@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{F3352630-A9F6-4D59-A54D-ECD92FD90FFC}</ProjectGuid>
+    <ProjectTypeGuids>{6BC8ED88-2882-458C-8E55-DFD12B67127B};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Lemon</RootNamespace>
+    <AssemblyName>Lemon</AssemblyName>
+    <BaseDirectory>..\..\Lemon</BaseDirectory>
+    <newfilesearch>OnLoadAutoInsert</newfilesearch>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Debug</OutputPath>
+    <DefineConstants>DEBUG;iOS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <DefineConstants>iOS</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="monotouch" />
+    <Reference Include="protobuf-net">
+      <HintPath>..\..\3rdParty\ProtoBuf-Net\iOS\protobuf-net.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Compile Include="..\..\Lemon\Animator.cs" />
+    <Compile Include="..\..\Lemon\AnimatorCollection.cs" />
+    <Compile Include="..\..\Lemon\AnimatorRegistry.cs" />
+    <Compile Include="..\..\Lemon\Audio.cs" />
+    <Compile Include="..\..\Lemon\Bone.cs" />
+    <Compile Include="..\..\Lemon\BoneArray.cs" />
+    <Compile Include="..\..\Lemon\Button.cs" />
+    <Compile Include="..\..\Lemon\DistortionMesh.cs" />
+    <Compile Include="..\..\Lemon\DistortionMeshPoint.cs" />
+    <Compile Include="..\..\Lemon\Frame.cs" />
+    <Compile Include="..\..\Lemon\Image.cs" />
+    <Compile Include="..\..\Lemon\ImageCombiner.cs" />
+    <Compile Include="..\..\Lemon\Marker.cs" />
+    <Compile Include="..\..\Lemon\MarkerCollection.cs" />
+    <Compile Include="..\..\Lemon\Node.cs" />
+    <Compile Include="..\..\Lemon\NodeCollection.cs" />
+    <Compile Include="..\..\Lemon\ParticleEmitter.cs" />
+    <Compile Include="..\..\Lemon\ParticleModifier.cs" />
+    <Compile Include="..\..\Lemon\ParticlesMagnet.cs" />
+    <Compile Include="..\..\Lemon\PointObject.cs" />
+    <Compile Include="..\..\Lemon\SimpleText.cs" />
+    <Compile Include="..\..\Lemon\Spline.cs" />
+    <Compile Include="..\..\Lemon\SplineGear.cs" />
+    <Compile Include="..\..\Lemon\SplinePoint.cs" />
+    <Compile Include="..\..\Lemon\UICoordinator.cs" />
+    <Compile Include="..\..\Lemon\Widget.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Lime.iOS\Lime.csproj">
+      <Project>{C64D4388-8411-4C0B-B1D8-846F4FAF7986}</Project>
+      <Name>Lime</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

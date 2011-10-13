@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C8AA9412-174E-4D60-8D2D-D062E090E63D}</ProjectGuid>
+    <ProjectTypeGuids>{948B3504-5B70-4649-8FE4-BDE1FB46EC69};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Orange</RootNamespace>
+    <AssemblyName>Orange</AssemblyName>
+    <BaseDirectory>..\..\Orange</BaseDirectory>
+    <newfilesearch>OnLoadAutoInsert</newfilesearch>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <ConsolePause>false</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="AfterBuild" command="/bin/cp -f ${TargetDir}/../${ProjectName} ${TargetDir}/${ProjectName}.app/Contents/MacOS" workingdir="${ProjectDir}" />
+      </CustomCommands>
+    </CustomCommands>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <ConsolePause>false</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="AfterBuild" command="/bin/cp -f ${TargetDir}/../${ProjectName} ${TargetDir}/${ProjectName}.app/Contents/MacOS" workingdir="${ProjectDir}" />
+      </CustomCommands>
+    </CustomCommands>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="MonoMac" />
+    <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="Mono.Posix" />
+    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="protobuf-net">
+      <HintPath>..\..\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Mono\MonoMac\v0.0\Mono.MonoMac.targets" />
+  <ItemGroup>
+    <Compile Include="..\..\Orange\AppConfig.cs" />
+    <Compile Include="..\..\Orange\AssemblyInfo.cs" />
+    <Compile Include="..\..\Orange\AssetsImporter.cs" />
+    <Compile Include="..\..\Orange\AtlasGenerator.cs" />
+    <Compile Include="..\..\Orange\Helpers.cs" />
+    <Compile Include="..\..\Orange\Main.cs" />
+    <Compile Include="..\..\Orange\MainDialog.cs" />
+    <Compile Include="..\..\Orange\RectAllocator.cs" />
+    <Compile Include="..\..\Orange\TextureCompressor.cs" />
+    <Compile Include="..\..\Orange\HotSource\FontImporter.cs" />
+    <Compile Include="..\..\Orange\HotSource\Lexer.cs" />
+    <Compile Include="..\..\Orange\HotSource\SceneImporter.Animators.cs" />
+    <Compile Include="..\..\Orange\HotSource\SceneImporter.cs" />
+    <Compile Include="..\..\Orange\gtk-gui\generated.cs" />
+    <Compile Include="..\..\Orange\gtk-gui\Orange.MainDialog.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Orange\NVTextureTools\OSX\libnvcore.dylib" />
+    <None Include="..\..\Orange\NVTextureTools\OSX\libnvimage.dylib" />
+    <None Include="..\..\Orange\NVTextureTools\OSX\libnvmath.dylib" />
+    <None Include="..\..\Orange\NVTextureTools\OSX\libnvtt.dylib" />
+    <None Include="..\..\Orange\NVTextureTools\OSX\nvcompress" />
+    <None Include="..\..\Orange\gtk-gui\gui.stetic" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Lemon.Mac\Lemon.csproj">
+      <Project>{1F2BF8B4-5F4C-42E4-BCE2-5BAD936AB565}</Project>
+      <Name>Lemon</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lime.Mac\Lime.csproj">
+      <Project>{07A38EE4-8603-4895-897B-1166C662F0AD}</Project>
+      <Name>Lime</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>
