@@ -83,6 +83,9 @@ namespace Orange
 					case "TexturePath":
 						propertyName = "Texture";
 						break;
+					case "Anchor":
+						propertyName = "Position";
+						break;
 					case "BlendMode":
 						propertyName = "Blending";
 						break;

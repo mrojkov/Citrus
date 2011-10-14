@@ -29,17 +29,17 @@ namespace Orange
 				bool exists = bundle.FileExists (path2);
 				if (!exists || File.GetLastWriteTime (path) > bundle.GetFileModificationTime (path2)) {
 					if (converter != null) {
+						Console.WriteLine ((exists ? "Updating: " : "Adding: ") + path2);
 						using (MemoryStream stream = new MemoryStream ()) {
 							if (converter (path1, stream)) {
 								stream.Seek (0, SeekOrigin.Begin);
-								bundle.ImportFile (path2, stream);
-								Console.WriteLine ((exists ? "Updated: " : "Added: ") + path2);
+								bundle.ImportFile (path2, stream);								
 							}
 						}
 					}
 					else {
- 						bundle.ImportFile (path1);
-						Console.WriteLine ((exists ? "Updated: " : "Added: ") + path1);
+ 						Console.WriteLine ((exists ? "Updating: " : "Adding: ") + path1);
+						bundle.ImportFile (path1);						
 					}
 				}
 			}

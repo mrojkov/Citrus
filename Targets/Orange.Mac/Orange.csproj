@@ -82,11 +82,6 @@
     <Compile Include="..\..\Orange\gtk-gui\Orange.MainDialog.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\Orange\NVTextureTools\OSX\libnvcore.dylib" />
-    <None Include="..\..\Orange\NVTextureTools\OSX\libnvimage.dylib" />
-    <None Include="..\..\Orange\NVTextureTools\OSX\libnvmath.dylib" />
-    <None Include="..\..\Orange\NVTextureTools\OSX\libnvtt.dylib" />
-    <None Include="..\..\Orange\NVTextureTools\OSX\nvcompress" />
     <None Include="..\..\Orange\gtk-gui\gui.stetic" />
   </ItemGroup>
   <ItemGroup>
