@@ -23,7 +23,7 @@ namespace Lemon
 			
 				PropertyInfo pi = Owner.GetType ().GetProperty (propertyName);
 				if (pi == null)
-					throw new RuntimeError ("Unknown property {0} in {1}", propertyName, Owner.GetType ().Name);
+					throw new Lime.Exception ("Unknown property {0} in {1}", propertyName, Owner.GetType ().Name);
 
 				var animator = AnimatorRegistry.Instance.CreateAnimator (pi.PropertyType);
 				animator.TargetProperty = propertyName;

@@ -21,7 +21,7 @@ namespace Lemon
 		{
 			Type animatorType;
 			if (!dict.TryGetValue (propertyType, out animatorType))
-				throw new RuntimeError ("Can't find animator type for property of {0}", propertyType.Name);
+				throw new Lime.Exception ("Can't find animator type for property of {0}", propertyType.Name);
 			var ctr = animatorType.GetConstructor (System.Type.EmptyTypes);
 			var animator = ctr.Invoke (new object[] {}) as Animator;
 			return animator;

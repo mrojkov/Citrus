@@ -228,11 +228,11 @@ namespace Lemon
 					return setter;
 				PropertyInfo pi = Owner.GetType ().GetProperty (TargetProperty);
 				if (pi == null)
-					throw new InternalError ("Property '{0}' doesn't exist for class '{1}'", TargetProperty, Owner.GetType ());
+					throw new Lime.Exception ("Property '{0}' doesn't exist for class '{1}'", TargetProperty, Owner.GetType ());
 
 				MethodInfo mi = pi.GetSetMethod ();
 				if (mi == null)
-					throw new InternalError ("Property '{0}' (class '{1}') is readonly", TargetProperty, Owner.GetType ());
+					throw new Lime.Exception ("Property '{0}' (class '{1}') is readonly", TargetProperty, Owner.GetType ());
 
 				setter = (Setter)Delegate.CreateDelegate (typeof(Setter), Owner, mi);
 				return setter;

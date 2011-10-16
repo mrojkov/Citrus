@@ -95,7 +95,7 @@ namespace Lemon
 		public static Node CreateFromBundle (string path)
 		{
 			if (processingFiles.Contains (path))
-				throw new RuntimeError ("Cyclic dependency of scenes has detected: {0}", path);
+				throw new Lime.Exception ("Cyclic dependency of scenes has detected: {0}", path);
 			Node node;
 			processingFiles.Add (path);
 			try {
@@ -202,7 +202,7 @@ namespace Lemon
 		public void SafeUpdate (int delta)
 		{
 			if (delta < 0)
-				throw new RuntimeError ("Update interval can not be negative");		
+				throw new Lime.Exception ("Update interval can not be negative");		
 			const int step = 1000 / WidgetUtils.FramesPerSecond - 1;
 			while (delta > step) {
 				Update (step);

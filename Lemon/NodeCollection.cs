@@ -75,7 +75,7 @@ namespace Lemon
 		{
 			T result = Find (id) as T;
 			if (result == null)
-				throw new RuntimeError (
+				throw new Lime.Exception (
                     String.Format ("Node '{0}' (of type: {1}) not found in '{2}' (type: {3})", 
                     id, typeof(T), Owner.Id, Owner.GetType ()));
 			return result;

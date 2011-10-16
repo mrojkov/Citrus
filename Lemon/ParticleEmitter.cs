@@ -521,7 +521,7 @@ namespace Lemon
 				p.RegularDirection = Direction.UniformRandomNumber () + emitterAngle - 90.0f;
 				break;
 			default:
-				throw new RuntimeError ("Unknown emitter shape");
+				throw new Lime.Exception ("Unknown emitter shape");
 			}
 
 			p.RegularPosition = transform.TransformVector (position);
