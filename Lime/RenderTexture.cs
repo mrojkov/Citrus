@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 #if iOS
 using OpenTK.Graphics.ES20;
@@ -40,7 +40,7 @@ namespace Lime
 			GL.BindFramebuffer (FramebufferTarget.FramebufferExt, framebuffer);
 			GL.FramebufferTexture2D (FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0Ext, TextureTarget.Texture2D, id, 0);
 			if (GL.CheckFramebufferStatus (FramebufferTarget.FramebufferExt) != FramebufferErrorCode.FramebufferCompleteExt)
-				throw new RuntimeError ("Failed to create render texture. Framebuffer is incomplete.");
+				throw new Exception ("Failed to create render texture. Framebuffer is incomplete.");
 			GL.BindFramebuffer (FramebufferTarget.FramebufferExt, 0);
 #endif
 		}

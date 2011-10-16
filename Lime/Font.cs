@@ -5,18 +5,18 @@ using ProtoBuf;
 
 namespace Lime
 {
-    [ProtoContract]
+	[ProtoContract]
 	public class Font
 	{
-        [ProtoMember(1)]
+		[ProtoMember(1)]
 		public PersistentTexture Texture = new PersistentTexture ();
-        [ProtoMember(2)]
+		[ProtoMember(2)]
 		public readonly FontCharCollection Chars = new FontCharCollection ();
-        [ProtoMember(3)]
+		[ProtoMember(3)]
 		public readonly FontPairCollection Pairs = new FontPairCollection ();
 	}
 
-    [ProtoContract]
+	[ProtoContract]
 	public class FontCharCollection : ICollection<FontChar>
 	{
 		[ProtoMember(1)]
@@ -77,36 +77,35 @@ namespace Lime
 		}
 	}
 
-    [ProtoContract]
+	[ProtoContract]
 	public struct FontChar
 	{
-        [ProtoMember(1)]
+		[ProtoMember(1)]
 		public uint Code;
-        [ProtoMember(2)]
+		[ProtoMember(2)]
 		public Vector2 Position;
-        [ProtoMember(3)]
+		[ProtoMember(3)]
 		public Vector2 Size;
-        [ProtoMember(4)]
+		[ProtoMember(4)]
 		public Vector2 ACWidths;
 	}
 
-    [ProtoContract]
+	[ProtoContract]
 	public struct FontPair
 	{
-        [ProtoMember(1)]
+		[ProtoMember(1)]
 		public uint Code1;
-        [ProtoMember(2)]
+		[ProtoMember(2)]
 		public uint Code2;
-        [ProtoMember(3)]
+		[ProtoMember(3)]
 		public float Delta;
 	}
 
-    [ProtoContract]
+	[ProtoContract]
 	public class FontPairCollection : ICollection<FontPair>
 	{
 		[ProtoMember(1)]
 		List<FontPair> pairList = new List<FontPair> ();
-		
 		[ProtoMember(2)]
 		Dictionary<uint, float> pairDic = new Dictionary<uint, float> ();
 

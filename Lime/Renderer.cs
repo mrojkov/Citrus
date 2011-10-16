@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 #if iOS
 using OpenTK;
 using OpenTK.Graphics;
@@ -162,7 +162,7 @@ namespace Lime
 				errCode = GL.GetError ();
 			}
 #endif
-			throw new RuntimeError ("OpenGL errors have occurred: " + errors);
+			throw new Exception ("OpenGL errors have occurred: " + errors);
 #endif			
 		}
 		

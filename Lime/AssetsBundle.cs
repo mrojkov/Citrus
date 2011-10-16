@@ -9,7 +9,7 @@ namespace Lime
 		public DateTime Time;
 		public Int32 Offset;
 		public Int32 Length;
-		public Int32 Space;
+		public Int32 AllocatedSize;
 	}
     	
 	public class AssetStream : Stream
@@ -21,8 +21,8 @@ namespace Lime
 		public AssetStream (AssetsBundle bundle, string path)
 		{
 			this.bundle = bundle;
-			if (!bundle.indexTable.TryGetValue (path, out descriptor)) {
-				throw new RuntimeError ("Can't open asset: {0}", path);
+			if (!bundle.index.TryGetValue (path, out descriptor)) {
+				throw new Exception ("Can't open asset: {0}", path);
 			}
 		}
 		
@@ -65,6 +65,8 @@ namespace Lime
 		
 		public override int Read (byte[] buffer, int offset, int count)
 		{
+			// Note: in order to get fast async access to the bundle we should use
+			// different IO streams, instead of locking.
 			lock (bundle) {
 				bundle.stream.Seek (position + descriptor.Offset, SeekOrigin.Begin);
 				count = Math.Min (count, descriptor.Length - position);
@@ -87,7 +89,7 @@ namespace Lime
 			} else {
 				position = descriptor.Length - (Int32)offset;
 			}
-			position = Math.Max(0, Math.Min ((Int32)offset, descriptor.Length));
+			position = Math.Max (0, Math.Min ((Int32)offset, descriptor.Length));
 			return position;
 		}
 
@@ -109,12 +111,15 @@ namespace Lime
 	
 	public class AssetsBundle : IAssetsSource, IDisposable
 	{	
-		static readonly AssetsBundle instance = new AssetsBundle();
+		static readonly AssetsBundle instance = new AssetsBundle ();
+
 		public static AssetsBundle Instance { get { return instance; } }
         
-		AssetsBundle () {}
+		AssetsBundle ()
+		{
+		}
 		
-		public AssetsBundle (string path, bool forWriting) 
+		public AssetsBundle (string path, bool forWriting)
 		{
 			Open (path, forWriting);
 		}
@@ -132,8 +137,50 @@ namespace Lime
 			ReadIndexTable ();
 		}
 		
+		private void MoveBlock (int offset, int size, int delta)
+		{
+			if (delta > 0) {
+				throw new NotImplementedException ();
+			}
+			byte[] buffer = new byte [4096];
+			while (size > 0) {
+				stream.Seek (offset, SeekOrigin.Begin);
+				int readCount = stream.Read (buffer, 0, Math.Min (size, buffer.Length));
+				stream.Seek (offset + delta, SeekOrigin.Begin);
+				stream.Write (buffer, 0, readCount);
+				size -= readCount;
+				offset += readCount;
+			}
+		}
+		
+		public void CleanupBundle ()
+		{
+			trash.Sort ((x, y) => {
+				return x.Offset - y.Offset; });
+			int moveDelta = 0;
+			var indexKeys = new string [index.Keys.Count]; 
+			index.Keys.CopyTo (indexKeys, 0);
+			for (int i = 0; i < trash.Count; i++) {
+				moveDelta += trash [i].AllocatedSize;
+				int blockBegin = trash [i].Offset + trash [i].AllocatedSize;
+				int blockEnd = (i < trash.Count - 1) ? trash [i + 1].Offset : indexOffset;
+				MoveBlock (blockBegin, blockEnd - blockBegin, -moveDelta);
+				foreach (var k in indexKeys) {
+					var d = index [k];
+					if (d.Offset >= blockBegin && d.Offset < blockEnd) {
+						d.Offset -= moveDelta;
+						index [k] = d;
+					}
+				}
+			}
+			trash.Clear ();
+			indexOffset -= moveDelta;
+			stream.SetLength (stream.Length - moveDelta);
+		}
+		
 		public void Close ()
 		{
+			CleanupBundle ();
 			if (writer != null) {
 				WriteIndexTable ();
 				writer.Close ();
@@ -145,14 +192,14 @@ namespace Lime
 			reader = null;
 			writer = null;
 			stream = null;
-			indexTable.Clear ();
+			index.Clear ();
 		}
 		
 		void IDisposable.Dispose ()
 		{
 			Close ();
 		}
-
+		
 		public Stream OpenFile (string path)
 		{
 			Stream stream = new AssetStream (this, path);
@@ -162,95 +209,92 @@ namespace Lime
 		public DateTime GetFileModificationTime (string path)
 		{
 			AssetDescriptor desc;
-			if (indexTable.TryGetValue (path, out desc)) {
+			if (index.TryGetValue (path, out desc)) {
 				return desc.Time;
 			}
-			throw new RuntimeError ("Asset '{0}' doesn't exist", path);
+			throw new Exception ("Asset '{0}' doesn't exist", path);
 		}
 		
 		public void RemoveFile (string path)
 		{
-			indexTable.Remove (path);
+			AssetDescriptor desc;
+			if (!index.TryGetValue (path, out desc)) {
+				throw new Exception ("Asset '{0}' doesn't exist", path);
+			}
+			index.Remove (path);
+			trash.Add (desc);
 		}
 		
 		public bool FileExists (string path)
 		{
-			return indexTable.ContainsKey (path);
+			return index.ContainsKey (path);
 		}
 
 		public bool FileExists (string path, string extension)
 		{
-			return indexTable.ContainsKey (System.IO.Path.ChangeExtension (path, extension));
-		}
-		
-		public void ImportFile (string path, Stream stream)
-		{
-			byte[] buffer = new byte [stream.Length];
-			int read = stream.Read (buffer, 0, (int)stream.Length);
-			if (read != stream.Length) {
-				throw new RuntimeError ("File read failure: {0}", path);
-			}
-			AssetDescriptor d;
-			if (!indexTable.TryGetValue (path, out d) || (d.Space < buffer.Length)) {
-				int tailSize = Math.Max (MinExtraBytes, buffer.Length * ExtraBytesPercent / 100);
-				d = new AssetDescriptor();
-				d.Time = DateTime.Now;
-				d.Length = buffer.Length;
-				d.Offset = indexTableOffset;
-				d.Space = d.Length + tailSize;
-				indexTable [path] = d;
-				indexTableOffset += d.Space;
-				this.stream.Seek (d.Offset, SeekOrigin.Begin);
-				this.stream.Write (buffer, 0, buffer.Length);
-				byte[] zeroBytes = new byte [tailSize];
-				this.stream.Write (zeroBytes, 0, zeroBytes.Length);
-			} else {
-				d.Length = buffer.Length;
-				d.Time = DateTime.Now;
-				indexTable [path] = d;
-				this.stream.Seek (d.Offset, SeekOrigin.Begin);
-				this.stream.Write (buffer, 0, buffer.Length);
-				int tailSize = d.Space - buffer.Length;
-				if (tailSize > 0) {
-					byte[] zeroBytes = new byte [tailSize];
-					this.stream.Write (zeroBytes, 0, zeroBytes.Length);
-				}
-			}			
+			return index.ContainsKey (System.IO.Path.ChangeExtension (path, extension));
 		}
 
-		public void ImportFile (string path)
+		public void ImportFile (string path, Stream stream, int reserve)
 		{
-			using (Stream stream = File.Open (path, FileMode.Open, FileAccess.Read)) {
-				ImportFile (path, stream);
+			AssetDescriptor d;
+			bool reuseExistingDescriptor = index.TryGetValue (path, out d) && 
+				(d.AllocatedSize >= stream.Length) && 
+				(d.AllocatedSize <= stream.Length + reserve);
+			if (reuseExistingDescriptor) {
+				d.Length = (int)stream.Length;
+				d.Time = DateTime.Now;
+				index [path] = d;
+				this.stream.Seek (d.Offset, SeekOrigin.Begin);
+				stream.CopyTo (this.stream);
+				reserve = d.AllocatedSize - (int)stream.Length;
+				if (reserve > 0) {
+					byte[] zeroBytes = new byte [reserve];
+					this.stream.Write (zeroBytes, 0, zeroBytes.Length);
+				}
+			} else {
+				if (FileExists (path))
+					RemoveFile (path);
+				d = new AssetDescriptor ();
+				d.Time = DateTime.Now;
+				d.Length = (int)stream.Length;
+				d.Offset = indexOffset;
+				d.AllocatedSize = d.Length + reserve;
+				index [path] = d;
+				indexOffset += d.AllocatedSize;
+				this.stream.Seek (d.Offset, SeekOrigin.Begin);
+				stream.CopyTo (this.stream);
+				byte[] zeroBytes = new byte [reserve];
+				this.stream.Write (zeroBytes, 0, zeroBytes.Length);
 			}
 		}
-       	
+
 		private void ReadIndexTable ()
 		{
-			if (stream.Length == 0)	{
-				indexTableOffset = sizeof (Int32) * 3;
-				indexTable.Clear ();
+			if (stream.Length == 0) {
+				indexOffset = sizeof(Int32) * 3;
+				index.Clear ();
 				return;
 			}
 			stream.Seek (0, SeekOrigin.Begin);
 			var signature = reader.ReadInt32 ();
 			if (signature != Signature) {
-				throw new RuntimeError ("Assets bundle has been corrupted");
+				throw new Exception ("Assets bundle has been corrupted");
 			}
 			reader.ReadInt32 (); // reserved field
-			indexTableOffset = reader.ReadInt32 ();
+			indexOffset = reader.ReadInt32 ();
 
-			stream.Seek (indexTableOffset, SeekOrigin.Begin);
+			stream.Seek (indexOffset, SeekOrigin.Begin);
 			int numDescriptors = reader.ReadInt32 ();
-			indexTable.Clear ();
+			index.Clear ();
 			for (int i = 0; i < numDescriptors; i++) {
 				var desc = new AssetDescriptor ();
 				string name = reader.ReadString ();
 				desc.Time = DateTime.FromBinary (reader.ReadInt64 ());
 				desc.Offset = reader.ReadInt32 ();
 				desc.Length = reader.ReadInt32 ();
-				desc.Space = reader.ReadInt32 ();
-				indexTable.Add (name, desc);
+				desc.AllocatedSize = reader.ReadInt32 ();
+				index.Add (name, desc);
 			}
 		}
 
@@ -259,36 +303,30 @@ namespace Lime
 			stream.Seek (0, SeekOrigin.Begin);
 			writer.Write (Signature);
 			writer.Write (0);
-			writer.Write (indexTableOffset);
-			stream.Seek (indexTableOffset, SeekOrigin.Begin);
-			Int32 numDescriptors = indexTable.Count;
+			writer.Write (indexOffset);
+			stream.Seek (indexOffset, SeekOrigin.Begin);
+			Int32 numDescriptors = index.Count;
 			writer.Write (numDescriptors);
-			foreach (KeyValuePair <string, AssetDescriptor> p in indexTable) {
+			foreach (KeyValuePair <string, AssetDescriptor> p in index) {
 				writer.Write (p.Key);
 				writer.Write ((Int64)p.Value.Time.ToBinary ());
 				writer.Write (p.Value.Offset);
 				writer.Write (p.Value.Length);
-				writer.Write (p.Value.Space);
+				writer.Write (p.Value.AllocatedSize);
 			}
 		}
 		
 		public ICollection<string> EnumerateFiles ()
 		{			
-			return indexTable.Keys;
+			return index.Keys;
 		}
 
 		const Int32 Signature = 0x13AF;
-		public Int32 indexTableOffset;
-		
-		// Actually we store additinal bytes after file end. Its neccessary in case if file size grew after update.
-		// The formula for calculating additional bytes is: ExtraBytes = Max(MinExtraBytes, (FileSize * ExtraBytesPercent) / 100)
-		const int ExtraBytesPercent = 10;
-		const int MinExtraBytes = 50;
-		
+		private Int32 indexOffset;
 		private BinaryReader reader;
 		private BinaryWriter writer;
 		internal FileStream stream;
-		internal Dictionary <string, AssetDescriptor> indexTable = new Dictionary<string, AssetDescriptor> ();
-
+		internal Dictionary <string, AssetDescriptor> index = new Dictionary<string, AssetDescriptor> ();
+		private List<AssetDescriptor> trash = new List<AssetDescriptor> ();
 	}
 }

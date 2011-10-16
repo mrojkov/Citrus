@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 #if iOS
@@ -75,7 +75,7 @@ namespace Lime
 				(info == CGImageAlphaInfo.First);
 			
 			if (image.ColorSpace == null)
-				throw new RuntimeError ("Unsupported image format");
+				throw new Exception ("Unsupported image format");
 
 			imgSize = new Size (image.Width, image.Height);
 			CGAffineTransform transform = CGAffineTransform.MakeIdentity ();
@@ -94,10 +94,10 @@ namespace Lime
 			using (CGColorSpace colorSpace = CGColorSpace.CreateDeviceRGB ()) {
 				if (hasAlpha) {
 					byte[] pixels = new byte [surSize.Height * surSize.Width * 4];
-					using (var context = new CGBitmapContext (pixels, 
-							surSize.Width, surSize.Height, 8, 4 * surSize.Width, 
-							colorSpace, CGImageAlphaInfo.PremultipliedLast)) {
-						
+					var context = new CGBitmapContext (pixels, 
+						surSize.Width, surSize.Height, 8, 4 * surSize.Width, 
+						colorSpace, CGImageAlphaInfo.PremultipliedLast);
+					using (context) {
 						context.ClearRect (new RectangleF (0, 0, surSize.Width, surSize.Height));
 						context.TranslateCTM (0, surSize.Height - imgSize.Height);
 						
@@ -126,10 +126,10 @@ namespace Lime
 					}
 				} else {
 					byte[] pixels = new byte [surSize.Height * surSize.Width * 4];
-					using (var context = new CGBitmapContext (pixels, 
-							surSize.Width, surSize.Height, 8, 4 * surSize.Width, 
-							colorSpace, CGImageAlphaInfo.NoneSkipLast)) {
-
+					var context = new CGBitmapContext (pixels, 
+						surSize.Width, surSize.Height, 8, 4 * surSize.Width, 
+						colorSpace, CGImageAlphaInfo.NoneSkipLast);
+					using (context) {
 						context.ClearRect (new RectangleF (0, 0, surSize.Width, surSize.Height));
 						context.TranslateCTM (0, surSize.Height - imgSize.Height);
 						
@@ -190,7 +190,7 @@ namespace Lime
 				int length = (int)stream.Length;
 				byte[] buffer = new byte [length];
 				if (stream.Read (buffer, 0, length) != length)
-					throw new RuntimeError ("Unable to read stream");
+					throw new Exception ("Unable to read stream");
 
 				CGDataProvider provider = new CGDataProvider (buffer, 0, length);
 				using (CGImage img = CGImage.FromPNG (provider, null, false, CGColorRenderingIntent.Default)) {
@@ -199,12 +199,18 @@ namespace Lime
 			} else if (sign [0] == 'R' && sign [1] == 'A' && sign [2] == 'W' && sign [3] == ' ') {
 				using (BinaryReader reader = new BinaryReader (stream)) {
 					imgSize = new Size (reader.ReadInt32 (), reader.ReadInt32 ());
-					surSize = new Size (reader.ReadInt32 (), reader.ReadInt32 ());
+					reader.ReadInt32 (); // surface width
+					reader.ReadInt32 (); // surface height
 					BitmapFormat format = (BitmapFormat)reader.ReadInt32();
-					byte [] buffer = reader.ReadBytes (reader.ReadInt32 ());
-					if (surSize.Width != Utils.NearestPowerOf2 (surSize.Width) ||
-						surSize.Height != Utils.NearestPowerOf2 (surSize.Height)) {
-						throw new RuntimeError ("Texture surface size must be power of 2");
+					reader.ReadInt32 (); // image size in bytes
+					int bytesPerPixel = 4;
+					if (format == BitmapFormat.R5G6B5 || format == BitmapFormat.RGBA4)
+						bytesPerPixel = 2;
+					surSize.Width = Utils.NearestPowerOf2 (imgSize.Width);
+					surSize.Height = Utils.NearestPowerOf2 (imgSize.Height);
+					byte[] buffer = new byte [surSize.Width * surSize.Height * bytesPerPixel];
+					for (int i = 0; i < imgSize.Height; i++) {
+						reader.Read (buffer, i * surSize.Width * bytesPerPixel, imgSize.Width * bytesPerPixel);
 					}
 					switch (format)
 					{
@@ -233,7 +239,6 @@ namespace Lime
 				}
 			}
 			Renderer.Instance.CheckErrors ();
-
 #else
 			// Discards current texture.
 			Dispose ();
