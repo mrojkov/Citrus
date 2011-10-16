@@ -112,7 +112,7 @@ namespace Orange
 				Assembly gameAssembly = Assembly.LoadFile (GameAssemblyChooser.Filename);
 				Type gameWidgets = gameAssembly.GetType ("SerializationSupport");
 				if (gameWidgets == null) {
-					throw new RuntimeError ("Class 'SerializationSupport' not found in assembly {0}", gameAssembly);
+					throw new Lime.Exception ("Class 'SerializationSupport' not found in assembly {0}", gameAssembly);
 				}					
 				MethodInfo mi = gameWidgets.GetMethod ("SetupTypes");
 				mi.Invoke (null, new object [] {model});
@@ -120,7 +120,7 @@ namespace Orange
 			model.CompileInPlace ();
 		}
 		
-		private void RunBuild ()
+		private void RunBuild (bool rebuild)
 		{
 			SaveState ();
 			try	{
@@ -134,28 +134,41 @@ namespace Orange
 				// Update texture atlases
 				UpdateTextureAtlases (AssetsFolderChooser.CurrentFolder);				
 				// Main assets processing
-				AssetsImporter.ProcessDirectory (AssetsFolderChooser.CurrentFolder);
+				AssetsImporter.ProcessDirectory (AssetsFolderChooser.CurrentFolder, rebuild);
 				System.DateTime endTime = System.DateTime.Now;
 				System.TimeSpan delta = endTime - startTime;
-				// Update serialization assembly
-				
+				// Update serialization assembly	
 				GenerateSerializerDll (model, System.IO.Path.Combine (AssetsFolderChooser.CurrentFolder, ".."));
 				// Show time statistics
 				Console.WriteLine ("Done at " + endTime.ToLongTimeString());
 				Console.WriteLine ("Building time {0}:{1}:{2}", delta.Hours, delta.Minutes, delta.Seconds);
 				CompileLog.ScrollToIter (CompileLog.Buffer.EndIter, 0, false, 0, 0);				
 			}
-			catch (Exception exc) {
+			catch (System.Exception exc) {
 				Console.WriteLine("Exception: " + exc.Message);
 			}				
 		}
 		
 		protected void OnBuildClicked (object sender, System.EventArgs e)
 		{
+			RebuildButton.Sensitive = false;
 			BuildButton.Sensitive = false;
 			try {
-				RunBuild ();
+				RunBuild (false);
 			} finally {
+				RebuildButton.Sensitive = true;
+				BuildButton.Sensitive = true;
+			}
+		}
+
+		protected void OnRebuildButtonClicked (object sender, System.EventArgs e)
+		{
+			RebuildButton.Sensitive = false;
+			BuildButton.Sensitive = false;
+			try {	
+				RunBuild (true);
+			} finally {
+				RebuildButton.Sensitive = true;
 				BuildButton.Sensitive = true;
 			}
 		}

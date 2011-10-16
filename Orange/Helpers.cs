@@ -6,6 +6,15 @@ namespace Orange
 {
 	public static class Helpers
 	{
+		public static string RemovePathPrefix (string path)
+		{
+			if (path.StartsWith ("./")) {
+				path = path.Remove (0, 2);
+			}
+			return path;
+		}
+						
+
 		public static bool IsPathHidden (string path)
 		{
 			if (path == ".") {

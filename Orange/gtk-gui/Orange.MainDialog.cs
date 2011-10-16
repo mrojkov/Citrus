@@ -15,6 +15,7 @@ namespace Orange
 		private global::Gtk.ScrolledWindow GtkScrolledWindow;
 		private global::Gtk.TextView CompileLog;
 		private global::Gtk.Button BuildButton;
+		private global::Gtk.Button RebuildButton;
 		
 		protected virtual void Build ()
 		{
@@ -140,6 +141,17 @@ namespace Orange
 			global::Gtk.ButtonBox.ButtonBoxChild w13 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w12 [this.BuildButton]));
 			w13.Expand = false;
 			w13.Fill = false;
+			// Container child dialog1_ActionArea.Gtk.ButtonBox+ButtonBoxChild
+			this.RebuildButton = new global::Gtk.Button ();
+			this.RebuildButton.CanFocus = true;
+			this.RebuildButton.Name = "RebuildButton";
+			this.RebuildButton.UseUnderline = true;
+			this.RebuildButton.Label = global::Mono.Unix.Catalog.GetString ("Rebuild");
+			w12.Add (this.RebuildButton);
+			global::Gtk.ButtonBox.ButtonBoxChild w14 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w12 [this.RebuildButton]));
+			w14.Position = 1;
+			w14.Expand = false;
+			w14.Fill = false;
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
@@ -148,6 +160,7 @@ namespace Orange
 			this.BuildButton.HasDefault = true;
 			this.Show ();
 			this.BuildButton.Clicked += new global::System.EventHandler (this.OnBuildClicked);
+			this.RebuildButton.Clicked += new global::System.EventHandler (this.OnRebuildButtonClicked);
 		}
 	}
 }

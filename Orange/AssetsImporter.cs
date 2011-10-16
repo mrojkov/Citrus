@@ -10,18 +10,12 @@ namespace Orange
 	{
 		public delegate bool Converter (string path, Stream output);
 		
-		private static string GetAssetPath (string path)
-		{
-			string path1 = path.Remove (0, 2); // './'
-			return path1;
-		}
-						
-		private static void SyncUpdated (string mask, string convertedFileExtension, Converter converter)
+		private static void SyncUpdated (string mask, string convertedFileExtension, int reservePercentage, Converter converter)
 		{
 			AssetsBundle bundle = AssetsBundle.Instance;
 			List<string> files = Helpers.GetAllFiles (".", mask);
 			foreach (string path in files) {
-				string path1 = GetAssetPath (path);
+				string path1 = Helpers.RemovePathPrefix (path);
 				string path2 = path1;
 				if (convertedFileExtension != "") {
 					path2 = Path.ChangeExtension (path2, convertedFileExtension);
@@ -29,17 +23,26 @@ namespace Orange
 				bool exists = bundle.FileExists (path2);
 				if (!exists || File.GetLastWriteTime (path) > bundle.GetFileModificationTime (path2)) {
 					if (converter != null) {
-						Console.WriteLine ((exists ? "Updating: " : "Adding: ") + path2);
 						using (MemoryStream stream = new MemoryStream ()) {
-							if (converter (path1, stream)) {
-								stream.Seek (0, SeekOrigin.Begin);
-								bundle.ImportFile (path2, stream);								
+							try {
+								if (converter (path1, stream)) {
+									stream.Seek (0, SeekOrigin.Begin);
+									int reserve = (int)stream.Length * reservePercentage / 100;
+									Console.WriteLine ((exists ? "* " : "+ ") + path2);
+									bundle.ImportFile (path2, stream, reserve);
+								}
+							} catch (System.Exception) {
+								Console.WriteLine ("An exception has caught while processing '{0}'", path1);
+								throw;
 							}
 						}
 					}
 					else {
- 						Console.WriteLine ((exists ? "Updating: " : "Adding: ") + path1);
-						bundle.ImportFile (path1);						
+ 						Console.WriteLine ((exists ? "* " : "+ ") + path1);
+						using (Stream stream = File.Open (path, FileMode.Open, FileAccess.Read)) {
+							int reserve = (int)stream.Length * reservePercentage / 100;
+							bundle.ImportFile (path2, stream, reserve);
+						}
 					}
 				}
 			}
@@ -53,58 +56,81 @@ namespace Orange
 				assets.Add (path);
 			}
 			foreach (string path in assets) {
-				string path1 = "./" + path;
+				string path1 = Path.Combine (".", path);
 				string ext;
 				if (extensionsMap.TryGetValue (Path.GetExtension (path1), out ext)) {
 					path1 = Path.ChangeExtension (path1, ext);
 				}
 				if (!File.Exists (path1)) {
+					Console.WriteLine ("- " + path);
 					bundle.RemoveFile (path);
-					Console.WriteLine ("Deleted: " + path);
 				}
 			}	
 		}
 	
-		public static void ProcessCurrentDirectory ()
+		public static void ProcessCurrentDirectory (bool rebuild)
 		{
-			AssetsBundle.Instance.Open ("../Assets.dat", true);
-			SyncUpdated ("*.png", ".raw", (path, output) => {
-					if (File.Exists (Path.ChangeExtension (path, ".texture"))) {
-						// No need to import this image since it is a part of texture atlas
-						return false;	
-					}					
-					TextureCompressor.CompressTexture (path, output);
-					return true;
-				}
-			);
-			SyncUpdated ("*.xml", "", null);
-			SyncUpdated ("*.texture", "", null);
-			SyncUpdated ("*.fnt", ".fnt", (path, output) => {
-                    var importer = new FontImporter (path);
-			        var font = importer.ParseFont ();
-					Serialization.WriteObject<Font> (path, output, font);
-					return true;
-				}
-			);
-			SyncUpdated ("*.scene", ".scene", (path, output) => {
-                    var importer = new SceneImporter (path);
-			        var scene = importer.ParseNode ();
-					Serialization.WriteObject<Node> (path, output, scene);
-					return true;
-				}
-			);
-			var map = new Dictionary <string, string> ();
-			map [".raw"] = ".png";
-			SyncDeleted (map);
-			AssetsBundle.Instance.Close ();
+			string bundlePath = Path.Combine ("..", "Assets.dat");
+			if (rebuild) {
+				File.Delete (bundlePath);
+			}
+			AssetsBundle.Instance.Open (bundlePath, true);
+			try {
+				SyncUpdated ("*.png", ".raw", 0, (path, output) => {
+						string texturePath = Path.Combine (".", Path.ChangeExtension (path, ".texture"));
+						if (File.Exists (texturePath)) {
+							// No need to import this image since it is a part of texture atlas.
+							// Delete texture from bundle if any exists.
+							return false;
+						}
+						TextureCompressor.CompressTexture (path, output);
+						return true;
+					}
+				);
+				SyncUpdated ("*.xml", "", 10, null);
+				SyncUpdated ("*.texture", "", 10, (path, output) => {
+						string imgPath = Path.ChangeExtension (path, ".raw");
+						// No need to import this image since it is a part of texture atlas.
+						// Delete texture from bundle if any exists.
+						if (AssetsBundle.Instance.FileExists (imgPath)) {
+							Console.WriteLine ("- " + imgPath);
+							AssetsBundle.Instance.RemoveFile (imgPath);
+						}
+						var s = new FileStream (path, FileMode.Open);
+						s.CopyTo (output);	
+						return true;
+					}
+				);
+				SyncUpdated ("*.fnt", ".fnt", 10, (path, output) => {
+	                    var importer = new FontImporter (path);
+				        var font = importer.ParseFont ();
+						Serialization.WriteObject<Font> (path, output, font);
+						return true;
+					}
+				);
+				SyncUpdated ("*.scene", ".scene", 10, (path, output) => {
+	                    var importer = new SceneImporter (path);
+				        var scene = importer.ParseNode ();
+						var t = scene.GetType ();
+						Serialization.WriteObject<Node> (path, output, scene);
+						return true;
+					}
+				);
+				var map = new Dictionary <string, string> ();
+				map [".raw"] = ".png";
+				SyncDeleted (map);
+			} finally {
+				Console.WriteLine ("Clean bundle up");
+				AssetsBundle.Instance.Close ();
+			}
 		}
 		
-		public static void ProcessDirectory (string directory)
+		public static void ProcessDirectory (string directory, bool rebuild)
 		{
 			string currentDirectory = System.IO.Directory.GetCurrentDirectory ();
 			try {
 				System.IO.Directory.SetCurrentDirectory (directory);
-				ProcessCurrentDirectory ();
+				ProcessCurrentDirectory (rebuild);
 			} finally {
 				System.IO.Directory.SetCurrentDirectory (currentDirectory);
 			}

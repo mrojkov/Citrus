@@ -36,7 +36,7 @@ namespace Orange
 				fontChar.ACWidths = lexer.ParseVector2 ();
 				break;
 			default:
-				throw new RuntimeError ("Unknown property '{0}'. Parsing: {1}", name, fontChar);
+				throw new Exception ("Unknown property '{0}'. Parsing: {1}", name, fontChar);
 			}
 		}
 
@@ -44,7 +44,7 @@ namespace Orange
 		{
 			string type = lexer.ParseQuotedString ();
 			if (type != "Hot::FontChar")
-				throw new RuntimeError ("Unknown type of object '{0}'", type);
+				throw new Exception ("Unknown type of object '{0}'", type);
 			var fontChar = new FontChar ();
 			lexer.ParseToken ('{');
 			while (lexer.PeekChar() != '}')
@@ -66,7 +66,7 @@ namespace Orange
 				fontCharPair.Delta = lexer.ParseFloat ();
 				break;
 			default:
-				throw new RuntimeError ("Unknown property '{0}'. Parsing: {1}", name, fontCharPair);
+				throw new Exception ("Unknown property '{0}'. Parsing: {1}", name, fontCharPair);
 			}
 		}
 
@@ -74,7 +74,7 @@ namespace Orange
 		{
 			string type = lexer.ParseQuotedString ();
 			if (type != "Hot::FontCharPair")
-				throw new RuntimeError ("Unknown type of object '{0}'", type);
+				throw new Exception ("Unknown type of object '{0}'", type);
 			var fontCharPair = new FontPair ();
 			lexer.ParseToken ('{');
 			while (lexer.PeekChar() != '}')
@@ -99,7 +99,7 @@ namespace Orange
 				lexer.ParseToken (']');
 				break;
 			default:
-				throw new RuntimeError ("Unknown property '{0}'. Parsing: {1}", name, font);
+				throw new Exception ("Unknown property '{0}'. Parsing: {1}", name, font);
 			}
 		}
 
@@ -107,7 +107,7 @@ namespace Orange
 		{
 			string type = lexer.ParseQuotedString ();
 			if (type != "Hot::Font")
-				throw new RuntimeError ("Unknown type of object '{0}'", type);
+				throw new Exception ("Unknown type of object '{0}'", type);
 			var font = new Font ();
 			lexer.ParseToken ('{');
 			while (lexer.PeekChar() != '}')

@@ -61,12 +61,12 @@ namespace Orange
 			SkipWhitespace ();
 			char quote = PeekChar ();
 			if (quote != '\'' && quote != '\"')
-				throw new RuntimeError ("Illegal symbol found near quoted string");
+				throw new Lime.Exception ("Illegal symbol found near quoted string");
 			ReadByte ();
 			string result = "";
 			while (true) {
 				if (PeekByte () < 0)
-					throw new RuntimeError ("Unterminated string");
+					throw new Lime.Exception ("Unterminated string");
 				if (PeekByte () == quote) {
 					ReadByte ();
 					break;
@@ -93,10 +93,10 @@ namespace Orange
 						result += '\'';
 						break;
 					default:
-						throw new RuntimeError ("Invalid escape sequence");
+						throw new Lime.Exception ("Invalid escape sequence");
 					}
 				} else if (PeekByte () == '\n')
-					throw new RuntimeError ("Illegal EOL found inside quoted string");
+					throw new Lime.Exception ("Illegal EOL found inside quoted string");
 				else
 					result += (char)ReadByte ();
 			}
@@ -121,7 +121,7 @@ namespace Orange
 		{
 			SkipWhitespace ();
 			if (ReadByte () != '0' || ReadByte () != 'x')
-				throw new RuntimeError ("Incorrect hexadecimal number format");
+				throw new Lime.Exception ("Incorrect hexadecimal number format");
 			int p = position;
 			while (true) {
 				char c = Char.ToUpper ((char)PeekByte ());
@@ -146,7 +146,7 @@ namespace Orange
 				return true;
 			if (word == "false" || word == "0")
 				return false;
-			throw new RuntimeError ("Incorrect boolean value format");
+			throw new Lime.Exception ("Incorrect boolean value format");
 		}
 
 		public string ParseWord ()
@@ -170,7 +170,7 @@ namespace Orange
 		{
 			SkipWhitespace ();
 			if (ReadByte () != token)
-				throw new RuntimeError ("Couldn't get expected '{0}'", token);
+				throw new Lime.Exception ("Couldn't get expected '{0}'", token);
 		}
 
 		public void ParseExpectedToken (string token)
@@ -178,7 +178,7 @@ namespace Orange
 			SkipWhitespace ();
 			for (int i = 0; i < token.Length; ++i)
 				if (ReadByte () != token [i])
-					throw new RuntimeError ("Couldn't get expected '{0}'", token);
+					throw new Lime.Exception ("Couldn't get expected '{0}'", token);
 		}
 
 		public string PeekString ()
@@ -195,7 +195,7 @@ namespace Orange
 			SkipWhitespace ();
 			int ch = ReadByte ();
 			if (ch < 0)
-				throw new RuntimeError ("Unexpected end of file ocurred");
+				throw new Lime.Exception ("Unexpected end of file ocurred");
 			position = p;
 			return (char)ch;
 		}

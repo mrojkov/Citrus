@@ -65,7 +65,7 @@ namespace Orange
 				lexer.ParseToken (']');
 				break;
 			default:
-				throw new RuntimeError ("Unknown property '{0}'. Parsing: {1}", name, node.GetType ());
+				throw new Exception ("Unknown property '{0}'. Parsing: {1}", name, node.GetType ());
 			}
 		}
 
@@ -515,7 +515,7 @@ namespace Orange
 				lexer.ParseToken (']');
 				break;
 			default:
-				throw new RuntimeError ("Unknown property '{0}'. Parsing: {1}", name, marker.GetType ());
+				throw new Exception ("Unknown property '{0}'. Parsing: {1}", name, marker.GetType ());
 			}
 		}
 
@@ -523,7 +523,7 @@ namespace Orange
 		{
 			string type = lexer.ParseQuotedString ();
 			if (type != "Hot::Marker")
-				throw new RuntimeError ("Invalid marker type '{0}'", type);
+				throw new Exception ("Invalid marker type '{0}'", type);
 			var marker = new Marker ();
 			lexer.ParseToken ('{');
 			while (lexer.PeekChar() != '}')
@@ -626,10 +626,10 @@ namespace Orange
 		{
 			var type = System.Type.GetType (className);
 			if (type == null)
-				throw new RuntimeError ("Unknown type: {0}", className);
+				throw new Exception ("Unknown type: {0}", className);
 			var ctor = type.GetConstructor (System.Type.EmptyTypes);
 			if (ctor == null)
-				throw new RuntimeError ("No public default constructor is defined for: {0}", className);
+				throw new Exception ("No public default constructor is defined for: {0}", className);
 			var obj = ctor.Invoke (new object[] {});
 			return obj;
 		}
@@ -666,7 +666,7 @@ namespace Orange
 					return n;
 				}
 			}
-			throw new RuntimeError ("Unknown type of actor '{0}'", actorClass);
+			throw new Exception ("Unknown type of actor '{0}'", actorClass);
 		}
 		
 		void RegisterKnownActorTypes ()

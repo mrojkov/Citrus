@@ -16,14 +16,6 @@ namespace Orange
 			writer.Write (' ');
 			writer.Write ((Int32)pixbuf.Width);
 			writer.Write ((Int32)pixbuf.Height);
-			if (pixbuf.Width != Utils.NearestPowerOf2 (pixbuf.Width) || 
-				pixbuf.Height != Utils.NearestPowerOf2 (pixbuf.Height)) {
-				var pixbuf1 = new Gdk.Pixbuf (Gdk.Colorspace.Rgb, pixbuf.HasAlpha, 8, 
-					Utils.NearestPowerOf2 (pixbuf.Width), Utils.NearestPowerOf2 (pixbuf.Height));
-				pixbuf1.Fill (0);
-				pixbuf.CopyArea (0, 0, pixbuf.Width, pixbuf.Height, pixbuf1, 0, 0);														
-				pixbuf = pixbuf1;
-			}
 			writer.Write ((Int32)pixbuf.Width);  
 			writer.Write ((Int32)pixbuf.Height);
 			if (pixbuf.HasAlpha) {
@@ -41,8 +33,7 @@ namespace Orange
 								int G = (*source++ >> 4) << 8;
 								int B = (*source++ >> 4) << 4;
 								int A = (*source++ >> 4);
-								*
-								dest1++ = (short)(R | G | B | A);
+								*dest1++ = (short)(R | G | B | A);
 							}
 						}
 					}
@@ -62,8 +53,7 @@ namespace Orange
 								int R = (*source++ >> 3) << 11;
 								int G = (*source++ >> 2) << 5;
 								int B = (*source++ >> 3);
-								*
-								dest1++ = (short)(R | G | B);
+								*dest1++ = (short)(R | G | B);
 							}
 						}
 					}

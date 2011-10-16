@@ -58,7 +58,7 @@ namespace Orange
 				return delegate() {
 					return (AudioAction)lexer.ParseInt (); };
 			default:
-				throw new RuntimeError ("Unknown type of animator '{0}'", animatorType);
+				throw new Exception ("Unknown type of animator '{0}'", animatorType);
 			}
 		}
 
@@ -128,7 +128,7 @@ namespace Orange
 					lexer.ParseToken (']');
 					break;
 				default:
-					throw new RuntimeError ("Unknown property '{0}'. Parsing: {1}", name, animator);
+					throw new Exception ("Unknown property '{0}'. Parsing: {1}", name, animator);
 				}
 			}
 			lexer.ParseToken ('}');

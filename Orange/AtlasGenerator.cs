@@ -7,16 +7,19 @@ namespace Orange
 {
 	public static class AtlasGenerator
 	{
-		private static bool TryUpdate (string imagePath, TextureParams texture)
+		private static bool TryUpdate (string imagePath, ref TextureParams texture)
 		{
 			var image = new Gdk.Pixbuf (imagePath);
 			if (image.Width != texture.AtlasRect.Width || image.Height != texture.AtlasRect.Height) {
 				// Since image size had changed, we need full atlas rebuild.
 				return false;
 			}
-			var atlasPath = Path.Combine (Path.GetDirectoryName (imagePath), texture.AtlasTexture);
+			var atlasPath = Path.ChangeExtension (texture.AtlasTexture, ".png");
+			Console.WriteLine ("{0} -> {1}", Helpers.RemovePathPrefix (imagePath), Path.GetFileName (atlasPath));
 			var atlas = new Gdk.Pixbuf (atlasPath);
-			return true;			
+			image.CopyArea (0, 0, image.Width, image.Height, atlas, texture.AtlasRect.A.X, texture.AtlasRect.A.Y);
+			atlas.Save (atlasPath, "png");
+			return true;
 		}
 		
 		private static void CleanupAtlases (string atlasesDirectory)
@@ -94,11 +97,12 @@ namespace Orange
 								texture.AtlasRect.B -= new IntVector2 (2, 2);
 								texture.AtlasTexture = Path.ChangeExtension (atlasPath.Remove (0, 2), null); // './'
 								TextureParams.WriteToFile (texture, Path.ChangeExtension (item.Path, ".texture"));
+								Console.WriteLine ("{0} -> {1}", Helpers.RemovePathPrefix (item.Path), Path.GetFileName (atlasPath));
 							}
 						}
 						atlas.Save (atlasPath, "png");
 						items.RemoveAll (x => x.Allocated);
-						Console.WriteLine ("Generated atlas {0}", atlasPath);
+						// Console.WriteLine ("Texture atlas '{0}' saved", atlasPath);
 						break;
 					}
 				}
@@ -137,7 +141,9 @@ namespace Orange
 				// If png had been changed after atlas generation, try to update atlas, or otherwise rebuild all atlases.
 				if (File.GetLastWriteTime (png) > File.GetLastWriteTime (texturePath))
 				{
-					if (!TryUpdate (png, texture)) {
+					if (TryUpdate (png, ref texture)) {
+						TextureParams.WriteToFile (texture, texturePath);
+					} else {
 						needRebuild = true;
 						break;
 					}
