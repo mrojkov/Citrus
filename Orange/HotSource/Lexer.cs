@@ -294,6 +294,7 @@ namespace Orange
 				string d = Path.GetDirectoryName (sourcePath);
 				path = Path.Combine (d, path);
 			}
+			path = Path.ChangeExtension (path, null);
 			return path;
 		}
 	}

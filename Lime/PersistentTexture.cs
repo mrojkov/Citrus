@@ -141,10 +141,10 @@ namespace Lime
 			return false;
 		}
 
-		private bool TryLoadTextureFile (string path)
-		{			
+		private bool TryLoadTextureAtlasPart (string path)
+		{
 			if (AssetsBundle.Instance.FileExists (path)) {
-				var texParams = TextureParams.ReadFromBundle (path);
+				var texParams = TextureAtlasPart.ReadFromBundle (path);
 				instance = new PersistentTexture (texParams.AtlasTexture);
 				uvRect.A = (Vector2)texParams.AtlasRect.A / (Vector2)instance.SurfaceSize;
 				uvRect.B = (Vector2)texParams.AtlasRect.B / (Vector2)instance.SurfaceSize;
@@ -169,9 +169,10 @@ namespace Lime
 			get {
 				if (instance == null) {
 					if (!TryCreateRenderTarget (Path) && 
-						!TryLoadTextureFile (System.IO.Path.ChangeExtension (Path, ".texture")) && 
-						!TryLoadImage (System.IO.Path.ChangeExtension (Path, ".raw")) && 
-						!TryLoadImage (System.IO.Path.ChangeExtension (Path, ".png"))) {
+						!TryLoadTextureAtlasPart (Path + ".atlasPart") && 
+						!TryLoadImage (Path + ".pvr") &&
+						!TryLoadImage (Path + ".raw") && 
+						!TryLoadImage (Path + ".png")) {
 						instance = CreateStubTexture ();
 					}
 				}

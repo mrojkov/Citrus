@@ -62,7 +62,6 @@
     <Compile Include="..\..\Lime\Renderer.cs" />
     <Compile Include="..\..\Lime\Serialization.cs" />
     <Compile Include="..\..\Lime\Texture.cs" />
-    <Compile Include="..\..\Lime\TextureParams.cs" />
     <Compile Include="..\..\Lime\Utils.cs" />
     <Compile Include="..\..\Lime\GameApp\IGameApp.cs" />
     <Compile Include="..\..\Lime\GameApp\Mac\AppDelegate.cs" />
@@ -79,5 +78,6 @@
     <Compile Include="..\..\Lime\Types\Rectangle.cs" />
     <Compile Include="..\..\Lime\Types\Size.cs" />
     <Compile Include="..\..\Lime\Types\Vector2.cs" />
+    <Compile Include="..\..\Lime\TextureAtlasPart.cs" />
   </ItemGroup>
 </Project>

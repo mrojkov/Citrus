@@ -65,6 +65,15 @@ namespace Lime
 				WriteObject (path, stream, instance);
 		}
 		
+		public static void WriteObjectToBundle<T> (AssetsBundle bundle, string path, T instance)
+		{
+			using (MemoryStream stream = new MemoryStream ()) {
+				WriteObject (path, stream, instance);
+				stream.Seek (0, SeekOrigin.Begin);
+				bundle.ImportFile (path, stream, 0);
+			}
+		}
+		
 		public static T DeepClone<T> (T obj)
 		{
 			opStack.Push (new Operation { Type = OperationType.Clone });

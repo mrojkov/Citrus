@@ -1,6 +1,8 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
+
 #if iOS
 using System.Runtime.InteropServices;
 using MonoTouch.UIKit;
@@ -16,6 +18,7 @@ using MonoMac.CoreGraphics;
 using OpenTK.Graphics.OpenGL;
 using System.Drawing;
 using System.Drawing.Imaging;
+
 #endif
 
 namespace Lime
@@ -64,6 +67,94 @@ namespace Lime
 				LoadImage (stream);
 			}
 		}
+
+#if iOS
+		// Values taken from PVRTexture.h from http://www.imgtec.com
+		enum PVRTextureFlag {
+			Mipmap			= (1<<8),		// has mip map levels
+			Twiddle			= (1<<9),		// is twiddled
+			FlagBumpmap		= (1<<10),		// has normals encoded for a bump map
+			Tiling			= (1<<11),		// is bordered for tiled pvr
+			Cubemap			= (1<<12),		// is a cubemap/skybox
+			FalseMipCol		= (1<<13),		// are there false coloured MIP levels
+			FlagVolume		= (1<<14),		// is this a volume texture
+			FlagAlpha		= (1<<15),		// v2.1 is there transparency info in the texture
+			VerticalFlip	= (1<<16),		// v2.1 is the texture vertically flipped
+		}
+
+		enum PVRFormat
+		{
+			RGBA_4444 = 0x0,
+			RGBA_1555 = 0x1,
+			RGB_565 = 0x2,
+			RGB_555 = 0x3,
+			RGB_888 = 0x4,
+			ARGB_888 = 0x5,
+			PVRTC_2 = 0xC,
+			PVRTC_4 = 0xD,	
+			GLARGB_4444 = 0x10,
+			GLRGB_565 = 0x13,
+		}
+		
+		private void InitWithPVRTexture (BinaryReader reader)
+		{
+			UInt32 headerLength = reader.ReadUInt32 ();
+			if (headerLength != 52) {
+				throw new Exception ("Invalid PVRT header");
+			}
+			Int32 height = reader.ReadInt32 ();
+			Int32 width = reader.ReadInt32 ();
+			UInt32 numMipmaps = reader.ReadUInt32 ();
+			Int32 flags = reader.ReadInt32 ();
+			/* UInt32 dataLength = */ reader.ReadUInt32 ();
+			/* UInt32 bpp = */ reader.ReadUInt32 ();
+			/* UInt32 bitmaskRed = */ reader.ReadUInt32 ();
+			/* UInt32 bnitmaskGreen = */ reader.ReadUInt32 ();
+			/* UInt32 bitmaskBlue = */ reader.ReadUInt32 ();
+			/* UInt32 bitmaskAlpha = */ reader.ReadUInt32 ();
+			/* UInt32 pvrTag = */ reader.ReadUInt32 ();
+			/* UInt32 numSurfs = */ reader.ReadUInt32 ();
+			
+			surSize = imgSize = new Size (width, height);
+			for (int i = 0; i <= numMipmaps; i++) {
+				if (i > 0 && (width < 8 || height < 8)) {
+					continue;
+				}
+				switch ((PVRFormat)(flags & 0xFF))	{
+				case PVRFormat.PVRTC_4: {
+					byte[] buffer = new byte [width * height * 4 / 8];
+					reader.Read (buffer, 0, buffer.Length);
+					GL.CompressedTexImage2D (All.Texture2D, i, All.CompressedRgbaPvrtc4Bppv1Img, width, height, 0, buffer.Length, buffer);
+					break;
+				}
+				case PVRFormat.PVRTC_2: {
+					byte[] buffer = new byte [width * height * 2 / 8];
+					reader.Read (buffer, 0, buffer.Length);
+					GL.CompressedTexImage2D (All.Texture2D, i, All.CompressedRgbaPvrtc2Bppv1Img, width, height, 0, buffer.Length, buffer);
+					break;
+				}
+				case PVRFormat.GLARGB_4444: {
+					byte[] buffer = new byte [width * height * 2];
+					reader.Read (buffer, 0, buffer.Length);					
+					GL.TexImage2D (All.Texture2D, i, (int)All.Rgba, width, height, 0, All.Rgba, All.UnsignedShort4444, buffer);
+					break;
+				}
+				case PVRFormat.GLRGB_565: {
+					byte[] buffer = new byte [width * height * 2];
+					reader.Read (buffer, 0, buffer.Length);
+					GL.TexImage2D (All.Texture2D, i, (int)All.Rgb, width, height, 0, All.Rgb, All.UnsignedShort565, buffer);
+					break;
+				}
+				default:
+					throw new NotImplementedException ();
+				}
+				width /= 2;
+				height /= 2;
+			}
+			Renderer.Instance.CheckErrors ();
+		}
+
+#endif
 		
 #if iOS || MAC
 		private void InitWithCGImage (CGImage image)
@@ -186,7 +277,7 @@ namespace Lime
 			byte[] sign = new byte [4];
 			stream.Read (sign, 0, 4);
 			if (sign [1] == 'P' && sign [2] == 'N' && sign [3] == 'G') {
-				stream.Seek (0, SeekOrigin.Begin);				
+				stream.Seek (0, SeekOrigin.Begin);
 				int length = (int)stream.Length;
 				byte[] buffer = new byte [length];
 				if (stream.Read (buffer, 0, length) != length)
@@ -196,6 +287,14 @@ namespace Lime
 				using (CGImage img = CGImage.FromPNG (provider, null, false, CGColorRenderingIntent.Default)) {
 					InitWithCGImage (img);
 				}
+#if iOS
+			} else if (true) {
+				// PVR Texture
+				using (BinaryReader reader = new BinaryReader (stream))	{
+					stream.Seek (0, SeekOrigin.Begin);
+					InitWithPVRTexture (reader);
+				}
+#endif				
 			} else if (sign [0] == 'R' && sign [1] == 'A' && sign [2] == 'W' && sign [3] == ' ') {
 				using (BinaryReader reader = new BinaryReader (stream)) {
 					imgSize = new Size (reader.ReadInt32 (), reader.ReadInt32 ());
@@ -236,7 +335,7 @@ namespace Lime
 					default:
 						throw new NotImplementedException ();
 					}
-				}
+				}			
 			}
 			Renderer.Instance.CheckErrors ();
 #else

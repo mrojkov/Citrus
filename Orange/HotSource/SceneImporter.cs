@@ -11,7 +11,7 @@ namespace Orange
 		
 		public SceneImporter (string path)
 		{
-			RegisterKnownActorTypes ();			
+			RegisterKnownActorTypes ();
 			using (Stream stream = new FileStream (path, FileMode.Open)) {
 				using (TextReader reader = new StreamReader (stream)) {
 					string text = reader.ReadToEnd ();

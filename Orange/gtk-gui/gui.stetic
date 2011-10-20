@@ -5,7 +5,7 @@
     <target-gtk-version>2.12</target-gtk-version>
   </configuration>
   <import>
-    <widget-library name="../../Targets/Orange.Mac/Debug/Orange.exe" internal="true" />
+    <widget-library name="../../Targets/Orange.Mac/Release/Orange.exe" internal="true" />
   </import>
   <widget class="Gtk.Dialog" id="Orange.MainDialog" design-size="400 467">
     <property name="MemberName" />

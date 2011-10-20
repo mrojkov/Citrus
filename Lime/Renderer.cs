@@ -114,7 +114,7 @@ namespace Lime
 		private Vector2[] batchVertices = new Vector2 [BatchMaxSize * 4];
 		private Color4[] batchColors = new Color4 [BatchMaxSize * 4];
 		private Vector2[] batchTexCoords0 = new Vector2 [BatchMaxSize * 4];
-		private Vector2[] batchTexCoords1 = new Vector2 [BatchMaxSize * 4];
+//		private Vector2[] batchTexCoords1 = new Vector2 [BatchMaxSize * 4];
 		private int batchSize = 0;
 		
 		public static Renderer Instance {
@@ -591,14 +591,14 @@ namespace Lime
 		public Vector2 MeasureTextLine (Font font, string text, float fontHeight)
 		{
 			Vector2 size = new Vector2 (0, fontHeight);
-			uint prevCharCode = 0;
+			char prevChar = '\0';
 			for (int i = 0; i < text.Length; i++) {
 				FontChar fontChar = font.Chars [text [i]];
 				float scale = fontHeight / fontChar.Size.Y;
-				float delta = font.Pairs.Get (prevCharCode, fontChar.Code);
+				float delta = font.Pairs.Get (prevChar, fontChar.Char);
 				size.X += scale * (fontChar.ACWidths.X + delta);
 				size.X += scale * (fontChar.Size.X + fontChar.ACWidths.Y + delta);
-				prevCharCode = fontChar.Code;
+				prevChar = fontChar.Char;
 			}
 			return size;
 		}
@@ -624,8 +624,7 @@ namespace Lime
 		public void DrawTextLine (Font font, Vector2 position, string text, Color4 color, float fontHeight)
 		{
 			float savedX = position.X;
-			uint prevCharCode = 0;
-			var invTextureSize = new Vector2 (1.0f / font.Texture.ImageSize.Width, 1.0f / font.Texture.ImageSize.Height);
+			char prevChar = '\0';
 			for (int i = 0; i < text.Length; i++) {
 				if (text [i] == '\n') {
 					position.X = savedX;
@@ -634,13 +633,11 @@ namespace Lime
 				}
 				FontChar fontChar = font.Chars [text [i]];
 				float scale = fontHeight / fontChar.Size.Y;
-				float delta = font.Pairs.Get (prevCharCode, fontChar.Code);
-				Vector2 uv0 = Vector2.Scale (fontChar.Position, invTextureSize);
-				Vector2 uv1 = Vector2.Scale (fontChar.Position + fontChar.Size, invTextureSize);
+				float delta = font.Pairs.Get (prevChar, fontChar.Char);
 				position.X += scale * (fontChar.ACWidths.X + delta);
-				DrawSprite (font.Texture, color, position, scale * fontChar.Size, uv0, uv1);
+				DrawSprite (font.Texture, color, position, scale * fontChar.Size, fontChar.UV0, fontChar.UV1);
 				position.X += scale * (fontChar.Size.X + fontChar.ACWidths.Y + delta);
-				prevCharCode = fontChar.Code;
+				prevChar = fontChar.Char;
 			}
 		}
 	}

@@ -6,15 +6,43 @@ namespace Orange
 {
 	public static class Helpers
 	{
-		public static string RemovePathPrefix (string path)
+		public static string GetTargetPlatformString (TargetPlatform platform)
 		{
-			if (path.StartsWith ("./")) {
-				path = path.Remove (0, 2);
+			switch (platform)
+			{
+			case TargetPlatform.Desktop:
+				return "Desktop";
+			case TargetPlatform.iOS:
+				return "iOS";
+			default:
+				throw new Lime.Exception ("Invalid target platform");
 			}
-			return path;
 		}
-						
-
+		
+		public static void CreateDirectoryRecursive (string path)
+		{
+			if (string.IsNullOrEmpty (path))
+				return;
+			string basePath = Path.GetDirectoryName (path);
+			if (basePath != "" && !Directory.Exists (basePath)) {
+				CreateDirectoryRecursive (basePath);
+			}
+			if (!Directory.Exists (path)) {
+				Directory.CreateDirectory (path);
+			}
+		}
+		
+		public static string GetApplicationDirectory ()
+		{
+			string appPath;
+			appPath = System.IO.Path.GetDirectoryName (System.Reflection.Assembly.GetExecutingAssembly ().
+				GetName ().CodeBase);
+			if (appPath.StartsWith ("file:")) {
+				appPath = appPath.Remove (0, 5);
+			}
+			return appPath;
+		}
+		
 		public static bool IsPathHidden (string path)
 		{
 			if (path == ".") {
@@ -24,7 +52,7 @@ namespace Orange
 			return (System.IO.File.GetAttributes (path) & FileAttributes.Hidden) != 0;
 		}
 		
-		public static List<string> GetAllFiles (string directory, string mask)
+		public static List<string> GetAllFiles (string directory, string mask, bool removePath)
 		{
 			List<string> result = new List<string> ();
 			string[] files = Directory.GetFiles (directory, mask, SearchOption.AllDirectories);
@@ -39,13 +67,17 @@ namespace Orange
 					continue;
 				}
 				if (!IsPathHidden (path)) {
-					result.Add (path);
+					var path1 = path;
+					if (removePath) {
+						path1 = path.Remove (0, directory.Length + 1);
+					}
+					result.Add (path1);
 				}
 			}
 			return result;
 		}
 
-		public static List<string> GetAllDirectories (string directory, string mask)
+		public static List<string> GetAllDirectories (string directory, string mask, bool removePath)
 		{
 			List<string> result = new List<string> ();
 			string[] directories = Directory.GetDirectories (directory, mask, SearchOption.AllDirectories);
@@ -58,7 +90,11 @@ namespace Orange
 				if (skipPath != "" && path.StartsWith (skipPath)) {
 					continue;
 				}
-				result.Add (path);
+				var path1 = path;
+				if (removePath) {
+					path1 = path.Remove (0, directory.Length + 1);
+				}
+				result.Add (path1);
 			}
 			return result;
 		}

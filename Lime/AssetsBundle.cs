@@ -206,7 +206,7 @@ namespace Lime
 			return stream;
 		}
         
-		public DateTime GetFileModificationTime (string path)
+		public DateTime GetFileLastWriteTime (string path)
 		{
 			AssetDescriptor desc;
 			if (index.TryGetValue (path, out desc)) {
@@ -215,7 +215,7 @@ namespace Lime
 			throw new Exception ("Asset '{0}' doesn't exist", path);
 		}
 		
-		public void RemoveFile (string path)
+		public void DeleteFile (string path)
 		{
 			AssetDescriptor desc;
 			if (!index.TryGetValue (path, out desc)) {
@@ -233,6 +233,13 @@ namespace Lime
 		public bool FileExists (string path, string extension)
 		{
 			return index.ContainsKey (System.IO.Path.ChangeExtension (path, extension));
+		}
+		
+		public void ImportFile (string srcPath, string dstPath, int reserve)
+		{
+			using (var stream = new FileStream (srcPath, FileMode.Open)) {
+				ImportFile (dstPath, stream, reserve);
+			}
 		}
 
 		public void ImportFile (string path, Stream stream, int reserve)
@@ -254,7 +261,7 @@ namespace Lime
 				}
 			} else {
 				if (FileExists (path))
-					RemoveFile (path);
+					DeleteFile (path);
 				d = new AssetDescriptor ();
 				d.Time = DateTime.Now;
 				d.Length = (int)stream.Length;
@@ -316,9 +323,11 @@ namespace Lime
 			}
 		}
 		
-		public ICollection<string> EnumerateFiles ()
-		{			
-			return index.Keys;
+		public string[] EnumerateFiles ()
+		{
+			string[] files = new string [index.Keys.Count];
+			index.Keys.CopyTo (files, 0);
+			return files;
 		}
 
 		const Int32 Signature = 0x13AF;

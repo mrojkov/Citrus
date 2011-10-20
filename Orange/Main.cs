@@ -11,9 +11,7 @@ namespace Orange
 	class MainClass
 	{
 		public static void Main (string[] args)
-		{
-			Process.Start ("./../Resources/nvcompress", "~/Documents/Background.png ~/Documents/Background.dds");
-			
+		{			
 /*
 			var input = new Nvidia.TextureTools.InputOptions ();
 			var compression = new Nvidia.TextureTools.CompressionOptions ();
@@ -42,7 +40,7 @@ namespace Orange
 					compressor.Compress (input, compression, output); 
 			//	}
 			//}
-*/		
+*/					
 			Gtk.Application.Init ();
 			MainDialog dlg = new MainDialog ();
 			dlg.Run ();

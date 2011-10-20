@@ -48,15 +48,16 @@ namespace Orange
 			
 			public override void Write (string buffer)
 			{
+				#pragma warning disable 618
 				textView.Buffer.Insert (textView.Buffer.EndIter, buffer + "\n");
 				while (Gtk.Application.EventsPending ())
-        				Gtk.Application.RunIteration ();
+					Gtk.Application.RunIteration ();
 				if (bufferedLines > 4) {
 					bufferedLines = 0;
 					textView.ScrollToIter (textView.Buffer.EndIter, 0, false, 0, 0);
 				}
 				bufferedLines++;
-			}		
+			}
 		
 			public override System.Text.Encoding Encoding {
 				get {
@@ -74,34 +75,12 @@ namespace Orange
 			} finally {
 				System.IO.Directory.SetCurrentDirectory (currentDirectory);
 			}
-		}		
-		
-		private void UpdateTextureAtlases ()
-		{
-			var directories = Helpers.GetAllDirectories (".", "*.*");
-			foreach (string dir in directories) {
- 				var name = System.IO.Path.GetFileName (dir);
-				if (name == "Atlases") {
-					AtlasGenerator.Process (dir);
-				}					
-			}			
-		}
-		
-		private void UpdateTextureAtlases (string directory)
-		{
-			string currentDirectory = System.IO.Directory.GetCurrentDirectory ();
-			try {
-				System.IO.Directory.SetCurrentDirectory (directory);
-				UpdateTextureAtlases ();				
-			} finally {
-				System.IO.Directory.SetCurrentDirectory (currentDirectory);
-			}
 		}
 		
 		private void RegisterEngineTypes (ProtoBuf.Meta.RuntimeTypeModel model)
 		{
 			model.Add (typeof(Node), true);
-			model.Add (typeof(TextureParams), true);
+			model.Add (typeof(TextureAtlasPart), true);
 			model.Add (typeof(Font), true);
 		}
 		
@@ -123,7 +102,7 @@ namespace Orange
 		private void RunBuild (bool rebuild)
 		{
 			SaveState ();
-			try	{
+			try {
 				System.DateTime startTime = System.DateTime.Now;
 				CompileLog.Buffer.Clear ();
 				// Create serialization model
@@ -131,21 +110,20 @@ namespace Orange
 				Serialization.Serializer = model;
 				// Populate model with ingame and engine types
 				PrepareTypeModel (model);
-				// Update texture atlases
-				UpdateTextureAtlases (AssetsFolderChooser.CurrentFolder);				
-				// Main assets processing
-				AssetsImporter.ProcessDirectory (AssetsFolderChooser.CurrentFolder, rebuild);
-				System.DateTime endTime = System.DateTime.Now;
-				System.TimeSpan delta = endTime - startTime;
+				// Cook all assets (the main job)
+				var platform = (TargetPlatform)this.TargetPlatform.Active;
+				AssetCooker cooker = new AssetCooker (AssetsFolderChooser.CurrentFolder, platform);
+				cooker.Cook ();
 				// Update serialization assembly	
 				GenerateSerializerDll (model, System.IO.Path.Combine (AssetsFolderChooser.CurrentFolder, ".."));
 				// Show time statistics
-				Console.WriteLine ("Done at " + endTime.ToLongTimeString());
+				System.DateTime endTime = System.DateTime.Now;
+				System.TimeSpan delta = endTime - startTime;
+				Console.WriteLine ("Done at " + endTime.ToLongTimeString ());
 				Console.WriteLine ("Building time {0}:{1}:{2}", delta.Hours, delta.Minutes, delta.Seconds);
 				CompileLog.ScrollToIter (CompileLog.Buffer.EndIter, 0, false, 0, 0);				
-			}
-			catch (System.Exception exc) {
-				Console.WriteLine("Exception: " + exc.Message);
+			} catch (System.Exception exc) {
+				Console.WriteLine ("Exception: " + exc.Message);
 			}				
 		}
 		

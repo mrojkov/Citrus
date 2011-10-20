@@ -26,10 +26,15 @@ namespace Lime
 		{
 			return (float)RandomGenerator.NextDouble ();
 		}
+		
+		public static bool IsPowerOf2 (int value)
+		{
+			return value == 1 || (value & (value - 1)) == 0;
+		}
 
 		public static int NearestPowerOf2 (int value)
 		{
-			if (value != 1 && (value & (value - 1)) != 0) {
+			if (!IsPowerOf2 (value)) {
 				int i = 1;
 				while (i < value)
 					i *= 2;

@@ -37,6 +37,7 @@ namespace Lime
 
     public class FontPool
     {
+		public Font Null = new Font ();
         private Dictionary<string, Font> fonts = new Dictionary<string, Font>();
 
         static readonly FontPool instance = new FontPool();
@@ -53,7 +54,9 @@ namespace Lime
                 Font font;
                 if (fonts.TryGetValue(name, out font))
                     return font;
-                string path = @"Fonts/" + name + ".fnt";
+                string path = "Fonts/" + name + ".fnt";
+				if (!AssetsBundle.Instance.FileExists (path))
+					return Null;
                 font = Serialization.ReadObjectFromBundle<Font>(path);
                 fonts[name] = font;
                 return font;

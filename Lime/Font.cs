@@ -22,9 +22,9 @@ namespace Lime
 		[ProtoMember(1)]
 		public List<FontChar> charList = new List<FontChar> ();
 		[ProtoMember(2)]
-		public Dictionary<uint, FontChar> charDic = new Dictionary<uint, FontChar> ();
+		public Dictionary<char, FontChar> charDic = new Dictionary<char, FontChar> ();
 
-		public FontChar this [uint code] { 
+		public FontChar this [char code] { 
 			get { return charDic [code]; }
 		}
 
@@ -57,12 +57,12 @@ namespace Lime
 		
 		public bool Contains (FontChar item)
 		{
-			return charDic.ContainsKey (item.Code);
+			return charDic.ContainsKey (item.Char);
 		}
 		
 		public bool Remove (FontChar item)
 		{
-			charDic.Remove (item.Code);
+			charDic.Remove (item.Char);
 			return charList.Remove (item);
 		}
 		
@@ -72,7 +72,7 @@ namespace Lime
 
 		public void Add (FontChar c)
 		{
-			charDic [c.Code] = c;
+			charDic [c.Char] = c;
 			charList.Add (c);
 		}
 	}
@@ -81,12 +81,14 @@ namespace Lime
 	public struct FontChar
 	{
 		[ProtoMember(1)]
-		public uint Code;
+		public char Char;
 		[ProtoMember(2)]
-		public Vector2 Position;
+		public Vector2 UV0;
 		[ProtoMember(3)]
-		public Vector2 Size;
+		public Vector2 UV1;
 		[ProtoMember(4)]
+		public Vector2 Size;
+		[ProtoMember(5)]
 		public Vector2 ACWidths;
 	}
 
@@ -94,9 +96,9 @@ namespace Lime
 	public struct FontPair
 	{
 		[ProtoMember(1)]
-		public uint Code1;
+		public char A;
 		[ProtoMember(2)]
-		public uint Code2;
+		public char B;
 		[ProtoMember(3)]
 		public float Delta;
 	}
@@ -137,14 +139,14 @@ namespace Lime
 
 		public void Add (FontPair pair)
 		{
-			var key = (pair.Code1 << 16) | pair.Code2;
+			var key = ((uint)pair.A << 16) | pair.B;
 			pairDic [key] = pair.Delta;
 			pairList.Add (pair);
 		}
 
-		public bool Contains (FontPair item)
+		public bool Contains (FontPair pair)
 		{
-			var key = (item.Code1 << 16) | item.Code2;
+			var key = ((uint)pair.A << 16) | pair.B;
 			return pairDic.ContainsKey (key);
 		}
 
@@ -152,11 +154,11 @@ namespace Lime
 			get { return false; }
 		}
 
-		public bool Remove (FontPair item)
+		public bool Remove (FontPair pair)
 		{
-			var key = (item.Code1 << 16) | item.Code2;
+			var key = ((uint)pair.A << 16) | pair.B;
 			pairDic.Remove (key);
-			return pairList.Remove (item);
+			return pairList.Remove (pair);
 		}
 		
 		public void Clear ()

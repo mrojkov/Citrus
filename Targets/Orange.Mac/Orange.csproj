@@ -67,19 +67,21 @@
   <ItemGroup>
     <Compile Include="..\..\Orange\AppConfig.cs" />
     <Compile Include="..\..\Orange\AssemblyInfo.cs" />
-    <Compile Include="..\..\Orange\AssetsImporter.cs" />
-    <Compile Include="..\..\Orange\AtlasGenerator.cs" />
     <Compile Include="..\..\Orange\Helpers.cs" />
     <Compile Include="..\..\Orange\Main.cs" />
     <Compile Include="..\..\Orange\MainDialog.cs" />
     <Compile Include="..\..\Orange\RectAllocator.cs" />
-    <Compile Include="..\..\Orange\TextureCompressor.cs" />
     <Compile Include="..\..\Orange\HotSource\FontImporter.cs" />
     <Compile Include="..\..\Orange\HotSource\Lexer.cs" />
     <Compile Include="..\..\Orange\HotSource\SceneImporter.Animators.cs" />
     <Compile Include="..\..\Orange\HotSource\SceneImporter.cs" />
     <Compile Include="..\..\Orange\gtk-gui\generated.cs" />
     <Compile Include="..\..\Orange\gtk-gui\Orange.MainDialog.cs" />
+    <Compile Include="..\..\Orange\TargetPlatform.cs" />
+    <Compile Include="..\..\Orange\DirectoryChanger.cs" />
+    <Compile Include="..\..\Orange\CookingRulesBuilder.cs" />
+    <Compile Include="..\..\Orange\TextureConverter.cs" />
+    <Compile Include="..\..\Orange\AssetCooker.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Orange\gtk-gui\gui.stetic" />
@@ -93,5 +95,13 @@
       <Project>{07A38EE4-8603-4895-897B-1166C662F0AD}</Project>
       <Name>Lime</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\Orange\PVRTexTool\PVRTexTool" />
+    <Content Include="..\..\Orange\NVCompress\libnvcore.dylib" />
+    <Content Include="..\..\Orange\NVCompress\libnvimage.dylib" />
+    <Content Include="..\..\Orange\NVCompress\libnvmath.dylib" />
+    <Content Include="..\..\Orange\NVCompress\libnvtt.dylib" />
+    <Content Include="..\..\Orange\NVCompress\nvcompress" />
   </ItemGroup>
 </Project>

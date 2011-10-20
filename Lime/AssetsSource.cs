@@ -11,7 +11,7 @@ namespace Lime
 			AssetsSource.Current = source;
 		}
 		
-		public void Dispose () 
+		public void Dispose ()
 		{
 		}
 	}
@@ -29,11 +29,16 @@ namespace Lime
 	public interface IAssetsSource
 	{
 		Stream OpenFile (string path);
-		DateTime GetFileModificationTime (string path);
-		void RemoveFile (string path);
+
+		DateTime GetFileLastWriteTime (string path);
+
+		void DeleteFile (string path);
+
 		bool FileExists (string path);
+
 		bool FileExists (string path, string extension);
-		ICollection<string> EnumerateFiles ();
+
+		string [] EnumerateFiles ();
 	}
 }
 

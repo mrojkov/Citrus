@@ -7,11 +7,10 @@ namespace Orange
 	public partial class FontImporter
 	{
 		Lexer lexer;
-		string path;
+		Size textureSize;
 
 		public FontImporter (string path)
 		{
-			this.path = path; 
 			using (Stream stream = new FileStream(path, FileMode.Open)) {
 				using (TextReader reader = new StreamReader(stream)) {
 					string text = reader.ReadToEnd ();
@@ -24,13 +23,14 @@ namespace Orange
 		{
 			switch (name) {
 			case "CharCode":
-				fontChar.Code = (uint)lexer.ParseInt ();
+				fontChar.Char = (char)lexer.ParseInt ();
 				break;
 			case "TexPosition":
-				fontChar.Position = lexer.ParseVector2 ();
+				fontChar.UV0 = lexer.ParseVector2 () / (Vector2)textureSize;
 				break;
 			case "TexSize":
 				fontChar.Size = lexer.ParseVector2 ();
+				fontChar.UV1 = fontChar.UV0 + fontChar.Size / (Vector2)textureSize;
 				break;
 			case "ACWidths":
 				fontChar.ACWidths = lexer.ParseVector2 ();
@@ -57,10 +57,10 @@ namespace Orange
 		{
 			switch (name) {
 			case "CharCodeL":
-				fontCharPair.Code1 = (uint)lexer.ParseInt ();
+				fontCharPair.A = (char)lexer.ParseInt ();
 				break;
 			case "CharCodeR":
-				fontCharPair.Code2 = (uint)lexer.ParseInt ();
+				fontCharPair.B = (char)lexer.ParseInt ();
 				break;
 			case "Delta":
 				fontCharPair.Delta = lexer.ParseFloat ();
@@ -103,8 +103,9 @@ namespace Orange
 			}
 		}
 
-		public Font ParseFont ()
+		public Font ParseFont (Size textureSize)
 		{
+			this.textureSize = textureSize;
 			string type = lexer.ParseQuotedString ();
 			if (type != "Hot::Font")
 				throw new Exception ("Unknown type of object '{0}'", type);
@@ -113,8 +114,6 @@ namespace Orange
 			while (lexer.PeekChar() != '}')
 				ParseFontProperty (font, lexer.ParseWord ());
 			lexer.ParseToken ('}');
-			string texturePath = Path.ChangeExtension (path, ".png");
-			font.Texture = new PersistentTexture (texturePath);
 			return font;
 		}
 	}
