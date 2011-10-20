@@ -168,11 +168,11 @@ namespace Lime
 		public ITexture Instance {
 			get {
 				if (instance == null) {
-					if (!TryCreateRenderTarget (Path) && 
-						!TryLoadTextureAtlasPart (Path + ".atlasPart") && 
-						!TryLoadImage (Path + ".pvr") &&
-						!TryLoadImage (Path + ".raw") && 
-						!TryLoadImage (Path + ".png")) {
+					bool loaded = TryCreateRenderTarget (Path) ||
+						TryLoadTextureAtlasPart (Path + ".atlasPart") ||
+						TryLoadImage (Path + ".pvr") ||
+						TryLoadImage (Path + ".dds");
+					if (!loaded) {
 						instance = CreateStubTexture ();
 					}
 				}
