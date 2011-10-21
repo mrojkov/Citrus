@@ -1,24 +1,13 @@
 using System;
-using System.Diagnostics;
 using System.IO;
-using System.Net;
 
 #if iOS
-using System.Runtime.InteropServices;
 using MonoTouch.UIKit;
 using OpenTK.Graphics.ES11;
-using MonoTouch.CoreGraphics;
-using MonoTouch.Foundation;
-using System.Drawing;
 #elif MAC
 using MonoMac.OpenGL;
-using System.Drawing;
-using MonoMac.CoreGraphics;
 #else
 using OpenTK.Graphics.OpenGL;
-using System.Drawing;
-using System.Drawing.Imaging;
-
 #endif
 
 namespace Lime
@@ -114,13 +103,13 @@ namespace Lime
 			/* UInt32 bitmaskAlpha = */ reader.ReadUInt32 ();
 			/* UInt32 pvrTag = */ reader.ReadUInt32 ();
 			/* UInt32 numSurfs = */ reader.ReadUInt32 ();
-			
 			surSize = imgSize = new Size (width, height);
 			for (int i = 0; i <= numMipmaps; i++) {
 				if (i > 0 && (width < 8 || height < 8)) {
 					continue;
 				}
-				switch ((PVRFormat)(flags & 0xFF))	{
+				PVRFormat format = (PVRFormat)(flags & 0xFF);
+				switch (format)	{
 				case PVRFormat.PVRTC_4: {
 					byte[] buffer = new byte [width * height * 4 / 8];
 					reader.Read (buffer, 0, buffer.Length);
@@ -133,13 +122,13 @@ namespace Lime
 					GL.CompressedTexImage2D (All.Texture2D, i, All.CompressedRgbaPvrtc2Bppv1Img, width, height, 0, buffer.Length, buffer);
 					break;
 				}
-				case PVRFormat.GLARGB_4444: {
+				case PVRFormat.RGBA_4444: {
 					byte[] buffer = new byte [width * height * 2];
 					reader.Read (buffer, 0, buffer.Length);
 					GL.TexImage2D (All.Texture2D, i, (int)All.Rgba, width, height, 0, All.Rgba, All.UnsignedShort4444, buffer);
 					break;
 				}
-				case PVRFormat.GLRGB_565: {
+				case PVRFormat.RGB_565: {
 					byte[] buffer = new byte [width * height * 2];
 					reader.Read (buffer, 0, buffer.Length);
 					GL.TexImage2D (All.Texture2D, i, (int)All.Rgb, width, height, 0, All.Rgb, All.UnsignedShort565, buffer);

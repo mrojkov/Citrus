@@ -85,6 +85,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Orange\gtk-gui\gui.stetic" />
+    <None Include="..\..\Orange\NVCompress\Bags01X.tga" />
+    <None Include="..\..\Orange\NVCompress\Bags01XX.tga" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon.Mac\Lemon.csproj">

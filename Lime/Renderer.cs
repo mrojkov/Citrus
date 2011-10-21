@@ -19,30 +19,15 @@ namespace Lime
 	public enum Blending
 	{
 		[ProtoEnum]
-		/// <summary>
-		/// Constant none.
-		/// </summary>
 		None,
 		[ProtoEnum]
-		/// <summary>
-		/// Constant default.
-		/// </summary>
 		Default,
 		[ProtoEnum]
-		/// <summary>
-		/// Constant alpha.
-		/// </summary>
 		Alpha,
 		[ProtoEnum]
-		/// <summary>
-		/// Constant add.
-		/// </summary>
 		Add,
 		[ProtoEnum]
-		/// <summary>
-		/// Constant silhuette.
-		/// </summary>
-		Silhuette
+		Silhuette,
 	}
 
     [ProtoContract]
@@ -108,7 +93,9 @@ namespace Lime
 	public class Renderer
 	{
 		static readonly Renderer instance = new Renderer ();
-		public static int DrawCalls = 0;
+		public bool PremulAlphaMode = true;
+		
+		public int DrawCalls = 0;
 		public const int BatchMaxSize = 128;
 		private ushort[] batchIndices = new ushort [BatchMaxSize * 6];
 		private Vector2[] batchVertices = new Vector2 [BatchMaxSize * 4];
@@ -400,7 +387,10 @@ namespace Lime
 					break;
 				case Blending.Alpha:
 				case Blending.Default:
-					GL.BlendFunc (All.SrcAlpha, All.OneMinusSrcAlpha);
+					if (PremulAlphaMode)
+						GL.BlendFunc (All.One, All.OneMinusSrcAlpha);
+					else
+						GL.BlendFunc (All.SrcAlpha, All.OneMinusSrcAlpha);
 					GL.TexEnv (All.TextureEnv, All.TextureEnvMode, (int)All.Modulate);
 					break;
 				}
@@ -418,12 +408,18 @@ namespace Lime
 					GL.TexEnv (TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Combine);
 					break;
 				case Blending.Add:
-					GL.BlendFunc (BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
+					if (PremulAlphaMode)
+						GL.BlendFunc (BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha);
+					else
+						GL.BlendFunc (BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
 					GL.TexEnv (TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
 					break;
 				case Blending.Alpha:
 				case Blending.Default:
-					GL.BlendFunc (BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+					if (PremulAlphaMode)
+						GL.BlendFunc (BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha);
+					else
+						GL.BlendFunc (BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 					GL.TexEnv (TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
 					break;
 				}
@@ -467,7 +463,9 @@ namespace Lime
 			Rectangle textureRect = texture.UVRect;
 			uv0 = textureRect.A + (textureRect.B - textureRect.A) * uv0;
 			uv1 = textureRect.A + (textureRect.B - textureRect.A) * uv1;
-		
+			if (PremulAlphaMode && blending == Blending.Add) {
+				color = Color4.PremulAlpha (color);
+			}
 			SetTexture (texture, 0);
 			FlushSpriteBatchIfFull ();
 			int i = batchSize++ * 4;
@@ -478,7 +476,7 @@ namespace Lime
 			batchColors [i + 1] = color;
 			batchVertices [i + 1] = WorldMatrix.TransformVector (new Vector2 (position.X + size.X, position.Y));
 			batchTexCoords0 [i + 1] = new Vector2 (uv1.X, uv0.Y);
-	
+
 			batchColors [i + 2] = color;
 			batchVertices [i + 2] = WorldMatrix.TransformVector (new Vector2 (position.X, position.Y + size.Y));
 			batchTexCoords0 [i + 2] = new Vector2 (uv0.X, uv1.Y);

@@ -55,6 +55,17 @@ namespace Lime
 			r.A = (byte)(((int)lhs.A * rhs.A) / 255);
 			return r;
 		}
+		
+		public static Color4 PremulAlpha (Color4 color)
+		{
+			if (color.A < 255) {
+				Color4 t = color;
+				color.R = (t.R == 255) ? t.A : (byte)(t.R * t.A / 255);
+				color.G = (t.G == 255) ? t.A : (byte)(t.G * t.A / 255);
+				color.B = (t.B == 255) ? t.A : (byte)(t.B * t.A / 255);
+			}
+			return color;
+		}
 
 		public static Color4 Lerp (Color4 a, Color4 b, float t)
 		{
