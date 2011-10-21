@@ -163,10 +163,20 @@ namespace Orange
 		{
 			string mipsFlag = mipMaps ? "" : "-nomips";
 			string compressionFlag = compressed ? (hasAlpha ? "-bc3" : "-bc1") : "-rgb";
-			string pvrTexTool = Path.Combine (Helpers.GetApplicationDirectory (), "NVCompress", "nvcompress");
+#if WIN
+			string nvcompress = Path.Combine (Helpers.GetApplicationDirectory (), "NVCompress.Win", "nvcompress.exe");
+			string args = String.Format ("-silent -fast {0} {1} \"{2}\" \"{3}\"", mipsFlag, compressionFlag, srcPath, dstPath);
+			var psi = new System.Diagnostics.ProcessStartInfo (nvcompress, args);
+			psi.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+			var p = System.Diagnostics.Process.Start (psi);
+#else
+			string nvcompress = Path.Combine (Helpers.GetApplicationDirectory (), "NVCompress", "nvcompress");
 			string args = String.Format ("-silent -fast {0} {1} '{2}' '{3}'", mipsFlag, compressionFlag, srcPath, dstPath);
-			var p = System.Diagnostics.Process.Start (pvrTexTool, args);
-			p.WaitForExit ();
+			var p = System.Diagnostics.Process.Start (nvcompress, args);
+#endif		
+			while (!p.HasExited) {
+				p.WaitForExit ();
+			}
 			if (p.ExitCode != 0) {
 				throw new Lime.Exception ("Failed to convert '{0}' to DDS format (error code: {1})", srcPath, p.ExitCode);
 			}

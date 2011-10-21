@@ -37,9 +37,15 @@ namespace Orange
 			string appPath;
 			appPath = System.IO.Path.GetDirectoryName (System.Reflection.Assembly.GetExecutingAssembly ().
 				GetName ().CodeBase);
+#if MAC			
 			if (appPath.StartsWith ("file:")) {
 				appPath = appPath.Remove (0, 5);
 			}
+#elif WIN
+			if (appPath.StartsWith ("file:\\")) {
+				appPath = appPath.Remove (0, 6);
+			}
+#endif			
 			return appPath;
 		}
 		
@@ -101,4 +107,3 @@ namespace Orange
 
 	}
 }
-

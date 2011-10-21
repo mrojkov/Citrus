@@ -42,6 +42,7 @@ namespace Orange
 			// Container child table1.Gtk.Table+TableChild
 			this.AssetsFolderChooser = new global::Gtk.FileChooserButton (global::Mono.Unix.Catalog.GetString ("Select An Assets Folder"), ((global::Gtk.FileChooserAction)(2)));
 			this.AssetsFolderChooser.Name = "AssetsFolderChooser";
+			this.AssetsFolderChooser.ShowHidden = true;
 			this.table1.Add (this.AssetsFolderChooser);
 			global::Gtk.Table.TableChild w2 = ((global::Gtk.Table.TableChild)(this.table1 [this.AssetsFolderChooser]));
 			w2.TopAttach = ((uint)(1));

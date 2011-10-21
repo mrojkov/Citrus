@@ -5,7 +5,8 @@
     <target-gtk-version>2.12</target-gtk-version>
   </configuration>
   <import>
-    <widget-library name="../../Targets/Orange.Mac/Debug/Orange.exe" internal="true" />
+    <widget-library name="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <widget-library name="../../Targets/Orange.Win/Debug/Orange.exe" internal="true" />
   </import>
   <widget class="Gtk.Dialog" id="Orange.MainDialog" design-size="400 467">
     <property name="MemberName" />
@@ -35,6 +36,7 @@
                     <property name="MemberName" />
                     <property name="Title" translatable="yes">Select An Assets Folder</property>
                     <property name="Action">SelectFolder</property>
+                    <property name="ShowHidden">True</property>
                   </widget>
                   <packing>
                     <property name="TopAttach">1</property>
