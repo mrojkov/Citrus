@@ -622,7 +622,16 @@ namespace Orange
 			}
 		}
 
-		public object CreateObject (string className)
+		public delegate void ActorPropReader (Node node, string name);
+
+		struct KnownActorType 
+		{
+			public string ActorClass;
+			public string NodeClass;
+			public ActorPropReader PropReader;
+		}
+		
+		public static object CreateObject (string className)
 		{
 			var type = System.Type.GetType (className);
 			if (type == null)
@@ -633,15 +642,6 @@ namespace Orange
 			var obj = ctor.Invoke (new object[] {});
 			return obj;
 		}
-
-		public delegate void ActorPropReader (Node node, string name);
-
-		struct KnownActorType 
-		{
-			public string ActorClass;
-			public string NodeClass;
-			public ActorPropReader PropReader;
-		}
 		
 		public Node ParseNode ()
 		{
@@ -651,7 +651,7 @@ namespace Orange
 				string[] s = actorClass.Split ('/');
 				actorClass = s [0];
 				nodeClass = s [1];
-			}			
+			}
 			foreach (KnownActorType t in knownActorTypes) {
 				if (t.ActorClass == actorClass) {
 					if (nodeClass == "")

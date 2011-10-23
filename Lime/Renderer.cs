@@ -93,16 +93,17 @@ namespace Lime
 	public class Renderer
 	{
 		static readonly Renderer instance = new Renderer ();
-		public bool PremulAlphaMode = true;
+		public bool PremulAlphaMode = false;
 		
-		public int DrawCalls = 0;
-		public const int BatchMaxSize = 128;
-		private ushort[] batchIndices = new ushort [BatchMaxSize * 6];
-		private Vector2[] batchVertices = new Vector2 [BatchMaxSize * 4];
-		private Color4[] batchColors = new Color4 [BatchMaxSize * 4];
-		private Vector2[] batchTexCoords0 = new Vector2 [BatchMaxSize * 4];
-//		private Vector2[] batchTexCoords1 = new Vector2 [BatchMaxSize * 4];
-		private int batchSize = 0;
+		const int MaxVertices = 128;
+		public int DrawCalls = 0;		
+		private ushort[] batchIndices = new ushort [MaxVertices * 3];
+		private Vector2[] batchVertices = new Vector2 [MaxVertices];
+		private Color4[] batchColors = new Color4 [MaxVertices];
+		private Vector2[] batchTexCoords0 = new Vector2 [MaxVertices];
+		private Vector2[] batchTexCoords1 = new Vector2 [MaxVertices];
+		private int currentVertex = 0;
+		private int currentIndex = 0;
 		
 		public static Renderer Instance {
 			get { return instance; }
@@ -110,17 +111,7 @@ namespace Lime
 		
 		private Renderer ()
 		{
-			WorldMatrix = Matrix32.Identity;		
-			int baseIndex = 0;
-			ushort baseVertex = 0;
-			for (int i = 0; i < BatchMaxSize; i++, baseIndex += 6, baseVertex += 4) {
-				batchIndices [baseIndex + 0] = (ushort)(baseVertex + 0);
-				batchIndices [baseIndex + 1] = (ushort)(baseVertex + 1);
-				batchIndices [baseIndex + 2] = (ushort)(baseVertex + 2);
-				batchIndices [baseIndex + 3] = (ushort)(baseVertex + 2);
-				batchIndices [baseIndex + 4] = (ushort)(baseVertex + 1);
-				batchIndices [baseIndex + 5] = (ushort)(baseVertex + 3);
-			}
+			WorldMatrix = Matrix32.Identity;
 		}
 
 		public void CheckErrors ()
@@ -155,16 +146,14 @@ namespace Lime
 		
 		public void FlushSpriteBatch ()
 		{
-			if (batchSize > 0) {
+			if (currentIndex > 0) {
 #if GLES11				
 				GL.DrawElements (All.Triangles, batchSize * 6, All.UnsignedShort, batchIndices);
-				CheckErrors ();
-				batchSize = 0;
 #else
-				GL.DrawElements (BeginMode.Triangles, batchSize * 6, DrawElementsType.UnsignedShort, batchIndices);
-				CheckErrors ();
-				batchSize = 0;
+				GL.DrawElements (BeginMode.Triangles, currentIndex, DrawElementsType.UnsignedShort, batchIndices);
 #endif
+				CheckErrors ();
+				currentIndex = currentVertex = 0;
 				DrawCalls++;
 			}
 		}
@@ -191,21 +180,20 @@ namespace Lime
 #else
 			GL.ClearColor (0.5f, 0.5f, 0.5f, 1.0f);
 			GL.Clear (ClearBufferMask.ColorBufferBit);
-			CheckErrors ();
+			GL.Enable (EnableCap.Texture2D);
+			// Set up vertex and color arrays
 			GL.VertexPointer (2, VertexPointerType.Float, 0, batchVertices);
 			GL.EnableClientState (ArrayCap.VertexArray);				
 			GL.ColorPointer (4, ColorPointerType.UnsignedByte, 0, batchColors);
-			GL.EnableClientState (ArrayCap.ColorArray);
-			CheckErrors ();
-				//GL.ActiveTexture (All.Texture1);
-			//GL.EnableClientState (All.TextureCoordArray);
-			//GL.TexCoordPointer (2, All.Float, 0, batchTexCoords1);
-			GL.ActiveTexture (TextureUnit.Texture0);
-			GL.Enable (EnableCap.Texture2D);
+			GL.EnableClientState (ArrayCap.ColorArray);			
+			// Set up texture coordinate arrays
+			GL.ClientActiveTexture (TextureUnit.Texture1);
+			GL.EnableClientState (ArrayCap.TextureCoordArray);
+			GL.TexCoordPointer (2, TexCoordPointerType.Float, 0, batchTexCoords1);
+			GL.ClientActiveTexture (TextureUnit.Texture0);
 			GL.EnableClientState (ArrayCap.TextureCoordArray);
 			GL.TexCoordPointer (2, TexCoordPointerType.Float, 0, batchTexCoords0);
-			CheckErrors ();
-			Blending = Blending.Default;
+			Blending = Blending.Default;			
 #endif
 			CheckErrors ();
 		}
@@ -262,31 +250,10 @@ namespace Lime
 			SetTexture (null, 1);
 		}
 		
-		private void FlushSpriteBatchIfFull ()
-		{
-			if (batchSize >= BatchMaxSize)
-				FlushSpriteBatch ();
-		}
-		
 		public Matrix32 WorldMatrix {
 			get; set;
 		}
 
-		/// <summary>
-		/// Sets the orthogonal projection.
-		/// </summary>
-		/// <param name='left'>
-		/// Left.
-		/// </param>
-		/// <param name='top'>
-		/// Top.
-		/// </param>
-		/// <param name='right'>
-		/// Right.
-		/// </param>
-		/// <param name='bottom'>
-		/// Bottom.
-		/// </param>
 		public void SetOrthogonalProjection (float left, float top, float right, float bottom)
 		{
 #if GLES11
@@ -308,12 +275,6 @@ namespace Lime
 
 		Viewport viewport;
 
-		/// <summary>
-		/// Gets or sets the viewport.
-		/// </summary>
-		/// <value>
-		/// The viewport.
-		/// </value>
 		public Viewport Viewport {
 			get { return viewport; }
 			set {
@@ -322,9 +283,6 @@ namespace Lime
 			}
 		}
 
-		/// <summary>
-		/// Pushs the projection matrix.
-		/// </summary>
 		public void PushProjectionMatrix ()
 		{
 #if GLES11
@@ -338,9 +296,6 @@ namespace Lime
 #endif
 		}
 
-		/// <summary>
-		/// Pops the projection matrix.
-		/// </summary>
 		public void PopProjectionMatrix ()
 		{
 #if GLES11
@@ -416,6 +371,7 @@ namespace Lime
 					break;
 				case Blending.Alpha:
 				case Blending.Default:
+				default:
 					if (PremulAlphaMode)
 						GL.BlendFunc (BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha);
 					else
@@ -428,36 +384,6 @@ namespace Lime
 			}
 		}
 		
-		/// <summary>
-		/// Renders a rectangular textured polygon.
-		/// </summary>
-		/// <param name="texture">Texture object.</param>
-		/// <param name="color">Sprite modulation color.</param>
-		/// <param name="position">Left top corner of the sprite.</param>
-		/// <param name="size">Size of the sprite.</param>
-		/// <param name="uv0">Left top of texture coordinates.</param>
-		/// <param name="uv1">Right bottom of texture coordinates.</param>
-		/// <summary>
-		/// Draws the sprite.
-		/// </summary>
-		/// <param name='texture'>
-		/// Texture.
-		/// </param>
-		/// <param name='color'>
-		/// Color.
-		/// </param>
-		/// <param name='position'>
-		/// Position.
-		/// </param>
-		/// <param name='size'>
-		/// Size.
-		/// </param>
-		/// <param name='uv0'>
-		/// Uv0.
-		/// </param>
-		/// <param name='uv1'>
-		/// Uv1.
-		/// </param>
 		public void DrawSprite (ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1)
 		{
 			Rectangle textureRect = texture.UVRect;
@@ -467,23 +393,34 @@ namespace Lime
 				color = Color4.PremulAlpha (color);
 			}
 			SetTexture (texture, 0);
-			FlushSpriteBatchIfFull ();
-			int i = batchSize++ * 4;
+			if (currentIndex + 6 >= batchIndices.Length || currentVertex + 4 >= batchVertices.Length) {
+				FlushSpriteBatch ();
+			}			
+			int i = currentVertex;
+			currentVertex += 4;
+			
 			batchColors [i + 0] = color;
-			batchVertices [i + 0] = WorldMatrix.TransformVector (new Vector2 (position.X, position.Y));
+			batchVertices [i + 0] = WorldMatrix * new Vector2 (position.X, position.Y);
 			batchTexCoords0 [i + 0] = new Vector2 (uv0.X, uv0.Y);
 
 			batchColors [i + 1] = color;
-			batchVertices [i + 1] = WorldMatrix.TransformVector (new Vector2 (position.X + size.X, position.Y));
+			batchVertices [i + 1] = WorldMatrix * new Vector2 (position.X + size.X, position.Y);
 			batchTexCoords0 [i + 1] = new Vector2 (uv1.X, uv0.Y);
 
 			batchColors [i + 2] = color;
-			batchVertices [i + 2] = WorldMatrix.TransformVector (new Vector2 (position.X, position.Y + size.Y));
+			batchVertices [i + 2] = WorldMatrix * new Vector2 (position.X, position.Y + size.Y);
 			batchTexCoords0 [i + 2] = new Vector2 (uv0.X, uv1.Y);
 
 			batchColors [i + 3] = color;
-			batchVertices [i + 3] = WorldMatrix.TransformVector (new Vector2 (position.X + size.X, position.Y + size.Y));
+			batchVertices [i + 3] = WorldMatrix * new Vector2 (position.X + size.X, position.Y + size.Y);
 			batchTexCoords0 [i + 3] = new Vector2 (uv1.X, uv1.Y);
+			
+			batchIndices [currentIndex++] = (ushort)(i + 0);
+			batchIndices [currentIndex++] = (ushort)(i + 1);
+			batchIndices [currentIndex++] = (ushort)(i + 2);
+			batchIndices [currentIndex++] = (ushort)(i + 2);
+			batchIndices [currentIndex++] = (ushort)(i + 1);
+			batchIndices [currentIndex++] = (ushort)(i + 3);
 		}
 
 		public struct Vertex
@@ -506,86 +443,62 @@ namespace Lime
 			public Vector2 UV2;
 		}
 
-		/// <summary>
-		/// Draws the triangle fan.
-		/// </summary>
-		/// <param name='texture'>
-		/// Texture.
-		/// </param>
-		/// <param name='vertices'>
-		/// Vertices.
-		/// </param>
-		/// <param name='numVertices'>
-		/// Number vertices.
-		/// </param>
 		public void DrawTriangleFan (ITexture texture, Vertex[] vertices, int numVertices)
 		{
-//			DrawCalls++;
-//			GL.ActiveTexture (TextureUnit.Texture0);
-//			GL.Enable (EnableCap.Texture2D);
-//			GL.BindTexture (TextureTarget.Texture2D, texture.GetHandle ());
-//			GL.Begin (BeginMode.TriangleFan);
-//			for (int i = 0; i < numVertices; i++) {
-//				var v = vertices [i];
-//				GL.Color4 (v.Color.R, v.Color.G, v.Color.B, v.Color.A);
-//				GL.TexCoord2 (v.UV1.X, v.UV1.Y);
-//				GL.Vertex2 (v.Pos.X, v.Pos.Y);
-//			}
-//			GL.End ();
+			SetTexture (texture, 0);
+			if (currentIndex + (numVertices - 2) * 3 >= batchIndices.Length || currentVertex + numVertices >= batchVertices.Length) {
+				FlushSpriteBatch ();
+			}
+			if (numVertices < 3 || (numVertices - 2) * 3 > batchIndices.Length) {
+				throw new Lime.Exception ("Wrong number of vertices");
+			}
+			int baseVertex = currentVertex;
+			Vector2 UV0 = texture.UVRect.A;
+			Vector2 dUV = texture.UVRect.B - UV0;
+			for (int i = 0; i < numVertices; i++) {
+				Vertex v = vertices [i];
+				Color4 color = v.Color;
+				if (PremulAlphaMode && blending == Blending.Add) {
+					color = Color4.PremulAlpha (color);
+				}
+				batchColors [currentVertex] = color;
+				batchVertices [currentVertex] = WorldMatrix * v.Pos;
+				batchTexCoords0 [currentVertex] = UV0 + dUV * v.UV1;
+				currentVertex++;
+			}
+			for (int i = 1; i <= numVertices - 2; i++) {
+				batchIndices [currentIndex++] = (ushort)baseVertex;
+				batchIndices [currentIndex++] = (ushort)(baseVertex + i);
+				batchIndices [currentIndex++] = (ushort)(baseVertex + i + 1);
+			}
 		}
 
-		/// <summary>
-		/// Draws the combined triangle fan.
-		/// </summary>
-		/// <param name='texture1'>
-		/// Texture1.
-		/// </param>
-		/// <param name='texture2'>
-		/// Texture2.
-		/// </param>
-		/// <param name='vertices'>
-		/// Vertices.
-		/// </param>
-		/// <param name='numVertices'>
-		/// Number vertices.
-		/// </param>
 		public void DrawCombinedTriangleFan (ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
 		{
-//			DrawCalls++;
-//			GL.Enable (EnableCap.Texture2D);
-//			GL.BindTexture (TextureTarget.Texture2D, texture1.GetHandle ());
-//			GL.ActiveTexture (TextureUnit.Texture1);
-//			GL.Enable (EnableCap.Texture2D);
-//			GL.BindTexture (TextureTarget.Texture2D, texture2.GetHandle ());
-//			GL.Begin (BeginMode.TriangleFan);
-//			for (int i = 0; i < numVertices; i++) {
-//				var v = vertices [i];
-//				GL.Color4 (v.Color.R, v.Color.G, v.Color.B, v.Color.A);
-//				GL.MultiTexCoord2 (TextureUnit.Texture0, v.UV1.X, v.UV1.Y);
-//				GL.MultiTexCoord2 (TextureUnit.Texture1, v.UV2.X, v.UV2.Y);
-//				GL.Vertex2 (v.Pos.X, v.Pos.Y);
-//			}
-//			GL.End ();
-//			GL.ActiveTexture (TextureUnit.Texture1);
-//			GL.Disable (EnableCap.Texture2D);
-//			GL.ActiveTexture (TextureUnit.Texture0);
+			FlushSpriteBatch ();
+			if (vertices.Length > batchVertices.Length) {
+				throw new Lime.Exception ("Too many vertices");
+			}
+			SetTexture (texture1, 0);
+			SetTexture (texture2, 1);
+			Rectangle textureRect1 = texture1.UVRect;
+			Rectangle textureRect2 = texture2.UVRect;
+			for (int i = 0; i < numVertices; i++) {
+				Vertex v = vertices [i];
+				Color4 color = v.Color;
+				if (PremulAlphaMode && blending == Blending.Add) {
+					color = Color4.PremulAlpha (color);
+				}
+				batchColors [i] = color;
+				batchVertices [i] = WorldMatrix * v.Pos;
+				batchTexCoords0 [i] = textureRect1.A + (textureRect1.B - textureRect1.A) * v.UV1;
+				batchTexCoords1 [i] = textureRect2.A + (textureRect2.B - textureRect2.A) * v.UV2;
+			}
+			GL.DrawArrays (BeginMode.TriangleFan, 0, numVertices);
+			SetTexture (null, 1);			
+			DrawCalls++;
 		}
 
-		/// <summary>
-		/// Measures the text line.
-		/// </summary>
-		/// <returns>
-		/// The text line.
-		/// </returns>
-		/// <param name='font'>
-		/// Font.
-		/// </param>
-		/// <param name='text'>
-		/// Text.
-		/// </param>
-		/// <param name='fontHeight'>
-		/// Font height.
-		/// </param>
 		public Vector2 MeasureTextLine (Font font, string text, float fontHeight)
 		{
 			Vector2 size = new Vector2 (0, fontHeight);
@@ -601,24 +514,6 @@ namespace Lime
 			return size;
 		}
 
-		/// <summary>
-		/// Draws the text line.
-		/// </summary>
-		/// <param name='font'>
-		/// Font.
-		/// </param>
-		/// <param name='position'>
-		/// Position.
-		/// </param>
-		/// <param name='text'>
-		/// Text.
-		/// </param>
-		/// <param name='color'>
-		/// Color.
-		/// </param>
-		/// <param name='fontHeight'>
-		/// Font height.
-		/// </param>
 		public void DrawTextLine (Font font, Vector2 position, string text, Color4 color, float fontHeight)
 		{
 			float savedX = position.X;

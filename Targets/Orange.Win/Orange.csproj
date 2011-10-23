@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{74361DDC-F189-4CC9-BB63-F3C896BEB11D}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>Orange</RootNamespace>
+    <AssemblyName>Orange</AssemblyName>
+    <BaseDirectory>..\..\Orange</BaseDirectory>
+    <newfilesearch>OnLoadAutoInsert</newfilesearch>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Debug</OutputPath>
+    <DefineConstants>DEBUG;WIN</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <ConsolePause>false</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <ConsolePause>false</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants>WIN</DefineConstants>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="protobuf-net">
+      <HintPath>..\..\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Posix" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\Orange\gtk-gui\gui.stetic">
+      <LogicalName>gui.stetic</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\Orange\gtk-gui\generated.cs" />
+    <Compile Include="..\..\Orange\AppConfig.cs" />
+    <Compile Include="..\..\Orange\AssetCooker.cs" />
+    <Compile Include="..\..\Orange\CookingRulesBuilder.cs" />
+    <Compile Include="..\..\Orange\DirectoryChanger.cs" />
+    <Compile Include="..\..\Orange\Helpers.cs" />
+    <Compile Include="..\..\Orange\MainDialog.cs" />
+    <Compile Include="..\..\Orange\RectAllocator.cs" />
+    <Compile Include="..\..\Orange\TargetPlatform.cs" />
+    <Compile Include="..\..\Orange\TextureConverter.cs" />
+    <Compile Include="..\..\Orange\gtk-gui\Orange.MainDialog.cs" />
+    <Compile Include="..\..\Orange\HotSource\FontImporter.cs" />
+    <Compile Include="..\..\Orange\HotSource\Lexer.cs" />
+    <Compile Include="..\..\Orange\HotSource\SceneImporter.Animators.cs" />
+    <Compile Include="..\..\Orange\HotSource\SceneImporter.cs" />
+    <Compile Include="..\..\Orange\Main.cs" />
+    <Compile Include="..\..\Orange\AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\Lemon.Win\Lemon.csproj">
+      <Project>{7BA30845-74F0-4040-8FCB-71629F1F3E18}</Project>
+      <Name>Lemon</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lime.Win\Lime.csproj">
+      <Project>{857FE9DB-65D1-4F4E-913B-EFD5C567DFE8}</Project>
+      <Name>Lime</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\Orange\NVCompress.Win\jpeg62.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\Orange\NVCompress.Win\libpng12.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\Orange\NVCompress.Win\libtiff3.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\Orange\NVCompress.Win\nvcompress.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\Orange\NVCompress.Win\nvtt.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\Orange\NVCompress.Win\zlib1.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Orange\NVCompress.Mac\libnvcore.dylib" />
+    <None Include="..\..\Orange\NVCompress.Mac\libnvimage.dylib" />
+    <None Include="..\..\Orange\NVCompress.Mac\libnvmath.dylib" />
+    <None Include="..\..\Orange\NVCompress.Mac\libnvtt.dylib" />
+    <None Include="..\..\Orange\NVCompress.Mac\nvcompress" />
+    <None Include="..\..\Orange\PVRTexTool\PVRTexTool" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <GtkDesignInfo generateGettext="false" />
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
+</Project>

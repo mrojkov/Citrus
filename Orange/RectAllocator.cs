@@ -29,6 +29,7 @@ namespace Orange
 				}
 			}
 			if (j < 0) {
+				rect = new IntRectangle (0, 0, 0, 0);
 				return false;
 			}
 			// Split the rest, minimizing the sum of parts perimeters.
@@ -39,8 +40,7 @@ namespace Orange
 			if (a < b) {
 				rects [j] = new IntRectangle (r.A.X, r.A.Y + size.Height, r.B.X, r.B.Y);
 				rects.Add (new IntRectangle (r.A.X + size.Width, r.A.Y, r.B.X, r.A.Y + size.Height));
-			}
-			else {
+			} else {
 				rects [j] = new IntRectangle (r.A.X, r.A.Y + size.Height, r.A.X + size.Width, r.B.Y);
 				rects.Add (new IntRectangle (r.A.X + size.Width, r.A.Y, r.B.X, r.B.Y));
 			}

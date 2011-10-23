@@ -14,7 +14,7 @@ namespace Orange
 		private global::Gtk.ComboBox TargetPlatform;
 		private global::Gtk.ScrolledWindow GtkScrolledWindow;
 		private global::Gtk.TextView CompileLog;
-		private global::Gtk.Button BuildButton;
+		private global::Gtk.Button SyncButton;
 		private global::Gtk.Button RebuildButton;
 		
 		protected virtual void Build ()
@@ -22,7 +22,7 @@ namespace Orange
 			global::Stetic.Gui.Initialize (this);
 			// Widget Orange.MainDialog
 			this.Name = "Orange.MainDialog";
-			this.Title = global::Mono.Unix.Catalog.GetString ("Orange");
+			this.Title = "Orange";
 			this.WindowPosition = ((global::Gtk.WindowPosition)(1));
 			this.Modal = true;
 			// Internal child Orange.MainDialog.VBox
@@ -40,7 +40,7 @@ namespace Orange
 			this.table1.RowSpacing = ((uint)(6));
 			this.table1.ColumnSpacing = ((uint)(6));
 			// Container child table1.Gtk.Table+TableChild
-			this.AssetsFolderChooser = new global::Gtk.FileChooserButton (global::Mono.Unix.Catalog.GetString ("Select An Assets Folder"), ((global::Gtk.FileChooserAction)(2)));
+			this.AssetsFolderChooser = new global::Gtk.FileChooserButton ("Select An Assets Folder", ((global::Gtk.FileChooserAction)(2)));
 			this.AssetsFolderChooser.Name = "AssetsFolderChooser";
 			this.AssetsFolderChooser.ShowHidden = true;
 			this.table1.Add (this.AssetsFolderChooser);
@@ -51,7 +51,7 @@ namespace Orange
 			w2.RightAttach = ((uint)(2));
 			w2.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
-			this.GameAssemblyChooser = new global::Gtk.FileChooserButton (global::Mono.Unix.Catalog.GetString ("Select An Assembly"), ((global::Gtk.FileChooserAction)(0)));
+			this.GameAssemblyChooser = new global::Gtk.FileChooserButton ("Select An Assembly", ((global::Gtk.FileChooserAction)(0)));
 			this.GameAssemblyChooser.Name = "GameAssemblyChooser";
 			this.table1.Add (this.GameAssemblyChooser);
 			global::Gtk.Table.TableChild w3 = ((global::Gtk.Table.TableChild)(this.table1 [this.GameAssemblyChooser]));
@@ -65,7 +65,7 @@ namespace Orange
 			this.label1 = new global::Gtk.Label ();
 			this.label1.Name = "label1";
 			this.label1.Xalign = 1F;
-			this.label1.LabelProp = global::Mono.Unix.Catalog.GetString ("Assets directory");
+			this.label1.LabelProp = "Assets directory";
 			this.table1.Add (this.label1);
 			global::Gtk.Table.TableChild w4 = ((global::Gtk.Table.TableChild)(this.table1 [this.label1]));
 			w4.TopAttach = ((uint)(1));
@@ -76,7 +76,7 @@ namespace Orange
 			this.label2 = new global::Gtk.Label ();
 			this.label2.Name = "label2";
 			this.label2.Xalign = 1F;
-			this.label2.LabelProp = global::Mono.Unix.Catalog.GetString ("Target platform");
+			this.label2.LabelProp = "Target platform";
 			this.table1.Add (this.label2);
 			global::Gtk.Table.TableChild w5 = ((global::Gtk.Table.TableChild)(this.table1 [this.label2]));
 			w5.XOptions = ((global::Gtk.AttachOptions)(4));
@@ -85,7 +85,7 @@ namespace Orange
 			this.label3 = new global::Gtk.Label ();
 			this.label3.Name = "label3";
 			this.label3.Xalign = 1F;
-			this.label3.LabelProp = global::Mono.Unix.Catalog.GetString ("Game assembly");
+			this.label3.LabelProp = "Game assembly";
 			this.table1.Add (this.label3);
 			global::Gtk.Table.TableChild w6 = ((global::Gtk.Table.TableChild)(this.table1 [this.label3]));
 			w6.TopAttach = ((uint)(2));
@@ -94,8 +94,8 @@ namespace Orange
 			w6.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
 			this.TargetPlatform = global::Gtk.ComboBox.NewText ();
-			this.TargetPlatform.AppendText (global::Mono.Unix.Catalog.GetString ("Desktop (PC, Mac, Linux)"));
-			this.TargetPlatform.AppendText (global::Mono.Unix.Catalog.GetString ("iPhone/iPad"));
+			this.TargetPlatform.AppendText ("Desktop (PC, Mac, Linux)");
+			this.TargetPlatform.AppendText ("iPhone/iPad");
 			this.TargetPlatform.Name = "TargetPlatform";
 			this.TargetPlatform.Active = 0;
 			this.table1.Add (this.TargetPlatform);
@@ -132,14 +132,14 @@ namespace Orange
 			w12.BorderWidth = ((uint)(5));
 			w12.LayoutStyle = ((global::Gtk.ButtonBoxStyle)(4));
 			// Container child dialog1_ActionArea.Gtk.ButtonBox+ButtonBoxChild
-			this.BuildButton = new global::Gtk.Button ();
-			this.BuildButton.CanDefault = true;
-			this.BuildButton.CanFocus = true;
-			this.BuildButton.Name = "BuildButton";
-			this.BuildButton.UseUnderline = true;
-			this.BuildButton.Label = global::Mono.Unix.Catalog.GetString ("Build");
-			w12.Add (this.BuildButton);
-			global::Gtk.ButtonBox.ButtonBoxChild w13 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w12 [this.BuildButton]));
+			this.SyncButton = new global::Gtk.Button ();
+			this.SyncButton.CanDefault = true;
+			this.SyncButton.CanFocus = true;
+			this.SyncButton.Name = "SyncButton";
+			this.SyncButton.UseUnderline = true;
+			this.SyncButton.Label = "Synchronize";
+			w12.Add (this.SyncButton);
+			global::Gtk.ButtonBox.ButtonBoxChild w13 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w12 [this.SyncButton]));
 			w13.Expand = false;
 			w13.Fill = false;
 			// Container child dialog1_ActionArea.Gtk.ButtonBox+ButtonBoxChild
@@ -147,7 +147,7 @@ namespace Orange
 			this.RebuildButton.CanFocus = true;
 			this.RebuildButton.Name = "RebuildButton";
 			this.RebuildButton.UseUnderline = true;
-			this.RebuildButton.Label = global::Mono.Unix.Catalog.GetString ("Rebuild");
+			this.RebuildButton.Label = "Rebuild";
 			w12.Add (this.RebuildButton);
 			global::Gtk.ButtonBox.ButtonBoxChild w14 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w12 [this.RebuildButton]));
 			w14.Position = 1;
@@ -156,11 +156,11 @@ namespace Orange
 			if ((this.Child != null)) {
 				this.Child.ShowAll ();
 			}
-			this.DefaultWidth = 400;
+			this.DefaultWidth = 555;
 			this.DefaultHeight = 467;
-			this.BuildButton.HasDefault = true;
+			this.SyncButton.HasDefault = true;
 			this.Show ();
-			this.BuildButton.Clicked += new global::System.EventHandler (this.OnBuildClicked);
+			this.SyncButton.Clicked += new global::System.EventHandler (this.OnSyncClicked);
 			this.RebuildButton.Clicked += new global::System.EventHandler (this.OnRebuildButtonClicked);
 		}
 	}

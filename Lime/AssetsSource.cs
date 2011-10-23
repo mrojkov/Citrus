@@ -35,9 +35,7 @@ namespace Lime
 		void DeleteFile (string path);
 
 		bool FileExists (string path);
-
-		bool FileExists (string path, string extension);
-
+		
 		string [] EnumerateFiles ();
 	}
 }

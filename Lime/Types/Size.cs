@@ -18,16 +18,11 @@ namespace Lime
 			Width = width;
 			Height = height;
 		}
-
+		
 		public static explicit operator Vector2 (Size size)
 		{
 			return new Vector2 ((float)size.Width, (float)size.Height);
 		}
-		
-		public static explicit operator Size (System.Drawing.Size size)
-        {
-            return new Size (size.Width, size.Height);
-        }
 
 		bool IEquatable<Size>.Equals (Size rhs)
 		{

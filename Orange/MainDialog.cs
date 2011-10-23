@@ -16,7 +16,7 @@ namespace Orange
 			TextWriter writer = new LogWriter (CompileLog);
 			Console.SetOut (writer);
 			Console.SetError (writer);
-			BuildButton.GrabFocus ();
+			SyncButton.GrabFocus ();
 		}
 		
 		void LoadState ()
@@ -46,17 +46,23 @@ namespace Orange
 				this.textView = textView;			
 			}
 			
-			public override void Write (string buffer)
+			public override void WriteLine (string value)
 			{
+				Write (value);
+			}
+			
+			public override void Write (string value)
+			{
+				value += "\n";
 				#pragma warning disable 618
-				textView.Buffer.Insert (textView.Buffer.EndIter, buffer + "\n");
+				textView.Buffer.Insert (textView.Buffer.EndIter, value);
 				while (Gtk.Application.EventsPending ())
 					Gtk.Application.RunIteration ();
 				if (bufferedLines > 4) {
 					bufferedLines = 0;
 					textView.ScrollToIter (textView.Buffer.EndIter, 0, false, 0, 0);
 				}
-				bufferedLines++;
+				bufferedLines++;							
 			}
 		
 			public override System.Text.Encoding Encoding {
@@ -92,11 +98,11 @@ namespace Orange
 				Type gameWidgets = gameAssembly.GetType ("SerializationSupport");
 				if (gameWidgets == null) {
 					throw new Lime.Exception ("Class 'SerializationSupport' not found in assembly {0}", gameAssembly);
-				}					
+				}
 				MethodInfo mi = gameWidgets.GetMethod ("SetupTypes");
 				mi.Invoke (null, new object [] {model});
 			}
-			model.CompileInPlace ();
+			model.CompileInPlace ();			
 		}
 		
 		private void RunBuild (bool rebuild)
@@ -113,7 +119,7 @@ namespace Orange
 				// Cook all assets (the main job)
 				var platform = (TargetPlatform)this.TargetPlatform.Active;
 				AssetCooker cooker = new AssetCooker (AssetsFolderChooser.CurrentFolder, platform);
-				cooker.Cook ();
+				cooker.Cook (rebuild);
 				// Update serialization assembly	
 				GenerateSerializerDll (model, System.IO.Path.Combine (AssetsFolderChooser.CurrentFolder, ".."));
 				// Show time statistics
@@ -124,32 +130,27 @@ namespace Orange
 				CompileLog.ScrollToIter (CompileLog.Buffer.EndIter, 0, false, 0, 0);				
 			} catch (System.Exception exc) {
 				Console.WriteLine ("Exception: " + exc.Message);
-			}				
+			}
 		}
 		
-		protected void OnBuildClicked (object sender, System.EventArgs e)
+		protected void OnSyncClicked (object sender, System.EventArgs e)
 		{
-			RebuildButton.Sensitive = false;
-			BuildButton.Sensitive = false;
+			this.Sensitive = false;
 			try {
 				RunBuild (false);
 			} finally {
-				RebuildButton.Sensitive = true;
-				BuildButton.Sensitive = true;
+				this.Sensitive = true;
 			}
 		}
 
 		protected void OnRebuildButtonClicked (object sender, System.EventArgs e)
 		{
-			RebuildButton.Sensitive = false;
-			BuildButton.Sensitive = false;
+			this.Sensitive = false;
 			try {	
 				RunBuild (true);
 			} finally {
-				RebuildButton.Sensitive = true;
-				BuildButton.Sensitive = true;
+				this.Sensitive = true;
 			}
 		}
 	}
 }
-

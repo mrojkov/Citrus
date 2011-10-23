@@ -662,7 +662,7 @@ namespace Lemon
 				float angle = p.Angle;
 				if (AlongPathOrientation)
 					angle += p.FullDirection;
-				Vector2 particleSize = Vector2.Scale (p.ScaleCurrent, (Vector2)texture.ImageSize);
+				Vector2 particleSize = p.ScaleCurrent * new Vector2 (texture.ImageSize.Width, texture.ImageSize.Height);
 				Matrix32 rotation = Matrix32.Rotation (Utils.DegreesToRadians * angle);
 				for (int i = 0; i < 4; i++) {
 					quad [i].Pos = Vector2.Scale (particleSize, rect [i] - Vector2.Half) * rotation + p.FullPosition;

@@ -26,6 +26,11 @@ namespace Orange
 			}
 		}
 		
+		string BundlePathToNative (string path)
+		{
+			return path.Replace ('/', Path.DirectorySeparatorChar);			
+		}
+		
 		string GetPlatformTextureExtension ()
 		{
 			if (platform == TargetPlatform.iOS)
@@ -40,10 +45,13 @@ namespace Orange
 			this.assetsDirectory = assetsDirectory;
 		}
 		
-		public void Cook ()
+		public void Cook (bool rebuild)
 		{
 			cookingRulesMap = CookingRulesBuilder.Build (assetsDirectory);
 			string bundlePath = Path.ChangeExtension (assetsDirectory, Helpers.GetTargetPlatformString (platform));
+			if (rebuild && File.Exists (bundlePath)) {
+				File.Delete (bundlePath);
+			}
 			AssetsBundle.Open (bundlePath, true);
 			try {
 				using (new DirectoryChanger (assetsDirectory)) {
@@ -72,15 +80,15 @@ namespace Orange
 							throw new Lime.Exception ("Font doesn't have an appropriate png texture file");
 						}
 						var importer = new FontImporter (srcPath);
-				        var font = importer.ParseFont (size);
+						var font = importer.ParseFont (size);
 						font.Texture = new Lime.PersistentTexture (Path.ChangeExtension (dstPath, null));
 						Helpers.CreateDirectoryRecursive (Path.GetDirectoryName (dstPath));
 						Lime.Serialization.WriteObjectToBundle<Lime.Font> (AssetsBundle, dstPath, font);
 						return true;
 					});
 					SyncUpdated ("*.scene", ".scene", (srcPath, dstPath) => {
-		                var importer = new SceneImporter (srcPath);
-				        var node = importer.ParseNode ();
+						var importer = new SceneImporter (srcPath);
+						var node = importer.ParseNode ();
 						Helpers.CreateDirectoryRecursive (Path.GetDirectoryName (dstPath));
 						Lime.Serialization.WriteObjectToBundle<Lemon.Node> (AssetsBundle, dstPath, node);
 						return true;
@@ -109,7 +117,7 @@ namespace Orange
 					continue;
 				}
 				string assetPath = Path.ChangeExtension (path, GetOriginalAssetExtension (path));
-				if (!assetsFiles.Contains (assetPath)) {
+				if (!assetsFiles.Contains (BundlePathToNative (assetPath))) {
 					Console.WriteLine ("- " + path);
 					AssetsBundle.DeleteFile (path);
 				}
@@ -265,8 +273,7 @@ namespace Orange
 		void SyncAtlases ()
 		{
 			var atlasChainsToRebuild = new HashSet<string> ();
-			// Figure out atlas chains to rebuld			
-			
+			// Figure out atlas chains to rebuld
 			foreach (string atlasPartPath in AssetsBundle.EnumerateFiles ()) {
 				if (Path.GetExtension (atlasPartPath) != ".atlasPart")
 					continue;
@@ -280,9 +287,8 @@ namespace Orange
 					if (!File.Exists (srcTexturePath)) {
 						Console.WriteLine ("- " + atlasPartPath);
 						AssetsBundle.DeleteFile (atlasPartPath);
-					}
-					else {
-						srcTexturePath = Path.ChangeExtension (atlasPartPath, ".png");
+					} else {
+						srcTexturePath = Path.ChangeExtension (BundlePathToNative (atlasPartPath), ".png");
 						CookingRules rules = cookingRulesMap [srcTexturePath];
 						if (rules.TextureAtlas != null) {
 							atlasChainsToRebuild.Add (rules.TextureAtlas);

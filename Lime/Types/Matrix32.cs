@@ -99,6 +99,14 @@ namespace Lime
             return m;
         }
 
+		public static Vector2 operator * (Matrix32 a, Vector2 b)
+		{
+			Vector2 v;
+			v.X = b.X * a.U.X + b.Y * a.V.X + a.T.X;
+			v.Y = b.X * a.U.Y + b.Y * a.V.Y + a.T.Y;
+			return v;
+		}        
+
         public Vector2 TransformVector(Vector2 a)
         {
             Vector2 v;

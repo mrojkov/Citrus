@@ -141,8 +141,7 @@ namespace Lime
 				height /= 2;
 			}
 		}
-#else
-		
+#else	
 		enum DDSFourCC {
 			DXT1 = ('D' | ('X' << 8) | ('T' << 16) | ('1' << 24)),
 			DXT3 = ('D' | ('X' << 8) | ('T' << 16) | ('3' << 24)),
@@ -217,8 +216,7 @@ namespace Lime
 				height /= 2;
 				Renderer.Instance.CheckErrors ();
 			}
-		}
-		
+		}		
 #endif
 		
 		/// <summary>
@@ -258,12 +256,11 @@ namespace Lime
 		/// <summary>
 		/// Create texture from pixel array.
 		/// </summary>
-		public void LoadImage (Color4[] pixels, int width, int height)
+		public void LoadImage (Color4[] pixels, int width, int height, bool generateMips)
 		{		
-#if GLES11
 			// Discards current texture.
 			Dispose ();
-			
+#if GLES11
 			// Generate a new texture.
 			GL.GenTextures (1, ref id);
 			
@@ -274,28 +271,24 @@ namespace Lime
 			
 			GL.TexImage2D (All.Texture2D, 0, (int)All.Rgba, width, height, 0,
             	All.Rgba, All.UnsignedByte, pixels);
-
-			imgSize = new Size (width, height);
-			surSize = imgSize;
 #else
-			// Discards current texture.
-			Dispose ();
-
 			// Generate a new texture.
 			id = (uint)GL.GenTexture ();
 			GL.BindTexture (TextureTarget.Texture2D, id);
 			GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
 			GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
 			GL.Hint (HintTarget.PerspectiveCorrectionHint, HintMode.Fastest);
-
 			GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0,
             	PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
-
-			imgSize = new Size (width, height);
-			surSize = imgSize;
+			if (generateMips) {
+				GL.GenerateMipmap (GenerateMipmapTarget.Texture2D);
+			}
 #endif
 			Renderer.Instance.CheckErrors ();
-			uvRect = new Rectangle (Vector2.Zero, (Vector2)ImageSize / (Vector2)SurfaceSize);
+			
+			imgSize = new Size (width, height);
+			surSize = imgSize;
+			uvRect = new Rectangle (0, 0, 1, 1);
 		}
 
 		private void Dispose (bool manual)

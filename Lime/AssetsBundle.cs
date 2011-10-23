@@ -17,11 +17,11 @@ namespace Lime
 		private AssetsBundle bundle;
 		private AssetDescriptor descriptor;
 		private Int32 position;
-		
+
 		public AssetStream (AssetsBundle bundle, string path)
 		{
 			this.bundle = bundle;
-			if (!bundle.index.TryGetValue (path, out descriptor)) {
+			if (!bundle.index.TryGetValue (AssetsBundle.CorrectSlashes (path), out descriptor)) {
 				throw new Exception ("Can't open asset: {0}", path);
 			}
 		}
@@ -111,6 +111,15 @@ namespace Lime
 	
 	public class AssetsBundle : IAssetsSource, IDisposable
 	{	
+		public static string CorrectSlashes (string path)
+		{
+			if (path.IndexOf ('\\') >= 0) {
+				return path.Replace ('\\', '/');
+			} else {
+				return path;
+			}
+		}
+
 		static readonly AssetsBundle instance = new AssetsBundle ();
 
 		public static AssetsBundle Instance { get { return instance; } }
@@ -202,14 +211,13 @@ namespace Lime
 		
 		public Stream OpenFile (string path)
 		{
-			Stream stream = new AssetStream (this, path);
-			return stream;
+			return new AssetStream (this, path);
 		}
         
 		public DateTime GetFileLastWriteTime (string path)
 		{
 			AssetDescriptor desc;
-			if (index.TryGetValue (path, out desc)) {
+			if (index.TryGetValue (CorrectSlashes (path), out desc)) {
 				return desc.Time;
 			}
 			throw new Exception ("Asset '{0}' doesn't exist", path);
@@ -218,23 +226,18 @@ namespace Lime
 		public void DeleteFile (string path)
 		{
 			AssetDescriptor desc;
-			if (!index.TryGetValue (path, out desc)) {
+			if (!index.TryGetValue (CorrectSlashes (path), out desc)) {
 				throw new Exception ("Asset '{0}' doesn't exist", path);
 			}
 			index.Remove (path);
 			trash.Add (desc);
 		}
-		
+				
 		public bool FileExists (string path)
 		{
-			return index.ContainsKey (path);
+			return index.ContainsKey (CorrectSlashes (path));
 		}
 
-		public bool FileExists (string path, string extension)
-		{
-			return index.ContainsKey (System.IO.Path.ChangeExtension (path, extension));
-		}
-		
 		public void ImportFile (string srcPath, string dstPath, int reserve)
 		{
 			using (var stream = new FileStream (srcPath, FileMode.Open)) {
@@ -245,13 +248,13 @@ namespace Lime
 		public void ImportFile (string path, Stream stream, int reserve)
 		{
 			AssetDescriptor d;
-			bool reuseExistingDescriptor = index.TryGetValue (path, out d) && 
+			bool reuseExistingDescriptor = index.TryGetValue (CorrectSlashes (path), out d) && 
 				(d.AllocatedSize >= stream.Length) && 
 				(d.AllocatedSize <= stream.Length + reserve);
 			if (reuseExistingDescriptor) {
 				d.Length = (int)stream.Length;
 				d.Time = DateTime.Now;
-				index [path] = d;
+				index [CorrectSlashes (path)] = d;
 				this.stream.Seek (d.Offset, SeekOrigin.Begin);
 				stream.CopyTo (this.stream);
 				reserve = d.AllocatedSize - (int)stream.Length;
@@ -267,7 +270,7 @@ namespace Lime
 				d.Length = (int)stream.Length;
 				d.Offset = indexOffset;
 				d.AllocatedSize = d.Length + reserve;
-				index [path] = d;
+				index [CorrectSlashes (path)] = d;
 				indexOffset += d.AllocatedSize;
 				this.stream.Seek (d.Offset, SeekOrigin.Begin);
 				stream.CopyTo (this.stream);

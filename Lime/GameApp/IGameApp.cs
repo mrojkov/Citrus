@@ -1,5 +1,4 @@
 using System;
-using System.Drawing;
 
 namespace Lime
 {
@@ -28,7 +27,7 @@ namespace Lime
 		void OnUpdateFrame (double delta);
 		void OnRenderFrame ();
 		void OnDeviceRotated (DeviceOrientation deviceOrientation);
-		void OnClick (Point position);
+		void OnClick (IntVector2 position);
 		
 		DeviceOrientation SupportedDeviceOrientations { get; }
 	}

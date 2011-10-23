@@ -8,7 +8,7 @@
     <widget-library name="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <widget-library name="../../Targets/Orange.Win/Debug/Orange.exe" internal="true" />
   </import>
-  <widget class="Gtk.Dialog" id="Orange.MainDialog" design-size="400 467">
+  <widget class="Gtk.Dialog" id="Orange.MainDialog" design-size="555 467">
     <property name="MemberName" />
     <property name="Title" translatable="yes">Orange</property>
     <property name="WindowPosition">Center</property>
@@ -197,16 +197,16 @@ iPhone/iPad</property>
         <property name="Size">2</property>
         <property name="LayoutStyle">End</property>
         <child>
-          <widget class="Gtk.Button" id="BuildButton">
+          <widget class="Gtk.Button" id="SyncButton">
             <property name="MemberName" />
             <property name="CanDefault">True</property>
             <property name="HasDefault">True</property>
             <property name="CanFocus">True</property>
             <property name="Type">TextOnly</property>
-            <property name="Label" translatable="yes">Build</property>
+            <property name="Label" translatable="yes">Synchronize</property>
             <property name="UseUnderline">True</property>
             <property name="ResponseId">-1</property>
-            <signal name="Clicked" handler="OnBuildClicked" after="yes" />
+            <signal name="Clicked" handler="OnSyncClicked" after="yes" />
           </widget>
           <packing>
             <property name="Expand">False</property>

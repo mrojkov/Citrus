@@ -64,7 +64,6 @@ namespace Lemon
 						pt.Y = -pt.Y;
 						sz.Y = -sz.Y;
 					}
-
 					if (pt.X >= 0 && pt.Y >= 0 && pt.X < sz.X && pt.Y < sz.Y) {
 						int u = (int)(Texture.ImageSize.Width * (pt.X / sz.X));
 						int v = (int)(Texture.ImageSize.Height * (pt.Y / sz.Y));

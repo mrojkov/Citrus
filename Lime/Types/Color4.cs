@@ -1,41 +1,45 @@
 using System;
 using ProtoBuf;
+using System.Runtime.InteropServices;
 
 namespace Lime
 {
 	[ProtoContract]
 	[System.Diagnostics.DebuggerStepThrough]
+	[StructLayout(LayoutKind.Explicit)]
 	public struct Color4 : IEquatable<Color4>
 	{		
-		// OpenGL order of color components
-		[ProtoMember(1)]
+		[FieldOffset(0)]
 		public byte R;
 
-		[ProtoMember(2)]
+		[FieldOffset(1)]
 		public byte G;
 		
-		[ProtoMember(3)]
+		[FieldOffset(2)]
 		public byte B;
 		
-		[ProtoMember(4)]
+		[FieldOffset(3)]
 		public byte A;
 		
-		public static readonly Color4 Red = new Color4 (0xFF0000FF);
-		public static readonly Color4 Green = new Color4 (0x00FF00FF);
-		public static readonly Color4 Blue = new Color4 (0x0000FFFF);
-		public static readonly Color4 White = new Color4 (0xFFFFFFFF);
-		public static readonly Color4 Black = new Color4 (0x000000FF);
+		[ProtoMember(1)]
+		[FieldOffset(0)]
+		public UInt32 ABGR;
+		
+		public static readonly Color4 Red = new Color4 (255, 0, 0, 255);
+		public static readonly Color4 Green = new Color4 (0, 255, 0, 255);
+		public static readonly Color4 Blue = new Color4 (0, 0, 255, 255);
+		public static readonly Color4 White = new Color4 (255, 255, 255, 255);
+		public static readonly Color4 Black = new Color4 (0, 0, 0, 255);
 
-		public Color4 (UInt32 rgba)
+		public Color4 (UInt32 abgr)
 		{
-			A = (byte)(rgba & 0xFF);
-			B = (byte)((rgba >> 8) & 0xFF);
-			G = (byte)((rgba >> 16) & 0xFF);
-			R = (byte)((rgba >> 24) & 0xFF);
+			R = G = B = A = 0;
+			ABGR = abgr;
 		}
 		
 		public Color4 (byte r, byte g, byte b, byte a)
 		{
+			ABGR = 0;
 			R = r;
 			G = g;
 			B = b;
@@ -44,9 +48,9 @@ namespace Lime
 
 		public static Color4 operator * (Color4 lhs, Color4 rhs)
 		{
-			if (lhs.Equals (White))
+			if (lhs.ABGR == 0xFFFFFFFF)
 				return rhs;
-			if (rhs.Equals (White))
+			if (rhs.ABGR == 0xFFFFFFFF)
 				return lhs;
 			Color4 r = new Color4 ();
 			r.R = (byte)(((int)lhs.R * rhs.R) / 255);
@@ -69,7 +73,7 @@ namespace Lime
 
 		public static Color4 Lerp (Color4 a, Color4 b, float t)
 		{
-			if (a.Equals (b))
+			if (a.ABGR == b.ABGR)
 				return a;
 			t = (t < 0) ? 0 : ((t > 1) ? 1 : t);
 			int y = (int)(t * 255);
@@ -84,8 +88,7 @@ namespace Lime
         
 		public bool Equals (Color4 other)
 		{
-			return A == other.A && R == other.R && G == other.G && B == other.B;
+			return ABGR == other.ABGR;
 		}
-
 	}
 }
