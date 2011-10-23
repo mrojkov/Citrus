@@ -1,1 +1,0 @@
-"C:\Program Files (x86)\Mono-2.10.6\bin\mono" Orange.exe
