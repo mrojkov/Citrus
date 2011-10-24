@@ -93,7 +93,7 @@ namespace Lime
 	public class Renderer
 	{
 		static readonly Renderer instance = new Renderer ();
-		public bool PremulAlphaMode = false;
+		public bool PremulAlphaMode = true;
 		
 		const int MaxVertices = 128;
 		public int DrawCalls = 0;		
@@ -193,7 +193,7 @@ namespace Lime
 			GL.ClientActiveTexture (TextureUnit.Texture0);
 			GL.EnableClientState (ArrayCap.TextureCoordArray);
 			GL.TexCoordPointer (2, TexCoordPointerType.Float, 0, batchTexCoords0);
-			Blending = Blending.Default;			
+			Blending = Blending.Default;
 #endif
 			CheckErrors ();
 		}
@@ -203,7 +203,7 @@ namespace Lime
 		private void SetTexture (ITexture texture, int stage)
 		{
 			uint handle = texture != null ? texture.GetHandle() : 0;
-			if (handle != textures [stage])
+			//if (handle != textures [stage])
 			{
 				BindTexture (handle, stage);
 				textures [stage] = handle;
@@ -212,9 +212,9 @@ namespace Lime
 
 		private void BindTexture (uint glTexNum, int stage)
 		{
-			FlushSpriteBatch ();			
-#if GLES11			
-			if (stage > 0) {				
+			FlushSpriteBatch ();
+#if GLES11
+			if (stage > 0) {
 				GL.ActiveTexture (All.Texture0 + stage);
 				if (glTexNum > 0) {
 					GL.Enable (All.Texture2D);
@@ -227,7 +227,7 @@ namespace Lime
 				GL.BindTexture (All.Texture2D, glTexNum);
 			}
 #else
-			if (stage > 0) {				
+			if (stage > 0) {
 				GL.ActiveTexture (TextureUnit.Texture0 + stage);
 				if (glTexNum > 0) {
 					GL.Enable (EnableCap.Texture2D);
@@ -246,6 +246,7 @@ namespace Lime
 		
 		public void EndFrame ()
 		{
+			FlushSpriteBatch ();
 			SetTexture (null, 0);
 			SetTexture (null, 1);
 		}
@@ -364,7 +365,7 @@ namespace Lime
 					break;
 				case Blending.Add:
 					if (PremulAlphaMode)
-						GL.BlendFunc (BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha);
+						GL.BlendFunc (BlendingFactorSrc.One, BlendingFactorDest.One);
 					else
 						GL.BlendFunc (BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
 					GL.TexEnv (TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
@@ -389,13 +390,13 @@ namespace Lime
 			Rectangle textureRect = texture.UVRect;
 			uv0 = textureRect.A + (textureRect.B - textureRect.A) * uv0;
 			uv1 = textureRect.A + (textureRect.B - textureRect.A) * uv1;
-			if (PremulAlphaMode && blending == Blending.Add) {
+			if (PremulAlphaMode) {
 				color = Color4.PremulAlpha (color);
 			}
 			SetTexture (texture, 0);
 			if (currentIndex + 6 >= batchIndices.Length || currentVertex + 4 >= batchVertices.Length) {
 				FlushSpriteBatch ();
-			}			
+			}
 			int i = currentVertex;
 			currentVertex += 4;
 			
@@ -458,7 +459,7 @@ namespace Lime
 			for (int i = 0; i < numVertices; i++) {
 				Vertex v = vertices [i];
 				Color4 color = v.Color;
-				if (PremulAlphaMode && blending == Blending.Add) {
+				if (PremulAlphaMode) {
 					color = Color4.PremulAlpha (color);
 				}
 				batchColors [currentVertex] = color;
@@ -486,7 +487,7 @@ namespace Lime
 			for (int i = 0; i < numVertices; i++) {
 				Vertex v = vertices [i];
 				Color4 color = v.Color;
-				if (PremulAlphaMode && blending == Blending.Add) {
+				if (PremulAlphaMode) {
 					color = Color4.PremulAlpha (color);
 				}
 				batchColors [i] = color;

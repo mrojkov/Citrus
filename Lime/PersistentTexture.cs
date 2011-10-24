@@ -162,16 +162,21 @@ namespace Lime
 				uvRect.B = (Vector2)instance.ImageSize / (Vector2)instance.SurfaceSize;
 				return true;
 			}
+			Console.WriteLine ("Missing texture: {0}", path);
 			return false;
 		}
 
 		public ITexture Instance {
 			get {
 				if (instance == null) {
-					bool loaded = TryCreateRenderTarget (Path) ||
+					bool loaded = !string.IsNullOrEmpty (Path)  && (TryCreateRenderTarget (Path) ||
 						TryLoadTextureAtlasPart (Path + ".atlasPart") ||
-						TryLoadImage (Path + ".pvr") ||
-						TryLoadImage (Path + ".dds");
+#if iOS
+						TryLoadImage (Path + ".pvr")
+#else
+						TryLoadImage (Path + ".dds")
+#endif
+					);
 					if (!loaded) {
 						instance = CreateStubTexture ();
 						uvRect = instance.UVRect;

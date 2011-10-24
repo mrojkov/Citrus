@@ -224,17 +224,18 @@ namespace Lime
 		/// </summary>
 		public void LoadImage (Stream stream)
 		{
+			Renderer.Instance.FlushSpriteBatch ();
 			// Discards current texture.
 			Dispose ();
 
-#if GLES11			
+#if GLES11
 			// Generate a new texture.
 			GL.GenTextures (1, ref id);
 			GL.BindTexture (All.Texture2D, id);
 			GL.TexParameter (All.Texture2D, All.TextureMinFilter, (int)All.Linear);
 			GL.TexParameter (All.Texture2D, All.TextureMagFilter, (int)All.Linear);
 			GL.Hint (All.PerspectiveCorrectionHint, All.Fastest);
-#else			
+#else
 			// Generate a new texture.
 			id = (uint)GL.GenTexture ();
 			GL.BindTexture (TextureTarget.Texture2D, id);
@@ -257,7 +258,8 @@ namespace Lime
 		/// Create texture from pixel array.
 		/// </summary>
 		public void LoadImage (Color4[] pixels, int width, int height, bool generateMips)
-		{		
+		{
+			Renderer.Instance.FlushSpriteBatch ();
 			// Discards current texture.
 			Dispose ();
 #if GLES11
@@ -279,7 +281,7 @@ namespace Lime
 			GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
 			GL.Hint (HintTarget.PerspectiveCorrectionHint, HintMode.Fastest);
 			GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0,
-            	PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
+				PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
 			if (generateMips) {
 				GL.GenerateMipmap (GenerateMipmapTarget.Texture2D);
 			}

@@ -108,8 +108,8 @@ namespace Orange
 			switch (ParseInt ()) {
 			case 0:
 				return Blending.Default;
-			case 1:
-				return Blending.Alpha;
+			case 2:
+				return Blending.Add;
 			case 7:
 				return Blending.Silhuette;
 			default:
@@ -285,16 +285,16 @@ namespace Orange
 		public string ParsePath ()
 		{
 			string path = ParseQuotedString ();
-			path = path.Replace ('\\', '/');
 			if (string.IsNullOrEmpty (path))
 				return path;
-			else if (path [0] == '/')
+			else if (path [0] == '/' || path [0] == '\\')
 				path = path.Substring (1);
 			else {
 				string d = Path.GetDirectoryName (sourcePath);
 				path = Path.Combine (d, path);
 			}
 			path = Path.ChangeExtension (path, null);
+			path = path.Replace ('\\', '/');
 			return path;
 		}
 	}
