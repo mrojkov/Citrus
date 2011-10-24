@@ -15,7 +15,10 @@ namespace Orange
 
 		[ProtoMember(3)]
 		public string GameAssembly;
-		
+
+		[ProtoMember(4)]
+		public string GameProto;
+
 		public AppConfig () {}
 		
 		private static string GetConfigPath ()

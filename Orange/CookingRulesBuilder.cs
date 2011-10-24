@@ -27,7 +27,7 @@ namespace Orange
 			rulesStack.Push (CookingRules.Default);
 			using (new DirectoryChanger (assetsDirectory)) {
 				var files = Helpers.GetAllFiles (".", "*.*", true);
-				foreach (string path in files) {					
+				foreach (string path in files) {
 					if (!path.StartsWith (pathStack.Peek ())) {
 						rulesStack.Pop ();
 						pathStack.Pop ();
@@ -37,9 +37,9 @@ namespace Orange
 						rulesStack.Push (ParseCookingRules (rulesStack.Peek (), path));
 					} else if (Path.GetExtension (path) != ".txt") {
 						var rules = rulesStack.Peek ();
-						var rulesFile = Path.ChangeExtension (path, ".txt");
+						var rulesFile = path + ".txt";
 						if (File.Exists (rulesFile)) {
-							rules = ParseCookingRules (rulesStack.Peek (), rulesFile);							
+							rules = ParseCookingRules (rulesStack.Peek (), rulesFile);
 						}
 						if (rules.LastChangeTime > File.GetLastWriteTime (path)) {
 							File.SetLastWriteTime (path, rules.LastChangeTime);
@@ -64,7 +64,7 @@ namespace Orange
 			try {
 				rules.LastChangeTime = File.GetLastWriteTime (path);
 				using (var s = new FileStream (path, FileMode.Open)) {
-					TextReader r = new StreamReader (s);					
+					TextReader r = new StreamReader (s);
 					string line;
 	 				while ((line = r.ReadLine()) != null) {
 						line = line.Trim ();
@@ -96,7 +96,7 @@ namespace Orange
 				}
 			} catch (Lime.Exception e) {
 				throw new Lime.Exception ("Syntax error in {0}: {1}", path, e.Message);
-			}				
+			}
 			return rules;
 		}
 	}

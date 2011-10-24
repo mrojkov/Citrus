@@ -25,6 +25,7 @@ namespace Orange
 			AssetsFolderChooser.SetCurrentFolder (config.AssetsFolder);
 			TargetPlatform.Active = config.TargetPlatform;
 			GameAssemblyChooser.SetFilename (config.GameAssembly);
+			GameProtoChooser.SetFilename (config.GameProto);
 		}
 		
 		void SaveState ()
@@ -33,6 +34,7 @@ namespace Orange
 			config.AssetsFolder = AssetsFolderChooser.CurrentFolder;
 			config.TargetPlatform = TargetPlatform.Active;
 			config.GameAssembly = GameAssemblyChooser.Filename;
+			config.GameProto = GameProtoChooser.Filename;
 			AppConfig.Save (config);
 		}
 		
@@ -62,7 +64,7 @@ namespace Orange
 					bufferedLines = 0;
 					textView.ScrollToIter (textView.Buffer.EndIter, 0, false, 0, 0);
 				}
-				bufferedLines++;							
+				bufferedLines++;
 			}
 		
 			public override System.Text.Encoding Encoding {
@@ -106,13 +108,19 @@ namespace Orange
 			try {
 				System.DateTime startTime = System.DateTime.Now;
 				CompileLog.Buffer.Clear ();
-
-				// Load gamr assembly if specified
+				// Generate game proto C# binding
+				var gameProto = GameProtoChooser.Filename;
+				if (gameProto == "" || !File.Exists (gameProto)) {
+					gameProto = null;
+				}
+				if (gameProto != null) {
+					ProtoGen.Execute (gameProto);
+				}
+				// Load game assembly if specified
 				Assembly gameAssembly = null;
 				if (File.Exists (GameAssemblyChooser.Filename)) {
 					gameAssembly = Assembly.LoadFile (GameAssemblyChooser.Filename);
 				}
-
 				// Create serialization model
 				var model = ProtoBuf.Meta.TypeModel.Create ();
 				RegisterEngineTypes (model);
@@ -122,11 +130,10 @@ namespace Orange
 					PrepareTypeModel (model, gameAssembly);
 				}
 				model.CompileInPlace ();
-
 				// Cook all assets (the main job)
 				var platform = (TargetPlatform)this.TargetPlatform.Active;
 				AssetCooker cooker = new AssetCooker (AssetsFolderChooser.CurrentFolder, platform);
-				cooker.Cook (rebuild, gameAssembly);
+				cooker.Cook (rebuild, gameAssembly, gameProto);
 				// Update serialization assembly	
 				GenerateSerializerDll (model, System.IO.Path.Combine (AssetsFolderChooser.CurrentFolder, ".."));
 				// Show time statistics
@@ -153,7 +160,7 @@ namespace Orange
 		protected void OnRebuildButtonClicked (object sender, System.EventArgs e)
 		{
 			this.Sensitive = false;
-			try {	
+			try {
 				RunBuild (true);
 			} finally {
 				this.Sensitive = true;

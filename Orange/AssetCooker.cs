@@ -21,6 +21,8 @@ namespace Orange
 			case ".pvr":
 			case ".atlasPart":
 				return ".png";
+			case ".bin":
+				return ".txt";
 			default:
 				return Path.GetExtension (path);
 			}
@@ -45,7 +47,7 @@ namespace Orange
 			this.assetsDirectory = assetsDirectory;
 		}
 		
-		public void Cook (bool rebuild, System.Reflection.Assembly gameAssembly)
+		public void Cook (bool rebuild, System.Reflection.Assembly gameAssembly, string gameProto)
 		{
 			cookingRulesMap = CookingRulesBuilder.Build (assetsDirectory);
 			string bundlePath = Path.ChangeExtension (assetsDirectory, Helpers.GetTargetPlatformString (platform));
@@ -57,7 +59,24 @@ namespace Orange
 				using (new DirectoryChanger (assetsDirectory)) {
 					Console.WriteLine ("Synchronizing {0}", bundlePath);
 					SyncAtlases ();
-					SyncDeleted ();	
+					SyncDeleted ();
+
+					DateTime protoAge = new DateTime (0);
+					if (gameProto != null) {
+						protoAge = File.GetLastWriteTime (gameProto);
+					}
+					SyncUpdated ("*.txt", ".bin", protoAge, (srcPath, dstPath) => {
+						if (gameProto == null)
+							return false;
+						// Skip cooking rules configs
+						if (Path.GetFileName (srcPath) == "#CookingRules.txt" || File.Exists (Path.ChangeExtension (srcPath, null)))
+							return false;
+						string tmpFile = Path.ChangeExtension (srcPath, ".bin");
+						ConfigConverter.Convert (srcPath, tmpFile, gameProto);
+						AssetsBundle.ImportFile (tmpFile, dstPath, 16);
+						File.Delete (tmpFile);
+						return true;
+					});
 					SyncUpdated ("*.png", GetPlatformTextureExtension (), (srcPath, dstPath) => {
 						CookingRules rules = cookingRulesMap [Path.ChangeExtension (dstPath, ".png")];
 						if (rules.TextureAtlas != null) {
@@ -71,7 +90,6 @@ namespace Orange
 						File.Delete (tmpFile);
 						return true;
 					});
-					SyncUpdated ("*.xml", ".xml", null);
 					SyncUpdated ("*.fnt", ".fnt", (srcPath, dstPath) => {
 						string fontPngFile = Path.ChangeExtension (srcPath, ".png");
 						Lime.Size size;
@@ -123,14 +141,21 @@ namespace Orange
 				}
 			}
 		}
-	
+
 		void SyncUpdated (string mask, string newFileExtension, Converter converter)
+		{
+			SyncUpdated (mask, newFileExtension, new DateTime (0), converter);
+		}
+
+		void SyncUpdated (string mask, string newFileExtension, DateTime ageLimit, Converter converter)
 		{
 			var files = Helpers.GetAllFiles (".", mask, true);
 			foreach (string srcPath in files) {
 				string dstPath = Path.ChangeExtension (srcPath, newFileExtension);
 				bool cached = AssetsBundle.FileExists (dstPath);
-				if (!cached || File.GetLastWriteTime (srcPath) > AssetsBundle.GetFileLastWriteTime (dstPath)) {
+				bool needUpdate = !cached || File.GetLastWriteTime (srcPath) > AssetsBundle.GetFileLastWriteTime (dstPath) || 
+					AssetsBundle.GetFileLastWriteTime (dstPath) < ageLimit;
+				if (needUpdate) {
 					if (converter != null) {
 						try {
 							if (converter (srcPath, dstPath)) {
