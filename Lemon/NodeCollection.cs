@@ -56,6 +56,12 @@ namespace Lemon
 			node.Parent = Owner;
 			nodes.Add (node);
 		}
+
+		public void Insert (int index, Node node)
+		{
+			node.Parent = Owner;
+			nodes.Insert (index, node);
+		}
 		
 		public bool Remove (Node node)
 		{
@@ -76,8 +82,8 @@ namespace Lemon
 			T result = Find (id) as T;
 			if (result == null)
 				throw new Lime.Exception (
-                    String.Format ("Node '{0}' (of type: {1}) not found in '{2}' (type: {3})", 
-                    id, typeof(T), Owner.Id, Owner.GetType ()));
+					String.Format ("Node '{0}' (of type: {1}) not found in '{2}' (type: {3})", 
+					id, typeof(T), Owner.Id, Owner.GetType ()));
 			return result;
 		}
 

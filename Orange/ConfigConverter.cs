@@ -12,7 +12,7 @@ namespace Orange
 			// xxx.yyy.txt -> yyy
 			string type = Path.GetFileNameWithoutExtension (srcPath);
 			if (Path.GetExtension (type) != "") {
-				type = Path.ChangeExtension (type, null);
+				type = Path.GetExtension (type).Remove (0, 1);
 			}
 			string protoPath = Path.GetDirectoryName (gameProto);
 			string args = String.Format ("--encode={0} --proto_path={1} {2}", type, protoPath, gameProto);

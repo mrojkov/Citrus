@@ -289,7 +289,7 @@ namespace Orange
 					AssetsBundle.ImportFile (outFile, atlasPath, 0);
 					File.Delete (inFile);
 					File.Delete (outFile);
-					items.RemoveAll (x => x.Allocated);							
+					items.RemoveAll (x => x.Allocated);
 					break;
 				}
 			}

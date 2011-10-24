@@ -48,12 +48,12 @@ namespace Lemon
 
 		public Widget Widget;
 
-        [ProtoMember(5)]
+		[ProtoMember(5)]
 		public readonly AnimatorCollection Animators = new AnimatorCollection ();
-        
+
 		[ProtoMember(6)]
 		public readonly NodeCollection Nodes = new NodeCollection ();
-        
+
 		[ProtoMember(7)]
 		public readonly MarkerCollection Markers = new MarkerCollection ();
 

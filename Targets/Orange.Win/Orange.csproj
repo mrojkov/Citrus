@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -11,6 +11,21 @@
     <AssemblyName>Orange</AssemblyName>
     <BaseDirectory>..\..\Orange</BaseDirectory>
     <newfilesearch>OnLoadAutoInsert</newfilesearch>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -37,6 +52,10 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="protobuf-net, Version=2.0.0.452, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
@@ -44,10 +63,8 @@
     <Reference Include="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
-    <Reference Include="protobuf-net">
-      <HintPath>..\..\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
-    </Reference>
     <Reference Include="Mono.Posix" />
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\..\Orange\gtk-gui\gui.stetic">
@@ -62,16 +79,26 @@
     <Compile Include="..\..\Orange\DirectoryChanger.cs" />
     <Compile Include="..\..\Orange\Helpers.cs" />
     <Compile Include="..\..\Orange\MainDialog.cs" />
+    <Compile Include="..\..\Orange\ProtoGen.cs">
+      <Link>ProtoGen.cs</Link>
+    </Compile>
     <Compile Include="..\..\Orange\RectAllocator.cs" />
     <Compile Include="..\..\Orange\TargetPlatform.cs" />
     <Compile Include="..\..\Orange\TextureConverter.cs" />
     <Compile Include="..\..\Orange\gtk-gui\Orange.MainDialog.cs" />
-    <Compile Include="..\..\Orange\HotSource\FontImporter.cs" />
+    <Compile Include="..\..\Orange\HotSource\FontImporter.cs">
+      <Link>HotSource\FontImporter.cs</Link>
+    </Compile>
     <Compile Include="..\..\Orange\HotSource\Lexer.cs" />
-    <Compile Include="..\..\Orange\HotSource\SceneImporter.Animators.cs" />
-    <Compile Include="..\..\Orange\HotSource\SceneImporter.cs" />
+    <Compile Include="..\..\Orange\HotSource\SceneImporter.Animators.cs">
+      <Link>HotSource\SceneImporter.Animators.cs</Link>
+    </Compile>
+    <Compile Include="..\..\Orange\HotSource\SceneImporter.cs">
+      <Link>HotSource\SceneImporter.cs</Link>
+    </Compile>
     <Compile Include="..\..\Orange\Main.cs" />
     <Compile Include="..\..\Orange\AssemblyInfo.cs" />
+    <Compile Include="..\..\Orange\ConfigConverter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -87,30 +114,80 @@
   <ItemGroup>
     <Content Include="..\..\Orange\NVCompress.Win\jpeg62.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>NVCompress.Win\jpeg62.dll</Link>
     </Content>
     <Content Include="..\..\Orange\NVCompress.Win\libpng12.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>NVCompress.Win\libpng12.dll</Link>
     </Content>
     <Content Include="..\..\Orange\NVCompress.Win\libtiff3.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>NVCompress.Win\libtiff3.dll</Link>
     </Content>
     <Content Include="..\..\Orange\NVCompress.Win\nvcompress.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>NVCompress.Win\nvcompress.exe</Link>
     </Content>
     <Content Include="..\..\Orange\NVCompress.Win\nvtt.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>NVCompress.Win\nvtt.dll</Link>
     </Content>
     <Content Include="..\..\Orange\NVCompress.Win\zlib1.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>NVCompress.Win\zlib1.dll</Link>
     </Content>
+    <Content Include="..\..\Orange\ProtoGen\common.xslt">
+      <Link>ProtoGen\common.xslt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\Orange\ProtoGen\csharp.xslt">
+      <Link>ProtoGen\csharp.xslt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\Orange\ProtoGen\protobuf-net.dll">
+      <Link>ProtoGen\protobuf-net.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\Orange\ProtoGen\xml.xslt">
+      <Link>ProtoGen\xml.xslt</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="..\..\Orange\ProtoGen\protogen.exe">
+      <Link>ProtoGen\protogen.exe</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\Orange\NVCompress.Mac\libnvcore.dylib" />
-    <None Include="..\..\Orange\NVCompress.Mac\libnvimage.dylib" />
-    <None Include="..\..\Orange\NVCompress.Mac\libnvmath.dylib" />
-    <None Include="..\..\Orange\NVCompress.Mac\libnvtt.dylib" />
-    <None Include="..\..\Orange\NVCompress.Mac\nvcompress" />
-    <None Include="..\..\Orange\PVRTexTool\PVRTexTool" />
+    <None Include="..\..\Orange\NVCompress.Mac\nvcompress">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>NVCompress.Win\nvcompress</Link>
+    </None>
+    <None Include="..\..\Orange\ProtoCompiler.Win\protoc.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>ProtoCompiler.Win\protoc.exe</Link>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>
