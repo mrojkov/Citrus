@@ -15,6 +15,34 @@ namespace Lime
 			this.app = app;
 			app.OnCreate (this);
 			Keyboard.KeyDown += HandleKeyboardKeyDown;
+			Mouse.ButtonDown += HandleMouseButtonDown;
+			Mouse.ButtonUp += HandleMouseButtonUp;
+		}
+
+		void HandleMouseButtonUp (object sender, MouseButtonEventArgs e)
+		{
+			Vector2 pointer = new Vector2 (e.X, e.Y);
+			switch (e.Button) {
+			case OpenTK.Input.MouseButton.Left:
+				app.OnMouseUp (MouseButton.Left, pointer);
+				break;
+			case OpenTK.Input.MouseButton.Right:
+				app.OnMouseUp (MouseButton.Right, pointer);
+				break;
+			}
+		}
+
+		void HandleMouseButtonDown (object sender, MouseButtonEventArgs e)
+		{
+			Vector2 pointer = new Vector2 (e.X, e.Y);
+			switch (e.Button) {
+			case OpenTK.Input.MouseButton.Left:
+				app.OnMouseDown (MouseButton.Left, pointer);
+				break;
+			case OpenTK.Input.MouseButton.Right:
+				app.OnMouseDown (MouseButton.Right, pointer);
+				break;
+			}
 		}
 		
 		protected override void OnClosed (EventArgs e)
@@ -28,9 +56,9 @@ namespace Lime
 				this.Exit ();
 			if (e.Key == Key.F12) {
 				FullScreen = !FullScreen;
-			}			
+			}
 		}
-		
+
 		protected override void OnUpdateFrame (OpenTK.FrameEventArgs e)
 		{
 			double delta = e.Time;

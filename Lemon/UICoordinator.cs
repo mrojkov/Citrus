@@ -34,7 +34,7 @@ namespace Lemon
 			get { return instance; }
 		}
 
-        public void DispatchEvents (Node node)
+		public void DispatchEvents (Node node)
 		{
 			while (Events.Count > 0) {
 				UIEventArgs e = Events.Dequeue ();
@@ -42,7 +42,7 @@ namespace Lemon
 			}
 		}
 /*
-#if !MONOTOUCH				
+#if !iOS
         public void SetupEventHandling(OpenTK.GameWindow gameWindow)
         {
             gameWindow.Mouse.ButtonDown += Mouse_ButtonDown;
@@ -66,8 +66,6 @@ namespace Lemon
         {
             Vector2 p = new Vector2(e.X, e.Y);
             Events.Enqueue(new UIEventArgs { Type = UIEventType.LeftDown, Pointer = p });
-        }
-#endif
-*/
+        }*/
     }
 }

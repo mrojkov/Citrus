@@ -18,6 +18,11 @@ namespace Lime
 		float FrameRate { get; }
 		DeviceOrientation CurrentDeviceOrientation { get; }
 	}
+
+	public enum MouseButton
+	{
+		Left, Right
+	}
 	
 	public interface IGameApp
 	{
@@ -27,7 +32,9 @@ namespace Lime
 		void OnUpdateFrame (double delta);
 		void OnRenderFrame ();
 		void OnDeviceRotated (DeviceOrientation deviceOrientation);
-		void OnClick (IntVector2 position);
+		
+		void OnMouseUp (MouseButton button, Vector2 pointer);
+		void OnMouseDown (MouseButton button, Vector2 pointer);
 		
 		DeviceOrientation SupportedDeviceOrientations { get; }
 	}

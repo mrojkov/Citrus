@@ -133,7 +133,17 @@ namespace Lemon
 		
 		#endregion
 		#region Methods
-		
+
+		public void DispatchMouseDown (MouseButton button, Vector2 pointer)
+		{
+			DispatchUIEvent (new UIEventArgs { Pointer = pointer, Type = UIEventType.LeftDown });
+		}
+
+		public void DispatchMouseUp (MouseButton button, Vector2 pointer)
+		{
+			DispatchUIEvent (new UIEventArgs { Pointer = pointer, Type = UIEventType.LeftUp });
+		}
+
 		public void DispatchUIEvent (UIEventArgs e)
 		{
 			//if (AcceptInput)

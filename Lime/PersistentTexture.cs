@@ -140,7 +140,7 @@ namespace Lime
 			}
 			return false;
 		}
-
+		
 		private bool TryLoadTextureAtlasPart (string path)
 		{
 			if (AssetsBundle.Instance.FileExists (path)) {
