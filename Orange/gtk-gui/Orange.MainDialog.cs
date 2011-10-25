@@ -24,7 +24,7 @@ namespace Orange
 			global::Stetic.Gui.Initialize (this);
 			// Widget Orange.MainDialog
 			this.Name = "Orange.MainDialog";
-			this.Title = "Orange";
+			this.Title = global::Mono.Unix.Catalog.GetString ("Orange");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(1));
 			this.Modal = true;
 			// Internal child Orange.MainDialog.VBox
@@ -42,7 +42,7 @@ namespace Orange
 			this.table1.RowSpacing = ((uint)(6));
 			this.table1.ColumnSpacing = ((uint)(6));
 			// Container child table1.Gtk.Table+TableChild
-			this.AssetsFolderChooser = new global::Gtk.FileChooserButton ("Select An Assets Folder", ((global::Gtk.FileChooserAction)(2)));
+			this.AssetsFolderChooser = new global::Gtk.FileChooserButton (global::Mono.Unix.Catalog.GetString ("Select An Assets Folder"), ((global::Gtk.FileChooserAction)(2)));
 			this.AssetsFolderChooser.Name = "AssetsFolderChooser";
 			this.AssetsFolderChooser.ShowHidden = true;
 			this.table1.Add (this.AssetsFolderChooser);
@@ -53,7 +53,7 @@ namespace Orange
 			w2.RightAttach = ((uint)(2));
 			w2.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
-			this.GameAssemblyChooser = new global::Gtk.FileChooserButton ("Select An Assembly", ((global::Gtk.FileChooserAction)(0)));
+			this.GameAssemblyChooser = new global::Gtk.FileChooserButton (global::Mono.Unix.Catalog.GetString ("Select An Assembly"), ((global::Gtk.FileChooserAction)(0)));
 			this.GameAssemblyChooser.Name = "GameAssemblyChooser";
 			this.table1.Add (this.GameAssemblyChooser);
 			global::Gtk.Table.TableChild w3 = ((global::Gtk.Table.TableChild)(this.table1 [this.GameAssemblyChooser]));
@@ -64,7 +64,7 @@ namespace Orange
 			w3.XOptions = ((global::Gtk.AttachOptions)(4));
 			w3.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
-			this.GameProtoChooser = new global::Gtk.FileChooserButton ("Select The Game .proto File", ((global::Gtk.FileChooserAction)(0)));
+			this.GameProtoChooser = new global::Gtk.FileChooserButton (global::Mono.Unix.Catalog.GetString ("Select The Game .proto File"), ((global::Gtk.FileChooserAction)(0)));
 			this.GameProtoChooser.Name = "GameProtoChooser";
 			this.table1.Add (this.GameProtoChooser);
 			global::Gtk.Table.TableChild w4 = ((global::Gtk.Table.TableChild)(this.table1 [this.GameProtoChooser]));
@@ -78,7 +78,7 @@ namespace Orange
 			this.label1 = new global::Gtk.Label ();
 			this.label1.Name = "label1";
 			this.label1.Xalign = 1F;
-			this.label1.LabelProp = "Assets directory";
+			this.label1.LabelProp = global::Mono.Unix.Catalog.GetString ("Assets directory");
 			this.table1.Add (this.label1);
 			global::Gtk.Table.TableChild w5 = ((global::Gtk.Table.TableChild)(this.table1 [this.label1]));
 			w5.TopAttach = ((uint)(1));
@@ -89,7 +89,7 @@ namespace Orange
 			this.label2 = new global::Gtk.Label ();
 			this.label2.Name = "label2";
 			this.label2.Xalign = 1F;
-			this.label2.LabelProp = "Target platform";
+			this.label2.LabelProp = global::Mono.Unix.Catalog.GetString ("Target platform");
 			this.table1.Add (this.label2);
 			global::Gtk.Table.TableChild w6 = ((global::Gtk.Table.TableChild)(this.table1 [this.label2]));
 			w6.XOptions = ((global::Gtk.AttachOptions)(4));
@@ -98,7 +98,7 @@ namespace Orange
 			this.label3 = new global::Gtk.Label ();
 			this.label3.Name = "label3";
 			this.label3.Xalign = 1F;
-			this.label3.LabelProp = "Game assembly";
+			this.label3.LabelProp = global::Mono.Unix.Catalog.GetString ("Game assembly");
 			this.table1.Add (this.label3);
 			global::Gtk.Table.TableChild w7 = ((global::Gtk.Table.TableChild)(this.table1 [this.label3]));
 			w7.TopAttach = ((uint)(2));
@@ -109,7 +109,7 @@ namespace Orange
 			this.label4 = new global::Gtk.Label ();
 			this.label4.Name = "label4";
 			this.label4.Xalign = 1F;
-			this.label4.LabelProp = "Game .proto";
+			this.label4.LabelProp = global::Mono.Unix.Catalog.GetString ("Game .proto");
 			this.label4.Justify = ((global::Gtk.Justification)(1));
 			this.table1.Add (this.label4);
 			global::Gtk.Table.TableChild w8 = ((global::Gtk.Table.TableChild)(this.table1 [this.label4]));
@@ -119,8 +119,8 @@ namespace Orange
 			w8.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
 			this.TargetPlatform = global::Gtk.ComboBox.NewText ();
-			this.TargetPlatform.AppendText ("Desktop (PC, Mac, Linux)");
-			this.TargetPlatform.AppendText ("iPhone/iPad");
+			this.TargetPlatform.AppendText (global::Mono.Unix.Catalog.GetString ("Desktop (PC, Mac, Linux)"));
+			this.TargetPlatform.AppendText (global::Mono.Unix.Catalog.GetString ("iPhone/iPad"));
 			this.TargetPlatform.Name = "TargetPlatform";
 			this.TargetPlatform.Active = 0;
 			this.table1.Add (this.TargetPlatform);
@@ -162,7 +162,7 @@ namespace Orange
 			this.SyncButton.CanFocus = true;
 			this.SyncButton.Name = "SyncButton";
 			this.SyncButton.UseUnderline = true;
-			this.SyncButton.Label = "Synchronize";
+			this.SyncButton.Label = global::Mono.Unix.Catalog.GetString ("Synchronize");
 			w14.Add (this.SyncButton);
 			global::Gtk.ButtonBox.ButtonBoxChild w15 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w14 [this.SyncButton]));
 			w15.Expand = false;
@@ -172,7 +172,7 @@ namespace Orange
 			this.RebuildButton.CanFocus = true;
 			this.RebuildButton.Name = "RebuildButton";
 			this.RebuildButton.UseUnderline = true;
-			this.RebuildButton.Label = "Rebuild";
+			this.RebuildButton.Label = global::Mono.Unix.Catalog.GetString ("Rebuild");
 			w14.Add (this.RebuildButton);
 			global::Gtk.ButtonBox.ButtonBoxChild w16 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w14 [this.RebuildButton]));
 			w16.Position = 1;
