@@ -7,16 +7,16 @@ namespace Lime
 {
 	public class GameView : OpenTK.GameWindow, IGameWindow
 	{
-		IGameApp app;
+		GameApp app;
 		
-		public GameView (IGameApp app)
+		public GameView (GameApp app)
 			: base (800, 600, new OpenTK.Graphics.GraphicsMode (32, 0, 0, 4))
 		{
 			this.app = app;
 			app.OnCreate (this);
-			Keyboard.KeyDown += HandleKeyboardKeyDown;
-			Mouse.ButtonDown += HandleMouseButtonDown;
-			Mouse.ButtonUp += HandleMouseButtonUp;
+			this.Keyboard.KeyDown += HandleKeyboardKeyDown;
+			this.Mouse.ButtonDown += HandleMouseButtonDown;
+			this.Mouse.ButtonUp += HandleMouseButtonUp;
 		}
 
 		void HandleMouseButtonUp (object sender, MouseButtonEventArgs e)
@@ -52,9 +52,9 @@ namespace Lime
 
 		void HandleKeyboardKeyDown (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
 		{
-			if (e.Key == Key.Escape)
+			if (e.Key == OpenTK.Input.Key.Escape)
 				this.Exit ();
-			if (e.Key == Key.F12) {
+			if (e.Key == OpenTK.Input.Key.F12) {
 				FullScreen = !FullScreen;
 			}
 		}
@@ -67,7 +67,7 @@ namespace Lime
 				delta = 0.01;
 			else if (delta > 0.1)
 				delta = 0.1;
-			app.OnUpdateFrame (0.1);
+			app.OnUpdateFrame (delta);
 		}
 		
 		protected override void OnRenderFrame (OpenTK.FrameEventArgs e)
@@ -106,7 +106,7 @@ namespace Lime
 					frameRate = (float)countedFrames / ((float)milliseconds / 1000.0f);
 				timeStamp = t;
 				countedFrames = 0;
-			}				
+			}
 		}
 		
 		public float FrameRate { 

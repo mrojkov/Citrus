@@ -24,19 +24,17 @@ namespace Lime
 		Left, Right
 	}
 	
-	public interface IGameApp
+	public class GameApp
 	{
-		void OnCreate (IGameWindow gameWindow);
-		void OnGLCreate ();
-		void OnGLDestroy ();
-		void OnUpdateFrame (double delta);
-		void OnRenderFrame ();
-		void OnDeviceRotated (DeviceOrientation deviceOrientation);
-		
-		void OnMouseUp (MouseButton button, Vector2 pointer);
-		void OnMouseDown (MouseButton button, Vector2 pointer);
-		
-		DeviceOrientation SupportedDeviceOrientations { get; }
+		public virtual void OnCreate (IGameWindow gameWindow) {}
+		public virtual void OnGLCreate () {}
+		public virtual void OnGLDestroy () {}
+		public virtual void OnUpdateFrame (double delta) {}
+		public virtual void OnRenderFrame () {}
+		public virtual void OnDeviceRotated (DeviceOrientation deviceOrientation) {}
+		public virtual void OnMouseUp (MouseButton button, Vector2 pointer) {}
+		public virtual void OnMouseDown (MouseButton button, Vector2 pointer) {}
+		public virtual DeviceOrientation GetSupportedDeviceOrientations () { return DeviceOrientation.LandscapeLeft; }
 	}
 }
 

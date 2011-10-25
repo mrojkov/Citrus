@@ -8,7 +8,7 @@ namespace Lime
 	[System.Diagnostics.DebuggerStepThrough]
 	[StructLayout(LayoutKind.Explicit)]
 	public struct Color4 : IEquatable<Color4>
-	{		
+	{
 		[FieldOffset(0)]
 		public byte R;
 
@@ -52,21 +52,22 @@ namespace Lime
 				return rhs;
 			if (rhs.ABGR == 0xFFFFFFFF)
 				return lhs;
-			Color4 r = new Color4 ();
-			r.R = (byte)(((int)lhs.R * rhs.R) / 255);
-			r.G = (byte)(((int)lhs.G * rhs.G) / 255);
-			r.B = (byte)(((int)lhs.B * rhs.B) / 255);
-			r.A = (byte)(((int)lhs.A * rhs.A) / 255);
-			return r;
+			Color4 c = new Color4 ();
+			c.R = (byte)((rhs.R * ((lhs.R << 8) + lhs.R) + 255) >> 16);
+			c.G = (byte)((rhs.G * ((lhs.G << 8) + lhs.G) + 255) >> 16);
+			c.B = (byte)((rhs.B * ((lhs.B << 8) + lhs.B) + 255) >> 16);
+			c.A = (byte)((rhs.A * ((lhs.A << 8) + lhs.A) + 255) >> 16);
+			return c;
 		}
 		
 		public static Color4 PremulAlpha (Color4 color)
 		{
-			if (color.A < 255) {
-				Color4 t = color;
-				color.R = (t.R == 255) ? t.A : (byte)(t.R * t.A / 255);
-				color.G = (t.G == 255) ? t.A : (byte)(t.G * t.A / 255);
-				color.B = (t.B == 255) ? t.A : (byte)(t.B * t.A / 255);
+			int a = color.A;
+			if (a < 255) {
+				a = (a << 8) + a;
+				color.R = (byte)((color.R * a + 255) >> 16);
+				color.G = (byte)((color.G * a + 255) >> 16);
+				color.B = (byte)((color.B * a + 255) >> 16); 
 			}
 			return color;
 		}
@@ -75,17 +76,21 @@ namespace Lime
 		{
 			if (a.ABGR == b.ABGR)
 				return a;
-			t = (t < 0) ? 0 : ((t > 1) ? 1 : t);
-			int y = (int)(t * 255);
-			int x = 255 - y;
+			int x, z;
+			x = (int)(t * 255);
+			x = (x < 0) ? 0 : ((x > 255) ? 255 : x);
 			Color4 r = new Color4 ();
-			r.R = (byte)((a.R * x + b.R * y) / 255);
-			r.G = (byte)((a.G * x + b.G * y) / 255);
-			r.B = (byte)((a.B * x + b.B * y) / 255);
-			r.A = (byte)((a.A * x + b.A * y) / 255);
+			z = (a.R << 8) - a.R + (b.R - a.R) * x;
+			r.R = (byte)(((z << 8) + z + 255) >> 16);
+			z = (a.G << 8) - a.G + (b.G - a.G) * x;
+			r.G = (byte)(((z << 8) + z + 255) >> 16);
+			z = (a.B << 8) - a.B + (b.B - a.B) * x;
+			r.B = (byte)(((z << 8) + z + 255) >> 16);
+			z = (a.A << 8) - a.A + (b.A - a.A) * x;
+			r.A = (byte)(((z << 8) + z + 255) >> 16);
 			return r;
 		}
-        
+
 		public bool Equals (Color4 other)
 		{
 			return ABGR == other.ABGR;

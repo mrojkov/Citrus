@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{D7896B3C-713E-4423-B64C-FA38BCA79F06}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Lime</RootNamespace>
+    <AssemblyName>Lime</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;WIN</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <DebugSymbols>true</DebugSymbols>
+    <DefineConstants>WIN</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="OpenTK">
+      <HintPath>..\3rdParty\OpenTK\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="protobuf-net">
+      <HintPath>..\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Common\AssetsBundle.cs" />
+    <Compile Include="Common\AssetsFolder.cs" />
+    <Compile Include="Common\AssetsSource.cs" />
+    <Compile Include="Common\Exception.cs" />
+    <Compile Include="Common\Font.cs" />
+    <Compile Include="Common\MathUtils.cs" />
+    <Compile Include="Common\PersistentFont.cs" />
+    <Compile Include="Common\PersistentSound.cs" />
+    <Compile Include="Common\PersistentTexture.cs" />
+    <Compile Include="Common\PlainTexture.cs" />
+    <Compile Include="Common\Renderer.cs" />
+    <Compile Include="Common\RenderTexture.cs" />
+    <Compile Include="Common\Serialization.cs" />
+    <Compile Include="Common\Texture.cs" />
+    <Compile Include="Common\TextureAtlasPart.cs" />
+    <Compile Include="Common\Utils.cs" />
+    <Compile Include="GameApp\IGameApp.cs" />
+    <Compile Include="GameApp\Keyboard.cs" />
+    <Compile Include="GameApp\OpenTK\GameView.cs" />
+    <Compile Include="Types\Color4.cs" />
+    <Compile Include="Types\IntRectangle.cs" />
+    <Compile Include="Types\IntVector2.cs" />
+    <Compile Include="Types\Matrix32.cs" />
+    <Compile Include="Types\NumericRange.cs" />
+    <Compile Include="Types\Rectangle.cs" />
+    <Compile Include="Types\Size.cs" />
+    <Compile Include="Types\Vector2.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>
