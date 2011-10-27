@@ -301,7 +301,11 @@ namespace Lime
 			GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0,
 				PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
 			if (generateMips) {
+#if WIN
 				GL.GenerateMipmap (GenerateMipmapTarget.Texture2D);
+#else
+				Console.WriteLine ("WARNING: Mipmap generation is not implemented for this platform");
+#endif
 			}
 #endif
 			Renderer.Instance.CheckErrors ();

@@ -8,16 +8,16 @@ namespace Orange
 	public class AppConfig
 	{
 		[ProtoMember(1)]
-		public string AssetsFolder;
+		public string AssetsFolder = "";
 		
 		[ProtoMember(2)]
 		public int TargetPlatform;
 
 		[ProtoMember(3)]
-		public string GameAssembly;
+		public string GameAssembly = "";
 
 		[ProtoMember(4)]
-		public string GameProto;
+		public string GameProto = "";
 
 		public AppConfig () {}
 		

@@ -9,9 +9,9 @@ namespace Lime
 {
 	internal class GameView : MonoMac.OpenGL.MonoMacGameView
 	{
-		IGameApp game;
+		GameApp game;
 		
-		public GameView (RectangleF frame, NSOpenGLContext context, IGameApp game) : base (frame, context)
+		public GameView (RectangleF frame, NSOpenGLContext context, GameApp game) : base (frame, context)
 		{
 			this.game = game;
 			AutoresizingMask = NSViewResizingMask.HeightSizable

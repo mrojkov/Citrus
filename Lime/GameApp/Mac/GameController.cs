@@ -25,7 +25,7 @@ namespace Lime
 		NSMenuItem fullScreenMenuItem;
 		NSMenuItem quitMenuItem;
 		
-		public GameController (IGameApp game)
+		public GameController (GameApp game)
 		{		
 			// The default resolution is 640 x 480
 			windowSize = new Size (640, 480);
@@ -43,7 +43,7 @@ namespace Lime
 			
 			// Attach MacOS application main menu
 			SetMainMenu ();
-						
+			
 			// Set the current directory.
 			// We set the current directory to the ResourcePath on Mac
 			Directory.SetCurrentDirectory (NSBundle.MainBundle.ResourcePath);
@@ -84,11 +84,11 @@ namespace Lime
 		public Size WindowSize {
 			// returs actual window size
 			get {
-				return (Size)view.Size;
+				return new Size (view.Size.Width, view.Size.Height);
 			}
 			// sets window size for windowed mode
 			set {
-				windowSize = value;
+				windowSize = new Size (value.Width, value.Height);
 				if (!isInFullScreenMode) {
 					ResetWindowBounds ();
 				}				
@@ -178,7 +178,7 @@ namespace Lime
 		private void GoWindowMode ()
 		{
 			isInFullScreenMode = false;
-				
+			
 			// Changing window style resets the title. Save it.
 			string oldTitle = view.Title;
 			
@@ -189,7 +189,7 @@ namespace Lime
 			ResetWindowBounds();
 			
 			if (oldTitle != null)
-				view.Title = oldTitle;		
+				view.Title = oldTitle;
 		}
 
 		public float FrameRate {

@@ -6,11 +6,11 @@ using MonoMac.Foundation;
 namespace Lime
 {
 	public class AppDelegate : NSApplicationDelegate
-	{	
-		IGameApp game;
+	{
+		GameApp game;
 		GameController gameController;
 		
-		public AppDelegate (IGameApp game)
+		public AppDelegate (GameApp game)
 		{
 			this.game = game;
 		}

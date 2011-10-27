@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{4F19022D-A3BC-45BC-920B-5DCA83295C94}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Lime.Mac</RootNamespace>
+    <AssemblyName>Lime.Mac</AssemblyName>
+    <newfilesearch>OnLoad</newfilesearch>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;MAC</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <DebugSymbols>true</DebugSymbols>
+    <DefineConstants>MAC</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="protobuf-net">
+      <HintPath>..\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Drawing" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Common\AssetsBundle.cs" />
+    <Compile Include="Common\AssetsFolder.cs" />
+    <Compile Include="Common\AssetsSource.cs" />
+    <Compile Include="Common\Exception.cs" />
+    <Compile Include="Common\Font.cs" />
+    <Compile Include="Common\MathUtils.cs" />
+    <Compile Include="Common\PersistentFont.cs" />
+    <Compile Include="Common\PersistentSound.cs" />
+    <Compile Include="Common\PersistentTexture.cs" />
+    <Compile Include="Common\PlainTexture.cs" />
+    <Compile Include="Common\RenderTexture.cs" />
+    <Compile Include="Common\Renderer.cs" />
+    <Compile Include="Common\Serialization.cs" />
+    <Compile Include="Common\Texture.cs" />
+    <Compile Include="Common\TextureAtlasPart.cs" />
+    <Compile Include="Common\Utils.cs" />
+    <Compile Include="GameApp\IGameApp.cs" />
+    <Compile Include="GameApp\Keyboard.cs" />
+    <Compile Include="GameApp\Mac\AppDelegate.cs" />
+    <Compile Include="GameApp\Mac\GameController.cs" />
+    <Compile Include="GameApp\Mac\GameView.cs" />
+    <Compile Include="Types\Color4.cs" />
+    <Compile Include="Types\IntRectangle.cs" />
+    <Compile Include="Types\IntVector2.cs" />
+    <Compile Include="Types\Matrix32.cs" />
+    <Compile Include="Types\NumericRange.cs" />
+    <Compile Include="Types\Rectangle.cs" />
+    <Compile Include="Types\Size.cs" />
+    <Compile Include="Types\Vector2.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <None Include="GameApp\OpenTK\GameView.cs">
+      <Visible>False</Visible>
+    </None>
+    <None Include="GameApp\iOS\AppDelegate.cs">
+      <Visible>False</Visible>
+    </None>
+    <None Include="GameApp\iOS\GameController.cs">
+      <Visible>False</Visible>
+    </None>
+    <None Include="GameApp\iOS\GameView.cs">
+      <Visible>False</Visible>
+    </None>
+  </ItemGroup>
+</Project>

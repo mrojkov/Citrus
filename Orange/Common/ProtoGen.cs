@@ -16,14 +16,15 @@ namespace Orange
 				string args = String.Format ("-i:\"{0}\" -o:\"{1}\"", protoPath, csPath);
 #if WIN
 				string protogen = Path.Combine (Helpers.GetApplicationDirectory (), "ToolChain.Win", "protogen.exe");
+#else
+				string protogen = Path.Combine (Helpers.GetApplicationDirectory (), "ToolChain.Mac", "protogen");
+#endif
 				var psi = new System.Diagnostics.ProcessStartInfo (protogen, args);
 				psi.RedirectStandardError = true;
 				psi.UseShellExecute = false;
 				psi.CreateNoWindow = true;
 				var p = System.Diagnostics.Process.Start (psi);
-#else
-				throw new NotImplementedException ();
-#endif
+
 				// Wait for complier 
 				while (!p.HasExited) {
 					p.WaitForExit ();
