@@ -57,7 +57,7 @@ namespace Orange
 			AssetsBundle.Open (bundlePath, true);
 			try {
 				using (new DirectoryChanger (assetsDirectory)) {
-					Console.WriteLine ("------------- Building Game Asset Bundle -------------");
+					Console.WriteLine ("------------- Building Game Assets -------------");
 					SyncAtlases ();
 					SyncDeleted ();
 					SyncUpdated ("*.png", GetPlatformTextureExtension (), (srcPath, dstPath) => {
