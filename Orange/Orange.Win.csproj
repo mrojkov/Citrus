@@ -14,7 +14,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
+    <OutputPath>bin\Win\Debug\</OutputPath>
     <DefineConstants>DEBUG;WIN</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -25,7 +25,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Release</OutputPath>
+    <OutputPath>bin\Win\Release\</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
@@ -48,84 +48,43 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="gtk-gui\gui.stetic">
-      <LogicalName>gui.stetic</LogicalName>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="gtk-gui\generated.cs" />
     <Compile Include="gtk-gui\Orange.MainDialog.cs" />
-    <Compile Include="HotSource\FontImporter.cs" />
-    <Compile Include="HotSource\Lexer.cs" />
-    <Compile Include="HotSource\SceneImporter.Animators.cs" />
-    <Compile Include="HotSource\SceneImporter.cs" />
-    <Compile Include="Common\AppConfig.cs" />
-    <Compile Include="Common\AssemblyInfo.cs" />
-    <Compile Include="Common\AssetCooker.cs" />
-    <Compile Include="Common\ConfigConverter.cs" />
-    <Compile Include="Common\CookingRulesBuilder.cs" />
-    <Compile Include="Common\DirectoryChanger.cs" />
-    <Compile Include="Common\Helpers.cs" />
-    <Compile Include="Common\Main.cs" />
-    <Compile Include="Common\MainDialog.cs" />
-    <Compile Include="Common\ProtoGen.cs" />
-    <Compile Include="Common\RectAllocator.cs" />
-    <Compile Include="Common\TargetPlatform.cs" />
-    <Compile Include="Common\TextureConverter.cs" />
+    <Compile Include="Source\AppConfig.cs" />
+    <Compile Include="Source\AssemblyInfo.cs" />
+    <Compile Include="Source\AssetCooker\AssetCooker.cs" />
+    <Compile Include="Source\AssetCooker\CookingRulesBuilder.cs" />
+    <Compile Include="Source\AssetCooker\RectAllocator.cs" />
+    <Compile Include="Source\AssetCooker\TextureConverter.cs" />
+    <Compile Include="Source\DirectoryChanger.cs" />
+    <Compile Include="Source\Helpers.cs" />
+    <Compile Include="Source\HotStudioImport\HotAnimators.cs" />
+    <Compile Include="Source\HotStudioImport\HotFontImporter.cs" />
+    <Compile Include="Source\HotStudioImport\HotLexer.cs" />
+    <Compile Include="Source\HotStudioImport\HotSceneImporter.cs" />
+    <Compile Include="Source\Main.cs" />
+    <Compile Include="Source\MainDialog.cs" />
+    <Compile Include="Source\SolutionBuilder.cs" />
+    <Compile Include="Source\TargetPlatform.cs" />
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\Lemon\Lemon.Win.csproj">
-      <Project>{80A5F32D-797A-43CD-9B71-8C2220F25F6C}</Project>
-      <Name>Lemon.Win</Name>
-    </ProjectReference>
+    <None Include="gtk-gui\gui.stetic" />
+    <None Include="Source\Orange.Mac.pidb" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Toolchain.Win\jpeg62.dll" />
+    <Content Include="Toolchain.Win\libpng12.dll" />
+    <Content Include="Toolchain.Win\libtiff3.dll" />
+    <Content Include="Toolchain.Win\msvcp100.dll" />
+    <Content Include="Toolchain.Win\msvcr100.dll" />
+    <Content Include="Toolchain.Win\nvcompress.exe" />
+    <Content Include="Toolchain.Win\nvtt.dll" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Lime\Lime.Win.csproj">
-      <Project>{D7896B3C-713E-4423-B64C-FA38BCA79F06}</Project>
+      <Project>{FC2DE6C9-641A-4230-8D29-EA4035CD8708}</Project>
       <Name>Lime.Win</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="Toolchain.Win\common.xslt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Toolchain.Win\csharp.xslt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Toolchain.Win\jpeg62.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Toolchain.Win\libpng12.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Toolchain.Win\libtiff3.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Toolchain.Win\msvcp100.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Toolchain.Win\msvcr100.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Toolchain.Win\nvcompress.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Toolchain.Win\nvtt.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Toolchain.Win\protobuf-net.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Toolchain.Win\protoc.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Toolchain.Win\protogen.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Toolchain.Win\xml.xslt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Toolchain.Win\zlib1.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -25,9 +25,9 @@ namespace Orange
 		public void Build ()
 		{
 			Console.WriteLine ("------------- Building Game Application -------------");
-			string args = "", slnFile = "";
+			string app = "", args = "", slnFile = "";
 #if MAC
-			string mdTool = "/Applications/MonoDevelop.app/Contents/MacOS/mdtool";
+			app = "/Applications/MonoDevelop.app/Contents/MacOS/mdtool";
 			if (platform == TargetPlatform.iOS) {
 				string slnName = Path.GetFileName (projectFolder) + ".iOS";
 				slnFile = Path.Combine (projectFolder, slnName, slnName + ".sln");
@@ -39,7 +39,7 @@ namespace Orange
 			}
 #endif
 			var p = new System.Diagnostics.Process ();
-			p.StartInfo.FileName = mdTool;
+			p.StartInfo.FileName = app;
 			p.StartInfo.Arguments = args;
 			p.StartInfo.EnvironmentVariables.Clear ();
 			p.StartInfo.UseShellExecute = false;
@@ -74,8 +74,8 @@ namespace Orange
 		public bool Run ()
 		{
 			Console.WriteLine ("------------- Starting Game -------------");
-#if MAC
 			string app = "", args = "", dir = Directory.GetCurrentDirectory ();
+#if MAC
 			if (platform == TargetPlatform.Desktop) {
 				string appName = Path.GetFileName (projectFolder);
 				app = Path.Combine (projectFolder, appName + ".Mac", "bin/Release", appName + ".app", "Contents/MacOS", appName);
@@ -83,6 +83,8 @@ namespace Orange
 			} else {				
 				throw new NotImplementedException ();
 			}
+#elif WIN
+
 #endif
 			using (new DirectoryChanger (dir)) {
 				var p = new System.Diagnostics.Process ();
