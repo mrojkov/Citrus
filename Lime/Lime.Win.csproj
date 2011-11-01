@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{FC2DE6C9-641A-4230-8D29-EA4035CD8708}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Lime</RootNamespace>
+    <AssemblyName>Lime</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>WIN</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>WIN</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="OpenTK">
+      <HintPath>..\3rdParty\OpenTK\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="protobuf-net">
+      <HintPath>..\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Source\Application\GameApp.cs" />
+    <Compile Include="Source\Application\iOSAppDelegate.cs" />
+    <Compile Include="Source\Application\iOSGameController.cs" />
+    <Compile Include="Source\Application\iOSGameView.cs" />
+    <Compile Include="Source\Application\MacAppDelegate.cs" />
+    <Compile Include="Source\Application\MacGameController.cs" />
+    <Compile Include="Source\Application\MacGameView.cs" />
+    <Compile Include="Source\Application\OpenTKGameView.cs" />
+    <Compile Include="Source\AssetsBundle.cs" />
+    <Compile Include="Source\AssetsFolder.cs" />
+    <Compile Include="Source\AssetsSource.cs" />
+    <Compile Include="Source\Audio\PersistentSound.cs" />
+    <Compile Include="Source\Exception.cs" />
+    <Compile Include="Source\Graphics\Font.cs" />
+    <Compile Include="Source\Graphics\PersistentFont.cs" />
+    <Compile Include="Source\Graphics\PersistentTexture.cs" />
+    <Compile Include="Source\Graphics\PlainTexture.cs" />
+    <Compile Include="Source\Graphics\Renderer.cs" />
+    <Compile Include="Source\Graphics\RenderTexture.cs" />
+    <Compile Include="Source\Graphics\Texture.cs" />
+    <Compile Include="Source\Graphics\TextureAtlasPart.cs" />
+    <Compile Include="Source\Input\Keyboard.cs" />
+    <Compile Include="Source\MathUtils.cs" />
+    <Compile Include="Source\Serialization.cs" />
+    <Compile Include="Source\Types\Color4.cs" />
+    <Compile Include="Source\Types\IntRectangle.cs" />
+    <Compile Include="Source\Types\IntVector2.cs" />
+    <Compile Include="Source\Types\Matrix32.cs" />
+    <Compile Include="Source\Types\NumericRange.cs" />
+    <Compile Include="Source\Types\Rectangle.cs" />
+    <Compile Include="Source\Types\Size.cs" />
+    <Compile Include="Source\Types\Vector2.cs" />
+    <Compile Include="Source\Utils.cs" />
+    <Compile Include="Source\Widgets\Animator.cs" />
+    <Compile Include="Source\Widgets\AnimatorCollection.cs" />
+    <Compile Include="Source\Widgets\AnimatorRegistry.cs" />
+    <Compile Include="Source\Widgets\Audio.cs" />
+    <Compile Include="Source\Widgets\Bone.cs" />
+    <Compile Include="Source\Widgets\BoneArray.cs" />
+    <Compile Include="Source\Widgets\Button.cs" />
+    <Compile Include="Source\Widgets\DistortionMesh.cs" />
+    <Compile Include="Source\Widgets\DistortionMeshPoint.cs" />
+    <Compile Include="Source\Widgets\Frame.cs" />
+    <Compile Include="Source\Widgets\Image.cs" />
+    <Compile Include="Source\Widgets\ImageCombiner.cs" />
+    <Compile Include="Source\Widgets\Marker.cs" />
+    <Compile Include="Source\Widgets\MarkerCollection.cs" />
+    <Compile Include="Source\Widgets\Node.cs" />
+    <Compile Include="Source\Widgets\NodeCollection.cs" />
+    <Compile Include="Source\Widgets\ParticleEmitter.cs" />
+    <Compile Include="Source\Widgets\ParticleModifier.cs" />
+    <Compile Include="Source\Widgets\ParticlesMagnet.cs" />
+    <Compile Include="Source\Widgets\PointObject.cs" />
+    <Compile Include="Source\Widgets\SimpleText.cs" />
+    <Compile Include="Source\Widgets\Spline.cs" />
+    <Compile Include="Source\Widgets\SplineGear.cs" />
+    <Compile Include="Source\Widgets\SplinePoint.cs" />
+    <Compile Include="Source\Widgets\UICoordinator.cs" />
+    <Compile Include="Source\Widgets\Widget.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Source\Lime.iOS.pidb" />
+    <None Include="Source\Lime.Mac.pidb" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
