@@ -20,7 +20,7 @@ namespace Orange
 			global::Stetic.Gui.Initialize (this);
 			// Widget Orange.MainDialog
 			this.Name = "Orange.MainDialog";
-			this.Title = "Orange";
+			this.Title = global::Mono.Unix.Catalog.GetString ("Orange");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(1));
 			this.Modal = true;
 			// Internal child Orange.MainDialog.VBox
@@ -41,7 +41,7 @@ namespace Orange
 			this.label1 = new global::Gtk.Label ();
 			this.label1.Name = "label1";
 			this.label1.Xalign = 1F;
-			this.label1.LabelProp = "Project folder";
+			this.label1.LabelProp = global::Mono.Unix.Catalog.GetString ("Project folder");
 			this.table1.Add (this.label1);
 			global::Gtk.Table.TableChild w2 = ((global::Gtk.Table.TableChild)(this.table1 [this.label1]));
 			w2.TopAttach = ((uint)(1));
@@ -52,13 +52,13 @@ namespace Orange
 			this.label2 = new global::Gtk.Label ();
 			this.label2.Name = "label2";
 			this.label2.Xalign = 1F;
-			this.label2.LabelProp = "Target platform";
+			this.label2.LabelProp = global::Mono.Unix.Catalog.GetString ("Target platform");
 			this.table1.Add (this.label2);
 			global::Gtk.Table.TableChild w3 = ((global::Gtk.Table.TableChild)(this.table1 [this.label2]));
 			w3.XOptions = ((global::Gtk.AttachOptions)(4));
 			w3.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
-			this.ProjectFolderChooser = new global::Gtk.FileChooserButton ("Select A Project Folder", ((global::Gtk.FileChooserAction)(2)));
+			this.ProjectFolderChooser = new global::Gtk.FileChooserButton (global::Mono.Unix.Catalog.GetString ("Select A Project Folder"), ((global::Gtk.FileChooserAction)(2)));
 			this.ProjectFolderChooser.Name = "ProjectFolderChooser";
 			this.ProjectFolderChooser.ShowHidden = true;
 			this.table1.Add (this.ProjectFolderChooser);
@@ -70,8 +70,8 @@ namespace Orange
 			w4.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
 			this.TargetPlatform = global::Gtk.ComboBox.NewText ();
-			this.TargetPlatform.AppendText ("Desktop (PC, Mac, Linux)");
-			this.TargetPlatform.AppendText ("iPhone/iPad");
+			this.TargetPlatform.AppendText (global::Mono.Unix.Catalog.GetString ("Desktop (PC, Mac, Linux)"));
+			this.TargetPlatform.AppendText (global::Mono.Unix.Catalog.GetString ("iPhone/iPad"));
 			this.TargetPlatform.Name = "TargetPlatform";
 			this.TargetPlatform.Active = 0;
 			this.table1.Add (this.TargetPlatform);
@@ -113,7 +113,7 @@ namespace Orange
 			this.RunButton.CanFocus = true;
 			this.RunButton.Name = "RunButton";
 			this.RunButton.UseUnderline = true;
-			this.RunButton.Label = "Run";
+			this.RunButton.Label = global::Mono.Unix.Catalog.GetString ("Run");
 			w10.Add (this.RunButton);
 			global::Gtk.ButtonBox.ButtonBoxChild w11 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w10 [this.RunButton]));
 			w11.Expand = false;
@@ -123,7 +123,7 @@ namespace Orange
 			this.CleanButton.CanFocus = true;
 			this.CleanButton.Name = "CleanButton";
 			this.CleanButton.UseUnderline = true;
-			this.CleanButton.Label = "Clean";
+			this.CleanButton.Label = global::Mono.Unix.Catalog.GetString ("Clean");
 			w10.Add (this.CleanButton);
 			global::Gtk.ButtonBox.ButtonBoxChild w12 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w10 [this.CleanButton]));
 			w12.Position = 1;

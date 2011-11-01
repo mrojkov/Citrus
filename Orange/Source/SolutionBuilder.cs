@@ -21,11 +21,48 @@ namespace Orange
 			Console.WriteLine ("Copying: {0}", dstFile);
 			System.IO.File.Copy (srcFile, dstFile, true);
 		}
+
+		private int StartProcess (string app, string args)
+		{
+			var p = new System.Diagnostics.Process ();
+			p.StartInfo.FileName = app;
+			p.StartInfo.Arguments = args;
+			p.StartInfo.UseShellExecute = false;
+#if WIN
+			p.StartInfo.CreateNoWindow = true;
+			p.StartInfo.WorkingDirectory = Path.GetDirectoryName (app);
+#else
+			p.StartInfo.StandardOutputEncoding = System.Text.Encoding.Default;
+			p.StartInfo.StandardErrorEncoding = System.Text.Encoding.Default;
+			p.StartInfo.EnvironmentVariables.Clear ();
+#endif
+			p.StartInfo.RedirectStandardOutput = true;
+			p.StartInfo.RedirectStandardError = true;
+			var logger = new System.Text.StringBuilder ();
+			p.OutputDataReceived += (sender, e) => { lock (logger) { logger.AppendLine (e.Data); } };
+			p.ErrorDataReceived += (sender, e) => { lock (logger) { logger.AppendLine (e.Data); } };
+			p.Start ();
+			p.BeginOutputReadLine ();
+			p.BeginErrorReadLine ();
+			while (!p.HasExited) {
+				p.WaitForExit (50);
+				lock (logger) {
+					if (logger.Length > 0) {
+						Console.Write (logger.ToString ());
+						logger.Clear ();
+					}
+				}
+				while (Gtk.Application.EventsPending ()) {
+					Gtk.Application.RunIteration ();
+				}
+			}
+			return p.ExitCode;
+		}
 		
 		public void Build ()
 		{
 			Console.WriteLine ("------------- Building Game Application -------------");
-			string app = "", args = "", slnFile = "";
+			string app, args, slnFile;
 #if MAC
 			app = "/Applications/MonoDevelop.app/Contents/MacOS/mdtool";
 			if (platform == TargetPlatform.iOS) {
@@ -37,28 +74,21 @@ namespace Orange
 				slnFile = Path.Combine (projectFolder, slnName, slnName + ".sln");
 				args = String.Format ("build \"{0}\" -t:Build -c:\"Release|x86\"", slnFile);
 			}
+#elif WIN
+			// Uncomment follow block if you would like to use mdtool instead of MSBuild
+			/*
+			app = @"C:\Program Files (x86)\MonoDevelop\bin\mdtool.exe";
+			string slnName = Path.GetFileName (projectFolder) + ".Win";
+			slnFile = Path.Combine (projectFolder, slnName, slnName + ".sln");
+			args = String.Format ("build \"{0}\" -t:Build -c:\"Release|x86\"", slnFile);
+			*/
+
+			app = Path.Combine (System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory (), "MSBuild.exe");
+			string slnName = Path.GetFileName (projectFolder) + ".Win";
+			slnFile = Path.Combine (projectFolder, slnName, slnName + ".sln");
+			args = String.Format ("\"{0}\" /verbosity:minimal /p:Configuration=Release", slnFile);
 #endif
-			var p = new System.Diagnostics.Process ();
-			p.StartInfo.FileName = app;
-			p.StartInfo.Arguments = args;
-			p.StartInfo.EnvironmentVariables.Clear ();
-			p.StartInfo.UseShellExecute = false;
-			p.StartInfo.StandardOutputEncoding = System.Text.Encoding.Default;
-			p.StartInfo.StandardErrorEncoding = System.Text.Encoding.Default;
-			p.StartInfo.RedirectStandardOutput = true;
-			p.StartInfo.RedirectStandardError = true;
-			p.Start ();
-			while (!p.HasExited) {
-				p.WaitForExit (100);
-				while (p.StandardOutput.Peek () != -1) {
-					Console.Write (p.StandardOutput.ReadLine ());
-				}
-				while (Gtk.Application.EventsPending ())
-					Gtk.Application.RunIteration ();
-			}
-			Console.Write (p.StandardOutput.ReadToEnd ());
-			// var errors = p.StandardError.ReadToEnd ();
-			if (p.ExitCode != 0) {
+			if (StartProcess (app, args) != 0) {
 				throw new Lime.Exception ("Build failed");
 			}
 #if MAC
@@ -71,46 +101,24 @@ namespace Orange
 #endif
 		}
 		
-		public bool Run ()
+		public void Run ()
 		{
 			Console.WriteLine ("------------- Starting Game -------------");
-			string app = "", args = "", dir = Directory.GetCurrentDirectory ();
+			string app, dir;
+			string appName = Path.GetFileName (projectFolder);
 #if MAC
 			if (platform == TargetPlatform.Desktop) {
-				string appName = Path.GetFileName (projectFolder);
 				app = Path.Combine (projectFolder, appName + ".Mac", "bin/Release", appName + ".app", "Contents/MacOS", appName);
 				dir = Path.GetDirectoryName (app);
-			} else {				
+			} else {
 				throw new NotImplementedException ();
 			}
 #elif WIN
-
+			app = Path.Combine (projectFolder, appName + ".Win", "bin/Release", appName + ".exe");
+			dir = Path.GetDirectoryName (app);
 #endif
 			using (new DirectoryChanger (dir)) {
-				var p = new System.Diagnostics.Process ();
-				p.StartInfo.FileName = app;
-				p.StartInfo.Arguments = args;
-				p.StartInfo.EnvironmentVariables.Clear ();
-				p.StartInfo.UseShellExecute = false;
-				p.StartInfo.StandardOutputEncoding = System.Text.Encoding.Default;
-				p.StartInfo.StandardErrorEncoding = System.Text.Encoding.Default;
-				p.StartInfo.RedirectStandardOutput = true;
-				p.StartInfo.RedirectStandardError = true;
-				p.Start ();
-				while (!p.HasExited) {
-					p.WaitForExit (100);
-					while (p.StandardError.Peek () != -1) {
-						Console.Write (p.StandardError.ReadLine ());
-					}
-					while (p.StandardOutput.Peek () != -1) {
-						Console.Write (p.StandardOutput.ReadLine ());
-					}
-					while (Gtk.Application.EventsPending ())
-						Gtk.Application.RunIteration ();
-				}
-				Console.Write (p.StandardError.ReadToEnd ());
-				Console.Write (p.StandardOutput.ReadToEnd ());
-				return p.ExitCode == 0;
+				StartProcess (app, "");
 			}
 		}
 	}

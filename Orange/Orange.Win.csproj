@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -69,16 +69,29 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="gtk-gui\gui.stetic" />
-    <None Include="Source\Orange.Mac.pidb" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Toolchain.Win\jpeg62.dll" />
-    <Content Include="Toolchain.Win\libpng12.dll" />
-    <Content Include="Toolchain.Win\libtiff3.dll" />
-    <Content Include="Toolchain.Win\msvcp100.dll" />
-    <Content Include="Toolchain.Win\msvcr100.dll" />
-    <Content Include="Toolchain.Win\nvcompress.exe" />
-    <Content Include="Toolchain.Win\nvtt.dll" />
+    <Content Include="Toolchain.Win\jpeg62.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Toolchain.Win\libpng12.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Toolchain.Win\libtiff3.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Toolchain.Win\msvcp100.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Toolchain.Win\msvcr100.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Toolchain.Win\nvcompress.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Toolchain.Win\nvtt.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lime\Lime.Win.csproj">

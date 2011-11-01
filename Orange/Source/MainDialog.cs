@@ -40,26 +40,29 @@ namespace Orange
 			
 			public LogWriter (Gtk.TextView textView)
 			{
-				this.textView = textView;			
+				this.textView = textView;
 			}
 			
 			public override void WriteLine (string value)
 			{
-				Write (value);
+				Write (value + '\n');
 			}
 			
 			public override void Write (string value)
 			{
-				value += "\n";
 				#pragma warning disable 618
 				textView.Buffer.Insert (textView.Buffer.EndIter, value);
 				while (Gtk.Application.EventsPending ())
 					Gtk.Application.RunIteration ();
+#if !WIN
 				if (bufferedLines > 4) {
 					bufferedLines = 0;
+#endif
 					textView.ScrollToIter (textView.Buffer.EndIter, 0, false, 0, 0);
+#if !WIN
 				}
 				bufferedLines++;
+#endif
 			}
 
 			public override System.Text.Encoding Encoding {
@@ -101,8 +104,8 @@ namespace Orange
 				Serialization.Serializer = model;
 				model.CompileInPlace ();
 				// Cook all assets (the main job)
-				AssetCooker cooker = new AssetCooker (projectFolder, platform);
-				cooker.Cook (rebuild);
+				//AssetCooker cooker = new AssetCooker (projectFolder, platform);
+				//cooker.Cook (rebuild);
 				// Update serialization assembly
 				GenerateSerializerDll (model, ProjectFolderChooser.CurrentFolder);
 				// Rebuild and run the game solution
