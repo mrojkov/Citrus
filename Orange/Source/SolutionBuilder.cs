@@ -39,8 +39,14 @@ namespace Orange
 			p.StartInfo.RedirectStandardOutput = true;
 			p.StartInfo.RedirectStandardError = true;
 			var logger = new System.Text.StringBuilder ();
-			p.OutputDataReceived += (sender, e) => { lock (logger) { logger.AppendLine (e.Data); } };
-			p.ErrorDataReceived += (sender, e) => { lock (logger) { logger.AppendLine (e.Data); } };
+			p.OutputDataReceived += (sender, e) => { 
+				lock (logger) 
+					logger.AppendLine (e.Data); 
+			};
+			p.ErrorDataReceived += (sender, e) => { 
+				lock (logger)
+					logger.AppendLine (e.Data); 
+			};
 			p.Start ();
 			p.BeginOutputReadLine ();
 			p.BeginErrorReadLine ();
@@ -59,7 +65,7 @@ namespace Orange
 			return p.ExitCode;
 		}
 		
-		public void Build ()
+		public bool Build ()
 		{
 			Console.WriteLine ("------------- Building Game Application -------------");
 			string app, args, slnFile;
@@ -89,7 +95,7 @@ namespace Orange
 			args = String.Format ("\"{0}\" /verbosity:minimal /p:Configuration=Release", slnFile);
 #endif
 			if (StartProcess (app, args) != 0) {
-				throw new Lime.Exception ("Build failed");
+				return false;
 			}
 #if MAC
 			if (platform == TargetPlatform.Desktop) {
@@ -99,6 +105,42 @@ namespace Orange
 				CopyFile (src, dst, "MonoMac.dll");
 			}
 #endif
+			return true;
+		}
+
+		public bool Clean ()
+		{
+			Console.WriteLine ("------------- Cleanup Game Application -------------");
+			string app, args, slnFile;
+#if MAC
+			app = "/Applications/MonoDevelop.app/Contents/MacOS/mdtool";
+			if (platform == TargetPlatform.iOS) {
+				string slnName = Path.GetFileName (projectFolder) + ".iOS";
+				slnFile = Path.Combine (projectFolder, slnName, slnName + ".sln");
+				args = String.Format ("build \"{0}\" -t:Clean -c:\"Release|iPhone\"", slnFile);
+			} else {
+				string slnName = Path.GetFileName (projectFolder) + ".Mac";
+				slnFile = Path.Combine (projectFolder, slnName, slnName + ".sln");
+				args = String.Format ("build \"{0}\" -t:Clean -c:\"Release|x86\"", slnFile);
+			}
+#elif WIN
+			// Uncomment follow block if you would like to use mdtool instead of MSBuild
+			/*
+			app = @"C:\Program Files (x86)\MonoDevelop\bin\mdtool.exe";
+			string slnName = Path.GetFileName (projectFolder) + ".Win";
+			slnFile = Path.Combine (projectFolder, slnName, slnName + ".sln");
+			args = String.Format ("build \"{0}\" -t:Clean -c:\"Release|x86\"", slnFile);
+			*/
+
+			app = Path.Combine (System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory (), "MSBuild.exe");
+			string slnName = Path.GetFileName (projectFolder) + ".Win";
+			slnFile = Path.Combine (projectFolder, slnName, slnName + ".sln");
+			args = String.Format ("\"{0}\" /t:Clean /p:Configuration=Release", slnFile);
+#endif
+			if (StartProcess (app, args) != 0) {
+				return false;
+			}
+			return true;
 		}
 		
 		public void Run ()

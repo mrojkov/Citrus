@@ -90,7 +90,48 @@ namespace Orange
 			model.Add (typeof(Font), true);
 		}
 
-		private void RunBuild (bool rebuild)
+		private void Clean ()
+		{
+			var platform = (TargetPlatform)this.TargetPlatform.Active;
+			var projectFolder = ProjectFolderChooser.CurrentFolder;
+			SaveState ();
+			try {
+				System.DateTime startTime = System.DateTime.Now;
+				CompileLog.Buffer.Clear ();
+				string assetsDirectory = System.IO.Path.Combine (projectFolder, "Data");
+				string bundlePath = System.IO.Path.ChangeExtension (assetsDirectory, Helpers.GetTargetPlatformString (platform));
+				if (File.Exists (bundlePath)) {
+					File.Delete (bundlePath);
+				}
+				var slnBuilder = new SolutionBuilder (projectFolder, platform);
+				if (!slnBuilder.Clean ()) {
+					Console.WriteLine ("Clean failed");
+					return;
+				}
+			} catch (System.Exception exc) {
+				Console.WriteLine ("Exception: " + exc.Message);
+			}
+		}
+
+		private bool CheckTargetAvailability ()
+		{
+			var platform = (TargetPlatform)this.TargetPlatform.Active;
+#if WIN
+			if (platform == Orange.TargetPlatform.iOS) {
+				var message = new Gtk.MessageDialog (this, 
+					Gtk.DialogFlags.DestroyWithParent, 
+					Gtk.MessageType.Error, Gtk.ButtonsType.Close,
+					"iOS target is not supported on Windows platform");
+				message.Title = "Orange";
+				message.Run ();
+				message.Destroy ();
+				return false;
+			}
+#endif
+			return true;
+		}
+
+		private void BuildAll ()
 		{
 			var platform = (TargetPlatform)this.TargetPlatform.Active;
 			var projectFolder = ProjectFolderChooser.CurrentFolder;
@@ -104,13 +145,16 @@ namespace Orange
 				Serialization.Serializer = model;
 				model.CompileInPlace ();
 				// Cook all assets (the main job)
-				//AssetCooker cooker = new AssetCooker (projectFolder, platform);
-				//cooker.Cook (rebuild);
+				AssetCooker cooker = new AssetCooker (projectFolder, platform);
+				cooker.Cook ();
 				// Update serialization assembly
 				GenerateSerializerDll (model, ProjectFolderChooser.CurrentFolder);
 				// Rebuild and run the game solution
 				var slnBuilder = new SolutionBuilder (projectFolder, platform);
-				slnBuilder.Build ();
+				if (!slnBuilder.Build ()) {
+					Console.WriteLine ("Build failed");
+					return;
+				}
 				// Show time statistics
 				System.DateTime endTime = System.DateTime.Now;
 				System.TimeSpan delta = endTime - startTime;
@@ -120,15 +164,16 @@ namespace Orange
 				slnBuilder.Run ();
 				CompileLog.ScrollToIter (CompileLog.Buffer.EndIter, 0, false, 0, 0);
 			} catch (System.Exception exc) {
-				Console.WriteLine ("Exception: " + exc.Message);
+				Console.WriteLine ("Exception:" + exc.Message);
 			}
 		}
-		
+
 		protected void OnRunClicked (object sender, System.EventArgs e)
 		{
 			this.Sensitive = false;
 			try {
-				RunBuild (false);
+				if (CheckTargetAvailability ())
+					BuildAll ();
 			} finally {
 				this.Sensitive = true;
 			}
@@ -138,7 +183,8 @@ namespace Orange
 		{
 			this.Sensitive = false;
 			try {
-				RunBuild (true);
+				if (CheckTargetAvailability ())
+					Clean ();
 			} finally {
 				this.Sensitive = true;
 			}

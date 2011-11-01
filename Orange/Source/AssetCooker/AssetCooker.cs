@@ -50,13 +50,10 @@ namespace Orange
 			}
 		}
 		
-		public void Cook (bool rebuild)
+		public void Cook ()
 		{
 			cookingRulesMap = CookingRulesBuilder.Build (assetsDirectory);
 			string bundlePath = Path.ChangeExtension (assetsDirectory, Helpers.GetTargetPlatformString (platform));
-			if (rebuild && File.Exists (bundlePath)) {
-				File.Delete (bundlePath);
-			}
 			AssetsBundle.Open (bundlePath, true);
 			try {
 				using (new DirectoryChanger (assetsDirectory)) {
