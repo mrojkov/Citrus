@@ -21,14 +21,14 @@ namespace Orange
 		void LoadState ()
 		{
 			var config = AppConfig.Load ();
-			ProjectFolderChooser.SetCurrentFolder (config.ProjectFolder);
+			CitrusProjectChooser.SetFilename (config.CitrusProject);
 			TargetPlatform.Active = config.TargetPlatform;
 		}
 		
 		void SaveState ()
 		{
 			var config = AppConfig.Load ();
-			config.ProjectFolder = ProjectFolderChooser.CurrentFolder;
+			config.CitrusProject = CitrusProjectChooser.Filename;
 			config.TargetPlatform = TargetPlatform.Active;
 			AppConfig.Save (config);
 		}
@@ -92,18 +92,18 @@ namespace Orange
 
 		private void Clean ()
 		{
-			var platform = (TargetPlatform)this.TargetPlatform.Active;
-			var projectFolder = ProjectFolderChooser.CurrentFolder;
 			SaveState ();
 			try {
+				var platform = (TargetPlatform)this.TargetPlatform.Active;
+				var citrusProject = new CitrusProject (CitrusProjectChooser.Filename);
 				System.DateTime startTime = System.DateTime.Now;
 				CompileLog.Buffer.Clear ();
-				string assetsDirectory = System.IO.Path.Combine (projectFolder, "Data");
+				string assetsDirectory = citrusProject.AssetsDirectory;
 				string bundlePath = System.IO.Path.ChangeExtension (assetsDirectory, Helpers.GetTargetPlatformString (platform));
 				if (File.Exists (bundlePath)) {
 					File.Delete (bundlePath);
 				}
-				var slnBuilder = new SolutionBuilder (projectFolder, platform);
+				var slnBuilder = new SolutionBuilder (citrusProject, platform);
 				if (!slnBuilder.Clean ()) {
 					Console.WriteLine ("Clean failed");
 					return;
@@ -133,10 +133,10 @@ namespace Orange
 
 		private void BuildAll ()
 		{
-			var platform = (TargetPlatform)this.TargetPlatform.Active;
-			var projectFolder = ProjectFolderChooser.CurrentFolder;
 			SaveState ();
 			try {
+				var platform = (TargetPlatform)this.TargetPlatform.Active;
+				var citrusProject = new CitrusProject (CitrusProjectChooser.Filename);
 				System.DateTime startTime = System.DateTime.Now;
 				CompileLog.Buffer.Clear ();
 				// Create serialization model
@@ -145,12 +145,12 @@ namespace Orange
 				Serialization.Serializer = model;
 				model.CompileInPlace ();
 				// Cook all assets (the main job)
-				AssetCooker cooker = new AssetCooker (projectFolder, platform);
+				AssetCooker cooker = new AssetCooker (citrusProject, platform);
 				cooker.Cook ();
 				// Update serialization assembly
-				GenerateSerializerDll (model, ProjectFolderChooser.CurrentFolder);
+				GenerateSerializerDll (model, citrusProject.ProjectDirectory);
 				// Rebuild and run the game solution
-				var slnBuilder = new SolutionBuilder (projectFolder, platform);
+				var slnBuilder = new SolutionBuilder (citrusProject, platform);
 				if (!slnBuilder.Build ()) {
 					Console.WriteLine ("Build failed");
 					return;

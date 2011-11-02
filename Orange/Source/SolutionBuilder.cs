@@ -5,12 +5,13 @@ namespace Orange
 {
 	public class SolutionBuilder
 	{
-		private string projectFolder;
+		private CitrusProject project;
 		private TargetPlatform platform;
+		private string projectName;
 		
-		public SolutionBuilder (string projectFolder, TargetPlatform platform)
+		public SolutionBuilder (CitrusProject project, TargetPlatform platform)
 		{
-			this.projectFolder = projectFolder;
+			this.project = project;
 			this.platform = platform;
 		}
 		
@@ -72,26 +73,22 @@ namespace Orange
 #if MAC
 			app = "/Applications/MonoDevelop.app/Contents/MacOS/mdtool";
 			if (platform == TargetPlatform.iOS) {
-				string slnName = Path.GetFileName (projectFolder) + ".iOS";
-				slnFile = Path.Combine (projectFolder, slnName, slnName + ".sln");
+				string slnFile = Path.Combine (project.ProjectDirectory, project.Title + ".iOS", project.Title + ".iOS.sln");
 				args = String.Format ("build \"{0}\" -t:Build -c:\"Release|iPhone\"", slnFile);
 			} else {
-				string slnName = Path.GetFileName (projectFolder) + ".Mac";
-				slnFile = Path.Combine (projectFolder, slnName, slnName + ".sln");
+				string slnFile = Path.Combine (project.ProjectDirectory, project.Title + ".Mac", project.Title + ".Mac.sln");
 				args = String.Format ("build \"{0}\" -t:Build -c:\"Release|x86\"", slnFile);
 			}
 #elif WIN
 			// Uncomment follow block if you would like to use mdtool instead of MSBuild
 			/*
 			app = @"C:\Program Files (x86)\MonoDevelop\bin\mdtool.exe";
-			string slnName = Path.GetFileName (projectFolder) + ".Win";
-			slnFile = Path.Combine (projectFolder, slnName, slnName + ".sln");
+			string slnFile = Path.Combine (project.ProjectDirectory, project.Title + ".Win", project.Title + ".Win.sln");
 			args = String.Format ("build \"{0}\" -t:Build -c:\"Release|x86\"", slnFile);
 			*/
 
 			app = Path.Combine (System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory (), "MSBuild.exe");
-			string slnName = Path.GetFileName (projectFolder) + ".Win";
-			slnFile = Path.Combine (projectFolder, slnName, slnName + ".sln");
+			slnFile = Path.Combine (project.ProjectDirectory, project.Title + ".Win", project.Title + ".Win.sln");
 			args = String.Format ("\"{0}\" /verbosity:minimal /p:Configuration=Release", slnFile);
 #endif
 			if (StartProcess (app, args) != 0) {
@@ -115,11 +112,9 @@ namespace Orange
 #if MAC
 			app = "/Applications/MonoDevelop.app/Contents/MacOS/mdtool";
 			if (platform == TargetPlatform.iOS) {
-				string slnName = Path.GetFileName (projectFolder) + ".iOS";
 				slnFile = Path.Combine (projectFolder, slnName, slnName + ".sln");
 				args = String.Format ("build \"{0}\" -t:Clean -c:\"Release|iPhone\"", slnFile);
 			} else {
-				string slnName = Path.GetFileName (projectFolder) + ".Mac";
 				slnFile = Path.Combine (projectFolder, slnName, slnName + ".sln");
 				args = String.Format ("build \"{0}\" -t:Clean -c:\"Release|x86\"", slnFile);
 			}
@@ -127,14 +122,12 @@ namespace Orange
 			// Uncomment follow block if you would like to use mdtool instead of MSBuild
 			/*
 			app = @"C:\Program Files (x86)\MonoDevelop\bin\mdtool.exe";
-			string slnName = Path.GetFileName (projectFolder) + ".Win";
-			slnFile = Path.Combine (projectFolder, slnName, slnName + ".sln");
+			slnFile = Path.Combine (project.ProjectDirectory, project.Title + ".Win", project.Title + ".Win.sln");
 			args = String.Format ("build \"{0}\" -t:Clean -c:\"Release|x86\"", slnFile);
 			*/
 
 			app = Path.Combine (System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory (), "MSBuild.exe");
-			string slnName = Path.GetFileName (projectFolder) + ".Win";
-			slnFile = Path.Combine (projectFolder, slnName, slnName + ".sln");
+			slnFile = Path.Combine (project.ProjectDirectory, project.Title + ".Win", project.Title + ".Win.sln");
 			args = String.Format ("\"{0}\" /t:Clean /p:Configuration=Release", slnFile);
 #endif
 			if (StartProcess (app, args) != 0) {
@@ -147,16 +140,15 @@ namespace Orange
 		{
 			Console.WriteLine ("------------- Starting Game -------------");
 			string app, dir;
-			string appName = Path.GetFileName (projectFolder);
 #if MAC
 			if (platform == TargetPlatform.Desktop) {
-				app = Path.Combine (projectFolder, appName + ".Mac", "bin/Release", appName + ".app", "Contents/MacOS", appName);
+				app = Path.Combine (projectFolder, project.Title + ".Mac", "bin/Release", project.Title + ".app", "Contents/MacOS", appName);
 				dir = Path.GetDirectoryName (app);
 			} else {
 				throw new NotImplementedException ();
 			}
 #elif WIN
-			app = Path.Combine (projectFolder, appName + ".Win", "bin/Release", appName + ".exe");
+			app = Path.Combine (project.ProjectDirectory, project.Title + ".Win", "bin/Release", project.Title + ".exe");
 			dir = Path.GetDirectoryName (app);
 #endif
 			using (new DirectoryChanger (dir)) {

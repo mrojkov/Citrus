@@ -8,7 +8,7 @@ namespace Orange
 	public class AppConfig
 	{
 		[ProtoMember(1)]
-		public string ProjectFolder = "";
+		public string CitrusProject = "";
 
 		[ProtoMember(2)]
 		public int TargetPlatform;

@@ -9,7 +9,7 @@ namespace Orange
 		private delegate bool Converter (string srcPath, string dstPath);
 	
 		private Lime.AssetsBundle AssetsBundle = Lime.AssetsBundle.Instance;
-		private string assetsDirectory;
+		private CitrusProject project;
 		private TargetPlatform platform;
 		private Dictionary<string, CookingRules> cookingRulesMap;
 		
@@ -41,22 +41,20 @@ namespace Orange
 				return ".dds";
 		}
 		
-		public AssetCooker (string projectDirectory, TargetPlatform platform)
+		public AssetCooker (CitrusProject project, TargetPlatform platform)
 		{
 			this.platform = platform;
-			this.assetsDirectory = Path.Combine (projectDirectory, "Data");
-			if (!Directory.Exists (assetsDirectory)) {
-				throw new Lime.Exception ("Assets folder '{0}' doesn't exist", assetsDirectory);
-			}
+			this.project = project;
+
 		}
 		
 		public void Cook ()
 		{
-			cookingRulesMap = CookingRulesBuilder.Build (assetsDirectory);
-			string bundlePath = Path.ChangeExtension (assetsDirectory, Helpers.GetTargetPlatformString (platform));
+			cookingRulesMap = CookingRulesBuilder.Build (project.AssetsDirectory);
+			string bundlePath = Path.ChangeExtension (project.AssetsDirectory, Helpers.GetTargetPlatformString (platform));
 			AssetsBundle.Open (bundlePath, true);
 			try {
-				using (new DirectoryChanger (assetsDirectory)) {
+				using (new DirectoryChanger (project.AssetsDirectory)) {
 					Console.WriteLine ("------------- Building Game Assets -------------");
 					SyncAtlases ();
 					SyncDeleted ();
@@ -103,7 +101,7 @@ namespace Orange
 		void SyncDeleted ()
 		{
 			var assetsFiles = new HashSet<string> ();
-			using (new DirectoryChanger (assetsDirectory)) {
+			using (new DirectoryChanger (project.AssetsDirectory)) {
 				foreach (string path in Helpers.GetAllFiles (".", "*.*", true)) {
 					assetsFiles.Add (path);
 				}
@@ -190,7 +188,7 @@ namespace Orange
 			var items = new List<AtlasItem> ();
 			foreach (var p in cookingRulesMap) {
 				if (p.Value.TextureAtlas == atlasChain && Path.GetExtension (p.Key) == ".png") {
-					var srcTexturePath = Path.Combine (assetsDirectory, p.Key);
+					var srcTexturePath = Path.Combine (project.AssetsDirectory, p.Key);
 					var pixbuf = new Gdk.Pixbuf (srcTexturePath);
 					// Ensure that no image exceede maxAtlasSize limit
 					if (pixbuf.Width > maxAtlasSize || pixbuf.Height > maxAtlasSize) {
@@ -286,7 +284,7 @@ namespace Orange
 				if (Path.GetExtension (atlasPartPath) != ".atlasPart")
 					continue;
 				// If atlas part has been outdated we should rebuild full atlas chain
-				string srcTexturePath = Path.Combine (assetsDirectory,
+				string srcTexturePath = Path.Combine (project.AssetsDirectory,
 					Path.ChangeExtension (atlasPartPath, GetOriginalAssetExtension (atlasPartPath)));
 				if (!File.Exists (srcTexturePath) || AssetsBundle.GetFileLastWriteTime (atlasPartPath) < File.GetLastWriteTime (srcTexturePath)) {
 					var part = Lime.TextureAtlasPart.ReadFromBundle (atlasPartPath);
