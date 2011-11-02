@@ -11,7 +11,7 @@ namespace Lime
 		public Int32 Length;
 		public Int32 AllocatedSize;
 	}
-    	
+
 	public class AssetStream : Stream
 	{
 		private AssetsBundle bundle;
@@ -54,7 +54,7 @@ namespace Lime
 		}
 		
 		protected override void Dispose (bool disposing)
-		{			 
+		{
 		}
 		
 		public override bool CanSeek {
