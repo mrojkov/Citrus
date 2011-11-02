@@ -66,6 +66,7 @@
     <Compile Include="Source\MainDialog.cs" />
     <Compile Include="Source\SolutionBuilder.cs" />
     <Compile Include="Source\TargetPlatform.cs" />
+    <Compile Include="Source\CitrusProject.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="gtk-gui\gui.stetic" />

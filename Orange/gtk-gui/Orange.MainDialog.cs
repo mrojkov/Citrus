@@ -6,9 +6,9 @@ namespace Orange
 	{
 		private global::Gtk.VBox vbox2;
 		private global::Gtk.Table table1;
+		private global::Gtk.FileChooserButton CitrusProjectChooser;
 		private global::Gtk.Label label1;
 		private global::Gtk.Label label2;
-		private global::Gtk.FileChooserButton ProjectFolderChooser;
 		private global::Gtk.ComboBox TargetPlatform;
 		private global::Gtk.ScrolledWindow GtkScrolledWindow;
 		private global::Gtk.TextView CompileLog;
@@ -34,39 +34,38 @@ namespace Orange
 			this.vbox2.BorderWidth = ((uint)(4));
 			// Container child vbox2.Gtk.Box+BoxChild
 			this.table1 = new global::Gtk.Table (((uint)(2)), ((uint)(2)), false);
-			this.table1.Name = "table1";
 			this.table1.RowSpacing = ((uint)(6));
 			this.table1.ColumnSpacing = ((uint)(6));
+			// Container child table1.Gtk.Table+TableChild
+			this.CitrusProjectChooser = new global::Gtk.FileChooserButton (global::Mono.Unix.Catalog.GetString ("Select A File"), ((global::Gtk.FileChooserAction)(0)));
+			this.CitrusProjectChooser.Name = "CitrusProjectChooser";
+			this.table1.Add (this.CitrusProjectChooser);
+			global::Gtk.Table.TableChild w2 = ((global::Gtk.Table.TableChild)(this.table1 [this.CitrusProjectChooser]));
+			w2.TopAttach = ((uint)(1));
+			w2.BottomAttach = ((uint)(2));
+			w2.LeftAttach = ((uint)(1));
+			w2.RightAttach = ((uint)(2));
+			w2.XOptions = ((global::Gtk.AttachOptions)(4));
+			w2.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
 			this.label1 = new global::Gtk.Label ();
 			this.label1.Name = "label1";
 			this.label1.Xalign = 1F;
-			this.label1.LabelProp = global::Mono.Unix.Catalog.GetString ("Project folder");
+			this.label1.LabelProp = global::Mono.Unix.Catalog.GetString ("Citrus project");
 			this.table1.Add (this.label1);
-			global::Gtk.Table.TableChild w2 = ((global::Gtk.Table.TableChild)(this.table1 [this.label1]));
-			w2.TopAttach = ((uint)(1));
-			w2.BottomAttach = ((uint)(2));
-			w2.XOptions = ((global::Gtk.AttachOptions)(4));
-			w2.YOptions = ((global::Gtk.AttachOptions)(4));
+			global::Gtk.Table.TableChild w3 = ((global::Gtk.Table.TableChild)(this.table1 [this.label1]));
+			w3.TopAttach = ((uint)(1));
+			w3.BottomAttach = ((uint)(2));
+			w3.XOptions = ((global::Gtk.AttachOptions)(4));
+			w3.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
 			this.label2 = new global::Gtk.Label ();
 			this.label2.Name = "label2";
 			this.label2.Xalign = 1F;
 			this.label2.LabelProp = global::Mono.Unix.Catalog.GetString ("Target platform");
 			this.table1.Add (this.label2);
-			global::Gtk.Table.TableChild w3 = ((global::Gtk.Table.TableChild)(this.table1 [this.label2]));
-			w3.XOptions = ((global::Gtk.AttachOptions)(4));
-			w3.YOptions = ((global::Gtk.AttachOptions)(4));
-			// Container child table1.Gtk.Table+TableChild
-			this.ProjectFolderChooser = new global::Gtk.FileChooserButton (global::Mono.Unix.Catalog.GetString ("Select A Project Folder"), ((global::Gtk.FileChooserAction)(2)));
-			this.ProjectFolderChooser.Name = "ProjectFolderChooser";
-			this.ProjectFolderChooser.ShowHidden = true;
-			this.table1.Add (this.ProjectFolderChooser);
-			global::Gtk.Table.TableChild w4 = ((global::Gtk.Table.TableChild)(this.table1 [this.ProjectFolderChooser]));
-			w4.TopAttach = ((uint)(1));
-			w4.BottomAttach = ((uint)(2));
-			w4.LeftAttach = ((uint)(1));
-			w4.RightAttach = ((uint)(2));
+			global::Gtk.Table.TableChild w4 = ((global::Gtk.Table.TableChild)(this.table1 [this.label2]));
+			w4.XOptions = ((global::Gtk.AttachOptions)(4));
 			w4.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
 			this.TargetPlatform = global::Gtk.ComboBox.NewText ();
