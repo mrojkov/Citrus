@@ -8,7 +8,8 @@ namespace Lime
 	[ProtoContract]
 	public class MarkerCollection : ICollection<Marker>
 	{
-		private readonly List<Marker> markers = new List<Marker> ();
+		static List<Marker> emptyList = new List<Marker> ();
+		List<Marker> markers = emptyList;
 
 		public Marker this [int index] { 
 			get { return markers [index]; }
@@ -31,7 +32,7 @@ namespace Lime
 			return markers.GetEnumerator ();
 		}
 
-		public Marker Find (string id)
+		public Marker Get (string id)
 		{
 			int count = markers.Count;
 			for (int i = 0; i < count; i++) {
@@ -43,7 +44,7 @@ namespace Lime
 			return null;
 		}
 
-		public Marker FindByFrame (int frame)
+		public Marker GetByFrame (int frame)
 		{
 			int count = markers.Count;
 			for (int i = 0; i < count; i++) {
@@ -57,12 +58,15 @@ namespace Lime
 
 		public void Add (Marker marker)
 		{
+			if (markers == emptyList) {
+				markers = new List<Marker> ();
+			}
 			markers.Add (marker);
 		}
 
 		public void Clear ()
 		{
-			markers.Clear ();
+			markers = emptyList;
 		}
 		
 		public bool Contains (Marker item)
@@ -72,7 +76,11 @@ namespace Lime
 		
 		public bool Remove (Marker item)
 		{
-			return markers.Remove (item);
+			bool result = markers.Remove (item);
+			if (markers.Count == 0) {
+				markers = emptyList;
+			}
+			return result;
 		}
 		
 		bool ICollection<Marker>.IsReadOnly { 

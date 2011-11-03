@@ -8,10 +8,15 @@ using ProtoBuf;
 
 namespace Lime
 {
+	public sealed class TriggerAttribute : Attribute
+	{
+	}
+
 	[ProtoContract]
 	public sealed class AnimatorCollection : ICollection<Animator>
 	{
-		private readonly List<Animator> animators = new List<Animator> ();
+		static List<Animator> emptyList = new List<Animator> ();
+		List<Animator> animators = emptyList;
 		
 		internal Node Owner;
 
@@ -20,11 +25,10 @@ namespace Lime
 				foreach (Animator a in animators)
 					if (a.TargetProperty == propertyName)
 						return a;
-			
 				PropertyInfo pi = Owner.GetType ().GetProperty (propertyName);
-				if (pi == null)
+				if (pi == null) {
 					throw new Lime.Exception ("Unknown property {0} in {1}", propertyName, Owner.GetType ().Name);
-
+				}
 				var animator = AnimatorRegistry.Instance.CreateAnimator (pi.PropertyType);
 				animator.TargetProperty = propertyName;
 				Add (animator);
@@ -52,10 +56,14 @@ namespace Lime
 		
 		public bool Remove (Animator item)
 		{
-			return animators.Remove (item);
+			bool result = animators.Remove (item);
+			if (animators.Count == 0) {
+				animators = emptyList;
+			}
+			return result;
 		}
 		
-		public void Clear () { animators.Clear(); }
+		public void Clear () { animators = emptyList; }
 		
 		public int Count { get { return animators.Count; } }
 	
@@ -71,7 +79,10 @@ namespace Lime
 		 
 		public void Add (Animator animator)
 		{
-			animator.Owner = Owner;
+			if (animators == emptyList) {
+				animators = new List<Animator> ();
+			}
+			animator.Bind (Owner);
 			animators.Add (animator);
 		}
 		
@@ -90,6 +101,17 @@ namespace Lime
 			int count = animators.Count;
 			for (int i = 0; i < count; i++) {
 				animators [i].Apply (time);
+			}
+		}
+
+		public void InvokeTriggers (int intervalBegin, int intervalEnd)
+		{
+			int count = animators.Count;
+			for (int i = 0; i < count; i++) {
+				var a = animators [i];
+				if (a.IsTriggerable) {
+					a.InvokeTrigger (intervalBegin, intervalEnd);
+				}
 			}
 		}
 	}

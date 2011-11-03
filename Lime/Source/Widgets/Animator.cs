@@ -14,32 +14,12 @@ namespace Lime
 		Spline,
 		ClosedSpline
 	}
-	 
+
 	public struct KeyFrame
 	{
 		public int Frame;
 		public KeyFunction Function;
 		public Object Value;
-	}
-		
-	public static partial class WidgetUtils
-	{
-		public const int FramesPerSecond = 16;
-		
-		static public int MillisecondsToFrame (int timeMs)
-		{
-			return timeMs >> 6;
-		}
-
-		static public int FrameToMilliseconds (int frame)
-		{
-			return frame << 6;
-		}
-		
-		static public int RoundMillisecondsToFrame (int timeMs)
-		{
-			return FrameToMilliseconds (MillisecondsToFrame (timeMs));
-		}
 	}
 
 	[ProtoContract(SkipConstructor = true)]
@@ -55,34 +35,52 @@ namespace Lime
 	[ProtoInclude(110, typeof(GenericAnimator<EmitterShape>))]
 	public abstract class Animator
 	{
+		public const int FramesPerSecond = 16;
+
+		static public int MsecsToFrames (int msecs)
+		{
+			return msecs >> 6;
+		}
+
+		static public int FramesToMsecs (int frames)
+		{
+			return frames << 6;
+		}
+		
+		static public int RoundMsecsToFrames (int msecs)
+		{
+			return FramesToMsecs (MsecsToFrames (msecs));
+		}
+
 		[Flags]
 		public enum KeyFlags
 		{
 			Immutable = 1,
 		};
-			
-		public static bool DidKeyFrameLeap;
 
 		protected abstract System.Collections.IList Values { get; }
-		
-		internal Node Owner;
-	
+
+		protected Node Owner;
+		internal bool IsTriggerable;
+
+		internal abstract void Bind (Node owner);
+
 		[ProtoMember(1)]
 		public string TargetProperty;
-		
+
 		[ProtoMember(2)]
 		public readonly List<int> Frames = new List<int> ();
 
 		[ProtoMember(3)]
 		public readonly List<KeyFunction> Functions = new List<KeyFunction> ();
 
-		protected int current;
+		protected int currentKey = 0;
 		
 		public void Add (int frame, object value, KeyFunction function = KeyFunction.Linear)
 		{
 			Add (new KeyFrame {Frame = frame, Value = value, Function = function});
 		}
-		
+
 		protected virtual bool IsEvaluable ()
 		{
 			return true;
@@ -99,57 +97,62 @@ namespace Lime
 		{
 			ApplyValue (t, b, c);
 		}
-		
+
 		public void Remove (int index)
 		{
 			Frames.RemoveAt (index);
 			Functions.RemoveAt (index);
 			Values.RemoveAt (index);
-			current = 0;
+			currentKey = 0;
 		}
-		
+
 		public void Clear ()
 		{
 			Frames.Clear ();
 			Functions.Clear ();
 			Values.Clear ();
-			current = 0;
-		}	
-			
+			currentKey = 0;
+		}
+
+		public void InvokeTrigger (int intervalBegin, int intervalEnd)
+		{
+			// This function relies on currentKey value. Therefore Apply (time) must be called before.
+			int t = FramesToMsecs (Frames [currentKey]);
+			if (t >= intervalBegin && t < intervalEnd) {
+				Owner.OnTrigger (TargetProperty);
+			}
+		}
+
 		public void Apply (int time)
 		{
 			int count = Frames.Count;
 			if (count == 0)
 				return;
-			int frame = WidgetUtils.MillisecondsToFrame (time);
-			while (current < count - 1 && frame > Frames [current])
-				current++;
-			while (current >= 0 && frame < Frames [current])
-				current--;
-			if (current >= 0 && frame == Frames [current]) {
-				DidKeyFrameLeap = true;
-			}
-			if (current < 0) {
+			int frame = MsecsToFrames (time);
+			while (currentKey < count - 1 && frame > Frames [currentKey])
+				currentKey++;
+			while (currentKey >= 0 && frame < Frames [currentKey])
+				currentKey--;
+			if (currentKey < 0) {
 				ApplyValue (0);
-				current = 0;
-			} else if (current == count - 1) {
- 				ApplyValue (count - 1);
+				currentKey = 0;
+			} else if (currentKey == count - 1) {
+				ApplyValue (count - 1);
 			} else {
 				ApplyHelper (time);
 			}
-			DidKeyFrameLeap = false;
 		}
 
 		private void ApplyHelper (int time)
 		{
-			int i = current;
+			int i = currentKey;
 			KeyFunction function = Functions [i];
 			if (function == KeyFunction.Steep) {
 				ApplyValue (i);
 			}
-			else {			
-				int t0 = WidgetUtils.FrameToMilliseconds (Frames [i]);
-				int t1 = WidgetUtils.FrameToMilliseconds (Frames [i + 1]);
+			else {
+				int t0 = FramesToMsecs (Frames [i]);
+				int t1 = FramesToMsecs (Frames [i + 1]);
 				float t = (time - t0) / (float)(t1 - t0);
 				switch (function) {
 				case KeyFunction.Linear:
@@ -178,7 +181,7 @@ namespace Lime
 				}
 			}
 		}
-		
+
 		public int Duration {
 			get {
 				if (Frames.Count == 0)
@@ -186,7 +189,7 @@ namespace Lime
 				return Frames [Frames.Count - 1];
 			}
 		}
-			
+
 		public void Add (KeyFrame key)
 		{
 			if (!IsEvaluable ()) {
@@ -196,7 +199,7 @@ namespace Lime
 			Functions.Add (key.Function);
 			Values.Add (key.Value);
 		}
-		
+
 		public KeyFrame this [int index] { 
 			get {
 				return new KeyFrame { 
@@ -214,29 +217,25 @@ namespace Lime
 			}
 		}
 	}
-	
+
 	[ProtoContract]
 	public abstract class AnimatorHelper<T> : Animator
 	{
-		protected delegate void Setter (T value);
+		protected delegate void SetterDelegate (T value);
 		
-		private Setter setter;
+		protected SetterDelegate Setter;
 
-		protected Setter SetProperty { 
-			get {
-				if (setter != null)
-					return setter;
-				PropertyInfo pi = Owner.GetType ().GetProperty (TargetProperty);
-				if (pi == null)
-					throw new Lime.Exception ("Property '{0}' doesn't exist for class '{1}'", TargetProperty, Owner.GetType ());
-
-				MethodInfo mi = pi.GetSetMethod ();
-				if (mi == null)
-					throw new Lime.Exception ("Property '{0}' (class '{1}') is readonly", TargetProperty, Owner.GetType ());
-
-				setter = (Setter)Delegate.CreateDelegate (typeof(Setter), Owner, mi);
-				return setter;
-			}
+		internal override void Bind (Node owner)
+		{
+			Owner = owner;
+			PropertyInfo pi = Owner.GetType ().GetProperty (TargetProperty);
+			if (pi == null)
+				throw new Lime.Exception ("Property '{0}' doesn't exist for class '{1}'", TargetProperty, Owner.GetType ());
+			IsTriggerable = pi.GetCustomAttributes (typeof (TriggerAttribute), false).Length > 0;
+			MethodInfo mi = pi.GetSetMethod ();
+			if (mi == null)
+				throw new Lime.Exception ("Property '{0}' (class '{1}') is readonly", TargetProperty, Owner.GetType ());
+			Setter = (SetterDelegate)Delegate.CreateDelegate (typeof(SetterDelegate), Owner, mi);
 		}
 	}
 
@@ -255,10 +254,10 @@ namespace Lime
 
 		protected override void ApplyValue (int i)
 		{
-			SetProperty (V [i]);	
+			Setter (V [i]);
 		}
 	}
-	
+
 	[ProtoContract]
 	public class Vector2Animator : AnimatorHelper<Vector2>
 	{
@@ -269,15 +268,15 @@ namespace Lime
 
 		protected override void ApplyValue (int i)
 		{
-			SetProperty (V [i]);	
+			Setter (V [i]);
 		}
 		
 		protected override void ApplyValue (float t, int a, int b)
 		{
-			SetProperty (Vector2.Lerp (V [a], V [b], t));	
+			Setter (Vector2.Lerp (V [a], V [b], t));
 		}
 	}
-	
+
 	[ProtoContract]
 	public class NumericAnimator : AnimatorHelper<float>
 	{
@@ -288,14 +287,14 @@ namespace Lime
 
 		protected override void ApplyValue (int i)
 		{
-			SetProperty (V [i]);	
+			Setter (V [i]);
 		}
 
 		protected override void ApplyValue (float t, int a, int b)
 		{
 			float va = V [a];
 			float vb = V [b];
-			SetProperty (t * (vb - va) + va);
+			Setter (t * (vb - va) + va);
 		}
 	}
 	
@@ -309,12 +308,12 @@ namespace Lime
 
 		protected override void ApplyValue (int i)
 		{
-			SetProperty (V [i]);	
+			Setter (V [i]);
 		}
 
 		protected override void ApplyValue (float t, int a, int b)
 		{
-			SetProperty (Color4.Lerp (V [a], V [b], t));	
+			Setter (Color4.Lerp (V [a], V [b], t));
 		}
 	}
 }

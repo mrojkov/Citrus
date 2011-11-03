@@ -34,11 +34,12 @@ namespace Lime
 	public class Widget : Node
 	{
 		#region Properties
-		internal bool bypassRendering = true;
 
 		public event EventHandler<UIEventArgs> LeftDown;
 		public event EventHandler<UIEventArgs> LeftUp;
 		public event EventHandler<UIEventArgs> Move;
+
+		public new string Description { get { return GetDescription (); } }
 
         [ProtoMember(1)]
 		public Vector2 Position { get; set; }
@@ -89,19 +90,11 @@ namespace Lime
         [ProtoMember(12)]
 		public bool AcceptInput { get; set; }
 
-		public bool Shown { get { return !bypassRendering && Visible && Color.A > 0; } }
+		public bool Shown { get { return Visible && Color.A > 0; } }
 		
 		[ProtoMember(13)]
 		public BoneArray BoneArray;
 
-		public override Node Parent {
-			get { return base.Parent; }
-			set {
-				base.Parent = value;
-				bypassRendering = true;
-			}
-		}
-		
 		public Matrix32 LocalMatrix {
 			get {
 				var u = new Vector2 (sincos.X * Scale.X, sincos.Y * Scale.X);
@@ -199,14 +192,13 @@ namespace Lime
 		}
 		
 		public override void Update (int delta)
-		{	
+		{
 			UpdatedNodes++;
-			bypassRendering = false;
 			UpdateWorldProperties (); 
 			if (WorldShown) {
 				if (Playing) {
-					AnimateChildren (delta);
-				}	
+					AdvanceAnimation (delta);
+				}
 				for (int i = Nodes.Count - 1; i >= 0; i--) {
 					Nodes [i].Update (delta);
 				}

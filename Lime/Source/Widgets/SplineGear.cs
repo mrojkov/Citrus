@@ -7,6 +7,8 @@ namespace Lime
 	[ProtoContract]
 	public class SplineGear : Node
 	{
+		public new string Description { get { return GetDescription (); } }
+
 		[ProtoMember(1)]
 		public string WidgetId { get; set; }
 
@@ -16,8 +18,19 @@ namespace Lime
 		[ProtoMember(3)]
 		public float SplineOffset { get; set; }
 
-		public SplineGear ()
+		public override void Update (int delta)
 		{
+			base.Update (delta);
+			if (Parent != null) {
+				Spline spline = Parent.Nodes.Get<Spline> (SplineId);
+				Widget widget = Parent.Nodes.Get<Widget> (WidgetId);
+				if (spline != null && widget != null) {
+					float length = spline.CalcLength ();
+					Vector2 point = spline.CalcPoint (SplineOffset * length);
+					widget.Position = spline.LocalMatrix.TransformVector (point);
+					widget.Update (0);
+				}
+			}
 		}
 	}
 }

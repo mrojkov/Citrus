@@ -61,14 +61,22 @@ namespace Lime
 			return (value < min) ? min : (value > max ? max : value);
 		}
 
+		public static Vector2 HermiteSpline (float t, Vector2 p0, Vector2 m0, Vector2 p1, Vector2 m1)
+		{
+			float t2 = t * t;
+			float t3 = t2 * t;
+			return (2.0f * t3 - 3.0f * t2 + 1.0f) * p0 + (t3 - 2.0f * t2 + t) * m0 +
+				(-2.0f * t3 + 3.0f * t2) * p1 + (t3 - t2) * m1;
+		}
+
 		public static Vector2 CatmullRomSpline (float t, Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3)
 		{
 			float t2 = t * t;
 			float t3 = t2 * t;
 			return p1 + 0.5f * (
-                (p2 - p0) * t +
-                (2.0f * p0 - 5.0f * p1 + 4.0f * p2 - p3) * t2 +
-                (3.0f * p1 - p0 - 3.0f * p2 + p3) * t3);
+				(p2 - p0) * t +
+				(2.0f * p0 - 5.0f * p1 + 4.0f * p2 - p3) * t2 +
+				(3.0f * p1 - p0 - 3.0f * p2 + p3) * t3);
 		}
 	}
 }

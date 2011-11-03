@@ -54,6 +54,11 @@ namespace Lime
 		{
 			return new Vector2 (lhs.X / rhs.X, lhs.Y / rhs.Y);
 		}
+
+		public static Vector2 operator / (Vector2 lhs, float rhs)
+		{
+			return new Vector2 (lhs.X / rhs, lhs.Y / rhs);
+		}
 		
 		public static Vector2 Scale (Vector2 lhs, Vector2 rhs)
 		{

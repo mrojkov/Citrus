@@ -6,6 +6,8 @@ namespace Lime
 	[ProtoContract]
     public class DistortionMesh : Widget
 	{
+		public new string Description { get { return GetDescription (); } }
+
 		[ProtoMember(1)]
 		public int NumCols { get; set; }
 

@@ -7,9 +7,10 @@ using ProtoBuf;
 namespace Lime
 {
 	[ProtoContract]
-    public class NodeCollection : ICollection<Node>
+	public sealed class NodeCollection : ICollection<Node>
 	{
-		private readonly List<Node> nodes = new List<Node> ();
+		static List<Node> emptyList = new List<Node> ();
+		List<Node> nodes = emptyList;
 		internal Node Owner;
 
 		public int IndexOf (Node node)
@@ -53,30 +54,54 @@ namespace Lime
 	
 		public void Add (Node node)
 		{
+			if (nodes == emptyList) {
+				nodes = new List<Node> ();
+			}
 			node.Parent = Owner;
 			nodes.Add (node);
 		}
 
 		public void Insert (int index, Node node)
 		{
+			if (nodes == emptyList) {
+				nodes = new List<Node> ();
+			}
 			node.Parent = Owner;
 			nodes.Insert (index, node);
 		}
 		
 		public bool Remove (Node node)
 		{
+			bool result = false;
 			if (nodes.Remove (node)) {
 				node.Parent = null;
-				return true;
+				result = true;
 			}
-			return false;
+			if (nodes.Count == 0) {
+				nodes = emptyList;
+			}
+			return result;
 		}
 
 		public void Clear ()
 		{
-			nodes.Clear ();
+			nodes = emptyList;
 		}
-			
+
+		public Node Get (string id)
+		{
+			foreach (Node child in this) {
+				if (child.Id == id)
+					return child;
+			}
+			return null;
+		}
+
+		public T Get<T> (string id) where T : Node
+		{
+			return Get (id) as T;
+		}
+		
 		public T Find<T> (string id) where T : Node
 		{
 			T result = Find (id) as T;

@@ -19,33 +19,18 @@ namespace Lime
 	{
 		public static int UpdatedNodes;
 		
-		#region Properties
         [ProtoMember(1)]
 		public string Id { get; set; }
 
         [ProtoMember(2)]
 		public string ContentsPath { get; set; }
-		
-        [ProtoMember(3)]
-		public string Trigger { 
-			get { return trigger; } 
-			set { 
-				trigger = value;
-				if (Animator.DidKeyFrameLeap) {
-					if (string.IsNullOrEmpty (value)) {
-						CurrentTime = 0;
-						Playing = true;
-					} else					
-						PlayAnimation (value);
-				}
-			} 
-		}
 
-		private string trigger;
+		[Trigger]
+		public string Trigger { get; set; }
 
-		public virtual Node Parent { get { return parent; } set { parent = value; } }
-		private Node parent;
+		public string Description { get { return GetDescription (); } }
 
+		public Node Parent;
 		public Widget Widget;
 
 		[ProtoMember(5)]
@@ -58,30 +43,53 @@ namespace Lime
 		public readonly MarkerCollection Markers = new MarkerCollection ();
 
 		[ProtoMember(9)]
-		public bool Playing {
-			get { return playing; }
-			set {
-				playing = value;
-				if (playing)
-					Update (0);
-			}
-		}
+		public bool Playing { get; set; }
 
+		private int animationTime;
 		[ProtoMember(10)]
-		public int CurrentTime {
-			get { return currentTime; }
+		public int AnimationTime {
+			get { return animationTime; }
 			set {
-				currentTime = value;
+				animationTime = value;
 				int count = Nodes.Count;
 				for (int i = 0; i < count; i++) {
-					Nodes [i].Animators.Apply (currentTime);
+					Nodes [i].Animators.Apply (animationTime);
 				}
 			}
 		}
-		private int currentTime;
-		#endregion
-		
-		#region Methods
+
+		public void AdvanceAnimation (int delta)
+		{
+			int count = Markers.Count;
+			for (int i = 0; i < count; i++) {
+				var marker = Markers [i];
+				int markerTime = Animator.FramesToMsecs (marker.Frame);
+				if (animationTime <= markerTime && markerTime < animationTime + delta) {
+					if (marker.Action == MarkerAction.Jump) {
+						var gotoMarker = Markers.Get (marker.JumpTo);
+						if (gotoMarker != null) {
+							int gotoTime = Animator.FramesToMsecs (gotoMarker.Frame);
+							animationTime = gotoTime + (animationTime + delta - markerTime);
+						}
+					} else if (marker.Action == MarkerAction.Stop) {
+						delta = markerTime - animationTime;
+						Playing = false;
+					} else if (marker.Action == MarkerAction.Destroy) {
+						Playing = false;
+						Suicide ();
+					}
+					break;
+				}
+			}
+			count = Nodes.Count;
+			for (int i = 0; i < count; i++) {
+				var animators = Nodes [i].Animators;
+				animators.Apply (animationTime + delta);
+				animators.InvokeTriggers (animationTime, animationTime + delta);
+			}
+			animationTime += delta;
+		}
+
 		private static List<Node> killList = new List<Node> ();
 
 		public Node ()
@@ -129,22 +137,20 @@ namespace Lime
 			return node;
 		}
 
-		private bool playing = false;
-
 		public void PlayAnimation (string markerId)
 		{
-			Marker marker = Markers.Find (markerId);
+			Marker marker = Markers.Get (markerId);
 			if (marker == null) {
-				// System.Diagnostics.Debug.WriteLine ("WARNING: Attempt to play animation. Unknown marker '{0}' in node '{1}'", markerId, Id);
+				// Console.WriteLine ("WARNING: Attempt to play animation. Unknown marker '{0}' in node '{1}'", markerId, Id);
 				return;
 			}
-			CurrentFrame = marker.Frame;
+			AnimationFrame = marker.Frame;
 			Playing = true;
 		}
 
-		public int CurrentFrame {
-			get { return WidgetUtils.MillisecondsToFrame (CurrentTime); }
-			set { CurrentTime = WidgetUtils.FrameToMilliseconds (value); }
+		public int AnimationFrame {
+			get { return Animator.MsecsToFrames (AnimationTime); }
+			set { AnimationTime = Animator.FramesToMsecs (value); }
 		}
 		
 		static public void CleanupDeadNodes ()
@@ -160,55 +166,28 @@ namespace Lime
 		{
 			return Serialization.DeepClone<Node> (this);
 		}
+
+		public string GetDescription ()
+		{
+			string r = string.IsNullOrEmpty (Id) ? String.Format ("[{0}]", GetType().Name): Id;
+			if (Parent != null) {
+				r = Parent.GetDescription () + "/" + r;
+			}
+			return r;
+		}
 		
-		public void Kill ()
+		public void Suicide ()
 		{
 			killList.Add (this);
 		}
 		
-		private void ProcessMarker ()
-		{
-			Marker marker = Markers.FindByFrame (CurrentFrame);
-			if (marker != null) {
-				switch (marker.Action) {
-				case MarkerAction.Jump:
-					{
-						var gotoMarker = Markers.Find (marker.JumpTo);
-						if (gotoMarker != null)
-							CurrentTime = WidgetUtils.FrameToMilliseconds (gotoMarker.Frame);
-						break;
-					}
-				case MarkerAction.Stop:
-					{
-						CurrentTime = WidgetUtils.RoundMillisecondsToFrame (CurrentTime);
-						Playing = false;
-						break;
-					}
-				case MarkerAction.Destroy:
-					{
-						Playing = false;
-						Kill ();
-						break;
-					}
-				}
-			}
-		}
-
-		protected void AnimateChildren (int delta)
-		{
-			int frameBefore = CurrentFrame;
-			CurrentTime = CurrentTime + delta;
-			if (frameBefore != CurrentFrame && Markers.Count > 0) {
-				ProcessMarker ();
-			}
-		}
-
 		// Delta must be in [0..1000 / WidgetUtils.FramesPerSecond - 1] range
 		public virtual void Update (int delta)
 		{
 			UpdatedNodes++;
-			if (Playing)
-				AnimateChildren (delta);
+			if (Playing) {
+				AdvanceAnimation (delta);
+			}
 			for (int i = Nodes.Count - 1; i >= 0; i--)
 				Nodes [i].Update (delta);
 		}
@@ -217,7 +196,7 @@ namespace Lime
 		{
 			if (delta < 0)
 				throw new Lime.Exception ("Update interval can not be negative");		
-			const int step = 1000 / WidgetUtils.FramesPerSecond - 1;
+			const int step = 1000 / Animator.FramesPerSecond - 1;
 			while (delta > step) {
 				Update (step);
 				delta -= step;
@@ -263,6 +242,22 @@ namespace Lime
 					Nodes.Add (node);
 			}
 		}
-		#endregion
+
+		protected internal virtual void OnTrigger (string property)
+		{
+			if (property == "Trigger") {
+				if (String.IsNullOrEmpty (Trigger)) {
+					AnimationTime = 0;
+					Playing = true;
+				} else {
+					PlayAnimation (Trigger);
+				}
+			}
+		}
+
+		protected internal virtual bool IsTriggerableProperty (string property)
+		{
+			return property == "Trigger";
+		}
 	}
 }

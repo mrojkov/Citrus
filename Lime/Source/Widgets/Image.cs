@@ -7,6 +7,8 @@ namespace Lime
     [ProtoContract]
 	public class Image : Widget, IImageCombinerArg
 	{
+		public new string Description { get { return GetDescription (); } }
+
         [ProtoMember(1)]
 		public PersistentTexture Texture { get; set; }
 

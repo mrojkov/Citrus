@@ -66,6 +66,8 @@ namespace Lime
     [ProtoContract]
     public class Audio : Node
     {
+		public new string Description { get { return GetDescription (); } }
+
         [ProtoMember(1)]
         public PersistentSound Sound { get; set; }
         

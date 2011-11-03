@@ -140,6 +140,8 @@ namespace Lime
 
 		public static bool EnabledGlobally = true;
 
+		public new string Description { get { return GetDescription (); } }
+
 		/// <summary>
 		/// Whether particles never die.
 		/// </summary>
@@ -552,7 +554,7 @@ namespace Lime
 			var modifier = Nodes [p.ModifierIndex] as ParticleModifier;
 			int duration = modifier.Animators.GetOverallDuration ();
 			if (duration > 0) {
-				modifier.Animators.Apply (WidgetUtils.FrameToMilliseconds ((int)(p.Age / p.Lifetime * duration)));
+				modifier.Animators.Apply (Animator.FramesToMsecs ((int)(p.Age / p.Lifetime * duration)));
 			}
 
 			p.Age += delta;

@@ -31,6 +31,8 @@ namespace Lime
 	[ProtoContract]
     public class Bone : Node
     {
+		public new string Description { get { return GetDescription (); } }
+
         [ProtoMember(1)]
         public Vector2 Position { get; set; }
 

@@ -163,7 +163,7 @@ namespace Lime
 			PlainTexture.DeleteScheduledTextures ();
 			DrawCalls = 0;
 			TexturePool.Instance.AdvanceGameRenderCycle ();
-#if GLES11			
+#if GLES11
 			GL.ClearColor (0.5f, 0.5f, 0.5f, 1.0f);
 			GL.Clear ((uint)All.ColorBufferBit);
 			GL.VertexPointer (2, All.Float, 0, batchVertices);
