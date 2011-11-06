@@ -68,7 +68,7 @@
     <Compile Include="Source\Graphics\RenderTexture.cs" />
     <Compile Include="Source\Graphics\Texture.cs" />
     <Compile Include="Source\Graphics\TextureAtlasPart.cs" />
-    <Compile Include="Source\Input\Keyboard.cs" />
+    <Compile Include="Source\Types\Keyboard.cs" />
     <Compile Include="Source\MathUtils.cs" />
     <Compile Include="Source\Serialization.cs" />
     <Compile Include="Source\Types\Color4.cs" />
@@ -109,6 +109,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
+    <Folder Include="Source\Input\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

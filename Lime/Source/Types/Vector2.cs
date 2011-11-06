@@ -3,15 +3,16 @@ using ProtoBuf;
 
 namespace Lime
 {
-    [System.Diagnostics.DebuggerStepThrough]
+	[System.Diagnostics.DebuggerStepThrough]
 	[ProtoContract]
 	public struct Vector2 : IEquatable<Vector2>
 	{
-		[ProtoMember(1)]
+		[ProtoMember (1)]
 		public float X;
-		[ProtoMember(2)]
+
+		[ProtoMember (2)]
 		public float Y;
-		
+
 		public static readonly Vector2 Zero = new Vector2 (0, 0);
 		public static readonly Vector2 One = new Vector2 (1, 1);
 		public static readonly Vector2 Half = new Vector2 (0.5f, 0.5f);
@@ -31,7 +32,7 @@ namespace Lime
 		{
 			return new Size ((int)v.X, (int)v.Y);
 		}
-		
+
 		bool IEquatable<Vector2>.Equals (Vector2 rhs)
 		{
 			return X == rhs.X && Y == rhs.Y;
@@ -59,7 +60,7 @@ namespace Lime
 		{
 			return new Vector2 (lhs.X / rhs, lhs.Y / rhs);
 		}
-		
+
 		public static Vector2 Scale (Vector2 lhs, Vector2 rhs)
 		{
 			return new Vector2 (lhs.X * rhs.X, lhs.Y * rhs.Y);
@@ -89,7 +90,7 @@ namespace Lime
 		{
 			return new Vector2 (-v.X, -v.Y);
 		}
-		
+
 		public static float DotProduct (Vector2 lhs, Vector2 rhs)
 		{
 			return lhs.X * rhs.X + lhs.Y * rhs.Y;
@@ -109,7 +110,7 @@ namespace Lime
 			}
 			return value;
 		}
-		
+
 		public static Vector2 CosSin (float radians)
 		{
 			if (radians == 0) {
@@ -127,16 +128,19 @@ namespace Lime
 			result.Y = value.X * cs.Y + value.Y * cs.X;
 			return result;
 		}
-		
-		public float Atan2 {
+
+		public float Atan2
+		{
 			get { return (float)Math.Atan2 (Y, X); }
 		}
 
-		public float Length {
+		public float Length
+		{
 			get { return (float)Math.Sqrt (X * X + Y * Y); }
 		}
 
-		public float SquaredLength {
+		public float SquaredLength
+		{
 			get { return X * X + Y * Y; }
 		}
 

@@ -369,7 +369,6 @@ namespace Lime
 				else
 					pendingParticles = Number;
 				pendingParticles = Math.Min (pendingParticles, Number - particles.Count);
-
 				while (particles.Count > Number) {
 					TotalParticles--;
 					particles.RemoveLast ();

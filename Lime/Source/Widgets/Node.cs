@@ -76,7 +76,7 @@ namespace Lime
 						Playing = false;
 					} else if (marker.Action == MarkerAction.Destroy) {
 						Playing = false;
-						Suicide ();
+						Destroy ();
 					}
 					break;
 				}
@@ -90,7 +90,7 @@ namespace Lime
 			animationTime += delta;
 		}
 
-		private static List<Node> killList = new List<Node> ();
+		private static List<Node> collectedNodes = new List<Node> ();
 
 		public Node ()
 		{
@@ -155,11 +155,11 @@ namespace Lime
 		
 		static public void CleanupDeadNodes ()
 		{
-			foreach (Node node in killList) {
+			foreach (Node node in collectedNodes) {
 				if (node.Parent != null)
 					node.Parent.Nodes.Remove (node);
 			}
-			killList.Clear ();
+			collectedNodes.Clear ();
 		}
 		
 		public Node DeepClone ()
@@ -176,9 +176,9 @@ namespace Lime
 			return r;
 		}
 		
-		public void Suicide ()
+		public void Destroy ()
 		{
-			killList.Add (this);
+			collectedNodes.Add (this);
 		}
 		
 		// Delta must be in [0..1000 / WidgetUtils.FramesPerSecond - 1] range
@@ -195,7 +195,7 @@ namespace Lime
 		public void SafeUpdate (int delta)
 		{
 			if (delta < 0)
-				throw new Lime.Exception ("Update interval can not be negative");		
+				throw new Lime.Exception ("Update interval can not be negative");
 			const int step = 1000 / Animator.FramesPerSecond - 1;
 			while (delta > step) {
 				Update (step);
@@ -253,11 +253,6 @@ namespace Lime
 					PlayAnimation (Trigger);
 				}
 			}
-		}
-
-		protected internal virtual bool IsTriggerableProperty (string property)
-		{
-			return property == "Trigger";
 		}
 	}
 }

@@ -141,6 +141,7 @@ namespace Orange
 				CompileLog.Buffer.Clear ();
 				// Create serialization model
 				var model = ProtoBuf.Meta.TypeModel.Create ();
+				model.UseImplicitZeroDefaults = false;
 				RegisterEngineTypes (model);
 				Serialization.Serializer = model;
 				model.CompileInPlace ();

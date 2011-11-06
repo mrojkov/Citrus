@@ -1,6 +1,7 @@
 using System;
 using Lime;
 using ProtoBuf;
+using System.ComponentModel;
 
 namespace Lime
 {
@@ -50,13 +51,13 @@ namespace Lime
         [ProtoMember(3)]
 		public Vector2 Pivot { get; set; }
 
-        [ProtoMember(4)]
+		[ProtoMember (4)]
 		public Vector2 Scale { get; set; }
 		
 		private float rotation;
 		private Vector2 sincos = new Vector2 (1, 0);
         
-		[ProtoMember(5)]
+		[ProtoMember(5), DefaultValue (0)]
 		public float Rotation { 
 			get {
 				return rotation;
@@ -78,7 +79,7 @@ namespace Lime
         [ProtoMember(8)]
 		public Blending Blending { get; set; }
 
-        [ProtoMember(9)]
+        [ProtoMember(9), DefaultValue (true)]
 		public bool Visible { get; set; }
 
         [ProtoMember(10)]

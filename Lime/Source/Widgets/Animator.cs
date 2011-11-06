@@ -52,12 +52,6 @@ namespace Lime
 			return FramesToMsecs (MsecsToFrames (msecs));
 		}
 
-		[Flags]
-		public enum KeyFlags
-		{
-			Immutable = 1,
-		};
-
 		protected abstract System.Collections.IList Values { get; }
 
 		protected Node Owner;

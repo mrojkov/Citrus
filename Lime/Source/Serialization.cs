@@ -5,7 +5,7 @@ using System.IO;
 namespace Lime
 {
 	public static class Serialization
-	{		
+	{
 		enum OperationType
 		{
 			Clone,
@@ -18,7 +18,7 @@ namespace Lime
 			public string SerializationPath;
 		}
 		
-#if iOS		
+#if iOS
 		public static ProtoBuf.Meta.TypeModel Serializer;
 #else
 		public static ProtoBuf.Meta.TypeModel Serializer = ProtoBuf.Meta.RuntimeTypeModel.Default;

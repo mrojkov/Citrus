@@ -1,14 +1,15 @@
 using Lime;
 using ProtoBuf;
+using System.ComponentModel;
 
 namespace Lime
 {
 	[ProtoContract]
     public struct BoneWeight
     {
-		[ProtoMember(1)]
+		[ProtoMember(1), DefaultValue (0)]
         public int Index;
-		[ProtoMember(2)]
+		[ProtoMember(2), DefaultValue (0)]
         public float Weight;
     }
 	 
