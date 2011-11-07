@@ -32,8 +32,11 @@ namespace Orange
 #if WIN
 			p.StartInfo.CreateNoWindow = true;
 			p.StartInfo.WorkingDirectory = Path.GetDirectoryName (app);
-			p.StartInfo.StandardOutputEncoding = System.Text.Encoding.Default;
-			p.StartInfo.StandardErrorEncoding = System.Text.Encoding.Default;
+			int cp = System.Text.Encoding.Default.CodePage;
+			if (cp == 1251)
+				cp = 866;
+			p.StartInfo.StandardOutputEncoding = System.Text.Encoding.GetEncoding (cp);
+			p.StartInfo.StandardErrorEncoding = System.Text.Encoding.GetEncoding (cp);
 #else
 			p.StartInfo.StandardOutputEncoding = System.Text.Encoding.Default;
 			p.StartInfo.StandardErrorEncoding = System.Text.Encoding.Default;
@@ -42,13 +45,17 @@ namespace Orange
 			p.StartInfo.RedirectStandardOutput = true;
 			p.StartInfo.RedirectStandardError = true;
 			var logger = new System.Text.StringBuilder ();
-			p.OutputDataReceived += (sender, e) => { 
-				lock (logger) 
-					logger.AppendLine (e.Data); 
+			p.OutputDataReceived += (sender, e) => {
+				lock (logger) {
+					if (args == "") {
+						string x = e.Data;
+					}
+					logger.AppendLine (e.Data);
+				}
 			};
-			p.ErrorDataReceived += (sender, e) => { 
+			p.ErrorDataReceived += (sender, e) => {
 				lock (logger)
-					logger.AppendLine (e.Data); 
+					logger.AppendLine (e.Data);
 			};
 			p.Start ();
 			p.BeginOutputReadLine ();
