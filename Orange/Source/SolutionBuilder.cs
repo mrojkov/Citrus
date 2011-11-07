@@ -32,6 +32,8 @@ namespace Orange
 #if WIN
 			p.StartInfo.CreateNoWindow = true;
 			p.StartInfo.WorkingDirectory = Path.GetDirectoryName (app);
+			p.StartInfo.StandardOutputEncoding = System.Text.Encoding.Default;
+			p.StartInfo.StandardErrorEncoding = System.Text.Encoding.Default;
 #else
 			p.StartInfo.StandardOutputEncoding = System.Text.Encoding.Default;
 			p.StartInfo.StandardErrorEncoding = System.Text.Encoding.Default;
