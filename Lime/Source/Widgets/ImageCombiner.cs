@@ -30,8 +30,6 @@ namespace Lime
     [ProtoContract]
 	public class ImageCombiner : Node
 	{
-		public new string Description { get { return GetDescription (); } }
-
         [ProtoMember(1)]
 		public bool Enabled { get; set; }
 		

@@ -64,7 +64,7 @@ namespace Lime
 		
 		/// <summary>
         /// Size of texture surface.
-        /// </summary>		
+        /// </summary>
 		Size SurfaceSize { get; }
 		
 		/// <summary>

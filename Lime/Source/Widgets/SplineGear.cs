@@ -7,8 +7,6 @@ namespace Lime
 	[ProtoContract]
 	public class SplineGear : Node
 	{
-		public new string Description { get { return GetDescription (); } }
-
 		[ProtoMember(1)]
 		public string WidgetId { get; set; }
 

@@ -7,12 +7,10 @@ namespace Lime
 	{
 	}
 
-    [ProtoContract]
+	[ProtoContract]
 	public class Button : Frame
 	{
-		public new string Description { get { return GetDescription (); } }
-
-        [ProtoMember(1)]
+		[ProtoMember(1)]
 		public string Caption { get; set; }
 
 		public Button ()

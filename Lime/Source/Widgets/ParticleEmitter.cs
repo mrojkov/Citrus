@@ -140,8 +140,6 @@ namespace Lime
 
 		public static bool EnabledGlobally = true;
 
-		public new string Description { get { return GetDescription (); } }
-
 		/// <summary>
 		/// Whether particles never die.
 		/// </summary>

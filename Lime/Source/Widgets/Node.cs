@@ -28,8 +28,6 @@ namespace Lime
 		[Trigger]
 		public string Trigger { get; set; }
 
-		public string Description { get { return GetDescription (); } }
-
 		public Node Parent;
 		public Widget Widget;
 
@@ -167,7 +165,12 @@ namespace Lime
 			return Serialization.DeepClone<Node> (this);
 		}
 
-		public string GetDescription ()
+		public override string ToString ()
+		{
+			return string.Format ("{0}, {1}", GetType ().Name, GetDescription ());
+		}
+
+		string GetDescription ()
 		{
 			string r = string.IsNullOrEmpty (Id) ? String.Format ("[{0}]", GetType().Name): Id;
 			if (Parent != null) {

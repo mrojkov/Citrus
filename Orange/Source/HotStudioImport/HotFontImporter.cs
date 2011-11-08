@@ -17,7 +17,7 @@ namespace Orange
 				}
 			}
 		}
-                    
+
 		void ParseFontCharProperty (ref FontChar fontChar, string name)
 		{
 			switch (name) {

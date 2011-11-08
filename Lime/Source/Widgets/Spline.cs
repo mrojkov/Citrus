@@ -6,8 +6,6 @@ namespace Lime
 	[ProtoContract]
 	public class Spline : Widget
 	{
-		public new string Description { get { return GetDescription (); } }
-
 		public Spline ()
 		{
 		}

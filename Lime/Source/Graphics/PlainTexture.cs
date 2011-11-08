@@ -37,35 +37,19 @@ namespace Lime
 				}
 			}
 		}
-		
-		/// <summary>
-		/// Constructor.
-		/// </summary>
-		public PlainTexture ()
-		{
-		}
 
-		/// <summary>
-		/// Size of texture.
-		/// </summary>
-		public Size ImageSize {
+		public Size ImageSize
+		{
 			get { return imgSize; }
 		}
-		
-		/// <summary>
-		/// Size of texture surface.
-		/// </summary>
-		public Size SurfaceSize { 
-			get {
-				return surSize;
-			} 
+
+		public Size SurfaceSize
+		{
+			get { return surSize; }
 		}
-		
+
 		public Rectangle UVRect { get { return uvRect; } }
-		
-		/// <summary>
-		/// Loads an image from file.
-		/// </summary>
+
 		public void LoadImage (string path)
 		{
 			using (Stream stream = AssetsBundle.Instance.OpenFile (path)) {
@@ -157,19 +141,21 @@ namespace Lime
 				height /= 2;
 			}
 		}
-#else	
-		enum DDSFourCC {
+#else
+		enum DDSFourCC
+		{
 			DXT1 = ('D' | ('X' << 8) | ('T' << 16) | ('1' << 24)),
 			DXT3 = ('D' | ('X' << 8) | ('T' << 16) | ('3' << 24)),
 			DXT5 = ('D' | ('X' << 8) | ('T' << 16) | ('5' << 24)),
 		}
-		
-		enum DDSPFFlags {
+
+		enum DDSPFFlags
+		{
 			Apha = 0x01,
 			FourCC = 0x04,
 			RGB = 0x40
 		}
-		
+
 		private void InitWithDDSTexture (BinaryReader reader)
 		{
 			UInt32 magic = reader.ReadUInt32 ();
@@ -177,33 +163,46 @@ namespace Lime
 			if (magic != 0x20534444 || size != 124) {
 				throw new Lime.Exception ("Invalid DDS file header");
 			}
-			/* UInt32 flags = */ reader.ReadUInt32 ();
-  			int height = reader.ReadInt32 ();
+			// UInt32 flags =
+			reader.ReadUInt32 ();
+			int height = reader.ReadInt32 ();
 			int width = reader.ReadInt32 ();
 			UInt32 pitchOrLinearSize = reader.ReadUInt32 ();
-  			/* UInt32 depth = */ reader.ReadUInt32 ();
-  			UInt32 mipMapCount = reader.ReadUInt32 ();
+			// UInt32 depth =
+			reader.ReadUInt32 ();
+			UInt32 mipMapCount = reader.ReadUInt32 ();
 			reader.ReadBytes (11 * 4);
-  			// Read pixel format
-			/* UInt32 pfSize = */ reader.ReadUInt32 ();
+			// Read pixel format
+			// UInt32 pfSize =
+			reader.ReadUInt32 ();
 			UInt32 pfFlags = reader.ReadUInt32 ();
 			UInt32 pfFourCC = reader.ReadUInt32 ();
-			/* UInt32 pfRGBBitCount = */ reader.ReadUInt32 ();
-			/* UInt32 pfRBitMask = */ reader.ReadUInt32 ();
-			/* UInt32 pfGBitMask = */ reader.ReadUInt32 ();
-			/* UInt32 pfBBitMask = */ reader.ReadUInt32 ();
-			/* UInt32 pfABitMask = */ reader.ReadUInt32 ();
+			// UInt32 pfRGBBitCount =
+			reader.ReadUInt32 ();
+			// UInt32 pfRBitMask =
+			reader.ReadUInt32 ();
+			// UInt32 pfGBitMask =
+			reader.ReadUInt32 ();
+			// UInt32 pfBBitMask =
+			reader.ReadUInt32 ();
+			// UInt32 pfABitMask =
+			reader.ReadUInt32 ();
 			// read the rest of header
-  			/* UInt32 caps = */ reader.ReadUInt32 ();
-  			/* UInt32 caps2 = */ reader.ReadUInt32 ();
-  			/* UInt32 caps3 = */ reader.ReadUInt32 ();
-  			/* UInt32 caps4 = */ reader.ReadUInt32 ();
-  			/* UInt32 reserved2 = */ reader.ReadUInt32 ();
-			
+			// UInt32 caps =
+			reader.ReadUInt32 ();
+			// UInt32 caps2 =
+			reader.ReadUInt32 ();
+			// UInt32 caps3 =
+			reader.ReadUInt32 ();
+			// UInt32 caps4 =
+			reader.ReadUInt32 ();
+			// UInt32 reserved2 =
+			reader.ReadUInt32 ();
+
 			if ((pfFlags & (UInt32)DDSPFFlags.FourCC) == 0) {
 				throw new Lime.Exception ("Only compressed DDS textures are supported");
 			}
-			
+
 			surSize = imgSize = new Size (width, height);
 			mipMapCount = 1;
 			for (int i = 0; i < mipMapCount; i++) {
@@ -224,23 +223,19 @@ namespace Lime
 				default:
 					throw new Lime.Exception ("Unsupported texture format");
 				}
-				byte[] buffer = new byte [pitchOrLinearSize];
-				reader.Read (buffer, 0,	buffer.Length);
+				byte [] buffer = new byte [pitchOrLinearSize];
+				reader.Read (buffer, 0, buffer.Length);
 				GL.CompressedTexImage2D (TextureTarget.Texture2D, 0, pf, width, height, 0, buffer.Length, buffer);
 				pitchOrLinearSize /= 4;
 				width /= 2;
 				height /= 2;
 				Renderer.Instance.CheckErrors ();
 			}
-		}		
+		}
 #endif
-		
-		/// <summary>
-		/// Loads an image from stream.
-		/// </summary>
+
 		public void LoadImage (Stream stream)
 		{
-			Renderer.Instance.FlushSpriteBatch ();
 			// Discards current texture.
 			Dispose ();
 			DeleteScheduledTextures ();
@@ -248,24 +243,28 @@ namespace Lime
 #if GLES11
 			// Generate a new texture.
 			GL.GenTextures (1, ref id);
-			GL.BindTexture (All.Texture2D, id);
+			Renderer.Instance.BindTexture (id, 0);
 			GL.TexParameter (All.Texture2D, All.TextureMinFilter, (int)All.Linear);
 			GL.TexParameter (All.Texture2D, All.TextureMagFilter, (int)All.Linear);
+			GL.TexParameter (All.Texture2D, All.TextureWrapS, (int)All.ClampToEdge);
+			GL.TexParameter (All.Texture2D, All.TextureWrapT, (int)All.ClampToEdge);
 			GL.Hint (All.PerspectiveCorrectionHint, All.Fastest);
 #else
 			// Generate a new texture.
 			id = (uint)GL.GenTexture ();
-			GL.BindTexture (TextureTarget.Texture2D, id);
+			Renderer.Instance.SetTexture (id, 0);
 			GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
 			GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+			GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureParameterName.ClampToEdge);
+			GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureParameterName.ClampToEdge);
 			GL.Hint (HintTarget.PerspectiveCorrectionHint, HintMode.Fastest);
-#endif				
-			using (BinaryReader reader = new BinaryReader (stream))	{
+#endif
+			using (BinaryReader reader = new BinaryReader (stream)) {
 #if iOS
 				InitWithPVRTexture (reader);
 #else
 				InitWithDDSTexture (reader);
-#endif	
+#endif
 			}
 			Renderer.Instance.CheckErrors ();
 			uvRect = new Rectangle (Vector2.Zero, (Vector2)ImageSize / (Vector2)SurfaceSize);
@@ -274,9 +273,8 @@ namespace Lime
 		/// <summary>
 		/// Create texture from pixel array.
 		/// </summary>
-		public void LoadImage (Color4[] pixels, int width, int height, bool generateMips)
+		public void LoadImage (Color4 [] pixels, int width, int height, bool generateMips)
 		{
-			Renderer.Instance.FlushSpriteBatch ();
 			// Discards current texture.
 			Dispose ();
 			DeleteScheduledTextures ();
@@ -284,19 +282,22 @@ namespace Lime
 			// Generate a new texture.
 			GL.GenTextures (1, ref id);
 			
-			GL.BindTexture (All.Texture2D, id);
+			Renderer.Instance.BindTexture (id, 0);
 			GL.TexParameter (All.Texture2D, All.TextureMinFilter, (int)All.Linear);
 			GL.TexParameter (All.Texture2D, All.TextureMagFilter, (int)All.Linear);
+			GL.TexParameter (All.Texture2D, All.TextureWrapS, (int)All.ClampToEdge);
+			GL.TexParameter (All.Texture2D, All.TextureWrapT, (int)All.ClampToEdge);
 			GL.Hint (All.PerspectiveCorrectionHint, All.Fastest);
-			
 			GL.TexImage2D (All.Texture2D, 0, (int)All.Rgba, width, height, 0,
-            	All.Rgba, All.UnsignedByte, pixels);
+				All.Rgba, All.UnsignedByte, pixels);
 #else
 			// Generate a new texture.
 			id = (uint)GL.GenTexture ();
-			GL.BindTexture (TextureTarget.Texture2D, id);
+			Renderer.Instance.SetTexture (id, 0);
 			GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
 			GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+			GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureParameterName.ClampToEdge);
+			GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureParameterName.ClampToEdge);
 			GL.Hint (HintTarget.PerspectiveCorrectionHint, HintMode.Fastest);
 			GL.TexImage2D (TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0,
 				PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
@@ -309,7 +310,7 @@ namespace Lime
 			}
 #endif
 			Renderer.Instance.CheckErrors ();
-			
+
 			imgSize = new Size (width, height);
 			surSize = imgSize;
 			uvRect = new Rectangle (0, 0, 1, 1);

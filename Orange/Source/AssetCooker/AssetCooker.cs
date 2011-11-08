@@ -30,7 +30,7 @@ namespace Orange
 		
 		string BundlePathToNative (string path)
 		{
-			return path.Replace ('/', Path.DirectorySeparatorChar);			
+			return path.Replace ('/', Path.DirectorySeparatorChar);
 		}
 		
 		string GetPlatformTextureExtension ()
@@ -80,7 +80,8 @@ namespace Orange
 						}
 						var importer = new HotFontImporter (srcPath);
 						var font = importer.ParseFont (size);
-						font.Texture = new Lime.PersistentTexture (Path.ChangeExtension (dstPath, null));
+						var texturePath = Lime.AssetsBundle.CorrectSlashes (Path.ChangeExtension (dstPath, null));
+						font.Texture = new Lime.PersistentTexture (texturePath);
 						Helpers.CreateDirectoryRecursive (Path.GetDirectoryName (dstPath));
 						Lime.Serialization.WriteObjectToBundle<Lime.Font> (AssetsBundle, dstPath, font);
 						return true;

@@ -38,9 +38,9 @@ namespace Lime
 		public Size ImageSize { get { return Instance.ImageSize; } }
 
 		public Size SurfaceSize { get { return Instance.SurfaceSize; } }
-		
-		public Rectangle UVRect { get { return core.UVRect; } }
-				
+
+		public Rectangle UVRect { get { return Instance.UVRect; } }
+
 		public uint GetHandle ()
 		{
 			return Instance.GetHandle ();
@@ -62,6 +62,11 @@ namespace Lime
 		}
 
 		private ITexture Instance { get { return core.Instance; } }
+
+		public override string ToString ()
+		{
+			return core.Path;
+		}
 	}
 
 	internal class PersistentTextureCore

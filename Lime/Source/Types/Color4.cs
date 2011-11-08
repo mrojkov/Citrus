@@ -95,5 +95,10 @@ namespace Lime
 		{
 			return ABGR == other.ABGR;
 		}
+
+		public override string ToString ()
+		{
+			return String.Format ("{0}, {1}, {2}, {3}", R, G, B, A);
+		}
 	}
 }

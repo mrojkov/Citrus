@@ -6,10 +6,8 @@ using ProtoBuf;
 namespace Lime
 {
 	[ProtoContract]
-    public class DistortionMeshPoint : PointObject
+	public class DistortionMeshPoint : PointObject
 	{
-		public new string Description { get { return GetDescription (); } }
-
 		[ProtoMember(1)]
 		public Color4 Color { get; set; }
 

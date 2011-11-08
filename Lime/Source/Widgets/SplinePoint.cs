@@ -7,8 +7,6 @@ namespace Lime
 	[ProtoContract]
 	public class SplinePoint : PointObject
 	{
-		public new string Description { get { return GetDescription (); } }
-
 		[ProtoMember(1)]
 		public bool Straight { get; set; }
 

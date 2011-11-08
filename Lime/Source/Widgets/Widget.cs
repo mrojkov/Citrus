@@ -40,8 +40,6 @@ namespace Lime
 		public event EventHandler<UIEventArgs> LeftUp;
 		public event EventHandler<UIEventArgs> Move;
 
-		public new string Description { get { return GetDescription (); } }
-
         [ProtoMember(1)]
 		public Vector2 Position { get; set; }
 
@@ -56,7 +54,7 @@ namespace Lime
 		
 		private float rotation;
 		private Vector2 sincos = new Vector2 (1, 0);
-        
+
 		[ProtoMember(5), DefaultValue (0)]
 		public float Rotation { 
 			get {

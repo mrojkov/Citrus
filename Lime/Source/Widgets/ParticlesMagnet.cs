@@ -7,8 +7,6 @@ namespace Lime
     [ProtoContract]
     public class ParticlesMagnet : Widget
     {
-		public new string Description { get { return GetDescription (); } }
-
         public ParticlesMagnet()
         {
             Shape = EmitterShape.Area;

@@ -123,7 +123,7 @@ namespace Lime
 		static readonly AssetsBundle instance = new AssetsBundle ();
 
 		public static AssetsBundle Instance { get { return instance; } }
-        
+
 		AssetsBundle ()
 		{
 		}
@@ -161,7 +161,7 @@ namespace Lime
 				offset += readCount;
 			}
 		}
-		
+
 		public void CleanupBundle ()
 		{
 			trash.Sort ((x, y) => {
@@ -186,7 +186,7 @@ namespace Lime
 			indexOffset -= moveDelta;
 			stream.SetLength (stream.Length - moveDelta);
 		}
-		
+
 		public void Close ()
 		{
 			CleanupBundle ();
@@ -203,17 +203,17 @@ namespace Lime
 			stream = null;
 			index.Clear ();
 		}
-		
+
 		void IDisposable.Dispose ()
 		{
 			Close ();
 		}
-		
+
 		public Stream OpenFile (string path)
 		{
 			return new AssetStream (this, path);
 		}
-        
+
 		public DateTime GetFileLastWriteTime (string path)
 		{
 			AssetDescriptor desc;
@@ -222,7 +222,7 @@ namespace Lime
 			}
 			throw new Exception ("Asset '{0}' doesn't exist", path);
 		}
-		
+
 		public void DeleteFile (string path)
 		{
 			AssetDescriptor desc;
@@ -232,7 +232,7 @@ namespace Lime
 			index.Remove (path);
 			trash.Add (desc);
 		}
-				
+
 		public bool FileExists (string path)
 		{
 			return index.ContainsKey (CorrectSlashes (path));

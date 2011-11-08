@@ -31,9 +31,7 @@ namespace Lime
 		RenderTarget renderTarget;
 		PersistentTexture renderTexture;
 
-		public new string Description { get { return GetDescription (); } }
-		
-        [ProtoMember(1)]
+		[ProtoMember(1)]
 		public RenderTarget RenderTarget {
 			get { return renderTarget; }
 			set {

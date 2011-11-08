@@ -4,18 +4,16 @@ using ProtoBuf;
 
 namespace Lime
 {
-    [ProtoContract]
+	[ProtoContract]
 	public class Image : Widget, IImageCombinerArg
 	{
-		public new string Description { get { return GetDescription (); } }
-
-        [ProtoMember(1)]
+		[ProtoMember (1)]
 		public PersistentTexture Texture { get; set; }
 
-        [ProtoMember(2)]
+		[ProtoMember (2)]
 		public Vector2 UV0 { get; set; }
 
-        [ProtoMember(3)]
+		[ProtoMember (3)]
 		public Vector2 UV1 { get; set; }
 
 		public Image ()
@@ -37,7 +35,7 @@ namespace Lime
 				return;
 			Renderer.Instance.WorldMatrix = WorldMatrix;
 			Renderer.Instance.Blending = WorldBlending;
-			Renderer.Instance.DrawSprite (Texture, WorldColor, Vector2.Zero, Size, UV0, UV1); 
+			Renderer.Instance.DrawSprite (Texture, WorldColor, Vector2.Zero, Size, UV0, UV1);
 		}
 
 		bool imageCombinerArg;
