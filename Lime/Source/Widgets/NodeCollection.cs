@@ -101,46 +101,5 @@ namespace Lime
 		{
 			return Get (id) as T;
 		}
-		
-		public T Find<T> (string id) where T : Node
-		{
-			T result = Find (id) as T;
-			if (result == null)
-				throw new Lime.Exception (
-					String.Format ("Node '{0}' (of type: {1}) not found in '{2}' (type: {3})", 
-					id, typeof(T), Owner.Id, Owner.GetType ()));
-			return result;
-		}
-
-		public Node Find (string id)
-		{
-			if (id.Contains ("/")) {
-				Node child = Owner;
-				string[] names = id.Split ('/');
-				foreach (string name in names) {
-					child = child.Nodes.Find (name);
-					if (child == null)
-						break;
-				}
-				return child;
-			} else
-				return FindHelper (id);
-		}
-
-		Node FindHelper (string id)
-		{
-			Queue<Node> queue = new Queue<Node> ();
-			queue.Enqueue (Owner);
-			while (queue.Count > 0) {
-				Node node = queue.Dequeue ();
-				foreach (Node child in node.Nodes) {
-					if (child.Id == id)
-						return child;
-				}
-				foreach (Node child in node.Nodes)
-					queue.Enqueue (child);
-			}
-			return null;
-		}
 	}
 }
