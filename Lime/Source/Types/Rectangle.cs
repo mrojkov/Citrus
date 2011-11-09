@@ -57,7 +57,7 @@ namespace Lime
 		
 		public override string ToString ()
 		{
-			return String.Format ("({0}, {1}, {2}, {3})", A.X, A.Y, B.X, B.Y);
+			return String.Format ("{0}, {1}, {2}, {3}", A.X, A.Y, B.X, B.Y);
 		}
 
 	}

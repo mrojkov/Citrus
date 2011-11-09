@@ -19,10 +19,10 @@ namespace Lime
 	{
 		public static int UpdatedNodes;
 		
-        [ProtoMember(1)]
+		[ProtoMember(1)]
 		public string Id { get; set; }
 
-        [ProtoMember(2)]
+		[ProtoMember(2)]
 		public string ContentsPath { get; set; }
 
 		[Trigger]

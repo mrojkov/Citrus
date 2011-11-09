@@ -70,7 +70,9 @@
     <Compile Include="Source\Graphics\RenderTexture.cs" />
     <Compile Include="Source\Graphics\Texture.cs" />
     <Compile Include="Source\Graphics\TextureAtlasPart.cs" />
+    <Compile Include="Source\Input\Input.cs" />
     <Compile Include="Source\Input\Keyboard.cs" />
+    <Compile Include="Source\Input\Mouse.cs" />
     <Compile Include="Source\MathUtils.cs" />
     <Compile Include="Source\Serialization.cs" />
     <Compile Include="Source\Types\Color4.cs" />

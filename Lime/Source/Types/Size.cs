@@ -5,20 +5,20 @@ namespace Lime
 {
 	[System.Diagnostics.DebuggerStepThrough]
 	[ProtoContract]
-    public struct Size : IEquatable<Size>
+	public struct Size : IEquatable<Size>
 	{
 		[ProtoMember(1)]
 		public int Width;
 		
 		[ProtoMember(2)]
 		public int Height;
-        
+
 		public Size (int width, int height)
 		{
 			Width = width;
 			Height = height;
 		}
-		
+
 		public static explicit operator Vector2 (Size size)
 		{
 			return new Vector2 ((float)size.Width, (float)size.Height);
@@ -31,7 +31,7 @@ namespace Lime
 
 		public override string ToString ()
 		{
-			return String.Format ("({0}, {1})", Width, Height);
+			return String.Format ("{0}, {1}", Width, Height);
 		}
 	}
 }

@@ -150,38 +150,37 @@ namespace Lime
 		Slash = 128,
 		BackSlash = 129,
 	}
-	
-	public static class Keyboard
+
+	public class Keyboard
 	{
 #if WIN
-		public static bool IsConnected ()
+		public bool Connected 
 		{
-			return OpenTK.Input.Keyboard.GetState (0).IsConnected;
+			get {
+				return OpenTK.Input.Keyboard.GetState (0).IsConnected;
+			}
 		}
 
-		public static bool IsKeyDown (Key key) 
+		public bool this [Key key]
 		{
-			return OpenTK.Input.Keyboard.GetState (0).IsKeyDown ((OpenTK.Input.Key)key);
+			get {
+				return OpenTK.Input.Keyboard.GetState (0).IsKeyDown ((OpenTK.Input.Key)key);
+			}
 		}
 
-		public static bool IsKeyUp (Key key)
-		{
-			return !IsKeyDown (key);
-		}
 #elif MAC
-		public static bool IsConnected ()
+		public bool Connected 
 		{
-			return false;
+			get {
+				return false;
+			}
 		}
 
-		public static bool IsKeyDown (Key key) 
+		public bool this [Key key]
 		{
-			return false;
-		}
-
-		public static bool IsKeyUp (Key key)
-		{
-			return !IsKeyDown (key);
+			get {
+				return false;
+			}
 		}
 #endif
 	}
