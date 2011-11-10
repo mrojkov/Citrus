@@ -7,6 +7,7 @@ namespace Lime
 {
 	public static class Input
 	{
+		public static Matrix32 ScreenToWorldTransform = Matrix32.Identity;
 		public static Mouse Mouse = new Mouse ();
 		public static Keyboard Keyboard = new Keyboard ();
 	}

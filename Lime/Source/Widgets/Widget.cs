@@ -193,7 +193,7 @@ namespace Lime
 		public override void Update (int delta)
 		{
 			UpdatedNodes++;
-			UpdateWorldProperties (); 
+			UpdateWorldProperties ();
 			if (WorldShown) {
 				if (Playing) {
 					AdvanceAnimation (delta);
@@ -205,35 +205,33 @@ namespace Lime
 			}
 		}
 
-		bool parentSizeIsDefined;
-		Vector2 parentSize;
+		Vector2? parentSize;
 
 		void ApplyAnchors ()
 		{
 			if (Anchors != Anchors.None && Parent.Widget != null) {
 				Vector2 currentSize = Parent.Widget.Size;
-				if (parentSizeIsDefined && !parentSize.Equals (currentSize)) {
+				if (parentSize.HasValue && !parentSize.Value.Equals (currentSize)) {
 					// Apply anchors along X axis.
 					if ((Anchors & Anchors.CenterH) != 0) {
-						Position += new Vector2 ((currentSize.X - parentSize.X) / 2, 0);
+						Position += new Vector2 ((currentSize.X - parentSize.Value.X) / 2, 0);
 					} else if ((Anchors & Anchors.Left) != 0 && (Anchors & Anchors.Right) != 0) {
-						Size += new Vector2 (currentSize.X - parentSize.X, 0);
-						Position += new Vector2 ((currentSize.X - parentSize.X) * Pivot.X, 0);
+						Size += new Vector2 (currentSize.X - parentSize.Value.X, 0);
+						Position += new Vector2 ((currentSize.X - parentSize.Value.X) * Pivot.X, 0);
 					} else if ((Anchors & Anchors.Right) != 0) {
-						Position += new Vector2 (currentSize.X - parentSize.X, 0);
+						Position += new Vector2 (currentSize.X - parentSize.Value.X, 0);
 					}
 
 					// Apply anchors along Y axis.
 					if ((Anchors & Anchors.CenterV) != 0) {
-						Position += new Vector2 (0, (currentSize.Y - parentSize.Y) / 2);
+						Position += new Vector2 (0, (currentSize.Y - parentSize.Value.Y) / 2);
 					} else if ((Anchors & Anchors.Top) != 0 && (Anchors & Anchors.Bottom) != 0) {
-						Size += new Vector2 (0, currentSize.Y - parentSize.Y);
-						Position += new Vector2 (0, (currentSize.Y - parentSize.Y) * Pivot.Y);
+						Size += new Vector2 (0, currentSize.Y - parentSize.Value.Y);
+						Position += new Vector2 (0, (currentSize.Y - parentSize.Value.Y) * Pivot.Y);
 					} else if ((Anchors & Anchors.Bottom) != 0) {
-						Position += new Vector2 (0, currentSize.Y - parentSize.Y);
+						Position += new Vector2 (0, currentSize.Y - parentSize.Value.Y);
 					}
 				}
-				parentSizeIsDefined = true;
 				parentSize = currentSize;
 			}
 		}

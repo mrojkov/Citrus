@@ -3,10 +3,6 @@ using ProtoBuf;
 
 namespace Lime
 {
-	public class WidgetEventArgs : EventArgs
-	{
-	}
-
 	[ProtoContract]
 	public class Button : Frame
 	{
@@ -53,7 +49,5 @@ namespace Lime
 				PlayAnimation ("Normal");
 			}
 		}
-
-		public event EventHandler<WidgetEventArgs> Click;
 	}
 }

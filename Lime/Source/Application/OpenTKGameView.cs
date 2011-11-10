@@ -10,41 +10,67 @@ namespace Lime
 		GameApp app;
 		
 		public GameView (GameApp app)
-			: base (800, 600, new OpenTK.Graphics.GraphicsMode (32, 0, 0, 4))
+			: base (640, 480, new OpenTK.Graphics.GraphicsMode (32, 0, 0, 4))
 		{
 			this.app = app;
 			app.OnCreate (this);
 			this.Keyboard.KeyDown += HandleKeyboardKeyDown;
 			this.Mouse.ButtonDown += HandleMouseButtonDown;
 			this.Mouse.ButtonUp += HandleMouseButtonUp;
+			this.Mouse.Move += HandleMouseMove;
+			this.KeyPress += HandleKeyPress;
+			this.KeyDown += HandleKeyDown;
+			this.KeyUp += HandleKeyUp;
+		}
+
+		void HandleKeyDown (object sender, KeyboardKeyEventArgs e)
+		{
+			app.OnKeyDown ((Key)e.Key);
+		}
+
+		void HandleKeyUp (object sender, KeyboardKeyEventArgs e)
+		{
+			app.OnKeyUp ((Key)e.Key);
+		}
+
+		void HandleKeyPress (object sender, KeyPressEventArgs e)
+		{
+			app.OnKeyPress (e.KeyChar);
 		}
 
 		void HandleMouseButtonUp (object sender, MouseButtonEventArgs e)
 		{
-			Vector2 pointer = new Vector2 (e.X, e.Y);
+			Vector2 position = new Vector2 (e.X, e.Y) * Input.ScreenToWorldTransform;
 			switch (e.Button) {
 			case OpenTK.Input.MouseButton.Left:
-				app.OnMouseUp (MouseButton.Left, pointer);
+				app.OnMouseUp (MouseButton.Left, position);
 				break;
 			case OpenTK.Input.MouseButton.Right:
-				app.OnMouseUp (MouseButton.Right, pointer);
+				app.OnMouseUp (MouseButton.Right, position);
 				break;
 			}
 		}
 
 		void HandleMouseButtonDown (object sender, MouseButtonEventArgs e)
 		{
-			Vector2 pointer = new Vector2 (e.X, e.Y);
+			Vector2 position = new Vector2 (e.X, e.Y) * Input.ScreenToWorldTransform;
 			switch (e.Button) {
 			case OpenTK.Input.MouseButton.Left:
-				app.OnMouseDown (MouseButton.Left, pointer);
+				app.OnMouseDown (MouseButton.Left, position);
 				break;
 			case OpenTK.Input.MouseButton.Right:
-				app.OnMouseDown (MouseButton.Right, pointer);
+				app.OnMouseDown (MouseButton.Right, position);
 				break;
 			}
 		}
-		
+
+		void HandleMouseMove (object sender, MouseMoveEventArgs e)
+		{
+			Vector2 position = new Vector2 (e.X, e.Y) * Input.ScreenToWorldTransform;
+			Input.Mouse.SetPosition (position);
+			app.OnMouseMove (position);
+		}
+
 		protected override void OnClosed (EventArgs e)
 		{
 			TexturePool.Instance.DiscardAll ();

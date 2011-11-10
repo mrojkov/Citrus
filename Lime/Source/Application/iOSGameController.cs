@@ -29,7 +29,7 @@ namespace Lime
 		Size IGameWindow.WindowSize {
 			get {
 				return new Size (View.Size.Width, View.Size.Height);
-			}			
+			}
 			set {}
 		}
 		

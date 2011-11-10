@@ -32,8 +32,12 @@ namespace Lime
 		public virtual void OnUpdateFrame (double delta) {}
 		public virtual void OnRenderFrame () {}
 		public virtual void OnDeviceRotated (DeviceOrientation deviceOrientation) {}
-		public virtual void OnMouseUp (MouseButton button, Vector2 pointer) {}
-		public virtual void OnMouseDown (MouseButton button, Vector2 pointer) {}
+		public virtual void OnMouseUp (MouseButton button, Vector2 position) {}
+		public virtual void OnMouseDown (MouseButton button, Vector2 position) {}
+		public virtual void OnMouseMove (Vector2 position) {}
+		public virtual void OnKeyDown (Key key) {}
+		public virtual void OnKeyUp (Key key) {}
+		public virtual void OnKeyPress (char keyChar) {}
 		public virtual DeviceOrientation GetSupportedDeviceOrientations () { return DeviceOrientation.LandscapeLeft; }
 	}
 }
