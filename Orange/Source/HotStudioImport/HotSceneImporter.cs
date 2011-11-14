@@ -39,7 +39,7 @@ namespace Orange
 				node.Trigger = lexer.ParseQuotedString ();
 				break;
 			case "Tag":
-				lexer.ParseQuotedString ();
+				node.Tag = lexer.ParseQuotedString ();
 				break;
 			case "Actors":
 				lexer.ParseToken ('[');

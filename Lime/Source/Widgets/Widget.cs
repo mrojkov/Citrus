@@ -40,11 +40,17 @@ namespace Lime
 		public event EventHandler<UIEventArgs> LeftUp;
 		public event EventHandler<UIEventArgs> Move;
 
+		Vector2 position;
         [ProtoMember(1)]
-		public Vector2 Position { get; set; }
+		public Vector2 Position { get { return position; } set { position = value; } }
+		public float X { get { return position.X; } set { position.X = value; } }
+		public float Y { get { return position.Y; } set { position.Y = value; } }
 
+		Vector2 size;
         [ProtoMember(2)]
-		public Vector2 Size { get; set; }
+		public Vector2 Size { get { return size; } set { size = value; } }
+		public float Width { get { return size.X; } set { size.X = value; } }
+		public float Height { get { return size.Y; } set { size.Y = value; } }
 
         [ProtoMember(3)]
 		public Vector2 Pivot { get; set; }

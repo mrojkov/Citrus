@@ -4,25 +4,27 @@ using System.Collections.Generic;
 using System.IO;
 using System;
 using ProtoBuf;
+using System.ComponentModel;
 
 namespace Lime
 {
 	[ProtoContract]
-	[ProtoInclude(101, typeof(Widget))]
-    [ProtoInclude(102, typeof(ParticleModifier))]
-    [ProtoInclude(103, typeof(ImageCombiner))]
-    [ProtoInclude(104, typeof(PointObject))]
-    [ProtoInclude(105, typeof(Bone))]
-    [ProtoInclude(106, typeof(Audio))]
-	[ProtoInclude(107, typeof(SplineGear))]
+	[ProtoInclude (101, typeof (Widget))]
+    [ProtoInclude (102, typeof (ParticleModifier))]
+    [ProtoInclude (103, typeof (ImageCombiner))]
+    [ProtoInclude (104, typeof (PointObject))]
+    [ProtoInclude (105, typeof (Bone))]
+    [ProtoInclude (106, typeof (Audio))]
+	[ProtoInclude (107, typeof (SplineGear))]
 	public class Node
 	{
 		public static int UpdatedNodes;
 		
-		[ProtoMember(1)]
+		[ProtoMember (1)]
 		public string Id { get; set; }
 
-		[ProtoMember(2)]
+		[ProtoMember (2)]
+		[DefaultValue (null)]
 		public string ContentsPath { get; set; }
 
 		[Trigger]
@@ -31,20 +33,22 @@ namespace Lime
 		public Node Parent;
 		public Widget Widget;
 
-		[ProtoMember(5)]
+		[ProtoMember (5)]
 		public readonly AnimatorCollection Animators = new AnimatorCollection ();
 
-		[ProtoMember(6)]
+		[ProtoMember (6)]
 		public readonly NodeCollection Nodes = new NodeCollection ();
 
-		[ProtoMember(7)]
+		[ProtoMember (7)]
 		public readonly MarkerCollection Markers = new MarkerCollection ();
 
-		[ProtoMember(9)]
+		[ProtoMember (9)]
+		[DefaultValue (false)]
 		public bool Playing { get; set; }
 
 		private int animationTime;
-		[ProtoMember(10)]
+		[ProtoMember (10)]
+		[DefaultValue (0)]
 		public int AnimationTime {
 			get { return animationTime; }
 			set {
@@ -55,6 +59,10 @@ namespace Lime
 				}
 			}
 		}
+
+		[ProtoMember (11)]
+		[DefaultValue (null)]
+		public string Tag { get; set; }
 
 		public void AdvanceAnimation (int delta)
 		{
@@ -258,32 +266,32 @@ namespace Lime
 			}
 		}
 
-		public T Find<T> (string id) where T : Node
+		public T Find<T> (string id, bool throwException = true) where T : Node
 		{
-			T result = Find (id) as T;
-			if (result == null)
-				throw new Lime.Exception (
-					String.Format ("Node '{0}' (of type: {1}) not found in '{2}' (type: {3})", 
-					id, typeof(T), Id, GetType ()));
+			T result = Find (id, throwException) as T;
+			if (throwException && result == null)
+				throw new Lime.Exception ("'{0}' of {1} not found for '{2}'", id, typeof (T).Name, ToString ());
 			return result;
 		}
 
-		public Node Find (string id)
+		public Node Find (string id, bool throwException = true)
 		{
-			if (id.Contains ("/")) {
+			if (id.IndexOf ('/') >= 0) {
 				Node child = this;
 				string[] names = id.Split ('/');
 				foreach (string name in names) {
-					child = child.Find (name);
+					child = child.Find (name, throwException);
 					if (child == null)
 						break;
 				}
+				if (throwException && child == null)
+					throw new Lime.Exception ("'{0}' not found for '{1}'", id, ToString ());
 				return child;
 			} else
-				return FindHelper (id);
+				return FindHelper (id, throwException);
 		}
 
-		Node FindHelper (string id)
+		Node FindHelper (string id, bool throwException)
 		{
 			Queue<Node> queue = new Queue<Node> ();
 			queue.Enqueue (this);
@@ -296,6 +304,8 @@ namespace Lime
 				foreach (Node child in node.Nodes)
 					queue.Enqueue (child);
 			}
+			if (throwException)
+				throw new Lime.Exception ("'{0}' not found for '{1}'", id, ToString ());
 			return null;
 		}
 	}
