@@ -210,8 +210,36 @@ namespace Lime
 				Values [index] = value.Value;
 			}
 		}
+		
+		protected struct Property
+		{
+			public PropertyInfo Info;
+			public bool Triggerable;
+		}
+		
+		static Dictionary<string, List<Property>> propertyCache = new Dictionary<string, List<Property>> ();
+		
+		protected static Property GetProperty (Type ownerType, string propertyName)
+		{
+			List<Property> plist;
+			if (!propertyCache.TryGetValue (propertyName, out plist)) {
+				plist = new List<Property> ();
+				propertyCache [propertyName] = plist;
+			}
+			foreach (Property i in plist) {
+				if (ownerType.IsSubclassOf (i.Info.DeclaringType))
+					return i;
+			}
+			var p = new Property ();
+			p.Info = ownerType.GetProperty (propertyName);
+			if (p.Info == null)
+				throw new Lime.Exception ("Property '{0}' doesn't exist for class '{1}'", propertyName, ownerType);
+			p.Triggerable = p.Info.GetCustomAttributes (typeof (TriggerAttribute), false).Length > 0;
+			plist.Add (p);
+			return p;
+		}
 	}
-
+	
 	[ProtoContract]
 	public abstract class AnimatorHelper<T> : Animator
 	{
@@ -222,14 +250,12 @@ namespace Lime
 		internal override void Bind (Node owner)
 		{
 			Owner = owner;
-			PropertyInfo pi = Owner.GetType ().GetProperty (TargetProperty);
-			if (pi == null)
-				throw new Lime.Exception ("Property '{0}' doesn't exist for class '{1}'", TargetProperty, Owner.GetType ());
-			IsTriggerable = pi.GetCustomAttributes (typeof (TriggerAttribute), false).Length > 0;
-			MethodInfo mi = pi.GetSetMethod ();
+			Property p = GetProperty (owner.GetType (), TargetProperty);
+			IsTriggerable = p.Triggerable;
+			var mi = p.Info.GetSetMethod ();
 			if (mi == null)
-				throw new Lime.Exception ("Property '{0}' (class '{1}') is readonly", TargetProperty, Owner.GetType ());
-			Setter = (SetterDelegate)Delegate.CreateDelegate (typeof(SetterDelegate), Owner, mi);
+				throw new Lime.Exception ("Property '{0}' (class '{1}') is readonly", TargetProperty, owner.GetType ());
+			Setter = (SetterDelegate)Delegate.CreateDelegate (typeof(SetterDelegate), owner, mi);
 		}
 	}
 

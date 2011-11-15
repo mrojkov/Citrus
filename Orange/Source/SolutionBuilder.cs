@@ -82,17 +82,17 @@ namespace Orange
 #if MAC
 			app = "/Applications/MonoDevelop.app/Contents/MacOS/mdtool";
 			if (platform == TargetPlatform.iOS) {
-				string slnFile = Path.Combine (project.ProjectDirectory, project.Title + ".iOS", project.Title + ".iOS.sln");
+				slnFile = Path.Combine (project.ProjectDirectory, project.Title + ".iOS", project.Title + ".iOS.sln");
 				args = String.Format ("build \"{0}\" -t:Build -c:\"Release|iPhone\"", slnFile);
 			} else {
-				string slnFile = Path.Combine (project.ProjectDirectory, project.Title + ".Mac", project.Title + ".Mac.sln");
+				slnFile = Path.Combine (project.ProjectDirectory, project.Title + ".Mac", project.Title + ".Mac.sln");
 				args = String.Format ("build \"{0}\" -t:Build -c:\"Release|x86\"", slnFile);
 			}
 #elif WIN
 			// Uncomment follow block if you would like to use mdtool instead of MSBuild
 			/*
 			app = @"C:\Program Files (x86)\MonoDevelop\bin\mdtool.exe";
-			string slnFile = Path.Combine (project.ProjectDirectory, project.Title + ".Win", project.Title + ".Win.sln");
+			slnFile = Path.Combine (project.ProjectDirectory, project.Title + ".Win", project.Title + ".Win.sln");
 			args = String.Format ("build \"{0}\" -t:Build -c:\"Release|x86\"", slnFile);
 			*/
 
@@ -105,9 +105,9 @@ namespace Orange
 			}
 #if MAC
 			if (platform == TargetPlatform.Desktop) {
-				string appName = Path.GetFileName (projectFolder);
+				string appName = Path.GetFileName (project.ProjectDirectory);
 				string src = "/Applications/MonoDevelop.app/Contents/MacOS/lib/monodevelop/Addins";
-				string dst = Path.Combine (projectFolder, appName + ".Mac", "bin/Release", appName + ".app", "Contents/Resources");
+				string dst = Path.Combine (project.ProjectDirectory, appName + ".Mac", "bin/Release", appName + ".app", "Contents/Resources");
 				CopyFile (src, dst, "MonoMac.dll");
 			}
 #endif
@@ -121,10 +121,10 @@ namespace Orange
 #if MAC
 			app = "/Applications/MonoDevelop.app/Contents/MacOS/mdtool";
 			if (platform == TargetPlatform.iOS) {
-				slnFile = Path.Combine (projectFolder, slnName, slnName + ".sln");
+				slnFile = Path.Combine (project.ProjectDirectory, project.Title, project.Title + ".sln");
 				args = String.Format ("build \"{0}\" -t:Clean -c:\"Release|iPhone\"", slnFile);
 			} else {
-				slnFile = Path.Combine (projectFolder, slnName, slnName + ".sln");
+				slnFile = Path.Combine (project.ProjectDirectory, project.Title, project.Title + ".sln");
 				args = String.Format ("build \"{0}\" -t:Clean -c:\"Release|x86\"", slnFile);
 			}
 #elif WIN
@@ -151,7 +151,7 @@ namespace Orange
 			string app, dir;
 #if MAC
 			if (platform == TargetPlatform.Desktop) {
-				app = Path.Combine (projectFolder, project.Title + ".Mac", "bin/Release", project.Title + ".app", "Contents/MacOS", appName);
+				app = Path.Combine (project.ProjectDirectory, project.Title + ".Mac", "bin/Release", project.Title + ".app", "Contents/MacOS", project.Title);
 				dir = Path.GetDirectoryName (app);
 			} else {
 				throw new NotImplementedException ();

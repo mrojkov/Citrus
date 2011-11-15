@@ -126,7 +126,8 @@ namespace Lime
 				if (cached) {
 					node = Serialization.ReadObjectCached<Node> (path);
 				} else {
-					node = Serialization.ReadObject<Node> (path);
+					using (Stream stream = AssetsBundle.Instance.OpenFile (path))
+						node = Serialization.ReadObject<Node> (path, stream);
 				}
 				node.LoadContents ();
 			} finally {
@@ -172,17 +173,22 @@ namespace Lime
 		{
 			return Serialization.DeepClone<Node> (this);
 		}
+		
+		public Node DeepCloneCached ()
+		{
+			return Serialization.DeepCloneCached<Node> (this);
+		}		
 
 		public override string ToString ()
 		{
-			return string.Format ("{0}, {1}", GetType ().Name, GetDescription ());
+			return string.Format ("{0}, {1}", GetType ().Name, GetHierarchyPath ());
 		}
 
-		string GetDescription ()
+		string GetHierarchyPath ()
 		{
 			string r = string.IsNullOrEmpty (Id) ? String.Format ("[{0}]", GetType().Name): Id;
 			if (Parent != null) {
-				r = Parent.GetDescription () + "/" + r;
+				r = Parent.GetHierarchyPath () + "/" + r;
 			}
 			return r;
 		}

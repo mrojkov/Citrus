@@ -24,14 +24,13 @@ namespace Lime
         [ProtoMember(6)]
         public VerticalAlign VerticalAlign;
 
-        public SimpleText () { }
-
         public override void Render()
         {
             Renderer.Instance.WorldMatrix = WorldMatrix;
             Renderer.Instance.Blending = WorldBlending;
-            if (!string.IsNullOrEmpty(Text))
-                Renderer.Instance.DrawTextLine (Font.Instance, Vector2.Zero, Text, WorldColor, FontHeight);
+            if (!string.IsNullOrEmpty(Text)) {
+               	Renderer.Instance.DrawTextLine (Font.Instance, Vector2.Zero, Text, WorldColor, FontHeight);
+			}
         }
     }
 }

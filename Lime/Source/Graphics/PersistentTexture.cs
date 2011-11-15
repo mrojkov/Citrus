@@ -39,7 +39,12 @@ namespace Lime
 
 		public Size SurfaceSize { get { return Instance.SurfaceSize; } }
 
-		public Rectangle UVRect { get { return Instance.UVRect; } }
+		public Rectangle UVRect { 
+			get { 
+				core.Instance.GetHandle (); 
+				return core.UVRect; 
+			} 
+		}
 
 		public uint GetHandle ()
 		{

@@ -172,6 +172,7 @@ namespace Lime
 		{
 			if (currentIndex > 0) {
 #if GLES11
+				GL.BufferData (All.ArrayBuffer, (IntPtr)(32 * currentVertex), batchVertices, All.StaticDraw);
 				GL.DrawElements (All.Triangles, currentIndex, All.UnsignedShort, batchIndices);
 #else
 				// Tell OpenGL to discard old VBO when done drawing it and reserve memory now for a new buffer.
@@ -195,18 +196,23 @@ namespace Lime
 #if GLES11
 			GL.ClearColor (0.5f, 0.5f, 0.5f, 1.0f);
 			GL.Clear ((uint)All.ColorBufferBit);
-			GL.VertexPointer (2, All.Float, 0, batchVertices);
-			GL.EnableClientState (All.VertexArray);
-			GL.ColorPointer (4, All.UnsignedByte, 0, batchColors);
-			GL.EnableClientState (All.ColorArray);
-			//GL.ActiveTexture (All.Texture1);
-			//GL.EnableClientState (All.TextureCoordArray);
-			//GL.TexCoordPointer (2, All.Float, 0, batchTexCoords1);
-			GL.ActiveTexture (All.Texture0);
 			GL.Enable (All.Texture2D);
+
+			GL.GenBuffers (1, ref batchVBO);
+			GL.BindBuffer (All.ArrayBuffer, batchVBO);
+			// Set up vertex and color arrays
+			GL.VertexPointer (2, All.Float, 32, (IntPtr)0);
+			GL.EnableClientState (All.VertexArray);
+			GL.ColorPointer (4, All.UnsignedByte, 32, (IntPtr)8);
+			GL.EnableClientState (All.ColorArray);
+
+			// Set up texture coordinate arrays
+			GL.ClientActiveTexture (All.Texture1);
 			GL.EnableClientState (All.TextureCoordArray);
-			GL.TexCoordPointer (2, All.Float, 0, batchTexCoords0);
-			Blending = Blending.Default;
+			GL.TexCoordPointer (2, All.Float, 32, (IntPtr)20);
+			GL.ClientActiveTexture (All.Texture0);
+			GL.EnableClientState (All.TextureCoordArray);
+			GL.TexCoordPointer (2, All.Float, 32, (IntPtr)12);
 #else
 			GL.ClearColor (0.5f, 0.5f, 0.5f, 1.0f);
 			GL.Clear (ClearBufferMask.ColorBufferBit);
@@ -227,9 +233,9 @@ namespace Lime
 			GL.ClientActiveTexture (TextureUnit.Texture0);
 			GL.EnableClientState (ArrayCap.TextureCoordArray);
 			GL.TexCoordPointer (2, TexCoordPointerType.Float, 32, 12);
-
-			Blending = Blending.Default;
 #endif
+			Blending = Blending.Default;
+
 			CheckErrors ();
 		}
 		
@@ -419,30 +425,21 @@ namespace Lime
 			}
 			int i = currentVertex;
 			currentVertex += 4;
-			batchVertices [i + 0] = new Vertex {
-				Pos = WorldMatrix * new Vector2 (position.X, position.Y),
-				Color = color,
-				UV1 = new Vector2 (uv0.X, uv0.Y),
-				UV2 = Vector2.Zero
-			};
-			batchVertices [i + 1] = new Vertex {
-				Pos = WorldMatrix * new Vector2 (position.X + size.X, position.Y),
-				Color = color,
-				UV1 = new Vector2 (uv1.X, uv0.Y),
-				UV2 = Vector2.Zero
-			};
-			batchVertices [i + 2] = new Vertex {
-				Pos = WorldMatrix * new Vector2 (position.X, position.Y + size.Y),
-				Color = color,
-				UV1 = new Vector2 (uv0.X, uv1.Y),
-				UV2 = Vector2.Zero
-			};
-			batchVertices [i + 3] = new Vertex {
-				Pos = WorldMatrix * new Vector2 (position.X + size.X, position.Y + size.Y),
-				Color = color,
-				UV1 = new Vector2 (uv1.X, uv1.Y),
-				UV2 = Vector2.Zero
-			};
+			Vertex v = new Vertex ();
+			v.Pos = WorldMatrix.TransformVector (position.X, position.Y);
+			v.Color = color;
+			v.UV1.X = uv0.X;
+			v.UV1.Y = uv0.Y;
+			batchVertices [i + 0] = v;
+			v.Pos = WorldMatrix.TransformVector (position.X + size.X, position.Y);
+			v.UV1.X = uv1.X;
+			batchVertices [i + 1] = v;
+			v.Pos = WorldMatrix.TransformVector (position.X + size.X, position.Y + size.Y);
+			v.UV1.Y = uv1.Y;
+			batchVertices [i + 3] = v;
+			v.Pos = WorldMatrix.TransformVector (position.X, position.Y + size.Y);
+			v.UV1.X = uv0.X;
+			batchVertices [i + 2] = v;
 			batchIndices [currentIndex++] = (ushort)(i + 0);
 			batchIndices [currentIndex++] = (ushort)(i + 1);
 			batchIndices [currentIndex++] = (ushort)(i + 2);
@@ -536,6 +533,70 @@ namespace Lime
 				FontChar fontChar = font.Chars [text [i]];
 				float scale = fontHeight / fontChar.Size.Y;
 				float delta = font.Pairs.Get (prevChar, fontChar.Char);
+				position.X += scale * (fontChar.ACWidths.X + delta);
+				DrawSprite (font.Texture, color, position, scale * fontChar.Size, fontChar.UV0, fontChar.UV1);
+				position.X += scale * (fontChar.Size.X + fontChar.ACWidths.Y + delta);
+				prevChar = fontChar.Char;
+			}
+		}
+
+		public void DrawSprite2 (ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1)
+		{
+			Rectangle textureRect = texture.UVRect;
+			uv0 = textureRect.A + (textureRect.B - textureRect.A) * uv0;
+			uv1 = textureRect.A + (textureRect.B - textureRect.A) * uv1;
+			if (PremulAlphaMode) {
+				color = Color4.PremulAlpha (color);
+			}
+			SetTexture (texture, 0);
+			if (currentIndex + 6 >= batchIndices.Length || currentVertex + 4 >= batchVertices.Length) {
+				FlushSpriteBatch ();
+			}
+			int i = currentVertex;
+			currentVertex += 4;
+			batchVertices [i + 0] = new Vertex {
+				Pos = WorldMatrix * new Vector2 (position.X, position.Y),
+				Color = color,
+				UV1 = new Vector2 (uv0.X, uv0.Y),
+			};
+			batchVertices [i + 1] = new Vertex {
+				Pos = WorldMatrix * new Vector2 (position.X + size.X, position.Y),
+				Color = color,
+				UV1 = new Vector2 (uv1.X, uv0.Y),
+			};
+			batchVertices [i + 2] = new Vertex {
+				Pos = WorldMatrix * new Vector2 (position.X, position.Y + size.Y),
+				Color = color,
+				UV1 = new Vector2 (uv0.X, uv1.Y),
+			};
+			batchVertices [i + 3] = new Vertex {
+				Pos = WorldMatrix * new Vector2 (position.X + size.X, position.Y + size.Y),
+				Color = color,
+				UV1 = new Vector2 (uv1.X, uv1.Y),
+			};
+			batchIndices [currentIndex++] = (ushort)(i + 0);
+			batchIndices [currentIndex++] = (ushort)(i + 1);
+			batchIndices [currentIndex++] = (ushort)(i + 2);
+			batchIndices [currentIndex++] = (ushort)(i + 2);
+			batchIndices [currentIndex++] = (ushort)(i + 1);
+			batchIndices [currentIndex++] = (ushort)(i + 3);
+		}
+
+		public void DrawTextLine2 (Font font, Vector2 position, string text, Color4 color, float fontHeight)
+		{
+			FontChar fontChar = font.Chars ['X'];
+			float savedX = position.X;
+			float scale = fontHeight / fontChar.Size.Y;
+			char prevChar = '\0';
+			for (int i = 0; i < text.Length; i++) {
+				if (text [i] == '\n') {
+					position.X = savedX;
+					position.Y += fontHeight;
+					continue;
+				}
+				//FontChar fontChar = font.Chars [text [i]];
+				
+				float delta = 0;//font.Pairs.Get (prevChar, fontChar.Char);
 				position.X += scale * (fontChar.ACWidths.X + delta);
 				DrawSprite (font.Texture, color, position, scale * fontChar.Size, fontChar.UV0, fontChar.UV1);
 				position.X += scale * (fontChar.Size.X + fontChar.ACWidths.Y + delta);

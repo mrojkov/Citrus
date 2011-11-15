@@ -640,7 +640,7 @@ namespace Lime
 			}
 			return true;
 		}
-
+/*
 		static readonly Vector2 [] rect = new Vector2 [4] { 
             new Vector2(0, 0), 
             new Vector2(1, 0), 
@@ -648,8 +648,8 @@ namespace Lime
             new Vector2(0, 1) 
         };
 		static Renderer.Vertex [] quad = new Renderer.Vertex [4];
-
-		void RenderParticle (Particle p, Color4 color)
+*/
+		void RenderParticle (Particle p, Matrix32 matrix, Color4 color)
 		{
 			color = color * p.ColorCurrent;
 			if (Color.A > 0) {
@@ -659,13 +659,20 @@ namespace Lime
 				if (AlongPathOrientation)
 					angle += p.FullDirection;
 				Vector2 particleSize = p.ScaleCurrent * new Vector2 (texture.ImageSize.Width, texture.ImageSize.Height);
+//				Renderer.Instance.WorldMatrix = Matrix32.Rotation (Utils.DegreesToRadians * angle) * Matrix32.Translation (p.FullPosition) * matrix;
+				Renderer.Instance.WorldMatrix = matrix;//Matrix32.Transformation (p.FullPosition, 
+					//particleSize, Utils.DegreesToRadians * angle, p.FullPosition) * matrix;
+				Vector2 a = -Vector2.Half * particleSize + p.FullPosition;
+				Vector2 b = Vector2.Half * particleSize + p.FullPosition;
+				Renderer.Instance.DrawSprite (texture, color, a, b, Vector2.Zero, Vector2.One);
+				/*
 				Matrix32 rotation = Matrix32.Rotation (Utils.DegreesToRadians * angle);
 				for (int i = 0; i < 4; i++) {
 					quad [i].Pos = Vector2.Scale (particleSize, rect [i] - Vector2.Half) * rotation + p.FullPosition;
 					quad [i].UV1 = rect [i];
 					quad [i].Color = color;
 				}
-				Renderer.Instance.DrawTriangleFan (texture, quad, 4);
+				Renderer.Instance.DrawTriangleFan (texture, quad, 4);*/
 			}
 		}
 
@@ -679,13 +686,12 @@ namespace Lime
 				color = basicWidget.WorldColor;
 			}
 
-			Renderer.Instance.WorldMatrix = matrix;
 			Renderer.Instance.Blending = WorldBlending;
 
 			LinkedListNode<Particle> node = particles.First;
 			for (; node != null; node = node.Next) {
 				Particle particle = node.Value;
-				RenderParticle (particle, color);
+				RenderParticle (particle, matrix, color);
 			}
 		}
 	}

@@ -77,7 +77,7 @@ namespace Orange
 			string currentDirectory = System.IO.Directory.GetCurrentDirectory ();
 			try {
 				System.IO.Directory.SetCurrentDirectory (directory);
-				model.Compile ("Lime.Serializer", "Lime.Serializer.dll");
+				model.Compile ("Serializer", "Serializer.dll");
 			} finally {
 				System.IO.Directory.SetCurrentDirectory (currentDirectory);
 			}

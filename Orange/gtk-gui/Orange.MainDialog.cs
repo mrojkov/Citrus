@@ -20,7 +20,7 @@ namespace Orange
 			global::Stetic.Gui.Initialize (this);
 			// Widget Orange.MainDialog
 			this.Name = "Orange.MainDialog";
-			this.Title = global::Mono.Unix.Catalog.GetString ("Orange");
+			this.Title = "Orange";
 			this.WindowPosition = ((global::Gtk.WindowPosition)(1));
 			this.Modal = true;
 			// Internal child Orange.MainDialog.VBox
@@ -34,10 +34,11 @@ namespace Orange
 			this.vbox2.BorderWidth = ((uint)(4));
 			// Container child vbox2.Gtk.Box+BoxChild
 			this.table1 = new global::Gtk.Table (((uint)(2)), ((uint)(2)), false);
+			this.table1.Name = "table1";
 			this.table1.RowSpacing = ((uint)(6));
 			this.table1.ColumnSpacing = ((uint)(6));
 			// Container child table1.Gtk.Table+TableChild
-			this.CitrusProjectChooser = new global::Gtk.FileChooserButton (global::Mono.Unix.Catalog.GetString ("Select A File"), ((global::Gtk.FileChooserAction)(0)));
+			this.CitrusProjectChooser = new global::Gtk.FileChooserButton ("Select A File", ((global::Gtk.FileChooserAction)(0)));
 			this.CitrusProjectChooser.Name = "CitrusProjectChooser";
 			this.table1.Add (this.CitrusProjectChooser);
 			global::Gtk.Table.TableChild w2 = ((global::Gtk.Table.TableChild)(this.table1 [this.CitrusProjectChooser]));
@@ -51,7 +52,7 @@ namespace Orange
 			this.label1 = new global::Gtk.Label ();
 			this.label1.Name = "label1";
 			this.label1.Xalign = 1F;
-			this.label1.LabelProp = global::Mono.Unix.Catalog.GetString ("Citrus project");
+			this.label1.LabelProp = "Citrus project";
 			this.table1.Add (this.label1);
 			global::Gtk.Table.TableChild w3 = ((global::Gtk.Table.TableChild)(this.table1 [this.label1]));
 			w3.TopAttach = ((uint)(1));
@@ -62,15 +63,15 @@ namespace Orange
 			this.label2 = new global::Gtk.Label ();
 			this.label2.Name = "label2";
 			this.label2.Xalign = 1F;
-			this.label2.LabelProp = global::Mono.Unix.Catalog.GetString ("Target platform");
+			this.label2.LabelProp = "Target platform";
 			this.table1.Add (this.label2);
 			global::Gtk.Table.TableChild w4 = ((global::Gtk.Table.TableChild)(this.table1 [this.label2]));
 			w4.XOptions = ((global::Gtk.AttachOptions)(4));
 			w4.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
 			this.TargetPlatform = global::Gtk.ComboBox.NewText ();
-			this.TargetPlatform.AppendText (global::Mono.Unix.Catalog.GetString ("Desktop (PC, Mac, Linux)"));
-			this.TargetPlatform.AppendText (global::Mono.Unix.Catalog.GetString ("iPhone/iPad"));
+			this.TargetPlatform.AppendText ("Desktop (PC, Mac, Linux)");
+			this.TargetPlatform.AppendText ("iPhone/iPad");
 			this.TargetPlatform.Name = "TargetPlatform";
 			this.TargetPlatform.Active = 0;
 			this.table1.Add (this.TargetPlatform);
@@ -112,7 +113,7 @@ namespace Orange
 			this.RunButton.CanFocus = true;
 			this.RunButton.Name = "RunButton";
 			this.RunButton.UseUnderline = true;
-			this.RunButton.Label = global::Mono.Unix.Catalog.GetString ("Run");
+			this.RunButton.Label = "Run";
 			w10.Add (this.RunButton);
 			global::Gtk.ButtonBox.ButtonBoxChild w11 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w10 [this.RunButton]));
 			w11.Expand = false;
@@ -122,7 +123,7 @@ namespace Orange
 			this.CleanButton.CanFocus = true;
 			this.CleanButton.Name = "CleanButton";
 			this.CleanButton.UseUnderline = true;
-			this.CleanButton.Label = global::Mono.Unix.Catalog.GetString ("Clean");
+			this.CleanButton.Label = "Clean";
 			w10.Add (this.CleanButton);
 			global::Gtk.ButtonBox.ButtonBoxChild w12 = ((global::Gtk.ButtonBox.ButtonBoxChild)(w10 [this.CleanButton]));
 			w12.Position = 1;

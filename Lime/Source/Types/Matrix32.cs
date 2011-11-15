@@ -114,7 +114,15 @@ namespace Lime
 			v.Y = a.X * U.Y + a.Y * V.Y + T.Y;
 			return v;
 		}
-
+		
+		public Vector2 TransformVector (float x, float y)
+		{
+			Vector2 v;
+			v.X = x * U.X + y * V.X + T.X;
+			v.Y = x * U.Y + y * V.Y + T.Y;
+			return v;
+		}
+		
 		public static Vector2 operator * (Vector2 a, Matrix32 b)
 		{
 			return b.TransformVector (a);

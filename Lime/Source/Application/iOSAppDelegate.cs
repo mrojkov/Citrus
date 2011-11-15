@@ -18,7 +18,7 @@ namespace Lime
 			UIApplication.Main (args, null, "AppDelegate");
 		}
 	}
-	
+
 	/// <summary>
 	/// The UIApplicationDelegate for the application. This class is responsible for launching the 
 	/// User Interface of the application, as well as listening (and optionally responding) to 
@@ -41,7 +41,7 @@ namespace Lime
 			gameController.Activate ();
 			Application.gameApp.OnGLCreate();
 		}
-			
+
 		public override void OnResignActivation (UIApplication application)
 		{
 			// Important: MonoTouch destroys OpenGL context on application hiding.
@@ -50,7 +50,7 @@ namespace Lime
 			Application.gameApp.OnGLDestroy();
 			gameController.Deactivate ();
 		}
-			
+
 		// This method is invoked when the application has loaded its UI and is ready to run
 		public override bool FinishedLaunching (UIApplication app, NSDictionary options)
 		{
@@ -58,19 +58,22 @@ namespace Lime
 			window = new UIWindow (UIScreen.MainScreen.Bounds);
 
 			gameController = new GameController ();
-
-			window.RootViewController = gameController;
+			
+			// in order to make iOS 3.0 compatible we use this:
+			window.AddSubview (gameController.View);
+			// instead of that:
+			// window.RootViewController = gameController;
 
 			// make the window visible
 			window.MakeKeyAndVisible ();
-	
+
 			// Set the current directory.
 			Directory.SetCurrentDirectory (NSBundle.MainBundle.ResourcePath);
-		
+
 			Application.gameApp.OnCreate (gameController);
 
 			return true;
-		}	
+		}
 	}
 }
 #endif

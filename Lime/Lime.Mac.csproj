@@ -105,5 +105,7 @@
     <Compile Include="Source\Widgets\SplinePoint.cs" />
     <Compile Include="Source\Widgets\UICoordinator.cs" />
     <Compile Include="Source\Widgets\Widget.cs" />
+    <Compile Include="Source\Input\Input.cs" />
+    <Compile Include="Source\Input\Mouse.cs" />
   </ItemGroup>
 </Project>

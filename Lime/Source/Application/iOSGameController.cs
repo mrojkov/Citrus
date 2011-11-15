@@ -1,8 +1,6 @@
 #if iOS
 using System;
 using OpenTK;
-//using OpenTK.Graphics.ES20;
-//using OpenTK.Platform.iPhoneOS;
 using System.Drawing;
 using MonoTouch.Foundation;
 using MonoTouch.CoreAnimation;
@@ -18,29 +16,55 @@ namespace Lime
 		{
 			base.View = new GameView ();
 		}
-		
+
 		new GameView View { get { return (GameView)base.View; } }
 
-			bool IGameWindow.FullScreen {
+		bool IGameWindow.FullScreen {
 			get { return true; }
 			set {}
 		}
-		
+
 		Size IGameWindow.WindowSize {
 			get {
 				return new Size (View.Size.Width, View.Size.Height);
 			}
 			set {}
 		}
-		
+
 		public void Activate ()
 		{
 			View.Run ();
 		}
-		
+
 		public void Deactivate ()
 		{
 			View.Stop ();
+		}
+		
+		public override void TouchesBegan (NSSet touches, UIEvent evt)
+		{
+			var pt = (touches.AnyObject as UITouch).LocationInView (this.View);
+			Vector2 position = new Vector2 (pt.X, pt.Y) * Input.ScreenToWorldTransform;
+			Input.Mouse.SetPosition (position);
+			Input.Mouse.SetTouching (true);
+			Application.gameApp.OnMouseDown (MouseButton.Left, position);
+		}
+		
+		public override void TouchesMoved (NSSet touches, UIEvent evt)
+		{
+			var pt = (touches.AnyObject as UITouch).LocationInView (this.View);
+			Vector2 position = new Vector2 (pt.X, pt.Y) * Input.ScreenToWorldTransform;
+			Input.Mouse.SetPosition (position);
+			Application.gameApp.OnMouseMove (position);
+		}
+		
+		public override void TouchesEnded (NSSet touches, UIEvent evt)
+		{
+			var pt = (touches.AnyObject as UITouch).LocationInView (this.View);
+			Vector2 position = new Vector2 (pt.X, pt.Y) * Input.ScreenToWorldTransform;
+			Input.Mouse.SetPosition (position);
+			Input.Mouse.SetTouching (false);
+			Application.gameApp.OnMouseUp (MouseButton.Left, position);
 		}
 
 		public DeviceOrientation CurrentDeviceOrientation {
@@ -74,13 +98,13 @@ namespace Lime
 			}
 			return false;
 		}
-					
+
 		public override void DidRotate (UIInterfaceOrientation fromInterfaceOrientation)
 		{
 			base.DidRotate (fromInterfaceOrientation);
 			Application.gameApp.OnDeviceRotated (CurrentDeviceOrientation);
 		}
-		
+
 		public float FrameRate {
 			get {
 				return View.FrameRate;

@@ -243,7 +243,7 @@ namespace Lime
 #if GLES11
 			// Generate a new texture.
 			GL.GenTextures (1, ref id);
-			Renderer.Instance.BindTexture (id, 0);
+			Renderer.Instance.SetTexture (id, 0);
 			GL.TexParameter (All.Texture2D, All.TextureMinFilter, (int)All.Linear);
 			GL.TexParameter (All.Texture2D, All.TextureMagFilter, (int)All.Linear);
 			GL.TexParameter (All.Texture2D, All.TextureWrapS, (int)All.ClampToEdge);
@@ -282,7 +282,7 @@ namespace Lime
 			// Generate a new texture.
 			GL.GenTextures (1, ref id);
 			
-			Renderer.Instance.BindTexture (id, 0);
+			Renderer.Instance.SetTexture (id, 0);
 			GL.TexParameter (All.Texture2D, All.TextureMinFilter, (int)All.Linear);
 			GL.TexParameter (All.Texture2D, All.TextureMagFilter, (int)All.Linear);
 			GL.TexParameter (All.Texture2D, All.TextureWrapS, (int)All.ClampToEdge);

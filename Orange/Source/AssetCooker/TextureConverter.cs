@@ -110,6 +110,12 @@ namespace Orange
 			int potWidth = GetNearestPowerOf2 (width, 8, 1024);
 			int potHeight = GetNearestPowerOf2 (height, 8, 1024);
 			
+			// HACK, just for testing purposes
+			//if (potWidth > 8 && potHeight > 8) {
+			//	potWidth /= 2;
+			//	potHeight /= 2;
+			//}
+			
 			int maxDimension = Math.Max (potWidth, potHeight);
 			int pvrtc4DataLength = maxDimension * maxDimension / 2;
 			int rgba16DataLength = potWidth * potHeight * 2;

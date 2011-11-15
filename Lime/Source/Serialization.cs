@@ -19,7 +19,7 @@ namespace Lime
 		}
 		
 #if iOS
-		public static ProtoBuf.Meta.TypeModel Serializer;
+		public static ProtoBuf.Meta.TypeModel Serializer = ProtoBuf.Meta.RuntimeTypeModel.Default;
 #else
 		public static ProtoBuf.Meta.TypeModel Serializer = ProtoBuf.Meta.RuntimeTypeModel.Default;
 #endif
@@ -74,6 +74,26 @@ namespace Lime
 			}
 		}
 		
+		static Dictionary<object, MemoryStream> cloneCache = new Dictionary<object, MemoryStream> ();
+		
+		// TODO: use weak references for keys
+		public static T DeepCloneCached<T> (T obj)
+		{
+			opStack.Push (new Operation { Type = OperationType.Clone });
+			try {
+				MemoryStream stream;
+				if (!cloneCache.TryGetValue (obj, out stream)) {
+					stream = new MemoryStream ();
+					Serializer.Serialize (stream, obj);
+					cloneCache [obj] = stream;
+				}
+				stream.Seek (0, SeekOrigin.Begin);
+				return (T)Serializer.Deserialize (stream, null, typeof(T));
+			} finally {
+				opStack.Pop ();
+			}
+		}
+
 		public static T DeepClone<T> (T obj)
 		{
 			opStack.Push (new Operation { Type = OperationType.Clone });
@@ -94,17 +114,17 @@ namespace Lime
 			}
 		}
 
-		static Dictionary<string, MemoryStream> cache = new Dictionary<string, MemoryStream> ();
-
+		static Dictionary<string, MemoryStream> readCache = new Dictionary<string, MemoryStream> ();
+		
 		public static T ReadObjectCached<T> (string path)
 		{
 			MemoryStream stream;
-			if (!cache.TryGetValue (path, out stream)) {
+			if (!readCache.TryGetValue (path, out stream)) {
 				stream = new MemoryStream ();
 				using (Stream input = AssetsBundle.Instance.OpenFile (path)) {
 					input.CopyTo (stream);
 				}
-				cache [path] = stream;
+				readCache [path] = stream;
 			}
 			stream.Seek (0, SeekOrigin.Begin);
 			return ReadObject<T> (path, stream);

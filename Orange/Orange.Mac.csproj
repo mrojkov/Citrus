@@ -71,6 +71,7 @@
     <Compile Include="Source\AssetCooker\CookingRulesBuilder.cs" />
     <Compile Include="Source\AssetCooker\RectAllocator.cs" />
     <Compile Include="Source\AssetCooker\TextureConverter.cs" />
+    <Compile Include="Source\CitrusProject.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="gtk-gui\gui.stetic">

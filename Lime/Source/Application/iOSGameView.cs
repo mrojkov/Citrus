@@ -21,24 +21,24 @@ namespace Lime
 			LayerRetainsBacking = false;
 			LayerColorFormat = EAGLColorFormat.RGB565;
 		}
-		
+
 		[Export ("layerClass")]
 		public static new Class GetLayerClass ()
 		{
 			return iPhoneOSGameView.GetLayerClass ();
 		}
-		
+
 		protected override void ConfigureLayer (CAEAGLLayer eaglLayer)
 		{
 			eaglLayer.Opaque = true;
 		}
-		
+
 		protected override void CreateFrameBuffer ()
 		{
 			ContextRenderingApi = EAGLRenderingAPI.OpenGLES1;
 			base.CreateFrameBuffer ();
 		}
-		
+
 		protected override void OnUpdateFrame (FrameEventArgs e)
 		{
 			double delta = e.Time; 
@@ -49,9 +49,9 @@ namespace Lime
 				delta = 0.1;
 			Application.gameApp.OnUpdateFrame (delta);
 		}
-		
+
 		protected override void OnRenderFrame (FrameEventArgs e)
-		{			
+		{
 			MakeCurrent ();
 			Application.gameApp.OnRenderFrame ();
 			SwapBuffers ();
@@ -74,7 +74,7 @@ namespace Lime
 				countedFrames = 0;
 			}				
 		}
-		
+
 		public float FrameRate {
 			get {
 				return frameRate;
