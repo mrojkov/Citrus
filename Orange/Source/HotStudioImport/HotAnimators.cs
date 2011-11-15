@@ -79,6 +79,12 @@ namespace Orange
 					propertyName = s [0];
 					className = s [1];
 					switch (propertyName) {
+                    case "TexCoordForMins":
+                        propertyName = "UV0";
+                        break;
+                    case "TexCoordForMaxs":
+                        propertyName = "UV1";
+                        break;
 					case "TexturePath":
 						propertyName = "Texture";
 						break;
