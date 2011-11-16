@@ -8,9 +8,11 @@ namespace Lime
 	[ProtoContract]
 	public class Font
 	{
-		[ProtoMember(1)]
-		public PersistentTexture Texture = new PersistentTexture ();
+		[ProtoMember (1)]
+		public float CharHeight;
 		[ProtoMember(2)]
+		public PersistentTexture Texture = new PersistentTexture ();
+		[ProtoMember(3)]
 		public readonly FontCharCollection Chars = new FontCharCollection ();
 	}
 
@@ -115,7 +117,7 @@ namespace Lime
 		[ProtoMember(3)]
 		public Vector2 UV1;
 		[ProtoMember(4)]
-		public Vector2 Size;
+		public float Width;
 		[ProtoMember(5)]
 		public Vector2 ACWidths;
 		[ProtoMember(6)]

@@ -507,9 +507,9 @@ namespace Lime
 
 		public Vector2 MeasureTextLine (Font font, string text, float fontHeight)
 		{
-			Vector2 size = new Vector2 (0, fontHeight);
 			FontChar prevChar = null;
-			float scale = 0;
+			Vector2 size = new Vector2 (0, fontHeight);
+			float scale = fontHeight / font.CharHeight;
 			for (int i = 0; i < text.Length; i++) {
 				FontChar fontChar = font.Chars [text [i]];
 				float kerning = 0;
@@ -521,10 +521,8 @@ namespace Lime
 						}
 					}
 				}
-				if (scale == 0)
-					scale = fontHeight / fontChar.Size.Y;
 				size.X += scale * (fontChar.ACWidths.X + kerning);
-				size.X += scale * (fontChar.Size.X + fontChar.ACWidths.Y + kerning);
+				size.X += scale * (fontChar.Width + fontChar.ACWidths.Y + kerning);
 				prevChar = fontChar;
 			}
 			return size;
@@ -532,16 +530,17 @@ namespace Lime
 
 		public void DrawTextLine (Font font, Vector2 position, string text, Color4 color, float fontHeight)
 		{
-			float savedX = position.X;
 			FontChar prevChar = null;
-			float scale = 0;
+			float savedX = position.X;
+			float scale = fontHeight / font.CharHeight;
 			for (int i = 0; i < text.Length; i++) {
-				if (text [i] == '\n') {
+				char ch = text [i];
+				if (ch == '\n') {
 					position.X = savedX;
 					position.Y += fontHeight;
 					continue;
 				}
-				FontChar fontChar = font.Chars [text [i]];
+				FontChar fontChar = font.Chars [ch];
 				float kerning = 0;
 				if (prevChar != null && prevChar.KerningPairs != null) {
 					foreach (var pair in prevChar.KerningPairs) {
@@ -551,77 +550,12 @@ namespace Lime
 						}
 					}
 				}
-				if (scale == 0)
-					scale = fontHeight / fontChar.Size.Y;
 				position.X += scale * (fontChar.ACWidths.X + kerning);
-				DrawSprite (font.Texture, color, position, scale * fontChar.Size, fontChar.UV0, fontChar.UV1);
-				position.X += scale * (fontChar.Size.X + fontChar.ACWidths.Y + kerning);
+				Vector2 size = new Vector2 (scale * fontChar.Width, fontHeight);
+				DrawSprite (font.Texture, color, position, size, fontChar.UV0, fontChar.UV1);
+				position.X += scale * (fontChar.Width + fontChar.ACWidths.Y + kerning);
 				prevChar = fontChar;
 			}
 		}
-		/*
-		public void DrawSprite2 (ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1)
-		{
-			Rectangle textureRect = texture.UVRect;
-			uv0 = textureRect.A + (textureRect.B - textureRect.A) * uv0;
-			uv1 = textureRect.A + (textureRect.B - textureRect.A) * uv1;
-			if (PremulAlphaMode) {
-				color = Color4.PremulAlpha (color);
-			}
-			SetTexture (texture, 0);
-			if (currentIndex + 6 >= batchIndices.Length || currentVertex + 4 >= batchVertices.Length) {
-				FlushSpriteBatch ();
-			}
-			int i = currentVertex;
-			currentVertex += 4;
-			batchVertices [i + 0] = new Vertex {
-				Pos = WorldMatrix * new Vector2 (position.X, position.Y),
-				Color = color,
-				UV1 = new Vector2 (uv0.X, uv0.Y),
-			};
-			batchVertices [i + 1] = new Vertex {
-				Pos = WorldMatrix * new Vector2 (position.X + size.X, position.Y),
-				Color = color,
-				UV1 = new Vector2 (uv1.X, uv0.Y),
-			};
-			batchVertices [i + 2] = new Vertex {
-				Pos = WorldMatrix * new Vector2 (position.X, position.Y + size.Y),
-				Color = color,
-				UV1 = new Vector2 (uv0.X, uv1.Y),
-			};
-			batchVertices [i + 3] = new Vertex {
-				Pos = WorldMatrix * new Vector2 (position.X + size.X, position.Y + size.Y),
-				Color = color,
-				UV1 = new Vector2 (uv1.X, uv1.Y),
-			};
-			batchIndices [currentIndex++] = (ushort)(i + 0);
-			batchIndices [currentIndex++] = (ushort)(i + 1);
-			batchIndices [currentIndex++] = (ushort)(i + 2);
-			batchIndices [currentIndex++] = (ushort)(i + 2);
-			batchIndices [currentIndex++] = (ushort)(i + 1);
-			batchIndices [currentIndex++] = (ushort)(i + 3);
-		}
-
-		public void DrawTextLine2 (Font font, Vector2 position, string text, Color4 color, float fontHeight)
-		{
-			FontChar fontChar = font.Chars ['X'];
-			float savedX = position.X;
-			float scale = fontHeight / fontChar.Size.Y;
-			char prevChar = '\0';
-			for (int i = 0; i < text.Length; i++) {
-				if (text [i] == '\n') {
-					position.X = savedX;
-					position.Y += fontHeight;
-					continue;
-				}
-				FontChar fontChar = font.Chars [text [i]];
-				
-				float delta = 0;//font.Pairs.Get (prevChar, fontChar.Char);
-				position.X += scale * (fontChar.ACWidths.X + delta);
-				DrawSprite (font.Texture, color, position, scale * fontChar.Size, fontChar.UV0, fontChar.UV1);
-				position.X += scale * (fontChar.Size.X + fontChar.ACWidths.Y + delta);
-				prevChar = fontChar.Char;
-			}
-		}*/
 	}
 }

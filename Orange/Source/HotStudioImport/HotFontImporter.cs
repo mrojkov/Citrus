@@ -8,6 +8,7 @@ namespace Orange
 	{
 		HotLexer lexer;
 		Size textureSize;
+		float fontCharHeight;
 
 		public HotFontImporter (string path)
 		{
@@ -29,8 +30,10 @@ namespace Orange
 				fontChar.UV0 = lexer.ParseVector2 () / (Vector2)textureSize;
 				break;
 			case "TexSize":
-				fontChar.Size = lexer.ParseVector2 ();
-				fontChar.UV1 = fontChar.UV0 + fontChar.Size / (Vector2)textureSize;
+				Vector2 size = lexer.ParseVector2 ();
+				fontChar.Width = size.X;
+				fontCharHeight = size.Y;
+				fontChar.UV1 = fontChar.UV0 + size / (Vector2)textureSize;
 				break;
 			case "ACWidths":
 				fontChar.ACWidths = lexer.ParseVector2 ();
@@ -127,6 +130,7 @@ namespace Orange
 			while (lexer.PeekChar() != '}')
 				ParseFontProperty (font, lexer.ParseWord ());
 			lexer.ParseToken ('}');
+			font.CharHeight = fontCharHeight;
 			return font;
 		}
 	}
