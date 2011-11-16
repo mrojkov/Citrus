@@ -47,11 +47,6 @@ namespace Lime
 			return frames << 6;
 		}
 		
-		static public int RoundMsecsToFrames (int msecs)
-		{
-			return FramesToMsecs (MsecsToFrames (msecs));
-		}
-
 		protected abstract System.Collections.IList Values { get; }
 
 		protected Node Owner;

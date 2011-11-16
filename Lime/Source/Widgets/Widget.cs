@@ -116,18 +116,14 @@ namespace Lime
 		}
 
 		protected bool renderedToTexture;
-		private Matrix32 worldMatrix;
-		private Color4 worldColor;
-		private Blending worldBlending;
-		private bool worldShown;
+		
+		protected Matrix32 worldMatrix;
+		protected Color4 worldColor;
+		protected Blending worldBlending;
 
 		public Matrix32 WorldMatrix { get { return worldMatrix; } }
-
 		public Color4 WorldColor { get { return worldColor; } }
-
 		public Blending WorldBlending { get { return worldBlending; } }
-
-		public override bool WorldShown { get { return worldShown; } }
 		
 		#endregion
 		#region Methods
@@ -200,14 +196,16 @@ namespace Lime
 		{
 			UpdatedNodes++;
 			UpdateWorldProperties ();
-			if (WorldShown) {
+			if (worldShown) {
 				if (Playing) {
 					AdvanceAnimation (delta);
 				}
 				for (int i = Nodes.Count - 1; i >= 0; i--) {
 					Nodes [i].Update (delta);
 				}
-				ApplyAnchors ();
+				if (Anchors != Anchors.None && Parent.Widget != null) {
+					ApplyAnchors ();
+				}
 			}
 		}
 
@@ -215,38 +213,36 @@ namespace Lime
 
 		void ApplyAnchors ()
 		{
-			if (Anchors != Anchors.None && Parent.Widget != null) {
-				Vector2 currentSize = Parent.Widget.Size;
-				if (parentSize.HasValue && !parentSize.Value.Equals (currentSize)) {
-					// Apply anchors along X axis.
-					if ((Anchors & Anchors.CenterH) != 0) {
-						Position += new Vector2 ((currentSize.X - parentSize.Value.X) / 2, 0);
-					} else if ((Anchors & Anchors.Left) != 0 && (Anchors & Anchors.Right) != 0) {
-						Size += new Vector2 (currentSize.X - parentSize.Value.X, 0);
-						Position += new Vector2 ((currentSize.X - parentSize.Value.X) * Pivot.X, 0);
-					} else if ((Anchors & Anchors.Right) != 0) {
-						Position += new Vector2 (currentSize.X - parentSize.Value.X, 0);
-					}
-
-					// Apply anchors along Y axis.
-					if ((Anchors & Anchors.CenterV) != 0) {
-						Position += new Vector2 (0, (currentSize.Y - parentSize.Value.Y) / 2);
-					} else if ((Anchors & Anchors.Top) != 0 && (Anchors & Anchors.Bottom) != 0) {
-						Size += new Vector2 (0, currentSize.Y - parentSize.Value.Y);
-						Position += new Vector2 (0, (currentSize.Y - parentSize.Value.Y) * Pivot.Y);
-					} else if ((Anchors & Anchors.Bottom) != 0) {
-						Position += new Vector2 (0, currentSize.Y - parentSize.Value.Y);
-					}
+			Vector2 currentSize = Parent.Widget.Size;
+			if (parentSize.HasValue && !parentSize.Value.Equals (currentSize)) {
+				// Apply anchors along X axis.
+				if ((Anchors & Anchors.CenterH) != 0) {
+					Position += new Vector2 ((currentSize.X - parentSize.Value.X) / 2, 0);
+				} else if ((Anchors & Anchors.Left) != 0 && (Anchors & Anchors.Right) != 0) {
+					Size += new Vector2 (currentSize.X - parentSize.Value.X, 0);
+					Position += new Vector2 ((currentSize.X - parentSize.Value.X) * Pivot.X, 0);
+				} else if ((Anchors & Anchors.Right) != 0) {
+					Position += new Vector2 (currentSize.X - parentSize.Value.X, 0);
 				}
-				parentSize = currentSize;
+
+				// Apply anchors along Y axis.
+				if ((Anchors & Anchors.CenterV) != 0) {
+					Position += new Vector2 (0, (currentSize.Y - parentSize.Value.Y) / 2);
+				} else if ((Anchors & Anchors.Top) != 0 && (Anchors & Anchors.Bottom) != 0) {
+					Size += new Vector2 (0, currentSize.Y - parentSize.Value.Y);
+					Position += new Vector2 (0, (currentSize.Y - parentSize.Value.Y) * Pivot.Y);
+				} else if ((Anchors & Anchors.Bottom) != 0) {
+					Position += new Vector2 (0, currentSize.Y - parentSize.Value.Y);
+				}
 			}
+			parentSize = currentSize;
 		}
 
 		public virtual bool HitTest (Vector2 point)
 		{
-			if (WorldShown) {
+			if (worldShown) {
 				if (HitTestMethod == HitTestMethod.BoundingRect) {
-					Vector2 pt = WorldMatrix.CalcInversed ().TransformVector (point);
+					Vector2 pt = worldMatrix.CalcInversed ().TransformVector (point);
 					Vector2 sz = Size;
 					if (sz.X < 0) {
 						pt.X = -pt.X;

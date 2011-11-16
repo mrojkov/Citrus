@@ -136,6 +136,9 @@ namespace Lime
 			// Current texture of the particle.
 			[ProtoMember (31)]
 			public float TextureIndex;
+			// Next particle in the chain
+			[ProtoMember (32)]
+			public Particle Next;
 		};
 
 		public static bool EnabledGlobally = true;
@@ -195,7 +198,7 @@ namespace Lime
 		public bool AlongPathOrientation { get; set; }
 
 		/// <summary>
-		/// Specifiecs direction of particles windage (0 - right, 90 - down) .
+		/// Specifiecs direction of particles windage (0 - right, 90 - down).
 		/// </summary>
 		[ProtoMember (10)]
 		public NumericRange WindDirection { get; set; }
@@ -207,7 +210,7 @@ namespace Lime
 		public NumericRange WindAmount { get; set; }
 
 		/// <summary>
-		/// Specifiecs direction of gravitation (0 - right, 90 - down) .
+		/// Specifiecs direction of gravitation (0 - right, 90 - down).
 		/// </summary>
 		[ProtoMember (12)]
 		public NumericRange GravityDirection { get; set; }
@@ -304,7 +307,9 @@ namespace Lime
 
 		[ProtoMember (29)]
 		public readonly LinkedList<Particle> particles = new LinkedList<Particle> ();
-
+		
+		static LinkedList<Particle> particlePool = new LinkedList<Particle> ();
+		
 		public ParticleEmitter ()
 		{
 			Shape = EmitterShape.Point;
@@ -340,23 +345,43 @@ namespace Lime
 			case ParticlesLinkage.Parent:
 				return (Parent != null) ? Parent.Widget : null;
 			case ParticlesLinkage.Other: {
-					Node node = Parent;
-					while (node != null) {
-						if (node.Id == LinkageWidgetName)
-							return node.Widget;
-						node = node.Parent;
-					}
-					return null;
+				Node node = Parent;
+				while (node != null) {
+					if (node.Id == LinkageWidgetName)
+						return node.Widget;
+					node = node.Parent;
 				}
+				return null;
+			}
 			case ParticlesLinkage.Root:
-			default: {
-					return (Parent != null) ? GetRoot ().Widget : null;
-				}
+			default:
+				return (Parent != null) ? GetRoot ().Widget : null;
 			}
 		}
 
 		public static int TotalParticles = 0;
 		public static bool GloballyEnabled = true;
+		
+		LinkedListNode<Particle> AllocParticle ()
+		{
+			LinkedListNode<Particle> result;
+			if (particlePool.Count == 0) {
+				result = new LinkedListNode<Particle>(new Particle ());
+			} else {
+			 	result = particlePool.First;
+				particlePool.RemoveFirst ();
+			}
+			particles.AddLast (result);
+			TotalParticles++;
+			return result;
+		}
+		
+		void FreeParticle (LinkedListNode<Particle> particleNode)
+		{
+			particles.Remove (particleNode);
+			particlePool.AddFirst (particleNode);
+			TotalParticles--;
+		}
 
 		void UpdateHelper (int delta)
 		{
@@ -368,19 +393,18 @@ namespace Lime
 					pendingParticles = Number;
 				pendingParticles = Math.Min (pendingParticles, Number - particles.Count);
 				while (particles.Count > Number) {
-					TotalParticles--;
-					particles.RemoveLast ();
+					FreeParticle (particles.Last);
 				}
 			} else {
 				pendingParticles += Number * deltaSec;
 			}
 
 			while (pendingParticles >= 1f) {
-				Particle particle = new Particle ();
-				if (GloballyEnabled && InitializeParticle (particle)) {
-					TotalParticles++;
-					AdvanceParticle (particle, 0);
-					particles.AddLast (particle);
+				LinkedListNode<Particle> particleNode = AllocParticle ();
+				if (GloballyEnabled && Nodes.Count > 0 && InitializeParticle (particleNode.Value)) {
+					AdvanceParticle (particleNode.Value, 0);
+				} else {
+					FreeParticle (particleNode);
 				}
 				pendingParticles -= 1;
 			}
@@ -393,8 +417,7 @@ namespace Lime
 				AdvanceParticle (particle, deltaSec);
 				if (!ImmortalParticles && particle.Age > particle.Lifetime) {
 					LinkedListNode<Particle> n = node.Next;
-					particles.Remove (node);
-					TotalParticles--;
+					FreeParticle (node);
 					node = n;
 					if (node == null)
 						break;
@@ -436,9 +459,6 @@ namespace Lime
 
 		bool InitializeParticle (Particle p)
 		{
-			if (Nodes.Count == 0)
-				return false;
-
 			// Calculating particle initial orientation & color
 			Color4 color = Color;
 			Matrix32 transform = LocalMatrix;
@@ -587,11 +607,15 @@ namespace Lime
 			}
 
 			// Updating other properties of a particle.
-			var windDirection = Vector2.CosSin (Utils.DegreesToRadians * p.WindDirection);
 			float windVelocity = p.WindAmount * modifier.WindAmount;
-
-			var gravityDirection = Vector2.CosSin (Utils.DegreesToRadians * p.GravityDirection);
-
+			if (windVelocity != 0) {
+				var windDirection = Vector2.CosSin (Utils.DegreesToRadians * p.WindDirection);
+				p.RegularPosition += windVelocity * delta * windDirection;
+			}
+			if (p.GravityVelocity != 0) {
+				var gravityDirection = Vector2.CosSin (Utils.DegreesToRadians * p.GravityDirection);
+				p.RegularPosition += p.GravityVelocity * delta * gravityDirection;
+			}
 			var direction = Vector2.CosSin (Utils.DegreesToRadians * p.RegularDirection);
 			float velocity = p.Velocity * modifier.Velocity;
 
@@ -600,13 +624,13 @@ namespace Lime
 			p.GravityVelocity += p.GravityAcceleration * delta;
 
 			p.RegularPosition += velocity * delta * direction;
-			p.RegularPosition += windVelocity * delta * windDirection;
-			p.RegularPosition += p.GravityVelocity * delta * gravityDirection;
-
 			p.Angle += p.Spin * modifier.Spin * delta;
-			p.ScaleCurrent.X = p.ScaleInitial.X * modifier.Scale * modifier.AspectRatio;
-			p.ScaleCurrent.Y = p.ScaleInitial.Y * modifier.Scale / Math.Max (0.0001f, modifier.AspectRatio);
 
+			p.ScaleCurrent = p.ScaleInitial * modifier.Scale;
+			if (modifier.AspectRatio != 1f) {
+				p.ScaleCurrent.X *= modifier.AspectRatio;
+				p.ScaleCurrent.Y /= Math.Max (0.0001f, modifier.AspectRatio);
+			}
 			p.ColorCurrent = p.ColorInitial * modifier.Color;
 
 			p.MagnetAmountCurrent = p.MagnetAmountInitial * modifier.MagnetAmount;
@@ -640,15 +664,7 @@ namespace Lime
 			}
 			return true;
 		}
-/*
-		static readonly Vector2 [] rect = new Vector2 [4] { 
-            new Vector2(0, 0), 
-            new Vector2(1, 0), 
-            new Vector2(1, 1), 
-            new Vector2(0, 1) 
-        };
-		static Renderer.Vertex [] quad = new Renderer.Vertex [4];
-*/
+
 		void RenderParticle (Particle p, Matrix32 matrix, Color4 color)
 		{
 			color = color * p.ColorCurrent;
@@ -658,21 +674,16 @@ namespace Lime
 				float angle = p.Angle;
 				if (AlongPathOrientation)
 					angle += p.FullDirection;
-				Vector2 particleSize = p.ScaleCurrent * new Vector2 (texture.ImageSize.Width, texture.ImageSize.Height);
-//				Renderer.Instance.WorldMatrix = Matrix32.Rotation (Utils.DegreesToRadians * angle) * Matrix32.Translation (p.FullPosition) * matrix;
-				Renderer.Instance.WorldMatrix = matrix;//Matrix32.Transformation (p.FullPosition, 
-					//particleSize, Utils.DegreesToRadians * angle, p.FullPosition) * matrix;
-				Vector2 a = -Vector2.Half * particleSize + p.FullPosition;
-				Vector2 b = Vector2.Half * particleSize + p.FullPosition;
-				Renderer.Instance.DrawSprite (texture, color, a, b, Vector2.Zero, Vector2.One);
-				/*
-				Matrix32 rotation = Matrix32.Rotation (Utils.DegreesToRadians * angle);
-				for (int i = 0; i < 4; i++) {
-					quad [i].Pos = Vector2.Scale (particleSize, rect [i] - Vector2.Half) * rotation + p.FullPosition;
-					quad [i].UV1 = rect [i];
-					quad [i].Color = color;
-				}
-				Renderer.Instance.DrawTriangleFan (texture, quad, 4);*/
+				Vector2 imageSize = new Vector2 (texture.ImageSize.Width, texture.ImageSize.Height);
+				Vector2 particleSize = p.ScaleCurrent * imageSize;
+				Vector2 orientation = Vector2.CosSin (Utils.DegreesToRadians * angle);
+				Matrix32 transform = new Matrix32 {
+					U = particleSize.X * orientation,
+					V = particleSize.Y * new Vector2 (-orientation.Y, orientation.X),
+					T = p.FullPosition
+				};
+				Renderer.Instance.WorldMatrix = transform * matrix;
+				Renderer.Instance.DrawSprite (texture, color, -Vector2.Half, Vector2.One, Vector2.Zero, Vector2.One);
 			}
 		}
 

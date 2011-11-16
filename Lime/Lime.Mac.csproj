@@ -107,5 +107,6 @@
     <Compile Include="Source\Widgets\Widget.cs" />
     <Compile Include="Source\Input\Input.cs" />
     <Compile Include="Source\Input\Mouse.cs" />
+    <Compile Include="Source\List.cs" />
   </ItemGroup>
 </Project>

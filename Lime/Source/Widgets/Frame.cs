@@ -56,21 +56,21 @@ namespace Lime
 				}
 			}
 		}
-		
+
 		public event EventHandler<EventArgs> BeforeRendering;
 		public event EventHandler<EventArgs> AfterRendering;
 		public event EventHandler<UpdateEventArgs> BeforeUpdate;
 		public event EventHandler<UpdateEventArgs> AfterUpdate;
-		
+
 		void IImageCombinerArg.BypassRendering ()
 		{
 		}
-		 
+
 		ITexture IImageCombinerArg.GetTexture ()
 		{
 			return renderTexture;
 		}
-		 
+
 		public override void Update (int delta)
 		{
 			if (BeforeUpdate != null)
@@ -81,7 +81,7 @@ namespace Lime
 			if (AfterUpdate != null)
 				AfterUpdate (this, new UpdateEventArgs {Delta = delta});
 		}
-		
+
 		public override void Render ()
 		{
 			if (BeforeRendering != null)

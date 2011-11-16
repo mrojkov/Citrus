@@ -96,7 +96,7 @@ namespace Lime
 		static readonly Renderer instance = new Renderer ();
 		public bool PremulAlphaMode = true;
 		
-		const int MaxVertices = 128;
+		const int MaxVertices = 256;
 		public int DrawCalls = 0;
 
 		[StructLayout(LayoutKind.Explicit, Size=32)]

@@ -33,9 +33,9 @@ namespace Lime
 		{
 			if (imageCombinerArg)
 				return;
-			Renderer.Instance.WorldMatrix = WorldMatrix;
-			Renderer.Instance.Blending = WorldBlending;
-			Renderer.Instance.DrawSprite (Texture, WorldColor, Vector2.Zero, Size, UV0, UV1);
+			Renderer.Instance.WorldMatrix = worldMatrix;
+			Renderer.Instance.Blending = worldBlending;
+			Renderer.Instance.DrawSprite (Texture, worldColor, Vector2.Zero, Size, UV0, UV1);
 		}
 
 		bool imageCombinerArg;
@@ -52,7 +52,7 @@ namespace Lime
 
 		public override bool HitTest (Vector2 point)
 		{
-			if (WorldShown && !imageCombinerArg) {
+			if (worldShown && !imageCombinerArg) {
 				if (HitTestMethod == HitTestMethod.Contents) {
 					Vector2 pt = WorldMatrix.CalcInversed ().TransformVector (point);
 					Vector2 sz = Size;

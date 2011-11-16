@@ -66,7 +66,7 @@ namespace Lime
 				polygon [t + 1].UV1 = points [w].UV;
 				polygon [t + 1].Pos = points [w].TransformedPosition;
 			}
-			Renderer.Instance.DrawTriangleFan (Texture, polygon, 6);			
+			Renderer.Instance.DrawTriangleFan (Texture, polygon, 6);
 		}
 		
 		public override void Render ()
