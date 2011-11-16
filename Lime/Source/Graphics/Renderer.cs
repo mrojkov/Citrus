@@ -508,14 +508,24 @@ namespace Lime
 		public Vector2 MeasureTextLine (Font font, string text, float fontHeight)
 		{
 			Vector2 size = new Vector2 (0, fontHeight);
-			char prevChar = '\0';
+			FontChar prevChar = null;
+			float scale = 0;
 			for (int i = 0; i < text.Length; i++) {
 				FontChar fontChar = font.Chars [text [i]];
-				float scale = fontHeight / fontChar.Size.Y;
-				float delta = font.Pairs.Get (prevChar, fontChar.Char);
-				size.X += scale * (fontChar.ACWidths.X + delta);
-				size.X += scale * (fontChar.Size.X + fontChar.ACWidths.Y + delta);
-				prevChar = fontChar.Char;
+				float kerning = 0;
+				if (prevChar != null && prevChar.KerningPairs != null) {
+					foreach (var pair in prevChar.KerningPairs) {
+						if (pair.Char == fontChar.Char) {
+							kerning = pair.Kerning;
+							break;
+						}
+					}
+				}
+				if (scale == 0)
+					scale = fontHeight / fontChar.Size.Y;
+				size.X += scale * (fontChar.ACWidths.X + kerning);
+				size.X += scale * (fontChar.Size.X + fontChar.ACWidths.Y + kerning);
+				prevChar = fontChar;
 			}
 			return size;
 		}
@@ -523,7 +533,8 @@ namespace Lime
 		public void DrawTextLine (Font font, Vector2 position, string text, Color4 color, float fontHeight)
 		{
 			float savedX = position.X;
-			char prevChar = '\0';
+			FontChar prevChar = null;
+			float scale = 0;
 			for (int i = 0; i < text.Length; i++) {
 				if (text [i] == '\n') {
 					position.X = savedX;
@@ -531,15 +542,24 @@ namespace Lime
 					continue;
 				}
 				FontChar fontChar = font.Chars [text [i]];
-				float scale = fontHeight / fontChar.Size.Y;
-				float delta = font.Pairs.Get (prevChar, fontChar.Char);
-				position.X += scale * (fontChar.ACWidths.X + delta);
+				float kerning = 0;
+				if (prevChar != null && prevChar.KerningPairs != null) {
+					foreach (var pair in prevChar.KerningPairs) {
+						if (pair.Char == fontChar.Char) {
+							kerning = pair.Kerning;
+							break;
+						}
+					}
+				}
+				if (scale == 0)
+					scale = fontHeight / fontChar.Size.Y;
+				position.X += scale * (fontChar.ACWidths.X + kerning);
 				DrawSprite (font.Texture, color, position, scale * fontChar.Size, fontChar.UV0, fontChar.UV1);
-				position.X += scale * (fontChar.Size.X + fontChar.ACWidths.Y + delta);
-				prevChar = fontChar.Char;
+				position.X += scale * (fontChar.Size.X + fontChar.ACWidths.Y + kerning);
+				prevChar = fontChar;
 			}
 		}
-
+		/*
 		public void DrawSprite2 (ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1)
 		{
 			Rectangle textureRect = texture.UVRect;
@@ -594,7 +614,7 @@ namespace Lime
 					position.Y += fontHeight;
 					continue;
 				}
-				//FontChar fontChar = font.Chars [text [i]];
+				FontChar fontChar = font.Chars [text [i]];
 				
 				float delta = 0;//font.Pairs.Get (prevChar, fontChar.Char);
 				position.X += scale * (fontChar.ACWidths.X + delta);
@@ -602,6 +622,6 @@ namespace Lime
 				position.X += scale * (fontChar.Size.X + fontChar.ACWidths.Y + delta);
 				prevChar = fontChar.Char;
 			}
-		}
+		}*/
 	}
 }

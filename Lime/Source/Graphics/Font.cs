@@ -12,20 +12,23 @@ namespace Lime
 		public PersistentTexture Texture = new PersistentTexture ();
 		[ProtoMember(2)]
 		public readonly FontCharCollection Chars = new FontCharCollection ();
-		[ProtoMember(3)]
-		public readonly FontPairCollection Pairs = new FontPairCollection ();
 	}
 
 	[ProtoContract]
 	public class FontCharCollection : ICollection<FontChar>
 	{
-		[ProtoMember(1)]
 		public List<FontChar> charList = new List<FontChar> ();
-		[ProtoMember(2)]
-		public Dictionary<char, FontChar> charDic = new Dictionary<char, FontChar> ();
+		public FontChar [] [] charMap = new FontChar [256] [];
 
 		public FontChar this [char code] { 
-			get { return charDic [code]; }
+			get { 
+				byte hb = (byte)(code >> 8);
+				byte lb = (byte)(code & 255);
+				if (charMap [hb] != null) {
+					return charMap [hb] [lb];
+				}
+				return null;
+			}
 		}
 
 		public void CopyTo (Array a, int index)
@@ -52,17 +55,28 @@ namespace Lime
 		public void Clear ()
 		{
 			charList.Clear ();
-			charDic.Clear ();
+			for (int i = 0; i < 256; i++) {
+				charMap [i] = null;
+			}
 		}
 		
 		public bool Contains (FontChar item)
 		{
-			return charDic.ContainsKey (item.Char);
+			byte hb = (byte)(item.Char >> 8);
+			byte lb = (byte)(item.Char & 255);
+			if (charMap [hb] != null) {
+				return charMap [hb] [lb] != null;
+			}
+			return false;
 		}
 		
 		public bool Remove (FontChar item)
 		{
-			charDic.Remove (item.Char);
+			byte hb = (byte)(item.Char >> 8);
+			byte lb = (byte)(item.Char & 255);
+			if (charMap [hb] != null) {
+				charMap [hb] [lb] = null;
+			}
 			return charList.Remove (item);
 		}
 		
@@ -72,13 +86,27 @@ namespace Lime
 
 		public void Add (FontChar c)
 		{
-			charDic [c.Char] = c;
+			byte hb = (byte)(c.Char >> 8);
+			byte lb = (byte)(c.Char & 255);
+			if (charMap [hb] == null) {
+				charMap [hb] = new FontChar [256];
+			}
+			charMap [hb] [lb] = c;
 			charList.Add (c);
 		}
 	}
 
 	[ProtoContract]
-	public struct FontChar
+	public struct KerningPair
+	{
+		[ProtoMember(1)]
+		public char Char;
+		[ProtoMember(2)]
+		public float Kerning;
+	}
+
+	[ProtoContract]
+	public class FontChar
 	{
 		[ProtoMember(1)]
 		public char Char;
@@ -90,81 +118,7 @@ namespace Lime
 		public Vector2 Size;
 		[ProtoMember(5)]
 		public Vector2 ACWidths;
-	}
-
-	[ProtoContract]
-	public struct FontPair
-	{
-		[ProtoMember(1)]
-		public char A;
-		[ProtoMember(2)]
-		public char B;
-		[ProtoMember(3)]
-		public float Delta;
-	}
-
-	[ProtoContract]
-	public class FontPairCollection : ICollection<FontPair>
-	{
-		[ProtoMember(1)]
-		List<FontPair> pairList = new List<FontPair> ();
-		[ProtoMember(2)]
-		Dictionary<uint, float> pairDic = new Dictionary<uint, float> ();
-
-		public float Get (uint Left, uint Right)
-		{
-			float value;
-			var key = (Left << 16) | Right;
-			if (pairDic.TryGetValue (key, out value))
-				return value;
-			return 0.0f;
-		}
-
-		IEnumerator<FontPair> IEnumerable<FontPair>.GetEnumerator ()
-		{
-			return pairList.GetEnumerator ();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator ()
-		{
-			return pairList.GetEnumerator ();
-		}
-	
-		void ICollection<FontPair>.CopyTo (FontPair[] a, int index)
-		{
-			pairList.CopyTo (a, index);
-		}
-
-		public int Count { get { return pairList.Count; } }
-
-		public void Add (FontPair pair)
-		{
-			var key = ((uint)pair.A << 16) | pair.B;
-			pairDic [key] = pair.Delta;
-			pairList.Add (pair);
-		}
-
-		public bool Contains (FontPair pair)
-		{
-			var key = ((uint)pair.A << 16) | pair.B;
-			return pairDic.ContainsKey (key);
-		}
-
-		bool ICollection<FontPair>.IsReadOnly { 
-			get { return false; }
-		}
-
-		public bool Remove (FontPair pair)
-		{
-			var key = ((uint)pair.A << 16) | pair.B;
-			pairDic.Remove (key);
-			return pairList.Remove (pair);
-		}
-		
-		public void Clear ()
-		{
-			pairList.Clear ();
-			pairDic.Clear ();
-		}
+		[ProtoMember(6)]
+		public List<KerningPair> KerningPairs;
 	}
 }

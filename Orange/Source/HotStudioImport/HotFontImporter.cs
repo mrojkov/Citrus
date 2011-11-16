@@ -1,5 +1,6 @@
 using System.IO;
 using Lime;
+using System.Collections.Generic;
 
 namespace Orange
 {
@@ -39,7 +40,7 @@ namespace Orange
 			}
 		}
 
-		public FontChar ParseFontChar ()
+		FontChar ParseFontChar ()
 		{
 			string type = lexer.ParseQuotedString ();
 			if (type != "Hot::FontChar")
@@ -62,14 +63,21 @@ namespace Orange
 				fontCharPair.B = (char)lexer.ParseInt ();
 				break;
 			case "Delta":
-				fontCharPair.Delta = lexer.ParseFloat ();
+				fontCharPair.Kerning = lexer.ParseFloat ();
 				break;
 			default:
 				throw new Exception ("Unknown property '{0}'. Parsing: {1}", name, fontCharPair);
 			}
 		}
 
-		public FontPair ParseFontCharPair ()
+		struct FontPair
+		{
+			public char A;
+			public char B;
+			public float Kerning;
+		}
+
+		FontPair ParseFontCharPair ()
 		{
 			string type = lexer.ParseQuotedString ();
 			if (type != "Hot::FontCharPair")
@@ -93,8 +101,14 @@ namespace Orange
 				break;
 			case "Pairs":
 				lexer.ParseToken ('[');
-				while (lexer.PeekChar() != ']')
-					font.Pairs.Add (ParseFontCharPair ());
+				while (lexer.PeekChar () != ']') {
+					var pair = ParseFontCharPair ();
+					FontChar c = font.Chars [pair.A];
+					if (c.KerningPairs == null) {
+						c.KerningPairs = new List<KerningPair> ();
+					}
+					c.KerningPairs.Add (new KerningPair { Char = pair.B, Kerning = pair.Kerning });
+				}
 				lexer.ParseToken (']');
 				break;
 			default:
