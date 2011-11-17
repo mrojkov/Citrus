@@ -66,13 +66,13 @@ namespace Lime
 				polygon [t + 1].UV1 = points [w].UV;
 				polygon [t + 1].Pos = points [w].TransformedPosition;
 			}
-			Renderer.Instance.DrawTriangleFan (Texture, polygon, 6);
+			Renderer.DrawTriangleFan (Texture, polygon, 6);
 		}
 		
 		public override void Render ()
 		{
-			Renderer.Instance.Blending = WorldBlending;
-			Renderer.Instance.WorldMatrix = WorldMatrix;
+			Renderer.Blending = WorldBlending;
+			Renderer.WorldMatrix = WorldMatrix;
 			for (int i = 0; i < NumRows; ++i) {
 				for (int j = 0; j < NumCols; ++j) {
 					points [0] = GetPoint (i, j);

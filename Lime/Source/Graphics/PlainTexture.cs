@@ -33,7 +33,7 @@ namespace Lime
 					texturesToDelete.CopyTo (ids);
 					GL.DeleteTextures (ids.Length, ids);
 					texturesToDelete.Clear ();
-					Renderer.Instance.CheckErrors ();
+					Renderer.CheckErrors ();
 				}
 			}
 		}
@@ -243,7 +243,7 @@ namespace Lime
 #if GLES11
 			// Generate a new texture.
 			GL.GenTextures (1, ref id);
-			Renderer.Instance.SetTexture (id, 0);
+			Renderer.SetTexture (id, 0);
 			GL.TexParameter (All.Texture2D, All.TextureMinFilter, (int)All.Linear);
 			GL.TexParameter (All.Texture2D, All.TextureMagFilter, (int)All.Linear);
 			GL.TexParameter (All.Texture2D, All.TextureWrapS, (int)All.ClampToEdge);
@@ -266,7 +266,7 @@ namespace Lime
 				InitWithDDSTexture (reader);
 #endif
 			}
-			Renderer.Instance.CheckErrors ();
+			Renderer.CheckErrors ();
 			uvRect = new Rectangle (Vector2.Zero, (Vector2)ImageSize / (Vector2)SurfaceSize);
 		}
 
@@ -282,7 +282,7 @@ namespace Lime
 			// Generate a new texture.
 			GL.GenTextures (1, ref id);
 			
-			Renderer.Instance.SetTexture (id, 0);
+			Renderer.SetTexture (id, 0);
 			GL.TexParameter (All.Texture2D, All.TextureMinFilter, (int)All.Linear);
 			GL.TexParameter (All.Texture2D, All.TextureMagFilter, (int)All.Linear);
 			GL.TexParameter (All.Texture2D, All.TextureWrapS, (int)All.ClampToEdge);
@@ -309,7 +309,7 @@ namespace Lime
 #endif
 			}
 #endif
-			Renderer.Instance.CheckErrors ();
+			Renderer.CheckErrors ();
 
 			imgSize = new Size (width, height);
 			surSize = imgSize;

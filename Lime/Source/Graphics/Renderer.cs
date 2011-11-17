@@ -91,13 +91,12 @@ namespace Lime
 		public int Height;
 	}
 
-	public class Renderer
+	public static class Renderer
 	{
-		static readonly Renderer instance = new Renderer ();
-		public bool PremulAlphaMode = true;
+		public static bool PremulAlphaMode = true;
 		
-		const int MaxVertices = 256;
-		public int DrawCalls = 0;
+		const int MaxVertices = 1024;
+		public static int DrawCalls = 0;
 
 		[StructLayout(LayoutKind.Explicit, Size=32)]
 		public struct Vertex
@@ -124,21 +123,17 @@ namespace Lime
 			public Vector2 UV2;
 		}
 
-		uint [] textures = new uint [2];
-		ushort [] batchIndices = new ushort [MaxVertices * 3];
-		Vertex [] batchVertices = new Vertex [MaxVertices];
-		uint batchVBO;
+		static uint [] textures = new uint [2];
+		static ushort [] batchIndices = new ushort [MaxVertices * 4];
+		static Vertex [] batchVertices = new Vertex [MaxVertices];
+		static uint batchVBO;
 
-		int currentVertex = 0;
-		int currentIndex = 0;
+		static int currentVertex = 0;
+		static int currentIndex = 0;
 		
-		public Matrix32 WorldMatrix = Matrix32.Identity;
+		public static Matrix32 WorldMatrix = Matrix32.Identity;
 
-		public static Renderer Instance {
-			get  { return instance; }
-		}
-		
-		public void CheckErrors ()
+		public static void CheckErrors ()
 		{
 #if DEBUG
 #if GLES11
@@ -168,7 +163,7 @@ namespace Lime
 #endif
 		}
 		
-		public void FlushSpriteBatch ()
+		public static void FlushSpriteBatch ()
 		{
 			if (currentIndex > 0) {
 #if GLES11
@@ -188,7 +183,7 @@ namespace Lime
 			}
 		}
 		
-		public void BeginFrame ()
+		public static void BeginFrame ()
 		{
 			PlainTexture.DeleteScheduledTextures ();
 			DrawCalls = 0;
@@ -239,13 +234,13 @@ namespace Lime
 			CheckErrors ();
 		}
 		
-		public void SetTexture (ITexture texture, int stage)
+		public static void SetTexture (ITexture texture, int stage)
 		{
 			uint handle = texture != null ? texture.GetHandle() : 0;
 			SetTexture (handle, stage);
 		}
 
-		internal void SetTexture (uint glTexNum, int stage)
+		internal static void SetTexture (uint glTexNum, int stage)
 		{
 			if (glTexNum == textures [stage])
 				return;
@@ -281,14 +276,14 @@ namespace Lime
 			CheckErrors ();
 		}
 		
-		public void EndFrame ()
+		public static void EndFrame ()
 		{
 			FlushSpriteBatch ();
 			SetTexture (null, 0);
 			SetTexture (null, 1);
 		}
 
-		public void SetOrthogonalProjection (float left, float top, float right, float bottom)
+		public static void SetOrthogonalProjection (float left, float top, float right, float bottom)
 		{
 #if GLES11
 			GL.MatrixMode (All.Projection);
@@ -307,9 +302,9 @@ namespace Lime
 #endif
 		}
 
-		Viewport viewport;
+		static Viewport viewport;
 
-		public Viewport Viewport {
+		public static Viewport Viewport {
 			get { return viewport; }
 			set {
 				viewport = value;
@@ -317,7 +312,7 @@ namespace Lime
 			}
 		}
 
-		public void PushProjectionMatrix ()
+		public static void PushProjectionMatrix ()
 		{
 #if GLES11
 			GL.MatrixMode (All.Projection);
@@ -330,7 +325,7 @@ namespace Lime
 #endif
 		}
 
-		public void PopProjectionMatrix ()
+		public static void PopProjectionMatrix ()
 		{
 #if GLES11
 			GL.MatrixMode (All.Projection);
@@ -343,8 +338,8 @@ namespace Lime
 #endif
 		}
 
-		Blending blending = Blending.None;
-		public Blending Blending {
+		static Blending blending = Blending.None;
+		public static Blending Blending {
 			set {
 				if (value == blending)
 					return;
@@ -411,16 +406,16 @@ namespace Lime
 			}
 		}
 		
-		public void DrawSprite (ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1)
+		public static void DrawSprite (ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1)
 		{
 			Rectangle textureRect = texture.UVRect;
-			uv0 = textureRect.A + (textureRect.B - textureRect.A) * uv0;
-			uv1 = textureRect.A + (textureRect.B - textureRect.A) * uv1;
+			uv0 = textureRect.A + textureRect.Size * uv0;
+			uv1 = textureRect.A + textureRect.Size * uv1;
 			if (PremulAlphaMode) {
 				color = Color4.PremulAlpha (color);
 			}
 			SetTexture (texture, 0);
-			if (currentIndex + 6 >= batchIndices.Length || currentVertex + 4 >= batchVertices.Length) {
+			if (currentVertex >= MaxVertices - 4 || currentIndex >= MaxVertices * 4 - 6) {
 				FlushSpriteBatch ();
 			}
 			int i = currentVertex;
@@ -448,10 +443,10 @@ namespace Lime
 			batchIndices [currentIndex++] = (ushort)(i + 3);
 		}
 		
-		public void DrawTriangleFan (ITexture texture, Vertex[] vertices, int numVertices)
+		public static void DrawTriangleFan (ITexture texture, Vertex[] vertices, int numVertices)
 		{
 			SetTexture (texture, 0);
-			if (currentIndex + (numVertices - 2) * 3 >= batchIndices.Length || currentVertex + numVertices >= batchVertices.Length) {
+			if (currentIndex + (numVertices - 2) * 3 >= MaxVertices * 4 || currentVertex + numVertices >= batchVertices.Length) {
 				FlushSpriteBatch ();
 			}
 			if (numVertices < 3 || (numVertices - 2) * 3 > batchIndices.Length) {
@@ -477,7 +472,7 @@ namespace Lime
 			}
 		}
 
-		public void DrawCombinedTriangleFan (ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
+		public static void DrawCombinedTriangleFan (ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
 		{
 			FlushSpriteBatch ();
 			if (vertices.Length > batchVertices.Length) {
@@ -505,7 +500,7 @@ namespace Lime
 			DrawCalls++;
 		}
 
-		public Vector2 MeasureTextLine (Font font, string text, float fontHeight)
+		public static Vector2 MeasureTextLine (Font font, string text, float fontHeight)
 		{
 			FontChar prevChar = null;
 			Vector2 size = new Vector2 (0, fontHeight);
@@ -528,7 +523,7 @@ namespace Lime
 			return size;
 		}
 
-		public void DrawTextLine (Font font, Vector2 position, string text, Color4 color, float fontHeight)
+		public static void DrawTextLine (Font font, Vector2 position, string text, Color4 color, float fontHeight)
 		{
 			FontChar prevChar = null;
 			float savedX = position.X;

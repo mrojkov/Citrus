@@ -33,9 +33,9 @@ namespace Lime
 		{
 			if (imageCombinerArg)
 				return;
-			Renderer.Instance.WorldMatrix = worldMatrix;
-			Renderer.Instance.Blending = worldBlending;
-			Renderer.Instance.DrawSprite (Texture, worldColor, Vector2.Zero, Size, UV0, UV1);
+			Renderer.WorldMatrix = worldMatrix;
+			Renderer.Blending = worldBlending;
+			Renderer.DrawSprite (Texture, worldColor, Vector2.Zero, Size, UV0, UV1);
 		}
 
 		bool imageCombinerArg;

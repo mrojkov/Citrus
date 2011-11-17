@@ -107,4 +107,9 @@
     <Compile Include="Source\Input\Input.cs" />
     <Compile Include="Source\Input\Mouse.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Source\List.cs">
+      <Visible>False</Visible>
+    </None>
+  </ItemGroup>
 </Project>

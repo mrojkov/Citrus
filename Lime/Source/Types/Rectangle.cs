@@ -50,6 +50,12 @@ namespace Lime
 			}
 		}
 		
+		public Vector2 Size { 
+			get {
+				return B - A;
+			}
+		}
+		
 		bool Contains (Vector2 v)
 		{
 			return (v.X >= A.X) && (v.Y >= A.Y) && (v.X < B.X) && (v.Y < B.Y);

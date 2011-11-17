@@ -49,6 +49,7 @@ namespace Lime
 		{
 			[ProtoMember (1)]
 			public int ModifierIndex;
+			public ParticleModifier Modifier;
 			// Position of particle with random motion.
 			[ProtoMember (2)]
 			public Vector2 FullPosition;
@@ -136,9 +137,9 @@ namespace Lime
 			// Current texture of the particle.
 			[ProtoMember (31)]
 			public float TextureIndex;
-			// Next particle in the chain
+			// modifier.Animators.OverallDuration / LifeTime
 			[ProtoMember (32)]
-			public Particle Next;
+			public float AgeToFrame;
 		};
 
 		public static bool EnabledGlobally = true;
@@ -385,7 +386,7 @@ namespace Lime
 
 		void UpdateHelper (int delta)
 		{
-			float deltaSec = delta * Speed / 1000.0f;
+			float deltaSec = delta * Speed * 0.001f;
 			if (ImmortalParticles) {
 				if (TimeShift > 0)
 					pendingParticles += Number * deltaSec / TimeShift;
@@ -408,8 +409,10 @@ namespace Lime
 				}
 				pendingParticles -= 1;
 			}
-
-			EnumerateMagnets ();
+			
+			if (MagnetAmount.Median != 0 || MagnetAmount.Variation != 0) {
+				EnumerateMagnets ();
+			}
 
 			LinkedListNode<Particle> node = particles.First;
 			for (; node != null; node = node.Next) {
@@ -542,16 +545,20 @@ namespace Lime
 
 			p.RegularPosition = transform.TransformVector (position);
 			p.ModifierIndex = -1;
+			p.Modifier = null;
 			for (int counter = 0; counter < 10; counter++) {
 				int i = Utils.Random (Nodes.Count);
-				ParticleModifier modifier = Nodes [i] as ParticleModifier;
-				if (modifier != null) {
+				p.Modifier = Nodes [i] as ParticleModifier;
+				if (p.Modifier != null) {
 					p.ModifierIndex = i;
 					break;
 				}
 			}
 			if (p.ModifierIndex < 0)
 				return false;
+			
+			int duration = p.Modifier.Animators.GetOverallDuration ();
+			p.AgeToFrame = duration / p.Lifetime;
 
 			if (EmissionType == EmissionType.Inner)
 				p.RegularDirection += 180;
@@ -568,18 +575,20 @@ namespace Lime
 
 		bool AdvanceParticle (Particle p, float delta)
 		{
-			var modifier = Nodes [p.ModifierIndex] as ParticleModifier;
-			int duration = modifier.Animators.GetOverallDuration ();
-			if (duration > 0) {
-				modifier.Animators.Apply (Animator.FramesToMsecs ((int)(p.Age / p.Lifetime * duration)));
-			}
-
 			p.Age += delta;
+			// If particle was deserialized, p.Modifier would be null.
+			if (p.Modifier == null) {
+				p.Modifier = Nodes [p.ModifierIndex] as ParticleModifier;
+			}
+			var modifier = p.Modifier;
+			
+			if (p.AgeToFrame > 0) {
+				p.Modifier.Animators.Apply (Animator.FramesToMsecs ((int)(p.Age * p.AgeToFrame)));
+			}
 			if (ImmortalParticles) {
 				if (p.Lifetime > 0.0f)
 					p.Age = p.Age % p.Lifetime;
 			}
-
 			// Updating a particle texture index.
 			if (p.TextureIndex == 0.0f)
 				p.TextureIndex = (float)modifier.FirstFrame;
@@ -640,15 +649,13 @@ namespace Lime
 			Vector2 positionOnSpline = Vector2.Zero;
 			if (p.RandomMotionSpeed > 0.0f) {
 				p.RandomSplineOffset += delta * p.RandomMotionSpeed;
-
-				if (p.RandomSplineOffset >= 1.0f) {
-					p.RandomSplineOffset = 0.0f;
+				while (p.RandomSplineOffset >= 1.0f) {
+					p.RandomSplineOffset -= 1.0f;
 					p.RandomSplineVertex0 = p.RandomSplineVertex1;
 					p.RandomSplineVertex1 = p.RandomSplineVertex2;
 					p.RandomSplineVertex2 = p.RandomSplineVertex3;
 					p.RandomSplineVertex3 = GenerateRandomMotionControlPoint (ref p.RandomRayDirection);
 				}
-
 				positionOnSpline = Utils.CatmullRomSpline (p.RandomSplineOffset,
 					p.RandomSplineVertex0, p.RandomSplineVertex1,
 					p.RandomSplineVertex2, p.RandomSplineVertex3);
@@ -669,12 +676,11 @@ namespace Lime
 		{
 			color = color * p.ColorCurrent;
 			if (Color.A > 0) {
-				var modifier = Nodes [p.ModifierIndex] as ParticleModifier;
-				PersistentTexture texture = modifier.GetTexture ((int)p.TextureIndex - 1);
+				PersistentTexture texture = p.Modifier.GetTexture ((int)p.TextureIndex - 1);
 				float angle = p.Angle;
 				if (AlongPathOrientation)
 					angle += p.FullDirection;
-				Vector2 imageSize = new Vector2 (texture.ImageSize.Width, texture.ImageSize.Height);
+				Vector2 imageSize = (Vector2)texture.ImageSize;
 				Vector2 particleSize = p.ScaleCurrent * imageSize;
 				Vector2 orientation = Vector2.CosSin (Utils.DegreesToRadians * angle);
 				Matrix32 transform = new Matrix32 {
@@ -682,8 +688,8 @@ namespace Lime
 					V = particleSize.Y * new Vector2 (-orientation.Y, orientation.X),
 					T = p.FullPosition
 				};
-				Renderer.Instance.WorldMatrix = transform * matrix;
-				Renderer.Instance.DrawSprite (texture, color, -Vector2.Half, Vector2.One, Vector2.Zero, Vector2.One);
+				Renderer.WorldMatrix = transform * matrix;
+				Renderer.DrawSprite (texture, color, -Vector2.Half, Vector2.One, Vector2.Zero, Vector2.One);
 			}
 		}
 
@@ -696,9 +702,7 @@ namespace Lime
 				matrix = basicWidget.WorldMatrix;
 				color = basicWidget.WorldColor;
 			}
-
-			Renderer.Instance.Blending = WorldBlending;
-
+			Renderer.Blending = WorldBlending;
 			LinkedListNode<Particle> node = particles.First;
 			for (; node != null; node = node.Next) {
 				Particle particle = node.Value;

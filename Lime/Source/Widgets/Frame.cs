@@ -89,15 +89,15 @@ namespace Lime
 			if (renderTexture != null) {
 				if (Size.X > 0 && Size.Y > 0) {
 					renderTexture.SetAsRenderTarget ();
-					Viewport vp = Renderer.Instance.Viewport;
-					Renderer.Instance.Viewport = new Viewport { X = 0, Y = 0, Width = renderTexture.ImageSize.Width, Height = renderTexture.ImageSize.Height };
-					Renderer.Instance.PushProjectionMatrix ();
-					Renderer.Instance.SetOrthogonalProjection (0, Size.Y, Size.X, 0);
+					Viewport vp = Renderer.Viewport;
+					Renderer.Viewport = new Viewport { X = 0, Y = 0, Width = renderTexture.ImageSize.Width, Height = renderTexture.ImageSize.Height };
+					Renderer.PushProjectionMatrix ();
+					Renderer.SetOrthogonalProjection (0, Size.Y, Size.X, 0);
 					base.Render ();
 					renderTexture.RestoreRenderTarget ();
-					Renderer.Instance.Viewport = vp;
-					Renderer.Instance.PopProjectionMatrix ();
-					Renderer.Instance.SetOrthogonalProjection (0, 0, 1024, 768);
+					Renderer.Viewport = vp;
+					Renderer.PopProjectionMatrix ();
+					Renderer.SetOrthogonalProjection (0, 0, 1024, 768);
 				}
 			} else
 				base.Render ();

@@ -9,7 +9,7 @@ namespace Lime
     [ProtoContract]
 	public class PersistentTexture : ITexture
 	{
-		private PersistentTextureCore core;
+		PersistentTextureCore core;
 
 		public PersistentTexture ()
 		{
@@ -20,7 +20,7 @@ namespace Lime
 		{
 			core = TexturePool.Instance.GetPersistentTextureCore (path);
 		}
-		
+
 		[ProtoMember(1)]
 		public string SerializationPath {
 			get {
@@ -33,40 +33,49 @@ namespace Lime
 			}
 		}
 
-		public string Path { get { return core.Path; } }
+		public string Path { 
+			get { 
+				return core.Path; 
+			} 
+		}
 
-		public Size ImageSize { get { return Instance.ImageSize; } }
+		public Size ImageSize {
+			get {
+				return core.Instance.ImageSize; 
+			}
+		}
 
-		public Size SurfaceSize { get { return Instance.SurfaceSize; } }
+		public Size SurfaceSize {
+			get {
+				return core.Instance.SurfaceSize;
+			}
+		}
 
 		public Rectangle UVRect { 
-			get { 
-				core.Instance.GetHandle (); 
-				return core.UVRect; 
-			} 
+			get {
+				return core.UVRect;
+			}
 		}
 
 		public uint GetHandle ()
 		{
-			return Instance.GetHandle ();
+			return core.Instance.GetHandle ();
 		}
 
 		public void SetAsRenderTarget ()
 		{
-			Instance.SetAsRenderTarget ();
+			core.Instance.SetAsRenderTarget ();
 		}
 
 		public void RestoreRenderTarget ()
 		{
-			Instance.RestoreRenderTarget ();
+			core.Instance.RestoreRenderTarget ();
 		}
 
 		public bool IsTransparentPixel (int x, int y)
 		{
-			return Instance.IsTransparentPixel (x, y);
+			return core.Instance.IsTransparentPixel (x, y);
 		}
-
-		private ITexture Instance { get { return core.Instance; } }
 
 		public override string ToString ()
 		{

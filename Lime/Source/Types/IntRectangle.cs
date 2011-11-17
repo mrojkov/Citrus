@@ -49,6 +49,13 @@ namespace Lime
 				B.Y = A.Y + value;
 			}
 		}
+
+		public IntVector2 Size { 
+			get {
+				return B - A;
+			}
+		}
+
 		
 		bool Contains (IntVector2 v)
 		{

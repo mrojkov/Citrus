@@ -149,7 +149,7 @@ namespace Lime
 				vertices [i].UV1 = coords [i] * uvTransform1;
 				vertices [i].UV2 = coords [i] * uvTransform2;
 			}
-			Renderer.Instance.DrawCombinedTriangleFan (texture1, texture2, vertices, numCoords);
+			Renderer.DrawCombinedTriangleFan (texture1, texture2, vertices, numCoords);
 		}
 
 		public override void Render ()
@@ -159,8 +159,8 @@ namespace Lime
 				if (GetArgs (out arg1, out arg2)) {
 					if (arg1.WorldShown && arg2.WorldShown) {
 						if (arg1.GetTexture () != null && arg2.GetTexture () != null) {
-							Renderer.Instance.WorldMatrix = Parent.Widget.WorldMatrix;
-							Renderer.Instance.Blending = Blending.Alpha;
+							Renderer.WorldMatrix = Parent.Widget.WorldMatrix;
+							Renderer.Blending = Blending.Alpha;
 							RenderHelper (arg1, arg2);
 						}
 					}
