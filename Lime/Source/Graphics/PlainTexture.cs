@@ -229,7 +229,7 @@ namespace Lime
 				pitchOrLinearSize /= 4;
 				width /= 2;
 				height /= 2;
-				Renderer.Instance.CheckErrors ();
+				Renderer.CheckErrors ();
 			}
 		}
 #endif
@@ -252,7 +252,7 @@ namespace Lime
 #else
 			// Generate a new texture.
 			id = (uint)GL.GenTexture ();
-			Renderer.Instance.SetTexture (id, 0);
+			Renderer.SetTexture (id, 0);
 			GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
 			GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
 			GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureParameterName.ClampToEdge);
@@ -293,7 +293,7 @@ namespace Lime
 #else
 			// Generate a new texture.
 			id = (uint)GL.GenTexture ();
-			Renderer.Instance.SetTexture (id, 0);
+			Renderer.SetTexture (id, 0);
 			GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
 			GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
 			GL.TexParameter (TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureParameterName.ClampToEdge);

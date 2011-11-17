@@ -41,4 +41,3 @@ namespace Lime
 		public virtual DeviceOrientation GetSupportedDeviceOrientations () { return DeviceOrientation.LandscapeLeft; }
 	}
 }
-

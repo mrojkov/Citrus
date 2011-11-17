@@ -11,7 +11,7 @@ namespace Lime
 {
 	internal class GameController : NSObject, IGameWindow
 	{
-		NSWindow window;		
+		NSWindow window;
 		GameView view;
 		Size windowSize;
 		

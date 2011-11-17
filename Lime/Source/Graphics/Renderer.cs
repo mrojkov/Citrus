@@ -435,12 +435,14 @@ namespace Lime
 			v.Pos = WorldMatrix.TransformVector (position.X, position.Y + size.Y);
 			v.UV1.X = uv0.X;
 			batchVertices [i + 2] = v;
-			batchIndices [currentIndex++] = (ushort)(i + 0);
-			batchIndices [currentIndex++] = (ushort)(i + 1);
-			batchIndices [currentIndex++] = (ushort)(i + 2);
-			batchIndices [currentIndex++] = (ushort)(i + 2);
-			batchIndices [currentIndex++] = (ushort)(i + 1);
-			batchIndices [currentIndex++] = (ushort)(i + 3);
+			int j = currentIndex;
+			currentIndex += 6;
+			batchIndices [j] = (ushort)(i + 0);
+			batchIndices [j + 1] = (ushort)(i + 1);
+			batchIndices [j + 2] = (ushort)(i + 2);
+			batchIndices [j + 3] = (ushort)(i + 2);
+			batchIndices [j + 4] = (ushort)(i + 1);
+			batchIndices [j + 5] = (ushort)(i + 3);
 		}
 		
 		public static void DrawTriangleFan (ITexture texture, Vertex[] vertices, int numVertices)
