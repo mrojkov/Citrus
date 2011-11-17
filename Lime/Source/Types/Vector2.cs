@@ -116,7 +116,10 @@ namespace Lime
 			if (radians == 0) {
 				return new Vector2 (1, 0);
 			} else {
-				return new Vector2 ((float)Math.Cos (radians), (float)Math.Sin (radians));
+				Vector2 result;
+				Utils.FastSinCos (radians, out result.X, out result.Y);
+				return result;
+				//return new Vector2 ((float)Math.Cos (radians), (float)Math.Sin (radians));
 			}
 		}
 
