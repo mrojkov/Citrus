@@ -67,13 +67,13 @@ namespace Lime
 
 		void ApplyBone (BoneWeight bw, Vector2 sourceVector, ref Vector2 resultVector, ref float overallWeight)
 		{
-			if (bw.Index > 0 && bw.Index < items.Length) {
+			if (items != null && bw.Index > 0 && bw.Index < items.Length) {
 				BoneArray.Entry e = items [bw.Index];
 				resultVector += bw.Weight * e.RelativeTransform.TransformVector (sourceVector);
 				overallWeight += bw.Weight;
 			}
 		}
-        
+
 		public Vector2 ApplySkinningToVector (Vector2 vector, SkinningWeights weights)
 		{
 			Vector2 result = Vector2.Zero;
@@ -82,10 +82,10 @@ namespace Lime
 			ApplyBone (weights.Bone1, vector, ref result, ref overallWeight);
 			ApplyBone (weights.Bone2, vector, ref result, ref overallWeight);
 			ApplyBone (weights.Bone3, vector, ref result, ref overallWeight);
-			if (overallWeight < 0.0f)
+			if (overallWeight < 0)
 				result = vector;
-			else if (overallWeight >= 0.0f && overallWeight < 1.0f)
-				result += (1.0f - overallWeight) * vector;
+			else if (overallWeight >= 0 && overallWeight < 1)
+				result += (1 - overallWeight) * vector;
 			else {
 				result.X /= overallWeight;
 				result.Y /= overallWeight;

@@ -104,7 +104,7 @@ namespace Lime
 		public static Vector2 Normalize (Vector2 value)
 		{
 			float length = value.Length;
-			if (length > 0.0f) {
+			if (length > 0) {
 				value.X /= length;
 				value.Y /= length;
 			}
@@ -117,8 +117,9 @@ namespace Lime
 				return new Vector2 (1, 0);
 			} else {
 				Vector2 result;
-				Utils.FastSinCos (radians, out result.X, out result.Y);
+				Utils.FastSinCos (radians, out result.Y, out result.X);
 				return result;
+				// No more slow sine/cosine!
 				//return new Vector2 ((float)Math.Cos (radians), (float)Math.Sin (radians));
 			}
 		}

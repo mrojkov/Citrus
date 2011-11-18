@@ -114,6 +114,12 @@
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\3rdParty\FMod\fmodex-dotnet.csproj">
+      <Project>{349A97D5-AC8E-44E1-AFD0-527F0A2C6367}</Project>
+      <Name>fmodex-dotnet</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

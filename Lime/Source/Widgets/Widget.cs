@@ -57,20 +57,18 @@ namespace Lime
 
 		[ProtoMember (4)]
 		public Vector2 Scale { get; set; }
-		
+
 		private float rotation;
-		private Vector2 sincos = new Vector2 (1, 0);
+		private Vector2 direction = new Vector2 (1, 0);
 
 		[ProtoMember(5), DefaultValue (0)]
 		public float Rotation { 
 			get {
 				return rotation;
-			} 
+			}
 			set {
 				rotation = value;
-				float a = Utils.DegreesToRadians * Rotation;
-				sincos.X = (float)Math.Cos (a);
-				sincos.Y = (float)Math.Sin (a);
+				direction = Vector2.CosSin (Utils.DegreesToRadians * value);
 			}
 		}
 
@@ -102,8 +100,8 @@ namespace Lime
 
 		public Matrix32 LocalMatrix {
 			get {
-				var u = new Vector2 (sincos.X * Scale.X, sincos.Y * Scale.X);
-				var v = new Vector2 (-sincos.Y * Scale.Y, sincos.X * Scale.Y);
+				var u = new Vector2 (direction.X * Scale.X, direction.Y * Scale.X);
+				var v = new Vector2 (-direction.Y * Scale.Y, direction.X * Scale.Y);
 				Vector2 translation = Position;
 				Vector2 center = Vector2.Scale (Size, Pivot);
 				Matrix32 matrix;
@@ -213,46 +211,45 @@ namespace Lime
 
 		void ApplyAnchors ()
 		{
-			Vector2 currentSize = Parent.Widget.Size;
-			if (parentSize.HasValue && !parentSize.Value.Equals (currentSize)) {
+			Vector2 s = Parent.Widget.Size;
+			if (parentSize.HasValue && !parentSize.Value.Equals (s)) {
 				// Apply anchors along X axis.
 				if ((Anchors & Anchors.CenterH) != 0) {
-					Position += new Vector2 ((currentSize.X - parentSize.Value.X) / 2, 0);
+					X += (s.X - parentSize.Value.X) / 2;
 				} else if ((Anchors & Anchors.Left) != 0 && (Anchors & Anchors.Right) != 0) {
-					Size += new Vector2 (currentSize.X - parentSize.Value.X, 0);
-					Position += new Vector2 ((currentSize.X - parentSize.Value.X) * Pivot.X, 0);
+					Width += s.X - parentSize.Value.X;
+					X += (s.X - parentSize.Value.X) * Pivot.X;
 				} else if ((Anchors & Anchors.Right) != 0) {
-					Position += new Vector2 (currentSize.X - parentSize.Value.X, 0);
+					X += s.X - parentSize.Value.X;
 				}
-
 				// Apply anchors along Y axis.
 				if ((Anchors & Anchors.CenterV) != 0) {
-					Position += new Vector2 (0, (currentSize.Y - parentSize.Value.Y) / 2);
+					Y += (s.Y - parentSize.Value.Y) / 2;
 				} else if ((Anchors & Anchors.Top) != 0 && (Anchors & Anchors.Bottom) != 0) {
-					Size += new Vector2 (0, currentSize.Y - parentSize.Value.Y);
-					Position += new Vector2 (0, (currentSize.Y - parentSize.Value.Y) * Pivot.Y);
+					Height += s.Y - parentSize.Value.Y;
+					Y += (s.Y - parentSize.Value.Y) * Pivot.Y;
 				} else if ((Anchors & Anchors.Bottom) != 0) {
-					Position += new Vector2 (0, currentSize.Y - parentSize.Value.Y);
+					Y += s.Y - parentSize.Value.Y;
 				}
 			}
-			parentSize = currentSize;
+			parentSize = s;
 		}
 
 		public virtual bool HitTest (Vector2 point)
 		{
 			if (worldShown) {
 				if (HitTestMethod == HitTestMethod.BoundingRect) {
-					Vector2 pt = worldMatrix.CalcInversed ().TransformVector (point);
-					Vector2 sz = Size;
-					if (sz.X < 0) {
-						pt.X = -pt.X;
-						sz.X = -sz.X;
+					Vector2 p = worldMatrix.CalcInversed ().TransformVector (point);
+					Vector2 s = Size;
+					if (s.X < 0) {
+						p.X = -p.X;
+						s.X = -s.X;
 					}
-					if (sz.Y < 0) {
-						pt.Y = -pt.Y;
-						sz.Y = -sz.Y;
+					if (s.Y < 0) {
+						p.Y = -p.Y;
+						s.Y = -s.Y;
 					}
-					return pt.X >= 0 && pt.Y >= 0 && pt.X < sz.X && pt.Y < sz.Y;
+					return p.X >= 0 && p.Y >= 0 && p.X < s.X && p.Y < s.Y;
 				} else if (HitTestMethod == HitTestMethod.Contents) {
 					foreach (Node node in Nodes) {
 						if (node.Widget != null && node.Widget.HitTest (point))
@@ -264,6 +261,16 @@ namespace Lime
 			return false;
 		}
 		
+		#endregion
+		#region Utils
+		public static void Center (Widget widget)
+		{
+			if (widget.Parent == null) {
+				throw new Lime.Exception ("Parent must not be null");
+			}
+			widget.Position = widget.Parent.Widget.Size * 0.5f;
+			widget.Pivot = Vector2.Half;
+		}
 		#endregion
 	}
 }
