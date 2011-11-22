@@ -53,6 +53,7 @@ namespace Lime
 	}
 
 	[ProtoContract]
+	[Flags]
 	public enum AudioFlags
 	{
 		[ProtoEnum]
@@ -66,6 +67,7 @@ namespace Lime
 	[ProtoContract]
 	public class Audio : Node
 	{
+		
 		[ProtoMember (1)]
 		public PersistentSound Sound { get; set; }
 
@@ -81,7 +83,7 @@ namespace Lime
 		[ProtoMember (5)]
 		public float Pan { get; set; }
 
-		[ProtoMember (6)]
+		[Trigger]
 		public AudioAction Action { get; set; }
 
 		[ProtoMember (7)]
@@ -89,5 +91,13 @@ namespace Lime
 
 		[ProtoMember (8)]
 		public float Prioriry { get; set; }
+
+		protected internal virtual void OnTrigger (string property)
+		{
+			if (property != "Action") {
+				base.OnTrigger (property);
+				return;
+			}
+		}
 	}
 }

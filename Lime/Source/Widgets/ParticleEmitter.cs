@@ -448,7 +448,7 @@ namespace Lime
 		Vector2 GenerateRandomMotionControlPoint (ref float rayDirection)
 		{
 			rayDirection += RandomMotionRotation.UniformRandomNumber ();
-			Vector2 result = Vector2.CosSin (Utils.DegreesToRadians * rayDirection);
+			Vector2 result = Utils.CosSin (Utils.DegreesToRadians * rayDirection);
 			NumericRange radius = RandomMotionRadius;
 			if (radius.Variation == 0)
 				radius.Variation = radius.Median;
@@ -622,10 +622,10 @@ namespace Lime
 				p.RegularPosition += windVelocity * delta * windDirection;
 			}
 			if (p.GravityVelocity != 0) {
-				var gravityDirection = Vector2.CosSin (Utils.DegreesToRadians * p.GravityDirection);
+				var gravityDirection = Utils.CosSin (Utils.DegreesToRadians * p.GravityDirection);
 				p.RegularPosition += p.GravityVelocity * delta * gravityDirection;
 			}
-			var direction = Vector2.CosSin (Utils.DegreesToRadians * p.RegularDirection);
+			var direction = Utils.CosSin (Utils.DegreesToRadians * p.RegularDirection);
 			float velocity = p.Velocity * modifier.Velocity;
 
 			p.RegularDirection += p.AngularVelocity * modifier.AngularVelocity * delta;
@@ -682,7 +682,7 @@ namespace Lime
 					angle += p.FullDirection;
 				Vector2 imageSize = (Vector2)texture.ImageSize;
 				Vector2 particleSize = p.ScaleCurrent * imageSize;
-				Vector2 orientation = Vector2.CosSin (Utils.DegreesToRadians * angle);
+				Vector2 orientation = Utils.CosSin (Utils.DegreesToRadians * angle);
 				Matrix32 transform = new Matrix32 {
 					U = particleSize.X * orientation,
 					V = particleSize.Y * new Vector2 (-orientation.Y, orientation.X),

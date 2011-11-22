@@ -12,40 +12,34 @@ namespace Lime
 		public const float DegreesToRadians = Pi / 180;
 		public const float RadiansToDegrees = 180 / Pi;
 
-		static bool sinTableReady = false;
-		static float [] CosTab0 = new float [256];
-		static float [] SinTab0 = new float [256];
-		static float [] CosTab1 = new float [256];
-		static float [] SinTab1 = new float [256];
+		static bool sinTableBuilt = false;
+		static Vector2 [] sinTable0 = new Vector2 [256];
+		static Vector2 [] sinTable1 = new Vector2 [256];
 
 		static void InitSinTable ()
 		{
 			float t1 = 2 * Pi / 256;
 			float t2 = t1 / 256;
 			for (int i = 0; i < 256; i++) {
-				CosTab0 [i] = (float)Math.Cos (i * t1);
-				SinTab0 [i] = (float)Math.Sin (i * t1);
-				CosTab1 [i] = (float)Math.Cos (i * t2);
-				SinTab1 [i] = (float)Math.Sin (i * t2);
+				sinTable0 [i] = new Vector2 ((float)Math.Cos (i * t1), (float)Math.Sin (i * t1));
+				sinTable1 [i] = new Vector2 ((float)Math.Cos (i * t2), (float)Math.Sin (i * t2));
 			}
 		}
 
-		public static void FastSinCos (float x, out float sin, out float cos)
+		public static Vector2 CosSin (float x)
 		{
-			if (!sinTableReady) {
-				sinTableReady = true;
+			if (!sinTableBuilt) {
+				sinTableBuilt = true;
 				InitSinTable ();
 			}
 			const float t = 65536 / (2 * Pi);
 			int index = (int)(x * t) & 65535;
-			int a = index >> 8;
-			int b = index & 255;
-			var sa = SinTab0 [a];
-			var ca = CosTab0 [a];
-			var sb = SinTab1 [b];
-			var cb = CosTab1 [b];
-			sin = sa * cb + ca * sb;
-			cos = ca * cb - sa * sb;
+			var a = sinTable0 [index >> 8];
+			var b = sinTable1 [index & 255];
+			Vector2 result;
+			result.X = a.X * b.X - a.Y * b.Y;
+			result.Y = a.Y * b.X + a.X * b.Y;
+			return result;
 		}
 
 		public static int Random (int maxValue)

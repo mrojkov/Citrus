@@ -93,6 +93,8 @@ namespace Orange
 						Lime.Serialization.WriteObjectToBundle<Lime.Node> (AssetsBundle, dstPath, node);
 						return true;
 					});
+					SyncUpdated ("*.mp3", ".mp3", null);
+					SyncUpdated ("*.ogg", ".ogg", null);
 				}
 			} finally {
 				AssetsBundle.Close ();
@@ -150,7 +152,7 @@ namespace Orange
 					}
 					else {
  						Console.WriteLine ((cached ? "* " : "+ ") + dstPath);
-						using (Stream stream = new FileStream (srcPath, FileMode.Open)) {
+						using (Stream stream = new FileStream (srcPath, FileMode.Open, FileAccess.Read)) {
 							Helpers.CreateDirectoryRecursive (Path.GetDirectoryName (dstPath));
 							AssetsBundle.ImportFile (dstPath, stream, 0);
 						}

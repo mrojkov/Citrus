@@ -79,12 +79,12 @@ namespace Orange
 					propertyName = s [0];
 					className = s [1];
 					switch (propertyName) {
-                    case "TexCoordForMins":
-                        propertyName = "UV0";
-                        break;
-                    case "TexCoordForMaxs":
-                        propertyName = "UV1";
-                        break;
+					case "TexCoordForMins":
+						propertyName = "UV0";
+					break;
+					case "TexCoordForMaxs":
+						propertyName = "UV1";
+					break;
 					case "TexturePath":
 						propertyName = "Texture";
 						break;
@@ -107,6 +107,9 @@ namespace Orange
 						break;
 					case "Blending@Hot::MaskedEffect":
 						animator = new GenericAnimator<Blending> ();
+						break;
+					case "Action@Hot::Audio":
+						animator = new GenericAnimator<AudioAction> ();
 						break;
 					default:
 						animator = node.Animators [propertyName]; 

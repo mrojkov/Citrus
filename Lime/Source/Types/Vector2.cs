@@ -113,15 +113,9 @@ namespace Lime
 
 		public static Vector2 CosSin (float radians)
 		{
-			if (radians == 0) {
-				return new Vector2 (1, 0);
-			} else {
-				Vector2 result;
-				Utils.FastSinCos (radians, out result.Y, out result.X);
-				return result;
-				// No more slow sine/cosine!
-				//return new Vector2 ((float)Math.Cos (radians), (float)Math.Sin (radians));
-			}
+			return Utils.CosSin (radians);
+			// No more slow sine/cosine!
+			//return new Vector2 ((float)Math.Cos (radians), (float)Math.Sin (radians));
 		}
 
 		public static Vector2 Rotate (Vector2 value, float radians)

@@ -6,23 +6,24 @@ using ProtoBuf;
 
 namespace Lime
 {
-    [ProtoContract]
-    public class PersistentSound
-    {
-        private PersistentSoundCore core;
+	[ProtoContract]
+	public class PersistentSound
+	{
+		PersistentSoundCore core;
 
-        public PersistentSound()
-        {
-            core = SoundPool.Instance.GetPersistentSoundCore("");
-        }
+		public PersistentSound ()
+		{
+			core = SoundPool.Instance.GetPersistentSoundCore ("");
+		}
 
-        public PersistentSound (string path)
+		public PersistentSound (string path)
 		{
 			core = SoundPool.Instance.GetPersistentSoundCore (path);
 		}
 
-		[ProtoMember(1)]
-		public string SerializationPath {
+		[ProtoMember (1)]
+		public string SerializationPath
+		{
 			get {
 				var path = Serialization.ShrinkPath (Path);
 				return path;
@@ -32,80 +33,76 @@ namespace Lime
 				core = SoundPool.Instance.GetPersistentSoundCore (path);
 			}
 		}
-		
 
-        public string Path { get { return core.Path; } }
-    }
+		public string Path { get { return core.Path; } }
+	}
 
-    internal class PersistentSoundCore
-    {
-        public readonly string Path;
+	internal class PersistentSoundCore
+	{
+		public readonly string Path;
 
-        public PersistentSoundCore(string path)
-        {
-            Path = path;
-        }
+		public PersistentSoundCore (string path)
+		{
+			Path = path;
+		}
 
-        ~PersistentSoundCore()
-        {
-            Discard();
-        }
+		~PersistentSoundCore ()
+		{
+			Discard ();
+		}
 
-        public void Discard()
-        {
-            //if (instance != null)
-            //{
-            //    if (instance is IDisposable)
-            //        (instance as IDisposable).Dispose();
-            //    instance = null;
-            //}
-        }
+		public void Discard ()
+		{
+			//if (instance != null)
+			//{
+			//    if (instance is IDisposable)
+			//        (instance as IDisposable).Dispose();
+			//    instance = null;
+			//}
+		}
 
-        public void DiscardIfNotUsed()
-        {
-            Discard();
-        }
-    }
+		public void DiscardIfNotUsed ()
+		{
+			Discard ();
+		}
+	}
 
-    public sealed class SoundPool
-    {
-        Dictionary<string, WeakReference> items;
-        static readonly SoundPool instance = new SoundPool();
+	public sealed class SoundPool
+	{
+		Dictionary<string, WeakReference> items;
+		static readonly SoundPool instance = new SoundPool ();
 
-        public static SoundPool Instance { get { return instance; } }
+		public static SoundPool Instance { get { return instance; } }
 
-        private SoundPool()
-        {
-            items = new Dictionary<string, WeakReference>();
-        }
+		private SoundPool ()
+		{
+			items = new Dictionary<string, WeakReference> ();
+		}
 
-        public void DiscardUnused()
-        {
-            foreach (WeakReference r in items.Values)
-            {
-                if (r.IsAlive)
-                    (r.Target as PersistentSoundCore).DiscardIfNotUsed();
-            }
-        }
+		public void DiscardUnused ()
+		{
+			foreach (WeakReference r in items.Values) {
+				if (r.IsAlive)
+					(r.Target as PersistentSoundCore).DiscardIfNotUsed ();
+			}
+		}
 
-        public void DiscardAll()
-        {
-            foreach (WeakReference r in items.Values)
-            {
-                if (r.IsAlive)
-                    (r.Target as PersistentSoundCore).Discard();
-            }
-        }
+		public void DiscardAll ()
+		{
+			foreach (WeakReference r in items.Values) {
+				if (r.IsAlive)
+					(r.Target as PersistentSoundCore).Discard ();
+			}
+		}
 
-        internal PersistentSoundCore GetPersistentSoundCore(string path)
-        {
-            WeakReference r;
-            if (!items.TryGetValue(path, out r) || !r.IsAlive)
-            {
-                r = new WeakReference(new PersistentSoundCore(path));
-                items[path] = r;
-            }
-            return r.Target as PersistentSoundCore;
-        }
-    }
+		internal PersistentSoundCore GetPersistentSoundCore (string path)
+		{
+			WeakReference r;
+			if (!items.TryGetValue (path, out r) || !r.IsAlive) {
+				r = new WeakReference (new PersistentSoundCore (path));
+				items [path] = r;
+			}
+			return r.Target as PersistentSoundCore;
+		}
+	}
 }

@@ -2840,10 +2840,10 @@ namespace FMOD
         [DllImport (VERSION.dll, CharSet = CharSet.Ansi)]  
         private static extern RESULT FMOD_System_CreateStream           (IntPtr system, string name_or_data, MODE mode, ref CREATESOUNDEXINFO exinfo, ref IntPtr sound);
         
-        [DllImport(VERSION.dll, CharSet = CharSet.Ansi)]
+        [DllImport(VERSION.dll, CharSet=CharSet.Unicode)]//, CharSet = CharSet.Ansi)]
         private static extern RESULT FMOD_System_CreateSound            (IntPtr system, string name_or_data, MODE mode, int exinfo, ref IntPtr sound);
         
-        [DllImport(VERSION.dll, CharSet = CharSet.Ansi)]
+        [DllImport(VERSION.dll, CharSet=CharSet.Unicode)]//, CharSet = CharSet.Ansi)]
         private static extern RESULT FMOD_System_CreateStream           (IntPtr system, string name_or_data, MODE mode, int exinfo, ref IntPtr sound);   
         [DllImport (VERSION.dll)]   
         private static extern RESULT FMOD_System_CreateSound            (IntPtr system, byte[] name_or_data, MODE mode, ref CREATESOUNDEXINFO exinfo, ref IntPtr sound);

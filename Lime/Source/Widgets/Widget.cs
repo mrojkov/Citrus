@@ -68,7 +68,7 @@ namespace Lime
 			}
 			set {
 				rotation = value;
-				direction = Vector2.CosSin (Utils.DegreesToRadians * value);
+				direction = Utils.CosSin (Utils.DegreesToRadians * value);
 			}
 		}
 
@@ -102,13 +102,12 @@ namespace Lime
 			get {
 				var u = new Vector2 (direction.X * Scale.X, direction.Y * Scale.X);
 				var v = new Vector2 (-direction.Y * Scale.Y, direction.X * Scale.Y);
-				Vector2 translation = Position;
-				Vector2 center = Vector2.Scale (Size, Pivot);
+				Vector2 center = Size * Pivot;
 				Matrix32 matrix;
 				matrix.U = u;
 				matrix.V = v;
-				matrix.T.X = -(center.X * u.X) - center.Y * v.X + translation.X;
-				matrix.T.Y = -(center.X * u.Y) - center.Y * v.Y + translation.Y;
+				matrix.T.X = -(center.X * u.X) - center.Y * v.X + X;
+				matrix.T.Y = -(center.X * u.Y) - center.Y * v.Y + Y;
 				return matrix;
 			}
 		}
