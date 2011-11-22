@@ -150,7 +150,7 @@ namespace Lime
 				case KeyFunction.Spline:
 					{
 						int count = Frames.Count;
-						int a = i < 1 ? 0 : i - 2;
+						int a = i < 1 ? 0 : i - 1;
 						int b = i;
 						int c = i + 1;
 						int d = c + 1 >= count - 1 ? count - 1 : c + 1;
@@ -289,6 +289,11 @@ namespace Lime
 		protected override void ApplyValue (float t, int a, int b)
 		{
 			Setter (Vector2.Lerp (V [a], V [b], t));
+		}
+
+		protected override void ApplyValue (float t, int a, int b, int c, int d)
+		{
+			Setter (Utils.CatmullRomSpline (t, V [a], V [b], V [c], V [d]));
 		}
 	}
 
