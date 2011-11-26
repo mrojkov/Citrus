@@ -81,7 +81,7 @@ namespace Orange
 						var importer = new HotFontImporter (srcPath);
 						var font = importer.ParseFont (size);
 						var texturePath = Lime.AssetsBundle.CorrectSlashes (Path.ChangeExtension (dstPath, null));
-						font.Texture = new Lime.PersistentTexture (texturePath);
+						font.Texture = new Lime.SerializableTexture (texturePath);
 						Helpers.CreateDirectoryRecursive (Path.GetDirectoryName (dstPath));
 						Lime.Serialization.WriteObjectToBundle<Lime.Font> (AssetsBundle, dstPath, font);
 						return true;

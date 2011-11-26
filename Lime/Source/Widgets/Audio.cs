@@ -1,48 +1,10 @@
 using System;
 using Lime;
 using ProtoBuf;
+using System.ComponentModel;
 
 namespace Lime
 {
-	[ProtoContract]
-	public enum SoundGroup
-	{
-		[ProtoEnum]
-		Master,
-		[ProtoEnum]
-		Music,
-		[ProtoEnum]
-		MusicSub0,
-		[ProtoEnum]
-		MusicSub1,
-		[ProtoEnum]
-		Ambient,
-		[ProtoEnum]
-		AmbientSub0,
-		[ProtoEnum]
-		AmbientSub1,
-		[ProtoEnum]
-		Sfx,
-		[ProtoEnum]
-		SfxSub0,
-		[ProtoEnum]
-		SfxSub1,
-		[ProtoEnum]
-		SfxSub2,
-		[ProtoEnum]
-		SfxSub3,
-		[ProtoEnum]
-		SfxSub4,
-		[ProtoEnum]
-		SfxSub5,
-		[ProtoEnum]
-		UI,
-		[ProtoEnum]
-		UISub0,
-		[ProtoEnum]
-		UISub1
-	};
-
 	[ProtoContract]
 	public enum AudioAction
 	{
@@ -53,50 +15,87 @@ namespace Lime
 	}
 
 	[ProtoContract]
-	[Flags]
-	public enum AudioFlags
-	{
-		[ProtoEnum]
-		Continual = 1,
-		[ProtoEnum]
-		Streamed = 2,
-		[ProtoEnum]
-		Looped = 4
-	}
-
-	[ProtoContract]
 	public class Audio : Node
 	{
-		
+		AudioChannel channel;
+
 		[ProtoMember (1)]
-		public PersistentSound Sound { get; set; }
+		public SerializableSound Sound { get; set; }
 
-		[ProtoMember (2)]
-		public AudioFlags Flags { get; set; }
+		[ProtoMember (2), DefaultValue (false)]
+		public bool Looping { get; set; }
 
-		[ProtoMember (3)]
+		[ProtoMember (3), DefaultValue (0)]
 		public float FadeTime { get; set; }
 
-		[ProtoMember (4)]
-		public float Volume { get; set; }
+		float volume = 1;
+		[ProtoMember (4), DefaultValue (1)]
+		public float Volume
+		{
+			get { return volume; }
+			set
+			{
+				volume = value;
+				if (channel != null) {
+					channel.Volume = volume;
+				}
+			}
+		}
 
-		[ProtoMember (5)]
-		public float Pan { get; set; }
+		float pan = 0;
+		[ProtoMember (5), DefaultValue (0)]
+		public float Pan
+		{
+			get { return pan; }
+			set
+			{
+				pan = value;
+				if (channel != null) {
+					channel.Pan = pan;
+				}
+			}
+		}
 
 		[Trigger]
 		public AudioAction Action { get; set; }
 
-		[ProtoMember (7)]
-		public SoundGroup Group { get; set; }
+		[ProtoMember (7), DefaultValue (AudioChannelGroup.Effects)]
+		public AudioChannelGroup Group { get; set; }
 
-		[ProtoMember (8)]
-		public float Prioriry { get; set; }
+		[ProtoMember (8), DefaultValue (0)]
+		public int Priority { get; set; }
 
-		protected internal virtual void OnTrigger (string property)
+		void Play ()
 		{
-			if (property != "Action") {
+			var channel = Sound.Play (AudioChannelGroup.Effects, true, Priority);
+			if (channel != null) {
+				channel.Looping = Looping;
+				channel.Volume = Volume;
+				channel.Pan = Pan;
+				channel.OnStop = (x) => {
+					channel = null;
+				};
+				channel.Resume ();
+			}
+		}
+
+		void Stop ()
+		{
+			if (channel != null) {
+				channel.Stop ();
+			}
+		}
+
+		protected internal override void OnTrigger (string property)
+		{
+			if (property == "Action") {
+				if (Action == AudioAction.Play) {
+					Play ();
+				} else {
+					Stop ();
+				}
+			} else {
 				base.OnTrigger (property);
-				return;
 			}
 		}
 	}

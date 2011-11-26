@@ -7,7 +7,7 @@ namespace Lime
     public class SimpleText : Widget
     {
         [ProtoMember(1)]
-        public PersistentFont Font = new PersistentFont();
+        public SerializableFont Font = new SerializableFont();
 
         [ProtoMember(2)]
         public string Text;

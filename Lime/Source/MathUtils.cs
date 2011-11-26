@@ -93,6 +93,12 @@ namespace Lime
 
 		public static Vector2 HermiteSpline (float t, Vector2 p0, Vector2 m0, Vector2 p1, Vector2 m1)
 		{
+			return new Vector2 (HermiteSpline (t, p0.X, m0.X, p1.X, m1.X),
+				HermiteSpline (t, p0.Y, m0.Y, p1.Y, m1.Y));
+		}
+
+		public static float HermiteSpline (float t, float p0, float m0, float p1, float m1)
+		{
 			float t2 = t * t;
 			float t3 = t2 * t;
 			return (2.0f * t3 - 3.0f * t2 + 1.0f) * p0 + (t3 - 2.0f * t2 + t) * m0 +
@@ -100,6 +106,12 @@ namespace Lime
 		}
 
 		public static Vector2 CatmullRomSpline (float t, Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3)
+		{
+			return new Vector2 (CatmullRomSpline (t, p0.X, p1.X, p2.X, p3.X),
+				CatmullRomSpline (t, p0.Y, p1.Y, p2.Y, p3.Y));
+		}
+
+		public static float CatmullRomSpline (float t, float p0, float p1, float p2, float p3)
 		{
 			float t2 = t * t;
 			float t3 = t2 * t;

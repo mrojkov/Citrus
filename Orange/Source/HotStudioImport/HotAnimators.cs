@@ -42,10 +42,10 @@ namespace Orange
 				case "Texture@Hot::DistortionMesh":
 				case "Texture@Hot::NineGrid":
 					return delegate() {
-						return new PersistentTexture (lexer.ParsePath ()); };
+						return new SerializableTexture (lexer.ParsePath ()); };
 				case "File@Audio":
 					return delegate() {
-						return new PersistentSound (lexer.ParsePath ()); };
+						return new SerializableSound (lexer.ParsePath ()); };
 				default:
 					return delegate() {
 						return lexer.ParseQuotedString (); };
@@ -107,9 +107,6 @@ namespace Orange
 						break;
 					case "Blending@Hot::MaskedEffect":
 						animator = new GenericAnimator<Blending> ();
-						break;
-					case "Action@Hot::Audio":
-						animator = new GenericAnimator<AudioAction> ();
 						break;
 					default:
 						animator = node.Animators [propertyName]; 

@@ -29,7 +29,7 @@ namespace Lime
 	public class Frame : Widget, IImageCombinerArg
 	{
 		RenderTarget renderTarget;
-		PersistentTexture renderTexture;
+		SerializableTexture renderTexture;
 
 		[ProtoMember(1)]
 		public RenderTarget RenderTarget {
@@ -39,16 +39,16 @@ namespace Lime
 				renderedToTexture = value != RenderTarget.None;
 				switch (value) {
 				case RenderTarget.A:
-					renderTexture = new PersistentTexture ("#a");
+					renderTexture = new SerializableTexture ("#a");
 					break;
 				case RenderTarget.B:
-					renderTexture = new PersistentTexture ("#b");
+					renderTexture = new SerializableTexture ("#b");
 					break;
 				case RenderTarget.C:
-					renderTexture = new PersistentTexture ("#c");
+					renderTexture = new SerializableTexture ("#c");
 					break;
 				case RenderTarget.D:
-					renderTexture = new PersistentTexture ("#d");
+					renderTexture = new SerializableTexture ("#d");
 					break;
 				default:
 					renderTexture = null;

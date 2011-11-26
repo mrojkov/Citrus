@@ -60,9 +60,9 @@ namespace Lime
 		[DefaultValue (true)]
 		public bool LoopedAnimation { get; set; }
 
-		PersistentTexture texture = new PersistentTexture ();
+		SerializableTexture texture = new SerializableTexture ();
 		[ProtoMember (14)]
-		public PersistentTexture Texture { get { return texture; } set { texture = value; textures = null; } }
+		public SerializableTexture Texture { get { return texture; } set { texture = value; textures = null; } }
 
 		public ParticleModifier ()
 		{
@@ -101,17 +101,17 @@ namespace Lime
 			return false;
 		}
 
-		List<PersistentTexture> textures;
-		internal PersistentTexture GetTexture (int index)
+		List<SerializableTexture> textures;
+		internal SerializableTexture GetTexture (int index)
 		{
 			if (textures == null) {
-				textures = new List<PersistentTexture> ();
+				textures = new List<SerializableTexture> ();
 				var path = texture.Path;
 				for (int i = 0; i < 100; i++) {
 					if (!ChangeTextureFrameIndex (ref path, i))
 						break;
 					if (File.Exists (path)) {
-						var t = new PersistentTexture (path);
+						var t = new SerializableTexture (path);
 						textures.Add (t);
 					} else if (i > 0)
 						break;

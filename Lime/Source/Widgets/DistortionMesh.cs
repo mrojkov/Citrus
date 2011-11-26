@@ -13,13 +13,13 @@ namespace Lime
 		public int NumRows { get; set; }
 
 		[ProtoMember(3)]
-		public PersistentTexture Texture { get; set; }
+		public SerializableTexture Texture { get; set; }
 		
 		public DistortionMesh ()
 		{
 			NumCols = 2;
 			NumRows = 2;
-			Texture = new PersistentTexture ();
+			Texture = new SerializableTexture ();
 		}
 		
 		DistortionMeshPoint GetPoint (int row, int col)

@@ -13,18 +13,24 @@ namespace Lime
 			: base (640, 480, new OpenTK.Graphics.GraphicsMode (32, 0, 0, 4))
 		{
 			this.app = app;
+			AudioSystem.Initialize ();
 			app.OnCreate (this);
-			this.Keyboard.KeyDown += HandleKeyboardKeyDown;
+			this.Keyboard.KeyDown += HandleKeyDown;
+			this.Keyboard.KeyUp += HandleKeyUp;
+			this.KeyPress += HandleKeyPress;
 			this.Mouse.ButtonDown += HandleMouseButtonDown;
 			this.Mouse.ButtonUp += HandleMouseButtonUp;
 			this.Mouse.Move += HandleMouseMove;
-			this.KeyPress += HandleKeyPress;
-			this.KeyDown += HandleKeyDown;
-			this.KeyUp += HandleKeyUp;
+			this.Location = new System.Drawing.Point (100, 100);
 		}
 
-		void HandleKeyDown (object sender, KeyboardKeyEventArgs e)
+		void HandleKeyDown (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
 		{
+			if (e.Key == OpenTK.Input.Key.Escape)
+				this.Exit ();
+			if (e.Key == OpenTK.Input.Key.F12) {
+				FullScreen = !FullScreen;
+			}
 			app.OnKeyDown ((Key)e.Key);
 		}
 
@@ -74,15 +80,7 @@ namespace Lime
 		protected override void OnClosed (EventArgs e)
 		{
 			TexturePool.Instance.DiscardAll ();
-		}
-
-		void HandleKeyboardKeyDown (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
-		{
-			if (e.Key == OpenTK.Input.Key.Escape)
-				this.Exit ();
-			if (e.Key == OpenTK.Input.Key.F12) {
-				FullScreen = !FullScreen;
-			}
+			AudioSystem.Terminate ();
 		}
 
 		protected override void OnUpdateFrame (OpenTK.FrameEventArgs e)
@@ -94,6 +92,7 @@ namespace Lime
 			else if (delta > 0.1)
 				delta = 0.1;
 			app.OnUpdateFrame (delta);
+			AudioSystem.ProcessEvents ();
 		}
 		
 		protected override void OnRenderFrame (OpenTK.FrameEventArgs e)

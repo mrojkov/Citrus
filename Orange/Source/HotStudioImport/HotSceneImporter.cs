@@ -36,7 +36,7 @@ namespace Orange
 				lexer.ParseInt ();
 				break;
 			case "Trigger":
-				node.Trigger = lexer.ParseQuotedString ();
+				lexer.ParseQuotedString ();
 				break;
 			case "Tag":
 				node.Tag = lexer.ParseQuotedString ();
@@ -116,7 +116,7 @@ namespace Orange
 			Image img = (Image)node;
 			switch (name) {
 			case "TexturePath":
-				img.Texture = new PersistentTexture (lexer.ParsePath ());
+				img.Texture = new SerializableTexture (lexer.ParsePath ());
 				break;
 			case "TexCoordForMins":
 				img.UV0 = lexer.ParseVector2 ();
@@ -135,7 +135,7 @@ namespace Orange
 			SimpleText text = (SimpleText)node;
 			switch (name) {
 			case "FontName":
-				text.Font = new PersistentFont (lexer.ParseQuotedString ());
+				text.Font = new SerializableFont (lexer.ParseQuotedString ());
 				break;
 			case "Text":
 				text.Text = lexer.ParseQuotedString ();
@@ -169,7 +169,7 @@ namespace Orange
 			ParticleModifier pm = (ParticleModifier)node;
 			switch (name) {
 			case "TexturePath":
-				pm.Texture = new PersistentTexture (lexer.ParsePath ());
+				pm.Texture = new SerializableTexture (lexer.ParsePath ());
 				break;
 			case "FirstFrame":
 				pm.FirstFrame = lexer.ParseInt ();
@@ -378,7 +378,7 @@ namespace Orange
 				mesh.NumCols = lexer.ParseInt ();
 				break;
 			case "TexturePath":
-				mesh.Texture = new PersistentTexture (lexer.ParsePath ());
+				mesh.Texture = new SerializableTexture (lexer.ParsePath ());
 				break;
 			default:
 				ParseGraphicProperty (mesh, name);
@@ -459,19 +459,19 @@ namespace Orange
 			Audio audio = (Audio)node;
 			switch (name) {
 			case "File":
-				audio.Sound = new PersistentSound (lexer.ParsePath ());
+				audio.Sound = new SerializableSound (lexer.ParsePath ());
 				break;
 			case "Flags":
-				audio.Flags = (AudioFlags)lexer.ParseInt ();
+				audio.Looping = (lexer.ParseInt () & 4) != 0;
 				break;
 			case "Action":
-				audio.Action = (AudioAction)lexer.ParseInt ();
+				lexer.ParseInt ();
 				break;
 			case "Group":
-				audio.Group = (SoundGroup)lexer.ParseInt ();
+				lexer.ParseInt ();
 				break;
 			case "Priority":
-				audio.Prioriry = lexer.ParseFloat ();
+				audio.Priority = (int)lexer.ParseFloat ();
 				break;
 			case "FadeTime":
 				audio.FadeTime = lexer.ParseFloat ();

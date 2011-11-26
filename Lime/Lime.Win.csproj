@@ -60,15 +60,17 @@
     <Compile Include="Source\AssetsBundle.cs" />
     <Compile Include="Source\AssetsFolder.cs" />
     <Compile Include="Source\AssetsSource.cs" />
+    <Compile Include="Source\Audio\AudioChannel.cs" />
+    <Compile Include="Source\Audio\AudioDecoder.cs" />
     <Compile Include="Source\Audio\AudioSystem.cs" />
-    <Compile Include="Source\Audio\PersistentSound.cs" />
+    <Compile Include="Source\Audio\SerializableSound.cs" />
     <Compile Include="Source\Exception.cs" />
     <Compile Include="Source\Graphics\Font.cs" />
-    <Compile Include="Source\Graphics\PersistentFont.cs" />
-    <Compile Include="Source\Graphics\PersistentTexture.cs" />
     <Compile Include="Source\Graphics\PlainTexture.cs" />
     <Compile Include="Source\Graphics\Renderer.cs" />
     <Compile Include="Source\Graphics\RenderTexture.cs" />
+    <Compile Include="Source\Graphics\SerializableFont.cs" />
+    <Compile Include="Source\Graphics\SerializableTexture.cs" />
     <Compile Include="Source\Graphics\Texture.cs" />
     <Compile Include="Source\Graphics\TextureAtlasPart.cs" />
     <Compile Include="Source\Input\Input.cs" />
@@ -116,9 +118,9 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\3rdParty\FMod\fmodex-dotnet.csproj">
-      <Project>{349A97D5-AC8E-44E1-AFD0-527F0A2C6367}</Project>
-      <Name>fmodex-dotnet</Name>
+    <ProjectReference Include="..\3rdParty\DragonOgg\DragonOgg.csproj">
+      <Project>{BB438628-F3CB-4E04-8E25-5A332C010FA5}</Project>
+      <Name>DragonOgg</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

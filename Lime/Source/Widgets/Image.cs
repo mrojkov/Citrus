@@ -8,7 +8,7 @@ namespace Lime
 	public class Image : Widget, IImageCombinerArg
 	{
 		[ProtoMember (1)]
-		public PersistentTexture Texture { get; set; }
+		public SerializableTexture Texture { get; set; }
 
 		[ProtoMember (2)]
 		public Vector2 UV0 { get; set; }
@@ -20,7 +20,7 @@ namespace Lime
 		{
 			UV0 = Vector2.Zero;
 			UV1 = Vector2.One;
-			Texture = new PersistentTexture ();
+			Texture = new SerializableTexture ();
 		}
 
 		public override void Update (int delta)

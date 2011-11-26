@@ -27,12 +27,14 @@ namespace Lime
 	[ProtoInclude(102, typeof(GenericAnimator<int>))]
 	[ProtoInclude(103, typeof(GenericAnimator<bool>))]
 	[ProtoInclude(104, typeof(GenericAnimator<Blending>))]
-	[ProtoInclude(105, typeof(GenericAnimator<PersistentTexture>))]
+	[ProtoInclude(105, typeof(GenericAnimator<SerializableTexture>))]
 	[ProtoInclude(106, typeof(GenericAnimator<NumericRange>))]
 	[ProtoInclude(107, typeof(Vector2Animator))]
 	[ProtoInclude(108, typeof(Color4Animator))]
 	[ProtoInclude(109, typeof(NumericAnimator))]
 	[ProtoInclude(110, typeof(GenericAnimator<EmitterShape>))]
+	[ProtoInclude(111, typeof(GenericAnimator<AudioAction>))]
+	[ProtoInclude(112, typeof(GenericAnimator<SerializableSound>))]
 	public abstract class Animator
 	{
 		public const int FramesPerSecond = 16;
@@ -47,7 +49,7 @@ namespace Lime
 			return frames << 6;
 		}
 		
-		protected abstract System.Collections.IList Values { get; }
+		public abstract System.Collections.IList Values { get; }
 
 		protected Node Owner;
 		internal bool IsTriggerable;
@@ -265,7 +267,7 @@ namespace Lime
 			return false;
 		}
 
-		protected override System.Collections.IList Values { get { return V; } }
+		public override System.Collections.IList Values { get { return V; } }
 
 		protected override void ApplyValue (int i)
 		{
@@ -279,7 +281,7 @@ namespace Lime
 		[ProtoMember(1)]
 		public readonly List<Vector2> V = new List<Vector2> ();
 		
-		protected override System.Collections.IList Values { get { return V; } }
+		public override System.Collections.IList Values { get { return V; } }
 
 		protected override void ApplyValue (int i)
 		{
@@ -303,7 +305,7 @@ namespace Lime
 		[ProtoMember(1)]
 		public readonly List<float> V = new List<float> ();
 		
-		protected override System.Collections.IList Values { get { return V; } }
+		public override System.Collections.IList Values { get { return V; } }
 
 		protected override void ApplyValue (int i)
 		{
@@ -316,6 +318,11 @@ namespace Lime
 			float vb = V [b];
 			Setter (t * (vb - va) + va);
 		}
+
+		protected override void ApplyValue (float t, int a, int b, int c, int d)
+		{
+			Setter (Utils.CatmullRomSpline (t, V [a], V [b], V [c], V [d]));
+		}
 	}
 	
 	[ProtoContract]
@@ -324,7 +331,7 @@ namespace Lime
 		[ProtoMember(1)]
 		public readonly List<Color4> V = new List<Color4> ();
 		
-		protected override System.Collections.IList Values { get { return V; } }
+		public override System.Collections.IList Values { get { return V; } }
 
 		protected override void ApplyValue (int i)
 		{

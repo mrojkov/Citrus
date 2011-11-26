@@ -676,7 +676,7 @@ namespace Lime
 		{
 			color = color * p.ColorCurrent;
 			if (Color.A > 0) {
-				PersistentTexture texture = p.Modifier.GetTexture ((int)p.TextureIndex - 1);
+				SerializableTexture texture = p.Modifier.GetTexture ((int)p.TextureIndex - 1);
 				float angle = p.Angle;
 				if (AlongPathOrientation)
 					angle += p.FullDirection;

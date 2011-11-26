@@ -1,93 +1,189 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-using System.Runtime.InteropServices;
+using OpenTK.Audio;
+using OpenTK.Audio.OpenAL;
+using System.Threading;
 
 namespace Lime
 {
-	public struct Sound
-	{
-		internal FMOD.Sound instance;
-		internal FMOD.Channel channel;
-	}
-
 	public static class AudioSystem
 	{
-		const int MaxChannels = 16;
-		static FMOD.System fmod;
-		static Dictionary<int, Stream> openedStreams = new Dictionary<int, Stream> ();
-		static int streamId = 1;
-		static FMOD.FILE_OPENCALLBACK openCallback = OpenCallback;
-		static FMOD.FILE_CLOSECALLBACK closeCallback = CloseCallback;
-		static FMOD.FILE_READCALLBACK readCallback = ReadCallback;
-		static FMOD.FILE_SEEKCALLBACK seekCallback = SeekCallback;
+		static AudioContext context;
+		static XRamExtension xram;
 
-		static void Assert (FMOD.RESULT result)
+		static List<AudioChannel> channels = new List<AudioChannel> ();
+		static float [] groupVolumes = new float [2];
+		
+		static Thread streamingThread;
+		static volatile bool shouldTerminateThread;
+
+		public static void Initialize (int numChannels = 16)
 		{
-			if (result != FMOD.RESULT.OK) {
-				throw new Lime.Exception ("FMOD error: {0}", result.ToString ());
+			context = new AudioContext();
+			xram = new XRamExtension();
+			for (int i = 0; i < numChannels; i++) {
+				channels.Add (new AudioChannel (i));
+			}
+			for (int i = 0; i < groupVolumes.Length; i++) {
+				groupVolumes [i] = 1;
+			}
+			streamingThread = new Thread (RunStreamingLoop);
+			streamingThread.IsBackground = true;
+			streamingThread.Start ();
+		}
+
+		public static void Terminate ()
+		{
+			shouldTerminateThread = true;
+			streamingThread.Join ();
+			foreach (var channel in channels) {
+				channel.Dispose ();
+			}
+			context.Dispose ();
+		}
+
+		static void RunStreamingLoop ()
+		{
+			while (!shouldTerminateThread) {
+				lock (channels) {
+					foreach (var channel in channels) {
+						channel.Update ();
+					}
+				}
+				Thread.Sleep (1);
 			}
 		}
 
-		public static void Initialize ()
+		public static void ProcessEvents ()
 		{
-			Assert (FMOD.Factory.System_Create (ref fmod));
-			if (fmod.init (MaxChannels, FMOD.INITFLAG.NORMAL, new IntPtr (0)) != FMOD.RESULT.OK) {
-				Assert (fmod.setOutput (FMOD.OUTPUTTYPE.NOSOUND));
-				Assert (fmod.init (MaxChannels, FMOD.INITFLAG.NORMAL, new IntPtr (0)));
+			lock (channels) {
+				foreach (var channel in channels) {
+					channel.ProcessEvents ();
+				}
 			}
-			Assert (fmod.setFileSystem (openCallback, closeCallback, readCallback, seekCallback, 2048));
 		}
 
-		static FMOD.RESULT OpenCallback (string name, int unicode, ref uint filesize, ref IntPtr handle, ref IntPtr userdata)
+		static bool active = true;
+		public static bool Active
 		{
-			if (!AssetsBundle.Instance.FileExists (name))
-				return FMOD.RESULT.ERR_FILE_NOTFOUND;
-			var stream = AssetsBundle.Instance.OpenFile (name);
-			filesize = (uint)stream.Length;
-			handle = new IntPtr (streamId++);
-			openedStreams [(int)handle] = stream;
-			return FMOD.RESULT.OK;
-		}
-
-		static FMOD.RESULT CloseCallback (IntPtr handle, IntPtr userdata)
-		{
-			var stream = openedStreams [(int)handle];
-			stream.Close ();
-			openedStreams.Remove ((int)handle);
-			return FMOD.RESULT.OK;
-		}
-
-		static FMOD.RESULT ReadCallback(IntPtr handle, IntPtr buffer, uint sizebytes, ref uint bytesread, IntPtr userdata)
-		{
-			var stream = openedStreams [(int)handle];
-			byte [] buffer2 = new byte [sizebytes];
-			bytesread = (uint)stream.Read (buffer2, 0, (int)sizebytes);
-			Marshal.Copy(buffer2, 0, buffer, (int)bytesread);
-			return FMOD.RESULT.OK;
-		}
-
-		static FMOD.RESULT SeekCallback(IntPtr handle, int pos, IntPtr userdata)
-		{
-			var stream = openedStreams [(int)handle];
-			stream.Seek (pos, SeekOrigin.Begin);
-			return FMOD.RESULT.OK;
-		}
-
-		public static Sound CreateSound (string path, bool streaming)
-		{
-			var sound = new Sound ();
-			var mode = FMOD.MODE.SOFTWARE | FMOD.MODE.LOWMEM | FMOD.MODE._2D | FMOD.MODE.LOOP_NORMAL | FMOD.MODE.UNICODE;
-			if (streaming) {
-				Assert (fmod.createStream (path, mode, ref sound.instance));
-			} else {
-				Assert (fmod.createSound (path, mode | FMOD.MODE.CREATECOMPRESSEDSAMPLE, ref sound.instance));
+			get { return active; }
+			set
+			{
+				if (active != value) {
+					active = value;
+					if (active)
+						ResumeAll ();
+					else
+						PauseAll ();
+				}
 			}
-			//sound.channel.setChannelGroup
-			fmod.playSound (FMOD.CHANNELINDEX.FREE, sound.instance, false, ref sound.channel);
-			return sound;
+		}
+
+		public static float GetGroupVolume (AudioChannelGroup group)
+		{
+			return groupVolumes [(int)group];
+		}
+
+		public static void SetGroupVolume (AudioChannelGroup group, float value)
+		{
+			value = Utils.Clamp (value, 0, 1);
+			groupVolumes [(int)group] = value;
+			foreach (var channel in channels) {
+				if (channel.Group == group) {
+					channel.Volume = channel.Volume;
+				}
+			}
+		}
+
+		static void PauseAll ()
+		{
+			foreach (var channel in channels) {
+				if (channel.IsPlaying ()) {
+					channel.Pause ();
+				}
+			}
+		}
+
+		static void ResumeAll ()
+		{
+			foreach (var channel in channels) {
+				if (channel.IsPaused ()) {
+					channel.Resume ();
+				}
+			}
+		}
+
+		static void LoadSoundToChannel (AudioChannel channel, string path, AudioChannelGroup group, int priority)
+		{
+			var stream = AssetsBundle.Instance.OpenFile (path);
+			var decoder = new OggDecoder (stream);
+			channel.SetDecoder (decoder);
+			channel.Group = group;
+			channel.Priority = priority;
+			channel.Looping = false;
+			channel.Volume = 1;
+			Console.WriteLine (channel.ToString ());
+		}
+
+		public static AudioChannel LoadSound (string path, AudioChannelGroup group, int priority = 0)
+		{
+			lock (channels) {
+				channels.Sort ((a, b) => { 
+					if (a.Priority != b.Priority)
+						return a.Priority - b.Priority;
+					if (a.InitiationTime == b.InitiationTime) {
+						return a.id - b.id;
+					}
+					return (a.InitiationTime < b.InitiationTime) ? -1 : 1;
+				});
+				foreach (var channel in channels) {
+					if (channel.OnStop == null && (channel.IsStopped () || channel.IsInitialState ())) {
+						LoadSoundToChannel (channel, path, group, priority);
+						return channel;
+					}
+				}
+				if (channels [0].Priority <= priority) {
+					if (channels [0].OnStop != null) {
+						channels [0].Stop ();
+					}
+					LoadSoundToChannel (channels [0], path, group, priority);
+					return channels [0];
+				} else {
+					return null;
+				}
+			}
+		}
+
+		public static AudioChannel Play (string path, AudioChannelGroup group, int priority = 0)
+		{
+			var channel = LoadSound (path, group, priority);
+			if (channel != null) {
+				channel.Resume ();
+			}
+			return channel;
+		}
+
+		public static AudioChannel PlayMusic (string path, int priority = 100)
+		{
+			return Play (path, AudioChannelGroup.Music, priority);
+		}
+
+		public static AudioChannel PlayEffect (string path, int priority = 0)
+		{
+			return Play (path, AudioChannelGroup.Effects, priority);
+		}
+
+		public static bool HasError ()
+		{
+			return AL.GetError () != ALError.NoError;
+		}
+
+		public static void CheckError ()
+		{
+			var error = AL.GetError ();
+			if (error != ALError.NoError) {
+				throw new Exception ("OpenAL error: " + AL.GetErrorString (error));
+			}
 		}
 	}
 }
