@@ -26,7 +26,9 @@ namespace Lime
 		NSMenuItem quitMenuItem;
 		
 		public GameController (GameApp game)
-		{		
+		{
+			AudioSystem.Initialize ();
+			
 			// The default resolution is 640 x 480
 			windowSize = new Size (640, 480);
 			RectangleF frame = new RectangleF (0, 0, windowSize.Width, windowSize.Height);
@@ -59,6 +61,7 @@ namespace Lime
 
 		void OnQuit (Object sender, EventArgs e)
 		{
+			AudioSystem.Terminate ();
 			NSApplication.SharedApplication.Terminate (new NSObject());
 		}
 
@@ -97,11 +100,13 @@ namespace Lime
 				
 		public void Activate ()
 		{
+			AudioSystem.Active = true;
 			view.Run ();
 		}
 		
 		public void Deactivate ()
 		{
+			AudioSystem.Active = false;
 			view.Stop ();
 		}
 		

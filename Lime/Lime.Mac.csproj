@@ -41,6 +41,12 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="DragonOgg">
+      <HintPath>..\3rdParty\DragonOgg\DragonOgg.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenTK">
+      <HintPath>..\3rdParty\OpenTK\OpenTK.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
@@ -61,10 +67,7 @@
     <Compile Include="Source\Application\iOSAppDelegate.cs" />
     <Compile Include="Source\Application\iOSGameController.cs" />
     <Compile Include="Source\Application\iOSGameView.cs" />
-    <Compile Include="Source\Audio\PersistentSound.cs" />
     <Compile Include="Source\Graphics\Font.cs" />
-    <Compile Include="Source\Graphics\PersistentFont.cs" />
-    <Compile Include="Source\Graphics\PersistentTexture.cs" />
     <Compile Include="Source\Graphics\PlainTexture.cs" />
     <Compile Include="Source\Graphics\RenderTexture.cs" />
     <Compile Include="Source\Graphics\Renderer.cs" />
@@ -108,5 +111,11 @@
     <Compile Include="Source\Input\Input.cs" />
     <Compile Include="Source\Input\Mouse.cs" />
     <Compile Include="Source\List.cs" />
+    <Compile Include="Source\Audio\AudioSystem.cs" />
+    <Compile Include="Source\Audio\AudioChannel.cs" />
+    <Compile Include="Source\Audio\AudioDecoder.cs" />
+    <Compile Include="Source\Audio\SerializableSound.cs" />
+    <Compile Include="Source\Graphics\SerializableFont.cs" />
+    <Compile Include="Source\Graphics\SerializableTexture.cs" />
   </ItemGroup>
 </Project>

@@ -106,6 +106,7 @@
     <Compile Include="Source\Application\GameApp.cs" />
     <Compile Include="Source\Input\Input.cs" />
     <Compile Include="Source\Input\Mouse.cs" />
+    <Compile Include="Source\Audio\AudioSystem.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\List.cs">

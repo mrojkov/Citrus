@@ -9,7 +9,7 @@ namespace Lime
 	public static class AudioSystem
 	{
 		static AudioContext context;
-		static XRamExtension xram;
+		// static XRamExtension xram;
 
 		static List<AudioChannel> channels = new List<AudioChannel> ();
 		static float [] groupVolumes = new float [2];
@@ -20,7 +20,7 @@ namespace Lime
 		public static void Initialize (int numChannels = 16)
 		{
 			context = new AudioContext();
-			xram = new XRamExtension();
+			// xram = new XRamExtension();
 			for (int i = 0; i < numChannels; i++) {
 				channels.Add (new AudioChannel (i));
 			}
