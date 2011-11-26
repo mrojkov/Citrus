@@ -67,9 +67,8 @@ namespace Lime
 
 		void Play ()
 		{
-			var channel = Sound.Play (AudioChannelGroup.Effects, true, Priority);
+			channel = Sound.Play (AudioChannelGroup.Effects, true, Looping, Priority);
 			if (channel != null) {
-				channel.Looping = Looping;
 				channel.Volume = Volume;
 				channel.Pan = Pan;
 				channel.OnStop = (x) => {

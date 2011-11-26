@@ -8,9 +8,7 @@ using ProtoBuf;
 
 namespace Lime
 {
-	public sealed class TriggerAttribute : Attribute
-	{
-	}
+	public sealed class TriggerAttribute : Attribute {}
 
 	[ProtoContract]
 	public sealed class AnimatorCollection : ICollection<Animator>

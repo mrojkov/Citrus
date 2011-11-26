@@ -16,7 +16,7 @@ namespace Lime
 
 	public class AudioChannel : IDisposable
 	{
-		public const int BufferSize = 1024 * 64;
+		public const int BufferSize = 1024 * 16;
 		public const int NumBuffers = 3;
 
 		public delegate void StopEvent (AudioChannel channel);
@@ -49,8 +49,9 @@ namespace Lime
 			AudioSystem.CheckError ();
 		}
 
-		internal void SetDecoder (IAudioDecoder decoder)
+		internal void PlaySound (IAudioDecoder decoder, bool looping)
 		{
+			this.Looping = looping;
 			this.decoder = decoder;
 			InitiationTime = DateTime.Now;
 			int queuedBuffers = 0;
@@ -61,7 +62,7 @@ namespace Lime
 			}
 			AudioSystem.CheckError ();
 			for (int i = 0; i < NumBuffers; i++) {
-				if (!FillBuffer (buffers [i]))
+				if (!StreamBuffer (buffers [i]))
 					break;
 				AL.SourceQueueBuffer (source, buffers [i]);
 				AudioSystem.CheckError ();
@@ -102,22 +103,23 @@ namespace Lime
 		static byte [] tempBuffer1 = new byte [BufferSize];
 		static byte [] tempBuffer2 = new byte [BufferSize];
 
-		internal bool FillBuffer (int buffer)
+		internal bool StreamBuffer (int buffer)
 		{
 			int totalRead = 0;
 			while (true) {
-				int read = decoder.ReadAudioData (tempBuffer1, tempBuffer2.Length - totalRead);
-				if (read == 0) {
-					if (Looping) {
+				int needToRead = tempBuffer2.Length - totalRead;
+				int actuallyRead = decoder.ReadAudioData (tempBuffer1, needToRead);
+				if (actuallyRead == 0) {
+					if (Looping && needToRead > 0) {
 						decoder.SetPosition (0);
 					} else {
 						break;
 					}
-				} else if (read < 0) {
-					throw new Lime.Exception ("Audio decoder returned an error {0}", read);
+				} else if (actuallyRead < 0) {
+					throw new Lime.Exception ("Audio decoder returned an error {0}", actuallyRead);
 				} else {
-					Array.Copy (tempBuffer1, 0, tempBuffer2, totalRead, read);
-					totalRead += read;
+					Array.Copy (tempBuffer1, 0, tempBuffer2, totalRead, actuallyRead);
+					totalRead += actuallyRead;
 				}
 			}
 			if (totalRead > 0) {
@@ -127,7 +129,7 @@ namespace Lime
 			return false;
 		}
 
-		internal void Update ()
+		internal void StreamBuffers ()
 		{
 			int processed = 0;
 			if (decoder != null && IsPlaying ()) {
@@ -140,7 +142,7 @@ namespace Lime
 						Thread.Sleep (1);
 						continue;
 					}
-					if (FillBuffer (buffer)) {
+					if (StreamBuffer (buffer)) {
 						AL.SourceQueueBuffer (source, buffer);
 					}
 					if (AudioSystem.HasError ()) {

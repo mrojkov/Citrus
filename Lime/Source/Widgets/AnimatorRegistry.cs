@@ -14,13 +14,13 @@ namespace Lime
 		
 		public void Add (Type propertyType, Type animatorType)
 		{
-			dict.Add (propertyType, animatorType);
+			map.Add (propertyType, animatorType);
 		}
 		
 		public Animator CreateAnimator (Type propertyType)
 		{
 			Type animatorType;
-			if (!dict.TryGetValue (propertyType, out animatorType))
+			if (!map.TryGetValue (propertyType, out animatorType))
 				throw new Lime.Exception ("Can't find animator type for property of {0}", propertyType.Name);
 			var ctr = animatorType.GetConstructor (System.Type.EmptyTypes);
 			var animator = ctr.Invoke (new object[] {}) as Animator;
@@ -42,7 +42,6 @@ namespace Lime
 			Add (typeof(AudioAction), typeof(GenericAnimator<AudioAction>));
 		}
 		
-		Dictionary<Type, Type> dict = new Dictionary<Type, Type> ();
+		Dictionary<Type, Type> map = new Dictionary<Type, Type> ();
 	}
 }
-

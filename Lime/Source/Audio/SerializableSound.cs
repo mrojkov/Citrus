@@ -9,6 +9,8 @@ namespace Lime
 	[ProtoContract]
 	public class SerializableSound
 	{
+		public string Path;
+
 		public SerializableSound () {}
 
 		public SerializableSound (string path)
@@ -27,25 +29,23 @@ namespace Lime
 			}
 		}
 
-		public string Path;
-		
-		public AudioChannel Play (AudioChannelGroup group, bool paused, int priority = 0)
+		public AudioChannel Play (AudioChannelGroup group, bool paused, bool looping = false, int priority = 0)
 		{
-			var channel = AudioSystem.LoadSound (Path + ".ogg", group, priority);
+			var channel = AudioSystem.LoadSound (Path, group, looping, priority);
 			if (!paused) {
 				channel.Resume ();
 			}
 			return channel;
 		}
 		
-		public AudioChannel PlayEffect (bool paused, int priority = 0)
+		public AudioChannel PlayEffect (bool paused, bool looping = false, int priority = 0)
 		{
-			return Play (AudioChannelGroup.Effects, paused, priority);
+			return Play (AudioChannelGroup.Effects, paused, looping, priority);
 		}
 
-		public AudioChannel PlayMusic (bool paused, int priority = 100)
+		public AudioChannel PlayMusic (bool paused, bool looping = true, int priority = 100)
 		{
-			return Play (AudioChannelGroup.Music, paused, priority);
+			return Play (AudioChannelGroup.Music, paused, looping, priority);
 		}
 	}
 }

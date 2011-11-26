@@ -47,7 +47,7 @@ namespace Lime
 			while (!shouldTerminateThread) {
 				lock (channels) {
 					foreach (var channel in channels) {
-						channel.Update ();
+						channel.StreamBuffers ();
 					}
 				}
 				Thread.Sleep (1);
@@ -113,19 +113,19 @@ namespace Lime
 			}
 		}
 
-		static void LoadSoundToChannel (AudioChannel channel, string path, AudioChannelGroup group, int priority)
+		static void LoadSoundToChannel (AudioChannel channel, string path, AudioChannelGroup group, bool looping, int priority)
 		{
+			path = System.IO.Path.ChangeExtension (path, ".ogg");
 			var stream = AssetsBundle.Instance.OpenFile (path);
 			var decoder = new OggDecoder (stream);
-			channel.SetDecoder (decoder);
+			channel.PlaySound (decoder, looping);
 			channel.Group = group;
 			channel.Priority = priority;
-			channel.Looping = false;
 			channel.Volume = 1;
-			Console.WriteLine (channel.ToString ());
+			// Console.WriteLine (channel.ToString ());
 		}
 
-		public static AudioChannel LoadSound (string path, AudioChannelGroup group, int priority = 0)
+		public static AudioChannel LoadSound (string path, AudioChannelGroup group, bool looping = false, int priority = 0)
 		{
 			lock (channels) {
 				channels.Sort ((a, b) => { 
@@ -138,7 +138,7 @@ namespace Lime
 				});
 				foreach (var channel in channels) {
 					if (channel.OnStop == null && (channel.IsStopped () || channel.IsInitialState ())) {
-						LoadSoundToChannel (channel, path, group, priority);
+						LoadSoundToChannel (channel, path, group, looping, priority);
 						return channel;
 					}
 				}
@@ -146,7 +146,7 @@ namespace Lime
 					if (channels [0].OnStop != null) {
 						channels [0].Stop ();
 					}
-					LoadSoundToChannel (channels [0], path, group, priority);
+					LoadSoundToChannel (channels [0], path, group, looping, priority);
 					return channels [0];
 				} else {
 					return null;
@@ -154,23 +154,23 @@ namespace Lime
 			}
 		}
 
-		public static AudioChannel Play (string path, AudioChannelGroup group, int priority = 0)
+		public static AudioChannel Play (string path, AudioChannelGroup group, bool looping = false, int priority = 0)
 		{
-			var channel = LoadSound (path, group, priority);
+			var channel = LoadSound (path, group, looping, priority);
 			if (channel != null) {
 				channel.Resume ();
 			}
 			return channel;
 		}
 
-		public static AudioChannel PlayMusic (string path, int priority = 100)
+		public static AudioChannel PlayMusic (string path, bool looping = true, int priority = 100)
 		{
-			return Play (path, AudioChannelGroup.Music, priority);
+			return Play (path, AudioChannelGroup.Music, looping, priority);
 		}
 
-		public static AudioChannel PlayEffect (string path, int priority = 0)
+		public static AudioChannel PlayEffect (string path, bool looping = false, int priority = 0)
 		{
-			return Play (path, AudioChannelGroup.Effects, priority);
+			return Play (path, AudioChannelGroup.Effects, looping, priority);
 		}
 
 		public static bool HasError ()
