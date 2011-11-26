@@ -9,16 +9,16 @@ namespace Lime
     [ProtoContract]
 	public class SerializableTexture : ITexture
 	{
-		PersistentTextureCore core;
+		SerializableTextureCore core;
 
 		public SerializableTexture ()
 		{
-			core = TexturePool.Instance.GetPersistentTextureCore ("");
+			core = TexturePool.Instance.GetSerializableTextureCore ("");
 		}
 
 		public SerializableTexture (string path)
 		{
-			core = TexturePool.Instance.GetPersistentTextureCore (path);
+			core = TexturePool.Instance.GetSerializableTextureCore (path);
 		}
 
 		[ProtoMember(1)]
@@ -29,7 +29,7 @@ namespace Lime
 			}
 			set {
 				var path = Serialization.ExpandPath (value);
-				core = TexturePool.Instance.GetPersistentTextureCore (path);
+				core = TexturePool.Instance.GetSerializableTextureCore (path);
 			}
 		}
 
@@ -83,7 +83,7 @@ namespace Lime
 		}
 	}
 
-	internal class PersistentTextureCore
+	internal class SerializableTextureCore
 	{
 		public readonly string Path;
 		int usedAtRenderCycle = 0;
@@ -93,12 +93,12 @@ namespace Lime
 		
 		public Rectangle UVRect { get { return uvRect; } }
 		
-		public PersistentTextureCore (string path)
+		public SerializableTextureCore (string path)
 		{
 			Path = path;
 		}
 
-		~PersistentTextureCore ()
+		~SerializableTextureCore ()
 		{
 			Discard ();
 		}
@@ -233,7 +233,7 @@ namespace Lime
 		{
 			foreach (WeakReference r in items.Values) {
 				if (r.IsAlive)
-					(r.Target as PersistentTextureCore).DiscardIfNotUsed (numCycles);
+					(r.Target as SerializableTextureCore).DiscardIfNotUsed (numCycles);
 			}
 			PlainTexture.DeleteScheduledTextures ();
 		}
@@ -245,7 +245,7 @@ namespace Lime
 		{
 			foreach (WeakReference r in items.Values) {
 				if (r.IsAlive) {
-					(r.Target as PersistentTextureCore).Discard ();
+					(r.Target as SerializableTextureCore).Discard ();
 				}
 			}
 			PlainTexture.DeleteScheduledTextures ();
@@ -260,14 +260,14 @@ namespace Lime
 			gameRenderCycle++;
 		}
 
-		internal PersistentTextureCore GetPersistentTextureCore (string path)
+		internal SerializableTextureCore GetSerializableTextureCore (string path)
 		{
 			WeakReference r;
 			if (!items.TryGetValue (path, out r) || !r.IsAlive) {
-				r = new WeakReference (new PersistentTextureCore (path));
+				r = new WeakReference (new SerializableTextureCore (path));
 				items [path] = r;
 			}
-			return r.Target as PersistentTextureCore;
+			return r.Target as SerializableTextureCore;
 		}
 	}
 }
