@@ -159,7 +159,7 @@ namespace Lime
 				errCode = GL.GetError ();
 			}
 #endif
-			throw new Exception ("OpenGL errors have occurred: " + errors);
+			throw new Exception ("OpenGL error(s): " + errors);
 #endif
 		}
 		

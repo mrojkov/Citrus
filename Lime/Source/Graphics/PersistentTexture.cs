@@ -7,16 +7,16 @@ using ProtoBuf;
 namespace Lime
 {
     [ProtoContract]
-	public class PersistentTexture : ITexture
+	public class SerializableTexture : ITexture
 	{
 		PersistentTextureCore core;
 
-		public PersistentTexture ()
+		public SerializableTexture ()
 		{
 			core = TexturePool.Instance.GetPersistentTextureCore ("");
 		}
 
-		public PersistentTexture (string path)
+		public SerializableTexture (string path)
 		{
 			core = TexturePool.Instance.GetPersistentTextureCore (path);
 		}
@@ -164,7 +164,7 @@ namespace Lime
 		{
 			if (AssetsBundle.Instance.FileExists (path)) {
 				var texParams = TextureAtlasPart.ReadFromBundle (path);
-				instance = new PersistentTexture (texParams.AtlasTexture);
+				instance = new SerializableTexture (texParams.AtlasTexture);
 				uvRect.A = (Vector2)texParams.AtlasRect.A / (Vector2)instance.SurfaceSize;
 				uvRect.B = (Vector2)texParams.AtlasRect.B / (Vector2)instance.SurfaceSize;
 				return true;
@@ -244,8 +244,9 @@ namespace Lime
 		public void DiscardAll ()
 		{
 			foreach (WeakReference r in items.Values) {
-				if (r.IsAlive)
+				if (r.IsAlive) {
 					(r.Target as PersistentTextureCore).Discard ();
+				}
 			}
 			PlainTexture.DeleteScheduledTextures ();
 		}

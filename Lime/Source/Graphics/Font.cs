@@ -11,7 +11,7 @@ namespace Lime
 		[ProtoMember (1)]
 		public float CharHeight;
 		[ProtoMember(2)]
-		public PersistentTexture Texture = new PersistentTexture ();
+		public SerializableTexture Texture = new SerializableTexture ();
 		[ProtoMember(3)]
 		public readonly FontCharCollection Chars = new FontCharCollection ();
 	}

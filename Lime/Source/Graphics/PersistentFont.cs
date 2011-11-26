@@ -7,7 +7,7 @@ using ProtoBuf;
 namespace Lime
 {
 	[ProtoContract]
-	public class PersistentFont
+	public class SerializableFont
 	{
 		public Font Instance { get; private set; }
 
@@ -25,12 +25,12 @@ namespace Lime
 
 		private string name;
 
-		public PersistentFont ()
+		public SerializableFont ()
 		{
 			Name = "";
 		}
 
-		public PersistentFont (string name)
+		public SerializableFont (string name)
 		{
 			Name = name;
 		}
