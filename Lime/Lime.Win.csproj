@@ -33,6 +33,10 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DragonOgg, Version=1.0.4344.30588, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\3rdParty\DragonOgg\DragonOgg.dll</HintPath>
+    </Reference>
     <Reference Include="OpenTK">
       <HintPath>..\3rdParty\OpenTK\OpenTK.dll</HintPath>
     </Reference>
@@ -116,12 +120,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\3rdParty\DragonOgg\DragonOgg.csproj">
-      <Project>{BB438628-F3CB-4E04-8E25-5A332C010FA5}</Project>
-      <Name>DragonOgg</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
