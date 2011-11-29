@@ -117,5 +117,11 @@
     <Compile Include="Source\Audio\SerializableSound.cs" />
     <Compile Include="Source\Graphics\SerializableFont.cs" />
     <Compile Include="Source\Graphics\SerializableTexture.cs" />
+    <Compile Include="Source\Audio\ADPCM.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Source\Audio\ADPCMEncoder.c">
+      <Visible>False</Visible>
+    </None>
   </ItemGroup>
 </Project>

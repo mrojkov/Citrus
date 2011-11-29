@@ -28,7 +28,8 @@ namespace Lime
 				groupVolumes [i] = 1;
 			}
 			streamingThread = new Thread (RunStreamingLoop);
-			streamingThread.IsBackground = true;
+			//streamingThread.IsBackground = true;
+			streamingThread.Priority = ThreadPriority.Highest;
 			streamingThread.Start ();
 		}
 
@@ -115,9 +116,9 @@ namespace Lime
 
 		static void LoadSoundToChannel (AudioChannel channel, string path, AudioChannelGroup group, bool looping, int priority)
 		{
-			path = System.IO.Path.ChangeExtension (path, ".ogg");
+			path = System.IO.Path.ChangeExtension (path, ".wav");
 			var stream = AssetsBundle.Instance.OpenFile (path);
-			var decoder = new OggDecoder (stream);
+			var decoder = new WavDecoder (stream);
 			channel.PlaySound (decoder, looping);
 			channel.Group = group;
 			channel.Priority = priority;

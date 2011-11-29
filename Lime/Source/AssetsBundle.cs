@@ -14,9 +14,10 @@ namespace Lime
 
 	public class AssetStream : Stream
 	{
-		private AssetsBundle bundle;
-		private AssetDescriptor descriptor;
-		private Int32 position;
+		AssetsBundle bundle;
+		AssetDescriptor descriptor;
+		Int32 position;
+		Stream stream;
 
 		public AssetStream (AssetsBundle bundle, string path)
 		{
@@ -24,6 +25,8 @@ namespace Lime
 			if (!bundle.index.TryGetValue (AssetsBundle.CorrectSlashes (path), out descriptor)) {
 				throw new Exception ("Can't open asset: {0}", path);
 			}
+			stream = bundle.AllocStream ();
+			Seek (0, SeekOrigin.Begin);
 		}
 		
 		public override bool CanRead {
@@ -49,12 +52,16 @@ namespace Lime
 				return position;
 			}
 			set {
-				position = (Int32)value;
+				Seek (value, SeekOrigin.Begin);
 			}
 		}
 		
 		protected override void Dispose (bool disposing)
 		{
+			if (stream != null) {
+				bundle.ReleaseStream (stream);
+				stream = null;
+			}
 		}
 		
 		public override bool CanSeek {
@@ -65,17 +72,14 @@ namespace Lime
 		
 		public override int Read (byte[] buffer, int offset, int count)
 		{
-			// Note: in order to get fast async access to the bundle we should use
-			// different IO streams, instead of locking.
-			lock (bundle) {
-				bundle.stream.Seek (position + descriptor.Offset, SeekOrigin.Begin);
-				count = Math.Min (count, descriptor.Length - position);
-				if (count > 0) {
-					count = bundle.stream.Read (buffer, offset, count);
-					position += count;
-				} else {
-					count = 0;
-				}
+			count = Math.Min (count, descriptor.Length - position);
+			if (count > 0) {
+				count = stream.Read (buffer, offset, count);
+				if (count < 0)
+					return count;
+				position += count;
+			} else {
+				count = 0;
 			}
 			return count;
 		}
@@ -89,7 +93,8 @@ namespace Lime
 			} else {
 				position = descriptor.Length - (Int32)offset;
 			}
-			position = Math.Max (0, Math.Min ((Int32)offset, descriptor.Length));
+			position = Math.Max (0, Math.Min (position, descriptor.Length));
+			stream.Seek (position + descriptor.Offset, SeekOrigin.Begin);
 			return position;
 		}
 
@@ -110,7 +115,17 @@ namespace Lime
 	}
 	
 	public class AssetsBundle : IAssetsSource, IDisposable
-	{	
+	{
+		Stack<Stream> streamPool = new Stack<Stream> ();
+		string path;
+		const Int32 Signature = 0x13AF;
+		Int32 indexOffset;
+		BinaryReader reader;
+		BinaryWriter writer;
+		FileStream stream;
+		internal Dictionary <string, AssetDescriptor> index = new Dictionary<string, AssetDescriptor> ();
+		List<AssetDescriptor> trash = new List<AssetDescriptor> ();
+
 		public static string CorrectSlashes (string path)
 		{
 			if (path.IndexOf ('\\') >= 0) {
@@ -124,23 +139,22 @@ namespace Lime
 
 		public static AssetsBundle Instance { get { return instance; } }
 
-		AssetsBundle ()
-		{
-		}
-		
+		AssetsBundle () {}
+
 		public AssetsBundle (string path, bool forWriting)
 		{
 			Open (path, forWriting);
 		}
-		
+
 		public void Open (string path, bool forWriting)
 		{
+			this.path = path;
 			if (forWriting) {
 				stream = new FileStream (path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
 				reader = new BinaryReader (stream);
 				writer = new BinaryWriter (stream);
 			} else {
-				stream = new FileStream (path, FileMode.Open, FileAccess.Read);
+				stream = new FileStream (path, FileMode.Open, FileAccess.Read, FileShare.Read);
 				reader = new BinaryReader (stream);
 			}
 			ReadIndexTable ();
@@ -333,12 +347,21 @@ namespace Lime
 			return files;
 		}
 
-		const Int32 Signature = 0x13AF;
-		private Int32 indexOffset;
-		private BinaryReader reader;
-		private BinaryWriter writer;
-		internal FileStream stream;
-		internal Dictionary <string, AssetDescriptor> index = new Dictionary<string, AssetDescriptor> ();
-		private List<AssetDescriptor> trash = new List<AssetDescriptor> ();
+		internal Stream AllocStream ()
+		{
+			lock (streamPool) {
+				if (streamPool.Count > 0) {
+					return streamPool.Pop ();
+				}
+			}
+			return new FileStream (path, FileMode.Open, FileAccess.Read, FileShare.Read);
+		}
+		
+		internal void ReleaseStream (Stream stream)
+		{
+			lock (streamPool) {
+				streamPool.Push (stream);
+			}
+		}
 	}
 }

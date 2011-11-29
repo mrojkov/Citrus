@@ -37,7 +37,7 @@ namespace Lime
 			}
 			return channel;
 		}
-		
+
 		public AudioChannel PlayEffect (bool paused, bool looping = false, int priority = 0)
 		{
 			return Play (AudioChannelGroup.Effects, paused, looping, priority);

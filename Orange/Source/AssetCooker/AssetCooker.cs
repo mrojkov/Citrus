@@ -95,6 +95,8 @@ namespace Orange
 					});
 					SyncUpdated ("*.mp3", ".mp3", null);
 					SyncUpdated ("*.ogg", ".ogg", null);
+					SyncUpdated ("*.caf", ".caf", null);
+					SyncUpdated ("*.wav", ".wav", null);
 				}
 			} finally {
 				AssetsBundle.Close ();

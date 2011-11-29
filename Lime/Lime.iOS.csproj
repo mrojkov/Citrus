@@ -22,6 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -32,6 +33,7 @@
     <ConsolePause>false</ConsolePause>
     <DebugSymbols>true</DebugSymbols>
     <DefineConstants>iOS;GLES11</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -42,6 +44,9 @@
       <HintPath>..\3rdParty\ProtoBuf-Net\iOS\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK" />
+    <Reference Include="DragonOggiOS">
+      <HintPath>..\3rdParty\DragonOgg\DragonOggiOS.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -59,10 +64,7 @@
     <Compile Include="Source\Application\iOSAppDelegate.cs" />
     <Compile Include="Source\Application\iOSGameController.cs" />
     <Compile Include="Source\Application\iOSGameView.cs" />
-    <Compile Include="Source\Audio\PersistentSound.cs" />
     <Compile Include="Source\Graphics\Font.cs" />
-    <Compile Include="Source\Graphics\PersistentFont.cs" />
-    <Compile Include="Source\Graphics\PersistentTexture.cs" />
     <Compile Include="Source\Graphics\PlainTexture.cs" />
     <Compile Include="Source\Graphics\RenderTexture.cs" />
     <Compile Include="Source\Graphics\Renderer.cs" />
@@ -107,9 +109,18 @@
     <Compile Include="Source\Input\Input.cs" />
     <Compile Include="Source\Input\Mouse.cs" />
     <Compile Include="Source\Audio\AudioSystem.cs" />
+    <Compile Include="Source\Audio\AudioChannel.cs" />
+    <Compile Include="Source\Audio\SerializableSound.cs" />
+    <Compile Include="Source\Graphics\SerializableFont.cs" />
+    <Compile Include="Source\Graphics\SerializableTexture.cs" />
+    <Compile Include="Source\Audio\AudioDecoder.cs" />
+    <Compile Include="Source\Audio\ADPCM.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\List.cs">
+      <Visible>False</Visible>
+    </None>
+    <None Include="Source\Audio\ADPCMEncoder.c">
       <Visible>False</Visible>
     </None>
   </ItemGroup>

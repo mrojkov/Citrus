@@ -16,8 +16,8 @@ namespace Lime
 
 	public class AudioChannel : IDisposable
 	{
-		public const int BufferSize = 1024 * 16;
-		public const int NumBuffers = 3;
+		public const int BufferSize = 1024 * 32;
+		public const int NumBuffers = 4;
 
 		public delegate void StopEvent (AudioChannel channel);
 		public StopEvent OnStop;
@@ -106,12 +106,13 @@ namespace Lime
 		internal bool StreamBuffer (int buffer)
 		{
 			int totalRead = 0;
+			Utils.BeginTimeMeasurement ();
 			while (true) {
 				int needToRead = tempBuffer2.Length - totalRead;
 				int actuallyRead = decoder.ReadAudioData (tempBuffer1, needToRead);
 				if (actuallyRead == 0) {
 					if (Looping && needToRead > 0) {
-						decoder.SetPosition (0);
+						decoder.Reset ();
 					} else {
 						break;
 					}
@@ -122,8 +123,11 @@ namespace Lime
 					totalRead += actuallyRead;
 				}
 			}
+			Utils.EndTimeMeasurement ();
+			Console.WriteLine ("======================");
 			if (totalRead > 0) {
 				AL.BufferData (buffer, decoder.Format, tempBuffer2, totalRead, decoder.Frequency);
+				AudioSystem.CheckError ();
 				return true;
 			}
 			return false;

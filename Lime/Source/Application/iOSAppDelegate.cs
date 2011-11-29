@@ -38,12 +38,14 @@ namespace Lime
 
 		public override void OnActivated (UIApplication application)
 		{
+			AudioSystem.Active = true;
 			gameController.Activate ();
 			Application.gameApp.OnGLCreate();
 		}
 
 		public override void OnResignActivation (UIApplication application)
 		{
+			AudioSystem.Active = false;
 			// Important: MonoTouch destroys OpenGL context on application hiding.
 			// So, we must destroy all OpenGL objects.
 			Lime.TexturePool.Instance.DiscardAll ();
@@ -54,6 +56,8 @@ namespace Lime
 		// This method is invoked when the application has loaded its UI and is ready to run
 		public override bool FinishedLaunching (UIApplication app, NSDictionary options)
 		{
+			AudioSystem.Initialize ();
+
 			// create a new window instance based on the screen size
 			window = new UIWindow (UIScreen.MainScreen.Bounds);
 
