@@ -114,7 +114,7 @@
     <Compile Include="Source\Graphics\SerializableFont.cs" />
     <Compile Include="Source\Graphics\SerializableTexture.cs" />
     <Compile Include="Source\Audio\AudioDecoder.cs" />
-    <Compile Include="Source\Audio\ADPCM.cs" />
+    <Compile Include="Source\Audio\WaveIMA4Decoder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\List.cs">

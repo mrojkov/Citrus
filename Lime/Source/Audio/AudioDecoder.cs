@@ -34,7 +34,7 @@ namespace Lime
 		//bool Seek(float seconds, bool relative);
 	}
 
-#if iOS || MAC
+#if XiOS || XMAC
 	class CustomAudioSource : AudioSource
 	{
 		static Stream streamForInitWith = null;

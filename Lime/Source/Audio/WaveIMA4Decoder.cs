@@ -79,7 +79,8 @@ namespace Lime
 
 		public int ReadBlocks (IntPtr buffer, int startIndex, int blockCount)
 		{
-			buffer += blockSize * startIndex;
+			
+			buffer = (IntPtr)(buffer.ToInt64 () + blockSize * startIndex);
 			int c = Math.Min (blockCount, totalBlocks - currentBlock);
 			for (int i = 0; i < c; i++) {
 				if (channels == 2) {
@@ -87,7 +88,7 @@ namespace Lime
 				} else {
 					throw Abort ("Unsupported number of channels");
 				}
-				buffer += blockSize;
+				buffer = (IntPtr)(buffer.ToInt64() + blockSize);
 			}
 			currentBlock += c;
 			return c;

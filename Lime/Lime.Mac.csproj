@@ -21,6 +21,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -31,6 +32,7 @@
     <ConsolePause>false</ConsolePause>
     <DebugSymbols>true</DebugSymbols>
     <DefineConstants>MAC</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -117,7 +119,7 @@
     <Compile Include="Source\Audio\SerializableSound.cs" />
     <Compile Include="Source\Graphics\SerializableFont.cs" />
     <Compile Include="Source\Graphics\SerializableTexture.cs" />
-    <Compile Include="Source\Audio\ADPCM.cs" />
+    <Compile Include="Source\Audio\WaveIMA4Decoder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Audio\ADPCMEncoder.c">
