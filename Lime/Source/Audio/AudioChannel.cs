@@ -2,6 +2,7 @@
 using OpenTK.Audio.OpenAL;
 using System.Threading;
 using ProtoBuf;
+using System.Runtime.InteropServices;
 
 namespace Lime
 {
@@ -17,7 +18,7 @@ namespace Lime
 	public class AudioChannel : IDisposable
 	{
 		public const int BufferSize = 1024 * 32;
-		public const int NumBuffers = 4;
+		public const int NumBuffers = 3;
 
 		public delegate void StopEvent (AudioChannel channel);
 		public StopEvent OnStop;
@@ -32,6 +33,7 @@ namespace Lime
 		int source;
 		int [] buffers;
 		internal IAudioDecoder decoder;
+		IntPtr tempBuffer;
 
 		internal AudioChannel (int index)
 		{
@@ -39,10 +41,12 @@ namespace Lime
 			buffers = AL.GenBuffers (NumBuffers);
 			source = AL.GenSource ();
 			AudioSystem.CheckError ();
+			tempBuffer = Marshal.AllocHGlobal (BufferSize);
 		}
 
 		public void Dispose ()
 		{
+			Marshal.FreeHGlobal (tempBuffer);
 			AL.SourceStop (source);
 			AL.DeleteSource (source);
 			AL.DeleteBuffers (buffers);
@@ -100,15 +104,19 @@ namespace Lime
 		// Not supported yet
 		public float Pan { get; set; }
 
-		static byte [] tempBuffer1 = new byte [BufferSize];
-		static byte [] tempBuffer2 = new byte [BufferSize];
-
-		internal bool StreamBuffer (int buffer)
+		bool StreamBuffer (int buffer)
 		{
 			int totalRead = 0;
-			Utils.BeginTimeMeasurement ();
+			int needToRead = BufferSize / decoder.GetBlockSize ();
 			while (true) {
-				int needToRead = tempBuffer2.Length - totalRead;
+				int actuallyRead = decoder.ReadBlocks (tempBuffer, totalRead, needToRead - totalRead);
+				totalRead += actuallyRead;
+				if (totalRead == needToRead || !Looping) {
+					break;
+				}
+				decoder.ResetToBeginning ();
+
+/*				int needToRead = tempBuffer2.Length - totalRead;
 				int actuallyRead = decoder.ReadAudioData (tempBuffer1, needToRead);
 				if (actuallyRead == 0) {
 					if (Looping && needToRead > 0) {
@@ -121,14 +129,11 @@ namespace Lime
 				} else {
 					Array.Copy (tempBuffer1, 0, tempBuffer2, totalRead, actuallyRead);
 					totalRead += actuallyRead;
-				}
+				}*/
 			}
-			Utils.EndTimeMeasurement ();
-			Console.WriteLine ("======================");
 			if (totalRead > 0) {
-				AL.BufferData (buffer, decoder.Format, tempBuffer2, totalRead, decoder.Frequency);
-				AudioSystem.CheckError ();
-				return true;
+				AL.BufferData (buffer, decoder.GetFormat (), tempBuffer, totalRead * decoder.GetBlockSize (), decoder.GetFrequency ());
+				return true; 
 			}
 			return false;
 		}

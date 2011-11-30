@@ -28,8 +28,7 @@ namespace Lime
 				groupVolumes [i] = 1;
 			}
 			streamingThread = new Thread (RunStreamingLoop);
-			//streamingThread.IsBackground = true;
-			streamingThread.Priority = ThreadPriority.Highest;
+			streamingThread.IsBackground = true;
 			streamingThread.Start ();
 		}
 
@@ -118,7 +117,7 @@ namespace Lime
 		{
 			path = System.IO.Path.ChangeExtension (path, ".wav");
 			var stream = AssetsBundle.Instance.OpenFile (path);
-			var decoder = new WavDecoder (stream);
+			var decoder = new WaveIMA4Decoder (stream);
 			channel.PlaySound (decoder, looping);
 			channel.Group = group;
 			channel.Priority = priority;
@@ -126,8 +125,39 @@ namespace Lime
 			// Console.WriteLine (channel.ToString ());
 		}
 
+		public static AudioChannel AllocateChannel (int priority)
+		{
+			lock (channels) {
+				channels.Sort ((a, b) => {
+					if (a.Priority != b.Priority)
+						return a.Priority - b.Priority;
+					if (a.InitiationTime == b.InitiationTime) {
+						return a.id - b.id;
+					}
+					return (a.InitiationTime < b.InitiationTime) ? -1 : 1;
+				});
+				foreach (var channel in channels) {
+					if (channel.OnStop == null && (channel.IsStopped () || channel.IsInitialState ())) {
+						return channel;
+					}
+				}
+				if (channels [0].Priority <= priority) {
+					channels [0].Stop ();
+					return channels [0];
+				} else {
+					return null;
+				}
+			}
+		}
+
 		public static AudioChannel LoadSound (string path, AudioChannelGroup group, bool looping = false, int priority = 0)
 		{
+			var channel = AllocateChannel (priority);
+			if (channel != null) {
+				LoadSoundToChannel (channel, path, group, looping, priority);
+			}
+			return channel;
+/*
 			lock (channels) {
 				channels.Sort ((a, b) => { 
 					if (a.Priority != b.Priority)
@@ -152,7 +182,7 @@ namespace Lime
 				} else {
 					return null;
 				}
-			}
+			}*/
 		}
 
 		public static AudioChannel Play (string path, AudioChannelGroup group, bool looping = false, int priority = 0)

@@ -2,36 +2,39 @@
 using System.IO;
 using csvorbis;
 using OpenTK.Audio.OpenAL;
+using System.Runtime.InteropServices;
 #if iOS
 using MonoTouch.AudioToolbox;
 #elif MAC
 using MonoMac.AudioToolbox;
 #endif
-using System.Runtime.InteropServices;
 
 namespace Lime
 {
 	public interface IAudioDecoder : IDisposable
 	{
-		ALFormat Format { get; }
-		int Frequency { get; }
+		ALFormat GetFormat ();
+		int GetFrequency ();
 		//float TotalTime { get; }
 		/// <summary>
 		/// Total length of audio clip in samples
 		/// </summary>
 		//int TotalLength { get; }
-		int CompressedSize { get; }
+		int GetCompressedSize ();
 		//float CurrentTime { get; }
 		//int CurrentPosition { get; }
 		//int BytesPerSample { get; }
 		//int CurrentCompressedPosition { get; }
 		//bool SeekingSupported { get; }
-		int ReadAudioData (Byte [] output, int amount);
-		bool Reset ();
+		//int ReadAudioData (Byte [] output, int amount);
+		bool ResetToBeginning ();
+		int GetBlockSize ();
+		int ReadBlocks (IntPtr buffer, int startIndex, int blockCount);
 		//bool SetPosition (int position);
 		//bool Seek(float seconds, bool relative);
 	}
 
+#if iOS || MAC
 	class CustomAudioSource : AudioSource
 	{
 		static Stream streamForInitWith = null;
@@ -152,60 +155,8 @@ namespace Lime
 			source.Dispose ();
 		}
 	}
-
-	public class WavDecoder : IAudioDecoder
-	{
-		IMA_ADPCM source;
-
-		public WavDecoder (Stream stream)
-		{
-			source = new IMA_ADPCM (stream);
-		}
-		
-		public bool Reset ()
-		{
-			source.Seek (0, SeekOrigin.Begin);
-			return true;
-		}
-
-		public int ReadAudioData (byte[] output, int amount)
-		{
-			int read = source.Read (output, 0, amount);
-			return read;
-		}
-		
-		public int BytesPerSample {
-			get {
-				return 2;
-			}
-		}
-
-		public int CompressedSize {
-			get {
-				return (int)source.Length;
-			}
-		}
-
-		public ALFormat Format {
-			get {
-				return source.Channels == 2 ? ALFormat.Mono16 : ALFormat.Mono8;
-			}
-		}
-
-		public int Frequency {
-			get {
-				int frequency = source.SamplesPerSec * 2;
-				return frequency;
-			}
-		}
-
-		void IDisposable.Dispose ()
-		{
-			source.Dispose ();
-		}
-	}
-	
-
+#endif
+	/*
 	public class OggDecoder : IAudioDecoder
 	{
 		public OggDecoder (Stream stream)
@@ -281,5 +232,5 @@ namespace Lime
 		VorbisFile vorbis;
 		VorbisFileInstance instance;
 		Info info;
-	}
+	}*/
 }

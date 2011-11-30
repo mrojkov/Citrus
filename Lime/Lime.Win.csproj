@@ -28,7 +28,7 @@
     <DefineConstants>WIN</DefineConstants>
     <DebugType>pdbonly</DebugType>
     <WarningLevel>4</WarningLevel>
-    <Optimize>false</Optimize>
+    <Optimize>true</Optimize>
     <DebugSymbols>true</DebugSymbols>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
@@ -64,6 +64,7 @@
     <Compile Include="Source\AssetsBundle.cs" />
     <Compile Include="Source\AssetsFolder.cs" />
     <Compile Include="Source\AssetsSource.cs" />
+    <Compile Include="Source\Audio\ADPCM.cs" />
     <Compile Include="Source\Audio\AudioChannel.cs" />
     <Compile Include="Source\Audio\AudioDecoder.cs" />
     <Compile Include="Source\Audio\AudioSystem.cs" />

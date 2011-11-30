@@ -150,11 +150,11 @@ namespace Lime
 		{
 			this.path = path;
 			if (forWriting) {
-				stream = new FileStream (path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+				stream = new FileStream (path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
 				reader = new BinaryReader (stream);
 				writer = new BinaryWriter (stream);
 			} else {
-				stream = new FileStream (path, FileMode.Open, FileAccess.Read, FileShare.Read);
+				stream = new FileStream (path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 				reader = new BinaryReader (stream);
 			}
 			ReadIndexTable ();
@@ -216,6 +216,7 @@ namespace Lime
 			writer = null;
 			stream = null;
 			index.Clear ();
+			streamPool.Clear ();
 		}
 
 		void IDisposable.Dispose ()
@@ -354,7 +355,7 @@ namespace Lime
 					return streamPool.Pop ();
 				}
 			}
-			return new FileStream (path, FileMode.Open, FileAccess.Read, FileShare.Read);
+			return new FileStream (path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 		}
 		
 		internal void ReleaseStream (Stream stream)
