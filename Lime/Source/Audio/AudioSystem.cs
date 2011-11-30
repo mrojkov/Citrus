@@ -122,10 +122,9 @@ namespace Lime
 			channel.Group = group;
 			channel.Priority = priority;
 			channel.Volume = 1;
-			// Console.WriteLine (channel.ToString ());
 		}
 
-		public static AudioChannel AllocateChannel (int priority)
+		static AudioChannel AllocateChannel (int priority)
 		{
 			lock (channels) {
 				channels.Sort ((a, b) => {
@@ -157,32 +156,6 @@ namespace Lime
 				LoadSoundToChannel (channel, path, group, looping, priority);
 			}
 			return channel;
-/*
-			lock (channels) {
-				channels.Sort ((a, b) => { 
-					if (a.Priority != b.Priority)
-						return a.Priority - b.Priority;
-					if (a.InitiationTime == b.InitiationTime) {
-						return a.id - b.id;
-					}
-					return (a.InitiationTime < b.InitiationTime) ? -1 : 1;
-				});
-				foreach (var channel in channels) {
-					if (channel.OnStop == null && (channel.IsStopped () || channel.IsInitialState ())) {
-						LoadSoundToChannel (channel, path, group, looping, priority);
-						return channel;
-					}
-				}
-				if (channels [0].Priority <= priority) {
-					if (channels [0].OnStop != null) {
-						channels [0].Stop ();
-					}
-					LoadSoundToChannel (channels [0], path, group, looping, priority);
-					return channels [0];
-				} else {
-					return null;
-				}
-			}*/
 		}
 
 		public static AudioChannel Play (string path, AudioChannelGroup group, bool looping = false, int priority = 0)

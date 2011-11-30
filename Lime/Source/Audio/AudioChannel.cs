@@ -46,6 +46,9 @@ namespace Lime
 
 		public void Dispose ()
 		{
+			if (this.decoder != null) {
+				this.decoder.Dispose ();
+			}
 			Marshal.FreeHGlobal (tempBuffer);
 			AL.SourceStop (source);
 			AL.DeleteSource (source);
@@ -56,6 +59,9 @@ namespace Lime
 		internal void PlaySound (IAudioDecoder decoder, bool looping)
 		{
 			this.Looping = looping;
+			if (this.decoder != null) {
+				this.decoder.Dispose ();
+			}
 			this.decoder = decoder;
 			InitiationTime = DateTime.Now;
 			int queuedBuffers = 0;
@@ -169,6 +175,10 @@ namespace Lime
 				if (IsStopped ()) {
 					var handler = OnStop;
 					OnStop = null;
+					if (decoder != null) {
+						decoder.Dispose ();
+						decoder = null;
+					}
 					handler (this);
 				}
 			}
