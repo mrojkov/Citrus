@@ -107,7 +107,7 @@ namespace Lime
 			}
 		}
 
-		// Not supported yet
+		// Not implemented yet
 		public float Pan { get; set; }
 
 		bool StreamBuffer (int buffer)
