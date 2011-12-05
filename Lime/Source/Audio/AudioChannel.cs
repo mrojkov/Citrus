@@ -121,21 +121,6 @@ namespace Lime
 					break;
 				}
 				decoder.ResetToBeginning ();
-
-/*				int needToRead = tempBuffer2.Length - totalRead;
-				int actuallyRead = decoder.ReadAudioData (tempBuffer1, needToRead);
-				if (actuallyRead == 0) {
-					if (Looping && needToRead > 0) {
-						decoder.Reset ();
-					} else {
-						break;
-					}
-				} else if (actuallyRead < 0) {
-					throw new Lime.Exception ("Audio decoder returned an error {0}", actuallyRead);
-				} else {
-					Array.Copy (tempBuffer1, 0, tempBuffer2, totalRead, actuallyRead);
-					totalRead += actuallyRead;
-				}*/
 			}
 			if (totalRead > 0) {
 				AL.BufferData (buffer, decoder.GetFormat (), tempBuffer, totalRead * decoder.GetBlockSize (), decoder.GetFrequency ());

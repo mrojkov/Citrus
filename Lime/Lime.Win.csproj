@@ -121,6 +121,10 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">
+      <Link>OpenAL32.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\Lemon\bin\Win32\Release\Lemon.dll">
       <Link>Lemon.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
