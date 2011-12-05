@@ -33,10 +33,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DragonOgg, Version=1.0.4344.30588, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\3rdParty\DragonOgg\DragonOgg.dll</HintPath>
-    </Reference>
     <Reference Include="OpenTK">
       <HintPath>..\3rdParty\OpenTK\OpenTK.dll</HintPath>
     </Reference>
@@ -53,6 +49,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Source\Audio\OggDecoder.cs" />
+    <Compile Include="Source\LemonAPI.cs" />
     <Compile Include="Source\Application\GameApp.cs" />
     <Compile Include="Source\Application\iOSAppDelegate.cs" />
     <Compile Include="Source\Application\iOSGameController.cs" />
@@ -121,6 +119,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\Lemon\bin\Win32\Release\Lemon.dll">
+      <Link>Lemon.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

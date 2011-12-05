@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using csvorbis;
 using OpenTK.Audio.OpenAL;
 using System.Runtime.InteropServices;
 #if iOS
@@ -27,7 +26,7 @@ namespace Lime
 		//int CurrentCompressedPosition { get; }
 		//bool SeekingSupported { get; }
 		//int ReadAudioData (Byte [] output, int amount);
-		bool ResetToBeginning ();
+		void ResetToBeginning ();
 		int GetBlockSize ();
 		int ReadBlocks (IntPtr buffer, int startIndex, int blockCount);
 		//bool SetPosition (int position);

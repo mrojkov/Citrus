@@ -115,9 +115,10 @@ namespace Lime
 
 		static void LoadSoundToChannel (AudioChannel channel, string path, AudioChannelGroup group, bool looping, int priority)
 		{
-			path = System.IO.Path.ChangeExtension (path, ".wav");
+			path = System.IO.Path.ChangeExtension (path, ".ogg");
 			var stream = AssetsBundle.Instance.OpenFile (path);
-			var decoder = new WaveIMA4Decoder (stream);
+			// var decoder = new WaveIMA4Decoder (stream);
+			var decoder = new OggDecoder (stream);
 			channel.PlaySound (decoder, looping);
 			channel.Group = group;
 			channel.Priority = priority;

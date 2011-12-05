@@ -40,7 +40,8 @@ namespace Lime
 				switch (ReadID ()) {
 				case "fmt ":
 					fmtSize = ReadInt32 ();
-					if (ReadUInt16 () != (ushort)WaveFormat.IMA_ADPCM)
+					uint fmt = ReadUInt16 ();
+					if (fmt != (ushort)WaveFormat.IMA_ADPCM)
 						throw Abort ("Not IMA ADPCM");
 					channels = ReadUInt16 ();
 					samplesPerSec = ReadInt32 ();
@@ -71,11 +72,10 @@ namespace Lime
 			ResetToBeginning ();
 		}
 
-		public bool ResetToBeginning ()
+		public void ResetToBeginning ()
 		{
 			currentBlock = 0;
 			stream.Seek (dataPosition, SeekOrigin.Begin);
-			return true;
 		}
 
 		public int ReadBlocks (IntPtr buffer, int startIndex, int blockCount)
@@ -241,7 +241,6 @@ namespace Lime
 			if ((v & 1) != 0)
 				d += s >> 2;
 			d += s >> 3;
-			//int d = ((2 * (v & 7) + 1) * s) >> 3;
 			if ((v & 8) != 0)
 				d = -d;
 			int val = ((int)Value) + d;
