@@ -1,12 +1,15 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <ogg\ogg.h>
-#include <vorbis\ivorbisfile.h>
+#include <vorbis/ivorbisfile.h>
 
-#ifdef LEMON_EXPORTS
-#define LEMON_API __declspec(dllexport)
+#if defined (_WIN32)
+    #ifdef LEMON_EXPORTS
+        #define LEMON_API __declspec(dllexport)
+    #else
+        #define LEMON_API __declspec(dllimport)
+    #endif
 #else
-#define LEMON_API __declspec(dllimport)
+    #define LEMON_API
 #endif
 
 LEMON_API OggVorbis_File* OggCreate ()

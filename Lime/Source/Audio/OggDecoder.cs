@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using OpenTK.Audio.OpenAL;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
 
 namespace Lime
 {
@@ -12,7 +13,9 @@ namespace Lime
 		IntPtr oggFile;
 		Lemon.FileSystem fs;
 		int bitstream;
-
+		int streamSlot;
+		static StreamTable streamTable = new StreamTable ();
+		
 		public OggDecoder (Stream stream)
 		{
 			this.stream = stream;
@@ -20,8 +23,10 @@ namespace Lime
 				ReadFunc = OggRead, CloseFunc = OggClose,
 				SeekFunc = OggSeek, TellFunc = OggTell
 			};
+			streamSlot = streamTable.AllocSlot ();
+			streamTable [streamSlot] = stream;
 			oggFile = Lemon.OggCreate ();
-			if (Lemon.OggOpen (stream, oggFile, fs) < 0) {
+			if (Lemon.OggOpen (streamSlot, oggFile, fs) < 0) {
 				throw new Lime.Exception ("Failed to open OGG/Vorbis file");
 			}
 			if (Lemon.OggGetChannels (oggFile) > 2) {
@@ -35,9 +40,13 @@ namespace Lime
 				stream.Dispose ();
 				stream = null;
 			}
-			if (oggFile != null) {
+			if (oggFile != IntPtr.Zero) {
 				Lemon.OggDispose (oggFile);
 				oggFile = IntPtr.Zero;
+			}
+			if (streamSlot != 0) {
+				streamTable [streamSlot] = null;
+				streamSlot = 0;
 			}
 		}
 
@@ -83,13 +92,17 @@ namespace Lime
 				actualCount += read;
 			}
 		}
-
-		static uint OggRead (IntPtr buffer, uint size, uint nmemb, Stream stream)
+		
+#if iOS
+		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.ReadCallback))]
+#endif
+		public static uint OggRead (IntPtr buffer, uint size, uint nmemb, int streamSlot)
 		{
 			byte [] block = new byte [1024 * 4];
 			int actualCount = 0;
 			int requestCount = (int)(size * nmemb);
 			while (true) {
+				var stream = streamTable [streamSlot];
 				int read = stream.Read (block, 0, Math.Min (block.Length, requestCount - actualCount));
 				if (read == 0)
 					break;
@@ -99,21 +112,62 @@ namespace Lime
 			return (uint)actualCount;
 		}
 
-		static int OggTell (Stream stream)
+#if iOS
+		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.TellCallback))]
+#endif
+		public static int OggTell (int streamSlot)
 		{
+			var stream = streamTable [streamSlot];
 			return (int)stream.Position;
 		}
-
-		static int OggSeek (Stream stream, long offset, SeekOrigin whence)
+		
+#if iOS
+		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.SeekCallback))]
+#endif
+		public static int OggSeek (int streamSlot, long offset, SeekOrigin whence)
 		{
-			//return -1;
+			var stream = streamTable [streamSlot];
 			return (int)stream.Seek (offset, whence);
 		}
-
-		static int OggClose (Stream stream)
+		
+#if iOS
+		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.CloseCallback))]
+#endif
+		public static int OggClose (int streamSlot)
 		{
+			var stream = streamTable [streamSlot];
 			stream.Close ();
 			return 0;
+		}
+	}
+
+	class StreamTable
+	{
+		Stream [] streams = new Stream [64];
+
+		public int AllocSlot ()
+		{
+			lock (streams) {
+				for (int i = 1; i < streams.Length; i++) {
+					if (streams [i] == null)
+						return i;
+				}
+			}
+			throw new Lime.Exception ("Too many opened streams");
+		}
+		
+		public Stream this [int slot]
+		{
+			get {
+				lock (streams) {
+					return streams [slot];
+				}
+			}
+			set {
+				lock (streams) {
+					streams [slot] = value;
+				}
+			}
 		}
 	}
 }

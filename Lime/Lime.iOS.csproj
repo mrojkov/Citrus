@@ -44,9 +44,6 @@
       <HintPath>..\3rdParty\ProtoBuf-Net\iOS\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK" />
-    <Reference Include="DragonOggiOS">
-      <HintPath>..\3rdParty\DragonOgg\DragonOggiOS.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -115,6 +112,8 @@
     <Compile Include="Source\Graphics\SerializableTexture.cs" />
     <Compile Include="Source\Audio\AudioDecoder.cs" />
     <Compile Include="Source\Audio\WaveIMA4Decoder.cs" />
+    <Compile Include="Source\Lemon.cs" />
+    <Compile Include="Source\Audio\OggDecoder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\List.cs">
