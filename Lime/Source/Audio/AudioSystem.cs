@@ -12,7 +12,7 @@ namespace Lime
 		// static XRamExtension xram;
 
 		static List<AudioChannel> channels = new List<AudioChannel> ();
-		static float [] groupVolumes = new float [2];
+		static float [] groupVolumes = new float [2] {1, 1};
 		
 		static Thread streamingThread;
 		static volatile bool shouldTerminateThread;
@@ -20,12 +20,11 @@ namespace Lime
 		public static void Initialize (int numChannels = 16)
 		{
 			context = new AudioContext();
-			// xram = new XRamExtension();
-			for (int i = 0; i < numChannels; i++) {
-				channels.Add (new AudioChannel (i));
-			}
-			for (int i = 0; i < groupVolumes.Length; i++) {
-				groupVolumes [i] = 1;
+			if (!HasError ()) {
+				// xram = new XRamExtension();
+				for (int i = 0; i < numChannels; i++) {
+					channels.Add (new AudioChannel (i));
+				}
 			}
 			streamingThread = new Thread (RunStreamingLoop);
 			streamingThread.IsBackground = true;
@@ -147,7 +146,7 @@ namespace Lime
 						return channel;
 					}
 				}
-				if (channels [0].Priority <= priority) {
+				if (channels.Count > 0 && channels [0].Priority <= priority) {
 					channels [0].Stop ();
 					return channels [0];
 				} else {

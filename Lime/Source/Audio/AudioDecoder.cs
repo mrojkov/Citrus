@@ -14,23 +14,10 @@ namespace Lime
 	{
 		ALFormat GetFormat ();
 		int GetFrequency ();
-		//float TotalTime { get; }
-		/// <summary>
-		/// Total length of audio clip in samples
-		/// </summary>
-		//int TotalLength { get; }
 		int GetCompressedSize ();
-		//float CurrentTime { get; }
-		//int CurrentPosition { get; }
-		//int BytesPerSample { get; }
-		//int CurrentCompressedPosition { get; }
-		//bool SeekingSupported { get; }
-		//int ReadAudioData (Byte [] output, int amount);
 		void ResetToBeginning ();
 		int GetBlockSize ();
 		int ReadBlocks (IntPtr buffer, int startIndex, int blockCount);
-		//bool SetPosition (int position);
-		//bool Seek(float seconds, bool relative);
 	}
 
 #if XiOS || XMAC
