@@ -113,16 +113,22 @@ namespace Lime
 			}
 		}
 
-		static void LoadSoundToChannel (AudioChannel channel, string path, AudioChannelGroup group, bool looping, int priority)
+		static bool LoadSoundToChannel (AudioChannel channel, string path, AudioChannelGroup group, bool looping, int priority)
 		{
-			path = System.IO.Path.ChangeExtension (path, ".ogg");
-			var stream = AssetsBundle.Instance.OpenFile (path);
-			// var decoder = new WaveIMA4Decoder (stream);
-			var decoder = new OggDecoder (stream);
+			IAudioDecoder decoder = null;
+			if (AssetsBundle.Instance.FileExists (path + ".ogg")) {
+				decoder = new OggDecoder (AssetsBundle.Instance.OpenFile (path + ".ogg"));
+			} else if (AssetsBundle.Instance.FileExists (path + ".wav")) {
+				decoder = new WaveIMA4Decoder (AssetsBundle.Instance.OpenFile (path + ".wav"));
+			} else {
+				Console.WriteLine ("Missing audio file: '{0}'", path);
+				return false;
+			}
 			channel.PlaySound (decoder, looping);
 			channel.Group = group;
 			channel.Priority = priority;
 			channel.Volume = 1;
+			return true;
 		}
 
 		static AudioChannel AllocateChannel (int priority)
@@ -154,7 +160,8 @@ namespace Lime
 		{
 			var channel = AllocateChannel (priority);
 			if (channel != null) {
-				LoadSoundToChannel (channel, path, group, looping, priority);
+				if (!LoadSoundToChannel (channel, path, group, looping, priority))
+					return null;
 			}
 			return channel;
 		}

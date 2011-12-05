@@ -50,7 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Audio\OggDecoder.cs" />
-    <Compile Include="Source\LemonAPI.cs" />
+    <Compile Include="Source\Lemon.cs" />
     <Compile Include="Source\Application\GameApp.cs" />
     <Compile Include="Source\Application\iOSAppDelegate.cs" />
     <Compile Include="Source\Application\iOSGameController.cs" />
