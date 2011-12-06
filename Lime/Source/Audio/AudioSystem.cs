@@ -119,10 +119,10 @@ namespace Lime
 		static bool LoadSoundToChannel (AudioChannel channel, string path, AudioChannelGroup group, bool looping, int priority)
 		{
 			IAudioDecoder decoder = null;
-			if (AssetsBundle.Instance.FileExists (path + ".ogg")) {
-				decoder = new OggDecoder (soundCache.OpenStream (path + ".ogg"));
-			} else if (AssetsBundle.Instance.FileExists (path + ".wav")) {
+			if (AssetsBundle.Instance.FileExists (path + ".wav")) {
 				decoder = new WaveIMA4Decoder (soundCache.OpenStream (path + ".wav"));
+			} else if (AssetsBundle.Instance.FileExists (path + ".ogg")) {
+				decoder = new OggDecoder (soundCache.OpenStream (path + ".ogg"));
 			} else {
 				Console.WriteLine ("Missing audio file: '{0}'", path);
 				return false;
