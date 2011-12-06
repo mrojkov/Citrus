@@ -22,20 +22,21 @@ namespace Lime
 		public delegate void StopEvent (AudioChannel channel);
 		public StopEvent OnStop;
 		public bool Looping;
-
+		
 		internal AudioChannelGroup Group;
 		internal int Priority;
 		internal DateTime InitiationTime;
 		internal int id;
 
+		object syncRoot = new object ();
 		int source;
 		int [] buffers;
 		int queueHead;
 		int queueLength;
-		volatile bool resumePending;
 
 		internal IAudioDecoder decoder;
 		IntPtr rawSound;
+		volatile bool resumePending = false;
 
 		internal AudioChannel (int index)
 		{
@@ -60,31 +61,29 @@ namespace Lime
 
 		internal void PlaySound (IAudioDecoder decoder, bool looping)
 		{
-			this.Looping = looping;
-			if (this.decoder != null) {
-				this.decoder.Dispose ();
+			lock (syncRoot) {
+				this.Looping = looping;
+				if (this.decoder != null) {
+					this.decoder.Dispose ();
+				}
+				this.decoder = decoder;
+				InitiationTime = DateTime.Now;
+				AL.SourceStop (source);
+				int queuedBuffers = 0;
+				AL.GetSource (source, ALGetSourcei.BuffersQueued, out queuedBuffers);
+				if (queuedBuffers > 0) {
+					AL.SourceUnqueueBuffers (source, queuedBuffers);
+				}
+				AudioSystem.CheckError ();
+				queueLength = 0;
+				queueHead = 0;
+				resumePending = false;
 			}
-			this.decoder = decoder;
-			InitiationTime = DateTime.Now;
-			AL.SourceStop (source);
-			int queuedBuffers = 0;
-			AL.GetSource (source, ALGetSourcei.BuffersQueued, out queuedBuffers);
-			if (queuedBuffers > 0) {
-				AL.SourceUnqueueBuffers (source, queuedBuffers);
-			}
-			AudioSystem.CheckError ();
-			queueLength = 0;
-			queueHead = 0;
-			resumePending = false;
-			//StreamBuffer ();
-			//StreamBuffer ();
 		}
 
 		public void Resume ()
 		{
 			resumePending = true;
-//			AL.SourcePlay (source);
-//			AudioSystem.CheckError ();
 		}
 
 		/// <summary>
@@ -92,8 +91,10 @@ namespace Lime
 		/// </summary>
 		internal void Pause ()
 		{
-			AL.SourcePause (source);
-			AudioSystem.CheckError ();
+			lock (this) {
+				AL.SourcePause (source);
+				AudioSystem.CheckError ();
+			}
 		}
 
 		float volume = 1;
@@ -112,20 +113,23 @@ namespace Lime
 		// Not implemented yet
 		public float Pan { get; set; }
 
-		internal void StreamBuffer ()
+		internal void ThreadedUpdate ()
 		{
-			if (resumePending) {
-				resumePending = false;
-				StreamBufferHelper ();
-				StreamBufferHelper ();
-				AL.SourcePlay (source);
-				AudioSystem.CheckError ();
-			} else if (IsPlaying ()) {
-				StreamBufferHelper ();
+			lock (syncRoot) {
+				if (IsPlaying ()) {
+					StreamBuffer ();
+				}
+				if (resumePending) {
+					resumePending = false;
+					StreamBuffer ();
+					StreamBuffer ();
+					AL.SourcePlay (source);
+					AudioSystem.CheckError ();
+				}
 			}
 		}
 
-		void StreamBufferHelper ()
+		void StreamBuffer ()
 		{
 			int buffer = AcquireBuffer ();
 			if (buffer != 0) {
@@ -142,7 +146,6 @@ namespace Lime
 			int totalRead = 0;
 			int needToRead = BufferSize / decoder.GetBlockSize ();
 			while (true) {
-
 				int actuallyRead = decoder.ReadBlocks (rawSound, totalRead, needToRead - totalRead);
 				totalRead += actuallyRead;
 				if (totalRead == needToRead || !Looping) {
@@ -171,42 +174,10 @@ namespace Lime
 			if (queueLength == NumBuffers)
 				return 0;
 			else {
-				return buffers [(queueHead + queueLength++) % NumBuffers];
+				int index = (queueHead + queueLength++) % NumBuffers;
+				return buffers [index];
 			}
 		}
-
-		/*internal void StreamBuffer ()
-		{
-			int processed = 0;
-			if (decoder != null && IsPlaying ()) {
-				AL.GetSource (source, ALGetSourcei.BuffersProcessed, out processed);
-				AudioSystem.CheckError ();
-				while (processed-- > 0) {
-					int buffer = AL.SourceUnqueueBuffer (source);
-					ReleaseBuffer (buffer);
-				}
-				int buffer = AllocAndLoadBuffer ();
-				if (buffer != 0) {
-					AL.SourceQueueBuffer (source, buffer);
-				}
-				while (processed-- > 0) {
-					int buffer = AL.SourceUnqueueBuffer (source);
-					if (AudioSystem.HasError ()) {
-						processed++;
-						Thread.Sleep (1);
-						continue;
-					}
-					if (StreamBuffer (buffer)) {
-						AL.SourceQueueBuffer (source, buffer);
-					}
-					if (AudioSystem.HasError ()) {
-						processed++;
-						Thread.Sleep (1);
-						continue;
-					}
-				}
-			}
-		}*/
 
 		internal void ProcessEvents ()
 		{
@@ -214,10 +185,10 @@ namespace Lime
 				if (IsStopped ()) {
 					var handler = OnStop;
 					OnStop = null;
-					if (decoder != null) {
-						decoder.Dispose ();
-						decoder = null;
-					}
+					//if (decoder != null) {
+					//	decoder.Dispose ();
+					//	decoder = null;
+					//}
 					handler (this);
 				}
 			}
@@ -245,10 +216,12 @@ namespace Lime
 
 		public void Stop ()
 		{
-			AL.SourceStop (source);
-			AudioSystem.CheckError ();
-			if (OnStop != null)
-				OnStop (this);
+			lock (this) {
+				AL.SourceStop (source);
+				AudioSystem.CheckError ();
+				if (OnStop != null)
+					OnStop (this);
+			}
 		}
 
 		public override string ToString ()

@@ -48,9 +48,7 @@ namespace Lime
 			while (!shouldTerminateThread) {
 				lock (channels) {
 					foreach (var channel in channels) {
-						//if (channel.IsPlaying ()) {
-							channel.StreamBuffer ();
-						//}
+						channel.ThreadedUpdate ();
 					}
 				}
 				Thread.Sleep (0);
@@ -59,10 +57,8 @@ namespace Lime
 
 		public static void ProcessEvents ()
 		{
-			lock (channels) {
-				foreach (var channel in channels) {
-					channel.ProcessEvents ();
-				}
+			foreach (var channel in channels) {
+				channel.ProcessEvents ();
 			}
 		}
 
