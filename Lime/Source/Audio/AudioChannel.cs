@@ -17,23 +17,24 @@ namespace Lime
 
 	public class AudioChannel : IDisposable
 	{
-		public const int BufferSize = 1024 * 32;
-		public const int NumBuffers = 3;
-
+		public const int BufferSize = 1024 * 16;
+		public const int NumBuffers = 8;
 		public delegate void StopEvent (AudioChannel channel);
 		public StopEvent OnStop;
-
 		public bool Looping;
 
 		internal AudioChannelGroup Group;
 		internal int Priority;
 		internal DateTime InitiationTime;
-
 		internal int id;
+
 		int source;
 		int [] buffers;
+		int queueHead;
+		int queueLength;
+
 		internal IAudioDecoder decoder;
-		IntPtr tempBuffer;
+		IntPtr rawSound;
 
 		internal AudioChannel (int index)
 		{
@@ -41,7 +42,7 @@ namespace Lime
 			buffers = AL.GenBuffers (NumBuffers);
 			source = AL.GenSource ();
 			AudioSystem.CheckError ();
-			tempBuffer = Marshal.AllocHGlobal (BufferSize);
+			rawSound = Marshal.AllocHGlobal (BufferSize);
 		}
 
 		public void Dispose ()
@@ -49,7 +50,7 @@ namespace Lime
 			if (this.decoder != null) {
 				this.decoder.Dispose ();
 			}
-			Marshal.FreeHGlobal (tempBuffer);
+			Marshal.FreeHGlobal (rawSound);
 			AL.SourceStop (source);
 			AL.DeleteSource (source);
 			AL.DeleteBuffers (buffers);
@@ -64,19 +65,17 @@ namespace Lime
 			}
 			this.decoder = decoder;
 			InitiationTime = DateTime.Now;
-			int queuedBuffers = 0;
 			AL.SourceStop (source);
+			int queuedBuffers = 0;
 			AL.GetSource (source, ALGetSourcei.BuffersQueued, out queuedBuffers);
 			if (queuedBuffers > 0) {
 				AL.SourceUnqueueBuffers (source, queuedBuffers);
 			}
 			AudioSystem.CheckError ();
-			for (int i = 0; i < NumBuffers; i++) {
-				if (!StreamBuffer (buffers [i]))
-					break;
-				AL.SourceQueueBuffer (source, buffers [i]);
-				AudioSystem.CheckError ();
-			}
+			queueLength = 0;
+			queueHead = 0;
+			StreamBuffer ();
+			StreamBuffer ();
 		}
 
 		public void Resume ()
@@ -110,12 +109,24 @@ namespace Lime
 		// Not implemented yet
 		public float Pan { get; set; }
 
-		bool StreamBuffer (int buffer)
+		internal void StreamBuffer ()
+		{
+			int buffer = AcquireBuffer ();
+			if (buffer != 0) {
+				if (LoadBuffer (buffer)) {
+					AL.SourceQueueBuffer (source, buffer);
+					AudioSystem.CheckError ();
+				} else
+					queueLength--;
+			}
+		}
+
+		bool LoadBuffer (int buffer)
 		{
 			int totalRead = 0;
 			int needToRead = BufferSize / decoder.GetBlockSize ();
 			while (true) {
-				int actuallyRead = decoder.ReadBlocks (tempBuffer, totalRead, needToRead - totalRead);
+				int actuallyRead = decoder.ReadBlocks (rawSound, totalRead, needToRead - totalRead);
 				totalRead += actuallyRead;
 				if (totalRead == needToRead || !Looping) {
 					break;
@@ -123,18 +134,44 @@ namespace Lime
 				decoder.ResetToBeginning ();
 			}
 			if (totalRead > 0) {
-				AL.BufferData (buffer, decoder.GetFormat (), tempBuffer, totalRead * decoder.GetBlockSize (), decoder.GetFrequency ());
+				AL.BufferData (buffer, decoder.GetFormat (), rawSound, 
+					totalRead * decoder.GetBlockSize (), decoder.GetFrequency ());
 				return true; 
 			}
 			return false;
 		}
 
-		internal void StreamBuffers ()
+		int AcquireBuffer ()
+		{
+			int processed = 0;
+			AL.GetSource (source, ALGetSourcei.BuffersProcessed, out processed);
+			while (processed-- > 0) {
+				AL.SourceUnqueueBuffer (source);
+				queueLength--;
+				queueHead = (queueHead + 1) % NumBuffers;
+			}
+			AudioSystem.CheckError ();
+			if (queueLength == NumBuffers)
+				return 0;
+			else {
+				return buffers [(queueHead + queueLength++) % NumBuffers];
+			}
+		}
+
+		/*internal void StreamBuffer ()
 		{
 			int processed = 0;
 			if (decoder != null && IsPlaying ()) {
 				AL.GetSource (source, ALGetSourcei.BuffersProcessed, out processed);
 				AudioSystem.CheckError ();
+				while (processed-- > 0) {
+					int buffer = AL.SourceUnqueueBuffer (source);
+					ReleaseBuffer (buffer);
+				}
+				int buffer = AllocAndLoadBuffer ();
+				if (buffer != 0) {
+					AL.SourceQueueBuffer (source, buffer);
+				}
 				while (processed-- > 0) {
 					int buffer = AL.SourceUnqueueBuffer (source);
 					if (AudioSystem.HasError ()) {
@@ -152,7 +189,7 @@ namespace Lime
 					}
 				}
 			}
-		}
+		}*/
 
 		internal void ProcessEvents ()
 		{
