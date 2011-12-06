@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OpenTK.Audio;
 using OpenTK.Audio.OpenAL;
 using System.Threading;
+using System.IO;
 
 namespace Lime
 {
@@ -10,10 +11,11 @@ namespace Lime
 	{
 		static AudioContext context;
 		// static XRamExtension xram;
+		static SoundCache soundCache = new SoundCache ();
 
 		static List<AudioChannel> channels = new List<AudioChannel> ();
 		static float [] groupVolumes = new float [2] {1, 1};
-		
+
 		static Thread streamingThread;
 		static volatile bool shouldTerminateThread;
 
@@ -116,9 +118,9 @@ namespace Lime
 		{
 			IAudioDecoder decoder = null;
 			if (AssetsBundle.Instance.FileExists (path + ".ogg")) {
-				decoder = new OggDecoder (AssetsBundle.Instance.OpenFile (path + ".ogg"));
+				decoder = new OggDecoder (soundCache.OpenStream (path + ".ogg"));
 			} else if (AssetsBundle.Instance.FileExists (path + ".wav")) {
-				decoder = new WaveIMA4Decoder (AssetsBundle.Instance.OpenFile (path + ".wav"));
+				decoder = new WaveIMA4Decoder (soundCache.OpenStream (path + ".wav"));
 			} else {
 				Console.WriteLine ("Missing audio file: '{0}'", path);
 				return false;
