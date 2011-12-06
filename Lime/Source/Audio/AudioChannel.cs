@@ -32,6 +32,7 @@ namespace Lime
 		int [] buffers;
 		int queueHead;
 		int queueLength;
+		volatile bool resumePending;
 
 		internal IAudioDecoder decoder;
 		IntPtr rawSound;
@@ -74,14 +75,16 @@ namespace Lime
 			AudioSystem.CheckError ();
 			queueLength = 0;
 			queueHead = 0;
-			StreamBuffer ();
-			StreamBuffer ();
+			resumePending = false;
+			//StreamBuffer ();
+			//StreamBuffer ();
 		}
 
 		public void Resume ()
 		{
-			AL.SourcePlay (source);
-			AudioSystem.CheckError ();
+			resumePending = true;
+//			AL.SourcePlay (source);
+//			AudioSystem.CheckError ();
 		}
 
 		/// <summary>
@@ -110,6 +113,19 @@ namespace Lime
 		public float Pan { get; set; }
 
 		internal void StreamBuffer ()
+		{
+			if (resumePending) {
+				resumePending = false;
+				StreamBufferHelper ();
+				StreamBufferHelper ();
+				AL.SourcePlay (source);
+				AudioSystem.CheckError ();
+			} else if (IsPlaying ()) {
+				StreamBufferHelper ();
+			}
+		}
+
+		void StreamBufferHelper ()
 		{
 			int buffer = AcquireBuffer ();
 			if (buffer != 0) {

@@ -48,9 +48,9 @@ namespace Lime
 			while (!shouldTerminateThread) {
 				lock (channels) {
 					foreach (var channel in channels) {
-						if (channel.IsPlaying ()) {
+						//if (channel.IsPlaying ()) {
 							channel.StreamBuffer ();
-						}
+						//}
 					}
 				}
 				Thread.Sleep (0);
