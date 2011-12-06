@@ -15,7 +15,7 @@ namespace Lime
 		int bitstream;
 		int streamSlot;
 		static StreamTable streamTable = new StreamTable ();
-		
+
 		public OggDecoder (Stream stream)
 		{
 			this.stream = stream;
@@ -155,7 +155,7 @@ namespace Lime
 			}
 			throw new Lime.Exception ("Too many opened streams");
 		}
-		
+
 		public Stream this [int slot]
 		{
 			get {

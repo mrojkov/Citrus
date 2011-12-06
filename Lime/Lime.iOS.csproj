@@ -114,6 +114,7 @@
     <Compile Include="Source\Audio\WaveIMA4Decoder.cs" />
     <Compile Include="Source\Lemon.cs" />
     <Compile Include="Source\Audio\OggDecoder.cs" />
+    <Compile Include="Source\Audio\SoundCache.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\List.cs">

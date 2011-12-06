@@ -142,6 +142,7 @@ namespace Lime
 			int totalRead = 0;
 			int needToRead = BufferSize / decoder.GetBlockSize ();
 			while (true) {
+
 				int actuallyRead = decoder.ReadBlocks (rawSound, totalRead, needToRead - totalRead);
 				totalRead += actuallyRead;
 				if (totalRead == needToRead || !Looping) {
