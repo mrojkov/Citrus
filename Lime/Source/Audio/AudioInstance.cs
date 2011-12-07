@@ -3,9 +3,9 @@ using OpenTK.Audio.OpenAL;
 
 namespace Lime
 {
-	public class AudioInstance
+	public class Sound
 	{
-		public AudioInstance () { Channel = NullAudioChannel.Instance; }
+		public Sound () { Channel = NullAudioChannel.Instance; }
 
 		public IAudioChannel Channel { get; internal set; }
 		

@@ -21,7 +21,7 @@ namespace Lime
 	{
 		static AudioContext context;
 		// static XRamExtension xram;
-		static SoundCache soundCache = new SoundCache ();
+		static SampleCache soundCache = new SampleCache ();
 
 		static List<AudioChannel> channels = new List<AudioChannel> ();
 		static float [] groupVolumes = new float [2] {1, 1};
@@ -113,7 +113,7 @@ namespace Lime
 			}
 		}
 
-		static AudioInstance LoadSoundToChannel (AudioChannel channel, string path, AudioChannelGroup group, bool looping, int priority)
+		static Sound LoadSoundToChannel (AudioChannel channel, string path, AudioChannelGroup group, bool looping, int priority)
 		{
 			IAudioDecoder decoder = null;
 			if (AssetsBundle.Instance.FileExists (path + ".ogg")) {
@@ -122,7 +122,7 @@ namespace Lime
 				decoder = new WaveIMA4Decoder (soundCache.OpenStream (path + ".wav"));
 			} else {
 				Console.WriteLine ("Missing audio file: '{0}'", path);
-				return new AudioInstance ();
+				return new Sound ();
 			}
 			var sound = channel.Play (decoder, looping);
 			channel.Group = group;
@@ -155,28 +155,28 @@ namespace Lime
 			}
 		}
 
-		public static AudioInstance LoadSound (string path, AudioChannelGroup group, bool looping = false, int priority = 0)
+		public static Sound LoadSound (string path, AudioChannelGroup group, bool looping = false, int priority = 0)
 		{
 			var channel = AllocateChannel (priority);
 			if (channel != null) {
 				return LoadSoundToChannel (channel, path, group, looping, priority);
 			}
-			return new AudioInstance ();
+			return new Sound ();
 		}
 
-		public static AudioInstance Play (string path, AudioChannelGroup group, bool looping = false, int priority = 0)
+		public static Sound Play (string path, AudioChannelGroup group, bool looping = false, int priority = 0)
 		{
 			var sound = LoadSound (path, group, looping, priority);
 			sound.Resume ();
 			return sound;
 		}
 
-		public static AudioInstance PlayMusic (string path, bool looping = true, int priority = 100)
+		public static Sound PlayMusic (string path, bool looping = true, int priority = 100)
 		{
 			return Play (path, AudioChannelGroup.Music, looping, priority);
 		}
 
-		public static AudioInstance PlayEffect (string path, bool looping = false, int priority = 0)
+		public static Sound PlayEffect (string path, bool looping = false, int priority = 0)
 		{
 			return Play (path, AudioChannelGroup.Effects, looping, priority);
 		}

@@ -44,7 +44,7 @@ namespace Lime
 		int queueLength;
 		bool looping;
 
-		AudioInstance sound;
+		Sound sound;
 		internal IAudioDecoder decoder;
 		IntPtr decodedData;
 
@@ -70,12 +70,12 @@ namespace Lime
 
 		public ALSourceState State { get { return AL.GetSourceState (source); } }
 
-		public AudioInstance Play (IAudioDecoder decoder, bool looping)
+		public Sound Play (IAudioDecoder decoder, bool looping)
 		{
 			Stop ();
 			if (sound != null)
 				sound.Channel = NullAudioChannel.Instance;
-			sound = new AudioInstance { Channel = this };
+			sound = new Sound { Channel = this };
 			this.looping = looping;
 			if (this.decoder != null)
 				this.decoder.Dispose ();

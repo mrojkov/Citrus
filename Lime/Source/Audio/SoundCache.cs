@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Lime
 {
-	internal class SoundCache
+	internal class SampleCache
 	{
 		public const int MaxCachedSoundSize = 128 * 1024;
 		public const int SoundCacheSize = 32;
