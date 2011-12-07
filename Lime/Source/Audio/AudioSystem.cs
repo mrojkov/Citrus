@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using OpenTK.Audio;
 using OpenTK.Audio.OpenAL;
 using System.Threading;
-using System.IO;
 using ProtoBuf;
 
 namespace Lime

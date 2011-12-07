@@ -17,10 +17,10 @@ namespace Lime
 	[ProtoContract]
 	public class Audio : Node
 	{
-		AudioInstance instance = new AudioInstance ();
+		Sound sound = new Sound ();
 
 		[ProtoMember (1)]
-		public SerializableSound Sound { get; set; }
+		public SerializableSample Sample { get; set; }
 
 		[ProtoMember (2), DefaultValue (false)]
 		public bool Looping { get; set; }
@@ -36,7 +36,7 @@ namespace Lime
 			set
 			{
 				volume = value;
-				instance.Volume = volume;
+				sound.Volume = volume;
 			}
 		}
 
@@ -48,7 +48,7 @@ namespace Lime
 			set
 			{
 				pan = value;
-				instance.Pan = pan;
+				sound.Pan = pan;
 			}
 		}
 
@@ -63,15 +63,15 @@ namespace Lime
 
 		void Play ()
 		{
-			instance = Sound.Play (AudioChannelGroup.Effects, true, Looping, Priority);
-			instance.Volume = Volume;
-			instance.Pan = Pan;
-			instance.Resume ();
+			sound = Sample.Play (AudioChannelGroup.Effects, true, Looping, Priority);
+			sound.Volume = Volume;
+			sound.Pan = Pan;
+			sound.Resume ();
 		}
 
 		void Stop ()
 		{
-			instance.Stop ();
+			sound.Stop ();
 		}
 
 		protected internal override void OnTrigger (string property)

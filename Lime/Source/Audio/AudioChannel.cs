@@ -1,6 +1,5 @@
 ﻿using System;
 using OpenTK.Audio.OpenAL;
-using System.Threading;
 using System.Runtime.InteropServices;
 
 namespace Lime

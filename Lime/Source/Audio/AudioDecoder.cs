@@ -1,7 +1,6 @@
 ﻿using System;
-using System.IO;
 using OpenTK.Audio.OpenAL;
-using System.Runtime.InteropServices;
+
 #if iOS
 using MonoTouch.AudioToolbox;
 #elif MAC

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Text;
 using OpenTK.Audio.OpenAL;
 using System.Runtime.InteropServices;
-using System.Collections.Generic;
 
 namespace Lime
 {
