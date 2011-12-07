@@ -4,9 +4,19 @@ using OpenTK.Audio;
 using OpenTK.Audio.OpenAL;
 using System.Threading;
 using System.IO;
+using ProtoBuf;
 
 namespace Lime
 {
+	[ProtoContract]
+	public enum AudioChannelGroup
+	{
+		[ProtoEnum]
+		Effects,
+		[ProtoEnum]
+		Music
+	}
+
 	public static class AudioSystem
 	{
 		static AudioContext context;
@@ -18,6 +28,7 @@ namespace Lime
 
 		static Thread streamingThread;
 		static volatile bool shouldTerminateThread;
+		static bool active = true;
 
 		public static void Initialize (int numChannels = 16)
 		{
@@ -55,14 +66,6 @@ namespace Lime
 			}
 		}
 
-		public static void ProcessEvents ()
-		{
-			foreach (var channel in channels) {
-				channel.ProcessEvents ();
-			}
-		}
-
-		static bool active = true;
 		public static bool Active
 		{
 			get { return active; }
@@ -97,7 +100,7 @@ namespace Lime
 		static void PauseAll ()
 		{
 			foreach (var channel in channels) {
-				if (channel.IsPlaying ()) {
+				if (channel.State == ALSourceState.Playing) {
 					channel.Pause ();
 				}
 			}
@@ -106,13 +109,13 @@ namespace Lime
 		static void ResumeAll ()
 		{
 			foreach (var channel in channels) {
-				if (channel.IsPaused ()) {
+				if (channel.State == ALSourceState.Paused) {
 					channel.Resume ();
 				}
 			}
 		}
 
-		static bool LoadSoundToChannel (AudioChannel channel, string path, AudioChannelGroup group, bool looping, int priority)
+		static AudioInstance LoadSoundToChannel (AudioChannel channel, string path, AudioChannelGroup group, bool looping, int priority)
 		{
 			IAudioDecoder decoder = null;
 			if (AssetsBundle.Instance.FileExists (path + ".ogg")) {
@@ -121,13 +124,13 @@ namespace Lime
 				decoder = new WaveIMA4Decoder (soundCache.OpenStream (path + ".wav"));
 			} else {
 				Console.WriteLine ("Missing audio file: '{0}'", path);
-				return false;
+				return new AudioInstance ();
 			}
-			channel.PlaySound (decoder, looping);
+			var sound = channel.Play (decoder, looping);
 			channel.Group = group;
 			channel.Priority = priority;
 			channel.Volume = 1;
-			return true;
+			return sound;
 		}
 
 		static AudioChannel AllocateChannel (int priority)
@@ -142,7 +145,7 @@ namespace Lime
 					return (a.InitiationTime < b.InitiationTime) ? -1 : 1;
 				});
 				foreach (var channel in channels) {
-					if (channel.OnStop == null && (channel.IsStopped () || channel.IsInitialState ())) {
+					if (channel.State == ALSourceState.Stopped || channel.State == ALSourceState.Initial) {
 						return channel;
 					}
 				}
@@ -155,31 +158,28 @@ namespace Lime
 			}
 		}
 
-		public static AudioChannel LoadSound (string path, AudioChannelGroup group, bool looping = false, int priority = 0)
+		public static AudioInstance LoadSound (string path, AudioChannelGroup group, bool looping = false, int priority = 0)
 		{
 			var channel = AllocateChannel (priority);
 			if (channel != null) {
-				if (!LoadSoundToChannel (channel, path, group, looping, priority))
-					return null;
+				return LoadSoundToChannel (channel, path, group, looping, priority);
 			}
-			return channel;
+			return new AudioInstance ();
 		}
 
-		public static AudioChannel Play (string path, AudioChannelGroup group, bool looping = false, int priority = 0)
+		public static AudioInstance Play (string path, AudioChannelGroup group, bool looping = false, int priority = 0)
 		{
-			var channel = LoadSound (path, group, looping, priority);
-			if (channel != null) {
-				channel.Resume ();
-			}
-			return channel;
+			var sound = LoadSound (path, group, looping, priority);
+			sound.Resume ();
+			return sound;
 		}
 
-		public static AudioChannel PlayMusic (string path, bool looping = true, int priority = 100)
+		public static AudioInstance PlayMusic (string path, bool looping = true, int priority = 100)
 		{
 			return Play (path, AudioChannelGroup.Music, looping, priority);
 		}
 
-		public static AudioChannel PlayEffect (string path, bool looping = false, int priority = 0)
+		public static AudioInstance PlayEffect (string path, bool looping = false, int priority = 0)
 		{
 			return Play (path, AudioChannelGroup.Effects, looping, priority);
 		}

@@ -29,21 +29,21 @@ namespace Lime
 			}
 		}
 
-		public AudioChannel Play (AudioChannelGroup group, bool paused, bool looping = false, int priority = 0)
+		public AudioInstance Play (AudioChannelGroup group, bool paused, bool looping = false, int priority = 0)
 		{
-			var channel = AudioSystem.LoadSound (Path, group, looping, priority);
+			var sound = AudioSystem.LoadSound (Path, group, looping, priority);
 			if (!paused) {
-				channel.Resume ();
+				sound.Resume ();
 			}
-			return channel;
+			return sound;
 		}
 
-		public AudioChannel PlayEffect (bool paused, bool looping = false, int priority = 0)
+		public AudioInstance PlayEffect (bool paused, bool looping = false, int priority = 0)
 		{
 			return Play (AudioChannelGroup.Effects, paused, looping, priority);
 		}
 
-		public AudioChannel PlayMusic (bool paused, bool looping = true, int priority = 100)
+		public AudioInstance PlayMusic (bool paused, bool looping = true, int priority = 100)
 		{
 			return Play (AudioChannelGroup.Music, paused, looping, priority);
 		}

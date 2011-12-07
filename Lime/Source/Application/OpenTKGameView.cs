@@ -92,7 +92,6 @@ namespace Lime
 			else if (delta > 0.1)
 				delta = 0.1;
 			app.OnUpdateFrame (delta);
-			AudioSystem.ProcessEvents ();
 		}
 		
 		protected override void OnRenderFrame (OpenTK.FrameEventArgs e)

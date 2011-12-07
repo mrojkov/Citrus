@@ -69,10 +69,10 @@ namespace Lime
 			totalBlocks = (int)(dataSize / origBlockSize);
 			blockSize = (origBlockSize - channels * 4) * 4 + channels * 2;
 			origBlockBuffer = new byte [origBlockSize];
-			ResetToBeginning ();
+			Rewind ();
 		}
 
-		public void ResetToBeginning ()
+		public void Rewind ()
 		{
 			currentBlock = 0;
 			stream.Seek (dataPosition, SeekOrigin.Begin);

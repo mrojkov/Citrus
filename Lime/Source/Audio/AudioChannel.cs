@@ -1,28 +1,35 @@
 ﻿using System;
 using OpenTK.Audio.OpenAL;
 using System.Threading;
-using ProtoBuf;
 using System.Runtime.InteropServices;
 
 namespace Lime
 {
-	[ProtoContract]
-	public enum AudioChannelGroup
+	public interface IAudioChannel
 	{
-		[ProtoEnum]
-		Effects,
-		[ProtoEnum]
-		Music
+		ALSourceState State { get; }
+		float Pan { get; set; }
+		void Resume ();
+		void Stop ();
+		float Volume { get; set; }
 	}
 
-	public class AudioChannel : IDisposable
+	public class NullAudioChannel : IAudioChannel
+	{
+		public static NullAudioChannel Instance = new NullAudioChannel ();
+
+		public ALSourceState State { get { return ALSourceState.Stopped; } }
+		public float Pan { get { return 0; } set { } }
+		public void Resume () {}
+		public void Stop () {}
+		public float Volume { get { return 0; } set { } }
+	}
+
+	public class AudioChannel : IDisposable, IAudioChannel
 	{
 		public const int BufferSize = 1024 * 16;
 		public const int NumBuffers = 8;
-		public delegate void StopEvent (AudioChannel channel);
-		public StopEvent OnStop;
-		public bool Looping;
-		
+
 		internal AudioChannelGroup Group;
 		internal int Priority;
 		internal DateTime InitiationTime;
@@ -30,12 +37,15 @@ namespace Lime
 
 		object syncRoot = new object ();
 		int source;
+		float volume = 1;
 		int [] buffers;
 		int queueHead;
 		int queueLength;
+		bool looping;
 
+		AudioInstance sound;
 		internal IAudioDecoder decoder;
-		IntPtr rawSound;
+		IntPtr decodedData;
 		volatile bool resumePending = false;
 
 		internal AudioChannel (int index)
@@ -44,7 +54,7 @@ namespace Lime
 			buffers = AL.GenBuffers (NumBuffers);
 			source = AL.GenSource ();
 			AudioSystem.CheckError ();
-			rawSound = Marshal.AllocHGlobal (BufferSize);
+			decodedData = Marshal.AllocHGlobal (BufferSize);
 		}
 
 		public void Dispose ()
@@ -52,52 +62,54 @@ namespace Lime
 			if (this.decoder != null) {
 				this.decoder.Dispose ();
 			}
-			Marshal.FreeHGlobal (rawSound);
+			Marshal.FreeHGlobal (decodedData);
 			AL.SourceStop (source);
 			AL.DeleteSource (source);
 			AL.DeleteBuffers (buffers);
 			AudioSystem.CheckError ();
 		}
 
-		internal void PlaySound (IAudioDecoder decoder, bool looping)
+		public AudioInstance Play (IAudioDecoder decoder, bool looping)
 		{
-			lock (syncRoot) {
-				this.Looping = looping;
-				if (this.decoder != null) {
-					this.decoder.Dispose ();
-				}
-				this.decoder = decoder;
-				InitiationTime = DateTime.Now;
-				AL.SourceStop (source);
-				int queuedBuffers = 0;
-				AL.GetSource (source, ALGetSourcei.BuffersQueued, out queuedBuffers);
-				if (queuedBuffers > 0) {
-					AL.SourceUnqueueBuffers (source, queuedBuffers);
-				}
-				AudioSystem.CheckError ();
-				queueLength = 0;
-				queueHead = 0;
-				resumePending = false;
+			if (sound != null) {
+				sound.Channel = NullAudioChannel.Instance;
 			}
+			sound = new AudioInstance { Channel = this };
+			Stop ();
+			this.looping = looping;
+			if (this.decoder != null) {
+				this.decoder.Dispose ();
+			}
+			this.decoder = decoder;
+			InitiationTime = DateTime.Now;
+			int queuedBuffers = 0;
+			AL.GetSource (source, ALGetSourcei.BuffersQueued, out queuedBuffers);
+			if (queuedBuffers > 0) {
+				AL.SourceUnqueueBuffers (source, queuedBuffers);
+			}
+			AudioSystem.CheckError ();
+			queueLength = 0;
+			queueHead = 0;
+			resumePending = false;
+			return sound;
 		}
 
 		public void Resume ()
 		{
-			resumePending = true;
+			StreamBuffer ();
+			AL.SourcePlay (source);
+			AudioSystem.CheckError ();
+			//resumePending = true;
 		}
 
-		/// <summary>
-		/// Pauses channel. Used only for pausing on application deactivation.
-		/// </summary>
-		internal void Pause ()
+		public void Pause ()
 		{
-			lock (this) {
+			lock (syncRoot) {
 				AL.SourcePause (source);
 				AudioSystem.CheckError ();
 			}
 		}
 
-		float volume = 1;
 		public float Volume
 		{
 			get { return volume; }
@@ -116,12 +128,11 @@ namespace Lime
 		internal void ThreadedUpdate ()
 		{
 			lock (syncRoot) {
-				if (IsPlaying ()) {
+				if (State == ALSourceState.Playing) {
 					StreamBuffer ();
 				}
 				if (resumePending) {
 					resumePending = false;
-					StreamBuffer ();
 					StreamBuffer ();
 					AL.SourcePlay (source);
 					AudioSystem.CheckError ();
@@ -146,15 +157,15 @@ namespace Lime
 			int totalRead = 0;
 			int needToRead = BufferSize / decoder.GetBlockSize ();
 			while (true) {
-				int actuallyRead = decoder.ReadBlocks (rawSound, totalRead, needToRead - totalRead);
+				int actuallyRead = decoder.ReadBlocks (decodedData, totalRead, needToRead - totalRead);
 				totalRead += actuallyRead;
-				if (totalRead == needToRead || !Looping) {
+				if (totalRead == needToRead || !looping) {
 					break;
 				}
-				decoder.ResetToBeginning ();
+				decoder.Rewind ();
 			}
 			if (totalRead > 0) {
-				AL.BufferData (buffer, decoder.GetFormat (), rawSound, 
+				AL.BufferData (buffer, decoder.GetFormat (), decodedData, 
 					totalRead * decoder.GetBlockSize (), decoder.GetFrequency ());
 				return true; 
 			}
@@ -179,54 +190,15 @@ namespace Lime
 			}
 		}
 
-		internal void ProcessEvents ()
-		{
-			if (OnStop != null) {
-				if (IsStopped ()) {
-					var handler = OnStop;
-					OnStop = null;
-					//if (decoder != null) {
-					//	decoder.Dispose ();
-					//	decoder = null;
-					//}
-					handler (this);
-				}
-			}
-		}
-
-		public bool IsPaused ()
-		{
-			return AL.GetSourceState (source) == ALSourceState.Paused;
-		}
-
-		public bool IsPlaying ()
-		{
-			return AL.GetSourceState (source) == ALSourceState.Playing;
-		}
-
-		public bool IsInitialState ()
-		{
-			return AL.GetSourceState (source) == ALSourceState.Initial;
-		}
-
-		public bool IsStopped ()
-		{
-			return AL.GetSourceState (source) == ALSourceState.Stopped;
-		}
+		public ALSourceState State { get { return AL.GetSourceState (source); } }
 
 		public void Stop ()
 		{
-			lock (this) {
+			lock (syncRoot) {
+				resumePending = false;
 				AL.SourceStop (source);
 				AudioSystem.CheckError ();
-				if (OnStop != null)
-					OnStop (this);
 			}
-		}
-
-		public override string ToString ()
-		{
-			return String.Format ("AudioChannel {0}", id);
 		}
 	}
 }

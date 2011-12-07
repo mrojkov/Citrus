@@ -15,7 +15,7 @@ namespace Lime
 		ALFormat GetFormat ();
 		int GetFrequency ();
 		int GetCompressedSize ();
-		void ResetToBeginning ();
+		void Rewind ();
 		int GetBlockSize ();
 		int ReadBlocks (IntPtr buffer, int startIndex, int blockCount);
 	}
