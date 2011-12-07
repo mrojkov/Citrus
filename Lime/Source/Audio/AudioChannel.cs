@@ -96,10 +96,10 @@ namespace Lime
 
 		public void Resume ()
 		{
-			StreamBuffer ();
-			AL.SourcePlay (source);
-			AudioSystem.CheckError ();
-			//resumePending = true;
+			//StreamBuffer ();
+			//AL.SourcePlay (source);
+			//AudioSystem.CheckError ();
+			resumePending = true;
 		}
 
 		public void Pause ()
