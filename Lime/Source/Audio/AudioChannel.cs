@@ -25,17 +25,18 @@ namespace Lime
 		public float Volume { get { return 0; } set { } }
 	}
 
-	public class AudioChannel : IDisposable, IAudioChannel
+	internal class AudioChannel : IDisposable, IAudioChannel
 	{
-		public const int BufferSize = 1024 * 16;
-		public const int NumBuffers = 8;
+		public const int BufferSize = 1024 * 32;
+		public const int NumBuffers = 4;
 
-		internal AudioChannelGroup Group;
-		internal int Priority;
-		internal DateTime InitiationTime;
-		internal int id;
+		public AudioChannelGroup Group;
+		public int Priority;
+		public DateTime StartupTime;
+		public int Id;
 
-		object syncRoot = new object ();
+		object streamingSync = new object ();
+
 		int source;
 		float volume = 1;
 		int [] buffers;
@@ -46,11 +47,10 @@ namespace Lime
 		AudioInstance sound;
 		internal IAudioDecoder decoder;
 		IntPtr decodedData;
-		volatile bool resumePending = false;
 
-		internal AudioChannel (int index)
+		public AudioChannel (int index)
 		{
-			this.id = index;
+			this.Id = index;
 			buffers = AL.GenBuffers (NumBuffers);
 			source = AL.GenSource ();
 			AudioSystem.CheckError ();
@@ -59,9 +59,8 @@ namespace Lime
 
 		public void Dispose ()
 		{
-			if (this.decoder != null) {
-				this.decoder.Dispose ();
-			}
+			if (decoder != null)
+				decoder.Dispose ();
 			Marshal.FreeHGlobal (decodedData);
 			AL.SourceStop (source);
 			AL.DeleteSource (source);
@@ -69,19 +68,18 @@ namespace Lime
 			AudioSystem.CheckError ();
 		}
 
+		public ALSourceState State { get { return AL.GetSourceState (source); } }
+
 		public AudioInstance Play (IAudioDecoder decoder, bool looping)
 		{
-			if (sound != null) {
-				sound.Channel = NullAudioChannel.Instance;
-			}
-			sound = new AudioInstance { Channel = this };
 			Stop ();
+			if (sound != null)
+				sound.Channel = NullAudioChannel.Instance;
+			sound = new AudioInstance { Channel = this };
 			this.looping = looping;
-			if (this.decoder != null) {
+			if (this.decoder != null)
 				this.decoder.Dispose ();
-			}
 			this.decoder = decoder;
-			InitiationTime = DateTime.Now;
 			int queuedBuffers = 0;
 			AL.GetSource (source, ALGetSourcei.BuffersQueued, out queuedBuffers);
 			if (queuedBuffers > 0) {
@@ -90,22 +88,27 @@ namespace Lime
 			AudioSystem.CheckError ();
 			queueLength = 0;
 			queueHead = 0;
-			resumePending = false;
+			StreamBuffer ();
+			StartupTime = DateTime.Now;
 			return sound;
 		}
 
 		public void Resume ()
 		{
-			//StreamBuffer ();
-			//AL.SourcePlay (source);
-			//AudioSystem.CheckError ();
-			resumePending = true;
+			AL.SourcePlay (source);
+			AudioSystem.CheckError ();
 		}
 
 		public void Pause ()
 		{
-			lock (syncRoot) {
-				AL.SourcePause (source);
+			AL.SourcePause (source);
+			AudioSystem.CheckError ();
+		}
+
+		public void Stop ()
+		{
+			lock (streamingSync) {
+				AL.SourceStop (source);
 				AudioSystem.CheckError ();
 			}
 		}
@@ -122,20 +125,14 @@ namespace Lime
 			}
 		}
 
-		// Not implemented yet
 		public float Pan { get; set; }
 
-		internal void ThreadedUpdate ()
+		public void Update ()
 		{
-			lock (syncRoot) {
-				if (State == ALSourceState.Playing) {
-					StreamBuffer ();
-				}
-				if (resumePending) {
-					resumePending = false;
-					StreamBuffer ();
-					AL.SourcePlay (source);
-					AudioSystem.CheckError ();
+			if (State == ALSourceState.Playing) {
+				lock (streamingSync) {
+					if (State == ALSourceState.Playing)
+						StreamBuffer ();
 				}
 			}
 		}
@@ -144,7 +141,7 @@ namespace Lime
 		{
 			int buffer = AcquireBuffer ();
 			if (buffer != 0) {
-				if (LoadBuffer (buffer)) {
+				if (FillupBuffer (buffer)) {
 					AL.SourceQueueBuffer (source, buffer);
 					AudioSystem.CheckError ();
 				} else
@@ -152,7 +149,7 @@ namespace Lime
 			}
 		}
 
-		bool LoadBuffer (int buffer)
+		bool FillupBuffer (int buffer)
 		{
 			int totalRead = 0;
 			int needToRead = BufferSize / decoder.GetBlockSize ();
@@ -187,17 +184,6 @@ namespace Lime
 			else {
 				int index = (queueHead + queueLength++) % NumBuffers;
 				return buffers [index];
-			}
-		}
-
-		public ALSourceState State { get { return AL.GetSourceState (source); } }
-
-		public void Stop ()
-		{
-			lock (syncRoot) {
-				resumePending = false;
-				AL.SourceStop (source);
-				AudioSystem.CheckError ();
 			}
 		}
 	}

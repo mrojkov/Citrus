@@ -57,10 +57,8 @@ namespace Lime
 		static void RunStreamingLoop ()
 		{
 			while (!shouldTerminateThread) {
-				lock (channels) {
-					foreach (var channel in channels) {
-						channel.ThreadedUpdate ();
-					}
+				foreach (var channel in channels) {
+					channel.Update ();
 				}
 				Thread.Sleep (0);
 			}
@@ -118,10 +116,10 @@ namespace Lime
 		static AudioInstance LoadSoundToChannel (AudioChannel channel, string path, AudioChannelGroup group, bool looping, int priority)
 		{
 			IAudioDecoder decoder = null;
-			if (AssetsBundle.Instance.FileExists (path + ".wav")) {
-				decoder = new WaveIMA4Decoder (soundCache.OpenStream (path + ".wav"));
-			} else if (AssetsBundle.Instance.FileExists (path + ".ogg")) {
+			if (AssetsBundle.Instance.FileExists (path + ".ogg")) {
 				decoder = new OggDecoder (soundCache.OpenStream (path + ".ogg"));
+			} else if (AssetsBundle.Instance.FileExists (path + ".wav")) {
+				decoder = new WaveIMA4Decoder (soundCache.OpenStream (path + ".wav"));
 			} else {
 				Console.WriteLine ("Missing audio file: '{0}'", path);
 				return new AudioInstance ();
@@ -135,26 +133,25 @@ namespace Lime
 
 		static AudioChannel AllocateChannel (int priority)
 		{
-			lock (channels) {
-				channels.Sort ((a, b) => {
-					if (a.Priority != b.Priority)
-						return a.Priority - b.Priority;
-					if (a.InitiationTime == b.InitiationTime) {
-						return a.id - b.id;
-					}
-					return (a.InitiationTime < b.InitiationTime) ? -1 : 1;
-				});
-				foreach (var channel in channels) {
-					if (channel.State == ALSourceState.Stopped || channel.State == ALSourceState.Initial) {
-						return channel;
-					}
+			var channels = AudioSystem.channels.ToArray ();
+			Array.Sort (channels, (a, b) => {
+				if (a.Priority != b.Priority)
+					return a.Priority - b.Priority;
+				if (a.StartupTime == b.StartupTime) {
+					return a.Id - b.Id;
 				}
-				if (channels.Count > 0 && channels [0].Priority <= priority) {
-					channels [0].Stop ();
-					return channels [0];
-				} else {
-					return null;
+				return (a.StartupTime < b.StartupTime) ? -1 : 1;
+			});
+			foreach (var channel in channels) {
+				if (channel.State == ALSourceState.Stopped || channel.State == ALSourceState.Initial) {
+					return channel;
 				}
+			}
+			if (channels.Length > 0 && channels [0].Priority <= priority) {
+				channels [0].Stop ();
+				return channels [0];
+			} else {
+				return null;
 			}
 		}
 
