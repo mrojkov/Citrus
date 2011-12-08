@@ -45,7 +45,7 @@ namespace Orange
 						return new SerializableTexture (lexer.ParsePath ()); };
 				case "File@Audio":
 					return delegate() {
-						return new SerializableSound (lexer.ParsePath ()); };
+						return new SerializableSample (lexer.ParsePath ()); };
 				default:
 					return delegate() {
 						return lexer.ParseQuotedString (); };

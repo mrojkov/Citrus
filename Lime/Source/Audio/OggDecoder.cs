@@ -95,7 +95,7 @@ namespace Lime
 #endif
 		public static uint OggRead (IntPtr buffer, uint size, uint nmemb, int handle)
 		{
-			byte [] block = new byte [1024 * 4];
+			byte [] block = new byte [1024 * 16];
 			int actualCount = 0;
 			int requestCount = (int)(size * nmemb);
 			while (true) {

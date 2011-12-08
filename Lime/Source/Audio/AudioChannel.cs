@@ -26,8 +26,8 @@ namespace Lime
 
 	internal class AudioChannel : IDisposable, IAudioChannel
 	{
-		public const int BufferSize = 1024 * 32;
-		public const int NumBuffers = 4;
+		public const int BufferSize = 1024 * 16;
+		public const int NumBuffers = 8;
 
 		public AudioChannelGroup Group;
 		public int Priority;
@@ -35,6 +35,7 @@ namespace Lime
 		public int Id;
 
 		object streamingSync = new object ();
+		volatile bool streaming;
 
 		int source;
 		float volume = 1;
@@ -67,35 +68,50 @@ namespace Lime
 			AudioSystem.CheckError ();
 		}
 
-		public ALSourceState State { get { return AL.GetSourceState (source); } }
+		public ALSourceState State { 
+			get {
+				return AL.GetSourceState (source); 
+			}
+		}
 
+		public bool IsFree ()
+		{
+			if (streaming) {
+				return false;
+			} else {
+				UnqueueBuffers ();
+				int queued;
+				AL.GetSource (source, ALGetSourcei.BuffersQueued, out queued);
+				AudioSystem.CheckError ();
+				return queued == 0;
+			}
+		}
+		
 		public Sound Play (IAudioDecoder decoder, bool looping)
 		{
-			Stop ();
-			if (sound != null)
-				sound.Channel = NullAudioChannel.Instance;
-			sound = new Sound { Channel = this };
-			this.looping = looping;
-			if (this.decoder != null)
-				this.decoder.Dispose ();
-			this.decoder = decoder;
-			int queuedBuffers = 0;
-			AL.GetSource (source, ALGetSourcei.BuffersQueued, out queuedBuffers);
-			if (queuedBuffers > 0) {
-				AL.SourceUnqueueBuffers (source, queuedBuffers);
+			if (streaming) {
+				throw new Lime.Exception ("Can't play on the channel");
 			}
-			AudioSystem.CheckError ();
-			queueLength = 0;
-			queueHead = 0;
-			StreamBuffer ();
+			lock (streamingSync) {
+				this.looping = looping;
+				if (this.decoder != null)
+					this.decoder.Dispose ();
+				this.decoder = decoder;
+			}
+			if (sound != null) {
+				sound.Channel = NullAudioChannel.Instance;
+			}
+			sound = new Sound { Channel = this };
 			StartupTime = DateTime.Now;
 			return sound;
 		}
 
 		public void Resume ()
 		{
-			AL.SourcePlay (source);
-			AudioSystem.CheckError ();
+			streaming = true;
+			if (State == ALSourceState.Paused) {
+				AL.SourcePlay (source);
+			}
 		}
 
 		public void Pause ()
@@ -106,10 +122,9 @@ namespace Lime
 
 		public void Stop ()
 		{
-			lock (streamingSync) {
-				AL.SourceStop (source);
-				AudioSystem.CheckError ();
-			}
+			streaming = false;
+			AL.SourceStop (source);
+			AudioSystem.CheckError ();
 		}
 
 		public float Volume
@@ -128,23 +143,34 @@ namespace Lime
 
 		public void Update ()
 		{
-			if (State == ALSourceState.Playing) {
+			if (streaming) {
 				lock (streamingSync) {
-					if (State == ALSourceState.Playing)
-						StreamBuffer ();
+					if (streaming) {
+						UpdateHelper ();
+					}
 				}
 			}
 		}
 
-		void StreamBuffer ()
+		void UpdateHelper ()
 		{
+			// queue one buffer
 			int buffer = AcquireBuffer ();
 			if (buffer != 0) {
 				if (FillupBuffer (buffer)) {
 					AL.SourceQueueBuffer (source, buffer);
 					AudioSystem.CheckError ();
-				} else
+				} else {
 					queueLength--;
+					streaming = false;
+				}
+			}
+			// resume playing
+			switch (State) {
+			case ALSourceState.Stopped:
+			case ALSourceState.Initial:
+				AL.SourcePlay (source);
+				break;
 			}
 		}
 
@@ -161,26 +187,32 @@ namespace Lime
 				decoder.Rewind ();
 			}
 			if (totalRead > 0) {
+				AudioSystem.CheckError ();
 				AL.BufferData (buffer, decoder.GetFormat (), decodedData, 
 					totalRead * decoder.GetBlockSize (), decoder.GetFrequency ());
+				AudioSystem.CheckError ();
 				return true; 
 			}
 			return false;
 		}
 
-		int AcquireBuffer ()
+		void UnqueueBuffers ()
 		{
-			int processed = 0;
+			int processed;
 			AL.GetSource (source, ALGetSourcei.BuffersProcessed, out processed);
 			while (processed-- > 0) {
 				AL.SourceUnqueueBuffer (source);
 				queueLength--;
 				queueHead = (queueHead + 1) % NumBuffers;
 			}
-			AudioSystem.CheckError ();
-			if (queueLength == NumBuffers)
+		}
+
+		int AcquireBuffer ()
+		{
+			UnqueueBuffers ();
+			if (queueLength == NumBuffers) {
 				return 0;
-			else {
+			} else {
 				int index = (queueHead + queueLength++) % NumBuffers;
 				return buffers [index];
 			}

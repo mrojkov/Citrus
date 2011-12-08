@@ -142,11 +142,13 @@ namespace Lime
 				return (a.StartupTime < b.StartupTime) ? -1 : 1;
 			});
 			foreach (var channel in channels) {
-				if (channel.State == ALSourceState.Stopped || channel.State == ALSourceState.Initial) {
+				if (channel.IsFree ()) {
 					return channel;
 				}
 			}
 			if (channels.Length > 0 && channels [0].Priority <= priority) {
+				// It's impossible to unqueue not processed buffers on iPhone.
+				// so, it will be delay before new sound appearance.
 				channels [0].Stop ();
 				return channels [0];
 			} else {

@@ -430,7 +430,7 @@ namespace Lime
 
 		public override void Update (int delta)
 		{
-			// return;
+			return;
 			base.Update (delta);
 			if (firstUpdate) {
 				firstUpdate = false;

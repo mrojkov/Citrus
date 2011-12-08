@@ -459,7 +459,7 @@ namespace Orange
 			Audio audio = (Audio)node;
 			switch (name) {
 			case "File":
-				audio.Sound = new SerializableSound (lexer.ParsePath ());
+				audio.Sample = new SerializableSample (lexer.ParsePath ());
 				break;
 			case "Flags":
 				audio.Looping = (lexer.ParseInt () & 4) != 0;
