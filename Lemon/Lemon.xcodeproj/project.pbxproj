@@ -97,7 +97,7 @@
 
 /* Begin PBXFileReference section */
 		278A4445148C5A08007283B6 /* libLemon.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libLemon.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
-		278A44B2148C697D007283B6 /* libLemon_iOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = libLemon_iOS.a; path = libLemon.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		278A44B2148C697D007283B6 /* libLemon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libLemon.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		278A44C2148C6B5A007283B6 /* ogg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ogg.h; sourceTree = "<group>"; };
 		278A44C3148C6B5A007283B6 /* os_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = os_types.h; sourceTree = "<group>"; };
 		278A44C5148C6B5A007283B6 /* codec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = codec.h; sourceTree = "<group>"; };
@@ -175,7 +175,7 @@
 			isa = PBXGroup;
 			children = (
 				278A4445148C5A08007283B6 /* libLemon.dylib */,
-				278A44B2148C697D007283B6 /* libLemon_iOS.a */,
+				278A44B2148C697D007283B6 /* libLemon.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -391,7 +391,7 @@
 			);
 			name = Lemon_iOS;
 			productName = Lemon_iOS;
-			productReference = 278A44B2148C697D007283B6 /* libLemon_iOS.a */;
+			productReference = 278A44B2148C697D007283B6 /* libLemon.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -571,9 +571,15 @@
 					"$(ARCHS_STANDARD_32_BIT)",
 				);
 				DSTROOT = /tmp/Lemon_iOS.dst;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				"GCC_PRECOMPILE_PREFIX_HEADER[arch=*]" = NO;
 				GCC_PREFIX_HEADER = "";
+				"GCC_PREPROCESSOR_DEFINITIONS[arch=*]" = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_THREADSAFE_STATICS = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = "";
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
 				IPHONEOS_DEPLOYMENT_TARGET = 3.2;
@@ -598,9 +604,11 @@
 					"$(ARCHS_STANDARD_32_BIT)",
 				);
 				DSTROOT = /tmp/Lemon_iOS.dst;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "";
+				GCC_THREADSAFE_STATICS = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = "";
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
 				IPHONEOS_DEPLOYMENT_TARGET = 3.2;
@@ -613,7 +621,7 @@
 				SYMROOT = bin/iOS;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = ./Source/Include;
-				VALIDATE_PRODUCT = YES;
+				VALIDATE_PRODUCT = NO;
 			};
 			name = Release;
 		};
