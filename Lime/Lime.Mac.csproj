@@ -126,10 +126,9 @@
     <None Include="Source\Audio\ADPCMEncoder.c">
       <Visible>False</Visible>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Source\libLemon.dylib">
+    <None Include="..\Lemon\bin\Mac\Release\libLemon.dylib">
+      <Link>libLemon.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </None>
   </ItemGroup>
 </Project>

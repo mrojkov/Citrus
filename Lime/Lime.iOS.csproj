@@ -127,5 +127,13 @@
     <None Include="Source\libLemon.dylib">
       <Visible>False</Visible>
     </None>
+    <None Include="..\Lemon\bin\iOS\Release-iphoneos\libLemon.a">
+      <Link>libLemon.a</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Lemon\bin\iOS\Release-iphonesimulator\libLemonSim.a">
+      <Link>libLemonSim.a</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>
