@@ -26,6 +26,16 @@ namespace Lime
 		int totalBlocks;
 		byte [] origBlockBuffer;
 
+		public static bool IsWaveStream (Stream stream)
+		{
+			bool result = stream.ReadByte () == 'R' &&
+				stream.ReadByte () == 'I' &&
+				stream.ReadByte () == 'F' &&
+				stream.ReadByte () == 'F';
+			stream.Seek (-4, SeekOrigin.Current);
+			return result;
+		}
+
 		public WaveIMA4Decoder (Stream stream)
 		{
 			this.stream = stream;
@@ -131,12 +141,12 @@ namespace Lime
 		{
 			unsafe {
 				short* pBuffer = (short*)buffer;
-				SampleValue v = new SampleValue (origBlockBuffer, 0);
-				*pBuffer++ = v.Value;
+				DecoderState state = new DecoderState (origBlockBuffer, 0);
+				*pBuffer++ = state.Value;
 				for (int i = 4; i < origBlockBuffer.Length; i++) {
 					var b = origBlockBuffer [i];
-					*pBuffer++ = v.Next (b & 0xf);
-					*pBuffer++ = v.Next (b >> 4);
+					*pBuffer++ = state.Next (b & 0xf);
+					*pBuffer++ = state.Next (b >> 4);
 				}
 			}
 		}
@@ -145,18 +155,18 @@ namespace Lime
 		{
 			unsafe {
 				short* pBuffer = (short*)buffer;
-				SampleValue v1 = new SampleValue (origBlockBuffer, 0);
-				SampleValue v2 = new SampleValue (origBlockBuffer, 4);
-				*pBuffer++ = v1.Value;
-				*pBuffer++ = v2.Value;
+				DecoderState channel1 = new DecoderState (origBlockBuffer, 0);
+				DecoderState channel2 = new DecoderState (origBlockBuffer, 4);
+				*pBuffer++ = channel1.Value;
+				*pBuffer++ = channel2.Value;
 				for (int i = 8; i < origBlockSize; i += 8) {
 					for (int j = 0; j < 4; j++) {
 						int a = origBlockBuffer [i + j];
 						int b = origBlockBuffer [i + j + 4];
-						*pBuffer++ = v1.Next (a & 0xf);
-						*pBuffer++ = v2.Next (b & 0xf);
-						*pBuffer++ = v1.Next (a >> 4);
-						*pBuffer++ = v2.Next (b >> 4);
+						*pBuffer++ = channel1.Next (a & 0xf);
+						*pBuffer++ = channel2.Next (b & 0xf);
+						*pBuffer++ = channel1.Next (a >> 4);
+						*pBuffer++ = channel2.Next (b >> 4);
 					}
 				}
 			}
@@ -197,12 +207,12 @@ namespace Lime
 		}
 	}
 
-	struct SampleValue
+	struct DecoderState
 	{
 		public short Value;
 		public int Index;
 
-		public SampleValue (byte[] value, int startIndex)
+		public DecoderState (byte[] value, int startIndex)
 		{
 			Value = BitConverter.ToInt16 (value, startIndex);
 			Index = value [startIndex + 2];
@@ -243,6 +253,10 @@ namespace Lime
 			d += s >> 3;
 			if ((v & 8) != 0)
 				d = -d;
+			// Another version, uses integer multiplication. Perhaps faster on modern CPU.
+			// d = (s * (v & 7) / 4) + (s / 8);
+			// if ((v & 8) != 0)
+			//	d = -d;
 			int val = ((int)Value) + d;
 			if (val > short.MaxValue)
 				val = short.MaxValue;

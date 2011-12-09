@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OpenTK.Audio;
 using OpenTK.Audio.OpenAL;
 using System.Threading;
+using System.IO;
 using ProtoBuf;
 
 namespace Lime
@@ -105,6 +106,7 @@ namespace Lime
 
 		static void ResumeAll ()
 		{
+			context.MakeCurrent ();
 			foreach (var channel in channels) {
 				if (channel.State == ALSourceState.Paused) {
 					channel.Resume ();
@@ -115,10 +117,9 @@ namespace Lime
 		static Sound LoadSoundToChannel (AudioChannel channel, string path, AudioChannelGroup group, bool looping, int priority)
 		{
 			IAudioDecoder decoder = null;
-			if (AssetsBundle.Instance.FileExists (path + ".wav")) {
-				decoder = new WaveIMA4Decoder (soundCache.OpenStream (path + ".wav"));
-			} else if (AssetsBundle.Instance.FileExists (path + ".ogg")) {
-				decoder = new OggDecoder (soundCache.OpenStream (path + ".ogg"));
+			path = path + ".sound";
+			if (AssetsBundle.Instance.FileExists (path)) {
+				decoder = AudioDecoderFactory.CreateDecoder (soundCache.OpenStream (path));
 			} else {
 				Console.WriteLine ("Missing audio file: '{0}'", path);
 				return new Sound ();
@@ -142,13 +143,11 @@ namespace Lime
 				return (a.StartupTime < b.StartupTime) ? -1 : 1;
 			});
 			foreach (var channel in channels) {
-				if (channel.IsFree ()) {
+				if (channel.State == ALSourceState.Stopped || channel.State == ALSourceState.Initial) {
 					return channel;
 				}
 			}
 			if (channels.Length > 0 && channels [0].Priority <= priority) {
-				// It's impossible to unqueue not processed buffers on iPhone.
-				// so, it will be delay before new sound appearance.
 				channels [0].Stop ();
 				return channels [0];
 			} else {

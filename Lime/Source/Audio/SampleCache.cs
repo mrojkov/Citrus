@@ -40,4 +40,5 @@ namespace Lime
 			}
 			return stream;
 		}
-	}}
+	}
+}

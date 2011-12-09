@@ -13,7 +13,7 @@ namespace Lime
 		int bitstream;
 		int handle;
 		static StreamMap streamMap = new StreamMap ();
-		
+
 		public OggDecoder (Stream stream)
 		{
 			this.stream = stream;
@@ -29,6 +29,16 @@ namespace Lime
 			if (Lemon.OggGetChannels (oggFile) > 2) {
 				throw new Lime.Exception ("Channel count must be either 1 or 2");
 			}
+		}
+
+		public static bool IsOggStream (Stream stream)
+		{
+			bool result = stream.ReadByte () == 'O' &&
+				stream.ReadByte () == 'g' &&
+				stream.ReadByte () == 'g' &&
+				stream.ReadByte () == 'S';
+			stream.Seek (-4, SeekOrigin.Current);
+			return result;
 		}
 
 		public void Dispose ()

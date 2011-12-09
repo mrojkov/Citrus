@@ -7,32 +7,31 @@ namespace Orange
 	public class AssetCooker
 	{
 		private delegate bool Converter (string srcPath, string dstPath);
-	
+
 		private Lime.AssetsBundle AssetsBundle = Lime.AssetsBundle.Instance;
 		private CitrusProject project;
 		private TargetPlatform platform;
 		private Dictionary<string, CookingRules> cookingRulesMap;
-		
+
 		string GetOriginalAssetExtension (string path)
 		{
 			switch (Path.GetExtension (path)) {
 			case ".dds":
-			case ".raw":
 			case ".pvr":
 			case ".atlasPart":
 				return ".png";
-			case ".bin":
-				return ".txt";
+			case ".sound":
+				return ".ogg";
 			default:
 				return Path.GetExtension (path);
 			}
 		}
-		
+
 		string BundlePathToNative (string path)
 		{
 			return path.Replace ('/', Path.DirectorySeparatorChar);
 		}
-		
+
 		string GetPlatformTextureExtension ()
 		{
 			if (platform == TargetPlatform.iOS)
@@ -40,12 +39,11 @@ namespace Orange
 			else
 				return ".dds";
 		}
-		
+
 		public AssetCooker (CitrusProject project, TargetPlatform platform)
 		{
 			this.platform = platform;
 			this.project = project;
-
 		}
 		
 		public void Cook ()
@@ -93,10 +91,24 @@ namespace Orange
 						Lime.Serialization.WriteObjectToBundle<Lime.Node> (AssetsBundle, dstPath, node);
 						return true;
 					});
-					SyncUpdated ("*.mp3", ".mp3", null);
-					SyncUpdated ("*.ogg", ".ogg", null);
-					SyncUpdated ("*.caf", ".caf", null);
-					SyncUpdated ("*.wav", ".wav", null);
+					SyncUpdated ("*.ogg", ".sound", (srcPath, dstPath) => {
+						using (var stream = new FileStream (srcPath, FileMode.Open)) {
+							// 1Mb is criteria for conversion Ogg to Wav/Adpcm
+							if (stream.Length > 1024 * 1024) {
+								AssetsBundle.ImportFile (dstPath, stream, 0);
+							} else {
+								Console.WriteLine ("Converting sound to ADPCM/IMA4 format...");
+								using (var input = new Lime.OggDecoder (stream)) {
+									using (var output = new MemoryStream ()) {
+										WaveIMA4Converter.Encode (input, output);
+										output.Seek (0, SeekOrigin.Begin);
+										AssetsBundle.ImportFile (dstPath, output, 0);
+									}
+								}
+							}
+							return true;
+						}
+					});
 				}
 			} finally {
 				AssetsBundle.Close ();
@@ -130,22 +142,16 @@ namespace Orange
 
 		void SyncUpdated (string mask, string newFileExtension, Converter converter)
 		{
-			SyncUpdated (mask, newFileExtension, new DateTime (0), converter);
-		}
-
-		void SyncUpdated (string mask, string newFileExtension, DateTime ageLimit, Converter converter)
-		{
 			var files = Helpers.GetAllFiles (".", mask, true);
 			foreach (string srcPath in files) {
 				string dstPath = Path.ChangeExtension (srcPath, newFileExtension);
-				bool cached = AssetsBundle.FileExists (dstPath);
-				bool needUpdate = !cached || File.GetLastWriteTime (srcPath) > AssetsBundle.GetFileLastWriteTime (dstPath) || 
-					AssetsBundle.GetFileLastWriteTime (dstPath) < ageLimit;
+				bool bundled = AssetsBundle.FileExists (dstPath);
+				bool needUpdate = !bundled || File.GetLastWriteTime (srcPath) > AssetsBundle.GetFileLastWriteTime (dstPath);
 				if (needUpdate) {
 					if (converter != null) {
 						try {
 							if (converter (srcPath, dstPath)) {
-								Console.WriteLine ((cached ? "* " : "+ ") + dstPath);
+								Console.WriteLine ((bundled ? "* " : "+ ") + Lime.AssetsBundle.CorrectSlashes (dstPath));
 							}
 						} catch (System.Exception) {
 							Console.WriteLine ("An exception was caught while processing '{0}'", srcPath);
@@ -153,7 +159,7 @@ namespace Orange
 						}
 					}
 					else {
- 						Console.WriteLine ((cached ? "* " : "+ ") + dstPath);
+ 						Console.WriteLine ((bundled ? "* " : "+ ") + Lime.AssetsBundle.CorrectSlashes (dstPath));
 						using (Stream stream = new FileStream (srcPath, FileMode.Open, FileAccess.Read)) {
 							Helpers.CreateDirectoryRecursive (Path.GetDirectoryName (dstPath));
 							AssetsBundle.ImportFile (dstPath, stream, 0);
@@ -161,7 +167,7 @@ namespace Orange
 					}
 				}
 			}
-		}	
+		}
 	
 		class AtlasItem
 		{
@@ -178,7 +184,7 @@ namespace Orange
 			return Path.Combine ("Atlases", atlasChain + "." + index.ToString ("00") + GetPlatformTextureExtension ());
 		}
 		
-		void BuildAtlasChain (string atlasChain)		
+		void BuildAtlasChain (string atlasChain)
 		{
 			for (int i = 0; i < 100; i++) {
 				string atlasPath = GetAtlasPath (atlasChain, i);
@@ -202,7 +208,7 @@ namespace Orange
 						pixbuf = pixbuf.ScaleSimple (w, h, Gdk.InterpType.Bilinear);
 						Console.WriteLine (
 							String.Format ("WARNING: {0} downscaled to {1}x{2}", srcTexturePath, w, h));
-					}					
+					}
 					var item = new AtlasItem {Path = Path.ChangeExtension (p.Key, ".atlasPart"), 
 						Pixbuf = pixbuf, MipMapped = p.Value.MipMaps,
 						Compressed = p.Value.Compression};
@@ -249,7 +255,7 @@ namespace Orange
 						compressed |= item.Compressed;
 						mipMapped |= item.MipMapped;
 						var p = item.Pixbuf;
-						p.CopyArea (0, 0, p.Width, p.Height, atlas, item.AtlasRect.A.X, item.AtlasRect.A.Y);														
+						p.CopyArea (0, 0, p.Width, p.Height, atlas, item.AtlasRect.A.X, item.AtlasRect.A.Y);
 						var atlasPart = new Lime.TextureAtlasPart ();
 						atlasPart.AtlasRect = item.AtlasRect;
 						atlasPart.AtlasRect.B -= new Lime.IntVector2 (2, 2);
@@ -257,8 +263,7 @@ namespace Orange
 						Helpers.CreateDirectoryRecursive (Path.GetDirectoryName (item.Path));
 						
 						//Console.WriteLine ("+ " + item.Path);
-						Lime.Serialization.WriteObjectToBundle<Lime.TextureAtlasPart> (AssetsBundle,
-							item.Path, atlasPart);						
+						Lime.Serialization.WriteObjectToBundle<Lime.TextureAtlasPart> (AssetsBundle, item.Path, atlasPart);
 						
 						// Delete non-atlased texture since now its useless
 						var texturePath = Path.ChangeExtension (item.Path, GetPlatformTextureExtension ());

@@ -531,7 +531,7 @@ namespace Orange
 			return marker;
 		}
 
-		void ParseUIButtonProperty (Node node, string name)
+		void ParseButtonProperty (Node node, string name)
 		{
 			Button button = (Button)node;
 			switch (name) {
@@ -682,7 +682,7 @@ namespace Orange
 				new KnownActorType {ActorClass = "Hot::Spline", NodeClass = "Lime.Spline, Lime", PropReader = ParseSplineProperty},
 				new KnownActorType {ActorClass = "Hot::SplinePoint", NodeClass = "Lime.SplinePoint, Lime", PropReader = ParseSplinePointProperty},
 				new KnownActorType {ActorClass = "Hot::Gear", NodeClass = "Lime.SplineGear, Lime", PropReader = ParseGearProperty},
-				new KnownActorType {ActorClass = "Hot::UIButton", NodeClass = "Lime.Button, Lime", PropReader = ParseUIButtonProperty},
+				new KnownActorType {ActorClass = "Hot::Button", NodeClass = "Lime.Button, Lime", PropReader = ParseButtonProperty},
 				new KnownActorType {ActorClass = "Hot::FolderBegin", NodeClass = "Lime.Node, Lime", PropReader = ParseFolderBeginProperty},
 				new KnownActorType {ActorClass = "Hot::FolderEnd", NodeClass = "Lime.Node, Lime", PropReader = ParseFolderEndProperty},
 			};
