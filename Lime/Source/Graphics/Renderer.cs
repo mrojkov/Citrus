@@ -506,9 +506,16 @@ namespace Lime
 		{
 			FontChar prevChar = null;
 			Vector2 size = new Vector2 (0, fontHeight);
+			float width = 0;
 			float scale = fontHeight / font.CharHeight;
 			for (int i = 0; i < text.Length; i++) {
-				FontChar fontChar = font.Chars [text [i]];
+				char ch = text [i];
+				if (ch == '\n') {
+					size.Y += fontHeight;
+					width = 0;
+					continue;
+				}
+				FontChar fontChar = font.Chars [ch];
 				float kerning = 0;
 				if (prevChar != null && prevChar.KerningPairs != null) {
 					foreach (var pair in prevChar.KerningPairs) {
@@ -518,8 +525,9 @@ namespace Lime
 						}
 					}
 				}
-				size.X += scale * (fontChar.ACWidths.X + kerning);
-				size.X += scale * (fontChar.Width + fontChar.ACWidths.Y + kerning);
+				width += scale * (fontChar.ACWidths.X + kerning);
+				width += scale * (fontChar.Width + fontChar.ACWidths.Y + kerning);
+				size.X = Math.Max (size.X, width);
 				prevChar = fontChar;
 			}
 			return size;

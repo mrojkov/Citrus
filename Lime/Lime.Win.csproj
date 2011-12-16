@@ -26,7 +26,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <OutputPath>bin\Win\Release\</OutputPath>
     <DefineConstants>WIN</DefineConstants>
-    <DebugType>pdbonly</DebugType>
+    <DebugType>full</DebugType>
     <WarningLevel>4</WarningLevel>
     <Optimize>true</Optimize>
     <DebugSymbols>true</DebugSymbols>
@@ -106,6 +106,7 @@
     <Compile Include="Source\Widgets\ImageCombiner.cs" />
     <Compile Include="Source\Widgets\Marker.cs" />
     <Compile Include="Source\Widgets\MarkerCollection.cs" />
+    <Compile Include="Source\Widgets\NineGrid.cs" />
     <Compile Include="Source\Widgets\Node.cs" />
     <Compile Include="Source\Widgets\NodeCollection.cs" />
     <Compile Include="Source\Widgets\ParticleEmitter.cs" />
@@ -113,6 +114,7 @@
     <Compile Include="Source\Widgets\ParticlesMagnet.cs" />
     <Compile Include="Source\Widgets\PointObject.cs" />
     <Compile Include="Source\Widgets\SimpleText.cs" />
+    <Compile Include="Source\Widgets\Slider.cs" />
     <Compile Include="Source\Widgets\Spline.cs" />
     <Compile Include="Source\Widgets\SplineGear.cs" />
     <Compile Include="Source\Widgets\SplinePoint.cs" />

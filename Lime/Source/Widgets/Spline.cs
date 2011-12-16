@@ -71,7 +71,7 @@ namespace Lime
 			}
 		}
 
-		float CalcOffset (Vector2 point)
+		public float CalcOffset (Vector2 point)
 		{
 			float length = 0;
 			SplinePoint p = null;

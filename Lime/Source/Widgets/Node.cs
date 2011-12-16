@@ -180,7 +180,7 @@ namespace Lime
 		public Node DeepCloneCached ()
 		{
 			return Serialization.DeepCloneCached<Node> (this);
-		}		
+		}
 
 		public override string ToString ()
 		{
@@ -200,7 +200,7 @@ namespace Lime
 		{
 			collectedNodes.Add (this);
 		}
-		
+
 		// Delta must be in [0..1000 / WidgetUtils.FramesPerSecond - 1] range
 		public virtual void Update (int delta)
 		{

@@ -15,15 +15,15 @@ namespace Lime
 			this.app = app;
 			AudioSystem.Initialize ();
 			app.OnCreate (this);
-			this.Keyboard.KeyDown += HandleKeyDown;
-			this.Keyboard.KeyUp += HandleKeyUp;
-			this.KeyPress += HandleKeyPress;
-			this.Mouse.ButtonDown += HandleMouseButtonDown;
-			this.Mouse.ButtonUp += HandleMouseButtonUp;
+			//this.Keyboard.KeyDown += HandleKeyDown;
+			//this.Keyboard.KeyUp += HandleKeyUp;
+			//this.KeyPress += HandleKeyPress;
+			//this.Mouse.ButtonDown += HandleMouseButtonDown;
+			//this.Mouse.ButtonUp += HandleMouseButtonUp;
 			this.Mouse.Move += HandleMouseMove;
 			this.Location = new System.Drawing.Point (100, 100);
 		}
-
+/*
 		void HandleKeyDown (object sender, OpenTK.Input.KeyboardKeyEventArgs e)
 		{
 			if (e.Key == OpenTK.Input.Key.Escape)
@@ -69,12 +69,11 @@ namespace Lime
 				break;
 			}
 		}
-
+*/
 		void HandleMouseMove (object sender, MouseMoveEventArgs e)
 		{
 			Vector2 position = new Vector2 (e.X, e.Y) * Input.ScreenToWorldTransform;
-			Input.Mouse.SetPosition (position);
-			app.OnMouseMove (position);
+			Input.MousePosition = position;
 		}
 
 		protected override void OnClosed (EventArgs e)
@@ -85,6 +84,7 @@ namespace Lime
 
 		protected override void OnUpdateFrame (OpenTK.FrameEventArgs e)
 		{
+			Input.Update ();
 			double delta = e.Time;
 			// Here is protection against time leap on inactive state and low FPS
 			if (delta > 0.5)

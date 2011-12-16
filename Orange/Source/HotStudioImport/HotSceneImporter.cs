@@ -535,11 +535,36 @@ namespace Orange
 		{
 			Button button = (Button)node;
 			switch (name) {
-			case "Caption":
+			case "Text":
 				button.Caption = lexer.ParseQuotedString ();
 				break;
 			default:
 				ParseSceneProperty (button, name);
+				break;
+			}
+		}
+
+		void ParseNineGridProperty (Node node, string name)
+		{
+			NineGrid grid = (NineGrid)node;
+			switch (name) {
+			case "TexturePath":
+				grid.Texture = new SerializableTexture (lexer.ParsePath ());
+				break;
+			case "LeftOffset":
+				grid.LeftOffset = lexer.ParseFloat ();
+				break;
+			case "TopOffset":
+				grid.TopOffset = lexer.ParseFloat ();
+				break;
+			case "RightOffset":
+				grid.RightOffset = lexer.ParseFloat ();
+				break;
+			case "BottomOffset":
+				grid.BottomOffset = lexer.ParseFloat ();
+				break;
+			default:
+				ParseGraphicProperty (grid, name);
 				break;
 			}
 		}
@@ -594,6 +619,28 @@ namespace Orange
 		void ParseSplineProperty (Node node, string name)
 		{
 			switch (name) {
+			default:
+				ParseGraphicProperty (node, name);
+				break;
+			}
+		}
+
+		void ParseSliderProperty (Node node, string name)
+		{
+			Slider slider = (Slider)node;
+			switch (name) {
+			case "RangeMin":
+				slider.RangeMin = lexer.ParseFloat ();
+				break;
+			case "RangeMax":
+				slider.RangeMax = lexer.ParseFloat ();
+				break;
+			case "Value":
+				slider.Value = lexer.ParseFloat ();
+				break;
+			case "Step":
+				lexer.ParseFloat ();
+				break;
 			default:
 				ParseGraphicProperty (node, name);
 				break;
@@ -685,6 +732,8 @@ namespace Orange
 				new KnownActorType {ActorClass = "Hot::Button", NodeClass = "Lime.Button, Lime", PropReader = ParseButtonProperty},
 				new KnownActorType {ActorClass = "Hot::FolderBegin", NodeClass = "Lime.Node, Lime", PropReader = ParseFolderBeginProperty},
 				new KnownActorType {ActorClass = "Hot::FolderEnd", NodeClass = "Lime.Node, Lime", PropReader = ParseFolderEndProperty},
+				new KnownActorType {ActorClass = "Hot::NineGrid", NodeClass = "Lime.NineGrid, Lime", PropReader = ParseNineGridProperty},
+				new KnownActorType {ActorClass = "Hot::Slider", NodeClass = "Lime.Slider, Lime", PropReader = ParseSliderProperty},
 			};
 		}
 	}

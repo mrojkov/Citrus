@@ -97,6 +97,9 @@ namespace Orange
 					case "AnimationFPS":
 						propertyName = "AnimationFps";
 						break;
+					case "Life":
+						propertyName = "Lifetime";
+						break;
 					}
 					switch (propertyName + '@' + className) {
 					case "TextColor@Hot::Text":

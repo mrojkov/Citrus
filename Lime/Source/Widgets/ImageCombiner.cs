@@ -17,11 +17,11 @@ namespace Lime
 		void BypassRendering ();
 
 		ITexture GetTexture ();
-        
+
 		Vector2 Size { get; }
-        
+
 		Color4 Color { get; }
-        
+
 		Matrix32 LocalMatrix { get; }
 	
 		bool WorldShown { get; }

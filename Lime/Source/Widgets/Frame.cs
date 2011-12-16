@@ -24,8 +24,14 @@ namespace Lime
 		public int Delta;
 	}
 
+	public class KeyEventArgs : EventArgs 
+	{
+		public bool Consumed;
+	}
+
     [ProtoContract]
     [ProtoInclude(101, typeof(Button))]
+	[ProtoInclude(102, typeof(Slider))]
 	public class Frame : Widget, IImageCombinerArg
 	{
 		RenderTarget renderTarget;
@@ -61,6 +67,10 @@ namespace Lime
 		public event EventHandler<EventArgs> AfterRendering;
 		public event EventHandler<UpdateEventArgs> BeforeUpdate;
 		public event EventHandler<UpdateEventArgs> AfterUpdate;
+		public event EventHandler<EventArgs> BeforeUpdateGUI;
+		public event EventHandler<EventArgs> AfterUpdateGUI;
+		public event EventHandler<EventArgs> MouseDown;
+		public event EventHandler<EventArgs> MouseUp;
 
 		void IImageCombinerArg.BypassRendering ()
 		{
@@ -71,13 +81,34 @@ namespace Lime
 			return renderTexture;
 		}
 
+		public override void UpdateGUI ()
+		{
+			if (BeforeUpdateGUI != null)
+				BeforeUpdateGUI (this, null);
+			if (MouseDown != null && Input.GetKeyDown (Key.Mouse0)) {
+				if (HitTest (Input.MousePosition)) {
+					var args = new KeyEventArgs { Consumed = true };
+					MouseDown (this, args);
+					Input.ConsumeKeyEvent (Key.Mouse0, args.Consumed);
+				}
+			}
+			if (MouseUp != null && Input.GetKeyUp (Key.Mouse0)) {
+				if (HitTest (Input.MousePosition)) {
+					var args = new KeyEventArgs { Consumed = true };
+					MouseUp (this, new EventArgs ());
+					Input.ConsumeKeyEvent (Key.Mouse0, args.Consumed);
+				}
+			}
+			base.UpdateGUI ();
+			if (AfterUpdateGUI != null)
+				AfterUpdateGUI (this, null);
+		}
+
 		public override void Update (int delta)
 		{
 			if (BeforeUpdate != null)
 				BeforeUpdate (this, new UpdateEventArgs {Delta = delta});
-			
 			base.Update (delta);
-			
 			if (AfterUpdate != null)
 				AfterUpdate (this, new UpdateEventArgs {Delta = delta});
 		}
@@ -85,7 +116,7 @@ namespace Lime
 		public override void Render ()
 		{
 			if (BeforeRendering != null)
-				BeforeRendering (this, new EventArgs ());
+				BeforeRendering (this, null);
 			if (renderTexture != null) {
 				if (Size.X > 0 && Size.Y > 0) {
 					renderTexture.SetAsRenderTarget ();
@@ -99,10 +130,11 @@ namespace Lime
 					Renderer.PopProjectionMatrix ();
 					Renderer.SetOrthogonalProjection (0, 0, 1024, 768);
 				}
-			} else
+			} else {
 				base.Render ();
+			}
 			if (AfterRendering != null)
-				AfterRendering (this, new EventArgs ());
+				AfterRendering (this, null);
 		}
 	}
 }

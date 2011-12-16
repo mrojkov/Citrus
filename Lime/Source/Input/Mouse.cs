@@ -27,6 +27,6 @@ namespace Lime
 		Vector2 position;
 		public Vector2 Position { get { return position; } }
 		internal void SetPosition (Vector2 position) { this.position = position; }
-#endif		
+#endif
 	}
 }

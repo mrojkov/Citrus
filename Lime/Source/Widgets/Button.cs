@@ -4,50 +4,61 @@ using ProtoBuf;
 namespace Lime
 {
 	[ProtoContract]
-	public class Button : Frame
+	public class Button : GUIWidget
 	{
+		SimpleText textPresenter;
+
 		[ProtoMember(1)]
 		public string Caption { get; set; }
 
-		public Button ()
+		public event EventHandler<EventArgs> OnClick;
+
+		protected override void Reset ()
 		{
-			AcceptInput = true;
-			this.LeftDown += new EventHandler<UIEventArgs> (Button_LeftDown);
-			this.Move += new EventHandler<UIEventArgs> (Button_Move);
+			PlayAnimation ("Normal");
 		}
 
-		public override void Render ()
+		public override void UpdateGUI ()
 		{
-			base.Render ();
-		}
-
-		void Button_Move (object sender, UIEventArgs e)
-		{
-			if (HitTest (e.Pointer)) {
-				if (UICoordinator.ActiveWidget != this) {
+			base.UpdateGUI ();
+			if (HitTest (Input.MousePosition)) {
+				if (GUIWidget.FocusedWidget == null) {
 					PlayAnimation ("Focus");
-					UICoordinator.ActiveWidget = this;
+					GUIWidget.FocusedWidget = this;
 				}
 			} else {
-				if (UICoordinator.ActiveWidget == this) {
+				if (GUIWidget.FocusedWidget == this) {
 					PlayAnimation ("Normal");
-					UICoordinator.ActiveWidget = null;
+					GUIWidget.FocusedWidget = null;
+				}
+			}
+			if (GUIWidget.FocusedWidget == this) {
+				if (Input.GetKeyDown (Key.Mouse0)) {
+					PlayAnimation ("Press");
+					Input.ConsumeKeyEvent (Key.Mouse0, true);
+				}
+				if (Input.GetKeyUp (Key.Mouse0)) {
+					if (HitTest (Input.MousePosition))
+						PlayAnimation ("Focus");
+					else
+						PlayAnimation ("Normal");
+					Input.ConsumeKeyEvent (Key.Mouse0, true);
+					if (OnClick != null) {
+						OnClick (this, null);
+					}
 				}
 			}
 		}
 
-		void Button_LeftDown (object sender, UIEventArgs e)
+		public override void Update (int delta)
 		{
-			if (UICoordinator.ActiveWidget == this) {
-				PlayAnimation ("Press");
+			if (textPresenter == null) {
+				textPresenter = Find<SimpleText> ("TextPresenter", false);
 			}
-		}
-
-		void Button_LeftUp (object sender, UIEventArgs e)
-		{
-			if (UICoordinator.ActiveWidget == this) {
-				PlayAnimation ("Normal");
+			if (textPresenter != null) {
+				textPresenter.Text = Caption;
 			}
+			base.Update (delta);
 		}
 	}
 }

@@ -32,13 +32,10 @@ namespace Lime
     [ProtoInclude(104, typeof(DistortionMesh))]
 	[ProtoInclude(105, typeof(Spline))]
     [ProtoInclude(106, typeof(ParticlesMagnet))]
+	[ProtoInclude(107, typeof(NineGrid))]
 	public class Widget : Node
 	{
 		#region Properties
-
-		public event EventHandler<UIEventArgs> LeftDown;
-		public event EventHandler<UIEventArgs> LeftUp;
-		public event EventHandler<UIEventArgs> Move;
 
 		Vector2 position;
         [ProtoMember(1)]
@@ -90,9 +87,6 @@ namespace Lime
         [ProtoMember(11)]
 		public HitTestMethod HitTestMethod { get; set; }
 
-        [ProtoMember(12)]
-		public bool AcceptInput { get; set; }
-
 		public bool Shown { get { return Visible && Color.A > 0; } }
 		
 		[ProtoMember(13)]
@@ -124,42 +118,6 @@ namespace Lime
 		
 		#endregion
 		#region Methods
-
-		public void DispatchMouseDown (MouseButton button, Vector2 pointer)
-		{
-			DispatchUIEvent (new UIEventArgs { Pointer = pointer, Type = UIEventType.LeftDown });
-		}
-
-		public void DispatchMouseUp (MouseButton button, Vector2 pointer)
-		{
-			DispatchUIEvent (new UIEventArgs { Pointer = pointer, Type = UIEventType.LeftUp });
-		}
-
-		public void DispatchUIEvent (UIEventArgs e)
-		{
-			//if (AcceptInput)
-			{
-				switch (e.Type) {
-				case UIEventType.LeftDown:
-					if (LeftDown != null)
-						LeftDown (this, e);
-					break;
-				case UIEventType.LeftUp:
-					if (LeftUp != null)
-						LeftUp (this, e);
-					break;
-				case UIEventType.Move:
-					if (Move != null)
-						Move (this, e);
-					break;
-				}
-			}
-			for (int i = 0; i < Nodes.Count; i++) {
-				var w = Nodes [i].Widget;
-				if (w != null)
-					w.DispatchUIEvent (e);
-			}
-		}
 
 		public Widget ()
 		{
@@ -259,7 +217,19 @@ namespace Lime
 			}
 			return false;
 		}
-		
+
+		public virtual void UpdateGUI ()
+		{
+			if (worldShown) {
+				for (int i = 0; i < Nodes.Count; i++) {
+					var widget = Nodes [i].Widget;
+					if (widget != null) {
+						widget.UpdateGUI ();
+					}
+				}
+			}
+		}
+	
 		#endregion
 		#region Utils
 		public static void Center (Widget widget)
