@@ -79,8 +79,6 @@
     <Compile Include="Source\Graphics\Texture.cs" />
     <Compile Include="Source\Graphics\TextureAtlasPart.cs" />
     <Compile Include="Source\Input\Input.cs" />
-    <Compile Include="Source\Input\Keyboard.cs" />
-    <Compile Include="Source\Input\Mouse.cs" />
     <Compile Include="Source\MathUtils.cs" />
     <Compile Include="Source\Serialization.cs" />
     <Compile Include="Source\Types\Color4.cs" />
@@ -102,6 +100,7 @@
     <Compile Include="Source\Widgets\DistortionMesh.cs" />
     <Compile Include="Source\Widgets\DistortionMeshPoint.cs" />
     <Compile Include="Source\Widgets\Frame.cs" />
+    <Compile Include="Source\Widgets\GUIWidget.cs" />
     <Compile Include="Source\Widgets\Image.cs" />
     <Compile Include="Source\Widgets\ImageCombiner.cs" />
     <Compile Include="Source\Widgets\Marker.cs" />
@@ -118,7 +117,6 @@
     <Compile Include="Source\Widgets\Spline.cs" />
     <Compile Include="Source\Widgets\SplineGear.cs" />
     <Compile Include="Source\Widgets\SplinePoint.cs" />
-    <Compile Include="Source\Widgets\UICoordinator.cs" />
     <Compile Include="Source\Widgets\Widget.cs" />
   </ItemGroup>
   <ItemGroup>
