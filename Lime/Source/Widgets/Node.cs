@@ -10,11 +10,11 @@ namespace Lime
 {
 	[ProtoContract]
 	[ProtoInclude (101, typeof (Widget))]
-    [ProtoInclude (102, typeof (ParticleModifier))]
-    [ProtoInclude (103, typeof (ImageCombiner))]
-    [ProtoInclude (104, typeof (PointObject))]
-    [ProtoInclude (105, typeof (Bone))]
-    [ProtoInclude (106, typeof (Audio))]
+	[ProtoInclude (102, typeof (ParticleModifier))]
+	[ProtoInclude (103, typeof (ImageCombiner))]
+	[ProtoInclude (104, typeof (PointObject))]
+	[ProtoInclude (105, typeof (Bone))]
+	[ProtoInclude (106, typeof (Audio))]
 	[ProtoInclude (107, typeof (SplineGear))]
 	public class Node
 	{

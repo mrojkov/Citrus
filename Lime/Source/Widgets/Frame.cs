@@ -63,8 +63,8 @@ namespace Lime
 			}
 		}
 
-		public event EventHandler<EventArgs> BeforeRendering;
-		public event EventHandler<EventArgs> AfterRendering;
+		public event EventHandler<UpdateEventArgs> BeforeRendering;
+		public event EventHandler<UpdateEventArgs> AfterRendering;
 		public event EventHandler<UpdateEventArgs> BeforeUpdate;
 		public event EventHandler<UpdateEventArgs> AfterUpdate;
 		public event EventHandler<EventArgs> BeforeLateUpdate;
@@ -82,10 +82,10 @@ namespace Lime
 		public override void LateUpdate (int delta)
 		{
 			if (BeforeLateUpdate != null)
-				BeforeLateUpdate (this, null);
+				BeforeLateUpdate (this, new UpdateEventArgs {Delta = delta});
 			base.LateUpdate (delta);
 			if (AfterLateUpdate != null)
-				AfterLateUpdate (this, null);
+				AfterLateUpdate (this, new UpdateEventArgs {Delta = delta});
 		}
 
 		public override void Update (int delta)
