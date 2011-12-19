@@ -208,8 +208,16 @@ namespace Lime
 			if (Playing) {
 				AdvanceAnimation (delta);
 			}
-			for (int i = Nodes.Count - 1; i >= 0; i--)
+			for (int i = 0; i < Nodes.Count; i++) {
 				Nodes [i].Update (delta);
+			}
+		}
+
+		public virtual void LateUpdate (int delta)
+		{
+			for (int i = 0; i < Nodes.Count; i++) {
+				Nodes [i].LateUpdate (delta);
+			}
 		}
 
 		public void SafeUpdate (int delta)
@@ -222,6 +230,7 @@ namespace Lime
 				delta -= step;
 			}
 			Update (delta);
+			LateUpdate (delta);
 		}
 		
 		public virtual void Render ()

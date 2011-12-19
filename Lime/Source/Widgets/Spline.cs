@@ -6,10 +6,6 @@ namespace Lime
 	[ProtoContract]
 	public class Spline : Widget
 	{
-		public Spline ()
-		{
-		}
-
 		public float CalcLength()
 		{
 			float length = 0;

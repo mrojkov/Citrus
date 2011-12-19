@@ -7,6 +7,8 @@ namespace Lime
 	[ProtoContract]
 	public class Image : Widget, IImageCombinerArg
 	{
+		bool imageCombinerArg;
+
 		[ProtoMember (1)]
 		public SerializableTexture Texture { get; set; }
 
@@ -37,8 +39,6 @@ namespace Lime
 			Renderer.Blending = worldBlending;
 			Renderer.DrawSprite (Texture, worldColor, Vector2.Zero, Size, UV0, UV1);
 		}
-
-		bool imageCombinerArg;
 
 		ITexture IImageCombinerArg.GetTexture ()
 		{

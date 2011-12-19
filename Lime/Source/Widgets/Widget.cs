@@ -155,7 +155,7 @@ namespace Lime
 				if (Playing) {
 					AdvanceAnimation (delta);
 				}
-				for (int i = Nodes.Count - 1; i >= 0; i--) {
+				for (int i = 0; i < Nodes.Count; i++) {
 					Nodes [i].Update (delta);
 				}
 				if (Anchors != Anchors.None && Parent.Widget != null) {
@@ -218,18 +218,6 @@ namespace Lime
 			return false;
 		}
 
-		public virtual void UpdateGUI ()
-		{
-			if (worldShown) {
-				for (int i = 0; i < Nodes.Count; i++) {
-					var widget = Nodes [i].Widget;
-					if (widget != null) {
-						widget.UpdateGUI ();
-					}
-				}
-			}
-		}
-	
 		#endregion
 		#region Utils
 		public static void Center (Widget widget)

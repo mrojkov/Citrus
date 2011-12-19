@@ -18,9 +18,14 @@ namespace Lime
 			PlayAnimation ("Normal");
 		}
 
-		public override void UpdateGUI ()
+		public override void Update (int delta)
 		{
-			base.UpdateGUI ();
+			if (textPresenter == null) {
+				textPresenter = Find<SimpleText> ("TextPresenter", false);
+			}
+			if (textPresenter != null) {
+				textPresenter.Text = Caption;
+			}
 			if (HitTest (Input.MousePosition)) {
 				if (GUIWidget.FocusedWidget == null) {
 					PlayAnimation ("Focus");
@@ -47,16 +52,6 @@ namespace Lime
 						OnClick (this, null);
 					}
 				}
-			}
-		}
-
-		public override void Update (int delta)
-		{
-			if (textPresenter == null) {
-				textPresenter = Find<SimpleText> ("TextPresenter", false);
-			}
-			if (textPresenter != null) {
-				textPresenter.Text = Caption;
 			}
 			base.Update (delta);
 		}

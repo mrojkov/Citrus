@@ -5,7 +5,7 @@ using ProtoBuf;
 namespace Lime
 {
 	/// <summary>
-	/// This interface must support every node which can be used as source for ImageCombiner.
+	/// This interface must implements every node which can be used as a source for ImageCombiner.
 	/// </summary>
 	public interface IImageCombinerArg
 	{
@@ -58,9 +58,9 @@ namespace Lime
 			return false;
 		}
 
-		public override void Update (int delta)
+		public override void LateUpdate (int delta)
 		{
-			base.Update (delta);
+			base.LateUpdate (delta);
 			IImageCombinerArg arg1, arg2;
 			if (Enabled && GetArgs (out arg1, out arg2)) {
 				arg1.BypassRendering ();
@@ -111,11 +111,11 @@ namespace Lime
 		static Vector2[] stencil = new Vector2[4];
 		static Renderer.Vertex[] vertices = new Renderer.Vertex[8];
 		static readonly Vector2[] rect = new Vector2[4] { 
-            new Vector2(0, 0), 
-            new Vector2(1, 0), 
-            new Vector2(1, 1), 
-            new Vector2(0, 1) 
-        };
+			new Vector2(0, 0), 
+			new Vector2(1, 0), 
+			new Vector2(1, 1), 
+			new Vector2(0, 1) 
+		};
 
 		private void RenderHelper (IImageCombinerArg arg1, IImageCombinerArg arg2)
 		{
@@ -149,7 +149,7 @@ namespace Lime
 				vertices [i].UV1 = coords [i] * uvTransform1;
 				vertices [i].UV2 = coords [i] * uvTransform2;
 			}
-			Renderer.DrawCombinedTriangleFan (texture1, texture2, vertices, numCoords);
+			Renderer.DrawTriangleFan (texture1, texture2, vertices, numCoords);
 		}
 
 		public override void Render ()

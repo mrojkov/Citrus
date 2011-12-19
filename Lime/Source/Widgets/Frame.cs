@@ -67,10 +67,8 @@ namespace Lime
 		public event EventHandler<EventArgs> AfterRendering;
 		public event EventHandler<UpdateEventArgs> BeforeUpdate;
 		public event EventHandler<UpdateEventArgs> AfterUpdate;
-		public event EventHandler<EventArgs> BeforeUpdateGUI;
-		public event EventHandler<EventArgs> AfterUpdateGUI;
-		public event EventHandler<EventArgs> MouseDown;
-		public event EventHandler<EventArgs> MouseUp;
+		public event EventHandler<EventArgs> BeforeLateUpdate;
+		public event EventHandler<EventArgs> AfterLateUpdate;
 
 		void IImageCombinerArg.BypassRendering ()
 		{
@@ -81,27 +79,13 @@ namespace Lime
 			return renderTexture;
 		}
 
-		public override void UpdateGUI ()
+		public override void LateUpdate (int delta)
 		{
-			if (BeforeUpdateGUI != null)
-				BeforeUpdateGUI (this, null);
-			if (MouseDown != null && Input.GetKeyDown (Key.Mouse0)) {
-				if (HitTest (Input.MousePosition)) {
-					var args = new KeyEventArgs { Consumed = true };
-					MouseDown (this, args);
-					Input.ConsumeKeyEvent (Key.Mouse0, args.Consumed);
-				}
-			}
-			if (MouseUp != null && Input.GetKeyUp (Key.Mouse0)) {
-				if (HitTest (Input.MousePosition)) {
-					var args = new KeyEventArgs { Consumed = true };
-					MouseUp (this, new EventArgs ());
-					Input.ConsumeKeyEvent (Key.Mouse0, args.Consumed);
-				}
-			}
-			base.UpdateGUI ();
-			if (AfterUpdateGUI != null)
-				AfterUpdateGUI (this, null);
+			if (BeforeLateUpdate != null)
+				BeforeLateUpdate (this, null);
+			base.LateUpdate (delta);
+			if (AfterLateUpdate != null)
+				AfterLateUpdate (this, null);
 		}
 
 		public override void Update (int delta)

@@ -415,6 +415,7 @@ namespace Lime
 				color = Color4.PremulAlpha (color);
 			}
 			SetTexture (texture, 0);
+			SetTexture (null, 1);
 			if (currentVertex >= MaxVertices - 4 || currentIndex >= MaxVertices * 4 - 6) {
 				FlushSpriteBatch ();
 			}
@@ -444,62 +445,41 @@ namespace Lime
 			batchIndices [j + 4] = (ushort)(i + 1);
 			batchIndices [j + 5] = (ushort)(i + 3);
 		}
-		
-		public static void DrawTriangleFan (ITexture texture, Vertex[] vertices, int numVertices)
+
+		public static void DrawTriangleFan (ITexture texture1, Vertex [] vertices, int numVertices)
 		{
-			SetTexture (texture, 0);
+			DrawTriangleFan (texture1, null, vertices, numVertices);
+		}
+
+		public static void DrawTriangleFan (ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
+		{
+			SetTexture (texture1, 0);
+			SetTexture (texture2, 1);
 			if (currentIndex + (numVertices - 2) * 3 >= MaxVertices * 4 || currentVertex + numVertices >= batchVertices.Length) {
 				FlushSpriteBatch ();
 			}
 			if (numVertices < 3 || (numVertices - 2) * 3 > batchIndices.Length) {
 				throw new Lime.Exception ("Wrong number of vertices");
 			}
+			Rectangle uvRect1 = texture1.UVRect;
+			Rectangle uvRect2 = (texture2 != null) ? texture2.UVRect : new Rectangle ();
 			int baseVertex = currentVertex;
-			Vector2 UV0 = texture.UVRect.A;
-			Vector2 dUV = texture.UVRect.B - UV0;
 			for (int i = 0; i < numVertices; i++) {
 				Vertex v = vertices [i];
 				if (PremulAlphaMode) {
 					v.Color = Color4.PremulAlpha (v.Color);
 				}
 				v.Pos = WorldMatrix * v.Pos;
-				v.UV1 = UV0 + dUV * v.UV1;
-				batchVertices [currentVertex] = v;
-				currentVertex++;
+				v.UV1 = uvRect1.A + uvRect1.Size * v.UV1;
+				if (texture2 != null)
+					v.UV2 = uvRect2.A + uvRect2.Size * v.UV2;
+				batchVertices [currentVertex++] = v;
 			}
 			for (int i = 1; i <= numVertices - 2; i++) {
 				batchIndices [currentIndex++] = (ushort)baseVertex;
 				batchIndices [currentIndex++] = (ushort)(baseVertex + i);
 				batchIndices [currentIndex++] = (ushort)(baseVertex + i + 1);
 			}
-		}
-
-		public static void DrawCombinedTriangleFan (ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
-		{
-			FlushSpriteBatch ();
-			if (vertices.Length > batchVertices.Length) {
-				throw new Lime.Exception ("Too many vertices");
-			}
-			SetTexture (texture1, 0);
-			SetTexture (texture2, 1);
-			Rectangle textureRect1 = texture1.UVRect;
-			Rectangle textureRect2 = texture2.UVRect;
-			for (int i = 0; i < numVertices; i++) {
-				Vertex v = vertices [i];
-				if (PremulAlphaMode) {
-					v.Color = Color4.PremulAlpha (v.Color);
-				}
-				v.UV1 = textureRect1.A + (textureRect1.B - textureRect1.A) * v.UV1;
-				v.UV2 = textureRect2.A + (textureRect2.B - textureRect2.A) * v.UV2;
-				batchVertices [i] = v;
-			}
-#if GLES11
-			GL.DrawArrays (All.TriangleFan, 0, numVertices);
-#else
-			GL.DrawArrays (BeginMode.TriangleFan, 0, numVertices);
-#endif
-			SetTexture (null, 1);
-			DrawCalls++;
 		}
 
 		public static Vector2 MeasureTextLine (Font font, string text, float fontHeight)

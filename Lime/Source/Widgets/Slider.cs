@@ -11,8 +11,16 @@ namespace Lime
 		[ProtoMember (2)]
 		public float RangeMax { get; set; }
 
+
 		[ProtoMember (3)]
-		public float Value { get; set; }
+		public float Value
+		{
+			get { return Utils.Clamp (value, RangeMin, RangeMax); }
+			set { this.value = value; }
+		}
+
+		float value;
+		float delta;
 
 		public Slider ()
 		{
@@ -29,7 +37,7 @@ namespace Lime
 			}
 		}
 
-		public override void UpdateGUI ()
+		public override void Update (int delta)
 		{
 			var thumb = Find<Widget> ("SliderThumb", false);
 			if (thumb != null) {
@@ -45,9 +53,11 @@ namespace Lime
 					}
 				}
 				if (GUIWidget.FocusedWidget == this) {
-					if (Input.GetKey (Key.Mouse0)) {
+					if (Input.GetKeyDown (Key.Mouse0)) {
 						Input.ConsumeKeyEvent (Key.Mouse0, true);
-						SliderFollowByMouse ();
+						ScrollSlider (true);
+					} else if (Input.GetKey (Key.Mouse0)) {
+						ScrollSlider (false);
 					}
 				}
 				Marker m1, m2;
@@ -60,16 +70,16 @@ namespace Lime
 				}
 				if (m1 != null && m2 != null) {
 					if (RangeMax > RangeMin) {
-						float value = Utils.Clamp (Value, RangeMin, RangeMax);
 						float t1 = Animator.FramesToMsecs (m1.Frame);
 						float t2 = Animator.FramesToMsecs (m2.Frame);
 						AnimationTime = (int)(t1 + (Value - RangeMin) / (RangeMax - RangeMin) * (t2 - t1));
 					}
 				}
+				base.Update (delta);
 			}
 		}
 
-		void SliderFollowByMouse()
+		void ScrollSlider (bool begin)
 		{
 			Spline rail = Find<Spline>("Rail", false);
 			if (rail != null) {
@@ -79,7 +89,12 @@ namespace Lime
 					Vector2 p = transform.TransformVector (Input.MousePosition);
 					float offset = rail.CalcOffset (p) / railLength;
 					if (RangeMax > RangeMin) {
-						Value = offset * (RangeMax - RangeMin) + RangeMin;
+						float v = offset * (RangeMax - RangeMin) + RangeMin;
+						if (begin) {
+							delta = Value - v;
+						} else {
+							Value = v + delta;
+						}
 					}
 				}
 			}
