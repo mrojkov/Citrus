@@ -26,10 +26,12 @@ namespace Lime
 
 		public override void Render ()
 		{
-			Renderer.WorldMatrix = worldMatrix;
-			Renderer.Blending = worldBlending;
-			if (!string.IsNullOrEmpty (Text)) {
-				Renderer.DrawTextLine (Font.Instance, Vector2.Zero, Text, worldColor, FontHeight);
+			if (worldShown) {
+				Renderer.WorldMatrix = worldMatrix;
+				Renderer.Blending = worldBlending;
+				if (!string.IsNullOrEmpty (Text)) {
+					Renderer.DrawTextLine (Font.Instance, Vector2.Zero, Text, worldColor, FontHeight);
+				}
 			}
 		}
 	}

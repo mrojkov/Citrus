@@ -100,7 +100,6 @@
     <Compile Include="Source\Widgets\DistortionMesh.cs" />
     <Compile Include="Source\Widgets\DistortionMeshPoint.cs" />
     <Compile Include="Source\Widgets\Frame.cs" />
-    <Compile Include="Source\Widgets\GUIWidget.cs" />
     <Compile Include="Source\Widgets\Image.cs" />
     <Compile Include="Source\Widgets\ImageCombiner.cs" />
     <Compile Include="Source\Widgets\Marker.cs" />

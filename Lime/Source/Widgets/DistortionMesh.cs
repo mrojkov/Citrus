@@ -51,7 +51,7 @@ namespace Lime
 			Vector2 divisor = new Vector2 (0.25f, 0.25f);
 			colorAR *= divisor;
 			colorGB *= divisor;
-			v.Color = new Color4 ((byte)colorAR.Y, (byte)colorGB.X, (byte)colorGB.Y, (byte)colorAR.X) * WorldColor;						
+			v.Color = new Color4 ((byte)colorAR.Y, (byte)colorGB.X, (byte)colorGB.Y, (byte)colorAR.X) * WorldColor;
 			v.UV1 *= divisor;
 			v.Pos *= divisor;
 			return v;
@@ -71,16 +71,18 @@ namespace Lime
 		
 		public override void Render ()
 		{
-			Renderer.Blending = WorldBlending;
-			Renderer.WorldMatrix = WorldMatrix;
-			for (int i = 0; i < NumRows; ++i) {
-				for (int j = 0; j < NumCols; ++j) {
-					points [0] = GetPoint (i, j);
-					points [1] = GetPoint (i, j + 1);
-					points [2] = GetPoint (i + 1, j + 1);
-					points [3] = GetPoint (i + 1, j);					
-					if (points [0] != null && points [1] != null && points [2] != null && points [3] != null) {
-						RenderTile ();
+			if (worldShown) {
+				Renderer.Blending = WorldBlending;
+				Renderer.WorldMatrix = WorldMatrix;
+				for (int i = 0; i < NumRows; ++i) {
+					for (int j = 0; j < NumCols; ++j) {
+						points [0] = GetPoint (i, j);
+						points [1] = GetPoint (i, j + 1);
+						points [2] = GetPoint (i + 1, j + 1);
+						points [3] = GetPoint (i + 1, j);
+						if (points [0] != null && points [1] != null && points [2] != null && points [3] != null) {
+							RenderTile ();
+						}
 					}
 				}
 			}

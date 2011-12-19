@@ -5,7 +5,7 @@ using System.ComponentModel;
 
 namespace Lime
 {
-    [Flags]
+	[Flags]
 	public enum Anchors
 	{
 		None,
@@ -25,31 +25,39 @@ namespace Lime
 	}
 
 	[ProtoContract]
-    [ProtoInclude(100, typeof(Frame))]
-    [ProtoInclude(101, typeof(Image))]
-    [ProtoInclude(102, typeof(SimpleText))]
-    [ProtoInclude(103, typeof(ParticleEmitter))]
-    [ProtoInclude(104, typeof(DistortionMesh))]
+	[ProtoInclude(100, typeof(Frame))]
+	[ProtoInclude(101, typeof(Image))]
+	[ProtoInclude(102, typeof(SimpleText))]
+	[ProtoInclude(103, typeof(ParticleEmitter))]
+	[ProtoInclude(104, typeof(DistortionMesh))]
 	[ProtoInclude(105, typeof(Spline))]
-    [ProtoInclude(106, typeof(ParticlesMagnet))]
+	[ProtoInclude(106, typeof(ParticlesMagnet))]
 	[ProtoInclude(107, typeof(NineGrid))]
+	[ProtoInclude(108, typeof(Button))]
+	[ProtoInclude(109, typeof(Slider))]
 	public class Widget : Node
 	{
+		/// <summary>
+		/// Widget which holds input focus. Before processing mouse down event you should test whether InputFocus == this.
+		/// For revoking input focus from button, slider or any other UI control you should nullify InputFocus.
+		/// </summary>
+		public static Widget InputFocus;
+		
 		#region Properties
 
 		Vector2 position;
-        [ProtoMember(1)]
+		[ProtoMember(1)]
 		public Vector2 Position { get { return position; } set { position = value; } }
 		public float X { get { return position.X; } set { position.X = value; } }
 		public float Y { get { return position.Y; } set { position.Y = value; } }
 
 		Vector2 size;
-        [ProtoMember(2)]
+		[ProtoMember(2)]
 		public Vector2 Size { get { return size; } set { size = value; } }
 		public float Width { get { return size.X; } set { size.X = value; } }
 		public float Height { get { return size.Y; } set { size.Y = value; } }
 
-        [ProtoMember(3)]
+		[ProtoMember(3)]
 		public Vector2 Pivot { get; set; }
 
 		[ProtoMember (4)]
@@ -69,22 +77,22 @@ namespace Lime
 			}
 		}
 
-        [ProtoMember(6)]
+		[ProtoMember(6)]
 		public Color4 Color { get; set; }
 
-        [ProtoMember(7)]
+		[ProtoMember(7)]
 		public Anchors Anchors { get; set; }
 
-        [ProtoMember(8)]
+		[ProtoMember(8)]
 		public Blending Blending { get; set; }
 
-        [ProtoMember(9), DefaultValue (true)]
+		[ProtoMember(9), DefaultValue (true)]
 		public bool Visible { get; set; }
 
-        [ProtoMember(10)]
+		[ProtoMember(10)]
 		public SkinningWeights SkinningWeights { get; set; }
 
-        [ProtoMember(11)]
+		[ProtoMember(11)]
 		public HitTestMethod HitTestMethod { get; set; }
 
 		public bool Shown { get { return Visible && Color.A > 0; } }
@@ -111,11 +119,13 @@ namespace Lime
 		protected Matrix32 worldMatrix;
 		protected Color4 worldColor;
 		protected Blending worldBlending;
+		protected bool worldShown = true;
 
 		public Matrix32 WorldMatrix { get { return worldMatrix; } }
 		public Color4 WorldColor { get { return worldColor; } }
 		public Blending WorldBlending { get { return worldBlending; } }
-		
+		public bool WorldShown { get { return worldShown; } }
+
 		#endregion
 		#region Methods
 
@@ -160,6 +170,15 @@ namespace Lime
 				}
 				if (Anchors != Anchors.None && Parent.Widget != null) {
 					ApplyAnchors ();
+				}
+			}
+		}
+
+		public override void Render ()
+		{
+			if (worldShown) {
+				for (int i = Nodes.Count - 1; i >= 0; i--) {
+					Nodes [i].Render ();
 				}
 			}
 		}

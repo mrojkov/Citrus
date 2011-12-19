@@ -18,9 +18,5 @@ namespace Lime
 
 		[ProtoMember(4)]
 		public Vector2 Anchor { get; set; }
-
-		public SplinePoint ()
-		{
-		}
 	}
 }

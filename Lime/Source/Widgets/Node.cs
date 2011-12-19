@@ -64,8 +64,7 @@ namespace Lime
 		[DefaultValue (null)]
 		public string Tag { get; set; }
 
-		protected bool worldShown = true;
-		public bool WorldShown { get { return worldShown; } }
+		public string CurrentAnimation { get; private set; }
 
 		public void AdvanceAnimation (int delta)
 		{
@@ -155,6 +154,7 @@ namespace Lime
 				return;
 			}
 			AnimationFrame = marker.Frame;
+			CurrentAnimation = markerId;
 			Playing = true;
 		}
 
@@ -232,13 +232,11 @@ namespace Lime
 			Update (delta);
 			LateUpdate (delta);
 		}
-		
+
 		public virtual void Render ()
 		{
 			for (int i = Nodes.Count - 1; i >= 0; i--) {
-				var node = Nodes [i];
-				if (node.worldShown)
-					node.Render ();
+				Nodes [i].Render ();
 			}
 		}
 

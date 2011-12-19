@@ -431,18 +431,20 @@ namespace Lime
 		public override void Update (int delta)
 		{
 			base.Update (delta);
-			if (firstUpdate) {
-				firstUpdate = false;
-				const int ModellingStep = 40;
-				delta = Math.Max (delta, (int)(TimeShift * 1000));
-				while (delta >= ModellingStep) {
-					UpdateHelper (ModellingStep);
-					delta -= ModellingStep;
-				}
-				if (delta > 0)
+			if (worldShown) {
+				if (firstUpdate) {
+					firstUpdate = false;
+					const int ModellingStep = 40;
+					delta = Math.Max (delta, (int)(TimeShift * 1000));
+					while (delta >= ModellingStep) {
+						UpdateHelper (ModellingStep);
+						delta -= ModellingStep;
+					}
+					if (delta > 0)
+						UpdateHelper (delta);
+				} else
 					UpdateHelper (delta);
-			} else
-				UpdateHelper (delta);
+			}
 		}
 
 		Vector2 GenerateRandomMotionControlPoint (ref float rayDirection)
@@ -695,18 +697,20 @@ namespace Lime
 
 		public override void Render ()
 		{
-			Matrix32 matrix = Matrix32.Identity;
-			Color4 color = Color4.White;
-			Widget basicWidget = GetBasicWidget ();
-			if (basicWidget != null) {
-				matrix = basicWidget.WorldMatrix;
-				color = basicWidget.WorldColor;
-			}
-			Renderer.Blending = WorldBlending;
-			LinkedListNode<Particle> node = particles.First;
-			for (; node != null; node = node.Next) {
-				Particle particle = node.Value;
-				RenderParticle (particle, matrix, color);
+			if (worldShown) {
+				Matrix32 matrix = Matrix32.Identity;
+				Color4 color = Color4.White;
+				Widget basicWidget = GetBasicWidget ();
+				if (basicWidget != null) {
+					matrix = basicWidget.WorldMatrix;
+					color = basicWidget.WorldColor;
+				}
+				Renderer.Blending = WorldBlending;
+				LinkedListNode<Particle> node = particles.First;
+				for (; node != null; node = node.Next) {
+					Particle particle = node.Value;
+					RenderParticle (particle, matrix, color);
+				}
 			}
 		}
 	}

@@ -4,7 +4,7 @@ using ProtoBuf;
 namespace Lime
 {
 	[ProtoContract]
-	public class Button : GUIWidget
+	public class Button : Widget
 	{
 		SimpleText textPresenter;
 
@@ -13,12 +13,7 @@ namespace Lime
 
 		public event EventHandler<EventArgs> OnClick;
 
-		protected override void Reset ()
-		{
-			PlayAnimation ("Normal");
-		}
-
-		public override void Update (int delta)
+		void UpdateHelper (int delta)
 		{
 			if (textPresenter == null) {
 				textPresenter = Find<SimpleText> ("TextPresenter", false);
@@ -27,17 +22,17 @@ namespace Lime
 				textPresenter.Text = Caption;
 			}
 			if (HitTest (Input.MousePosition)) {
-				if (GUIWidget.FocusedWidget == null) {
+				if (Widget.InputFocus == null) {
 					PlayAnimation ("Focus");
-					GUIWidget.FocusedWidget = this;
+					Widget.InputFocus = this;
 				}
 			} else {
-				if (GUIWidget.FocusedWidget == this) {
+				if (Widget.InputFocus == this) {
 					PlayAnimation ("Normal");
-					GUIWidget.FocusedWidget = null;
+					Widget.InputFocus = null;
 				}
 			}
-			if (GUIWidget.FocusedWidget == this) {
+			if (Widget.InputFocus == this) {
 				if (Input.GetKeyDown (Key.Mouse0)) {
 					PlayAnimation ("Press");
 					Input.ConsumeKeyEvent (Key.Mouse0, true);
@@ -52,6 +47,16 @@ namespace Lime
 						OnClick (this, null);
 					}
 				}
+			}
+			if (Widget.InputFocus != this && CurrentAnimation != "Normal") {
+				PlayAnimation ("Normal");
+			}
+		}
+
+		public override void Update (int delta)
+		{
+			if (worldShown) {
+				UpdateHelper (delta);
 			}
 			base.Update (delta);
 		}

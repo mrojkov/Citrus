@@ -539,7 +539,7 @@ namespace Orange
 				button.Caption = lexer.ParseQuotedString ();
 				break;
 			default:
-				ParseSceneProperty (button, name);
+				ParseGraphicProperty (button, name);
 				break;
 			}
 		}

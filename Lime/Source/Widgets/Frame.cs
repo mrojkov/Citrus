@@ -29,9 +29,7 @@ namespace Lime
 		public bool Consumed;
 	}
 
-    [ProtoContract]
-    [ProtoInclude(101, typeof(Button))]
-	[ProtoInclude(102, typeof(Slider))]
+	[ProtoContract]
 	public class Frame : Widget, IImageCombinerArg
 	{
 		RenderTarget renderTarget;
@@ -99,26 +97,28 @@ namespace Lime
 
 		public override void Render ()
 		{
-			if (BeforeRendering != null)
-				BeforeRendering (this, null);
-			if (renderTexture != null) {
-				if (Size.X > 0 && Size.Y > 0) {
-					renderTexture.SetAsRenderTarget ();
-					Viewport vp = Renderer.Viewport;
-					Renderer.Viewport = new Viewport { X = 0, Y = 0, Width = renderTexture.ImageSize.Width, Height = renderTexture.ImageSize.Height };
-					Renderer.PushProjectionMatrix ();
-					Renderer.SetOrthogonalProjection (0, Size.Y, Size.X, 0);
+			if (worldShown) {
+				if (BeforeRendering != null)
+					BeforeRendering (this, null);
+				if (renderTexture != null) {
+					if (Size.X > 0 && Size.Y > 0) {
+						renderTexture.SetAsRenderTarget ();
+						Viewport vp = Renderer.Viewport;
+						Renderer.Viewport = new Viewport { X = 0, Y = 0, Width = renderTexture.ImageSize.Width, Height = renderTexture.ImageSize.Height };
+						Renderer.PushProjectionMatrix ();
+						Renderer.SetOrthogonalProjection (0, Size.Y, Size.X, 0);
+						base.Render ();
+						renderTexture.RestoreRenderTarget ();
+						Renderer.Viewport = vp;
+						Renderer.PopProjectionMatrix ();
+						Renderer.SetOrthogonalProjection (0, 0, 1024, 768);
+					}
+				} else {
 					base.Render ();
-					renderTexture.RestoreRenderTarget ();
-					Renderer.Viewport = vp;
-					Renderer.PopProjectionMatrix ();
-					Renderer.SetOrthogonalProjection (0, 0, 1024, 768);
 				}
-			} else {
-				base.Render ();
+				if (AfterRendering != null)
+					AfterRendering (this, null);
 			}
-			if (AfterRendering != null)
-				AfterRendering (this, null);
 		}
 	}
 }
