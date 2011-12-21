@@ -150,17 +150,26 @@ namespace Lime
 		Slash = 128,
 		BackSlash = 129,
 
+		/// <summary>
+		/// Left mouse button
+		/// </summary>
 		Mouse0 = 130,
+		/// <summary>
+		/// Right mouse button
+		/// </summary>
 		Mouse1 = 131,
+		/// <summary>
+		/// Middle mouse button
+		/// </summary>
 		Mouse2 = 132,
-		
-		LastKey,
+
+		KeyCount,
 	}
 
 	public static class Input
 	{
-		static bool [] previousKeysState = new bool [(int)Key.LastKey];
-		static bool [] currentKeysState = new bool [(int)Key.LastKey];
+		static bool [] previousKeysState = new bool [(int)Key.KeyCount];
+		static bool [] currentKeysState = new bool [(int)Key.KeyCount];
 
 		/// <summary>
 		/// The matrix describes transition from pixels to virtual coordinates. 
