@@ -15,7 +15,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Dialog user interact with. All dialogs below that are ignore input events.
+		/// Dialog user interact with. All dialogs below that should ignore input events.
 		/// </summary>
 		public Widget ActiveDialog;
 
