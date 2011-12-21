@@ -9,7 +9,7 @@
 				if (rootFrame.ActiveDialog == null) {
 					rootFrame.ActiveDialog = this;
 				}
-				if (RootFrame.Instance.ActiveDialog == this) {
+				if (rootFrame.ActiveDialog == this) {
 					if (rootFrame.ActiveWidget != null && !rootFrame.ActiveWidget.ChildOf (this)) {
 						rootFrame.ActiveWidget = null;
 					}
