@@ -215,6 +215,15 @@ namespace Lime
 			}
 		}
 
+		public static void ConsumeAllKeyEvents (bool value)
+		{
+			if (value) {
+				for (int i = 1; i < (int)Key.KeyCount; ++i) {
+					previousKeysState [i] = currentKeysState [i];
+				}
+			}
+		}
+
 #if WIN
 		internal static void Update ()
 		{
