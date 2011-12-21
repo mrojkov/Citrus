@@ -1,6 +1,6 @@
 ﻿namespace Lime
 {
-	public class Dialog : Widget
+	public class Dialog : Frame
 	{
 		public override void Update (int delta)
 		{
