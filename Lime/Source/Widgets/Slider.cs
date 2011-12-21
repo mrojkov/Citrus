@@ -30,20 +30,21 @@ namespace Lime
 
 		void UpdateHelper (int delta)
 		{
+			var rootFrame = RootFrame.Instance;
 			var thumb = Find<Widget> ("SliderThumb", false);
 			if (thumb != null) {
 				if (thumb.HitTest (Input.MousePosition)) {
-					if (Widget.InputFocus == null) {
+					if (rootFrame.ActiveWidget == null) {
 						thumb.PlayAnimation ("Focus");
-						Widget.InputFocus = this;
+						rootFrame.ActiveWidget = this;
 					}
 				} else {
-					if (Widget.InputFocus == this && !Input.GetKey (Key.Mouse0)) {
+					if (rootFrame.ActiveWidget == this && !Input.GetKey (Key.Mouse0)) {
 						thumb.PlayAnimation ("Normal");
-						Widget.InputFocus = null;
+						rootFrame.ActiveWidget = null;
 					}
 				}
-				if (Widget.InputFocus == this) {
+				if (rootFrame.ActiveWidget == this) {
 					if (Input.GetKeyDown (Key.Mouse0)) {
 						Input.ConsumeKeyEvent (Key.Mouse0, true);
 						ScrollSlider (true);
@@ -52,7 +53,7 @@ namespace Lime
 					}
 				}
 				Marker m1, m2;
-				if (Widget.InputFocus == this) {
+				if (rootFrame.ActiveWidget == this) {
 					m1 = Markers.Get ("FocusLow");
 					m2 = Markers.Get ("FocusHigh");
 				} else {
@@ -67,7 +68,7 @@ namespace Lime
 					}
 				}
 			}
-			if (Widget.InputFocus != this && thumb.CurrentAnimation != "Normal") {
+			if (rootFrame.ActiveWidget != this && thumb.CurrentAnimation != "Normal") {
 				thumb.PlayAnimation ("Normal");
 			}
 		}

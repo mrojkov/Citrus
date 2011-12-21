@@ -15,6 +15,7 @@ namespace Lime
 
 		void UpdateHelper (int delta)
 		{
+			var rootFrame = RootFrame.Instance;
 			if (textPresenter == null) {
 				textPresenter = Find<SimpleText> ("TextPresenter", false);
 			}
@@ -22,17 +23,17 @@ namespace Lime
 				textPresenter.Text = Caption;
 			}
 			if (HitTest (Input.MousePosition)) {
-				if (Widget.InputFocus == null) {
+				if (rootFrame.ActiveWidget == null) {
 					PlayAnimation ("Focus");
-					Widget.InputFocus = this;
+					rootFrame.ActiveWidget = this;
 				}
 			} else {
-				if (Widget.InputFocus == this) {
+				if (rootFrame.ActiveWidget == this) {
 					PlayAnimation ("Normal");
-					Widget.InputFocus = null;
+					rootFrame.ActiveWidget = null;
 				}
 			}
-			if (Widget.InputFocus == this) {
+			if (rootFrame.ActiveWidget == this) {
 				if (Input.GetKeyDown (Key.Mouse0)) {
 					PlayAnimation ("Press");
 					Input.ConsumeKeyEvent (Key.Mouse0, true);
@@ -48,7 +49,7 @@ namespace Lime
 					}
 				}
 			}
-			if (Widget.InputFocus != this && CurrentAnimation != "Normal") {
+			if (rootFrame.ActiveWidget != this && CurrentAnimation != "Normal") {
 				PlayAnimation ("Normal");
 			}
 		}

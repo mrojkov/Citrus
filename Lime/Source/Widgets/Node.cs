@@ -1,5 +1,3 @@
-using System.Runtime.Serialization;
-using Lime;
 using System.Collections.Generic;
 using System.IO;
 using System;
@@ -144,6 +142,15 @@ namespace Lime
 			while (node.Parent != null)
 				node = node.Parent;
 			return node;
+		}
+
+		public bool ChildOf (Node node)
+		{
+			for (Node n = Parent; n != null; n = n.Parent) {
+				if (n == node)
+					return true;
+			}
+			return false;
 		}
 
 		public void PlayAnimation (string markerId)

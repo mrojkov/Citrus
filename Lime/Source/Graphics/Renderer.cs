@@ -32,7 +32,7 @@ namespace Lime
 	}
 
     [ProtoContract]
-	public enum HorizontalAlign
+	public enum HAlignment
 	{
         [ProtoEnum]
 		/// <summary>
@@ -52,7 +52,7 @@ namespace Lime
 	}
 
     [ProtoContract]
-	public enum VerticalAlign
+	public enum VAlignment
 	{
         [ProtoEnum]
 		/// <summary>

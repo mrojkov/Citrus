@@ -35,6 +35,13 @@ namespace Lime
 		RenderTarget renderTarget;
 		SerializableTexture renderTexture;
 
+		public event EventHandler<UpdateEventArgs> BeforeRendering;
+		public event EventHandler<UpdateEventArgs> AfterRendering;
+		public event EventHandler<UpdateEventArgs> BeforeUpdate;
+		public event EventHandler<UpdateEventArgs> AfterUpdate;
+		public event EventHandler<EventArgs> BeforeLateUpdate;
+		public event EventHandler<EventArgs> AfterLateUpdate;
+
 		[ProtoMember(1)]
 		public RenderTarget RenderTarget {
 			get { return renderTarget; }
@@ -61,16 +68,7 @@ namespace Lime
 			}
 		}
 
-		public event EventHandler<UpdateEventArgs> BeforeRendering;
-		public event EventHandler<UpdateEventArgs> AfterRendering;
-		public event EventHandler<UpdateEventArgs> BeforeUpdate;
-		public event EventHandler<UpdateEventArgs> AfterUpdate;
-		public event EventHandler<EventArgs> BeforeLateUpdate;
-		public event EventHandler<EventArgs> AfterLateUpdate;
-
-		void IImageCombinerArg.BypassRendering ()
-		{
-		}
+		void IImageCombinerArg.BypassRendering () {}
 
 		ITexture IImageCombinerArg.GetTexture ()
 		{

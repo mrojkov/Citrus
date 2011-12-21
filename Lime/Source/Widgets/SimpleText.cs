@@ -19,10 +19,10 @@ namespace Lime
 		public float Spacing = 0;
 
 		[ProtoMember (5)]
-		public HorizontalAlign HorizontalAlign;
+		public HAlignment HorizontalAlign;
 
 		[ProtoMember (6)]
-		public VerticalAlign VerticalAlign;
+		public VAlignment VerticalAlign;
 
 		public override void Render ()
 		{
