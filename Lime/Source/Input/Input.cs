@@ -215,6 +215,13 @@ namespace Lime
 			}
 		}
 
+		public static void HideMouseAway (bool value)
+		{
+			if (value) {
+				MousePosition = new Vector2 (-100000, -100000);
+			}
+		}
+
 		public static void ConsumeAllKeyEvents (bool value)
 		{
 			if (value) {
