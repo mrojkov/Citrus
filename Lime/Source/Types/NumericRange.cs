@@ -11,36 +11,32 @@ namespace Lime
 		public float Median;
 
 		[ProtoMember (2)]
-		public float Variation;
+		public float Dispersion;
 
 		public NumericRange (float median, float variation)
 		{
 			Median = median;
-			Variation = variation;
+			Dispersion = variation;
 		}
 
 		public float NormalRandomNumber ()
 		{
-			float x = 0;
-			for (int i = 0; i < 12; ++i)
-				x += Utils.Random ();
-			x -= 6;
-			return Median + x * Variation;
+			return Utils.NormalRandom (Median, Dispersion);
 		}
 
 		public float UniformRandomNumber ()
 		{
-			return Median + (Utils.Random () - 0.5f) * Variation;
+			return Utils.UniformRandom (Median, Dispersion);
 		}
 
 		bool IEquatable<NumericRange>.Equals (NumericRange rhs)
 		{
-			return Median == rhs.Median && Variation == rhs.Variation;
+			return Median == rhs.Median && Dispersion == rhs.Dispersion;
 		}
 
 		public override string ToString ()
 		{
-			return String.Format ("{0}, {1}", Median, Variation);
+			return String.Format ("{0}, {1}", Median, Dispersion);
 		}
 	}
 }

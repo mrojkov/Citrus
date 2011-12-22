@@ -410,7 +410,7 @@ namespace Lime
 				pendingParticles -= 1;
 			}
 			
-			if (MagnetAmount.Median != 0 || MagnetAmount.Variation != 0) {
+			if (MagnetAmount.Median != 0 || MagnetAmount.Dispersion != 0) {
 				EnumerateMagnets ();
 			}
 
@@ -452,8 +452,8 @@ namespace Lime
 			rayDirection += RandomMotionRotation.UniformRandomNumber ();
 			Vector2 result = Utils.CosSin (Utils.DegreesToRadians * rayDirection);
 			NumericRange radius = RandomMotionRadius;
-			if (radius.Variation == 0)
-				radius.Variation = radius.Median;
+			if (radius.Dispersion == 0)
+				radius.Dispersion = radius.Median;
 			result *= Math.Abs (radius.NormalRandomNumber ());
 			if (RandomMotionAspectRatio != 1f && RandomMotionAspectRatio > 0f) {
 				result.X *= RandomMotionAspectRatio;
@@ -487,7 +487,7 @@ namespace Lime
 			emitterScaleAmount = (float)Math.Sqrt (Math.Abs (crossProduct));
 			float emitterAngle = transform.U.Atan2 * Utils.RadiansToDegrees;
 
-			NumericRange aspectRatioVariationPair = new NumericRange (0, Math.Max (0.0f, AspectRatio.Variation));
+			NumericRange aspectRatioVariationPair = new NumericRange (0, Math.Max (0.0f, AspectRatio.Dispersion));
 			float zoom = Zoom.NormalRandomNumber ();
 			float aspectRatio = Math.Max (0.00001f, AspectRatio.Median *
 				(1 + Math.Abs (aspectRatioVariationPair.NormalRandomNumber ())) /

@@ -56,6 +56,20 @@ namespace Lime
 		{
 			return (float)RandomGenerator.NextDouble ();
 		}
+
+		public static float NormalRandom (float median, float dispersion)
+		{
+			float x = 0;
+			for (int i = 0; i < 12; ++i)
+				x += Random ();
+			x -= 6;
+			return median + x * dispersion;
+		}
+
+		public static float UniformRandom (float median, float dispersion)
+		{
+			return median + (Random () - 0.5f) * dispersion;
+		}
 		
 		public static bool IsPowerOf2 (int value)
 		{
