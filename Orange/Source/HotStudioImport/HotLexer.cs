@@ -258,7 +258,7 @@ namespace Orange
 			NumericRange v = new NumericRange ();
 			ParseToken ('[');
 			v.Median = ParseFloat ();
-			v.Variation = ParseFloat ();
+			v.Dispersion = ParseFloat ();
 			ParseToken (']');
 			return v;
 		}

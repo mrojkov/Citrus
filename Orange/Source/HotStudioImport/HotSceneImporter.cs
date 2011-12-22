@@ -152,11 +152,11 @@ namespace Orange
 			case "ShadowColor":
 				lexer.ParseColor4 ();
 				break;
-			case "VAlign":
-				text.HorizontalAlign = (HorizontalAlign)lexer.ParseInt ();
-				break;
 			case "HAlign":
-				text.VerticalAlign = (VerticalAlign)lexer.ParseInt ();
+				text.HorizontalAlign = (HAlignment)lexer.ParseInt ();
+				break;
+			case "VAlign":
+				text.VerticalAlign = (VAlignment)lexer.ParseInt ();
 				break;
 			default:
 				ParseGraphicProperty (node, name);
