@@ -22,7 +22,7 @@ namespace Lime
 				textPresenter.Text = Caption;
 			}
 			if (HitTest (Input.MousePosition)) {
-				if (Widget.ActiveWidget == null) {
+				if (Widget.ActiveWidget == null || !Widget.ActiveWidget.WorldShown) {
 					PlayAnimation ("Focus");
 					Widget.ActiveWidget = this;
 				}

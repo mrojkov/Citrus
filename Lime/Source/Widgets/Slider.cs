@@ -38,7 +38,7 @@ namespace Lime
 			var thumb = Find<Widget> ("SliderThumb", false);
 			if (thumb != null) {
 				if (thumb.HitTest (Input.MousePosition)) {
-					if (Widget.ActiveWidget == null) {
+					if (Widget.ActiveWidget == null || !Widget.ActiveWidget.WorldShown) {
 						thumb.PlayAnimation ("Focus");
 						Widget.ActiveWidget = this;
 					}
