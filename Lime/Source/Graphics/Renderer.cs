@@ -482,14 +482,24 @@ namespace Lime
 			}
 		}
 
+		public static void DrawTextLine (Font font, Vector2 position, string text, Color4 color, float fontHeight)
+		{
+			DrawTextLine (font, position, text, color, fontHeight, 0, text.Length);
+		}
+
 		public static Vector2 MeasureTextLine (Font font, string text, float fontHeight)
+		{
+			return MeasureTextLine (font, text, fontHeight, 0, text.Length);
+		}
+
+		public static Vector2 MeasureTextLine (Font font, string text, float fontHeight, int start, int length)
 		{
 			FontChar prevChar = null;
 			Vector2 size = new Vector2 (0, fontHeight);
 			float width = 0;
 			float scale = fontHeight / font.CharHeight;
-			for (int i = 0; i < text.Length; i++) {
-				char ch = text [i];
+			for (int i = 0; i < length; i++) {
+				char ch = text [i + start];
 				if (ch == '\n') {
 					size.Y += fontHeight;
 					width = 0;
@@ -513,13 +523,13 @@ namespace Lime
 			return size;
 		}
 
-		public static void DrawTextLine (Font font, Vector2 position, string text, Color4 color, float fontHeight)
+		public static void DrawTextLine (Font font, Vector2 position, string text, Color4 color, float fontHeight, int start, int length)
 		{
 			FontChar prevChar = null;
 			float savedX = position.X;
 			float scale = fontHeight / font.CharHeight;
-			for (int i = 0; i < text.Length; i++) {
-				char ch = text [i];
+			for (int i = 0; i < length; i++) {
+				char ch = text [i + start];
 				if (ch == '\n') {
 					position.X = savedX;
 					position.Y += fontHeight;

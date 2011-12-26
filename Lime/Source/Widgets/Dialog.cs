@@ -6,6 +6,9 @@
 
 		public override void Update (int delta)
 		{
+			if (Widget.ActiveWidget != null && !Widget.ActiveWidget.WorldShown) {
+				Widget.ActiveWidget = null;
+			}
 			if (worldShown && !Input.MousePosition.Equals (MouseHole)) {
 				if (Widget.ActiveWidget != null && !Widget.ActiveWidget.ChildOf (this)) {
 					// Discard active widget if it's not a child of the topmost dialog.

@@ -35,6 +35,7 @@ namespace Lime
 	[ProtoInclude(107, typeof(NineGrid))]
 	[ProtoInclude(108, typeof(Button))]
 	[ProtoInclude(109, typeof(Slider))]
+	[ProtoInclude(110, typeof(Text))]
 	public class Widget : Node
 	{
 		/// <summary>

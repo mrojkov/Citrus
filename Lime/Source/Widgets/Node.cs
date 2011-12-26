@@ -14,6 +14,7 @@ namespace Lime
 	[ProtoInclude (105, typeof (Bone))]
 	[ProtoInclude (106, typeof (Audio))]
 	[ProtoInclude (107, typeof (SplineGear))]
+	[ProtoInclude (108, typeof (TextStyle))]
 	public class Node
 	{
 		public static int UpdatedNodes;
