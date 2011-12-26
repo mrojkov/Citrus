@@ -38,12 +38,6 @@ namespace Lime
 	[ProtoInclude(110, typeof(Text))]
 	public class Widget : Node
 	{
-		/// <summary>
-		/// Widget which holds input focus. Before processing mouse down event you should test whether ActiveWidget == this.
-		/// For revoking input focus from button, slider or any other UI control you should nullify ActiveWidget.
-		/// </summary>
-		public static Widget ActiveWidget;
-
 		#region Properties
 
 		Vector2 position;
@@ -171,6 +165,9 @@ namespace Lime
 				}
 				if (Anchors != Anchors.None && Parent.Widget != null) {
 					ApplyAnchors ();
+				}
+				if (RootFrame.Instance.ActiveWidget == this) {
+					RootFrame.Instance.ActiveWidgetUpdated = true;
 				}
 			}
 		}

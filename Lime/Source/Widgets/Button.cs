@@ -22,17 +22,17 @@ namespace Lime
 				textPresenter.Text = Caption;
 			}
 			if (HitTest (Input.MousePosition)) {
-				if (Widget.ActiveWidget == null || !Widget.ActiveWidget.WorldShown) {
+				if (RootFrame.Instance.ActiveWidget == null) {
 					PlayAnimation ("Focus");
-					Widget.ActiveWidget = this;
+					RootFrame.Instance.ActiveWidget = this;
 				}
 			} else {
-				if (Widget.ActiveWidget == this) {
+				if (RootFrame.Instance.ActiveWidget == this) {
 					PlayAnimation ("Normal");
-					Widget.ActiveWidget = null;
+					RootFrame.Instance.ActiveWidget = null;
 				}
 			}
-			if (Widget.ActiveWidget == this) {
+			if (RootFrame.Instance.ActiveWidget == this) {
 				if (Input.GetKeyDown (Key.Mouse0)) {
 					PlayAnimation ("Press");
 					Input.ConsumeKeyEvent (Key.Mouse0, true);
@@ -48,7 +48,7 @@ namespace Lime
 					}
 				}
 			}
-			if (Widget.ActiveWidget != this && CurrentAnimation != "Normal") {
+			if (RootFrame.Instance.ActiveWidget != this && CurrentAnimation != "Normal") {
 				PlayAnimation ("Normal");
 			}
 		}

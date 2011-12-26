@@ -34,17 +34,17 @@ namespace Lime
 			var thumb = Find<Widget> ("SliderThumb", false);
 			if (thumb != null) {
 				if (thumb.HitTest (Input.MousePosition)) {
-					if (Widget.ActiveWidget == null || !Widget.ActiveWidget.WorldShown) {
+					if (RootFrame.Instance.ActiveWidget == null) {
 						thumb.PlayAnimation ("Focus");
-						Widget.ActiveWidget = this;
+						RootFrame.Instance.ActiveWidget = this;
 					}
 				} else {
-					if (Widget.ActiveWidget == this && !Input.GetKey (Key.Mouse0)) {
+					if (RootFrame.Instance.ActiveWidget == this && !Input.GetKey (Key.Mouse0)) {
 						thumb.PlayAnimation ("Normal");
-						Widget.ActiveWidget = null;
+						RootFrame.Instance.ActiveWidget = null;
 					}
 				}
-				if (Widget.ActiveWidget == this) {
+				if (RootFrame.Instance.ActiveWidget == this) {
 					if (Input.GetKeyDown (Key.Mouse0)) {
 						Input.ConsumeKeyEvent (Key.Mouse0, true);
 						ScrollSlider (true);
@@ -53,7 +53,7 @@ namespace Lime
 					}
 				}
 				Marker m1, m2;
-				if (Widget.ActiveWidget == this) {
+				if (RootFrame.Instance.ActiveWidget == this) {
 					m1 = Markers.Get ("FocusLow");
 					m2 = Markers.Get ("FocusHigh");
 				} else {
@@ -68,7 +68,7 @@ namespace Lime
 					}
 				}
 			}
-			if (Widget.ActiveWidget != this && thumb.CurrentAnimation != "Normal") {
+			if (RootFrame.Instance.ActiveWidget != this && thumb.CurrentAnimation != "Normal") {
 				thumb.PlayAnimation ("Normal");
 			}
 		}
