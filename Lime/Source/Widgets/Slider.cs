@@ -1,10 +1,5 @@
 ﻿using ProtoBuf;
-/*
-TODO:
-Миха, пометь себе пожалуйста где-нибудь, что со слайдерами есть такой косяк.
-В зависимости от того, за какую часть кнопки ты тащишь ползунок - ты не дотаскиваешь его
-до самой крайней позиции, а лишь до определенного места.
-*/
+
 namespace Lime
 {
 	[ProtoContract]
@@ -24,7 +19,8 @@ namespace Lime
 		}
 
 		float value;
-		float delta;
+		float offset0;
+		float delta0;
 
 		public Slider ()
 		{
@@ -97,9 +93,15 @@ namespace Lime
 					if (RangeMax > RangeMin) {
 						float v = offset * (RangeMax - RangeMin) + RangeMin;
 						if (begin) {
-							delta = Value - v;
+							delta0 = Value - v;
+							offset0 = offset;
 						} else {
-							Value = v + delta;
+							if (offset > offset0 && offset0 < 1)
+								Value = v + delta0 * (1 - (offset - offset0) / (1 - offset0));
+							else if (offset < offset0 && offset0 > 0)
+								Value = v + delta0 * (1 - (offset0 - offset) / offset0);
+							else
+								Value = v + delta0;
 						}
 					}
 				}
