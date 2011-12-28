@@ -59,12 +59,15 @@ namespace Lime
 			TextColor = Color4.White;
 			ShadowColor = Color4.Black;
 			ShadowOffset = Vector2.One;
+			Font = new SerializableFont ();
+			ImageTexture = new SerializableTexture ();
 		}
 	}
 
 	[ProtoContract]
-	public class Text : Widget
+	public class RichText : Widget
 	{
+		[ProtoMember(1)]
 		public string Content
 		{
 			get { return content; }
@@ -76,7 +79,11 @@ namespace Lime
 				}
 			}
 		}
+		
+		[ProtoMember(2)]
 		public HAlignment HAlignment { get; set; }
+		
+		[ProtoMember(3)]
 		public VAlignment VAlignment { get; set; }
 
 		TextParser parser;
@@ -111,6 +118,8 @@ namespace Lime
 					renderer.AddFragment (frag.Text, frag.Style + 1);
 				}
 				// Draw text.
+				Renderer.WorldMatrix = worldMatrix;
+				Renderer.Blending = worldBlending;
 				renderer.Render (worldColor, Size, HAlignment, VAlignment);
 			}
 		}
@@ -127,10 +136,10 @@ namespace Lime
 		string text;
 		int pos;
 		int currentStyle;
-		Stack<string> tagStack;
+		Stack<string> tagStack = new Stack<string> ();
 		public string ErrorMessage;
-		public List<string> Styles;
-		public List<Fragment> Fragments;
+		public List<string> Styles = new List<string> ();
+		public List<Fragment> Fragments = new List<Fragment> ();
 
 		public bool Parse (string text)
 		{
@@ -149,7 +158,7 @@ namespace Lime
 				}
 			}
 			if (tagStack.Count > 0) {
-				ErrorMessage = String.Format ("Unclosed tag '&lt;{0}&gt;'", tagStack.Peek ());
+				ErrorMessage = String.Format ("Unmatched tag '&lt;{0}&gt;'", tagStack.Peek ());
 				return false;
 			}
 			return true;
@@ -247,8 +256,8 @@ namespace Lime
 
 		string UnescapeTaggedString (string text)
 		{
-			text = text.Replace ("&lt;", "<" );
-			text = text.Replace ("&gt;", ">" );
+			text = text.Replace ("&lt;", "<");
+			text = text.Replace ("&gt;", ">");
 			return text;
 		}
 
@@ -272,9 +281,9 @@ namespace Lime
 
 	class TextRenderer
 	{
-		List<Fragment> fragments;
-		List<TextStyle> styles;
-		List<SerializableFont> fonts;
+		List<Fragment> fragments = new List<Fragment> ();
+		List<TextStyle> styles = new List<TextStyle> ();
+		List<SerializableFont> fonts = new List<SerializableFont> ();
 
 		struct Fragment
 		{
@@ -310,7 +319,8 @@ namespace Lime
 				bullet = style.ImageSize.X;
 			if (word.Length == 1) {
 				float fontScale = style.Size / font.CharHeight;
-				float width = bullet + font.Chars [word.Text [word.Start]].Width * fontScale;
+				var c = font.Chars [word.Text [word.Start]];
+				float width = bullet + c.Width * fontScale;
 				return width;
 			} else {
 				Vector2 size = Renderer.MeasureTextLine (font, word.Text, style.Size, word.Start, word.Length);
@@ -333,7 +343,7 @@ namespace Lime
 					words.Add (word);
 				} else {
 					bool isTagBegin = true;
-					while (curr != start + length) {
+					while (curr < length) {
 						bool lineBreak = false;
 						if (word.Text [curr] <= ' ') {
 							if (word.Text [curr] == '\n') {
@@ -341,7 +351,7 @@ namespace Lime
 							}
 							curr++;
 						} else {
-							while (curr != start + length && word.Text [curr] > ' ') {
+							while (curr < length && word.Text [curr] > ' ') {
 								curr++;
 							}
 						}
@@ -418,7 +428,7 @@ namespace Lime
 				if (hAlign == HAlignment.Right)
 					offset.X = area.X - totalWidth;
 				else if (hAlign == HAlignment.Center)
-					offset.X = (area.X - totalWidth ) * 0.5f;
+					offset.X = (area.X - totalWidth) * 0.5f;
 				// Calculate offset for vertical alignment.
 				if (vAlign == VAlignment.Bottom)
 					offset.Y = area.Y - totalHeight;

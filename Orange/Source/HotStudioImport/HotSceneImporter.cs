@@ -153,10 +153,10 @@ namespace Orange
 				lexer.ParseColor4 ();
 				break;
 			case "HAlign":
-				text.HorizontalAlign = (HAlignment)lexer.ParseInt ();
+				text.HAlignment = (HAlignment)lexer.ParseInt ();
 				break;
 			case "VAlign":
-				text.VerticalAlign = (VAlignment)lexer.ParseInt ();
+				text.VAlignment = (VAlignment)lexer.ParseInt ();
 				break;
 			default:
 				ParseGraphicProperty (node, name);
@@ -647,6 +647,64 @@ namespace Orange
 			}
 		}
 
+		void ParseTextStyleProperty (Node node, string name)
+		{
+			TextStyle style = (TextStyle)node;
+			switch (name) {
+			case "ImagePath":
+				style.ImageTexture = new SerializableTexture (lexer.ParseQuotedString ());
+				break;
+			case "ImageSize":
+				style.ImageSize = lexer.ParseVector2 ();
+				break;
+			case "ImageUsage":
+				style.ImageUsage = (TextStyle.ImageUsageEnum)lexer.ParseInt ();
+				break;
+			case "FontName":
+				style.Font = new SerializableFont (lexer.ParseQuotedString ());
+				break;
+			case "SpaceAfter":
+				style.SpaceAfter = lexer.ParseFloat ();
+				break;
+			case "Size":
+				style.Size = lexer.ParseFloat ();
+				break;
+			case "Bold":
+				style.Bold = lexer.ParseBool ();
+				break;
+			case "DropShadow":
+				style.CastShadow = lexer.ParseBool ();
+				break;
+			case "ShadowColor":
+				style.ShadowColor = lexer.ParseColor4 ();
+				break;
+			case "ShadowOffset":
+				style.ShadowOffset = lexer.ParseVector2 ();
+				break;
+			default:
+				ParseActorProperty (node, name);
+				break;
+			}
+		}
+		void ParseRichTextProperty (Node node, string name)
+		{
+			RichText text = (RichText)node;
+			switch (name) {
+			case "Text":
+				text.Content = lexer.ParseQuotedString ();
+				break;
+			case "HAlign":
+				text.HAlignment = (HAlignment)lexer.ParseInt ();
+				break;
+			case "VAlign":
+				text.VAlignment = (VAlignment)lexer.ParseInt ();
+				break;
+			default:
+				ParseGraphicProperty (node, name);
+				break;
+			}
+		}
+
 		void ParseFolderBeginProperty (Node node, string name)
 		{
 			switch (name) {
@@ -734,6 +792,8 @@ namespace Orange
 				new KnownActorType {ActorClass = "Hot::FolderEnd", NodeClass = "Lime.Node, Lime", PropReader = ParseFolderEndProperty},
 				new KnownActorType {ActorClass = "Hot::NineGrid", NodeClass = "Lime.NineGrid, Lime", PropReader = ParseNineGridProperty},
 				new KnownActorType {ActorClass = "Hot::Slider", NodeClass = "Lime.Slider, Lime", PropReader = ParseSliderProperty},
+				new KnownActorType {ActorClass = "Hot::RichText", NodeClass = "Lime.RichText, Lime", PropReader = ParseRichTextProperty},
+				new KnownActorType {ActorClass = "Hot::TextStyle", NodeClass = "Lime.TextStyle, Lime", PropReader = ParseTextStyleProperty},
 			};
 		}
 	}

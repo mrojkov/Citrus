@@ -27,9 +27,11 @@ namespace Lime
 				byte hb = (byte)(code >> 8);
 				byte lb = (byte)(code & 255);
 				if (charMap [hb] != null) {
-					return charMap [hb] [lb];
+					var c = charMap [hb] [lb];
+					if (c != null)
+						return c;
 				}
-				return null;
+				return FontChar.Null;
 			}
 		}
 
@@ -122,5 +124,7 @@ namespace Lime
 		public Vector2 ACWidths;
 		[ProtoMember(6)]
 		public List<KerningPair> KerningPairs;
+
+		public static FontChar Null = new FontChar ();
 	}
 }

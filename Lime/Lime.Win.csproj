@@ -112,8 +112,8 @@
     <Compile Include="Source\Widgets\ParticleModifier.cs" />
     <Compile Include="Source\Widgets\ParticlesMagnet.cs" />
     <Compile Include="Source\Widgets\PointObject.cs" />
+    <Compile Include="Source\Widgets\RichText.cs" />
     <Compile Include="Source\Widgets\RootFrame.cs" />
-    <Compile Include="Source\Widgets\Text.cs" />
     <Compile Include="Source\Widgets\SimpleText.cs" />
     <Compile Include="Source\Widgets\Slider.cs" />
     <Compile Include="Source\Widgets\Spline.cs" />
