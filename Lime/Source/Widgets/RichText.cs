@@ -73,7 +73,6 @@ namespace Lime
 			get { return content; }
 			set {
 				content = value;
-				parser = new TextParser ();
 				if (!parser.Parse (content)) {
 					parser.Parse ("Error: " + parser.ErrorMessage);
 				}
@@ -86,7 +85,7 @@ namespace Lime
 		[ProtoMember(3)]
 		public VAlignment VAlignment { get; set; }
 
-		TextParser parser;
+		TextParser parser = new TextParser ();
 		string content;
 
 		public override void Render ()

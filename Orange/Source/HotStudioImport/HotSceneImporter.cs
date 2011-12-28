@@ -652,7 +652,7 @@ namespace Orange
 			TextStyle style = (TextStyle)node;
 			switch (name) {
 			case "ImagePath":
-				style.ImageTexture = new SerializableTexture (lexer.ParseQuotedString ());
+				style.ImageTexture = new SerializableTexture (lexer.ParsePath ());
 				break;
 			case "ImageSize":
 				style.ImageSize = lexer.ParseVector2 ();
