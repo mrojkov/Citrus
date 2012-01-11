@@ -100,12 +100,12 @@ namespace Lime
 			Vector2 a = Interpolate( v1, v2, ta );
 			minDistance = float.MaxValue;
 			offset = 0;
-			for ( int i = 0; i < SegmentCount; ++i ) {
+			for (int i = 0; i < SegmentCount; ++i) {
 				float tb = (float)(i + 1) / SegmentCount;
 				Vector2 b = Interpolate(v1, v2, tb);
 				float minDistance_, offset_;
 				if (CalcLineOffset(a, b, point, out minDistance_, out offset_ )) {
-					if ( minDistance_ < minDistance ) {
+					if (minDistance_ < minDistance) {
 						offset = offset_ * (tb - ta) + ta;
 						minDistance = minDistance_;
 					}
