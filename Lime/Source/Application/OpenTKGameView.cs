@@ -72,7 +72,6 @@ namespace Lime
 */
 		void HandleMouseMove(object sender, MouseMoveEventArgs e)
 		{
-			Console.WriteLine(string.Format("{0} {1}", e.X, e.Y));
 			Vector2 position = new Vector2(e.X, e.Y) * Input.ScreenToWorldTransform;
 			Input.MousePosition = position;
 		}

@@ -228,11 +228,11 @@ namespace Lime
 		internal static void Update()
 		{
 			currentKeysState.CopyTo(previousKeysState, 0);
-			var kbdState = OpenTK.Input.Keyboard.GetState(0);
+			var kbdState = OpenTK.Input.Keyboard.GetState();
 			for (int i = (int)Key.LShift; i <= (int)Key.BackSlash; i++) {
 				currentKeysState[i] = kbdState.IsKeyDown((OpenTK.Input.Key)i);
 			}
-			var mouseState = OpenTK.Input.Mouse.GetState(0);
+			var mouseState = OpenTK.Input.Mouse.GetState();
 			currentKeysState[(int)Key.Mouse0] = mouseState.IsButtonDown(OpenTK.Input.MouseButton.Left);
 			currentKeysState[(int)Key.Mouse1] = mouseState.IsButtonDown(OpenTK.Input.MouseButton.Right);
 			currentKeysState[(int)Key.Mouse2] = mouseState.IsButtonDown(OpenTK.Input.MouseButton.Middle);
