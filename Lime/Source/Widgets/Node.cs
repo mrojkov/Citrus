@@ -7,23 +7,23 @@ using System.ComponentModel;
 namespace Lime
 {
 	[ProtoContract]
-	[ProtoInclude (101, typeof (Widget))]
-	[ProtoInclude (102, typeof (ParticleModifier))]
-	[ProtoInclude (103, typeof (ImageCombiner))]
-	[ProtoInclude (104, typeof (PointObject))]
-	[ProtoInclude (105, typeof (Bone))]
-	[ProtoInclude (106, typeof (Audio))]
-	[ProtoInclude (107, typeof (SplineGear))]
-	[ProtoInclude (108, typeof (TextStyle))]
+	[ProtoInclude(101, typeof(Widget))]
+	[ProtoInclude(102, typeof(ParticleModifier))]
+	[ProtoInclude(103, typeof(ImageCombiner))]
+	[ProtoInclude(104, typeof(PointObject))]
+	[ProtoInclude(105, typeof(Bone))]
+	[ProtoInclude(106, typeof(Audio))]
+	[ProtoInclude(107, typeof(SplineGear))]
+	[ProtoInclude(108, typeof(TextStyle))]
 	public class Node
 	{
 		public static int UpdatedNodes;
 		
-		[ProtoMember (1)]
+		[ProtoMember(1)]
 		public string Id { get; set; }
 
-		[ProtoMember (2)]
-		[DefaultValue (null)]
+		[ProtoMember(2)]
+		[DefaultValue(null)]
 		public string ContentsPath { get; set; }
 
 		[Trigger]
@@ -32,50 +32,50 @@ namespace Lime
 		public Node Parent;
 		public Widget Widget;
 
-		[ProtoMember (5)]
-		public readonly AnimatorCollection Animators = new AnimatorCollection ();
+		[ProtoMember(5)]
+		public readonly AnimatorCollection Animators = new AnimatorCollection();
 
-		[ProtoMember (6)]
-		public readonly NodeCollection Nodes = new NodeCollection ();
+		[ProtoMember(6)]
+		public readonly NodeCollection Nodes = new NodeCollection();
 
-		[ProtoMember (7)]
-		public readonly MarkerCollection Markers = new MarkerCollection ();
+		[ProtoMember(7)]
+		public readonly MarkerCollection Markers = new MarkerCollection();
 
-		[ProtoMember (9)]
-		[DefaultValue (false)]
+		[ProtoMember(9)]
+		[DefaultValue(false)]
 		public bool Playing { get; set; }
 
 		private int animationTime;
-		[ProtoMember (10)]
-		[DefaultValue (0)]
+		[ProtoMember(10)]
+		[DefaultValue(0)]
 		public int AnimationTime {
 			get { return animationTime; }
 			set {
 				animationTime = value;
 				int count = Nodes.Count;
 				for (int i = 0; i < count; i++) {
-					Nodes [i].Animators.Apply (animationTime);
+					Nodes[i].Animators.Apply(animationTime);
 				}
 			}
 		}
 
-		[ProtoMember (11)]
-		[DefaultValue (null)]
+		[ProtoMember(11)]
+		[DefaultValue(null)]
 		public string Tag { get; set; }
 
 		public string CurrentAnimation { get; private set; }
 
-		public void AdvanceAnimation (int delta)
+		public void AdvanceAnimation(int delta)
 		{
 			int count = Markers.Count;
 			for (int i = 0; i < count; i++) {
-				var marker = Markers [i];
-				int markerTime = Animator.FramesToMsecs (marker.Frame);
+				var marker = Markers[i];
+				int markerTime = Animator.FramesToMsecs(marker.Frame);
 				if (animationTime <= markerTime && markerTime < animationTime + delta) {
 					if (marker.Action == MarkerAction.Jump) {
-						var gotoMarker = Markers.Get (marker.JumpTo);
+						var gotoMarker = Markers.Get(marker.JumpTo);
 						if (gotoMarker != null) {
-							int gotoTime = Animator.FramesToMsecs (gotoMarker.Frame);
+							int gotoTime = Animator.FramesToMsecs(gotoMarker.Frame);
 							animationTime = gotoTime + (animationTime + delta - markerTime);
 						}
 					} else if (marker.Action == MarkerAction.Stop) {
@@ -83,61 +83,61 @@ namespace Lime
 						Playing = false;
 					} else if (marker.Action == MarkerAction.Destroy) {
 						Playing = false;
-						Destroy ();
+						Destroy();
 					}
 					break;
 				}
 			}
 			count = Nodes.Count;
 			for (int i = 0; i < count; i++) {
-				var animators = Nodes [i].Animators;
-				animators.Apply (animationTime + delta);
-				animators.InvokeTriggers (animationTime, animationTime + delta);
+				var animators = Nodes[i].Animators;
+				animators.Apply(animationTime + delta);
+				animators.InvokeTriggers(animationTime, animationTime + delta);
 			}
 			animationTime += delta;
 		}
 
-		private static List<Node> collectedNodes = new List<Node> ();
+		private static List<Node> collectedNodes = new List<Node>();
 
-		public Node ()
+		public Node()
 		{
 			Animators.Owner = this;
 			Nodes.Owner = this;
 		}
 		
-		static HashSet<string> processingFiles = new HashSet<string> ();
+		static HashSet<string> processingFiles = new HashSet<string>();
 
-		public static Node CreateFromBundle (string path)
+		public static Node CreateFromBundle(string path)
 		{
-			return CreateFromBundleHelper (path, false);
+			return CreateFromBundleHelper(path, false);
 		}
 
-		public static Node CreateFromBundleCached (string path)
+		public static Node CreateFromBundleCached(string path)
 		{
-			return CreateFromBundleHelper (path, true);
+			return CreateFromBundleHelper(path, true);
 		}
 
-		static Node CreateFromBundleHelper (string path, bool cached)
+		static Node CreateFromBundleHelper(string path, bool cached)
 		{
-			if (processingFiles.Contains (path))
-				throw new Lime.Exception ("Cyclic dependency of scenes has detected: {0}", path);
+			if (processingFiles.Contains(path))
+				throw new Lime.Exception("Cyclic dependency of scenes has detected: {0}", path);
 			Node node;
-			processingFiles.Add (path);
+			processingFiles.Add(path);
 			try {
 				if (cached) {
-					node = Serialization.ReadObjectCached<Node> (path);
+					node = Serialization.ReadObjectCached<Node>(path);
 				} else {
-					using (Stream stream = AssetsBundle.Instance.OpenFile (path))
-						node = Serialization.ReadObject<Node> (path, stream);
+					using (Stream stream = AssetsBundle.Instance.OpenFile(path))
+						node = Serialization.ReadObject<Node>(path, stream);
 				}
-				node.LoadContents ();
+				node.LoadContents();
 			} finally {
-				processingFiles.Remove (path);
+				processingFiles.Remove(path);
 			}
 			return node;
 		}
 
-		public Node GetRoot ()
+		public Node GetRoot()
 		{
 			Node node = this;
 			while (node.Parent != null)
@@ -145,7 +145,7 @@ namespace Lime
 			return node;
 		}
 
-		public bool ChildOf (Node node)
+		public bool ChildOf(Node node)
 		{
 			for (Node n = Parent; n != null; n = n.Parent) {
 				if (n == node)
@@ -154,11 +154,11 @@ namespace Lime
 			return false;
 		}
 
-		public void PlayAnimation (string markerId)
+		public void PlayAnimation(string markerId)
 		{
-			Marker marker = Markers.Get (markerId);
+			Marker marker = Markers.Get(markerId);
 			if (marker == null) {
-				// Console.WriteLine ("WARNING: Attempt to play animation. Unknown marker '{0}' in node '{1}'", markerId, Id);
+				// Console.WriteLine("WARNING: Attempt to play animation. Unknown marker '{0}' in node '{1}'", markerId, Id);
 				return;
 			}
 			AnimationFrame = marker.Frame;
@@ -167,167 +167,167 @@ namespace Lime
 		}
 
 		public int AnimationFrame {
-			get { return Animator.MsecsToFrames (AnimationTime); }
-			set { AnimationTime = Animator.FramesToMsecs (value); }
+			get { return Animator.MsecsToFrames(AnimationTime); }
+			set { AnimationTime = Animator.FramesToMsecs(value); }
 		}
 		
-		static public void CleanupDeadNodes ()
+		static public void CleanupDeadNodes()
 		{
 			foreach (Node node in collectedNodes) {
 				if (node.Parent != null)
-					node.Parent.Nodes.Remove (node);
+					node.Parent.Nodes.Remove(node);
 			}
-			collectedNodes.Clear ();
+			collectedNodes.Clear();
 		}
 		
-		public Node DeepClone ()
+		public Node DeepClone()
 		{
-			return Serialization.DeepClone<Node> (this);
+			return Serialization.DeepClone<Node>(this);
 		}
 		
-		public Node DeepCloneCached ()
+		public Node DeepCloneCached()
 		{
-			return Serialization.DeepCloneCached<Node> (this);
+			return Serialization.DeepCloneCached<Node>(this);
 		}
 
-		public override string ToString ()
+		public override string ToString()
 		{
-			return string.Format ("{0}, {1}", GetType ().Name, GetHierarchyPath ());
+			return string.Format("{0}, {1}", GetType().Name, GetHierarchyPath());
 		}
 
-		string GetHierarchyPath ()
+		string GetHierarchyPath()
 		{
-			string r = string.IsNullOrEmpty (Id) ? String.Format ("[{0}]", GetType().Name): Id;
+			string r = string.IsNullOrEmpty(Id) ? String.Format("[{0}]", GetType().Name): Id;
 			if (Parent != null) {
-				r = Parent.GetHierarchyPath () + "/" + r;
+				r = Parent.GetHierarchyPath() + "/" + r;
 			}
 			return r;
 		}
 		
-		public void Destroy ()
+		public void Destroy()
 		{
-			collectedNodes.Add (this);
+			collectedNodes.Add(this);
 		}
 
-		// Delta must be in [0..1000 / WidgetUtils.FramesPerSecond - 1] range
-		public virtual void Update (int delta)
+		// Delta must be in[0..1000 / WidgetUtils.FramesPerSecond - 1] range
+		public virtual void Update(int delta)
 		{
 			UpdatedNodes++;
 			if (Playing) {
-				AdvanceAnimation (delta);
+				AdvanceAnimation(delta);
 			}
 			for (int i = 0; i < Nodes.Count; i++) {
-				Nodes [i].Update (delta);
+				Nodes[i].Update(delta);
 			}
 		}
 
-		public virtual void LateUpdate (int delta)
+		public virtual void LateUpdate(int delta)
 		{
 			for (int i = 0; i < Nodes.Count; i++) {
-				Nodes [i].LateUpdate (delta);
+				Nodes[i].LateUpdate(delta);
 			}
 		}
 
-		public void SafeUpdate (int delta)
+		public void SafeUpdate(int delta)
 		{
 			if (delta < 0)
-				throw new Lime.Exception ("Update interval can not be negative");
+				throw new Lime.Exception("Update interval can not be negative");
 			const int step = 1000 / Animator.FramesPerSecond - 1;
 			while (delta > step) {
-				Update (step);
+				Update(step);
 				delta -= step;
 			}
-			Update (delta);
-			LateUpdate (delta);
+			Update(delta);
+			LateUpdate(delta);
 		}
 
-		public virtual void Render ()
+		public virtual void Render()
 		{
 			for (int i = Nodes.Count - 1; i >= 0; i--) {
-				Nodes [i].Render ();
+				Nodes[i].Render();
 			}
 		}
 
-		public void LoadContents ()
+		public void LoadContents()
 		{
-			if (!string.IsNullOrEmpty (ContentsPath))
-				LoadContentsHelper ();
+			if (!string.IsNullOrEmpty(ContentsPath))
+				LoadContentsHelper();
 			else {
 				foreach (Node node in Nodes)
-					node.LoadContents ();
+					node.LoadContents();
 			}
 		}
 
-		void LoadContentsHelper ()
+		void LoadContentsHelper()
 		{
-			Nodes.Clear ();
-			Markers.Clear ();
-			if (File.Exists (ContentsPath)) {
-				Node contents = Node.CreateFromBundle (ContentsPath);
+			Nodes.Clear();
+			Markers.Clear();
+			if (File.Exists(ContentsPath)) {
+				Node contents = Node.CreateFromBundle(ContentsPath);
 				if (contents.Widget != null && Widget != null) {
-					contents.Update (0);
+					contents.Update(0);
 					contents.Widget.Size = Widget.Size;
-					contents.Update (0);
+					contents.Update(0);
 				}
 				foreach (Marker marker in contents.Markers)
-					Markers.Add (marker);
+					Markers.Add(marker);
 				foreach (Node node in contents.Nodes)
-					Nodes.Add (node);
+					Nodes.Add(node);
 			}
 		}
 
-		protected internal virtual void OnTrigger (string property)
+		protected internal virtual void OnTrigger(string property)
 		{
 			if (property == "Trigger") {
-				if (String.IsNullOrEmpty (Trigger)) {
+				if (String.IsNullOrEmpty(Trigger)) {
 					AnimationTime = 0;
 					Playing = true;
 				} else {
-					PlayAnimation (Trigger);
+					PlayAnimation(Trigger);
 				}
 			}
 		}
 
-		public T Find<T> (string id, bool throwException = true) where T : Node
+		public T Find<T>(string id, bool throwException = true) where T : Node
 		{
-			T result = Find (id, throwException) as T;
+			T result = Find(id, throwException) as T;
 			if (throwException && result == null)
-				throw new Lime.Exception ("'{0}' of {1} not found for '{2}'", id, typeof (T).Name, ToString ());
+				throw new Lime.Exception("'{0}' of {1} not found for '{2}'", id, typeof(T).Name, ToString());
 			return result;
 		}
 
-		public Node Find (string id, bool throwException = true)
+		public Node Find(string id, bool throwException = true)
 		{
-			if (id.IndexOf ('/') >= 0) {
+			if (id.IndexOf('/') >= 0) {
 				Node child = this;
-				string[] names = id.Split ('/');
+				string[] names = id.Split('/');
 				foreach (string name in names) {
-					child = child.Find (name, throwException);
+					child = child.Find(name, throwException);
 					if (child == null)
 						break;
 				}
 				if (throwException && child == null)
-					throw new Lime.Exception ("'{0}' not found for '{1}'", id, ToString ());
+					throw new Lime.Exception("'{0}' not found for '{1}'", id, ToString());
 				return child;
 			} else
-				return FindHelper (id, throwException);
+				return FindHelper(id, throwException);
 		}
 
-		Node FindHelper (string id, bool throwException)
+		Node FindHelper(string id, bool throwException)
 		{
-			Queue<Node> queue = new Queue<Node> ();
-			queue.Enqueue (this);
+			Queue<Node> queue = new Queue<Node>();
+			queue.Enqueue(this);
 			while (queue.Count > 0) {
-				Node node = queue.Dequeue ();
+				Node node = queue.Dequeue();
 				foreach (Node child in node.Nodes) {
 					if (child.Id == id)
 						return child;
 				}
 				foreach (Node child in node.Nodes)
-					queue.Enqueue (child);
+					queue.Enqueue(child);
 			}
 			if (throwException)
-				throw new Lime.Exception ("'{0}' not found for '{1}'", id, ToString ());
+				throw new Lime.Exception("'{0}' not found for '{1}'", id, ToString());
 			return null;
 		}
 	}

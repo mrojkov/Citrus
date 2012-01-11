@@ -7,38 +7,38 @@ namespace Lime
 	[System.Diagnostics.DebuggerStepThrough]
 	public struct Matrix32 : IEquatable<Matrix32>
 	{
-		[ProtoMember (1)]
+		[ProtoMember(1)]
 		public Vector2 U;
 
-		[ProtoMember (2)]
+		[ProtoMember(2)]
 		public Vector2 V;
 
-		[ProtoMember (3)]
+		[ProtoMember(3)]
 		public Vector2 T;
 
-		public static readonly Matrix32 Identity = new Matrix32 (new Vector2 (1, 0), new Vector2 (0, 1), new Vector2 (0, 0));
+		public static readonly Matrix32 Identity = new Matrix32(new Vector2(1, 0), new Vector2(0, 1), new Vector2(0, 0));
 
-		public Matrix32 (Vector2 u, Vector2 v, Vector2 t)
+		public Matrix32(Vector2 u, Vector2 v, Vector2 t)
 		{
 			U = u;
 			V = v;
 			T = t;
 		}
 
-		bool IEquatable<Matrix32>.Equals (Matrix32 rhs)
+		bool IEquatable<Matrix32>.Equals(Matrix32 rhs)
 		{
-			return U.Equals (rhs.U) && V.Equals (rhs.V) && T.Equals (rhs.T);
+			return U.Equals(rhs.U) && V.Equals(rhs.V) && T.Equals(rhs.T);
 		}
 
-		public float CalcDeterminant ()
+		public float CalcDeterminant()
 		{
 			return U.X * V.Y - U.Y * V.X;
 		}
 
-		public Matrix32 CalcInversed ()
+		public Matrix32 CalcInversed()
 		{
 			Matrix32 m;
-			float invDet = 1.0f / CalcDeterminant ();
+			float invDet = 1.0f / CalcDeterminant();
 			m.U.X = invDet * V.Y; m.U.Y = -invDet * U.Y;
 			m.V.X = -invDet * V.X; m.V.Y = invDet * U.X;
 			m.T.X = invDet * (V.X * T.Y - V.Y * T.X);
@@ -46,9 +46,9 @@ namespace Lime
 			return m;
 		}
 
-		public static Matrix32 Rotation (float radians)
+		public static Matrix32 Rotation(float radians)
 		{
-			Vector2 cs = Utils.CosSin (radians);
+			Vector2 cs = Utils.CosSin(radians);
 			Matrix32 m;
 			m.U.X = cs.X;
 			m.U.Y = cs.Y;
@@ -59,7 +59,7 @@ namespace Lime
 			return m;
 		}
 
-		public static Matrix32 Scaling (Vector2 scaling)
+		public static Matrix32 Scaling(Vector2 scaling)
 		{
 			Matrix32 m = Identity;
 			m.U.X = scaling.X;
@@ -67,16 +67,16 @@ namespace Lime
 			return m;
 		}
 
-		public static Matrix32 Translation (Vector2 translation)
+		public static Matrix32 Translation(Vector2 translation)
 		{
 			Matrix32 m = Identity;
 			m.T = translation;
 			return m;
 		}
 
-		public static Matrix32 Transformation (Vector2 center, Vector2 scaling, float rotation, Vector2 translation)
+		public static Matrix32 Transformation(Vector2 center, Vector2 scaling, float rotation, Vector2 translation)
 		{
-			Vector2 cs = Utils.CosSin (rotation);
+			Vector2 cs = Utils.CosSin(rotation);
 			Matrix32 m;
 			m.U.X = scaling.X * cs.X;
 			m.U.Y = scaling.X * cs.Y;
@@ -87,7 +87,7 @@ namespace Lime
 			return m;
 		}
 
-		public static Matrix32 operator * (Matrix32 a, Matrix32 b)
+		public static Matrix32 operator *(Matrix32 a, Matrix32 b)
 		{
 			Matrix32 m;
 			m.U.X = a.U.X * b.U.X + a.U.Y * b.V.X;
@@ -99,7 +99,7 @@ namespace Lime
 			return m;
 		}
 
-		public static Vector2 operator * (Matrix32 a, Vector2 b)
+		public static Vector2 operator *(Matrix32 a, Vector2 b)
 		{
 			Vector2 v;
 			v.X = b.X * a.U.X + b.Y * a.V.X + a.T.X;
@@ -107,7 +107,7 @@ namespace Lime
 			return v;
 		}
 
-		public Vector2 TransformVector (Vector2 a)
+		public Vector2 TransformVector(Vector2 a)
 		{
 			Vector2 v;
 			v.X = a.X * U.X + a.Y * V.X + T.X;
@@ -115,7 +115,7 @@ namespace Lime
 			return v;
 		}
 		
-		public Vector2 TransformVector (float x, float y)
+		public Vector2 TransformVector(float x, float y)
 		{
 			Vector2 v;
 			v.X = x * U.X + y * V.X + T.X;
@@ -123,9 +123,9 @@ namespace Lime
 			return v;
 		}
 		
-		public static Vector2 operator * (Vector2 a, Matrix32 b)
+		public static Vector2 operator *(Vector2 a, Matrix32 b)
 		{
-			return b.TransformVector (a);
+			return b.TransformVector(a);
 		}
 		/*
 		public static explicit operator OpenTK.Matrix4(Matrix32 m)

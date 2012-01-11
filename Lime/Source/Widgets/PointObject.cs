@@ -6,15 +6,15 @@ using ProtoBuf;
 
 namespace Lime
 {
-    [ProtoContract]
+	[ProtoContract]
 	[ProtoInclude(101, typeof(SplinePoint))]
-    [ProtoInclude(102, typeof(DistortionMeshPoint))]
-    public class PointObject : Node
-    {
-        [ProtoMember(1)]
-        public Vector2 Position { get; set; }
+	[ProtoInclude(102, typeof(DistortionMeshPoint))]
+	public class PointObject : Node
+	{
+		[ProtoMember(1)]
+		public Vector2 Position { get; set; }
 
-        [ProtoMember(2)]
-        public SkinningWeights SkinningWeights { get; set; }
-    }
+		[ProtoMember(2)]
+		public SkinningWeights SkinningWeights { get; set; }
+	}
 }

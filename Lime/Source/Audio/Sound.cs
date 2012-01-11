@@ -5,7 +5,7 @@ namespace Lime
 {
 	public class Sound
 	{
-		public Sound () { Channel = NullAudioChannel.Instance; }
+		public Sound() { Channel = NullAudioChannel.Instance; }
 
 		public IAudioChannel Channel { get; internal set; }
 		
@@ -21,8 +21,8 @@ namespace Lime
 			set { Channel.Pan = value; }
 		}
 
-		public void Resume () { Channel.Resume (); }
-		public bool IsStopped () { return Channel.State == ALSourceState.Stopped; }
-		public void Stop () { Channel.Stop (); }
+		public void Resume() { Channel.Resume(); }
+		public bool IsStopped() { return Channel.State == ALSourceState.Stopped; }
+		public void Stop() { Channel.Stop(); }
 	}
 }

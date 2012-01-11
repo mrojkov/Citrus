@@ -25,59 +25,59 @@ namespace Lime
 		NSMenuItem fullScreenMenuItem;
 		NSMenuItem quitMenuItem;
 
-		public GameController (GameApp game)
+		public GameController(GameApp game)
 		{
-			AudioSystem.Initialize ();
+			AudioSystem.Initialize();
 
 			// The default resolution is 640 x 480
-			windowSize = new Size (640, 480);
-			RectangleF frame = new RectangleF (0, 0, windowSize.Width, windowSize.Height);
+			windowSize = new Size(640, 480);
+			RectangleF frame = new RectangleF(0, 0, windowSize.Width, windowSize.Height);
 
 			// Create a window
-			window = new NSWindow (frame, NSWindowStyle.Titled | NSWindowStyle.Closable, NSBackingStore.Buffered, true);
-			window.Center ();
+			window = new NSWindow(frame, NSWindowStyle.Titled | NSWindowStyle.Closable, NSBackingStore.Buffered, true);
+			window.Center();
 			window.IsOpaque = true;
 
-			view = new GameView (frame, null, game);
+			view = new GameView(frame, null, game);
 
-			window.ContentView.AddSubview (view);
+			window.ContentView.AddSubview(view);
 			window.AcceptsMouseMovedEvents = false;
 
 			// Attach MacOS application main menu
-			SetMainMenu ();
+			SetMainMenu();
 
 			// Set the current directory.
 			// We set the current directory to the ResourcePath on Mac
-			Directory.SetCurrentDirectory (NSBundle.MainBundle.ResourcePath);
+			Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
 
-			game.OnCreate (this);
-			window.MakeKeyAndOrderFront (window);
+			game.OnCreate(this);
+			window.MakeKeyAndOrderFront(window);
 		}
 
-		void OnFullScreen (Object sender, EventArgs e)
+		void OnFullScreen(Object sender, EventArgs e)
 		{
 			FullScreen = !FullScreen;
 		}
 
-		void OnQuit (Object sender, EventArgs e)
+		void OnQuit(Object sender, EventArgs e)
 		{
-			AudioSystem.Terminate ();
-			NSApplication.SharedApplication.Terminate (new NSObject());
+			AudioSystem.Terminate();
+			NSApplication.SharedApplication.Terminate(new NSObject());
 		}
 
-		void SetMainMenu ()
+		void SetMainMenu()
 		{
-			mainMenu = new NSMenu ("MainMenu");
-			appMenu = new NSMenu ("Application");
-			appMenuItem = mainMenu.AddItem ("Application", null, "");
-			mainMenu.SetSubmenu (appMenu, appMenuItem);
-			fullScreenMenuItem = new NSMenuItem ("Toggle FullScreen", "f", OnFullScreen);
-			appMenu.AddItem (fullScreenMenuItem);
-			separatorMenuItem = new NSMenuItem ("");
-			appMenu.AddItem (separatorMenuItem);
-			quitMenuItem = new NSMenuItem ("Quit", "q", OnQuit);
-			appMenu.AddItem (quitMenuItem);
-			NSApplication.SharedApplication.SetMainMenu (mainMenu);
+			mainMenu = new NSMenu("MainMenu");
+			appMenu = new NSMenu("Application");
+			appMenuItem = mainMenu.AddItem("Application", null, "");
+			mainMenu.SetSubmenu(appMenu, appMenuItem);
+			fullScreenMenuItem = new NSMenuItem("Toggle FullScreen", "f", OnFullScreen);
+			appMenu.AddItem(fullScreenMenuItem);
+			separatorMenuItem = new NSMenuItem("");
+			appMenu.AddItem(separatorMenuItem);
+			quitMenuItem = new NSMenuItem("Quit", "q", OnQuit);
+			appMenu.AddItem(quitMenuItem);
+			NSApplication.SharedApplication.SetMainMenu(mainMenu);
 		}
 
 		public DeviceOrientation CurrentDeviceOrientation {
@@ -87,27 +87,27 @@ namespace Lime
 		public Size WindowSize {
 			// returs actual window size
 			get {
-				return new Size (view.Size.Width, view.Size.Height);
+				return new Size(view.Size.Width, view.Size.Height);
 			}
 			// sets window size for windowed mode
 			set {
-				windowSize = new Size (value.Width, value.Height);
+				windowSize = new Size(value.Width, value.Height);
 				if (!isInFullScreenMode) {
-					ResetWindowBounds ();
+					ResetWindowBounds();
 				}
 			}
 		}
 
-		public void Activate ()
+		public void Activate()
 		{
 			AudioSystem.Active = true;
-			view.Run ();
+			view.Run();
 		}
 
-		public void Deactivate ()
+		public void Deactivate()
 		{
 			AudioSystem.Active = false;
-			view.Stop ();
+			view.Stop();
 		}
 
 		public bool FullScreen {
@@ -116,20 +116,20 @@ namespace Lime
 				if (isInFullScreenMode != value) {
 					isInFullScreenMode = value;
 					if (isInFullScreenMode)
-						GoFullScreenMode ();
+						GoFullScreenMode();
 					else
-						GoWindowMode ();
+						GoWindowMode();
 				}
 			}
 		}
 
-		private float TitleBarHeight ()
+		private float TitleBarHeight()
 		{
-			RectangleF contentRect = NSWindow.ContentRectFor (window.Frame, window.StyleMask);
+			RectangleF contentRect = NSWindow.ContentRectfor (window.Frame, window.StyleMask);
 			return window.Frame.Height - contentRect.Height;
 		}
 
-		private void ResetWindowBounds ()
+		private void ResetWindowBounds()
 		{
 			RectangleF frame;
 			RectangleF content;
@@ -137,34 +137,34 @@ namespace Lime
 			if (isInFullScreenMode) {
 				frame = NSScreen.MainScreen.Frame;
 				content = NSScreen.MainScreen.Frame;
-				window.SetFrame (frame, true);
+				window.SetFrame(frame, true);
 			} else {
 				content = view.Bounds;
-				content.Width = Math.Min (windowSize.Width, NSScreen.MainScreen.VisibleFrame.Width);
-				content.Height = Math.Min (windowSize.Height, NSScreen.MainScreen.VisibleFrame.Height - TitleBarHeight ());
+				content.Width = Math.Min(windowSize.Width, NSScreen.MainScreen.VisibleFrame.Width);
+				content.Height = Math.Min(windowSize.Height, NSScreen.MainScreen.VisibleFrame.Height - TitleBarHeight());
 
 				frame = window.Frame;
-				frame.X = Math.Max (frame.X, NSScreen.MainScreen.VisibleFrame.X);
-				frame.Y = Math.Max (frame.Y, NSScreen.MainScreen.VisibleFrame.Y);
+				frame.X = Math.Max(frame.X, NSScreen.MainScreen.VisibleFrame.X);
+				frame.Y = Math.Max(frame.Y, NSScreen.MainScreen.VisibleFrame.Y);
 				frame.Width = content.Width;
 				frame.Height = content.Height + TitleBarHeight();
 
-				window.SetFrame (frame, true);
-				window.Center ();
+				window.SetFrame(frame, true);
+				window.Center();
 			}
 
 			view.Bounds = content;
 			view.Size = content.Size.ToSize();
 		}
 
-		private void GoFullScreenMode ()
+		private void GoFullScreenMode()
 		{
 			isInFullScreenMode = true;
 
 			// Some games set fullscreen in their initialize function,
 			// before we have sized the window and set it active.
 			// Do that now, or else mouse tracking breaks.
-			window.MakeKeyAndOrderFront (window);
+			window.MakeKeyAndOrderFront(window);
 			ResetWindowBounds();
 
 			// Changing window style resets the title. Save it.
@@ -180,7 +180,7 @@ namespace Lime
 				view.Title = oldTitle;
 		}
 
-		private void GoWindowMode ()
+		private void GoWindowMode()
 		{
 			isInFullScreenMode = false;
 

@@ -6,31 +6,46 @@ namespace Lime
 	[ProtoContract]
 	public class SimpleText : Widget
 	{
-		[ProtoMember (1)]
-		public SerializableFont Font = new SerializableFont ();
+		[ProtoMember(1)]
+		public SerializableFont Font = new SerializableFont();
 
-		[ProtoMember (2)]
+		[ProtoMember(2)]
 		public string Text;
 
-		[ProtoMember (3)]
+		[ProtoMember(3)]
 		public float FontHeight = 15;
 
-		[ProtoMember (4)]
+		[ProtoMember(4)]
 		public float Spacing = 0;
 
-		[ProtoMember (5)]
+		[ProtoMember(5)]
 		public HAlignment HAlignment;
 
-		[ProtoMember (6)]
+		[ProtoMember(6)]
 		public VAlignment VAlignment;
 
-		public override void Render ()
+		public override void Render()
 		{
 			if (worldShown) {
 				Renderer.WorldMatrix = worldMatrix;
 				Renderer.Blending = worldBlending;
-				if (!string.IsNullOrEmpty (Text)) {
-					Renderer.DrawTextLine (Font.Instance, Vector2.Zero, Text, worldColor, FontHeight);
+				if (!string.IsNullOrEmpty(Text)) {
+					var strings = Text.Split('\n');
+					var pos = new Vector2();
+					float totalHeight = FontHeight * strings.Length + Spacing * (strings.Length - 1);
+					if (VAlignment == VAlignment.Bottom)
+						pos.Y = Size.Y - totalHeight;
+					else if (VAlignment == VAlignment.Center)
+						pos.Y = (Size.Y - totalHeight) * 0.5f;
+					foreach (var str in strings) {
+						var extend = Renderer.MeasureTextLine(Font.Instance, str, FontHeight);
+						if (HAlignment == HAlignment.Right)
+							pos.X = Size.X - extend.X;
+						else if (HAlignment == HAlignment.Center)
+							pos.X = (Size.X - extend.X) * 0.5f;
+						Renderer.DrawTextLine(Font.Instance, pos, str, worldColor, FontHeight);
+						pos.Y += Spacing + FontHeight;
+					}
 				}
 			}
 		}

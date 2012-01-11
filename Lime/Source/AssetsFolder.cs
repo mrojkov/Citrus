@@ -4,7 +4,7 @@ namespace Citrus.Framework
 {
 	public class AssetsFolder
 	{
-		public AssetsFolder ()
+		public AssetsFolder()
 		{
 		}
 	}

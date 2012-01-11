@@ -14,20 +14,20 @@
 
 		public static RootFrame Instance;
 
-		public RootFrame ()
+		public RootFrame()
 		{
 			Instance = this;
 		}
 
-		public override void Update (int delta)
+		public override void Update(int delta)
 		{
 			ActiveWidgetUpdated = false;
-			base.Update (delta);
+			base.Update(delta);
 		}
 
-		public override void LateUpdate (int delta)
+		public override void LateUpdate(int delta)
 		{
-			base.LateUpdate (delta);
+			base.LateUpdate(delta);
 			if (!ActiveWidgetUpdated) {
 				ActiveWidget = null;
 			}

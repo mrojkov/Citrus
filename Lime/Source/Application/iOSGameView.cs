@@ -16,30 +16,30 @@ namespace Lime
 {
 	internal class GameView : iPhoneOSGameView
 	{
-		public GameView () : base (new RectangleF (0, 0, 0, 0))
+		public GameView() : base(new RectangleF(0, 0, 0, 0))
 		{
 			LayerRetainsBacking = false;
 			LayerColorFormat = EAGLColorFormat.RGB565;
 		}
 
-		[Export ("layerClass")]
-		public static new Class GetLayerClass ()
+		[Export("layerClass")]
+		public static new Class GetLayerClass()
 		{
-			return iPhoneOSGameView.GetLayerClass ();
+			return iPhoneOSGameView.GetLayerClass();
 		}
 
-		protected override void ConfigureLayer (CAEAGLLayer eaglLayer)
+		protected override void ConfigureLayer(CAEAGLLayer eaglLayer)
 		{
 			eaglLayer.Opaque = true;
 		}
 
-		protected override void CreateFrameBuffer ()
+		protected override void CreateFrameBuffer()
 		{
 			ContextRenderingApi = EAGLRenderingAPI.OpenGLES1;
-			base.CreateFrameBuffer ();
+			base.CreateFrameBuffer();
 		}
 
-		protected override void OnUpdateFrame (FrameEventArgs e)
+		protected override void OnUpdateFrame(FrameEventArgs e)
 		{
 			double delta = e.Time; 
 			// Here is protection against time leap on inactive state and low FPS
@@ -47,22 +47,22 @@ namespace Lime
 				delta = 0.01;
 			else if (delta > 0.1)
 				delta = 0.1;
-			Application.gameApp.OnUpdateFrame (delta);
+			Application.gameApp.OnUpdateFrame(delta);
 		}
 
-		protected override void OnRenderFrame (FrameEventArgs e)
+		protected override void OnRenderFrame(FrameEventArgs e)
 		{
-			MakeCurrent ();
-			Application.gameApp.OnRenderFrame ();
-			SwapBuffers ();
-			UpdateFrameRate ();
+			MakeCurrent();
+			Application.gameApp.OnRenderFrame();
+			SwapBuffers();
+			UpdateFrameRate();
 		}
 
 		private long timeStamp;
 		private int countedFrames;
 		private float frameRate;
 
-		private void UpdateFrameRate ()
+		private void UpdateFrameRate()
 		{
 			countedFrames++;
 			long t = System.DateTime.Now.Ticks;
@@ -72,7 +72,7 @@ namespace Lime
 					frameRate = (float)countedFrames / ((float)milliseconds / 1000.0f);
 				timeStamp = t;
 				countedFrames = 0;
-			}				
+			}
 		}
 
 		public float FrameRate {

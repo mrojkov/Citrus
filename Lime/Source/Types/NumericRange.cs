@@ -7,36 +7,36 @@ namespace Lime
 	[ProtoContract]
 	public struct NumericRange : IEquatable<NumericRange>
 	{
-		[ProtoMember (1)]
+		[ProtoMember(1)]
 		public float Median;
 
-		[ProtoMember (2)]
+		[ProtoMember(2)]
 		public float Dispersion;
 
-		public NumericRange (float median, float variation)
+		public NumericRange(float median, float variation)
 		{
 			Median = median;
 			Dispersion = variation;
 		}
 
-		public float NormalRandomNumber ()
+		public float NormalRandomNumber()
 		{
-			return Utils.NormalRandom (Median, Dispersion);
+			return Utils.NormalRandom(Median, Dispersion);
 		}
 
-		public float UniformRandomNumber ()
+		public float UniformRandomNumber()
 		{
-			return Utils.UniformRandom (Median, Dispersion);
+			return Utils.UniformRandom(Median, Dispersion);
 		}
 
-		bool IEquatable<NumericRange>.Equals (NumericRange rhs)
+		bool IEquatable<NumericRange>.Equals(NumericRange rhs)
 		{
 			return Median == rhs.Median && Dispersion == rhs.Dispersion;
 		}
 
-		public override string ToString ()
+		public override string ToString()
 		{
-			return String.Format ("{0}, {1}", Median, Dispersion);
+			return String.Format("{0}, {1}", Median, Dispersion);
 		}
 	}
 }

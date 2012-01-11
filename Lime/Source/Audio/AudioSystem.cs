@@ -21,46 +21,46 @@ namespace Lime
 	{
 		static AudioContext context;
 		// static XRamExtension xram;
-		static SampleCache soundCache = new SampleCache ();
+		static SampleCache soundCache = new SampleCache();
 
-		static List<AudioChannel> channels = new List<AudioChannel> ();
-		static float [] groupVolumes = new float [2] {1, 1};
+		static List<AudioChannel> channels = new List<AudioChannel>();
+		static float[] groupVolumes = new float[2] {1, 1};
 
 		static Thread streamingThread;
 		static volatile bool shouldTerminateThread;
 		static bool active = true;
 
-		public static void Initialize (int numChannels = 16)
+		public static void Initialize(int numChannels = 16)
 		{
 			context = new AudioContext();
-			if (!HasError ()) {
+			if (!HasError()) {
 				// xram = new XRamExtension();
 				for (int i = 0; i < numChannels; i++) {
-					channels.Add (new AudioChannel (i));
+					channels.Add(new AudioChannel(i));
 				}
 			}
-			streamingThread = new Thread (RunStreamingLoop);
+			streamingThread = new Thread(RunStreamingLoop);
 			streamingThread.IsBackground = true;
-			streamingThread.Start ();
+			streamingThread.Start();
 		}
 
-		public static void Terminate ()
+		public static void Terminate()
 		{
 			shouldTerminateThread = true;
-			streamingThread.Join ();
+			streamingThread.Join();
 			foreach (var channel in channels) {
-				channel.Dispose ();
+				channel.Dispose();
 			}
-			context.Dispose ();
+			context.Dispose();
 		}
 
-		static void RunStreamingLoop ()
+		static void RunStreamingLoop()
 		{
 			while (!shouldTerminateThread) {
 				foreach (var channel in channels) {
-					channel.Update ();
+					channel.Update();
 				}
-				Thread.Sleep (0);
+				Thread.Sleep(0);
 			}
 		}
 
@@ -72,22 +72,22 @@ namespace Lime
 				if (active != value) {
 					active = value;
 					if (active)
-						ResumeAll ();
+						ResumeAll();
 					else
-						PauseAll ();
+						PauseAll();
 				}
 			}
 		}
 
-		public static float GetGroupVolume (AudioChannelGroup group)
+		public static float GetGroupVolume(AudioChannelGroup group)
 		{
-			return groupVolumes [(int)group];
+			return groupVolumes[(int)group];
 		}
 
-		public static void SetGroupVolume (AudioChannelGroup group, float value)
+		public static void SetGroupVolume(AudioChannelGroup group, float value)
 		{
-			value = Utils.Clamp (value, 0, 1);
-			groupVolumes [(int)group] = value;
+			value = Utils.Clamp(value, 0, 1);
+			groupVolumes[(int)group] = value;
 			foreach (var channel in channels) {
 				if (channel.Group == group) {
 					channel.Volume = channel.Volume;
@@ -95,46 +95,46 @@ namespace Lime
 			}
 		}
 
-		static void PauseAll ()
+		static void PauseAll()
 		{
 			foreach (var channel in channels) {
 				if (channel.State == ALSourceState.Playing) {
-					channel.Pause ();
+					channel.Pause();
 				}
 			}
 		}
 
-		static void ResumeAll ()
+		static void ResumeAll()
 		{
-			context.MakeCurrent ();
+			context.MakeCurrent();
 			foreach (var channel in channels) {
 				if (channel.State == ALSourceState.Paused) {
-					channel.Resume ();
+					channel.Resume();
 				}
 			}
 		}
 
-		static Sound LoadSoundToChannel (AudioChannel channel, string path, AudioChannelGroup group, bool looping, int priority)
+		static Sound LoadSoundToChannel(AudioChannel channel, string path, AudioChannelGroup group, bool looping, int priority)
 		{
 			IAudioDecoder decoder = null;
 			path = path + ".sound";
-			if (AssetsBundle.Instance.FileExists (path)) {
-				decoder = AudioDecoderFactory.CreateDecoder (soundCache.OpenStream (path));
+			if (AssetsBundle.Instance.FileExists(path)) {
+				decoder = AudioDecoderFactory.CreateDecoder(soundCache.OpenStream(path));
 			} else {
-				Console.WriteLine ("Missing audio file: '{0}'", path);
-				return new Sound ();
+				Console.WriteLine("Missing audio file: '{0}'", path);
+				return new Sound();
 			}
-			var sound = channel.Play (decoder, looping);
+			var sound = channel.Play(decoder, looping);
 			channel.Group = group;
 			channel.Priority = priority;
 			channel.Volume = 1;
 			return sound;
 		}
 
-		static AudioChannel AllocateChannel (int priority)
+		static AudioChannel AllocateChannel(int priority)
 		{
-			var channels = AudioSystem.channels.ToArray ();
-			Array.Sort (channels, (a, b) => {
+			var channels = AudioSystem.channels.ToArray();
+			Array.Sort(channels, (a, b) => {
 				if (a.Priority != b.Priority)
 					return a.Priority - b.Priority;
 				if (a.StartupTime == b.StartupTime) {
@@ -147,50 +147,50 @@ namespace Lime
 					return channel;
 				}
 			}
-			if (channels.Length > 0 && channels [0].Priority <= priority) {
-				channels [0].Stop ();
-				return channels [0];
+			if (channels.Length > 0 && channels[0].Priority <= priority) {
+				channels[0].Stop();
+				return channels[0];
 			} else {
 				return null;
 			}
 		}
 
-		public static Sound LoadSound (string path, AudioChannelGroup group, bool looping = false, int priority = 0)
+		public static Sound LoadSound(string path, AudioChannelGroup group, bool looping = false, int priority = 0)
 		{
-			var channel = AllocateChannel (priority);
+			var channel = AllocateChannel(priority);
 			if (channel != null) {
-				return LoadSoundToChannel (channel, path, group, looping, priority);
+				return LoadSoundToChannel(channel, path, group, looping, priority);
 			}
-			return new Sound ();
+			return new Sound();
 		}
 
-		public static Sound Play (string path, AudioChannelGroup group, bool looping = false, int priority = 0)
+		public static Sound Play(string path, AudioChannelGroup group, bool looping = false, int priority = 0)
 		{
-			var sound = LoadSound (path, group, looping, priority);
-			sound.Resume ();
+			var sound = LoadSound(path, group, looping, priority);
+			sound.Resume();
 			return sound;
 		}
 
-		public static Sound PlayMusic (string path, bool looping = true, int priority = 100)
+		public static Sound PlayMusic(string path, bool looping = true, int priority = 100)
 		{
-			return Play (path, AudioChannelGroup.Music, looping, priority);
+			return Play(path, AudioChannelGroup.Music, looping, priority);
 		}
 
-		public static Sound PlayEffect (string path, bool looping = false, int priority = 0)
+		public static Sound PlayEffect(string path, bool looping = false, int priority = 0)
 		{
-			return Play (path, AudioChannelGroup.Effects, looping, priority);
+			return Play(path, AudioChannelGroup.Effects, looping, priority);
 		}
 
-		public static bool HasError ()
+		public static bool HasError()
 		{
-			return AL.GetError () != ALError.NoError;
+			return AL.GetError() != ALError.NoError;
 		}
 
-		public static void CheckError ()
+		public static void CheckError()
 		{
-			var error = AL.GetError ();
+			var error = AL.GetError();
 			if (error != ALError.NoError) {
-				throw new Exception ("OpenAL error: " + AL.GetErrorString (error));
+				throw new Exception("OpenAL error: " + AL.GetErrorString(error));
 			}
 		}
 	}

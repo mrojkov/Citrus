@@ -19,31 +19,31 @@ namespace Orange
 		[ProtoMember(4)]
 		public string Unused2 = "";
 
-		public AppConfig () {}
+		public AppConfig() {}
 
-		private static string GetConfigPath ()
+		private static string GetConfigPath()
 		{
-			var basePath = Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData);
-			var configPath = Path.Combine (basePath, System.Reflection.Assembly.GetExecutingAssembly().GetName().Name + ".config");
+			var basePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+			var configPath = Path.Combine(basePath, System.Reflection.Assembly.GetExecutingAssembly().GetName().Name + ".config");
 			return configPath;
 		}
 
-		public static AppConfig Load ()
+		public static AppConfig Load()
 		{
 			try {
-				using (FileStream stream = new FileStream (GetConfigPath (), FileMode.Open, FileAccess.Read, FileShare.None)) {
-					return ProtoBuf.Serializer.Deserialize<AppConfig> (stream);
+				using(FileStream stream = new FileStream(GetConfigPath(), FileMode.Open, FileAccess.Read, FileShare.None)) {
+					return ProtoBuf.Serializer.Deserialize<AppConfig>(stream);
 				}
 			}
 			catch {
-				return new AppConfig ();
+				return new AppConfig();
 			}
 		}
 
-		public static void Save (AppConfig config)
+		public static void Save(AppConfig config)
 		{
-			using (FileStream stream = new FileStream (GetConfigPath (), FileMode.Create, FileAccess.Write, FileShare.None)) {
-				ProtoBuf.Serializer.Serialize (stream, config);
+			using(FileStream stream = new FileStream(GetConfigPath(), FileMode.Create, FileAccess.Write, FileShare.None)) {
+				ProtoBuf.Serializer.Serialize(stream, config);
 			}
 		}
 	}

@@ -48,18 +48,18 @@ namespace Lime
 			set {
 				renderTarget = value;
 				renderedToTexture = value != RenderTarget.None;
-				switch (value) {
+				switch(value) {
 				case RenderTarget.A:
-					renderTexture = new SerializableTexture ("#a");
+					renderTexture = new SerializableTexture("#a");
 					break;
 				case RenderTarget.B:
-					renderTexture = new SerializableTexture ("#b");
+					renderTexture = new SerializableTexture("#b");
 					break;
 				case RenderTarget.C:
-					renderTexture = new SerializableTexture ("#c");
+					renderTexture = new SerializableTexture("#c");
 					break;
 				case RenderTarget.D:
-					renderTexture = new SerializableTexture ("#d");
+					renderTexture = new SerializableTexture("#d");
 					break;
 				default:
 					renderTexture = null;
@@ -68,54 +68,54 @@ namespace Lime
 			}
 		}
 
-		void IImageCombinerArg.BypassRendering () {}
+		void IImageCombinerArg.BypassRendering() {}
 
-		ITexture IImageCombinerArg.GetTexture ()
+		ITexture IImageCombinerArg.GetTexture()
 		{
 			return renderTexture;
 		}
 
-		public override void LateUpdate (int delta)
+		public override void LateUpdate(int delta)
 		{
 			if (BeforeLateUpdate != null)
-				BeforeLateUpdate (this, new UpdateEventArgs {Delta = delta});
-			base.LateUpdate (delta);
+				BeforeLateUpdate(this, new UpdateEventArgs {Delta = delta});
+			base.LateUpdate(delta);
 			if (AfterLateUpdate != null)
-				AfterLateUpdate (this, new UpdateEventArgs {Delta = delta});
+				AfterLateUpdate(this, new UpdateEventArgs {Delta = delta});
 		}
 
-		public override void Update (int delta)
+		public override void Update(int delta)
 		{
 			if (BeforeUpdate != null)
-				BeforeUpdate (this, new UpdateEventArgs {Delta = delta});
-			base.Update (delta);
+				BeforeUpdate(this, new UpdateEventArgs {Delta = delta});
+			base.Update(delta);
 			if (AfterUpdate != null)
-				AfterUpdate (this, new UpdateEventArgs {Delta = delta});
+				AfterUpdate(this, new UpdateEventArgs {Delta = delta});
 		}
 
-		public override void Render ()
+		public override void Render()
 		{
 			if (worldShown) {
 				if (BeforeRendering != null)
-					BeforeRendering (this, null);
+					BeforeRendering(this, null);
 				if (renderTexture != null) {
 					if (Size.X > 0 && Size.Y > 0) {
-						renderTexture.SetAsRenderTarget ();
+						renderTexture.SetAsRenderTarget();
 						Viewport vp = Renderer.Viewport;
 						Renderer.Viewport = new Viewport { X = 0, Y = 0, Width = renderTexture.ImageSize.Width, Height = renderTexture.ImageSize.Height };
-						Renderer.PushProjectionMatrix ();
-						Renderer.SetOrthogonalProjection (0, Size.Y, Size.X, 0);
-						base.Render ();
-						renderTexture.RestoreRenderTarget ();
+						Renderer.PushProjectionMatrix();
+						Renderer.SetOrthogonalProjection(0, Size.Y, Size.X, 0);
+						base.Render();
+						renderTexture.RestoreRenderTarget();
 						Renderer.Viewport = vp;
-						Renderer.PopProjectionMatrix ();
-						Renderer.SetOrthogonalProjection (0, 0, 1024, 768);
+						Renderer.PopProjectionMatrix();
+						Renderer.SetOrthogonalProjection(0, 0, 1024, 768);
 					}
 				} else {
-					base.Render ();
+					base.Render();
 				}
 				if (AfterRendering != null)
-					AfterRendering (this, null);
+					AfterRendering(this, null);
 			}
 		}
 	}

@@ -17,19 +17,19 @@ namespace Lime
 	[ProtoContract]
 	public class Audio : Node
 	{
-		Sound sound = new Sound ();
+		Sound sound = new Sound();
 
-		[ProtoMember (1)]
+		[ProtoMember(1)]
 		public SerializableSample Sample { get; set; }
 
-		[ProtoMember (2), DefaultValue (false)]
+		[ProtoMember(2), DefaultValue(false)]
 		public bool Looping { get; set; }
 
-		[ProtoMember (3), DefaultValue (0)]
+		[ProtoMember(3), DefaultValue(0)]
 		public float FadeTime { get; set; }
 
 		float volume = 1;
-		[ProtoMember (4), DefaultValue (1)]
+		[ProtoMember(4), DefaultValue(1)]
 		public float Volume
 		{
 			get { return volume; }
@@ -41,7 +41,7 @@ namespace Lime
 		}
 
 		float pan = 0;
-		[ProtoMember (5), DefaultValue (0)]
+		[ProtoMember(5), DefaultValue(0)]
 		public float Pan
 		{
 			get { return pan; }
@@ -55,35 +55,35 @@ namespace Lime
 		[Trigger]
 		public AudioAction Action { get; set; }
 
-		[ProtoMember (7), DefaultValue (AudioChannelGroup.Effects)]
+		[ProtoMember(7), DefaultValue(AudioChannelGroup.Effects)]
 		public AudioChannelGroup Group { get; set; }
 
-		[ProtoMember (8), DefaultValue (0)]
+		[ProtoMember(8), DefaultValue(0)]
 		public int Priority { get; set; }
 
-		void Play ()
+		void Play()
 		{
-			sound = Sample.Play (AudioChannelGroup.Effects, true, Looping, Priority);
+			sound = Sample.Play(AudioChannelGroup.Effects, true, Looping, Priority);
 			sound.Volume = Volume;
 			sound.Pan = Pan;
-			sound.Resume ();
+			sound.Resume();
 		}
 
-		void Stop ()
+		void Stop()
 		{
-			sound.Stop ();
+			sound.Stop();
 		}
 
-		protected internal override void OnTrigger (string property)
+		protected internal override void OnTrigger(string property)
 		{
 			if (property == "Action") {
 				if (Action == AudioAction.Play) {
-					Play ();
+					Play();
 				} else {
-					Stop ();
+					Stop();
 				}
 			} else {
-				base.OnTrigger (property);
+				base.OnTrigger(property);
 			}
 		}
 	}

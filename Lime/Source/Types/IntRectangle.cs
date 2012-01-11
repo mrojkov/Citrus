@@ -13,7 +13,7 @@ namespace Lime
 		[ProtoMember(2)]
 		public IntVector2 B;
 		
-		public IntRectangle (int left, int top, int right, int bottom)
+		public IntRectangle(int left, int top, int right, int bottom)
 		{
 			A.X = left;
 			A.Y = top;
@@ -21,15 +21,15 @@ namespace Lime
 			B.Y = bottom;
 		}
 
-		public IntRectangle (IntVector2 a, IntVector2 b)
+		public IntRectangle(IntVector2 a, IntVector2 b)
 		{
 			A = a;
 			B = b;
 		}
 		
-		bool IEquatable<IntRectangle>.Equals (IntRectangle other)
+		bool IEquatable<IntRectangle>.Equals(IntRectangle other)
 		{
-			return A.Equals (other.A) && B.Equals (other.B);
+			return A.Equals(other.A) && B.Equals(other.B);
 		}
 		
 		public int Width {
@@ -57,14 +57,14 @@ namespace Lime
 		}
 
 		
-		bool Contains (IntVector2 v)
+		bool Contains(IntVector2 v)
 		{
 			return (v.X >= A.X) && (v.Y >= A.Y) && (v.X < B.X) && (v.Y < B.Y);
 		}
 		
-		public override string ToString ()
+		public override string ToString()
 		{
-			return String.Format ("{0}, {1}, {2}, {3}", A.X, A.Y, B.X, B.Y);
+			return String.Format("{0}, {1}, {2}, {3}", A.X, A.Y, B.X, B.Y);
 		}
 	}
 }

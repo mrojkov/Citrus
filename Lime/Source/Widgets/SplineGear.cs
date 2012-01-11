@@ -16,17 +16,17 @@ namespace Lime
 		[ProtoMember(3)]
 		public float SplineOffset { get; set; }
 
-		public override void Update (int delta)
+		public override void Update(int delta)
 		{
-			base.Update (delta);
+			base.Update(delta);
 			if (Parent != null) {
-				Spline spline = Parent.Nodes.Get<Spline> (SplineId);
-				Widget widget = Parent.Nodes.Get<Widget> (WidgetId);
+				Spline spline = Parent.Nodes.Get<Spline>(SplineId);
+				Widget widget = Parent.Nodes.Get<Widget>(WidgetId);
 				if (spline != null && widget != null) {
-					float length = spline.CalcLength ();
-					Vector2 point = spline.CalcPoint (SplineOffset * length);
-					widget.Position = spline.LocalMatrix.TransformVector (point);
-					widget.Update (0);
+					float length = spline.CalcLength();
+					Vector2 point = spline.CalcPoint(SplineOffset * length);
+					widget.Position = spline.LocalMatrix.TransformVector(point);
+					widget.Update(0);
 				}
 			}
 		}

@@ -5,13 +5,13 @@ namespace Orange
 {
 	public class CitrusProject
 	{
-		public CitrusProject (string fileName)
+		public CitrusProject(string fileName)
 		{
-			Title = File.ReadAllText (fileName);
-			ProjectDirectory = Path.GetDirectoryName (fileName);
-			AssetsDirectory = Path.Combine (ProjectDirectory, "Data");
-			if (!Directory.Exists (AssetsDirectory)) {
-				throw new Lime.Exception ("Assets folder '{0}' doesn't exist", AssetsDirectory);
+			Title = File.ReadAllText(fileName);
+			ProjectDirectory = Path.GetDirectoryName(fileName);
+			AssetsDirectory = Path.Combine(ProjectDirectory, "Data");
+			if (!Directory.Exists(AssetsDirectory)) {
+				throw new Lime.Exception("Assets folder '{0}' doesn't exist", AssetsDirectory);
 			}
 		}
 

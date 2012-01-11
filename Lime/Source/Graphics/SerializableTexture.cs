@@ -6,30 +6,30 @@ using ProtoBuf;
 
 namespace Lime
 {
-    [ProtoContract]
+	[ProtoContract]
 	public class SerializableTexture : ITexture
 	{
 		SerializableTextureCore core;
 
-		public SerializableTexture ()
+		public SerializableTexture()
 		{
-			core = TexturePool.Instance.GetSerializableTextureCore ("");
+			core = TexturePool.Instance.GetSerializableTextureCore("");
 		}
 
-		public SerializableTexture (string path)
+		public SerializableTexture(string path)
 		{
-			core = TexturePool.Instance.GetSerializableTextureCore (path);
+			core = TexturePool.Instance.GetSerializableTextureCore(path);
 		}
 
 		[ProtoMember(1)]
 		public string SerializationPath {
 			get {
-				var path = Serialization.ShrinkPath (Path);
+				var path = Serialization.ShrinkPath(Path);
 				return path;
 			}
 			set {
-				var path = Serialization.ExpandPath (value);
-				core = TexturePool.Instance.GetSerializableTextureCore (path);
+				var path = Serialization.ExpandPath(value);
+				core = TexturePool.Instance.GetSerializableTextureCore(path);
 			}
 		}
 
@@ -57,33 +57,33 @@ namespace Lime
 			}
 		}
 
-		public uint GetHandle ()
+		public uint GetHandle()
 		{
-			return core.Instance.GetHandle ();
+			return core.Instance.GetHandle();
 		}
 
-		public void SetAsRenderTarget ()
+		public void SetAsRenderTarget()
 		{
-			core.Instance.SetAsRenderTarget ();
+			core.Instance.SetAsRenderTarget();
 		}
 
-		public void RestoreRenderTarget ()
+		public void RestoreRenderTarget()
 		{
-			core.Instance.RestoreRenderTarget ();
+			core.Instance.RestoreRenderTarget();
 		}
 
-		public bool IsTransparentPixel (int x, int y)
+		public bool IsTransparentPixel(int x, int y)
 		{
-			return core.Instance.IsTransparentPixel (x, y);
+			return core.Instance.IsTransparentPixel(x, y);
 		}
 
-		public override string ToString ()
+		public override string ToString()
 		{
 			return core.Path;
 		}
 	}
 
-	internal class SerializableTextureCore
+	class SerializableTextureCore
 	{
 		public readonly string Path;
 		int usedAtRenderCycle = 0;
@@ -93,35 +93,35 @@ namespace Lime
 		
 		public Rectangle UVRect { get { return uvRect; } }
 		
-		public SerializableTextureCore (string path)
+		public SerializableTextureCore(string path)
 		{
 			Path = path;
 		}
 
-		~SerializableTextureCore ()
+		~SerializableTextureCore()
 		{
-			Discard ();
+			Discard();
 		}
 		
-		static PlainTexture CreateStubTexture ()
+		static PlainTexture CreateStubTexture()
 		{
-			var stubTexture = new PlainTexture ();
+			var stubTexture = new PlainTexture();
 			Color4[] pixels = new Color4[128 * 128];
 			for (int i = 0; i < 128; i++)
 				for (int j = 0; j < 128; j++)
-					pixels [i * 128 + j] = (((i + (j & ~7)) & 8) == 0) ? Color4.Blue : Color4.White;
-			stubTexture.LoadImage (pixels, 128, 128, true);
+					pixels[i * 128 + j] = (((i + (j & ~7)) & 8) == 0) ? Color4.Blue : Color4.White;
+			stubTexture.LoadImage(pixels, 128, 128, true);
 			return stubTexture;
 		}
 
 		/// <summary>
 		/// Discards texture, frees graphics resources.
 		/// </summary>
-		public void Discard ()
+		public void Discard()
 		{
 			if (instance != null) {
 				if (instance is IDisposable)
-					(instance as IDisposable).Dispose ();
+					(instance as IDisposable).Dispose();
 				instance = null;
 			}
 		}
@@ -130,28 +130,28 @@ namespace Lime
 		/// Discards texture if it has not been used 
 		/// for given number of game cycles.
 		/// </summary>
-		public void DiscardIfNotUsed (int numCycles)
+		public void DiscardIfNotUsed(int numCycles)
 		{
 			if ((TexturePool.Instance.gameRenderCycle - usedAtRenderCycle) >= numCycles)
-				Discard ();
+				Discard();
 		}
 		
-		private bool TryCreateRenderTarget (string path)
+		private bool TryCreateRenderTarget(string path)
 		{
-			if (Path.Length > 0 && Path [0] == '#') {
-				switch (Path) {
+			if (Path.Length > 0 && Path[0] == '#') {
+				switch(Path) {
 				case "#a":
 				case "#b":
-					instance = new RenderTexture (256, 256);
+					instance = new RenderTexture(256, 256);
 					break;
 				case "#c":
-					instance = new RenderTexture (512, 512);
+					instance = new RenderTexture(512, 512);
 					break;
 				case "#d":
-					instance = new RenderTexture (1024, 1024);
+					instance = new RenderTexture(1024, 1024);
 					break;
 				default:
-					instance = CreateStubTexture ();
+					instance = CreateStubTexture();
 					break;
 				}
 				uvRect.A = Vector2.Zero;
@@ -160,11 +160,11 @@ namespace Lime
 			return false;
 		}
 		
-		private bool TryLoadTextureAtlasPart (string path)
+		private bool TryLoadTextureAtlasPart(string path)
 		{
-			if (AssetsBundle.Instance.FileExists (path)) {
-				var texParams = TextureAtlasPart.ReadFromBundle (path);
-				instance = new SerializableTexture (texParams.AtlasTexture);
+			if (AssetsBundle.Instance.FileExists(path)) {
+				var texParams = TextureAtlasPart.ReadFromBundle(path);
+				instance = new SerializableTexture(texParams.AtlasTexture);
 				uvRect.A = (Vector2)texParams.AtlasRect.A / (Vector2)instance.SurfaceSize;
 				uvRect.B = (Vector2)texParams.AtlasRect.B / (Vector2)instance.SurfaceSize;
 				return true;
@@ -172,32 +172,32 @@ namespace Lime
 			return false;
 		}
 		
-		private bool TryLoadImage (string path)
+		private bool TryLoadImage(string path)
 		{
-			if (AssetsBundle.Instance.FileExists (path)) {
-				instance = new PlainTexture ();
-				(instance as PlainTexture).LoadImage (path);
+			if (AssetsBundle.Instance.FileExists(path)) {
+				instance = new PlainTexture();
+				(instance as PlainTexture).LoadImage(path);
 				uvRect.A = Vector2.Zero;
 				uvRect.B = (Vector2)instance.ImageSize / (Vector2)instance.SurfaceSize;
 				return true;
 			}
-			Console.WriteLine ("Missing texture: {0}", path);
+			Console.WriteLine("Missing texture: {0}", path);
 			return false;
 		}
 
 		public ITexture Instance {
 			get {
 				if (instance == null) {
-					bool loaded = !string.IsNullOrEmpty (Path)  && (TryCreateRenderTarget (Path) ||
-						TryLoadTextureAtlasPart (Path + ".atlasPart") ||
+					bool loaded = !string.IsNullOrEmpty(Path) && (TryCreateRenderTarget(Path) ||
+						TryLoadTextureAtlasPart(Path + ".atlasPart") ||
 #if iOS
-						TryLoadImage (Path + ".pvr")
+						TryLoadImage(Path + ".pvr")
 #else
-						TryLoadImage (Path + ".dds")
+						TryLoadImage(Path + ".dds")
 #endif
 					);
 					if (!loaded) {
-						instance = CreateStubTexture ();
+						instance = CreateStubTexture();
 						uvRect = instance.UVRect;
 					}
 				}
@@ -207,65 +207,57 @@ namespace Lime
 		}
 	}
 
-	/// Container for texture assets.
-	/// </summary>
 	public sealed class TexturePool
 	{
 		internal int gameRenderCycle = 1;
 		Dictionary<string, WeakReference> items;
-		static readonly TexturePool instance = new TexturePool ();
+		static readonly TexturePool instance = new TexturePool();
 
-		/// <summary>
-		/// Global singleton.
-		/// </summary>
 		public static TexturePool Instance { get { return instance; } }
 
-		private TexturePool ()
+		private TexturePool()
 		{
-			items = new Dictionary<string, WeakReference> ();
+			items = new Dictionary<string, WeakReference>();
 		}
 
 		/// <summary>
 		/// Discards textures wich have not been used 
 		/// for given number of game cycles.
 		/// </summary>
-		public void DiscardUnused (int numCycles)
+		public void DiscardUnusedTextures(int numCycles)
 		{
 			foreach (WeakReference r in items.Values) {
 				if (r.IsAlive)
-					(r.Target as SerializableTextureCore).DiscardIfNotUsed (numCycles);
+					(r.Target as SerializableTextureCore).DiscardIfNotUsed(numCycles);
 			}
-			PlainTexture.DeleteScheduledTextures ();
+			PlainTexture.DeleteScheduledTextures();
 		}
 
-		/// <summary>
-		/// Discards all textures.
-		/// </summary>
-		public void DiscardAll ()
+		public void DiscardAllTextures()
 		{
 			foreach (WeakReference r in items.Values) {
 				if (r.IsAlive) {
-					(r.Target as SerializableTextureCore).Discard ();
+					(r.Target as SerializableTextureCore).Discard();
 				}
 			}
-			PlainTexture.DeleteScheduledTextures ();
+			PlainTexture.DeleteScheduledTextures();
 		}
 
 		/// <summary>
 		/// Increases current game render cycle. 
 		/// Usually this function must be called at the end of frame.
 		/// </summary>
-		public void AdvanceGameRenderCycle ()
+		public void AdvanceGameRenderCycle()
 		{
 			gameRenderCycle++;
 		}
 
-		internal SerializableTextureCore GetSerializableTextureCore (string path)
+		internal SerializableTextureCore GetSerializableTextureCore(string path)
 		{
 			WeakReference r;
-			if (!items.TryGetValue (path, out r) || !r.IsAlive) {
-				r = new WeakReference (new SerializableTextureCore (path));
-				items [path] = r;
+			if (!items.TryGetValue(path, out r) || !r.IsAlive) {
+				r = new WeakReference(new SerializableTextureCore(path));
+				items[path] = r;
 			}
 			return r.Target as SerializableTextureCore;
 		}

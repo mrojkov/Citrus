@@ -10,66 +10,66 @@ namespace Orange
 		Size textureSize;
 		float fontCharHeight;
 
-		public HotFontImporter (string path)
+		public HotFontImporter(string path)
 		{
-			using (Stream stream = new FileStream(path, FileMode.Open)) {
-				using (TextReader reader = new StreamReader(stream)) {
-					string text = reader.ReadToEnd ();
-					lexer = new HotLexer (path, text);
+			using(Stream stream = new FileStream(path, FileMode.Open)) {
+				using(TextReader reader = new StreamReader(stream)) {
+					string text = reader.ReadToEnd();
+					lexer = new HotLexer(path, text);
 				}
 			}
 		}
 
-		void ParseFontCharProperty (ref FontChar fontChar, string name)
+		void ParseFontCharProperty(ref FontChar fontChar, string name)
 		{
-			switch (name) {
+			switch(name) {
 			case "CharCode":
-				fontChar.Char = (char)lexer.ParseInt ();
+				fontChar.Char = (char)lexer.ParseInt();
 				break;
 			case "TexPosition":
-				fontChar.UV0 = lexer.ParseVector2 () / (Vector2)textureSize;
+				fontChar.UV0 = lexer.ParseVector2() / (Vector2)textureSize;
 				break;
 			case "TexSize":
-				Vector2 size = lexer.ParseVector2 ();
+				Vector2 size = lexer.ParseVector2();
 				fontChar.Width = size.X;
 				fontCharHeight = size.Y;
 				fontChar.UV1 = fontChar.UV0 + size / (Vector2)textureSize;
 				break;
 			case "ACWidths":
-				fontChar.ACWidths = lexer.ParseVector2 ();
+				fontChar.ACWidths = lexer.ParseVector2();
 				break;
 			default:
-				throw new Exception ("Unknown property '{0}'. Parsing: {1}", name, fontChar);
+				throw new Exception("Unknown property '{0}'. Parsing: {1}", name, fontChar);
 			}
 		}
 
-		FontChar ParseFontChar ()
+		FontChar ParseFontChar()
 		{
-			string type = lexer.ParseQuotedString ();
+			string type = lexer.ParseQuotedString();
 			if (type != "Hot::FontChar")
-				throw new Exception ("Unknown type of object '{0}'", type);
-			var fontChar = new FontChar ();
-			lexer.ParseToken ('{');
+				throw new Exception("Unknown type of object '{0}'", type);
+			var fontChar = new FontChar();
+			lexer.ParseToken('{');
 			while (lexer.PeekChar() != '}')
-				ParseFontCharProperty (ref fontChar, lexer.ParseWord ());
-			lexer.ParseToken ('}');
+				ParseFontCharProperty(ref fontChar, lexer.ParseWord());
+			lexer.ParseToken('}');
 			return fontChar;
 		}
 
-		void ParseFontCharPairProperty (ref FontPair fontCharPair, string name)
+		void ParseFontCharPairProperty(ref FontPair fontCharPair, string name)
 		{
-			switch (name) {
+			switch(name) {
 			case "CharCodeL":
-				fontCharPair.A = (char)lexer.ParseInt ();
+				fontCharPair.A = (char)lexer.ParseInt();
 				break;
 			case "CharCodeR":
-				fontCharPair.B = (char)lexer.ParseInt ();
+				fontCharPair.B = (char)lexer.ParseInt();
 				break;
 			case "Delta":
-				fontCharPair.Kerning = lexer.ParseFloat ();
+				fontCharPair.Kerning = lexer.ParseFloat();
 				break;
 			default:
-				throw new Exception ("Unknown property '{0}'. Parsing: {1}", name, fontCharPair);
+				throw new Exception("Unknown property '{0}'. Parsing: {1}", name, fontCharPair);
 			}
 		}
 
@@ -80,56 +80,56 @@ namespace Orange
 			public float Kerning;
 		}
 
-		FontPair ParseFontCharPair ()
+		FontPair ParseFontCharPair()
 		{
-			string type = lexer.ParseQuotedString ();
+			string type = lexer.ParseQuotedString();
 			if (type != "Hot::FontCharPair")
-				throw new Exception ("Unknown type of object '{0}'", type);
-			var fontCharPair = new FontPair ();
-			lexer.ParseToken ('{');
+				throw new Exception("Unknown type of object '{0}'", type);
+			var fontCharPair = new FontPair();
+			lexer.ParseToken('{');
 			while (lexer.PeekChar() != '}')
-				ParseFontCharPairProperty (ref fontCharPair, lexer.ParseWord ());
-			lexer.ParseToken ('}');
+				ParseFontCharPairProperty(ref fontCharPair, lexer.ParseWord());
+			lexer.ParseToken('}');
 			return fontCharPair;
 		}
 
-		void ParseFontProperty (Font font, string name)
+		void ParseFontProperty(Font font, string name)
 		{
-			switch (name) {
+			switch(name) {
 			case "Characters":
-				lexer.ParseToken ('[');
+				lexer.ParseToken('[');
 				while (lexer.PeekChar() != ']')
-					font.Chars.Add (ParseFontChar ());
-				lexer.ParseToken (']');
+					font.Chars.Add(ParseFontChar());
+				lexer.ParseToken(']');
 				break;
 			case "Pairs":
-				lexer.ParseToken ('[');
-				while (lexer.PeekChar () != ']') {
-					var pair = ParseFontCharPair ();
-					FontChar c = font.Chars [pair.A];
+				lexer.ParseToken('[');
+				while (lexer.PeekChar() != ']') {
+					var pair = ParseFontCharPair();
+					FontChar c = font.Chars[pair.A];
 					if (c.KerningPairs == null) {
-						c.KerningPairs = new List<KerningPair> ();
+						c.KerningPairs = new List<KerningPair>();
 					}
-					c.KerningPairs.Add (new KerningPair { Char = pair.B, Kerning = pair.Kerning });
+					c.KerningPairs.Add(new KerningPair { Char = pair.B, Kerning = pair.Kerning });
 				}
-				lexer.ParseToken (']');
+				lexer.ParseToken(']');
 				break;
 			default:
-				throw new Exception ("Unknown property '{0}'. Parsing: {1}", name, font);
+				throw new Exception("Unknown property '{0}'. Parsing: {1}", name, font);
 			}
 		}
 
-		public Font ParseFont (Size textureSize)
+		public Font ParseFont(Size textureSize)
 		{
 			this.textureSize = textureSize;
-			string type = lexer.ParseQuotedString ();
+			string type = lexer.ParseQuotedString();
 			if (type != "Hot::Font")
-				throw new Exception ("Unknown type of object '{0}'", type);
-			var font = new Font ();
-			lexer.ParseToken ('{');
+				throw new Exception("Unknown type of object '{0}'", type);
+			var font = new Font();
+			lexer.ParseToken('{');
 			while (lexer.PeekChar() != '}')
-				ParseFontProperty (font, lexer.ParseWord ());
-			lexer.ParseToken ('}');
+				ParseFontProperty(font, lexer.ParseWord());
+			lexer.ParseToken('}');
 			font.CharHeight = fontCharHeight;
 			return font;
 		}

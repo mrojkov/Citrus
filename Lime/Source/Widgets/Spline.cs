@@ -22,7 +22,7 @@ namespace Lime
 			return length;
 		}
 
-		public Vector2 CalcPoint (float t)
+		public Vector2 CalcPoint(float t)
 		{
 			float length = 0.0f;
 			SplinePoint p = null;
@@ -35,7 +35,7 @@ namespace Lime
 				if (p != null) {
 					float segmentLength = ((v.Position - p.Position) * Size).Length;
 					if (length <= t && t < length + segmentLength) {
-						return Interpolate (p, v, (t - length) / segmentLength);
+						return Interpolate(p, v, (t - length) / segmentLength);
 					}
 					length += segmentLength;
 				}
@@ -47,16 +47,16 @@ namespace Lime
 				return Vector2.Zero;
 		}
 
-		Vector2 Interpolate (SplinePoint v1, SplinePoint v2, float t)
+		Vector2 Interpolate(SplinePoint v1, SplinePoint v2, float t)
 		{
-			if( !v1.Straight ) {
+			if (!v1.Straight) {
 				Vector2 p1 = v1.Position * Size;
 				Vector2 p2 = v2.Position * Size;
 				float len = (p2 - p1).Length;
 				float ta1 = v1.TangentAngle * Utils.DegreesToRadians;
 				float ta2 = v2.TangentAngle * Utils.DegreesToRadians;
-				Vector2 t1 = Utils.CosSin (ta1);
-				Vector2 t2 = Utils.CosSin (ta2);
+				Vector2 t1 = Utils.CosSin(ta1);
+				Vector2 t2 = Utils.CosSin(ta2);
 				t1 *= len * v1.TangentWeight;
 				t2 *= len * v2.TangentWeight;
 				return Utils.HermiteSpline( t, p1, t1, p2, t2 );
@@ -67,7 +67,7 @@ namespace Lime
 			}
 		}
 
-		public float CalcOffset (Vector2 point)
+		public float CalcOffset(Vector2 point)
 		{
 			float length = 0;
 			SplinePoint p = null;
@@ -75,12 +75,12 @@ namespace Lime
 			float offset = 0;
 			foreach (Node node in Nodes) {
 				SplinePoint v = node as SplinePoint;
-				if(v == null)
+				if (v == null)
 					continue;
 				if (p != null) {
 					float segmentLength = ((v.Position - p.Position) * Size).Length;
 					float minDistance_, offset_;
-					if (CalcOffsetHelper (p, v, point, out minDistance_, out offset_)) {
+					if (CalcOffsetHelper(p, v, point, out minDistance_, out offset_)) {
 						if (minDistance_ < minDistance) {
 							offset = offset_ * segmentLength + length;
 							minDistance = minDistance_;
@@ -93,19 +93,19 @@ namespace Lime
 			return offset;
 		}
 	
-		bool CalcOffsetHelper (SplinePoint v1, SplinePoint v2, Vector2 point, out float minDistance, out float offset)
+		bool CalcOffsetHelper(SplinePoint v1, SplinePoint v2, Vector2 point, out float minDistance, out float offset)
 		{
 			const int SegmentCount = 10;
 			float ta = 0;
 			Vector2 a = Interpolate( v1, v2, ta );
 			minDistance = float.MaxValue;
 			offset = 0;
-			for( int i = 0; i < SegmentCount; ++i ) {
+			for ( int i = 0; i < SegmentCount; ++i ) {
 				float tb = (float)(i + 1) / SegmentCount;
-				Vector2 b = Interpolate (v1, v2, tb);
+				Vector2 b = Interpolate(v1, v2, tb);
 				float minDistance_, offset_;
-				if (CalcLineOffset (a, b, point, out minDistance_, out offset_ )) {
-					if( minDistance_ < minDistance ) {
+				if (CalcLineOffset(a, b, point, out minDistance_, out offset_ )) {
+					if ( minDistance_ < minDistance ) {
 						offset = offset_ * (tb - ta) + ta;
 						minDistance = minDistance_;
 					}
@@ -116,7 +116,7 @@ namespace Lime
 			return minDistance < float.MaxValue;
 		}
 
-		bool CalcLineOffset (Vector2 a, Vector2 b, Vector2 point, out float minDistance, out float offset )
+		bool CalcLineOffset(Vector2 a, Vector2 b, Vector2 point, out float minDistance, out float offset )
 		{
 			Vector2 v = b - a;
 			float len = v.Length;
@@ -125,8 +125,8 @@ namespace Lime
 				return false;
 			}
 			Vector2 direction = v / len;
-			float f = Vector2.DotProduct (direction, point - a);
-			offset = Utils.Clamp (f / len, 0, 1);
+			float f = Vector2.DotProduct(direction, point - a);
+			offset = Utils.Clamp(f / len, 0, 1);
 			Vector2 projectedPoint = a + offset * v;
 			minDistance = (projectedPoint - point).Length;
 			return true;

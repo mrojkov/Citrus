@@ -7,15 +7,15 @@ namespace Orange
 	{
 		private string oldDirectory;
 	
-		public DirectoryChanger (string directory)
+		public DirectoryChanger(string directory)
 		{
-			oldDirectory = Directory.GetCurrentDirectory ();
-			Directory.SetCurrentDirectory (directory);
+			oldDirectory = Directory.GetCurrentDirectory();
+			Directory.SetCurrentDirectory(directory);
 		}
 		
-		public void Dispose ()
+		public void Dispose()
 		{
-			Directory.SetCurrentDirectory (oldDirectory);
+			Directory.SetCurrentDirectory(oldDirectory);
 		}
 	}
 }

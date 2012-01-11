@@ -55,20 +55,20 @@ namespace Lime
 		[ProtoMember(3)]
 		public Vector2 Pivot { get; set; }
 
-		[ProtoMember (4)]
+		[ProtoMember(4)]
 		public Vector2 Scale { get; set; }
 
 		private float rotation;
-		private Vector2 direction = new Vector2 (1, 0);
+		private Vector2 direction = new Vector2(1, 0);
 
-		[ProtoMember(5), DefaultValue (0)]
+		[ProtoMember(5), DefaultValue(0)]
 		public float Rotation { 
 			get {
 				return rotation;
 			}
 			set {
 				rotation = value;
-				direction = Utils.CosSin (Utils.DegreesToRadians * value);
+				direction = Utils.CosSin(Utils.DegreesToRadians * value);
 			}
 		}
 
@@ -81,7 +81,7 @@ namespace Lime
 		[ProtoMember(8)]
 		public Blending Blending { get; set; }
 
-		[ProtoMember(9), DefaultValue (true)]
+		[ProtoMember(9), DefaultValue(true)]
 		public bool Visible { get; set; }
 
 		[ProtoMember(10)]
@@ -97,8 +97,8 @@ namespace Lime
 
 		public Matrix32 LocalMatrix {
 			get {
-				var u = new Vector2 (direction.X * Scale.X, direction.Y * Scale.X);
-				var v = new Vector2 (-direction.Y * Scale.Y, direction.X * Scale.Y);
+				var u = new Vector2(direction.X * Scale.X, direction.Y * Scale.X);
+				var v = new Vector2(-direction.Y * Scale.Y, direction.X * Scale.Y);
 				Vector2 center = Size * Pivot;
 				Matrix32 matrix;
 				matrix.U = u;
@@ -124,17 +124,17 @@ namespace Lime
 		#endregion
 		#region Methods
 
-		public Widget ()
+		public Widget()
 		{
 			Widget = this;
-			Size = new Vector2 (100, 100);
+			Size = new Vector2(100, 100);
 			Color = Color4.White;
 			Scale = Vector2.One;
 			Visible = true;
 			Blending = Blending.Default;
 		}
 
-		public void UpdateWorldProperties ()
+		public void UpdateWorldProperties()
 		{
 			if (Parent != null) {
 				var widget = Parent.Widget;
@@ -152,19 +152,19 @@ namespace Lime
 			worldBlending = Blending;
 		}
 		
-		public override void Update (int delta)
+		public override void Update(int delta)
 		{
 			UpdatedNodes++;
-			UpdateWorldProperties ();
+			UpdateWorldProperties();
 			if (worldShown) {
 				if (Playing) {
-					AdvanceAnimation (delta);
+					AdvanceAnimation(delta);
 				}
 				for (int i = 0; i < Nodes.Count; i++) {
-					Nodes [i].Update (delta);
+					Nodes[i].Update(delta);
 				}
 				if (Anchors != Anchors.None && Parent.Widget != null) {
-					ApplyAnchors ();
+					ApplyAnchors();
 				}
 				if (RootFrame.Instance.ActiveWidget == this) {
 					RootFrame.Instance.ActiveWidgetUpdated = true;
@@ -172,21 +172,21 @@ namespace Lime
 			}
 		}
 
-		public override void Render ()
+		public override void Render()
 		{
 			if (worldShown) {
 				for (int i = Nodes.Count - 1; i >= 0; i--) {
-					Nodes [i].Render ();
+					Nodes[i].Render();
 				}
 			}
 		}
 
 		Vector2? parentSize;
 
-		void ApplyAnchors ()
+		void ApplyAnchors()
 		{
 			Vector2 s = Parent.Widget.Size;
-			if (parentSize.HasValue && !parentSize.Value.Equals (s)) {
+			if (parentSize.HasValue && !parentSize.Value.Equals(s)) {
 				// Apply anchors along X axis.
 				if ((Anchors & Anchors.CenterH) != 0) {
 					X += (s.X - parentSize.Value.X) / 2;
@@ -209,11 +209,11 @@ namespace Lime
 			parentSize = s;
 		}
 
-		public virtual bool HitTest (Vector2 point)
+		public virtual bool HitTest(Vector2 point)
 		{
 			if (worldShown) {
 				if (HitTestMethod == HitTestMethod.BoundingRect) {
-					Vector2 p = worldMatrix.CalcInversed ().TransformVector (point);
+					Vector2 p = worldMatrix.CalcInversed().TransformVector(point);
 					Vector2 s = Size;
 					if (s.X < 0) {
 						p.X = -p.X;
@@ -226,7 +226,7 @@ namespace Lime
 					return p.X >= 0 && p.Y >= 0 && p.X < s.X && p.Y < s.Y;
 				} else if (HitTestMethod == HitTestMethod.Contents) {
 					foreach (Node node in Nodes) {
-						if (node.Widget != null && node.Widget.HitTest (point))
+						if (node.Widget != null && node.Widget.HitTest(point))
 							return true;
 					}
 					return false;
@@ -237,10 +237,10 @@ namespace Lime
 
 		#endregion
 		#region Utils
-		public static void Center (Widget widget)
+		public static void Center(Widget widget)
 		{
 			if (widget.Parent == null) {
-				throw new Lime.Exception ("Parent must not be null");
+				throw new Lime.Exception("Parent must not be null");
 			}
 			widget.Position = widget.Parent.Widget.Size * 0.5f;
 			widget.Pivot = Vector2.Half;

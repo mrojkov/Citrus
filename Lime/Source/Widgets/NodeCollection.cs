@@ -9,71 +9,71 @@ namespace Lime
 	[ProtoContract]
 	public sealed class NodeCollection : ICollection<Node>
 	{
-		static List<Node> emptyList = new List<Node> ();
+		static List<Node> emptyList = new List<Node>();
 		List<Node> nodes = emptyList;
 		internal Node Owner;
 		
-		public int IndexOf (Node node)
+		public int IndexOf(Node node)
 		{
 			int count = Count;
 			for (int i = 0; i < count; i++)
-				if (nodes [i] == node)
+				if (nodes[i] == node)
 					return i;
 			return -1;
 		}
 		
-		public Node this [int index] {
-			get { return nodes [index]; }
+		public Node this[int index] {
+			get { return nodes[index]; }
 		}
 
-		void ICollection<Node>.CopyTo (Node[] n, int index)
+		void ICollection<Node>.CopyTo(Node[] n, int index)
 		{
-			nodes.CopyTo (n, index);
+			nodes.CopyTo(n, index);
 		}
 
 		public int Count { get { return nodes.Count; } }
 
-		public IEnumerator<Node> GetEnumerator ()
+		public IEnumerator<Node> GetEnumerator()
 		{
-			return nodes.GetEnumerator ();
+			return nodes.GetEnumerator();
 		}
 
-		IEnumerator IEnumerable.GetEnumerator ()
+		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return nodes.GetEnumerator ();
+			return nodes.GetEnumerator();
 		}
 
 		bool ICollection<Node>.IsReadOnly {
 			get { return false; }
 		}
 
-		public bool Contains (Node node)
+		public bool Contains(Node node)
 		{
-			return nodes.Contains (node);
+			return nodes.Contains(node);
 		}
 
-		public void Add (Node node)
-		{
-			if (nodes == emptyList) {
-				nodes = new List<Node> ();
-			}
-			node.Parent = Owner;
-			nodes.Add (node);
-		}
-
-		public void Insert (int index, Node node)
+		public void Add(Node node)
 		{
 			if (nodes == emptyList) {
-				nodes = new List<Node> ();
+				nodes = new List<Node>();
 			}
 			node.Parent = Owner;
-			nodes.Insert (index, node);
+			nodes.Add(node);
 		}
 
-		public bool Remove (Node node)
+		public void Insert(int index, Node node)
+		{
+			if (nodes == emptyList) {
+				nodes = new List<Node>();
+			}
+			node.Parent = Owner;
+			nodes.Insert(index, node);
+		}
+
+		public bool Remove(Node node)
 		{
 			bool result = false;
-			if (nodes.Remove (node)) {
+			if (nodes.Remove(node)) {
 				node.Parent = null;
 				result = true;
 			}
@@ -83,12 +83,12 @@ namespace Lime
 			return result;
 		}
 
-		public void Clear ()
+		public void Clear()
 		{
 			nodes = emptyList;
 		}
 
-		public Node Get (string id)
+		public Node Get(string id)
 		{
 			foreach (Node child in this) {
 				if (child.Id == id)
@@ -97,9 +97,9 @@ namespace Lime
 			return null;
 		}
 
-		public T Get<T> (string id) where T : Node
+		public T Get<T>(string id) where T : Node
 		{
-			return Get (id) as T;
+			return Get(id) as T;
 		}
 	}
 }

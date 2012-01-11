@@ -9,7 +9,7 @@ namespace Lime
 	[ProtoContract]
 	public class TextStyle : Node
 	{
-		public static TextStyle Default = new TextStyle ();
+		public static TextStyle Default = new TextStyle();
 
 		[ProtoContract]
 		public enum ImageUsageEnum
@@ -53,14 +53,14 @@ namespace Lime
 		[ProtoMember(11)]
 		public Color4 ShadowColor { get; set; }
 
-		public TextStyle ()
+		public TextStyle()
 		{
 			Size = 15;
 			TextColor = Color4.White;
 			ShadowColor = Color4.Black;
 			ShadowOffset = Vector2.One;
-			Font = new SerializableFont ();
-			ImageTexture = new SerializableTexture ();
+			Font = new SerializableFont();
+			ImageTexture = new SerializableTexture();
 		}
 	}
 
@@ -68,13 +68,14 @@ namespace Lime
 	public class RichText : Widget
 	{
 		[ProtoMember(1)]
-		public string Content
+		public string Text
 		{
-			get { return content; }
+			get { return text; }
 			set {
-				content = value;
-				if (!parser.Parse (content)) {
-					parser.Parse ("Error: " + parser.ErrorMessage);
+				text = value;
+				parser = new TextParser(value);
+				if (parser.ErrorMessage != null) {
+					parser = new TextParser("Error: " + parser.ErrorMessage);
 				}
 			}
 		}
@@ -85,41 +86,41 @@ namespace Lime
 		[ProtoMember(3)]
 		public VAlignment VAlignment { get; set; }
 
-		TextParser parser = new TextParser ();
-		string content;
+		TextParser parser = new TextParser();
+		string text;
 
-		public override void Render ()
+		public override void Render()
 		{
 			if (worldShown) {
-				var renderer = new TextRenderer ();
-				// Setup default style (take first one from node list or TextStyle.Default).
+				var renderer = new TextRenderer();
+				// Setup default style(take first one from node list or TextStyle.Default).
 				TextStyle defaultStyle = null;
 				if (Nodes.Count > 0) {
-					defaultStyle = Nodes [0] as TextStyle;
+					defaultStyle = Nodes[0] as TextStyle;
 				}
 				if (defaultStyle != null) {
-					renderer.AddStyle (defaultStyle);
+					renderer.AddStyle(defaultStyle);
 				} else {
-					renderer.AddStyle (TextStyle.Default);
+					renderer.AddStyle(TextStyle.Default);
 				}
 				// Fill up style list.
 				foreach (var styleName in parser.Styles) {
-					var style = Nodes.Get (styleName) as TextStyle;
+					var style = Nodes.Get(styleName) as TextStyle;
 					if (style != null) {
-						renderer.AddStyle (style);
+						renderer.AddStyle(style);
 					} else {
-						renderer.AddStyle (TextStyle.Default);
+						renderer.AddStyle(TextStyle.Default);
 					}
 				}
 				// Add text fragments.
 				foreach (var frag in parser.Fragments) {
 					// Warning! Using style + 1, because -1 is a default style.
-					renderer.AddFragment (frag.Text, frag.Style + 1);
+					renderer.AddFragment(frag.Text, frag.Style + 1);
 				}
 				// Draw text.
 				Renderer.WorldMatrix = worldMatrix;
 				Renderer.Blending = worldBlending;
-				renderer.Render (worldColor, Size, HAlignment, VAlignment);
+				renderer.Render(worldColor, Size, HAlignment, VAlignment);
 			}
 		}
 	}
@@ -133,43 +134,35 @@ namespace Lime
 		}
 
 		string text;
-		int pos;
-		int currentStyle;
-		Stack<string> tagStack = new Stack<string> ();
+		int pos = 0;
+		int currentStyle = -1;
+		Stack<string> tagStack = new Stack<string>();
 		public string ErrorMessage;
-		public List<string> Styles = new List<string> ();
-		public List<Fragment> Fragments = new List<Fragment> ();
+		public List<string> Styles = new List<string>();
+		public List<Fragment> Fragments = new List<Fragment>();
 
-		public bool Parse (string text)
+		public TextParser(string text = "")
 		{
-			tagStack.Clear ();
-			Styles.Clear();
-			Fragments.Clear();
-			currentStyle = -1;
-			ErrorMessage = null;
-			pos = 0;
 			this.text = text;
 			while (pos < text.Length) {
-				if (text [pos] == '<') {
-					ParseTag ();
+				if (text[pos] == '<') {
+					ParseTag();
 				} else {
-					ParseText ();
+					ParseText();
 				}
 			}
 			if (tagStack.Count > 0) {
-				ErrorMessage = String.Format ("Unmatched tag '&lt;{0}&gt;'", tagStack.Peek ());
-				return false;
+				ErrorMessage = String.Format("Unmatched tag '&lt;{0}&gt;'", tagStack.Peek());
 			}
-			return true;
 		}
 
-		void ParseText ()
+		void ParseText()
 		{
 			int p = pos;
 			while (pos < text.Length) {
-				if (text [pos] == '<') {
+				if (text[pos] == '<') {
 					break;
-				} else if (text [pos] == '>') {
+				} else if (text[pos] == '>') {
 					ErrorMessage = "Unexpected '&gt;'";
 					pos = text.Length;
 					return;
@@ -178,22 +171,22 @@ namespace Lime
 				}
 			}
 			if (p != pos) {
-				ProcessTextBlock (text.Substring (p, pos - p));
+				ProcessTextBlock (text.Substring(p, pos - p));
 			}
 		}
 
-		void ParseTag ()
+		void ParseTag()
 		{
 			bool isOpeningTag = true;
 			bool isClosedTag = false;
 			int p = ++pos;
 			while (pos < text.Length) {
-				if (text [pos] == '/') {
+				if (text[pos] == '/') {
 					if (p == pos) {
 						isOpeningTag = false;
 						pos++;
 						p++;
-					} else if (pos + 1 < text.Length && text [pos + 1] == '>' && isOpeningTag) {
+					} else if (pos + 1 < text.Length && text[pos + 1] == '>' && isOpeningTag) {
 						pos++;
 						isClosedTag = true;
 					} else {
@@ -201,20 +194,20 @@ namespace Lime
 						pos = text.Length;
 						return;
 					}
-				} else if (text [pos] == '>') {
+				} else if (text[pos] == '>') {
 					if (isClosedTag) {
-						string tag = text.Substring (p, pos - p - 1);
-						ProcessOpeningTag (tag);
+						string tag = text.Substring(p, pos - p - 1);
+						ProcessOpeningTag(tag);
 						ProcessTextBlock ("");
-						ProcessClosingTag (tag);
+						ProcessClosingTag(tag);
 					} else if (isOpeningTag) {
-						string tag = text.Substring (p, pos - p);
-						if (!ProcessOpeningTag (tag)) {
+						string tag = text.Substring(p, pos - p);
+						if (!ProcessOpeningTag(tag)) {
 							pos = text.Length;
 							return;
 						}
 					} else {
-						string tag = text.Substring (p, pos - p);
+						string tag = text.Substring(p, pos - p);
 						if (!ProcessClosingTag(tag)) {
 							pos = text.Length;
 							return;
@@ -230,41 +223,41 @@ namespace Lime
 			pos = text.Length;
 		}
 
-		bool ProcessOpeningTag (string tag)
+		bool ProcessOpeningTag(string tag)
 		{
-			tagStack.Push (tag);
-			SetStyle (tag);
+			tagStack.Push(tag);
+			SetStyle(tag);
 			return true;
 		}
 
-		bool ProcessClosingTag (string tag)
+		bool ProcessClosingTag(string tag)
 		{
-			if (tagStack.Count == 0 || tagStack.Peek () != tag) {
-				ErrorMessage = String.Format ("Unexpected closing tag '&lt;/{0}&gt;'", tag);
+			if (tagStack.Count == 0 || tagStack.Peek() != tag) {
+				ErrorMessage = String.Format("Unexpected closing tag '&lt;/{0}&gt;'", tag);
 				return false;
 			}
-			tagStack.Pop ();
-			SetStyle (tagStack.Count == 0 ? null : tagStack.Peek());
+			tagStack.Pop();
+			SetStyle(tagStack.Count == 0 ? null : tagStack.Peek());
 			return true;
 		}
 
-		void ProcessTextBlock (string text)
+		void ProcessTextBlock(string text)
 		{
-			Fragments.Add (new Fragment { Style = currentStyle, Text = UnescapeTaggedString (text) });
+			Fragments.Add(new Fragment { Style = currentStyle, Text = UnescapeTaggedString(text) });
 		}
 
-		string UnescapeTaggedString (string text)
+		string UnescapeTaggedString(string text)
 		{
-			text = text.Replace ("&lt;", "<");
-			text = text.Replace ("&gt;", ">");
+			text = text.Replace("&lt;", "<");
+			text = text.Replace("&gt;", ">");
 			return text;
 		}
 
-		void SetStyle (string styleName)
+		void SetStyle(string styleName)
 		{
 			if (styleName != null) {
 				for (int i = 0; i < Styles.Count; i++) {
-					if (Styles [i] == styleName) {
+					if (Styles[i] == styleName) {
 						currentStyle = i;
 						return;
 					}
@@ -274,15 +267,15 @@ namespace Lime
 				return;
 			}
 			currentStyle = Styles.Count;
-			Styles.Add (styleName);
+			Styles.Add(styleName);
 		}
 	}
 
 	class TextRenderer
 	{
-		List<Fragment> fragments = new List<Fragment> ();
-		List<TextStyle> styles = new List<TextStyle> ();
-		List<SerializableFont> fonts = new List<SerializableFont> ();
+		List<Fragment> fragments = new List<Fragment>();
+		List<TextStyle> styles = new List<TextStyle>();
+		List<SerializableFont> fonts = new List<SerializableFont>();
 
 		struct Fragment
 		{
@@ -296,61 +289,61 @@ namespace Lime
 			public bool IsTagBegin;
 		};
 
-		public void AddFragment (string text, int style)
+		public void AddFragment(string text, int style)
 		{
 			Fragment p = new Fragment { Text = text, Start = 0, Length = text.Length, Style = style, 
 				IsTagBegin = false, LineBreak = false, X = 0, Width = 0 };
-			fragments.Add (p);
+			fragments.Add(p);
 		}
 
-		public void AddStyle (TextStyle style)
+		public void AddStyle(TextStyle style)
 		{
-			styles.Add (style);
-			fonts.Add (style.Font);
+			styles.Add(style);
+			fonts.Add(style.Font);
 		}
 
-		float CalcWordWidth (Fragment word)
+		float CalcWordWidth(Fragment word)
 		{
-			Font font = fonts [word.Style].Instance;
-			TextStyle style = styles [word.Style];
+			Font font = fonts[word.Style].Instance;
+			TextStyle style = styles[word.Style];
 			float bullet = 0;
 			if (word.IsTagBegin && style.ImageUsage == TextStyle.ImageUsageEnum.Bullet)
 				bullet = style.ImageSize.X;
 			if (word.Length == 1) {
 				float fontScale = style.Size / font.CharHeight;
-				var c = font.Chars [word.Text [word.Start]];
+				var c = font.Chars[word.Text[word.Start]];
 				float width = bullet + c.Width * fontScale;
 				return width;
 			} else {
-				Vector2 size = Renderer.MeasureTextLine (font, word.Text, style.Size, word.Start, word.Length);
+				Vector2 size = Renderer.MeasureTextLine(font, word.Text, style.Size, word.Start, word.Length);
 				size.X += bullet;
 				return size.X;
 			}
 		}
 
-		public void Render (Color4 color, Vector2 area, HAlignment hAlign, VAlignment vAlign)
+		public void Render(Color4 color, Vector2 area, HAlignment hAlign, VAlignment vAlign)
 		{
-			var words = new List<Fragment> ();
+			var words = new List<Fragment>();
 			// Split whole text into words. Every whitespace, linebreak, etc. consider to be separate word.
 			for (int i = 0; i < fragments.Count; i++) {
-				var word = fragments [i];
+				var word = fragments[i];
 				int curr = word.Start;
 				int start = word.Start;
 				int length = word.Length;
 				if (length == 0) {
 					word.IsTagBegin = true;
-					words.Add (word);
+					words.Add(word);
 				} else {
 					bool isTagBegin = true;
 					while (curr < length) {
 						bool lineBreak = false;
-						if (word.Text [curr] <= ' ') {
-							if (word.Text [curr] == '\n') {
+						if (word.Text[curr] <= ' ') {
+							if (word.Text[curr] == '\n') {
 								lineBreak = true;
 							}
 							curr++;
 						} else {
-							while (curr < length && word.Text [curr] > ' ') {
+							while (curr < length && word.Text[curr] > ' ') {
 								curr++;
 							}
 						}
@@ -358,7 +351,7 @@ namespace Lime
 						word.Length = curr - start;
 						word.LineBreak = lineBreak;
 						word.IsTagBegin = isTagBegin;
-						words.Add (word);
+						words.Add(word);
 						start = curr;
 						isTagBegin = false;
 					}
@@ -368,8 +361,8 @@ namespace Lime
 			float x = 0;
 			float maxWidth = area.X;
 			for (int i = 0; i < words.Count; i++) {
-				Fragment word = words [i];
-				word.Width = CalcWordWidth (word);
+				Fragment word = words[i];
+				word.Width = CalcWordWidth(word);
 				if (word.LineBreak) {
 					x = 0;
 				}
@@ -381,29 +374,29 @@ namespace Lime
 					word.X = x;
 					x += word.Width;
 				}
-				words [i] = word;
+				words[i] = word;
 			}
 			// Calculate word count for every string.
-			var lines = new List<int> ();
+			var lines = new List<int>();
 			float totalHeight = 0;
 			float lineHeight = 0;
 			int c = 0;
 			foreach (Fragment word in words) {
-				TextStyle style = styles [word.Style];
+				TextStyle style = styles[word.Style];
 				if (word.LineBreak && c > 0) {
 					totalHeight += lineHeight;
 					lineHeight = 0;
-					lines.Add (c);
+					lines.Add(c);
 					c = 0;
 				}
-				lineHeight = Math.Max (lineHeight, style.Size + style.SpaceAfter);
+				lineHeight = Math.Max(lineHeight, style.Size + style.SpaceAfter);
 				if (word.IsTagBegin) {
-					lineHeight = Math.Max (lineHeight, style.ImageSize.Y + style.SpaceAfter);
+					lineHeight = Math.Max(lineHeight, style.ImageSize.Y + style.SpaceAfter);
 				}
 				c++;
 			}
 			if (c > 0) {
-				lines.Add (c);
+				lines.Add(c);
 				totalHeight += lineHeight;
 			}
 			// Draw all lines.
@@ -414,16 +407,16 @@ namespace Lime
 				float maxHeight = 0;
 				float totalWidth = 0;
 				for (int j = 0; j < count; j++) {
-					Fragment word = words [b + j];
-					TextStyle style = styles [word.Style];
-					maxHeight = Math.Max (maxHeight, style.Size + style.SpaceAfter);
+					Fragment word = words[b + j];
+					TextStyle style = styles[word.Style];
+					maxHeight = Math.Max(maxHeight, style.Size + style.SpaceAfter);
 					if (word.IsTagBegin) {
-						maxHeight = Math.Max (maxHeight, style.ImageSize.Y + style.SpaceAfter);
+						maxHeight = Math.Max(maxHeight, style.ImageSize.Y + style.SpaceAfter);
 					}
 					totalWidth += word.Width;
 				}
 				// Calculate offset for horizontal alignment.
-				var offset = new Vector2 ();
+				var offset = new Vector2();
 				if (hAlign == HAlignment.Right)
 					offset.X = area.X - totalWidth;
 				else if (hAlign == HAlignment.Center)
@@ -431,49 +424,49 @@ namespace Lime
 				// Calculate offset for vertical alignment.
 				if (vAlign == VAlignment.Bottom)
 					offset.Y = area.Y - totalHeight;
-				else if( vAlign == VAlignment.Center)
+				else if (vAlign == VAlignment.Center)
 					offset.Y = (area.Y - totalHeight) * 0.5f;
 				// Draw string.
 				for (int j = 0; j < count; j++) {
-					Fragment word = words [b + j];
-					TextStyle style = styles [word.Style];
+					Fragment word = words[b + j];
+					TextStyle style = styles[word.Style];
 					Vector2 yOffset;
-					Vector2 position = new Vector2 (word.X, y) + offset;
-					Font font = fonts [word.Style].Instance;
+					Vector2 position = new Vector2(word.X, y) + offset;
+					Font font = fonts[word.Style].Instance;
 					if (word.IsTagBegin && style.ImageUsage == TextStyle.ImageUsageEnum.Bullet) {
-						yOffset = new Vector2 (0, (maxHeight - style.ImageSize.Y) * 0.5f);
+						yOffset = new Vector2(0, (maxHeight - style.ImageSize.Y) * 0.5f);
 						if (style.ImageTexture.Path != null) {
-							Renderer.DrawSprite (style.ImageTexture, color, position + yOffset, style.ImageSize, Vector2.Zero, Vector2.One);
+							Renderer.DrawSprite(style.ImageTexture, color, position + yOffset, style.ImageSize, Vector2.Zero, Vector2.One);
 						}
 						position.X += style.ImageSize.X;
 					}
-					yOffset = new Vector2 (0, (maxHeight - style.Size) * 0.5f);
+					yOffset = new Vector2(0, (maxHeight - style.Size) * 0.5f);
 					if (style.CastShadow) {
-						for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
-							Renderer.DrawTextLine (font, position + style.ShadowOffset + yOffset, word.Text, style.ShadowColor * color, style.Size, word.Start, word.Length);
+						for (int k = 0; k <(style.Bold ? 2 : 1); k++) {
+							Renderer.DrawTextLine(font, position + style.ShadowOffset + yOffset, word.Text, style.ShadowColor * color, style.Size, word.Start, word.Length);
 						}
 					}
-					for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
-						Renderer.DrawTextLine (font, position + yOffset, word.Text, style.TextColor * color, style.Size, word.Start, word.Length);
+					for (int k = 0; k <(style.Bold ? 2 : 1); k++) {
+						Renderer.DrawTextLine(font, position + yOffset, word.Text, style.TextColor * color, style.Size, word.Start, word.Length);
 					}
 				}
 				// Draw overlays
 				for (int j = 0; j < count; j++) {
-					var word = words [b + j];
-					TextStyle style = styles [word.Style];
+					var word = words[b + j];
+					TextStyle style = styles[word.Style];
 					if (style.ImageUsage == TextStyle.ImageUsageEnum.Overlay) {
 						int k = j + 1;
 						for (; k < count; k++) {
-							if (words [b + k].IsTagBegin)
+							if (words[b + k].IsTagBegin)
 								break;
 						}
 						k -= 1;
-						Vector2 lt = new Vector2 (words [b + j].X, y) + offset;
-						Vector2 rb = new Vector2 (words [b + k].X + words [b + k].Width, y) + offset;
+						Vector2 lt = new Vector2(words[b + j].X, y) + offset;
+						Vector2 rb = new Vector2(words[b + k].X + words[b + k].Width, y) + offset;
 						float yOffset = (maxHeight - style.ImageSize.Y) * 0.5f;
-						Renderer.DrawSprite (style.ImageTexture, color,
-							lt + new Vector2 (0, yOffset), 
-							rb - lt + new Vector2 (0, style.ImageSize.Y),
+						Renderer.DrawSprite(style.ImageTexture, color,
+							lt + new Vector2(0, yOffset), 
+							rb - lt + new Vector2(0, style.ImageSize.Y),
 							Vector2.Zero, Vector2.One);
 						j = k;
 					}

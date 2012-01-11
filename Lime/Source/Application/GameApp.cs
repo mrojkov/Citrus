@@ -17,17 +17,17 @@ namespace Lime
 		bool FullScreen { get; set; }
 		float FrameRate { get; }
 		DeviceOrientation CurrentDeviceOrientation { get; }
-		void Exit ();
+		void Exit();
 	}
 
 	public class GameApp
 	{
-		public virtual void OnCreate (IGameWindow gameWindow) {}
-		public virtual void OnGLCreate () {}
-		public virtual void OnGLDestroy () {}
-		public virtual void OnUpdateFrame (double delta) {}
-		public virtual void OnRenderFrame () {}
-		public virtual void OnDeviceRotated (DeviceOrientation deviceOrientation) {}
-		public virtual DeviceOrientation GetSupportedDeviceOrientations () { return DeviceOrientation.LandscapeLeft; }
+		public virtual void OnCreate(IGameWindow gameWindow) {}
+		public virtual void OnGLCreate() {}
+		public virtual void OnGLDestroy() {}
+		public virtual void OnUpdateFrame(double delta) {}
+		public virtual void OnRenderFrame() {}
+		public virtual void OnDeviceRotated(DeviceOrientation deviceOrientation) {}
+		public virtual DeviceOrientation GetSupportedDeviceOrientations() { return DeviceOrientation.LandscapeLeft; }
 	}
 }

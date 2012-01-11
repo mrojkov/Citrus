@@ -8,725 +8,725 @@ namespace Orange
 		HotLexer lexer;
 		KnownActorType[] knownActorTypes;
 		
-		public HotSceneImporter (string path)
+		public HotSceneImporter(string path)
 		{
-			RegisterKnownActorTypes ();
-			using (Stream stream = new FileStream (path, FileMode.Open)) {
-				using (TextReader reader = new StreamReader (stream)) {
-					string text = reader.ReadToEnd ();
-					lexer = new HotLexer (path, text);
+			RegisterKnownActorTypes();
+			using(Stream stream = new FileStream(path, FileMode.Open)) {
+				using(TextReader reader = new StreamReader(stream)) {
+					string text = reader.ReadToEnd();
+					lexer = new HotLexer(path, text);
 				}
 			}
 		}
 
-		void ParseActorProperty (Node node, string name)
+		void ParseActorProperty(Node node, string name)
 		{
-			switch (name) {
+			switch(name) {
 			case "Name":
-				node.Id = lexer.ParseQuotedString ();
+				node.Id = lexer.ParseQuotedString();
 				break;
 			case "RuntimeClass":
-				lexer.ParseQuotedString ();
+				lexer.ParseQuotedString();
 				break;
 			case "Source":
-				var s = lexer.ParsePath ();
+				var s = lexer.ParsePath();
 				node.ContentsPath = s;
 				break;
 			case "Attributes":
-				lexer.ParseInt ();
+				lexer.ParseInt();
 				break;
 			case "Trigger":
-				lexer.ParseQuotedString ();
+				lexer.ParseQuotedString();
 				break;
 			case "Tag":
-				node.Tag = lexer.ParseQuotedString ();
+				node.Tag = lexer.ParseQuotedString();
 				break;
 			case "Actors":
-				lexer.ParseToken ('[');
+				lexer.ParseToken('[');
 				while (lexer.PeekChar() != ']') {
-					var child = ParseNode ();
+					var child = ParseNode();
 					if (child != null)
-						node.Nodes.Add (child);
+						node.Nodes.Add(child);
 				}
-				lexer.ParseToken (']');
+				lexer.ParseToken(']');
 				break;
 			case "Animators":
-				lexer.ParseToken ('[');
+				lexer.ParseToken('[');
 				while (lexer.PeekChar() != ']') {
-					ParseAnimator (node);
+					ParseAnimator(node);
 				}
-				lexer.ParseToken (']');
+				lexer.ParseToken(']');
 				break;
 			case "Markers":
-				lexer.ParseToken ('[');
+				lexer.ParseToken('[');
 				while (lexer.PeekChar() != ']')
-					node.Markers.Add (ParseMarker ());
-				lexer.ParseToken (']');
+					node.Markers.Add(ParseMarker());
+				lexer.ParseToken(']');
 				break;
 			default:
-				throw new Exception ("Unknown property '{0}'. Parsing: {1}", name, node.GetType ());
+				throw new Exception("Unknown property '{0}'. Parsing: {1}", name, node.GetType());
 			}
 		}
 
-		void ParseGraphicProperty (Node node, string name)
+		void ParseGraphicProperty(Node node, string name)
 		{
 			Widget widget = (Widget)node;
-			switch (name) {
+			switch(name) {
 			case "Anchors":
-				widget.Anchors = (Anchors)lexer.ParseInt ();
+				widget.Anchors = (Anchors)lexer.ParseInt();
 				break;
 			case "HitTestMethod":
-				widget.HitTestMethod = (HitTestMethod)lexer.ParseInt ();
+				widget.HitTestMethod = (HitTestMethod)lexer.ParseInt();
 				break;
 			case "SkinningWeights":
-				widget.SkinningWeights = lexer.ParseSkinningWeights ();
+				widget.SkinningWeights = lexer.ParseSkinningWeights();
 				break;
 			case "Visible":
-				widget.Visible = lexer.ParseBool ();
+				widget.Visible = lexer.ParseBool();
 				break;
 			case "Position":
-				widget.Position = lexer.ParseVector2 ();
+				widget.Position = lexer.ParseVector2();
 				break;
 			case "Pivot":
-				widget.Pivot = lexer.ParseVector2 ();
+				widget.Pivot = lexer.ParseVector2();
 				break;
 			case "Size":
-				widget.Size = lexer.ParseVector2 ();
+				widget.Size = lexer.ParseVector2();
 				break;
 			case "Scale":
-				widget.Scale = lexer.ParseVector2 ();
+				widget.Scale = lexer.ParseVector2();
 				break;
 			case "Color":
-				widget.Color = lexer.ParseColor4 ();
+				widget.Color = lexer.ParseColor4();
 				break;
 			case "Rotation":
-				widget.Rotation = lexer.ParseFloat ();
+				widget.Rotation = lexer.ParseFloat();
 				break;
 			case "BlendMode":
-				widget.Blending = lexer.ParseBlendMode ();
+				widget.Blending = lexer.ParseBlendMode();
 				break;
 			default:
-				ParseActorProperty (node, name);
+				ParseActorProperty(node, name);
 				break;
 			}
 		}
 
-		void ParseImageProperty (Node node, string name)
+		void ParseImageProperty(Node node, string name)
 		{
 			Image img = (Image)node;
-			switch (name) {
+			switch(name) {
 			case "TexturePath":
-				img.Texture = new SerializableTexture (lexer.ParsePath ());
+				img.Texture = new SerializableTexture(lexer.ParsePath());
 				break;
 			case "TexCoordForMins":
-				img.UV0 = lexer.ParseVector2 ();
+				img.UV0 = lexer.ParseVector2();
 				break;
 			case "TexCoordForMaxs":
-				img.UV1 = lexer.ParseVector2 ();
+				img.UV1 = lexer.ParseVector2();
 				break;
 			default:
-				ParseGraphicProperty (node, name);
+				ParseGraphicProperty(node, name);
 				break;
 			}
 		}
 
-		void ParseTextProperty (Node node, string name)
+		void ParseTextProperty(Node node, string name)
 		{
 			SimpleText text = (SimpleText)node;
-			switch (name) {
+			switch(name) {
 			case "FontName":
-				text.Font = new SerializableFont (lexer.ParseQuotedString ());
+				text.Font = new SerializableFont(lexer.ParseQuotedString());
 				break;
 			case "Text":
-				text.Text = lexer.ParseQuotedString ();
+				text.Text = lexer.ParseQuotedString();
 				break;
 			case "LineIndent":
-				text.Spacing = lexer.ParseFloat ();
+				text.Spacing = lexer.ParseFloat();
 				break;
 			case "FontSize":
-				text.FontHeight = lexer.ParseFloat ();
+				text.FontHeight = lexer.ParseFloat();
 				break;
 			case "TextColor":
-				text.Color = text.Color * lexer.ParseColor4 ();
+				text.Color = text.Color * lexer.ParseColor4();
 				break;
 			case "ShadowColor":
-				lexer.ParseColor4 ();
+				lexer.ParseColor4();
 				break;
 			case "HAlign":
-				text.HAlignment = (HAlignment)lexer.ParseInt ();
+				text.HAlignment = (HAlignment)lexer.ParseInt();
 				break;
 			case "VAlign":
-				text.VAlignment = (VAlignment)lexer.ParseInt ();
+				text.VAlignment = (VAlignment)lexer.ParseInt();
 				break;
 			default:
-				ParseGraphicProperty (node, name);
+				ParseGraphicProperty(node, name);
 				break;
 			}
 		}
 
-		void ParseParticleTemplateProperty (Node node, string name)
+		void ParseParticleTemplateProperty(Node node, string name)
 		{
 			ParticleModifier pm = (ParticleModifier)node;
-			switch (name) {
+			switch(name) {
 			case "TexturePath":
-				pm.Texture = new SerializableTexture (lexer.ParsePath ());
+				pm.Texture = new SerializableTexture(lexer.ParsePath());
 				break;
 			case "FirstFrame":
-				pm.FirstFrame = lexer.ParseInt ();
+				pm.FirstFrame = lexer.ParseInt();
 				break;
 			case "LastFrame":
-				pm.LastFrame = lexer.ParseInt ();
+				pm.LastFrame = lexer.ParseInt();
 				break;
 			case "LoopedAnimation":
-				pm.LoopedAnimation = lexer.ParseBool ();
+				pm.LoopedAnimation = lexer.ParseBool();
 				break;
 			case "AnimationFPS":
-				pm.AnimationFps = lexer.ParseFloat ();
+				pm.AnimationFps = lexer.ParseFloat();
 				break;
 			case "Scale":
-				pm.Scale = lexer.ParseFloat ();
+				pm.Scale = lexer.ParseFloat();
 				break;
 			case "AspectRatio":
-				pm.AspectRatio = lexer.ParseFloat ();
+				pm.AspectRatio = lexer.ParseFloat();
 				break;
 			case "Velocity":
-				pm.Velocity = lexer.ParseFloat ();
+				pm.Velocity = lexer.ParseFloat();
 				break;
 			case "WindAmount":
-				pm.WindAmount = lexer.ParseFloat ();
+				pm.WindAmount = lexer.ParseFloat();
 				break;
 			case "GravityAmount":
-				pm.GravityAmount = lexer.ParseFloat ();
+				pm.GravityAmount = lexer.ParseFloat();
 				break;
 			case "MagnetAmount":
-				pm.MagnetAmount = lexer.ParseFloat ();
+				pm.MagnetAmount = lexer.ParseFloat();
 				break;
 			case "Spin":
-				pm.Spin = lexer.ParseFloat ();
+				pm.Spin = lexer.ParseFloat();
 				break;
 			case "AngularVelocity":
-				pm.AngularVelocity = lexer.ParseFloat ();
+				pm.AngularVelocity = lexer.ParseFloat();
 				break;
 			case "Color":
-				pm.Color = lexer.ParseColor4 ();
+				pm.Color = lexer.ParseColor4();
 				break;
 			default:
-				ParseActorProperty (node, name);
+				ParseActorProperty(node, name);
 				break;
 			}
 		}
 
-		void ParseParticlesMagnetProperty (Node node, string name)
+		void ParseParticlesMagnetProperty(Node node, string name)
 		{
 			ParticlesMagnet magnet = (ParticlesMagnet)node;
-			switch (name) {
+			switch(name) {
 			case "Shape":
-				magnet.Shape = (EmitterShape)lexer.ParseInt ();
+				magnet.Shape = (EmitterShape)lexer.ParseInt();
 				break;
 			case "Attenuation":
-				magnet.Attenuation = lexer.ParseFloat ();
+				magnet.Attenuation = lexer.ParseFloat();
 				break;
 			case "Strength":
-				magnet.Strength = lexer.ParseFloat ();
+				magnet.Strength = lexer.ParseFloat();
 				break;
 			default:
-				ParseGraphicProperty (magnet, name);
+				ParseGraphicProperty(magnet, name);
 				break;
 			}
 		}
 
-		void ParseParticleEmitter2Property (Node node, string name)
+		void ParseParticleEmitter2Property(Node node, string name)
 		{
 			ParticleEmitter emitter = (ParticleEmitter)node;
-			switch (name) {
+			switch(name) {
 			case "Shape":
-				emitter.Shape = (EmitterShape)lexer.ParseInt ();
+				emitter.Shape = (EmitterShape)lexer.ParseInt();
 				break;
 			case "EmissionType":
-				emitter.EmissionType = (EmissionType)lexer.ParseInt ();
+				emitter.EmissionType = (EmissionType)lexer.ParseInt();
 				break;
 			case "ParticlesLinkage":
-				emitter.ParticlesLinkage = (ParticlesLinkage)lexer.ParseInt ();
+				emitter.ParticlesLinkage = (ParticlesLinkage)lexer.ParseInt();
 				break;
 			case "LinkageActorName":
-				emitter.LinkageWidgetName = lexer.ParseQuotedString ();
+				emitter.LinkageWidgetName = lexer.ParseQuotedString();
 				break;
 			case "Number":
-				emitter.Number = lexer.ParseFloat ();
+				emitter.Number = lexer.ParseFloat();
 				break;
 			case "TimeShift":
-				emitter.TimeShift = lexer.ParseFloat ();
+				emitter.TimeShift = lexer.ParseFloat();
 				break;
 			case "ImmortalParticles":
-				emitter.ImmortalParticles = lexer.ParseBool ();
+				emitter.ImmortalParticles = lexer.ParseBool();
 				break;
 			case "Speed":
-				emitter.Speed = lexer.ParseFloat ();
+				emitter.Speed = lexer.ParseFloat();
 				break;
 			case "Life":
-				emitter.Lifetime = lexer.ParseNumericRange ();
+				emitter.Lifetime = lexer.ParseNumericRange();
 				break;
 			case "Velocity":
-				emitter.Velocity = lexer.ParseNumericRange ();
+				emitter.Velocity = lexer.ParseNumericRange();
 				break;
 			case "Zoom":
-				emitter.Zoom = lexer.ParseNumericRange ();
+				emitter.Zoom = lexer.ParseNumericRange();
 				break;
 			case "AspectRatio":
-				emitter.AspectRatio = lexer.ParseNumericRange ();
+				emitter.AspectRatio = lexer.ParseNumericRange();
 				break;
 			case "Spin":
-				emitter.Spin = lexer.ParseNumericRange ();
+				emitter.Spin = lexer.ParseNumericRange();
 				break;
 			case "AngularVelocity":
-				emitter.AngularVelocity = lexer.ParseNumericRange ();
+				emitter.AngularVelocity = lexer.ParseNumericRange();
 				break;
 			case "Orientation":
-				emitter.Orientation = lexer.ParseNumericRange ();
+				emitter.Orientation = lexer.ParseNumericRange();
 				break;
 			case "AlongTrackOrientation":
-				emitter.AlongPathOrientation = lexer.ParseBool ();
+				emitter.AlongPathOrientation = lexer.ParseBool();
 				break;
 			case "Direction":
-				emitter.Direction = lexer.ParseNumericRange ();
+				emitter.Direction = lexer.ParseNumericRange();
 				break;
 			case "WindDirection":
-				emitter.WindDirection = lexer.ParseNumericRange ();
+				emitter.WindDirection = lexer.ParseNumericRange();
 				break;
 			case "WindAmount":
-				emitter.WindAmount = lexer.ParseNumericRange ();
+				emitter.WindAmount = lexer.ParseNumericRange();
 				break;
 			case "GravityDirection":
-				emitter.GravityDirection = lexer.ParseNumericRange ();
+				emitter.GravityDirection = lexer.ParseNumericRange();
 				break;
 			case "GravityAmount":
-				emitter.GravityAmount = lexer.ParseNumericRange ();
+				emitter.GravityAmount = lexer.ParseNumericRange();
 				break;
 			case "MagnetAmount":
-				emitter.MagnetAmount = lexer.ParseNumericRange ();
+				emitter.MagnetAmount = lexer.ParseNumericRange();
 				break;
 			case "RandMotionRadius":
-				emitter.RandomMotionRadius = lexer.ParseNumericRange ();
+				emitter.RandomMotionRadius = lexer.ParseNumericRange();
 				break;
 			case "RandMotionRotation":
-				emitter.RandomMotionRotation = lexer.ParseNumericRange ();
+				emitter.RandomMotionRotation = lexer.ParseNumericRange();
 				break;
 			case "RandMotionSpeed":
-				emitter.RandomMotionSpeed = lexer.ParseNumericRange ();
+				emitter.RandomMotionSpeed = lexer.ParseNumericRange();
 				break;
 			case "RandMotionAspectRatio":
-				emitter.RandomMotionAspectRatio = lexer.ParseFloat ();
+				emitter.RandomMotionAspectRatio = lexer.ParseFloat();
 				break;
 			default:
-				ParseGraphicProperty (emitter, name);
+				ParseGraphicProperty(emitter, name);
 				break;
 			}
 		}
 
-		void ParseSceneProperty (Node node, string name)
+		void ParseSceneProperty(Node node, string name)
 		{
 			Frame frame = (Frame)node;
-			switch (name) {
+			switch(name) {
 			case "Enabled":
-				lexer.ParseBool ();
+				lexer.ParseBool();
 				break;
 			case "DefaultFocus":
-				lexer.ParseBool ();
+				lexer.ParseBool();
 				break;
 			case "Modal":
-				lexer.ParseBool ();
+				lexer.ParseBool();
 				break;
 			case "ControlClass":
-				lexer.ParseQuotedString ();
+				lexer.ParseQuotedString();
 				break;
 			case "RenderTarget":
-				frame.RenderTarget = (RenderTarget)lexer.ParseInt ();
+				frame.RenderTarget = (RenderTarget)lexer.ParseInt();
 				break;
 			case "Transparent":
-				lexer.ParseBool ();
+				lexer.ParseBool();
 				break;
 			default:
-				ParseGraphicProperty (node, name);
+				ParseGraphicProperty(node, name);
 				break;
 			}
 		}
 		
-		void ParseMaskedEffectProperty (Node node, string name)
+		void ParseMaskedEffectProperty(Node node, string name)
 		{
 			ImageCombiner combiner = (ImageCombiner)node;
-			switch (name) {
+			switch(name) {
 			case "Enabled":
-				combiner.Enabled = lexer.ParseBool ();
+				combiner.Enabled = lexer.ParseBool();
 				break;
 			case "BlendMode":
-				lexer.ParseInt ();
+				lexer.ParseInt();
 				break;
 			default:
-				ParseActorProperty (combiner, name);
+				ParseActorProperty(combiner, name);
 				break;
 			}
 		}
 
-		void ParseDistortionMeshProperty (Node node, string name)
+		void ParseDistortionMeshProperty(Node node, string name)
 		{
 			DistortionMesh mesh = (DistortionMesh)node;
-			switch (name) {
+			switch(name) {
 			case "NumRows":
-				mesh.NumRows = lexer.ParseInt ();
+				mesh.NumRows = lexer.ParseInt();
 				break;
 			case "NumCols":
-				mesh.NumCols = lexer.ParseInt ();
+				mesh.NumCols = lexer.ParseInt();
 				break;
 			case "TexturePath":
-				mesh.Texture = new SerializableTexture (lexer.ParsePath ());
+				mesh.Texture = new SerializableTexture(lexer.ParsePath());
 				break;
 			default:
-				ParseGraphicProperty (mesh, name);
+				ParseGraphicProperty(mesh, name);
 				break;
 			}
 		}
 
-		void ParseMeshPointProperty (Node node, string name)
+		void ParseMeshPointProperty(Node node, string name)
 		{
 			DistortionMeshPoint point = (DistortionMeshPoint)node;
-			switch (name) {
+			switch(name) {
 			case "Position":
-				lexer.ParseVector2 ();
+				lexer.ParseVector2();
 				break;
 			case "Anchor":
-				point.Position = lexer.ParseVector2 ();
+				point.Position = lexer.ParseVector2();
 				break;
 			case "UV":
-				point.UV = lexer.ParseVector2 ();
+				point.UV = lexer.ParseVector2();
 				break;
 			case "Color":
-				point.Color = lexer.ParseColor4 ();
+				point.Color = lexer.ParseColor4();
 				break;
 			case "SkinningWeights":
-				point.SkinningWeights = lexer.ParseSkinningWeights ();
+				point.SkinningWeights = lexer.ParseSkinningWeights();
 				break;
 			default:
-				ParseActorProperty (point, name);
+				ParseActorProperty(point, name);
 				break;
 			}
 		}
 
-		void ParseBoneProperty (Node node, string name)
+		void ParseBoneProperty(Node node, string name)
 		{
 			Bone bone = (Bone)node;
-			switch (name) {
+			switch(name) {
 			case "Position":
-				bone.Position = lexer.ParseVector2 ();
+				bone.Position = lexer.ParseVector2();
 				break;
 			case "Rotation":
-				bone.Rotation = lexer.ParseFloat ();
+				bone.Rotation = lexer.ParseFloat();
 				break;
 			case "Length":
-				bone.Length = lexer.ParseFloat ();
+				bone.Length = lexer.ParseFloat();
 				break;
 			case "IKStopper":
-				bone.IKStopper = lexer.ParseBool ();
+				bone.IKStopper = lexer.ParseBool();
 				break;
 			case "Index":
-				bone.Index = lexer.ParseInt ();
+				bone.Index = lexer.ParseInt();
 				break;
 			case "BaseIndex":
-				bone.BaseIndex = lexer.ParseInt ();
+				bone.BaseIndex = lexer.ParseInt();
 				break;
 			case "EffectiveRadius":
-				bone.EffectiveRadius = lexer.ParseFloat ();
+				bone.EffectiveRadius = lexer.ParseFloat();
 				break;
 			case "FadeoutZone":
-				bone.FadeoutZone = lexer.ParseFloat ();
+				bone.FadeoutZone = lexer.ParseFloat();
 				break;
 			case "RefPosition":
-				bone.RefPosition = lexer.ParseVector2 ();
+				bone.RefPosition = lexer.ParseVector2();
 				break;
 			case "RefRotation":
-				bone.RefRotation = lexer.ParseFloat ();
+				bone.RefRotation = lexer.ParseFloat();
 				break;
 			case "RefLength":
-				bone.RefLength = lexer.ParseFloat ();
+				bone.RefLength = lexer.ParseFloat();
 				break;
 			default:
-				ParseActorProperty (bone, name);
+				ParseActorProperty(bone, name);
 				break;
 			}
 		}
 
-		void ParseAudioProperty (Node node, string name)
+		void ParseAudioProperty(Node node, string name)
 		{
 			Audio audio = (Audio)node;
-			switch (name) {
+			switch(name) {
 			case "File":
-				audio.Sample = new SerializableSample (lexer.ParsePath ());
+				audio.Sample = new SerializableSample(lexer.ParsePath());
 				break;
 			case "Flags":
-				audio.Looping = (lexer.ParseInt () & 4) != 0;
+				audio.Looping = (lexer.ParseInt() & 4) != 0;
 				break;
 			case "Action":
-				lexer.ParseInt ();
+				lexer.ParseInt();
 				break;
 			case "Group":
-				lexer.ParseInt ();
+				lexer.ParseInt();
 				break;
 			case "Priority":
-				audio.Priority = (int)lexer.ParseFloat ();
+				audio.Priority = (int)lexer.ParseFloat();
 				break;
 			case "FadeTime":
-				audio.FadeTime = lexer.ParseFloat ();
+				audio.FadeTime = lexer.ParseFloat();
 				break;
 			case "Volume":
-				audio.Volume = lexer.ParseFloat ();
+				audio.Volume = lexer.ParseFloat();
 				break;
 			case "Pan":
-				audio.Pan = lexer.ParseFloat ();
+				audio.Pan = lexer.ParseFloat();
 				break;
 			default:
-				ParseActorProperty (audio, name);
+				ParseActorProperty(audio, name);
 				break;
 			}
 		}
 
-		void ParseMarkerProperty (Marker marker, string name)
+		void ParseMarkerProperty(Marker marker, string name)
 		{
-			switch (name) {
+			switch(name) {
 			case "Name":
-				marker.Id = lexer.ParseQuotedString ();
+				marker.Id = lexer.ParseQuotedString();
 				break;
 			case "Frame":
-				marker.Frame = lexer.ParseInt ();
+				marker.Frame = lexer.ParseInt();
 				break;
 			case "EaseInterpolation":
-				lexer.ParseBool ();
+				lexer.ParseBool();
 				break;
 			case "Command":
-				marker.Action = (MarkerAction)lexer.ParseInt ();
+				marker.Action = (MarkerAction)lexer.ParseInt();
 				break;
 			case "OtherMarkerName":
-				marker.JumpTo = lexer.ParseQuotedString ();
+				marker.JumpTo = lexer.ParseQuotedString();
 				break;
 			case "EaseParameters":
-				lexer.ParseToken ('[');
-				lexer.ParseFloat ();
-				lexer.ParseFloat ();
-				lexer.ParseFloat ();
-				lexer.ParseToken (']');
+				lexer.ParseToken('[');
+				lexer.ParseFloat();
+				lexer.ParseFloat();
+				lexer.ParseFloat();
+				lexer.ParseToken(']');
 				break;
 			default:
-				throw new Exception ("Unknown property '{0}'. Parsing: {1}", name, marker.GetType ());
+				throw new Exception("Unknown property '{0}'. Parsing: {1}", name, marker.GetType());
 			}
 		}
 
-		Marker ParseMarker ()
+		Marker ParseMarker()
 		{
-			string type = lexer.ParseQuotedString ();
+			string type = lexer.ParseQuotedString();
 			if (type != "Hot::Marker")
-				throw new Exception ("Invalid marker type '{0}'", type);
-			var marker = new Marker ();
-			lexer.ParseToken ('{');
+				throw new Exception("Invalid marker type '{0}'", type);
+			var marker = new Marker();
+			lexer.ParseToken('{');
 			while (lexer.PeekChar() != '}')
-				ParseMarkerProperty (marker, lexer.ParseWord ());
-			lexer.ParseToken ('}');
+				ParseMarkerProperty(marker, lexer.ParseWord());
+			lexer.ParseToken('}');
 			return marker;
 		}
 
-		void ParseButtonProperty (Node node, string name)
+		void ParseButtonProperty(Node node, string name)
 		{
 			Button button = (Button)node;
-			switch (name) {
+			switch(name) {
 			case "Text":
-				button.Caption = lexer.ParseQuotedString ();
+				button.Caption = lexer.ParseQuotedString();
 				break;
 			default:
-				ParseGraphicProperty (button, name);
+				ParseGraphicProperty(button, name);
 				break;
 			}
 		}
 
-		void ParseNineGridProperty (Node node, string name)
+		void ParseNineGridProperty(Node node, string name)
 		{
 			NineGrid grid = (NineGrid)node;
-			switch (name) {
+			switch(name) {
 			case "TexturePath":
-				grid.Texture = new SerializableTexture (lexer.ParsePath ());
+				grid.Texture = new SerializableTexture(lexer.ParsePath());
 				break;
 			case "LeftOffset":
-				grid.LeftOffset = lexer.ParseFloat ();
+				grid.LeftOffset = lexer.ParseFloat();
 				break;
 			case "TopOffset":
-				grid.TopOffset = lexer.ParseFloat ();
+				grid.TopOffset = lexer.ParseFloat();
 				break;
 			case "RightOffset":
-				grid.RightOffset = lexer.ParseFloat ();
+				grid.RightOffset = lexer.ParseFloat();
 				break;
 			case "BottomOffset":
-				grid.BottomOffset = lexer.ParseFloat ();
+				grid.BottomOffset = lexer.ParseFloat();
 				break;
 			default:
-				ParseGraphicProperty (grid, name);
+				ParseGraphicProperty(grid, name);
 				break;
 			}
 		}
 
-		void ParseSplinePointProperty (Node node, string name)
+		void ParseSplinePointProperty(Node node, string name)
 		{
 			SplinePoint point = (SplinePoint)node;
-			switch (name) {
+			switch(name) {
 			case "Position":
-				lexer.ParseVector2 ();
+				lexer.ParseVector2();
 				break;
 			case "Anchor":
-				point.Position = lexer.ParseVector2 ();
+				point.Position = lexer.ParseVector2();
 				break;
 			case "Straight":
-				point.Straight = lexer.ParseBool ();
+				point.Straight = lexer.ParseBool();
 				break;
 			case "TangentAngle":
-				point.TangentAngle = lexer.ParseFloat ();
+				point.TangentAngle = lexer.ParseFloat();
 				break;
 			case "TangentWeight":
-				point.TangentWeight = lexer.ParseFloat ();
+				point.TangentWeight = lexer.ParseFloat();
 				break;
 			case "SkinningWeights":
-				point.SkinningWeights = lexer.ParseSkinningWeights ();
+				point.SkinningWeights = lexer.ParseSkinningWeights();
 				break;
 			default:
-				ParseActorProperty (point, name);
+				ParseActorProperty(point, name);
 				break;
 			}
 		}
 		
-		void ParseGearProperty (Node node, string name)
+		void ParseGearProperty(Node node, string name)
 		{
 			SplineGear gear = (SplineGear)node;
-			switch (name) {
+			switch(name) {
 			case "WidgetName":
-				gear.WidgetId = lexer.ParseQuotedString ();
+				gear.WidgetId = lexer.ParseQuotedString();
 				break;
 			case "SplineName":
-				gear.SplineId = lexer.ParseQuotedString ();
+				gear.SplineId = lexer.ParseQuotedString();
 				break;
 			case "SplineOffset":
-				gear.SplineOffset = lexer.ParseFloat ();
+				gear.SplineOffset = lexer.ParseFloat();
 				break;
 			default:
-				ParseActorProperty (gear, name);
+				ParseActorProperty(gear, name);
 				break;
 			}
 		}
 
-		void ParseSplineProperty (Node node, string name)
+		void ParseSplineProperty(Node node, string name)
 		{
-			switch (name) {
+			switch(name) {
 			default:
-				ParseGraphicProperty (node, name);
+				ParseGraphicProperty(node, name);
 				break;
 			}
 		}
 
-		void ParseSliderProperty (Node node, string name)
+		void ParseSliderProperty(Node node, string name)
 		{
 			Slider slider = (Slider)node;
-			switch (name) {
+			switch(name) {
 			case "RangeMin":
-				slider.RangeMin = lexer.ParseFloat ();
+				slider.RangeMin = lexer.ParseFloat();
 				break;
 			case "RangeMax":
-				slider.RangeMax = lexer.ParseFloat ();
+				slider.RangeMax = lexer.ParseFloat();
 				break;
 			case "Value":
-				slider.Value = lexer.ParseFloat ();
+				slider.Value = lexer.ParseFloat();
 				break;
 			case "Step":
-				lexer.ParseFloat ();
+				lexer.ParseFloat();
 				break;
 			default:
-				ParseGraphicProperty (node, name);
+				ParseGraphicProperty(node, name);
 				break;
 			}
 		}
 
-		void ParseTextStyleProperty (Node node, string name)
+		void ParseTextStyleProperty(Node node, string name)
 		{
 			TextStyle style = (TextStyle)node;
-			switch (name) {
+			switch(name) {
 			case "ImagePath":
-				style.ImageTexture = new SerializableTexture (lexer.ParsePath ());
+				style.ImageTexture = new SerializableTexture(lexer.ParsePath());
 				break;
 			case "ImageSize":
-				style.ImageSize = lexer.ParseVector2 ();
+				style.ImageSize = lexer.ParseVector2();
 				break;
 			case "ImageUsage":
-				style.ImageUsage = (TextStyle.ImageUsageEnum)lexer.ParseInt ();
+				style.ImageUsage = (TextStyle.ImageUsageEnum)lexer.ParseInt();
 				break;
 			case "FontName":
-				style.Font = new SerializableFont (lexer.ParseQuotedString ());
+				style.Font = new SerializableFont(lexer.ParseQuotedString());
 				break;
 			case "SpaceAfter":
-				style.SpaceAfter = lexer.ParseFloat ();
+				style.SpaceAfter = lexer.ParseFloat();
 				break;
 			case "Size":
-				style.Size = lexer.ParseFloat ();
+				style.Size = lexer.ParseFloat();
 				break;
 			case "Bold":
-				style.Bold = lexer.ParseBool ();
+				style.Bold = lexer.ParseBool();
 				break;
 			case "DropShadow":
-				style.CastShadow = lexer.ParseBool ();
+				style.CastShadow = lexer.ParseBool();
 				break;
 			case "ShadowColor":
-				style.ShadowColor = lexer.ParseColor4 ();
+				style.ShadowColor = lexer.ParseColor4();
 				break;
 			case "ShadowOffset":
-				style.ShadowOffset = lexer.ParseVector2 ();
+				style.ShadowOffset = lexer.ParseVector2();
 				break;
 			default:
-				ParseActorProperty (node, name);
+				ParseActorProperty(node, name);
 				break;
 			}
 		}
-		void ParseRichTextProperty (Node node, string name)
+		void ParseRichTextProperty(Node node, string name)
 		{
 			RichText text = (RichText)node;
-			switch (name) {
+			switch(name) {
 			case "Text":
-				text.Content = lexer.ParseQuotedString ();
+				text.Text = lexer.ParseQuotedString();
 				break;
 			case "HAlign":
-				text.HAlignment = (HAlignment)lexer.ParseInt ();
+				text.HAlignment = (HAlignment)lexer.ParseInt();
 				break;
 			case "VAlign":
-				text.VAlignment = (VAlignment)lexer.ParseInt ();
+				text.VAlignment = (VAlignment)lexer.ParseInt();
 				break;
 			default:
-				ParseGraphicProperty (node, name);
+				ParseGraphicProperty(node, name);
 				break;
 			}
 		}
 
-		void ParseFolderBeginProperty (Node node, string name)
+		void ParseFolderBeginProperty(Node node, string name)
 		{
-			switch (name) {
+			switch(name) {
 			case "Expanded":
-				lexer.ParseBool ();
+				lexer.ParseBool();
 				break;
 			default:
-				ParseActorProperty (node, name);
+				ParseActorProperty(node, name);
 				break;
 			}
 		}
 
-		void ParseFolderEndProperty (Node node, string name)
+		void ParseFolderEndProperty(Node node, string name)
 		{
-			switch (name) {
+			switch(name) {
 			default:
-				ParseActorProperty (node, name);
+				ParseActorProperty(node, name);
 				break;
 			}
 		}
 
-		public delegate void ActorPropReader (Node node, string name);
+		public delegate void ActorPropReader(Node node, string name);
 
 		struct KnownActorType 
 		{
@@ -735,40 +735,40 @@ namespace Orange
 			public ActorPropReader PropReader;
 		}
 		
-		public object CreateObject (string className)
+		public object CreateObject(string className)
 		{
-			var type = System.Type.GetType (className);
+			var type = System.Type.GetType(className);
 			if (type == null) {
-				throw new Exception ("Unknown type: {0}", className);
+				throw new Exception("Unknown type: {0}", className);
 			}
-			var ctor = type.GetConstructor (System.Type.EmptyTypes);
+			var ctor = type.GetConstructor(System.Type.EmptyTypes);
 			if (ctor == null)
-				throw new Exception ("No public default constructor is defined for: {0}", className);
-			var obj = ctor.Invoke (new object[] {});
+				throw new Exception("No public default constructor is defined for: {0}", className);
+			var obj = ctor.Invoke(new object[] {});
 			return obj;
 		}
 		
-		public Node ParseNode ()
+		public Node ParseNode()
 		{
-			string actorClass = lexer.ParseQuotedString ();
+			string actorClass = lexer.ParseQuotedString();
 			foreach (KnownActorType t in knownActorTypes) {
 				if (t.ActorClass == actorClass) {
-					Node n = (Node)CreateObject (t.NodeClass);
-					lexer.ParseToken ('{');
+					Node n = (Node)CreateObject(t.NodeClass);
+					lexer.ParseToken('{');
 					while (lexer.PeekChar() != '}')
-						t.PropReader (n, lexer.ParseWord ());
-					lexer.ParseToken ('}');
+						t.PropReader(n, lexer.ParseWord());
+					lexer.ParseToken('}');
 					if (t.ActorClass == "Hot::FolderBegin" || t.ActorClass == "Hot::FolderEnd")
 						return null;
 					return n;
 				}
 			}
-			throw new Exception ("Unknown type of actor '{0}'", actorClass);
+			throw new Exception("Unknown type of actor '{0}'", actorClass);
 		}
 		
-		void RegisterKnownActorTypes ()
+		void RegisterKnownActorTypes()
 		{
-			knownActorTypes = new KnownActorType [] {
+			knownActorTypes = new KnownActorType[] {
 				new KnownActorType {ActorClass = "Hot::Scene", NodeClass = "Lime.Frame, Lime", PropReader = ParseSceneProperty},
 				new KnownActorType {ActorClass = "Hot::RootScene", NodeClass = "Lime.Frame, Lime", PropReader = ParseSceneProperty},
 				new KnownActorType {ActorClass = "Hot::Visual", NodeClass = "Lime.Frame, Lime", PropReader = ParseSceneProperty},

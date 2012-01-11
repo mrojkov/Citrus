@@ -13,7 +13,7 @@ namespace Lime
 		[ProtoMember(2)]
 		public Vector2 B;
 		
-		public Rectangle (float left, float top, float right, float bottom)
+		public Rectangle(float left, float top, float right, float bottom)
 		{
 			A.X = left;
 			A.Y = top;
@@ -21,15 +21,15 @@ namespace Lime
 			B.Y = bottom;
 		}
 
-		public Rectangle (Vector2 a, Vector2 b)
+		public Rectangle(Vector2 a, Vector2 b)
 		{
 			A = a;
 			B = b;
 		}
 		
-		bool IEquatable<Rectangle>.Equals (Rectangle other)
+		bool IEquatable<Rectangle>.Equals(Rectangle other)
 		{
-			return A.Equals (other.A) && B.Equals (other.B);
+			return A.Equals(other.A) && B.Equals(other.B);
 		}
 		
 		public float Width {
@@ -56,14 +56,14 @@ namespace Lime
 			}
 		}
 		
-		bool Contains (Vector2 v)
+		bool Contains(Vector2 v)
 		{
 			return (v.X >= A.X) && (v.Y >= A.Y) && (v.X < B.X) && (v.Y < B.Y);
 		}
 		
-		public override string ToString ()
+		public override string ToString()
 		{
-			return String.Format ("{0}, {1}, {2}, {3}", A.X, A.Y, B.X, B.Y);
+			return String.Format("{0}, {1}, {2}, {3}", A.X, A.Y, B.X, B.Y);
 		}
 
 	}

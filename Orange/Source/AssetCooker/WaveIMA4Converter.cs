@@ -19,138 +19,138 @@ namespace Orange
 			IMA_ADPCM = 0x11
 		}
 
-		public static byte [] Decode (IAudioDecoder input)
+		public static byte[] Decode(IAudioDecoder input)
 		{
 			const int bufferSize = 10 * 1024;
-			IntPtr buffer = Marshal.AllocHGlobal (bufferSize);
-			byte [] decodedSound = new byte [1024 * 64];
+			IntPtr buffer = Marshal.AllocHGlobal(bufferSize);
+			byte[] decodedSound = new byte[1024 * 64];
 			try {
-				int blockSize = input.GetBlockSize ();
+				int blockSize = input.GetBlockSize();
 				int needToRead = bufferSize / blockSize;
 				int totalRead = 0;
 				while (true) {
-					int actuallyRead = input.ReadBlocks (buffer, 0, needToRead);
+					int actuallyRead = input.ReadBlocks(buffer, 0, needToRead);
 					if (actuallyRead == 0) {
 						break;
 					}
 					totalRead += actuallyRead;
 					if (totalRead * blockSize > decodedSound.Length) {
-						Array.Resize (ref decodedSound, totalRead * blockSize * 3 / 2);
+						Array.Resize(ref decodedSound, totalRead * blockSize * 3 / 2);
 					}
-					Marshal.Copy (buffer, decodedSound, (totalRead - actuallyRead) * blockSize,  actuallyRead * blockSize);
+					Marshal.Copy(buffer, decodedSound, (totalRead - actuallyRead) * blockSize, actuallyRead * blockSize);
 				}
-				Array.Resize (ref decodedSound, totalRead * blockSize);
+				Array.Resize(ref decodedSound, totalRead * blockSize);
 			} finally {
-				Marshal.FreeHGlobal (buffer);
+				Marshal.FreeHGlobal(buffer);
 			}
 			return decodedSound;
 		}
 
-		public static void Encode (IAudioDecoder input, Stream output)
+		public static void Encode(IAudioDecoder input, Stream output)
 		{
-			byte [] decodedSound = Decode (input);
-			int channels = input.GetFormat () == ALFormat.Stereo16 ? 2 : 1;
+			byte[] decodedSound = Decode(input);
+			int channels = input.GetFormat() == ALFormat.Stereo16 ? 2 : 1;
 			int blockSize = channels * 1024;
-			var ima4Encoder = new Ima4Encoder ();
-			var adpcmSound = ima4Encoder.Encode (decodedSound, channels, blockSize);
+			var ima4Encoder = new Ima4Encoder();
+			var adpcmSound = ima4Encoder.Encode(decodedSound, channels, blockSize);
 			long numFrames = (decodedSound.Length / channels / 2);
-			int frequency = input.GetFrequency ();
+			int frequency = input.GetFrequency();
 			int averageBytesPerSecond = (int)(adpcmSound.Length * (long)frequency / numFrames);
-			int framesPerBlock = (blockSize - 4 * channels) * 8 / (4 * channels) + 1;
-			var bw = new BinaryWriter (output);
+			int framesPerBlock = (blockSize - 4 * channels) * 8 /(4 * channels) + 1;
+			var bw = new BinaryWriter(output);
 			// RIFF chunk
-			bw.Write (Encoding.UTF8.GetBytes ("RIFF"));
-			bw.Write (adpcmSound.Length + 44 - 8);
-			bw.Write (Encoding.UTF8.GetBytes ("WAVE"));
+			bw.Write(Encoding.UTF8.GetBytes("RIFF"));
+			bw.Write(adpcmSound.Length + 44 - 8);
+			bw.Write(Encoding.UTF8.GetBytes("WAVE"));
 			// Fmt sub-chunk
-			bw.Write (Encoding.UTF8.GetBytes ("fmt "));
-			bw.Write (20); // chunk size
-			bw.Write ((ushort)WaveFormat.IMA_ADPCM); // format
-			bw.Write ((ushort)channels);
-			bw.Write (frequency);
-			bw.Write (averageBytesPerSecond); // average bytes per seconds
-			bw.Write ((ushort)(blockSize)); // block align
-			bw.Write ((ushort)4); // bits per sample
-			bw.Write ((ushort)channels);
-			bw.Write ((ushort)framesPerBlock);
+			bw.Write(Encoding.UTF8.GetBytes("fmt "));
+			bw.Write(20); // chunk size
+			bw.Write((ushort)WaveFormat.IMA_ADPCM); // format
+			bw.Write((ushort)channels);
+			bw.Write(frequency);
+			bw.Write(averageBytesPerSecond); // average bytes per seconds
+			bw.Write((ushort)(blockSize)); // block align
+			bw.Write((ushort)4); // bits per sample
+			bw.Write((ushort)channels);
+			bw.Write((ushort)framesPerBlock);
 			// Data sub-chunk
-			bw.Write (Encoding.UTF8.GetBytes ("data"));
-			bw.Write (adpcmSound.Length);
+			bw.Write(Encoding.UTF8.GetBytes("data"));
+			bw.Write(adpcmSound.Length);
 			// Write down the data
-			output.Write (adpcmSound, 0, adpcmSound.Length);
+			output.Write(adpcmSound, 0, adpcmSound.Length);
 		}
 
 		struct Ima4Encoder
 		{
-			byte [] input;
-			byte [] output;
+			byte[] input;
+			byte[] output;
 			int inputPosition;
 			int outputPosition;
 			int framesPerBlock;
 			int blockSize;
 			int channels;
-			EncoderState [] states;
+			EncoderState[] states;
 
-			public byte [] Encode (byte [] input, int channels, int blockSize)
+			public byte[] Encode(byte[] input, int channels, int blockSize)
 			{
 				this.input = input;
 				this.blockSize = blockSize;
 				this.channels = channels;
 				inputPosition = 0;
-				states = new EncoderState [channels];
+				states = new EncoderState[channels];
 				framesPerBlock = (blockSize - 4 * channels) * 8 / (4 * channels) + 1;
 				int numBlocks = input.Length / framesPerBlock / (2 * channels);
-				output = new byte [numBlocks * blockSize];
+				output = new byte[numBlocks * blockSize];
 				for (int i = 0; i < numBlocks; i++) {
-					EncodeBlock ();
+					EncodeBlock();
 				}
 				return output;
 			}
 
-			short ReadSample ()
+			short ReadSample()
 			{
 				if (inputPosition >= input.Length) {
 					return 0;
 				} else {
-					return (short)(input [inputPosition++] | (input [inputPosition++] << 8));
+					return (short)(input[inputPosition++] | (input[inputPosition++] << 8));
 				}
 			}
 
-			void EncodeBlock ()
+			void EncodeBlock()
 			{
 				int p = outputPosition;
 				for (int i = 0; i < channels; i++) {
-					short sample0 = ReadSample ();
+					short sample0 = ReadSample();
 					inputPosition += (channels - 1) * 2;
-					short sample1 = ReadSample ();
+					short sample1 = ReadSample();
 					inputPosition -= ((channels - 1) * 2 + 2);
 					// Using number of iterations to calculate initial stepIndex
-					var state = states [i];
+					var state = states[i];
 					state.StepIndex = 0;
 					for (int j = 0; j < 100; j++) {
 						state.PrevSample = sample0;
-						state.CompressSample (sample1);
+						state.CompressSample(sample1);
 					}
 					state.PrevSample = sample0;
 					state.StepIndex = 61;
-					output [p++] = (byte)((ushort)sample0 & 255);
-					output [p++] = (byte)((ushort)sample0 >> 8);
-					output [p++] = (byte)state.StepIndex;
-					output [p++] = 0;
-					states [i] = state;
+					output[p++] = (byte)((ushort)sample0 & 255);
+					output[p++] = (byte)((ushort)sample0 >> 8);
+					output[p++] = (byte)state.StepIndex;
+					output[p++] = 0;
+					states[i] = state;
 				}
-				short [,] samples = new short [2, 8];
+				short[,] samples = new short[2, 8];
 				for (int i = 0; i < framesPerBlock - 1; i += 8) {
 					for (int j = 0; j < 8; j++) {
 						for (int c = 0; c < channels; c++) {
-							samples [c, j] = ReadSample ();
+							samples[c, j] = ReadSample();
 						}
 					}
 					for (int c = 0; c < channels; c++) {
 						for (int j = 0; j < 4; j++) {
-							int a = states [c].CompressSample (samples [c, j * 2]);
-							int b = states [c].CompressSample (samples [c, j * 2 + 1]);
-							output [p++] = (byte)((a & 0xf) | ((b << 4) & 0xf0));
+							int a = states[c].CompressSample(samples[c, j * 2]);
+							int b = states[c].CompressSample(samples[c, j * 2 + 1]);
+							output[p++] = (byte)((a & 0xf) | ((b << 4) & 0xf0));
 						}
 					}
 				}
@@ -163,7 +163,7 @@ namespace Orange
 			public int StepIndex;
 			public int PrevSample;
 
-			static int[] StepTable = new []
+			static int[] StepTable = new[]
 			{
 				7, 8, 9, 10, 11, 12, 13, 14,
 				16, 17, 19, 21, 23, 25, 28, 31,
@@ -179,15 +179,15 @@ namespace Orange
 				32767
 			};
 			
-			static int[] IndexTable = new []
+			static int[] IndexTable = new[]
 			{
 				-1, -1, -1, -1, 2, 4, 6, 8,
 				-1, -1, -1, -1, 2, 4, 6, 8
 			};
 
-			public byte CompressSample (short sample)
+			public byte CompressSample(short sample)
 			{
-				int sign = 0; // sign bit of the nibble (MSB)
+				int sign = 0; // sign bit of the nibble(MSB)
 				int delta = sample - PrevSample;
 				if (delta < 0) {
 					sign = 1;

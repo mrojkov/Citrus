@@ -12,9 +12,9 @@ namespace Lime
 {
 	internal class GameController : UIViewController, IGameWindow
 	{
-		public GameController () : base ()
+		public GameController() : base()
 		{
-			base.View = new GameView ();
+			base.View = new GameView();
 		}
 
 		new GameView View { get { return (GameView)base.View; } }
@@ -26,50 +26,50 @@ namespace Lime
 
 		Size IGameWindow.WindowSize {
 			get {
-				return new Size (View.Size.Width, View.Size.Height);
+				return new Size(View.Size.Width, View.Size.Height);
 			}
 			set {}
 		}
 
-		public void Activate ()
+		public void Activate()
 		{
-			View.Run ();
+			View.Run();
 		}
 
-		public void Deactivate ()
+		public void Deactivate()
 		{
-			View.Stop ();
+			View.Stop();
 		}
 		
-		public override void TouchesBegan (NSSet touches, UIEvent evt)
+		public override void TouchesBegan(NSSet touches, UIEvent evt)
 		{
-			var pt = (touches.AnyObject as UITouch).LocationInView (this.View);
-			Vector2 position = new Vector2 (pt.X, pt.Y) * Input.ScreenToWorldTransform;
-			Input.Mouse.SetPosition (position);
-			Input.Mouse.SetTouching (true);
-			Application.gameApp.OnMouseDown (MouseButton.Left, position);
+			var pt = (touches.AnyObject as UITouch).LocationInView(this.View);
+			Vector2 position = new Vector2(pt.X, pt.Y) * Input.ScreenToWorldTransform;
+			Input.Mouse.SetPosition(position);
+			Input.Mouse.SetTouching(true);
+			Application.gameApp.OnMouseDown(MouseButton.Left, position);
 		}
 		
-		public override void TouchesMoved (NSSet touches, UIEvent evt)
+		public override void TouchesMoved(NSSet touches, UIEvent evt)
 		{
-			var pt = (touches.AnyObject as UITouch).LocationInView (this.View);
-			Vector2 position = new Vector2 (pt.X, pt.Y) * Input.ScreenToWorldTransform;
-			Input.Mouse.SetPosition (position);
-			Application.gameApp.OnMouseMove (position);
+			var pt = (touches.AnyObject as UITouch).LocationInView(this.View);
+			Vector2 position = new Vector2(pt.X, pt.Y) * Input.ScreenToWorldTransform;
+			Input.Mouse.SetPosition(position);
+			Application.gameApp.OnMouseMove(position);
 		}
 		
-		public override void TouchesEnded (NSSet touches, UIEvent evt)
+		public override void TouchesEnded(NSSet touches, UIEvent evt)
 		{
-			var pt = (touches.AnyObject as UITouch).LocationInView (this.View);
-			Vector2 position = new Vector2 (pt.X, pt.Y) * Input.ScreenToWorldTransform;
-			Input.Mouse.SetPosition (position);
-			Input.Mouse.SetTouching (false);
-			Application.gameApp.OnMouseUp (MouseButton.Left, position);
+			var pt = (touches.AnyObject as UITouch).LocationInView(this.View);
+			Vector2 position = new Vector2(pt.X, pt.Y) * Input.ScreenToWorldTransform;
+			Input.Mouse.SetPosition(position);
+			Input.Mouse.SetTouching(false);
+			Application.gameApp.OnMouseUp(MouseButton.Left, position);
 		}
 
 		public DeviceOrientation CurrentDeviceOrientation {
 			get {
-				switch (InterfaceOrientation) {
+				switch(InterfaceOrientation) {
 				case UIInterfaceOrientation.Portrait:
 					return DeviceOrientation.Portrait;
 				case UIInterfaceOrientation.PortraitUpsideDown:
@@ -83,26 +83,26 @@ namespace Lime
 			}
 		}
 
-		public override bool ShouldAutorotateToInterfaceOrientation (UIInterfaceOrientation toInterfaceOrientation)
+		public override bool ShouldAutorotateToInterfaceOrientation(UIInterfaceOrientation toInterfaceOrientation)
 		{
-			switch (toInterfaceOrientation)
+			switch(toInterfaceOrientation)
 			{
 			case UIInterfaceOrientation.LandscapeLeft:
-				return (Application.gameApp.GetSupportedDeviceOrientations () & DeviceOrientation.LandscapeLeft) != 0;
+				return (Application.gameApp.GetSupportedDeviceOrientations() & DeviceOrientation.LandscapeLeft) != 0;
 			case UIInterfaceOrientation.LandscapeRight:
-				return (Application.gameApp.GetSupportedDeviceOrientations () & DeviceOrientation.LandscapeRight) != 0;
+				return (Application.gameApp.GetSupportedDeviceOrientations() & DeviceOrientation.LandscapeRight) != 0;
 			case UIInterfaceOrientation.Portrait:
-				return (Application.gameApp.GetSupportedDeviceOrientations () & DeviceOrientation.Portrait) != 0;
+				return (Application.gameApp.GetSupportedDeviceOrientations() & DeviceOrientation.Portrait) != 0;
 			case UIInterfaceOrientation.PortraitUpsideDown:
-				return (Application.gameApp.GetSupportedDeviceOrientations () & DeviceOrientation.PortraitUpsideDown) != 0;
+				return (Application.gameApp.GetSupportedDeviceOrientations() & DeviceOrientation.PortraitUpsideDown) != 0;
 			}
 			return false;
 		}
 
-		public override void DidRotate (UIInterfaceOrientation fromInterfaceOrientation)
+		public override void DidRotate(UIInterfaceOrientation fromInterfaceOrientation)
 		{
-			base.DidRotate (fromInterfaceOrientation);
-			Application.gameApp.OnDeviceRotated (CurrentDeviceOrientation);
+			base.DidRotate(fromInterfaceOrientation);
+			Application.gameApp.OnDeviceRotated(CurrentDeviceOrientation);
 		}
 
 		public float FrameRate {

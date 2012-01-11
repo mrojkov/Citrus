@@ -168,8 +168,8 @@ namespace Lime
 
 	public static class Input
 	{
-		static bool [] previousKeysState = new bool [(int)Key.KeyCount];
-		static bool [] currentKeysState = new bool [(int)Key.KeyCount];
+		static bool[] previousKeysState = new bool[(int)Key.KeyCount];
+		static bool[] currentKeysState = new bool[(int)Key.KeyCount];
 
 		/// <summary>
 		/// The matrix describes transition from pixels to virtual coordinates. 
@@ -177,65 +177,65 @@ namespace Lime
 		public static Matrix32 ScreenToWorldTransform = Matrix32.Identity;
 
 		/// <summary>
-		/// The current mouse position in virtual coordinates coordinates. (Read Only)
+		/// The current mouse position in virtual coordinates coordinates.(Read Only)
 		/// </summary>
 		public static Vector2 MousePosition { get; internal set; }
 
 		/// <summary>
 		/// Returns true while the user holds down the key identified by name. Think auto fire.
 		/// </summary>
-		public static bool GetKey (Key key)
+		public static bool GetKey(Key key)
 		{
-			return currentKeysState [(int)key];
+			return currentKeysState[(int)key];
 		}
 
 		/// <summary>
 		/// Returns true during the frame the user releases the key identified by name.
 		/// </summary>
-		public static bool GetKeyUp (Key key)
+		public static bool GetKeyUp(Key key)
 		{
-			return !currentKeysState [(int)key] && previousKeysState [(int)key];
+			return !currentKeysState[(int)key] && previousKeysState[(int)key];
 		}
 
 		/// <summary>
 		/// Returns true during the frame the user starts pressing down the key identified by name.
 		/// </summary>
-		public static bool GetKeyDown (Key key)
+		public static bool GetKeyDown(Key key)
 		{
-			return currentKeysState [(int)key] && !previousKeysState [(int)key];
+			return currentKeysState[(int)key] && !previousKeysState[(int)key];
 		}
 
 		/// <summary>
-		/// After consumption, GetKeyUp (), GetKeyDown () will return false.
+		/// After consumption, GetKeyUp(), GetKeyDown() will return false.
 		/// </summary>
-		public static void ConsumeKeyEvent (Key key, bool value)
+		public static void ConsumeKeyEvent(Key key, bool value)
 		{
 			if (value) {
-				previousKeysState [(int)key] = currentKeysState [(int)key];
+				previousKeysState[(int)key] = currentKeysState[(int)key];
 			}
 		}
 
-		public static void ConsumeAllKeyEvents (bool value)
+		public static void ConsumeAllKeyEvents(bool value)
 		{
 			if (value) {
-				for (int i = 1; i < (int)Key.KeyCount; ++i) {
-					previousKeysState [i] = currentKeysState [i];
+				for (int i = 1; i < (int)Key.KeyCount; i++) {
+					previousKeysState[i] = currentKeysState[i];
 				}
 			}
 		}
 
 #if WIN
-		internal static void Update ()
+		internal static void Update()
 		{
-			currentKeysState.CopyTo (previousKeysState, 0);
-			var kbdState = OpenTK.Input.Keyboard.GetState (0);
+			currentKeysState.CopyTo(previousKeysState, 0);
+			var kbdState = OpenTK.Input.Keyboard.GetState(0);
 			for (int i = (int)Key.LShift; i <= (int)Key.BackSlash; i++) {
-				currentKeysState [i] = kbdState.IsKeyDown ((OpenTK.Input.Key)i);
+				currentKeysState[i] = kbdState.IsKeyDown((OpenTK.Input.Key)i);
 			}
-			var mouseState = OpenTK.Input.Mouse.GetState (0);
-			currentKeysState [(int)Key.Mouse0] = mouseState.IsButtonDown (OpenTK.Input.MouseButton.Left);
-			currentKeysState [(int)Key.Mouse1] = mouseState.IsButtonDown (OpenTK.Input.MouseButton.Right);
-			currentKeysState [(int)Key.Mouse2] = mouseState.IsButtonDown (OpenTK.Input.MouseButton.Middle);
+			var mouseState = OpenTK.Input.Mouse.GetState(0);
+			currentKeysState[(int)Key.Mouse0] = mouseState.IsButtonDown(OpenTK.Input.MouseButton.Left);
+			currentKeysState[(int)Key.Mouse1] = mouseState.IsButtonDown(OpenTK.Input.MouseButton.Right);
+			currentKeysState[(int)Key.Mouse2] = mouseState.IsButtonDown(OpenTK.Input.MouseButton.Middle);
 		}
 #endif
 	}

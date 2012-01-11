@@ -9,54 +9,54 @@ namespace Lime
 	{
 		bool imageCombinerArg;
 
-		[ProtoMember (1)]
+		[ProtoMember(1)]
 		public SerializableTexture Texture { get; set; }
 
-		[ProtoMember (2)]
+		[ProtoMember(2)]
 		public Vector2 UV0 { get; set; }
 
-		[ProtoMember (3)]
+		[ProtoMember(3)]
 		public Vector2 UV1 { get; set; }
 
-		public Image ()
+		public Image()
 		{
 			UV0 = Vector2.Zero;
 			UV1 = Vector2.One;
-			Texture = new SerializableTexture ();
+			Texture = new SerializableTexture();
 		}
 
-		public override void Update (int delta)
+		public override void Update(int delta)
 		{
-			base.Update (delta);
+			base.Update(delta);
 			imageCombinerArg = false;
 		}
 
-		public override void Render ()
+		public override void Render()
 		{
 			if (worldShown) {
 				if (imageCombinerArg)
 					return;
 				Renderer.WorldMatrix = worldMatrix;
 				Renderer.Blending = worldBlending;
-				Renderer.DrawSprite (Texture, worldColor, Vector2.Zero, Size, UV0, UV1);
+				Renderer.DrawSprite(Texture, worldColor, Vector2.Zero, Size, UV0, UV1);
 			}
 		}
 
-		ITexture IImageCombinerArg.GetTexture ()
+		ITexture IImageCombinerArg.GetTexture()
 		{
 			return Texture;
 		}
 
-		void IImageCombinerArg.BypassRendering ()
+		void IImageCombinerArg.BypassRendering()
 		{
 			imageCombinerArg = true;
 		}
 
-		public override bool HitTest (Vector2 point)
+		public override bool HitTest(Vector2 point)
 		{
 			if (worldShown && !imageCombinerArg) {
 				if (HitTestMethod == HitTestMethod.Contents) {
-					Vector2 pt = WorldMatrix.CalcInversed ().TransformVector (point);
+					Vector2 pt = WorldMatrix.CalcInversed().TransformVector(point);
 					Vector2 sz = Size;
 					if (sz.X < 0) {
 						pt.X = -pt.X;
@@ -69,11 +69,11 @@ namespace Lime
 					if (pt.X >= 0 && pt.Y >= 0 && pt.X < sz.X && pt.Y < sz.Y) {
 						int u = (int)(Texture.ImageSize.Width * (pt.X / sz.X));
 						int v = (int)(Texture.ImageSize.Height * (pt.Y / sz.Y));
-						return !Texture.IsTransparentPixel (u, v);
+						return !Texture.IsTransparentPixel(u, v);
 					} else
 						return false;
 				} else
-					return base.HitTest (point);
+					return base.HitTest(point);
 			}
 			return false;
 		}

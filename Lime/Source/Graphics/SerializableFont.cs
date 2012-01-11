@@ -11,7 +11,7 @@ namespace Lime
 	{
 		public Font Instance { get; private set; }
 
-		[ProtoMember (1)]
+		[ProtoMember(1)]
 		public string Name
 		{
 			get	{
@@ -19,18 +19,18 @@ namespace Lime
 			}
 			set	{
 				name = value;
-				Instance = FontPool.Instance [Name];
+				Instance = FontPool.Instance[Name];
 			}
 		}
 
 		private string name;
 
-		public SerializableFont ()
+		public SerializableFont()
 		{
 			Name = "";
 		}
 
-		public SerializableFont (string name)
+		public SerializableFont(string name)
 		{
 			Name = name;
 		}
@@ -38,27 +38,27 @@ namespace Lime
 
 	public class FontPool
 	{
-		public Font Null = new Font ();
-		private Dictionary<string, Font> fonts = new Dictionary<string, Font> ();
+		public Font Null = new Font();
+		private Dictionary<string, Font> fonts = new Dictionary<string, Font>();
 
-		static readonly FontPool instance = new FontPool ();
+		static readonly FontPool instance = new FontPool();
 		public static FontPool Instance { get { return instance; } }
 
-		private FontPool () { }
+		private FontPool() { }
 
-		public Font this [string name]
+		public Font this[string name]
 		{
 			get	{
-				if (string.IsNullOrEmpty (name))
+				if (string.IsNullOrEmpty(name))
 					name = "Default";
 				Font font;
-				if (fonts.TryGetValue (name, out font))
+				if (fonts.TryGetValue(name, out font))
 					return font;
 				string path = "Fonts/" + name + ".fnt";
-				if (!AssetsBundle.Instance.FileExists (path))
-					return null;
-				font = Serialization.ReadObject<Font> (path);
-				fonts [name] = font;
+				if (!AssetsBundle.Instance.FileExists(path))
+					return Null;
+				font = Serialization.ReadObject<Font>(path);
+				fonts[name] = font;
 				return font;
 			}
 		}

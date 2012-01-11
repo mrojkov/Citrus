@@ -45,43 +45,43 @@ namespace Lime
 
 		const int InitialSize = 10;
 
-		void EnsureArraySize (int size)
+		void EnsureArraySize(int size)
 		{
 			if (items == null)
 				items = new Entry[InitialSize];
 			if (size > items.Length)
-				Array.Resize<Entry> (ref items, size);
+				Array.Resize<Entry>(ref items, size);
 		}
 
-		public Entry this [int index] {
+		public Entry this[int index] {
 			get {
-				EnsureArraySize (index + 1);
-				return items [index];
+				EnsureArraySize(index + 1);
+				return items[index];
 			}
 
 			set {
-				EnsureArraySize (index + 1);
-				items [index] = value;
+				EnsureArraySize(index + 1);
+				items[index] = value;
 			}
 		}
 
-		void ApplyBone (BoneWeight bw, Vector2 sourceVector, ref Vector2 resultVector, ref float overallWeight)
+		void ApplyBone(BoneWeight bw, Vector2 sourceVector, ref Vector2 resultVector, ref float overallWeight)
 		{
 			if (items != null && bw.Index > 0 && bw.Index < items.Length) {
-				BoneArray.Entry e = items [bw.Index];
-				resultVector += bw.Weight * e.RelativeTransform.TransformVector (sourceVector);
+				BoneArray.Entry e = items[bw.Index];
+				resultVector += bw.Weight * e.RelativeTransform.TransformVector(sourceVector);
 				overallWeight += bw.Weight;
 			}
 		}
 
-		public Vector2 ApplySkinningToVector (Vector2 vector, SkinningWeights weights)
+		public Vector2 ApplySkinningToVector(Vector2 vector, SkinningWeights weights)
 		{
 			Vector2 result = Vector2.Zero;
 			float overallWeight = 0;
-			ApplyBone (weights.Bone0, vector, ref result, ref overallWeight);
-			ApplyBone (weights.Bone1, vector, ref result, ref overallWeight);
-			ApplyBone (weights.Bone2, vector, ref result, ref overallWeight);
-			ApplyBone (weights.Bone3, vector, ref result, ref overallWeight);
+			ApplyBone(weights.Bone0, vector, ref result, ref overallWeight);
+			ApplyBone(weights.Bone1, vector, ref result, ref overallWeight);
+			ApplyBone(weights.Bone2, vector, ref result, ref overallWeight);
+			ApplyBone(weights.Bone3, vector, ref result, ref overallWeight);
 			if (overallWeight < 0)
 				result = vector;
 			else if (overallWeight >= 0 && overallWeight < 1)

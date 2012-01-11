@@ -5,19 +5,19 @@ namespace Lime
 	[ProtoContract]
 	public class NineGrid : Widget
 	{
-		[ProtoMember (1)]
+		[ProtoMember(1)]
 		public SerializableTexture Texture { get; set; }
 
-		[ProtoMember (2)]
+		[ProtoMember(2)]
 		public float LeftOffset { get; set; }
 		
-		[ProtoMember (3)]
+		[ProtoMember(3)]
 		public float RightOffset { get; set; }
 		
-		[ProtoMember (4)]
+		[ProtoMember(4)]
 		public float TopOffset { get; set; }
 		
-		[ProtoMember (5)]
+		[ProtoMember(5)]
 		public float BottomOffset { get; set; }
 
 		struct Part
@@ -26,9 +26,9 @@ namespace Lime
 			public Rectangle UV;
 		};
 
-		Part [] layout = new Part [9];
+		Part[] layout = new Part[9];
 
-		void BuildLayout (Part [] layout)
+		void BuildLayout(Part[] layout)
 		{
 			Vector2 textureSize = (Vector2)Texture.ImageSize;
 
@@ -71,69 +71,69 @@ namespace Lime
 				ty2 = ty3 = 1;
 			}
 			// Corners
-			layout [0].Rect = new Rectangle (0, 0, leftPart, topPart);
-			layout [0].UV = new Rectangle (tx0, ty0, tx1, ty1);
-			layout [1].Rect = new Rectangle (gridSize.X - rightPart, 0, gridSize.X, topPart);
-			layout [1].UV = new Rectangle (tx2, ty0, tx3, ty1);
-			layout [2].Rect = new Rectangle (0, gridSize.Y - bottomPart, leftPart, gridSize.Y);
-			layout [2].UV = new Rectangle (tx0, ty2, tx1, ty3);
-			layout [3].Rect = new Rectangle (gridSize.X - rightPart, gridSize.Y - bottomPart, gridSize.X, gridSize.Y);
-			layout [3].UV = new Rectangle (tx2, ty2, tx3, ty3);
+			layout[0].Rect = new Rectangle(0, 0, leftPart, topPart);
+			layout[0].UV = new Rectangle(tx0, ty0, tx1, ty1);
+			layout[1].Rect = new Rectangle(gridSize.X - rightPart, 0, gridSize.X, topPart);
+			layout[1].UV = new Rectangle(tx2, ty0, tx3, ty1);
+			layout[2].Rect = new Rectangle(0, gridSize.Y - bottomPart, leftPart, gridSize.Y);
+			layout[2].UV = new Rectangle(tx0, ty2, tx1, ty3);
+			layout[3].Rect = new Rectangle(gridSize.X - rightPart, gridSize.Y - bottomPart, gridSize.X, gridSize.Y);
+			layout[3].UV = new Rectangle(tx2, ty2, tx3, ty3);
 			// Central part
-			layout [4].Rect = new Rectangle (leftPart, topPart, gridSize.X - rightPart, gridSize.Y - bottomPart);
-			layout [4].UV = new Rectangle (tx1, ty1, tx2, ty2);
+			layout[4].Rect = new Rectangle(leftPart, topPart, gridSize.X - rightPart, gridSize.Y - bottomPart);
+			layout[4].UV = new Rectangle(tx1, ty1, tx2, ty2);
 			// Sides
-			layout [5].Rect = new Rectangle (leftPart, 0, gridSize.X - rightPart, topPart);
-			layout [5].UV = new Rectangle (tx1, ty0, tx2, ty1);
-			layout [6].Rect = new Rectangle (leftPart, gridSize.Y - bottomPart, gridSize.X - rightPart, gridSize.Y);
-			layout [6].UV = new Rectangle (tx1, ty2, tx2, ty3);
-			layout [7].Rect = new Rectangle (0, topPart, leftPart, gridSize.Y - bottomPart);
-			layout [7].UV = new Rectangle (tx0, ty1, tx1, ty2);
-			layout [8].Rect = new Rectangle (gridSize.X - rightPart, topPart, gridSize.X, gridSize.Y - bottomPart);
-			layout [8].UV = new Rectangle (tx2, ty1, tx3, ty2);
+			layout[5].Rect = new Rectangle(leftPart, 0, gridSize.X - rightPart, topPart);
+			layout[5].UV = new Rectangle(tx1, ty0, tx2, ty1);
+			layout[6].Rect = new Rectangle(leftPart, gridSize.Y - bottomPart, gridSize.X - rightPart, gridSize.Y);
+			layout[6].UV = new Rectangle(tx1, ty2, tx2, ty3);
+			layout[7].Rect = new Rectangle(0, topPart, leftPart, gridSize.Y - bottomPart);
+			layout[7].UV = new Rectangle(tx0, ty1, tx1, ty2);
+			layout[8].Rect = new Rectangle(gridSize.X - rightPart, topPart, gridSize.X, gridSize.Y - bottomPart);
+			layout[8].UV = new Rectangle(tx2, ty1, tx3, ty2);
 			for (int i = 0; i < 9; i++) {
 				if (flipX) {
-					layout [i].Rect.A.X = -layout [i].Rect.A.X;
-					layout [i].Rect.B.X = -layout [i].Rect.B.X;
+					layout[i].Rect.A.X = -layout[i].Rect.A.X;
+					layout[i].Rect.B.X = -layout[i].Rect.B.X;
 				}
 				if (flipY) {
-					layout [i].Rect.A.Y = -layout [i].Rect.A.Y;
-					layout [i].Rect.B.Y = -layout [i].Rect.B.Y;
+					layout[i].Rect.A.Y = -layout[i].Rect.A.Y;
+					layout[i].Rect.B.Y = -layout[i].Rect.B.Y;
 				}
 			}
 		}
 
-		public override void Render ()
+		public override void Render()
 		{
 			if (worldShown) {
-				BuildLayout (layout);
+				BuildLayout(layout);
 				Renderer.WorldMatrix = worldMatrix;
 				Renderer.Blending = worldBlending;
 				for (int i = 0; i < layout.Length; i++) {
-					var part = layout [i];
-					Renderer.DrawSprite (Texture, worldColor, part.Rect.A, part.Rect.Size, part.UV.A, part.UV.B);
+					var part = layout[i];
+					Renderer.DrawSprite(Texture, worldColor, part.Rect.A, part.Rect.Size, part.UV.A, part.UV.B);
 				}
 			}
 		}
 
-		public override bool HitTest (Vector2 point)
+		public override bool HitTest(Vector2 point)
 		{
 			if (worldShown) {
 				if (HitTestMethod == HitTestMethod.Contents) {
-					BuildLayout (layout);
+					BuildLayout(layout);
 					for (int i = 0; i < layout.Length; i++) {
-						if (PartHitTest (layout [i], point))
+						if (PartHitTest(layout[i], point))
 							return true;
 					}
 					return false;
 				}
 			}
-			return base.HitTest (point);
+			return base.HitTest(point);
 		}
 
-		bool PartHitTest (Part part, Vector2 point)
+		bool PartHitTest(Part part, Vector2 point)
 		{
-			point = WorldMatrix.CalcInversed ().TransformVector (point);
+			point = WorldMatrix.CalcInversed().TransformVector(point);
 			if (part.Rect.B.X < part.Rect.A.X) {
 				part.Rect.A.X = -part.Rect.A.X;
 				part.Rect.B.X = -part.Rect.B.X;
@@ -149,7 +149,7 @@ namespace Lime
 				float vf = (point.Y - part.Rect.A.Y) / part.Rect.Height * part.UV.Height + part.UV.A.Y;
 				int ui = (int)(Texture.ImageSize.Width * uf);
 				int vi = (int)(Texture.ImageSize.Height * vf);
-				return !Texture.IsTransparentPixel (ui, vi);
+				return !Texture.IsTransparentPixel(ui, vi);
 			}
 			return false;
 		}

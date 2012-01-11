@@ -14,9 +14,9 @@ namespace Lime
 		/// It notifies that widget will be used in combining, and
 		/// must not be drawn on render pass.
 		/// </summary>
-		void BypassRendering ();
+		void BypassRendering();
 
-		ITexture GetTexture ();
+		ITexture GetTexture();
 
 		Vector2 Size { get; }
 
@@ -27,29 +27,29 @@ namespace Lime
 		bool WorldShown { get; }
 	}
 
-    [ProtoContract]
+	[ProtoContract]
 	public class ImageCombiner : Node
 	{
-        [ProtoMember(1)]
+		[ProtoMember(1)]
 		public bool Enabled { get; set; }
 		
-		public ImageCombiner ()
+		public ImageCombiner()
 		{
 			Enabled = true;
 		}
 		
-		bool AreVectorsClockwiseOrdered (Vector2 u, Vector2 v, Vector2 w)
+		bool AreVectorsClockwiseOrdered(Vector2 u, Vector2 v, Vector2 w)
 		{
 			return (v.Y - u.Y) * (w.X - v.X) > (v.X - u.X) * (w.Y - v.Y);
 		}
 
-		bool GetArgs (out IImageCombinerArg arg1, out IImageCombinerArg arg2)
+		bool GetArgs(out IImageCombinerArg arg1, out IImageCombinerArg arg2)
 		{
 			if (Parent != null) {
-				int index = Parent.Nodes.IndexOf (this);
+				int index = Parent.Nodes.IndexOf(this);
 				if (index < Parent.Nodes.Count - 2) {
-					arg1 = Parent.Nodes [index + 1].Widget as IImageCombinerArg;
-					arg2 = Parent.Nodes [index + 2].Widget as IImageCombinerArg;
+					arg1 = Parent.Nodes[index + 1].Widget as IImageCombinerArg;
+					arg2 = Parent.Nodes[index + 2].Widget as IImageCombinerArg;
 					if (arg1 != null & arg2 != null)
 						return true;
 				}
@@ -58,36 +58,36 @@ namespace Lime
 			return false;
 		}
 
-		public override void LateUpdate (int delta)
+		public override void LateUpdate(int delta)
 		{
-			base.LateUpdate (delta);
+			base.LateUpdate(delta);
 			IImageCombinerArg arg1, arg2;
-			if (Enabled && GetArgs (out arg1, out arg2)) {
-				arg1.BypassRendering ();
-				arg2.BypassRendering ();
+			if (Enabled && GetArgs(out arg1, out arg2)) {
+				arg1.BypassRendering();
+				arg2.BypassRendering();
 			}
 		}
 
 		static Vector2[] outVertices = new Vector2[64];
 
-		private void ClipPolygonByLine (Vector2[] vertices, ref int numVertices, Vector2 a, Vector2 b)
+		private void ClipPolygonByLine(Vector2[] vertices, ref int numVertices, Vector2 a, Vector2 b)
 		{
 			const float Eps = 1e-5f;
 			int numOutVertices = 0;
 			for (int i = 0; i < numVertices; i++) {
 				int j = (i < numVertices - 1) ? i + 1 : 0;
-				Vector2 u = vertices [i];
-				Vector2 v = vertices [j];
+				Vector2 u = vertices[i];
+				Vector2 v = vertices[j];
 
 				float d1 = (u.Y - a.Y) * (b.X - a.X) - (u.X - a.X) * (b.Y - a.Y);
 				float d2 = (v.Y - a.Y) * (b.X - a.X) - (v.X - a.X) * (b.Y - a.Y);
 
-				int s1 = Math.Abs (d1) < Eps ? 0 : ((d1 < 0) ? -1 : 1);
-				int s2 = Math.Abs (d2) < Eps ? 0 : ((d2 < 0) ? -1 : 1);
+				int s1 = Math.Abs(d1) < Eps ? 0 : ((d1 < 0) ? -1 : 1);
+				int s2 = Math.Abs(d2) < Eps ? 0 : ((d2 < 0) ? -1 : 1);
 
 				// if the first point lies inside visible half-plane or on the line, then include it into list.
 				if (s1 >= 0)
-					outVertices [numOutVertices++] = u;
+					outVertices[numOutVertices++] = u;
 				// the line crosses the edge.
 				if (s1 > 0 && s2 < 0 || s1 < 0 && s2 > 0) {
 					float z = (v.X - u.X) * (b.Y - a.Y) - (v.Y - u.Y) * (b.X - a.X);
@@ -95,14 +95,14 @@ namespace Lime
 					Vector2 p;
 					p.X = u.X + (v.X - u.X) * t;
 					p.Y = u.Y + (v.Y - u.Y) * t;
-					outVertices [numOutVertices++] = p;
+					outVertices[numOutVertices++] = p;
 				}
 			}
 			if (numOutVertices < 3)
 				numVertices = 0;
 			else {
 				for (int i = 0; i < numOutVertices; i++)
-					vertices [i] = outVertices [i];
+					vertices[i] = outVertices[i];
 				numVertices = numOutVertices;
 			}
 		}
@@ -117,51 +117,51 @@ namespace Lime
 			new Vector2(0, 1) 
 		};
 
-		private void RenderHelper (IImageCombinerArg arg1, IImageCombinerArg arg2)
+		private void RenderHelper(IImageCombinerArg arg1, IImageCombinerArg arg2)
 		{
-			Matrix32 transform1 = Matrix32.Scaling (arg1.Size) * arg1.LocalMatrix;
-			Matrix32 transform2 = Matrix32.Scaling (arg2.Size) * arg2.LocalMatrix;
+			Matrix32 transform1 = Matrix32.Scaling(arg1.Size) * arg1.LocalMatrix;
+			Matrix32 transform2 = Matrix32.Scaling(arg2.Size) * arg2.LocalMatrix;
 			// source rectangle
 			int numCoords = 4;
 			for (int i = 0; i < 4; i++)
-				coords [i] = rect [i] * transform1;
+				coords[i] = rect[i] * transform1;
 			for (int i = 0; i < 4; i++)
-				stencil [i] = rect [i] * transform2;
-			bool clockwiseOrder = AreVectorsClockwiseOrdered (stencil [0], stencil [1], stencil [2]);
+				stencil[i] = rect[i] * transform2;
+			bool clockwiseOrder = AreVectorsClockwiseOrdered(stencil[0], stencil[1], stencil[2]);
 			// clip invisible parts
 			for (int i = 0; i < 4; i++) {
 				int j = (i < 3) ? i + 1 : 0;
-				Vector2 v1 = clockwiseOrder ? stencil [j] : stencil [i];
-				Vector2 v2 = clockwiseOrder ? stencil [i] : stencil [j];
-				ClipPolygonByLine (coords, ref numCoords, v1, v2);
+				Vector2 v1 = clockwiseOrder ? stencil[j] : stencil[i];
+				Vector2 v2 = clockwiseOrder ? stencil[i] : stencil[j];
+				ClipPolygonByLine(coords, ref numCoords, v1, v2);
 			}
 			if (numCoords < 3)
 				return;
 			// Эти матрицы переводят координаты вершин изображения в текстурные координаты.
-			Matrix32 uvTransform1 = transform1.CalcInversed ();
-			Matrix32 uvTransform2 = transform2.CalcInversed ();
-			ITexture texture1 = arg1.GetTexture ();
-			ITexture texture2 = arg2.GetTexture ();
+			Matrix32 uvTransform1 = transform1.CalcInversed();
+			Matrix32 uvTransform2 = transform2.CalcInversed();
+			ITexture texture1 = arg1.GetTexture();
+			ITexture texture2 = arg2.GetTexture();
 			Color4 color = arg1.Color * arg2.Color * Parent.Widget.WorldColor;
 			for (int i = 0; i < numCoords; i++) {
-				vertices [i].Pos = coords [i];
-				vertices [i].Color = color;
-				vertices [i].UV1 = coords [i] * uvTransform1;
-				vertices [i].UV2 = coords [i] * uvTransform2;
+				vertices[i].Pos = coords[i];
+				vertices[i].Color = color;
+				vertices[i].UV1 = coords[i] * uvTransform1;
+				vertices[i].UV2 = coords[i] * uvTransform2;
 			}
-			Renderer.DrawTriangleFan (texture1, texture2, vertices, numCoords);
+			Renderer.DrawTriangleFan(texture1, texture2, vertices, numCoords);
 		}
 
-		public override void Render ()
+		public override void Render()
 		{
 			if (Enabled && Parent.Widget != null) {
 				IImageCombinerArg arg1, arg2;
-				if (GetArgs (out arg1, out arg2)) {
+				if (GetArgs(out arg1, out arg2)) {
 					if (arg1.WorldShown && arg2.WorldShown) {
-						if (arg1.GetTexture () != null && arg2.GetTexture () != null) {
+						if (arg1.GetTexture() != null && arg2.GetTexture() != null) {
 							Renderer.WorldMatrix = Parent.Widget.WorldMatrix;
 							Renderer.Blending = Blending.Alpha;
-							RenderHelper (arg1, arg2);
+							RenderHelper(arg1, arg2);
 						}
 					}
 				}

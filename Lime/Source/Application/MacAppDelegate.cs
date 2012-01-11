@@ -10,31 +10,31 @@ namespace Lime
 		GameApp game;
 		GameController gameController;
 		
-		public AppDelegate (GameApp game)
+		public AppDelegate(GameApp game)
 		{
 			this.game = game;
 		}
 		
-		public override void FinishedLaunching (MonoMac.Foundation.NSObject notification)
+		public override void FinishedLaunching(MonoMac.Foundation.NSObject notification)
 		{
-			gameController = new GameController (game);
+			gameController = new GameController(game);
 		}
 		
-		public override void DidBecomeActive (NSNotification notification)
+		public override void DidBecomeActive(NSNotification notification)
 		{
 			if (gameController != null) {
-				gameController.Activate ();
+				gameController.Activate();
 			}
 		}
 		
-		public override void DidResignActive (NSNotification notification)
+		public override void DidResignActive(NSNotification notification)
 		{
 			if (gameController != null) {
-				gameController.Deactivate ();
+				gameController.Deactivate();
 			}
 		}
 		
-		public override bool ApplicationShouldTerminateAfterLastWindowClosed (NSApplication sender)
+		public override bool ApplicationShouldTerminateAfterLastWindowClosed(NSApplication sender)
 		{
 			return true;
 		}

@@ -8,35 +8,35 @@ namespace Lime
 	[ProtoContract]
 	public class MarkerCollection : ICollection<Marker>
 	{
-		static List<Marker> emptyList = new List<Marker> ();
+		static List<Marker> emptyList = new List<Marker>();
 		List<Marker> markers = emptyList;
 
-		public Marker this [int index] { 
-			get { return markers [index]; }
+		public Marker this[int index] { 
+			get { return markers[index]; }
 		}
 		
-		void ICollection<Marker>.CopyTo (Marker[] a, int index)
+		void ICollection<Marker>.CopyTo(Marker[] a, int index)
 		{
-			markers.CopyTo (a, index);
+			markers.CopyTo(a, index);
 		}
 
 		public int Count { get { return markers.Count; } }
 
-		IEnumerator<Marker> IEnumerable<Marker>.GetEnumerator ()
+		IEnumerator<Marker> IEnumerable<Marker>.GetEnumerator()
 		{
-			return markers.GetEnumerator ();
+			return markers.GetEnumerator();
 		}
 		
-		IEnumerator IEnumerable.GetEnumerator ()
+		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return markers.GetEnumerator ();
+			return markers.GetEnumerator();
 		}
 
-		public Marker Get (string id)
+		public Marker Get(string id)
 		{
 			int count = markers.Count;
 			for (int i = 0; i < count; i++) {
-				var marker = markers [i];
+				var marker = markers[i];
 				if (marker.Id == id) {
 					return marker;
 				}
@@ -44,11 +44,11 @@ namespace Lime
 			return null;
 		}
 
-		public Marker GetByFrame (int frame)
+		public Marker GetByFrame(int frame)
 		{
 			int count = markers.Count;
 			for (int i = 0; i < count; i++) {
-				var marker = markers [i];
+				var marker = markers[i];
 				if (marker.Frame == frame) {
 					return marker;
 				}
@@ -56,27 +56,27 @@ namespace Lime
 			return null;
 		}
 
-		public void Add (Marker marker)
+		public void Add(Marker marker)
 		{
 			if (markers == emptyList) {
-				markers = new List<Marker> ();
+				markers = new List<Marker>();
 			}
-			markers.Add (marker);
+			markers.Add(marker);
 		}
 
-		public void Clear ()
+		public void Clear()
 		{
 			markers = emptyList;
 		}
 		
-		public bool Contains (Marker item)
+		public bool Contains(Marker item)
 		{
-			return markers.Contains (item);
+			return markers.Contains(item);
 		}
 		
-		public bool Remove (Marker item)
+		public bool Remove(Marker item)
 		{
-			bool result = markers.Remove (item);
+			bool result = markers.Remove(item);
 			if (markers.Count == 0) {
 				markers = emptyList;
 			}

@@ -13,52 +13,52 @@ namespace Lime
 
 		public event EventHandler<EventArgs> OnClick;
 
-		void UpdateHelper (int delta)
+		void UpdateHelper(int delta)
 		{
 			if (textPresenter == null) {
-				textPresenter = Find<SimpleText> ("TextPresenter", false);
+				textPresenter = Find<SimpleText>("TextPresenter", false);
 			}
 			if (textPresenter != null) {
 				textPresenter.Text = Caption;
 			}
-			if (HitTest (Input.MousePosition)) {
+			if (HitTest(Input.MousePosition)) {
 				if (RootFrame.Instance.ActiveWidget == null) {
-					PlayAnimation ("Focus");
+					PlayAnimation("Focus");
 					RootFrame.Instance.ActiveWidget = this;
 				}
 			} else {
 				if (RootFrame.Instance.ActiveWidget == this) {
-					PlayAnimation ("Normal");
+					PlayAnimation("Normal");
 					RootFrame.Instance.ActiveWidget = null;
 				}
 			}
 			if (RootFrame.Instance.ActiveWidget == this) {
-				if (Input.GetKeyDown (Key.Mouse0)) {
-					PlayAnimation ("Press");
-					Input.ConsumeKeyEvent (Key.Mouse0, true);
+				if (Input.GetKeyDown(Key.Mouse0)) {
+					PlayAnimation("Press");
+					Input.ConsumeKeyEvent(Key.Mouse0, true);
 				}
-				if (Input.GetKeyUp (Key.Mouse0)) {
-					if (HitTest (Input.MousePosition))
-						PlayAnimation ("Focus");
+				if (Input.GetKeyUp(Key.Mouse0)) {
+					if (HitTest(Input.MousePosition))
+						PlayAnimation("Focus");
 					else
-						PlayAnimation ("Normal");
-					Input.ConsumeKeyEvent (Key.Mouse0, true);
+						PlayAnimation("Normal");
+					Input.ConsumeKeyEvent(Key.Mouse0, true);
 					if (OnClick != null) {
-						OnClick (this, null);
+						OnClick(this, null);
 					}
 				}
 			}
 			if (RootFrame.Instance.ActiveWidget != this && CurrentAnimation != "Normal") {
-				PlayAnimation ("Normal");
+				PlayAnimation("Normal");
 			}
 		}
 
-		public override void Update (int delta)
+		public override void Update(int delta)
 		{
 			if (worldShown) {
-				UpdateHelper (delta);
+				UpdateHelper(delta);
 			}
-			base.Update (delta);
+			base.Update(delta);
 		}
 	}
 }

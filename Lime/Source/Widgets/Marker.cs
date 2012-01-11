@@ -5,31 +5,31 @@ using ProtoBuf;
 namespace Lime
 {
 	[ProtoContract]
-    public enum MarkerAction
-    {
+	public enum MarkerAction
+	{
 		[ProtoEnum]
-        Play,
+		Play,
 		[ProtoEnum]
-        Stop,
+		Stop,
 		[ProtoEnum]
-        Jump,
+		Jump,
 		[ProtoEnum]
-        Destroy
-    }
+		Destroy
+	}
 
-    [ProtoContract]
-    public class Marker
-    {
-        [ProtoMember(1)]
-        public string Id { get; set; }
-        
-        [ProtoMember(2)]
-        public int Frame { get; set; }
-        
-        [ProtoMember(3)]
-        public MarkerAction Action { get; set; }
-        
-        [ProtoMember(4)]
-        public string JumpTo { get; set; }
+	[ProtoContract]
+	public class Marker
+	{
+	[ProtoMember(1)]
+	public string Id { get; set; }
+
+	[ProtoMember(2)]
+	public int Frame { get; set; }
+
+	[ProtoMember(3)]
+	public MarkerAction Action { get; set; }
+
+	[ProtoMember(4)]
+	public string JumpTo { get; set; }
 	}
 }
