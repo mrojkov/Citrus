@@ -236,9 +236,6 @@ namespace Lime
 			currentKeysState[(int)Key.Mouse0] = mouseState.IsButtonDown(OpenTK.Input.MouseButton.Left);
 			currentKeysState[(int)Key.Mouse1] = mouseState.IsButtonDown(OpenTK.Input.MouseButton.Right);
 			currentKeysState[(int)Key.Mouse2] = mouseState.IsButtonDown(OpenTK.Input.MouseButton.Middle);
-			if(currentKeysState[(int)Key.Mouse0]) {
-				Console.WriteLine("MouseDown");
-			}
 		}
 #endif
 	}
