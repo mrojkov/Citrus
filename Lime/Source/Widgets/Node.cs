@@ -18,6 +18,7 @@ namespace Lime
 	public class Node
 	{
 		public static int UpdatedNodes;
+		private static List<Node> collectedNodes = new List<Node>();
 		
 		[ProtoMember(1)]
 		public string Id { get; set; }
@@ -96,8 +97,6 @@ namespace Lime
 			}
 			animationTime += delta;
 		}
-
-		private static List<Node> collectedNodes = new List<Node>();
 
 		public Node()
 		{

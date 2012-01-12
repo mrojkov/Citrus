@@ -73,7 +73,8 @@ namespace Lime
 			get { return text; }
 			set {
 				text = value;
-				parser = new TextParser(value);
+				var localizedText = Locale.GetString(text);
+				parser = new TextParser(localizedText);
 				if (parser.ErrorMessage != null) {
 					parser = new TextParser("Error: " + parser.ErrorMessage);
 				}

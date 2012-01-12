@@ -29,8 +29,9 @@ namespace Lime
 			if (worldShown) {
 				Renderer.WorldMatrix = worldMatrix;
 				Renderer.Blending = worldBlending;
-				if (!string.IsNullOrEmpty(Text)) {
-					var strings = Text.Split('\n');
+				var localizedText = Locale.GetString(Text);
+				if (!string.IsNullOrEmpty(localizedText)) {
+					var strings = localizedText.Split('\n');
 					var pos = new Vector2();
 					float totalHeight = FontHeight * strings.Length + Spacing * (strings.Length - 1);
 					if (VAlignment == VAlignment.Bottom)

@@ -8,7 +8,7 @@ namespace Lime
 	public class GameView : OpenTK.GameWindow, IGameWindow
 	{
 		GameApp app;
-		
+
 		public GameView(GameApp app)
 			: base(640, 480, new OpenTK.Graphics.GraphicsMode(32, 0, 0, 4))
 		{
