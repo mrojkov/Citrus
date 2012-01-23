@@ -171,7 +171,7 @@ namespace Orange
 			string compressionFlag = compressed ? (hasAlpha ? "-bc3" : "-bc1") : "-rgb";
 #if WIN
 			string nvcompress = Path.Combine(Helpers.GetApplicationDirectory(), "Toolchain.Win", "nvcompress.exe");
-			string args = String.Format("-silent -fast {0} {1} \"{2}\" \"{3}\"", mipsFlag, compressionFlag, srcPath, dstPath);
+			string args = String.Format("-silent {0} {1} \"{2}\" \"{3}\"", mipsFlag, compressionFlag, srcPath, dstPath);
 			var psi = new System.Diagnostics.ProcessStartInfo(nvcompress, args);
 			psi.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
 			var p = System.Diagnostics.Process.Start(psi);
