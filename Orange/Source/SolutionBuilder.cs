@@ -22,7 +22,7 @@ namespace Orange
 			System.IO.File.Copy(srcFile, dstFile, true);
 		}
 
-		private int StartProcess(string app, string args)
+		public static int StartProcess(string app, string args)
 		{
 			var p = new System.Diagnostics.Process();
 			p.StartInfo.FileName = app;

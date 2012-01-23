@@ -171,23 +171,20 @@ namespace Orange
 			string compressionFlag = compressed ? (hasAlpha ? "-bc3" : "-bc1") : "-rgb";
 #if WIN
 			string nvcompress = Path.Combine(Helpers.GetApplicationDirectory(), "Toolchain.Win", "nvcompress.exe");
-			string args = String.Format("-silent {0} {1} \"{2}\" \"{3}\"", mipsFlag, compressionFlag, srcPath, dstPath);
-			var psi = new System.Diagnostics.ProcessStartInfo(nvcompress, args);
-			psi.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
-			var p = System.Diagnostics.Process.Start(psi);
+            srcPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), srcPath);
+            dstPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), dstPath);
+            string args = String.Format("-silent -fast {0} {1} \"{2}\" \"{3}\"", mipsFlag, compressionFlag, srcPath, dstPath);
+            int exitCode = SolutionBuilder.StartProcess(nvcompress, args);
 #else
-			string nvcompress = Path.Combine(Helpers.GetApplicationDirectory(), "Toolchain.Mac", "nvcompress");
-			Mono.Unix.Native.Syscall.chmod(nvcompress, Mono.Unix.Native.FilePermissions.S_IXOTH | Mono.Unix.Native.FilePermissions.S_IXUSR);
-			string args = String.Format("-silent -fast {0} {1} '{2}' '{3}'", mipsFlag, compressionFlag, srcPath, dstPath);
-			var psi = new System.Diagnostics.ProcessStartInfo(nvcompress, args);
-			var p = System.Diagnostics.Process.Start(psi);
-#endif		
-			while (!p.HasExited) {
-				p.WaitForExit();
-			}
-			if (p.ExitCode != 0) {
-				throw new Lime.Exception("Failed to convert '{0}' to DDS format(error code: {1})", srcPath, p.ExitCode);
-			}
+			    string nvcompress = Path.Combine(Helpers.GetApplicationDirectory(), "Toolchain.Mac", "nvcompress");
+			    Mono.Unix.Native.Syscall.chmod(nvcompress, Mono.Unix.Native.FilePermissions.S_IXOTH | Mono.Unix.Native.FilePermissions.S_IXUSR);
+			    string args = String.Format("-silent -fast {0} {1} '{2}' '{3}'", mipsFlag, compressionFlag, srcPath, dstPath);
+			    var psi = new System.Diagnostics.ProcessStartInfo(nvcompress, args);
+			    var p = System.Diagnostics.Process.Start(psi);
+#endif
+            if (exitCode != 0) {
+                throw new Lime.Exception("Failed to convert '{0}' to DDS format(error code: {1})", srcPath, exitCode);
+            }
 		}
 		
 		public static void Convert(string srcPath, string dstPath, bool compressed, bool mipMaps, TargetPlatform platform)
