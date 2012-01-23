@@ -40,6 +40,26 @@ namespace Lime
 
 		public void ReadFromStream(Stream stream)
 		{
+			using (var r = new StreamReader(stream)) {
+				string line = r.ReadLine();
+				while (line != null) {
+					if (line.Length < 3 || line[0] != '[' || line[line.Length - 1] != ']')
+						throw new Lime.Exception("Invalid tag");
+					string tagLine = line.Substring(1, line.Length - 2);
+					int tag;
+					if (!int.TryParse(tagLine, out tag))
+						throw new Lime.Exception("Invalid tag");
+					string text = "";
+					while (true) {
+						line = r.ReadLine();
+						if (line == null || line.Length > 0 && line[0] == '[')
+							break;
+						text += line + '\n';
+					}
+					text = text.TrimEnd('\n');
+					strings[tag] = text;
+				}
+			}
 		}
 
 		public void WriteToStream(Stream stream)
@@ -51,6 +71,11 @@ namespace Lime
 					w.WriteLine();
 				}
 			}
+		}
+
+		public void Clear()
+		{
+			strings.Clear();
 		}
 	}
 

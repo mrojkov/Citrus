@@ -19,8 +19,15 @@ namespace Orange
 		
 		public void ExtractDictionary()
 		{
+			Console.WriteLine("------------- Localization dictionary update started -------------");
+			using (new DirectoryChanger(project.ProjectDirectory)) {
+				var files = Helpers.GetAllFiles(".", "*.cs", true);
+				foreach (string file in files) {
+					Console.WriteLine("* " + file);
+					ProcessSourceFile(file);
+				}
+			}
 			using (new DirectoryChanger(project.AssetsDirectory)) {
-				Console.WriteLine("------------- Localization dictionary update started -------------");
 				var files = Helpers.GetAllFiles(".", "*.scene", true);
 				foreach (string file in files) {
 					Console.WriteLine("* " + file);
@@ -29,7 +36,35 @@ namespace Orange
 			}
 		}
 
-		string TagString(string str)
+		void ProcessSourceFile(string file)
+		{
+			var text = File.ReadAllText(file);
+			text = EscapeQuotes(text);
+			text = Regex.Replace(text, @"""\[\]([^""]*)""",
+				(match) => {
+					string str = match.Groups[1].Value;
+					str = EscapeQuotes(AddStringToDictionary(UnescapeQuotes(str)));
+					return '"' + str + '"';
+				});
+			text = UnescapeQuotes(text);
+			File.WriteAllText(file + "X", text);
+		}
+
+		void ProcessSceneFile(string file)
+		{
+			var text = File.ReadAllText(file);
+			text = Regex.Replace(text, @"^(\s*Text)\s""([^""]*)""$", 
+				(match) => {
+					string prefix = match.Groups[1].Value;
+					string str = match.Groups[2].Value;
+					str = AddStringToDictionary(str);
+					string result = string.Format(@"{0} ""{1}""", prefix, str);
+					return result;
+				}, RegexOptions.Multiline);
+			File.WriteAllText(file + "X", text);
+		}
+
+		string AddStringToDictionary(string str)
 		{
 			var match = Regex.Match(str, @"^\[(\d*)\](.*)$");
 			if (match.Success) {
@@ -66,18 +101,14 @@ namespace Orange
 			}
 		}
 
-		void ProcessSceneFile(string file)
+		static string EscapeQuotes(string str)
 		{
-			var text = File.ReadAllText(file);
-			var s = Regex.Replace(text, @"^(\s*Text)\s""([^""]*)""$", 
-				(match) => {
-					string prefix = match.Groups[1].Value;
-					string str = match.Groups[2].Value;
-					str = TagString(str);
-					string result = string.Format(@"{0} ""{1}""", prefix, str);
-					return result;
-				}, RegexOptions.Multiline);
-			File.WriteAllText(file + "X", s);
+			return str.Replace("\\\"", "&quote;");
+		}
+
+		static string UnescapeQuotes(string str)
+		{
+			return str.Replace("&quote;", "\\\"");
 		}
 	}
 }
