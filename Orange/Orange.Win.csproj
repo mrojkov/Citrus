@@ -35,10 +35,6 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="OpenTK, Version=0.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\3rdParty\OpenTK\OpenTK.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="Mono.Posix, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756" />
     <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
@@ -51,10 +47,12 @@
       <HintPath>..\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
+    <Reference Include="OpenTK">
+      <HintPath>..\3rdParty\OpenTK\OpenTK.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="gtk-gui\generated.cs" />
-    <Compile Include="gtk-gui\Orange.MainDialog.cs" />
     <Compile Include="Source\AppConfig.cs" />
     <Compile Include="Source\AssemblyInfo.cs" />
     <Compile Include="Source\AssetCooker\AssetCooker.cs" />
@@ -62,6 +60,7 @@
     <Compile Include="Source\AssetCooker\RectAllocator.cs" />
     <Compile Include="Source\AssetCooker\TextureConverter.cs" />
     <Compile Include="Source\AssetCooker\WaveIMA4Converter.cs" />
+    <Compile Include="Source\DictionaryExtractor.cs" />
     <Compile Include="Source\DirectoryChanger.cs" />
     <Compile Include="Source\Helpers.cs" />
     <Compile Include="Source\HotStudioImport\HotAnimators.cs" />
@@ -69,10 +68,11 @@
     <Compile Include="Source\HotStudioImport\HotLexer.cs" />
     <Compile Include="Source\HotStudioImport\HotSceneImporter.cs" />
     <Compile Include="Source\Main.cs" />
-    <Compile Include="Source\MainDialog.cs" />
     <Compile Include="Source\SolutionBuilder.cs" />
     <Compile Include="Source\TargetPlatform.cs" />
     <Compile Include="Source\CitrusProject.cs" />
+    <Compile Include="gtk-gui\Orange.MainWindow.cs" />
+    <Compile Include="Source\MainWindow.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="gtk-gui\gui.stetic" />

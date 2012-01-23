@@ -7,7 +7,6 @@ namespace Orange
 	{
 		private CitrusProject project;
 		private TargetPlatform platform;
-		private string projectName;
 		
 		public SolutionBuilder(CitrusProject project, TargetPlatform platform)
 		{
