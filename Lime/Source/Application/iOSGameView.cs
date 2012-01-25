@@ -16,7 +16,7 @@ namespace Lime
 {
 	internal class GameView : iPhoneOSGameView
 	{
-		public GameView() : base(new RectangleF(0, 0, 0, 0))
+		public GameView() : base(UIScreen.MainScreen.Bounds)
 		{
 			LayerRetainsBacking = false;
 			LayerColorFormat = EAGLColorFormat.RGB565;

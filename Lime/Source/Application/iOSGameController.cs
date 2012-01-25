@@ -45,26 +45,26 @@ namespace Lime
 		{
 			var pt = (touches.AnyObject as UITouch).LocationInView(this.View);
 			Vector2 position = new Vector2(pt.X, pt.Y) * Input.ScreenToWorldTransform;
-			Input.Mouse.SetPosition(position);
-			Input.Mouse.SetTouching(true);
-			Application.gameApp.OnMouseDown(MouseButton.Left, position);
+			//Input.Mouse.SetPosition(position);
+			//Input.Mouse.SetTouching(true);
+			//Application.gameApp.OnMouseDown(MouseButton.Left, position);
 		}
 		
 		public override void TouchesMoved(NSSet touches, UIEvent evt)
 		{
 			var pt = (touches.AnyObject as UITouch).LocationInView(this.View);
 			Vector2 position = new Vector2(pt.X, pt.Y) * Input.ScreenToWorldTransform;
-			Input.Mouse.SetPosition(position);
-			Application.gameApp.OnMouseMove(position);
+			//Input.Mouse.SetPosition(position);
+			//Application.gameApp.OnMouseMove(position);
 		}
 		
 		public override void TouchesEnded(NSSet touches, UIEvent evt)
 		{
 			var pt = (touches.AnyObject as UITouch).LocationInView(this.View);
 			Vector2 position = new Vector2(pt.X, pt.Y) * Input.ScreenToWorldTransform;
-			Input.Mouse.SetPosition(position);
-			Input.Mouse.SetTouching(false);
-			Application.gameApp.OnMouseUp(MouseButton.Left, position);
+			//Input.Mouse.SetPosition(position);
+			//Input.Mouse.SetTouching(false);
+			//Application.gameApp.OnMouseUp(MouseButton.Left, position);
 		}
 
 		public DeviceOrientation CurrentDeviceOrientation {

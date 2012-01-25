@@ -17,7 +17,9 @@ namespace Lime
 		bool FullScreen { get; set; }
 		float FrameRate { get; }
 		DeviceOrientation CurrentDeviceOrientation { get; }
+#if !iOS
 		void Exit();
+#endif
 	}
 
 	public class GameApp

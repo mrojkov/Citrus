@@ -33,7 +33,7 @@ namespace Lime
 		
 		public override void ReceiveMemoryWarning(UIApplication application)
 		{
-			Lime.TexturePool.Instance.DiscardAll();
+			Lime.TexturePool.Instance.DiscardAllTextures();
 		}
 
 		public override void OnActivated(UIApplication application)
