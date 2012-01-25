@@ -114,7 +114,7 @@ namespace Orange
 			this.Action.AppendText (global::Mono.Unix.Catalog.GetString ("Build & Run"));
 			this.Action.AppendText (global::Mono.Unix.Catalog.GetString ("Build Only"));
 			this.Action.AppendText (global::Mono.Unix.Catalog.GetString ("Rebuild"));
-			this.Action.AppendText (global::Mono.Unix.Catalog.GetString ("Update Translation Tags"));
+			this.Action.AppendText (global::Mono.Unix.Catalog.GetString ("Make Localization Dictionary"));
 			this.Action.Name = "Action";
 			this.Action.Active = 0;
 			this.table3.Add (this.Action);

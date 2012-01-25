@@ -11,7 +11,7 @@ namespace Orange
 		BuildAndRun,
 		Build,
 		Rebuild,
-		UpdateLocalizationTags
+		MakeLocalizationDictionary
 	}
 
 	public partial class MainWindow : Gtk.Window
@@ -152,7 +152,7 @@ namespace Orange
 			return true;
 		}
 
-		private void UpdateLocalizationDictionary()
+		private void MakeLocalizationDictionary()
 		{
 			var citrusProject = new CitrusProject(CitrusProjectChooser.Filename);
 			DictionaryExtractor extractor = new DictionaryExtractor(citrusProject);
@@ -188,7 +188,6 @@ namespace Orange
 					ClearLog();
 					switch ((Orange.Action)Action.Active) {
 					case Orange.Action.BuildAndRun:
-						// UpdateLocalizationDictionary();
 						if (BuildSolution()) {
 							ScrollLogToEnd();
 							RunSolution();
@@ -202,8 +201,8 @@ namespace Orange
 							BuildSolution();
 						}
 						break;
-					case Orange.Action.UpdateLocalizationTags:
-						UpdateLocalizationDictionary();
+					case Orange.Action.MakeLocalizationDictionary:
+						MakeLocalizationDictionary();
 						break;
 					}
 				} catch (System.Exception exc) {

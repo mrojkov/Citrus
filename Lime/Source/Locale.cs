@@ -7,22 +7,6 @@ namespace Lime
 	{
 		Dictionary<int, string> strings = new Dictionary<int, string>();
 
-		public LocalizationDictionary()
-		{
-		}
-
-		public LocalizationDictionary(Stream stream)
-		{
-			ReadFromStream(stream);
-		}
-
-		public LocalizationDictionary(string file)
-		{
-			using (var stream = AssetsBundle.Instance.OpenFile(file)) {
-				ReadFromStream(stream);
-			}
-		}
-
 		public void Add(int tag, string value)
 		{
 			strings[tag] = value;
@@ -43,6 +27,7 @@ namespace Lime
 			using (var r = new StreamReader(stream)) {
 				string line = r.ReadLine();
 				while (line != null) {
+					line = line.Trim();
 					if (line.Length < 3 || line[0] != '[' || line[line.Length - 1] != ']')
 						throw new Lime.Exception("Invalid tag");
 					string tagLine = line.Substring(1, line.Length - 2);

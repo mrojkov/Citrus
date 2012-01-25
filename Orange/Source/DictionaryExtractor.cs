@@ -10,7 +10,13 @@ namespace Orange
 {
 	public class DictionaryExtractor
 	{
-		private CitrusProject project;
+		enum Pass
+		{
+			ExtractTaggedStrings,
+			TagUntaggedStrings
+		}
+
+		CitrusProject project;
 
 		public DictionaryExtractor(CitrusProject project)
 		{
@@ -19,49 +25,70 @@ namespace Orange
 		
 		public void ExtractDictionary()
 		{
-			Console.WriteLine("------------- Localization dictionary update started -------------");
-			using (new DirectoryChanger(project.ProjectDirectory)) {
-				var files = Helpers.GetAllFiles(".", "*.cs", true);
-				foreach (string file in files) {
-					Console.WriteLine("* " + file);
-					ProcessSourceFile(file);
+			const string dictionary = "Dictionary.txt";
+			Locale.Dictionary.Clear();
+			for (int pass = 0; pass < 2; pass++) {
+				using (new DirectoryChanger(project.ProjectDirectory)) {
+					var files = Helpers.GetAllFiles(".", "*.cs", true);
+					foreach (string file in files) {
+						if (pass == 0)
+							Console.WriteLine("* " + file);
+						ProcessSourceFile(file, (Pass)pass);
+					}
+				}
+				using (new DirectoryChanger(project.AssetsDirectory)) {
+					var files = Helpers.GetAllFiles(".", "*.scene", true);
+					foreach (string file in files) {
+						if (pass == 0)
+							Console.WriteLine("* " + file);
+						ProcessSceneFile(file, (Pass)pass);
+					}
 				}
 			}
 			using (new DirectoryChanger(project.AssetsDirectory)) {
-				var files = Helpers.GetAllFiles(".", "*.scene", true);
-				foreach (string file in files) {
-					Console.WriteLine("* " + file);
-					ProcessSceneFile(file);
+				using (var stream = new FileStream(dictionary, FileMode.Create)) {
+					Locale.Dictionary.WriteToStream(stream);
 				}
 			}
 		}
 
-		void ProcessSourceFile(string file)
+		void ProcessSourceFile(string file, Pass pass)
 		{
-			var text = File.ReadAllText(file);
-			text = EscapeQuotes(text);
-			text = Regex.Replace(text, @"""\[\]([^""]*)""",
+			var origText = File.ReadAllText(file);
+			var text = EscapeQuotes(origText);
+			text = Regex.Replace(text, @"""(\[\d*\][^""]*)""",
 				(match) => {
 					string str = match.Groups[1].Value;
-					str = EscapeQuotes(AddStringToDictionary(UnescapeQuotes(str)));
+					if (pass == Pass.TagUntaggedStrings || IsStringTagged(str))
+						str = EscapeQuotes(AddStringToDictionary(UnescapeQuotes(str)));
 					return '"' + str + '"';
 				});
 			text = UnescapeQuotes(text);
-			File.WriteAllText(file + "X", text);
+			if (text != origText) {
+				File.WriteAllText(file, text);
+			}
 		}
 
-		void ProcessSceneFile(string file)
+		void ProcessSceneFile(string file, Pass pass)
 		{
-			var text = File.ReadAllText(file);
-			text = Regex.Replace(text, @"^(\s*Text)\s""([^""]*)""$", 
+			var origText = File.ReadAllText(file);
+			var text = Regex.Replace(origText, @"^(\s*Text)\s""([^""]*)""$", 
 				(match) => {
 					string prefix = match.Groups[1].Value;
 					string str = match.Groups[2].Value;
-					str = AddStringToDictionary(str);
+					if (pass == Pass.TagUntaggedStrings || IsStringTagged(str))
+						str = AddStringToDictionary(str);
 					string result = string.Format(@"{0} ""{1}""", prefix, str);
 					return result;
 				}, RegexOptions.Multiline);
-			File.WriteAllText(file + "X", text);
+			if (origText != text) {
+				File.WriteAllText(file, text);
+			}
+		}
+
+		bool IsStringTagged(string str)
+		{
+			return Regex.Match(str, @"^\[(\d+)\](.*)$").Success;
 		}
 
 		string AddStringToDictionary(string str)

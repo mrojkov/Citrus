@@ -56,6 +56,10 @@ namespace Orange
 					Console.WriteLine("------------- Building Game Assets -------------");
 					SyncAtlases();
 					SyncDeleted();
+					SyncUpdated("*.txt", ".txt", (srcPath, dstPath) => {
+						AssetsBundle.ImportFile(srcPath, dstPath, 0);
+						return true;
+					});
 					SyncUpdated("*.png", GetPlatformTextureExtension(), (srcPath, dstPath) => {
 						CookingRules rules = cookingRulesMap[Path.ChangeExtension(dstPath, ".png")];
 						if (rules.TextureAtlas != null) {

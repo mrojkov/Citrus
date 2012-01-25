@@ -157,7 +157,7 @@ iPhone/iPad</property>
                 <property name="Items" translatable="yes">Build &amp; Run
 Build Only
 Rebuild
-Update Translation Tags</property>
+Make Localization Dictionary</property>
                 <property name="Active">0</property>
               </widget>
               <packing>
