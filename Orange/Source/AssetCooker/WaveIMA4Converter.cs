@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using Lime;
-using OpenTK.Audio.OpenAL;
 using System.Runtime.InteropServices;
 
 namespace Orange
@@ -49,7 +48,7 @@ namespace Orange
 		public static void Encode(IAudioDecoder input, Stream output)
 		{
 			byte[] decodedSound = Decode(input);
-			int channels = input.GetFormat() == ALFormat.Stereo16 ? 2 : 1;
+			int channels = input.GetFormat() == AudioFormat.Stereo16 ? 2 : 1;
 			int blockSize = channels * 1024;
 			var ima4Encoder = new Ima4Encoder();
 			var adpcmSound = ima4Encoder.Encode(decodedSound, channels, blockSize);

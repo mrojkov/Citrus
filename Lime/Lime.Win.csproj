@@ -79,6 +79,7 @@
     <Compile Include="Source\Graphics\Texture.cs" />
     <Compile Include="Source\Graphics\TextureAtlasPart.cs" />
     <Compile Include="Source\Input\Input.cs" />
+    <Compile Include="Source\List.cs" />
     <Compile Include="Source\Locale.cs" />
     <Compile Include="Source\MathUtils.cs" />
     <Compile Include="Source\Serialization.cs" />

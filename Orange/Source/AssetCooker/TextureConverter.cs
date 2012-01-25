@@ -176,11 +176,11 @@ namespace Orange
             string args = String.Format("-silent -fast {0} {1} \"{2}\" \"{3}\"", mipsFlag, compressionFlag, srcPath, dstPath);
             int exitCode = SolutionBuilder.StartProcess(nvcompress, args);
 #else
-			    string nvcompress = Path.Combine(Helpers.GetApplicationDirectory(), "Toolchain.Mac", "nvcompress");
-			    Mono.Unix.Native.Syscall.chmod(nvcompress, Mono.Unix.Native.FilePermissions.S_IXOTH | Mono.Unix.Native.FilePermissions.S_IXUSR);
-			    string args = String.Format("-silent -fast {0} {1} '{2}' '{3}'", mipsFlag, compressionFlag, srcPath, dstPath);
-			    var psi = new System.Diagnostics.ProcessStartInfo(nvcompress, args);
-			    var p = System.Diagnostics.Process.Start(psi);
+			string nvcompress = Path.Combine(Helpers.GetApplicationDirectory(), "Toolchain.Win", "nvcompress.exe");
+            srcPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), srcPath);
+            dstPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), dstPath);
+            string args = String.Format("-silent -fast {0} {1} \"{2}\" \"{3}\"", mipsFlag, compressionFlag, srcPath, dstPath);
+            int exitCode = SolutionBuilder.StartProcess(nvcompress, args);
 #endif
             if (exitCode != 0) {
                 throw new Lime.Exception("Failed to convert '{0}' to DDS format(error code: {1})", srcPath, exitCode);

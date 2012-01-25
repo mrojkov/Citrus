@@ -59,19 +59,21 @@
     <Compile Include="Source\DirectoryChanger.cs" />
     <Compile Include="Source\Helpers.cs" />
     <Compile Include="Source\Main.cs" />
-    <Compile Include="Source\MainDialog.cs" />
     <Compile Include="Source\TargetPlatform.cs" />
     <Compile Include="Source\HotStudioImport\HotLexer.cs" />
     <Compile Include="Source\HotStudioImport\HotAnimators.cs" />
     <Compile Include="Source\HotStudioImport\HotSceneImporter.cs" />
     <Compile Include="Source\HotStudioImport\HotFontImporter.cs" />
-    <Compile Include="gtk-gui\Orange.MainDialog.cs" />
     <Compile Include="Source\SolutionBuilder.cs" />
     <Compile Include="Source\AssetCooker\AssetCooker.cs" />
     <Compile Include="Source\AssetCooker\CookingRulesBuilder.cs" />
     <Compile Include="Source\AssetCooker\RectAllocator.cs" />
     <Compile Include="Source\AssetCooker\TextureConverter.cs" />
     <Compile Include="Source\CitrusProject.cs" />
+    <Compile Include="Source\DictionaryExtractor.cs" />
+    <Compile Include="Source\MainWindow.cs" />
+    <Compile Include="Source\AssetCooker\WaveIMA4Converter.cs" />
+    <Compile Include="gtk-gui\Orange.MainWindow.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="gtk-gui\gui.stetic">
