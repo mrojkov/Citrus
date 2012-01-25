@@ -237,6 +237,10 @@ namespace Lime
 			currentKeysState[(int)Key.Mouse1] = mouseState.IsButtonDown(OpenTK.Input.MouseButton.Right);
 			currentKeysState[(int)Key.Mouse2] = mouseState.IsButtonDown(OpenTK.Input.MouseButton.Middle);
 		}
+#elif MAC		
+		internal static void Update()
+		{
+		}
 #endif
 	}
 }

@@ -4,9 +4,15 @@ using System.IO;
 
 namespace Lime
 {
+	public enum AudioFormat
+	{
+		Stereo16,
+		Mono16
+	}
+	
 	public interface IAudioDecoder : IDisposable
 	{
-		ALFormat GetFormat();
+		AudioFormat GetFormat();
 		int GetFrequency();
 		int GetCompressedSize();
 		void Rewind();

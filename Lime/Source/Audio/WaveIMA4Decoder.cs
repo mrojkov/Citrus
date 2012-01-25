@@ -119,9 +119,9 @@ namespace Lime
 			return blockSize;
 		}
 
-		public ALFormat GetFormat()
+		public AudioFormat GetFormat()
 		{
-			return channels == 2 ? ALFormat.Stereo16 : ALFormat.Mono16;
+			return channels == 2 ? AudioFormat.Stereo16 : AudioFormat.Mono16;
 		}
 
 		public int GetFrequency()

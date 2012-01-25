@@ -44,7 +44,7 @@ namespace Orange
 			p.StartInfo.RedirectStandardOutput = true;
 			p.StartInfo.RedirectStandardError = true;
 			var logger = new System.Text.StringBuilder();
-			p.OutputDataReceived +=(sender, e) => {
+			p.OutputDataReceived += (sender, e) => {
 				lock(logger) {
 					if (args == "") {
 						string x = e.Data;
@@ -52,7 +52,7 @@ namespace Orange
 					logger.AppendLine(e.Data);
 				}
 			};
-			p.ErrorDataReceived +=(sender, e) => {
+			p.ErrorDataReceived += (sender, e) => {
 				lock(logger)
 					logger.AppendLine(e.Data);
 			};
@@ -120,10 +120,10 @@ namespace Orange
 #if MAC
 			app = "/Applications/MonoDevelop.app/Contents/MacOS/mdtool";
 			if (platform == TargetPlatform.iOS) {
-				slnFile = Path.Combine(project.ProjectDirectory, project.Title, project.Title + ".sln");
+				slnFile = Path.Combine(project.ProjectDirectory, project.Title + ".iOS", project.Title + ".iOS.sln");
 				args = String.Format("build \"{0}\" -t:Clean -c:\"Release|iPhone\"", slnFile);
 			} else {
-				slnFile = Path.Combine(project.ProjectDirectory, project.Title, project.Title + ".sln");
+				slnFile = Path.Combine(project.ProjectDirectory, project.Title + ".Mac", project.Title + ".Mac.sln");
 				args = String.Format("build \"{0}\" -t:Clean -c:\"Release|x86\"", slnFile);
 			}
 #elif WIN

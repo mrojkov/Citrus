@@ -41,14 +41,14 @@ namespace Lime
 		public override void MouseDown(NSEvent theEvent)
 		{
 			var p = theEvent.LocationInWindow;
-			game.OnMouseDown(MouseButton.Left, new Vector2(p.X, Size.Height - p.Y));
+			// game.OnMouseDown(MouseButton.Left, new Vector2(p.X, Size.Height - p.Y));
 			base.MouseDown(theEvent);
 		}
 		
 		public override void MouseUp(NSEvent theEvent)
 		{
 			var p = theEvent.LocationInWindow;
-			game.OnMouseUp(MouseButton.Left, new Vector2(p.X, Size.Height - p.Y));
+			// game.OnMouseUp(MouseButton.Left, new Vector2(p.X, Size.Height - p.Y));
 			base.MouseUp(theEvent);
 		}
 		

@@ -57,10 +57,10 @@ namespace Lime
 			}
 		}
 
-		public ALFormat GetFormat()
+		public AudioFormat GetFormat()
 		{
 			int channels = Lemon.OggGetChannels(oggFile);
-			return channels == 1 ? ALFormat.Mono16 : ALFormat.Stereo16;
+			return channels == 1 ? AudioFormat.Mono16 : AudioFormat.Stereo16;
 		}
 
 		public int GetFrequency()

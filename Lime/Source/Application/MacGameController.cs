@@ -125,7 +125,7 @@ namespace Lime
 
 		private float TitleBarHeight()
 		{
-			RectangleF contentRect = NSWindow.ContentRectfor (window.Frame, window.StyleMask);
+			RectangleF contentRect = NSWindow.ContentRectFor(window.Frame, window.StyleMask);
 			return window.Frame.Height - contentRect.Height;
 		}
 
@@ -196,13 +196,17 @@ namespace Lime
 			if (oldTitle != null)
 				view.Title = oldTitle;
 		}
+		
+		public void Exit()
+		{
+			NSApplication.SharedApplication.Terminate(this);
+		}
 
 		public float FrameRate {
 			get {
 				return view.FrameRate;
 			}
 		}
-
 	}
 }
 #endif
