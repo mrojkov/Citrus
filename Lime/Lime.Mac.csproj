@@ -72,7 +72,6 @@
     <Compile Include="Source\Graphics\Renderer.cs" />
     <Compile Include="Source\Graphics\Texture.cs" />
     <Compile Include="Source\Graphics\TextureAtlasPart.cs" />
-    <Compile Include="Source\Input\Keyboard.cs" />
     <Compile Include="Source\Types\Color4.cs" />
     <Compile Include="Source\Types\IntRectangle.cs" />
     <Compile Include="Source\Types\IntVector2.cs" />
@@ -105,10 +104,8 @@
     <Compile Include="Source\Widgets\Spline.cs" />
     <Compile Include="Source\Widgets\SplineGear.cs" />
     <Compile Include="Source\Widgets\SplinePoint.cs" />
-    <Compile Include="Source\Widgets\UICoordinator.cs" />
     <Compile Include="Source\Widgets\Widget.cs" />
     <Compile Include="Source\Input\Input.cs" />
-    <Compile Include="Source\Input\Mouse.cs" />
     <Compile Include="Source\List.cs" />
     <Compile Include="Source\Audio\AudioSystem.cs" />
     <Compile Include="Source\Audio\AudioChannel.cs" />
@@ -121,6 +118,12 @@
     <Compile Include="Source\Audio\SampleCache.cs" />
     <Compile Include="Source\Audio\SerializableSample.cs" />
     <Compile Include="Source\Audio\Sound.cs" />
+    <Compile Include="Source\Locale.cs" />
+    <Compile Include="Source\Widgets\Dialog.cs" />
+    <Compile Include="Source\Widgets\NineGrid.cs" />
+    <Compile Include="Source\Widgets\RichText.cs" />
+    <Compile Include="Source\Widgets\RootFrame.cs" />
+    <Compile Include="Source\Widgets\Slider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Audio\ADPCMEncoder.c">
