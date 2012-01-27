@@ -26,7 +26,7 @@ namespace Orange
 		public void ExtractDictionary()
 		{
 			const string dictionary = "Dictionary.txt";
-			Locale.Dictionary.Clear();
+			Localization.Dictionary.Clear();
 			for (int pass = 0; pass < 2; pass++) {
 				using (new DirectoryChanger(project.ProjectDirectory)) {
 					var files = Helpers.GetAllFiles(".", "*.cs", true);
@@ -47,7 +47,7 @@ namespace Orange
 			}
 			using (new DirectoryChanger(project.AssetsDirectory)) {
 				using (var stream = new FileStream(dictionary, FileMode.Create)) {
-					Locale.Dictionary.WriteToStream(stream);
+					Localization.Dictionary.WriteToStream(stream);
 				}
 			}
 		}
@@ -99,21 +99,21 @@ namespace Orange
 					// case of "[123]..."
 					int tag = int.Parse(match.Groups[1].Value);
 					string value = match.Groups[2].Value;
-					if (!Locale.Dictionary.Contains(tag)) {
-						Locale.Dictionary.Add(tag, value);
+					if (!Localization.Dictionary.Contains(tag)) {
+						Localization.Dictionary.Add(tag, value);
 					}
 					return str;
 				} else {
 					// case of "[]..."
 					int tag = GenerateTag();
 					string value = match.Groups[2].Value;
-					Locale.Dictionary.Add(tag, value);
+					Localization.Dictionary.Add(tag, value);
 					str = string.Format("[{0}]{1}", tag, value);
 					return str;
 				}
 			} else {
 				int tag = GenerateTag();
-				Locale.Dictionary.Add(tag, str);
+				Localization.Dictionary.Add(tag, str);
 				str = string.Format("[{0}]{1}", tag, str);
 				return str;
 			}
@@ -123,7 +123,7 @@ namespace Orange
 		{
 			string s;
 			for (int tag = 1; ; tag++) {
-				if (!Locale.Dictionary.TryGetString(tag, out s))
+				if (!Localization.Dictionary.TryGetString(tag, out s))
 					return tag;
 			}
 		}

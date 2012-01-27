@@ -64,7 +64,7 @@ namespace Lime
 		}
 	}
 
-	public static class Locale
+	public static class Localization
 	{
 		public static LocalizationDictionary Dictionary = new LocalizationDictionary();
 

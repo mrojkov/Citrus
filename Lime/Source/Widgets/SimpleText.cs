@@ -29,7 +29,7 @@ namespace Lime
 			if (worldShown) {
 				Renderer.WorldMatrix = worldMatrix;
 				Renderer.Blending = worldBlending;
-				var localizedText = Locale.GetString(Text);
+				var localizedText = Localization.GetString(Text);
 				if (!string.IsNullOrEmpty(localizedText)) {
 					var strings = localizedText.Split('\n');
 					var pos = new Vector2();
