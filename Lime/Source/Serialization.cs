@@ -79,7 +79,7 @@ namespace Lime
 		// TODO: use weak references for keys
 		public static T DeepCloneCached<T>(T obj)
 		{
-			opStack.Push(new Operation { Type = OperationType.Clone });
+			opStack.Push(new Operation {Type = OperationType.Clone});
 			try {
 				MemoryStream stream;
 				if (!cloneCache.TryGetValue(obj, out stream)) {

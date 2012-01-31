@@ -697,20 +697,18 @@ namespace Lime
 
 		public override void Render()
 		{
-			if (worldShown) {
-				Matrix32 matrix = Matrix32.Identity;
-				Color4 color = Color4.White;
-				Widget basicWidget = GetBasicWidget();
-				if (basicWidget != null) {
-					matrix = basicWidget.WorldMatrix;
-					color = basicWidget.WorldColor;
-				}
-				Renderer.Blending = WorldBlending;
-				LinkedListNode<Particle> node = particles.First;
-				for (; node != null; node = node.Next) {
-					Particle particle = node.Value;
-					RenderParticle(particle, matrix, color);
-				}
+			Matrix32 matrix = Matrix32.Identity;
+			Color4 color = Color4.White;
+			Widget basicWidget = GetBasicWidget();
+			if (basicWidget != null) {
+				matrix = basicWidget.WorldMatrix;
+				color = basicWidget.WorldColor;
+			}
+			Renderer.Blending = WorldBlending;
+			LinkedListNode<Particle> node = particles.First;
+			for (; node != null; node = node.Next) {
+				Particle particle = node.Value;
+				RenderParticle(particle, matrix, color);
 			}
 		}
 	}

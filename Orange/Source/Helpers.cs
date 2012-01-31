@@ -18,7 +18,69 @@ namespace Orange
 				throw new Lime.Exception("Invalid target platform");
 			}
 		}
-		
+
+		public enum StartProcessOptions
+		{
+			RedirectOutput = 1,
+			RedirectErrors = 2
+		}
+
+		public static int StartProcess(string app, string args, StartProcessOptions options = StartProcessOptions.RedirectOutput | StartProcessOptions.RedirectErrors)
+		{
+			var p = new System.Diagnostics.Process();
+			p.StartInfo.FileName = app;
+			p.StartInfo.Arguments = args;
+			p.StartInfo.UseShellExecute = false;
+#if WIN
+			p.StartInfo.CreateNoWindow = true;
+			p.StartInfo.WorkingDirectory = Path.GetDirectoryName(app);
+			int cp = System.Text.Encoding.Default.CodePage;
+			if (cp == 1251)
+				cp = 866;
+			p.StartInfo.StandardOutputEncoding = System.Text.Encoding.GetEncoding(cp);
+			p.StartInfo.StandardErrorEncoding = System.Text.Encoding.GetEncoding(cp);
+#else
+			p.StartInfo.StandardOutputEncoding = System.Text.Encoding.Default;
+			p.StartInfo.StandardErrorEncoding = System.Text.Encoding.Default;
+			p.StartInfo.EnvironmentVariables.Clear();
+#endif
+			p.StartInfo.RedirectStandardOutput = true;
+			p.StartInfo.RedirectStandardError = true;
+			var logger = new System.Text.StringBuilder();
+			if ((options & StartProcessOptions.RedirectOutput) != 0) {
+				p.OutputDataReceived += (sender, e) => {
+					lock (logger) {
+						if (e.Data != null)
+							logger.AppendLine(e.Data);
+					}
+				};
+			}
+			if ((options & StartProcessOptions.RedirectErrors) != 0) {
+				p.ErrorDataReceived += (sender, e) => {
+					lock (logger) {
+						if (e.Data != null)
+							logger.AppendLine(e.Data);
+					}
+				};
+			}
+			p.Start();
+			p.BeginOutputReadLine();
+			p.BeginErrorReadLine();
+			while (!p.HasExited) {
+				p.WaitForExit(50);
+				lock(logger) {
+					if (logger.Length > 0) {
+						Console.Write(logger.ToString());
+						logger.Clear();
+					}
+				}
+				while (Gtk.Application.EventsPending()) {
+					Gtk.Application.RunIteration();
+				}
+			}
+			return p.ExitCode;
+		}
+
 		public static void CreateDirectoryRecursive(string path)
 		{
 			if (string.IsNullOrEmpty(path))
@@ -31,7 +93,7 @@ namespace Orange
 				Directory.CreateDirectory(path);
 			}
 		}
-		
+
 		public static string GetApplicationDirectory()
 		{
 			string appPath;
@@ -48,7 +110,7 @@ namespace Orange
 #endif
 			return appPath;
 		}
-		
+
 		public static bool IsPathHidden(string path)
 		{
 			if (path == ".") {
@@ -57,7 +119,7 @@ namespace Orange
 			}
 			return (System.IO.File.GetAttributes(path) & FileAttributes.Hidden) != 0;
 		}
-		
+
 		public static List<string> GetAllFiles(string directory, string mask, bool removePath)
 		{
 			List<string> result = new List<string>();

@@ -33,13 +33,15 @@ namespace Lime
 
 		public override void Render()
 		{
-			if (worldShown) {
-				if (imageCombinerArg)
-					return;
-				Renderer.WorldMatrix = worldMatrix;
-				Renderer.Blending = worldBlending;
-				Renderer.DrawSprite(Texture, worldColor, Vector2.Zero, Size, UV0, UV1);
-			}
+			Renderer.WorldMatrix = worldMatrix;
+			Renderer.Blending = worldBlending;
+			Renderer.DrawSprite(Texture, worldColor, Vector2.Zero, Size, UV0, UV1);
+		}
+
+		public override void AddToRenderChain(RenderChain chain)
+		{
+			if (worldShown && !imageCombinerArg)
+				chain.Add(this, Layer);
 		}
 
 		ITexture IImageCombinerArg.GetTexture()

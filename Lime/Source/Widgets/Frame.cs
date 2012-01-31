@@ -35,8 +35,6 @@ namespace Lime
 		RenderTarget renderTarget;
 		SerializableTexture renderTexture;
 
-		public event EventHandler<UpdateEventArgs> BeforeRendering;
-		public event EventHandler<UpdateEventArgs> AfterRendering;
 		public event EventHandler<UpdateEventArgs> BeforeUpdate;
 		public event EventHandler<UpdateEventArgs> AfterUpdate;
 		public event EventHandler<EventArgs> BeforeLateUpdate;
@@ -95,27 +93,31 @@ namespace Lime
 
 		public override void Render()
 		{
-			if (worldShown) {
-				if (BeforeRendering != null)
-					BeforeRendering(this, null);
-				if (renderTexture != null) {
-					if (Size.X > 0 && Size.Y > 0) {
-						renderTexture.SetAsRenderTarget();
-						Viewport vp = Renderer.Viewport;
-						Renderer.Viewport = new Viewport { X = 0, Y = 0, Width = renderTexture.ImageSize.Width, Height = renderTexture.ImageSize.Height };
-						Renderer.PushProjectionMatrix();
-						Renderer.SetOrthogonalProjection(0, Size.Y, Size.X, 0);
-						base.Render();
-						renderTexture.RestoreRenderTarget();
-						Renderer.Viewport = vp;
-						Renderer.PopProjectionMatrix();
-						Renderer.SetOrthogonalProjection(0, 0, 1024, 768);
-					}
-				} else {
-					base.Render();
+			if (renderTexture != null) {
+				if (Size.X > 0 && Size.Y > 0) {
+					renderTexture.SetAsRenderTarget();
+					Viewport vp = Renderer.Viewport;
+					Renderer.Viewport = new Viewport { X = 0, Y = 0, Width = renderTexture.ImageSize.Width, Height = renderTexture.ImageSize.Height };
+					Renderer.PushProjectionMatrix();
+					Renderer.SetOrthogonalProjection(0, Size.Y, Size.X, 0);
+					var chain = new RenderChain();
+					base.AddToRenderChain(chain);
+					chain.RenderAndClear();
+					renderTexture.RestoreRenderTarget();
+					Renderer.Viewport = vp;
+					Renderer.PopProjectionMatrix();
+					Renderer.SetOrthogonalProjection(0, 0, 1024, 768);
 				}
-				if (AfterRendering != null)
-					AfterRendering(this, null);
+			}
+		}
+
+		public override void AddToRenderChain(RenderChain chain)
+		{
+			if (worldShown) {
+				if (renderTexture != null)
+					chain.Add(this);
+				else
+					base.AddToRenderChain(chain);
 			}
 		}
 	}

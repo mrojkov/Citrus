@@ -172,12 +172,17 @@ namespace Lime
 			}
 		}
 
-		public override void Render()
+		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (worldShown) {
-				for (int i = Nodes.Count - 1; i >= 0; i--) {
-					Nodes[i].Render();
+				if (Layer != 0)
+					chain.PushLayer(Layer);
+				for (int i = 0; i < Nodes.Count; i++) {
+					Nodes[i].AddToRenderChain(chain);
 				}
+				chain.Add(this);
+				if (Layer != 0)
+					chain.PopLayer();
 			}
 		}
 

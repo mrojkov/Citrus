@@ -22,58 +22,6 @@ namespace Orange
 			System.IO.File.Copy(srcFile, dstFile, true);
 		}
 
-		public static int StartProcess(string app, string args)
-		{
-			var p = new System.Diagnostics.Process();
-			p.StartInfo.FileName = app;
-			p.StartInfo.Arguments = args;
-			p.StartInfo.UseShellExecute = false;
-#if WIN
-			p.StartInfo.CreateNoWindow = true;
-			p.StartInfo.WorkingDirectory = Path.GetDirectoryName(app);
-			int cp = System.Text.Encoding.Default.CodePage;
-			if (cp == 1251)
-				cp = 866;
-			p.StartInfo.StandardOutputEncoding = System.Text.Encoding.GetEncoding(cp);
-			p.StartInfo.StandardErrorEncoding = System.Text.Encoding.GetEncoding(cp);
-#else
-			p.StartInfo.StandardOutputEncoding = System.Text.Encoding.Default;
-			p.StartInfo.StandardErrorEncoding = System.Text.Encoding.Default;
-			p.StartInfo.EnvironmentVariables.Clear();
-#endif
-			p.StartInfo.RedirectStandardOutput = true;
-			p.StartInfo.RedirectStandardError = true;
-			var logger = new System.Text.StringBuilder();
-			p.OutputDataReceived += (sender, e) => {
-				lock(logger) {
-					if (args == "") {
-						string x = e.Data;
-					}
-					logger.AppendLine(e.Data);
-				}
-			};
-			p.ErrorDataReceived += (sender, e) => {
-				lock(logger)
-					logger.AppendLine(e.Data);
-			};
-			p.Start();
-			p.BeginOutputReadLine();
-			p.BeginErrorReadLine();
-			while (!p.HasExited) {
-				p.WaitForExit(50);
-				lock(logger) {
-					if (logger.Length > 0) {
-						Console.Write(logger.ToString());
-						logger.Clear();
-					}
-				}
-				while (Gtk.Application.EventsPending()) {
-					Gtk.Application.RunIteration();
-				}
-			}
-			return p.ExitCode;
-		}
-		
 		public bool Build()
 		{
 			Console.WriteLine("------------- Building Game Application -------------");
@@ -99,7 +47,7 @@ namespace Orange
 			slnFile = Path.Combine(project.ProjectDirectory, project.Title + ".Win", project.Title + ".Win.sln");
 			args = String.Format("\"{0}\" /verbosity:minimal /p:Configuration=Release", slnFile);
 #endif
-			if (StartProcess(app, args) != 0) {
+			if (Helpers.StartProcess(app, args) != 0) {
 				return false;
 			}
 #if MAC
@@ -138,7 +86,7 @@ namespace Orange
 			slnFile = Path.Combine(project.ProjectDirectory, project.Title + ".Win", project.Title + ".Win.sln");
 			args = String.Format("\"{0}\" /t:Clean /p:Configuration=Release", slnFile);
 #endif
-			if (StartProcess(app, args) != 0) {
+			if (Helpers.StartProcess(app, args) != 0) {
 				return false;
 			}
 			return true;
@@ -160,7 +108,7 @@ namespace Orange
 			dir = Path.GetDirectoryName(app);
 #endif
 			using(new DirectoryChanger(dir)) {
-				StartProcess(app, "");
+				Helpers.StartProcess(app, "");
 			}
 		}
 	}

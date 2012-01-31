@@ -92,37 +92,35 @@ namespace Lime
 
 		public override void Render()
 		{
-			if (worldShown) {
-				var renderer = new TextRenderer();
-				// Setup default style(take first one from node list or TextStyle.Default).
-				TextStyle defaultStyle = null;
-				if (Nodes.Count > 0) {
-					defaultStyle = Nodes[0] as TextStyle;
-				}
-				if (defaultStyle != null) {
-					renderer.AddStyle(defaultStyle);
+			var renderer = new TextRenderer();
+			// Setup default style(take first one from node list or TextStyle.Default).
+			TextStyle defaultStyle = null;
+			if (Nodes.Count > 0) {
+				defaultStyle = Nodes[0] as TextStyle;
+			}
+			if (defaultStyle != null) {
+				renderer.AddStyle(defaultStyle);
+			} else {
+				renderer.AddStyle(TextStyle.Default);
+			}
+			// Fill up style list.
+			foreach (var styleName in parser.Styles) {
+				var style = Nodes.Get(styleName) as TextStyle;
+				if (style != null) {
+					renderer.AddStyle(style);
 				} else {
 					renderer.AddStyle(TextStyle.Default);
 				}
-				// Fill up style list.
-				foreach (var styleName in parser.Styles) {
-					var style = Nodes.Get(styleName) as TextStyle;
-					if (style != null) {
-						renderer.AddStyle(style);
-					} else {
-						renderer.AddStyle(TextStyle.Default);
-					}
-				}
-				// Add text fragments.
-				foreach (var frag in parser.Fragments) {
-					// Warning! Using style + 1, because -1 is a default style.
-					renderer.AddFragment(frag.Text, frag.Style + 1);
-				}
-				// Draw text.
-				Renderer.WorldMatrix = worldMatrix;
-				Renderer.Blending = worldBlending;
-				renderer.Render(worldColor, Size, HAlignment, VAlignment);
 			}
+			// Add text fragments.
+			foreach (var frag in parser.Fragments) {
+				// Warning! Using style + 1, because -1 is a default style.
+				renderer.AddFragment(frag.Text, frag.Style + 1);
+			}
+			// Draw text.
+			Renderer.WorldMatrix = worldMatrix;
+			Renderer.Blending = worldBlending;
+			renderer.Render(worldColor, Size, HAlignment, VAlignment);
 		}
 	}
 

@@ -56,7 +56,11 @@ namespace Lime
 			}
 		}
 
-		
+		public int Left { get { return A.X; } set { A.X = value; } }
+		public int Top { get { return A.Y; } set { A.Y = value; } }
+		public int Right { get { return B.X; } set { B.X = value; } }
+		public int Bottom { get { return B.Y; } set { B.Y = value; } }
+
 		bool Contains(IntVector2 v)
 		{
 			return (v.X >= A.X) && (v.Y >= A.Y) && (v.X < B.X) && (v.Y < B.Y);

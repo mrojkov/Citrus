@@ -105,14 +105,12 @@ namespace Lime
 
 		public override void Render()
 		{
-			if (worldShown) {
-				BuildLayout(layout);
-				Renderer.WorldMatrix = worldMatrix;
-				Renderer.Blending = worldBlending;
-				for (int i = 0; i < layout.Length; i++) {
-					var part = layout[i];
-					Renderer.DrawSprite(Texture, worldColor, part.Rect.A, part.Rect.Size, part.UV.A, part.UV.B);
-				}
+			BuildLayout(layout);
+			Renderer.WorldMatrix = worldMatrix;
+			Renderer.Blending = worldBlending;
+			for (int i = 0; i < layout.Length; i++) {
+				var part = layout[i];
+				Renderer.DrawSprite(Texture, worldColor, part.Rect.A, part.Rect.Size, part.UV.A, part.UV.B);
 			}
 		}
 

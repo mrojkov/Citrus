@@ -26,27 +26,25 @@ namespace Lime
 
 		public override void Render()
 		{
-			if (worldShown) {
-				Renderer.WorldMatrix = worldMatrix;
-				Renderer.Blending = worldBlending;
-				var localizedText = Localization.GetString(Text);
-				if (!string.IsNullOrEmpty(localizedText)) {
-					var strings = localizedText.Split('\n');
-					var pos = new Vector2();
-					float totalHeight = FontHeight * strings.Length + Spacing * (strings.Length - 1);
-					if (VAlignment == VAlignment.Bottom)
-						pos.Y = Size.Y - totalHeight;
-					else if (VAlignment == VAlignment.Center)
-						pos.Y = (Size.Y - totalHeight) * 0.5f;
-					foreach (var str in strings) {
-						var extend = Renderer.MeasureTextLine(Font.Instance, str, FontHeight);
-						if (HAlignment == HAlignment.Right)
-							pos.X = Size.X - extend.X;
-						else if (HAlignment == HAlignment.Center)
-							pos.X = (Size.X - extend.X) * 0.5f;
-						Renderer.DrawTextLine(Font.Instance, pos, str, worldColor, FontHeight);
-						pos.Y += Spacing + FontHeight;
-					}
+			Renderer.WorldMatrix = worldMatrix;
+			Renderer.Blending = worldBlending;
+			var localizedText = Localization.GetString(Text);
+			if (!string.IsNullOrEmpty(localizedText)) {
+				var strings = localizedText.Split('\n');
+				var pos = new Vector2();
+				float totalHeight = FontHeight * strings.Length + Spacing * (strings.Length - 1);
+				if (VAlignment == VAlignment.Bottom)
+					pos.Y = Size.Y - totalHeight;
+				else if (VAlignment == VAlignment.Center)
+					pos.Y = (Size.Y - totalHeight) * 0.5f;
+				foreach (var str in strings) {
+					var extend = Renderer.MeasureTextLine(Font.Instance, str, FontHeight);
+					if (HAlignment == HAlignment.Right)
+						pos.X = Size.X - extend.X;
+					else if (HAlignment == HAlignment.Center)
+						pos.X = (Size.X - extend.X) * 0.5f;
+					Renderer.DrawTextLine(Font.Instance, pos, str, worldColor, FontHeight);
+					pos.Y += Spacing + FontHeight;
 				}
 			}
 		}

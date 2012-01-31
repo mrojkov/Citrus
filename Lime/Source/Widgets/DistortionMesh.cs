@@ -71,18 +71,16 @@ namespace Lime
 		
 		public override void Render()
 		{
-			if (worldShown) {
-				Renderer.Blending = WorldBlending;
-				Renderer.WorldMatrix = WorldMatrix;
-				for (int i = 0; i < NumRows; ++i) {
-					for (int j = 0; j < NumCols; ++j) {
-						points[0] = GetPoint(i, j);
-						points[1] = GetPoint(i, j + 1);
-						points[2] = GetPoint(i + 1, j + 1);
-						points[3] = GetPoint(i + 1, j);
-						if (points[0] != null && points[1] != null && points[2] != null && points[3] != null) {
-							RenderTile();
-						}
+			Renderer.Blending = WorldBlending;
+			Renderer.WorldMatrix = WorldMatrix;
+			for (int i = 0; i < NumRows; ++i) {
+				for (int j = 0; j < NumCols; ++j) {
+					points[0] = GetPoint(i, j);
+					points[1] = GetPoint(i, j + 1);
+					points[2] = GetPoint(i + 1, j + 1);
+					points[3] = GetPoint(i + 1, j);
+					if (points[0] != null && points[1] != null && points[2] != null && points[3] != null) {
+						RenderTile();
 					}
 				}
 			}

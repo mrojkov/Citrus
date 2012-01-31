@@ -174,7 +174,7 @@ namespace Orange
             srcPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), srcPath);
             dstPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), dstPath);
             string args = String.Format("-silent -fast {0} {1} \"{2}\" \"{3}\"", mipsFlag, compressionFlag, srcPath, dstPath);
-            int exitCode = SolutionBuilder.StartProcess(nvcompress, args);
+            int exitCode = Helpers.StartProcess(nvcompress, args, Helpers.StartProcessOptions.RedirectErrors);
             if (exitCode != 0) {
                 throw new Lime.Exception("Failed to convert '{0}' to DDS format(error code: {1})", srcPath, exitCode);
             }

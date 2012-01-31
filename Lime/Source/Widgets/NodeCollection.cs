@@ -47,6 +47,11 @@ namespace Lime
 			get { return false; }
 		}
 
+		public void Sort(Comparison<Node> comparison)
+		{
+			nodes.Sort(comparison);
+		}
+
 		public bool Contains(Node node)
 		{
 			return nodes.Contains(node);

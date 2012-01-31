@@ -33,6 +33,9 @@ namespace Lime
 		public Node Parent;
 		public Widget Widget;
 
+		public Node NextToRender;
+		public int Layer;
+
 		[ProtoMember(5)]
 		public readonly AnimatorCollection Animators = new AnimatorCollection();
 
@@ -242,8 +245,12 @@ namespace Lime
 
 		public virtual void Render()
 		{
-			for (int i = Nodes.Count - 1; i >= 0; i--) {
-				Nodes[i].Render();
+		}
+
+		public virtual void AddToRenderChain(RenderChain chain)
+		{
+			for (int i = 0; i < Nodes.Count; i++) {
+				Nodes[i].AddToRenderChain(chain);
 			}
 		}
 
