@@ -660,7 +660,7 @@ namespace Orange
 			case "ImageUsage":
 				style.ImageUsage = (TextStyle.ImageUsageEnum)lexer.ParseInt();
 				break;
-			case "FontName":
+			case "Font":
 				style.Font = new SerializableFont(lexer.ParseQuotedString());
 				break;
 			case "SpaceAfter":
