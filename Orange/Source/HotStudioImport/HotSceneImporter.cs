@@ -28,6 +28,9 @@ namespace Orange
 			case "RuntimeClass":
 				lexer.ParseQuotedString();
 				break;
+			case "Localizable":
+				lexer.ParseBool();
+				break;
 			case "Source":
 				var s = lexer.ParsePath();
 				node.ContentsPath = s;
