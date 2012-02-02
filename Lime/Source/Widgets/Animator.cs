@@ -107,10 +107,12 @@ namespace Lime
 
 		public void InvokeTrigger(int intervalBegin, int intervalEnd)
 		{
-			// This function relies on currentKey value. Therefore Apply(time) must be called before.
-			int t = FramesToMsecs(Frames[currentKey]);
-			if (t >= intervalBegin && t < intervalEnd) {
-				Owner.OnTrigger(TargetProperty);
+			if (Frames.Count > 0) {
+				// This function relies on currentKey value. Therefore Apply(time) must be called before.
+				int t = FramesToMsecs(Frames[currentKey]);
+				if (t >= intervalBegin && t < intervalEnd) {
+					Owner.OnTrigger(TargetProperty);
+				}
 			}
 		}
 
