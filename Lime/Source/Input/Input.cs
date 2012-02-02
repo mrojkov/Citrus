@@ -241,6 +241,12 @@ namespace Lime
 		internal static void Update()
 		{
 		}
+#elif iOS
+		internal static void Update(bool touching)
+		{
+			currentKeysState.CopyTo(previousKeysState, 0);
+			currentKeysState[(int)Key.Mouse0] = touching;
+		}
 #endif
 	}
 }
