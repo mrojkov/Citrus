@@ -30,6 +30,7 @@ namespace Lime
 		public static readonly Color4 Blue = new Color4(0, 0, 255, 255);
 		public static readonly Color4 White = new Color4(255, 255, 255, 255);
 		public static readonly Color4 Black = new Color4(0, 0, 0, 255);
+		public static readonly Color4 Transparent = new Color4(255, 255, 255, 0);
 
 		public Color4(UInt32 abgr)
 		{
