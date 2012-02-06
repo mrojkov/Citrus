@@ -182,6 +182,11 @@ namespace Lime
 		public static Vector2 MousePosition { get; internal set; }
 
 		/// <summary>
+		/// The current accelerometer state.(Read Only)
+		/// </summary>
+		public static Vector3 Acceleration { get; internal set; }		
+
+		/// <summary>
 		/// Returns true while the user holds down the key identified by name. Think auto fire.
 		/// </summary>
 		public static bool GetKey(Key key)

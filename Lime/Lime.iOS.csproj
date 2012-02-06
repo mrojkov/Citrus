@@ -120,6 +120,7 @@
     <Compile Include="Source\Widgets\Slider.cs" />
     <Compile Include="Source\Localization.cs" />
     <Compile Include="Source\Widgets\RenderChain.cs" />
+    <Compile Include="Source\Types\Vector3.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Lemon\bin\iOS\Release-iphoneos\libLemon.a">

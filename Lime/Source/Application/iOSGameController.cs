@@ -15,6 +15,8 @@ namespace Lime
 		public GameController() : base()
 		{
 			base.View = new GameView();
+			UIAccelerometer.SharedAccelerometer.UpdateInterval = 0.05;
+			UIAccelerometer.SharedAccelerometer.Acceleration += OnAcceleration;
 		}
 
 		new GameView View { get { return (GameView)base.View; } }
@@ -29,6 +31,11 @@ namespace Lime
 				return new Size(View.Size.Width, View.Size.Height);
 			}
 			set {}
+		}
+		
+		private void OnAcceleration (object sender, UIAccelerometerEventArgs e)
+		{
+			Input.Acceleration = new Vector3((float)e.Acceleration.X, (float)e.Acceleration.Y, (float)e.Acceleration.Z);
 		}
 
 		public void Activate()
