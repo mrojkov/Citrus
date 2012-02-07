@@ -97,7 +97,6 @@ namespace Orange
 			x = (y - x < x - y / 2) ? y : y / 2;
 			x = Math.Max(Math.Min(max, x), min);
 			return x;
-		
 		}
 		
 		private static void ToPVRTexture(string srcPath, string dstPath, bool compressed, bool mipMaps)

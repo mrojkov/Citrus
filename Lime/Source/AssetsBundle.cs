@@ -240,8 +240,9 @@ namespace Lime
 
 		public void DeleteFile(string path)
 		{
+			path = CorrectSlashes(path);
 			AssetDescriptor desc;
-			if (!index.TryGetValue(CorrectSlashes(path), out desc)) {
+			if (!index.TryGetValue(path, out desc)) {
 				throw new Exception("Asset '{0}' doesn't exist", path);
 			}
 			index.Remove(path);
