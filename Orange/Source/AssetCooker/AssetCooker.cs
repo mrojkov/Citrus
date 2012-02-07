@@ -8,7 +8,7 @@ namespace Orange
 	{
 		private delegate bool Converter(string srcPath, string dstPath);
 
-		private Lime.AssetsBundle AssetsBundle = Lime.AssetsBundle.Instance;
+		private Lime.AssetsBundle assetsBundle = Lime.AssetsBundle.Instance;
 		private CitrusProject project;
 		private TargetPlatform platform;
 		private Dictionary<string, CookingRules> cookingRulesMap;
@@ -50,14 +50,14 @@ namespace Orange
 		{
 			cookingRulesMap = CookingRulesBuilder.Build(project.AssetsDirectory);
 			string bundlePath = Path.ChangeExtension(project.AssetsDirectory, Helpers.GetTargetPlatformString(platform));
-			AssetsBundle.Open(bundlePath, true);
+			assetsBundle.Open(bundlePath, true);
 			try {
 				using(new DirectoryChanger(project.AssetsDirectory)) {
 					Console.WriteLine("------------- Building Game Assets -------------");
 					SyncAtlases();
 					SyncDeleted();
 					SyncUpdated("*.txt", ".txt", (srcPath, dstPath) => {
-						AssetsBundle.ImportFile(srcPath, dstPath, 0);
+						assetsBundle.ImportFile(srcPath, dstPath, 0);
 						return true;
 					});
 					SyncUpdated("*.png", GetPlatformTextureExtension(), (srcPath, dstPath) => {
@@ -69,7 +69,7 @@ namespace Orange
 						Helpers.CreateDirectoryRecursive(Path.GetDirectoryName(dstPath));
 						string tmpFile = Path.ChangeExtension(srcPath, GetPlatformTextureExtension());
 						TextureConverter.Convert(srcPath, tmpFile, rules.Compression, rules.MipMaps, platform);
-						AssetsBundle.ImportFile(tmpFile, dstPath, 0);
+						assetsBundle.ImportFile(tmpFile, dstPath, 0);
 						File.Delete(tmpFile);
 						return true;
 					});
@@ -85,28 +85,28 @@ namespace Orange
 						var texturePath = Lime.AssetsBundle.CorrectSlashes(Path.ChangeExtension(dstPath, null));
 						font.Texture = new Lime.SerializableTexture(texturePath);
 						Helpers.CreateDirectoryRecursive(Path.GetDirectoryName(dstPath));
-						Lime.Serialization.WriteObjectToBundle<Lime.Font>(AssetsBundle, dstPath, font);
+						Lime.Serialization.WriteObjectToBundle<Lime.Font>(assetsBundle, dstPath, font);
 						return true;
 					});
 					SyncUpdated("*.scene", ".scene", (srcPath, dstPath) => {
 						var importer = new HotSceneImporter(srcPath);
 						var node = importer.ParseNode();
 						Helpers.CreateDirectoryRecursive(Path.GetDirectoryName(dstPath));
-						Lime.Serialization.WriteObjectToBundle<Lime.Node>(AssetsBundle, dstPath, node);
+						Lime.Serialization.WriteObjectToBundle<Lime.Node>(assetsBundle, dstPath, node);
 						return true;
 					});
 					SyncUpdated("*.ogg", ".sound", (srcPath, dstPath) => {
 						using(var stream = new FileStream(srcPath, FileMode.Open)) {
 							// 1Mb is criteria for conversion Ogg to Wav/Adpcm
 							if (stream.Length > 1024 * 1024) {
-								AssetsBundle.ImportFile(dstPath, stream, 0);
+								assetsBundle.ImportFile(dstPath, stream, 0);
 							} else {
 								Console.WriteLine("Converting sound to ADPCM/IMA4 format...");
 								using(var input = new Lime.OggDecoder(stream)) {
 									using(var output = new MemoryStream()) {
 										WaveIMA4Converter.Encode(input, output);
 										output.Seek(0, SeekOrigin.Begin);
-										AssetsBundle.ImportFile(dstPath, output, 0);
+										assetsBundle.ImportFile(dstPath, output, 0);
 									}
 								}
 							}
@@ -115,7 +115,7 @@ namespace Orange
 					});
 				}
 			} finally {
-				AssetsBundle.Close();
+				assetsBundle.Close();
 			}
 		}
 	
@@ -127,7 +127,7 @@ namespace Orange
 					assetsFiles.Add(path);
 				}
 			}
-			foreach (string path in AssetsBundle.EnumerateFiles()) {
+			foreach (string path in assetsBundle.EnumerateFiles()) {
 				// Ignoring texture atlases
 				if (path.StartsWith("Atlases")) {
 					continue;
@@ -139,7 +139,7 @@ namespace Orange
 				string assetPath = Path.ChangeExtension(path, GetOriginalAssetExtension(path));
 				if (!assetsFiles.Contains(BundlePathToNative(assetPath))) {
 					Console.WriteLine("- " + path);
-					AssetsBundle.DeleteFile(path);
+					assetsBundle.DeleteFile(path);
 				}
 			}
 		}
@@ -149,8 +149,8 @@ namespace Orange
 			var files = Helpers.GetAllFiles(".", mask, true);
 			foreach (string srcPath in files) {
 				string dstPath = Path.ChangeExtension(srcPath, newFileExtension);
-				bool bundled = AssetsBundle.FileExists(dstPath);
-				bool needUpdate = !bundled || File.GetLastWriteTime(srcPath) > AssetsBundle.GetFileLastWriteTime(dstPath);
+				bool bundled = assetsBundle.FileExists(dstPath);
+				bool needUpdate = !bundled || File.GetLastWriteTime(srcPath) > assetsBundle.GetFileLastWriteTime(dstPath);
 				if (needUpdate) {
 					if (converter != null) {
 						try {
@@ -166,7 +166,7 @@ namespace Orange
  						Console.WriteLine((bundled ? "* " : "+ ") + Lime.AssetsBundle.CorrectSlashes(dstPath));
 						using(Stream stream = new FileStream(srcPath, FileMode.Open, FileAccess.Read)) {
 							Helpers.CreateDirectoryRecursive(Path.GetDirectoryName(dstPath));
-							AssetsBundle.ImportFile(dstPath, stream, 0);
+							assetsBundle.ImportFile(dstPath, stream, 0);
 						}
 					}
 				}
@@ -192,9 +192,9 @@ namespace Orange
 		{
 			for (int i = 0; i < 100; i++) {
 				string atlasPath = GetAtlasPath(atlasChain, i);
-				if (AssetsBundle.FileExists(atlasPath)) {
+				if (assetsBundle.FileExists(atlasPath)) {
 					Console.WriteLine("- " + atlasPath);
-					AssetsBundle.DeleteFile(atlasPath);
+					assetsBundle.DeleteFile(atlasPath);
 				} else {
 					break;
 				}
@@ -248,7 +248,7 @@ namespace Orange
 						throw new Lime.Exception("Too many textures in the atlas chain {0}", atlasChain);
 					}
 					string atlasPath = GetAtlasPath(atlasChain, atlasId);
-					var atlas = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, true, 8, i, i);  
+					var atlas = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, true, 8, i, i);
 					atlas.Fill(0);
 					bool compressed = false;
 					bool mipMapped = false;
@@ -267,13 +267,13 @@ namespace Orange
 						Helpers.CreateDirectoryRecursive(Path.GetDirectoryName(item.Path));
 						
 						//Console.WriteLine("+ " + item.Path);
-						Lime.Serialization.WriteObjectToBundle<Lime.TextureAtlasPart>(AssetsBundle, item.Path, atlasPart);
+						Lime.Serialization.WriteObjectToBundle<Lime.TextureAtlasPart>(assetsBundle, item.Path, atlasPart);
 						
 						// Delete non-atlased texture since now its useless
 						var texturePath = Path.ChangeExtension(item.Path, GetPlatformTextureExtension());
-						if (AssetsBundle.FileExists(texturePath)) {
+						if (assetsBundle.FileExists(texturePath)) {
 							//Console.WriteLine("- " + texturePath);
-							AssetsBundle.DeleteFile(texturePath);
+							assetsBundle.DeleteFile(texturePath);
 						}
 					}
 					Console.WriteLine("+ " + atlasPath);
@@ -281,7 +281,7 @@ namespace Orange
 					string outFile = Path.ChangeExtension(inFile, GetPlatformTextureExtension());
 					atlas.Save(inFile, "png");
 					TextureConverter.Convert(inFile, outFile, compressed, mipMapped, platform);
-					AssetsBundle.ImportFile(outFile, atlasPath, 0);
+					assetsBundle.ImportFile(outFile, atlasPath, 0);
 					File.Delete(inFile);
 					File.Delete(outFile);
 					items.RemoveAll(x => x.Allocated);
@@ -294,19 +294,19 @@ namespace Orange
 		{
 			var atlasChainsToRebuild = new HashSet<string>();
 			// Figure out atlas chains to rebuld
-			foreach (string atlasPartPath in AssetsBundle.EnumerateFiles()) {
+			foreach (string atlasPartPath in assetsBundle.EnumerateFiles()) {
 				if (Path.GetExtension(atlasPartPath) != ".atlasPart")
 					continue;
 				// If atlas part has been outdated we should rebuild full atlas chain
 				string srcTexturePath = Path.Combine(project.AssetsDirectory,
 					Path.ChangeExtension(atlasPartPath, GetOriginalAssetExtension(atlasPartPath)));
-				if (!File.Exists(srcTexturePath) || AssetsBundle.GetFileLastWriteTime(atlasPartPath) < File.GetLastWriteTime(srcTexturePath)) {
+				if (!File.Exists(srcTexturePath) || assetsBundle.GetFileLastWriteTime(atlasPartPath) < File.GetLastWriteTime(srcTexturePath)) {
 					var part = Lime.TextureAtlasPart.ReadFromBundle(atlasPartPath);
 					string atlasChain = Path.GetFileNameWithoutExtension(part.AtlasTexture);
 					atlasChainsToRebuild.Add(atlasChain);
 					if (!File.Exists(srcTexturePath)) {
 						Console.WriteLine("- " + atlasPartPath);
-						AssetsBundle.DeleteFile(atlasPartPath);
+						assetsBundle.DeleteFile(atlasPartPath);
 					} else {
 						srcTexturePath = Path.ChangeExtension(BundlePathToNative(atlasPartPath), ".png");
 						CookingRules rules = cookingRulesMap[srcTexturePath];
@@ -314,7 +314,7 @@ namespace Orange
 							atlasChainsToRebuild.Add(rules.TextureAtlas);
 						} else {
 							Console.WriteLine("- " + atlasPartPath);
-							AssetsBundle.DeleteFile(atlasPartPath);
+							assetsBundle.DeleteFile(atlasPartPath);
 						}
 					}
 				}
@@ -323,7 +323,7 @@ namespace Orange
 			foreach (var p in cookingRulesMap) {
 				string atlasPartPath = Path.ChangeExtension(p.Key, ".atlasPart");
 				bool atlasNeedRebuld = p.Value.TextureAtlas != null && 
-					Path.GetExtension(p.Key) == ".png" && !AssetsBundle.FileExists(atlasPartPath);
+					Path.GetExtension(p.Key) == ".png" && !assetsBundle.FileExists(atlasPartPath);
 				if (atlasNeedRebuld) {
 					atlasChainsToRebuild.Add(p.Value.TextureAtlas);
 				}

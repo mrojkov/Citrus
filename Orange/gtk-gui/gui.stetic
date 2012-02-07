@@ -156,7 +156,8 @@ iPhone/iPad</property>
                 <property name="Items" translatable="yes">Build &amp; Run
 Build Only
 Rebuild
-Make Localization Dictionary</property>
+Make Localization Dictionary
+Unpack Bundle</property>
                 <property name="Active">0</property>
               </widget>
               <packing>

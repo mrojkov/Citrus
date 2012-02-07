@@ -172,19 +172,19 @@ namespace Lime
 		static bool[] currentKeysState = new bool[(int)Key.KeyCount];
 
 		/// <summary>
-		/// The matrix describes transition from pixels to virtual coordinates. 
+		/// The matrix describes transition from pixels to virtual coordinates.
 		/// </summary>
 		public static Matrix32 ScreenToWorldTransform = Matrix32.Identity;
 
 		/// <summary>
-		/// The current mouse position in virtual coordinates coordinates.(Read Only)
+		/// The current mouse position in virtual coordinates coordinates. (read only)
 		/// </summary>
 		public static Vector2 MousePosition { get; internal set; }
 
 		/// <summary>
-		/// The current accelerometer state.(Read Only)
+		/// The current accelerometer state (read only).
 		/// </summary>
-		public static Vector3 Acceleration { get; internal set; }		
+		public static Vector3 Acceleration { get; internal set; }
 
 		/// <summary>
 		/// Returns true while the user holds down the key identified by name. Think auto fire.

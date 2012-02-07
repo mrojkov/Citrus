@@ -11,7 +11,8 @@ namespace Orange
 		BuildAndRun,
 		Build,
 		Rebuild,
-		MakeLocalizationDictionary
+		MakeLocalizationDictionary,
+		UnpackBundle,
 	}
 
 	public partial class MainWindow : Gtk.Window
@@ -32,6 +33,7 @@ namespace Orange
 			var config = AppConfig.Load();
 			CitrusProjectChooser.SetFilename(config.CitrusProject);
 			TargetPlatform.Active = config.TargetPlatform;
+			Action.Active = config.Action;
 		}
 		
 		void SaveState()
@@ -39,13 +41,13 @@ namespace Orange
 			var config = AppConfig.Load();
 			config.CitrusProject = CitrusProjectChooser.Filename;
 			config.TargetPlatform = TargetPlatform.Active;
+			config.Action = Action.Active;
 			AppConfig.Save(config);
 		}
 		
 		class LogWriter : TextWriter
 		{
 			Gtk.TextView textView;
-			int bufferedLines = 0;
 			
 			public LogWriter(Gtk.TextView textView)
 			{
@@ -92,14 +94,14 @@ namespace Orange
 			}
 		}
 		
-		private void RegisterEngineTypes(ProtoBuf.Meta.RuntimeTypeModel model)
+		void RegisterEngineTypes(ProtoBuf.Meta.RuntimeTypeModel model)
 		{
 			model.Add(typeof(Node), true);
 			model.Add(typeof(TextureAtlasPart), true);
 			model.Add(typeof(Font), true);
 		}
 
-		private bool CleanSolution()
+		bool CleanSolution()
 		{
 			var platform = (TargetPlatform)this.TargetPlatform.Active;
 			var citrusProject = new CitrusProject(CitrusProjectChooser.Filename);
@@ -116,7 +118,7 @@ namespace Orange
 			return true;
 		}
 
-		private bool BuildSolution()
+		bool BuildSolution()
 		{
 			DateTime startTime = DateTime.Now;
 			var platform = (TargetPlatform)this.TargetPlatform.Active;
@@ -143,7 +145,7 @@ namespace Orange
 			return true;
 		}
 
-		private bool RunSolution()
+		bool RunSolution()
 		{
 			var platform = (TargetPlatform)this.TargetPlatform.Active;
 			var citrusProject = new CitrusProject(CitrusProjectChooser.Filename);
@@ -152,21 +154,28 @@ namespace Orange
 			return true;
 		}
 
-		private void MakeLocalizationDictionary()
+		void MakeLocalizationDictionary()
 		{
 			var citrusProject = new CitrusProject(CitrusProjectChooser.Filename);
 			DictionaryExtractor extractor = new DictionaryExtractor(citrusProject);
 			extractor.ExtractDictionary();
 		}
 
-		private void ClearLog()
+		void ClearLog()
 		{
 			CompileLog.Buffer.Clear();
 		}
 
-		private void ScrollLogToEnd()
+		void ScrollLogToEnd()
 		{
 			CompileLog.ScrollToIter(CompileLog.Buffer.EndIter, 0, false, 0, 0);
+		}
+
+		void UnpackBundle()
+		{
+			var platform = (TargetPlatform)this.TargetPlatform.Active;
+			var citrusProject = new CitrusProject(CitrusProjectChooser.Filename);
+			AssetsUnpacker.Unpack(citrusProject, platform);
 		}
 
 		void ShowTimeStatistics(DateTime startTime)
@@ -203,6 +212,9 @@ namespace Orange
 						break;
 					case Orange.Action.MakeLocalizationDictionary:
 						MakeLocalizationDictionary();
+						break;
+					case Orange.Action.UnpackBundle:
+						UnpackBundle();
 						break;
 					}
 				} catch (System.Exception exc) {

@@ -19,6 +19,9 @@ namespace Orange
 		[ProtoMember(4)]
 		public string Unused2 = "";
 
+		[ProtoMember(5)]
+		public int Action;
+
 		public AppConfig() {}
 
 		private static string GetConfigPath()
