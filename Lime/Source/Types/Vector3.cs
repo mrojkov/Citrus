@@ -91,9 +91,13 @@ namespace Lime
 			return lhs.X * rhs.X + lhs.Y * rhs.Y + lhs.Z * rhs.Z;
 		}
 
-		public static float CrossProduct(Vector3 lhs, Vector3 rhs)
+		public static Vector3 CrossProduct(Vector3 lhs, Vector3 rhs)
 		{
-			return lhs.Y * rhs.Z + lhs.Z * rhs.X + lhs.X * rhs.Y - lhs.Z * rhs.Y - lhs.X * rhs.Z - lhs.Y * rhs.X;
+			return Vector3(
+				lhs.Y * rhs.Z - lhs.Z * rhs.Y,
+				lhs.Z * rhs.X - lhs.X * rhs.Z,
+				lhs.X * rhs.Y - lhs.Y * rhs.X
+			);
 		}
 
 		public static Vector3 Normalize(Vector3 value)
