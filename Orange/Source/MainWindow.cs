@@ -48,6 +48,9 @@ namespace Orange
 		class LogWriter : TextWriter
 		{
 			Gtk.TextView textView;
+#if !WIN
+			int bufferedLines;
+#endif
 			
 			public LogWriter(Gtk.TextView textView)
 			{
