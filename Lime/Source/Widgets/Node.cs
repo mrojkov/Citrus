@@ -56,9 +56,8 @@ namespace Lime
 			get { return animationTime; }
 			set {
 				animationTime = value;
-				int count = Nodes.Count;
-				for (int i = 0; i < count; i++) {
-					Nodes[i].Animators.Apply(animationTime);
+				foreach (Node node in Nodes) {
+					node.Animators.Apply(animationTime);
 				}
 			}
 		}
@@ -218,15 +217,15 @@ namespace Lime
 			if (Playing) {
 				AdvanceAnimation(delta);
 			}
-			for (int i = 0; i < Nodes.Count; i++) {
-				Nodes[i].Update(delta);
+			foreach (Node node in Nodes) {
+				node.Update(delta);
 			}
 		}
 
 		public virtual void LateUpdate(int delta)
 		{
-			for (int i = 0; i < Nodes.Count; i++) {
-				Nodes[i].LateUpdate(delta);
+			foreach (Node node in Nodes) {
+				node.LateUpdate(delta);
 			}
 		}
 
@@ -249,8 +248,8 @@ namespace Lime
 
 		public virtual void AddToRenderChain(RenderChain chain)
 		{
-			for (int i = 0; i < Nodes.Count; i++) {
-				Nodes[i].AddToRenderChain(chain);
+			foreach (Node node in Nodes) {
+				node.AddToRenderChain(chain);
 			}
 		}
 

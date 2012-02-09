@@ -170,8 +170,8 @@ namespace Lime
 				if (Playing) {
 					AdvanceAnimation(delta);
 				}
-				for (int i = 0; i < Nodes.Count; i++) {
-					Nodes[i].Update(delta);
+				foreach (Node node in Nodes) {
+					node.Update(delta);
 				}
 				if (Anchors != Anchors.None && Parent.Widget != null) {
 					ApplyAnchors();
@@ -187,8 +187,8 @@ namespace Lime
 			if (worldShown) {
 				if (Layer != 0)
 					chain.PushLayer(Layer);
-				for (int i = 0; i < Nodes.Count; i++) {
-					Nodes[i].AddToRenderChain(chain);
+				foreach (Node node in Nodes) {
+					node.AddToRenderChain(chain);
 				}
 				chain.Add(this);
 				if (Layer != 0)
