@@ -134,6 +134,16 @@ namespace Lime
 			Blending = Blending.Default;
 		}
 
+        public void Hide()
+        {
+            Visible = false;
+        }
+
+        public void Show()
+        {
+            Visible = true;
+        }
+
 		public void UpdateWorldProperties()
 		{
 			if (Parent != null) {
