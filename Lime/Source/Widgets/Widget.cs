@@ -170,7 +170,7 @@ namespace Lime
 				if (Playing) {
 					AdvanceAnimation(delta);
 				}
-				foreach (Node node in Nodes) {
+				foreach (Node node in Nodes.AsArray) {
 					node.Update(delta);
 				}
 				if (Anchors != Anchors.None && Parent.Widget != null) {
@@ -187,7 +187,7 @@ namespace Lime
 			if (worldShown) {
 				if (Layer != 0)
 					chain.PushLayer(Layer);
-				foreach (Node node in Nodes) {
+				foreach (Node node in Nodes.AsArray) {
 					node.AddToRenderChain(chain);
 				}
 				chain.Add(this);
@@ -240,7 +240,7 @@ namespace Lime
 					}
 					return p.X >= 0 && p.Y >= 0 && p.X < s.X && p.Y < s.Y;
 				} else if (HitTestMethod == HitTestMethod.Contents) {
-					foreach (Node node in Nodes) {
+					foreach (Node node in Nodes.AsArray) {
 						if (node.Widget != null && node.Widget.HitTest(point))
 							return true;
 					}

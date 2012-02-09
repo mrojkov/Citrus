@@ -56,7 +56,7 @@ namespace Lime
 			get { return animationTime; }
 			set {
 				animationTime = value;
-				foreach (Node node in Nodes) {
+				foreach (Node node in Nodes.AsArray) {
 					node.Animators.Apply(animationTime);
 				}
 			}
@@ -70,7 +70,8 @@ namespace Lime
 
 		public void AdvanceAnimation(int delta)
 		{
-			foreach (Marker marker in Markers) {
+			for (int i = 0; i < Markers.Count; i++) {
+				Marker marker = Markers[i];
 				int markerTime = Animator.FramesToMsecs(marker.Frame);
 				if (animationTime <= markerTime && markerTime < animationTime + delta) {
 					if (marker.Action == MarkerAction.Jump) {
@@ -89,7 +90,7 @@ namespace Lime
 					break;
 				}
 			}
-			foreach (Node node in Nodes) {
+			foreach (Node node in Nodes.AsArray) {
 				var animators = node.Animators;
 				animators.Apply(animationTime + delta);
 				animators.InvokeTriggers(animationTime, animationTime + delta);
@@ -214,14 +215,14 @@ namespace Lime
 			if (Playing) {
 				AdvanceAnimation(delta);
 			}
-			foreach (Node node in Nodes) {
+			foreach (Node node in Nodes.AsArray) {
 				node.Update(delta);
 			}
 		}
 
 		public virtual void LateUpdate(int delta)
 		{
-			foreach (Node node in Nodes) {
+			foreach (Node node in Nodes.AsArray) {
 				node.LateUpdate(delta);
 			}
 		}
@@ -245,7 +246,7 @@ namespace Lime
 
 		public virtual void AddToRenderChain(RenderChain chain)
 		{
-			foreach (Node node in Nodes) {
+			foreach (Node node in Nodes.AsArray) {
 				node.AddToRenderChain(chain);
 			}
 		}
@@ -255,7 +256,7 @@ namespace Lime
 			if (!string.IsNullOrEmpty(ContentsPath))
 				LoadContentsHelper();
 			else {
-				foreach (Node node in Nodes)
+				foreach (Node node in Nodes.AsArray)
 					node.LoadContents();
 			}
 		}
@@ -273,7 +274,7 @@ namespace Lime
 				}
 				foreach (Marker marker in contents.Markers)
 					Markers.Add(marker);
-				foreach (Node node in contents.Nodes)
+				foreach (Node node in contents.Nodes.AsArray)
 					Nodes.Add(node);
 			}
 		}
@@ -321,11 +322,11 @@ namespace Lime
 			queue.Enqueue(this);
 			while (queue.Count > 0) {
 				Node node = queue.Dequeue();
-				foreach (Node child in node.Nodes) {
+				foreach (Node child in node.Nodes.AsArray) {
 					if (child.Id == id)
 						return child;
 				}
-				foreach (Node child in node.Nodes)
+				foreach (Node child in node.Nodes.AsArray)
 					queue.Enqueue(child);
 			}
 			if (throwException)
