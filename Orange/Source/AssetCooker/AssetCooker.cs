@@ -6,7 +6,7 @@ namespace Orange
 {
 	public class AssetCooker
 	{
-		private delegate bool Converter(string srcPath, string dstPath);
+		private delegate bool Converter(string srcPath,string dstPath);
 
 		private Lime.AssetsBundle assetsBundle = Lime.AssetsBundle.Instance;
 		private CitrusProject project;
@@ -15,7 +15,7 @@ namespace Orange
 
 		string GetOriginalAssetExtension(string path)
 		{
-			switch(Path.GetExtension(path)) {
+			switch (Path.GetExtension(path)) {
 			case ".dds":
 			case ".pvr":
 			case ".atlasPart":
@@ -52,7 +52,7 @@ namespace Orange
 			string bundlePath = Path.ChangeExtension(project.AssetsDirectory, Helpers.GetTargetPlatformString(platform));
 			assetsBundle.Open(bundlePath, true);
 			try {
-				using(new DirectoryChanger(project.AssetsDirectory)) {
+				using (new DirectoryChanger(project.AssetsDirectory)) {
 					Console.WriteLine("------------- Building Game Assets -------------");
 					SyncAtlases();
 					SyncDeleted();
@@ -96,14 +96,14 @@ namespace Orange
 						return true;
 					});
 					SyncUpdated("*.ogg", ".sound", (srcPath, dstPath) => {
-						using(var stream = new FileStream(srcPath, FileMode.Open)) {
+						using (var stream = new FileStream(srcPath, FileMode.Open)) {
 							// 1Mb is criteria for conversion Ogg to Wav/Adpcm
 							if (stream.Length > 1024 * 1024) {
 								assetsBundle.ImportFile(dstPath, stream, 0);
 							} else {
 								Console.WriteLine("Converting sound to ADPCM/IMA4 format...");
-								using(var input = new Lime.OggDecoder(stream)) {
-									using(var output = new MemoryStream()) {
+								using (var input = new Lime.OggDecoder(stream)) {
+									using (var output = new MemoryStream()) {
 										WaveIMA4Converter.Encode(input, output);
 										output.Seek(0, SeekOrigin.Begin);
 										assetsBundle.ImportFile(dstPath, output, 0);
@@ -122,7 +122,7 @@ namespace Orange
 		void SyncDeleted()
 		{
 			var assetsFiles = new HashSet<string>();
-			using(new DirectoryChanger(project.AssetsDirectory)) {
+			using (new DirectoryChanger(project.AssetsDirectory)) {
 				foreach (string path in Helpers.GetAllFiles(".", "*.*", true)) {
 					assetsFiles.Add(path);
 				}
@@ -144,7 +144,7 @@ namespace Orange
 			}
 		}
 
-		void SyncUpdated(string mask, string newFileExtension, Converter converter)
+		void SyncUpdated(string mask,string newFileExtension,Converter converter)
 		{
 			var files = Helpers.GetAllFiles(".", mask, true);
 			foreach (string srcPath in files) {
@@ -161,10 +161,9 @@ namespace Orange
 							Console.WriteLine("An exception was caught while processing '{0}'", srcPath);
 							throw;
 						}
-					}
-					else {
- 						Console.WriteLine((bundled ? "* " : "+ ") + Lime.AssetsBundle.CorrectSlashes(dstPath));
-						using(Stream stream = new FileStream(srcPath, FileMode.Open, FileAccess.Read)) {
+					} else {
+						Console.WriteLine((bundled ? "* " : "+ ") + Lime.AssetsBundle.CorrectSlashes(dstPath));
+						using (Stream stream = new FileStream(srcPath, FileMode.Open, FileAccess.Read)) {
 							Helpers.CreateDirectoryRecursive(Path.GetDirectoryName(dstPath));
 							assetsBundle.ImportFile(dstPath, stream, 0);
 						}
@@ -183,7 +182,7 @@ namespace Orange
 			public bool Compressed;
 		}
 		
-		string GetAtlasPath(string atlasChain, int index)
+		string GetAtlasPath(string atlasChain,int index)
 		{
 			return Path.Combine("Atlases", atlasChain + "." + index.ToString("00") + GetPlatformTextureExtension());
 		}
@@ -199,7 +198,7 @@ namespace Orange
 					break;
 				}
 			}
-			int maxAtlasSize =(platform == TargetPlatform.Desktop) ? 2048 : 1024;
+			int maxAtlasSize = (platform == TargetPlatform.Desktop) ? 2048 : 1024;
 			var items = new List<AtlasItem>();
 			foreach (var p in cookingRulesMap) {
 				if (p.Value.TextureAtlas == atlasChain && Path.GetExtension(p.Key) == ".png") {

@@ -13,11 +13,16 @@ namespace Lime
 	public interface IAudioDecoder : IDisposable
 	{
 		AudioFormat GetFormat();
+
 		int GetFrequency();
+
 		int GetCompressedSize();
+
 		void Rewind();
+
 		int GetBlockSize();
-		int ReadBlocks(IntPtr buffer, int startIndex, int blockCount);
+
+		int ReadBlocks(IntPtr buffer,int startIndex,int blockCount);
 	}
 
 	public class AudioDecoderFactory

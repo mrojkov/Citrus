@@ -10,7 +10,6 @@ namespace Orange
 		public bool MipMaps;
 		public bool Compression;
 		public DateTime LastChangeTime;
-
 		public static CookingRules Default = new CookingRules {
 			TextureAtlas = null, MipMaps = false, 
 			Compression = true, LastChangeTime = new DateTime(0)};
@@ -25,7 +24,7 @@ namespace Orange
 			var map = new Dictionary<string, CookingRules>();
 			pathStack.Push("");
 			rulesStack.Push(CookingRules.Default);
-			using(new DirectoryChanger(assetsDirectory)) {
+			using (new DirectoryChanger(assetsDirectory)) {
 				var files = Helpers.GetAllFiles(".", "*.*", true);
 				foreach (string path in files) {
 					if (!path.StartsWith(pathStack.Peek())) {
@@ -55,18 +54,18 @@ namespace Orange
 		{
 			if (value != "Yes" && value != "No")
 				throw new Lime.Exception("Invalid value. Must be either 'Yes' or 'No'");
-			return value == "Yes";	
-		}	
+			return value == "Yes";
+		}
 		
 		static CookingRules ParseCookingRules(CookingRules basicRules, string path)
-		{
+		{ 
 			var rules = basicRules;
 			try {
 				rules.LastChangeTime = File.GetLastWriteTime(path);
-				using(var s = new FileStream(path, FileMode.Open)) {
+				using (var s = new FileStream(path, FileMode.Open)) {
 					TextReader r = new StreamReader(s);
 					string line;
-	 				while ((line = r.ReadLine()) != null) {
+					while ((line = r.ReadLine()) != null) {
 						line = line.Trim();
 						if (line == "") {
 							continue;
@@ -75,13 +74,19 @@ namespace Orange
 						if (words.Length != 2) {
 							throw new Lime.Exception("Invalid line format");
 						}
-						switch(words[0])
-						{
+						switch (words[0]) {
 						case "TextureAtlas":
 							if (words[1] == "None")
 								rules.TextureAtlas = null;
-							else
+							else if (words[1] == "${DirectoryName}") {
+								string atlasName = Path.GetFileName(Path.GetDirectoryName(path));
+								if (string.IsNullOrEmpty(atlasName)) {
+									throw new Lime.Exception("Atlas directory is empty. Choose another atlas name");
+								}
+								rules.TextureAtlas = atlasName;
+							} else {
 								rules.TextureAtlas = words[1];
+							}
 							break;
 						case "MipMaps":
 							rules.MipMaps = ParseBool(words[1]);

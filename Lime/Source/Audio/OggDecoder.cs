@@ -83,7 +83,7 @@ namespace Lime
 			return 1;
 		}
 
-		public int ReadBlocks(IntPtr buffer, int startIndex, int blockCount)
+		public int ReadBlocks(IntPtr buffer,int startIndex,int blockCount)
 		{
 			int actualCount = 0;
 			int requestCount = blockCount;
@@ -103,7 +103,7 @@ namespace Lime
 #if iOS
 		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.ReadCallback))]
 #endif
-		public static uint OggRead(IntPtr buffer, uint size, uint nmemb, int handle)
+		public static uint OggRead(IntPtr buffer,uint size,uint nmemb,int handle)
 		{
 			byte[] block = new byte[1024 * 16];
 			int actualCount = 0;
@@ -131,7 +131,7 @@ namespace Lime
 #if iOS
 		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.SeekCallback))]
 #endif
-		public static int OggSeek(int handle, long offset, SeekOrigin whence)
+		public static int OggSeek(int handle,long offset,SeekOrigin whence)
 		{
 			var stream = streamMap[handle];
 			return (int)stream.Seek(offset, whence);
@@ -172,8 +172,7 @@ namespace Lime
 			}
 		}
 
-		public Stream this[int slot]
-		{
+		public Stream this[int slot] {
 			get {
 				return map[slot];
 			}

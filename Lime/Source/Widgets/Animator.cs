@@ -49,7 +49,7 @@ namespace Lime
 			return frames << 6;
 		}
 
-		protected abstract Array values { get; }
+		protected abstract Array Values { get; }
 
 		protected abstract void ResizeValuesArray(int newSize);
 
@@ -62,10 +62,10 @@ namespace Lime
 		public string TargetProperty;
 
 		[ProtoMember(2)]
-		int[] frames = new int[0];
+		public int[] Frames = new int[0];
 
 		[ProtoMember(3)]
-		KeyFunction[] functions = new KeyFunction[0];
+		public KeyFunction[] Functions = new KeyFunction[0];
 
 		protected int currentKey = 0;
 		
@@ -101,17 +101,17 @@ namespace Lime
 
 		public void Clear()
 		{
-			frames = new int[0];
-			functions = new KeyFunction[0];
+			Frames = new int[0];
+			Functions = new KeyFunction[0];
 			ResizeValuesArray(0);
 			currentKey = 0;
 		}
 
 		public void InvokeTrigger(int intervalBegin, int intervalEnd)
 		{
-			if (frames.Length > 0) {
+			if (Frames.Length > 0) {
 				// This function relies on currentKey value. Therefore Apply(time) must be called before.
-				int t = FramesToMsecs(frames[currentKey]);
+				int t = FramesToMsecs(Frames[currentKey]);
 				if (t >= intervalBegin && t < intervalEnd) {
 					Owner.OnTrigger(TargetProperty);
 				}
@@ -120,13 +120,13 @@ namespace Lime
 
 		public void Apply(int time)
 		{
-			int count = frames.Length;
+			int count = Frames.Length;
 			if (count == 0)
 				return;
 			int frame = MsecsToFrames(time);
-			while (currentKey < count - 1 && frame > frames[currentKey])
+			while (currentKey < count - 1 && frame > Frames[currentKey])
 				currentKey++;
-			while (currentKey >= 0 && frame < frames[currentKey])
+			while (currentKey >= 0 && frame < Frames[currentKey])
 				currentKey--;
 			if (currentKey < 0) {
 				ApplyValue(0);
@@ -141,21 +141,20 @@ namespace Lime
 		private void ApplyHelper(int time)
 		{
 			int i = currentKey;
-			KeyFunction function = functions[i];
+			KeyFunction function = Functions[i];
 			if (function == KeyFunction.Steep) {
 				ApplyValue(i);
-			}
-			else {
-				int t0 = FramesToMsecs(frames[i]);
-				int t1 = FramesToMsecs(frames[i + 1]);
+			} else {
+				int t0 = FramesToMsecs(Frames[i]);
+				int t1 = FramesToMsecs(Frames[i + 1]);
 				float t = (time - t0) / (float)(t1 - t0);
-				switch(function) {
+				switch (function) {
 				case KeyFunction.Linear:
 					ApplyValue(t, i, i + 1);
 					break;
 				case KeyFunction.Spline:
 					{
-						int count = frames.Length;
+						int count = Frames.Length;
 						int a = i < 1 ? 0 : i - 1;
 						int b = i;
 						int c = i + 1;
@@ -165,7 +164,7 @@ namespace Lime
 					break;
 				case KeyFunction.ClosedSpline:
 					{
-						int count = frames.Length;
+						int count = Frames.Length;
 						int a = i < 1 ? count - 1 : i - 1;
 						int b = i;
 						int c = i + 1;
@@ -179,9 +178,9 @@ namespace Lime
 
 		public int Duration {
 			get {
-				if (frames.Length == 0)
+				if (Frames.Length == 0)
 					return 0;
-				return frames[frames.Length - 1];
+				return Frames[Frames.Length - 1];
 			}
 		}
 
@@ -190,29 +189,29 @@ namespace Lime
 			if (!IsEvaluable()) {
 				key.Function = KeyFunction.Steep;
 			}
-			int c = frames.Length;
-			Array.Resize<int>(ref frames, c + 1);
-			Array.Resize<KeyFunction>(ref functions, c + 1);
+			int c = Frames.Length;
+			Array.Resize<int>(ref Frames, c + 1);
+			Array.Resize<KeyFunction>(ref Functions, c + 1);
 			ResizeValuesArray(c + 1);
-			frames[c] = key.Frame;
-			functions[c] = key.Function;
-			values.SetValue(key.Value, c);
+			Frames[c] = key.Frame;
+			Functions[c] = key.Function;
+			Values.SetValue(key.Value, c);
 		}
 
 		public KeyFrame this[int index] { 
 			get {
 				return new KeyFrame { 
-					Frame = frames[index], 
-					Function = functions[index], 
-					Value = values.GetValue(index) };
+					Frame = Frames[index], 
+					Function = Functions[index], 
+					Value = Values.GetValue(index) };
 			} 
 			set {
 				if (!IsEvaluable()) {
 					value.Function = KeyFunction.Steep;
 				}
-				frames[index] = value.Frame;
-				functions[index] = value.Function;
-				values.SetValue(value.Value, index);
+				Frames[index] = value.Frame;
+				Functions[index] = value.Function;
+				Values.SetValue(value.Value, index);
 			}
 		}
 		
@@ -268,7 +267,7 @@ namespace Lime
 	public class GenericAnimator<T> : AnimatorHelper<T>
 	{
 		[ProtoMember(1)]
-		T[] v = new T[0];
+		public T[] v = new T[0];
 
 		protected override bool IsEvaluable()
 		{
@@ -280,7 +279,7 @@ namespace Lime
 			Array.Resize<T>(ref v, newSize);
 		}
 
-		protected override Array values { get { return v; } }
+		protected override Array Values { get { return v; } }
 
 		protected override void ApplyValue(int i)
 		{
@@ -292,9 +291,9 @@ namespace Lime
 	public class Vector2Animator : AnimatorHelper<Vector2>
 	{
 		[ProtoMember(1)]
-		Vector2[] v = new Vector2[0];
+		public Vector2[] v = new Vector2[0];
 
-		protected override Array values { get { return v; } }
+		protected override Array Values { get { return v; } }
 
 		protected override void ResizeValuesArray(int newSize)
 		{
@@ -321,9 +320,9 @@ namespace Lime
 	public class NumericAnimator : AnimatorHelper<float>
 	{
 		[ProtoMember(1)]
-		float[] v = new float[0];
+		public float[] v = new float[0];
 
-		protected override Array values { get { return v; } }
+		protected override Array Values { get { return v; } }
 
 		protected override void ResizeValuesArray(int newSize)
 		{
@@ -352,9 +351,9 @@ namespace Lime
 	public class Color4Animator : AnimatorHelper<Color4>
 	{
 		[ProtoMember(1)]
-		Color4[] v = new Color4[0];
+		public Color4[] v = new Color4[0];
 
-		protected override Array values { get { return v; } }
+		protected override Array Values { get { return v; } }
 
 		protected override void ResizeValuesArray(int newSize)
 		{
