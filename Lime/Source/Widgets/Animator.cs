@@ -48,8 +48,10 @@ namespace Lime
 		{
 			return frames << 6;
 		}
-		
-		public abstract System.Collections.IList Values { get; }
+
+		protected abstract Array values { get; }
+
+		protected abstract void ResizeValuesArray(int newSize);
 
 		protected Node Owner;
 		internal bool IsTriggerable;
@@ -60,10 +62,10 @@ namespace Lime
 		public string TargetProperty;
 
 		[ProtoMember(2)]
-		public readonly List<int> Frames = new List<int>();
+		int[] frames = new int[0];
 
 		[ProtoMember(3)]
-		public readonly List<KeyFunction> Functions = new List<KeyFunction>();
+		KeyFunction[] functions = new KeyFunction[0];
 
 		protected int currentKey = 0;
 		
@@ -91,25 +93,25 @@ namespace Lime
 
 		public void Remove(int index)
 		{
-			Frames.RemoveAt(index);
-			Functions.RemoveAt(index);
-			Values.RemoveAt(index);
+			//Frames.RemoveAt(index);
+			//Functions.RemoveAt(index);
+			//Values.RemoveAt(index);
 			currentKey = 0;
 		}
 
 		public void Clear()
 		{
-			Frames.Clear();
-			Functions.Clear();
-			Values.Clear();
+			frames = new int[0];
+			functions = new KeyFunction[0];
+			ResizeValuesArray(0);
 			currentKey = 0;
 		}
 
 		public void InvokeTrigger(int intervalBegin, int intervalEnd)
 		{
-			if (Frames.Count > 0) {
+			if (frames.Length > 0) {
 				// This function relies on currentKey value. Therefore Apply(time) must be called before.
-				int t = FramesToMsecs(Frames[currentKey]);
+				int t = FramesToMsecs(frames[currentKey]);
 				if (t >= intervalBegin && t < intervalEnd) {
 					Owner.OnTrigger(TargetProperty);
 				}
@@ -118,13 +120,13 @@ namespace Lime
 
 		public void Apply(int time)
 		{
-			int count = Frames.Count;
+			int count = frames.Length;
 			if (count == 0)
 				return;
 			int frame = MsecsToFrames(time);
-			while (currentKey < count - 1 && frame > Frames[currentKey])
+			while (currentKey < count - 1 && frame > frames[currentKey])
 				currentKey++;
-			while (currentKey >= 0 && frame < Frames[currentKey])
+			while (currentKey >= 0 && frame < frames[currentKey])
 				currentKey--;
 			if (currentKey < 0) {
 				ApplyValue(0);
@@ -139,13 +141,13 @@ namespace Lime
 		private void ApplyHelper(int time)
 		{
 			int i = currentKey;
-			KeyFunction function = Functions[i];
+			KeyFunction function = functions[i];
 			if (function == KeyFunction.Steep) {
 				ApplyValue(i);
 			}
 			else {
-				int t0 = FramesToMsecs(Frames[i]);
-				int t1 = FramesToMsecs(Frames[i + 1]);
+				int t0 = FramesToMsecs(frames[i]);
+				int t1 = FramesToMsecs(frames[i + 1]);
 				float t = (time - t0) / (float)(t1 - t0);
 				switch(function) {
 				case KeyFunction.Linear:
@@ -153,7 +155,7 @@ namespace Lime
 					break;
 				case KeyFunction.Spline:
 					{
-						int count = Frames.Count;
+						int count = frames.Length;
 						int a = i < 1 ? 0 : i - 1;
 						int b = i;
 						int c = i + 1;
@@ -163,7 +165,7 @@ namespace Lime
 					break;
 				case KeyFunction.ClosedSpline:
 					{
-						int count = Frames.Count;
+						int count = frames.Length;
 						int a = i < 1 ? count - 1 : i - 1;
 						int b = i;
 						int c = i + 1;
@@ -177,9 +179,9 @@ namespace Lime
 
 		public int Duration {
 			get {
-				if (Frames.Count == 0)
+				if (frames.Length == 0)
 					return 0;
-				return Frames[Frames.Count - 1];
+				return frames[frames.Length - 1];
 			}
 		}
 
@@ -188,48 +190,52 @@ namespace Lime
 			if (!IsEvaluable()) {
 				key.Function = KeyFunction.Steep;
 			}
-			Frames.Add(key.Frame);
-			Functions.Add(key.Function);
-			Values.Add(key.Value);
+			int c = frames.Length;
+			Array.Resize<int>(ref frames, c + 1);
+			Array.Resize<KeyFunction>(ref functions, c + 1);
+			ResizeValuesArray(c + 1);
+			frames[c] = key.Frame;
+			functions[c] = key.Function;
+			values.SetValue(key.Value, c);
 		}
 
 		public KeyFrame this[int index] { 
 			get {
 				return new KeyFrame { 
-					Frame = Frames[index], 
-					Function = Functions[index], 
-					Value = Values[index] };
+					Frame = frames[index], 
+					Function = functions[index], 
+					Value = values.GetValue(index) };
 			} 
 			set {
 				if (!IsEvaluable()) {
 					value.Function = KeyFunction.Steep;
 				}
-				Frames[index] = value.Frame;
-				Functions[index] = value.Function;
-				Values[index] = value.Value;
+				frames[index] = value.Frame;
+				functions[index] = value.Function;
+				values.SetValue(value.Value, index);
 			}
 		}
 		
-		protected struct Property
+		protected struct PropertyData
 		{
 			public PropertyInfo Info;
 			public bool Triggerable;
 		}
 		
-		static Dictionary<string, List<Property>> propertyCache = new Dictionary<string, List<Property>>();
+		static Dictionary<string, List<PropertyData>> propertyCache = new Dictionary<string, List<PropertyData>>();
 		
-		protected static Property GetProperty(Type ownerType, string propertyName)
+		protected static PropertyData GetProperty(Type ownerType, string propertyName)
 		{
-			List<Property> plist;
+			List<PropertyData> plist;
 			if (!propertyCache.TryGetValue(propertyName, out plist)) {
-				plist = new List<Property>();
+				plist = new List<PropertyData>();
 				propertyCache[propertyName] = plist;
 			}
-			foreach (Property i in plist) {
+			foreach (PropertyData i in plist) {
 				if (ownerType.IsSubclassOf(i.Info.DeclaringType))
 					return i;
 			}
-			var p = new Property();
+			var p = new PropertyData();
 			p.Info = ownerType.GetProperty(propertyName);
 			if (p.Info == null)
 				throw new Lime.Exception("Property '{0}' doesn't exist for class '{1}'", propertyName, ownerType);
@@ -249,7 +255,7 @@ namespace Lime
 		internal override void Bind(Node owner)
 		{
 			Owner = owner;
-			Property p = GetProperty(owner.GetType(), TargetProperty);
+			PropertyData p = GetProperty(owner.GetType(), TargetProperty);
 			IsTriggerable = p.Triggerable;
 			var mi = p.Info.GetSetMethod();
 			if (mi == null)
@@ -262,18 +268,23 @@ namespace Lime
 	public class GenericAnimator<T> : AnimatorHelper<T>
 	{
 		[ProtoMember(1)]
-		public readonly List<T> V = new List<T>();
+		T[] v = new T[0];
 
 		protected override bool IsEvaluable()
 		{
 			return false;
 		}
 
-		public override System.Collections.IList Values { get { return V; } }
+		protected override void ResizeValuesArray(int newSize)
+		{
+			Array.Resize<T>(ref v, newSize);
+		}
+
+		protected override Array values { get { return v; } }
 
 		protected override void ApplyValue(int i)
 		{
-			Setter(V[i]);
+			Setter(v[i]);
 		}
 	}
 
@@ -281,23 +292,28 @@ namespace Lime
 	public class Vector2Animator : AnimatorHelper<Vector2>
 	{
 		[ProtoMember(1)]
-		public readonly List<Vector2> V = new List<Vector2>();
-		
-		public override System.Collections.IList Values { get { return V; } }
+		Vector2[] v = new Vector2[0];
+
+		protected override Array values { get { return v; } }
+
+		protected override void ResizeValuesArray(int newSize)
+		{
+			Array.Resize<Vector2>(ref v, newSize);
+		}
 
 		protected override void ApplyValue(int i)
 		{
-			Setter(V[i]);
+			Setter(v[i]);
 		}
 		
 		protected override void ApplyValue(float t, int a, int b)
 		{
-			Setter(Vector2.Lerp(V[a], V[b], t));
+			Setter(Vector2.Lerp(v[a], v[b], t));
 		}
 
 		protected override void ApplyValue(float t, int a, int b, int c, int d)
 		{
-			Setter(Utils.CatmullRomSpline(t, V[a], V[b], V[c], V[d]));
+			Setter(Utils.CatmullRomSpline(t, v[a], v[b], v[c], v[d]));
 		}
 	}
 
@@ -305,25 +321,30 @@ namespace Lime
 	public class NumericAnimator : AnimatorHelper<float>
 	{
 		[ProtoMember(1)]
-		public readonly List<float> V = new List<float>();
-		
-		public override System.Collections.IList Values { get { return V; } }
+		float[] v = new float[0];
+
+		protected override Array values { get { return v; } }
+
+		protected override void ResizeValuesArray(int newSize)
+		{
+			Array.Resize<float>(ref v, newSize);
+		}
 
 		protected override void ApplyValue(int i)
 		{
-			Setter(V[i]);
+			Setter(v[i]);
 		}
 
 		protected override void ApplyValue(float t, int a, int b)
 		{
-			float va = V[a];
-			float vb = V[b];
+			float va = v[a];
+			float vb = v[b];
 			Setter(t * (vb - va) + va);
 		}
 
 		protected override void ApplyValue(float t, int a, int b, int c, int d)
 		{
-			Setter(Utils.CatmullRomSpline(t, V[a], V[b], V[c], V[d]));
+			Setter(Utils.CatmullRomSpline(t, v[a], v[b], v[c], v[d]));
 		}
 	}
 	
@@ -331,18 +352,23 @@ namespace Lime
 	public class Color4Animator : AnimatorHelper<Color4>
 	{
 		[ProtoMember(1)]
-		public readonly List<Color4> V = new List<Color4>();
-		
-		public override System.Collections.IList Values { get { return V; } }
+		Color4[] v = new Color4[0];
+
+		protected override Array values { get { return v; } }
+
+		protected override void ResizeValuesArray(int newSize)
+		{
+			Array.Resize<Color4>(ref v, newSize);
+		}
 
 		protected override void ApplyValue(int i)
 		{
-			Setter(V[i]);
+			Setter(v[i]);
 		}
 
 		protected override void ApplyValue(float t, int a, int b)
 		{
-			Setter(Color4.Lerp(V[a], V[b], t));
+			Setter(Color4.Lerp(v[a], v[b], t));
 		}
 	}
 }

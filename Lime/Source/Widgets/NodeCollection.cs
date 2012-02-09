@@ -12,54 +12,56 @@ namespace Lime
 		static List<Node> emptyList = new List<Node>();
 		static Node[] emptyArray = new Node[0];
 
-		List<Node> nodesList = emptyList;
-		Node[] nodesArray;
+		List<Node> nodeList = emptyList;
+		Node[] nodeArray;
 		internal Node Owner;
 
 		public Node[] AsArray
 		{
 			get
 			{
-				if (nodesArray == null) {
-					if (nodesList.Count > 0) {
-						nodesArray = new Node[nodesList.Count];
-						nodesList.CopyTo(nodesArray);
+				if (nodeArray == null) {
+					if (nodeList.Count > 0) {
+						nodeArray = new Node[nodeList.Count];
+						nodeList.CopyTo(nodeArray);
 					} else {
-						nodesArray = emptyArray;
+						nodeArray = emptyArray;
 					}
 				}
-				return nodesArray;
+				return nodeArray;
 			}
 		}
 
 		public int IndexOf(Node node)
 		{
-			int count = Count;
-			for (int i = 0; i < count; i++)
-				if (nodesList[i] == node)
+			int i = 0;
+			foreach (var current in this.AsArray) {
+				if (current == node)
 					return i;
+				i++;
+			}
 			return -1;
 		}
 		
 		public Node this[int index] {
-			get { return nodesList[index]; }
+			get { return nodeList[index]; }
 		}
 
 		void ICollection<Node>.CopyTo(Node[] n, int index)
 		{
-			nodesList.CopyTo(n, index);
+			nodeList.CopyTo(n, index);
 		}
 
-		public int Count { get { return nodesList.Count; } }
+		public int Count { get { return nodeList.Count; } }
 
 		public IEnumerator<Node> GetEnumerator()
 		{
-			return nodesList.GetEnumerator();
+			return nodeList.GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return nodesList.GetEnumerator();
+			return nodeList.GetEnumerator();
 		}
 
 		bool ICollection<Node>.IsReadOnly {
@@ -68,55 +70,55 @@ namespace Lime
 
 		public void Sort(Comparison<Node> comparison)
 		{
-			nodesList.Sort(comparison);
-			if (nodesArray != null) {
-				nodesList.CopyTo(nodesArray);
+			nodeList.Sort(comparison);
+			if (nodeArray != null) {
+				nodeList.CopyTo(nodeArray);
 			}
 		}
 
 		public bool Contains(Node node)
 		{
-			return nodesList.Contains(node);
+			return nodeList.Contains(node);
 		}
 
 		public void Add(Node node)
 		{
-			nodesArray = null;
-			if (nodesList == emptyList) {
-				nodesList = new List<Node>();
+			nodeArray = null;
+			if (nodeList == emptyList) {
+				nodeList = new List<Node>();
 			}
 			node.Parent = Owner;
-			nodesList.Add(node);
+			nodeList.Add(node);
 		}
 
 		public void Insert(int index, Node node)
 		{
-			nodesArray = null;
-			if (nodesList == emptyList) {
-				nodesList = new List<Node>();
+			nodeArray = null;
+			if (nodeList == emptyList) {
+				nodeList = new List<Node>();
 			}
 			node.Parent = Owner;
-			nodesList.Insert(index, node);
+			nodeList.Insert(index, node);
 		}
 
 		public bool Remove(Node node)
 		{
 			bool result = false;
-			if (nodesList.Remove(node)) {
+			if (nodeList.Remove(node)) {
 				node.Parent = null;
 				result = true;
-				nodesArray = null;
+				nodeArray = null;
 			}
-			if (nodesList.Count == 0) {
-				nodesList = emptyList;
+			if (nodeList.Count == 0) {
+				nodeList = emptyList;
 			}
 			return result;
 		}
 
 		public void Clear()
 		{
-			nodesArray = null;
-			nodesList = emptyList;
+			nodeArray = null;
+			nodeList = emptyList;
 		}
 
 		public Node Get(string id)
