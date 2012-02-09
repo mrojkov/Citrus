@@ -57,15 +57,17 @@ namespace Lime
 		internal bool IsTriggerable;
 
 		internal abstract void Bind(Node owner);
-
+		
 		[ProtoMember(1)]
 		public string TargetProperty;
-
+		
+		static int[] emptyFrames = new int[0];
 		[ProtoMember(2)]
-		public int[] Frames = new int[0];
-
+		public int[] Frames = emptyFrames;
+		
+		static KeyFunction[] emptyFunctions = new KeyFunction[0];
 		[ProtoMember(3)]
-		public KeyFunction[] Functions = new KeyFunction[0];
+		public KeyFunction[] Functions = emptyFunctions;
 
 		protected int currentKey = 0;
 		
@@ -89,14 +91,6 @@ namespace Lime
 		protected virtual void ApplyValue(float t, int a, int b, int c, int d)
 		{
 			ApplyValue(t, b, c);
-		}
-
-		public void Remove(int index)
-		{
-			//Frames.RemoveAt(index);
-			//Functions.RemoveAt(index);
-			//Values.RemoveAt(index);
-			currentKey = 0;
 		}
 
 		public void Clear()
@@ -190,6 +184,9 @@ namespace Lime
 				key.Function = KeyFunction.Steep;
 			}
 			int c = Frames.Length;
+			if (c > 0 && Frames[c - 1] >= key.Frame) {
+				throw new Lime.Exception("Key frames must be added in ascendant order");
+			}
 			Array.Resize<int>(ref Frames, c + 1);
 			Array.Resize<KeyFunction>(ref Functions, c + 1);
 			ResizeValuesArray(c + 1);
@@ -266,8 +263,10 @@ namespace Lime
 	[ProtoContract]
 	public class GenericAnimator<T> : AnimatorHelper<T>
 	{
+		static T[] emptyValues = new T[0];
+		
 		[ProtoMember(1)]
-		public T[] v = new T[0];
+		public T[] values = emptyValues;
 
 		protected override bool IsEvaluable()
 		{
@@ -276,98 +275,104 @@ namespace Lime
 
 		protected override void ResizeValuesArray(int newSize)
 		{
-			Array.Resize<T>(ref v, newSize);
+			Array.Resize<T>(ref values, newSize);
 		}
 
-		protected override Array Values { get { return v; } }
+		protected override Array Values { get { return values; } }
 
 		protected override void ApplyValue(int i)
 		{
-			Setter(v[i]);
+			Setter(values[i]);
 		}
 	}
 
 	[ProtoContract]
 	public class Vector2Animator : AnimatorHelper<Vector2>
 	{
+		static Vector2[] emptyValues = new Vector2[0];
+		
 		[ProtoMember(1)]
-		public Vector2[] v = new Vector2[0];
+		public Vector2[] values = emptyValues;
 
-		protected override Array Values { get { return v; } }
+		protected override Array Values { get { return values; } }
 
 		protected override void ResizeValuesArray(int newSize)
 		{
-			Array.Resize<Vector2>(ref v, newSize);
+			Array.Resize<Vector2>(ref values, newSize);
 		}
 
 		protected override void ApplyValue(int i)
 		{
-			Setter(v[i]);
+			Setter(values[i]);
 		}
 		
 		protected override void ApplyValue(float t, int a, int b)
 		{
-			Setter(Vector2.Lerp(v[a], v[b], t));
+			Setter(Vector2.Lerp(values[a], values[b], t));
 		}
 
 		protected override void ApplyValue(float t, int a, int b, int c, int d)
 		{
-			Setter(Utils.CatmullRomSpline(t, v[a], v[b], v[c], v[d]));
+			Setter(Utils.CatmullRomSpline(t, values[a], values[b], values[c], values[d]));
 		}
 	}
 
 	[ProtoContract]
 	public class NumericAnimator : AnimatorHelper<float>
 	{
+		static float[] emptyValues = new float[0];
+		
 		[ProtoMember(1)]
-		public float[] v = new float[0];
+		public float[] values = emptyValues;
 
-		protected override Array Values { get { return v; } }
+		protected override Array Values { get { return values; } }
 
 		protected override void ResizeValuesArray(int newSize)
 		{
-			Array.Resize<float>(ref v, newSize);
+			Array.Resize<float>(ref values, newSize);
 		}
 
 		protected override void ApplyValue(int i)
 		{
-			Setter(v[i]);
+			Setter(values[i]);
 		}
 
 		protected override void ApplyValue(float t, int a, int b)
 		{
-			float va = v[a];
-			float vb = v[b];
+			float va = values[a];
+			float vb = values[b];
 			Setter(t * (vb - va) + va);
 		}
 
 		protected override void ApplyValue(float t, int a, int b, int c, int d)
 		{
-			Setter(Utils.CatmullRomSpline(t, v[a], v[b], v[c], v[d]));
+			Setter(Utils.CatmullRomSpline(t, values[a], values[b], values[c], values[d]));
 		}
 	}
 	
 	[ProtoContract]
 	public class Color4Animator : AnimatorHelper<Color4>
 	{
+		static Color4[] emptyValues = new Color4[0];
+		
 		[ProtoMember(1)]
-		public Color4[] v = new Color4[0];
+		public Color4[] values = emptyValues;
 
-		protected override Array Values { get { return v; } }
+		protected override Array Values { get { return values; } }
 
 		protected override void ResizeValuesArray(int newSize)
 		{
-			Array.Resize<Color4>(ref v, newSize);
+			Array.Resize<Color4>(ref values, newSize);
 		}
 
 		protected override void ApplyValue(int i)
 		{
-			Setter(v[i]);
+			Setter(values[i]);
 		}
 
 		protected override void ApplyValue(float t, int a, int b)
 		{
-			Setter(Color4.Lerp(v[a], v[b], t));
+			Setter(Color4.Lerp(values[a], values[b], t));
 		}
 	}
 }
