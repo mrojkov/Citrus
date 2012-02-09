@@ -70,9 +70,7 @@ namespace Lime
 
 		public void AdvanceAnimation(int delta)
 		{
-			int count = Markers.Count;
-			for (int i = 0; i < count; i++) {
-				var marker = Markers[i];
+			foreach (Marker marker in Markers) {
 				int markerTime = Animator.FramesToMsecs(marker.Frame);
 				if (animationTime <= markerTime && markerTime < animationTime + delta) {
 					if (marker.Action == MarkerAction.Jump) {
@@ -91,9 +89,8 @@ namespace Lime
 					break;
 				}
 			}
-			count = Nodes.Count;
-			for (int i = 0; i < count; i++) {
-				var animators = Nodes[i].Animators;
+			foreach (Node node in Nodes) {
+				var animators = node.Animators;
 				animators.Apply(animationTime + delta);
 				animators.InvokeTriggers(animationTime, animationTime + delta);
 			}
