@@ -103,7 +103,7 @@ namespace Lime
 #if iOS
 		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.ReadCallback))]
 #endif
-		public static uint OggRead(IntPtr buffer,uint size,uint nmemb,int handle)
+		public static uint OggRead(IntPtr buffer, uint size, uint nmemb, int handle)
 		{
 			byte[] block = new byte[1024 * 16];
 			int actualCount = 0;

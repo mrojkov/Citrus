@@ -39,19 +39,15 @@ namespace Lime
 	{
 		public const int FramesPerSecond = 16;
 
-		static public int MsecsToFrames(int msecs)
+		public static int MsecsToFrames(int msecs)
 		{
 			return msecs >> 6;
 		}
 
-		static public int FramesToMsecs(int frames)
+		public static int FramesToMsecs(int frames)
 		{
 			return frames << 6;
 		}
-
-		protected abstract Array Values { get; }
-
-		protected abstract void ResizeValuesArray(int newSize);
 
 		protected Node Owner;
 		internal bool IsTriggerable;
@@ -60,14 +56,19 @@ namespace Lime
 		
 		[ProtoMember(1)]
 		public string TargetProperty;
-		
-		static int[] emptyFrames = new int[0];
+
 		[ProtoMember(2)]
 		public int[] Frames = emptyFrames;
-		
-		static KeyFunction[] emptyFunctions = new KeyFunction[0];
+
 		[ProtoMember(3)]
 		public KeyFunction[] Functions = emptyFunctions;
+
+		static int[] emptyFrames = new int[0];
+		static KeyFunction[] emptyFunctions = new KeyFunction[0];
+
+		protected abstract Array Values { get; }
+
+		protected abstract void ResizeValuesArray(int newSize);
 
 		protected int currentKey = 0;
 		
@@ -95,8 +96,8 @@ namespace Lime
 
 		public void Clear()
 		{
-			Frames = new int[0];
-			Functions = new KeyFunction[0];
+			Frames = emptyFrames;
+			Functions = emptyFunctions;
 			ResizeValuesArray(0);
 			currentKey = 0;
 		}

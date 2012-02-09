@@ -22,7 +22,7 @@ namespace Lime
 
 		int GetBlockSize();
 
-		int ReadBlocks(IntPtr buffer,int startIndex,int blockCount);
+		int ReadBlocks(IntPtr buffer, int startIndex, int blockCount);
 	}
 
 	public class AudioDecoderFactory

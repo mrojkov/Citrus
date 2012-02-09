@@ -94,7 +94,9 @@
     <None Include="gtk-gui\gui.stetic" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Toolchain.Win\cudart32_30_14.dll" />
+    <Content Include="Toolchain.Win\cudart32_30_14.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Toolchain.Win\jpeg62.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

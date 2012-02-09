@@ -6,7 +6,7 @@ namespace Orange
 {
 	public class AssetCooker
 	{
-		private delegate bool Converter(string srcPath,string dstPath);
+		private delegate bool Converter(string srcPath, string dstPath);
 
 		private Lime.AssetsBundle assetsBundle = Lime.AssetsBundle.Instance;
 		private CitrusProject project;
@@ -144,7 +144,7 @@ namespace Orange
 			}
 		}
 
-		void SyncUpdated(string mask,string newFileExtension,Converter converter)
+		void SyncUpdated(string mask, string newFileExtension, Converter converter)
 		{
 			var files = Helpers.GetAllFiles(".", mask, true);
 			foreach (string srcPath in files) {
@@ -182,7 +182,7 @@ namespace Orange
 			public bool Compressed;
 		}
 		
-		string GetAtlasPath(string atlasChain,int index)
+		string GetAtlasPath(string atlasChain, int index)
 		{
 			return Path.Combine("Atlases", atlasChain + "." + index.ToString("00") + GetPlatformTextureExtension());
 		}
