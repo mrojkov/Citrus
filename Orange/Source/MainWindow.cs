@@ -8,17 +8,17 @@ namespace Orange
 {
 	enum Action
 	{
-		BuildAndRun,
-		Build,
-		Rebuild,
-		MakeLocalizationDictionary,
-		UnpackBundle,
+		BuildGameAndRun,
+		BuildContentOnly,
+		RebuildGame,
+		RevealContent,
+		ExtractTranslatableStrings
 	}
 
 	public partial class MainWindow : Gtk.Window
 	{
 		public MainWindow () :
-				base(Gtk.WindowType.Toplevel)
+			base(Gtk.WindowType.Toplevel)
 		{
 			this.Build ();
 			LoadState();
@@ -121,9 +121,32 @@ namespace Orange
 			return true;
 		}
 
+		void BuildContent()
+		{
+			DateTime startTime = DateTime.Now;
+			BuildContentHelper();
+			ShowTimeStatistics(startTime);
+		}
+
 		bool BuildSolution()
 		{
 			DateTime startTime = DateTime.Now;
+			BuildContentHelper();
+			var platform = (TargetPlatform)this.TargetPlatform.Active;
+			var citrusProject = new CitrusProject(CitrusProjectChooser.Filename);
+			// Build game solution
+			var slnBuilder = new SolutionBuilder(citrusProject, platform);
+			if (!slnBuilder.Build()) {
+				Console.WriteLine("Build failed");
+				ShowTimeStatistics(startTime);
+				return false;
+			}
+			ShowTimeStatistics(startTime);
+			return true;
+		}
+
+		void BuildContentHelper()
+		{
 			var platform = (TargetPlatform)this.TargetPlatform.Active;
 			var citrusProject = new CitrusProject(CitrusProjectChooser.Filename);
 			// Create serialization model
@@ -137,15 +160,6 @@ namespace Orange
 			cooker.Cook();
 			// Update serialization assembly
 			GenerateSerializerDll(model, citrusProject.ProjectDirectory);
-			// Build game solution
-			var slnBuilder = new SolutionBuilder(citrusProject, platform);
-			if (!slnBuilder.Build()) {
-				Console.WriteLine("Build failed");
-				ShowTimeStatistics(startTime);
-				return false;
-			}
-			ShowTimeStatistics(startTime);
-			return true;
 		}
 
 		bool RunSolution()
@@ -174,7 +188,7 @@ namespace Orange
 			CompileLog.ScrollToIter(CompileLog.Buffer.EndIter, 0, false, 0, 0);
 		}
 
-		void UnpackBundle()
+		void RevealContent()
 		{
 			var platform = (TargetPlatform)this.TargetPlatform.Active;
 			var citrusProject = new CitrusProject(CitrusProjectChooser.Filename);
@@ -199,25 +213,25 @@ namespace Orange
 				try {
 					ClearLog();
 					switch ((Orange.Action)Action.Active) {
-					case Orange.Action.BuildAndRun:
+					case Orange.Action.BuildGameAndRun:
 						if (BuildSolution()) {
 							ScrollLogToEnd();
 							RunSolution();
 						}
 						break;
-					case Orange.Action.Build:
-						BuildSolution();
+					case Orange.Action.BuildContentOnly:
+						BuildContent();
 						break;
-					case Orange.Action.Rebuild:
+					case Orange.Action.RebuildGame:
 						if (CleanSolution()) {
 							BuildSolution();
 						}
 						break;
-					case Orange.Action.MakeLocalizationDictionary:
+					case Orange.Action.ExtractTranslatableStrings:
 						MakeLocalizationDictionary();
 						break;
-					case Orange.Action.UnpackBundle:
-						UnpackBundle();
+					case Orange.Action.RevealContent:
+						RevealContent();
 						break;
 					}
 				} catch (System.Exception exc) {

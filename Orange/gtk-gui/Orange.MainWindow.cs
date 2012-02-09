@@ -111,11 +111,11 @@ namespace Orange
 			this.table3.BorderWidth = ((uint)(5));
 			// Container child table3.Gtk.Table+TableChild
 			this.Action = global::Gtk.ComboBox.NewText ();
-			this.Action.AppendText ("Build & Run");
-			this.Action.AppendText ("Build Only");
-			this.Action.AppendText ("Rebuild");
-			this.Action.AppendText ("Make Localization Dictionary");
-			this.Action.AppendText ("Unpack Bundle");
+			this.Action.AppendText ("Build Game & Run");
+			this.Action.AppendText ("Build Content Only");
+			this.Action.AppendText ("Rebuild Game");
+			this.Action.AppendText ("Reveal Content");
+			this.Action.AppendText ("Extract Translatable Strings");
 			this.Action.Name = "Action";
 			this.Action.Active = 0;
 			this.table3.Add (this.Action);

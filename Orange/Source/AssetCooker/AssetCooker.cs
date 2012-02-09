@@ -53,7 +53,7 @@ namespace Orange
 			assetsBundle.Open(bundlePath, true);
 			try {
 				using (new DirectoryChanger(project.AssetsDirectory)) {
-					Console.WriteLine("------------- Building Game Assets -------------");
+					Console.WriteLine("------------- Building Game Content -------------");
 					SyncAtlases();
 					SyncDeleted();
 					SyncUpdated("*.txt", ".txt", (srcPath, dstPath) => {
