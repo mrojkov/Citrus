@@ -72,7 +72,7 @@ namespace Orange
 						}
 						var words = line.Split(' ');
 						if (words.Length != 2) {
-							throw new Lime.Exception("Invalid line format");
+							throw new Lime.Exception("Invalid rule format");
 						}
 						switch (words[0]) {
 						case "TextureAtlas":

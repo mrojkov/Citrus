@@ -75,19 +75,19 @@ namespace Lime
 		[ProtoMember(6)]
 		public Color4 Color { get; set; }
 
-		[ProtoMember(7)]
+		[ProtoMember(7), DefaultValue(Anchors.None)]
 		public Anchors Anchors { get; set; }
 
-		[ProtoMember(8)]
+		[ProtoMember(8), DefaultValue(Blending.Default)]
 		public Blending Blending { get; set; }
 
 		[ProtoMember(9), DefaultValue(true)]
 		public bool Visible { get; set; }
 
-		[ProtoMember(10)]
+		[ProtoMember(10), DefaultValue(null)]
 		public SkinningWeights SkinningWeights { get; set; }
 
-		[ProtoMember(11)]
+		[ProtoMember(11), DefaultValue(HitTestMethod.BoundingRect)]
 		public HitTestMethod HitTestMethod { get; set; }
 
 		public bool Shown { get { return Visible && Color.A > 0; } }
@@ -134,15 +134,15 @@ namespace Lime
 			Blending = Blending.Default;
 		}
 
-        public void Hide()
-        {
-            Visible = false;
-        }
+		public void Hide()
+		{
+			Visible = false;
+		}
 
-        public void Show()
-        {
-            Visible = true;
-        }
+		public void Show()
+		{
+			Visible = true;
+		}
 
 		public void UpdateWorldProperties()
 		{

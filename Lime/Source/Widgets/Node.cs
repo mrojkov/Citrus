@@ -23,8 +23,7 @@ namespace Lime
 		[ProtoMember(1)]
 		public string Id { get; set; }
 
-		[ProtoMember(2)]
-		[DefaultValue(null)]
+		[ProtoMember(2), DefaultValue(null)]
 		public string ContentsPath { get; set; }
 
 		[Trigger]

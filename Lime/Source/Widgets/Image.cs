@@ -31,6 +31,10 @@ namespace Lime
 			imageCombinerArg = false;
 		}
 
+		public override void LateUpdate(int delta)
+		{
+		}
+
 		public override void Render()
 		{
 			Renderer.WorldMatrix = worldMatrix;
