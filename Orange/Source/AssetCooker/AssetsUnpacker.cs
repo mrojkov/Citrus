@@ -15,7 +15,7 @@ namespace Orange
 			string outputDirectory = bundlePath + ".Unpacked";
 			AssetsBundle.Instance.Open(bundlePath, true);
 			try {
-				Console.WriteLine("Unpacking Game Assets into \"{0}\"", outputDirectory);
+				Console.WriteLine("Extracting game content into \"{0}\"", outputDirectory);
 				if (Directory.Exists(outputDirectory)) {
 					Directory.Delete(outputDirectory, true);
 				}
