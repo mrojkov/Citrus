@@ -46,7 +46,7 @@ namespace Lime
 
 		[ProtoMember(9)]
 		[DefaultValue(false)]
-		public bool Playing { get; set; }
+		public bool Playing;
 
 		private int animationTime;
 		[ProtoMember(10)]
