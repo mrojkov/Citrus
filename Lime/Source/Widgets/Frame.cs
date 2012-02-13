@@ -101,12 +101,13 @@ namespace Lime
 					Renderer.PushProjectionMatrix();
 					Renderer.SetOrthogonalProjection(0, Size.Y, Size.X, 0);
 					var chain = new RenderChain();
-					base.AddToRenderChain(chain);
+					foreach (Node node in Nodes.AsArray) {
+						node.AddToRenderChain(chain);
+					}
 					chain.RenderAndClear();
 					renderTexture.RestoreRenderTarget();
 					Renderer.Viewport = vp;
 					Renderer.PopProjectionMatrix();
-					Renderer.SetOrthogonalProjection(0, 0, 1024, 768);
 				}
 			}
 		}

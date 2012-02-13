@@ -156,6 +156,7 @@ namespace Lime
 				}
 				uvRect.A = Vector2.Zero;
 				uvRect.B = (Vector2)instance.SurfaceSize;
+				return true;
 			}
 			return false;
 		}
