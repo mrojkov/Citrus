@@ -130,7 +130,7 @@ namespace Orange
 			int rgba16DataLength = potWidth * potHeight * 2;
 			
 			string formatFlag;
-			if (rgba16DataLength < pvrtc4DataLength) {
+			if (!compressed || rgba16DataLength < pvrtc4DataLength) {
 				if (hasAlpha)
 					formatFlag = "-f 4444 -nt";
 				else
@@ -142,7 +142,7 @@ namespace Orange
 			string mipsFlag = mipMaps ? "-m" : "";
 			string pvrTexTool = Path.Combine(Helpers.GetApplicationDirectory(), "Toolchain.Mac", "PVRTexTool");
 			Mono.Unix.Native.Syscall.chmod(pvrTexTool, Mono.Unix.Native.FilePermissions.S_IXOTH | Mono.Unix.Native.FilePermissions.S_IXUSR);
-			string args = String.Format("{0} -i '{1}' -o '{2}' {3} -pvrtcfast -premultalpha -silent -x {4} -y {5}", 
+			string args = String.Format("{0} -i '{1}' -o '{2}' {3} -pvrtcfast -premultalpha -silent -x {4} -y {5}",
 				formatFlag,	srcPath, dstPath, mipsFlag, potWidth, potHeight);
 			var p = System.Diagnostics.Process.Start(pvrTexTool, args);
 			p.WaitForExit();
