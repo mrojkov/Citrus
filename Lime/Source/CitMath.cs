@@ -65,23 +65,7 @@ namespace Lime
 		{
 			return median + (Random() - 0.5f) * dispersion;
 		}
-		
-		public static bool IsPowerOf2(int value)
-		{
-			return value == 1 || (value & (value - 1)) == 0;
-		}
 
-		public static int NearestPowerOf2(int value)
-		{
-			if (!IsPowerOf2(value)) {
-				int i = 1;
-				while (i < value)
-					i *= 2;
-				return i;
-			}
-			return value;
-		}
-		
 		public static float Clamp(float value, float min, float max)
 		{
 			return (value < min) ? min : (value > max ? max : value);
