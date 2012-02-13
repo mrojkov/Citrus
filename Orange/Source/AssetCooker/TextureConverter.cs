@@ -90,15 +90,31 @@ namespace Orange
 			}
 			return true;
 		}
-		
+
 		private static int GetNearestPowerOf2(int x, int min, int max)
 		{
-			int y = Utils.NearestPowerOf2(x);
+			int y = GetNearestPowerOf2Helper(x);
 			x = (y - x < x - y / 2) ? y : y / 2;
 			x = Math.Max(Math.Min(max, x), min);
 			return x;
 		}
-		
+
+		static int GetNearestPowerOf2Helper(int value)
+		{
+			if (!IsPowerOf2(value)) {
+				int i = 1;
+				while (i < value)
+					i *= 2;
+				return i;
+			}
+			return value;
+		}
+
+		public static bool IsPowerOf2(int value)
+		{
+			return value == 1 || (value & (value - 1)) == 0;
+		}
+
 		private static void ToPVRTexture(string srcPath, string dstPath, bool compressed, bool mipMaps)
 		{
 			int width, height;
@@ -108,12 +124,6 @@ namespace Orange
 			}
 			int potWidth = GetNearestPowerOf2(width, 8, 1024);
 			int potHeight = GetNearestPowerOf2(height, 8, 1024);
-			
-			// HACK, just for testing purposes
-			//if (potWidth > 8 && potHeight > 8) {
-			//	potWidth /= 2;
-			//	potHeight /= 2;
-			//}
 			
 			int maxDimension = Math.Max(potWidth, potHeight);
 			int pvrtc4DataLength = maxDimension * maxDimension / 2;

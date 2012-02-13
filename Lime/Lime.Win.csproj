@@ -53,6 +53,7 @@
     <Compile Include="Source\Audio\SampleCache.cs" />
     <Compile Include="Source\Audio\SerializableSample.cs" />
     <Compile Include="Source\Audio\Sound.cs" />
+    <Compile Include="Source\CitMath.cs" />
     <Compile Include="Source\Lemon.cs" />
     <Compile Include="Source\Application\GameApp.cs" />
     <Compile Include="Source\Application\iOSAppDelegate.cs" />
@@ -80,7 +81,7 @@
     <Compile Include="Source\Graphics\TextureAtlasPart.cs" />
     <Compile Include="Source\Input\Input.cs" />
     <Compile Include="Source\Localization.cs" />
-    <Compile Include="Source\MathUtils.cs" />
+    <Compile Include="Source\Profiler.cs" />
     <Compile Include="Source\Serialization.cs" />
     <Compile Include="Source\Types\Color4.cs" />
     <Compile Include="Source\Types\IntRectangle.cs" />
@@ -91,7 +92,6 @@
     <Compile Include="Source\Types\Size.cs" />
     <Compile Include="Source\Types\Vector2.cs" />
     <Compile Include="Source\Types\Vector3.cs" />
-    <Compile Include="Source\Utils.cs" />
     <Compile Include="Source\Widgets\Animator.cs" />
     <Compile Include="Source\Widgets\AnimatorCollection.cs" />
     <Compile Include="Source\Widgets\AnimatorRegistry.cs" />
