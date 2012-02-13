@@ -125,6 +125,7 @@
     <Compile Include="Source\Types\Vector3.cs" />
     <Compile Include="Source\CitMath.cs" />
     <Compile Include="Source\Profiler.cs" />
+    <Compile Include="Source\EnvironmentUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Audio\ADPCMEncoder.c">

@@ -54,5 +54,8 @@ Global
 		$0.StandardHeader = $5
 		$5.Text = 
 		$5.IncludeInNewFiles = True
+		$0.DotNetNamingPolicy = $6
+		$6.DirectoryNamespaceAssociation = None
+		$6.ResourceNamePolicy = FileFormatDefault
 	EndGlobalSection
 EndGlobal

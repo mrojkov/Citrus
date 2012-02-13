@@ -122,6 +122,7 @@
     <Compile Include="Source\Types\Vector3.cs" />
     <Compile Include="Source\CitMath.cs" />
     <Compile Include="Source\Profiler.cs" />
+    <Compile Include="Source\EnvironmentUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Lemon\bin\iOS\Release-iphoneos\libLemon.a">
@@ -132,5 +133,8 @@
       <Link>libLemonSim.a</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Source\Utils\" />
   </ItemGroup>
 </Project>
