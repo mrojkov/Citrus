@@ -26,7 +26,11 @@ namespace Lime
 	{
 		public static string GetDataDirectory(string appName, string appVersion = "1.0")
 		{
+#if iOS
+			string path = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+#else
 			string path = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+#endif
 			path = System.IO.Path.Combine(path, appName, appVersion);
 			System.IO.Directory.CreateDirectory(path);
 			return path;

@@ -52,9 +52,7 @@
     <Compile Include="Source\AssetsFolder.cs" />
     <Compile Include="Source\AssetsSource.cs" />
     <Compile Include="Source\Exception.cs" />
-    <Compile Include="Source\MathUtils.cs" />
     <Compile Include="Source\Serialization.cs" />
-    <Compile Include="Source\Utils.cs" />
     <Compile Include="Source\Application\MacAppDelegate.cs" />
     <Compile Include="Source\Application\MacGameController.cs" />
     <Compile Include="Source\Application\MacGameView.cs" />
@@ -122,6 +120,8 @@
     <Compile Include="Source\Localization.cs" />
     <Compile Include="Source\Widgets\RenderChain.cs" />
     <Compile Include="Source\Types\Vector3.cs" />
+    <Compile Include="Source\CitMath.cs" />
+    <Compile Include="Source\Profiler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Lemon\bin\iOS\Release-iphoneos\libLemon.a">

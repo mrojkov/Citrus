@@ -116,6 +116,7 @@ namespace Orange
 			this.Action.AppendText ("Rebuild Game");
 			this.Action.AppendText ("Reveal Content");
 			this.Action.AppendText ("Extract Translatable Strings");
+			this.Action.AppendText ("");
 			this.Action.Name = "Action";
 			this.Action.Active = 0;
 			this.table3.Add (this.Action);
