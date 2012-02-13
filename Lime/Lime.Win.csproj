@@ -54,6 +54,7 @@
     <Compile Include="Source\Audio\SerializableSample.cs" />
     <Compile Include="Source\Audio\Sound.cs" />
     <Compile Include="Source\CitMath.cs" />
+    <Compile Include="Source\EnvironmentUtils.cs" />
     <Compile Include="Source\Lemon.cs" />
     <Compile Include="Source\Application\GameApp.cs" />
     <Compile Include="Source\Application\iOSAppDelegate.cs" />

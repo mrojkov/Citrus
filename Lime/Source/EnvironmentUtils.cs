@@ -4,12 +4,14 @@ namespace Lime
 {
 	public static class EnvironmentUtils
 	{
-#if iOS	
 		public static void OpenBrowser(string url)
 		{
+#if iOS	
 			var nsUrl = new MonoTouch.Foundation.NSUrl(url);
 			MonoTouch.UIKit.UIApplication.SharedApplication.OpenUrl(nsUrl);
-		}
+#else
+			System.Diagnostics.Process.Start( url );
 #endif
+		}
 	}
 }
