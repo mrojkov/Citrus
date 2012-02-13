@@ -98,8 +98,8 @@ namespace Lime
 					else
 						targetPosition.Y = magnet.Size.Y;
 				} else {
-					targetPosition.X = Utils.Clamp(targetPosition.X, 0, magnet.Size.X);
-					targetPosition.Y = Utils.Clamp(targetPosition.Y, 0, magnet.Size.Y);
+					targetPosition.X = CitMath.Clamp(targetPosition.X, 0, magnet.Size.X);
+					targetPosition.Y = CitMath.Clamp(targetPosition.Y, 0, magnet.Size.Y);
 				}
 				break;
 			case EmitterShape.Ellipse:

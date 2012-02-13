@@ -86,7 +86,7 @@ namespace Lime
 
 		public static void SetGroupVolume(AudioChannelGroup group, float value)
 		{
-			value = Utils.Clamp(value, 0, 1);
+			value = CitMath.Clamp(value, 0, 1);
 			groupVolumes[(int)group] = value;
 			foreach (var channel in channels) {
 				if (channel.Group == group) {

@@ -113,7 +113,7 @@ namespace Lime
 
 		public static Vector2 CosSin(float radians)
 		{
-			return Utils.CosSin(radians);
+			return CitMath.CosSin(radians);
 			// No more slow sine/cosine!
 			//return new Vector2((float)Math.Cos(radians), (float)Math.Sin(radians));
 		}

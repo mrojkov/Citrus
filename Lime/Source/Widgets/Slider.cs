@@ -14,7 +14,7 @@ namespace Lime
 		[ProtoMember(3)]
 		public float Value
 		{
-			get { return Utils.Clamp(value, RangeMin, RangeMax); }
+			get { return CitMath.Clamp(value, RangeMin, RangeMax); }
 			set { this.value = value; }
 		}
 

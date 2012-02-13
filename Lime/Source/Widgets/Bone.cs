@@ -84,25 +84,33 @@ namespace Lime
 				if (BaseIndex > 0) {
 					// Tie the bone to the parent bone.
 					BoneArray.Entry b = Parent.Widget.BoneArray[BaseIndex];
-					float l = Utils.ClipAboutZero(b.Length);
+					float l = ClipAboutZero(b.Length);
 					Vector2 u = b.Tip - b.Joint;
 					Vector2 v = new Vector2(-u.Y / l, u.X / l);
 					e.Joint = b.Tip + u * Position.X + v * Position.Y;
 					e.Rotation += b.Rotation;
 				}
 				// Get position of bone's tip.
-				e.Tip = Vector2.Rotate(new Vector2(e.Length, 0), e.Rotation * Utils.DegreesToRadians) + e.Joint;
+				e.Tip = Vector2.Rotate(new Vector2(e.Length, 0), e.Rotation * CitMath.DegreesToRadians) + e.Joint;
 				if (RefLength != 0) {
-					float relativeScaling = Length / Utils.ClipAboutZero(RefLength);
+					float relativeScaling = Length / ClipAboutZero(RefLength);
 					// Calculating the matrix of relative transformation.
 					Matrix32 m1, m2;
-					m1 = Matrix32.Transformation(Vector2.Zero, Vector2.One, RefRotation * Utils.DegreesToRadians, RefPosition);
-					m2 = Matrix32.Transformation(Vector2.Zero, new Vector2(relativeScaling, 1), e.Rotation * Utils.DegreesToRadians, e.Joint);
+					m1 = Matrix32.Transformation(Vector2.Zero, Vector2.One, RefRotation * CitMath.DegreesToRadians, RefPosition);
+					m2 = Matrix32.Transformation(Vector2.Zero, new Vector2(relativeScaling, 1), e.Rotation * CitMath.DegreesToRadians, e.Joint);
 					e.RelativeTransform = m1.CalcInversed() * m2;
 				} else
 					e.RelativeTransform = Matrix32.Identity;
 				Parent.Widget.BoneArray[Index] = e;
 			}
+		}
+
+		static float ClipAboutZero(float value, float eps = 0.0001f)
+		{
+			if (value > -eps && value < eps)
+				return eps < 0 ? -eps : eps;
+			else
+				return value;
 		}
 	}
 }

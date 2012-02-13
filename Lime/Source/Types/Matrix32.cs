@@ -48,7 +48,7 @@ namespace Lime
 
 		public static Matrix32 Rotation(float radians)
 		{
-			Vector2 cs = Utils.CosSin(radians);
+			Vector2 cs = CitMath.CosSin(radians);
 			Matrix32 m;
 			m.U.X = cs.X;
 			m.U.Y = cs.Y;
@@ -76,7 +76,7 @@ namespace Lime
 
 		public static Matrix32 Transformation(Vector2 center, Vector2 scaling, float rotation, Vector2 translation)
 		{
-			Vector2 cs = Utils.CosSin(rotation);
+			Vector2 cs = CitMath.CosSin(rotation);
 			Matrix32 m;
 			m.U.X = scaling.X * cs.X;
 			m.U.Y = scaling.X * cs.Y;

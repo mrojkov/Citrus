@@ -450,7 +450,7 @@ namespace Lime
 		Vector2 GenerateRandomMotionControlPoint(ref float rayDirection)
 		{
 			rayDirection += RandomMotionRotation.UniformRandomNumber();
-			Vector2 result = Utils.CosSin(Utils.DegreesToRadians * rayDirection);
+			Vector2 result = CitMath.CosSin(CitMath.DegreesToRadians * rayDirection);
 			NumericRange radius = RandomMotionRadius;
 			if (radius.Dispersion == 0)
 				radius.Dispersion = radius.Median;
@@ -485,7 +485,7 @@ namespace Lime
 			if (crossProduct < 0.0f)
 				emitterScale.Y = -emitterScale.Y;
 			emitterScaleAmount = (float)Math.Sqrt(Math.Abs(crossProduct));
-			float emitterAngle = transform.U.Atan2 * Utils.RadiansToDegrees;
+			float emitterAngle = transform.U.Atan2 * CitMath.RadiansToDegrees;
 
 			NumericRange aspectRatioVariationPair = new NumericRange(0, Math.Max(0.0f, AspectRatio.Dispersion));
 			float zoom = Zoom.NormalRandomNumber();
@@ -526,19 +526,19 @@ namespace Lime
 				p.RegularDirection = Direction.UniformRandomNumber() + emitterAngle - 90.0f;
 				break;
 			case EmitterShape.Line:
-				position = new Vector2(Utils.Random() * Size.X, Size.Y * 0.5f);
+				position = new Vector2(CitMath.Random() * Size.X, Size.Y * 0.5f);
 				p.RegularDirection = Direction.UniformRandomNumber() + emitterAngle - 90.0f;
 				break;
 			case EmitterShape.Ellipse: {
-					float angle = Utils.Random() * 2 * Utils.Pi;
+					float angle = CitMath.Random() * 2 * CitMath.Pi;
 					Vector2 sincos = Vector2.CosSin(angle);
 					position = 0.5f * Vector2.Scale((sincos + Vector2.One), Size);
 					p.RegularDirection = Direction.UniformRandomNumber() + emitterAngle - 90 + angle;
 				}
 				break;
 			case EmitterShape.Area:
-				position.X = Utils.Random() * Size.X;
-				position.Y = Utils.Random() * Size.Y;
+				position.X = CitMath.Random() * Size.X;
+				position.Y = CitMath.Random() * Size.Y;
 				p.RegularDirection = Direction.UniformRandomNumber() + emitterAngle - 90.0f;
 				break;
 			default:
@@ -549,7 +549,7 @@ namespace Lime
 			p.ModifierIndex = -1;
 			p.Modifier = null;
 			for (int counter = 0; counter < 10; counter++) {
-				int i = Utils.Random(Nodes.Count);
+				int i = CitMath.Random(Nodes.Count);
 				p.Modifier = Nodes[i] as ParticleModifier;
 				if (p.Modifier != null) {
 					p.ModifierIndex = i;
@@ -565,7 +565,7 @@ namespace Lime
 			if (EmissionType == EmissionType.Inner)
 				p.RegularDirection += 180;
 			else if ((EmissionType & EmissionType.Inner) != 0) {
-				if (Utils.RandomFlag())
+				if (CitMath.Random(2) == 0)
 					p.RegularDirection += 180;
 			} else if (EmissionType == 0)
 				return false;
@@ -620,14 +620,14 @@ namespace Lime
 			// Updating other properties of a particle.
 			float windVelocity = p.WindAmount * modifier.WindAmount;
 			if (windVelocity != 0) {
-				var windDirection = Vector2.CosSin(Utils.DegreesToRadians * p.WindDirection);
+				var windDirection = Vector2.CosSin(CitMath.DegreesToRadians * p.WindDirection);
 				p.RegularPosition += windVelocity * delta * windDirection;
 			}
 			if (p.GravityVelocity != 0) {
-				var gravityDirection = Utils.CosSin(Utils.DegreesToRadians * p.GravityDirection);
+				var gravityDirection = CitMath.CosSin(CitMath.DegreesToRadians * p.GravityDirection);
 				p.RegularPosition += p.GravityVelocity * delta * gravityDirection;
 			}
-			var direction = Utils.CosSin(Utils.DegreesToRadians * p.RegularDirection);
+			var direction = CitMath.CosSin(CitMath.DegreesToRadians * p.RegularDirection);
 			float velocity = p.Velocity * modifier.Velocity;
 
 			p.RegularDirection += p.AngularVelocity * modifier.AngularVelocity * delta;
@@ -658,7 +658,7 @@ namespace Lime
 					p.RandomSplineVertex2 = p.RandomSplineVertex3;
 					p.RandomSplineVertex3 = GenerateRandomMotionControlPoint(ref p.RandomRayDirection);
 				}
-				positionOnSpline = Utils.CatmullRomSpline(p.RandomSplineOffset,
+				positionOnSpline = CitMath.CatmullRomSpline(p.RandomSplineOffset,
 					p.RandomSplineVertex0, p.RandomSplineVertex1,
 					p.RandomSplineVertex2, p.RandomSplineVertex3);
 			}
@@ -669,7 +669,7 @@ namespace Lime
 			if (AlongPathOrientation) {
 				Vector2 deltaPos = p.FullPosition - previousPosition;
 				if (deltaPos.SquaredLength > 0.00001f)
-					p.FullDirection = deltaPos.Atan2 * Utils.RadiansToDegrees;
+					p.FullDirection = deltaPos.Atan2 * CitMath.RadiansToDegrees;
 			}
 			return true;
 		}
@@ -684,7 +684,7 @@ namespace Lime
 					angle += p.FullDirection;
 				Vector2 imageSize = (Vector2)texture.ImageSize;
 				Vector2 particleSize = p.ScaleCurrent * imageSize;
-				Vector2 orientation = Utils.CosSin(Utils.DegreesToRadians * angle);
+				Vector2 orientation = CitMath.CosSin(CitMath.DegreesToRadians * angle);
 				Matrix32 transform = new Matrix32 {
 					U = particleSize.X * orientation,
 					V = particleSize.Y * new Vector2(-orientation.Y, orientation.X),

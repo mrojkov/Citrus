@@ -24,6 +24,13 @@ namespace Lime
 
 	public class GameApp
 	{
+		public static string GetDataDirectory(string appName, string appVersion = "1.0")
+		{
+			string path = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+			path = System.IO.Path.Combine(path, appName, appVersion);
+			System.IO.Directory.CreateDirectory(path);
+			return path;
+		}
 		public virtual void OnCreate(IGameWindow gameWindow) {}
 		public virtual void OnGLCreate() {}
 		public virtual void OnGLDestroy() {}

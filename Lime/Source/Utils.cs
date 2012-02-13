@@ -2,22 +2,23 @@ using System;
 
 namespace Lime
 {
-	public static partial class Utils
+	public static class Profiler
 	{
 		static int ticks = 0;
 
-		public static void BeginTimeMeasurement()
+		public static void Start()
 		{
 			ticks = Environment.TickCount;
 		}
 
-		public static int EndTimeMeasurement()
+		public static int Stop()
 		{
 			ticks = Environment.TickCount - ticks;
 			Console.WriteLine(String.Format("Execution time {0} ms.", ticks));
 			return ticks;
 		}
-		
+	}
+	/*
 		public static object CreateObject(string className)
 		{
 			var type = System.Type.GetType(className);
@@ -29,5 +30,5 @@ namespace Lime
 			var obj = ctor.Invoke(new object[] {});
 			return obj;
 		}
-	}
+	}*/
 }
