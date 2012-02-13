@@ -67,7 +67,12 @@ namespace Lime
 	public static class Localization
 	{
 		public static LocalizationDictionary Dictionary = new LocalizationDictionary();
-
+		
+		public static string GetCurrentLanguage()
+		{
+			return System.Globalization.CultureInfo.CurrentCulture.ThreeLetterISOLanguageName;
+		}
+		
 		public static string GetString(string taggedString)
 		{
 			if (string.IsNullOrEmpty(taggedString))
