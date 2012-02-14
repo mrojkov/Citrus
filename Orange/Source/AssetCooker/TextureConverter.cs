@@ -132,9 +132,9 @@ namespace Orange
 			string formatFlag;
 			if (!compressed || rgba16DataLength < pvrtc4DataLength) {
 				if (hasAlpha)
-					formatFlag = "-f 4444 -nt";
+					formatFlag = "-f OGL4444 -nt -yflip0";
 				else
-					formatFlag = "-f 565 -nt";
+					formatFlag = "-f OGL565 -nt -yflip0";
 			} else {
 				formatFlag = "-f PVRTC4";
 				potWidth = potHeight = maxDimension;

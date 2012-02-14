@@ -122,13 +122,13 @@ namespace Lime
 					GL.CompressedTexImage2D(All.Texture2D, i, All.CompressedRgbaPvrtc2Bppv1Img, width, height, 0, buffer.Length, buffer);
 					break;
 				}
-				case PVRFormat.RGBA_4444: {
+				case PVRFormat.GLARGB_4444: {
 					byte[] buffer = new byte[width * height * 2];
 					reader.Read(buffer, 0, buffer.Length);
 					GL.TexImage2D(All.Texture2D, i, (int)All.Rgba, width, height, 0, All.Rgba, All.UnsignedShort4444, buffer);
 					break;
 				}
-				case PVRFormat.RGB_565: {
+				case PVRFormat.GLRGB_565: {
 					byte[] buffer = new byte[width * height * 2];
 					reader.Read(buffer, 0, buffer.Length);
 					GL.TexImage2D(All.Texture2D, i, (int)All.Rgb, width, height, 0, All.Rgb, All.UnsignedShort565, buffer);
