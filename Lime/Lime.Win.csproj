@@ -49,7 +49,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MathLib.cs" />
     <Compile Include="Source\Audio\OggDecoder.cs" />
     <Compile Include="Source\Audio\SampleCache.cs" />
     <Compile Include="Source\Audio\SerializableSample.cs" />
@@ -82,6 +81,7 @@
     <Compile Include="Source\Graphics\TextureAtlasPart.cs" />
     <Compile Include="Source\Input\Input.cs" />
     <Compile Include="Source\Localization.cs" />
+    <Compile Include="Source\MathLib.cs" />
     <Compile Include="Source\Profiler.cs" />
     <Compile Include="Source\Serialization.cs" />
     <Compile Include="Source\Types\Color4.cs" />
