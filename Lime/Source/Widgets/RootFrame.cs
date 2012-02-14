@@ -21,6 +21,7 @@
 
 		public override void Update(int delta)
 		{
+			ParticleEmitter.NumberOfUpdatedParticles = 0;
 			ActiveWidgetUpdated = false;
 			base.Update(delta);
 		}

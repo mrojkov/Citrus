@@ -360,7 +360,7 @@ namespace Lime
 			}
 		}
 
-		public static int TotalParticles = 0;
+		public static int NumberOfUpdatedParticles = 0;
 		public static bool GloballyEnabled = true;
 		
 		LinkedListNode<Particle> AllocParticle()
@@ -373,7 +373,6 @@ namespace Lime
 				particlePool.RemoveFirst();
 			}
 			particles.AddLast(result);
-			TotalParticles++;
 			return result;
 		}
 		
@@ -381,7 +380,6 @@ namespace Lime
 		{
 			particles.Remove(particleNode);
 			particlePool.AddFirst(particleNode);
-			TotalParticles--;
 		}
 
 		void UpdateHelper(int delta)
@@ -577,6 +575,7 @@ namespace Lime
 
 		bool AdvanceParticle(Particle p, float delta)
 		{
+			NumberOfUpdatedParticles++;
 			p.Age += delta;
 			// If particle was deserialized, p.Modifier would be null.
 			if (p.Modifier == null) {

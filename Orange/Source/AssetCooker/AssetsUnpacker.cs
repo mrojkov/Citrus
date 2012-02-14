@@ -13,7 +13,7 @@ namespace Orange
 		{
 			string bundlePath = Path.ChangeExtension(project.AssetsDirectory, Helpers.GetTargetPlatformString(platform));
 			string outputDirectory = bundlePath + ".Unpacked";
-			AssetsBundle.Instance.Open(bundlePath, true);
+			AssetsBundle.Instance.Open(bundlePath, AssetBundleFlags.None);
 			try {
 				Console.WriteLine("Extracting game content into \"{0}\"", outputDirectory);
 				if (Directory.Exists(outputDirectory)) {

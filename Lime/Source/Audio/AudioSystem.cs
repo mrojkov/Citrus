@@ -121,7 +121,7 @@ namespace Lime
 			if (AssetsBundle.Instance.FileExists(path)) {
 				decoder = AudioDecoderFactory.CreateDecoder(soundCache.OpenStream(path));
 			} else {
-				Console.WriteLine("Missing audio file: '{0}'", path);
+				Console.WriteLine("Missing audio file '{0}'", path);
 				return new Sound();
 			}
 			var sound = channel.Play(decoder, looping);

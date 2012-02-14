@@ -182,7 +182,7 @@ namespace Lime
 				uvRect.B = (Vector2)instance.ImageSize / (Vector2)instance.SurfaceSize;
 				return true;
 			}
-			Console.WriteLine("Missing texture: {0}", path);
+			Console.WriteLine("Missing texture '{0}'", path);
 			return false;
 		}
 

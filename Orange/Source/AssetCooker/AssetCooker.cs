@@ -50,7 +50,7 @@ namespace Orange
 		{
 			cookingRulesMap = CookingRulesBuilder.Build(project.AssetsDirectory);
 			string bundlePath = Path.ChangeExtension(project.AssetsDirectory, Helpers.GetTargetPlatformString(platform));
-			assetsBundle.Open(bundlePath, true);
+			assetsBundle.Open(bundlePath, Lime.AssetBundleFlags.Writable);
 			try {
 				using (new DirectoryChanger(project.AssetsDirectory)) {
 					Console.WriteLine("------------- Building Game Content -------------");
