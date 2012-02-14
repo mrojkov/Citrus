@@ -91,13 +91,13 @@ namespace Lime
 					e.Rotation += b.Rotation;
 				}
 				// Get position of bone's tip.
-				e.Tip = Vector2.Rotate(new Vector2(e.Length, 0), e.Rotation * CitMath.DegreesToRadians) + e.Joint;
+				e.Tip = Vector2.Rotate(new Vector2(e.Length, 0), e.Rotation * MathLib.DegreesToRadians) + e.Joint;
 				if (RefLength != 0) {
 					float relativeScaling = Length / ClipAboutZero(RefLength);
 					// Calculating the matrix of relative transformation.
 					Matrix32 m1, m2;
-					m1 = Matrix32.Transformation(Vector2.Zero, Vector2.One, RefRotation * CitMath.DegreesToRadians, RefPosition);
-					m2 = Matrix32.Transformation(Vector2.Zero, new Vector2(relativeScaling, 1), e.Rotation * CitMath.DegreesToRadians, e.Joint);
+					m1 = Matrix32.Transformation(Vector2.Zero, Vector2.One, RefRotation * MathLib.DegreesToRadians, RefPosition);
+					m2 = Matrix32.Transformation(Vector2.Zero, new Vector2(relativeScaling, 1), e.Rotation * MathLib.DegreesToRadians, e.Joint);
 					e.RelativeTransform = m1.CalcInversed() * m2;
 				} else
 					e.RelativeTransform = Matrix32.Identity;

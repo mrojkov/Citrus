@@ -119,7 +119,7 @@ namespace Lime
 			}
 			if (textures.Count == 0)
 				return texture;
-			index = CitMath.Clamp(index, 0, textures.Count - 1);
+			index = MathLib.Clamp(index, 0, textures.Count - 1);
 			return textures[index];
 		}
 	}

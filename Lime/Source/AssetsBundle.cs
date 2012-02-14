@@ -113,7 +113,15 @@ namespace Lime
 			throw new NotImplementedException();
 		}
 	}
-	
+
+	[Flags]
+	public enum AssetBundleFlags
+	{
+		None = 0,
+		Writable = 1,
+		LanguageSensitiveOpenFile = 2
+	}
+
 	public class AssetsBundle : IAssetsSource, IDisposable
 	{
 		Stack<Stream> streamPool = new Stack<Stream>();
@@ -125,6 +133,8 @@ namespace Lime
 		FileStream stream;
 		internal Dictionary <string, AssetDescriptor> index = new Dictionary<string, AssetDescriptor>();
 		List<AssetDescriptor> trash = new List<AssetDescriptor>();
+		AssetBundleFlags flags;
+		public string CurrentLanguage;
 
 		public static string CorrectSlashes(string path)
 		{
@@ -141,15 +151,15 @@ namespace Lime
 
 		AssetsBundle() {}
 
-		public AssetsBundle(string path, bool forWriting)
+		public AssetsBundle(string path, AssetBundleFlags flags, string language = "en")
 		{
-			Open(path, forWriting);
+			Open(path, flags, language);
 		}
 
-		public void Open(string path, bool forWriting)
+		public void Open(string path, AssetBundleFlags flags, string language = "en")
 		{
 			this.path = path;
-			if (forWriting) {
+			if ((flags & AssetBundleFlags.Writable) != 0) {
 				stream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
 				reader = new BinaryReader(stream);
 				writer = new BinaryWriter(stream);
