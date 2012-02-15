@@ -121,7 +121,7 @@ namespace Lime
 			MemoryStream stream;
 			if (!readCache.TryGetValue(path, out stream)) {
 				stream = new MemoryStream();
-				using (Stream input = AssetsBundle.Instance.OpenFile(path)) {
+				using (Stream input = AssetsBundle.Instance.OpenFileLocalized(path)) {
 					input.CopyTo(stream);
 				}
 				readCache[path] = stream;
@@ -132,7 +132,7 @@ namespace Lime
 
 		public static T ReadObject<T>(string path)
 		{
-			using (Stream stream = AssetsBundle.Instance.OpenFile(path))
+			using (Stream stream = AssetsBundle.Instance.OpenFileLocalized(path))
 				return ReadObject<T>(path, stream);
 		}
 		

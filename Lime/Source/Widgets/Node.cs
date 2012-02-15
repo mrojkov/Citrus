@@ -125,7 +125,7 @@ namespace Lime
 				if (cached) {
 					node = Serialization.ReadObjectCached<Node>(path);
 				} else {
-					using (Stream stream = AssetsBundle.Instance.OpenFile(path))
+					using (Stream stream = AssetsBundle.Instance.OpenFileLocalized(path))
 						node = Serialization.ReadObject<Node>(path, stream);
 				}
 				node.LoadContents();

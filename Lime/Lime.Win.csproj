@@ -53,7 +53,7 @@
     <Compile Include="Source\Audio\SampleCache.cs" />
     <Compile Include="Source\Audio\SerializableSample.cs" />
     <Compile Include="Source\Audio\Sound.cs" />
-    <Compile Include="Source\EnvironmentUtils.cs" />
+    <Compile Include="Source\Environment.cs" />
     <Compile Include="Source\Lemon.cs" />
     <Compile Include="Source\Application\GameApp.cs" />
     <Compile Include="Source\Application\iOSAppDelegate.cs" />
@@ -64,8 +64,6 @@
     <Compile Include="Source\Application\MacGameView.cs" />
     <Compile Include="Source\Application\OpenTKGameView.cs" />
     <Compile Include="Source\AssetsBundle.cs" />
-    <Compile Include="Source\AssetsFolder.cs" />
-    <Compile Include="Source\AssetsSource.cs" />
     <Compile Include="Source\Audio\AudioChannel.cs" />
     <Compile Include="Source\Audio\AudioDecoder.cs" />
     <Compile Include="Source\Audio\AudioSystem.cs" />

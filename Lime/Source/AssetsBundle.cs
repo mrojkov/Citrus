@@ -119,10 +119,9 @@ namespace Lime
 	{
 		None = 0,
 		Writable = 1,
-		LanguageSensitiveOpenFile = 2
 	}
 
-	public class AssetsBundle : IAssetsSource, IDisposable
+	public class AssetsBundle : IDisposable
 	{
 		Stack<Stream> streamPool = new Stack<Stream>();
 		string path;
@@ -151,12 +150,12 @@ namespace Lime
 
 		AssetsBundle() {}
 
-		public AssetsBundle(string path, AssetBundleFlags flags, string language = "en")
+		public AssetsBundle(string path, AssetBundleFlags flags)
 		{
-			Open(path, flags, language);
+			Open(path, flags);
 		}
 
-		public void Open(string path, AssetBundleFlags flags, string language = "en")
+		public void Open(string path, AssetBundleFlags flags)
 		{
 			this.path = path;
 			if ((flags & AssetBundleFlags.Writable) != 0) {
@@ -213,8 +212,8 @@ namespace Lime
 
 		public void Close()
 		{
-			CleanupBundle();
 			if (writer != null) {
+				CleanupBundle();
 				WriteIndexTable();
 				writer.Close();
 			}
@@ -237,6 +236,24 @@ namespace Lime
 		public Stream OpenFile(string path)
 		{
 			return new AssetStream(this, path);
+		}
+
+		public Stream OpenFileLocalized(string path)
+		{
+			return new AssetStream(this, GetLocalizedPath(path));
+		}
+
+		public string GetLocalizedPath(string path)
+		{
+			if (string.IsNullOrEmpty(CurrentLanguage))
+				return path;
+			string extension = Path.GetExtension(path);
+			string pathWithoutExtension = Path.ChangeExtension(path, null);
+			string localizedParth = pathWithoutExtension + "." + CurrentLanguage + extension;
+			if (FileExists(localizedParth)) {
+				return localizedParth;
+			}
+			return path;
 		}
 
 		public DateTime GetFileLastWriteTime(string path)

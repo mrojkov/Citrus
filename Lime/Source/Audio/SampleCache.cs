@@ -27,7 +27,7 @@ namespace Lime
 					return new MemoryStream(item.Buffer);
 				}
 			}
-			var stream = AssetsBundle.Instance.OpenFile(path);
+			var stream = AssetsBundle.Instance.OpenFileLocalized(path);
 			if (stream.Length < MaxCachedSoundSize) {
 				var stream2 = new MemoryStream((int)stream.Length);
 				stream.CopyTo(stream2);

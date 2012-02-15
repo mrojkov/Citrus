@@ -8,12 +8,12 @@ namespace Lime
 
 		public static void Start()
 		{
-			ticks = Environment.TickCount;
+			ticks = System.Environment.TickCount;
 		}
 
 		public static int Stop()
 		{
-			ticks = Environment.TickCount - ticks;
+			ticks = System.Environment.TickCount - ticks;
 			Console.WriteLine(String.Format("Execution time {0} ms.", ticks));
 			return ticks;
 		}
