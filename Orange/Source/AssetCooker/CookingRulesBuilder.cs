@@ -8,11 +8,11 @@ namespace Orange
 	{
 		public string TextureAtlas;
 		public bool MipMaps;
-		public bool Compression;
+		public bool PVRCompression;
 		public DateTime LastChangeTime;
 		public static CookingRules Default = new CookingRules {
 			TextureAtlas = null, MipMaps = false, 
-			Compression = true, LastChangeTime = new DateTime(0)};
+			PVRCompression = true, LastChangeTime = new DateTime(0)};
 	}
 	
 	public class CookingRulesBuilder
@@ -91,8 +91,8 @@ namespace Orange
 						case "MipMaps":
 							rules.MipMaps = ParseBool(words[1]);
 							break;
-						case "Compression":
-							rules.Compression = ParseBool(words[1]);
+						case "PVRCompression":
+							rules.PVRCompression = ParseBool(words[1]);
 							break;
 						default:
 							throw new Lime.Exception("Unknown attribute {0}", words[0]);

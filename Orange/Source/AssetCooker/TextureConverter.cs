@@ -203,13 +203,13 @@ namespace Orange
 #endif
 		}
 		
-		public static void Convert(string srcPath, string dstPath, bool compressed, bool mipMaps, TargetPlatform platform)
+		public static void Convert(string srcPath, string dstPath, bool pvrCompressed, bool mipMaps, TargetPlatform platform)
 		{
 			if (Path.GetExtension(dstPath) == ".pvr") {
-				ToPVRTexture(srcPath, dstPath, compressed, mipMaps);
+				ToPVRTexture(srcPath, dstPath, pvrCompressed, mipMaps);
 			}
 			else if (Path.GetExtension(dstPath) == ".dds") {
-				ToDDSTexture(srcPath, dstPath, compressed, mipMaps);
+				ToDDSTexture(srcPath, dstPath, true, mipMaps);
 			}
 			else {
 				throw new Lime.Exception("Unknown texture format for: {0}", dstPath);

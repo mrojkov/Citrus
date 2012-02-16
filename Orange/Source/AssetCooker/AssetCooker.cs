@@ -68,7 +68,7 @@ namespace Orange
 						}
 						Helpers.CreateDirectoryRecursive(Path.GetDirectoryName(dstPath));
 						string tmpFile = Path.ChangeExtension(srcPath, GetPlatformTextureExtension());
-						TextureConverter.Convert(srcPath, tmpFile, rules.Compression, rules.MipMaps, platform);
+						TextureConverter.Convert(srcPath, tmpFile, rules.PVRCompression, rules.MipMaps, platform);
 						assetsBundle.ImportFile(tmpFile, dstPath, 0);
 						File.Delete(tmpFile);
 						return true;
@@ -214,7 +214,7 @@ namespace Orange
 					}
 					var item = new AtlasItem {Path = Path.ChangeExtension(p.Key, ".atlasPart"), 
 						Pixbuf = pixbuf, MipMapped = p.Value.MipMaps,
-						Compressed = p.Value.Compression};
+						Compressed = p.Value.PVRCompression};
 					items.Add(item);
 				}
 			}
