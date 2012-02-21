@@ -73,6 +73,7 @@
     <Compile Include="Source\AssetCooker\AssetCooker.cs" />
     <Compile Include="Source\AssetCooker\AssetsUnpacker.cs" />
     <Compile Include="Source\AssetCooker\CookingRulesBuilder.cs" />
+    <Compile Include="Source\AssetCooker\TextureConverterUtils.cs" />
     <Compile Include="Source\AssetCooker\RectAllocator.cs" />
     <Compile Include="Source\AssetCooker\TextureConverter.cs" />
     <Compile Include="Source\AssetCooker\WaveIMA4Converter.cs" />

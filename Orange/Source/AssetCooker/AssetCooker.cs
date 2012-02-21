@@ -77,7 +77,7 @@ namespace Orange
 						string fontPngFile = Path.ChangeExtension(srcPath, ".png");
 						Lime.Size size;
 						bool hasAlpha;
-						if (!TextureConverter.GetPngFileInfo(fontPngFile, out size.Width, out size.Height, out hasAlpha)) {
+						if (!TextureConverterUtils.GetPngFileInfo(fontPngFile, out size.Width, out size.Height, out hasAlpha)) {
 							throw new Lime.Exception("Font doesn't have an appropriate png texture file");
 						}
 						var importer = new HotFontImporter(srcPath);
