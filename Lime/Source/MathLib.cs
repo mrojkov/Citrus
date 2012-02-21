@@ -9,6 +9,7 @@ namespace Lime
 	{
 		public static readonly Random RandomGenerator = new Random();
 		public const float Pi = 3.141592653f;
+		public const float Pi2 = 2 * 3.141592653f;
 		public const float DegreesToRadians = Pi / 180;
 		public const float RadiansToDegrees = 180 / Pi;
 

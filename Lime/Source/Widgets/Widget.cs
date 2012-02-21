@@ -185,14 +185,19 @@ namespace Lime
 		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (worldShown) {
-				if (Layer != 0)
-					chain.PushLayer(Layer);
-				foreach (Node node in Nodes.AsArray) {
-					node.AddToRenderChain(chain);
+				if (Layer != 0) {
+					int oldLayer = chain.SetLayer(Layer);
+					foreach (Node node in Nodes.AsArray) {
+						node.AddToRenderChain(chain);
+					}
+					chain.Add(this);
+					chain.SetLayer(oldLayer);
+				} else {
+					foreach (Node node in Nodes.AsArray) {
+						node.AddToRenderChain(chain);
+					}
+					chain.Add(this);
 				}
-				chain.Add(this);
-				if (Layer != 0)
-					chain.PopLayer();
 			}
 		}
 

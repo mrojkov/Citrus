@@ -152,16 +152,17 @@ namespace Lime
 			return false;
 		}
 
-		public void PlayAnimation(string markerId)
+		public bool PlayAnimation(string markerId)
 		{
 			Marker marker = Markers.Get(markerId);
 			if (marker == null) {
 				// Console.WriteLine("WARNING: Attempt to play animation. Unknown marker '{0}' in node '{1}'", markerId, Id);
-				return;
+				return false;
 			}
 			AnimationFrame = marker.Frame;
 			CurrentAnimation = markerId;
 			Playing = true;
+			return true;
 		}
 
 		public int AnimationFrame {

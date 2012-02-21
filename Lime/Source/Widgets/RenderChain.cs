@@ -8,7 +8,6 @@ namespace Lime
 		int currentLayer;
 		int maxUsedLayer;
 
-		Stack<int> layerStack = new Stack<int>();
 		Node[] layers = new Node[MaxLayers];
 
 		public void Add(Node node)
@@ -20,27 +19,22 @@ namespace Lime
 		public void Add(Node node, int layer)
 		{
 			if (layer != 0) {
-				PushLayer(layer);
+				int oldLayer = SetLayer(layer);
 				Add(node);
-				PopLayer();
+				SetLayer(oldLayer);
 			} else {
 				Add(node);
 			}
 		}
 
-		public void PushLayer(int layer)
+		public int SetLayer(int layer)
 		{
 			if (layer > maxUsedLayer) {
 				maxUsedLayer = layer;
 			}
+			int oldLayer = currentLayer;
 			currentLayer = layer;
-			layerStack.Push(layer);
-		}
-
-		public void PopLayer()
-		{
-			currentLayer = layerStack.Peek();
-			layerStack.Pop();
+			return oldLayer;
 		}
 
 		public void RenderAndClear()

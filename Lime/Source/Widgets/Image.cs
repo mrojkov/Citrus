@@ -44,8 +44,9 @@ namespace Lime
 
 		public override void AddToRenderChain(RenderChain chain)
 		{
-			if (worldShown && !imageCombinerArg)
+			if (worldShown && !imageCombinerArg) {
 				chain.Add(this, Layer);
+			}
 		}
 
 		ITexture IImageCombinerArg.GetTexture()
