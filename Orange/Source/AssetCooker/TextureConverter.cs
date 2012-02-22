@@ -62,7 +62,6 @@ namespace Orange
 			if (hasAlpha) {
 				var pixbuf = new Gdk.Pixbuf(srcPath);
 				TextureConverterUtils.PremultiplyAlpha(pixbuf, true);
-				TextureConverterUtils.ReduceColorsToRGBA4444WithFloydSteinbergDithering(pixbuf);
 				string tga = Path.ChangeExtension(srcPath, ".tga");
 				try {
 					TextureConverterUtils.SaveToTGA(pixbuf, tga);
