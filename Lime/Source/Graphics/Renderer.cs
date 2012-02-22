@@ -63,7 +63,7 @@ namespace Lime
 
 	public static class Renderer
 	{
-		public static bool PremulAlphaMode = true;
+		public static bool PremulAlphaMode = false;
 		
 		const int MaxVertices = 1024;
 		public static int DrawCalls = 0;
