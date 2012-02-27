@@ -69,6 +69,43 @@ namespace Orange
 			pixel.B = (byte)Math.Min((int)pixel.B + (error.B * koeff >> 4), 255);
 			return pixel;
 		}
+	
+		public static void SwapChannels(Gdk.Pixbuf pixbuf)
+		{
+			if (pixbuf.HasAlpha) {
+				unsafe {
+					for (int i = 0; i < pixbuf.Height; i++) {
+						RGBA* pixels = (RGBA*)((byte*)pixbuf.Pixels + pixbuf.Rowstride * i);
+						int width = pixbuf.Width;
+						for (int j = 0; j < width; j++) {
+							RGBA c = *pixels;
+							byte r = c.R;
+							byte b = c.B;
+							c.R = b;
+							c.B = r;
+							*pixels++ = c;
+						}
+					}
+				}
+			} else {
+				unsafe {
+					for (int i = 0; i < pixbuf.Height; i++) {
+						byte* src = (byte*)pixbuf.Pixels + pixbuf.Rowstride * i;
+						byte* dst = src;
+						int width = pixbuf.Width;						
+						for (int j = 0; j < width; j++) {
+							byte r = *src++;
+							byte g = *src++;
+							byte b = *src++;
+							*dst++ = b;
+							*dst++ = g;
+							*dst++ = r;
+						}
+					}
+				}		
+			}
+		}	
+		
 		
 		public static void PremultiplyAlpha(Gdk.Pixbuf pixbuf, bool swapChannels)
 		{
@@ -107,8 +144,8 @@ namespace Orange
 		
 		public static void SaveToTGA(Gdk.Pixbuf pixbuf, string path)
 		{
-			using(Stream stream = new FileStream(path, FileMode.Create)) {
-				using(BinaryWriter o = new BinaryWriter(stream)) {
+			using (Stream stream = new FileStream(path, FileMode.Create)) {
+				using (BinaryWriter o = new BinaryWriter(stream)) {
 					o.Write((byte)0); // size of ID field that follows 18 byte header(0 usually)
 					o.Write((byte)0); // type of colour map 0 = none, 1 = has palette
 					o.Write((byte)2); // type of image 0 = none, 1 = indexed, 2 = rgb, 3 = grey, +8 = rle packed
@@ -119,11 +156,12 @@ namespace Orange
 					o.Write((short)0); // image y origin
 					o.Write((short)pixbuf.Width); // image width in pixels
 					o.Write((short)pixbuf.Height); // image height in pixels
-					o.Write((byte)32); // image bits per pixel 8,16,24,32
+					o.Write((byte)(pixbuf.HasAlpha ? 32 : 24)); // image bits per pixel 8,16,24,32
 					o.Write((byte)0); // descriptor
-					byte[] buffer = new byte[pixbuf.Width * 4];
+					int bpp = pixbuf.HasAlpha ? 4 : 3;
+					byte[] buffer = new byte[pixbuf.Width * bpp];
 					for (int i = pixbuf.Height - 1; i >= 0; i--) {
-						Marshal.Copy(pixbuf.Pixels + pixbuf.Rowstride * i, buffer, 0, pixbuf.Width * 4);
+						Marshal.Copy(pixbuf.Pixels + pixbuf.Rowstride * i, buffer, 0, pixbuf.Width * bpp);
 						o.Write(buffer, 0, buffer.Length);
 					}
 				}
