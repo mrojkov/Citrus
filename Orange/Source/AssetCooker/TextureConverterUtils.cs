@@ -70,7 +70,7 @@ namespace Orange
 			return pixel;
 		}
 
-		public static void SwapRGBAChannels(Gdk.Pixbuf pixbuf)
+		public static void SwapRGBChannels(Gdk.Pixbuf pixbuf)
 		{
 			if (pixbuf.HasAlpha) {
 				unsafe {
