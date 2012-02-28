@@ -10,7 +10,7 @@ namespace Lime
 		public SerializableFont Font = new SerializableFont();
 
 		[ProtoMember(2)]
-		public string Text;
+		public string Text = "";
 
 		[ProtoMember(3)]
 		public float FontHeight = 15;

@@ -71,6 +71,9 @@ namespace Lime
 			if (RootFrame.Instance.ActiveWidget != this && thumb.CurrentAnimation != "Normal") {
 				thumb.PlayAnimation("Normal");
 			}
+			if (RootFrame.Instance.ActiveWidget == this) {
+				RootFrame.Instance.ActiveWidgetUpdated = true;
+			}
 		}
 
 		public override void Update(int delta)

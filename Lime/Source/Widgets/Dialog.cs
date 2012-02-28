@@ -12,11 +12,18 @@
 					RootFrame.Instance.ActiveWidget = null;
 				}
 			}
+			if (worldShown) {
+				if (RootFrame.Instance.ActiveTextWidget != null && !RootFrame.Instance.ActiveTextWidget.ChildOf(this)) {
+					// Discard active text widget if it's not a child of the topmost dialog.
+					RootFrame.Instance.ActiveTextWidget = null;
+				}
+			}
 			base.Update(delta);
 			if (worldShown) {
-				// Cosume all input events and drive mouse into the hole.
+				// Cosume all input events and drive mouse out of the screen.
 				Input.ConsumeAllKeyEvents(true);
 				Input.MousePosition = MouseRefuge;
+				Input.TextInput = null;
 			}
 		}
 	}

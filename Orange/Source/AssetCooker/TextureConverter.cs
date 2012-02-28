@@ -36,7 +36,7 @@ namespace Orange
 			}
 			string tga = Path.ChangeExtension(srcPath, ".tga");
 			try {
-				TextureConverterUtils.SwapChannels(pixbuf);
+				TextureConverterUtils.SwapRGBAChannels(pixbuf);
 				TextureConverterUtils.SaveToTGA(pixbuf, tga);
 				string mipsFlag = mipMaps ? "-m" : "";
 				string pvrTexTool = Path.Combine(Helpers.GetApplicationDirectory(), "Toolchain.Mac", "PVRTexTool");

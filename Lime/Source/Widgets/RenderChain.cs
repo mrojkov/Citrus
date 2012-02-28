@@ -33,7 +33,9 @@ namespace Lime
 				maxUsedLayer = layer;
 			}
 			int oldLayer = currentLayer;
-			currentLayer = layer;
+			if (layer != 0) {
+				currentLayer = layer;
+			}
 			return oldLayer;
 		}
 

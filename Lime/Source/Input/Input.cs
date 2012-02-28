@@ -229,6 +229,8 @@ namespace Lime
 			}
 		}
 
+		public static string TextInput { get; internal set; }
+
 #if WIN
 		internal static void Update()
 		{
@@ -242,7 +244,7 @@ namespace Lime
 			currentKeysState[(int)Key.Mouse1] = mouseState.IsButtonDown(OpenTK.Input.MouseButton.Right);
 			currentKeysState[(int)Key.Mouse2] = mouseState.IsButtonDown(OpenTK.Input.MouseButton.Middle);
 		}
-#elif MAC		
+#elif MAC
 		internal static void Update()
 		{
 		}

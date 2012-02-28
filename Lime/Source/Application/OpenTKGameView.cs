@@ -17,7 +17,7 @@ namespace Lime
 			app.OnCreate(this);
 			//this.Keyboard.KeyDown += HandleKeyDown;
 			//this.Keyboard.KeyUp += HandleKeyUp;
-			//this.KeyPress += HandleKeyPress;
+			this.KeyPress += HandleKeyPress;
 			//this.Mouse.ButtonDown += HandleMouseButtonDown;
 			//this.Mouse.ButtonUp += HandleMouseButtonUp;
 			this.Mouse.Move += HandleMouseMove;
@@ -38,12 +38,12 @@ namespace Lime
 		{
 			app.OnKeyUp((Key)e.Key);
 		}
-
+*/
 		void HandleKeyPress(object sender, KeyPressEventArgs e)
 		{
-			app.OnKeyPress(e.KeyChar);
+			Input.TextInput += e.KeyChar;
 		}
-
+/*
 		void HandleMouseButtonUp(object sender, MouseButtonEventArgs e)
 		{
 			Vector2 position = new Vector2(e.X, e.Y) * Input.ScreenToWorldTransform;
@@ -92,6 +92,7 @@ namespace Lime
 			else if (delta > 0.1)
 				delta = 0.1;
 			app.OnUpdateFrame(delta);
+			Input.TextInput = null;
 		}
 		
 		protected override void OnRenderFrame(OpenTK.FrameEventArgs e)

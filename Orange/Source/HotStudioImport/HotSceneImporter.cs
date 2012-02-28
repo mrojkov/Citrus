@@ -21,7 +21,7 @@ namespace Orange
 
 		void ParseActorProperty(Node node, string name)
 		{
-			switch(name) {
+			switch (name) {
 			case "Name":
 				node.Id = lexer.ParseQuotedString();
 				break;
@@ -74,7 +74,7 @@ namespace Orange
 		void ParseGraphicProperty(Node node, string name)
 		{
 			Widget widget = (Widget)node;
-			switch(name) {
+			switch (name) {
 			case "Anchors":
 				widget.Anchors = (Anchors)lexer.ParseInt();
 				break;
@@ -117,7 +117,7 @@ namespace Orange
 		void ParseImageProperty(Node node, string name)
 		{
 			Image img = (Image)node;
-			switch(name) {
+			switch (name) {
 			case "TexturePath":
 				img.Texture = new SerializableTexture(lexer.ParsePath());
 				break;
@@ -136,7 +136,7 @@ namespace Orange
 		void ParseTextProperty(Node node, string name)
 		{
 			SimpleText text = (SimpleText)node;
-			switch(name) {
+			switch (name) {
 			case "FontName":
 				text.Font = new SerializableFont(lexer.ParseQuotedString());
 				break;
@@ -170,7 +170,7 @@ namespace Orange
 		void ParseParticleTemplateProperty(Node node, string name)
 		{
 			ParticleModifier pm = (ParticleModifier)node;
-			switch(name) {
+			switch (name) {
 			case "TexturePath":
 				pm.Texture = new SerializableTexture(lexer.ParsePath());
 				break;
@@ -222,7 +222,7 @@ namespace Orange
 		void ParseParticlesMagnetProperty(Node node, string name)
 		{
 			ParticlesMagnet magnet = (ParticlesMagnet)node;
-			switch(name) {
+			switch (name) {
 			case "Shape":
 				magnet.Shape = (EmitterShape)lexer.ParseInt();
 				break;
@@ -241,7 +241,7 @@ namespace Orange
 		void ParseParticleEmitter2Property(Node node, string name)
 		{
 			ParticleEmitter emitter = (ParticleEmitter)node;
-			switch(name) {
+			switch (name) {
 			case "Shape":
 				emitter.Shape = (EmitterShape)lexer.ParseInt();
 				break;
@@ -329,7 +329,7 @@ namespace Orange
 		void ParseSceneProperty(Node node, string name)
 		{
 			Frame frame = (Frame)node;
-			switch(name) {
+			switch (name) {
 			case "Enabled":
 				lexer.ParseBool();
 				break;
@@ -357,7 +357,7 @@ namespace Orange
 		void ParseMaskedEffectProperty(Node node, string name)
 		{
 			ImageCombiner combiner = (ImageCombiner)node;
-			switch(name) {
+			switch (name) {
 			case "Enabled":
 				combiner.Enabled = lexer.ParseBool();
 				break;
@@ -373,7 +373,7 @@ namespace Orange
 		void ParseDistortionMeshProperty(Node node, string name)
 		{
 			DistortionMesh mesh = (DistortionMesh)node;
-			switch(name) {
+			switch (name) {
 			case "NumRows":
 				mesh.NumRows = lexer.ParseInt();
 				break;
@@ -392,7 +392,7 @@ namespace Orange
 		void ParseMeshPointProperty(Node node, string name)
 		{
 			DistortionMeshPoint point = (DistortionMeshPoint)node;
-			switch(name) {
+			switch (name) {
 			case "Position":
 				lexer.ParseVector2();
 				break;
@@ -417,7 +417,7 @@ namespace Orange
 		void ParseBoneProperty(Node node, string name)
 		{
 			Bone bone = (Bone)node;
-			switch(name) {
+			switch (name) {
 			case "Position":
 				bone.Position = lexer.ParseVector2();
 				break;
@@ -460,7 +460,7 @@ namespace Orange
 		void ParseAudioProperty(Node node, string name)
 		{
 			Audio audio = (Audio)node;
-			switch(name) {
+			switch (name) {
 			case "File":
 				audio.Sample = new SerializableSample(lexer.ParsePath());
 				break;
@@ -493,7 +493,7 @@ namespace Orange
 
 		void ParseMarkerProperty(Marker marker, string name)
 		{
-			switch(name) {
+			switch (name) {
 			case "Name":
 				marker.Id = lexer.ParseQuotedString();
 				break;
@@ -537,7 +537,7 @@ namespace Orange
 		void ParseButtonProperty(Node node, string name)
 		{
 			Button button = (Button)node;
-			switch(name) {
+			switch (name) {
 			case "Text":
 				button.Caption = lexer.ParseQuotedString();
 				break;
@@ -550,7 +550,7 @@ namespace Orange
 		void ParseNineGridProperty(Node node, string name)
 		{
 			NineGrid grid = (NineGrid)node;
-			switch(name) {
+			switch (name) {
 			case "TexturePath":
 				grid.Texture = new SerializableTexture(lexer.ParsePath());
 				break;
@@ -575,7 +575,7 @@ namespace Orange
 		void ParseSplinePointProperty(Node node, string name)
 		{
 			SplinePoint point = (SplinePoint)node;
-			switch(name) {
+			switch (name) {
 			case "Position":
 				lexer.ParseVector2();
 				break;
@@ -603,7 +603,7 @@ namespace Orange
 		void ParseGearProperty(Node node, string name)
 		{
 			SplineGear gear = (SplineGear)node;
-			switch(name) {
+			switch (name) {
 			case "WidgetName":
 				gear.WidgetId = lexer.ParseQuotedString();
 				break;
@@ -621,7 +621,7 @@ namespace Orange
 
 		void ParseSplineProperty(Node node, string name)
 		{
-			switch(name) {
+			switch (name) {
 			default:
 				ParseGraphicProperty(node, name);
 				break;
@@ -631,7 +631,7 @@ namespace Orange
 		void ParseSliderProperty(Node node, string name)
 		{
 			Slider slider = (Slider)node;
-			switch(name) {
+			switch (name) {
 			case "RangeMin":
 				slider.RangeMin = lexer.ParseFloat();
 				break;
@@ -653,7 +653,7 @@ namespace Orange
 		void ParseTextStyleProperty(Node node, string name)
 		{
 			TextStyle style = (TextStyle)node;
-			switch(name) {
+			switch (name) {
 			case "ImagePath":
 				style.ImageTexture = new SerializableTexture(lexer.ParsePath());
 				break;
@@ -692,7 +692,7 @@ namespace Orange
 		void ParseRichTextProperty(Node node, string name)
 		{
 			RichText text = (RichText)node;
-			switch(name) {
+			switch (name) {
 			case "Text":
 				text.Text = lexer.ParseQuotedString();
 				break;
@@ -708,9 +708,40 @@ namespace Orange
 			}
 		}
 
+		void ParseEditProperty(Node node, string name)
+		{
+			TextBox textBox = (TextBox)node;
+			switch (name) {
+			case "FontName":
+				textBox.Font = new SerializableFont(lexer.ParseQuotedString());
+				break;
+			case "Text":
+				textBox.Text = lexer.ParseQuotedString();
+				break;
+			case "FontSize":
+				textBox.FontHeight = lexer.ParseFloat();
+				break;
+			case "MaxLength":
+				textBox.MaxTextLength = lexer.ParseInt();
+				break;
+			case "ExclusiveMode":
+				lexer.ParseBool();
+				break;
+			case "CaretChar":
+				string caret = lexer.ParseQuotedString();
+				if (caret != "") {
+					textBox.CaretChar = caret[0];
+				}
+				break;
+			default:
+				ParseGraphicProperty(node, name);
+				break;
+			}
+		}
+
 		void ParseFolderBeginProperty(Node node, string name)
 		{
-			switch(name) {
+			switch (name) {
 			case "Expanded":
 				lexer.ParseBool();
 				break;
@@ -722,7 +753,7 @@ namespace Orange
 
 		void ParseFolderEndProperty(Node node, string name)
 		{
-			switch(name) {
+			switch (name) {
 			default:
 				ParseActorProperty(node, name);
 				break;
@@ -797,6 +828,7 @@ namespace Orange
 				new KnownActorType {ActorClass = "Hot::Slider", NodeClass = "Lime.Slider, Lime", PropReader = ParseSliderProperty},
 				new KnownActorType {ActorClass = "Hot::RichText", NodeClass = "Lime.RichText, Lime", PropReader = ParseRichTextProperty},
 				new KnownActorType {ActorClass = "Hot::TextStyle", NodeClass = "Lime.TextStyle, Lime", PropReader = ParseTextStyleProperty},
+				new KnownActorType {ActorClass = "Hot::Edit", NodeClass = "Lime.TextBox, Lime", PropReader = ParseEditProperty},
 			};
 		}
 	}

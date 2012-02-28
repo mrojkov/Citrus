@@ -24,6 +24,12 @@ namespace Lime
 
 	public class GameApp
 	{
+		public GameApp()
+		{
+			// Use '.' as decimal separator.
+			System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+		}
+
 		public virtual void OnCreate(IGameWindow gameWindow) {}
 		public virtual void OnGLCreate() {}
 		public virtual void OnGLDestroy() {}

@@ -36,6 +36,7 @@ namespace Lime
 	[ProtoInclude(108, typeof(Button))]
 	[ProtoInclude(109, typeof(Slider))]
 	[ProtoInclude(110, typeof(RichText))]
+	[ProtoInclude(111, typeof(TextBox))]
 	public class Widget : Node
 	{
 		#region Properties
@@ -175,9 +176,6 @@ namespace Lime
 				}
 				if (Anchors != Anchors.None && Parent.Widget != null) {
 					ApplyAnchors();
-				}
-				if (RootFrame.Instance.ActiveWidget == this) {
-					RootFrame.Instance.ActiveWidgetUpdated = true;
 				}
 			}
 		}

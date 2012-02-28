@@ -69,8 +69,8 @@ namespace Orange
 			pixel.B = (byte)Math.Min((int)pixel.B + (error.B * koeff >> 4), 255);
 			return pixel;
 		}
-	
-		public static void SwapChannels(Gdk.Pixbuf pixbuf)
+
+		public static void SwapRGBAChannels(Gdk.Pixbuf pixbuf)
 		{
 			if (pixbuf.HasAlpha) {
 				unsafe {
@@ -92,7 +92,7 @@ namespace Orange
 					for (int i = 0; i < pixbuf.Height; i++) {
 						byte* src = (byte*)pixbuf.Pixels + pixbuf.Rowstride * i;
 						byte* dst = src;
-						int width = pixbuf.Width;						
+						int width = pixbuf.Width;
 						for (int j = 0; j < width; j++) {
 							byte r = *src++;
 							byte g = *src++;
@@ -102,11 +102,10 @@ namespace Orange
 							*dst++ = r;
 						}
 					}
-				}		
+				}
 			}
-		}	
-		
-		
+		}
+
 		public static void PremultiplyAlpha(Gdk.Pixbuf pixbuf, bool swapChannels)
 		{
 			if ((pixbuf.Rowstride & 0x3) != 0) {
