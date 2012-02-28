@@ -111,7 +111,7 @@ namespace Lime
 		}
 
 		protected bool renderedToTexture;
-		
+
 		protected Matrix32 worldMatrix;
 		protected Color4 worldColor;
 		protected Blending worldBlending;

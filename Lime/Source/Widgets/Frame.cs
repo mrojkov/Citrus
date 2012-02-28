@@ -66,11 +66,35 @@ namespace Lime
 			}
 		}
 
+		// public bool BlockControlsWhileAnimating;
+		public bool ConsumeUIEvents;
+
 		void IImageCombinerArg.BypassRendering() {}
 
 		ITexture IImageCombinerArg.GetTexture()
 		{
 			return renderTexture;
+		}
+
+		static Vector2 MouseRefuge = new Vector2(-100000, -100000);
+
+		void UpdateIfInputStopper(int delta)
+		{
+			if (!Input.MousePosition.Equals(MouseRefuge)) {
+				if (RootFrame.Instance.ActiveWidget != null && !RootFrame.Instance.ActiveWidget.ChildOf(this)) {
+					// Discard active widget if it's not a child of the topmost dialog.
+					RootFrame.Instance.ActiveWidget = null;
+				}
+			}
+			if (RootFrame.Instance.ActiveTextWidget != null && !RootFrame.Instance.ActiveTextWidget.ChildOf(this)) {
+				// Discard active text widget if it's not a child of the topmost dialog.
+				RootFrame.Instance.ActiveTextWidget = null;
+			}
+			base.Update(delta);
+			// Cosume all input events and drive mouse out of the screen.
+			Input.ConsumeAllKeyEvents(true);
+			Input.MousePosition = MouseRefuge;
+			Input.TextInput = null;
 		}
 
 		public override void LateUpdate(int delta)
@@ -86,7 +110,11 @@ namespace Lime
 		{
 			if (BeforeUpdate != null)
 				BeforeUpdate(this, new UpdateEventArgs {Delta = delta});
-			base.Update(delta);
+			if (ConsumeUIEvents && worldShown) {
+				UpdateIfInputStopper(delta);
+			} else {
+				base.Update(delta);
+			}
 			if (AfterUpdate != null)
 				AfterUpdate(this, new UpdateEventArgs {Delta = delta});
 		}
