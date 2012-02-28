@@ -83,23 +83,25 @@ namespace Lime
 
 		void UpdateForDialogMode(int delta)
 		{
-			if (!Input.MousePosition.Equals(MouseRefuge)) {
+			if (worldShown && !Input.MousePosition.Equals(MouseRefuge)) {
 				if (RootFrame.Instance.ActiveWidget != null && !RootFrame.Instance.ActiveWidget.ChildOf(this)) {
 					// Discard active widget if it's not a child of the topmost dialog.
 					RootFrame.Instance.ActiveWidget = null;
 				}
 			}
-			if (RootFrame.Instance.ActiveTextWidget != null && !RootFrame.Instance.ActiveTextWidget.ChildOf(this)) {
+			if (worldShown && RootFrame.Instance.ActiveTextWidget != null && !RootFrame.Instance.ActiveTextWidget.ChildOf(this)) {
 				// Discard active text widget if it's not a child of the topmost dialog.
 				RootFrame.Instance.ActiveTextWidget = null;
 			}
 			if (!Playing) {
 				base.Update(delta);
 			}
-			// Cosume all input events and drive mouse out of the screen.
-			Input.ConsumeAllKeyEvents(true);
-			Input.MousePosition = MouseRefuge;
-			Input.TextInput = null;
+			if (worldShown) {
+				// Cosume all input events and drive mouse out of the screen.
+				Input.ConsumeAllKeyEvents(true);
+				Input.MousePosition = MouseRefuge;
+				Input.TextInput = null;
+			}
 			if (Playing) {
 				base.Update(delta);
 			}
@@ -124,7 +126,7 @@ namespace Lime
 			}
 			if (BeforeUpdate != null)
 				BeforeUpdate(this, new UpdateEventArgs {Delta = delta});
-			if (DialogMode && worldShown) {
+			if (DialogMode) {
 				UpdateForDialogMode(delta);
 			} else {
 				base.Update(delta);
