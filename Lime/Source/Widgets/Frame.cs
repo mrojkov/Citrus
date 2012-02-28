@@ -67,6 +67,7 @@ namespace Lime
 		}
 
 		// public bool BlockControlsWhileAnimating;
+		public float AnimationSpeed = 1.0f;
 		public bool ConsumeUIEvents;
 
 		void IImageCombinerArg.BypassRendering() {}
@@ -99,6 +100,9 @@ namespace Lime
 
 		public override void LateUpdate(int delta)
 		{
+			if (AnimationSpeed < 1.0f) {
+				delta = (int)(delta * AnimationSpeed);
+			}
 			if (BeforeLateUpdate != null)
 				BeforeLateUpdate(this, new UpdateEventArgs {Delta = delta});
 			base.LateUpdate(delta);
@@ -108,6 +112,9 @@ namespace Lime
 
 		public override void Update(int delta)
 		{
+			if (AnimationSpeed < 1.0f) {
+				delta = (int)(delta * AnimationSpeed);
+			}
 			if (BeforeUpdate != null)
 				BeforeUpdate(this, new UpdateEventArgs {Delta = delta});
 			if (ConsumeUIEvents && worldShown) {
