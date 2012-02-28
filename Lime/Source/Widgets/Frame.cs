@@ -66,9 +66,11 @@ namespace Lime
 			}
 		}
 
-		// public bool BlockControlsWhileAnimating;
 		public float AnimationSpeed = 1.0f;
-		public bool ConsumeUIEvents;
+
+		// In dialog mode frame acts like a modal dialog, all controls behind the dialog are frozen.
+		// If dialog is being shown or hidden then all controls on dialog are frozen either.
+		public bool DialogMode;
 
 		void IImageCombinerArg.BypassRendering() {}
 
@@ -79,7 +81,7 @@ namespace Lime
 
 		static Vector2 MouseRefuge = new Vector2(-100000, -100000);
 
-		void UpdateIfInputStopper(int delta)
+		void UpdateForDialogMode(int delta)
 		{
 			if (!Input.MousePosition.Equals(MouseRefuge)) {
 				if (RootFrame.Instance.ActiveWidget != null && !RootFrame.Instance.ActiveWidget.ChildOf(this)) {
@@ -91,17 +93,22 @@ namespace Lime
 				// Discard active text widget if it's not a child of the topmost dialog.
 				RootFrame.Instance.ActiveTextWidget = null;
 			}
-			base.Update(delta);
+			if (!Playing) {
+				base.Update(delta);
+			}
 			// Cosume all input events and drive mouse out of the screen.
 			Input.ConsumeAllKeyEvents(true);
 			Input.MousePosition = MouseRefuge;
 			Input.TextInput = null;
+			if (Playing) {
+				base.Update(delta);
+			}
 		}
 
 		public override void LateUpdate(int delta)
 		{
-			if (AnimationSpeed < 1.0f) {
-				delta = (int)(delta * AnimationSpeed);
+			if (AnimationSpeed != 1.0f) {
+				delta = MultiplyDeltaByAnimationSpeed(delta);
 			}
 			if (BeforeLateUpdate != null)
 				BeforeLateUpdate(this, new UpdateEventArgs {Delta = delta});
@@ -112,18 +119,27 @@ namespace Lime
 
 		public override void Update(int delta)
 		{
-			if (AnimationSpeed < 1.0f) {
-				delta = (int)(delta * AnimationSpeed);
+			if (AnimationSpeed != 1.0f) {
+				delta = MultiplyDeltaByAnimationSpeed(delta);
 			}
 			if (BeforeUpdate != null)
 				BeforeUpdate(this, new UpdateEventArgs {Delta = delta});
-			if (ConsumeUIEvents && worldShown) {
-				UpdateIfInputStopper(delta);
+			if (DialogMode && worldShown) {
+				UpdateForDialogMode(delta);
 			} else {
 				base.Update(delta);
 			}
 			if (AfterUpdate != null)
 				AfterUpdate(this, new UpdateEventArgs {Delta = delta});
+		}
+
+		int MultiplyDeltaByAnimationSpeed(int delta)
+		{
+			if (AnimationSpeed < 0 || AnimationSpeed > 1) {
+				throw new Lime.Exception("AnimationSpeed out of range [0..1]");
+			}
+			delta = (int)(delta * AnimationSpeed);
+			return delta;
 		}
 
 		public override void Render()
