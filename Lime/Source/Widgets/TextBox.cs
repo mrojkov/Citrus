@@ -87,14 +87,16 @@ namespace Lime
 			int start = 0;
 			int length = text.Length;
 			Vector2 extent = Renderer.MeasureTextLine(Font.Instance, text, FontHeight);
-			while (extent.X > Width - BorderWidth * 2) {
+			while (extent.X > Width - BorderWidth * 2 && length > 0) {
 				start++;
 				length--;
 				extent = Renderer.MeasureTextLine(Font.Instance, text, FontHeight, start, length);
 			}
 			int period = (int)(CaretBlinkPeriod * 1000);
-			if (RootFrame.Instance.ActiveTextWidget == this && caretBlinkPhase % period < period / 2) {
-				length--;
+			if (RootFrame.Instance.ActiveTextWidget == this) {
+				if (caretBlinkPhase % period < period / 2 && length > 0) {
+					length--;
+				}
 			}
 			var textPosition = new Vector2(BorderWidth, (Height - FontHeight) / 2);
 			Renderer.WorldMatrix = worldMatrix;

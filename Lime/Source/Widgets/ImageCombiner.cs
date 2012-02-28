@@ -68,6 +68,13 @@ namespace Lime
 			}
 		}
 
+		public override void AddToRenderChain(RenderChain chain)
+		{
+			if (Enabled) {
+				chain.Add(this);
+			}
+		}
+
 		static Vector2[] outVertices = new Vector2[64];
 
 		private void ClipPolygonByLine(Vector2[] vertices, ref int numVertices, Vector2 a, Vector2 b)
@@ -154,7 +161,7 @@ namespace Lime
 
 		public override void Render()
 		{
-			if (Enabled && Parent.Widget != null) {
+			if (Parent.Widget != null) {
 				IImageCombinerArg arg1, arg2;
 				if (GetArgs(out arg1, out arg2)) {
 					if (arg1.WorldShown && arg2.WorldShown) {
