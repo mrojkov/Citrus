@@ -79,11 +79,9 @@ namespace Lime
 			return renderTexture;
 		}
 
-		static Vector2 MouseRefuge = new Vector2(-100000, -100000);
-
 		void UpdateForDialogMode(int delta)
 		{
-			if (worldShown && !Input.MousePosition.Equals(MouseRefuge)) {
+			if (worldShown && Input.MouseVisible) {
 				if (RootFrame.Instance.ActiveWidget != null && !RootFrame.Instance.ActiveWidget.ChildOf(this)) {
 					// Discard active widget if it's not a child of the topmost dialog.
 					RootFrame.Instance.ActiveWidget = null;
@@ -99,7 +97,7 @@ namespace Lime
 			if (worldShown) {
 				// Cosume all input events and drive mouse out of the screen.
 				Input.ConsumeAllKeyEvents(true);
-				Input.MousePosition = MouseRefuge;
+				Input.MouseVisible = false;
 				Input.TextInput = null;
 			}
 			if (Playing) {

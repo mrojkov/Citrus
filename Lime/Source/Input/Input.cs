@@ -178,8 +178,20 @@ namespace Lime
 
 		/// <summary>
 		/// The current mouse position in virtual coordinates coordinates. (read only)
+		/// When mouse is invisible this property has an offscreen value.
 		/// </summary>
-		public static Vector2 MousePosition { get; internal set; }
+		public static Vector2 MousePosition {
+			get { return MouseVisible ? mousePosition : mouseRefuge; }
+			internal set { mousePosition = value; }
+		}
+
+		static Vector2 mousePosition;
+		static Vector2 mouseRefuge = new Vector2(-123456, -123456);
+
+		/// <summary>
+		/// Use this property for hiding mouse away. E.g. after processing modal dialog controls.
+		/// </summary>
+		public static bool MouseVisible;
 
 		/// <summary>
 		/// The current accelerometer state (read only).
@@ -234,6 +246,7 @@ namespace Lime
 #if WIN
 		internal static void Update()
 		{
+			MouseVisible = true;
 			currentKeysState.CopyTo(previousKeysState, 0);
 			var kbdState = OpenTK.Input.Keyboard.GetState();
 			for (int i = (int)Key.LShift; i <= (int)Key.BackSlash; i++) {
@@ -251,6 +264,7 @@ namespace Lime
 #elif iOS
 		internal static void Update(bool touching)
 		{
+			MouseVisible = true;
 			currentKeysState.CopyTo(previousKeysState, 0);
 			currentKeysState[(int)Key.Mouse0] = touching;
 		}
