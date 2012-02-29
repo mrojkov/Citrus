@@ -41,6 +41,7 @@ namespace Lime
 
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{
+			Input.MouseVisible = true;
 			double delta = e.Time; 
 			// Here is protection against time leap on inactive state and low FPS
 			if (delta > 0.5)
@@ -48,6 +49,8 @@ namespace Lime
 			else if (delta > 0.1)
 				delta = 0.1;
 			Application.gameApp.OnUpdateFrame(delta);
+			Input.TextInput = null;
+			Input.CopyKeysState();
 		}
 
 		protected override void OnRenderFrame(FrameEventArgs e)

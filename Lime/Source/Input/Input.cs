@@ -243,31 +243,14 @@ namespace Lime
 
 		public static string TextInput { get; internal set; }
 
-#if WIN
-		internal static void Update()
+		internal static void SetKeyState(Key key, bool value)
 		{
-			MouseVisible = true;
+			currentKeysState[(int)key] = value;
+		}
+
+		internal static void CopyKeysState()
+		{
 			currentKeysState.CopyTo(previousKeysState, 0);
-			var kbdState = OpenTK.Input.Keyboard.GetState();
-			for (int i = (int)Key.LShift; i <= (int)Key.BackSlash; i++) {
-				currentKeysState[i] = kbdState.IsKeyDown((OpenTK.Input.Key)i);
-			}
-			var mouseState = OpenTK.Input.Mouse.GetState();
-			currentKeysState[(int)Key.Mouse0] = mouseState.IsButtonDown(OpenTK.Input.MouseButton.Left);
-			currentKeysState[(int)Key.Mouse1] = mouseState.IsButtonDown(OpenTK.Input.MouseButton.Right);
-			currentKeysState[(int)Key.Mouse2] = mouseState.IsButtonDown(OpenTK.Input.MouseButton.Middle);
 		}
-#elif MAC
-		internal static void Update()
-		{
-		}
-#elif iOS
-		internal static void Update(bool touching)
-		{
-			MouseVisible = true;
-			currentKeysState.CopyTo(previousKeysState, 0);
-			currentKeysState[(int)Key.Mouse0] = touching;
-		}
-#endif
 	}
 }

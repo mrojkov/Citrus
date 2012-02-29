@@ -15,61 +15,60 @@ namespace Lime
 			this.app = app;
 			AudioSystem.Initialize();
 			app.OnCreate(this);
-			//this.Keyboard.KeyDown += HandleKeyDown;
-			//this.Keyboard.KeyUp += HandleKeyUp;
+			this.Keyboard.KeyDown += HandleKeyDown;
+			this.Keyboard.KeyUp += HandleKeyUp;
 			this.KeyPress += HandleKeyPress;
-			//this.Mouse.ButtonDown += HandleMouseButtonDown;
-			//this.Mouse.ButtonUp += HandleMouseButtonUp;
+			this.Mouse.ButtonDown += HandleMouseButtonDown;
+			this.Mouse.ButtonUp += HandleMouseButtonUp;
 			this.Mouse.Move += HandleMouseMove;
 			this.Location = new System.Drawing.Point(100, 100);
 		}
-/*
+
 		void HandleKeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
 		{
-			if (e.Key == OpenTK.Input.Key.Escape)
-				this.Exit();
-			if (e.Key == OpenTK.Input.Key.F12) {
-				FullScreen = !FullScreen;
-			}
-			app.OnKeyDown((Key)e.Key);
+			Input.SetKeyState((Key)e.Key, true);
 		}
 
 		void HandleKeyUp(object sender, KeyboardKeyEventArgs e)
 		{
-			app.OnKeyUp((Key)e.Key);
+			Input.SetKeyState((Key)e.Key, false);
 		}
-*/
+
 		void HandleKeyPress(object sender, KeyPressEventArgs e)
 		{
 			Input.TextInput += e.KeyChar;
 		}
-/*
+
 		void HandleMouseButtonUp(object sender, MouseButtonEventArgs e)
 		{
-			Vector2 position = new Vector2(e.X, e.Y) * Input.ScreenToWorldTransform;
 			switch(e.Button) {
 			case OpenTK.Input.MouseButton.Left:
-				app.OnMouseUp(MouseButton.Left, position);
+				Input.SetKeyState(Key.Mouse0, false);
 				break;
 			case OpenTK.Input.MouseButton.Right:
-				app.OnMouseUp(MouseButton.Right, position);
+				Input.SetKeyState(Key.Mouse2, false);
+				break;
+			case OpenTK.Input.MouseButton.Middle:
+				Input.SetKeyState(Key.Mouse2, false);
 				break;
 			}
 		}
 
 		void HandleMouseButtonDown(object sender, MouseButtonEventArgs e)
 		{
-			Vector2 position = new Vector2(e.X, e.Y) * Input.ScreenToWorldTransform;
 			switch(e.Button) {
 			case OpenTK.Input.MouseButton.Left:
-				app.OnMouseDown(MouseButton.Left, position);
+				Input.SetKeyState(Key.Mouse0, true);
 				break;
 			case OpenTK.Input.MouseButton.Right:
-				app.OnMouseDown(MouseButton.Right, position);
+				Input.SetKeyState(Key.Mouse2, true);
+				break;
+			case OpenTK.Input.MouseButton.Middle:
+				Input.SetKeyState(Key.Mouse2, true);
 				break;
 			}
 		}
-*/
+
 		void HandleMouseMove(object sender, MouseMoveEventArgs e)
 		{
 			Vector2 position = new Vector2(e.X, e.Y) * Input.ScreenToWorldTransform;
@@ -84,7 +83,7 @@ namespace Lime
 
 		protected override void OnUpdateFrame(OpenTK.FrameEventArgs e)
 		{
-			Input.Update();
+			Input.MouseVisible = true;
 			double delta = e.Time;
 			// Here is protection against time leap on inactive state and low FPS
 			if (delta > 0.5)
@@ -93,6 +92,7 @@ namespace Lime
 				delta = 0.1;
 			app.OnUpdateFrame(delta);
 			Input.TextInput = null;
+			Input.CopyKeysState();
 		}
 		
 		protected override void OnRenderFrame(OpenTK.FrameEventArgs e)

@@ -53,7 +53,7 @@ namespace Lime
 			var pt = (touches.AnyObject as UITouch).LocationInView(this.View);
 			Vector2 position = new Vector2(pt.X, pt.Y) * Input.ScreenToWorldTransform;
 			Input.MousePosition = position;
-			Input.Update(true);
+			Input.SetKeyState(Key.Mouse0, true);
 		}
 		
 		public override void TouchesMoved(NSSet touches, UIEvent evt)
@@ -68,7 +68,7 @@ namespace Lime
 			var pt = (touches.AnyObject as UITouch).LocationInView(this.View);
 			Vector2 position = new Vector2(pt.X, pt.Y) * Input.ScreenToWorldTransform;
 			Input.MousePosition = position;
-			Input.Update(false);
+			Input.SetKeyState(Key.Mouse0, false);
 		}
 
 		public DeviceOrientation CurrentDeviceOrientation {
