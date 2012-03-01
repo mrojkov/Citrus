@@ -227,14 +227,16 @@ namespace Lime
 			}
 		}
 
+		protected const int MaxTimeDelta = 1000 / Animator.FramesPerSecond - 1;
+
 		public void SafeUpdate(int delta)
 		{
 			if (delta < 0)
 				throw new Lime.Exception("Update interval can not be negative");
-			const int step = 1000 / Animator.FramesPerSecond - 1;
-			while (delta > step) {
-				Update(step);
-				delta -= step;
+			while (delta > MaxTimeDelta) {
+				Update(MaxTimeDelta);
+				LateUpdate(MaxTimeDelta);
+				delta -= MaxTimeDelta;
 			}
 			Update(delta);
 			LateUpdate(delta);

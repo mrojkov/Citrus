@@ -105,38 +105,56 @@ namespace Lime
 			}
 		}
 
+		void LateUpdateHelper(int delta)
+		{
+			base.LateUpdate(delta);
+		}
+
 		public override void LateUpdate(int delta)
 		{
-			if (AnimationSpeed != 1.0f) {
-				delta = MultiplyDeltaByAnimationSpeed(delta);
-			}
 			if (BeforeLateUpdate != null)
 				BeforeLateUpdate(this, new UpdateEventArgs {Delta = delta});
+			if (AnimationSpeed != 1.0f) {
+				delta = MultiplyDeltaByAnimationSpeed(delta);
+				while (delta > MaxTimeDelta) {
+					base.LateUpdate(MaxTimeDelta);
+					delta -= MaxTimeDelta;
+				}
+			}
 			base.LateUpdate(delta);
 			if (AfterLateUpdate != null)
 				AfterLateUpdate(this, new UpdateEventArgs {Delta = delta});
 		}
 
-		public override void Update(int delta)
+		void UpdateHelper(int delta)
 		{
-			if (AnimationSpeed != 1.0f) {
-				delta = MultiplyDeltaByAnimationSpeed(delta);
-			}
-			if (BeforeUpdate != null)
-				BeforeUpdate(this, new UpdateEventArgs {Delta = delta});
 			if (DialogMode) {
 				UpdateForDialogMode(delta);
 			} else {
 				base.Update(delta);
 			}
+		}
+
+		public override void Update(int delta)
+		{
+			if (BeforeUpdate != null)
+				BeforeUpdate(this, new UpdateEventArgs {Delta = delta});
+			if (AnimationSpeed != 1.0f) {
+				delta = MultiplyDeltaByAnimationSpeed(delta);
+				while (delta > MaxTimeDelta) {
+					UpdateHelper(MaxTimeDelta);
+					delta -= MaxTimeDelta;
+				}
+			}
+			UpdateHelper(delta);
 			if (AfterUpdate != null)
 				AfterUpdate(this, new UpdateEventArgs {Delta = delta});
 		}
 
 		int MultiplyDeltaByAnimationSpeed(int delta)
 		{
-			if (AnimationSpeed < 0 || AnimationSpeed > 1) {
-				throw new Lime.Exception("AnimationSpeed out of range [0..1]");
+			if (AnimationSpeed < 0) {
+				throw new Lime.Exception("AnimationSpeed can not be negative");
 			}
 			delta = (int)(delta * AnimationSpeed);
 			return delta;
