@@ -122,6 +122,7 @@
     <Compile Include="Source\Widgets\SplinePoint.cs" />
     <Compile Include="Source\Widgets\TextBox.cs" />
     <Compile Include="Source\Widgets\Widget.cs" />
+    <Compile Include="Toolbox.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
