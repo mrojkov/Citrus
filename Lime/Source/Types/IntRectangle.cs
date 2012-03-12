@@ -60,6 +60,7 @@ namespace Lime
 		public int Top { get { return A.Y; } set { A.Y = value; } }
 		public int Right { get { return B.X; } set { B.X = value; } }
 		public int Bottom { get { return B.Y; } set { B.Y = value; } }
+		public IntVector2 Center { get { return new IntVector2((A.X + B.X) / 2, (A.Y + B.Y) / 2); } }
 
 		bool Contains(IntVector2 v)
 		{

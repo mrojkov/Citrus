@@ -54,6 +54,7 @@ namespace Lime
 		public float Top { get { return A.Y; } set { A.Y = value; } }
 		public float Right { get { return B.X; } set { B.X = value; } }
 		public float Bottom { get { return B.Y; } set { B.Y = value; } }
+		public Vector2 Center { get { return (A + B) / 2; } }
 
 		public Vector2 Size { 
 			get {
