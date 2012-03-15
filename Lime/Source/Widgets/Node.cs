@@ -69,6 +69,7 @@ namespace Lime
 
 		public void AdvanceAnimation(int delta)
 		{
+			int tunedDelta = delta;
 			for (int i = 0; i < Markers.Count; i++) {
 				Marker marker = Markers[i];
 				int markerTime = Animator.FramesToMsecs(marker.Frame);
@@ -80,7 +81,7 @@ namespace Lime
 							animationTime = gotoTime + (animationTime + delta - markerTime);
 						}
 					} else if (marker.Action == MarkerAction.Stop) {
-						delta = markerTime - animationTime;
+						tunedDelta = markerTime - animationTime;
 						Playing = false;
 					} else if (marker.Action == MarkerAction.Destroy) {
 						Playing = false;
@@ -91,10 +92,10 @@ namespace Lime
 			}
 			foreach (Node node in Nodes.AsArray) {
 				var animators = node.Animators;
-				animators.Apply(animationTime + delta);
+				animators.Apply(animationTime + tunedDelta);
 				animators.InvokeTriggers(animationTime, animationTime + delta);
 			}
-			animationTime += delta;
+			animationTime += tunedDelta;
 		}
 
 		public Node()

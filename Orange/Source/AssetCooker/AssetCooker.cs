@@ -308,8 +308,8 @@ namespace Orange
 						assetsBundle.DeleteFile(atlasPartPath);
 					} else {
 						srcTexturePath = Path.ChangeExtension(BundlePathToNative(atlasPartPath), ".png");
-						CookingRules rules = cookingRulesMap[srcTexturePath];
-						if (rules.TextureAtlas != null) {
+						if (cookingRulesMap[srcTexturePath].TextureAtlas != null) {
+							CookingRules rules = cookingRulesMap[srcTexturePath];
 							atlasChainsToRebuild.Add(rules.TextureAtlas);
 						} else {
 							Console.WriteLine("- " + atlasPartPath);
