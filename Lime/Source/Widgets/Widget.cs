@@ -73,8 +73,10 @@ namespace Lime
 			}
 		}
 
+		Color4 color;
 		[ProtoMember(6)]
-		public Color4 Color { get; set; }
+		public Color4 Color { get { return color; } set { color = value; } }
+		public byte Alpha { get { return color.A; } set { color.A = value; } }
 
 		[ProtoMember(7), DefaultValue(Anchors.None)]
 		public Anchors Anchors { get; set; }
@@ -91,7 +93,7 @@ namespace Lime
 		[ProtoMember(11), DefaultValue(HitTestMethod.BoundingRect)]
 		public HitTestMethod HitTestMethod { get; set; }
 
-		public bool Shown { get { return Visible && Color.A > 0; } }
+		public bool Shown { get { return Visible && color.A > 0; } }
 		
 		[ProtoMember(13)]
 		public BoneArray BoneArray;
