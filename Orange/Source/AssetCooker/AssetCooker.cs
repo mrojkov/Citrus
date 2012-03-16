@@ -48,7 +48,7 @@ namespace Orange
 		
 		public void Cook()
 		{
-			cookingRulesMap = CookingRulesBuilder.Build(project.AssetsDirectory);
+			cookingRulesMap = CookingRulesBuilder.Build(project.AssetFiles);
 			string bundlePath = Path.ChangeExtension(project.AssetsDirectory, Helpers.GetTargetPlatformString(platform));
 			assetsBundle.Open(bundlePath, Lime.AssetBundleFlags.Writable);
 			try {
@@ -56,11 +56,11 @@ namespace Orange
 					Console.WriteLine("------------- Building Game Content -------------");
 					SyncAtlases();
 					SyncDeleted();
-					SyncUpdated("*.txt", ".txt", (srcPath, dstPath) => {
+					SyncUpdated(".txt", ".txt", (srcPath, dstPath) => {
 						assetsBundle.ImportFile(srcPath, dstPath, 0);
 						return true;
 					});
-					SyncUpdated("*.png", GetPlatformTextureExtension(), (srcPath, dstPath) => {
+					SyncUpdated(".png", GetPlatformTextureExtension(), (srcPath, dstPath) => {
 						CookingRules rules = cookingRulesMap[Path.ChangeExtension(dstPath, ".png")];
 						if (rules.TextureAtlas != null) {
 							// No need to cache this texture since it is a part of texture atlas.
@@ -73,7 +73,7 @@ namespace Orange
 						File.Delete(tmpFile);
 						return true;
 					});
-					SyncUpdated("*.fnt", ".fnt", (srcPath, dstPath) => {
+					SyncUpdated(".fnt", ".fnt", (srcPath, dstPath) => {
 						string fontPngFile = Path.ChangeExtension(srcPath, ".png");
 						Lime.Size size;
 						bool hasAlpha;
@@ -88,14 +88,14 @@ namespace Orange
 						Lime.Serialization.WriteObjectToBundle<Lime.Font>(assetsBundle, dstPath, font);
 						return true;
 					});
-					SyncUpdated("*.scene", ".scene", (srcPath, dstPath) => {
+					SyncUpdated(".scene", ".scene", (srcPath, dstPath) => {
 						var importer = new HotSceneImporter(srcPath);
 						var node = importer.ParseNode();
 						Helpers.CreateDirectoryRecursive(Path.GetDirectoryName(dstPath));
 						Lime.Serialization.WriteObjectToBundle<Lime.Node>(assetsBundle, dstPath, node);
 						return true;
 					});
-					SyncUpdated("*.ogg", ".sound", (srcPath, dstPath) => {
+					SyncUpdated(".ogg", ".sound", (srcPath, dstPath) => {
 						using (var stream = new FileStream(srcPath, FileMode.Open)) {
 							// 1Mb is criteria for conversion Ogg to Wav/Adpcm
 							if (stream.Length > 1024 * 1024) {
@@ -122,10 +122,8 @@ namespace Orange
 		void SyncDeleted()
 		{
 			var assetsFiles = new HashSet<string>();
-			using (new DirectoryChanger(project.AssetsDirectory)) {
-				foreach (string path in Helpers.GetAllFiles(".", "*.*", true)) {
-					assetsFiles.Add(path);
-				}
+			foreach (var fileInfo in project.AssetFiles.Enumerate()) {
+				assetsFiles.Add(fileInfo.Path);
 			}
 			foreach (string path in assetsBundle.EnumerateFiles()) {
 				// Ignoring texture atlases
@@ -144,13 +142,13 @@ namespace Orange
 			}
 		}
 
-		void SyncUpdated(string mask, string newFileExtension, Converter converter)
+		void SyncUpdated(string fileExtension, string bundleAssetExtension, Converter converter)
 		{
-			var files = Helpers.GetAllFiles(".", mask, true);
-			foreach (string srcPath in files) {
-				string dstPath = Path.ChangeExtension(srcPath, newFileExtension);
+			foreach (var srcFileInfo in project.AssetFiles.Enumerate(fileExtension)) {
+				string srcPath = srcFileInfo.Path;
+				string dstPath = Path.ChangeExtension(srcPath, bundleAssetExtension);
 				bool bundled = assetsBundle.FileExists(dstPath);
-				bool needUpdate = !bundled || File.GetLastWriteTime(srcPath) > assetsBundle.GetFileLastWriteTime(dstPath);
+				bool needUpdate = !bundled || srcFileInfo.LastWriteTime > assetsBundle.GetFileLastWriteTime(dstPath);
 				if (needUpdate) {
 					if (converter != null) {
 						try {

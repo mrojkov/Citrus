@@ -13,11 +13,13 @@ namespace Orange
 			if (!Directory.Exists(AssetsDirectory)) {
 				throw new Lime.Exception("Assets folder '{0}' doesn't exist", AssetsDirectory);
 			}
+			AssetFiles = new FileEnumerator(AssetsDirectory);
 		}
 
 		public readonly string ProjectDirectory;
 		public readonly string AssetsDirectory;
 		public readonly string Title;
+		public FileEnumerator AssetFiles;
 	}
 }
 

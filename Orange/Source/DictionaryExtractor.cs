@@ -28,20 +28,21 @@ namespace Orange
 			const string dictionary = "Dictionary.txt";
 			Localization.Dictionary.Clear();
 			for (int pass = 0; pass < 2; pass++) {
+				var sourceFiles = new FileEnumerator(project.ProjectDirectory);
 				using (new DirectoryChanger(project.ProjectDirectory)) {
-					var files = Helpers.GetAllFiles(".", "*.cs", true);
-					foreach (string file in files) {
+					var files = sourceFiles.Enumerate(".cs");
+					foreach (var fileInfo in files) {
 						if (pass == 0)
-							Console.WriteLine("* " + file);
-						ProcessSourceFile(file, (Pass)pass);
+							Console.WriteLine("* " + fileInfo.Path);
+						ProcessSourceFile(fileInfo.Path, (Pass)pass);
 					}
 				}
 				using (new DirectoryChanger(project.AssetsDirectory)) {
-					var files = Helpers.GetAllFiles(".", "*.scene", true);
-					foreach (string file in files) {
+					var files = project.AssetFiles.Enumerate(".scene");
+					foreach (var fileInfo in files) {
 						if (pass == 0)
-							Console.WriteLine("* " + file);
-						ProcessSceneFile(file, (Pass)pass);
+							Console.WriteLine("* " + fileInfo.Path);
+						ProcessSceneFile(fileInfo.Path, (Pass)pass);
 					}
 				}
 			}

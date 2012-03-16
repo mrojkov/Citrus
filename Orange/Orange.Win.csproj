@@ -79,6 +79,7 @@
     <Compile Include="Source\AssetCooker\WaveIMA4Converter.cs" />
     <Compile Include="Source\DictionaryExtractor.cs" />
     <Compile Include="Source\DirectoryChanger.cs" />
+    <Compile Include="Source\FileEnumerator.cs" />
     <Compile Include="Source\Helpers.cs" />
     <Compile Include="Source\HotStudioImport\HotAnimators.cs" />
     <Compile Include="Source\HotStudioImport\HotFontImporter.cs" />

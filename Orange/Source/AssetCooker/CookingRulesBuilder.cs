@@ -17,16 +17,17 @@ namespace Orange
 	
 	public class CookingRulesBuilder
 	{
-		public static Dictionary<string, CookingRules> Build(string assetsDirectory)
+		public static Dictionary<string, CookingRules> Build(FileEnumerator fileEnumerator)
 		{
+			var shouldRescanEnumerator = false;
 			var pathStack = new Stack<string>();
 			var rulesStack = new Stack<CookingRules>();
 			var map = new Dictionary<string, CookingRules>();
 			pathStack.Push("");
 			rulesStack.Push(CookingRules.Default);
-			using (new DirectoryChanger(assetsDirectory)) {
-				var files = Helpers.GetAllFiles(".", "*.*", true);
-				foreach (string path in files) {
+			using (new DirectoryChanger(fileEnumerator.Directory)) {
+				foreach (var fileInfo in fileEnumerator.Enumerate()) {
+					var path = fileInfo.Path;
 					if (!path.StartsWith(pathStack.Peek())) {
 						rulesStack.Pop();
 						pathStack.Pop();
@@ -40,12 +41,16 @@ namespace Orange
 						if (File.Exists(rulesFile)) {
 							rules = ParseCookingRules(rulesStack.Peek(), rulesFile);
 						}
-						if (rules.LastChangeTime > File.GetLastWriteTime(path)) {
+						if (rules.LastChangeTime > fileInfo.LastWriteTime) {
 							File.SetLastWriteTime(path, rules.LastChangeTime);
+							shouldRescanEnumerator = true;
 						}
 						map[path] = rules;
 					}
 				}
+			}
+			if (shouldRescanEnumerator) {
+				fileEnumerator.Rescan();
 			}
 			return map;
 		}
