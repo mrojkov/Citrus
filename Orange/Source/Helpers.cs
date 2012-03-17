@@ -81,19 +81,6 @@ namespace Orange
 			return p.ExitCode;
 		}
 
-		public static void CreateDirectoryRecursive(string path)
-		{
-			if (string.IsNullOrEmpty(path))
-				return;
-			string basePath = Path.GetDirectoryName(path);
-			if (basePath != "" && !Directory.Exists(basePath)) {
-				CreateDirectoryRecursive(basePath);
-			}
-			if (!Directory.Exists(path)) {
-				Directory.CreateDirectory(path);
-			}
-		}
-
 		public static string GetApplicationDirectory()
 		{
 			string appPath;

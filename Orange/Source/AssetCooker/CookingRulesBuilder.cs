@@ -33,7 +33,7 @@ namespace Orange
 						pathStack.Pop();
 					}
 					if (Path.GetFileName(path) == "#CookingRules.txt") {
-						pathStack.Push(Path.GetDirectoryName(path));
+						pathStack.Push(Lime.AssetPath.GetDirectoryName(path));
 						rulesStack.Push(ParseCookingRules(rulesStack.Peek(), path));
 					} else if (Path.GetExtension(path) != ".txt") {
 						var rules = rulesStack.Peek();
@@ -54,14 +54,14 @@ namespace Orange
 			}
 			return map;
 		}
-		
+
 		static bool ParseBool(string value)
 		{
 			if (value != "Yes" && value != "No")
 				throw new Lime.Exception("Invalid value. Must be either 'Yes' or 'No'");
 			return value == "Yes";
 		}
-		
+
 		static CookingRules ParseCookingRules(CookingRules basicRules, string path)
 		{ 
 			var rules = basicRules;
@@ -84,7 +84,7 @@ namespace Orange
 							if (words[1] == "None")
 								rules.TextureAtlas = null;
 							else if (words[1] == "${DirectoryName}") {
-								string atlasName = Path.GetFileName(Path.GetDirectoryName(path));
+								string atlasName = Path.GetFileName(Lime.AssetPath.GetDirectoryName(path));
 								if (string.IsNullOrEmpty(atlasName)) {
 									throw new Lime.Exception("Atlas directory is empty. Choose another atlas name");
 								}

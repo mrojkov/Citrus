@@ -154,12 +154,14 @@ namespace Orange
 			model.UseImplicitZeroDefaults = false;
 			RegisterEngineTypes(model);
 			Serialization.Serializer = model;
-			model.CompileInPlace();
 			// Cook all assets(the main job)
 			AssetCooker cooker = new AssetCooker(citrusProject, platform);
 			cooker.Cook();
 			// Update serialization assembly
-			GenerateSerializerDll(model, citrusProject.ProjectDirectory);
+			if (platform == Orange.TargetPlatform.iOS) {
+				model.CompileInPlace();
+				GenerateSerializerDll(model, citrusProject.ProjectDirectory);
+			}
 		}
 
 		bool RunSolution()
