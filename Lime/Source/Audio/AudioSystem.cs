@@ -143,7 +143,7 @@ namespace Lime
 				return (a.StartupTime < b.StartupTime) ? -1 : 1;
 			});
 			foreach (var channel in channels) {
-				if (channel.IsFree) {
+				if (!channel.Streaming) {
 					var state = channel.State;
 					if (state == ALSourceState.Stopped || state == ALSourceState.Initial) {
 						return channel;
