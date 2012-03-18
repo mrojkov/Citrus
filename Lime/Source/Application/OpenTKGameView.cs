@@ -46,7 +46,7 @@ namespace Lime
 				Input.SetKeyState(Key.Mouse0, false);
 				break;
 			case OpenTK.Input.MouseButton.Right:
-				Input.SetKeyState(Key.Mouse2, false);
+				Input.SetKeyState(Key.Mouse1, false);
 				break;
 			case OpenTK.Input.MouseButton.Middle:
 				Input.SetKeyState(Key.Mouse2, false);
@@ -61,7 +61,7 @@ namespace Lime
 				Input.SetKeyState(Key.Mouse0, true);
 				break;
 			case OpenTK.Input.MouseButton.Right:
-				Input.SetKeyState(Key.Mouse2, true);
+				Input.SetKeyState(Key.Mouse1, true);
 				break;
 			case OpenTK.Input.MouseButton.Middle:
 				Input.SetKeyState(Key.Mouse2, true);
