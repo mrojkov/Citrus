@@ -30,7 +30,7 @@ namespace Lime
 		static volatile bool shouldTerminateThread;
 		static bool active = true;
 
-		public static void Initialize(int numChannels = 16)
+		public static void Initialize(int numChannels = 5)
 		{
 			context = new AudioContext();
 			if (!HasError()) {
@@ -143,8 +143,11 @@ namespace Lime
 				return (a.StartupTime < b.StartupTime) ? -1 : 1;
 			});
 			foreach (var channel in channels) {
-				if (channel.State == ALSourceState.Stopped || channel.State == ALSourceState.Initial) {
-					return channel;
+				if (channel.IsFree) {
+					var state = channel.State;
+					if (state == ALSourceState.Stopped || state == ALSourceState.Initial) {
+						return channel;
+					}
 				}
 			}
 			if (channels.Length > 0 && channels[0].Priority <= priority) {

@@ -6,6 +6,7 @@ namespace Lime
 {
 	public interface IAudioChannel
 	{
+		bool IsFree { get; }
 		ALSourceState State { get; }
 		float Pan { get; set; }
 		void Resume();
@@ -18,6 +19,7 @@ namespace Lime
 		public static NullAudioChannel Instance = new NullAudioChannel();
 
 		public ALSourceState State { get { return ALSourceState.Stopped; } }
+		public bool IsFree { get { return false; } }
 		public float Pan { get { return 0; } set { } }
 		public void Resume() {}
 		public void Stop() {}
@@ -35,7 +37,7 @@ namespace Lime
 		public int Id;
 
 		object streamingSync = new object();
-		volatile bool streaming;
+		public volatile bool streaming;
 
 		int source;
 		float volume = 1;
@@ -74,25 +76,14 @@ namespace Lime
 			}
 		}
 
-		public bool IsFree()
-		{
-			if (streaming) {
-				return false;
-			} else {
-				UnqueueBuffers();
-				int queued;
-				AL.GetSource(source, ALGetSourcei.BuffersQueued, out queued);
-				AudioSystem.CheckError();
-				return queued == 0;
-			}
-		}
+		public bool IsFree { get { return !streaming; } }
 		
 		public Sound Play(IAudioDecoder decoder, bool looping)
 		{
-			if (streaming) {
-				throw new Lime.Exception("Can't play on the channel");
-			}
 			lock (streamingSync) {
+				if (!IsFree) {
+					throw new Lime.Exception("Can't play on the channel because it is already being played");
+				}
 				this.looping = looping;
 				if (this.decoder != null)
 					this.decoder.Dispose();
@@ -166,7 +157,7 @@ namespace Lime
 				}
 			}
 			// resume playing
-			switch(State) {
+			switch (State) {
 			case ALSourceState.Stopped:
 			case ALSourceState.Initial:
 				AL.SourcePlay(source);
