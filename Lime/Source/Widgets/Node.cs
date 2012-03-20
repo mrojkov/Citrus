@@ -279,7 +279,7 @@ namespace Lime
 		{
 			Nodes.Clear();
 			Markers.Clear();
-			if (File.Exists(ContentsPath)) {
+			if (AssetsBundle.Instance.FileExists(ContentsPath)) {
 				Node contents = Node.CreateFromBundle(ContentsPath);
 				if (contents.Widget != null && Widget != null) {
 					contents.Update(0);

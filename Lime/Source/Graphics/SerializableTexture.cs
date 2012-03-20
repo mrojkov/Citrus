@@ -41,40 +41,42 @@ namespace Lime
 
 		public Size ImageSize {
 			get {
-				return core.Instance.ImageSize; 
+				core.GetInstance();
+				return core.ImageSize; 
 			}
 		}
 
 		public Size SurfaceSize {
 			get {
-				return core.Instance.SurfaceSize;
+				return core.GetInstance().SurfaceSize;
 			}
 		}
 
 		public Rectangle UVRect { 
 			get {
+				core.GetInstance();
 				return core.UVRect;
 			}
 		}
 
 		public uint GetHandle()
 		{
-			return core.Instance.GetHandle();
+			return core.GetInstance().GetHandle();
 		}
 
 		public void SetAsRenderTarget()
 		{
-			core.Instance.SetAsRenderTarget();
+			core.GetInstance().SetAsRenderTarget();
 		}
 
 		public void RestoreRenderTarget()
 		{
-			core.Instance.RestoreRenderTarget();
+			core.GetInstance().RestoreRenderTarget();
 		}
 
 		public bool IsTransparentPixel(int x, int y)
 		{
-			return core.Instance.IsTransparentPixel(x, y);
+			return core.GetInstance().IsTransparentPixel(x, y);
 		}
 
 		public override string ToString()
@@ -89,10 +91,9 @@ namespace Lime
 		int usedAtRenderCycle = 0;
 		
 		ITexture instance;
-		Rectangle uvRect;
-		
-		public Rectangle UVRect { get { return uvRect; } }
-		
+		internal Rectangle UVRect;
+		internal Size ImageSize;
+
 		public SerializableTextureCore(string path)
 		{
 			Path = path;
@@ -132,7 +133,7 @@ namespace Lime
 		/// </summary>
 		public void DiscardIfNotUsed(int numCycles)
 		{
-			if ((TexturePool.Instance.gameRenderCycle - usedAtRenderCycle) >= numCycles)
+			if ((Renderer.RenderCycle - usedAtRenderCycle) >= numCycles)
 				Discard();
 		}
 		
@@ -154,8 +155,9 @@ namespace Lime
 					instance = CreateStubTexture();
 					break;
 				}
-				uvRect.A = Vector2.Zero;
-				uvRect.B = (Vector2)instance.SurfaceSize;
+				UVRect.A = Vector2.Zero;
+				UVRect.B = (Vector2)instance.SurfaceSize;
+				ImageSize = instance.ImageSize;
 				return true;
 			}
 			return false;
@@ -166,8 +168,9 @@ namespace Lime
 			if (AssetsBundle.Instance.FileExists(path)) {
 				var texParams = TextureAtlasPart.ReadFromBundle(path);
 				instance = new SerializableTexture(texParams.AtlasTexture);
-				uvRect.A = (Vector2)texParams.AtlasRect.A / (Vector2)instance.SurfaceSize;
-				uvRect.B = (Vector2)texParams.AtlasRect.B / (Vector2)instance.SurfaceSize;
+				UVRect.A = (Vector2)texParams.AtlasRect.A / (Vector2)instance.SurfaceSize;
+				UVRect.B = (Vector2)texParams.AtlasRect.B / (Vector2)instance.SurfaceSize;
+				ImageSize = (Size)texParams.AtlasRect.Size;
 				return true;
 			}
 			return false;
@@ -178,39 +181,39 @@ namespace Lime
 			if (AssetsBundle.Instance.FileExists(path)) {
 				instance = new PlainTexture();
 				(instance as PlainTexture).LoadImage(path);
-				uvRect.A = Vector2.Zero;
-				uvRect.B = (Vector2)instance.ImageSize / (Vector2)instance.SurfaceSize;
+				UVRect.A = Vector2.Zero;
+				UVRect.B = (Vector2)instance.ImageSize / (Vector2)instance.SurfaceSize;
+				ImageSize = instance.ImageSize;
 				return true;
 			}
 			Console.WriteLine("Missing texture '{0}'", path);
 			return false;
 		}
 
-		public ITexture Instance {
-			get {
-				if (instance == null) {
-					bool loaded = !string.IsNullOrEmpty(Path) && (TryCreateRenderTarget(Path) ||
-						TryLoadTextureAtlasPart(Path + ".atlasPart") ||
+		public ITexture GetInstance()
+		{
+			if (instance == null) {
+				bool loaded = !string.IsNullOrEmpty(Path) && (TryCreateRenderTarget(Path) ||
+					TryLoadTextureAtlasPart(Path + ".atlasPart") ||
 #if iOS
-						TryLoadImage(Path + ".pvr")
+					TryLoadImage(Path + ".pvr")
 #else
-						TryLoadImage(Path + ".dds")
+					TryLoadImage(Path + ".dds")
 #endif
-					);
-					if (!loaded) {
-						instance = CreateStubTexture();
-						uvRect = instance.UVRect;
-					}
+				);
+				if (!loaded) {
+					instance = CreateStubTexture();
+					UVRect = instance.UVRect;
+					ImageSize = instance.ImageSize;
 				}
-				usedAtRenderCycle = TexturePool.Instance.gameRenderCycle;
-				return instance;
 			}
+			usedAtRenderCycle = Renderer.RenderCycle;
+			return instance;
 		}
 	}
 
 	public sealed class TexturePool
 	{
-		internal int gameRenderCycle = 1;
 		Dictionary<string, WeakReference> items;
 		static readonly TexturePool instance = new TexturePool();
 
@@ -223,7 +226,7 @@ namespace Lime
 
 		/// <summary>
 		/// Discards textures wich have not been used 
-		/// for given number of game cycles.
+		/// for given number of render cycles.
 		/// </summary>
 		public void DiscardUnusedTextures(int numCycles)
 		{
@@ -242,15 +245,6 @@ namespace Lime
 				}
 			}
 			PlainTexture.DeleteScheduledTextures();
-		}
-
-		/// <summary>
-		/// Increases current game render cycle. 
-		/// Usually this function must be called at the end of frame.
-		/// </summary>
-		public void AdvanceGameRenderCycle()
-		{
-			gameRenderCycle++;
 		}
 
 		internal SerializableTextureCore GetSerializableTextureCore(string path)

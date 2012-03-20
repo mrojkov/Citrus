@@ -1,25 +1,3 @@
-/*
-TODO:
-Необработанное исключение: System.NullReferenceException: Ссылка на объект не указывает на экземпляр объекта.
-
-в Lime.SerializableTexture.get_UVRect() в d:\SVN\Kill3\Citrus\Lime\Source\Graphics\SerializableTexture.cs:строка 56
-
-в Lime.Renderer.DrawSprite(ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1) в d:\SVN\Kill3\Citrus\Lime\Source\Graphics\Renderer.cs:строка 369
-
-в Lime.Image.Render() в d:\SVN\Kill3\Citrus\Lime\Source\Widgets\Image.cs:строка 41
-
-в Lime.RenderChain.RenderAndClear() в d:\SVN\Kill3\Citrus\Lime\Source\Widgets\RenderChain.cs:строка 47
-
-в Kill3.GameApp.OnRenderFrame() в d:\SVN\Kill3\Main\Kill3.Game\Source\GameApp.cs:строка 78
-
-в Lime.GameView.OnRenderFrame(FrameEventArgs e) в d:\SVN\Kill3\Citrus\Lime\Source\Application\OpenTKGameView.cs:строка 102
-
-в OpenTK.GameWindow.RaiseRenderFrame(Stopwatch render_watch, Double& next_render, FrameEventArgs render_args)
-
-в OpenTK.GameWindow.Run(Double updates_per_second, Double frames_per_second)
-
-в Kill3.Application.Main() в d:\SVN\Kill3\Main\Kill3.Win\Application.cs:строка 16
-*/
 using System;
 #if iOS
 using OpenTK;
@@ -85,6 +63,8 @@ namespace Lime
 
 	public static class Renderer
 	{
+		public static int RenderCycle = 1;
+
 		public static bool PremulAlphaMode = true;
 		
 		const int MaxVertices = 1024;
@@ -167,7 +147,7 @@ namespace Lime
 		{
 			PlainTexture.DeleteScheduledTextures();
 			DrawCalls = 0;
-			TexturePool.Instance.AdvanceGameRenderCycle();
+			RenderCycle++;
 #if GLES11
 			GL.ClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 			GL.Clear((uint)All.ColorBufferBit);
@@ -388,17 +368,17 @@ namespace Lime
 		
 		public static void DrawSprite(ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1)
 		{
-			Rectangle textureRect = texture.UVRect;
-			uv0 = textureRect.A + textureRect.Size * uv0;
-			uv1 = textureRect.A + textureRect.Size * uv1;
-			if (PremulAlphaMode) {
-				color = Color4.PremulAlpha(color);
-			}
 			SetTexture(texture, 0);
 			SetTexture(null, 1);
 			if (currentVertex >= MaxVertices - 4 || currentIndex >= MaxVertices * 4 - 6) {
 				FlushSpriteBatch();
 			}
+			if (PremulAlphaMode) {
+				color = Color4.PremulAlpha(color);
+			}
+			Rectangle textureRect = texture.UVRect;
+			uv0 = textureRect.A + textureRect.Size * uv0;
+			uv1 = textureRect.A + textureRect.Size * uv1;
 			int i = currentVertex;
 			currentVertex += 4;
 			Vertex v = new Vertex();

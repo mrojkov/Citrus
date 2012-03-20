@@ -21,7 +21,12 @@ namespace Lime
 			X = x;
 			Y = y;
 		}
-		
+
+		public static explicit operator Size(IntVector2 v)
+		{
+			return new Size(v.X, v.Y);
+		}
+
 		public static explicit operator Vector2(IntVector2 v)
 		{
 			return new Vector2((float)v.X, (float)v.Y);

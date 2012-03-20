@@ -110,7 +110,7 @@ namespace Lime
 				for (int i = 0; i < 100; i++) {
 					if (!ChangeTextureFrameIndex(ref path, i))
 						break;
-					if (File.Exists(path)) {
+					if (AssetsBundle.Instance.FileExists(path)) {
 						var t = new SerializableTexture(path);
 						textures.Add(t);
 					} else if (i > 0)
