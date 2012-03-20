@@ -43,6 +43,11 @@ namespace Lime
 			}
 		}
 
+		public static T Random<T>(params T[] objects)
+		{
+			return objects[Random(objects.Length)];
+		}
+
 		public static int Random(int maxValue)
 		{
 			return RandomGenerator.Next(maxValue);

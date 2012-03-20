@@ -164,7 +164,7 @@ namespace Lime
 			worldShown = Shown;
 			worldBlending = Blending;
 		}
-		
+
 		public override void Update(int delta)
 		{
 			UpdatedNodes++;

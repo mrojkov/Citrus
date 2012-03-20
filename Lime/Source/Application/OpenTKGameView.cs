@@ -13,7 +13,7 @@ namespace Lime
 			: base(640, 480, new OpenTK.Graphics.GraphicsMode(32, 0, 0, 4))
 		{
 			this.app = app;
-			AudioSystem.Initialize();
+			AudioSystem.Initialize(16);
 			app.OnCreate(this);
 			this.Keyboard.KeyDown += HandleKeyDown;
 			this.Keyboard.KeyUp += HandleKeyUp;

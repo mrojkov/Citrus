@@ -30,7 +30,7 @@ namespace Lime
 		static volatile bool shouldTerminateThread;
 		static bool active = true;
 
-		public static void Initialize(int numChannels = 5)
+		public static void Initialize(int numChannels = 16)
 		{
 			context = new AudioContext();
 			if (!HasError()) {
@@ -117,7 +117,7 @@ namespace Lime
 		static Sound LoadSoundToChannel(AudioChannel channel, string path, AudioChannelGroup group, bool looping, int priority)
 		{
 			IAudioDecoder decoder = null;
-			path = path + ".sound";
+			path += ".sound";
 			if (AssetsBundle.Instance.FileExists(path)) {
 				decoder = AudioDecoderFactory.CreateDecoder(soundCache.OpenStream(path));
 			} else {

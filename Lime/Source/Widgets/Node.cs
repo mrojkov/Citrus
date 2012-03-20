@@ -70,33 +70,43 @@ namespace Lime
 
 		public void AdvanceAnimation(int delta)
 		{
-			int tunedDelta = delta;
-			for (int i = 0; i < Markers.Count; i++) {
-				Marker marker = Markers[i];
-				int markerTime = Animator.FramesToMsecs(marker.Frame);
-				if (animationTime <= markerTime && markerTime < animationTime + delta) {
-					if (marker.Action == MarkerAction.Jump) {
+			int prevFrame = Animator.MsecsToFrames(animationTime - 1);
+			int currFrame = Animator.MsecsToFrames(animationTime + delta - 1);
+			animationTime += delta;
+			if (prevFrame != currFrame && Markers.Count > 0) {
+				Marker marker = Markers.GetByFrame(currFrame);
+				if (marker != null) {
+					switch (marker.Action) {
+					case MarkerAction.Jump:
 						var gotoMarker = Markers.Get(marker.JumpTo);
 						if (gotoMarker != null) {
-							int gotoTime = Animator.FramesToMsecs(gotoMarker.Frame);
-							animationTime = gotoTime + (animationTime + delta - markerTime);
+							int hopFrames = gotoMarker.Frame - AnimationFrame;
+							animationTime += Animator.FramesToMsecs(hopFrames);
+							prevFrame += hopFrames;
+							currFrame += hopFrames;
 						}
-					} else if (marker.Action == MarkerAction.Stop) {
-						tunedDelta = markerTime - animationTime;
+						break;
+					case MarkerAction.Stop:
+						animationTime = Animator.FramesToMsecs(marker.Frame);
+						prevFrame = currFrame - 1;
 						Playing = false;
-					} else if (marker.Action == MarkerAction.Destroy) {
+						break;
+					case MarkerAction.Destroy:
+						animationTime = Animator.FramesToMsecs(marker.Frame);
+						prevFrame = currFrame - 1;
 						Playing = false;
 						Destroy();
+						break;
 					}
-					break;
 				}
 			}
 			foreach (Node node in Nodes.AsArray) {
 				var animators = node.Animators;
-				animators.Apply(animationTime + tunedDelta);
-				animators.InvokeTriggers(animationTime, animationTime + delta);
+				animators.Apply(animationTime);
+				if (prevFrame != currFrame) {
+					animators.InvokeTriggers(currFrame);
+				}
 			}
-			animationTime += tunedDelta;
 		}
 
 		public Node()

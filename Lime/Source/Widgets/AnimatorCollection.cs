@@ -102,13 +102,13 @@ namespace Lime
 			}
 		}
 
-		public void InvokeTriggers(int intervalBegin, int intervalEnd)
+		public void InvokeTriggers(int frame)
 		{
 			int count = animators.Count;
 			for (int i = 0; i < count; i++) {
 				var a = animators[i];
 				if (a.IsTriggerable) {
-					a.InvokeTrigger(intervalBegin, intervalEnd);
+					a.InvokeTrigger(frame);
 				}
 			}
 		}
