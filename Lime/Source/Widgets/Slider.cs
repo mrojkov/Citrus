@@ -1,4 +1,5 @@
-﻿using ProtoBuf;
+﻿using System;
+using ProtoBuf;
 
 namespace Lime
 {
@@ -17,6 +18,8 @@ namespace Lime
 			get { return MathLib.Clamp(value, RangeMin, RangeMax); }
 			set { this.value = value; }
 		}
+
+		public event EventHandler<EventArgs> OnChange;
 
 		float value;
 		float offset0;
@@ -105,6 +108,9 @@ namespace Lime
 								Value = v + delta0 * (1 - (offset0 - offset) / offset0);
 							else
 								Value = v + delta0;
+							if (OnChange != null) {
+								OnChange(this, null);
+							}
 						}
 					}
 				}
