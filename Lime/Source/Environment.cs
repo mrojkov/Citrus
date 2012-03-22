@@ -14,14 +14,23 @@ namespace Lime
 #endif
 		}
 
-		public static string GetDataDirectory(string companyName, string appName, string appVersion = "1.0")
+		public static string GetDataDirectory(string appName)
+		{
+			return GetDataDirectory(null, appName, "1.0");
+		}
+
+		public static string GetDataDirectory(string companyName, string appName, string appVersion)
 		{
 #if iOS
 			string path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);
 #else
 			string path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.CommonApplicationData);
 #endif
-			path = System.IO.Path.Combine(path, companyName, appName, appVersion);
+			if (string.IsNullOrEmpty(companyName)) {
+				path = System.IO.Path.Combine(path, appName, appVersion);
+			} else {
+				path = System.IO.Path.Combine(path, companyName, appName, appVersion);
+			}
 			System.IO.Directory.CreateDirectory(path);
 			return path;
 		}
