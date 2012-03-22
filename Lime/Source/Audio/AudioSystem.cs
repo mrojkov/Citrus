@@ -158,6 +158,15 @@ namespace Lime
 			}
 		}
 
+		public static void StopGroup(AudioChannelGroup group)
+		{
+			foreach (var channel in channels) {
+				if (channel.Group == group) {
+					channel.Stop();
+				}
+			}
+		}
+
 		public static Sound LoadSound(string path, AudioChannelGroup group, bool looping = false, int priority = 0)
 		{
 			var channel = AllocateChannel(priority);

@@ -63,7 +63,7 @@ namespace Lime
 
 		void Play()
 		{
-			sound = Sample.Play(AudioChannelGroup.Effects, true, Looping, Priority);
+			sound = Sample.Play(Group, true, Looping, Priority);
 			sound.Volume = Volume;
 			sound.Pan = Pan;
 			sound.Resume();
