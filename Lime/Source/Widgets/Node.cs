@@ -219,6 +219,12 @@ namespace Lime
 			collectedNodes.Add(this);
 		}
 
+		[Obsolete("Use Detach() instead")]
+		public void Destroy()
+		{
+			Detach();
+		}
+
 		// Delta must be in[0..1000 / WidgetUtils.FramesPerSecond - 1] range
 		public virtual void Update(int delta)
 		{
