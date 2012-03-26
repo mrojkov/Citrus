@@ -23,11 +23,11 @@ namespace Lime
 			this.owner = owner;
 		}
 
-		internal static AnimatorCollection DeepClone(Node owner, AnimatorCollection source)
+		internal static AnimatorCollection SharedClone(Node owner, AnimatorCollection source)
 		{
 			var result = new AnimatorCollection(owner);
 			foreach (var animator in source.animators) {
-				result.Add(animator.Clone());
+				result.Add(animator.SharedClone());
 			}
 			return result;
 		}

@@ -54,8 +54,9 @@ namespace Lime
 
 		internal abstract void Bind(Node owner);
 
-		internal Animator Clone()
+		internal Animator SharedClone()
 		{
+			var ani = (Animator)MemberwiseClone();
 			return (Animator)MemberwiseClone();
 		}
 

@@ -195,7 +195,7 @@ namespace Lime
 		{
 			Node clone = (Node)MemberwiseClone();
 			clone.Widget = clone as Widget;
-			clone.Animators = AnimatorCollection.DeepClone(clone, Animators);
+			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Nodes = NodeCollection.DeepClone(clone, Nodes);
 			return clone;
 		}
