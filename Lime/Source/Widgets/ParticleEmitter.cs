@@ -307,7 +307,7 @@ namespace Lime
 		public float pendingParticles;
 
 		[ProtoMember(29)]
-		public readonly LinkedList<Particle> particles = new LinkedList<Particle>();
+		public LinkedList<Particle> particles = new LinkedList<Particle>();
 		
 		static LinkedList<Particle> particlePool = new LinkedList<Particle>();
 		
@@ -338,6 +338,13 @@ namespace Lime
 			AlongPathOrientation = false;
 			TimeShift = 0;
 			ImmortalParticles = false;
+		}
+
+		public override Node DeepCloneFast()
+		{
+			var clone = base.DeepCloneFast() as ParticleEmitter;
+			clone.particles = new LinkedList<Particle>();
+			return clone;
 		}
 
 		Widget GetBasicWidget()

@@ -20,16 +20,21 @@ namespace Lime
 	[ProtoContract]
 	public class Marker
 	{
-	[ProtoMember(1)]
-	public string Id { get; set; }
+		[ProtoMember(1)]
+		public string Id { get; set; }
 
-	[ProtoMember(2)]
-	public int Frame { get; set; }
+		[ProtoMember(2)]
+		public int Frame { get; set; }
 
-	[ProtoMember(3)]
-	public MarkerAction Action { get; set; }
+		[ProtoMember(3)]
+		public MarkerAction Action { get; set; }
 
-	[ProtoMember(4)]
-	public string JumpTo { get; set; }
+		[ProtoMember(4)]
+		public string JumpTo { get; set; }
+
+		internal Marker Clone()
+		{
+			return (Marker)MemberwiseClone();
+		}
 	}
 }

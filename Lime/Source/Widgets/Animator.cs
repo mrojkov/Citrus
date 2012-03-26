@@ -53,7 +53,12 @@ namespace Lime
 		internal bool IsTriggerable;
 
 		internal abstract void Bind(Node owner);
-		
+
+		internal Animator Clone()
+		{
+			return (Animator)MemberwiseClone();
+		}
+
 		[ProtoMember(1)]
 		public string TargetProperty;
 

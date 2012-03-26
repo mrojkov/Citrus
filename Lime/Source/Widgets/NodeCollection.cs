@@ -14,7 +14,21 @@ namespace Lime
 
 		List<Node> nodeList = emptyList;
 		Node[] nodeArray;
-		internal Node Owner;
+		Node Owner;
+
+		public NodeCollection(Node owner)
+		{
+			Owner = owner;
+		}
+
+		internal static NodeCollection DeepClone(Node owner, NodeCollection source)
+		{
+			var result = new NodeCollection(owner);
+			foreach (var node in source.AsArray) {
+				result.Add(node.DeepCloneFast());
+			}
+			return result;
+		}
 
 		public Node[] AsArray
 		{

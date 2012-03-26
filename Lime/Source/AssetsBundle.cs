@@ -154,7 +154,6 @@ namespace Lime
 		FileStream stream;
 		internal Dictionary <string, AssetDescriptor> index = new Dictionary<string, AssetDescriptor>();
 		List<AssetDescriptor> trash = new List<AssetDescriptor>();
-		AssetBundleFlags flags;
 		public string CurrentLanguage;
 
 		static readonly AssetsBundle instance = new AssetsBundle();

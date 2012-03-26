@@ -11,6 +11,16 @@ namespace Lime
 		static List<Marker> emptyList = new List<Marker>();
 		List<Marker> markers = emptyList;
 
+		internal static MarkerCollection DeepClone(MarkerCollection source)
+		{
+			var result = new MarkerCollection();
+			foreach (var marker in source.markers) {
+				var clone = marker.Clone();
+				result.Add(clone);
+			}
+			return result;
+		}
+
 		public Marker this[int index] { 
 			get { return markers[index]; }
 		}

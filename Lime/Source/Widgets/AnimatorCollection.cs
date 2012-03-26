@@ -16,9 +16,24 @@ namespace Lime
 		static List<Animator> emptyList = new List<Animator>();
 		List<Animator> animators = emptyList;
 		
-		internal Node Owner;
+		Node Owner;
 
-		public Animator this[string propertyName] {
+		public AnimatorCollection(Node owner)
+		{
+			Owner = owner;
+		}
+
+		internal static AnimatorCollection DeepClone(Node owner, AnimatorCollection source)
+		{
+			var result = new AnimatorCollection(owner);
+			foreach (var animator in source.animators) {
+				result.Add(animator.Clone());
+			}
+			return result;
+		}
+
+		public Animator this[string propertyName]
+		{
 			get {
 				foreach (Animator a in animators)
 					if (a.TargetProperty == propertyName)

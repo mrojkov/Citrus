@@ -36,13 +36,13 @@ namespace Lime
 		public int Layer;
 
 		[ProtoMember(5)]
-		public readonly AnimatorCollection Animators = new AnimatorCollection();
+		public AnimatorCollection Animators;
 
 		[ProtoMember(6)]
-		public readonly NodeCollection Nodes = new NodeCollection();
+		public NodeCollection Nodes;
 
 		[ProtoMember(7)]
-		public readonly MarkerCollection Markers = new MarkerCollection();
+		public MarkerCollection Markers;
 
 		[ProtoMember(9)]
 		[DefaultValue(false)]
@@ -111,8 +111,9 @@ namespace Lime
 
 		public Node()
 		{
-			Animators.Owner = this;
-			Nodes.Owner = this;
+			Animators = new AnimatorCollection(this);
+			Markers = new MarkerCollection();
+			Nodes = new NodeCollection(this);
 		}
 		
 		static HashSet<string> processingFiles = new HashSet<string>();
@@ -199,6 +200,19 @@ namespace Lime
 		public Node DeepCloneCached()
 		{
 			return Serialization.DeepCloneCached<Node>(this);
+		}
+
+		/// <summary>
+		/// Use for fast deep cloning. This function based of MemberwiseClone().
+		/// Animators keys, Markers and SkinningWeights are shared between clone and original.
+		/// </summary>
+		public virtual Node DeepCloneFast()
+		{
+			Node clone = (Node)MemberwiseClone();
+			clone.Widget = clone as Widget;
+			clone.Animators = AnimatorCollection.DeepClone(clone, Animators);
+			clone.Nodes = NodeCollection.DeepClone(clone, Nodes);
+			return clone;
 		}
 
 		public override string ToString()
