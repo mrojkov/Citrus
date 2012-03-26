@@ -182,7 +182,7 @@ namespace Lime
 			get { return Animator.MsecsToFrames(AnimationTime); }
 			set { AnimationTime = Animator.FramesToMsecs(value); }
 		}
-		
+
 		static public void CleanupDeadNodes()
 		{
 			foreach (Node node in collectedNodes) {
@@ -191,19 +191,17 @@ namespace Lime
 			}
 			collectedNodes.Clear();
 		}
-		
-		public Node DeepClone()
+
+		/// <summary>
+		/// Slow but safe deep cloning. This function is based on serialization/deserialization.
+		/// </summary>
+		public Node DeepCloneSafe()
 		{
 			return Serialization.DeepClone<Node>(this);
 		}
-		
-		public Node DeepCloneCached()
-		{
-			return Serialization.DeepCloneCached<Node>(this);
-		}
 
 		/// <summary>
-		/// Use for fast deep cloning. This function based of MemberwiseClone().
+		/// Use for fast deep cloning of unchangeable objects. This function based of MemberwiseClone().
 		/// Animators keys, Markers and SkinningWeights are shared between clone and original.
 		/// </summary>
 		public virtual Node DeepCloneFast()

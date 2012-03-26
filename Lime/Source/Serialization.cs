@@ -73,26 +73,6 @@ namespace Lime
 				bundle.ImportFile(path, stream, 0);
 			}
 		}
-		
-		static Dictionary<object, MemoryStream> cloneCache = new Dictionary<object, MemoryStream>();
-		
-		// TODO: use weak references for keys
-		public static T DeepCloneCached<T>(T obj)
-		{
-			opStack.Push(new Operation {Type = OperationType.Clone});
-			try {
-				MemoryStream stream;
-				if (!cloneCache.TryGetValue(obj, out stream)) {
-					stream = new MemoryStream();
-					Serializer.Serialize(stream, obj);
-					cloneCache[obj] = stream;
-				}
-				stream.Seek(0, SeekOrigin.Begin);
-				return (T)Serializer.Deserialize(stream, null, typeof(T));
-			} finally {
-				opStack.Pop();
-			}
-		}
 
 		public static T DeepClone<T>(T obj)
 		{

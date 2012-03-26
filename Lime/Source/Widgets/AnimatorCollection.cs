@@ -16,11 +16,11 @@ namespace Lime
 		static List<Animator> emptyList = new List<Animator>();
 		List<Animator> animators = emptyList;
 		
-		Node Owner;
+		Node owner;
 
 		public AnimatorCollection(Node owner)
 		{
-			Owner = owner;
+			this.owner = owner;
 		}
 
 		internal static AnimatorCollection DeepClone(Node owner, AnimatorCollection source)
@@ -38,9 +38,9 @@ namespace Lime
 				foreach (Animator a in animators)
 					if (a.TargetProperty == propertyName)
 						return a;
-				PropertyInfo pi = Owner.GetType().GetProperty(propertyName);
+				PropertyInfo pi = owner.GetType().GetProperty(propertyName);
 				if (pi == null) {
-					throw new Lime.Exception("Unknown property {0} in {1}", propertyName, Owner.GetType().Name);
+					throw new Lime.Exception("Unknown property {0} in {1}", propertyName, owner.GetType().Name);
 				}
 				var animator = AnimatorRegistry.Instance.CreateAnimator(pi.PropertyType);
 				animator.TargetProperty = propertyName;
@@ -95,7 +95,7 @@ namespace Lime
 			if (animators == emptyList) {
 				animators = new List<Animator>();
 			}
-			animator.Bind(Owner);
+			animator.Bind(owner);
 			animators.Add(animator);
 		}
 		

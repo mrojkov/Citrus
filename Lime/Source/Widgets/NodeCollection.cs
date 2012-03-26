@@ -14,11 +14,11 @@ namespace Lime
 
 		List<Node> nodeList = emptyList;
 		Node[] nodeArray;
-		Node Owner;
+		Node owner;
 
 		public NodeCollection(Node owner)
 		{
-			Owner = owner;
+			this.owner = owner;
 		}
 
 		internal static NodeCollection DeepClone(Node owner, NodeCollection source)
@@ -101,7 +101,7 @@ namespace Lime
 			if (nodeList == emptyList) {
 				nodeList = new List<Node>();
 			}
-			node.Parent = Owner;
+			node.Parent = owner;
 			nodeList.Add(node);
 		}
 
@@ -111,7 +111,7 @@ namespace Lime
 			if (nodeList == emptyList) {
 				nodeList = new List<Node>();
 			}
-			node.Parent = Owner;
+			node.Parent = owner;
 			nodeList.Insert(index, node);
 		}
 
