@@ -95,7 +95,7 @@ namespace Lime
 						animationTime = Animator.FramesToMsecs(marker.Frame);
 						prevFrame = currFrame - 1;
 						Playing = false;
-						Destroy();
+						Detach();
 						break;
 					}
 				}
@@ -214,7 +214,7 @@ namespace Lime
 			return r;
 		}
 		
-		public void Destroy()
+		public void Detach()
 		{
 			collectedNodes.Add(this);
 		}
