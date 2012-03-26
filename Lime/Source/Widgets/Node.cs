@@ -120,26 +120,13 @@ namespace Lime
 
 		public static Node CreateFromBundle(string path)
 		{
-			return CreateFromBundleHelper(path, false);
-		}
-
-		public static Node CreateFromBundleCached(string path)
-		{
-			return CreateFromBundleHelper(path, true);
-		}
-
-		static Node CreateFromBundleHelper(string path, bool cached)
-		{
 			if (processingFiles.Contains(path))
 				throw new Lime.Exception("Cyclic dependency of scenes has detected: {0}", path);
 			Node node;
 			processingFiles.Add(path);
 			try {
-				if (cached) {
-					node = Serialization.ReadObjectCached<Node>(path);
-				} else {
-					using (Stream stream = AssetsBundle.Instance.OpenFileLocalized(path))
-						node = Serialization.ReadObject<Node>(path, stream);
+				using (Stream stream = AssetsBundle.Instance.OpenFileLocalized(path)) {
+					node = Serialization.ReadObject<Node>(path, stream);
 				}
 				node.LoadContents();
 			} finally {

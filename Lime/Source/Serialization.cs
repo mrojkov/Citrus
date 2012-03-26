@@ -94,22 +94,6 @@ namespace Lime
 			}
 		}
 
-		static Dictionary<string, MemoryStream> readCache = new Dictionary<string, MemoryStream>();
-		
-		public static T ReadObjectCached<T>(string path)
-		{
-			MemoryStream stream;
-			if (!readCache.TryGetValue(path, out stream)) {
-				stream = new MemoryStream();
-				using (Stream input = AssetsBundle.Instance.OpenFileLocalized(path)) {
-					input.CopyTo(stream);
-				}
-				readCache[path] = stream;
-			}
-			stream.Seek(0, SeekOrigin.Begin);
-			return ReadObject<T>(path, stream);
-		}
-
 		public static T ReadObject<T>(string path)
 		{
 			using (Stream stream = AssetsBundle.Instance.OpenFileLocalized(path))
