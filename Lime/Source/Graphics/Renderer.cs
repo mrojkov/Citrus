@@ -169,7 +169,7 @@ namespace Lime
 			GL.EnableClientState(All.TextureCoordArray);
 			GL.TexCoordPointer(2, All.Float, 32, (IntPtr)12);
 #else
-			GL.ClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+			GL.ClearColor(0, 0, 0, 1);
 			GL.Clear(ClearBufferMask.ColorBufferBit);
 			GL.Enable(EnableCap.Texture2D);
 
