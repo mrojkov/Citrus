@@ -39,39 +39,35 @@ namespace Lime
 
 		void EnumerateMagnets()
 		{
-			lock (magnets) {
-				numMagnets = 0;
-				if (Parent == null)
-					return;
-				foreach (Node node in Parent.Nodes) {
-					ParticlesMagnet magnet = node as ParticlesMagnet;
-					if (magnet != null) {
-						if (numMagnets >= MaxMagnets)
-							break;
-						Matrix32 transform = magnet.LocalMatrix;
-						Widget basicWidget = GetBasicWidget();
-						if (basicWidget != null) {
-							for (Node n = Parent; n != basicWidget; n = n.Parent) {
-								if (n.Widget != null)
-									transform *= n.Widget.LocalMatrix;
-							}
+			numMagnets = 0;
+			if (Parent == null)
+				return;
+			foreach (Node node in Parent.Nodes) {
+				ParticlesMagnet magnet = node as ParticlesMagnet;
+				if (magnet != null) {
+					if (numMagnets >= MaxMagnets)
+						break;
+					Matrix32 transform = magnet.LocalMatrix;
+					Widget basicWidget = GetBasicWidget();
+					if (basicWidget != null) {
+						for (Node n = Parent; n != basicWidget; n = n.Parent) {
+							if (n.Widget != null)
+								transform *= n.Widget.LocalMatrix;
 						}
-						magnets[numMagnets++] = new MagnetData {
-							Magnet = magnet,
-							PrecalcTransitionMatrix = transform.CalcInversed(),
-							PrecalcInvTransitionMatrix = transform
-						};
 					}
+					magnets[numMagnets++] = new MagnetData {
+						Magnet = magnet,
+						PrecalcTransitionMatrix = transform.CalcInversed(),
+						PrecalcInvTransitionMatrix = transform
+					};
 				}
 			}
 		}
 
 		void ApplyMagnetsToParticle(Particle p, float delta)
 		{
-			lock (magnets) {
-				for (int i = 0; i < numMagnets; i++)
-					ApplyMagnetToParticle(p, magnets[i], delta);
-			}
+			for (int i = 0; i < numMagnets; i++)
+				ApplyMagnetToParticle(p, magnets[i], delta);
 		}
 
 		void ApplyMagnetToParticle(Particle p, MagnetData magnetData, float delta)
