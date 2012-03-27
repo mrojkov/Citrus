@@ -32,7 +32,6 @@ namespace Lime
 
 		public static void Initialize(int numChannels = 16)
 		{
-			numChannels = 0;
 			context = new AudioContext();
 			if (!HasError()) {
 				// xram = new XRamExtension();
@@ -42,7 +41,7 @@ namespace Lime
 			}
 			streamingThread = new Thread(RunStreamingLoop);
 			streamingThread.IsBackground = true;
-			//streamingThread.Start();
+			streamingThread.Start();
 		}
 
 		public static void Terminate()

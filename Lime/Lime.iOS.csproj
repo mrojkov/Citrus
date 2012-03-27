@@ -109,7 +109,6 @@
     <Compile Include="Source\Audio\SampleCache.cs" />
     <Compile Include="Source\Audio\SerializableSample.cs" />
     <Compile Include="Source\Audio\Sound.cs" />
-    <Compile Include="Source\Widgets\Dialog.cs" />
     <Compile Include="Source\Widgets\NineGrid.cs" />
     <Compile Include="Source\Widgets\RichText.cs" />
     <Compile Include="Source\Widgets\RootFrame.cs" />
@@ -120,6 +119,7 @@
     <Compile Include="Source\Profiler.cs" />
     <Compile Include="Source\Environment.cs" />
     <Compile Include="Source\MathLib.cs" />
+    <Compile Include="Source\Widgets\TextBox.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Lemon\bin\iOS\Release-iphoneos\libLemon.a">
@@ -130,8 +130,5 @@
       <Link>libLemonSim.a</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Source\Utils\" />
   </ItemGroup>
 </Project>

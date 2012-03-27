@@ -113,9 +113,11 @@ namespace Lime
 
 		public void Stop()
 		{
-			streaming = false;
-			AL.SourceStop(source);
-			AudioSystem.CheckError();
+			lock (streamingSync) {
+				streaming = false;
+				AL.SourceStop(source);
+				AudioSystem.CheckError();
+			}
 		}
 
 		public float Volume
@@ -192,6 +194,11 @@ namespace Lime
 		{
 			int processed;
 			AL.GetSource(source, ALGetSourcei.BuffersProcessed, out processed);
+#if iOS
+			// This is a bug in iOS OpenAl implementation.
+			// When AL.SourceStop() has called, the number of processed buffers exceedes total number of buffers.
+			processed = Math.Min(queueLength, processed);
+#endif
 			while (processed-- > 0) {
 				AL.SourceUnqueueBuffer(source);
 				queueLength--;

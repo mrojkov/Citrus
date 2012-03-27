@@ -76,6 +76,7 @@
     <Compile Include="gtk-gui\Orange.MainWindow.cs" />
     <Compile Include="Source\AssetCooker\AssetsUnpacker.cs" />
     <Compile Include="Source\AssetCooker\TextureConverterUtils.cs" />
+    <Compile Include="Source\FileEnumerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="gtk-gui\gui.stetic">
@@ -111,6 +112,7 @@
     <None Include="Orange.Win.userprefs">
       <Visible>False</Visible>
     </None>
+    <None Include="Ico.ico" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Source\AssetCooker\" />
