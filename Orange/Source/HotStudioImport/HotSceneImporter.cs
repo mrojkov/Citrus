@@ -675,6 +675,9 @@ namespace Orange
 			case "Bold":
 				style.Bold = lexer.ParseBool();
 				break;
+			case "TextColor":
+				style.TextColor = lexer.ParseColor4();
+				break;
 			case "DropShadow":
 				style.CastShadow = lexer.ParseBool();
 				break;
