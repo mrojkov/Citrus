@@ -49,6 +49,9 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Orange.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="Mono.Posix, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756" />
@@ -96,6 +99,7 @@
     <None Include="gtk-gui\gui.stetic" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Ico.ico" />
     <Content Include="Toolchain.Win\cudart32_30_14.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
