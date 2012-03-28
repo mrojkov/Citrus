@@ -57,6 +57,7 @@ namespace Lime
 		public override bool FinishedLaunching(UIApplication app, NSDictionary options)
 		{
 			AudioSystem.Initialize();
+			UIApplication.SharedApplication.StatusBarHidden = true;
 
 			// create a new window instance based on the screen size
 			window = new UIWindow(UIScreen.MainScreen.Bounds);
