@@ -102,12 +102,19 @@ namespace Lime
 			get {
 				var u = new Vector2(direction.X * Scale.X, direction.Y * Scale.X);
 				var v = new Vector2(-direction.Y * Scale.Y, direction.X * Scale.Y);
+				Vector2 translation = position;
 				Vector2 center = Size * Pivot;
 				Matrix32 matrix;
+				if (SkinningWeights != null && Parent != null && Parent.Widget != null) {
+					BoneArray a = Parent.Widget.BoneArray;
+					translation = a.ApplySkinningToVector(position, SkinningWeights);
+					u = a.ApplySkinningToVector(u + position, SkinningWeights) - translation;
+					v = a.ApplySkinningToVector(v + position, SkinningWeights) - translation;
+				}
 				matrix.U = u;
 				matrix.V = v;
-				matrix.T.X = -(center.X * u.X) - center.Y * v.X + X;
-				matrix.T.Y = -(center.X * u.Y) - center.Y * v.Y + Y;
+				matrix.T.X = -(center.X * u.X) - center.Y * v.X + translation.X;
+				matrix.T.Y = -(center.X * u.Y) - center.Y * v.Y + translation.Y;
 				return matrix;
 			}
 		}
