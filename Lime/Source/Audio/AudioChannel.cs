@@ -195,7 +195,7 @@ namespace Lime
 			int processed;
 			AL.GetSource(source, ALGetSourcei.BuffersProcessed, out processed);
 #if iOS
-			// This is a bug in iOS OpenAl implementation.
+			// This is workaround for a bug in iOS OpenAl implementation.
 			// When AL.SourceStop() has called, the number of processed buffers exceedes total number of buffers.
 			processed = Math.Min(queueLength, processed);
 #endif

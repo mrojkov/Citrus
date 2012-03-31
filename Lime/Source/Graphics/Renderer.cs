@@ -128,11 +128,6 @@ namespace Lime
 #if GLES11
 				GL.DrawElements(All.Triangles, currentIndex, All.UnsignedShort, (IntPtr)batchIndices);
 #else
-				// Tell OpenGL to discard old VBO when done drawing it and reserve memory now for a new buffer.
-				// without this, GL would wait until draw operations on old VBO are complete before writing to it
-				GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(32 * currentVertex), IntPtr.Zero, BufferUsageHint.StreamDraw);
-				// Fill newly allocated buffer
-				GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(32 * currentVertex), (IntPtr)batchVertices, BufferUsageHint.StreamDraw);
 				GL.DrawElements(BeginMode.Triangles, currentIndex, DrawElementsType.UnsignedShort, (IntPtr)batchIndices);
 #endif
 				CheckErrors();
@@ -145,13 +140,13 @@ namespace Lime
 		{
 			if (batchIndices == null) {
 				batchIndices = (ushort*)System.Runtime.InteropServices.Marshal.AllocHGlobal(sizeof(ushort) * MaxVertices * 4);
-				batchVertices = (Vertex*)System.Runtime.InteropServices.Marshal.AllocHGlobal(MaxVertices * sizeof(Vertex));
+				batchVertices = (Vertex*)System.Runtime.InteropServices.Marshal.AllocHGlobal(sizeof(Vertex) * MaxVertices);
 			}
 			PlainTexture.DeleteScheduledTextures();
 			DrawCalls = 0;
 			RenderCycle++;
 #if GLES11
-			GL.ClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+			GL.ClearColor(0, 0, 0, 1);
 			GL.Clear((uint)All.ColorBufferBit);
 			GL.Enable(All.Texture2D);
 
@@ -174,21 +169,18 @@ namespace Lime
 			GL.Clear(ClearBufferMask.ColorBufferBit);
 			GL.Enable(EnableCap.Texture2D);
 
-			GL.GenBuffers(1, out batchVBO);
-			// Since there's only 1 VBO in the app, might aswell setup here.
-			GL.BindBuffer(BufferTarget.ArrayBuffer, batchVBO);
 			// Set up vertex and color arrays
-			GL.VertexPointer(2, VertexPointerType.Float, 32, 0);
+			GL.VertexPointer(2, VertexPointerType.Float, 32, (IntPtr)batchVertices);
 			GL.EnableClientState(ArrayCap.VertexArray);
-			GL.ColorPointer(4, ColorPointerType.UnsignedByte, 32, 8);
+			GL.ColorPointer(4, ColorPointerType.UnsignedByte, 32, (IntPtr)((uint)batchVertices + 8));
 			GL.EnableClientState(ArrayCap.ColorArray);
 			// Set up texture coordinate arrays
 			GL.ClientActiveTexture(TextureUnit.Texture1);
 			GL.EnableClientState(ArrayCap.TextureCoordArray);
-			GL.TexCoordPointer(2, TexCoordPointerType.Float, 32, 20);
+			GL.TexCoordPointer(2, TexCoordPointerType.Float, 32, (IntPtr)((uint)batchVertices + 20));
 			GL.ClientActiveTexture(TextureUnit.Texture0);
 			GL.EnableClientState(ArrayCap.TextureCoordArray);
-			GL.TexCoordPointer(2, TexCoordPointerType.Float, 32, 12);
+			GL.TexCoordPointer(2, TexCoordPointerType.Float, 32, (IntPtr)((uint)batchVertices + 12));
 #endif
 			Blending = Blending.Default;
 
@@ -382,29 +374,33 @@ namespace Lime
 			uv1 = textureRect.A + textureRect.Size * uv1;
 			int i = currentVertex;
 			currentVertex += 4;
-			Vertex v = new Vertex();
-			v.Pos = WorldMatrix.TransformVector(position.X, position.Y);
-			v.Color = color;
-			v.UV1.X = uv0.X;
-			v.UV1.Y = uv0.Y;
-			batchVertices[i + 0] = v;
-			v.Pos = WorldMatrix.TransformVector(position.X + size.X, position.Y);
-			v.UV1.X = uv1.X;
-			batchVertices[i + 1] = v;
-			v.Pos = WorldMatrix.TransformVector(position.X + size.X, position.Y + size.Y);
-			v.UV1.Y = uv1.Y;
-			batchVertices[i + 3] = v;
-			v.Pos = WorldMatrix.TransformVector(position.X, position.Y + size.Y);
-			v.UV1.X = uv0.X;
-			batchVertices[i + 2] = v;
+			Vertex* vp = &batchVertices[i];
+			vp->Pos = WorldMatrix.TransformVector(position.X, position.Y);
+			vp->Color = color;
+			vp->UV1 = uv0;
+			vp++;
+			vp->Pos = WorldMatrix.TransformVector(position.X + size.X, position.Y);
+			vp->Color = color;
+			vp->UV1.X = uv1.X;
+			vp->UV1.Y = uv0.Y;
+			vp++;
+			vp->Pos = WorldMatrix.TransformVector(position.X, position.Y + size.Y);
+			vp->Color = color;
+			vp->UV1.X = uv0.X;
+			vp->UV1.Y = uv1.Y;
+			vp++;
+			vp->Pos = WorldMatrix.TransformVector(position.X + size.X, position.Y + size.Y);
+			vp->Color = color;
+			vp->UV1 = uv1;
 			int j = currentIndex;
 			currentIndex += 6;
-			batchIndices[j] = (ushort)(i + 0);
-			batchIndices[j + 1] = (ushort)(i + 1);
-			batchIndices[j + 2] = (ushort)(i + 2);
-			batchIndices[j + 3] = (ushort)(i + 2);
-			batchIndices[j + 4] = (ushort)(i + 1);
-			batchIndices[j + 5] = (ushort)(i + 3);
+			ushort* ip = &batchIndices[j];
+			*ip++ = (ushort)(i + 0);
+			*ip++ = (ushort)(i + 1);
+			*ip++ = (ushort)(i + 2);
+			*ip++ = (ushort)(i + 2);
+			*ip++ = (ushort)(i + 1);
+			*ip++ = (ushort)(i + 3);
 		}
 
 		public static void DrawTriangleFan(ITexture texture1, Vertex[] vertices, int numVertices)

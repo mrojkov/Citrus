@@ -50,7 +50,7 @@ namespace Lime
 		public void WriteToStream(Stream stream)
 		{
 			using (var w = new StreamWriter(stream)) {
-				foreach(KeyValuePair<int, string> p in strings) {
+				foreach (KeyValuePair<int, string> p in strings) {
 					w.WriteLine(string.Format("[{0}]", p.Key));
 					w.WriteLine(p.Value);
 					w.WriteLine();
