@@ -33,7 +33,8 @@ namespace Lime
 		
 		public override void ReceiveMemoryWarning(UIApplication application)
 		{
-			Lime.TexturePool.Instance.DiscardAllTextures();
+			Lime.TexturePool.Instance.DiscardUnusedTextures(2);
+			System.GC.Collect();
 		}
 
 		public override void OnActivated(UIApplication application)
@@ -56,8 +57,10 @@ namespace Lime
 		// This method is invoked when the application has loaded its UI and is ready to run
 		public override bool FinishedLaunching(UIApplication app, NSDictionary options)
 		{
-			AudioSystem.Initialize();
 			UIApplication.SharedApplication.StatusBarHidden = true;
+			UIApplication.SharedApplication.IdleTimerDisabled = true;
+			
+			AudioSystem.Initialize();
 
 			// create a new window instance based on the screen size
 			window = new UIWindow(UIScreen.MainScreen.Bounds);

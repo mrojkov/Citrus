@@ -39,7 +39,7 @@ namespace Orange
 			this.table1.RowSpacing = ((uint)(6));
 			this.table1.ColumnSpacing = ((uint)(6));
 			// Container child table1.Gtk.Table+TableChild
-			this.CitrusProjectChooser = new global::Gtk.FileChooserButton ("Select A File", ((global::Gtk.FileChooserAction)(0)));
+			this.CitrusProjectChooser = new global::Gtk.FileChooserButton ("Select a File", ((global::Gtk.FileChooserAction)(0)));
 			this.CitrusProjectChooser.Name = "CitrusProjectChooser";
 			this.CitrusProjectChooser.ShowHidden = true;
 			this.table1.Add (this.CitrusProjectChooser);

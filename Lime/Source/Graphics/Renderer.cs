@@ -61,7 +61,7 @@ namespace Lime
 		public int Height;
 	}
 
-	public static class Renderer
+	public unsafe static class Renderer
 	{
 		public static int RenderCycle = 1;
 
@@ -84,9 +84,8 @@ namespace Lime
 		}
 
 		static uint[] textures = new uint[2];
-		static ushort[] batchIndices = new ushort[MaxVertices * 4];
-		static Vertex[] batchVertices = new Vertex[MaxVertices];
-		static uint batchVBO;
+		static ushort* batchIndices;
+		static Vertex* batchVertices;
 
 		static int currentVertex = 0;
 		static int currentIndex = 0;
@@ -127,15 +126,14 @@ namespace Lime
 		{
 			if (currentIndex > 0) {
 #if GLES11
-				GL.BufferData(All.ArrayBuffer, (IntPtr)(32 * currentVertex), batchVertices, All.StaticDraw);
-				GL.DrawElements(All.Triangles, currentIndex, All.UnsignedShort, batchIndices);
+				GL.DrawElements(All.Triangles, currentIndex, All.UnsignedShort, (IntPtr)batchIndices);
 #else
 				// Tell OpenGL to discard old VBO when done drawing it and reserve memory now for a new buffer.
 				// without this, GL would wait until draw operations on old VBO are complete before writing to it
 				GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(32 * currentVertex), IntPtr.Zero, BufferUsageHint.StreamDraw);
 				// Fill newly allocated buffer
-				GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(32 * currentVertex), batchVertices, BufferUsageHint.StreamDraw);
-				GL.DrawElements(BeginMode.Triangles, currentIndex, DrawElementsType.UnsignedShort, batchIndices);
+				GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(32 * currentVertex), (IntPtr)batchVertices, BufferUsageHint.StreamDraw);
+				GL.DrawElements(BeginMode.Triangles, currentIndex, DrawElementsType.UnsignedShort, (IntPtr)batchIndices);
 #endif
 				CheckErrors();
 				currentIndex = currentVertex = 0;
@@ -145,6 +143,10 @@ namespace Lime
 		
 		public static void BeginFrame()
 		{
+			if (batchIndices == null) {
+				batchIndices = (ushort*)System.Runtime.InteropServices.Marshal.AllocHGlobal(sizeof(ushort) * MaxVertices * 4);
+				batchVertices = (Vertex*)System.Runtime.InteropServices.Marshal.AllocHGlobal(MaxVertices * sizeof(Vertex));
+			}
 			PlainTexture.DeleteScheduledTextures();
 			DrawCalls = 0;
 			RenderCycle++;
@@ -153,21 +155,20 @@ namespace Lime
 			GL.Clear((uint)All.ColorBufferBit);
 			GL.Enable(All.Texture2D);
 
-			GL.GenBuffers(1, ref batchVBO);
-			GL.BindBuffer(All.ArrayBuffer, batchVBO);
 			// Set up vertex and color arrays
-			GL.VertexPointer(2, All.Float, 32, (IntPtr)0);
+			GL.VertexPointer(2, All.Float, 32, (IntPtr)batchVertices);
 			GL.EnableClientState(All.VertexArray);
-			GL.ColorPointer(4, All.UnsignedByte, 32, (IntPtr)8);
+			GL.ColorPointer(4, All.UnsignedByte, 32, (IntPtr)((uint)batchVertices + 8));
 			GL.EnableClientState(All.ColorArray);
 
 			// Set up texture coordinate arrays
 			GL.ClientActiveTexture(All.Texture1);
 			GL.EnableClientState(All.TextureCoordArray);
-			GL.TexCoordPointer(2, All.Float, 32, (IntPtr)20);
+			GL.TexCoordPointer(2, All.Float, 32, (IntPtr)((uint)batchVertices + 20));
 			GL.ClientActiveTexture(All.Texture0);
 			GL.EnableClientState(All.TextureCoordArray);
-			GL.TexCoordPointer(2, All.Float, 32, (IntPtr)12);
+			GL.TexCoordPointer(2, All.Float, 32, (IntPtr)((uint)batchVertices + 12));
+			
 #else
 			GL.ClearColor(0, 0, 0, 1);
 			GL.Clear(ClearBufferMask.ColorBufferBit);
@@ -415,10 +416,10 @@ namespace Lime
 		{
 			SetTexture(texture1, 0);
 			SetTexture(texture2, 1);
-			if (currentIndex + (numVertices - 2) * 3 >= MaxVertices * 4 || currentVertex + numVertices >= batchVertices.Length) {
+			if (currentIndex + (numVertices - 2) * 3 >= MaxVertices * 4 || currentVertex + numVertices >= MaxVertices) {
 				FlushSpriteBatch();
 			}
-			if (numVertices < 3 || (numVertices - 2) * 3 > batchIndices.Length) {
+			if (numVertices < 3 || (numVertices - 2) * 3 > MaxVertices * 4) {
 				throw new Lime.Exception("Wrong number of vertices");
 			}
 			Rectangle uvRect1 = texture1.UVRect;

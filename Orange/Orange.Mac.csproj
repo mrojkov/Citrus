@@ -112,7 +112,7 @@
     <None Include="Orange.Win.userprefs">
       <Visible>False</Visible>
     </None>
-    <None Include="Ico.ico" />
+    <None Include="Orange.ico" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Source\AssetCooker\" />
