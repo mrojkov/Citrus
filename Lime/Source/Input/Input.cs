@@ -280,7 +280,7 @@ namespace Lime
 		internal static void SetTouchPosition(int index, Vector2 position)
 		{
 			touchPositions[index] = position;
-		}		
+		}
 		
 		public static int GetNumTouches()
 		{

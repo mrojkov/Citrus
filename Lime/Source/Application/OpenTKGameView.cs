@@ -44,6 +44,7 @@ namespace Lime
 			switch(e.Button) {
 			case OpenTK.Input.MouseButton.Left:
 				Input.SetKeyState(Key.Mouse0, false);
+				Input.SetKeyState(Key.Touch0, false);
 				break;
 			case OpenTK.Input.MouseButton.Right:
 				Input.SetKeyState(Key.Mouse1, false);
@@ -59,6 +60,7 @@ namespace Lime
 			switch(e.Button) {
 			case OpenTK.Input.MouseButton.Left:
 				Input.SetKeyState(Key.Mouse0, true);
+				Input.SetKeyState(Key.Touch0, true);
 				break;
 			case OpenTK.Input.MouseButton.Right:
 				Input.SetKeyState(Key.Mouse1, true);
@@ -73,6 +75,7 @@ namespace Lime
 		{
 			Vector2 position = new Vector2(e.X, e.Y) * Input.ScreenToWorldTransform;
 			Input.MousePosition = position;
+			Input.SetTouchPosition(0, position);
 		}
 
 		protected override void OnClosed(EventArgs e)
@@ -83,6 +86,7 @@ namespace Lime
 
 		protected override void OnUpdateFrame(OpenTK.FrameEventArgs e)
 		{
+			Input.ProcessPendingKeyEvents();
 			Input.MouseVisible = true;
 			double delta = e.Time;
 			// Here is protection against time leap on inactive state and low FPS
