@@ -162,12 +162,27 @@ namespace Lime
 		/// Middle mouse button
 		/// </summary>
 		Mouse2 = 132,
-
+		
+		Touch0 = 133,
+		Touch1 = 134,
+		Touch2 = 135,
+		Touch3 = 136,
+		
 		KeyCount,
 	}
 
 	public static class Input
 	{
+		struct KeyEvent
+		{
+			public Key Key;
+			public bool State;
+		}
+
+		static List<KeyEvent> keyEventQueue = new List<KeyEvent>();
+		
+		public const int MaxTouches = 4;
+
 		static bool[] previousKeysState = new bool[(int)Key.KeyCount];
 		static bool[] currentKeysState = new bool[(int)Key.KeyCount];
 
@@ -184,7 +199,8 @@ namespace Lime
 			get { return MouseVisible ? mousePosition : mouseRefuge; }
 			internal set { mousePosition = value; }
 		}
-
+		
+		static Vector2[] touchPositions = new Vector2[MaxTouches];
 		static Vector2 mousePosition;
 		static Vector2 mouseRefuge = new Vector2(-123456, -123456);
 
@@ -241,11 +257,62 @@ namespace Lime
 			}
 		}
 
+		public static bool GetTouchBegan(int index)
+		{
+			return GetKeyDown((Key)((int)Key.Touch0 + index));
+		}
+
+		public static bool GetTouchEnded(int index)
+		{
+			return GetKeyUp((Key)((int)Key.Touch0 + index));
+		}
+
+		public static bool GetTouch(int index)
+		{
+			return GetKey((Key)((int)Key.Touch0 + index));
+		}
+
+		public static Vector2 GetTouchPosition(int index)
+		{
+			return MouseVisible ? touchPositions[index] : mouseRefuge;
+		}
+
+		internal static void SetTouchPosition(int index, Vector2 position)
+		{
+			touchPositions[index] = position;
+		}		
+		
+		public static int GetNumTouches()
+		{
+			int j = 0;
+			for (int i = 0; i < MaxTouches; i++) {
+				if (GetTouch(i))
+					j++;
+			}
+			return j;
+		}
+		
 		public static string TextInput { get; internal set; }
 
 		internal static void SetKeyState(Key key, bool value)
 		{
-			currentKeysState[(int)key] = value;
+			keyEventQueue.Add(new KeyEvent{Key = key, State = value});
+		}
+		
+		internal static void ProcessPendingKeyEvents()
+		{
+			if (keyEventQueue.Count > 0) {
+				var processedKeys = new bool[(int)Key.KeyCount];
+				for (int i = 0; i < keyEventQueue.Count; i++) {
+					var evt = keyEventQueue[i];
+					if (!processedKeys[(int)evt.Key]) {
+						processedKeys[(int)evt.Key] = true;
+						currentKeysState[(int)evt.Key] = evt.State;
+						keyEventQueue.RemoveAt(i);
+						i--;
+					}
+				}
+			}
 		}
 
 		internal static void CopyKeysState()

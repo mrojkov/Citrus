@@ -20,6 +20,7 @@ namespace Lime
 		{
 			LayerRetainsBacking = false;
 			LayerColorFormat = EAGLColorFormat.RGB565;
+			MultipleTouchEnabled = true;
 		}
 
 		[Export("layerClass")]
@@ -41,6 +42,7 @@ namespace Lime
 
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{
+			Input.ProcessPendingKeyEvents();
 			Input.MouseVisible = true;
 			double delta = e.Time; 
 			// Here is protection against time leap on inactive state and low FPS
@@ -48,9 +50,11 @@ namespace Lime
 				delta = 0.01;
 			else if (delta > 0.1)
 				delta = 0.1;
+			//Input.ProcessKeydownEvents();
 			Application.gameApp.OnUpdateFrame(delta);
 			Input.TextInput = null;
 			Input.CopyKeysState();
+			//Input.ProcessKeyupEvents();
 		}
 
 		protected override void OnRenderFrame(FrameEventArgs e)

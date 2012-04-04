@@ -79,7 +79,6 @@ namespace Lime
 			Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
 
 			Application.gameApp.OnCreate(gameController);
-
 			return true;
 		}
 	}

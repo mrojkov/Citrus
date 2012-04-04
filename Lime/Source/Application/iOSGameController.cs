@@ -7,11 +7,14 @@ using MonoTouch.CoreAnimation;
 using MonoTouch.ObjCRuntime;
 using MonoTouch.OpenGLES;
 using MonoTouch.UIKit;
+using System.Collections.Generic;
 
 namespace Lime
 {
 	internal class GameController : UIViewController, IGameWindow
 	{
+		UITouch[] activeTouches = new UITouch[Input.MaxTouches];
+			
 		public GameController() : base()
 		{
 			base.View = new GameView();
@@ -50,25 +53,65 @@ namespace Lime
 		
 		public override void TouchesBegan(NSSet touches, UIEvent evt)
 		{
-			var pt = (touches.AnyObject as UITouch).LocationInView(this.View);
-			Vector2 position = new Vector2(pt.X, pt.Y) * Input.ScreenToWorldTransform;
-			Input.MousePosition = position;
-			Input.SetKeyState(Key.Mouse0, true);
+			foreach (var touch in touches.ToArray<UITouch>()) {
+				for (int i = 0; i < Input.MaxTouches; i++) {
+					if (activeTouches[i] == null) {
+						var pt = touch.LocationInView(this.View);
+						Vector2 position = new Vector2(pt.X, pt.Y) * Input.ScreenToWorldTransform;
+						if (i == 0) {
+							Input.MousePosition = position;
+							Input.SetKeyState(Key.Mouse0, true);
+						}
+						Key key = (Key)((int)Key.Touch0 + i);
+						Input.SetTouchPosition(i, position);
+						activeTouches[i] = touch;
+						Input.SetKeyState(key, true);
+						break;
+					}
+				}
+			}
 		}
 		
 		public override void TouchesMoved(NSSet touches, UIEvent evt)
 		{
-			var pt = (touches.AnyObject as UITouch).LocationInView(this.View);
-			Vector2 position = new Vector2(pt.X, pt.Y) * Input.ScreenToWorldTransform;
-			Input.MousePosition = position;
+			foreach (var touch in touches.ToArray<UITouch>()) {
+				for (int i = 0; i < Input.MaxTouches; i++) {
+					if (activeTouches[i] == touch) {
+						var pt = touch.LocationInView(this.View);
+						Vector2 position = new Vector2(pt.X, pt.Y) * Input.ScreenToWorldTransform;
+						if (i == 0) {
+							Input.MousePosition = position;
+						}
+						Input.SetTouchPosition(i, position);
+					}
+				}
+			}
 		}
 		
 		public override void TouchesEnded(NSSet touches, UIEvent evt)
 		{
-			var pt = (touches.AnyObject as UITouch).LocationInView(this.View);
-			Vector2 position = new Vector2(pt.X, pt.Y) * Input.ScreenToWorldTransform;
-			Input.MousePosition = position;
-			Input.SetKeyState(Key.Mouse0, false);
+			foreach (var touch in touches.ToArray<UITouch>()) {
+				for (int i = 0; i < Input.MaxTouches; i++) {
+					if (activeTouches[i] == touch) {
+						var pt = touch.LocationInView(this.View);
+						Vector2 position = new Vector2(pt.X, pt.Y) * Input.ScreenToWorldTransform;
+						if (i == 0) {
+							Input.MousePosition = position;
+							Input.SetKeyState(Key.Mouse0, false);
+						}
+						activeTouches[i] = null;
+						Key key = (Key)((int)Key.Touch0 + i);
+						Input.SetTouchPosition(i, position);
+						//Input.ScheduleKeyupEvent(key);
+						Input.SetKeyState(key, false);
+					}
+				}
+			}
+		}
+		
+		public override void TouchesCancelled(NSSet touches, UIEvent evt)
+		{
+			TouchesEnded(touches, evt);
 		}
 
 		public DeviceOrientation CurrentDeviceOrientation {
