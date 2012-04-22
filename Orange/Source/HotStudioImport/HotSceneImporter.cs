@@ -108,6 +108,9 @@ namespace Orange
 			case "BlendMode":
 				widget.Blending = lexer.ParseBlendMode();
 				break;
+			case "SuppressSkin":
+				lexer.ParseBool();
+				break;
 			default:
 				ParseActorProperty(node, name);
 				break;

@@ -33,6 +33,9 @@ namespace Lime
 		[ProtoMember(8)]
 		public bool Numeric;
 
+		[ProtoMember(9)]
+		public HAlignment HAlignment;
+
 		int caretBlinkPhase;
 
 		public override void AddToRenderChain(RenderChain chain)
@@ -99,6 +102,10 @@ namespace Lime
 				}
 			}
 			var textPosition = new Vector2(BorderWidth, (Height - FontHeight) / 2);
+			if (HAlignment == HAlignment.Right)
+				textPosition.X = Size.X - BorderWidth - extent.X;
+			else if (HAlignment == HAlignment.Center)
+				textPosition.X = (Size.X - extent.X) * 0.5f;
 			Renderer.WorldMatrix = worldMatrix;
 			Renderer.Blending = worldBlending;
 			Renderer.DrawTextLine(Font.Instance, textPosition, text, worldColor, FontHeight, start, length);

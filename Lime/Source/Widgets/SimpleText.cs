@@ -38,11 +38,11 @@ namespace Lime
 				else if (VAlignment == VAlignment.Center)
 					pos.Y = (Size.Y - totalHeight) * 0.5f;
 				foreach (var str in strings) {
-					var extend = Renderer.MeasureTextLine(Font.Instance, str, FontHeight);
+					var extent = Renderer.MeasureTextLine(Font.Instance, str, FontHeight);
 					if (HAlignment == HAlignment.Right)
-						pos.X = Size.X - extend.X;
+						pos.X = Size.X - extent.X;
 					else if (HAlignment == HAlignment.Center)
-						pos.X = (Size.X - extend.X) * 0.5f;
+						pos.X = (Size.X - extent.X) * 0.5f;
 					Renderer.DrawTextLine(Font.Instance, pos, str, worldColor, FontHeight);
 					pos.Y += Spacing + FontHeight;
 				}

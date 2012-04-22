@@ -19,7 +19,7 @@ namespace Lime
 			set { this.value = value; }
 		}
 
-		public event EventHandler<EventArgs> OnChange;
+		public EventHandler<EventArgs> OnChange;
 
 		float value;
 		float offset0;

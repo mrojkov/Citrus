@@ -11,7 +11,7 @@ namespace Lime
 		[ProtoMember(1)]
 		public string Caption { get; set; }
 
-		public event EventHandler<EventArgs> OnClick;
+		public EventHandler<EventArgs> OnClick;
 
 		void UpdateHelper(int delta)
 		{

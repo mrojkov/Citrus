@@ -82,6 +82,16 @@ namespace Lime
 			return (value < min) ? min : (value > max ? max : value);
 		}
 
+		public static void Clamp(ref float value, float min, float max)
+		{
+			value = (value < min) ? min : (value > max ? max : value);
+		}
+
+		public static void Clamp(ref int value, int min, int max)
+		{
+			value = (value < min) ? min : (value > max ? max : value);
+		}
+
 		public static Vector2 HermiteSpline(float t, Vector2 p0, Vector2 m0, Vector2 p1, Vector2 m1)
 		{
 			return new Vector2(HermiteSpline(t, p0.X, m0.X, p1.X, m1.X),

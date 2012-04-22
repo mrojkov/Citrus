@@ -35,10 +35,10 @@ namespace Lime
 		RenderTarget renderTarget;
 		SerializableTexture renderTexture;
 
-		public event EventHandler<UpdateEventArgs> BeforeUpdate;
-		public event EventHandler<UpdateEventArgs> AfterUpdate;
-		public event EventHandler<EventArgs> BeforeLateUpdate;
-		public event EventHandler<EventArgs> AfterLateUpdate;
+		public EventHandler<UpdateEventArgs> BeforeUpdate;
+		public EventHandler<UpdateEventArgs> AfterUpdate;
+		public EventHandler<EventArgs> BeforeLateUpdate;
+		public EventHandler<EventArgs> AfterLateUpdate;
 
 		[ProtoMember(1)]
 		public RenderTarget RenderTarget {
