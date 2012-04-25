@@ -4,7 +4,7 @@ namespace Lime
 {
 	public static class Environment
 	{
-#if !iOS		
+#if !iOS
 		public static void GenerateSerializationAssembly(string assemblyName, params Type[] types)
 		{
 			var model = ProtoBuf.Meta.TypeModel.Create();
