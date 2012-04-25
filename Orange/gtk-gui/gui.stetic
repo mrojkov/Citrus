@@ -158,7 +158,7 @@ Build Content Only
 Rebuild Game
 Reveal Content
 Extract Translatable Strings
-</property>
+Generate Serialization Assembly</property>
                 <property name="Active">0</property>
               </widget>
               <packing>

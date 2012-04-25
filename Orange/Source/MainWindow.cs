@@ -12,7 +12,8 @@ namespace Orange
 		BuildContentOnly,
 		RebuildGame,
 		RevealContent,
-		ExtractTranslatableStrings
+		ExtractTranslatableStrings,
+		GenerateSerializationAssembly
 	}
 
 	public partial class MainWindow : Gtk.Window
@@ -85,7 +86,44 @@ namespace Orange
 				}
 			}
 		}
-		
+
+		public bool GenerateSerializationAssembly()
+		{
+			BuildContent();
+			if (!BuildSolution()) {
+				return false;
+			}
+			var platform = (TargetPlatform)this.TargetPlatform.Active;
+			var citrusProject = new CitrusProject(CitrusProjectChooser.Filename);
+			var slnBuilder = new SolutionBuilder(citrusProject, platform);
+			int exitCode = slnBuilder.Run("--GenerateSerializationAssembly");
+			if (exitCode != 0) {
+				Console.WriteLine("Application terminated with exit code {0}", exitCode);
+				return false;
+			}
+			string app = slnBuilder.GetApplicationPath();
+			string dir = System.IO.Path.GetDirectoryName(app);
+			string assembly = System.IO.Path.Combine(dir, "Serializer.dll");
+			if (!System.IO.File.Exists(assembly)) {
+				Console.WriteLine("{0} doesn't exist", assembly);
+				Console.WriteLine(@"Ensure your Application.cs contains following code:
+	public static void Main(string[] args)
+	{
+		if (Array.IndexOf(args, ""--GenerateSerializationAssembly"") >= 0) {
+			Lime.Environment.GenerateSerializationAssembly(""Serializer"");
+			return;
+		}");
+				return false;
+			}
+			var destination = System.IO.Path.Combine(citrusProject.ProjectDirectory, "Serializer.dll");
+			if (System.IO.File.Exists(destination)) {
+				System.IO.File.Delete(destination);
+			}
+			System.IO.File.Move(assembly, destination);
+			Console.WriteLine("Serialization assembly saved to '{0}'", destination);
+			return true;
+		}
+		/*
 		public static void GenerateSerializerDll(ProtoBuf.Meta.RuntimeTypeModel model, string directory)
 		{
 			string currentDirectory = System.IO.Directory.GetCurrentDirectory();
@@ -102,7 +140,7 @@ namespace Orange
 			model.Add(typeof(Node), true);
 			model.Add(typeof(TextureAtlasPart), true);
 			model.Add(typeof(Font), true);
-		}
+		}*/
 
 		bool CleanSolution()
 		{
@@ -115,7 +153,20 @@ namespace Orange
 			}
 			var slnBuilder = new SolutionBuilder(citrusProject, platform);
 			if (!slnBuilder.Clean()) {
-				Console.WriteLine("Clean failed");
+				Console.WriteLine("CLEANUP FAILED");
+				return false;
+			}
+			return true;
+		}
+
+		bool BuildSolution()
+		{
+			var platform = (TargetPlatform)this.TargetPlatform.Active;
+			var citrusProject = new CitrusProject(CitrusProjectChooser.Filename);
+			// Build game solution
+			var slnBuilder = new SolutionBuilder(citrusProject, platform);
+			if (!slnBuilder.Build()) {
+				Console.WriteLine("BUILD FAILED");
 				return false;
 			}
 			return true;
@@ -123,45 +174,16 @@ namespace Orange
 
 		void BuildContent()
 		{
-			DateTime startTime = DateTime.Now;
-			BuildContentHelper();
-			ShowTimeStatistics(startTime);
-		}
-
-		bool BuildSolution()
-		{
-			DateTime startTime = DateTime.Now;
-			BuildContentHelper();
 			var platform = (TargetPlatform)this.TargetPlatform.Active;
 			var citrusProject = new CitrusProject(CitrusProjectChooser.Filename);
-			// Build game solution
-			var slnBuilder = new SolutionBuilder(citrusProject, platform);
-			if (!slnBuilder.Build()) {
-				Console.WriteLine("Build failed");
-				ShowTimeStatistics(startTime);
-				return false;
-			}
-			ShowTimeStatistics(startTime);
-			return true;
-		}
-
-		void BuildContentHelper()
-		{
-			var platform = (TargetPlatform)this.TargetPlatform.Active;
-			var citrusProject = new CitrusProject(CitrusProjectChooser.Filename);
-			// Create serialization model
+			/*// Create serialization model
 			var model = ProtoBuf.Meta.TypeModel.Create();
 			model.UseImplicitZeroDefaults = false;
 			RegisterEngineTypes(model);
-			Serialization.Serializer = model;
+			Serialization.Serializer = model;*/
 			// Cook all assets(the main job)
 			AssetCooker cooker = new AssetCooker(citrusProject, platform);
 			cooker.Cook();
-			// Update serialization assembly
-			if (platform == Orange.TargetPlatform.iOS) {
-				model.CompileInPlace();
-				GenerateSerializerDll(model, citrusProject.ProjectDirectory);
-			}
 		}
 
 		bool RunSolution()
@@ -169,7 +191,11 @@ namespace Orange
 			var platform = (TargetPlatform)this.TargetPlatform.Active;
 			var citrusProject = new CitrusProject(CitrusProjectChooser.Filename);
 			var slnBuilder = new SolutionBuilder(citrusProject, platform);
-			slnBuilder.Run();
+			int exitCode = slnBuilder.Run("");
+			if (exitCode != 0) {
+				Console.WriteLine("Application terminated with exit code {0}", exitCode);
+				return false;
+			}
 			return true;
 		}
 
@@ -201,7 +227,6 @@ namespace Orange
 		{
 			DateTime endTime = DateTime.Now;
 			TimeSpan delta = endTime - startTime;
-			Console.WriteLine("Done at " + endTime.ToLongTimeString());
 			Console.WriteLine("Elapsed time {0}:{1}:{2}", delta.Hours, delta.Minutes, delta.Seconds);
 		}
 
@@ -209,6 +234,7 @@ namespace Orange
 		{
 			if (!CheckTargetAvailability())
 				return;
+			DateTime startTime = DateTime.Now;
 			SaveState();
 			this.Sensitive = false;
 			try {
@@ -216,6 +242,7 @@ namespace Orange
 					ClearLog();
 					switch ((Orange.Action)Action.Active) {
 					case Orange.Action.BuildGameAndRun:
+						BuildContent();
 						if (BuildSolution()) {
 							ScrollLogToEnd();
 							RunSolution();
@@ -226,6 +253,7 @@ namespace Orange
 						break;
 					case Orange.Action.RebuildGame:
 						if (CleanSolution()) {
+							BuildContent();
 							BuildSolution();
 						}
 						break;
@@ -235,6 +263,9 @@ namespace Orange
 					case Orange.Action.RevealContent:
 						RevealContent();
 						break;
+					case Orange.Action.GenerateSerializationAssembly:
+						GenerateSerializationAssembly();
+						break;
 					}
 				} catch (System.Exception exc) {
 					Console.WriteLine("Exception:" + exc.Message);
@@ -243,6 +274,7 @@ namespace Orange
 			} finally {
 				this.Sensitive = true;
 			}
+			ShowTimeStatistics(startTime);
 		}
 
 		private bool CheckTargetAvailability()

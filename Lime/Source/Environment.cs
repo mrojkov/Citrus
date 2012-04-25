@@ -4,6 +4,19 @@ namespace Lime
 {
 	public static class Environment
 	{
+		public static void GenerateSerializationAssembly(string assemblyName, params Type[] types)
+		{
+			var model = ProtoBuf.Meta.TypeModel.Create();
+			model.UseImplicitZeroDefaults = false;
+			model.Add(typeof(Node), true);
+			model.Add(typeof(TextureAtlasPart), true);
+			model.Add(typeof(Font), true);
+			foreach (var type in types) {
+				model.Add(type, true);
+			}
+			model.Compile(assemblyName, assemblyName + ".dll");
+		}
+
 		public static void OpenBrowser(string url)
 		{
 #if iOS

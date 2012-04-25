@@ -91,24 +91,30 @@ namespace Orange
 			}
 			return true;
 		}
-		
-		public void Run()
+
+		public string GetApplicationPath()
 		{
-			Console.WriteLine("------------- Starting Game -------------");
-			string app, dir;
+			string app;
 #if MAC
 			if (platform == TargetPlatform.Desktop) {
 				app = Path.Combine(project.ProjectDirectory, project.Title + ".Mac", "bin/Release", project.Title + ".app", "Contents/MacOS", project.Title);
-				dir = Path.GetDirectoryName(app);
 			} else {
 				throw new NotImplementedException();
 			}
 #elif WIN
 			app = Path.Combine(project.ProjectDirectory, project.Title + ".Win", "bin/Release", project.Title + ".exe");
-			dir = Path.GetDirectoryName(app);
 #endif
-			using(new DirectoryChanger(dir)) {
-				Helpers.StartProcess(app, "");
+			return app;
+		}
+
+		public int Run(string arguments)
+		{
+			Console.WriteLine("------------- Starting Application -------------");
+			string app = GetApplicationPath();
+			string dir = Path.GetDirectoryName(app);
+			using (new DirectoryChanger(dir)) {
+				int exitCode = Helpers.StartProcess(app, arguments);
+				return exitCode;
 			}
 		}
 	}
