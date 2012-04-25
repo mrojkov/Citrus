@@ -50,14 +50,6 @@ namespace Orange
 			if (Helpers.StartProcess(app, args) != 0) {
 				return false;
 			}
-#if MAC
-			if (platform == TargetPlatform.Desktop) {
-				string appName = Path.GetFileName(project.ProjectDirectory);
-				string src = "/Applications/MonoDevelop.app/Contents/MacOS/lib/monodevelop/Addins";
-				string dst = Path.Combine(project.ProjectDirectory, appName + ".Mac", "bin/Release", appName + ".app", "Contents/Resources");
-				CopyFile(src, dst, "MonoMac.dll");
-			}
-#endif
 			return true;
 		}
 
