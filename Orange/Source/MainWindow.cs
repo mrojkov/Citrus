@@ -155,12 +155,6 @@ namespace Orange
 		void BuildContent(Orange.TargetPlatform platform)
 		{
 			var citrusProject = new CitrusProject(CitrusProjectChooser.Filename);
-			/*// Create serialization model
-			var model = ProtoBuf.Meta.TypeModel.Create();
-			model.UseImplicitZeroDefaults = false;
-			RegisterEngineTypes(model);
-			Serialization.Serializer = model;*/
-			// Cook all assets(the main job)
 			AssetCooker cooker = new AssetCooker(citrusProject, platform);
 			cooker.Cook();
 		}
