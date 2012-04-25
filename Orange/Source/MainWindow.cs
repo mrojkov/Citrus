@@ -89,13 +89,12 @@ namespace Orange
 
 		public bool GenerateSerializationAssembly()
 		{
-			BuildContent();
-			if (!BuildSolution()) {
+			BuildContent(Orange.TargetPlatform.Desktop);
+			if (!BuildSolution(Orange.TargetPlatform.Desktop)) {
 				return false;
 			}
-			var platform = (TargetPlatform)this.TargetPlatform.Active;
 			var citrusProject = new CitrusProject(CitrusProjectChooser.Filename);
-			var slnBuilder = new SolutionBuilder(citrusProject, platform);
+			var slnBuilder = new SolutionBuilder(citrusProject, Orange.TargetPlatform.Desktop);
 			int exitCode = slnBuilder.Run("--GenerateSerializationAssembly");
 			if (exitCode != 0) {
 				Console.WriteLine("Application terminated with exit code {0}", exitCode);
@@ -159,9 +158,8 @@ namespace Orange
 			return true;
 		}
 
-		bool BuildSolution()
+		bool BuildSolution(Orange.TargetPlatform platform)
 		{
-			var platform = (TargetPlatform)this.TargetPlatform.Active;
 			var citrusProject = new CitrusProject(CitrusProjectChooser.Filename);
 			// Build game solution
 			var slnBuilder = new SolutionBuilder(citrusProject, platform);
@@ -172,9 +170,8 @@ namespace Orange
 			return true;
 		}
 
-		void BuildContent()
+		void BuildContent(Orange.TargetPlatform platform)
 		{
-			var platform = (TargetPlatform)this.TargetPlatform.Active;
 			var citrusProject = new CitrusProject(CitrusProjectChooser.Filename);
 			/*// Create serialization model
 			var model = ProtoBuf.Meta.TypeModel.Create();
@@ -186,9 +183,8 @@ namespace Orange
 			cooker.Cook();
 		}
 
-		bool RunSolution()
+		bool RunSolution(Orange.TargetPlatform platform)
 		{
-			var platform = (TargetPlatform)this.TargetPlatform.Active;
 			var citrusProject = new CitrusProject(CitrusProjectChooser.Filename);
 			var slnBuilder = new SolutionBuilder(citrusProject, platform);
 			int exitCode = slnBuilder.Run("");
@@ -237,24 +233,25 @@ namespace Orange
 			DateTime startTime = DateTime.Now;
 			SaveState();
 			this.Sensitive = false;
+			var platform = (TargetPlatform)this.TargetPlatform.Active;
 			try {
 				try {
 					ClearLog();
 					switch ((Orange.Action)Action.Active) {
 					case Orange.Action.BuildGameAndRun:
-						BuildContent();
-						if (BuildSolution()) {
+						BuildContent(platform);
+						if (BuildSolution(platform)) {
 							ScrollLogToEnd();
-							RunSolution();
+							RunSolution(platform);
 						}
 						break;
 					case Orange.Action.BuildContentOnly:
-						BuildContent();
+						BuildContent(platform);
 						break;
 					case Orange.Action.RebuildGame:
 						if (CleanSolution()) {
-							BuildContent();
-							BuildSolution();
+							BuildContent(platform);
+							BuildSolution(platform);
 						}
 						break;
 					case Orange.Action.ExtractTranslatableStrings:
