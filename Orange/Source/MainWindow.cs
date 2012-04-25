@@ -122,24 +122,6 @@ namespace Orange
 			Console.WriteLine("Serialization assembly saved to '{0}'", destination);
 			return true;
 		}
-		/*
-		public static void GenerateSerializerDll(ProtoBuf.Meta.RuntimeTypeModel model, string directory)
-		{
-			string currentDirectory = System.IO.Directory.GetCurrentDirectory();
-			try {
-				System.IO.Directory.SetCurrentDirectory(directory);
-				model.Compile("Serializer", "Serializer.dll");
-			} finally {
-				System.IO.Directory.SetCurrentDirectory(currentDirectory);
-			}
-		}
-		
-		void RegisterEngineTypes(ProtoBuf.Meta.RuntimeTypeModel model)
-		{
-			model.Add(typeof(Node), true);
-			model.Add(typeof(TextureAtlasPart), true);
-			model.Add(typeof(Font), true);
-		}*/
 
 		bool CleanSolution()
 		{

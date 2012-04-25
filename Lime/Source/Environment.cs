@@ -4,6 +4,7 @@ namespace Lime
 {
 	public static class Environment
 	{
+#if !iOS		
 		public static void GenerateSerializationAssembly(string assemblyName, params Type[] types)
 		{
 			var model = ProtoBuf.Meta.TypeModel.Create();
@@ -16,7 +17,8 @@ namespace Lime
 			}
 			model.Compile(assemblyName, assemblyName + ".dll");
 		}
-
+#endif
+		
 		public static void OpenBrowser(string url)
 		{
 #if iOS
