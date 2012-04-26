@@ -9,13 +9,15 @@ using MonoMac.ObjCRuntime;
 
 namespace Lime
 {
-	internal class GameController : NSObject, IGameWindow
+	internal class GameController : NSObject
 	{
 		NSWindow window;
 		GameView view;
 		Size windowSize;
 
 		bool isInFullScreenMode;
+
+		public static GameController Instance;
 
 		// Put the main menu stuff here to prevent a garbage collection
 		NSMenu mainMenu;
@@ -27,6 +29,7 @@ namespace Lime
 
 		public GameController(GameApp game)
 		{
+			Instance = this;
 			AudioSystem.Initialize();
 
 			// The default resolution is 640 x 480
@@ -38,7 +41,7 @@ namespace Lime
 			window.Center();
 			window.IsOpaque = true;
 
-			view = new GameView(frame, null, game);
+			view = new GameView(frame, null);
 
 			window.ContentView.AddSubview(view);
 			window.AcceptsMouseMovedEvents = false;
@@ -50,7 +53,7 @@ namespace Lime
 			// We set the current directory to the ResourcePath on Mac
 			Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
 
-			game.OnCreate(this);
+			game.OnCreate();
 			window.MakeKeyAndOrderFront(window);
 		}
 
@@ -78,10 +81,6 @@ namespace Lime
 			quitMenuItem = new NSMenuItem("Quit", "q", OnQuit);
 			appMenu.AddItem(quitMenuItem);
 			NSApplication.SharedApplication.SetMainMenu(mainMenu);
-		}
-
-		public DeviceOrientation CurrentDeviceOrientation {
-			get { return DeviceOrientation.LandscapeLeft; }
 		}
 
 		public Size WindowSize {
@@ -196,16 +195,10 @@ namespace Lime
 			if (oldTitle != null)
 				view.Title = oldTitle;
 		}
-		
+
 		public void Exit()
 		{
 			NSApplication.SharedApplication.Terminate(this);
-		}
-
-		public float FrameRate {
-			get {
-				return view.FrameRate;
-			}
 		}
 	}
 }

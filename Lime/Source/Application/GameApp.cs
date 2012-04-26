@@ -1,4 +1,9 @@
 using System;
+#if iOS
+using MonoTouch.UIKit;
+#elif MAC
+using MonoMac.AppKit;
+#endif
 
 namespace Lime
 {
@@ -10,32 +15,79 @@ namespace Lime
 		LandscapeLeft = 4,
 		LandscapeRight = 8,
 	}
-	
-	public interface IGameWindow
-	{
-		Size WindowSize { get; set; }
-		bool FullScreen { get; set; }
-		float FrameRate { get; }
-		DeviceOrientation CurrentDeviceOrientation { get; }
-#if !iOS
-		void Exit();
-#endif
-	}
 
 	public class GameApp
 	{
+		public static GameApp Instance;
+
 		public GameApp()
 		{
+			Instance = this;
 			// Use '.' as decimal separator.
-			System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+			var culture = System.Globalization.CultureInfo.InvariantCulture;
+			System.Threading.Thread.CurrentThread.CurrentCulture = culture;
+		}
+#if iOS
+		public Size WindowSize {
+			get {
+				var size = GameView.Instance.Size;
+				return new Size(size.Width, size.Height);
+			}
+			set {}
 		}
 
-		public virtual void OnCreate(IGameWindow gameWindow) {}
+		public void ShowOnscreenKeyboard(bool show)
+		{
+			GameView.Instance.ShowOnscreenKeyboard(show);
+		}
+
+		public bool FullScreen { get { return true; } set {} }
+		public float FrameRate { get { return GameView.Instance.FrameRate; } }
+
+		public DeviceOrientation CurrentDeviceOrientation {
+			get {
+				switch (GameController.Instance.InterfaceOrientation) {
+				case UIInterfaceOrientation.Portrait:
+					return DeviceOrientation.Portrait;
+				case UIInterfaceOrientation.PortraitUpsideDown:
+					return DeviceOrientation.PortraitUpsideDown;
+				case UIInterfaceOrientation.LandscapeLeft:
+					return DeviceOrientation.LandscapeLeft;
+				case UIInterfaceOrientation.LandscapeRight:
+				default:
+					return DeviceOrientation.LandscapeRight;
+				}
+			}
+		}
+#else
+		public void Exit()
+		{
+			GameController.Instance.Exit();
+		}
+
+		public bool FullScreen { 
+			get { return GameController.Instance.FullScreen; } 
+			set { GameController.Instance.FullScreen = value; } 
+		}
+
+		public float FrameRate { get { return GameView.Instance.FrameRate; } }
+
+		public DeviceOrientation CurrentDeviceOrientation {
+			get { return DeviceOrientation.LandscapeLeft; }
+		}
+
+		public Size WindowSize {
+			get { return GameController.Instance.WindowSize; } 
+			set { GameController.Instance.WindowSize = value; } 
+		}
+#endif
+
+		public virtual void OnCreate() {}
 		public virtual void OnGLCreate() {}
 		public virtual void OnGLDestroy() {}
 		public virtual void OnUpdateFrame(double delta) {}
 		public virtual void OnRenderFrame() {}
-		public virtual void OnDeviceRotated(DeviceOrientation deviceOrientation) {}
+		public virtual void OnDeviceRotated() {}
 		public virtual DeviceOrientation GetSupportedDeviceOrientations() { return DeviceOrientation.LandscapeLeft; }
 	}
 }

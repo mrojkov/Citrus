@@ -9,11 +9,11 @@ namespace Lime
 {
 	internal class GameView : MonoMac.OpenGL.MonoMacGameView
 	{
-		GameApp game;
-		
-		public GameView(RectangleF frame, NSOpenGLContext context, GameApp game) : base(frame, context)
+		public static GameView Instance;
+
+		public GameView(RectangleF frame, NSOpenGLContext context) : base(frame, context)
 		{
-			this.game = game;
+			Instance = this;
 			AutoresizingMask = NSViewResizingMask.HeightSizable
 				| NSViewResizingMask.MaxXMargin 
 				| NSViewResizingMask.MinYMargin
@@ -28,14 +28,14 @@ namespace Lime
 				delta = 0.01;
 			else if (delta > 0.1)
 				delta = 0.1;
-			game.OnUpdateFrame(delta);
+			GameApp.Instance.OnUpdateFrame(delta);
 		}
 		
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
 			UpdateFrameRate();
 			UpdateView();
-			game.OnRenderFrame();
+			GameApp.Instance.OnRenderFrame();
 		}
 
 		public override void MouseDown(NSEvent theEvent)

@@ -119,7 +119,7 @@ namespace Orange
 				System.IO.File.Delete(destination);
 			}
 			System.IO.File.Move(assembly, destination);
-			Console.WriteLine("Serialization assembly saved to '{0}'", destination);
+			Console.Write("Serialization assembly saved to '{0}'\n", destination);
 			return true;
 		}
 

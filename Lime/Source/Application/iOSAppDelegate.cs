@@ -8,17 +8,6 @@ using MonoTouch.UIKit;
 
 namespace Lime
 {
-	public class Application
-	{
-		internal static GameApp gameApp;
-		
-		public static void Main(string[] args, GameApp gameApp)
-		{
-			Application.gameApp = gameApp;
-			UIApplication.Main(args, null, "AppDelegate");
-		}
-	}
-
 	/// <summary>
 	/// The UIApplicationDelegate for the application. This class is responsible for launching the 
 	/// User Interface of the application, as well as listening(and optionally responding) to 
@@ -41,7 +30,7 @@ namespace Lime
 		{
 			AudioSystem.Active = true;
 			gameController.Activate();
-			Application.gameApp.OnGLCreate();
+			GameApp.Instance.OnGLCreate();
 		}
 
 		public override void OnResignActivation(UIApplication application)
@@ -50,7 +39,7 @@ namespace Lime
 			// Important: MonoTouch destroys OpenGL context on application hiding.
 			// So, we must destroy all OpenGL objects.
 			Lime.TexturePool.Instance.DiscardAllTextures();
-			Application.gameApp.OnGLDestroy();
+			GameApp.Instance.OnGLDestroy();
 			gameController.Deactivate();
 		}
 
@@ -78,7 +67,7 @@ namespace Lime
 			// Set the current directory.
 			Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
 
-			Application.gameApp.OnCreate(gameController);
+			GameApp.Instance.OnCreate();
 			return true;
 		}
 	}
