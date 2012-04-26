@@ -16,11 +16,11 @@ namespace Lime
 		LandscapeRight = 8,
 	}
 
-	public class GameApp
+	public class Application
 	{
-		public static GameApp Instance;
+		public static Application Instance;
 
-		public GameApp()
+		public Application()
 		{
 			Instance = this;
 			// Use '.' as decimal separator.
@@ -59,7 +59,7 @@ namespace Lime
 				}
 			}
 		}
-#else
+#elif MAC
 		public void Exit()
 		{
 			GameController.Instance.Exit();
@@ -79,6 +79,27 @@ namespace Lime
 		public Size WindowSize {
 			get { return GameController.Instance.WindowSize; } 
 			set { GameController.Instance.WindowSize = value; } 
+		}
+#elif WIN
+		public void Exit()
+		{
+			GameView.Instance.Exit();
+		}
+
+		public bool FullScreen { 
+			get { return GameView.Instance.FullScreen; } 
+			set { GameView.Instance.FullScreen = value; } 
+		}
+
+		public float FrameRate { get { return GameView.Instance.FrameRate; } }
+
+		public DeviceOrientation CurrentDeviceOrientation {
+			get { return DeviceOrientation.LandscapeLeft; }
+		}
+
+		public Size WindowSize {
+			get { return GameView.Instance.WindowSize; } 
+			set { GameView.Instance.WindowSize = value; } 
 		}
 #endif
 

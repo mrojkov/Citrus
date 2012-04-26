@@ -5,16 +5,18 @@ using OpenTK.Input;
 
 namespace Lime
 {
-	public class GameView : OpenTK.GameWindow, IGameWindow
+	public class GameView : OpenTK.GameWindow
 	{
-		GameApp app;
+		public static GameView Instance;
+		Application app;
 
-		public GameView(GameApp app)
+		public GameView(Application app)
 			: base(640, 480, new OpenTK.Graphics.GraphicsMode(32, 0, 0, 4))
 		{
+			Instance = this;
 			this.app = app;
 			AudioSystem.Initialize(16);
-			app.OnCreate(this);
+			app.OnCreate();
 			this.Keyboard.KeyDown += HandleKeyDown;
 			this.Keyboard.KeyUp += HandleKeyUp;
 			this.KeyPress += HandleKeyPress;
@@ -141,11 +143,6 @@ namespace Lime
 		public float FrameRate { 
 			get { return frameRate; } 
 		}
-		
-		public DeviceOrientation CurrentDeviceOrientation { 
-			get { return DeviceOrientation.LandscapeLeft; } 
-		}
-
 	}
 }
 #endif
