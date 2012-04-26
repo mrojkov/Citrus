@@ -28,27 +28,29 @@ namespace Lime
 				delta = 0.01;
 			else if (delta > 0.1)
 				delta = 0.1;
-			GameApp.Instance.OnUpdateFrame(delta);
+			Application.Instance.OnUpdateFrame(delta);
 		}
 		
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
 			UpdateFrameRate();
 			UpdateView();
-			GameApp.Instance.OnRenderFrame();
+			Application.Instance.OnRenderFrame();
 		}
 
 		public override void MouseDown(NSEvent theEvent)
 		{
 			var p = theEvent.LocationInWindow;
-			// game.OnMouseDown(MouseButton.Left, new Vector2(p.X, Size.Height - p.Y));
+			Input.MousePosition = new Vector2(p.X, Size.Height - p.Y);
+			Input.SetKeyState(Key.Mouse0, true);
 			base.MouseDown(theEvent);
 		}
 		
 		public override void MouseUp(NSEvent theEvent)
 		{
 			var p = theEvent.LocationInWindow;
-			// game.OnMouseUp(MouseButton.Left, new Vector2(p.X, Size.Height - p.Y));
+			Input.MousePosition = new Vector2(p.X, Size.Height - p.Y);
+			Input.SetKeyState(Key.Mouse0, false);
 			base.MouseUp(theEvent);
 		}
 		

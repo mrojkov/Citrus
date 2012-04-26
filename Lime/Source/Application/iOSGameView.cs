@@ -80,7 +80,7 @@ namespace Lime
 				delta = 0.01;
 			else if (delta > 0.1)
 				delta = 0.1;
-			GameApp.Instance.OnUpdateFrame(delta);
+			Application.Instance.OnUpdateFrame(delta);
 			Input.TextInput = null;
 			Input.CopyKeysState();
 			Input.SetKeyState(Key.Enter, false);
@@ -106,7 +106,7 @@ namespace Lime
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
 			MakeCurrent();
-			GameApp.Instance.OnRenderFrame();
+			Application.Instance.OnRenderFrame();
 			SwapBuffers();
 			UpdateFrameRate();
 		}

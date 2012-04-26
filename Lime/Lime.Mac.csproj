@@ -54,7 +54,6 @@
     <Compile Include="Source\AssetsBundle.cs" />
     <Compile Include="Source\Exception.cs" />
     <Compile Include="Source\Serialization.cs" />
-    <Compile Include="Source\Application\GameApp.cs" />
     <Compile Include="Source\Application\MacAppDelegate.cs" />
     <Compile Include="Source\Application\MacGameController.cs" />
     <Compile Include="Source\Application\MacGameView.cs" />
@@ -124,6 +123,7 @@
     <Compile Include="Source\Environment.cs" />
     <Compile Include="Source\MathLib.cs" />
     <Compile Include="Source\Widgets\TextBox.cs" />
+    <Compile Include="Source\Application\Application.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Audio\ADPCMEncoder.c">

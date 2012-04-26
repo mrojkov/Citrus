@@ -7,17 +7,17 @@ namespace Lime
 {
 	public class AppDelegate : NSApplicationDelegate
 	{
-		GameApp game;
+		Application app;
 		GameController gameController;
 		
-		public AppDelegate(GameApp game)
+		public AppDelegate(Application app)
 		{
-			this.game = game;
+			this.app = app;
 		}
 		
 		public override void FinishedLaunching(MonoMac.Foundation.NSObject notification)
 		{
-			gameController = new GameController(game);
+			gameController = new GameController(app);
 		}
 		
 		public override void DidBecomeActive(NSNotification notification)

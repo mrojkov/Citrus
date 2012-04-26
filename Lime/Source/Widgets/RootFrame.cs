@@ -47,7 +47,7 @@
 			}
 #if iOS
 			bool showKeyboard = ActiveTextWidget != null && ActiveTextWidget.Visible;
-			GameApp.Instance.ShowOnscreenKeyboard(showKeyboard);
+			Application.Instance.ShowOnscreenKeyboard(showKeyboard);
 #endif
 		}
 	}

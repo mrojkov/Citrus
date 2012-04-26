@@ -111,13 +111,13 @@ namespace Lime
 			switch (toInterfaceOrientation)
 			{
 			case UIInterfaceOrientation.LandscapeLeft:
-				return (GameApp.Instance.GetSupportedDeviceOrientations() & DeviceOrientation.LandscapeLeft) != 0;
+				return (Application.Instance.GetSupportedDeviceOrientations() & DeviceOrientation.LandscapeLeft) != 0;
 			case UIInterfaceOrientation.LandscapeRight:
-				return (GameApp.Instance.GetSupportedDeviceOrientations() & DeviceOrientation.LandscapeRight) != 0;
+				return (Application.Instance.GetSupportedDeviceOrientations() & DeviceOrientation.LandscapeRight) != 0;
 			case UIInterfaceOrientation.Portrait:
-				return (GameApp.Instance.GetSupportedDeviceOrientations() & DeviceOrientation.Portrait) != 0;
+				return (Application.Instance.GetSupportedDeviceOrientations() & DeviceOrientation.Portrait) != 0;
 			case UIInterfaceOrientation.PortraitUpsideDown:
-				return (GameApp.Instance.GetSupportedDeviceOrientations() & DeviceOrientation.PortraitUpsideDown) != 0;
+				return (Application.Instance.GetSupportedDeviceOrientations() & DeviceOrientation.PortraitUpsideDown) != 0;
 			}
 			return false;
 		}
@@ -125,7 +125,7 @@ namespace Lime
 		public override void DidRotate(UIInterfaceOrientation fromInterfaceOrientation)
 		{
 			base.DidRotate(fromInterfaceOrientation);
-			GameApp.Instance.OnDeviceRotated();
+			Application.Instance.OnDeviceRotated();
 		}
 	}
 }

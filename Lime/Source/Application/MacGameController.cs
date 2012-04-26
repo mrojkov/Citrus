@@ -27,7 +27,7 @@ namespace Lime
 		NSMenuItem fullScreenMenuItem;
 		NSMenuItem quitMenuItem;
 
-		public GameController(GameApp game)
+		public GameController(Application app)
 		{
 			Instance = this;
 			AudioSystem.Initialize();
@@ -53,7 +53,7 @@ namespace Lime
 			// We set the current directory to the ResourcePath on Mac
 			Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
 
-			game.OnCreate();
+			app.OnCreate();
 			window.MakeKeyAndOrderFront(window);
 		}
 

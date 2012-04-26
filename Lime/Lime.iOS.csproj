@@ -97,7 +97,6 @@
     <Compile Include="Source\Widgets\SplineGear.cs" />
     <Compile Include="Source\Widgets\SplinePoint.cs" />
     <Compile Include="Source\Widgets\Widget.cs" />
-    <Compile Include="Source\Application\GameApp.cs" />
     <Compile Include="Source\Input\Input.cs" />
     <Compile Include="Source\Audio\AudioSystem.cs" />
     <Compile Include="Source\Audio\AudioChannel.cs" />
@@ -121,6 +120,7 @@
     <Compile Include="Source\Environment.cs" />
     <Compile Include="Source\MathLib.cs" />
     <Compile Include="Source\Widgets\TextBox.cs" />
+    <Compile Include="Source\Application\Application.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Lemon\bin\iOS\Release-iphoneos\libLemon.a">

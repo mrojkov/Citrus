@@ -30,7 +30,7 @@ namespace Lime
 		{
 			AudioSystem.Active = true;
 			gameController.Activate();
-			GameApp.Instance.OnGLCreate();
+			Application.Instance.OnGLCreate();
 		}
 
 		public override void OnResignActivation(UIApplication application)
@@ -39,7 +39,7 @@ namespace Lime
 			// Important: MonoTouch destroys OpenGL context on application hiding.
 			// So, we must destroy all OpenGL objects.
 			Lime.TexturePool.Instance.DiscardAllTextures();
-			GameApp.Instance.OnGLDestroy();
+			Application.Instance.OnGLDestroy();
 			gameController.Deactivate();
 		}
 
@@ -67,7 +67,7 @@ namespace Lime
 			// Set the current directory.
 			Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
 
-			GameApp.Instance.OnCreate();
+			Application.Instance.OnCreate();
 			return true;
 		}
 	}
