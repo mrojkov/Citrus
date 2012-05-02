@@ -62,7 +62,7 @@ namespace Lime
 		private float rotation;
 		private Vector2 direction = new Vector2(1, 0);
 
-		[ProtoMember(5), DefaultValue(0)]
+		[ProtoMember(5)]
 		public float Rotation { 
 			get {
 				return rotation;
@@ -78,19 +78,19 @@ namespace Lime
 		public Color4 Color { get { return color; } set { color = value; } }
 		public byte Alpha { get { return color.A; } set { color.A = value; } }
 
-		[ProtoMember(7), DefaultValue(Anchors.None)]
+		[ProtoMember(7)]
 		public Anchors Anchors { get; set; }
 
-		[ProtoMember(8), DefaultValue(Blending.Default)]
+		[ProtoMember(8)]
 		public Blending Blending { get; set; }
 
-		[ProtoMember(9), DefaultValue(true)]
+		[ProtoMember(9)]
 		public bool Visible { get; set; }
 
-		[ProtoMember(10), DefaultValue(null)]
+		[ProtoMember(10)]
 		public SkinningWeights SkinningWeights { get; set; }
 
-		[ProtoMember(11), DefaultValue(HitTestMethod.BoundingRect)]
+		[ProtoMember(11)]
 		public HitTestMethod HitTestMethod { get; set; }
 
 		public bool Shown { get { return Visible && color.A > 0; } }

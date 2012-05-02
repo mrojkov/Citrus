@@ -22,14 +22,14 @@ namespace Lime
 		[ProtoMember(1)]
 		public SerializableSample Sample { get; set; }
 
-		[ProtoMember(2), DefaultValue(false)]
+		[ProtoMember(2)]
 		public bool Looping { get; set; }
 
-		[ProtoMember(3), DefaultValue(0)]
+		[ProtoMember(3)]
 		public float FadeTime { get; set; }
 
 		float volume = 1;
-		[ProtoMember(4), DefaultValue(1)]
+		[ProtoMember(4)]
 		public float Volume
 		{
 			get { return volume; }
@@ -41,7 +41,7 @@ namespace Lime
 		}
 
 		float pan = 0;
-		[ProtoMember(5), DefaultValue(0)]
+		[ProtoMember(5)]
 		public float Pan
 		{
 			get { return pan; }
@@ -55,10 +55,10 @@ namespace Lime
 		[Trigger]
 		public AudioAction Action { get; set; }
 
-		[ProtoMember(7), DefaultValue(AudioChannelGroup.Effects)]
+		[ProtoMember(7)]
 		public AudioChannelGroup Group { get; set; }
 
-		[ProtoMember(8), DefaultValue(0)]
+		[ProtoMember(8)]
 		public int Priority { get; set; }
 
 		void Play()

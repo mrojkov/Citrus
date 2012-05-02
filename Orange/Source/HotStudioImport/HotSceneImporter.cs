@@ -111,6 +111,10 @@ namespace Orange
 			case "SuppressSkin":
 				lexer.ParseBool();
 				break;
+			case "VisualName":
+				lexer.ParseQuotedString();
+				System.Console.WriteLine("WARNING: Citrus doesn't support skins. VisualName must be empty");
+				break;
 			default:
 				ParseActorProperty(node, name);
 				break;

@@ -11,53 +11,42 @@ namespace Lime
 	public class ParticleModifier : Node
 	{
 		[ProtoMember(1)]
-		[DefaultValue(1f)]
 		public float Scale { get; set; }
 
 		[ProtoMember(2)]
-		[DefaultValue(1f)]
 		public float AspectRatio { get; set; }
 
 		[ProtoMember(3)]
-		[DefaultValue(1f)]
 		public float Velocity { get; set; }
 
 		[ProtoMember(4)]
-		[DefaultValue(1f)]
 		public float Spin { get; set; }
 
 		[ProtoMember(5)]
-		[DefaultValue(1f)]
 		public float AngularVelocity { get; set; }
 
 		[ProtoMember(6)]
-		[DefaultValue(1f)]
 		public float GravityAmount { get; set; }
 
 		[ProtoMember(7)]
-		[DefaultValue(1f)]
 		public float WindAmount { get; set; }
 
 		[ProtoMember(8)]
-		[DefaultValue(1f)]
 		public float MagnetAmount { get; set; }
 
 		[ProtoMember(9)]
 		public Color4 Color { get; set; }
 
 		[ProtoMember(10)]
-		[DefaultValue(1)]
 		public int FirstFrame { get; set; }
 
 		[ProtoMember(11)]
-		[DefaultValue(1)]
 		public int LastFrame { get; set; }
 
 		[ProtoMember(12)]
 		public float AnimationFps { get; set; }
 
 		[ProtoMember(13)]
-		[DefaultValue(true)]
 		public bool LoopedAnimation { get; set; }
 
 		SerializableTexture texture = new SerializableTexture();

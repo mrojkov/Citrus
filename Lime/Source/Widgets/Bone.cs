@@ -7,9 +7,9 @@ namespace Lime
 	[ProtoContract]
 	public struct BoneWeight
 	{
-		[ProtoMember(1), DefaultValue(0)]
+		[ProtoMember(1)]
 		public int Index;
-		[ProtoMember(2), DefaultValue(0)]
+		[ProtoMember(2)]
 		public float Weight;
 	}
 

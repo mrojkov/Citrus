@@ -99,7 +99,6 @@
     <None Include="gtk-gui\gui.stetic" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Ico.ico" />
     <Content Include="Toolchain.Win\cudart32_30_14.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

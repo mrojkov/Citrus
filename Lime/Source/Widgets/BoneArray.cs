@@ -58,7 +58,6 @@ namespace Lime
 				EnsureArraySize(index + 1);
 				return items[index];
 			}
-
 			set {
 				EnsureArraySize(index + 1);
 				items[index] = value;

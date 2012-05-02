@@ -23,7 +23,7 @@ namespace Lime
 		[ProtoMember(1)]
 		public string Id { get; set; }
 
-		[ProtoMember(2), DefaultValue(null)]
+		[ProtoMember(2)]
 		public string ContentsPath { get; set; }
 
 		[Trigger]
@@ -45,13 +45,11 @@ namespace Lime
 		public MarkerCollection Markers;
 
 		[ProtoMember(9)]
-		[DefaultValue(false)]
 		public bool Playing;
 		public bool Stopped { get { return !Playing; } set { Playing = !value; } }
 
 		private int animationTime;
 		[ProtoMember(10)]
-		[DefaultValue(0)]
 		public int AnimationTime {
 			get { return animationTime; }
 			set {
@@ -63,7 +61,6 @@ namespace Lime
 		}
 
 		[ProtoMember(11)]
-		[DefaultValue(null)]
 		public string Tag { get; set; }
 
 		public string CurrentAnimation { get; private set; }

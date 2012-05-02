@@ -21,8 +21,16 @@ namespace Lime
 #if iOS
 		public static ProtoBuf.Meta.TypeModel Serializer = ProtoBuf.Meta.RuntimeTypeModel.Default;
 #else
-		public static ProtoBuf.Meta.TypeModel Serializer = ProtoBuf.Meta.RuntimeTypeModel.Default;
+		public static ProtoBuf.Meta.TypeModel Serializer = CreateSerializer();
 #endif
+
+		static ProtoBuf.Meta.TypeModel CreateSerializer()
+		{
+			var model = ProtoBuf.Meta.RuntimeTypeModel.Create();
+			model.UseImplicitZeroDefaults = false;
+			model.CompileInPlace();
+			return model;
+		}
 		
 		static readonly Stack<Operation> opStack = new Stack<Operation>();
 		
