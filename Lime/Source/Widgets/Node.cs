@@ -170,8 +170,9 @@ namespace Lime
 		static public void CleanupDeadNodes()
 		{
 			foreach (Node node in collectedNodes) {
-				if (node.Parent != null)
+				if (node.Parent != null) {
 					node.Parent.Nodes.Remove(node);
+				}
 			}
 			collectedNodes.Clear();
 		}

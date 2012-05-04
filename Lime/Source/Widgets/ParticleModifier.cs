@@ -95,7 +95,7 @@ namespace Lime
 		{
 			if (textures == null) {
 				textures = new List<SerializableTexture>();
-				var path = texture.Path;
+				var path = texture.SerializationPath;
 				for (int i = 0; i < 100; i++) {
 					if (!ChangeTextureFrameIndex(ref path, i))
 						break;

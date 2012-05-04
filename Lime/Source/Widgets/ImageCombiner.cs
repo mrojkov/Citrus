@@ -166,7 +166,7 @@ namespace Lime
 				if (GetArgs(out arg1, out arg2)) {
 					if (arg1.WorldShown && arg2.WorldShown) {
 						if (arg1.GetTexture() != null && arg2.GetTexture() != null) {
-							Renderer.WorldMatrix = Parent.Widget.WorldMatrix;
+							Renderer.Transform1 = Parent.Widget.WorldMatrix;
 							Renderer.Blending = Blending.Alpha;
 							RenderHelper(arg1, arg2);
 						}

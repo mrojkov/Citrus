@@ -6,7 +6,7 @@ namespace Lime
 	public class NineGrid : Widget
 	{
 		[ProtoMember(1)]
-		public SerializableTexture Texture { get; set; }
+		public ITexture Texture { get; set; }
 
 		[ProtoMember(2)]
 		public float LeftOffset { get; set; }
@@ -106,7 +106,7 @@ namespace Lime
 		public override void Render()
 		{
 			BuildLayout(layout);
-			Renderer.WorldMatrix = worldMatrix;
+			Renderer.Transform1 = worldMatrix;
 			Renderer.Blending = worldBlending;
 			for (int i = 0; i < layout.Length; i++) {
 				var part = layout[i];

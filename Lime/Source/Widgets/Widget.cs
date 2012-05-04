@@ -264,13 +264,36 @@ namespace Lime
 
 		#endregion
 		#region Utils
-		public static void Center(Widget widget)
+
+		public void RenderToTexture(ITexture texture)
 		{
-			if (widget.Parent == null) {
+			if (Width > 0 && Height > 0) {
+				texture.SetAsRenderTarget();
+				Viewport vp = Renderer.Viewport;
+				Renderer.Viewport = new Viewport { X = 0, Y = 0, Width = texture.ImageSize.Width, Height = texture.ImageSize.Height };
+				Renderer.PushProjectionMatrix();
+				Renderer.SetOrthogonalProjection(0, Size.Y, Size.X, 0);
+
+				var savedTransform2 = Renderer.Transform2;
+				Renderer.Transform2 = worldMatrix.CalcInversed();
+				var chain = new RenderChain();
+				AddToRenderChain(chain);
+				chain.RenderAndClear();
+				Renderer.Transform2 = savedTransform2;
+
+				texture.RestoreRenderTarget();
+				Renderer.Viewport = vp;
+				Renderer.PopProjectionMatrix();
+			}
+		}
+
+		public void Center()
+		{
+			if (Parent == null) {
 				throw new Lime.Exception("Parent must not be null");
 			}
-			widget.Position = widget.Parent.Widget.Size * 0.5f;
-			widget.Pivot = Vector2.Half;
+			Position = Parent.Widget.Size * 0.5f;
+			Pivot = Vector2.Half;
 		}
 		#endregion
 	}

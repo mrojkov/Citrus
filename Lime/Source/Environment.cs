@@ -9,6 +9,7 @@ namespace Lime
 		{
 			var model = ProtoBuf.Meta.TypeModel.Create();
 			model.UseImplicitZeroDefaults = false;
+			model.Add(typeof(ITexture), true);
 			model.Add(typeof(Node), true);
 			model.Add(typeof(TextureAtlasPart), true);
 			model.Add(typeof(Font), true);

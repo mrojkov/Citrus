@@ -26,7 +26,7 @@ namespace Lime
 
 		public override void Render()
 		{
-			Renderer.WorldMatrix = worldMatrix;
+			Renderer.Transform1 = worldMatrix;
 			Renderer.Blending = worldBlending;
 			var localizedText = Localization.GetString(Text);
 			if (!string.IsNullOrEmpty(localizedText)) {

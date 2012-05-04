@@ -13,18 +13,18 @@ namespace Lime
 	public class RenderTexture : ITexture, IDisposable
 	{
 		int framebuffer;
-		int id;
+		uint id;
 		Size size = new Size(0, 0);
 		Rectangle uvRect;
 
 		public RenderTexture(int width, int height)
 		{
-#if MAC
+#if MAC || WIN
 			size.Width = width;
 			size.Height = height;
 			uvRect = new Rectangle(0, 0, 1, 1);
 			GL.GenFramebuffers(1, out framebuffer);
-			id = GL.GenTexture();
+			id = (uint)GL.GenTexture();
 			GL.BindTexture(TextureTarget.Texture2D, id);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
@@ -51,48 +51,52 @@ namespace Lime
 			get { return uvRect; }
 		}
 		
-		private void Dispose(bool manual)
-		{
-#if MAC			
-			if (id != 0) {
-				if (manual) {
-					GL.DeleteFramebuffers(1, ref framebuffer);
-					GL.DeleteTexture(id);
-				} else
-					Debug.Print("[Warning] {0} leaked.", this);
-				id = 0;
-			}
-#endif			
-		}
-
 		public void Dispose()
 		{
-			this.Dispose(true);
+#if MAC || WIN
+			if (id != 0) {
+				lock (PlainTexture.TexturesToDelete) {
+					PlainTexture.TexturesToDelete.Add(id);
+				}
+				id = 0;
+			}
+#endif
+		}
+
+		~RenderTexture()
+		{
+			Dispose();
 		}
 
 		public uint GetHandle()
 		{
-			return (uint)id;
+			return id;
+		}
+
+		public string SerializationPath {
+			get {
+				throw new NotSupportedException();
+			}
+			set {
+				throw new NotSupportedException();
+			}
 		}
 
 		public void SetAsRenderTarget()
 		{
-//			GL.BindFramebuffer(FramebufferTarget.FramebufferExt, framebuffer);
+			Renderer.FlushSpriteBatch();
+			GL.BindFramebuffer(FramebufferTarget.FramebufferExt, framebuffer);
 		}
 
 		public void RestoreRenderTarget()
 		{
-//			GL.BindFramebuffer(FramebufferTarget.FramebufferExt, 0);
+			Renderer.FlushSpriteBatch();
+			GL.BindFramebuffer(FramebufferTarget.FramebufferExt, 0);
 		}
 
 		public bool IsTransparentPixel(int x, int y)
 		{
 			return false;
-		}
-
-		~RenderTexture()
-		{
-			Dispose(false);
 		}
 	}
 }

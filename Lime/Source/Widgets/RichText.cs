@@ -118,7 +118,7 @@ namespace Lime
 				renderer.AddFragment(frag.Text, frag.Style + 1);
 			}
 			// Draw text.
-			Renderer.WorldMatrix = worldMatrix;
+			Renderer.Transform1 = worldMatrix;
 			Renderer.Blending = worldBlending;
 			renderer.Render(worldColor, Size, HAlignment, VAlignment);
 		}
@@ -434,7 +434,7 @@ namespace Lime
 					Font font = fonts[word.Style].Instance;
 					if (word.IsTagBegin && style.ImageUsage == TextStyle.ImageUsageEnum.Bullet) {
 						yOffset = new Vector2(0, (maxHeight - style.ImageSize.Y) * 0.5f);
-						if (style.ImageTexture.Path != null) {
+						if (style.ImageTexture.SerializationPath != null) {
 							Renderer.DrawSprite(style.ImageTexture, color, position + yOffset, style.ImageSize, Vector2.Zero, Vector2.One);
 						}
 						position.X += style.ImageSize.X;

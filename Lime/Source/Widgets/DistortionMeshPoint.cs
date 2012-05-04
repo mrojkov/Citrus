@@ -14,11 +14,6 @@ namespace Lime
 		[ProtoMember(2)]
 		public Vector2 UV { get; set; }
 
-		public DistortionMeshPoint()
-		{
-			Color = Color4.White;
-		}
-
 		public Vector2 TransformedPosition {
 			get {
 				Vector2 result = Vector2.Zero;

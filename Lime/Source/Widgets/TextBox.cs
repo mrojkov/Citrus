@@ -106,7 +106,7 @@ namespace Lime
 				textPosition.X = Size.X - BorderWidth - extent.X;
 			else if (HAlignment == HAlignment.Center)
 				textPosition.X = (Size.X - extent.X) * 0.5f;
-			Renderer.WorldMatrix = worldMatrix;
+			Renderer.Transform1 = worldMatrix;
 			Renderer.Blending = worldBlending;
 			Renderer.DrawTextLine(Font.Instance, textPosition, text, worldColor, FontHeight, start, length);
 		}

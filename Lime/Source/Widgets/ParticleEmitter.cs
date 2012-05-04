@@ -696,7 +696,7 @@ namespace Lime
 					V = particleSize.Y * new Vector2(-orientation.Y, orientation.X),
 					T = p.FullPosition
 				};
-				Renderer.WorldMatrix = transform * matrix;
+				Renderer.Transform1 = transform * matrix;
 				Renderer.DrawSprite(texture, color, -Vector2.Half, Vector2.One, Vector2.Zero, Vector2.One);
 			}
 		}

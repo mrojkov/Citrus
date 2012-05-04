@@ -90,7 +90,8 @@ namespace Lime
 		static int currentVertex = 0;
 		static int currentIndex = 0;
 		
-		public static Matrix32 WorldMatrix = Matrix32.Identity;
+		public static Matrix32 Transform1 = Matrix32.Identity;
+		public static Matrix32 Transform2 = Matrix32.Identity;
 
 		public static void CheckErrors()
 		{
@@ -361,6 +362,7 @@ namespace Lime
 		
 		public static void DrawSprite(ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1)
 		{
+			var transform = Transform1 * Transform2;
 			SetTexture(texture, 0);
 			SetTexture(null, 1);
 			if (currentVertex >= MaxVertices - 4 || currentIndex >= MaxVertices * 4 - 6) {
@@ -375,21 +377,21 @@ namespace Lime
 			int i = currentVertex;
 			currentVertex += 4;
 			Vertex* vp = &batchVertices[i];
-			vp->Pos = WorldMatrix.TransformVector(position.X, position.Y);
+			vp->Pos = transform.TransformVector(position.X, position.Y);
 			vp->Color = color;
 			vp->UV1 = uv0;
 			vp++;
-			vp->Pos = WorldMatrix.TransformVector(position.X + size.X, position.Y);
+			vp->Pos = transform.TransformVector(position.X + size.X, position.Y);
 			vp->Color = color;
 			vp->UV1.X = uv1.X;
 			vp->UV1.Y = uv0.Y;
 			vp++;
-			vp->Pos = WorldMatrix.TransformVector(position.X, position.Y + size.Y);
+			vp->Pos = transform.TransformVector(position.X, position.Y + size.Y);
 			vp->Color = color;
 			vp->UV1.X = uv0.X;
 			vp->UV1.Y = uv1.Y;
 			vp++;
-			vp->Pos = WorldMatrix.TransformVector(position.X + size.X, position.Y + size.Y);
+			vp->Pos = transform.TransformVector(position.X + size.X, position.Y + size.Y);
 			vp->Color = color;
 			vp->UV1 = uv1;
 			int j = currentIndex;
@@ -410,6 +412,7 @@ namespace Lime
 
 		public static void DrawTriangleFan(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
 		{
+			var transform = Transform1 * Transform2;
 			SetTexture(texture1, 0);
 			SetTexture(texture2, 1);
 			if (currentIndex + (numVertices - 2) * 3 >= MaxVertices * 4 || currentVertex + numVertices >= MaxVertices) {
@@ -426,7 +429,7 @@ namespace Lime
 				if (PremulAlphaMode) {
 					v.Color = Color4.PremulAlpha(v.Color);
 				}
-				v.Pos = WorldMatrix * v.Pos;
+				v.Pos = transform * v.Pos;
 				v.UV1 = uvRect1.A + uvRect1.Size * v.UV1;
 				if (texture2 != null)
 					v.UV2 = uvRect2.A + uvRect2.Size * v.UV2;

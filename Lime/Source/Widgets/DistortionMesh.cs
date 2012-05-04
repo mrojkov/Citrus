@@ -13,8 +13,8 @@ namespace Lime
 		public int NumRows { get; set; }
 
 		[ProtoMember(3)]
-		public SerializableTexture Texture { get; set; }
-		
+		public ITexture Texture { get; set; }
+
 		public DistortionMesh()
 		{
 			NumCols = 2;
@@ -22,11 +22,18 @@ namespace Lime
 			Texture = new SerializableTexture();
 		}
 		
-		DistortionMeshPoint GetPoint(int row, int col)
+		public DistortionMeshPoint GetPoint(int row, int col)
 		{
-			int i = row * (NumCols + 1) + col;
-			if (i < 0 || i >= Nodes.Count)
+			if (row < 0 || col < 0 || row >= NumRows || col >= NumCols)
 				return null;
+			int i = row * (NumCols + 1) + col;
+			while (i >= Nodes.Count) {
+				var point = new DistortionMeshPoint();
+				point.Color = Color4.White;
+				point.UV = new Vector2((float)col / (NumCols - 1), (float)row / (NumRows - 1));
+				point.Position = point.UV;
+				Nodes.Add(point);
+			}
 			return Nodes[i] as DistortionMeshPoint;
 		}
 
@@ -72,7 +79,7 @@ namespace Lime
 		public override void Render()
 		{
 			Renderer.Blending = WorldBlending;
-			Renderer.WorldMatrix = WorldMatrix;
+			Renderer.Transform1 = WorldMatrix;
 			for (int i = 0; i < NumRows; ++i) {
 				for (int j = 0; j < NumCols; ++j) {
 					points[0] = GetPoint(i, j);

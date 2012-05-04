@@ -10,7 +10,7 @@ namespace Lime
 		bool imageCombinerArg;
 
 		[ProtoMember(1)]
-		public SerializableTexture Texture { get; set; }
+		public ITexture Texture { get; set; }
 
 		[ProtoMember(2)]
 		public Vector2 UV0 { get; set; }
@@ -37,8 +37,8 @@ namespace Lime
 
 		public override void Render()
 		{
-			Renderer.WorldMatrix = worldMatrix;
 			Renderer.Blending = worldBlending;
+			Renderer.Transform1 = worldMatrix;
 			Renderer.DrawSprite(Texture, worldColor, Vector2.Zero, Size, UV0, UV1);
 		}
 

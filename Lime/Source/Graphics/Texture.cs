@@ -1,3 +1,6 @@
+using System;
+using ProtoBuf;
+
 namespace Lime
 {
 	public enum BitmapFormat
@@ -19,7 +22,9 @@ namespace Lime
 	/// Base class for texture handling.
 	/// Contains functionality that is common to both PlainTexture and RenderTexture classes.
 	/// </summary>
-	public interface ITexture
+	[ProtoContract]
+	[ProtoInclude(100, typeof(SerializableTexture))]
+	public interface ITexture : IDisposable
 	{
 		Size ImageSize { get; }
 		Size SurfaceSize { get; }
@@ -28,5 +33,7 @@ namespace Lime
 		void SetAsRenderTarget();
 		void RestoreRenderTarget();
 		bool IsTransparentPixel(int x, int y);
+		[ProtoMember(1)]
+		string SerializationPath { get; set; }
 	}
 }

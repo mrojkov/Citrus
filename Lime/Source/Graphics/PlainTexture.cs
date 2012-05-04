@@ -16,23 +16,23 @@ namespace Lime
 	/// <summary>
 	/// Represents 2D texture.
 	/// </summary>
-	public class PlainTexture : ITexture, IDisposable
+	public class PlainTexture : ITexture
 	{
 		uint id;
 		Size imgSize;
 		Size surSize;
 		Rectangle uvRect;
 
-		static List<uint> texturesToDelete = new List<uint>();
+		public static List<uint> TexturesToDelete = new List<uint>();
 
 		public static void DeleteScheduledTextures()
 		{
-			lock (texturesToDelete) {
-				if (texturesToDelete.Count > 0) {
-					var ids = new uint[texturesToDelete.Count];
-					texturesToDelete.CopyTo(ids);
+			lock (TexturesToDelete) {
+				if (TexturesToDelete.Count > 0) {
+					var ids = new uint[TexturesToDelete.Count];
+					TexturesToDelete.CopyTo(ids);
 					GL.DeleteTextures(ids.Length, ids);
-					texturesToDelete.Clear();
+					TexturesToDelete.Clear();
 					Renderer.CheckErrors();
 				}
 			}
@@ -46,6 +46,15 @@ namespace Lime
 		public Size SurfaceSize
 		{
 			get { return surSize; }
+		}
+
+		public string SerializationPath {
+			get {
+				throw new NotSupportedException();
+			}
+			set {
+				throw new NotSupportedException();
+			}
 		}
 
 		public Rectangle UVRect { get { return uvRect; } }
@@ -316,22 +325,19 @@ namespace Lime
 			uvRect = new Rectangle(0, 0, 1, 1);
 		}
 
-		private void Dispose(bool manual)
+		~PlainTexture()
+		{
+			Dispose();
+		}
+
+		public void Dispose()
 		{
 			if (id != 0) {
-				lock (texturesToDelete) {
-					texturesToDelete.Add(id);
+				lock (TexturesToDelete) {
+					TexturesToDelete.Add(id);
 				}
 				id = 0;
 			}
-		}
-
-		/// <summary>
-		/// Frees OpenGL texture
-		/// </summary>
-		public void Dispose()
-		{
-			this.Dispose(true);
 		}
 
 		/// <summary>
@@ -366,14 +372,6 @@ namespace Lime
 		public bool IsTransparentPixel(int x, int y)
 		{
 			return false;
-		}
-
-		/// <summary>
-		/// Destructor.
-		/// </summary>
-		~PlainTexture()
-		{
-			Dispose(false);
 		}
 	}
 }

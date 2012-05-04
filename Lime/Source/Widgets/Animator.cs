@@ -27,7 +27,7 @@ namespace Lime
 	[ProtoInclude(102, typeof(GenericAnimator<int>))]
 	[ProtoInclude(103, typeof(GenericAnimator<bool>))]
 	[ProtoInclude(104, typeof(GenericAnimator<Blending>))]
-	[ProtoInclude(105, typeof(GenericAnimator<SerializableTexture>))]
+	[ProtoInclude(105, typeof(GenericAnimator<ITexture>))]
 	[ProtoInclude(106, typeof(GenericAnimator<NumericRange>))]
 	[ProtoInclude(107, typeof(Vector2Animator))]
 	[ProtoInclude(108, typeof(Color4Animator))]

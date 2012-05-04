@@ -11,6 +11,10 @@ namespace Lime
 	{
 		SerializableTextureCore core;
 
+		public SerializableTexture(ITexture Texture)
+		{
+		}
+
 		public SerializableTexture()
 		{
 			core = TexturePool.Instance.GetSerializableTextureCore("");
@@ -21,22 +25,15 @@ namespace Lime
 			core = TexturePool.Instance.GetSerializableTextureCore(path);
 		}
 
-		[ProtoMember(1)]
 		public string SerializationPath {
 			get {
-				var path = Serialization.ShrinkPath(Path);
+				var path = Serialization.ShrinkPath(core.Path);
 				return path;
 			}
 			set {
 				var path = Serialization.ExpandPath(value);
 				core = TexturePool.Instance.GetSerializableTextureCore(path);
 			}
-		}
-
-		public string Path { 
-			get { 
-				return core.Path; 
-			} 
 		}
 
 		public Size ImageSize {
@@ -82,6 +79,10 @@ namespace Lime
 		public override string ToString()
 		{
 			return core.Path;
+		}
+
+		public void Dispose()
+		{
 		}
 	}
 

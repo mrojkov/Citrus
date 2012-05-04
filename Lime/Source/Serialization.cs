@@ -28,6 +28,8 @@ namespace Lime
 		{
 			var model = ProtoBuf.Meta.RuntimeTypeModel.Create();
 			model.UseImplicitZeroDefaults = false;
+			// Add ITexture type here due a bug in ProtoBuf-Net
+			model.Add(typeof(ITexture), true);
 			model.CompileInPlace();
 			return model;
 		}
@@ -36,6 +38,9 @@ namespace Lime
 		
 		public static string ShrinkPath(string path)
 		{
+			if (opStack.Count == 0) {
+				return path;
+			}
 			if (opStack.Peek().Type == OperationType.Clone)
 				return path;
 			return '/' + path;
@@ -43,6 +48,9 @@ namespace Lime
 
 		public static string ExpandPath(string path)
 		{
+			if (opStack.Count == 0) {
+				return path;
+			}
 			if (opStack.Peek().Type == OperationType.Clone)
 				return path;
 			string result;

@@ -36,7 +36,7 @@ namespace Lime
 			Add(typeof(bool), typeof(GenericAnimator<bool>));
 			Add(typeof(NumericRange), typeof(GenericAnimator<NumericRange>));
 			Add(typeof(Blending), typeof(GenericAnimator<Blending>));
-			Add(typeof(SerializableTexture), typeof(GenericAnimator<SerializableTexture>));
+			Add(typeof(ITexture), typeof(GenericAnimator<ITexture>));
 			Add(typeof(SerializableSample), typeof(GenericAnimator<SerializableSample>));
 			Add(typeof(EmitterShape), typeof(GenericAnimator<EmitterShape>));
 			Add(typeof(AudioAction), typeof(GenericAnimator<AudioAction>));
