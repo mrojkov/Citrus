@@ -455,7 +455,7 @@ namespace Lime
 		Vector2 GenerateRandomMotionControlPoint(ref float rayDirection)
 		{
 			rayDirection += RandomMotionRotation.UniformRandomNumber();
-			Vector2 result = MathLib.CosSin(MathLib.DegreesToRadians * rayDirection);
+			Vector2 result = Vector2.HeadingDegrees(rayDirection);
 			NumericRange radius = RandomMotionRadius;
 			if (radius.Dispersion == 0)
 				radius.Dispersion = radius.Median;
@@ -536,7 +536,7 @@ namespace Lime
 				break;
 			case EmitterShape.Ellipse: {
 					float angle = MathLib.Random() * 2 * MathLib.Pi;
-					Vector2 sincos = Vector2.CosSin(angle);
+					Vector2 sincos = Vector2.Heading(angle);
 					position = 0.5f * Vector2.Scale((sincos + Vector2.One), Size);
 					p.RegularDirection = Direction.UniformRandomNumber() + emitterAngle - 90 + angle;
 				}
@@ -626,14 +626,14 @@ namespace Lime
 			// Updating other properties of a particle.
 			float windVelocity = p.WindAmount * modifier.WindAmount;
 			if (windVelocity != 0) {
-				var windDirection = Vector2.CosSin(MathLib.DegreesToRadians * p.WindDirection);
+				var windDirection = Vector2.HeadingDegrees(p.WindDirection);
 				p.RegularPosition += windVelocity * delta * windDirection;
 			}
 			if (p.GravityVelocity != 0) {
-				var gravityDirection = MathLib.CosSin(MathLib.DegreesToRadians * p.GravityDirection);
+				var gravityDirection = Vector2.HeadingDegrees(p.GravityDirection);
 				p.RegularPosition += p.GravityVelocity * delta * gravityDirection;
 			}
-			var direction = MathLib.CosSin(MathLib.DegreesToRadians * p.RegularDirection);
+			var direction = Vector2.HeadingDegrees(p.RegularDirection);
 			float velocity = p.Velocity * modifier.Velocity;
 
 			p.RegularDirection += p.AngularVelocity * modifier.AngularVelocity * delta;
@@ -690,7 +690,7 @@ namespace Lime
 					angle += p.FullDirection;
 				Vector2 imageSize = (Vector2)texture.ImageSize;
 				Vector2 particleSize = p.ScaleCurrent * imageSize;
-				Vector2 orientation = MathLib.CosSin(MathLib.DegreesToRadians * angle);
+				Vector2 orientation = Vector2.HeadingDegrees(angle);
 				Matrix32 transform = new Matrix32 {
 					U = particleSize.X * orientation,
 					V = particleSize.Y * new Vector2(-orientation.Y, orientation.X),

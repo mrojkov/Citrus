@@ -43,6 +43,11 @@ namespace Lime
 			}
 		}
 
+		public static float Lerp(float a, float b, float t)
+		{
+			return a + (b - a) * t;
+		}
+
 		public static T Random<T>(params T[] objects)
 		{
 			return objects[Random(objects.Length)];

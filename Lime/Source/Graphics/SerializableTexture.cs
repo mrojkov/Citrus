@@ -11,10 +11,6 @@ namespace Lime
 	{
 		SerializableTextureCore core;
 
-		public SerializableTexture(ITexture Texture)
-		{
-		}
-
 		public SerializableTexture()
 		{
 			core = TexturePool.Instance.GetSerializableTextureCore("");

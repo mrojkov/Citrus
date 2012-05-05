@@ -111,25 +111,38 @@ namespace Lime
 			return value;
 		}
 
-		public static Vector2 CosSin(float radians)
+		public static Vector2 Heading(float angle)
 		{
-			return MathLib.CosSin(radians);
-			// No more slow sine/cosine!
-			//return new Vector2((float)Math.Cos(radians), (float)Math.Sin(radians));
+			return MathLib.CosSin(angle);
 		}
 
-		public static Vector2 Rotate(Vector2 value, float radians)
+		public static Vector2 HeadingDegrees(float angle)
 		{
-			Vector2 cs = Vector2.CosSin(radians);
+			return MathLib.CosSin(angle * MathLib.DegreesToRadians);
+		}
+
+		public static Vector2 Rotate(Vector2 value, float angle)
+		{
+			Vector2 cs = MathLib.CosSin(angle);
 			Vector2 result;
 			result.X = value.X * cs.X - value.Y * cs.Y;
 			result.Y = value.X * cs.Y + value.Y * cs.X;
 			return result;
 		}
 
+		public static Vector2 RotateDegrees(Vector2 value, float angle)
+		{
+			return Rotate(value, angle * MathLib.DegreesToRadians);
+		}
+
 		public float Atan2
 		{
 			get { return (float)Math.Atan2(Y, X); }
+		}
+
+		public float Atan2Degrees
+		{
+			get { return (float)Math.Atan2(Y, X) * MathLib.RadiansToDegrees; }
 		}
 
 		public float Length
