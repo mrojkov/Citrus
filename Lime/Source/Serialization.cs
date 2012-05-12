@@ -30,7 +30,9 @@ namespace Lime
 			model.UseImplicitZeroDefaults = false;
 			// Add ITexture type here due a bug in ProtoBuf-Net
 			model.Add(typeof(ITexture), true);
+#if !iOS
 			model.CompileInPlace();
+#endif
 			return model;
 		}
 		

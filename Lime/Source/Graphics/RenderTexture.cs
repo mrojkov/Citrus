@@ -85,13 +85,21 @@ namespace Lime
 		public void SetAsRenderTarget()
 		{
 			Renderer.FlushSpriteBatch();
+#if iOS
+			GL.BindFramebuffer(All.Framebuffer, framebuffer);
+#else
 			GL.BindFramebuffer(FramebufferTarget.FramebufferExt, framebuffer);
+#endif
 		}
 
 		public void RestoreRenderTarget()
 		{
 			Renderer.FlushSpriteBatch();
+#if iOS
+			GL.BindFramebuffer(All.Framebuffer, 0);
+#else
 			GL.BindFramebuffer(FramebufferTarget.FramebufferExt, 0);
+#endif
 		}
 
 		public bool IsTransparentPixel(int x, int y)
