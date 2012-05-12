@@ -30,9 +30,12 @@ namespace Lime
 		static volatile bool shouldTerminateThread;
 		static bool active = true;
 
-		public static void Initialize(int numChannels = 16)
+		public static void Initialize(int numChannels = 16, string[] args = null)
 		{
-			context = new AudioContext();
+			bool silent = args != null && Array.IndexOf(args, "--Silent") >= 0;
+			if (!silent) {
+				context = new AudioContext();
+			}
 			if (!HasError()) {
 				// xram = new XRamExtension();
 				for (int i = 0; i < numChannels; i++) {
@@ -51,7 +54,9 @@ namespace Lime
 			foreach (var channel in channels) {
 				channel.Dispose();
 			}
-			context.Dispose();
+			if (context != null) {
+				context.Dispose();
+			}
 		}
 
 		static void RunStreamingLoop()
@@ -106,7 +111,9 @@ namespace Lime
 
 		static void ResumeAll()
 		{
-			context.MakeCurrent();
+			if (context != null) {
+				context.MakeCurrent();
+			}
 			foreach (var channel in channels) {
 				if (channel.State == ALSourceState.Paused) {
 					channel.Resume();

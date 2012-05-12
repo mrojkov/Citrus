@@ -33,7 +33,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="OpenTK">
+    <Reference Include="OpenTK, Version=0.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\3rdParty\OpenTK\OpenTK.dll</HintPath>
     </Reference>
     <Reference Include="protobuf-net">

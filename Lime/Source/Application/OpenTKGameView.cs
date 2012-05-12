@@ -10,12 +10,12 @@ namespace Lime
 		public static GameView Instance;
 		Application app;
 
-		public GameView(Application app)
+		public GameView(Application app, string[] args = null)
 			: base(640, 480, new OpenTK.Graphics.GraphicsMode(32, 0, 0, 4))
 		{
 			Instance = this;
 			this.app = app;
-			AudioSystem.Initialize(16);
+			AudioSystem.Initialize(16, args);
 			app.OnCreate();
 			this.Keyboard.KeyDown += HandleKeyDown;
 			this.Keyboard.KeyUp += HandleKeyUp;
