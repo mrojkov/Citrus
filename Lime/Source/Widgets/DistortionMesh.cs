@@ -24,7 +24,7 @@ namespace Lime
 		
 		public DistortionMeshPoint GetPoint(int row, int col)
 		{
-			if (row < 0 || col < 0 || row >= NumRows || col >= NumCols)
+			if (row < 0 || col < 0 || row > NumRows || col > NumCols)
 				return null;
 			int i = row * (NumCols + 1) + col;
 			while (i >= Nodes.Count) {

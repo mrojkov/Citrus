@@ -19,10 +19,7 @@ namespace Lime
 		D,
 	}
 	
-	public class UpdateEventArgs : EventArgs 
-	{
-		public int Delta;
-	}
+	public delegate void UpdateDelegate(float delta);
 
 	public class KeyEventArgs : EventArgs 
 	{
@@ -35,10 +32,10 @@ namespace Lime
 		RenderTarget renderTarget;
 		ITexture renderTexture;
 
-		public EventHandler<UpdateEventArgs> BeforeUpdate;
-		public EventHandler<UpdateEventArgs> AfterUpdate;
-		public EventHandler<EventArgs> BeforeLateUpdate;
-		public EventHandler<EventArgs> AfterLateUpdate;
+		public UpdateDelegate BeforeUpdate;
+		public UpdateDelegate AfterUpdate;
+		public UpdateDelegate BeforeLateUpdate;
+		public UpdateDelegate AfterLateUpdate;
 
 		[ProtoMember(1)]
 		public RenderTarget RenderTarget {
@@ -105,25 +102,22 @@ namespace Lime
 			}
 		}
 
-		void LateUpdateHelper(int delta)
-		{
-			base.LateUpdate(delta);
-		}
-
 		public override void LateUpdate(int delta)
 		{
-			if (BeforeLateUpdate != null)
-				BeforeLateUpdate(this, new UpdateEventArgs {Delta = delta});
 			if (AnimationSpeed != 1.0f) {
 				delta = MultiplyDeltaByAnimationSpeed(delta);
-				while (delta > MaxTimeDelta) {
-					base.LateUpdate(MaxTimeDelta);
-					delta -= MaxTimeDelta;
-				}
+			}
+			if (BeforeLateUpdate != null) {
+				BeforeLateUpdate(delta * 0.001f);
+			}
+			while (delta > MaxTimeDelta) {
+				base.LateUpdate(MaxTimeDelta);
+				delta -= MaxTimeDelta;
 			}
 			base.LateUpdate(delta);
-			if (AfterLateUpdate != null)
-				AfterLateUpdate(this, new UpdateEventArgs {Delta = delta});
+			if (AfterLateUpdate != null) {
+				AfterLateUpdate(delta * 0.001f);
+			}
 		}
 
 		void UpdateHelper(int delta)
@@ -137,26 +131,28 @@ namespace Lime
 
 		public override void Update(int delta)
 		{
-			if (BeforeUpdate != null)
-				BeforeUpdate(this, new UpdateEventArgs {Delta = delta});
 			if (AnimationSpeed != 1.0f) {
 				delta = MultiplyDeltaByAnimationSpeed(delta);
-				while (delta > MaxTimeDelta) {
-					UpdateHelper(MaxTimeDelta);
-					delta -= MaxTimeDelta;
-				}
+			}
+			if (BeforeUpdate != null) {
+				BeforeUpdate(delta * 0.001f);
+			}
+			while (delta > MaxTimeDelta) {
+				UpdateHelper(MaxTimeDelta);
+				delta -= MaxTimeDelta;
 			}
 			UpdateHelper(delta);
-			if (AfterUpdate != null)
-				AfterUpdate(this, new UpdateEventArgs {Delta = delta});
+			if (AfterUpdate != null) {
+				AfterUpdate(delta * 0.001f);
+			}
 		}
 
 		int MultiplyDeltaByAnimationSpeed(int delta)
 		{
-			if (AnimationSpeed < 0) {
-				throw new Lime.Exception("AnimationSpeed can not be negative");
-			}
 			delta = (int)(delta * AnimationSpeed);
+			if (delta < 0) {
+				throw new System.ArgumentOutOfRangeException("delta");
+			}
 			return delta;
 		}
 
