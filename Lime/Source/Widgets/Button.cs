@@ -3,6 +3,8 @@ using ProtoBuf;
 
 namespace Lime
 {
+	public delegate void ButtonClickEvent(Button button);
+
 	[ProtoContract]
 	public class Button : Widget
 	{
@@ -11,7 +13,7 @@ namespace Lime
 		[ProtoMember(1)]
 		public string Caption { get; set; }
 
-		public EventHandler<EventArgs> OnClick;
+		public ButtonClickEvent OnClick;
 
 		void UpdateHelper(int delta)
 		{
@@ -44,7 +46,7 @@ namespace Lime
 						PlayAnimation("Normal");
 					Input.ConsumeKeyEvent(Key.Mouse0, true);
 					if (OnClick != null) {
-						OnClick(this, null);
+						OnClick(this);
 					}
 				}
 			}

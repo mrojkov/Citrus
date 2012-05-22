@@ -3,6 +3,8 @@ using ProtoBuf;
 
 namespace Lime
 {
+	public delegate void SliderChangeEvent(Slider slider);
+
 	[ProtoContract]
 	public class Slider : Widget
 	{
@@ -19,7 +21,7 @@ namespace Lime
 			set { this.value = value; }
 		}
 
-		public EventHandler<EventArgs> OnChange;
+		public SliderChangeEvent OnChange;
 
 		float value;
 		float offset0;
@@ -109,7 +111,7 @@ namespace Lime
 							else
 								Value = v + delta0;
 							if (OnChange != null) {
-								OnChange(this, null);
+								OnChange(this);
 							}
 						}
 					}
