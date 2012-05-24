@@ -38,7 +38,7 @@ namespace Lime
 		{
 			var thumb = Find<Widget>("SliderThumb", false);
 			if (thumb != null) {
-				if (thumb.HitTest(Input.MousePosition) && Input.GetKey(Key.Mouse0)) {
+				if (thumb.HitTest(Input.MousePosition) && Input.GetKeyDown(Key.Mouse0)) {
 					if (RootFrame.Instance.ActiveWidget == null) {
 						thumb.PlayAnimation("Focus");
 						RootFrame.Instance.ActiveWidget = this;
