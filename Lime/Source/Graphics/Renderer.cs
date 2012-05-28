@@ -442,7 +442,17 @@ namespace Lime
 			}
 		}
 
-		public static void DrawTextLine(Font font, Vector2 position, string text, Color4 color, float fontHeight)
+		public static void DrawTextLine(float x, float y, string text, float fontHeight = 20, uint abgr = 0xFFFFFFFF)
+		{
+			DrawTextLine(new Vector2(x, y), text, fontHeight, abgr);
+		}
+
+		public static void DrawTextLine(Vector2 position, string text, float fontHeight = 20, uint abgr = 0xFFFFFFFF)
+		{
+			DrawTextLine(FontPool.Instance[null], position, text, fontHeight, new Color4(abgr));
+		}
+
+		public static void DrawTextLine(Font font, Vector2 position, string text, float fontHeight, Color4 color)
 		{
 			DrawTextLine(font, position, text, color, fontHeight, 0, text.Length);
 		}

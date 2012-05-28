@@ -43,6 +43,11 @@ namespace Lime
 			}
 		}
 
+		public static float Sqr(float x)
+		{
+			return x * x;
+		}
+
 		public static float Lerp(float a, float b, float t)
 		{
 			return a + (b - a) * t;

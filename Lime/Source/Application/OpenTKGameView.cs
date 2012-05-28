@@ -86,7 +86,26 @@ namespace Lime
 			AudioSystem.Terminate();
 		}
 
+		// Why several OnUpdateFrame() calls before OnRenderFrame()?
 		protected override void OnUpdateFrame(OpenTK.FrameEventArgs e)
+		{
+		}
+		
+		protected override void OnRenderFrame(OpenTK.FrameEventArgs e)
+		{
+			DoUpdate(e);
+			DoRender();
+		}
+
+		private void DoRender()
+		{
+			UpdateFrameRate();
+			MakeCurrent();
+			app.OnRenderFrame();
+			SwapBuffers();
+		}
+
+		private void DoUpdate(OpenTK.FrameEventArgs e)
 		{
 			Input.ProcessPendingKeyEvents();
 			Input.MouseVisible = true;
@@ -99,14 +118,6 @@ namespace Lime
 			app.OnUpdateFrame(delta);
 			Input.TextInput = null;
 			Input.CopyKeysState();
-		}
-		
-		protected override void OnRenderFrame(OpenTK.FrameEventArgs e)
-		{
-			UpdateFrameRate();
-			MakeCurrent();
-			app.OnRenderFrame();
-			SwapBuffers();
 		}
 		
 		public Size WindowSize { 

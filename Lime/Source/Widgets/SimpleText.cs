@@ -43,7 +43,7 @@ namespace Lime
 						pos.X = Size.X - extent.X;
 					else if (HAlignment == HAlignment.Center)
 						pos.X = (Size.X - extent.X) * 0.5f;
-					Renderer.DrawTextLine(Font.Instance, pos, str, worldColor, FontHeight);
+					Renderer.DrawTextLine(Font.Instance, pos, str, FontHeight, worldColor);
 					pos.Y += Spacing + FontHeight;
 				}
 			}

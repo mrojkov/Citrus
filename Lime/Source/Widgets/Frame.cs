@@ -20,6 +20,7 @@ namespace Lime
 	}
 	
 	public delegate void UpdateDelegate(float delta);
+	public delegate void RenderDelegate();
 
 	public class KeyEventArgs : EventArgs 
 	{
@@ -36,6 +37,7 @@ namespace Lime
 		public UpdateDelegate AfterUpdate;
 		public UpdateDelegate BeforeLateUpdate;
 		public UpdateDelegate AfterLateUpdate;
+		public RenderDelegate OnRender;
 
 		[ProtoMember(1)]
 		public RenderTarget RenderTarget {
@@ -160,6 +162,10 @@ namespace Lime
 		{
 			if (renderTexture != null) {
 				RenderToTexture(renderTexture);
+			}
+			if (OnRender != null) {
+				Renderer.Transform1 = WorldMatrix;
+				OnRender();
 			}
 		}
 
