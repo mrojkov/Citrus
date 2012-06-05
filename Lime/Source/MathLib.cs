@@ -39,7 +39,7 @@ namespace Lime
 			float t2 = t1 / 256;
 			for (int i = 0; i < 256; i++) {
 				sinTable0[i] = new Vector2((float)Math.Cos(i * t1), (float)Math.Sin(i * t1));
-				sinTable1[i] = new	Vector2((float)Math.Cos(i * t2), (float)Math.Sin(i * t2));
+				sinTable1[i] = new Vector2((float)Math.Cos(i * t2), (float)Math.Sin(i * t2));
 			}
 		}
 
