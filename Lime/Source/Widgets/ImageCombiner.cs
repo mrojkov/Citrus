@@ -22,7 +22,7 @@ namespace Lime
 
 		Color4 Color { get; }
 
-		Matrix32 LocalMatrix { get; }
+		Matrix32 CalcLocalMatrix();
 	
 		bool WorldShown { get; }
 	}
@@ -126,8 +126,8 @@ namespace Lime
 
 		private void RenderHelper(IImageCombinerArg arg1, IImageCombinerArg arg2)
 		{
-			Matrix32 transform1 = Matrix32.Scaling(arg1.Size) * arg1.LocalMatrix;
-			Matrix32 transform2 = Matrix32.Scaling(arg2.Size) * arg2.LocalMatrix;
+			Matrix32 transform1 = Matrix32.Scaling(arg1.Size) * arg1.CalcLocalMatrix();
+			Matrix32 transform2 = Matrix32.Scaling(arg2.Size) * arg2.CalcLocalMatrix();
 			// source rectangle
 			int numCoords = 4;
 			for (int i = 0; i < 4; i++)

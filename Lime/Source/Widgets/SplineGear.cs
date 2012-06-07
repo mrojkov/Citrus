@@ -25,7 +25,7 @@ namespace Lime
 				if (spline != null && widget != null) {
 					float length = spline.CalcLength();
 					Vector2 point = spline.CalcPoint(SplineOffset * length);
-					widget.Position = spline.LocalMatrix.TransformVector(point);
+					widget.Position = spline.CalcLocalMatrix().TransformVector(point);
 					widget.Update(0);
 				}
 			}

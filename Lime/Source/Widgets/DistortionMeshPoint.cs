@@ -22,7 +22,7 @@ namespace Lime
 
 				if (SkinningWeights != null && Parent != null && Parent.Parent != null) {
 					BoneArray a = Parent.Parent.Widget.BoneArray;
-					Matrix32 m1 = Parent.Widget.LocalMatrix;
+					Matrix32 m1 = Parent.Widget.CalcLocalMatrix();
 					Matrix32 m2 = m1.CalcInversed();
 					result = m2.TransformVector(a.ApplySkinningToVector(m1.TransformVector(result), SkinningWeights));
 				}

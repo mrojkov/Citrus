@@ -471,13 +471,13 @@ namespace Lime
 		{
 			// Calculating particle initial orientation & color
 			Color4 color = Color;
-			Matrix32 transform = LocalMatrix;
+			Matrix32 transform = CalcLocalMatrix();
 
 			Widget basicWidget = GetBasicWidget();
 			if (basicWidget != null) {
 				for (Node node = Parent; node != basicWidget; node = node.Parent) {
 					if (node.Widget != null) {
-						transform *= node.Widget.LocalMatrix;
+						transform *= node.Widget.CalcLocalMatrix();
 						color *= node.Widget.Color;
 					}
 				}
