@@ -38,22 +38,22 @@ namespace Lime
 		{
 			var thumb = Find<Widget>("SliderThumb", false);
 			if (thumb != null) {
-				if (thumb.HitTest(Input.MousePosition) && Input.GetKeyDown(Key.Mouse0)) {
+				if (thumb.HitTest(Input.MousePosition) && Input.WasKeyPressed(Key.Mouse0)) {
 					if (RootFrame.Instance.ActiveWidget == null) {
 						thumb.PlayAnimation("Focus");
 						RootFrame.Instance.ActiveWidget = this;
 					}
 				} else {
-					if (RootFrame.Instance.ActiveWidget == this && !Input.GetKey(Key.Mouse0)) {
+					if (RootFrame.Instance.ActiveWidget == this && !Input.IsKeyPressed(Key.Mouse0)) {
 						thumb.PlayAnimation("Normal");
 						RootFrame.Instance.ActiveWidget = null;
 					}
 				}
 				if (RootFrame.Instance.ActiveWidget == this) {
-					if (Input.GetKeyDown(Key.Mouse0)) {
+					if (Input.WasKeyPressed(Key.Mouse0)) {
 						Input.ConsumeKeyEvent(Key.Mouse0, true);
 						ScrollSlider(true);
-					} else if (Input.GetKey(Key.Mouse0)) {
+					} else if (Input.IsKeyPressed(Key.Mouse0)) {
 						ScrollSlider(false);
 					}
 				}

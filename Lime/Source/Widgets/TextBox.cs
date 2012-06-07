@@ -55,7 +55,7 @@ namespace Lime
 			if (RootFrame.Instance.ActiveTextWidget == null) {
 				RootFrame.Instance.ActiveTextWidget = this;
 			}
-			if (Input.GetKeyDown(Key.Mouse0) && HitTest(Input.MousePosition)) {
+			if (Input.WasKeyPressed(Key.Mouse0) && HitTest(Input.MousePosition)) {
 				RootFrame.Instance.ActiveTextWidget = this;
 			}
 			base.Update(delta);

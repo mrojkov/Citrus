@@ -25,6 +25,14 @@ namespace Lime
 			Texture = new SerializableTexture();
 		}
 
+		public Image(ITexture texture)
+		{
+			UV0 = Vector2.Zero;
+			UV1 = Vector2.One;
+			Texture = texture;
+			Size = (Vector2)texture.ImageSize;
+		}
+
 		public Image(string texturePath)
 		{
 			UV0 = Vector2.Zero;
@@ -32,7 +40,6 @@ namespace Lime
 			Texture = new SerializableTexture(texturePath);
 			Size = (Vector2)Texture.ImageSize;
 		}
-
 
 		public override void Update(int delta)
 		{

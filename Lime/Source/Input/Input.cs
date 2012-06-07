@@ -217,7 +217,7 @@ namespace Lime
 		/// <summary>
 		/// Returns true while the user holds down the key identified by name. Think auto fire.
 		/// </summary>
-		public static bool GetKey(Key key)
+		public static bool IsKeyPressed(Key key)
 		{
 			return currentKeysState[(int)key];
 		}
@@ -225,7 +225,7 @@ namespace Lime
 		/// <summary>
 		/// Returns true during the frame the user releases the key identified by name.
 		/// </summary>
-		public static bool GetKeyUp(Key key)
+		public static bool WasKeyReleased(Key key)
 		{
 			return !currentKeysState[(int)key] && previousKeysState[(int)key];
 		}
@@ -233,13 +233,28 @@ namespace Lime
 		/// <summary>
 		/// Returns true during the frame the user starts pressing down the key identified by name.
 		/// </summary>
-		public static bool GetKeyDown(Key key)
+		public static bool WasKeyPressed(Key key)
 		{
 			return currentKeysState[(int)key] && !previousKeysState[(int)key];
 		}
 
+		public static bool WasMousePressed()
+		{
+			return WasKeyPressed(Key.Mouse0);
+		}
+
+		public static bool WasMouseReleased()
+		{
+			return WasKeyReleased(Key.Mouse0);
+		}
+
+		public static bool IsMousePressed()
+		{
+			return IsKeyPressed(Key.Mouse0);
+		}
+
 		/// <summary>
-		/// After consumption, GetKeyUp(), GetKeyDown() will return false.
+		/// After consumption, WasKeyPressed(), WasKeyReleased() will return false.
 		/// </summary>
 		public static void ConsumeKeyEvent(Key key, bool value)
 		{
@@ -259,17 +274,17 @@ namespace Lime
 
 		public static bool GetTouchBegan(int index)
 		{
-			return GetKeyDown((Key)((int)Key.Touch0 + index));
+			return WasKeyPressed((Key)((int)Key.Touch0 + index));
 		}
 
 		public static bool GetTouchEnded(int index)
 		{
-			return GetKeyUp((Key)((int)Key.Touch0 + index));
+			return WasKeyReleased((Key)((int)Key.Touch0 + index));
 		}
 
 		public static bool GetTouch(int index)
 		{
-			return GetKey((Key)((int)Key.Touch0 + index));
+			return IsKeyPressed((Key)((int)Key.Touch0 + index));
 		}
 
 		public static Vector2 GetTouchPosition(int index)

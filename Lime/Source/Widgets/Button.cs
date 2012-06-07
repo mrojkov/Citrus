@@ -35,11 +35,11 @@ namespace Lime
 				}
 			}
 			if (RootFrame.Instance.ActiveWidget == this) {
-				if (Input.GetKeyDown(Key.Mouse0)) {
+				if (Input.WasKeyPressed(Key.Mouse0)) {
 					PlayAnimation("Press");
 					Input.ConsumeKeyEvent(Key.Mouse0, true);
 				}
-				if (Input.GetKeyUp(Key.Mouse0)) {
+				if (Input.WasKeyReleased(Key.Mouse0)) {
 					if (HitTest(Input.MousePosition))
 						PlayAnimation("Focus");
 					else
