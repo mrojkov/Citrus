@@ -154,6 +154,11 @@ namespace Lime
 			get { return (float)Math.Sqrt(X * X + Y * Y); }
 		}
 
+		public Vector2 Normalized
+		{
+			get { return Vector2.Normalize(this); }
+		}
+
 		public float SquaredLength
 		{
 			get { return X * X + Y * Y; }
