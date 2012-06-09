@@ -127,16 +127,26 @@ namespace Lime
 
 		public static Vector2 Rotate(Vector2 value, float angle)
 		{
+			return value.Rotate(angle);
+		}
+
+		public Vector2 Rotate(float angle)
+		{
 			Vector2 cs = MathLib.CosSin(angle);
 			Vector2 result;
-			result.X = value.X * cs.X - value.Y * cs.Y;
-			result.Y = value.X * cs.Y + value.Y * cs.X;
+			result.X = X * cs.X - Y * cs.Y;
+			result.Y = X * cs.Y + Y * cs.X;
 			return result;
 		}
 
 		public static Vector2 RotateDegrees(Vector2 value, float angle)
 		{
 			return Rotate(value, angle * MathLib.DegreesToRadians);
+		}
+
+		public Vector2 RotateDegrees(float angle)
+		{
+			return Rotate(angle * MathLib.DegreesToRadians);
 		}
 
 		public float Atan2
