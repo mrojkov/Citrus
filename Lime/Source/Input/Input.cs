@@ -272,17 +272,17 @@ namespace Lime
 			}
 		}
 
-		public static bool GetTouchBegan(int index)
+		public static bool WasTouchBegan(int index)
 		{
 			return WasKeyPressed((Key)((int)Key.Touch0 + index));
 		}
 
-		public static bool GetTouchEnded(int index)
+		public static bool WasTouchEnded(int index)
 		{
 			return WasKeyReleased((Key)((int)Key.Touch0 + index));
 		}
 
-		public static bool GetTouch(int index)
+		public static bool IsTouching(int index)
 		{
 			return IsKeyPressed((Key)((int)Key.Touch0 + index));
 		}
@@ -301,7 +301,7 @@ namespace Lime
 		{
 			int j = 0;
 			for (int i = 0; i < MaxTouches; i++) {
-				if (GetTouch(i))
+				if (IsTouching(i))
 					j++;
 			}
 			return j;
