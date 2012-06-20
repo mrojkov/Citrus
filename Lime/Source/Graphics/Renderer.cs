@@ -183,6 +183,7 @@ namespace Lime
 			GL.EnableClientState(ArrayCap.TextureCoordArray);
 			GL.TexCoordPointer(2, TexCoordPointerType.Float, 32, (IntPtr)((uint)batchVertices + 12));
 #endif
+			blending = Blending.None;
 			Blending = Blending.Default;
 
 			CheckErrors();
