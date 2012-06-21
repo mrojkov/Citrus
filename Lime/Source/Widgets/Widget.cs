@@ -76,7 +76,7 @@ namespace Lime
 		Color4 color;
 		[ProtoMember(6)]
 		public Color4 Color { get { return color; } set { color = value; } }
-		public byte Alpha { get { return color.A; } set { color.A = value; } }
+		public float Opaque { get { return (float)color.A * (1 / 255f); } set { color.A = (byte)(value * 255f); } }
 
 		[ProtoMember(7)]
 		public Anchors Anchors { get; set; }
