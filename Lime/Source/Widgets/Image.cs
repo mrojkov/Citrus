@@ -53,14 +53,14 @@ namespace Lime
 
 		public override void Render()
 		{
-			Renderer.Blending = worldBlending;
-			Renderer.Transform1 = worldMatrix;
-			Renderer.DrawSprite(Texture, worldColor, Vector2.Zero, Size, UV0, UV1);
+			Renderer.Blending = combinedBlending;
+			Renderer.Transform1 = combinedMatrix;
+			Renderer.DrawSprite(Texture, combinedColor, Vector2.Zero, Size, UV0, UV1);
 		}
 
 		public override void AddToRenderChain(RenderChain chain)
 		{
-			if (worldShown && !imageCombinerArg) {
+			if (shown && !imageCombinerArg) {
 				chain.Add(this, Layer);
 			}
 		}
@@ -77,9 +77,9 @@ namespace Lime
 
 		public override bool HitTest(Vector2 point)
 		{
-			if (worldShown && !imageCombinerArg) {
+			if (shown && !imageCombinerArg) {
 				if (HitTestMethod == HitTestMethod.Contents) {
-					Vector2 pt = WorldMatrix.CalcInversed().TransformVector(point);
+					Vector2 pt = CombinedMatrix.CalcInversed().TransformVector(point);
 					Vector2 sz = Size;
 					if (sz.X < 0) {
 						pt.X = -pt.X;

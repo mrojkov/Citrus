@@ -436,7 +436,7 @@ namespace Lime
 		public override void Update(int delta)
 		{
 			base.Update(delta);
-			if (worldShown) {
+			if (shown) {
 				if (firstUpdate) {
 					firstUpdate = false;
 					const int ModellingStep = 40;
@@ -471,13 +471,13 @@ namespace Lime
 		{
 			// Calculating particle initial orientation & color
 			Color4 color = Color;
-			Matrix32 transform = CalcLocalMatrix();
+			Matrix32 transform = CalcTransformMatrix();
 
 			Widget basicWidget = GetBasicWidget();
 			if (basicWidget != null) {
 				for (Node node = Parent; node != basicWidget; node = node.Parent) {
 					if (node.Widget != null) {
-						transform *= node.Widget.CalcLocalMatrix();
+						transform *= node.Widget.CalcTransformMatrix();
 						color *= node.Widget.Color;
 					}
 				}
@@ -707,10 +707,10 @@ namespace Lime
 			Color4 color = Color4.White;
 			Widget basicWidget = GetBasicWidget();
 			if (basicWidget != null) {
-				matrix = basicWidget.WorldMatrix;
-				color = basicWidget.WorldColor;
+				matrix = basicWidget.CombinedMatrix;
+				color = basicWidget.CombinedColor;
 			}
-			Renderer.Blending = WorldBlending;
+			Renderer.Blending = CombinedBlending;
 			LinkedListNode<Particle> node = particles.First;
 			for (; node != null; node = node.Next) {
 				Particle particle = node.Value;

@@ -106,17 +106,17 @@ namespace Lime
 		public override void Render()
 		{
 			BuildLayout(layout);
-			Renderer.Transform1 = worldMatrix;
-			Renderer.Blending = worldBlending;
+			Renderer.Transform1 = combinedMatrix;
+			Renderer.Blending = combinedBlending;
 			for (int i = 0; i < layout.Length; i++) {
 				var part = layout[i];
-				Renderer.DrawSprite(Texture, worldColor, part.Rect.A, part.Rect.Size, part.UV.A, part.UV.B);
+				Renderer.DrawSprite(Texture, combinedColor, part.Rect.A, part.Rect.Size, part.UV.A, part.UV.B);
 			}
 		}
 
 		public override bool HitTest(Vector2 point)
 		{
-			if (worldShown) {
+			if (shown) {
 				if (HitTestMethod == HitTestMethod.Contents) {
 					BuildLayout(layout);
 					for (int i = 0; i < layout.Length; i++) {
@@ -131,7 +131,7 @@ namespace Lime
 
 		bool PartHitTest(Part part, Vector2 point)
 		{
-			point = WorldMatrix.CalcInversed().TransformVector(point);
+			point = CombinedMatrix.CalcInversed().TransformVector(point);
 			if (part.Rect.B.X < part.Rect.A.X) {
 				part.Rect.A.X = -part.Rect.A.X;
 				part.Rect.B.X = -part.Rect.B.X;

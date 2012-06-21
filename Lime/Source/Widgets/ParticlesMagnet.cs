@@ -47,12 +47,12 @@ namespace Lime
 				if (magnet != null) {
 					if (numMagnets >= MaxMagnets)
 						break;
-					Matrix32 transform = magnet.CalcLocalMatrix();
+					Matrix32 transform = magnet.CalcTransformMatrix();
 					Widget basicWidget = GetBasicWidget();
 					if (basicWidget != null) {
 						for (Node n = Parent; n != basicWidget; n = n.Parent) {
 							if (n.Widget != null)
-								transform *= n.Widget.CalcLocalMatrix();
+								transform *= n.Widget.CalcTransformMatrix();
 						}
 					}
 					magnets[numMagnets++] = new MagnetData {

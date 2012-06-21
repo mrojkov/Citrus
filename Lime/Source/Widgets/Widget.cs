@@ -41,15 +41,17 @@ namespace Lime
 	{
 		#region Properties
 
-		Vector2 position;
 		[ProtoMember(1)]
 		public Vector2 Position { get { return position; } set { position = value; } }
+		private Vector2 position;
+
 		public float X { get { return position.X; } set { position.X = value; } }
 		public float Y { get { return position.Y; } set { position.Y = value; } }
 
-		Vector2 size;
 		[ProtoMember(2)]
 		public Vector2 Size { get { return size; } set { size = value; } }
+		private Vector2 size;
+
 		public float Width { get { return size.X; } set { size.X = value; } }
 		public float Height { get { return size.Y; } set { size.Y = value; } }
 
@@ -58,9 +60,6 @@ namespace Lime
 
 		[ProtoMember(4)]
 		public Vector2 Scale { get; set; }
-
-		private float rotation;
-		private Vector2 direction = new Vector2(1, 0);
 
 		[ProtoMember(5)]
 		public float Rotation { 
@@ -73,9 +72,13 @@ namespace Lime
 			}
 		}
 
-		Color4 color;
+		private float rotation;
+		private Vector2 direction = new Vector2(1, 0);
+
 		[ProtoMember(6)]
 		public Color4 Color { get { return color; } set { color = value; } }
+		private Color4 color;
+
 		public float Opacity { 
 			get {
 				return (float)color.A * (1 / 255f);
@@ -100,12 +103,10 @@ namespace Lime
 		[ProtoMember(11)]
 		public HitTestMethod HitTestMethod { get; set; }
 
-		public bool Shown { get { return Visible && color.A > 0; } }
-		
 		[ProtoMember(13)]
 		public BoneArray BoneArray;
 
-		public Matrix32 CalcLocalMatrix()
+		public Matrix32 CalcTransformMatrix()
 		{
 			var u = new Vector2(direction.X * Scale.X, direction.Y * Scale.X);
 			var v = new Vector2(-direction.Y * Scale.Y, direction.X * Scale.Y);
@@ -127,15 +128,15 @@ namespace Lime
 
 		protected bool renderedToTexture;
 
-		protected Matrix32 worldMatrix;
-		protected Color4 worldColor;
-		protected Blending worldBlending;
-		protected bool worldShown = true;
+		public Matrix32 CombinedMatrix { get { return combinedMatrix; } }
+		public Color4 CombinedColor { get { return combinedColor; } }
+		public Blending CombinedBlending { get { return combinedBlending; } }
+		public bool Shown { get { return shown; } }
 
-		public Matrix32 WorldMatrix { get { return worldMatrix; } }
-		public Color4 WorldColor { get { return worldColor; } }
-		public Blending WorldBlending { get { return worldBlending; } }
-		public bool WorldShown { get { return worldShown; } }
+		protected Matrix32 combinedMatrix;
+		protected Color4 combinedColor;
+		protected Blending combinedBlending;
+		protected bool shown = true;
 
 		#endregion
 		#region Methods
@@ -160,37 +161,37 @@ namespace Lime
 			Visible = true;
 		}
 
-		public void UpdateWorldProperties()
+		public void UpdateCombinedAttributes()
 		{
 			if (Parent != null) {
 				var widget = Parent.Widget;
 				if (widget != null && !widget.renderedToTexture) {
-					worldMatrix = CalcLocalMatrix() * widget.WorldMatrix;
-					worldColor = Color * widget.WorldColor;
-					worldShown = Shown && widget.WorldShown;
-					worldBlending = Blending == Blending.Default ? widget.WorldBlending : Blending;
+					combinedMatrix = CalcTransformMatrix() * widget.CombinedMatrix;
+					combinedColor = Color * widget.CombinedColor;
+					combinedBlending = Blending == Blending.Default ? widget.CombinedBlending : Blending;
+					shown = (Visible && Color.A > 0) && widget.Shown;
 					return;
 				}
 			}
-			worldMatrix = CalcLocalMatrix();
-			worldColor = Color;
-			worldShown = Shown;
-			worldBlending = Blending;
+			combinedMatrix = CalcTransformMatrix();
+			combinedColor = Color;
+			combinedBlending = Blending;
+			shown = Visible && Color.A > 0;
 		}
 
-		public void UpdateWorldPropertiesUplift()
+		public void UpdateCombinedAttributesUplift()
 		{
 			if (Parent != null && Parent.Widget != null) {
-				Parent.Widget.UpdateWorldPropertiesUplift();
+				Parent.Widget.UpdateCombinedAttributesUplift();
 			}
-			UpdateWorldProperties();
+			UpdateCombinedAttributes();
 		}
 
 		public override void Update(int delta)
 		{
 			UpdatedNodes++;
-			UpdateWorldProperties();
-			if (worldShown) {
+			UpdateCombinedAttributes();
+			if (shown) {
 				if (Playing) {
 					AdvanceAnimation(delta);
 				}
@@ -205,7 +206,7 @@ namespace Lime
 
 		public override void AddToRenderChain(RenderChain chain)
 		{
-			if (worldShown) {
+			if (shown) {
 				if (Layer != 0) {
 					int oldLayer = chain.SetLayer(Layer);
 					foreach (Node node in Nodes.AsArray) {
@@ -221,8 +222,6 @@ namespace Lime
 				}
 			}
 		}
-
-		Vector2? parentSize;
 
 		void ApplyAnchors()
 		{
@@ -250,11 +249,13 @@ namespace Lime
 			parentSize = s;
 		}
 
+		private Vector2? parentSize;
+
 		public virtual bool HitTest(Vector2 point)
 		{
-			if (worldShown) {
+			if (shown) {
 				if (HitTestMethod == HitTestMethod.BoundingRect) {
-					Vector2 p = worldMatrix.CalcInversed().TransformVector(point);
+					Vector2 p = combinedMatrix.CalcInversed().TransformVector(point);
 					Vector2 s = Size;
 					if (s.X < 0) {
 						p.X = -p.X;
@@ -289,7 +290,7 @@ namespace Lime
 				Renderer.SetOrthogonalProjection(0, Size.Y, Size.X, 0);
 
 				var savedTransform2 = Renderer.Transform2;
-				Renderer.Transform2 = worldMatrix.CalcInversed();
+				Renderer.Transform2 = combinedMatrix.CalcInversed();
 				var chain = new RenderChain();
 				AddToRenderChain(chain);
 				chain.RenderAndClear();

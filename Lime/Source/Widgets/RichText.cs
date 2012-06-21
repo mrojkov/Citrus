@@ -118,9 +118,9 @@ namespace Lime
 				renderer.AddFragment(frag.Text, frag.Style + 1);
 			}
 			// Draw text.
-			Renderer.Transform1 = worldMatrix;
-			Renderer.Blending = worldBlending;
-			renderer.Render(worldColor, Size, HAlignment, VAlignment);
+			Renderer.Transform1 = combinedMatrix;
+			Renderer.Blending = combinedBlending;
+			renderer.Render(combinedColor, Size, HAlignment, VAlignment);
 		}
 	}
 

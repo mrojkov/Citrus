@@ -58,7 +58,7 @@ namespace Lime
 			Vector2 divisor = new Vector2(0.25f, 0.25f);
 			colorAR *= divisor;
 			colorGB *= divisor;
-			v.Color = new Color4((byte)colorAR.Y, (byte)colorGB.X, (byte)colorGB.Y, (byte)colorAR.X) * WorldColor;
+			v.Color = new Color4((byte)colorAR.Y, (byte)colorGB.X, (byte)colorGB.Y, (byte)colorAR.X) * CombinedColor;
 			v.UV1 *= divisor;
 			v.Pos *= divisor;
 			return v;
@@ -69,7 +69,7 @@ namespace Lime
 			polygon[0] = CalculateCenterVertex();
 			for (int t = 0; t < 5; t++) {
 				int w = t % 4;
-				polygon[t + 1].Color = points[w].Color * WorldColor;
+				polygon[t + 1].Color = points[w].Color * CombinedColor;
 				polygon[t + 1].UV1 = points[w].UV;
 				polygon[t + 1].Pos = points[w].TransformedPosition;
 			}
@@ -78,8 +78,8 @@ namespace Lime
 		
 		public override void Render()
 		{
-			Renderer.Blending = WorldBlending;
-			Renderer.Transform1 = WorldMatrix;
+			Renderer.Blending = CombinedBlending;
+			Renderer.Transform1 = CombinedMatrix;
 			for (int i = 0; i < NumRows; ++i) {
 				for (int j = 0; j < NumCols; ++j) {
 					points[0] = GetPoint(i, j);

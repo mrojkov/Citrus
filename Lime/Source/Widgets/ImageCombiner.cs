@@ -22,9 +22,9 @@ namespace Lime
 
 		Color4 Color { get; }
 
-		Matrix32 CalcLocalMatrix();
+		Matrix32 CalcTransformMatrix();
 	
-		bool WorldShown { get; }
+		bool Shown { get; }
 	}
 
 	[ProtoContract]
@@ -126,8 +126,8 @@ namespace Lime
 
 		private void RenderHelper(IImageCombinerArg arg1, IImageCombinerArg arg2)
 		{
-			Matrix32 transform1 = Matrix32.Scaling(arg1.Size) * arg1.CalcLocalMatrix();
-			Matrix32 transform2 = Matrix32.Scaling(arg2.Size) * arg2.CalcLocalMatrix();
+			Matrix32 transform1 = Matrix32.Scaling(arg1.Size) * arg1.CalcTransformMatrix();
+			Matrix32 transform2 = Matrix32.Scaling(arg2.Size) * arg2.CalcTransformMatrix();
 			// source rectangle
 			int numCoords = 4;
 			for (int i = 0; i < 4; i++)
@@ -149,7 +149,7 @@ namespace Lime
 			Matrix32 uvTransform2 = transform2.CalcInversed();
 			ITexture texture1 = arg1.GetTexture();
 			ITexture texture2 = arg2.GetTexture();
-			Color4 color = arg1.Color * arg2.Color * Parent.Widget.WorldColor;
+			Color4 color = arg1.Color * arg2.Color * Parent.Widget.CombinedColor;
 			for (int i = 0; i < numCoords; i++) {
 				vertices[i].Pos = coords[i];
 				vertices[i].Color = color;
@@ -164,9 +164,9 @@ namespace Lime
 			if (Parent.Widget != null) {
 				IImageCombinerArg arg1, arg2;
 				if (GetArgs(out arg1, out arg2)) {
-					if (arg1.WorldShown && arg2.WorldShown) {
+					if (arg1.Shown && arg2.Shown) {
 						if (arg1.GetTexture() != null && arg2.GetTexture() != null) {
-							Renderer.Transform1 = Parent.Widget.WorldMatrix;
+							Renderer.Transform1 = Parent.Widget.CombinedMatrix;
 							Renderer.Blending = Blending.Alpha;
 							RenderHelper(arg1, arg2);
 						}
