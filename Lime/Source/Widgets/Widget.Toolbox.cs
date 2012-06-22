@@ -71,7 +71,7 @@ namespace Lime
 			Pivot = Vector2.Half;
 		}
 
-		public Matrix32 CalcTransitionMatrixToSpaceOf(Widget container)
+		public Matrix32 CalcTransitionToSpaceOf(Widget container)
 		{
 			RecalcGlobalMatrixAndColor();
 			container.RecalcGlobalMatrixAndColor();
@@ -107,7 +107,7 @@ namespace Lime
 			var v1 = new Vector2(1, 0);
 			var v2 = new Vector2(0, 1);
 			var v3 = new Vector2(0, 0);
-			Matrix32 mtx = CalcTransitionMatrixToSpaceOf(container);
+			Matrix32 mtx = CalcTransitionToSpaceOf(container);
 			v1 = mtx.TransformVector(v1);
 			v2 = mtx.TransformVector(v2);
 			v3 = mtx.TransformVector(v3);

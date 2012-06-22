@@ -106,7 +106,7 @@ namespace Lime
 		[ProtoMember(13)]
 		public BoneArray BoneArray;
 
-		public Matrix32 CalcTransformMatrix()
+		public Matrix32 CalcLocalTransformMatrix()
 		{
 			var u = new Vector2(direction.X * Scale.X, direction.Y * Scale.X);
 			var v = new Vector2(-direction.Y * Scale.Y, direction.X * Scale.Y);
@@ -174,14 +174,14 @@ namespace Lime
 			if (Parent != null) {
 				var parentWidget = Parent.Widget;
 				if (parentWidget != null && !parentWidget.renderedToTexture) {
-					globalMatrix = CalcTransformMatrix() * parentWidget.GlobalMatrix;
+					globalMatrix = CalcLocalTransformMatrix() * parentWidget.GlobalMatrix;
 					globalColor = Color * parentWidget.GlobalColor;
 					globalBlending = Blending == Blending.Default ? parentWidget.GlobalBlending : Blending;
 					globallyVisible = (Visible && color.A != 0) && parentWidget.GloballyVisible;
 					return;
 				}
 			}
-			globalMatrix = CalcTransformMatrix();
+			globalMatrix = CalcLocalTransformMatrix();
 			globalColor = color;
 			globalBlending = Blending;
 			globallyVisible = Visible && color.A != 0;
