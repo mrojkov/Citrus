@@ -40,7 +40,7 @@ namespace Lime
 
 		public override void AddToRenderChain(RenderChain chain)
 		{
-			if (shown) {
+			if (globallyVisible) {
 				int oldLayer = chain.SetLayer(Layer);
 				chain.Add(this);
 				foreach (Node node in Nodes.AsArray) {
@@ -106,9 +106,9 @@ namespace Lime
 				textPosition.X = Size.X - BorderWidth - extent.X;
 			else if (HAlignment == HAlignment.Center)
 				textPosition.X = (Size.X - extent.X) * 0.5f;
-			Renderer.Transform1 = combinedMatrix;
-			Renderer.Blending = combinedBlending;
-			Renderer.DrawTextLine(Font.Instance, textPosition, text, combinedColor, FontHeight, start, length);
+			Renderer.Transform1 = globalMatrix;
+			Renderer.Blending = globalBlending;
+			Renderer.DrawTextLine(Font.Instance, textPosition, text, globalColor, FontHeight, start, length);
 		}
 	}
 }

@@ -83,7 +83,7 @@ namespace Lime
 
 		public override void Update(int delta)
 		{
-			if (shown) {
+			if (globallyVisible) {
 				UpdateHelper(delta);
 			}
 			base.Update(delta);
@@ -95,7 +95,7 @@ namespace Lime
 			if (rail != null) {
 				float railLength = rail.CalcLength();
 				if (railLength > 0) {
-					Matrix32 transform = rail.CombinedMatrix.CalcInversed();
+					Matrix32 transform = rail.GlobalMatrix.CalcInversed();
 					Vector2 p = transform.TransformVector(Input.MousePosition);
 					float offset = rail.CalcOffset(p) / railLength;
 					if (RangeMax > RangeMin) {

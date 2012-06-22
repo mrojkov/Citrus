@@ -24,7 +24,7 @@ namespace Lime
 
 		Matrix32 CalcTransformMatrix();
 	
-		bool Shown { get; }
+		bool GloballyVisible { get; }
 	}
 
 	[ProtoContract]
@@ -149,7 +149,7 @@ namespace Lime
 			Matrix32 uvTransform2 = transform2.CalcInversed();
 			ITexture texture1 = arg1.GetTexture();
 			ITexture texture2 = arg2.GetTexture();
-			Color4 color = arg1.Color * arg2.Color * Parent.Widget.CombinedColor;
+			Color4 color = arg1.Color * arg2.Color * Parent.Widget.GlobalColor;
 			for (int i = 0; i < numCoords; i++) {
 				vertices[i].Pos = coords[i];
 				vertices[i].Color = color;
@@ -164,9 +164,9 @@ namespace Lime
 			if (Parent.Widget != null) {
 				IImageCombinerArg arg1, arg2;
 				if (GetArgs(out arg1, out arg2)) {
-					if (arg1.Shown && arg2.Shown) {
+					if (arg1.GloballyVisible && arg2.GloballyVisible) {
 						if (arg1.GetTexture() != null && arg2.GetTexture() != null) {
-							Renderer.Transform1 = Parent.Widget.CombinedMatrix;
+							Renderer.Transform1 = Parent.Widget.GlobalMatrix;
 							Renderer.Blending = Blending.Alpha;
 							RenderHelper(arg1, arg2);
 						}

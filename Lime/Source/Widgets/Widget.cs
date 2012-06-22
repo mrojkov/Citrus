@@ -37,7 +37,7 @@ namespace Lime
 	[ProtoInclude(109, typeof(Slider))]
 	[ProtoInclude(110, typeof(RichText))]
 	[ProtoInclude(111, typeof(TextBox))]
-	public class Widget : Node
+	public partial class Widget : Node
 	{
 		#region Properties
 
@@ -82,7 +82,7 @@ namespace Lime
 		public float Opacity { 
 			get {
 				return (float)color.A * (1 / 255f);
-			} 
+			}
 			set {
 				color.A = (byte)(value * 255f);
 			}
@@ -128,15 +128,15 @@ namespace Lime
 
 		protected bool renderedToTexture;
 
-		public Matrix32 CombinedMatrix { get { return combinedMatrix; } }
-		public Color4 CombinedColor { get { return combinedColor; } }
-		public Blending CombinedBlending { get { return combinedBlending; } }
-		public bool Shown { get { return shown; } }
+		public Matrix32 GlobalMatrix { get { return globalMatrix; } }
+		public Color4 GlobalColor { get { return globalColor; } }
+		public Blending GlobalBlending { get { return globalBlending; } }
+		public bool GloballyVisible { get { return globallyVisible; } }
 
-		protected Matrix32 combinedMatrix;
-		protected Color4 combinedColor;
-		protected Blending combinedBlending;
-		protected bool shown = true;
+		protected Matrix32 globalMatrix;
+		protected Color4 globalColor;
+		protected Blending globalBlending;
+		protected bool globallyVisible = true;
 
 		#endregion
 		#region Methods
@@ -161,37 +161,37 @@ namespace Lime
 			Visible = true;
 		}
 
-		public void UpdateCombinedAttributes()
+		public void RecalcGlobalMatrixAndColor()
+		{
+			if (Parent != null && Parent.Widget != null) {
+				Parent.Widget.RecalcGlobalMatrixAndColor();
+			}
+			RecalcGlobalMatrixAndColorHelper();
+		}
+
+		private void RecalcGlobalMatrixAndColorHelper()
 		{
 			if (Parent != null) {
-				var widget = Parent.Widget;
-				if (widget != null && !widget.renderedToTexture) {
-					combinedMatrix = CalcTransformMatrix() * widget.CombinedMatrix;
-					combinedColor = Color * widget.CombinedColor;
-					combinedBlending = Blending == Blending.Default ? widget.CombinedBlending : Blending;
-					shown = (Visible && Color.A > 0) && widget.Shown;
+				var parentWidget = Parent.Widget;
+				if (parentWidget != null && !parentWidget.renderedToTexture) {
+					globalMatrix = CalcTransformMatrix() * parentWidget.GlobalMatrix;
+					globalColor = Color * parentWidget.GlobalColor;
+					globalBlending = Blending == Blending.Default ? parentWidget.GlobalBlending : Blending;
+					globallyVisible = (Visible && color.A != 0) && parentWidget.GloballyVisible;
 					return;
 				}
 			}
-			combinedMatrix = CalcTransformMatrix();
-			combinedColor = Color;
-			combinedBlending = Blending;
-			shown = Visible && Color.A > 0;
-		}
-
-		public void UpdateCombinedAttributesUplift()
-		{
-			if (Parent != null && Parent.Widget != null) {
-				Parent.Widget.UpdateCombinedAttributesUplift();
-			}
-			UpdateCombinedAttributes();
+			globalMatrix = CalcTransformMatrix();
+			globalColor = color;
+			globalBlending = Blending;
+			globallyVisible = Visible && color.A != 0;
 		}
 
 		public override void Update(int delta)
 		{
 			UpdatedNodes++;
-			UpdateCombinedAttributes();
-			if (shown) {
+			RecalcGlobalMatrixAndColorHelper();
+			if (globallyVisible) {
 				if (Playing) {
 					AdvanceAnimation(delta);
 				}
@@ -206,7 +206,7 @@ namespace Lime
 
 		public override void AddToRenderChain(RenderChain chain)
 		{
-			if (shown) {
+			if (globallyVisible) {
 				if (Layer != 0) {
 					int oldLayer = chain.SetLayer(Layer);
 					foreach (Node node in Nodes.AsArray) {
@@ -223,7 +223,7 @@ namespace Lime
 			}
 		}
 
-		void ApplyAnchors()
+		private void ApplyAnchors()
 		{
 			Vector2 s = Parent.Widget.Size;
 			if (parentSize.HasValue && !parentSize.Value.Equals(s)) {
@@ -253,9 +253,9 @@ namespace Lime
 
 		public virtual bool HitTest(Vector2 point)
 		{
-			if (shown) {
+			if (globallyVisible) {
 				if (HitTestMethod == HitTestMethod.BoundingRect) {
-					Vector2 p = combinedMatrix.CalcInversed().TransformVector(point);
+					Vector2 p = globalMatrix.CalcInversed().TransformVector(point);
 					Vector2 s = Size;
 					if (s.X < 0) {
 						p.X = -p.X;
@@ -277,39 +277,6 @@ namespace Lime
 			return false;
 		}
 
-		#endregion
-		#region Utils
-
-		public void RenderToTexture(ITexture texture)
-		{
-			if (Width > 0 && Height > 0) {
-				texture.SetAsRenderTarget();
-				Viewport vp = Renderer.Viewport;
-				Renderer.Viewport = new Viewport { X = 0, Y = 0, Width = texture.ImageSize.Width, Height = texture.ImageSize.Height };
-				Renderer.PushProjectionMatrix();
-				Renderer.SetOrthogonalProjection(0, Size.Y, Size.X, 0);
-
-				var savedTransform2 = Renderer.Transform2;
-				Renderer.Transform2 = combinedMatrix.CalcInversed();
-				var chain = new RenderChain();
-				AddToRenderChain(chain);
-				chain.RenderAndClear();
-				Renderer.Transform2 = savedTransform2;
-
-				texture.RestoreRenderTarget();
-				Renderer.Viewport = vp;
-				Renderer.PopProjectionMatrix();
-			}
-		}
-
-		public void Center()
-		{
-			if (Parent == null) {
-				throw new Lime.Exception("Parent must not be null");
-			}
-			Position = Parent.Widget.Size * 0.5f;
-			Pivot = Vector2.Half;
-		}
 		#endregion
 	}
 }

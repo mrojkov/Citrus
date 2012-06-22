@@ -80,20 +80,20 @@ namespace Lime
 
 		void UpdateForDialogMode(int delta)
 		{
-			if (shown && Input.MouseVisible) {
+			if (globallyVisible && Input.MouseVisible) {
 				if (RootFrame.Instance.ActiveWidget != null && !RootFrame.Instance.ActiveWidget.ChildOf(this)) {
 					// Discard active widget if it's not a child of the topmost dialog.
 					RootFrame.Instance.ActiveWidget = null;
 				}
 			}
-			if (shown && RootFrame.Instance.ActiveTextWidget != null && !RootFrame.Instance.ActiveTextWidget.ChildOf(this)) {
+			if (globallyVisible && RootFrame.Instance.ActiveTextWidget != null && !RootFrame.Instance.ActiveTextWidget.ChildOf(this)) {
 				// Discard active text widget if it's not a child of the topmost dialog.
 				RootFrame.Instance.ActiveTextWidget = null;
 			}
 			if (!Playing) {
 				base.Update(delta);
 			}
-			if (shown) {
+			if (globallyVisible) {
 				// Cosume all input events and drive mouse out of the screen.
 				Input.ConsumeAllKeyEvents(true);
 				Input.MouseVisible = false;
@@ -164,14 +164,14 @@ namespace Lime
 				RenderToTexture(renderTexture);
 			}
 			if (OnRender != null) {
-				Renderer.Transform1 = CombinedMatrix;
+				Renderer.Transform1 = GlobalMatrix;
 				OnRender();
 			}
 		}
 
 		public override void AddToRenderChain(RenderChain chain)
 		{
-			if (shown) {
+			if (globallyVisible) {
 				if (renderTexture != null)
 					chain.Add(this);
 				else

@@ -436,7 +436,7 @@ namespace Lime
 		public override void Update(int delta)
 		{
 			base.Update(delta);
-			if (shown) {
+			if (globallyVisible) {
 				if (firstUpdate) {
 					firstUpdate = false;
 					const int ModellingStep = 40;
@@ -707,10 +707,10 @@ namespace Lime
 			Color4 color = Color4.White;
 			Widget basicWidget = GetBasicWidget();
 			if (basicWidget != null) {
-				matrix = basicWidget.CombinedMatrix;
-				color = basicWidget.CombinedColor;
+				matrix = basicWidget.GlobalMatrix;
+				color = basicWidget.GlobalColor;
 			}
-			Renderer.Blending = CombinedBlending;
+			Renderer.Blending = GlobalBlending;
 			LinkedListNode<Particle> node = particles.First;
 			for (; node != null; node = node.Next) {
 				Particle particle = node.Value;

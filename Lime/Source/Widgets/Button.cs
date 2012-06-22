@@ -60,7 +60,7 @@ namespace Lime
 
 		public override void Update(int delta)
 		{
-			if (shown) {
+			if (globallyVisible) {
 				UpdateHelper(delta);
 			}
 			base.Update(delta);
