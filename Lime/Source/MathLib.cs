@@ -151,7 +151,7 @@ namespace Lime
 			while (t < 0) { t += 1; }
 			while (t >= 1) { t -= 1; }
 			int curSeg = (int)(t * segCount);
-			float k = (t * segCount - curSeg);
+			float k = t * segCount - curSeg;
 			return CatmullRomSpline(k, points[curSeg], points[curSeg + 1], points[curSeg + 2], points[curSeg + 3]);
 		}
 
