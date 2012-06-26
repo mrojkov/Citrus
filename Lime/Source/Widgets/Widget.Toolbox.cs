@@ -35,6 +35,8 @@ namespace Lime
 				new Vector2(0, 0), new Vector2(1, 0),
 				new Vector2(1, 1), new Vector2(0, 1)
 			};
+			a.RecalcGlobalMatrixAndColor();
+			b.RecalcGlobalMatrixAndColor();
 			var sizes = new Vector2[2] { a.Size, b.Size };
 			var matrices = new Matrix32[2] { a.GlobalMatrix, b.GlobalMatrix };
 			var det = new float[2] { matrices[0].CalcDeterminant(), matrices[1].CalcDeterminant() };

@@ -43,9 +43,29 @@ namespace Lime
 			}
 		}
 
+		public static float Cos(float x)
+		{
+			return (float)Math.Cos(x);
+		}
+
+		public static float Sin(float x)
+		{
+			return (float)Math.Sin(x);
+		}
+
 		public static float Sqr(float x)
 		{
 			return x * x;
+		}
+
+		public static float Sqrt(float x)
+		{
+			return (float)Math.Sqrt(x);
+		}
+
+		public static float Pow(float x, float y)
+		{
+			return (float)Math.Pow(x, y);
 		}
 
 		public static float Lerp(float a, float b, float t)
@@ -120,6 +140,19 @@ namespace Lime
 		{
 			return new Vector2(CatmullRomSpline(t, p0.X, p1.X, p2.X, p3.X),
 				CatmullRomSpline(t, p0.Y, p1.Y, p2.Y, p3.Y));
+		}
+		
+		public static Vector2 CatmullRomJoinedSpline(float t, params Vector2[] points)
+		{
+			int segCount = points.Length - 3;
+			if (segCount < 1) {
+				throw new System.ArgumentException("Not enough spline knots");
+			}
+			while (t < 0) { t += 1; }
+			while (t >= 1) { t -= 1; }
+			int curSeg = (int)(t * segCount);
+			float k = (t * segCount - curSeg);
+			return CatmullRomSpline(k, points[curSeg], points[curSeg + 1], points[curSeg + 2], points[curSeg + 3]);
 		}
 
 		public static float CatmullRomSpline(float t, float p0, float p1, float p2, float p3)

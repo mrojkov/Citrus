@@ -413,6 +413,27 @@ namespace Lime
 
 		public static void DrawTriangleFan(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
 		{
+			int baseVertex = DrawTriangleFanHelper(texture1, texture2, vertices, numVertices);
+			for (int i = 1; i <= numVertices - 2; i++) {
+				batchIndices[currentIndex++] = (ushort)baseVertex;
+				batchIndices[currentIndex++] = (ushort)(baseVertex + i);
+				batchIndices[currentIndex++] = (ushort)(baseVertex + i + 1);
+			}
+		}
+
+		public static void DrawTriangleStrip(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
+		{
+			int vertex = DrawTriangleFanHelper(texture1, texture2, vertices, numVertices);
+			for (int i = 0; i < numVertices - 2; i++) {
+				batchIndices[currentIndex++] = (ushort)vertex;
+				batchIndices[currentIndex++] = (ushort)(vertex + 1);
+				batchIndices[currentIndex++] = (ushort)(vertex + 2);
+				vertex++;
+			}
+		}
+
+		private static int DrawTriangleFanHelper(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
+		{
 			var transform = Transform1 * Transform2;
 			SetTexture(texture1, 0);
 			SetTexture(texture2, 1);
@@ -436,11 +457,7 @@ namespace Lime
 					v.UV2 = uvRect2.A + uvRect2.Size * v.UV2;
 				batchVertices[currentVertex++] = v;
 			}
-			for (int i = 1; i <= numVertices - 2; i++) {
-				batchIndices[currentIndex++] = (ushort)baseVertex;
-				batchIndices[currentIndex++] = (ushort)(baseVertex + i);
-				batchIndices[currentIndex++] = (ushort)(baseVertex + i + 1);
-			}
+			return baseVertex;
 		}
 
 		public static void DrawTextLine(float x, float y, string text, float fontHeight = 20, uint abgr = 0xFFFFFFFF)

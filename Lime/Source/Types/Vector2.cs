@@ -169,6 +169,11 @@ namespace Lime
 			get { return Vector2.Normalize(this); }
 		}
 
+		public Vector2 Normal
+		{
+			get { return new Vector2(-Y, X); }
+		}
+
 		public float SquaredLength
 		{
 			get { return X * X + Y * Y; }
