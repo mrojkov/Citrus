@@ -148,8 +148,8 @@ namespace Lime
 			if (segCount < 1) {
 				throw new System.ArgumentException("Not enough spline knots");
 			}
-			while (t < 0) { t += 1; }
-			while (t >= 1) { t -= 1; }
+			while (t < 0) { t++; }
+			while (t >= 1) { t--; }
 			int curSeg = (int)(t * segCount);
 			float k = t * segCount - curSeg;
 			return CatmullRomSpline(k, points[curSeg], points[curSeg + 1], points[curSeg + 2], points[curSeg + 3]);
