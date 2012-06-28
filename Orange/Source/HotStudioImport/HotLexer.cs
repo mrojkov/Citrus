@@ -286,6 +286,8 @@ namespace Orange
 			string path = ParseQuotedString();
 			if (string.IsNullOrEmpty(path))
 				return path;
+            else if (path[0] == '#')
+                return path;
 			else if (path[0] == '/' || path[0] == '\\')
 				path = path.Substring(1);
 			else {

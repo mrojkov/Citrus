@@ -126,7 +126,10 @@ namespace Orange
 			Image img = (Image)node;
 			switch (name) {
 			case "TexturePath":
-				img.Texture = new SerializableTexture(lexer.ParsePath());
+                var path = lexer.ParsePath();
+                if (path == "#a") {
+                }
+				img.Texture = new SerializableTexture(path);
 				break;
 			case "TexCoordForMins":
 				img.UV0 = lexer.ParseVector2();

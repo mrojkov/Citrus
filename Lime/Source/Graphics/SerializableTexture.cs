@@ -23,11 +23,18 @@ namespace Lime
 
 		public string SerializationPath {
 			get {
-				var path = Serialization.ShrinkPath(core.Path);
-				return path;
+                var path = core.Path;
+                if (!string.IsNullOrEmpty(path) && path[0] == '#') {
+                    return path;
+                } else {
+                    return Serialization.ShrinkPath(path);
+                }
 			}
 			set {
-				var path = Serialization.ExpandPath(value);
+                string path = value;
+                if (!string.IsNullOrEmpty(value) && value[0] != '#') {
+                    path = Serialization.ExpandPath(value);
+                }
 				core = TexturePool.Instance.GetSerializableTextureCore(path);
 			}
 		}

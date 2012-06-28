@@ -15,13 +15,18 @@ namespace Lime
 				Renderer.Viewport = new Viewport { X = 0, Y = 0, Width = texture.ImageSize.Width, Height = texture.ImageSize.Height };
 				Renderer.PushProjectionMatrix();
 				Renderer.SetOrthogonalProjection(0, Height, Width, 0);
+				
+				OpenTK.Graphics.OpenGL.GL.ClearColor(0, 0, 0, 0);
+				OpenTK.Graphics.OpenGL.GL.Clear(OpenTK.Graphics.OpenGL.ClearBufferMask.ColorBufferBit);
+
+				Renderer.DrawTextLine(new Vector2(30, 30), "XXXXXXXXXXXXXXXXXXXXXX");
 
 				var savedTransform2 = Renderer.Transform2;
 				Renderer.Transform2 = globalMatrix.CalcInversed();
 				var chain = new RenderChain();
-                foreach (var node in Nodes) {
-                    node.AddToRenderChain(chain);
-                }
+				foreach (var node in Nodes) {
+					node.AddToRenderChain(chain);
+				}
 				chain.RenderAndClear();
 				Renderer.Transform2 = savedTransform2;
 
