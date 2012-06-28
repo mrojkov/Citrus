@@ -146,9 +146,8 @@ namespace Lime
 			PlainTexture.DeleteScheduledTextures();
 			DrawCalls = 0;
 			RenderCycle++;
+			ClearRenderTarget(0, 0, 0, 1);
 #if GLES11
-			GL.ClearColor(0, 0, 0, 1);
-			GL.Clear((uint)All.ColorBufferBit);
 			GL.Enable(All.Texture2D);
 
 			// Set up vertex and color arrays
@@ -166,8 +165,6 @@ namespace Lime
 			GL.TexCoordPointer(2, All.Float, 32, (IntPtr)((uint)batchVertices + 12));
 			
 #else
-			GL.ClearColor(0, 0, 0, 1);
-			GL.Clear(ClearBufferMask.ColorBufferBit);
 			GL.Enable(EnableCap.Texture2D);
 
 			// Set up vertex and color arrays
@@ -189,6 +186,17 @@ namespace Lime
 			CheckErrors();
 		}
 		
+		public static void ClearRenderTarget(float r, float g, float b, float a)
+		{
+#if GLES11
+			GL.ClearColor(r, g, b, a);
+			GL.Clear((uint)All.ColorBufferBit);
+#else
+			GL.ClearColor(r, g, b, a);
+			GL.Clear(ClearBufferMask.ColorBufferBit);
+#endif
+		}
+
 		public static void SetTexture(ITexture texture, int stage)
 		{
 			uint handle = texture != null ? texture.GetHandle() : 0;

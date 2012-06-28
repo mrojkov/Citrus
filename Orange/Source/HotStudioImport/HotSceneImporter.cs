@@ -127,8 +127,6 @@ namespace Orange
 			switch (name) {
 			case "TexturePath":
                 var path = lexer.ParsePath();
-                if (path == "#a") {
-                }
 				img.Texture = new SerializableTexture(path);
 				break;
 			case "TexCoordForMins":

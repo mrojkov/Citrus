@@ -14,19 +14,23 @@ namespace Lime
 		[ProtoMember(2)]
 		public Vector2 UV { get; set; }
 
+		public DistortionMeshPoint()
+		{
+			Color = Color4.White;
+		}
+
 		public Vector2 TransformedPosition {
 			get {
 				Vector2 result = Vector2.Zero;
-				if (Parent != null && Parent.Widget != null)
+				if (Parent != null && Parent.Widget != null) {
 					result = Vector2.Scale(Parent.Widget.Size, Position);
-
+				}
 				if (SkinningWeights != null && Parent != null && Parent.Parent != null) {
 					BoneArray a = Parent.Parent.Widget.BoneArray;
 					Matrix32 m1 = Parent.Widget.CalcLocalTransformMatrix();
 					Matrix32 m2 = m1.CalcInversed();
 					result = m2.TransformVector(a.ApplySkinningToVector(m1.TransformVector(result), SkinningWeights));
 				}
-
 				return result;
 			}
 		}

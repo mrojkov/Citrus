@@ -160,7 +160,7 @@ namespace Lime
 					break;
 				}
 				UVRect.A = Vector2.Zero;
-				UVRect.B = (Vector2)instance.SurfaceSize;
+				UVRect.B = Vector2.One;
 				ImageSize = instance.ImageSize;
 				return true;
 			}
