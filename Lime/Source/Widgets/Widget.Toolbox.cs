@@ -11,27 +11,32 @@ namespace Lime
 		{
 			if (Width > 0 && Height > 0) {
 				texture.SetAsRenderTarget();
-				Viewport vp = Renderer.Viewport;
+				Viewport savedViewport = Renderer.Viewport;
 				Renderer.Viewport = new Viewport { X = 0, Y = 0, Width = texture.ImageSize.Width, Height = texture.ImageSize.Height };
 				Renderer.PushProjectionMatrix();
 				Renderer.SetOrthogonalProjection(0, Height, Width, 0);
 				
-				OpenTK.Graphics.OpenGL.GL.ClearColor(0, 0, 0, 0);
+				OpenTK.Graphics.OpenGL.GL.ClearColor(0, 1, 0, 0);
 				OpenTK.Graphics.OpenGL.GL.Clear(OpenTK.Graphics.OpenGL.ClearBufferMask.ColorBufferBit);
 
-				Renderer.DrawTextLine(new Vector2(30, 30), "XXXXXXXXXXXXXXXXXXXXXX");
+				Renderer.Blending = Lime.Blending.Alpha;
+				Renderer.Transform2 = Matrix32.Identity;
+				Renderer.Transform1 = Matrix32.Identity;
 
+				Renderer.DrawSprite(new SerializableTexture(""), Color4.Red, Vector2.Zero, new Vector2(50, 50), Vector2.Zero, new Vector2(0.1f, 0.1f));
+				//Renderer.DrawTextLine(new Vector2(30, 50), "XXXXXXXXXXXXXXXXXXXXXX");
+				
 				var savedTransform2 = Renderer.Transform2;
 				Renderer.Transform2 = globalMatrix.CalcInversed();
-				var chain = new RenderChain();
-				foreach (var node in Nodes) {
+				/*var chain = new RenderChain();
+				foreach (var node in Nodes) {	
 					node.AddToRenderChain(chain);
 				}
-				chain.RenderAndClear();
+				chain.RenderAndClear(); */
 				Renderer.Transform2 = savedTransform2;
 
 				texture.RestoreRenderTarget();
-				Renderer.Viewport = vp;
+				Renderer.Viewport = savedViewport;
 				Renderer.PopProjectionMatrix();
 			}
 		}
