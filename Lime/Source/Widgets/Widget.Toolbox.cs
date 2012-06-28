@@ -19,7 +19,9 @@ namespace Lime
 				var savedTransform2 = Renderer.Transform2;
 				Renderer.Transform2 = globalMatrix.CalcInversed();
 				var chain = new RenderChain();
-				AddToRenderChain(chain);
+                foreach (var node in Nodes) {
+                    node.AddToRenderChain(chain);
+                }
 				chain.RenderAndClear();
 				Renderer.Transform2 = savedTransform2;
 
