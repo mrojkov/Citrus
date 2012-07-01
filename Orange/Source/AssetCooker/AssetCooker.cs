@@ -89,7 +89,7 @@ namespace Orange
 					});
 					SyncUpdated(".ogg", ".sound", (srcPath, dstPath) => {
 						using (var stream = new FileStream(srcPath, FileMode.Open)) {
-							// 1Mb is criteria for conversion Ogg to Wav/Adpcm
+							// All sounds below 1mb size are converted from OGG to Wav/Adpcm
 							if (stream.Length > 1024 * 1024) {
 								assetsBundle.ImportFile(dstPath, stream, 0);
 							} else {
