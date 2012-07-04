@@ -38,6 +38,9 @@ namespace Orange
 			case "ACWidths":
 				fontChar.ACWidths = lexer.ParseVector2();
 				break;
+			case "TextureIndex":
+				fontChar.TextureIndex = lexer.ParseInt();
+				break;
 			default:
 				throw new Exception("Unknown property '{0}'. Parsing: {1}", name, fontChar);
 			}
@@ -113,6 +116,9 @@ namespace Orange
 					c.KerningPairs.Add(new KerningPair { Char = pair.B, Kerning = pair.Kerning });
 				}
 				lexer.ParseToken(']');
+				break;
+			case "About":
+				font.About = lexer.ParseQuotedString();
 				break;
 			default:
 				throw new Exception("Unknown property '{0}'. Parsing: {1}", name, font);

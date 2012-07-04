@@ -543,7 +543,7 @@ namespace Lime
 				}
 				position.X += scale * (fontChar.ACWidths.X + kerning);
 				Vector2 size = new Vector2(scale * fontChar.Width, fontHeight);
-				DrawSprite(font.Texture, color, position, size, fontChar.UV0, fontChar.UV1);
+				DrawSprite(font.Textures[fontChar.TextureIndex], color, position, size, fontChar.UV0, fontChar.UV1);
 				position.X += scale * (fontChar.Width + fontChar.ACWidths.Y + kerning);
 				prevChar = fontChar;
 			}

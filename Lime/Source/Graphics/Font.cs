@@ -11,9 +11,11 @@ namespace Lime
 		[ProtoMember(1)]
 		public float CharHeight;
 		[ProtoMember(2)]
-		public SerializableTexture Texture = new SerializableTexture();
+		public List<SerializableTexture> Textures = new List<SerializableTexture>();
 		[ProtoMember(3)]
 		public readonly FontCharCollection Chars = new FontCharCollection();
+		[ProtoMember(4)]
+		public string About;
 	}
 
 	[ProtoContract]
@@ -124,7 +126,8 @@ namespace Lime
 		public Vector2 ACWidths;
 		[ProtoMember(6)]
 		public List<KerningPair> KerningPairs;
-
+		[ProtoMember(7)]
+		public int TextureIndex;
 		public static FontChar Null = new FontChar();
 	}
 }

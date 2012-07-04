@@ -76,8 +76,15 @@ namespace Orange
 						}
 						var importer = new HotFontImporter(srcPath);
 						var font = importer.ParseFont(size);
-						var texturePath = Path.ChangeExtension(dstPath, null);
-						font.Texture = new Lime.SerializableTexture(texturePath);
+						for (int i = 0; ; i++) {
+							var texturePath = Path.ChangeExtension(dstPath, null);
+							string index = (i == 0) ? "" : i.ToString("00");
+							string texturePng = Path.Combine(Path.ChangeExtension(srcPath, null) + index + ".png");
+							if (!File.Exists(Path.Combine(texturePng))) {
+								break;
+							}
+							font.Textures.Add(new Lime.SerializableTexture(texturePath + index));
+						}
 						Lime.Serialization.WriteObjectToBundle<Lime.Font>(assetsBundle, dstPath, font);
 						return true;
 					});
