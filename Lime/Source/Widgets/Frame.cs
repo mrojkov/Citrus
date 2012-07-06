@@ -20,7 +20,6 @@ namespace Lime
 	}
 	
 	public delegate void UpdateDelegate(float delta);
-	public delegate void RenderDelegate();
 
 	public class KeyEventArgs : EventArgs 
 	{
@@ -37,7 +36,7 @@ namespace Lime
 		public UpdateDelegate AfterUpdate;
 		public UpdateDelegate BeforeLateUpdate;
 		public UpdateDelegate AfterLateUpdate;
-		public RenderDelegate OnRender;
+		public Event OnRender;
 
 		[ProtoMember(1)]
 		public RenderTarget RenderTarget {
@@ -177,6 +176,21 @@ namespace Lime
 				else
 					base.AddToRenderChain(chain);
 			}
+		}
+
+		public new static Frame Create(string path)
+		{
+			return Node.Create(path) as Frame;
+		}
+
+		public static Frame CreateAndPlay(Node parent, string path, string marker)
+		{
+			Frame frame = Frame.Create(path);
+			frame.PlayAnimation(marker);
+			if (parent != null) {
+				parent.Nodes.Insert(0, frame);
+			}
+			return frame;
 		}
 	}
 }

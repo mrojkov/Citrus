@@ -6,6 +6,8 @@ using System.ComponentModel;
 
 namespace Lime
 {
+	public delegate void Event();
+
 	[ProtoContract]
 	[ProtoInclude(101, typeof(Widget))]
 	[ProtoInclude(102, typeof(ParticleModifier))]
@@ -48,6 +50,8 @@ namespace Lime
 		public bool Playing;
 		public bool Stopped { get { return !Playing; } set { Playing = !value; } }
 
+		public Event OnStop;
+
 		private int animationTime;
 		[ProtoMember(10)]
 		public int AnimationTime {
@@ -87,11 +91,17 @@ namespace Lime
 						animationTime = Animator.FramesToMsecs(marker.Frame);
 						prevFrame = currFrame - 1;
 						Playing = false;
+						if (OnStop != null) {
+							OnStop();
+						}
 						break;
 					case MarkerAction.Destroy:
 						animationTime = Animator.FramesToMsecs(marker.Frame);
 						prevFrame = currFrame - 1;
 						Playing = false;
+						if (OnStop != null) {
+							OnStop();
+						}
 						Detach();
 						break;
 					}
@@ -115,8 +125,9 @@ namespace Lime
 		
 		static HashSet<string> processingFiles = new HashSet<string>();
 
-		public static Node CreateFromBundle(string path)
+		public static Node Create(string path)
 		{
+			path = Path.ChangeExtension(path, "scene");
 			if (processingFiles.Contains(path))
 				throw new Lime.Exception("Cyclic dependency of scenes has detected: {0}", path);
 			Node node;
@@ -283,7 +294,7 @@ namespace Lime
 			Nodes.Clear();
 			Markers.Clear();
 			if (AssetsBundle.Instance.FileExists(ContentsPath)) {
-				Node contents = Node.CreateFromBundle(ContentsPath);
+				Node contents = Node.Create(ContentsPath);
 				if (contents.Widget != null && Widget != null) {
 					contents.Update(0);
 					contents.Widget.Size = Widget.Size;
