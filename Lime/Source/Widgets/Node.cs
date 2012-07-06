@@ -102,7 +102,7 @@ namespace Lime
 						if (OnStop != null) {
 							OnStop();
 						}
-						Detach();
+						UnlinkAfterUpdate();
 						break;
 					}
 				}
@@ -222,16 +222,15 @@ namespace Lime
 			}
 			return r;
 		}
+
+		public void Unlink()
+		{
+			Parent.Nodes.Remove(this);
+		}
 		
-		public void Detach()
+		public void UnlinkAfterUpdate()
 		{
 			collectedNodes.Add(this);
-		}
-
-		[Obsolete("Use Detach() instead")]
-		public void Destroy()
-		{
-			Detach();
 		}
 
 		// Delta must be in[0..1000 / WidgetUtils.FramesPerSecond - 1] range
