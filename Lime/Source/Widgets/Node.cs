@@ -53,6 +53,7 @@ namespace Lime
 		public Event OnStop;
 
 		private int animationTime;
+
 		[ProtoMember(10)]
 		public int AnimationTime {
 			get { return animationTime; }
@@ -214,7 +215,7 @@ namespace Lime
 			return string.Format("{0}, {1}", GetType().Name, GetHierarchyPath());
 		}
 
-		string GetHierarchyPath()
+		private string GetHierarchyPath()
 		{
 			string r = string.IsNullOrEmpty(Id) ? String.Format("[{0}]", GetType().Name): Id;
 			if (Parent != null) {
@@ -267,9 +268,7 @@ namespace Lime
 			LateUpdate(delta);
 		}
 
-		public virtual void Render()
-		{
-		}
+		public virtual void Render() {}
 
 		public virtual void AddToRenderChain(RenderChain chain)
 		{
