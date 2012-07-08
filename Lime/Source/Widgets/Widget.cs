@@ -192,7 +192,7 @@ namespace Lime
 			UpdatedNodes++;
 			RecalcGlobalMatrixAndColorHelper();
 			if (globallyVisible) {
-				if (Playing) {
+				if (Running) {
 					AdvanceAnimation(delta);
 				}
 				foreach (Node node in Nodes.AsArray) {

@@ -20,7 +20,7 @@ namespace Lime
 	public class Node
 	{
 		public static int UpdatedNodes;
-		private static List<Node> collectedNodes = new List<Node>();
+		private static List<Node> nodesToUnlink = new List<Node>();
 		
 		[ProtoMember(1)]
 		public string Id { get; set; }
@@ -47,8 +47,8 @@ namespace Lime
 		public MarkerCollection Markers;
 
 		[ProtoMember(9)]
-		public bool Playing;
-		public bool Stopped { get { return !Playing; } set { Playing = !value; } }
+		public bool Running;
+		public bool Stopped { get { return !Running; } set { Running = !value; } }
 
 		public Event OnStop;
 
@@ -91,7 +91,7 @@ namespace Lime
 					case MarkerAction.Stop:
 						animationTime = Animator.FramesToMsecs(marker.Frame);
 						prevFrame = currFrame - 1;
-						Playing = false;
+						Running = false;
 						if (OnStop != null) {
 							OnStop();
 						}
@@ -99,7 +99,7 @@ namespace Lime
 					case MarkerAction.Destroy:
 						animationTime = Animator.FramesToMsecs(marker.Frame);
 						prevFrame = currFrame - 1;
-						Playing = false;
+						Running = false;
 						if (OnStop != null) {
 							OnStop();
 						}
@@ -124,26 +124,6 @@ namespace Lime
 			Nodes = new NodeCollection(this);
 		}
 		
-		static HashSet<string> processingFiles = new HashSet<string>();
-
-		public static Node Create(string path)
-		{
-			path = Path.ChangeExtension(path, "scene");
-			if (processingFiles.Contains(path))
-				throw new Lime.Exception("Cyclic dependency of scenes has detected: {0}", path);
-			Node node;
-			processingFiles.Add(path);
-			try {
-				using (Stream stream = AssetsBundle.Instance.OpenFileLocalized(path)) {
-					node = Serialization.ReadObject<Node>(path, stream);
-				}
-				node.LoadContents();
-			} finally {
-				processingFiles.Remove(path);
-			}
-			return node;
-		}
-
 		public Node GetRoot()
 		{
 			Node node = this;
@@ -161,7 +141,7 @@ namespace Lime
 			return false;
 		}
 
-		public bool PlayAnimation(string markerId)
+		public bool RunAnimation(string markerId)
 		{
 			Marker marker = Markers.Get(markerId);
 			if (marker == null) {
@@ -170,7 +150,7 @@ namespace Lime
 			}
 			AnimationFrame = marker.Frame;
 			CurrentAnimation = markerId;
-			Playing = true;
+			Running = true;
 			return true;
 		}
 
@@ -179,14 +159,14 @@ namespace Lime
 			set { AnimationTime = Animator.FramesToMsecs(value); }
 		}
 
-		static public void CleanupDeadNodes()
+		static public void UnlinkScheduledNodes()
 		{
-			foreach (Node node in collectedNodes) {
+			foreach (Node node in nodesToUnlink) {
 				if (node.Parent != null) {
 					node.Parent.Nodes.Remove(node);
 				}
 			}
-			collectedNodes.Clear();
+			nodesToUnlink.Clear();
 		}
 
 		/// <summary>
@@ -231,14 +211,14 @@ namespace Lime
 		
 		public void UnlinkAfterUpdate()
 		{
-			collectedNodes.Add(this);
+			nodesToUnlink.Add(this);
 		}
 
 		// Delta must be in[0..1000 / WidgetUtils.FramesPerSecond - 1] range
 		public virtual void Update(int delta)
 		{
 			UpdatedNodes++;
-			if (Playing) {
+			if (Running) {
 				AdvanceAnimation(delta);
 			}
 			foreach (Node node in Nodes.AsArray) {
@@ -277,42 +257,14 @@ namespace Lime
 			}
 		}
 
-		public void LoadContents()
-		{
-			if (!string.IsNullOrEmpty(ContentsPath))
-				LoadContentsHelper();
-			else {
-				foreach (Node node in Nodes.AsArray)
-					node.LoadContents();
-			}
-		}
-
-		void LoadContentsHelper()
-		{
-			Nodes.Clear();
-			Markers.Clear();
-			if (AssetsBundle.Instance.FileExists(ContentsPath)) {
-				Node contents = Node.Create(ContentsPath);
-				if (contents.Widget != null && Widget != null) {
-					contents.Update(0);
-					contents.Widget.Size = Widget.Size;
-					contents.Update(0);
-				}
-				foreach (Marker marker in contents.Markers)
-					Markers.Add(marker);
-				foreach (Node node in contents.Nodes.AsArray)
-					Nodes.Add(node);
-			}
-		}
-
 		protected internal virtual void OnTrigger(string property)
 		{
 			if (property == "Trigger") {
 				if (String.IsNullOrEmpty(Trigger)) {
 					AnimationTime = 0;
-					Playing = true;
+					Running = true;
 				} else {
-					PlayAnimation(Trigger);
+					RunAnimation(Trigger);
 				}
 			}
 		}

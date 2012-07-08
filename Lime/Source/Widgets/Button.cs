@@ -25,25 +25,25 @@ namespace Lime
 			}
 			if (HitTest(Input.MousePosition)) {
 				if (RootFrame.Instance.ActiveWidget == null) {
-					PlayAnimation("Focus");
+					RunAnimation("Focus");
 					RootFrame.Instance.ActiveWidget = this;
 				}
 			} else {
 				if (RootFrame.Instance.ActiveWidget == this) {
-					PlayAnimation("Normal");
+					RunAnimation("Normal");
 					RootFrame.Instance.ActiveWidget = null;
 				}
 			}
 			if (RootFrame.Instance.ActiveWidget == this) {
 				if (Input.WasKeyPressed(Key.Mouse0)) {
-					PlayAnimation("Press");
+					RunAnimation("Press");
 					Input.ConsumeKeyEvent(Key.Mouse0, true);
 				}
 				if (Input.WasKeyReleased(Key.Mouse0)) {
 					if (HitTest(Input.MousePosition))
-						PlayAnimation("Focus");
+						RunAnimation("Focus");
 					else
-						PlayAnimation("Normal");
+						RunAnimation("Normal");
 					Input.ConsumeKeyEvent(Key.Mouse0, true);
 					if (OnClick != null) {
 						OnClick(this);
@@ -51,7 +51,7 @@ namespace Lime
 				}
 			}
 			if (RootFrame.Instance.ActiveWidget != this && CurrentAnimation != "Normal") {
-				PlayAnimation("Normal");
+				RunAnimation("Normal");
 			}
 			if (RootFrame.Instance.ActiveWidget == this) {
 				RootFrame.Instance.ActiveWidgetUpdated = true;

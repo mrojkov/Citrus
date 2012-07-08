@@ -40,12 +40,12 @@ namespace Lime
 			if (thumb != null) {
 				if (thumb.HitTest(Input.MousePosition) && Input.WasKeyPressed(Key.Mouse0)) {
 					if (RootFrame.Instance.ActiveWidget == null) {
-						thumb.PlayAnimation("Focus");
+						thumb.RunAnimation("Focus");
 						RootFrame.Instance.ActiveWidget = this;
 					}
 				} else {
 					if (RootFrame.Instance.ActiveWidget == this && !Input.IsKeyPressed(Key.Mouse0)) {
-						thumb.PlayAnimation("Normal");
+						thumb.RunAnimation("Normal");
 						RootFrame.Instance.ActiveWidget = null;
 					}
 				}
@@ -74,7 +74,7 @@ namespace Lime
 				}
 			}
 			if (RootFrame.Instance.ActiveWidget != this && thumb.CurrentAnimation != "Normal") {
-				thumb.PlayAnimation("Normal");
+				thumb.RunAnimation("Normal");
 			}
 			if (RootFrame.Instance.ActiveWidget == this) {
 				RootFrame.Instance.ActiveWidgetUpdated = true;
