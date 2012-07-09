@@ -15,7 +15,7 @@ namespace Lime
 
 		public override void Update(int delta)
 		{
-			if ((time -= delta * 0.001f) < 0) {
+			if ((time -= delta * 0.001f) <= 0) {
 				evt();
 				Unlink();
 			}
