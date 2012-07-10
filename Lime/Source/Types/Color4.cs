@@ -74,7 +74,7 @@ namespace Lime
 			return color;
 		}
 
-		public static Color4 Lerp(Color4 a, Color4 b, float t)
+		public static Color4 Lerp(float t, Color4 a, Color4 b)
 		{
 			if (a.ABGR == b.ABGR)
 				return a;

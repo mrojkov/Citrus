@@ -68,7 +68,7 @@ namespace Lime
 			return (float)Math.Pow(x, y);
 		}
 
-		public static float Lerp(float a, float b, float t)
+		public static float Lerp(float t, float a, float b)
 		{
 			return a + (b - a) * t;
 		}

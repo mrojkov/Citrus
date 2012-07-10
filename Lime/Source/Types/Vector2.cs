@@ -42,7 +42,12 @@ namespace Lime
 			return X == rhs.X && Y == rhs.Y;
 		}
 
-		public static Vector2 Lerp(Vector2 a, Vector2 b, float t)
+		public bool IsWithin(float radius)
+		{
+			return SquaredLength < radius * radius;
+		}
+
+		public static Vector2 Lerp(float t, Vector2 a, Vector2 b)
 		{
 			Vector2 r = new Vector2();
 			r.X = (b.X - a.X) * t + a.X;

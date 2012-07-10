@@ -32,7 +32,7 @@ namespace Lime
 			return X == rhs.X && Y == rhs.Y && Z == rhs.Z;
 		}
 
-		public static Vector3 Lerp(Vector3 a, Vector3 b, float t)
+		public static Vector3 Lerp(float t, Vector3 a, Vector3 b)
 		{
 			Vector3 r = new Vector3();
 			r.X = (b.X - a.X) * t + a.X;

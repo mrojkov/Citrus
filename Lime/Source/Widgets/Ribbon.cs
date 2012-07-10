@@ -78,8 +78,8 @@ namespace Lime
 					Vector2 d = (b.Position - a.Position) / l;
 					float t0 = smoothAmount / l;
 					float t1 = 1 - t0;
-					result.Add(Vertex.Lerp(a, b, t0));
-					result.Add(Vertex.Lerp(a, b, t1));
+					result.Add(Vertex.Lerp(t0, a, b));
+					result.Add(Vertex.Lerp(t1, a, b));
 				} else {
 					result.Add(a);
 				}
@@ -117,12 +117,12 @@ namespace Lime
 			public float TextureU;
 			public Color4 Color;
 
-			public static Vertex Lerp(Vertex a, Vertex b, float t)
+			public static Vertex Lerp(float t, Vertex a, Vertex b)
 			{
 				Vertex result;
-				result.Position = Vector2.Lerp(a.Position, b.Position, t);
-				result.Color = Color4.Lerp(a.Color, b.Color, t);
-				result.TextureU = MathLib.Lerp(a.TextureU, b.TextureU, t);
+				result.Position = Vector2.Lerp(t, a.Position, b.Position);
+				result.Color = Color4.Lerp(t, a.Color, b.Color);
+				result.TextureU = MathLib.Lerp(t, a.TextureU, b.TextureU);
 				return result;
 			}
 		}

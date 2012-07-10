@@ -313,7 +313,7 @@ namespace Lime
 		
 		protected override void ApplyValue(float t, int a, int b)
 		{
-			Setter(Vector2.Lerp(values[a], values[b], t));
+			Setter(Vector2.Lerp(t, values[a], values[b]));
 		}
 
 		protected override void ApplyValue(float t, int a, int b, int c, int d)
@@ -377,7 +377,7 @@ namespace Lime
 
 		protected override void ApplyValue(float t, int a, int b)
 		{
-			Setter(Color4.Lerp(values[a], values[b], t));
+			Setter(Color4.Lerp(t, values[a], values[b]));
 		}
 	}
 }
