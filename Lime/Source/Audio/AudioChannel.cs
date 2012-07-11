@@ -125,7 +125,7 @@ namespace Lime
 			get { return volume; }
 			set
 			{
-				volume = MathLib.Clamp(value, 0, 1);
+				volume = Mathf.Clamp(value, 0, 1);
 				float gain = volume * AudioSystem.GetGroupVolume(Group);
 				AL.Source(source, ALSourcef.Gain, gain);
 				AudioSystem.CheckError();

@@ -122,7 +122,7 @@ namespace Lime
 				Vertex result;
 				result.Position = Vector2.Lerp(t, a.Position, b.Position);
 				result.Color = Color4.Lerp(t, a.Color, b.Color);
-				result.TextureU = MathLib.Lerp(t, a.TextureU, b.TextureU);
+				result.TextureU = Mathf.Lerp(t, a.TextureU, b.TextureU);
 				return result;
 			}
 		}

@@ -318,7 +318,7 @@ namespace Lime
 
 		protected override void ApplyValue(float t, int a, int b, int c, int d)
 		{
-			Setter(MathLib.CatmullRomSpline(t, values[a], values[b], values[c], values[d]));
+			Setter(Mathf.CatmullRomSpline(t, values[a], values[b], values[c], values[d]));
 		}
 	}
 
@@ -351,7 +351,7 @@ namespace Lime
 
 		protected override void ApplyValue(float t, int a, int b, int c, int d)
 		{
-			Setter(MathLib.CatmullRomSpline(t, values[a], values[b], values[c], values[d]));
+			Setter(Mathf.CatmullRomSpline(t, values[a], values[b], values[c], values[d]));
 		}
 	}
 	

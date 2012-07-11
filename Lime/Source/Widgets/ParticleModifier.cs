@@ -108,7 +108,7 @@ namespace Lime
 			}
 			if (textures.Count == 0)
 				return texture;
-			index = MathLib.Clamp(index, 0, textures.Count - 1);
+			index = Mathf.Clamp(index, 0, textures.Count - 1);
 			return textures[index];
 		}
 	}

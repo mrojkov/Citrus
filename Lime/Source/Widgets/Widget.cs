@@ -68,7 +68,7 @@ namespace Lime
 			}
 			set {
 				rotation = value;
-				direction = MathLib.CosSin(MathLib.DegreesToRadians * value);
+				direction = Mathf.CosSin(Mathf.DegreesToRadians * value);
 			}
 		}
 

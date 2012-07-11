@@ -490,7 +490,7 @@ namespace Lime
 			if (crossProduct < 0.0f)
 				emitterScale.Y = -emitterScale.Y;
 			emitterScaleAmount = (float)Math.Sqrt(Math.Abs(crossProduct));
-			float emitterAngle = transform.U.Atan2 * MathLib.RadiansToDegrees;
+			float emitterAngle = transform.U.Atan2 * Mathf.RadiansToDegrees;
 
 			NumericRange aspectRatioVariationPair = new NumericRange(0, Math.Max(0.0f, AspectRatio.Dispersion));
 			float zoom = Zoom.NormalRandomNumber();
@@ -531,19 +531,19 @@ namespace Lime
 				p.RegularDirection = Direction.UniformRandomNumber() + emitterAngle - 90.0f;
 				break;
 			case EmitterShape.Line:
-				position = new Vector2(MathLib.Random() * Size.X, Size.Y * 0.5f);
+				position = new Vector2(Mathf.Random() * Size.X, Size.Y * 0.5f);
 				p.RegularDirection = Direction.UniformRandomNumber() + emitterAngle - 90.0f;
 				break;
 			case EmitterShape.Ellipse: {
-					float angle = MathLib.Random() * 2 * MathLib.Pi;
+					float angle = Mathf.Random() * 2 * Mathf.Pi;
 					Vector2 sincos = Vector2.Heading(angle);
 					position = 0.5f * Vector2.Scale((sincos + Vector2.One), Size);
 					p.RegularDirection = Direction.UniformRandomNumber() + emitterAngle - 90 + angle;
 				}
 				break;
 			case EmitterShape.Area:
-				position.X = MathLib.Random() * Size.X;
-				position.Y = MathLib.Random() * Size.Y;
+				position.X = Mathf.Random() * Size.X;
+				position.Y = Mathf.Random() * Size.Y;
 				p.RegularDirection = Direction.UniformRandomNumber() + emitterAngle - 90.0f;
 				break;
 			default:
@@ -554,7 +554,7 @@ namespace Lime
 			p.ModifierIndex = -1;
 			p.Modifier = null;
 			for (int counter = 0; counter < 10; counter++) {
-				int i = MathLib.Random(Nodes.Count);
+				int i = Mathf.Random(Nodes.Count);
 				p.Modifier = Nodes[i] as ParticleModifier;
 				if (p.Modifier != null) {
 					p.ModifierIndex = i;
@@ -570,7 +570,7 @@ namespace Lime
 			if (EmissionType == EmissionType.Inner)
 				p.RegularDirection += 180;
 			else if ((EmissionType & EmissionType.Inner) != 0) {
-				if (MathLib.Random(2) == 0)
+				if (Mathf.Random(2) == 0)
 					p.RegularDirection += 180;
 			} else if (EmissionType == 0)
 				return false;
@@ -664,7 +664,7 @@ namespace Lime
 					p.RandomSplineVertex2 = p.RandomSplineVertex3;
 					p.RandomSplineVertex3 = GenerateRandomMotionControlPoint(ref p.RandomRayDirection);
 				}
-				positionOnSpline = MathLib.CatmullRomSpline(p.RandomSplineOffset,
+				positionOnSpline = Mathf.CatmullRomSpline(p.RandomSplineOffset,
 					p.RandomSplineVertex0, p.RandomSplineVertex1,
 					p.RandomSplineVertex2, p.RandomSplineVertex3);
 			}
@@ -675,7 +675,7 @@ namespace Lime
 			if (AlongPathOrientation) {
 				Vector2 deltaPos = p.FullPosition - previousPosition;
 				if (deltaPos.SquaredLength > 0.00001f)
-					p.FullDirection = deltaPos.Atan2 * MathLib.RadiansToDegrees;
+					p.FullDirection = deltaPos.Atan2 * Mathf.RadiansToDegrees;
 			}
 			return true;
 		}

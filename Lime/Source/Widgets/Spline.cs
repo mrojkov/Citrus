@@ -53,13 +53,13 @@ namespace Lime
 				Vector2 p1 = v1.Position * Size;
 				Vector2 p2 = v2.Position * Size;
 				float len = (p2 - p1).Length;
-				float ta1 = v1.TangentAngle * MathLib.DegreesToRadians;
-				float ta2 = v2.TangentAngle * MathLib.DegreesToRadians;
-				Vector2 t1 = MathLib.CosSin(ta1);
-				Vector2 t2 = MathLib.CosSin(ta2);
+				float ta1 = v1.TangentAngle * Mathf.DegreesToRadians;
+				float ta2 = v2.TangentAngle * Mathf.DegreesToRadians;
+				Vector2 t1 = Mathf.CosSin(ta1);
+				Vector2 t2 = Mathf.CosSin(ta2);
 				t1 *= len * v1.TangentWeight;
 				t2 *= len * v2.TangentWeight;
-				return MathLib.HermiteSpline( t, p1, t1, p2, t2 );
+				return Mathf.HermiteSpline( t, p1, t1, p2, t2 );
 			} else {
 				Vector2 p1 = v1.Position * Size;
 				Vector2 p2 = v2.Position * Size;
@@ -126,7 +126,7 @@ namespace Lime
 			}
 			Vector2 direction = v / len;
 			float f = Vector2.DotProduct(direction, point - a);
-			offset = MathLib.Clamp(f / len, 0, 1);
+			offset = Mathf.Clamp(f / len, 0, 1);
 			Vector2 projectedPoint = a + offset * v;
 			minDistance = (projectedPoint - point).Length;
 			return true;

@@ -21,12 +21,12 @@ namespace Lime
 
 		public float NormalRandomNumber()
 		{
-			return MathLib.NormalRandom(Median, Dispersion);
+			return Mathf.NormalRandom(Median, Dispersion);
 		}
 
 		public float UniformRandomNumber()
 		{
-			return MathLib.UniformRandom(Median, Dispersion);
+			return Mathf.UniformRandom(Median, Dispersion);
 		}
 
 		bool IEquatable<NumericRange>.Equals(NumericRange rhs)

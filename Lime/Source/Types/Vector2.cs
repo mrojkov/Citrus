@@ -42,7 +42,7 @@ namespace Lime
 			return X == rhs.X && Y == rhs.Y;
 		}
 
-		public bool IsWithin(float radius)
+		public bool IsShorterThan(float radius)
 		{
 			return SquaredLength < radius * radius;
 		}
@@ -122,12 +122,12 @@ namespace Lime
 
 		public static Vector2 Heading(float angle)
 		{
-			return MathLib.CosSin(angle);
+			return Mathf.CosSin(angle);
 		}
 
 		public static Vector2 HeadingDegrees(float angle)
 		{
-			return MathLib.CosSin(angle * MathLib.DegreesToRadians);
+			return Mathf.CosSin(angle * Mathf.DegreesToRadians);
 		}
 
 		public static Vector2 Rotate(Vector2 value, float angle)
@@ -137,7 +137,7 @@ namespace Lime
 
 		public Vector2 Rotate(float angle)
 		{
-			Vector2 cs = MathLib.CosSin(angle);
+			Vector2 cs = Mathf.CosSin(angle);
 			Vector2 result;
 			result.X = X * cs.X - Y * cs.Y;
 			result.Y = X * cs.Y + Y * cs.X;
@@ -146,12 +146,12 @@ namespace Lime
 
 		public static Vector2 RotateDegrees(Vector2 value, float angle)
 		{
-			return Rotate(value, angle * MathLib.DegreesToRadians);
+			return Rotate(value, angle * Mathf.DegreesToRadians);
 		}
 
 		public Vector2 RotateDegrees(float angle)
 		{
-			return Rotate(angle * MathLib.DegreesToRadians);
+			return Rotate(angle * Mathf.DegreesToRadians);
 		}
 
 		public float Atan2
@@ -161,7 +161,7 @@ namespace Lime
 
 		public float Atan2Degrees
 		{
-			get { return (float)Math.Atan2(Y, X) * MathLib.RadiansToDegrees; }
+			get { return (float)Math.Atan2(Y, X) * Mathf.RadiansToDegrees; }
 		}
 
 		public float Length

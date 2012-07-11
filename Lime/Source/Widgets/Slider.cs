@@ -17,7 +17,7 @@ namespace Lime
 		[ProtoMember(3)]
 		public float Value
 		{
-			get { return MathLib.Clamp(value, RangeMin, RangeMax); }
+			get { return Mathf.Clamp(value, RangeMin, RangeMax); }
 			set { this.value = value; }
 		}
 
