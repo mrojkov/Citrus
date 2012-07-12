@@ -108,8 +108,6 @@ namespace Lime
 
 		public Basis CalcBasisInSpaceOf(Widget container)
 		{
-			container.RecalcGlobalMatrixAndColor();
-			RecalcGlobalMatrixAndColor();
 			var v1 = new Vector2(1, 0);
 			var v2 = new Vector2(0, 1);
 			var v3 = new Vector2(0, 0);

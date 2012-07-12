@@ -163,7 +163,7 @@ namespace Lime
 
 		public void RecalcGlobalMatrixAndColor()
 		{
-			if (Parent != null && Parent.Widget != null) {
+			if (Parent != null) {
 				Parent.Widget.RecalcGlobalMatrixAndColor();
 			}
 			RecalcGlobalMatrixAndColorHelper();
