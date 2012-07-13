@@ -194,6 +194,7 @@ namespace Lime
 					frame = Serialization.ReadObject<Frame>(path, stream);
 				}
 				frame.LoadContent();
+				frame.Tag = path;
 			} finally {
 				processingFiles.Remove(path);
 			}
@@ -233,12 +234,16 @@ namespace Lime
 
 		public static Frame CreateSubframe(string path)
 		{
-			return Create(path).Nodes[0] as Frame;
+			var frame = Create(path).Nodes[0] as Frame;
+			frame.Parent = null;
+			frame.Tag = path;
+			return frame;
 		}
 
 		public static Frame CreateAndRun(Node parent, string path, string marker = null)
 		{
 			Frame frame = Create(path);
+			frame.Tag = path;
 			if (marker == null) {
 				frame.Running = true;
 			} else {
@@ -253,6 +258,8 @@ namespace Lime
 		public static Frame CreateSubframeAndRun(Node parent, string path, string marker = null)
 		{
 			Frame frame = Frame.Create(path).Nodes[0] as Frame;
+			frame.Parent = null;
+			frame.Tag = path;
 			if (marker == null) {
 				frame.Running = true;
 			} else {

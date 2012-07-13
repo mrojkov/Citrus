@@ -97,6 +97,9 @@ namespace Lime
 
 		public void Add(Node node)
 		{
+			if (node.Parent != null) {
+				throw new Lime.Exception("Node can be added to one collection only");
+			}
 			nodeArray = null;
 			if (nodeList == emptyList) {
 				nodeList = new List<Node>();

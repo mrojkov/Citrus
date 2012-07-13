@@ -184,6 +184,7 @@ namespace Lime
 		public virtual Node DeepCloneFast()
 		{
 			Node clone = (Node)MemberwiseClone();
+			clone.Parent = null;
 			clone.Widget = clone as Widget;
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Nodes = NodeCollection.DeepClone(clone, Nodes);
@@ -197,7 +198,10 @@ namespace Lime
 
 		private string GetHierarchyPath()
 		{
-			string r = string.IsNullOrEmpty(Id) ? String.Format("[{0}]", GetType().Name): Id;
+			string r = string.IsNullOrEmpty(Id) ? String.Format("[{0}]", GetType().Name) : Id;
+			if (!string.IsNullOrEmpty(Tag)) {
+				r += string.Format(" ({0})", Tag);
+			}
 			if (Parent != null) {
 				r = Parent.GetHierarchyPath() + "/" + r;
 			}
