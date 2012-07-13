@@ -100,6 +100,9 @@ namespace Orange
 					case "Life":
 						propertyName = "Lifetime";
 						break;
+					case "FontSize":
+						propertyName = "FontHeight";
+						break;
 					}
 					switch(propertyName + '@' + className) {
 					case "TextColor@Hot::Text":

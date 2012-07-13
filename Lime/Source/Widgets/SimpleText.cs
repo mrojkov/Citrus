@@ -7,22 +7,29 @@ namespace Lime
 	public class SimpleText : Widget
 	{
 		[ProtoMember(1)]
-		public SerializableFont Font = new SerializableFont();
+		public SerializableFont Font { get; set; }
 
 		[ProtoMember(2)]
-		public string Text = "";
+		public string Text { get; set; }
 
 		[ProtoMember(3)]
-		public float FontHeight = 15;
+		public float FontHeight { get; set; }
 
 		[ProtoMember(4)]
-		public float Spacing = 0;
+		public float Spacing { get; set; }
 
 		[ProtoMember(5)]
-		public HAlignment HAlignment;
+		public HAlignment HAlignment { get; set; }
 
 		[ProtoMember(6)]
-		public VAlignment VAlignment;
+		public VAlignment VAlignment { get; set; }
+
+		public SimpleText()
+		{
+			Text = "";
+			FontHeight = 15;
+			Font = new SerializableFont();
+		}
 
 		public override void Render()
 		{

@@ -35,9 +35,11 @@ namespace Lime
 		public Animator this[string propertyName]
 		{
 			get {
-				foreach (Animator a in animators)
-					if (a.TargetProperty == propertyName)
+				foreach (Animator a in animators) {
+					if (a.TargetProperty == propertyName) {
 						return a;
+					}
+				}
 				PropertyInfo pi = owner.GetType().GetProperty(propertyName);
 				if (pi == null) {
 					throw new Lime.Exception("Unknown property {0} in {1}", propertyName, owner.GetType().Name);
