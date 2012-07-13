@@ -71,7 +71,7 @@ namespace Lime
 		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (Enabled) {
-				chain.Add(this);
+				chain.Add(this, Layer);
 			}
 		}
 
