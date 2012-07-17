@@ -15,6 +15,12 @@ namespace Lime
 			set { Channel.Volume = value; }
 		}
 
+		public float Pitch
+		{
+			get { return Channel.Pitch; }
+			set { Channel.Pitch = value; }
+		}
+
 		public float Pan
 		{
 			get { return Channel.Pan; }

@@ -183,6 +183,16 @@ namespace Lime
 			return new Sound();
 		}
 
+		public static Sound LoadEffect(string path, bool looping = false, int priority = 0)
+		{
+			return LoadSound(path, AudioChannelGroup.Effects, looping, priority);
+		}
+
+		public static Sound LoadMusic(string path, bool looping = false, int priority = 0)
+		{
+			return LoadSound(path, AudioChannelGroup.Music, looping, priority);
+		}
+
 		public static Sound Play(string path, AudioChannelGroup group, bool looping = false, int priority = 0)
 		{
 			var sound = LoadSound(path, group, looping, priority);

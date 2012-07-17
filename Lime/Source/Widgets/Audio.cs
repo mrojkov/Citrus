@@ -28,7 +28,7 @@ namespace Lime
 		[ProtoMember(3)]
 		public float FadeTime { get; set; }
 
-		float volume = 1;
+		private float volume = 1;
 		[ProtoMember(4)]
 		public float Volume
 		{
@@ -40,7 +40,7 @@ namespace Lime
 			}
 		}
 
-		float pan = 0;
+		private float pan = 0;
 		[ProtoMember(5)]
 		public float Pan
 		{
@@ -49,6 +49,18 @@ namespace Lime
 			{
 				pan = value;
 				sound.Pan = pan;
+			}
+		}
+
+		private float pitch = 0;
+		[ProtoMember(9)]
+		public float Pitch
+		{
+			get { return pitch; }
+			set
+			{
+				pitch = value;
+				sound.Pitch = pitch;
 			}
 		}
 
@@ -66,6 +78,7 @@ namespace Lime
 			sound = Sample.Play(Group, true, Looping, Priority);
 			sound.Volume = Volume;
 			sound.Pan = Pan;
+			sound.Pitch = Pitch;
 			sound.Resume();
 		}
 

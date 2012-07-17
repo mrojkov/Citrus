@@ -12,6 +12,7 @@ namespace Lime
 		void Resume();
 		void Stop();
 		float Volume { get; set; }
+		float Pitch { get; set; }
 	}
 
 	public class NullAudioChannel : IAudioChannel
@@ -24,6 +25,7 @@ namespace Lime
 		public void Resume() {}
 		public void Stop() {}
 		public float Volume { get { return 0; } set { } }
+		public float Pitch { get { return 1; } set { } }
 	}
 
 	internal class AudioChannel : IDisposable, IAudioChannel
@@ -36,15 +38,16 @@ namespace Lime
 		public DateTime StartupTime;
 		public int Id;
 
-		object streamingSync = new object();
+		private object streamingSync = new object();
 		public volatile bool streaming;
 
-		int source;
-		float volume = 1;
-		int[] buffers;
-		int queueHead;
-		int queueLength;
-		bool looping;
+		private int source;
+		private float volume = 1;
+		private float pitch = 1;
+		private int[] buffers;
+		private int queueHead;
+		private int queueLength;
+		private bool looping;
 
 		Sound sound;
 		internal IAudioDecoder decoder;
@@ -116,6 +119,16 @@ namespace Lime
 			lock (streamingSync) {
 				streaming = false;
 				AL.SourceStop(source);
+				AudioSystem.CheckError();
+			}
+		}
+
+		public float Pitch
+		{
+			get { return pitch; }
+			set {
+				pitch = value;
+				AL.Source(source, ALSourcef.Pitch, pitch);
 				AudioSystem.CheckError();
 			}
 		}
