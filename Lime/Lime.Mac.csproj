@@ -121,9 +121,12 @@
     <Compile Include="Source\Types\Vector3.cs" />
     <Compile Include="Source\Profiler.cs" />
     <Compile Include="Source\Environment.cs" />
-    <Compile Include="Source\MathLib.cs" />
     <Compile Include="Source\Widgets\TextBox.cs" />
     <Compile Include="Source\Application\Application.cs" />
+    <Compile Include="Source\Mathf.cs" />
+    <Compile Include="Source\Widgets\Ribbon.cs" />
+    <Compile Include="Source\Widgets\TimeWaiter.cs" />
+    <Compile Include="Source\Widgets\Widget.Toolbox.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Audio\ADPCMEncoder.c">

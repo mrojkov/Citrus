@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using OpenTK.Graphics.OpenGL;
 
 namespace Lime
 {
@@ -12,22 +11,20 @@ namespace Lime
 		{
 			if (Width > 0 && Height > 0) {
 				texture.SetAsRenderTarget();
+
 				Renderer.ClearRenderTarget(0, 0, 0, 0);
 				Viewport savedViewport = Renderer.Viewport;
 				Renderer.Viewport = new Viewport { X = 0, Y = 0, Width = texture.ImageSize.Width, Height = texture.ImageSize.Height };
 				Renderer.PushProjectionMatrix();
 				Renderer.SetOrthogonalProjection(0, Height, Width, 0);
-			
-				//var savedTransform2 = Renderer.Transform2;
-				//Renderer.Transform2 = globalMatrix.CalcInversed();
 				var chain = new RenderChain();
 				foreach (var node in Nodes) {	
 					node.AddToRenderChain(chain);
 				}
 				chain.RenderAndClear();
-				//Renderer.Transform2 = savedTransform2;
 
 				texture.RestoreRenderTarget();
+
 				Renderer.Viewport = savedViewport;
 				Renderer.PopProjectionMatrix();
 			}

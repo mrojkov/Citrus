@@ -128,8 +128,8 @@ namespace Lime
 			get { return pitch; }
 			set {
 				pitch = value;
-				AL.Source(source, ALSourcef.Pitch, pitch);
-				AudioSystem.CheckError();
+				//AL.Source(source, ALSourcef.Pitch, pitch);
+				//AudioSystem.CheckError();
 			}
 		}
 

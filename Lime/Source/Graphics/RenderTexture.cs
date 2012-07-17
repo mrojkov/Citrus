@@ -17,12 +17,32 @@ namespace Lime
 		Size size = new Size(0, 0);
 		Rectangle uvRect;
 
+#if GLES11
+		static int defaultFramebuffer = -1;
+#endif
+
 		public RenderTexture(int width, int height)
 		{
-#if MAC || WIN
 			size.Width = width;
 			size.Height = height;
 			uvRect = new Rectangle(0, 0, 1, 1);
+#if GLES11
+			if (defaultFramebuffer < 0) {
+				GL.GetInteger(All.FramebufferBinding, ref defaultFramebuffer);
+			}
+			GL.GenFramebuffers(1, ref framebuffer);
+			GL.GenTextures(1, ref id);
+			GL.BindTexture(All.Texture2D, id);
+			GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)All.Linear);
+			GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
+			GL.TexImage2D(All.Texture2D, 0, (int)All.Rgba, width, height, 0,
+				All.Bgra, All.UnsignedByte, (IntPtr)null);
+			GL.BindFramebuffer(All.Framebuffer, framebuffer);
+			GL.FramebufferTexture2D(All.Framebuffer, All.ColorAttachment0, All.Texture2D, id, 0);
+			if (GL.CheckFramebufferStatus(All.Framebuffer) != All.FramebufferComplete)
+				throw new Exception("Failed to create render texture. Framebuffer is incomplete.");
+			GL.BindFramebuffer(All.Framebuffer, defaultFramebuffer);
+#else
 			GL.GenFramebuffers(1, out framebuffer);
 			id = (uint)GL.GenTexture();
 			GL.BindTexture(TextureTarget.Texture2D, id);
@@ -37,6 +57,7 @@ namespace Lime
 				throw new Exception("Failed to create render texture. Framebuffer is incomplete.");
 			GL.BindFramebuffer(FramebufferTarget.FramebufferExt, 0);
 #endif
+			Renderer.CheckErrors();
 		}
 
 		public Size ImageSize {
@@ -53,14 +74,12 @@ namespace Lime
 		
 		public void Dispose()
 		{
-#if MAC || WIN
 			if (id != 0) {
 				lock (PlainTexture.TexturesToDelete) {
 					PlainTexture.TexturesToDelete.Add(id);
 				}
 				id = 0;
 			}
-#endif
 		}
 
 		~RenderTexture()
@@ -96,7 +115,7 @@ namespace Lime
 		{
 			Renderer.FlushSpriteBatch();
 #if iOS
-			GL.BindFramebuffer(All.Framebuffer, 0);
+			GL.BindFramebuffer(All.Framebuffer, defaultFramebuffer);
 #else
 			GL.BindFramebuffer(FramebufferTarget.FramebufferExt, 0);
 #endif
