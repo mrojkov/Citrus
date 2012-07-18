@@ -18,7 +18,7 @@ namespace Lime
 				Renderer.PushProjectionMatrix();
 				Renderer.SetOrthogonalProjection(0, Height, Width, 0);
 				var chain = new RenderChain();
-				foreach (var node in Nodes) {	
+				foreach (var node in Nodes) {
 					node.AddToRenderChain(chain);
 				}
 				chain.RenderAndClear();
@@ -121,6 +121,11 @@ namespace Lime
 			basis.U = v1;
 			basis.V = v2;
 			return basis;
+		}
+
+		public Vector2 CalcPositionInSpaceOf(Widget container)
+		{
+			return CalcBasisInSpaceOf(container).Position;
 		}
 	}
 }
