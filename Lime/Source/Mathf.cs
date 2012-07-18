@@ -131,7 +131,7 @@ namespace Lime
 		{
 			int segCount = points.Length - 3;
 			if (segCount < 1) {
-				throw new System.ArgumentException("Not enough spline knots");
+				throw new System.ArgumentException("At least 4 knots must be given");
 			}
 			while (t < 0) { t++; }
 			while (t >= 1) { t--; }

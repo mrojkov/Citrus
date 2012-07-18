@@ -72,6 +72,13 @@ namespace Lime
 		// If dialog is being shown or hidden then all controls on dialog are frozen either.
 		public bool DialogMode;
 
+		public Frame() {}
+
+		public Frame(Vector2 position)
+		{
+			this.Position = position;
+		}
+
 		void IImageCombinerArg.BypassRendering() {}
 
 		ITexture IImageCombinerArg.GetTexture()
@@ -79,7 +86,7 @@ namespace Lime
 			return renderTexture;
 		}
 
-		void UpdateForDialogMode(int delta)
+		private void UpdateForDialogMode(int delta)
 		{
 			if (globallyVisible && Input.MouseVisible) {
 				if (RootFrame.Instance.ActiveWidget != null && !RootFrame.Instance.ActiveWidget.ChildOf(this)) {
@@ -123,7 +130,7 @@ namespace Lime
 			}
 		}
 
-		void UpdateHelper(int delta)
+		private void UpdateHelper(int delta)
 		{
 			if (DialogMode) {
 				UpdateForDialogMode(delta);
@@ -150,7 +157,7 @@ namespace Lime
 			}
 		}
 
-		int MultiplyDeltaByAnimationSpeed(int delta)
+		private int MultiplyDeltaByAnimationSpeed(int delta)
 		{
 			delta = (int)(delta * AnimationSpeed);
 			if (delta < 0) {
@@ -214,7 +221,7 @@ namespace Lime
 			}
 		}
 
-		void LoadContentHelper()
+		private void LoadContentHelper()
 		{
 			Nodes.Clear();
 			Markers.Clear();
