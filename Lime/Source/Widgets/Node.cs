@@ -301,6 +301,16 @@ namespace Lime
 			return Find<SimpleText>(id, throwException);
 		}
 
+		public void AddNode(Node node)
+		{
+			Nodes.Add(node);
+		}
+
+		public void AddToNode(Node node)
+		{
+			node.Nodes.Add(this);
+		}
+
 		public Node Find(string id, bool throwException = true)
 		{
 			if (id.IndexOf('/') >= 0) {

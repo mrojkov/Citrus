@@ -4,7 +4,7 @@ namespace Lime
 {
 	public class Exception : System.Exception
 	{
-		public Exception(string message) 
+		public Exception(string message = null)
 			: base(message)
 		{
 		}
