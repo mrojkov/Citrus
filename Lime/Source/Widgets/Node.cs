@@ -301,14 +301,22 @@ namespace Lime
 			return Find<SimpleText>(id, throwException);
 		}
 
-		public void AddNode(Node node)
+		public void AddNode(Node node, int index = -1)
 		{
-			Nodes.Add(node);
+			if (index < 0) {
+				Nodes.Add(node);
+			} else {
+				Nodes.Insert(index, node);
+			}
 		}
 
-		public void AddToNode(Node node)
+		public void AddToNode(Node node, int index = -1)
 		{
-			node.Nodes.Add(this);
+			if (index < 0) {
+				node.Nodes.Add(this);
+			} else {
+				node.Nodes.Insert(index, this);
+			}
 		}
 
 		public Node Find(string id, bool throwException = true)
