@@ -23,7 +23,7 @@ namespace Lime
 			this.Mouse.ButtonDown += HandleMouseButtonDown;
 			this.Mouse.ButtonUp += HandleMouseButtonUp;
 			this.Mouse.Move += HandleMouseMove;
-			this.Location = new System.Drawing.Point(100, 100);
+			this.Location = new System.Drawing.Point(0, 0);
 		}
 
 		void HandleKeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
@@ -105,17 +105,20 @@ namespace Lime
 			SwapBuffers();
 		}
 
+		private long tickCount;
+
 		private void DoUpdate(OpenTK.FrameEventArgs e)
 		{
+			long delta = System.DateTime.Now.Ticks - tickCount;
+			tickCount += delta;
 			Input.ProcessPendingKeyEvents();
 			Input.MouseVisible = true;
-			double delta = e.Time;
 			// Here is protection against time leap on inactive state and low FPS
-			if (delta > 0.5)
-				delta = 0.01;
-			else if (delta > 0.1)
-				delta = 0.1;
-			app.OnUpdateFrame(delta);
+			if (delta > 500)
+				delta = 10;
+			else if (delta > 100)
+				delta = 100;
+			app.OnUpdateFrame((int)delta);
 			Input.TextInput = null;
 			Input.CopyKeysState();
 		}

@@ -95,6 +95,11 @@ namespace Lime
 			return nodeList.Contains(node);
 		}
 
+		public void Push(Node node)
+		{
+			Insert(0, node);
+		}
+
 		public void Add(Node node)
 		{
 			if (node.Parent != null) {

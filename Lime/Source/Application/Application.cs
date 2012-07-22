@@ -106,7 +106,7 @@ namespace Lime
 		public virtual void OnCreate() {}
 		public virtual void OnGLCreate() {}
 		public virtual void OnGLDestroy() {}
-		public virtual void OnUpdateFrame(double delta) {}
+		public virtual void OnUpdateFrame(int delta) {}
 		public virtual void OnRenderFrame() {}
 		public virtual void OnDeviceRotated() {}
 		public virtual DeviceOrientation GetSupportedDeviceOrientations() { return DeviceOrientation.LandscapeLeft; }

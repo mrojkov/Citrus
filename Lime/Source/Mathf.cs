@@ -28,6 +28,11 @@ namespace Lime
 			return Math.Abs(x);
 		}
 
+		public static int Sign(float x)
+		{
+			return Math.Sign(x);
+		}
+
 		public static float Cos(float x)
 		{
 			return (float)Math.Cos(x);
