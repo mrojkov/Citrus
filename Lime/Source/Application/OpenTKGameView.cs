@@ -109,15 +109,19 @@ namespace Lime
 
 		private void DoUpdate(OpenTK.FrameEventArgs e)
 		{
-			long delta = System.DateTime.Now.Ticks - tickCount;
-			tickCount += delta;
+			long delta = (System.DateTime.Now.Ticks / 10000) - tickCount;
+			if (tickCount == 0) {
+				tickCount = delta;
+				delta = 0;
+			} else {
+				tickCount += delta;
+			}
 			Input.ProcessPendingKeyEvents();
 			Input.MouseVisible = true;
-			// Here is protection against time leap on inactive state and low FPS
-			if (delta > 500)
-				delta = 10;
-			else if (delta > 100)
-				delta = 100;
+			// Ensure time delta lower bound is 16.6 frames per second.
+			// This is protection against time leap on inactive state
+			// and multiple updates of node hierarchy.
+ 			delta = Math.Min(delta, 60);
 			app.OnUpdateFrame((int)delta);
 			Input.TextInput = null;
 			Input.CopyKeysState();
