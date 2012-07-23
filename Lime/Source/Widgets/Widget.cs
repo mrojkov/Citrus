@@ -2,6 +2,7 @@ using System;
 using Lime;
 using ProtoBuf;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Lime
 {
@@ -37,8 +38,75 @@ namespace Lime
 	[ProtoInclude(109, typeof(Slider))]
 	[ProtoInclude(110, typeof(RichText))]
 	[ProtoInclude(111, typeof(TextBox))]
+	[DebuggerTypeProxy(typeof(WidgetDebugView))]
 	public partial class Widget : Node
 	{
+		internal class WidgetDebugView
+		{
+			private Widget widget;
+
+			public struct Geometry
+			{
+				public Vector2 Position;
+				public Vector2 Scale;
+				public Vector2 Pivot;
+				public Vector2 Size;
+				public float Rotation;
+				public Color4 Color;
+				public bool Visible;
+				public Blending Blending;
+
+				public override string ToString()
+				{
+					return string.Format("Position: {0}", Position);
+				}
+			}
+
+			public WidgetDebugView(Widget widget)
+			{
+				this.widget = widget;
+			}
+
+			public Node Parent { get { return widget.Parent; } }
+
+			public Geometry LocalGeometry {
+				get {
+					return new Geometry {
+						Color = widget.Color,
+						Position = widget.Position,
+						Size = widget.Size,
+						Scale = widget.Scale,
+						Rotation = widget.Rotation,
+						Blending = widget.Blending,
+						Visible = widget.Visible,
+						Pivot = widget.Pivot
+					};
+				}
+			}
+
+			public Geometry GlobalGeometry
+			{
+				get
+				{
+					widget.RecalcGlobalMatrixAndColor();
+					var b = widget.CalcBasisFromMatrix(widget.GlobalMatrix);
+					return new Geometry {
+						Position = b.Position,
+						Pivot = widget.Pivot,
+						Rotation = b.Rotation,
+						Scale = b.Scale,
+						Size = widget.Size,
+						Visible = widget.GloballyVisible,
+						Blending = widget.GlobalBlending,
+						Color = widget.GlobalColor
+					};
+				}
+			}
+
+			[DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
+			public Node[] Nodes { get { return widget.Nodes.AsArray; } }
+		}
+
 		#region Properties
 
 		[ProtoMember(1)]

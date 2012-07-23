@@ -3,6 +3,7 @@ using System.IO;
 using System;
 using ProtoBuf;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Lime
 {
@@ -17,8 +18,25 @@ namespace Lime
 	[ProtoInclude(106, typeof(Audio))]
 	[ProtoInclude(107, typeof(SplineGear))]
 	[ProtoInclude(108, typeof(TextStyle))]
+	[DebuggerTypeProxy(typeof(NodeDebugView))]
 	public class Node
 	{
+		internal class NodeDebugView
+		{
+			[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+			private Node node;
+
+			public Node Parent { get { return node.Parent; } }
+
+			[DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
+			public Node[] Nodes { get { return node.Nodes.AsArray; } }
+
+			public NodeDebugView(Node node)
+			{
+				this.node = node;
+			}
+		}
+
 		public static int UpdatedNodes;
 		private static List<Node> nodesToUnlink = new List<Node>();
 		

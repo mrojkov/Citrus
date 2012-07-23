@@ -103,24 +103,29 @@ namespace Lime
 			public Vector2 V;
 		}
 
-		public Basis CalcBasisInSpaceOf(Widget container)
+		public Basis CalcBasisFromMatrix(Matrix32 matrix)
 		{
 			var v1 = new Vector2(1, 0);
 			var v2 = new Vector2(0, 1);
 			var v3 = new Vector2(0, 0);
-			Matrix32 mtx = CalcTransitionToSpaceOf(container);
-			v1 = mtx.TransformVector(v1);
-			v2 = mtx.TransformVector(v2);
-			v3 = mtx.TransformVector(v3);
+			v1 = matrix.TransformVector(v1);
+			v2 = matrix.TransformVector(v2);
+			v3 = matrix.TransformVector(v3);
 			v1 = v1 - v3;
 			v2 = v2 - v3;
 			Basis basis;
-			basis.Position = mtx.TransformVector(Pivot * Size);
+			basis.Position = matrix.TransformVector(Pivot * Size);
 			basis.Scale = new Vector2(v1.Length, v2.Length);
 			basis.Rotation = v1.Atan2Degrees;
 			basis.U = v1;
 			basis.V = v2;
 			return basis;
+		}
+
+		public Basis CalcBasisInSpaceOf(Widget container)
+		{
+			Matrix32 matrix = CalcTransitionToSpaceOf(container);
+			return CalcBasisFromMatrix(matrix);
 		}
 
 		public Vector2 CalcPositionInSpaceOf(Widget container)
