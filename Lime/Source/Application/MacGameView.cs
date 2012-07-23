@@ -19,16 +19,27 @@ namespace Lime
 				| NSViewResizingMask.MinYMargin
 				| NSViewResizingMask.WidthSizable;
 		}
-		
+
+		private long tickCount;
+
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{
-			double delta = e.Time; 
-			// Here is protection against time leap on inactive state and low FPS
-			if (delta > 0.5)
-				delta = 0.01;
-			else if (delta > 0.1)
-				delta = 0.1;
-			Application.Instance.OnUpdateFrame(delta);
+			long delta = (System.DateTime.Now.Ticks / 10000) - tickCount;
+			if (tickCount == 0) {
+				tickCount = delta;
+				delta = 0;
+			} else {
+				tickCount += delta;
+			}
+			Input.ProcessPendingKeyEvents();
+			Input.MouseVisible = true;
+			// Ensure time delta lower bound is 16.6 frames per second.
+			// This is protection against time leap on inactive state
+			// and multiple updates of node hierarchy.
+ 			delta = Math.Min(delta, 60);
+			Application.Instance.OnUpdateFrame((int)delta);
+			Input.TextInput = null;
+			Input.CopyKeysState();
 		}
 		
 		protected override void OnRenderFrame(FrameEventArgs e)
