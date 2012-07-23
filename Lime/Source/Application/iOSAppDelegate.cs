@@ -14,10 +14,10 @@ namespace Lime
 	/// application events from iOS.
 	/// </summary>
 	[Register("AppDelegate")]
-	internal class AppDelegate : UIApplicationDelegate
+	public class AppDelegate : UIApplicationDelegate
 	{
 		// class-level declarations
-		UIWindow window;
+		public UIWindow Window { get; private set; }
 		GameController gameController;
 		
 		public override void ReceiveMemoryWarning(UIApplication application)
@@ -52,17 +52,17 @@ namespace Lime
 			AudioSystem.Initialize();
 
 			// create a new window instance based on the screen size
-			window = new UIWindow(UIScreen.MainScreen.Bounds);
+			Window = new UIWindow(UIScreen.MainScreen.Bounds);
 
 			gameController = new GameController();
 			
 			// in order to make iOS 3.0 compatible we use this:
-			window.AddSubview(gameController.View);
+			Window.AddSubview(gameController.View);
 			// instead of that:
 			// window.RootViewController = gameController;
 
 			// make the window visible
-			window.MakeKeyAndVisible();
+			Window.MakeKeyAndVisible();
 
 			// Set the current directory.
 			Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
