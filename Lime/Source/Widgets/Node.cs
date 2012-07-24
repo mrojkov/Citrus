@@ -26,7 +26,6 @@ namespace Lime
 			[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 			private Node node;
 
-			public Node Parent { get { return node.Parent; } }
 
 			[DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
 			public Node[] Nodes { get { return node.Nodes.AsArray; } }
