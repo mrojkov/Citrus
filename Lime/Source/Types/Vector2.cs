@@ -42,6 +42,16 @@ namespace Lime
 			return X == rhs.X && Y == rhs.Y;
 		}
 
+		public static bool operator == (Vector2 lhs, Vector2 rhs)
+		{
+			return lhs.X == rhs.X && lhs.Y == rhs.Y;
+		}
+
+		public static bool operator != (Vector2 lhs, Vector2 rhs)
+		{
+			return lhs.X != rhs.X || lhs.Y != rhs.Y;
+		}
+
 		public bool IsShorterThan(float radius)
 		{
 			return SquaredLength < radius * radius;

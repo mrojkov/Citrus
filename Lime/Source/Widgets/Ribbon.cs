@@ -87,6 +87,22 @@ namespace Lime
 			return result.ToArray();
 		}
 
+		public float CalcLength()
+		{
+			float length = 0;
+			for (int i = 1; i < Vertices.Length; i++) {
+				length += (Vertices[i].Position - Vertices[i - 1].Position).Length;
+			}
+			return length;
+		}
+
+		public void ScaleTextureCoords(float scale)
+		{
+			for (int i = 0; i < Vertices.Length; i++) {
+				Vertices[i].TextureU *= scale;
+			}
+		}
+
 		public void GenerateTextureCoords()
 		{
 			if (Vertices.Length > 0) {
