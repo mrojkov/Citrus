@@ -76,10 +76,12 @@ namespace Lime
 			{
 				if (active != value) {
 					active = value;
+#if !iOS
 					if (active)
 						ResumeAll();
 					else
 						PauseAll();
+#endif
 				}
 			}
 		}
@@ -135,6 +137,7 @@ namespace Lime
 			channel.Group = group;
 			channel.Priority = priority;
 			channel.Volume = 1;
+			channel.Pitch = 1;
 			return sound;
 		}
 

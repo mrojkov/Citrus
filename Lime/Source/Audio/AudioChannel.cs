@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using OpenTK.Audio.OpenAL;
 using System.Runtime.InteropServices;
 
@@ -30,7 +30,7 @@ namespace Lime
 
 	internal class AudioChannel : IDisposable, IAudioChannel
 	{
-		public const int BufferSize = 1024 * 16;
+		public const int BufferSize = 1024 * 32;
 		public const int NumBuffers = 8;
 
 		public AudioChannelGroup Group;
@@ -127,9 +127,9 @@ namespace Lime
 		{
 			get { return pitch; }
 			set {
-				pitch = value;
-				//AL.Source(source, ALSourcef.Pitch, pitch);
-				//AudioSystem.CheckError();
+				pitch = Mathf.Clamp(value, 0.0625f, 16);
+				AL.Source(source, ALSourcef.Pitch, pitch);
+				AudioSystem.CheckError();
 			}
 		}
 
@@ -198,7 +198,7 @@ namespace Lime
 				AL.BufferData(buffer, format, decodedData, 
 					totalRead * decoder.GetBlockSize(), decoder.GetFrequency());
 				AudioSystem.CheckError();
-				return true; 
+				return true;
 			}
 			return false;
 		}

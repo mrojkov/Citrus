@@ -52,7 +52,7 @@ namespace Lime
 			}
 		}
 
-		private float pitch = 0;
+		private float pitch = 1;
 		[ProtoMember(9)]
 		public float Pitch
 		{
