@@ -42,6 +42,17 @@ namespace Lime
 			return X == rhs.X && Y == rhs.Y;
 		}
 
+		public override bool Equals(object o)
+		{
+			Vector2 rhs = (Vector2)o;
+			return X == rhs.X && Y == rhs.Y;
+		}
+
+		public override int GetHashCode()
+		{
+			return X.GetHashCode() ^ Y.GetHashCode();
+		}
+
 		public static bool operator == (Vector2 lhs, Vector2 rhs)
 		{
 			return lhs.X == rhs.X && lhs.Y == rhs.Y;

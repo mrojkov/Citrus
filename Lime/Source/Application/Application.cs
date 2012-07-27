@@ -91,8 +91,10 @@ namespace Lime
 			set { GameView.Instance.FullScreen = value; } 
 		}
 
-		public float FrameRate { get { return GameView.Instance.FrameRate; } }
+		public bool Active { get; internal set; }
 
+		public float FrameRate { get { return GameView.Instance.FrameRate; } }
+		
 		public DeviceOrientation CurrentDeviceOrientation {
 			get { return DeviceOrientation.LandscapeLeft; }
 		}
@@ -102,6 +104,23 @@ namespace Lime
 			set { GameView.Instance.WindowSize = value; } 
 		}
 #endif
+
+		public event Event OnActivated;
+		public event Event OnDeactivated;
+
+		internal void Activate()
+		{
+			if (OnActivated != null) {
+				OnActivated();
+			}
+		}
+
+		internal void Deactivate() 
+		{
+			if (OnDeactivated != null) {
+				OnDeactivated();
+			}
+		}
 
 		public virtual void OnCreate() {}
 		public virtual void OnGLCreate() {}

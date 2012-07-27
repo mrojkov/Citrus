@@ -15,6 +15,7 @@ namespace Lime
 		{
 			Instance = this;
 			this.app = app;
+			app.Active = true;
 			AudioSystem.Initialize(16, args);
 			app.OnCreate();
 			this.Keyboard.KeyDown += HandleKeyDown;
@@ -39,6 +40,16 @@ namespace Lime
 		void HandleKeyPress(object sender, KeyPressEventArgs e)
 		{
 			Input.TextInput += e.KeyChar;
+		}
+
+		protected override void OnFocusedChanged(EventArgs e)
+		{
+			Application.Instance.Active = this.Focused;
+			if (this.Focused) {
+				Application.Instance.Activate();
+			} else {
+				Application.Instance.Deactivate();
+			}
 		}
 
 		void HandleMouseButtonUp(object sender, MouseButtonEventArgs e)
