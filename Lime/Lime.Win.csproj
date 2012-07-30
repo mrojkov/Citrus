@@ -56,6 +56,7 @@
     <Compile Include="Source\Audio\SerializableSample.cs" />
     <Compile Include="Source\Audio\Sound.cs" />
     <Compile Include="Source\Environment.cs" />
+    <Compile Include="Source\Geometry.cs" />
     <Compile Include="Source\Lemon.cs" />
     <Compile Include="Source\Application\iOSAppDelegate.cs" />
     <Compile Include="Source\Application\iOSGameController.cs" />
@@ -113,8 +114,8 @@
     <Compile Include="Source\Widgets\ParticleModifier.cs" />
     <Compile Include="Source\Widgets\ParticlesMagnet.cs" />
     <Compile Include="Source\Widgets\PointObject.cs" />
+    <Compile Include="Source\Widgets\Polyline.cs" />
     <Compile Include="Source\Widgets\RenderChain.cs" />
-    <Compile Include="Source\Widgets\Ribbon.cs" />
     <Compile Include="Source\Widgets\RichText.cs" />
     <Compile Include="Source\Widgets\RootFrame.cs" />
     <Compile Include="Source\Widgets\SimpleText.cs" />

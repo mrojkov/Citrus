@@ -51,18 +51,12 @@ namespace Lime
 					var isOutside = true;
 					for (int j = 0; j < 4; j++) {
 						var pt = matrices[1 - k] * (rect[j] * sizes[1 - k]);
-						isOutside = isOutside && CalcPointHalfPlane(pt, ptA, ptB) * det[k] < 0;
+						isOutside = isOutside && Geometry.CalcPointHalfPlane(pt, ptA, ptB) * det[k] < 0;
 					}
 					if (isOutside)
 						return false;
 				}
 			return true;
-		}
-
-		private static int CalcPointHalfPlane(Vector2 point, Vector2 lineA, Vector2 lineB)
-		{
-			float s = (lineB.X - lineA.X) * (point.Y - lineA.Y) - (lineB.Y - lineA.Y) * (point.X - lineA.X);
-			return Math.Sign(s);
 		}
 
 		public void CenterOnParent()

@@ -197,7 +197,7 @@ namespace Lime
 
 		public Vector2 Normal
 		{
-			get { return new Vector2(-Y, X); }
+			get { return new Vector2(-Y, X).Normalized; }
 		}
 
 		public float SquaredLength

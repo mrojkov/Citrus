@@ -451,7 +451,7 @@ namespace Lime
 			if (numVertices < 3 || (numVertices - 2) * 3 > MaxVertices * 4) {
 				throw new Lime.Exception("Wrong number of vertices");
 			}
-			Rectangle uvRect1 = texture1.UVRect;
+			Rectangle uvRect1 = (texture1 != null) ? texture1.UVRect : new Rectangle();
 			Rectangle uvRect2 = (texture2 != null) ? texture2.UVRect : new Rectangle();
 			int baseVertex = currentVertex;
 			for (int i = 0; i < numVertices; i++) {

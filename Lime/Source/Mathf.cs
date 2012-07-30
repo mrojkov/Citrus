@@ -10,8 +10,17 @@ namespace Lime
 		public static readonly Random RandomGenerator = new Random();
 		public const float Pi = 3.141592653f;
 		public const float Pi2 = 2 * 3.141592653f;
+		public const float HalfPi = 3.141592653f / 2;
 		public const float DegreesToRadians = Pi / 180;
 		public const float RadiansToDegrees = 180 / Pi;
+
+		public static void Swap<T>(ref T lhs, ref T rhs)
+		{
+			T temp;
+			temp = lhs;
+			lhs = rhs;
+			rhs = temp;
+		}
 
 		public static float Max(float x, float y)
 		{
@@ -137,19 +146,6 @@ namespace Lime
 				CatmullRomSpline(t, p0.Y, p1.Y, p2.Y, p3.Y));
 		}
 		
-		public static Vector2 CatmullRomJoinedSpline(float t, params Vector2[] points)
-		{
-			int segCount = points.Length - 3;
-			if (segCount < 1) {
-				throw new System.ArgumentException("At least 4 knots must be given");
-			}
-			while (t < 0) { t++; }
-			while (t >= 1) { t--; }
-			int curSeg = (int)(t * segCount);
-			float k = t * segCount - curSeg;
-			return CatmullRomSpline(k, points[curSeg], points[curSeg + 1], points[curSeg + 2], points[curSeg + 3]);
-		}
-
 		public static float CatmullRomSpline(float t, float p0, float p1, float p2, float p3)
 		{
 			float t2 = t * t;
