@@ -17,7 +17,6 @@ namespace Lime
 
 		public override void Render()
 		{
-			Color = new Color4(255, 255, 255, 128);
 			Renderer.Blending = globalBlending;
 			Renderer.Transform1 = globalMatrix;
 			int n = Points.Count;
