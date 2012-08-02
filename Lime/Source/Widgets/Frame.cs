@@ -34,11 +34,11 @@ namespace Lime
 		RenderTarget renderTarget;
 		ITexture renderTexture;
 
-		public UpdateDelegate BeforeUpdate;
-		public UpdateDelegate AfterUpdate;
-		public UpdateDelegate BeforeLateUpdate;
-		public UpdateDelegate AfterLateUpdate;
-		public Event OnRender;
+		public UpdateDelegate Updating;
+		public UpdateDelegate Updated;
+		public UpdateDelegate LateUpdating;
+		public UpdateDelegate LateUpdated;
+		public BareEventHandler Rendered;
 
 		[ProtoMember(1)]
 		public RenderTarget RenderTarget {
@@ -117,16 +117,16 @@ namespace Lime
 			if (AnimationSpeed != 1) {
 				delta = MultiplyDeltaByAnimationSpeed(delta);
 			}
-			if (BeforeLateUpdate != null) {
-				BeforeLateUpdate(delta * 0.001f);
+			if (LateUpdating != null) {
+				LateUpdating(delta * 0.001f);
 			}
 			while (delta > MaxTimeDelta) {
 				base.LateUpdate(MaxTimeDelta);
 				delta -= MaxTimeDelta;
 			}
 			base.LateUpdate(delta);
-			if (AfterLateUpdate != null) {
-				AfterLateUpdate(delta * 0.001f);
+			if (LateUpdated != null) {
+				LateUpdated(delta * 0.001f);
 			}
 		}
 
@@ -144,16 +144,16 @@ namespace Lime
 			if (AnimationSpeed != 1) {
 				delta = MultiplyDeltaByAnimationSpeed(delta);
 			}
-			if (BeforeUpdate != null) {
-				BeforeUpdate(delta * 0.001f);
+			if (Updating != null) {
+				Updating(delta * 0.001f);
 			}
 			while (delta > MaxTimeDelta) {
 				UpdateHelper(MaxTimeDelta);
 				delta -= MaxTimeDelta;
 			}
 			UpdateHelper(delta);
-			if (AfterUpdate != null) {
-				AfterUpdate(delta * 0.001f);
+			if (Updated != null) {
+				Updated(delta * 0.001f);
 			}
 		}
 
@@ -171,9 +171,9 @@ namespace Lime
 			if (renderTexture != null) {
 				RenderToTexture(renderTexture);
 			}
-			if (OnRender != null) {
+			if (Rendered != null) {
 				Renderer.Transform1 = GlobalMatrix;
-				OnRender();
+				Rendered();
 			}
 		}
 

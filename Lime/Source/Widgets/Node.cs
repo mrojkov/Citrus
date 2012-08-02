@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace Lime
 {
-	public delegate void Event();
+	public delegate void BareEventHandler();
 
 	[ProtoContract]
 	[ProtoInclude(101, typeof(Widget))]
@@ -67,7 +67,7 @@ namespace Lime
 		public bool Running;
 		public bool Stopped { get { return !Running; } set { Running = !value; } }
 
-		public Event OnStop;
+		public BareEventHandler OnStop;
 
 		private int animationTime;
 
@@ -147,6 +147,11 @@ namespace Lime
 			while (node.Parent != null)
 				node = node.Parent;
 			return node;
+		}
+
+		public bool HasChild(Node node)
+		{
+			return node.ChildOf(this);
 		}
 
 		public bool ChildOf(Node node)

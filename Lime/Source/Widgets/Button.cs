@@ -13,7 +13,7 @@ namespace Lime
 		[ProtoMember(1)]
 		public string Caption { get; set; }
 
-		public ButtonClickEvent OnClick;
+		public ButtonClickEvent Clicked;
 
 		void UpdateHelper(int delta)
 		{
@@ -45,8 +45,8 @@ namespace Lime
 					else
 						RunAnimation("Normal");
 					Input.ConsumeKeyEvent(Key.Mouse0, true);
-					if (OnClick != null) {
-						OnClick(this);
+					if (Clicked != null) {
+						Clicked(this);
 					}
 				}
 			}

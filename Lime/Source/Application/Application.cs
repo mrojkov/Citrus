@@ -105,8 +105,8 @@ namespace Lime
 		}
 #endif
 
-		public event Event OnActivated;
-		public event Event OnDeactivated;
+		public event BareEventHandler OnActivated;
+		public event BareEventHandler OnDeactivated;
 
 		internal void Activate()
 		{

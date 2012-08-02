@@ -5,9 +5,9 @@ namespace Lime
 	public class TimeWaiter : Node
 	{
 		private float time;
-		private Event evt;
+		private BareEventHandler evt;
 
-		public TimeWaiter(float time, Event evt)
+		public TimeWaiter(float time, BareEventHandler evt)
 		{
 			this.evt = evt;
 			this.time = time;
@@ -21,7 +21,7 @@ namespace Lime
 			}
 		}
 
-		public static TimeWaiter Create(Node parent, float time, Event evt)
+		public static TimeWaiter Create(Node parent, float time, BareEventHandler evt)
 		{
 			var trigger = new TimeWaiter(time, evt);
 			parent.Nodes.Add(trigger);
