@@ -16,6 +16,13 @@ namespace Lime
 		LandscapeRight = 8,
 	}
 
+	public enum PlatformId
+	{
+		iOS,
+		Mac,
+		Win
+	}
+
 	public class Application
 	{
 		public static Application Instance;
@@ -26,6 +33,21 @@ namespace Lime
 			// Use '.' as decimal separator.
 			var culture = System.Globalization.CultureInfo.InvariantCulture;
 			System.Threading.Thread.CurrentThread.CurrentCulture = culture;
+		}
+
+		public PlatformId Platform {
+			get
+			{
+#if iOS
+				return PlatformId.iOS;
+#elif WIN
+				return PlatformId.Win;
+#elif MAC
+				return PlatformId.Mac
+#else
+				throw new Lime.Exception("Unknown platform");
+#endif
+			}
 		}
 #if iOS
 		public Size WindowSize {
