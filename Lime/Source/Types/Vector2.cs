@@ -68,6 +68,11 @@ namespace Lime
 			return SquaredLength < radius * radius;
 		}
 
+		public bool IsWithin(Rectangle rect)
+		{
+			return rect.Contains(this);
+		}
+
 		public static Vector2 Lerp(float t, Vector2 a, Vector2 b)
 		{
 			Vector2 r = new Vector2();

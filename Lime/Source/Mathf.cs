@@ -9,7 +9,7 @@ namespace Lime
 	{
 		public static readonly Random RandomGenerator = new Random();
 		public const float Pi = 3.141592653f;
-		public const float Pi2 = 2 * 3.141592653f;
+		public const float TwoPi = 2 * 3.141592653f;
 		public const float HalfPi = 3.141592653f / 2;
 		public const float DegreesToRadians = Pi / 180;
 		public const float RadiansToDegrees = 180 / Pi;
@@ -50,6 +50,28 @@ namespace Lime
 		public static float Sin(float x)
 		{
 			return (float)Math.Sin(x);
+		}
+
+		public static float WrapRadians(float x)
+		{
+			while (x > TwoPi) {
+				x -= TwoPi;
+			}
+			while (x < 0) {
+				x += TwoPi;
+			}
+			return x;
+		}
+
+		public static float WrapDegrees(float x)
+		{
+			while (x > 360) {
+				x -= 360;
+			}
+			while (x < 0) {
+				x += 360;
+			}
+			return x;
 		}
 
 		public static float Sqr(float x)

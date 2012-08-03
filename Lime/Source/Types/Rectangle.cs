@@ -56,17 +56,17 @@ namespace Lime
 		public float Bottom { get { return B.Y; } set { B.Y = value; } }
 		public Vector2 Center { get { return (A + B) / 2; } }
 
+		public bool Contains(Vector2 v)
+		{
+			return (v.X >= A.X) && (v.Y >= A.Y) && (v.X < B.X) && (v.Y < B.Y);
+		}
+
 		public Vector2 Size { 
 			get {
 				return B - A;
 			}
 		}
-		
-		bool Contains(Vector2 v)
-		{
-			return (v.X >= A.X) && (v.Y >= A.Y) && (v.X < B.X) && (v.Y < B.Y);
-		}
-		
+				
 		public override string ToString()
 		{
 			return String.Format("{0}, {1}, {2}, {3}", A.X, A.Y, B.X, B.Y);
