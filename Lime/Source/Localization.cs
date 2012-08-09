@@ -70,7 +70,7 @@ namespace Lime
 		
 		public static string GetCurrentLanguage()
 		{
-			return System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+			return System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
 		}
 		
 		public static string GetString(string taggedString)
