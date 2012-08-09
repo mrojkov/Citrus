@@ -27,8 +27,8 @@ namespace Lime
 			set { Channel.Pan = value; }
 		}
 
-		public void Resume() { Channel.Resume(); }
+		public void Resume(float fadeinTime = 0) { Channel.Resume(fadeinTime); }
 		public bool IsStopped() { return Channel.State == ALSourceState.Stopped; }
-		public void Stop() { Channel.Stop(); }
+		public void Stop(float fadeoutTime = 0) { Channel.Stop(fadeoutTime); }
 	}
 }

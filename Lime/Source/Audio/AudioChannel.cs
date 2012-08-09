@@ -9,8 +9,8 @@ namespace Lime
 		bool Streaming { get; }
 		ALSourceState State { get; }
 		float Pan { get; set; }
-		void Resume();
-		void Stop();
+		void Resume(float fadeinTime = 0);
+		void Stop(float fadeoutTime = 0);
 		float Volume { get; set; }
 		float Pitch { get; set; }
 	}
@@ -22,8 +22,8 @@ namespace Lime
 		public ALSourceState State { get { return ALSourceState.Stopped; } }
 		public bool Streaming { get { return false; } }
 		public float Pan { get { return 0; } set { } }
-		public void Resume() {}
-		public void Stop() {}
+		public void Resume(float fadeinTime = 0) {}
+		public void Stop(float fadeoutTime = 0) {}
 		public float Volume { get { return 0; } set { } }
 		public float Pitch { get { return 1; } set { } }
 	}
@@ -48,6 +48,8 @@ namespace Lime
 		private int queueHead;
 		private int queueLength;
 		private bool looping;
+		private float fadeVolume;
+		private float fadeSpeed;
 
 		Sound sound;
 		internal IAudioDecoder decoder;
@@ -100,8 +102,16 @@ namespace Lime
 			return sound;
 		}
 
-		public void Resume()
+		public void Resume(float fadeinTime = 0)
 		{
+			if (fadeinTime > 0) {
+				fadeVolume = 0;
+				fadeSpeed = 1 / fadeinTime;
+			} else {
+				fadeSpeed = 0;
+				fadeVolume = 1;
+			}
+			Volume = volume;
 			streaming = true;
 			if (State == ALSourceState.Paused) {
 				AL.SourcePlay(source);
@@ -114,8 +124,16 @@ namespace Lime
 			AudioSystem.CheckError();
 		}
 
-		public void Stop()
+		public void Stop(float fadeoutTime = 0)
 		{
+			if (fadeoutTime > 0) {
+				// fadeVolume = 1;
+				fadeSpeed = -1 / fadeoutTime;
+				return;
+			} else {
+				fadeSpeed = 0;
+				fadeVolume = 0;
+			}
 			lock (streamingSync) {
 				streaming = false;
 				AL.SourceStop(source);
@@ -139,7 +157,7 @@ namespace Lime
 			set
 			{
 				volume = Mathf.Clamp(value, 0, 1);
-				float gain = volume * AudioSystem.GetGroupVolume(Group);
+				float gain = volume * AudioSystem.GetGroupVolume(Group) * fadeVolume;
 				AL.Source(source, ALSourcef.Gain, gain);
 				AudioSystem.CheckError();
 			}
@@ -147,7 +165,7 @@ namespace Lime
 
 		public float Pan { get; set; }
 
-		public void Update()
+		public void Update(float delta)
 		{
 			if (streaming) {
 				lock (streamingSync) {
@@ -155,6 +173,18 @@ namespace Lime
 						UpdateHelper();
 					}
 				}
+			}
+			if (fadeSpeed != 0) {
+				fadeVolume += delta * fadeSpeed;
+				if (fadeVolume > 1) {
+					fadeSpeed = 0;
+					fadeVolume = 1;
+				} else if (fadeVolume < 0) {
+					fadeSpeed = 0;
+					fadeVolume = 0;
+					Stop();
+				}
+				Volume = volume;
 			}
 		}
 

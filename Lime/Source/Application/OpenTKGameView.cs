@@ -120,7 +120,8 @@ namespace Lime
 
 		private void DoUpdate(OpenTK.FrameEventArgs e)
 		{
-			long delta = (System.DateTime.Now.Ticks / 10000) - tickCount;
+			long delta = (System.DateTime.Now.Ticks / 10000L) - tickCount;
+			delta = Math.Max(0, delta); // Why can it be possible?
 			if (tickCount == 0) {
 				tickCount = delta;
 				delta = 0;

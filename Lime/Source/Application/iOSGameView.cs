@@ -77,7 +77,7 @@ namespace Lime
 			Input.ProcessPendingKeyEvents();
 			Input.MouseVisible = true;
 
-			long delta = (System.DateTime.Now.Ticks / 10000) - tickCount;
+			long delta = (System.DateTime.Now.Ticks / 10000L) - tickCount;
 			if (tickCount == 0) {
 				tickCount = delta;
 				delta = 0;

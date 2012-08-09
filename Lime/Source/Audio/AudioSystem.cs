@@ -59,11 +59,26 @@ namespace Lime
 			}
 		}
 
+		private static long tickCount;
+
+		private static long GetTimeDelta()
+		{
+			long delta = (System.DateTime.Now.Ticks / 10000L) - tickCount;
+			if (tickCount == 0) {
+				tickCount = delta;
+				delta = 0;
+			} else {
+				tickCount += delta;
+			}
+			return delta;
+		}
+
 		static void RunStreamingLoop()
 		{
 			while (!shouldTerminateThread) {
+				float delta = GetTimeDelta() * 0.001f;
 				foreach (var channel in channels) {
-					channel.Update();
+					channel.Update(delta);
 				}
 				Thread.Sleep(0);
 			}
@@ -168,11 +183,11 @@ namespace Lime
 			}
 		}
 
-		public static void StopGroup(AudioChannelGroup group)
+		public static void StopGroup(AudioChannelGroup group, float fadeoutTime = 0)
 		{
 			foreach (var channel in channels) {
 				if (channel.Group == group) {
-					channel.Stop();
+					channel.Stop(fadeoutTime);
 				}
 			}
 		}
@@ -196,21 +211,21 @@ namespace Lime
 			return LoadSound(path, AudioChannelGroup.Music, looping, priority);
 		}
 
-		public static Sound Play(string path, AudioChannelGroup group, bool looping = false, int priority = 0)
+		public static Sound Play(string path, AudioChannelGroup group, bool looping = false, int priority = 0, float fadeinTime = 0)
 		{
 			var sound = LoadSound(path, group, looping, priority);
-			sound.Resume();
+			sound.Resume(fadeinTime);
 			return sound;
 		}
 
-		public static Sound PlayMusic(string path, bool looping = true, int priority = 100)
+		public static Sound PlayMusic(string path, bool looping = true, int priority = 100, float fadeinTime = 0.5f)
 		{
-			return Play(path, AudioChannelGroup.Music, looping, priority);
+			return Play(path, AudioChannelGroup.Music, looping, priority, fadeinTime);
 		}
 
-		public static Sound PlayEffect(string path, bool looping = false, int priority = 0)
+		public static Sound PlayEffect(string path, bool looping = false, int priority = 0, float fadeinTime = 0)
 		{
-			return Play(path, AudioChannelGroup.Effects, looping, priority);
+			return Play(path, AudioChannelGroup.Effects, looping, priority, fadeinTime);
 		}
 
 		public static bool HasError()
