@@ -311,7 +311,7 @@ namespace Lime
 			if (word.Length == 1) {
 				float fontScale = style.Size / font.CharHeight;
 				var c = font.Chars[word.Text[word.Start]];
-				float width = bullet + c.Width * fontScale;
+				float width = bullet + (c.ACWidths.X + c.ACWidths.Y + c.Width) * fontScale;
 				return width;
 			} else {
 				Vector2 size = Renderer.MeasureTextLine(font, word.Text, style.Size, word.Start, word.Length);
@@ -441,11 +441,11 @@ namespace Lime
 					}
 					yOffset = new Vector2(0, (maxHeight - style.Size) * 0.5f);
 					if (style.CastShadow) {
-						for (int k = 0; k <(style.Bold ? 2 : 1); k++) {
+						for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
 							Renderer.DrawTextLine(font, position + style.ShadowOffset + yOffset, word.Text, style.ShadowColor * color, style.Size, word.Start, word.Length);
 						}
 					}
-					for (int k = 0; k <(style.Bold ? 2 : 1); k++) {
+					for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
 						Renderer.DrawTextLine(font, position + yOffset, word.Text, style.TextColor * color, style.Size, word.Start, word.Length);
 					}
 				}
