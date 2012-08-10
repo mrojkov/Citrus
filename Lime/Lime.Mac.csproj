@@ -124,9 +124,11 @@
     <Compile Include="Source\Widgets\TextBox.cs" />
     <Compile Include="Source\Application\Application.cs" />
     <Compile Include="Source\Mathf.cs" />
-    <Compile Include="Source\Widgets\Ribbon.cs" />
     <Compile Include="Source\Widgets\TimeWaiter.cs" />
     <Compile Include="Source\Widgets\Widget.Toolbox.cs" />
+    <Compile Include="Source\Geometry.cs" />
+    <Compile Include="Source\Widgets\Polyline.cs" />
+    <Compile Include="Source\Widgets\Widget.Debugging.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Audio\ADPCMEncoder.c">

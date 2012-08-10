@@ -43,7 +43,7 @@ namespace Lime
 #elif WIN
 				return PlatformId.Win;
 #elif MAC
-				return PlatformId.Mac
+				return PlatformId.Mac;
 #else
 				throw new Lime.Exception("Unknown platform");
 #endif
