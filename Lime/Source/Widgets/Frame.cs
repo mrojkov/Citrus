@@ -79,6 +79,11 @@ namespace Lime
 			this.Position = position;
 		}
 
+		public Frame this[string id]
+		{
+			get { return Find<Frame>(id); }
+		}
+
 		void IImageCombinerArg.BypassRendering() {}
 
 		ITexture IImageCombinerArg.GetTexture()
@@ -89,14 +94,14 @@ namespace Lime
 		private void UpdateForDialogMode(int delta)
 		{
 			if (globallyVisible && Input.MouseVisible) {
-				if (RootFrame.Instance.ActiveWidget != null && !RootFrame.Instance.ActiveWidget.ChildOf(this)) {
+				if (World.Instance.ActiveWidget != null && !World.Instance.ActiveWidget.ChildOf(this)) {
 					// Discard active widget if it's not a child of the topmost dialog.
-					RootFrame.Instance.ActiveWidget = null;
+					World.Instance.ActiveWidget = null;
 				}
 			}
-			if (globallyVisible && RootFrame.Instance.ActiveTextWidget != null && !RootFrame.Instance.ActiveTextWidget.ChildOf(this)) {
+			if (globallyVisible && World.Instance.ActiveTextWidget != null && !World.Instance.ActiveTextWidget.ChildOf(this)) {
 				// Discard active text widget if it's not a child of the topmost dialog.
-				RootFrame.Instance.ActiveTextWidget = null;
+				World.Instance.ActiveTextWidget = null;
 			}
 			if (!Running) {
 				base.Update(delta);

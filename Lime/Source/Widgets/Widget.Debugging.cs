@@ -91,7 +91,7 @@ namespace Lime
 		public virtual void GetReasonsWhyItCanBeInvisible(List<string> suggestions)
 		{
 			RecalcGlobalMatrixAndColor();
-			if (!ChildOf(RootFrame.Instance)) {
+			if (!ChildOf(World.Instance)) {
 				suggestions.Add("Widget is not added to the main hierarchy");
 			}
 			if (!Visible) {
@@ -105,13 +105,13 @@ namespace Lime
 			} else if (globalColor.A < 10) {
 				suggestions.Add("One of its parent has 'Opacity' close to zero");
 			}
-			var basis = CalcBasisInSpaceOf(RootFrame.Instance);
+			var basis = CalcBasisInSpaceOf(World.Instance);
 			if (Mathf.Abs(basis.Scale.X) < 0.01f || Mathf.Abs(basis.Scale.Y) < 0.01f) {
 				suggestions.Add(string.Format("Widget is probably too small (Scale: {0})", basis.Scale));
 			}
 			bool withinScreenBounds =
-				basis.Position.X > 10 && basis.Position.X < RootFrame.Instance.Width - 10 &&
-				basis.Position.Y > 10 && basis.Position.Y < RootFrame.Instance.Height - 10;
+				basis.Position.X > 10 && basis.Position.X < World.Instance.Width - 10 &&
+				basis.Position.Y > 10 && basis.Position.Y < World.Instance.Height - 10;
 			if (!withinScreenBounds) {
 				suggestions.Add(string.Format("Widget is possible out of the screen (Position: {0})", basis.Position));
 			}

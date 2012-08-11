@@ -1,6 +1,6 @@
 ﻿namespace Lime
 {
-	public class RootFrame : Frame
+	public class World : Frame
 	{
 		/// <summary>
 		/// Widget which holds mouse input focus. Before processing mouse down event you should test whether ActiveWidget == this.
@@ -21,9 +21,9 @@
 		/// </summary>
 		public bool ActiveTextWidgetUpdated;
 
-		public static RootFrame Instance;
+		public static World Instance;
 
-		public RootFrame()
+		public World()
 		{
 			Instance = this;
 		}

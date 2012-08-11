@@ -303,26 +303,6 @@ namespace Lime
 			return result;
 		}
 
-		public Button FindButton(string id, bool throwException = true)
-		{
-			return Find<Button>(id, throwException);
-		}
-
-		public Widget FindWidget(string id, bool throwException = true)
-		{
-			return Find<Widget>(id, throwException);
-		}
-
-		public Frame FindFrame(string id, bool throwException = true)
-		{
-			return Find<Frame>(id, throwException);
-		}
-
-		public SimpleText FindText(string id, bool throwException = true)
-		{
-			return Find<SimpleText>(id, throwException);
-		}
-
 		public void AddNode(Node node)
 		{
 			Nodes.Add(node);

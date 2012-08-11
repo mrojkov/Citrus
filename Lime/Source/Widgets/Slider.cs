@@ -39,17 +39,17 @@ namespace Lime
 			var thumb = Find<Widget>("SliderThumb", false);
 			if (thumb != null) {
 				if (thumb.HitTest(Input.MousePosition) && Input.WasKeyPressed(Key.Mouse0)) {
-					if (RootFrame.Instance.ActiveWidget == null) {
+					if (World.Instance.ActiveWidget == null) {
 						thumb.RunAnimation("Focus");
-						RootFrame.Instance.ActiveWidget = this;
+						World.Instance.ActiveWidget = this;
 					}
 				} else {
-					if (RootFrame.Instance.ActiveWidget == this && !Input.IsKeyPressed(Key.Mouse0)) {
+					if (World.Instance.ActiveWidget == this && !Input.IsKeyPressed(Key.Mouse0)) {
 						thumb.RunAnimation("Normal");
-						RootFrame.Instance.ActiveWidget = null;
+						World.Instance.ActiveWidget = null;
 					}
 				}
-				if (RootFrame.Instance.ActiveWidget == this) {
+				if (World.Instance.ActiveWidget == this) {
 					if (Input.WasKeyPressed(Key.Mouse0)) {
 						Input.ConsumeKeyEvent(Key.Mouse0, true);
 						ScrollSlider(true);
@@ -58,7 +58,7 @@ namespace Lime
 					}
 				}
 				Marker m1, m2;
-				if (RootFrame.Instance.ActiveWidget == this) {
+				if (World.Instance.ActiveWidget == this) {
 					m1 = Markers.Get("FocusLow");
 					m2 = Markers.Get("FocusHigh");
 				} else {
@@ -73,11 +73,11 @@ namespace Lime
 					}
 				}
 			}
-			if (RootFrame.Instance.ActiveWidget != this && thumb.CurrentAnimation != "Normal") {
+			if (World.Instance.ActiveWidget != this && thumb.CurrentAnimation != "Normal") {
 				thumb.RunAnimation("Normal");
 			}
-			if (RootFrame.Instance.ActiveWidget == this) {
-				RootFrame.Instance.ActiveWidgetUpdated = true;
+			if (World.Instance.ActiveWidget == this) {
+				World.Instance.ActiveWidgetUpdated = true;
 			}
 		}
 

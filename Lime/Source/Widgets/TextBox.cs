@@ -52,14 +52,14 @@ namespace Lime
 
 		public override void Update(int delta)
 		{
-			if (RootFrame.Instance.ActiveTextWidget == null) {
-				RootFrame.Instance.ActiveTextWidget = this;
+			if (World.Instance.ActiveTextWidget == null) {
+				World.Instance.ActiveTextWidget = this;
 			}
 			if (Input.WasKeyPressed(Key.Mouse0) && HitTest(Input.MousePosition)) {
-				RootFrame.Instance.ActiveTextWidget = this;
+				World.Instance.ActiveTextWidget = this;
 			}
 			base.Update(delta);
-			if (RootFrame.Instance.ActiveTextWidget == this && Input.TextInput != null) {
+			if (World.Instance.ActiveTextWidget == this && Input.TextInput != null) {
 				foreach (char c in Input.TextInput) {
 					if (c >= 32 && Text.Length < MaxTextLength) {
 						if (Numeric) {
@@ -75,8 +75,8 @@ namespace Lime
 					}
 				}
 			}
-			if (RootFrame.Instance.ActiveTextWidget == this) {
-				RootFrame.Instance.ActiveTextWidgetUpdated = true;
+			if (World.Instance.ActiveTextWidget == this) {
+				World.Instance.ActiveTextWidgetUpdated = true;
 			}
 			caretBlinkPhase += delta;
 		}
@@ -84,7 +84,7 @@ namespace Lime
 		public override void Render()
 		{
 			string text = Text;
-			if (RootFrame.Instance.ActiveTextWidget == this) {
+			if (World.Instance.ActiveTextWidget == this) {
 				text += CaretChar;
 			}
 			int start = 0;
@@ -96,7 +96,7 @@ namespace Lime
 				extent = Renderer.MeasureTextLine(Font.Instance, text, FontHeight, start, length);
 			}
 			int period = (int)(CaretBlinkPeriod * 1000);
-			if (RootFrame.Instance.ActiveTextWidget == this) {
+			if (World.Instance.ActiveTextWidget == this) {
 				if (caretBlinkPhase % period < period / 2 && length > 0) {
 					length--;
 				}
