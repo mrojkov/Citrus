@@ -192,7 +192,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Slow but safe deep cloning. This function is based on serialization/deserialization.
+		/// Slow but safe deep cloning. This function is based on protobuf-net serialization.
 		/// </summary>
 		public Node DeepCloneSafe()
 		{
@@ -200,7 +200,15 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Use for fast deep cloning of unchangeable objects. This function based of MemberwiseClone().
+		/// Slow but safe deep cloning. This function is based on protobuf-net serialization.
+		/// </summary>
+		public T DeepCloneSafe<T>() where T : Node
+		{
+			return DeepCloneSafe() as T;
+		}
+
+		/// <summary>
+		/// Use for fast deep cloning of unchangeable objects. This function based on MemberwiseClone().
 		/// Animators keys, Markers and SkinningWeights are shared between clone and original.
 		/// </summary>
 		public virtual Node DeepCloneFast()
@@ -211,6 +219,15 @@ namespace Lime
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Nodes = NodeCollection.DeepClone(clone, Nodes);
 			return clone;
+		}
+
+		/// <summary>
+		/// Use for fast deep cloning of unchangeable objects. This function based on MemberwiseClone().
+		/// Animators keys, Markers and SkinningWeights are shared between clone and original.
+		/// </summary>
+		public T DeepCloneFast<T>() where T : Node
+		{
+			return DeepCloneFast() as T;
 		}
 
 		public override string ToString()
@@ -317,33 +334,33 @@ namespace Lime
 
 		public T Find<T>(string id) where T : Node
 		{
-			T result = FindOrNull(id) as T;
+			T result = TryFind(id) as T;
 			if (result == null)
 				throw new Lime.Exception("'{0}' of {1} not found for '{2}'", id, typeof(T).Name, ToString());
 			return result;
 		}
 
-		public T FindOrNull<T>(string id) where T : Node
+		public T TryFind<T>(string id) where T : Node
 		{
-			return FindOrNull(id) as T;
+			return TryFind(id) as T;
 		}
 
 		public Node Find(string id)
 		{
-			var node = FindOrNull(id);
+			var node = TryFind(id);
 			if (node == null) {
 				throw new Lime.Exception("'{0}' not found for '{1}'", id, ToString());
 			}
 			return node;
 		}
 
-		public Node FindOrNull(string id)
+		public Node TryFind(string id)
 		{
 			if (id.IndexOf('/') >= 0) {
 				Node child = this;
 				string[] names = id.Split('/');
 				foreach (string name in names) {
-					child = child.FindOrNull(name);
+					child = child.TryFind(name);
 					if (child == null)
 						break;
 				}

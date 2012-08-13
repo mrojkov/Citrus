@@ -67,11 +67,21 @@ namespace Lime
 			return m;
 		}
 
+		public static Matrix32 Scaling(float x, float y)
+		{
+			return Scaling(new Vector2(x, y));
+		}
+
 		public static Matrix32 Translation(Vector2 translation)
 		{
 			Matrix32 m = Identity;
 			m.T = translation;
 			return m;
+		}
+
+		public static Matrix32 Translation(float x, float y)
+		{
+			return Translation(new Vector2(x, y));
 		}
 
 		public static Matrix32 Transformation(Vector2 center, Vector2 scaling, float rotation, Vector2 translation)

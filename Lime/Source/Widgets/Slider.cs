@@ -36,7 +36,7 @@ namespace Lime
 
 		void UpdateHelper(int delta)
 		{
-			var thumb = FindOrNull<Widget>("SliderThumb");
+			var thumb = TryFind<Widget>("SliderThumb");
 			if (thumb != null) {
 				if (thumb.HitTest(Input.MousePosition) && Input.WasKeyPressed(Key.Mouse0)) {
 					if (World.Instance.ActiveWidget == null) {
@@ -91,7 +91,7 @@ namespace Lime
 
 		void ScrollSlider(bool begin)
 		{
-			Spline rail = FindOrNull<Spline>("Rail");
+			Spline rail = TryFind<Spline>("Rail");
 			if (rail != null) {
 				float railLength = rail.CalcLength();
 				if (railLength > 0) {
