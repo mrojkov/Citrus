@@ -18,7 +18,7 @@ namespace Lime
 		void UpdateHelper(int delta)
 		{
 			if (textPresenter == null) {
-				textPresenter = Find<SimpleText>("TextPresenter", false);
+				textPresenter = FindOrNull<SimpleText>("TextPresenter");
 			}
 			if (textPresenter != null) {
 				textPresenter.Text = Caption;

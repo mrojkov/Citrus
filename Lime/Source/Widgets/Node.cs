@@ -295,14 +295,6 @@ namespace Lime
 			}
 		}
 
-		public T Find<T>(string id, bool throwException = true) where T : Node
-		{
-			T result = Find(id, throwException) as T;
-			if (throwException && result == null)
-				throw new Lime.Exception("'{0}' of {1} not found for '{2}'", id, typeof(T).Name, ToString());
-			return result;
-		}
-
 		public void AddNode(Node node)
 		{
 			Nodes.Add(node);
@@ -323,24 +315,44 @@ namespace Lime
 			node.Nodes.Push(this);
 		}
 
-		public Node Find(string id, bool throwException = true)
+		public T Find<T>(string id) where T : Node
+		{
+			T result = FindOrNull(id) as T;
+			if (result == null)
+				throw new Lime.Exception("'{0}' of {1} not found for '{2}'", id, typeof(T).Name, ToString());
+			return result;
+		}
+
+		public T FindOrNull<T>(string id) where T : Node
+		{
+			return FindOrNull(id) as T;
+		}
+
+		public Node Find(string id)
+		{
+			var node = FindOrNull(id);
+			if (node == null) {
+				throw new Lime.Exception("'{0}' not found for '{1}'", id, ToString());
+			}
+			return node;
+		}
+
+		public Node FindOrNull(string id)
 		{
 			if (id.IndexOf('/') >= 0) {
 				Node child = this;
 				string[] names = id.Split('/');
 				foreach (string name in names) {
-					child = child.Find(name, throwException);
+					child = child.FindOrNull(name);
 					if (child == null)
 						break;
 				}
-				if (throwException && child == null)
-					throw new Lime.Exception("'{0}' not found for '{1}'", id, ToString());
 				return child;
 			} else
-				return FindHelper(id, throwException);
+				return FindOrNullHelper(id);
 		}
 
-		Node FindHelper(string id, bool throwException)
+		private Node FindOrNullHelper(string id)
 		{
 			Queue<Node> queue = new Queue<Node>();
 			queue.Enqueue(this);
@@ -353,8 +365,6 @@ namespace Lime
 				foreach (Node child in node.Nodes.AsArray)
 					queue.Enqueue(child);
 			}
-			if (throwException)
-				throw new Lime.Exception("'{0}' not found for '{1}'", id, ToString());
 			return null;
 		}
 	}
