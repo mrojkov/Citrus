@@ -83,7 +83,7 @@ namespace Lime
 		{
 			get { return Find<Frame>(id); }
 		}
-
+		
 		void IImageCombinerArg.BypassRendering() {}
 
 		ITexture IImageCombinerArg.GetTexture()
