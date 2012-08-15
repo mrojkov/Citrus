@@ -19,11 +19,27 @@ namespace Lime
 		// class-level declarations
 		public UIWindow Window { get; private set; }
 		GameController gameController;
+
+		public AppDelegate()
+		{
+			AppDomain.CurrentDomain.UnhandledException += GlobalExceptionHandler;
+		}
 		
 		public override void ReceiveMemoryWarning(UIApplication application)
 		{
 			Lime.TexturePool.Instance.DiscardUnusedTextures(2);
 			System.GC.Collect();
+		}
+
+		static void GlobalExceptionHandler(object sender, UnhandledExceptionEventArgs e)
+		{
+			//string appId = Path.GetFileName(NSBundle.MainBundle.ExecutablePath);
+			//string currentDateTime = DateTime.Now.ToString();
+			//string path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);
+			//string fileName = string.Format("{0} {1} Crash.txt", appId, currentDateTime);
+			//string filePath = Path.Combine(path, fileName);
+			Console.WriteLine(e.ToString());
+			//File.WriteAllText(filePath, e.ToString());
 		}
 
 		public override void OnActivated(UIApplication application)
