@@ -35,6 +35,11 @@ namespace Lime
 			System.Threading.Thread.CurrentThread.CurrentCulture = culture;
 		}
 
+		public string[] GetCommandLineArgs()
+		{
+			return System.Environment.GetCommandLineArgs();
+		}
+
 		public PlatformId Platform {
 			get
 			{
