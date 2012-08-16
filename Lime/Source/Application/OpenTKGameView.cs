@@ -104,6 +104,8 @@ namespace Lime
 		
 		protected override void OnRenderFrame(OpenTK.FrameEventArgs e)
 		{
+			// !!! Just for battery saving
+			System.Threading.Thread.Sleep(10);
 			DoUpdate(e);
 			DoRender();
 		}
