@@ -124,7 +124,6 @@
     <Compile Include="Source\Widgets\SplineGear.cs" />
     <Compile Include="Source\Widgets\SplinePoint.cs" />
     <Compile Include="Source\Widgets\TextBox.cs" />
-    <Compile Include="Source\Widgets\TimeWaiter.cs" />
     <Compile Include="Source\Widgets\Widget.cs" />
     <Compile Include="Source\Widgets\Widget.Toolbox.cs" />
   </ItemGroup>
