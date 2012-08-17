@@ -5,9 +5,23 @@ using System.Collections.Generic;
 using System.Linq;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
+using System.Runtime.InteropServices;
 
 namespace Lime
 {
+	public class Logger
+	{
+	    [DllImport(MonoTouch.Constants.FoundationLibrary)]
+	    private extern static void NSLog(IntPtr message);
+
+	    public static void Log(string msg, params object[] args)
+	    {
+	        using (var nss = new NSString(string.Format(msg, args))) {
+	            NSLog(nss.Handle);
+	        }
+	    }
+	}
+
 	/// <summary>
 	/// The UIApplicationDelegate for the application. This class is responsible for launching the 
 	/// User Interface of the application, as well as listening(and optionally responding) to 
@@ -27,19 +41,14 @@ namespace Lime
 		
 		public override void ReceiveMemoryWarning(UIApplication application)
 		{
+			Logger.Log("Memory warning");
 			Lime.TexturePool.Instance.DiscardUnusedTextures(2);
 			System.GC.Collect();
 		}
 
 		static void GlobalExceptionHandler(object sender, UnhandledExceptionEventArgs e)
 		{
-			//string appId = Path.GetFileName(NSBundle.MainBundle.ExecutablePath);
-			//string currentDateTime = DateTime.Now.ToString();
-			//string path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);
-			//string fileName = string.Format("{0} {1} Crash.txt", appId, currentDateTime);
-			//string filePath = Path.Combine(path, fileName);
-			Console.WriteLine(e.ToString());
-			//File.WriteAllText(filePath, e.ToString());
+			Logger.Log(e.ExceptionObject.ToString());
 		}
 
 		public override void OnActivated(UIApplication application)
