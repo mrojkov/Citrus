@@ -117,7 +117,7 @@ namespace Lime
 			}
 		}
 
-		static void PauseAll()
+		public static void PauseAll()
 		{
 			foreach (var channel in channels) {
 				if (channel.State == ALSourceState.Playing) {
@@ -126,7 +126,7 @@ namespace Lime
 			}
 		}
 
-		static void ResumeAll()
+		public static void ResumeAll()
 		{
 			if (context != null) {
 				context.MakeCurrent();
