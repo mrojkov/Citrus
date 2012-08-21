@@ -26,7 +26,6 @@ namespace Lime
 			[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 			private Node node;
 
-
 			[DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
 			public Node[] Nodes { get { return node.Nodes.AsArray; } }
 
@@ -65,9 +64,9 @@ namespace Lime
 
 		[ProtoMember(9)]
 		public bool Running;
-		public bool Stopped { get { return !Running; } set { Running = !value; } }
+		public bool IsStopped { get { return !Running; } set { Running = !value; } }
 
-		public BareEventHandler OnStop;
+		public BareEventHandler Stopped;
 
 		private int animationTime;
 
@@ -109,16 +108,16 @@ namespace Lime
 						animationTime = Animator.FramesToMsecs(marker.Frame);
 						prevFrame = currFrame - 1;
 						Running = false;
-						if (OnStop != null) {
-							OnStop();
+						if (Stopped != null) {
+							Stopped();
 						}
 						break;
 					case MarkerAction.Destroy:
 						animationTime = Animator.FramesToMsecs(marker.Frame);
 						prevFrame = currFrame - 1;
 						Running = false;
-						if (OnStop != null) {
-							OnStop();
+						if (Stopped != null) {
+							Stopped();
 						}
 						UnlinkAfterUpdate();
 						break;

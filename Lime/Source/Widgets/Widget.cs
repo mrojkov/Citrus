@@ -151,12 +151,12 @@ namespace Lime
 			Blending = Blending.Default;
 		}
 
-		public void Hide()
+		public void MakeInvisible()
 		{
 			Visible = false;
 		}
 
-		public void Show()
+		public void MakeVisible()
 		{
 			Visible = true;
 		}
