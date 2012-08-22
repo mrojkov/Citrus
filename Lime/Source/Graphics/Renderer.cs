@@ -493,7 +493,7 @@ namespace Lime
 			FontChar prevChar = null;
 			Vector2 size = new Vector2(0, fontHeight);
 			float width = 0;
-			float scale = fontHeight / font.CharHeight;
+			// float scale = fontHeight / font.CharHeight;
 			for (int i = 0; i < length; i++) {
 				char ch = text[i + start];
 				if (ch == '\n') {
@@ -511,8 +511,9 @@ namespace Lime
 						}
 					}
 				}
+				float scale = fontHeight / fontChar.Height;
 				width += scale * (fontChar.ACWidths.X + kerning);
-				width += scale * (fontChar.Width + fontChar.ACWidths.Y + kerning);
+				width += scale * (fontChar.Width + fontChar.ACWidths.Y);
 				size.X = Math.Max(size.X, width);
 				prevChar = fontChar;
 			}
@@ -523,7 +524,6 @@ namespace Lime
 		{
 			FontChar prevChar = null;
 			float savedX = position.X;
-			float scale = fontHeight / font.CharHeight;
 			for (int i = 0; i < length; i++) {
 				char ch = text[i + start];
 				if (ch == '\n') {
@@ -541,10 +541,11 @@ namespace Lime
 						}
 					}
 				}
+				float scale = fontHeight / fontChar.Height;
 				position.X += scale * (fontChar.ACWidths.X + kerning);
 				Vector2 size = new Vector2(scale * fontChar.Width, fontHeight);
 				DrawSprite(font.Textures[fontChar.TextureIndex], color, position, size, fontChar.UV0, fontChar.UV1);
-				position.X += scale * (fontChar.Width + fontChar.ACWidths.Y + kerning);
+				position.X += scale * (fontChar.Width + fontChar.ACWidths.Y);
 				prevChar = fontChar;
 			}
 		}

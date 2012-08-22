@@ -309,8 +309,8 @@ namespace Lime
 			if (word.IsTagBegin && style.ImageUsage == TextStyle.ImageUsageEnum.Bullet)
 				bullet = style.ImageSize.X;
 			if (word.Length == 1) {
-				float fontScale = style.Size / font.CharHeight;
 				var c = font.Chars[word.Text[word.Start]];
+				float fontScale = style.Size / c.Height;
 				float width = bullet + (c.ACWidths.X + c.ACWidths.Y + c.Width) * fontScale;
 				return width;
 			} else {

@@ -9,13 +9,11 @@ namespace Lime
 	public class Font
 	{
 		[ProtoMember(1)]
-		public float CharHeight;
+		public string About;
 		[ProtoMember(2)]
 		public List<SerializableTexture> Textures = new List<SerializableTexture>();
 		[ProtoMember(3)]
 		public readonly FontCharCollection Chars = new FontCharCollection();
-		[ProtoMember(4)]
-		public string About;
 	}
 
 	[ProtoContract]
@@ -123,10 +121,12 @@ namespace Lime
 		[ProtoMember(4)]
 		public float Width;
 		[ProtoMember(5)]
-		public Vector2 ACWidths;
+		public float Height;
 		[ProtoMember(6)]
-		public List<KerningPair> KerningPairs;
+		public Vector2 ACWidths;
 		[ProtoMember(7)]
+		public List<KerningPair> KerningPairs;
+		[ProtoMember(8)]
 		public int TextureIndex;
 		public static FontChar Null = new FontChar();
 	}
