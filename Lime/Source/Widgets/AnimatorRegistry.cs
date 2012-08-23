@@ -40,6 +40,8 @@ namespace Lime
 			Add(typeof(SerializableSample), typeof(GenericAnimator<SerializableSample>));
 			Add(typeof(EmitterShape), typeof(GenericAnimator<EmitterShape>));
 			Add(typeof(AudioAction), typeof(GenericAnimator<AudioAction>));
+			Add(typeof(HAlignment), typeof(GenericAnimator<HAlignment>));
+			Add(typeof(VAlignment), typeof(GenericAnimator<VAlignment>));
 		}
 		
 		Dictionary<Type, Type> map = new Dictionary<Type, Type>();

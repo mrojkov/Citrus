@@ -15,47 +15,39 @@ namespace Orange
 		KeyReader GetKeyReader(string animatorType, string propertyName, string className)
 		{
 			switch(animatorType) {
+			case "Hot::TypedAnimator<Hot::HorizontalAlignment>":
+				return () => (HAlignment)lexer.ParseInt();
+			case "Hot::TypedAnimator<Hot::VerticalAlignment>":
+				return () => (VAlignment)lexer.ParseInt();
 			case "Hot::TypedAnimator<Hot::EmitterShape>":
-				return delegate() {
-					return (EmitterShape)lexer.ParseInt(); };
+				return () => (EmitterShape)lexer.ParseInt();
 			case "Hot::TypedAnimator<Hot::BlendMode>":
-				return delegate() {
-					return lexer.ParseBlendMode(); };
+				return () => lexer.ParseBlendMode();
 			case "Hot::TypedAnimator<Hot::Color>":
-				return delegate() {
-					return lexer.ParseColor4(); };
+				return () => lexer.ParseColor4();
 			case "Hot::TypedAnimator<Hot::Vector2>":
-				return delegate() {
-					return lexer.ParseVector2(); };
+				return () => lexer.ParseVector2();
 			case "Hot::TypedAnimator<float>":
-				return delegate() {
-					return lexer.ParseFloat(); };
+				return () => lexer.ParseFloat();
 			case "Hot::TypedAnimator<int>":
-				return delegate() {
-					return lexer.ParseInt(); };
+				return () => lexer.ParseInt();
 			case "Hot::TypedAnimator<bool>":
-				return delegate() {
-					return lexer.ParseBool(); };
+				return () => lexer.ParseBool();
 			case "Hot::TypedAnimator<std::basic_string<char,std::char_traits<char>,std::allocator<char>>>":
 				switch(propertyName + "@" + className) {
 				case "Texture@Hot::Image":
 				case "Texture@Hot::DistortionMesh":
 				case "Texture@Hot::NineGrid":
-					return delegate() {
-						return new SerializableTexture(lexer.ParsePath()); };
+					return () => new SerializableTexture(lexer.ParsePath());
 				case "File@Audio":
-					return delegate() {
-						return new SerializableSample(lexer.ParsePath()); };
+					return () => new SerializableSample(lexer.ParsePath());
 				default:
-					return delegate() {
-						return lexer.ParseQuotedString(); };
+					return () => lexer.ParseQuotedString();
 				}
 			case "Hot::TypedAnimator<Hot::RandomPair>":
-				return delegate() {
-					return lexer.ParseNumericRange(); };
+				return () => lexer.ParseNumericRange();
 			case "Hot::TypedAnimator<Hot::Audio::Action>":
-				return delegate() {
-					return (AudioAction)lexer.ParseInt(); };
+				return () => (AudioAction)lexer.ParseInt();
 			default:
 				throw new Exception("Unknown type of animator '{0}'", animatorType);
 			}
@@ -102,6 +94,12 @@ namespace Orange
 						break;
 					case "FontSize":
 						propertyName = "FontHeight";
+						break;
+					case "HAlign":
+						propertyName = "HAlignment";
+						break;
+					case "VAlign":
+						propertyName = "VAlignment";
 						break;
 					}
 					switch(propertyName + '@' + className) {

@@ -35,6 +35,8 @@ namespace Lime
 	[ProtoInclude(110, typeof(GenericAnimator<EmitterShape>))]
 	[ProtoInclude(111, typeof(GenericAnimator<AudioAction>))]
 	[ProtoInclude(112, typeof(GenericAnimator<SerializableSample>))]
+	[ProtoInclude(113, typeof(GenericAnimator<HAlignment>))]
+	[ProtoInclude(114, typeof(GenericAnimator<VAlignment>))]
 	public abstract class Animator
 	{
 		public const int FramesPerSecond = 16;
