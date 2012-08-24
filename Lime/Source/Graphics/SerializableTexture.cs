@@ -21,6 +21,12 @@ namespace Lime
 			core = TexturePool.Instance.GetSerializableTextureCore(path);
 		}
 
+		public SerializableTexture(string format, params object[] args)
+		{
+			var path = string.Format(format, args);
+			core = TexturePool.Instance.GetSerializableTextureCore(path);
+		}
+
 		public string SerializationPath {
 			get {
                 var path = core.Path;
