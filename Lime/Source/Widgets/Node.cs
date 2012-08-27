@@ -175,6 +175,13 @@ namespace Lime
 			return true;
 		}
 
+		public void SwitchAnimation(string animation)
+		{
+			if (CurrentAnimation != animation) {
+				RunAnimation(animation);
+			}
+		}
+
 		public int AnimationFrame {
 			get { return Animator.MsecsToFrames(AnimationTime); }
 			set { AnimationTime = Animator.FramesToMsecs(value); }
