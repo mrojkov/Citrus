@@ -339,9 +339,19 @@ namespace Lime
 			return result;
 		}
 
+		public T Find<T>(string format, params object[] args) where T : Node
+		{
+			return Find<T>(string.Format(format, args));
+		}
+
 		public T TryFind<T>(string id) where T : Node
 		{
 			return TryFind(id) as T;
+		}
+
+		public T TryFind<T>(string format, params object[] args) where T : Node
+		{
+			return TryFind<T>(string.Format(format, args));
 		}
 
 		public Node Find(string id)

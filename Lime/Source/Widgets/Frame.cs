@@ -39,6 +39,7 @@ namespace Lime
 		public UpdateDelegate LateUpdating;
 		public UpdateDelegate LateUpdated;
 		public BareEventHandler Rendered;
+		public BareEventHandler Clicked;
 
 		[ProtoMember(1)]
 		public RenderTarget RenderTarget {
@@ -159,6 +160,11 @@ namespace Lime
 			UpdateHelper(delta);
 			if (Updated != null) {
 				Updated(delta * 0.001f);
+			}
+			if (Clicked != null) {
+				if (Input.WasMouseReleased() && HitTest(Input.MousePosition)) {
+					Clicked();
+				}
 			}
 		}
 
