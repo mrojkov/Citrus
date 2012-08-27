@@ -200,7 +200,20 @@ namespace Lime
 
 		private static HashSet<string> processingFiles = new HashSet<string>();
 
+		public Frame(Node parent, string path)
+		{
+			LoadFromBundle(path);
+			if (parent != null) {
+				parent.PushNode(this);
+			}
+		}
+
 		public Frame(string path)
+		{
+			LoadFromBundle(path);
+		}
+
+		private void LoadFromBundle(string path)
 		{
 			path = Path.ChangeExtension(path, "scene");
 			if (processingFiles.Contains(path))

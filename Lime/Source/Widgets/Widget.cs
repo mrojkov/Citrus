@@ -132,6 +132,8 @@ namespace Lime
 		public Color4 GlobalColor { get { return globalColor; } }
 		public Blending GlobalBlending { get { return globalBlending; } }
 		public bool GloballyVisible { get { return globallyVisible; } }
+		public Vector2 GlobalPosition { get { return globalMatrix * Vector2.Zero; } }
+		public Vector2 GlobalCenter { get { return globalMatrix * (Size / 2); } }
 
 		protected Matrix32 globalMatrix;
 		protected Color4 globalColor;

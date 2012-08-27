@@ -30,7 +30,7 @@ namespace Lime
 		private void OnAcceleration(object sender, UIAccelerometerEventArgs e)
 		{
 			Input.Acceleration = new Vector3((float)e.Acceleration.X,
-                 (float)e.Acceleration.Y, (float)e.Acceleration.Z);
+				(float)e.Acceleration.Y, (float)e.Acceleration.Z);
 		}
 
 		public void Activate()
