@@ -194,23 +194,26 @@ namespace Lime
 
 		private static HashSet<string> processingFiles = new HashSet<string>();
 
-		public static Frame Create(string path)
+		public Frame(string path)
 		{
 			path = Path.ChangeExtension(path, "scene");
 			if (processingFiles.Contains(path))
 				throw new Lime.Exception("Cyclic dependency of scenes has detected: {0}", path);
-			Frame frame;
 			processingFiles.Add(path);
 			try {
 				using (Stream stream = AssetsBundle.Instance.OpenFileLocalized(path)) {
-					frame = Serialization.ReadObject<Frame>(path, stream);
+					Serialization.ReadObject<Frame>(path, stream, this);
 				}
-				frame.LoadContent();
-				frame.Tag = path;
+				LoadContent();
+				Tag = path;
 			} finally {
 				processingFiles.Remove(path);
 			}
-			return frame;
+		}
+
+		public static Frame Create(string path)
+		{
+			return new Frame(path);
 		}
 
 		public void LoadContent()

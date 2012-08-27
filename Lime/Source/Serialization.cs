@@ -102,26 +102,26 @@ namespace Lime
 			}
 		}
 
-		public static T ReadObject<T>(string path, Stream stream)
+		public static T ReadObject<T>(string path, Stream stream, object obj = null)
 		{
 			opStack.Push(new Operation { SerializationPath = path, Type = OperationType.Serialization });
 			try {
-				return (T)Serializer.Deserialize(stream, null, typeof(T));
+				return (T)Serializer.Deserialize(stream, obj, typeof(T));
 			} finally {
 				opStack.Pop();
 			}
 		}
 
-		public static T ReadObject<T>(string path)
+		public static T ReadObject<T>(string path, object obj = null)
 		{
 			using (Stream stream = AssetsBundle.Instance.OpenFileLocalized(path))
-				return ReadObject<T>(path, stream);
+				return ReadObject<T>(path, stream, obj);
 		}
 		
-		public static T ReadObjectFromFile<T>(string path)
+		public static T ReadObjectFromFile<T>(string path, object obj = null)
 		{
 			using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-				return ReadObject<T>(path, stream);
+				return ReadObject<T>(path, stream, obj);
 		}
 	}
 }
