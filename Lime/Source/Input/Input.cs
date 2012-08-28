@@ -179,7 +179,12 @@ namespace Lime
 			public bool State;
 		}
 
-		static List<KeyEvent> keyEventQueue = new List<KeyEvent>();
+		public static Vector2 MouseRefuge = new Vector2(-123456, -123456);
+
+		private static Vector2[] touchPositions = new Vector2[MaxTouches];
+		private static Vector2 mousePosition;
+
+		private static List<KeyEvent> keyEventQueue = new List<KeyEvent>();
 		
 		public const int MaxTouches = 4;
 
@@ -196,13 +201,9 @@ namespace Lime
 		/// When mouse is invisible this property has an offscreen value.
 		/// </summary>
 		public static Vector2 MousePosition {
-			get { return MouseVisible ? mousePosition : mouseRefuge; }
+			get { return MouseVisible ? mousePosition : MouseRefuge; }
 			internal set { mousePosition = value; }
 		}
-		
-		static Vector2[] touchPositions = new Vector2[MaxTouches];
-		static Vector2 mousePosition;
-		static Vector2 mouseRefuge = new Vector2(-123456, -123456);
 
 		/// <summary>
 		/// Use this property for hiding mouse away. E.g. after processing modal dialog controls.
@@ -289,7 +290,7 @@ namespace Lime
 
 		public static Vector2 GetTouchPosition(int index)
 		{
-			return MouseVisible ? touchPositions[index] : mouseRefuge;
+			return MouseVisible ? touchPositions[index] : MouseRefuge;
 		}
 
 		internal static void SetTouchPosition(int index, Vector2 position)
