@@ -42,7 +42,7 @@ namespace Lime
 			return markers.GetEnumerator();
 		}
 
-		public Marker Get(string id)
+		public Marker TryFind(string id)
 		{
 			int count = markers.Count;
 			for (int i = 0; i < count; i++) {
@@ -52,6 +52,15 @@ namespace Lime
 				}
 			}
 			return null;
+		}
+
+		public Marker Find(string id)
+		{
+			var marker = TryFind(id);
+			if (marker == null) {
+				throw new Lime.Exception("Unknown marker '{0}'", id);
+			}
+			return marker;
 		}
 
 		public Marker GetByFrame(int frame)

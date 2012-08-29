@@ -25,25 +25,25 @@ namespace Lime
 			}
 			if (HitTest(Input.MousePosition)) {
 				if (World.Instance.ActiveWidget == null) {
-					RunAnimation("Focus");
+					TryRunAnimation("Focus");
 					World.Instance.ActiveWidget = this;
 				}
 			} else {
 				if (World.Instance.ActiveWidget == this) {
-					RunAnimation("Normal");
+					TryRunAnimation("Normal");
 					World.Instance.ActiveWidget = null;
 				}
 			}
 			if (World.Instance.ActiveWidget == this) {
 				if (Input.WasKeyPressed(Key.Mouse0)) {
-					RunAnimation("Press");
+					TryRunAnimation("Press");
 					Input.ConsumeKeyEvent(Key.Mouse0, true);
 				}
 				if (Input.WasKeyReleased(Key.Mouse0)) {
 					if (HitTest(Input.MousePosition))
-						RunAnimation("Focus");
+						TryRunAnimation("Focus");
 					else
-						RunAnimation("Normal");
+						TryRunAnimation("Normal");
 					Input.ConsumeKeyEvent(Key.Mouse0, true);
 					if (Clicked != null) {
 						Clicked(this);
@@ -51,7 +51,7 @@ namespace Lime
 				}
 			}
 			if (World.Instance.ActiveWidget != this && CurrentAnimation != "Normal") {
-				RunAnimation("Normal");
+				TryRunAnimation("Normal");
 			}
 			if (World.Instance.ActiveWidget == this) {
 				World.Instance.ActiveWidgetUpdated = true;

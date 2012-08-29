@@ -96,7 +96,7 @@ namespace Lime
 				if (marker != null) {
 					switch (marker.Action) {
 					case MarkerAction.Jump:
-						var gotoMarker = Markers.Get(marker.JumpTo);
+						var gotoMarker = Markers.TryFind(marker.JumpTo);
 						if (gotoMarker != null) {
 							int hopFrames = gotoMarker.Frame - AnimationFrame;
 							animationTime += Animator.FramesToMsecs(hopFrames);
@@ -162,11 +162,10 @@ namespace Lime
 			return false;
 		}
 
-		public bool RunAnimation(string markerId)
+		public bool TryRunAnimation(string markerId)
 		{
-			Marker marker = Markers.Get(markerId);
+			Marker marker = Markers.TryFind(markerId);
 			if (marker == null) {
-				// Console.WriteLine("WARNING: Attempt to play animation. Unknown marker '{0}' in node '{1}'", markerId, Id);
 				return false;
 			}
 			AnimationFrame = marker.Frame;
@@ -175,11 +174,30 @@ namespace Lime
 			return true;
 		}
 
+		public void RunAnimation(string markerId)
+		{
+			if (!TryRunAnimation(markerId)) {
+				throw new Lime.Exception("Unknown animation '{0}' in node '{1}'", markerId, this.ToString());
+			}
+		}
+
 		public void SwitchAnimation(string animation)
 		{
 			if (CurrentAnimation != animation) {
 				RunAnimation(animation);
 			}
+		}
+
+		public bool IsAnimationBefore(string markerId)
+		{
+			var marker = Markers.Find(markerId);
+			return AnimationFrame < marker.Frame;
+		}
+
+		public bool IsAnimationAfter(string markerId)
+		{
+			var marker = Markers.Find(markerId);
+			return AnimationFrame >= marker.Frame;
 		}
 
 		public int AnimationFrame {
@@ -313,7 +331,7 @@ namespace Lime
 					AnimationTime = 0;
 					Running = true;
 				} else {
-					RunAnimation(Trigger);
+					TryRunAnimation(Trigger);
 				}
 			}
 		}

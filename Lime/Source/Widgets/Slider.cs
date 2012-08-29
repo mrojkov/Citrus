@@ -40,12 +40,12 @@ namespace Lime
 			if (thumb != null) {
 				if (thumb.HitTest(Input.MousePosition) && Input.WasKeyPressed(Key.Mouse0)) {
 					if (World.Instance.ActiveWidget == null) {
-						thumb.RunAnimation("Focus");
+						thumb.TryRunAnimation("Focus");
 						World.Instance.ActiveWidget = this;
 					}
 				} else {
 					if (World.Instance.ActiveWidget == this && !Input.IsKeyPressed(Key.Mouse0)) {
-						thumb.RunAnimation("Normal");
+						thumb.TryRunAnimation("Normal");
 						World.Instance.ActiveWidget = null;
 					}
 				}
@@ -59,11 +59,11 @@ namespace Lime
 				}
 				Marker m1, m2;
 				if (World.Instance.ActiveWidget == this) {
-					m1 = Markers.Get("FocusLow");
-					m2 = Markers.Get("FocusHigh");
+					m1 = Markers.TryFind("FocusLow");
+					m2 = Markers.TryFind("FocusHigh");
 				} else {
-					m1 = Markers.Get("NormalLow");
-					m2 = Markers.Get("NormalHigh");
+					m1 = Markers.TryFind("NormalLow");
+					m2 = Markers.TryFind("NormalHigh");
 				}
 				if (m1 != null && m2 != null) {
 					if (RangeMax > RangeMin) {
@@ -74,7 +74,7 @@ namespace Lime
 				}
 			}
 			if (World.Instance.ActiveWidget != this && thumb.CurrentAnimation != "Normal") {
-				thumb.RunAnimation("Normal");
+				thumb.TryRunAnimation("Normal");
 			}
 			if (World.Instance.ActiveWidget == this) {
 				World.Instance.ActiveWidgetUpdated = true;

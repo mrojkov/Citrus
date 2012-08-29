@@ -281,7 +281,7 @@ namespace Lime
 			if (marker == null) {
 				frame.Running = true;
 			} else {
-				frame.RunAnimation(marker);
+				frame.TryRunAnimation(marker);
 			}
 			if (parent != null) {
 				parent.Nodes.Insert(0, frame);
@@ -297,7 +297,7 @@ namespace Lime
 			if (marker == null) {
 				frame.Running = true;
 			} else {
-				frame.RunAnimation(marker);
+				frame.TryRunAnimation(marker);
 			}
 			if (parent != null) {
 				parent.Nodes.Insert(0, frame);
