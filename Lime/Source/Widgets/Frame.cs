@@ -102,7 +102,7 @@ namespace Lime
 			}
 			if (globallyVisible && World.Instance.ActiveTextWidget != null && !World.Instance.ActiveTextWidget.ChildOf(this)) {
 				// Discard active text widget if it's not a child of the topmost dialog.
-				World.Instance.ActiveTextWidget = null;
+				//World.Instance.ActiveTextWidget = null;
 			}
 			if (!Running) {
 				base.Update(delta);
