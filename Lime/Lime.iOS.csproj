@@ -125,6 +125,7 @@
     <Compile Include="Source\Geometry.cs" />
     <Compile Include="Source\Widgets\Polyline.cs" />
     <Compile Include="Source\Widgets\Widget.Debugging.cs" />
+    <Compile Include="Source\StringExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Lemon\bin\iOS\Release-iphoneos\libLemon.a">
