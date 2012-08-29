@@ -21,6 +21,11 @@ namespace Lime
 		public static readonly Vector2 East = new Vector2(1, 0);
 		public static readonly Vector2 West = new Vector2(-1, 0);
 
+		public Vector2(float xy)
+		{
+			X = Y = xy;
+		}
+
 		public Vector2(float x, float y)
 		{
 			X = x;
