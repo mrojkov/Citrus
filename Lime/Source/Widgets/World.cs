@@ -10,7 +10,7 @@
 		/// <summary>
 		/// On each update cycle active widget must set this flag true.
 		/// </summary>
-		public bool ActiveWidgetUpdated;
+		public bool IsActiveWidgetUpdated;
 		/// <summary>
 		/// Widget which holds text input focus. Before processing Input.TextInput string you should test whether ActiveTextWidget == this.
 		/// For revoking text input focus from widget you should nullify ActiveTextWidget.
@@ -19,7 +19,11 @@
 		/// <summary>
 		/// On each update cycle active text widget must set this flag true.
 		/// </summary>
-		public bool ActiveTextWidgetUpdated;
+		public bool IsActiveTextWidgetUpdated;
+		/// <summary>
+		/// On each update cycle modal dialog frame must set this flag true.
+		/// </summary>
+		public bool IsTopDialogUpdated;
 
 		public static World Instance;
 
@@ -31,18 +35,19 @@
 		public override void Update(int delta)
 		{
 			ParticleEmitter.NumberOfUpdatedParticles = 0;
-			ActiveWidgetUpdated = false;
-			ActiveTextWidgetUpdated = false;
+			IsActiveWidgetUpdated = false;
+			IsActiveTextWidgetUpdated = false;
+			IsTopDialogUpdated = false;
 			base.Update(delta);
 		}
 
 		public override void LateUpdate(int delta)
 		{
 			base.LateUpdate(delta);
-			if (!ActiveWidgetUpdated) {
+			if (!IsActiveWidgetUpdated) {
 				ActiveWidget = null;
 			}
-			if (!ActiveTextWidgetUpdated) {
+			if (!IsActiveTextWidgetUpdated) {
 				ActiveTextWidget = null;
 			}
 #if iOS

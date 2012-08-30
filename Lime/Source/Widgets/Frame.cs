@@ -94,21 +94,23 @@ namespace Lime
 
 		private void UpdateForDialogMode(int delta)
 		{
-			if (globallyVisible && Input.MouseVisible) {
-				if (World.Instance.ActiveWidget != null && !World.Instance.ActiveWidget.ChildOf(this)) {
-					// Discard active widget if it's not a child of the topmost dialog.
-					World.Instance.ActiveWidget = null;
+			if (!World.Instance.IsTopDialogUpdated) {
+				if (globallyVisible && Input.MouseVisible) {
+					if (World.Instance.ActiveWidget != null && !World.Instance.ActiveWidget.ChildOf(this)) {
+						// Discard active widget if it's not a child of the topmost dialog.
+						World.Instance.ActiveWidget = null;
+					}
 				}
-			}
-			if (globallyVisible && World.Instance.ActiveTextWidget != null && !World.Instance.ActiveTextWidget.ChildOf(this)) {
-				// Discard active text widget if it's not a child of the topmost dialog.
-				//World.Instance.ActiveTextWidget = null;
+				if (globallyVisible && World.Instance.ActiveTextWidget != null && !World.Instance.ActiveTextWidget.ChildOf(this)) {
+					// Discard active text widget if it's not a child of the topmost dialog.
+					World.Instance.ActiveTextWidget = null;
+				}
 			}
 			if (!Running) {
 				base.Update(delta);
 			}
 			if (globallyVisible) {
-				// Cosume all input events and drive mouse out of the screen.
+				// Consume all input events and drive mouse out of the screen.
 				Input.ConsumeAllKeyEvents(true);
 				Input.MouseVisible = false;
 				Input.TextInput = null;
@@ -116,6 +118,7 @@ namespace Lime
 			if (Running) {
 				base.Update(delta);
 			}
+			World.Instance.IsTopDialogUpdated = true;
 		}
 
 		public override void LateUpdate(int delta)

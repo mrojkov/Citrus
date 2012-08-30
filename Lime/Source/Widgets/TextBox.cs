@@ -76,7 +76,7 @@ namespace Lime
 				}
 			}
 			if (World.Instance.ActiveTextWidget == this) {
-				World.Instance.ActiveTextWidgetUpdated = true;
+				World.Instance.IsActiveTextWidgetUpdated = true;
 			}
 			caretBlinkPhase += delta;
 		}

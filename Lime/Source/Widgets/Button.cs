@@ -54,7 +54,7 @@ namespace Lime
 				TryRunAnimation("Normal");
 			}
 			if (World.Instance.ActiveWidget == this) {
-				World.Instance.ActiveWidgetUpdated = true;
+				World.Instance.IsActiveWidgetUpdated = true;
 			}
 		}
 
