@@ -73,10 +73,13 @@ namespace Orange
 					switch(propertyName) {
 					case "TexCoordForMins":
 						propertyName = "UV0";
-					break;
+						break;
 					case "TexCoordForMaxs":
 						propertyName = "UV1";
-					break;
+						break;
+					case "WidgetName":
+						propertyName = "WidgetId";
+						break;
 					case "TexturePath":
 						propertyName = "Texture";
 						break;
