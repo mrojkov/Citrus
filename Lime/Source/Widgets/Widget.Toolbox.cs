@@ -5,8 +5,38 @@ using System.Text;
 
 namespace Lime
 {
+	public struct Basis
+	{
+		public Vector2 Position;
+		public Vector2 Scale;
+		public float Rotation;
+		public Vector2 U;
+		public Vector2 V;
+	}
+
 	public partial class Widget : Node
 	{
+		public Basis Basis
+		{
+			get
+			{
+				// Vector2 cs = Mathf.CosSin(Mathf.DegreesToRadians * Rotation);
+				return new Basis {
+					Position = Position,
+					Rotation = Rotation,
+					Scale = Scale,
+					// U = new Vector2(cs.X, cs.Y),
+					// V = new Vector2(-cs.Y, cs.X)
+				};
+			}
+			set
+			{
+				Position = value.Position;
+				Rotation = value.Rotation;
+				Scale = value.Scale;
+			}
+		}
+
 		public void RenderToTexture(ITexture texture)
 		{
 			if (Width > 0 && Height > 0) {
@@ -86,15 +116,6 @@ namespace Lime
 			vertices[2] = vertices[0] + basis.U * Size.X + basis.V * Size.Y;
 			vertices[3] = vertices[0] + basis.V * Size.Y;
 			return vertices;
-		}
-
-		public struct Basis
-		{
-			public Vector2 Position;
-			public Vector2 Scale;
-			public float Rotation;
-			public Vector2 U;
-			public Vector2 V;
 		}
 
 		public Basis CalcBasisFromMatrix(Matrix32 matrix)

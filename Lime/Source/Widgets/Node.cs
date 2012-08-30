@@ -63,8 +63,8 @@ namespace Lime
 		public MarkerCollection Markers;
 
 		[ProtoMember(9)]
-		public bool Running;
-		public bool IsStopped { get { return !Running; } set { Running = !value; } }
+		public bool IsRunning;
+		public bool IsStopped { get { return !IsRunning; } set { IsRunning = !value; } }
 
 		public BareEventHandler Stopped;
 
@@ -107,7 +107,7 @@ namespace Lime
 					case MarkerAction.Stop:
 						animationTime = Animator.FramesToMsecs(marker.Frame);
 						prevFrame = currFrame - 1;
-						Running = false;
+						IsRunning = false;
 						if (Stopped != null) {
 							Stopped();
 						}
@@ -115,7 +115,7 @@ namespace Lime
 					case MarkerAction.Destroy:
 						animationTime = Animator.FramesToMsecs(marker.Frame);
 						prevFrame = currFrame - 1;
-						Running = false;
+						IsRunning = false;
 						if (Stopped != null) {
 							Stopped();
 						}
@@ -170,7 +170,7 @@ namespace Lime
 			}
 			AnimationFrame = marker.Frame;
 			CurrentAnimation = markerId;
-			Running = true;
+			IsRunning = true;
 			return true;
 		}
 
@@ -285,7 +285,7 @@ namespace Lime
 		public virtual void Update(int delta)
 		{
 			UpdatedNodes++;
-			if (Running) {
+			if (IsRunning) {
 				AdvanceAnimation(delta);
 			}
 			foreach (Node node in Nodes.AsArray) {
@@ -329,7 +329,7 @@ namespace Lime
 			if (property == "Trigger") {
 				if (String.IsNullOrEmpty(Trigger)) {
 					AnimationTime = 0;
-					Running = true;
+					IsRunning = true;
 				} else {
 					TryRunAnimation(Trigger);
 				}

@@ -106,7 +106,7 @@ namespace Lime
 					World.Instance.ActiveTextWidget = null;
 				}
 			}
-			if (!Running) {
+			if (!IsRunning) {
 				base.Update(delta);
 			}
 			if (globallyVisible) {
@@ -115,7 +115,7 @@ namespace Lime
 				Input.MouseVisible = false;
 				Input.TextInput = null;
 			}
-			if (Running) {
+			if (IsRunning) {
 				base.Update(delta);
 			}
 			World.Instance.IsTopDialogUpdated = true;
@@ -255,7 +255,8 @@ namespace Lime
 		{
 			Nodes.Clear();
 			Markers.Clear();
-			if (AssetsBundle.Instance.FileExists(ContentsPath)) {
+			var contentsPath = Path.ChangeExtension(ContentsPath, "scene");
+			if (AssetsBundle.Instance.FileExists(contentsPath)) {
 				Frame content = Frame.Create(ContentsPath);
 				if (content.Widget != null && Widget != null) {
 					content.Update(0);
@@ -264,8 +265,10 @@ namespace Lime
 				}
 				foreach (Marker marker in content.Markers)
 					Markers.Add(marker);
-				foreach (Node node in content.Nodes.AsArray)
+				foreach (Node node in content.Nodes.AsArray) {
+					node.Unlink();
 					Nodes.Add(node);
+				}
 			}
 		}
 
@@ -282,7 +285,7 @@ namespace Lime
 			Frame frame = Create(path);
 			frame.Tag = path;
 			if (marker == null) {
-				frame.Running = true;
+				frame.IsRunning = true;
 			} else {
 				frame.TryRunAnimation(marker);
 			}
@@ -298,7 +301,7 @@ namespace Lime
 			frame.Parent = null;
 			frame.Tag = path;
 			if (marker == null) {
-				frame.Running = true;
+				frame.IsRunning = true;
 			} else {
 				frame.TryRunAnimation(marker);
 			}
