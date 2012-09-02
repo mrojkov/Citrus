@@ -358,7 +358,7 @@ namespace Lime
 
 		public T Find<T>(string id) where T : Node
 		{
-			T result = TryFind(id) as T;
+			T result = TryFindNode(id) as T;
 			if (result == null)
 				throw new Lime.Exception("'{0}' of {1} not found for '{2}'", id, typeof(T).Name, ToString());
 			return result;
@@ -371,7 +371,7 @@ namespace Lime
 
 		public T TryFind<T>(string id) where T : Node
 		{
-			return TryFind(id) as T;
+			return TryFindNode(id) as T;
 		}
 
 		public T TryFind<T>(string format, params object[] args) where T : Node
@@ -379,31 +379,31 @@ namespace Lime
 			return TryFind<T>(string.Format(format, args));
 		}
 
-		public Node Find(string id)
+		public Node FindNode(string id)
 		{
-			var node = TryFind(id);
+			var node = TryFindNode(id);
 			if (node == null) {
 				throw new Lime.Exception("'{0}' not found for '{1}'", id, ToString());
 			}
 			return node;
 		}
 
-		public Node TryFind(string id)
+		public Node TryFindNode(string id)
 		{
 			if (id.IndexOf('/') >= 0) {
 				Node child = this;
 				string[] names = id.Split('/');
 				foreach (string name in names) {
-					child = child.TryFind(name);
+					child = child.TryFindNode(name);
 					if (child == null)
 						break;
 				}
 				return child;
 			} else
-				return FindOrNullHelper(id);
+				return TryFindNodeHelper(id);
 		}
 
-		private Node FindOrNullHelper(string id)
+		private Node TryFindNodeHelper(string id)
 		{
 			Queue<Node> queue = new Queue<Node>();
 			queue.Enqueue(this);
