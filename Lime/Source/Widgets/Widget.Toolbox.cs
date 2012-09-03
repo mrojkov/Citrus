@@ -37,6 +37,11 @@ namespace Lime
 			}
 		}
 
+		public void MatchByPositionWith(Widget widget)
+		{
+			Position = widget.CalcPositionInSpaceOf(Parent.Widget);
+		}
+
 		public void RenderToTexture(ITexture texture)
 		{
 			if (Width > 0 && Height > 0) {
