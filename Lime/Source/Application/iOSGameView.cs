@@ -14,7 +14,7 @@ using MonoTouch.UIKit;
 
 namespace Lime
 {
-	internal class GameView : iPhoneOSGameView
+	public class GameView : iPhoneOSGameView
 	{
 		UITextField textField;
 

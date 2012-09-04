@@ -11,7 +11,7 @@ using System.Collections.Generic;
 
 namespace Lime
 {
-	internal class GameController : UIViewController
+	public class GameController : UIViewController
 	{
 		public static GameController Instance;
 
