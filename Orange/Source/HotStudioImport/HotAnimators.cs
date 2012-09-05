@@ -35,12 +35,12 @@ namespace Orange
 				return () => lexer.ParseBool();
 			case "Hot::TypedAnimator<std::basic_string<char,std::char_traits<char>,std::allocator<char>>>":
 				switch(propertyName + "@" + className) {
+				case "Sample@Hot::Audio":
+					return () => new SerializableSample(lexer.ParsePath());
 				case "Texture@Hot::Image":
 				case "Texture@Hot::DistortionMesh":
 				case "Texture@Hot::NineGrid":
 					return () => new SerializableTexture(lexer.ParsePath());
-				case "File@Audio":
-					return () => new SerializableSample(lexer.ParsePath());
 				default:
 					return () => lexer.ParseQuotedString();
 				}
@@ -71,6 +71,9 @@ namespace Orange
 					propertyName = s[0];
 					className = s[1];
 					switch(propertyName) {
+					case "File":
+						propertyName = "Sample";
+						break;
 					case "TexCoordForMins":
 						propertyName = "UV0";
 						break;
