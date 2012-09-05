@@ -46,9 +46,9 @@ namespace Lime
 		{
 			Application.Instance.Active = this.Focused;
 			if (this.Focused) {
-				Application.Instance.Activate();
+				Application.Instance.OnActivate();
 			} else {
-				Application.Instance.Deactivate();
+				Application.Instance.OnDeactivate();
 			}
 		}
 
