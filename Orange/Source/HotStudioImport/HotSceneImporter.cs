@@ -549,7 +549,10 @@ namespace Orange
 			case "Text":
 				button.Caption = lexer.ParseQuotedString();
 				break;
-			default:
+            case "Enabled":
+                button.Enabled = lexer.ParseBool();
+                break;
+            default:
 				ParseGraphicProperty(button, name);
 				break;
 			}
