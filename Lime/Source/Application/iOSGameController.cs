@@ -36,13 +36,13 @@ namespace Lime
 		public void Activate()
 		{
 			View.Run();
-			Application.Instance.Activate();
+			Application.Instance.OnActivate();
 		}
 
 		public void Deactivate()
 		{
 			View.Stop();
-			Application.Instance.Deactivate();
+			Application.Instance.OnDeactivate();
 		}
 		
 		public override void TouchesBegan(NSSet touches, UIEvent evt)
