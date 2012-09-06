@@ -38,6 +38,8 @@ namespace Lime
 
 			public Node Parent { get { return widget.Parent; } }
 
+			public Marker[] Markers { get { return widget.Markers.AsArray(); } }
+
 			public Geometry LocalGeometry
 			{
 				get

@@ -11,6 +11,11 @@ namespace Lime
 		static List<Marker> emptyList = new List<Marker>();
 		List<Marker> markers = emptyList;
 
+		public Marker[] AsArray()
+		{
+			return markers.ToArray();
+		}
+
 		internal static MarkerCollection DeepClone(MarkerCollection source)
 		{
 			var result = new MarkerCollection();

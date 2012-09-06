@@ -38,5 +38,10 @@ namespace Lime
 		{
 			return (Marker)MemberwiseClone();
 		}
+
+		public override string ToString()
+		{
+			return string.Format("{1} '{0}'", Id, Action);
+		}
 	}
 }
