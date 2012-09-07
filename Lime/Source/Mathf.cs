@@ -37,6 +37,16 @@ namespace Lime
 			return Math.Abs(x);
 		}
 
+		public static float Abs(Vector2 x)
+		{
+			return x.Length;
+		}
+
+		public static float Abs(Vector3 x)
+		{
+			return x.Length;
+		}
+
 		public static int Sign(float x)
 		{
 			return Math.Sign(x);
