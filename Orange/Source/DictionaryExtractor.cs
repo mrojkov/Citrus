@@ -101,23 +101,28 @@ namespace Orange
 					int tag = int.Parse(match.Groups[1].Value);
 					string value = match.Groups[2].Value;
 					if (!Localization.Dictionary.Contains(tag)) {
-						Localization.Dictionary.Add(tag, value);
+						Localization.Dictionary.Add(tag, ReplaceNewlines(value));
 					}
 					return str;
 				} else {
 					// case of "[]..."
 					int tag = GenerateTag();
 					string value = match.Groups[2].Value;
-					Localization.Dictionary.Add(tag, value);
+					Localization.Dictionary.Add(tag, ReplaceNewlines(value));
 					str = string.Format("[{0}]{1}", tag, value);
 					return str;
 				}
 			} else {
 				int tag = GenerateTag();
-				Localization.Dictionary.Add(tag, str);
+				Localization.Dictionary.Add(tag, ReplaceNewlines(str));
 				str = string.Format("[{0}]{1}", tag, str);
 				return str;
 			}
+		}
+
+		string ReplaceNewlines(string s)
+		{
+			return s.Replace("\\n", "\n");
 		}
 
 		int GenerateTag()
