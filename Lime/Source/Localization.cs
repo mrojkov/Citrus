@@ -72,7 +72,13 @@ namespace Lime
 		{
 			return System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
 		}
-		
+
+		public static string GetString(string taggedFormat, params object[] args)
+		{
+			string s = GetString(taggedFormat);
+			return string.Format(s, args);
+		}
+
 		public static string GetString(string taggedString)
 		{
 			if (string.IsNullOrEmpty(taggedString))
