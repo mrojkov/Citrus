@@ -264,7 +264,11 @@ namespace Lime
 				r = new WeakReference(new SerializableTextureCore(path));
 				items[path] = r;
 			}
-			return r.Target as SerializableTextureCore;
+			var core = r.Target as SerializableTextureCore;
+			if (core == null) {
+				throw new Lime.Exception("Can't obtain serializable texture");
+			}
+			return core;
 		}
 	}
 }
