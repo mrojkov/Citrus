@@ -27,6 +27,13 @@ namespace Orange
 		{
 			const string dictionary = "Dictionary.txt";
 			Localization.Dictionary.Clear();
+			using (new DirectoryChanger(project.AssetsDirectory)) {
+				if (File.Exists(dictionary)) {
+					using (var stream = new FileStream(dictionary, FileMode.Open)) {
+						Localization.Dictionary.ReadFromStream(stream);
+					}
+				}
+			}
 			for (int pass = 0; pass < 2; pass++) {
 				var sourceFiles = new FileEnumerator(project.ProjectDirectory);
 				using (new DirectoryChanger(project.ProjectDirectory)) {
