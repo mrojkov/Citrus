@@ -106,8 +106,9 @@ namespace Lime
 			return groupVolumes[(int)group];
 		}
 
-		public static void SetGroupVolume(AudioChannelGroup group, float value)
+		public static float SetGroupVolume(AudioChannelGroup group, float value)
 		{
+			float oldVolume = groupVolumes[(int)group];
 			value = Mathf.Clamp(value, 0, 1);
 			groupVolumes[(int)group] = value;
 			foreach (var channel in channels) {
@@ -115,6 +116,7 @@ namespace Lime
 					channel.Volume = channel.Volume;
 				}
 			}
+			return oldVolume;
 		}
 
 		public static void PauseAll()
