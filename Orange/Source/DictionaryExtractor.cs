@@ -49,6 +49,9 @@ namespace Orange
 					foreach (var fileInfo in files) {
 						if (pass == 0)
 							Console.WriteLine("* " + fileInfo.Path);
+						// Сначала прогоним все строки вида: "[]blah-blah.."
+						ProcessSourceFile(fileInfo.Path, (Pass)pass);
+						// Затем прогоним все строки вида: Text "blah-blah.."
 						ProcessSceneFile(fileInfo.Path, (Pass)pass);
 					}
 				}
