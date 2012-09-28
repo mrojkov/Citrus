@@ -27,14 +27,23 @@ namespace Lime
 			if (row < 0 || col < 0 || row > NumRows || col > NumCols)
 				return null;
 			int i = row * (NumCols + 1) + col;
-			while (i >= Nodes.Count) {
-				var point = new DistortionMeshPoint();
-				point.Color = Color4.White;
-				point.UV = new Vector2((float)col / (NumCols - 1), (float)row / (NumRows - 1));
-				point.Position = point.UV;
-				Nodes.Add(point);
-			}
 			return Nodes[i] as DistortionMeshPoint;
+		}
+
+		public void ResetPoints()
+		{
+			Nodes.Clear();
+			for (int i = 0; i <= NumRows; i++) {
+				for (int j = 0; j <= NumCols; j++) {
+					var p = new Vector2((float)j / NumCols, (float)i / NumRows);
+					var point = new DistortionMeshPoint() {
+						Color = Color4.White,
+						UV = p,
+						Position = p
+					};
+					Nodes.Add(point);
+				}
+			}
 		}
 
 		static Renderer.Vertex[] polygon = new Renderer.Vertex[6];
