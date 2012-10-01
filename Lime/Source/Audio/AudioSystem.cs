@@ -119,6 +119,27 @@ namespace Lime
 			return oldVolume;
 		}
 
+		public static void PauseGroup(AudioChannelGroup group)
+		{
+			foreach (var channel in channels) {
+				if (channel.Group == group && channel.State == ALSourceState.Playing) {
+					channel.Pause();
+				}
+			}
+		}
+
+		public static void ResumeGroup(AudioChannelGroup group)
+		{
+			if (context != null) {
+				context.MakeCurrent();
+			}
+			foreach (var channel in channels) {
+				if (channel.Group == group && channel.State == ALSourceState.Paused) {
+					channel.Resume();
+				}
+			}
+		}
+
 		public static void PauseAll()
 		{
 			foreach (var channel in channels) {
