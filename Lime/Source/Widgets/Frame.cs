@@ -34,10 +34,8 @@ namespace Lime
 		RenderTarget renderTarget;
 		ITexture renderTexture;
 
-		public UpdateDelegate Updating;
-		public UpdateDelegate Updated;
-		public UpdateDelegate LateUpdating;
-		public UpdateDelegate LateUpdated;
+		public event UpdateDelegate Updating;
+		public event UpdateDelegate Updated;
 		public BareEventHandler Rendered;
 		public BareEventHandler Clicked;
 
@@ -65,6 +63,11 @@ namespace Lime
 					break;
 				}
 			}
+		}
+
+		public void ClearUpdatingEvent()
+		{
+			this.Updating = null;
 		}
 
 		public float AnimationSpeed = 1;
@@ -126,17 +129,11 @@ namespace Lime
 			if (AnimationSpeed != 1) {
 				delta = MultiplyDeltaByAnimationSpeed(delta);
 			}
-			if (LateUpdating != null) {
-				LateUpdating(delta * 0.001f);
-			}
 			while (delta > MaxTimeDelta) {
 				base.LateUpdate(MaxTimeDelta);
 				delta -= MaxTimeDelta;
 			}
 			base.LateUpdate(delta);
-			if (LateUpdated != null) {
-				LateUpdated(delta * 0.001f);
-			}
 		}
 
 		private void UpdateHelper(int delta)
