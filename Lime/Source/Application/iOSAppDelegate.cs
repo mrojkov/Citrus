@@ -28,14 +28,14 @@ namespace Lime
 		
 		public override void ReceiveMemoryWarning(UIApplication application)
 		{
-			Logger.Log("Memory warning");
+			Logger.Write("Memory warning");
 			Lime.TexturePool.Instance.DiscardUnusedTextures(2);
 			System.GC.Collect();
 		}
 
 		static void GlobalExceptionHandler(object sender, UnhandledExceptionEventArgs e)
 		{
-			Logger.Log(e.ExceptionObject.ToString());
+			Logger.Write(e.ExceptionObject.ToString());
 		}
 
 		public override void OnActivated(UIApplication application)

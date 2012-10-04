@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Runtime.InteropServices;
+
+
 #if iOS
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
@@ -24,7 +27,7 @@ namespace Lime
 
 		public static void Write(string msg, params object[] args)
 		{
-			Log(string.Format(msg, args));
+			Write(string.Format(msg, args));
 		}
 #else
 		public static void Write(string msg)
