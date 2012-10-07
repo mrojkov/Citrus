@@ -59,6 +59,8 @@ namespace Lime
 
 		public Rectangle UVRect { get { return uvRect; } }
 
+		public bool ChessTexture { get { return false; } }
+
 		public void LoadImage(string path)
 		{
 			using (Stream stream = AssetsBundle.Instance.OpenFileLocalized(path)) {

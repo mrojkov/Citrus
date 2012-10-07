@@ -18,6 +18,7 @@ namespace Lime
 		void SetAsRenderTarget();
 		void RestoreRenderTarget();
 		bool IsTransparentPixel(int x, int y);
+		bool ChessTexture { get; }
 		[ProtoMember(1)]
 		string SerializationPath { get; set; }
 	}
