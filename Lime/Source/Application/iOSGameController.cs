@@ -41,8 +41,12 @@ namespace Lime
 
 		public void Deactivate()
 		{
-			View.Stop();
+			// Send signal of dectivation to gamelogic and do last update & render.
+			// So, game may show pause dialog here.
 			Application.Instance.OnDeactivate();
+			View.UpdateFrame();
+			View.RenderFrame();
+			View.Stop();
 		}
 		
 		public override void TouchesBegan(NSSet touches, UIEvent evt)

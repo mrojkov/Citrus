@@ -72,6 +72,11 @@ namespace Lime
 
 		private long tickCount;
 
+		public void UpdateFrame()
+		{
+			OnUpdateFrame(null);
+		}
+
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{
 			Input.ProcessPendingKeyEvents();
@@ -111,6 +116,11 @@ namespace Lime
 				}
 			}
 			prevText = currText;
+		}
+
+		public void RenderFrame()
+		{
+			OnRenderFrame(null);
 		}
 
 		protected override void OnRenderFrame(FrameEventArgs e)

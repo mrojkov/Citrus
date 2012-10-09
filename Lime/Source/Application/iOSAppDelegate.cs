@@ -50,9 +50,9 @@ namespace Lime
 			AudioSystem.Active = false;
 			// Important: MonoTouch destroys OpenGL context on application hiding.
 			// So, we must destroy all OpenGL objects.
+			gameController.Deactivate();
 			Lime.TexturePool.Instance.DiscardAllTextures();
 			Application.Instance.OnGLDestroy();
-			gameController.Deactivate();
 		}
 
 		// This method is invoked when the application has loaded its UI and is ready to run
