@@ -46,6 +46,11 @@ namespace Lime
 			}
 		}
 
+		public override void PreloadTextures()
+		{
+			Texture.GetHandle();
+		}
+
 		static Renderer.Vertex[] polygon = new Renderer.Vertex[6];
 		static DistortionMeshPoint[] points = new DistortionMeshPoint[4];
 		

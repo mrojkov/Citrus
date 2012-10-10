@@ -41,6 +41,11 @@ namespace Lime
 			Size = (Vector2)Texture.ImageSize;
 		}
 
+		public override void PreloadTextures()
+		{
+			Texture.GetHandle();
+		}
+
 		public override void Update(int delta)
 		{
 			base.Update(delta);

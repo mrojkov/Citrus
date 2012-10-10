@@ -164,6 +164,13 @@ namespace Lime
 			return false;
 		}
 
+		public virtual void PreloadTextures()
+		{
+			foreach (var node in Nodes) {
+				node.PreloadTextures();
+			}
+		}
+
 		public bool TryRunAnimation(string markerId)
 		{
 			Marker marker = Markers.TryFind(markerId);
