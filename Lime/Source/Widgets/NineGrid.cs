@@ -103,7 +103,7 @@ namespace Lime
 			}
 		}
 
-		public override void Render()
+		public override void Render(float extrapolation)
 		{
 			BuildLayout(layout);
 			Renderer.Transform1 = globalMatrix;

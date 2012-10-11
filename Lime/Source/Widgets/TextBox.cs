@@ -81,7 +81,7 @@ namespace Lime
 			caretBlinkPhase += delta;
 		}
 
-		public override void Render()
+		public override void Render(float extrapolation)
 		{
 			string text = Text;
 			if (World.Instance.ActiveTextWidget == this) {

@@ -701,7 +701,7 @@ namespace Lime
 			}
 		}
 
-		public override void Render()
+		public override void Render(float extrapolation)
 		{
 			Matrix32 matrix = Matrix32.Identity;
 			Color4 color = Color4.White;

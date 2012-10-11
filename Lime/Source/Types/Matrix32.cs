@@ -150,5 +150,17 @@ namespace Lime
 			return r;
 		}
 		*/
+
+		public static Matrix32 Extrapolate(Matrix32 a, Matrix32 b, float t)
+		{
+			if (a.CalcDeterminant() == 0) {
+				return b;
+			}
+			Matrix32 r;
+			r.T = b.T + (b.T - a.T) * t;
+			r.U = b.U + (b.U - a.U) * t;
+			r.V = b.V + (b.V - a.V) * t;
+			return r;
+		}
 	}
 }

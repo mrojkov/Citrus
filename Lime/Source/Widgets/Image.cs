@@ -56,10 +56,10 @@ namespace Lime
 		{
 		}
 
-		public override void Render()
+		public override void Render(float extrapolation)
 		{
 			Renderer.Blending = globalBlending;
-			Renderer.Transform1 = globalMatrix;
+			Renderer.Transform1 = Matrix32.Extrapolate(globalMatrix0, globalMatrix, extrapolation);
 			Renderer.DrawSprite(Texture, globalColor, Vector2.Zero, Size, UV0, UV1);
 		}
 

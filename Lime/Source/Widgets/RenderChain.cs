@@ -39,12 +39,12 @@ namespace Lime
 			return oldLayer;
 		}
 
-		public void RenderAndClear()
+		public void RenderAndClear(float extrapolation)
 		{
 			for (int i = 0; i <= maxUsedLayer; i++) {
 				Node node = layers[i];
 				while (node != null) {
-					node.Render();
+					node.Render(extrapolation);
 					Node next = node.NextToRender;
 					node.NextToRender = null;
 					node = next;

@@ -177,10 +177,10 @@ namespace Lime
 			return delta;
 		}
 
-		public override void Render()
+		public override void Render(float extrapolation)
 		{
 			if (renderTexture != null) {
-				RenderToTexture(renderTexture);
+				RenderToTexture(renderTexture, extrapolation);
 			}
 			if (Rendered != null) {
 				Renderer.Transform1 = GlobalMatrix;

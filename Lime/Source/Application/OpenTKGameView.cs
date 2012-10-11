@@ -101,41 +101,68 @@ namespace Lime
 		protected override void OnUpdateFrame(OpenTK.FrameEventArgs e)
 		{
 		}
-		
+
+		private long updateTime;
+		private long updateDelta;
+		private int renderCycle;
+
 		protected override void OnRenderFrame(OpenTK.FrameEventArgs e)
 		{
+			long time = GetTime();
 			// !!! Just for battery saving sake
-			System.Threading.Thread.Sleep(10);
-			DoUpdate(e);
-			DoRender();
+			// System.Threading.Thread.Sleep(10);
+			if ((renderCycle++ % 4) == 0) { //time - updateTime > 20) {
+				updateDelta = time - updateTime;
+				updateTime = time;
+				DoUpdate(updateDelta);
+			}
+			float extrapolation = 0;
+			if (updateDelta > 0) {
+				extrapolation = (float)(time - updateTime) / (float)updateDelta;
+			}
+			DoRender(extrapolation);
 		}
 
-		private void DoRender()
+		private long startTime = 0;
+
+		private long GetTime()
+		{
+			long t = DateTime.Now.Ticks / 10000L;
+			if (startTime == 0) {
+				startTime = t;
+			}
+			return t - startTime;
+		}
+
+		//private long RefreshDelta()
+		//{
+		//	long delta = (System.DateTime.Now.Ticks / 10000L) - tickCount;
+		//	delta = Math.Max(0, delta); // How can it be possible?
+		//	if (tickCount == 0) {
+		//		tickCount = delta;
+		//		delta = 0;
+		//	} else {
+		//		tickCount += delta;
+		//	}
+		//	// Ensure time delta lower bound is 16.6 frames per second.
+		//	// This is protection against time leap on inactive state
+		//	// and multiple updates of node hierarchy.
+		//	delta = Math.Min(delta, 60);
+		//	return delta;
+		//}
+
+		private void DoRender(float extrapolation)
 		{
 			UpdateFrameRate();
 			MakeCurrent();
-			app.OnRenderFrame();
+			app.OnRenderFrame(extrapolation);
 			SwapBuffers();
 		}
 
-		private long tickCount;
-
-		private void DoUpdate(OpenTK.FrameEventArgs e)
+		private void DoUpdate(float delta)
 		{
-			long delta = (System.DateTime.Now.Ticks / 10000L) - tickCount;
-			delta = Math.Max(0, delta); // Why can it be possible?
-			if (tickCount == 0) {
-				tickCount = delta;
-				delta = 0;
-			} else {
-				tickCount += delta;
-			}
 			Input.ProcessPendingKeyEvents();
 			Input.MouseVisible = true;
-			// Ensure time delta lower bound is 16.6 frames per second.
-			// This is protection against time leap on inactive state
-			// and multiple updates of node hierarchy.
- 			delta = Math.Min(delta, 60);
 			app.OnUpdateFrame((int)delta);
 			Input.TextInput = null;
 			Input.CopyKeysState();

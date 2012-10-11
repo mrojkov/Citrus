@@ -89,8 +89,8 @@ namespace Lime
 			}
 			Renderer.DrawTriangleFan(Texture, polygon, 6);
 		}
-		
-		public override void Render()
+
+		public override void Render(float extrapolation)
 		{
 			Renderer.Blending = GlobalBlending;
 			Renderer.Transform1 = GlobalMatrix;

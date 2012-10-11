@@ -128,6 +128,9 @@ namespace Lime
 
 		protected bool renderedToTexture;
 
+		public Matrix32 GlobalMatrix0 { get { return globalMatrix0; } }
+		public Color4 GlobalColor0 { get { return globalColor0; } }
+
 		public Matrix32 GlobalMatrix { get { return globalMatrix; } }
 		public Color4 GlobalColor { get { return globalColor; } }
 		public Blending GlobalBlending { get { return globalBlending; } }
@@ -135,6 +138,8 @@ namespace Lime
 		public Vector2 GlobalPosition { get { return globalMatrix * Vector2.Zero; } }
 		public Vector2 GlobalCenter { get { return globalMatrix * (Size / 2); } }
 
+		protected Matrix32 globalMatrix0;
+		protected Color4 globalColor0;
 		protected Matrix32 globalMatrix;
 		protected Color4 globalColor;
 		protected Blending globalBlending;
@@ -187,6 +192,15 @@ namespace Lime
 			globalColor = color;
 			globalBlending = Blending;
 			globallyVisible = Visible && color.A != 0;
+		}
+
+		public override void StoreExtrapolationData()
+		{
+			globalColor0 = globalColor;
+			globalMatrix0 = globalMatrix;
+			foreach (Node node in Nodes.AsArray) {
+				node.StoreExtrapolationData();
+			}
 		}
 
 		public override void Update(int delta)
