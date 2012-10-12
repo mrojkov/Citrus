@@ -311,10 +311,10 @@ namespace Lime
 
 		protected const int MaxTimeDelta = 1000 / Animator.FramesPerSecond - 1;
 
-		public virtual void StoreExtrapolationData()
+		public virtual void StoreInterpolationData()
 		{
 			foreach (Node node in Nodes.AsArray) {
-				node.StoreExtrapolationData();
+				node.StoreInterpolationData();
 			}
 		}
 
@@ -331,7 +331,7 @@ namespace Lime
 			LateUpdate(delta);
 		}
 
-		public virtual void Render(float extrapolation) {}
+		public virtual void Render(float interpolation) {}
 
 		public virtual void AddToRenderChain(RenderChain chain)
 		{

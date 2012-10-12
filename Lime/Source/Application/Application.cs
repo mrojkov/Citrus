@@ -153,7 +153,7 @@ namespace Lime
 		public virtual void OnGLCreate() {}
 		public virtual void OnGLDestroy() {}
 		public virtual void OnUpdateFrame(int delta) {}
-		public virtual void OnRenderFrame(float extrapolation) {}
+		public virtual void OnRenderFrame(float interpolation) {}
 		public virtual void OnDeviceRotated() {}
 		public virtual DeviceOrientation GetSupportedDeviceOrientations() { return DeviceOrientation.LandscapeLeft; }
 	}

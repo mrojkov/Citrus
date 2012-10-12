@@ -102,60 +102,46 @@ namespace Lime
 		{
 		}
 
-		private long updateTime;
-		private long updateDelta;
-		private int renderCycle;
+		private long gameTime;
+		private long currentTime;
+		private long updateDelta = 50;
 
 		protected override void OnRenderFrame(OpenTK.FrameEventArgs e)
 		{
-			long time = GetTime();
+			// ≈сли реальное врем€ сильно убежало вперед от игрового,
+			// то передвинем игровое вперед.
+			if (currentTime > gameTime + 300) {
+				gameTime = currentTime;
+			}
 			// !!! Just for battery saving sake
-			// System.Threading.Thread.Sleep(10);
-			if ((renderCycle++ % 4) == 0) { //time - updateTime > 20) {
-				updateDelta = time - updateTime;
-				updateTime = time;
+			// System.Threading.Thread.Sleep(40);
+			UpdateCurrentTime();
+			if (currentTime >= gameTime) {
+				gameTime += updateDelta;
+				World.Instance.StoreInterpolationData();
 				DoUpdate(updateDelta);
 			}
-			float extrapolation = 0;
-			if (updateDelta > 0) {
-				extrapolation = (float)(time - updateTime) / (float)updateDelta;
-			}
-			DoRender(extrapolation);
+			float interpolation = (float)(currentTime - (gameTime - updateDelta)) / (float)updateDelta;
+			Mathf.Clamp(ref interpolation, 0, 1);
+			DoRender(interpolation);
 		}
 
 		private long startTime = 0;
 
-		private long GetTime()
+		private void UpdateCurrentTime()
 		{
 			long t = DateTime.Now.Ticks / 10000L;
 			if (startTime == 0) {
 				startTime = t;
 			}
-			return t - startTime;
+			currentTime = t - startTime;
 		}
 
-		//private long RefreshDelta()
-		//{
-		//	long delta = (System.DateTime.Now.Ticks / 10000L) - tickCount;
-		//	delta = Math.Max(0, delta); // How can it be possible?
-		//	if (tickCount == 0) {
-		//		tickCount = delta;
-		//		delta = 0;
-		//	} else {
-		//		tickCount += delta;
-		//	}
-		//	// Ensure time delta lower bound is 16.6 frames per second.
-		//	// This is protection against time leap on inactive state
-		//	// and multiple updates of node hierarchy.
-		//	delta = Math.Min(delta, 60);
-		//	return delta;
-		//}
-
-		private void DoRender(float extrapolation)
+		private void DoRender(float interpolation)
 		{
 			UpdateFrameRate();
 			MakeCurrent();
-			app.OnRenderFrame(extrapolation);
+			app.OnRenderFrame(interpolation);
 			SwapBuffers();
 		}
 

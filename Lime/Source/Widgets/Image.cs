@@ -56,11 +56,21 @@ namespace Lime
 		{
 		}
 
-		public override void Render(float extrapolation)
+		private int renderedAtCycle;
+
+		public override void Render(float interpolation)
 		{
+			if (Renderer.RenderCycle != renderedAtCycle + 1) {
+				globalColor0 = globalColor;
+				globalMatrix0 = globalMatrix;
+			}
+			renderedAtCycle = Renderer.RenderCycle;
+			Matrix32 transform;
+			Color4 color;
+			InterpolateGlobalMatrixAndColor(interpolation, out transform, out color);
 			Renderer.Blending = globalBlending;
-			Renderer.Transform1 = Matrix32.Extrapolate(globalMatrix0, globalMatrix, extrapolation);
-			Renderer.DrawSprite(Texture, globalColor, Vector2.Zero, Size, UV0, UV1);
+			Renderer.Transform1 = transform;
+			Renderer.DrawSprite(Texture, color, Vector2.Zero, Size, UV0, UV1);
 		}
 
 		public override void AddToRenderChain(RenderChain chain)
