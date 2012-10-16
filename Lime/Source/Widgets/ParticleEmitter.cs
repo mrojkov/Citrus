@@ -47,12 +47,6 @@ namespace Lime
 		[ProtoContract]
 		public class Particle
 		{
-			public int RenderedAtCycle;
-			public Color4 GlobalColor0;
-			public Color4 GlobalColor1;
-			public Matrix32 GlobalMatrix0;
-			public Matrix32 GlobalMatrix1;
-
 			[ProtoMember(1)]
 			public int ModifierIndex;
 			public ParticleModifier Modifier;
@@ -344,16 +338,6 @@ namespace Lime
 			AlongPathOrientation = false;
 			TimeShift = 0;
 			ImmortalParticles = false;
-		}
-
-		public override void StoreInterpolationData()
-		{
-			LinkedListNode<Particle> node = particles.First;
-			for (; node != null; node = node.Next) {
-				Particle particle = node.Value;
-				particle.GlobalColor0 = particle.GlobalColor1;
-				particle.GlobalMatrix0 = particle.GlobalMatrix1;
-			}
 		}
 
 		public override Node DeepCloneFast()
@@ -693,40 +677,27 @@ namespace Lime
 				if (deltaPos.SquaredLength > 0.00001f)
 					p.FullDirection = deltaPos.Atan2 * Mathf.RadiansToDegrees;
 			}
-			p.GlobalColor1 = p.ColorCurrent;
-			UpdateParticleGlobalMatrix(p);
 			return true;
 		}
 
 		void RenderParticle(Particle p, Matrix32 matrix, Color4 color, float interpolation)
 		{
-			color *= Color4.Lerp(interpolation, p.GlobalColor0, p.GlobalColor1);
-			if (color.A > 0) {
-				if (Renderer.RenderCycle != p.RenderedAtCycle + 1) {
-					p.GlobalColor0 = p.GlobalColor1;
-					p.GlobalMatrix0 = p.GlobalMatrix1;
-				}
-				p.RenderedAtCycle = Renderer.RenderCycle;
+			if (p.ColorCurrent.A > 0) {
+				float angle = p.Angle;
+				if (AlongPathOrientation)
+					angle += p.FullDirection;
 				SerializableTexture texture = p.Modifier.GetTexture((int)p.TextureIndex - 1);
-				Renderer.Transform1 = Matrix32.Lerp(interpolation, p.GlobalMatrix0, p.GlobalMatrix1) * matrix;
-				Renderer.DrawSprite(texture, color, -Vector2.Half, Vector2.One, Vector2.Zero, Vector2.One);
+				Vector2 imageSize = (Vector2)texture.ImageSize;
+				Vector2 particleSize = p.ScaleCurrent * imageSize;
+				Vector2 orientation = Vector2.HeadingDegrees(angle);
+				var globalMatrix = new Matrix32 {
+					U = particleSize.X * orientation,
+					V = particleSize.Y * new Vector2(-orientation.Y, orientation.X),
+					T = p.FullPosition
+				};
+				Renderer.Transform1 = globalMatrix * matrix;
+				Renderer.DrawSprite(texture, p.ColorCurrent, -Vector2.Half, Vector2.One, Vector2.Zero, Vector2.One);
 			}
-		}
-
-		private void UpdateParticleGlobalMatrix(Particle p)
-		{
-			float angle = p.Angle;
-			if (AlongPathOrientation)
-				angle += p.FullDirection;
-			SerializableTexture texture = p.Modifier.GetTexture((int)p.TextureIndex - 1);
-			Vector2 imageSize = (Vector2)texture.ImageSize;
-			Vector2 particleSize = p.ScaleCurrent * imageSize;
-			Vector2 orientation = Vector2.HeadingDegrees(angle);
-			p.GlobalMatrix1 = new Matrix32 {
-				U = particleSize.X * orientation,
-				V = particleSize.Y * new Vector2(-orientation.Y, orientation.X),
-				T = p.FullPosition
-			};
 		}
 
 		public override void Render(float interpolation)

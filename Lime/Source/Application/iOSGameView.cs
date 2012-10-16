@@ -70,36 +70,39 @@ namespace Lime
 			base.CreateFrameBuffer();
 		}
 
-		private long tickCount;
-
 		public void UpdateFrame()
 		{
 			OnUpdateFrame(null);
 		}
 
+		private long prevTime = 0;
+
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{
+			long currentTime = GetCurrentTime();
+			int delta = (int)(currentTime - prevTime);
+			prevTime = currentTime;
+			Mathf.Clamp(ref delta, 0, 40);
 			Input.ProcessPendingKeyEvents();
 			Input.MouseVisible = true;
-
-			long delta = (System.DateTime.Now.Ticks / 10000L) - tickCount;
-			if (tickCount == 0) {
-				tickCount = delta;
-				delta = 0;
-			} else {
-				tickCount += delta;
-			}
 			Input.ProcessPendingKeyEvents();
 			Input.MouseVisible = true;
-			// Ensure time delta lower bound is 16.6 frames per second.
-			// This is protection against time leap on inactive state
-			// and multiple updates of node hierarchy.
- 			delta = Math.Min(delta, 60);
-			Application.Instance.OnUpdateFrame((int)delta);
+			Application.Instance.OnUpdateFrame(delta);
 			Input.TextInput = null;
 			Input.CopyKeysState();
 			Input.SetKeyState(Key.Enter, false);
 			ProcessTextInput();
+		}
+
+		private long startTime = 0;
+		
+		private long GetCurrentTime()
+		{
+			long t = DateTime.Now.Ticks / 10000L;
+			if (startTime == 0) {
+				startTime = t;
+			}
+			return t - startTime;
 		}
 
 		string prevText;
@@ -123,10 +126,15 @@ namespace Lime
 			OnRenderFrame(null);
 		}
 
+		//int renderCounter = 0;
+
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
+			//if (renderCounter++ % 3 == 0) {
+			//	return;
+			//}
 			MakeCurrent();
-			Application.Instance.OnRenderFrame();
+			Application.Instance.OnRenderFrame(0);
 			SwapBuffers();
 			UpdateFrameRate();
 		}

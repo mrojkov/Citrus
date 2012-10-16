@@ -311,13 +311,6 @@ namespace Lime
 
 		protected const int MaxTimeDelta = 1000 / Animator.FramesPerSecond - 1;
 
-		public virtual void StoreInterpolationData()
-		{
-			foreach (Node node in Nodes.AsArray) {
-				node.StoreInterpolationData();
-			}
-		}
-
 		public void SafeUpdate(int delta)
 		{
 			if (delta < 0)
