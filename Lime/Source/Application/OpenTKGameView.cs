@@ -102,39 +102,27 @@ namespace Lime
 		{
 		}
 
-		private long gameTime;
-		private long currentTime;
-		private long updateDelta = 50;
+		private long prevTime = 0;
 
 		protected override void OnRenderFrame(OpenTK.FrameEventArgs e)
 		{
-			// ≈сли реальное врем€ сильно убежало вперед от игрового,
-			// то передвинем игровое вперед.
-			if (currentTime > gameTime + 300) {
-				gameTime = currentTime;
-			}
-			// !!! Just for battery saving sake
-			// System.Threading.Thread.Sleep(40);
-			UpdateCurrentTime();
-			if (currentTime >= gameTime) {
-				gameTime += updateDelta;
-				World.Instance.StoreInterpolationData();
-				DoUpdate(updateDelta);
-			}
-			float interpolation = (float)(currentTime - (gameTime - updateDelta)) / (float)updateDelta;
-			Mathf.Clamp(ref interpolation, 0, 1);
-			DoRender(interpolation);
+			long currentTime = GetCurrentTime();
+			int delta = (int)(currentTime - prevTime);
+			Mathf.Clamp(ref delta, 0, 40);
+			prevTime = currentTime;
+			DoUpdate(delta);
+			DoRender(0);
 		}
 
 		private long startTime = 0;
 
-		private void UpdateCurrentTime()
+		private long GetCurrentTime()
 		{
 			long t = DateTime.Now.Ticks / 10000L;
 			if (startTime == 0) {
 				startTime = t;
 			}
-			currentTime = t - startTime;
+			return t - startTime;
 		}
 
 		private void DoRender(float interpolation)
