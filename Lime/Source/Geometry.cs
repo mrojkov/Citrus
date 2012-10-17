@@ -13,6 +13,24 @@ namespace Lime
 			return Math.Sign(s);
 		}
 
+		public static bool IntersectLineCircle(Vector2 location, float radius, Vector2 lineFrom, Vector2 lineTo, out Vector2 intersection)
+		{
+			float ab2, acab, h2;
+			Vector2 ac = location - lineFrom;
+			Vector2 ab = lineTo - lineFrom;
+			ab2 = Vector2.DotProduct(ab, ab);
+			acab = Vector2.DotProduct(ac, ab);
+			float t = acab / ab2;
+			if (t < 0)
+				t = 0;
+			else if (t > 1)
+				t = 1;
+			intersection = (ab * t) + lineFrom;
+			Vector2 h = intersection - location;
+			h2 = Vector2.DotProduct(h, h);
+			return h2 <= (radius * radius);
+		}
+
 		public static bool CalcLinesIntersection(Vector2 a1, Vector2 b1, Vector2 a2, Vector2 b2, ref Vector2 intersection)
 		{
 			float d = (b2.Y - a2.Y) * (b1.X - a1.X) - (b2.X - a2.X) * (b1.Y - a1.Y);
