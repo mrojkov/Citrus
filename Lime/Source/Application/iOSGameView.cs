@@ -95,7 +95,7 @@ namespace Lime
 		}
 
 		private long startTime = 0;
-		
+
 		private long GetCurrentTime()
 		{
 			long t = DateTime.Now.Ticks / 10000L;
@@ -126,13 +126,8 @@ namespace Lime
 			OnRenderFrame(null);
 		}
 
-		//int renderCounter = 0;
-
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
-			//if (renderCounter++ % 3 == 0) {
-			//	return;
-			//}
 			MakeCurrent();
 			Application.Instance.OnRenderFrame(0);
 			SwapBuffers();
