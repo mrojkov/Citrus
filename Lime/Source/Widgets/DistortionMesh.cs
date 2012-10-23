@@ -69,12 +69,12 @@ namespace Lime
 				colorGB.X += points[t].Color.G;
 				colorGB.Y += points[t].Color.B;
 			}
-			Vector2 divisor = new Vector2(0.25f, 0.25f);
-			colorAR *= divisor;
-			colorGB *= divisor;
+			Vector2 k = new Vector2(0.25f, 0.25f);
+			colorAR *= k;
+			colorGB *= k;
 			v.Color = new Color4((byte)colorAR.Y, (byte)colorGB.X, (byte)colorGB.Y, (byte)colorAR.X) * GlobalColor;
-			v.UV1 *= divisor;
-			v.Pos *= divisor;
+			v.UV1 *= k;
+			v.Pos *= k;
 			return v;
 		}
 		
