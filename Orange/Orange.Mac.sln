@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.Mac", "..\Lime\Lime.Ma
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orange.Mac", "Orange.Mac.csproj", "{4B2BDD5A-2AAE-46AE-AA1A-8C9308BAA50D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lemon", "..\Lemon\Lemon.csproj", "{D7C64263-0E86-4055-B15B-47C8A72DDA07}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -15,6 +17,10 @@ Global
 		{4B2BDD5A-2AAE-46AE-AA1A-8C9308BAA50D}.Debug|x86.Build.0 = Debug|x86
 		{4B2BDD5A-2AAE-46AE-AA1A-8C9308BAA50D}.Release|x86.ActiveCfg = Release|x86
 		{4B2BDD5A-2AAE-46AE-AA1A-8C9308BAA50D}.Release|x86.Build.0 = Release|x86
+		{D7C64263-0E86-4055-B15B-47C8A72DDA07}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D7C64263-0E86-4055-B15B-47C8A72DDA07}.Debug|x86.Build.0 = Debug|Any CPU
+		{D7C64263-0E86-4055-B15B-47C8A72DDA07}.Release|x86.ActiveCfg = Release|Any CPU
+		{D7C64263-0E86-4055-B15B-47C8A72DDA07}.Release|x86.Build.0 = Release|Any CPU
 		{DC16EEBF-404D-4610-B87A-15B57464D707}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{DC16EEBF-404D-4610-B87A-15B57464D707}.Debug|x86.Build.0 = Debug|Any CPU
 		{DC16EEBF-404D-4610-B87A-15B57464D707}.Release|x86.ActiveCfg = Release|Any CPU

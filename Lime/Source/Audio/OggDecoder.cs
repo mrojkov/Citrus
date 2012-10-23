@@ -9,7 +9,7 @@ namespace Lime
 	{
 		Stream stream;
 		IntPtr oggFile;
-		Lemon.FileSystem fileSystem;
+		Lemon.Api.FileSystem fileSystem;
 		int bitstream;
 		int handle;
 		static StreamMap streamMap = new StreamMap();
@@ -17,16 +17,16 @@ namespace Lime
 		public OggDecoder(Stream stream)
 		{
 			this.stream = stream;
-			fileSystem = new Lemon.FileSystem { 
+			fileSystem = new Lemon.Api.FileSystem { 
 				ReadFunc = OggRead, CloseFunc = OggClose,
 				SeekFunc = OggSeek, TellFunc = OggTell
 			};
 			handle = streamMap.Allocate(stream);
-			oggFile = Lemon.OggCreate();
-			if (Lemon.OggOpen(handle, oggFile, fileSystem) < 0) {
+			oggFile = Lemon.Api.OggCreate();
+			if (Lemon.Api.OggOpen(handle, oggFile, fileSystem) < 0) {
 				throw new Lime.Exception("Failed to open OGG/Vorbis file");
 			}
-			if (Lemon.OggGetChannels(oggFile) > 2) {
+			if (Lemon.Api.OggGetChannels(oggFile) > 2) {
 				throw new Lime.Exception("Channel count must be either 1 or 2");
 			}
 		}
@@ -48,7 +48,7 @@ namespace Lime
 				stream = null;
 			}
 			if (oggFile != IntPtr.Zero) {
-				Lemon.OggDispose(oggFile);
+				Lemon.Api.OggDispose(oggFile);
 				oggFile = IntPtr.Zero;
 			}
 			if (handle != 0) {
@@ -59,13 +59,13 @@ namespace Lime
 
 		public AudioFormat GetFormat()
 		{
-			int channels = Lemon.OggGetChannels(oggFile);
+			int channels = Lemon.Api.OggGetChannels(oggFile);
 			return channels == 1 ? AudioFormat.Mono16 : AudioFormat.Stereo16;
 		}
 
 		public int GetFrequency()
 		{
-			return Lemon.OggGetFrequency(oggFile);
+			return Lemon.Api.OggGetFrequency(oggFile);
 		}
 
 		public int GetCompressedSize()
@@ -75,7 +75,7 @@ namespace Lime
 
 		public void Rewind()
 		{
-			Lemon.OggResetToBeginning(oggFile);
+			Lemon.Api.OggResetToBeginning(oggFile);
 		}
 
 		public int GetBlockSize()
@@ -89,7 +89,7 @@ namespace Lime
 			int requestCount = blockCount;
 			while (true) {
 				var p = new IntPtr(buffer.ToInt64() + startIndex + actualCount);
-				int read = Lemon.OggRead(oggFile, p, requestCount - actualCount, ref bitstream);
+				int read = Lemon.Api.OggRead(oggFile, p, requestCount - actualCount, ref bitstream);
 				if (read < 0) {
 					throw new Lime.Exception("Read error");
 				}
@@ -101,7 +101,7 @@ namespace Lime
 		}
 		
 #if iOS
-		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.ReadCallback))]
+		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.Api.ReadCallback))]
 #endif
 		public static uint OggRead(IntPtr buffer, uint size, uint nmemb, int handle)
 		{
@@ -120,7 +120,7 @@ namespace Lime
 		}
 
 #if iOS
-		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.TellCallback))]
+		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.Api.TellCallback))]
 #endif
 		public static int OggTell(int handle)
 		{
@@ -129,7 +129,7 @@ namespace Lime
 		}
 		
 #if iOS
-		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.SeekCallback))]
+		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.Api.SeekCallback))]
 #endif
 		public static int OggSeek(int handle,long offset,SeekOrigin whence)
 		{
@@ -138,7 +138,7 @@ namespace Lime
 		}
 		
 #if iOS
-		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.CloseCallback))]
+		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.Api.CloseCallback))]
 #endif
 		public static int OggClose(int handle)
 		{

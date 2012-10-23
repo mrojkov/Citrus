@@ -104,7 +104,6 @@
     <Compile Include="Source\Graphics\SerializableTexture.cs" />
     <Compile Include="Source\Audio\AudioDecoder.cs" />
     <Compile Include="Source\Audio\WaveIMA4Decoder.cs" />
-    <Compile Include="Source\Lemon.cs" />
     <Compile Include="Source\Audio\OggDecoder.cs" />
     <Compile Include="Source\Audio\SampleCache.cs" />
     <Compile Include="Source\Audio\SerializableSample.cs" />
@@ -129,13 +128,9 @@
     <Compile Include="Source\Application\Logger.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Lemon\bin\iOS\Release-iphoneos\libLemon.a">
-      <Link>libLemon.a</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Lemon\bin\iOS\Release-iphonesimulator\libLemonSim.a">
-      <Link>libLemonSim.a</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <ProjectReference Include="..\Lemon\Lemon.iOS.csproj">
+      <Project>{C4795CBE-B192-4E53-8140-7310FBD206DD}</Project>
+      <Name>Lemon.iOS</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

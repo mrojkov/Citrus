@@ -107,7 +107,6 @@
     <Compile Include="Source\Graphics\SerializableFont.cs" />
     <Compile Include="Source\Graphics\SerializableTexture.cs" />
     <Compile Include="Source\Audio\WaveIMA4Decoder.cs" />
-    <Compile Include="Source\Lemon.cs" />
     <Compile Include="Source\Audio\OggDecoder.cs" />
     <Compile Include="Source\Audio\SampleCache.cs" />
     <Compile Include="Source\Audio\SerializableSample.cs" />
@@ -135,9 +134,14 @@
     <None Include="Source\Audio\ADPCMEncoder.c">
       <Visible>False</Visible>
     </None>
-    <None Include="..\Lemon\bin\Mac\Release\libLemon.dylib">
+    <None Include="..\Lemon\Library\bin\Mac\Release\libLemon.dylib">
       <Link>libLemon.dylib</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Lemon\Lemon.csproj">
+      <Project>{D7C64263-0E86-4055-B15B-47C8A72DDA07}</Project>
+      <Name>Lemon</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>
