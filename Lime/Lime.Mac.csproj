@@ -139,9 +139,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Lemon\Lemon.csproj">
-      <Project>{D7C64263-0E86-4055-B15B-47C8A72DDA07}</Project>
-      <Name>Lemon</Name>
+    <ProjectReference Include="..\Lemon\Lemon.Mac.csproj">
+      <Project>{4604AA2E-129F-4814-AD0D-8BA35346ECC4}</Project>
+      <Name>Lemon.Mac</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

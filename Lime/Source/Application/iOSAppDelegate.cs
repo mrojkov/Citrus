@@ -17,12 +17,15 @@ namespace Lime
 	[Register("AppDelegate")]
 	public class AppDelegate : UIApplicationDelegate
 	{
+		public static AppDelegate Instance;
+
 		// class-level declarations
 		public UIWindow Window { get; private set; }
 		GameController gameController;
 
 		public AppDelegate()
 		{
+			Instance = this;
 			AppDomain.CurrentDomain.UnhandledException += GlobalExceptionHandler;
 		}
 		
@@ -68,10 +71,10 @@ namespace Lime
 
 			gameController = new GameController();
 			
-			// in order to make iOS 3.0 compatible we use this:
-			Window.AddSubview(gameController.View);
+			// in order to make iOS 3.0 compatible we should use this:
+			//Window.AddSubview(gameController.View);
 			// instead of that:
-			// window.RootViewController = gameController;
+			Window.RootViewController = gameController;
 
 			// make the window visible
 			Window.MakeKeyAndVisible();

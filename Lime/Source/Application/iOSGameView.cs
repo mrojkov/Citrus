@@ -108,9 +108,8 @@ namespace Lime
 		string prevText;
 		void ProcessTextInput()
 		{
-			var currText = textField.Text;
-			if (currText == null) { currText = ""; }
-			if (prevText == null) { prevText = ""; }
+			var currText = textField.Text ?? "";
+			prevText = prevText ?? "";
 			if (currText.Length > prevText.Length) {
 				Input.TextInput = currText.Substring(prevText.Length);
 			} else {

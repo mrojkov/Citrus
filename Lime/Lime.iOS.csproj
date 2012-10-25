@@ -117,7 +117,6 @@
     <Compile Include="Source\Profiler.cs" />
     <Compile Include="Source\Environment.cs" />
     <Compile Include="Source\Widgets\TextBox.cs" />
-    <Compile Include="Source\Application\Application.cs" />
     <Compile Include="Source\Mathf.cs" />
     <Compile Include="Source\Widgets\Widget.Toolbox.cs" />
     <Compile Include="Source\Geometry.cs" />
@@ -126,6 +125,7 @@
     <Compile Include="Source\StringExtensions.cs" />
     <Compile Include="Source\Widgets\World.cs" />
     <Compile Include="Source\Application\Logger.cs" />
+    <Compile Include="Source\Application\Application.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.iOS.csproj">
