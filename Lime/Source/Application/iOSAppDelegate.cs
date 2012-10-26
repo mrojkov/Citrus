@@ -71,10 +71,12 @@ namespace Lime
 
 			gameController = new GameController();
 			
-			// in order to make iOS 3.0 compatible we should use this:
-			//Window.AddSubview(gameController.View);
-			// instead of that:
-			Window.RootViewController = gameController;
+			string currSysVer = UIDevice.CurrentDevice.SystemVersion;
+			if (currSysVer[0] >= '6') {
+				Window.RootViewController = gameController;
+			} else {
+				Window.AddSubview(gameController.View);
+			}
 
 			// make the window visible
 			Window.MakeKeyAndVisible();
