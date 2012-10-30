@@ -56,7 +56,7 @@ namespace Lime
 		{
 		}
 
-		public override void Render(float interpolation)
+		public override void Render()
 		{
 			Renderer.Blending = globalBlending;
 			Renderer.Transform1 = globalMatrix;

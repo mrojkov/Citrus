@@ -32,7 +32,7 @@ namespace Lime
 			Font = new SerializableFont();
 		}
 
-		public override void Render(float extrapolation)
+		public override void Render()
 		{
 			Renderer.Transform1 = globalMatrix;
 			Renderer.Blending = globalBlending;

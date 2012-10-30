@@ -90,7 +90,7 @@ namespace Lime
 		TextParser parser = new TextParser();
 		string text;
 
-		public override void Render(float extrapolation)
+		public override void Render()
 		{
 			var renderer = new TextRenderer();
 			// Setup default style(take first one from node list or TextStyle.Default).

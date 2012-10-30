@@ -159,7 +159,7 @@ namespace Lime
 			Renderer.DrawTriangleFan(texture1, texture2, vertices, numCoords);
 		}
 
-		public override void Render(float extrapolation)
+		public override void Render()
 		{
 			if (Parent.Widget != null) {
 				IImageCombinerArg arg1, arg2;

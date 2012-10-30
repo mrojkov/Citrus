@@ -324,7 +324,7 @@ namespace Lime
 			LateUpdate(delta);
 		}
 
-		public virtual void Render(float interpolation) {}
+		public virtual void Render() {}
 
 		public virtual void AddToRenderChain(RenderChain chain)
 		{

@@ -15,7 +15,7 @@ namespace Lime
 			this.Thickness = thickness;
 		}
 
-		public override void Render(float extrapolation)
+		public override void Render()
 		{
 			Renderer.Blending = globalBlending;
 			Renderer.Transform1 = globalMatrix;

@@ -680,7 +680,7 @@ namespace Lime
 			return true;
 		}
 
-		void RenderParticle(Particle p, Matrix32 matrix, Color4 color, float interpolation)
+		void RenderParticle(Particle p, Matrix32 matrix, Color4 color)
 		{
 			if (p.ColorCurrent.A > 0) {
 				float angle = p.Angle;
@@ -700,7 +700,7 @@ namespace Lime
 			}
 		}
 
-		public override void Render(float interpolation)
+		public override void Render()
 		{
 			Matrix32 matrix = Matrix32.Identity;
 			Color4 color = Color4.White;
@@ -713,7 +713,7 @@ namespace Lime
 			LinkedListNode<Particle> node = particles.First;
 			for (; node != null; node = node.Next) {
 				Particle particle = node.Value;
-				RenderParticle(particle, matrix, color, interpolation);
+				RenderParticle(particle, matrix, color);
 			}
 		}
 	}

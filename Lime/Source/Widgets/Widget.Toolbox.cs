@@ -42,7 +42,7 @@ namespace Lime
 			Position = widget.CalcPositionInSpaceOf(Parent.Widget);
 		}
 
-		public void RenderToTexture(ITexture texture, float extrapolation)
+		public void RenderToTexture(ITexture texture)
 		{
 			if (Width > 0 && Height > 0) {
 				texture.SetAsRenderTarget();
@@ -56,7 +56,7 @@ namespace Lime
 				foreach (var node in Nodes) {
 					node.AddToRenderChain(chain);
 				}
-				chain.RenderAndClear(extrapolation);
+				chain.RenderAndClear();
 
 				texture.RestoreRenderTarget();
 
