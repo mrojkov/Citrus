@@ -134,9 +134,6 @@
     <None Include="Source\Audio\ADPCMEncoder.c">
       <Visible>False</Visible>
     </None>
-    <None Include="..\Lemon\Library\bin\Mac\Release\libLemon.dylib">
-      <Link>libLemon.dylib</Link>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Mac.csproj">

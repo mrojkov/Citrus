@@ -38,9 +38,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Library\bin\Mac\Release\libLemon.dylib">
+    <Content Include="Library\bin\Mac\Release\libLemon.dylib">
       <Link>libLemon.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
 </Project>

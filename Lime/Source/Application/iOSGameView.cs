@@ -32,8 +32,8 @@ namespace Lime
 		public GameView() : base(UIScreen.MainScreen.Bounds)
 		{
 			Instance = this;
-			LayerRetainsBacking = false;
-			LayerColorFormat = EAGLColorFormat.RGB565;
+			//LayerRetainsBacking = false;
+			//LayerColorFormat = EAGLColorFormat.RGB565;
 			MultipleTouchEnabled = true;
 			textField = new MonoTouch.UIKit.UITextField();
 			textField.Delegate = new TextFieldDelegate();
