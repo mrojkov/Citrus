@@ -33,9 +33,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Lemon">
-      <HintPath>..\Lemon\bin\Release\Lemon.dll</HintPath>
-    </Reference>
     <Reference Include="OpenTK, Version=0.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\3rdParty\OpenTK\OpenTK.dll</HintPath>
@@ -146,6 +143,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Widgets\Widget.Debugging.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Lemon\Lemon.Win.csproj">
+      <Project>{538e41e4-725c-4521-bcf3-a5591a1a3afd}</Project>
+      <Name>Lemon.Win</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
