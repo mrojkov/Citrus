@@ -9,6 +9,7 @@ namespace Lime
 	public class Button : Widget
 	{
 		SimpleText textPresenter;
+        bool isAlreadyDisabled;
 
 		[ProtoMember(1)]
 		public string Caption { get; set; }
@@ -22,6 +23,7 @@ namespace Lime
             : base()
         {
             Enabled = true;
+            isAlreadyDisabled = false;
         }
 
 		void UpdateHelper(int delta)
@@ -33,6 +35,7 @@ namespace Lime
 				textPresenter.Text = Caption;
 			}
             if (Enabled) {
+                isAlreadyDisabled = false;
                 if (HitTest(Input.MousePosition)) {
                     if (World.Instance.ActiveWidget == null) {
                         TryRunAnimation("Focus");
@@ -40,7 +43,10 @@ namespace Lime
                     }
                 } else {
                     if (World.Instance.ActiveWidget == this) {
-                        TryRunAnimation("Normal");
+                        if (isAlreadyDisabled)
+                            TryRunAnimation("Enable");
+                        else
+                            TryRunAnimation("Normal");
                         World.Instance.ActiveWidget = null;
                     }
                 }
@@ -67,7 +73,9 @@ namespace Lime
 				    World.Instance.IsActiveWidgetUpdated = true;
 			    }
             } else {
-                TryRunAnimation("Disable");
+                if (!isAlreadyDisabled)
+                    TryRunAnimation("Disable");
+                isAlreadyDisabled = true;
             }
         }
 
