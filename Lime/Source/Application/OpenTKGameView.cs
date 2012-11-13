@@ -111,7 +111,7 @@ namespace Lime
 			Mathf.Clamp(ref delta, 0, 40);
 			prevTime = currentTime;
 			DoUpdate(delta);
-			DoRender(0);
+			DoRender();
 		}
 
 		private long startTime = 0;
@@ -125,11 +125,11 @@ namespace Lime
 			return t - startTime;
 		}
 
-		private void DoRender(float interpolation)
+		private void DoRender()
 		{
 			UpdateFrameRate();
 			MakeCurrent();
-			app.OnRenderFrame(interpolation);
+			app.OnRenderFrame();
 			SwapBuffers();
 		}
 
