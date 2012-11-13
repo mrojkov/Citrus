@@ -48,13 +48,32 @@ namespace Lime
 			View.RenderFrame();
 			View.Stop();
 		}
+
+		public static System.Drawing.PointF GetTouchLocationInView(UITouch touch, UIView view)
+		{
+			// This code absolute equivalent to:
+			//		return touch.LocationInView(this.View);
+			// but later line causes crash when being run under XCode,
+			// so we managed this workaround:
+			System.Drawing.PointF result;
+			var selector = Selector.GetHandle("locationInView:");
+			if (MonoTouch.ObjCRuntime.Runtime.Arch == Arch.DEVICE)
+			{
+				Messaging.PointF_objc_msgSend_stret_IntPtr(out result, touch.Handle, selector, (view != null) ? view.Handle : IntPtr.Zero);
+			}
+			else
+			{
+				result = Messaging.PointF_objc_msgSend_IntPtr(touch.Handle, selector, (view != null) ? view.Handle : IntPtr.Zero);
+			}
+			return result;
+		}
 		
 		public override void TouchesBegan(NSSet touches, UIEvent evt)
 		{
 			foreach (var touch in touches.ToArray<UITouch>()) {
 				for (int i = 0; i < Input.MaxTouches; i++) {
 					if (activeTouches[i] == null) {
-						var pt = touch.LocationInView(this.View);
+						var pt = GetTouchLocationInView(touch, this.View);
 						Vector2 position = new Vector2(pt.X, pt.Y) * Input.ScreenToWorldTransform;
 						if (i == 0) {
 							Input.MousePosition = position;
@@ -75,7 +94,7 @@ namespace Lime
 			foreach (var touch in touches.ToArray<UITouch>()) {
 				for (int i = 0; i < Input.MaxTouches; i++) {
 					if (activeTouches[i] == touch) {
-						var pt = touch.LocationInView(this.View);
+						var pt = GetTouchLocationInView(touch, this.View);
 						Vector2 position = new Vector2(pt.X, pt.Y) * Input.ScreenToWorldTransform;
 						if (i == 0) {
 							Input.MousePosition = position;
@@ -91,7 +110,7 @@ namespace Lime
 			foreach (var touch in touches.ToArray<UITouch>()) {
 				for (int i = 0; i < Input.MaxTouches; i++) {
 					if (activeTouches[i] == touch) {
-						var pt = touch.LocationInView(this.View);
+						var pt = GetTouchLocationInView(touch, this.View);
 						Vector2 position = new Vector2(pt.X, pt.Y) * Input.ScreenToWorldTransform;
 						if (i == 0) {
 							Input.MousePosition = position;

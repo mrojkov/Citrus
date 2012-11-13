@@ -46,7 +46,7 @@ namespace Lime
 		{
 			UpdateFrameRate();
 			UpdateView();
-			Application.Instance.OnRenderFrame(0);
+			Application.Instance.OnRenderFrame();
 		}
 
 		public override void MouseDown(NSEvent theEvent)

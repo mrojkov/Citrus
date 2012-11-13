@@ -32,8 +32,8 @@ namespace Lime
 		public GameView() : base(UIScreen.MainScreen.Bounds)
 		{
 			Instance = this;
-			//LayerRetainsBacking = false;
-			//LayerColorFormat = EAGLColorFormat.RGB565;
+			LayerRetainsBacking = false;
+			LayerColorFormat = EAGLColorFormat.RGB565;
 			MultipleTouchEnabled = true;
 			textField = new MonoTouch.UIKit.UITextField();
 			textField.Delegate = new TextFieldDelegate();
@@ -125,10 +125,17 @@ namespace Lime
 			OnRenderFrame(null);
 		}
 
+		public override void WillMoveToWindow(UIWindow window)
+		{
+			// Base implementation disposes framebuffer when window is null.
+			// This causes blackscreen after "Bigfish: Show More Games" screen.
+			// So disable it.
+		}
+
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
 			MakeCurrent();
-			Application.Instance.OnRenderFrame(0);
+			Application.Instance.OnRenderFrame();
 			SwapBuffers();
 			UpdateFrameRate();
 		}

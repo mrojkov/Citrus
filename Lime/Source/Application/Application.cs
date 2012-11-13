@@ -92,9 +92,9 @@ namespace Lime
 			GameController.Instance.Exit();
 		}
 
-		public bool FullScreen { 
-			get { return GameController.Instance.FullScreen; } 
-			set { GameController.Instance.FullScreen = value; } 
+		public bool FullScreen {
+			get { return GameController.Instance.FullScreen; }
+			set { GameController.Instance.FullScreen = value; }
 		}
 
 		public float FrameRate { get { return GameView.Instance.FrameRate; } }
@@ -104,8 +104,8 @@ namespace Lime
 		}
 
 		public Size WindowSize {
-			get { return GameController.Instance.WindowSize; } 
-			set { GameController.Instance.WindowSize = value; } 
+			get { return GameController.Instance.WindowSize; }
+			set { GameController.Instance.WindowSize = value; }
 		}
 #elif WIN
 		public void Exit()
@@ -113,22 +113,22 @@ namespace Lime
 			GameView.Instance.Exit();
 		}
 
-		public bool FullScreen { 
-			get { return GameView.Instance.FullScreen; } 
-			set { GameView.Instance.FullScreen = value; } 
+		public bool FullScreen {
+			get { return GameView.Instance.FullScreen; }
+			set { GameView.Instance.FullScreen = value; }
 		}
 
 		public bool Active { get; internal set; }
 
 		public float FrameRate { get { return GameView.Instance.FrameRate; } }
-		
+
 		public DeviceOrientation CurrentDeviceOrientation {
 			get { return DeviceOrientation.LandscapeLeft; }
 		}
 
 		public Size WindowSize {
-			get { return GameView.Instance.WindowSize; } 
-			set { GameView.Instance.WindowSize = value; } 
+			get { return GameView.Instance.WindowSize; }
+			set { GameView.Instance.WindowSize = value; }
 		}
 #endif
 
@@ -142,7 +142,7 @@ namespace Lime
 			}
 		}
 
-		internal void OnDeactivate() 
+		internal void OnDeactivate()
 		{
 			if (Deactivated != null) {
 				Deactivated();
@@ -153,7 +153,7 @@ namespace Lime
 		public virtual void OnGLCreate() {}
 		public virtual void OnGLDestroy() {}
 		public virtual void OnUpdateFrame(int delta) {}
-		public virtual void OnRenderFrame(float interpolation) {}
+		public virtual void OnRenderFrame() {}
 		public virtual void OnDeviceRotated() {}
 		public virtual DeviceOrientation GetSupportedDeviceOrientations() { return DeviceOrientation.LandscapeLeft; }
 	}
