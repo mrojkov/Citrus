@@ -1,5 +1,5 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orange.Win", "Orange.Win.csproj", "{6F0C1A51-492A-4E6E-B302-E212D441EBF3}"
 EndProject

@@ -119,6 +119,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Lemon\Lemon.Win.csproj">
+      <Project>{538E41E4-725C-4521-BCF3-A5591A1A3AFD}</Project>
+      <Name>Lemon.Win</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Lime\Lime.Win.csproj">
       <Project>{FC2DE6C9-641A-4230-8D29-EA4035CD8708}</Project>
       <Name>Lime.Win</Name>
