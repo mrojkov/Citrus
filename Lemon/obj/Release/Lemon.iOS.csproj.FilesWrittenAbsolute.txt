@@ -1,2 +1,0 @@
-/Users/mike/Projects/Citrus/Lemon/bin/Release/Lemon.dll
-/Users/mike/Projects/Citrus/Lemon/obj/Release/Lemon.dll
