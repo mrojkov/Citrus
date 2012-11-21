@@ -28,7 +28,7 @@ namespace Lime
 
 		void SetNormalState()
 		{
-			if (World.Instance.ActiveWidget == this) {
+			if (World.Instance != null && World.Instance.ActiveWidget == this) {
 				World.Instance.ActiveWidget = null;
 			}
 			TryRunAnimation("Normal");
