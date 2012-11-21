@@ -106,6 +106,9 @@ namespace Lime
 		[ProtoMember(13)]
 		public BoneArray BoneArray;
 
+        public event UpdateDelegate Updating;
+        public event UpdateDelegate Updated;
+
 		public Matrix32 CalcLocalTransformMatrix()
 		{
 			var u = new Vector2(direction.X * Scale.X, direction.Y * Scale.X);
@@ -153,6 +156,16 @@ namespace Lime
 			Blending = Blending.Default;
 		}
 
+        public Widget this[string id]
+        {
+            get { return Find<Widget>(id); }
+        }
+
+        public void ClearUpdatingEvent()
+        {
+            this.Updating = null;
+        }
+
 		public void MakeInvisible()
 		{
 			Visible = false;
@@ -191,7 +204,10 @@ namespace Lime
 
 		public override void Update(int delta)
 		{
-			UpdatedNodes++;
+            if (Updating != null) {
+                Updating(delta * 0.001f);
+            }
+            UpdatedNodes++;
 			RecalcGlobalMatrixAndColorHelper();
 			if (globallyVisible) {
 				if (IsRunning) {
@@ -204,7 +220,10 @@ namespace Lime
 					ApplyAnchors();
 				}
 			}
-		}
+            if (Updated != null) {
+                Updated(delta * 0.001f);
+            }
+        }
 
 		public override void AddToRenderChain(RenderChain chain)
 		{

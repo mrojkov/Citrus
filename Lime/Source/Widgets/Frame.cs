@@ -34,8 +34,6 @@ namespace Lime
 		RenderTarget renderTarget;
 		ITexture renderTexture;
 
-		public event UpdateDelegate Updating;
-		public event UpdateDelegate Updated;
 		public BareEventHandler Rendered;
 		public BareEventHandler Clicked;
 
@@ -65,11 +63,6 @@ namespace Lime
 			}
 		}
 
-		public void ClearUpdatingEvent()
-		{
-			this.Updating = null;
-		}
-
 		public float AnimationSpeed = 1;
 
 		// In dialog mode frame acts like a modal dialog, all controls behind the dialog are frozen.
@@ -83,11 +76,6 @@ namespace Lime
 			this.Position = position;
 		}
 
-		public Frame this[string id]
-		{
-			get { return Find<Frame>(id); }
-		}
-		
 		void IImageCombinerArg.BypassRendering() {}
 
 		ITexture IImageCombinerArg.GetTexture()
@@ -150,17 +138,11 @@ namespace Lime
 			if (AnimationSpeed != 1) {
 				delta = MultiplyDeltaByAnimationSpeed(delta);
 			}
-			if (Updating != null) {
-				Updating(delta * 0.001f);
-			}
 			while (delta > MaxTimeDelta) {
 				UpdateHelper(MaxTimeDelta);
 				delta -= MaxTimeDelta;
 			}
 			UpdateHelper(delta);
-			if (Updated != null) {
-				Updated(delta * 0.001f);
-			}
 			if (Clicked != null) {
 				if (Input.WasMouseReleased() && HitTest(Input.MousePosition)) {
 					Clicked();
