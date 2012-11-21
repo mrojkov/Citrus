@@ -70,7 +70,7 @@ namespace Lime
 				RunAnimationWithStopHandler("Release", () => SetNormalState());
 			} else if (Input.WasKeyReleased(Key.Mouse0)) {
 				if (Clicked != null) {
-					Clicked(this);
+						Clicked(this);
 				}
 				RunAnimationWithStopHandler("Release", () => SetNormalState());
 			}
@@ -138,11 +138,11 @@ namespace Lime
 			if (globallyVisible) {
 				StateHandler();
 				UpdateLabel();
+				SyncActiveWidget();
 			}
 			if (!Enabled && StateHandler != UpdateDisabledState) {
 				SetDisabledState();
 			}
-			SyncActiveWidget();
 			base.Update(delta);
 		}
 
