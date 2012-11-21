@@ -47,6 +47,7 @@ namespace Lime
 			World.Instance.ActiveWidget = this;
 			TryRunAnimation("Focus");
 			StateHandler = UpdateFocusedState;
+			UpdateFocusedState();
 		}
 
 		void UpdateFocusedState()
@@ -62,6 +63,7 @@ namespace Lime
 		{
 			TryRunAnimation("Press");
 			StateHandler = UpdatePressedState;
+			UpdatePressedState();
 		}
 
 		void UpdatePressedState()
