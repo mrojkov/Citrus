@@ -1,5 +1,6 @@
 using System;
 using ProtoBuf;
+using System.Collections.Generic;
 
 namespace Lime
 {
@@ -8,9 +9,6 @@ namespace Lime
 	[ProtoContract]
 	public class Button : Widget
 	{
-		SimpleText textPresenter;
-        bool isAlreadyDisabled;
-
 		[ProtoMember(1)]
 		public string Caption { get; set; }
 
@@ -19,14 +17,95 @@ namespace Lime
 
 		public ButtonClickEvent Clicked;
 
+		private SimpleText textPresenter;
+		private BareEventHandler StateHandler;
+
         public Button()
-            : base()
         {
             Enabled = true;
-            isAlreadyDisabled = false;
+			SetNormalState();
         }
 
-		void UpdateHelper(int delta)
+		void SetNormalState()
+		{
+			if (World.Instance.ActiveWidget == this) {
+				World.Instance.ActiveWidget = null;
+			}
+			TryRunAnimation("Normal");
+			StateHandler = UpdateNormalState;
+		}
+
+		void UpdateNormalState()
+		{
+			if (HitTest(Input.MousePosition) && World.Instance.ActiveWidget == null) {
+				SetFocusedState();
+			}
+		}
+
+		void SetFocusedState()
+		{
+			World.Instance.ActiveWidget = this;
+			TryRunAnimation("Focus");
+			StateHandler = UpdateFocusedState;
+		}
+
+		void UpdateFocusedState()
+		{
+			if (!HitTest(Input.MousePosition)) {
+				SetNormalState();
+			} else if (Input.WasKeyPressed(Key.Mouse0)) {
+				SetPressedState();
+			}
+		}
+
+		void SetPressedState()
+		{
+			TryRunAnimation("Press");
+			StateHandler = UpdatePressedState;
+		}
+
+		void UpdatePressedState()
+		{
+			if (!HitTest(Input.MousePosition)) {
+				RunAnimationWithStopHandler("Release", () => SetNormalState());
+			} else if (Input.WasKeyReleased(Key.Mouse0)) {
+				if (Clicked != null) {
+					Clicked(this);
+				}
+				RunAnimationWithStopHandler("Release", () => SetNormalState());
+			}
+		}
+
+		void SetDisabledState()
+		{
+			if (World.Instance.ActiveWidget == this) {
+				World.Instance.ActiveWidget = null;
+			}
+			TryRunAnimation("Disable");
+			StateHandler = UpdateDisabledState;
+		}
+
+		void UpdateDisabledState()
+		{
+			if (Enabled) {
+				RunAnimationWithStopHandler("Enable", () => SetNormalState());
+			}
+		}
+
+		void RunAnimationWithStopHandler(string name, BareEventHandler onStop)
+		{
+			if (TryRunAnimation(name)) {
+				StateHandler = () => {
+					if (IsStopped) {
+						onStop();
+					}
+				};
+			} else {
+				onStop();
+			}
+		}
+
+		private void UpdateLabel()
 		{
 			if (textPresenter == null) {
 				textPresenter = TryFind<SimpleText>("TextPresenter");
@@ -34,57 +113,49 @@ namespace Lime
 			if (textPresenter != null) {
 				textPresenter.Text = Caption;
 			}
-            if (Enabled) {
-                isAlreadyDisabled = false;
-                if (HitTest(Input.MousePosition)) {
-                    if (World.Instance.ActiveWidget == null) {
-                        TryRunAnimation("Focus");
-                        World.Instance.ActiveWidget = this;
-                    }
-                } else {
-                    if (World.Instance.ActiveWidget == this) {
-                        if (isAlreadyDisabled)
-                            TryRunAnimation("Enable");
-                        else
-                            TryRunAnimation("Normal");
-                        World.Instance.ActiveWidget = null;
-                    }
-                }
-                if (World.Instance.ActiveWidget == this) {
-                    if (Input.WasKeyPressed(Key.Mouse0)) {
-                        TryRunAnimation("Press");
-                        Input.ConsumeKeyEvent(Key.Mouse0, true);
-                    }
-                    if (Input.WasKeyReleased(Key.Mouse0)) {
-                        if (HitTest(Input.MousePosition))
-                            TryRunAnimation("Focus");
-                        else
-                            TryRunAnimation("Normal");
-                        Input.ConsumeKeyEvent(Key.Mouse0, true);
-                        if (Clicked != null) {
-                            Clicked(this);
-                        }
-                    }
-                }
-                if (World.Instance.ActiveWidget != this && CurrentAnimation != "Normal") {
-                    TryRunAnimation("Normal");
-                }
-			    if (World.Instance.ActiveWidget == this) {
-				    World.Instance.IsActiveWidgetUpdated = true;
-			    }
-            } else {
-                if (!isAlreadyDisabled)
-                    TryRunAnimation("Disable");
-                isAlreadyDisabled = true;
-            }
-        }
+		}
+
+		private void RunReleaseAnimation()
+		{
+			if (TryRunAnimation("Release")) {
+				Stopped = () => {
+					Stopped = null;
+					if (HitTest(Input.MousePosition))
+						TryRunAnimation("Focus");
+					else
+						TryRunAnimation("Normal");
+				};
+			} else {
+				if (HitTest(Input.MousePosition))
+					TryRunAnimation("Focus");
+				else
+					TryRunAnimation("Normal");
+			}
+		}
 
 		public override void Update(int delta)
 		{
 			if (globallyVisible) {
-				UpdateHelper(delta);
+				StateHandler();
+				UpdateLabel();
 			}
+			if (!Enabled && StateHandler != UpdateDisabledState) {
+				SetDisabledState();
+			}
+			SyncActiveWidget();
 			base.Update(delta);
+		}
+
+		void SyncActiveWidget()
+		{
+			if (Enabled) {
+				if (World.Instance.ActiveWidget != this && StateHandler != UpdateNormalState) {
+					SetNormalState();
+				}
+			    if (World.Instance.ActiveWidget == this) {
+				    World.Instance.IsActiveWidgetUpdated = true;
+			    }			
+			}
 		}
 	}
 }
