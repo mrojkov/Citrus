@@ -8,7 +8,7 @@ namespace Orange
 {
 	public static class TextureConverter
 	{
-		private static void ToPVRTexture(string srcPath, string dstPath, bool compressed, bool mipMaps)
+		private static void ToPVRTexture(string srcPath, string dstPath, PVRFormat pvrFormat, bool mipMaps)
 		{
 			int width, height;
 			bool hasAlpha;
@@ -23,16 +23,29 @@ namespace Orange
 			int rgba16DataLength = potWidth * potHeight * 2;
 			
 			var pixbuf = new Gdk.Pixbuf(srcPath);
-			string formatFlag;
-			if (!compressed || rgba16DataLength < pvrtc4DataLength) {
-				if (hasAlpha) {
-					formatFlag = "-f OGL4444 -nt -yflip0";
-					TextureConverterUtils.ReduceColorsToRGBA4444WithFloydSteinbergDithering(pixbuf);
-				} else
-					formatFlag = "-f OGL565 -nt -yflip0";
-			} else {
-				formatFlag = "-f PVRTC4";
+			string formatArguments = "";
+			switch (pvrFormat)
+			{
+			case PVRFormat.PVRTC4:
+				formatArguments = "-f PVRTC4";
 				potWidth = potHeight = maxDimension;
+				break;
+			case PVRFormat.RGB565:
+				if (hasAlpha) {
+					Console.WriteLine("WARNING: texture has alpha channel. Used 'OGL4444' format instead of 'OGL565'.");
+					formatArguments = "-f OGL4444 -nt -yflip0";
+					TextureConverterUtils.ReduceColorsToRGBA4444WithFloydSteinbergDithering(pixbuf);
+				} else {
+					formatArguments = "-f OGL565 -nt -yflip0";
+				}
+				break;
+			case PVRFormat.RGBA4:
+				formatArguments = "-f OGL4444 -nt -yflip0";
+				TextureConverterUtils.ReduceColorsToRGBA4444WithFloydSteinbergDithering(pixbuf);
+				break;
+			case PVRFormat.ARGB8:
+				formatArguments = "-f OGL8888 -nt -yflip0";
+				break;
 			}
 			string tga = Path.ChangeExtension(srcPath, ".tga");
 			try {
@@ -42,7 +55,7 @@ namespace Orange
 				string pvrTexTool = Path.Combine(Helpers.GetApplicationDirectory(), "Toolchain.Mac", "PVRTexTool");
 				Mono.Unix.Native.Syscall.chmod(pvrTexTool, Mono.Unix.Native.FilePermissions.S_IXOTH | Mono.Unix.Native.FilePermissions.S_IXUSR);
 				string args = String.Format("{0} -i '{1}' -o '{2}' {3} -pvrtcfast -premultalpha -silent -x {4} -y {5}",
-					formatFlag, tga, dstPath, mipsFlag, potWidth, potHeight);
+					formatArguments, tga, dstPath, mipsFlag, potWidth, potHeight);
 				var p = System.Diagnostics.Process.Start(pvrTexTool, args);
 				p.WaitForExit();
 				if (p.ExitCode != 0) {
@@ -104,10 +117,10 @@ namespace Orange
 #endif
 		}
 		
-		public static void Convert(string srcPath, string dstPath, bool pvrCompressed, bool mipMaps, TargetPlatform platform)
+		public static void Convert(string srcPath, string dstPath, PVRFormat pvrFormat, bool mipMaps, TargetPlatform platform)
 		{
 			if (Path.GetExtension(dstPath) == ".pvr") {
-				ToPVRTexture(srcPath, dstPath, pvrCompressed, mipMaps);
+				ToPVRTexture(srcPath, dstPath, pvrFormat, mipMaps);
 			}
 			else if (Path.GetExtension(dstPath) == ".dds") {
 				ToDDSTexture(srcPath, dstPath, true, mipMaps);

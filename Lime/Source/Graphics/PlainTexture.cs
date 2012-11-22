@@ -89,10 +89,11 @@ namespace Lime
 			RGB_565 = 0x2,
 			RGB_555 = 0x3,
 			RGB_888 = 0x4,
-			ARGB_888 = 0x5,
+			ARGB_8888 = 0x5,
 			PVRTC_2 = 0xC,
 			PVRTC_4 = 0xD,	
 			GLARGB_4444 = 0x10,
+			GLARGB_8888 = 0x12,
 			GLRGB_565 = 0x13,
 		}
 		
@@ -143,6 +144,12 @@ namespace Lime
 					byte[] buffer = new byte[width * height * 2];
 					reader.Read(buffer, 0, buffer.Length);
 					GL.TexImage2D(All.Texture2D, i, (int)All.Rgb, width, height, 0, All.Rgb, All.UnsignedShort565, buffer);
+					break;
+				}
+				case PVRFormat.GLARGB_8888: {
+					byte[] buffer = new byte[width * height * 4];
+					reader.Read(buffer, 0, buffer.Length);
+					GL.TexImage2D(All.Texture2D, i, (int)All.Rgba, width, height, 0, All.Rgba, All.UnsignedByte, buffer);
 					break;
 				}
 				default:

@@ -62,7 +62,7 @@ namespace Orange
 							return false;
 						}
 						string tmpFile = Path.ChangeExtension(srcPath, GetPlatformTextureExtension());
-						TextureConverter.Convert(srcPath, tmpFile, rules.PVRCompression, rules.MipMaps, platform);
+						TextureConverter.Convert(srcPath, tmpFile, rules.PVRFormat, rules.MipMaps, platform);
 						assetsBundle.ImportFile(tmpFile, dstPath, 0);
 						File.Delete(tmpFile);
 						return true;
@@ -155,7 +155,7 @@ namespace Orange
 								Console.WriteLine((bundled ? "* " : "+ ") + dstPath);
 							}
 						} catch (System.Exception) {
-							Console.WriteLine("An exception was caught while processing '{0}'", srcPath);
+							Console.WriteLine("An exception was caught while processing '{0}'\n", srcPath);
 							throw;
 						}
 					} else {
@@ -175,7 +175,7 @@ namespace Orange
 			public Lime.IntRectangle AtlasRect;
 			public bool Allocated;
 			public bool MipMapped;
-			public bool Compressed;
+			public PVRFormat PVRFormat;
 		}
 		
 		string GetAtlasPath(string atlasChain, int index)
@@ -211,7 +211,7 @@ namespace Orange
 					}
 					var item = new AtlasItem {Path = Path.ChangeExtension(p.Key, ".atlasPart"), 
 						Pixbuf = pixbuf, MipMapped = p.Value.MipMaps,
-						Compressed = p.Value.PVRCompression};
+						PVRFormat = p.Value.PVRFormat};
 					items.Add(item);
 				}
 			}
@@ -246,13 +246,14 @@ namespace Orange
 					string atlasPath = GetAtlasPath(atlasChain, atlasId);
 					var atlas = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, true, 8, i, i);
 					atlas.Fill(0);
-					bool compressed = false;
+					PVRFormat pvrFormat = PVRFormat.PVRTC4;
 					bool mipMapped = false;
 					foreach (AtlasItem item in items) {
 						if (!item.Allocated) {
 							continue;
 						}
-						compressed |= item.Compressed;
+						if (item.PVRFormat > pvrFormat)
+							pvrFormat = item.PVRFormat;
 						mipMapped |= item.MipMapped;
 						var p = item.Pixbuf;
 						p.CopyArea(0, 0, p.Width, p.Height, atlas, item.AtlasRect.A.X, item.AtlasRect.A.Y);
@@ -275,7 +276,7 @@ namespace Orange
 					string inFile = "$TMP$.png";
 					string outFile = Path.ChangeExtension(inFile, GetPlatformTextureExtension());
 					atlas.Save(inFile, "png");
-					TextureConverter.Convert(inFile, outFile, compressed, mipMapped, platform);
+					TextureConverter.Convert(inFile, outFile, pvrFormat, mipMapped, platform);
 					assetsBundle.ImportFile(outFile, atlasPath, 0);
 					File.Delete(inFile);
 					File.Delete(outFile);

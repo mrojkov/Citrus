@@ -4,15 +4,25 @@ using System.Collections.Generic;
 
 namespace Orange
 {
+	// NB: When packing textures into atlases, Orange chooses texture format with highest value
+	// amoung all atlas items.
+	public enum PVRFormat
+	{
+		PVRTC4,
+		RGB565,
+		RGBA4,
+		ARGB8,
+	}
+
 	public struct CookingRules
 	{
 		public string TextureAtlas;
 		public bool MipMaps;
-		public bool PVRCompression;
+		public PVRFormat PVRFormat;
 		public DateTime LastChangeTime;
 		public static CookingRules Default = new CookingRules {
 			TextureAtlas = null, MipMaps = false, 
-			PVRCompression = true, LastChangeTime = new DateTime(0)};
+			PVRFormat = PVRFormat.PVRTC4, LastChangeTime = new DateTime(0)};
 	}
 	
 	public class CookingRulesBuilder
@@ -62,6 +72,23 @@ namespace Orange
 			return value == "Yes";
 		}
 
+		static PVRFormat ParsePVRFormat(string value)
+		{
+			switch(value)
+			{
+			case "PVRTC4":
+				return PVRFormat.PVRTC4;
+			case "RGBA4":
+				return PVRFormat.RGBA4;
+			case "RGB565":
+				return PVRFormat.RGB565;
+			case "ARGB8":
+				return PVRFormat.ARGB8;
+			default:
+				throw new Lime.Exception("Invalid value. Must be one of: PVRTC4, RGBA4, RGB565, ARGB8");
+			}
+		}
+
 		static CookingRules ParseCookingRules(CookingRules basicRules, string path)
 		{ 
 			var rules = basicRules;
@@ -96,8 +123,8 @@ namespace Orange
 						case "MipMaps":
 							rules.MipMaps = ParseBool(words[1]);
 							break;
-						case "PVRCompression":
-							rules.PVRCompression = ParseBool(words[1]);
+						case "PVRFormat":
+							rules.PVRFormat = ParsePVRFormat(words[1]);
 							break;
 						default:
 							throw new Lime.Exception("Unknown attribute {0}", words[0]);
