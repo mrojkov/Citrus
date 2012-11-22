@@ -76,6 +76,11 @@ namespace Lime
 			this.Position = position;
 		}
 
+		public Frame this[string id]
+		{
+			get { return Find<Frame>(id); }
+		}
+
 		void IImageCombinerArg.BypassRendering() {}
 
 		ITexture IImageCombinerArg.GetTexture()
