@@ -41,24 +41,22 @@
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Xamarin.ObjcBinding.CSharp.targets" />
   <ItemGroup>
-    <ObjcBindingNativeLibrary Include="Library\bin\iOS\Release-iphoneos\libLemon.a">
-      <Link>libLemon.a</Link>
-      <DeployService-Deploy>True</DeployService-Deploy>
-    </ObjcBindingNativeLibrary>
+    <ObjcBindingApiDefinition Include="ApiDefinition.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <ObjcBindingNativeLibrary Include="Library\bin\iOS\Release-iphonesimulator\libLemonSim.a">
       <Link>libLemonSim.a</Link>
-      <DeployService-Deploy>True</DeployService-Deploy>
+    </ObjcBindingNativeLibrary>
+    <ObjcBindingNativeLibrary Include="Library\bin\iOS\Release-iphoneos\libLemon.a">
+      <Link>libLemon.a</Link>
     </ObjcBindingNativeLibrary>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Library\bin\iOS\Release-iphoneos\libLemon.linkwith.cs">
-      <DependentUpon>libLemon.a</DependentUpon>
-    </Compile>
     <Compile Include="Library\bin\iOS\Release-iphonesimulator\libLemonSim.linkwith.cs">
       <DependentUpon>libLemonSim.a</DependentUpon>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <ObjcBindingApiDefinition Include="ApiDefinition.cs" />
+    <Compile Include="Library\bin\iOS\Release-iphoneos\libLemon.linkwith.cs">
+      <DependentUpon>libLemon.a</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>
