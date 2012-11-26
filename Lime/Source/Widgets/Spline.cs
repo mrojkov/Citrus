@@ -27,12 +27,9 @@ namespace Lime
         {
             var result = new List<Vector2>();
             SplinePoint prevPoint = null;
-            foreach (SplinePoint curPoint in Nodes)
-            {
-                if (prevPoint != null)
-                {
-                    for (int i = 1; i < approximateCount; i++)
-                    {
+            foreach (SplinePoint curPoint in Nodes) {
+                if (prevPoint != null) {
+                    for (int i = 1; i < approximateCount; i++) {
                         Vector2 position = Interpolate(prevPoint, curPoint, (float)(i) / approximateCount);
                         result.Add(position);
                     }
@@ -47,8 +44,7 @@ namespace Lime
         {
             float length = 0;
             Vector2 prevPosition = point1.Position;
-            for (int i = 1; i < approximateCount; i++)
-            {
+            for (int i = 1; i < approximateCount; i++) {
                 Vector2 curPosition = Interpolate(point1, point2, (float)(i) / approximateCount);
                 length += (curPosition - prevPosition).Length;
                 prevPosition = curPosition;
@@ -61,10 +57,10 @@ namespace Lime
         {
             float length = 0;
             SplinePoint prevPoint = null;
-            foreach (SplinePoint curPoint in Nodes)
-            {   
-                if(prevPoint != null)
+            foreach (SplinePoint curPoint in Nodes) {
+                if (prevPoint != null) {
                     length += CalcAccurateSegmentLength(prevPoint, curPoint, approximateCount);
+                }
                 prevPoint = curPoint;
             }
             return length;
