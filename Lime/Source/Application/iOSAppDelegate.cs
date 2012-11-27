@@ -21,7 +21,7 @@ namespace Lime
 
 		// class-level declarations
 		public UIWindow Window { get; private set; }
-		GameController gameController;
+		public GameController GameController { get; private set; }
 
 		public AppDelegate()
 		{
@@ -44,7 +44,7 @@ namespace Lime
 		public override void OnActivated(UIApplication application)
 		{
 			AudioSystem.Active = true;
-			gameController.Activate();
+			GameController.Activate();
 			Application.Instance.OnGLCreate();
 		}
 
@@ -53,7 +53,7 @@ namespace Lime
 			AudioSystem.Active = false;
 			// Important: MonoTouch destroys OpenGL context on application hiding.
 			// So, we must destroy all OpenGL objects.
-			gameController.Deactivate();
+			GameController.Deactivate();
 			Lime.TexturePool.Instance.DiscardAllTextures();
 			Application.Instance.OnGLDestroy();
 		}
@@ -69,14 +69,14 @@ namespace Lime
 			// create a new window instance based on the screen size
 			Window = new UIWindow(UIScreen.MainScreen.Bounds);
 
-			gameController = new GameController();
+			GameController = new GameController();
 			
 			string currSysVer = UIDevice.CurrentDevice.SystemVersion;
 			if (currSysVer[0] >= '6') {
-				Window.RootViewController = gameController;
-				gameController.View.AutoResize = true;
+				Window.RootViewController = GameController;
+				GameController.View.AutoResize = true;
 			} else {
-				Window.AddSubview(gameController.View);
+				Window.AddSubview(GameController.View);
 			}
 
 			// make the window visible
