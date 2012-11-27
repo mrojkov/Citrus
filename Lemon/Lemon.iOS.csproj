@@ -55,8 +55,5 @@
     <Compile Include="Library\bin\iOS\Release-iphonesimulator\libLemonSim.linkwith.cs">
       <DependentUpon>libLemonSim.a</DependentUpon>
     </Compile>
-    <Compile Include="Library\bin\iOS\Release-iphoneos\libLemon.linkwith.cs">
-      <DependentUpon>libLemon.a</DependentUpon>
-    </Compile>
   </ItemGroup>
 </Project>
