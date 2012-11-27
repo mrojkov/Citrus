@@ -23,48 +23,48 @@ namespace Lime
 			return length;
 		}
 
-        public List<Vector2> Approximation(int approximateCount)
-        {
-            var result = new List<Vector2>();
-            SplinePoint prevPoint = null;
-            foreach (SplinePoint curPoint in Nodes) {
-                if (prevPoint != null) {
-                    for (int i = 1; i < approximateCount; i++) {
-                        Vector2 position = Interpolate(prevPoint, curPoint, (float)(i) / approximateCount);
-                        result.Add(position);
-                    }
-                }
-                result.Add(curPoint.Position);
-                prevPoint = curPoint;
-            }
-            return result;
-        }
+		public List<Vector2> ApproximateByPolyline(int approximateCount)
+		{
+			var result = new List<Vector2>();
+			SplinePoint prevPoint = null;
+			foreach (SplinePoint curPoint in Nodes) {
+				if (prevPoint != null) {
+					for (int i = 1; i < approximateCount; i++) {
+						Vector2 position = Interpolate(prevPoint, curPoint, (float)(i) / approximateCount);
+						result.Add(position);
+					}
+				}
+				result.Add(curPoint.Position);
+				prevPoint = curPoint;
+			}
+			return result;
+		}
 
-        private float CalcAccurateSegmentLength(SplinePoint point1, SplinePoint point2, int approximateCount)
-        {
-            float length = 0;
-            Vector2 prevPosition = point1.Position;
-            for (int i = 1; i < approximateCount; i++) {
-                Vector2 curPosition = Interpolate(point1, point2, (float)(i) / approximateCount);
-                length += (curPosition - prevPosition).Length;
-                prevPosition = curPosition;
-            }
-            length += (point2.Position - prevPosition).Length;
-            return length;
-        }
+		private float CalcAccurateSegmentLength(SplinePoint point1, SplinePoint point2, int approximateCount)
+		{
+			float length = 0;
+			Vector2 prevPosition = point1.Position;
+			for (int i = 1; i < approximateCount; i++) {
+				Vector2 curPosition = Interpolate(point1, point2, (float)(i) / approximateCount);
+				length += (curPosition - prevPosition).Length;
+				prevPosition = curPosition;
+			}
+			length += (point2.Position - prevPosition).Length;
+			return length;
+		}
 
-        public float CalcAccurateLength(int approximateCount)
-        {
-            float length = 0;
-            SplinePoint prevPoint = null;
-            foreach (SplinePoint curPoint in Nodes) {
-                if (prevPoint != null) {
-                    length += CalcAccurateSegmentLength(prevPoint, curPoint, approximateCount);
-                }
-                prevPoint = curPoint;
-            }
-            return length;
-        }
+		public float CalcAccurateLength(int approximateCount)
+		{
+			float length = 0;
+			SplinePoint prevPoint = null;
+			foreach (SplinePoint curPoint in Nodes) {
+				if (prevPoint != null) {
+					length += CalcAccurateSegmentLength(prevPoint, curPoint, approximateCount);
+				}
+				prevPoint = curPoint;
+			}
+			return length;
+		}
 
 		public Vector2 CalcPoint(float t)
 		{
