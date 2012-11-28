@@ -141,6 +141,18 @@ namespace Lime
 			return lhs.X * rhs.Y - lhs.Y * rhs.X;
 		}
 
+        public static Vector2 Min(Vector2 value1, Vector2 value2)
+        {
+            return new Vector2(value1.X < value2.X ? value1.X : value2.X,
+                               value1.Y < value2.Y ? value1.Y : value2.Y);
+        }
+
+        public static Vector2 Max(Vector2 value1, Vector2 value2)
+        {
+            return new Vector2(value1.X > value2.X ? value1.X : value2.X,
+                               value1.Y > value2.Y ? value1.Y : value2.Y);
+        }
+
 		public static Vector2 Normalize(Vector2 value)
 		{
 			float length = value.Length;
@@ -150,6 +162,17 @@ namespace Lime
 			}
 			return value;
 		}
+
+        public Vector2 Normalize()
+        {
+            float length = this.Length;
+            if (length > 0)
+            {
+                this.X /= length;
+                this.Y /= length;
+            }
+            return this;
+        }
 
 		public static Vector2 Heading(float angle)
 		{
