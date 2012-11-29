@@ -44,16 +44,11 @@
     <ObjcBindingApiDefinition Include="ApiDefinition.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ObjcBindingNativeLibrary Include="Library\bin\iOS\Release-iphonesimulator\libLemonSim.a">
-      <Link>libLemonSim.a</Link>
-    </ObjcBindingNativeLibrary>
-    <ObjcBindingNativeLibrary Include="Library\bin\iOS\Release-iphoneos\libLemon.a">
-      <Link>libLemon.a</Link>
-    </ObjcBindingNativeLibrary>
+    <ObjcBindingNativeLibrary Include="libLemonUniversal.a" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Library\bin\iOS\Release-iphonesimulator\libLemonSim.linkwith.cs">
-      <DependentUpon>libLemonSim.a</DependentUpon>
+    <Compile Include="libLemonUniversal.linkwith.cs">
+      <DependentUpon>libLemonUniversal.a</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>

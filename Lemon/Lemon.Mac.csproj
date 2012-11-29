@@ -40,7 +40,7 @@
   <ItemGroup>
     <Content Include="Library\bin\Mac\Release\libLemon.dylib">
       <Link>libLemon.dylib</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 </Project>

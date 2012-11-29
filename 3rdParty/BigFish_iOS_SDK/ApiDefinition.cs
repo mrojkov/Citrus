@@ -172,6 +172,15 @@ namespace BigFish_iOS_SDK
 
 		[Export("stopBranding")]
 		void StopBranding();
+
+		[Export("showSupport")]
+		void ShowSupport();
+
+		[Export("showTerms")]
+		void ShowTerms();
+
+		[Export("showPrivacy")]
+		void ShowPrivacy();
 	}
 }
 
