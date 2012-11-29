@@ -52,7 +52,11 @@ namespace Lime
 
 		void UpdateFocusedState()
 		{
+#if iOS
+			if (!HitTest(Input.MousePosition) || !Input.IsMousePressed()) {
+#else
 			if (!HitTest(Input.MousePosition)) {
+#endif
 				SetNormalState();
 			} else if (Input.WasKeyPressed(Key.Mouse0)) {
 				SetPressedState();
