@@ -68,7 +68,7 @@ namespace Lime
 		public bool IsRunning;
 		public bool IsStopped { get { return !IsRunning; } set { IsRunning = !value; } }
 
-		public BareEventHandler Stopped;
+		public event BareEventHandler AnimationStopped;
 
 		private int animationTime;
 
@@ -110,16 +110,16 @@ namespace Lime
 						animationTime = Animator.FramesToMsecs(marker.Frame);
 						prevFrame = currFrame - 1;
 						IsRunning = false;
-						if (Stopped != null) {
-							Stopped();
+						if (AnimationStopped != null) {
+							AnimationStopped();
 						}
 						break;
 					case MarkerAction.Destroy:
 						animationTime = Animator.FramesToMsecs(marker.Frame);
 						prevFrame = currFrame - 1;
 						IsRunning = false;
-						if (Stopped != null) {
-							Stopped();
+						if (AnimationStopped != null) {
+							AnimationStopped();
 						}
 						UnlinkAfterUpdate();
 						break;
@@ -177,6 +177,7 @@ namespace Lime
 			if (marker == null) {
 				return false;
 			}
+			AnimationStopped = null;
 			AnimationFrame = marker.Frame;
 			CurrentAnimation = markerId;
 			IsRunning = true;

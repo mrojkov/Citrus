@@ -124,8 +124,7 @@ namespace Lime
 		private void RunReleaseAnimation()
 		{
 			if (TryRunAnimation("Release")) {
-				Stopped = () => {
-					Stopped = null;
+				AnimationStopped += () => {
 					if (HitTest(Input.MousePosition))
 						TryRunAnimation("Focus");
 					else
