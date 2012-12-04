@@ -136,7 +136,7 @@ namespace Pinta.Gui.Widgets
 
 				double theta = (this.angleValue * 2.0 * Math.PI) / 360.0;
 
-				Cairo.Rectangle ellipseRect = new Cairo.Rectangle (ourRect.Location (), diameter, diameter);
+				Cairo.Rectangle ellipseRect = new Cairo.Rectangle (ourRect.GetLocation (), diameter, diameter);
 				Cairo.Rectangle ellipseOutlineRect = ellipseRect;
 
 				g.DrawEllipse (ellipseOutlineRect, new Cairo.Color (.1, .1, .1), 1);

@@ -1,10 +1,10 @@
 // 
-// ToolBarLabel.cs
+// ImageExporter.cs
 //  
 // Author:
-//       Jonathan Pobst <monkey@jpobst.com>
+//       Maia Kozheva <sikon@ubuntu.com>
 // 
-// Copyright (c) 2010 Jonathan Pobst
+// Copyright (c) 2010 Maia Kozheva <sikon@ubuntu.com>
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -25,24 +25,16 @@
 // THE SOFTWARE.
 
 using System;
-using Gtk;
+using Mono.Addins;
 
 namespace Pinta.Core
 {
-	public class ToolBarLabel : ToolItem
+	[TypeExtensionPoint]
+	public interface IImageExporter
 	{
-		public ToolBarLabel (string text)
-		{
-			Label l = new Label (text);
-			l.Show ();
-
-			Add (l);
-			Show ();
-		}
-
-		public string Text {
-			get { return (Child as Label).Text; }
-			set { (Child as Label).Text = value; }
-		}
+		/// <summary>
+		/// Exports a document to a file.
+		/// </summary>
+		void Export (Document document, string fileName);
 	}
 }

@@ -20,7 +20,7 @@ namespace Pinta.Core
 			List<Point[]> polygons = new List<Point[]> ();
 
 			if (!stencil.IsEmpty) {
-				Point start = bounds.Location ();
+				Point start = bounds.GetLocation ();
 				List<Point> pts = new List<Point> ();
 				int count = 0;
 

@@ -42,14 +42,14 @@ namespace Pinta.Core
 		private string last_dialog_directory;
 		private RecentData recent_data;
 
-		// public ImageConverterManager ImageFormats { get; private set; }
+		public ImageConverterManager ImageFormats { get; private set; }
 		// public FontManager Fonts { get; private set; }
 		public int RenderThreads { get; set; }
 		public OS OperatingSystem { get { return operating_system; } }
 		
 		public SystemManager ()
 		{
-			// ImageFormats = new ImageConverterManager ();
+			ImageFormats = new ImageConverterManager ();
 			RenderThreads = Environment.ProcessorCount;
 			// Fonts = new FontManager ();
 

@@ -612,7 +612,7 @@ namespace Pinta.Core
 			return new Cairo.Rectangle (r.X, r.Y, r.Width, r.Height);
 		}
 
-		public static Cairo.Point Location (this Cairo.Rectangle r)
+		public static Cairo.Point GetLocation (this Cairo.Rectangle r)
 		{
 			return new Cairo.Point ((int)r.X, (int)r.Y);
 		}

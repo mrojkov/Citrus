@@ -44,19 +44,11 @@ namespace Pinta.Core
 	{
 		private string filename;
 		private bool is_dirty;
-//		private int layer_name_int = 2;
-//		private int current_layer = -1;
-//
-//		// The layer for tools to use until their output is committed
-////		private Layer tool_layer;
-//
-//		// The layer used for selections
-////		private Layer selection_layer;
-//
-//		private bool show_selection;
-//
-////		public DocumentSelection Selection = new DocumentSelection();
-//
+
+		public Lime.Widget RootNode { get; private set; }
+		public Lime.Node Container { get; private set; }
+		public List<Lime.Node> Selection = new List<Lime.Node>();
+
 		public Document (Gdk.Size size)
 		{
 			Guid = Guid.NewGuid ();
@@ -66,6 +58,12 @@ namespace Pinta.Core
 			HasFile = false;
 			HasBeenSavedInSession = false;
 			ImageSize = size;
+			RootNode = new Lime.Widget();
+			Container = RootNode;
+			for (int i = 0; i < 10; i++) {
+				RootNode.AddNode(new Lime.Image() { Id = string.Format("Image{0:00}", i) });
+				RootNode.AddNode(new Lime.Frame() { Id = string.Format("Frame{0:00}", i) }) ;
+			}
 
 //			UserLayers = new List<UserLayer>();
 

@@ -225,9 +225,9 @@ namespace Pinta.Core
 		internal void ResetTitle ()
 		{
 			if (HasOpenDocuments)
-				PintaCore.Chrome.MainWindow.Title = string.Format ("{0}{1} - Pinta", ActiveDocument.Filename, ActiveDocument.IsDirty ? "*" : "");
+				PintaCore.Chrome.MainWindow.Title = string.Format ("{0}{1} - Tangerine", ActiveDocument.Filename, ActiveDocument.IsDirty ? "*" : "");
 			else
-				PintaCore.Chrome.MainWindow.Title = "Pinta";
+				PintaCore.Chrome.MainWindow.Title = "Tangerine";
 		}
 
 		public void SetActiveDocument (int index)
@@ -284,10 +284,17 @@ namespace Pinta.Core
 				CanvasSizeChanged (this, EventArgs.Empty);
 		}
 
+		public void OnDocumentModified(DocumentEventArgs e)
+		{
+			if (DocumentModified != null) {
+				DocumentModified(this, e);
+			}
+		}
+
 		protected internal void OnDocumentCreated (DocumentEventArgs e)
 		{
 			if (DocumentCreated != null)
-				DocumentCreated (this, e);
+				DocumentCreated(this, e);
 		}
 
 		protected internal void OnDocumentOpened (DocumentEventArgs e)
@@ -325,6 +332,7 @@ namespace Pinta.Core
 		public event EventHandler<DocumentEventArgs> DocumentCreated;
 		public event EventHandler<DocumentEventArgs> DocumentOpened;
 		public event EventHandler<DocumentEventArgs> DocumentClosed;
+		public event EventHandler<DocumentEventArgs> DocumentModified;
 		#endregion
 		
 	}

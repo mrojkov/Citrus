@@ -74,10 +74,10 @@ namespace Lime
 		{
 			if (frame < 0 || frame > 99)
 				return false;
-			int i = path.Length - 1;
-			for (; i >= 0; i--)
-				if (path[i] == '.')
-					break;
+			int i = path.Length;
+			//for (; i >= 0; i--)
+			//	if (path[i] == '.')
+			//		break;
 			if (i < 2)
 				return false;
 			if (char.IsDigit(path, i - 1) && char.IsDigit(path, i - 2)) {
@@ -91,15 +91,21 @@ namespace Lime
 		}
 
 		List<SerializableTexture> textures;
+
 		internal SerializableTexture GetTexture(int index)
 		{
+			if (FirstFrame == LastFrame) {
+				return texture;
+			}
 			if (textures == null) {
 				textures = new List<SerializableTexture>();
 				var path = texture.SerializationPath;
 				for (int i = 0; i < 100; i++) {
 					if (!ChangeTextureFrameIndex(ref path, i))
 						break;
-					if (AssetsBundle.Instance.FileExists(path)) {
+					if (AssetsBundle.Instance.FileExists(path + ".atlasPart") ||
+						AssetsBundle.Instance.FileExists(path)) 
+					{
 						var t = new SerializableTexture(path);
 						textures.Add(t);
 					} else if (i > 0)

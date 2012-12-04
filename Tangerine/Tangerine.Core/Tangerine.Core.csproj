@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -78,6 +78,14 @@
     <Compile Include="Effects\Scanline.cs" />
     <Compile Include="Effects\IBitVector2D.cs" />
     <Compile Include="Effects\Utility.cs" />
+    <Compile Include="HistoryItems\SelectNodesHistoryItem.cs" />
+    <Compile Include="ImageFormats\FormatDescriptor.cs" />
+    <Compile Include="ImageFormats\GdkPixbufFormat.cs" />
+    <Compile Include="ImageFormats\IImageExporter.cs" />
+    <Compile Include="ImageFormats\IImageImporter.cs" />
+    <Compile Include="ImageFormats\JpegFormat.cs" />
+    <Compile Include="ImageFormats\TgaExporter.cs" />
+    <Compile Include="Managers\ImageConverterManager.cs" />
     <Compile Include="Managers\ResourceManager.cs" />
     <Compile Include="TangerineCore.cs" />
     <Compile Include="Managers\ActionManager.cs" />
@@ -110,14 +118,16 @@
     <Compile Include="Actions\EditActions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="Enumerations\" />
-    <Folder Include="Managers\" />
-    <Folder Include="Actions\" />
-    <Folder Include="HistoryItems\" />
-    <Folder Include="Widgets\" />
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="..\..\Lemon\Lemon.Win.csproj">
+      <Project>{538e41e4-725c-4521-bcf3-a5591a1a3afd}</Project>
+      <Name>Lemon.Win</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Lime\Lime.Win.csproj">
+      <Project>{fc2de6c9-641a-4230-8d29-ea4035cd8708}</Project>
+      <Name>Lime.Win</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Tangerine.Resources\Tangerine.Resources.csproj">
       <Project>{50AFF341-655E-45EF-83CA-58F8254E4C8B}</Project>
       <Name>Tangerine.Resources</Name>
