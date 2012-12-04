@@ -4,7 +4,7 @@ using ProtoBuf;
 using System.IO;
 using System.Collections.Generic;
 
-namespace Kumquat
+namespace Lime
 {
 	[ProtoContract]
 	public class ExitArea : Area

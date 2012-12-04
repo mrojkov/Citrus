@@ -33,10 +33,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Kumquat, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Orange\bin\Win\Release\Kumquat.dll</HintPath>
-    </Reference>
     <Reference Include="OpenTK, Version=0.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\3rdParty\OpenTK\OpenTK.dll</HintPath>
@@ -56,11 +52,13 @@
   <ItemGroup>
     <Compile Include="Source\Application\Application.cs" />
     <Compile Include="Source\Application\Logger.cs" />
+    <Compile Include="Source\Area.cs" />
     <Compile Include="Source\Audio\OggDecoder.cs" />
     <Compile Include="Source\Audio\SampleCache.cs" />
     <Compile Include="Source\Audio\SerializableSample.cs" />
     <Compile Include="Source\Audio\Sound.cs" />
     <Compile Include="Source\Environment.cs" />
+    <Compile Include="Source\ExitArea.cs" />
     <Compile Include="Source\Geometry.cs" />
     <Compile Include="Source\Application\iOSAppDelegate.cs" />
     <Compile Include="Source\Application\iOSGameController.cs" />

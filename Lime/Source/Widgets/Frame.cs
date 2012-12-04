@@ -3,7 +3,6 @@ using Lime;
 using ProtoBuf;
 using System.IO;
 using System.Collections.Generic;
-using Kumquat;
 
 namespace Lime
 {
@@ -30,7 +29,7 @@ namespace Lime
 	}
 
 	[ProtoContract]
-	[ProtoInclude(100, typeof(Kumquat.Area))]
+	[ProtoInclude(100, typeof(Area))]
 	public class Frame : Widget, IImageCombinerArg
 	{
 		RenderTarget renderTarget;

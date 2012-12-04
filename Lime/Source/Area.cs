@@ -4,7 +4,7 @@ using ProtoBuf;
 using System.IO;
 using System.Collections.Generic;
 
-namespace Kumquat
+namespace Lime
 {
 	[ProtoContract]
 	[ProtoInclude(100, typeof(ExitArea))]

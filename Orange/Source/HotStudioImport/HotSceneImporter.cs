@@ -1,6 +1,5 @@
 using System.IO;
 using Lime;
-using Kumquat;
 
 namespace Orange
 {
@@ -883,8 +882,8 @@ namespace Orange
 				new KnownActorType {ActorClass = "Hot::Edit", NodeClass = "Lime.TextBox, Lime", PropReader = ParseEditProperty},
 
 				// Kumquat:
-				new KnownActorType {ActorClass = "Area", NodeClass = "Kumquat.Area, Kumquat", PropReader = ParseAreaProperty},
-				new KnownActorType {ActorClass = "ExitArea", NodeClass = "Kumquat.ExitArea, Kumquat", PropReader = ParseExitAreaProperty},
+				new KnownActorType {ActorClass = "Area", NodeClass = "Lime.Area, Lime", PropReader = ParseAreaProperty},
+				new KnownActorType {ActorClass = "ExitArea", NodeClass = "Lime.ExitArea, Lime", PropReader = ParseExitAreaProperty},
 			};
 		}
 	}

@@ -53,10 +53,6 @@
     <ApplicationIcon>Orange.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Kumquat, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Win\Release\Kumquat.dll</HintPath>
-    </Reference>
     <Reference Include="protobuf-net, Version=2.0.0.470, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
