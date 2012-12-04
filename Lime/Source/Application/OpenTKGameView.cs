@@ -24,7 +24,14 @@ namespace Lime
 			this.Mouse.ButtonDown += HandleMouseButtonDown;
 			this.Mouse.ButtonUp += HandleMouseButtonUp;
 			this.Mouse.Move += HandleMouseMove;
-			this.Location = new System.Drawing.Point(0, 0);
+
+            // Как узнать разрешение текущего экрана без Windows Forms?
+            Size screenSize = new Size(1280, 1024);
+            
+            this.Location = new System.Drawing.Point(
+                (screenSize.Width - this.Width) / 2,
+                (screenSize.Height - this.Height) / 2
+            );
 		}
 
 		void HandleKeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)

@@ -1,5 +1,6 @@
 using System.IO;
 using Lime;
+using Kumquat;
 
 namespace Orange
 {
@@ -18,6 +19,8 @@ namespace Orange
 				}
 			}
 		}
+
+		#region LimeParse
 
 		void ParseActorProperty(Node node, string name)
 		{
@@ -813,7 +816,42 @@ namespace Orange
 			}
 			throw new Exception("Unknown type of actor '{0}'", actorClass);
 		}
-		
+
+		#endregion
+
+		#region KumquatParse
+
+		void ParseAreaProperty(Node node, string name)
+		{
+			Area area = (Area)node;
+			switch (name) {
+				case "CursorName":
+					area.CursorName = lexer.ParseQuotedString();
+					break;
+				case "Tools":
+					area.Tools = lexer.ParseQuotedString();
+					break;
+				default:
+					ParseSceneProperty(node, name);
+					break;
+			}
+		}
+
+		void ParseExitAreaProperty(Node node, string name)
+		{
+			ExitArea exitArea = (ExitArea)node;
+			switch (name) {
+				case "ExitTo":
+					exitArea.ExitTo = lexer.ParseQuotedString();
+					break;
+				default:
+					ParseAreaProperty(node, name);
+					break;
+			}
+		}
+
+		#endregion
+
 		void RegisterKnownActorTypes()
 		{
 			knownActorTypes = new KnownActorType[] {
@@ -843,6 +881,10 @@ namespace Orange
 				new KnownActorType {ActorClass = "Hot::RichText", NodeClass = "Lime.RichText, Lime", PropReader = ParseRichTextProperty},
 				new KnownActorType {ActorClass = "Hot::TextStyle", NodeClass = "Lime.TextStyle, Lime", PropReader = ParseTextStyleProperty},
 				new KnownActorType {ActorClass = "Hot::Edit", NodeClass = "Lime.TextBox, Lime", PropReader = ParseEditProperty},
+
+				// Kumquat:
+				new KnownActorType {ActorClass = "Area", NodeClass = "Kumquat.Area, Kumquat", PropReader = ParseAreaProperty},
+				new KnownActorType {ActorClass = "ExitArea", NodeClass = "Kumquat.ExitArea, Kumquat", PropReader = ParseExitAreaProperty},
 			};
 		}
 	}
