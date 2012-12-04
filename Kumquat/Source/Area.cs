@@ -7,6 +7,7 @@ using System.Collections.Generic;
 namespace Kumquat
 {
 	[ProtoContract]
+	[ProtoInclude(100, typeof(ExitArea))]
 	public class Area : Frame
 	{
 		[ProtoMember(1)]
