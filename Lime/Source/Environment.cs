@@ -12,6 +12,8 @@ namespace Lime
 			model.Add(typeof(ITexture), true);
 			model.Add(typeof(Node), true);
 			model.Add(typeof(TextureAtlasPart), true);
+			model.Add(typeof(Kumquat.Area), true);
+			model.Add(typeof(Kumquat.ExitArea), true);
 			model.Add(typeof(Font), true);
 			foreach (var type in types) {
 				model.Add(type, true);

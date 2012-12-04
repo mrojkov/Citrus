@@ -33,6 +33,9 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Kumquat">
+      <HintPath>..\Kumquat\bin\Release\Kumquat.dll</HintPath>
+    </Reference>
     <Reference Include="OpenTK, Version=0.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\3rdParty\OpenTK\OpenTK.dll</HintPath>
