@@ -50,17 +50,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Kumquat\GameScreen.cs" />
-    <Compile Include="Kumquat\Location.cs" />
+    <Compile Include="Source\Kumquat\GameScreen.cs" />
+    <Compile Include="Source\Kumquat\Location.cs" />
     <Compile Include="Source\Application\Application.cs" />
     <Compile Include="Source\Application\Logger.cs" />
-    <Compile Include="Kumquat\Area.cs" />
+    <Compile Include="Source\Kumquat\Area.cs" />
     <Compile Include="Source\Audio\OggDecoder.cs" />
     <Compile Include="Source\Audio\SampleCache.cs" />
     <Compile Include="Source\Audio\SerializableSample.cs" />
     <Compile Include="Source\Audio\Sound.cs" />
     <Compile Include="Source\Environment.cs" />
-    <Compile Include="Kumquat\ExitArea.cs" />
+    <Compile Include="Source\Kumquat\ExitArea.cs" />
     <Compile Include="Source\Geometry.cs" />
     <Compile Include="Source\Application\iOSAppDelegate.cs" />
     <Compile Include="Source\Application\iOSGameController.cs" />
