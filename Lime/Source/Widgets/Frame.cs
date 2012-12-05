@@ -29,7 +29,7 @@ namespace Lime
 	}
 
 	[ProtoContract]
-	[ProtoInclude(100, typeof(Area))]
+	[ProtoInclude(100, typeof(Kumquat.Area))]
 	public class Frame : Widget, IImageCombinerArg
 	{
 		RenderTarget renderTarget;

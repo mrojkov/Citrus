@@ -4,7 +4,7 @@ using ProtoBuf;
 using System.IO;
 using System.Collections.Generic;
 
-namespace Lime
+namespace Kumquat
 {
 	[ProtoContract]
 	[ProtoInclude(100, typeof(ExitArea))]
@@ -15,5 +15,6 @@ namespace Lime
 
 		[ProtoMember(2)]
 		public string Tools = "";
+
 	}
 }
