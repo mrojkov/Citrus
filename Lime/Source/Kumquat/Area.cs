@@ -21,7 +21,7 @@ namespace Kumquat
 
 		public override void OnClicked()
 		{
-			if (Enabled)
+			if (Enabled && Visible)
 				Clicked();
 		}
 	}
