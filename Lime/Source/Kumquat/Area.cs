@@ -16,5 +16,8 @@ namespace Kumquat
 		[ProtoMember(2)]
 		public string Tools = "";
 
+		[ProtoMember(3)]
+		public bool Enabled = true;
+
 	}
 }
