@@ -97,8 +97,6 @@
     <Compile Include="Widgets\ColorGradientWidget.cs" />
     <Compile Include="Widgets\ToolBoxWidget.cs" />
     <Compile Include="Widgets\OpenImages\OpenImagesListWidget.cs" />
-    <Compile Include="TimeLineWidget.cs" />
-    <Compile Include="gtk-gui\Pinta.Gui.Widgets.TimeLineWidget.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
