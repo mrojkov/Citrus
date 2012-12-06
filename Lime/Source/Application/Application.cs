@@ -63,9 +63,9 @@ namespace Lime
 			set {}
 		}
 
-		public void ShowOnscreenKeyboard(bool show)
+		public void ShowOnscreenKeyboard(bool show, string text)
 		{
-			GameView.Instance.ShowOnscreenKeyboard(show);
+			GameView.Instance.ShowOnscreenKeyboard(show, text);
 		}
 
 		public bool FullScreen { get { return true; } set {} }

@@ -47,10 +47,12 @@ namespace Lime
 			return iPhoneOSGameView.GetLayerClass();
 		}
 
-		public void ShowOnscreenKeyboard(bool show)
+		string prevText;
+		public void ShowOnscreenKeyboard(bool show, string text)
 		{
 			if (show != textField.IsFirstResponder) {
-				textField.Text = null;
+				prevText = text;
+				textField.Text = text;
 				if (show) {
 					textField.BecomeFirstResponder();
 				} else {
@@ -105,7 +107,6 @@ namespace Lime
 			return t - startTime;
 		}
 
-		string prevText;
 		void ProcessTextInput()
 		{
 			var currText = textField.Text ?? "";

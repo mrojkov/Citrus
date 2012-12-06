@@ -126,6 +126,10 @@
     <Compile Include="Source\Widgets\World.cs" />
     <Compile Include="Source\Application\Logger.cs" />
     <Compile Include="Source\Application\Application.cs" />
+    <Compile Include="Source\Kumquat\Area.cs" />
+    <Compile Include="Source\Kumquat\ExitArea.cs" />
+    <Compile Include="Source\Kumquat\GameScreen.cs" />
+    <Compile Include="Source\Kumquat\Location.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.iOS.csproj">
