@@ -19,5 +19,10 @@ namespace Kumquat
 		[ProtoMember(3)]
 		public bool Enabled = true;
 
+		public override void OnClicked()
+		{
+			if (Enabled)
+				Clicked();
+		}
 	}
 }

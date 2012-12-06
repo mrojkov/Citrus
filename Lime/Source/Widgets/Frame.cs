@@ -146,9 +146,14 @@ namespace Lime
 			UpdateHelper(delta);
 			if (Clicked != null) {
 				if (Input.WasMouseReleased() && HitTest(Input.MousePosition)) {
-					Clicked();
+					OnClicked();
 				}
 			}
+		}
+
+		public virtual void OnClicked()
+		{
+			Clicked();
 		}
 
 		private int MultiplyDeltaByAnimationSpeed(int delta)
