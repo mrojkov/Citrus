@@ -850,16 +850,6 @@ namespace Orange
 			}
 		}
 
-		void ParseItemViewProperty(Node node, string name)
-		{
-			ItemView itemView = (ItemView)node;
-			switch (name) {
-				default:
-					ParseSceneProperty(node, name);
-					break;
-			}
-		}
-
 		#endregion
 
 		void RegisterKnownActorTypes()
@@ -893,7 +883,6 @@ namespace Orange
 				new KnownActorType {ActorClass = "Hot::Edit", NodeClass = "Lime.TextBox, Lime", PropReader = ParseEditProperty},
 
 				// Kumquat:
-				new KnownActorType {ActorClass = "ItemView", NodeClass = "Kumquat.ItemView, Lime", PropReader = ParseItemViewProperty},
 				new KnownActorType {ActorClass = "Area", NodeClass = "Kumquat.Area, Lime", PropReader = ParseAreaProperty},
 				new KnownActorType {ActorClass = "ExitArea", NodeClass = "Kumquat.ExitArea, Lime", PropReader = ParseExitAreaProperty},
 			};
