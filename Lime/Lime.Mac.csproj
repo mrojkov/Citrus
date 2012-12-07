@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -131,8 +131,6 @@
     <Compile Include="Source\Application\Logger.cs" />
     <Compile Include="Source\Kumquat\Area.cs" />
     <Compile Include="Source\Kumquat\ExitArea.cs" />
-    <Compile Include="Source\Kumquat\GameScreen.cs" />
-    <Compile Include="Source\Kumquat\Location.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Audio\ADPCMEncoder.c">
