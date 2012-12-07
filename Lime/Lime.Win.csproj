@@ -50,8 +50,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Source\Kumquat\GameScreen.cs" />
-    <Compile Include="Source\Kumquat\Location.cs" />
     <Compile Include="Source\Application\Application.cs" />
     <Compile Include="Source\Application\Logger.cs" />
     <Compile Include="Source\Kumquat\Area.cs" />
