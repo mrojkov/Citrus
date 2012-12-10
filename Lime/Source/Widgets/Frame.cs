@@ -36,7 +36,6 @@ namespace Lime
 		ITexture renderTexture;
 
 		public BareEventHandler Rendered;
-		public BareEventHandler Clicked;
 
 		[ProtoMember(1)]
 		public RenderTarget RenderTarget {
@@ -149,11 +148,6 @@ namespace Lime
 					OnClicked();
 				}
 			}
-		}
-
-		public virtual void OnClicked()
-		{
-			Clicked();
 		}
 
 		private int MultiplyDeltaByAnimationSpeed(int delta)
