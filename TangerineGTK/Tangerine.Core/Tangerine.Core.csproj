@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{769F8D4A-95FE-496D-8A21-681F1BF7F744}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Tangerine.Core</RootNamespace>
+    <AssemblyName>Tangerine.Core</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <PlatformTarget>x86</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <PlatformTarget>x86</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="Mono.Posix, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756" />
+    <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="glib-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="glade-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
+    <Reference Include="Mono.Cairo, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="Mono.Addins">
+      <HintPath>..\lib\Mono.Addins.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Addins.Gui">
+      <HintPath>..\lib\Mono.Addins.Gui.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Addins.Setup">
+      <HintPath>..\lib\Mono.Addins.Setup.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Extensions\CairoExtensions.cs" />
+    <Compile Include="Extensions\GdkExtensions.cs" />
+    <Compile Include="Extensions\GtkExtensions.cs" />
+    <Compile Include="Extensions\OtherExtensions.cs" />
+    <Compile Include="Extensions\ToolBarButton.cs" />
+    <Compile Include="Extensions\ToolBarComboBox.cs" />
+    <Compile Include="Extensions\ToolBarFontComboBox.cs" />
+    <Compile Include="Extensions\ToolBarImage.cs" />
+    <Compile Include="Extensions\ToolBarLabel.cs" />
+    <Compile Include="Extensions\ToolBarSlider.cs" />
+    <Compile Include="Extensions\ToolBarToggleButton.cs" />
+    <Compile Include="Enumerations\BlendMode.cs" />
+    <Compile Include="Enumerations\EditingMode.cs" />
+    <Compile Include="Enumerations\EffectAdjustment.cs" />
+    <Compile Include="Enumerations\GradientColorMode.cs" />
+    <Compile Include="Enumerations\TextAlignment.cs" />
+    <Compile Include="Enumerations\TextMode.cs" />
+    <Compile Include="Effects\ColorBgra.cs" />
+    <Compile Include="Effects\Scanline.cs" />
+    <Compile Include="Effects\IBitVector2D.cs" />
+    <Compile Include="Effects\Utility.cs" />
+    <Compile Include="HistoryItems\SelectNodesHistoryItem.cs" />
+    <Compile Include="ImageFormats\FormatDescriptor.cs" />
+    <Compile Include="ImageFormats\GdkPixbufFormat.cs" />
+    <Compile Include="ImageFormats\IImageExporter.cs" />
+    <Compile Include="ImageFormats\IImageImporter.cs" />
+    <Compile Include="ImageFormats\JpegFormat.cs" />
+    <Compile Include="ImageFormats\TgaExporter.cs" />
+    <Compile Include="Managers\ImageConverterManager.cs" />
+    <Compile Include="Managers\ResourceManager.cs" />
+    <Compile Include="TangerineCore.cs" />
+    <Compile Include="Managers\ActionManager.cs" />
+    <Compile Include="EventArgs\DocumentEventArgs.cs" />
+    <Compile Include="Classes\Document.cs" />
+    <Compile Include="Managers\SettingsManager.cs" />
+    <Compile Include="Managers\ChromeManager.cs" />
+    <Compile Include="EventArgs\TextChangedEventArgs.cs" />
+    <Compile Include="Classes\IExtension.cs" />
+    <Compile Include="Managers\SystemManager.cs" />
+    <Compile Include="Actions\FileActions.cs" />
+    <Compile Include="EventArgs\DocumentCancelEventArgs.cs" />
+    <Compile Include="Classes\Anchor.cs" />
+    <Compile Include="Classes\ScaleFactor.cs" />
+    <Compile Include="Managers\HistoryManager.cs" />
+    <Compile Include="EventArgs\HistoryItemAddedEventArgs.cs" />
+    <Compile Include="EventArgs\HistoryItemRemovedEventArgs.cs" />
+    <Compile Include="HistoryItems\BaseHistoryItem.cs" />
+    <Compile Include="Managers\WorkspaceManager.cs" />
+    <Compile Include="Classes\DocumentWorkspace.cs" />
+    <Compile Include="HistoryItems\CompoundHistoryItem.cs" />
+    <Compile Include="EventArgs\CanvasInvalidatedEventArgs.cs" />
+    <Compile Include="Classes\DocumentWorkspaceHistory.cs" />
+    <Compile Include="Actions\WindowActions.cs" />
+    <Compile Include="Managers\ToolManager.cs" />
+    <Compile Include="Classes\BaseTool.cs" />
+    <Compile Include="EventArgs\ToolEventArgs.cs" />
+    <Compile Include="Widgets\MenuButton.cs" />
+    <Compile Include="Widgets\ToolBarDropDownButton.cs" />
+    <Compile Include="Actions\EditActions.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\Lemon\Lemon.Win.csproj">
+      <Project>{538e41e4-725c-4521-bcf3-a5591a1a3afd}</Project>
+      <Name>Lemon.Win</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Lime\Lime.Win.csproj">
+      <Project>{fc2de6c9-641a-4230-8d29-ea4035cd8708}</Project>
+      <Name>Lime.Win</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tangerine.Resources\Tangerine.Resources.csproj">
+      <Project>{50AFF341-655E-45EF-83CA-58F8254E4C8B}</Project>
+      <Name>Tangerine.Resources</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>
