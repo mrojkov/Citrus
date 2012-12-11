@@ -831,6 +831,9 @@ namespace Orange
 				case "Tools":
 					area.Tools = lexer.ParseQuotedString();
 					break;
+				case "Enable":
+					area.Enabled = lexer.ParseBool();
+					break;
 				default:
 					ParseSceneProperty(node, name);
 					break;
