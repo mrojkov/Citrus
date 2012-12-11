@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="Source\AssetsBundle.cs" />
     <Compile Include="Source\Exception.cs" />
+    <Compile Include="Source\Kumquat\Tool.cs" />
     <Compile Include="Source\Serialization.cs" />
     <Compile Include="Source\Application\MacAppDelegate.cs" />
     <Compile Include="Source\Application\MacGameController.cs" />
