@@ -24,7 +24,7 @@ namespace Lime
 		[ProtoMember(1)]
 		[FieldOffset(0)]
 		public UInt32 ABGR;
-		
+
 		public static readonly Color4 Red = new Color4(255, 0, 0, 255);
 		public static readonly Color4 Green = new Color4(0, 255, 0, 255);
 		public static readonly Color4 Blue = new Color4(0, 0, 255, 255);
@@ -32,6 +32,8 @@ namespace Lime
 		public static readonly Color4 Black = new Color4(0, 0, 0, 255);
 		public static readonly Color4 Gray = new Color4(128, 128, 128, 255);
 		public static readonly Color4 DarkGray = new Color4(64, 64, 64, 255);
+		public static readonly Color4 Yellow = new Color4(255, 255, 0, 255);
+		public static readonly Color4 Orange = new Color4(255, 128, 0, 255);
 		public static readonly Color4 Transparent = new Color4(255, 255, 255, 0);
 
 		public Color4(UInt32 abgr)

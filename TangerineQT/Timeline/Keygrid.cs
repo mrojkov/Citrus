@@ -126,7 +126,7 @@ namespace Tangerine
 		{
 			long t = System.Environment.TickCount;
 			for (int i = 0; i < 30000; i++) {
-				ptr.DrawLine(0, 0, 30, 0);
+				ptr.DrawLine(0, 0, 0, 0);
 			}
 			t = System.Environment.TickCount - t;
 			Console.WriteLine("T1: " + t);
@@ -140,7 +140,7 @@ namespace Tangerine
 					}
 					si[1].s_int = 0;
 					si[2].s_int = 0;
-					si[3].s_int = 30;
+					si[3].s_int = 0;
 					si[4].s_int = 0;
 					CallSmokeMethod(drawLineIndex.smoke, drawLineIndex.index, (IntPtr)instanceHandle, (IntPtr)si, 4);//(IntPtr)stackPtr, stack.Length);
 				}

@@ -37,11 +37,13 @@ namespace Lime
 	[ProtoInclude(109, typeof(Slider))]
 	[ProtoInclude(110, typeof(RichText))]
 	[ProtoInclude(111, typeof(TextBox))]
+	[TangerineClass]
 	public partial class Widget : Node
 	{
 		#region Properties
 
 		[ProtoMember(1)]
+		[TangerineProperty("Red")]
 		public Vector2 Position { get { return position; } set { position = value; } }
 		private Vector2 position;
 
@@ -49,6 +51,7 @@ namespace Lime
 		public float Y { get { return position.Y; } set { position.Y = value; } }
 
 		[ProtoMember(2)]
+		[TangerineProperty("Green")]
 		public Vector2 Size { get { return size; } set { size = value; } }
 		private Vector2 size;
 
@@ -56,12 +59,15 @@ namespace Lime
 		public float Height { get { return size.Y; } set { size.Y = value; } }
 
 		[ProtoMember(3)]
+		[TangerineProperty("Blue")]
 		public Vector2 Pivot { get; set; }
 
 		[ProtoMember(4)]
+		[TangerineProperty("Yellow")]
 		public Vector2 Scale { get; set; }
 
 		[ProtoMember(5)]
+		[TangerineProperty("Margenta")]
 		public float Rotation { 
 			get {
 				return rotation;
