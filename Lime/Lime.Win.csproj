@@ -82,6 +82,7 @@
     <Compile Include="Source\Graphics\Texture.cs" />
     <Compile Include="Source\Graphics\TextureAtlasPart.cs" />
     <Compile Include="Source\Input\Input.cs" />
+    <Compile Include="Source\Kumquat\Tool.cs" />
     <Compile Include="Source\Localization.cs" />
     <Compile Include="Source\Mathf.cs" />
     <Compile Include="Source\Profiler.cs" />

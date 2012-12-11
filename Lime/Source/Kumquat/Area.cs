@@ -8,6 +8,7 @@ namespace Kumquat
 {
 	[ProtoContract]
 	[ProtoInclude(100, typeof(ExitArea))]
+	[ProtoInclude(101, typeof(Tool))]
 	public class Area : Frame
 	{
 		[ProtoMember(1)]

@@ -850,6 +850,19 @@ namespace Orange
 			}
 		}
 
+		void ParseToolProperty(Node node, string name)
+		{
+			Tool tool = (Tool)node;
+			switch (name) {
+				case "Caption":
+					tool.Caption = lexer.ParseQuotedString();
+					break;
+				default:
+					ParseAreaProperty(node, name);
+					break;
+			}
+		}
+
 		#endregion
 
 		void RegisterKnownActorTypes()
@@ -885,6 +898,7 @@ namespace Orange
 				// Kumquat:
 				new KnownActorType {ActorClass = "Area", NodeClass = "Kumquat.Area, Lime", PropReader = ParseAreaProperty},
 				new KnownActorType {ActorClass = "ExitArea", NodeClass = "Kumquat.ExitArea, Lime", PropReader = ParseExitAreaProperty},
+				new KnownActorType {ActorClass = "Tool", NodeClass = "Kumquat.Tool, Lime", PropReader = ParseToolProperty},
 			};
 		}
 	}
