@@ -172,6 +172,11 @@ namespace Lime
             this.Updating = null;
         }
 
+		public void ClearUpdatedEvent()
+		{
+			this.Updated = null;
+		}
+
 		public void MakeInvisible()
 		{
 			Visible = false;
