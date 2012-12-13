@@ -114,7 +114,6 @@ namespace Lime
 
         public event UpdateDelegate Updating;
         public event UpdateDelegate Updated;
-		public BareEventHandler Clicked;
 
 		public Matrix32 CalcLocalTransformMatrix()
 		{
@@ -230,17 +229,7 @@ namespace Lime
             if (Updated != null) {
                 Updated(delta * 0.001f);
             }
-			if (Clicked != null) {
-				if (Input.WasMouseReleased() && HitTest(Input.MousePosition)) {
-					OnClicked();
-				}
-			}
         }
-
-		public virtual void OnClicked()
-		{
-			Clicked();
-		}
 
 		public override void AddToRenderChain(RenderChain chain)
 		{

@@ -144,11 +144,6 @@ namespace Lime
 				delta -= MaxTimeDelta;
 			}
 			UpdateHelper(delta);
-			if (Clicked != null) {
-				if (Input.WasMouseReleased() && HitTest(Input.MousePosition)) {
-					OnClicked();
-				}
-			}
 		}
 
 		private int MultiplyDeltaByAnimationSpeed(int delta)
