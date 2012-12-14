@@ -100,6 +100,10 @@
       <Project>{4604AA2E-129F-4814-AD0D-8BA35346ECC4}</Project>
       <Name>Lemon.Mac</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Kumquat\Kumquat.csproj">
+      <Project>{09EDE517-07B3-42E0-A65C-4943900C240B}</Project>
+      <Name>Kumquat</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Info.plist" />

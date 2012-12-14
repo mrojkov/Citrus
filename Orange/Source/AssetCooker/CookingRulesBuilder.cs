@@ -52,7 +52,7 @@ namespace Orange
 							rules = ParseCookingRules(rulesStack.Peek(), rulesFile);
 						}
 						if (rules.LastChangeTime > fileInfo.LastWriteTime) {
-							File.SetLastWriteTime(path, rules.LastChangeTime);
+							//File.SetLastWriteTime(path, rules.LastChangeTime);
 							shouldRescanEnumerator = true;
 						}
 						map[path] = rules;
