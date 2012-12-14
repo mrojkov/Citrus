@@ -29,7 +29,6 @@ namespace Lime
 	}
 
 	[ProtoContract]
-	[ProtoInclude(100, typeof(Kumquat.Area))]
 	[TangerineClass]
 	public class Frame : Widget, IImageCombinerArg
 	{

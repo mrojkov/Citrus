@@ -899,9 +899,9 @@ namespace Orange
 				new KnownActorType {ActorClass = "Hot::Edit", NodeClass = "Lime.TextBox, Lime", PropReader = ParseEditProperty},
 
 				// Kumquat:
-				new KnownActorType {ActorClass = "Area", NodeClass = "Kumquat.Area, Lime", PropReader = ParseAreaProperty},
-				new KnownActorType {ActorClass = "ExitArea", NodeClass = "Kumquat.ExitArea, Lime", PropReader = ParseExitAreaProperty},
-				new KnownActorType {ActorClass = "Tool", NodeClass = "Kumquat.Tool, Lime", PropReader = ParseToolProperty},
+				new KnownActorType {ActorClass = "Area", NodeClass = "Kumquat.Area, Kumquat", PropReader = ParseAreaProperty},
+				new KnownActorType {ActorClass = "ExitArea", NodeClass = "Kumquat.ExitArea, Kumquat", PropReader = ParseExitAreaProperty},
+				new KnownActorType {ActorClass = "Tool", NodeClass = "Kumquat.Tool, Kumquat", PropReader = ParseToolProperty},
 			};
 		}
 	}

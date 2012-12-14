@@ -21,10 +21,10 @@ namespace Lime
 #if iOS
 		public static ProtoBuf.Meta.TypeModel Serializer = ProtoBuf.Meta.RuntimeTypeModel.Default;
 #else
-		public static ProtoBuf.Meta.TypeModel Serializer = CreateSerializer();
+		public static ProtoBuf.Meta.RuntimeTypeModel Serializer = CreateSerializer();
 #endif
 
-		static ProtoBuf.Meta.TypeModel CreateSerializer()
+		static ProtoBuf.Meta.RuntimeTypeModel CreateSerializer()
 		{
 			var model = ProtoBuf.Meta.RuntimeTypeModel.Create();
 			model.UseImplicitZeroDefaults = false;

@@ -19,26 +19,20 @@ namespace Kumquat
 		[ProtoMember(3)]
 		public bool Enabled = true;
 
-		BareEventHandler clicked;
-
-		private void Update(float delta) {
-			if (Enabled && Visible && Input.WasMouseReleased() && HitTest(Input.MousePosition)) {
-				Input.ConsumeKeyEvent(Key.Mouse0, true);
-				clicked();
-			}
-		}
-
-		public BareEventHandler Clicked
+		public Area()
 		{
-			set
-			{
-				if( clicked != null)
-					Updated -= Update;
-				clicked = value;
-				if (clicked != null)
-					Updated += Update;
+			Updated += OnUpdated;
+		}
+
+		private void OnUpdated(float delta) {
+			if (Clicked != null && Enabled && Visible) {
+				if (Input.WasMouseReleased() && HitTest(Input.MousePosition)) {
+					Input.ConsumeKeyEvent(Key.Mouse0, true);
+					Clicked();
+				}
 			}
 		}
 
+		public BareEventHandler Clicked;
 	}
 }

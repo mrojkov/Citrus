@@ -52,13 +52,11 @@
   <ItemGroup>
     <Compile Include="Source\Application\Application.cs" />
     <Compile Include="Source\Application\Logger.cs" />
-    <Compile Include="Source\Kumquat\Area.cs" />
     <Compile Include="Source\Audio\OggDecoder.cs" />
     <Compile Include="Source\Audio\SampleCache.cs" />
     <Compile Include="Source\Audio\SerializableSample.cs" />
     <Compile Include="Source\Audio\Sound.cs" />
     <Compile Include="Source\Environment.cs" />
-    <Compile Include="Source\Kumquat\ExitArea.cs" />
     <Compile Include="Source\Geometry.cs" />
     <Compile Include="Source\Application\iOSAppDelegate.cs" />
     <Compile Include="Source\Application\iOSGameController.cs" />
@@ -82,7 +80,6 @@
     <Compile Include="Source\Graphics\Texture.cs" />
     <Compile Include="Source\Graphics\TextureAtlasPart.cs" />
     <Compile Include="Source\Input\Input.cs" />
-    <Compile Include="Source\Kumquat\Tool.cs" />
     <Compile Include="Source\Localization.cs" />
     <Compile Include="Source\Mathf.cs" />
     <Compile Include="Source\Profiler.cs" />
