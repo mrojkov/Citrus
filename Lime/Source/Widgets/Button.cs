@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Lime
 {
-	public delegate void ButtonClickEvent(Button button);
+	public delegate void ButtonClickEventHandler(Button button);
 
 	[ProtoContract]
 	public class Button : Widget
@@ -15,7 +15,7 @@ namespace Lime
         [ProtoMember(2)]
         public bool Enabled { get; set; }
 
-		public ButtonClickEvent Clicked;
+		public ButtonClickEventHandler Clicked;
 
 		private SimpleText textPresenter;
 		private BareEventHandler StateHandler;
