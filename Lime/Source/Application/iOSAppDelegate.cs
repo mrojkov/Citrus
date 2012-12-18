@@ -6,6 +6,7 @@ using System.Linq;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 using System.Runtime.InteropServices;
+using MonoTouch.MessageUI;
 
 namespace Lime
 {
@@ -38,7 +39,7 @@ namespace Lime
 
 		static void GlobalExceptionHandler(object sender, UnhandledExceptionEventArgs e)
 		{
-			Logger.Write(e.ExceptionObject.ToString());
+			Logger.Write("========================= CRASH REPORT ============================\n" + e.ExceptionObject.ToString());
 		}
 
 		public override void OnActivated(UIApplication application)
