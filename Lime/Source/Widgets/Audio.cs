@@ -70,8 +70,13 @@ namespace Lime
 		[ProtoMember(7)]
 		public AudioChannelGroup Group { get; set; }
 
-		[ProtoMember(8)]
-		public int Priority { get; set; }
+		[ProtoMember(10)]
+		public float Priority { get; set; }
+
+		public Audio()
+		{
+			Priority = 0.5f;
+		}
 
 		void Play()
 		{

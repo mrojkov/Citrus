@@ -25,7 +25,7 @@ namespace Lime
 			}
 		}
 
-		public Sound Play(AudioChannelGroup group, bool paused, bool looping = false, int priority = 0)
+		public Sound Play(AudioChannelGroup group, bool paused, bool looping = false, float priority = 0.5f)
 		{
 			var sound = AudioSystem.LoadSound(Path, group, looping, priority);
 			if (!paused) {
@@ -34,12 +34,12 @@ namespace Lime
 			return sound;
 		}
 
-		public Sound PlayEffect(bool paused, bool looping = false, int priority = 0)
+		public Sound PlayEffect(bool paused, bool looping = false, float priority = 0.5f)
 		{
 			return Play(AudioChannelGroup.Effects, paused, looping, priority);
 		}
 
-		public Sound PlayMusic(bool paused, bool looping = true, int priority = 100)
+		public Sound PlayMusic(bool paused, bool looping = true, float priority = 100)
 		{
 			return Play(AudioChannelGroup.Music, paused, looping, priority);
 		}

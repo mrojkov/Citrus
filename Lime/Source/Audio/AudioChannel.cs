@@ -34,7 +34,7 @@ namespace Lime
 		public const int NumBuffers = 8;
 
 		public AudioChannelGroup Group;
-		public int Priority;
+		public float Priority;
 		public DateTime StartupTime;
 		public int Id;
 

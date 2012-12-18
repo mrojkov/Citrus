@@ -161,7 +161,7 @@ namespace Lime
 			}
 		}
 
-		static Sound LoadSoundToChannel(AudioChannel channel, string path, AudioChannelGroup group, bool looping, int priority)
+		static Sound LoadSoundToChannel(AudioChannel channel, string path, AudioChannelGroup group, bool looping, float priority)
 		{
 			IAudioDecoder decoder = null;
 			path += ".sound";
@@ -179,12 +179,12 @@ namespace Lime
 			return sound;
 		}
 
-		static AudioChannel AllocateChannel(int priority)
+		static AudioChannel AllocateChannel(float priority)
 		{
 			var channels = AudioSystem.channels.ToArray();
 			Array.Sort(channels, (a, b) => {
 				if (a.Priority != b.Priority)
-					return a.Priority - b.Priority;
+					return Mathf.Sign(a.Priority - b.Priority);
 				if (a.StartupTime == b.StartupTime) {
 					return a.Id - b.Id;
 				}
@@ -215,7 +215,7 @@ namespace Lime
 			}
 		}
 
-		public static Sound LoadSound(string path, AudioChannelGroup group, bool looping = false, int priority = 0)
+		public static Sound LoadSound(string path, AudioChannelGroup group, bool looping = false, float priority = 0.5f)
 		{
 			var channel = AllocateChannel(priority);
 			if (channel != null) {
@@ -224,29 +224,29 @@ namespace Lime
 			return new Sound();
 		}
 
-		public static Sound LoadEffect(string path, bool looping = false, int priority = 0)
+		public static Sound LoadEffect(string path, bool looping = false, float priority = 0.5f)
 		{
 			return LoadSound(path, AudioChannelGroup.Effects, looping, priority);
 		}
 
-		public static Sound LoadMusic(string path, bool looping = false, int priority = 0)
+		public static Sound LoadMusic(string path, bool looping = false, float priority = 100f)
 		{
 			return LoadSound(path, AudioChannelGroup.Music, looping, priority);
 		}
 
-		public static Sound Play(string path, AudioChannelGroup group, bool looping = false, int priority = 0, float fadeinTime = 0)
+		public static Sound Play(string path, AudioChannelGroup group, bool looping = false, float priority = 0.5f, float fadeinTime = 0)
 		{
 			var sound = LoadSound(path, group, looping, priority);
 			sound.Resume(fadeinTime);
 			return sound;
 		}
 
-		public static Sound PlayMusic(string path, bool looping = true, int priority = 100, float fadeinTime = 0.5f)
+		public static Sound PlayMusic(string path, bool looping = true, float priority = 100f, float fadeinTime = 0.5f)
 		{
 			return Play(path, AudioChannelGroup.Music, looping, priority, fadeinTime);
 		}
 
-		public static Sound PlayEffect(string path, bool looping = false, int priority = 0, float fadeinTime = 0)
+		public static Sound PlayEffect(string path, bool looping = false, float priority = 0.5f, float fadeinTime = 0)
 		{
 			return Play(path, AudioChannelGroup.Effects, looping, priority, fadeinTime);
 		}
