@@ -25,7 +25,9 @@ namespace Tangerine
 			//Resize(800, 600);
 			Move(300, 300);
 			ShowMaximized();
-			//LoadDockState();
+			The.Timeline.GrabKeyboard();
+
+			LoadDockState();
 		}
 
 		private void CreateDockWindows()
@@ -107,6 +109,7 @@ namespace Tangerine
 		public static int Main(String[] args)
 		{
 			var app = new QApplication(args);
+			//var app = new QApplication(new string[] { "-style", "" });
 			new MainWindow();
 			return QApplication.Exec();
 		}

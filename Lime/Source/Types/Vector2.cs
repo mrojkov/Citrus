@@ -208,11 +208,17 @@ namespace Lime
 			return Rotate(angle * Mathf.DegreesToRadians);
 		}
 
+		/// <summary>
+		/// Returns ATan of given vector in range (-Pi, Pi]
+		/// </summary>
 		public float Atan2
 		{
 			get { return (float)Math.Atan2(Y, X); }
 		}
 
+		/// <summary>
+		/// Returns ATan of given vector in range (-180, 180]
+		/// </summary>
 		public float Atan2Degrees
 		{
 			get { return (float)Math.Atan2(Y, X) * Mathf.RadiansToDegrees; }

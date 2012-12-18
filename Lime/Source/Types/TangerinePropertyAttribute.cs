@@ -7,11 +7,13 @@ namespace Lime
 {
 	public class TangerinePropertyAttribute : Attribute
 	{
-		public string ColorName;
+		public int KeyColor;
 
-		public TangerinePropertyAttribute(string colorName)
+		public static readonly TangerinePropertyAttribute Null = new TangerinePropertyAttribute(0);
+
+		public TangerinePropertyAttribute(int keyColor)
 		{
-			this.ColorName = colorName;
+			this.KeyColor = keyColor;
 		}
 	}
 }

@@ -24,7 +24,14 @@ namespace Lime
         {
             Enabled = true;
 			SetNormalState();
+			// Run animation on the next frame (when button contents will be loaded)
+			StateHandler = UpdateInitialState;
         }
+
+		void UpdateInitialState()
+		{
+			SetNormalState();
+		}
 
 		void SetNormalState()
 		{

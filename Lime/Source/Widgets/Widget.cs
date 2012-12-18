@@ -43,7 +43,7 @@ namespace Lime
 		#region Properties
 
 		[ProtoMember(1)]
-		[TangerineProperty("Red")]
+		[TangerineProperty(0)]
 		public Vector2 Position { get { return position; } set { position = value; } }
 		private Vector2 position;
 
@@ -51,7 +51,7 @@ namespace Lime
 		public float Y { get { return position.Y; } set { position.Y = value; } }
 
 		[ProtoMember(2)]
-		[TangerineProperty("Green")]
+		[TangerineProperty(1)]
 		public Vector2 Size { get { return size; } set { size = value; } }
 		private Vector2 size;
 
@@ -59,15 +59,15 @@ namespace Lime
 		public float Height { get { return size.Y; } set { size.Y = value; } }
 
 		[ProtoMember(3)]
-		[TangerineProperty("Blue")]
+		[TangerineProperty(2)]
 		public Vector2 Pivot { get; set; }
 
 		[ProtoMember(4)]
-		[TangerineProperty("Yellow")]
+		[TangerineProperty(3)]
 		public Vector2 Scale { get; set; }
 
 		[ProtoMember(5)]
-		[TangerineProperty("Margenta")]
+		[TangerineProperty(4)]
 		public float Rotation { 
 			get {
 				return rotation;

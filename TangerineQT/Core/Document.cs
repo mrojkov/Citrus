@@ -23,26 +23,29 @@ namespace Tangerine
 				var ani = frame.Animators["Position"];
 				ani.Add(0, new Lime.Vector2(0, 0));
 				ani.Add(10, new Lime.Vector2(100, 0));
-				ani.Add(20, new Lime.Vector2(100, 0));
+				ani.Add(12, new Lime.Vector2(100, 0));
+				ani.Add(16, new Lime.Vector2(100, 0));
+				ani.Add(19, new Lime.Vector2(100, 0));
 				ani.Add(30, new Lime.Vector2(200, 0));
 
 				ani = frame.Animators["Scale"];
-				ani.Add(0, new Lime.Vector2(0, 0));
-				ani.Add(10, new Lime.Vector2(100, 0));
-				ani.Add(20, new Lime.Vector2(100, 0));
-				ani.Add(30, new Lime.Vector2(200, 0));
+				ani.Add(5, new Lime.Vector2(0, 0));
+				ani.Add(15, new Lime.Vector2(100, 0));
+				//ani.Add(20, new Lime.Vector2(100, 0));
+				//ani.Add(30, new Lime.Vector2(200, 0));
 
 				ani = frame.Animators["Size"];
 				ani.Add(0, new Lime.Vector2(0, 0));
-				ani.Add(10, new Lime.Vector2(100, 0));
-				ani.Add(20, new Lime.Vector2(100, 0));
-				ani.Add(30, new Lime.Vector2(200, 0));
+				ani.Add(50, new Lime.Vector2(50, 0));
+				ani.Add(100, new Lime.Vector2(100, 0));
+				//ani.Add(20, new Lime.Vector2(100, 0));
+				//ani.Add(30, new Lime.Vector2(200, 0));
 
 				ani = frame.Animators["Rotation"];
-				ani.Add(0, 0f);
-				ani.Add(10, 0f);
-				ani.Add(20, 0f);
-				ani.Add(30, 0f);
+				ani.Add(15, 0f);
+				ani.Add(60, 1f);
+
+				//ani.Add(50, 0);
 
 				RootNode.AddNode(frame);
 			}

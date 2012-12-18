@@ -61,11 +61,18 @@
     <Compile Include="Core\KeyframeColors.cs" />
     <Compile Include="MainWindow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Timeline\Keygrid.cs" />
-    <Compile Include="Timeline\NodeList.cs" />
+    <Compile Include="Timeline\KeyGrid.cs" />
+    <Compile Include="Timeline\KeyGridRuler.cs" />
+    <Compile Include="Timeline\KeyTransient.cs" />
+    <Compile Include="Timeline\KeyTransientPalette.cs" />
+    <Compile Include="Timeline\NodeRoll.cs" />
     <Compile Include="Timeline\Panview.cs" />
     <Compile Include="Timeline\Timeline.cs" />
+    <Compile Include="Timeline\TimelineToolbar.cs" />
     <Compile Include="Toolbox.cs" />
+    <Compile Include="Toolbox\MemoryLeaksChecker.cs" />
+    <Compile Include="Toolbox\QyotoBooster.cs" />
+    <Compile Include="Toolbox\CachedTextPainter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -170,6 +177,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
