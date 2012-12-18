@@ -66,8 +66,15 @@ namespace Lime
 			eaglLayer.Opaque = true;
 		}
 
+		bool frameBufferCreated;
+
 		protected override void CreateFrameBuffer()
 		{
+			// OpenTK bug - sometimes CreateFrameBuffer is being called twise, 
+			// so within OpenTK an exception ocurred cause of duplication GraphicsContext keys in a dictionary.
+			// Force garbage collection to eliminate weak keys in the dictionary.
+			System.GC.Collect();
+			System.GC.WaitForPendingFinalizers();
 			ContextRenderingApi = EAGLRenderingAPI.OpenGLES1;
 			base.CreateFrameBuffer();
 		}

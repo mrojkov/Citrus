@@ -126,9 +126,6 @@
     <Compile Include="Source\Widgets\World.cs" />
     <Compile Include="Source\Application\Logger.cs" />
     <Compile Include="Source\Application\Application.cs" />
-    <Compile Include="Source\Kumquat\Area.cs" />
-    <Compile Include="Source\Kumquat\ExitArea.cs" />
-    <Compile Include="Source\Kumquat\Tool.cs" />
     <Compile Include="Source\Types\TangerineClassAttribute.cs" />
     <Compile Include="Source\Types\TangerinePropertyAttribute.cs" />
   </ItemGroup>
@@ -137,5 +134,8 @@
       <Project>{C4795CBE-B192-4E53-8140-7310FBD206DD}</Project>
       <Name>Lemon.iOS</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Source\Kumquat\" />
   </ItemGroup>
 </Project>
