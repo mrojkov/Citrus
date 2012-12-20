@@ -66,8 +66,6 @@ namespace Lime
 			eaglLayer.Opaque = true;
 		}
 
-		bool frameBufferCreated;
-
 		protected override void CreateFrameBuffer()
 		{
 			// OpenTK bug - sometimes CreateFrameBuffer is being called twise, 

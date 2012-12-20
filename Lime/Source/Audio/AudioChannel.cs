@@ -223,7 +223,8 @@ namespace Lime
 				decoder.Rewind();
 			}
 			if (totalRead > 0) {
-				AudioSystem.CheckError();
+				AL.GetError(); // Suppress any possible error
+				// AudioSystem.CheckError();
 				ALFormat format = (decoder.GetFormat() == AudioFormat.Stereo16) ? ALFormat.Stereo16 : ALFormat.Mono16;
 				AL.BufferData(buffer, format, decodedData, 
 					totalRead * decoder.GetBlockSize(), decoder.GetFrequency());
