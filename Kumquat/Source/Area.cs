@@ -15,7 +15,7 @@ namespace Kumquat
 		public string CursorName = "";
 
 		[ProtoMember(2)]
-		public string Tools = "";
+		public string Tool = "";
 
 		[ProtoMember(3)]
 		public bool Enabled = true;
