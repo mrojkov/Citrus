@@ -828,8 +828,8 @@ namespace Orange
 				case "CursorName":
 					area.CursorName = lexer.ParseQuotedString();
 					break;
-				case "Tools":
-					area.Tools = lexer.ParseQuotedString();
+				case "Tool":
+					area.Tool = lexer.ParseQuotedString();
 					break;
 				case "Enable":
 					area.Enabled = lexer.ParseBool();
