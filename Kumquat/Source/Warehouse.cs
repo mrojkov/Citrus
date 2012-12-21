@@ -15,36 +15,24 @@ namespace Kumquat
 		[ProtoMember(1)]
 		public Dictionary<string, Widget> Tools = new Dictionary<string, Widget>();
 
-		public Warehouse()
+		public Warehouse(Dictionary<string, Frame> locations)
 		{
-			var prefix = "Location";
-			var arr = AssetsBundle.Instance.EnumerateFiles();
-	
-			arr = arr.Where(x => 
-				x.Substring(0, prefix.Length) == prefix && 
-				Path.GetExtension(x) == ".scene"
-			).ToArray();
-
-			foreach (var path in arr)
-				FindTools(new Frame(path));
+			foreach (var frame in locations.Values) {
+				foreach (var tool in frame.Descendants<Tool>()) {
+					if (Tools.Keys.Contains(tool.Id)) {
+						var mes = String.Format("Два тула с одинаковым именем: {0}", tool.Id);
+						throw new Lime.Exception(mes);
+					} else {
+						Tools.Add(tool.Id, tool.DeepCloneFast<Widget>());
+					};
+				}
+			}
 		}
 
 		public Widget this[string name]
 		{
 			get {
 				return Tools[name];
-			}
-		}
-
-		private void FindTools(Node root)
-		{
-			foreach (var tool in root.Descendants<Tool>()) {
-				if (Tools.Keys.Contains(tool.Id)) {
-					var mes = String.Format("Два тула с одинаковым именем: {0}", tool.Id);
-					throw new Lime.Exception(mes);
-				} else {
-					Tools.Add(tool.Id, tool.DeepCloneFast<Widget>());
-				};
 			}
 		}
 
