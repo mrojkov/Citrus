@@ -65,9 +65,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Source\Area.cs" />
-    <Compile Include="Source\ExitArea.cs" />
-    <Compile Include="Source\Tool.cs" />
+    <Compile Include="Source\Widgets\Area.cs" />
+    <Compile Include="Source\Widgets\ExitArea.cs" />
+    <Compile Include="Source\Widgets\Tool.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lime\Lime.Win.csproj">
