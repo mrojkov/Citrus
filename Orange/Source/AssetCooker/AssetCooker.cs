@@ -147,7 +147,7 @@ namespace Orange
 				string srcPath = srcFileInfo.Path;
 				string dstPath = Path.ChangeExtension(srcPath, bundleAssetExtension);
 				bool bundled = assetsBundle.FileExists(dstPath);
-				bool needUpdate = !bundled || srcFileInfo.LastWriteTime > assetsBundle.GetFileLastWriteTime(dstPath);
+				bool needUpdate =  !bundled || srcFileInfo.LastWriteTime > assetsBundle.GetFileLastWriteTime(dstPath);
 				if (needUpdate) {
 					if (converter != null) {
 						try {

@@ -155,8 +155,8 @@ namespace Orange
 		void BuildContent(Orange.TargetPlatform platform)
 		{
 			var citrusProject = new CitrusProject(CitrusProjectChooser.Filename);
-			AssetCooker cooker = new AssetCooker(citrusProject, platform);
-			cooker.Cook();
+			new AssetCooker(citrusProject, platform).Cook();
+			new KumquatCooker(citrusProject, platform).Cook();
 		}
 
 		bool RunSolution(Orange.TargetPlatform platform)

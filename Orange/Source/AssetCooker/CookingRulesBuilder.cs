@@ -16,6 +16,7 @@ namespace Orange
 
 	public struct CookingRules
 	{
+		public bool KumquatLocation;
 		public string TextureAtlas;
 		public bool MipMaps;
 		public PVRFormat PVRFormat;
@@ -125,6 +126,9 @@ namespace Orange
 							break;
 						case "PVRFormat":
 							rules.PVRFormat = ParsePVRFormat(words[1]);
+							break;
+						case "KumquatLocation":
+							rules.KumquatLocation = ParseBool(words[1]);
 							break;
 						default:
 							throw new Lime.Exception("Unknown attribute {0}", words[0]);

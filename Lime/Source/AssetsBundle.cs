@@ -288,6 +288,12 @@ namespace Lime
 			trash.Add(desc);
 		}
 
+		public void ListFiles()
+		{
+			foreach (var k in index.Keys)
+				Console.WriteLine(k);
+		}
+
 		public bool FileExists(string path)
 		{
 			return index.ContainsKey(AssetPath.CorrectSlashes(path));

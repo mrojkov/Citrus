@@ -89,6 +89,7 @@
     <Compile Include="Source\HotStudioImport\HotFontImporter.cs" />
     <Compile Include="Source\HotStudioImport\HotLexer.cs" />
     <Compile Include="Source\HotStudioImport\HotSceneImporter.cs" />
+    <Compile Include="Source\KumquatCooker\KumquatCooker.cs" />
     <Compile Include="Source\Main.cs" />
     <Compile Include="Source\SolutionBuilder.cs" />
     <Compile Include="Source\TargetPlatform.cs" />

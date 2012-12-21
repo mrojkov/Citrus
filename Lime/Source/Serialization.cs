@@ -123,5 +123,6 @@ namespace Lime
 			using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
 				return ReadObject<T>(path, stream, obj);
 		}
+
 	}
 }
