@@ -6,20 +6,44 @@ using System.Threading.Tasks;
 
 namespace Tangerine
 {
+	public delegate void DocumentEventHandler(Document document);
+
 	public class Document
 	{
-		public static Document Instance;
+		public static Document Null = new Document(readOnly: true);
 
+		public static Document Instance = Null;
+		
 		public Lime.Node RootNode { get; private set; }
 
-		public Document()
+		public DocumentSettings Settings = new DocumentSettings();
+
+		public bool ReadOnly;
+
+		public static event DocumentEventHandler Changed;
+
+		public Document(bool readOnly)
 		{
 			Instance = this;
+			this.ReadOnly = readOnly;
 			RootNode = new Lime.Widget();
-			for (int i = 0; i < 100; i++) {
+			RootNode.Guid = Guid.NewGuid();
+		}
+
+		public void OnChanged()
+		{
+			if (Changed != null) {
+				Changed(this);
+			}
+		}
+
+		public void AddSomeNodes()
+		{
+			for (int i = 0; i < 20; i++) {
 				var frame = new Lime.Frame();
+				frame.Guid = Guid.NewGuid();
 				frame.Id = string.Format("Image {0:00}", i);
-				
+
 				var ani = frame.Animators["Position"];
 				ani.Add(0, new Lime.Vector2(0, 0));
 				ani.Add(10, new Lime.Vector2(100, 0));

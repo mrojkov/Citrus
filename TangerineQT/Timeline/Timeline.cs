@@ -7,6 +7,8 @@ using Qyoto;
 
 namespace Tangerine
 {
+	public delegate void KeyboardHandler(Qt.Key key);
+
 	public class Timeline
 	{
 		public QDockWidget Dock { get; private set; }
@@ -17,10 +19,25 @@ namespace Tangerine
 		public int ToRow;
 		public int LeftCol;
 
+		public CachedTextPainter TextPainter = new CachedTextPainter();
+
 		public static Timeline Instance;
+
+		public TimelineController Controller;
 
 		QSplitter splitter1;
 		QSplitter splitter2;
+
+		public int FontHeight { get; private set; }
+		public NodeRoll NodeRoll;
+
+		public event Lime.BareEventHandler ActiveRowChanged = () => {};
+		public event KeyboardHandler KeyPressed = (key) => {};
+
+		public void OnActiveRowChanged()
+		{
+			ActiveRowChanged();
+		}
 
 		public Timeline()
 		{
@@ -29,6 +46,7 @@ namespace Tangerine
 			Dock.ObjectName = "Timeline";
 			Dock.SetAllowedAreas(Qt.DockWidgetArea.TopDockWidgetArea | Qt.DockWidgetArea.BottomDockWidgetArea);
 			Dock.Font = new QFont("Tahoma", 9);
+			FontHeight = Dock.FontMetrics().Height();
 			splitter1 = new QSplitter(Qt.Orientation.Vertical);
 			splitter2 = new QSplitter(Qt.Orientation.Horizontal);
 			splitter2.AddWidget(CreateToolbarAndNodeRoll());
@@ -39,28 +57,26 @@ namespace Tangerine
 			Dock.MinimumHeight = 30;
 			splitter1.Sizes = new List<int> { 10, 100 };
 			splitter2.Sizes = new List<int> { 25, 100 };
-			Dock.KeyPress += OnKeyPress;
+			Dock.KeyPress += OnKeyPressed;
+			Controller = new TimelineController();
+			Dock.MousePress += Dock_MousePress;
 		}
 
-		public void GrabKeyboard()
+		void Dock_MousePress(object sender, QEventArgs<QMouseEvent> e)
 		{
-			Dock.GrabKeyboard();
+//			QWidget w = QApplication.FocusWidget();
+//			if (w == null && !Dock.IsAncestorOf(w)) {
+				Dock.SetFocus();
+//			}
 		}
 
-		void OnKeyPress(object sender, QEventArgs<QKeyEvent> e)
+		void OnKeyPressed(object sender, QEventArgs<QKeyEvent> e)
 		{
-			switch ((Qt.Key)e.Event.Key()) {
-				case Qt.Key.Key_Down:
-					ActiveRow++;
-					Dock.Update();
-					//this.Update();
-					break;
-				case Qt.Key.Key_Up:
-					ActiveRow--;
-					Dock.Update();
-					//this.Update();
-					break;
+			QWidget w = QApplication.FocusWidget();
+			if (w != null && w is QLineEdit) {
+				return;
 			}
+			KeyPressed((Qt.Key)e.Event.Key());
 		}
 
 		private QWidget CreateRulerAndGrid()
@@ -81,7 +97,8 @@ namespace Tangerine
 			layout.Spacing = 0;
 			layout.Margin = 0;
 			layout.AddWidget(new TimelineToolbar());
-			layout.AddWidget(new NodeRoll());
+			NodeRoll = new NodeRoll();
+			layout.AddWidget(NodeRoll);
 			return ctr;
 		}
 	}

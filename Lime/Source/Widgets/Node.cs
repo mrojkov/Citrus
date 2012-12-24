@@ -37,6 +37,10 @@ namespace Lime
 			}
 		}
 
+#if WIN
+		public Guid Guid;
+#endif
+
 		public static int UpdatedNodes;
 		private static List<Node> nodesToUnlink = new List<Node>();
 		

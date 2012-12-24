@@ -19,15 +19,15 @@ namespace Tangerine
 		{
 			Instance = this;
 			WindowTitle = "Tangerine";
-			new Document();
 			InitUI();
 			CreateDockWindows();
 			//Resize(800, 600);
 			Move(300, 300);
-			ShowMaximized();
-			The.Timeline.GrabKeyboard();
-
 			LoadDockState();
+			ShowMaximized();
+			var doc = new Document(readOnly: false);
+			doc.AddSomeNodes();
+			doc.OnChanged();
 		}
 
 		private void CreateDockWindows()

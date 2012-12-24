@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Document.cs" />
+    <Compile Include="Core\DocumentSettings.cs" />
     <Compile Include="Core\Globals.cs" />
     <Compile Include="Core\KeyframeColors.cs" />
     <Compile Include="MainWindow.cs" />
@@ -68,8 +69,9 @@
     <Compile Include="Timeline\NodeRoll.cs" />
     <Compile Include="Timeline\Panview.cs" />
     <Compile Include="Timeline\Timeline.cs" />
+    <Compile Include="Timeline\TimelineController.cs" />
     <Compile Include="Timeline\TimelineToolbar.cs" />
-    <Compile Include="Toolbox.cs" />
+    <Compile Include="IconCache.cs" />
     <Compile Include="Toolbox\MemoryLeaksChecker.cs" />
     <Compile Include="Toolbox\QyotoBooster.cs" />
     <Compile Include="Toolbox\CachedTextPainter.cs" />
@@ -158,6 +160,9 @@
     <Content Include="Icons\Nodes\TextPresenter.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Icons\Timeline\Collapsed.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Icons\Timeline\Cross.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -170,7 +175,34 @@
     <Content Include="Icons\Timeline\ExitContainer.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Icons\Timeline\Expanded.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Icons\Timeline\Eye.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\Timeline\Interpolation\ClosedSpline.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\Timeline\Interpolation\ClosedSplineGrayed.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\Timeline\Interpolation\Linear.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\Timeline\Interpolation\LinearGrayed.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\Timeline\Interpolation\None.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\Timeline\Interpolation\NoneGrayed.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\Timeline\Interpolation\Spline.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Icons\Timeline\Interpolation\SplineGrayed.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Icons\Timeline\Lock.png">

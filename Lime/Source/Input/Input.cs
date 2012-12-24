@@ -264,7 +264,7 @@ namespace Lime
 			}
 		}
 
-		public static void ConsumeAllKeyEvents(bool value)
+		public static void ConsumeAllKeyEvents(bool value = true)
 		{
 			if (value) {
 				for (int i = 1; i < (int)Key.KeyCount; i++) {

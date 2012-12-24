@@ -27,13 +27,16 @@ namespace Tangerine
 			int numCols = Size.Width / ColWidth + 1;
 			using (var ptr = new QPainter(this)) {
 				DrawGrid(numRows, numCols, ptr);
-				var nodes = The.Document.RootNode.Nodes;
-				for (int i = 0; i < nodes.Count; i++) {
-					var node = nodes[i];
-					if (i < numRows) {
-						DrawTransients(KeyTransientCollector.GetTransients(node), i, 0, numCols, ptr);
-					}
+				foreach (var row in The.Timeline.Controller.Rows) {
+					row.PaintContent(ptr, Width);
 				}
+				//var nodes = The.Document.RootNode.Nodes;
+				//for (int i = 0; i < nodes.Count; i++) {
+				//	var node = nodes[i];
+				//	if (i < numRows) {
+				//		DrawTransients(KeyTransientCollector.GetTransients(node), i, 0, numCols, ptr);
+				//	}
+				//}
 			}
 		}
 
@@ -57,7 +60,6 @@ namespace Tangerine
 				ptr.FillRect(x, y - 1, x1 - x, 2, m.QColor);
 			}
 		}
-
 
 		private void DrawGrid(int numRows, int numCols, QPainter ptr)
 		{

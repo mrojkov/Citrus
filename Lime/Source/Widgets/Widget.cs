@@ -67,7 +67,7 @@ namespace Lime
 		public Vector2 Scale { get; set; }
 
 		[ProtoMember(5)]
-		[TangerineProperty(4)]
+		//[TangerineProperty(4)]
 		public float Rotation { 
 			get {
 				return rotation;
