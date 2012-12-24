@@ -20,8 +20,7 @@ namespace Kumquat
 			foreach (var frame in locations.Values) {
 				foreach (var tool in frame.Descendants<Tool>()) {
 					if (Tools.Keys.Contains(tool.Id)) {
-						var mes = String.Format("Два тула с одинаковым именем: {0}", tool.Id);
-						throw new Lime.Exception(mes);
+						throw new Lime.Exception("There are two tools with the same name: {0}", tool.Id);
 					} else {
 						Tools.Add(tool.Id, tool.DeepCloneFast<Widget>());
 					};
