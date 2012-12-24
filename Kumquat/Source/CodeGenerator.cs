@@ -33,7 +33,7 @@ namespace Kumquat
 			AddLocationCollectionHeader();
 			foreach (string locPath in Locations.Keys) {
 				var name = Path.GetFileNameWithoutExtension(locPath);
-				var line = "\t\tpublic Location NAME { get { return Dictionary[\"NAME\"]; } }";
+				var line = "\t\tpublic NAME NAME { get { return (NAME)Dictionary[\"NAME\"]; } }";
 				lines.Add(line.Replace("NAME", name));
 			}
 			AddFooter();
@@ -41,47 +41,35 @@ namespace Kumquat
 
 			foreach (var loc in Locations) {
 				var className = Path.GetFileNameWithoutExtension(loc.Key);
-				if (!File.Exists(locationsPath + "\\" + className + ".cs"))
-					CreateLocationFile(locationsPath, className);
+				var path = locationsPath + "\\" + className + ".cs";
+				if (!File.Exists(path)) {
+					lines.Clear();
+					AddLocationTemplate(className);
+					System.IO.File.WriteAllLines(path, lines);
+				}
 
-				var frame = loc.Value;
-				CreateLocationFile(generatedPath, className, () => {
-					var line = "\t\tpublic Item @NAME { get { return Items[\"NAME\"]; } }";
-					HashSet<string> names = new HashSet<string>();
-					foreach (Area area in frame.Descendants<Area>()) {
-						if (!names.Contains(area.Id)) {
-							names.Add(area.Id);
-							lines.Add(line.Replace("NAME", area.Id));
-						} else {
-							Console.WriteLine("WARNING: Duplicate '{0}' on '{1}'", area.Id, className);
-						}
-					}
-				});
-			}
-
-		}
-
-		private void CreateLocationFile(string path, string className, BodyDelegate bodyFunc = null)
-		{
-			lines.Clear();
-			if (className == "LocationCollection") {
-				AddLocationCollectionHeader();
-			} else {
+				lines.Clear();
 				AddLocationHeader(className);
+				var line = "\t\tpublic Item @NAME { get { return Items[\"NAME\"]; } }";
+				HashSet<string> names = new HashSet<string>();
+				foreach (Area area in loc.Value.Descendants<Area>()) {
+					if (!names.Contains(area.Id)) {
+						names.Add(area.Id);
+						lines.Add(line.Replace("NAME", area.Id));
+					} else {
+						Console.WriteLine("WARNING: Duplicate '{0}' on '{1}'", area.Id, className);
+					}
+				}
+				AddFooter();
+				System.IO.File.WriteAllLines(generatedPath + "\\" + className + ".cs", lines);
 			}
-			if( bodyFunc != null )
-				bodyFunc();
-			AddFooter();
-			System.IO.File.WriteAllLines(path + "\\" + className + ".cs", lines);
+
 		}
 
 		private void AddLocationCollectionHeader()
 		{
 			var header = @"
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using PROJECT_NAME.Locations;
 
 namespace PROJECT_NAME
 {
@@ -93,24 +81,40 @@ namespace PROJECT_NAME
 		private void AddLocationHeader(string className)
 		{
 			var header = @"
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Lime;
 using Kumquat;
 using ProtoBuf;
 
 namespace PROJECT_NAME.Locations
 {
-	using R = IEnumerator<object>;
-
 	[ProtoContract]
 	public partial class CLASS_NAME : Location
 	{";
 			header = header.Replace("PROJECT_NAME", ProjectName);
 			header = header.Replace("CLASS_NAME", className);
 			lines.Add(header);
+		}
+
+		private void AddLocationTemplate(string className)
+		{
+			var text = @"
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Lime;
+using Kumquat;
+
+namespace PROJECT_NAME.Locations
+{
+	using R = IEnumerator<object>;
+
+	public partial class CLASS_NAME : Location
+	{
+	}
+}";
+			text = text.Replace("PROJECT_NAME", ProjectName);
+			text = text.Replace("CLASS_NAME", className);
+			lines.Add(text);
 		}
 
 		private void AddFooter()
