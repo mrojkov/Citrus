@@ -51,5 +51,12 @@ namespace Lime
 			return path;
 		}
 
+		public static Vector2 GetDesktopSize()
+		{
+			var device = OpenTK.DisplayDevice.Default;
+			return new Vector2(device.Width, device.Height);
+		}
+
+
 	}
 }
