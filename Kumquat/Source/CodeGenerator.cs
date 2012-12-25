@@ -33,7 +33,7 @@ namespace Kumquat
 			AddLocationCollectionHeader();
 			foreach (string locPath in Locations.Keys) {
 				var name = Path.GetFileNameWithoutExtension(locPath);
-				var line = "\t\tpublic NAME NAME { get { return (NAME)Dictionary[\"NAME\"]; } }";
+				var line = "\t\tpublic NAME NAME { get { return (NAME)this[\"NAME\"]; } }";
 				lines.Add(line.Replace("NAME", name));
 			}
 			AddFooter();
