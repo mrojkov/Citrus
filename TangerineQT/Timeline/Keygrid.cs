@@ -27,8 +27,8 @@ namespace Tangerine
 			int numCols = Size.Width / ColWidth + 1;
 			using (var ptr = new QPainter(this)) {
 				DrawGrid(numRows, numCols, ptr);
-				foreach (var row in The.Timeline.Controller.Rows) {
-					row.PaintContent(ptr, Width);
+				foreach (var item in The.Timeline.Controller.Items) {
+					item.PaintContent(ptr, Width);
 				}
 				//var nodes = The.Document.RootNode.Nodes;
 				//for (int i = 0; i < nodes.Count; i++) {
@@ -40,26 +40,26 @@ namespace Tangerine
 			}
 		}
 
-		private void DrawTransients(List<KeyTransient> keyMarks, int row, int startFrame, int endFrame, QPainter ptr)
-		{
-			for (int i = 0; i < keyMarks.Count; i++) {
-				var m = keyMarks[i];
-				if (m.Frame >= startFrame && m.Frame < endFrame) {
-					int x = ColWidth * (m.Frame - startFrame) + 4;
-					int y = RowHeight * row + m.Line * 6 + 4;
-					DrawKey(ptr, m, x, y);
-				}
-			}
-		}
+		//private void DrawTransients(List<KeyTransient> keyMarks, int row, int startFrame, int endFrame, QPainter ptr)
+		//{
+		//	for (int i = 0; i < keyMarks.Count; i++) {
+		//		var m = keyMarks[i];
+		//		if (m.Frame >= startFrame && m.Frame < endFrame) {
+		//			int x = ColWidth * (m.Frame - startFrame) + 4;
+		//			int y = RowHeight * row + m.Line * 6 + 4;
+		//			DrawKey(ptr, m, x, y);
+		//		}
+		//	}
+		//}
 
-		private void DrawKey(QPainter ptr, KeyTransient m, int x, int y)
-		{
-			ptr.FillRect(x - 3, y - 3, 6, 6, m.QColor);
-			if (m.Length > 0) {
-				int x1 = x + m.Length * ColWidth;
-				ptr.FillRect(x, y - 1, x1 - x, 2, m.QColor);
-			}
-		}
+		//private void DrawKey(QPainter ptr, KeyTransient m, int x, int y)
+		//{
+		//	ptr.FillRect(x - 3, y - 3, 6, 6, m.QColor);
+		//	if (m.Length > 0) {
+		//		int x1 = x + m.Length * ColWidth;
+		//		ptr.FillRect(x, y - 1, x1 - x, 2, m.QColor);
+		//	}
+		//}
 
 		private void DrawGrid(int numRows, int numCols, QPainter ptr)
 		{

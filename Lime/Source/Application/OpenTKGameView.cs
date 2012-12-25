@@ -27,11 +27,21 @@ namespace Lime
 
             // Как узнать разрешение текущего экрана без Windows Forms?
             Size screenSize = new Size(1280, 1024);
-            
-            this.Location = new System.Drawing.Point(
-                (screenSize.Width - this.Width) / 2,
-                (screenSize.Height - this.Height) / 2
-            );
+
+			if (CheckMaximizedArg(args)) {
+				this.Location = new System.Drawing.Point(0, 0);
+				this.WindowState = OpenTK.WindowState.Maximized;
+			} else {
+				this.Location = new System.Drawing.Point(
+					(screenSize.Width - this.Width) / 2,
+					(screenSize.Height - this.Height) / 2
+				);
+			}
+		}
+
+		private static bool CheckMaximizedArg(string[] args)
+		{
+			return args != null && Array.IndexOf(args, "--Maximized") >= 0;
 		}
 
 		void HandleKeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)

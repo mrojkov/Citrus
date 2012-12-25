@@ -25,10 +25,11 @@ namespace Tangerine
 			int numCols = Width / ColWidth + 1;
 			using (var ptr = new QPainter(this)) {
 				//DrawGrid(numRows, numCols, ptr);
+				var c = new KeyTransientCollector();
 				for (int i = 0; i < container.Nodes.Count; i++) {
 					var node = container.Nodes[i];
 					if (i < numRows) {
-						DrawTransients(KeyTransientCollector.GetTransients(node), i, 0, numCols, ptr);
+						DrawTransients(c.GetTransients(node), i, 0, numCols, ptr);
 					}
 				}
 			}

@@ -8,200 +8,49 @@ using System.Reflection;
 
 namespace Tangerine
 {
-	public static class PropertyEditorRegistry
-	{
-		public static PropertyEditor CreateEditor(Lime.Node node, PropertyInfo property)
-		{
-			PropertyEditor e = null;
-			if (property.PropertyType == typeof(Lime.Vector2)) {
-				e = new PropertyEditorForVector2();
-			} else {
-				throw new NotImplementedException();
-			}
-			e.Node = node;
-			e.Property = property;
-			return e;
-		}
-	}
-
-	public abstract class PropertyEditor : QObject
-	{
-		public Lime.Node Node;
-		public PropertyInfo Property;
-
-		protected static void SetWhiteBackground(QWidget w)
-		{
-			var pal = new QPalette();
-			pal.SetColor(w.BackgroundRole, Qt.GlobalColor.white);
-			pal.SetColor(QPalette.ColorRole.Text, GlobalColor.black);
-			w.Palette = pal;
-		}
-
-		protected static void SetTransparentBackground(QWidget w)
-		{
-			var pal = new QPalette();
-			pal.SetColor(w.BackgroundRole, Qt.GlobalColor.transparent);
-			pal.SetColor(QPalette.ColorRole.Text, GlobalColor.black);
-			w.Palette = pal;
-		}
-
-		public abstract void StartEditing();
-
-		public abstract void CreateWidgets(QBoxLayout layout);
-		public abstract void SetFromProperty();
-
-		public virtual void Destroy() { }
-	}
-
-	public delegate void InplaceEditorHandler(string text);
-
-	public class InplaceTextEditor : QObject
-	{
-		private QWidget oldFocus;
-		private QLineEdit edit;
-		
-		public event InplaceEditorHandler Finished;
-		
-		public InplaceTextEditor(QLabel label)
-		{
-			oldFocus = QApplication.FocusWidget();
-			var parent = label.ParentWidget();
-			edit = new QLineEdit();
-			var p = label.MapTo(parent, new QPoint(0, 0));
-			edit.SetParent(parent);
-			edit.Move(p.X, p.Y + 2);
-			edit.Resize(label.Width, label.Height - 4);
-			edit.SetFocus();
-			edit.Text = label.Text;
-			edit.Raise();
-			edit.Frame = false;
-			edit.LostFocus += edit_LostFocus;
-			edit.ReturnPressed += edit_ReturnPressed;
-			edit.Show();
-		}
-
-		[Q_SLOT]
-		void edit_LostFocus()
-		{
-			StopEditing();
-		}
-
-		[Q_SLOT]
-		void edit_ReturnPressed()
-		{
-			StopEditing();
-			if (oldFocus != null) {
-				oldFocus.SetFocus();
-			}
-		}
-
-		void StopEditing()
-		{
-			edit.SetParent(null);
-			if (Finished != null) {
-				Finished(edit.Text);
-			}
-			edit.DeleteLater();
-		}
-	}
-
-	public class PropertyEditorForVector2 : PropertyEditor
-	{
-		QLabel label;
-
-		public override void CreateWidgets(QBoxLayout layout)
-		{
-			label = new QLabel(GetValueFromProperty());
-			//edit = new QLineEdit();
-			//edit.LostFocus += edit_LostFocus;
-			label.MouseDoubleClick += label_MouseDoubleClick;
-			layout.AddWidget(label);
-			//layout.AddWidget(edit);
-			//edit.Hide();
-			layout.AddSpacing(4);
-		}
-
-		public override void StartEditing()
-		{
-			edit = new InplaceTextEditor(label);
-			edit.Finished += (text) => {
-				text = text ?? "";
-				var v = (Lime.Vector2)Property.GetValue(Node);
-				var vals = text.Split(';');
-				if (vals.Length == 2) {
-					float x, y;
-					if (float.TryParse(vals[0], out x)) {
-						v.X = x;
-					}
-					if (float.TryParse(vals[1], out y)) {
-						v.Y = y;
-					}
-					Property.SetValue(Node, v);
-				}
-				SetFromProperty();
-				label.Show();
-			};
-		}
-
-		InplaceTextEditor edit;
-
-		void label_MouseDoubleClick(object sender, QEventArgs<QMouseEvent> e)
-		{
-			StartEditing();
-		}
-
-		public override void SetFromProperty()
-		{
-			label.Text = GetValueFromProperty();
-		}
-
-		private string GetValueFromProperty()
-		{
-			var v = (Lime.Vector2)Property.GetValue(Node);
-			return string.Format("{0}; {1}", v.X, v.Y);
-		}
-	}
-
 	/// <summary>
 	/// Абстрактный класс для представления одной строки на таймлайне
 	/// </summary>
-	public class AbstractRow : QObject
+	public class AbstractItem : QObject
 	{
 		protected int ActiveRow { get { return The.Timeline.ActiveRow; } }
 		protected int RowHeight { get { return The.Timeline.RowHeight; } }
 		protected int ColWidth { get { return The.Timeline.ColWidth; } }
 
-		public int Row;
+		public int Row { get; set; }
 
-		protected QWidget container;
+		protected QWidget slot;
 		protected QHBoxLayout layout;
 
-		public AbstractRow(int row)
+		public AbstractItem()
 		{
-			this.Row = row;
-			The.Timeline.ActiveRowChanged += Timeline_ActiveRowChanged;
 		}
 
 		void Timeline_ActiveRowChanged()
 		{
-			container.AutoFillBackground = (Row == ActiveRow);
+			slot.AutoFillBackground = (Row == ActiveRow);
 		}
 
-		public virtual void Destroy()
+		public virtual void Attach(int row)
+		{
+			Row = row;
+			slot.SetParent(The.Timeline.NodeRoll);
+			slot.Move(0, row * RowHeight);
+			slot.Resize(The.Timeline.NodeRoll.Width, RowHeight);
+			The.Timeline.ActiveRowChanged += Timeline_ActiveRowChanged;
+		}
+
+		public virtual void Detach()
 		{
 			The.Timeline.ActiveRowChanged -= Timeline_ActiveRowChanged;
-			container.SetParent(null);
-			//container.DeleteLater();
+			slot.SetParent(null);
 		}
 
-		public virtual void SetupWidgets()
+		public virtual void CreateWidgets()
 		{
-			container = new QWidget(The.Timeline.NodeRoll);
-			container.Move(0, Row * RowHeight);
-			container.Resize(The.Timeline.NodeRoll.Width, RowHeight);
-			container.Palette = new QPalette(Qt.GlobalColor.lightGray);
-			container.AutoFillBackground = (Row == ActiveRow);
-			layout = new QHBoxLayout(container);
+			slot = new QWidget();
+			slot.Palette = new QPalette(Qt.GlobalColor.lightGray);
+			layout = new QHBoxLayout(slot);
 			layout.Spacing = 0;
 			layout.Margin = 0;
 		}
@@ -213,6 +62,15 @@ namespace Tangerine
 			bt.AutoRaise = true;
 			bt.FocusPolicy = Qt.FocusPolicy.NoFocus;
 			return bt;
+		}
+
+		protected QLabel CreateImageWidget(string iconPath)
+		{
+			var label = new QLabel();
+			var icon = IconCache.Get(iconPath);
+			label.Pixmap = icon.Pixmap(16, 16);
+			label.SetContentsMargins(2, 0, 2, 0);
+			return label;
 		}
 
 		protected int Top {
@@ -235,7 +93,7 @@ namespace Tangerine
 	/// <summary>
 	/// Строка представляющая один нод на таймлайне
 	/// </summary>
-	public class NodeRow : AbstractRow
+	public class NodeItem : AbstractItem
 	{
 		private Lime.Node node;
 		private NodeSettings settings;
@@ -245,96 +103,78 @@ namespace Tangerine
 			get { return settings.IsFolded; }
 		}
 
-		public NodeRow(int row, Lime.Node node)
-			: base(row)
+		public NodeItem(Lime.Node node)
 		{
 			settings = The.Document.Settings.GetObjectSettings<NodeSettings>(node.Guid.ToString());
 			this.node = node;
 		}
 
-		public override void SetupWidgets()
+		public override void CreateWidgets()
 		{
-			base.SetupWidgets();
-			var nodeIcon = CreateIconButton("Nodes/Scene");
-			nodeIcon.Clicked += nodeIcon_Clicked;
-			layout.AddWidget(nodeIcon, 0);
+			base.CreateWidgets();
+			var expanderIcon = CreateImageWidget("Timeline/Collapsed");
+			expanderIcon.MousePress += expanderIcon_MousePress;
+			layout.AddWidget(expanderIcon);
+
+			var nodeIcon = CreateImageWidget("Nodes/Scene");
+			//nodeIcon.Clicked += nodeIcon_Clicked;
+			layout.AddWidget(nodeIcon);
 
 			var label = new QLabel(node.Id);
 			layout.AddWidget(label, 10);
 
-			var bt = CreateIconButton("Timeline/Dot");
-			layout.AddWidget(bt, 0);
+			var bt = CreateImageWidget("Timeline/Dot");
+			layout.AddWidget(bt);
 
-			bt = CreateIconButton("Timeline/Dot");
+			bt = CreateImageWidget("Timeline/Dot");
 			layout.AddWidget(bt, 0);
+		}
+
+		void expanderIcon_MousePress(object sender, QEventArgs<QMouseEvent> e)
+		{
+			settings.IsFolded = !settings.IsFolded;
+			The.Timeline.Controller.Rebuild();
 		}
 
 		public override void HandleKey(Qt.Key key)
 		{
 			if (key == Key.Key_Return) {
 				settings.IsFolded = !settings.IsFolded;
-				The.Timeline.Controller.RebuildRows();
+				The.Timeline.Controller.Rebuild();
 			}
 		}
 
-		[Q_SLOT]
-		void nodeIcon_Clicked()
-		{
-			settings.IsFolded = !settings.IsFolded;
-			The.Timeline.Controller.RebuildRows();
-		}
+		//[Q_SLOT]
+		//void nodeIcon_Clicked()
+		//{
+		//	settings.IsFolded = !settings.IsFolded;
+		//	The.Timeline.Controller.Rebuild();
+		//}
 
-		public virtual void PaintContent(QPainter ptr, int width, int fontHeight)
+		public override void PaintContent(QPainter ptr, int width)
 		{
 			int numCols = width / ColWidth + 1;
-			var transients = KeyTransientCollector.GetTransients(node);
-			DrawTransients(transients, 0, numCols, ptr);
+			var c = new KeyTransientCollector();
+			var tp = new TransientsPainter(ColWidth, Top);
+			var transients = c.GetTransients(node);
+			tp.DrawTransients(transients, 0, numCols, ptr);
 		}
-
-		private void DrawTransients(List<KeyTransient> transients, int startFrame, int endFrame, QPainter ptr)
-		{
-			for (int i = 0; i < transients.Count; i++) {
-				var m = transients[i];
-				if (m.Frame >= startFrame && m.Frame < endFrame) {
-					int x = ColWidth * (m.Frame - startFrame) + 4;
-					int y = Top + m.Line * 6 + 4;
-					DrawKey(ptr, m, x, y);
-				}
-			}
-		}
-
-		private void DrawKey(QPainter ptr, KeyTransient m, int x, int y)
-		{
-			ptr.FillRect(x - 3, y - 3, 6, 6, m.QColor);
-			if (m.Length > 0) {
-				int x1 = x + m.Length * ColWidth;
-				ptr.FillRect(x, y - 1, x1 - x, 2, m.QColor);
-			}
-		}
-
 	}
 
 	/// <summary>
 	/// Строка представляющая одно свойство нода на таймлайне
 	/// </summary>
-	public class PropertyRow : AbstractRow
+	public class PropertyItem : AbstractItem
 	{
 		Lime.Node node;
-		PropertyInfo prop;
+		PropertyInfo property;
 		PropertyEditor editor;
 
-		public PropertyRow(int row, Lime.Node node, PropertyInfo prop)
-			: base(row)
+		public PropertyItem(Lime.Node node, PropertyInfo property)
 		{
 			this.node = node;
-			this.prop = prop;
-			editor = PropertyEditorRegistry.CreateEditor(node, prop);
-		}
-
-		public override void Destroy()
-		{
-			editor.Destroy();
-			base.Destroy();
+			this.property = property;
+			editor = PropertyEditorRegistry.CreateEditor(node, property);
 		}
 
 		public override void HandleKey(Qt.Key key)
@@ -344,21 +184,61 @@ namespace Tangerine
 			}
 		}
 
-		public override void SetupWidgets()
+		public override void CreateWidgets()
 		{
-			base.SetupWidgets();
-			//var bt1 = CreateIconButton("Nodes/Scene");
-			//layout.AddWidget(bt1, 0);
+			base.CreateWidgets();
+
 			layout.AddSpacing(30);
-			var label = new QLabel(prop.Name);
+			var label = new QLabel(property.Name);
 			label.SetFixedWidth(50);
 			layout.AddWidget(label);
 
-			var bt1 = CreateIconButton("Timeline/Interpolation/Spline");
-			layout.AddWidget(bt1, 0);
+			var iconButton = CreateIconButton("Timeline/Interpolation/Spline");
+			layout.AddWidget(iconButton, 0);
 
 			editor.CreateWidgets(layout);
-			editor.SetFromProperty();
+		}
+
+		public override void PaintContent(QPainter ptr, int width)
+		{
+			int numCols = width / ColWidth + 1;
+			var c = new KeyTransientCollector(property);
+			var tp = new TransientsPainter(ColWidth, Top);
+			var transients = c.GetTransients(node);
+			tp.DrawTransients(transients, 0, numCols, ptr);
+		}
+	}
+
+	public class TransientsPainter
+	{
+		int colWidth;
+		int top;
+
+		public TransientsPainter(int colWidth, int top)
+		{
+			this.colWidth = colWidth;
+			this.top = top;
+		}
+
+		public void DrawTransients(List<KeyTransient> transients, int startFrame, int endFrame, QPainter ptr)
+		{
+			for (int i = 0; i < transients.Count; i++) {
+				var m = transients[i];
+				if (m.Frame >= startFrame && m.Frame < endFrame) {
+					int x = colWidth * (m.Frame - startFrame) + 4;
+					int y = top + m.Line * 6 + 4;
+					DrawKey(ptr, m, x, y);
+				}
+			}
+		}
+
+		private void DrawKey(QPainter ptr, KeyTransient m, int x, int y)
+		{
+			ptr.FillRect(x - 3, y - 3, 6, 6, m.QColor);
+			if (m.Length > 0) {
+				int x1 = x + m.Length * colWidth;
+				ptr.FillRect(x, y - 1, x1 - x, 2, m.QColor);
+			}
 		}
 	}
 
@@ -380,8 +260,8 @@ namespace Tangerine
 
 	public class TimelineController
 	{
-		public List<AbstractRow> Rows = new List<AbstractRow>();
-		public int ActiveRow { get { return The.Timeline.ActiveRow; } set { The.Timeline.ActiveRow = value; } }
+		public List<AbstractItem> Items = new List<AbstractItem>();
+		public int ActiveItem { get { return The.Timeline.ActiveRow; } set { The.Timeline.ActiveRow = value; } }
 
 		public TimelineController()
 		{
@@ -393,14 +273,14 @@ namespace Tangerine
 		{
 			switch (key) {
 				case Qt.Key.Key_Down:
-					if (ActiveRow < Rows.Count) {
-						ActiveRow++;
+					if (ActiveItem < Items.Count) {
+						ActiveItem++;
 						The.Timeline.OnActiveRowChanged();
 					}
 					break;
 				case Qt.Key.Key_Up:
-					if (ActiveRow > 0) {
-						ActiveRow--;
+					if (ActiveItem > 0) {
+						ActiveItem--;
 						The.Timeline.OnActiveRowChanged();
 					}
 					break;
@@ -408,8 +288,8 @@ namespace Tangerine
 					The.Document.OnChanged();
 					break;
 				default:
-					if (Rows.Count > 0) {
-						Rows[ActiveRow].HandleKey(key);
+					if (Items.Count > 0) {
+						Items[ActiveItem].HandleKey(key);
 					}
 					break;
 			}
@@ -417,38 +297,60 @@ namespace Tangerine
 
 		void Document_Changed(Document document)
 		{
-			RebuildRows();
+			Rebuild();
 		}
 
-		public void RebuildRows()
+		Dictionary<string, AbstractItem> rowCache = new Dictionary<string, AbstractItem>();
+
+		NodeItem GetNodeItem(int index, Lime.Node node)
+		{
+			string key = node.Guid.ToString();
+			AbstractItem item;
+			if (!rowCache.TryGetValue(key, out item)) {
+				item = new NodeItem(node);
+				item.CreateWidgets();
+				rowCache[key] = item;	
+			}
+			item.Attach(index);
+			return item as NodeItem;
+		}
+
+		PropertyItem GetPropertyItem(int index, Lime.Node node, PropertyInfo property)
+		{
+			string key = node.Guid.ToString() + '#' + property.Name;
+			AbstractItem item;
+			if (!rowCache.TryGetValue(key, out item)) {
+				item = new PropertyItem(node, property);
+				item.CreateWidgets();
+				rowCache[key] = item;
+			}
+			item.Attach(index);
+			return item as PropertyItem;
+		}
+
+		public void Rebuild()
 		{
 			The.Timeline.NodeRoll.Hide();
 			var document = The.Document;
-			foreach (var row in Rows) {
-				row.Destroy();
+			foreach (var row in Items) {
+				row.Detach();
 			}
-			System.GC.Collect(10, GCCollectionMode.Forced, true);
-
-			Rows.Clear();
+			Items.Clear();
 			int i = 0;
 			var nodes = document.RootNode.Nodes;
 			foreach (var node in nodes) {
-				var nodeRow = new NodeRow(i++, node);
-				Rows.Add(nodeRow);
-				if (!nodeRow.IsFolded) {
+				var nodeItem = GetNodeItem(i++, node);
+				Items.Add(nodeItem);
+				if (!nodeItem.IsFolded) {
 					foreach (var prop in node.GetProperties()) {
-						var propRow = new PropertyRow(i++, node, prop);
-						Rows.Add(propRow);
+						var propItem = GetPropertyItem(i++, node, prop);
+						Items.Add(propItem);
 					}
 				}
 			}
-			long t = System.Environment.TickCount;
-			foreach (var row in Rows) {
-				row.SetupWidgets();
-			}
-			t = System.Environment.TickCount - t;
-			Console.WriteLine("T1: " + t);
 			The.Timeline.NodeRoll.Show();
+			The.Timeline.KeyGrid.Update();
+			The.Timeline.OnActiveRowChanged();
 		}
 	}
 }

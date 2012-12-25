@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Qyoto;
+using System.Reflection;
 
 namespace Tangerine
 {
@@ -24,7 +25,14 @@ namespace Tangerine
 	/// </summary>
 	public class KeyTransientCollector
 	{
-		public static List<KeyTransient> GetTransients(Lime.Node node)
+		PropertyInfo property;
+
+		public KeyTransientCollector(PropertyInfo property = null)
+		{
+			this.property = property;
+		}
+
+		public List<KeyTransient> GetTransients(Lime.Node node)
 		{
 			var transients = GatherTransientsFromAnimators(node);
 			transients.Sort((a, b) => a.Frame - b.Frame);
@@ -32,7 +40,7 @@ namespace Tangerine
 			return transients;
 		}
 
-		private static void AllocateLines(List<KeyTransient> transients)
+		private void AllocateLines(List<KeyTransient> transients)
 		{
 			var attributes = new Lime.TangerinePropertyAttribute[KeyGrid.MaxLinesPerRow];
 			var endings = new int[KeyGrid.MaxLinesPerRow];
@@ -44,7 +52,7 @@ namespace Tangerine
 			}
 		}
 
-		private static void PutTransientToFreeLine(Lime.TangerinePropertyAttribute[] attributes, int[] endings, int[] priorityMap, KeyTransient transient)
+		private void PutTransientToFreeLine(Lime.TangerinePropertyAttribute[] attributes, int[] endings, int[] priorityMap, KeyTransient transient)
 		{
 			foreach (int j in priorityMap) {
 				if (endings[j] < transient.Frame) {
@@ -59,7 +67,7 @@ namespace Tangerine
 			}
 		}
 
-		private static bool TryJoinTransientToPreviousOne(Lime.TangerinePropertyAttribute[] attributes, int[] endings, int[] priorityMap, KeyTransient transient)
+		private bool TryJoinTransientToPreviousOne(Lime.TangerinePropertyAttribute[] attributes, int[] endings, int[] priorityMap, KeyTransient transient)
 		{
 			foreach (int j in priorityMap) {
 				if (endings[j] == transient.Frame - 1) {
@@ -73,7 +81,7 @@ namespace Tangerine
 			return false;
 		}
 
-		private static int[] GenerateLinesPriorityMap(int maxLines)
+		private int[] GenerateLinesPriorityMap(int maxLines)
 		{
 			int[] linesPriorityMap = new int[maxLines];
 			for (int i = 0; i < KeyGrid.MaxLinesPerRow; i++) {
@@ -83,10 +91,12 @@ namespace Tangerine
 			return linesPriorityMap;
 		}
 
-		private static List<KeyTransient> GatherTransientsFromAnimators(Lime.Node node)
+		private List<KeyTransient> GatherTransientsFromAnimators(Lime.Node node)
 		{
 			var transients = new List<KeyTransient>();
 			foreach (var ani in node.Animators) {
+				if (property != null && ani.TargetProperty != property.Name)
+					continue;
 				var attr = GetAnimatorAttributes(node, ani);
 				for (int i = 0; i < ani.Frames.Length; i++) {
 					var key0 = ani[i];
@@ -108,7 +118,7 @@ namespace Tangerine
 			return transients;
 		}
 
-		private static Lime.TangerinePropertyAttribute GetAnimatorAttributes(Lime.Node node, Lime.Animator ani)
+		private Lime.TangerinePropertyAttribute GetAnimatorAttributes(Lime.Node node, Lime.Animator ani)
 		{
 			var prop = node.GetType().GetProperty(ani.TargetProperty);
 			var attrs = prop.GetCustomAttributes(typeof(Lime.TangerinePropertyAttribute), false);

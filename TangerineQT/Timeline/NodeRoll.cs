@@ -21,7 +21,7 @@ namespace Tangerine
 		void NodeRoll_MousePress(object sender, QEventArgs<QMouseEvent> e)
 		{
 			int row = e.Event.Y() / RowHeight;
-			if (row >= 0 && row < The.Timeline.Controller.Rows.Count) {
+			if (row >= 0 && row < The.Timeline.Controller.Items.Count) {
 				The.Timeline.ActiveRow = row;
 				The.Timeline.OnActiveRowChanged();
 			}

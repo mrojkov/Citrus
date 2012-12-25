@@ -68,10 +68,12 @@
     <Compile Include="Timeline\KeyTransientPalette.cs" />
     <Compile Include="Timeline\NodeRoll.cs" />
     <Compile Include="Timeline\Panview.cs" />
+    <Compile Include="Timeline\PropertyEditor.cs" />
     <Compile Include="Timeline\Timeline.cs" />
     <Compile Include="Timeline\TimelineController.cs" />
     <Compile Include="Timeline\TimelineToolbar.cs" />
     <Compile Include="IconCache.cs" />
+    <Compile Include="Toolbox\InplaceTextEditor.cs" />
     <Compile Include="Toolbox\MemoryLeaksChecker.cs" />
     <Compile Include="Toolbox\QyotoBooster.cs" />
     <Compile Include="Toolbox\CachedTextPainter.cs" />

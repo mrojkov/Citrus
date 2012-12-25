@@ -30,6 +30,7 @@ namespace Tangerine
 
 		public int FontHeight { get; private set; }
 		public NodeRoll NodeRoll;
+		public KeyGrid KeyGrid;
 
 		public event Lime.BareEventHandler ActiveRowChanged = () => {};
 		public event KeyboardHandler KeyPressed = (key) => {};
@@ -86,7 +87,8 @@ namespace Tangerine
 			layout.Spacing = 0;
 			layout.Margin = 0;
 			layout.AddWidget(new KeyGridRuler());
-			layout.AddWidget(new KeyGrid());
+			KeyGrid = new KeyGrid();
+			layout.AddWidget(KeyGrid);
 			return ctr;
 		}
 
