@@ -71,7 +71,12 @@ namespace Lime
 		public static IntVector2 operator -(IntVector2 v)
 		{
 			return new IntVector2(-v.X, -v.Y);
-		}	
+		}
+
+		public static IntVector2 operator /(IntVector2 lhs, int rhs)
+		{
+			return new IntVector2(lhs.X / rhs, lhs.Y / rhs);
+		}
 
 		public override string ToString()
 		{
