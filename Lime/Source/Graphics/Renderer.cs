@@ -29,6 +29,8 @@ namespace Lime
 		Add,
 		[ProtoEnum]
 		Silhuette,
+		[ProtoEnum]
+		Glow,
 	}
 
 	[ProtoContract]
@@ -341,19 +343,6 @@ namespace Lime
 				GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.Src1Rgb, (int)TextureEnvModeSource.Texture);
 				GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.Src1Alpha, (int)TextureEnvModeSource.Texture);
 				switch(value) {
-				case Blending.Silhuette:
-					GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-					GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.CombineRgb, (int)TextureEnvModeCombine.Replace);
-					GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.CombineAlpha, (int)TextureEnvModeCombine.Modulate);
-					GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Combine);
-					break;
-				case Blending.Add:
-					if (PremulAlphaMode)
-						GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.One);
-					else
-						GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
-					GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
-					break;
 				case Blending.Alpha:
 				case Blending.Default:
 				default:
@@ -363,13 +352,39 @@ namespace Lime
 						GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 					GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
 					break;
+				case Blending.Silhuette:
+					GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+					GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.CombineRgb, (int)TextureEnvModeCombine.Replace);
+					GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.CombineAlpha, (int)TextureEnvModeCombine.Modulate);
+					GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Combine);
+					break;
+				case Blending.Add:
+				case Blending.Glow:
+					if (PremulAlphaMode)
+						GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.One);
+					else
+						GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
+					GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
+					break;
 				}
 #endif
 				CheckErrors();
 			}
 		}
-		
+
 		public static void DrawSprite(ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1)
+		{
+			if (blending == Blending.Glow) {
+				Blending = Blending.Default;
+				DrawSpriteHelper(texture, color, position, size, uv0, uv1);
+				Blending = Blending.Glow;
+				DrawSpriteHelper(texture, color, position, size, uv0, uv1);
+			} else {
+				DrawSpriteHelper(texture, color, position, size, uv0, uv1);
+			}
+		}
+		
+		public static void DrawSpriteHelper(ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1)
 		{
 			var transform = Transform1 * Transform2;
 			SetTexture(texture, 0);
@@ -421,7 +436,19 @@ namespace Lime
 
 		public static void DrawTriangleFan(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
 		{
-			int baseVertex = DrawTriangleFanHelper(texture1, texture2, vertices, numVertices);
+			if (blending == Lime.Blending.Glow) {
+				Blending = Lime.Blending.Default;
+				DrawTriangleFanHelper(texture1, texture2, vertices, numVertices);
+				Blending = Lime.Blending.Glow;
+				DrawTriangleFanHelper(texture1, texture2, vertices, numVertices);
+			} else {
+				DrawTriangleFanHelper(texture1, texture2, vertices, numVertices);
+			}
+		}
+
+		private static void DrawTriangleFanHelper(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
+		{
+			int baseVertex = DrawTrianglesHelper(texture1, texture2, vertices, numVertices);
 			for (int i = 1; i <= numVertices - 2; i++) {
 				batchIndices[currentIndex++] = (ushort)baseVertex;
 				batchIndices[currentIndex++] = (ushort)(baseVertex + i);
@@ -431,7 +458,19 @@ namespace Lime
 
 		public static void DrawTriangleStrip(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
 		{
-			int vertex = DrawTriangleFanHelper(texture1, texture2, vertices, numVertices);
+			if (blending == Lime.Blending.Glow) {
+				Blending = Lime.Blending.Default;
+				DrawTriangleStripHelper(texture1, texture2, vertices, numVertices);
+				Blending = Lime.Blending.Glow;
+				DrawTriangleStripHelper(texture1, texture2, vertices, numVertices);
+			} else {
+				DrawTriangleStripHelper(texture1, texture2, vertices, numVertices);
+			}
+		}
+
+		private static void DrawTriangleStripHelper(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
+		{
+			int vertex = DrawTrianglesHelper(texture1, texture2, vertices, numVertices);
 			for (int i = 0; i < numVertices - 2; i++) {
 				batchIndices[currentIndex++] = (ushort)vertex;
 				batchIndices[currentIndex++] = (ushort)(vertex + 1);
@@ -440,7 +479,7 @@ namespace Lime
 			}
 		}
 
-		private static int DrawTriangleFanHelper(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
+		private static int DrawTrianglesHelper(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
 		{
 			var transform = Transform1 * Transform2;
 			SetTexture(texture1, 0);
