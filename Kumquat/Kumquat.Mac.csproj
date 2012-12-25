@@ -76,6 +76,8 @@
     <Compile Include="Source\Router.cs" />
     <Compile Include="Source\Utils.cs" />
     <Compile Include="Source\Warehouse.cs" />
+    <Compile Include="Source\Goals.cs" />
+    <Compile Include="Source\Tag.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

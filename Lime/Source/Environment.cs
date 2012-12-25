@@ -53,8 +53,13 @@ namespace Lime
 
 		public static Vector2 GetDesktopSize()
 		{
+#if !iOS
 			var device = OpenTK.DisplayDevice.Default;
 			return new Vector2(device.Width, device.Height);
+#else
+			//Grisha: no time to explain. Will write iOS implementation forthis later.
+			return new Vector2(0, 0); 
+#endif
 		}
 
 
