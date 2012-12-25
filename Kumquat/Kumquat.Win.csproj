@@ -68,6 +68,7 @@
     <Compile Include="Source\CodeGenerator.cs" />
     <Compile Include="Source\Extension.cs" />
     <Compile Include="Source\Router.cs" />
+    <Compile Include="Source\Tag.cs" />
     <Compile Include="Source\Utils.cs" />
     <Compile Include="Source\Warehouse.cs" />
     <Compile Include="Source\Widgets\Area.cs" />
