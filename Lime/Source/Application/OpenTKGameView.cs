@@ -25,7 +25,7 @@ namespace Lime
 			this.Mouse.ButtonUp += HandleMouseButtonUp;
 			this.Mouse.Move += HandleMouseMove;
 
-            // Как узнать разрешение текущего экрана без Windows Forms?
+			// Как узнать разрешение текущего экрана без Windows Forms?
             Size screenSize = new Size(1280, 1024);
 
 			if (CheckMaximizedArg(args)) {
