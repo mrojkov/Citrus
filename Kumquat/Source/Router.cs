@@ -34,25 +34,25 @@ namespace Kumquat
 		#endregion
 
 		[ProtoMember(1)]
-		Dictionary<string, Vertex> Vertexes = new Dictionary<string, Vertex>();
+		Dictionary<string, Vertex> Vertices = new Dictionary<string, Vertex>();
 
 		public Router(Dictionary<string, Frame> locations)
 		{
 			foreach (var path in locations.Keys) {
 				var name = Path.GetFileNameWithoutExtension(path);
-				Vertexes.Add(name, new Vertex(name));
+				Vertices.Add(name, new Vertex(name));
 			}
 
 			foreach (var pair in locations) {
 				var name = Path.GetFileNameWithoutExtension(pair.Key);
 				var frame = pair.Value;
-				var vertex = Vertexes[name];
+				var vertex = Vertices[name];
 				foreach (var exitArea in frame.Descendants<ExitArea>()) {
 					var destination = exitArea.ExitTo;
-					if (Vertexes.Keys.Contains(destination)) {
-						vertex.Adjacencies.Add(Vertexes[destination]);
+					if (Vertices.Keys.Contains(destination)) {
+						vertex.Adjacencies.Add(Vertices[destination]);
 						if (Utils.IsCloseUp(destination)) {
-							Vertexes[destination].Adjacencies.Add(vertex);
+							Vertices[destination].Adjacencies.Add(vertex);
 						}
 					}
 
@@ -60,14 +60,13 @@ namespace Kumquat
 			}
 		}
 
-		private List<Vertex> WaveStep(IEnumerable<Vertex> vertexes)
+		private List<Vertex> WaveStep(IEnumerable<Vertex> vertices)
 		{
 			List<Vertex> result = new List<Vertex>();
-			foreach (var vertex in vertexes) {
+			foreach (var vertex in vertices) {
 				foreach (var v in vertex.Adjacencies) {
 					Console.WriteLine(v.Id + " " + v.Distance);
-
-					Console.WriteLine(Vertexes[v.Id].Distance);
+					Console.WriteLine(Vertices[v.Id].Distance);
 
 					if (v.Distance == -1) {
 						v.Distance = vertex.Distance + 1;
@@ -81,11 +80,11 @@ namespace Kumquat
 
 		public List<string> Route(string source, string destination)
 		{
-			foreach (var v in Vertexes.Values)
+			foreach (var v in Vertices.Values)
 				v.Distance = -1;
 
-			var srcVertex = Vertexes[source];
-			var dscVertex = Vertexes[destination];
+			var srcVertex = Vertices[source];
+			var dscVertex = Vertices[destination];
 
 			List<Vertex> list = new List<Vertex>() { srcVertex };
 			do {
