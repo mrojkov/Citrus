@@ -1,5 +1,4 @@
 ﻿using System;
-using Lime;
 using ProtoBuf;
 using System.IO;
 using System.Collections.Generic;
@@ -12,5 +11,7 @@ namespace Kumquat
 		[ProtoMember(1)]
 		public string ExitTo = "";
 
+		[ProtoMember(2)]
+		public string Caption = "";
 	}
 }

@@ -11,6 +11,5 @@ namespace Kumquat
 	{
 		[ProtoMember(1)]
 		public string Caption = "";
-
 	}
 }

@@ -73,6 +73,7 @@
     <Compile Include="Source\Utils.cs" />
     <Compile Include="Source\Warehouse.cs" />
     <Compile Include="Source\Widgets\Area.cs" />
+    <Compile Include="Source\Widgets\Clickable.cs" />
     <Compile Include="Source\Widgets\ExitArea.cs" />
     <Compile Include="Source\Widgets\Tool.cs" />
   </ItemGroup>

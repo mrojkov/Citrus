@@ -7,18 +7,10 @@ using System.Collections.Generic;
 namespace Kumquat
 {
 	[ProtoContract]
-	[ProtoInclude(100, typeof(ExitArea))]
-	[ProtoInclude(101, typeof(Tool))]
-	public class Area : Frame
+	public class Area : Clickable
 	{
 		[ProtoMember(1)]
-		public string CursorName = "";
-
-		[ProtoMember(2)]
 		public string Tool = "";
-
-		[ProtoMember(3)]
-		public bool Enabled = true;
 
 		public Area()
 		{
