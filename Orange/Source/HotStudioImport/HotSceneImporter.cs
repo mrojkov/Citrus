@@ -821,34 +821,18 @@ namespace Orange
 
 		#region KumquatParse
 
-		void ParseAreaProperty(Node node, string name)
+		void ParseClickableProperty(Node node, string name)
 		{
-			Area area = (Area)node;
+			Clickable clickable = (Clickable)node;
 			switch (name) {
-				case "CursorName":
-					area.CursorName = lexer.ParseQuotedString();
-					break;
-				case "Tool":
-					area.Tool = lexer.ParseQuotedString();
-					break;
 				case "Enable":
-					area.Enabled = lexer.ParseBool();
+					clickable.Enabled = lexer.ParseBool();
+					break;
+				case "CursorName":
+					clickable.CursorName = lexer.ParseQuotedString();
 					break;
 				default:
 					ParseSceneProperty(node, name);
-					break;
-			}
-		}
-
-		void ParseExitAreaProperty(Node node, string name)
-		{
-			ExitArea exitArea = (ExitArea)node;
-			switch (name) {
-				case "ExitTo":
-					exitArea.ExitTo = lexer.ParseQuotedString();
-					break;
-				default:
-					ParseAreaProperty(node, name);
 					break;
 			}
 		}
@@ -861,7 +845,36 @@ namespace Orange
 					tool.Caption = lexer.ParseQuotedString();
 					break;
 				default:
-					ParseAreaProperty(node, name);
+					ParseClickableProperty(node, name);
+					break;
+			}
+		}
+
+		void ParseAreaProperty(Node node, string name)
+		{
+			Area area = (Area)node;
+			switch (name) {
+				case "Tool":
+					area.Tool = lexer.ParseQuotedString();
+					break;
+				default:
+					ParseClickableProperty(node, name);
+					break;
+			}
+		}
+
+		void ParseExitAreaProperty(Node node, string name)
+		{
+			ExitArea exitArea = (ExitArea)node;
+			switch (name) {
+				case "ExitTo":
+					exitArea.ExitTo = lexer.ParseQuotedString();
+					break;
+				case "Caption":
+					exitArea.Caption = lexer.ParseQuotedString();
+					break;
+				default:
+					ParseClickableProperty(node, name);
 					break;
 			}
 		}
@@ -899,9 +912,10 @@ namespace Orange
 				new KnownActorType {ActorClass = "Hot::Edit", NodeClass = "Lime.TextBox, Lime", PropReader = ParseEditProperty},
 
 				// Kumquat:
-				new KnownActorType {ActorClass = "Area", NodeClass = "Kumquat.Area, Kumquat", PropReader = ParseAreaProperty},
-				new KnownActorType {ActorClass = "ExitArea", NodeClass = "Kumquat.ExitArea, Kumquat", PropReader = ParseExitAreaProperty},
+				new KnownActorType {ActorClass = "Clickable", NodeClass = "Kumquat.Clickable, Kumquat", PropReader = ParseClickableProperty},
 				new KnownActorType {ActorClass = "Tool", NodeClass = "Kumquat.Tool, Kumquat", PropReader = ParseToolProperty},
+				new KnownActorType {ActorClass = "Area", NodeClass = "Kumquat.Area, Kumquat", PropReader = ParseAreaProperty},
+				new KnownActorType {ActorClass = "ExitArea", NodeClass = "Kumquat.ExitArea, Kumquat", PropReader = ParseExitAreaProperty}
 			};
 		}
 	}
