@@ -78,6 +78,7 @@
     <Compile Include="Source\Warehouse.cs" />
     <Compile Include="Source\Goals.cs" />
     <Compile Include="Source\Tag.cs" />
+    <Compile Include="Source\Widgets\Clickable.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
