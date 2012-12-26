@@ -64,6 +64,9 @@ namespace Kumquat
 		{
 			List<Vertex> result = new List<Vertex>();
 			foreach (var vertex in vertexes) {
+
+				//Console.WriteLine(
+
 				foreach (var v in vertex.Adjacencies) {
 					if (v.Distance == -1) {
 						v.Distance = vertex.Distance + 1;
