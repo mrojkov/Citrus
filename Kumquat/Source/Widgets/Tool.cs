@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace Kumquat
 {
 	[ProtoContract]
-	public class Tool : Area
+	public class Tool : Clickable
 	{
 		[ProtoMember(1)]
 		public string Caption = "";

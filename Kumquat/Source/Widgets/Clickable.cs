@@ -8,9 +8,9 @@ using ProtoBuf;
 namespace Kumquat
 {
 	[ProtoContract]
-	[ProtoInclude(100, typeof(Tool))]
-	[ProtoInclude(101, typeof(Area))]
-	[ProtoInclude(102, typeof(ExitArea))]
+	[ProtoInclude(101, typeof(Tool))]
+	[ProtoInclude(102, typeof(Area))]
+	[ProtoInclude(103, typeof(ExitArea))]
 	public class Clickable : Frame
 	{
 		[ProtoMember(1)]

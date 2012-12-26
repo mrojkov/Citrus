@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace Kumquat
 {
 	[ProtoContract]
-	public class ExitArea : Area
+	public class ExitArea : Clickable
 	{
 		[ProtoMember(1)]
 		public string ExitTo = "";
