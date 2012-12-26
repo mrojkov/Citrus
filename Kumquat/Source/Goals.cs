@@ -17,7 +17,7 @@ namespace Kumquat
 			public Enum Goal;
 
 			[ProtoMember(2)]
-			public bool IsStrike = false;
+			public bool IsStrike;
 
 			public Record(Enum goal)
 			{

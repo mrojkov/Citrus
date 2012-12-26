@@ -10,7 +10,7 @@ namespace Kumquat
 	public class Area : Clickable
 	{
 		[ProtoMember(1)]
-		public string Tool = "";
+		public string Tool;
 
 		public Area()
 		{

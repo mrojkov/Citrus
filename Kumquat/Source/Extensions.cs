@@ -27,7 +27,7 @@ namespace Kumquat
 			Type type = value.GetType();
 			FieldInfo fieldInfo = type.GetField(value.ToString());
 			Tag[] attribs = fieldInfo.GetCustomAttributes(typeof(Tag), false) as Tag[];
-			return attribs.Length > 0 ? attribs[0].value : null; 
+			return attribs.Length > 0 ? attribs[0].Value : null; 
 		}
 
 	}

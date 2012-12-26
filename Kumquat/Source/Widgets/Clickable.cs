@@ -17,6 +17,6 @@ namespace Kumquat
 		public bool Enabled = true;
 
 		[ProtoMember(2)]
-		public string CursorName = "";
+		public string CursorName;
 	}
 }

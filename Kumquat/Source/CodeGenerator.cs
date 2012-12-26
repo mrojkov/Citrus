@@ -7,7 +7,6 @@ using Lime;
 
 namespace Kumquat
 {
-
 	public class CodeGenerator
 	{
 		private string Directory;
@@ -63,7 +62,6 @@ namespace Kumquat
 				AddFooter();
 				System.IO.File.WriteAllLines(generatedPath + "\\" + className + ".cs", lines);
 			}
-
 		}
 
 		private void AddLocationCollectionHeader()
@@ -120,7 +118,5 @@ namespace PROJECT_NAME.Locations
 			lines.Add("\t}");
 			lines.Add("}");
 		}
-
 	}
-
 }

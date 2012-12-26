@@ -9,9 +9,9 @@ namespace Kumquat
 	public class ExitArea : Clickable
 	{
 		[ProtoMember(1)]
-		public string ExitTo = "";
+		public string ExitTo;
 
 		[ProtoMember(2)]
-		public string Caption = "";
+		public string Caption;
 	}
 }

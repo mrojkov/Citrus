@@ -7,14 +7,14 @@ namespace Kumquat
 {
 	public class Tag : Attribute
 	{
-		public string value
+		public string Value
 		{
 			get; protected set;
 		}
 
 		public Tag(string value)
 		{
-			this.value = value;
+			this.Value = value;
 		}
 	}
 }

@@ -10,6 +10,6 @@ namespace Kumquat
 	public class Tool : Clickable
 	{
 		[ProtoMember(1)]
-		public string Caption = "";
+		public string Caption;
 	}
 }
