@@ -64,10 +64,11 @@ namespace Kumquat
 		{
 			List<Vertex> result = new List<Vertex>();
 			foreach (var vertex in vertexes) {
-
-				//Console.WriteLine(
-
 				foreach (var v in vertex.Adjacencies) {
+					Console.WriteLine(v.Id + " " + v.Distance);
+
+					Console.WriteLine(Vertexes[v.Id].Distance);
+
 					if (v.Distance == -1) {
 						v.Distance = vertex.Distance + 1;
 						v.Back = vertex;
@@ -85,7 +86,6 @@ namespace Kumquat
 
 			var srcVertex = Vertexes[source];
 			var dscVertex = Vertexes[destination];
-			srcVertex.Distance = 0;
 
 			List<Vertex> list = new List<Vertex>() { srcVertex };
 			do {
