@@ -52,12 +52,12 @@ namespace Kumquat
 				AddLocationHeader(className);
 				var line = "\t\tpublic Item @NAME { get { return Items[\"NAME\"]; } }";
 				HashSet<string> names = new HashSet<string>();
-				foreach (Area area in loc.Value.Descendants<Area>()) {
-					if (!names.Contains(area.Id)) {
-						names.Add(area.Id);
-						lines.Add(line.Replace("NAME", area.Id));
+				foreach (Clickable clickable in loc.Value.Descendants<Clickable>()) {
+					if (!names.Contains(clickable.Id)) {
+						names.Add(clickable.Id);
+						lines.Add(line.Replace("NAME", clickable.Id));
 					} else {
-						Console.WriteLine("WARNING: Duplicate '{0}' on '{1}'", area.Id, className);
+						Console.WriteLine("WARNING: Duplicate '{0}' on '{1}'", clickable.Id, className);
 					}
 				}
 				AddFooter();
