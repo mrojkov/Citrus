@@ -114,11 +114,6 @@ namespace Lime
 			AudioSystem.Terminate();
 		}
 
-		// Why several OnUpdateFrame() calls before OnRenderFrame()?
-		protected override void OnUpdateFrame(OpenTK.FrameEventArgs e)
-		{
-		}
-
 		private long prevTime = 0;
 
 		protected override void OnRenderFrame(OpenTK.FrameEventArgs e)

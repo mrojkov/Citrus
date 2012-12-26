@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Source\Application\Application.cs" />
     <Compile Include="Source\Application\Logger.cs" />
+    <Compile Include="Source\Application\WinCursors.cs" />
     <Compile Include="Source\Audio\OggDecoder.cs" />
     <Compile Include="Source\Audio\SampleCache.cs" />
     <Compile Include="Source\Audio\SerializableSample.cs" />

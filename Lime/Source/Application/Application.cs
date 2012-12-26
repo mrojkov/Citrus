@@ -156,5 +156,12 @@ namespace Lime
 		public virtual void OnRenderFrame() {}
 		public virtual void OnDeviceRotated() {}
 		public virtual DeviceOrientation GetSupportedDeviceOrientations() { return DeviceOrientation.LandscapeLeft; }
+
+		public void SetCursor(string name)
+		{
+#if WIN
+			WinCursors.SetCursor(name);
+#endif
+		}
 	}
 }
