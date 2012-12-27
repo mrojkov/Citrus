@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace Lime
 {
@@ -49,7 +50,7 @@ namespace Lime
 
 		public void WriteToStream(Stream stream)
 		{
-			using (var w = new StreamWriter(stream)) {
+			using (var w = new StreamWriter(stream, new UTF8Encoding(true))) {
 				foreach (KeyValuePair<int, string> p in strings) {
 					w.WriteLine(string.Format("[{0}]", p.Key));
 					w.WriteLine(p.Value);
