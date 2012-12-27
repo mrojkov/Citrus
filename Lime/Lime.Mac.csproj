@@ -131,6 +131,7 @@
     <Compile Include="Source\Application\Logger.cs" />
     <Compile Include="Source\Types\TangerineClassAttribute.cs" />
     <Compile Include="Source\Types\TangerinePropertyAttribute.cs" />
+    <Compile Include="Source\Application\WinCursors.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Audio\ADPCMEncoder.c">

@@ -53,11 +53,16 @@ namespace Lime
 
 		private static IntPtr GetWindowHandle()
 		{
+#if iOS || MAC
+			// Grisha: non-Windows implementation needed;
+			return (IntPtr)0;
+#elif
 			OpenTK.Platform.IWindowInfo ii = GameView.Instance.WindowInfo;
 			object inf = GameView.Instance.WindowInfo;
 			PropertyInfo pi = inf.GetType().GetProperty("WindowHandle");
 			IntPtr hwnd = (IntPtr)pi.GetValue(ii, null);
 			return hwnd;
+#endif
 		}
 	}
 }

@@ -72,13 +72,13 @@
     <Compile Include="Source\Widgets\ExitArea.cs" />
     <Compile Include="Source\Widgets\Tool.cs" />
     <Compile Include="Source\CodeGenerator.cs" />
-    <Compile Include="Source\Extension.cs" />
     <Compile Include="Source\Router.cs" />
     <Compile Include="Source\Utils.cs" />
     <Compile Include="Source\Warehouse.cs" />
     <Compile Include="Source\Goals.cs" />
     <Compile Include="Source\Tag.cs" />
     <Compile Include="Source\Widgets\Clickable.cs" />
+    <Compile Include="Source\Extensions.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

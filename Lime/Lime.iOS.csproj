@@ -138,4 +138,9 @@
   <ItemGroup>
     <Folder Include="Source\Kumquat\" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Source\Application\WinCursors.cs">
+      <Visible>False</Visible>
+    </None>
+  </ItemGroup>
 </Project>
