@@ -80,12 +80,14 @@ namespace Lime
 		void UpdatePressedState()
 		{
 			if (!HitTest(Input.MousePosition)) {
-				RunAnimationWithStopHandler("Release", () => SetNormalState());
+                RunReleaseAnimation();
+				//RunAnimationWithStopHandler("Release", () => SetNormalState());
 			} else if (Input.WasKeyReleased(Key.Mouse0)) {
 				if (Clicked != null) {
 						Clicked(this);
 				}
-				RunAnimationWithStopHandler("Release", () => SetNormalState());
+                RunReleaseAnimation();
+				//RunAnimationWithStopHandler("Release", () => SetNormalState());
 			}
 		}
 
@@ -130,19 +132,15 @@ namespace Lime
 
 		private void RunReleaseAnimation()
 		{
-			if (TryRunAnimation("Release")) {
-				AnimationStopped += () => {
-					if (HitTest(Input.MousePosition))
-						TryRunAnimation("Focus");
-					else
-						TryRunAnimation("Normal");
-				};
-			} else {
-				if (HitTest(Input.MousePosition))
-					TryRunAnimation("Focus");
-				else
-					TryRunAnimation("Normal");
-			}
+            RunAnimationWithStopHandler(
+                "Release", 
+                () => {
+                    if (HitTest(Input.MousePosition))
+                        SetFocusedState();
+                    else
+                        SetNormalState();
+                }
+            );
 		}
 
 		public override void Update(int delta)
