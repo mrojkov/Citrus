@@ -42,8 +42,13 @@ namespace Lime
 			AppDomain.CurrentDomain.UnhandledException += (sender, e) => {
 				Console.WriteLine(e.ExceptionObject.ToString());
 #if WIN
+				var title = "The application";
+				if (GameView.Instance != null) {
+					GameView.Instance.FullScreen = false;
+					title = GameView.Instance.Title;
+				}
 				WinApi.MessageBox(IntPtr.Zero, e.ExceptionObject.ToString(), 
-					string.Format("{0} has terminated with error", GameView.Instance.Title), 0);
+					string.Format("{0} has terminated with an error", title), 0);
 #endif
 			};
 		}
