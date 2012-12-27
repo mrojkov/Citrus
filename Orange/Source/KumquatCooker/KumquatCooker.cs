@@ -23,6 +23,9 @@ namespace Orange
 
 		public void Cook()
 		{
+			if (Lime.World.Instance == null) {
+				new Lime.World();
+			}
 			string bundlePath = Path.ChangeExtension(project.AssetsDirectory, Helpers.GetTargetPlatformString(platform));
 			assetsBundle.Open(bundlePath, Lime.AssetBundleFlags.Writable);
 			try {
@@ -36,8 +39,10 @@ namespace Orange
 		{
 			LocDict locations = new LocDict();
 			var locationPaths = GetLocationPaths();
-			foreach (var path in locationPaths)
+			foreach (var path in locationPaths) {
+				Console.WriteLine(path);
 				locations.Add(path, new Lime.Frame(path));
+			}
 
 			if (locations.Count > 0) {
 				Lime.Serialization.WriteObjectToBundle<Router>(assetsBundle, "Router", new Router(locations));
