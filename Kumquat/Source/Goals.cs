@@ -14,14 +14,14 @@ namespace Kumquat
 		public class Record
 		{
 			[ProtoMember(1)]
-			public Enum Goal;
+			public int Goal;
 
 			[ProtoMember(2)]
 			public bool IsStrike;
 
 			public Record(Enum goal)
 			{
-				Goal = goal;
+                Goal = Convert.ToInt32(goal);
 			}
 		}
 
@@ -35,8 +35,9 @@ namespace Kumquat
 
 		public void Strike(Enum goal)
 		{
-			foreach (var record in Records)
-				if (record.Goal == goal)
+            int value = Convert.ToInt32(goal);
+            foreach (var record in Records)
+                if (record.Goal == value)
 					record.IsStrike = true;
 		}
 	}
