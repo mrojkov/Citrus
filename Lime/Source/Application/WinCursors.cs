@@ -31,7 +31,10 @@ namespace Lime
 			public static extern IntPtr CreateIconIndirect(ref IconInfo icon);
 
 			[DllImport("user32.dll")]
-			internal static extern int SetClassLong(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+			public static extern int SetClassLong(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+			
+			[DllImport("user32.dll")]
+			public static extern void SetCursor(IntPtr dwCursor);
 		}
 
 		static Dictionary<string, IntPtr> CursorMap = new Dictionary<string, IntPtr>();
@@ -41,6 +44,7 @@ namespace Lime
 		{
 			currentCursor = GetCursor(resourceName);
 			WinApi.SetClassLong(GetWindowHandle(), WinApi.GCL_HCURSOR, currentCursor);
+			WinApi.SetCursor(currentCursor);
 		}
 
 		private static IntPtr GetCursor(string resourceName)
