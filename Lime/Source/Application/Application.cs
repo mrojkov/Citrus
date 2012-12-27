@@ -1,4 +1,5 @@
 using System;
+
 #if iOS
 using MonoTouch.UIKit;
 #elif MAC
@@ -33,6 +34,18 @@ namespace Lime
 			// Use '.' as decimal separator.
 			var culture = System.Globalization.CultureInfo.InvariantCulture;
 			System.Threading.Thread.CurrentThread.CurrentCulture = culture;
+			SetGlobalExceptionHandler();
+		}
+
+		private void SetGlobalExceptionHandler()
+		{
+			AppDomain.CurrentDomain.UnhandledException += (sender, e) => {
+				Console.WriteLine(e.ExceptionObject.ToString());
+#if WIN
+				WinApi.MessageBox(IntPtr.Zero, e.ExceptionObject.ToString(), 
+					string.Format("{0} has terminated with error", GameView.Instance.Title), 0);
+#endif
+			};
 		}
 
 		public string[] GetCommandLineArgs()
