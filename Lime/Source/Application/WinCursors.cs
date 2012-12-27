@@ -37,7 +37,7 @@ namespace Lime
 			var file = entryAssembly.GetManifestResourceStream(fullResourceName);
 			Bitmap bitmap = new Bitmap(file);
 			if (bitmap.Width > 32 || bitmap.Height > 32) {
-				throw new Lime.Exception("A cursor size can not exceeds 32x32 pixels");
+				throw new Lime.Exception("A cursor can not exceeds 32x32 pixels (Windows XP compatibility)");
 			}
 			return bitmap;
 		}
