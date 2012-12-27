@@ -16,11 +16,13 @@ namespace Kumquat
 		[ProtoContract(SkipConstructor = true)]
 		private class Vertex
 		{
+            public int Index;
+
 			[ProtoMember(1)]
 			public string Id;
 
-			[ProtoMember(2, AsReference = true)]
-			public List<Vertex> Adjacencies = new List<Vertex>();
+			[ProtoMember(2)]
+            public List<string> Adjacencies = new List<string>();
 
 			public int Distance = -1;
 			public Vertex Back = null;
@@ -34,8 +36,8 @@ namespace Kumquat
 		#endregion
 
 		[ProtoMember(1)]
-		Dictionary<string, Vertex> Vertices = new Dictionary<string, Vertex>();
-
+        Dictionary<string, Vertex> Vertices = new Dictionary<string, Vertex>();
+        
 		public Router(Dictionary<string, Frame> locations)
 		{
 			foreach (var path in locations.Keys) {
@@ -50,9 +52,9 @@ namespace Kumquat
 				foreach (var exitArea in frame.Descendants<ExitArea>()) {
 					var destination = exitArea.ExitTo;
 					if (Vertices.Keys.Contains(destination)) {
-						vertex.Adjacencies.Add(Vertices[destination]);
+                        vertex.Adjacencies.Add(destination);
 						if (Utils.IsCloseUp(destination)) {
-							Vertices[destination].Adjacencies.Add(vertex);
+							Vertices[destination].Adjacencies.Add(vertex.Id);
 						}
 					}
 
@@ -64,11 +66,9 @@ namespace Kumquat
 		{
 			List<Vertex> result = new List<Vertex>();
 			foreach (var vertex in vertices) {
-				foreach (var v in vertex.Adjacencies) {
-					Console.WriteLine(v.Id + " " + v.Distance);
-					Console.WriteLine(Vertices[v.Id].Distance);
-
-					if (v.Distance == -1) {
+				foreach (var name in vertex.Adjacencies) {
+                    var v = Vertices[name];
+                    if (v.Distance == -1) {
 						v.Distance = vertex.Distance + 1;
 						v.Back = vertex;
 						result.Add(v);
