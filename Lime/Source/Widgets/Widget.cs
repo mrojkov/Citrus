@@ -255,7 +255,7 @@ namespace Lime
 			}
 		}
 
-		private void ApplyAnchors()
+		public void ApplyAnchors()
 		{
 			Vector2 s = Parent.Widget.Size;
 			if (parentSize.HasValue && !parentSize.Value.Equals(s)) {
