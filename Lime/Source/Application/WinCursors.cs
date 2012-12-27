@@ -11,21 +11,21 @@ namespace Lime
 		static Dictionary<string, IntPtr> CursorMap = new Dictionary<string, IntPtr>();
 		static IntPtr currentCursor;
 
-		public static void SetCursor(string resourceName)
+		public static void SetCursor(string resourceName, IntVector2 hotSpot)
 		{
-			currentCursor = GetCursor(resourceName);
+			currentCursor = GetCursor(resourceName, hotSpot);
 			WinApi.SetClassLong(GetWindowHandle(), WinApi.GCL_HCURSOR, currentCursor);
 			WinApi.SetCursor(currentCursor);
 		}
 
-		private static IntPtr GetCursor(string resourceName)
+		private static IntPtr GetCursor(string resourceName, IntVector2 hotSpot)
 		{
 			IntPtr cursor;
 			if (CursorMap.TryGetValue(resourceName, out cursor)) {
 				return cursor;
 			}
 			Bitmap bitmap = CreateBitmapFromResource(resourceName);
-			cursor = CreateCursor(bitmap, bitmap.Width / 2, bitmap.Height / 2);
+			cursor = CreateCursor(bitmap, hotSpot);
 			CursorMap[resourceName] = cursor;
 			return cursor;
 		}
@@ -36,16 +36,19 @@ namespace Lime
 			var fullResourceName = entryAssembly.GetName().Name + "." + resourceName;
 			var file = entryAssembly.GetManifestResourceStream(fullResourceName);
 			Bitmap bitmap = new Bitmap(file);
+			if (bitmap.Width > 32 || bitmap.Height > 32) {
+				throw new Lime.Exception("A cursor size can not exceeds 32x32 pixels");
+			}
 			return bitmap;
 		}
 
-		private static IntPtr CreateCursor(Bitmap bmp, int xHotSpot, int yHotSpot)
+		private static IntPtr CreateCursor(Bitmap bmp, IntVector2 hotSpot)
 		{
 			IntPtr ptr = bmp.GetHicon();
 			WinApi.IconInfo tmp = new WinApi.IconInfo();
 			WinApi.GetIconInfo(ptr, ref tmp);
-			tmp.xHotspot = xHotSpot;
-			tmp.yHotspot = yHotSpot;
+			tmp.xHotspot = hotSpot.X;
+			tmp.yHotspot = hotSpot.Y;
 			tmp.fIcon = false;
 			ptr = WinApi.CreateIconIndirect(ref tmp);
 			return ptr;
@@ -53,16 +56,11 @@ namespace Lime
 
 		private static IntPtr GetWindowHandle()
 		{
-#if iOS || MAC
-			// Grisha: non-Windows implementation needed;
-			return (IntPtr)0;
-#else
-			OpenTK.Platform.IWindowInfo ii = GameView.Instance.WindowInfo;
+			OpenTK.Platform.IWindowInfo wi = GameView.Instance.WindowInfo;
 			object inf = GameView.Instance.WindowInfo;
 			PropertyInfo pi = inf.GetType().GetProperty("WindowHandle");
-			IntPtr hwnd = (IntPtr)pi.GetValue(ii, null);
+			IntPtr hwnd = (IntPtr)pi.GetValue(wi, null);
 			return hwnd;
-#endif
 		}
 	}
 }

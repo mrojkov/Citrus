@@ -175,10 +175,10 @@ namespace Lime
 		public virtual void OnDeviceRotated() {}
 		public virtual DeviceOrientation GetSupportedDeviceOrientations() { return DeviceOrientation.LandscapeLeft; }
 
-		public void SetCursor(string name)
+		public void SetCursor(string name, IntVector2 hotSpot)
 		{
 #if WIN
-			WinCursors.SetCursor(name);
+			WinCursors.SetCursor(name, hotSpot);
 #endif
 		}
 	}
