@@ -42,7 +42,7 @@ namespace Lime
 			ABGR = abgr;
 		}
 
-		public Color4(byte r, byte g, byte b, byte a)
+		public Color4(byte r, byte g, byte b, byte a = 255)
 		{
 			ABGR = 0;
 			R = r;
