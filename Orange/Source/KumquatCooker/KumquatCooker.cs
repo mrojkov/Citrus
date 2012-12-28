@@ -39,11 +39,8 @@ namespace Orange
 		{
 			LocDict locations = new LocDict();
 			var locationPaths = GetLocationPaths();
-			foreach (var path in locationPaths) {
-				Console.WriteLine(path);
+			foreach(var path in locationPaths)
 				locations.Add(path, new Lime.Frame(path));
-			}
-
 			if (locations.Count > 0) {
 				Lime.Serialization.WriteObjectToBundle<Router>(assetsBundle, "Router", new Router(locations));
 				Lime.Serialization.WriteObjectToBundle<Warehouse>(assetsBundle, "Warehouse", new Warehouse(locations));
