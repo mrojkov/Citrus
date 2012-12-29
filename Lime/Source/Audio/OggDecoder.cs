@@ -131,7 +131,7 @@ namespace Lime
 #if iOS
 		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.Api.SeekCallback))]
 #endif
-		public static int OggSeek(int handle,long offset,SeekOrigin whence)
+		public static int OggSeek(int handle, long offset,SeekOrigin whence)
 		{
 			var stream = streamMap[handle];
 			return (int)stream.Seek(offset, whence);

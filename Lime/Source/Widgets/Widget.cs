@@ -37,6 +37,7 @@ namespace Lime
 	[ProtoInclude(109, typeof(Slider))]
 	[ProtoInclude(110, typeof(RichText))]
 	[ProtoInclude(111, typeof(TextBox))]
+	[ProtoInclude(112, typeof(Video))]
 	[TangerineClass]
 	public partial class Widget : Node
 	{

@@ -32,10 +32,16 @@ namespace Lime
 	[TangerineClass]
 	public class Frame : Widget, IImageCombinerArg
 	{
-		RenderTarget renderTarget;
-		ITexture renderTexture;
+		public float AnimationSpeed = 1;
+
+		// In dialog mode frame acts like a modal dialog, all controls behind the dialog are frozen.
+		// If dialog is being shown or hidden then all controls on dialog are frozen either.
+		public bool DialogMode;
 
 		public BareEventHandler Rendered;
+
+		RenderTarget renderTarget;
+		ITexture renderTexture;
 
 		[ProtoMember(1)]
 		public RenderTarget RenderTarget {
@@ -43,31 +49,9 @@ namespace Lime
 			set {
 				renderTarget = value;
 				renderedToTexture = value != RenderTarget.None;
-				switch(value) {
-				case RenderTarget.A:
-					renderTexture = new SerializableTexture("#a");
-					break;
-				case RenderTarget.B:
-					renderTexture = new SerializableTexture("#b");
-					break;
-				case RenderTarget.C:
-					renderTexture = new SerializableTexture("#c");
-					break;
-				case RenderTarget.D:
-					renderTexture = new SerializableTexture("#d");
-					break;
-				default:
-					renderTexture = null;
-					break;
-				}
+				renderTexture = CreateRenderTargetTexture(value);
 			}
 		}
-
-		public float AnimationSpeed = 1;
-
-		// In dialog mode frame acts like a modal dialog, all controls behind the dialog are frozen.
-		// If dialog is being shown or hidden then all controls on dialog are frozen either.
-		public bool DialogMode;
 
 		public Frame() {}
 
@@ -137,10 +121,10 @@ namespace Lime
 		{
 			if (AnimationSpeed != 1) {
 				delta = MultiplyDeltaByAnimationSpeed(delta);
-			}
-			while (delta > MaxTimeDelta) {
-				UpdateHelper(MaxTimeDelta);
-				delta -= MaxTimeDelta;
+				while (delta > MaxTimeDelta) {
+					UpdateHelper(MaxTimeDelta);
+					delta -= MaxTimeDelta;
+				}
 			}
 			UpdateHelper(delta);
 		}
@@ -283,6 +267,22 @@ namespace Lime
 				parent.Nodes.Insert(0, frame);
 			}
 			return frame;
+		}
+
+		private ITexture CreateRenderTargetTexture(RenderTarget value)
+		{
+			switch (value) {
+				case RenderTarget.A:
+					return new SerializableTexture("#a");
+				case RenderTarget.B:
+					return new SerializableTexture("#b");
+				case RenderTarget.C:
+					return new SerializableTexture("#c");
+				case RenderTarget.D:
+					return new SerializableTexture("#d");
+				default:
+					return null;
+			}
 		}
 	}
 }

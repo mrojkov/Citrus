@@ -19,8 +19,8 @@ namespace Lime
 	public class PlainTexture : ITexture
 	{
 		uint id;
-		Size imgSize;
-		Size surSize;
+		public Size ImageSize { get; protected set; }
+		public Size SurfaceSize { get; protected set; }
 		Rectangle uvRect;
 
 		public static List<uint> TexturesToDelete = new List<uint>();
@@ -36,16 +36,6 @@ namespace Lime
 					Renderer.CheckErrors();
 				}
 			}
-		}
-
-		public Size ImageSize
-		{
-			get { return imgSize; }
-		}
-
-		public Size SurfaceSize
-		{
-			get { return surSize; }
 		}
 
 		public string SerializationPath {
@@ -221,7 +211,7 @@ namespace Lime
 				throw new Lime.Exception("Only compressed DDS textures are supported");
 			}
 
-			surSize = imgSize = new Size(width, height);
+			SurfaceSize = ImageSize = new Size(width, height);
 			mipMapCount = 1;
 			for (int i = 0; i < mipMapCount; i++) {
 				if (width < 8 || height < 8) {
@@ -294,12 +284,17 @@ namespace Lime
 		public void LoadImage(Color4[] pixels, int width, int height, bool generateMips)
 		{
 			// Discards current texture.
-			Dispose();
-			DeleteScheduledTextures();
+			if (width != ImageSize.Width || height != ImageSize.Height) {
+				Dispose();
+				DeleteScheduledTextures();
+				// Generate a new texture id.
 #if GLES11
-			// Generate a new texture.
-			GL.GenTextures(1, ref id);
-			
+				GL.GenTextures(1, ref id);
+#else
+				id = (uint)GL.GenTexture();
+#endif
+			}
+#if GLES11
 			Renderer.SetTexture(id, 0);
 			GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)All.Linear);
 			GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
@@ -309,8 +304,6 @@ namespace Lime
 			GL.TexImage2D(All.Texture2D, 0, (int)All.Rgba, width, height, 0,
 				All.Rgba, All.UnsignedByte, pixels);
 #else
-			// Generate a new texture.
-			id = (uint)GL.GenTexture();
 			Renderer.SetTexture(id, 0);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
@@ -329,8 +322,8 @@ namespace Lime
 #endif
 			Renderer.CheckErrors();
 
-			imgSize = new Size(width, height);
-			surSize = imgSize;
+			ImageSize = new Size(width, height);
+			SurfaceSize = ImageSize;
 			uvRect = new Rectangle(0, 0, 1, 1);
 		}
 

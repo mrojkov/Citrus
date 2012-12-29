@@ -112,6 +112,10 @@ namespace Orange
 							return true;
 						}
 					});
+					SyncUpdated(".ogv", ".ogv", (srcPath, dstPath) => {
+						assetsBundle.ImportFile(srcPath, dstPath, 0);
+						return true;
+					});
 				}
 			} finally {
 				assetsBundle.Close();
