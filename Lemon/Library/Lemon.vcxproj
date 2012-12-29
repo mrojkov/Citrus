@@ -11,14 +11,47 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Lemon.c" />
+    <ClCompile Include="Source\OggDecoder.c" />
     <ClCompile Include="Source\Ogg\bitwise.c" />
     <ClCompile Include="Source\Ogg\framing.c" />
+    <ClCompile Include="Source\OgvDecoder.c" />
+    <ClCompile Include="Source\TheoraDecoder.c" />
+    <ClCompile Include="Source\Theora\apiwrapper.c" />
+    <ClCompile Include="Source\Theora\bitpack.c" />
+    <ClCompile Include="Source\Theora\collect.c" />
+    <ClCompile Include="Source\Theora\decapiwrapper.c" />
+    <ClCompile Include="Source\Theora\decinfo.c" />
+    <ClCompile Include="Source\Theora\decode.c" />
+    <ClCompile Include="Source\Theora\dequant.c" />
+    <ClCompile Include="Source\Theora\encfrag.c" />
+    <ClCompile Include="Source\Theora\encinfo.c" />
+    <ClCompile Include="Source\Theora\encoder_disabled.c" />
+    <ClCompile Include="Source\Theora\enquant.c" />
+    <ClCompile Include="Source\Theora\fdct.c" />
+    <ClCompile Include="Source\Theora\fragment.c" />
+    <ClCompile Include="Source\Theora\huffdec.c" />
+    <ClCompile Include="Source\Theora\huffenc.c" />
+    <ClCompile Include="Source\Theora\idct.c" />
+    <ClCompile Include="Source\Theora\info.c" />
+    <ClCompile Include="Source\Theora\internal.c" />
+    <ClCompile Include="Source\Theora\mathops.c" />
+    <ClCompile Include="Source\Theora\mcenc.c" />
+    <ClCompile Include="Source\Theora\quant.c" />
+    <ClCompile Include="Source\Theora\rate.c" />
+    <ClCompile Include="Source\Theora\state.c" />
+    <ClCompile Include="Source\Theora\tokenize.c" />
+    <ClCompile Include="Source\Theora\x86_vc\mmxencfrag.c" />
+    <ClCompile Include="Source\Theora\x86_vc\mmxfdct.c" />
+    <ClCompile Include="Source\Theora\x86_vc\mmxfrag.c" />
+    <ClCompile Include="Source\Theora\x86_vc\mmxidct.c" />
+    <ClCompile Include="Source\Theora\x86_vc\mmxstate.c" />
+    <ClCompile Include="Source\Theora\x86_vc\x86cpu.c" />
+    <ClCompile Include="Source\Theora\x86_vc\x86state.c" />
     <ClCompile Include="Source\Tremor\block.c" />
     <ClCompile Include="Source\Tremor\codebook.c" />
     <ClCompile Include="Source\Tremor\floor0.c" />
     <ClCompile Include="Source\Tremor\floor1.c" />
-    <ClCompile Include="Source\Tremor\info.c" />
+    <ClCompile Include="Source\Tremor\vorbis_info.c" />
     <ClCompile Include="Source\Tremor\mapping0.c" />
     <ClCompile Include="Source\Tremor\mdct.c" />
     <ClCompile Include="Source\Tremor\registry.c" />
@@ -27,8 +60,36 @@
     <ClCompile Include="Source\Tremor\synthesis.c" />
     <ClCompile Include="Source\Tremor\vorbisfile.c" />
     <ClCompile Include="Source\Tremor\window.c" />
+    <ClCompile Include="Source\VUV2RGB.c" />
+    <ClCompile Include="Source\yuv2rgb\yuv2rgb16tab.c" />
+    <ClCompile Include="Source\yuv2rgb\yuv422rgb8888c.c" />
+    <ClCompile Include="Source\yuv2rgb\yuv422rgb888c.c" />
+    <ClCompile Include="Source\yuv2rgb\yuv444rgb8888c.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Lemon.h" />
+    <ClInclude Include="Source\TheoraDecoder.h" />
+    <ClInclude Include="Source\Theora\apiwrapper.h" />
+    <ClInclude Include="Source\Theora\bitpack.h" />
+    <ClInclude Include="Source\Theora\collect.h" />
+    <ClInclude Include="Source\Theora\dct.h" />
+    <ClInclude Include="Source\Theora\decint.h" />
+    <ClInclude Include="Source\Theora\dequant.h" />
+    <ClInclude Include="Source\Theora\encint.h" />
+    <ClInclude Include="Source\Theora\enquant.h" />
+    <ClInclude Include="Source\Theora\huffdec.h" />
+    <ClInclude Include="Source\Theora\huffenc.h" />
+    <ClInclude Include="Source\Theora\huffman.h" />
+    <ClInclude Include="Source\Theora\internal.h" />
+    <ClInclude Include="Source\Theora\mathops.h" />
+    <ClInclude Include="Source\Theora\modedec.h" />
+    <ClInclude Include="Source\Theora\ocintrin.h" />
+    <ClInclude Include="Source\Theora\quant.h" />
+    <ClInclude Include="Source\Theora\state.h" />
+    <ClInclude Include="Source\Theora\x86_vc\mmxloop.h" />
+    <ClInclude Include="Source\Theora\x86_vc\x86cpu.h" />
+    <ClInclude Include="Source\Theora\x86_vc\x86int.h" />
+    <ClInclude Include="Source\Theora\x86_vc\x86zigzag.h" />
     <ClInclude Include="Source\Tremor\asm_arm.h" />
     <ClInclude Include="Source\Tremor\backends.h" />
     <ClInclude Include="Source\Tremor\block.h" />
@@ -45,6 +106,7 @@
     <ClInclude Include="Source\Tremor\registry.h" />
     <ClInclude Include="Source\Tremor\window.h" />
     <ClInclude Include="Source\Tremor\window_lookup.h" />
+    <ClInclude Include="Source\yuv2rgb\yuv2rgb.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1C0DA1F3-EAA1-45FE-A547-FBF7F51F54A3}</ProjectGuid>
@@ -53,17 +115,17 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v110</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -92,7 +154,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level2</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;LEMON_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;OC_X86_ASM;_USRDLL;LEMON_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <AdditionalIncludeDirectories>Source/Include</AdditionalIncludeDirectories>
       <CallingConvention>Cdecl</CallingConvention>
@@ -112,7 +174,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;LEMON_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;OC_X86_ASM;_USRDLL;LEMON_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalIncludeDirectories>Source/Include</AdditionalIncludeDirectories>
       <CallingConvention>Cdecl</CallingConvention>

@@ -36,6 +36,7 @@ namespace Lemon
 			public TellCallback TellFunc;
 		}
 		
+		// OGG\Vorbis  
 		[DllImport(Dll, CallingConvention = CallingConvention.Cdecl)]
 		public static extern IntPtr OggCreate();
 		
@@ -56,6 +57,44 @@ namespace Lemon
 		
 		[DllImport(Dll, CallingConvention = CallingConvention.Cdecl)]
 		public static extern int OggGetChannels(IntPtr vorbisFile);
+
+		// Theora
+		[StructLayout(LayoutKind.Sequential)]
+		public struct TheoraImagePlane
+		{
+			public int Width;
+			public int Height;
+			public int Stride;
+			public IntPtr Data;
+		}
+
+		[DllImport(Dll, CallingConvention = CallingConvention.Cdecl)]
+		public static extern IntPtr OgvCreate(int datasource, FileSystem callbacks);
+
+		[DllImport(Dll, CallingConvention = CallingConvention.Cdecl)]
+		public static extern IntPtr OgvDispose(IntPtr ogv, int datasource, FileSystem callbacks);
+
+		[DllImport(Dll, CallingConvention = CallingConvention.Cdecl)]
+		public static extern TheoraImagePlane OgvGetBuffer(IntPtr ogv, int plane);
+
+		[DllImport(Dll, CallingConvention = CallingConvention.Cdecl)]
+		public static extern int OgvDecodeFrame(IntPtr ogv);
+
+		[DllImport(Dll, CallingConvention = CallingConvention.Cdecl)]
+		public static extern int OgvGetVideoWidth(IntPtr ogv);
+
+		[DllImport(Dll, CallingConvention = CallingConvention.Cdecl)]
+		public static extern int OgvGetVideoHeight(IntPtr ogv);
+
+		[DllImport(Dll, CallingConvention = CallingConvention.Cdecl)]
+		public static extern double OgvGetPlaybackTime(IntPtr ogv);
+
+		[DllImport(Dll, CallingConvention = CallingConvention.Cdecl)]
+		// public static extern void DecodeRGBX8(IntPtr dst_ptr, IntPtr y_ptr, IntPtr u_ptr, IntPtr v_ptr, int width, int height, int y_span, int uv_span, int dst_span, int dither);
+		public static extern void DecodeRGBX(IntPtr yData, IntPtr uData, IntPtr vData,
+			int yWidth, int yHeight, int yStride,
+			int uvWidth, int uvHeight, int uvStride,
+			IntPtr destRgbx, int destStride);
 	}
 }
 
