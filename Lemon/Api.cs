@@ -72,7 +72,7 @@ namespace Lemon
 		public static extern IntPtr OgvCreate(int datasource, FileSystem callbacks);
 
 		[DllImport(Dll, CallingConvention = CallingConvention.Cdecl)]
-		public static extern IntPtr OgvDispose(IntPtr ogv, int datasource, FileSystem callbacks);
+		public static extern IntPtr OgvDispose(IntPtr ogv);
 
 		[DllImport(Dll, CallingConvention = CallingConvention.Cdecl)]
 		public static extern TheoraImagePlane OgvGetBuffer(IntPtr ogv, int plane);

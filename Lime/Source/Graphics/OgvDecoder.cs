@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Lime
 {
-	public class OgvDecoder
+	public class OgvDecoder : IDisposable
 	{
 		Stream stream;
 		int streamHandle;
@@ -33,11 +33,14 @@ namespace Lime
 				Lemon.Api.OgvGetVideoHeight(ogvHandle));
 		}
 
-		public void DecodeFrame()
+		public void Dispose()
 		{
-			if (Lemon.Api.OgvDecodeFrame(ogvHandle) < 0) {
-				throw new Lime.Exception("DecodeFrame() failed");
-			}
+			Lemon.Api.OgvDispose(ogvHandle);
+		}
+
+		public bool DecodeFrame()
+		{
+			return Lemon.Api.OgvDecodeFrame(ogvHandle) == 0;
 		}
 
 		public double GetPlaybackTime()

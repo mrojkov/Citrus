@@ -38,14 +38,15 @@ void InitTables()
 	}
 }
 	
-LEMON_API void DecodeRGBX(char* yData, char* uData, char* vData, 
+LEMON_API void DecodeRGBX(unsigned char* yData, 
+	unsigned char* uData, unsigned char* vData, 
 	int yWidth, int yHeight, int yStride,
 	int uvWidth, int uvHeight, int uvStride,
 	unsigned int* rgbx, int stride)
 {
-	char cu, cv;
-	int x, y, rV, gUV, bU, Y;
-	char* ySrc, *uSrc, *vSrc;
+	unsigned char cu, cv;
+	unsigned int x, y, rV, gUV, bU, Y;
+	unsigned char* ySrc, *uSrc, *vSrc;
 	unsigned int* dst1, *dst2;
 	
 	ySrc = yData;
