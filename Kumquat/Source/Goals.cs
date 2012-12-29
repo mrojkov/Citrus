@@ -10,7 +10,7 @@ namespace Kumquat
 	[ProtoContract]
 	public class Goals
 	{
-		[ProtoContract]
+		[ProtoContract(SkipConstructor = true)]
 		public class Record
 		{
 			[ProtoMember(1)]
