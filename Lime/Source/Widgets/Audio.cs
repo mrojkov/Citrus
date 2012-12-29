@@ -78,7 +78,7 @@ namespace Lime
 			Priority = 0.5f;
 		}
 
-		void Play()
+		public void Play()
 		{
 			sound = Sample.Play(Group, true, Looping, Priority);
 			sound.Volume = Volume;
@@ -87,7 +87,7 @@ namespace Lime
 			sound.Resume();
 		}
 
-		void Stop()
+		public void Stop()
 		{
 			sound.Stop();
 		}
