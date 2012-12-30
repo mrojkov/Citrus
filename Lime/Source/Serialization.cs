@@ -31,7 +31,7 @@ namespace Lime
 			// Add ITexture type here due a bug in ProtoBuf-Net
 			model.Add(typeof(ITexture), true);
 #if !iOS
-			// model.CompileInPlace();
+			model.CompileInPlace();
 #endif
 			return model;
 		}
