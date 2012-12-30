@@ -55,9 +55,10 @@ namespace Lime
 			var vPlane = Lemon.Api.OgvGetBuffer(ogvHandle, 2);
 			unsafe {
 				fixed (Color4* p = &pixels[0]) {
-					Lemon.Api.DecodeRGBX(yPlane.Data, 
-						uPlane.Data, vPlane.Data, yPlane.Width, yPlane.Height, 
-						yPlane.Stride, uPlane.Width, uPlane.Height, uPlane.Stride, (IntPtr)p, width * 4);
+					Lemon.Api.DecodeRGBX8((IntPtr)p, 
+						yPlane.Data, uPlane.Data, vPlane.Data,
+						yPlane.Width, yPlane.Height, yPlane.Stride, uPlane.Stride,
+						width * 4, 0);
 				}
 			}
 		}

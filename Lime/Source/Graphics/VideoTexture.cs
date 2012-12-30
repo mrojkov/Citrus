@@ -47,7 +47,7 @@ namespace Lime
 						rgbDecoder.DecodeFrame();
 					} else {
 						Stopped = true;
-						break;
+						return;
 					}
 				}
 				if (alphaDecoder != null) {
