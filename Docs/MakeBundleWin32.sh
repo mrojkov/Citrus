@@ -2,8 +2,9 @@
 # If this doesn't work, ensure you have UNIX line endings in this file
 # (\n, not \r\n.) You can use Notepad++ to switch them.
 
-export GAME=Kill3
+export GAME=RoyalCandy
 export OUTPUT_DIR=Output
+export ASSEMBLIES="$GAME.Game Lime LemonBinding Kumquat OpenTK protobuf-net"
 
 # Cygwin package requirements: gcc-mingw, pkg-config
 # If you want to pass -z to mkbundle: mingw-zlib1, mingw-zlib-devel
@@ -20,10 +21,11 @@ export PKG_CONFIG_PATH=$MONO/lib/pkgconfig
 export CC="i686-pc-mingw32-gcc -U _WIN32"
 
 mkdir ./$OUTPUT_DIR
-$MONO/bin/mkbundle $GAME.exe OpenTK $GAME.Game Lime LemonBinding protobuf-net --deps -o $OUTPUT_DIR/$GAME.exe
+$MONO/bin/mkbundle $GAME.exe $ASSEMBLIES --deps -o $OUTPUT_DIR/$GAME.exe
 
 # Copy mono-2.0.dll here since Output.exe depends on it.
 cp $MONO/bin/mono-2.0.dll ./$OUTPUT_DIR
 cp ./wrap_oal.dll ./$OUTPUT_DIR
 cp ./OpenAL32.dll ./$OUTPUT_DIR
 cp ./Data.Desktop ./$OUTPUT_DIR
+cp ./Lemon.dll ./$OUTPUT_DIR

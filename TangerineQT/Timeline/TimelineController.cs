@@ -14,8 +14,8 @@ namespace Tangerine
 	public class AbstractItem : QObject
 	{
 		protected int ActiveRow { get { return The.Timeline.ActiveRow; } }
-		protected int RowHeight { get { return The.Timeline.RowHeight; } }
-		protected int ColWidth { get { return The.Timeline.ColWidth; } }
+		protected int RowHeight { get { return The.Preferences.TimelineRowHeight; } }
+		protected int ColWidth { get { return The.Preferences.TimelineColWidth; } }
 
 		public int Row { get; set; }
 
@@ -112,9 +112,9 @@ namespace Tangerine
 		public override void CreateWidgets()
 		{
 			base.CreateWidgets();
-			var expanderIcon = CreateImageWidget("Timeline/Collapsed");
-			expanderIcon.MousePress += expanderIcon_MousePress;
-			layout.AddWidget(expanderIcon);
+			//var expanderIcon = CreateIconButton("Timeline/Collapsed");
+			//expanderIcon.Clicked += expanderIcon_Clicked;
+			//layout.AddWidget(expanderIcon);
 
 			var nodeIcon = CreateImageWidget("Nodes/Scene");
 			//nodeIcon.Clicked += nodeIcon_Clicked;
@@ -266,7 +266,7 @@ namespace Tangerine
 		public TimelineController()
 		{
 			Document.Changed += Document_Changed;
-			The.Timeline.KeyPressed += Timeline_KeyPressed;
+			//The.Timeline.KeyPressed += Timeline_KeyPressed;
 		}
 
 		void Timeline_KeyPressed(Qt.Key key)

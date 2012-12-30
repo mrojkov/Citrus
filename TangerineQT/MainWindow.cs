@@ -8,60 +8,60 @@ using Qyoto;
 
 namespace Tangerine
 {
+	public class Action : QObject
+	{
+		protected event Lime.BareEventHandler Triggered;
+		protected QAction qAction;
+
+		public string Text { get { return qAction.Text; } }
+		
+		public Action(QWidget parent, string text) {
+			qAction = new QAction(text, parent);
+			qAction.Triggered += qAction_Triggered;
+		}
+
+		[Q_SLOT]
+		void qAction_Triggered()
+		{
+			if (Triggered != null) {
+				Triggered();
+			}
+		}
+	}
 
 	public class MainWindow : QMainWindow
 	{
 		private string dockStateFile = "DockState.bin";
 
-		public static MainWindow Instance;
+		public static readonly MainWindow Instance = new MainWindow();
+
+		public QMenu FileMenu;
 
 		public MainWindow()
 		{
-			Instance = this;
 			WindowTitle = "Tangerine";
 			InitUI();
 			CreateDockWindows();
-			//Resize(800, 600);
 			Move(300, 300);
-			LoadDockState();
 			ShowMaximized();
 			var doc = new Document(readOnly: false);
 			doc.AddSomeNodes();
 			doc.OnChanged();
+			LoadDockState();
+		}
+
+		Action a;
+
+		public void Initialize()
+		{
+			a = new TimelinePrevNode();
 		}
 
 		private void CreateDockWindows()
 		{
-			var tl = new Timeline();
-			this.AddDockWidget(Qt.DockWidgetArea.TopDockWidgetArea, tl.Dock);
-			var inspector = new QDockWidget("Inspector", this);
-			inspector.ObjectName = "Inspector";
-			inspector.SetAllowedAreas(Qt.DockWidgetArea.LeftDockWidgetArea | Qt.DockWidgetArea.RightDockWidgetArea);
-			this.AddDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, inspector);
-		}
-
-		void timeline_Paint(object sender, QEventArgs<QPaintEvent> e)
-		{
-			var tl = (QGLWidget)sender;
-			//tl.QglClearColor(new QColor(128, 128, 128));
-			//tl.RenderText(50, 50, "Hello QT!");
-			//tl.SwapBuffers();
-			//var ptr = new QPainter(tl);
-			//ptr.Pen = new QPen(new QColor(255, 0, 0), 2);
-			//ptr.SetBrush(Qt.BrushStyle.NoBrush);
-
-			//int c = 0;
-			//for (int i = 0; i < tl.Width / 10; i++) {
-			//	for (int j = 0; j < tl.Height / 10; j++) {
-			//		c++;
-			//		//ptr.DrawRect(i * 10, j * 10, (i + 1) * 10, (j + 1) * 10);
-			//		ptr.DrawRect(i * 10, j * 10, 10, 10);
-			//		//ptr.DrawPoint(i, i);
-			//		//ptr.DrawRect(0, 0, 10, 10);
-			//	}
-			//}
-			//Console.WriteLine(c);
-			//ptr.End();
+			this.AddDockWidget(Qt.DockWidgetArea.TopDockWidgetArea, The.Timeline.DockWidget);
+			this.AddDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, The.Inspector.DockWidget);
+			this.CentralWidget = The.SceneView.DockWidget;
 		}
 
 		private void InitUI()
@@ -72,9 +72,9 @@ namespace Tangerine
 			QAction restoreState = new QAction("&RestoreState", this);
 			restoreState.Triggered += restoreState_Triggered;
 
-			QMenu file = MenuBar.AddMenu("&File");
-			file.AddAction(restoreState);
-			file.AddAction(saveState);
+			FileMenu = MenuBar.AddMenu("&File");
+			FileMenu.AddAction(restoreState);
+			FileMenu.AddAction(saveState);
 
 			//Connect(quit, SIGNAL("triggered()"), qApp, SLOT("quit()"));
 		}
@@ -103,14 +103,6 @@ namespace Tangerine
 		{
 			var state = this.SaveState(1);
 			File.WriteAllBytes(dockStateFile, state.ToArray());
-		}
-
-		[STAThread]
-		public static int Main(String[] args)
-		{
-			var app = new QApplication(args);
-			new MainWindow();
-			return QApplication.Exec();
 		}
 	}
 }

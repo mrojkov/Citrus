@@ -11,17 +11,16 @@ namespace Tangerine
 
 	public class Timeline
 	{
-		public QDockWidget Dock { get; private set; }
+		public static int RowHeight { get { return The.Preferences.TimelineRowHeight; } }
+		public static int ColWidth { get { return The.Preferences.TimelineColWidth; } }
 
-		public int RowHeight = 30;
-		public int ColWidth = 10;
+		public QDockWidget DockWidget { get; private set; }
+
 		public int ActiveRow;
 		public int ToRow;
 		public int LeftCol;
 
-		public CachedTextPainter TextPainter = new CachedTextPainter();
-
-		public static Timeline Instance;
+		public static Timeline Instance = new Timeline();
 
 		public TimelineController Controller;
 
@@ -40,34 +39,31 @@ namespace Tangerine
 			ActiveRowChanged();
 		}
 
-		public Timeline()
+		private Timeline()
 		{
-			Instance = this;
-			Dock = new QDockWidget("Timeline", MainWindow.Instance);
-			Dock.ObjectName = "Timeline";
-			Dock.SetAllowedAreas(Qt.DockWidgetArea.TopDockWidgetArea | Qt.DockWidgetArea.BottomDockWidgetArea);
-			Dock.Font = new QFont("Tahoma", 9);
-			FontHeight = Dock.FontMetrics().Height();
+			DockWidget = new QDockWidget("Timeline", MainWindow.Instance);
+			DockWidget.ObjectName = "Timeline";
+			DockWidget.Font = new QFont("Tahoma", 9);
+			FontHeight = DockWidget.FontMetrics().Height();
 			splitter1 = new QSplitter(Qt.Orientation.Vertical);
 			splitter2 = new QSplitter(Qt.Orientation.Horizontal);
 			splitter2.AddWidget(CreateToolbarAndNodeRoll());
 			splitter2.AddWidget(CreateRulerAndGrid());
 			splitter1.AddWidget(new Panview());
 			splitter1.AddWidget(splitter2);
-			Dock.Widget = splitter1;
-			Dock.MinimumHeight = 30;
-			splitter1.Sizes = new List<int> { 10, 100 };
-			splitter2.Sizes = new List<int> { 25, 100 };
-			Dock.KeyPress += OnKeyPressed;
+			DockWidget.Widget = splitter1;
+			splitter1.Sizes = new List<int> { 30, 100 };
+			splitter2.Sizes = new List<int> { 30, 100 };
+			DockWidget.KeyPress += OnKeyPressed;
 			Controller = new TimelineController();
-			Dock.MousePress += Dock_MousePress;
+			DockWidget.MousePress += Dock_MousePress;
 		}
 
 		void Dock_MousePress(object sender, QEventArgs<QMouseEvent> e)
 		{
 //			QWidget w = QApplication.FocusWidget();
 //			if (w == null && !Dock.IsAncestorOf(w)) {
-				Dock.SetFocus();
+				DockWidget.SetFocus();
 //			}
 		}
 

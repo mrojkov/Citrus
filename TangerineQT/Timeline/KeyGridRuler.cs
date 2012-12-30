@@ -13,12 +13,12 @@ namespace Tangerine
 
 		public KeyGridRuler()
 		{
-			this.SetFixedHeight(The.Timeline.RowHeight);
+			this.SetFixedHeight(RowHeight);
 			Paint += KeyGridRuler_Paint;
 		}
 
-		int RowHeight { get { return The.Timeline.RowHeight; } set { The.Timeline.RowHeight = value; } }
-		int ColWidth { get { return The.Timeline.ColWidth; } set { The.Timeline.ColWidth = value; } }
+		int RowHeight { get { return The.Preferences.TimelineRowHeight; } }
+		int ColWidth { get { return The.Preferences.TimelineColWidth; } }
 
 		void KeyGridRuler_Paint(object sender, QEventArgs<QPaintEvent> e)
 		{

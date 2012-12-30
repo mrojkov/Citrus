@@ -11,7 +11,7 @@ namespace Tangerine
 	{
 		public TimelineToolbar()
 		{
-			this.SetFixedHeight(The.Timeline.RowHeight);
+			this.SetFixedHeight(30);//The.Timeline.RowHeight);
 			Paint += KeyGridRuler_Paint;
 		}
 

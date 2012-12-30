@@ -13,8 +13,6 @@ namespace Tangerine
 		public static int MaxLinesPerRow = 5;
 
 		int ActiveRow { get { return The.Timeline.ActiveRow; } set { The.Timeline.ActiveRow = value; } }
-		int RowHeight { get { return The.Timeline.RowHeight; } set { The.Timeline.RowHeight = value; } }
-		int ColWidth { get { return The.Timeline.ColWidth; } set { The.Timeline.ColWidth = value; } }
 
 		public KeyGrid()
 		{
@@ -23,8 +21,8 @@ namespace Tangerine
 
 		void Keygrid_Paint(object sender, QEventArgs<QPaintEvent> e)
 		{
-			int numRows = Size.Height / RowHeight + 1;
-			int numCols = Size.Width / ColWidth + 1;
+			int numRows = Size.Height / Timeline.RowHeight + 1;
+			int numCols = Size.Width / Timeline.ColWidth + 1;
 			using (var ptr = new QPainter(this)) {
 				DrawGrid(numRows, numCols, ptr);
 				foreach (var item in The.Timeline.Controller.Items) {
@@ -67,13 +65,13 @@ namespace Tangerine
 			ptr.Pen = new QPen(GlobalColor.darkGray, 1, PenStyle.DotLine);
 			var line = new QLine(0, 0, Size.Width, 0);
 			for (int i = 0; i < numRows; i++) {
-				line.Translate(0, RowHeight);
+				line.Translate(0, Timeline.RowHeight);
 				ptr.DrawLine(line);
 			}
 			ptr.Pen = new QPen(GlobalColor.darkGray, 1, PenStyle.DotLine);
 			line = new QLine(0, 0, 0, Size.Height);
 			for (int i = 0; i < numCols / 5; i++) {
-				line.Translate(ColWidth * 5, 0);
+				line.Translate(Timeline.ColWidth * 5, 0);
 				ptr.DrawLine(line);
 			}
 		}

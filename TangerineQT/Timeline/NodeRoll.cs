@@ -9,8 +9,6 @@ namespace Tangerine
 {
 	public class NodeRoll : QWidget
 	{
-		int RowHeight { get { return The.Timeline.RowHeight; } }
-
 		public NodeRoll()
 		{
 			AutoFillBackground = true;
@@ -18,9 +16,14 @@ namespace Tangerine
 			MousePress += NodeRoll_MousePress;
 		}
 
+		public override QSize SizeHint()
+		{
+			return new QSize(0, The.Preferences.TimelineDefaultHeight);
+		}
+
 		void NodeRoll_MousePress(object sender, QEventArgs<QMouseEvent> e)
 		{
-			int row = e.Event.Y() / RowHeight;
+			int row = e.Event.Y() / Timeline.RowHeight;
 			if (row >= 0 && row < The.Timeline.Controller.Items.Count) {
 				The.Timeline.ActiveRow = row;
 				The.Timeline.OnActiveRowChanged();

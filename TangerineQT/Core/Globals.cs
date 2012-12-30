@@ -9,6 +9,9 @@ namespace Tangerine
 	public static class The
 	{
 		public static Timeline Timeline { get { return Timeline.Instance; } }
+		public static Inspector Inspector { get { return Inspector.Instance; } }
+		public static SceneView SceneView { get { return SceneView.Instance; } }
 		public static Document Document { get { return Document.Instance; } }
+		public static Preferences Preferences { get { return Preferences.Instance; } }
 	}
 }
