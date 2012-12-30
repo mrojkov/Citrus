@@ -13,7 +13,7 @@ namespace Kumquat
 	public class Warehouse
 	{
 		[ProtoMember(1)]
-		public Dictionary<string, Widget> Tools = new Dictionary<string, Widget>();
+		public Dictionary<string, Tool> Tools = new Dictionary<string, Tool>();
 
 		public Warehouse(Dictionary<string, Frame> locations)
 		{
@@ -22,13 +22,13 @@ namespace Kumquat
 					if (Tools.Keys.Contains(tool.Id)) {
 						throw new Lime.Exception("There are two tools with the same name: {0}", tool.Id);
 					} else {
-						Tools.Add(tool.Id, tool.DeepCloneFast<Widget>());
+						Tools.Add(tool.Id, tool.DeepCloneFast<Tool>());
 					};
 				}
 			}
 		}
 
-		public Widget this[string name]
+		public Tool this[string name]
 		{
 			get {
 				return Tools[name];
