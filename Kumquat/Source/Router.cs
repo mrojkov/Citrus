@@ -16,8 +16,6 @@ namespace Kumquat
 		[ProtoContract(SkipConstructor = true)]
 		private class Vertex
 		{
-            public int Index;
-
 			[ProtoMember(1)]
 			public string Id;
 

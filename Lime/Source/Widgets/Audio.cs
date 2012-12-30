@@ -92,6 +92,11 @@ namespace Lime
 			sound.Stop();
 		}
 
+		public bool IsPlaying()
+		{
+			return !sound.IsStopped();
+		}
+
 		protected internal override void OnTrigger(string property)
 		{
 			if (property == "Action") {
