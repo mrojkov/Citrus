@@ -51,7 +51,6 @@
     <ClCompile Include="Source\Tremor\codebook.c" />
     <ClCompile Include="Source\Tremor\floor0.c" />
     <ClCompile Include="Source\Tremor\floor1.c" />
-    <ClCompile Include="Source\Tremor\vorbis_info.c" />
     <ClCompile Include="Source\Tremor\mapping0.c" />
     <ClCompile Include="Source\Tremor\mdct.c" />
     <ClCompile Include="Source\Tremor\registry.c" />
@@ -59,12 +58,10 @@
     <ClCompile Include="Source\Tremor\sharedbook.c" />
     <ClCompile Include="Source\Tremor\synthesis.c" />
     <ClCompile Include="Source\Tremor\vorbisfile.c" />
+    <ClCompile Include="Source\Tremor\vorbis_info.c" />
     <ClCompile Include="Source\Tremor\window.c" />
-    <ClCompile Include="Source\VUV2RGB.c" />
     <ClCompile Include="Source\yuv2rgb\yuv2rgb16tab.c" />
-    <ClCompile Include="Source\yuv2rgb\yuv422rgb8888c.c" />
-    <ClCompile Include="Source\yuv2rgb\yuv422rgb888c.c" />
-    <ClCompile Include="Source\yuv2rgb\yuv444rgb8888c.c" />
+    <ClCompile Include="Source\yuv2rgb\yuv420rgb8888c.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Lemon.h" />

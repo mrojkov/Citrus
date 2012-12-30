@@ -222,17 +222,17 @@ LEMON_API double OgvGetPlaybackTime(OgvDecoder* ogv)
 	return time;
 }
 
-//LEMON_API void DecodeRGBX8(uint8_t *dst_ptr,
-//    const uint8_t  *y_ptr,
-//    const uint8_t  *u_ptr,
-//    const uint8_t  *v_ptr,
-//    int32_t   width,
-//    int32_t   height,
-//    int32_t   y_span,
-//    int32_t   uv_span,
-//    int32_t   dst_span,
-//    int32_t   dither)
-//{
-//	yuv422_2_rgb8888(dst_ptr, y_ptr, u_ptr, v_ptr, width, height,
-//		y_span, uv_span, dst_span, yuv2bgr565_table, dither);
-//}
+LEMON_API void DecodeRGBX8(uint8_t *dst_ptr,
+    const uint8_t  *y_ptr,
+    const uint8_t  *u_ptr,
+    const uint8_t  *v_ptr,
+    int32_t   width,
+    int32_t   height,
+    int32_t   y_span,
+    int32_t   uv_span,
+    int32_t   dst_span,
+    int32_t   dither)
+{
+	yuv420_2_rgb8888(dst_ptr, y_ptr, u_ptr, v_ptr, width, height,
+		y_span, uv_span, dst_span, yuv2rgb565_table, dither);
+}
