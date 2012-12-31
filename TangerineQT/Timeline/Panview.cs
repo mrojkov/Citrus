@@ -18,7 +18,7 @@ namespace Tangerine
 
 		void Panview_Paint(object sender, QEventArgs<QPaintEvent> e)
 		{
-			var container = The.Document.RootNode;
+			var container = The.Document.Container;
 			ColWidth = 4;
 			RowHeight = 3;// Height / container.Nodes.Count;
 			int numRows = Height / RowHeight + 1;

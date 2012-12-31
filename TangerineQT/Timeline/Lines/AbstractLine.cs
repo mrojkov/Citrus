@@ -10,28 +10,31 @@ namespace Tangerine
 	/// <summary>
 	/// Абстрактный класс для представления одной строки на таймлайне
 	/// </summary>
-	public class InspectorItem : QObject
+	public class AbstractLine : QObject
 	{
-		public int Row { get; set; }
+		protected int RowHeight { get { return The.Preferences.TimelineRowHeight; } }
+		protected int ColWidth { get { return The.Preferences.TimelineColWidth; } }
+
+		public int Index { get; set; }
 
 		protected QWidget slot;
 		protected QHBoxLayout layout;
 
-		public InspectorItem()
+		public void SetSelected(bool selected)
 		{
+			slot.AutoFillBackground = selected;
 		}
 
-		void Timeline_ActiveRowChanged()
+		public virtual void Attach(int index)
 		{
-			slot.AutoFillBackground = (Row == The.Inspector.ActiveRow);
-		}
-
-		public virtual void Attach(int row)
-		{
-			Row = row;
+			Index = index;
 			slot.SetParent(The.Timeline.NodeRoll);
-			slot.Move(0, row * Inspector.RowHeight);
-			slot.Resize(The.Timeline.NodeRoll.Width, Inspector.RowHeight);
+			slot.Resize(The.Timeline.NodeRoll.Width, RowHeight);
+		}
+
+		public void RefreshPosition()
+		{
+			slot.Move(0, Top);
 		}
 
 		public virtual void Detach()
@@ -68,7 +71,7 @@ namespace Tangerine
 
 		protected int Top
 		{
-			get { return Row * Inspector.RowHeight; }
+			get { return (Index - The.Timeline.TopLine) * RowHeight; }
 		}
 
 		public virtual void HandleMousePress(int x)
@@ -81,32 +84,6 @@ namespace Tangerine
 
 		public virtual void HandleKey(Qt.Key key)
 		{
-		}
-	}
-
-	public class Inspector
-	{
-		public static int RowHeight { get { return The.Preferences.InspectorRowHeight; } }
-
-		public int ActiveRow;
-
-		public QDockWidget DockWidget { get; private set; }
-
-		public static readonly Inspector Instance = new Inspector();
-
-		private Inspector()
-		{
-			DockWidget = new QDockWidget("Inspector", MainWindow.Instance);
-			DockWidget.ObjectName = "Inspector";
-			DockWidget.Widget = new InspectorWidget();
-		}
-	}
-
-	public class InspectorWidget : QWidget
-	{
-		public override QSize SizeHint()
-		{
-			return new QSize(The.Preferences.InspectorDefaultWidth, 0);
 		}
 	}
 }

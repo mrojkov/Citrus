@@ -54,7 +54,7 @@ namespace Tangerine
 			editor = new InplaceTextEditor(label);
 			editor.Finished += (text) => {
 				text = text ?? "";
-				var v = (Lime.Vector2)PropertyInfo.GetValue(Node);
+				var v = (Lime.Vector2)PropertyInfo.GetValue(Node, null);
 				var vals = text.Split(';');
 				if (vals.Length == 2) {
 					float x, y;
@@ -64,7 +64,7 @@ namespace Tangerine
 					if (float.TryParse(vals[1], out y)) {
 						v.Y = y;
 					}
-					PropertyInfo.SetValue(Node, v);
+					PropertyInfo.SetValue(Node, v, null);
 				}
 				label.Text = GetValueFromProperty();
 				label.Show();
@@ -78,7 +78,7 @@ namespace Tangerine
 
 		private string GetValueFromProperty()
 		{
-			var v = (Lime.Vector2)PropertyInfo.GetValue(Node);
+			var v = (Lime.Vector2)PropertyInfo.GetValue(Node, null);
 			return string.Format("{0}; {1}", v.X, v.Y);
 		}
 	}

@@ -12,7 +12,7 @@ namespace Tangerine
 	{
 		public static int MaxLinesPerRow = 5;
 
-		int ActiveRow { get { return The.Timeline.ActiveRow; } set { The.Timeline.ActiveRow = value; } }
+		//int ActiveRow { get { return The.Timeline.RowIndex; } set { The.Timeline.RowIndex = value; } }
 
 		public KeyGrid()
 		{
@@ -25,7 +25,7 @@ namespace Tangerine
 			int numCols = Size.Width / Timeline.ColWidth + 1;
 			using (var ptr = new QPainter(this)) {
 				DrawGrid(numRows, numCols, ptr);
-				foreach (var item in The.Timeline.Controller.Items) {
+				foreach (var item in The.Timeline.Lines) {
 					item.PaintContent(ptr, Width);
 				}
 				//var nodes = The.Document.RootNode.Nodes;

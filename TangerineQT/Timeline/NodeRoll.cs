@@ -23,10 +23,10 @@ namespace Tangerine
 
 		void NodeRoll_MousePress(object sender, QEventArgs<QMouseEvent> e)
 		{
-			int row = e.Event.Y() / Timeline.RowHeight;
-			if (row >= 0 && row < The.Timeline.Controller.Items.Count) {
-				The.Timeline.ActiveRow = row;
-				The.Timeline.OnActiveRowChanged();
+			int line = e.Event.Y() / Timeline.RowHeight + The.Timeline.TopLine;
+			if (line >= 0 && line < The.Timeline.Lines.Count) {
+				The.Document.History.Add(new Commands.SelectLines(line));
+				The.Document.History.Commit("Select Line");
 			}
 		}
 	}

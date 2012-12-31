@@ -11,18 +11,18 @@ namespace Tangerine
 
 	public class Timeline
 	{
+		public List<AbstractLine> Lines = new List<AbstractLine>();
+		public LinesBuilder LinesBuilder = new LinesBuilder();
+
 		public static int RowHeight { get { return The.Preferences.TimelineRowHeight; } }
 		public static int ColWidth { get { return The.Preferences.TimelineColWidth; } }
 
 		public QDockWidget DockWidget { get; private set; }
 
-		public int ActiveRow;
-		public int ToRow;
+		public int TopLine;
 		public int LeftCol;
 
 		public static Timeline Instance = new Timeline();
-
-		public TimelineController Controller;
 
 		QSplitter splitter1;
 		QSplitter splitter2;
@@ -30,14 +30,6 @@ namespace Tangerine
 		public int FontHeight { get; private set; }
 		public NodeRoll NodeRoll;
 		public KeyGrid KeyGrid;
-
-		public event Lime.BareEventHandler ActiveRowChanged = () => {};
-		public event KeyboardHandler KeyPressed = (key) => {};
-
-		public void OnActiveRowChanged()
-		{
-			ActiveRowChanged();
-		}
 
 		private Timeline()
 		{
@@ -54,9 +46,17 @@ namespace Tangerine
 			DockWidget.Widget = splitter1;
 			splitter1.Sizes = new List<int> { 30, 100 };
 			splitter2.Sizes = new List<int> { 30, 100 };
-			DockWidget.KeyPress += OnKeyPressed;
-			Controller = new TimelineController();
 			DockWidget.MousePress += Dock_MousePress;
+			Document.Changed += Document_Changed;
+			DockWidget.Wheel += DockWidget_Wheel;
+		}
+
+		void DockWidget_Wheel(object sender, QEventArgs<QWheelEvent> e)
+		{
+			TopLine += e.Event.Delta() > 0 ? -1 : 1;
+			int m = Lines.Count - GetNumberOfVisibleLines();
+			Lime.Mathf.Clamp(ref TopLine, 0, m);
+			Refresh();
 		}
 
 		void Dock_MousePress(object sender, QEventArgs<QMouseEvent> e)
@@ -67,14 +67,65 @@ namespace Tangerine
 //			}
 		}
 
-		void OnKeyPressed(object sender, QEventArgs<QKeyEvent> e)
+		private void Document_Changed()
 		{
-			QWidget w = QApplication.FocusWidget();
-			if (w != null && w is QLineEdit) {
-				return;
-			}
-			KeyPressed((Qt.Key)e.Event.Key());
+			Refresh();
 		}
+
+		public void Refresh()
+		{
+			var newLines = LinesBuilder.BuildLines(The.Document.Container);
+			if (!Lines.AreEqual(newLines)) {
+				NodeRoll.Hide();
+				RefreshLines(newLines);
+				NodeRoll.Show();
+				KeyGrid.Update();
+			}
+			foreach (var line in Lines) {
+				bool lineSelected = The.Document.SelectedLines.Contains(line.Index);
+				line.RefreshPosition();
+				line.SetSelected(lineSelected);
+			}
+			KeyGrid.Update();
+		}
+
+		private void RefreshLines(List<AbstractLine> newLines)
+		{
+			var document = The.Document;
+			foreach (var line in Lines) {
+				line.Detach();
+			}
+			Lines.Clear();
+			int i = 0;
+			foreach (var line in newLines) {
+				line.Attach(i++);
+				Lines.Add(line);
+			}
+		}
+
+		public void EnsureLineVisible(int line)
+		{
+			if (line < TopLine) {
+				TopLine = line;
+			} else if (line > TopLine + GetNumberOfVisibleLines()) {
+				TopLine = line - GetNumberOfVisibleLines();
+			}
+		}
+
+		public int GetNumberOfVisibleLines()
+		{
+			int numVisibleRows = (NodeRoll.Height - RowHeight + 1) / RowHeight;
+			return numVisibleRows;
+		}
+
+		//void OnKeyPressed(object sender, QEventArgs<QKeyEvent> e)
+		//{
+		//	QWidget w = QApplication.FocusWidget();
+		//	if (w != null && w is QLineEdit) {
+		//		return;
+		//	}
+		//	KeyPressed((Qt.Key)e.Event.Key());
+		//}
 
 		private QWidget CreateRulerAndGrid()
 		{

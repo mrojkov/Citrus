@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Tangerine
 {
-	public delegate void DocumentEventHandler(Document document);
+	public delegate void DocumentEventHandler();
 
 	public class Document
 	{
@@ -15,6 +15,9 @@ namespace Tangerine
 		public static Document Instance = Null;
 		
 		public Lime.Node RootNode { get; private set; }
+		public Lime.Node Container { get; set; }
+
+		public List<int> SelectedLines = new List<int>();
 
 		public DocumentSettings Settings = new DocumentSettings();
 
@@ -22,18 +25,21 @@ namespace Tangerine
 
 		public static event DocumentEventHandler Changed;
 
+		public readonly DocumentHistory History = new DocumentHistory();
+
 		public Document(bool readOnly)
 		{
 			Instance = this;
 			this.ReadOnly = readOnly;
 			RootNode = new Lime.Widget();
 			RootNode.Guid = Guid.NewGuid();
+			Container = RootNode;
 		}
 
 		public void OnChanged()
 		{
 			if (Changed != null) {
-				Changed(this);
+				Changed();
 			}
 		}
 
@@ -42,7 +48,13 @@ namespace Tangerine
 			for (int i = 0; i < 20; i++) {
 				var frame = new Lime.Frame();
 				frame.Guid = Guid.NewGuid();
-				frame.Id = string.Format("Image {0:00}", i);
+				frame.Id = string.Format("Frame {0:00}", i);
+				for (int j = 0; j < 12; j++) {
+					var image = new Lime.Image();
+					image.Id = j.ToString("Image 00");
+					image.Guid = Guid.NewGuid();
+					frame.AddNode(image);
+				}
 
 				var ani = frame.Animators["Position"];
 				ani.Add(0, new Lime.Vector2(0, 0));

@@ -8,27 +8,6 @@ using Qyoto;
 
 namespace Tangerine
 {
-	public class Action : QObject
-	{
-		protected event Lime.BareEventHandler Triggered;
-		protected QAction qAction;
-
-		public string Text { get { return qAction.Text; } }
-		
-		public Action(QWidget parent, string text) {
-			qAction = new QAction(text, parent);
-			qAction.Triggered += qAction_Triggered;
-		}
-
-		[Q_SLOT]
-		void qAction_Triggered()
-		{
-			if (Triggered != null) {
-				Triggered();
-			}
-		}
-	}
-
 	public class MainWindow : QMainWindow
 	{
 		private string dockStateFile = "DockState.bin";
@@ -50,11 +29,8 @@ namespace Tangerine
 			LoadDockState();
 		}
 
-		Action a;
-
 		public void Initialize()
 		{
-			a = new TimelinePrevNode();
 		}
 
 		private void CreateDockWindows()

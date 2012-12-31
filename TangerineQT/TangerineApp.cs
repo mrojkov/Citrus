@@ -14,6 +14,7 @@ namespace Tangerine
 		{
 			var app = new QApplication(args);
 			CreateMainWindow();
+			ActionManager.Instance.Initialize();
 			return QApplication.Exec();
 		}
 

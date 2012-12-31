@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Tangerine</RootNamespace>
     <AssemblyName>Tangerine</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -56,10 +56,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Action.cs" />
+    <Compile Include="Core\ActionManager.cs" />
+    <Compile Include="Core\Command.cs" />
+    <Compile Include="Core\Commands\ChangeContainer.cs" />
+    <Compile Include="Core\Commands\SelectLines.cs" />
     <Compile Include="Core\Document.cs" />
+    <Compile Include="Core\DocumentHistory.cs" />
     <Compile Include="Core\DocumentSettings.cs" />
     <Compile Include="Core\Globals.cs" />
     <Compile Include="Core\KeyframeColors.cs" />
+    <Compile Include="Core\NodeExtensions.cs" />
     <Compile Include="Core\Preferences.cs" />
     <Compile Include="Inspector\Inspector.cs" />
     <Compile Include="MainWindow.cs" />
@@ -70,14 +77,18 @@
     <Compile Include="Timeline\KeyGridRuler.cs" />
     <Compile Include="Timeline\KeyTransient.cs" />
     <Compile Include="Timeline\KeyTransientPalette.cs" />
+    <Compile Include="Timeline\LinesBuilder.cs" />
     <Compile Include="Timeline\NodeRoll.cs" />
     <Compile Include="Timeline\Panview.cs" />
     <Compile Include="Timeline\PropertyEditor.cs" />
     <Compile Include="Timeline\Timeline.cs" />
-    <Compile Include="Timeline\TimelineActions.cs" />
-    <Compile Include="Timeline\TimelineController.cs" />
+    <Compile Include="Timeline\Actions\NavigateActions.cs" />
+    <Compile Include="Timeline\Lines\AbstractLine.cs" />
+    <Compile Include="Timeline\Lines\NodeLine.cs" />
+    <Compile Include="Timeline\Lines\PropertyLine.cs" />
     <Compile Include="Timeline\TimelineToolbar.cs" />
     <Compile Include="IconCache.cs" />
+    <Compile Include="Timeline\KeyTransientsPainter.cs" />
     <Compile Include="Toolbox\InplaceTextEditor.cs" />
     <Compile Include="Toolbox\MemoryLeaksChecker.cs" />
     <Compile Include="Toolbox\QyotoBooster.cs" />
