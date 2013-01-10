@@ -186,7 +186,7 @@ namespace Lime
 		
 		private bool TryLoadTextureAtlasPart(string path)
 		{
-			if (AssetsBundle.Instance.FileExists(path)) {
+			if (PackedAssetsBundle.Instance.FileExists(path)) {
 				var texParams = TextureAtlasPart.ReadFromBundle(path);
 				instance = new SerializableTexture(texParams.AtlasTexture);
 				UVRect.A = (Vector2)texParams.AtlasRect.A / (Vector2)instance.SurfaceSize;
@@ -199,7 +199,7 @@ namespace Lime
 		
 		private bool TryLoadImage(string path)
 		{
-			if (AssetsBundle.Instance.FileExists(path)) {
+			if (PackedAssetsBundle.Instance.FileExists(path)) {
 				instance = new PlainTexture();
 				(instance as PlainTexture).LoadImage(path);
 				UVRect.A = Vector2.Zero;
@@ -207,7 +207,6 @@ namespace Lime
 				ImageSize = instance.ImageSize;
 				return true;
 			}
-			Console.WriteLine("Missing texture '{0}'", path);
 			return false;
 		}
 
@@ -219,10 +218,12 @@ namespace Lime
 #if iOS
 					TryLoadImage(Path + ".pvr")
 #else
-					TryLoadImage(Path + ".dds")
+					TryLoadImage(Path + ".dds") ||
+					TryLoadImage(Path + ".png")
 #endif
 				);
 				if (!loaded) {
+					Console.WriteLine("Missing texture '{0}'", Path);
 					instance = CreateChessTexture();
 					ChessTexture = true;
 					UVRect = instance.UVRect;
@@ -237,9 +238,8 @@ namespace Lime
 	public sealed class TexturePool
 	{
 		Dictionary<string, WeakReference> items;
-		static readonly TexturePool instance = new TexturePool();
 
-		public static TexturePool Instance { get { return instance; } }
+		public readonly static TexturePool Instance = new TexturePool();
 
 		private TexturePool()
 		{

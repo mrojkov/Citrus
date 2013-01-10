@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace Tangerine.Commands
 {
-	public class SelectLines : Command
+	public class SelectRows : Command
 	{
 		int[] lines;
 		int[] savedLines;
 		int savedTopLine;
 
-		public SelectLines(params int[] lines)
+		public SelectRows(params int[] lines)
 		{
 			Array.Sort(lines);
 			this.lines = lines;
@@ -20,18 +20,18 @@ namespace Tangerine.Commands
 
 		public override void Do()
 		{
-			savedTopLine = The.Timeline.TopLine;
-			savedLines = The.Document.SelectedLines.ToArray();
-			The.Document.SelectedLines.Clear();
-			The.Document.SelectedLines.AddRange(lines);
-			The.Timeline.EnsureLineVisible(lines[0]);
+			savedTopLine = The.Document.TopRow;
+			savedLines = The.Document.SelectedRows.ToArray();
+			The.Document.SelectedRows.Clear();
+			The.Document.SelectedRows.AddRange(lines);
+			The.Timeline.EnsureRowVisible(lines[0]);
 		}
 
 		public override void Undo()
 		{
-			The.Timeline.TopLine = savedTopLine;
-			The.Document.SelectedLines.Clear();
-			The.Document.SelectedLines.AddRange(savedLines);
+			The.Document.TopRow = savedTopLine;
+			The.Document.SelectedRows.Clear();
+			The.Document.SelectedRows.AddRange(savedLines);
 		}
 	}
 }

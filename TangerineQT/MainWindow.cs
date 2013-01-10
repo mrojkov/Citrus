@@ -10,61 +10,72 @@ namespace Tangerine
 {
 	public class MainWindow : QMainWindow
 	{
-		private string dockStateFile = "DockState.bin";
+		private string dockStateFile = Lime.Environment.GetPathInsideDataDirectory("Tangerine", "DockState.bin");
 
 		public static readonly MainWindow Instance = new MainWindow();
 
-		public QMenu FileMenu;
+		public QMdiArea MdiArea;
+		public event Lime.BareEventHandler Closing;
+
+		public QWidget DefaultQtParent = new QWidget();
 
 		public MainWindow()
 		{
-			WindowTitle = "Tangerine";
 			InitUI();
-			CreateDockWindows();
-			Move(300, 300);
-			ShowMaximized();
-			var doc = new Document(readOnly: false);
-			doc.AddSomeNodes();
-			doc.OnChanged();
-			LoadDockState();
+		}
+
+		private void InitUI()
+		{
+			WindowTitle = "Tangerine";
+			MdiArea = new QMdiArea(this);
+			CentralWidget = MdiArea;
+			MdiArea.ActivationOrder = QMdiArea.WindowOrder.CreationOrder;
+			MdiArea.viewMode = QMdiArea.ViewMode.TabbedView;
+			MdiArea.TabShape = QTabWidget.TabShape.Rounded;
+			MdiArea.TabsClosable = true;
+			MdiArea.TabsMovable = true;
 		}
 
 		public void Initialize()
 		{
+			CreateDockWindows();
+			Move(300, 300);
+			ShowMaximized();
+			var doc = new Document(readOnly: false);
+			doc.OnChanged();
+			LoadDockState();
+			CloseEvent += OnClose;
+		}
+
+		~MainWindow()
+		{
+			System.Diagnostics.Debug.WriteLine("Destroying " + GetType().Name);
+		}
+
+		[Q_SLOT]
+		void OnClose(object sender, QEventArgs<QCloseEvent> e)
+		{
+			if (!Workspace.Close()) {
+				e.Event.Ignore();
+				e.Handled = true;
+			} else {
+				SaveDockState();
+				DefaultQtParent.Dispose();
+				if (Closing != null) {
+					Closing();
+				}
+			}
+		}
+
+		public void AddMenu(Menu menu)
+		{
+			MenuBar.AddMenu(menu.QMenu);
 		}
 
 		private void CreateDockWindows()
 		{
 			this.AddDockWidget(Qt.DockWidgetArea.TopDockWidgetArea, The.Timeline.DockWidget);
 			this.AddDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, The.Inspector.DockWidget);
-			this.CentralWidget = The.SceneView.DockWidget;
-		}
-
-		private void InitUI()
-		{
-			QAction saveState = new QAction("&SaveState", this);
-			saveState.Triggered += saveState_Triggered;
-
-			QAction restoreState = new QAction("&RestoreState", this);
-			restoreState.Triggered += restoreState_Triggered;
-
-			FileMenu = MenuBar.AddMenu("&File");
-			FileMenu.AddAction(restoreState);
-			FileMenu.AddAction(saveState);
-
-			//Connect(quit, SIGNAL("triggered()"), qApp, SLOT("quit()"));
-		}
-
-		[Q_SLOT]
-		void restoreState_Triggered()
-		{
-			LoadDockState();
-		}
-
-		[Q_SLOT]
-		void saveState_Triggered()
-		{
-			SaveDockState();
 		}
 
 		private void LoadDockState()

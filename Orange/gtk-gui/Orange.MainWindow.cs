@@ -115,6 +115,7 @@ namespace Orange
 			this.Action.AppendText ("Build Content Only");
 			this.Action.AppendText ("Rebuild Game");
 			this.Action.AppendText ("Reveal Content");
+			this.Action.AppendText("Extract Tangerine Scenes");
 			this.Action.AppendText ("Extract Translatable Strings");
 			this.Action.AppendText ("Generate Serialization Assembly");
 			this.Action.Name = "Action";

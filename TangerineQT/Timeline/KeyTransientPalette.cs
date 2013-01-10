@@ -10,15 +10,17 @@ namespace Tangerine
 	public static class KeyTransientPalette
 	{
 		static QColor[] colors = new QColor[] {
-			new QColor(255, 0, 0),
-			new QColor(192, 64, 0),
-			new QColor(128, 128, 0),
-			new QColor(64, 192, 0),
-			new QColor(0, 255, 0),
-			new QColor(0, 192, 64),
-			new QColor(0, 128, 128),
-			new QColor(0, 64, 192),
-			new QColor(0, 0, 255),
+			new QColor(0x606060),
+			new QColor(0xFF3030),
+			new QColor(0xFF8020),
+			new QColor(0xFFFF40),
+			new QColor(0x00FF00),
+			new QColor(0x00FFFF),
+			new QColor(0xFF40FF),
+			new QColor(0x8080FF),
+			new QColor(0x4040FF),
+			new QColor(0x2020FF),
+			new QColor(0x808080),
 		};
 
 		public static QColor GetColor(int index)

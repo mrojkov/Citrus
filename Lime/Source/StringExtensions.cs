@@ -11,5 +11,15 @@ namespace Lime
 		{
 			return string.Format(format, args);
 		}
+
+		public static string Localize(this string text)
+		{
+			return Localization.GetString(text);
+		}
+
+		public static string Localize(this string format, params object[] args)
+		{
+			return Localization.GetString(format, args);
+		}
 	}
 }

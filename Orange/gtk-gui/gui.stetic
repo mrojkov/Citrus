@@ -157,6 +157,7 @@ iPhone/iPad</property>
 Build Content Only
 Rebuild Game
 Reveal Content
+Extract Tangerine Scenes
 Extract Translatable Strings
 Generate Serialization Assembly</property>
                 <property name="Active">0</property>

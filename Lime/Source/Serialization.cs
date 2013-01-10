@@ -83,7 +83,7 @@ namespace Lime
 				WriteObject(path, stream, instance);
 		}
 		
-		public static void WriteObjectToBundle<T>(AssetsBundle bundle, string path, T instance)
+		public static void WriteObjectToBundle<T>(PackedAssetsBundle bundle, string path, T instance)
 		{
 			using (MemoryStream stream = new MemoryStream()) {
 				WriteObject(path, stream, instance);
@@ -114,7 +114,7 @@ namespace Lime
 
 		public static T ReadObject<T>(string path, object obj = null)
 		{
-			using (Stream stream = AssetsBundle.Instance.OpenFileLocalized(path))
+			using (Stream stream = PackedAssetsBundle.Instance.OpenFileLocalized(path))
 				return ReadObject<T>(path, stream, obj);
 		}
 		

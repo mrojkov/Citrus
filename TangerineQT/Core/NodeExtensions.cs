@@ -9,6 +9,16 @@ namespace Tangerine
 {
 	public static class NodeExtensions
 	{
+		public static void AssignMissedGuids(this Lime.Node node)
+		{
+			if (node.Guid == Guid.Empty) {
+				node.Guid = Guid.NewGuid();
+			}
+			foreach (var child in node.Nodes) {
+				child.AssignMissedGuids();
+			}
+		}
+
 		public static List<PropertyInfo> GetProperties(this Lime.Node node)
 		{
 			var result = new List<PropertyInfo>();

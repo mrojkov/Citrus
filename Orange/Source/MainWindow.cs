@@ -12,6 +12,7 @@ namespace Orange
 		BuildContentOnly,
 		RebuildGame,
 		RevealContent,
+		ExtractTangerineScenes,
 		ExtractTranslatableStrings,
 		GenerateSerializationAssembly
 	}
@@ -195,6 +196,13 @@ namespace Orange
 			AssetsUnpacker.Unpack(citrusProject, platform);
 		}
 
+		void ExtractTangerineScenes()
+		{
+			var platform = (TargetPlatform)this.TargetPlatform.Active;
+			var citrusProject = new CitrusProject(CitrusProjectChooser.Filename);
+			AssetsUnpacker.UnpackTangerineScenes(citrusProject, platform);
+		}
+
 		void ShowTimeStatistics(DateTime startTime)
 		{
 			DateTime endTime = DateTime.Now;
@@ -235,6 +243,9 @@ namespace Orange
 						break;
 					case Orange.Action.RevealContent:
 						RevealContent();
+						break;
+					case Orange.Action.ExtractTangerineScenes:
+						ExtractTangerineScenes();
 						break;
 					case Orange.Action.GenerateSerializationAssembly:
 						GenerateSerializationAssembly();

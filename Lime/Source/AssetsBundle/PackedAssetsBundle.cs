@@ -36,12 +36,12 @@ namespace Lime
 
 	public class AssetStream : Stream
 	{
-		AssetsBundle bundle;
+		PackedAssetsBundle bundle;
 		AssetDescriptor descriptor;
 		Int32 position;
 		Stream stream;
 
-		public AssetStream(AssetsBundle bundle, string path)
+		public AssetStream(PackedAssetsBundle bundle, string path)
 		{
 			this.bundle = bundle;
 			if (!bundle.index.TryGetValue(AssetPath.CorrectSlashes(path), out descriptor)) {
@@ -143,7 +143,7 @@ namespace Lime
 		Writable = 1,
 	}
 
-	public class AssetsBundle : IDisposable
+	public class PackedAssetsBundle : AssetsBundle, IDisposable
 	{
 		Stack<Stream> streamPool = new Stack<Stream>();
 		string path;
@@ -154,15 +154,10 @@ namespace Lime
 		FileStream stream;
 		internal Dictionary <string, AssetDescriptor> index = new Dictionary<string, AssetDescriptor>();
 		List<AssetDescriptor> trash = new List<AssetDescriptor>();
-		public string CurrentLanguage;
 
-		static readonly AssetsBundle instance = new AssetsBundle();
+		PackedAssetsBundle() {}
 
-		public static AssetsBundle Instance { get { return instance; } }
-
-		AssetsBundle() {}
-
-		public AssetsBundle(string path, AssetBundleFlags flags)
+		public PackedAssetsBundle(string path, AssetBundleFlags flags)
 		{
 			Open(path, flags);
 		}
@@ -181,7 +176,7 @@ namespace Lime
 			ReadIndexTable();
 		}
 		
-		private void MoveBlock (int offset, int size, int delta)
+		private void MoveBlock(int offset, int size, int delta)
 		{
 			if (delta > 0) {
 				throw new NotImplementedException();
@@ -245,30 +240,12 @@ namespace Lime
 			Close();
 		}
 
-		public Stream OpenFile(string path)
+		public override Stream OpenFile(string path)
 		{
 			return new AssetStream(this, path);
 		}
 
-		public Stream OpenFileLocalized(string path)
-		{
-			return new AssetStream(this, GetLocalizedPath(path));
-		}
-
-		public string GetLocalizedPath(string path)
-		{
-			if (string.IsNullOrEmpty(CurrentLanguage))
-				return path;
-			string extension = Path.GetExtension(path);
-			string pathWithoutExtension = Path.ChangeExtension(path, null);
-			string localizedParth = pathWithoutExtension + "." + CurrentLanguage + extension;
-			if (FileExists(localizedParth)) {
-				return localizedParth;
-			}
-			return path;
-		}
-
-		public DateTime GetFileLastWriteTime(string path)
+		public override DateTime GetFileLastWriteTime(string path)
 		{
 			AssetDescriptor desc;
 			if (index.TryGetValue(AssetPath.CorrectSlashes(path), out desc)) {
@@ -277,7 +254,7 @@ namespace Lime
 			throw new Exception("Asset '{0}' doesn't exist", path);
 		}
 
-		public void DeleteFile(string path)
+		public override void DeleteFile(string path)
 		{
 			path = AssetPath.CorrectSlashes(path);
 			AssetDescriptor desc;
@@ -288,25 +265,19 @@ namespace Lime
 			trash.Add(desc);
 		}
 
-		public void ListFiles()
-		{
-			foreach (var k in index.Keys)
-				Console.WriteLine(k);
-		}
+		// Mike: WTF?
+		//public void ListFiles()
+		//{
+		//	foreach (var k in index.Keys)
+		//		Console.WriteLine(k);
+		//}
 
-		public bool FileExists(string path)
+		public override bool FileExists(string path)
 		{
 			return index.ContainsKey(AssetPath.CorrectSlashes(path));
 		}
 
-		public void ImportFile(string srcPath, string dstPath, int reserve)
-		{
-			using (var stream = new FileStream(srcPath, FileMode.Open)) {
-				ImportFile(dstPath, stream, reserve);
-			}
-		}
-
-		public void ImportFile(string path, Stream stream, int reserve)
+		public override void ImportFile(string path, Stream stream, int reserve)
 		{
 			AssetDescriptor d;
 			bool reuseExistingDescriptor = index.TryGetValue(AssetPath.CorrectSlashes(path), out d) && 
@@ -387,7 +358,7 @@ namespace Lime
 			}
 		}
 		
-		public string[] EnumerateFiles()
+		public override string[] EnumerateFiles()
 		{
 			string[] files = new string[index.Keys.Count];
 			index.Keys.CopyTo(files, 0);

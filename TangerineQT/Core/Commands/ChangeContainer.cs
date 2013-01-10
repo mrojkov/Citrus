@@ -9,7 +9,7 @@ namespace Tangerine.Commands
 	{
 		Lime.Node savedContainer;
 		Lime.Node container;
-		Command selectLines;
+		Command selectRows;
 
 		public ChangeContainer(Lime.Node container)
 		{
@@ -20,20 +20,23 @@ namespace Tangerine.Commands
 		{
 			savedContainer = The.Document.Container;
 			The.Document.Container = container;
+			The.Document.RebuildRows();
+			selectRows = new SelectRows(0);
 			if (container.Nodes.Contains(savedContainer)) {
-				var linesCache = The.Timeline.LinesBuilder;
-				var lines = linesCache.BuildLines(container);
-				int i = lines.IndexOf(linesCache.GetNodeLine(savedContainer));
-				selectLines = new SelectLines(i);
-			} else {
-				selectLines = new SelectLines(0);
+				// Если выходим наверх, то выставим в качестве текущего нода, тот откуда мы вышли
+				foreach (var row in The.Document.Rows) {
+					var nodeRow = row as TimelineNodeRow;
+					if (nodeRow != null && nodeRow.Node == savedContainer) {
+						selectRows = new SelectRows(row.Index);
+					}
+				}
 			}
-			selectLines.Do();
+			selectRows.Do();
 		}
 
 		public override void Undo()
 		{
-			selectLines.Undo();
+			selectRows.Undo();
 			The.Document.Container = savedContainer;
 		}
 	}

@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{B16BCAB9-4526-417E-8DDF-783858A9EA10}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Tangerine</RootNamespace>
     <AssemblyName>Tangerine</AssemblyName>
@@ -35,7 +35,18 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="OpenTK, Version=0.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\3rdParty\OpenTK\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="protobuf-net, Version=2.0.0.612, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
+    </Reference>
     <Reference Include="qyoto-qtcore, Version=2.0.0.0, Culture=neutral, PublicKeyToken=194a23ba31c08164, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Qyoto\qyoto-qtcore.dll</HintPath>
@@ -57,35 +68,50 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Action.cs" />
-    <Compile Include="Core\ActionManager.cs" />
+    <Compile Include="Core\DocumentState.cs" />
+    <Compile Include="Core\SlotWrapper.cs" />
     <Compile Include="Core\Command.cs" />
     <Compile Include="Core\Commands\ChangeContainer.cs" />
     <Compile Include="Core\Commands\SelectLines.cs" />
     <Compile Include="Core\Document.cs" />
     <Compile Include="Core\DocumentHistory.cs" />
-    <Compile Include="Core\DocumentSettings.cs" />
     <Compile Include="Core\Globals.cs" />
     <Compile Include="Core\KeyframeColors.cs" />
+    <Compile Include="Core\Menu.cs" />
     <Compile Include="Core\NodeExtensions.cs" />
     <Compile Include="Core\Preferences.cs" />
+    <Compile Include="Core\TimelineRow.cs" />
+    <Compile Include="Core\TimelineRowListExtension.cs" />
+    <Compile Include="Core\Workspace.cs" />
+    <Compile Include="DocumentView\DocumentCanvas.cs" />
+    <Compile Include="FileActions\ExitAction.cs" />
+    <Compile Include="FileActions\FileMenu.cs" />
+    <Compile Include="FileActions\OpenFileAction.cs" />
+    <Compile Include="FileActions\OpenProject.cs" />
+    <Compile Include="FileActions\RecentFilesMenu.cs" />
+    <Compile Include="FileActions\RecentProjectsManager.cs" />
+    <Compile Include="FileActions\RecentProjectsMenu.cs" />
     <Compile Include="Inspector\Inspector.cs" />
     <Compile Include="MainWindow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Scene\SceneView.cs" />
-    <Compile Include="TangerineApp.cs" />
+    <Compile Include="DocumentView\DocumentView.cs" />
+    <Compile Include="Timeline\TimelineToolbox.cs" />
+    <Compile Include="ViewActions\ShowTimeline.cs" />
+    <Compile Include="ViewActions\SwitchDocumentActions.cs" />
+    <Compile Include="Tangerine.cs" />
     <Compile Include="Timeline\KeyGrid.cs" />
     <Compile Include="Timeline\KeyGridRuler.cs" />
     <Compile Include="Timeline\KeyTransient.cs" />
     <Compile Include="Timeline\KeyTransientPalette.cs" />
-    <Compile Include="Timeline\LinesBuilder.cs" />
+    <Compile Include="Core\TimelineRowsCache.cs" />
     <Compile Include="Timeline\NodeRoll.cs" />
     <Compile Include="Timeline\Panview.cs" />
     <Compile Include="Timeline\PropertyEditor.cs" />
     <Compile Include="Timeline\Timeline.cs" />
     <Compile Include="Timeline\Actions\NavigateActions.cs" />
-    <Compile Include="Timeline\Lines\AbstractLine.cs" />
-    <Compile Include="Timeline\Lines\NodeLine.cs" />
-    <Compile Include="Timeline\Lines\PropertyLine.cs" />
+    <Compile Include="Timeline\RowViews\TimelineRowView.cs" />
+    <Compile Include="Timeline\RowViews\TimelineNodeView.cs" />
+    <Compile Include="Timeline\RowViews\TimelinePropertyView.cs" />
     <Compile Include="Timeline\TimelineToolbar.cs" />
     <Compile Include="IconCache.cs" />
     <Compile Include="Timeline\KeyTransientsPainter.cs" />
@@ -93,6 +119,7 @@
     <Compile Include="Toolbox\MemoryLeaksChecker.cs" />
     <Compile Include="Toolbox\QyotoBooster.cs" />
     <Compile Include="Toolbox\CachedTextPainter.cs" />
+    <Compile Include="ViewActions\ViewMenu.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

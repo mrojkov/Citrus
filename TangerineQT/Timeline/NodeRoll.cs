@@ -9,6 +9,8 @@ namespace Tangerine
 {
 	public class NodeRoll : QWidget
 	{
+		Document doc { get { return The.Document; } }
+
 		public NodeRoll()
 		{
 			AutoFillBackground = true;
@@ -23,9 +25,9 @@ namespace Tangerine
 
 		void NodeRoll_MousePress(object sender, QEventArgs<QMouseEvent> e)
 		{
-			int line = e.Event.Y() / Timeline.RowHeight + The.Timeline.TopLine;
-			if (line >= 0 && line < The.Timeline.Lines.Count) {
-				The.Document.History.Add(new Commands.SelectLines(line));
+			int row = e.Event.Y() / doc.RowHeight + doc.TopRow;
+			if (row >= 0 && row < doc.Rows.Count) {
+				The.Document.History.Add(new Commands.SelectRows(row));
 				The.Document.History.Commit("Select Line");
 			}
 		}

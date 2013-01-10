@@ -35,6 +35,11 @@ namespace Lime
 			return GetDataDirectory(null, appName, "1.0");
 		}
 
+		public static string GetPathInsideDataDirectory(string appName, string path)
+		{
+			return System.IO.Path.Combine(GetDataDirectory(appName), path);
+		}
+
 		public static string GetDataDirectory(string companyName, string appName, string appVersion)
 		{
 #if iOS || MAC

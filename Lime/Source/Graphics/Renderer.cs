@@ -131,7 +131,7 @@ namespace Lime
 #if GLES11
 				GL.DrawElements(All.Triangles, currentIndex, All.UnsignedShort, (IntPtr)batchIndices);
 #else
-				GL.DrawElements(BeginMode.Triangles, currentIndex, DrawElementsType.UnsignedShort, (IntPtr)batchIndices);
+				OGL.DrawElements(BeginMode.Triangles, currentIndex, DrawElementsType.UnsignedShort, (IntPtr)batchIndices);
 #endif
 				CheckErrors();
 				currentIndex = currentVertex = 0;
@@ -167,20 +167,20 @@ namespace Lime
 			GL.TexCoordPointer(2, All.Float, 32, (IntPtr)((uint)batchVertices + 12));
 			
 #else
-			GL.Enable(EnableCap.Texture2D);
+			OGL.Enable(EnableCap.Texture2D);
 
 			// Set up vertex and color arrays
-			GL.VertexPointer(2, VertexPointerType.Float, 32, (IntPtr)batchVertices);
-			GL.EnableClientState(ArrayCap.VertexArray);
-			GL.ColorPointer(4, ColorPointerType.UnsignedByte, 32, (IntPtr)((uint)batchVertices + 8));
-			GL.EnableClientState(ArrayCap.ColorArray);
+			OGL.VertexPointer(2, VertexPointerType.Float, 32, (IntPtr)batchVertices);
+			OGL.EnableClientState(ArrayCap.VertexArray);
+			OGL.ColorPointer(4, ColorPointerType.UnsignedByte, 32, (IntPtr)((uint)batchVertices + 8));
+			OGL.EnableClientState(ArrayCap.ColorArray);
 			// Set up texture coordinate arrays
-			GL.ClientActiveTexture(TextureUnit.Texture1);
-			GL.EnableClientState(ArrayCap.TextureCoordArray);
-			GL.TexCoordPointer(2, TexCoordPointerType.Float, 32, (IntPtr)((uint)batchVertices + 20));
-			GL.ClientActiveTexture(TextureUnit.Texture0);
-			GL.EnableClientState(ArrayCap.TextureCoordArray);
-			GL.TexCoordPointer(2, TexCoordPointerType.Float, 32, (IntPtr)((uint)batchVertices + 12));
+			OGL.ClientActiveTexture(TextureUnit.Texture1);
+			OGL.EnableClientState(ArrayCap.TextureCoordArray);
+			OGL.TexCoordPointer(2, TexCoordPointerType.Float, 32, (IntPtr)((uint)batchVertices + 20));
+			OGL.ClientActiveTexture(TextureUnit.Texture0);
+			OGL.EnableClientState(ArrayCap.TextureCoordArray);
+			OGL.TexCoordPointer(2, TexCoordPointerType.Float, 32, (IntPtr)((uint)batchVertices + 12));
 #endif
 			blending = Blending.None;
 			Blending = Blending.Default;
@@ -194,8 +194,8 @@ namespace Lime
 			GL.ClearColor(r, g, b, a);
 			GL.Clear((uint)All.ColorBufferBit);
 #else
-			GL.ClearColor(r, g, b, a);
-			GL.Clear(ClearBufferMask.ColorBufferBit);
+			OGL.ClearColor(r, g, b, a);
+			OGL.Clear(ClearBufferMask.ColorBufferBit);
 #endif
 		}
 
@@ -225,16 +225,16 @@ namespace Lime
 			}
 #else
 			if (stage > 0) {
-				GL.ActiveTexture(TextureUnit.Texture0 + stage);
+				OGL.ActiveTexture(TextureUnit.Texture0 + stage);
 				if (glTexNum > 0) {
-					GL.Enable(EnableCap.Texture2D);
-					GL.BindTexture(TextureTarget.Texture2D, glTexNum);
+					OGL.Enable(EnableCap.Texture2D);
+					OGL.BindTexture(TextureTarget.Texture2D, glTexNum);
 				} else {
-					GL.Disable(EnableCap.Texture2D);
+					OGL.Disable(EnableCap.Texture2D);
 				}
-				GL.ActiveTexture(TextureUnit.Texture0);
+				OGL.ActiveTexture(TextureUnit.Texture0);
 			} else {
-				GL.BindTexture(TextureTarget.Texture2D, glTexNum);
+				OGL.BindTexture(TextureTarget.Texture2D, glTexNum);
 			}
 #endif
 			textures[stage] = glTexNum;
@@ -258,12 +258,12 @@ namespace Lime
 
 			GL.MatrixMode(All.Modelview);
 #else
-			GL.MatrixMode(MatrixMode.Projection);
+			OGL.MatrixMode(MatrixMode.Projection);
 		
-			GL.LoadIdentity();
-			GL.Ortho(left, right, bottom, top, 0, 1);
+			OGL.LoadIdentity();
+			OGL.Ortho(left, right, bottom, top, 0, 1);
 
-			GL.MatrixMode(MatrixMode.Modelview);
+			OGL.MatrixMode(MatrixMode.Modelview);
 #endif
 		}
 
@@ -273,7 +273,7 @@ namespace Lime
 			get { return viewport; }
 			set {
 				viewport = value;
-				GL.Viewport(value.X, value.Y, value.Width, value.Height);
+				OGL.Viewport(value.X, value.Y, value.Width, value.Height);
 			}
 		}
 
@@ -284,9 +284,9 @@ namespace Lime
 			GL.PushMatrix();
 			GL.MatrixMode(All.Modelview);
 #else
-			GL.MatrixMode(MatrixMode.Projection);
-			GL.PushMatrix();
-			GL.MatrixMode(MatrixMode.Modelview);
+			OGL.MatrixMode(MatrixMode.Projection);
+			OGL.PushMatrix();
+			OGL.MatrixMode(MatrixMode.Modelview);
 #endif
 		}
 
@@ -297,9 +297,9 @@ namespace Lime
 			GL.PopMatrix();
 			GL.MatrixMode(All.Modelview);
 #else
-			GL.MatrixMode(MatrixMode.Projection);
-			GL.PopMatrix();
-			GL.MatrixMode(MatrixMode.Modelview);
+			OGL.MatrixMode(MatrixMode.Projection);
+			OGL.PopMatrix();
+			OGL.MatrixMode(MatrixMode.Modelview);
 #endif
 		}
 
@@ -337,34 +337,34 @@ namespace Lime
 					break;
 				}
 #else
-				GL.Enable(EnableCap.Blend);
-				GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.Source0Rgb, (int)TextureEnvModeSource.Previous);
-				GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.Src0Alpha, (int)TextureEnvModeSource.Previous);
-				GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.Src1Rgb, (int)TextureEnvModeSource.Texture);
-				GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.Src1Alpha, (int)TextureEnvModeSource.Texture);
+				OGL.Enable(EnableCap.Blend);
+				OGL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.Source0Rgb, (int)TextureEnvModeSource.Previous);
+				OGL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.Src0Alpha, (int)TextureEnvModeSource.Previous);
+				OGL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.Src1Rgb, (int)TextureEnvModeSource.Texture);
+				OGL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.Src1Alpha, (int)TextureEnvModeSource.Texture);
 				switch(value) {
 				case Blending.Alpha:
 				case Blending.Default:
 				default:
 					if (PremulAlphaMode)
-						GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha);
+						OGL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha);
 					else
-						GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-					GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
+						OGL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+					OGL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
 					break;
 				case Blending.Silhuette:
-					GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
-					GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.CombineRgb, (int)TextureEnvModeCombine.Replace);
-					GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.CombineAlpha, (int)TextureEnvModeCombine.Modulate);
-					GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Combine);
+					OGL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+					OGL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.CombineRgb, (int)TextureEnvModeCombine.Replace);
+					OGL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.CombineAlpha, (int)TextureEnvModeCombine.Modulate);
+					OGL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Combine);
 					break;
 				case Blending.Add:
 				case Blending.Glow:
 					if (PremulAlphaMode)
-						GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.One);
+						OGL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.One);
 					else
-						GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
-					GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
+						OGL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
+					OGL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
 					break;
 				}
 #endif

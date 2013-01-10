@@ -7,43 +7,39 @@ using Qyoto;
 
 namespace Tangerine
 {
-	/// <summary>
-	/// The Action class provides an abstract user interface action that can be 
-	/// inserted into widgets.
-	/// </summary>
-	public class Action : QObject
+	public class Action
 	{
-		protected event Lime.BareEventHandler Triggered;
-		protected QAction qAction;
+		public QAction QAction;
+		private SlotWrapper triggerWrapper;
 
-		public string Text { get { return qAction.Text; } }
-		public string Shortcut {
-			get { return qAction.Shortcut.ToString(); }
-			set { qAction.Shortcut = QKeySequence.FromString(value); }
+		public string Text {
+			get { return QAction.Text; }
+			set { QAction.Text = value; } 
 		}
 
-		public Action(QObject parent, string text)
+		public QKeySequence Shortcut { 
+			get { return QAction.Shortcut; }
+			set { QAction.Shortcut = value; }
+		}
+
+		public Action()
 		{
-			qAction = new QAction(text, parent);
-			qAction.Triggered += OnTriggered;
+			triggerWrapper = new SlotWrapper(OnTriggered);
+			QAction = new QAction(The.DefaultQtParent);
+			QAction.Triggered += triggerWrapper.OnSignal;
 		}
 
-		[Q_SLOT]
-		protected virtual void OnTriggered()
-		{
-			if (Triggered != null) {
-				Triggered();
-			}
-		}
+		protected virtual void OnTriggered() { }
 	}
 
 	public class ContextualAction : Action
 	{
 		public ContextualAction(QWidget context, string text)
-			: base(context, text)
+			: base()
 		{
-			qAction.ShortcutContext = ShortcutContext.WidgetWithChildrenShortcut;
-			context.AddAction(qAction);
+			Text = text;
+			QAction.ShortcutContext = Qt.ShortcutContext.WidgetWithChildrenShortcut;
+			context.AddAction(QAction);
 		}
 	}
 }

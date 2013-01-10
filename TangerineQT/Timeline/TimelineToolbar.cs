@@ -7,11 +7,14 @@ using Qyoto;
 
 namespace Tangerine
 {
-	public class TimelineToolbar : QToolBar
+	public class TimelineToolbar : QWidget
 	{
+		Document doc { get { return The.Document; } }
+		CachedTextPainter textPainter = new CachedTextPainter();
+
 		public TimelineToolbar()
 		{
-			this.SetFixedHeight(30);//The.Timeline.RowHeight);
+			this.SetFixedHeight(doc.RowHeight);
 			Paint += KeyGridRuler_Paint;
 		}
 
@@ -19,7 +22,7 @@ namespace Tangerine
 		{
 			using (var ptr = new QPainter(this)) {
 				var mem = System.GC.GetTotalMemory(true);
-				ptr.DrawText(0, Height - 10, (mem / 1024).ToString("Memory: 0kb"));
+				//textPainter.Draw(ptr, 0, 0, (mem / 1024).ToString("Memory: 0kb"));
 			}
 		}
 	}

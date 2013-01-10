@@ -96,7 +96,7 @@ namespace Tangerine
 
 		private Inspector()
 		{
-			DockWidget = new QDockWidget("Inspector", MainWindow.Instance);
+			DockWidget = new QDockWidget("Inspector", The.DefaultQtParent);
 			DockWidget.ObjectName = "Inspector";
 			DockWidget.Widget = new InspectorWidget();
 		}

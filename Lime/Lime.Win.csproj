@@ -33,6 +33,10 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\3rdParty\OpenTK\OpenTK.dll</HintPath>
+    </Reference>
     <Reference Include="protobuf-net, Version=2.0.0.612, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
@@ -45,15 +49,13 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="OpenTK">
-      <HintPath>..\3rdParty\OpenTK\OpenTK.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Application\Application.cs" />
     <Compile Include="Source\Application\Logger.cs" />
     <Compile Include="Source\Application\WinApi.cs" />
     <Compile Include="Source\Application\WinCursors.cs" />
+    <Compile Include="Source\AssetsBundle\AssetsBundle.cs" />
     <Compile Include="Source\Audio\OggDecoder.cs" />
     <Compile Include="Source\Audio\SampleCache.cs" />
     <Compile Include="Source\Audio\SerializableSample.cs" />
@@ -67,13 +69,14 @@
     <Compile Include="Source\Application\MacGameController.cs" />
     <Compile Include="Source\Application\MacGameView.cs" />
     <Compile Include="Source\Application\OpenTKGameView.cs" />
-    <Compile Include="Source\AssetsBundle.cs" />
+    <Compile Include="Source\AssetsBundle\PackedAssetsBundle.cs" />
     <Compile Include="Source\Audio\AudioChannel.cs" />
     <Compile Include="Source\Audio\AudioDecoder.cs" />
     <Compile Include="Source\Audio\AudioSystem.cs" />
     <Compile Include="Source\Audio\WaveIMA4Decoder.cs" />
     <Compile Include="Source\Exception.cs" />
     <Compile Include="Source\Graphics\Font.cs" />
+    <Compile Include="Source\Graphics\OpenGL.cs" />
     <Compile Include="Source\Graphics\PlainTexture.cs" />
     <Compile Include="Source\Graphics\Renderer.cs" />
     <Compile Include="Source\Graphics\RenderTexture.cs" />
@@ -100,6 +103,7 @@
     <Compile Include="Source\Types\Size.cs" />
     <Compile Include="Source\Types\Vector2.cs" />
     <Compile Include="Source\Types\Vector3.cs" />
+    <Compile Include="Source\AssetsBundle\UnpackedAssetsBundle.cs" />
     <Compile Include="Source\Widgets\Animator.cs" />
     <Compile Include="Source\Widgets\AnimatorCollection.cs" />
     <Compile Include="Source\Widgets\AnimatorRegistry.cs" />

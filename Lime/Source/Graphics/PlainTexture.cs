@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-
 #if iOS
 using MonoTouch.UIKit;
 using OpenTK.Graphics.ES11;
@@ -31,7 +30,7 @@ namespace Lime
 				if (TexturesToDelete.Count > 0) {
 					var ids = new uint[TexturesToDelete.Count];
 					TexturesToDelete.CopyTo(ids);
-					GL.DeleteTextures(ids.Length, ids);
+					OGL.DeleteTextures(ids.Length, ids);
 					TexturesToDelete.Clear();
 					Renderer.CheckErrors();
 				}
@@ -53,7 +52,7 @@ namespace Lime
 
 		public void LoadImage(string path)
 		{
-			using (Stream stream = AssetsBundle.Instance.OpenFileLocalized(path)) {
+			using (Stream stream = PackedAssetsBundle.Instance.OpenFileLocalized(path)) {
 				LoadImage(stream);
 			}
 		}
@@ -164,7 +163,7 @@ namespace Lime
 			RGB = 0x40
 		}
 
-		private void InitWithDDSTexture(BinaryReader reader)
+		private void InitWithDDSBitmap(BinaryReader reader)
 		{
 			UInt32 magic = reader.ReadUInt32();
 			UInt32 size = reader.ReadUInt32();
@@ -233,12 +232,32 @@ namespace Lime
 				}
 				byte[] buffer = new byte[pitchOrLinearSize];
 				reader.Read(buffer, 0, buffer.Length);
-				GL.CompressedTexImage2D(TextureTarget.Texture2D, 0, pf, width, height, 0, buffer.Length, buffer);
+				OGL.CompressedTexImage2D(TextureTarget.Texture2D, 0, pf, width, height, 0, buffer.Length, buffer);
 				pitchOrLinearSize /= 4;
 				width /= 2;
 				height /= 2;
 				Renderer.CheckErrors();
 			}
+		}
+
+		private void InitWithPNGBitmap(BinaryReader reader)
+		{
+            var bitmap = new System.Drawing.Bitmap(reader.BaseStream);
+			SurfaceSize = ImageSize = new Size(bitmap.Width, bitmap.Height);
+			var lockRect = new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height);
+			var lockMode = System.Drawing.Imaging.ImageLockMode.ReadOnly;
+			if (bitmap.PixelFormat == System.Drawing.Imaging.PixelFormat.Format24bppRgb) {
+				var data = bitmap.LockBits(lockRect, lockMode, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+				OGL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, data.Width, data.Height, 0,
+					PixelFormat.Bgr, PixelType.UnsignedByte, data.Scan0);
+				bitmap.UnlockBits(data);
+			} else {
+				var data = bitmap.LockBits(lockRect, lockMode, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
+				OGL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width, data.Height, 0,
+					PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
+				bitmap.UnlockBits(data);
+			}
+			Renderer.CheckErrors();
 		}
 #endif
 
@@ -259,19 +278,27 @@ namespace Lime
 			GL.Hint(All.PerspectiveCorrectionHint, All.Fastest);
 #else
 			// Generate a new texture.
-			id = (uint)GL.GenTexture();
+			id = (uint)OGL.GenTexture();
 			Renderer.SetTexture(id, 0);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureParameterName.ClampToEdge);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureParameterName.ClampToEdge);
-			GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Fastest);
+			OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+			OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+			OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureParameterName.ClampToEdge);
+			OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureParameterName.ClampToEdge);
+			OGL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Fastest);
 #endif
 			using (BinaryReader reader = new BinaryReader(stream)) {
 #if iOS
 				InitWithPVRTexture(reader);
 #else
-				InitWithDDSTexture(reader);
+				int sign = stream.ReadByte();
+				stream.Seek(0, SeekOrigin.Begin);
+				if (sign == 'D') { 
+					InitWithDDSBitmap(reader);
+				} else if (sign == 137) {
+					InitWithPNGBitmap(reader);
+				} else {
+					throw new Lime.Exception("Texture format must be either DDS or PNG");
+				}
 #endif
 			}
 			Renderer.CheckErrors();
@@ -305,16 +332,16 @@ namespace Lime
 				All.Rgba, All.UnsignedByte, pixels);
 #else
 			Renderer.SetTexture(id, 0);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureParameterName.ClampToEdge);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureParameterName.ClampToEdge);
-			GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Fastest);
-			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0,
+			OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+			OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+			OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureParameterName.ClampToEdge);
+			OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureParameterName.ClampToEdge);
+			OGL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Fastest);
+			OGL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0,
 				PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
 			if (generateMips) {
 #if WIN
-				GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+				OGL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 #else
 				Console.WriteLine("WARNING: Mipmap generation is not implemented for this platform");
 #endif

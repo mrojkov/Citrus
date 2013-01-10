@@ -8,28 +8,13 @@ using System.Reflection;
 
 namespace Tangerine
 {
-	/// <summary>
-	/// Строка представляющая один нод на таймлайне
-	/// </summary>
-	public class NodeLine : AbstractLine
+	public class TimelineNodeView : TimelineRowView
 	{
-		private Lime.Node node;
-		private NodeSettings settings;
+		public new TimelineNodeRow row { get { return base.row as TimelineNodeRow; } }
 
-		public bool IsFolded
+		public TimelineNodeView(TimelineRow row)
+			: base(row)
 		{
-			get { return settings.IsFolded; }
-		}
-
-		public NodeLine(Lime.Node node)
-		{
-			settings = The.Document.Settings.GetObjectSettings<NodeSettings>(node.Guid.ToString());
-			this.node = node;
-		}
-
-		public override void CreateWidgets()
-		{
-			base.CreateWidgets();
 			//var expanderIcon = CreateIconButton("Timeline/Collapsed");
 			//expanderIcon.Clicked += expanderIcon_Clicked;
 			//layout.AddWidget(expanderIcon);
@@ -38,7 +23,7 @@ namespace Tangerine
 			//nodeIcon.Clicked += nodeIcon_Clicked;
 			layout.AddWidget(nodeIcon);
 
-			var label = new QLabel(node.Id);
+			var label = new QLabel(this.row.Node.Id);
 			layout.AddWidget(label, 10);
 
 			var bt = CreateImageWidget("Timeline/Dot");
@@ -69,13 +54,18 @@ namespace Tangerine
 		//	The.Timeline.Controller.Rebuild();
 		//}
 
-		public override void PaintContent(QPainter ptr, int width)
+		public override void PaintContent(QPainter ptr, int top, int width)
 		{
 			int numCols = width / ColWidth + 1;
 			var c = new KeyTransientCollector();
-			var tp = new KeyTransientsPainter(ColWidth, Top);
-			var transients = c.GetTransients(node);
+			var tp = new KeyTransientsPainter(ColWidth, top);
+			var transients = c.GetTransients(row.Node);
 			tp.DrawTransients(transients, 0, numCols, ptr);
+		}
+
+		private void DrawKey(QPainter ptr, KeyTransient m, int x, int y)
+		{
+			ptr.FillRect(x, y, 2, 2, m.QColor);
 		}
 	}
 }

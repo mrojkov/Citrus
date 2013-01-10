@@ -58,7 +58,7 @@ namespace Lime
 		}
 		
 		public Node this[int index] {
-			get { return nodeList[index]; }
+			get {return nodeList[index]; }
 		}
 
 		void ICollection<Node>.CopyTo(Node[] n, int index)

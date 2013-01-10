@@ -44,7 +44,7 @@ namespace Lime
 		#region Properties
 
 		[ProtoMember(1)]
-		[TangerineProperty(0)]
+		[TangerineProperty(4)]
 		public Vector2 Position { get { return position; } set { position = value; } }
 		private Vector2 position;
 
@@ -52,7 +52,7 @@ namespace Lime
 		public float Y { get { return position.Y; } set { position.Y = value; } }
 
 		[ProtoMember(2)]
-		[TangerineProperty(1)]
+		[TangerineProperty(7)]
 		public Vector2 Size { get { return size; } set { size = value; } }
 		private Vector2 size;
 
@@ -60,15 +60,15 @@ namespace Lime
 		public float Height { get { return size.Y; } set { size.Y = value; } }
 
 		[ProtoMember(3)]
-		[TangerineProperty(2)]
+		[TangerineProperty(6)]
 		public Vector2 Pivot { get; set; }
 
 		[ProtoMember(4)]
-		[TangerineProperty(3)]
+		[TangerineProperty(5)]
 		public Vector2 Scale { get; set; }
 
 		[ProtoMember(5)]
-		//[TangerineProperty(4)]
+		[TangerineProperty(3)]
 		public float Rotation { 
 			get {
 				return rotation;
@@ -83,6 +83,7 @@ namespace Lime
 		private Vector2 direction = new Vector2(1, 0);
 
 		[ProtoMember(6)]
+		[TangerineProperty(8)]
 		public Color4 Color { get { return color; } set { color = value; } }
 		private Color4 color;
 
@@ -99,9 +100,11 @@ namespace Lime
 		public Anchors Anchors { get; set; }
 
 		[ProtoMember(8)]
+		[TangerineProperty(9)]
 		public Blending Blending { get; set; }
 
 		[ProtoMember(9)]
+		[TangerineProperty(2)]
 		public bool Visible { get; set; }
 
 		[ProtoMember(10)]

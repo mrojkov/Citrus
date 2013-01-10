@@ -7,22 +7,15 @@ using Qyoto;
 
 namespace Tangerine
 {
-	public delegate void KeyboardHandler(Qt.Key key);
-
 	public class Timeline
 	{
-		public List<AbstractLine> Lines = new List<AbstractLine>();
-		public LinesBuilder LinesBuilder = new LinesBuilder();
-
-		public static int RowHeight { get { return The.Preferences.TimelineRowHeight; } }
-		public static int ColWidth { get { return The.Preferences.TimelineColWidth; } }
-
-		public QDockWidget DockWidget { get; private set; }
-
-		public int TopLine;
-		public int LeftCol;
+		Document doc { get { return The.Document; } }
 
 		public static Timeline Instance = new Timeline();
+
+		private List<TimelineRow> rows = new List<TimelineRow>();
+
+		public QDockWidget DockWidget { get; private set; }
 
 		QSplitter splitter1;
 		QSplitter splitter2;
@@ -30,10 +23,14 @@ namespace Tangerine
 		public int FontHeight { get; private set; }
 		public NodeRoll NodeRoll;
 		public KeyGrid KeyGrid;
+		public Panview Panview;
+		public KeyGridRuler KeyGridRuler;
+
+		private List<Action> actions = new List<Action>();
 
 		private Timeline()
 		{
-			DockWidget = new QDockWidget("Timeline", MainWindow.Instance);
+			DockWidget = new QDockWidget("Timeline", The.DefaultQtParent);
 			DockWidget.ObjectName = "Timeline";
 			DockWidget.Font = new QFont("Tahoma", 9);
 			FontHeight = DockWidget.FontMetrics().Height();
@@ -41,7 +38,8 @@ namespace Tangerine
 			splitter2 = new QSplitter(Qt.Orientation.Horizontal);
 			splitter2.AddWidget(CreateToolbarAndNodeRoll());
 			splitter2.AddWidget(CreateRulerAndGrid());
-			splitter1.AddWidget(new Panview());
+			Panview = new Panview();
+			splitter1.AddWidget(Panview);
 			splitter1.AddWidget(splitter2);
 			DockWidget.Widget = splitter1;
 			splitter1.Sizes = new List<int> { 30, 100 };
@@ -49,13 +47,26 @@ namespace Tangerine
 			DockWidget.MousePress += Dock_MousePress;
 			Document.Changed += Document_Changed;
 			DockWidget.Wheel += DockWidget_Wheel;
+			CreateActions();
+		}
+
+		private void CreateActions()
+		{
+			actions.Add(new ChoosePrevNode(DockWidget));
+			actions.Add(new ChooseNextNode(DockWidget));
+			actions.Add(new EnterContainer(DockWidget));
+			actions.Add(new ExitContainer(DockWidget));
+			actions.Add(new MoveCursorRight(DockWidget));
+			actions.Add(new MoveCursorLeft(DockWidget));
+			actions.Add(new MoveCursorRightFast(DockWidget));
+			actions.Add(new MoveCursorLeftFast(DockWidget));
 		}
 
 		void DockWidget_Wheel(object sender, QEventArgs<QWheelEvent> e)
 		{
-			TopLine += e.Event.Delta() > 0 ? -1 : 1;
-			int m = Lines.Count - GetNumberOfVisibleLines();
-			Lime.Mathf.Clamp(ref TopLine, 0, m);
+			doc.TopRow += e.Event.Delta() > 0 ? -1 : 1;
+			int m = Math.Max(0, rows.Count - TimelineToolbox.NumberOfVisibleRows);
+			doc.TopRow = Lime.Mathf.Clamp(doc.TopRow, 0, m);
 			Refresh();
 		}
 
@@ -74,48 +85,50 @@ namespace Tangerine
 
 		public void Refresh()
 		{
-			var newLines = LinesBuilder.BuildLines(The.Document.Container);
-			if (!Lines.AreEqual(newLines)) {
+			var newRows = The.Document.Rows;
+			if (!rows.AreEqual(newRows)) {
 				NodeRoll.Hide();
-				RefreshLines(newLines);
+				RefreshRows(newRows);
 				NodeRoll.Show();
-				KeyGrid.Update();
 			}
-			foreach (var line in Lines) {
-				bool lineSelected = The.Document.SelectedLines.Contains(line.Index);
-				line.RefreshPosition();
-				line.SetSelected(lineSelected);
+			foreach (var row in rows) {
+				bool rowSelected = The.Document.SelectedRows.Contains(row.Index);
+				row.View.SetPosition((row.Index - doc.TopRow) * doc.RowHeight);
+				row.View.SetSelected(rowSelected);
 			}
 			KeyGrid.Update();
+			KeyGridRuler.Update();
+			Panview.Update();
 		}
 
-		private void RefreshLines(List<AbstractLine> newLines)
+		private void RefreshRows(List<TimelineRow> newRows)
 		{
-			var document = The.Document;
-			foreach (var line in Lines) {
-				line.Detach();
+			foreach (var row in rows) {
+				row.View.Detach();
 			}
-			Lines.Clear();
-			int i = 0;
-			foreach (var line in newLines) {
-				line.Attach(i++);
-				Lines.Add(line);
-			}
-		}
-
-		public void EnsureLineVisible(int line)
-		{
-			if (line < TopLine) {
-				TopLine = line;
-			} else if (line > TopLine + GetNumberOfVisibleLines()) {
-				TopLine = line - GetNumberOfVisibleLines();
+			rows.Clear();
+			foreach (var row in newRows) {
+				row.View.Attach();
+				rows.Add(row);
 			}
 		}
 
-		public int GetNumberOfVisibleLines()
+		public void EnsureRowVisible(int row)
 		{
-			int numVisibleRows = (NodeRoll.Height - RowHeight + 1) / RowHeight;
-			return numVisibleRows;
+			if (row < doc.TopRow) {
+				doc.TopRow = row;
+			} else if (row >= doc.TopRow + TimelineToolbox.NumberOfVisibleRows) {
+				doc.TopRow = row - TimelineToolbox.NumberOfVisibleRows + 1;
+			}
+		}
+
+		public void EnsureColumnVisible(int column)
+		{
+			if (column < doc.LeftColumn) {
+				doc.LeftColumn = column;
+			} else if (column >= doc.LeftColumn + TimelineToolbox.NumberOfVisibleColumns) {
+				doc.LeftColumn = column - TimelineToolbox.NumberOfVisibleColumns + 1;
+			}
 		}
 
 		//void OnKeyPressed(object sender, QEventArgs<QKeyEvent> e)
@@ -133,7 +146,8 @@ namespace Tangerine
 			var layout = new QVBoxLayout(ctr);
 			layout.Spacing = 0;
 			layout.Margin = 0;
-			layout.AddWidget(new KeyGridRuler());
+			KeyGridRuler = new KeyGridRuler();
+			layout.AddWidget(KeyGridRuler);
 			KeyGrid = new KeyGrid();
 			layout.AddWidget(KeyGrid);
 			return ctr;

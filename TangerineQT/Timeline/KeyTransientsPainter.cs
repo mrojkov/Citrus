@@ -9,10 +9,10 @@ namespace Tangerine
 {
 	public class KeyTransientsPainter
 	{
-		int colWidth;
-		int top;
+		float colWidth;
+		float top;
 
-		public KeyTransientsPainter(int colWidth, int top)
+		public KeyTransientsPainter(float colWidth, float top)
 		{
 			this.colWidth = colWidth;
 			this.top = top;
@@ -23,8 +23,8 @@ namespace Tangerine
 			for (int i = 0; i < transients.Count; i++) {
 				var m = transients[i];
 				if (m.Frame >= startFrame && m.Frame < endFrame) {
-					int x = colWidth * (m.Frame - startFrame) + 4;
-					int y = top + m.Line * 6 + 4;
+					int x = (int)(colWidth * (m.Frame - startFrame));
+					int y = (int)(top + m.Line * 6);
 					DrawKey(ptr, m, x, y);
 				}
 			}
@@ -32,10 +32,10 @@ namespace Tangerine
 
 		private void DrawKey(QPainter ptr, KeyTransient m, int x, int y)
 		{
-			ptr.FillRect(x - 3, y - 3, 6, 6, m.QColor);
+			ptr.FillRect(x + 3, y + 1, 6, 6, m.QColor);
 			if (m.Length > 0) {
-				int x1 = x + m.Length * colWidth;
-				ptr.FillRect(x, y - 1, x1 - x, 2, m.QColor);
+				int x1 = (int)(x + m.Length * colWidth);
+				ptr.FillRect(x + 3, y + 3, x1 - x, 2, m.QColor);
 			}
 		}
 	}

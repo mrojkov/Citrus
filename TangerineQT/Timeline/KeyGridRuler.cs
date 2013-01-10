@@ -7,23 +7,22 @@ using Qyoto;
 
 namespace Tangerine
 {
-	public class KeyGridRuler : QToolBar
+	public class KeyGridRuler : QWidget
 	{
+		Document doc { get { return The.Document; } }
 		CachedTextPainter textPainter = new CachedTextPainter();
 
 		public KeyGridRuler()
 		{
-			this.SetFixedHeight(RowHeight);
+			this.SetFixedHeight(doc.RowHeight);
 			Paint += KeyGridRuler_Paint;
 		}
 
-		int RowHeight { get { return The.Preferences.TimelineRowHeight; } }
-		int ColWidth { get { return The.Preferences.TimelineColWidth; } }
-
 		void KeyGridRuler_Paint(object sender, QEventArgs<QPaintEvent> e)
 		{
-			int numCols = Size.Width / ColWidth + 1;
+			int numCols = TimelineToolbox.MaxColumn; // Size.Width / doc.ColumnWidth + 1;
 			using (var ptr = new QPainter(this)) {
+				ptr.Translate(-doc.LeftColumn * doc.ColumnWidth, 0);
 				DrawGrid(numCols, ptr);
 			}
 		}
@@ -34,14 +33,18 @@ namespace Tangerine
 			ptr.Pen = new QPen(GlobalColor.darkGray);
 			var line = new QLine(0, Size.Height - 6, 0, Size.Height - 5);
 			for (int i = 0; i <= numCols; i++) {
-				line.Translate(ColWidth, 0);
+				line.Translate(doc.ColumnWidth, 0);
 				ptr.DrawLine(line);
 			}
+			// Рисуем курсор
+			ptr.Pen = new QPen(GlobalColor.darkRed, 1);
+			ptr.Brush = new QBrush(new QColor(255, 128, 128));
+			ptr.DrawRect(doc.CurrentColumn * doc.ColumnWidth, 1, doc.ColumnWidth, Height - 2);
 			// Рисуем числа
 			ptr.Pen = new QPen(GlobalColor.black);
 			ptr.Font = new QFont("Tahoma", 9);
 			for (int i = 0; i <= numCols / 10; i++) {
-				textPainter.Draw(ptr, i * ColWidth * 10 + 1, 5, (i * 10).ToString());
+				textPainter.Draw(ptr, i * doc.ColumnWidth * 10 + 1, 5, (i * 10).ToString());
 			}
 		}
 	}

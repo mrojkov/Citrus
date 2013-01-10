@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
+using ProtoBuf;
 
 namespace Tangerine
 {
+	[ProtoContract]
 	public class Preferences
 	{
 		public int TimelineRowHeight = 30;

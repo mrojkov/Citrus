@@ -20,7 +20,7 @@ namespace Lime
 
 		public VideoTexture(string path)
 		{
-			rgbStream = AssetsBundle.Instance.OpenFile(path);
+			rgbStream = PackedAssetsBundle.Instance.OpenFile(path);
 			rgbDecoder = new OgvDecoder(rgbStream);
 			this.ImageSize = rgbDecoder.FrameSize;
 			this.SurfaceSize = ImageSize;

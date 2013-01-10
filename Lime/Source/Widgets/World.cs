@@ -1,6 +1,6 @@
 ﻿namespace Lime
 {
-	public class World : Frame
+	public sealed class World : Frame
 	{
 		/// <summary>
 		/// Widget which holds mouse input focus. Before processing mouse down event you should test whether ActiveWidget == this.
@@ -25,12 +25,7 @@
 		/// </summary>
 		public bool IsTopDialogUpdated;
 
-		public static World Instance;
-
-		public World()
-		{
-			Instance = this;
-		}
+		public static World Instance = new World();
 
 		public override void Update(int delta)
 		{

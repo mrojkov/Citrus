@@ -18,6 +18,7 @@ namespace Tangerine
 		public int Line;
 		public int Length;
 		public int Frame;
+		public string PropertyName;
 	}
 
 	/// <summary>
@@ -59,7 +60,7 @@ namespace Tangerine
 					endings[j] = 0;
 				}
 				if (endings[j] == 0) {
-					endings[j] = transient.Frame + transient.Length - 1;
+					endings[j] = transient.Frame + transient.Length;
 					transient.Line = j;
 					attributes[j] = transient.Attribute;
 					break;
@@ -70,10 +71,10 @@ namespace Tangerine
 		private bool TryJoinTransientToPreviousOne(Lime.TangerinePropertyAttribute[] attributes, int[] endings, int[] priorityMap, KeyTransient transient)
 		{
 			foreach (int j in priorityMap) {
-				if (endings[j] == transient.Frame - 1) {
+				if (endings[j] == transient.Frame) {
 					if (transient.Attribute == attributes[j]) {
 						transient.Line = j;
-						endings[j] = transient.Frame + transient.Length - 1;
+						endings[j] = transient.Frame + transient.Length;
 						return true;
 					}
 				}
@@ -101,6 +102,7 @@ namespace Tangerine
 				for (int i = 0; i < ani.Frames.Length; i++) {
 					var key0 = ani[i];
 					var transient = new KeyTransient() {
+						PropertyName = ani.TargetProperty,
 						Line = 0,
 						Attribute = attr,
 						QColor = KeyTransientPalette.GetColor(attr.KeyColor),

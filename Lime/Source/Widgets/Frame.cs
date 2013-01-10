@@ -181,7 +181,7 @@ namespace Lime
 				throw new Lime.Exception("Cyclic dependency of scenes has detected: {0}", path);
 			processingFiles.Add(path);
 			try {
-				using (Stream stream = AssetsBundle.Instance.OpenFileLocalized(path)) {
+				using (Stream stream = PackedAssetsBundle.Instance.OpenFileLocalized(path)) {
 					Serialization.ReadObject<Frame>(path, stream, this);
 				}
 				LoadContent();
@@ -214,7 +214,7 @@ namespace Lime
 			Nodes.Clear();
 			Markers.Clear();
 			var contentsPath = Path.ChangeExtension(ContentsPath, "scene");
-			if (AssetsBundle.Instance.FileExists(contentsPath)) {
+			if (PackedAssetsBundle.Instance.FileExists(contentsPath)) {
 				Frame content = Frame.Create(ContentsPath);
 				if (content.Widget != null && Widget != null) {
 					content.Update(0);

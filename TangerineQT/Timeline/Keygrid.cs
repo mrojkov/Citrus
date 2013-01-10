@@ -10,9 +10,9 @@ namespace Tangerine
 {
 	public class KeyGrid : QWidget
 	{
-		public static int MaxLinesPerRow = 5;
+		Document doc { get { return The.Document; } }
 
-		//int ActiveRow { get { return The.Timeline.RowIndex; } set { The.Timeline.RowIndex = value; } }
+		public static int MaxLinesPerRow = 5;
 
 		public KeyGrid()
 		{
@@ -21,59 +21,44 @@ namespace Tangerine
 
 		void Keygrid_Paint(object sender, QEventArgs<QPaintEvent> e)
 		{
-			int numRows = Size.Height / Timeline.RowHeight + 1;
-			int numCols = Size.Width / Timeline.ColWidth + 1;
+			int numRows = Size.Height / doc.RowHeight + 1;
+			int numCols = TimelineToolbox.MaxColumn; // Size.Width / doc.ColumnWidth + 1;
 			using (var ptr = new QPainter(this)) {
+				ptr.Translate(-doc.LeftColumn * doc.ColumnWidth, 0);
 				DrawGrid(numRows, numCols, ptr);
-				foreach (var item in The.Timeline.Lines) {
-					item.PaintContent(ptr, Width);
+				foreach (var row in doc.Rows) {
+					int top = (row.Index - doc.TopRow) * doc.RowHeight;
+					row.View.PaintContent(ptr, top, Width);
 				}
-				//var nodes = The.Document.RootNode.Nodes;
-				//for (int i = 0; i < nodes.Count; i++) {
-				//	var node = nodes[i];
-				//	if (i < numRows) {
-				//		DrawTransients(KeyTransientCollector.GetTransients(node), i, 0, numCols, ptr);
-				//	}
-				//}
+				DrawCursor(ptr);
 			}
 		}
 
-		//private void DrawTransients(List<KeyTransient> keyMarks, int row, int startFrame, int endFrame, QPainter ptr)
-		//{
-		//	for (int i = 0; i < keyMarks.Count; i++) {
-		//		var m = keyMarks[i];
-		//		if (m.Frame >= startFrame && m.Frame < endFrame) {
-		//			int x = ColWidth * (m.Frame - startFrame) + 4;
-		//			int y = RowHeight * row + m.Line * 6 + 4;
-		//			DrawKey(ptr, m, x, y);
-		//		}
-		//	}
-		//}
-
-		//private void DrawKey(QPainter ptr, KeyTransient m, int x, int y)
-		//{
-		//	ptr.FillRect(x - 3, y - 3, 6, 6, m.QColor);
-		//	if (m.Length > 0) {
-		//		int x1 = x + m.Length * ColWidth;
-		//		ptr.FillRect(x, y - 1, x1 - x, 2, m.QColor);
-		//	}
-		//}
-
 		private void DrawGrid(int numRows, int numCols, QPainter ptr)
 		{
-			ptr.FillRect(Rect, GlobalColor.white);
+			ptr.FillRect(0, 0, numCols * doc.ColumnWidth, Height, GlobalColor.white);
 			ptr.Pen = new QPen(GlobalColor.darkGray, 1, PenStyle.DotLine);
-			var line = new QLine(0, 0, Size.Width, 0);
-			for (int i = 0; i < numRows; i++) {
-				line.Translate(0, Timeline.RowHeight);
+			var line = new QLine(0, 0, numCols * doc.ColumnWidth, 0);
+			for (int i = 0; i <= numRows; i++) {
 				ptr.DrawLine(line);
+				line.Translate(0, doc.RowHeight);
 			}
 			ptr.Pen = new QPen(GlobalColor.darkGray, 1, PenStyle.DotLine);
 			line = new QLine(0, 0, 0, Size.Height);
-			for (int i = 0; i < numCols / 5; i++) {
-				line.Translate(Timeline.ColWidth * 5, 0);
+			for (int i = 0; i <= numCols / 5; i++) {
 				ptr.DrawLine(line);
+				line.Translate(doc.ColumnWidth * 5, 0);
 			}
+		}
+
+		private QLine DrawCursor(QPainter ptr)
+		{
+			var line = new QLine();
+			ptr.Pen = new QPen(GlobalColor.darkRed, 1);
+			line = new QLine(0, 0, 0, Size.Height);
+			line.Translate((int)(doc.ColumnWidth * (doc.CurrentColumn + 0.5)), 0);
+			ptr.DrawLine(line);
+			return line;
 		}
 	}
 }
