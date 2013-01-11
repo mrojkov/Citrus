@@ -42,8 +42,8 @@ namespace Orange
 			foreach(var path in locationPaths)
 				locations.Add(path, new Lime.Frame(path));
 			if (locations.Count > 0) {
-				Lime.Serialization.WriteObjectToBundle<Router>(assetsBundle, "Router", new Router(locations));
-				Lime.Serialization.WriteObjectToBundle<Warehouse>(assetsBundle, "Warehouse", new Warehouse(locations));
+				//Lime.Serialization.WriteObjectToBundle<Router>(assetsBundle, "Router", new Router(locations));
+				//Lime.Serialization.WriteObjectToBundle<Warehouse>(assetsBundle, "Warehouse", new Warehouse(locations));
 				new CodeGenerator(project.ProjectDirectory, project.Title, locations).Start();
 			}
 
