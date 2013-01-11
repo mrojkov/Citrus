@@ -51,7 +51,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Compile Include="Source\AssetsBundle.cs" />
     <Compile Include="Source\Exception.cs" />
     <Compile Include="Source\Serialization.cs" />
     <Compile Include="Source\Application\MacAppDelegate.cs" />
@@ -132,8 +131,14 @@
     <Compile Include="Source\Types\TangerineClassAttribute.cs" />
     <Compile Include="Source\Types\TangerinePropertyAttribute.cs" />
     <Compile Include="Source\Application\WinCursors.cs" />
-    <Compile Include="Source\Types\TangerineClassAttribute.cs" />
-    <Compile Include="Source\Types\TangerinePropertyAttribute.cs" />
+    <Compile Include="Source\Application\WinApi.cs" />
+    <Compile Include="Source\AssetsBundle\AssetsBundle.cs" />
+    <Compile Include="Source\AssetsBundle\PackedAssetsBundle.cs" />
+    <Compile Include="Source\AssetsBundle\UnpackedAssetsBundle.cs" />
+    <Compile Include="Source\Graphics\OgvDecoder.cs" />
+    <Compile Include="Source\Graphics\OpenGL.cs" />
+    <Compile Include="Source\Graphics\VideoTexture.cs" />
+    <Compile Include="Source\Widgets\Video.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Audio\ADPCMEncoder.c">
