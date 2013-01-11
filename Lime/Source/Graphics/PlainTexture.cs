@@ -12,6 +12,9 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Lime
 {
+#if MAC
+	using OGL = GL;
+#endif
 	/// <summary>
 	/// Represents 2D texture.
 	/// </summary>

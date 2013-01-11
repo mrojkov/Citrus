@@ -19,22 +19,21 @@ namespace Lime
 		}
 		
 #if iOS
-		public static ProtoBuf.Meta.TypeModel Serializer = ProtoBuf.Meta.RuntimeTypeModel.Default;
+		public static ProtoBuf.Meta.TypeModel Serializer = null; // ProtoBuf.Meta.RuntimeTypeModel.Default;
 #else
 		public static ProtoBuf.Meta.TypeModel Serializer = CreateSerializer();
 #endif
-
+#if !iOS
 		static ProtoBuf.Meta.RuntimeTypeModel CreateSerializer()
 		{
 			var model = ProtoBuf.Meta.RuntimeTypeModel.Create();
 			model.UseImplicitZeroDefaults = false;
 			// Add ITexture type here due a bug in ProtoBuf-Net
 			model.Add(typeof(ITexture), true);
-#if !iOS
 			model.CompileInPlace();
-#endif
 			return model;
 		}
+#endif
 		
 		static readonly Stack<Operation> opStack = new Stack<Operation>();
 		

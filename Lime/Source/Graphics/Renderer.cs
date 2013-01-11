@@ -16,6 +16,9 @@ using System.Runtime.InteropServices;
 
 namespace Lime
 {
+#if MAC
+	using OGL = GL;
+#endif
 	[ProtoContract]
 	public enum Blending
 	{
