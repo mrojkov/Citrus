@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace Lime
 {
-	public static class OGL
+	public static partial class OGL
 	{
 		const string library = "opengl32.dll";
 
@@ -48,19 +48,19 @@ namespace Lime
 		public static extern void BindTexture(TextureTarget target, UInt32 texture);
 
 		[DllImport(library, EntryPoint = "glVertexPointer")]
-		public static extern void VertexPointer(Int32 size, OpenTK.Graphics.OpenGL.VertexPointerType type, Int32 stride, IntPtr pointer);
+		public static extern void VertexPointer(Int32 size, VertexPointerType type, Int32 stride, IntPtr pointer);
 
 		[DllImport(library, EntryPoint = "glEnableClientState")]
-		public static extern void EnableClientState(OpenTK.Graphics.OpenGL.ArrayCap array);
+		public static extern void EnableClientState(ArrayCap array);
 
 		[DllImport(library, EntryPoint = "glColorPointer")]
-		public static extern void ColorPointer(Int32 size, OpenTK.Graphics.OpenGL.ColorPointerType type, Int32 stride, IntPtr pointer);
+		public static extern void ColorPointer(Int32 size, ColorPointerType type, Int32 stride, IntPtr pointer);
 
 		[DllImport(library, EntryPoint = "glTexCoordPointer")]
 		public static extern void TexCoordPointer(int size, TexCoordPointerType type, int stride, IntPtr pointer);
 
 		[DllImport(library, EntryPoint = "glMatrixMode")]
-		public static extern void MatrixMode(OpenTK.Graphics.OpenGL.MatrixMode mode);
+		public static extern void MatrixMode(MatrixMode mode);
 
 		[DllImport(library, EntryPoint = "glPushMatrix")]
 		public static extern void PushMatrix();
@@ -75,7 +75,7 @@ namespace Lime
 		public static extern void Ortho(double left, double right, double bottom, double top, double zNear, double zFar);
 
 		[DllImport(library, EntryPoint = "glTexEnvf")]
-		public static extern void TexEnv(OpenTK.Graphics.OpenGL.TextureEnvTarget target, OpenTK.Graphics.OpenGL.TextureEnvParameter pname, Single param);
+		public static extern void TexEnv(TextureEnvTarget target, TextureEnvParameter pname, Single param);
 
 		[DllImport(library, EntryPoint = "glBlendFunc")]
 		public static extern void BlendFunc(BlendingFactorSrc src, BlendingFactorDest dst);
