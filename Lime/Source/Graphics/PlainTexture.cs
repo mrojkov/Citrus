@@ -30,7 +30,11 @@ namespace Lime
 				if (TexturesToDelete.Count > 0) {
 					var ids = new uint[TexturesToDelete.Count];
 					TexturesToDelete.CopyTo(ids);
+#if GLES11
+					GL.DeleteTextures(ids.Length, ids);
+#else
 					OGL.DeleteTextures(ids.Length, ids);
+#endif
 					TexturesToDelete.Clear();
 					Renderer.CheckErrors();
 				}
@@ -104,7 +108,7 @@ namespace Lime
 			/* UInt32 bitmaskAlpha = */ reader.ReadUInt32();
 			/* UInt32 pvrTag = */ reader.ReadUInt32();
 			/* UInt32 numSurfs = */ reader.ReadUInt32();
-			surSize = imgSize = new Size(width, height);
+			SurfaceSize = ImageSize = new Size(width, height);
 			for (int i = 0; i <= numMipmaps; i++) {
 				if (i > 0 && (width < 8 || height < 8)) {
 					continue;

@@ -29,7 +29,7 @@ namespace Lime
 		static T GetProc<T>(string name) where T: class
 		{
 			var ptr = GetProcAddress(name);
-			if (ptr == null) {
+			if (ptr == new IntPtr(0)) {
 				throw new Lime.Exception("Unsupported OpenGL procedure: {0}", name);
 			}
 			return Marshal.GetDelegateForFunctionPointer(ptr, typeof(T)) as T;

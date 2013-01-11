@@ -273,7 +273,11 @@ namespace Lime
 			get { return viewport; }
 			set {
 				viewport = value;
+#if GLES11
+				GL.Viewport(value.X, value.Y, value.Width, value.Height);
+#else
 				OGL.Viewport(value.X, value.Y, value.Width, value.Height);
+#endif
 			}
 		}
 
