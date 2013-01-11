@@ -16,6 +16,8 @@ namespace Lime
 		Node[] nodeArray;
 		Node owner;
 
+		public NodeCollection() { /* ctor for ProtoBuf only */ }
+
 		public NodeCollection(Node owner)
 		{
 			this.owner = owner;

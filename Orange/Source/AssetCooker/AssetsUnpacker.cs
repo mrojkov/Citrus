@@ -13,8 +13,7 @@ namespace Orange
 		{
 			string bundlePath = Path.ChangeExtension(project.AssetsDirectory, Helpers.GetTargetPlatformString(platform));
 			string outputDirectory = bundlePath + ".Unpacked";
-			AssetsBundle.Instance.Open(bundlePath, AssetBundleFlags.None);
-			try {
+			using (AssetsBundle.Instance = new PackedAssetsBundle(bundlePath, AssetBundleFlags.None)) {
 				Console.WriteLine("Extracting game content into \"{0}\"", outputDirectory);
 				if (Directory.Exists(outputDirectory)) {
 					Directory.Delete(outputDirectory, true);
@@ -34,8 +33,6 @@ namespace Orange
 						}
 					}
 				}
-			} finally {
-				AssetsBundle.Instance.Close();
 			}
 		}
 
@@ -43,8 +40,7 @@ namespace Orange
 		{
 			string bundlePath = Path.ChangeExtension(project.AssetsDirectory, Helpers.GetTargetPlatformString(platform));
 			string outputDirectory = project.AssetsDirectory;
-			AssetsBundle.Instance.Open(bundlePath, AssetBundleFlags.None);
-			try {
+			using (AssetsBundle.Instance = new PackedAssetsBundle(bundlePath, AssetBundleFlags.None)) {
 				Console.WriteLine("Extracting tangerine scenes into \"{0}\"", outputDirectory);
 				using (new DirectoryChanger(outputDirectory)) {
 					foreach (string asset in AssetsBundle.Instance.EnumerateFiles()) {
@@ -59,8 +55,6 @@ namespace Orange
 						}
 					}
 				}
-			} finally {
-				AssetsBundle.Instance.Close();
 			}		
 		}
 	}

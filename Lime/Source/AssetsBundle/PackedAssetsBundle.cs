@@ -143,7 +143,7 @@ namespace Lime
 		Writable = 1,
 	}
 
-	public class PackedAssetsBundle : AssetsBundle, IDisposable
+	public class PackedAssetsBundle : AssetsBundle
 	{
 		Stack<Stream> streamPool = new Stack<Stream>();
 		string path;
@@ -158,11 +158,6 @@ namespace Lime
 		PackedAssetsBundle() {}
 
 		public PackedAssetsBundle(string path, AssetBundleFlags flags)
-		{
-			Open(path, flags);
-		}
-
-		public void Open(string path, AssetBundleFlags flags)
 		{
 			this.path = path;
 			if ((flags & AssetBundleFlags.Writable) != 0) {
@@ -217,8 +212,9 @@ namespace Lime
 			stream.SetLength(stream.Length - moveDelta);
 		}
 
-		public void Close()
+		public override void Dispose()
 		{
+			base.Dispose();
 			if (writer != null) {
 				CleanupBundle();
 				WriteIndexTable();
@@ -233,11 +229,6 @@ namespace Lime
 			stream = null;
 			index.Clear();
 			streamPool.Clear();
-		}
-
-		void IDisposable.Dispose()
-		{
-			Close();
 		}
 
 		public override Stream OpenFile(string path)

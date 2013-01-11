@@ -18,6 +18,8 @@ namespace Lime
 		
 		Node owner;
 
+		public AnimatorCollection() { /* ctor for ProtoBuf only */ }
+
 		public AnimatorCollection(Node owner)
 		{
 			this.owner = owner;

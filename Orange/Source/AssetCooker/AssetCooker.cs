@@ -8,7 +8,7 @@ namespace Orange
 	{
 		private delegate bool Converter(string srcPath, string dstPath);
 
-		private Lime.AssetsBundle assetsBundle = Lime.AssetsBundle.Instance;
+		private Lime.AssetsBundle assetsBundle { get { return Lime.AssetsBundle.Instance; } }
 		private CitrusProject project;
 		private TargetPlatform platform;
 		private Dictionary<string, CookingRules> cookingRulesMap;
@@ -45,8 +45,7 @@ namespace Orange
 		{
 			cookingRulesMap = CookingRulesBuilder.Build(project.AssetFiles);
 			string bundlePath = Path.ChangeExtension(project.AssetsDirectory, Helpers.GetTargetPlatformString(platform));
-			assetsBundle.Open(bundlePath, Lime.AssetBundleFlags.Writable);
-			try {
+			using (Lime.AssetsBundle.Instance = new Lime.PackedAssetsBundle(bundlePath, Lime.AssetBundleFlags.Writable)) {
 				using (new DirectoryChanger(project.AssetsDirectory)) {
 					Console.WriteLine("------------- Building Game Content -------------");
 					SyncAtlases();
@@ -117,8 +116,6 @@ namespace Orange
 						return true;
 					});
 				}
-			} finally {
-				assetsBundle.Close();
 			}
 		}
 	

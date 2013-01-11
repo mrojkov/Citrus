@@ -21,7 +21,7 @@ namespace Lime
 #if iOS
 		public static ProtoBuf.Meta.TypeModel Serializer = ProtoBuf.Meta.RuntimeTypeModel.Default;
 #else
-		public static ProtoBuf.Meta.RuntimeTypeModel Serializer = CreateSerializer();
+		public static ProtoBuf.Meta.TypeModel Serializer = CreateSerializer();
 #endif
 
 		static ProtoBuf.Meta.RuntimeTypeModel CreateSerializer()
@@ -83,7 +83,7 @@ namespace Lime
 				WriteObject(path, stream, instance);
 		}
 		
-		public static void WriteObjectToBundle<T>(PackedAssetsBundle bundle, string path, T instance)
+		public static void WriteObjectToBundle<T>(AssetsBundle bundle, string path, T instance)
 		{
 			using (MemoryStream stream = new MemoryStream()) {
 				WriteObject(path, stream, instance);

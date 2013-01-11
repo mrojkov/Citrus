@@ -11,7 +11,6 @@ namespace Orange
 
 	public class KumquatCooker
 	{
-		private Lime.AssetsBundle assetsBundle = Lime.AssetsBundle.Instance;
 		private CitrusProject project;
 		private Orange.TargetPlatform platform;
 
@@ -27,11 +26,8 @@ namespace Orange
 				new Lime.World();
 			}
 			string bundlePath = Path.ChangeExtension(project.AssetsDirectory, Helpers.GetTargetPlatformString(platform));
-			assetsBundle.Open(bundlePath, Lime.AssetBundleFlags.Writable);
-			try {
+			using (Lime.AssetsBundle.Instance = new Lime.PackedAssetsBundle(bundlePath, Lime.AssetBundleFlags.Writable)) {
 				CookLocations();
-			} finally {
-				assetsBundle.Close();
 			}
 		}
 

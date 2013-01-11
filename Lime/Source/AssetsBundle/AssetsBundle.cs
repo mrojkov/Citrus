@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Lime
 {
-	public abstract class AssetsBundle
+	public abstract class AssetsBundle : IDisposable
 	{
 		private static AssetsBundle instance;
 
@@ -20,6 +20,13 @@ namespace Lime
 				return instance;
 			}
 			set { instance = value; }
+		}
+
+		public virtual void Dispose()
+		{
+			if (instance == this) {
+				instance = null;
+			}
 		}
 
 		public string CurrentLanguage { get; set; }
