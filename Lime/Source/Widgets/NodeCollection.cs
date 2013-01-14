@@ -58,7 +58,7 @@ namespace Lime
 			}
 			return -1;
 		}
-		
+
 		public Node this[int index] {
 			get {return nodeList[index]; }
 		}

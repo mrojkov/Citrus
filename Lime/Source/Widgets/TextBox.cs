@@ -60,25 +60,30 @@ namespace Lime
 			}
 			base.Update(delta);
 			if (World.Instance.ActiveTextWidget == this && Input.TextInput != null) {
-				foreach (char c in Input.TextInput) {
-					if (c >= 32 && Text.Length < MaxTextLength) {
-						if (Numeric) {
-							float foo;
-							if ((c == '-' && Text == "") || float.TryParse(Text + c, out foo)) {
-								Text += c;
-							}
-						} else {
-							Text += c;
-						}
-					} else if (Text.Length > 0 && c == 8) {
-						Text = Text.Remove(Text.Length - 1);
-					}
-				}
+				ProcessInput();
 			}
 			if (World.Instance.ActiveTextWidget == this) {
 				World.Instance.IsActiveTextWidgetUpdated = true;
 			}
 			caretBlinkPhase += delta;
+		}
+
+		private void ProcessInput()
+		{
+			foreach (char c in Input.TextInput) {
+				if (c >= 32 && Text.Length < MaxTextLength) {
+					if (Numeric) {
+						float foo;
+						if ((c == '-' && Text == "") || float.TryParse(Text + c, out foo)) {
+							Text += c;
+						}
+					} else {
+						Text += c;
+					}
+				} else if (Text.Length > 0 && c == 8) {
+					Text = Text.Remove(Text.Length - 1);
+				}
+			}
 		}
 
 		public override void Render()

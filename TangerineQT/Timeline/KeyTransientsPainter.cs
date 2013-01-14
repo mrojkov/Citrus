@@ -18,15 +18,13 @@ namespace Tangerine
 			this.top = top;
 		}
 
-		public void DrawTransients(List<KeyTransient> transients, int startFrame, int endFrame, QPainter ptr)
+		public void DrawTransients(List<KeyTransient> transients, QPainter ptr)
 		{
 			for (int i = 0; i < transients.Count; i++) {
 				var m = transients[i];
-				if (m.Frame >= startFrame && m.Frame < endFrame) {
-					int x = (int)(colWidth * (m.Frame - startFrame));
-					int y = (int)(top + m.Line * 6);
-					DrawKey(ptr, m, x, y);
-				}
+				int x = (int)(colWidth * m.Frame);
+				int y = (int)(top + m.Line * 6);
+				DrawKey(ptr, m, x, y);
 			}
 		}
 

@@ -22,8 +22,8 @@ namespace Lime
 		{
 			this.stream = stream;
 			fileSystem = new Lemon.Api.FileSystem {
-				ReadFunc = OggRead, CloseFunc = OggClose,
-				SeekFunc = OggSeek, TellFunc = OggTell
+				ReadFunc = OgvRead, CloseFunc = OgvClose,
+				SeekFunc = OgvSeek, TellFunc = OgvTell
 			};
 			streamHandle = streamMap.Allocate(stream);
 			ogvHandle = Lemon.Api.OgvCreate(streamHandle, fileSystem);
@@ -67,7 +67,7 @@ namespace Lime
 #if iOS
 		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.Api.ReadCallback))]
 #endif
-		private static uint OggRead(IntPtr buffer, uint size, uint nmemb, int handle)
+		private static uint OgvRead(IntPtr buffer, uint size, uint nmemb, int handle)
 		{
 			byte[] block = new byte[1024 * 16];
 			int actualCount = 0;
@@ -86,7 +86,7 @@ namespace Lime
 #if iOS
 		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.Api.TellCallback))]
 #endif
-		private static int OggTell(int handle)
+		private static int OgvTell(int handle)
 		{
 			var stream = streamMap[handle];
 			return (int)stream.Position;
@@ -95,7 +95,7 @@ namespace Lime
 #if iOS
 		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.Api.SeekCallback))]
 #endif
-		private static int OggSeek(int handle, long offset, SeekOrigin whence)
+		private static int OgvSeek(int handle, long offset, SeekOrigin whence)
 		{
 			var stream = streamMap[handle];
 			return (int)stream.Seek(offset, whence);
@@ -104,7 +104,7 @@ namespace Lime
 #if iOS
 		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.Api.CloseCallback))]
 #endif
-		private static int OggClose(int handle)
+		private static int OgvClose(int handle)
 		{
 			var stream = streamMap[handle];
 			stream.Close();

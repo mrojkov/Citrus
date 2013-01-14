@@ -12,8 +12,7 @@ namespace Tangerine
 	public class TimelineRowView : QObject
 	{
 		protected TimelineRow row;
-		protected int RowHeight { get { return The.Preferences.TimelineRowHeight; } }
-		protected int ColWidth { get { return The.Preferences.TimelineColWidth; } }
+		protected Document doc { get { return The.Document; } }
 
 		public int Index { get { return row.Index; } }
 
@@ -38,7 +37,7 @@ namespace Tangerine
 		public virtual void Attach()
 		{
 			slot.SetParent(The.Timeline.NodeRoll);
-			slot.Resize(The.Timeline.NodeRoll.Width, RowHeight);
+			slot.Resize(The.Timeline.NodeRoll.Width, doc.RowHeight);
 		}
 
 		public void SetPosition(int top)

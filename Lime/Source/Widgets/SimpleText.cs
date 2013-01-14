@@ -32,6 +32,11 @@ namespace Lime
 			Font = new SerializableFont();
 		}
 
+		public override Vector2 CalcContentSize()
+		{
+			return Renderer.MeasureTextLine(Font.Instance, Text, FontHeight);
+		}
+
 		public override void Render()
 		{
 			Renderer.Transform1 = globalMatrix;

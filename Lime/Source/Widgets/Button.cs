@@ -84,7 +84,7 @@ namespace Lime
 				//RunAnimationWithStopHandler("Release", () => SetNormalState());
 			} else if (Input.WasKeyReleased(Key.Mouse0)) {
 				if (Clicked != null) {
-						Clicked(this);
+					Clicked(this);
 				}
                 RunReleaseAnimation();
 				//RunAnimationWithStopHandler("Release", () => SetNormalState());

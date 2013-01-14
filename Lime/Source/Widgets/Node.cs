@@ -91,6 +91,9 @@ namespace Lime
 		[ProtoMember(11)]
 		public string Tag { get; set; }
 
+		[ProtoMember(12)]
+		public bool PropagateAnimation { get; set; }
+
 		public string CurrentAnimation { get; private set; }
 
 		public void AdvanceAnimation(int delta)
@@ -131,11 +134,20 @@ namespace Lime
 					}
 				}
 			}
+			AdvanceAnimationHelper(prevFrame != currFrame);
+		}
+
+		private void AdvanceAnimationHelper(bool invokeTriggers)
+		{
 			foreach (Node node in Nodes.AsArray) {
 				var animators = node.Animators;
 				animators.Apply(animationTime);
-				if (prevFrame != currFrame) {
-					animators.InvokeTriggers(currFrame);
+				if (invokeTriggers) {
+					animators.InvokeTriggers(AnimationFrame);
+				}
+				if (PropagateAnimation) {
+					node.animationTime = animationTime;
+					node.AdvanceAnimationHelper(invokeTriggers);
 				}
 			}
 		}
@@ -167,6 +179,15 @@ namespace Lime
 					return true;
 			}
 			return false;
+		}
+
+		public IEnumerable<T> GetNodesOfType<T>() where T : Node
+		{
+			foreach (var node in Nodes) {
+				if (node is T) {
+					yield return node as T;
+				}
+			}
 		}
 
 		public virtual void PreloadTextures()

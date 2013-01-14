@@ -436,20 +436,18 @@ namespace Lime
 		public override void Update(int delta)
 		{
 			base.Update(delta);
-			if (globallyVisible) {
-				if (firstUpdate) {
-					firstUpdate = false;
-					const int ModellingStep = 40;
-					delta = Math.Max(delta, (int)(TimeShift * 1000));
-					while (delta >= ModellingStep) {
-						UpdateHelper(ModellingStep);
-						delta -= ModellingStep;
-					}
-					if (delta > 0)
-						UpdateHelper(delta);
-				} else
+			if (firstUpdate) {
+				firstUpdate = false;
+				const int ModellingStep = 40;
+				delta = Math.Max(delta, (int)(TimeShift * 1000));
+				while (delta >= ModellingStep) {
+					UpdateHelper(ModellingStep);
+					delta -= ModellingStep;
+				}
+				if (delta > 0)
 					UpdateHelper(delta);
-			}
+			} else
+				UpdateHelper(delta);
 		}
 
 		Vector2 GenerateRandomMotionControlPoint(ref float rayDirection)

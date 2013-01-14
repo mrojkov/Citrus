@@ -166,6 +166,11 @@ namespace Lime
 			Blending = Blending.Default;
 		}
 
+		public virtual Vector2 CalcContentSize()
+		{
+			return Size;
+		}
+
         public Widget this[string id]
         {
             get { return Find<Widget>(id); }
@@ -219,25 +224,25 @@ namespace Lime
 
 		public override void Update(int delta)
 		{
-            if (Updating != null) {
-                Updating(delta * 0.001f);
-            }
-            UpdatedNodes++;
+			if (Anchors != Anchors.None && Parent.Widget != null) {
+				ApplyAnchors();
+			}
 			RecalcGlobalMatrixAndColorHelper();
 			if (globallyVisible) {
+				UpdatedNodes++;
+				if (Updating != null) {
+					Updating(delta * 0.001f);
+				}
 				if (IsRunning) {
 					AdvanceAnimation(delta);
 				}
 				foreach (Node node in Nodes.AsArray) {
 					node.Update(delta);
 				}
-				if (Anchors != Anchors.None && Parent.Widget != null) {
-					ApplyAnchors();
+				if (Updated != null) {
+					Updated(delta * 0.001f);
 				}
 			}
-            if (Updated != null) {
-                Updated(delta * 0.001f);
-            }
         }
 
 		public override void AddToRenderChain(RenderChain chain)

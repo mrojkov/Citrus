@@ -60,7 +60,13 @@
     <Compile Include="Source\Audio\SampleCache.cs" />
     <Compile Include="Source\Audio\SerializableSample.cs" />
     <Compile Include="Source\Audio\Sound.cs" />
+    <Compile Include="Source\PopupMenu\ImageBox.cs" />
+    <Compile Include="Source\PopupMenu\LayoutTools.cs" />
+    <Compile Include="Source\PopupMenu\MenuButton.cs" />
+    <Compile Include="Source\PopupMenu\MenuItem.cs" />
+    <Compile Include="Source\PopupMenu\PopupMenu.cs" />
     <Compile Include="Source\Environment.cs" />
+    <Compile Include="Source\PopupMenu\RoundedRectangle.cs" />
     <Compile Include="Source\Geometry.cs" />
     <Compile Include="Source\Application\iOSAppDelegate.cs" />
     <Compile Include="Source\Application\iOSGameController.cs" />
@@ -89,6 +95,8 @@
     <Compile Include="Source\Input\Input.cs" />
     <Compile Include="Source\Localization.cs" />
     <Compile Include="Source\Mathf.cs" />
+    <Compile Include="Source\PopupMenu\Separator.cs" />
+    <Compile Include="Source\PopupMenu\StringItem.cs" />
     <Compile Include="Source\Profiler.cs" />
     <Compile Include="Source\Serialization.cs" />
     <Compile Include="Source\StringExtensions.cs" />

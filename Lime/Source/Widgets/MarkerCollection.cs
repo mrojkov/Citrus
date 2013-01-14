@@ -88,6 +88,16 @@ namespace Lime
 			markers.Add(marker);
 		}
 
+		public void AddStopMarker(string id, int frame)
+		{
+			Add(new Marker() { Id = id, Action = MarkerAction.Stop, Frame = frame });
+		}
+
+		public void AddPlayMarker(string id, int frame)
+		{
+			Add(new Marker() { Id = id, Action = MarkerAction.Play, Frame = frame });
+		}
+
 		public void Clear()
 		{
 			markers = emptyList;

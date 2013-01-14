@@ -15,10 +15,19 @@ namespace Tangerine
 		{
 			QIcon icon;
 			if (!icons.TryGetValue(iconPath, out icon)) {
-				icon = new QIcon(string.Format("Icons/{0}.png", iconPath));
+				string location = GetEntryAssemblyDirectory();
+				var path = string.Format("{0}/Icons/{1}.png", location, iconPath);
+				icon = new QIcon(path);
 				icons[iconPath] = icon;
 			}
 			return icon;
+		}
+
+		private static string GetEntryAssemblyDirectory()
+		{
+			var entryAssembly = System.Reflection.Assembly.GetEntryAssembly();
+			string location = System.IO.Path.GetDirectoryName(entryAssembly.Location);
+			return location;
 		}
 	}
 }
