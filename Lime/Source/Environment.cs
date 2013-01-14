@@ -1,4 +1,6 @@
 using System;
+using MonoTouch;
+using MonoTouch.UIKit;
 
 namespace Lime
 {
@@ -62,8 +64,8 @@ namespace Lime
 			var device = OpenTK.DisplayDevice.Default;
 			return new Vector2(device.Width, device.Height);
 #else
-			//Grisha: no time to explain. Will write iOS implementation forthis later.
-			return new Vector2(0, 0); 
+			UIScreen screen = UIScreen.MainScreen;
+			return new Vector2(screen.Bounds.Width, screen.Bounds.Height); 
 #endif
 		}
 
