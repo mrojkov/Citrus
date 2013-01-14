@@ -1,6 +1,8 @@
 using System;
+#if iOS
 using MonoTouch;
 using MonoTouch.UIKit;
+#endif
 
 namespace Lime
 {
