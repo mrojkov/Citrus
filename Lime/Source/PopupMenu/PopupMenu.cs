@@ -15,9 +15,10 @@ namespace Lime.PopupMenu
 		List<MenuItem> items = new List<MenuItem>();
 		int layer;
 
-		public Menu(int layer)
+		public Menu(int layer, int width = 350)
 		{
 			this.layer = layer;
+			Frame.Width = width;
 			Frame.AddNode(rectangle);
 			Frame.Updating += Frame_Updating;
 			Frame.DialogMode = true;
@@ -45,7 +46,6 @@ namespace Lime.PopupMenu
 					Hide();
 				}
 			}
-			Frame.Width = MenuItem.Width;
 			Frame.Height = MenuItem.Height * Count + MenuItem.Height;
 			UpdateBackground();
 			UpdateItems();
@@ -56,7 +56,7 @@ namespace Lime.PopupMenu
 			int i = 0;
 			foreach (var item in items) {
 				item.Frame.Y = i * MenuItem.Height + MenuItem.Height / 2;
-				item.Frame.Width = MenuItem.Width;
+				item.Frame.Width = Frame.Width;
 				item.Frame.Height = MenuItem.Height;
 				i++;
 			}
