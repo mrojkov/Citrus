@@ -14,7 +14,7 @@ namespace Lime
 		/// It notifies that widget will be used in combining, and
 		/// must not be drawn on render pass.
 		/// </summary>
-		void BypassRendering();
+		void SkipRender();
 
 		ITexture GetTexture();
 
@@ -63,8 +63,8 @@ namespace Lime
 			base.Update(delta);
 			IImageCombinerArg arg1, arg2;
 			if (Enabled && GetArgs(out arg1, out arg2)) {
-				arg1.BypassRendering();
-				arg2.BypassRendering();
+				arg1.SkipRender();
+				arg2.SkipRender();
 			}
 		}
 

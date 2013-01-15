@@ -58,7 +58,7 @@ namespace Lime
 			this.Position = position;
 		}
 
-		void IImageCombinerArg.BypassRendering() {}
+		void IImageCombinerArg.SkipRender() {}
 
 		ITexture IImageCombinerArg.GetTexture()
 		{

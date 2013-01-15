@@ -93,71 +93,6 @@ namespace Lime
 
 		public float AnimationSpeed = 1;
 
-		public void AdvanceAnimation(int delta)
-		{
-			while (delta > MaxTimeDelta) {
-				AdvanceAnimationShort(MaxTimeDelta);
-				delta -= MaxTimeDelta;
-			}
-			AdvanceAnimationShort(delta);
-		}
-
-		private void AdvanceAnimationShort(int delta)
-		{
-			int prevFrame = Animator.MsecsToFrames(animationTime - 1);
-			int currFrame = Animator.MsecsToFrames(animationTime + delta - 1);
-			animationTime += delta;
-			if (prevFrame != currFrame && Markers.Count > 0) {
-				Marker marker = Markers.GetByFrame(currFrame);
-				if (marker != null) {
-					switch (marker.Action) {
-					case MarkerAction.Jump:
-						var gotoMarker = Markers.TryFind(marker.JumpTo);
-						if (gotoMarker != null) {
-							int hopFrames = gotoMarker.Frame - AnimationFrame;
-							animationTime += Animator.FramesToMsecs(hopFrames);
-							prevFrame += hopFrames;
-							currFrame += hopFrames;
-						}
-						break;
-					case MarkerAction.Stop:
-						animationTime = Animator.FramesToMsecs(marker.Frame);
-						prevFrame = currFrame - 1;
-						IsRunning = false;
-						if (AnimationStopped != null) {
-							AnimationStopped();
-						}
-						break;
-					case MarkerAction.Destroy:
-						animationTime = Animator.FramesToMsecs(marker.Frame);
-						prevFrame = currFrame - 1;
-						IsRunning = false;
-						if (AnimationStopped != null) {
-							AnimationStopped();
-						}
-						UnlinkAfterUpdate();
-						break;
-					}
-				}
-			}
-			ApplyAnimators(prevFrame != currFrame);
-		}
-
-		private void ApplyAnimators(bool invokeTriggers)
-		{
-			foreach (Node node in Nodes.AsArray) {
-				var animators = node.Animators;
-				animators.Apply(animationTime);
-				if (invokeTriggers) {
-					animators.InvokeTriggers(AnimationFrame);
-				}
-				if (PropagateAnimation) {
-					node.animationTime = animationTime;
-					node.ApplyAnimators(invokeTriggers);
-				}
-			}
-		}
-
 		public Node()
 		{
 			Animators = new AnimatorCollection(this);
@@ -346,26 +281,10 @@ namespace Lime
 			}
 		}
 
-		public virtual void LateUpdate(int delta)
-		{
-			foreach (Node node in Nodes.AsArray) {
-				node.LateUpdate(delta);
-			}
-		}
-
-		protected const int MaxTimeDelta = 1000 / Animator.FramesPerSecond - 1;
-
+		[Obsolete("Using Update() instead")]
 		public void SafeUpdate(int delta)
 		{
-			if (delta < 0)
-				throw new Lime.Exception("Update interval can not be negative");
-			while (delta > MaxTimeDelta) {
-				Update(MaxTimeDelta);
-				LateUpdate(MaxTimeDelta);
-				delta -= MaxTimeDelta;
-			}
 			Update(delta);
-			LateUpdate(delta);
 		}
 
 		public virtual void Render() {}
@@ -471,6 +390,83 @@ namespace Lime
 			}
 			return null;
 		}
+
+		public void AdvanceAnimation(int delta)
+		{
+			const int MaxTimeDelta = 1000 / Animator.FramesPerSecond - 1;
+			while (delta > MaxTimeDelta) {
+				AdvanceAnimationShort(MaxTimeDelta);
+				delta -= MaxTimeDelta;
+			}
+			AdvanceAnimationShort(delta);
+		}
+
+		private void AdvanceAnimationShort(int delta)
+		{
+			if (IsRunning) {
+				int prevFrame = Animator.MsecsToFrames(animationTime - 1);
+				int currFrame = Animator.MsecsToFrames(animationTime + delta - 1);
+				animationTime += delta;
+				if (prevFrame != currFrame && Markers.Count > 0) {
+					Marker marker = Markers.GetByFrame(currFrame);
+					if (marker != null) {
+						ProcessMarker(marker, ref prevFrame, ref currFrame);
+					}
+				}
+				bool invokeTriggers = prevFrame != currFrame;
+				ApplyAnimators(invokeTriggers);
+				if (!IsRunning) {
+					OnAnimationStopped();
+				}
+			}
+		}
+
+		protected virtual void OnAnimationStopped()
+		{
+			if (AnimationStopped != null) {
+				AnimationStopped();
+			}
+		}
+
+		private void ProcessMarker(Marker marker, ref int prevFrame, ref int currFrame)
+		{
+			switch (marker.Action) {
+				case MarkerAction.Jump:
+					var gotoMarker = Markers.TryFind(marker.JumpTo);
+					if (gotoMarker != null) {
+						int hopFrames = gotoMarker.Frame - AnimationFrame;
+						animationTime += Animator.FramesToMsecs(hopFrames);
+						prevFrame += hopFrames;
+						currFrame += hopFrames;
+					}
+					break;
+				case MarkerAction.Stop:
+					animationTime = Animator.FramesToMsecs(marker.Frame);
+					prevFrame = currFrame - 1;
+					IsRunning = false;
+					break;
+				case MarkerAction.Destroy:
+					animationTime = Animator.FramesToMsecs(marker.Frame);
+					prevFrame = currFrame - 1;
+					IsRunning = false;
+					UnlinkAfterUpdate();
+					break;
+			}
+		}
+
+		private void ApplyAnimators(bool invokeTriggers)
+		{
+			foreach (Node node in Nodes.AsArray) {
+				var animators = node.Animators;
+				animators.Apply(animationTime);
+				if (invokeTriggers) {
+					animators.InvokeTriggers(AnimationFrame);
+				}
+				if (PropagateAnimation) {
+					node.animationTime = animationTime;
+					node.ApplyAnimators(invokeTriggers);
+				}
+			}
+		}
 	}
 }
-	

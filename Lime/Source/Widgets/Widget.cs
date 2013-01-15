@@ -224,24 +224,24 @@ namespace Lime
 
 		public override void Update(int delta)
 		{
+			UpdatedNodes++;
 			if (Anchors != Anchors.None && Parent.Widget != null) {
 				ApplyAnchors();
 			}
+			if (Updating != null) {
+				Updating(delta * 0.001f);
+			}
 			RecalcGlobalMatrixAndColorHelper();
 			if (globallyVisible) {
-				UpdatedNodes++;
-				if (Updating != null) {
-					Updating(delta * 0.001f);
-				}
 				if (IsRunning) {
 					AdvanceAnimation(delta);
 				}
 				if (Nodes.Count > 0) {
 					UpdateChildren(delta);
 				}
-				if (Updated != null) {
-					Updated(delta * 0.001f);
-				}
+			}
+			if (Updated != null) {
+				Updated(delta * 0.001f);
 			}
         }
 

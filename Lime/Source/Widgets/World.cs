@@ -34,11 +34,6 @@
 			IsActiveTextWidgetUpdated = false;
 			IsTopDialogUpdated = false;
 			base.Update(delta);
-		}
-
-		public override void LateUpdate(int delta)
-		{
-			base.LateUpdate(delta);
 			if (!IsActiveWidgetUpdated) {
 				ActiveWidget = null;
 			}
