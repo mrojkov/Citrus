@@ -236,8 +236,8 @@ namespace Lime
 				if (IsRunning) {
 					AdvanceAnimation(delta);
 				}
-				foreach (Node node in Nodes.AsArray) {
-					node.Update(delta);
+				if (Nodes.Count > 0) {
+					UpdateChildren(delta);
 				}
 				if (Updated != null) {
 					Updated(delta * 0.001f);

@@ -32,8 +32,6 @@ namespace Lime
 	[TangerineClass]
 	public class Frame : Widget, IImageCombinerArg
 	{
-		public float AnimationSpeed = 1;
-
 		// In dialog mode frame acts like a modal dialog, all controls behind the dialog are frozen.
 		// If dialog is being shown or hidden then all controls on dialog are frozen either.
 		public bool DialogMode;
@@ -96,46 +94,13 @@ namespace Lime
 			World.Instance.IsTopDialogUpdated = true;
 		}
 
-		public override void LateUpdate(int delta)
-		{
-			if (AnimationSpeed != 1) {
-				delta = MultiplyDeltaByAnimationSpeed(delta);
-			}
-			while (delta > MaxTimeDelta) {
-				base.LateUpdate(MaxTimeDelta);
-				delta -= MaxTimeDelta;
-			}
-			base.LateUpdate(delta);
-		}
-
-		private void UpdateHelper(int delta)
+		public override void Update(int delta)
 		{
 			if (DialogMode) {
 				UpdateForDialogMode(delta);
 			} else {
 				base.Update(delta);
 			}
-		}
-
-		public override void Update(int delta)
-		{
-			if (AnimationSpeed != 1) {
-				delta = MultiplyDeltaByAnimationSpeed(delta);
-				while (delta > MaxTimeDelta) {
-					UpdateHelper(MaxTimeDelta);
-					delta -= MaxTimeDelta;
-				}
-			}
-			UpdateHelper(delta);
-		}
-
-		private int MultiplyDeltaByAnimationSpeed(int delta)
-		{
-			delta = (int)(delta * AnimationSpeed);
-			if (delta < 0) {
-				throw new System.ArgumentOutOfRangeException("delta");
-			}
-			return delta;
 		}
 
 		public override void Render()

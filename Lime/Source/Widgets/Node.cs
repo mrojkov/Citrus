@@ -80,12 +80,7 @@ namespace Lime
 		[ProtoMember(10)]
 		public int AnimationTime {
 			get { return animationTime; }
-			set {
-				animationTime = value;
-				foreach (Node node in Nodes.AsArray) {
-					node.Animators.Apply(animationTime);
-				}
-			}
+			set { animationTime = value; ApplyAnimators(false); }
 		}
 
 		[ProtoMember(11)]
@@ -96,7 +91,18 @@ namespace Lime
 
 		public string CurrentAnimation { get; private set; }
 
+		public float AnimationSpeed = 1;
+
 		public void AdvanceAnimation(int delta)
+		{
+			while (delta > MaxTimeDelta) {
+				AdvanceAnimationShort(MaxTimeDelta);
+				delta -= MaxTimeDelta;
+			}
+			AdvanceAnimationShort(delta);
+		}
+
+		private void AdvanceAnimationShort(int delta)
 		{
 			int prevFrame = Animator.MsecsToFrames(animationTime - 1);
 			int currFrame = Animator.MsecsToFrames(animationTime + delta - 1);
@@ -134,10 +140,10 @@ namespace Lime
 					}
 				}
 			}
-			AdvanceAnimationHelper(prevFrame != currFrame);
+			ApplyAnimators(prevFrame != currFrame);
 		}
 
-		private void AdvanceAnimationHelper(bool invokeTriggers)
+		private void ApplyAnimators(bool invokeTriggers)
 		{
 			foreach (Node node in Nodes.AsArray) {
 				var animators = node.Animators;
@@ -147,7 +153,7 @@ namespace Lime
 				}
 				if (PropagateAnimation) {
 					node.animationTime = animationTime;
-					node.AdvanceAnimationHelper(invokeTriggers);
+					node.ApplyAnimators(invokeTriggers);
 				}
 			}
 		}
@@ -324,8 +330,19 @@ namespace Lime
 			if (IsRunning) {
 				AdvanceAnimation(delta);
 			}
+			if (Nodes.Count > 0) {
+				UpdateChildren(delta);
+			}
+		}
+
+		protected void UpdateChildren(int delta)
+		{
 			foreach (Node node in Nodes.AsArray) {
-				node.Update(delta);
+				if (node.AnimationSpeed != 1) {
+					node.Update((int)(node.AnimationSpeed * delta));
+				} else {
+					node.Update(delta);
+				}
 			}
 		}
 

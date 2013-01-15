@@ -7,7 +7,7 @@ namespace Lime
 	[ProtoContract]
 	public class Image : Widget, IImageCombinerArg
 	{
-		bool imageCombinerArg;
+		bool bypassRendering;
 
 		[ProtoMember(1)]
 		public ITexture Texture { get; set; }
@@ -51,16 +51,6 @@ namespace Lime
 			Texture.GetHandle();
 		}
 
-		public override void Update(int delta)
-		{
-			base.Update(delta);
-			imageCombinerArg = false;
-		}
-
-		public override void LateUpdate(int delta)
-		{
-		}
-
 		public override void Render()
 		{
 			Renderer.Blending = globalBlending;
@@ -70,9 +60,10 @@ namespace Lime
 
 		public override void AddToRenderChain(RenderChain chain)
 		{
-			if (globallyVisible && !imageCombinerArg) {
+			if (globallyVisible && !bypassRendering) {
 				chain.Add(this, Layer);
 			}
+			bypassRendering = false;
 		}
 
 		ITexture IImageCombinerArg.GetTexture()
@@ -82,12 +73,12 @@ namespace Lime
 
 		void IImageCombinerArg.BypassRendering()
 		{
-			imageCombinerArg = true;
+			bypassRendering = true;
 		}
 
 		public override bool HitTest(Vector2 point)
 		{
-			if (globallyVisible && !imageCombinerArg) {
+			if (globallyVisible && !bypassRendering) {
 				if (HitTestMethod == HitTestMethod.Contents) {
 					Vector2 pt = GlobalMatrix.CalcInversed().TransformVector(point);
 					Vector2 sz = Size;
