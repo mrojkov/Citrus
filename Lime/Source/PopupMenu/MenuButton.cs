@@ -60,7 +60,7 @@ namespace Lime.PopupMenu
 			AddNode(new ExpandSiblingsToParent());
 			AddNode(hbox);
 			AddNode(background);
-			hbox.AddNode(new StackSiblingsHorizontally("TextPresenter"));
+			hbox.AddNode(new StackSiblingsHorizontally(stretch: "TextPresenter"));
 			hbox.AddNode(new CenterSiblingsVertically());
 			hbox.AddNode(new Spacer(10));
 			hbox.AddNode(imageBox);
