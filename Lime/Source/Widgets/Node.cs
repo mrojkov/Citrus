@@ -158,25 +158,6 @@ namespace Lime
 			}
 		}
 
-		public void SwitchAnimation(string animation)
-		{
-			if (CurrentAnimation != animation) {
-				RunAnimation(animation);
-			}
-		}
-
-		public bool IsAnimationBefore(string markerId)
-		{
-			var marker = Markers.Find(markerId);
-			return AnimationFrame < marker.Frame;
-		}
-
-		public bool IsAnimationAfter(string markerId)
-		{
-			var marker = Markers.Find(markerId);
-			return AnimationFrame >= marker.Frame;
-		}
-
 		public int AnimationFrame {
 			get { return Animator.MsecsToFrames(AnimationTime); }
 			set { AnimationTime = Animator.FramesToMsecs(value); }
@@ -258,7 +239,6 @@ namespace Lime
 			nodesToUnlink.Add(this);
 		}
 
-		// Delta must be in[0..1000 / WidgetUtils.FramesPerSecond - 1] range
 		public virtual void Update(int delta)
 		{
 			UpdatedNodes++;
