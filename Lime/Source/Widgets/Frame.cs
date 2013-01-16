@@ -68,13 +68,13 @@ namespace Lime
 		private void UpdateForDialogMode(int delta)
 		{
 			if (!World.Instance.IsTopDialogUpdated) {
-				if (globallyVisible && Input.MouseVisible) {
+				if (GloballyVisible && Input.MouseVisible) {
 					if (World.Instance.ActiveWidget != null && !World.Instance.ActiveWidget.ChildOf(this)) {
 						// Discard active widget if it's not a child of the topmost dialog.
 						World.Instance.ActiveWidget = null;
 					}
 				}
-				if (globallyVisible && World.Instance.ActiveTextWidget != null && !World.Instance.ActiveTextWidget.ChildOf(this)) {
+				if (GloballyVisible && World.Instance.ActiveTextWidget != null && !World.Instance.ActiveTextWidget.ChildOf(this)) {
 					// Discard active text widget if it's not a child of the topmost dialog.
 					World.Instance.ActiveTextWidget = null;
 				}
@@ -82,7 +82,7 @@ namespace Lime
 			if (!IsRunning) {
 				base.Update(delta);
 			}
-			if (globallyVisible) {
+			if (GloballyVisible) {
 				// Consume all input events and drive mouse out of the screen.
 				Input.ConsumeAllKeyEvents(true);
 				Input.MouseVisible = false;
@@ -116,7 +116,7 @@ namespace Lime
 
 		public override void AddToRenderChain(RenderChain chain)
 		{
-			if (globallyVisible) {
+			if (GloballyVisible) {
 				if (renderTexture != null)
 					chain.Add(this);
 				else

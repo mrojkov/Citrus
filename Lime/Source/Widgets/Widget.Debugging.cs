@@ -102,9 +102,9 @@ namespace Lime
 				suggestions.Add("It is fully transparent! Check up 'Opacity' property!");
 			} else if (Opacity < 0.1f) {
 				suggestions.Add("It is almost transparent! Check up 'Opacity' property!");
-			} else if (!globallyVisible) {
+			} else if (!GloballyVisible) {
 				suggestions.Add("One of its parent has 'Visible' flag not set");
-			} else if (globalColor.A < 10) {
+			} else if (GlobalColor.A < 10) {
 				suggestions.Add("One of its parent has 'Opacity' close to zero");
 			}
 			var basis = CalcBasisInSpaceOf(World.Instance);

@@ -54,14 +54,14 @@ namespace Lime
 
 		public override void Render()
 		{
-			Renderer.Blending = globalBlending;
-			Renderer.Transform1 = globalMatrix;
-			Renderer.DrawSprite(Texture, globalColor, Vector2.Zero, Size, UV0, UV1);
+			Renderer.Blending = GlobalBlending;
+			Renderer.Transform1 = GlobalMatrix;
+			Renderer.DrawSprite(Texture, GlobalColor, Vector2.Zero, Size, UV0, UV1);
 		}
 
 		public override void AddToRenderChain(RenderChain chain)
 		{
-			if (globallyVisible && !skipRender) {
+			if (GloballyVisible && !skipRender) {
 				chain.Add(this, Layer);
 			}
 		}
@@ -85,7 +85,7 @@ namespace Lime
 
 		public override bool HitTest(Vector2 point)
 		{
-			if (globallyVisible && !skipRender) {
+			if (GloballyVisible && !skipRender) {
 				if (HitTestMethod == HitTestMethod.Contents) {
 					Vector2 pt = GlobalMatrix.CalcInversed().TransformVector(point);
 					Vector2 sz = Size;

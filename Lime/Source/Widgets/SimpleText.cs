@@ -39,8 +39,8 @@ namespace Lime
 
 		public override void Render()
 		{
-			Renderer.Transform1 = globalMatrix;
-			Renderer.Blending = globalBlending;
+			Renderer.Transform1 = GlobalMatrix;
+			Renderer.Blending = GlobalBlending;
 			var localizedText = Localization.GetString(Text);
 			if (!string.IsNullOrEmpty(localizedText)) {
 				var strings = SplitText(localizedText);
@@ -56,7 +56,7 @@ namespace Lime
 						pos.X = Size.X - extent.X;
 					else if (HAlignment == HAlignment.Center)
 						pos.X = (Size.X - extent.X) * 0.5f;
-					Renderer.DrawTextLine(Font.Instance, pos, str, FontHeight, globalColor);
+					Renderer.DrawTextLine(Font.Instance, pos, str, FontHeight, GlobalColor);
 					pos.Y += Spacing + FontHeight;
 				}
 			}

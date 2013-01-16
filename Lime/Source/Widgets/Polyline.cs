@@ -17,8 +17,8 @@ namespace Lime
 
 		public override void Render()
 		{
-			Renderer.Blending = globalBlending;
-			Renderer.Transform1 = globalMatrix;
+			Renderer.Blending = GlobalBlending;
+			Renderer.Transform1 = GlobalMatrix;
 			int n = Points.Count;
 			if (n >= 2) {
 				bool closed = Points[0] == Points[n - 1];
@@ -67,10 +67,10 @@ namespace Lime
 		private void DrawQuad(Vector2 a, Vector2 b, Vector2 c, Vector2 d)
 		{
 			var v = new Renderer.Vertex[4];
-			v[0] = new Renderer.Vertex { Pos = a, Color = globalColor };
-			v[1] = new Renderer.Vertex { Pos = b, Color = globalColor };
-			v[2] = new Renderer.Vertex { Pos = c, Color = globalColor };
-			v[3] = new Renderer.Vertex { Pos = d, Color = globalColor };
+			v[0] = new Renderer.Vertex { Pos = a, Color = GlobalColor };
+			v[1] = new Renderer.Vertex { Pos = b, Color = GlobalColor };
+			v[2] = new Renderer.Vertex { Pos = c, Color = GlobalColor };
+			v[3] = new Renderer.Vertex { Pos = d, Color = GlobalColor };
 			Renderer.DrawTriangleFan(null, null, v, v.Length);
 		}
 
@@ -85,12 +85,12 @@ namespace Lime
 				angle2 -= 2 * Mathf.Pi;
 			}
 			var v = new Renderer.Vertex[10];
-			v[0] = new Renderer.Vertex { Pos = p, Color = globalColor };
+			v[0] = new Renderer.Vertex { Pos = p, Color = GlobalColor };
 			float length = n2.Length;
 			for (int i = 0; i < v.Length - 1; i++) {
 				float t = (float)i / (v.Length - 2);
 				p = -Vector2.Heading(Mathf.Lerp(t, angle1, angle2)) * length + b;
-				v[i + 1] = new Renderer.Vertex { Pos = p, Color = globalColor };
+				v[i + 1] = new Renderer.Vertex { Pos = p, Color = GlobalColor };
 			}
 			Renderer.DrawTriangleFan(null, null, v, v.Length);
 		}
@@ -105,11 +105,11 @@ namespace Lime
 		{
 			const int numPoints = 10;
 			var v = new Renderer.Vertex[numPoints + 2];
-			v[0] = new Renderer.Vertex { Pos = center, Color = globalColor };
+			v[0] = new Renderer.Vertex { Pos = center, Color = GlobalColor };
 			for (int i = 0; i <= numPoints; i++) {
 				float t = (float)i / numPoints;
 				Vector2 p = Vector2.Heading(Mathf.Lerp(t, angle1, angle2));
-				v[i + 1] = new Renderer.Vertex { Pos = center + p * Thickness / 2, Color = globalColor };
+				v[i + 1] = new Renderer.Vertex { Pos = center + p * Thickness / 2, Color = GlobalColor };
 			}
 			Renderer.DrawTriangleFan(null, null, v, v.Length);
 		}
@@ -118,10 +118,10 @@ namespace Lime
 		{
 			Vector2 n = (b - a).Normal * Thickness / 2;
 			var v = new Renderer.Vertex[4];
-			v[0] = new Renderer.Vertex { Pos = a - n, Color = globalColor };
-			v[1] = new Renderer.Vertex { Pos = b - n, Color = globalColor };
-			v[2] = new Renderer.Vertex { Pos = b + n, Color = globalColor };
-			v[3] = new Renderer.Vertex { Pos = a + n, Color = globalColor };
+			v[0] = new Renderer.Vertex { Pos = a - n, Color = GlobalColor };
+			v[1] = new Renderer.Vertex { Pos = b - n, Color = GlobalColor };
+			v[2] = new Renderer.Vertex { Pos = b + n, Color = GlobalColor };
+			v[3] = new Renderer.Vertex { Pos = a + n, Color = GlobalColor };
 			Renderer.DrawTriangleFan(null, null, v, v.Length);
 		}
 	}

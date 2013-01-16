@@ -145,7 +145,7 @@ namespace Lime
 
 		public override void Update(int delta)
 		{
-			if (globallyVisible) {
+			if (GloballyVisible) {
 				StateHandler();
 				UpdateLabel();
 				SyncActiveWidget();

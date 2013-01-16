@@ -106,17 +106,17 @@ namespace Lime
 		public override void Render()
 		{
 			BuildLayout(layout);
-			Renderer.Transform1 = globalMatrix;
-			Renderer.Blending = globalBlending;
+			Renderer.Transform1 = GlobalMatrix;
+			Renderer.Blending = GlobalBlending;
 			for (int i = 0; i < layout.Length; i++) {
 				var part = layout[i];
-				Renderer.DrawSprite(Texture, globalColor, part.Rect.A, part.Rect.Size, part.UV.A, part.UV.B);
+				Renderer.DrawSprite(Texture, GlobalColor, part.Rect.A, part.Rect.Size, part.UV.A, part.UV.B);
 			}
 		}
 
 		public override bool HitTest(Vector2 point)
 		{
-			if (globallyVisible) {
+			if (GloballyVisible) {
 				if (HitTestMethod == HitTestMethod.Contents) {
 					BuildLayout(layout);
 					for (int i = 0; i < layout.Length; i++) {

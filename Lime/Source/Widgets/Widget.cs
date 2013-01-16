@@ -141,17 +141,12 @@ namespace Lime
 
 		protected bool renderedToTexture;
 
-		public Matrix32 GlobalMatrix { get { return globalMatrix; } }
-		public Color4 GlobalColor { get { return globalColor; } }
-		public Blending GlobalBlending { get { return globalBlending; } }
-		public bool GloballyVisible { get { return globallyVisible; } }
-		public Vector2 GlobalPosition { get { return globalMatrix * Vector2.Zero; } }
-		public Vector2 GlobalCenter { get { return globalMatrix * (Size / 2); } }
-
-		protected Matrix32 globalMatrix;
-		protected Color4 globalColor;
-		protected Blending globalBlending;
-		protected bool globallyVisible;
+		public Matrix32 GlobalMatrix { get; protected set; }
+		public Color4 GlobalColor { get; protected set; }
+		public Blending GlobalBlending { get; protected set; }
+		public bool GloballyVisible { get; protected set; }
+		public Vector2 GlobalPosition { get { return GlobalMatrix * Vector2.Zero; } }
+		public Vector2 GlobalCenter { get { return GlobalMatrix * (Size / 2); } }
 
 		#endregion
 		#region Methods
@@ -209,17 +204,17 @@ namespace Lime
 			if (Parent != null) {
 				var parentWidget = Parent.Widget;
 				if (parentWidget != null && !parentWidget.renderedToTexture) {
-					globalMatrix = CalcLocalTransformMatrix() * parentWidget.GlobalMatrix;
-					globalColor = Color * parentWidget.GlobalColor;
-					globalBlending = Blending == Blending.Default ? parentWidget.GlobalBlending : Blending;
-					globallyVisible = (Visible && color.A != 0) && parentWidget.GloballyVisible;
+					GlobalMatrix = CalcLocalTransformMatrix() * parentWidget.GlobalMatrix;
+					GlobalColor = Color * parentWidget.GlobalColor;
+					GlobalBlending = Blending == Blending.Default ? parentWidget.GlobalBlending : Blending;
+					GloballyVisible = (Visible && color.A != 0) && parentWidget.GloballyVisible;
 					return;
 				}
 			}
-			globalMatrix = CalcLocalTransformMatrix();
-			globalColor = color;
-			globalBlending = Blending;
-			globallyVisible = Visible && color.A != 0;
+			GlobalMatrix = CalcLocalTransformMatrix();
+			GlobalColor = color;
+			GlobalBlending = Blending;
+			GloballyVisible = Visible && color.A != 0;
 		}
 
 		public override void Update(int delta)
@@ -232,7 +227,7 @@ namespace Lime
 				Updating(delta * 0.001f);
 			}
 			RecalcGlobalMatrixAndColorHelper();
-			if (globallyVisible) {
+			if (GloballyVisible) {
 				if (IsRunning) {
 					AdvanceAnimation(delta);
 				}
@@ -247,7 +242,7 @@ namespace Lime
 
 		public override void AddToRenderChain(RenderChain chain)
 		{
-			if (globallyVisible) {
+			if (GloballyVisible) {
 				if (Layer != 0) {
 					int oldLayer = chain.SetLayer(Layer);
 					foreach (Node node in Nodes.AsArray) {
@@ -294,9 +289,9 @@ namespace Lime
 
 		public virtual bool HitTest(Vector2 point)
 		{
-			if (globallyVisible) {
+			if (GloballyVisible) {
 				if (HitTestMethod == HitTestMethod.BoundingRect) {
-					Vector2 p = globalMatrix.CalcInversed().TransformVector(point);
+					Vector2 p = GlobalMatrix.CalcInversed().TransformVector(point);
 					Vector2 s = Size;
 					if (s.X < 0) {
 						p.X = -p.X;
