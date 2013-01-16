@@ -21,8 +21,6 @@ namespace Lime
 		D,
 	}
 	
-	public delegate void UpdateDelegate(float delta);
-
 	public class KeyEventArgs : EventArgs 
 	{
 		public bool Consumed;
@@ -32,14 +30,16 @@ namespace Lime
 	[TangerineClass]
 	public class Frame : Widget, IImageCombinerArg
 	{
-		// In dialog mode frame acts like a modal dialog, all controls behind the dialog are frozen.
-		// If dialog is being shown or hidden then all controls on dialog are frozen either.
-		public bool DialogMode;
-
 		public BareEventHandler Rendered;
 
-		RenderTarget renderTarget;
-		ITexture renderTexture;
+		private static HashSet<string> processingFiles = new HashSet<string>();
+
+		// In dialog mode frame acts like a modal dialog, all controls behind the dialog are frozen.
+		// If dialog is being shown or hidden then all controls on dialog are frozen either.
+		public bool DialogMode { get; set; }
+
+		RenderTarget renderTarget { get; set; }
+		ITexture renderTexture { get; set; }
 
 		[ProtoMember(1)]
 		public RenderTarget RenderTarget {
@@ -123,8 +123,6 @@ namespace Lime
 					base.AddToRenderChain(chain);
 			}
 		}
-
-		private static HashSet<string> processingFiles = new HashSet<string>();
 
 		public Frame(Node parent, string path)
 		{

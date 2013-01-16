@@ -8,6 +8,7 @@ using System.Diagnostics;
 namespace Lime
 {
 	public delegate void BareEventHandler();
+	public delegate void UpdateDelegate(float delta);
 
 	[ProtoContract]
 	[ProtoInclude(101, typeof(Widget))]
@@ -21,6 +22,8 @@ namespace Lime
 	[DebuggerTypeProxy(typeof(NodeDebugView))]
 	public class Node
 	{
+		public event UpdateDelegate Updating;
+		public event UpdateDelegate Updated;
 		public event BareEventHandler AnimationStopped;
 
 		public static int UpdatedNodes;
@@ -95,6 +98,16 @@ namespace Lime
 			while (node.Parent != null)
 				node = node.Parent;
 			return node;
+		}
+
+		public void ClearUpdatingEvent()
+		{
+			this.Updating = null;
+		}
+
+		public void ClearUpdatedEvent()
+		{
+			this.Updated = null;
 		}
 
 		public bool HasChild(Node node)
@@ -244,17 +257,24 @@ namespace Lime
 		{
 			foreach (Node node in Nodes.AsArray) {
 				if (node.AnimationSpeed != 1) {
-					node.Update((int)(node.AnimationSpeed * delta + 0.5f));
+					int delta2 = (int)(node.AnimationSpeed * delta + 0.5f);
+					node.FullUpdate(delta2);
 				} else {
-					node.Update(delta);
+					node.FullUpdate(delta);
 				}
+				
 			}
 		}
 
-		[Obsolete("Using Update() instead")]
-		public void SafeUpdate(int delta)
+		public void FullUpdate(int delta)
 		{
+			if (Updating != null) {
+				Updating(delta * 0.001f);
+			}
 			Update(delta);
+			if (Updated != null) {
+				Updated(delta * 0.001f);
+			}
 		}
 
 		public virtual void Render() {}

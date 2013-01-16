@@ -41,9 +41,6 @@ namespace Lime
 	[TangerineClass]
 	public partial class Widget : Node
 	{
-		public event UpdateDelegate Updating;
-		public event UpdateDelegate Updated;
-
 		private Vector2 position;
 		private Vector2 size;
 		private float rotation;
@@ -143,16 +140,6 @@ namespace Lime
             get { return Find<Widget>(id); }
         }
 
-        public void ClearUpdatingEvent()
-        {
-            this.Updating = null;
-        }
-
-		public void ClearUpdatedEvent()
-		{
-			this.Updated = null;
-		}
-
 		public void MakeInvisible()
 		{
 			Visible = false;
@@ -169,9 +156,6 @@ namespace Lime
 			if (Anchors != Anchors.None && Parent.Widget != null) {
 				ApplyAnchors();
 			}
-			if (Updating != null) {
-				Updating(delta * 0.001f);
-			}
 			RecalcGlobalMatrixAndColorHelper();
 			if (GloballyVisible) {
 				if (IsRunning) {
@@ -180,9 +164,6 @@ namespace Lime
 				if (Nodes.Count > 0) {
 					UpdateChildren(delta);
 				}
-			}
-			if (Updated != null) {
-				Updated(delta * 0.001f);
 			}
 		}
 
