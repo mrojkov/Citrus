@@ -21,29 +21,18 @@ namespace Lime
 	[DebuggerTypeProxy(typeof(NodeDebugView))]
 	public class Node
 	{
-		internal class NodeDebugView
-		{
-			[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-			private Node node;
-
-			[DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-			public Node[] Nodes { get { return node.Nodes.AsArray; } }
-
-			public Marker[] Markers { get { return node.Markers.AsArray(); } }
-	
-			public NodeDebugView(Node node)
-			{
-				this.node = node;
-			}
-		}
-
-#if WIN
-		public Guid Guid;
-#endif
+		public event BareEventHandler AnimationStopped;
 
 		public static int UpdatedNodes;
 		private static List<Node> nodesToUnlink = new List<Node>();
-		
+
+		private int animationTime;
+
+		#region properties
+#if WIN
+		public Guid Guid { get; set; }
+#endif
+	
 		[ProtoMember(1)]
 		public string Id { get; set; }
 
@@ -54,11 +43,11 @@ namespace Lime
 		[TangerineProperty(1)]
 		public string Trigger { get; set; }
 
-		public Node Parent;
-		public Widget Widget;
+		public Node Parent { get; internal set; }
+		public Widget Widget { get; internal set; }
 
-		public Node NextToRender;
-		public int Layer;
+		internal Node NextToRender;
+		public int Layer { get; set; }
 
 		[ProtoMember(5)]
 		public AnimatorCollection Animators;
@@ -70,12 +59,8 @@ namespace Lime
 		public MarkerCollection Markers;
 
 		[ProtoMember(9)]
-		public bool IsRunning;
+		public bool IsRunning { get; set; }
 		public bool IsStopped { get { return !IsRunning; } set { IsRunning = !value; } }
-
-		public event BareEventHandler AnimationStopped;
-
-		private int animationTime;
 
 		[ProtoMember(10)]
 		public int AnimationTime {
@@ -91,10 +76,14 @@ namespace Lime
 
 		public string CurrentAnimation { get; private set; }
 
-		public float AnimationSpeed = 1;
+		public float AnimationSpeed { get; set; }
+
+		#endregion
+		#region Methods
 
 		public Node()
 		{
+			AnimationSpeed = 1;
 			Animators = new AnimatorCollection(this);
 			Markers = new MarkerCollection();
 			Nodes = new NodeCollection(this);
@@ -232,6 +221,7 @@ namespace Lime
 		public void Unlink()
 		{
 			Parent.Nodes.Remove(this);
+			Parent = null;
 		}
 		
 		public void UnlinkAfterUpdate()
@@ -254,7 +244,7 @@ namespace Lime
 		{
 			foreach (Node node in Nodes.AsArray) {
 				if (node.AnimationSpeed != 1) {
-					node.Update((int)(node.AnimationSpeed * delta));
+					node.Update((int)(node.AnimationSpeed * delta + 0.5f));
 				} else {
 					node.Update(delta);
 				}
@@ -448,5 +438,6 @@ namespace Lime
 				}
 			}
 		}
+		#endregion
 	}
 }

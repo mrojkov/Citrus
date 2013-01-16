@@ -41,21 +41,28 @@ namespace Lime
 	[TangerineClass]
 	public partial class Widget : Node
 	{
+		public event UpdateDelegate Updating;
+		public event UpdateDelegate Updated;
+
+		private Vector2 position;
+		private Vector2 size;
+		private float rotation;
+		private Vector2 direction = new Vector2(1, 0);
+		private Color4 color;
+		protected bool renderedToTexture;
+		private Vector2? parentSize;
+
 		#region Properties
 
 		[ProtoMember(1)]
 		[TangerineProperty(4)]
 		public Vector2 Position { get { return position; } set { position = value; } }
-		private Vector2 position;
-
 		public float X { get { return position.X; } set { position.X = value; } }
 		public float Y { get { return position.Y; } set { position.Y = value; } }
 
 		[ProtoMember(2)]
 		[TangerineProperty(7)]
 		public Vector2 Size { get { return size; } set { size = value; } }
-		private Vector2 size;
-
 		public float Width { get { return size.X; } set { size.X = value; } }
 		public float Height { get { return size.Y; } set { size.Y = value; } }
 
@@ -70,30 +77,20 @@ namespace Lime
 		[ProtoMember(5)]
 		[TangerineProperty(3)]
 		public float Rotation { 
-			get {
-				return rotation;
-			}
+			get { return rotation; }
 			set {
 				rotation = value;
 				direction = Mathf.CosSin(Mathf.DegreesToRadians * value);
 			}
 		}
 
-		private float rotation;
-		private Vector2 direction = new Vector2(1, 0);
-
 		[ProtoMember(6)]
 		[TangerineProperty(8)]
 		public Color4 Color { get { return color; } set { color = value; } }
-		private Color4 color;
 
 		public float Opacity { 
-			get {
-				return (float)color.A * (1 / 255f);
-			}
-			set {
-				color.A = (byte)(value * 255f);
-			}
+			get { return (float)color.A * (1 / 255f); }
+			set { color.A = (byte)(value * 255f); }
 		}
 
 		[ProtoMember(7)]
@@ -115,31 +112,6 @@ namespace Lime
 
 		[ProtoMember(13)]
 		public BoneArray BoneArray;
-
-        public event UpdateDelegate Updating;
-        public event UpdateDelegate Updated;
-
-		public Matrix32 CalcLocalTransformMatrix()
-		{
-			var u = new Vector2(direction.X * Scale.X, direction.Y * Scale.X);
-			var v = new Vector2(-direction.Y * Scale.Y, direction.X * Scale.Y);
-			Vector2 translation = position;
-			Vector2 center = Size * Pivot;
-			Matrix32 matrix;
-			if (SkinningWeights != null && Parent != null && Parent.Widget != null) {
-				BoneArray a = Parent.Widget.BoneArray;
-				translation = a.ApplySkinningToVector(position, SkinningWeights);
-				u = a.ApplySkinningToVector(u + position, SkinningWeights) - translation;
-				v = a.ApplySkinningToVector(v + position, SkinningWeights) - translation;
-			}
-			matrix.U = u;
-			matrix.V = v;
-			matrix.T.X = -(center.X * u.X) - center.Y * v.X + translation.X;
-			matrix.T.Y = -(center.X * u.Y) - center.Y * v.Y + translation.Y;
-			return matrix;
-		}
-
-		protected bool renderedToTexture;
 
 		public Matrix32 GlobalMatrix { get; protected set; }
 		public Color4 GlobalColor { get; protected set; }
@@ -191,6 +163,29 @@ namespace Lime
 			Visible = true;
 		}
 
+		public override void Update(int delta)
+		{
+			UpdatedNodes++;
+			if (Anchors != Anchors.None && Parent.Widget != null) {
+				ApplyAnchors();
+			}
+			if (Updating != null) {
+				Updating(delta * 0.001f);
+			}
+			RecalcGlobalMatrixAndColorHelper();
+			if (GloballyVisible) {
+				if (IsRunning) {
+					AdvanceAnimation(delta);
+				}
+				if (Nodes.Count > 0) {
+					UpdateChildren(delta);
+				}
+			}
+			if (Updated != null) {
+				Updated(delta * 0.001f);
+			}
+		}
+
 		public void RecalcGlobalMatrixAndColor()
 		{
 			if (Parent != null) {
@@ -217,28 +212,25 @@ namespace Lime
 			GloballyVisible = Visible && color.A != 0;
 		}
 
-		public override void Update(int delta)
+		public Matrix32 CalcLocalTransformMatrix()
 		{
-			UpdatedNodes++;
-			if (Anchors != Anchors.None && Parent.Widget != null) {
-				ApplyAnchors();
+			var u = new Vector2(direction.X * Scale.X, direction.Y * Scale.X);
+			var v = new Vector2(-direction.Y * Scale.Y, direction.X * Scale.Y);
+			Vector2 translation = position;
+			Vector2 center = Size * Pivot;
+			Matrix32 matrix;
+			if (SkinningWeights != null && Parent != null && Parent.Widget != null) {
+				BoneArray a = Parent.Widget.BoneArray;
+				translation = a.ApplySkinningToVector(position, SkinningWeights);
+				u = a.ApplySkinningToVector(u + position, SkinningWeights) - translation;
+				v = a.ApplySkinningToVector(v + position, SkinningWeights) - translation;
 			}
-			if (Updating != null) {
-				Updating(delta * 0.001f);
-			}
-			RecalcGlobalMatrixAndColorHelper();
-			if (GloballyVisible) {
-				if (IsRunning) {
-					AdvanceAnimation(delta);
-				}
-				if (Nodes.Count > 0) {
-					UpdateChildren(delta);
-				}
-			}
-			if (Updated != null) {
-				Updated(delta * 0.001f);
-			}
-        }
+			matrix.U = u;
+			matrix.V = v;
+			matrix.T.X = -(center.X * u.X) - center.Y * v.X + translation.X;
+			matrix.T.Y = -(center.X * u.Y) - center.Y * v.Y + translation.Y;
+			return matrix;
+		}
 
 		public override void AddToRenderChain(RenderChain chain)
 		{
@@ -284,8 +276,6 @@ namespace Lime
 			}
 			parentSize = s;
 		}
-
-		private Vector2? parentSize;
 
 		public virtual bool HitTest(Vector2 point)
 		{
