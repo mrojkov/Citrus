@@ -548,6 +548,9 @@ namespace Lime
 					continue;
 				}
 				FontChar fontChar = font.Chars[ch];
+				if (fontChar == FontChar.Null) {
+					continue;
+				}
 				float kerning = 0;
 				if (prevChar != null && prevChar.KerningPairs != null) {
 					foreach (var pair in prevChar.KerningPairs) {
@@ -578,6 +581,9 @@ namespace Lime
 					continue;
 				}
 				FontChar fontChar = font.Chars[ch];
+				if (fontChar == FontChar.Null) {
+					continue;
+				}
 				float kerning = 0;
 				if (prevChar != null && prevChar.KerningPairs != null) {
 					foreach (var pair in prevChar.KerningPairs) {
