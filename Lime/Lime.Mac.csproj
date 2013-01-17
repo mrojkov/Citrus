@@ -147,6 +147,7 @@
     <Compile Include="Source\PopupMenu\RoundedRectangle.cs" />
     <Compile Include="Source\PopupMenu\Separator.cs" />
     <Compile Include="Source\PopupMenu\StringItem.cs" />
+    <Compile Include="Source\Widgets\NodeDebugView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Audio\ADPCMEncoder.c">
