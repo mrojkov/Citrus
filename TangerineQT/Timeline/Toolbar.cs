@@ -5,20 +5,20 @@ using System.Text;
 using System.Threading.Tasks;
 using Qyoto;
 
-namespace Tangerine
+namespace Tangerine.Timeline
 {
-	public class TimelineToolbar : QWidget
+	public class Toolbar : QWidget
 	{
 		Document doc { get { return The.Document; } }
 		CachedTextPainter textPainter = new CachedTextPainter();
 
-		public TimelineToolbar()
+		public Toolbar()
 		{
 			this.SetFixedHeight(doc.RowHeight);
-			Paint += KeyGridRuler_Paint;
+			Paint += this_Paint;
 		}
 
-		void KeyGridRuler_Paint(object sender, QEventArgs<QPaintEvent> e)
+		void this_Paint(object sender, QEventArgs<QPaintEvent> e)
 		{
 			using (var ptr = new QPainter(this)) {
 				var mem = System.GC.GetTotalMemory(true);

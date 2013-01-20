@@ -40,7 +40,7 @@ namespace Tangerine
 		{
 			Document.Active = Document;
 			The.Document.RebuildRows();
-			The.Document.OnChanged();
+			The.Document.UpdateViews();
 			MdiSubWindow.ShowMaximized();
 		}
 

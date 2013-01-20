@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Qyoto;
 
-namespace Tangerine
+namespace Tangerine.Timeline
 {
 	///// <summary>
 	///// Строка представляющая одно свойство нода на таймлайне

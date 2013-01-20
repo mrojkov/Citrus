@@ -22,7 +22,8 @@ namespace Tangerine
 			transaction.Text = text;
 			Commands.Add(transaction);
 			transaction.Do();
-			The.Document.OnChanged();
+			The.Document.RebuildRows();
+			The.Document.UpdateViews();
 			transaction = new CompoundCommand();
 		}
 	}

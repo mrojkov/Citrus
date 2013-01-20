@@ -12,17 +12,17 @@ namespace Tangerine
 	public class TimelineRowsCache
 	{
 		[ProtoMember(1)]
-		Dictionary<string, TimelineRow> cache = new Dictionary<string, TimelineRow>();
+		Dictionary<string, Timeline.Row> cache = new Dictionary<string, Timeline.Row>();
 
-		public TimelineNodeRow GetNodeRow(Lime.Node node)
+		public Timeline.NodeRow GetNodeRow(Lime.Node node)
 		{
 			string key = node.Guid.ToString();
-			TimelineRow item;
+			Timeline.Row item;
 			if (!cache.TryGetValue(key, out item)) {
-				item = new TimelineNodeRow(node);
+				item = new Timeline.NodeRow(node);
 				cache[key] = item;
 			}
-			return item as TimelineNodeRow;
+			return item as Timeline.NodeRow;
 		}
 
 		//public PropertyLine GetPropertyRow(Lime.Node node, PropertyInfo property)
@@ -37,9 +37,9 @@ namespace Tangerine
 		//	return item as PropertyLine;
 		//}
 
-		public List<TimelineRow> GetRowsForContainer(Lime.Node container)
+		public List<Timeline.Row> GetRowsForContainer(Lime.Node container)
 		{
-			var rows = new List<TimelineRow>();
+			var rows = new List<Timeline.Row>();
 			int i = 0;
 			foreach (var node in container.Nodes) {
 				var nodeRow = GetNodeRow(node);

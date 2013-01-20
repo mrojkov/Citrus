@@ -30,7 +30,7 @@ namespace Tangerine
 
 		protected override void PaintGL()
 		{
-			The.Document.RootNode.SafeUpdate(0);
+			The.Document.RootNode.Update(0);
 			Lime.Renderer.BeginFrame();
 			var chain = new Lime.RenderChain();
 			The.Document.RootNode.AddToRenderChain(chain);

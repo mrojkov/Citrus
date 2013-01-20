@@ -42,7 +42,7 @@ namespace Tangerine
 			Move(300, 300);
 			ShowMaximized();
 			var doc = new Document(readOnly: false);
-			doc.OnChanged();
+			doc.UpdateViews();
 			LoadDockState();
 			CloseEvent += OnClose;
 		}

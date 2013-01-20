@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Qyoto;
 
-namespace Tangerine
+namespace Tangerine.Timeline
 {
 	public class ChoosePrevNode : ContextualAction
 	{
@@ -97,7 +97,7 @@ namespace Tangerine
 		{
 			The.Document.CurrentColumn++;
 			The.Timeline.EnsureColumnVisible(The.Document.CurrentColumn);
-			The.Document.OnChanged();
+			The.Document.UpdateViews();
 		}
 	}
 
@@ -115,7 +115,7 @@ namespace Tangerine
 				The.Document.CurrentColumn--;
 				The.Timeline.EnsureColumnVisible(The.Document.CurrentColumn);
 			}
-			The.Document.OnChanged();
+			The.Document.UpdateViews();
 		}
 	}
 
@@ -131,7 +131,7 @@ namespace Tangerine
 		{
 			The.Document.CurrentColumn += 10;
 			The.Timeline.EnsureColumnVisible(The.Document.CurrentColumn);
-			The.Document.OnChanged();
+			The.Document.UpdateViews();
 		}
 	}
 
@@ -149,7 +149,7 @@ namespace Tangerine
 				The.Document.CurrentColumn = Math.Max(0, The.Document.CurrentColumn - 10);
 				The.Timeline.EnsureColumnVisible(The.Document.CurrentColumn);
 			}
-			The.Document.OnChanged();
+			The.Document.UpdateViews();
 		}
 	}
 }

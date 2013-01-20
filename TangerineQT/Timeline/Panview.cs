@@ -5,42 +5,65 @@ using System.Text;
 using System.Threading.Tasks;
 using Qyoto;
 
-namespace Tangerine
+namespace Tangerine.Timeline
 {
 	public class Panview : QWidget
 	{
-		Document doc { get { return The.Document; } }
-
 		bool dragging;
+		int leftColumnBeforeDrag;
+		int topRowBeforeDrag;
+		int maxColumnBeforeDrag;
+		QPoint dragPosition;
+
+		Document doc { get { return The.Document; } }
 
 		public Panview()
 		{
-			//this.Palette = new QPalette(new QColor(230, 230, 230));
-			//this.AutoFillBackground = true;
-			Paint += Panview_Paint;
-			this.MousePress += Panview_MousePress;
-			this.MouseRelease += Panview_MouseRelease;
-			this.MouseMove += Panview_MouseMove;
+			Paint += this_Paint;
+			this.MousePress += this_MousePress;
+			this.MouseRelease += this_MouseRelease;
+			this.MouseMove += this_MouseMove;
 		}
 
-		void Panview_MouseMove(object sender, QEventArgs<QMouseEvent> e)
+		void this_MouseMove(object sender, QEventArgs<QMouseEvent> e)
 		{
 			if (dragging) {
-			
+				doc.LeftColumn = PixelToColumn(e.Event.Pos().X - dragPosition.X) + leftColumnBeforeDrag;
+				doc.LeftColumn = Math.Min(doc.LeftColumn, maxColumnBeforeDrag - Toolbox.CalcNumberOfVisibleColumns());
+				doc.LeftColumn = Math.Max(doc.LeftColumn, 0);
+				doc.TopRow = PixelToRow(e.Event.Pos().Y - dragPosition.Y) + topRowBeforeDrag;
+				doc.TopRow = Math.Min(doc.TopRow, doc.Rows.Count - Toolbox.CalcNumberOfVisibleRows());
+ 				doc.TopRow = Math.Max(doc.TopRow, 0);
+				doc.UpdateViews();
 			}
 		}
 
-		void Panview_MouseRelease(object sender, QEventArgs<QMouseEvent> e)
+		int PixelToColumn(int x)
+		{
+			return (int)(x / (GetCanvasScale().X * doc.ColumnWidth) + 0.5f);
+		}
+
+		int PixelToRow(int y)
+		{
+			return (int)(y / (GetCanvasScale().Y * doc.RowHeight) + 0.5f);
+		}
+
+		void this_MouseRelease(object sender, QEventArgs<QMouseEvent> e)
 		{
 			dragging = false;
+			Repaint();
 		}
 
-		void Panview_MousePress(object sender, QEventArgs<QMouseEvent> e)
+		void this_MousePress(object sender, QEventArgs<QMouseEvent> e)
 		{
 			dragging = true;
+			dragPosition = e.Event.Pos();
+			leftColumnBeforeDrag = doc.LeftColumn;
+			topRowBeforeDrag = doc.TopRow;
+			maxColumnBeforeDrag = Toolbox.CalcLastColumn();
 		}
 
-		void Panview_Paint(object sender, QEventArgs<QPaintEvent> e)
+		void this_Paint(object sender, QEventArgs<QPaintEvent> e)
 		{
 			if (doc.Rows.Count > 0) {
 				using (var ptr = new QPainter(this)) {
@@ -53,8 +76,8 @@ namespace Tangerine
 
 		private void PaintVisibleRect(QPainter ptr)
 		{
-			int numCols = TimelineToolbox.NumberOfVisibleColumns;
-			int numRows = Math.Min(TimelineToolbox.NumberOfVisibleRows, doc.Rows.Count - doc.TopRow);
+			int numCols = Toolbox.CalcNumberOfVisibleColumns();
+			int numRows = Math.Min(Toolbox.CalcNumberOfVisibleRows(), doc.Rows.Count - doc.TopRow);
 			int x = doc.LeftColumn * doc.ColumnWidth;
 			int y = doc.TopRow * doc.RowHeight;
 			int w = numCols * doc.ColumnWidth;
@@ -66,14 +89,22 @@ namespace Tangerine
 
 		private void SetScale(QPainter ptr)
 		{
-			int width = TimelineToolbox.MaxColumn * doc.ColumnWidth;
+			ptr.Scale(GetCanvasScale().X, GetCanvasScale().Y);
+		}
+
+		private Lime.Vector2 GetCanvasScale()
+		{
+			int width = Toolbox.CalcLastColumn() * doc.ColumnWidth;
 			int height = doc.Rows.Count * doc.RowHeight;
-			ptr.Scale((Width - 1) / (double)width, (Height - 1) / (double)height);
+			Lime.Vector2 scale;
+			scale.X = (Width - 1) / (float)width;
+			scale.Y = (Height - 1) / (float)height;
+			return scale;
 		}
 
 		private void PaintRows(QPainter ptr)
 		{
-			int width = TimelineToolbox.MaxColumn * doc.ColumnWidth;
+			int width = Toolbox.CalcLastColumn() * doc.ColumnWidth;
 			foreach (var row in doc.Rows) {
 				int top = row.Index * doc.RowHeight;
 				row.View.PaintContent(ptr, top, width);

@@ -12,14 +12,22 @@ namespace Tangerine
 		public QAction QAction;
 		private SlotWrapper triggerWrapper;
 
-		public string Text {
+		public string Text
+		{
 			get { return QAction.Text; }
 			set { QAction.Text = value; } 
 		}
 
-		public QKeySequence Shortcut { 
+		public QKeySequence Shortcut
+		{ 
 			get { return QAction.Shortcut; }
 			set { QAction.Shortcut = value; }
+		}
+
+		public bool Enabled
+		{
+			get { return QAction.Enabled; }
+			set { QAction.Enabled = value; }
 		}
 
 		public Action()

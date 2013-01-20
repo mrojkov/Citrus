@@ -4,14 +4,14 @@ using System.Text;
 using System.Threading.Tasks;
 using Qyoto;
 
-namespace Tangerine
+namespace Tangerine.Timeline
 {
 	/// <summary>
 	/// Абстрактный класс для представления одной строки на таймлайне
 	/// </summary>
-	public class TimelineRowView : QObject
+	public class RowView : QObject
 	{
-		protected TimelineRow row;
+		protected Row row;
 		protected Document doc { get { return The.Document; } }
 
 		public int Index { get { return row.Index; } }
@@ -19,7 +19,7 @@ namespace Tangerine
 		protected QWidget slot;
 		protected QHBoxLayout layout;
 
-		public TimelineRowView(TimelineRow row)
+		public RowView(Row row)
 		{
 			this.row = row;
 			slot = new QWidget();
@@ -36,8 +36,8 @@ namespace Tangerine
 
 		public virtual void Attach()
 		{
-			slot.SetParent(The.Timeline.NodeRoll);
-			slot.Resize(The.Timeline.NodeRoll.Width, doc.RowHeight);
+			slot.SetParent(The.Timeline.Roll);
+			slot.Resize(The.Timeline.Roll.Width, doc.RowHeight);
 		}
 
 		public void SetPosition(int top)
@@ -69,6 +69,10 @@ namespace Tangerine
 		}
 
 		public virtual void HandleMousePress(int x)
+		{
+		}
+
+		public virtual void Refresh()
 		{
 		}
 

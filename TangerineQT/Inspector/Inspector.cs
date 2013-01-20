@@ -29,9 +29,9 @@ namespace Tangerine
 		public virtual void Attach(int row)
 		{
 			Row = row;
-			slot.SetParent(The.Timeline.NodeRoll);
+			slot.SetParent(The.Timeline.Roll);
 			slot.Move(0, row * Inspector.RowHeight);
-			slot.Resize(The.Timeline.NodeRoll.Width, Inspector.RowHeight);
+			slot.Resize(The.Timeline.Roll.Width, Inspector.RowHeight);
 		}
 
 		public virtual void Detach()

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Qyoto;
 
-namespace Tangerine
+namespace Tangerine.Timeline
 {
 	public class Timeline
 	{
@@ -13,7 +13,7 @@ namespace Tangerine
 
 		public static Timeline Instance = new Timeline();
 
-		private List<TimelineRow> rows = new List<TimelineRow>();
+		private List<Row> rows = new List<Row>();
 
 		public QDockWidget DockWidget { get; private set; }
 
@@ -21,10 +21,10 @@ namespace Tangerine
 		QSplitter splitter2;
 
 		public int FontHeight { get; private set; }
-		public NodeRoll NodeRoll;
-		public KeyGrid KeyGrid;
+		public Roll Roll;
+		public Grid Grid;
 		public Panview Panview;
-		public KeyGridRuler KeyGridRuler;
+		public TimlineRuler Ruler;
 
 		private List<Action> actions = new List<Action>();
 
@@ -62,20 +62,24 @@ namespace Tangerine
 			actions.Add(new MoveCursorLeftFast(DockWidget));
 		}
 
+		public void EnableActions(bool enable)
+		{
+			foreach (var action in actions) {
+				action.Enabled = enable;
+			}
+		}
+
 		void DockWidget_Wheel(object sender, QEventArgs<QWheelEvent> e)
 		{
 			doc.TopRow += e.Event.Delta() > 0 ? -1 : 1;
-			int m = Math.Max(0, rows.Count - TimelineToolbox.NumberOfVisibleRows);
+			int m = Math.Max(0, rows.Count - Toolbox.CalcNumberOfVisibleRows());
 			doc.TopRow = Lime.Mathf.Clamp(doc.TopRow, 0, m);
 			Refresh();
 		}
 
 		void Dock_MousePress(object sender, QEventArgs<QMouseEvent> e)
 		{
-//			QWidget w = QApplication.FocusWidget();
-//			if (w == null && !Dock.IsAncestorOf(w)) {
-				DockWidget.SetFocus();
-//			}
+			DockWidget.SetFocus();
 		}
 
 		private void Document_Changed()
@@ -87,21 +91,22 @@ namespace Tangerine
 		{
 			var newRows = The.Document.Rows;
 			if (!rows.AreEqual(newRows)) {
-				NodeRoll.Hide();
+				Roll.Hide();
 				RefreshRows(newRows);
-				NodeRoll.Show();
+				Roll.Show();
 			}
 			foreach (var row in rows) {
+				row.View.Refresh();
 				bool rowSelected = The.Document.SelectedRows.Contains(row.Index);
 				row.View.SetPosition((row.Index - doc.TopRow) * doc.RowHeight);
 				row.View.SetSelected(rowSelected);
 			}
-			KeyGrid.Update();
-			KeyGridRuler.Update();
+			Grid.Update();
+			Ruler.Update();
 			Panview.Update();
 		}
 
-		private void RefreshRows(List<TimelineRow> newRows)
+		private void RefreshRows(List<Row> newRows)
 		{
 			foreach (var row in rows) {
 				row.View.Detach();
@@ -117,8 +122,8 @@ namespace Tangerine
 		{
 			if (row < doc.TopRow) {
 				doc.TopRow = row;
-			} else if (row >= doc.TopRow + TimelineToolbox.NumberOfVisibleRows) {
-				doc.TopRow = row - TimelineToolbox.NumberOfVisibleRows + 1;
+			} else if (row >= doc.TopRow + Toolbox.CalcNumberOfVisibleRows()) {
+				doc.TopRow = row - Toolbox.CalcNumberOfVisibleRows() + 1;
 			}
 		}
 
@@ -126,8 +131,8 @@ namespace Tangerine
 		{
 			if (column < doc.LeftColumn) {
 				doc.LeftColumn = column;
-			} else if (column >= doc.LeftColumn + TimelineToolbox.NumberOfVisibleColumns) {
-				doc.LeftColumn = column - TimelineToolbox.NumberOfVisibleColumns + 1;
+			} else if (column >= doc.LeftColumn + Toolbox.CalcNumberOfVisibleColumns()) {
+				doc.LeftColumn = column - Toolbox.CalcNumberOfVisibleColumns() + 1;
 			}
 		}
 
@@ -146,10 +151,10 @@ namespace Tangerine
 			var layout = new QVBoxLayout(ctr);
 			layout.Spacing = 0;
 			layout.Margin = 0;
-			KeyGridRuler = new KeyGridRuler();
-			layout.AddWidget(KeyGridRuler);
-			KeyGrid = new KeyGrid();
-			layout.AddWidget(KeyGrid);
+			Ruler = new TimlineRuler();
+			layout.AddWidget(Ruler);
+			Grid = new Grid();
+			layout.AddWidget(Grid);
 			return ctr;
 		}
 
@@ -159,9 +164,9 @@ namespace Tangerine
 			var layout = new QVBoxLayout(ctr);
 			layout.Spacing = 0;
 			layout.Margin = 0;
-			layout.AddWidget(new TimelineToolbar());
-			NodeRoll = new NodeRoll();
-			layout.AddWidget(NodeRoll);
+			layout.AddWidget(new Toolbar());
+			Roll = new Roll();
+			layout.AddWidget(Roll);
 			return ctr;
 		}
 	}

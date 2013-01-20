@@ -7,7 +7,7 @@ namespace Tangerine
 {
 	public static class TimelineRowListExtension
 	{
-		public static bool AreEqual(this List<TimelineRow> rows1, List<TimelineRow> rows2)
+		public static bool AreEqual(this List<Timeline.Row> rows1, List<Timeline.Row> rows2)
 		{
 			if (rows1.Count != rows2.Count) {
 				return false;

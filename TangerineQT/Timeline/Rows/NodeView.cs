@@ -6,28 +6,28 @@ using System.Threading.Tasks;
 using Qyoto;
 using System.Reflection;
 
-namespace Tangerine
+namespace Tangerine.Timeline
 {
-	public class TimelineNodeView : TimelineRowView
+	public class NodeView : RowView
 	{
 		private QLabel nodeName;
 		private InplaceTextEditor inplaceEditor;
 
-		public new TimelineNodeRow row { get { return base.row as TimelineNodeRow; } }
+		public new NodeRow row { get { return base.row as NodeRow; } }
 
-		public TimelineNodeView(TimelineRow row)
+		public NodeView(Row row)
 			: base(row)
 		{
 			//var expanderIcon = CreateIconButton("Timeline/Collapsed");
 			//expanderIcon.Clicked += expanderIcon_Clicked;
 			//layout.AddWidget(expanderIcon);
 
+			nodeName = new QLabel(this.row.Node.Id);
 			//var nodeIcon = CreateIconButton("Nodes/Scene");
 			var nodeIcon = CreateImageWidget("Nodes/Scene");
 			//nodeIcon.Clicked += nodeIcon_Clicked;
 			layout.AddWidget(nodeIcon, 1);
 
-			nodeName = new QLabel(this.row.Node.Id);
 			nodeName.MouseDoubleClick += nodeName_MouseDoubleClick;
 			layout.AddWidget(nodeName, 10);
 
@@ -35,7 +35,6 @@ namespace Tangerine
 			//layout.AddWidget(spacing, 10);
 
 			var bt = CreateImageWidget("Timeline/Dot");
-			bt.MousePress += bt_MousePress;
 			layout.AddWidget(bt);
 
 			var bt2 = CreateImageWidget("Timeline/Dot");
@@ -44,16 +43,42 @@ namespace Tangerine
 
 		void nodeName_MouseDoubleClick(object sender, QEventArgs<QMouseEvent> e)
 		{
-			NodeRoll.MouseDoubleClickConsumed = true;
-			inplaceEditor = new InplaceTextEditor(nodeName);
-			inplaceEditor.Finished += (text) => {
-				this.row.Node.Id = text;
-			};
+			var label = (QLabel)sender;
+			var metrics = new QFontMetrics(label.Font);
+			int textWidth = metrics.Width(label.Text);
+			bool hitLabel = e.Event.X() < textWidth;
+			if (hitLabel) {
+				RenameNode();
+			} else {
+				EnterIntoNode();
+			}
 		}
 
-		void bt_MousePress(object sender, QEventArgs<QMouseEvent> e)
+		public override void Refresh()
 		{
-			NodeRoll.MousePressConsumed = true;
+			nodeName.Text = row.Node.Id;
+		}
+
+		private static void EnterIntoNode()
+		{
+			var lines = The.Document.SelectedRows;
+			if (lines.Count > 0) {
+				var container = The.Document.Container.Nodes[lines[0]];
+				The.Document.History.Add(new Commands.ChangeContainer(container));
+				The.Document.History.Commit("Change container");
+			}
+		}
+
+		private void RenameNode()
+		{
+			The.Timeline.EnableActions(false);
+			inplaceEditor = new InplaceTextEditor(nodeName);
+			inplaceEditor.Finished += (text) => {
+				The.Timeline.EnableActions(true);
+				//The.Timeline.DockWidget.SetDisabled(false);
+				The.Document.History.Add(new Commands.ChangeNodeProperty(row.Node, "Id", text));
+				The.Document.History.Commit("Rename node");
+			};	
 		}
 
 		//void expanderIcon_MousePress(object sender, QEventArgs<QMouseEvent> e)

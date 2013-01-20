@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Qyoto;
 
-namespace Tangerine
+namespace Tangerine.Timeline
 {
 	public static class KeyTransientPalette
 	{

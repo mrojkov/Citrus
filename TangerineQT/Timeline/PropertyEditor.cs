@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Qyoto;
 using System.Reflection;
 
-namespace Tangerine
+namespace Tangerine.Timeline
 {
 	public static class PropertyEditorRegistry
 	{

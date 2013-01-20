@@ -6,23 +6,69 @@ using System.Threading.Tasks;
 using Qyoto;
 using System.Runtime.InteropServices;
 
-namespace Tangerine
+namespace Tangerine.Timeline
 {
-	public class KeyGrid : QWidget
+	public class Grid : QWidget
 	{
 		Document doc { get { return The.Document; } }
+		QTimer timer;
 
 		public static int MaxLinesPerRow = 5;
+		private GridState state = new GridIdleState();
 
-		public KeyGrid()
+		public Grid()
 		{
-			Paint += Keygrid_Paint;
+			Paint += this_Paint;
+			this.MouseMove += this_MouseMove;
+			this.MousePress += this_MousePress;
+			this.MouseRelease += this_MouseRelease;
+			CreateScrollTimer();
 		}
 
-		void Keygrid_Paint(object sender, QEventArgs<QPaintEvent> e)
+		public void ChangeState(GridState newState)
+		{
+			state = newState;
+		}
+
+		void this_MouseRelease(object sender, QEventArgs<QMouseEvent> e)
+		{
+			state.OnMouseRelease(e.Event);
+		}
+
+		void this_MousePress(object sender, QEventArgs<QMouseEvent> e)
+		{
+			state.OnMousePress(e.Event);
+		}
+
+		void this_MouseMove(object sender, QEventArgs<QMouseEvent> e)
+		{
+			state.OnMouseMove(e.Event);
+		}
+
+		private void CreateScrollTimer()
+		{
+			timer = new QTimer(this);
+			timer.Interval = 10;
+			timer.Timer += this_Timer;
+		}
+
+		void this_Timer(object sender, QEventArgs<QTimerEvent> e)
+		{
+			if (Toolbox.IsLeftButtonPressed()) {
+				int column = Toolbox.PixelToColumn(MapFromGlobal(QCursor.Pos).X);
+				if (column <= doc.LeftColumn) {
+					column = doc.LeftColumn - 10;
+				} else if (column >= doc.RightColumn) {
+					column = doc.RightColumn + 10;
+				}
+				Toolbox.SetCurrentColumn(column);
+			}
+		}
+
+		void this_Paint(object sender, QEventArgs<QPaintEvent> e)
 		{
 			int numRows = Size.Height / doc.RowHeight + 1;
-			int numCols = TimelineToolbox.MaxColumn; // Size.Width / doc.ColumnWidth + 1;
+			int numCols = Toolbox.CalcLastColumn(); // Size.Width / doc.ColumnWidth + 1;
 			using (var ptr = new QPainter(this)) {
 				ptr.Translate(-doc.LeftColumn * doc.ColumnWidth, 0);
 				DrawGrid(numRows, numCols, ptr);

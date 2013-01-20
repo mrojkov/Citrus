@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Qyoto;
 using System.Reflection;
 
-namespace Tangerine
+namespace Tangerine.Timeline
 {
 	/// <summary>
 	/// Этот класс задает геометрию отображения ключа на таймлайне
@@ -43,9 +43,9 @@ namespace Tangerine
 
 		private void AllocateLines(List<KeyTransient> transients)
 		{
-			var attributes = new Lime.TangerinePropertyAttribute[KeyGrid.MaxLinesPerRow];
-			var endings = new int[KeyGrid.MaxLinesPerRow];
-			int[] priorityMap = GenerateLinesPriorityMap(KeyGrid.MaxLinesPerRow);
+			var attributes = new Lime.TangerinePropertyAttribute[Grid.MaxLinesPerRow];
+			var endings = new int[Grid.MaxLinesPerRow];
+			int[] priorityMap = GenerateLinesPriorityMap(Grid.MaxLinesPerRow);
 			foreach (var transient in transients) {
 				if (!TryJoinTransientToPreviousOne(attributes, endings, priorityMap, transient)) {
 					PutTransientToFreeLine(attributes, endings, priorityMap, transient);
@@ -85,9 +85,9 @@ namespace Tangerine
 		private int[] GenerateLinesPriorityMap(int maxLines)
 		{
 			int[] linesPriorityMap = new int[maxLines];
-			for (int i = 0; i < KeyGrid.MaxLinesPerRow; i++) {
+			for (int i = 0; i < Grid.MaxLinesPerRow; i++) {
 				int s = (i % 2) == 0 ? 1 : -1;
-				linesPriorityMap[i] = KeyGrid.MaxLinesPerRow / 2 + (i + 1) * s / 2;
+				linesPriorityMap[i] = Grid.MaxLinesPerRow / 2 + (i + 1) * s / 2;
 			}
 			return linesPriorityMap;
 		}

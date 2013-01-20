@@ -25,7 +25,7 @@ namespace Tangerine.Commands
 			if (container.Nodes.Contains(savedContainer)) {
 				// Если выходим наверх, то выставим в качестве текущего нода, тот откуда мы вышли
 				foreach (var row in The.Document.Rows) {
-					var nodeRow = row as TimelineNodeRow;
+					var nodeRow = row as Timeline.NodeRow;
 					if (nodeRow != null && nodeRow.Node == savedContainer) {
 						selectRows = new SelectRows(row.Index);
 					}

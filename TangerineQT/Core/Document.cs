@@ -48,7 +48,7 @@ namespace Tangerine
 			Active = this;
 		}
 
-		public void OnChanged()
+		public void UpdateViews()
 		{
 			if (Changed != null) {
 				Changed();
