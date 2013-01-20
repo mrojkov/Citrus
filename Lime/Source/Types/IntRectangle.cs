@@ -33,27 +33,17 @@ namespace Lime
 		}
 		
 		public int Width {
-			get {
-				return B.X - A.X;
-			}
-			set {
-				B.X = A.X + value;
-			}
+			get { return B.X - A.X; }
+			set { B.X = A.X + value; }
 		}
 
 		public int Height {
-			get {
-				return B.Y - A.Y;
-			}
-			set {
-				B.Y = A.Y + value;
-			}
+			get { return B.Y - A.Y; }
+			set { B.Y = A.Y + value; }
 		}
 
 		public IntVector2 Size { 
-			get {
-				return B - A;
-			}
+			get { return B - A; }
 		}
 
 		public int Left { get { return A.X; } set { A.X = value; } }
@@ -62,7 +52,7 @@ namespace Lime
 		public int Bottom { get { return B.Y; } set { B.Y = value; } }
 		public IntVector2 Center { get { return new IntVector2((A.X + B.X) / 2, (A.Y + B.Y) / 2); } }
 
-		bool Contains(IntVector2 v)
+		public bool Contains(IntVector2 v)
 		{
 			return (v.X >= A.X) && (v.Y >= A.Y) && (v.X < B.X) && (v.Y < B.Y);
 		}

@@ -28,7 +28,9 @@ namespace Lime
 			// Как узнать разрешение текущего экрана без Windows Forms?
             Size screenSize = new Size(1280, 1024);
 
-			if (CheckMaximizedArg(args)) {
+			if (CheckFullscreenArg(args)) {
+				this.WindowState = OpenTK.WindowState.Fullscreen;
+			} else if (CheckMaximizedArg(args)) {
 				this.Location = new System.Drawing.Point(0, 0);
 				this.WindowState = OpenTK.WindowState.Maximized;
 			} else {
@@ -42,6 +44,11 @@ namespace Lime
 		private static bool CheckMaximizedArg(string[] args)
 		{
 			return args != null && Array.IndexOf(args, "--Maximized") >= 0;
+		}
+
+		private static bool CheckFullscreenArg(string[] args)
+		{
+			return args != null && Array.IndexOf(args, "--Fullscreen") >= 0;
 		}
 
 		void HandleKeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)

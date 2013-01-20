@@ -325,7 +325,7 @@ namespace Lime
 #if GLES11
 				GL.GenTextures(1, ref id);
 #else
-				id = (uint)GL.GenTexture();
+				id = (uint)OGL.GenTexture();
 #endif
 			}
 #if GLES11
