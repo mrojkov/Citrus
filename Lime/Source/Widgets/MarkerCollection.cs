@@ -64,7 +64,7 @@ namespace Lime
 			var marker = TryFind(id);
 			if (marker == null) {
 				throw new Lime.Exception("Unknown marker '{0}'", id);
-			}
+			}	
 			return marker;
 		}
 

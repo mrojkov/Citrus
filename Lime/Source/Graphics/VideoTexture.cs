@@ -10,7 +10,7 @@ namespace Lime
 	public class VideoTexture : PlainTexture
 	{
 		Stream rgbStream;
-		Stream alphaStream;
+		Stream alphaStream = null;
 		OgvDecoder rgbDecoder;
 		OgvDecoder alphaDecoder;
 		Color4[] pixels;

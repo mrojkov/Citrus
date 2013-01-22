@@ -127,7 +127,7 @@ namespace Lime
 			}
 		}
 
-		public static T Random<T>(params T[] objects)
+		public static T RandomOf<T>(params T[] objects)
 		{
 			return objects[Random(objects.Length)];
 		}

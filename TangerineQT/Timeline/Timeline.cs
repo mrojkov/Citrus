@@ -24,7 +24,7 @@ namespace Tangerine.Timeline
 		public Roll Roll;
 		public Grid Grid;
 		public Panview Panview;
-		public TimlineRuler Ruler;
+		public Ruler Ruler;
 
 		private List<Action> actions = new List<Action>();
 
@@ -120,6 +120,7 @@ namespace Tangerine.Timeline
 
 		public void EnsureRowVisible(int row)
 		{
+			row = row.Clamp(0, doc.Rows.Count);
 			if (row < doc.TopRow) {
 				doc.TopRow = row;
 			} else if (row >= doc.TopRow + Toolbox.CalcNumberOfVisibleRows()) {
@@ -129,6 +130,7 @@ namespace Tangerine.Timeline
 
 		public void EnsureColumnVisible(int column)
 		{
+			column = Math.Max(0, column);
 			if (column < doc.LeftColumn) {
 				doc.LeftColumn = column;
 			} else if (column >= doc.LeftColumn + Toolbox.CalcNumberOfVisibleColumns()) {
@@ -151,7 +153,7 @@ namespace Tangerine.Timeline
 			var layout = new QVBoxLayout(ctr);
 			layout.Spacing = 0;
 			layout.Margin = 0;
-			Ruler = new TimlineRuler();
+			Ruler = new Ruler();
 			layout.AddWidget(Ruler);
 			Grid = new Grid();
 			layout.AddWidget(Grid);

@@ -26,6 +26,20 @@ namespace Lime
 			A = a;
 			B = b;
 		}
+
+		public Lime.IntRectangle Normalize()
+		{
+			var rect = this;
+			if (Width < 0) {
+				rect.A.X = B.X;
+				rect.B.X = A.X;
+			}
+			if (Height < 0) {
+				rect.A.Y = B.Y;
+				rect.B.Y = A.Y;
+			}
+			return rect;
+		}
 		
 		bool IEquatable<IntRectangle>.Equals(IntRectangle other)
 		{

@@ -7,13 +7,13 @@ using Qyoto;
 
 namespace Tangerine.Timeline
 {
-	public class TimlineRuler : QWidget
+	public class Ruler : QWidget
 	{
 		QTimer timer;
 		Document doc { get { return The.Document; } }
 		CachedTextPainter textPainter = new CachedTextPainter();
 
-		public TimlineRuler()
+		public Ruler()
 		{
 			this.SetFixedHeight(doc.RowHeight);
 			Paint += this_Paint;
@@ -31,7 +31,7 @@ namespace Tangerine.Timeline
 		private void CreateScrollTimer()
 		{
 			timer = new QTimer(this);
-			timer.Interval = 10;
+			timer.Interval = 50;
 			timer.Timer += this_Timer;
 		}
 
@@ -44,8 +44,15 @@ namespace Tangerine.Timeline
 				} else if (column >= doc.RightColumn) {
 					column = doc.RightColumn + 10;
 				}
-				Toolbox.SetCurrentColumn(column);
+				SetCurrentColumn(column);
 			}
+		}
+
+		private void SetCurrentColumn(int column)
+		{
+			doc.CurrentColumn = Math.Max(0, column);
+			The.Timeline.EnsureColumnVisible(column);
+			doc.UpdateViews();
 		}
 
 		private static bool IsLeftButtonPressed()
@@ -57,7 +64,7 @@ namespace Tangerine.Timeline
 		{
 			int column = Toolbox.PixelToColumn(e.Event.Pos().X);
 			timer.Start();
-			Toolbox.SetCurrentColumn(column);
+			SetCurrentColumn(column);
 		}
 
 		void this_MouseMove(object sender, QEventArgs<QMouseEvent> e)
@@ -65,7 +72,7 @@ namespace Tangerine.Timeline
 			if (IsLeftButtonPressed()) {
 				int column = Toolbox.PixelToColumn(e.Event.Pos().X);
 				column = column.Clamp(doc.LeftColumn, doc.RightColumn);
-				Toolbox.SetCurrentColumn(column);
+				SetCurrentColumn(column);
 			}
 		}
 

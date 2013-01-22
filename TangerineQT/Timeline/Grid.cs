@@ -32,37 +32,66 @@ namespace Tangerine.Timeline
 
 		void this_MouseRelease(object sender, QEventArgs<QMouseEvent> e)
 		{
-			state.OnMouseRelease(e.Event);
+			state.OnMouseRelease();
+			timer.Stop();
 		}
 
 		void this_MousePress(object sender, QEventArgs<QMouseEvent> e)
 		{
-			state.OnMousePress(e.Event);
+			state.OnMousePress(GetCellUnderMouseCursor());
+			timer.Start();
 		}
 
 		void this_MouseMove(object sender, QEventArgs<QMouseEvent> e)
 		{
-			state.OnMouseMove(e.Event);
+			state.OnMouseMove(GetCellUnderMouseCursor());
 		}
 
 		private void CreateScrollTimer()
 		{
 			timer = new QTimer(this);
-			timer.Interval = 10;
+			timer.Interval = 50;
 			timer.Timer += this_Timer;
 		}
 
 		void this_Timer(object sender, QEventArgs<QTimerEvent> e)
 		{
 			if (Toolbox.IsLeftButtonPressed()) {
-				int column = Toolbox.PixelToColumn(MapFromGlobal(QCursor.Pos).X);
-				if (column <= doc.LeftColumn) {
-					column = doc.LeftColumn - 10;
-				} else if (column >= doc.RightColumn) {
-					column = doc.RightColumn + 10;
-				}
-				Toolbox.SetCurrentColumn(column);
+				DoHorizontalScrolling();
+				DoVerticalScrolling();
+				state.OnMouseMove(GetCellUnderMouseCursor());
+				doc.UpdateViews();
 			}
+		}
+
+		Lime.IntVector2 GetCellUnderMouseCursor()
+		{
+			Lime.IntVector2 cell = Toolbox.PixelToCell(MapFromGlobal(QCursor.Pos));
+			cell.Y = cell.Y.Clamp(0, doc.Rows.Count - 1);
+			return cell;
+		}
+
+		private void DoVerticalScrolling()
+		{
+			int row = Toolbox.PixelToRow(MapFromGlobal(QCursor.Pos).Y);
+			if (row <= doc.TopRow) {
+				row = doc.TopRow - 1;
+			} else if (row >= doc.BottomRow) {
+				row = doc.BottomRow + 1;
+			}
+			The.Timeline.EnsureRowVisible(row);
+		}
+
+		private void DoHorizontalScrolling()
+		{
+			int column = Toolbox.PixelToColumn(MapFromGlobal(QCursor.Pos).X);
+			if (column <= doc.LeftColumn) {
+				column = doc.LeftColumn - 10;
+			} else if (column >= doc.RightColumn) {
+				column = doc.RightColumn + 10;
+			}
+			doc.CurrentColumn = Math.Max(0, column);
+			The.Timeline.EnsureColumnVisible(column);
 		}
 
 		void this_Paint(object sender, QEventArgs<QPaintEvent> e)
@@ -76,6 +105,7 @@ namespace Tangerine.Timeline
 					int top = (row.Index - doc.TopRow) * doc.RowHeight;
 					row.View.PaintContent(ptr, top, Width);
 				}
+				state.Paint(ptr);
 				DrawCursor(ptr);
 			}
 		}

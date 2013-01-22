@@ -10,9 +10,9 @@ namespace Tangerine.Timeline
 	{
 		protected Document doc { get { return The.Document; } }
 
-		public virtual void OnMousePress(QMouseEvent e) { }
-		public virtual void OnMouseRelease(QMouseEvent e) { }
-		public virtual void OnMouseMove(QMouseEvent e) { }
+		public virtual void OnMousePress(Lime.IntVector2 cell) { }
+		public virtual void OnMouseRelease() { }
+		public virtual void OnMouseMove(Lime.IntVector2 cell) { }
 		public virtual void Paint(QPainter ptr) { }
 	}
 }

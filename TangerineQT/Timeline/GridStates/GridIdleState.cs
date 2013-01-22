@@ -7,14 +7,13 @@ namespace Tangerine.Timeline
 {
 	public class GridIdleState : GridState
 	{
-		public override void OnMousePress(Qyoto.QMouseEvent e)
+		public override void OnMousePress(Lime.IntVector2 cell)
 		{
-			Lime.IntVector2 cell = Toolbox.PixelToCell(e.Pos());
 			if (doc.SelectedCells.Contains(cell)) {
 				//The.Timeline.Grid.ChangeState(new TimelineGridDragSelectionState(cell));
 			} else {
+				The.Timeline.Grid.ChangeState(new SelectRectGridState(cell));
 			}
-			base.OnMousePress(e);
 		}
 	}
 }

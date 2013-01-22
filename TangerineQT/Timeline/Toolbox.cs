@@ -45,13 +45,6 @@ namespace Tangerine.Timeline
 			return column;
 		}
 
-		public static void SetCurrentColumn(int column)
-		{
-			doc.CurrentColumn = Math.Max(0, column);
-			Timeline.Instance.EnsureColumnVisible(doc.CurrentColumn);
-			doc.UpdateViews();
-		}
-
 		public static int PixelToRow(int y)
 		{
 			int row = y / doc.RowHeight + doc.TopRow;

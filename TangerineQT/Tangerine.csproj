@@ -82,6 +82,7 @@
     <Compile Include="Core\Menu.cs" />
     <Compile Include="Core\NodeExtensions.cs" />
     <Compile Include="Core\Preferences.cs" />
+    <Compile Include="Timeline\GridStates\SelectRectGridState.cs" />
     <Compile Include="Timeline\Rows\NodeRow.cs" />
     <Compile Include="Timeline\Rows\Row.cs" />
     <Compile Include="Core\TimelineRowListExtension.cs" />
