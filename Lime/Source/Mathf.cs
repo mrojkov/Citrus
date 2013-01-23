@@ -7,7 +7,7 @@ namespace Lime
 {
 	public static class Mathf
 	{
-		public static readonly Random RandomGenerator = new Random();
+		public static readonly System.Random RandomGenerator = new System.Random();
 		public const float Pi = 3.141592653f;
 		public const float TwoPi = 2 * 3.141592653f;
 		public const float HalfPi = 3.141592653f / 2;
@@ -109,9 +109,14 @@ namespace Lime
 			return a + (b - a) * t;
 		}
 
-		public static float Random(float min, float max)
+		public static float RandomFloat(float min, float max)
 		{
-			return Random() * (max - min) + min;
+			return RandomFloat() * (max - min) + min;
+		}
+
+		public static int RandomInt(int min, int max)
+		{
+			return RandomInt(max - min + 1) + min;
 		}
 
 		public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source)
@@ -121,7 +126,7 @@ namespace Lime
 				// Swap element "i" with a random earlier element it (or itself)
 				// ... except we don't really need to swap it fully, as we can
 				// return it immediately, and afterwards it's irrelevant.
-				int swapIndex = Random(i + 1);
+				int swapIndex = RandomInt(i + 1);
 				yield return elements[swapIndex];
 				elements[swapIndex] = elements[i];
 			}
@@ -129,15 +134,15 @@ namespace Lime
 
 		public static T RandomOf<T>(params T[] objects)
 		{
-			return objects[Random(objects.Length)];
+			return objects[RandomInt(objects.Length)];
 		}
 
-		public static int Random(int maxValue)
+		public static int RandomInt(int maxValue)
 		{
 			return RandomGenerator.Next(maxValue);
 		}
 
-		public static float Random()
+		public static float RandomFloat()
 		{
 			return (float)RandomGenerator.NextDouble();
 		}
@@ -146,14 +151,14 @@ namespace Lime
 		{
 			float x = 0;
 			for (int i = 0; i < 12; ++i)
-				x += Random();
+				x += RandomFloat();
 			x -= 6;
 			return median + x * dispersion;
 		}
 
 		public static float UniformRandom(float median, float dispersion)
 		{
-			return median + (Random() - 0.5f) * dispersion;
+			return median + (RandomFloat() - 0.5f) * dispersion;
 		}
 
 		public static float Clamp(float value, float min, float max)

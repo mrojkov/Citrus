@@ -529,19 +529,19 @@ namespace Lime
 				p.RegularDirection = Direction.UniformRandomNumber() + emitterAngle - 90.0f;
 				break;
 			case EmitterShape.Line:
-				position = new Vector2(Mathf.Random() * Size.X, Size.Y * 0.5f);
+				position = new Vector2(Mathf.RandomFloat() * Size.X, Size.Y * 0.5f);
 				p.RegularDirection = Direction.UniformRandomNumber() + emitterAngle - 90.0f;
 				break;
 			case EmitterShape.Ellipse: {
-					float angle = Mathf.Random() * 2 * Mathf.Pi;
+					float angle = Mathf.RandomFloat() * 2 * Mathf.Pi;
 					Vector2 sincos = Vector2.Heading(angle);
 					position = 0.5f * Vector2.Scale((sincos + Vector2.One), Size);
 					p.RegularDirection = Direction.UniformRandomNumber() + emitterAngle - 90 + angle;
 				}
 				break;
 			case EmitterShape.Area:
-				position.X = Mathf.Random() * Size.X;
-				position.Y = Mathf.Random() * Size.Y;
+				position.X = Mathf.RandomFloat() * Size.X;
+				position.Y = Mathf.RandomFloat() * Size.Y;
 				p.RegularDirection = Direction.UniformRandomNumber() + emitterAngle - 90.0f;
 				break;
 			default:
@@ -552,7 +552,7 @@ namespace Lime
 			p.ModifierIndex = -1;
 			p.Modifier = null;
 			for (int counter = 0; counter < 10; counter++) {
-				int i = Mathf.Random(Nodes.Count);
+				int i = Mathf.RandomInt(Nodes.Count);
 				p.Modifier = Nodes[i] as ParticleModifier;
 				if (p.Modifier != null) {
 					p.ModifierIndex = i;
@@ -568,7 +568,7 @@ namespace Lime
 			if (EmissionType == EmissionType.Inner)
 				p.RegularDirection += 180;
 			else if ((EmissionType & EmissionType.Inner) != 0) {
-				if (Mathf.Random(2) == 0)
+				if (Mathf.RandomInt(2) == 0)
 					p.RegularDirection += 180;
 			} else if (EmissionType == 0)
 				return false;
