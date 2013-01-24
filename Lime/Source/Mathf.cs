@@ -114,6 +114,11 @@ namespace Lime
 			return RandomFloat() * (max - min) + min;
 		}
 
+		public static bool RandomBool()
+		{
+			return RandomInt(2) == 0;
+		}
+
 		public static int RandomInt(int min, int max)
 		{
 			return RandomInt(max - min + 1) + min;
