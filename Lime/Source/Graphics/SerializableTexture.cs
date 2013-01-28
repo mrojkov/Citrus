@@ -271,16 +271,18 @@ namespace Lime
 
 		internal SerializableTextureCore GetSerializableTextureCore(string path)
 		{
-			SerializableTextureCore core = null;
+			SerializableTextureCore core;
 			WeakReference r;
-			if (!items.TryGetValue(path, out r) || !r.IsAlive) {
+			if (!items.TryGetValue(path, out r)) {
 				core = new SerializableTextureCore(path);
 				items[path] = new WeakReference(core);
 				return core;
 			}
 			core = r.Target as SerializableTextureCore;
 			if (core == null) {
-				throw new Lime.Exception("Can't obtain serializable texture");
+				core = new SerializableTextureCore(path);
+				items[path] = new WeakReference(core);
+				return core;
 			}
 			return core;
 		}
