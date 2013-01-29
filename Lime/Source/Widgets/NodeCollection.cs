@@ -105,7 +105,7 @@ namespace Lime
 		public void Add(Node node)
 		{
 			if (node.Parent != null) {
-				throw new Lime.Exception("Node can be added to one collection only");
+				throw new Lime.Exception("Can't adopt node twice. Try Unlink() first");
 			}
 			nodeArray = null;
 			if (nodeList == emptyList) {
@@ -117,6 +117,9 @@ namespace Lime
 
 		public void Insert(int index, Node node)
 		{
+			if (node.Parent != null) {
+				throw new Lime.Exception("Can't adopt node twice. Try Unlink() first");
+			}
 			nodeArray = null;
 			if (nodeList == emptyList) {
 				nodeList = new List<Node>();
