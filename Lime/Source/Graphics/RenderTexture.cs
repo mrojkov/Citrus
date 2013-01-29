@@ -4,6 +4,7 @@ using System.Diagnostics;
 using OpenTK.Graphics.ES20;
 #elif MAC
 using MonoMac.OpenGL;
+using OGL = MonoMac.OpenGL.GL;
 #else
 using OpenTK.Graphics.OpenGL;
 #endif
