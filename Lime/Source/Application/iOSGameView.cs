@@ -89,7 +89,7 @@ namespace Lime
 			long currentTime = GetCurrentTime();
 			int delta = (int)(currentTime - prevTime);
 			prevTime = currentTime;
-			Mathf.Clamp(ref delta, 0, 40);
+			delta = delta.Clamp(0, 40);
 			Input.ProcessPendingKeyEvents();
 			Input.MouseVisible = true;
 			Input.ProcessPendingKeyEvents();
