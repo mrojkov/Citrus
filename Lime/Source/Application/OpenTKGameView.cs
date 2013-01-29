@@ -127,7 +127,7 @@ namespace Lime
 		{
 			long currentTime = GetCurrentTime();
 			int delta = (int)(currentTime - prevTime);
-			Mathf.Clamp(ref delta, 0, 40);
+			delta = delta.Clamp(0, 40);
 			prevTime = currentTime;
 			DoUpdate(delta);
 			DoRender();

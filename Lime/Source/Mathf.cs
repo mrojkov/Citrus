@@ -62,7 +62,17 @@ namespace Lime
 			return (float)Math.Sin(x);
 		}
 
-		public static float WrapRadians(float x)
+		public static int Wrap(int x, int lowerBound, int upperBound)
+		{
+			int range = upperBound - lowerBound + 1;
+			x = ((x - lowerBound) % range);
+			if (x < 0)
+				return upperBound + 1 + x;
+			else
+				return lowerBound + x;
+		}
+
+		public static float WrapRadians(this float x)
 		{
 			while (x > TwoPi) {
 				x -= TwoPi;
@@ -73,7 +83,7 @@ namespace Lime
 			return x;
 		}
 
-		public static float WrapDegrees(float x)
+		public static float WrapDegrees(this float x)
 		{
 			while (x > 360) {
 				x -= 360;
@@ -174,16 +184,6 @@ namespace Lime
 		public static int Clamp(int value, int min, int max)
 		{
 			return (value < min) ? min : (value > max ? max : value);
-		}
-
-		public static void Clamp(ref float value, float min, float max)
-		{
-			value = (value < min) ? min : (value > max ? max : value);
-		}
-
-		public static void Clamp(ref int value, int min, int max)
-		{
-			value = (value < min) ? min : (value > max ? max : value);
 		}
 
 		public static Vector2 HermiteSpline(float t, Vector2 p0, Vector2 m0, Vector2 p1, Vector2 m1)
