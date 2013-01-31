@@ -7,6 +7,15 @@ using System.Diagnostics;
 
 namespace Lime
 {
+	public class NodeTreeStatistics
+	{
+		public int TotalNodes;
+		public int VisibileNodes;
+		public int OldNodes;
+		public DateTime OldNodeBarrier = DateTime.Now.AddMinutes(-5);
+	}
+
+
 	public delegate void BareEventHandler();
 	public delegate void UpdateDelegate(float delta);
 
@@ -25,8 +34,6 @@ namespace Lime
 		public event UpdateDelegate Updating;
 		public event UpdateDelegate Updated;
 		public event BareEventHandler AnimationStopped;
-
-		public static int UpdatedNodes;
 		private static List<Node> nodesToUnlink = new List<Node>();
 
 		private int animationTime;
@@ -70,6 +77,8 @@ namespace Lime
 			get { return animationTime; }
 			set { animationTime = value; ApplyAnimators(false); }
 		}
+
+		public DateTime CreationTime = DateTime.Now; 
 
 		[ProtoMember(11)]
 		public string Tag { get; set; }
@@ -244,12 +253,25 @@ namespace Lime
 
 		public virtual void Update(int delta)
 		{
-			UpdatedNodes++;
 			if (IsRunning) {
 				AdvanceAnimation(delta);
 			}
 			if (Nodes.Count > 0) {
 				UpdateChildren(delta);
+			}
+		}
+
+		public void CollectStatistics(NodeTreeStatistics stat)
+		{
+			stat.TotalNodes++;
+			if (CreationTime < stat.OldNodeBarrier) {
+				stat.OldNodes++;
+			}
+			if (Widget != null && Widget.GloballyVisible) {
+				stat.VisibileNodes++;
+			}
+			foreach (var child in Nodes.AsArray) {
+				child.CollectStatistics(stat);
 			}
 		}
 

@@ -152,7 +152,6 @@ namespace Lime
 
 		public override void Update(int delta)
 		{
-			UpdatedNodes++;
 			if (Anchors != Anchors.None && Parent.Widget != null) {
 				ApplyAnchors();
 			}
