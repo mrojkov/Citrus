@@ -331,6 +331,7 @@ namespace Lime
 					GL.TexEnv(All.TextureEnv, All.TextureEnvMode, (int)All.Combine);
 					break;
 				case Blending.Add:
+				case Blending.Glow:
 					GL.BlendFunc(All.SrcAlpha, All.One);
 					GL.TexEnv(All.TextureEnv, All.TextureEnvMode, (int)All.Modulate);
 					break;
