@@ -9,7 +9,7 @@ namespace Lime.PopupMenu
 	{
 		public static float Height = 40;
 
-		public Frame Frame = new Frame();
+		public Frame Frame = new Frame() { Tag = "$MenuItem.cs" };
 		public Menu Menu;
 	}
 }

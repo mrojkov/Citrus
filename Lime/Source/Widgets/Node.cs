@@ -100,6 +100,16 @@ namespace Lime
 			Markers = new MarkerCollection();
 			Nodes = new NodeCollection(this);
 		}
+
+		public Delegate[] GetUpdatingInvocationList()
+		{
+			return Updating != null ? Updating.GetInvocationList() : null;
+		}
+
+		public Delegate[] GetUpdatedInvocationList()
+		{
+			return Updated != null ? Updated.GetInvocationList() : null;
+		}
 		
 		public Node GetRoot()
 		{
@@ -207,6 +217,7 @@ namespace Lime
 		public virtual Node DeepCloneFast()
 		{
 			Node clone = (Node)MemberwiseClone();
+			clone.CreationTime = DateTime.Now;
 			clone.Parent = null;
 			clone.Widget = clone as Widget;
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
