@@ -81,8 +81,8 @@ namespace Lime
 			if (angle1 > angle2) {
 				Mathf.Swap(ref angle1, ref angle2);
 			}
-			if (angle2 - angle1 > Mathf.Pi) {
-				angle2 -= 2 * Mathf.Pi;
+			if (angle2 - angle1 > 180) {
+				angle2 -= 360;
 			}
 			var v = new Renderer.Vertex[10];
 			v[0] = new Renderer.Vertex { Pos = p, Color = GlobalColor };
@@ -98,7 +98,7 @@ namespace Lime
 		private void DrawCap(Vector2 a, Vector2 b)
 		{
 			float angle = (a - b).Atan2;
-			DrawRoundPart(a, angle - Mathf.HalfPi, angle + Mathf.HalfPi);
+			DrawRoundPart(a, angle - 90, angle + 90);
 		}
 
 		private void DrawRoundPart(Vector2 center, float angle1, float angle2)

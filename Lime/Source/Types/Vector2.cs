@@ -173,60 +173,36 @@ namespace Lime
         public Vector2 Normalize()
         {
             float length = this.Length;
-            if (length > 0)
-            {
+            if (length > 0) {
                 this.X /= length;
                 this.Y /= length;
             }
             return this;
         }
 
-		public static Vector2 Heading(float angle)
+		public static Vector2 Heading(float degrees)
 		{
-			return Mathf.CosSin(angle);
+			return Mathf.CosSin(degrees * Mathf.DegreesToRadians);
 		}
 
-		public static Vector2 HeadingDegrees(float angle)
+		public static Vector2 Rotate(Vector2 value, float degrees)
 		{
-			return Mathf.CosSin(angle * Mathf.DegreesToRadians);
+			return value.Rotate(degrees);
 		}
 
-		public static Vector2 Rotate(Vector2 value, float angle)
+		public Vector2 Rotate(float degrees)
 		{
-			return value.Rotate(angle);
-		}
-
-		public Vector2 Rotate(float angle)
-		{
-			Vector2 cs = Mathf.CosSin(angle);
+			Vector2 cs = Mathf.CosSin(degrees * Mathf.DegreesToRadians);
 			Vector2 result;
 			result.X = X * cs.X - Y * cs.Y;
 			result.Y = X * cs.Y + Y * cs.X;
 			return result;
 		}
 
-		public static Vector2 RotateDegrees(Vector2 value, float angle)
-		{
-			return Rotate(value, angle * Mathf.DegreesToRadians);
-		}
-
-		public Vector2 RotateDegrees(float angle)
-		{
-			return Rotate(angle * Mathf.DegreesToRadians);
-		}
-
-		/// <summary>
-		/// Returns ATan of given vector in range (-Pi, Pi]
-		/// </summary>
-		public float Atan2
-		{
-			get { return (float)Math.Atan2(Y, X); }
-		}
-
 		/// <summary>
 		/// Returns ATan of given vector in range (-180, 180]
 		/// </summary>
-		public float Atan2Degrees
+		public float Atan2
 		{
 			get { return (float)Math.Atan2(Y, X) * Mathf.RadiansToDegrees; }
 		}

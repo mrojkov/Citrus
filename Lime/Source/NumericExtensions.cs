@@ -12,14 +12,9 @@ namespace Lime
 			return Mathf.Wrap(x, lowerBound, upperBound);
 		}
 
-		public static float WrapRadians(this float x)
+		public static float Wrap360(this float x)
 		{
-			return Mathf.WrapRadians(x);
-		}
-
-		public static float WrapDegrees(this float x)
-		{
-			return Mathf.WrapDegrees(x);
+			return Mathf.Wrap360(x);
 		}
 
 		public static float Clamp(this float value, float min, float max)

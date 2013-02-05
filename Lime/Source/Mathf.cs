@@ -52,46 +52,33 @@ namespace Lime
 			return Math.Sign(x);
 		}
 
-		public static float Cos(float x)
+		public static float Cos(float radians)
 		{
-			return (float)Math.Cos(x);
+			return (float)Math.Cos(radians);
 		}
 
-		public static float Sin(float x)
+		public static float Sin(float radians)
 		{
-			return (float)Math.Sin(x);
+			return (float)Math.Sin(radians);
 		}
 
 		public static int Wrap(int x, int lowerBound, int upperBound)
 		{
 			int range = upperBound - lowerBound + 1;
 			x = ((x - lowerBound) % range);
-			if (x < 0)
+			if (x < 0) {
 				return upperBound + 1 + x;
-			else
+			} else {
 				return lowerBound + x;
+			}
 		}
 
-		public static float WrapRadians(this float x)
+		public static float Wrap360(float angle)
 		{
-			while (x > TwoPi) {
-				x -= TwoPi;
+			if ((angle >= 360.0f) || (angle < 0.0f)) {
+				angle -= (float)Math.Floor(angle * (1.0f / 360.0f)) * 360.0f;
 			}
-			while (x < 0) {
-				x += TwoPi;
-			}
-			return x;
-		}
-
-		public static float WrapDegrees(this float x)
-		{
-			while (x > 360) {
-				x -= 360;
-			}
-			while (x < 0) {
-				x += 360;
-			}
-			return x;
+			return angle;
 		}
 
 		public static float Sqr(float x)
@@ -132,19 +119,6 @@ namespace Lime
 		public static int RandomInt(int min, int max)
 		{
 			return RandomInt(max - min + 1) + min;
-		}
-
-		public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source)
-		{
-			T[] elements = source.ToArray();
-			for (int i = elements.Length - 1; i >= 0; i--) {
-				// Swap element "i" with a random earlier element it (or itself)
-				// ... except we don't really need to swap it fully, as we can
-				// return it immediately, and afterwards it's irrelevant.
-				int swapIndex = RandomInt(i + 1);
-				yield return elements[swapIndex];
-				elements[swapIndex] = elements[i];
-			}
 		}
 
 		public static T RandomOf<T>(params T[] objects)
@@ -216,13 +190,13 @@ namespace Lime
 				(3.0f * p1 - p0 - 3.0f * p2 + p3) * t3);
 		}
 
-		public static Vector2 CosSin(float x)
+		public static Vector2 CosSin(float radians)
 		{
 			if (sinTable0 == null) {
 				BuildSinTable();
 			}
 			const float t = 65536 / (2 * Pi);
-			int index = (int)(x * t) & 65535;
+			int index = (int)(radians * t) & 65535;
 			var a = sinTable0[index >> 8];
 			var b = sinTable1[index & 255];
 			Vector2 result;

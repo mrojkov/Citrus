@@ -453,7 +453,7 @@ namespace Lime
 		Vector2 GenerateRandomMotionControlPoint(ref float rayDirection)
 		{
 			rayDirection += RandomMotionRotation.UniformRandomNumber();
-			Vector2 result = Vector2.HeadingDegrees(rayDirection);
+			Vector2 result = Vector2.Heading(rayDirection);
 			NumericRange radius = RandomMotionRadius;
 			if (radius.Dispersion == 0)
 				radius.Dispersion = radius.Median;
@@ -488,7 +488,7 @@ namespace Lime
 			if (crossProduct < 0.0f)
 				emitterScale.Y = -emitterScale.Y;
 			emitterScaleAmount = (float)Math.Sqrt(Math.Abs(crossProduct));
-			float emitterAngle = transform.U.Atan2 * Mathf.RadiansToDegrees;
+			float emitterAngle = transform.U.Atan2;
 
 			NumericRange aspectRatioVariationPair = new NumericRange(0, Math.Max(0.0f, AspectRatio.Dispersion));
 			float zoom = Zoom.NormalRandomNumber();
@@ -532,12 +532,11 @@ namespace Lime
 				position = new Vector2(Mathf.RandomFloat() * Size.X, Size.Y * 0.5f);
 				p.RegularDirection = Direction.UniformRandomNumber() + emitterAngle - 90.0f;
 				break;
-			case EmitterShape.Ellipse: {
-					float angle = Mathf.RandomFloat() * 2 * Mathf.Pi;
-					Vector2 sincos = Vector2.Heading(angle);
-					position = 0.5f * Vector2.Scale((sincos + Vector2.One), Size);
-					p.RegularDirection = Direction.UniformRandomNumber() + emitterAngle - 90 + angle;
-				}
+			case EmitterShape.Ellipse:
+				float angle = Mathf.RandomFloat(0, 360);
+				Vector2 sincos = Vector2.Heading(angle);
+				position = 0.5f * Vector2.Scale((sincos + Vector2.One), Size);
+				p.RegularDirection = Direction.UniformRandomNumber() + emitterAngle - 90 + angle;
 				break;
 			case EmitterShape.Area:
 				position.X = Mathf.RandomFloat() * Size.X;
@@ -624,14 +623,14 @@ namespace Lime
 			// Updating other properties of a particle.
 			float windVelocity = p.WindAmount * modifier.WindAmount;
 			if (windVelocity != 0) {
-				var windDirection = Vector2.HeadingDegrees(p.WindDirection);
+				var windDirection = Vector2.Heading(p.WindDirection);
 				p.RegularPosition += windVelocity * delta * windDirection;
 			}
 			if (p.GravityVelocity != 0) {
-				var gravityDirection = Vector2.HeadingDegrees(p.GravityDirection);
+				var gravityDirection = Vector2.Heading(p.GravityDirection);
 				p.RegularPosition += p.GravityVelocity * delta * gravityDirection;
 			}
-			var direction = Vector2.HeadingDegrees(p.RegularDirection);
+			var direction = Vector2.Heading(p.RegularDirection);
 			float velocity = p.Velocity * modifier.Velocity;
 
 			p.RegularDirection += p.AngularVelocity * modifier.AngularVelocity * delta;
@@ -673,7 +672,7 @@ namespace Lime
 			if (AlongPathOrientation) {
 				Vector2 deltaPos = p.FullPosition - previousPosition;
 				if (deltaPos.SquaredLength > 0.00001f)
-					p.FullDirection = deltaPos.Atan2 * Mathf.RadiansToDegrees;
+					p.FullDirection = deltaPos.Atan2;
 			}
 			return true;
 		}
@@ -687,7 +686,7 @@ namespace Lime
 				SerializableTexture texture = p.Modifier.GetTexture((int)p.TextureIndex - 1);
 				Vector2 imageSize = (Vector2)texture.ImageSize;
 				Vector2 particleSize = p.ScaleCurrent * imageSize;
-				Vector2 orientation = Vector2.HeadingDegrees(angle);
+				Vector2 orientation = Vector2.Heading(angle);
 				var globalMatrix = new Matrix32 {
 					U = particleSize.X * orientation,
 					V = particleSize.Y * new Vector2(-orientation.Y, orientation.X),

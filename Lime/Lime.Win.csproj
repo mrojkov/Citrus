@@ -98,7 +98,6 @@
     <Compile Include="Source\Mathf.cs" />
     <Compile Include="Source\PopupMenu\Separator.cs" />
     <Compile Include="Source\PopupMenu\StringItem.cs" />
-    <Compile Include="Source\Profiler.cs" />
     <Compile Include="Source\Serialization.cs" />
     <Compile Include="Source\StringExtensions.cs" />
     <Compile Include="Source\Types\Color4.cs" />

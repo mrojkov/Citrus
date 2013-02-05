@@ -11,7 +11,7 @@ namespace Lime
 		Application app;
 
 		public GameView(Application app, string[] args = null)
-			: base(640, 480, new OpenTK.Graphics.GraphicsMode(32, 0, 0, 4))
+			: base(640, 480, new OpenTK.Graphics.GraphicsMode(32, 0, 0, 1))
 		{
 			Instance = this;
 			this.app = app;
