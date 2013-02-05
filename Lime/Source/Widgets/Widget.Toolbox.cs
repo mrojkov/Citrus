@@ -136,7 +136,7 @@ namespace Lime
 			Basis basis;
 			basis.Position = matrix.TransformVector(Pivot * Size);
 			basis.Scale = new Vector2(v1.Length, v2.Length);
-			basis.Rotation = v1.Atan2;
+			basis.Rotation = v1.Atan2Deg;
 			basis.U = v1;
 			basis.V = v2;
 			return basis;

@@ -78,11 +78,16 @@ namespace Lime
 			return rect.Contains(this);
 		}
 
-		public static float AngleBetween(Vector2 vector1, Vector2 vector2)
+		public static float AngleBetweenDeg(Vector2 vector1, Vector2 vector2)
+		{
+			return AngleBetweenRad(vector1, vector2) * Mathf.RadiansToDegrees;
+		}
+
+		public static float AngleBetweenRad(Vector2 vector1, Vector2 vector2)
 		{
 			float sin = vector1.X * vector2.Y - vector2.X * vector1.Y;
 			float cos = vector1.X * vector2.X + vector1.Y * vector2.Y;
-			return (float)Math.Atan2(sin, cos) * Mathf.RadiansToDegrees;
+			return (float)Math.Atan2(sin, cos);
 		}
 
 		public static Vector2 Lerp(float t, Vector2 a, Vector2 b)
@@ -180,17 +185,22 @@ namespace Lime
             return this;
         }
 
-		public static Vector2 Heading(float degrees)
+		public static Vector2 HeadingDeg(float degrees)
 		{
 			return Mathf.CosSin(degrees * Mathf.DegreesToRadians);
 		}
 
-		public static Vector2 Rotate(Vector2 value, float degrees)
+		public static Vector2 HeadingRad(float radians)
 		{
-			return value.Rotate(degrees);
+			return Mathf.CosSin(radians);
 		}
 
-		public Vector2 Rotate(float degrees)
+		public static Vector2 RotateDeg(Vector2 value, float degrees)
+		{
+			return value.RotateDeg(degrees);
+		}
+
+		public Vector2 RotateDeg(float degrees)
 		{
 			Vector2 cs = Mathf.CosSin(degrees * Mathf.DegreesToRadians);
 			Vector2 result;
@@ -199,10 +209,32 @@ namespace Lime
 			return result;
 		}
 
+		public static Vector2 RotateRad(Vector2 value, float radians)
+		{
+			return value.RotateRad(radians);
+		}
+
+		public Vector2 RotateRad(float radians)
+		{
+			Vector2 cs = Mathf.CosSin(radians);
+			Vector2 result;
+			result.X = X * cs.X - Y * cs.Y;
+			result.Y = X * cs.Y + Y * cs.X;
+			return result;
+		}
+
+		/// <summary>
+		/// Returns ATan of given vector in range (-Pi, Pi]
+		/// </summary>
+		public float Atan2Rad
+		{
+			get { return (float)Math.Atan2(Y, X); }
+		}
+
 		/// <summary>
 		/// Returns ATan of given vector in range (-180, 180]
 		/// </summary>
-		public float Atan2
+		public float Atan2Deg
 		{
 			get { return (float)Math.Atan2(Y, X) * Mathf.RadiansToDegrees; }
 		}

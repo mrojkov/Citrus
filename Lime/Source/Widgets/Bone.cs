@@ -91,7 +91,7 @@ namespace Lime
 					e.Rotation += b.Rotation;
 				}
 				// Get position of bone's tip.
-				e.Tip = Vector2.Rotate(new Vector2(e.Length, 0), e.Rotation) + e.Joint;
+				e.Tip = Vector2.RotateDeg(new Vector2(e.Length, 0), e.Rotation) + e.Joint;
 				if (RefLength != 0) {
 					float relativeScaling = Length / ClipAboutZero(RefLength);
 					// Calculating the matrix of relative transformation.

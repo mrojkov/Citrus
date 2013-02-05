@@ -76,8 +76,8 @@ namespace Lime
 
 		private void FillJointGap(Vector2 p, Vector2 b, Vector2 n1, Vector2 n2)
 		{
-			float angle1 = n1.Atan2;
-			float angle2 = n2.Atan2;
+			float angle1 = n1.Atan2Deg;
+			float angle2 = n2.Atan2Deg;
 			if (angle1 > angle2) {
 				Mathf.Swap(ref angle1, ref angle2);
 			}
@@ -89,7 +89,7 @@ namespace Lime
 			float length = n2.Length;
 			for (int i = 0; i < v.Length - 1; i++) {
 				float t = (float)i / (v.Length - 2);
-				p = -Vector2.Heading(Mathf.Lerp(t, angle1, angle2)) * length + b;
+				p = -Vector2.HeadingDeg(Mathf.Lerp(t, angle1, angle2)) * length + b;
 				v[i + 1] = new Renderer.Vertex { Pos = p, Color = GlobalColor };
 			}
 			Renderer.DrawTriangleFan(null, null, v, v.Length);
@@ -97,7 +97,7 @@ namespace Lime
 
 		private void DrawCap(Vector2 a, Vector2 b)
 		{
-			float angle = (a - b).Atan2;
+			float angle = (a - b).Atan2Deg;
 			DrawRoundPart(a, angle - 90, angle + 90);
 		}
 
@@ -108,7 +108,7 @@ namespace Lime
 			v[0] = new Renderer.Vertex { Pos = center, Color = GlobalColor };
 			for (int i = 0; i <= numPoints; i++) {
 				float t = (float)i / numPoints;
-				Vector2 p = Vector2.Heading(Mathf.Lerp(t, angle1, angle2));
+				Vector2 p = Vector2.HeadingDeg(Mathf.Lerp(t, angle1, angle2));
 				v[i + 1] = new Renderer.Vertex { Pos = center + p * Thickness / 2, Color = GlobalColor };
 			}
 			Renderer.DrawTriangleFan(null, null, v, v.Length);
