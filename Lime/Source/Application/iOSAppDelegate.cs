@@ -20,6 +20,10 @@ namespace Lime
 	{
 		public static AppDelegate Instance;
 
+		// handlers
+		public delegate bool OpenURLHandler(NSUrl url);
+		public OpenURLHandler UrlOpened;
+
 		// class-level declarations
 		public UIWindow Window { get; private set; }
 		public GameController GameController { get; private set; }
@@ -40,6 +44,22 @@ namespace Lime
 		static void GlobalExceptionHandler(object sender, UnhandledExceptionEventArgs e)
 		{
 			Logger.Write("========================= CRASH REPORT ============================\n" + e.ExceptionObject.ToString());
+		}
+
+		public override bool HandleOpenURL (UIApplication application, NSUrl url)
+		{
+			if (UrlOpened != null)
+				return UrlOpened(url);
+			else
+				return base.HandleOpenURL(application, url);
+		}
+		
+		public override bool OpenUrl (UIApplication application, NSUrl url, string sourceApplication, NSObject annotation)
+		{
+			if (UrlOpened != null)
+				return UrlOpened(url);
+			else
+				return base.OpenUrl(application, url, sourceApplication, annotation);
 		}
 
 		public override void OnActivated(UIApplication application)
