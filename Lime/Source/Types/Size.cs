@@ -24,6 +24,11 @@ namespace Lime
 			return new Vector2((float)size.Width, (float)size.Height);
 		}
 
+		public static explicit operator IntVector2(Size size)
+		{
+			return new IntVector2(size.Width, size.Height);
+		}
+
 		bool IEquatable<Size>.Equals(Size rhs)
 		{
 			return Width == rhs.Width && Height == rhs.Height;
