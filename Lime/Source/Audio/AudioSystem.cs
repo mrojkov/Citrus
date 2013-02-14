@@ -29,13 +29,15 @@ namespace Lime
 		static Thread streamingThread;
 		static volatile bool shouldTerminateThread;
 		static bool active = true;
+		static public bool SilentMode { get; private set; }
 
 		public static void Initialize(int numChannels = 16, string[] args = null)
 		{
-			// XXX
-			bool silent = true;// args != null && Array.IndexOf(args, "--Silent") >= 0;
-			if (!silent) {
+			SilentMode = false;// args != null && Array.IndexOf(args, "--Silent") >= 0;
+			if (!SilentMode) {
+#if !iOS
 				context = new AudioContext();
+#endif
 			}
 			if (!HasError()) {
 				// xram = new XRamExtension();
@@ -81,7 +83,7 @@ namespace Lime
 				foreach (var channel in channels) {
 					channel.Update(delta);
 				}
-				Thread.Sleep(0);
+				Thread.Sleep(10);
 			}
 		}
 
@@ -164,6 +166,9 @@ namespace Lime
 
 		static Sound LoadSoundToChannel(AudioChannel channel, string path, AudioChannelGroup group, bool looping, float priority)
 		{
+			if (SilentMode) {
+				return new Sound();
+			}
 			IAudioDecoder decoder = null;
 			path += ".sound";
 			if (PackedAssetsBundle.Instance.FileExists(path)) {
