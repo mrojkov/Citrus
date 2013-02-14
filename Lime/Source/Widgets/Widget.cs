@@ -135,10 +135,10 @@ namespace Lime
 			return Size;
 		}
 
-        public Widget this[string id]
-        {
-            get { return Find<Widget>(id); }
-        }
+		public Widget this[string id]
+		{
+			get { return Find<Widget>(id); }
+		}
 
 		public void MakeInvisible()
 		{

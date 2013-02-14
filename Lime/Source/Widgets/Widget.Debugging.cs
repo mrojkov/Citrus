@@ -93,7 +93,7 @@ namespace Lime
 		public virtual void GetReasonsWhyItCanBeInvisible(List<string> suggestions)
 		{
 			RecalcGlobalMatrixAndColor();
-			if (!ChildOf(World.Instance)) {
+			if (!ChildOf(World.Instance) && (this != World.Instance)) {
 				suggestions.Add("Widget is not added to the main hierarchy");
 			}
 			if (!Visible) {

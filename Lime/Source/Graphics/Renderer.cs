@@ -64,6 +64,14 @@ namespace Lime
 		public int Y;
 		public int Width;
 		public int Height;
+
+		public Viewport(IntVector2 origin, Size size)
+		{
+			X = origin.X;
+			Y = origin.Y;
+			Width = size.Width;
+			Height = size.Height;
+		}
 	}
 
 	public unsafe static class Renderer
@@ -249,6 +257,11 @@ namespace Lime
 			FlushSpriteBatch();
 			SetTexture(null, 0);
 			SetTexture(null, 1);
+		}
+
+		public static void SetOrthogonalProjection(Vector2 leftTop, Vector2 rightBottom)
+		{
+			SetOrthogonalProjection(leftTop.X, leftTop.Y, rightBottom.X, rightBottom.Y);
 		}
 
 		public static void SetOrthogonalProjection(float left, float top, float right, float bottom)

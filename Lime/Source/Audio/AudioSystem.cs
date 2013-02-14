@@ -32,7 +32,8 @@ namespace Lime
 
 		public static void Initialize(int numChannels = 16, string[] args = null)
 		{
-			bool silent = args != null && Array.IndexOf(args, "--Silent") >= 0;
+			// XXX
+			bool silent = true;// args != null && Array.IndexOf(args, "--Silent") >= 0;
 			if (!silent) {
 				context = new AudioContext();
 			}

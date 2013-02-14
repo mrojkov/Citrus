@@ -141,8 +141,9 @@ namespace Lime
 		public void Discard()
 		{
 			if (instance != null) {
-				if (instance is IDisposable)
+				if (instance is IDisposable) {
 					(instance as IDisposable).Dispose();
+				}
 				instance = null;
 			}
 		}
@@ -223,7 +224,9 @@ namespace Lime
 #endif
 				);
 				if (!loaded) {
-					Console.WriteLine("Missing texture '{0}'", Path);
+					if (!string.IsNullOrEmpty(Path)) {
+						Console.WriteLine("Missing texture '{0}'", Path);
+					}
 					instance = CreateChessTexture();
 					ChessTexture = true;
 					UVRect = instance.UVRect;
@@ -253,8 +256,10 @@ namespace Lime
 		public void DiscardUnusedTextures(int numCycles)
 		{
 			foreach (WeakReference r in items.Values) {
-				if (r.IsAlive)
-					(r.Target as SerializableTextureCore).DiscardIfNotUsed(numCycles);
+				var target = r.Target as SerializableTextureCore;
+				if (target != null) {
+					target.DiscardIfNotUsed(numCycles);
+				}
 			}
 			PlainTexture.DeleteScheduledTextures();
 		}
@@ -262,8 +267,9 @@ namespace Lime
 		public void DiscardAllTextures()
 		{
 			foreach (WeakReference r in items.Values) {
-				if (r.IsAlive) {
-					(r.Target as SerializableTextureCore).Discard();
+				var target = r.Target as SerializableTextureCore;
+				if (target != null) {
+					target.Discard();
 				}
 			}
 			PlainTexture.DeleteScheduledTextures();
