@@ -33,12 +33,14 @@ namespace Lime
 
 		public static void Initialize(int numChannels = 16, string[] args = null)
 		{
+#if !iOS
 			SilentMode = args != null && Array.IndexOf(args, "--Silent") >= 0;
 			if (!SilentMode) {
-#if !iOS
 				context = new AudioContext();
-#endif
 			}
+#else
+			context = new AudioContext();
+#endif
 			if (!HasError()) {
 				// xram = new XRamExtension();
 				for (int i = 0; i < numChannels; i++) {
