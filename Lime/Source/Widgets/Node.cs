@@ -165,11 +165,16 @@ namespace Lime
 			if (marker == null) {
 				return false;
 			}
-			AnimationStopped = null;
+			ClearStoppedEvent();
 			AnimationFrame = marker.Frame;
 			CurrentAnimation = markerId;
 			IsRunning = true;
 			return true;
+		}
+
+		public void ClearStoppedEvent()
+		{
+			AnimationStopped = null;
 		}
 
 		public void RunAnimation(string markerId)
