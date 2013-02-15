@@ -85,7 +85,7 @@ namespace Lime
 				foreach (var channel in channels) {
 					channel.Update(delta);
 				}
-				Thread.Sleep(100);
+				Thread.Sleep(50);
 			}
 		}
 
