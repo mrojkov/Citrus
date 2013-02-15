@@ -249,6 +249,15 @@ namespace Lime
 			items = new Dictionary<string, WeakReference>();
 		}
 
+		public void PreloadTextures(string path)
+		{
+			foreach (var i in AssetsBundle.Instance.EnumerateFiles()) {
+				if (i.StartsWith(path)) {
+					new SerializableTexture(i);
+				}
+			}
+		}
+
 		/// <summary>
 		/// Discards textures wich have not been used 
 		/// for given number of render cycles.
