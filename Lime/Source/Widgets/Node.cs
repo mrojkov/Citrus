@@ -54,7 +54,7 @@ namespace Lime
 		public string Trigger { get; set; }
 
 		public Node Parent { get; internal set; }
-		public Widget Widget { get; internal set; }
+		public Widget AsWidget { get; internal set; }
 
 		internal Node NextToRender;
 		public int Layer { get; set; }
@@ -219,9 +219,9 @@ namespace Lime
 			Node clone = (Node)MemberwiseClone();
 			clone.CreationTime = DateTime.Now;
 			clone.Parent = null;
-			clone.Widget = clone as Widget;
+			clone.AsWidget = clone as Widget;
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
-			clone.Nodes = NodeCollection.DeepClone(clone, Nodes);
+			clone.Nodes = NodeCollection.DeepCloneFast(clone, Nodes);
 			return clone;
 		}
 
@@ -278,7 +278,7 @@ namespace Lime
 			if (CreationTime < stat.OldNodeBarrier) {
 				stat.OldNodes++;
 			}
-			if (Widget != null && Widget.GloballyVisible) {
+			if (AsWidget != null && AsWidget.GloballyVisible) {
 				stat.VisibileNodes++;
 			}
 			foreach (var child in Nodes.AsArray) {

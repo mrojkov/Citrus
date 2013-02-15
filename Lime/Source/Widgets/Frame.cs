@@ -179,9 +179,9 @@ namespace Lime
 			var contentsPath = Path.ChangeExtension(ContentsPath, "scene");
 			if (PackedAssetsBundle.Instance.FileExists(contentsPath)) {
 				Frame content = Frame.Create(ContentsPath);
-				if (content.Widget != null && Widget != null) {
+				if (content.AsWidget != null && AsWidget != null) {
 					content.Update(0);
-					content.Widget.Size = Widget.Size;
+					content.AsWidget.Size = AsWidget.Size;
 					content.Update(0);
 				}
 				foreach (Marker marker in content.Markers)

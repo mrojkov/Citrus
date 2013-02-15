@@ -33,7 +33,7 @@ namespace Lime
 
 		public static void Initialize(int numChannels = 16, string[] args = null)
 		{
-			SilentMode = false;// args != null && Array.IndexOf(args, "--Silent") >= 0;
+			SilentMode = args != null && Array.IndexOf(args, "--Silent") >= 0;
 			if (!SilentMode) {
 #if !iOS
 				context = new AudioContext();
@@ -83,7 +83,7 @@ namespace Lime
 				foreach (var channel in channels) {
 					channel.Update(delta);
 				}
-				Thread.Sleep(10);
+				Thread.Sleep(100);
 			}
 		}
 

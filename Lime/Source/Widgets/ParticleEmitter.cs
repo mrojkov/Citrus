@@ -342,8 +342,11 @@ namespace Lime
 
 		public override Node DeepCloneFast()
 		{
+			// Do not clone particle instances
+			var savedParticles = particles;
+			particles = new LinkedList<Particle>();
 			var clone = base.DeepCloneFast() as ParticleEmitter;
-			clone.particles = new LinkedList<Particle>();
+			particles = savedParticles;
 			return clone;
 		}
 
@@ -351,19 +354,19 @@ namespace Lime
 		{
 			switch(ParticlesLinkage) {
 			case ParticlesLinkage.Parent:
-				return (Parent != null) ? Parent.Widget : null;
+				return (Parent != null) ? Parent.AsWidget : null;
 			case ParticlesLinkage.Other: {
 				Node node = Parent;
 				while (node != null) {
 					if (node.Id == LinkageWidgetName)
-						return node.Widget;
+						return node.AsWidget;
 					node = node.Parent;
 				}
 				return null;
 			}
 			case ParticlesLinkage.Root:
 			default:
-				return (Parent != null) ? GetRoot().Widget : null;
+				return (Parent != null) ? GetRoot().AsWidget : null;
 			}
 		}
 
@@ -474,9 +477,9 @@ namespace Lime
 			Widget basicWidget = GetBasicWidget();
 			if (basicWidget != null) {
 				for (Node node = Parent; node != basicWidget; node = node.Parent) {
-					if (node.Widget != null) {
-						transform *= node.Widget.CalcLocalTransformMatrix();
-						color *= node.Widget.Color;
+					if (node.AsWidget != null) {
+						transform *= node.AsWidget.CalcLocalTransformMatrix();
+						color *= node.AsWidget.Color;
 					}
 				}
 			}

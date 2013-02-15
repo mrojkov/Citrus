@@ -48,8 +48,8 @@ namespace Lime
 			if (Parent != null) {
 				int index = Parent.Nodes.IndexOf(this);
 				if (index < Parent.Nodes.Count - 2) {
-					arg1 = Parent.Nodes[index + 1].Widget as IImageCombinerArg;
-					arg2 = Parent.Nodes[index + 2].Widget as IImageCombinerArg;
+					arg1 = Parent.Nodes[index + 1] as IImageCombinerArg;
+					arg2 = Parent.Nodes[index + 2] as IImageCombinerArg;
 					if (arg1 != null & arg2 != null)
 						return true;
 				}
@@ -149,7 +149,7 @@ namespace Lime
 			Matrix32 uvTransform2 = transform2.CalcInversed();
 			ITexture texture1 = arg1.GetTexture();
 			ITexture texture2 = arg2.GetTexture();
-			Color4 color = arg1.Color * arg2.Color * Parent.Widget.GlobalColor;
+			Color4 color = arg1.Color * arg2.Color * Parent.AsWidget.GlobalColor;
 			for (int i = 0; i < numCoords; i++) {
 				vertices[i].Pos = coords[i];
 				vertices[i].Color = color;
@@ -161,12 +161,12 @@ namespace Lime
 
 		public override void Render()
 		{
-			if (Parent.Widget != null) {
+			if (Parent.AsWidget != null) {
 				IImageCombinerArg arg1, arg2;
 				if (GetArgs(out arg1, out arg2)) {
 					if (arg1.GloballyVisible && arg2.GloballyVisible) {
 						if (arg1.GetTexture() != null && arg2.GetTexture() != null) {
-							Renderer.Transform1 = Parent.Widget.GlobalMatrix;
+							Renderer.Transform1 = Parent.AsWidget.GlobalMatrix;
 							Renderer.Blending = Blending.Alpha;
 							RenderHelper(arg1, arg2);
 						}

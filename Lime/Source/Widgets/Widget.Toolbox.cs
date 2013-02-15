@@ -39,7 +39,7 @@ namespace Lime
 
 		public void MatchByPositionWith(Widget widget)
 		{
-			Position = widget.CalcPositionInSpaceOf(Parent.Widget);
+			Position = widget.CalcPositionInSpaceOf(Parent.AsWidget);
 		}
 
 		public void RenderToTexture(ITexture texture)
@@ -99,7 +99,7 @@ namespace Lime
 			if (Parent == null) {
 				throw new Lime.Exception("Parent must not be null");
 			}
-			Position = Parent.Widget.Size * 0.5f;
+			Position = Parent.AsWidget.Size * 0.5f;
 			Pivot = Vector2.Half;
 		}
 

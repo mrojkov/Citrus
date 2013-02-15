@@ -83,7 +83,7 @@ namespace Lime
 				e.Length = Length;
 				if (BaseIndex > 0) {
 					// Tie the bone to the parent bone.
-					BoneArray.Entry b = Parent.Widget.BoneArray[BaseIndex];
+					BoneArray.Entry b = Parent.AsWidget.BoneArray[BaseIndex];
 					float l = ClipAboutZero(b.Length);
 					Vector2 u = b.Tip - b.Joint;
 					Vector2 v = new Vector2(-u.Y / l, u.X / l);
@@ -101,7 +101,7 @@ namespace Lime
 					e.RelativeTransform = m1.CalcInversed() * m2;
 				} else
 					e.RelativeTransform = Matrix32.Identity;
-				Parent.Widget.BoneArray[Index] = e;
+				Parent.AsWidget.BoneArray[Index] = e;
 			}
 		}
 

@@ -23,7 +23,7 @@ namespace Lime
 			this.owner = owner;
 		}
 
-		internal static NodeCollection DeepClone(Node owner, NodeCollection source)
+		internal static NodeCollection DeepCloneFast(Node owner, NodeCollection source)
 		{
 			var result = new NodeCollection(owner);
 			foreach (var node in source.AsArray) {

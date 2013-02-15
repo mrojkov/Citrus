@@ -22,12 +22,12 @@ namespace Lime
 		public Vector2 TransformedPosition {
 			get {
 				Vector2 result = Vector2.Zero;
-				if (Parent != null && Parent.Widget != null) {
-					result = Vector2.Scale(Parent.Widget.Size, Position);
+				if (Parent != null && Parent.AsWidget != null) {
+					result = Vector2.Scale(Parent.AsWidget.Size, Position);
 				}
 				if (SkinningWeights != null && Parent != null && Parent.Parent != null) {
-					BoneArray a = Parent.Parent.Widget.BoneArray;
-					Matrix32 m1 = Parent.Widget.CalcLocalTransformMatrix();
+					BoneArray a = Parent.Parent.AsWidget.BoneArray;
+					Matrix32 m1 = Parent.AsWidget.CalcLocalTransformMatrix();
 					Matrix32 m2 = m1.CalcInversed();
 					result = m2.TransformVector(a.ApplySkinningToVector(m1.TransformVector(result), SkinningWeights));
 				}

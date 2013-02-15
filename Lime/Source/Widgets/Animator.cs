@@ -222,6 +222,7 @@ namespace Lime
 		
 		protected struct PropertyData
 		{
+			public Type OwnerType;
 			public PropertyInfo Info;
 			public bool Triggerable;
 		}
@@ -236,11 +237,13 @@ namespace Lime
 				propertyCache[propertyName] = plist;
 			}
 			foreach (PropertyData i in plist) {
-				if (ownerType.IsSubclassOf(i.Info.DeclaringType))
+				if (ownerType == i.OwnerType) {
 					return i;
+				}
 			}
 			var p = new PropertyData();
 			p.Info = ownerType.GetProperty(propertyName);
+			p.OwnerType = ownerType;
 			if (p.Info == null)
 				throw new Lime.Exception("Property '{0}' doesn't exist for class '{1}'", propertyName, ownerType);
 			p.Triggerable = p.Info.GetCustomAttributes(typeof(TriggerAttribute), false).Length > 0;

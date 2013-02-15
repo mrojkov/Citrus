@@ -51,8 +51,8 @@ namespace Lime
 					Widget basicWidget = GetBasicWidget();
 					if (basicWidget != null) {
 						for (Node n = Parent; n != basicWidget; n = n.Parent) {
-							if (n.Widget != null)
-								transform *= n.Widget.CalcLocalTransformMatrix();
+							if (n.AsWidget != null)
+								transform *= n.AsWidget.CalcLocalTransformMatrix();
 						}
 					}
 					magnets[numMagnets++] = new MagnetData {

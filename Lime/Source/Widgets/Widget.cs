@@ -122,7 +122,7 @@ namespace Lime
 
 		public Widget()
 		{
-			Widget = this;
+			AsWidget = this;
 			Size = new Vector2(100, 100);
 			Color = Color4.White;
 			Scale = Vector2.One;
@@ -152,7 +152,7 @@ namespace Lime
 
 		public override void Update(int delta)
 		{
-			if (Anchors != Anchors.None && Parent.Widget != null) {
+			if (Anchors != Anchors.None && Parent.AsWidget != null) {
 				ApplyAnchors();
 			}
 			RecalcGlobalMatrixAndColorHelper();
@@ -169,7 +169,7 @@ namespace Lime
 		public void RecalcGlobalMatrixAndColor()
 		{
 			if (Parent != null) {
-				Parent.Widget.RecalcGlobalMatrixAndColor();
+				Parent.AsWidget.RecalcGlobalMatrixAndColor();
 			}
 			RecalcGlobalMatrixAndColorHelper();
 		}
@@ -177,7 +177,7 @@ namespace Lime
 		private void RecalcGlobalMatrixAndColorHelper()
 		{
 			if (Parent != null) {
-				var parentWidget = Parent.Widget;
+				var parentWidget = Parent.AsWidget;
 				if (parentWidget != null && !parentWidget.renderedToTexture) {
 					GlobalMatrix = CalcLocalTransformMatrix() * parentWidget.GlobalMatrix;
 					GlobalColor = Color * parentWidget.GlobalColor;
@@ -199,8 +199,8 @@ namespace Lime
 			Vector2 translation = position;
 			Vector2 center = Size * Pivot;
 			Matrix32 matrix;
-			if (SkinningWeights != null && Parent != null && Parent.Widget != null) {
-				BoneArray a = Parent.Widget.BoneArray;
+			if (SkinningWeights != null && Parent != null && Parent.AsWidget != null) {
+				BoneArray a = Parent.AsWidget.BoneArray;
 				translation = a.ApplySkinningToVector(position, SkinningWeights);
 				u = a.ApplySkinningToVector(u + position, SkinningWeights) - translation;
 				v = a.ApplySkinningToVector(v + position, SkinningWeights) - translation;
@@ -233,7 +233,7 @@ namespace Lime
 
 		private void ApplyAnchors()
 		{
-			Vector2 s = Parent.Widget.Size;
+			Vector2 s = Parent.AsWidget.Size;
 			if (parentSize.HasValue && !parentSize.Value.Equals(s)) {
 				// Apply anchors along X axis.
 				if ((Anchors & Anchors.CenterH) != 0) {
@@ -274,7 +274,7 @@ namespace Lime
 					return p.X >= 0 && p.Y >= 0 && p.X < s.X && p.Y < s.Y;
 				} else if (HitTestMethod == HitTestMethod.Contents) {
 					foreach (Node node in Nodes.AsArray) {
-						if (node.Widget != null && node.Widget.HitTest(point))
+						if (node.AsWidget != null && node.AsWidget.HitTest(point))
 							return true;
 					}
 					return false;
