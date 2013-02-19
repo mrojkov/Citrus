@@ -131,6 +131,21 @@ namespace Lime
 			TouchesEnded(touches, evt);
 		}
 
+		public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations ()
+		{
+			UIInterfaceOrientationMask mask = 0;
+			if ((Application.Instance.GetSupportedDeviceOrientations() & DeviceOrientation.LandscapeLeft) != 0)
+				mask = mask | UIInterfaceOrientationMask.LandscapeLeft;
+			if ((Application.Instance.GetSupportedDeviceOrientations() & DeviceOrientation.LandscapeRight) != 0)
+				mask = mask | UIInterfaceOrientationMask.LandscapeRight;
+			if ((Application.Instance.GetSupportedDeviceOrientations() & DeviceOrientation.Portrait) != 0)
+				mask = mask | UIInterfaceOrientationMask.Portrait;
+			if ((Application.Instance.GetSupportedDeviceOrientations() & DeviceOrientation.PortraitUpsideDown) != 0)
+				mask = mask | UIInterfaceOrientationMask.PortraitUpsideDown;
+			return mask;
+		}
+
+
 		public override bool ShouldAutorotateToInterfaceOrientation(UIInterfaceOrientation toInterfaceOrientation)
 		{
 			switch (toInterfaceOrientation)

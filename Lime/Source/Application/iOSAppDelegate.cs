@@ -34,6 +34,16 @@ namespace Lime
 			AppDomain.CurrentDomain.UnhandledException += GlobalExceptionHandler;
 		}
 		
+		public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations(UIApplication application, UIWindow forWindow)
+		{
+			// Grisha: UIInterfaceOrientationMask.Portrait is required by GameCenter for iPhone in iOS 6.
+			// so, if your app works in Landscape mode, use AllButUpsideDown.
+			// read
+			// http://stackoverflow.com/questions/12488838/game-center-login-lock-in-landscape-only-in-i-os-6
+			// for more information.
+			return UIInterfaceOrientationMask.AllButUpsideDown;
+		}
+
 		public override void ReceiveMemoryWarning(UIApplication application)
 		{
 			Logger.Write("Memory warning");

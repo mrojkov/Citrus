@@ -152,6 +152,8 @@ namespace Lime
 		
 		public static void BeginFrame()
 		{
+			SetDefaultViewport();
+
 			if (batchIndices == null) {
 				batchIndices = (ushort*)System.Runtime.InteropServices.Marshal.AllocHGlobal(sizeof(ushort) * MaxVertices * 4);
 				batchVertices = (Vertex*)System.Runtime.InteropServices.Marshal.AllocHGlobal(sizeof(Vertex) * MaxVertices);
@@ -281,6 +283,19 @@ namespace Lime
 
 			OGL.MatrixMode(MatrixMode.Modelview);
 #endif
+		}
+
+		public static void SetDefaultViewport()
+		{
+			int w = Application.Instance.WindowSize.Width;
+			int h = Application.Instance.WindowSize.Height;
+#if iOS
+			if (GameView.Instance.IsRetinaDisplay) {
+				w *= 2;
+				h *= 2;
+			}
+#endif
+			Viewport = new Viewport { X = 0, Y = 0, Width = w, Height = h };
 		}
 
 		static Viewport viewport;

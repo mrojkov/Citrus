@@ -28,10 +28,12 @@ namespace Lime
 		}
 
 		public static GameView Instance;
+		public bool IsRetinaDisplay { get; internal set; }
 
 		public GameView() : base(UIScreen.MainScreen.Bounds)
 		{
 			Instance = this;
+			this.AutoResize = true;
 			LayerRetainsBacking = false;
 			LayerColorFormat = EAGLColorFormat.RGB565;
 			MultipleTouchEnabled = true;
@@ -64,6 +66,15 @@ namespace Lime
 		protected override void ConfigureLayer(CAEAGLLayer eaglLayer)
 		{
 			eaglLayer.Opaque = true;
+
+			// Grisha: support retina displays
+			// read
+			// http://stackoverflow.com/questions/4884176/retina-display-image-quality-problem/9644622
+			// for more information.
+			eaglLayer.ContentsScale = UIScreen.MainScreen.Scale;
+			if (UIScreen.MainScreen.Scale > 1.0f) {
+				IsRetinaDisplay = true;
+			}
 		}
 
 		protected override void CreateFrameBuffer()
