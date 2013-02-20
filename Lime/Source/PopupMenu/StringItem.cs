@@ -14,8 +14,8 @@ namespace Lime.PopupMenu
 
 		public string Text
 		{
-			get { return button.Caption; }
-			set { button.Caption = value; }
+			get { return button.Text; }
+			set { button.Text = value; }
 		}
 
 		public StringItem(string text, BareEventHandler activated = null)
@@ -47,7 +47,7 @@ namespace Lime.PopupMenu
 			button.Clicked += OnClick;
 		}
 
-		void OnClick(Button button)
+		void OnClick(Widget button)
 		{
 			if (Submenu != null) {
 				Submenu.Show();

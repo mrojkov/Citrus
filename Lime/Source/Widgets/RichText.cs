@@ -68,7 +68,7 @@ namespace Lime
 	public class RichText : Widget
 	{
 		[ProtoMember(1)]
-		public string Text
+		public override string Text
 		{
 			get { return text; }
 			set {

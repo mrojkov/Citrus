@@ -13,7 +13,7 @@ namespace Lime
 		public SerializableFont Font = new SerializableFont();
 
 		[ProtoMember(2)]
-		public string Text = "";
+		public override string Text { get; set; }
 
 		[ProtoMember(3)]
 		public int MaxTextLength = 50;

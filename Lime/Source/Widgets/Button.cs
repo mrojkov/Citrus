@@ -4,29 +4,27 @@ using System.Collections.Generic;
 
 namespace Lime
 {
-	public delegate void ButtonClickEventHandler(Button button);
-
 	[ProtoContract]
 	public class Button : Widget
 	{
 		[ProtoMember(1)]
-		public string Caption { get; set; }
+		public override string Text { get; set; }
 
-        [ProtoMember(2)]
-        public bool Enabled { get; set; }
+		[ProtoMember(2)]
+		public bool Enabled { get; set; }
 
-		public ButtonClickEventHandler Clicked;
+		public override WidgetClickHandler Clicked { get; set; }
 
 		private SimpleText textPresenter;
 		private BareEventHandler StateHandler;
 
-        public Button()
-        {
-            Enabled = true;
+		public Button()
+		{
+			Enabled = true;
 			SetNormalState();
 			// Run animation on the next frame (when button contents will be loaded)
 			StateHandler = UpdateInitialState;
-        }
+		}
 
 		void UpdateInitialState()
 		{
@@ -126,7 +124,7 @@ namespace Lime
 				textPresenter = TryFind<SimpleText>("TextPresenter");
 			}
 			if (textPresenter != null) {
-				textPresenter.Text = Caption;
+				textPresenter.Text = Text;
 			}
 		}
 

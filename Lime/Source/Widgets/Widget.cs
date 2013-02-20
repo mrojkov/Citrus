@@ -24,6 +24,8 @@ namespace Lime
 		Skip
 	}
 
+	public delegate void WidgetClickHandler(Widget widget);
+
 	[ProtoContract]
 	[ProtoInclude(100, typeof(Frame))]
 	[ProtoInclude(101, typeof(Image))]
@@ -50,6 +52,24 @@ namespace Lime
 		private Vector2? parentSize;
 
 		#region Properties
+
+		public virtual string Text { 
+			get {
+				throw new NotImplementedException();
+			}
+			set {
+				throw new NotImplementedException();
+			}
+		}
+
+		public virtual WidgetClickHandler Clicked {
+			get { 
+				throw new NotImplementedException();
+			}
+			set {
+				throw new NotImplementedException();
+			}
+		}
 
 		[ProtoMember(1)]
 		[TangerineProperty(4)]
