@@ -30,9 +30,11 @@ namespace Lime
 	[DebuggerTypeProxy(typeof(NodeDebugView))]
 	public class Node
 	{
-		public event UpdateHandler Updating;
-		public event UpdateHandler Updated;
+		public UpdateHandler Updating;
+		public UpdateHandler Updated;
+
 		public event BareEventHandler AnimationStopped;
+	
 		private static List<Node> nodesToUnlink = new List<Node>();
 
 		private int animationTime;
@@ -100,32 +102,12 @@ namespace Lime
 			Nodes = new NodeCollection(this);
 		}
 
-		public Delegate[] GetUpdatingInvocationList()
-		{
-			return Updating != null ? Updating.GetInvocationList() : null;
-		}
-
-		public Delegate[] GetUpdatedInvocationList()
-		{
-			return Updated != null ? Updated.GetInvocationList() : null;
-		}
-		
 		public Node GetRoot()
 		{
 			Node node = this;
 			while (node.Parent != null)
 				node = node.Parent;
 			return node;
-		}
-
-		public void ClearUpdatingEvent()
-		{
-			this.Updating = null;
-		}
-
-		public void ClearUpdatedEvent()
-		{
-			this.Updated = null;
 		}
 
 		public bool HasChild(Node node)
@@ -164,16 +146,11 @@ namespace Lime
 			if (marker == null) {
 				return false;
 			}
-			ClearStoppedEvent();
+			AnimationStopped = null;
 			AnimationFrame = marker.Frame;
 			CurrentAnimation = markerId;
 			IsRunning = true;
 			return true;
-		}
-
-		public void ClearStoppedEvent()
-		{
-			AnimationStopped = null;
 		}
 
 		public void RunAnimation(string markerId)
