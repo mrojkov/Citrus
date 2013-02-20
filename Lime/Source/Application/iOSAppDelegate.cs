@@ -21,6 +21,7 @@ namespace Lime
 		public static AppDelegate Instance;
 
 		// handlers
+		public delegate void AlertClickHandler(int buttonIdx);
 		public delegate bool OpenURLHandler(NSUrl url);
 		public OpenURLHandler UrlOpened;
 
@@ -42,6 +43,19 @@ namespace Lime
 			// http://stackoverflow.com/questions/12488838/game-center-login-lock-in-landscape-only-in-i-os-6
 			// for more information.
 			return UIInterfaceOrientationMask.AllButUpsideDown;
+		}
+
+		UIAlertView pleaseRateMessage = null;
+		public void ShowAlertMessage(string title, string text, string cancelTitle, string[] otherButtons, AlertClickHandler onClick)
+		{
+			if (pleaseRateMessage == null) {
+				pleaseRateMessage = new UIAlertView(title, text, null, cancelTitle, otherButtons);
+				pleaseRateMessage.Show();
+				pleaseRateMessage.Clicked += (sender, buttonArgs) => {
+					onClick(buttonArgs.ButtonIndex);
+					pleaseRateMessage = null;
+				};
+			}
 		}
 
 		public override void ReceiveMemoryWarning(UIApplication application)
