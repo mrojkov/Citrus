@@ -28,11 +28,12 @@ namespace Lime
 
 		public static bool IsWaveStream(Stream stream)
 		{
+			var position = stream.Position;
 			bool result = stream.ReadByte() == 'R' &&
 				stream.ReadByte() == 'I' &&
 				stream.ReadByte() == 'F' &&
 				stream.ReadByte() == 'F';
-			stream.Seek(-4, SeekOrigin.Current);
+			stream.Seek(position, SeekOrigin.Begin);
 			return result;
 		}
 

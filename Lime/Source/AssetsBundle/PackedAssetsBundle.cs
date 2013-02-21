@@ -1,4 +1,5 @@
 using System.IO;
+using System.IO.Compression;
 using System;
 using System.Collections.Generic;
 
@@ -233,7 +234,17 @@ namespace Lime
 
 		public override Stream OpenFile(string path)
 		{
-			return new AssetStream(this, path);
+			var stream = new AssetStream(this, path);
+			return DecompressStream(stream);
+		}
+
+		private static Stream DecompressStream(AssetStream stream)
+		{
+			var deflateStream = new DeflateStream(stream, CompressionMode.Decompress);
+			var memStream = new MemoryStream();
+			deflateStream.CopyTo(memStream);
+			memStream.Seek(0, SeekOrigin.Begin);
+			return memStream;
 		}
 
 		public override DateTime GetFileLastWriteTime(string path)
@@ -270,6 +281,7 @@ namespace Lime
 
 		public override void ImportFile(string path, Stream stream, int reserve)
 		{
+			stream = CompressStream(stream);
 			AssetDescriptor d;
 			bool reuseExistingDescriptor = index.TryGetValue(AssetPath.CorrectSlashes(path), out d) && 
 				(d.AllocatedSize >= stream.Length) && 
@@ -300,6 +312,17 @@ namespace Lime
 				byte[] zeroBytes = new byte[reserve];
 				this.stream.Write(zeroBytes, 0, zeroBytes.Length);
 			}
+		}
+
+		private static Stream CompressStream(Stream stream)
+		{
+			MemoryStream memStream = new MemoryStream();
+			using (var deflateStream = new DeflateStream(memStream, CompressionMode.Compress, true)) {
+				stream.CopyTo(deflateStream);
+			}
+			memStream.Seek(0, SeekOrigin.Begin);
+			stream = memStream;
+			return stream;
 		}
 
 		private void ReadIndexTable()
