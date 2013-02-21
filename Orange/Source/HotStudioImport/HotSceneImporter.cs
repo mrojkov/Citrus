@@ -550,7 +550,7 @@ namespace Orange
 			Button button = (Button)node;
 			switch (name) {
 			case "Text":
-				button.Caption = lexer.ParseQuotedString();
+				button.Text = lexer.ParseQuotedString();
 				break;
             case "Enabled":
                 button.Enabled = lexer.ParseBool();
