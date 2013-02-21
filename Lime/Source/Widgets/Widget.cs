@@ -71,6 +71,11 @@ namespace Lime
 			}
 		}
 
+		public virtual bool WasClicked()
+		{
+			throw new NotImplementedException();
+		}
+
 		[ProtoMember(1)]
 		[TangerineProperty(4)]
 		public Vector2 Position { get { return position; } set { position = value; } }

@@ -17,6 +17,7 @@ namespace Lime
 
 		private SimpleText textPresenter;
 		private BareEventHandler StateHandler;
+		private bool wasClicked;
 
 		public Button()
 		{
@@ -24,6 +25,11 @@ namespace Lime
 			SetNormalState();
 			// Run animation on the next frame (when button contents will be loaded)
 			StateHandler = UpdateInitialState;
+		}
+
+		public override bool WasClicked()
+		{
+			return wasClicked;
 		}
 
 		void UpdateInitialState()
@@ -84,6 +90,7 @@ namespace Lime
 				if (Clicked != null) {
 					Clicked(this);
 				}
+				wasClicked = true;
                 RunReleaseAnimation();
 				//RunAnimationWithStopHandler("Release", () => SetNormalState());
 			}
@@ -143,6 +150,7 @@ namespace Lime
 
 		public override void Update(int delta)
 		{
+			wasClicked = false;
 			if (GloballyVisible) {
 				StateHandler();
 				UpdateLabel();
