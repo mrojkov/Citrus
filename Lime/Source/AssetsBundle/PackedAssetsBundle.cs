@@ -235,7 +235,8 @@ namespace Lime
 		public override Stream OpenFile(string path)
 		{
 			var stream = new AssetStream(this, path);
-			return DecompressStream(stream);
+			return stream;
+			// return DecompressStream(stream);
 		}
 
 		private static Stream DecompressStream(AssetStream stream)
@@ -281,7 +282,7 @@ namespace Lime
 
 		public override void ImportFile(string path, Stream stream, int reserve)
 		{
-			stream = CompressStream(stream);
+			// stream = CompressStream(stream);
 			AssetDescriptor d;
 			bool reuseExistingDescriptor = index.TryGetValue(AssetPath.CorrectSlashes(path), out d) && 
 				(d.AllocatedSize >= stream.Length) && 
