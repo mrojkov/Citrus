@@ -251,10 +251,11 @@ namespace Lime
 
 		private static Stream DecompressStream(AssetStream stream)
 		{
-			var deflateStream = new DeflateStream(stream, CompressionMode.Decompress);
 			var memStream = new MemoryStream();
-			deflateStream.CopyTo(memStream);
-			memStream.Seek(0, SeekOrigin.Begin);
+			using (var deflateStream = new DeflateStream(stream, CompressionMode.Decompress)) {
+				deflateStream.CopyTo(memStream);
+				memStream.Seek(0, SeekOrigin.Begin);
+			}
 			return memStream;
 		}
 
