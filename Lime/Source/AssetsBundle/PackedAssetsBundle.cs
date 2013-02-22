@@ -5,12 +5,19 @@ using System.Collections.Generic;
 
 namespace Lime
 {
+	[Flags]
+	enum AssetAttributes
+	{
+		Zipped = 1
+	}
+
 	struct AssetDescriptor
 	{
-		public DateTime Time;
+		public DateTime ModificationTime;
 		public Int32 Offset;
 		public Int32 Length;
 		public Int32 AllocatedSize;
+		public AssetAttributes Attributes;
 	}
 
 	public static class AssetPath
@@ -38,7 +45,7 @@ namespace Lime
 	public class AssetStream : Stream
 	{
 		PackedAssetsBundle bundle;
-		AssetDescriptor descriptor;
+		internal AssetDescriptor descriptor;
 		Int32 position;
 		Stream stream;
 
@@ -235,8 +242,11 @@ namespace Lime
 		public override Stream OpenFile(string path)
 		{
 			var stream = new AssetStream(this, path);
+			var desc = stream.descriptor;
+			if ((desc.Attributes & AssetAttributes.Zipped) != 0) {
+				return DecompressStream(stream);
+			}
 			return stream;
-			// return DecompressStream(stream);
 		}
 
 		private static Stream DecompressStream(AssetStream stream)
@@ -252,7 +262,7 @@ namespace Lime
 		{
 			AssetDescriptor desc;
 			if (index.TryGetValue(AssetPath.CorrectSlashes(path), out desc)) {
-				return desc.Time;
+				return desc.ModificationTime;
 			}
 			throw new Exception("Asset '{0}' doesn't exist", path);
 		}
@@ -280,16 +290,21 @@ namespace Lime
 			return index.ContainsKey(AssetPath.CorrectSlashes(path));
 		}
 
-		public override void ImportFile(string path, Stream stream, int reserve)
+		public override void ImportFile(string path, Stream stream, int reserve, bool compress)
 		{
-			// stream = CompressStream(stream);
 			AssetDescriptor d;
+			AssetAttributes attributes = 0;
+			if (compress) {
+				attributes |= AssetAttributes.Zipped;
+				stream = CompressStream(stream);
+			}
 			bool reuseExistingDescriptor = index.TryGetValue(AssetPath.CorrectSlashes(path), out d) && 
 				(d.AllocatedSize >= stream.Length) && 
 				(d.AllocatedSize <= stream.Length + reserve);
 			if (reuseExistingDescriptor) {
 				d.Length = (int)stream.Length;
-				d.Time = DateTime.Now;
+				d.ModificationTime = DateTime.Now;
+				d.Attributes = attributes;
 				index[AssetPath.CorrectSlashes(path)] = d;
 				this.stream.Seek(d.Offset, SeekOrigin.Begin);
 				stream.CopyTo(this.stream);
@@ -299,13 +314,15 @@ namespace Lime
 					this.stream.Write(zeroBytes, 0, zeroBytes.Length);
 				}
 			} else {
-				if (FileExists(path))
+				if (FileExists(path)) {
 					DeleteFile(path);
+				}
 				d = new AssetDescriptor();
-				d.Time = DateTime.Now;
+				d.ModificationTime = DateTime.Now;
 				d.Length = (int)stream.Length;
 				d.Offset = indexOffset;
 				d.AllocatedSize = d.Length + reserve;
+				d.Attributes = attributes;
 				index[AssetPath.CorrectSlashes(path)] = d;
 				indexOffset += d.AllocatedSize;
 				this.stream.Seek(d.Offset, SeekOrigin.Begin);
@@ -347,10 +364,11 @@ namespace Lime
 			for (int i = 0; i < numDescriptors; i++) {
 				var desc = new AssetDescriptor();
 				string name = reader.ReadString();
-				desc.Time = DateTime.FromBinary(reader.ReadInt64());
+				desc.ModificationTime = DateTime.FromBinary(reader.ReadInt64());
 				desc.Offset = reader.ReadInt32();
 				desc.Length = reader.ReadInt32();
 				desc.AllocatedSize = reader.ReadInt32();
+				desc.Attributes = (AssetAttributes)reader.ReadInt32();
 				index.Add(name, desc);
 			}
 		}
@@ -366,10 +384,11 @@ namespace Lime
 			writer.Write(numDescriptors);
 			foreach (KeyValuePair <string, AssetDescriptor> p in index) {
 				writer.Write(p.Key);
-				writer.Write((Int64)p.Value.Time.ToBinary());
+				writer.Write((Int64)p.Value.ModificationTime.ToBinary());
 				writer.Write(p.Value.Offset);
 				writer.Write(p.Value.Length);
 				writer.Write(p.Value.AllocatedSize);
+				writer.Write((Int32)p.Value.Attributes);
 			}
 		}
 		

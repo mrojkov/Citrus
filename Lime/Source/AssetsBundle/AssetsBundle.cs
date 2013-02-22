@@ -35,13 +35,13 @@ namespace Lime
 		public abstract DateTime GetFileLastWriteTime(string path);
 		public abstract void DeleteFile(string path);
 		public abstract bool FileExists(string path);
-		public abstract void ImportFile(string path, Stream stream, int reserve);
+		public abstract void ImportFile(string path, Stream stream, int reserve, bool compress = false);
 		public abstract string[] EnumerateFiles();
 
-		public void ImportFile(string srcPath, string dstPath, int reserve)
+		public void ImportFile(string srcPath, string dstPath, int reserve, bool compress = false)
 		{
 			using (var stream = new FileStream(srcPath, FileMode.Open)) {
-				ImportFile(dstPath, stream, reserve);
+				ImportFile(dstPath, stream, reserve, compress);
 			}
 		}
 

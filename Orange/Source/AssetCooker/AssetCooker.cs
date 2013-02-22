@@ -62,7 +62,7 @@ namespace Orange
 						}
 						string tmpFile = Path.ChangeExtension(srcPath, GetPlatformTextureExtension());
 						TextureConverter.Convert(srcPath, tmpFile, rules.PVRFormat, rules.MipMaps, platform);
-						assetsBundle.ImportFile(tmpFile, dstPath, 0);
+						assetsBundle.ImportFile(tmpFile, dstPath, reserve: 0, compress: true);
 						File.Delete(tmpFile);
 						return true;
 					});
@@ -276,9 +276,12 @@ namespace Orange
 					Console.WriteLine("+ " + atlasPath);
 					string inFile = "$TMP$.png";
 					string outFile = Path.ChangeExtension(inFile, GetPlatformTextureExtension());
-					atlas.Save(inFile, "png");
+					if (!atlas.Save(inFile, "png")) {
+						var error = (Gdk.PixbufError)Gdk.Pixbuf.ErrorQuark();
+						throw new Lime.Exception("Can't save '{0}' (error: {1})", inFile, error.ToString()); 
+					}
 					TextureConverter.Convert(inFile, outFile, pvrFormat, mipMapped, platform);
-					assetsBundle.ImportFile(outFile, atlasPath, 0);
+					assetsBundle.ImportFile(outFile, atlasPath, 0, true);
 					File.Delete(inFile);
 					File.Delete(outFile);
 					items.RemoveAll(x => x.Allocated);

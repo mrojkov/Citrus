@@ -35,7 +35,7 @@ namespace Lime
 			return File.Exists(Path.Combine(BaseDirectory, path));
 		}
 
-		public override void ImportFile(string path, Stream stream, int reserve)
+		public override void ImportFile(string path, Stream stream, int reserve, bool compress)
 		{
 			stream.Seek(0, SeekOrigin.Begin);
 			var bytes = new byte[stream.Length];
