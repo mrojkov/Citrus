@@ -154,11 +154,6 @@ namespace Lime
 			}
 		}
 
-		public static Frame Create(string path)
-		{
-			return new Frame(path);
-		}
-
 		public void LoadContent()
 		{
 			if (!string.IsNullOrEmpty(ContentsPath))
@@ -178,7 +173,7 @@ namespace Lime
 			Markers.Clear();
 			var contentsPath = Path.ChangeExtension(ContentsPath, "scene");
 			if (PackedAssetsBundle.Instance.FileExists(contentsPath)) {
-				Frame content = Frame.Create(ContentsPath);
+				Frame content = new Frame(ContentsPath);
 				if (content.AsWidget != null && AsWidget != null) {
 					content.Update(0);
 					content.AsWidget.Size = AsWidget.Size;
@@ -195,40 +190,9 @@ namespace Lime
 
 		public static Frame CreateSubframe(string path)
 		{
-			var frame = Create(path).Nodes[0] as Frame;
+			var frame = new Frame(path).Nodes[0] as Frame;
 			frame.Unlink();
 			frame.Tag = path;
-			return frame;
-		}
-
-		public static Frame CreateAndRun(Node parent, string path, string marker = null)
-		{
-			Frame frame = Create(path);
-			frame.Tag = path;
-			if (marker == null) {
-				frame.IsRunning = true;
-			} else {
-				frame.RunAnimation(marker);
-			}
-			if (parent != null) {
-				parent.Nodes.Insert(0, frame);
-			}
-			return frame;
-		}
-
-		public static Frame CreateSubframeAndRun(Node parent, string path, string marker = null)
-		{
-			Frame frame = Frame.Create(path).Nodes[0] as Frame;
-			frame.Parent = null;
-			frame.Tag = path;
-			if (marker == null) {
-				frame.IsRunning = true;
-			} else {
-				frame.RunAnimation(marker);
-			}
-			if (parent != null) {
-				parent.Nodes.Insert(0, frame);
-			}
 			return frame;
 		}
 
