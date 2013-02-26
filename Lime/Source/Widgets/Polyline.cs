@@ -79,7 +79,7 @@ namespace Lime
 			float angle1 = n1.Atan2Deg;
 			float angle2 = n2.Atan2Deg;
 			if (angle1 > angle2) {
-				Mathf.Swap(ref angle1, ref angle2);
+				Toolbox.Swap(ref angle1, ref angle2);
 			}
 			if (angle2 - angle1 > 180) {
 				angle2 -= 360;

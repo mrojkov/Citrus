@@ -14,14 +14,6 @@ namespace Lime
 		public const float DegreesToRadians = Pi / 180;
 		public const float RadiansToDegrees = 180 / Pi;
 
-		public static void Swap<T>(ref T lhs, ref T rhs)
-		{
-			T temp;
-			temp = lhs;
-			lhs = rhs;
-			rhs = temp;
-		}
-
 		public static float Max(float x, float y)
 		{
 			return (x > y) ? x : y;

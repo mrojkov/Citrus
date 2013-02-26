@@ -196,7 +196,7 @@ namespace Lime
 		public static Frame CreateSubframe(string path)
 		{
 			var frame = Create(path).Nodes[0] as Frame;
-			frame.Parent = null;
+			frame.Unlink();
 			frame.Tag = path;
 			return frame;
 		}
