@@ -16,7 +16,7 @@ namespace Lime
 			Instance = this;
 			this.app = app;
 			app.Active = true;
-			AudioSystem.Initialize(16, args);
+			AudioSystem.Initialize(16);
 			app.OnCreate();
 			this.Keyboard.KeyDown += HandleKeyDown;
 			this.Keyboard.KeyUp += HandleKeyUp;

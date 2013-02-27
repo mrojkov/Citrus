@@ -31,10 +31,10 @@ namespace Lime
 		static bool active = true;
 		static public bool SilentMode { get; private set; }
 
-		public static void Initialize(int numChannels = 16, string[] args = null)
+		public static void Initialize(int numChannels = 16)
 		{
 #if !iOS
-			SilentMode = args != null && Array.IndexOf(args, "--Silent") >= 0;
+			SilentMode = Application.CheckCommandLineArg("--Silent");
 			if (!SilentMode) {
 				context = new AudioContext();
 			}

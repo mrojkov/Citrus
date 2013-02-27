@@ -53,9 +53,17 @@ namespace Lime
 			};
 		}
 
-		public string[] GetCommandLineArgs()
+		public static string[] GetCommandLineArgs()
 		{
 			return System.Environment.GetCommandLineArgs();
+		}
+
+		public static bool CheckCommandLineArg(string name)
+		{
+			if (Array.IndexOf(GetCommandLineArgs(), name) >= 0) {
+				return true;
+			}
+			return false;
 		}
 
 		public PlatformId Platform {
