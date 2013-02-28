@@ -73,6 +73,16 @@ namespace Lime
 			return SquaredLength < radius * radius;
 		}
 
+		public bool IsLongerThan(float radius)
+		{
+			return SquaredLength > radius * radius;
+		}
+
+		public float DistanceTo(Vector2 v)
+		{
+			return (this - v).Length;
+		}
+
 		public bool IsWithin(Rectangle rect)
 		{
 			return rect.Contains(this);
