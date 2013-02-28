@@ -54,26 +54,24 @@ namespace Lime
 		#region Properties
 
 		public virtual string Text { 
-			get {
-				throw new NotImplementedException();
-			}
-			set {
-				throw new NotImplementedException();
-			}
+			get { throw new NotImplementedException(); }
+			set { throw new NotImplementedException(); }
 		}
 
 		public virtual WidgetClickHandler Clicked {
-			get { 
-				throw new NotImplementedException();
-			}
-			set {
-				throw new NotImplementedException();
-			}
+			get { throw new NotImplementedException(); }
+			set { throw new NotImplementedException(); }
 		}
 
 		public virtual bool WasClicked()
 		{
 			throw new NotImplementedException();
+		}
+
+		public virtual ITexture Texture
+		{
+			get { throw new NotImplementedException(); }
+			set { throw new NotImplementedException(); }
 		}
 
 		[ProtoMember(1)]

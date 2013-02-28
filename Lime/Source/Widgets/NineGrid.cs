@@ -6,7 +6,7 @@ namespace Lime
 	public class NineGrid : Widget
 	{
 		[ProtoMember(1)]
-		public ITexture Texture { get; set; }
+		public override ITexture Texture { get; set; }
 
 		[ProtoMember(2)]
 		public float LeftOffset { get; set; }

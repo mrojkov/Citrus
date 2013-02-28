@@ -13,7 +13,7 @@ namespace Lime
 		public int NumRows { get; set; }
 
 		[ProtoMember(3)]
-		public ITexture Texture { get; set; }
+		public override ITexture Texture { get; set; }
 
 		public DistortionMesh()
 		{

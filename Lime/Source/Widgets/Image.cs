@@ -11,7 +11,7 @@ namespace Lime
 		bool requestSkipRender;
 
 		[ProtoMember(1)]
-		public ITexture Texture { get; set; }
+		public override ITexture Texture { get; set; }
 
 		[ProtoMember(2)]
 		public Vector2 UV0 { get; set; }
