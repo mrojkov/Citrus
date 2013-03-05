@@ -256,6 +256,7 @@ namespace Lime
 				deflateStream.CopyTo(memStream);
 				memStream.Seek(0, SeekOrigin.Begin);
 			}
+			stream.Dispose();
 			return memStream;
 		}
 

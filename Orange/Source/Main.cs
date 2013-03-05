@@ -10,6 +10,7 @@ namespace Orange
 
 			Gtk.Application.Init();
 			MainWindow window = new MainWindow();
+			window.Title = "Citrus Aurantium"; 	// Ха-ха, Ксюха купила аромомасло "сладкий апельсин"
 			window.Show();
 			Gtk.Application.Run();
 		}
