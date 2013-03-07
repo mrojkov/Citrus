@@ -27,6 +27,9 @@ namespace Lime
 	public class Application
 	{
 		public static Application Instance;
+		// FrameSync защищает код Update, Render
+		// Используй этот объект для синхронизации коллбэков (от appstore, gamecenter)
+		public static readonly object FrameSync = new object();
 
 		public Application()
 		{

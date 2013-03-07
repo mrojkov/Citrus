@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Source\Application\TimeUtils.cs" />
     <Compile Include="Source\Toolbox.cs" />
     <Compile Include="Source\NumericExtensions.cs" />
     <Compile Include="Source\Application\Application.cs" />

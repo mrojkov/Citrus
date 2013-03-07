@@ -251,13 +251,15 @@ namespace Lime
 
 		private static Stream DecompressStream(AssetStream stream)
 		{
-			var memStream = new MemoryStream();
-			using (var deflateStream = new DeflateStream(stream, CompressionMode.Decompress)) {
-				deflateStream.CopyTo(memStream);
-				memStream.Seek(0, SeekOrigin.Begin);
-			}
-			stream.Dispose();
-			return memStream;
+			var deflateStream = new DeflateStream(stream, CompressionMode.Decompress, false);
+			return deflateStream;
+			//var memStream = new MemoryStream();
+			//using (var deflateStream = new DeflateStream(stream, CompressionMode.Decompress)) {
+			//	deflateStream.CopyTo(memStream);
+			//	memStream.Seek(0, SeekOrigin.Begin);
+			//}
+			//stream.Dispose();
+			//return memStream;
 		}
 
 		public override DateTime GetFileLastWriteTime(string path)

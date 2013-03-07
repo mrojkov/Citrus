@@ -297,15 +297,17 @@ namespace Lime
 #if iOS
 				InitWithPVRTexture(reader);
 #else
-				int sign = stream.ReadByte();
-				stream.Seek(0, SeekOrigin.Begin);
-				if (sign == 'D') { 
-					InitWithDDSBitmap(reader);
-				} else if (sign == 137) {
-					InitWithPNGBitmap(reader);
-				} else {
-					throw new Lime.Exception("Texture format must be either DDS or PNG");
-				}
+				InitWithDDSBitmap(reader);
+				// Mike: временно убрал поддержку Png потому что DeflateStream не поддерживает Seek()
+				//int sign = stream.ReadByte();
+				//stream.Seek(0, SeekOrigin.Begin);
+				//if (sign == 'D') { 
+				//	InitWithDDSBitmap(reader);
+				//} else if (sign == 137) {
+				//	InitWithPNGBitmap(reader);
+				//} else {
+				//	throw new Lime.Exception("Texture format must be either DDS or PNG");
+				//}
 #endif
 			}
 			Renderer.CheckErrors();

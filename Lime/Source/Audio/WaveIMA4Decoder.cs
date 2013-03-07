@@ -98,9 +98,9 @@ namespace Lime
 					throw Abort("Read error");
 				}
 				if (channels == 2) {
-					DecodeStereoBlock (buffer);
+					DecodeStereoBlock(buffer);
 				}  else if (channels == 1) {
-					DecodeMonoBlock (buffer);
+					DecodeMonoBlock(buffer);
 				} else {
 					throw Abort("Unsupported number of channels");
 				}

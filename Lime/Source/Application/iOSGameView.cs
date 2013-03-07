@@ -97,7 +97,7 @@ namespace Lime
 
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{
-			long currentTime = GetCurrentTime();
+			long currentTime = TimeUtils.GetMillisecondsSinceGameStarted();
 			int delta = (int)(currentTime - prevTime);
 			prevTime = currentTime;
 			delta = delta.Clamp(0, 40);
@@ -110,17 +110,6 @@ namespace Lime
 			Input.CopyKeysState();
 			Input.SetKeyState(Key.Enter, false);
 			ProcessTextInput();
-		}
-
-		private long startTime = 0;
-
-		private long GetCurrentTime()
-		{
-			long t = DateTime.Now.Ticks / 10000L;
-			if (startTime == 0) {
-				startTime = t;
-			}
-			return t - startTime;
 		}
 
 		void ProcessTextInput()
@@ -154,29 +143,12 @@ namespace Lime
 			MakeCurrent();
 			Application.Instance.OnRenderFrame();
 			SwapBuffers();
-			UpdateFrameRate();
-		}
-
-		private long timeStamp;
-		private int countedFrames;
-		private float frameRate;
-
-		private void UpdateFrameRate()
-		{
-			countedFrames++;
-			long t = System.DateTime.Now.Ticks;
-			long milliseconds = (t - timeStamp) / 10000;
-			if (milliseconds > 1000) {
-				if (timeStamp > 0)
-					frameRate = (float)countedFrames / ((float)milliseconds / 1000.0f);
-				timeStamp = t;
-				countedFrames = 0;
-			}
+			TimeUtils.RefreshFrameRate();
 		}
 
 		public float FrameRate {
 			get {
-				return frameRate;
+				return TimeUtils.FrameRate;
 			}
 		}
 	}

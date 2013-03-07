@@ -125,28 +125,19 @@ namespace Lime
 
 		protected override void OnRenderFrame(OpenTK.FrameEventArgs e)
 		{
-			long currentTime = GetCurrentTime();
-			int delta = (int)(currentTime - prevTime);
-			delta = delta.Clamp(0, 40);
-			prevTime = currentTime;
-			DoUpdate(delta);
-			DoRender();
-		}
-
-		private long startTime = 0;
-
-		private long GetCurrentTime()
-		{
-			long t = DateTime.Now.Ticks / 10000L;
-			if (startTime == 0) {
-				startTime = t;
+			lock (Application.FrameSync) {
+				long currentTime = TimeUtils.GetMillisecondsSinceGameStarted();
+				int delta = (int)(currentTime - prevTime);
+				delta = delta.Clamp(0, 40);
+				prevTime = currentTime;
+				DoUpdate(delta);
+				DoRender();
 			}
-			return t - startTime;
 		}
 
 		private void DoRender()
 		{
-			UpdateFrameRate();
+			TimeUtils.RefreshFrameRate();
 			MakeCurrent();
 			app.OnRenderFrame();
 			SwapBuffers();
@@ -174,26 +165,9 @@ namespace Lime
 				this.WindowState = value ? WindowState.Fullscreen : WindowState.Normal;
 			}
 		}
-		
-		private long timeStamp;
-		private int countedFrames;
-		private float frameRate;
 
-		private void UpdateFrameRate()
-		{
-			countedFrames++;
-			long t = System.DateTime.Now.Ticks;
-			long milliseconds = (t - timeStamp) / 10000;
-			if (milliseconds > 1000) {
-				if (timeStamp > 0)
-					frameRate = (float)countedFrames / ((float)milliseconds / 1000.0f);
-				timeStamp = t;
-				countedFrames = 0;
-			}
-		}
-		
 		public float FrameRate { 
-			get { return frameRate; } 
+			get { return TimeUtils.FrameRate; } 
 		}
 	}
 }
