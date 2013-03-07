@@ -97,19 +97,21 @@ namespace Lime
 
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{
-			long currentTime = TimeUtils.GetMillisecondsSinceGameStarted();
-			int delta = (int)(currentTime - prevTime);
-			prevTime = currentTime;
-			delta = delta.Clamp(0, 40);
-			Input.ProcessPendingKeyEvents();
-			Input.MouseVisible = true;
-			Input.ProcessPendingKeyEvents();
-			Input.MouseVisible = true;
-			Application.Instance.OnUpdateFrame(delta);
-			Input.TextInput = null;
-			Input.CopyKeysState();
-			Input.SetKeyState(Key.Enter, false);
-			ProcessTextInput();
+			lock (Application.FrameSync) {
+				long currentTime = TimeUtils.GetMillisecondsSinceGameStarted();
+				int delta = (int)(currentTime - prevTime);
+				prevTime = currentTime;
+				delta = delta.Clamp(0, 40);
+				Input.ProcessPendingKeyEvents();
+				Input.MouseVisible = true;
+				Input.ProcessPendingKeyEvents();
+				Input.MouseVisible = true;
+				Application.Instance.OnUpdateFrame(delta);
+				Input.TextInput = null;
+				Input.CopyKeysState();
+				Input.SetKeyState(Key.Enter, false);
+				ProcessTextInput();
+			}
 		}
 
 		void ProcessTextInput()
@@ -140,10 +142,12 @@ namespace Lime
 
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
-			MakeCurrent();
-			Application.Instance.OnRenderFrame();
-			SwapBuffers();
-			TimeUtils.RefreshFrameRate();
+			lock (Application.FrameSync) {
+				MakeCurrent();
+				Application.Instance.OnRenderFrame();
+				SwapBuffers();
+				TimeUtils.RefreshFrameRate();
+			}
 		}
 
 		public float FrameRate {

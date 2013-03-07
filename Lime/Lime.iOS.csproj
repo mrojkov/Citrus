@@ -145,15 +145,13 @@
     <Compile Include="Source\Widgets\NodeDebugView.cs" />
     <Compile Include="Source\NumericExtensions.cs" />
     <Compile Include="Source\Toolbox.cs" />
+    <Compile Include="Source\Application\TimeUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.iOS.csproj">
       <Project>{C4795CBE-B192-4E53-8140-7310FBD206DD}</Project>
       <Name>Lemon.iOS</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Source\Kumquat\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Application\WinCursors.cs">
