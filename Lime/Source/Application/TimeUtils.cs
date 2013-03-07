@@ -25,7 +25,7 @@ namespace Lime
 			long milliseconds = (t - timeStamp) / 10000;
 			if (milliseconds > 1000) {
 				if (timeStamp > 0) {
-					FrameRate = (float)countedFrames / (float)milliseconds / 1000.0f;
+					FrameRate = (float)countedFrames / (float)milliseconds * 1000.0f;
 				}
 				timeStamp = t;
 				countedFrames = 0;
