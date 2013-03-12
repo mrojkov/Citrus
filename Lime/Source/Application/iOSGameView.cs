@@ -33,7 +33,6 @@ namespace Lime
 		public GameView() : base(UIScreen.MainScreen.Bounds)
 		{
 			Instance = this;
-			this.AutoResize = true;
 			LayerRetainsBacking = false;
 			LayerColorFormat = EAGLColorFormat.RGB565;
 			MultipleTouchEnabled = true;
