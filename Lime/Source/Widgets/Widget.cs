@@ -24,8 +24,6 @@ namespace Lime
 		Skip
 	}
 
-	public delegate void WidgetClickHandler(Widget widget);
-
 	[ProtoContract]
 	[ProtoInclude(100, typeof(Frame))]
 	[ProtoInclude(101, typeof(Image))]
@@ -58,7 +56,7 @@ namespace Lime
 			set { throw new NotImplementedException(); }
 		}
 
-		public virtual WidgetClickHandler Clicked {
+		public virtual BareEventHandler Clicked {
 			get { throw new NotImplementedException(); }
 			set { throw new NotImplementedException(); }
 		}

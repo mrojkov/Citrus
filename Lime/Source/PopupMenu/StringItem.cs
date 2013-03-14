@@ -47,7 +47,7 @@ namespace Lime.PopupMenu
 			button.Clicked += OnClick;
 		}
 
-		void OnClick(Widget button)
+		void OnClick()
 		{
 			if (Submenu != null) {
 				Submenu.Show();

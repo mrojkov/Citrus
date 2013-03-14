@@ -13,7 +13,7 @@ namespace Lime
 		[ProtoMember(2)]
 		public bool Enabled { get; set; }
 
-		public override WidgetClickHandler Clicked { get; set; }
+		public override BareEventHandler Clicked { get; set; }
 
 		private SimpleText textPresenter;
 		private BareEventHandler StateHandler;
@@ -88,7 +88,7 @@ namespace Lime
 				//RunAnimationWithStopHandler("Release", () => SetNormalState());
 			} else if (Input.WasKeyReleased(Key.Mouse0)) {
 				if (Clicked != null) {
-					Clicked(this);
+					Clicked();
 				}
 				wasClicked = true;
                 RunReleaseAnimation();
