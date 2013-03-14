@@ -17,7 +17,7 @@ namespace Lime
 	[ProtoContract]
 	public class Audio : Node
 	{
-		Sound sound = new Sound();
+		Sound sound = new Sound() { IsBumpable = true };
 
 		[ProtoMember(1)]
 		public SerializableSample Sample { get; set; }
@@ -81,6 +81,7 @@ namespace Lime
 		public void Play()
 		{
 			sound = Sample.Play(Group, true, Looping, Priority);
+			sound.IsBumpable = true;
 			sound.Volume = Volume;
 			sound.Pan = Pan;
 			sound.Pitch = Pitch;
@@ -95,6 +96,12 @@ namespace Lime
 		public bool IsPlaying()
 		{
 			return !sound.IsStopped();
+		}
+
+		public override void Update(int delta)
+		{
+			base.Update(delta);
+			sound.Bump();
 		}
 
 		protected internal override void OnTrigger(string property)

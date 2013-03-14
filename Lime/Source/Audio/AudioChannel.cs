@@ -13,6 +13,7 @@ namespace Lime
 		void Stop(float fadeoutTime = 0);
 		float Volume { get; set; }
 		float Pitch { get; set; }
+		void Bump();
 	}
 
 	public class NullAudioChannel : IAudioChannel
@@ -26,6 +27,7 @@ namespace Lime
 		public void Stop(float fadeoutTime = 0) {}
 		public float Volume { get { return 0; } set { } }
 		public float Pitch { get { return 1; } set { } }
+		public void Bump() {}
 	}
 
 	internal class AudioChannel : IDisposable, IAudioChannel
@@ -50,6 +52,7 @@ namespace Lime
 		private bool looping;
 		private float fadeVolume;
 		private float fadeSpeed;
+		private int lastBumpedRenderCycle = 0;
 
 		Sound sound;
 		internal IAudioDecoder decoder;
@@ -165,6 +168,11 @@ namespace Lime
 
 		public float Pan { get; set; }
 
+		public void Bump()
+		{
+			lastBumpedRenderCycle = Renderer.RenderCycle;
+		}
+
 		public void Update(float delta)
 		{
 			if (streaming) {
@@ -186,6 +194,8 @@ namespace Lime
 				}
 				Volume = volume;
 			}
+			if (sound != null && sound.IsBumpable && Renderer.RenderCycle - lastBumpedRenderCycle > 3)
+				Stop(0.1f);
 		}
 
 		void UpdateHelper()

@@ -5,9 +5,13 @@ namespace Lime
 {
 	public class Sound
 	{
-		public Sound() { Channel = NullAudioChannel.Instance; }
+		public Sound() { 
+			Channel = NullAudioChannel.Instance;
+			IsBumpable = false;
+		}
 
 		public IAudioChannel Channel { get; internal set; }
+		public bool IsBumpable { get; set; }
 		
 		public float Volume
 		{
@@ -30,5 +34,6 @@ namespace Lime
 		public void Resume(float fadeinTime = 0) { Channel.Resume(fadeinTime); }
 		public bool IsStopped() { return Channel.State == ALSourceState.Stopped; }
 		public void Stop(float fadeoutTime = 0) { Channel.Stop(fadeoutTime); }
+		public void Bump() { Channel.Bump(); }
 	}
 }
