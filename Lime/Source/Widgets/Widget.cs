@@ -48,6 +48,7 @@ namespace Lime
 		private Color4 color;
 		protected bool renderedToTexture;
 		private Vector2? parentSize;
+		private BareEventHandler clicked;
 
 		#region Properties
 
@@ -57,13 +58,13 @@ namespace Lime
 		}
 
 		public virtual BareEventHandler Clicked {
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return clicked; }
+			set { clicked = value; }
 		}
 
 		public virtual bool WasClicked()
 		{
-			throw new NotImplementedException();
+			return Input.WasMouseReleased() && HitTest(Input.MousePosition);
 		}
 
 		public virtual ITexture Texture
@@ -161,6 +162,11 @@ namespace Lime
 			get { return Find<Widget>(id); }
 		}
 
+		public Widget this[string format, object arg]
+		{
+			get { return Find<Widget>(string.Format(format, arg)); }
+		}
+
 		public void MakeInvisible()
 		{
 			Visible = false;
@@ -184,6 +190,16 @@ namespace Lime
 				if (Nodes.Count > 0) {
 					UpdateChildren(delta);
 				}
+				if (clicked != null) {
+					HandleClick();
+				}
+			}
+		}
+
+		private void HandleClick()
+		{
+			if (Input.WasMouseReleased() && HitTest(Input.MousePosition)) {
+				clicked();
 			}
 		}
 
