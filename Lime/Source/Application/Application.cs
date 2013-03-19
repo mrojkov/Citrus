@@ -42,6 +42,9 @@ namespace Lime
 
 		private void SetGlobalExceptionHandler()
 		{
+			// Почитать и применить:	
+			// http://forums.xamarin.com/discussion/931/how-to-prevent-ios-crash-reporters-from-crashing-monotouch-apps
+
 			AppDomain.CurrentDomain.UnhandledException += (sender, e) => {
 				Console.WriteLine(e.ExceptionObject.ToString());
 #if WIN
