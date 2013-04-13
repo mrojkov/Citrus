@@ -72,6 +72,16 @@ namespace Lime
 			return false;
 		}
 
+		public static void InvokeInMainThread(Action action)
+		{
+#if iOS
+			var appDelegate = UIApplication.SharedApplication.Delegate as AppDelegate;
+			appDelegate.BeginInvokeOnMainThread(action);
+#else
+			throw new NotImplementedException();
+#endif
+		}
+
 		public PlatformId Platform {
 			get
 			{
