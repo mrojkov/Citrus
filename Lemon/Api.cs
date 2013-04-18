@@ -14,7 +14,7 @@ namespace Lemon
 #else
 		const string Dll = "Lemon";
 #endif
-		
+
 		[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 		public delegate uint ReadCallback(IntPtr ptr, uint size, uint nmemb, int datasource);
 		

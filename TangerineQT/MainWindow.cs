@@ -76,14 +76,15 @@ namespace Tangerine
 		{
 			this.AddDockWidget(Qt.DockWidgetArea.TopDockWidgetArea, The.Timeline.DockWidget);
 			this.AddDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, The.Inspector.DockWidget);
+			this.AddDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, The.ActorList.DockWidget);
 		}
 
 		private void LoadDockState()
 		{
-			if (File.Exists(dockStateFile)) {
-				var bytes = File.ReadAllBytes(dockStateFile);
-				this.RestoreState(new QByteArray(bytes), 1);
-			}
+			//if (File.Exists(dockStateFile)) {
+			//	var bytes = File.ReadAllBytes(dockStateFile);
+			//	this.RestoreState(new QByteArray(bytes), 1);
+			//}
 		}
 
 		private void SaveDockState()

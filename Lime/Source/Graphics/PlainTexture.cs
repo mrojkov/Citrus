@@ -293,21 +293,24 @@ namespace Lime
 			OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureParameterName.ClampToEdge);
 			OGL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Fastest);
 #endif
+
 			using (BinaryReader reader = new BinaryReader(stream)) {
 #if iOS
 				InitWithPVRTexture(reader);
 #else
-				InitWithDDSBitmap(reader);
-				// Mike: временно убрал поддержку Png потому что DeflateStream не поддерживает Seek()
-				//int sign = stream.ReadByte();
-				//stream.Seek(0, SeekOrigin.Begin);
-				//if (sign == 'D') { 
-				//	InitWithDDSBitmap(reader);
-				//} else if (sign == 137) {
-				//	InitWithPNGBitmap(reader);
-				//} else {
-				//	throw new Lime.Exception("Texture format must be either DDS or PNG");
-				//}
+				if (stream.CanSeek) {
+					int sign = reader.PeekChar();
+					stream.Seek(0, SeekOrigin.Begin);
+					if (sign == 'D') {
+						InitWithDDSBitmap(reader);
+					} else if (sign == 137) {
+						InitWithPNGBitmap(reader);
+					} else {
+						throw new Lime.Exception("Texture format must be either DDS or PNG");
+					}
+				} else {
+					InitWithDDSBitmap(reader);
+				}
 #endif
 			}
 			Renderer.CheckErrors();

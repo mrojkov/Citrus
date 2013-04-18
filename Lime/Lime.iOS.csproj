@@ -148,14 +148,15 @@
     <Compile Include="Source\Application\TimeUtils.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Lemon\Lemon.iOS.csproj">
-      <Project>{C4795CBE-B192-4E53-8140-7310FBD206DD}</Project>
-      <Name>Lemon.iOS</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Source\Application\WinCursors.cs">
       <Visible>False</Visible>
     </None>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Lemon\Lemon.iOS.csproj">
+      <Project>{c4795cbe-b192-4e53-8140-7310fbd206dd}</Project>
+      <Name>Lemon.iOS</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

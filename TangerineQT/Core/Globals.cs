@@ -13,6 +13,7 @@ namespace Tangerine
 		public static Qyoto.QWidget DefaultQtParent { get { return MainWindow.Instance.DefaultQtParent; } }
 		public static TL Timeline { get { return TL.Instance; } }
 		public static Inspector Inspector { get { return Inspector.Instance; } }
+		public static ActorList ActorList { get { return ActorList.Instance; } }
 		public static DocumentView SceneView { get { return Document.Active.View; } }
 		public static Document Document { get { return Document.Active; } }
 		public static Preferences Preferences { get { return Preferences.Instance; } }

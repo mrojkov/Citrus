@@ -1,0 +1,128 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace Tangerine
+{
+	public class DockManager
+	{
+		public Xwt.Widget CentralWidget { get; set; }
+		public Xwt.Box DockArea { get; private set; }
+		public DockDragManager DragManager { get; private set; }
+
+		private Xwt.Paned panedTree;
+		private List<IDockPanel> panels;
+
+		public DockManager(Xwt.Box dockArea)
+		{
+			DockArea = dockArea;
+			DragManager = new DockDragManager(this);
+			panels = new List<IDockPanel>();
+		}
+
+		public IEnumerable<IDockPanel> Panels { get { return panels; } }
+
+		public void AddDockPanel(IDockPanel panel, DockZone zone)
+		{
+			panels.Add(panel);
+			// This is advanced feature (not implemented yet):
+			// var site = FindDockSite(zone);
+			//if (site == null) {
+			//	site = CreateDockSite(zone);
+			//}
+			var site = CreateDockSite(zone);
+			site.AddPanel(panel);
+		}
+
+		public bool RemoveDockPanel(IDockPanel panel)
+		{
+			panels.Remove(panel);
+			foreach (var site in EnumerateDockSites(panedTree)) {
+				if (site.RemovePanel(panel)) {
+					if (site.PanelCount == 0) {
+						RemoveDockSite(site);
+					}
+					return true;
+				}
+			}
+			return false;
+		}
+
+		private void RemoveDockSite(DockSite site)
+		{
+			var paned = site.Parent as Xwt.Paned;
+			Xwt.Widget content;
+			if (site == paned.Panel1.Content) {
+				content = paned.Panel2.Content;
+			} else {
+				content = paned.Panel1.Content;
+			}
+			PanedUtils.ExtractFromPaned(content);
+			var panel = PanedUtils.GetOwnedPanel(paned);
+			if (panel != null) {
+				panel.Content = content;
+			} else {
+				panedTree = content as Xwt.Paned;
+				DockArea.Clear();
+				DockArea.PackStart(content, Xwt.BoxMode.Expand);
+			}
+		}
+
+		private DockSite FindDockSite(DockZone zone)
+		{
+			var e = EnumerateDockSites(panedTree);
+			return e.FirstOrDefault(ds => ds.Zone == zone);
+		}
+
+		private IEnumerable<DockSite> EnumerateDockSites(Xwt.Widget tree)
+		{
+			if (tree is DockSite) {
+				yield return (DockSite)tree;
+			} else if (tree is Xwt.Paned) {
+				var paned = (Xwt.Paned)tree;
+				foreach (var ds in EnumerateDockSites(paned.Panel1.Content)) {
+					yield return ds;
+				}
+				foreach (var ds in EnumerateDockSites(paned.Panel2.Content)) {
+					yield return ds;
+				}
+			}
+		}
+
+		private DockSite CreateDockSite(DockZone zone)
+		{
+			Xwt.Widget content = null;
+			if (panedTree == null) {
+				content = CentralWidget;
+			} else {
+				content = panedTree;
+			}
+			DockArea.Remove(content);
+			var site = new DockSite(zone);
+			Xwt.Paned paned = null;
+			if (zone == DockZone.Left) {
+				paned = new Xwt.HPaned();
+				paned.Panel1.Content = site;
+				paned.Panel2.Content = content;
+			} else if (zone == DockZone.Right) {
+				paned = new Xwt.HPaned();
+				paned.Panel1.Content = content;
+				paned.Panel2.Content = site;
+			} else if (zone == DockZone.Top) {
+				paned = new Xwt.VPaned();
+				paned.Panel1.Content = site;
+				paned.Panel2.Content = content;
+			} else if (zone == DockZone.Bottom) {
+				paned = new Xwt.VPaned();
+				paned.Panel1.Content = content;
+				paned.Panel2.Content = site;
+			} else {
+				throw new InvalidOperationException();
+			}
+			panedTree = paned;
+			DockArea.PackStart(panedTree, Xwt.BoxMode.Expand);
+			return site;
+		}
+	}
+}

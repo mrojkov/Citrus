@@ -87,11 +87,15 @@ namespace Tangerine
 		{
 			userPrefs.CurrentDirectory = AssetsDirectory;
 			userPrefs.Load(GetUserPrefsFile());
-			System.IO.Directory.SetCurrentDirectory(userPrefs.CurrentDirectory);
-			foreach (var file in userPrefs.OpenedDocuments) {
-				OpenDocument(file);
+			try {
+				System.IO.Directory.SetCurrentDirectory(userPrefs.CurrentDirectory);
+				foreach (var file in userPrefs.OpenedDocuments) {
+					OpenDocument(file);
+				}
+				userPrefs.OpenedDocuments.Clear();
+			} catch (System.Exception e) {
+				new QMessageBox(QMessageBox.Icon.Critical, "Tangerine", e.ToString());
 			}
-			userPrefs.OpenedDocuments.Clear();
 		}
 
 		private string GetUserPrefsFile()

@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{B16BCAB9-4526-417E-8DDF-783858A9EA10}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Tangerine</RootNamespace>
     <AssemblyName>Tangerine</AssemblyName>
@@ -67,6 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActorList\ActorList.cs" />
     <Compile Include="Core\Action.cs" />
     <Compile Include="Core\Commands\ChangeNodeProperty.cs" />
     <Compile Include="Core\DocumentState.cs" />

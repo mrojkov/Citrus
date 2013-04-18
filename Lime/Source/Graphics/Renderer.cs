@@ -287,15 +287,17 @@ namespace Lime
 
 		public static void SetDefaultViewport()
 		{
-			int w = Application.Instance.WindowSize.Width;
-			int h = Application.Instance.WindowSize.Height;
+			if (Application.Instance != null) {
+				int w = Application.Instance.WindowSize.Width;
+				int h = Application.Instance.WindowSize.Height;
 #if iOS
-			if (GameView.Instance.IsRetinaDisplay) {
-				w *= 2;
-				h *= 2;
-			}
+				if (GameView.Instance.IsRetinaDisplay) {
+					w *= 2;
+					h *= 2;
+				}
 #endif
-			Viewport = new Viewport { X = 0, Y = 0, Width = w, Height = h };
+				Viewport = new Viewport { X = 0, Y = 0, Width = w, Height = h };
+			}
 		}
 
 		static Viewport viewport;
