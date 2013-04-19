@@ -9,6 +9,7 @@ namespace Lime
 	{
 		public static GameView Instance;
 		Application app;
+		internal Action ScheduledActions;
 
 		public GameView(Application app, string[] args = null)
 			: base(640, 480, new OpenTK.Graphics.GraphicsMode(32, 0, 0, 1))
@@ -125,13 +126,17 @@ namespace Lime
 
 		protected override void OnRenderFrame(OpenTK.FrameEventArgs e)
 		{
-			lock (Application.FrameSync) {
+			lock (Application.MainThreadSync) {
 				long currentTime = TimeUtils.GetMillisecondsSinceGameStarted();
 				int delta = (int)(currentTime - prevTime);
 				delta = delta.Clamp(0, 40);
 				prevTime = currentTime;
 				DoUpdate(delta);
 				DoRender();
+				if (ScheduledActions != null) {
+					ScheduledActions();
+					ScheduledActions = null;
+				}
 			}
 		}
 

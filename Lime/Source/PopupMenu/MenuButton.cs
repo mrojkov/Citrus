@@ -23,7 +23,7 @@ namespace Lime.PopupMenu
 			get { return imageBox.Image.Texture.SerializationPath; }
 			set {
 				imageBox.Image.Texture = new SerializableTexture(value);
-				imageBox.Visible = !imageBox.Image.Texture.ChessTexture;
+				imageBox.Visible = !imageBox.Image.Texture.IsStubTexture;
 			}
 		}
 

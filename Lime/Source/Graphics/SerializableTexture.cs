@@ -45,12 +45,12 @@ namespace Lime
 			}
 		}
 
-		public bool ChessTexture
+		public bool IsStubTexture
 		{
 			get
 			{
 				core.GetInstance();
-				return core.ChessTexture;
+				return core.IsStubTexture;
 			}
 		}
 
@@ -112,7 +112,7 @@ namespace Lime
 		ITexture instance;
 		internal Rectangle UVRect;
 		internal Size ImageSize;
-		public bool ChessTexture { get; private set; }
+		public bool IsStubTexture { get; private set; }
 
 		public SerializableTextureCore(string path)
 		{
@@ -124,15 +124,15 @@ namespace Lime
 			Discard();
 		}
 		
-		static Texture2D CreateChessTexture()
+		static Texture2D CreateStubTexture()
 		{
-			var chessTexture = new Texture2D();
+			var texture = new Texture2D();
 			Color4[] pixels = new Color4[128 * 128];
 			for (int i = 0; i < 128; i++)
 				for (int j = 0; j < 128; j++)
 					pixels[i * 128 + j] = (((i + (j & ~7)) & 8) == 0) ? Color4.Blue : Color4.White;
-			chessTexture.LoadImage(pixels, 128, 128, true);
-			return chessTexture;
+			texture.LoadImage(pixels, 128, 128, true);
+			return texture;
 		}
 
 		/// <summary>
@@ -173,8 +173,8 @@ namespace Lime
 					instance = new RenderTexture(1024, 1024);
 					break;
 				default:
-					instance = CreateChessTexture();
-					ChessTexture = true;
+					instance = CreateStubTexture();
+					IsStubTexture = true;
 					break;
 				}
 				UVRect.A = Vector2.Zero;
@@ -227,8 +227,8 @@ namespace Lime
 					if (!string.IsNullOrEmpty(Path)) {
 						Console.WriteLine("Missing texture '{0}'", Path);
 					}
-					instance = CreateChessTexture();
-					ChessTexture = true;
+					instance = CreateStubTexture();
+					IsStubTexture = true;
 					UVRect = instance.UVRect;
 					ImageSize = instance.ImageSize;
 				}

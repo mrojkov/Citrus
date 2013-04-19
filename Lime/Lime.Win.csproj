@@ -52,6 +52,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Application\TimeUtils.cs" />
+    <Compile Include="Source\Graphics\Texture2D.DDS.cs" />
+    <Compile Include="Source\Graphics\Texture2D.PVR.cs" />
+    <Compile Include="Source\Graphics\Texture2D.Png.cs" />
     <Compile Include="Source\RewindableStream.cs" />
     <Compile Include="Source\Toolbox.cs" />
     <Compile Include="Source\NumericExtensions.cs" />

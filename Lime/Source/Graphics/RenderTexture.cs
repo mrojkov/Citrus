@@ -93,7 +93,7 @@ namespace Lime
 			return id;
 		}
 
-		public bool ChessTexture { get { return false; } }
+		public bool IsStubTexture { get { return false; } }
 
 		public string SerializationPath {
 			get {
