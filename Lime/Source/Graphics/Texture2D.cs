@@ -92,11 +92,13 @@ namespace Lime
 			GLARGB_8888 = 0x12,
 			GLRGB_565 = 0x13,
 		}
-		
+
+		private UInt32 PVRMagic = 52;
+
 		private void InitWithPVRTexture(BinaryReader reader)
 		{
 			UInt32 headerLength = reader.ReadUInt32();
-			if (headerLength != 52) {
+			if (headerLength != PVRMagic) {
 				throw new Exception("Invalid PVRT header");
 			}
 			Int32 height = reader.ReadInt32();
@@ -153,6 +155,15 @@ namespace Lime
 				}
 				width /= 2;
 				height /= 2;
+			}
+		}
+
+		private void InitWithPngOrJpgBitmap(Stream stream)
+		{
+			var nsData = MonoTouch.Foundation.NSData.FromStream(stream);
+			UIImage image = UIImage.LoadFromData(nsData);
+			if (image == null) {
+				throw new Lime.Exception("Error loading texture from stream");
 			}
 		}
 #else
@@ -298,7 +309,13 @@ namespace Lime
 			using (RewindableStream rewindableStream = new RewindableStream(stream))
 			using (BinaryReader reader = new BinaryReader(rewindableStream)) {
 #if iOS
-				InitWithPVRTexture(reader);
+				int sign = reader.ReadInt32();
+				rewindableStream.Rewind();
+				if (sign == PVRMagic) {
+					InitWithPVRTexture(reader);
+				} else {
+					InitWithPngOrJpgBitmap(rewindableStream);
+				}
 #else
 				int sign = reader.ReadInt32();
 				rewindableStream.Rewind();

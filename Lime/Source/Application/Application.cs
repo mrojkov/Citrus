@@ -76,7 +76,7 @@ namespace Lime
 		{
 #if iOS
 			var appDelegate = UIApplication.SharedApplication.Delegate as AppDelegate;
-			appDelegate.BeginInvokeOnMainThread(action);
+			appDelegate.BeginInvokeOnMainThread(() => action());
 #else
 			throw new NotImplementedException();
 #endif
