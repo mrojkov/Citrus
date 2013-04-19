@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Application\TimeUtils.cs" />
+    <Compile Include="Source\RewindableStream.cs" />
     <Compile Include="Source\Toolbox.cs" />
     <Compile Include="Source\NumericExtensions.cs" />
     <Compile Include="Source\Application\Application.cs" />
@@ -86,12 +87,12 @@
     <Compile Include="Source\Exception.cs" />
     <Compile Include="Source\Graphics\Font.cs" />
     <Compile Include="Source\Graphics\OpenGL.cs" />
-    <Compile Include="Source\Graphics\PlainTexture.cs" />
+    <Compile Include="Source\Graphics\Texture2D.cs" />
     <Compile Include="Source\Graphics\Renderer.cs" />
     <Compile Include="Source\Graphics\RenderTexture.cs" />
     <Compile Include="Source\Graphics\SerializableFont.cs" />
     <Compile Include="Source\Graphics\SerializableTexture.cs" />
-    <Compile Include="Source\Graphics\Texture.cs" />
+    <Compile Include="Source\Graphics\ITexture.cs" />
     <Compile Include="Source\Graphics\TextureAtlasPart.cs" />
     <Compile Include="Source\Graphics\OgvDecoder.cs" />
     <Compile Include="Source\Graphics\VideoTexture.cs" />

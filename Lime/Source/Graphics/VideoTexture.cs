@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Lime
 {
-	public class VideoTexture : PlainTexture
+	public class VideoTexture : Texture2D
 	{
 		Stream rgbStream;
 		Stream alphaStream = null;

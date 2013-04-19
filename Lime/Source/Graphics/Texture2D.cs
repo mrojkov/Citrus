@@ -16,9 +16,9 @@ namespace Lime
 	using OGL = GL;
 #endif
 	/// <summary>
-	/// Represents 2D texture.
+	/// Represents 2D texture
 	/// </summary>
-	public class PlainTexture : ITexture
+	public class Texture2D : ITexture
 	{
 		uint id;
 		public Size ImageSize { get; protected set; }
@@ -170,11 +170,13 @@ namespace Lime
 			RGB = 0x40
 		}
 
+		const UInt32 DDSMagic = 0x20534444;
+
 		private void InitWithDDSBitmap(BinaryReader reader)
 		{
 			UInt32 magic = reader.ReadUInt32();
 			UInt32 size = reader.ReadUInt32();
-			if (magic != 0x20534444 || size != 124) {
+			if (magic != DDSMagic || size != 124) {
 				throw new Lime.Exception("Invalid DDS file header");
 			}
 			// UInt32 flags =
@@ -247,9 +249,9 @@ namespace Lime
 			}
 		}
 
-		private void InitWithPNGBitmap(BinaryReader reader)
+		private void InitWithPngOrJpgBitmap(Stream stream)
 		{
-            var bitmap = new System.Drawing.Bitmap(reader.BaseStream);
+            var bitmap = new System.Drawing.Bitmap(stream);
 			SurfaceSize = ImageSize = new Size(bitmap.Width, bitmap.Height);
 			var lockRect = new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height);
 			var lockMode = System.Drawing.Imaging.ImageLockMode.ReadOnly;
@@ -270,7 +272,7 @@ namespace Lime
 
 		public void LoadImage(Stream stream)
 		{
-			// Discards current texture.
+			// Discard current texture
 			Dispose();
 			DeleteScheduledTextures();
 
@@ -284,7 +286,7 @@ namespace Lime
 			GL.TexParameter(All.Texture2D, All.TextureWrapT, (int)All.ClampToEdge);
 			GL.Hint(All.PerspectiveCorrectionHint, All.Fastest);
 #else
-			// Generate a new texture.
+			// Generate a new texture
 			id = (uint)OGL.GenTexture();
 			Renderer.SetTexture(id, 0);
 			OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
@@ -293,23 +295,17 @@ namespace Lime
 			OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureParameterName.ClampToEdge);
 			OGL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Fastest);
 #endif
-
-			using (BinaryReader reader = new BinaryReader(stream)) {
+			using (RewindableStream rewindableStream = new RewindableStream(stream))
+			using (BinaryReader reader = new BinaryReader(rewindableStream)) {
 #if iOS
 				InitWithPVRTexture(reader);
 #else
-				if (stream.CanSeek) {
-					int sign = reader.PeekChar();
-					stream.Seek(0, SeekOrigin.Begin);
-					if (sign == 'D') {
-						InitWithDDSBitmap(reader);
-					} else if (sign == 137) {
-						InitWithPNGBitmap(reader);
-					} else {
-						throw new Lime.Exception("Texture format must be either DDS or PNG");
-					}
-				} else {
+				int sign = reader.ReadInt32();
+				rewindableStream.Rewind();
+				if (sign == DDSMagic) {
 					InitWithDDSBitmap(reader);
+				} else {
+					InitWithPngOrJpgBitmap(rewindableStream);
 				}
 #endif
 			}
@@ -318,7 +314,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Create texture from pixel array.
+		/// Create texture from pixel array
 		/// </summary>
 		public void LoadImage(Color4[] pixels, int width, int height, bool generateMips)
 		{
@@ -326,7 +322,7 @@ namespace Lime
 			if (width != ImageSize.Width || height != ImageSize.Height) {
 				Dispose();
 				DeleteScheduledTextures();
-				// Generate a new texture id.
+				// Generate a new texture id
 #if GLES11
 				GL.GenTextures(1, ref id);
 #else
@@ -366,7 +362,7 @@ namespace Lime
 			uvRect = new Rectangle(0, 0, 1, 1);
 		}
 
-		~PlainTexture()
+		~Texture2D()
 		{
 			Dispose();
 		}
@@ -382,7 +378,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Returns native texture handle.
+		/// Returns native texture handle
 		/// </summary>
 		/// <returns></returns>
 		public uint GetHandle()
@@ -391,7 +387,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Sets texture as a render target.
+		/// Sets texture as a render target
 		/// </summary>
 		public void SetAsRenderTarget()
 		{
@@ -405,7 +401,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Checks pixel transparency at given coordinates.
+		/// Checks pixel transparency at given coordinates
 		/// </summary>
 		/// <param name="x">x-coordinate of pixel</param>
 		/// <param name="y">y-coordinate of pixel</param>

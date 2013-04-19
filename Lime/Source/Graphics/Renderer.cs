@@ -158,7 +158,7 @@ namespace Lime
 				batchIndices = (ushort*)System.Runtime.InteropServices.Marshal.AllocHGlobal(sizeof(ushort) * MaxVertices * 4);
 				batchVertices = (Vertex*)System.Runtime.InteropServices.Marshal.AllocHGlobal(sizeof(Vertex) * MaxVertices);
 			}
-			PlainTexture.DeleteScheduledTextures();
+			Texture2D.DeleteScheduledTextures();
 			DrawCalls = 0;
 			RenderCycle++;
 			ClearRenderTarget(0, 0, 0, 1);

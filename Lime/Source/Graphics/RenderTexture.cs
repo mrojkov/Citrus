@@ -76,8 +76,8 @@ namespace Lime
 		public void Dispose()
 		{
 			if (id != 0) {
-				lock (PlainTexture.TexturesToDelete) {
-					PlainTexture.TexturesToDelete.Add(id);
+				lock (Texture2D.TexturesToDelete) {
+					Texture2D.TexturesToDelete.Add(id);
 				}
 				id = 0;
 			}

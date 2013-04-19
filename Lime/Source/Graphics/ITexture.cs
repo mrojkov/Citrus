@@ -3,10 +3,6 @@ using ProtoBuf;
 
 namespace Lime
 {
-	/// <summary>
-	/// Base class for texture handling.
-	/// Contains functionality that is common to both PlainTexture and RenderTexture classes.
-	/// </summary>
 	[ProtoContract]
 	[ProtoInclude(100, typeof(SerializableTexture))]
 	public interface ITexture : IDisposable

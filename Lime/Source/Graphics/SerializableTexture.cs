@@ -124,9 +124,9 @@ namespace Lime
 			Discard();
 		}
 		
-		static PlainTexture CreateChessTexture()
+		static Texture2D CreateChessTexture()
 		{
-			var chessTexture = new PlainTexture();
+			var chessTexture = new Texture2D();
 			Color4[] pixels = new Color4[128 * 128];
 			for (int i = 0; i < 128; i++)
 				for (int j = 0; j < 128; j++)
@@ -201,8 +201,8 @@ namespace Lime
 		private bool TryLoadImage(string path)
 		{
 			if (PackedAssetsBundle.Instance.FileExists(path)) {
-				instance = new PlainTexture();
-				(instance as PlainTexture).LoadImage(path);
+				instance = new Texture2D();
+				(instance as Texture2D).LoadImage(path);
 				UVRect.A = Vector2.Zero;
 				UVRect.B = (Vector2)instance.ImageSize / (Vector2)instance.SurfaceSize;
 				ImageSize = instance.ImageSize;
@@ -270,7 +270,7 @@ namespace Lime
 					target.DiscardIfNotUsed(numCycles);
 				}
 			}
-			PlainTexture.DeleteScheduledTextures();
+			Texture2D.DeleteScheduledTextures();
 		}
 
 		public void DiscardAllTextures()
@@ -281,7 +281,7 @@ namespace Lime
 					target.Discard();
 				}
 			}
-			PlainTexture.DeleteScheduledTextures();
+			Texture2D.DeleteScheduledTextures();
 		}
 
 		internal SerializableTextureCore GetSerializableTextureCore(string path)
