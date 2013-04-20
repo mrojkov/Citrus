@@ -21,7 +21,6 @@ namespace Tangerine
 	class MainWindow
 	{
 		public Xwt.Window Window { get; private set; }
-		public Xwt.Canvas DockingCanvas;
 		public Xwt.HBox DockingArea;
 		public DocumentsArea DocumentsArea { get; private set; }
 		public DockManager DockSiteManager { get; private set; }
@@ -33,12 +32,9 @@ namespace Tangerine
 			Window = new Xwt.Window() { Width = 800, Height = 600 };
 			Window.Padding = new Xwt.WidgetSpacing();
 			DockingArea = new Xwt.HBox();
-			DockingCanvas = new Xwt.Canvas();
-			DockingCanvas.AddChild(DockingArea);
 			DocumentsArea = new DocumentsArea();
 			DockingArea.PackStart(DocumentsArea.Notebook, Xwt.BoxMode.Expand);
-			Window.Content = DockingCanvas;
-			DockingCanvas.BoundsChanged += DockingCanvas_BoundsChanged;
+			Window.Content = DockingArea;
 			Window.Show();
 
 			DockSiteManager = new DockManager(DockingArea) { CentralWidget = DocumentsArea.Notebook	 };
@@ -58,11 +54,6 @@ namespace Tangerine
 			//DockSiteManager.AddDockPanel(panel2, DockZone.Right);
 			//DockSiteManager.AddDockPanel(panel3, DockZone.Right);
 			CreateMenu();
-		}
-
-		void DockingCanvas_BoundsChanged(object sender, EventArgs e)
-		{
-			DockingCanvas.SetChildBounds(DockingArea, DockingCanvas.Bounds);
 		}
 
 		private void CreateMenu()

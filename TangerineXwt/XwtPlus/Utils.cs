@@ -7,7 +7,7 @@ namespace XwtPlus
 {
 	public interface IUtilsBackend : Xwt.Backends.IBackend
 	{
-		Xwt.Point GetPointerPosition(Xwt.Widget widget);
+		Xwt.Point GetPointerPosition();
 		bool GetPointerButtonState(Xwt.PointerButton button);
 		void CaptureMouse(Xwt.Widget widget);
 		void ReleaseMouse();
@@ -23,9 +23,9 @@ namespace XwtPlus
 			get { return (IUtilsBackend)BackendHost.Backend; }
 		}
 
-		public Xwt.Point GetPointerPosition(Xwt.Widget widget)
+		public Xwt.Point GetPointerPosition()
 		{
-			return Backend.GetPointerPosition(widget);
+			return Backend.GetPointerPosition();
 		}
 
 		public bool GetPointerButtonState(Xwt.PointerButton button)

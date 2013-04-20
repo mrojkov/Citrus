@@ -21,71 +21,102 @@ namespace Tangerine
 			}
 		}
 
+		class DragSnippet : Xwt.Window
+		{
+			Xwt.Label titleLabel;
+			CustomCanvas canvas;
+
+			public DragSnippet(string title)
+			{
+				CreateContent(title);
+				UpdateLocation();
+				Xwt.Application.TimeoutInvoke(10, DragHandler);
+			}
+
+			private void CreateContent(string title)
+			{
+				canvas = new CustomCanvas();
+				this.Padding = new Xwt.WidgetSpacing();
+				this.TransientFor = MainWindow.Instance.Window;
+				this.Size = new Xwt.Size(100, 50);
+				this.Decorated = false;
+				this.Content = canvas;
+				canvas.BoundsChanged += canvas_BoundsChanged;
+				titleLabel = new Xwt.Label(title);
+				titleLabel.TextAlignment = Xwt.Alignment.Center;
+				canvas.AddChild(titleLabel);
+				canvas.Drawn += canvas_Drawn;
+				this.Show();
+			}
+
+			void canvas_Drawn(Xwt.Drawing.Context ctx, Xwt.Rectangle dirtyRect)
+			{
+				ctx.SetColor(Xwt.Drawing.Colors.White);
+				ctx.Rectangle(canvas.Bounds);
+				ctx.FillPreserve();
+				ctx.SetColor(Xwt.Drawing.Colors.Black);
+				ctx.Stroke();
+			}
+
+			void canvas_BoundsChanged(object sender, EventArgs e)
+			{
+				canvas.SetChildBounds(titleLabel, canvas.Bounds);
+			}
+
+			private bool DragHandler()
+			{
+				UpdateLocation();
+				if (!XwtPlus.Utils.Instance.GetPointerButtonState(Xwt.PointerButton.Left)) {
+					Hide();
+					return false;
+				}
+				return true;
+			}
+
+			private void UpdateLocation()
+			{
+				Xwt.Point p = XwtPlus.Utils.Instance.GetPointerPosition();
+				this.Location = p - new Xwt.Size(Size.Width / 2, Size.Height / 2);
+			}
+		}
+
 		private DockZone dragZone;
 		private DragHintPanel hintPanel;
 		private DockManager dockManager;
 		private DockPanel draggingPanel;
 
-		private Xwt.Canvas dockCanvas { get { return MainWindow.Instance.DockingCanvas; } }
+		private Xwt.HBox dockArea { get { return MainWindow.Instance.DockingArea; } }
 
 		public DockDragManager(DockManager dockManager)
 		{
 			this.hintPanel = new DragHintPanel();
 			this.dockManager = dockManager;
-			dockCanvas.ButtonPressed += DockArea_ButtonPressed;
-			dockCanvas.MouseMoved += MainCanvas_MouseMoved;
-			dockCanvas.ButtonReleased += MainCanvas_ButtonReleased;
+			dockArea.ButtonPressed += DockArea_ButtonPressed;
 		}
 
 		void DockArea_ButtonPressed(object sender, Xwt.ButtonEventArgs e)
 		{
+			if (e.Button != Xwt.PointerButton.Left) {
+				return;
+			}
 			foreach (var panel in dockManager.Panels) {
 				var dockPanel = panel as DockPanel;
 				if (dockPanel != null) {
-					var p = dockCanvas.ConvertToScreenCoordinates(new Xwt.Point(e.X, e.Y));
+					var p = dockArea.ConvertToScreenCoordinates(new Xwt.Point(e.X, e.Y));
 					if (dockPanel.TitleLabel.ScreenBounds.Contains(p)) {
 						StartDrag(dockPanel);
+						e.Handled = true;
 						break;
 					}
 				}
 			}
 		}
 
-		void Parent_MouseExited(object sender, EventArgs e)
+		private void StopDrag()
 		{
 			if (draggingPanel != null) {
 				DropPanel(cancelOperation: false);
-			}
-		}
-
-		void MainCanvas_MouseMoved(object sender, Xwt.MouseMovedEventArgs e)
-		{
-			Console.WriteLine(e.X);
-			if (draggingPanel != null) {
-				DockZone zone = GetZoneForPointer(new Xwt.Point(e.X, e.Y));
-				if (zone != dragZone) {
-					dragZone = zone;
-					dockManager.RemoveDockPanel(hintPanel);
-					if (zone != DockZone.None) {
-						dockManager.AddDockPanel(hintPanel, zone);
-					}
-				}
-			}
-			//if (draggingSnippet != null) {
-			//	var canvas = this.dockManager.MainCanvas;
-			//	var b = canvas.GetChildBounds(draggingSnippet);
-			//	b.Location = new Xwt.Point(e.X - draggingSnippet.Size.Width / 2, e.Y - draggingSnippet.Size.Height * 0.75);
-			//	canvas.SetChildBounds(draggingSnippet, b);
-			//}
-		}
-
-
-		void MainCanvas_ButtonReleased(object sender, Xwt.ButtonEventArgs e)
-		{
-			//XwtPlus.Utils.Instance.ReleaseMouse();
-			if (draggingPanel != null) {
-				DropPanel(cancelOperation: false);
-				dockCanvas.Cursor = Xwt.CursorType.Arrow;
+				dockArea.Cursor = Xwt.CursorType.Arrow;
 			}
 		}
 
@@ -103,38 +134,9 @@ namespace Tangerine
 			}
 		}
 
-		//private void dockArea_DragLeave(object sender, EventArgs e)
-		//{
-		//	Console.WriteLine("Leave");
-		//	lastDragZone = dragZone;
-		//	dragZone = DockZone.None;
-		//	dockManager.RemoveDockPanel(hintPanel);
-		//}
-
-		//void dockArea_DragDrop(object sender, Xwt.DragEventArgs e)
-		//{
-		//	if (lastDragZone != DockZone.None) {
-		//		dockManager.AddDockPanel(draggingPanel, lastDragZone);
-		//	}
-		//	e.Success = true;
-		//}
-
-		//void dockArea_DragOver(object sender, Xwt.DragOverEventArgs e)
-		//{
-		//	DockZone zone = GetZoneForPointer(e.Position);
-		//	if (zone != dragZone) {
-		//		dragZone = zone;
-		//		dockManager.RemoveDockPanel(hintPanel);
-		//		if (zone != DockZone.None) {
-		//			dockManager.AddDockPanel(hintPanel, zone);
-		//		}
-		//	}
-		//	e.AllowedAction = Xwt.DragDropAction.Move;
-		//}
-
 		public DockZone GetZoneForPointer(Xwt.Point ptr)
 		{
-			var da = dockCanvas;
+			var da = dockArea;
 			const double margin = 50;
 			if (ptr.X < margin) {
 				return DockZone.Left;
@@ -148,66 +150,36 @@ namespace Tangerine
 			return DockZone.None;
 		}
 
-		//private static Xwt.Drawing.Image CreateDraggingSnippet(string title)
-		//{
-		//	using (var tl = new Xwt.Drawing.TextLayout()) {
-		//		tl.Width = 100;
-		//		tl.Text = title;
-		//		var textSize = tl.GetSize();
-		//		using (var ib = new Xwt.Drawing.ImageBuilder(textSize.Width + 20, textSize.Height + 20)) {
-		//			tl.Width = ib.Width;
-		//			tl.Height = ib.Height;
-		//			var ctx = ib.Context;
-		//			ctx.SetColor(Xwt.Drawing.Colors.White);
-		//			ctx.Rectangle(0, 0, ib.Width, ib.Height);
-		//			ctx.FillPreserve();
-		//			ctx.SetColor(Xwt.Drawing.Colors.Gray);
-		//			ctx.Stroke();
-		//			ctx.SetColor(Xwt.Drawing.Colors.Black);
-		//			var textPos = new Xwt.Point {
-		//				X = (ib.Width - textSize.Width) / 2,
-		//				Y = (ib.Height - textSize.Height) * 0.4
-		//			};
-		//			ctx.DrawTextLayout(tl, textPos);
-		//			return ib.ToBitmap();
-		//		}
-		//	}
-		//}
-
 		public void StartDrag(DockPanel panel)
 		{
-			//hintPanel.Widget.MinWidth = 100;// panel.Widget.Size.Width;
-			//hintPanel.Widget.MinHeight = 100;// panel.Widget.Size.Height;
+			var snippet = new DragSnippet(panel.Title);
+			Xwt.Application.TimeoutInvoke(10, HandleDrag);
 			draggingPanel = panel;
 			dockManager.RemoveDockPanel(panel);
+		}
 
-			//this.dockManager.DockArea.MouseMoved -= MainCanvas_MouseMoved;
-			//this.dockManager.DockArea.ButtonReleased -= MainCanvas_ButtonReleased;
-
-			XwtPlus.Utils.Instance.CaptureMouse(dockManager.DockArea);
-		
-			//var image = CreateDraggingSnippet(panel.Title);
-
-			//var box = new Xwt.HBox();
-			//var img = new Xwt.ImageView(image);
-			//box.PackStart(img, Xwt.BoxMode.Expand);
-			//draggingSnippet = box;
-
-			//var canvas = dockManager.MainCanvas;
-			//var children = canvas.Children.ToArray();
-			//foreach (var child in children) {
-			//	canvas.RemoveChild(child);
-			//}
-			//dockManager.DockArea.Cursor = Xwt.CursorType.Crosshair;
-			//draggingSnippet.ConvertToScreenCoordinates
-			//foreach (var child in children) {
-			//	canvas.AddChild(child);
-			//}
-			//canvas.AddChild(draggingSnippet);
-
-			//d.AllowedActions = Xwt.DragDropAction.Move;
-			//d.Finished += operation_Finished;
-			//d.Start();
+		private bool HandleDrag()
+		{
+			if (draggingPanel != null) {
+				if (!XwtPlus.Utils.Instance.GetPointerButtonState(Xwt.PointerButton.Left)) {
+					StopDrag();
+					return false;
+				} else {
+					Xwt.Point p = XwtPlus.Utils.Instance.GetPointerPosition();
+					p.X -= dockArea.ScreenBounds.Left;
+					p.Y -= dockArea.ScreenBounds.Top;
+					DockZone zone = GetZoneForPointer(p);
+					if (zone != dragZone) {
+						dragZone = zone;
+						dockManager.RemoveDockPanel(hintPanel);
+						if (zone != DockZone.None) {
+							dockManager.AddDockPanel(hintPanel, zone);
+						}
+					}
+				}
+				return true;			
+			}
+			return false;
 		}
 	}
 }
