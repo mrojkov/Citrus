@@ -96,7 +96,7 @@ namespace Lime
 
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{
-			lock (Application.FrameSync) {
+			lock (Application.MainThreadSync) {
 				long currentTime = TimeUtils.GetMillisecondsSinceGameStarted();
 				int delta = (int)(currentTime - prevTime);
 				prevTime = currentTime;
@@ -141,7 +141,7 @@ namespace Lime
 
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
-			lock (Application.FrameSync) {
+			lock (Application.MainThreadSync) {
 				MakeCurrent();
 				Application.Instance.OnRenderFrame();
 				SwapBuffers();

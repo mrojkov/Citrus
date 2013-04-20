@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
+#if iOS
+using OpenTK.Graphics.ES11;
+#endif
 
 namespace Lime
 {

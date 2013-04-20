@@ -5,16 +5,13 @@ using System.Collections.Generic;
 using OpenTK.Graphics.ES11;
 #elif MAC
 using MonoMac.OpenGL;
-using OpenTK.Graphics.OpenGL;
+using OGL = MonoMac.OpenGL.GL;
 #elif WIN
 using OpenTK.Graphics.OpenGL;
 #endif
 
 namespace Lime
 {
-#if MAC
-	using OGL = GL;
-#endif
 	/// <summary>
 	/// Represents 2D texture
 	/// </summary>

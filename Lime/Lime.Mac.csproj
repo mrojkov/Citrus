@@ -151,6 +151,9 @@
     <Compile Include="Source\RewindableStream.cs" />
     <Compile Include="Source\Graphics\ITexture.cs" />
     <Compile Include="Source\Graphics\Texture2D.cs" />
+    <Compile Include="Source\Graphics\Texture2D.DDS.cs" />
+    <Compile Include="Source\Graphics\Texture2D.Png.cs" />
+    <Compile Include="Source\Graphics\Texture2D.Pvr.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Audio\ADPCMEncoder.c">

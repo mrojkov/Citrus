@@ -1,15 +1,20 @@
-﻿using OpenTK.Graphics.OpenGL;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
+
+#if WIN
+using OpenTK.Graphics.OpenGL;
+#elif MAC
+using MonoMac.OpenGL;
+using OGL = MonoMac.OpenGL.GL;
+#endif
 
 namespace Lime
 {
 	public partial class Texture2D : ITexture
 	{
-#if WIN
+#if WIN || MAC
 		enum DDSFourCC
 		{
 			DXT1 = ('D' | ('X' << 8) | ('T' << 16) | ('1' << 24)),
