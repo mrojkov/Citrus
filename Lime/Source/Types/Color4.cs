@@ -51,6 +51,15 @@ namespace Lime
 			A = a;
 		}
 
+		public Color4(float r, float g, float b, float a = 1)
+		{
+			ABGR = 0;
+			R = (byte)(Mathf.Clamp(r, 0, 1) * 255);
+			G = (byte)(Mathf.Clamp(g, 0, 1) * 255);
+			B = (byte)(Mathf.Clamp(b, 0, 1) * 255);
+			A = (byte)(Mathf.Clamp(a, 0, 1) * 255);
+		}
+
 		public static Color4 operator *(Color4 lhs, Color4 rhs)
 		{
 			if (lhs.ABGR == 0xFFFFFFFF)
