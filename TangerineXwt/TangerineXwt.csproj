@@ -64,8 +64,10 @@
     <Compile Include="Core\TimelineRowListExtension.cs" />
     <Compile Include="Core\TimelineRowsCache.cs" />
     <Compile Include="Core\Workspace.cs" />
-    <Compile Include="DockingLibrary\DockDragManager2.cs" />
-    <Compile Include="DockingLibrary\DockDragManager1.cs" />
+    <Compile Include="DockingLibrary\DockDragManager.cs" />
+    <Compile Include="DockingLibrary\DockDragSnippet.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="DockingLibrary\DockManager.cs" />
     <Compile Include="DockingLibrary\DockPanel.cs" />
     <Compile Include="DockingLibrary\DockSite.cs">

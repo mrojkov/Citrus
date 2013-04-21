@@ -12,35 +12,35 @@ namespace Tangerine
 		public DockDragManager DragManager { get; private set; }
 
 		private Xwt.Paned panedTree;
-		private List<IDockPanel> panels;
+		private List<IDockElement> elements;
 
 		public DockManager(Xwt.Box dockArea)
 		{
 			DockArea = dockArea;
 			DragManager = new DockDragManager(this);
-			panels = new List<IDockPanel>();
+			elements = new List<IDockElement>();
 		}
 
-		public IEnumerable<IDockPanel> Panels { get { return panels; } }
+		public IEnumerable<IDockElement> Elements { get { return elements; } }
 
-		public void AddDockPanel(IDockPanel panel, DockZone zone)
+		public void AddDockElement(IDockElement element, DockZone zone)
 		{
-			panels.Add(panel);
+			elements.Add(element);
 			// This is advanced feature (not implemented yet):
 			// var site = FindDockSite(zone);
 			//if (site == null) {
 			//	site = CreateDockSite(zone);
 			//}
 			var site = CreateDockSite(zone);
-			site.AddPanel(panel);
+			site.AddElement(element);
 		}
 
-		public bool RemoveDockPanel(IDockPanel panel)
+		public bool RemoveDockElement(IDockElement element)
 		{
-			panels.Remove(panel);
+			elements.Remove(element);
 			foreach (var site in EnumerateDockSites(panedTree)) {
-				if (site.RemovePanel(panel)) {
-					if (site.PanelCount == 0) {
+				if (site.RemoveElement(element)) {
+					if (site.ElementCount == 0) {
 						RemoveDockSite(site);
 					}
 					return true;

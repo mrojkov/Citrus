@@ -22,12 +22,9 @@ namespace Tangerine
 	{
 		public Xwt.Box box;
 		public DockZone Zone { get; private set; }
-		//private DockSiteManager manager;
 
 		public DockSite(DockZone zone)
 		{
-			//manager = new DockSiteManager(this);
-
 			if (zone == DockZone.Top || zone == DockZone.Bottom) {
 				box = new Xwt.HBox();
 			} else {
@@ -37,23 +34,23 @@ namespace Tangerine
 			Zone = zone;
 		}
 
-		public void AddPanel(IDockPanel panel)
+		public void AddElement(IDockElement element)
 		{
 			//if (manager.CentralWidget == null) {
 			//	manager.CentralWidget = panel.Widget;
 			//} else {
 			//	manager.AddDockPanel(panel, DockZone.Bottom);
 			//}
-			box.PackStart(panel.Widget, Xwt.BoxMode.Expand);
+			box.PackStart(element.MainWidget, Xwt.BoxMode.Expand);
 		}
 
-		public bool RemovePanel(IDockPanel panel)
+		public bool RemoveElement(IDockElement element)
 		{
 			//return manager.RemoveDockPanel(panel);
-			return box.Remove(panel.Widget);
+			return box.Remove(element.MainWidget);
 		}
 
-		public int PanelCount
+		public int ElementCount
 		{
 			get { return box.Children.Count(); }
 		}

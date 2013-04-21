@@ -5,161 +5,214 @@ using System.Text;
 
 namespace Tangerine
 {
-	public class DockPanelLayout
+	public class DockedLocation
 	{
 		public Xwt.Size DockedSize;
-		public Xwt.Size FloatingSize = new Xwt.Size(400, 300);
-		public bool Docked;
 		public DockZone DockZone;
 	}
 
-	public interface IDockPanel
+	public class FloatingLocation
 	{
-		Xwt.Widget Widget { get; }
+		public Xwt.Point Location;
+		public Xwt.Size Size;
 	}
 
-	public class DockPanel : IDockPanel
+	public interface IDockElement
 	{
+		Xwt.Widget MainWidget { get; }
+	}
+
+	public class DockPanel : IDockElement
+	{
+		private Xwt.Label titleLabel { get; set; }
+		private Xwt.VBox panelBox;
+		private Xwt.VBox contentBox;
+		private Xwt.Widget content;
+		private Xwt.Window window;
 		private DockManager dockSiteManager;
-		private Xwt.HBox windowContent;
-		public Xwt.Window Window { get; private set; }
-		public Xwt.VBox Content { get; private set; }
-		public Xwt.Widget Widget { get { return headerAndContentBox; } }
+		private bool isTitleBeingPressed;
+		private DockedLocation dockedLocation;
+		private FloatingLocation floatingLocation;
 
-		public DockPanelLayout Layout { get; private set; }
-
-		public Xwt.Label TitleLabel { get; private set; }
-		Xwt.VBox headerAndContentBox;
+		Xwt.Widget IDockElement.MainWidget { get { return panelBox; } }
 
 		public string Title
 		{
-			get { return TitleLabel.Text; }
-			set { TitleLabel.Text = value; }
+			get { return titleLabel.Text; }
+			set { titleLabel.Text = value; }
 		}
 
-		public bool Docked
+		public bool Docked { get; private set; }
+		public bool Visible { get; private set; }
+
+		public Xwt.Widget Content
 		{
-			get { return dockSiteManager.Panels.Contains(this); }
+			get { return content; }
+			set { SetContent(value); }
 		}
 
-		public void Undock()
+		public void Hide()
 		{
-			if (!Docked) {
-				throw new InvalidOperationException("Panel is not docked");
+			HidePanelAndWindow();
+		}
+
+		public void Show()
+		{
+			HidePanelAndWindow();
+			if (Docked) {
+				Dock(dockedLocation.DockZone);
+			} else {
+				Floating(atMouse: false);
 			}
-			dockSiteManager.RemoveDockPanel(this);
-			windowContent.PackStart(Widget, Xwt.BoxMode.Expand);
-			Window.Size = Layout.FloatingSize;
-			Window.Show();
-			Window.TransientFor = MainWindow.Instance.Window;
 		}
 
-		bool holdOnTitle;
-
-		//void title_ButtonPressed(object sender, Xwt.ButtonEventArgs e)
-		//{
-		//	if (e.Button == Xwt.PointerButton.Left) {
-		//		holdOnTitle = true;
-		//	}
-		//}
-
-		//void title_MouseMoved(object sender, Xwt.MouseMovedEventArgs e)
-		//{
-		//	Console.WriteLine("X" + e.X);
-		//	if (holdOnTitle) {
-		//		holdOnTitle = false;
-		//		dockSiteManager.DragManager.StartDrag(this);
-
-			
-		//		//Undock();
-		//		//Window.Location = new Xwt.Point(0, 10000);
-		//		//Window.Y += 10000;
-
-		//		//dockSiteManager.RemoveDockPanel(this);
-				
-		//		//var p = new Xwt.Point {
-		//		//	X = title.ScreenBounds.X + e.X - 20,
-		//		//	Y = title.ScreenBounds.Y + e.Y - 10
-		//		//};
-		//		////title.MouseMoved -= title_MouseMoved;
-		//		//// Special hack, so move events now come to dragWindow
-		//		//title.Visible = false;
-		//		//title.Visible = true;
-		//		//new DragWindow(p, Title);
-		//	}
-		//}
-
-		//void title_ButtonReleased(object sender, Xwt.ButtonEventArgs e)
-		//{
-		//	if (e.Button == Xwt.PointerButton.Left) {
-		//		holdOnTitle = false;
-		//	}
-		//}
-
-
-		//bool dragging;
-
-		//void Window_BoundsChanged(object sender, EventArgs e)
-		//{
-		//	dragging = true;
-		//	bool buttonReleased = !XwtPlus.Utils.Instance.GetPointerButtonState(Xwt.PointerButton.Left);
-		//	if (buttonReleased) {
-		//		var ptr = XwtPlus.Utils.Instance.GetPointerPosition(Widget);
-		//		DockZone zone;
-		//		if (dockSiteManager.TryGetZoneForPointer(ptr, out zone)) {
-		//			Dock(zone);
-		//		}
-		//	}
-		//}
+		public void Floating(bool atMouse)
+		{
+			HidePanelAndWindow();
+			CreateWindow();
+			if (atMouse) {
+				Xwt.Point p = XwtPlus.Utils.Instance.GetPointerPosition();
+				p.X -= window.Size.Width / 2;
+				p.Y -= 50;
+				window.Location = p;
+			}
+			Docked = false;
+			Visible = true;
+		}
 
 		public void Dock(DockZone zone)
 		{
-			if (Docked) {
-				throw new InvalidOperationException("Panel has already docked");
-			}
-			Window.Hide();
-			windowContent.Clear();
-			dockSiteManager.AddDockPanel(this, zone);
-			//TitleLabel.ButtonReleased += title_ButtonReleased;
-			//TitleLabel.ButtonPressed += title_ButtonPressed;
-			//TitleLabel.MouseMoved += title_MouseMoved;
+			HidePanelAndWindow();
+			dockedLocation.DockZone = zone;
+			dockSiteManager.AddDockElement(this, zone);
+			Docked = true;
+			Visible = true;
 		}
 
-		public DockPanel(DockManager dockSiteManager, DockPanelLayout layout)
+		private void HidePanelAndWindow()
 		{
-			this.Layout = layout;
-			this.dockSiteManager = dockSiteManager;
-			CreateWindow();
-			CreateContent();
-			TitleLabel = new Xwt.Label("DockPanel");
-			TitleLabel.MarginLeft = 4;
-			TitleLabel.MarginBottom = 2;
-			TitleLabel.MarginTop = 2;
-			headerAndContentBox = new Xwt.VBox();
-			headerAndContentBox.PackStart(TitleLabel);
-			headerAndContentBox.PackStart(Content, Xwt.BoxMode.Expand);
-			headerAndContentBox.BackgroundColor = Colors.ToolPanelBackground;
+			if (window != null) {
+				DestroyWindow();
+			}
+			if (dockSiteManager.Elements.Contains(this)) {
+				dockSiteManager.RemoveDockElement(this);
+			}
+			Visible = false;
+		}
+
+		private void SetContent(Xwt.Widget value)
+		{
+			contentBox.Clear();
+			if (value != null) {
+				contentBox.PackStart(value, Xwt.BoxMode.Expand);
+			}
+			content = value;
+		}
+
+		private void DestroyWindow()
+		{
+			if (window != null) {
+				floatingLocation.Location = window.Location;
+				floatingLocation.Size = window.Size;
+				(window.Content as Xwt.HBox).Clear();
+				window.Dispose();
+				window = null;
+			}
 		}
 
 		private void CreateWindow()
 		{
-			Window = new Xwt.Window() { ShowInTaskbar = false };
-			windowContent = new Xwt.HBox();
-			Window.Content = windowContent;
+			window = new Xwt.Window() {
+				TransientFor = MainWindow.Instance.Window,
+				Padding = new Xwt.WidgetSpacing(),
+				Title = Title
+			};
+			var windowArea = new Xwt.HBox();
+			window.Content = windowArea;
+			windowArea.PackStart(panelBox, Xwt.BoxMode.Expand);
+			window.Size = floatingLocation.Size;
+			window.Location = floatingLocation.Location;
+			window.Show();
+		}
+
+		void title_ButtonPressed(object sender, Xwt.ButtonEventArgs e)
+		{
+			if (e.Button == Xwt.PointerButton.Left) {
+				isTitleBeingPressed = true;
+			}
+		}
+
+		void title_MouseMoved(object sender, Xwt.MouseMovedEventArgs e)
+		{
+			if (isTitleBeingPressed) {
+				isTitleBeingPressed = false;
+				if (Docked) {
+					dockSiteManager.RemoveDockElement(this);
+				} else {
+					DestroyWindow();
+				}
+				dockSiteManager.DragManager.StartDrag(this);
+			}
+		}
+
+		void title_ButtonReleased(object sender, Xwt.ButtonEventArgs e)
+		{
+			if (e.Button == Xwt.PointerButton.Left) {
+				isTitleBeingPressed = false;
+			}
+		}
+
+		public DockPanel(DockManager dockSiteManager)
+			: this(dockSiteManager, false, false, new DockedLocation(), new FloatingLocation())
+		{
+		}
+
+		public DockPanel(
+			DockManager dockSiteManager, 
+			bool visible,
+			bool docked, 
+			DockedLocation dockedLocation,
+			FloatingLocation floatingLocation)
+		{
+			this.dockSiteManager = dockSiteManager;
+			this.dockedLocation = dockedLocation;
+			this.floatingLocation = floatingLocation;
+			CreateDecoration();
+			CreateContent();
+			this.Docked = docked;
+			if (visible) {
+				Show();
+			}
+		}
+
+		private void CreateDecoration()
+		{
+			titleLabel = new Xwt.Label("DockPanel");
+			titleLabel.MarginLeft = 4;
+			titleLabel.MarginBottom = 2;
+			titleLabel.MarginTop = 2;
+			titleLabel.ButtonReleased += title_ButtonReleased;
+			titleLabel.ButtonPressed += title_ButtonPressed;
+			titleLabel.MouseMoved += title_MouseMoved;
+			contentBox = new Xwt.VBox();
+			contentBox.Margin = new Xwt.WidgetSpacing(4, 0, 4, 4);
+			panelBox = new Xwt.VBox();
+			panelBox.PackStart(titleLabel, Xwt.BoxMode.Fill);
+			panelBox.PackStart(contentBox, Xwt.BoxMode.Expand);
+			panelBox.BackgroundColor = Colors.ToolPanelBackground;
 		}
 
 		private void CreateContent()
 		{
-			Content = new Xwt.VBox();
-			Content.Margin = new Xwt.WidgetSpacing(4, 0, 4, 4);
 			//Content.MinWidth = 30;
 			//Content.MinHeight = 200;
 			//Content.NaturalWidth = 300;
 			var button = new Xwt.Button("Test");
-			Content.PackStart(button, Xwt.BoxMode.Fill);
-			Content.PackStart(new Xwt.RichTextView(), Xwt.BoxMode.Fill);
-			Content.PackStart(new Xwt.ComboBox(), Xwt.BoxMode.Fill);
-			//Content.AddChild(button);
+			var content = new Xwt.VBox();
+			this.Content = content;
+			content.PackStart(button, Xwt.BoxMode.Fill);
+			content.PackStart(new Xwt.RichTextView(), Xwt.BoxMode.Fill);
+			content.PackStart(new Xwt.ComboBox(), Xwt.BoxMode.Fill);
 		}
 	}
 

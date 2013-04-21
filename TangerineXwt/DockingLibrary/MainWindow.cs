@@ -39,11 +39,11 @@ namespace Tangerine
 
 			DockSiteManager = new DockManager(DockingArea) { CentralWidget = DocumentsArea.Notebook	 };
 
-			var panel1 = new DockPanel(DockSiteManager, new DockPanelLayout()) { Title = "Timeline" };
+			var panel1 = new DockPanel(DockSiteManager) { Title = "Timeline" };
 			//DockSiteManager.AddDockPanel(panel1, DockZone.Left);
-			var panel2 = new DockPanel(DockSiteManager, new DockPanelLayout()) { Title = "ActorInspector" };
+			var panel2 = new DockPanel(DockSiteManager) { Title = "ActorInspector" };
 			//DockSiteManager.AddDockPanel(panel2, DockZone.Bottom);
-			var panel3 = new DockPanel(DockSiteManager, new DockPanelLayout()) { Title = "ActorList" };
+			var panel3 = new DockPanel(DockSiteManager) { Title = "ActorList" };
 			//DockSiteManager.AddDockPanel(panel3, DockZone.Right);
 			panel1.Dock(DockZone.Left);
 			panel2.Dock(DockZone.Right);
