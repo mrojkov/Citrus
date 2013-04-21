@@ -64,8 +64,10 @@ namespace XwtPlus.GtkBackend
 		void widget_KeyPressed(object sender, Xwt.KeyEventArgs e)
 		{
 			if (frontend.KeySequence == e.Key.ToString()) {
+				e.Handled = true;
 				frontend.OnTriggered();
 			} else if (frontend.KeySequence == "Backspace" && e.Key == Xwt.Key.BackSpace) {
+				e.Handled = true;
 				frontend.OnTriggered();
 			}
 		}

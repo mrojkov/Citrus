@@ -103,18 +103,22 @@ namespace Tangerine
 			Xwt.Paned paned = null;
 			if (zone == DockZone.Left) {
 				paned = new Xwt.HPaned();
+				paned.BackgroundColor = Colors.ToolPanelBackground;
 				paned.Panel1.Content = site;
 				paned.Panel2.Content = content;
 			} else if (zone == DockZone.Right) {
 				paned = new Xwt.HPaned();
+				paned.BackgroundColor = Colors.ToolPanelBackground;
 				paned.Panel1.Content = content;
 				paned.Panel2.Content = site;
 			} else if (zone == DockZone.Top) {
 				paned = new Xwt.VPaned();
+				paned.BackgroundColor = Colors.ToolPanelBackground;
 				paned.Panel1.Content = site;
 				paned.Panel2.Content = content;
 			} else if (zone == DockZone.Bottom) {
 				paned = new Xwt.VPaned();
+				paned.BackgroundColor = Colors.ToolPanelBackground;
 				paned.Panel1.Content = content;
 				paned.Panel2.Content = site;
 			} else {

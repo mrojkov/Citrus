@@ -195,7 +195,7 @@ namespace Tangerine
 			titleLabel.ButtonPressed += title_ButtonPressed;
 			titleLabel.MouseMoved += title_MouseMoved;
 			contentBox = new Xwt.VBox();
-			contentBox.Margin = new Xwt.WidgetSpacing(4, 0, 4, 4);
+			contentBox.Margin = new Xwt.WidgetSpacing();//4, 0, 4, 4);
 			panelBox = new Xwt.VBox();
 			panelBox.PackStart(titleLabel, Xwt.BoxMode.Fill);
 			panelBox.PackStart(contentBox, Xwt.BoxMode.Expand);

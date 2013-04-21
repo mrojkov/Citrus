@@ -14,7 +14,7 @@ namespace Tangerine.Timeline
 
 		private List<Row> rows = new List<Row>();
 
-		public Xwt.Window Window { get; private set; }
+		public DockPanel DockPanel { get; private set; }
 
 		Xwt.Paned panviewSplitter;
 		Xwt.Paned rollAndGridSplitter;
@@ -32,9 +32,10 @@ namespace Tangerine.Timeline
 
 		private Timeline()
 		{
-			Window = new Xwt.Window() { Title = "Timeline", Size = new Xwt.Size(1000, 300) };
-			Window.Padding = 0;
-			Window.Location = new Xwt.Point(0, 0);
+			DockPanel = new DockPanel(MainWindow.Instance.DockSiteManager);
+			DockPanel.Dock(DockZone.Top);
+			DockPanel.Title = "Timeline";
+
 			rollAndGridSplitter = new Xwt.HPaned();
 			Grid = new Grid();
 			Roll = new Roll();
@@ -60,6 +61,7 @@ namespace Tangerine.Timeline
 			panviewSplitter.Panel2.Content = rollAndGridSplitter;
 
 			Panel = new Xwt.HBox();
+			Panel.Margin = new Xwt.WidgetSpacing();
 			Panel.PackStart(panviewSplitter, Xwt.BoxMode.Expand);
 			Panel.CanGetFocus = true;
 			Panel.ButtonPressed += Box_ButtonPressed;
@@ -71,8 +73,7 @@ namespace Tangerine.Timeline
 			Panview.Canvas.MinHeight = The.Preferences.TimelineDefaultPanviewHeight;
 			Roll.Canvas.MinWidth = The.Preferences.TimelineDefaultRollWidth;
 
-			Window.Content = Panel;
-			Window.Show();
+			DockPanel.Content = Panel;
 			CreateActions();
 		}
 
