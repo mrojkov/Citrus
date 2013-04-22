@@ -92,6 +92,18 @@ namespace Lime
 
 		public override void Render()
 		{
+			var renderer = PrepareRenderer();
+			renderer.Render(GlobalColor, Size, HAlignment, VAlignment);
+		}
+
+		public float MeasureTextHeight()
+		{
+			var renderer = PrepareRenderer();
+			return renderer.MeasureTextHeight(Size.X);
+		}
+
+		private TextRenderer PrepareRenderer()
+		{
 			var renderer = new TextRenderer();
 			// Setup default style(take first one from node list or TextStyle.Default).
 			TextStyle defaultStyle = null;
@@ -120,7 +132,7 @@ namespace Lime
 			// Draw text.
 			Renderer.Transform1 = GlobalMatrix;
 			Renderer.Blending = GlobalBlending;
-			renderer.Render(GlobalColor, Size, HAlignment, VAlignment);
+			return renderer;
 		}
 	}
 
@@ -325,82 +337,10 @@ namespace Lime
 
 		public void Render(Color4 color, Vector2 area, HAlignment hAlign, VAlignment vAlign)
 		{
-			var words = new List<Fragment>();
-			// Split whole text into words. Every whitespace, linebreak, etc. consider to be separate word.
-			for (int i = 0; i < fragments.Count; i++) {
-				var word = fragments[i];
-				int curr = word.Start;
-				int start = word.Start;
-				int length = word.Length;
-				if (length == 0) {
-					word.IsTagBegin = true;
-					words.Add(word);
-				} else {
-					bool isTagBegin = true;
-					while (curr < length) {
-						bool lineBreak = false;
-						if (word.Text[curr] <= ' ') {
-							if (word.Text[curr] == '\n') {
-								lineBreak = true;
-							}
-							curr++;
-						} else {
-							while (curr < length && word.Text[curr] > ' ') {
-								curr++;
-							}
-						}
-						word.Start = start;
-						word.Length = curr - start;
-						word.LineBreak = lineBreak;
-						word.IsTagBegin = isTagBegin;
-						words.Add(word);
-						start = curr;
-						isTagBegin = false;
-					}
-				}
-			}
-			// Calculate words sizes and insert additional spaces to fit by width.
-			float x = 0;
-			float maxWidth = area.X;
-			for (int i = 0; i < words.Count; i++) {
-				Fragment word = words[i];
-				word.Width = CalcWordWidth(word);
-				if (word.LineBreak) {
-					x = 0;
-				}
-				if (x > 0 && x + word.Width > maxWidth) {
-					x = word.Width;
-					word.X = 0;
-					word.LineBreak = true;
-				} else {
-					word.X = x;
-					x += word.Width;
-				}
-				words[i] = word;
-			}
-			// Calculate word count for every string.
-			var lines = new List<int>();
-			float totalHeight = 0;
-			float lineHeight = 0;
-			int c = 0;
-			foreach (Fragment word in words) {
-				TextStyle style = styles[word.Style];
-				if (word.LineBreak && c > 0) {
-					totalHeight += lineHeight;
-					lineHeight = 0;
-					lines.Add(c);
-					c = 0;
-				}
-				lineHeight = Math.Max(lineHeight, style.Size + style.SpaceAfter);
-				if (word.IsTagBegin) {
-					lineHeight = Math.Max(lineHeight, style.ImageSize.Y + style.SpaceAfter);
-				}
-				c++;
-			}
-			if (c > 0) {
-				lines.Add(c);
-				totalHeight += lineHeight;
-			}
+			List<Fragment> words;
+			List<int> lines;
+			float totalHeight;
+			PrepareWordsAndLines(area.X, out words, out lines, out totalHeight);
 			// Draw all lines.
 			int b = 0;
 			float y = 0;
@@ -475,6 +415,94 @@ namespace Lime
 				}
 				y += maxHeight;
 				b += count;
+			}
+		}
+
+		public float MeasureTextHeight(float maxWidth)
+		{
+			List<Fragment> words;
+			List<int> lines;
+			float totalHeight;
+			PrepareWordsAndLines(maxWidth, out words, out lines, out totalHeight);
+			return totalHeight;
+		}
+
+		private void PrepareWordsAndLines(float maxWidth, out List<Fragment> words, out List<int> lines, out float totalHeight)
+		{
+			words = new List<Fragment>();
+			// Split whole text into words. Every whitespace, linebreak, etc. consider to be separate word.
+			for (int i = 0; i < fragments.Count; i++) {
+				var word = fragments[i];
+				int curr = word.Start;
+				int start = word.Start;
+				int length = word.Length;
+				if (length == 0) {
+					word.IsTagBegin = true;
+					words.Add(word);
+				} else {
+					bool isTagBegin = true;
+					while (curr < length) {
+						bool lineBreak = false;
+						if (word.Text[curr] <= ' ') {
+							if (word.Text[curr] == '\n') {
+								lineBreak = true;
+							}
+							curr++;
+						} else {
+							while (curr < length && word.Text[curr] > ' ') {
+								curr++;
+							}
+						}
+						word.Start = start;
+						word.Length = curr - start;
+						word.LineBreak = lineBreak;
+						word.IsTagBegin = isTagBegin;
+						words.Add(word);
+						start = curr;
+						isTagBegin = false;
+					}
+				}
+			}
+			// Calculate words sizes and insert additional spaces to fit by width.
+			float x = 0;
+			for (int i = 0; i < words.Count; i++) {
+				Fragment word = words[i];
+				word.Width = CalcWordWidth(word);
+				if (word.LineBreak) {
+					x = 0;
+				}
+				if (x > 0 && x + word.Width > maxWidth) {
+					x = word.Width;
+					word.X = 0;
+					word.LineBreak = true;
+				} else {
+					word.X = x;
+					x += word.Width;
+				}
+				words[i] = word;
+			}
+			// Calculate word count for every string.
+			lines = new List<int>();
+			totalHeight = 0;
+			float lineHeight = 0;
+			int c = 0;
+			foreach (Fragment word in words) {
+				TextStyle style = styles[word.Style];
+				if (word.LineBreak && c > 0) {
+					totalHeight += lineHeight;
+					lineHeight = 0;
+					lines.Add(c);
+					c = 0;
+				}
+				lineHeight = Math.Max(lineHeight, style.Size + style.SpaceAfter);
+				if (word.IsTagBegin) {
+					lineHeight = Math.Max(lineHeight, style.ImageSize.Y + style.SpaceAfter);
+				}
+				c++;
+			}
+			if (c > 0) {
+				lines.Add(c);
+				totalHeight += lineHeight;
 			}
 		}
 	}
