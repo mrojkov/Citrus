@@ -22,6 +22,7 @@ namespace Lime
 			DXT5 = ('D' | ('X' << 8) | ('T' << 16) | ('5' << 24)),
 		}
 
+		[Flags]
 		enum DDSPFFlags
 		{
 			Apha = 0x01,
@@ -48,9 +49,8 @@ namespace Lime
 			UInt32 mipMapCount = reader.ReadUInt32();
 			reader.ReadBytes(11 * 4);
 			// Read pixel format
-			// UInt32 pfSize =
-			reader.ReadUInt32();
-			UInt32 pfFlags = reader.ReadUInt32();
+			reader.ReadUInt32(); // Structure size (32 bytes)
+			DDSPFFlags pfFlags = (DDSPFFlags)reader.ReadUInt32();
 			UInt32 pfFourCC = reader.ReadUInt32();
 			// UInt32 pfRGBBitCount =
 			reader.ReadUInt32();
@@ -74,38 +74,56 @@ namespace Lime
 			// UInt32 reserved2 =
 			reader.ReadUInt32();
 
-			if ((pfFlags & (UInt32)DDSPFFlags.FourCC) == 0) {
-				throw new Lime.Exception("Only compressed DDS textures are supported");
-			}
-
 			SurfaceSize = ImageSize = new Size(width, height);
 			mipMapCount = 1;
-			for (int i = 0; i < mipMapCount; i++) {
+			for (int level = 0; level < mipMapCount; level++) {
 				if (width < 8 || height < 8) {
 					break;
 				}
-				PixelInternalFormat pf;
-				switch ((DDSFourCC)pfFourCC) {
-					case DDSFourCC.DXT1:
-						pf = PixelInternalFormat.CompressedRgbS3tcDxt1Ext;
-						break;
-					case DDSFourCC.DXT3:
-						pf = PixelInternalFormat.CompressedRgbaS3tcDxt3Ext;
-						break;
-					case DDSFourCC.DXT5:
-						pf = PixelInternalFormat.CompressedRgbaS3tcDxt5Ext;
-						break;
-					default:
-						throw new Lime.Exception("Unsupported texture format");
+				if ((pfFlags & DDSPFFlags.RGB) != 0) {
+					ReadRGBAImage(reader, level, width, height, pitchOrLinearSize);
+				} else if ((pfFlags & DDSPFFlags.FourCC) != 0) {
+					ReadCompressedImage(reader, level, width, height, pitchOrLinearSize, pfFourCC);
+				} else {
+					throw new Lime.Exception("Error reading DDS");
 				}
-				byte[] buffer = new byte[pitchOrLinearSize];
-				reader.Read(buffer, 0, buffer.Length);
-				OGL.CompressedTexImage2D(TextureTarget.Texture2D, 0, pf, width, height, 0, buffer.Length, buffer);
 				pitchOrLinearSize /= 4;
 				width /= 2;
 				height /= 2;
 				Renderer.CheckErrors();
 			}
+		}
+
+		private static void ReadRGBAImage(BinaryReader reader, int level, int width, int height, uint pitchOrLinearSize)
+		{
+			if (pitchOrLinearSize != width * 4) {
+				throw new Lime.Exception("Error reading RGBA texture. Must be 32 bit rgba");
+			}
+			byte[] buffer = new byte[pitchOrLinearSize * height];
+			reader.Read(buffer, 0, buffer.Length);
+			OGL.TexImage2D(TextureTarget.Texture2D, level, PixelInternalFormat.Rgba8, width, height, 0, 
+				PixelFormat.Bgra, PixelType.UnsignedByte, buffer);
+		}
+
+		private static void ReadCompressedImage(BinaryReader reader, int level, int width, int height, UInt32 linearSize, UInt32 pfFourCC)
+		{
+			PixelInternalFormat pif;
+			switch ((DDSFourCC)pfFourCC) {
+				case DDSFourCC.DXT1:
+					pif = PixelInternalFormat.CompressedRgbS3tcDxt1Ext;
+					break;
+				case DDSFourCC.DXT3:
+					pif = PixelInternalFormat.CompressedRgbaS3tcDxt3Ext;
+					break;
+				case DDSFourCC.DXT5:
+					pif = PixelInternalFormat.CompressedRgbaS3tcDxt5Ext;
+					break;
+				default:
+					throw new Lime.Exception("Unsupported texture format");
+			}
+			byte[] buffer = new byte[linearSize];
+			reader.Read(buffer, 0, buffer.Length);
+			OGL.CompressedTexImage2D(TextureTarget.Texture2D, level, pif, width, height, 0, buffer.Length, buffer);
 		}
 #endif
 	}

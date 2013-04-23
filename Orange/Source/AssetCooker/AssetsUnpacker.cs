@@ -27,9 +27,9 @@ namespace Orange
 							if (assetDirectory != "") {
 								Directory.CreateDirectory(assetDirectory);
 							}
-							var buffer = new byte[stream.Length];
-							stream.Read(buffer, 0, buffer.Length);
-							File.WriteAllBytes(asset, buffer);
+							using (var file = new FileStream(asset, FileMode.Create)) {
+								stream.CopyTo(file);
+							}
 						}
 					}
 				}

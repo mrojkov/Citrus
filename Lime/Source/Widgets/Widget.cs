@@ -48,7 +48,7 @@ namespace Lime
 		private Color4 color;
 		protected bool renderedToTexture;
 		private Vector2? parentSize;
-		private BareEventHandler clicked;
+		private Action clicked;
 
 		#region Properties
 
@@ -57,7 +57,7 @@ namespace Lime
 			set { throw new NotImplementedException(); }
 		}
 
-		public virtual BareEventHandler Clicked {
+		public virtual Action Clicked {
 			get { return clicked; }
 			set { clicked = value; }
 		}

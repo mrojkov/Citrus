@@ -7,6 +7,7 @@ namespace Tangerine
 {
 	public static class Colors
 	{
+		public static Color SexySash = Color.FromName("#A0A0A0");
 		public static Color ToolPanelBackground = Xwt.Drawing.Color.FromName("#E0E6FF");
 		public static Color Text = Color.FromName("#000000");
 		public static Color SelectedRow = new Color(0.8, 0.8, 0.8);

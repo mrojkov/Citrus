@@ -7,9 +7,9 @@ namespace Tangerine
 {
 	public static class PanedUtils
 	{
-		public static Xwt.Panel GetOwnedPanel(Xwt.Widget widget)
+		public static SexyPanel GetOwnedPanel(Xwt.Widget widget)
 		{
-			var paned = widget.Parent as Xwt.Paned;
+			var paned = widget.Parent as SexyPaned;
 			if (paned != null) {
 				if (paned.Panel1.Content == widget) {
 					return paned.Panel1;

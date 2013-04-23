@@ -30,7 +30,7 @@ namespace Lime
 	[TangerineClass]
 	public class Frame : Widget, IImageCombinerArg
 	{
-		public BareEventHandler Rendered;
+		public Action Rendered;
 
 		private static HashSet<string> processingFiles = new HashSet<string>();
 

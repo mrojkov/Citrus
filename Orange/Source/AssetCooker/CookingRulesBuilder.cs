@@ -14,16 +14,28 @@ namespace Orange
 		ARGB8,
 	}
 
+	public enum DDSFormat
+	{
+		DXTi,
+		ARGB8
+	}
+
 	public struct CookingRules
 	{
 		public bool KumquatLocation;
 		public string TextureAtlas;
 		public bool MipMaps;
 		public PVRFormat PVRFormat;
+		public DDSFormat DDSFormat;
 		public DateTime LastChangeTime;
+
 		public static CookingRules Default = new CookingRules {
-			TextureAtlas = null, MipMaps = false, 
-			PVRFormat = PVRFormat.PVRTC4, LastChangeTime = new DateTime(0)};
+			TextureAtlas = null,
+			MipMaps = false,
+			PVRFormat = PVRFormat.PVRTC4, 
+			DDSFormat = DDSFormat.DXTi,
+			LastChangeTime = new DateTime(0)
+		};
 	}
 	
 	public class CookingRulesBuilder
@@ -73,20 +85,31 @@ namespace Orange
 			return value == "Yes";
 		}
 
+		static DDSFormat ParseDDSFormat(string value)
+		{
+			switch (value) {
+				case "DXTi":
+					return DDSFormat.DXTi;
+				case "ARGB8":
+					return DDSFormat.ARGB8;
+				default:
+					throw new Lime.Exception("Error parsing DDS format. Must be either DXTi or ARGB8");
+			}
+		}
+
 		static PVRFormat ParsePVRFormat(string value)
 		{
-			switch(value)
-			{
-			case "PVRTC4":
-				return PVRFormat.PVRTC4;
-			case "RGBA4":
-				return PVRFormat.RGBA4;
-			case "RGB565":
-				return PVRFormat.RGB565;
-			case "ARGB8":
-				return PVRFormat.ARGB8;
-			default:
-				throw new Lime.Exception("Invalid value. Must be one of: PVRTC4, RGBA4, RGB565, ARGB8");
+			switch (value) {
+				case "PVRTC4":
+					return PVRFormat.PVRTC4;
+				case "RGBA4":
+					return PVRFormat.RGBA4;
+				case "RGB565":
+					return PVRFormat.RGB565;
+				case "ARGB8":
+					return PVRFormat.ARGB8;
+				default:
+					throw new Lime.Exception("Error parsing PVR format. Must be one of: PVRTC4, RGBA4, RGB565, ARGB8");
 			}
 		}
 
@@ -126,6 +149,9 @@ namespace Orange
 							break;
 						case "PVRFormat":
 							rules.PVRFormat = ParsePVRFormat(words[1]);
+							break;
+						case "DDSFormat":
+							rules.DDSFormat = ParseDDSFormat(words[1]);
 							break;
 						case "KumquatLocation":
 							rules.KumquatLocation = ParseBool(words[1]);

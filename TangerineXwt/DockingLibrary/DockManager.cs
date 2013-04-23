@@ -11,7 +11,7 @@ namespace Tangerine
 		public Xwt.Box DockArea { get; private set; }
 		public DockDragManager DragManager { get; private set; }
 
-		private Xwt.Paned panedTree;
+		private SexyPaned panedTree;
 		private List<IDockElement> elements;
 
 		public DockManager(Xwt.Box dockArea)
@@ -51,7 +51,7 @@ namespace Tangerine
 
 		private void RemoveDockSite(DockSite site)
 		{
-			var paned = site.Parent as Xwt.Paned;
+			var paned = site.Parent as SexyPaned;
 			Xwt.Widget content;
 			if (site == paned.Panel1.Content) {
 				content = paned.Panel2.Content;
@@ -63,7 +63,7 @@ namespace Tangerine
 			if (panel != null) {
 				panel.Content = content;
 			} else {
-				panedTree = content as Xwt.Paned;
+				panedTree = content as SexyPaned;
 				DockArea.Clear();
 				DockArea.PackStart(content, Xwt.BoxMode.Expand);
 			}
@@ -79,8 +79,8 @@ namespace Tangerine
 		{
 			if (tree is DockSite) {
 				yield return (DockSite)tree;
-			} else if (tree is Xwt.Paned) {
-				var paned = (Xwt.Paned)tree;
+			} else if (tree is SexyPaned) {
+				var paned = (SexyPaned)tree;
 				foreach (var ds in EnumerateDockSites(paned.Panel1.Content)) {
 					yield return ds;
 				}
@@ -100,24 +100,24 @@ namespace Tangerine
 			}
 			DockArea.Remove(content);
 			var site = new DockSite(zone);
-			Xwt.Paned paned = null;
+			SexyPaned paned = null;
 			if (zone == DockZone.Left) {
-				paned = new Xwt.HPaned();
+				paned = new SexyHPaned();
 				paned.BackgroundColor = Colors.ToolPanelBackground;
 				paned.Panel1.Content = site;
 				paned.Panel2.Content = content;
 			} else if (zone == DockZone.Right) {
-				paned = new Xwt.HPaned();
+				paned = new SexyHPaned();
 				paned.BackgroundColor = Colors.ToolPanelBackground;
 				paned.Panel1.Content = content;
 				paned.Panel2.Content = site;
 			} else if (zone == DockZone.Top) {
-				paned = new Xwt.VPaned();
+				paned = new SexyVPaned();
 				paned.BackgroundColor = Colors.ToolPanelBackground;
 				paned.Panel1.Content = site;
 				paned.Panel2.Content = content;
 			} else if (zone == DockZone.Bottom) {
-				paned = new Xwt.VPaned();
+				paned = new SexyVPaned();
 				paned.BackgroundColor = Colors.ToolPanelBackground;
 				paned.Panel1.Content = content;
 				paned.Panel2.Content = site;

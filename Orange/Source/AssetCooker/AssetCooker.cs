@@ -61,7 +61,7 @@ namespace Orange
 							return false;
 						}
 						string tmpFile = Path.ChangeExtension(srcPath, GetPlatformTextureExtension());
-						TextureConverter.Convert(srcPath, tmpFile, rules.PVRFormat, rules.MipMaps, platform);
+						TextureConverter.Convert(srcPath, tmpFile, rules, platform);
 						assetsBundle.ImportFile(tmpFile, dstPath, reserve: 0, compress: true);
 						File.Delete(tmpFile);
 						return true;
@@ -177,6 +177,7 @@ namespace Orange
 			public bool Allocated;
 			public bool MipMapped;
 			public PVRFormat PVRFormat;
+			public DDSFormat DDSFormat;
 		}
 		
 		string GetAtlasPath(string atlasChain, int index)
@@ -210,9 +211,13 @@ namespace Orange
 						Console.WriteLine(
 							String.Format("WARNING: {0} downscaled to {1}x{2}", srcTexturePath, w, h));
 					}
-					var item = new AtlasItem {Path = Path.ChangeExtension(p.Key, ".atlasPart"), 
-						Pixbuf = pixbuf, MipMapped = p.Value.MipMaps,
-						PVRFormat = p.Value.PVRFormat};
+					var item = new AtlasItem {
+						Path = Path.ChangeExtension(p.Key, ".atlasPart"), 
+						Pixbuf = pixbuf,
+						MipMapped = p.Value.MipMaps,
+						PVRFormat = p.Value.PVRFormat,
+						DDSFormat = p.Value.DDSFormat
+					};
 					items.Add(item);
 				}
 			}
@@ -247,15 +252,20 @@ namespace Orange
 					string atlasPath = GetAtlasPath(atlasChain, atlasId);
 					var atlas = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, true, 8, i, i);
 					atlas.Fill(0);
-					PVRFormat pvrFormat = PVRFormat.PVRTC4;
-					bool mipMapped = false;
+					var rules = new CookingRules() { 
+						MipMaps = false, 
+						PVRFormat = PVRFormat.PVRTC4,
+						DDSFormat = DDSFormat.DXTi
+					};
 					foreach (AtlasItem item in items) {
 						if (!item.Allocated) {
 							continue;
 						}
-						if (item.PVRFormat > pvrFormat)
-							pvrFormat = item.PVRFormat;
-						mipMapped |= item.MipMapped;
+						if (item.PVRFormat > rules.PVRFormat)
+							rules.PVRFormat = item.PVRFormat;
+						if (item.DDSFormat > rules.DDSFormat)
+							rules.DDSFormat = item.DDSFormat;
+						rules.MipMaps |= item.MipMapped;
 						var p = item.Pixbuf;
 						p.CopyArea(0, 0, p.Width, p.Height, atlas, item.AtlasRect.A.X, item.AtlasRect.A.Y);
 						var atlasPart = new Lime.TextureAtlasPart();
@@ -280,7 +290,7 @@ namespace Orange
 						var error = (Gdk.PixbufError)Gdk.Pixbuf.ErrorQuark();
 						throw new Lime.Exception("Can't save '{0}' (error: {1})", inFile, error.ToString()); 
 					}
-					TextureConverter.Convert(inFile, outFile, pvrFormat, mipMapped, platform);
+					TextureConverter.Convert(inFile, outFile, rules, platform);
 					assetsBundle.ImportFile(outFile, atlasPath, 0, true);
 					File.Delete(inFile);
 					File.Delete(outFile);

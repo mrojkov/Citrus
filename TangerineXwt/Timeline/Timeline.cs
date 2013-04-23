@@ -16,8 +16,8 @@ namespace Tangerine.Timeline
 
 		public DockPanel DockPanel { get; private set; }
 
-		Xwt.Paned panviewSplitter;
-		Xwt.Paned rollAndGridSplitter;
+		SexyPaned panviewSplitter;
+		SexyPaned rollAndGridSplitter;
 
 		public int FontHeight { get; private set; }
 
@@ -36,7 +36,7 @@ namespace Tangerine.Timeline
 			DockPanel.Dock(DockZone.Top);
 			DockPanel.Title = "Timeline";
 
-			rollAndGridSplitter = new Xwt.HPaned();
+			rollAndGridSplitter = new SexyHPaned();
 			Grid = new Grid();
 			Roll = new Roll();
 			Panview = new Panview();
@@ -55,9 +55,9 @@ namespace Tangerine.Timeline
 			rollAndGridSplitter.Panel1.Content = toolbarAndRowBox;
 			rollAndGridSplitter.Panel2.Content = rulerAndGridBox;
 
-			panviewSplitter = new Xwt.VPaned();
+			panviewSplitter = new SexyVPaned();
 			panviewSplitter.Panel1.Content = Panview.Canvas;
-			panviewSplitter.Panel1.Shrink = true;
+			//panviewSplitter.Panel1.Shrink = true;
 			panviewSplitter.Panel2.Content = rollAndGridSplitter;
 
 			Panel = new Xwt.HBox();

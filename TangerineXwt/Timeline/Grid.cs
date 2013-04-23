@@ -23,11 +23,18 @@ namespace Tangerine.Timeline
 		{
 			Canvas = new CustomCanvas();
 			Canvas.Drawn += Grid_Drawn;
+			Canvas.MouseMoved += Canvas_MouseMoved;
 			//Paint += this_Paint;
 			//this.MouseMove += this_MouseMove;
 			//this.MousePress += this_MousePress;
 			//this.MouseRelease += this_MouseRelease;
 			//CreateScrollTimer();
+		}
+
+		void Canvas_MouseMoved(object sender, Xwt.MouseMovedEventArgs e)
+		{
+			Console.WriteLine("Grid move {0}", e.X);
+			//e.Handled = true;
 		}
 
 		void Grid_Drawn(Xwt.Drawing.Context ctx, Xwt.Rectangle dirtyRect)

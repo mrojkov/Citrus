@@ -13,10 +13,10 @@ namespace Lime
 		[ProtoMember(2)]
 		public bool Enabled { get; set; }
 
-		public override BareEventHandler Clicked { get; set; }
+		public override Action Clicked { get; set; }
 
 		private SimpleText textPresenter;
-		private BareEventHandler StateHandler;
+		private Action StateHandler;
 		private bool wasClicked;
 
 		public Button()
@@ -112,7 +112,7 @@ namespace Lime
 			}
 		}
 
-		void RunAnimationWithStopHandler(string name, BareEventHandler onStop)
+		void RunAnimationWithStopHandler(string name, Action onStop)
 		{
 			if (TryRunAnimation(name)) {
 				StateHandler = () => {

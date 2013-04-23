@@ -27,9 +27,7 @@ namespace Lime
 	public class Application
 	{
 		public static Application Instance;
-		// FrameSync защищает код Update, Render
-		// Используй этот объект для синхронизации коллбэков (от appstore, gamecenter)
-		public static readonly object MainThreadSync = new object();
+		internal static readonly object MainThreadSync = new object();
 
 		public Application()
 		{
@@ -78,7 +76,9 @@ namespace Lime
 			var appDelegate = UIApplication.SharedApplication.Delegate as AppDelegate;
 			appDelegate.BeginInvokeOnMainThread(() => action());
 #else
-			GameView.Instance.ScheduledActions += action;
+			lock (MainThreadSync) {
+				GameView.Instance.ScheduledActions += action;
+			}
 #endif
 		}
 
@@ -174,8 +174,8 @@ namespace Lime
 		}
 #endif
 
-		public event BareEventHandler Activated;
-		public event BareEventHandler Deactivated;
+		public event Action Activated;
+		public event Action Deactivated;
 
 		internal void OnActivate()
 		{

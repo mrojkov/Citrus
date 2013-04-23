@@ -26,6 +26,6 @@ namespace Kumquat
 			}
 		}
 
-		public BareEventHandler Clicked;
+		public System.Action Clicked;
 	}
 }

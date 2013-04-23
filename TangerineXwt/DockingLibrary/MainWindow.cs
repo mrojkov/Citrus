@@ -7,14 +7,14 @@ namespace Tangerine
 {
 	public class DocumentsArea
 	{
-		public Xwt.Notebook Notebook;
+		public Xwt.Box Notebook;
 
 		public DocumentsArea()
 		{
-			Notebook = new Xwt.Notebook();
-			Notebook.BackgroundColor = Colors.ToolPanelBackground;
-			Notebook.Add(new Xwt.Canvas() { BackgroundColor = Colors.ActiveBackground }, "Document1");
-			Notebook.Add(new Xwt.Canvas() { BackgroundColor = Colors.ActiveBackground }, "Document2");
+			Notebook = new Xwt.HBox();// Notebook();
+			//Notebook.BackgroundColor = Colors.ToolPanelBackground;
+			//Notebook.Add(new Xwt.Canvas() { BackgroundColor = Colors.ActiveBackground }, "Document1");
+			//Notebook.Add(new Xwt.Canvas() { BackgroundColor = Colors.ActiveBackground }, "Document2");
 		}
 	}
 
@@ -35,20 +35,31 @@ namespace Tangerine
 			DocumentsArea = new DocumentsArea();
 			DockingArea.PackStart(DocumentsArea.Notebook, Xwt.BoxMode.Expand);
 			Window.Content = DockingArea;
+			DockingArea.MouseMoved += (a, e) => { Console.WriteLine("Docking area move"); };
 			Window.Show();
 
 			DockSiteManager = new DockManager(DockingArea) { CentralWidget = DocumentsArea.Notebook	 };
 
 			var panel2 = new DockPanel(DockSiteManager) { Title = "ActorInspector" };
 			var panel3 = new DockPanel(DockSiteManager) { Title = "ActorList" };
-			panel2.Dock(DockZone.Right);
-			panel3.Dock(DockZone.Bottom);
-			//DockSiteManager.RemoveDockPanel(panel3);
-			//DockSiteManager.RemoveDockPanel(panel2);
-			//DockSiteManager.RemoveDockPanel(panel1);
-			//DockSiteManager.AddDockPanel(panel2, DockZone.Right);
-			//DockSiteManager.AddDockPanel(panel3, DockZone.Right);
+			//panel2.Dock(DockZone.Right);
+			//panel3.Dock(DockZone.Bottom);
+			CreatePanelSampleContent(panel2);
+			CreatePanelSampleContent(panel3);
 			CreateMenu();
+		}
+
+		private void CreatePanelSampleContent(DockPanel panel)
+		{
+			//Content.MinWidth = 30;
+			//Content.MinHeight = 200;
+			//Content.NaturalWidth = 300;
+			var box1 = new Xwt.VBox();
+			panel.Content = box1;
+			box1.Margin = new Xwt.WidgetSpacing(4, 4, 4, 4);
+			box1.PackStart(new Xwt.RichTextView(), Xwt.BoxMode.Fill);
+			box1.PackStart(new Xwt.Button("Test"), Xwt.BoxMode.Fill);
+			box1.PackStart(new Xwt.ComboBox(), Xwt.BoxMode.Fill);
 		}
 
 		private void CreateMenu()

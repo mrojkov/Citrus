@@ -12,9 +12,9 @@ namespace Tangerine
 	{
 		public static Document Null = new Document(readOnly: true);
 		public static Document Active = Null;
-		public static event Lime.BareEventHandler Changed;
+		public static event System.Action Changed;
 
-		public event Lime.BareEventHandler Closed;
+		public event System.Action Closed;
 		public string Path { get; private set; }
 		public DocumentHistory History = new DocumentHistory();
 		public bool ReadOnly;

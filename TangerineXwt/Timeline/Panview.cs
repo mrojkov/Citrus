@@ -123,7 +123,7 @@ namespace Tangerine.Timeline
 				double top = row.Index * doc.RowHeight;
 				row.View.PaintContent(ctx, top, width);
 			}
-			Console.WriteLine(KeyTransientsPainter.DrawCounter);
+			//Console.WriteLine(KeyTransientsPainter.DrawCounter);
 		}
 	}
 }

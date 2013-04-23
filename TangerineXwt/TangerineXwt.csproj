@@ -64,6 +64,9 @@
     <Compile Include="Core\TimelineRowListExtension.cs" />
     <Compile Include="Core\TimelineRowsCache.cs" />
     <Compile Include="Core\Workspace.cs" />
+    <Compile Include="DockingLibrary\SexyHPaned.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="DockingLibrary\DockDragManager.cs" />
     <Compile Include="DockingLibrary\DockDragSnippet.cs">
       <SubType>Component</SubType>
@@ -74,6 +77,12 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="DockingLibrary\PanedUtils.cs" />
+    <Compile Include="DockingLibrary\SexyPaned.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DockingLibrary\SexyVPaned.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="DocumentView\DocumentCanvas.cs" />
     <Compile Include="DocumentView\DocumentView.cs" />
     <Compile Include="IconCache.cs" />

@@ -20,7 +20,7 @@ namespace Tangerine.Timeline
 			: base(row)
 		{
 			nodeIcon = new Xwt.ImageView(IconCache.Get("Nodes/Scene"));
-			eye = new Xwt.Button(IconCache.Get("Timeline/Dot"));
+			eye = new Xwt.Button(IconCache.Get("Nodes/Scene"));
 			eye.Style = Xwt.ButtonStyle.Flat;
 			eye.CanGetFocus = false;
 			name = new Xwt.Label(this.row.Node.Id);

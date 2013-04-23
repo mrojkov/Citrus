@@ -178,7 +178,6 @@ namespace Tangerine
 			this.dockedLocation = dockedLocation;
 			this.floatingLocation = floatingLocation;
 			CreateDecoration();
-			CreateContent();
 			this.Docked = docked;
 			if (visible) {
 				Show();
@@ -201,19 +200,5 @@ namespace Tangerine
 			panelBox.PackStart(contentBox, Xwt.BoxMode.Expand);
 			panelBox.BackgroundColor = Colors.ToolPanelBackground;
 		}
-
-		private void CreateContent()
-		{
-			//Content.MinWidth = 30;
-			//Content.MinHeight = 200;
-			//Content.NaturalWidth = 300;
-			var button = new Xwt.Button("Test");
-			var content = new Xwt.VBox();
-			this.Content = content;
-			content.PackStart(button, Xwt.BoxMode.Fill);
-			content.PackStart(new Xwt.RichTextView(), Xwt.BoxMode.Fill);
-			content.PackStart(new Xwt.ComboBox(), Xwt.BoxMode.Fill);
-		}
 	}
-
 }

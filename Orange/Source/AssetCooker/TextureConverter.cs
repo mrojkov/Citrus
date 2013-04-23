@@ -66,13 +66,14 @@ namespace Orange
 			}
 		}
 		
-		private static void ToDDSTexture(string srcPath, string dstPath, bool compressed, bool mipMaps)
+		private static void ToDDSTexture(string srcPath, string dstPath, DDSFormat format, bool mipMaps)
 		{
 			int width, height;
 			bool hasAlpha;
 			if (!TextureConverterUtils.GetPngFileInfo(srcPath, out width, out height, out hasAlpha)) {
 				throw new Lime.Exception("Wrong png file: " + srcPath);
 			}
+			bool compressed = format == DDSFormat.DXTi;
 			if (hasAlpha) {
 				var pixbuf = new Gdk.Pixbuf(srcPath);
 				TextureConverterUtils.PremultiplyAlpha(pixbuf, true);
@@ -117,13 +118,13 @@ namespace Orange
 #endif
 		}
 		
-		public static void Convert(string srcPath, string dstPath, PVRFormat pvrFormat, bool mipMaps, TargetPlatform platform)
+		public static void Convert(string srcPath, string dstPath, CookingRules cookingRules, TargetPlatform platform)
 		{
 			if (Path.GetExtension(dstPath) == ".pvr") {
-				ToPVRTexture(srcPath, dstPath, pvrFormat, mipMaps);
+				ToPVRTexture(srcPath, dstPath, cookingRules.PVRFormat, cookingRules.MipMaps);
 			}
 			else if (Path.GetExtension(dstPath) == ".dds") {
-				ToDDSTexture(srcPath, dstPath, true, mipMaps);
+				ToDDSTexture(srcPath, dstPath, cookingRules.DDSFormat, cookingRules.MipMaps);
 			}
 			else {
 				throw new Lime.Exception("Unknown texture format for: {0}", dstPath);

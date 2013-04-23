@@ -38,7 +38,6 @@ namespace Tangerine
 		{
 			if (draggingPanel != null) {
 				DropPanel();
-				dockArea.Cursor = Xwt.CursorType.Arrow;
 			}
 		}
 

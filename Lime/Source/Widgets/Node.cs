@@ -15,7 +15,6 @@ namespace Lime
 		public DateTime OldNodeBarrier = DateTime.Now.AddMinutes(-5);
 	}
 
-	public delegate void BareEventHandler();
 	public delegate void UpdateHandler(float delta);
 
 	[ProtoContract]
@@ -33,7 +32,7 @@ namespace Lime
 		public UpdateHandler Updating;
 		public UpdateHandler Updated;
 
-		public event BareEventHandler AnimationStopped;
+		public event Action AnimationStopped;
 	
 		private static List<Node> nodesToUnlink = new List<Node>();
 

@@ -9,7 +9,7 @@ namespace Lime.PopupMenu
 	{
 		MenuButton button;
 
-		public BareEventHandler Activated;
+		public Action Activated;
 		public Menu Submenu;
 
 		public string Text
@@ -18,13 +18,13 @@ namespace Lime.PopupMenu
 			set { button.Text = value; }
 		}
 
-		public StringItem(string text, BareEventHandler activated = null)
+		public StringItem(string text, Action activated = null)
 		{
 			Activated = activated;
 			Setup(text);
 		}
 
-		public StringItem(string text, string iconPath, BareEventHandler activated = null)
+		public StringItem(string text, string iconPath, Action activated = null)
 		{
 			Activated = activated;
 			Setup(text);

@@ -10,7 +10,7 @@ namespace Lime.PopupMenu
 	{
 		RoundedRectangle rectangle = new RoundedRectangle();
 
-		public event BareEventHandler Hidden;
+		public event Action Hidden;
 		public Frame Frame = new Frame() { Tag = "$PopupMenu.cs" };
 		List<MenuItem> items = new List<MenuItem>();
 		int layer;
