@@ -6,6 +6,10 @@ using Lime;
 
 namespace Tangerine.Timeline
 {
+#if !SEXY_PANED
+	using SexyPaned = Xwt.Paned;
+#endif
+
 	public class Timeline
 	{
 		Document doc { get { return The.Document; } }

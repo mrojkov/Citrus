@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Tangerine
 {
+#if SEXY_PANEL
 	public class SexyPanel
 	{
 		Xwt.IContainerEventSink<SexyPanel> parent;
@@ -67,7 +68,7 @@ namespace Tangerine
 			if (newWidget != null) {
 				this.AddChild(newWidget);
 			}
-			RefreshMinExtension();
+			RefreshMinSize();
 		}
 
 		protected void SetWindowCursor(Xwt.CursorType cursor)
@@ -75,8 +76,8 @@ namespace Tangerine
 			(this.ParentWindow as Xwt.Window).Content.Cursor = cursor;
 		}
 
-		protected abstract void RefreshMinExtension();
+		protected abstract void RefreshMinSize();
 		protected abstract void SetPosition(double value);
 	}
-
+#endif
 }

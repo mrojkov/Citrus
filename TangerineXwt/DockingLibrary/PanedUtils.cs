@@ -5,6 +5,11 @@ using System.Text;
 
 namespace Tangerine
 {
+#if !SEXY_PANED
+	using SexyPanel = Xwt.Panel;
+	using SexyPaned = Xwt.Paned;
+#endif
+
 	public static class PanedUtils
 	{
 		public static SexyPanel GetOwnedPanel(Xwt.Widget widget)

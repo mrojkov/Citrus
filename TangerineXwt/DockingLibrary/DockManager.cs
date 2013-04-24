@@ -5,6 +5,10 @@ using System.Text;
 
 namespace Tangerine
 {
+#if !SEXY_PANED
+	using SexyPaned = Xwt.Paned;
+#endif
+
 	public class DockManager
 	{
 		public Xwt.Widget CentralWidget { get; set; }

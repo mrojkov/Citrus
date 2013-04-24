@@ -344,6 +344,12 @@ namespace Lime
 			return Find<T>(string.Format(format, args));
 		}
 
+		public bool TryFind<T>(string id, out T node) where T : Node
+		{
+			node = TryFindNode(id) as T;
+			return node != null;
+		}
+
 		public T TryFind<T>(string id) where T : Node
 		{
 			return TryFindNode(id) as T;

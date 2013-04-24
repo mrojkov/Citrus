@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Tangerine
 {
+#if SEXY_PANED
 	public class SexyHPaned : SexyPaned
 	{
 		public SexyHPaned()
@@ -15,18 +16,27 @@ namespace Tangerine
 			this.ButtonReleased += this_ButtonReleased;
 		}
 
-		protected override void RefreshMinExtension()
+		protected override void RefreshMinSize()
 		{
-			double w = GetPanelPreferredWidth(0) + GetPanelPreferredWidth(1);
+			double w = GetPanelMinWidth(0) + GetPanelMinWidth(1);
 			this.MinHeight = Math.Max(dragBandWidth, w);
 		}
 
-		double GetPanelPreferredWidth(int index)
+		private double ClampPosition(double position)
+		{
+			double result = Math.Max(position, GetPanelMinWidth(0));
+			result = Math.Min(result, Size.Width - GetPanelMinWidth(1));
+			result = Math.Min(Math.Max(result, 0), Size.Width);
+			result = Math.Round(result);
+			return result;
+		}
+
+		double GetPanelMinWidth(int index)
 		{
 			var p = panels[index].Content;
 			if (p != null) {
 				p.Surface.Reallocate();
-				return p.Surface.GetPreferredWidth().NaturalSize;
+				return p.Surface.GetPreferredWidth().MinSize;
 			} else {
 				return 0;
 			}
@@ -34,19 +44,16 @@ namespace Tangerine
 
 		protected override void SetPosition(double value)
 		{
-			position = Math.Max(value, GetPanelPreferredWidth(0));
-			position = Math.Min(position, Size.Width - GetPanelPreferredWidth(1));
-			position = Math.Min(Math.Max(position, 0), Size.Width);
-			position = Math.Round(position);
+			position = value;
 			if (Panel1.Content != null) {
-				var b1 = new Xwt.Rectangle(0, 0, Position, Size.Height);
+				var b1 = new Xwt.Rectangle(0, 0, ClampPosition(value), Size.Height);
 				this.SetChildBounds(Panel1.Content, b1);
 			}
 			if (Panel2.Content != null) {
-				var b2 = new Xwt.Rectangle(Position + 1, 0, Size.Width - Position - 1, Size.Height);
+				var b2 = new Xwt.Rectangle(ClampPosition(Position) + 1, 0, Size.Width - ClampPosition(value) - 1, Size.Height);
 				this.SetChildBounds(Panel2.Content, b2);
 			}
-			RefreshMinExtension();
+			RefreshMinSize();
 			this.QueueDraw();
 		}
 
@@ -60,7 +67,7 @@ namespace Tangerine
 
 		void this_ButtonPressed(object sender, Xwt.ButtonEventArgs e)
 		{
-			if (Math.Abs(e.X - Position) < dragBandWidth) {
+			if (Math.Abs(e.X - ClampPosition(Position)) < dragBandWidth) {
 				dragging = true;
 				e.Handled = true;
 			}
@@ -70,11 +77,14 @@ namespace Tangerine
 
 		void this_MouseMoved(object sender, Xwt.MouseMovedEventArgs e)
 		{
+			if (!XwtPlus.Utils.Instance.GetPointerButtonState(Xwt.PointerButton.Left)) {
+				dragging = false;
+			}
 			if (dragging) {
-				Position = e.X;
+				Position = ClampPosition(e.X);
 				e.Handled = true;
 			} else {
-				if (Math.Abs(e.X - Position) < dragBandWidth) {
+				if (Math.Abs(e.X - ClampPosition(Position)) < dragBandWidth) {
 					e.Handled = true;
 					overDragBand = true;
 					SetWindowCursor(Xwt.CursorType.ResizeLeftRight);
@@ -85,19 +95,19 @@ namespace Tangerine
 			}
 		}
 
-		Xwt.Size previousSize;
+		Xwt.Size lastSize;
 
 		void this_BoundsChanged(object sender, EventArgs e)
 		{
-			if (previousSize.IsZero || previousSize == new Xwt.Size(1, 1)) {
+			if (lastSize.IsZero || lastSize == new Xwt.Size(1, 1)) {
 				if (Size != new Xwt.Size(1, 1)) {
 					Position = Math.Round(Size.Width / 2);
-					previousSize = Size;
+					lastSize = Size;
 				}
 			} else {
-				double p = Position / previousSize.Width;
+				double p = Position / lastSize.Width;
 				Position = Size.Width * p;
-				previousSize = Size;
+				lastSize = Size;
 			}
 		}
 
@@ -112,9 +122,14 @@ namespace Tangerine
 			ctx.Translate(0.5, 0.5);
 			ctx.SetLineWidth(1);
 			ctx.SetColor(Colors.SexySash);
-			ctx.MoveTo(Position, 0);
-			ctx.LineTo(Position, this.Size.Height);
+			ctx.MoveTo(ClampPosition(position), 0);
+			ctx.LineTo(ClampPosition(position), this.Size.Height);
 			ctx.Stroke();
 		}
 	}
+#else
+	public class SexyHPaned : Xwt.HPaned
+	{
+	}
+#endif
 }
