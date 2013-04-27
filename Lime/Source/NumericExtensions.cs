@@ -12,6 +12,16 @@ namespace Lime
 			return Mathf.Wrap(x, lowerBound, upperBound);
 		}
 
+		public static float Abs(this float x)
+		{
+			return Math.Abs(x);
+		}
+
+		public static float Sign(this float x)
+		{
+			return Math.Sign(x);
+		}
+
 		public static float Wrap360(this float x)
 		{
 			return Mathf.Wrap360(x);
