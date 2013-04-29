@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 2012 for Windows Desktop
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orange.Win", "Orange.Win.csproj", "{6F0C1A51-492A-4E6E-B302-E212D441EBF3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.Win", "..\Lime\Lime.Win.csproj", "{FC2DE6C9-641A-4230-8D29-EA4035CD8708}"
@@ -53,6 +53,7 @@ Global
 		{538E41E4-725C-4521-BCF3-A5591A1A3AFD}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{538E41E4-725C-4521-BCF3-A5591A1A3AFD}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{538E41E4-725C-4521-BCF3-A5591A1A3AFD}.Release|x86.ActiveCfg = Release|Any CPU
+		{538E41E4-725C-4521-BCF3-A5591A1A3AFD}.Release|x86.Build.0 = Release|Any CPU
 		{09EDE517-07B3-42E0-A65C-4943900C240B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{09EDE517-07B3-42E0-A65C-4943900C240B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09EDE517-07B3-42E0-A65C-4943900C240B}.Debug|Mixed Platforms.ActiveCfg = Debug|x86

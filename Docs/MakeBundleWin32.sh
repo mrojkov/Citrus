@@ -25,6 +25,7 @@ $MONO/bin/mkbundle $GAME.exe $ASSEMBLIES --deps -o $OUTPUT_DIR/$GAME.exe
 
 # Copy mono-2.0.dll here since Output.exe depends on it.
 cp $MONO/bin/mono-2.0.dll ./$OUTPUT_DIR
+cp $MONO/bin/MonoPosixHelper.dll ./$OUTPUT_DIR
 cp ./wrap_oal.dll ./$OUTPUT_DIR
 cp ./OpenAL32.dll ./$OUTPUT_DIR
 cp ./Data.Desktop ./$OUTPUT_DIR

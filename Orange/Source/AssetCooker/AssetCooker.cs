@@ -291,7 +291,7 @@ namespace Orange
 						throw new Lime.Exception("Can't save '{0}' (error: {1})", inFile, error.ToString()); 
 					}
 					TextureConverter.Convert(inFile, outFile, rules, platform);
-					assetsBundle.ImportFile(outFile, atlasPath, 0, true);
+					assetsBundle.ImportFile(outFile, atlasPath, 0, compress: true);
 					File.Delete(inFile);
 					File.Delete(outFile);
 					items.RemoveAll(x => x.Allocated);
