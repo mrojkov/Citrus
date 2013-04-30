@@ -61,6 +61,13 @@ namespace Lime
 			}
 		}
 
+		public void LoadImage(byte[] data)
+		{
+			using (var stream = new MemoryStream(data)) {
+				LoadImage(stream);
+			}
+		}
+
 		public void LoadImage(Stream stream)
 		{
 			// Discard current texture
