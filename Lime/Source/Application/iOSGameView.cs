@@ -65,7 +65,6 @@ namespace Lime
 		protected override void ConfigureLayer(CAEAGLLayer eaglLayer)
 		{
 			eaglLayer.Opaque = true;
-
 			// Grisha: support retina displays
 			// read
 			// http://stackoverflow.com/questions/4884176/retina-display-image-quality-problem/9644622
@@ -141,6 +140,9 @@ namespace Lime
 
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
+			if (!Application.Instance.Active) {
+				return;
+			}
 			lock (Application.MainThreadSync) {
 				MakeCurrent();
 				Application.Instance.OnRenderFrame();

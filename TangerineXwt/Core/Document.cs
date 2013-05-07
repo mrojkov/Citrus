@@ -24,14 +24,30 @@ namespace Tangerine
 
 		public Document(string path)
 		{
+			RootNode = new Lime.Frame();
 			Path = path;
-			ReadOnly = IsFileReadonly(path);
+			//ReadOnly = IsFileReadonly(path);
 			Container = RootNode;
 			Active = this;
-			RootNode = Lime.Serialization.ReadObjectFromFile<Lime.Node>(path);
+			GenerateDocumentSampleContent();
+			//RootNode = Lime.Serialization.ReadObjectFromFile<Lime.Node>(path);
 			RootNode.AssignMissedGuids();
 			Container = RootNode;
 			View = new DocumentView(this);
+		}
+
+		void GenerateDocumentSampleContent()
+		{
+			for (int i = 1; i < 10; i++) {
+				var img = new Lime.Frame() { Id = "Image " + i };
+				var pos = img.Animators ["Position"];
+				var scale = img.Animators ["Scale"];
+				for (int j = 0; j < 10; j++) {
+					pos.Add (new Lime.KeyFrame() { Frame = j * 10, Value = new Lime.Vector2(0, j) });
+					//scale[j * 10 + 5] = new Lime.KeyFrame() { Value = new Lime.Vector2(1, 1) };
+				}
+				RootNode.AddNode (img);
+			}
 		}
 
 		private static bool IsFileReadonly(string path)

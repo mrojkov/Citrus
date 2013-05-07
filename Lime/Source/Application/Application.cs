@@ -110,6 +110,8 @@ namespace Lime
 			GameView.Instance.ShowOnscreenKeyboard(show, text);
 		}
 
+		public bool Active { get; internal set; }
+
 		public bool FullScreen { get { return true; } set {} }
 		public float FrameRate { get { return GameView.Instance.FrameRate; } }
 
@@ -177,14 +179,14 @@ namespace Lime
 		public event Action Activated;
 		public event Action Deactivated;
 
-		internal void OnActivate()
+		public virtual void OnActivate()
 		{
 			if (Activated != null) {
 				Activated();
 			}
 		}
 
-		internal void OnDeactivate()
+		public virtual void OnDeactivate()
 		{
 			if (Deactivated != null) {
 				Deactivated();
@@ -192,8 +194,6 @@ namespace Lime
 		}
 
 		public virtual void OnCreate() {}
-		public virtual void OnGLCreate() {}
-		public virtual void OnGLDestroy() {}
 		public virtual void OnUpdateFrame(int delta) {}
 		public virtual void OnRenderFrame() {}
 		public virtual void OnDeviceRotated() {}

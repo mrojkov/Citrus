@@ -11,6 +11,8 @@
     <AssemblyName>XwtPlus.WPF</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <ProductVersion>12.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -51,15 +53,15 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\3rdParty\xwt\Xwt.WPF\Xwt.WPF.csproj">
-      <Project>{c93d746e-1586-4d4f-b411-bf5a966e6a08}</Project>
+      <Project>{C93D746E-1586-4D4F-B411-BF5A966E6A08}</Project>
       <Name>Xwt.WPF</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\3rdParty\xwt\Xwt\Xwt.csproj">
-      <Project>{92494904-35fa-4dc9-bde9-3a3e87ac49d3}</Project>
+      <Project>{92494904-35FA-4DC9-BDE9-3A3E87AC49D3}</Project>
       <Name>Xwt</Name>
     </ProjectReference>
     <ProjectReference Include="..\XwtPlus\XwtPlus.csproj">
-      <Project>{887b87fd-0530-4fbf-a375-7a80153ca523}</Project>
+      <Project>{887B87FD-0530-4FBF-A375-7A80153CA523}</Project>
       <Name>XwtPlus</Name>
     </ProjectReference>
   </ItemGroup>

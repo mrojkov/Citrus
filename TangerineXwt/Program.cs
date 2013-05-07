@@ -13,8 +13,13 @@ namespace Tangerine
 		{
 			//Application.Initialize("XwtPlus.WPFBackend.WPFEngine, XwtPlus.WPF, Version=1.00");
 			Application.Initialize("XwtPlus.GtkBackend.GtkEngine, XwtPlus.Gtk, Version=1.00");
-			Workspace.Open("f:/Work/Zzz/Kill3.citproj");
+			//Application.Initialize(ToolkitType.Wpf);
+			//Workspace.Open("f:/Work/Zzz/Kill3.citproj");
+			//The.Workspace.OpenDocument("f:/Work/Zzz/Data/Game/Alien.tan");
+			//Workspace.Open("f:/Work/Zzz/Kill3.citproj");
+			Workspace.Open("/Users/buzer2010/Desktop/dev/net/Zzz/Main/Kill3.citproj");
 			The.Workspace.OpenDocument("f:/Work/Zzz/Data/Game/Alien.tan");
+			//The.Workspace.OpenDocument("/Users/buzer2010/Desktop/dev/net/Zzz/Main/Data/Game/Alien.tan");
 			//The.Workspace.OpenDocument("f:/Work/Zzz/Data/Game/Levels/C_Bridge/Bridge02.tan");
 			var mainWindow = new MainWindow();
 			ShowTimeline();

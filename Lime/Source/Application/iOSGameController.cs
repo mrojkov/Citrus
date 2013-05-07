@@ -23,6 +23,7 @@ namespace Lime
 			base.View = new GameView();
 			UIAccelerometer.SharedAccelerometer.UpdateInterval = 0.05;
 			UIAccelerometer.SharedAccelerometer.Acceleration += OnAcceleration;
+			View.Run();
 		}
 
 		public new GameView View { get { return (GameView)base.View; } }
@@ -31,22 +32,6 @@ namespace Lime
 		{
 			Input.Acceleration = new Vector3((float)e.Acceleration.X,
 				(float)e.Acceleration.Y, (float)e.Acceleration.Z);
-		}
-
-		public void Activate()
-		{
-			View.Run();
-			Application.Instance.OnActivate();
-		}
-
-		public void Deactivate()
-		{
-			// Send signal of dectivation to gamelogic and do last update & render.
-			// So, game may show pause dialog here.
-			Application.Instance.OnDeactivate();
-			View.UpdateFrame();
-			View.RenderFrame();
-			View.Stop();
 		}
 
 		public static System.Drawing.PointF GetTouchLocationInView(UITouch touch, UIView view)

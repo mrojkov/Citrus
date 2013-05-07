@@ -11,6 +11,8 @@ namespace XwtPlus.GtkBackend
 		{
 		}
 
+		private Gdk.ModifierType prevPointerModifiers;
+
 		public Xwt.Point GetPointerPosition()
 		{
 			int x, y;
@@ -20,15 +22,22 @@ namespace XwtPlus.GtkBackend
 			return new Xwt.Point(x, y);
 		}
 
+		private Gdk.ModifierType prevPointerButtonsState;
+
 		public bool GetPointerButtonState(Xwt.PointerButton button)
 		{
 			int x, y;
-			Gdk.ModifierType m;
-			Gdk.Display.Default.GetPointer(out x, out y, out m);
-			//var screenWindow = Gdk.Screen.Default.RootWindow;
-			// screenWindow.GetPointer(out x, out y, out m);
+			Gdk.ModifierType pointerModifiers;
+			Gdk.Display.Default.GetPointer(out x, out y, out pointerModifiers);
+			// WTF? sometimes m contains this magic value on Mac
+			if ((int)pointerModifiers == 8192) {
+				return true;
+				//pointerModifiers = prevPointerModifiers;
+			}// else {
+			//	prevPointerModifiers = pointerModifiers;
+			//}
 			if (button == Xwt.PointerButton.Left) {
-				return (m & Gdk.ModifierType.Button1Mask) != 0;
+				return (pointerModifiers & Gdk.ModifierType.Button1Mask) != 0;
 			} else {
 				throw new NotImplementedException();
 			}

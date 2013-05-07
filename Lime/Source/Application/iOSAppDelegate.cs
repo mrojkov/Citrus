@@ -88,19 +88,20 @@ namespace Lime
 
 		public override void OnActivated(UIApplication application)
 		{
+			Application.Instance.Active = true;
 			AudioSystem.Active = true;
-			GameController.Activate();
-			Application.Instance.OnGLCreate();
+			Application.Instance.OnActivate();
 		}
 
 		public override void OnResignActivation(UIApplication application)
 		{
+			// http://developer.apple.com/library/ios/#documentation/3DDrawing/Conceptual/OpenGLES_ProgrammingGuide/ImplementingaMultitasking-awareOpenGLESApplication/ImplementingaMultitasking-awareOpenGLESApplication.html#//apple_ref/doc/uid/TP40008793-CH5
 			AudioSystem.Active = false;
-			// Important: MonoTouch destroys OpenGL context on application hiding.
-			// So, we must destroy all OpenGL objects.
-			GameController.Deactivate();
-			Lime.TexturePool.Instance.DiscardAllTextures();
-			Application.Instance.OnGLDestroy();
+			Application.Instance.OnDeactivate();
+			GameController.Instance.View.RenderFrame();
+			OpenTK.Graphics.ES11.GL.Finish();
+			TexturePool.Instance.DiscardUnusedTextures(5);
+			Application.Instance.Active = false;
 		}
 
 		// This method is invoked when the application has loaded its UI and is ready to run

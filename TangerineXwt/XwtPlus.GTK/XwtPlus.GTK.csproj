@@ -11,6 +11,8 @@
     <AssemblyName>XwtPlus.GTK</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <ProductVersion>12.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -52,15 +54,15 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\3rdParty\xwt\Xwt.Gtk\Xwt.Gtk.csproj">
-      <Project>{c3887a93-b2bd-4097-8e2f-3a063eff32fd}</Project>
+      <Project>{C3887A93-B2BD-4097-8E2F-3A063EFF32FD}</Project>
       <Name>Xwt.Gtk</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\3rdParty\xwt\Xwt\Xwt.csproj">
-      <Project>{92494904-35fa-4dc9-bde9-3a3e87ac49d3}</Project>
+      <Project>{92494904-35FA-4DC9-BDE9-3A3E87AC49D3}</Project>
       <Name>Xwt</Name>
     </ProjectReference>
     <ProjectReference Include="..\XwtPlus\XwtPlus.csproj">
-      <Project>{887b87fd-0530-4fbf-a375-7a80153ca523}</Project>
+      <Project>{887B87FD-0530-4FBF-A375-7A80153CA523}</Project>
       <Name>XwtPlus</Name>
     </ProjectReference>
   </ItemGroup>

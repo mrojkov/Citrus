@@ -27,7 +27,7 @@ namespace Lime
 			this.Mouse.Move += HandleMouseMove;
 
 			// Как узнать разрешение текущего экрана без Windows Forms?
-            Size screenSize = new Size(1280, 1024);
+			Size screenSize = new Size(1280, 1024);
 
 			if (CheckFullscreenArg(args)) {
 				this.WindowState = OpenTK.WindowState.Fullscreen;

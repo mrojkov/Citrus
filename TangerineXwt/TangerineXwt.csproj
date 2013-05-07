@@ -11,6 +11,8 @@
     <AssemblyName>TangerineXwt</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <ProductVersion>12.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -31,9 +33,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="protobuf-net">
       <HintPath>..\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
@@ -42,7 +41,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -131,36 +129,32 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\3rdParty\xwt\Xwt.Gtk\Xwt.Gtk.csproj">
-      <Project>{c3887a93-b2bd-4097-8e2f-3a063eff32fd}</Project>
+      <Project>{C3887A93-B2BD-4097-8E2F-3A063EFF32FD}</Project>
       <Name>Xwt.Gtk</Name>
     </ProjectReference>
-    <ProjectReference Include="..\3rdParty\xwt\Xwt.WPF\Xwt.WPF.csproj">
-      <Project>{c93d746e-1586-4d4f-b411-bf5a966e6a08}</Project>
-      <Name>Xwt.WPF</Name>
-    </ProjectReference>
     <ProjectReference Include="..\3rdParty\xwt\Xwt\Xwt.csproj">
-      <Project>{92494904-35fa-4dc9-bde9-3a3e87ac49d3}</Project>
+      <Project>{92494904-35FA-4DC9-BDE9-3A3E87AC49D3}</Project>
       <Name>Xwt</Name>
     </ProjectReference>
     <ProjectReference Include="..\Lemon\Lemon.Win.csproj">
-      <Project>{538e41e4-725c-4521-bcf3-a5591a1a3afd}</Project>
+      <Project>{538E41E4-725C-4521-BCF3-A5591A1A3AFD}</Project>
       <Name>Lemon.Win</Name>
     </ProjectReference>
     <ProjectReference Include="..\Lime\Lime.Win.csproj">
-      <Project>{fc2de6c9-641a-4230-8d29-ea4035cd8708}</Project>
+      <Project>{FC2DE6C9-641A-4230-8D29-EA4035CD8708}</Project>
       <Name>Lime.Win</Name>
     </ProjectReference>
     <ProjectReference Include="XwtPlus.Gtk\XwtPlus.Gtk.csproj">
-      <Project>{9ee5c401-17dd-4ac1-978b-001b57af1f31}</Project>
+      <Project>{9EE5C401-17DD-4AC1-978B-001B57AF1F31}</Project>
       <Name>XwtPlus.Gtk</Name>
     </ProjectReference>
-    <ProjectReference Include="XwtPlus.WPF\XwtPlus.WPF.csproj">
-      <Project>{1726664c-aea0-4d71-a2f5-7316f1497b43}</Project>
-      <Name>XwtPlus.WPF</Name>
-    </ProjectReference>
     <ProjectReference Include="XwtPlus\XwtPlus.csproj">
-      <Project>{887b87fd-0530-4fbf-a375-7a80153ca523}</Project>
+      <Project>{887B87FD-0530-4FBF-A375-7A80153CA523}</Project>
       <Name>XwtPlus</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\3rdParty\xwt\Xwt.Mac\Xwt.Mac.csproj">
+      <Project>{B7C1673E-5124-4BE5-8D21-EC8B12F85B6B}</Project>
+      <Name>Xwt.Mac</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
