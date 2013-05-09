@@ -132,6 +132,8 @@ namespace Lime
 			Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
 
 			Application.Instance.OnCreate();
+
+			GameView.Instance.Run();
 			return true;
 		}
 	}

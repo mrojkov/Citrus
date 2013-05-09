@@ -23,7 +23,6 @@ namespace Lime
 			base.View = new GameView();
 			UIAccelerometer.SharedAccelerometer.UpdateInterval = 0.05;
 			UIAccelerometer.SharedAccelerometer.Acceleration += OnAcceleration;
-			View.Run();
 		}
 
 		public new GameView View { get { return (GameView)base.View; } }
