@@ -75,6 +75,8 @@ namespace Lime
 #if iOS
 			var appDelegate = UIApplication.SharedApplication.Delegate as AppDelegate;
 			appDelegate.BeginInvokeOnMainThread(() => action());
+#elif UNITY
+			throw new NotImplementedException();
 #else
 			lock (MainThreadSync) {
 				GameView.Instance.ScheduledActions += action;
@@ -173,6 +175,32 @@ namespace Lime
 		public Size WindowSize {
 			get { return GameView.Instance.WindowSize; }
 			set { GameView.Instance.WindowSize = value; }
+		}
+#elif UNITY
+		public void Exit()
+		{
+			UnityEngine.Application.Quit();
+		}
+
+		public bool FullScreen
+		{
+			get { return UnityEngine.Screen.fullScreen; }
+			set { UnityEngine.Screen.fullScreen = value; }
+		}
+
+		public bool Active { get; internal set; }
+
+		public float FrameRate { get { return 30; } }
+
+		public DeviceOrientation CurrentDeviceOrientation
+		{
+			get { return DeviceOrientation.LandscapeLeft; }
+		}
+
+		public Size WindowSize
+		{
+			get { return new Size(UnityEngine.Screen.width, UnityEngine.Screen.height); }
+			set { UnityEngine.Screen.SetResolution(value.Width, value.Height, FullScreen); }
 		}
 #endif
 

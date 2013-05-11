@@ -1,5 +1,7 @@
 ﻿using System;
+#if OPENAL
 using OpenTK.Audio.OpenAL;
+#endif
 
 namespace Lime
 {

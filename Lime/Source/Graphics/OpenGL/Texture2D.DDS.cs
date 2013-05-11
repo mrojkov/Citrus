@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if OPENGL || GLES11
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -128,3 +129,4 @@ namespace Lime
 #endif
 	}
 }
+#endif

@@ -1,10 +1,13 @@
 ﻿using System;
 using System.IO;
+#if OPENAL
 using OpenTK.Audio.OpenAL;
+#endif
 using System.Runtime.InteropServices;
 
 namespace Lime
 {
+#if !UNITY
 	public class OggDecoder : IAudioDecoder
 	{
 		Stream stream;
@@ -178,4 +181,5 @@ namespace Lime
 			}
 		}
 	}
+#endif
 }

@@ -1,9 +1,9 @@
-﻿using System;
+﻿#if WIN
+using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Reflection;
+using System.Drawing;
 
-#if WIN
 namespace Lime
 {
 	internal static class WinCursors

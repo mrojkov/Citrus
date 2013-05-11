@@ -22,7 +22,11 @@ namespace Lime
 
 		public override DateTime GetFileLastWriteTime(string path)
 		{
+#if UNITY_WEBPLAYER
+			throw new NotImplementedException();
+#else
 			return File.GetLastWriteTime(Path.Combine(BaseDirectory, path));
+#endif
 		}
 
 		public override void DeleteFile(string path)
@@ -37,10 +41,14 @@ namespace Lime
 
 		public override void ImportFile(string path, Stream stream, int reserve, bool compress)
 		{
+#if UNITY_WEBPLAYER
+			throw new NotImplementedException();
+#else
 			stream.Seek(0, SeekOrigin.Begin);
 			var bytes = new byte[stream.Length];
 			stream.Read(bytes, 0, bytes.Length);
 			File.WriteAllBytes(Path.Combine(BaseDirectory, path), bytes);
+#endif
 		}
 
 		public override string[] EnumerateFiles()

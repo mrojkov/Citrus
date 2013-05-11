@@ -1,6 +1,17 @@
 using System;
+#if OPENAL
 using OpenTK.Audio.OpenAL;
+#endif
 using System.Runtime.InteropServices;
+
+#if !OPENAL
+public enum ALSourceState
+{
+	Initial,
+	Playing,
+	Stopped
+}
+#endif
 
 namespace Lime
 {
@@ -30,6 +41,38 @@ namespace Lime
 		public void Bump() {}
 	}
 
+#if !OPENAL
+	internal class AudioChannel : NullAudioChannel, IDisposable
+	{
+		public AudioChannelGroup Group;
+		public float Priority;
+		public DateTime StartupTime = DateTime.Now;
+		public int Id;
+
+		public AudioChannel(int index)
+		{
+			Id = index;
+		}
+
+		public void Update(float delta)
+		{
+		}
+
+		public Sound Play(IAudioDecoder decoder, bool looping)
+		{
+			return new Sound();
+		}
+
+		public void Pause()
+		{
+		}
+
+		public void Dispose()
+		{
+		}
+	}
+
+#else
 	internal class AudioChannel : IDisposable, IAudioChannel
 	{
 		public const int BufferSize = 1024 * 32;
@@ -41,7 +84,7 @@ namespace Lime
 		public int Id;
 
 		private object streamingSync = new object();
-		public volatile bool streaming;
+		private volatile bool streaming;
 
 		private int source;
 		private float volume = 1;
@@ -272,4 +315,5 @@ namespace Lime
 			}
 		}
 	}
+#endif
 }

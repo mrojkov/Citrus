@@ -51,6 +51,7 @@ namespace Lime
 			A = a;
 		}
 
+#if !UNITY // .NET 3.5 generates ambiguous error
 		public Color4(float r, float g, float b, float a = 1)
 		{
 			ABGR = 0;
@@ -59,6 +60,7 @@ namespace Lime
 			B = (byte)(Mathf.Clamp(b, 0, 1) * 255);
 			A = (byte)(Mathf.Clamp(a, 0, 1) * 255);
 		}
+#endif
 
 		public static Color4 operator *(Color4 lhs, Color4 rhs)
 		{

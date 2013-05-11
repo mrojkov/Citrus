@@ -32,12 +32,20 @@ namespace Lime
 #else
 		public static void Write(string msg)
 		{
+#if UNITY
+			UnityEngine.Debug.Log(msg);
+#else
 			Console.WriteLine(msg);
+#endif
 		}
 
 		public static void Write(string msg, params object[] args)
 		{
+#if UNITY
+			UnityEngine.Debug.Log(string.Format(msg, args));
+#else
 			Console.WriteLine(msg, args);
+#endif
 		}
 #endif
 	}

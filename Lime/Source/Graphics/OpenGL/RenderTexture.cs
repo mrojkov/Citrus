@@ -1,3 +1,4 @@
+#if OPENGL || GLES11
 using System;
 using System.Diagnostics;
 #if iOS
@@ -5,7 +6,7 @@ using OpenTK.Graphics.ES20;
 #elif MAC
 using MonoMac.OpenGL;
 using OGL = MonoMac.OpenGL.GL;
-#else
+#elif OPENGL
 using OpenTK.Graphics.OpenGL;
 #endif
 
@@ -43,7 +44,7 @@ namespace Lime
 			if (GL.CheckFramebufferStatus(All.Framebuffer) != All.FramebufferComplete)
 				throw new Exception("Failed to create render texture. Framebuffer is incomplete.");
 			GL.BindFramebuffer(All.Framebuffer, defaultFramebuffer);
-#else
+#elif OPENGL
 			GL.GenFramebuffers(1, out framebuffer);
 			id = (uint)GL.GenTexture();
 			GL.BindTexture(TextureTarget.Texture2D, id);
@@ -107,9 +108,9 @@ namespace Lime
 		public void SetAsRenderTarget()
 		{
 			Renderer.FlushSpriteBatch();
-#if iOS
+#if GLES11
 			GL.BindFramebuffer(All.Framebuffer, framebuffer);
-#else
+#elif OPENGL
 			GL.BindFramebuffer(FramebufferTarget.FramebufferExt, framebuffer);
 #endif
 		}
@@ -117,9 +118,9 @@ namespace Lime
 		public void RestoreRenderTarget()
 		{
 			Renderer.FlushSpriteBatch();
-#if iOS
+#if GLES11
 			GL.BindFramebuffer(All.Framebuffer, defaultFramebuffer);
-#else
+#elif OPENGL
 			GL.BindFramebuffer(FramebufferTarget.FramebufferExt, 0);
 #endif
 		}
@@ -130,3 +131,4 @@ namespace Lime
 		}
 	}
 }
+#endif

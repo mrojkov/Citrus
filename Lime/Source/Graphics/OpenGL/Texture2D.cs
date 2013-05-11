@@ -1,3 +1,4 @@
+#if OPENGL || GLES11
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -32,7 +33,7 @@ namespace Lime
 					TexturesToDelete.CopyTo(ids);
 #if GLES11
 					GL.DeleteTextures(ids.Length, ids);
-#else
+#elif OPENGL
 					OGL.DeleteTextures(ids.Length, ids);
 #endif
 					TexturesToDelete.Clear();
@@ -83,7 +84,7 @@ namespace Lime
 			GL.TexParameter(All.Texture2D, All.TextureWrapS, (int)All.ClampToEdge);
 			GL.TexParameter(All.Texture2D, All.TextureWrapT, (int)All.ClampToEdge);
 			GL.Hint(All.PerspectiveCorrectionHint, All.Fastest);
-#else
+#elif OPENGL
 			// Generate a new texture
 			id = (uint)OGL.GenTexture();
 			Renderer.SetTexture(id, 0);
@@ -103,7 +104,7 @@ namespace Lime
 				} else {
 					InitWithPngOrJpgBitmap(rewindableStream);
 				}
-#else
+#elif OPENGL
 				int sign = reader.ReadInt32();
 				rewindableStream.Rewind();
 				if (sign == DDSMagic) {
@@ -129,7 +130,7 @@ namespace Lime
 				// Generate a new texture id
 #if GLES11
 				GL.GenTextures(1, ref id);
-#else
+#elif OPENGL
 				id = (uint)OGL.GenTexture();
 #endif
 			}
@@ -142,7 +143,7 @@ namespace Lime
 			GL.Hint(All.PerspectiveCorrectionHint, All.Fastest);
 			GL.TexImage2D(All.Texture2D, 0, (int)All.Rgba, width, height, 0,
 				All.Rgba, All.UnsignedByte, pixels);
-#else
+#elif OPENGL
 			Renderer.SetTexture(id, 0);
 			OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
 			OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
@@ -154,7 +155,7 @@ namespace Lime
 			if (generateMips) {
 #if WIN
 				OGL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
-#else
+#elif OPENGL
 				Console.WriteLine("WARNING: Mipmap generation is not implemented for this platform");
 #endif
 			}
@@ -216,3 +217,4 @@ namespace Lime
 		}
 	}
 }
+#endif

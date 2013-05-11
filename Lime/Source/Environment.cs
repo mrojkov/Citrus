@@ -8,7 +8,7 @@ namespace Lime
 {
 	public static class Environment
 	{
-#if !iOS
+#if !iOS && !UNITY
 		public static void GenerateSerializationAssembly(string assemblyName, params Type[] types)
 		{
 			var model = ProtoBuf.Meta.TypeModel.Create();
@@ -29,6 +29,8 @@ namespace Lime
 #if iOS
 			var nsUrl = new MonoTouch.Foundation.NSUrl(url);
 			MonoTouch.UIKit.UIApplication.SharedApplication.OpenUrl(nsUrl);
+#elif UNITY_WEBPLAYER
+			throw new NotImplementedException();
 #else
 			System.Diagnostics.Process.Start(url);
 #endif
@@ -46,6 +48,9 @@ namespace Lime
 
 		public static string GetDataDirectory(string companyName, string appName, string appVersion)
 		{
+#if UNITY
+			return UnityEngine.Application.persistentDataPath;
+#else
 #if iOS || MAC
 			string path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);
 #else
@@ -58,16 +63,20 @@ namespace Lime
 			}
 			System.IO.Directory.CreateDirectory(path);
 			return path;
+#endif
 		}
 
 		public static Vector2 GetDesktopSize()
 		{
-#if !iOS
-			var device = OpenTK.DisplayDevice.Default;
-			return new Vector2(device.Width, device.Height);
-#else
+#if iOS
 			UIScreen screen = UIScreen.MainScreen;
 			return new Vector2(screen.Bounds.Width, screen.Bounds.Height); 
+#elif UNITY
+			var r = UnityEngine.Screen.currentResolution;
+			return new Vector2(r.width, r.height);
+#else
+			var device = OpenTK.DisplayDevice.Default;
+			return new Vector2(device.Width, device.Height);
 #endif
 		}
 

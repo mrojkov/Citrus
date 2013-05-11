@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+#if OPENAL
 using OpenTK.Audio;
 using OpenTK.Audio.OpenAL;
+#endif
 using System.Threading;
 using System.IO;
 using ProtoBuf;
@@ -19,7 +21,9 @@ namespace Lime
 
 	public static class AudioSystem
 	{
+#if OPENAL
 		static AudioContext context;
+#endif
 		// static XRamExtension xram;
 		static SampleCache soundCache = new SampleCache();
 
@@ -33,6 +37,7 @@ namespace Lime
 
 		public static void Initialize(int numChannels = 16)
 		{
+#if OPENAL
 #if !iOS
 			SilentMode = Application.CheckCommandLineArg("--Silent");
 			if (!SilentMode) {
@@ -40,6 +45,7 @@ namespace Lime
 			}
 #else
 			context = new AudioContext();
+#endif
 #endif
 			if (!HasError()) {
 				// xram = new XRamExtension();
@@ -59,9 +65,11 @@ namespace Lime
 			foreach (var channel in channels) {
 				channel.Dispose();
 			}
+#if OPENAL
 			if (context != null) {
 				context.Dispose();
 			}
+#endif
 		}
 
 		private static long tickCount;
@@ -135,6 +143,7 @@ namespace Lime
 
 		public static void ResumeGroup(AudioChannelGroup group)
 		{
+#if OPENAL
 			if (context != null) {
 				context.MakeCurrent();
 			}
@@ -143,6 +152,7 @@ namespace Lime
 					channel.Resume();
 				}
 			}
+#endif
 		}
 
 		public static void PauseAll()
@@ -156,6 +166,7 @@ namespace Lime
 
 		public static void ResumeAll()
 		{
+#if OPENAL
 			if (context != null) {
 				context.MakeCurrent();
 			}
@@ -164,6 +175,7 @@ namespace Lime
 					channel.Resume();
 				}
 			}
+#endif
 		}
 
 		static Sound LoadSoundToChannel(AudioChannel channel, string path, AudioChannelGroup group, bool looping, float priority)
@@ -261,15 +273,21 @@ namespace Lime
 
 		public static bool HasError()
 		{
+#if OPENAL
 			return AL.GetError() != ALError.NoError;
+#else
+			return false;
+#endif
 		}
 
 		public static void CheckError()
 		{
+#if OPENAL
 			var error = AL.GetError();
 			if (error != ALError.NoError) {
 				throw new Exception("OpenAL error: " + AL.GetErrorString(error));
 			}
+#endif
 		}
 	}
 }

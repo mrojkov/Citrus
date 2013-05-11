@@ -47,8 +47,7 @@ namespace Lime
 
 		public bool IsStubTexture
 		{
-			get
-			{
+			get {
 				core.GetInstance();
 				return core.IsStubTexture;
 			}
@@ -77,6 +76,11 @@ namespace Lime
 		public uint GetHandle()
 		{
 			return core.GetInstance().GetHandle();
+		}
+
+		public UnityEngine.Texture GetUnityTexture()
+		{
+			return core.GetInstance().GetUnityTexture();
 		}
 
 		public void SetAsRenderTarget()
@@ -187,7 +191,7 @@ namespace Lime
 		
 		private bool TryLoadTextureAtlasPart(string path)
 		{
-			if (PackedAssetsBundle.Instance.FileExists(path)) {
+			if (AssetsBundle.Instance.FileExists(path)) {
 				var texParams = TextureAtlasPart.ReadFromBundle(path);
 				instance = new SerializableTexture(texParams.AtlasTexture);
 				UVRect.A = (Vector2)texParams.AtlasRect.A / (Vector2)instance.SurfaceSize;
@@ -200,7 +204,7 @@ namespace Lime
 		
 		private bool TryLoadImage(string path)
 		{
-			if (PackedAssetsBundle.Instance.FileExists(path)) {
+			if (AssetsBundle.Instance.FileExists(path)) {
 				instance = new Texture2D();
 				(instance as Texture2D).LoadImage(path);
 				UVRect.A = Vector2.Zero;
@@ -218,6 +222,8 @@ namespace Lime
 					TryLoadTextureAtlasPart(Path + ".atlasPart") ||
 #if iOS
 					TryLoadImage(Path + ".pvr")
+#elif UNITY
+					TryLoadImage(Path + ".png")
 #else
 					TryLoadImage(Path + ".dds") ||
 					TryLoadImage(Path + ".png")
@@ -270,7 +276,9 @@ namespace Lime
 					target.DiscardIfNotUsed(numCycles);
 				}
 			}
+#if !UNITY
 			Texture2D.DeleteScheduledTextures();
+#endif
 		}
 
 		public void DiscardAllTextures()
@@ -281,7 +289,9 @@ namespace Lime
 					target.Discard();
 				}
 			}
+#if !UNITY
 			Texture2D.DeleteScheduledTextures();
+#endif
 		}
 
 		internal SerializableTextureCore GetSerializableTextureCore(string path)

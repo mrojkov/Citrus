@@ -1,5 +1,7 @@
 ﻿using System;
+#if !UNITY
 using OpenTK.Audio.OpenAL;
+#endif
 using System.IO;
 
 namespace Lime
@@ -29,6 +31,9 @@ namespace Lime
 	{
 		public static IAudioDecoder CreateDecoder(Stream stream)
 		{
+#if UNITY
+			throw new NotImplementedException();
+#else
 			if (WaveIMA4Decoder.IsWaveStream(stream)) {
 				return new WaveIMA4Decoder(stream);
 			} else if (OggDecoder.IsOggStream(stream)) {
@@ -36,6 +41,7 @@ namespace Lime
 			} else {
 				throw new Lime.Exception("Unknown audio format");
 			}
+#endif
 		}
 	};
 }

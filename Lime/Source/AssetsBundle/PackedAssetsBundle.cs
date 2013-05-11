@@ -251,15 +251,12 @@ namespace Lime
 
 		private static Stream DecompressStream(AssetStream stream)
 		{
+#if UNITY
+			throw new NotImplementedException();
+#else
 			var deflateStream = new DeflateStream(stream, CompressionMode.Decompress, false);
 			return deflateStream;
-			//var memStream = new MemoryStream();
-			//using (var deflateStream = new DeflateStream(stream, CompressionMode.Decompress)) {
-			//	deflateStream.CopyTo(memStream);
-			//	memStream.Seek(0, SeekOrigin.Begin);
-			//}
-			//stream.Dispose();
-			//return memStream;
+#endif
 		}
 
 		public override DateTime GetFileLastWriteTime(string path)
@@ -338,6 +335,9 @@ namespace Lime
 
 		private static Stream CompressStream(Stream stream)
 		{
+#if UNITY
+			throw new NotImplementedException();
+#else
 			MemoryStream memStream = new MemoryStream();
 			using (var deflateStream = new DeflateStream(memStream, CompressionMode.Compress, true)) {
 				stream.CopyTo(deflateStream);
@@ -345,6 +345,7 @@ namespace Lime
 			memStream.Seek(0, SeekOrigin.Begin);
 			stream = memStream;
 			return stream;
+#endif
 		}
 
 		private void ReadIndexTable()

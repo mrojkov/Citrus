@@ -5,6 +5,28 @@ using System.Collections.Generic;
 namespace Lime
 {
 	[ProtoContract]
+	public enum HAlignment
+	{
+		[ProtoEnum]
+		Left,
+		[ProtoEnum]
+		Center,
+		[ProtoEnum]
+		Right,
+	}
+
+	[ProtoContract]
+	public enum VAlignment
+	{
+		[ProtoEnum]
+		Top,
+		[ProtoEnum]
+		Center,
+		[ProtoEnum]
+		Bottom,
+	}
+
+	[ProtoContract]
 	public class SimpleText : Widget
 	{
 		[ProtoMember(1)]
