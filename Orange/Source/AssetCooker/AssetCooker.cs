@@ -29,10 +29,13 @@ namespace Orange
 
 		string GetPlatformTextureExtension()
 		{
-			if (platform == TargetPlatform.iOS)
+			if (platform == TargetPlatform.iOS) {
 				return ".pvr";
-			else
+			} else if (platform == TargetPlatform.Unity) {
+				return ".png";
+			} else {
 				return ".dds";
+			}
 		}
 
 		public AssetCooker(CitrusProject project, TargetPlatform platform)
@@ -44,78 +47,107 @@ namespace Orange
 		public void Cook()
 		{
 			cookingRulesMap = CookingRulesBuilder.Build(project.AssetFiles);
-			string bundlePath = Path.ChangeExtension(project.AssetsDirectory, Helpers.GetTargetPlatformString(platform));
-			using (Lime.AssetsBundle.Instance = new Lime.PackedAssetsBundle(bundlePath, Lime.AssetBundleFlags.Writable)) {
-				using (new DirectoryChanger(project.AssetsDirectory)) {
-					Console.WriteLine("------------- Building Game Content -------------");
-					SyncAtlases();
-					SyncDeleted();
-					SyncUpdated(".txt", ".txt", (srcPath, dstPath) => {
-						assetsBundle.ImportFile(srcPath, dstPath, 0);
-						return true;
-					});
-					SyncUpdated(".png", GetPlatformTextureExtension(), (srcPath, dstPath) => {
-						CookingRules rules = cookingRulesMap[Path.ChangeExtension(dstPath, ".png")];
-						if (rules.TextureAtlas != null) {
-							// No need to cache this texture since it is a part of texture atlas.
-							return false;
-						}
+			if (platform == TargetPlatform.Unity) {
+				CookForUnity();
+			} else {
+				string bundlePath = Path.ChangeExtension(project.AssetsDirectory, Helpers.GetTargetPlatformString(platform));
+				using (Lime.AssetsBundle.Instance = new Lime.PackedAssetsBundle(bundlePath, Lime.AssetBundleFlags.Writable)) {
+					CookHelper();
+				}
+			}
+		}
+
+		private void CookForUnity()
+		{
+			string resourcesPath = project.GetUnityResourcesDirectory();
+			if (!System.IO.Directory.Exists(resourcesPath)) {
+				throw new Lime.Exception("Output directory '{0}' doesn't exist", resourcesPath);
+			}
+			using (Lime.AssetsBundle.Instance = new UnityAssetBundle(resourcesPath)) {
+				CookHelper();
+			}
+		}
+
+		private void CookHelper()
+		{
+			using (new DirectoryChanger(project.AssetsDirectory)) {
+				Console.WriteLine("------------- Building Game Content -------------");
+				SyncAtlases();
+				SyncDeleted();
+				SyncUpdated(".txt", ".txt", (srcPath, dstPath) => {
+					assetsBundle.ImportFile(srcPath, dstPath, 0);
+					return true;
+				});
+				SyncUpdated(".png", GetPlatformTextureExtension(), (srcPath, dstPath) => {
+					CookingRules rules = cookingRulesMap[Path.ChangeExtension(dstPath, ".png")];
+					if (rules.TextureAtlas != null) {
+						// No need to cache this texture since it is a part of texture atlas.
+						return false;
+					}
+					if (platform == TargetPlatform.Unity) {
+						assetsBundle.ImportFile(srcPath, dstPath, reserve: 0);
+					} else {
 						string tmpFile = Path.ChangeExtension(srcPath, GetPlatformTextureExtension());
 						TextureConverter.Convert(srcPath, tmpFile, rules, platform);
 						assetsBundle.ImportFile(tmpFile, dstPath, reserve: 0, compress: true);
 						File.Delete(tmpFile);
-						return true;
-					});
-					SyncUpdated(".fnt", ".fnt", (srcPath, dstPath) => {
-						string fontPngFile = Path.ChangeExtension(srcPath, ".png");
-						Lime.Size size;
-						bool hasAlpha;
-						if (!TextureConverterUtils.GetPngFileInfo(fontPngFile, out size.Width, out size.Height, out hasAlpha)) {
-							throw new Lime.Exception("Font doesn't have an appropriate png texture file");
+					}
+					return true;
+				});
+				SyncUpdated(".fnt", ".fnt", (srcPath, dstPath) => {
+					string fontPngFile = Path.ChangeExtension(srcPath, ".png");
+					Lime.Size size;
+					bool hasAlpha;
+					if (!TextureConverterUtils.GetPngFileInfo(fontPngFile, out size.Width, out size.Height, out hasAlpha)) {
+						throw new Lime.Exception("Font doesn't have an appropriate png texture file");
+					}
+					var importer = new HotFontImporter(srcPath);
+					var font = importer.ParseFont(size);
+					for (int i = 0; ; i++) {
+						var texturePath = Path.ChangeExtension(dstPath, null);
+						string index = (i == 0) ? "" : i.ToString("00");
+						string texturePng = Path.Combine(Path.ChangeExtension(srcPath, null) + index + ".png");
+						if (!File.Exists(Path.Combine(texturePng))) {
+							break;
 						}
-						var importer = new HotFontImporter(srcPath);
-						var font = importer.ParseFont(size);
-						for (int i = 0; ; i++) {
-							var texturePath = Path.ChangeExtension(dstPath, null);
-							string index = (i == 0) ? "" : i.ToString("00");
-							string texturePng = Path.Combine(Path.ChangeExtension(srcPath, null) + index + ".png");
-							if (!File.Exists(Path.Combine(texturePng))) {
-								break;
-							}
-							font.Textures.Add(new Lime.SerializableTexture(texturePath + index));
-						}
-						Lime.Serialization.WriteObjectToBundle<Lime.Font>(assetsBundle, dstPath, font);
-						return true;
-					});
-					SyncUpdated(".scene", ".scene", (srcPath, dstPath) => {
-						var importer = new HotSceneImporter(srcPath);
-						var node = importer.ParseNode();
-						Lime.Serialization.WriteObjectToBundle<Lime.Node>(assetsBundle, dstPath, node);
-						return true;
-					});
-					SyncUpdated(".ogg", ".sound", (srcPath, dstPath) => {
-						using (var stream = new FileStream(srcPath, FileMode.Open)) {
-							// All sounds below 100kb size are converted from OGG to Wav/Adpcm
-							if (stream.Length > 100 * 1024) {
-								assetsBundle.ImportFile(dstPath, stream, 0);
-							} else {
-								Console.WriteLine("Converting sound to ADPCM/IMA4 format...");
-								using (var input = new Lime.OggDecoder(stream)) {
-									using (var output = new MemoryStream()) {
-										WaveIMA4Converter.Encode(input, output);
-										output.Seek(0, SeekOrigin.Begin);
-										assetsBundle.ImportFile(dstPath, output, 0);
-									}
+						font.Textures.Add(new Lime.SerializableTexture(texturePath + index));
+					}
+					Lime.Serialization.WriteObjectToBundle<Lime.Font>(assetsBundle, dstPath, font);
+					return true;
+				});
+				SyncUpdated(".scene", ".scene", (srcPath, dstPath) => {
+					var importer = new HotSceneImporter(srcPath);
+					var node = importer.ParseNode();
+					Lime.Serialization.WriteObjectToBundle<Lime.Node>(assetsBundle, dstPath, node);
+					return true;
+				});
+				SyncUpdated(".ogg", ".sound", (srcPath, dstPath) => {
+					using (var stream = new FileStream(srcPath, FileMode.Open)) {
+						// All sounds below 100kb size are converted from OGG to Wav/Adpcm
+						if (stream.Length > 100 * 1024) {
+							assetsBundle.ImportFile(dstPath, stream, 0);
+						} else {
+							Console.WriteLine("Converting sound to ADPCM/IMA4 format...");
+							using (var input = new Lime.OggDecoder(stream)) {
+								using (var output = new MemoryStream()) {
+									WaveIMA4Converter.Encode(input, output);
+									output.Seek(0, SeekOrigin.Begin);
+									assetsBundle.ImportFile(dstPath, output, 0);
 								}
 							}
-							return true;
 						}
-					});
-					SyncUpdated(".ogv", ".ogv", (srcPath, dstPath) => {
-						assetsBundle.ImportFile(srcPath, dstPath, 0);
 						return true;
-					});
-				}
+					}
+				});
+				SyncUpdated(".ogv", ".ogv", (srcPath, dstPath) => {
+					assetsBundle.ImportFile(srcPath, dstPath, 0);
+					return true;
+				});
+				// Unity3D shaders
+				SyncUpdated(".shader", ".shader", (srcPath, dstPath) => {
+					assetsBundle.ImportFile(srcPath, dstPath, 0);
+					return true;
+				});
 			}
 		}
 	
@@ -285,15 +317,25 @@ namespace Orange
 					}
 					Console.WriteLine("+ " + atlasPath);
 					string inFile = "$TMP$.png";
-					string outFile = Path.ChangeExtension(inFile, GetPlatformTextureExtension());
 					if (!atlas.Save(inFile, "png")) {
 						var error = (Gdk.PixbufError)Gdk.Pixbuf.ErrorQuark();
 						throw new Lime.Exception("Can't save '{0}' (error: {1})", inFile, error.ToString()); 
 					}
-					TextureConverter.Convert(inFile, outFile, rules, platform);
-					assetsBundle.ImportFile(outFile, atlasPath, 0, compress: true);
+					if (!File.Exists(inFile)) {
+						throw new Lime.Exception("'{0}' doesn't exist!");
+					}
+					if (platform == TargetPlatform.Unity) {
+						assetsBundle.ImportFile(inFile, atlasPath, 0);
+					} else {
+						string outFile = Path.ChangeExtension(inFile, GetPlatformTextureExtension());
+						TextureConverter.Convert(inFile, outFile, rules, platform);
+						assetsBundle.ImportFile(outFile, atlasPath, 0, compress: true);
+						File.Delete(outFile);
+					}
 					File.Delete(inFile);
-					File.Delete(outFile);
+					while (File.Exists(inFile)) {
+						System.Threading.Thread.Sleep(1);
+					}
 					items.RemoveAll(x => x.Allocated);
 					break;
 				}

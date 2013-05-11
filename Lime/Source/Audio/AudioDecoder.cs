@@ -39,7 +39,7 @@ namespace Lime
 			} else if (OggDecoder.IsOggStream(stream)) {
 				return new OggDecoder(stream);
 			} else {
-				throw new Lime.Exception("Unknown audio format");
+				throw new Lime.Exception("Unsupported audio format");
 			}
 #endif
 		}

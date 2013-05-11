@@ -47,13 +47,20 @@ namespace Lime
 			stream.Seek(0, SeekOrigin.Begin);
 			var bytes = new byte[stream.Length];
 			stream.Read(bytes, 0, bytes.Length);
+			var dir = Path.Combine(BaseDirectory, Path.GetDirectoryName(path));
+			Directory.CreateDirectory(dir);
 			File.WriteAllBytes(Path.Combine(BaseDirectory, path), bytes);
 #endif
 		}
 
-		public override string[] EnumerateFiles()
+		public override IEnumerable<string> EnumerateFiles()
 		{
-			throw new NotImplementedException();
+			var baseDir = new Uri(BaseDirectory + "/");
+			foreach (var i in Directory.EnumerateFiles(BaseDirectory, "*.*", SearchOption.AllDirectories)) {
+				var relativePath = baseDir.MakeRelativeUri(new Uri(i)).ToString();
+				relativePath = Uri.UnescapeDataString(relativePath);
+				yield return relativePath;
+			}
 		}
 	}
 }

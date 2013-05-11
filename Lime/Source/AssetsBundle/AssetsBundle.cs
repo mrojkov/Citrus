@@ -38,7 +38,7 @@ namespace Lime
 		public abstract void DeleteFile(string path);
 		public abstract bool FileExists(string path);
 		public abstract void ImportFile(string path, Stream stream, int reserve, bool compress = false);
-		public abstract string[] EnumerateFiles();
+		public abstract IEnumerable<string> EnumerateFiles();
 
 		public void ImportFile(string srcPath, string dstPath, int reserve, bool compress = false)
 		{

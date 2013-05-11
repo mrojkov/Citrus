@@ -29,7 +29,7 @@ namespace Kumquat
 			return locationName[3] != '_';
 		}
 
-		public static string[] GetLocations()
+		public static IEnumerable<string> GetLocations()
 		{
 			var prefix = "Location";
 			var arr = AssetsBundle.Instance.EnumerateFiles();

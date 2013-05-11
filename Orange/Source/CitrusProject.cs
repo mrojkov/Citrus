@@ -20,6 +20,13 @@ namespace Orange
 		public readonly string AssetsDirectory;
 		public readonly string Title;
 		public FileEnumerator AssetFiles;
+
+		public string GetUnityResourcesDirectory()
+		{
+			string path = Path.Combine(Path.GetDirectoryName(ProjectDirectory),
+				Path.GetFileName(ProjectDirectory) + ".Unity", "Assets", "Resources");
+			return path;
+		}
 	}
 }
 

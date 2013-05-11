@@ -5,6 +5,7 @@ namespace Orange
 	public enum TargetPlatform
 	{
 		Desktop,
-		iOS
+		iOS,
+		Unity,
 	}
 }

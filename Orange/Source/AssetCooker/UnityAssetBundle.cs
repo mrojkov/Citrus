@@ -1,0 +1,79 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.IO;
+
+namespace Orange
+{
+	public class UnityAssetBundle : Lime.UnpackedAssetsBundle
+	{
+		public UnityAssetBundle(string baseDirectory)
+			: base(baseDirectory)
+		{
+		}
+
+		private string AdjustExtensionForBinaryAsset(string path)
+		{
+			var ext = Path.GetExtension(path);
+			if (ext != ".png" && ext != ".txt" && ext != ".ogg" && ext != ".shader") {
+				path += ".bytes";
+			}
+			return path;
+		}
+
+		public override Stream OpenFile(string path)
+		{
+			return base.OpenFile(AdjustExtensionForBinaryAsset(path));
+		}
+
+		public override DateTime GetFileLastWriteTime(string path)
+		{
+			return base.GetFileLastWriteTime(AdjustExtensionForBinaryAsset(path));
+		}
+
+		public override void DeleteFile(string path)
+		{
+			base.DeleteFile(AdjustExtensionForBinaryAsset(path));
+		}
+
+		public override bool FileExists(string path)
+		{
+			return base.FileExists(AdjustExtensionForBinaryAsset(path));
+		}
+
+		public override void ImportFile(string path, Stream stream, int reserve, bool compress)
+		{
+			base.ImportFile(AdjustExtensionForBinaryAsset(path), stream, reserve, compress);
+		}
+
+		public override IEnumerable<string> EnumerateFiles()
+		{
+			foreach (var i in base.EnumerateFiles()) {
+				string ext = Path.GetExtension(i);
+				if (ext == ".meta") {
+					continue;
+				}
+				if (i == "@FileList.txt") {
+					continue;
+				}
+				if (ext == ".bytes") {
+					yield return Path.ChangeExtension(i, null);
+				} else {
+					yield return i;
+				}
+			}
+		}
+
+		public override void Dispose()
+		{
+			SaveFileList();
+			base.Dispose();
+		}
+
+		private void SaveFileList()
+		{
+			File.WriteAllLines(BaseDirectory + "/@FileList.txt", EnumerateFiles());
+		}
+	}
+}

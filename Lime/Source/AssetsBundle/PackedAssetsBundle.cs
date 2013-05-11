@@ -42,7 +42,7 @@ namespace Lime
 		}
 	}
 
-	public class AssetStream : Stream
+	public sealed class AssetStream : Stream
 	{
 		PackedAssetsBundle bundle;
 		internal AssetDescriptor descriptor;
@@ -397,7 +397,7 @@ namespace Lime
 			}
 		}
 		
-		public override string[] EnumerateFiles()
+		public override IEnumerable<string> EnumerateFiles()
 		{
 			string[] files = new string[index.Keys.Count];
 			index.Keys.CopyTo(files, 0);

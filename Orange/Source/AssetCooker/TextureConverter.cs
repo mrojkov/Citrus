@@ -120,6 +120,9 @@ namespace Orange
 		
 		public static void Convert(string srcPath, string dstPath, CookingRules cookingRules, TargetPlatform platform)
 		{
+			if (platform == TargetPlatform.Unity) {
+				throw new Lime.Exception("No need to convert textures for Unity platform!");
+			}
 			if (Path.GetExtension(dstPath) == ".pvr") {
 				ToPVRTexture(srcPath, dstPath, cookingRules.PVRFormat, cookingRules.MipMaps);
 			}

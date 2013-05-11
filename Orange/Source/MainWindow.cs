@@ -157,7 +157,7 @@ namespace Orange
 		{
 			var citrusProject = new CitrusProject(CitrusProjectChooser.Filename);
 			new AssetCooker(citrusProject, platform).Cook();
-			new KumquatCooker(citrusProject, platform).Cook();
+			// new KumquatCooker(citrusProject, platform).Cook();
 		}
 
 		bool RunSolution(Orange.TargetPlatform platform)
@@ -252,7 +252,7 @@ namespace Orange
 						break;
 					}
 				} catch (System.Exception exc) {
-					Console.WriteLine("Exception:" + exc.Message);
+					Console.WriteLine(exc.Message);
 				}
 				ScrollLogToEnd();
 			} finally {
