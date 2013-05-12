@@ -54,7 +54,7 @@ namespace Orange
 				if (ext == ".meta") {
 					continue;
 				}
-				if (i == "@FileList.txt") {
+				if (i == "Files.txt") {
 					continue;
 				}
 				if (ext == ".bytes") {
@@ -73,7 +73,7 @@ namespace Orange
 
 		private void SaveFileList()
 		{
-			File.WriteAllLines(BaseDirectory + "/@FileList.txt", EnumerateFiles());
+			File.WriteAllLines(BaseDirectory + "/Files.txt", EnumerateFiles());
 		}
 	}
 }

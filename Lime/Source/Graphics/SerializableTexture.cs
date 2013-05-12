@@ -78,10 +78,12 @@ namespace Lime
 			return core.GetInstance().GetHandle();
 		}
 
+#if UNITY
 		public UnityEngine.Texture GetUnityTexture()
 		{
 			return core.GetInstance().GetUnityTexture();
 		}
+#endif
 
 		public void SetAsRenderTarget()
 		{

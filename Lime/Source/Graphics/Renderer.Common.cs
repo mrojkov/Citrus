@@ -42,10 +42,12 @@ namespace Lime
 		}
 	}
 
+#if UNITY
 	public static partial class Renderer
+#else
+	public static unsafe partial class Renderer
+#endif
 	{
-		const int MaxVertices = 256;
-
 		public static void DrawTextLine(float x, float y, string text, float fontHeight = 20, uint abgr = 0xFFFFFFFF)
 		{
 			DrawTextLine(new Vector2(x, y), text, fontHeight, abgr);
@@ -134,9 +136,6 @@ namespace Lime
 			}
 		}
 
-#if UNITY 
-		// TODO: use following functions for OpenGL platform either:
-
 		public static void DrawSprite(ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1)
 		{
 			if (blending == Blending.Glow) {
@@ -166,12 +165,12 @@ namespace Lime
 			int i = currentVertex;
 			int j = currentIndex;
 			currentIndex += 6;
-			batchIndices[j++] = i + 0;
-			batchIndices[j++] = i + 1;
-			batchIndices[j++] = i + 2;
-			batchIndices[j++] = i + 2;
-			batchIndices[j++] = i + 1;
-			batchIndices[j++] = i + 3;
+			batchIndices[j++] = (ushort)(i + 0);
+			batchIndices[j++] = (ushort)(i + 1);
+			batchIndices[j++] = (ushort)(i + 2);
+			batchIndices[j++] = (ushort)(i + 2);
+			batchIndices[j++] = (ushort)(i + 1);
+			batchIndices[j++] = (ushort)(i + 3);
 			currentVertex += 4;
 			batchVertices[i].Pos = transform.TransformVector(position.X, position.Y);
 			batchVertices[i].Color = color;
@@ -213,9 +212,9 @@ namespace Lime
 		{
 			int baseVertex = DrawTrianglesHelper(texture1, texture2, vertices, numVertices);
 			for (int i = 1; i <= numVertices - 2; i++) {
-				batchIndices[currentIndex++] = baseVertex;
-				batchIndices[currentIndex++] = (baseVertex + i);
-				batchIndices[currentIndex++] = (baseVertex + i + 1);
+				batchIndices[currentIndex++] = (ushort)baseVertex;
+				batchIndices[currentIndex++] = (ushort)(baseVertex + i);
+				batchIndices[currentIndex++] = (ushort)(baseVertex + i + 1);
 			}
 		}
 
@@ -235,9 +234,9 @@ namespace Lime
 		{
 			int vertex = DrawTrianglesHelper(texture1, texture2, vertices, numVertices);
 			for (int i = 0; i < numVertices - 2; i++) {
-				batchIndices[currentIndex++] = vertex;
-				batchIndices[currentIndex++] = (vertex + 1);
-				batchIndices[currentIndex++] = (vertex + 2);
+				batchIndices[currentIndex++] = (ushort)vertex;
+				batchIndices[currentIndex++] = (ushort)(vertex + 1);
+				batchIndices[currentIndex++] = (ushort)(vertex + 2);
 				vertex++;
 			}
 		}
@@ -270,5 +269,4 @@ namespace Lime
 			return baseVertex;
 		}
 	}
-#endif
 }

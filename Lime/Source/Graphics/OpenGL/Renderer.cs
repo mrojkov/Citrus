@@ -21,7 +21,7 @@ namespace Lime
 	using OGL = GL;
 #endif
 
-	public unsafe partial static class Renderer
+	public unsafe static partial class Renderer
 	{
 		[StructLayout(LayoutKind.Explicit, Size = 32)]
 		public struct Vertex
@@ -89,7 +89,7 @@ namespace Lime
 		{
 			if (currentIndex > 0) {
 #if GLES11
-				GL.DrawElements(All.Triangles, currentIndex, All.UnsignedShort, (IntPtr)batchIndices);
+				GL.DrawElements(All.Triangles, currentIndex, All.UnsignedInt, (IntPtr)batchIndices);
 #elif OPENGL
 				OGL.DrawElements(BeginMode.Triangles, currentIndex, DrawElementsType.UnsignedShort, (IntPtr)batchIndices);
 #endif
@@ -358,18 +358,8 @@ namespace Lime
 			}
 		}
 
-		public static void DrawSprite(ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1)
-		{
-			if (blending == Blending.Glow) {
-				Blending = Blending.Default;
-				DrawSpriteHelper(texture, color, position, size, uv0, uv1);
-				Blending = Blending.Glow;
-				DrawSpriteHelper(texture, color, position, size, uv0, uv1);
-			} else {
-				DrawSpriteHelper(texture, color, position, size, uv0, uv1);
-			}
-		}
-		
+#if X
+		// Highly optimized version for OpenGL
 		public static void DrawSpriteHelper(ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1)
 		{
 			var transform = Transform1 * Transform2;
@@ -414,84 +404,7 @@ namespace Lime
 			*ip++ = (ushort)(i + 1);
 			*ip++ = (ushort)(i + 3);
 		}
-
-		public static void DrawTriangleFan(ITexture texture1, Vertex[] vertices, int numVertices)
-		{
-			DrawTriangleFan(texture1, null, vertices, numVertices);
-		}
-
-		public static void DrawTriangleFan(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
-		{
-			if (blending == Lime.Blending.Glow) {
-				Blending = Lime.Blending.Default;
-				DrawTriangleFanHelper(texture1, texture2, vertices, numVertices);
-				Blending = Lime.Blending.Glow;
-				DrawTriangleFanHelper(texture1, texture2, vertices, numVertices);
-			} else {
-				DrawTriangleFanHelper(texture1, texture2, vertices, numVertices);
-			}
-		}
-
-		private static void DrawTriangleFanHelper(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
-		{
-			int baseVertex = DrawTrianglesHelper(texture1, texture2, vertices, numVertices);
-			for (int i = 1; i <= numVertices - 2; i++) {
-				batchIndices[currentIndex++] = (ushort)baseVertex;
-				batchIndices[currentIndex++] = (ushort)(baseVertex + i);
-				batchIndices[currentIndex++] = (ushort)(baseVertex + i + 1);
-			}
-		}
-
-		public static void DrawTriangleStrip(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
-		{
-			if (blending == Lime.Blending.Glow) {
-				Blending = Lime.Blending.Default;
-				DrawTriangleStripHelper(texture1, texture2, vertices, numVertices);
-				Blending = Lime.Blending.Glow;
-				DrawTriangleStripHelper(texture1, texture2, vertices, numVertices);
-			} else {
-				DrawTriangleStripHelper(texture1, texture2, vertices, numVertices);
-			}
-		}
-
-		private static void DrawTriangleStripHelper(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
-		{
-			int vertex = DrawTrianglesHelper(texture1, texture2, vertices, numVertices);
-			for (int i = 0; i < numVertices - 2; i++) {
-				batchIndices[currentIndex++] = (ushort)vertex;
-				batchIndices[currentIndex++] = (ushort)(vertex + 1);
-				batchIndices[currentIndex++] = (ushort)(vertex + 2);
-				vertex++;
-			}
-		}
-
-		private static int DrawTrianglesHelper(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
-		{
-			var transform = Transform1 * Transform2;
-			SetTexture(texture1, 0);
-			SetTexture(texture2, 1);
-			if (currentIndex + (numVertices - 2) * 3 >= MaxVertices * 4 || currentVertex + numVertices >= MaxVertices) {
-				FlushSpriteBatch();
-			}
-			if (numVertices < 3 || (numVertices - 2) * 3 > MaxVertices * 4) {
-				throw new Lime.Exception("Wrong number of vertices");
-			}
-			Rectangle uvRect1 = (texture1 != null) ? texture1.UVRect : new Rectangle();
-			Rectangle uvRect2 = (texture2 != null) ? texture2.UVRect : new Rectangle();
-			int baseVertex = currentVertex;
-			for (int i = 0; i < numVertices; i++) {
-				Vertex v = vertices[i];
-				if (PremulAlphaMode) {
-					v.Color = Color4.PremulAlpha(v.Color);
-				}
-				v.Pos = transform * v.Pos;
-				v.UV1 = uvRect1.A + uvRect1.Size * v.UV1;
-				if (texture2 != null)
-					v.UV2 = uvRect2.A + uvRect2.Size * v.UV2;
-				batchVertices[currentVertex++] = v;
-			}
-			return baseVertex;
-		}
+#endif
 	}
 }
 #endif

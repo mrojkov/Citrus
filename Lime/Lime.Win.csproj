@@ -15,7 +15,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <PlatformTarget>x86</PlatformTarget>
     <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>WIN</DefineConstants>
+    <DefineConstants>WIN;OPENGL;OPENAL</DefineConstants>
     <DebugType>full</DebugType>
     <WarningLevel>4</WarningLevel>
     <Optimize>false</Optimize>
@@ -25,7 +25,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <PlatformTarget>x86</PlatformTarget>
     <OutputPath>bin\Win\Release\</OutputPath>
-    <DefineConstants>WIN</DefineConstants>
+    <DefineConstants>WIN;OPENGL;OPENAL</DefineConstants>
     <DebugType>full</DebugType>
     <WarningLevel>4</WarningLevel>
     <Optimize>true</Optimize>
@@ -50,9 +50,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Application\TimeUtils.cs" />
-    <Compile Include="Source\Graphics\Texture2D.DDS.cs" />
-    <Compile Include="Source\Graphics\Texture2D.PVR.cs" />
-    <Compile Include="Source\Graphics\Texture2D.Png.cs" />
+    <Compile Include="Source\AssetsBundle\UnityAssetsBundle.cs" />
+    <Compile Include="Source\Graphics\OpenGL\OpenGL.cs" />
+    <Compile Include="Source\Graphics\OpenGL\Renderer.cs" />
+    <Compile Include="Source\Graphics\OpenGL\RenderTexture.cs" />
+    <Compile Include="Source\Graphics\OpenGL\Texture2D.cs" />
+    <Compile Include="Source\Graphics\OpenGL\Texture2D.DDS.cs" />
+    <Compile Include="Source\Graphics\OpenGL\Texture2D.Png.cs" />
+    <Compile Include="Source\Graphics\OpenGL\Texture2D.Pvr.cs" />
+    <Compile Include="Source\Graphics\Renderer.Common.cs" />
+    <Compile Include="Source\Graphics\Unity\MaterialFactory.cs" />
+    <Compile Include="Source\Graphics\Unity\Renderer.cs" />
+    <Compile Include="Source\Graphics\Unity\RenderTexture.cs" />
+    <Compile Include="Source\Graphics\Unity\Texture2D.cs" />
+    <Compile Include="Source\Input\Input.Common.cs" />
+    <Compile Include="Source\Input\Input.Native.cs" />
+    <Compile Include="Source\Input\Input.Unity.cs" />
     <Compile Include="Source\RewindableStream.cs" />
     <Compile Include="Source\Toolbox.cs" />
     <Compile Include="Source\NumericExtensions.cs" />
@@ -87,17 +100,12 @@
     <Compile Include="Source\Audio\WaveIMA4Decoder.cs" />
     <Compile Include="Source\Exception.cs" />
     <Compile Include="Source\Graphics\Font.cs" />
-    <Compile Include="Source\Graphics\OpenGL.cs" />
-    <Compile Include="Source\Graphics\Texture2D.cs" />
-    <Compile Include="Source\Graphics\Renderer.cs" />
-    <Compile Include="Source\Graphics\RenderTexture.cs" />
     <Compile Include="Source\Graphics\SerializableFont.cs" />
     <Compile Include="Source\Graphics\SerializableTexture.cs" />
     <Compile Include="Source\Graphics\ITexture.cs" />
     <Compile Include="Source\Graphics\TextureAtlasPart.cs" />
     <Compile Include="Source\Graphics\OgvDecoder.cs" />
     <Compile Include="Source\Graphics\VideoTexture.cs" />
-    <Compile Include="Source\Input\Input.cs" />
     <Compile Include="Source\Localization.cs" />
     <Compile Include="Source\Mathf.cs" />
     <Compile Include="Source\PopupMenu\Separator.cs" />
