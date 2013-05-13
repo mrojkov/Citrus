@@ -20,6 +20,10 @@ namespace Lime
 		public static readonly Vector2 South = new Vector2(0, 1);
 		public static readonly Vector2 East = new Vector2(1, 0);
 		public static readonly Vector2 West = new Vector2(-1, 0);
+		public static readonly Vector2 Up = North;
+		public static readonly Vector2 Down = South;
+		public static readonly Vector2 Left = West;
+		public static readonly Vector2 Right = East;
 
 		public Vector2(float xy)
 		{
