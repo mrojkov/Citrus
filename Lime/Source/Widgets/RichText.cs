@@ -71,16 +71,9 @@ namespace Lime
 		public override string Text
 		{
 			get { return text; }
-			set {
-				text = value;
-				var localizedText = Localization.GetString(text);
-				parser = new TextParser(localizedText);
-				if (parser.ErrorMessage != null) {
-					parser = new TextParser("Error: " + parser.ErrorMessage);
-				}
-			}
+			set { SetText(value); }
 		}
-		
+
 		[ProtoMember(2)]
 		public HAlignment HAlignment { get; set; }
 		
@@ -134,6 +127,16 @@ namespace Lime
 			Renderer.Blending = GlobalBlending;
 			return renderer;
 		}
+
+		private void SetText(string value)
+		{
+			text = value;
+			var localizedText = Localization.GetString(text);
+			parser = new TextParser(localizedText);
+			if (parser.ErrorMessage != null) {
+				parser = new TextParser("Error: " + parser.ErrorMessage);
+			}
+		}
 	}
 
 	class TextParser
@@ -152,8 +155,9 @@ namespace Lime
 		public List<string> Styles = new List<string>();
 		public List<Fragment> Fragments = new List<Fragment>();
 
-		public TextParser(string text = "")
+		public TextParser(string text = null)
 		{
+			text = text ?? "";
 			this.text = text;
 			while (pos < text.Length) {
 				if (text[pos] == '<') {
