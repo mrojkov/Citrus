@@ -95,7 +95,7 @@ namespace Lime
 			if (rail != null) {
 				float railLength = rail.CalcLength();
 				if (railLength > 0) {
-					Matrix32 transform = rail.GlobalMatrix.CalcInversed();
+					Matrix32 transform = rail.LocalToWorldTransform.CalcInversed();
 					Vector2 p = transform.TransformVector(Input.MousePosition);
 					float offset = rail.CalcOffset(p) / railLength;
 					if (RangeMax > RangeMin) {

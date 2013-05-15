@@ -123,7 +123,7 @@ namespace Lime
 				renderer.AddFragment(frag.Text, frag.Style + 1);
 			}
 			// Draw text.
-			Renderer.Transform1 = GlobalMatrix;
+			Renderer.Transform1 = LocalToWorldTransform;
 			Renderer.Blending = GlobalBlending;
 			return renderer;
 		}

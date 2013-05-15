@@ -109,7 +109,7 @@ namespace Lime
 				RenderToTexture(renderTexture);
 			}
 			if (Rendered != null) {
-				Renderer.Transform1 = GlobalMatrix;
+				Renderer.Transform1 = LocalToWorldTransform;
 				Rendered();
 			}
 		}

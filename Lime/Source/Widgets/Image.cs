@@ -55,7 +55,7 @@ namespace Lime
 		public override void Render()
 		{
 			Renderer.Blending = GlobalBlending;
-			Renderer.Transform1 = GlobalMatrix;
+			Renderer.Transform1 = LocalToWorldTransform;
 			Renderer.DrawSprite(Texture, GlobalColor, Vector2.Zero, Size, UV0, UV1);
 		}
 
@@ -87,7 +87,7 @@ namespace Lime
 		{
 			if (GloballyVisible && !skipRender) {
 				if (HitTestMethod == HitTestMethod.Contents) {
-					Vector2 pt = GlobalMatrix.CalcInversed().TransformVector(point);
+					Vector2 pt = LocalToWorldTransform.CalcInversed().TransformVector(point);
 					Vector2 sz = Size;
 					if (sz.X < 0) {
 						pt.X = -pt.X;

@@ -22,7 +22,7 @@ namespace Lime
 
 		Color4 Color { get; }
 
-		Matrix32 CalcLocalTransformMatrix();
+		Matrix32 CalcLocalToParentTransform();
 	
 		bool GloballyVisible { get; }
 	}
@@ -126,8 +126,8 @@ namespace Lime
 
 		private void RenderHelper(IImageCombinerArg arg1, IImageCombinerArg arg2)
 		{
-			Matrix32 transform1 = Matrix32.Scaling(arg1.Size) * arg1.CalcLocalTransformMatrix();
-			Matrix32 transform2 = Matrix32.Scaling(arg2.Size) * arg2.CalcLocalTransformMatrix();
+			Matrix32 transform1 = Matrix32.Scaling(arg1.Size) * arg1.CalcLocalToParentTransform();
+			Matrix32 transform2 = Matrix32.Scaling(arg2.Size) * arg2.CalcLocalToParentTransform();
 			// source rectangle
 			int numCoords = 4;
 			for (int i = 0; i < 4; i++)
@@ -166,7 +166,7 @@ namespace Lime
 				if (GetArgs(out arg1, out arg2)) {
 					if (arg1.GloballyVisible && arg2.GloballyVisible) {
 						if (arg1.GetTexture() != null && arg2.GetTexture() != null) {
-							Renderer.Transform1 = Parent.AsWidget.GlobalMatrix;
+							Renderer.Transform1 = Parent.AsWidget.LocalToWorldTransform;
 							Renderer.Blending = Blending.Alpha;
 							RenderHelper(arg1, arg2);
 						}

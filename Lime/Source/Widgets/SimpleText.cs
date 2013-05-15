@@ -61,7 +61,7 @@ namespace Lime
 
 		public override void Render()
 		{
-			Renderer.Transform1 = GlobalMatrix;
+			Renderer.Transform1 = LocalToWorldTransform;
 			Renderer.Blending = GlobalBlending;
 			var localizedText = Localization.GetString(Text);
 			if (!string.IsNullOrEmpty(localizedText)) {

@@ -74,7 +74,7 @@ namespace Lime
 			a.RecalcGlobalMatrixAndColor();
 			b.RecalcGlobalMatrixAndColor();
 			var sizes = new Vector2[2] { a.Size, b.Size };
-			var matrices = new Matrix32[2] { a.GlobalMatrix, b.GlobalMatrix };
+			var matrices = new Matrix32[2] { a.LocalToWorldTransform, b.LocalToWorldTransform };
 			var det = new float[2] { matrices[0].CalcDeterminant(), matrices[1].CalcDeterminant() };
 			if (det[0] == 0 || det[1] == 0) {
 				return false;
@@ -107,8 +107,8 @@ namespace Lime
 		{
 			RecalcGlobalMatrixAndColor();
 			container.RecalcGlobalMatrixAndColor();
-			Matrix32 mtx1 = container.GlobalMatrix.CalcInversed();
-			Matrix32 mtx2 = GlobalMatrix;
+			Matrix32 mtx1 = container.LocalToWorldTransform.CalcInversed();
+			Matrix32 mtx2 = LocalToWorldTransform;
 			return mtx2 * mtx1;
 		}
 

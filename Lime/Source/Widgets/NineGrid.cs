@@ -106,7 +106,7 @@ namespace Lime
 		public override void Render()
 		{
 			BuildLayout(layout);
-			Renderer.Transform1 = GlobalMatrix;
+			Renderer.Transform1 = LocalToWorldTransform;
 			Renderer.Blending = GlobalBlending;
 			for (int i = 0; i < layout.Length; i++) {
 				var part = layout[i];
@@ -131,7 +131,7 @@ namespace Lime
 
 		bool PartHitTest(Part part, Vector2 point)
 		{
-			point = GlobalMatrix.CalcInversed().TransformVector(point);
+			point = LocalToWorldTransform.CalcInversed().TransformVector(point);
 			if (part.Rect.B.X < part.Rect.A.X) {
 				part.Rect.A.X = -part.Rect.A.X;
 				part.Rect.B.X = -part.Rect.B.X;

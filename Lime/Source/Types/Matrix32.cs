@@ -137,19 +137,18 @@ namespace Lime
 		{
 			return b.TransformVector(a);
 		}
-		/*
-		public static explicit operator OpenTK.Matrix4(Matrix32 m)
-		{
-			OpenTK.Matrix4 r = OpenTK.Matrix4.Identity;
-			r.M41 = m.T.X;
-			r.M42 = m.T.Y;
-			r.M11 = m.U.X;
-			r.M12 = m.U.Y;
-			r.M21 = m.V.X;
-			r.M22 = m.V.Y;
-			return r;
-		}
-		*/
+
+		//public static explicit operator OpenTK.Matrix4(Matrix32 m)
+		//{
+		//	OpenTK.Matrix4 r = OpenTK.Matrix4.Identity;
+		//	r.M41 = m.T.X;
+		//	r.M42 = m.T.Y;
+		//	r.M11 = m.U.X;
+		//	r.M12 = m.U.Y;
+		//	r.M21 = m.V.X;
+		//	r.M22 = m.V.Y;
+		//	return r;
+		//}
 
 		public static Matrix32 Lerp(float t, Matrix32 a, Matrix32 b)
 		{

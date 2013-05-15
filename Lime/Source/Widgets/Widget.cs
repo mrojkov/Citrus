@@ -132,12 +132,12 @@ namespace Lime
 		[ProtoMember(13)]
 		public BoneArray BoneArray;
 
-		public Matrix32 GlobalMatrix { get; protected set; }
+		public Matrix32 LocalToWorldTransform { get; protected set; }
 		public Color4 GlobalColor { get; protected set; }
 		public Blending GlobalBlending { get; protected set; }
 		public bool GloballyVisible { get; protected set; }
-		public Vector2 GlobalPosition { get { return GlobalMatrix * Vector2.Zero; } }
-		public Vector2 GlobalCenter { get { return GlobalMatrix * (Size / 2); } }
+		public Vector2 GlobalPosition { get { return LocalToWorldTransform * Vector2.Zero; } }
+		public Vector2 GlobalCenter { get { return LocalToWorldTransform * (Size / 2); } }
 
 		#endregion
 		#region Methods
@@ -216,20 +216,20 @@ namespace Lime
 			if (Parent != null) {
 				var parentWidget = Parent.AsWidget;
 				if (parentWidget != null && !parentWidget.renderedToTexture) {
-					GlobalMatrix = CalcLocalTransformMatrix() * parentWidget.GlobalMatrix;
+					LocalToWorldTransform = CalcLocalToParentTransform() * parentWidget.LocalToWorldTransform;
 					GlobalColor = Color * parentWidget.GlobalColor;
 					GlobalBlending = Blending == Blending.Default ? parentWidget.GlobalBlending : Blending;
 					GloballyVisible = (Visible && color.A != 0) && parentWidget.GloballyVisible;
 					return;
 				}
 			}
-			GlobalMatrix = CalcLocalTransformMatrix();
+			LocalToWorldTransform = CalcLocalToParentTransform();
 			GlobalColor = color;
 			GlobalBlending = Blending;
 			GloballyVisible = Visible && color.A != 0;
 		}
 
-		public Matrix32 CalcLocalTransformMatrix()
+		public Matrix32 CalcLocalToParentTransform()
 		{
 			var u = new Vector2(direction.X * Scale.X, direction.Y * Scale.X);
 			var v = new Vector2(-direction.Y * Scale.Y, direction.X * Scale.Y);
@@ -298,7 +298,7 @@ namespace Lime
 		{
 			if (GloballyVisible) {
 				if (HitTestMethod == HitTestMethod.BoundingRect) {
-					Vector2 p = GlobalMatrix.CalcInversed().TransformVector(point);
+					Vector2 p = LocalToWorldTransform.CalcInversed().TransformVector(point);
 					Vector2 s = Size;
 					if (s.X < 0) {
 						p.X = -p.X;

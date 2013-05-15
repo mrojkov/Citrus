@@ -18,7 +18,7 @@ namespace Lime
 		public override void Render()
 		{
 			Renderer.Blending = GlobalBlending;
-			Renderer.Transform1 = GlobalMatrix;
+			Renderer.Transform1 = LocalToWorldTransform;
 			int n = Points.Count;
 			if (n >= 2) {
 				bool closed = Points[0] == Points[n - 1];

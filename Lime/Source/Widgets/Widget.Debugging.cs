@@ -62,7 +62,7 @@ namespace Lime
 				get
 				{
 					widget.RecalcGlobalMatrixAndColor();
-					var b = widget.CalcBasisFromMatrix(widget.GlobalMatrix);
+					var b = widget.CalcBasisFromMatrix(widget.LocalToWorldTransform);
 					return new Geometry {
 						Position = b.Position,
 						Pivot = widget.Pivot,
