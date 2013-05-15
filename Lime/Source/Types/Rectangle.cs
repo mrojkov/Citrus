@@ -26,28 +26,38 @@ namespace Lime
 			A = a;
 			B = b;
 		}
-		
-		bool IEquatable<Rectangle>.Equals(Rectangle other)
+
+		public override bool Equals(object obj)
+		{
+			var rhs = (Rectangle)obj;
+			return A.Equals(rhs.A) && B.Equals(rhs.B);
+		}
+
+		public bool Equals(Rectangle other)
 		{
 			return A.Equals(other.A) && B.Equals(other.B);
 		}
-		
-		public float Width {
-			get {
-				return B.X - A.X;
-			}
-			set {
-				B.X = A.X + value;
-			}
+
+		public static bool operator ==(Rectangle lhs, Rectangle rhs)
+		{
+			return lhs.Equals(rhs);
 		}
 
-		public float Height {
-			get {
-				return B.Y - A.Y;
-			}
-			set {
-				B.Y = A.Y + value;
-			}
+		public static bool operator !=(Rectangle lhs, Rectangle rhs)
+		{
+			return !lhs.Equals(rhs);
+		}
+
+		public float Width
+		{
+			get { return B.X - A.X; }
+			set { B.X = A.X + value; }
+		}
+
+		public float Height
+		{
+			get { return B.Y - A.Y; }
+			set { B.Y = A.Y + value; }
 		}
 
 		public float Left { get { return A.X; } set { A.X = value; } }
@@ -56,15 +66,23 @@ namespace Lime
 		public float Bottom { get { return B.Y; } set { B.Y = value; } }
 		public Vector2 Center { get { return (A + B) / 2; } }
 
+		public void Normalize()
+		{
+			if (A.X > B.X) {
+				Toolbox.Swap(ref A.X, ref B.X);
+			}
+			if (A.Y > B.Y) {
+				Toolbox.Swap(ref A.Y, ref B.Y);
+			}
+		}
+
 		public bool Contains(Vector2 v)
 		{
 			return (v.X >= A.X) && (v.Y >= A.Y) && (v.X < B.X) && (v.Y < B.Y);
 		}
 
 		public Vector2 Size { 
-			get {
-				return B - A;
-			}
+			get { return B - A; }
 		}
 				
 		public override string ToString()
@@ -72,5 +90,9 @@ namespace Lime
 			return String.Format("{0}, {1}, {2}, {3}", A.X, A.Y, B.X, B.Y);
 		}
 
+		public override int GetHashCode()
+		{
+			return A.GetHashCode() ^ B.GetHashCode();
+		}
 	}
 }

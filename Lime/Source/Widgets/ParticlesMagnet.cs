@@ -104,7 +104,7 @@ namespace Lime
 					float k = magnet.Size.X / magnet.Size.Y;
 					targetPosition -= center;
 					targetPosition.Y *= k;
-					targetPosition = Vector2.Normalize(targetPosition);
+					targetPosition = targetPosition.Normalized;
 					targetPosition *= magnet.Size.X * 0.5f;
 					targetPosition.Y /= k;
 					targetPosition += center;
@@ -126,7 +126,7 @@ namespace Lime
 
 			Vector2 direction = targetPosition - p.RegularPosition;
 			float squaredDistance = direction.SquaredLength;
-			direction = Vector2.Normalize(direction);
+			direction = direction.Normalized;
 
 			float magnetStrength = magnet.Strength;
 			if (magnet.Attenuation > 0.0001f) {

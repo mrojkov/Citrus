@@ -46,7 +46,7 @@ namespace Lime
 			return new Size((int)v.X, (int)v.Y);
 		}
 
-		bool IEquatable<Vector2>.Equals(Vector2 rhs)
+		public bool Equals(Vector2 rhs)
 		{
 			return X == rhs.X && Y == rhs.Y;
 		}
@@ -179,24 +179,13 @@ namespace Lime
                                value1.Y > value2.Y ? value1.Y : value2.Y);
         }
 
-		public static Vector2 Normalize(Vector2 value)
-		{
-			float length = value.Length;
-			if (length > 0) {
-				value.X /= length;
-				value.Y /= length;
-			}
-			return value;
-		}
-
-        public Vector2 Normalize()
+        public void Normalize()
         {
             float length = this.Length;
             if (length > 0) {
                 this.X /= length;
                 this.Y /= length;
             }
-            return this;
         }
 
 		public static Vector2 HeadingDeg(float degrees)
@@ -260,7 +249,12 @@ namespace Lime
 
 		public Vector2 Normalized
 		{
-			get { return Vector2.Normalize(this); }
+			get 
+			{
+				var v = new Vector2(X, Y);
+				v.Normalize();
+				return v;
+			}
 		}
 
 		public Vector2 Normal
