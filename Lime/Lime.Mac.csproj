@@ -17,7 +17,7 @@
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\Mac\Debug</OutputPath>
-    <DefineConstants>DEBUG;MAC</DefineConstants>
+    <DefineConstants>DEBUG;OPENGL;OPENAL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>False</ConsolePause>
@@ -31,7 +31,7 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>False</ConsolePause>
     <DebugSymbols>True</DebugSymbols>
-    <DefineConstants>MAC</DefineConstants>
+    <DefineConstants>MAC;OPENGL;OPENAL</DefineConstants>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
@@ -61,8 +61,6 @@
     <Compile Include="Source\Application\iOSGameController.cs" />
     <Compile Include="Source\Application\iOSGameView.cs" />
     <Compile Include="Source\Graphics\Font.cs" />
-    <Compile Include="Source\Graphics\RenderTexture.cs" />
-    <Compile Include="Source\Graphics\Renderer.cs" />
     <Compile Include="Source\Graphics\TextureAtlasPart.cs" />
     <Compile Include="Source\Types\Color4.cs" />
     <Compile Include="Source\Types\IntRectangle.cs" />
@@ -97,7 +95,6 @@
     <Compile Include="Source\Widgets\SplineGear.cs" />
     <Compile Include="Source\Widgets\SplinePoint.cs" />
     <Compile Include="Source\Widgets\Widget.cs" />
-    <Compile Include="Source\Input\Input.cs" />
     <Compile Include="Source\Audio\AudioSystem.cs" />
     <Compile Include="Source\Audio\AudioChannel.cs" />
     <Compile Include="Source\Audio\AudioDecoder.cs" />
@@ -133,7 +130,6 @@
     <Compile Include="Source\AssetsBundle\PackedAssetsBundle.cs" />
     <Compile Include="Source\AssetsBundle\UnpackedAssetsBundle.cs" />
     <Compile Include="Source\Graphics\OgvDecoder.cs" />
-    <Compile Include="Source\Graphics\OpenGL.cs" />
     <Compile Include="Source\Graphics\VideoTexture.cs" />
     <Compile Include="Source\Widgets\Video.cs" />
     <Compile Include="Source\PopupMenu\ImageBox.cs" />
@@ -150,10 +146,23 @@
     <Compile Include="Source\Application\TimeUtils.cs" />
     <Compile Include="Source\RewindableStream.cs" />
     <Compile Include="Source\Graphics\ITexture.cs" />
-    <Compile Include="Source\Graphics\Texture2D.cs" />
-    <Compile Include="Source\Graphics\Texture2D.DDS.cs" />
-    <Compile Include="Source\Graphics\Texture2D.Png.cs" />
-    <Compile Include="Source\Graphics\Texture2D.Pvr.cs" />
+    <Compile Include="Source\StreamExtensions.cs" />
+    <Compile Include="Source\AssetsBundle\UnityAssetsBundle.cs" />
+    <Compile Include="Source\Graphics\Renderer.Common.cs" />
+    <Compile Include="Source\Graphics\OpenGL\OpenGL.cs" />
+    <Compile Include="Source\Graphics\OpenGL\RenderTexture.cs" />
+    <Compile Include="Source\Graphics\OpenGL\Renderer.cs" />
+    <Compile Include="Source\Graphics\OpenGL\Texture2D.DDS.cs" />
+    <Compile Include="Source\Graphics\OpenGL\Texture2D.Png.cs" />
+    <Compile Include="Source\Graphics\OpenGL\Texture2D.Pvr.cs" />
+    <Compile Include="Source\Graphics\OpenGL\Texture2D.cs" />
+    <Compile Include="Source\Graphics\Unity\MaterialFactory.cs" />
+    <Compile Include="Source\Graphics\Unity\RenderTexture.cs" />
+    <Compile Include="Source\Graphics\Unity\Renderer.cs" />
+    <Compile Include="Source\Graphics\Unity\Texture2D.cs" />
+    <Compile Include="Source\Input\Input.Common.cs" />
+    <Compile Include="Source\Input\Input.Native.cs" />
+    <Compile Include="Source\Input\Input.Unity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Audio\ADPCMEncoder.c">

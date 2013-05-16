@@ -89,7 +89,7 @@ namespace Lime
 		{
 			if (currentIndex > 0) {
 #if GLES11
-				GL.DrawElements(All.Triangles, currentIndex, All.UnsignedInt, (IntPtr)batchIndices);
+				GL.DrawElements(All.Triangles, currentIndex, All.UnsignedShort, (IntPtr)batchIndices);
 #elif OPENGL
 				OGL.DrawElements(BeginMode.Triangles, currentIndex, DrawElementsType.UnsignedShort, (IntPtr)batchIndices);
 #endif

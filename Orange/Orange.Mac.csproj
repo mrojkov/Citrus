@@ -89,6 +89,7 @@
     <Compile Include="Source\AssetCooker\TextureConverterUtils.cs" />
     <Compile Include="Source\FileEnumerator.cs" />
     <Compile Include="Source\KumquatCooker\KumquatCooker.cs" />
+    <Compile Include="Source\AssetCooker\UnityAssetBundle.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="gtk-gui\gui.stetic">
