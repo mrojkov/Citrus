@@ -67,15 +67,15 @@ namespace Lime
 			return lhs.X != rhs.X || lhs.Y != rhs.Y;
 		}
 
-		public static float AngleDeg(Vector2 vector1, Vector2 vector2)
+		public static float AngleDeg(Vector2 a, Vector2 b)
 		{
-			return AngleRad(vector1, vector2) * Mathf.RadiansToDegrees;
+			return AngleRad(a, b) * Mathf.RadiansToDegrees;
 		}
 
-		public static float AngleRad(Vector2 vector1, Vector2 vector2)
+		public static float AngleRad(Vector2 a, Vector2 b)
 		{
-			float sin = vector1.X * vector2.Y - vector2.X * vector1.Y;
-			float cos = vector1.X * vector2.X + vector1.Y * vector2.Y;
+			float sin = a.X * b.Y - b.X * a.Y;
+			float cos = a.X * b.X + a.Y * b.Y;
 			return (float)Math.Atan2(sin, cos);
 		}
 
