@@ -152,10 +152,6 @@
       <Project>{887B87FD-0530-4FBF-A375-7A80153CA523}</Project>
       <Name>XwtPlus</Name>
     </ProjectReference>
-    <ProjectReference Include="..\3rdParty\xwt\Xwt.Mac\Xwt.Mac.csproj">
-      <Project>{B7C1673E-5124-4BE5-8D21-EC8B12F85B6B}</Project>
-      <Name>Xwt.Mac</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Icons\Nodes\Audio.png">

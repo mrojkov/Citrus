@@ -17,6 +17,16 @@ namespace Lime
 			return Math.Abs(x);
 		}
 
+		public static float Sqr(this float x)
+		{
+			return x * x;
+		}
+
+		public static float Sqrt(this float x)
+		{
+			return Mathf.Sqrt(x);
+		}
+
 		public static float Sign(this float x)
 		{
 			return Math.Sign(x);

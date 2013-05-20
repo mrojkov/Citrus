@@ -23,7 +23,7 @@ namespace Lime
 			get {
 				Vector2 result = Vector2.Zero;
 				if (Parent != null && Parent.AsWidget != null) {
-					result = Vector2.Scale(Parent.AsWidget.Size, Position);
+					result = Parent.AsWidget.Size * Position;
 				}
 				if (SkinningWeights != null && Parent != null && Parent.Parent != null) {
 					BoneArray a = Parent.Parent.AsWidget.BoneArray;

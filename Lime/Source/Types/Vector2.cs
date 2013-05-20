@@ -25,11 +25,6 @@ namespace Lime
 		public static readonly Vector2 Left = West;
 		public static readonly Vector2 Right = East;
 
-		public Vector2(float xy)
-		{
-			X = Y = xy;
-		}
-
 		public Vector2(float x, float y)
 		{
 			X = x;
@@ -72,32 +67,12 @@ namespace Lime
 			return lhs.X != rhs.X || lhs.Y != rhs.Y;
 		}
 
-		public bool IsShorterThan(float radius)
+		public static float AngleDeg(Vector2 vector1, Vector2 vector2)
 		{
-			return SquaredLength < radius * radius;
+			return AngleRad(vector1, vector2) * Mathf.RadiansToDegrees;
 		}
 
-		public bool IsLongerThan(float radius)
-		{
-			return SquaredLength > radius * radius;
-		}
-
-		public float DistanceTo(Vector2 v)
-		{
-			return (this - v).Length;
-		}
-
-		public bool IsWithin(Rectangle rect)
-		{
-			return rect.Contains(this);
-		}
-
-		public static float AngleBetweenDeg(Vector2 vector1, Vector2 vector2)
-		{
-			return AngleBetweenRad(vector1, vector2) * Mathf.RadiansToDegrees;
-		}
-
-		public static float AngleBetweenRad(Vector2 vector1, Vector2 vector2)
+		public static float AngleRad(Vector2 vector1, Vector2 vector2)
 		{
 			float sin = vector1.X * vector2.Y - vector2.X * vector1.Y;
 			float cos = vector1.X * vector2.X + vector1.Y * vector2.Y;
@@ -110,6 +85,11 @@ namespace Lime
 			r.X = (b.X - a.X) * t + a.X;
 			r.Y = (b.Y - a.Y) * t + a.Y;
 			return r;
+		}
+
+		public static float Distance(Vector2 a, Vector2 b)
+		{
+			return (a - b).Length;
 		}
 
 		public static Vector2 operator *(Vector2 lhs, Vector2 rhs)
@@ -125,11 +105,6 @@ namespace Lime
 		public static Vector2 operator /(Vector2 lhs, float rhs)
 		{
 			return new Vector2(lhs.X / rhs, lhs.Y / rhs);
-		}
-
-		public static Vector2 Scale(Vector2 lhs, Vector2 rhs)
-		{
-			return new Vector2(lhs.X * rhs.X, lhs.Y * rhs.Y);
 		}
 
 		public static Vector2 operator *(float lhs, Vector2 rhs)
@@ -167,18 +142,6 @@ namespace Lime
 			return lhs.X * rhs.Y - lhs.Y * rhs.X;
 		}
 
-        public static Vector2 Min(Vector2 value1, Vector2 value2)
-        {
-            return new Vector2(value1.X < value2.X ? value1.X : value2.X,
-                               value1.Y < value2.Y ? value1.Y : value2.Y);
-        }
-
-        public static Vector2 Max(Vector2 value1, Vector2 value2)
-        {
-            return new Vector2(value1.X > value2.X ? value1.X : value2.X,
-                               value1.Y > value2.Y ? value1.Y : value2.Y);
-        }
-
         public void Normalize()
         {
             float length = this.Length;
@@ -198,31 +161,17 @@ namespace Lime
 			return Mathf.CosSin(radians);
 		}
 
-		public static Vector2 RotateDeg(Vector2 value, float degrees)
+		public static Vector2 RotateDeg(Vector2 v, float degrees)
 		{
-			return value.RotateDeg(degrees);
+			return RotateRad(v, degrees * Mathf.DegreesToRadians);
 		}
 
-		public Vector2 RotateDeg(float degrees)
-		{
-			Vector2 cs = Mathf.CosSin(degrees * Mathf.DegreesToRadians);
-			Vector2 result;
-			result.X = X * cs.X - Y * cs.Y;
-			result.Y = X * cs.Y + Y * cs.X;
-			return result;
-		}
-
-		public static Vector2 RotateRad(Vector2 value, float radians)
-		{
-			return value.RotateRad(radians);
-		}
-
-		public Vector2 RotateRad(float radians)
+		public static Vector2 RotateRad(Vector2 v, float radians)
 		{
 			Vector2 cs = Mathf.CosSin(radians);
 			Vector2 result;
-			result.X = X * cs.X - Y * cs.Y;
-			result.Y = X * cs.Y + Y * cs.X;
+			result.X = v.X * cs.X - v.Y * cs.Y;
+			result.Y = v.X * cs.Y + v.Y * cs.X;
 			return result;
 		}
 
@@ -257,12 +206,7 @@ namespace Lime
 			}
 		}
 
-		public Vector2 Normal
-		{
-			get { return new Vector2(-Y, X).Normalized; }
-		}
-
-		public float SquaredLength
+		public float SqrLength
 		{
 			get { return X * X + Y * Y; }
 		}

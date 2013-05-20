@@ -125,7 +125,7 @@ namespace Lime
 			targetPosition = magnetData.PrecalcInvTransitionMatrix.TransformVector(targetPosition);
 
 			Vector2 direction = targetPosition - p.RegularPosition;
-			float squaredDistance = direction.SquaredLength;
+			float squaredDistance = direction.SqrLength;
 			direction = direction.Normalized;
 
 			float magnetStrength = magnet.Strength;

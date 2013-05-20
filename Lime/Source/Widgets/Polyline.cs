@@ -15,6 +15,11 @@ namespace Lime
 			this.Thickness = thickness;
 		}
 
+		static Vector2 GetVectorNormal(Vector2 v)
+		{
+			return new Vector2(-v.Y, v.X).Normalized;
+		}
+
 		public override void Render()
 		{
 			Renderer.Blending = GlobalBlending;
@@ -51,8 +56,8 @@ namespace Lime
 
 		private void DrawJoint(Vector2 a, Vector2 b, Vector2 c)
 		{
-			Vector2 n1 = (b - a).Normal * Thickness / 2;
-			Vector2 n2 = (c - b).Normal * Thickness / 2;
+			Vector2 n1 = GetVectorNormal(b - a) * Thickness / 2;
+			Vector2 n2 = GetVectorNormal(c - b) * Thickness / 2;
 			if (Vector2.CrossProduct(a - b, c - b) > 0) {
 				n1 = -n1;
 				n2 = -n2;
@@ -116,7 +121,7 @@ namespace Lime
 
 		private void DrawSegment(Vector2 a, Vector2 b)
 		{
-			Vector2 n = (b - a).Normal * Thickness / 2;
+			Vector2 n = GetVectorNormal(b - a) * Thickness / 2;
 			var v = new Renderer.Vertex[4];
 			v[0] = new Renderer.Vertex { Pos = a - n, Color = GlobalColor };
 			v[1] = new Renderer.Vertex { Pos = b - n, Color = GlobalColor };

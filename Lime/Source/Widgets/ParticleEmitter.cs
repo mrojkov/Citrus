@@ -501,7 +501,7 @@ namespace Lime
 
 			p.TextureIndex = 0.0f;
 			p.Velocity = Velocity.NormalRandomNumber() * emitterScaleAmount;
-			p.ScaleInitial = Vector2.Scale(emitterScale, new Vector2(zoom * aspectRatio, zoom / aspectRatio));
+			p.ScaleInitial = emitterScale * new Vector2(zoom * aspectRatio, zoom / aspectRatio);
 			p.ScaleCurrent = p.ScaleInitial;
 			p.WindDirection = WindDirection.UniformRandomNumber();
 			p.WindAmount = WindAmount.NormalRandomNumber() * emitterScaleAmount;
@@ -538,7 +538,7 @@ namespace Lime
 			case EmitterShape.Ellipse:
 				float angle = Mathf.RandomFloat(0, 360);
 				Vector2 sincos = Vector2.HeadingDeg(angle);
-				position = 0.5f * Vector2.Scale((sincos + Vector2.One), Size);
+				position = 0.5f * ((sincos + Vector2.One) * Size);
 				p.RegularDirection = Direction.UniformRandomNumber() + emitterAngle - 90 + angle;
 				break;
 			case EmitterShape.Area:
@@ -674,7 +674,7 @@ namespace Lime
 
 			if (AlongPathOrientation) {
 				Vector2 deltaPos = p.FullPosition - previousPosition;
-				if (deltaPos.SquaredLength > 0.00001f)
+				if (deltaPos.SqrLength > 0.00001f)
 					p.FullDirection = deltaPos.Atan2Deg;
 			}
 			return true;

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Tangerine
 {
-#if SEXY_PANEL
+#if SEXY_PANED
 	public class SexyPanel
 	{
 		Xwt.IContainerEventSink<SexyPanel> parent;

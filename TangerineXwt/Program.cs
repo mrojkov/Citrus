@@ -16,9 +16,9 @@ namespace Tangerine
 			//Application.Initialize(ToolkitType.Wpf);
 			//Workspace.Open("f:/Work/Zzz/Kill3.citproj");
 			//The.Workspace.OpenDocument("f:/Work/Zzz/Data/Game/Alien.tan");
-			//Workspace.Open("f:/Work/Zzz/Kill3.citproj");
-			Workspace.Open("/Users/buzer2010/Desktop/dev/net/Zzz/Main/Kill3.citproj");
-			The.Workspace.OpenDocument("f:/Work/Zzz/Data/Game/Alien.tan");
+			Workspace.Open("f:/Work/Zx3/Kill3.citproj");
+			//Workspace.Open("/Users/buzer2010/Desktop/dev/net/Zzz/Main/Kill3.citproj");
+			The.Workspace.OpenDocument("f:/Work/Zx3/Data/Game/Alien.tan");
 			//The.Workspace.OpenDocument("/Users/buzer2010/Desktop/dev/net/Zzz/Main/Data/Game/Alien.tan");
 			//The.Workspace.OpenDocument("f:/Work/Zzz/Data/Game/Levels/C_Bridge/Bridge02.tan");
 			var mainWindow = new MainWindow();
