@@ -74,6 +74,7 @@ namespace Orange
 			this.TargetPlatform = global::Gtk.ComboBox.NewText ();
 			this.TargetPlatform.AppendText (global::Mono.Unix.Catalog.GetString("Desktop (PC, Mac, Linux)"));
 			this.TargetPlatform.AppendText (global::Mono.Unix.Catalog.GetString("iPhone/iPad"));
+			this.TargetPlatform.AppendText (global::Mono.Unix.Catalog.GetString("Unity"));
 			this.TargetPlatform.Name = "TargetPlatform";
 			this.TargetPlatform.Active = 0;
 			this.table1.Add (this.TargetPlatform);

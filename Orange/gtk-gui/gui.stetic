@@ -93,7 +93,8 @@
                     <property name="MemberName" />
                     <property name="IsTextCombo">True</property>
                     <property name="Items" translatable="yes">Desktop (PC, Mac, Linux)
-iPhone/iPad</property>
+iPhone/iPad
+Unity</property>
                     <property name="Active">0</property>
                   </widget>
                   <packing>
