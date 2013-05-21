@@ -16,13 +16,13 @@ namespace Orange
 		private global::Gtk.Table table3;
 		private global::Gtk.ComboBox Action;
 		private global::Gtk.Button GoButton;
-		
+
 		protected virtual void Build ()
 		{
 			global::Stetic.Gui.Initialize (this);
 			// Widget Orange.MainWindow
 			this.Name = "Orange.MainWindow";
-			this.Title = "Orange";
+			this.Title = global::Mono.Unix.Catalog.GetString ("Orange");
 			this.WindowPosition = ((global::Gtk.WindowPosition)(1));
 			// Container child Orange.MainWindow.Gtk.Container+ContainerChild
 			this.dialog1_VBox = new global::Gtk.VBox ();
@@ -39,7 +39,7 @@ namespace Orange
 			this.table1.RowSpacing = ((uint)(6));
 			this.table1.ColumnSpacing = ((uint)(6));
 			// Container child table1.Gtk.Table+TableChild
-			this.CitrusProjectChooser = new global::Gtk.FileChooserButton ("Select a File", ((global::Gtk.FileChooserAction)(0)));
+			this.CitrusProjectChooser = new global::Gtk.FileChooserButton (global::Mono.Unix.Catalog.GetString("Select a File"), ((global::Gtk.FileChooserAction)(0)));
 			this.CitrusProjectChooser.Name = "CitrusProjectChooser";
 			this.CitrusProjectChooser.ShowHidden = true;
 			this.table1.Add (this.CitrusProjectChooser);
@@ -54,7 +54,7 @@ namespace Orange
 			this.label1 = new global::Gtk.Label ();
 			this.label1.Name = "label1";
 			this.label1.Xalign = 1F;
-			this.label1.LabelProp = "Citrus project";
+			this.label1.LabelProp = global::Mono.Unix.Catalog.GetString ("Citrus project");
 			this.table1.Add (this.label1);
 			global::Gtk.Table.TableChild w2 = ((global::Gtk.Table.TableChild)(this.table1 [this.label1]));
 			w2.TopAttach = ((uint)(1));
@@ -65,16 +65,15 @@ namespace Orange
 			this.label2 = new global::Gtk.Label ();
 			this.label2.Name = "label2";
 			this.label2.Xalign = 1F;
-			this.label2.LabelProp = "Target platform";
+			this.label2.LabelProp = global::Mono.Unix.Catalog.GetString ("Target platform");
 			this.table1.Add (this.label2);
 			global::Gtk.Table.TableChild w3 = ((global::Gtk.Table.TableChild)(this.table1 [this.label2]));
 			w3.XOptions = ((global::Gtk.AttachOptions)(4));
 			w3.YOptions = ((global::Gtk.AttachOptions)(4));
 			// Container child table1.Gtk.Table+TableChild
 			this.TargetPlatform = global::Gtk.ComboBox.NewText ();
-			this.TargetPlatform.AppendText ("Desktop (PC, Mac, Linux)");
-			this.TargetPlatform.AppendText ("iPhone/iPad");
-			this.TargetPlatform.AppendText ("Unity");
+			this.TargetPlatform.AppendText (global::Mono.Unix.Catalog.GetString("Desktop (PC, Mac, Linux)"));
+			this.TargetPlatform.AppendText (global::Mono.Unix.Catalog.GetString("iPhone/iPad"));
 			this.TargetPlatform.Name = "TargetPlatform";
 			this.TargetPlatform.Active = 0;
 			this.table1.Add (this.TargetPlatform);
@@ -112,13 +111,13 @@ namespace Orange
 			this.table3.BorderWidth = ((uint)(5));
 			// Container child table3.Gtk.Table+TableChild
 			this.Action = global::Gtk.ComboBox.NewText ();
-			this.Action.AppendText ("Build Game & Run");
-			this.Action.AppendText ("Build Content Only");
-			this.Action.AppendText ("Rebuild Game");
-			this.Action.AppendText ("Reveal Content");
-			this.Action.AppendText ("Extract Tangerine Scenes");
-			this.Action.AppendText ("Extract Translatable Strings");
-			this.Action.AppendText ("Generate Serialization Assembly");
+			this.Action.AppendText (global::Mono.Unix.Catalog.GetString("Build Game & Run"));
+			this.Action.AppendText (global::Mono.Unix.Catalog.GetString("Build Content Only"));
+			this.Action.AppendText (global::Mono.Unix.Catalog.GetString("Rebuild Game"));
+			this.Action.AppendText (global::Mono.Unix.Catalog.GetString("Reveal Content"));
+			this.Action.AppendText (global::Mono.Unix.Catalog.GetString("Extract Tangerine Scenes"));
+			this.Action.AppendText (global::Mono.Unix.Catalog.GetString("Extract Translatable Strings"));
+			this.Action.AppendText (global::Mono.Unix.Catalog.GetString("Generate Serialization Assembly"));
 			this.Action.Name = "Action";
 			this.Action.Active = 0;
 			this.table3.Add (this.Action);
@@ -130,7 +129,7 @@ namespace Orange
 			this.GoButton.CanFocus = true;
 			this.GoButton.Name = "GoButton";
 			this.GoButton.UseUnderline = true;
-			this.GoButton.Label = "_Go";
+			this.GoButton.Label = global::Mono.Unix.Catalog.GetString ("_Go");
 			this.table3.Add (this.GoButton);
 			global::Gtk.Table.TableChild w10 = ((global::Gtk.Table.TableChild)(this.table3 [this.GoButton]));
 			w10.LeftAttach = ((uint)(1));
