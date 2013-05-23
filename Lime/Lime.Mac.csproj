@@ -146,7 +146,6 @@
     <Compile Include="Source\Application\TimeUtils.cs" />
     <Compile Include="Source\RewindableStream.cs" />
     <Compile Include="Source\Graphics\ITexture.cs" />
-    <Compile Include="Source\StreamExtensions.cs" />
     <Compile Include="Source\AssetsBundle\UnityAssetsBundle.cs" />
     <Compile Include="Source\Graphics\Renderer.Common.cs" />
     <Compile Include="Source\Graphics\OpenGL\OpenGL.cs" />
