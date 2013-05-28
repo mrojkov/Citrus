@@ -46,6 +46,8 @@ namespace Lime
 
 		private FontPool() { }
 
+		public Font DefaultFont { get { return this[null]; } }
+
 		public Font this[string name]
 		{
 			get	{
