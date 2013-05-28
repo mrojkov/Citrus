@@ -186,10 +186,11 @@ namespace Tangerine
 
 		private void CreateDecoration()
 		{
-			titleLabel = new Xwt.Label("DockPanel");
-			titleLabel.MarginLeft = 4;
-			titleLabel.MarginBottom = 2;
-			titleLabel.MarginTop = 2;
+			titleLabel = new Xwt.Label("DockPanel") {
+				MarginLeft = 4,
+				MarginBottom = 2,
+				MarginTop = 2
+			};
 			titleLabel.ButtonReleased += title_ButtonReleased;
 			titleLabel.ButtonPressed += title_ButtonPressed;
 			titleLabel.MouseMoved += title_MouseMoved;

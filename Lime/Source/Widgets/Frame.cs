@@ -65,6 +65,11 @@ namespace Lime
 			return renderTexture;
 		}
 
+		public bool IsTopDialog()
+		{
+			return World.Instance.GetTopDialog() == this;
+		}
+
 		private void UpdateForDialogMode(int delta)
 		{
 			if (!World.Instance.IsTopDialogUpdated) {

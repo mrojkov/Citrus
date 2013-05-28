@@ -27,6 +27,26 @@
 
 		public static World Instance = new World();
 
+		public Widget GetTopDialog()
+		{
+			return GetTopDialogHelper(this);
+		}
+
+		public Widget GetTopDialogHelper(Node parent)
+		{
+			foreach (var node in parent.Nodes) {
+				var frame = node as Frame;
+				if (frame != null && frame.DialogMode && frame.GloballyVisible) {
+					return frame;
+				}
+				var dialog = GetTopDialogHelper(node);
+				if (dialog != null) {
+					return dialog;
+				}
+			}
+			return null;
+		}
+
 		public override void Update(int delta)
 		{
 			ParticleEmitter.NumberOfUpdatedParticles = 0;
