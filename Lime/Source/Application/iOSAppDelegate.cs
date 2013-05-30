@@ -23,7 +23,7 @@ namespace Lime
 		// handlers
 		public delegate void AlertClickHandler(int buttonIdx);
 		public delegate bool OpenURLHandler(NSUrl url);
-		public OpenURLHandler UrlOpened;
+		public event OpenURLHandler UrlOpened;
 
 		// class-level declarations
 		public UIWindow Window { get; private set; }
