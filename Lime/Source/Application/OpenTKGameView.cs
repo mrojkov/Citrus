@@ -10,6 +10,7 @@ namespace Lime
 		public static GameView Instance;
 		Application app;
 		internal Action ScheduledActions;
+		public bool PowerSaveMode { get; set; }
 
 		public GameView(Application app, string[] args = null)
 			: base(640, 480, new OpenTK.Graphics.GraphicsMode(32, 0, 0, 1))
@@ -25,13 +26,11 @@ namespace Lime
 			this.Mouse.ButtonDown += HandleMouseButtonDown;
 			this.Mouse.ButtonUp += HandleMouseButtonUp;
 			this.Mouse.Move += HandleMouseMove;
-
 			// Как узнать разрешение текущего экрана без Windows Forms?
 			Size screenSize = new Size(1280, 1024);
-
 			if (CheckFullscreenArg(args)) {
 				this.WindowState = OpenTK.WindowState.Fullscreen;
-			} else if (CheckMaximizedArg(args)) {
+			} else if (CheckMaximizedFlag(args)) {
 				this.Location = new System.Drawing.Point(0, 0);
 				this.WindowState = OpenTK.WindowState.Maximized;
 			} else {
@@ -40,11 +39,17 @@ namespace Lime
 					(screenSize.Height - this.Height) / 2
 				);
 			}
+			PowerSaveMode = CheckPowerSaveFlag(args);
 		}
 
-		private static bool CheckMaximizedArg(string[] args)
+		private static bool CheckMaximizedFlag(string[] args)
 		{
 			return args != null && Array.IndexOf(args, "--Maximized") >= 0;
+		}
+
+		private static bool CheckPowerSaveFlag(string[] args)
+		{
+			return args != null && Array.IndexOf(args, "--PowerSave") >= 0;
 		}
 
 		private static bool CheckFullscreenArg(string[] args)
@@ -122,17 +127,22 @@ namespace Lime
 			AudioSystem.Terminate();
 		}
 
-		private long prevTime = 0;
+		private long lastMillisecondsCount = 0;
 
 		protected override void OnRenderFrame(OpenTK.FrameEventArgs e)
 		{
 			lock (Application.MainThreadSync) {
-				long currentTime = TimeUtils.GetMillisecondsSinceGameStarted();
-				int delta = (int)(currentTime - prevTime);
+				long millisecondsCount = TimeUtils.GetMillisecondsSinceGameStarted();
+				int delta = (int)(millisecondsCount - lastMillisecondsCount);
 				delta = delta.Clamp(0, 40);
-				prevTime = currentTime;
+				lastMillisecondsCount = millisecondsCount;
 				DoUpdate(delta);
 				DoRender();
+				if (PowerSaveMode) {
+					millisecondsCount = TimeUtils.GetMillisecondsSinceGameStarted();
+					delta = (int)(millisecondsCount - lastMillisecondsCount);
+					System.Threading.Thread.Sleep(Math.Max(0, (1000 / 25) - delta));
+				}
 				if (ScheduledActions != null) {
 					ScheduledActions();
 					ScheduledActions = null;

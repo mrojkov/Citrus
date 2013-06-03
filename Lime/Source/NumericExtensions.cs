@@ -22,6 +22,11 @@ namespace Lime
 			return x * x;
 		}
 
+		public static float Pow(this float x, float y)
+		{
+			return (float)Math.Pow(x, y);
+		}
+
 		public static float Sqrt(this float x)
 		{
 			return Mathf.Sqrt(x);

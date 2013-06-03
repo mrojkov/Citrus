@@ -206,7 +206,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Use for fast deep cloning of unchangeable objects. This function based on MemberwiseClone().
+		/// Use for fast deep cloning of immutable objects. This function based on MemberwiseClone().
 		/// Animators keys, Markers and SkinningWeights are shared between clone and original.
 		/// </summary>
 		public T DeepCloneFast<T>() where T : Node
