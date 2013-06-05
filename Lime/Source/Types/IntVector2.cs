@@ -78,6 +78,16 @@ namespace Lime
 			return new IntVector2(lhs.X / rhs, lhs.Y / rhs);
 		}
 
+		public static IntVector2 operator *(int lhs, IntVector2 rhs)
+		{
+			return new IntVector2(lhs * rhs.X, lhs * rhs.Y);
+		}
+
+		public static IntVector2 operator *(IntVector2 lhs, int rhs)
+		{
+			return new IntVector2(rhs * lhs.X, rhs * lhs.Y);
+		}
+
 		public override string ToString()
 		{
 			return String.Format("{0}, {1}", X, Y);
