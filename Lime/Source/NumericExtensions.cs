@@ -51,5 +51,15 @@ namespace Lime
 		{
 			return Mathf.Clamp(value, min, max);
 		}
+
+		public static int Truncate(this float x)
+		{
+			return (int)x;
+		}
+
+		public static int Round(this float x)
+		{
+			return (int)Math.Round(x);
+		}
 	}
 }
