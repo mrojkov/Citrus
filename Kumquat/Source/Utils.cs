@@ -11,7 +11,7 @@ namespace Kumquat
 	{
 		public static void Reparent(Widget widget, Widget parent)
 		{
-			widget.Basis = widget.CalcBasisInSpaceOf(parent);
+			widget.Transform = widget.CalcTransformInSpaceOf(parent);
 			
 			if (widget.Parent != null)
 				widget.Unlink();
