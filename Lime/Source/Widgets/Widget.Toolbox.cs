@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Lime
 {
-	public struct Basis
+	public struct Transform
 	{
 		public Vector2 Position;
 		public Vector2 Scale;
@@ -16,12 +16,12 @@ namespace Lime
 
 	public partial class Widget : Node
 	{
-		public Basis Basis
+		public Transform Transform
 		{
 			get
 			{
 				// Vector2 cs = Mathf.CosSin(Mathf.DegreesToRadians * Rotation);
-				return new Basis {
+				return new Transform {
 					Position = Position,
 					Rotation = Rotation,
 					Scale = Scale,
@@ -115,7 +115,7 @@ namespace Lime
 		public Vector2[] CalcHullInSpaceOf(Widget container)
 		{
 			Vector2[] vertices = new Vector2[4];
-			var basis = CalcBasisInSpaceOf(container);
+			var basis = CalcTransformInSpaceOf(container);
 			vertices[0] = basis.Position - basis.U * Size.X * Pivot.X - basis.V * Size.Y * Pivot.Y;
 			vertices[1] = vertices[0] + basis.U * Size.X;
 			vertices[2] = vertices[0] + basis.U * Size.X + basis.V * Size.Y;
@@ -123,7 +123,7 @@ namespace Lime
 			return vertices;
 		}
 
-		public Basis CalcBasisFromMatrix(Matrix32 matrix)
+		public Transform CalcBasisFromMatrix(Matrix32 matrix)
 		{
 			var v1 = new Vector2(1, 0);
 			var v2 = new Vector2(0, 1);
@@ -133,7 +133,7 @@ namespace Lime
 			v3 = matrix.TransformVector(v3);
 			v1 = v1 - v3;
 			v2 = v2 - v3;
-			Basis basis;
+			Transform basis;
 			basis.Position = matrix.TransformVector(Pivot * Size);
 			basis.Scale = new Vector2(v1.Length, v2.Length);
 			basis.Rotation = v1.Atan2Deg;
@@ -142,7 +142,7 @@ namespace Lime
 			return basis;
 		}
 
-		public Basis CalcBasisInSpaceOf(Widget container)
+		public Transform CalcTransformInSpaceOf(Widget container)
 		{
 			Matrix32 matrix = CalcTransitionToSpaceOf(container);
 			return CalcBasisFromMatrix(matrix);
@@ -150,7 +150,7 @@ namespace Lime
 
 		public Vector2 CalcPositionInSpaceOf(Widget container)
 		{
-			return CalcBasisInSpaceOf(container).Position;
+			return CalcTransformInSpaceOf(container).Position;
 		}
 	}
 }

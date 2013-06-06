@@ -107,7 +107,7 @@ namespace Lime
 			} else if (GlobalColor.A < 10) {
 				suggestions.Add("One of its parent has 'Opacity' close to zero");
 			}
-			var basis = CalcBasisInSpaceOf(World.Instance);
+			var basis = CalcTransformInSpaceOf(World.Instance);
 			if (Mathf.Abs(basis.Scale.X) < 0.01f || Mathf.Abs(basis.Scale.Y) < 0.01f) {
 				suggestions.Add(string.Format("Widget is probably too small (Scale: {0})", basis.Scale));
 			}
