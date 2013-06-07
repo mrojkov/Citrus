@@ -65,7 +65,7 @@ namespace Orange
 
 		void ProcessSourceFile(string file, Pass pass)
 		{
-			var origText = File.ReadAllText(file);
+			var origText = File.ReadAllText(file, Encoding.Default);
 			var text = EscapeQuotes(origText);
 			text = Regex.Replace(text, @"""(\[\d*\][^""]*)""",
 				(match) => {
@@ -82,7 +82,7 @@ namespace Orange
 
 		void ProcessSceneFile(string file, Pass pass)
 		{
-			var origText = File.ReadAllText(file);
+			var origText = File.ReadAllText(file, Encoding.Default);
 			var text = Regex.Replace(origText, @"^(\s*Text)\s""([^""]*)""$", 
 				(match) => {
 					string prefix = match.Groups[1].Value;
