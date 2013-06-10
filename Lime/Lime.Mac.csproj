@@ -17,7 +17,7 @@
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\Mac\Debug</OutputPath>
-    <DefineConstants>DEBUG;OPENGL;OPENAL</DefineConstants>
+    <DefineConstants>DEBUG;OPENGL;OPENAL;MAC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>False</ConsolePause>
