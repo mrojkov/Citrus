@@ -7,7 +7,8 @@ namespace Lime
 {
 	public class Sound
 	{
-		public Sound() { 
+		public Sound()
+		{ 
 			Channel = NullAudioChannel.Instance;
 			IsBumpable = false;
 		}

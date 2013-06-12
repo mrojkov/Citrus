@@ -115,15 +115,15 @@ namespace Lime
 		public Vector2[] CalcHullInSpaceOf(Widget container)
 		{
 			Vector2[] vertices = new Vector2[4];
-			var basis = CalcTransformInSpaceOf(container);
-			vertices[0] = basis.Position - basis.U * Size.X * Pivot.X - basis.V * Size.Y * Pivot.Y;
-			vertices[1] = vertices[0] + basis.U * Size.X;
-			vertices[2] = vertices[0] + basis.U * Size.X + basis.V * Size.Y;
-			vertices[3] = vertices[0] + basis.V * Size.Y;
+			var transform = CalcTransformInSpaceOf(container);
+			vertices[0] = transform.Position - transform.U * Size.X * Pivot.X - transform.V * Size.Y * Pivot.Y;
+			vertices[1] = vertices[0] + transform.U * Size.X;
+			vertices[2] = vertices[0] + transform.U * Size.X + transform.V * Size.Y;
+			vertices[3] = vertices[0] + transform.V * Size.Y;
 			return vertices;
 		}
 
-		public Transform CalcBasisFromMatrix(Matrix32 matrix)
+		public Transform CalcTransformFromMatrix(Matrix32 matrix)
 		{
 			var v1 = new Vector2(1, 0);
 			var v2 = new Vector2(0, 1);
@@ -133,19 +133,19 @@ namespace Lime
 			v3 = matrix.TransformVector(v3);
 			v1 = v1 - v3;
 			v2 = v2 - v3;
-			Transform basis;
-			basis.Position = matrix.TransformVector(Pivot * Size);
-			basis.Scale = new Vector2(v1.Length, v2.Length);
-			basis.Rotation = v1.Atan2Deg;
-			basis.U = v1;
-			basis.V = v2;
-			return basis;
+			Transform transform;
+			transform.Position = matrix.TransformVector(Pivot * Size);
+			transform.Scale = new Vector2(v1.Length, v2.Length);
+			transform.Rotation = v1.Atan2Deg;
+			transform.U = v1;
+			transform.V = v2;
+			return transform;
 		}
 
 		public Transform CalcTransformInSpaceOf(Widget container)
 		{
 			Matrix32 matrix = CalcTransitionToSpaceOf(container);
-			return CalcBasisFromMatrix(matrix);
+			return CalcTransformFromMatrix(matrix);
 		}
 
 		public Vector2 CalcPositionInSpaceOf(Widget container)

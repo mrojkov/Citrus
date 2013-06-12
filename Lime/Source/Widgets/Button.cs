@@ -140,10 +140,11 @@ namespace Lime
             RunAnimationWithStopHandler(
                 "Release", 
                 () => {
-                    if (HitTest(Input.MousePosition))
-                        SetFocusedState();
-                    else
-                        SetNormalState();
+					if (HitTest(Input.MousePosition)) {
+						SetFocusedState();
+					} else {
+						SetNormalState();
+					}
                 }
             );
 		}
@@ -166,11 +167,13 @@ namespace Lime
 		{
 			if (Enabled) {
 				if (World.Instance.ActiveWidget != this && StateHandler != UpdateNormalState) {
-					SetNormalState();
+					if (CurrentAnimation != "Release") {
+						SetNormalState();
+					}
 				}
 			    if (World.Instance.ActiveWidget == this) {
 				    World.Instance.IsActiveWidgetUpdated = true;
-			    }			
+			    }	
 			}
 		}
 	}
