@@ -24,53 +24,53 @@ namespace BigFish_iOS_SDK
 	[BaseType(typeof(NSObject), Name = "bfgGameReporting")]
 	interface BfgGameReporting
 	{
-		[Static, Export("sharedInstance")]
-		BfgGameReporting SharedInstance { get; }
-
-		[Export("logMainMenuShown")]
+		[Static, Export("logMainMenuShown")]
 		void LogMainMenuShown();
 	
-		[Export("logRateMainMenuCancelled")]
+		[Static, Export("logRateMainMenuCancelled")]
 		void LogRateMainMenuCanceled();
 	
-		[Export("logOptionsShown")]
+		[Static, Export("logOptionsShown")]
 		void LogOptionsShown();
 	
-		[Export("logPurchaseSuccessful")]
+		[Static, Export("logPurchaseSuccessful")]
 		void LogPurchaseSuccessful();
 
-		[Export("logPurchaseSuccessful:")]
+		[Static, Export("logPurchaseSuccessful:")]
 		void LogPurchaseSuccessful(string purchaseID);
 	
-		[Export("logPurchaseMainMenuShown")]
+		[Static, Export("logPurchaseMainMenuShown")]
 		void LogPurchaseMainMenuShown();
 
-		[Export("logPurchasePayWallShown:")]
+		[Static, Export("logPurchasePayWallShown:")]
 		void LogPurchasePayWallShown(string paywallID);
 
-		[Export("logLevelStart:")]
+		[Static, Export("logLevelStart:")]
 		void LogLevelStart(string levelID);
 
-		[Export("logLevelFinished:")]
+		[Static, Export("logLevelFinished:")]
 		void LogLevelFinished(string levelID);
 
-		[Export("logMiniGameStart:")]
+		[Static, Export("logMiniGameStart:")]
 		void LogMiniGameStart(string miniGameID);
 
-		[Export("logMiniGameSkipped:")]
+		[Static, Export("logMiniGameSkipped:")]
 		void LogMiniGameSkipped(string miniGameID);
 
-		[Export("logMiniGameFinished:")]
+		[Static, Export("logMiniGameFinished:")]
 		void LogMiniGameFinished(string miniGameID);
 
-		[Export("logAchievementEarned:")]
+		[Static, Export("logAchievementEarned:")]
 		void LogAchievementEarned(string achievementID);
 
-		[Export("logTellAFriendTapped")]
+		[Static, Export("logTellAFriendTapped")]
 		void LogTellAFriendTapped();
 
-		[Export("logGameCompleted")]
+		[Static, Export("logGameCompleted")]
 		void LogGameCompleted();
+
+		[Static, Export("logCustomEvent:value:level:details1:details2:details3:additionalDetails:")]
+		void LogCustomEvent(string name, int value, int level, string details1, string details2, string details3, NSDictionary additionalDetails);
 	}
 
 	[BaseType(typeof(NSObject), Name = "bfgSplash")]
