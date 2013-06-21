@@ -20,10 +20,16 @@ namespace Lime
 	{
 		public static AppDelegate Instance;
 
+		public NSDictionary LaunchOptions;
+
 		// handlers
 		public delegate void AlertClickHandler(int buttonIdx);
 		public delegate bool OpenURLHandler(NSUrl url);
+		public delegate void RegisteredForRemoteNotificationsHandler(NSData deviceToken);
+
 		public event OpenURLHandler UrlOpened;
+		public event RegisteredForRemoteNotificationsHandler RegisteredForRemoteNotificationsEvent;
+		public event Action WillTerminateEvent;
 
 		// class-level declarations
 		public UIWindow Window { get; private set; }
@@ -93,6 +99,14 @@ namespace Lime
 			Application.Instance.OnActivate();
 		}
 
+	
+		public override void WillTerminate(UIApplication application)
+		{
+			if (WillTerminateEvent != null) {
+				WillTerminateEvent();
+			}
+		}
+
 		public override void OnResignActivation(UIApplication application)
 		{
 			// http://developer.apple.com/library/ios/#documentation/3DDrawing/Conceptual/OpenGLES_ProgrammingGuide/ImplementingaMultitasking-awareOpenGLESApplication/ImplementingaMultitasking-awareOpenGLESApplication.html#//apple_ref/doc/uid/TP40008793-CH5
@@ -104,12 +118,21 @@ namespace Lime
 			Application.Instance.Active = false;
 		}
 
+		public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken)
+		{
+			if (RegisteredForRemoteNotificationsEvent != null) {
+				RegisteredForRemoteNotificationsEvent(deviceToken);
+			}
+		}
+
 		// This method is invoked when the application has loaded its UI and is ready to run
 		public override bool FinishedLaunching(UIApplication app, NSDictionary options)
 		{
 			UIApplication.SharedApplication.StatusBarHidden = true;
 			UIApplication.SharedApplication.IdleTimerDisabled = true;
-			
+		
+			LaunchOptions = options;
+
 			AudioSystem.Initialize();
 
 			// create a new window instance based on the screen size

@@ -5,6 +5,6 @@ using MonoTouch.ObjCRuntime;
    	LinkTarget.ArmV7 | LinkTarget.Simulator,
     ForceLoad = true,
 	LinkerFlags = "-lz -licucore",
-    Frameworks = "Security SystemConfiguration StoreKit UIKit OpenGLES MessageUI Foundation CoreGraphics",
+                    Frameworks = "Security SystemConfiguration StoreKit UIKit OpenGLES MessageUI Foundation CoreGraphics CoreTelephony",
 	WeakFrameworks = "iAd GameKit")
 ]
