@@ -243,10 +243,23 @@ namespace Lime
 		{
 			var stream = new AssetStream(this, path);
 			var desc = stream.descriptor;
+			if (Application.CheckCommandLineArg("--iPadLags")) {
+				SimulateReadDelay(path, desc.Length);
+			}
 			if ((desc.Attributes & AssetAttributes.Zipped) != 0) {
 				return DecompressStream(stream);
 			}
 			return stream;
+		}
+
+		private void SimulateReadDelay(string path, int length)
+		{
+			const float readSpeed = 2000 * 1024;
+			int readTime = (int)(1000L * length / readSpeed);
+			if (readTime > 10) {
+				Console.WriteLine("Lag {0} ms while reading {1}", readTime, path);
+			}
+			System.Threading.Thread.Sleep(readTime);
 		}
 
 		private static Stream DecompressStream(AssetStream stream)

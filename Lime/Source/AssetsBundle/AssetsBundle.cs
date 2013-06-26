@@ -10,8 +10,6 @@ namespace Lime
 	{
 		private static AssetsBundle instance;
 
-		const float iPadFlashReadingSpeed = 50 * 1024 * 1024;
-
 		public static AssetsBundle Instance
 		{
 			get
@@ -50,13 +48,6 @@ namespace Lime
 		public Stream OpenFileLocalized(string path)
 		{
 			var stream = OpenFile(GetLocalizedPath(path));
-			if (Application.CheckCommandLineArg("--iPadLags")) {
-				int readTime = (int)(1000 * stream.Length / iPadFlashReadingSpeed);
-				System.Threading.Thread.Sleep(readTime);
-				if (readTime > 20) {
-					Console.WriteLine("Lag {0} ms while reading {1}", readTime, path);
-				}
-			}
 			return stream;
 		}
 
