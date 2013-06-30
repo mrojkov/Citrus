@@ -321,6 +321,10 @@ namespace Lime
 						GL.BlendFunc(All.SrcAlpha, All.OneMinusSrcAlpha);
 					GL.TexEnv(All.TextureEnv, All.TextureEnvMode, (int)All.Modulate);
 					break;
+				case Blending.Modulate:
+					GL.BlendFunc(All.DstColor, All.Zero);
+					GL.TexEnv(All.TextureEnv, All.TextureEnvMode, (int)All.Modulate);
+					break;
 				}
 #elif OPENGL
 				OGL.Enable(EnableCap.Blend);
@@ -350,6 +354,10 @@ namespace Lime
 						OGL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.One);
 					else
 						OGL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
+					OGL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
+					break;
+				case Blending.Modulate:
+					OGL.BlendFunc(BlendingFactorSrc.DstColor, BlendingFactorDest.Zero);
 					OGL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
 					break;
 				}

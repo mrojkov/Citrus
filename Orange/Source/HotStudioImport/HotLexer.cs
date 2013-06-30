@@ -109,6 +109,8 @@ namespace Orange
 				return Blending.Default;
 			case 2:
 				return Blending.Add;
+			case 5:
+				return Blending.Modulate;
 			case 7:
 				return Blending.Silhuette;
 			default:

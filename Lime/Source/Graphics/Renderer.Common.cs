@@ -24,6 +24,8 @@ namespace Lime
 		Silhuette,
 		[ProtoEnum]
 		Glow,
+		[ProtoEnum]
+		Modulate,
 	}
 
 	public struct Viewport
