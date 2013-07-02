@@ -165,7 +165,7 @@ namespace Lime
 
 		PackedAssetsBundle() {}
 
-		public PackedAssetsBundle(string path, AssetBundleFlags flags)
+		public PackedAssetsBundle(string path, AssetBundleFlags flags = Lime.AssetBundleFlags.None)
 		{
 			this.path = path;
 			if ((flags & AssetBundleFlags.Writable) != 0) {
