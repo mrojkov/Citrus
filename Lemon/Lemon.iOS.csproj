@@ -35,6 +35,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="monotouch" />
+    <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
     <ObjcBindingCoreSource Include="Api.cs" />

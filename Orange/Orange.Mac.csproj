@@ -60,11 +60,13 @@
       <HintPath>..\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Posix" />
+    <Reference Include="atk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Mono\MonoMac\v0.0\Mono.MonoMac.targets" />
   <ItemGroup>
-    <Compile Include="gtk-gui\generated.cs" />
     <Compile Include="Source\AppConfig.cs" />
     <Compile Include="Source\AssemblyInfo.cs" />
     <Compile Include="Source\DirectoryChanger.cs" />
@@ -84,17 +86,12 @@
     <Compile Include="Source\DictionaryExtractor.cs" />
     <Compile Include="Source\MainWindow.cs" />
     <Compile Include="Source\AssetCooker\WaveIMA4Converter.cs" />
-    <Compile Include="gtk-gui\Orange.MainWindow.cs" />
     <Compile Include="Source\AssetCooker\AssetsUnpacker.cs" />
     <Compile Include="Source\AssetCooker\TextureConverterUtils.cs" />
     <Compile Include="Source\FileEnumerator.cs" />
     <Compile Include="Source\KumquatCooker\KumquatCooker.cs" />
     <Compile Include="Source\AssetCooker\UnityAssetBundle.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="gtk-gui\gui.stetic">
-      <LogicalName>gui.stetic</LogicalName>
-    </EmbeddedResource>
+    <Compile Include="Source\MainWindow.Controls.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lime\Lime.Mac.csproj">

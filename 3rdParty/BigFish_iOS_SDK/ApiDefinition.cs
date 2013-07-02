@@ -14,11 +14,65 @@ namespace BigFish_iOS_SDK
 		[Static, Export("initialize")]
 		void Initialize();
 
+		[Static, Export("reset")]
+		void Reset();
+
 		[Static, Export("mainMenuRateApp")]
 		void MainMenuRateApp();
 
 		[Static, Export("immediateTrigger")]
 		void ImmediateTrigger();
+	}
+
+	[BaseType(typeof(NSObject), Name = "bfgSettings")]
+	interface BfgSettings
+	{
+		[Static, Export("set:value:")]
+		void Set(string key, NSObject value);
+
+		[Static, Export("plistPath")]
+		string GetPlistPath();
+
+		[Static, Export("get")]
+		NSObject Get(string key);
+	}
+
+	[BaseType(typeof(NSObject), Name = "bfgPurchaseObject")]
+	interface BfgPurchaseObject
+	{
+		[Export("productId")]
+		string ProductId { get; }
+
+		[Export("productInfo")]
+		NSDictionary ProductInfo { get; }
+	}
+
+	[BaseType(typeof(NSObject), Name = "bfgPurchase")]
+	interface BfgPurchase
+	{
+		[Static, Export("acquireProductInformationForProducts:")]
+		void AcquireProductInformationForProducts(NSSet products);
+
+		[Static, Export("canStartPurchase:")]
+		bool CanStartPurchase(string productId);
+
+		[Static, Export("finishPurchase:")]
+		void FinishPurchase(string productId);
+
+		[Static, Export("isPurchaseActive:")]
+		void IsPurchaseActive(string productId);
+
+		[Static, Export("productInformation:")]
+		NSDictionary ProductInformation(string productId);
+
+		[Static, Export("restorePurchases")]
+		void RestorePurchases();
+
+		[Static, Export("startPurchase:")]
+		void StartPurchase(string productId);
+
+		[Static, Export("startService")]
+		bool StartService();
 	}
 
 	[BaseType(typeof(NSObject), Name = "bfgGameReporting")]
