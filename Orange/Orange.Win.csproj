@@ -50,7 +50,8 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Orange.ico</ApplicationIcon>
+    <ApplicationIcon>
+    </ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -72,7 +73,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="gtk-gui\generated.cs" />
     <Compile Include="Source\AppConfig.cs" />
     <Compile Include="Source\AssemblyInfo.cs" />
     <Compile Include="Source\AssetCooker\AssetCooker.cs" />
@@ -96,11 +96,8 @@
     <Compile Include="Source\SolutionBuilder.cs" />
     <Compile Include="Source\TargetPlatform.cs" />
     <Compile Include="Source\CitrusProject.cs" />
-    <Compile Include="gtk-gui\Orange.MainWindow.cs" />
+    <Compile Include="Source\MainWindow.Controls.cs" />
     <Compile Include="Source\MainWindow.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="gtk-gui\gui.stetic" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Toolchain.Win\cudart32_30_14.dll">

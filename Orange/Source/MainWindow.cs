@@ -19,12 +19,12 @@ namespace Orange
 
 	public partial class MainWindow : Gtk.Window
 	{
-		public MainWindow () :
+		public MainWindow() :
 			base(Gtk.WindowType.Toplevel)
 		{
-			this.Build ();
+			this.CreateControls ();
 			LoadState();
-			TextWriter writer = new LogWriter(CompileLog);
+			TextWriter writer = new LogWriter(OutputPane);
 			Console.SetOut(writer);
 			Console.SetError(writer);
 			GoButton.GrabFocus();
@@ -34,16 +34,16 @@ namespace Orange
 		{
 			var config = AppConfig.Load();
 			CitrusProjectChooser.SetFilename(config.CitrusProject);
-			TargetPlatform.Active = config.TargetPlatform;
-			Action.Active = config.Action;
+			TargetPlatformPicker.Active = config.TargetPlatform;
+			ActionPicker.Active = config.Action;
 		}
 		
 		void SaveState()
 		{
 			var config = AppConfig.Load();
 			config.CitrusProject = CitrusProjectChooser.Filename;
-			config.TargetPlatform = TargetPlatform.Active;
-			config.Action = Action.Active;
+			config.TargetPlatform = TargetPlatformPicker.Active;
+			config.Action = ActionPicker.Active;
 			AppConfig.Save(config);
 		}
 		
@@ -126,7 +126,7 @@ namespace Orange
 
 		bool CleanSolution()
 		{
-			var platform = (TargetPlatform)this.TargetPlatform.Active;
+			var platform = (TargetPlatform)this.TargetPlatformPicker.Active;
 			var citrusProject = new CitrusProject(CitrusProjectChooser.Filename);
 			string assetsDirectory = citrusProject.AssetsDirectory;
 			string bundlePath = System.IO.Path.ChangeExtension(assetsDirectory, Helpers.GetTargetPlatformString(platform));
@@ -181,24 +181,24 @@ namespace Orange
 
 		void ClearLog()
 		{
-			CompileLog.Buffer.Clear();
+			OutputPane.Buffer.Clear();
 		}
 
 		void ScrollLogToEnd()
 		{
-			CompileLog.ScrollToIter(CompileLog.Buffer.EndIter, 0, false, 0, 0);
+			OutputPane.ScrollToIter(OutputPane.Buffer.EndIter, 0, false, 0, 0);
 		}
 
 		void RevealContent()
 		{
-			var platform = (TargetPlatform)this.TargetPlatform.Active;
+			var platform = (TargetPlatform)this.TargetPlatformPicker.Active;
 			var citrusProject = new CitrusProject(CitrusProjectChooser.Filename);
 			AssetsUnpacker.Unpack(citrusProject, platform);
 		}
 
 		void ExtractTangerineScenes()
 		{
-			var platform = (TargetPlatform)this.TargetPlatform.Active;
+			var platform = (TargetPlatform)this.TargetPlatformPicker.Active;
 			var citrusProject = new CitrusProject(CitrusProjectChooser.Filename);
 			AssetsUnpacker.UnpackTangerineScenes(citrusProject, platform);
 		}
@@ -210,18 +210,18 @@ namespace Orange
 			Console.WriteLine("Elapsed time {0}:{1}:{2}", delta.Hours, delta.Minutes, delta.Seconds);
 		}
 
-		protected void OnGoButtonClicked(object sender, System.EventArgs e)
+		protected void GoButton_Clicked(object sender, System.EventArgs e)
 		{
 			if (!CheckTargetAvailability())
 				return;
 			DateTime startTime = DateTime.Now;
 			SaveState();
 			this.Sensitive = false;
-			var platform = (TargetPlatform)this.TargetPlatform.Active;
+			var platform = (TargetPlatform)this.TargetPlatformPicker.Active;
 			try {
 				try {
 					ClearLog();
-					switch ((Orange.Action)Action.Active) {
+					switch ((Orange.Action)ActionPicker.Active) {
 					case Orange.Action.BuildGameAndRun:
 						BuildContent(platform);
 						if (BuildSolution(platform)) {
@@ -263,7 +263,7 @@ namespace Orange
 
 		private bool CheckTargetAvailability()
 		{
-			var platform = (TargetPlatform)this.TargetPlatform.Active;
+			var platform = (TargetPlatform)this.TargetPlatformPicker.Active;
 #if WIN
 			if (platform == Orange.TargetPlatform.iOS) {
 				var message = new Gtk.MessageDialog(this, 
@@ -279,7 +279,7 @@ namespace Orange
 			return true;
 		}
 
-		protected void OnHidden(object sender, System.EventArgs e)
+		protected void Window_Hidden(object sender, System.EventArgs e)
 		{
 			Gtk.Application.Quit();
 		}
