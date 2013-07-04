@@ -1,7 +1,10 @@
+using System;
+
 namespace Orange
 {
 	class MainClass
 	{
+		[STAThread]
 		public static void Main (string[] args)
 		{
 			Gtk.Application.Init();

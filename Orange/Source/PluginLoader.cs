@@ -9,8 +9,21 @@ namespace Orange
 {
 	static class PluginLoader
 	{
+		public static string CurrentPluginDirectory;
 		public static Assembly CurrentPlugin;
 		public static List<Assembly> LoadedPlugins = new List<Assembly>();
+
+		static PluginLoader()
+		{
+			AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+		}
+
+		static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+		{
+			var name = args.Name.Split(',')[0];
+			var path = Path.Combine(CurrentPluginDirectory, name + ".dll");
+			return LoadAssembly(path);
+		}
 
 		public static void ScanForPlugins(string citrusProjectFile)
 		{
@@ -20,12 +33,13 @@ namespace Orange
 #else
 			var pluginConfiguration = "Release";
 #endif
+			CurrentPluginDirectory = Path.Combine(pluginRoot, "bin", pluginConfiguration);
 			var pluginDll = Path.GetFileName(pluginRoot) + ".dll";
-			var pluginAssembly = Path.Combine(pluginRoot, "bin", pluginConfiguration, pluginDll);
+			var pluginAssembly = Path.Combine(CurrentPluginDirectory, pluginDll);
 			if (File.Exists(pluginAssembly)) {
 				try {
 					LoadPlugin(pluginAssembly);
-					Console.WriteLine("Loaded plugin: " + pluginDll);
+					Console.WriteLine("Loaded: " + pluginDll);
 				} catch (Exception e) {
 					ResetCurrentPlugin();
 					Console.WriteLine(e.Message);
@@ -43,16 +57,24 @@ namespace Orange
 
 		private static void LoadPlugin(string pluginAssembly)
 		{
-			// Load assembly without locking its file
-			byte[] readAllBytes = File.ReadAllBytes(pluginAssembly);
-			var assembly = Assembly.Load(readAllBytes);
-			CurrentPlugin = assembly;
-			if (!LoadedPlugins.Contains(assembly)) {
-				The.MenuController.CreateAssemblyMenuItems(assembly);
-			} else {
-				The.MenuController.RefreshMenu();
+			using (new DirectoryChanger(Path.GetDirectoryName(pluginAssembly))) {
+				var assembly = LoadAssembly(pluginAssembly);
+				CurrentPlugin = assembly;
+				if (!LoadedPlugins.Contains(assembly)) {
+					The.MenuController.CreateAssemblyMenuItems(assembly);
+				} else {
+					The.MenuController.RefreshMenu();
+				}
+				LoadedPlugins.Add(assembly);
 			}
-			LoadedPlugins.Add(assembly);
+		}
+
+		private static Assembly LoadAssembly(string assemblyDll)
+		{
+			Console.WriteLine("Loaded {0}", assemblyDll);
+			byte[] readAllBytes = File.ReadAllBytes(assemblyDll);
+			var assembly = Assembly.Load(readAllBytes);
+			return assembly;
 		}
 	}
 }
