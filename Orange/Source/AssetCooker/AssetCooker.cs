@@ -12,7 +12,7 @@ namespace Orange
 		private TargetPlatform platform;
 		private Dictionary<string, CookingRules> cookingRulesMap;
 
-		public static void BuildForActivePlatform()
+		public static void CookForActivePlatform()
 		{
 			new AssetCooker(The.Workspace.ActivePlatform).Cook();
 		}

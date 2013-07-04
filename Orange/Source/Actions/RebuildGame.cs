@@ -13,7 +13,7 @@ namespace Orange
 		{
 			The.MainWindow.Execute(() => {
 				if (CleanupGame()) {
-					AssetCooker.BuildForActivePlatform();
+					AssetCooker.CookForActivePlatform();
 					BuildGame();
 				}
 			});

@@ -17,7 +17,7 @@ namespace Orange
 
 		public static bool GenerateSerializerDll()
 		{
-			AssetCooker.BuildForActivePlatform();
+			AssetCooker.CookForActivePlatform();
 			if (!BuildGame(Orange.TargetPlatform.Desktop)) {
 				return false;
 			}

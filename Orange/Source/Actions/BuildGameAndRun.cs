@@ -11,12 +11,27 @@ namespace Orange
 		public static void BuildGameAndRunAction()
 		{
 			The.MainWindow.Execute(() => {
-				AssetCooker.BuildForActivePlatform();
+				AssetCooker.CookForActivePlatform();
 				if (BuildGame()) {
 					The.MainWindow.ScrollLogToEnd();
 					RunGame();
 				}
 			});
+		}
+
+		public static bool BuildGame()
+		{
+			return BuildGame(The.Workspace.ActivePlatform);
+		}
+
+		public static bool BuildGame(TargetPlatform platform)
+		{
+			var builder = new SolutionBuilder(platform);
+			if (!builder.Build()) {
+				Console.WriteLine("BUILD FAILED");
+				return false;
+			}
+			return true;
 		}
 
 		public static void RunGame()

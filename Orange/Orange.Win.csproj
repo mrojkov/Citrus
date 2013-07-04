@@ -72,7 +72,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Source\Actions\BuildGame.cs" />
+    <Compile Include="Source\Actions\CookGameAssets.cs" />
     <Compile Include="Source\Actions\ExtractTangerineScenes.cs" />
     <Compile Include="Source\Actions\RebuildGame.cs" />
     <Compile Include="Source\Actions\GenerateSerializerDll.cs" />
