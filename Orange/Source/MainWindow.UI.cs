@@ -2,17 +2,20 @@ namespace Orange
 {
 	public partial class MainWindow
 	{
-		private Gtk.FileChooserButton CitrusProjectChooser;
-		private Gtk.ComboBox TargetPlatformPicker;
-		private Gtk.TextView OutputPane;
-		private Gtk.ComboBox ActionPicker;
-		private Gtk.Button GoButton;
+		public Gtk.Window NativeWindow;
+		public Gtk.FileChooserButton CitrusProjectChooser;
+		public Gtk.ComboBox PlatformPicker;
+		public Gtk.TextView OutputPane;
+		public Gtk.ComboBox ActionPicker;
+		public Gtk.Button GoButton;
 
-		private void CreateControls()
+		private void Create()
 		{
-			Title = "Citrus Aurantium";
-			WindowPosition = Gtk.WindowPosition.Center;
-			DefaultSize = new Gdk.Size(500, 400);
+			NativeWindow = new Gtk.Window(Gtk.WindowType.Toplevel);
+
+			NativeWindow.Title = "Citrus Aurantium";
+			NativeWindow.WindowPosition = Gtk.WindowPosition.Center;
+			NativeWindow.DefaultSize = new Gdk.Size(500, 400);
 
 			var mainVBox = new Gtk.VBox() { Spacing = 6, BorderWidth = 6 };
 			var header = CreateHeaderSection();
@@ -23,12 +26,12 @@ namespace Orange
 			
 			var hbox = CreateFooterSection();
 			mainVBox.PackStart(hbox, expand: false, fill: true, padding: 0);
-			Add (mainVBox);
+			NativeWindow.Add(mainVBox);
 
-			Hidden += Window_Hidden;
+			NativeWindow.Hidden += Window_Hidden;
 			GoButton.Clicked += GoButton_Clicked;
 
-			ShowAll();
+			NativeWindow.ShowAll();
 		}
 
 		private Gtk.Widget CreateFooterSection()
@@ -37,19 +40,11 @@ namespace Orange
 			
 			// ActionPicker section
 			ActionPicker = Gtk.ComboBox.NewText();
-			ActionPicker.AppendText("Build Game & Run");
-			ActionPicker.AppendText("Build Content Only");
-			ActionPicker.AppendText("Rebuild Game");
-			ActionPicker.AppendText("Reveal Content");
-			ActionPicker.AppendText("Extract Tangerine Scenes");
-			ActionPicker.AppendText("Extract Translatable Strings");
-			ActionPicker.AppendText("Generate Serialization Assembly");
-			ActionPicker.Active = 0;
 			hbox.PackStart(ActionPicker);
 			hbox.Spacing = 5;
 
 			// GoButton section
-			this.GoButton = new Gtk.Button() { WidthRequest = 80, Label = "_Go" };
+			this.GoButton = new Gtk.Button() { WidthRequest = 80, Label = "Go" };
 			hbox.PackEnd(GoButton, expand: false, fill: true, padding: 0);
 			return hbox;
 		}
@@ -73,17 +68,17 @@ namespace Orange
 				ColumnSpacing = 6
 			};
 			
-			// Target platform section
+			// Platform section
 			var label1 = new Gtk.Label() { Xalign = 1, LabelProp = "Target platform" };
 			table.Attach(label1, 0, 1, 0, 1, xoptions: Gtk.AttachOptions.Fill, yoptions: 0,
 				xpadding: 0, ypadding: 0);
 
-			TargetPlatformPicker = Gtk.ComboBox.NewText();
-			TargetPlatformPicker.AppendText("Desktop (PC, Mac, Linux)");
-			TargetPlatformPicker.AppendText("iPhone/iPad");
-			TargetPlatformPicker.AppendText("Unity");
-			TargetPlatformPicker.Active = 0;
-			table.Attach(TargetPlatformPicker, 1, 2, 0, 1);
+			PlatformPicker = Gtk.ComboBox.NewText();
+			PlatformPicker.AppendText("Desktop (PC, Mac, Linux)");
+			PlatformPicker.AppendText("iPhone/iPad");
+			PlatformPicker.AppendText("Unity");
+			PlatformPicker.Active = 0;
+			table.Attach(PlatformPicker, 1, 2, 0, 1);
 
 			// Citrus project section
 			var label2 = new Gtk.Label() { Xalign = 1, LabelProp = "Citrus Project" };
@@ -92,6 +87,7 @@ namespace Orange
 
 			CitrusProjectChooser = new Gtk.FileChooserButton("Select a File", Gtk.FileChooserAction.Open);
 			table.Attach(CitrusProjectChooser, 1, 2, 1, 2);
+			CitrusProjectChooser.FileSet += CitrusProjectChooser_SelectionChanged;
 			return table;
 		}
 	}

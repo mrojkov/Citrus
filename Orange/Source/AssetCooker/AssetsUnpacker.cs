@@ -9,9 +9,9 @@ namespace Orange
 {
 	public static class AssetsUnpacker
 	{
-		public static void Unpack(CitrusProject project, TargetPlatform platform)
+		public static void Unpack(TargetPlatform platform)
 		{
-			string bundlePath = Path.ChangeExtension(project.AssetsDirectory, Helpers.GetTargetPlatformString(platform));
+			string bundlePath = The.Workspace.GetBundlePath(platform);
 			string outputDirectory = bundlePath + ".Unpacked";
 			using (AssetsBundle.Instance = new PackedAssetsBundle(bundlePath, AssetBundleFlags.None)) {
 				Console.WriteLine("Extracting game content into \"{0}\"", outputDirectory);
@@ -36,10 +36,10 @@ namespace Orange
 			}
 		}
 
-		public static void UnpackTangerineScenes(CitrusProject project, TargetPlatform platform)
+		public static void UnpackTangerineScenes()
 		{
-			string bundlePath = Path.ChangeExtension(project.AssetsDirectory, Helpers.GetTargetPlatformString(platform));
-			string outputDirectory = project.AssetsDirectory;
+			string bundlePath = The.Workspace.GetBundlePath();
+			string outputDirectory = The.Workspace.AssetsDirectory;
 			using (AssetsBundle.Instance = new PackedAssetsBundle(bundlePath, AssetBundleFlags.None)) {
 				Console.WriteLine("Extracting tangerine scenes into \"{0}\"", outputDirectory);
 				using (new DirectoryChanger(outputDirectory)) {

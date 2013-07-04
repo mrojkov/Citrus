@@ -5,15 +5,13 @@ namespace Orange
 {
 	public class SolutionBuilder
 	{
-		private CitrusProject project;
-		private TargetPlatform platform;
-		
-		public SolutionBuilder(CitrusProject project, TargetPlatform platform)
+		TargetPlatform plaform;
+
+		public SolutionBuilder(TargetPlatform plaform)
 		{
-			this.project = project;
-			this.platform = platform;
+			this.plaform = plaform;
 		}
-		
+
 		public static void CopyFile(string srcDir, string dstDir, string fileName)
 		{
 			string srcFile = Path.Combine(srcDir, fileName);
@@ -29,22 +27,22 @@ namespace Orange
 #if MAC
 			app = "/Applications/MonoDevelop.app/Contents/MacOS/mdtool";
 			if (platform == TargetPlatform.iOS) {
-				slnFile = Path.Combine(project.ProjectDirectory, project.Title + ".iOS", project.Title + ".iOS.sln");
+				slnFile = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + ".iOS", The.Workspace.Title + ".iOS.sln");
 				args = String.Format("build \"{0}\" -t:Build -c:\"Release|iPhone\"", slnFile);
 			} else {
-				slnFile = Path.Combine(project.ProjectDirectory, project.Title + ".Mac", project.Title + ".Mac.sln");
+				slnFile = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + ".Mac", The.Workspace.Title + ".Mac.sln");
 				args = String.Format("build \"{0}\" -t:Build -c:\"Release|x86\"", slnFile);
 			}
 #elif WIN
 			// Uncomment follow block if you would like to use mdtool instead of MSBuild
 			/*
 			app = @"C:\Program Files(x86)\MonoDevelop\bin\mdtool.exe";
-			slnFile = Path.Combine(project.ProjectDirectory, project.Title + ".Win", project.Title + ".Win.sln");
+			slnFile = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + ".Win", The.Workspace.Title + ".Win.sln");
 			args = String.Format("build \"{0}\" -t:Build -c:\"Release|x86\"", slnFile);
 			*/
 
 			app = Path.Combine(System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(), "MSBuild.exe");
-			slnFile = Path.Combine(project.ProjectDirectory, project.Title + ".Win", project.Title + ".Win.sln");
+			slnFile = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + ".Win", The.Workspace.Title + ".Win.sln");
 			args = String.Format("\"{0}\" /verbosity:minimal /p:Configuration=Release", slnFile);
 #endif
 			if (Helpers.StartProcess(app, args) != 0) {
@@ -75,7 +73,7 @@ namespace Orange
 			*/
 
 			app = Path.Combine(System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(), "MSBuild.exe");
-			slnFile = Path.Combine(project.ProjectDirectory, project.Title + ".Win", project.Title + ".Win.sln");
+			slnFile = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + ".Win", The.Workspace.Title + ".Win.sln");
 			args = String.Format("\"{0}\" /t:Clean /p:Configuration=Release", slnFile);
 #endif
 			if (Helpers.StartProcess(app, args) != 0) {
@@ -94,7 +92,7 @@ namespace Orange
 				throw new NotImplementedException();
 			}
 #elif WIN
-			app = Path.Combine(project.ProjectDirectory, project.Title + ".Win", "bin/Release", project.Title + ".exe");
+			app = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + ".Win", "bin/Release", The.Workspace.Title + ".exe");
 #endif
 			return app;
 		}

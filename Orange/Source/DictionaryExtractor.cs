@@ -16,18 +16,11 @@ namespace Orange
 			TagUntaggedStrings
 		}
 
-		CitrusProject project;
-
-		public DictionaryExtractor(CitrusProject project)
-		{
-			this.project = project;
-		}
-		
 		public void ExtractDictionary()
 		{
 			const string dictionary = "Dictionary.txt";
 			Localization.Dictionary.Clear();
-			using (new DirectoryChanger(project.AssetsDirectory)) {
+			using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
 				if (File.Exists(dictionary)) {
 					using (var stream = new FileStream(dictionary, FileMode.Open)) {
 						Localization.Dictionary.ReadFromStream(stream);
@@ -35,8 +28,8 @@ namespace Orange
 				}
 			}
 			for (int pass = 0; pass < 2; pass++) {
-				var sourceFiles = new FileEnumerator(project.ProjectDirectory);
-				using (new DirectoryChanger(project.ProjectDirectory)) {
+				var sourceFiles = new FileEnumerator(The.Workspace.ProjectDirectory);
+				using (new DirectoryChanger(The.Workspace.ProjectDirectory)) {
 					var files = sourceFiles.Enumerate(".cs");
 					foreach (var fileInfo in files) {
 						if (pass == 0)
@@ -44,8 +37,8 @@ namespace Orange
 						ProcessSourceFile(fileInfo.Path, (Pass)pass);
 					}
 				}
-				using (new DirectoryChanger(project.AssetsDirectory)) {
-					var files = project.AssetFiles.Enumerate(".scene");
+				using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
+					var files = The.Workspace.AssetFiles.Enumerate(".scene");
 					foreach (var fileInfo in files) {
 						if (pass == 0)
 							Console.WriteLine("* " + fileInfo.Path);
@@ -56,7 +49,7 @@ namespace Orange
 					}
 				}
 			}
-			using (new DirectoryChanger(project.AssetsDirectory)) {
+			using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
 				using (var stream = new FileStream(dictionary, FileMode.Create)) {
 					Localization.Dictionary.WriteToStream(stream);
 				}

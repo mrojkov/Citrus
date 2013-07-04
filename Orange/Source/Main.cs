@@ -6,10 +6,19 @@ namespace Orange
 		{
 			Gtk.Application.Init();
 
-			var window = new MainWindow();
-			window.Show();
+			new MainWindow();
+
+			CreateMenuItems();
+
+			The.Workspace.Load();
 
 			Gtk.Application.Run();
+		}
+
+		private static void CreateMenuItems()
+		{
+			var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+			The.MenuController.CreateAssemblyMenuItems(assembly);
 		}
 	}
 }

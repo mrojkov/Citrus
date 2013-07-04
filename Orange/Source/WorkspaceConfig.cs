@@ -5,7 +5,7 @@ using ProtoBuf;
 namespace Orange
 {
     [ProtoContract]
-	public class AppConfig
+	public class WorkspaceConfig
 	{
 		[ProtoMember(1)]
 		public string CitrusProject = "";
@@ -13,16 +13,10 @@ namespace Orange
 		[ProtoMember(2)]
 		public int TargetPlatform;
 
-		[ProtoMember(3)]
-		public string Unused1 = "";
-
-		[ProtoMember(4)]
-		public string Unused2 = "";
-
 		[ProtoMember(5)]
 		public int Action;
 
-		public AppConfig() {}
+		public WorkspaceConfig() {}
 
 		private static string GetConfigPath()
 		{
@@ -31,19 +25,19 @@ namespace Orange
 			return configPath;
 		}
 
-		public static AppConfig Load()
+		public static WorkspaceConfig Load()
 		{
 			try {
 				using(FileStream stream = new FileStream(GetConfigPath(), FileMode.Open, FileAccess.Read, FileShare.None)) {
-					return ProtoBuf.Serializer.Deserialize<AppConfig>(stream);
+					return ProtoBuf.Serializer.Deserialize<WorkspaceConfig>(stream);
 				}
 			}
 			catch {
-				return new AppConfig();
+				return new WorkspaceConfig();
 			}
 		}
 
-		public static void Save(AppConfig config)
+		public static void Save(WorkspaceConfig config)
 		{
 			using(FileStream stream = new FileStream(GetConfigPath(), FileMode.Create, FileAccess.Write, FileShare.None)) {
 				ProtoBuf.Serializer.Serialize(stream, config);

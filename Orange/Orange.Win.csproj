@@ -50,8 +50,7 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>
-    </ApplicationIcon>
+    <ApplicationIcon>Orange.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -73,7 +72,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Source\AppConfig.cs" />
+    <Compile Include="Source\Actions\BuildGame.cs" />
+    <Compile Include="Source\Actions\ExtractTangerineScenes.cs" />
+    <Compile Include="Source\Actions\RebuildGame.cs" />
+    <Compile Include="Source\Actions\GenerateSerializerDll.cs" />
+    <Compile Include="Source\Actions\RevealCookedAssets.cs" />
+    <Compile Include="Source\Actions\BuildGameAndRun.cs" />
+    <Compile Include="Source\Actions\UpdateDictionaryTxt.cs" />
+    <Compile Include="Source\WorkspaceConfig.cs" />
     <Compile Include="Source\AssemblyInfo.cs" />
     <Compile Include="Source\AssetCooker\AssetCooker.cs" />
     <Compile Include="Source\AssetCooker\AssetsUnpacker.cs" />
@@ -91,15 +97,19 @@
     <Compile Include="Source\HotStudioImport\HotFontImporter.cs" />
     <Compile Include="Source\HotStudioImport\HotLexer.cs" />
     <Compile Include="Source\HotStudioImport\HotSceneImporter.cs" />
-    <Compile Include="Source\KumquatCooker\KumquatCooker.cs" />
     <Compile Include="Source\Main.cs" />
+    <Compile Include="Source\MenuController.cs" />
+    <Compile Include="Source\MenuItemAttribute.cs" />
+    <Compile Include="Source\PluginLoader.cs" />
     <Compile Include="Source\SolutionBuilder.cs" />
     <Compile Include="Source\TargetPlatform.cs" />
-    <Compile Include="Source\CitrusProject.cs" />
-    <Compile Include="Source\MainWindow.Controls.cs" />
+    <Compile Include="Source\MainWindow.UI.cs" />
     <Compile Include="Source\MainWindow.cs" />
+    <Compile Include="Source\The.cs" />
+    <Compile Include="Source\Workspace.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Orange.ico" />
     <Content Include="Toolchain.Win\cudart32_30_14.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

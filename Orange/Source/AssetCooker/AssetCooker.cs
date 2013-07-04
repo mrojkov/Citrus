@@ -9,9 +9,13 @@ namespace Orange
 		private delegate bool Converter(string srcPath, string dstPath);
 
 		private Lime.AssetsBundle assetsBundle { get { return Lime.AssetsBundle.Instance; } }
-		private CitrusProject project;
 		private TargetPlatform platform;
 		private Dictionary<string, CookingRules> cookingRulesMap;
+
+		public static void BuildForActivePlatform()
+		{
+			new AssetCooker(The.Workspace.ActivePlatform).Cook();
+		}
 
 		string GetOriginalAssetExtension(string path)
 		{
@@ -38,19 +42,18 @@ namespace Orange
 			}
 		}
 
-		public AssetCooker(CitrusProject project, TargetPlatform platform)
+		public AssetCooker(TargetPlatform platform)
 		{
 			this.platform = platform;
-			this.project = project;
 		}
 		
 		public void Cook()
 		{
-			cookingRulesMap = CookingRulesBuilder.Build(project.AssetFiles);
+			cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles);
 			if (platform == TargetPlatform.Unity) {
 				CookForUnity();
 			} else {
-				string bundlePath = Path.ChangeExtension(project.AssetsDirectory, Helpers.GetTargetPlatformString(platform));
+				string bundlePath = The.Workspace.GetBundlePath(platform);
 				using (Lime.AssetsBundle.Instance = new Lime.PackedAssetsBundle(bundlePath, Lime.AssetBundleFlags.Writable)) {
 					CookHelper();
 				}
@@ -59,7 +62,7 @@ namespace Orange
 
 		private void CookForUnity()
 		{
-			string resourcesPath = project.GetUnityResourcesDirectory();
+			string resourcesPath = The.Workspace.GetUnityResourcesDirectory();
 			if (!System.IO.Directory.Exists(resourcesPath)) {
 				throw new Lime.Exception("Output directory '{0}' doesn't exist", resourcesPath);
 			}
@@ -70,7 +73,7 @@ namespace Orange
 
 		private void CookHelper()
 		{
-			using (new DirectoryChanger(project.AssetsDirectory)) {
+			using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
 				Console.WriteLine("------------- Building Game Content -------------");
 				SyncAtlases();
 				SyncDeleted();
@@ -154,7 +157,7 @@ namespace Orange
 		void SyncDeleted()
 		{
 			var assetsFiles = new HashSet<string>();
-			foreach (var fileInfo in project.AssetFiles.Enumerate()) {
+			foreach (var fileInfo in The.Workspace.AssetFiles.Enumerate()) {
 				assetsFiles.Add(fileInfo.Path);
 			}
 			foreach (string path in assetsBundle.EnumerateFiles()) {
@@ -176,7 +179,7 @@ namespace Orange
 
 		void SyncUpdated(string fileExtension, string bundleAssetExtension, Converter converter)
 		{
-			foreach (var srcFileInfo in project.AssetFiles.Enumerate(fileExtension)) {
+			foreach (var srcFileInfo in The.Workspace.AssetFiles.Enumerate(fileExtension)) {
 				string srcPath = srcFileInfo.Path;
 				string dstPath = Path.ChangeExtension(srcPath, bundleAssetExtension);
 				bool bundled = assetsBundle.FileExists(dstPath);
@@ -233,7 +236,7 @@ namespace Orange
 			var items = new List<AtlasItem>();
 			foreach (var p in cookingRulesMap) {
 				if (p.Value.TextureAtlas == atlasChain && Path.GetExtension(p.Key) == ".png") {
-					var srcTexturePath = Lime.AssetPath.Combine(project.AssetsDirectory, p.Key);
+					var srcTexturePath = Lime.AssetPath.Combine(The.Workspace.AssetsDirectory, p.Key);
 					var pixbuf = new Gdk.Pixbuf(srcTexturePath);
 					// Ensure that no image exceede maxAtlasSize limit
 					if (pixbuf.Width > maxAtlasSize || pixbuf.Height > maxAtlasSize) {
@@ -345,7 +348,7 @@ namespace Orange
 		void SyncAtlases()
 		{
 			var textures = new Dictionary<string, DateTime>();
-			foreach (var fileInfo in project.AssetFiles.Enumerate(".png")) {
+			foreach (var fileInfo in The.Workspace.AssetFiles.Enumerate(".png")) {
 				textures[fileInfo.Path] = fileInfo.LastWriteTime;
 			}
 			var atlasChainsToRebuild = new HashSet<string>();
@@ -356,7 +359,7 @@ namespace Orange
 				// If atlas part has been outdated we should rebuild full atlas chain
 				string srcTexturePath =  Path.ChangeExtension(atlasPartPath, ".png");
 				if (!textures.ContainsKey(srcTexturePath) || assetsBundle.GetFileLastWriteTime(atlasPartPath) < textures[srcTexturePath]) {
-					srcTexturePath = Lime.AssetPath.Combine(project.AssetsDirectory, srcTexturePath);
+					srcTexturePath = Lime.AssetPath.Combine(The.Workspace.AssetsDirectory, srcTexturePath);
 					var part = Lime.TextureAtlasPart.ReadFromBundle(atlasPartPath);
 					string atlasChain = Path.GetFileNameWithoutExtension(part.AtlasTexture);
 					atlasChainsToRebuild.Add(atlasChain);
