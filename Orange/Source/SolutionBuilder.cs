@@ -5,11 +5,11 @@ namespace Orange
 {
 	public class SolutionBuilder
 	{
-		TargetPlatform plaform;
+		TargetPlatform platform;
 
 		public SolutionBuilder(TargetPlatform plaform)
 		{
-			this.plaform = plaform;
+			this.platform = plaform;
 		}
 
 		public static void CopyFile(string srcDir, string dstDir, string fileName)
@@ -58,10 +58,10 @@ namespace Orange
 #if MAC
 			app = "/Applications/MonoDevelop.app/Contents/MacOS/mdtool";
 			if (platform == TargetPlatform.iOS) {
-				slnFile = Path.Combine(project.ProjectDirectory, project.Title + ".iOS", project.Title + ".iOS.sln");
+				slnFile = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + ".iOS", The.Workspace.Title + ".iOS.sln");
 				args = String.Format("build \"{0}\" -t:Clean -c:\"Release|iPhone\"", slnFile);
 			} else {
-				slnFile = Path.Combine(project.ProjectDirectory, project.Title + ".Mac", project.Title + ".Mac.sln");
+				slnFile = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + ".Mac", The.Workspace.Title + ".Mac.sln");
 				args = String.Format("build \"{0}\" -t:Clean -c:\"Release|x86\"", slnFile);
 			}
 #elif WIN
@@ -87,7 +87,7 @@ namespace Orange
 			string app;
 #if MAC
 			if (platform == TargetPlatform.Desktop) {
-				app = Path.Combine(project.ProjectDirectory, project.Title + ".Mac", "bin/Release", project.Title + ".app", "Contents/MacOS", project.Title);
+				app = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + ".Mac", "bin/Release", The.Workspace.Title + ".app", "Contents/MacOS", The.Workspace.Title);
 			} else {
 				throw new NotImplementedException();
 			}

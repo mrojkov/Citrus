@@ -70,15 +70,20 @@ namespace Orange
 							throw new Lime.Exception("MenuItemAttribute is valid only for static parameterless methods");
 						}
 						var attr = attrs[0] as MenuItemAttribute;
-						yield return new MenuItem() {
-							Action = () => method.Invoke(null, null),
-							Label = attr.Label,
-							Priority = attr.Priority,
-							Assembly = assembly
-						};
+						yield return CreateMenuItem(method, assembly, attr);
 					}
 				}
 			}
+		}
+
+		private static MenuItem CreateMenuItem(MethodInfo method, Assembly assembly, MenuItemAttribute attr)
+		{
+			return new MenuItem() {
+				Action = () => method.Invoke(null, null),
+				Label = attr.Label,
+				Priority = attr.Priority,
+				Assembly = assembly
+			};
 		}
 	}
 }

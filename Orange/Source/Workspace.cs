@@ -49,7 +49,7 @@ namespace Orange
 			}
 			AssetFiles = new FileEnumerator(AssetsDirectory);
 			PluginLoader.ScanForPlugins(file);
-			The.MainWindow.CitrusProjectChooser.SetFilename(file);
+			The.MainWindow.CitrusProjectChooser.SelectFilename(file);
 		}
 
 		public string GetActivePlatformString()

@@ -105,10 +105,19 @@ namespace Orange
 			Console.WriteLine("Elapsed time {0}:{1}:{2}", delta.Hours, delta.Minutes, delta.Seconds);
 		}
 
+		bool citrusProjectChooserRecursed = false;
+
 		void CitrusProjectChooser_SelectionChanged(object sender, System.EventArgs e)
 		{
-			if (CitrusProjectChooser.Filename != null) {
-				The.Workspace.Open(CitrusProjectChooser.Filename);
+			if (!citrusProjectChooserRecursed) {
+				citrusProjectChooserRecursed = true;
+				try {
+					if (CitrusProjectChooser.Filename != null) {
+						The.Workspace.Open(CitrusProjectChooser.Filename);
+					}
+				} finally {
+					citrusProjectChooserRecursed = false;
+				}
 			}
 		}
 
