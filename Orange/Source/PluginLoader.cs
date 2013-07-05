@@ -39,7 +39,6 @@ namespace Orange
 			if (File.Exists(pluginAssembly)) {
 				try {
 					LoadPlugin(pluginAssembly);
-					Console.WriteLine("Loaded: " + pluginDll);
 				} catch (Exception e) {
 					ResetCurrentPlugin();
 					Console.WriteLine(e.Message);
@@ -71,7 +70,7 @@ namespace Orange
 
 		private static Assembly LoadAssembly(string assemblyDll)
 		{
-			Console.WriteLine("Loaded {0}", assemblyDll);
+			Console.WriteLine("Loaded assembly: {0}", Path.GetFileName(assemblyDll));
 			byte[] readAllBytes = File.ReadAllBytes(assemblyDll);
 			var assembly = Assembly.Load(readAllBytes);
 			return assembly;
