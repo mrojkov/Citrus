@@ -103,7 +103,7 @@ namespace Orange
 				throw new Lime.Exception("Failed to convert '{0}' to DDS format(error code: {1})", srcPath, exitCode);
 			}
 #else
-			string nvcompress = Path.Combine(Helpers.GetApplicationDirectory(), "Toolchain.Mac", "nvcompress");
+			string nvcompress = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Mac", "nvcompress");
 			Mono.Unix.Native.Syscall.chmod(nvcompress, Mono.Unix.Native.FilePermissions.S_IXOTH | Mono.Unix.Native.FilePermissions.S_IXUSR);
 			string args = String.Format("-silent -fast {0} {1} '{2}' '{3}'", mipsFlag, compressionFlag, srcPath, dstPath);
 			Console.WriteLine(nvcompress);
