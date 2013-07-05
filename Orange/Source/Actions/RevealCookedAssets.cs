@@ -10,9 +10,7 @@ namespace Orange
 		[MenuItem("Reveal Cooked Assets")]
 		public static void RevealCookedAssetsAction()
 		{
-			The.MainWindow.Execute(() => {
-				AssetsUnpacker.Unpack(The.Workspace.ActivePlatform);
-			});
+			AssetsUnpacker.Unpack(The.Workspace.ActivePlatform);
 		}
 	}
 }

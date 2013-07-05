@@ -4,8 +4,21 @@ using System.IO;
 
 namespace Orange
 {
-	public static class Helpers
+	public static class Toolbox
 	{
+		public static bool ShowConfirmationDialog(string text)
+		{
+			var box = new Gtk.MessageDialog(Orange.MainWindow.Instance.NativeWindow,
+				Gtk.DialogFlags.Modal, Gtk.MessageType.Question,
+				Gtk.ButtonsType.YesNo,
+				text);
+			box.Title = "Orange";
+			box.Modal = true;
+			int result = box.Run();
+			box.Destroy();
+			return result == (int)Gtk.ResponseType.Yes;
+		}
+
 		public static string GetTargetPlatformString(TargetPlatform platform)
 		{
 			switch(platform)
@@ -74,11 +87,16 @@ namespace Orange
 						logger.Clear();
 					}
 				}
-				while (Gtk.Application.EventsPending()) {
-					Gtk.Application.RunIteration();
-				}
+				ProcessPendingEvents();
 			}
 			return p.ExitCode;
+		}
+
+		public static void ProcessPendingEvents()
+		{
+			while (Gtk.Application.EventsPending()) {
+				Gtk.Application.RunIteration();
+			}
 		}
 
 		public static string GetApplicationDirectory()

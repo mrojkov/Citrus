@@ -76,7 +76,7 @@ namespace Orange
 			OutputPane.ScrollToIter(OutputPane.Buffer.EndIter, 0, false, 0, 0);
 		}
 
-		public void Execute(Action action)
+		private void Execute(Action action)
 		{
 			if (!CheckTargetAvailability())
 				return;
@@ -89,7 +89,11 @@ namespace Orange
 					ClearLog();
 					action();
 				} catch (System.Exception exc) {
-					Console.WriteLine(exc.Message);
+					if (exc.InnerException != null) {
+						Console.WriteLine(exc.InnerException.Message);
+					} else {
+						Console.WriteLine(exc.Message);
+					}
 				}
 				ScrollLogToEnd();
 			} finally {
@@ -125,7 +129,7 @@ namespace Orange
 		{
 			var menuItem = The.MenuController.Items.Find(i => i.Label == ActionPicker.ActiveText);
 			if (menuItem != null) {
-				menuItem.Action();
+				Execute(menuItem.Action);
 			}
 		}
 

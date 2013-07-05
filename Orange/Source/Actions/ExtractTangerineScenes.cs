@@ -10,9 +10,7 @@ namespace Orange
 		// [MenuItem("Extract Tangerine Scenes")]
 		public static void ExtractTangerineScenes()
 		{
-			The.MainWindow.Execute(() => {
-				AssetsUnpacker.UnpackTangerineScenes();
-			});
+			AssetsUnpacker.UnpackTangerineScenes();
 		}
 	}
 }

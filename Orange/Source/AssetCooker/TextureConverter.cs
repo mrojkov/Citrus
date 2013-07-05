@@ -52,7 +52,7 @@ namespace Orange
 				TextureConverterUtils.SwapRGBChannels(pixbuf);
 				TextureConverterUtils.SaveToTGA(pixbuf, tga);
 				string mipsFlag = mipMaps ? "-m" : "";
-				string pvrTexTool = Path.Combine(Helpers.GetApplicationDirectory(), "Toolchain.Mac", "PVRTexTool");
+				string pvrTexTool = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Mac", "PVRTexTool");
 				Mono.Unix.Native.Syscall.chmod(pvrTexTool, Mono.Unix.Native.FilePermissions.S_IXOTH | Mono.Unix.Native.FilePermissions.S_IXUSR);
 				string args = String.Format("{0} -i '{1}' -o '{2}' {3} -pvrtcfast -premultalpha -silent -x {4} -y {5}",
 					formatArguments, tga, dstPath, mipsFlag, potWidth, potHeight);
@@ -94,11 +94,11 @@ namespace Orange
 			string mipsFlag = mipMaps ? "" : "-nomips";
 			string compressionFlag = compressed ? (hasAlpha ? "-bc3" : "-bc1") : "-rgb";
 #if WIN
-			string nvcompress = Path.Combine(Helpers.GetApplicationDirectory(), "Toolchain.Win", "nvcompress.exe");
+			string nvcompress = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Win", "nvcompress.exe");
 			srcPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), srcPath);
 			dstPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), dstPath);
 			string args = String.Format("-silent -fast {0} {1} \"{2}\" \"{3}\"", mipsFlag, compressionFlag, srcPath, dstPath);
-			int exitCode = Helpers.StartProcess(nvcompress, args, Helpers.StartProcessOptions.RedirectErrors);
+			int exitCode = Toolbox.StartProcess(nvcompress, args, Toolbox.StartProcessOptions.RedirectErrors);
 			if (exitCode != 0) {
 				throw new Lime.Exception("Failed to convert '{0}' to DDS format(error code: {1})", srcPath, exitCode);
 			}

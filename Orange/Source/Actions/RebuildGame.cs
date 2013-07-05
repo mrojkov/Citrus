@@ -11,12 +11,12 @@ namespace Orange
 		[MenuItem("Rebuild Game")]
 		public static void RebuildGameAction()
 		{
-			The.MainWindow.Execute(() => {
+			if (Toolbox.ShowConfirmationDialog("Are you sure you want to rebuild the game?")) {
 				if (CleanupGame()) {
 					AssetCooker.CookForActivePlatform();
 					BuildGame();
 				}
-			});
+			}
 		}
 
 		static bool CleanupGame()

@@ -10,9 +10,7 @@ namespace Orange
 		[MenuItem("Cook Game Assets", 1)]
 		public static void CookGameAssetsAction()
 		{
-			The.MainWindow.Execute(() => {
-				AssetCooker.CookForActivePlatform();
-			});
+			AssetCooker.CookForActivePlatform();
 		}
 	}
 }

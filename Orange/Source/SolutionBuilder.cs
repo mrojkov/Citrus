@@ -45,7 +45,7 @@ namespace Orange
 			slnFile = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + ".Win", The.Workspace.Title + ".Win.sln");
 			args = String.Format("\"{0}\" /verbosity:minimal /p:Configuration=Release", slnFile);
 #endif
-			if (Helpers.StartProcess(app, args) != 0) {
+			if (Toolbox.StartProcess(app, args) != 0) {
 				return false;
 			}
 			return true;
@@ -76,7 +76,7 @@ namespace Orange
 			slnFile = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + ".Win", The.Workspace.Title + ".Win.sln");
 			args = String.Format("\"{0}\" /t:Clean /p:Configuration=Release", slnFile);
 #endif
-			if (Helpers.StartProcess(app, args) != 0) {
+			if (Toolbox.StartProcess(app, args) != 0) {
 				return false;
 			}
 			return true;
@@ -103,7 +103,7 @@ namespace Orange
 			string app = GetApplicationPath();
 			string dir = Path.GetDirectoryName(app);
 			using (new DirectoryChanger(dir)) {
-				int exitCode = Helpers.StartProcess(app, arguments);
+				int exitCode = Toolbox.StartProcess(app, arguments);
 				return exitCode;
 			}
 		}

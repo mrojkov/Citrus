@@ -54,12 +54,12 @@ namespace Orange
 
 		public string GetActivePlatformString()
 		{
-			return Helpers.GetTargetPlatformString(ActivePlatform);
+			return Toolbox.GetTargetPlatformString(ActivePlatform);
 		}
 
 		public string GetBundlePath(TargetPlatform platform)
 		{
-			return Path.ChangeExtension(AssetsDirectory, Helpers.GetTargetPlatformString(platform));
+			return Path.ChangeExtension(AssetsDirectory, Toolbox.GetTargetPlatformString(platform));
 		}
 
 		public string GetBundlePath()

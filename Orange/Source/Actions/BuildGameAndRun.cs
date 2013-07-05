@@ -10,13 +10,11 @@ namespace Orange
 		[MenuItem("Build Game & Run", 0)]
 		public static void BuildGameAndRunAction()
 		{
-			The.MainWindow.Execute(() => {
-				AssetCooker.CookForActivePlatform();
-				if (BuildGame()) {
-					The.MainWindow.ScrollLogToEnd();
-					RunGame();
-				}
-			});
+			AssetCooker.CookForActivePlatform();
+			if (BuildGame()) {
+				The.MainWindow.ScrollLogToEnd();
+				RunGame();
+			}
 		}
 
 		public static bool BuildGame()

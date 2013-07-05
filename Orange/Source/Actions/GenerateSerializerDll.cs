@@ -10,9 +10,7 @@ namespace Orange
 		[MenuItem("Generate Serializer.dll")]
 		public static void GenerateSerializerDllAction()
 		{
-			The.MainWindow.Execute(() => {
-				GenerateSerializerDll();
-			});
+			GenerateSerializerDll();
 		}
 
 		public static bool GenerateSerializerDll()

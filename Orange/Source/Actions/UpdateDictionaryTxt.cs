@@ -10,10 +10,10 @@ namespace Orange
 		[MenuItem("Update Dictionary.txt")]
 		public static void UpdateDictionaryTxt()
 		{
-			The.MainWindow.Execute(() => {
+			if (Toolbox.ShowConfirmationDialog("Are you sure you want to update the dictionary?")) {
 				DictionaryExtractor extractor = new DictionaryExtractor();
 				extractor.ExtractDictionary();
-			});
+			}
 		}
 	}
 }
