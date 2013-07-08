@@ -87,6 +87,7 @@ namespace Orange
 			try {
 				try {
 					ClearLog();
+					The.Workspace.AssetFiles.Rescan();
 					action();
 				} catch (System.Exception exc) {
 					if (exc.InnerException != null) {
