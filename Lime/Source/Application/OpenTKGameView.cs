@@ -26,6 +26,7 @@ namespace Lime
 			this.Mouse.ButtonDown += HandleMouseButtonDown;
 			this.Mouse.ButtonUp += HandleMouseButtonUp;
 			this.Mouse.Move += HandleMouseMove;
+			this.Mouse.WheelChanged += HandleMouseWheel;
 			// Как узнать разрешение текущего экрана без Windows Forms?
 			Size screenSize = new Size(1280, 1024);
 			if (CheckFullscreenArg(args)) {
@@ -119,6 +120,17 @@ namespace Lime
 			Vector2 position = new Vector2(e.X, e.Y) * Input.ScreenToWorldTransform;
 			Input.MousePosition = position;
 			Input.SetTouchPosition(0, position);
+		}
+
+		void HandleMouseWheel(object sender, MouseWheelEventArgs e)
+		{
+			if (e.Delta > 0) {
+				Input.SetKeyState(Key.MouseWheelUp, true);
+				Input.SetKeyState(Key.MouseWheelUp, false);
+			} else if (e.Delta < 0) {
+				Input.SetKeyState(Key.MouseWheelDown, true);
+				Input.SetKeyState(Key.MouseWheelDown, false);
+			}
 		}
 
 		protected override void OnClosed(EventArgs e)

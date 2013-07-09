@@ -168,6 +168,9 @@ namespace Lime
 		Touch2 = 135,
 		Touch3 = 136,
 
+		MouseWheelUp = 137,
+		MouseWheelDown = 138,
+
 		KeyCount,
 	}
 }
