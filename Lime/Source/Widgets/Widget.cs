@@ -187,9 +187,7 @@ namespace Lime
 				if (IsRunning) {
 					AdvanceAnimation(delta);
 				}
-				if (Nodes.Count > 0) {
-					UpdateChildren(delta);
-				}
+				UpdateChildren(delta);
 				if (clicked != null) {
 					HandleClick();
 				}
@@ -231,10 +229,14 @@ namespace Lime
 
 		public Matrix32 CalcLocalToParentTransform()
 		{
-			var u = new Vector2(direction.X * Scale.X, direction.Y * Scale.X);
-			var v = new Vector2(-direction.Y * Scale.Y, direction.X * Scale.Y);
+			Vector2 u, v;
 			Vector2 translation = position;
 			Vector2 center = Size * Pivot;
+			Vector2 scale = Scale;
+			u.X = direction.X * scale.X;
+			u.Y = direction.Y * scale.X;
+			v.X = -direction.Y * scale.Y;
+			v.Y = direction.X * scale.Y;
 			Matrix32 matrix;
 			if (SkinningWeights != null && Parent != null && Parent.AsWidget != null) {
 				BoneArray a = Parent.AsWidget.BoneArray;

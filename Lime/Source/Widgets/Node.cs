@@ -247,7 +247,7 @@ namespace Lime
 			if (IsRunning) {
 				AdvanceAnimation(delta);
 			}
-			if (Nodes.Count > 0) {
+			if (!Nodes.Empty) {
 				UpdateChildren(delta);
 			}
 		}
@@ -275,7 +275,6 @@ namespace Lime
 				} else {
 					node.FullUpdate(delta);
 				}
-				
 			}
 		}
 

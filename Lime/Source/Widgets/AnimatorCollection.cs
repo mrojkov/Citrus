@@ -99,7 +99,7 @@ namespace Lime
 		
 		public void Clear() { animatorList = emptyList; }
 		
-		public int Count { get { return animatorList.Count; } }
+		public int Count { get { return AsArray.Length; } }
 	
 		IEnumerator<Animator> IEnumerable<Animator>.GetEnumerator()
 		{

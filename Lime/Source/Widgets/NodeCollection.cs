@@ -50,7 +50,7 @@ namespace Lime
 		public int IndexOf(Node node)
 		{
 			int i = 0;
-			foreach (var current in this.AsArray) {
+			foreach (var current in AsArray) {
 				if (current == node)
 					return i;
 				i++;
@@ -59,7 +59,7 @@ namespace Lime
 		}
 
 		public Node this[int index] {
-			get {return nodeList[index]; }
+			get {return AsArray[index]; }
 		}
 
 		void ICollection<Node>.CopyTo(Node[] n, int index)
@@ -67,7 +67,9 @@ namespace Lime
 			nodeList.CopyTo(n, index);
 		}
 
-		public int Count { get { return nodeList.Count; } }
+		public bool Empty { get { return AsArray == emptyArray; } }
+
+		public int Count { get { return AsArray.Length; } }
 
 		public IEnumerator<Node> GetEnumerator()
 		{
