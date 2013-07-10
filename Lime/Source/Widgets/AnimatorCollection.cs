@@ -14,8 +14,9 @@ namespace Lime
 	public sealed class AnimatorCollection : ICollection<Animator>
 	{
 		static List<Animator> emptyList = new List<Animator>();
-		List<Animator> animators = emptyList;
-		
+		static Animator[] emptyArray = new Animator[0];
+		List<Animator> animatorList = emptyList;
+		Animator[] animatorArray;
 		Node owner;
 
 		public AnimatorCollection() { /* ctor for ProtoBuf only */ }
@@ -25,10 +26,25 @@ namespace Lime
 			this.owner = owner;
 		}
 
+		public Animator[] AsArray
+		{
+			get
+			{
+				if (animatorArray == null) {
+					if (animatorList.Count > 0) {
+						animatorArray = animatorList.ToArray();
+					} else {
+						animatorArray = emptyArray;
+					}
+				}
+				return animatorArray;
+			}
+		}
+
 		internal static AnimatorCollection SharedClone(Node owner, AnimatorCollection source)
 		{
 			var result = new AnimatorCollection(owner);
-			foreach (var animator in source.animators) {
+			foreach (var animator in source.animatorList) {
 				result.Add(animator.SharedClone());
 			}
 			return result;
@@ -37,7 +53,7 @@ namespace Lime
 		public Animator this[string propertyName]
 		{
 			get {
-				foreach (Animator a in animators) {
+				foreach (Animator a in animatorList) {
 					if (a.TargetProperty == propertyName) {
 						return a;
 					}
@@ -55,12 +71,12 @@ namespace Lime
 		
 		public bool Contains(Animator item)
 		{
-			return animators.Contains(item);
+			return animatorList.Contains(item);
 		}
 		
 		void ICollection<Animator>.CopyTo(Animator[] a, int index)
 		{
-			animators.CopyTo(a, index);
+			animatorList.CopyTo(a, index);
 		}
 		
 		bool ICollection<Animator>.IsReadOnly { 
@@ -68,66 +84,64 @@ namespace Lime
 		}
 		
 		public Animator this[int index] { 
-			get { return animators[index]; }
+			get { return animatorList[index]; }
 		}
 		
 		public bool Remove(Animator item)
 		{
-			bool result = animators.Remove(item);
-			if (animators.Count == 0) {
-				animators = emptyList;
+			bool result = animatorList.Remove(item);
+			if (animatorList.Count == 0) {
+				animatorList = emptyList;
 			}
+			animatorArray = null;
 			return result;
 		}
 		
-		public void Clear() { animators = emptyList; }
+		public void Clear() { animatorList = emptyList; }
 		
-		public int Count { get { return animators.Count; } }
+		public int Count { get { return animatorList.Count; } }
 	
 		IEnumerator<Animator> IEnumerable<Animator>.GetEnumerator()
 		{
-			return animators.GetEnumerator();
+			return animatorList.GetEnumerator();
 		}
 		
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return animators.GetEnumerator();
+			return animatorList.GetEnumerator();
 		}
 		 
 		public void Add(Animator animator)
 		{
-			if (animators == emptyList) {
-				animators = new List<Animator>();
+			if (animatorList == emptyList) {
+				animatorList = new List<Animator>();
 			}
+			animatorArray = null;
 			animator.Bind(owner);
-			animators.Add(animator);
+			animatorList.Add(animator);
 		}
 		
 		public int GetOverallDuration()
 		{
 			int val = 0;
-			int count = animators.Count;
-			for (int i = 0; i < count; i++) {
-				val = Math.Max(val, animators[i].Duration);
+			foreach (var animator in animatorList) {
+				val = Math.Max(val, animator.Duration);
 			}
 			return val;
 		}
 
 		public void Apply(int time)
 		{
-			int count = animators.Count;
-			for (int i = 0; i < count; i++) {
-				animators[i].Apply(time);
+			foreach (var animator in AsArray) {
+				animator.Apply(time);
 			}
 		}
 
 		public void InvokeTriggers(int frame)
 		{
-			int count = animators.Count;
-			for (int i = 0; i < count; i++) {
-				var a = animators[i];
-				if (a.IsTriggerable) {
-					a.InvokeTrigger(frame);
+			foreach (var animator in AsArray) {
+				if (animator.IsTriggerable) {
+					animator.InvokeTrigger(frame);
 				}
 			}
 		}

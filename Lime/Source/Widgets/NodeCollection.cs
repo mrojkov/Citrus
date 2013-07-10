@@ -38,8 +38,7 @@ namespace Lime
 			{
 				if (nodeArray == null) {
 					if (nodeList.Count > 0) {
-						nodeArray = new Node[nodeList.Count];
-						nodeList.CopyTo(nodeArray);
+						nodeArray = nodeList.ToArray();
 					} else {
 						nodeArray = emptyArray;
 					}
