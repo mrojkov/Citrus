@@ -11,7 +11,6 @@ namespace Orange
 		public static void BuildGameAndRunAction()
 		{
 			AssetCooker.CookForActivePlatform();
-			CsprojSynchronization.SynchronizeAll();
 			if (BuildGame()) {
 				The.MainWindow.ScrollLogToEnd();
 				RunGame();

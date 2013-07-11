@@ -22,7 +22,8 @@ namespace Orange
 
 		public bool Build()
 		{
-			Console.WriteLine("------------- Building Game Application -------------");
+			Console.WriteLine("------------- Building Game -------------");
+			CsprojSynchronization.SynchronizeAll();
 			string app, args, slnFile;
 #if MAC
 			app = "/Applications/MonoDevelop.app/Contents/MacOS/mdtool";

@@ -74,7 +74,7 @@ namespace Orange
 		private void CookHelper()
 		{
 			using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
-				Console.WriteLine("------------- Building Game Content -------------");
+				Console.WriteLine("------------- Cooking Assets -------------");
 				SyncAtlases();
 				SyncDeleted();
 				SyncUpdated(".txt", ".txt", (srcPath, dstPath) => {
