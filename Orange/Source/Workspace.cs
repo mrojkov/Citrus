@@ -14,6 +14,41 @@ namespace Orange
 		public string Title { get; private set; }
 		public FileEnumerator AssetFiles { get; private set; }
 
+		public string GetPlatformSuffix()
+		{
+#if WIN
+			return ".Win";
+#else
+			return ActivePlatform == TargetPlatform.Desktop ? ".Mac" : ".iOS";
+#endif
+		}
+
+		/// <summary>
+		/// Returns solution path. E.g: Zx3.Win/Zx3.Win.sln
+		/// </summary>
+		public string GetSolutionFilePath()
+		{
+			var path = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + GetPlatformSuffix(), The.Workspace.Title + GetPlatformSuffix() + ".sln");
+			return path;
+		}
+
+		/// <summary>
+		/// Returns main project path. E.g: Zx3.Win/Zx3.Win.csproj
+		/// </summary>
+		public string GetMainCsprojFilePath()
+		{
+			return Path.ChangeExtension(GetSolutionFilePath(), ".csproj");
+		}
+
+		/// <summary>
+		/// Returns game project path. E.g: Zx3.Game/Zx3.Game.Win.csproj
+		/// </summary>
+		public string GetGameCsprojFilePath()
+		{
+			var path = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + ".Game", The.Workspace.Title + ".Game" + GetPlatformSuffix() + ".csproj");
+			return path;
+		}
+
 		public static readonly Workspace Instance = new Workspace();
 
 		public TargetPlatform ActivePlatform {
