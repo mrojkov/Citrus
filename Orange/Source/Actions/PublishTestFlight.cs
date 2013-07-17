@@ -15,39 +15,41 @@ namespace Orange
 		[MenuItem("Publish to TestFlight")]
 		public static void PublishTestFlightAction()
 		{
-			var apiToken = The.Workspace.GetProjectAttribute("TestFlightApiToken");
-			var teamToken = The.Workspace.GetProjectAttribute("TestFlightTeamToken");
-			var notes = The.Workspace.GetProjectAttribute("BuildNotes");
+			if (Actions.BuildGame()) {
+				var apiToken = The.Workspace.GetProjectAttribute("TestFlightApiToken");
+				var teamToken = The.Workspace.GetProjectAttribute("TestFlightTeamToken");
+				var notes = The.Workspace.GetProjectAttribute("BuildNotes");
 
-			var ipaPath = GetIPAPath();
-			Console.WriteLine("Uploading " + ipaPath);
+				var ipaPath = GetIPAPath();
+				Console.WriteLine("Uploading " + ipaPath);
 
-			var testflight = new RestClient("http://testflightapp.com");
-			var uploadRequest = new RestRequest("api/builds.json", Method.POST);
-			uploadRequest.AddParameter("api_token", apiToken);
-			uploadRequest.AddParameter("team_token", teamToken);
-			uploadRequest.AddParameter("notes", notes);
-			uploadRequest.AddFile("file", ipaPath);
+				var testflight = new RestClient("http://testflightapp.com");
+				var uploadRequest = new RestRequest("api/builds.json", Method.POST);
+				uploadRequest.AddParameter("api_token", apiToken);
+				uploadRequest.AddParameter("team_token", teamToken);
+				uploadRequest.AddParameter("notes", notes);
+				uploadRequest.AddFile("file", ipaPath);
 
-			IRestResponse response = null;
-			var bw = new BackgroundWorker();
-			bw.DoWork += (s, e) => {
-				response = testflight.Execute(uploadRequest);
-			};
-			bw.RunWorkerCompleted += (s, e) => {
-				if (e.Error != null) {
-					Console.WriteLine(e.Error);
+				IRestResponse response = null;
+				var bw = new BackgroundWorker();
+				bw.DoWork += (s, e) => {
+					response = testflight.Execute(uploadRequest);
+				};
+				bw.RunWorkerCompleted += (s, e) => {
+					if (e.Error != null) {
+						Console.WriteLine(e.Error);
+					}
+				};
+				bw.RunWorkerAsync();
+				WaitWhileBusy(bw);
+				if (response != null) {
+					if (response.StatusCode == HttpStatusCode.OK) {
+						Console.WriteLine("Build uploaded to TestFlight");
+					} else {
+						Console.WriteLine("Build not uploaded, testflight returned error");
+					}
+					Console.WriteLine(response.Content);
 				}
-			};
-			bw.RunWorkerAsync();
-			WaitWhileBusy(bw);
-			if (response != null) {
-				if (response.StatusCode == HttpStatusCode.OK) {
-					Console.WriteLine("Build uploaded to TestFlight");
-				} else {
-					Console.WriteLine("Build not uploaded, testflight returned error");
-				}
-				Console.WriteLine(response.Content);
 			}
 		}
 

@@ -82,7 +82,7 @@ namespace Orange
 				return;
 			DateTime startTime = DateTime.Now;
 			The.Workspace.Save();
-			NativeWindow.Sensitive = false;
+			EnableControls(false);
 			var platform = (TargetPlatform)this.PlatformPicker.Active;
 			try {
 				try {
@@ -99,9 +99,18 @@ namespace Orange
 				}
 				ScrollLogToEnd();
 			} finally {
-				NativeWindow.Sensitive = true;
+				EnableControls(true);
 			}
 			ShowTimeStatistics(startTime);
+		}
+
+		private void EnableControls(bool value)
+		{
+			this.GoButton.Sensitive = value;
+			this.ActionPicker.Sensitive = value;
+			this.PlatformPicker.Sensitive = value;
+			this.CitrusProjectChooser.Sensitive = value;
+			this.UpdateBeforeBuildCheckbox.Sensitive = value;
 		}
 
 		private void UpdateProjectIfNeeded()

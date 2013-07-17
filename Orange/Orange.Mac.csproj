@@ -111,7 +111,6 @@
     <Compile Include="Source\Actions\CookGameAssets.cs" />
     <Compile Include="Source\CsprojSynchronization\CsprojSynchronization.cs" />
     <Compile Include="Source\Subversion.cs" />
-    <Compile Include="Source\XCodeExport\XCodeExport.cs" />
     <Compile Include="Source\Actions\PublishTestFlight.cs" />
   </ItemGroup>
   <ItemGroup>
