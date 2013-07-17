@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 
 namespace Orange
 {
@@ -26,7 +27,7 @@ namespace Orange
 			CsprojSynchronization.SynchronizeAll();
 			string app, args, slnFile;
 #if MAC
-			app = "/Applications/MonoDevelop.app/Contents/MacOS/mdtool";
+			app = "/Applications/Xamarin Studio.app/Contents/MacOS/mdtool";
 			if (platform == TargetPlatform.iOS) {
 				slnFile = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + ".iOS", The.Workspace.Title + ".iOS.sln");
 				args = String.Format("build \"{0}\" -t:Build -c:\"Release|iPhone\"", slnFile);
@@ -101,12 +102,37 @@ namespace Orange
 		public int Run(string arguments)
 		{
 			Console.WriteLine("------------- Starting Application -------------");
+#if WIN
 			string app = GetApplicationPath();
 			string dir = Path.GetDirectoryName(app);
 			using (new DirectoryChanger(dir)) {
 				int exitCode = Toolbox.StartProcess(app, arguments);
 				return exitCode;
 			}
+#else
+			var args = "--installdev=" + GetIOSAppName();
+			int exitCode = Toolbox.StartProcess("/Developer/MonoTouch/usr/bin/mtouch", args);
+			if (exitCode != 0) {
+				return exitCode;
+			}
+			Console.WriteLine("Please start app manually :)");
+			//args = "--launchdev=" + GetBundleId();
+			//exitCode = Toolbox.StartProcess("/Developer/MonoTouch/usr/bin/mtouch", args);
+			return exitCode;
+#endif
+		}
+
+		private string GetIOSAppName()
+		{
+			var directory = Path.Combine(Path.GetDirectoryName(The.Workspace.GetSolutionFilePath()), "bin", "iPhone", "Release");
+			var dirInfo = new System.IO.DirectoryInfo(directory);
+			var all = new List<System.IO.DirectoryInfo>(dirInfo.EnumerateDirectories("*.app"));
+			all.Sort((a, b) => b.CreationTime.CompareTo(a.CreationTime));
+			if (all.Count > 0) {
+				var path = Path.Combine(directory, all[0].FullName);
+				return path;
+			}
+			return null;
 		}
 	}
 }

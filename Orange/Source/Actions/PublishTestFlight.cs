@@ -69,9 +69,15 @@ namespace Orange
 
 		private static string GetIPAPath()
 		{
-			var ipa = "F:\\Work\\Zx3\\Kill3.iOS\\bin\\iPhone\\Release\\ZZZ-6.32_NoData.ipa";
-			//var ipa = Path.Combine(Path.GetDirectoryName(The.Workspace.GetSolutionFilePath()), "bin", "iPhone", "Release", "ZZZ-6.32.ipa");
-			return ipa;
+			var directory = Path.Combine(Path.GetDirectoryName(The.Workspace.GetSolutionFilePath()), "bin", "iPhone", "Release");
+			var dirInfo = new DirectoryInfo(directory);
+			var allFiles = dirInfo.EnumerateFiles("*.ipa").ToList();
+			allFiles.Sort((a, b) => b.CreationTime.CompareTo(a.CreationTime));
+			if (allFiles.Count > 0) {
+				var ipaPath = Path.Combine(directory, allFiles[0].FullName);
+				return ipaPath;
+			}
+			return null;
 		}
 	}
 }

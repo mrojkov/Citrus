@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 
 namespace Orange
 {
@@ -11,9 +12,9 @@ namespace Orange
 #if WIN
 			svn = "svn";
 #else
-			Svn = "/opt/subversion/bin";
-			if (!File.PathExist(Svn)) {
-				Console.WriteLine(string.Format("WARNING: '{0}' not found", Svn));
+			svn = "/opt/subversion/bin/svn";
+			if (!File.Exists(svn)) {
+				Console.WriteLine(string.Format("WARNING: '{0}' not found. Visit http://www.wandisco.com/subversion/download#osx\n", svn));
 			}
 #endif
 		}
