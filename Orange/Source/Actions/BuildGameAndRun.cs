@@ -7,8 +7,8 @@ namespace Orange
 {
 	static partial class Actions
 	{
-		[MenuItem("Build Game & Run", 0)]
-		public static void BuildGameAndRunAction()
+		[MenuItem("Build & Run", 0)]
+		public static void BuildAndRunAction()
 		{
 			AssetCooker.CookForActivePlatform();
 			if (BuildGame()) {

@@ -7,6 +7,7 @@ namespace Orange
 		public Gtk.ComboBox PlatformPicker;
 		public Gtk.TextView OutputPane;
 		public Gtk.ComboBox ActionPicker;
+		public Gtk.CheckButton UpdateBeforeBuildCheckbox;
 		public Gtk.Button GoButton;
 
 		private void Create()
@@ -18,8 +19,7 @@ namespace Orange
 			NativeWindow.DefaultSize = new Gdk.Size(500, 400);
 
 			var mainVBox = new Gtk.VBox() { Spacing = 6, BorderWidth = 6 };
-			var header = CreateHeaderSection();
-			mainVBox.PackStart(header, expand: false, fill: false, padding: 0);
+			CreateHeaderSection(mainVBox);
 
 			var output = CreateOutputPane();
 			mainVBox.PackStart(output, expand: true, fill: true, padding: 0);
@@ -61,7 +61,7 @@ namespace Orange
 			return scrolledWindow;
 		}
 
-		private Gtk.Widget CreateHeaderSection()
+		private void CreateHeaderSection(Gtk.VBox mainVBox)
 		{
 			var table = new Gtk.Table(2, 2, homogeneous: false) { 
 				RowSpacing = 6, 
@@ -88,7 +88,13 @@ namespace Orange
 			CitrusProjectChooser = new Gtk.FileChooserButton("Select a File", Gtk.FileChooserAction.Open);
 			table.Attach(CitrusProjectChooser, 1, 2, 1, 2);
 			CitrusProjectChooser.FileSet += CitrusProjectChooser_SelectionChanged;
-			return table;
+			
+			// Svn update section
+			UpdateBeforeBuildCheckbox = new Gtk.CheckButton() { Xalign = 1, Label = "Update project before build" };
+
+			// Pack everything to vbox
+			mainVBox.PackStart(table, expand: false, fill: false, padding: 0);
+			mainVBox.PackStart(UpdateBeforeBuildCheckbox, expand: false, fill: false, padding: 0);
 		}
 	}
 }

@@ -13,8 +13,8 @@ namespace Orange
 		[ProtoMember(2)]
 		public int TargetPlatform;
 
-		[ProtoMember(5)]
-		public int Action;
+		[ProtoMember(6)]
+		public bool UpdateBeforeBuild;
 
 		public WorkspaceConfig() {}
 

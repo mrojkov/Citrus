@@ -87,6 +87,7 @@ namespace Orange
 			try {
 				try {
 					ClearLog();
+					UpdateProjectIfNeeded();
 					The.Workspace.AssetFiles.Rescan();
 					action();
 				} catch (System.Exception exc) {
@@ -101,6 +102,15 @@ namespace Orange
 				NativeWindow.Sensitive = true;
 			}
 			ShowTimeStatistics(startTime);
+		}
+
+		private void UpdateProjectIfNeeded()
+		{
+			if (UpdateBeforeBuildCheckbox.Active) {
+				var citrusPath = Path.Combine(Path.GetDirectoryName(The.Workspace.ProjectDirectory), "Citrus", "Lime");
+				Subversion.Update(citrusPath);
+				Subversion.Update(The.Workspace.ProjectDirectory);
+			}
 		}
 
 		void ShowTimeStatistics(DateTime startTime)
@@ -139,8 +149,8 @@ namespace Orange
 			var platform = (TargetPlatform)this.PlatformPicker.Active;
 #if WIN
 			if (platform == Orange.TargetPlatform.iOS) {
-				var message = new Gtk.MessageDialog(NativeWindow, 
-					Gtk.DialogFlags.DestroyWithParent, 
+				var message = new Gtk.MessageDialog(NativeWindow,
+					Gtk.DialogFlags.DestroyWithParent,
 					Gtk.MessageType.Error, Gtk.ButtonsType.Close,
 					"iOS target is not supported on Windows platform");
 				message.Title = "Orange";

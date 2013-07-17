@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using Newtonsoft.Json.Linq;
 
 namespace Orange
 {
@@ -13,6 +14,7 @@ namespace Orange
 		public string AssetsDirectory { get; private set; }
 		public string Title { get; private set; }
 		public FileEnumerator AssetFiles { get; private set; }
+		private JObject projectJson;
 
 		public string GetPlatformSuffix()
 		{
@@ -30,6 +32,15 @@ namespace Orange
 		{
 			var path = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + GetPlatformSuffix(), The.Workspace.Title + GetPlatformSuffix() + ".sln");
 			return path;
+		}
+
+		public string GetProjectAttribute(string name)
+		{
+			JToken value;
+			if (!projectJson.TryGetValue(name, out value)) {
+				throw new Lime.Exception("{0} is not defined in {1}", name, ProjectFile);
+			}
+			return value.ToString();
 		}
 
 		/// <summary>
@@ -60,6 +71,7 @@ namespace Orange
 			var config = WorkspaceConfig.Load();
 			Open(config.CitrusProject);
 			The.MainWindow.PlatformPicker.Active = config.TargetPlatform;
+			The.MainWindow.UpdateBeforeBuildCheckbox.Active = config.UpdateBeforeBuild;
 			// ActionPicker.Active = config.Action;
 		}
 
@@ -68,23 +80,34 @@ namespace Orange
 			var config = WorkspaceConfig.Load();
 			config.CitrusProject = ProjectFile;
 			config.TargetPlatform = (int)ActivePlatform;
+			config.UpdateBeforeBuild = The.MainWindow.UpdateBeforeBuildCheckbox.Active;
 			// config.Action = ActionPicker.Active;
 			WorkspaceConfig.Save(config);
 		}
 
 		public void Open(string file)
 		{
-			The.MainWindow.ClearLog();
-			ProjectFile = file;
-			Title = File.ReadAllText(file);
-			ProjectDirectory = Path.GetDirectoryName(file);
-			AssetsDirectory = Path.Combine(ProjectDirectory, "Data");
-			if (!Directory.Exists(AssetsDirectory)) {
-				throw new Lime.Exception("Assets folder '{0}' doesn't exist", AssetsDirectory);
+			try {
+				The.MainWindow.ClearLog();
+				ProjectFile = file;
+				ReadProject(file);
+				ProjectDirectory = Path.GetDirectoryName(file);
+				AssetsDirectory = Path.Combine(ProjectDirectory, "Data");
+				if (!Directory.Exists(AssetsDirectory)) {
+					throw new Lime.Exception("Assets folder '{0}' doesn't exist", AssetsDirectory);
+				}
+				AssetFiles = new FileEnumerator(AssetsDirectory);
+				PluginLoader.ScanForPlugins(file);
+				The.MainWindow.CitrusProjectChooser.SelectFilename(file);
+			} catch (System.Exception e) {
+				Console.WriteLine(string.Format("Can't open {0}:\n{1}", file, e.Message));
 			}
-			AssetFiles = new FileEnumerator(AssetsDirectory);
-			PluginLoader.ScanForPlugins(file);
-			The.MainWindow.CitrusProjectChooser.SelectFilename(file);
+		}
+
+		private void ReadProject(string file)
+		{
+			projectJson = JObject.Parse(File.ReadAllText(file));
+			Title = GetProjectAttribute("Title");
 		}
 
 		public string GetActivePlatformString()
