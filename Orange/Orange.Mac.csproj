@@ -105,6 +105,7 @@
     <Compile Include="Source\Actions\CookGameAssets.cs" />
     <Compile Include="Source\CsprojSynchronization\CsprojSynchronization.cs" />
     <Compile Include="Source\Subversion.cs" />
+    <Compile Include="Source\XCodeExport\XCodeExport.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lime\Lime.Mac.csproj">
@@ -159,5 +160,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Source\AssetCooker\" />
+    <Folder Include="Source\XCodeExport\" />
   </ItemGroup>
 </Project>
