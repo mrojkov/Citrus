@@ -47,8 +47,8 @@ namespace Lime
 		private Vector2 direction = new Vector2(1, 0);
 		private Color4 color;
 		protected bool renderedToTexture;
-		private Vector2? parentSize;
 		private Action clicked;
+		private Vector2? parentSize;
 
 		#region Properties
 
@@ -267,6 +267,13 @@ namespace Lime
 					}
 					chain.Add(this);
 				}
+			}
+		}
+
+		internal override void OnParentChanged()
+		{
+			if (Parent != null && Parent.AsWidget != null) {
+				parentSize = Parent.AsWidget.Size;
 			}
 		}
 

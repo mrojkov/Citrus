@@ -59,7 +59,7 @@ namespace Lime
 		}
 
 		public Node this[int index] {
-			get {return AsArray[index]; }
+			get { return AsArray[index]; }
 		}
 
 		void ICollection<Node>.CopyTo(Node[] n, int index)
@@ -145,6 +145,9 @@ namespace Lime
 
 		public void Clear()
 		{
+			foreach (var node in nodeList) {
+				node.Parent = null;
+			}
 			nodeArray = null;
 			nodeList = emptyList;
 		}

@@ -53,7 +53,8 @@ namespace Lime
 		[TangerineProperty(1)]
 		public string Trigger { get; set; }
 
-		public Node Parent { get; internal set; }
+		private Node parent;
+		public Node Parent { get { return parent; } set { parent = value; OnParentChanged(); } }
 		public Widget AsWidget { get; internal set; }
 
 		internal Node NextToRender;
@@ -288,6 +289,8 @@ namespace Lime
 				Updated(delta * 0.001f);
 			}
 		}
+
+		internal virtual void OnParentChanged() {}
 
 		public virtual void Render() {}
 
