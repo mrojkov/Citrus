@@ -69,7 +69,7 @@ namespace Lime
 
 		public virtual ITexture Texture
 		{
-			get { throw new NotImplementedException(); }
+			get { return null; }
 			set { throw new NotImplementedException(); }
 		}
 

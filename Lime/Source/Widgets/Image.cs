@@ -47,11 +47,6 @@ namespace Lime
 			return (Vector2)Texture.ImageSize;
 		}
 
-		public override void PreloadTextures()
-		{
-			Texture.GetHandle();
-		}
-
 		public override void Render()
 		{
 			Renderer.Blending = GlobalBlending;

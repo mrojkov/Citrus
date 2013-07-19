@@ -133,13 +133,6 @@ namespace Lime
 			}
 		}
 
-		public virtual void PreloadTextures()
-		{
-			foreach (var node in Nodes) {
-				node.PreloadTextures();
-			}
-		}
-
 		public bool TryRunAnimation(string markerId)
 		{
 			Marker marker = Markers.TryFind(markerId);
@@ -479,6 +472,31 @@ namespace Lime
 				}
 			}
 		}
+
+		public void PreloadTextures()
+		{
+			foreach (var prop in GetType().GetProperties()) {
+				if (prop.PropertyType == typeof(ITexture)) {
+					var getter = prop.GetGetMethod();
+					var texture = getter.Invoke(this, new object[] {}) as ITexture;
+					if (texture != null) {
+						texture.GetHandle();
+					}
+				}
+			}
+			foreach (var animator in Animators) {
+				var a = animator as GenericAnimator<ITexture>;
+				if (a != null) {
+					foreach (var texture in a.values) {
+						texture.GetHandle();
+					}
+				}
+			}
+			foreach (var node in Nodes.AsArray) {
+				node.PreloadTextures();
+			}
+		}
+
 		#endregion
 	}
 }
