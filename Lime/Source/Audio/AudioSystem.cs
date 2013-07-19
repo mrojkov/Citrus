@@ -25,8 +25,6 @@ namespace Lime
 		static AudioContext context;
 #endif
 		// static XRamExtension xram;
-		static SampleCache soundCache = new SampleCache();
-
 		static List<AudioChannel> channels = new List<AudioChannel>();
 		static float[] groupVolumes = new float[2] {1, 1};
 
@@ -186,7 +184,8 @@ namespace Lime
 			IAudioDecoder decoder = null;
 			path += ".sound";
 			if (AssetsBundle.Instance.FileExists(path)) {
-				decoder = AudioDecoderFactory.CreateDecoder(soundCache.OpenStream(path));
+				decoder = new PreloadingAudioDecoder(path);
+					// AudioDecoderFactory.CreateDecoder(path);
 			} else {
 				Console.WriteLine("Missing audio file '{0}'", path);
 				return new Sound();

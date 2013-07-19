@@ -252,8 +252,14 @@ namespace Lime
 			return stream;
 		}
 
+		DateTime lastReadTime;
+
 		private void SimulateReadDelay(string path, int length)
 		{
+			if (DateTime.Now - lastReadTime > new TimeSpan(0, 0, 1)) {
+				System.Threading.Thread.Sleep(250);
+				lastReadTime = DateTime.Now;
+			}
 			const float readSpeed = 2000 * 1024;
 			int readTime = (int)(1000L * length / readSpeed);
 			if (readTime > 10) {

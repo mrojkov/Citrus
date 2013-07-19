@@ -112,8 +112,9 @@ namespace Lime
 
 		public void Dispose()
 		{
-			if (decoder != null)
+			if (decoder != null) {
 				decoder.Dispose();
+			}
 			Marshal.FreeHGlobal(decodedData);
 			AL.SourceStop(source);
 			AL.DeleteSource(source);
@@ -136,8 +137,9 @@ namespace Lime
 					throw new Lime.Exception("Can't play on the channel because it is already being played");
 				}
 				this.looping = looping;
-				if (this.decoder != null)
+				if (this.decoder != null) {
 					this.decoder.Dispose();
+				}
 				this.decoder = decoder;
 			}
 			if (sound != null) {
@@ -190,7 +192,8 @@ namespace Lime
 		public float Pitch
 		{
 			get { return pitch; }
-			set {
+			set 
+			{
 				pitch = Mathf.Clamp(value, 0.0625f, 16);
 				AL.Source(source, ALSourcef.Pitch, pitch);
 				AudioSystem.CheckError();

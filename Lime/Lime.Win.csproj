@@ -75,7 +75,7 @@
     <Compile Include="Source\Application\WinCursors.cs" />
     <Compile Include="Source\AssetsBundle\AssetsBundle.cs" />
     <Compile Include="Source\Audio\OggDecoder.cs" />
-    <Compile Include="Source\Audio\SampleCache.cs" />
+    <Compile Include="Source\Audio\AudioCache.cs" />
     <Compile Include="Source\Audio\SerializableSample.cs" />
     <Compile Include="Source\Audio\Sound.cs" />
     <Compile Include="Source\PopupMenu\ImageBox.cs" />
