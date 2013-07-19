@@ -166,6 +166,5 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Source\AssetCooker\" />
-    <Folder Include="Source\XCodeExport\" />
   </ItemGroup>
 </Project>
