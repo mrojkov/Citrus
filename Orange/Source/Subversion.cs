@@ -26,7 +26,7 @@ namespace Orange
 
 		public static void Commit(string path, string message)
 		{
-			SvnCommand("commit " + path);
+			SvnCommand(string.Format("commit {0} -m \"{1}\"", path, message));
 		}
 
 		private static void SvnCommand(string args)

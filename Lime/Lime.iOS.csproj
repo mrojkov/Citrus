@@ -99,7 +99,6 @@
     <Compile Include="Source\Audio\AudioDecoder.cs" />
     <Compile Include="Source\Audio\WaveIMA4Decoder.cs" />
     <Compile Include="Source\Audio\OggDecoder.cs" />
-    <Compile Include="Source\Audio\SampleCache.cs" />
     <Compile Include="Source\Audio\SerializableSample.cs" />
     <Compile Include="Source\Audio\Sound.cs" />
     <Compile Include="Source\Widgets\NineGrid.cs" />
@@ -158,6 +157,7 @@
     <Compile Include="Source\Input\Input.Common.cs" />
     <Compile Include="Source\Input\Input.Native.cs" />
     <Compile Include="Source\Input\Input.Unity.cs" />
+    <Compile Include="Source\Audio\AudioCache.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Application\WinCursors.cs">

@@ -35,19 +35,19 @@ namespace Lime
 		private void ReadoutAndCacheStreamAsync(string path, Stream stream, Action<Stream> succeeded)
 		{
 			var stream2 = new MemoryStream((int)stream.Length);
-			var bw = new BackgroundWorker();
-			bw.DoWork += (s, e) => {
+			//var bw = new BackgroundWorker();
+			//bw.DoWork += (s, e) => {
 				stream.CopyTo(stream2);
-			};
-			bw.RunWorkerCompleted += (s, e) => {
+			//};
+			//bw.RunWorkerCompleted += (s, e) => {
 				stream2.Position = 0;
 				if (items.Count >= SoundCacheSize) {
 					items.RemoveAt(0);
 				}
 				items.Add(new Item { Buffer = stream2.GetBuffer(), Path = path });
 				succeeded(stream2);
-			};
-			bw.RunWorkerAsync();
+			//};
+			//bw.RunWorkerAsync();
 		}
 
 		//public Stream OpenStream(string path)
