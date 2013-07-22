@@ -176,6 +176,25 @@ namespace Lime
 #endif
 		}
 
+		static AudioCache cache = new AudioCache();
+
+		public static void PreloadSound(string path)
+		{
+			cache.OpenStream(path + ".sound");
+		}
+
+		public static void PreloadSounds(string path)
+		{
+			foreach (var assetPath in AssetsBundle.Instance.EnumerateFiles()) {
+				if (assetPath.StartsWith(path)) {
+					var ext = Path.GetExtension(assetPath);
+					if (ext == ".sound") {
+						PreloadSound(Path.ChangeExtension(assetPath, null));
+					}
+				}
+			}
+		}
+
 		static Sound LoadSoundToChannel(AudioChannel channel, string path, AudioChannelGroup group, bool looping, float priority)
 		{
 			if (SilentMode) {
@@ -183,13 +202,11 @@ namespace Lime
 			}
 			IAudioDecoder decoder = null;
 			path += ".sound";
-			if (AssetsBundle.Instance.FileExists(path)) {
-				decoder = new PreloadingAudioDecoder(path);
-					// AudioDecoderFactory.CreateDecoder(path);
-			} else {
-				Console.WriteLine("Missing audio file '{0}'", path);
+			var stream = cache.OpenStream(path);
+			if (stream == null) {
 				return new Sound();
 			}
+			decoder = AudioDecoderFactory.CreateDecoder(stream);
 			var sound = channel.Play(decoder, looping);
 			channel.Group = group;
 			channel.Priority = priority;

@@ -49,9 +49,9 @@ namespace Lime
 		[ProtoMember(13)]
 		public bool LoopedAnimation { get; set; }
 
-		SerializableTexture texture = new SerializableTexture();
+		ITexture texture = new SerializableTexture();
 		[ProtoMember(14)]
-		public SerializableTexture Texture { get { return texture; } set { texture = value; textures = null; } }
+		public ITexture Texture { get { return texture; } set { texture = value; textures = null; } }
 
 		public ParticleModifier()
 		{
@@ -92,7 +92,7 @@ namespace Lime
 
 		List<SerializableTexture> textures;
 
-		internal SerializableTexture GetTexture(int index)
+		internal ITexture GetTexture(int index)
 		{
 			if (FirstFrame == LastFrame) {
 				return texture;

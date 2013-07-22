@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 
 namespace Lime
 {
 	internal class AudioCache
 	{
-		public const int MaxCachedSoundSize = 128 * 1024;
-		public const int SoundCacheSize = 32;
+		public const int MaxCachedSoundSize = 256 * 1024;
+		public const int MaxCacheSize = 4 * 1024 * 1024;
 		private List<Item> items = new List<Item>();
 
 		class Item
@@ -17,61 +16,42 @@ namespace Lime
 			public byte[] Buffer;
 		}
 
-		public void OpenStreamAsync(string path, Action<Stream> succeeded)
+		public int CalcCacheSize()
+		{
+			int size = 0;
+			foreach (var i in items) {
+				size += i.Buffer.Length;
+			}
+			return size;
+		}
+
+		public Stream OpenStream(string path)
 		{
 			var stream = GetCachedStream(path);
 			if (stream != null) {
-				succeeded(stream);
-				return;
+				return stream;
+			}
+			if (!AssetsBundle.Instance.FileExists(path)) {
+				Logger.Write("Missing audio file '{0}'", path);
+				return null;
 			}
 			stream = PackedAssetsBundle.Instance.OpenFileLocalized(path);
-			if (stream.Length >= MaxCachedSoundSize) {
-				succeeded(stream);
-			} else {
-				ReadoutAndCacheStreamAsync(path, stream, succeeded);
-			}
-		}
-
-		private void ReadoutAndCacheStreamAsync(string path, Stream stream, Action<Stream> succeeded)
-		{
-			var stream2 = new MemoryStream((int)stream.Length);
-			//var bw = new BackgroundWorker();
-			//bw.DoWork += (s, e) => {
-				stream.CopyTo(stream2);
-			//};
-			//bw.RunWorkerCompleted += (s, e) => {
-				stream2.Position = 0;
-				if (items.Count >= SoundCacheSize) {
+			if (stream.Length < MaxCachedSoundSize) {
+				Logger.Write("Caching sound {0}", path);
+				var memStream = new MemoryStream((int)stream.Length);
+				stream.CopyTo(memStream);
+				memStream.Position = 0;
+				while (CalcCacheSize() > MaxCacheSize) {
 					items.RemoveAt(0);
 				}
-				items.Add(new Item { Buffer = stream2.GetBuffer(), Path = path });
-				succeeded(stream2);
-			//};
-			//bw.RunWorkerAsync();
+				items.Add(new Item {
+					Buffer = memStream.GetBuffer(),
+					Path = path
+				});
+				return memStream;
+			}
+			return stream;
 		}
-
-		//public Stream OpenStream(string path)
-		//{
-		//	var stream = GetCachedStream(path);
-		//	if (stream != null) {
-		//		return stream;
-		//	}
-		//	stream = PackedAssetsBundle.Instance.OpenFileLocalized(path);
-		//	if (stream.Length < MaxCachedSoundSize) {
-		//		var stream2 = new MemoryStream((int)stream.Length);
-		//		stream.CopyTo(stream2);
-		//		stream2.Position = 0;
-		//		if (items.Count >= SoundCacheSize) {
-		//			items.RemoveAt(0);
-		//		}
-		//		items.Add(new CacheItem {
-		//			Buffer = stream2.GetBuffer(), 
-		//			Path = path
-		//		});
-		//		return stream2;
-		//	}
-		//	return stream;
-		//}
 
 		private Stream GetCachedStream(string path)
 		{

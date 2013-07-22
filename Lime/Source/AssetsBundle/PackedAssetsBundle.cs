@@ -243,7 +243,7 @@ namespace Lime
 		{
 			var stream = new AssetStream(this, path);
 			var desc = stream.descriptor;
-			if (Application.CheckCommandLineArg("--iPadLags")) {
+			if (Application.CheckCommandLineArg("--Jerky")) {
 				SimulateReadDelay(path, desc.Length);
 			}
 			if ((desc.Attributes & AssetAttributes.Zipped) != 0) {
@@ -256,12 +256,12 @@ namespace Lime
 
 		private void SimulateReadDelay(string path, int length)
 		{
+			const float readSpeed = 5000 * 1024;
+			int readTime = (int)(1000L * length / readSpeed);
 			if (DateTime.Now - lastReadTime > new TimeSpan(0, 0, 1)) {
-				System.Threading.Thread.Sleep(250);
+				readTime += 200;
 				lastReadTime = DateTime.Now;
 			}
-			const float readSpeed = 2000 * 1024;
-			int readTime = (int)(1000L * length / readSpeed);
 			if (readTime > 10) {
 				Console.WriteLine("Lag {0} ms while reading {1}", readTime, path);
 			}
@@ -297,13 +297,6 @@ namespace Lime
 			index.Remove(path);
 			trash.Add(desc);
 		}
-
-		// Mike: WTF?
-		//public void ListFiles()
-		//{
-		//	foreach (var k in index.Keys)
-		//		Console.WriteLine(k);
-		//}
 
 		public override bool FileExists(string path)
 		{

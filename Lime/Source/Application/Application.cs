@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 
 #if iOS
 using MonoTouch.UIKit;
@@ -26,16 +27,32 @@ namespace Lime
 
 	public class Application
 	{
+		public static Thread MainThread { get; private set; }
+		public static bool IsMainThread { get { return Thread.CurrentThread == MainThread; } }
+
 		public static Application Instance;
-		internal static readonly object MainThreadSync = new object();
+		private static readonly object scheduledActionsSync = new object();
+		private static Action scheduledActions;
 
 		public Application()
 		{
 			Instance = this;
+			MainThread = Thread.CurrentThread;
 			// Use '.' as decimal separator.
 			var culture = System.Globalization.CultureInfo.InvariantCulture;
 			System.Threading.Thread.CurrentThread.CurrentCulture = culture;
 			SetGlobalExceptionHandler();
+			GameView.WillRenderFrame += RunScheduledActions;
+		}
+
+		private void RunScheduledActions()
+		{
+			lock (scheduledActionsSync) {
+				if (scheduledActions != null) {
+					scheduledActions();
+					scheduledActions = null;
+				}
+			}
 		}
 
 		private void SetGlobalExceptionHandler()
@@ -72,16 +89,21 @@ namespace Lime
 
 		public static void InvokeOnMainThread(Action action)
 		{
-#if iOS
-			var appDelegate = UIApplication.SharedApplication.Delegate as AppDelegate;
-			appDelegate.BeginInvokeOnMainThread(() => action());
-#elif UNITY
-			throw new NotImplementedException();
-#else
-			lock (MainThreadSync) {
-				GameView.Instance.ScheduledActions += action;
+			if (IsMainThread) {
+				action();
+				return;
 			}
-#endif
+//#if iOS
+//			var appDelegate = UIApplication.SharedApplication.Delegate as AppDelegate;
+//			appDelegate.BeginInvokeOnMainThread(() => action());
+//#elif UNITY
+//			throw new NotImplementedException();
+//#else
+			// Now we use unified way on iOS and PC platform
+			lock (scheduledActionsSync) {
+				scheduledActions += action;
+			}
+//#endif
 		}
 
 		public PlatformId Platform {

@@ -107,7 +107,7 @@ namespace Lime
 		{
 			opStack.Push(new Operation { SerializationPath = path, Type = OperationType.Serialization });
 			try {
-				//if (Application.CheckCommandLineArg("--iPadLags")) {
+				//if (Application.CheckCommandLineArg("--Jerky")) {
 				//	int readTime = (int)(1000 * stream.Length / iPadDeserializationSpeed);
 				//	System.Threading.Thread.Sleep(readTime);
 				//	if (readTime > 20) {

@@ -28,6 +28,9 @@ namespace Lime
 #if WIN || MAC
 		private void InitWithPngOrJpgBitmap(Stream stream)
 		{
+			if (!Application.IsMainThread) {
+				throw new NotSupportedException("Calling from non-main thread currently is not supported");
+			}
 			var bitmap = new SD.Bitmap(stream);
 			SurfaceSize = ImageSize = new Size(bitmap.Width, bitmap.Height);
 			var lockRect = new SD.Rectangle(0, 0, bitmap.Width, bitmap.Height);
@@ -48,6 +51,9 @@ namespace Lime
 #elif iOS
 		private void InitWithPngOrJpgBitmap(Stream stream)
 		{
+			if (!Application.IsMainThead) {
+				throw new NotSupportedException("Calling from non-main thread currently is not supported");
+			}
 			using (var nsData = MonoTouch.Foundation.NSData.FromStream(stream))
 			using (UIImage image = UIImage.LoadFromData(nsData)) {
 				if (image == null) {

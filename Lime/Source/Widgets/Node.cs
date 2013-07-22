@@ -473,7 +473,7 @@ namespace Lime
 			}
 		}
 
-		public void PreloadTextures()
+		public void Preload()
 		{
 			foreach (var prop in GetType().GetProperties()) {
 				if (prop.PropertyType == typeof(ITexture)) {
@@ -481,6 +481,20 @@ namespace Lime
 					var texture = getter.Invoke(this, new object[] {}) as ITexture;
 					if (texture != null) {
 						texture.GetHandle();
+					}
+				} else if (prop.PropertyType == typeof(SerializableFont)) {
+					var getter = prop.GetGetMethod();
+					var font = getter.Invoke(this, new object[] { }) as SerializableFont;
+					if (font != null) {
+						foreach (var texture in font.Instance.Textures) {
+							texture.GetHandle();
+						}
+					}
+				} else if (prop.PropertyType == typeof(SerializableSample)) {
+					var getter = prop.GetGetMethod();
+					var sample = getter.Invoke(this, new object[] { }) as SerializableSample;
+					if (sample != null) {
+						AudioSystem.PreloadSound(sample.Path);
 					}
 				}
 			}
@@ -493,7 +507,7 @@ namespace Lime
 				}
 			}
 			foreach (var node in Nodes.AsArray) {
-				node.PreloadTextures();
+				node.Preload();
 			}
 		}
 

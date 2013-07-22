@@ -1,6 +1,7 @@
 using System.Collections;
 using System.IO;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System;
 using ProtoBuf;
 
@@ -105,9 +106,7 @@ namespace Lime
 			return core.Path;
 		}
 
-		public void Dispose()
-		{
-		}
+		public void Dispose() {}
 	}
 
 	class SerializableTextureCore
@@ -142,7 +141,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Discards texture, frees graphics resources.
+		/// Discards texture, free graphics resources.
 		/// </summary>
 		public void Discard()
 		{
@@ -248,26 +247,40 @@ namespace Lime
 
 	public sealed class TexturePool
 	{
-		Dictionary<string, WeakReference> items;
+		ConcurrentDictionary<string, WeakReference> items;
 
 		public readonly static TexturePool Instance = new TexturePool();
 
 		private TexturePool()
 		{
-			items = new Dictionary<string, WeakReference>();
+			items = new ConcurrentDictionary<string, WeakReference>();
 		}
 
-		public void PreloadTextures(string path)
+		public IEnumerable<ITexture> PreloadAll(string path)
 		{
+			var textures = new List<ITexture>();
 			foreach (var i in AssetsBundle.Instance.EnumerateFiles()) {
 				if (i.StartsWith(path)) {
-					new SerializableTexture(i);
+					var ext = Path.GetExtension(i);
+					if (ext == ".atlasPart" || ext == ".pvr" || ext == ".dds" || ext == ".png") {
+						var texturePath = Path.ChangeExtension(i, null);
+						var texture = Preload(texturePath);
+						textures.Add(texture);
+					}
 				}
 			}
+			return textures;
+		}
+
+		public ITexture Preload(string path)
+		{
+			var texture = new SerializableTexture(path);
+			texture.GetHandle();
+			return texture;
 		}
 
 		/// <summary>
-		/// Discards textures wich have not been used 
+		/// Discards textures which have not been used 
 		/// for given number of render cycles.
 		/// </summary>
 		public void DiscardUnusedTextures(int numCycles)

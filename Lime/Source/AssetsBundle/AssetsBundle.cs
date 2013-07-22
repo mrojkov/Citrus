@@ -29,7 +29,7 @@ namespace Lime
 			}
 		}
 
-		public string CurrentLanguage { get; set; }
+		public virtual string CurrentLanguage { get; set; }
 
 		public abstract Stream OpenFile(string path);
 		public abstract DateTime GetFileLastWriteTime(string path);
@@ -37,7 +37,7 @@ namespace Lime
 		public abstract bool FileExists(string path);
 		public abstract void ImportFile(string path, Stream stream, int reserve, bool compress = false);
 		public abstract IEnumerable<string> EnumerateFiles();
-
+		
 		public void ImportFile(string srcPath, string dstPath, int reserve, bool compress = false)
 		{
 			using (var stream = new FileStream(srcPath, FileMode.Open)) {

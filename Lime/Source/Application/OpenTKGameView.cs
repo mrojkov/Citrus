@@ -9,8 +9,9 @@ namespace Lime
 	{
 		public static GameView Instance;
 		Application app;
-		internal Action ScheduledActions;
 		public bool PowerSaveMode { get; set; }
+		internal static event Action WillRenderFrame;
+		internal static event Action DidRenderFrame;
 
 		public GameView(Application app, string[] args = null)
 			: base(640, 480, new OpenTK.Graphics.GraphicsMode(32, 0, 0, 1))
@@ -143,22 +144,22 @@ namespace Lime
 
 		protected override void OnRenderFrame(OpenTK.FrameEventArgs e)
 		{
-			lock (Application.MainThreadSync) {
-				long millisecondsCount = TimeUtils.GetMillisecondsSinceGameStarted();
-				int delta = (int)(millisecondsCount - lastMillisecondsCount);
-				delta = delta.Clamp(0, 40);
-				lastMillisecondsCount = millisecondsCount;
-				DoUpdate(delta);
-				DoRender();
-				if (PowerSaveMode) {
-					millisecondsCount = TimeUtils.GetMillisecondsSinceGameStarted();
-					delta = (int)(millisecondsCount - lastMillisecondsCount);
-					System.Threading.Thread.Sleep(Math.Max(0, (1000 / 25) - delta));
-				}
-				if (ScheduledActions != null) {
-					ScheduledActions();
-					ScheduledActions = null;
-				}
+			long millisecondsCount = TimeUtils.GetMillisecondsSinceGameStarted();
+			int delta = (int)(millisecondsCount - lastMillisecondsCount);
+			delta = delta.Clamp(0, 40);
+			lastMillisecondsCount = millisecondsCount;
+			DoUpdate(delta);
+			if (WillRenderFrame != null) {
+				WillRenderFrame();
+			}
+			DoRender();
+			if (PowerSaveMode) {
+				millisecondsCount = TimeUtils.GetMillisecondsSinceGameStarted();
+				delta = (int)(millisecondsCount - lastMillisecondsCount);
+				System.Threading.Thread.Sleep(Math.Max(0, (1000 / 25) - delta));
+			}
+			if (DidRenderFrame != null) {
+				DidRenderFrame();
 			}
 		}
 

@@ -91,7 +91,6 @@ namespace Lime
 				pitchOrLinearSize /= 4;
 				width /= 2;
 				height /= 2;
-				Renderer.CheckErrors();
 			}
 		}
 
@@ -102,8 +101,11 @@ namespace Lime
 			}
 			byte[] buffer = new byte[pitchOrLinearSize * height];
 			reader.Read(buffer, 0, buffer.Length);
-			OGL.TexImage2D(TextureTarget.Texture2D, level, PixelInternalFormat.Rgba8, width, height, 0, 
-				PixelFormat.Bgra, PixelType.UnsignedByte, buffer);
+			Application.InvokeOnMainThread(() => {
+				OGL.TexImage2D(TextureTarget.Texture2D, level, PixelInternalFormat.Rgba8, width, height, 0,
+					PixelFormat.Bgra, PixelType.UnsignedByte, buffer);
+				Renderer.CheckErrors();
+			});
 		}
 
 		private static void ReadCompressedImage(BinaryReader reader, int level, int width, int height, UInt32 linearSize, UInt32 pfFourCC)
@@ -124,7 +126,10 @@ namespace Lime
 			}
 			byte[] buffer = new byte[linearSize];
 			reader.Read(buffer, 0, buffer.Length);
-			OGL.CompressedTexImage2D(TextureTarget.Texture2D, level, pif, width, height, 0, buffer.Length, buffer);
+			Application.InvokeOnMainThread(() => {
+				OGL.CompressedTexImage2D(TextureTarget.Texture2D, level, pif, width, height, 0, buffer.Length, buffer);
+				Renderer.CheckErrors();
+			});
 		}
 #endif
 	}

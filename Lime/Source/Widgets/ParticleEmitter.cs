@@ -686,7 +686,7 @@ namespace Lime
 				float angle = p.Angle;
 				if (AlongPathOrientation)
 					angle += p.FullDirection;
-				SerializableTexture texture = p.Modifier.GetTexture((int)p.TextureIndex - 1);
+				ITexture texture = p.Modifier.GetTexture((int)p.TextureIndex - 1);
 				Vector2 imageSize = (Vector2)texture.ImageSize;
 				Vector2 particleSize = p.ScaleCurrent * imageSize;
 				Vector2 orientation = Vector2.HeadingDeg(angle);

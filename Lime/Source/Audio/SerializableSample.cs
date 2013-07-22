@@ -1,4 +1,5 @@
 using ProtoBuf;
+using System.Collections.Generic;
 
 namespace Lime
 {

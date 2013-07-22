@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 #if OPENGL || GLES11
 using System;
 using System.Diagnostics;
@@ -60,6 +61,11 @@ namespace Lime
 			GL.BindFramebuffer(FramebufferTarget.FramebufferExt, 0);
 #endif
 			Renderer.CheckErrors();
+		}
+
+		public IEnumerator<object> PrefetchAsync()
+		{
+			throw new InvalidOperationException();
 		}
 
 		public Size ImageSize {
