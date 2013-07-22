@@ -65,7 +65,7 @@ namespace Lime
 			while (errCode != All.NoError) {
 				if (errors != "")
 					errors += ", ";
-				errors += GL.GetString(errCode);
+				errors += errCode.ToString();// GL.GetString(errCode);
 				errCode = GL.GetError();
 			}
 			throw new Exception("OpenGL error(s): " + errors);

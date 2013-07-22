@@ -27,6 +27,8 @@ namespace Lime
 			}
 		}
 
+		internal static event Action DidUpdated;
+
 		public static GameView Instance;
 		public bool IsRetinaDisplay { get; internal set; }
 
@@ -95,20 +97,21 @@ namespace Lime
 
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{
-			lock (Application.MainThreadSync) {
-				long currentTime = TimeUtils.GetMillisecondsSinceGameStarted();
-				int delta = (int)(currentTime - prevTime);
-				prevTime = currentTime;
-				delta = delta.Clamp(0, 40);
-				Input.ProcessPendingKeyEvents();
-				Input.MouseVisible = true;
-				Input.ProcessPendingKeyEvents();
-				Input.MouseVisible = true;
-				Application.Instance.OnUpdateFrame(delta);
-				Input.TextInput = null;
-				Input.CopyKeysState();
-				Input.SetKeyState(Key.Enter, false);
-				ProcessTextInput();
+			long currentTime = TimeUtils.GetMillisecondsSinceGameStarted();
+			int delta = (int)(currentTime - prevTime);
+			prevTime = currentTime;
+			delta = delta.Clamp(0, 40);
+			Input.ProcessPendingKeyEvents();
+			Input.MouseVisible = true;
+			Input.ProcessPendingKeyEvents();
+			Input.MouseVisible = true;
+			Application.Instance.OnUpdateFrame(delta);
+			Input.TextInput = null;
+			Input.CopyKeysState();
+			Input.SetKeyState(Key.Enter, false);
+			ProcessTextInput();
+			if (DidUpdated != null) {
+				DidUpdated();
 			}
 		}
 
@@ -143,12 +146,10 @@ namespace Lime
 			if (!Application.Instance.Active) {
 				return;
 			}
-			lock (Application.MainThreadSync) {
-				MakeCurrent();
-				Application.Instance.OnRenderFrame();
-				SwapBuffers();
-				TimeUtils.RefreshFrameRate();
-			}
+			MakeCurrent();
+			Application.Instance.OnRenderFrame();
+			SwapBuffers();
+			TimeUtils.RefreshFrameRate();
 		}
 
 		public float FrameRate {

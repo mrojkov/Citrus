@@ -51,7 +51,7 @@ namespace Lime
 #elif iOS
 		private void InitWithPngOrJpgBitmap(Stream stream)
 		{
-			if (!Application.IsMainThead) {
+			if (!Application.IsMainThread) {
 				throw new NotSupportedException("Calling from non-main thread currently is not supported");
 			}
 			using (var nsData = MonoTouch.Foundation.NSData.FromStream(stream))

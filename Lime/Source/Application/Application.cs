@@ -42,7 +42,7 @@ namespace Lime
 			var culture = System.Globalization.CultureInfo.InvariantCulture;
 			System.Threading.Thread.CurrentThread.CurrentCulture = culture;
 			SetGlobalExceptionHandler();
-			GameView.WillRenderFrame += RunScheduledActions;
+			GameView.DidUpdated += RunScheduledActions;
 		}
 
 		private void RunScheduledActions()

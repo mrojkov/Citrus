@@ -88,6 +88,7 @@ namespace Lime
 				DeleteScheduledTextures();
 #if GLES11
 				// Generate a new texture.
+				GL.Enable(All.Texture2D);
 				GL.GenTextures(1, ref id);
 				Renderer.SetTexture(id, 0);
 				GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)All.Linear);
@@ -95,6 +96,7 @@ namespace Lime
 				GL.TexParameter(All.Texture2D, All.TextureWrapS, (int)All.ClampToEdge);
 				GL.TexParameter(All.Texture2D, All.TextureWrapT, (int)All.ClampToEdge);
 				GL.Hint(All.PerspectiveCorrectionHint, All.Fastest);
+				Renderer.CheckErrors();
 #elif OPENGL
 				// Generate a new texture
 				id = (uint)OGL.GenTexture();
@@ -104,8 +106,8 @@ namespace Lime
 				OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureParameterName.ClampToEdge);
 				OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureParameterName.ClampToEdge);
 				OGL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Fastest);
-			});
 #endif
+			});
 			using (RewindableStream rewindableStream = new RewindableStream(stream))
 			using (BinaryReader reader = new BinaryReader(rewindableStream)) {
 #if iOS

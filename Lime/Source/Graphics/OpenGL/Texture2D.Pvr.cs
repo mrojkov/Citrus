@@ -65,36 +65,55 @@ namespace Lime
 				if (i > 0 && (width < 8 || height < 8)) {
 					continue;
 				}
+				// Cloning variables to prevent wrong capturing
+				int mipLevel = i;
+				int width2 = width;
+				int height2 = height;
 				PVRFormat format = (PVRFormat)(flags & 0xFF);
 				switch(format)	{
 				case PVRFormat.PVRTC_4: {
 					byte[] buffer = new byte[width * height * 4 / 8];
 					reader.Read(buffer, 0, buffer.Length);
-					GL.CompressedTexImage2D(All.Texture2D, i, All.CompressedRgbaPvrtc4Bppv1Img, width, height, 0, buffer.Length, buffer);
+					Application.InvokeOnMainThread(() => {
+						GL.CompressedTexImage2D(All.Texture2D, mipLevel, All.CompressedRgbaPvrtc4Bppv1Img, width2, height2, 0, buffer.Length, buffer);
+						Renderer.CheckErrors();
+					});
 					break;
 				}
 				case PVRFormat.PVRTC_2: {
 					byte[] buffer = new byte[width * height * 2 / 8];
 					reader.Read(buffer, 0, buffer.Length);
-					GL.CompressedTexImage2D(All.Texture2D, i, All.CompressedRgbaPvrtc2Bppv1Img, width, height, 0, buffer.Length, buffer);
+					Application.InvokeOnMainThread(() => {
+						GL.CompressedTexImage2D(All.Texture2D, mipLevel, All.CompressedRgbaPvrtc2Bppv1Img, width2, height2, 0, buffer.Length, buffer);
+						Renderer.CheckErrors();
+					});
 					break;
 				}
 				case PVRFormat.GLARGB_4444: {
 					byte[] buffer = new byte[width * height * 2];
 					reader.Read(buffer, 0, buffer.Length);
-					GL.TexImage2D(All.Texture2D, i, (int)All.Rgba, width, height, 0, All.Rgba, All.UnsignedShort4444, buffer);
+					Application.InvokeOnMainThread(() => {
+						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgba, width2, height2, 0, All.Rgba, All.UnsignedShort4444, buffer);
+						Renderer.CheckErrors();
+					});
 					break;
 				}
 				case PVRFormat.GLRGB_565: {
 					byte[] buffer = new byte[width * height * 2];
 					reader.Read(buffer, 0, buffer.Length);
-					GL.TexImage2D(All.Texture2D, i, (int)All.Rgb, width, height, 0, All.Rgb, All.UnsignedShort565, buffer);
+					Application.InvokeOnMainThread(() => {
+						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgb, width2, height2, 0, All.Rgb, All.UnsignedShort565, buffer);
+						Renderer.CheckErrors();
+					});
 					break;
 				}
 				case PVRFormat.GLARGB_8888: {
 					byte[] buffer = new byte[width * height * 4];
 					reader.Read(buffer, 0, buffer.Length);
-					GL.TexImage2D(All.Texture2D, i, (int)All.Rgba, width, height, 0, All.Rgba, All.UnsignedByte, buffer);
+					Application.InvokeOnMainThread(() => {
+						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgba, width2, height2, 0, All.Rgba, All.UnsignedByte, buffer);
+						Renderer.CheckErrors();
+					});
 					break;
 				}
 				default:
