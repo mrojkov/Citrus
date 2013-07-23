@@ -7,6 +7,7 @@ using OpenTK.Audio.OpenAL;
 using System.Threading;
 using System.IO;
 using ProtoBuf;
+using System.ComponentModel;
 
 namespace Lime
 {
@@ -178,41 +179,63 @@ namespace Lime
 
 		static AudioCache cache = new AudioCache();
 
-		public static void PreloadSound(string path)
-		{
-			cache.OpenStream(path + ".sound");
-		}
+		//public static void PreloadSound(string path)
+		//{
+		//	cache.OpenStream(path + ".sound");
+		//}
 
-		public static void PreloadSounds(string path)
-		{
-			foreach (var assetPath in AssetsBundle.Instance.EnumerateFiles()) {
-				if (assetPath.StartsWith(path)) {
-					var ext = Path.GetExtension(assetPath);
-					if (ext == ".sound") {
-						PreloadSound(Path.ChangeExtension(assetPath, null));
-					}
-				}
-			}
-		}
+		//public static void PreloadSounds(string path)
+		//{
+		//	foreach (var assetPath in AssetsBundle.Instance.EnumerateFiles()) {
+		//		if (assetPath.StartsWith(path)) {
+		//			var ext = Path.GetExtension(assetPath);
+		//			if (ext == ".sound") {
+		//				PreloadSound(Path.ChangeExtension(assetPath, null));
+		//			}
+		//		}
+		//	}
+		//}
 
-		static Sound LoadSoundToChannel(AudioChannel channel, string path, AudioChannelGroup group, bool looping, float priority)
+		private static Sound LoadSoundToChannel(AudioChannel channel, string path, bool looping, bool paused, float fadeinTime)
 		{
 			if (SilentMode) {
-				return new Sound();
+				return new Sound() { Loaded = true };
 			}
-			IAudioDecoder decoder = null;
 			path += ".sound";
-			var stream = cache.OpenStream(path);
-			if (stream == null) {
-				return new Sound();
+			var sound = new Sound() { Channel = channel };
+			if (cache.IsSampleCached(path)) {
+				sound.Loaded = true;
+				var stream = cache.OpenStream(path);
+				var decoder = AudioDecoderFactory.CreateDecoder(stream);
+				channel.Play(sound, decoder, looping, paused, fadeinTime);
+			} else {
+				LoadSoundToChannelAsync(channel, path, looping, paused, fadeinTime, sound);
 			}
-			decoder = AudioDecoderFactory.CreateDecoder(stream);
-			var sound = channel.Play(decoder, looping);
-			channel.Group = group;
-			channel.Priority = priority;
-			channel.Volume = 1;
-			channel.Pitch = 1;
 			return sound;
+		}
+
+		private static void LoadSoundToChannelAsync(AudioChannel channel, string path, bool looping, bool paused, float fadeinTime, Sound sound)
+		{
+			channel.Locked = true;
+			var bw = new BackgroundWorker();
+			bw.DoWork += (s, e) => {
+				e.Result = cache.OpenStream(path);
+			};
+			bw.RunWorkerCompleted += (s, e) => {
+				Application.InvokeOnMainThread(() => {
+					channel.Locked = false;
+					if (e.Error != null) {
+						throw e.Error;
+					}
+					var stream = (Stream)e.Result;
+					if (stream != null) {
+						sound.Loaded = true;
+						var decoder = AudioDecoderFactory.CreateDecoder(stream);
+						channel.Play(sound, decoder, looping, paused, fadeinTime);
+					}
+				});
+			};
+			bw.RunWorkerAsync();
 		}
 
 		static AudioChannel AllocateChannel(float priority)
@@ -226,20 +249,23 @@ namespace Lime
 				}
 				return (a.StartupTime < b.StartupTime) ? -1 : 1;
 			});
+			// Looking for stopped channels
 			foreach (var channel in channels) {
-				if (!channel.Streaming) {
+				if (!channel.Streaming && !channel.Locked) {
 					var state = channel.State;
 					if (state == ALSourceState.Stopped || state == ALSourceState.Initial) {
 						return channel;
 					}
 				}
 			}
-			if (channels.Length > 0 && channels[0].Priority <= priority) {
-				channels[0].Stop();
-				return channels[0];
-			} else {
-				return null;
+			// Trying to stop first non-locked channel in order of priority
+			foreach (var channel in channels) {
+				if (!channel.Locked && channels[0].Priority <= priority) {
+					channel.Stop();
+					return channel;
+				}
 			}
+			return null;
 		}
 
 		public static void StopGroup(AudioChannelGroup group, float fadeoutTime = 0)
@@ -251,40 +277,28 @@ namespace Lime
 			}
 		}
 
-		public static Sound LoadSound(string path, AudioChannelGroup group, bool looping = false, float priority = 0.5f)
+		public static Sound Play(string path, AudioChannelGroup group, bool looping = false, float priority = 0.5f, float fadeinTime = 0f, bool paused = false, float volume = 1f, float pan = 0f, float pitch = 1f)
 		{
 			var channel = AllocateChannel(priority);
 			if (channel != null) {
-				return LoadSoundToChannel(channel, path, group, looping, priority);
+				channel.Group = group;
+				channel.Priority = priority;
+				channel.Volume = volume;
+				channel.Pitch = pitch;
+				channel.Pan = 0;
+				return LoadSoundToChannel(channel, path, looping, paused, fadeinTime);
 			}
 			return new Sound();
 		}
 
-		public static Sound LoadEffect(string path, bool looping = false, float priority = 0.5f)
+		public static Sound PlayMusic(string path, bool looping = true, float priority = 100f, float fadeinTime = 0.5f, bool paused = false, float volume = 1f, float pan = 0f, float pitch = 1f)
 		{
-			return LoadSound(path, AudioChannelGroup.Effects, looping, priority);
+			return Play(path, AudioChannelGroup.Music, looping, priority, fadeinTime, paused, volume, pan, pitch);
 		}
 
-		public static Sound LoadMusic(string path, bool looping = false, float priority = 100f)
+		public static Sound PlayEffect(string path, bool looping = false, float priority = 0.5f, float fadeinTime = 0f, bool paused = false, float volume = 1f, float pan = 0f, float pitch = 1f)
 		{
-			return LoadSound(path, AudioChannelGroup.Music, looping, priority);
-		}
-
-		public static Sound Play(string path, AudioChannelGroup group, bool looping = false, float priority = 0.5f, float fadeinTime = 0)
-		{
-			var sound = LoadSound(path, group, looping, priority);
-			sound.Resume(fadeinTime);
-			return sound;
-		}
-
-		public static Sound PlayMusic(string path, bool looping = true, float priority = 100f, float fadeinTime = 0.5f)
-		{
-			return Play(path, AudioChannelGroup.Music, looping, priority, fadeinTime);
-		}
-
-		public static Sound PlayEffect(string path, bool looping = false, float priority = 0.5f, float fadeinTime = 0)
-		{
-			return Play(path, AudioChannelGroup.Effects, looping, priority, fadeinTime);
+			return Play(path, AudioChannelGroup.Effects, looping, priority, fadeinTime, paused, volume, pan, pitch);
 		}
 
 		public static bool HasError()

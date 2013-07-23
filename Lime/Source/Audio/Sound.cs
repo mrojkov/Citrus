@@ -12,7 +12,7 @@ namespace Lime
 			Channel = NullAudioChannel.Instance;
 			IsBumpable = false;
 		}
-
+		public bool Loaded { get; internal set; }
 		public IAudioChannel Channel { get; internal set; }
 		public bool IsBumpable { get; set; }
 		

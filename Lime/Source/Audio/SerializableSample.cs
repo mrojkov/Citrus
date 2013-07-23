@@ -26,23 +26,9 @@ namespace Lime
 			}
 		}
 
-		public Sound Play(AudioChannelGroup group, bool paused, bool looping = false, float priority = 0.5f)
+		public Sound Play(AudioChannelGroup group, bool paused, float fadeinTime = 0, bool looping = false, float priority = 0.5f, float volume = 1, float pan = 0, float pitch = 1)
 		{
-			var sound = AudioSystem.LoadSound(Path, group, looping, priority);
-			if (!paused) {
-				sound.Resume();
-			}
-			return sound;
-		}
-
-		public Sound PlayEffect(bool paused, bool looping = false, float priority = 0.5f)
-		{
-			return Play(AudioChannelGroup.Effects, paused, looping, priority);
-		}
-
-		public Sound PlayMusic(bool paused, bool looping = true, float priority = 100)
-		{
-			return Play(AudioChannelGroup.Music, paused, looping, priority);
+			return AudioSystem.Play(Path, group, looping, priority, fadeinTime, paused, volume, pan, pitch);
 		}
 	}
 }

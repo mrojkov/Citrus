@@ -490,13 +490,15 @@ namespace Lime
 							texture.GetHandle();
 						}
 					}
-				} else if (prop.PropertyType == typeof(SerializableSample)) {
-					var getter = prop.GetGetMethod();
-					var sample = getter.Invoke(this, new object[] { }) as SerializableSample;
-					if (sample != null) {
-						AudioSystem.PreloadSound(sample.Path);
-					}
 				}
+				// Do not load preload sounds because the AudioSystem has its own async preloading system
+				//if (prop.PropertyType == typeof(SerializableSample)) {
+				//	var getter = prop.GetGetMethod();
+				//	var sample = getter.Invoke(this, new object[] { }) as SerializableSample;
+				//	if (sample != null) {
+				//		AudioSystem.PreloadSound(sample.Path);
+				//	}
+				//}
 			}
 			foreach (var animator in Animators) {
 				var a = animator as GenericAnimator<ITexture>;

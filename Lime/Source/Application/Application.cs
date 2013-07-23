@@ -87,23 +87,24 @@ namespace Lime
 			return false;
 		}
 
+		/// <summary>
+		/// Invokes given action on the main thread between update and render. 
+		/// If we are on main thread, invokes action immediately.
+		/// </summary>
+		/// <param name="action"></param>
 		public static void InvokeOnMainThread(Action action)
 		{
 			if (IsMainThread) {
 				action();
 				return;
 			}
-//#if iOS
-//			var appDelegate = UIApplication.SharedApplication.Delegate as AppDelegate;
-//			appDelegate.BeginInvokeOnMainThread(() => action());
-//#elif UNITY
+//#if UNITY
 //			throw new NotImplementedException();
 //#else
 			// Now we use unified way on iOS and PC platform
 			lock (scheduledActionsSync) {
 				scheduledActions += action;
 			}
-//#endif
 		}
 
 		public PlatformId Platform {

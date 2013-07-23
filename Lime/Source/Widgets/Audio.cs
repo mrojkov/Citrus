@@ -80,12 +80,8 @@ namespace Lime
 
 		public void Play()
 		{
-			sound = Sample.Play(Group, true, Looping, Priority);
+			sound = Sample.Play(Group, false, 0f, Looping, Priority, Volume, Pan, Pitch);
 			sound.IsBumpable = true;
-			sound.Volume = Volume;
-			sound.Pan = Pan;
-			sound.Pitch = Pitch;
-			sound.Resume();
 		}
 
 		public void Stop()

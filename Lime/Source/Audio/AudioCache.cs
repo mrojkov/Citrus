@@ -6,21 +6,26 @@ namespace Lime
 {
 	internal class AudioCache
 	{
-		public const int MaxCachedSoundSize = 256 * 1024;
-		public const int MaxCacheSize = 4 * 1024 * 1024;
-		private List<Item> items = new List<Item>();
-
-		class Item
+		class CachedSample
 		{
 			public string Path;
-			public byte[] Buffer;
+			public byte[] Data;
 		}
 
-		public int CalcCacheSize()
+		public const int MaxCachedSampleSize = 256 * 1024;
+		public const int MaxCacheSize = 4 * 1024 * 1024;
+		public int CacheSize { get { return CalcCacheSize(); } }
+
+		private List<CachedSample> samples = new List<CachedSample>();
+		private object sync = new object();
+
+		private int CalcCacheSize()
 		{
 			int size = 0;
-			foreach (var i in items) {
-				size += i.Buffer.Length;
+			lock (sync) {
+				foreach (var i in samples) {
+					size += i.Data.Length;
+				}
 			}
 			return size;
 		}
@@ -36,31 +41,44 @@ namespace Lime
 				return null;
 			}
 			stream = PackedAssetsBundle.Instance.OpenFileLocalized(path);
-			if (stream.Length < MaxCachedSoundSize) {
+			if (stream.Length < MaxCachedSampleSize) {
 				Logger.Write("Caching sound {0}", path);
 				var memStream = new MemoryStream((int)stream.Length);
 				stream.CopyTo(memStream);
 				memStream.Position = 0;
 				while (CalcCacheSize() > MaxCacheSize) {
-					items.RemoveAt(0);
+					lock (sync) {
+						samples.RemoveAt(0);
+					}
 				}
-				items.Add(new Item {
-					Buffer = memStream.GetBuffer(),
-					Path = path
-				});
+				lock (sync) {
+					samples.Add(new CachedSample {
+						Data = memStream.GetBuffer(),
+						Path = path
+					});
+				}
 				return memStream;
 			}
 			return stream;
 		}
 
+		public bool IsSampleCached(string path)
+		{
+			lock (sync) {
+				return samples.Find(i => i.Path == path) != null;
+			}
+		}
+
 		private Stream GetCachedStream(string path)
 		{
-			for (int i = 0; i < items.Count; i++) {
-				var item = items[i];
-				if (item.Path == path) {
-					items.RemoveAt(i);
-					items.Add(item);
-					return new MemoryStream(item.Buffer);
+			lock (sync) {
+				for (int i = 0; i < samples.Count; i++) {
+					var sample = samples[i];
+					if (sample.Path == path) {
+						samples.RemoveAt(i);
+						samples.Add(sample);
+						return new MemoryStream(sample.Data);
+					}
 				}
 			}
 			return null;

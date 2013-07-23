@@ -59,6 +59,7 @@
     <Compile Include="Source\Graphics\OpenGL\Texture2D.Png.cs" />
     <Compile Include="Source\Graphics\OpenGL\Texture2D.Pvr.cs" />
     <Compile Include="Source\Graphics\Renderer.Common.cs" />
+    <Compile Include="Source\Graphics\TexturePool.cs" />
     <Compile Include="Source\Graphics\Unity\MaterialFactory.cs" />
     <Compile Include="Source\Graphics\Unity\Renderer.cs" />
     <Compile Include="Source\Graphics\Unity\RenderTexture.cs" />

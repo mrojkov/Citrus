@@ -1,7 +1,6 @@
 using System.Collections;
 using System.IO;
 using System.Collections.Generic;
-using System.Collections.Concurrent;
 using System;
 using ProtoBuf;
 
@@ -242,89 +241,6 @@ namespace Lime
 			}
 			usedAtRenderCycle = Renderer.RenderCycle;
 			return instance;
-		}
-	}
-
-	public sealed class TexturePool
-	{
-		ConcurrentDictionary<string, WeakReference> items;
-
-		public readonly static TexturePool Instance = new TexturePool();
-
-		private TexturePool()
-		{
-			items = new ConcurrentDictionary<string, WeakReference>();
-		}
-
-		public IEnumerable<ITexture> PreloadAll(string path)
-		{
-			var textures = new List<ITexture>();
-			foreach (var i in AssetsBundle.Instance.EnumerateFiles()) {
-				if (i.StartsWith(path)) {
-					var ext = Path.GetExtension(i);
-					if (ext == ".atlasPart" || ext == ".pvr" || ext == ".dds" || ext == ".png") {
-						var texturePath = Path.ChangeExtension(i, null);
-						var texture = Preload(texturePath);
-						textures.Add(texture);
-					}
-				}
-			}
-			return textures;
-		}
-
-		public ITexture Preload(string path)
-		{
-			var texture = new SerializableTexture(path);
-			texture.GetHandle();
-			return texture;
-		}
-
-		/// <summary>
-		/// Discards textures which have not been used 
-		/// for given number of render cycles.
-		/// </summary>
-		public void DiscardUnusedTextures(int numCycles)
-		{
-			foreach (WeakReference r in items.Values) {
-				var target = r.Target as SerializableTextureCore;
-				if (target != null) {
-					target.DiscardIfNotUsed(numCycles);
-				}
-			}
-#if !UNITY
-			Texture2D.DeleteScheduledTextures();
-#endif
-		}
-
-		public void DiscardAllTextures()
-		{
-			foreach (WeakReference r in items.Values) {
-				var target = r.Target as SerializableTextureCore;
-				if (target != null) {
-					target.Discard();
-				}
-			}
-#if !UNITY
-			Texture2D.DeleteScheduledTextures();
-#endif
-		}
-
-		internal SerializableTextureCore GetSerializableTextureCore(string path)
-		{
-			SerializableTextureCore core;
-			WeakReference r;
-			if (!items.TryGetValue(path, out r)) {
-				core = new SerializableTextureCore(path);
-				items[path] = new WeakReference(core);
-				return core;
-			}
-			core = r.Target as SerializableTextureCore;
-			if (core == null) {
-				core = new SerializableTextureCore(path);
-				items[path] = new WeakReference(core);
-				return core;
-			}
-			return core;
 		}
 	}
 }

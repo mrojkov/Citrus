@@ -97,10 +97,15 @@ namespace Lime
 		private float fadeSpeed;
 		private int lastBumpedRenderCycle = 0;
 
-		Sound sound;
-		internal IAudioDecoder decoder;
-		IntPtr decodedData;
+		private Sound sound = null;
+		private IAudioDecoder decoder;
+		private IntPtr decodedData;
 
+		// The channel can be locked while a sound is being preloaded
+		public bool Locked { get; set; }
+
+		public bool Streaming { get { return streaming; } }
+		
 		public AudioChannel(int index)
 		{
 			this.Id = index;
@@ -128,9 +133,7 @@ namespace Lime
 			}
 		}
 
-		public bool Streaming { get { return streaming; } }
-		
-		public Sound Play(IAudioDecoder decoder, bool looping)
+		internal void Play(Sound sound, IAudioDecoder decoder, bool looping, bool paused, float fadeinTime)
 		{
 			lock (streamingSync) {
 				if (streaming) {
@@ -142,16 +145,21 @@ namespace Lime
 				}
 				this.decoder = decoder;
 			}
-			if (sound != null) {
-				sound.Channel = NullAudioChannel.Instance;
+			if (this.sound != null) {
+				this.sound.Channel = NullAudioChannel.Instance;
 			}
-			sound = new Sound { Channel = this };
+			sound.Channel = this;
 			StartupTime = DateTime.Now;
-			return sound;
+			if (!paused) {
+				Resume(fadeinTime);
+			}
 		}
 
 		public void Resume(float fadeinTime = 0)
 		{
+			if (decoder == null) {
+				throw new InvalidOperationException("Can't resume sound before it has decoded");
+			}
 			if (fadeinTime > 0) {
 				fadeVolume = 0;
 				fadeSpeed = 1 / fadeinTime;
@@ -246,6 +254,9 @@ namespace Lime
 
 		void UpdateHelper()
 		{
+			if (decoder == null) {
+				throw new InvalidOperationException("AudioChannel is streaming while decoder is not set");
+			}
 			// queue one buffer
 			int buffer = AcquireBuffer();
 			if (buffer != 0) {
