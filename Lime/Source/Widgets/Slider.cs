@@ -3,8 +3,6 @@ using ProtoBuf;
 
 namespace Lime
 {
-	public delegate void SliderChangeHandler(Slider slider);
-
 	[ProtoContract]
 	public class Slider : Widget
 	{
@@ -21,7 +19,8 @@ namespace Lime
 			set { this.value = value; }
 		}
 
-		public SliderChangeHandler ValueChanged;
+		public Action Released;
+		public Action ValueChanged;
 
 		float value;
 		float offset0;
@@ -47,6 +46,9 @@ namespace Lime
 					if (World.Instance.ActiveWidget == this && !Input.IsKeyPressed(Key.Mouse0)) {
 						thumb.TryRunAnimation("Normal");
 						World.Instance.ActiveWidget = null;
+						if (Released != null) {
+							Released();
+						}
 					}
 				}
 				if (World.Instance.ActiveWidget == this) {
@@ -111,7 +113,7 @@ namespace Lime
 							else
 								Value = v + delta0;
 							if (ValueChanged != null) {
-								ValueChanged(this);
+								ValueChanged();
 							}
 						}
 					}
