@@ -10,7 +10,7 @@ namespace Lime
 	internal class GameView : MonoMac.OpenGL.MonoMacGameView
 	{
 		public static GameView Instance;
-		internal Action ScheduledActions;
+		internal static Action DidUpdated;
 
 		public GameView(RectangleF frame, NSOpenGLContext context) : base(frame, context)
 		{
@@ -41,9 +41,8 @@ namespace Lime
 			Application.Instance.OnUpdateFrame((int)delta);
 			Input.TextInput = null;
 			Input.CopyKeysState();
-			if (ScheduledActions != null) {
-				ScheduledActions();
-				ScheduledActions = null;
+			if (DidUpdated != null) {
+				DidUpdated();
 			}
 		}
 		
