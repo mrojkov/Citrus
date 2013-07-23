@@ -94,7 +94,7 @@ namespace Lime
 			}
 		}
 
-		private static void ReadRGBAImage(BinaryReader reader, int level, int width, int height, uint pitchOrLinearSize)
+		private void ReadRGBAImage(BinaryReader reader, int level, int width, int height, uint pitchOrLinearSize)
 		{
 			if (pitchOrLinearSize != width * 4) {
 				throw new Lime.Exception("Error reading RGBA texture. Must be 32 bit rgba");
@@ -102,13 +102,14 @@ namespace Lime
 			byte[] buffer = new byte[pitchOrLinearSize * height];
 			reader.Read(buffer, 0, buffer.Length);
 			Application.InvokeOnMainThread(() => {
+				PrepareOpenGLTexture();
 				OGL.TexImage2D(TextureTarget.Texture2D, level, PixelInternalFormat.Rgba8, width, height, 0,
 					PixelFormat.Bgra, PixelType.UnsignedByte, buffer);
 				Renderer.CheckErrors();
 			});
 		}
 
-		private static void ReadCompressedImage(BinaryReader reader, int level, int width, int height, UInt32 linearSize, UInt32 pfFourCC)
+		private void ReadCompressedImage(BinaryReader reader, int level, int width, int height, UInt32 linearSize, UInt32 pfFourCC)
 		{
 			PixelInternalFormat pif;
 			switch ((DDSFourCC)pfFourCC) {
@@ -127,6 +128,7 @@ namespace Lime
 			byte[] buffer = new byte[linearSize];
 			reader.Read(buffer, 0, buffer.Length);
 			Application.InvokeOnMainThread(() => {
+				PrepareOpenGLTexture();
 				OGL.CompressedTexImage2D(TextureTarget.Texture2D, level, pif, width, height, 0, buffer.Length, buffer);
 				Renderer.CheckErrors();
 			});

@@ -10,8 +10,7 @@ namespace Lime
 		public static GameView Instance;
 		Application app;
 		public bool PowerSaveMode { get; set; }
-		internal static event Action WillRenderFrame;
-		internal static event Action DidRenderFrame;
+		internal static event Action DidUpdated;
 
 		public GameView(Application app, string[] args = null)
 			: base(640, 480, new OpenTK.Graphics.GraphicsMode(32, 0, 0, 1))
@@ -149,17 +148,14 @@ namespace Lime
 			delta = delta.Clamp(0, 40);
 			lastMillisecondsCount = millisecondsCount;
 			DoUpdate(delta);
-			if (WillRenderFrame != null) {
-				WillRenderFrame();
+			if (DidUpdated != null) {
+				DidUpdated();
 			}
 			DoRender();
 			if (PowerSaveMode) {
 				millisecondsCount = TimeUtils.GetMillisecondsSinceGameStarted();
 				delta = (int)(millisecondsCount - lastMillisecondsCount);
 				System.Threading.Thread.Sleep(Math.Max(0, (1000 / 25) - delta));
-			}
-			if (DidRenderFrame != null) {
-				DidRenderFrame();
 			}
 		}
 

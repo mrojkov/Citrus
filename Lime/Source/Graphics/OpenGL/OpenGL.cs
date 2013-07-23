@@ -95,6 +95,9 @@ namespace Lime
 		[DllImport(library, EntryPoint = "glDeleteTextures")]
 		public static extern void DeleteTextures(Int32 n, UIntPtr textures);
 
+		[DllImport(library, EntryPoint = "glFinish")]
+		public static extern void Finish();
+
 		public static uint GenTexture()
 		{
 			var t = new UInt32[1];

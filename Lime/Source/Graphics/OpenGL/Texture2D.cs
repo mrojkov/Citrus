@@ -84,30 +84,6 @@ namespace Lime
 		{
 			// Discard current texture
 			Dispose();
-			Application.InvokeOnMainThread(() => {
-				DeleteScheduledTextures();
-#if GLES11
-				// Generate a new texture.
-				GL.Enable(All.Texture2D);
-				GL.GenTextures(1, ref id);
-				Renderer.SetTexture(id, 0);
-				GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)All.Linear);
-				GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
-				GL.TexParameter(All.Texture2D, All.TextureWrapS, (int)All.ClampToEdge);
-				GL.TexParameter(All.Texture2D, All.TextureWrapT, (int)All.ClampToEdge);
-				GL.Hint(All.PerspectiveCorrectionHint, All.Fastest);
-				Renderer.CheckErrors();
-#elif OPENGL
-				// Generate a new texture
-				id = (uint)OGL.GenTexture();
-				Renderer.SetTexture(id, 0);
-				OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-				OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-				OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureParameterName.ClampToEdge);
-				OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureParameterName.ClampToEdge);
-				OGL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Fastest);
-#endif
-			});
 			using (RewindableStream rewindableStream = new RewindableStream(stream))
 			using (BinaryReader reader = new BinaryReader(rewindableStream)) {
 #if iOS
@@ -131,41 +107,44 @@ namespace Lime
 			uvRect = new Rectangle(Vector2.Zero, (Vector2)ImageSize / (Vector2)SurfaceSize);
 		}
 
-		/// <summary>
-		/// Create texture from pixel array
-		/// </summary>
-		public void LoadImage(Color4[] pixels, int width, int height, bool generateMips)
+		private void PrepareOpenGLTexture()
 		{
-			// Discards current texture.
-			if (width != ImageSize.Width || height != ImageSize.Height) {
-				Dispose();
-				Application.InvokeOnMainThread(() => {
-					DeleteScheduledTextures();
-					// Generate a new texture id
+			DeleteScheduledTextures();
 #if GLES11
-					GL.GenTextures(1, ref id);
-#elif OPENGL
-					id = (uint)OGL.GenTexture();
-#endif
-				});
-			}
-			Application.InvokeOnMainThread(() => {
-#if GLES11
+				// Generate a new texture.
+				GL.Enable(All.Texture2D);
+				GL.GenTextures(1, ref id);
 				Renderer.SetTexture(id, 0);
 				GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)All.Linear);
 				GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
 				GL.TexParameter(All.Texture2D, All.TextureWrapS, (int)All.ClampToEdge);
 				GL.TexParameter(All.Texture2D, All.TextureWrapT, (int)All.ClampToEdge);
 				GL.Hint(All.PerspectiveCorrectionHint, All.Fastest);
+				Renderer.CheckErrors();
+#elif OPENGL
+			// Generate a new texture
+			id = (uint)OGL.GenTexture();
+			Renderer.SetTexture(id, 0);
+			OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+			OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+			OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureParameterName.ClampToEdge);
+			OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureParameterName.ClampToEdge);
+			OGL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Fastest);
+#endif
+		}
+
+		/// <summary>
+		/// Create texture from pixel array
+		/// </summary>
+		public void LoadImage(Color4[] pixels, int width, int height, bool generateMips)
+		{
+			Dispose();
+			Application.InvokeOnMainThread(() => {
+				PrepareOpenGLTexture();
+#if GLES11
 				GL.TexImage2D(All.Texture2D, 0, (int)All.Rgba, width, height, 0,
 					All.Rgba, All.UnsignedByte, pixels);
 #elif OPENGL
-				Renderer.SetTexture(id, 0);
-				OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-				OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-				OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureParameterName.ClampToEdge);
-				OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureParameterName.ClampToEdge);
-				OGL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Fastest);
 				OGL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0,
 					PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
 				if (generateMips) {

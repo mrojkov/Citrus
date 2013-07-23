@@ -75,6 +75,7 @@ namespace Lime
 					byte[] buffer = new byte[width * height * 4 / 8];
 					reader.Read(buffer, 0, buffer.Length);
 					Application.InvokeOnMainThread(() => {
+						PrepareOpenGLTexture();
 						GL.CompressedTexImage2D(All.Texture2D, mipLevel, All.CompressedRgbaPvrtc4Bppv1Img, width2, height2, 0, buffer.Length, buffer);
 						Renderer.CheckErrors();
 					});
@@ -84,6 +85,7 @@ namespace Lime
 					byte[] buffer = new byte[width * height * 2 / 8];
 					reader.Read(buffer, 0, buffer.Length);
 					Application.InvokeOnMainThread(() => {
+						PrepareOpenGLTexture();
 						GL.CompressedTexImage2D(All.Texture2D, mipLevel, All.CompressedRgbaPvrtc2Bppv1Img, width2, height2, 0, buffer.Length, buffer);
 						Renderer.CheckErrors();
 					});
@@ -93,6 +95,7 @@ namespace Lime
 					byte[] buffer = new byte[width * height * 2];
 					reader.Read(buffer, 0, buffer.Length);
 					Application.InvokeOnMainThread(() => {
+						PrepareOpenGLTexture();
 						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgba, width2, height2, 0, All.Rgba, All.UnsignedShort4444, buffer);
 						Renderer.CheckErrors();
 					});
@@ -102,6 +105,7 @@ namespace Lime
 					byte[] buffer = new byte[width * height * 2];
 					reader.Read(buffer, 0, buffer.Length);
 					Application.InvokeOnMainThread(() => {
+						PrepareOpenGLTexture();
 						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgb, width2, height2, 0, All.Rgb, All.UnsignedShort565, buffer);
 						Renderer.CheckErrors();
 					});
@@ -111,6 +115,7 @@ namespace Lime
 					byte[] buffer = new byte[width * height * 4];
 					reader.Read(buffer, 0, buffer.Length);
 					Application.InvokeOnMainThread(() => {
+						PrepareOpenGLTexture();
 						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgba, width2, height2, 0, All.Rgba, All.UnsignedByte, buffer);
 						Renderer.CheckErrors();
 					});
