@@ -36,11 +36,13 @@ namespace Lime
 			var lockRect = new SD.Rectangle(0, 0, bitmap.Width, bitmap.Height);
 			var lockMode = SDI.ImageLockMode.ReadOnly;
 			if (bitmap.PixelFormat == SDI.PixelFormat.Format24bppRgb) {
+				PrepareOpenGLTexture();
 				var data = bitmap.LockBits(lockRect, lockMode, SDI.PixelFormat.Format24bppRgb);
 				OGL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, data.Width, data.Height, 0,
 					PixelFormat.Bgr, PixelType.UnsignedByte, data.Scan0);
 				bitmap.UnlockBits(data);
 			} else {
+				PrepareOpenGLTexture();
 				var data = bitmap.LockBits(lockRect, lockMode, SDI.PixelFormat.Format32bppPArgb);
 				OGL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width, data.Height, 0,
 					PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
@@ -76,6 +78,7 @@ namespace Lime
 				using (var colorSpace = CGColorSpace.CreateDeviceRGB())
 				using (var context = new MonoTouch.CoreGraphics.CGBitmapContext(data, width, height, bitsPerComponent, bytesPerRow, colorSpace, alphaInfo)) {
 					context.DrawImage(new System.Drawing.RectangleF(0, 0, width, height), imageRef);
+					PrepareOpenGLTexture();
 					GL.TexImage2D(All.Texture2D, 0, (int)All.Rgba, width, height, 0, All.Rgba, All.UnsignedByte, data);
 				}
 			}
