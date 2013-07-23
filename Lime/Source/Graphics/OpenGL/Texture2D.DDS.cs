@@ -77,14 +77,17 @@ namespace Lime
 
 			SurfaceSize = ImageSize = new Size(width, height);
 			mipMapCount = 1;
+			Action glCommands = () => {
+				PrepareOpenGLTexture();
+			};
 			for (int level = 0; level < mipMapCount; level++) {
 				if (width < 8 || height < 8) {
 					break;
 				}
 				if ((pfFlags & DDSPFFlags.RGB) != 0) {
-					ReadRGBAImage(reader, level, width, height, pitchOrLinearSize);
+					ReadRGBAImage(ref glCommands, reader, level, width, height, pitchOrLinearSize);
 				} else if ((pfFlags & DDSPFFlags.FourCC) != 0) {
-					ReadCompressedImage(reader, level, width, height, pitchOrLinearSize, pfFourCC);
+					ReadCompressedImage(ref glCommands, reader, level, width, height, pitchOrLinearSize, pfFourCC);
 				} else {
 					throw new Lime.Exception("Error reading DDS");
 				}
@@ -92,24 +95,24 @@ namespace Lime
 				width /= 2;
 				height /= 2;
 			}
+			Application.InvokeOnMainThread(glCommands);
 		}
 
-		private void ReadRGBAImage(BinaryReader reader, int level, int width, int height, uint pitchOrLinearSize)
+		private void ReadRGBAImage(ref Action glCommands, BinaryReader reader, int level, int width, int height, uint pitchOrLinearSize)
 		{
 			if (pitchOrLinearSize != width * 4) {
 				throw new Lime.Exception("Error reading RGBA texture. Must be 32 bit rgba");
 			}
 			byte[] buffer = new byte[pitchOrLinearSize * height];
 			reader.Read(buffer, 0, buffer.Length);
-			Application.InvokeOnMainThread(() => {
-				PrepareOpenGLTexture();
+			glCommands += () => {
 				OGL.TexImage2D(TextureTarget.Texture2D, level, PixelInternalFormat.Rgba8, width, height, 0,
 					PixelFormat.Bgra, PixelType.UnsignedByte, buffer);
 				Renderer.CheckErrors();
-			});
+			};
 		}
 
-		private void ReadCompressedImage(BinaryReader reader, int level, int width, int height, UInt32 linearSize, UInt32 pfFourCC)
+		private void ReadCompressedImage(ref Action glCommands, BinaryReader reader, int level, int width, int height, UInt32 linearSize, UInt32 pfFourCC)
 		{
 			PixelInternalFormat pif;
 			switch ((DDSFourCC)pfFourCC) {
@@ -127,11 +130,10 @@ namespace Lime
 			}
 			byte[] buffer = new byte[linearSize];
 			reader.Read(buffer, 0, buffer.Length);
-			Application.InvokeOnMainThread(() => {
-				PrepareOpenGLTexture();
+			glCommands += () => {
 				OGL.CompressedTexImage2D(TextureTarget.Texture2D, level, pif, width, height, 0, buffer.Length, buffer);
 				Renderer.CheckErrors();
-			});
+			};
 		}
 #endif
 	}
