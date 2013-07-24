@@ -158,6 +158,7 @@
     <Compile Include="Source\Input\Input.Native.cs" />
     <Compile Include="Source\Input\Input.Unity.cs" />
     <Compile Include="Source\Audio\AudioCache.cs" />
+    <Compile Include="Source\Graphics\TexturePool.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Application\WinCursors.cs">
