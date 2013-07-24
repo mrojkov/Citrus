@@ -34,6 +34,8 @@ namespace Lime
 		private static readonly object scheduledActionsSync = new object();
 		private static Action scheduledActions;
 
+		public static readonly bool JerkyMode = CheckCommandLineArg("--Jerky");
+
 		public Application()
 		{
 			Instance = this;

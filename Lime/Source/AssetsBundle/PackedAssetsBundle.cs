@@ -243,29 +243,13 @@ namespace Lime
 		{
 			var stream = new AssetStream(this, path);
 			var desc = stream.descriptor;
-			if (Application.CheckCommandLineArg("--Jerky")) {
-				SimulateReadDelay(path, desc.Length);
+			if (Application.JerkyMode) {
+				ApplicationToolbox.SimulateReadDelay(path, desc.Length);
 			}
 			if ((desc.Attributes & AssetAttributes.Zipped) != 0) {
 				return DecompressStream(stream);
 			}
 			return stream;
-		}
-
-		DateTime lastReadTime;
-
-		private void SimulateReadDelay(string path, int length)
-		{
-			const float readSpeed = 5000 * 1024;
-			int readTime = (int)(1000L * length / readSpeed);
-			if (DateTime.Now - lastReadTime > new TimeSpan(0, 0, 1)) {
-				readTime += 200;
-				lastReadTime = DateTime.Now;
-			}
-			if (readTime > 10) {
-				Console.WriteLine("Lag {0} ms while reading {1}", readTime, path);
-			}
-			System.Threading.Thread.Sleep(readTime);
 		}
 
 		private static Stream DecompressStream(AssetStream stream)

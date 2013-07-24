@@ -2,12 +2,13 @@ using System;
 
 namespace Lime
 {
-	internal static class TimeUtils
+	internal static class ApplicationToolbox
 	{
 		private static long startTime = DateTime.Now.Ticks;
 		private static long timeStamp;
 		private static int countedFrames;
 		public static float FrameRate { get; private set; }
+		static DateTime lastReadTime;
 
 		public static long GetMillisecondsSinceGameStarted()
 		{
@@ -30,6 +31,20 @@ namespace Lime
 				timeStamp = t;
 				countedFrames = 0;
 			}
+		}
+
+		public static void SimulateReadDelay(string path, int dataLength)
+		{
+			const float readSpeed = 5000 * 1024;
+			int readTime = (int)(1000L * dataLength / readSpeed);
+			if (DateTime.Now - lastReadTime > new TimeSpan(0, 0, 1)) {
+				readTime += 200;
+				lastReadTime = DateTime.Now;
+			}
+			if (readTime > 10 && Application.IsMainThread) {
+				Logger.Write("Lag {0} ms while reading {1}", readTime, path);
+			}
+			System.Threading.Thread.Sleep(readTime);
 		}
 	}
 }

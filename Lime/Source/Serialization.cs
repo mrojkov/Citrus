@@ -107,13 +107,6 @@ namespace Lime
 		{
 			opStack.Push(new Operation { SerializationPath = path, Type = OperationType.Serialization });
 			try {
-				//if (Application.CheckCommandLineArg("--Jerky")) {
-				//	int readTime = (int)(1000 * stream.Length / iPadDeserializationSpeed);
-				//	System.Threading.Thread.Sleep(readTime);
-				//	if (readTime > 20) {
-				//		Console.WriteLine("Lag {0} ms while reading {1}", readTime, path);
-				//	}
-				//}
 				return (T)Serializer.Deserialize(stream, obj, typeof(T));
 			} finally {
 				opStack.Pop();

@@ -116,8 +116,7 @@ namespace Orange
 		private void UpdateProjectIfNeeded()
 		{
 			if (UpdateBeforeBuildCheckbox.Active) {
-				var citrusPath = Path.Combine(Path.GetDirectoryName(The.Workspace.ProjectDirectory), "Citrus", "Lime");
-				Subversion.Update(citrusPath);
+				Subversion.Update(Path.GetDirectoryName(The.Workspace.GetLimeCsprojFilePath()));
 				Subversion.Update(The.Workspace.ProjectDirectory);
 			}
 		}

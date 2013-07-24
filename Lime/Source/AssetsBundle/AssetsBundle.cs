@@ -12,14 +12,16 @@ namespace Lime
 
 		public static AssetsBundle Instance
 		{
-			get
-			{
-				if (instance == null) {
-					throw new Lime.Exception("AssetsBundle.Instance should initialized before usage");
-				}
-				return instance;
-			}
+			get { return GetInstance(); }
 			set { instance = value; }
+		}
+
+		private static AssetsBundle GetInstance()
+		{
+			if (instance == null) {
+				throw new Lime.Exception("AssetsBundle.Instance should initialized before usage");
+			}
+			return instance;
 		}
 
 		public virtual void Dispose()

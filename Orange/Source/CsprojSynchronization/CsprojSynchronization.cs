@@ -11,6 +11,9 @@ namespace Orange
 	{
 		public static void SynchronizeAll()
 		{
+			var limeProj = The.Workspace.GetLimeCsprojFilePath();
+			SynchronizeProject(limeProj);
+
 			var gameProj = The.Workspace.GetGameCsprojFilePath();
 			SynchronizeProject(gameProj);
 
@@ -20,17 +23,20 @@ namespace Orange
 
 		public static void SynchronizeProject(string projectFileName)
 		{
+			bool changed = false;
 			var doc = new XmlDocument();
 			doc.Load(projectFileName);
 			using (new DirectoryChanger(Path.GetDirectoryName(projectFileName))) {
-				ExcludeMissingItems(doc);
-				IncludeNewItems(doc);
+				ExcludeMissingItems(doc, ref changed);
+				IncludeNewItems(doc, ref changed);
 			}
-			doc.Save(projectFileName);
+			if (changed) {
+				doc.Save(projectFileName);
+			}
 			Console.WriteLine(string.Format("Synchronized project: {0}", projectFileName));
 		}
 
-		private static void IncludeNewItems(XmlDocument doc)
+		private static void IncludeNewItems(XmlDocument doc, ref bool changed)
 		{
 			var itemGroups = doc["Project"].EnumerateElements("ItemGroup").ToArray();
 			// It is assumed that the second <ItemGroup> tag contains compile items
@@ -43,6 +49,7 @@ namespace Orange
 						var include = item.Attributes.Append(doc.CreateAttribute("Include"));
 						include.Value = path;
 						compileItems.AppendChild(item);
+						changed = true;
 						Console.WriteLine("Added a new file: " + file.Path);
 					}
 				}
@@ -63,20 +70,21 @@ namespace Orange
 			return false;
 		}
 
-		private static void ExcludeMissingItems(XmlDocument doc)
+		private static void ExcludeMissingItems(XmlDocument doc, ref bool changed)
 		{
 			var itemGroups = doc["Project"].EnumerateElements("ItemGroup");
 			foreach (var group in itemGroups) {
-				ExcludeMissingItemsFromGroup(group);
+				ExcludeMissingItemsFromGroup(group, ref changed);
 			}
 		}
 
-		private static void ExcludeMissingItemsFromGroup(XmlNode group)
+		private static void ExcludeMissingItemsFromGroup(XmlNode group, ref bool changed)
 		{
 			foreach (var item in group.EnumerateElements("Compile")) {
 				var path = item.Attributes["Include"].Value;
 				if (!File.Exists(ToUnixSlashes(path))) {
 					group.RemoveChild(item);
+					changed = true;
 					Console.WriteLine("Removed a missing file: " + path);
 				}
 			}

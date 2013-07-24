@@ -42,7 +42,6 @@ namespace Lime
 			}
 			stream = PackedAssetsBundle.Instance.OpenFileLocalized(path);
 			if (stream.Length < MaxCachedSampleSize) {
-				Logger.Write("Caching sound {0}", path);
 				var memStream = new MemoryStream((int)stream.Length);
 				stream.CopyTo(memStream);
 				memStream.Position = 0;

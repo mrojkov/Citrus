@@ -60,6 +60,14 @@ namespace Orange
 			return path;
 		}
 
+		/// <summary>
+		/// Returns Citrus/Lime project path. It is supposed that Citrus lies beside the game.
+		/// </summary>
+		public string GetLimeCsprojFilePath()
+		{
+			return Path.Combine(Path.GetDirectoryName(ProjectDirectory), "Citrus", "Lime", "Lime" + GetPlatformSuffix() + ".csproj");
+		}
+
 		public static readonly Workspace Instance = new Workspace();
 
 		public TargetPlatform ActivePlatform {

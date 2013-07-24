@@ -49,7 +49,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Source\Application\TimeUtils.cs" />
+    <Compile Include="Source\Application\ApplicationToolbox.cs" />
     <Compile Include="Source\AssetsBundle\UnityAssetsBundle.cs" />
     <Compile Include="Source\Graphics\OpenGL\OpenGL.cs" />
     <Compile Include="Source\Graphics\OpenGL\Renderer.cs" />

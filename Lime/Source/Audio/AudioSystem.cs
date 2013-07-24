@@ -179,23 +179,6 @@ namespace Lime
 
 		static AudioCache cache = new AudioCache();
 
-		//public static void PreloadSound(string path)
-		//{
-		//	cache.OpenStream(path + ".sound");
-		//}
-
-		//public static void PreloadSounds(string path)
-		//{
-		//	foreach (var assetPath in AssetsBundle.Instance.EnumerateFiles()) {
-		//		if (assetPath.StartsWith(path)) {
-		//			var ext = Path.GetExtension(assetPath);
-		//			if (ext == ".sound") {
-		//				PreloadSound(Path.ChangeExtension(assetPath, null));
-		//			}
-		//		}
-		//	}
-		//}
-
 		private static Sound LoadSoundToChannel(AudioChannel channel, string path, bool looping, bool paused, float fadeinTime)
 		{
 			if (SilentMode) {

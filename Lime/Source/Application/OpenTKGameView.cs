@@ -143,7 +143,7 @@ namespace Lime
 
 		protected override void OnRenderFrame(OpenTK.FrameEventArgs e)
 		{
-			long millisecondsCount = TimeUtils.GetMillisecondsSinceGameStarted();
+			long millisecondsCount = ApplicationToolbox.GetMillisecondsSinceGameStarted();
 			int delta = (int)(millisecondsCount - lastMillisecondsCount);
 			delta = delta.Clamp(0, 40);
 			lastMillisecondsCount = millisecondsCount;
@@ -153,7 +153,7 @@ namespace Lime
 			}
 			DoRender();
 			if (PowerSaveMode) {
-				millisecondsCount = TimeUtils.GetMillisecondsSinceGameStarted();
+				millisecondsCount = ApplicationToolbox.GetMillisecondsSinceGameStarted();
 				delta = (int)(millisecondsCount - lastMillisecondsCount);
 				System.Threading.Thread.Sleep(Math.Max(0, (1000 / 25) - delta));
 			}
@@ -161,7 +161,7 @@ namespace Lime
 
 		private void DoRender()
 		{
-			TimeUtils.RefreshFrameRate();
+			ApplicationToolbox.RefreshFrameRate();
 			MakeCurrent();
 			app.OnRenderFrame();
 			SwapBuffers();
@@ -191,7 +191,7 @@ namespace Lime
 		}
 
 		public float FrameRate { 
-			get { return TimeUtils.FrameRate; } 
+			get { return ApplicationToolbox.FrameRate; } 
 		}
 	}
 }
