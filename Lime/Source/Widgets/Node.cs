@@ -227,8 +227,10 @@ namespace Lime
 
 		public void Unlink()
 		{
-			Parent.Nodes.Remove(this);
-			Parent = null;
+			if (Parent != null) {
+				Parent.Nodes.Remove(this);
+				Parent = null;
+			}
 		}
 		
 		public void UnlinkAfterUpdate()
