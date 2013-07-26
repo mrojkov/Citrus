@@ -33,9 +33,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Compile Include="Api.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
+    <Compile Include="Api.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Library\bin\Mac\Release\libLemon.dylib">

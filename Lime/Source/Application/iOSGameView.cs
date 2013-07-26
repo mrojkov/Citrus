@@ -97,7 +97,7 @@ namespace Lime
 
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{
-			long currentTime = TimeUtils.GetMillisecondsSinceGameStarted();
+			long currentTime = ApplicationToolbox.GetMillisecondsSinceGameStarted();
 			int delta = (int)(currentTime - prevTime);
 			prevTime = currentTime;
 			delta = delta.Clamp(0, 40);
@@ -149,12 +149,12 @@ namespace Lime
 			MakeCurrent();
 			Application.Instance.OnRenderFrame();
 			SwapBuffers();
-			TimeUtils.RefreshFrameRate();
+			ApplicationToolbox.RefreshFrameRate();
 		}
 
 		public float FrameRate {
 			get {
-				return TimeUtils.FrameRate;
+				return ApplicationToolbox.FrameRate;
 			}
 		}
 	}

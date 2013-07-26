@@ -138,7 +138,6 @@
     <Compile Include="Source\Widgets\NodeDebugView.cs" />
     <Compile Include="Source\NumericExtensions.cs" />
     <Compile Include="Source\Toolbox.cs" />
-    <Compile Include="Source\Application\TimeUtils.cs" />
     <Compile Include="Source\RewindableStream.cs" />
     <Compile Include="Source\Graphics\ITexture.cs" />
     <Compile Include="Source\AssetsBundle\UnityAssetsBundle.cs" />
@@ -159,6 +158,8 @@
     <Compile Include="Source\Input\Input.Unity.cs" />
     <Compile Include="Source\Audio\AudioCache.cs" />
     <Compile Include="Source\Graphics\TexturePool.cs" />
+    <Compile Include="Source\Application\ApplicationToolbox.cs" />
+    <Compile Include="Source\Application\WinCursors.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Application\WinCursors.cs">
