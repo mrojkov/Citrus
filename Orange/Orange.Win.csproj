@@ -6,7 +6,7 @@
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{6F0C1A51-492A-4E6E-B302-E212D441EBF3}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <RootNamespace>Orange</RootNamespace>
     <AssemblyName>Orange</AssemblyName>
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -52,6 +52,9 @@
   <PropertyGroup>
     <ApplicationIcon>Orange.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
       <HintPath>packages\Newtonsoft.Json.5.0.6\lib\net40\Newtonsoft.Json.dll</HintPath>
@@ -89,6 +92,8 @@
     <Compile Include="Source\Actions\UpdateDictionaryTxt.cs" />
     <Compile Include="Source\CsprojSynchronization\CsprojSynchronization.cs" />
     <Compile Include="Source\Subversion.cs" />
+    <Compile Include="Source\UI\ConsoleUI.cs" />
+    <Compile Include="Source\UI\UserInterface.cs" />
     <Compile Include="Source\WorkspaceConfig.cs" />
     <Compile Include="Source\AssemblyInfo.cs" />
     <Compile Include="Source\AssetCooker\AssetCooker.cs" />
@@ -102,7 +107,7 @@
     <Compile Include="Source\DictionaryExtractor.cs" />
     <Compile Include="Source\DirectoryChanger.cs" />
     <Compile Include="Source\FileEnumerator.cs" />
-    <Compile Include="Source\Helpers.cs" />
+    <Compile Include="Source\Toolbox.cs" />
     <Compile Include="Source\HotStudioImport\HotAnimators.cs" />
     <Compile Include="Source\HotStudioImport\HotFontImporter.cs" />
     <Compile Include="Source\HotStudioImport\HotLexer.cs" />
@@ -113,8 +118,8 @@
     <Compile Include="Source\PluginLoader.cs" />
     <Compile Include="Source\SolutionBuilder.cs" />
     <Compile Include="Source\TargetPlatform.cs" />
-    <Compile Include="Source\MainWindow.UI.cs" />
-    <Compile Include="Source\MainWindow.cs" />
+    <Compile Include="Source\UI\MainWindow.UI.cs" />
+    <Compile Include="Source\UI\MainWindow.cs" />
     <Compile Include="Source\The.cs" />
     <Compile Include="Source\Workspace.cs" />
   </ItemGroup>

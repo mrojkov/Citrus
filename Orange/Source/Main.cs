@@ -7,31 +7,21 @@ namespace Orange
 		[STAThread]
 		public static void Main (string[] args)
 		{
-			if (Array.IndexOf(args, "-console") >= 0) {
-				ConsoleMode();
+			if (Toolbox.GetCommandLineFlag("--console") || Toolbox.GetCommandLineFlag("--help")) {
+				ConsoleMode(args);
 			} else {
 				GuiMode();
 			}
 		}
 
-		static void ConsoleMode()
+		static void ConsoleMode(string[] args)
 		{
-			Console.WriteLine("Hello from Orange!");
+			UserInterface.CreateConsole();
 		}
 
 		static void GuiMode()
 		{
-			Gtk.Application.Init();
-			new MainWindow();
-			CreateMenuItems();
-			The.Workspace.Load();
-			Gtk.Application.Run();
-		}
-
-		private static void CreateMenuItems()
-		{
-			var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-			The.MenuController.CreateAssemblyMenuItems(assembly);
+			UserInterface.CreateGUI();
 		}
 	}
 }

@@ -51,7 +51,7 @@ namespace Orange
 		private static void ResetCurrentPlugin()
 		{
 			CurrentPlugin = null;
-			The.MenuController.RefreshMenu();
+			The.UI.RefreshMenu();
 		}
 
 		private static void LoadPlugin(string pluginAssembly)
@@ -62,7 +62,7 @@ namespace Orange
 				if (!LoadedPlugins.Contains(assembly)) {
 					The.MenuController.CreateAssemblyMenuItems(assembly);
 				} else {
-					The.MenuController.RefreshMenu();
+					The.UI.RefreshMenu();
 				}
 				LoadedPlugins.Add(assembly);
 			}

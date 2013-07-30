@@ -63,7 +63,7 @@ namespace Orange
 				Console.Write(" . ");
 				for (int j = 0; j < 10; j++) {
 					System.Threading.Thread.Sleep(100);
-					Toolbox.ProcessPendingEvents();
+					The.UI.ProcessPendingEvents();
 				}
 			}
 			Console.Write("\n");

@@ -1,6 +1,9 @@
+using System;
+using System.IO;
+
 namespace Orange
 {
-	public partial class MainWindow
+	public partial class MainWindow : UserInterface
 	{
 		public Gtk.Window NativeWindow;
 		public Gtk.FileChooserButton CitrusProjectChooser;
@@ -9,6 +12,35 @@ namespace Orange
 		public Gtk.ComboBox ActionPicker;
 		public Gtk.CheckButton UpdateBeforeBuildCheckbox;
 		public Gtk.Button GoButton;
+
+		public override void Initialize()
+		{
+			Gtk.Application.Init();
+
+			Create();
+			TextWriter writer = new LogWriter(OutputPane);
+			Console.SetOut(writer);
+			Console.SetError(writer);
+			GoButton.GrabFocus();
+			NativeWindow.Show();
+
+			CreateMenuItems();
+			The.Workspace.Load();
+			Gtk.Application.Run();
+		}
+
+		public override void ProcessPendingEvents()
+		{
+			while (Gtk.Application.EventsPending()) {
+				Gtk.Application.RunIteration();
+			}
+		}
+
+		private static void CreateMenuItems()
+		{
+			var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+			The.MenuController.CreateAssemblyMenuItems(assembly);
+		}
 
 		private void Create()
 		{

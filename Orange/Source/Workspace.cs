@@ -71,15 +71,16 @@ namespace Orange
 		public static readonly Workspace Instance = new Workspace();
 
 		public TargetPlatform ActivePlatform {
-			get { return The.MainWindow.ActivePlatform; }
+			get { return The.UI.GetActivePlatform(); }
 		}
 
 		public void Load()
 		{
 			var config = WorkspaceConfig.Load();
 			Open(config.CitrusProject);
-			The.MainWindow.PlatformPicker.Active = config.TargetPlatform;
-			The.MainWindow.UpdateBeforeBuildCheckbox.Active = config.UpdateBeforeBuild;
+			// XXX
+			// The.MainWindow.PlatformPicker.Active = config.TargetPlatform;
+			// The.MainWindow.UpdateBeforeBuildCheckbox.Active = config.UpdateBeforeBuild;
 			// ActionPicker.Active = config.Action;
 		}
 
@@ -88,7 +89,8 @@ namespace Orange
 			var config = WorkspaceConfig.Load();
 			config.CitrusProject = ProjectFile;
 			config.TargetPlatform = (int)ActivePlatform;
-			config.UpdateBeforeBuild = The.MainWindow.UpdateBeforeBuildCheckbox.Active;
+			// XXX
+			// config.UpdateBeforeBuild = The.MainWindow.UpdateBeforeBuildCheckbox.Active;
 			// config.Action = ActionPicker.Active;
 			WorkspaceConfig.Save(config);
 		}
@@ -96,7 +98,7 @@ namespace Orange
 		public void Open(string file)
 		{
 			try {
-				The.MainWindow.ClearLog();
+				The.UI.ClearLog();
 				ProjectFile = file;
 				ReadProject(file);
 				ProjectDirectory = Path.GetDirectoryName(file);
@@ -106,7 +108,7 @@ namespace Orange
 				}
 				AssetFiles = new FileEnumerator(AssetsDirectory);
 				PluginLoader.ScanForPlugins(file);
-				The.MainWindow.CitrusProjectChooser.SelectFilename(file);
+				The.UI.OnWorkspaceOpened();
 			} catch (System.Exception e) {
 				Console.WriteLine(string.Format("Can't open {0}:\n{1}", file, e.Message));
 			}

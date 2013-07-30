@@ -6,17 +6,22 @@ namespace Orange
 {
 	public static class Toolbox
 	{
-		public static bool ShowConfirmationDialog(string text)
+		public static string GetCommandLineArg(string name)
 		{
-			var box = new Gtk.MessageDialog(Orange.MainWindow.Instance.NativeWindow,
-				Gtk.DialogFlags.Modal, Gtk.MessageType.Question,
-				Gtk.ButtonsType.YesNo,
-				text);
-			box.Title = "Orange";
-			box.Modal = true;
-			int result = box.Run();
-			box.Destroy();
-			return result == (int)Gtk.ResponseType.Yes;
+			var args = System.Environment.GetCommandLineArgs();
+			foreach (var arg in args) {
+				var x = arg.Split(':');
+				if (x.Length == 2 && x[0] == name) {
+					return x[1];
+				}
+			}
+			return null;
+		}
+
+		public static bool GetCommandLineFlag(string name)
+		{
+			var args = System.Environment.GetCommandLineArgs();
+			return Array.IndexOf(args, name) >= 0;
 		}
 
 		public static string GetTargetPlatformString(TargetPlatform platform)
@@ -53,10 +58,10 @@ namespace Orange
 			p.StartInfo.StandardOutputEncoding = System.Text.Encoding.GetEncoding(cp);
 			p.StartInfo.StandardErrorEncoding = System.Text.Encoding.GetEncoding(cp);
 #else
-			p.StartInfo.StandardOutputEncoding = System.Text.Encoding.Default;
-			p.StartInfo.StandardErrorEncoding = System.Text.Encoding.Default;
-			p.StartInfo.EnvironmentVariables.Clear();
-			p.StartInfo.EnvironmentVariables.Add("PATH", "/usr/bin");
+					p.StartInfo.StandardOutputEncoding = System.Text.Encoding.Default;
+					p.StartInfo.StandardErrorEncoding = System.Text.Encoding.Default;
+					p.StartInfo.EnvironmentVariables.Clear();
+					p.StartInfo.EnvironmentVariables.Add("PATH", "/usr/bin");
 #endif
 			p.StartInfo.RedirectStandardOutput = true;
 			p.StartInfo.RedirectStandardError = true;
@@ -82,22 +87,16 @@ namespace Orange
 			p.BeginErrorReadLine();
 			while (!p.HasExited) {
 				p.WaitForExit(50);
-				lock(logger) {
+				lock (logger) {
 					if (logger.Length > 0) {
 						Console.Write(logger.ToString());
 						logger.Clear();
 					}
 				}
-				ProcessPendingEvents();
+				The.UI.ProcessPendingEvents();
 			}
+			Console.Write(logger.ToString());
 			return p.ExitCode;
-		}
-
-		public static void ProcessPendingEvents()
-		{
-			while (Gtk.Application.EventsPending()) {
-				Gtk.Application.RunIteration();
-			}
 		}
 
 		public static string GetApplicationDirectory()

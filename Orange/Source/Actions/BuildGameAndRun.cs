@@ -12,7 +12,7 @@ namespace Orange
 		{
 			AssetCooker.CookForActivePlatform();
 			if (BuildGame()) {
-				The.MainWindow.ScrollLogToEnd();
+				The.UI.ScrollLogToEnd();
 				RunGame();
 			}
 		}

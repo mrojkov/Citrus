@@ -6,23 +6,16 @@ using System.Collections.Generic;
 
 namespace Orange
 {
-	public partial class MainWindow
+	public partial class MainWindow : UserInterface
 	{
-		public static MainWindow Instance;
-
 		internal MainWindow()
 		{
-			Create();
-			TextWriter writer = new LogWriter(OutputPane);
-			Console.SetOut(writer);
-			Console.SetError(writer);
-			GoButton.GrabFocus();
-			NativeWindow.Show();
 			Instance = this;
 		}
 
-		public TargetPlatform ActivePlatform {
-			get { return (TargetPlatform)PlatformPicker.Active; }
+		public override TargetPlatform GetActivePlatform() 
+		{
+			return (TargetPlatform)PlatformPicker.Active;
 		}
 				
 		class LogWriter : TextWriter
@@ -66,15 +59,55 @@ namespace Orange
 			}
 		}
 
-		public void ClearLog()
+		public override void ClearLog()
 		{
 			OutputPane.Buffer.Clear();
 		}
 
-		public void ScrollLogToEnd()
+		public override void ScrollLogToEnd()
 		{
 			OutputPane.ScrollToIter(OutputPane.Buffer.EndIter, 0, false, 0, 0);
 		}
+
+		public override void OnWorkspaceOpened()
+		{
+			CitrusProjectChooser.SelectFilename(The.Workspace.ProjectFile);
+		}
+
+		public override bool AskConfirmation(string text)
+		{
+			var box = new Gtk.MessageDialog(NativeWindow,
+				Gtk.DialogFlags.Modal, Gtk.MessageType.Question,
+				Gtk.ButtonsType.YesNo,
+				text);
+			box.Title = "Orange";
+			box.Modal = true;
+			int result = box.Run();
+			box.Destroy();
+			return result == (int)Gtk.ResponseType.Yes;
+		}
+
+		public override void RefreshMenu()
+		{
+			var picker = ActionPicker;
+			var activeText = picker.ActiveText;
+			int count = picker.Model.IterNChildren();
+			for (int i = 0; i < count; i++) {
+				picker.RemoveText(0);
+			}
+			int active = 0;
+			int c = 0;
+			var items = The.MenuController.GetVisibleAndSortedItems();
+			foreach (var item in items) {
+				picker.AppendText(item.Label);
+				if (item.Label == activeText) {
+					active = c;
+				}
+				c++;
+			}
+			picker.Active = active;
+		}
+
 
 		private void Execute(Action action)
 		{
@@ -87,7 +120,9 @@ namespace Orange
 			try {
 				try {
 					ClearLog();
-					UpdateProjectIfNeeded();
+					if (DoesNeedSvnUpdate()) {
+						SolutionBuilder.SvnUpdate();
+					}
 					The.Workspace.AssetFiles.Rescan();
 					action();
 				} catch (System.Exception exc) {
@@ -113,12 +148,9 @@ namespace Orange
 			this.UpdateBeforeBuildCheckbox.Sensitive = value;
 		}
 
-		private void UpdateProjectIfNeeded()
+		public override bool DoesNeedSvnUpdate()
 		{
-			if (UpdateBeforeBuildCheckbox.Active) {
-				Subversion.Update(Path.GetDirectoryName(The.Workspace.GetLimeCsprojFilePath()));
-				Subversion.Update(The.Workspace.ProjectDirectory);
-			}
+			return UpdateBeforeBuildCheckbox.Active;
 		}
 
 		void ShowTimeStatistics(DateTime startTime)

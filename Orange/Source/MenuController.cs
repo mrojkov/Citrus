@@ -20,26 +20,11 @@ namespace Orange
 
 		public readonly List<MenuItem> Items = new List<MenuItem>();
 
-		public void RefreshMenu()
+		public List<MenuItem> GetVisibleAndSortedItems()
 		{
-			var picker = The.MainWindow.ActionPicker;
-			var activeText = picker.ActiveText;
-			int count = picker.Model.IterNChildren();
-			for (int i = 0; i < count; i++) {
-				picker.RemoveText(0);
-			}
-			int active = 0;
-			int c = 0;
 			var items = Items.FindAll(i => IsVisibleMenuItem(i));
 			items.Sort((a, b) => a.Priority.CompareTo(b.Priority));
-			foreach (var item in items) {
-				picker.AppendText(item.Label);
-				if (item.Label == activeText) {
-					active = c;
-				}
-				c++;
-			}
-			picker.Active = active;
+			return items;
 		}
 
 		private bool IsVisibleMenuItem(MenuItem item)
@@ -57,7 +42,7 @@ namespace Orange
 		{
 			var items = new List<MenuItem>(ScanForMenuItems(assembly));
 			Items.AddRange(items);
-			RefreshMenu();
+			The.UI.RefreshMenu();
 		}
 
 		private static IEnumerable<MenuItem> ScanForMenuItems(System.Reflection.Assembly assembly)

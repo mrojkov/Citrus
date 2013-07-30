@@ -13,6 +13,12 @@ namespace Orange
 			this.platform = plaform;
 		}
 
+		public static void SvnUpdate()
+		{
+			Subversion.Update(Path.GetDirectoryName(The.Workspace.GetLimeCsprojFilePath()));
+			Subversion.Update(The.Workspace.ProjectDirectory);
+		}
+
 		public static void CopyFile(string srcDir, string dstDir, string fileName)
 		{
 			string srcFile = Path.Combine(srcDir, fileName);
