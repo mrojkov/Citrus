@@ -29,6 +29,13 @@ namespace Orange
 			Gtk.Application.Run();
 		}
 
+		public override string GetConsoleOutput()
+		{
+			var buffer = OutputPane.Buffer;
+			string output = buffer.StartIter.GetText(buffer.EndIter);
+			return output;
+		}
+
 		public override void ProcessPendingEvents()
 		{
 			while (Gtk.Application.EventsPending()) {
