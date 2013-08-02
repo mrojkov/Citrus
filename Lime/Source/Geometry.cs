@@ -10,6 +10,9 @@ namespace Lime
 		public static int CalcPointHalfPlane(Vector2 point, Vector2 lineA, Vector2 lineB)
 		{
 			float s = (lineB.X - lineA.X) * (point.Y - lineA.Y) - (lineB.Y - lineA.Y) * (point.X - lineA.X);
+			if (float.IsNaN(s)) {
+				return 0;
+			}
 			return Math.Sign(s);
 		}
 

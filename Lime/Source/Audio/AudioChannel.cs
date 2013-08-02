@@ -193,7 +193,7 @@ namespace Lime
 			lock (streamingSync) {
 				streaming = false;
 				AL.SourceStop(source);
-				AudioSystem.CheckError();
+				AudioSystem.SuppressError("AudioChannel.Stop");
 			}
 		}
 
@@ -290,8 +290,7 @@ namespace Lime
 				decoder.Rewind();
 			}
 			if (totalRead > 0) {
-				AL.GetError(); // Suppress any possible error
-				// AudioSystem.CheckError();
+				AudioSystem.SuppressError("AudioChannel.FillupBuffer");
 				ALFormat format = (decoder.GetFormat() == AudioFormat.Stereo16) ? ALFormat.Stereo16 : ALFormat.Mono16;
 				AL.BufferData(buffer, format, decodedData, 
 					totalRead * decoder.GetBlockSize(), decoder.GetFrequency());

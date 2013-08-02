@@ -293,6 +293,17 @@ namespace Lime
 #endif
 		}
 
+		public static void SuppressError(string method)
+		{
+#if OPENAL
+			var error = AL.GetError();
+			if (error != ALError.NoError) {
+				Logger.Write(string.Format("OpenAL error: {0} (called from {1})", 
+					AL.GetErrorString(error), method));
+			}
+#endif
+		}
+
 		public static void CheckError()
 		{
 #if OPENAL
