@@ -76,7 +76,6 @@
   <ItemGroup>
     <Compile Include="Source\AssemblyInfo.cs" />
     <Compile Include="Source\DirectoryChanger.cs" />
-    <Compile Include="Source\Helpers.cs" />
     <Compile Include="Source\Main.cs" />
     <Compile Include="Source\TargetPlatform.cs" />
     <Compile Include="Source\HotStudioImport\HotLexer.cs" />
@@ -89,13 +88,11 @@
     <Compile Include="Source\AssetCooker\RectAllocator.cs" />
     <Compile Include="Source\AssetCooker\TextureConverter.cs" />
     <Compile Include="Source\DictionaryExtractor.cs" />
-    <Compile Include="Source\MainWindow.cs" />
     <Compile Include="Source\AssetCooker\WaveIMA4Converter.cs" />
     <Compile Include="Source\AssetCooker\AssetsUnpacker.cs" />
     <Compile Include="Source\AssetCooker\TextureConverterUtils.cs" />
     <Compile Include="Source\FileEnumerator.cs" />
     <Compile Include="Source\AssetCooker\UnityAssetBundle.cs" />
-    <Compile Include="Source\MainWindow.UI.cs" />
     <Compile Include="Source\MenuController.cs" />
     <Compile Include="Source\MenuItemAttribute.cs" />
     <Compile Include="Source\PluginLoader.cs" />
@@ -112,6 +109,12 @@
     <Compile Include="Source\CsprojSynchronization\CsprojSynchronization.cs" />
     <Compile Include="Source\Subversion.cs" />
     <Compile Include="Source\Actions\PublishTestFlight.cs" />
+    <Compile Include="Source\UI\ConsoleUI.cs" />
+    <Compile Include="Source\UI\MainWindow.cs" />
+    <Compile Include="Source\UI\MainWindow.UI.cs" />
+    <Compile Include="Source\UI\UserInterface.cs" />
+    <Compile Include="Source\Toolbox.cs" />
+    <Compile Include="Source\Actions\UpdateXCodeProject.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lime\Lime.Mac.csproj">

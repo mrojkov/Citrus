@@ -15,7 +15,10 @@ namespace Orange
 		[MenuItem("Publish to TestFlight")]
 		public static void PublishTestFlightAction()
 		{
-			if (Actions.BuildGame()) {
+			// XXX
+			// if (Actions.BuildGame()) {
+			Actions.BuildGame();
+			if (true) {
 				var apiToken = The.Workspace.GetProjectAttribute("TestFlightApiToken");
 				var teamToken = The.Workspace.GetProjectAttribute("TestFlightTeamToken");
 				var notes = The.Workspace.GetProjectAttribute("BuildNotes");

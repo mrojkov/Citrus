@@ -19,7 +19,11 @@ namespace Orange
 	{
 		public override void Initialize()
 		{
+#if MAC
+			AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+#else
 			AppDomain.CurrentDomain.FirstChanceException += CurrentDomain_FirstChanceException;
+#endif
 			var args = System.Environment.GetCommandLineArgs();
 			if (args.Length < 3) {
 				WriteHelpAndExit();
@@ -27,6 +31,14 @@ namespace Orange
 			CreateMenuItems();
 			The.Workspace.Load();
 			RunCommand(Toolbox.GetCommandLineArg("--command"));
+		}
+
+		void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+		{
+			var te = e.ExceptionObject as TerminateException;
+			if (te != null) {
+				System.Environment.Exit(te.Code);
+			}
 		}
 
 		void CurrentDomain_FirstChanceException(object sender, System.Runtime.ExceptionServices.FirstChanceExceptionEventArgs e)

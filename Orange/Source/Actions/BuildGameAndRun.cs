@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,10 +11,13 @@ namespace Orange
 		public static void BuildAndRunAction()
 		{
 			AssetCooker.CookForActivePlatform();
-			if (BuildGame()) {
-				The.UI.ScrollLogToEnd();
-				RunGame();
-			}
+			// XXX
+			// Temporally we disabled error checking while those bug in the mdtool isn't fixed
+			// if (
+			BuildGame();
+			The.UI.ScrollLogToEnd();
+			RunGame();
+			//}
 		}
 
 		public static bool BuildGame()
