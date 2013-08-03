@@ -19,6 +19,7 @@ namespace Orange
 	{
 		public override void Initialize()
 		{
+			Gtk.Application.Init();
 #if MAC
 			AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 #else
@@ -69,7 +70,7 @@ namespace Orange
 
 		private static void WriteHelpAndExit()
 		{
-			Console.WriteLine("Orange --console citrus_project --target:target --command:command [--autoupdate]");
+			Console.WriteLine("Orange --console citrus_project --platform:[ios|desktop] --command:command [--autoupdate]");
 			var commands = The.MenuController.GetVisibleAndSortedItems();
 			if (commands.Count > 0) {
 				Console.WriteLine("Available commands are:");
