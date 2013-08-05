@@ -12,6 +12,9 @@ namespace Orange
 		public static void UpgradeOrangeAction()
 		{
 			var path = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(Toolbox.GetApplicationDirectory())));
+#if MAC
+			path = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(path)));
+#endif
 			var builder = new SolutionBuilder(TargetPlatform.Desktop, path, "Orange");
 			builder.SvnUpdate();
 #if WIN

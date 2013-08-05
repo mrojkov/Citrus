@@ -138,7 +138,7 @@ namespace Orange
 			}
 #else
 			var args = "--installdev=" + GetIOSAppName();
-			int exitCode = Toolbox.StartProcess("/Developer/MonoTouch/usr/bin/mtouch", args);
+			int exitCode = Process.Start("/Developer/MonoTouch/usr/bin/mtouch", args);
 			if (exitCode != 0) {
 				return exitCode;
 			}

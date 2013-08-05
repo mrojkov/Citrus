@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -75,7 +75,6 @@
   <Import Project="$(MSBuildExtensionsPath)\Mono\MonoMac\v0.0\Mono.MonoMac.targets" />
   <ItemGroup>
     <Compile Include="Source\AssemblyInfo.cs" />
-    <Compile Include="Source\DirectoryChanger.cs" />
     <Compile Include="Source\Main.cs" />
     <Compile Include="Source\TargetPlatform.cs" />
     <Compile Include="Source\HotStudioImport\HotLexer.cs" />
@@ -91,7 +90,6 @@
     <Compile Include="Source\AssetCooker\WaveIMA4Converter.cs" />
     <Compile Include="Source\AssetCooker\AssetsUnpacker.cs" />
     <Compile Include="Source\AssetCooker\TextureConverterUtils.cs" />
-    <Compile Include="Source\FileEnumerator.cs" />
     <Compile Include="Source\AssetCooker\UnityAssetBundle.cs" />
     <Compile Include="Source\MenuController.cs" />
     <Compile Include="Source\MenuItemAttribute.cs" />
@@ -107,14 +105,19 @@
     <Compile Include="Source\Actions\UpdateDictionaryTxt.cs" />
     <Compile Include="Source\Actions\CookGameAssets.cs" />
     <Compile Include="Source\CsprojSynchronization\CsprojSynchronization.cs" />
-    <Compile Include="Source\Subversion.cs" />
     <Compile Include="Source\Actions\PublishTestFlight.cs" />
     <Compile Include="Source\UI\ConsoleUI.cs" />
     <Compile Include="Source\UI\MainWindow.cs" />
     <Compile Include="Source\UI\MainWindow.UI.cs" />
     <Compile Include="Source\UI\UserInterface.cs" />
-    <Compile Include="Source\Toolbox.cs" />
-    <Compile Include="Source\Actions\UpdateXCodeProject.cs" />
+    <Compile Include="Source\Actions\UpgradeOrange.cs" />
+    <Compile Include="Source\Toolbox\DirectoryChanger.cs" />
+    <Compile Include="Source\Toolbox\FileEnumerator.cs" />
+    <Compile Include="Source\Toolbox\Json.cs" />
+    <Compile Include="Source\Toolbox\Process.cs" />
+    <Compile Include="Source\Toolbox\Subversion.cs" />
+    <Compile Include="Source\Toolbox\Toolbox.cs" />
+    <Compile Include="Source\Actions\Test.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lime\Lime.Mac.csproj">
@@ -162,12 +165,30 @@
     <None Include="Orange.Mac.userprefs">
       <Visible>False</Visible>
     </None>
-    <None Include="Orange.Win.userprefs">
-      <Visible>False</Visible>
-    </None>
     <None Include="Orange.ico" />
+    <None Include="packages.config" />
+    <None Include="packages\repositories.config" />
+    <None Include="packages\Newtonsoft.Json.5.0.6\Newtonsoft.Json.5.0.6.nupkg" />
+    <None Include="packages\Newtonsoft.Json.5.0.6\Newtonsoft.Json.5.0.6.nuspec" />
+    <None Include="packages\Newtonsoft.Json.5.0.6\lib\net20\Newtonsoft.Json.xml" />
+    <None Include="packages\Newtonsoft.Json.5.0.6\lib\net35\Newtonsoft.Json.xml" />
+    <None Include="packages\Newtonsoft.Json.5.0.6\lib\net40\Newtonsoft.Json.xml" />
+    <None Include="packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.xml" />
+    <None Include="packages\Newtonsoft.Json.5.0.6\lib\netcore45\Newtonsoft.Json.xml" />
+    <None Include="packages\Newtonsoft.Json.5.0.6\lib\portable-net40+sl4+wp7+win8\Newtonsoft.Json.xml" />
+    <None Include="packages\Newtonsoft.Json.5.0.6\lib\portable-net45+wp80+win8\Newtonsoft.Json.xml" />
+    <None Include="packages\RestSharp.104.1\RestSharp.104.1.nupkg" />
+    <None Include="packages\RestSharp.104.1\RestSharp.104.1.nuspec" />
+    <None Include="packages\RestSharp.104.1\readme.txt" />
+    <None Include="packages\RestSharp.104.1\lib\net35\RestSharp.xml" />
+    <None Include="packages\RestSharp.104.1\lib\net35-client\RestSharp.xml" />
+    <None Include="packages\RestSharp.104.1\lib\net4\RestSharp.xml" />
+    <None Include="packages\RestSharp.104.1\lib\net4-client\RestSharp.xml" />
+    <None Include="packages\RestSharp.104.1\lib\sl4\RestSharp.Silverlight.xml" />
+    <None Include="packages\RestSharp.104.1\lib\sl4-wp71\RestSharp.WindowsPhone.xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Source\AssetCooker\" />
+    <Folder Include="bin\Mac\Debug\Orange.app\Contents\MonoBundle\" />
   </ItemGroup>
 </Project>
