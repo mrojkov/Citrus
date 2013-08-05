@@ -31,7 +31,7 @@ namespace Orange
 
 		private static void SvnCommand(string args)
 		{
-			if (Toolbox.StartProcess(svn, args) != 0) {
+			if (Process.Start(svn, args) != 0) {
 				throw new Lime.Exception("SVN error");
 			}
 		}

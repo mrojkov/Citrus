@@ -90,8 +90,12 @@
     <Compile Include="Source\Actions\BuildGameAndRun.cs" />
     <Compile Include="Source\Actions\PublishTestFlight.cs" />
     <Compile Include="Source\Actions\UpdateDictionaryTxt.cs" />
+    <Compile Include="Source\Actions\UpdateXCodeProject.cs" />
     <Compile Include="Source\CsprojSynchronization\CsprojSynchronization.cs" />
-    <Compile Include="Source\Subversion.cs" />
+    <Compile Include="Source\Toolbox\Json.cs" />
+    <Compile Include="Source\Toolbox\Process.cs" />
+    <Compile Include="Source\Toolbox\Subversion.cs" />
+    <Compile Include="Source\Toolbox\Toolbox.cs" />
     <Compile Include="Source\UI\ConsoleUI.cs" />
     <Compile Include="Source\UI\UserInterface.cs" />
     <Compile Include="Source\WorkspaceConfig.cs" />
@@ -105,9 +109,8 @@
     <Compile Include="Source\AssetCooker\UnityAssetBundle.cs" />
     <Compile Include="Source\AssetCooker\WaveIMA4Converter.cs" />
     <Compile Include="Source\DictionaryExtractor.cs" />
-    <Compile Include="Source\DirectoryChanger.cs" />
-    <Compile Include="Source\FileEnumerator.cs" />
-    <Compile Include="Source\Toolbox.cs" />
+    <Compile Include="Source\Toolbox\DirectoryChanger.cs" />
+    <Compile Include="Source\Toolbox\FileEnumerator.cs" />
     <Compile Include="Source\HotStudioImport\HotAnimators.cs" />
     <Compile Include="Source\HotStudioImport\HotFontImporter.cs" />
     <Compile Include="Source\HotStudioImport\HotLexer.cs" />

@@ -14,7 +14,12 @@ namespace Orange
 
 		public static void CookForActivePlatform()
 		{
-			new AssetCooker(The.Workspace.ActivePlatform).Cook();
+			Cook(The.Workspace.ActivePlatform);
+		}
+
+		public static void Cook(TargetPlatform platform)
+		{
+			new AssetCooker(platform).Cook();
 		}
 
 		string GetOriginalAssetExtension(string path)

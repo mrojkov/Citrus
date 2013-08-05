@@ -14,7 +14,7 @@ namespace Orange
 		public string AssetsDirectory { get; private set; }
 		public string Title { get; private set; }
 		public FileEnumerator AssetFiles { get; private set; }
-		private JObject projectJson;
+		public Json ProjectJson { get; private set; }
 
 		public string GetPlatformSuffix()
 		{
@@ -32,15 +32,6 @@ namespace Orange
 		{
 			var path = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + GetPlatformSuffix(), The.Workspace.Title + GetPlatformSuffix() + ".sln");
 			return path;
-		}
-
-		public string GetProjectAttribute(string name)
-		{
-			JToken value;
-			if (!projectJson.TryGetValue(name, out value)) {
-				throw new Lime.Exception("{0} is not defined in {1}", name, ProjectFile);
-			}
-			return value.ToString();
 		}
 
 		/// <summary>
@@ -116,8 +107,9 @@ namespace Orange
 
 		private void ReadProject(string file)
 		{
-			projectJson = JObject.Parse(File.ReadAllText(file));
-			Title = GetProjectAttribute("Title");
+			var jobject = JObject.Parse(File.ReadAllText(file));
+			ProjectJson = new Json(jobject, file);
+			Title = ProjectJson["Title"] as string;
 		}
 
 		public string GetActivePlatformString()

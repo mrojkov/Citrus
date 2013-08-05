@@ -98,9 +98,9 @@ namespace Orange
 			srcPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), srcPath);
 			dstPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), dstPath);
 			string args = String.Format("-silent -fast {0} {1} \"{2}\" \"{3}\"", mipsFlag, compressionFlag, srcPath, dstPath);
-			int exitCode = Toolbox.StartProcess(nvcompress, args, Toolbox.StartProcessOptions.RedirectErrors);
-			if (exitCode != 0) {
-				throw new Lime.Exception("Failed to convert '{0}' to DDS format(error code: {1})", srcPath, exitCode);
+			int result = Process.Start(nvcompress, args, Process.Options.RedirectErrors);
+			if (result != 0) {
+				throw new Lime.Exception("Failed to convert '{0}' to DDS format(error code: {1})", srcPath, result);
 			}
 #else
 			string nvcompress = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Mac", "nvcompress");

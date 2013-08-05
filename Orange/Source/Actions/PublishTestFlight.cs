@@ -19,9 +19,9 @@ namespace Orange
 			// if (Actions.BuildGame()) {
 			Actions.BuildGame();
 			if (true) {
-				var apiToken = The.Workspace.GetProjectAttribute("TestFlightApiToken");
-				var teamToken = The.Workspace.GetProjectAttribute("TestFlightTeamToken");
-				var notes = The.Workspace.GetProjectAttribute("BuildNotes");
+				var apiToken = The.Workspace.ProjectJson["TestFlight/ApiToken"];
+				var teamToken = The.Workspace.ProjectJson["TestFlight/TeamToken"];
+				var notes = The.Workspace.ProjectJson["BuildNotes"];
 
 				var ipaPath = GetIPAPath();
 				Console.WriteLine("Uploading " + ipaPath);

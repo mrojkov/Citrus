@@ -92,11 +92,6 @@ namespace Orange
 			The.MenuController.CreateAssemblyMenuItems(assembly);
 		}
 
-		public override string GetConsoleOutput()
-		{
-			throw new NotImplementedException();
-		}
-
 		public override bool AskConfirmation(string text)
 		{
 			Console.WriteLine(text + " (Y/N)");

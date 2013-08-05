@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Orange
 {
@@ -27,7 +28,7 @@ namespace Orange
 			System.IO.File.Copy(srcFile, dstFile, true);
 		}
 
-		public bool Build()
+		public bool Build(StringBuilder output = null)
 		{
 			Console.WriteLine("------------- Building Game -------------");
 			CsprojSynchronization.SynchronizeAll();
@@ -53,7 +54,7 @@ namespace Orange
 			slnFile = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + ".Win", The.Workspace.Title + ".Win.sln");
 			args = String.Format("\"{0}\" /verbosity:minimal /p:Configuration=Release", slnFile);
 #endif
-			if (Toolbox.StartProcess(app, args) != 0) {
+			if (Process.Start(app, args, output: output) != 0) {
 				return false;
 			}
 			return true;
@@ -84,7 +85,7 @@ namespace Orange
 			slnFile = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + ".Win", The.Workspace.Title + ".Win.sln");
 			args = String.Format("\"{0}\" /t:Clean /p:Configuration=Release", slnFile);
 #endif
-			if (Toolbox.StartProcess(app, args) != 0) {
+			if (Process.Start(app, args) != 0) {
 				return false;
 			}
 			return true;
@@ -112,7 +113,7 @@ namespace Orange
 			string app = GetApplicationPath();
 			string dir = Path.GetDirectoryName(app);
 			using (new DirectoryChanger(dir)) {
-				int exitCode = Toolbox.StartProcess(app, arguments);
+				int exitCode = Process.Start(app, arguments);
 				return exitCode;
 			}
 #else
