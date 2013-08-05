@@ -91,6 +91,7 @@
     <Compile Include="Source\Actions\PublishTestFlight.cs" />
     <Compile Include="Source\Actions\UpdateDictionaryTxt.cs" />
     <Compile Include="Source\Actions\UpdateXCodeProject.cs" />
+    <Compile Include="Source\Actions\UpgradeOrange.cs" />
     <Compile Include="Source\CsprojSynchronization\CsprojSynchronization.cs" />
     <Compile Include="Source\Toolbox\Json.cs" />
     <Compile Include="Source\Toolbox\Process.cs" />
@@ -125,6 +126,8 @@
     <Compile Include="Source\UI\MainWindow.cs" />
     <Compile Include="Source\The.cs" />
     <Compile Include="Source\Workspace.cs" />
+    <Compile Include="bin\Mac\Release\Api.cs" />
+    <Compile Include="Source\Toolbox.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Orange.ico" />
