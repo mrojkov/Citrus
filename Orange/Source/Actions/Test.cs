@@ -8,7 +8,7 @@ namespace Orange
 	public static class Test
 	{
 		[MenuItem("Test", 1)]
-		public static void Test()
+		public static void TestAction()
 		{
 		}
 	}
