@@ -7,17 +7,37 @@ namespace Orange
 {
 	public class SolutionBuilder
 	{
+		string projectDirectory;
+		string projectName;
 		TargetPlatform platform;
 
-		public SolutionBuilder(TargetPlatform plaform)
+		public SolutionBuilder(TargetPlatform platform)
 		{
-			this.platform = plaform;
+			this.platform = platform;
+			projectName = The.Workspace.Title;
+			projectDirectory = Path.Combine(The.Workspace.ProjectDirectory, projectName);
+#if WIN
+			projectDirectory += ".Win";
+#elif MAC
+			if (platform == TargetPlatform.iOS) {
+				projectDirectory += ".iOS";
+			} else {
+				projectDirectory += ".Mac";
+			}
+#endif
 		}
 
-		public static void SvnUpdate()
+		public SolutionBuilder(TargetPlatform platform, string projectDirectory, string projectName)
+		{
+			this.platform = platform;
+			this.projectDirectory = projectDirectory;
+			this.projectName = projectName;
+		}
+
+		public void SvnUpdate()
 		{
 			Subversion.Update(Path.GetDirectoryName(The.Workspace.GetLimeCsprojFilePath()));
-			Subversion.Update(The.Workspace.ProjectDirectory);
+			Subversion.Update(projectDirectory);
 		}
 
 		public static void CopyFile(string srcDir, string dstDir, string fileName)
@@ -36,22 +56,22 @@ namespace Orange
 #if MAC
 			app = "/Applications/Xamarin Studio.app/Contents/MacOS/mdtool";
 			if (platform == TargetPlatform.iOS) {
-				slnFile = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + ".iOS", The.Workspace.Title + ".iOS.sln");
+				slnFile = Path.Combine(projectDirectory, projectName + ".iOS.sln");
 				args = String.Format("build \"{0}\" -t:Build -c:\"Release|iPhone\"", slnFile);
 			} else {
-				slnFile = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + ".Mac", The.Workspace.Title + ".Mac.sln");
+				slnFile = Path.Combine(projectDirectory, projectName + ".Mac.sln");
 				args = String.Format("build \"{0}\" -t:Build -c:\"Release|x86\"", slnFile);
 			}
 #elif WIN
 			// Uncomment follow block if you would like to use mdtool instead of MSBuild
 			/*
 			app = @"C:\Program Files(x86)\MonoDevelop\bin\mdtool.exe";
-			slnFile = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + ".Win", The.Workspace.Title + ".Win.sln");
+			slnFile = Path.Combine(projectDirectory, projectName + ".Win.sln");
 			args = String.Format("build \"{0}\" -t:Build -c:\"Release|x86\"", slnFile);
 			*/
 
 			app = Path.Combine(System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(), "MSBuild.exe");
-			slnFile = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + ".Win", The.Workspace.Title + ".Win.sln");
+			slnFile = Path.Combine(projectDirectory, projectName + ".Win.sln");
 			args = String.Format("\"{0}\" /verbosity:minimal /p:Configuration=Release", slnFile);
 #endif
 			if (Process.Start(app, args, output: output) != 0) {
@@ -67,22 +87,22 @@ namespace Orange
 #if MAC
 			app = "/Applications/MonoDevelop.app/Contents/MacOS/mdtool";
 			if (platform == TargetPlatform.iOS) {
-				slnFile = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + ".iOS", The.Workspace.Title + ".iOS.sln");
+				slnFile = Path.Combine(projectDirectory, projectName + ".iOS.sln");
 				args = String.Format("build \"{0}\" -t:Clean -c:\"Release|iPhone\"", slnFile);
 			} else {
-				slnFile = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + ".Mac", The.Workspace.Title + ".Mac.sln");
+				slnFile = Path.Combine(projectDirectory, projectName + ".Mac.sln");
 				args = String.Format("build \"{0}\" -t:Clean -c:\"Release|x86\"", slnFile);
 			}
 #elif WIN
 			// Uncomment follow block if you would like to use mdtool instead of MSBuild
 			/*
 			app = @"C:\Program Files(x86)\MonoDevelop\bin\mdtool.exe";
-			slnFile = Path.Combine(project.ProjectDirectory, project.Title + ".Win", project.Title + ".Win.sln");
+			slnFile = Path.Combine(projectDirectory, projectName + ".Win.sln");
 			args = String.Format("build \"{0}\" -t:Clean -c:\"Release|x86\"", slnFile);
 			*/
 
 			app = Path.Combine(System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(), "MSBuild.exe");
-			slnFile = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + ".Win", The.Workspace.Title + ".Win.sln");
+			slnFile = Path.Combine(projectDirectory, projectName + ".Win.sln");
 			args = String.Format("\"{0}\" /t:Clean /p:Configuration=Release", slnFile);
 #endif
 			if (Process.Start(app, args) != 0) {
@@ -96,12 +116,12 @@ namespace Orange
 			string app;
 #if MAC
 			if (platform == TargetPlatform.Desktop) {
-				app = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + ".Mac", "bin/Release", The.Workspace.Title + ".app", "Contents/MacOS", The.Workspace.Title);
+				app = Path.Combine(projectDirectory, "bin/Release", projectName + ".app", "Contents/MacOS", projectName);
 			} else {
 				throw new NotImplementedException();
 			}
 #elif WIN
-			app = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + ".Win", "bin/Release", The.Workspace.Title + ".exe");
+			app = Path.Combine(projectDirectory, "bin/Release", projectName + ".exe");
 #endif
 			return app;
 		}
@@ -131,7 +151,8 @@ namespace Orange
 
 		private string GetIOSAppName()
 		{
-			var directory = Path.Combine(Path.GetDirectoryName(The.Workspace.GetSolutionFilePath()), "bin", "iPhone", "Release");
+			var directory = Path.Combine(projectDirectory, "bin", "iPhone", "Release");
+			// var directory = Path.Combine(Path.GetDirectoryName(The.Workspace.GetSolutionFilePath()), "bin", "iPhone", "Release");
 			var dirInfo = new System.IO.DirectoryInfo(directory);
 			var all = new List<System.IO.DirectoryInfo>(dirInfo.EnumerateDirectories("*.app"));
 			all.Sort((a, b) => b.CreationTime.CompareTo(a.CreationTime));

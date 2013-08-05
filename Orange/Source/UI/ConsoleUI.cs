@@ -62,7 +62,8 @@ namespace Orange
 				WriteHelpAndExit();
 			}
 			if (DoesNeedSvnUpdate()) {
-				SolutionBuilder.SvnUpdate();
+				var builder = new SolutionBuilder(The.Workspace.ActivePlatform);
+				builder.SvnUpdate();
 			}
 			The.Workspace.AssetFiles.Rescan();
 			commandObj.Action();

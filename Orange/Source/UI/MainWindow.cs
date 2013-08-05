@@ -121,7 +121,8 @@ namespace Orange
 				try {
 					ClearLog();
 					if (DoesNeedSvnUpdate()) {
-						SolutionBuilder.SvnUpdate();
+						var builder = new SolutionBuilder(The.Workspace.ActivePlatform);
+						builder.SvnUpdate();
 					}
 					The.Workspace.AssetFiles.Rescan();
 					action();
