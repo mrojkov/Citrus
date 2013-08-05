@@ -126,8 +126,6 @@
     <Compile Include="Source\UI\MainWindow.cs" />
     <Compile Include="Source\The.cs" />
     <Compile Include="Source\Workspace.cs" />
-    <Compile Include="bin\Mac\Release\Api.cs" />
-    <Compile Include="Source\Toolbox.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Orange.ico" />
@@ -188,6 +186,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="bin\Mac\Release\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
