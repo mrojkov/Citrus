@@ -22,7 +22,9 @@ namespace Orange
 #elif MAC
 			CsprojSynchronization.SynchronizeProject(Path.Combine(path, "Orange.Mac.csproj"));
 #endif
-			builder.Build();
+			if (builder.Build()) {
+				Subversion.Commit(path, "");
+			}
 		}
 	}
 }
