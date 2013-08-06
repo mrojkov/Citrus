@@ -32,6 +32,11 @@ namespace Orange
 				uploadRequest.AddParameter("api_token", apiToken);
 				uploadRequest.AddParameter("team_token", teamToken);
 				uploadRequest.AddParameter("notes", notes);
+				bool notify = The.Workspace.ProjectJson.GetBool("TestFlight/Notify");
+				if (notify) {
+					uploadRequest.AddParameter("notify", "true");
+					uploadRequest.AddParameter("distribution_lists", The.Workspace.ProjectJson.GetBool("DistributionLists"));
+				}
 				uploadRequest.AddFile("file", ipaPath);
 
 				IRestResponse response = null;
