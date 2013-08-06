@@ -15,6 +15,8 @@ namespace Orange
 		[MenuItem("Publish to TestFlight")]
 		public static void PublishTestFlightAction()
 		{
+			string notifyX = The.Workspace.ProjectJson["TestFlight/Notify"] as string;
+			Console.WriteLine("XXXXXXXXXXXXXXXXX '{0}'", notifyX);
 			AssetCooker.CookForActivePlatform();
 			// XXX
 			// if (Actions.BuildGame()) {

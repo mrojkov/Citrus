@@ -85,7 +85,7 @@ namespace Orange
 			Console.WriteLine("------------- Cleanup Game Application -------------");
 			string app, args, slnFile;
 #if MAC
-			app = "/Applications/MonoDevelop.app/Contents/MacOS/mdtool";
+			app = "/Applications/Xamarin Studio.app/Contents/MacOS/mdtool";
 			if (platform == TargetPlatform.iOS) {
 				slnFile = Path.Combine(projectDirectory, projectName + ".iOS.sln");
 				args = String.Format("build \"{0}\" -t:Clean -c:\"Release|iPhone\"", slnFile);
