@@ -15,8 +15,6 @@ namespace Orange
 		[MenuItem("Publish to TestFlight")]
 		public static void PublishTestFlightAction()
 		{
-			string notifyX = The.Workspace.ProjectJson["TestFlight/Notify"].ToString();
-			Console.WriteLine("XXXXXXXXXXXXXXXXX '{0}'", notifyX);
 			AssetCooker.CookForActivePlatform();
 			// XXX
 			// if (Actions.BuildGame()) {
@@ -36,8 +34,9 @@ namespace Orange
 				uploadRequest.AddParameter("notes", notes);
 				bool notify = The.Workspace.ProjectJson.GetBool("TestFlight/Notify");
 				if (notify) {
+					var distributionLists = The.Workspace.ProjectJson["TestFlight/DistributionLists"];
 					uploadRequest.AddParameter("notify", "true");
-					uploadRequest.AddParameter("distribution_lists", The.Workspace.ProjectJson.GetBool("DistributionLists"));
+					uploadRequest.AddParameter("distribution_lists", distributionLists);
 				}
 				uploadRequest.AddFile("file", ipaPath);
 
