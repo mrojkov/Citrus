@@ -15,6 +15,7 @@ namespace Orange
 		[MenuItem("Publish to TestFlight")]
 		public static void PublishTestFlightAction()
 		{
+			AssetCooker.CookForActivePlatform();
 			// XXX
 			// if (Actions.BuildGame()) {
 			Actions.BuildGame();
