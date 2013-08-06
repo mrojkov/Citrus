@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Orange
 {
-	static class Process
+	public static class Process
 	{
 		public enum Options
 		{
