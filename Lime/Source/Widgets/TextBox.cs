@@ -9,11 +9,13 @@ namespace Lime
 	[ProtoContract]
 	public class TextBox : Widget
 	{
+		private string text;
+
 		[ProtoMember(1)]
 		public SerializableFont Font = new SerializableFont();
 
 		[ProtoMember(2)]
-		public override string Text { get; set; }
+		public override string Text { get { return text ?? ""; } set { text = value; } }
 
 		[ProtoMember(3)]
 		public int MaxTextLength = 50;
