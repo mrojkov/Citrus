@@ -40,6 +40,14 @@ namespace Lime
 
 		int caretBlinkPhase;
 
+		[ProtoMember(10)]
+		public bool Enabled { get; set; }
+
+		public TextBox()
+		{
+			Enabled = true;
+		}
+
 		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (GloballyVisible) {
@@ -54,20 +62,28 @@ namespace Lime
 
 		public override void Update(int delta)
 		{
-			if (World.Instance.ActiveTextWidget == null) {
-				World.Instance.ActiveTextWidget = this;
+			var world = World.Instance;
+			if (!Enabled) {
+				if (world.ActiveTextWidget == this) {
+					world.ActiveTextWidget = null;
+				}
+				base.Update(delta);
+			} else {
+				if (world.ActiveTextWidget == null) {
+					world.ActiveTextWidget = this;
+				}
+				if (Input.WasKeyPressed(Key.Mouse0) && HitTest(Input.MousePosition)) {
+					world.ActiveTextWidget = this;
+				}
+				base.Update(delta);
+				if (world.ActiveTextWidget == this && Input.TextInput != null) {
+					ProcessInput();
+				}
+				if (world.ActiveTextWidget == this) {
+					world.IsActiveTextWidgetUpdated = true;
+				}
+				caretBlinkPhase += delta;
 			}
-			if (Input.WasKeyPressed(Key.Mouse0) && HitTest(Input.MousePosition)) {
-				World.Instance.ActiveTextWidget = this;
-			}
-			base.Update(delta);
-			if (World.Instance.ActiveTextWidget == this && Input.TextInput != null) {
-				ProcessInput();
-			}
-			if (World.Instance.ActiveTextWidget == this) {
-				World.Instance.IsActiveTextWidgetUpdated = true;
-			}
-			caretBlinkPhase += delta;
 		}
 
 		private void ProcessInput()
