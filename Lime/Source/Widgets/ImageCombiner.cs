@@ -167,7 +167,7 @@ namespace Lime
 					if (arg1.GloballyVisible && arg2.GloballyVisible) {
 						if (arg1.GetTexture() != null && arg2.GetTexture() != null) {
 							Renderer.Transform1 = Parent.AsWidget.LocalToWorldTransform;
-							Renderer.Blending = Blending.Alpha;
+							Renderer.Blending = Parent.AsWidget.GlobalBlending;
 							RenderHelper(arg1, arg2);
 						}
 					}
