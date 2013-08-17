@@ -11,13 +11,10 @@ namespace Orange
 		public static void BuildAndRunAction()
 		{
 			AssetCooker.CookForActivePlatform();
-			// XXX
-			// Temporally we disabled error checking while those bug in the mdtool isn't fixed
-			// if (
-			BuildGame();
-			The.UI.ScrollLogToEnd();
-			RunGame();
-			//}
+			if (BuildGame()) {
+				The.UI.ScrollLogToEnd();
+				RunGame();
+			}
 		}
 
 		public static bool BuildGame()

@@ -15,13 +15,9 @@ namespace Kill3.OrangePlugin
 			}
 			AssetCooker.Cook(TargetPlatform.iOS);
 			var builder = new Orange.SolutionBuilder(TargetPlatform.iOS);
-			// XXX 
-			// Temporaly omit error checking cause of a bug in mdtool
-			// if (builder.Build()) {
 			var output = new StringBuilder();
 			builder.Clean();
-			builder.Build(output);
-			if (true) {
+			if (builder.Build(output)) {
 				The.UI.ScrollLogToEnd();
 				string allText = output.ToString();
 				foreach (var line in allText.Split('\n')) {

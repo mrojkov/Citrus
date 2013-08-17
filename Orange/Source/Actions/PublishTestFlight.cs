@@ -16,10 +16,7 @@ namespace Orange
 		public static void PublishTestFlightAction()
 		{
 			AssetCooker.CookForActivePlatform();
-			// XXX
-			// if (Actions.BuildGame()) {
-			Actions.BuildGame();
-			if (true) {
+			if (Actions.BuildGame()) {
 				var apiToken = The.Workspace.ProjectJson["TestFlight/ApiToken"];
 				var teamToken = The.Workspace.ProjectJson["TestFlight/TeamToken"];
 				var notes = The.Workspace.ProjectJson["BuildNotes"];
