@@ -92,6 +92,7 @@
     <Compile Include="Source\Actions\UpdateDictionaryTxt.cs" />
     <Compile Include="Source\Actions\UpdateXCodeProject.cs" />
     <Compile Include="Source\Actions\UpgradeOrange.cs" />
+    <Compile Include="Source\PluginInitializationAttribute.cs" />
     <Compile Include="Source\CsprojSynchronization\CsprojSynchronization.cs" />
     <Compile Include="Source\Toolbox\Json.cs" />
     <Compile Include="Source\Toolbox\Process.cs" />

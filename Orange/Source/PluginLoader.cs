@@ -60,11 +60,22 @@ namespace Orange
 				var assembly = LoadAssembly(pluginAssembly);
 				CurrentPlugin = assembly;
 				if (!LoadedPlugins.Contains(assembly)) {
+					DoPluginInitialization(assembly);
 					The.MenuController.CreateAssemblyMenuItems(assembly);
 				} else {
 					The.UI.RefreshMenu();
 				}
 				LoadedPlugins.Add(assembly);
+			}
+		}
+
+		public static void DoPluginInitialization(System.Reflection.Assembly assembly)
+		{
+			foreach (var method in assembly.GetAllMethodsWithAttribute(typeof(PluginInitializationAttribute))) {
+				if (!method.IsStatic) {
+					new System.Exception(string.Format("'{0}' must be a static method", method.Name));
+				}
+				method.Invoke(null, null);
 			}
 		}
 

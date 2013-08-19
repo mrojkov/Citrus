@@ -47,17 +47,13 @@ namespace Orange
 
 		private static IEnumerable<MenuItem> ScanForMenuItems(System.Reflection.Assembly assembly)
 		{
-			foreach (var type in assembly.GetTypes()) {
-				foreach (var method in type.GetMethods()) {
-					var attrs = method.GetCustomAttributes(typeof(MenuItemAttribute), false);
-					if (attrs.Length > 0) {
-						if (!method.IsStatic || method.GetParameters().Length > 0) {
-							throw new Lime.Exception("MenuItemAttribute is valid only for static parameterless methods");
-						}
-						var attr = attrs[0] as MenuItemAttribute;
-						yield return CreateMenuItem(method, assembly, attr);
-					}
+			foreach (var method in assembly.GetAllMethodsWithAttribute(typeof(MenuItemAttribute))) {
+				if (!method.IsStatic || method.GetParameters().Length > 0) {
+					throw new Lime.Exception("MenuItemAttribute is valid only for static parameterless methods");
 				}
+				var attrs = method.GetCustomAttributes(typeof(MenuItemAttribute), false);
+				var attr = attrs[0] as MenuItemAttribute;
+				yield return CreateMenuItem(method, assembly, attr);
 			}
 		}
 

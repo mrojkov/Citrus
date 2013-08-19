@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 
 namespace Orange
 {
@@ -51,6 +53,18 @@ namespace Orange
 				return "iOS";
 			default:
 				throw new Lime.Exception("Invalid target platform");
+			}
+		}
+
+		public static IEnumerable<MethodInfo> GetAllMethodsWithAttribute(this Assembly assembly, Type attributeType)
+		{
+			foreach (var type in assembly.GetTypes()) {
+				var allMethods = type.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Public);
+				foreach (var method in allMethods
+					.Where(m => m.GetCustomAttributes(attributeType, false).Length > 0)
+					.ToArray()) {
+					yield return method;
+				}
 			}
 		}
 	}
