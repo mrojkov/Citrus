@@ -59,8 +59,8 @@ namespace Orange
 			using (new DirectoryChanger(Path.GetDirectoryName(pluginAssembly))) {
 				var assembly = LoadAssembly(pluginAssembly);
 				CurrentPlugin = assembly;
+				DoPluginInitialization(assembly);
 				if (!LoadedPlugins.Contains(assembly)) {
-					DoPluginInitialization(assembly);
 					The.MenuController.CreateAssemblyMenuItems(assembly);
 				} else {
 					The.UI.RefreshMenu();
@@ -81,10 +81,16 @@ namespace Orange
 
 		private static Assembly LoadAssembly(string assemblyDll)
 		{
+			if (!File.Exists(assemblyDll)) {
+				Console.WriteLine("Warning: missing assembly {0}", Path.GetFileName(assemblyDll));
+				return null;
+			}
 			Console.WriteLine("Loaded assembly: {0}", Path.GetFileName(assemblyDll));
-			byte[] readAllBytes = File.ReadAllBytes(assemblyDll);
-			var assembly = Assembly.Load(readAllBytes);
-			return assembly;
+			return Assembly.LoadFrom(assemblyDll);
+			// Non blocking version of assembly load
+			//byte[] readAllBytes = File.ReadAllBytes(assemblyDll);
+			//var assembly = Assembly.Load(readAllBytes);
+			//return assembly;
 		}
 	}
 }

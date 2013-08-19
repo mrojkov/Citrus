@@ -17,7 +17,7 @@ namespace Orange
 
 	public partial class HotSceneImporter
 	{
-		HotLexer lexer;
+		protected HotLexer lexer;
 		protected List<KnownActorType> knownActorTypes;
 		
 		public HotSceneImporter(string path)
@@ -31,9 +31,14 @@ namespace Orange
 			}
 		}
 
+		public virtual ProtoBuf.Meta.RuntimeTypeModel CreateTypeModel()
+		{
+			return Lime.Serialization.CreateSerializer();
+		}
+
 		#region LimeParse
 
-		void ParseActorProperty(Node node, string name)
+		protected void ParseActorProperty(Node node, string name)
 		{
 			switch (name) {
 			case "Name":
@@ -85,7 +90,7 @@ namespace Orange
 			}
 		}
 
-		void ParseGraphicProperty(Node node, string name)
+		protected void ParseGraphicProperty(Node node, string name)
 		{
 			Widget widget = (Widget)node;
 			switch (name) {
@@ -135,7 +140,7 @@ namespace Orange
 			}
 		}
 
-		void ParseImageProperty(Node node, string name)
+		protected void ParseImageProperty(Node node, string name)
 		{
 			Image img = (Image)node;
 			switch (name) {
@@ -155,7 +160,7 @@ namespace Orange
 			}
 		}
 
-		void ParseTextProperty(Node node, string name)
+		protected void ParseTextProperty(Node node, string name)
 		{
 			SimpleText text = (SimpleText)node;
 			switch (name) {
@@ -189,7 +194,7 @@ namespace Orange
 			}
 		}
 
-		void ParseParticleTemplateProperty(Node node, string name)
+		protected void ParseParticleTemplateProperty(Node node, string name)
 		{
 			ParticleModifier pm = (ParticleModifier)node;
 			switch (name) {
@@ -241,7 +246,7 @@ namespace Orange
 			}
 		}
 
-		void ParseParticlesMagnetProperty(Node node, string name)
+		protected void ParseParticlesMagnetProperty(Node node, string name)
 		{
 			ParticlesMagnet magnet = (ParticlesMagnet)node;
 			switch (name) {
@@ -260,7 +265,7 @@ namespace Orange
 			}
 		}
 
-		void ParseParticleEmitter2Property(Node node, string name)
+		protected void ParseParticleEmitter2Property(Node node, string name)
 		{
 			ParticleEmitter emitter = (ParticleEmitter)node;
 			switch (name) {
@@ -348,7 +353,7 @@ namespace Orange
 			}
 		}
 
-		void ParseSceneProperty(Node node, string name)
+		protected void ParseSceneProperty(Node node, string name)
 		{
 			Frame frame = (Frame)node;
 			switch (name) {
@@ -375,8 +380,8 @@ namespace Orange
 				break;
 			}
 		}
-		
-		void ParseMaskedEffectProperty(Node node, string name)
+
+		protected void ParseMaskedEffectProperty(Node node, string name)
 		{
 			ImageCombiner combiner = (ImageCombiner)node;
 			switch (name) {
@@ -411,7 +416,7 @@ namespace Orange
 			}
 		}
 
-		void ParseMeshPointProperty(Node node, string name)
+		protected void ParseMeshPointProperty(Node node, string name)
 		{
 			DistortionMeshPoint point = (DistortionMeshPoint)node;
 			switch (name) {
@@ -436,7 +441,7 @@ namespace Orange
 			}
 		}
 
-		void ParseBoneProperty(Node node, string name)
+		protected void ParseBoneProperty(Node node, string name)
 		{
 			Bone bone = (Bone)node;
 			switch (name) {
@@ -479,7 +484,7 @@ namespace Orange
 			}
 		}
 
-		void ParseAudioProperty(Node node, string name)
+		protected void ParseAudioProperty(Node node, string name)
 		{
 			Audio audio = (Audio)node;
 			switch (name) {
@@ -513,7 +518,7 @@ namespace Orange
 			}
 		}
 
-		void ParseMarkerProperty(Marker marker, string name)
+		protected void ParseMarkerProperty(Marker marker, string name)
 		{
 			switch (name) {
 			case "Name":
@@ -543,7 +548,7 @@ namespace Orange
 			}
 		}
 
-		Marker ParseMarker()
+		protected Marker ParseMarker()
 		{
 			string type = lexer.ParseQuotedString();
 			if (type != "Hot::Marker")
@@ -556,7 +561,7 @@ namespace Orange
 			return marker;
 		}
 
-		void ParseButtonProperty(Node node, string name)
+		protected void ParseButtonProperty(Node node, string name)
 		{
 			Button button = (Button)node;
 			switch (name) {
@@ -572,7 +577,7 @@ namespace Orange
 			}
 		}
 
-		void ParseNineGridProperty(Node node, string name)
+		protected void ParseNineGridProperty(Node node, string name)
 		{
 			NineGrid grid = (NineGrid)node;
 			switch (name) {
@@ -597,7 +602,7 @@ namespace Orange
 			}
 		}
 
-		void ParseSplinePointProperty(Node node, string name)
+		protected void ParseSplinePointProperty(Node node, string name)
 		{
 			SplinePoint point = (SplinePoint)node;
 			switch (name) {
@@ -624,8 +629,8 @@ namespace Orange
 				break;
 			}
 		}
-		
-		void ParseGearProperty(Node node, string name)
+
+		protected void ParseGearProperty(Node node, string name)
 		{
 			SplineGear gear = (SplineGear)node;
 			switch (name) {
@@ -644,7 +649,7 @@ namespace Orange
 			}
 		}
 
-		void ParseSplineProperty(Node node, string name)
+		protected void ParseSplineProperty(Node node, string name)
 		{
 			switch (name) {
 			default:
@@ -653,7 +658,7 @@ namespace Orange
 			}
 		}
 
-		void ParseSliderProperty(Node node, string name)
+		protected void ParseSliderProperty(Node node, string name)
 		{
 			Slider slider = (Slider)node;
 			switch (name) {
@@ -675,7 +680,7 @@ namespace Orange
 			}
 		}
 
-		void ParseTextStyleProperty(Node node, string name)
+		protected void ParseTextStyleProperty(Node node, string name)
 		{
 			TextStyle style = (TextStyle)node;
 			switch (name) {
@@ -717,7 +722,7 @@ namespace Orange
 				break;
 			}
 		}
-		void ParseRichTextProperty(Node node, string name)
+		protected void ParseRichTextProperty(Node node, string name)
 		{
 			RichText text = (RichText)node;
 			switch (name) {
@@ -736,7 +741,7 @@ namespace Orange
 			}
 		}
 
-		void ParseEditProperty(Node node, string name)
+		protected void ParseEditProperty(Node node, string name)
 		{
 			TextBox textBox = (TextBox)node;
 			switch (name) {
@@ -767,7 +772,7 @@ namespace Orange
 			}
 		}
 
-		void ParseFolderBeginProperty(Node node, string name)
+		protected void ParseFolderBeginProperty(Node node, string name)
 		{
 			switch (name) {
 			case "Expanded":
@@ -779,7 +784,7 @@ namespace Orange
 			}
 		}
 
-		void ParseFolderEndProperty(Node node, string name)
+		protected void ParseFolderEndProperty(Node node, string name)
 		{
 			switch (name) {
 			default:
