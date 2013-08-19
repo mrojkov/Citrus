@@ -150,10 +150,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Kumquat\Kumquat.Win.csproj">
-      <Project>{09EDE517-07B3-42E0-A65C-4943900C240B}</Project>
-      <Name>Kumquat.Win</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Lemon\Lemon.Win.csproj">
       <Project>{538E41E4-725C-4521-BCF3-A5591A1A3AFD}</Project>
       <Name>Lemon.Win</Name>

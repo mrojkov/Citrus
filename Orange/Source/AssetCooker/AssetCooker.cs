@@ -124,7 +124,7 @@ namespace Orange
 					return true;
 				});
 				SyncUpdated(".scene", ".scene", (srcPath, dstPath) => {
-					var importer = new HotSceneImporter(srcPath);
+					var importer = HotSceneImporterFactory.CreateImporter(srcPath);
 					var node = importer.ParseNode();
 					Lime.Serialization.WriteObjectToBundle<Lime.Node>(assetsBundle, dstPath, node);
 					return true;

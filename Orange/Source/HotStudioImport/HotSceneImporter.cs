@@ -1,13 +1,24 @@
 using System.IO;
 using Lime;
-using Kumquat;
+using System.Collections.Generic;
 
 namespace Orange
 {
+	public static class HotSceneImporterFactory
+	{
+		public static System.Type ImporterClass = typeof(HotSceneImporter);
+
+		public static HotSceneImporter CreateImporter(string srcPath)
+		{
+			var ctr = ImporterClass.GetConstructor(new System.Type[] { typeof(string) });
+			return ctr.Invoke(new object[] { srcPath }) as HotSceneImporter;
+		}
+	}
+
 	public partial class HotSceneImporter
 	{
 		HotLexer lexer;
-		KnownActorType[] knownActorTypes;
+		protected List<KnownActorType> knownActorTypes;
 		
 		public HotSceneImporter(string path)
 		{
@@ -779,7 +790,7 @@ namespace Orange
 
 		public delegate void ActorPropReader(Node node, string name);
 
-		struct KnownActorType 
+		public struct KnownActorType 
 		{
 			public string ActorClass;
 			public string NodeClass;
@@ -819,71 +830,9 @@ namespace Orange
 
 		#endregion
 
-		#region KumquatParse
-
-		void ParseClickableProperty(Node node, string name)
+		protected virtual void RegisterKnownActorTypes()
 		{
-			Clickable clickable = (Clickable)node;
-			switch (name) {
-				case "Enable":
-					clickable.Enabled = lexer.ParseBool();
-					break;
-				case "CursorName":
-					clickable.CursorName = lexer.ParseQuotedString();
-					break;
-				default:
-					ParseSceneProperty(node, name);
-					break;
-			}
-		}
-
-		void ParseToolProperty(Node node, string name)
-		{
-			Tool tool = (Tool)node;
-			switch (name) {
-				case "Caption":
-					tool.Caption = lexer.ParseQuotedString();
-					break;
-				default:
-					ParseClickableProperty(node, name);
-					break;
-			}
-		}
-
-		void ParseAreaProperty(Node node, string name)
-		{
-			Area area = (Area)node;
-			switch (name) {
-				case "Tool":
-					area.Tool = lexer.ParseQuotedString();
-					break;
-				default:
-					ParseClickableProperty(node, name);
-					break;
-			}
-		}
-
-		void ParseExitAreaProperty(Node node, string name)
-		{
-			ExitArea exitArea = (ExitArea)node;
-			switch (name) {
-				case "ExitTo":
-					exitArea.ExitTo = lexer.ParseQuotedString();
-					break;
-				case "Caption":
-					exitArea.Caption = lexer.ParseQuotedString();
-					break;
-				default:
-					ParseClickableProperty(node, name);
-					break;
-			}
-		}
-
-		#endregion
-
-		void RegisterKnownActorTypes()
-		{
-			knownActorTypes = new KnownActorType[] {
+			knownActorTypes = new List<KnownActorType> {
 				new KnownActorType {ActorClass = "Hot::Scene", NodeClass = "Lime.Frame, Lime", PropReader = ParseSceneProperty},
 				new KnownActorType {ActorClass = "Hot::RootScene", NodeClass = "Lime.Frame, Lime", PropReader = ParseSceneProperty},
 				new KnownActorType {ActorClass = "Hot::Visual", NodeClass = "Lime.Frame, Lime", PropReader = ParseSceneProperty},
@@ -910,12 +859,6 @@ namespace Orange
 				new KnownActorType {ActorClass = "Hot::RichText", NodeClass = "Lime.RichText, Lime", PropReader = ParseRichTextProperty},
 				new KnownActorType {ActorClass = "Hot::TextStyle", NodeClass = "Lime.TextStyle, Lime", PropReader = ParseTextStyleProperty},
 				new KnownActorType {ActorClass = "Hot::Edit", NodeClass = "Lime.TextBox, Lime", PropReader = ParseEditProperty},
-
-				// Kumquat:
-				new KnownActorType {ActorClass = "Clickable", NodeClass = "Kumquat.Clickable, Kumquat", PropReader = ParseClickableProperty},
-				new KnownActorType {ActorClass = "Tool", NodeClass = "Kumquat.Tool, Kumquat", PropReader = ParseToolProperty},
-				new KnownActorType {ActorClass = "Area", NodeClass = "Kumquat.Area, Kumquat", PropReader = ParseAreaProperty},
-				new KnownActorType {ActorClass = "ExitArea", NodeClass = "Kumquat.ExitArea, Kumquat", PropReader = ParseExitAreaProperty}
 			};
 		}
 	}
