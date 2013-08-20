@@ -126,13 +126,7 @@ namespace Orange
 				SyncUpdated(".scene", ".scene", (srcPath, dstPath) => {
 					var importer = HotSceneImporterFactory.CreateImporter(srcPath);
 					var node = importer.ParseNode();
-					var savedModel = Lime.Serialization.Serializer;
-					try {
-						Lime.Serialization.Serializer = importer.CreateTypeModel();
-						Lime.Serialization.WriteObjectToBundle<Lime.Node>(assetsBundle, dstPath, node);
-					} finally {
-						Lime.Serialization.Serializer = savedModel;
-					}
+					Lime.Serialization.WriteObjectToBundle<Lime.Node>(assetsBundle, dstPath, node);
 					return true;
 				});
 				SyncUpdated(".ogg", ".sound", (srcPath, dstPath) => {

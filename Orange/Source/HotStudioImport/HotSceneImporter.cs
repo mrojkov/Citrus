@@ -31,11 +31,6 @@ namespace Orange
 			}
 		}
 
-		public virtual ProtoBuf.Meta.RuntimeTypeModel CreateTypeModel()
-		{
-			return Lime.Serialization.CreateSerializer();
-		}
-
 		#region LimeParse
 
 		protected void ParseActorProperty(Node node, string name)

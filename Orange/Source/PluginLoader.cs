@@ -56,6 +56,9 @@ namespace Orange
 
 		private static void LoadPlugin(string pluginAssembly)
 		{
+			if (CurrentPlugin != null) {
+				DoPluginFinalization(CurrentPlugin);
+			}
 			using (new DirectoryChanger(Path.GetDirectoryName(pluginAssembly))) {
 				var assembly = LoadAssembly(pluginAssembly);
 				CurrentPlugin = assembly;
@@ -69,7 +72,17 @@ namespace Orange
 			}
 		}
 
-		public static void DoPluginInitialization(System.Reflection.Assembly assembly)
+		private static void DoPluginFinalization(System.Reflection.Assembly assembly)
+		{
+			foreach (var method in assembly.GetAllMethodsWithAttribute(typeof(PluginFinalizationAttribute))) {
+				if (!method.IsStatic) {
+					new System.Exception(string.Format("'{0}' must be a static method", method.Name));
+				}
+				method.Invoke(null, null);
+			}			
+		}
+
+		private static void DoPluginInitialization(System.Reflection.Assembly assembly)
 		{
 			foreach (var method in assembly.GetAllMethodsWithAttribute(typeof(PluginInitializationAttribute))) {
 				if (!method.IsStatic) {
