@@ -30,8 +30,17 @@ namespace Orange
 				WriteHelpAndExit();
 			}
 			CreateMenuItems();
-			The.Workspace.Load();
+			OpenWorkspace(args);
 			RunCommand(Toolbox.GetCommandLineArg("--command"));
+		}
+
+		private static void OpenWorkspace(string[] args)
+		{
+			var projectFile = args[1];
+			if (!System.IO.File.Exists(projectFile)) {
+				throw new Lime.Exception("Project file '{0}' does not exist", projectFile);
+			}
+			The.Workspace.Open(projectFile);
 		}
 
 		void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
