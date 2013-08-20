@@ -69,7 +69,9 @@ namespace Orange
 		{
 			var config = WorkspaceConfig.Load();
 			Open(config.CitrusProject);
-			// XXX
+#if MAC
+			The.MainWindow.PlatformPicker.Active = TargetPlatform.iOS;			
+#endif
 			// The.MainWindow.PlatformPicker.Active = config.TargetPlatform;
 			// The.MainWindow.UpdateBeforeBuildCheckbox.Active = config.UpdateBeforeBuild;
 			// ActionPicker.Active = config.Action;
@@ -80,7 +82,6 @@ namespace Orange
 			var config = WorkspaceConfig.Load();
 			config.CitrusProject = ProjectFile;
 			config.TargetPlatform = (int)ActivePlatform;
-			// XXX
 			// config.UpdateBeforeBuild = The.MainWindow.UpdateBeforeBuildCheckbox.Active;
 			// config.Action = ActionPicker.Active;
 			WorkspaceConfig.Save(config);
