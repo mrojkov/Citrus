@@ -118,6 +118,8 @@
     <Compile Include="Source\Toolbox\Subversion.cs" />
     <Compile Include="Source\Toolbox\Toolbox.cs" />
     <Compile Include="Source\Actions\UpdateXCodeProject.cs" />
+    <Compile Include="Source\PluginFinalizationAttribute.cs" />
+    <Compile Include="Source\PluginInitializationAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lime\Lime.Mac.csproj">
@@ -127,10 +129,6 @@
     <ProjectReference Include="..\Lemon\Lemon.Mac.csproj">
       <Project>{4604AA2E-129F-4814-AD0D-8BA35346ECC4}</Project>
       <Name>Lemon.Mac</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Kumquat\Kumquat.Mac.csproj">
-      <Project>{09EDE517-07B3-42E0-A65C-4943900C240B}</Project>
-      <Name>Kumquat.Mac</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

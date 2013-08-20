@@ -69,9 +69,9 @@ namespace Orange
 		{
 			var config = WorkspaceConfig.Load();
 			Open(config.CitrusProject);
-#if MAC
-			The.MainWindow.PlatformPicker.Active = TargetPlatform.iOS;			
-#endif
+//#if MAC
+			//The.UI.PlatformPicker.Active = TargetPlatform.iOS;			
+//#endif
 			// The.MainWindow.PlatformPicker.Active = config.TargetPlatform;
 			// The.MainWindow.UpdateBeforeBuildCheckbox.Active = config.UpdateBeforeBuild;
 			// ActionPicker.Active = config.Action;
