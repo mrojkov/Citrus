@@ -50,7 +50,7 @@ namespace Orange
 
 		public bool Build(StringBuilder output = null)
 		{
-			Console.WriteLine("------------- Building Game -------------");
+			Console.WriteLine("------------- Building Application -------------");
 			CsprojSynchronization.SynchronizeAll();
 			string app, args, slnFile;
 #if MAC
