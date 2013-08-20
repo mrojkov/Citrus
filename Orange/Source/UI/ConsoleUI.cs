@@ -36,7 +36,7 @@ namespace Orange
 
 		private static void OpenWorkspace(string[] args)
 		{
-			var projectFile = args[1];
+			var projectFile = args[2];
 			if (!System.IO.File.Exists(projectFile)) {
 				throw new Lime.Exception("Project file '{0}' does not exist", projectFile);
 			}
