@@ -98,7 +98,7 @@ namespace Orange
 				Console.WriteLine("Warning: missing assembly {0}", Path.GetFileName(assemblyDll));
 				return null;
 			}
-			Console.WriteLine("Loaded assembly: {0}", Path.GetFileName(assemblyDll));
+			Console.WriteLine("Loaded assembly: {0}", assemblyDll);
 			return Assembly.LoadFrom(assemblyDll);
 			// Non blocking version of assembly load
 			//byte[] readAllBytes = File.ReadAllBytes(assemblyDll);
