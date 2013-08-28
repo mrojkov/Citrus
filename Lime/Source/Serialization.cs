@@ -21,7 +21,7 @@ namespace Lime
 		}
 		
 #if iOS
-		public static ProtoBuf.Meta.TypeModel Serializer = null; // ProtoBuf.Meta.RuntimeTypeModel.Default;
+		public static ProtoBuf.Meta.TypeModel Serializer = null;
 #else
 		public static ProtoBuf.Meta.TypeModel Serializer = CreateSerializer();
 #endif
@@ -36,8 +36,21 @@ namespace Lime
 			return model;
 		}
 #endif
-		
-		static readonly Stack<Operation> opStack = new Stack<Operation>();
+		static class OperationStackCapsule
+		{
+			[ThreadStatic]
+			public static Stack<Operation> OpStack;
+		}
+
+		static Stack<Operation> opStack {
+			get
+			{
+				if (OperationStackCapsule.OpStack == null) {
+					OperationStackCapsule.OpStack = new Stack<Operation>();
+				}
+				return OperationStackCapsule.OpStack;
+			}
+		}
 		
 		public static string ShrinkPath(string path)
 		{
