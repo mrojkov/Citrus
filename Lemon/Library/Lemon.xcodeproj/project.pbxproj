@@ -29,8 +29,6 @@
 		278A4505148C6B5A007283B6 /* vorbisenc.h in Headers */ = {isa = PBXBuildFile; fileRef = 278A44CE148C6B5A007283B6 /* vorbisenc.h */; };
 		278A4506148C6B5A007283B6 /* vorbisfile.h in Headers */ = {isa = PBXBuildFile; fileRef = 278A44CF148C6B5A007283B6 /* vorbisfile.h */; };
 		278A4507148C6B5A007283B6 /* vorbisfile.h in Headers */ = {isa = PBXBuildFile; fileRef = 278A44CF148C6B5A007283B6 /* vorbisfile.h */; };
-		278A4508148C6B5A007283B6 /* Lemon.c in Sources */ = {isa = PBXBuildFile; fileRef = 278A44D0148C6B5A007283B6 /* Lemon.c */; };
-		278A4509148C6B5A007283B6 /* Lemon.c in Sources */ = {isa = PBXBuildFile; fileRef = 278A44D0148C6B5A007283B6 /* Lemon.c */; };
 		278A450A148C6B5A007283B6 /* bitwise.c in Sources */ = {isa = PBXBuildFile; fileRef = 278A44D2148C6B5A007283B6 /* bitwise.c */; };
 		278A450B148C6B5A007283B6 /* bitwise.c in Sources */ = {isa = PBXBuildFile; fileRef = 278A44D2148C6B5A007283B6 /* bitwise.c */; };
 		278A450C148C6B5A007283B6 /* framing.c in Sources */ = {isa = PBXBuildFile; fileRef = 278A44D3148C6B5A007283B6 /* framing.c */; };
@@ -55,8 +53,6 @@
 		278A451F148C6B5A007283B6 /* floor0.c in Sources */ = {isa = PBXBuildFile; fileRef = 278A44DD148C6B5A007283B6 /* floor0.c */; };
 		278A4520148C6B5A007283B6 /* floor1.c in Sources */ = {isa = PBXBuildFile; fileRef = 278A44DE148C6B5A007283B6 /* floor1.c */; };
 		278A4521148C6B5A007283B6 /* floor1.c in Sources */ = {isa = PBXBuildFile; fileRef = 278A44DE148C6B5A007283B6 /* floor1.c */; };
-		278A4522148C6B5A007283B6 /* info.c in Sources */ = {isa = PBXBuildFile; fileRef = 278A44DF148C6B5A007283B6 /* info.c */; };
-		278A4523148C6B5A007283B6 /* info.c in Sources */ = {isa = PBXBuildFile; fileRef = 278A44DF148C6B5A007283B6 /* info.c */; };
 		278A4524148C6B5A007283B6 /* ivorbiscodec.h in Headers */ = {isa = PBXBuildFile; fileRef = 278A44E0148C6B5A007283B6 /* ivorbiscodec.h */; };
 		278A4525148C6B5A007283B6 /* ivorbiscodec.h in Headers */ = {isa = PBXBuildFile; fileRef = 278A44E0148C6B5A007283B6 /* ivorbiscodec.h */; };
 		278A4526148C6B5A007283B6 /* ivorbisfile.h in Headers */ = {isa = PBXBuildFile; fileRef = 278A44E1148C6B5A007283B6 /* ivorbisfile.h */; };
@@ -93,6 +89,8 @@
 		278A4545148C6B5A007283B6 /* window.h in Headers */ = {isa = PBXBuildFile; fileRef = 278A44F0148C6B5A007283B6 /* window.h */; };
 		278A4546148C6B5A007283B6 /* window_lookup.h in Headers */ = {isa = PBXBuildFile; fileRef = 278A44F1148C6B5A007283B6 /* window_lookup.h */; };
 		278A4547148C6B5A007283B6 /* window_lookup.h in Headers */ = {isa = PBXBuildFile; fileRef = 278A44F1148C6B5A007283B6 /* window_lookup.h */; };
+		88979EE517CECEF70076343C /* OggDecoder.c in Sources */ = {isa = PBXBuildFile; fileRef = 88979EE317CECEF70076343C /* OggDecoder.c */; };
+		88979EEA17CED66C0076343C /* vorbis_info.c in Sources */ = {isa = PBXBuildFile; fileRef = 88979EE917CED66C0076343C /* vorbis_info.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -110,7 +108,6 @@
 		278A44CD148C6B5A007283B6 /* Makefile.am */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Makefile.am; sourceTree = "<group>"; };
 		278A44CE148C6B5A007283B6 /* vorbisenc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vorbisenc.h; sourceTree = "<group>"; };
 		278A44CF148C6B5A007283B6 /* vorbisfile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vorbisfile.h; sourceTree = "<group>"; };
-		278A44D0148C6B5A007283B6 /* Lemon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Lemon.c; sourceTree = "<group>"; };
 		278A44D2148C6B5A007283B6 /* bitwise.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bitwise.c; sourceTree = "<group>"; };
 		278A44D3148C6B5A007283B6 /* framing.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = framing.c; sourceTree = "<group>"; };
 		278A44D5148C6B5A007283B6 /* asm_arm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = asm_arm.h; sourceTree = "<group>"; };
@@ -123,7 +120,6 @@
 		278A44DC148C6B5A007283B6 /* config_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config_types.h; sourceTree = "<group>"; };
 		278A44DD148C6B5A007283B6 /* floor0.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = floor0.c; sourceTree = "<group>"; };
 		278A44DE148C6B5A007283B6 /* floor1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = floor1.c; sourceTree = "<group>"; };
-		278A44DF148C6B5A007283B6 /* info.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = info.c; sourceTree = "<group>"; };
 		278A44E0148C6B5A007283B6 /* ivorbiscodec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ivorbiscodec.h; sourceTree = "<group>"; };
 		278A44E1148C6B5A007283B6 /* ivorbisfile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ivorbisfile.h; sourceTree = "<group>"; };
 		278A44E2148C6B5A007283B6 /* lsp_lookup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lsp_lookup.h; sourceTree = "<group>"; };
@@ -142,6 +138,10 @@
 		278A44EF148C6B5A007283B6 /* window.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = window.c; sourceTree = "<group>"; };
 		278A44F0148C6B5A007283B6 /* window.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = window.h; sourceTree = "<group>"; };
 		278A44F1148C6B5A007283B6 /* window_lookup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = window_lookup.h; sourceTree = "<group>"; };
+		88979EE317CECEF70076343C /* OggDecoder.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = OggDecoder.c; path = Source/OggDecoder.c; sourceTree = "<group>"; };
+		88979EE417CECEF70076343C /* TheoraDecoder.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = TheoraDecoder.c; path = Source/TheoraDecoder.c; sourceTree = "<group>"; };
+		88979EE717CED2CB0076343C /* vorbis_info.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = vorbis_info.c; sourceTree = "<group>"; };
+		88979EE917CED66C0076343C /* vorbis_info.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = vorbis_info.c; path = Source/Tremor/vorbis_info.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -165,6 +165,9 @@
 		278A443A148C5A08007283B6 = {
 			isa = PBXGroup;
 			children = (
+				88979EE917CED66C0076343C /* vorbis_info.c */,
+				88979EE317CECEF70076343C /* OggDecoder.c */,
+				88979EE417CECEF70076343C /* TheoraDecoder.c */,
 				278A44BF148C6B5A007283B6 /* Source */,
 				278A44B3148C697D007283B6 /* Frameworks */,
 				278A4446148C5A08007283B6 /* Products */,
@@ -191,7 +194,6 @@
 			isa = PBXGroup;
 			children = (
 				278A44C0148C6B5A007283B6 /* Include */,
-				278A44D0148C6B5A007283B6 /* Lemon.c */,
 				278A44D1148C6B5A007283B6 /* Ogg */,
 				278A44D4148C6B5A007283B6 /* Tremor */,
 			);
@@ -253,6 +255,7 @@
 		278A44D4148C6B5A007283B6 /* Tremor */ = {
 			isa = PBXGroup;
 			children = (
+				88979EE717CED2CB0076343C /* vorbis_info.c */,
 				278A44D5148C6B5A007283B6 /* asm_arm.h */,
 				278A44D6148C6B5A007283B6 /* backends.h */,
 				278A44D7148C6B5A007283B6 /* block.c */,
@@ -263,7 +266,6 @@
 				278A44DC148C6B5A007283B6 /* config_types.h */,
 				278A44DD148C6B5A007283B6 /* floor0.c */,
 				278A44DE148C6B5A007283B6 /* floor1.c */,
-				278A44DF148C6B5A007283B6 /* info.c */,
 				278A44E0148C6B5A007283B6 /* ivorbiscodec.h */,
 				278A44E1148C6B5A007283B6 /* ivorbisfile.h */,
 				278A44E2148C6B5A007283B6 /* lsp_lookup.h */,
@@ -425,14 +427,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				278A4508148C6B5A007283B6 /* Lemon.c in Sources */,
 				278A450A148C6B5A007283B6 /* bitwise.c in Sources */,
 				278A450C148C6B5A007283B6 /* framing.c in Sources */,
 				278A4512148C6B5A007283B6 /* block.c in Sources */,
 				278A4516148C6B5A007283B6 /* codebook.c in Sources */,
 				278A451E148C6B5A007283B6 /* floor0.c in Sources */,
 				278A4520148C6B5A007283B6 /* floor1.c in Sources */,
-				278A4522148C6B5A007283B6 /* info.c in Sources */,
 				278A452A148C6B5A007283B6 /* mapping0.c in Sources */,
 				278A452C148C6B5A007283B6 /* mdct.c in Sources */,
 				278A4536148C6B5A007283B6 /* registry.c in Sources */,
@@ -448,14 +448,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				278A4509148C6B5A007283B6 /* Lemon.c in Sources */,
+				88979EEA17CED66C0076343C /* vorbis_info.c in Sources */,
+				88979EE517CECEF70076343C /* OggDecoder.c in Sources */,
 				278A450B148C6B5A007283B6 /* bitwise.c in Sources */,
 				278A450D148C6B5A007283B6 /* framing.c in Sources */,
 				278A4513148C6B5A007283B6 /* block.c in Sources */,
 				278A4517148C6B5A007283B6 /* codebook.c in Sources */,
 				278A451F148C6B5A007283B6 /* floor0.c in Sources */,
 				278A4521148C6B5A007283B6 /* floor1.c in Sources */,
-				278A4523148C6B5A007283B6 /* info.c in Sources */,
 				278A452B148C6B5A007283B6 /* mapping0.c in Sources */,
 				278A452D148C6B5A007283B6 /* mdct.c in Sources */,
 				278A4537148C6B5A007283B6 /* registry.c in Sources */,
@@ -510,6 +510,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
@@ -566,10 +567,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = (
-					armv6,
-					"$(ARCHS_STANDARD_32_BIT)",
-				);
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				DSTROOT = /tmp/Lemon_iOS.dst;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
@@ -599,10 +597,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = (
-					armv6,
-					"$(ARCHS_STANDARD_32_BIT)",
-				);
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				DSTROOT = /tmp/Lemon_iOS.dst;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;

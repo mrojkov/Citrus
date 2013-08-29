@@ -290,12 +290,15 @@ namespace Lime
 				decoder.Rewind();
 			}
 			if (totalRead > 0) {
-				AudioSystem.SuppressError("AudioChannel.FillupBuffer");
+				AudioSystem.SuppressError("AudioChannel.FillupBuffer (1)");
 				ALFormat format = (decoder.GetFormat() == AudioFormat.Stereo16) ? ALFormat.Stereo16 : ALFormat.Mono16;
 				AL.BufferData(buffer, format, decodedData, 
 					totalRead * decoder.GetBlockSize(), decoder.GetFrequency());
-				AL.GetError(); // Suppress any possible error
-				// AudioSystem.CheckError();
+				AudioSystem.SuppressError("AudioChannel.FillupBuffer (2)");
+				// XXXX
+				//if (Group == AudioChannelGroup.Music) {
+				//	Logger.Write("streaming music: {0}", decoder.GetCompressedSize());
+				//}
 				return true;
 			}
 			return false;

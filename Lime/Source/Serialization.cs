@@ -39,35 +39,35 @@ namespace Lime
 		static class OperationStackCapsule
 		{
 			[ThreadStatic]
-			public static Stack<Operation> OpStack;
+			public static Stack<Operation> stack;
 		}
 
-		static Stack<Operation> opStack {
+		static Stack<Operation> OperationStack {
 			get
 			{
-				if (OperationStackCapsule.OpStack == null) {
-					OperationStackCapsule.OpStack = new Stack<Operation>();
+				if (OperationStackCapsule.stack == null) {
+					OperationStackCapsule.stack = new Stack<Operation>();
 				}
-				return OperationStackCapsule.OpStack;
+				return OperationStackCapsule.stack;
 			}
 		}
 		
 		public static string ShrinkPath(string path)
 		{
-			if (opStack.Count == 0) {
+			if (OperationStack.Count == 0) {
 				return path;
 			}
-			if (opStack.Peek().Type == OperationType.Clone)
+			if (OperationStack.Peek().Type == OperationType.Clone)
 				return path;
 			return '/' + path;
 		}
 
 		public static string ExpandPath(string path)
 		{
-			if (opStack.Count == 0) {
+			if (OperationStack.Count == 0) {
 				return path;
 			}
-			if (opStack.Peek().Type == OperationType.Clone)
+			if (OperationStack.Peek().Type == OperationType.Clone)
 				return path;
 			string result;
 			if (string.IsNullOrEmpty(path))
@@ -75,7 +75,7 @@ namespace Lime
 			else if (path[0] == '/')
 				result = path.Substring(1);
 			else {
-				string p = opStack.Peek().SerializationPath;
+				string p = OperationStack.Peek().SerializationPath;
 				result = Path.Combine(Path.GetDirectoryName(p), path);
 			}
 			return result;
@@ -83,11 +83,11 @@ namespace Lime
 
 		public static void WriteObject<T>(string path, Stream stream, T instance)
 		{
-			opStack.Push(new Operation { SerializationPath = path, Type = OperationType.Serialization });
+			OperationStack.Push(new Operation { SerializationPath = path, Type = OperationType.Serialization });
 			try {
 				Serializer.Serialize(stream, instance);
 			} finally {
-				opStack.Pop();
+				OperationStack.Pop();
 			}
 		}
 
@@ -108,21 +108,21 @@ namespace Lime
 
 		public static T DeepClone<T>(T obj)
 		{
-			opStack.Push(new Operation { Type = OperationType.Clone });
+			OperationStack.Push(new Operation { Type = OperationType.Clone });
 			try {
 				return (T)Serializer.DeepClone(obj);
 			} finally {
-				opStack.Pop();
+				OperationStack.Pop();
 			}
 		}
 
 		public static T ReadObject<T>(string path, Stream stream, object obj = null)
 		{
-			opStack.Push(new Operation { SerializationPath = path, Type = OperationType.Serialization });
+			OperationStack.Push(new Operation { SerializationPath = path, Type = OperationType.Serialization });
 			try {
 				return (T)Serializer.Deserialize(stream, obj, typeof(T));
 			} finally {
-				opStack.Pop();
+				OperationStack.Pop();
 			}
 		}
 

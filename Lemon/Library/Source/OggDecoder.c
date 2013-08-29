@@ -33,6 +33,6 @@ LEMON_API int OggGetFrequency(OggVorbis_File *vf)
 
 LEMON_API int OggGetChannels(OggVorbis_File *vf)
 {
-	return vf->vi->channels;
+ 	return vf->vi->channels;
 }
 

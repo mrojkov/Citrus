@@ -271,6 +271,9 @@ namespace Lime
 				channel.Pan = 0;
 				return LoadSoundToChannel(channel, path, looping, paused, fadeinTime);
 			}
+			if (channel == null && group == AudioChannelGroup.Music) {
+				Logger.Write("Failed to allocate a channel for music (priority {0})", priority);
+			}
 			return new Sound();
 		}
 
