@@ -22,6 +22,38 @@ namespace Lime
 
 	public static class AudioSystem
 	{
+		public struct ErrorChecker : IDisposable
+		{
+			string method;
+
+			public ErrorChecker(string method)
+			{
+				this.method = method;
+				AudioSystem.CheckError(">" + method);
+			}
+
+			void IDisposable.Dispose()
+			{
+				AudioSystem.CheckError("<" + method);
+			}
+		}
+
+		public struct ErrorSuppresser : IDisposable
+		{
+			string method;
+
+			public ErrorSuppresser(string method)
+			{
+				this.method = method;
+				AudioSystem.SuppressError(">" + method);
+			}
+
+			void IDisposable.Dispose()
+			{
+				AudioSystem.SuppressError("<" + method);
+			}
+		}
+
 #if OPENAL
 		static AudioContext context;
 #endif
@@ -307,7 +339,7 @@ namespace Lime
 #endif
 		}
 
-		public static void CheckError()
+		public static void CheckError(string method)
 		{
 #if OPENAL
 			var error = AL.GetError();
