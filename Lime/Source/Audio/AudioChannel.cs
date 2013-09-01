@@ -268,7 +268,7 @@ namespace Lime
 			// queue one buffer
 			int buffer = AcquireBuffer();
 			if (buffer != 0) {
-				if (FillupBuffer(buffer)) {
+				if (FillBuffer(buffer)) {
 					using (new AudioSystem.ErrorChecker("AudioChannel.UpdateHelper")) {
 						AL.SourceQueueBuffer(source, buffer);
 					}
@@ -286,7 +286,7 @@ namespace Lime
 			}
 		}
 
-		bool FillupBuffer(int buffer)
+		bool FillBuffer(int buffer)
 		{
 			int totalRead = 0;
 			int needToRead = BufferSize / decoder.GetBlockSize();
@@ -299,7 +299,7 @@ namespace Lime
 				decoder.Rewind();
 			}
 			if (totalRead > 0) {
-				using (new AudioSystem.ErrorSuppresser("AudioChannel.FillupBuffer")) {
+				using (new AudioSystem.ErrorSuppresser("AudioChannel.FillBuffer")) {
 					ALFormat format = (decoder.GetFormat() == AudioFormat.Stereo16) ? ALFormat.Stereo16 : ALFormat.Mono16;
 					AL.BufferData(buffer, format, decodedData,
 						totalRead * decoder.GetBlockSize(), decoder.GetFrequency());
