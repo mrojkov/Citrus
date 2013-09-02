@@ -236,5 +236,15 @@ namespace BigFish_iOS_SDK
 		[Export("showPrivacy")]
 		void ShowPrivacy();
 	}
+
+	[BaseType(typeof(NSObject), Name = "bfgutils")]
+	interface BfgUtils
+	{
+		[Static, Export("bfgUDID")]
+		string BfgUDID { get; }
+
+		[Static, Export("getMACAddress")]
+		string GetMACAddress { get; }
+	}
 }
 
