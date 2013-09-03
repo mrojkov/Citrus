@@ -6,7 +6,7 @@
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{6F0C1A51-492A-4E6E-B302-E212D441EBF3}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <RootNamespace>Orange</RootNamespace>
     <AssemblyName>Orange</AssemblyName>
     <IsWebBootstrapper>false</IsWebBootstrapper>
