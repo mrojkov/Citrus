@@ -795,6 +795,18 @@ namespace Orange
 			public string ActorClass;
 			public string NodeClass;
 			public ActorPropReader PropReader;
+
+			public static KnownActorType Generate(System.Type Type, ActorPropReader PropReader)
+			{
+				string actorClass = Type.Name;
+				string nodeClass = string.Format("{0}, {1}", Type.FullName, Type.Namespace);
+				KnownActorType result = new KnownActorType() {
+					ActorClass = actorClass,
+					NodeClass = nodeClass,
+					PropReader = PropReader
+				};
+				return result;
+			}
 		}
 		
 		public object CreateObject(string className)
