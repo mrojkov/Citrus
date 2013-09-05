@@ -143,25 +143,8 @@ namespace Lime
 			using (var memStream = new MemoryStream()) {
 				WriteObject(path, memStream, obj);
 				memStream.Flush();
-				int checkSum = ComputeHash(memStream.GetBuffer(), (int)memStream.Length);
+				int checkSum = Toolbox.ComputeHash(memStream.GetBuffer(), (int)memStream.Length);
 				return checkSum;
-			}
-		}
-
-		private static int ComputeHash(byte[] data, int length)
-		{
-			unchecked {
-				const int p = 16777619;
-				int hash = (int)2166136261;
-				for (int i = 0; i < length; i++) {
-					hash = (hash ^ data[i]) * p;
-				}
-				hash += hash << 13;
-				hash ^= hash >> 7;
-				hash += hash << 3;
-				hash ^= hash >> 17;
-				hash += hash << 5;
-				return hash;
 			}
 		}
 	}

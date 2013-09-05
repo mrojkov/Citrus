@@ -178,6 +178,47 @@ namespace Lime
 			}
 			ReadIndexTable();
 		}
+
+		public static int CalcBundleCheckSum(string bundlePath)
+		{
+			// It would be better read whole file by chunks
+			var contents = File.ReadAllBytes(bundlePath);
+			if (contents.Length < 8) {
+				return 0;
+			}
+			contents[4] = 0;
+			contents[5] = 0;
+			contents[6] = 0;
+			contents[7] = 0;
+			int checkSum = Toolbox.ComputeHash(contents, contents.Length);
+			return checkSum;
+		}
+
+		public static bool IsBundleCorrupted(string bundlePath)
+		{
+			using (var stream = new FileStream(bundlePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
+				if (stream.Length < 8) {
+					return true;
+				}
+				var reader = new BinaryReader(stream);
+				int sign = reader.ReadInt32();
+				int storedCheckSum = reader.ReadInt32();
+				int actualCheckSum = CalcBundleCheckSum(bundlePath);
+				return storedCheckSum != actualCheckSum;
+			}
+		}
+
+		public static void RefreshBundleCheckSum(string bundlePath)
+		{
+			int checkSum = CalcBundleCheckSum(bundlePath);
+			using (var stream = new FileStream(bundlePath, FileMode.Open, FileAccess.Write)) {
+				if (stream.Length > 8) {
+					stream.Seek(4, SeekOrigin.Begin);
+					var reader = new BinaryWriter(stream);
+					reader.Write(checkSum);
+				}
+			}
+		}
 		
 		private void MoveBlock(int offset, int size, int delta)
 		{
@@ -356,7 +397,7 @@ namespace Lime
 			if (signature != Signature) {
 				throw new Exception("Assets bundle has been corrupted");
 			}
-			reader.ReadInt32(); // reserved field
+			reader.ReadInt32(); // CheckSum
 			indexOffset = reader.ReadInt32();
 
 			stream.Seek(indexOffset, SeekOrigin.Begin);
