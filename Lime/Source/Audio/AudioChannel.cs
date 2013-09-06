@@ -119,6 +119,7 @@ namespace Lime
 				buffers = AL.GenBuffers(NumBuffers);
 				source = AL.GenSource();
 			}
+			Logger.Write("Allocated audio source: {0}", source);
 		}
 
 		public void Dispose()
@@ -126,14 +127,14 @@ namespace Lime
 			if (decoder != null) {
 				decoder.Dispose();
 			}
-			StopAndDeleteSource();
+			AL.SourceStop(source);
+			DeleteSource();
 			Marshal.FreeHGlobal(decodedData);
 		}
 
-		private void StopAndDeleteSource()
+		private void DeleteSource()
 		{
 			using (new AudioSystem.ErrorChecker("AudioChannel.StopAndDeleteSource")) {
-				AL.SourceStop(source);
 				AL.DeleteSource(source);
 				AL.DeleteBuffers(buffers);
 			}
@@ -156,8 +157,8 @@ namespace Lime
 					this.decoder.Dispose();
 				}
 				this.decoder = decoder;
-				StopAndDeleteSource();
-				AllocateSource();
+				//DeleteSource();
+				//AllocateSource();
 			}
 			if (this.sound != null) {
 				this.sound.Channel = NullAudioChannel.Instance;
@@ -313,13 +314,12 @@ namespace Lime
 			if (totalRead > 0) {
 				using (new AudioSystem.ErrorSuppresser("AudioChannel.FillBuffer")) {
 					ALFormat format = (decoder.GetFormat() == AudioFormat.Stereo16) ? ALFormat.Stereo16 : ALFormat.Mono16;
+					// XXX
+					//format = Mathf.RandomOf(ALFormat.Stereo16, ALFormat.Mono16);
+					//Logger.Write("{0} {1}", format.ToString(), totalRead * decoder.GetBlockSize());
 					AL.BufferData(buffer, format, decodedData,
 						totalRead * decoder.GetBlockSize(), decoder.GetFrequency());
 				}
-				// XXXX
-				//if (Group == AudioChannelGroup.Music) {
-				//	Logger.Write("streaming music: {0}", decoder.GetCompressedSize());
-				//}
 				return true;
 			}
 			return false;

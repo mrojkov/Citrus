@@ -45,6 +45,21 @@ namespace BigFish_iOS_SDK
 
 		[Export("productInfo")]
 		NSDictionary ProductInfo { get; }
+
+		[Export("quantity")]
+		int Quantity { get; }
+
+		[Export("receipt")]
+		NSData Receipt { get; }
+
+		[Export("sandbox")]
+		bool Sandbox { get; }
+
+		[Export("restore")]
+		bool Restore { get; }
+
+		[Export("success")]
+		bool Success { get; }
 	}
 
 	[BaseType(typeof(NSObject), Name = "bfgPurchase")]
