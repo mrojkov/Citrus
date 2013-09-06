@@ -164,6 +164,10 @@ namespace Lime
 
 		internal void Play(Sound sound, IAudioDecoder decoder, bool looping, bool paused, float fadeinTime)
 		{
+			var state = AL.GetSourceState(source);
+			if (state != ALSourceState.Initial && state != ALSourceState.Stopped) {
+				throw new Lime.Exception("AudioSource must be stopped before play");
+			}
 			lock (streamingSync) {
 				if (streaming) {
 					throw new Lime.Exception("Can't play on the channel because it is already being played");
@@ -173,10 +177,8 @@ namespace Lime
 					this.decoder.Dispose();
 				}
 				this.decoder = decoder;
-				queueHead = queueLength = 0;
-				DetachBuffers();
-				QueueBuffer(resumePlay: false);
 			}
+			DetachBuffers();
 			if (this.sound != null) {
 				this.sound.Channel = NullAudioChannel.Instance;
 			}
@@ -189,9 +191,13 @@ namespace Lime
 
 		private void DetachBuffers()
 		{
-			using (new AudioSystem.ErrorChecker("AudioChannel.DetachBuffers")) {
+			for (int i = 0; i < NumBuffers; i++) {
+				AL.SourceUnqueueBuffer(source);
+			}
+			using (new AudioSystem.ErrorSuppresser("AudioChannel.DetachBuffers")) {
 				AL.Source(source, ALSourcei.Buffer, 0);
 			}
+			queueHead = queueLength = 0;
 		}
 
 		public void Resume(float fadeinTime = 0)
