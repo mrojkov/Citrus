@@ -105,7 +105,22 @@ namespace Lime
 		public bool Locked { get; set; }
 
 		public bool Streaming { get { return streaming; } }
-		
+
+		public float Pitch
+		{
+			get { return pitch; }
+			set { SetPitch(value); }
+		}
+
+		public float Volume
+		{
+			get { return volume; }
+			set { SetVolume(value); }
+		}
+
+		// Not implemented yet
+		public float Pan { get; set; }
+
 		public AudioChannel(int index)
 		{
 			this.Id = index;
@@ -133,8 +148,10 @@ namespace Lime
 
 		private void DeleteSource()
 		{
-			using (new AudioSystem.ErrorChecker("AudioChannel.DeleteSource")) {
+			using (new AudioSystem.ErrorSuppresser("AL.DeleteSources")) {
 				AL.DeleteSource(source);
+			}
+			using (new AudioSystem.ErrorSuppresser("AL.DeleteBuffers")) {
 				AL.DeleteBuffers(buffers);
 			}
 		}
@@ -145,11 +162,8 @@ namespace Lime
 			}
 		}
 
-		int stereoMono = 0;
-
 		internal void Play(Sound sound, IAudioDecoder decoder, bool looping, bool paused, float fadeinTime)
 		{
-			stereoMono++;
 			lock (streamingSync) {
 				if (streaming) {
 					throw new Lime.Exception("Can't play on the channel because it is already being played");
@@ -159,8 +173,9 @@ namespace Lime
 					this.decoder.Dispose();
 				}
 				this.decoder = decoder;
-				//DeleteSource();
-				//AllocateSource();
+				queueHead = queueLength = 0;
+				DetachBuffers();
+				QueueBuffer(resumePlay: false);
 			}
 			if (this.sound != null) {
 				this.sound.Channel = NullAudioChannel.Instance;
@@ -169,6 +184,13 @@ namespace Lime
 			StartupTime = DateTime.Now;
 			if (!paused) {
 				Resume(fadeinTime);
+			}
+		}
+
+		private void DetachBuffers()
+		{
+			using (new AudioSystem.ErrorChecker("AudioChannel.DetachBuffers")) {
+				AL.Source(source, ALSourcei.Buffer, 0);
 			}
 		}
 
@@ -218,32 +240,22 @@ namespace Lime
 			}
 		}
 
-		public float Pitch
+		private void SetPitch(float value)
 		{
-			get { return pitch; }
-			set 
-			{
-				pitch = Mathf.Clamp(value, 0.0625f, 16);
-				using (new AudioSystem.ErrorChecker("AudioChannel.SetPitch")) {
-					AL.Source(source, ALSourcef.Pitch, pitch);
-				}
+			pitch = Mathf.Clamp(value, 0.0625f, 16);
+			using (new AudioSystem.ErrorChecker("AudioChannel.SetPitch")) {
+				AL.Source(source, ALSourcef.Pitch, pitch);
 			}
 		}
 
-		public float Volume
+		private void SetVolume(float value)
 		{
-			get { return volume; }
-			set
-			{
-				volume = Mathf.Clamp(value, 0, 1);
-				float gain = volume * AudioSystem.GetGroupVolume(Group) * fadeVolume;
-				using (new AudioSystem.ErrorChecker("AudioChannel.SetVolume")) {
-					AL.Source(source, ALSourcef.Gain, gain);
-				}
+			volume = Mathf.Clamp(value, 0, 1);
+			float gain = volume * AudioSystem.GetGroupVolume(Group) * fadeVolume;
+			using (new AudioSystem.ErrorChecker("AudioChannel.SetVolume")) {
+				AL.Source(source, ALSourcef.Gain, gain);
 			}
 		}
-
-		public float Pan { get; set; }
 
 		public void Bump()
 		{
@@ -255,7 +267,7 @@ namespace Lime
 			if (streaming) {
 				lock (streamingSync) {
 					if (streaming) {
-						UpdateHelper();
+						QueueBuffer(resumePlay: true);
 					}
 				}
 			}
@@ -275,7 +287,7 @@ namespace Lime
 				Stop(0.1f);
 		}
 
-		void UpdateHelper()
+		void QueueBuffer(bool resumePlay)
 		{
 			if (decoder == null) {
 				throw new InvalidOperationException("AudioChannel is streaming while decoder is not set");
@@ -292,12 +304,13 @@ namespace Lime
 					streaming = false;
 				}
 			}
-			// resume playing
-			switch (State) {
-			case ALSourceState.Stopped:
-			case ALSourceState.Initial:
-				AL.SourcePlay(source);
-				break;
+			if (resumePlay) {
+				switch (State) {
+					case ALSourceState.Stopped:
+					case ALSourceState.Initial:
+						AL.SourcePlay(source);
+						break;
+				}
 			}
 		}
 
@@ -316,9 +329,6 @@ namespace Lime
 			if (totalRead > 0) {
 				using (new AudioSystem.ErrorSuppresser("AudioChannel.FillBuffer")) {
 					ALFormat format = (decoder.GetFormat() == AudioFormat.Stereo16) ? ALFormat.Stereo16 : ALFormat.Mono16;
-					// XXX
-					format = (stereoMono % 2 == 0) ? ALFormat.Stereo16 : ALFormat.Mono16;
-					//Logger.Write("{0} {1}", format.ToString(), totalRead * decoder.GetBlockSize());
 					AL.BufferData(buffer, format, decodedData,
 						totalRead * decoder.GetBlockSize(), decoder.GetFrequency());
 				}
@@ -344,7 +354,7 @@ namespace Lime
 				queueHead = (queueHead + 1) % NumBuffers;
 			}
 		}
-
+		
 		int AcquireBuffer()
 		{
 			UnqueueBuffers();

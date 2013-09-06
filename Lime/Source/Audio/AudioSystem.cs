@@ -57,7 +57,6 @@ namespace Lime
 #if OPENAL
 		static AudioContext context;
 #endif
-		// static XRamExtension xram;
 		static List<AudioChannel> channels = new List<AudioChannel>();
 		static float[] groupVolumes = new float[2] {1, 1};
 
@@ -66,7 +65,7 @@ namespace Lime
 		static bool active = true;
 		static public bool SilentMode { get; private set; }
 
-		public static void Initialize(int numChannels = 3)
+		public static void Initialize(int numChannels = 16)
 		{
 #if OPENAL
 #if !iOS
@@ -79,7 +78,6 @@ namespace Lime
 #endif
 #endif
 			if (!HasError()) {
-				// xram = new XRamExtension();
 				for (int i = 0; i < numChannels; i++) {
 					channels.Add(new AudioChannel(i));
 				}
@@ -222,8 +220,6 @@ namespace Lime
 				sound.Loaded = true;
 				var stream = cache.OpenStream(path);
 				var decoder = AudioDecoderFactory.CreateDecoder(stream);
-				// XXX
-				Logger.Write("LoadSoundToChannel: {0} {1} {2}", path, decoder.GetFormat().ToString(), decoder.GetType().ToString());
 				channel.Play(sound, decoder, looping, paused, fadeinTime);
 			} else {
 				LoadSoundToChannelAsync(channel, path, looping, paused, fadeinTime, sound);
@@ -248,8 +244,6 @@ namespace Lime
 					if (stream != null) {
 						sound.Loaded = true;
 						var decoder = AudioDecoderFactory.CreateDecoder(stream);
-						// XXX
-						Logger.Write("LoadSoundToChannel: {0} {1} {2}", path, decoder.GetFormat().ToString(), decoder.GetType().ToString());
 						channel.Play(sound, decoder, looping, paused, fadeinTime);
 					}
 				});
@@ -277,7 +271,6 @@ namespace Lime
 					}
 				}
 			}
-// XXX Commented it, because it might be the cause of crash in AudioChannel.FillBuffer
 			// Trying to stop first non-locked channel in order of priority
 			foreach (var channel in channels) {
 				if (!channel.Locked && channels[0].Priority <= priority) {
