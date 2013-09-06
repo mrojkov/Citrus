@@ -119,7 +119,6 @@ namespace Lime
 				buffers = AL.GenBuffers(NumBuffers);
 				source = AL.GenSource();
 			}
-			Logger.Write("Allocated audio source: {0}", source);
 		}
 
 		public void Dispose()
@@ -134,7 +133,7 @@ namespace Lime
 
 		private void DeleteSource()
 		{
-			using (new AudioSystem.ErrorChecker("AudioChannel.StopAndDeleteSource")) {
+			using (new AudioSystem.ErrorChecker("AudioChannel.DeleteSource")) {
 				AL.DeleteSource(source);
 				AL.DeleteBuffers(buffers);
 			}
