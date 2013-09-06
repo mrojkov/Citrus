@@ -66,7 +66,7 @@ namespace Lime
 		static bool active = true;
 		static public bool SilentMode { get; private set; }
 
-		public static void Initialize(int numChannels = 32)
+		public static void Initialize(int numChannels = 3)
 		{
 #if OPENAL
 #if !iOS
@@ -278,13 +278,13 @@ namespace Lime
 				}
 			}
 // XXX Commented it, because it might be the cause of crash in AudioChannel.FillBuffer
-//			// Trying to stop first non-locked channel in order of priority
-//			foreach (var channel in channels) {
-//				if (!channel.Locked && channels[0].Priority <= priority) {
-//					channel.Stop();
-//					return channel;
-//				}
-//			}
+			// Trying to stop first non-locked channel in order of priority
+			foreach (var channel in channels) {
+				if (!channel.Locked && channels[0].Priority <= priority) {
+					channel.Stop();
+					return channel;
+				}
+			}
 			return null;
 		}
 

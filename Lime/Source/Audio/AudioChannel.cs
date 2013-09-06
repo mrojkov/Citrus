@@ -145,8 +145,11 @@ namespace Lime
 			}
 		}
 
+		int stereoMono = 0;
+
 		internal void Play(Sound sound, IAudioDecoder decoder, bool looping, bool paused, float fadeinTime)
 		{
+			stereoMono++;
 			lock (streamingSync) {
 				if (streaming) {
 					throw new Lime.Exception("Can't play on the channel because it is already being played");
@@ -156,8 +159,8 @@ namespace Lime
 					this.decoder.Dispose();
 				}
 				this.decoder = decoder;
-				DeleteSource();
-				AllocateSource();
+				//DeleteSource();
+				//AllocateSource();
 			}
 			if (this.sound != null) {
 				this.sound.Channel = NullAudioChannel.Instance;
@@ -314,7 +317,7 @@ namespace Lime
 				using (new AudioSystem.ErrorSuppresser("AudioChannel.FillBuffer")) {
 					ALFormat format = (decoder.GetFormat() == AudioFormat.Stereo16) ? ALFormat.Stereo16 : ALFormat.Mono16;
 					// XXX
-					//format = Mathf.RandomOf(ALFormat.Stereo16, ALFormat.Mono16);
+					format = (stereoMono % 2 == 0) ? ALFormat.Stereo16 : ALFormat.Mono16;
 					//Logger.Write("{0} {1}", format.ToString(), totalRead * decoder.GetBlockSize());
 					AL.BufferData(buffer, format, decodedData,
 						totalRead * decoder.GetBlockSize(), decoder.GetFrequency());
