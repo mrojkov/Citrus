@@ -156,8 +156,8 @@ namespace Lime
 					this.decoder.Dispose();
 				}
 				this.decoder = decoder;
-				//DeleteSource();
-				//AllocateSource();
+				DeleteSource();
+				AllocateSource();
 			}
 			if (this.sound != null) {
 				this.sound.Channel = NullAudioChannel.Instance;
