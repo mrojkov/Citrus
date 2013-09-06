@@ -222,6 +222,8 @@ namespace Lime
 				sound.Loaded = true;
 				var stream = cache.OpenStream(path);
 				var decoder = AudioDecoderFactory.CreateDecoder(stream);
+				// XXX
+				Logger.Write("LoadSoundToChannel: {0} {1} {2}", path, decoder.GetFormat().ToString(), decoder.GetType().ToString());
 				channel.Play(sound, decoder, looping, paused, fadeinTime);
 			} else {
 				LoadSoundToChannelAsync(channel, path, looping, paused, fadeinTime, sound);
@@ -246,6 +248,8 @@ namespace Lime
 					if (stream != null) {
 						sound.Loaded = true;
 						var decoder = AudioDecoderFactory.CreateDecoder(stream);
+						// XXX
+						Logger.Write("LoadSoundToChannel: {0} {1} {2}", path, decoder.GetFormat().ToString(), decoder.GetType().ToString());
 						channel.Play(sound, decoder, looping, paused, fadeinTime);
 					}
 				});

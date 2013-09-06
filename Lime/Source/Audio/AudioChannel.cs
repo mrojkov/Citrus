@@ -109,11 +109,16 @@ namespace Lime
 		public AudioChannel(int index)
 		{
 			this.Id = index;
-			using (new AudioSystem.ErrorChecker("AudioChannel.AudioChannel")) {
+			AllocateSource();
+			decodedData = Marshal.AllocHGlobal(BufferSize);
+		}
+
+		private void AllocateSource()
+		{
+			using (new AudioSystem.ErrorChecker("AudioChannel.AllocateSource")) {
 				buffers = AL.GenBuffers(NumBuffers);
 				source = AL.GenSource();
 			}
-			decodedData = Marshal.AllocHGlobal(BufferSize);
 		}
 
 		public void Dispose()
@@ -121,8 +126,13 @@ namespace Lime
 			if (decoder != null) {
 				decoder.Dispose();
 			}
+			StopAndDeleteSource();
 			Marshal.FreeHGlobal(decodedData);
-			using (new AudioSystem.ErrorChecker("AudioChannel.Dispose")) {
+		}
+
+		private void StopAndDeleteSource()
+		{
+			using (new AudioSystem.ErrorChecker("AudioChannel.StopAndDeleteSource")) {
 				AL.SourceStop(source);
 				AL.DeleteSource(source);
 				AL.DeleteBuffers(buffers);
@@ -146,6 +156,8 @@ namespace Lime
 					this.decoder.Dispose();
 				}
 				this.decoder = decoder;
+				StopAndDeleteSource();
+				AllocateSource();
 			}
 			if (this.sound != null) {
 				this.sound.Channel = NullAudioChannel.Instance;
