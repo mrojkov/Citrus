@@ -211,6 +211,7 @@ namespace Lime
 
 		private static Sound LoadSoundToChannel(AudioChannel channel, string path, bool looping, bool paused, float fadeinTime)
 		{
+			channel.SampleInfo = path;
 			if (SilentMode) {
 				return new Sound() { Loaded = true };
 			}
@@ -273,7 +274,7 @@ namespace Lime
 			}
 			// Trying to stop first non-locked channel in order of priority
 			foreach (var channel in channels) {
-				if (!channel.Locked && channels[0].Priority <= priority) {
+				if (!channel.Locked && channel.Priority <= priority) {
 					channel.Stop();
 					return channel;
 				}
@@ -294,6 +295,9 @@ namespace Lime
 		{
 			var channel = AllocateChannel(priority);
 			if (channel != null) {
+				if (channel.Sound != null) {
+					channel.Sound.Channel = NullAudioChannel.Instance;
+				}
 				channel.Group = group;
 				channel.Priority = priority;
 				channel.Volume = volume;

@@ -24,6 +24,8 @@ namespace Lime
 		void Stop(float fadeoutTime = 0);
 		float Volume { get; set; }
 		float Pitch { get; set; }
+		string SampleInfo { get; set; }
+		Sound Sound { get; }
 		void Bump();
 	}
 
@@ -39,6 +41,8 @@ namespace Lime
 		public float Volume { get { return 0; } set { } }
 		public float Pitch { get { return 1; } set { } }
 		public void Bump() {}
+		public string SampleInfo { get; set; }
+		public Sound Sound { get { return null; } }
 	}
 
 #if !OPENAL
@@ -118,42 +122,32 @@ namespace Lime
 			set { SetVolume(value); }
 		}
 
+		public Sound Sound { get { return sound; } }
+
 		// Not implemented yet
 		public float Pan { get; set; }
+
+		public string SampleInfo { get; set; }
 
 		public AudioChannel(int index)
 		{
 			this.Id = index;
-			AllocateSource();
 			decodedData = Marshal.AllocHGlobal(BufferSize);
-		}
-
-		private void AllocateSource()
-		{
 			using (new AudioSystem.ErrorChecker("AudioChannel.AllocateSource")) {
 				buffers = AL.GenBuffers(NumBuffers);
 				source = AL.GenSource();
 			}
 		}
-
+		
 		public void Dispose()
 		{
 			if (decoder != null) {
 				decoder.Dispose();
 			}
 			AL.SourceStop(source);
-			DeleteSource();
+			AL.DeleteSource(source);
+			AL.DeleteBuffers(buffers);
 			Marshal.FreeHGlobal(decodedData);
-		}
-
-		private void DeleteSource()
-		{
-			using (new AudioSystem.ErrorSuppresser("AL.DeleteSources")) {
-				AL.DeleteSource(source);
-			}
-			using (new AudioSystem.ErrorSuppresser("AL.DeleteBuffers")) {
-				AL.DeleteBuffers(buffers);
-			}
 		}
 
 		public ALSourceState State { 
@@ -191,9 +185,9 @@ namespace Lime
 
 		private void DetachBuffers()
 		{
-			for (int i = 0; i < NumBuffers; i++) {
-				AL.SourceUnqueueBuffer(source);
-			}
+			//for (int i = 0; i < NumBuffers; i++) {
+			//	AL.SourceUnqueueBuffer(source);
+			//}
 			using (new AudioSystem.ErrorSuppresser("AudioChannel.DetachBuffers")) {
 				AL.Source(source, ALSourcei.Buffer, 0);
 			}
