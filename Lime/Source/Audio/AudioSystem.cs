@@ -65,7 +65,7 @@ namespace Lime
 		static bool active = true;
 		static public bool SilentMode { get; private set; }
 
-		public static void Initialize(int numChannels = 16)
+		public static void Initialize(int numChannels = 32)
 		{
 #if OPENAL
 #if !iOS
