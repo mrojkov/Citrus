@@ -24,7 +24,7 @@ namespace Lime
 		void Stop(float fadeoutTime = 0);
 		float Volume { get; set; }
 		float Pitch { get; set; }
-		string SampleInfo { get; set; }
+		string SamplePath { get; set; }
 		Sound Sound { get; }
 		void Bump();
 	}
@@ -41,7 +41,7 @@ namespace Lime
 		public float Volume { get { return 0; } set { } }
 		public float Pitch { get { return 1; } set { } }
 		public void Bump() {}
-		public string SampleInfo { get; set; }
+		public string SamplePath { get; set; }
 		public Sound Sound { get { return null; } }
 	}
 
@@ -127,7 +127,7 @@ namespace Lime
 		// Not implemented yet
 		public float Pan { get; set; }
 
-		public string SampleInfo { get; set; }
+		public string SamplePath { get; set; }
 
 		public AudioChannel(int index)
 		{
@@ -173,9 +173,10 @@ namespace Lime
 				this.decoder = decoder;
 			}
 			DetachBuffers();
-			if (this.sound != null) {
-				this.sound.Channel = NullAudioChannel.Instance;
+			if (Sound != null) {
+				Sound.Channel = NullAudioChannel.Instance;
 			}
+			this.sound = sound;
 			sound.Channel = this;
 			StartupTime = DateTime.Now;
 			if (!paused) {
@@ -185,9 +186,6 @@ namespace Lime
 
 		private void DetachBuffers()
 		{
-			//for (int i = 0; i < NumBuffers; i++) {
-			//	AL.SourceUnqueueBuffer(source);
-			//}
 			using (new AudioSystem.ErrorSuppresser("AudioChannel.DetachBuffers")) {
 				AL.Source(source, ALSourcei.Buffer, 0);
 			}
@@ -283,8 +281,9 @@ namespace Lime
 				}
 				Volume = volume;
 			}
-			if (sound != null && sound.IsBumpable && Renderer.RenderCycle - lastBumpedRenderCycle > 3)
+			if (sound != null && sound.IsBumpable && Renderer.RenderCycle - lastBumpedRenderCycle > 3) {
 				Stop(0.1f);
+			}
 		}
 
 		void QueueBuffer(bool resumePlay)
@@ -339,6 +338,8 @@ namespace Lime
 
 		void UnqueueBuffers()
 		{
+			// XXX
+			AL.SourceStop(source);
 			int processed;
 			using (new AudioSystem.ErrorChecker("AudioChannel.UnqueueBuffers")) {
 				AL.GetSource(source, ALGetSourcei.BuffersProcessed, out processed);

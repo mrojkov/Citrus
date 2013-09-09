@@ -211,7 +211,7 @@ namespace Lime
 
 		private static Sound LoadSoundToChannel(AudioChannel channel, string path, bool looping, bool paused, float fadeinTime)
 		{
-			channel.SampleInfo = path;
+			channel.SamplePath = path;
 			if (SilentMode) {
 				return new Sound() { Loaded = true };
 			}
@@ -335,8 +335,7 @@ namespace Lime
 #if OPENAL
 			var error = AL.GetError();
 			if (error != ALError.NoError) {
-				Logger.Write(string.Format("OpenAL error: {0} (called from {1})", 
-					AL.GetErrorString(error), method));
+				Logger.Write(string.Format("OpenAL error: {0} (called from {1})", AL.GetErrorString(error), method));
 			}
 #endif
 		}
@@ -346,7 +345,7 @@ namespace Lime
 #if OPENAL
 			var error = AL.GetError();
 			if (error != ALError.NoError) {
-				throw new Exception("OpenAL error: " + AL.GetErrorString(error));
+				throw new Exception("OpenAL error: {0} (called from {1})", AL.GetErrorString(error), method);
 			}
 #endif
 		}
