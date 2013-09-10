@@ -160,6 +160,7 @@
     <Compile Include="Source\Graphics\TexturePool.cs" />
     <Compile Include="Source\Application\ApplicationToolbox.cs" />
     <Compile Include="Source\Application\WinCursors.cs" />
+    <Compile Include="Source\Audio\AudioSystem.ErrorChecker.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Application\WinCursors.cs">
