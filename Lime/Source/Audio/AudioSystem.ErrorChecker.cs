@@ -33,7 +33,7 @@ namespace Lime
 					if (throwException) {
 						throw new Exception(message);
 					} else {
-						Logger.Write(comment);
+						Logger.Write(message);
 					}
 				}
 #endif

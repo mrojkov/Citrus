@@ -297,7 +297,7 @@ namespace Lime
 			int buffer = AcquireBuffer();
 			if (buffer != 0) {
 				if (FillBuffer(buffer)) {
-					using (new AudioSystem.ErrorChecker()) {
+					using (new AudioSystem.ErrorChecker(throwException: false)) {
 						AL.SourceQueueBuffer(source, buffer);
 					}
 				} else {
