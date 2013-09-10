@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 #if OPENAL
 using OpenTK.Audio.OpenAL;
 #endif
@@ -93,13 +94,12 @@ namespace Lime
 		private int source;
 		private float volume = 1;
 		private float pitch = 1;
-		private int[] buffers;
-		private int queueHead;
-		private int queueLength;
 		private bool looping;
 		private float fadeVolume;
 		private float fadeSpeed;
-		private int lastBumpedRenderCycle = 0;
+		private int lastBumpedRenderCycle;
+		private List<int> allBuffers;
+		private Stack<int> processedBuffers;
 
 		private Sound sound = null;
 		private IAudioDecoder decoder;
@@ -134,9 +134,10 @@ namespace Lime
 			this.Id = index;
 			decodedData = Marshal.AllocHGlobal(BufferSize);
 			using (new AudioSystem.ErrorChecker()) {
-				buffers = AL.GenBuffers(NumBuffers);
+				allBuffers = new List<int>(AL.GenBuffers(NumBuffers));
 				source = AL.GenSource();
 			}
+			processedBuffers = new Stack<int>(allBuffers);
 		}
 		
 		public void Dispose()
@@ -146,7 +147,7 @@ namespace Lime
 			}
 			AL.SourceStop(source);
 			AL.DeleteSource(source);
-			AL.DeleteBuffers(buffers);
+			AL.DeleteBuffers(allBuffers.ToArray());
 			Marshal.FreeHGlobal(decodedData);
 		}
 
@@ -189,7 +190,7 @@ namespace Lime
 			using (new AudioSystem.ErrorChecker(throwException: false)) {
 				AL.Source(source, ALSourcei.Buffer, 0);
 			}
-			queueHead = queueLength = 0;
+			processedBuffers = new Stack<int>(allBuffers);
 		}
 
 		public void Resume(float fadeinTime = 0)
@@ -291,6 +292,7 @@ namespace Lime
 			if (decoder == null) {
 				throw new InvalidOperationException("AudioChannel is streaming while decoder is not set");
 			}
+			UnqueueProcessedBuffers();
 			// queue one buffer
 			int buffer = AcquireBuffer();
 			if (buffer != 0) {
@@ -299,7 +301,7 @@ namespace Lime
 						AL.SourceQueueBuffer(source, buffer);
 					}
 				} else {
-					queueLength--;
+					processedBuffers.Push(buffer);
 					streaming = false;
 				}
 			}
@@ -336,32 +338,27 @@ namespace Lime
 			return false;
 		}
 
-		void UnqueueBuffers()
+		void UnqueueProcessedBuffers()
 		{
-			int processed;
-			using (new AudioSystem.ErrorChecker(throwException: false)) {
-				AL.GetSource(source, ALGetSourcei.BuffersProcessed, out processed);
-			}
-//#if iOS
-			// This is workaround for a bug in iOS OpenAL implementation.
-			// When AL.SourceStop() has called, the number of processed buffers exceedes total number of buffers.
-			// processed = Math.Min(queueLength, processed);
-//#endif
-			while (processed-- > 0) {
-				AL.SourceUnqueueBuffer(source);
-				queueLength--;
-				queueHead = (queueHead + 1) % NumBuffers;
+			AL.GetError();
+			int numProcessed;
+			AL.GetSource(source, ALGetSourcei.BuffersProcessed, out numProcessed);
+			for (int i = 0; i < numProcessed; i++) {
+				int buffer = AL.SourceUnqueueBuffer(source);
+				if (buffer != 0) {
+					processedBuffers.Push(buffer);
+				}
 			}
 		}
 		
 		int AcquireBuffer()
 		{
-			UnqueueBuffers();
-			if (queueLength == NumBuffers) {
+			int c = processedBuffers.Count;
+			if (c == 0) {
 				return 0;
 			} else {
-				int index = (queueHead + queueLength++) % NumBuffers;
-				return buffers[index];
+				var buffer = processedBuffers.Pop();
+				return buffer;
 			}
 		}
 	}
