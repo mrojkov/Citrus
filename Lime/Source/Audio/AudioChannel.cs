@@ -133,7 +133,7 @@ namespace Lime
 		{
 			this.Id = index;
 			decodedData = Marshal.AllocHGlobal(BufferSize);
-			using (new AudioSystem.ErrorChecker("AudioChannel.AllocateSource")) {
+			using (new AudioSystem.ErrorChecker()) {
 				buffers = AL.GenBuffers(NumBuffers);
 				source = AL.GenSource();
 			}
@@ -186,7 +186,7 @@ namespace Lime
 
 		private void DetachBuffers()
 		{
-			using (new AudioSystem.ErrorSuppresser("AudioChannel.DetachBuffers")) {
+			using (new AudioSystem.ErrorChecker(throwException: false)) {
 				AL.Source(source, ALSourcei.Buffer, 0);
 			}
 			queueHead = queueLength = 0;
@@ -207,7 +207,7 @@ namespace Lime
 			Volume = volume;
 			streaming = true;
 			if (State == ALSourceState.Paused) {
-				using (new AudioSystem.ErrorChecker("AudioChannel.Resume")) {
+				using (new AudioSystem.ErrorChecker()) {
 					AL.SourcePlay(source);
 				}
 			}
@@ -215,7 +215,7 @@ namespace Lime
 
 		public void Pause()
 		{
-			using (new AudioSystem.ErrorChecker("AudioChannel.Pause")) {
+			using (new AudioSystem.ErrorChecker()) {
 				AL.SourcePause(source);
 			}
 		}
@@ -232,7 +232,7 @@ namespace Lime
 			}
 			lock (streamingSync) {
 				streaming = false;
-				using (new AudioSystem.ErrorSuppresser("AudioChannel.Stop")) {
+				using (new AudioSystem.ErrorChecker(throwException: false)) {
 					AL.SourceStop(source);
 				}
 			}
@@ -241,7 +241,7 @@ namespace Lime
 		private void SetPitch(float value)
 		{
 			pitch = Mathf.Clamp(value, 0.0625f, 16);
-			using (new AudioSystem.ErrorChecker("AudioChannel.SetPitch")) {
+			using (new AudioSystem.ErrorChecker()) {
 				AL.Source(source, ALSourcef.Pitch, pitch);
 			}
 		}
@@ -250,7 +250,7 @@ namespace Lime
 		{
 			volume = Mathf.Clamp(value, 0, 1);
 			float gain = volume * AudioSystem.GetGroupVolume(Group) * fadeVolume;
-			using (new AudioSystem.ErrorChecker("AudioChannel.SetVolume")) {
+			using (new AudioSystem.ErrorChecker()) {
 				AL.Source(source, ALSourcef.Gain, gain);
 			}
 		}
@@ -295,7 +295,7 @@ namespace Lime
 			int buffer = AcquireBuffer();
 			if (buffer != 0) {
 				if (FillBuffer(buffer)) {
-					using (new AudioSystem.ErrorChecker("AudioChannel.UpdateHelper")) {
+					using (new AudioSystem.ErrorChecker()) {
 						AL.SourceQueueBuffer(source, buffer);
 					}
 				} else {
@@ -326,7 +326,7 @@ namespace Lime
 				decoder.Rewind();
 			}
 			if (totalRead > 0) {
-				using (new AudioSystem.ErrorSuppresser("AudioChannel.FillBuffer")) {
+				using (new AudioSystem.ErrorChecker(throwException: false)) {
 					ALFormat format = (decoder.GetFormat() == AudioFormat.Stereo16) ? ALFormat.Stereo16 : ALFormat.Mono16;
 					AL.BufferData(buffer, format, decodedData,
 						totalRead * decoder.GetBlockSize(), decoder.GetFrequency());
@@ -338,17 +338,15 @@ namespace Lime
 
 		void UnqueueBuffers()
 		{
-			// XXX
-			AL.SourceStop(source);
 			int processed;
-			using (new AudioSystem.ErrorChecker("AudioChannel.UnqueueBuffers")) {
+			using (new AudioSystem.ErrorChecker(throwException: false)) {
 				AL.GetSource(source, ALGetSourcei.BuffersProcessed, out processed);
 			}
-#if iOS
-			// This is workaround for a bug in iOS OpenAl implementation.
+//#if iOS
+			// This is workaround for a bug in iOS OpenAL implementation.
 			// When AL.SourceStop() has called, the number of processed buffers exceedes total number of buffers.
-			processed = Math.Min(queueLength, processed);
-#endif
+			// processed = Math.Min(queueLength, processed);
+//#endif
 			while (processed-- > 0) {
 				AL.SourceUnqueueBuffer(source);
 				queueLength--;

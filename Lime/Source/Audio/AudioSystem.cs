@@ -20,40 +20,8 @@ namespace Lime
 		Music
 	}
 
-	public static class AudioSystem
+	public static partial class AudioSystem
 	{
-		public struct ErrorChecker : IDisposable
-		{
-			string method;
-
-			public ErrorChecker(string method)
-			{
-				this.method = method;
-				AudioSystem.CheckError(">" + method);
-			}
-
-			void IDisposable.Dispose()
-			{
-				AudioSystem.CheckError("<" + method);
-			}
-		}
-
-		public struct ErrorSuppresser : IDisposable
-		{
-			string method;
-
-			public ErrorSuppresser(string method)
-			{
-				this.method = method;
-				AudioSystem.SuppressError(">" + method);
-			}
-
-			void IDisposable.Dispose()
-			{
-				AudioSystem.SuppressError("<" + method);
-			}
-		}
-
 #if OPENAL
 		static AudioContext context;
 #endif
@@ -327,26 +295,6 @@ namespace Lime
 			return AL.GetError() != ALError.NoError;
 #else
 			return false;
-#endif
-		}
-
-		public static void SuppressError(string method)
-		{
-#if OPENAL
-			var error = AL.GetError();
-			if (error != ALError.NoError) {
-				Logger.Write(string.Format("OpenAL error: {0} (called from {1})", AL.GetErrorString(error), method));
-			}
-#endif
-		}
-
-		public static void CheckError(string method)
-		{
-#if OPENAL
-			var error = AL.GetError();
-			if (error != ALError.NoError) {
-				throw new Exception("OpenAL error: {0} (called from {1})", AL.GetErrorString(error), method);
-			}
 #endif
 		}
 	}
