@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 #if iOS
 using MonoTouch;
 using MonoTouch.UIKit;
@@ -43,7 +44,7 @@ namespace Lime
 
 		public static string GetPathInsideDataDirectory(string appName, string path)
 		{
-			return System.IO.Path.Combine(GetDataDirectory(appName), path);
+			return Path.Combine(GetDataDirectory(appName), path);
 		}
 
 		public static string GetDataDirectory(string companyName, string appName, string appVersion)
@@ -51,17 +52,44 @@ namespace Lime
 #if UNITY
 			return UnityEngine.Application.persistentDataPath;
 #else
-#if iOS || MAC
+#if iOS
+			string path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);
+			return path;
+#elif MAC
 			string path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);
 #else
 			string path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.CommonApplicationData);
 #endif
+#if !iOS
 			if (string.IsNullOrEmpty(companyName)) {
-				path = System.IO.Path.Combine(path, appName, appVersion);
+				path = Path.Combine(path, appName, appVersion);
 			} else {
-				path = System.IO.Path.Combine(path, companyName, appName, appVersion);
+				path = Path.Combine(path, companyName, appName, appVersion);
 			}
-			System.IO.Directory.CreateDirectory(path);
+			Directory.CreateDirectory(path);
+			return path;
+#endif
+#endif
+		}
+
+		public static string GetDownloadableContentDirectory(string appName)
+		{
+			return GetDownloadableContentDirectory(null, appName, "1.0");
+		}
+
+		public static string GetDownloadableContentDirectory(string companyName, string appName, string appVersion)
+		{
+#if UNITY
+			return UnityEngine.Application.persistentDataPath;
+#else
+#if iOS
+			string path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);
+			path = Path.Combine(Path.GetDirectoryName(path), "Library", "DLC");
+#else
+			string path = GetDataDirectory(companyName, appName, appVersion);
+			path = Path.Combine(path, "DLC");
+#endif
+			Directory.CreateDirectory(path);
 			return path;
 #endif
 		}
