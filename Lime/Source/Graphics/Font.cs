@@ -19,15 +19,15 @@ namespace Lime
 	[ProtoContract]
 	public class FontCharCollection : ICollection<FontChar>
 	{
-		public List<FontChar> charList = new List<FontChar>();
-		public FontChar[][] charMap = new FontChar[256][];
+		public List<FontChar> CharList = new List<FontChar>();
+		public FontChar[][] CharMap = new FontChar[256][];
 
 		public FontChar this[char code] { 
 			get { 
 				byte hb = (byte)(code >> 8);
 				byte lb = (byte)(code & 255);
-				if (charMap[hb] != null) {
-					var c = charMap[hb][lb];
+				if (CharMap[hb] != null) {
+					var c = CharMap[hb][lb];
 					if (c != null)
 						return c;
 				}
@@ -39,28 +39,28 @@ namespace Lime
 		{
 		}
 
-		public int Count { get { return charList.Count; } }
+		public int Count { get { return CharList.Count; } }
 
 		IEnumerator<FontChar> IEnumerable<FontChar>.GetEnumerator()
 		{
-			return charList.GetEnumerator();
+			return CharList.GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return charList.GetEnumerator();
+			return CharList.GetEnumerator();
 		}
 
 		void ICollection<FontChar>.CopyTo(FontChar[] a, int index)
 		{
-			charList.CopyTo(a, index);
+			CharList.CopyTo(a, index);
 		}
 		
 		public void Clear()
 		{
-			charList.Clear();
+			CharList.Clear();
 			for (int i = 0; i < 256; i++) {
-				charMap[i] = null;
+				CharMap[i] = null;
 			}
 		}
 		
@@ -68,8 +68,8 @@ namespace Lime
 		{
 			byte hb = (byte)(item.Char >> 8);
 			byte lb = (byte)(item.Char & 255);
-			if (charMap[hb] != null) {
-				return charMap[hb][lb] != null;
+			if (CharMap[hb] != null) {
+				return CharMap[hb][lb] != null;
 			}
 			return false;
 		}
@@ -78,10 +78,10 @@ namespace Lime
 		{
 			byte hb = (byte)(item.Char >> 8);
 			byte lb = (byte)(item.Char & 255);
-			if (charMap[hb] != null) {
-				charMap[hb][lb] = null;
+			if (CharMap[hb] != null) {
+				CharMap[hb][lb] = null;
 			}
-			return charList.Remove(item);
+			return CharList.Remove(item);
 		}
 		
 		bool ICollection<FontChar>.IsReadOnly { 
@@ -92,11 +92,11 @@ namespace Lime
 		{
 			byte hb = (byte)(c.Char >> 8);
 			byte lb = (byte)(c.Char & 255);
-			if (charMap[hb] == null) {
-				charMap[hb] = new FontChar[256];
+			if (CharMap[hb] == null) {
+				CharMap[hb] = new FontChar[256];
 			}
-			charMap[hb][lb] = c;
-			charList.Add(c);
+			CharMap[hb][lb] = c;
+			CharList.Add(c);
 		}
 	}
 

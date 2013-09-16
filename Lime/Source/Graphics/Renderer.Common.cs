@@ -73,7 +73,7 @@ namespace Lime
 		public static Vector2 MeasureTextLine(Font font, string text, float fontHeight, int start, int length)
 		{
 			FontChar prevChar = null;
-			Vector2 size = new Vector2(0, fontHeight);
+			var size = new Vector2(0, fontHeight);
 			float width = 0;
 			// float scale = fontHeight / font.CharHeight;
 			for (int i = 0; i < length; i++) {
@@ -83,7 +83,7 @@ namespace Lime
 					width = 0;
 					continue;
 				}
-				FontChar fontChar = font.Chars[ch];
+				var fontChar = font.Chars[ch];
 				if (fontChar == FontChar.Null) {
 					continue;
 				}

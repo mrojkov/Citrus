@@ -145,9 +145,7 @@ namespace Lime
 		public void Discard()
 		{
 			if (instance != null) {
-				if (instance is IDisposable) {
-					(instance as IDisposable).Dispose();
-				}
+				instance.Dispose();
 				instance = null;
 			}
 		}

@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Lime;
 using ProtoBuf;
 using System.Collections.Generic;
@@ -27,7 +28,7 @@ namespace Lime
 	}
 
 	[ProtoContract]
-	public class SimpleText : Widget
+	public sealed class SimpleText : Widget
 	{
 		[ProtoMember(1)]
 		public SerializableFont Font { get; set; }
@@ -47,8 +48,12 @@ namespace Lime
 		[ProtoMember(6)]
 		public VAlignment VAlignment { get; set; }
 
+		[ProtoMember(7)]
+		public bool AutoFit { get; set; }
+
 		public SimpleText()
 		{
+			AutoFit = true;
 			Text = "";
 			FontHeight = 15;
 			Font = new SerializableFont();
@@ -63,23 +68,74 @@ namespace Lime
 		{
 			Renderer.Transform1 = LocalToWorldTransform;
 			Renderer.Blending = GlobalBlending;
+			Vector2 extent;
+			RenderHelper(measureOnly: false, extent: out extent);
+		}
+
+		public Vector2 MeasureText()
+		{
+			Vector2 extent;
+			RenderHelper(measureOnly: true, extent: out extent);
+			return extent;
+		}
+
+		private void RenderHelper(bool measureOnly, out Vector2 extent)
+		{
+			extent = Vector2.Zero;
 			var localizedText = Localization.GetString(Text);
-			if (!string.IsNullOrEmpty(localizedText)) {
-				var strings = SplitText(localizedText);
-				var pos = new Vector2();
-				float totalHeight = FontHeight * strings.Count + Spacing * (strings.Count - 1);
-				if (VAlignment == VAlignment.Bottom)
+			if (string.IsNullOrEmpty(localizedText)) {
+				return;
+			}
+			var lines = SplitText(localizedText);
+			var pos = new Vector2();
+			var totalHeight = FontHeight * lines.Count + Spacing * (lines.Count - 1);
+			switch (VAlignment) {
+				case VAlignment.Bottom:
 					pos.Y = Size.Y - totalHeight;
-				else if (VAlignment == VAlignment.Center)
+					break;
+				case VAlignment.Center:
 					pos.Y = (Size.Y - totalHeight) * 0.5f;
-				foreach (var str in strings) {
-					var extent = Renderer.MeasureTextLine(Font.Instance, str, FontHeight);
-					if (HAlignment == HAlignment.Right)
-						pos.X = Size.X - extent.X;
-					else if (HAlignment == HAlignment.Center)
-						pos.X = (Size.X - extent.X) * 0.5f;
-					Renderer.DrawTextLine(Font.Instance, pos, str, FontHeight, GlobalColor);
-					pos.Y += Spacing + FontHeight;
+					break;
+			}
+			foreach (var line in lines) {
+				var lineExtent = Renderer.MeasureTextLine(Font.Instance, line, FontHeight);
+				switch (HAlignment) {
+					case HAlignment.Right:
+						pos.X = Size.X - lineExtent.X;
+						break;
+					case HAlignment.Center:
+						pos.X = (Size.X - lineExtent.X) * 0.5f;
+						break;
+				}
+				if (!measureOnly) {
+					Renderer.DrawTextLine(Font.Instance, pos, line, FontHeight, GlobalColor);
+				}
+				extent.X = Mathf.Max(extent.X, pos.X + lineExtent.X);
+				pos.Y += Spacing + FontHeight;
+			}
+			extent.Y = lines.Count * (FontHeight + Spacing);
+			if (extent.Y > 0) {
+				extent.Y -= Spacing;
+			}
+		}
+
+		public void FitTextInsideWidgetArea(float minFontHeight = 10)
+		{
+			var minH = minFontHeight;
+			var maxH = FontHeight;
+			if (maxH <= minH) {
+				return;
+			}
+			var spacingKoeff = Spacing / FontHeight;
+			while (maxH - minH > 1) {
+				FontHeight = (minH + maxH) / 2;
+				Spacing = FontHeight * spacingKoeff;
+				var extent = MeasureText();
+				var fit = (extent.X < Width && extent.Y < Height);
+				if (fit) {
+					minH = FontHeight;
+				} else {
+					maxH = FontHeight;
 				}
 			}
 		}
@@ -87,9 +143,9 @@ namespace Lime
 		private List<string> SplitText(string text)
 		{
 			var strings = new List<string>(text.Split('\n'));
-			for (int i = 0; i < strings.Count; i++) {
+			for (var i = 0; i < strings.Count; i++) {
 				while (Renderer.MeasureTextLine(Font.Instance, strings[i], FontHeight).X > Width) {
-					int lastSpacePosition = strings[i].LastIndexOf(' ');
+					var lastSpacePosition = strings[i].LastIndexOf(' ');
 					if (lastSpacePosition >= 0) {
 						if (i + 1 >= strings.Count) {
 							strings.Add("");
