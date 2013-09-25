@@ -25,13 +25,15 @@ namespace Lime
 #if OPENAL
 		static AudioContext context;
 #endif
-		static List<AudioChannel> channels = new List<AudioChannel>();
-		static float[] groupVolumes = new float[2] {1, 1};
+		static readonly List<AudioChannel> channels = new List<AudioChannel>();
+		static readonly float[] groupVolumes = new float[2] {1, 1};
 
 		static Thread streamingThread;
 		static volatile bool shouldTerminateThread;
 		static bool active = true;
 		static public bool SilentMode { get; private set; }
+
+		public static bool SimulateOpenALError;
 
 		public static void Initialize(int numChannels = 16)
 		{
@@ -97,18 +99,22 @@ namespace Lime
 		public static bool Active
 		{
 			get { return active; }
-			set
-			{
-				if (active != value) {
-					active = value;
-#if !iOS
-					if (active)
-						ResumeAll();
-					else
-						PauseAll();
-#endif
-				}
+			set { SetActive(value); }
+		}
+
+		private static void SetActive(bool value)
+		{
+			if (active == value) {
+				return;
 			}
+			active = value;
+#if !iOS
+			if (active) {
+				ResumeAll();
+			} else {
+				PauseAll();
+			}
+#endif
 		}
 
 		public static float GetGroupVolume(AudioChannelGroup group)
@@ -175,7 +181,7 @@ namespace Lime
 #endif
 		}
 
-		static AudioCache cache = new AudioCache();
+		static readonly AudioCache cache = new AudioCache();
 
 		private static Sound LoadSoundToChannel(AudioChannel channel, string path, bool looping, bool paused, float fadeinTime)
 		{
@@ -203,20 +209,18 @@ namespace Lime
 			bw.DoWork += (s, e) => {
 				e.Result = cache.OpenStream(path);
 			};
-			bw.RunWorkerCompleted += (s, e) => {
-				Application.InvokeOnMainThread(() => {
-					channel.Locked = false;
-					if (e.Error != null) {
-						throw e.Error;
-					}
-					var stream = (Stream)e.Result;
-					if (stream != null) {
-						sound.Loaded = true;
-						var decoder = AudioDecoderFactory.CreateDecoder(stream);
-						channel.Play(sound, decoder, looping, paused, fadeinTime);
-					}
-				});
-			};
+			bw.RunWorkerCompleted += (s, e) => Application.InvokeOnMainThread(() => {
+				channel.Locked = false;
+				if (e.Error != null) {
+					throw e.Error;
+				}
+				var stream = (Stream)e.Result;
+				if (stream != null) {
+					sound.Loaded = true;
+					var decoder = AudioDecoderFactory.CreateDecoder(stream);
+					channel.Play(sound, decoder, looping, paused, fadeinTime);
+				}
+			});
 			bw.RunWorkerAsync();
 		}
 
@@ -233,11 +237,12 @@ namespace Lime
 			});
 			// Looking for stopped channels
 			foreach (var channel in channels) {
-				if (!channel.Streaming && !channel.Locked) {
-					var state = channel.State;
-					if (state == ALSourceState.Stopped || state == ALSourceState.Initial) {
-						return channel;
-					}
+				if (channel.Streaming || channel.Locked) {
+					continue;
+				}
+				var state = channel.State;
+				if (state == ALSourceState.Stopped || state == ALSourceState.Initial) {
+					return channel;
 				}
 			}
 			// Trying to stop first non-locked channel in order of priority
@@ -273,7 +278,7 @@ namespace Lime
 				channel.Pan = 0;
 				return LoadSoundToChannel(channel, path, looping, paused, fadeinTime);
 			}
-			if (channel == null && group == AudioChannelGroup.Music) {
+			if (group == AudioChannelGroup.Music) {
 				Logger.Write("Failed to allocate a channel for music (priority {0})", priority);
 			}
 			return new Sound();

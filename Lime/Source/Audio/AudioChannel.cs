@@ -88,10 +88,10 @@ namespace Lime
 		public DateTime StartupTime;
 		public int Id;
 
-		private object streamingSync = new object();
+		private readonly object streamingSync = new object();
 		private volatile bool streaming;
 
-		private int source;
+		private readonly int source;
 		private float volume = 1;
 		private float pitch = 1;
 		private bool looping;
@@ -101,9 +101,8 @@ namespace Lime
 		private List<int> allBuffers;
 		private Stack<int> processedBuffers;
 
-		private Sound sound = null;
 		private IAudioDecoder decoder;
-		private IntPtr decodedData;
+		private readonly IntPtr decodedData;
 
 		// The channel can be locked while a sound is being preloaded
 		public bool Locked { get; set; }
@@ -122,7 +121,7 @@ namespace Lime
 			set { SetVolume(value); }
 		}
 
-		public Sound Sound { get { return sound; } }
+		public Sound Sound { get; private set; }
 
 		// Not implemented yet
 		public float Pan { get; set; }
@@ -131,6 +130,7 @@ namespace Lime
 
 		public AudioChannel(int index)
 		{
+			Sound = null;
 			this.Id = index;
 			decodedData = Marshal.AllocHGlobal(BufferSize);
 			using (new AudioSystem.ErrorChecker()) {
@@ -177,7 +177,7 @@ namespace Lime
 			if (Sound != null) {
 				Sound.Channel = NullAudioChannel.Instance;
 			}
-			this.sound = sound;
+			this.Sound = sound;
 			sound.Channel = this;
 			StartupTime = DateTime.Now;
 			if (!paused) {
@@ -282,7 +282,7 @@ namespace Lime
 				}
 				Volume = volume;
 			}
-			if (sound != null && sound.IsBumpable && Renderer.RenderCycle - lastBumpedRenderCycle > 3) {
+			if (Sound != null && Sound.IsBumpable && Renderer.RenderCycle - lastBumpedRenderCycle > 3) {
 				Stop(0.1f);
 			}
 		}
@@ -297,8 +297,13 @@ namespace Lime
 			int buffer = AcquireBuffer();
 			if (buffer != 0) {
 				if (FillBuffer(buffer)) {
-					using (new AudioSystem.ErrorChecker(throwException: false)) {
+					if (AL.GetError() != ALError.NoError) {
+						RecreateBuffers();
+					} else {
 						AL.SourceQueueBuffer(source, buffer);
+						if (AL.GetError() != ALError.NoError) {
+							RecreateBuffers();
+						}
 					}
 				} else {
 					processedBuffers.Push(buffer);
@@ -306,13 +311,22 @@ namespace Lime
 				}
 			}
 			if (resumePlay) {
-				switch (State) {
-					case ALSourceState.Stopped:
-					case ALSourceState.Initial:
-						AL.SourcePlay(source);
-						break;
+				if (State == ALSourceState.Stopped || State == ALSourceState.Initial) {
+					AL.SourcePlay(source);
 				}
 			}
+		}
+
+		private void RecreateBuffers()
+		{
+			Logger.Write("Recreating audio buffers (sample: {0})", SamplePath);
+			DetachBuffers();
+			foreach (var buffer in allBuffers) {
+				AL.DeleteBuffer(buffer);
+				AL.GetError();
+			}
+			allBuffers = new List<int>(AL.GenBuffers(NumBuffers));
+			processedBuffers = new Stack<int>(allBuffers);
 		}
 
 		bool FillBuffer(int buffer)
@@ -328,11 +342,15 @@ namespace Lime
 				decoder.Rewind();
 			}
 			if (totalRead > 0) {
-				using (new AudioSystem.ErrorChecker(throwException: false)) {
-					ALFormat format = (decoder.GetFormat() == AudioFormat.Stereo16) ? ALFormat.Stereo16 : ALFormat.Mono16;
-					AL.BufferData(buffer, format, decodedData,
-						totalRead * decoder.GetBlockSize(), decoder.GetFrequency());
+				ALFormat format = (decoder.GetFormat() == AudioFormat.Stereo16) ? ALFormat.Stereo16 : ALFormat.Mono16;
+				// XXX
+				int dataSize = totalRead * decoder.GetBlockSize();
+				if (AudioSystem.SimulateOpenALError && Mathf.RandomFloat() < 0.3f) {
+					format = (decoder.GetFormat() == AudioFormat.Stereo16) ? ALFormat.Mono8: ALFormat.Stereo16;
+					AudioSystem.SimulateOpenALError = false;
 				}
+				AL.BufferData(buffer, format, decodedData,
+					dataSize, decoder.GetFrequency());
 				return true;
 			}
 			return false;

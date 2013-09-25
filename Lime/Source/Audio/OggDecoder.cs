@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Lemon;
 #if OPENAL
 using OpenTK.Audio.OpenAL;
 #endif
@@ -12,10 +13,10 @@ namespace Lime
 	{
 		Stream stream;
 		IntPtr oggFile;
-		Lemon.Api.FileSystem fileSystem;
 		int bitstream;
 		int handle;
-		static StreamMap streamMap = new StreamMap();
+		readonly Lemon.Api.FileSystem fileSystem;
+		static readonly StreamMap streamMap = new StreamMap();
 
 		public OggDecoder(Stream stream)
 		{
@@ -108,7 +109,7 @@ namespace Lime
 #endif
 		public static uint OggRead(IntPtr buffer, uint size, uint nmemb, int handle)
 		{
-			byte[] block = new byte[1024 * 16];
+			var block = new byte[1024 * 16];
 			int actualCount = 0;
 			int requestCount = (int)(size * nmemb);
 			while (true) {
