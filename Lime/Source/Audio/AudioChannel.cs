@@ -121,6 +121,11 @@ namespace Lime
 			set { SetVolume(value); }
 		}
 
+		public ALSourceState State
+		{
+			get { return AL.GetSourceState(source); }
+		}
+
 		public Sound Sound { get; private set; }
 
 		// Not implemented yet
@@ -128,8 +133,11 @@ namespace Lime
 
 		public string SamplePath { get; set; }
 
-		public AudioChannel(int index)
+		public AudioFormat AudioFormat { get; private set; }
+
+		public AudioChannel(int index, AudioFormat format)
 		{
+			AudioFormat = format;
 			Sound = null;
 			this.Id = index;
 			decodedData = Marshal.AllocHGlobal(BufferSize);
@@ -149,12 +157,6 @@ namespace Lime
 			AL.DeleteSource(source);
 			AL.DeleteBuffers(allBuffers.ToArray());
 			Marshal.FreeHGlobal(decodedData);
-		}
-
-		public ALSourceState State { 
-			get {
-				return AL.GetSourceState(source); 
-			}
 		}
 
 		internal void Play(Sound sound, IAudioDecoder decoder, bool looping, bool paused, float fadeinTime)
@@ -196,7 +198,7 @@ namespace Lime
 		public void Resume(float fadeinTime = 0)
 		{
 			if (decoder == null) {
-				throw new InvalidOperationException("Can't resume sound before it has decoded");
+				throw new InvalidOperationException("Audio decoder is not set");
 			}
 			if (fadeinTime > 0) {
 				fadeVolume = 0;
@@ -290,13 +292,14 @@ namespace Lime
 		void QueueBuffer(bool resumePlay)
 		{
 			if (decoder == null) {
-				throw new InvalidOperationException("AudioChannel is streaming while decoder is not set");
+				throw new InvalidOperationException("Audio decoder is not set");
 			}
 			UnqueueProcessedBuffers();
 			// queue one buffer
 			int buffer = AcquireBuffer();
 			if (buffer != 0) {
 				if (FillBuffer(buffer)) {
+					// iOS OpenAL implementation is buggy, so protect ourselves
 					if (AL.GetError() != ALError.NoError) {
 						RecreateBuffers();
 					} else {
@@ -329,7 +332,7 @@ namespace Lime
 			processedBuffers = new Stack<int>(allBuffers);
 		}
 
-		bool FillBuffer(int buffer)
+		private bool FillBuffer(int buffer)
 		{
 			int totalRead = 0;
 			int needToRead = BufferSize / decoder.GetBlockSize();

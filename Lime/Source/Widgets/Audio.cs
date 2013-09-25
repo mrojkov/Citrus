@@ -91,7 +91,7 @@ namespace Lime
 
 		public bool IsPlaying()
 		{
-			return !sound.IsStopped();
+			return !sound.IsStopped;
 		}
 
 		public override void Update(int delta)

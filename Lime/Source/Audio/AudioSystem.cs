@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 #if OPENAL
 using OpenTK.Audio;
 using OpenTK.Audio.OpenAL;
@@ -35,7 +36,7 @@ namespace Lime
 
 		public static bool SimulateOpenALError;
 
-		public static void Initialize(int numChannels = 16)
+		public static void Initialize(int numStereoChannels = 4, int numMonoChannels = 12)
 		{
 #if OPENAL
 #if !iOS
@@ -48,8 +49,12 @@ namespace Lime
 #endif
 #endif
 			if (!HasError()) {
-				for (int i = 0; i < numChannels; i++) {
-					channels.Add(new AudioChannel(i));
+				// iOS dislike to mix stereo and mono buffers on one audio source, so separate them
+				for (int i = 0; i < numStereoChannels; i++) {
+					channels.Add(new AudioChannel(i, AudioFormat.Stereo16));
+				}
+				for (int i = 0; i < numMonoChannels; i++) {
+					channels.Add(new AudioChannel(i, AudioFormat.Mono16));
 				}
 			}
 			streamingThread = new Thread(RunStreamingLoop);
@@ -181,55 +186,64 @@ namespace Lime
 #endif
 		}
 
+		delegate AudioChannel ChannelSelector(AudioFormat format);
+
 		static readonly AudioCache cache = new AudioCache();
 
-		private static Sound LoadSoundToChannel(AudioChannel channel, string path, bool looping, bool paused, float fadeinTime)
+		private static Sound LoadSoundToChannel(ChannelSelector channelSelector, string path, bool looping, bool paused, float fadeinTime)
 		{
-			channel.SamplePath = path;
 			if (SilentMode) {
-				return new Sound() { Loaded = true };
+				return new Sound();
 			}
 			path += ".sound";
-			var sound = new Sound() { Channel = channel };
+			var sound = new Sound();
 			if (cache.IsSampleCached(path)) {
-				sound.Loaded = true;
 				var stream = cache.OpenStream(path);
 				var decoder = AudioDecoderFactory.CreateDecoder(stream);
+				var channel = channelSelector(decoder.GetFormat());
+				if (channel == null) {
+					return sound;
+				}
+				channel.SamplePath = path;
 				channel.Play(sound, decoder, looping, paused, fadeinTime);
 			} else {
-				LoadSoundToChannelAsync(channel, path, looping, paused, fadeinTime, sound);
+				LoadSoundToChannelAsync(channelSelector, path, looping, paused, fadeinTime, sound);
 			}
 			return sound;
 		}
 
-		private static void LoadSoundToChannelAsync(AudioChannel channel, string path, bool looping, bool paused, float fadeinTime, Sound sound)
+		private static void LoadSoundToChannelAsync(ChannelSelector channelSelector, string path, bool looping, bool paused, float fadeinTime, Sound sound)
 		{
-			channel.Locked = true;
+			sound.IsLoading = true;
 			var bw = new BackgroundWorker();
 			bw.DoWork += (s, e) => {
 				e.Result = cache.OpenStream(path);
 			};
 			bw.RunWorkerCompleted += (s, e) => Application.InvokeOnMainThread(() => {
-				channel.Locked = false;
+				sound.IsLoading = false;
 				if (e.Error != null) {
 					throw e.Error;
 				}
 				var stream = (Stream)e.Result;
-				if (stream != null) {
-					sound.Loaded = true;
-					var decoder = AudioDecoderFactory.CreateDecoder(stream);
+				if (stream == null) {
+					return;
+				}
+				var decoder = AudioDecoderFactory.CreateDecoder(stream);
+				var channel = channelSelector(decoder.GetFormat());
+				if (channel != null) {
 					channel.Play(sound, decoder, looping, paused, fadeinTime);
 				}
 			});
 			bw.RunWorkerAsync();
 		}
 
-		static AudioChannel AllocateChannel(float priority)
+		static AudioChannel AllocateChannel(float priority, AudioFormat format)
 		{
-			var channels = AudioSystem.channels.ToArray();
+			var channels = AudioSystem.channels.Where(c => c.AudioFormat == format).ToArray();
 			Array.Sort(channels, (a, b) => {
-				if (a.Priority != b.Priority)
+				if (a.Priority != b.Priority) {
 					return Mathf.Sign(a.Priority - b.Priority);
+				}
 				if (a.StartupTime == b.StartupTime) {
 					return a.Id - b.Id;
 				}
@@ -266,22 +280,22 @@ namespace Lime
 
 		public static Sound Play(string path, AudioChannelGroup group, bool looping = false, float priority = 0.5f, float fadeinTime = 0f, bool paused = false, float volume = 1f, float pan = 0f, float pitch = 1f)
 		{
-			var channel = AllocateChannel(priority);
-			if (channel != null) {
-				if (channel.Sound != null) {
-					channel.Sound.Channel = NullAudioChannel.Instance;
+			ChannelSelector channelSelector = (format) => {
+				var channel = AllocateChannel(priority, format);
+				if (channel != null) {
+					if (channel.Sound != null) {
+						channel.Sound.Channel = NullAudioChannel.Instance;
+					}
+					channel.Group = group;
+					channel.Priority = priority;
+					channel.Volume = volume;
+					channel.Pitch = pitch;
+					channel.Pan = 0;
 				}
-				channel.Group = group;
-				channel.Priority = priority;
-				channel.Volume = volume;
-				channel.Pitch = pitch;
-				channel.Pan = 0;
-				return LoadSoundToChannel(channel, path, looping, paused, fadeinTime);
-			}
-			if (group == AudioChannelGroup.Music) {
-				Logger.Write("Failed to allocate a channel for music (priority {0})", priority);
-			}
-			return new Sound();
+				return channel;
+			};
+			var sound = LoadSoundToChannel(channelSelector, path, looping, paused, fadeinTime);
+			return sound;
 		}
 
 		public static Sound PlayMusic(string path, bool looping = true, float priority = 100f, float fadeinTime = 0.5f, bool paused = false, float volume = 1f, float pan = 0f, float pitch = 1f)
