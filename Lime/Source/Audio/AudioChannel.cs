@@ -103,10 +103,7 @@ namespace Lime
 
 		private IAudioDecoder decoder;
 		private readonly IntPtr decodedData;
-
-		// The channel can be locked while a sound is being preloaded
-		public bool Locked { get; set; }
-
+		
 		public bool Streaming { get { return streaming; } }
 
 		public float Pitch
@@ -346,14 +343,8 @@ namespace Lime
 			}
 			if (totalRead > 0) {
 				ALFormat format = (decoder.GetFormat() == AudioFormat.Stereo16) ? ALFormat.Stereo16 : ALFormat.Mono16;
-				// XXX
 				int dataSize = totalRead * decoder.GetBlockSize();
-				if (AudioSystem.SimulateOpenALError && Mathf.RandomFloat() < 0.3f) {
-					format = (decoder.GetFormat() == AudioFormat.Stereo16) ? ALFormat.Mono8: ALFormat.Stereo16;
-					AudioSystem.SimulateOpenALError = false;
-				}
-				AL.BufferData(buffer, format, decodedData,
-					dataSize, decoder.GetFrequency());
+				AL.BufferData(buffer, format, decodedData, dataSize, decoder.GetFrequency());
 				return true;
 			}
 			return false;

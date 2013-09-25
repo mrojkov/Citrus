@@ -78,18 +78,22 @@ namespace Lime
 
 		public override bool HandleOpenURL (UIApplication application, NSUrl url)
 		{
-			if (UrlOpened != null)
+			if (UrlOpened != null) {
 				return UrlOpened(url);
-			else
-				return base.HandleOpenURL(application, url);
+			}
+			return false;
+		//	else
+		//		return base.HandleOpenURL(application, url);
 		}
 		
 		public override bool OpenUrl (UIApplication application, NSUrl url, string sourceApplication, NSObject annotation)
 		{
-			if (UrlOpened != null)
+			if (UrlOpened != null) {
 				return UrlOpened(url);
-			else
-				return base.OpenUrl(application, url, sourceApplication, annotation);
+			}
+			return false;
+		//	else
+		//		return base.OpenUrl(application, url, sourceApplication, annotation);
 		}
 
 		public override void OnActivated(UIApplication application)
@@ -98,7 +102,6 @@ namespace Lime
 			AudioSystem.Active = true;
 			Application.Instance.OnActivate();
 		}
-
 	
 		public override void WillTerminate(UIApplication application)
 		{

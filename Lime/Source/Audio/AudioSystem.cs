@@ -34,8 +34,6 @@ namespace Lime
 		static bool active = true;
 		static public bool SilentMode { get; private set; }
 
-		public static bool SimulateOpenALError;
-
 		public static void Initialize(int numStereoChannels = 4, int numMonoChannels = 12)
 		{
 #if OPENAL
@@ -251,7 +249,7 @@ namespace Lime
 			});
 			// Looking for stopped channels
 			foreach (var channel in channels) {
-				if (channel.Streaming || channel.Locked) {
+				if (channel.Streaming) {
 					continue;
 				}
 				var state = channel.State;
@@ -259,9 +257,9 @@ namespace Lime
 					return channel;
 				}
 			}
-			// Trying to stop first non-locked channel in order of priority
+			// Trying to stop first channel in order of priority
 			foreach (var channel in channels) {
-				if (!channel.Locked && channel.Priority <= priority) {
+				if (channel.Priority <= priority) {
 					channel.Stop();
 					return channel;
 				}
