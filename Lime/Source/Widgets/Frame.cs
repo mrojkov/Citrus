@@ -32,8 +32,6 @@ namespace Lime
 	{
 		public Action Rendered;
 
-		private static HashSet<string> processingFiles = new HashSet<string>();
-
 		// In dialog mode frame acts like a modal dialog, all controls behind the dialog are frozen.
 		// If dialog is being shown or hidden then all controls on dialog are frozen either.
 		public bool DialogMode { get; set; }
@@ -142,12 +140,18 @@ namespace Lime
 			LoadFromBundle(path);
 		}
 
+		[ThreadStatic]
+		private static HashSet<string> cyclicDependencyTracker;
+
 		private void LoadFromBundle(string path)
 		{
+			if (cyclicDependencyTracker == null) {
+				cyclicDependencyTracker = new HashSet<string>();
+			}
 			path = Path.ChangeExtension(path, "scene");
-			if (processingFiles.Contains(path))
-				throw new Lime.Exception("Cyclic dependency of scenes has detected: {0}", path);
-			processingFiles.Add(path);
+			if (cyclicDependencyTracker.Contains(path))
+				throw new Lime.Exception("Cyclic dependency of scenes was detected: {0}", path);
+			cyclicDependencyTracker.Add(path);
 			try {
 				using (Stream stream = PackedAssetsBundle.Instance.OpenFileLocalized(path)) {
 					Serialization.ReadObject<Frame>(path, stream, this);
@@ -155,7 +159,7 @@ namespace Lime
 				LoadContent();
 				Tag = path;
 			} finally {
-				processingFiles.Remove(path);
+				cyclicDependencyTracker.Remove(path);
 			}
 		}
 

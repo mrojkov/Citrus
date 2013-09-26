@@ -36,20 +36,14 @@ namespace Lime
 			return model;
 		}
 #endif
-		static class OperationStackCapsule
+		static class OperationStackKeeper
 		{
 			[ThreadStatic]
 			public static Stack<Operation> stack;
 		}
 
 		static Stack<Operation> OperationStack {
-			get
-			{
-				if (OperationStackCapsule.stack == null) {
-					OperationStackCapsule.stack = new Stack<Operation>();
-				}
-				return OperationStackCapsule.stack;
-			}
+			get { return OperationStackKeeper.stack ?? (OperationStackKeeper.stack = new Stack<Operation>()); }
 		}
 		
 		public static string ShrinkPath(string path)

@@ -196,6 +196,9 @@ namespace Lime
 			path += ".sound";
 			var sound = new Sound();
 			var stream = cache.OpenStream(path);
+			if (stream == null) {
+				return sound;
+			}
 			var decoder = AudioDecoderFactory.CreateDecoder(stream);
 			var channel = channelSelector(decoder.GetFormat());
 			if (channel == null) {
