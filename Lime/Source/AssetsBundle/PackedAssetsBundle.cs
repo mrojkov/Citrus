@@ -6,9 +6,9 @@ using System.Collections.Generic;
 namespace Lime
 {
 	[Flags]
-	enum AssetAttributes
+	public enum AssetAttributes
 	{
-		Zipped = 1
+		Zipped = 1 << 0,
 	}
 
 	struct AssetDescriptor
@@ -305,20 +305,13 @@ namespace Lime
 
 		public override DateTime GetFileLastWriteTime(string path)
 		{
-			AssetDescriptor desc;
-			if (index.TryGetValue(AssetPath.CorrectSlashes(path), out desc)) {
-				return desc.ModificationTime;
-			}
-			throw new Exception("Asset '{0}' doesn't exist", path);
+			return GetDescriptor(path).ModificationTime;
 		}
 
 		public override void DeleteFile(string path)
 		{
 			path = AssetPath.CorrectSlashes(path);
-			AssetDescriptor desc;
-			if (!index.TryGetValue(path, out desc)) {
-				throw new Exception("Asset '{0}' doesn't exist", path);
-			}
+			var desc = GetDescriptor(path);
 			index.Remove(path);
 			trash.Add(desc);
 		}
@@ -456,6 +449,15 @@ namespace Lime
 			lock (streamPool) {
 				streamPool.Push(stream);
 			}
+		}
+
+		private AssetDescriptor GetDescriptor(string path)
+		{
+			AssetDescriptor desc;
+			if (index.TryGetValue(AssetPath.CorrectSlashes(path), out desc)) {
+				return desc;
+			}
+			throw new Exception("Asset '{0}' doesn't exist", path);
 		}
 	}
 }

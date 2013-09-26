@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
+using System.Linq;
 
 namespace Lime
 {
@@ -16,18 +18,14 @@ namespace Lime
 		public const int MaxCacheSize = 4 * 1024 * 1024;
 		public int CacheSize { get { return CalcCacheSize(); } }
 
-		private List<CachedSample> samples = new List<CachedSample>();
-		private object sync = new object();
+		private readonly List<CachedSample> samples = new List<CachedSample>();
+		private readonly object sync = new object();
 
 		private int CalcCacheSize()
 		{
-			int size = 0;
 			lock (sync) {
-				foreach (var i in samples) {
-					size += i.Data.Length;
-				}
+				return samples.Sum(i => i.Data.Length);
 			}
-			return size;
 		}
 
 		public Stream OpenStream(string path)
@@ -42,23 +40,40 @@ namespace Lime
 			}
 			stream = PackedAssetsBundle.Instance.OpenFileLocalized(path);
 			if (stream.Length < MaxCachedSampleSize) {
-				var memStream = new MemoryStream((int)stream.Length);
-				stream.CopyTo(memStream);
-				memStream.Position = 0;
-				while (CalcCacheSize() > MaxCacheSize) {
-					lock (sync) {
-						samples.RemoveAt(0);
-					}
-				}
-				lock (sync) {
-					samples.Add(new CachedSample {
-						Data = memStream.GetBuffer(),
-						Path = path
-					});
-				}
-				return memStream;
+				CacheSoundAsync(path);
 			}
 			return stream;
+		}
+
+		private void CacheSoundAsync(string path)
+		{
+			var bw = new BackgroundWorker();
+			bw.DoWork += (s, e) => {
+				using (var stream = PackedAssetsBundle.Instance.OpenFileLocalized(path)) {
+					var memStream = new MemoryStream((int)stream.Length);
+					stream.CopyTo(memStream);
+					memStream.Position = 0;
+					Cleanup();
+					lock (sync) {
+						if (samples.FindIndex(i => i.Path == path) < 0) {
+							samples.Add(new CachedSample {
+								Data = memStream.GetBuffer(),
+								Path = path
+							});
+						}
+					}
+				}
+			};
+			bw.RunWorkerAsync();
+		}
+
+		private void Cleanup()
+		{
+			while (CalcCacheSize() > MaxCacheSize) {
+				lock (sync) {
+					samples.RemoveAt(0);
+				}
+			}
 		}
 
 		public bool IsSampleCached(string path)

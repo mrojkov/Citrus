@@ -28,7 +28,7 @@ namespace Lime
 		int ReadBlocks(IntPtr buffer, int startIndex, int blockCount);
 	}
 
-	internal class AudioDecoderFactory
+	public class AudioDecoderFactory
 	{
 		public static IAudioDecoder CreateDecoder(Stream stream)
 		{

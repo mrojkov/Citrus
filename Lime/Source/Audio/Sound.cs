@@ -34,8 +34,25 @@ namespace Lime
 			set { Channel.Pan = value; }
 		}
 
-		public void Resume(float fadeinTime = 0) { Channel.Resume(fadeinTime); }
-		public void Stop(float fadeoutTime = 0) { Channel.Stop(fadeoutTime); }
+		public void Resume(float fadeinTime = 0)
+		{
+			EnsureLoaded();
+			Channel.Resume(fadeinTime);
+		}
+
+		public void Stop(float fadeoutTime = 0)
+		{
+			EnsureLoaded();
+			Channel.Stop(fadeoutTime);
+		}
+
 		public void Bump() { Channel.Bump(); }
+
+		private void EnsureLoaded()
+		{
+			if (IsLoading) {
+				throw new System.InvalidOperationException("The sound is being loaded");
+			}
+		}
 	}
 }

@@ -38,7 +38,7 @@ namespace Lime
 		{
 			return File.Exists(Path.Combine(BaseDirectory, path));
 		}
-		
+
 		public override void ImportFile(string path, Stream stream, int reserve, bool compress)
 		{
 #if UNITY_WEBPLAYER

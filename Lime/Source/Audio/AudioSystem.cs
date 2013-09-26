@@ -195,44 +195,15 @@ namespace Lime
 			}
 			path += ".sound";
 			var sound = new Sound();
-			if (cache.IsSampleCached(path)) {
-				var stream = cache.OpenStream(path);
-				var decoder = AudioDecoderFactory.CreateDecoder(stream);
-				var channel = channelSelector(decoder.GetFormat());
-				if (channel == null) {
-					return sound;
-				}
-				channel.SamplePath = path;
-				channel.Play(sound, decoder, looping, paused, fadeinTime);
-			} else {
-				LoadSoundToChannelAsync(channelSelector, path, looping, paused, fadeinTime, sound);
+			var stream = cache.OpenStream(path);
+			var decoder = AudioDecoderFactory.CreateDecoder(stream);
+			var channel = channelSelector(decoder.GetFormat());
+			if (channel == null) {
+				return sound;
 			}
+			channel.SamplePath = path;
+			channel.Play(sound, decoder, looping, paused, fadeinTime);
 			return sound;
-		}
-
-		private static void LoadSoundToChannelAsync(ChannelSelector channelSelector, string path, bool looping, bool paused, float fadeinTime, Sound sound)
-		{
-			sound.IsLoading = true;
-			var bw = new BackgroundWorker();
-			bw.DoWork += (s, e) => {
-				e.Result = cache.OpenStream(path);
-			};
-			bw.RunWorkerCompleted += (s, e) => Application.InvokeOnMainThread(() => {
-				sound.IsLoading = false;
-				if (e.Error != null) {
-					throw e.Error;
-				}
-				var stream = (Stream)e.Result;
-				if (stream == null) {
-					return;
-				}
-				var decoder = AudioDecoderFactory.CreateDecoder(stream);
-				var channel = channelSelector(decoder.GetFormat());
-				if (channel != null) {
-					channel.Play(sound, decoder, looping, paused, fadeinTime);
-				}
-			});
-			bw.RunWorkerAsync();
 		}
 
 		static AudioChannel AllocateChannel(float priority, AudioFormat format)
