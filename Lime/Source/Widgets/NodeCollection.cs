@@ -9,12 +9,12 @@ namespace Lime
 	[ProtoContract]
 	public sealed class NodeCollection : ICollection<Node>
 	{
-		static List<Node> emptyList = new List<Node>();
-		static Node[] emptyArray = new Node[0];
+		static readonly List<Node> emptyList = new List<Node>();
+		static readonly Node[] emptyArray = new Node[0];
 
 		List<Node> nodeList = emptyList;
 		Node[] nodeArray;
-		Node owner;
+		readonly Node owner;
 
 		public NodeCollection() { /* ctor for ProtoBuf only */ }
 
@@ -37,11 +37,7 @@ namespace Lime
 			get
 			{
 				if (nodeArray == null) {
-					if (nodeList.Count > 0) {
-						nodeArray = nodeList.ToArray();
-					} else {
-						nodeArray = emptyArray;
-					}
+					nodeArray = nodeList.Count > 0 ? nodeList.ToArray() : emptyArray;
 				}
 				return nodeArray;
 			}
