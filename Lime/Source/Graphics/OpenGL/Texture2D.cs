@@ -163,6 +163,24 @@ namespace Lime
 			uvRect = new Rectangle(0, 0, 1, 1);
 		}
 
+		/// <summary>
+		/// Load subtexture from pixel array
+		/// </summary>
+		public void LoadSubImage(Color4[] pixels, int x, int y, int width, int height)
+		{
+			Application.InvokeOnMainThread(() => {
+				Renderer.SetTexture(this, 0);
+#if GLES11
+				GL.TexSubImage2D(All.Texture2D, 0, x, y, width, height,
+					All.Rgba, All.UnsignedByte, pixels);
+#elif OPENGL
+				OGL.TexSubImage2D(TextureTarget.Texture2D, 0, x, y, width, height, 
+					PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
+#endif
+				Renderer.CheckErrors();
+			});
+		}
+
 		~Texture2D()
 		{
 			Dispose();

@@ -156,6 +156,19 @@ namespace Lime
 			}
 		}
 
+		[DllImport(library, EntryPoint = "glTexSubImage2D")]
+		public static extern void TexSubImage2D(TextureTarget target, int level, int xoffset, int yoffset, int width, int height, PixelFormat format, PixelType type, IntPtr pixels);
+
+		public static void TexSubImage2D<T>(TextureTarget target, int level, int xoffset, int yoffset, int width, int height, PixelFormat format, PixelType type, T[] pixels) where T : struct
+		{
+			GCHandle ptr = GCHandle.Alloc(pixels, GCHandleType.Pinned);
+			try {
+				TexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, (IntPtr)ptr.AddrOfPinnedObject());
+			} finally {
+				ptr.Free();
+			}
+		}
+
 		public static void ClientActiveTexture(TextureUnit texture)
 		{
 			clientActiveTexture(texture);
