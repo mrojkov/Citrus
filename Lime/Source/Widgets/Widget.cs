@@ -179,7 +179,7 @@ namespace Lime
 
 		public override void Update(int delta)
 		{
-			if (Anchors != Anchors.None && Parent.AsWidget != null) {
+			if (Anchors != Anchors.None && Parent != null && Parent.AsWidget != null) {
 				ApplyAnchors();
 			}
 			RecalcGlobalMatrixAndColorHelper();
