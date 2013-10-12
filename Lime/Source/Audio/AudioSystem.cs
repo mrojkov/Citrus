@@ -34,7 +34,7 @@ namespace Lime
 		static bool active = true;
 		static public bool SilentMode { get; private set; }
 
-		public static void Initialize(int numStereoChannels = 4, int numMonoChannels = 12)
+		public static void Initialize(int numStereoChannels = 4, int numMonoChannels = 16)
 		{
 #if OPENAL
 #if !iOS
@@ -234,8 +234,6 @@ namespace Lime
 			// Trying to stop first channel in order of priority
 			foreach (var channel in channels) {
 				if (channel.Priority <= priority) {
-					// XXX
-					Logger.Write("!!! Stopped channel: {0}", channel.SamplePath);
 					channel.Stop();
 					return channel;
 				}
@@ -255,8 +253,6 @@ namespace Lime
 		public static Sound Play(string path, AudioChannelGroup group, bool looping = false, float priority = 0.5f, float fadeinTime = 0f, bool paused = false, float volume = 1f, float pan = 0f, float pitch = 1f)
 		{
 			ChannelSelector channelSelector = (format) => {
-				// XXX
-				Logger.Write("Allocating channel for {0}", path);
 				var channel = AllocateChannel(priority, format);
 				if (channel != null) {
 					if (channel.Sound != null) {
