@@ -163,6 +163,7 @@
     <Compile Include="Source\Audio\AudioCache.cs" />
     <Compile Include="Source\Application\ApplicationToolbox.cs" />
     <Compile Include="Source\Graphics\TexturePool.cs" />
+    <Compile Include="Source\Audio\AudioSystem.ErrorChecker.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Mac.csproj">
