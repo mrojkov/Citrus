@@ -10,10 +10,9 @@ namespace Kill3.OrangePlugin
 		[MenuItem("Update XCode Project")]
 		public static void UpdateXCodeProjectAction()
 		{
-			// XXX
-			//if (The.Workspace.ProjectJson.GetBool("XCodeProject/DoSvnUpdate")) {
-			//	Subversion.Update(GetXCodeProjectFolder());
-			//}
+			if (The.Workspace.ProjectJson.GetBool("XCodeProject/DoSvnUpdate")) {
+				Subversion.Update(GetXCodeProjectFolder());
+			}
 			AssetCooker.Cook(TargetPlatform.iOS);
 			var builder = new Orange.SolutionBuilder(TargetPlatform.iOS);
 			var output = new StringBuilder();
