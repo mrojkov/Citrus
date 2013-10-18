@@ -439,7 +439,6 @@ namespace Lime
 		public override void Update(int delta)
 		{
 			base.Update(delta);
-			return;
 			if (firstUpdate) {
 				firstUpdate = false;
 				const int ModellingStep = 40;
