@@ -15,14 +15,11 @@ namespace Lime
 {
 	public class RenderTexture : ITexture, IDisposable
 	{
-		int framebuffer;
 		uint id;
-		Size size = new Size(0, 0);
-		Rectangle uvRect;
-
-#if GLES11
-		static int defaultFramebuffer = -1;
-#endif
+		readonly int framebuffer;
+		readonly Size size = new Size(0, 0);
+		readonly Rectangle uvRect;
+		static readonly Stack<int> framebufferStack = new Stack<int>();
 
 		public RenderTexture(int width, int height)
 		{
@@ -30,9 +27,6 @@ namespace Lime
 			size.Height = height;
 			uvRect = new Rectangle(0, 0, 1, 1);
 #if GLES11
-			if (defaultFramebuffer < 0) {
-				GL.GetInteger(All.FramebufferBinding, ref defaultFramebuffer);
-			}
 			GL.GenFramebuffers(1, ref framebuffer);
 			GL.GenTextures(1, ref id);
 			GL.BindTexture(All.Texture2D, id);
@@ -114,20 +108,26 @@ namespace Lime
 		public void SetAsRenderTarget()
 		{
 			Renderer.FlushSpriteBatch();
+			int currentFramebuffer;
 #if GLES11
+			GL.GetInteger(All.FramebufferBinding, ref currentFramebuffer);
 			GL.BindFramebuffer(All.Framebuffer, framebuffer);
+			framebufferStack.Push(currentFramebuffer);
 #elif OPENGL
+			GL.GetInteger(GetPName.FramebufferBindingExt, out currentFramebuffer);
 			GL.BindFramebuffer(FramebufferTarget.FramebufferExt, framebuffer);
+			framebufferStack.Push(currentFramebuffer);
 #endif
 		}
 
 		public void RestoreRenderTarget()
 		{
 			Renderer.FlushSpriteBatch();
+			int prevFramebuffer = framebufferStack.Pop();
 #if GLES11
-			GL.BindFramebuffer(All.Framebuffer, defaultFramebuffer);
+			GL.BindFramebuffer(All.Framebuffer, prevFramebuffer);
 #elif OPENGL
-			GL.BindFramebuffer(FramebufferTarget.FramebufferExt, 0);
+			GL.BindFramebuffer(FramebufferTarget.FramebufferExt, prevFramebuffer);
 #endif
 		}
 
