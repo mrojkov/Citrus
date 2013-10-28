@@ -27,7 +27,7 @@ namespace Lime
 			size.Height = height;
 			uvRect = new Rectangle(0, 0, 1, 1);
 #if GLES11
-			int defaultFramebuffer;
+			int defaultFramebuffer = 0;
 			GL.GetInteger(All.FramebufferBinding, ref defaultFramebuffer);
 			GL.GenFramebuffers(1, ref framebuffer);
 			GL.GenTextures(1, ref id);
@@ -110,7 +110,7 @@ namespace Lime
 		public void SetAsRenderTarget()
 		{
 			Renderer.FlushSpriteBatch();
-			int currentFramebuffer;
+			int currentFramebuffer = 0;
 #if GLES11
 			GL.GetInteger(All.FramebufferBinding, ref currentFramebuffer);
 			GL.BindFramebuffer(All.Framebuffer, framebuffer);
