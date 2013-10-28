@@ -27,6 +27,8 @@ namespace Lime
 			size.Height = height;
 			uvRect = new Rectangle(0, 0, 1, 1);
 #if GLES11
+			int defaultFramebuffer;
+			GL.GetInteger(All.FramebufferBinding, ref defaultFramebuffer);
 			GL.GenFramebuffers(1, ref framebuffer);
 			GL.GenTextures(1, ref id);
 			GL.BindTexture(All.Texture2D, id);
