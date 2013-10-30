@@ -44,8 +44,6 @@ namespace Lime
 			if (path == null) {
 				throw new ArgumentException();
 			}
-			videoTime = 0;
-			gameTime = 0;
 			Stop();
 			Path = path;
 			rgbStream = AssetsBundle.Instance.OpenFile(path + ".ogv");
@@ -87,6 +85,8 @@ namespace Lime
 			throw new NotImplementedException();
 #else
 			Stopped = true;
+			videoTime = 0;
+			gameTime = 0;
 			if (rgbDecoder != null) {
 				rgbDecoder.Dispose();
 				rgbDecoder = null;
