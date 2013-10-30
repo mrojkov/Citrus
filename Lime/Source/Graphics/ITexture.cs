@@ -18,7 +18,6 @@ namespace Lime
 		bool IsStubTexture { get; }
 		[ProtoMember(1)]
 		string SerializationPath { get; set; }
-
 #if UNITY
 		UnityEngine.Texture GetUnityTexture();
 #endif

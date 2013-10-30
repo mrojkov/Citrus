@@ -298,13 +298,14 @@ namespace Lime
 
 		protected internal virtual void OnTrigger(string property)
 		{
-			if (property == "Trigger") {
-				if (String.IsNullOrEmpty(Trigger)) {
-					AnimationTime = 0;
-					IsRunning = true;
-				} else {
-					TryRunAnimation(Trigger);
-				}
+			if (property != "Trigger") {
+				return;
+			}
+			if (String.IsNullOrEmpty(Trigger)) {
+				AnimationTime = 0;
+				IsRunning = true;
+			} else {
+				TryRunAnimation(Trigger);
 			}
 		}
 

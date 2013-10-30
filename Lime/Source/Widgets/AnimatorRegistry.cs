@@ -40,6 +40,7 @@ namespace Lime
 			Add(typeof(SerializableSample), typeof(GenericAnimator<SerializableSample>));
 			Add(typeof(EmitterShape), typeof(GenericAnimator<EmitterShape>));
 			Add(typeof(AudioAction), typeof(GenericAnimator<AudioAction>));
+			Add(typeof(MovieAction), typeof(GenericAnimator<MovieAction>));
 			Add(typeof(HAlignment), typeof(GenericAnimator<HAlignment>));
 			Add(typeof(VAlignment), typeof(GenericAnimator<VAlignment>));
 		}

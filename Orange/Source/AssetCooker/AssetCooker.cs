@@ -6,7 +6,7 @@ namespace Orange
 {
 	public static class AssetCooker
 	{
-		private static List<Action> cookStages = new List<Action>();
+		private static readonly List<Action> cookStages = new List<Action>();
 		public static IEnumerable<Action> CookStages { get { return cookStages; } }
 
 		private delegate bool Converter(string srcPath, string dstPath);
@@ -87,9 +87,9 @@ namespace Orange
 			AddStage(SyncTxtAssets);
 			AddStage(SyncTextures);
 			AddStage(SyncFonts);
+			AddStage(SyncVideoAssets);
 			AddStage(SyncScenes);
 			AddStage(SyncSounds);
-			AddStage(SyncVideoAssets);
 			AddStage(SyncUnityShaders);
 		}
 
@@ -166,8 +166,8 @@ namespace Orange
 				for (int i = 0; ; i++) {
 					var texturePath = Path.ChangeExtension(dstPath, null);
 					string index = (i == 0) ? "" : i.ToString("00");
-					string texturePng = Path.Combine(Path.ChangeExtension(srcPath, null) + index + ".png");
-					if (!File.Exists(Path.Combine(texturePng))) {
+					string texturePng = Path.Combine(Path.ChangeExtension(srcPath, null), index + ".png");
+					if (!File.Exists(texturePng)) {
 						break;
 					}
 					font.Textures.Add(new Lime.SerializableTexture(texturePath + index));

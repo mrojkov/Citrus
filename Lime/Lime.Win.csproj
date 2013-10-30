@@ -106,7 +106,7 @@
     <Compile Include="Source\Graphics\ITexture.cs" />
     <Compile Include="Source\Graphics\TextureAtlasPart.cs" />
     <Compile Include="Source\Graphics\OgvDecoder.cs" />
-    <Compile Include="Source\Graphics\VideoTexture.cs" />
+    <Compile Include="Source\Graphics\MovieTexture.cs" />
     <Compile Include="Source\Localization.cs" />
     <Compile Include="Source\Mathf.cs" />
     <Compile Include="Source\PopupMenu\Separator.cs" />
@@ -150,7 +150,7 @@
     <Compile Include="Source\Widgets\Polyline.cs" />
     <Compile Include="Source\Widgets\RenderChain.cs" />
     <Compile Include="Source\Widgets\RichText.cs" />
-    <Compile Include="Source\Widgets\Video.cs" />
+    <Compile Include="Source\Widgets\Movie.cs" />
     <Compile Include="Source\Widgets\World.cs" />
     <Compile Include="Source\Widgets\SimpleText.cs" />
     <Compile Include="Source\Widgets\Slider.cs" />

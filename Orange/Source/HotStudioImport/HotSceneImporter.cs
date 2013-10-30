@@ -513,6 +513,25 @@ namespace Orange
 			}
 		}
 
+		protected void ParseVideoProperty(Node node, string name)
+		{
+			Movie movie = (Movie)node;
+			switch (name) {
+				case "File":
+					movie.Path = lexer.ParsePath();
+					break;
+				case "Flags":
+					movie.Looped = (lexer.ParseInt() & 1) != 0;
+					break;
+				case "Action":
+					lexer.ParseInt();
+					break;
+				default:
+					ParseGraphicProperty(movie, name);
+					break;
+			}
+		}
+
 		protected void ParseMarkerProperty(Marker marker, string name)
 		{
 			switch (name) {
@@ -871,6 +890,7 @@ namespace Orange
 				new KnownActorType {ActorClass = "Hot::RichText", NodeClass = "Lime.RichText, Lime", PropReader = ParseRichTextProperty},
 				new KnownActorType {ActorClass = "Hot::TextStyle", NodeClass = "Lime.TextStyle, Lime", PropReader = ParseTextStyleProperty},
 				new KnownActorType {ActorClass = "Hot::Edit", NodeClass = "Lime.TextBox, Lime", PropReader = ParseEditProperty},
+				new KnownActorType {ActorClass = "Hot::Movie", NodeClass = "Lime.Movie, Lime", PropReader = ParseVideoProperty},
 			};
 		}
 	}

@@ -9,7 +9,7 @@ namespace Lime
 {
 	public sealed class TexturePool
 	{
-		private ConcurrentDictionary<string, WeakReference> textures;
+		private readonly ConcurrentDictionary<string, WeakReference> textures;
 
 		public readonly static TexturePool Instance = new TexturePool();
 

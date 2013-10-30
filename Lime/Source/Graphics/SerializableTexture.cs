@@ -131,7 +131,7 @@ namespace Lime
 		static Texture2D CreateStubTexture()
 		{
 			var texture = new Texture2D();
-			Color4[] pixels = new Color4[128 * 128];
+			var pixels = new Color4[128 * 128];
 			for (int i = 0; i < 128; i++)
 				for (int j = 0; j < 128; j++)
 					pixels[i * 128 + j] = (((i + (j & ~7)) & 8) == 0) ? Color4.Blue : Color4.White;
@@ -144,10 +144,11 @@ namespace Lime
 		/// </summary>
 		public void Discard()
 		{
-			if (instance != null) {
-				instance.Dispose();
-				instance = null;
+			if (instance == null) {
+				return;
 			}
+			instance.Dispose();
+			instance = null;
 		}
 
 		/// <summary>
@@ -162,8 +163,10 @@ namespace Lime
 		
 		private bool TryCreateRenderTarget(string path)
 		{
-			if (Path.Length > 0 && Path[0] == '#') {
-				switch(Path) {
+			if (Path.Length <= 0 || Path[0] != '#') {
+				return false;
+			}
+			switch(Path) {
 				case "#a":
 				case "#b":
 					instance = new RenderTexture(256, 256);
@@ -178,39 +181,37 @@ namespace Lime
 					instance = CreateStubTexture();
 					IsStubTexture = true;
 					break;
-				}
-				UVRect.A = Vector2.Zero;
-				UVRect.B = Vector2.One;
-				ImageSize = instance.ImageSize;
-				return true;
 			}
-			return false;
+			UVRect.A = Vector2.Zero;
+			UVRect.B = Vector2.One;
+			ImageSize = instance.ImageSize;
+			return true;
 		}
 		
 		private bool TryLoadTextureAtlasPart(string path)
 		{
-			if (AssetsBundle.Instance.FileExists(path)) {
-				var texParams = TextureAtlasPart.ReadFromBundle(path);
-				instance = new SerializableTexture(texParams.AtlasTexture);
-				UVRect.A = (Vector2)texParams.AtlasRect.A / (Vector2)instance.SurfaceSize;
-				UVRect.B = (Vector2)texParams.AtlasRect.B / (Vector2)instance.SurfaceSize;
-				ImageSize = (Size)texParams.AtlasRect.Size;
-				return true;
+			if (!AssetsBundle.Instance.FileExists(path)) {
+				return false;
 			}
-			return false;
+			var texParams = TextureAtlasPart.ReadFromBundle(path);
+			instance = new SerializableTexture(texParams.AtlasTexture);
+			UVRect.A = (Vector2)texParams.AtlasRect.A / (Vector2)instance.SurfaceSize;
+			UVRect.B = (Vector2)texParams.AtlasRect.B / (Vector2)instance.SurfaceSize;
+			ImageSize = (Size)texParams.AtlasRect.Size;
+			return true;
 		}
 		
 		private bool TryLoadImage(string path)
 		{
-			if (AssetsBundle.Instance.FileExists(path)) {
-				instance = new Texture2D();
-				(instance as Texture2D).LoadImage(path);
-				UVRect.A = Vector2.Zero;
-				UVRect.B = (Vector2)instance.ImageSize / (Vector2)instance.SurfaceSize;
-				ImageSize = instance.ImageSize;
-				return true;
+			if (!AssetsBundle.Instance.FileExists(path)) {
+				return false;
 			}
-			return false;
+			instance = new Texture2D();
+			(instance as Texture2D).LoadImage(path);
+			UVRect.A = Vector2.Zero;
+			UVRect.B = (Vector2)instance.ImageSize / (Vector2)instance.SurfaceSize;
+			ImageSize = instance.ImageSize;
+			return true;
 		}
 
 		public ITexture GetInstance()

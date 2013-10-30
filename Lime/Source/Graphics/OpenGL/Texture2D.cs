@@ -43,7 +43,7 @@ namespace Lime
 			}
 		}
 
-		public string SerializationPath {
+		public virtual string SerializationPath {
 			get {
 				throw new NotSupportedException();
 			}
@@ -84,8 +84,8 @@ namespace Lime
 		{
 			// Discard current texture
 			Dispose();
-			using (RewindableStream rewindableStream = new RewindableStream(stream))
-			using (BinaryReader reader = new BinaryReader(rewindableStream)) {
+			using (var rewindableStream = new RewindableStream(stream))
+			using (var reader = new BinaryReader(rewindableStream)) {
 #if iOS
 				int sign = reader.ReadInt32();
 				rewindableStream.Rewind();
@@ -111,19 +111,23 @@ namespace Lime
 		{
 			DeleteScheduledTextures();
 #if GLES11
-				// Generate a new texture.
-				GL.Enable(All.Texture2D);
+			// Generate a new texture.
+			GL.Enable(All.Texture2D);
+			if (id == 0) {
 				GL.GenTextures(1, ref id);
-				Renderer.SetTexture(id, 0);
-				GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)All.Linear);
-				GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
-				GL.TexParameter(All.Texture2D, All.TextureWrapS, (int)All.ClampToEdge);
-				GL.TexParameter(All.Texture2D, All.TextureWrapT, (int)All.ClampToEdge);
-				GL.Hint(All.PerspectiveCorrectionHint, All.Fastest);
-				Renderer.CheckErrors();
+			}
+			Renderer.SetTexture(id, 0);
+			GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)All.Linear);
+			GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
+			GL.TexParameter(All.Texture2D, All.TextureWrapS, (int)All.ClampToEdge);
+			GL.TexParameter(All.Texture2D, All.TextureWrapT, (int)All.ClampToEdge);
+			GL.Hint(All.PerspectiveCorrectionHint, All.Fastest);
+			Renderer.CheckErrors();
 #elif OPENGL
 			// Generate a new texture
-			id = (uint)OGL.GenTexture();
+			if (id == 0) {
+				id = (uint)OGL.GenTexture();
+			}
 			Renderer.SetTexture(id, 0);
 			OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
 			OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
@@ -138,7 +142,6 @@ namespace Lime
 		/// </summary>
 		public void LoadImage(Color4[] pixels, int width, int height, bool generateMips)
 		{
-			Dispose();
 			Application.InvokeOnMainThread(() => {
 				PrepareOpenGLTexture();
 #if GLES11
@@ -169,7 +172,7 @@ namespace Lime
 		public void LoadSubImage(Color4[] pixels, int x, int y, int width, int height)
 		{
 			Application.InvokeOnMainThread(() => {
-				Renderer.SetTexture(this, 0);
+				PrepareOpenGLTexture();
 #if GLES11
 				GL.TexSubImage2D(All.Texture2D, 0, x, y, width, height,
 					All.Rgba, All.UnsignedByte, pixels);
@@ -186,7 +189,7 @@ namespace Lime
 			Dispose();
 		}
 
-		public void Dispose()
+		public virtual void Dispose()
 		{
 			if (id != 0) {
 				lock (TexturesToDelete) {

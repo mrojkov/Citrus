@@ -22,7 +22,7 @@ namespace Orange
 
 		public List<MenuItem> GetVisibleAndSortedItems()
 		{
-			var items = Items.FindAll(i => IsVisibleMenuItem(i));
+			var items = Items.FindAll(IsVisibleMenuItem);
 			items.Sort((a, b) => a.Priority.CompareTo(b.Priority));
 			return items;
 		}

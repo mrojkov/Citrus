@@ -6,9 +6,9 @@ namespace Orange
 {
 	public partial class HotSceneImporter
 	{
-		List<int> frames = new List<int>();
-		List<KeyFunction> functions = new List<KeyFunction>();
-		List<object> values = new List<object>();
+		readonly List<int> frames = new List<int>();
+		readonly List<KeyFunction> functions = new List<KeyFunction>();
+		readonly List<object> values = new List<object>();
 
 		delegate object KeyReader();
 
@@ -48,6 +48,8 @@ namespace Orange
 				return () => lexer.ParseNumericRange();
 			case "Hot::TypedAnimator<Hot::Audio::Action>":
 				return () => (AudioAction)lexer.ParseInt();
+			case "Hot::TypedAnimator<Hot::Movie::Action>":
+				return () => (MovieAction)lexer.ParseInt();
 			default:
 				throw new Exception("Unknown type of animator '{0}'", animatorType);
 			}
@@ -147,8 +149,9 @@ namespace Orange
 				}
 			}
 			lexer.ParseToken('}');
-			for (int i = 0; i < frames.Count; i++)
+			for (int i = 0; i < frames.Count; i++) {
 				animator.Add(frames[i], values[i], functions[i]);
+			}
 		}
 	}
 }
