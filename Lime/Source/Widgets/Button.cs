@@ -22,7 +22,7 @@ namespace Lime
 		
 		private SimpleText textPresenter;
 		private bool wasClicked;
-		private readonly StateMachine stateMachine = new StateMachine();
+		private StateMachine stateMachine = new StateMachine();
 		private StateFunc State
 		{
 			get { return stateMachine.State; }
@@ -43,6 +43,7 @@ namespace Lime
 		public override Node DeepCloneFast()
 		{
 			var clone = (Button)base.DeepCloneFast();
+			clone.stateMachine = new StateMachine();
 			clone.State = clone.NormalState;
 			return clone;
 		}
