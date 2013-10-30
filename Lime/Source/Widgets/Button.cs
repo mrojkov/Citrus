@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 namespace Lime
 {
+	using StateFunc = Func<IEnumerator<int>>;
+
 	[ProtoContract]
 	public class Button : Widget
 	{
@@ -13,18 +15,24 @@ namespace Lime
 		[ProtoMember(2)]
 		public bool Enabled { get; set; }
 
-		public override Action Clicked { get; set; }
+		[ProtoMember(3)]
+		public bool Movable { get; set; }
 
+		public override Action Clicked { get; set; }
+		
 		private SimpleText textPresenter;
-		private Action StateHandler;
 		private bool wasClicked;
+		private readonly StateMachine stateMachine = new StateMachine();
+		private StateFunc State
+		{
+			get { return stateMachine.State; }
+			set { stateMachine.SetState(value); }
+		}
 
 		public Button()
 		{
 			Enabled = true;
-			SetNormalState();
-			// Run animation on the next frame (when button contents will be loaded)
-			StateHandler = UpdateInitialState;
+			State = NormalState;
 		}
 
 		public override bool WasClicked()
@@ -32,149 +40,193 @@ namespace Lime
 			return wasClicked;
 		}
 
-		void UpdateInitialState()
+		public override Node DeepCloneFast()
 		{
-			SetNormalState();
+			var clone = (Button)base.DeepCloneFast();
+			clone.State = clone.NormalState;
+			return clone;
 		}
 
-		void SetNormalState()
+		private IEnumerator<int> NormalState()
 		{
-			if (World.Instance != null && World.Instance.ActiveWidget == this) {
-				World.Instance.ActiveWidget = null;
+			if (World.Instance != null && TheActiveWidget == this) {
+				TheActiveWidget = null;
 			}
 			TryRunAnimation("Normal");
-			StateHandler = UpdateNormalState;
-		}
-
-		void UpdateNormalState()
-		{
-			if (HitTest(Input.MousePosition) && World.Instance.ActiveWidget == null) {
-				SetFocusedState();
+			while (true) {
+				if (HitTest(Input.MousePosition) && TheActiveWidget == null) {
+					State = FocusedState;
+				}
+				yield return 0;
 			}
 		}
 
-		void SetFocusedState()
+		private static IEnumerable<int> TimeDelay(float secs)
+		{
+			var time = DateTime.Now;
+			while ((DateTime.Now - time).TotalSeconds < secs) {
+				yield return 0;
+			}
+		}
+
+		private IEnumerator<int> FocusedState()
 		{
 			World.Instance.ActiveWidget = this;
 			TryRunAnimation("Focus");
-			StateHandler = UpdateFocusedState;
-			UpdateFocusedState();
-		}
-
-		void UpdateFocusedState()
-		{
+			while (true) {
 #if iOS
-			if (!HitTest(Input.MousePosition) || !Input.IsMousePressed()) {
+				if (!HitTest(Input.MousePosition) || !Input.IsMousePressed()) {
 #else
-			if (!HitTest(Input.MousePosition)) {
+				if (!HitTest(Input.MousePosition)) {
 #endif
-				SetNormalState();
-			} else if (Input.WasKeyPressed(Key.Mouse0)) {
-				SetPressedState();
-			}
-		}
-
-		void SetPressedState()
-		{
-			TryRunAnimation("Press");
-			StateHandler = UpdatePressedState;
-			UpdatePressedState();
-		}
-
-		void UpdatePressedState()
-		{
-			if (!HitTest(Input.MousePosition)) {
-                RunReleaseAnimation();
-				//RunAnimationWithStopHandler("Release", () => SetNormalState());
-			} else if (Input.WasKeyReleased(Key.Mouse0)) {
-				if (Clicked != null) {
-					Clicked();
+					State = NormalState;
+				} else if (Input.WasKeyPressed(Key.Mouse0)) {
+					if (Movable) {
+						State = DetectMovingState;
+					} else {
+						State = PressedState;
+					}
 				}
-				wasClicked = true;
-                RunReleaseAnimation();
-				//RunAnimationWithStopHandler("Release", () => SetNormalState());
+				yield return 0;
 			}
 		}
 
-		void SetDisabledState()
+		private IEnumerator<int> DetectMovingState()
 		{
-			if (World.Instance.ActiveWidget == this) {
-				World.Instance.ActiveWidget = null;
+			var mouse = Input.MousePosition;
+			foreach (var t in TimeDelay(0.15f)) {
+				yield return 0;
+				if ((mouse - Input.MousePosition).Length > 5) {
+					State = NormalState;
+				} else if (Input.WasKeyReleased(Key.Mouse0) && HitTest(Input.MousePosition)) {
+					HandleClick();
+					State = ReleaseState;
+				}
+			}
+			State = PressedState;
+		}
+
+		private IEnumerator<int> PressedState()
+		{
+			var mouse = Input.MousePosition;
+			TryRunAnimation("Press");
+			while (true) {
+				if (Movable && (mouse - Input.MousePosition).Length > 5) {
+					State = ReleaseState;
+				} else if (!HitTest(Input.MousePosition)) {
+					State = ReleaseState;
+				} else if (Input.WasKeyReleased(Key.Mouse0)) {
+					HandleClick();
+					State = ReleaseState;
+				}
+				yield return 0;
+			}
+		}
+
+		private void HandleClick()
+		{
+			if (Clicked != null) {
+				Clicked();
+			}
+			wasClicked = true;
+		}
+
+		private IEnumerator<int> ReleaseState()
+		{
+			if (TryRunAnimation("Release")) {
+				while (IsRunning) {
+					yield return 0;
+				}
+			}
+			if (HitTest(Input.MousePosition)) {
+				State = FocusedState;
+			} else {
+				State = NormalState;
+			}
+		}
+
+		private IEnumerator<int> DisabledState()
+		{
+			if (TheActiveWidget == this) {
+				TheActiveWidget = null;
 			}
 			TryRunAnimation("Disable");
-			StateHandler = UpdateDisabledState;
-		}
-
-		void UpdateDisabledState()
-		{
-			if (Enabled) {
-				RunAnimationWithStopHandler("Enable", () => SetNormalState());
+			while (IsRunning) {
+				yield return 0;
 			}
-		}
-
-		void RunAnimationWithStopHandler(string name, Action onStop)
-		{
-			if (TryRunAnimation(name)) {
-				StateHandler = () => {
-					if (IsStopped) {
-						onStop();
-					}
-				};
-			} else {
-				onStop();
+			while (!Enabled) {
+				yield return 0;
 			}
+			TryRunAnimation("Enable");
+			while (IsRunning) {
+				yield return 0;
+			}
+			State = NormalState;
 		}
 
 		private void UpdateLabel()
 		{
 			if (textPresenter == null) {
-				textPresenter = TryFind<SimpleText>("TextPresenter");
+				TryFind<SimpleText>("TextPresenter", out textPresenter);
 			}
 			if (textPresenter != null) {
 				textPresenter.Text = Text;
 			}
 		}
 
-		private void RunReleaseAnimation()
-		{
-            RunAnimationWithStopHandler(
-                "Release", 
-                () => {
-					if (HitTest(Input.MousePosition)) {
-						SetFocusedState();
-					} else {
-						SetNormalState();
-					}
-                }
-            );
-		}
-
 		public override void Update(int delta)
 		{
 			wasClicked = false;
 			if (GloballyVisible) {
-				StateHandler();
+				stateMachine.Advance();
 				UpdateLabel();
 				SyncActiveWidget();
 			}
-			if (!Enabled && StateHandler != UpdateDisabledState) {
-				SetDisabledState();
+			if (!Enabled && State != DisabledState) {
+				State = DisabledState;
 			}
 			base.Update(delta);
 		}
 
 		void SyncActiveWidget()
 		{
-			if (Enabled) {
-				if (World.Instance.ActiveWidget != this && StateHandler != UpdateNormalState) {
-					if (CurrentAnimation != "Release") {
-						SetNormalState();
-					}
+			if (!Enabled) {
+				return;
+			}
+			if (World.Instance.ActiveWidget != this && State != NormalState) {
+				if (CurrentAnimation != "Release") {
+					State = NormalState;
 				}
-			    if (World.Instance.ActiveWidget == this) {
-				    World.Instance.IsActiveWidgetUpdated = true;
-			    }	
+			}
+			if (TheActiveWidget == this) {
+				World.Instance.IsActiveWidgetUpdated = true;
 			}
 		}
+
+		private static Widget TheActiveWidget
+		{
+			get { return World.Instance.ActiveWidget; }
+			set { World.Instance.ActiveWidget = value; }
+		}
+
+#region StateMachine
+		class StateMachine
+		{
+			private IEnumerator<int> stateHandler;
+			public StateFunc State { get; private set; }
+
+			public void SetState(StateFunc state)
+			{
+				State = state;
+				stateHandler = state();
+				stateHandler.MoveNext();
+			}
+
+			public void Advance()
+			{
+				stateHandler.MoveNext();
+			}
+		}
+#endregion
 	}
 }
