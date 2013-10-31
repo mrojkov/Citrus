@@ -57,7 +57,6 @@ namespace Lemon
 		[DllImport(Dll, CallingConvention = CallingConvention.Cdecl)]
 		public static extern int OggGetChannels(IntPtr vorbisFile);
 
-#if !iOS
 		// Theora
 		[StructLayout(LayoutKind.Sequential)]
 		public struct TheoraImagePlane
@@ -95,6 +94,5 @@ namespace Lemon
 		//	int yWidth, int yHeight, int yStride,
 		//	int uvWidth, int uvHeight, int uvStride,
 		//	IntPtr destRgbx, int destStride);
-#endif
 	}
 }

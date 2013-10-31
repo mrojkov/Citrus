@@ -125,8 +125,6 @@
     <Compile Include="Source\AssetsBundle\PackedAssetsBundle.cs" />
     <Compile Include="Source\AssetsBundle\UnpackedAssetsBundle.cs" />
     <Compile Include="Source\Graphics\OgvDecoder.cs" />
-    <Compile Include="Source\Graphics\VideoTexture.cs" />
-    <Compile Include="Source\Widgets\Video.cs" />
     <Compile Include="Source\PopupMenu\ImageBox.cs" />
     <Compile Include="Source\PopupMenu\LayoutTools.cs" />
     <Compile Include="Source\PopupMenu\MenuButton.cs" />
@@ -161,6 +159,8 @@
     <Compile Include="Source\Application\ApplicationToolbox.cs" />
     <Compile Include="Source\Application\WinCursors.cs" />
     <Compile Include="Source\Audio\AudioSystem.ErrorChecker.cs" />
+    <Compile Include="Source\Graphics\MovieTexture.cs" />
+    <Compile Include="Source\Widgets\Movie.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Application\WinCursors.cs">
