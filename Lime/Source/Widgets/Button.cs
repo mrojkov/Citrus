@@ -15,8 +15,12 @@ namespace Lime
 		[ProtoMember(2)]
 		public bool Enabled { get; set; }
 
+		/// <summary>
+		/// Indicates whether a button has draggable behaviour. 
+		/// It means that if a user quickly swiped across the button it would not be pressed.
+		/// </summary>
 		[ProtoMember(3)]
-		public bool Movable { get; set; }
+		public bool Draggable { get; set; }
 
 		public override Action Clicked { get; set; }
 		
@@ -82,8 +86,8 @@ namespace Lime
 #endif
 					State = NormalState;
 				} else if (Input.WasKeyPressed(Key.Mouse0)) {
-					if (Movable) {
-						State = DetectMovingState;
+					if (Draggable) {
+						State = DetectDraggingState;
 					} else {
 						State = PressedState;
 					}
@@ -92,7 +96,7 @@ namespace Lime
 			}
 		}
 
-		private IEnumerator<int> DetectMovingState()
+		private IEnumerator<int> DetectDraggingState()
 		{
 			var mouse = Input.MousePosition;
 			foreach (var t in TimeDelay(0.15f)) {
@@ -112,7 +116,7 @@ namespace Lime
 			var mouse = Input.MousePosition;
 			TryRunAnimation("Press");
 			while (true) {
-				if (Movable && (mouse - Input.MousePosition).Length > 5) {
+				if (Draggable && (mouse - Input.MousePosition).Length > 5) {
 					State = ReleaseState;
 				} else if (!HitTest(Input.MousePosition)) {
 					State = ReleaseState;
