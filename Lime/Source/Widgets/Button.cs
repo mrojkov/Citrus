@@ -59,6 +59,12 @@ namespace Lime
 			}
 			TryRunAnimation("Normal");
 			while (true) {
+#if !iOS
+				if (!Input.IsMousePressed()) {
+					yield return 0;
+					continue;
+				}
+#endif
 				if (HitTest(Input.MousePosition) && TheActiveWidget == null) {
 					State = FocusedState;
 				}
@@ -79,12 +85,7 @@ namespace Lime
 			World.Instance.ActiveWidget = this;
 			TryRunAnimation("Focus");
 			while (true) {
-				// XXX
-#if iOS
-				if (!HitTest(Input.MousePosition)) {// || !Input.IsMousePressed()) {
-#else
 				if (!HitTest(Input.MousePosition)) {
-#endif
 					State = NormalState;
 				} else if (Input.WasKeyPressed(Key.Mouse0)) {
 					if (Draggable) {
