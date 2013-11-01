@@ -58,7 +58,6 @@ namespace Lemon
 		public static extern int OggGetChannels(IntPtr vorbisFile);
 
 		// Theora
-#if !iOS
 		[StructLayout(LayoutKind.Sequential)]
 		public struct TheoraImagePlane
 		{
@@ -95,6 +94,5 @@ namespace Lemon
 		//	int yWidth, int yHeight, int yStride,
 		//	int uvWidth, int uvHeight, int uvStride,
 		//	IntPtr destRgbx, int destStride);
-#endif
 	}
 }

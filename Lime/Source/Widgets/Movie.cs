@@ -17,7 +17,6 @@ namespace Lime
 		Stop
 	}
 
-#if !iOS
 	[ProtoContract]
 	public sealed class Movie : Widget, IImageCombinerArg
 	{
@@ -122,18 +121,4 @@ namespace Lime
 			}
 		}
 	}
-#else
-	[ProtoContract]
-	public sealed class Movie : Widget
-	{
-		[ProtoMember(1)]
-		public string Path { get; set; }
-
-		[ProtoMember(2)]
-		public bool Looped { get; set; }
-
-		[Trigger]
-		public MovieAction Action { get; set; }
-	}
-#endif
 }
