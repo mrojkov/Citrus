@@ -166,7 +166,7 @@ namespace Orange
 				for (int i = 0; ; i++) {
 					var texturePath = Path.ChangeExtension(dstPath, null);
 					string index = (i == 0) ? "" : i.ToString("00");
-					string texturePng = Path.Combine(Path.ChangeExtension(srcPath, null), index + ".png");
+					string texturePng = Path.ChangeExtension(srcPath, null) + index + ".png";
 					if (!File.Exists(texturePng)) {
 						break;
 					}

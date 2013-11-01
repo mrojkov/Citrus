@@ -79,8 +79,9 @@ namespace Lime
 			World.Instance.ActiveWidget = this;
 			TryRunAnimation("Focus");
 			while (true) {
+				// XXX
 #if iOS
-				if (!HitTest(Input.MousePosition) || !Input.IsMousePressed()) {
+				if (!HitTest(Input.MousePosition)) {// || !Input.IsMousePressed()) {
 #else
 				if (!HitTest(Input.MousePosition)) {
 #endif
