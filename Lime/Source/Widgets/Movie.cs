@@ -122,7 +122,7 @@ namespace Lime
 			}
 		}
 	}
-#endif
+#else
 	[ProtoContract]
 	public sealed class Movie : Widget
 	{
