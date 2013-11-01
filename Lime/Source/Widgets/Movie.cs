@@ -20,6 +20,7 @@ namespace Lime
 	[ProtoContract]
 	public sealed class Movie : Widget, IImageCombinerArg
 	{
+#if !iOS
 		bool skipRender;
 		bool requestSkipRender;
 		MovieTexture movieTexture;
@@ -120,5 +121,6 @@ namespace Lime
 					break;
 			}
 		}
+#endif
 	}
 }
