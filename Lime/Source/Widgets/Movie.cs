@@ -126,6 +126,18 @@ namespace Lime
 	[ProtoContract]
 	public sealed class Movie : Widget
 	{
+		[ProtoMember(1)]
+		public string Path
+		{
+			get { return Serialization.ShrinkPath(movieTexture.Path); }
+			set { movieTexture.Open(Serialization.ExpandPath(value)); }
+		}
+
+		[ProtoMember(2)]
+		public bool Looped { get; set; }
+
+		[Trigger]
+		public MovieAction Action { get; set; }
 	}
 #endif
 }
