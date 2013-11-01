@@ -59,7 +59,7 @@ namespace Lime
 			}
 			TryRunAnimation("Normal");
 			while (true) {
-#if !iOS
+#if iOS
 				if (!Input.IsMousePressed()) {
 					yield return 0;
 					continue;
