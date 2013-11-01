@@ -416,7 +416,7 @@ namespace Orange
 			DistortionMeshPoint point = (DistortionMeshPoint)node;
 			switch (name) {
 			case "Position":
-				lexer.ParseVector2();
+				point.Offset = lexer.ParseVector2();
 				break;
 			case "Anchor":
 				point.Position = lexer.ParseVector2();

@@ -14,6 +14,9 @@ namespace Lime
 		[ProtoMember(2)]
 		public Vector2 UV { get; set; }
 
+		[ProtoMember(3)]
+		public Vector2 Offset { get; set; }
+
 		public DistortionMeshPoint()
 		{
 			Color = Color4.White;
@@ -21,9 +24,9 @@ namespace Lime
 
 		public Vector2 TransformedPosition {
 			get {
-				Vector2 result = Vector2.Zero;
+				Vector2 result = Offset;
 				if (Parent != null && Parent.AsWidget != null) {
-					result = Parent.AsWidget.Size * Position;
+					result = Parent.AsWidget.Size * Position + Offset;
 				}
 				if (SkinningWeights != null && Parent != null && Parent.Parent != null) {
 					BoneArray a = Parent.Parent.AsWidget.BoneArray;
