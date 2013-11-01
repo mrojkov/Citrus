@@ -1,4 +1,5 @@
-﻿#if !UNITY
+﻿#if !iOS
+#if !UNITY
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -112,4 +113,5 @@ namespace Lime
 		}
 	}
 }
+#endif
 #endif
