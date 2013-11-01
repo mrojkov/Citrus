@@ -103,7 +103,7 @@ namespace Lime
 			var mouse = Input.MousePosition;
 			foreach (var t in TimeDelay(0.15f)) {
 				yield return 0;
-				if ((mouse - Input.MousePosition).Length > 5) {
+				if ((mouse - Input.MousePosition).Length > 15) {
 					State = NormalState;
 				} else if (Input.WasKeyReleased(Key.Mouse0) && HitTest(Input.MousePosition)) {
 					HandleClick();
@@ -118,7 +118,7 @@ namespace Lime
 			var mouse = Input.MousePosition;
 			TryRunAnimation("Press");
 			while (true) {
-				if (Draggable && (mouse - Input.MousePosition).Length > 5) {
+				if (Draggable && (mouse - Input.MousePosition).Length > 15) {
 					State = ReleaseState;
 				} else if (!HitTest(Input.MousePosition)) {
 					State = ReleaseState;
