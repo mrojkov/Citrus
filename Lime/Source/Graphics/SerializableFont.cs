@@ -57,7 +57,7 @@ namespace Lime
 				if (fonts.TryGetValue(name, out font))
 					return font;
 				string path = "Fonts/" + name + ".fnt";
-				if (!PackedAssetsBundle.Instance.FileExists(path))
+				if (!AssetsBundle.Instance.FileExists(path))
 					return Null;
 				font = Serialization.ReadObject<Font>(path);
 				fonts[name] = font;
