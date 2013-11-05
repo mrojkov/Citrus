@@ -35,7 +35,7 @@ namespace Lemon
 			public TellCallback TellFunc;
 		}
 		
-		// OGG\Vorbis  
+		// OGG\Vorbis
 		[DllImport(Dll, CallingConvention = CallingConvention.Cdecl)]
 		public static extern IntPtr OggCreate();
 		
@@ -90,9 +90,5 @@ namespace Lemon
 
 		[DllImport(Dll, CallingConvention = CallingConvention.Cdecl)]
 		public static extern void DecodeRGBX8(IntPtr dst_ptr, IntPtr y_ptr, IntPtr u_ptr, IntPtr v_ptr, int width, int height, int y_span, int uv_span, int dst_span, int dither);
-		//public static extern void DecodeRGBX(IntPtr yData, IntPtr uData, IntPtr vData,
-		//	int yWidth, int yHeight, int yStride,
-		//	int uvWidth, int uvHeight, int uvStride,
-		//	IntPtr destRgbx, int destStride);
 	}
 }

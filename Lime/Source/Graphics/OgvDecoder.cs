@@ -27,7 +27,7 @@ namespace Lime
 			};
 			streamHandle = streamMap.Allocate(stream);
 			ogvHandle = Lemon.Api.OgvCreate(streamHandle, fileSystem);
-			if (ogvHandle == null) {
+			if (ogvHandle.ToInt32() == 0) {
 				throw new Lime.Exception("Failed to open Ogv/Theora file");
 			}
 			FrameSize = new Size(Lemon.Api.OgvGetVideoWidth(ogvHandle),

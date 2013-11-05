@@ -37,8 +37,8 @@ namespace Lime
 
 		public void Open(string path)
 		{
-#if UNITY
-			throw new NotImplementedException();
+#if UNITY || MAC
+			Path = path;
 #else
 			if (path == null) {
 				throw new ArgumentException();
@@ -80,8 +80,7 @@ namespace Lime
 
 		public void Stop()
 		{
-#if UNITY
-			throw new NotImplementedException();
+#if UNITY || MAC
 #else
 			Stopped = true;
 			videoTime = 0;
@@ -107,8 +106,7 @@ namespace Lime
 
 		public void Update(float delta)
 		{
-#if UNITY
-			throw new NotImplementedException();
+#if UNITY || MAC
 #else
 			if (Paused || Stopped) {
 				return;
