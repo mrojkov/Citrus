@@ -19,35 +19,35 @@ namespace Lime
 		Color4[] pixels;
 		double gameTime;
 		double videoTime;
+		string path;
 
 		public bool Looped { get; set; }
 		public bool Paused { get; private set; }
 		public bool Stopped { get; private set; }
-		public string Path { get; private set; }
+		public string Path { get { return path; } set { SetPath(value); } }
 
 		public MovieTexture()
 		{
 			Stopped = true;
 		}
 
-		public MovieTexture(string path)
+		private void SetPath(string value)
 		{
-			Open(path);
+			path = value;
+			Stop();
 		}
 
-		public void Open(string path)
+		private void Open()
 		{
 #if UNITY || MAC
-			Path = path;
 #else
-			if (path == null) {
+			if (Path == null) {
 				throw new ArgumentException();
 			}
 			Stop();
-			Path = path;
-			rgbStream = AssetsBundle.Instance.OpenFile(path + ".ogv");
-			if (AssetsBundle.Instance.FileExists(path + "_alpha.ogv")) {
-				alphaStream = AssetsBundle.Instance.OpenFile(path + "_alpha.ogv");
+			rgbStream = AssetsBundle.Instance.OpenFile(Path + ".ogv");
+			if (AssetsBundle.Instance.FileExists(Path + "_alpha.ogv")) {
+				alphaStream = AssetsBundle.Instance.OpenFile(Path + "_alpha.ogv");
 			}
 			rgbDecoder = new OgvDecoder(rgbStream);
 			this.ImageSize = rgbDecoder.FrameSize;
@@ -59,7 +59,7 @@ namespace Lime
 		public void Play()
 		{
 			if (Stopped) {
-				Open(Path);
+				Open();
 				Stopped = false;
 			}
 			if (Paused) {
@@ -82,6 +82,7 @@ namespace Lime
 		{
 #if UNITY || MAC
 #else
+			DisposeOpenGLTexture();
 			Stopped = true;
 			videoTime = 0;
 			gameTime = 0;
@@ -120,7 +121,7 @@ namespace Lime
 						Restart();
 						rgbDecoder.DecodeFrame();
 					} else {
-						Stopped = true;
+						Stop();
 						return;
 					}
 				}

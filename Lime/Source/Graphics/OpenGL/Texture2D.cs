@@ -191,6 +191,11 @@ namespace Lime
 
 		public virtual void Dispose()
 		{
+			DisposeOpenGLTexture();
+		}
+
+		protected void DisposeOpenGLTexture()
+		{
 			if (id != 0) {
 				lock (TexturesToDelete) {
 					TexturesToDelete.Add(id);

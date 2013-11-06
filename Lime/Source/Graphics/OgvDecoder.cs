@@ -37,6 +37,9 @@ namespace Lime
 		public void Dispose()
 		{
 			Lemon.Api.OgvDispose(ogvHandle);
+			streamMap.Release(streamHandle);
+			ogvHandle = new IntPtr(0);
+			streamHandle = 0;
 		}
 
 		public bool DecodeFrame()

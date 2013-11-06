@@ -28,7 +28,7 @@ namespace Lime
 		public string Path
 		{
 			get { return Serialization.ShrinkPath(movieTexture.Path); }
-			set { movieTexture.Open(Serialization.ExpandPath(value)); }
+			set { movieTexture.Path = Serialization.ExpandPath(value); }
 		}
 
 		[ProtoMember(2)]
