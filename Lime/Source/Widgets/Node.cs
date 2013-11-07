@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System;
+using System.Reflection;
 using ProtoBuf;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -34,7 +35,7 @@ namespace Lime
 
 		public event Action AnimationStopped;
 	
-		private static List<Node> nodesToUnlink = new List<Node>();
+		private static readonly List<Node> nodesToUnlink = new List<Node>();
 
 		private int animationTime;
 
@@ -105,14 +106,20 @@ namespace Lime
 		public Node GetRoot()
 		{
 			Node node = this;
-			while (node.Parent != null)
+			while (node.Parent != null) {
 				node = node.Parent;
+			}
 			return node;
 		}
 
 		public bool HasChild(Node node)
 		{
 			return node.ChildOf(this);
+		}
+
+		public bool HasChild(string path)
+		{
+			return this.TryFindNode(path) != null;
 		}
 
 		public bool ChildOf(Node node)
@@ -190,7 +197,7 @@ namespace Lime
 		/// </summary>
 		public virtual Node DeepCloneFast()
 		{
-			Node clone = (Node)MemberwiseClone();
+			var clone = (Node)MemberwiseClone();
 			clone.CreationTime = DateTime.Now;
 			clone.Parent = null;
 			clone.AsWidget = clone as Widget;
@@ -358,33 +365,33 @@ namespace Lime
 			return TryFind<T>(string.Format(format, args));
 		}
 
-		public Node FindNode(string id)
+		public Node FindNode(string path)
 		{
-			var node = TryFindNode(id);
+			var node = TryFindNode(path);
 			if (node == null) {
-				throw new Lime.Exception("'{0}' not found for '{1}'", id, ToString());
+				throw new Lime.Exception("'{0}' not found for '{1}'", path, ToString());
 			}
 			return node;
 		}
 
-		public Node TryFindNode(string id)
+		public Node TryFindNode(string path)
 		{
-			if (id.IndexOf('/') >= 0) {
+			if (path.IndexOf('/') >= 0) {
 				Node child = this;
-				string[] names = id.Split('/');
-				foreach (string name in names) {
-					child = child.TryFindNode(name);
+				string[] ids = path.Split('/');
+				foreach (string id in ids) {
+					child = child.TryFindNode(id);
 					if (child == null)
 						break;
 				}
 				return child;
 			} else
-				return TryFindNodeHelper(id);
+				return TryFindNodeHelper(path);
 		}
 
 		private Node TryFindNodeHelper(string id)
 		{
-			Queue<Node> queue = new Queue<Node>();
+			var queue = new Queue<Node>();
 			queue.Enqueue(this);
 			while (queue.Count > 0) {
 				Node node = queue.Dequeue();
@@ -400,10 +407,10 @@ namespace Lime
 
 		public void AdvanceAnimation(int delta)
 		{
-			const int MaxTimeDelta = 1000 / Animator.FramesPerSecond - 1;
-			while (delta > MaxTimeDelta) {
-				AdvanceAnimationShort(MaxTimeDelta);
-				delta -= MaxTimeDelta;
+			const int maxTimeDelta = 1000 / Animator.FramesPerSecond - 1;
+			while (delta > maxTimeDelta) {
+				AdvanceAnimationShort(maxTimeDelta);
+				delta -= maxTimeDelta;
 			}
 			AdvanceAnimationShort(delta);
 		}
@@ -480,31 +487,46 @@ namespace Lime
 		{
 			foreach (var prop in GetType().GetProperties()) {
 				if (prop.PropertyType == typeof(ITexture)) {
-					var getter = prop.GetGetMethod();
-					var texture = getter.Invoke(this, new object[] {}) as ITexture;
-					if (texture != null) {
-						texture.GetHandle();
-					}
+					PreloadTexture(prop);
 				} else if (prop.PropertyType == typeof(SerializableFont)) {
-					var getter = prop.GetGetMethod();
-					var font = getter.Invoke(this, new object[] { }) as SerializableFont;
-					if (font != null) {
-						foreach (var texture in font.Instance.Textures) {
-							texture.GetHandle();
-						}
-					}
+					PreloadFont(prop);
 				}
 			}
 			foreach (var animator in Animators) {
-				var a = animator as GenericAnimator<ITexture>;
-				if (a != null) {
-					foreach (var texture in a.values) {
-						texture.GetHandle();
-					}
-				}
+				PreloadAnimatedTextures(animator);
 			}
 			foreach (var node in Nodes.AsArray) {
 				node.Preload();
+			}
+		}
+
+		private static void PreloadAnimatedTextures(Animator animator)
+		{
+			var textureAnimator = animator as GenericAnimator<ITexture>;
+			if (textureAnimator != null) {
+				foreach (var texture in textureAnimator.values) {
+					texture.GetHandle();
+				}
+			}
+		}
+
+		private void PreloadFont(PropertyInfo prop)
+		{
+			var getter = prop.GetGetMethod();
+			var font = getter.Invoke(this, new object[]{}) as SerializableFont;
+			if (font != null) {
+				foreach (var texture in font.Instance.Textures) {
+					texture.GetHandle();
+				}
+			}
+		}
+
+		private void PreloadTexture(PropertyInfo prop)
+		{
+			var getter = prop.GetGetMethod();
+			var texture = getter.Invoke(this, new object[]{}) as ITexture;
+			if (texture != null) {
+				texture.GetHandle();
 			}
 		}
 

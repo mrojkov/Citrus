@@ -46,9 +46,10 @@ namespace Lime
 		private float rotation;
 		private Vector2 direction = new Vector2(1, 0);
 		private Color4 color;
-		protected bool renderedToTexture;
 		private Action clicked;
 		private Vector2? parentSize;
+
+		protected bool RenderedToTexture;
 
 		#region Properties
 
@@ -183,14 +184,15 @@ namespace Lime
 				ApplyAnchors();
 			}
 			RecalcGlobalMatrixAndColorHelper();
-			if (GloballyVisible) {
-				if (IsRunning) {
-					AdvanceAnimation(delta);
-				}
-				UpdateChildren(delta);
-				if (clicked != null) {
-					HandleClick();
-				}
+			if (!GloballyVisible) {
+				return;
+			}
+			if (IsRunning) {
+				AdvanceAnimation(delta);
+			}
+			UpdateChildren(delta);
+			if (clicked != null) {
+				HandleClick();
 			}
 		}
 
@@ -213,13 +215,14 @@ namespace Lime
 		{
 			if (Parent != null) {
 				var parentWidget = Parent.AsWidget;
-				if (parentWidget != null && !parentWidget.renderedToTexture) {
-					LocalToWorldTransform = CalcLocalToParentTransform() * parentWidget.LocalToWorldTransform;
-					GlobalColor = Color * parentWidget.GlobalColor;
-					GlobalBlending = Blending == Blending.Default ? parentWidget.GlobalBlending : Blending;
-					GloballyVisible = (Visible && color.A != 0) && parentWidget.GloballyVisible;
+				if (parentWidget == null || parentWidget.RenderedToTexture) {
 					return;
 				}
+				LocalToWorldTransform = CalcLocalToParentTransform() * parentWidget.LocalToWorldTransform;
+				GlobalColor = Color * parentWidget.GlobalColor;
+				GlobalBlending = Blending == Blending.Default ? parentWidget.GlobalBlending : Blending;
+				GloballyVisible = (Visible && color.A != 0) && parentWidget.GloballyVisible;
+				return;
 			}
 			LocalToWorldTransform = CalcLocalToParentTransform();
 			GlobalColor = color;
@@ -253,20 +256,21 @@ namespace Lime
 
 		public override void AddToRenderChain(RenderChain chain)
 		{
-			if (GloballyVisible) {
-				if (Layer != 0) {
-					int oldLayer = chain.SetLayer(Layer);
-					foreach (Node node in Nodes.AsArray) {
-						node.AddToRenderChain(chain);
-					}
-					chain.Add(this);
-					chain.SetLayer(oldLayer);
-				} else {
-					foreach (Node node in Nodes.AsArray) {
-						node.AddToRenderChain(chain);
-					}
-					chain.Add(this);
+			if (!GloballyVisible) {
+				return;
+			}
+			if (Layer != 0) {
+				int oldLayer = chain.SetLayer(Layer);
+				foreach (Node node in Nodes.AsArray) {
+					node.AddToRenderChain(chain);
 				}
+				chain.Add(this);
+				chain.SetLayer(oldLayer);
+			} else {
+				foreach (Node node in Nodes.AsArray) {
+					node.AddToRenderChain(chain);
+				}
+				chain.Add(this);
 			}
 		}
 
@@ -281,50 +285,61 @@ namespace Lime
 		{
 			Vector2 s = Parent.AsWidget.Size;
 			if (parentSize.HasValue && !parentSize.Value.Equals(s)) {
-				// Apply anchors along X axis.
-				if ((Anchors & Anchors.CenterH) != 0) {
-					X += (s.X - parentSize.Value.X) / 2;
-				} else if ((Anchors & Anchors.Left) != 0 && (Anchors & Anchors.Right) != 0) {
-					Width += s.X - parentSize.Value.X;
-					X += (s.X - parentSize.Value.X) * Pivot.X;
-				} else if ((Anchors & Anchors.Right) != 0) {
-					X += s.X - parentSize.Value.X;
-				}
-				// Apply anchors along Y axis.
-				if ((Anchors & Anchors.CenterV) != 0) {
-					Y += (s.Y - parentSize.Value.Y) / 2;
-				} else if ((Anchors & Anchors.Top) != 0 && (Anchors & Anchors.Bottom) != 0) {
-					Height += s.Y - parentSize.Value.Y;
-					Y += (s.Y - parentSize.Value.Y) * Pivot.Y;
-				} else if ((Anchors & Anchors.Bottom) != 0) {
-					Y += s.Y - parentSize.Value.Y;
-				}
+				ApplyAnchorsAlongXAxis();
+				ApplyAnchorsAlongYAxis();
 			}
 			parentSize = s;
 		}
 
+		private void ApplyAnchorsAlongYAxis()
+		{
+			Vector2 s = Parent.AsWidget.Size;
+			if ((Anchors & Anchors.CenterV) != 0) {
+				Y += (s.Y - parentSize.Value.Y) / 2;
+			} else if ((Anchors & Anchors.Top) != 0 && (Anchors & Anchors.Bottom) != 0) {
+				Height += s.Y - parentSize.Value.Y;
+				Y += (s.Y - parentSize.Value.Y) * Pivot.Y;
+			} else if ((Anchors & Anchors.Bottom) != 0) {
+				Y += s.Y - parentSize.Value.Y;
+			}
+		}
+
+		private void ApplyAnchorsAlongXAxis()
+		{
+			Vector2 s = Parent.AsWidget.Size;
+			if ((Anchors & Anchors.CenterH) != 0) {
+				X += (s.X - parentSize.Value.X) / 2;
+			} else if ((Anchors & Anchors.Left) != 0 && (Anchors & Anchors.Right) != 0) {
+				Width += s.X - parentSize.Value.X;
+				X += (s.X - parentSize.Value.X) * Pivot.X;
+			} else if ((Anchors & Anchors.Right) != 0) {
+				X += s.X - parentSize.Value.X;
+			}
+		}
+
 		public virtual bool HitTest(Vector2 point)
 		{
-			if (GloballyVisible) {
-				if (HitTestMethod == HitTestMethod.BoundingRect) {
-					Vector2 p = LocalToWorldTransform.CalcInversed().TransformVector(point);
-					Vector2 s = Size;
-					if (s.X < 0) {
-						p.X = -p.X;
-						s.X = -s.X;
-					}
-					if (s.Y < 0) {
-						p.Y = -p.Y;
-						s.Y = -s.Y;
-					}
-					return p.X >= 0 && p.Y >= 0 && p.X < s.X && p.Y < s.Y;
-				} else if (HitTestMethod == HitTestMethod.Contents) {
-					foreach (Node node in Nodes.AsArray) {
-						if (node.AsWidget != null && node.AsWidget.HitTest(point))
-							return true;
-					}
-					return false;
+			if (!GloballyVisible) {
+				return false;
+			}
+			if (HitTestMethod == HitTestMethod.BoundingRect) {
+				Vector2 p = LocalToWorldTransform.CalcInversed().TransformVector(point);
+				Vector2 s = Size;
+				if (s.X < 0) {
+					p.X = -p.X;
+					s.X = -s.X;
 				}
+				if (s.Y < 0) {
+					p.Y = -p.Y;
+					s.Y = -s.Y;
+				}
+				return p.X >= 0 && p.Y >= 0 && p.X < s.X && p.Y < s.Y;
+			} else if (HitTestMethod == HitTestMethod.Contents) {
+				foreach (Node node in Nodes.AsArray) {
+					if (node.AsWidget != null && node.AsWidget.HitTest(point))
+						return true;
+				}
+				return false;
 			}
 			return false;
 		}

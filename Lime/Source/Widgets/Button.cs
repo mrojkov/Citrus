@@ -101,7 +101,7 @@ namespace Lime
 		private IEnumerator<int> DetectDraggingState()
 		{
 			var mouse = Input.MousePosition;
-			foreach (var t in TimeDelay(0.15f)) {
+			foreach (var t in TimeDelay(0.1f)) {
 				yield return 0;
 				if ((mouse - Input.MousePosition).Length > 15) {
 					State = NormalState;

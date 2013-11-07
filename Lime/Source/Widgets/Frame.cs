@@ -36,17 +36,13 @@ namespace Lime
 		// If dialog is being shown or hidden then all controls on dialog are frozen either.
 		public bool DialogMode { get; set; }
 
-		RenderTarget renderTarget { get; set; }
-		ITexture renderTexture { get; set; }
+		RenderTarget renderTarget;
+		ITexture renderTexture;
 
 		[ProtoMember(1)]
 		public RenderTarget RenderTarget {
 			get { return renderTarget; }
-			set {
-				renderTarget = value;
-				renderedToTexture = value != RenderTarget.None;
-				renderTexture = CreateRenderTargetTexture(value);
-			}
+			set { SetRenderTarget(value); }
 		}
 
 		public Frame() {}
@@ -56,16 +52,21 @@ namespace Lime
 			this.Position = position;
 		}
 
-		void IImageCombinerArg.SkipRender() {}
-
-		ITexture IImageCombinerArg.GetTexture()
+		public Frame(string path)
 		{
-			return renderTexture;
+			LoadFromBundle(path);
 		}
 
 		public bool IsTopDialog()
 		{
 			return World.Instance.GetTopDialog() == this;
+		}
+
+		private void SetRenderTarget(RenderTarget value)
+		{
+			renderTarget = value;
+			RenderedToTexture = value != RenderTarget.None;
+			renderTexture = CreateRenderTargetTexture(value);
 		}
 
 		private void UpdateForDialogMode(int delta)
@@ -119,25 +120,14 @@ namespace Lime
 
 		public override void AddToRenderChain(RenderChain chain)
 		{
-			if (GloballyVisible) {
-				if (renderTexture != null)
-					chain.Add(this);
-				else
-					base.AddToRenderChain(chain);
+			if (!GloballyVisible) {
+				return;
 			}
-		}
-
-		public Frame(Node parent, string path)
-		{
-			LoadFromBundle(path);
-			if (parent != null) {
-				parent.PushNode(this);
+			if (renderTexture != null) {
+				chain.Add(this);
+			} else {
+				base.AddToRenderChain(chain);
 			}
-		}
-
-		public Frame(string path)
-		{
-			LoadFromBundle(path);
 		}
 
 		[ThreadStatic]
@@ -153,7 +143,7 @@ namespace Lime
 				throw new Lime.Exception("Cyclic dependency of scenes was detected: {0}", path);
 			cyclicDependencyTracker.Add(path);
 			try {
-				using (Stream stream = PackedAssetsBundle.Instance.OpenFileLocalized(path)) {
+				using (Stream stream = AssetsBundle.Instance.OpenFileLocalized(path)) {
 					Serialization.ReadObject<Frame>(path, stream, this);
 				}
 				LoadContent();
@@ -165,9 +155,9 @@ namespace Lime
 
 		public void LoadContent()
 		{
-			if (!string.IsNullOrEmpty(ContentsPath))
+			if (!string.IsNullOrEmpty(ContentsPath)) {
 				LoadContentHelper();
-			else {
+			} else {
 				foreach (Node node in Nodes.AsArray) {
 					if (node is Frame) {
 						(node as Frame).LoadContent();
@@ -181,31 +171,32 @@ namespace Lime
 			Nodes.Clear();
 			Markers.Clear();
 			var contentsPath = Path.ChangeExtension(ContentsPath, "scene");
-			if (PackedAssetsBundle.Instance.FileExists(contentsPath)) {
-				Frame content = new Frame(ContentsPath);
-				if (content.AsWidget != null && AsWidget != null) {
-					content.Update(0);
-					content.AsWidget.Size = AsWidget.Size;
-					content.Update(0);
-				}
-				foreach (Marker marker in content.Markers)
-					Markers.Add(marker);
-				foreach (Node node in content.Nodes.AsArray) {
-					node.Unlink();
-					Nodes.Add(node);
-				}
+			if (!AssetsBundle.Instance.FileExists(contentsPath)) {
+				return;
+			}
+			var content = new Frame(ContentsPath);
+			if (content.AsWidget != null && AsWidget != null) {
+				content.Update(0);
+				content.AsWidget.Size = AsWidget.Size;
+				content.Update(0);
+			}
+			foreach (Marker marker in content.Markers)
+				Markers.Add(marker);
+			foreach (Node node in content.Nodes.AsArray) {
+				node.Unlink();
+				Nodes.Add(node);
 			}
 		}
 
 		public static Frame CreateSubframe(string path)
 		{
-			var frame = new Frame(path).Nodes[0] as Frame;
+			var frame = (Frame)(new Frame(path).Nodes[0]);
 			frame.Unlink();
 			frame.Tag = path;
 			return frame;
 		}
 
-		private ITexture CreateRenderTargetTexture(RenderTarget value)
+		private static ITexture CreateRenderTargetTexture(RenderTarget value)
 		{
 			switch (value) {
 				case RenderTarget.A:
@@ -220,5 +211,16 @@ namespace Lime
 					return null;
 			}
 		}
+
+		#region IImageCombinerArg
+		
+		void IImageCombinerArg.SkipRender() { }
+
+		ITexture IImageCombinerArg.GetTexture()
+		{
+			return renderTexture;
+		}
+
+		#endregion
 	}
 }

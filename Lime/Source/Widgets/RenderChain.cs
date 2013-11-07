@@ -8,7 +8,7 @@ namespace Lime
 		int currentLayer;
 		int maxUsedLayer;
 
-		Node[] layers = new Node[MaxLayers];
+		readonly Node[] layers = new Node[MaxLayers];
 
 		public void Add(Node node)
 		{
