@@ -215,14 +215,13 @@ namespace Lime
 		{
 			if (Parent != null) {
 				var parentWidget = Parent.AsWidget;
-				if (parentWidget == null || parentWidget.RenderedToTexture) {
+				if (parentWidget != null && !parentWidget.RenderedToTexture) {
+					LocalToWorldTransform = CalcLocalToParentTransform() * parentWidget.LocalToWorldTransform;
+					GlobalColor = Color * parentWidget.GlobalColor;
+					GlobalBlending = Blending == Blending.Default ? parentWidget.GlobalBlending : Blending;
+					GloballyVisible = (Visible && color.A != 0) && parentWidget.GloballyVisible;
 					return;
 				}
-				LocalToWorldTransform = CalcLocalToParentTransform() * parentWidget.LocalToWorldTransform;
-				GlobalColor = Color * parentWidget.GlobalColor;
-				GlobalBlending = Blending == Blending.Default ? parentWidget.GlobalBlending : Blending;
-				GloballyVisible = (Visible && color.A != 0) && parentWidget.GloballyVisible;
-				return;
 			}
 			LocalToWorldTransform = CalcLocalToParentTransform();
 			GlobalColor = color;
