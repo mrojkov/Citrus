@@ -108,6 +108,7 @@ namespace Lime
 				} else if (Input.WasKeyReleased(Key.Mouse0) && HitTest(Input.MousePosition)) {
 					HandleClick();
 					State = ReleaseState;
+					yield break;
 				}
 			}
 			State = PressedState;
