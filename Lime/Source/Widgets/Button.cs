@@ -17,7 +17,7 @@ namespace Lime
 
 		/// <summary>
 		/// Indicates whether a button has draggable behaviour. 
-		/// It means that if a user quickly swiped across the button it would not be pressed.
+		/// It means that if a user has quickly passed his finger through the button it would not be pressed.
 		/// </summary>
 		[ProtoMember(3)]
 		public bool Draggable { get; set; }
@@ -32,6 +32,20 @@ namespace Lime
 			get { return stateMachine.State; }
 			set { stateMachine.SetState(value); }
 		}
+
+		/// <summary>
+		/// The minimum distance which finger should pass through the button,
+		/// in order to avoid button click. 
+		/// For Draggable buttons only.
+		/// </summary>
+		private const float DragDistanceThreshold = 15;
+
+		/// <summary>
+		/// The period of time while drag detection is working, 
+		/// since a finger touched the button.
+		/// For Draggable buttons only.
+		/// </summary>
+		private const float DragDetectionTime = 0.15f;
 
 		public Button()
 		{
@@ -101,17 +115,27 @@ namespace Lime
 		private IEnumerator<int> DetectDraggingState()
 		{
 			var mouse = Input.MousePosition;
-			foreach (var t in TimeDelay(0.1f)) {
+			foreach (var t in TimeDelay(DragDetectionTime)) {
 				yield return 0;
-				if ((mouse - Input.MousePosition).Length > 15) {
+				if ((mouse - Input.MousePosition).Length > DragDistanceThreshold) {
 					State = NormalState;
 				} else if (Input.WasKeyReleased(Key.Mouse0) && HitTest(Input.MousePosition)) {
-					HandleClick();
-					State = ReleaseState;
+					State = QuickClickOnDraggableButtonState;
 					yield break;
 				}
 			}
 			State = PressedState;
+		}
+
+		private IEnumerator<int> QuickClickOnDraggableButtonState()
+		{
+			if (TryRunAnimation("Press")) {
+				while (IsRunning) {
+					yield return 0;
+				}
+			}
+			HandleClick();
+			State = ReleaseState;
 		}
 
 		private IEnumerator<int> PressedState()
@@ -119,7 +143,7 @@ namespace Lime
 			var mouse = Input.MousePosition;
 			TryRunAnimation("Press");
 			while (true) {
-				if (Draggable && (mouse - Input.MousePosition).Length > 15) {
+				if (Draggable && (mouse - Input.MousePosition).Length > DragDistanceThreshold) {
 					State = ReleaseState;
 				} else if (!HitTest(Input.MousePosition)) {
 					State = ReleaseState;
