@@ -37,7 +37,13 @@ namespace Lime
 			var file = entryAssembly.GetManifestResourceStream(fullResourceName);
 			Bitmap bitmap = new Bitmap(file);
 			if (bitmap.Width > 32 || bitmap.Height > 32) {
-				throw new Lime.Exception("A cursor can not exceeds 32x32 pixels (Windows XP compatibility)");
+				// Заменил Exception на Warning, так как SP1 и SP2 встречаются редко.
+				// Если вдруг нам всё-таки понадобится их поддержка, то сюда нужно
+				// добавить код, который будет ресайзить битмап до нужного размера.
+				// Нужный размер можно узнать с помощью 
+				// GetSystemMetrics(SM_CXCURSOR) и GetSystemMetrics(SM_CYCURSOR)
+				// -- Гриша.
+				Console.WriteLine("WARNING: A cursor should not exceeds 32x32 pixels (Windows XP SP1 and SP2 compatibility)");
 			}
 			return bitmap;
 		}
