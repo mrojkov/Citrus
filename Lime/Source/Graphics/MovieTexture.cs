@@ -46,10 +46,11 @@ namespace Lime
 			}
 			Stop();
 			rgbStream = AssetsBundle.Instance.OpenFile(Path + ".ogv");
+			rgbDecoder = new OgvDecoder(rgbStream);
 			if (AssetsBundle.Instance.FileExists(Path + "_alpha.ogv")) {
 				alphaStream = AssetsBundle.Instance.OpenFile(Path + "_alpha.ogv");
+				alphaDecoder = new OgvDecoder(alphaStream);
 			}
-			rgbDecoder = new OgvDecoder(rgbStream);
 			this.ImageSize = rgbDecoder.FrameSize;
 			this.SurfaceSize = ImageSize;
 			pixels = new Color4[ImageSize.Width * ImageSize.Height];
@@ -132,7 +133,10 @@ namespace Lime
 				if (videoTime >= gameTime)
 					break;
 			}
-			rgbDecoder.FillTextureRGB8(pixels, ImageSize.Width, ImageSize.Height);
+			rgbDecoder.FillTextureRGBX8(pixels, ImageSize.Width, ImageSize.Height);
+			if (alphaDecoder != null) {
+				alphaDecoder.FillTextureAlpha(pixels, ImageSize.Width, ImageSize.Height);
+			}
 			LoadImage(pixels, ImageSize.Width, ImageSize.Height, false);
 #endif
 		}

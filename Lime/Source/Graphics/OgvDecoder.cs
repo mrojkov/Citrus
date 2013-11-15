@@ -52,7 +52,7 @@ namespace Lime
 			return Lemon.Api.OgvGetPlaybackTime(ogvHandle);
 		}
 
-		public void FillTextureRGB8(Color4[] pixels, int width, int height)
+		public void FillTextureRGBX8(Color4[] pixels, int width, int height)
 		{
 			var yPlane = Lemon.Api.OgvGetBuffer(ogvHandle, 0);
 			var uPlane = Lemon.Api.OgvGetBuffer(ogvHandle, 1);
@@ -66,6 +66,27 @@ namespace Lime
 				}
 			}
 		}
+
+		public void FillTextureAlpha(Color4[] pixels, int width, int height)
+		{
+			var yPlane = Lemon.Api.OgvGetBuffer(ogvHandle, 0);
+			if (yPlane.Width != width || yPlane.Height != height) {
+				throw new ArgumentException();
+			}
+			unsafe {
+				fixed (Color4* pixelsPtr = &pixels[0]) {
+					for (int i = 0; i < height; i++) {
+						var alphaPtr = (byte*)yPlane.Data.ToPointer() + i * yPlane.Stride;
+						var linePtr = pixelsPtr + i * width;
+						var lineEnd = linePtr + width;
+						for (; linePtr != lineEnd; linePtr++) {
+							linePtr->A = *alphaPtr++;
+						}
+					}
+				}
+			}
+		}
+
 
 #if iOS
 		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.Api.ReadCallback))]
