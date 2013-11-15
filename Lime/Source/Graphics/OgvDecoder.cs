@@ -14,7 +14,7 @@ namespace Lime
 		int streamHandle;
 		Lemon.Api.FileSystem fileSystem;
 		IntPtr ogvHandle;
-		static StreamMap streamMap = new StreamMap();
+		static readonly StreamMap streamMap = new StreamMap();
 
 		public Size FrameSize { get; private set; }
 
