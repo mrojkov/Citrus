@@ -32,13 +32,17 @@ namespace Lime
 	{
 		[ProtoMember(1)]
 		public bool Enabled { get; set; }
-		
+
+		[ProtoMember(2)]
+		public Blending Blending { get; set; }
+
 		public ImageCombiner()
 		{
 			Enabled = true;
+			Blending = Blending.Default;
 		}
-		
-		bool AreVectorsClockwiseOrdered(Vector2 u, Vector2 v, Vector2 w)
+
+		static bool AreVectorsClockwiseOrdered(Vector2 u, Vector2 v, Vector2 w)
 		{
 			return (v.Y - u.Y) * (w.X - v.X) > (v.X - u.X) * (w.Y - v.Y);
 		}
@@ -75,7 +79,7 @@ namespace Lime
 			}
 		}
 
-		static Vector2[] outVertices = new Vector2[64];
+		static readonly Vector2[] outVertices = new Vector2[64];
 
 		private void ClipPolygonByLine(Vector2[] vertices, ref int numVertices, Vector2 a, Vector2 b)
 		{
@@ -114,9 +118,9 @@ namespace Lime
 			}
 		}
 
-		static Vector2[] coords = new Vector2[8];
-		static Vector2[] stencil = new Vector2[4];
-		static Renderer.Vertex[] vertices = new Renderer.Vertex[8];
+		static readonly Vector2[] coords = new Vector2[8];
+		static readonly Vector2[] stencil = new Vector2[4];
+		static readonly Renderer.Vertex[] vertices = new Renderer.Vertex[8];
 		static readonly Vector2[] rect = new Vector2[4] { 
 			new Vector2(0, 0), 
 			new Vector2(1, 0), 
@@ -163,15 +167,18 @@ namespace Lime
 		{
 			if (Parent.AsWidget != null) {
 				IImageCombinerArg arg1, arg2;
-				if (GetArgs(out arg1, out arg2)) {
-					if (arg1.GloballyVisible && arg2.GloballyVisible) {
-						if (arg1.GetTexture() != null && arg2.GetTexture() != null) {
-							Renderer.Transform1 = Parent.AsWidget.LocalToWorldTransform;
-							Renderer.Blending = Parent.AsWidget.GlobalBlending;
-							RenderHelper(arg1, arg2);
-						}
-					}
+				if (!GetArgs(out arg1, out arg2)) {
+					return;
 				}
+				if (!arg1.GloballyVisible || !arg2.GloballyVisible) {
+					return;
+				}
+				if (arg1.GetTexture() == null || arg2.GetTexture() == null) {
+					return;
+				}
+				Renderer.Transform1 = Parent.AsWidget.LocalToWorldTransform;
+				Renderer.Blending = Blending == Blending.Default ? Parent.AsWidget.GlobalBlending : Blending;
+				RenderHelper(arg1, arg2);
 			}
 		}
 	}

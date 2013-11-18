@@ -384,7 +384,7 @@ namespace Orange
 				combiner.Enabled = lexer.ParseBool();
 				break;
 			case "BlendMode":
-				lexer.ParseInt();
+				combiner.Blending = lexer.ParseBlendMode();
 				break;
 			default:
 				ParseActorProperty(combiner, name);
