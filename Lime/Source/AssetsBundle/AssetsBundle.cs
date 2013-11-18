@@ -19,7 +19,7 @@ namespace Lime
 		private static AssetsBundle GetInstance()
 		{
 			if (instance == null) {
-				throw new Lime.Exception("AssetsBundle.Instance should initialized before usage");
+				throw new Lime.Exception("AssetsBundle.Instance should be initialized before first usage");
 			}
 			return instance;
 		}
