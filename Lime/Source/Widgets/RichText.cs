@@ -83,6 +83,8 @@ namespace Lime
 		TextParser parser = new TextParser();
 		string text;
 
+		public string ErrorMessage { get; private set; }
+
 		public override void Render()
 		{
 			var renderer = PrepareRenderer();
@@ -133,10 +135,12 @@ namespace Lime
 			text = value;
 			var localizedText = Localization.GetString(text);
 			parser = new TextParser(localizedText);
-			if (parser.ErrorMessage != null) {
-				parser = new TextParser("Error: " + parser.ErrorMessage);
+			ErrorMessage = parser.ErrorMessage;
+			if (ErrorMessage != null) {
+				parser = new TextParser("Error: " + ErrorMessage);
 			}
 		}
+
 	}
 
 	class TextParser
