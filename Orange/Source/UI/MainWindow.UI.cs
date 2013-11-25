@@ -50,7 +50,12 @@ namespace Orange
 			NativeWindow.WindowPosition = Gtk.WindowPosition.Center;
 			NativeWindow.DefaultSize = new Gdk.Size(500, 400);
 
+			var mainHBox = new Gtk.HBox();
+			mainHBox.Name = "MainHBox";
+			
 			var mainVBox = new Gtk.VBox() { Spacing = 6, BorderWidth = 6 };
+			mainVBox.Name = "MainVBox";
+
 			CreateHeaderSection(mainVBox);
 
 			var output = CreateOutputPane();
@@ -58,7 +63,10 @@ namespace Orange
 			
 			var hbox = CreateFooterSection();
 			mainVBox.PackStart(hbox, expand: false, fill: true, padding: 0);
-			NativeWindow.Add(mainVBox);
+
+			mainHBox.Add(mainVBox);
+
+			NativeWindow.Add(mainHBox);
 
 			NativeWindow.Hidden += Window_Hidden;
 			GoButton.Clicked += GoButton_Clicked;
