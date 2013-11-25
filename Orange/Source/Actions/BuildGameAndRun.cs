@@ -40,7 +40,8 @@ namespace Orange
 		public static bool RunGame(TargetPlatform platform)
 		{
 			var builder = new SolutionBuilder(platform);
-			int exitCode = builder.Run("");
+			string arguments = PluginLoader.GetCommandLineArguments();
+			int exitCode = builder.Run(arguments);
 			if (exitCode != 0) {
 				Console.WriteLine("Application terminated with exit code {0}", exitCode);
 				return false;

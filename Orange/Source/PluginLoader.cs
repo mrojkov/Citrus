@@ -105,5 +105,27 @@ namespace Orange
 			//var assembly = Assembly.Load(readAllBytes);
 			//return assembly;
 		}
+
+		public static string GetCommandLineArguments()
+		{
+			string result = "";
+			if (CurrentPlugin != null) {
+				result = GetPluginCommandLineArgumets(CurrentPlugin);
+			}
+			return result;
+		}
+
+		private static string GetPluginCommandLineArgumets(System.Reflection.Assembly assembly)
+		{
+			string result = "";
+			foreach (var method in assembly.GetAllMethodsWithAttribute(typeof(PluginCommandLineArgumentsAttribute))) {
+				if (!method.IsStatic) {
+					new System.Exception(string.Format("'{0}' must be a static method", method.Name));
+				}
+				result = result + method.Invoke(null, null) + " ";
+			}
+			return result;
+		}
+
 	}
 }
