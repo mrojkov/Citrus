@@ -91,10 +91,10 @@ namespace Lime
 			renderer.Render(GlobalColor, Size, HAlignment, VAlignment);
 		}
 
-		public float MeasureTextHeight()
+		public Vector2 MeasureText()
 		{
 			var renderer = PrepareRenderer();
-			return renderer.MeasureTextHeight(Size.X);
+			return renderer.MeasureText(Size.X);
 		}
 
 		private TextRenderer PrepareRenderer()
@@ -348,7 +348,8 @@ namespace Lime
 			List<Fragment> words;
 			List<int> lines;
 			float totalHeight;
-			PrepareWordsAndLines(area.X, out words, out lines, out totalHeight);
+			float longestLineWidth;
+			PrepareWordsAndLines(area.X, out words, out lines, out totalHeight, out longestLineWidth);
 			// Draw all lines.
 			int b = 0;
 			float y = 0;
@@ -426,17 +427,20 @@ namespace Lime
 			}
 		}
 
-		public float MeasureTextHeight(float maxWidth)
+		public Vector2 MeasureText(float maxWidth)
 		{
 			List<Fragment> words;
 			List<int> lines;
 			float totalHeight;
-			PrepareWordsAndLines(maxWidth, out words, out lines, out totalHeight);
-			return totalHeight;
+			float longestLineWidth;
+			PrepareWordsAndLines(maxWidth, out words, out lines, out totalHeight, out longestLineWidth);
+			Vector2 extent = new Vector2(longestLineWidth, totalHeight);
+			return extent;
 		}
 
-		private void PrepareWordsAndLines(float maxWidth, out List<Fragment> words, out List<int> lines, out float totalHeight)
+		private void PrepareWordsAndLines(float maxWidth, out List<Fragment> words, out List<int> lines, out float totalHeight, out float longestLineWidth)
 		{
+			longestLineWidth = 0;
 			words = new List<Fragment>();
 			// Split whole text into words. Every whitespace, linebreak, etc. consider to be separate word.
 			for (int i = 0; i < fragments.Count; i++) {
@@ -487,6 +491,8 @@ namespace Lime
 					word.X = x;
 					x += word.Width;
 				}
+				if (word.X + word.Width > longestLineWidth)
+					longestLineWidth = word.X + word.Width;
 				words[i] = word;
 			}
 			// Calculate word count for every string.
