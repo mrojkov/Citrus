@@ -220,7 +220,7 @@ namespace Lime
 			return string.Format("{0}, {1}", GetType().Name, GetHierarchyPath());
 		}
 
-		public string GetHierarchyPath()
+		private string GetHierarchyPath()
 		{
 			string r = string.IsNullOrEmpty(Id) ? String.Format("[{0}]", GetType().Name) : Id;
 			if (!string.IsNullOrEmpty(Tag)) {
