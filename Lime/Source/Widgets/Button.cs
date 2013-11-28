@@ -82,14 +82,19 @@ namespace Lime
 			TryRunAnimation("Normal");
 			while (true) {
 #if iOS
-				if (!Input.IsMousePressed()) {
-					yield return 0;
-					continue;
+				if (HitTest(Input.MousePosition) && Input.WasMousePressed()) {
+					World.Instance.ActiveWidget = this;
+					if (Draggable) {
+						State = DetectDraggingState;
+					} else {
+						State = PressedState;
+					}
 				}
-#endif
+#else
 				if (HitTest(Input.MousePosition) && TheActiveWidget == null) {
 					State = FocusedState;
 				}
+#endif
 				yield return 0;
 			}
 		}
@@ -102,6 +107,7 @@ namespace Lime
 			}
 		}
 
+#if !iOS
 		private IEnumerator<int> FocusedState()
 		{
 			World.Instance.ActiveWidget = this;
@@ -109,7 +115,7 @@ namespace Lime
 			while (true) {
 				if (!HitTest(Input.MousePosition)) {
 					State = NormalState;
-				} else if (Input.WasKeyPressed(Key.Mouse0)) {
+				} else if (Input.WasMousePressed()) {
 					if (Draggable) {
 						State = DetectDraggingState;
 					} else {
@@ -119,6 +125,7 @@ namespace Lime
 				yield return 0;
 			}
 		}
+#endif
 
 		private IEnumerator<int> DetectDraggingState()
 		{
@@ -127,7 +134,7 @@ namespace Lime
 				yield return 0;
 				if ((mouse - Input.MousePosition).Length > DragDistanceThreshold) {
 					State = NormalState;
-				} else if (Input.WasKeyReleased(Key.Mouse0) && HitTest(Input.MousePosition)) {
+				} else if (!Input.IsMousePressed() && HitTest(Input.MousePosition)) {
 					State = QuickClickOnDraggableButtonState;
 					yield break;
 				}
@@ -155,7 +162,7 @@ namespace Lime
 					State = ReleaseState;
 				} else if (!HitTest(Input.MousePosition)) {
 					State = ReleaseState;
-				} else if (Input.WasKeyReleased(Key.Mouse0)) {
+				} else if (!Input.IsMousePressed()) {
 					HandleClick();
 					State = ReleaseState;
 				}
@@ -178,11 +185,15 @@ namespace Lime
 					yield return 0;
 				}
 			}
+#if iOS
+			State = NormalState;
+#else
 			if (HitTest(Input.MousePosition)) {
 				State = FocusedState;
 			} else {
 				State = NormalState;
 			}
+#endif
 		}
 
 		private IEnumerator<int> DisabledState()
