@@ -34,6 +34,16 @@ namespace Lime
 			return Width == rhs.Width && Height == rhs.Height;
 		}
 
+		public static bool operator ==(Size lhs, Size rhs)
+		{
+			return lhs.Width == rhs.Width && lhs.Height == rhs.Height;
+		}
+
+		public static bool operator !=(Size lhs, Size rhs)
+		{
+			return lhs.Width != rhs.Width || lhs.Height != rhs.Height;
+		}
+
 		public override string ToString()
 		{
 			return String.Format("{0}, {1}", Width, Height);
