@@ -33,7 +33,7 @@ namespace Lime
 		[ProtoEnum]
 		None,
 		[ProtoEnum]
-		ScissorRect,
+		ScissorTest,
 		[ProtoEnum]
 		StencilBuffer,
 	}
@@ -125,7 +125,7 @@ namespace Lime
 		{
 			if (renderTexture != null) {
 				RenderToTexture(renderTexture);
-			} else if (ClipChildren == ClipMethod.ScissorRect) {
+			} else if (ClipChildren == ClipMethod.ScissorTest) {
 				RenderWithScissorTest();
 			}
 			if (Rendered != null) {
@@ -178,7 +178,7 @@ namespace Lime
 			if (!GloballyVisible) {
 				return;
 			}
-			if (renderTexture != null || ClipChildren == ClipMethod.ScissorRect) {
+			if (renderTexture != null || ClipChildren == ClipMethod.ScissorTest) {
 				chain.Add(this);
 			} else {
 				base.AddToRenderChain(chain);
