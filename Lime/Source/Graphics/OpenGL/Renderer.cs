@@ -326,6 +326,7 @@ namespace Lime
 		public static void PopProjectionMatrix()
 		{
 			projectionStack.Pop();
+			Projection = projectionStack.Peek();
 		}
 
 		static Blending blending = Blending.None;
