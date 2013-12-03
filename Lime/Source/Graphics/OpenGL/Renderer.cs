@@ -305,13 +305,13 @@ namespace Lime
 			FlushSpriteBatch();
 			if (value) {
 #if GLES11
-				GL.Enable(All.Scissor);
+				GL.Enable(All.ScissorTest);
 #else
 				OGL.Enable(EnableCap.ScissorTest);
 #endif
 			} else {
 #if GLES11
-				GL.Disable(All.Scissor);
+				GL.Disable(All.ScissorTest);
 #else
 				OGL.Disable(EnableCap.ScissorTest);
 #endif
@@ -412,13 +412,16 @@ namespace Lime
 		{
 			projectionStack.Pop();
 			projectionStack.Push(value);
-			OGL.MatrixMode(MatrixMode.Projection);
 #if GLES11
+			GL.MatrixMode(All.Projection);
 			GL.LoadMatrix(value.ToFloatArray());
+			GL.MatrixMode(All.Modelview);
 #else
-			OGL.LoadMatrix(value.ToFloatArray());
+			GL.MatrixMode(MatrixMode.Projection);
+			GL.LoadMatrix(value.ToFloatArray());
+			GL.MatrixMode(MatrixMode.Modelview);
 #endif
-			OGL.MatrixMode(MatrixMode.Modelview);
+
 		}
 
 #if X

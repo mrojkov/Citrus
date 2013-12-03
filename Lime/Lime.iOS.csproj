@@ -161,6 +161,7 @@
     <Compile Include="Source\Audio\AudioSystem.ErrorChecker.cs" />
     <Compile Include="Source\Graphics\MovieTexture.cs" />
     <Compile Include="Source\Widgets\Movie.cs" />
+    <Compile Include="Source\Types\Matrix44.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Application\WinCursors.cs">
