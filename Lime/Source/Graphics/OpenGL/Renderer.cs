@@ -21,6 +21,14 @@ namespace Lime
 	using OGL = GL;
 #endif
 
+	public struct WindowRect
+	{
+		public int X;
+		public int Y;
+		public int Width;
+		public int Height;
+	}
+
 	public unsafe static partial class Renderer
 	{
 		[StructLayout(LayoutKind.Explicit, Size = 32)]
@@ -43,16 +51,30 @@ namespace Lime
 		const int MaxVertices = 1024;
 		public static int DrawCalls = 0;
 
-		static uint[] textures = new uint[2];
+		static readonly uint[] textures = new uint[2];
 
 		static ushort* batchIndices;
 		static Vertex* batchVertices;
 		
-		static int currentVertex = 0;
-		static int currentIndex = 0;
+		static int currentVertex;
+		static int currentIndex;
 		
 		public static Matrix32 Transform1 = Matrix32.Identity;
 		public static Matrix32 Transform2 = Matrix32.Identity;
+
+		static readonly Stack<Matrix44> projectionStack;
+
+		static Renderer()
+		{
+			projectionStack = new Stack<Matrix44>();
+			projectionStack.Push(Matrix44.Identity);
+		}
+
+		public static Matrix44 Projection
+		{
+			get { return projectionStack.Peek(); }
+			set { SetProjection(value); }
+		}
 
 		public static void CheckErrors()
 		{
@@ -148,7 +170,7 @@ namespace Lime
 
 			CheckErrors();
 		}
-		
+
 		public static void ClearRenderTarget(float r, float g, float b, float a)
 		{
 #if GLES11
@@ -216,76 +238,94 @@ namespace Lime
 
 		public static void SetOrthogonalProjection(float left, float top, float right, float bottom)
 		{
-#if GLES11
-			GL.MatrixMode(All.Projection);
-		
-			GL.LoadIdentity();
-			GL.Ortho(left, right, bottom, top, -1, 1);
-
-			GL.MatrixMode(All.Modelview);
-#elif OPENGL
-			OGL.MatrixMode(MatrixMode.Projection);
-		
-			OGL.LoadIdentity();
-			OGL.Ortho(left, right, bottom, top, 0, 1);
-
-			OGL.MatrixMode(MatrixMode.Modelview);
-#endif
+			Projection = Matrix44.CreateOrthographicOffCenter(left, right, bottom, top, 0, 1);
 		}
 
 		public static void SetDefaultViewport()
 		{
 			if (Application.Instance != null) {
-				int w = Application.Instance.WindowSize.Width;
-				int h = Application.Instance.WindowSize.Height;
+				var windowSize = Application.Instance.WindowSize;
 #if iOS
 				if (GameView.Instance.IsRetinaDisplay) {
-					w *= 2;
-					h *= 2;
+					windowSize.Width *= 2;
+					windowSize.Height *= 2;
 				}
 #endif
-				Viewport = new Viewport { X = 0, Y = 0, Width = w, Height = h };
+				Viewport = new WindowRect { 
+					X = 0, Y = 0, 
+					Width = windowSize.Width, 
+					Height = windowSize.Height 
+				};
 			}
 		}
 
-		static Viewport viewport;
-
-		public static Viewport Viewport {
+		static WindowRect viewport;
+		public static WindowRect Viewport
+		{
 			get { return viewport; }
-			set {
-				viewport = value;
+			set { SetViewport(value); }
+		}
+
+		private static void SetViewport(WindowRect value)
+		{
+			viewport = value;
 #if GLES11
-				GL.Viewport(value.X, value.Y, value.Width, value.Height);
+			GL.Viewport(value.X, value.Y, value.Width, value.Height);
 #elif OPENGL
-				OGL.Viewport(value.X, value.Y, value.Width, value.Height);
+			OGL.Viewport(value.X, value.Y, value.Width, value.Height);
+#endif
+		}
+
+		static WindowRect scissorRectangle;
+		public static WindowRect ScissorRectangle
+		{
+			get { return scissorRectangle; }
+			set { SetScissorRectangle(value); }
+		}
+
+		static bool scissorTestEnabled;
+		public static bool ScissorTestEnabled
+		{
+			get { return scissorTestEnabled; }
+			set { SetScissorTestEnabled(value); }
+		}
+
+		public static void SetScissorRectangle(WindowRect value)
+		{
+			FlushSpriteBatch();
+#if GLES11
+			GL.Scissor(value.X, value.Y, value.Width, value.Height);
+#else
+			OGL.Scissor(value.X, value.Y, value.Width, value.Height);
+#endif
+		}
+
+		public static void SetScissorTestEnabled(bool value)
+		{
+			FlushSpriteBatch();
+			if (value) {
+#if GLES11
+				GL.Enable(All.Scissor);
+#else
+				OGL.Enable(EnableCap.ScissorTest);
+#endif
+			} else {
+#if GLES11
+				GL.Disable(All.Scissor);
+#else
+				OGL.Disable(EnableCap.ScissorTest);
 #endif
 			}
 		}
 
 		public static void PushProjectionMatrix()
 		{
-#if GLES11
-			GL.MatrixMode(All.Projection);
-			GL.PushMatrix();
-			GL.MatrixMode(All.Modelview);
-#elif OPENGL
-			OGL.MatrixMode(MatrixMode.Projection);
-			OGL.PushMatrix();
-			OGL.MatrixMode(MatrixMode.Modelview);
-#endif
+			projectionStack.Push(projectionStack.Peek());
 		}
 
 		public static void PopProjectionMatrix()
 		{
-#if GLES11
-			GL.MatrixMode(All.Projection);
-			GL.PopMatrix();
-			GL.MatrixMode(All.Modelview);
-#elif OPENGL
-			OGL.MatrixMode(MatrixMode.Projection);
-			OGL.PopMatrix();
-			OGL.MatrixMode(MatrixMode.Modelview);
-#endif
+			projectionStack.Pop();
 		}
 
 		static Blending blending = Blending.None;
@@ -336,10 +376,11 @@ namespace Lime
 				case Blending.Alpha:
 				case Blending.Default:
 				default:
-					if (PremulAlphaMode)
+					if (PremulAlphaMode) {
 						OGL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.OneMinusSrcAlpha);
-					else
+					} else {
 						OGL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+					}
 					OGL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
 					break;
 				case Blending.Silhuette:
@@ -350,10 +391,11 @@ namespace Lime
 					break;
 				case Blending.Add:
 				case Blending.Glow:
-					if (PremulAlphaMode)
+					if (PremulAlphaMode) {
 						OGL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.One);
-					else
+					} else {
 						OGL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
+					}
 					OGL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Modulate);
 					break;
 				case Blending.Modulate:
@@ -364,6 +406,19 @@ namespace Lime
 #endif
 				CheckErrors();
 			}
+		}
+
+		private static void SetProjection(Matrix44 value)
+		{
+			projectionStack.Pop();
+			projectionStack.Push(value);
+			OGL.MatrixMode(MatrixMode.Projection);
+#if GLES11
+			GL.LoadMatrix(value.ToFloatArray());
+#else
+			OGL.LoadMatrix(value.ToFloatArray());
+#endif
+			OGL.MatrixMode(MatrixMode.Modelview);
 		}
 
 #if X

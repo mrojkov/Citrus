@@ -27,6 +27,11 @@ namespace Lime
 			B = b;
 		}
 
+		public static explicit operator Rectangle(IntRectangle r)
+		{
+			return new Rectangle(r.Left, r.Top, r.Right, r.Bottom);
+		}
+
 		public Lime.IntRectangle Normalize()
 		{
 			var rect = this;
@@ -39,11 +44,6 @@ namespace Lime
 				rect.B.Y = A.Y;
 			}
 			return rect;
-		}
-		
-		bool IEquatable<IntRectangle>.Equals(IntRectangle other)
-		{
-			return A.Equals(other.A) && B.Equals(other.B);
 		}
 		
 		public int Width {
@@ -65,6 +65,32 @@ namespace Lime
 		public int Right { get { return B.X; } set { B.X = value; } }
 		public int Bottom { get { return B.Y; } set { B.Y = value; } }
 		public IntVector2 Center { get { return new IntVector2((A.X + B.X) / 2, (A.Y + B.Y) / 2); } }
+
+		public static bool operator ==(IntRectangle lhs, IntRectangle rhs)
+		{
+			return lhs.A == rhs.A && lhs.B == rhs.B;
+		}
+
+		public static bool operator !=(IntRectangle lhs, IntRectangle rhs)
+		{
+			return lhs.A != rhs.A || lhs.B != rhs.B;
+		}
+
+		bool IEquatable<IntRectangle>.Equals(IntRectangle other)
+		{
+			return A.Equals(other.A) && B.Equals(other.B);
+		}
+		
+		public override bool Equals(object o)
+		{
+			var rhs = (IntRectangle)o;
+			return A == rhs.A && B == rhs.B;
+		}
+
+		public override int GetHashCode()
+		{
+			return A.GetHashCode() ^ B.GetHashCode();
+		}
 
 		public bool Contains(IntVector2 v)
 		{

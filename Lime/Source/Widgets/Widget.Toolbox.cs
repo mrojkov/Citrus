@@ -46,10 +46,9 @@ namespace Lime
 		{
 			if (Width > 0 && Height > 0) {
 				texture.SetAsRenderTarget();
-
 				Renderer.ClearRenderTarget(0, 0, 0, 0);
-				Viewport savedViewport = Renderer.Viewport;
-				Renderer.Viewport = new Viewport { X = 0, Y = 0, Width = texture.ImageSize.Width, Height = texture.ImageSize.Height };
+				var savedViewport = Renderer.Viewport;
+				Renderer.Viewport = new WindowRect { X = 0, Y = 0, Width = texture.ImageSize.Width, Height = texture.ImageSize.Height };
 				Renderer.PushProjectionMatrix();
 				Renderer.SetOrthogonalProjection(0, Height, Width, 0);
 				var chain = new RenderChain();
@@ -57,9 +56,7 @@ namespace Lime
 					node.AddToRenderChain(chain);
 				}
 				chain.RenderAndClear();
-
 				texture.RestoreRenderTarget();
-
 				Renderer.Viewport = savedViewport;
 				Renderer.PopProjectionMatrix();
 			}
@@ -121,6 +118,19 @@ namespace Lime
 			vertices[2] = vertices[0] + transform.U * Size.X + transform.V * Size.Y;
 			vertices[3] = vertices[0] + transform.V * Size.Y;
 			return vertices;
+		}
+
+		public Rectangle CalcAABBInSpaceOf(Widget container)
+		{
+			var vertices = CalcHullInSpaceOf(container);
+			var aabb = new Rectangle(float.MaxValue, float.MaxValue, float.MinValue, float.MinValue);
+			foreach (var v in vertices) {
+				aabb.Left = Mathf.Min(v.X, aabb.Left);
+				aabb.Right = Mathf.Max(v.X, aabb.Right);
+				aabb.Top = Mathf.Min(v.Y, aabb.Top);
+				aabb.Bottom = Mathf.Max(v.Y, aabb.Bottom);
+			}
+			return aabb;
 		}
 
 		public Transform CalcTransformFromMatrix(Matrix32 matrix)

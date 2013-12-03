@@ -36,6 +36,11 @@ namespace Lime
 			return new IntVector2((int)v.X, (int)v.Y);
 		}
 
+		public static explicit operator Vector3(Vector2 v)
+		{
+			return new Vector3(v.X, v.Y, 0);
+		}
+
 		public static explicit operator Size(Vector2 v)
 		{
 			return new Size((int)v.X, (int)v.Y);

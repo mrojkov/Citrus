@@ -39,7 +39,7 @@ namespace Lime
 
 		public override bool Equals(object o)
 		{
-			IntVector2 rhs = (IntVector2)o;
+			var rhs = (IntVector2)o;
 			return X == rhs.X && Y == rhs.Y;
 		}
 

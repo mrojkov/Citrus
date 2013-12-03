@@ -28,22 +28,6 @@ namespace Lime
 		Modulate,
 	}
 
-	public struct Viewport
-	{
-		public int X;
-		public int Y;
-		public int Width;
-		public int Height;
-
-		public Viewport(IntVector2 origin, Size size)
-		{
-			X = origin.X;
-			Y = origin.Y;
-			Width = size.Width;
-			Height = size.Height;
-		}
-	}
-
 #if UNITY
 	public static partial class Renderer
 #else

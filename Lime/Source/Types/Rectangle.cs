@@ -27,6 +27,11 @@ namespace Lime
 			B = b;
 		}
 
+		public static explicit operator IntRectangle(Rectangle r)
+		{
+			return new IntRectangle((int)r.Left, (int)r.Top, (int)r.Right, (int)r.Bottom);
+		}
+
 		public override bool Equals(object obj)
 		{
 			var rhs = (Rectangle)obj;

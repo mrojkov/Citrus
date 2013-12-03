@@ -35,6 +35,9 @@ namespace Lime
 			return Marshal.GetDelegateForFunctionPointer(ptr, typeof(T)) as T;
 		}
 
+		[DllImport(library, EntryPoint = "glScissor")]
+		public static extern void Scissor(int x, int y, int width, int height);
+
 		[DllImport(library, EntryPoint = "glViewport")]
 		public static extern void Viewport(int x, int y, int width, int height);
 
@@ -68,12 +71,6 @@ namespace Lime
 		[DllImport(library, EntryPoint = "glPopMatrix")]
 		public static extern void PopMatrix();
 
-		[DllImport(library, EntryPoint = "glLoadIdentity")]
-		public static extern void LoadIdentity();
-
-		[DllImport(library, EntryPoint = "glOrtho")]
-		public static extern void Ortho(double left, double right, double bottom, double top, double zNear, double zFar);
-
 		[DllImport(library, EntryPoint = "glTexEnvf")]
 		public static extern void TexEnv(TextureEnvTarget target, TextureEnvParameter pname, Single param);
 
@@ -94,6 +91,9 @@ namespace Lime
 
 		[DllImport(library, EntryPoint = "glDeleteTextures")]
 		public static extern void DeleteTextures(Int32 n, UIntPtr textures);
+
+		[DllImport(library, EntryPoint = "glLoadMatrixf")]
+		public static extern void LoadMatrix(float[] values);
 
 		[DllImport(library, EntryPoint = "glFinish")]
 		public static extern void Finish();

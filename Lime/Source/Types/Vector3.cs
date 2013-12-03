@@ -27,6 +27,11 @@ namespace Lime
 			Z = z;
 		}
 
+		public static explicit operator Vector2(Vector3 v)
+		{
+			return new Vector2(v.X, v.Y);
+		}
+
 		bool IEquatable<Vector3>.Equals(Vector3 rhs)
 		{
 			return X == rhs.X && Y == rhs.Y && Z == rhs.Z;

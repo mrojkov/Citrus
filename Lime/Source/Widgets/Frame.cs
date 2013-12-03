@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Lime;
 using ProtoBuf;
 using System.IO;
@@ -27,6 +28,17 @@ namespace Lime
 	}
 
 	[ProtoContract]
+	public enum ClipMethod
+	{
+		[ProtoEnum]
+		None,
+		[ProtoEnum]
+		ScissorRect,
+		[ProtoEnum]
+		StencilBuffer,
+	}
+
+	[ProtoContract]
 	[TangerineClass]
 	public class Frame : Widget, IImageCombinerArg
 	{
@@ -35,6 +47,8 @@ namespace Lime
 		// In dialog mode frame acts like a modal dialog, all controls behind the dialog are frozen.
 		// If dialog is being shown or hidden then all controls on dialog are frozen either.
 		public bool DialogMode { get; set; }
+
+		public ClipMethod ClipChildren { get; set; }
 
 		RenderTarget renderTarget;
 		ITexture renderTexture;
@@ -111,6 +125,8 @@ namespace Lime
 		{
 			if (renderTexture != null) {
 				RenderToTexture(renderTexture);
+			} else if (ClipChildren == ClipMethod.ScissorRect) {
+				RenderWithScissorTest();
 			}
 			if (Rendered != null) {
 				Renderer.Transform1 = LocalToWorldTransform;
@@ -118,12 +134,51 @@ namespace Lime
 			}
 		}
 
+		private void RenderWithScissorTest()
+		{
+			Renderer.ScissorTestEnabled = true;
+			Renderer.ScissorRectangle = CalculateScissorRectangle();
+			try {
+				var chain = new RenderChain();
+				foreach (var node in Nodes) {
+					node.AddToRenderChain(chain);
+				}
+				chain.RenderAndClear();
+			} finally {
+				Renderer.ScissorTestEnabled = false;
+			}
+		}
+
+		private WindowRect CalculateScissorRectangle()
+		{
+			var aabb = CalcAABBInSpaceOf(World.Instance);
+			// Get the projected AABB coordinates in the normalized OpenGL space
+			Matrix44 proj = Renderer.Projection;
+			aabb.A = proj.TransformVector(aabb.A);
+			aabb.B = proj.TransformVector(aabb.B);
+			// Transform to 0,0 - 1,1 coordinate space
+			aabb.Left = (1 + aabb.Left) / 2;
+			aabb.Right = (1 + aabb.Right) / 2;
+			aabb.Top = (1 + aabb.Top) / 2;
+			aabb.Bottom = (1 + aabb.Bottom) / 2;
+			// Transform to window coordinates
+			var viewport = Renderer.Viewport;
+			var result = new WindowRect();
+			var min = new Vector2(viewport.X, viewport.Y);
+			var max = new Vector2(viewport.X + viewport.Width, viewport.Y + viewport.Height);
+			result.X = (int)Mathf.Lerp(aabb.Left, min.X, max.X);
+			result.Width = (int)Mathf.Lerp(aabb.Right, min.X, max.X) - result.X;
+			result.Y = (int)Mathf.Lerp(aabb.Bottom, min.Y, max.Y);
+			result.Height = (int)Mathf.Lerp(aabb.Top, min.Y, max.Y) - result.Y;
+			return result;
+		}
+
 		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (!GloballyVisible) {
 				return;
 			}
-			if (renderTexture != null) {
+			if (renderTexture != null || ClipChildren == ClipMethod.ScissorRect) {
 				chain.Add(this);
 			} else {
 				base.AddToRenderChain(chain);
@@ -157,12 +212,10 @@ namespace Lime
 		{
 			if (!string.IsNullOrEmpty(ContentsPath)) {
 				LoadContentHelper();
-			} else {
-				foreach (Node node in Nodes.AsArray) {
-					if (node is Frame) {
-						(node as Frame).LoadContent();
-					}
-				}
+				return;
+			}
+			foreach (var frame in Nodes.AsArray.OfType<Frame>()) {
+				frame.LoadContent();
 			}
 		}
 
@@ -180,8 +233,9 @@ namespace Lime
 				content.AsWidget.Size = AsWidget.Size;
 				content.Update(0);
 			}
-			foreach (Marker marker in content.Markers)
+			foreach (Marker marker in content.Markers) {
 				Markers.Add(marker);
+			}
 			foreach (Node node in content.Nodes.AsArray) {
 				node.Unlink();
 				Nodes.Add(node);

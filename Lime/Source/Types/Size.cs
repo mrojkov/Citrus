@@ -29,11 +29,6 @@ namespace Lime
 			return new IntVector2(size.Width, size.Height);
 		}
 
-		bool IEquatable<Size>.Equals(Size rhs)
-		{
-			return Width == rhs.Width && Height == rhs.Height;
-		}
-
 		public static bool operator ==(Size lhs, Size rhs)
 		{
 			return lhs.Width == rhs.Width && lhs.Height == rhs.Height;
@@ -42,6 +37,22 @@ namespace Lime
 		public static bool operator !=(Size lhs, Size rhs)
 		{
 			return lhs.Width != rhs.Width || lhs.Height != rhs.Height;
+		}
+
+		bool IEquatable<Size>.Equals(Size rhs)
+		{
+			return Width == rhs.Width && Height == rhs.Height;
+		}
+
+		public override bool Equals(object o)
+		{
+			var rhs = (Size)o;
+			return Width == rhs.Width && Height == rhs.Height;
+		}
+
+		public override int GetHashCode()
+		{
+			return Width.GetHashCode() ^ Height.GetHashCode();
 		}
 
 		public override string ToString()
