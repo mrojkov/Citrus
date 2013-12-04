@@ -4,7 +4,8 @@ using ProtoBuf;
 namespace Lime
 {
 	[ProtoContract]
-	[System.Diagnostics.DebuggerStepThrough]
+	// XXX
+	// [System.Diagnostics.DebuggerStepThrough]
 	public struct Matrix32 : IEquatable<Matrix32>
 	{
 		[ProtoMember(1)]
@@ -157,6 +158,11 @@ namespace Lime
 			r.U = a.U + (b.U - a.U) * t;
 			r.V = a.V + (b.V - a.V) * t;
 			return r;
+		}
+
+		public bool IsIdentity()
+		{
+			return T.X == 0 && T.Y == 0 && U.X == 1 && U.Y == 0 && V.X == 0 && V.Y == 1;
 		}
 	}
 }

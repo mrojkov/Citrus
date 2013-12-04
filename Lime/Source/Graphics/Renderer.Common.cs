@@ -136,7 +136,6 @@ namespace Lime
 
 		public static void DrawSpriteHelper(ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1)
 		{
-			var transform = Transform1 * Transform2;
 			SetTexture(texture, 0);
 			SetTexture(null, 1);
 			if (currentVertex >= MaxVertices - 4 || currentIndex >= MaxVertices * 4 - 6) {
@@ -146,10 +145,15 @@ namespace Lime
 				color = Color4.PremulAlpha(color);
 			}
 			Rectangle textureRect = texture.UVRect;
-			uv0 = textureRect.A + textureRect.Size * uv0;
-			uv1 = textureRect.A + textureRect.Size * uv1;
+			float textureWidth = textureRect.Width;
+			float textureHeight = textureRect.Height;
+			uv0.X = textureRect.Left + textureWidth * uv0.X;
+			uv0.Y = textureRect.Top + textureHeight * uv0.Y;
+			uv1.X = textureRect.Left + textureWidth * uv1.X;
+			uv1.Y = textureRect.Top + textureHeight * uv1.Y;
 			int i = currentVertex;
 			int j = currentIndex;
+			var matrix = Transform2.IsIdentity() ? Transform1 : Transform1 * Transform2;
 			currentIndex += 6;
 			batchIndices[j++] = (ushort)(i + 0);
 			batchIndices[j++] = (ushort)(i + 1);
@@ -158,21 +162,37 @@ namespace Lime
 			batchIndices[j++] = (ushort)(i + 1);
 			batchIndices[j++] = (ushort)(i + 3);
 			currentVertex += 4;
-			batchVertices[i].Pos = transform.TransformVector(position.X, position.Y);
+			float x0 = position.X;
+			float y0 = position.Y;
+			float x1 = position.X + size.X;
+			float y1 = position.Y + size.Y;
+			float x0ux = x0 * matrix.U.X;
+			float x0uy = x0 * matrix.U.Y;
+			float y0vx = y0 * matrix.V.X;
+			float y0vy = y0 * matrix.V.Y;
+			float x1ux = x1 * matrix.U.X;
+			float x1uy = x1 * matrix.U.Y;
+			float y1vx = y1 * matrix.V.X;
+			float y1vy = y1 * matrix.V.Y;
+			batchVertices[i].Pos.X = x0ux + y0vx + matrix.T.X;
+			batchVertices[i].Pos.Y = x0uy + y0vy + matrix.T.Y;
 			batchVertices[i].Color = color;
 			batchVertices[i].UV1 = uv0;
 			i++;
-			batchVertices[i].Pos = transform.TransformVector(position.X + size.X, position.Y);
+			batchVertices[i].Pos.X = x1ux + y0vx + matrix.T.X;
+			batchVertices[i].Pos.Y = x1uy + y0vy + matrix.T.Y;
 			batchVertices[i].Color = color;
 			batchVertices[i].UV1.X = uv1.X;
 			batchVertices[i].UV1.Y = uv0.Y;
 			i++;
-			batchVertices[i].Pos = transform.TransformVector(position.X, position.Y + size.Y);
+			batchVertices[i].Pos.X = x0ux + y1vx + matrix.T.X;
+			batchVertices[i].Pos.Y = x0uy + y1vy + matrix.T.Y;
 			batchVertices[i].Color = color;
 			batchVertices[i].UV1.X = uv0.X;
 			batchVertices[i].UV1.Y = uv1.Y;
 			i++;
-			batchVertices[i].Pos = transform.TransformVector(position.X + size.X, position.Y + size.Y);
+			batchVertices[i].Pos.X = x1ux + y1vx + matrix.T.X;
+			batchVertices[i].Pos.Y = x1uy + y1vy + matrix.T.Y;
 			batchVertices[i].Color = color;
 			batchVertices[i].UV1 = uv1;
 		}
@@ -229,7 +249,6 @@ namespace Lime
 
 		private static int DrawTrianglesHelper(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
 		{
-			var transform = Transform1 * Transform2;
 			SetTexture(texture1, 0);
 			SetTexture(texture2, 1);
 			if (currentIndex + (numVertices - 2) * 3 >= MaxVertices * 4 || currentVertex + numVertices >= MaxVertices) {
@@ -241,6 +260,7 @@ namespace Lime
 			Rectangle uvRect1 = (texture1 != null) ? texture1.UVRect : new Rectangle();
 			Rectangle uvRect2 = (texture2 != null) ? texture2.UVRect : new Rectangle();
 			int baseVertex = currentVertex;
+			var transform = Transform2.IsIdentity() ? Transform1 : Transform1 * Transform2;
 			for (int i = 0; i < numVertices; i++) {
 				Vertex v = vertices[i];
 				if (PremulAlphaMode) {
@@ -248,8 +268,9 @@ namespace Lime
 				}
 				v.Pos = transform * v.Pos;
 				v.UV1 = uvRect1.A + uvRect1.Size * v.UV1;
-				if (texture2 != null)
+				if (texture2 != null) {
 					v.UV2 = uvRect2.A + uvRect2.Size * v.UV2;
+				}
 				batchVertices[currentVertex++] = v;
 			}
 			return baseVertex;

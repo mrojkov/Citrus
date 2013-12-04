@@ -32,7 +32,7 @@ namespace Lime
 			return Mathf.Sqrt(x);
 		}
 
-		public static float Sign(this float x)
+		public static int Sign(this float x)
 		{
 			return Math.Sign(x);
 		}
