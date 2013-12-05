@@ -114,10 +114,25 @@ namespace Lime
 
 		public override void Update(int delta)
 		{
+			bool savedMouseVisibility = false;
+			if (ClipChildren != ClipMethod.None) {
+				savedMouseVisibility = Input.MouseVisible;
+				HideMouseOutsideFrameRect();
+			}
 			if (DialogMode) {
 				UpdateForDialogMode(delta);
 			} else {
 				base.Update(delta);
+			}
+			if (ClipChildren != ClipMethod.None) {
+				Input.MouseVisible = savedMouseVisibility;
+			}
+		}
+
+		private void HideMouseOutsideFrameRect()
+		{
+			if (!HitTest(Input.MousePosition, HitTestMethod.BoundingRect)) {
+				Input.MouseVisible = false;
 			}
 		}
 

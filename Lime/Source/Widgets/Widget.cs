@@ -318,10 +318,15 @@ namespace Lime
 
 		public virtual bool HitTest(Vector2 point)
 		{
+			return HitTest(point, HitTestMethod);
+		}
+
+		public virtual bool HitTest(Vector2 point, HitTestMethod method)
+		{
 			if (!GloballyVisible) {
 				return false;
 			}
-			if (HitTestMethod == HitTestMethod.BoundingRect) {
+			if (method == HitTestMethod.BoundingRect) {
 				Vector2 p = LocalToWorldTransform.CalcInversed().TransformVector(point);
 				Vector2 s = Size;
 				if (s.X < 0) {
@@ -333,7 +338,7 @@ namespace Lime
 					s.Y = -s.Y;
 				}
 				return p.X >= 0 && p.Y >= 0 && p.X < s.X && p.Y < s.Y;
-			} else if (HitTestMethod == HitTestMethod.Contents) {
+			} else if (method == HitTestMethod.Contents) {
 				foreach (Node node in Nodes.AsArray) {
 					if (node.AsWidget != null && node.AsWidget.HitTest(point))
 						return true;
