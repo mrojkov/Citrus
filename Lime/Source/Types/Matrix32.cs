@@ -4,8 +4,7 @@ using ProtoBuf;
 namespace Lime
 {
 	[ProtoContract]
-	// XXX
-	// [System.Diagnostics.DebuggerStepThrough]
+	[System.Diagnostics.DebuggerStepThrough]
 	public struct Matrix32 : IEquatable<Matrix32>
 	{
 		[ProtoMember(1)]
