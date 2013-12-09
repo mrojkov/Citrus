@@ -349,6 +349,9 @@ namespace Lime
 					GL.TexEnv(All.TextureEnv, All.CombineAlpha, (int)All.Modulate);
 					GL.TexEnv(All.TextureEnv, All.TextureEnvMode, (int)All.Combine);
 					break;
+				case Blending.Burn:
+					GL.BlendFunc(All.DstColor, All.OneMinusSrcAlpha);
+					break;
 				case Blending.Add:
 				case Blending.Glow:
 					GL.BlendFunc(All.SrcAlpha, All.One);
@@ -389,6 +392,9 @@ namespace Lime
 					OGL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.CombineRgb, (int)TextureEnvModeCombine.Replace);
 					OGL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.CombineAlpha, (int)TextureEnvModeCombine.Modulate);
 					OGL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Combine);
+					break;
+				case Blending.Burn:
+					OGL.BlendFunc(BlendingFactorSrc.DstColor, BlendingFactorDest.OneMinusSrcAlpha);
 					break;
 				case Blending.Add:
 				case Blending.Glow:

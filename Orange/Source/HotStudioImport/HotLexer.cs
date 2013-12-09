@@ -109,6 +109,8 @@ namespace Orange
 				return Blending.Default;
 			case 2:
 				return Blending.Add;
+			case 3:
+				return Blending.Burn;
 			case 5:
 				return Blending.Modulate;
 			case 7:

@@ -26,6 +26,8 @@ namespace Lime
 		Glow,
 		[ProtoEnum]
 		Modulate,
+		[ProtoEnum]
+		Burn,
 	}
 
 #if UNITY
