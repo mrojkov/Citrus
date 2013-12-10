@@ -67,6 +67,13 @@ namespace Lime
 	[ProtoContract]
 	public class RichText : Widget
 	{
+		private TextParser parser = new TextParser();
+		private string text;
+		private HAlignment hAlignment;
+		private VAlignment vAlignment;
+		private Renderer.SpriteList spriteList;
+		private Vector2 prevSize;
+
 		[ProtoMember(1)]
 		public override string Text
 		{
@@ -75,20 +82,35 @@ namespace Lime
 		}
 
 		[ProtoMember(2)]
-		public HAlignment HAlignment { get; set; }
+		public HAlignment HAlignment 
+		{ 
+			get { return hAlignment; } 
+			set { SetHAlignment(value); } 
+		}
 		
 		[ProtoMember(3)]
-		public VAlignment VAlignment { get; set; }
-
-		TextParser parser = new TextParser();
-		string text;
+		public VAlignment VAlignment 
+		{ 
+			get { return vAlignment; } 
+			set { SetVAlignment(value); } 
+		}
 
 		public string ErrorMessage { get; private set; }
 
 		public override void Render()
 		{
-			var renderer = PrepareRenderer();
-			renderer.Render(GlobalColor, Size, HAlignment, VAlignment);
+			if (prevSize != Size) {
+				DisposeSpriteList();
+				prevSize = Size;
+			}
+			if (spriteList == null) {
+				var renderer = PrepareRenderer();
+				spriteList = new Renderer.SpriteList();
+				renderer.Render(spriteList, Size, HAlignment, VAlignment);
+			}
+			Renderer.Transform1 = LocalToWorldTransform;
+			Renderer.Blending = GlobalBlending;
+			spriteList.Render(GlobalColor);
 		}
 
 		public Vector2 MeasureText()
@@ -105,33 +127,44 @@ namespace Lime
 			if (Nodes.Count > 0) {
 				defaultStyle = Nodes[0] as TextStyle;
 			}
-			if (defaultStyle != null) {
-				renderer.AddStyle(defaultStyle);
-			} else {
-				renderer.AddStyle(TextStyle.Default);
-			}
+			renderer.AddStyle(defaultStyle ?? TextStyle.Default);
 			// Fill up style list.
 			foreach (var styleName in parser.Styles) {
 				var style = Nodes.Get(styleName) as TextStyle;
-				if (style != null) {
-					renderer.AddStyle(style);
-				} else {
-					renderer.AddStyle(TextStyle.Default);
-				}
+				renderer.AddStyle(style ?? TextStyle.Default);
 			}
 			// Add text fragments.
 			foreach (var frag in parser.Fragments) {
 				// Warning! Using style + 1, because -1 is a default style.
 				renderer.AddFragment(frag.Text, frag.Style + 1);
 			}
-			// Draw text.
-			Renderer.Transform1 = LocalToWorldTransform;
-			Renderer.Blending = GlobalBlending;
 			return renderer;
+		}
+
+		private void SetHAlignment(Lime.HAlignment value)
+		{
+			if (value == hAlignment) {
+				return;
+			}
+			hAlignment = value;
+			DisposeSpriteList();
+		}
+
+		private void SetVAlignment(Lime.VAlignment value)
+		{
+			if (value == vAlignment) {
+				return;
+			}
+			vAlignment = value;
+			DisposeSpriteList();
 		}
 
 		private void SetText(string value)
 		{
+			if (value == text) {
+				return;
+			}
+			DisposeSpriteList();
 			text = value;
 			var localizedText = Localization.GetString(text);
 			parser = new TextParser(localizedText);
@@ -141,6 +174,13 @@ namespace Lime
 			}
 		}
 
+		private void DisposeSpriteList()
+		{
+			if (spriteList != null) {
+				spriteList.Dispose();
+				spriteList = null;
+			}
+		}
 	}
 
 	class TextParser
@@ -151,10 +191,11 @@ namespace Lime
 			public string Text;
 		}
 
-		string text;
+		readonly string text;
+		readonly Stack<string> tagStack = new Stack<string>();
+
 		int pos = 0;
 		int currentStyle = -1;
-		Stack<string> tagStack = new Stack<string>();
 		public string ErrorMessage;
 		public List<string> Styles = new List<string>();
 		public List<Fragment> Fragments = new List<Fragment>();
@@ -292,9 +333,9 @@ namespace Lime
 
 	class TextRenderer
 	{
-		List<Fragment> fragments = new List<Fragment>();
-		List<TextStyle> styles = new List<TextStyle>();
-		List<SerializableFont> fonts = new List<SerializableFont>();
+		readonly List<Fragment> fragments = new List<Fragment>();
+		readonly List<TextStyle> styles = new List<TextStyle>();
+		readonly List<SerializableFont> fonts = new List<SerializableFont>();
 
 		struct Fragment
 		{
@@ -310,9 +351,16 @@ namespace Lime
 
 		public void AddFragment(string text, int style)
 		{
-			Fragment p = new Fragment { Text = text, Start = 0, Length = text.Length, Style = style, 
-				IsTagBegin = false, LineBreak = false, X = 0, Width = 0 };
-			fragments.Add(p);
+			fragments.Add(new Fragment { 
+				Text = text, 
+				Start = 0, 
+				Length = text.Length, 
+				Style = style, 
+				IsTagBegin = false, 
+				LineBreak = false, 
+				X = 0, 
+				Width = 0 
+			});
 		}
 
 		public void AddStyle(TextStyle style)
@@ -343,7 +391,7 @@ namespace Lime
 			}
 		}
 
-		public void Render(Color4 color, Vector2 area, HAlignment hAlign, VAlignment vAlign)
+		public void Render(Renderer.SpriteList spriteList, Vector2 area, HAlignment hAlign, VAlignment vAlign)
 		{
 			List<Fragment> words;
 			List<int> lines;
@@ -387,18 +435,19 @@ namespace Lime
 					if (word.IsTagBegin && style.ImageUsage == TextStyle.ImageUsageEnum.Bullet) {
 						yOffset = new Vector2(0, (maxHeight - style.ImageSize.Y) * 0.5f);
 						if (style.ImageTexture.SerializationPath != null) {
-							Renderer.DrawSprite(style.ImageTexture, color, position + yOffset, style.ImageSize, Vector2.Zero, Vector2.One);
+							spriteList.Add(style.ImageTexture, Color4.White, position + yOffset, style.ImageSize, Vector2.Zero, Vector2.One);
+							// Renderer.DrawSprite(SpriteList, style.ImageTexture, color, position + yOffset, style.ImageSize, Vector2.Zero, Vector2.One);
 						}
 						position.X += style.ImageSize.X;
 					}
 					yOffset = new Vector2(0, (maxHeight - style.Size) * 0.5f);
 					if (style.CastShadow) {
 						for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
-							Renderer.DrawTextLine(font, position + style.ShadowOffset + yOffset, word.Text, style.ShadowColor * color, style.Size, word.Start, word.Length);
+							Renderer.DrawTextLine(spriteList, font, position + style.ShadowOffset + yOffset, word.Text, style.ShadowColor, style.Size, word.Start, word.Length);
 						}
 					}
 					for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
-						Renderer.DrawTextLine(font, position + yOffset, word.Text, style.TextColor * color, style.Size, word.Start, word.Length);
+						Renderer.DrawTextLine(spriteList, font, position + yOffset, word.Text, style.TextColor, style.Size, word.Start, word.Length);
 					}
 				}
 				// Draw overlays
@@ -415,10 +464,13 @@ namespace Lime
 						Vector2 lt = new Vector2(words[b + j].X, y) + offset;
 						Vector2 rb = new Vector2(words[b + k].X + words[b + k].Width, y) + offset;
 						float yOffset = (maxHeight - style.ImageSize.Y) * 0.5f;
-						Renderer.DrawSprite(style.ImageTexture, color,
-							lt + new Vector2(0, yOffset), 
+						spriteList.Add(style.ImageTexture, Color4.White, lt + new Vector2(0, yOffset),
 							rb - lt + new Vector2(0, style.ImageSize.Y),
 							Vector2.Zero, Vector2.One);
+						//Renderer.DrawSprite(style.ImageTexture, color,
+						//	lt + new Vector2(0, yOffset), 
+						//	rb - lt + new Vector2(0, style.ImageSize.Y),
+						//	Vector2.Zero, Vector2.One);
 						j = k;
 					}
 				}
@@ -434,7 +486,7 @@ namespace Lime
 			float totalHeight;
 			float longestLineWidth;
 			PrepareWordsAndLines(maxWidth, out words, out lines, out totalHeight, out longestLineWidth);
-			Vector2 extent = new Vector2(longestLineWidth, totalHeight);
+			var extent = new Vector2(longestLineWidth, totalHeight);
 			return extent;
 		}
 
