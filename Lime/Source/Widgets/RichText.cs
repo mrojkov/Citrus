@@ -467,10 +467,6 @@ namespace Lime
 						spriteList.Add(style.ImageTexture, Color4.White, lt + new Vector2(0, yOffset),
 							rb - lt + new Vector2(0, style.ImageSize.Y),
 							Vector2.Zero, Vector2.One);
-						//Renderer.DrawSprite(style.ImageTexture, color,
-						//	lt + new Vector2(0, yOffset), 
-						//	rb - lt + new Vector2(0, style.ImageSize.Y),
-						//	Vector2.Zero, Vector2.One);
 						j = k;
 					}
 				}
@@ -492,42 +488,13 @@ namespace Lime
 
 		private void PrepareWordsAndLines(float maxWidth, out List<Fragment> words, out List<int> lines, out float totalHeight, out float longestLineWidth)
 		{
-			longestLineWidth = 0;
 			words = new List<Fragment>();
 			// Split whole text into words. Every whitespace, linebreak, etc. consider to be separate word.
-			for (int i = 0; i < fragments.Count; i++) {
-				var word = fragments[i];
-				int curr = word.Start;
-				int start = word.Start;
-				int length = word.Length;
-				if (length == 0) {
-					word.IsTagBegin = true;
-					words.Add(word);
-				} else {
-					bool isTagBegin = true;
-					while (curr < length) {
-						bool lineBreak = false;
-						if (word.Text[curr] <= ' ') {
-							if (word.Text[curr] == '\n') {
-								lineBreak = true;
-							}
-							curr++;
-						} else {
-							while (curr < length && word.Text[curr] > ' ') {
-								curr++;
-							}
-						}
-						word.Start = start;
-						word.Length = curr - start;
-						word.LineBreak = lineBreak;
-						word.IsTagBegin = isTagBegin;
-						words.Add(word);
-						start = curr;
-						isTagBegin = false;
-					}
-				}
+			foreach (var fragment in fragments) {
+				SplitFragmentIntoWords(words, fragment);
 			}
 			// Calculate words sizes and insert additional spaces to fit by width.
+			longestLineWidth = 0;
 			float x = 0;
 			for (int i = 0; i < words.Count; i++) {
 				Fragment word = words[i];
@@ -543,8 +510,9 @@ namespace Lime
 					word.X = x;
 					x += word.Width;
 				}
-				if (word.X + word.Width > longestLineWidth)
+				if (word.X + word.Width > longestLineWidth) {
 					longestLineWidth = word.X + word.Width;
+				}
 				words[i] = word;
 			}
 			// Calculate word count for every string.
@@ -569,6 +537,40 @@ namespace Lime
 			if (c > 0) {
 				lines.Add(c);
 				totalHeight += lineHeight;
+			}
+		}
+
+		private static void SplitFragmentIntoWords(List<Fragment> words, Fragment fragment)
+		{
+			var word = fragment;
+			int curr = word.Start;
+			int start = word.Start;
+			int length = word.Length;
+			if (length == 0) {
+				word.IsTagBegin = true;
+				words.Add(word);
+			} else {
+				bool isTagBegin = true;
+				while (curr < length) {
+					bool lineBreak = false;
+					if (word.Text[curr] <= ' ') {
+						if (word.Text[curr] == '\n') {
+							lineBreak = true;
+						}
+						curr++;
+					} else {
+						while (curr < length && word.Text[curr] > ' ') {
+							curr++;
+						}
+					}
+					word.Start = start;
+					word.Length = curr - start;
+					word.LineBreak = lineBreak;
+					word.IsTagBegin = isTagBegin;
+					words.Add(word);
+					start = curr;
+					isTagBegin = false;
+				}
 			}
 		}
 	}

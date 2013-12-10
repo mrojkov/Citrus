@@ -30,26 +30,57 @@ namespace Lime
 	[ProtoContract]
 	public sealed class SimpleText : Widget
 	{
+		private Renderer.SpriteList spriteList;
+		private SerializableFont font;
+		private string text;
+		private float fontHeight;
+		private float spacing;
+		private HAlignment hAlignment;
+		private VAlignment vAlignment;
+		private bool autoFit;
+		private Vector2 prevSize;
+
 		[ProtoMember(1)]
-		public SerializableFont Font { get; set; }
+		public SerializableFont Font {
+			get { return font; }
+			set { SetFont(value); }
+		}
 
 		[ProtoMember(2)]
-		public override string Text { get; set; }
+		public override string Text {
+			get { return text; }
+			set { SetText(value); }
+		}
 
 		[ProtoMember(3)]
-		public float FontHeight { get; set; }
+		public float FontHeight {
+			get { return fontHeight; }
+			set { SetFontHeight(value); }
+		}
 
 		[ProtoMember(4)]
-		public float Spacing { get; set; }
+		public float Spacing {
+			get { return spacing; }
+			set { SetSpacing(value); }
+		}
 
 		[ProtoMember(5)]
-		public HAlignment HAlignment { get; set; }
+		public HAlignment HAlignment {
+			get { return hAlignment; }
+			set { SetHAlignment(value); }
+		}
 
 		[ProtoMember(6)]
-		public VAlignment VAlignment { get; set; }
+		public VAlignment VAlignment {
+			get { return vAlignment; }
+			set { SetVAlignment(value); }
+		}
 
 		[ProtoMember(7)]
-		public bool AutoFit { get; set; }
+		public bool AutoFit {
+			get { return autoFit; }
+			set { SetAutoFit(value); }
+		}
 
 		public SimpleText()
 		{
@@ -66,20 +97,28 @@ namespace Lime
 
 		public override void Render()
 		{
+			if (prevSize != Size) {
+				DisposeSpriteList();
+				prevSize = Size;
+			}
+			if (spriteList == null) {
+				spriteList = new Renderer.SpriteList();
+				Vector2 extent;
+				RenderHelper(spriteList, out extent);
+			}
 			Renderer.Transform1 = LocalToWorldTransform;
 			Renderer.Blending = GlobalBlending;
-			Vector2 extent;
-			RenderHelper(measureOnly: false, extent: out extent);
+			spriteList.Render(GlobalColor);
 		}
 
 		public Vector2 MeasureText()
 		{
 			Vector2 extent;
-			RenderHelper(measureOnly: true, extent: out extent);
+			RenderHelper(null, out extent);
 			return extent;
 		}
 
-		private void RenderHelper(bool measureOnly, out Vector2 extent)
+		private void RenderHelper(Renderer.SpriteList spriteList, out Vector2 extent)
 		{
 			extent = Vector2.Zero;
 			var localizedText = Localization.GetString(Text);
@@ -107,8 +146,8 @@ namespace Lime
 						pos.X = (Size.X - lineExtent.X) * 0.5f;
 						break;
 				}
-				if (!measureOnly) {
-					Renderer.DrawTextLine(Font.Instance, pos, line, FontHeight, GlobalColor);
+				if (spriteList != null) {
+					Renderer.DrawTextLine(spriteList, Font.Instance, pos, line, Color4.White, FontHeight, 0, line.Length);
 				}
 				extent.X = Mathf.Max(extent.X, pos.X + lineExtent.X);
 				pos.Y += Spacing + FontHeight;
@@ -161,6 +200,70 @@ namespace Lime
 				}
 			}
 			return strings;
+		}
+
+		private void SetFont(SerializableFont value)
+		{
+			if (value != font) {
+				font = value;
+				DisposeSpriteList();
+			}
+		}
+
+		private void SetText(string value)
+		{
+			if (value != text) {
+				text = value;
+				DisposeSpriteList();
+			}
+		}
+
+		private void SetFontHeight(float value)
+		{
+			if (value != fontHeight) {
+				fontHeight = value;
+				DisposeSpriteList();
+			}
+		}
+
+		private void SetHAlignment(Lime.HAlignment value)
+		{
+			if (value != hAlignment) {
+				hAlignment = value;
+				DisposeSpriteList();
+			}
+		}
+
+		private void SetVAlignment(Lime.VAlignment value)
+		{
+			if (value != vAlignment) {
+				vAlignment = value;
+				DisposeSpriteList();
+			}
+		}
+
+		private void SetAutoFit(bool value)
+		{
+			if (value != autoFit) {
+				autoFit = value;
+				DisposeSpriteList();
+			}
+		}
+
+		private void SetSpacing(float value)
+		{
+			if (value != spacing) {
+				spacing = value;
+				DisposeSpriteList();
+			}
+		}
+
+		private void DisposeSpriteList()
+		{
+			if (spriteList != null) {
+				spriteList.Dispose();
+				spriteList = null;
+			}
 		}
 	}
 }
