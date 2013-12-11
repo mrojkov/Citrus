@@ -78,22 +78,24 @@ namespace Lime
 
 		public override bool HandleOpenURL (UIApplication application, NSUrl url)
 		{
-			if (UrlOpened != null) {
-				return UrlOpened(url);
-			}
-			return false;
-		//	else
-		//		return base.HandleOpenURL(application, url);
+			return InvokeUrlOpenedDelegate(url);
 		}
 		
 		public override bool OpenUrl (UIApplication application, NSUrl url, string sourceApplication, NSObject annotation)
 		{
+			return InvokeUrlOpenedDelegate(url);
+		}
+
+		bool InvokeUrlOpenedDelegate(NSUrl url)
+		{
 			if (UrlOpened != null) {
-				return UrlOpened(url);
+				bool result = false;
+				foreach (OpenURLHandler d in UrlOpened.GetInvocationList()) {
+					result = result || d(url);
+				}
+				return result;
 			}
 			return false;
-		//	else
-		//		return base.OpenUrl(application, url, sourceApplication, annotation);
 		}
 
 		public override void OnActivated(UIApplication application)
