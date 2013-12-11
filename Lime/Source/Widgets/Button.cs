@@ -233,7 +233,8 @@ namespace Lime
 				UpdateLabel();
 				SyncActiveWidget();
 			}
-			if (!Enabled && State != DisabledState) {
+			// buz: Иногда хочется задизейблить кнопку по клику на неё, но анимацию отжатия проиграть всё равно нужно.
+			if (!Enabled && State != DisabledState && State != ReleaseState) {
 				State = DisabledState;
 			}
 			base.Update(delta);
