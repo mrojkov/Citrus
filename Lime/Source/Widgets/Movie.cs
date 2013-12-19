@@ -93,6 +93,7 @@ namespace Lime
 				Renderer.DrawSprite(movieTexture, GlobalColor, Vector2.Zero, Size, Vector2.Zero, Vector2.One);
 				Renderer.FlushSpriteBatch();
 			} finally {
+				Renderer.Blending = Blending.None;
 				Renderer.PremulAlphaMode = pam;
 			}
 		}
