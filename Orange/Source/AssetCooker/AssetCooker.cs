@@ -91,6 +91,7 @@ namespace Orange
 			AddStage(SyncScenes);
 			AddStage(SyncSounds);
 			AddStage(SyncUnityShaders);
+			AddStage(SyncRawAssets);
 		}
 
 		private static void CookHelper()
@@ -115,6 +116,14 @@ namespace Orange
 		private static void SyncVideoAssets()
 		{
 			SyncUpdated(".ogv", ".ogv", (srcPath, dstPath) => {
+				assetsBundle.ImportFile(srcPath, dstPath, 0);
+				return true;
+			});
+		}
+
+		private static void SyncRawAssets()
+		{
+			SyncUpdated(".raw", ".raw", (srcPath, dstPath) => {
 				assetsBundle.ImportFile(srcPath, dstPath, 0);
 				return true;
 			});
