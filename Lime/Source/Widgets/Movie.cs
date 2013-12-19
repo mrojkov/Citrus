@@ -84,9 +84,17 @@ namespace Lime
 			if (movieTexture.Stopped) {
 				return;
 			}
-			Renderer.Blending = GlobalBlending;
-			Renderer.Transform1 = LocalToWorldTransform;
-			Renderer.DrawSprite(movieTexture, GlobalColor, Vector2.Zero, Size, Vector2.Zero, Vector2.One);
+			var pam = Renderer.PremulAlphaMode;
+			try {
+				Renderer.PremulAlphaMode = false;
+				Renderer.Blending = Blending.None;
+				Renderer.Blending = GlobalBlending;
+				Renderer.Transform1 = LocalToWorldTransform;
+				Renderer.DrawSprite(movieTexture, GlobalColor, Vector2.Zero, Size, Vector2.Zero, Vector2.One);
+				Renderer.FlushSpriteBatch();
+			} finally {
+				Renderer.PremulAlphaMode = pam;
+			}
 		}
 
 		public override bool HitTest(Vector2 point)

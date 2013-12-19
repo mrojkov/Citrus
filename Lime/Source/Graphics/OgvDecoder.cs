@@ -10,6 +10,9 @@ namespace Lime
 {
 	public class OgvDecoder : IDisposable
 	{
+		const byte MinAlphaThreshold = 45;
+		const byte MaxAlphaThreshold = 250;
+
 		Stream stream;
 		int streamHandle;
 		Lemon.Api.FileSystem fileSystem;
@@ -80,7 +83,12 @@ namespace Lime
 						var linePtr = pixelsPtr + i * width;
 						var lineEnd = linePtr + width;
 						for (; linePtr != lineEnd; linePtr++) {
-							linePtr->A = *alphaPtr++;
+							byte c = *alphaPtr++;
+							if (c < MinAlphaThreshold) {
+								linePtr->A = 0;
+							} else if (c < MaxAlphaThreshold) {
+								linePtr->A = c;
+							}
 						}
 					}
 				}
