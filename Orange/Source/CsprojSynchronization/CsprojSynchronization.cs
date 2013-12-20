@@ -14,11 +14,9 @@ namespace Orange
 			var limeProj = The.Workspace.GetLimeCsprojFilePath();
 			SynchronizeProject(limeProj);
 
-			var gameProj = The.Workspace.GetGameCsprojFilePath();
-			SynchronizeProject(gameProj);
-
-			var mainProj = The.Workspace.GetMainCsprojFilePath();
-			SynchronizeProject(mainProj);
+			foreach (var gameProj in The.Workspace.EnumerateGameCsprojFilePaths()) {
+				SynchronizeProject(gameProj);
+			}
 		}
 
 		public static void SynchronizeProject(string projectFileName)
@@ -43,6 +41,9 @@ namespace Orange
 			var compileItems = itemGroups[1];
 			foreach (var file in new FileEnumerator(".").Enumerate(".cs")) {
 				var path = ToWindowsSlashes(file.Path);
+				if (Path.GetFileName(path).StartsWith("TemporaryGeneratedFile")) {
+					continue;
+				}
 				if (!HasCompileItem(doc, path)) {
 					if (IsItemShouldBeAdded(path)) {
 						var item = doc.CreateElement("Compile", doc["Project"].NamespaceURI);

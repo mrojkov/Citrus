@@ -43,12 +43,15 @@ namespace Orange
 		}
 
 		/// <summary>
-		/// Returns game project path. E.g: Zx3.Game/Zx3.Game.Win.csproj
+		/// Enumerate all game projects. E.g: Zx3.Game/Zx3.Game.Win.csproj
 		/// </summary>
-		public string GetGameCsprojFilePath()
+		public IEnumerable<string> EnumerateGameCsprojFilePaths()
 		{
-			var path = Path.Combine(The.Workspace.ProjectDirectory, The.Workspace.Title + ".Game", The.Workspace.Title + ".Game" + GetPlatformSuffix() + ".csproj");
-			return path;
+			var dirInfo = new System.IO.DirectoryInfo(ProjectDirectory);
+			foreach (var fileInfo in dirInfo.GetFiles("*" + GetPlatformSuffix() + ".csproj", SearchOption.AllDirectories)) {
+				var file = fileInfo.FullName;
+				yield return file;
+			}
 		}
 
 		/// <summary>
