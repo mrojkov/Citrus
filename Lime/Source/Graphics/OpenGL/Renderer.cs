@@ -424,9 +424,9 @@ namespace Lime
 			GL.LoadMatrix(value.ToFloatArray());
 			GL.MatrixMode(All.Modelview);
 #else
-			GL.MatrixMode(MatrixMode.Projection);
-			GL.LoadMatrix(value.ToFloatArray());
-			GL.MatrixMode(MatrixMode.Modelview);
+			OGL.MatrixMode(MatrixMode.Projection);
+			OGL.LoadMatrix(value.ToFloatArray());
+			OGL.MatrixMode(MatrixMode.Modelview);
 #endif
 
 		}
