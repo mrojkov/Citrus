@@ -168,17 +168,13 @@ namespace Lime
 			}
 			switch(Path) {
 				case "#a":
-				case "#A":
 				case "#b":
-				case "#B":
 					instance = new RenderTexture(256, 256);
 					break;
 				case "#c":
-				case "#C":
 					instance = new RenderTexture(512, 512);
 					break;
 				case "#d":
-				case "#D":
 					instance = new RenderTexture(1024, 1024);
 					break;
 				default:
