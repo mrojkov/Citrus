@@ -276,14 +276,14 @@ namespace Lime
 #endif
 		}
 
-		static WindowRect scissorRectangle;
+		static WindowRect scissorRectangle = new WindowRect();
 		public static WindowRect ScissorRectangle
 		{
 			get { return scissorRectangle; }
 			set { SetScissorRectangle(value); }
 		}
 
-		static bool scissorTestEnabled;
+		static bool scissorTestEnabled = false;
 		public static bool ScissorTestEnabled
 		{
 			get { return scissorTestEnabled; }

@@ -76,13 +76,13 @@ namespace Lime
 
 		private IEnumerator<int> NormalState()
 		{
-			if (World.Instance != null && TheActiveWidget == this) {
+			if (TheActiveWidget == this) {
 				TheActiveWidget = null;
 			}
 			TryRunAnimation("Normal");
 			while (true) {
 #if iOS
-				if (Input.WasMousePressed() && HitTest(Input.MousePosition) && World.Instance.ActiveWidget == null) {
+				if (Input.WasMousePressed() && HitTest(Input.MousePosition) && TheActiveWidget == null) {
 					World.Instance.ActiveWidget = this;
 					if (Draggable) {
 						State = DetectDraggingState;
