@@ -82,7 +82,8 @@ namespace Lime
 			TryRunAnimation("Normal");
 			while (true) {
 #if iOS
-				if (HitTest(Input.MousePosition) && Input.WasMousePressed()) {
+				if (Input.WasMousePressed() && HitTest(Input.MousePosition)) {
+					Input.ConsumeKeyEvent(Key.Mouse0, true);
 					World.Instance.ActiveWidget = this;
 					if (Draggable) {
 						State = DetectDraggingState;
