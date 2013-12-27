@@ -154,7 +154,7 @@ namespace Lime
 		{
 			if (keyEventQueue.Count > 0) {
 				var processedKeys = new bool[(int)Key.KeyCount];
-				for (int i = 0; i < keyEventQueue.Count; i++) {
+				for (int i = 0; i < keyEventQueue.Count(); i++) {
 					var evt = keyEventQueue[i];
 					if (!processedKeys[(int)evt.Key]) {
 						processedKeys[(int)evt.Key] = true;

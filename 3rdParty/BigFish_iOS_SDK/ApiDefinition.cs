@@ -60,6 +60,9 @@ namespace BigFish_iOS_SDK
 
 		[Export("success")]
 		bool Success { get; }
+	
+		[Export("canceled")]
+		bool Canceled { get; }
 	}
 
 	[BaseType(typeof(NSObject), Name = "bfgPurchase")]

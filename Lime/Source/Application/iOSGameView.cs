@@ -17,6 +17,7 @@ namespace Lime
 	public class GameView : iPhoneOSGameView
 	{
 		UITextField textField;
+		UITouch[] activeTouches = new UITouch[Input.MaxTouches];
 
 		class TextFieldDelegate : UITextFieldDelegate
 		{
@@ -42,6 +43,85 @@ namespace Lime
 			textField.Delegate = new TextFieldDelegate();
 			textField.AutocorrectionType = UITextAutocorrectionType.No;
 			this.Add(textField);
+		}
+
+		
+		public static System.Drawing.PointF GetTouchLocationInView(UITouch touch, UIView view)
+		{
+			// This code absolute equivalent to:
+			//		return touch.LocationInView(this.View);
+			// but later line causes crash when being run under XCode,
+			// so we managed this workaround:
+			System.Drawing.PointF result;
+			var selector = Selector.GetHandle("locationInView:");
+			if (MonoTouch.ObjCRuntime.Runtime.Arch == Arch.DEVICE) {
+				Messaging.PointF_objc_msgSend_stret_IntPtr(out result, touch.Handle, selector, (view != null) ? view.Handle : IntPtr.Zero);
+			} else {
+				result = Messaging.PointF_objc_msgSend_IntPtr(touch.Handle, selector, (view != null) ? view.Handle : IntPtr.Zero);
+			}
+			return result;
+		}
+
+		public override void TouchesBegan(NSSet touches, UIEvent evt)
+		{
+			foreach (var touch in touches.ToArray<UITouch>()) {
+				for (int i = 0; i < Input.MaxTouches; i++) {
+					if (activeTouches[i] == null) {
+						var pt = GetTouchLocationInView(touch, this);
+						Vector2 position = new Vector2(pt.X, pt.Y) * Input.ScreenToWorldTransform;
+						if (i == 0) {
+							Input.MousePosition = position;
+							Input.SetKeyState(Key.Mouse0, true);
+						}
+						Key key = (Key)((int)Key.Touch0 + i);
+						Input.SetTouchPosition(i, position);
+						activeTouches[i] = touch;
+						Input.SetKeyState(key, true);
+						break;
+					}
+				}
+			}
+		}
+
+		public override void TouchesMoved(NSSet touches, UIEvent evt)
+		{
+			foreach (var touch in touches.ToArray<UITouch>()) {
+				for (int i = 0; i < Input.MaxTouches; i++) {
+					if (activeTouches[i] == touch) {
+						var pt = GetTouchLocationInView(touch, this);
+						Vector2 position = new Vector2(pt.X, pt.Y) * Input.ScreenToWorldTransform;
+						if (i == 0) {
+							Input.MousePosition = position;
+						}
+						Input.SetTouchPosition(i, position);
+					}
+				}
+			}
+		}
+
+		public override void TouchesEnded(NSSet touches, UIEvent evt)
+		{
+			foreach (var touch in touches.ToArray<UITouch>()) {
+				for (int i = 0; i < Input.MaxTouches; i++) {
+					if (activeTouches[i] == touch) {
+						var pt = GetTouchLocationInView(touch, this);
+						Vector2 position = new Vector2(pt.X, pt.Y) * Input.ScreenToWorldTransform;
+						if (i == 0) {
+							Input.MousePosition = position;
+							Input.SetKeyState(Key.Mouse0, false);
+						}
+						activeTouches[i] = null;
+						Key key = (Key)((int)Key.Touch0 + i);
+						Input.SetTouchPosition(i, position);
+						Input.SetKeyState(key, false);
+					}
+				}
+			}
+		}
+
+		public override void TouchesCancelled(NSSet touches, UIEvent evt)
+		{
+			TouchesEnded(touches, evt);
 		}
 
 		[Export("layerClass")]
@@ -101,8 +181,6 @@ namespace Lime
 			int delta = (int)(currentTime - prevTime);
 			prevTime = currentTime;
 			delta = delta.Clamp(0, 40);
-			Input.ProcessPendingKeyEvents();
-			Input.MouseVisible = true;
 			Input.ProcessPendingKeyEvents();
 			Input.MouseVisible = true;
 			Application.Instance.OnUpdateFrame(delta);
