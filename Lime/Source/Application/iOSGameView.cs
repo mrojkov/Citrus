@@ -44,7 +44,6 @@ namespace Lime
 			textField.AutocorrectionType = UITextAutocorrectionType.No;
 			this.Add(textField);
 		}
-
 		
 		public static System.Drawing.PointF GetTouchLocationInView(UITouch touch, UIView view)
 		{
