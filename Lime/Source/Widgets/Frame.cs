@@ -223,40 +223,6 @@ namespace Lime
 			}
 		}
 
-		public void LoadContent()
-		{
-			if (!string.IsNullOrEmpty(ContentsPath)) {
-				LoadContentHelper();
-				return;
-			}
-			foreach (var frame in Nodes.AsArray.OfType<Frame>()) {
-				frame.LoadContent();
-			}
-		}
-
-		private void LoadContentHelper()
-		{
-			Nodes.Clear();
-			Markers.Clear();
-			var contentsPath = Path.ChangeExtension(ContentsPath, "scene");
-			if (!AssetsBundle.Instance.FileExists(contentsPath)) {
-				return;
-			}
-			var content = new Frame(ContentsPath);
-			if (content.AsWidget != null && AsWidget != null) {
-				content.Update(0);
-				content.AsWidget.Size = AsWidget.Size;
-				content.Update(0);
-			}
-			foreach (Marker marker in content.Markers) {
-				Markers.Add(marker);
-			}
-			foreach (Node node in content.Nodes.AsArray) {
-				node.Unlink();
-				Nodes.Add(node);
-			}
-		}
-
 		public static Frame CreateSubframe(string path)
 		{
 			var frame = (Frame)(new Frame(path).Nodes[0]);

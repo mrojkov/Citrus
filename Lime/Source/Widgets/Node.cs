@@ -530,6 +530,40 @@ namespace Lime
 			}
 		}
 
+		protected void LoadContent()
+		{
+			if (!string.IsNullOrEmpty(ContentsPath)) {
+				LoadContentHelper();
+			} else {
+				foreach (var node in Nodes.AsArray) {
+					node.LoadContent();
+				}
+			}
+		}
+
+		private void LoadContentHelper()
+		{
+			Nodes.Clear();
+			Markers.Clear();
+			var contentsPath = Path.ChangeExtension(ContentsPath, "scene");
+			if (!AssetsBundle.Instance.FileExists(contentsPath)) {
+				return;
+			}
+			var content = new Frame(ContentsPath);
+			if (content.AsWidget != null && AsWidget != null) {
+				content.Update(0);
+				content.AsWidget.Size = AsWidget.Size;
+				content.Update(0);
+			}
+			foreach (Marker marker in content.Markers) {
+				Markers.Add(marker);
+			}
+			foreach (Node node in content.Nodes.AsArray) {
+				node.Unlink();
+				Nodes.Add(node);
+			}
+		}
+
 		#endregion
 	}
 }
