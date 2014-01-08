@@ -7,8 +7,9 @@ using OpenTK.Graphics.ES20;
 #elif MAC
 using MonoMac.OpenGL;
 using OGL = MonoMac.OpenGL.GL;
-#elif OPENGL
+#elif WIN
 using OpenTK.Graphics.OpenGL;
+using OGL = OpenTK.Graphics.OpenGL.GL;
 #endif
 
 namespace Lime

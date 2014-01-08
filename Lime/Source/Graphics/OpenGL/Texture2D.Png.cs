@@ -6,6 +6,7 @@ using System.IO;
 
 #if WIN
 using OpenTK.Graphics.OpenGL;
+using OGL = OpenTK.Graphics.OpenGL.GL;
 #elif MAC
 using MonoMac.OpenGL;
 using OGL = MonoMac.OpenGL.GL;

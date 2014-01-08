@@ -6,10 +6,11 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.ES11;
 #elif MAC
 using MonoMac.OpenGL;
-#elif OPENGL
+#elif WIN
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
+using OGL = OpenTK.Graphics.OpenGL.GL;
 #endif
 using ProtoBuf;
 using System.Collections.Generic;
@@ -17,10 +18,6 @@ using System.Runtime.InteropServices;
 
 namespace Lime
 {
-#if MAC
-	using OGL = GL;
-#endif
-
 	public struct WindowRect
 	{
 		public int X;

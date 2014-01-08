@@ -9,6 +9,7 @@ using System.Reflection;
 
 namespace Lime
 {
+#if NOT_USED
 	public static partial class OGL
 	{
 		const string library = "opengl32.dll";
@@ -175,5 +176,6 @@ namespace Lime
 			}
 		}
 	}
+#endif
 }
 #endif

@@ -9,7 +9,8 @@ using MonoMac.OpenGL;
 using OGL = MonoMac.OpenGL.GL;
 #elif WIN
 using OpenTK.Graphics.OpenGL;
-using System.ComponentModel;
+using OGL = OpenTK.Graphics.OpenGL.GL;
+// using System.ComponentModel;
 #endif
 
 namespace Lime
