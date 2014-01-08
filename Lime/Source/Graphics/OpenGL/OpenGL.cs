@@ -12,16 +12,26 @@ namespace Lime
 	public static partial class OGL
 	{
 		const string library = "opengl32.dll";
+		public static class Delegates
+		{
+			public delegate void ClientActiveTexture(TextureUnit texture);
+			public delegate void ActiveTexture(TextureUnit texture);
+			public delegate void GenerateMipmap(GenerateMipmapTarget target);
+			public delegate void CompressedTexImage2D(TextureTarget target, int level, PixelInternalFormat internalformat, int width, int height, int border, int imageSize, IntPtr data);
+			public delegate void GenFramebuffers(int num, out int framebuffer);
+			public delegate void BindFramebuffer(FramebufferTarget target, int framebuffer);
+			public delegate void FramebufferTexture2D(FramebufferTarget target, FramebufferAttachment attachment, TextureTarget textarget, uint texture, int level);
+			public delegate FramebufferErrorCode CheckFramebufferStatus(FramebufferTarget target);
+		}
 
-		delegate void ClientActiveTextureHandler(TextureUnit texture);
-		delegate void ActiveTextureHandler(TextureUnit texture);
-		delegate void GenerateMipmapHandler(GenerateMipmapTarget target);
-		delegate void CompressedTexImage2DHandler(TextureTarget target, int level, PixelInternalFormat internalformat, int width, int height, int border, int imageSize, IntPtr data);
-
-		static ClientActiveTextureHandler clientActiveTexture = GetProc<ClientActiveTextureHandler>("glClientActiveTexture");
-		static ActiveTextureHandler activeTexture = GetProc<ActiveTextureHandler>("glActiveTexture");
-		static CompressedTexImage2DHandler compressedTexImage2D = GetProc<CompressedTexImage2DHandler>("glCompressedTexImage2D");
-		static GenerateMipmapHandler generateMipmap = GetProc<GenerateMipmapHandler>("glGenerateMipmap");
+		public static Delegates.GenerateMipmap GenerateMipmap = GetProc<Delegates.GenerateMipmap>("glGenerateMipmap");
+		public static Delegates.ClientActiveTexture ClientActiveTexture = GetProc<Delegates.ClientActiveTexture>("glClientActiveTexture");
+		public static Delegates.ActiveTexture ActiveTexture = GetProc<Delegates.ActiveTexture>("glActiveTexture");
+		public static Delegates.GenFramebuffers GenFramebuffers = GetProc<Delegates.GenFramebuffers>("glGenFramebuffers");
+		public static Delegates.BindFramebuffer BindFramebuffer = GetProc<Delegates.BindFramebuffer>("glBindFramebuffer");
+		public static Delegates.FramebufferTexture2D FramebufferTexture2D = GetProc<Delegates.FramebufferTexture2D>("glFramebufferTexture2D");
+		public static Delegates.CheckFramebufferStatus CheckFramebufferStatus = GetProc<Delegates.CheckFramebufferStatus>("glCheckFramebufferStatus");
+		private static Delegates.CompressedTexImage2D compressedTexImage2D = GetProc<Delegates.CompressedTexImage2D>("glCompressedTexImage2D");
 
 		[DllImport(library, EntryPoint = "wglGetProcAddress")]
 		static extern IntPtr GetProcAddress(string name);
@@ -44,10 +54,10 @@ namespace Lime
 		[DllImport(library, EntryPoint = "glEnable")]
 		public static extern void Enable(EnableCap cap);
 
-		[DllImport(library, EntryPoint="glDisable")]
+		[DllImport(library, EntryPoint = "glDisable")]
 		public static extern void Disable(EnableCap cap);
 
-		[DllImport(library, EntryPoint="glBindTexture")]
+		[DllImport(library, EntryPoint = "glBindTexture")]
 		public static extern void BindTexture(TextureTarget target, UInt32 texture);
 
 		[DllImport(library, EntryPoint = "glVertexPointer")]
@@ -97,7 +107,10 @@ namespace Lime
 
 		[DllImport(library, EntryPoint = "glFinish")]
 		public static extern void Finish();
-
+		
+		[DllImport(library, EntryPoint = "glGetIntegerv")]
+		public static extern void GetInteger(GetPName pname, out int value);
+	
 		public static uint GenTexture()
 		{
 			var t = new UInt32[1];
@@ -123,11 +136,6 @@ namespace Lime
 		
 		[DllImport(library, EntryPoint = "glHint")]
 		public static extern void Hint(HintTarget target, HintMode mode);
-
-		public static void GenerateMipmap(GenerateMipmapTarget target)
-		{
-			generateMipmap(target);
-		}
 
 		public static void CompressedTexImage2D(TextureTarget target, int level, PixelInternalFormat internalformat, int width, int height, int border, int imageSize, IntPtr data)
 		{
@@ -167,16 +175,6 @@ namespace Lime
 			} finally {
 				ptr.Free();
 			}
-		}
-
-		public static void ClientActiveTexture(TextureUnit texture)
-		{
-			clientActiveTexture(texture);
-		}
-
-		public static void ActiveTexture(TextureUnit texture)
-		{
-			activeTexture(texture);
 		}
 	}
 }

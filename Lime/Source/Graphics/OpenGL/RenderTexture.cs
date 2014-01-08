@@ -42,26 +42,21 @@ namespace Lime
 				throw new Exception("Failed to create render texture. Framebuffer is incomplete.");
 			GL.BindFramebuffer(All.Framebuffer, defaultFramebuffer);
 #elif OPENGL
-			GL.GenFramebuffers(1, out framebuffer);
-			id = (uint)GL.GenTexture();
-			GL.BindTexture(TextureTarget.Texture2D, id);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-			GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Fastest);
-			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0,
+			OGL.GenFramebuffers(1, out framebuffer);
+			id = (uint)OGL.GenTexture();
+			OGL.BindTexture(TextureTarget.Texture2D, id);
+			OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+			OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+			OGL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Fastest);
+			OGL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0,
 				PixelFormat.Bgra, PixelType.UnsignedByte, (IntPtr)null);
-			GL.BindFramebuffer(FramebufferTarget.FramebufferExt, framebuffer);
-			GL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0Ext, TextureTarget.Texture2D, id, 0);
-			if (GL.CheckFramebufferStatus(FramebufferTarget.FramebufferExt) != FramebufferErrorCode.FramebufferCompleteExt)
+			OGL.BindFramebuffer(FramebufferTarget.FramebufferExt, framebuffer);
+			OGL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0Ext, TextureTarget.Texture2D, id, 0);
+			if (OGL.CheckFramebufferStatus(FramebufferTarget.FramebufferExt) != FramebufferErrorCode.FramebufferCompleteExt)
 				throw new Exception("Failed to create render texture. Framebuffer is incomplete.");
-			GL.BindFramebuffer(FramebufferTarget.FramebufferExt, 0);
+			OGL.BindFramebuffer(FramebufferTarget.FramebufferExt, 0);
 #endif
 			Renderer.CheckErrors();
-		}
-
-		public IEnumerator<object> PrefetchAsync()
-		{
-			throw new InvalidOperationException();
 		}
 
 		public Size ImageSize {
@@ -116,8 +111,8 @@ namespace Lime
 			GL.BindFramebuffer(All.Framebuffer, framebuffer);
 			framebufferStack.Push(currentFramebuffer);
 #elif OPENGL
-			GL.GetInteger(GetPName.FramebufferBindingExt, out currentFramebuffer);
-			GL.BindFramebuffer(FramebufferTarget.FramebufferExt, framebuffer);
+			OGL.GetInteger(GetPName.FramebufferBindingExt, out currentFramebuffer);
+			OGL.BindFramebuffer(FramebufferTarget.FramebufferExt, framebuffer);
 			framebufferStack.Push(currentFramebuffer);
 #endif
 		}
@@ -129,7 +124,7 @@ namespace Lime
 #if GLES11
 			GL.BindFramebuffer(All.Framebuffer, prevFramebuffer);
 #elif OPENGL
-			GL.BindFramebuffer(FramebufferTarget.FramebufferExt, prevFramebuffer);
+			OGL.BindFramebuffer(FramebufferTarget.FramebufferExt, prevFramebuffer);
 #endif
 		}
 

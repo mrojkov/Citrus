@@ -56,11 +56,6 @@ namespace Lime
 
 		public bool IsStubTexture { get { return false; } }
 
-		public IEnumerator<object> PrefetchAsync()
-		{
-			throw new InvalidOperationException();
-		}
-
 		public void LoadImage(string path)
 		{
 			using (Stream stream = PackedAssetsBundle.Instance.OpenFileLocalized(path)) {
