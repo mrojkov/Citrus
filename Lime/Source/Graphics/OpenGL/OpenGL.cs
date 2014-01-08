@@ -16,7 +16,6 @@ namespace Lime
 		{
 			public delegate void ClientActiveTexture(TextureUnit texture);
 			public delegate void ActiveTexture(TextureUnit texture);
-			public delegate void GenerateMipmap(GenerateMipmapTarget target);
 			public delegate void CompressedTexImage2D(TextureTarget target, int level, PixelInternalFormat internalformat, int width, int height, int border, int imageSize, IntPtr data);
 			public delegate void GenFramebuffers(int num, out int framebuffer);
 			public delegate void BindFramebuffer(FramebufferTarget target, int framebuffer);
@@ -24,7 +23,6 @@ namespace Lime
 			public delegate FramebufferErrorCode CheckFramebufferStatus(FramebufferTarget target);
 		}
 
-		public static Delegates.GenerateMipmap GenerateMipmap = GetProc<Delegates.GenerateMipmap>("glGenerateMipmap");
 		public static Delegates.ClientActiveTexture ClientActiveTexture = GetProc<Delegates.ClientActiveTexture>("glClientActiveTexture");
 		public static Delegates.ActiveTexture ActiveTexture = GetProc<Delegates.ActiveTexture>("glActiveTexture");
 		public static Delegates.GenFramebuffers GenFramebuffers = GetProc<Delegates.GenFramebuffers>("glGenFramebuffers");
