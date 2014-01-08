@@ -146,11 +146,8 @@ namespace Lime
 				OGL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0,
 					PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
 				if (generateMips) {
-#if WIN
-					OGL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
-#elif OPENGL
-					Console.WriteLine("WARNING: Mipmap generation is not implemented for this platform");
-#endif
+					throw new NotImplementedException("MipMap generation is not implemented yet");
+					// OGL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 				}
 #endif
 				Renderer.CheckErrors();
