@@ -23,6 +23,7 @@ namespace Lime
 		{
 			UV0 = Vector2.Zero;
 			UV1 = Vector2.One;
+			HitTestMethod = HitTestMethod.Contents;
 			Texture = new SerializableTexture();
 		}
 
@@ -31,6 +32,7 @@ namespace Lime
 			UV0 = Vector2.Zero;
 			UV1 = Vector2.One;
 			Texture = texture;
+			HitTestMethod = HitTestMethod.Contents;
 			Size = (Vector2)texture.ImageSize;
 		}
 

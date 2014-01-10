@@ -36,6 +36,7 @@ namespace Orange
 			case ".dds":
 			case ".pvr":
 			case ".atlasPart":
+			case ".mask":
 				return ".png";
 			case ".sound":
 				return ".ogg";
@@ -86,12 +87,26 @@ namespace Orange
 			AddStage(SyncDeleted);
 			AddStage(SyncTxtAssets);
 			AddStage(SyncTextures);
+			AddStage(DeleteOrphanedMasks);
 			AddStage(SyncFonts);
 			AddStage(SyncVideoAssets);
 			AddStage(SyncScenes);
 			AddStage(SyncSounds);
 			AddStage(SyncUnityShaders);
 			AddStage(SyncRawAssets);
+		}
+
+		private static void DeleteOrphanedMasks()
+		{
+			foreach (var maskPath in assetsBundle.EnumerateFiles()) {
+				if (Path.GetExtension(maskPath) == ".mask") {
+					var origImageFile = Path.ChangeExtension(maskPath, GetPlatformTextureExtension());
+					if (!assetsBundle.FileExists(origImageFile)) {
+						Console.WriteLine("- " + maskPath);
+						assetsBundle.DeleteFile(maskPath);
+					}
+				}
+			}
 		}
 
 		private static void CookHelper()
@@ -197,6 +212,8 @@ namespace Orange
 				if (platform == TargetPlatform.Unity) {
 					assetsBundle.ImportFile(srcPath, dstPath, reserve: 0);
 				} else {
+					string maskPath = Path.ChangeExtension(srcPath, ".mask");
+					OpacityMaskCreator.CreateMask(assetsBundle, srcPath, maskPath);
 					string tmpFile = Path.ChangeExtension(srcPath, GetPlatformTextureExtension());
 					TextureConverter.Convert(srcPath, tmpFile, rules, platform);
 					assetsBundle.ImportFile(tmpFile, dstPath, reserve: 0, compress: true);
@@ -225,8 +242,9 @@ namespace Orange
 				if (path.StartsWith("Atlases")) {
 					continue;
 				}
-				// Ignore atlas parts
-				if (Path.GetExtension(path) == ".atlasPart") {
+				// Ignore atlas parts and masks
+				var ext = Path.GetExtension(path);
+				if (ext == ".atlasPart" || ext == ".mask") {
 					continue;
 				}
 				string assetPath = Path.ChangeExtension(path, GetOriginalAssetExtension(path));
@@ -379,7 +397,7 @@ namespace Orange
 						}
 					}
 					Console.WriteLine("+ " + atlasPath);
-					string inFile = "$TMP$.png";
+					string inFile = GetTempFilePathWithExtension(".png");
 					if (!atlas.Save(inFile, "png")) {
 						var error = (Gdk.PixbufError)Gdk.Pixbuf.ErrorQuark();
 						throw new Lime.Exception("Can't save '{0}' (error: {1})", inFile, error.ToString()); 
@@ -391,6 +409,8 @@ namespace Orange
 						assetsBundle.ImportFile(inFile, atlasPath, 0);
 					} else {
 						string outFile = Path.ChangeExtension(inFile, GetPlatformTextureExtension());
+						string maskPath = Path.ChangeExtension(atlasPath, ".mask");
+						OpacityMaskCreator.CreateMask(assetsBundle, inFile, maskPath);
 						TextureConverter.Convert(inFile, outFile, rules, platform);
 						assetsBundle.ImportFile(outFile, atlasPath, 0, compress: true);
 						File.Delete(outFile);
@@ -403,6 +423,13 @@ namespace Orange
 					break;
 				}
 			}
+		}
+
+		static string GetTempFilePathWithExtension(string extension)
+		{
+			var path = Path.GetTempPath();
+			var fileName = Guid.NewGuid().ToString() + extension;
+			return Path.Combine(path, fileName);
 		}
 
 		static void SyncAtlases()

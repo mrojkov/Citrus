@@ -28,6 +28,11 @@ namespace Lime
 
 		Part[] layout = new Part[9];
 
+		public NineGrid()
+		{
+			HitTestMethod = HitTestMethod.Contents;
+		}
+
 		void BuildLayout(Part[] layout)
 		{
 			Vector2 textureSize = (Vector2)Texture.ImageSize;

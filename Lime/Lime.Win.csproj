@@ -162,6 +162,7 @@
     <Compile Include="Source\Widgets\TextBox.cs" />
     <Compile Include="Source\Widgets\Widget.cs" />
     <Compile Include="Source\Widgets\Widget.Toolbox.cs" />
+    <Compile Include="Source\Graphics\OpacityMask.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

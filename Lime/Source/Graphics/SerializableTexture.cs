@@ -97,7 +97,13 @@ namespace Lime
 
 		public bool IsTransparentPixel(int x, int y)
 		{
-			return core.GetInstance().IsTransparentPixel(x, y);
+			var texture = core.GetInstance();
+			var size = (Size)(UVRect.Size * (Vector2)texture.SurfaceSize);
+			if (x < 0 || y < 0 || x >= size.Width || y >= size.Height) {
+				return false;
+			}
+			var offset = (IntVector2)(UVRect.A * (Vector2)texture.SurfaceSize);
+			return texture.IsTransparentPixel(x + offset.X, y + offset.Y);
 		}
 
 		public override string ToString()

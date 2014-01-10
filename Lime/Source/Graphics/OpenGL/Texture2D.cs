@@ -21,6 +21,7 @@ namespace Lime
 	public partial class Texture2D : ITexture
 	{
 		uint id;
+		public OpacityMask OpacityMask { get; private set; }
 		public Size ImageSize { get; protected set; }
 		public Size SurfaceSize { get; protected set; }
 		Rectangle uvRect;
@@ -59,8 +60,12 @@ namespace Lime
 
 		public void LoadImage(string path)
 		{
-			using (Stream stream = PackedAssetsBundle.Instance.OpenFileLocalized(path)) {
+			using (Stream stream = AssetsBundle.Instance.OpenFileLocalized(path)) {
 				LoadImage(stream);
+			}
+			var maskPath = Path.ChangeExtension(path, ".mask");
+			if (AssetsBundle.Instance.FileExists(maskPath)) {
+				OpacityMask = new OpacityMask(maskPath);
 			}
 		}
 
@@ -228,6 +233,11 @@ namespace Lime
 		/// <returns></returns>
 		public bool IsTransparentPixel(int x, int y)
 		{
+			if (OpacityMask != null) {
+				int x1 = x * OpacityMask.Width / ImageSize.Width;
+				int y1 = y * OpacityMask.Height / ImageSize.Height;
+				return !OpacityMask.TestPixel(x1, y1);
+			}
 			return false;
 		}
 	}

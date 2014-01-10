@@ -392,7 +392,6 @@ namespace Lime
 			}
 			reader.ReadInt32(); // CheckSum
 			indexOffset = reader.ReadInt32();
-
 			stream.Seek(indexOffset, SeekOrigin.Begin);
 			int numDescriptors = reader.ReadInt32();
 			index.Clear();

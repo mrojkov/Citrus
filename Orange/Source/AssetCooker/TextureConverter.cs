@@ -24,8 +24,7 @@ namespace Orange
 			
 			var pixbuf = new Gdk.Pixbuf(srcPath);
 			string formatArguments = "";
-			switch (pvrFormat)
-			{
+			switch (pvrFormat) {
 			case PVRFormat.PVRTC4:
 				formatArguments = "-f PVRTC4";
 				potWidth = potHeight = maxDimension;
