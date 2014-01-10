@@ -22,6 +22,7 @@ namespace Lime
 	{
 		bool skipRender;
 		bool requestSkipRender;
+		bool textureInitialized;
 		MovieTexture movieTexture;
 
 		[ProtoMember(1)]
@@ -65,7 +66,7 @@ namespace Lime
 
 		public override void AddToRenderChain(RenderChain chain)
 		{
-			if (GloballyVisible && !skipRender) {
+			if (GloballyVisible && !skipRender && textureInitialized) {
 				chain.Add(this, Layer);
 			}
 		}
@@ -117,6 +118,7 @@ namespace Lime
 			switch (Action) {
 				case MovieAction.Play:
 					movieTexture.Play();
+					textureInitialized = true;
 					break;
 				case MovieAction.Pause:
 					movieTexture.Pause(true);
