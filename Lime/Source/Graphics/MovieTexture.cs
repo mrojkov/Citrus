@@ -83,7 +83,6 @@ namespace Lime
 		{
 #if UNITY || MAC
 #else
-			DisposeOpenGLTexture();
 			Stopped = true;
 			videoTime = 0;
 			gameTime = 0;

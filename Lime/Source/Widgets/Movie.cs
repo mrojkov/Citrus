@@ -81,9 +81,6 @@ namespace Lime
 
 		public override void Render()
 		{
-			if (movieTexture.Stopped) {
-				return;
-			}
 			var pam = Renderer.PremulAlphaMode;
 			try {
 				Renderer.PremulAlphaMode = false;
