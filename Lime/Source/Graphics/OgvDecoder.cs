@@ -70,7 +70,7 @@ namespace Lime
 			}
 		}
 
-		static byte[] alphaSaturateTable = InitAlphaTable();
+		static readonly byte[] alphaSaturateTable = InitAlphaTable();
 
 		private static byte[] InitAlphaTable()
 		{
