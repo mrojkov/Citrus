@@ -70,6 +70,23 @@ namespace Lime
 			}
 		}
 
+		static byte[] alphaSaturateTable = InitAlphaTable();
+
+		private static byte[] InitAlphaTable()
+		{
+			var table = new byte[256];
+			for (int i = 0; i < 256; i++) {
+				if (i < MinAlphaThreshold) {
+					table[i] = 0;
+				} else if (i > MaxAlphaThreshold) {
+					table[i] = 255;
+				} else {
+					table[i] = (byte)(i + 255 - MaxAlphaThreshold);
+				}
+			}
+			return table;
+		}
+
 		public void FillTextureAlpha(Color4[] pixels, int width, int height)
 		{
 			var yPlane = Lemon.Api.OgvGetBuffer(ogvHandle, 0);
@@ -77,24 +94,19 @@ namespace Lime
 				throw new ArgumentException();
 			}
 			unsafe {
+				fixed (byte* alphaTablePtr = &alphaSaturateTable[0])
 				fixed (Color4* pixelsPtr = &pixels[0]) {
 					for (int i = 0; i < height; i++) {
 						var alphaPtr = (byte*)yPlane.Data.ToPointer() + i * yPlane.Stride;
 						var linePtr = pixelsPtr + i * width;
 						var lineEnd = linePtr + width;
 						for (; linePtr != lineEnd; linePtr++) {
-							byte c = *alphaPtr++;
-							if (c < MinAlphaThreshold) {
-								linePtr->A = 0;
-							} else if (c < MaxAlphaThreshold) {
-								linePtr->A = c;
-							}
+							linePtr->A = alphaTablePtr[*alphaPtr++];
 						}
 					}
 				}
 			}
 		}
-
 
 #if iOS
 		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.Api.ReadCallback))]
