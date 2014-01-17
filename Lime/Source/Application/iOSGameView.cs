@@ -106,12 +106,10 @@ namespace Lime
 						var pt = GetTouchLocationInView(touch, this);
 						Vector2 position = new Vector2(pt.X, pt.Y) * Input.ScreenToWorldTransform;
 						if (i == 0) {
-							Input.MousePosition = position;
 							Input.SetKeyState(Key.Mouse0, false);
 						}
 						activeTouches[i] = null;
 						Key key = (Key)((int)Key.Touch0 + i);
-						Input.SetTouchPosition(i, position);
 						Input.SetKeyState(key, false);
 					}
 				}
@@ -130,11 +128,17 @@ namespace Lime
 		}
 
 		string prevText;
+
+		public void ChangeOnscreenKeyboardText(string text)
+		{
+			prevText = text;
+			textField.Text = text;
+		}
+
 		public void ShowOnscreenKeyboard(bool show, string text)
 		{
 			if (show != textField.IsFirstResponder) {
-				prevText = text;
-				textField.Text = text;
+				ChangeOnscreenKeyboardText(text);
 				if (show) {
 					textField.BecomeFirstResponder();
 				} else {

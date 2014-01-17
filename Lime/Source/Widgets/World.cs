@@ -47,6 +47,9 @@
 			return null;
 		}
 
+#if iOS
+		bool? prevKeyboardState;
+#endif
 		public override void Update(int delta)
 		{
 			ParticleEmitter.NumberOfUpdatedParticles = 0;
@@ -62,7 +65,13 @@
 			}
 #if iOS
 			bool showKeyboard = ActiveTextWidget != null && ActiveTextWidget.Visible;
-			Application.Instance.ShowOnscreenKeyboard(showKeyboard, ActiveTextWidget != null ? ActiveTextWidget.Text : "");
+			var text = ActiveTextWidget != null ? ActiveTextWidget.Text : "";
+			if (!prevKeyboardState.HasValue || prevKeyboardState.Value != showKeyboard) {
+				prevKeyboardState = showKeyboard;
+				Application.Instance.ShowOnscreenKeyboard(showKeyboard, text);
+			} else {
+				Application.Instance.ChangeOnscreenKeyboardText(text);
+			}
 #endif
 		}
 	}
