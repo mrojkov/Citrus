@@ -21,6 +21,7 @@ namespace Lime
 
 		public Action Released;
 		public Action ValueChanged;
+		public bool Enabled;
 
 		float value;
 		float offset0;
@@ -31,6 +32,7 @@ namespace Lime
 			RangeMin = 0;
 			RangeMax = 100;
 			Value = 0;
+			Enabled = true;
 		}
 
 		void UpdateHelper(int delta)
@@ -51,7 +53,7 @@ namespace Lime
 						}
 					}
 				}
-				if (World.Instance.ActiveWidget == this) {
+				if (World.Instance.ActiveWidget == this && Enabled) {
 					if (Input.WasKeyPressed(Key.Mouse0)) {
 						Input.ConsumeKeyEvent(Key.Mouse0, true);
 						ScrollSlider(true);
@@ -91,7 +93,7 @@ namespace Lime
 			base.Update(delta);
 		}
 
-		void ScrollSlider(bool begin)
+		public void ScrollSlider(bool begin)
 		{
 			Spline rail = TryFind<Spline>("Rail");
 			if (rail != null) {
