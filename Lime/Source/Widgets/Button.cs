@@ -160,12 +160,12 @@ namespace Lime
 
 		private IEnumerator<int> PressedState()
 		{
-			var mouse = Input.MousePosition;
+			var mouse = Input.VisibleMousePosition;
 			TryRunAnimation("Press");
 			bool wasPressed = true;
 			while (true) {
 				bool isPressed = HitTest(Input.VisibleMousePosition) ||
-					(Input.MousePosition - this.GlobalCenter).Length < ButtonEffectiveRadius;
+					(Input.VisibleMousePosition - this.GlobalCenter).Length < ButtonEffectiveRadius;
 				if (!Input.IsMousePressed()) {
 					if (isPressed) {
 						HandleClick();
