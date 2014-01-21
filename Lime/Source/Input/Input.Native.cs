@@ -40,10 +40,20 @@ namespace Lime
 			internal set { mousePosition = value; }
 		}
 
+		public static Vector2 VisibleMousePosition
+		{
+			get { return mousePosition; }
+		}
+
 		/// <summary>
 		/// Use this property for hiding mouse away. E.g. after processing modal dialog controls.
 		/// </summary>
-		public static bool MouseVisible;
+		static bool mouseVisible;
+		public static bool MouseVisible
+		{
+			get { return mouseVisible; }
+			set { mouseVisible = value; }
+		}
 
 		/// <summary>
 		/// The current accelerometer state (read only).

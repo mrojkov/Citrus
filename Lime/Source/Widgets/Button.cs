@@ -47,6 +47,11 @@ namespace Lime
 		/// </summary>
 		private const float DragDetectionTime = 0.15f;
 
+		/// <summary>
+		/// Once button has been clicked, its active area includes circle with a given radius.
+		/// </summary>
+		public static float ButtonEffectiveRadius = 400;
+
 		public Button()
 		{
 			Enabled = true;
@@ -157,16 +162,22 @@ namespace Lime
 		{
 			var mouse = Input.MousePosition;
 			TryRunAnimation("Press");
+			bool wasPressed = true;
 			while (true) {
-				if (Draggable && (mouse - Input.MousePosition).Length > DragDistanceThreshold) {
+				bool isPressed = HitTest(Input.VisibleMousePosition) ||
+					(Input.MousePosition - this.GlobalCenter).Length < ButtonEffectiveRadius;
+				if (!Input.IsMousePressed()) {
+					if (isPressed) {
+						HandleClick();
+					}
 					State = ReleaseState;
-				} else if (!HitTest(Input.MousePosition)) {
-					State = ReleaseState;
-				} else if (!Input.IsMousePressed()) {
-					HandleClick();
-					State = ReleaseState;
+				} else if (wasPressed && !isPressed) {
+					TryRunAnimation("Release");
+				} else if (!wasPressed && isPressed) {
+					TryRunAnimation("Press");
 				}
 				yield return 0;
+				wasPressed = isPressed;
 			}
 		}
 
@@ -180,9 +191,11 @@ namespace Lime
 
 		private IEnumerator<int> ReleaseState()
 		{
-			if (TryRunAnimation("Release")) {
-				while (IsRunning) {
-					yield return 0;
+			if (CurrentAnimation != "Release") {
+				if (TryRunAnimation("Release")) {
+					while (IsRunning) {
+						yield return 0;
+					}
 				}
 			}
 #if iOS
