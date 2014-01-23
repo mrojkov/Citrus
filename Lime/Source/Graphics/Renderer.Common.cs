@@ -219,7 +219,6 @@ namespace Lime
 				item.Size = new Vector2(scale * fontChar.Width, fontHeight);
 				item.UV0 = fontChar.UV0;
 				item.UV1 = fontChar.UV1;
-				// DrawSprite(font.Textures[fontChar.TextureIndex], color, position, size, fontChar.UV0, fontChar.UV1);
 				position.X += scale * (fontChar.Width + fontChar.ACWidths.Y);
 				prevChar = fontChar;
 			}
@@ -257,6 +256,9 @@ namespace Lime
 			int i = currentVertex;
 			int j = currentIndex;
 			var matrix = Transform2.IsIdentity() ? Transform1 : Transform1 * Transform2;
+			if (texture.SerializationPath.Contains("TableCardsSmall")) {
+				Logger.Write(matrix.ToString());
+			}
 			currentIndex += 6;
 			batchIndices[j++] = (ushort)(i + 0);
 			batchIndices[j++] = (ushort)(i + 1);
