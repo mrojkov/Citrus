@@ -47,7 +47,7 @@ namespace Lime
 		private Vector2 direction = new Vector2(1, 0);
 		private Color4 color;
 		private Action clicked;
-		private Vector2? parentSize;
+		private Vector2 parentSize;
 
 		protected bool RenderedToTexture;
 
@@ -151,6 +151,17 @@ namespace Lime
 			Scale = Vector2.One;
 			Visible = true;
 			Blending = Blending.Default;
+		}
+
+		[ProtoAfterDeserialization]
+		private void AfterDeserialization()
+		{
+			parentSize = Size;
+			foreach (var node in Nodes.AsArray) {
+				if (node.AsWidget != null) {
+					node.AsWidget.parentSize = Size;
+				}
+			}
 		}
 
 		public virtual Vector2 CalcContentSize()
@@ -273,17 +284,10 @@ namespace Lime
 			}
 		}
 
-		internal override void OnParentChanged()
-		{
-			if (Parent != null && Parent.AsWidget != null) {
-				parentSize = Parent.AsWidget.Size;
-			}
-		}
-
 		private void ApplyAnchors()
 		{
 			Vector2 s = Parent.AsWidget.Size;
-			if (parentSize.HasValue && !parentSize.Value.Equals(s)) {
+			if (!parentSize.Equals(s)) {
 				ApplyAnchorsAlongXAxis();
 				ApplyAnchorsAlongYAxis();
 			}
@@ -294,12 +298,12 @@ namespace Lime
 		{
 			Vector2 s = Parent.AsWidget.Size;
 			if ((Anchors & Anchors.CenterV) != 0) {
-				Y += (s.Y - parentSize.Value.Y) / 2;
+				Y += (s.Y - parentSize.Y) / 2;
 			} else if ((Anchors & Anchors.Top) != 0 && (Anchors & Anchors.Bottom) != 0) {
-				Height += s.Y - parentSize.Value.Y;
-				Y += (s.Y - parentSize.Value.Y) * Pivot.Y;
+				Height += s.Y - parentSize.Y;
+				Y += (s.Y - parentSize.Y) * Pivot.Y;
 			} else if ((Anchors & Anchors.Bottom) != 0) {
-				Y += s.Y - parentSize.Value.Y;
+				Y += s.Y - parentSize.Y;
 			}
 		}
 
@@ -307,12 +311,12 @@ namespace Lime
 		{
 			Vector2 s = Parent.AsWidget.Size;
 			if ((Anchors & Anchors.CenterH) != 0) {
-				X += (s.X - parentSize.Value.X) / 2;
+				X += (s.X - parentSize.X) / 2;
 			} else if ((Anchors & Anchors.Left) != 0 && (Anchors & Anchors.Right) != 0) {
-				Width += s.X - parentSize.Value.X;
-				X += (s.X - parentSize.Value.X) * Pivot.X;
+				Width += s.X - parentSize.X;
+				X += (s.X - parentSize.X) * Pivot.X;
 			} else if ((Anchors & Anchors.Right) != 0) {
-				X += s.X - parentSize.Value.X;
+				X += s.X - parentSize.X;
 			}
 		}
 
