@@ -154,7 +154,7 @@ namespace Lime
 		}
 
 		[ProtoAfterDeserialization]
-		private void AfterDeserialization()
+		public void AfterDeserialization()
 		{
 			parentSize = Size; 	// This assignment sets the parentSize for a top parentless widget
 			foreach (var node in Nodes.AsArray) {
