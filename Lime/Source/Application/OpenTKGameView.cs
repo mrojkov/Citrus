@@ -27,20 +27,24 @@ namespace Lime
 			this.Mouse.ButtonUp += HandleMouseButtonUp;
 			this.Mouse.Move += HandleMouseMove;
 			this.Mouse.WheelChanged += HandleMouseWheel;
-			// Как узнать разрешение текущего экрана без Windows Forms?
-			Size screenSize = new Size(1280, 1024);
+			SetupWindowLocationAndSize(args);
+			PowerSaveMode = CheckPowerSaveFlag(args);
+		}
+
+		private void SetupWindowLocationAndSize(string[] args)
+		{
+			var displayBounds = OpenTK.DisplayDevice.Default.Bounds;
 			if (CheckFullscreenArg(args)) {
 				this.WindowState = OpenTK.WindowState.Fullscreen;
 			} else if (CheckMaximizedFlag(args)) {
-				this.Location = new System.Drawing.Point(0, 0);
+				this.Location = displayBounds.Location;
 				this.WindowState = OpenTK.WindowState.Maximized;
 			} else {
-				this.Location = new System.Drawing.Point(
-					(screenSize.Width - this.Width) / 2,
-					(screenSize.Height - this.Height) / 2
-				);
+				this.Location = new System.Drawing.Point {
+					X = (displayBounds.Width - this.Width) / 2 + displayBounds.X,
+					Y = (displayBounds.Height - this.Height) / 2 + displayBounds.Y
+				};
 			}
-			PowerSaveMode = CheckPowerSaveFlag(args);
 		}
 
 		private static bool CheckMaximizedFlag(string[] args)
