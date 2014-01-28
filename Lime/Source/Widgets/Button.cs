@@ -191,6 +191,10 @@ namespace Lime
 
 		private IEnumerator<int> ReleaseState()
 		{
+			// buz: это позволяет быстро прокликивать по кнопкам не дожидаясь, пока полностью проиграется анимация отжатия предыдущей
+			if (TheActiveWidget == this) {
+				TheActiveWidget = null;
+			}
 			if (CurrentAnimation != "Release") {
 				if (TryRunAnimation("Release")) {
 					while (IsRunning) {
