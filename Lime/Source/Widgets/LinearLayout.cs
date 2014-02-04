@@ -6,6 +6,7 @@ using System.Text;
 
 namespace Lime
 {
+	[ProtoContract]
 	public class LinearLayout : Node
 	{
 		[ProtoMember(1)]
