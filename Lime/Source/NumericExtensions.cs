@@ -52,14 +52,24 @@ namespace Lime
 			return Mathf.Clamp(value, min, max);
 		}
 
-		public static int Truncate(this float x)
+		public static float Truncate(this float x)
 		{
-			return (int)x;
+			return (float)Math.Truncate(x);
 		}
 
-		public static int Round(this float x)
+		public static float Round(this float x)
 		{
-			return (int)Math.Round(x);
+			return (float)Math.Round(x);
+		}
+
+		public static float Floor(this float x)
+		{
+			return (float)Math.Floor(x);
+		}
+
+		public static float Ceiling(this float x)
+		{
+			return (float)Math.Ceiling(x);
 		}
 	}
 }
