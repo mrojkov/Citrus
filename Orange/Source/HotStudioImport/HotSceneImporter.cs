@@ -859,6 +859,19 @@ namespace Orange
 			throw new Exception("Unknown type of actor '{0}'", actorClass);
 		}
 
+		protected void ParseLinearLayoutProperty(Node node, string name)
+		{
+			var layout = (LinearLayout)node;
+			switch (name) {
+				case "Horizontal":
+					layout.Horizontal = lexer.ParseBool();
+					break;
+				default:
+					ParseActorProperty(node, name);
+					break;
+			}
+		}
+
 		#endregion
 
 		protected virtual void RegisterKnownActorTypes()
@@ -891,6 +904,7 @@ namespace Orange
 				new KnownActorType {ActorClass = "Hot::TextStyle", NodeClass = "Lime.TextStyle, Lime", PropReader = ParseTextStyleProperty},
 				new KnownActorType {ActorClass = "Hot::Edit", NodeClass = "Lime.TextBox, Lime", PropReader = ParseEditProperty},
 				new KnownActorType {ActorClass = "Hot::Movie", NodeClass = "Lime.Movie, Lime", PropReader = ParseVideoProperty},
+				new KnownActorType {ActorClass = "LinearLayout", NodeClass = "Lime.LinearLayout, Lime", PropReader = ParseLinearLayoutProperty},
 			};
 		}
 	}

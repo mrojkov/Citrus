@@ -27,6 +27,7 @@ namespace Lime
 	[ProtoInclude(106, typeof(Audio))]
 	[ProtoInclude(107, typeof(SplineGear))]
 	[ProtoInclude(108, typeof(TextStyle))]
+	[ProtoInclude(109, typeof(LinearLayout))]
 	[DebuggerTypeProxy(typeof(NodeDebugView))]
 	public class Node
 	{
