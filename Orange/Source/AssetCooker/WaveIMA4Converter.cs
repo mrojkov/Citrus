@@ -131,7 +131,6 @@ namespace Orange
 						state.CompressSample(sample1);
 					}
 					state.PrevSample = sample0;
-					state.StepIndex = 61;
 					output[p++] = (byte)((ushort)sample0 & 255);
 					output[p++] = (byte)((ushort)sample0 >> 8);
 					output[p++] = (byte)state.StepIndex;

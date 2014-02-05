@@ -89,6 +89,7 @@
     <Compile Include="Source\Actions\RevealCookedAssets.cs" />
     <Compile Include="Source\Actions\BuildGameAndRun.cs" />
     <Compile Include="Source\Actions\PublishTestFlight.cs" />
+    <Compile Include="Source\Actions\TestADPCM.cs" />
     <Compile Include="Source\Actions\UpdateDictionaryTxt.cs" />
     <Compile Include="Source\Actions\UpdateXCodeProject.cs" />
     <Compile Include="Source\Actions\UpgradeOrange.cs" />
