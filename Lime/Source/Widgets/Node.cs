@@ -563,8 +563,6 @@ namespace Lime
 				Nodes.Add(node);
 			}
 		}
-
-
 		#endregion
 	}
 }

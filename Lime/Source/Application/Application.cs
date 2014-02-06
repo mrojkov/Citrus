@@ -18,6 +18,19 @@ namespace Lime
 		LandscapeRight = 8,
 	}
 
+	public static class DeviceOrientationExtensions
+	{
+		public static bool IsPortrait(this DeviceOrientation value)
+		{
+			return (value == DeviceOrientation.Portrait) || (value == DeviceOrientation.PortraitUpsideDown);
+		}
+
+		public static bool IsLandscape(this DeviceOrientation value)
+		{
+			return !value.IsPortrait();
+		}
+	}
+
 	public enum PlatformId
 	{
 		iOS,

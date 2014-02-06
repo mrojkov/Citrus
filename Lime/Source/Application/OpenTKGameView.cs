@@ -151,11 +151,11 @@ namespace Lime
 			int delta = (int)(millisecondsCount - lastMillisecondsCount);
 			delta = delta.Clamp(0, 40);
 			lastMillisecondsCount = millisecondsCount;
-			DoUpdate(delta);
+			Update(delta);
 			if (DidUpdated != null) {
 				DidUpdated();
 			}
-			DoRender();
+			Render();
 			if (PowerSaveMode) {
 				millisecondsCount = ApplicationToolbox.GetMillisecondsSinceGameStarted();
 				delta = (int)(millisecondsCount - lastMillisecondsCount);
@@ -163,7 +163,7 @@ namespace Lime
 			}
 		}
 
-		private void DoRender()
+		private void Render()
 		{
 			ApplicationToolbox.RefreshFrameRate();
 			MakeCurrent();
@@ -171,7 +171,7 @@ namespace Lime
 			SwapBuffers();
 		}
 
-		private void DoUpdate(float delta)
+		private void Update(float delta)
 		{
 			Input.ProcessPendingKeyEvents();
 			Input.MouseVisible = true;
