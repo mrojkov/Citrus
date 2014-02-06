@@ -48,7 +48,7 @@ namespace Lime
 			// read
 			// http://stackoverflow.com/questions/12488838/game-center-login-lock-in-landscape-only-in-i-os-6
 			// for more information.
-			return UIInterfaceOrientationMask.AllButUpsideDown;
+			return UIInterfaceOrientationMask.All;
 		}
 
 		UIAlertView pleaseRateMessage = null;
