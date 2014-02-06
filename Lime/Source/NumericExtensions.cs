@@ -57,14 +57,9 @@ namespace Lime
 			return (float)Math.Truncate(x);
 		}
 
-		public static float Round(this float x)
+		public static int Round(this float x)
 		{
-			return (float)Math.Round(x);
-		}
-
-		public static int iRound(this float x)
-		{
-			return (int)Math.Round(x);
+			return (int)(x + 0.5f);
 		}
 
 		public static float Floor(this float x)
