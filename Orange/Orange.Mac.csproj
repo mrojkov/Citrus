@@ -121,6 +121,7 @@
     <Compile Include="Source\PluginFinalizationAttribute.cs" />
     <Compile Include="Source\PluginInitializationAttribute.cs" />
     <Compile Include="Source\PluginCommandLineArgumentsAttribute.cs" />
+    <Compile Include="Source\AssetCooker\OpacityMaskCreator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lime\Lime.Mac.csproj">

@@ -6,6 +6,7 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.ES11;
 #elif MAC
 using MonoMac.OpenGL;
+using OGL = MonoMac.OpenGL.GL;
 #elif WIN
 using OpenTK;
 using OpenTK.Graphics;

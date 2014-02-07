@@ -49,6 +49,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Types\Matrix44.cs" />
+    <Compile Include="Source\Graphics\OpacityMask.cs" />
+    <Compile Include="Source\Widgets\LinearLayout.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
