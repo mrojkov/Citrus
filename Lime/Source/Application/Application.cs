@@ -16,6 +16,7 @@ namespace Lime
 		PortraitUpsideDown = 2,
 		LandscapeLeft = 4,
 		LandscapeRight = 8,
+		All = 15,
 	}
 
 	public static class DeviceOrientationExtensions
