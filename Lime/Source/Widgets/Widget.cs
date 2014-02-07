@@ -47,7 +47,7 @@ namespace Lime
 		private Vector2 direction = new Vector2(1, 0);
 		private Color4 color;
 		private Action clicked;
-		private Vector2 parentSize;
+		public Vector2 ParentSize;
 
 		protected bool RenderedToTexture;
 
@@ -156,10 +156,10 @@ namespace Lime
 		[ProtoAfterDeserialization]
 		public void AfterDeserialization()
 		{
-			parentSize = Size; 	// This assignment sets the parentSize for a top parentless widget
+			ParentSize = Size; 	// This assignment sets the parentSize for a top parentless widget
 			foreach (var node in Nodes.AsArray) {
 				if (node.AsWidget != null) {
-					node.AsWidget.parentSize = Size;
+					node.AsWidget.ParentSize = Size;
 				}
 			}
 		}
@@ -287,23 +287,23 @@ namespace Lime
 		private void ApplyAnchors()
 		{
 			Vector2 s = Parent.AsWidget.Size;
-			if (!parentSize.Equals(s)) {
+			if (!ParentSize.Equals(s)) {
 				ApplyAnchorsAlongXAxis();
 				ApplyAnchorsAlongYAxis();
 			}
-			parentSize = s;
+			ParentSize = s;
 		}
 
 		private void ApplyAnchorsAlongYAxis()
 		{
 			Vector2 s = Parent.AsWidget.Size;
 			if ((Anchors & Anchors.CenterV) != 0) {
-				Y += (s.Y - parentSize.Y) / 2;
+				Y += (s.Y - ParentSize.Y) / 2;
 			} else if ((Anchors & Anchors.Top) != 0 && (Anchors & Anchors.Bottom) != 0) {
-				Height += s.Y - parentSize.Y;
-				Y += (s.Y - parentSize.Y) * Pivot.Y;
+				Height += s.Y - ParentSize.Y;
+				Y += (s.Y - ParentSize.Y) * Pivot.Y;
 			} else if ((Anchors & Anchors.Bottom) != 0) {
-				Y += s.Y - parentSize.Y;
+				Y += s.Y - ParentSize.Y;
 			}
 		}
 
@@ -311,12 +311,12 @@ namespace Lime
 		{
 			Vector2 s = Parent.AsWidget.Size;
 			if ((Anchors & Anchors.CenterH) != 0) {
-				X += (s.X - parentSize.X) / 2;
+				X += (s.X - ParentSize.X) / 2;
 			} else if ((Anchors & Anchors.Left) != 0 && (Anchors & Anchors.Right) != 0) {
-				Width += s.X - parentSize.X;
-				X += (s.X - parentSize.X) * Pivot.X;
+				Width += s.X - ParentSize.X;
+				X += (s.X - ParentSize.X) * Pivot.X;
 			} else if ((Anchors & Anchors.Right) != 0) {
-				X += s.X - parentSize.X;
+				X += s.X - ParentSize.X;
 			}
 		}
 
