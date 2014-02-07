@@ -116,6 +116,20 @@ namespace Lime
 			}
 		}
 
+		public override void LayoutSubviews()
+		{
+			var context = this.GraphicsContext;
+			if (context != null) {
+				this.GraphicsContext = null;
+				base.LayoutSubviews();
+				this.GraphicsContext = context;
+				this.MakeCurrent();
+			}
+			else {
+				base.LayoutSubviews();
+			}
+		}
+
 		public override void TouchesCancelled(NSSet touches, UIEvent evt)
 		{
 			TouchesEnded(touches, evt);
