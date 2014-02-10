@@ -115,19 +115,13 @@ namespace Lime
 				}
 			}
 		}
-
+	
 		public override void LayoutSubviews()
 		{
-			var context = this.GraphicsContext;
-			if (context != null) {
-				this.GraphicsContext = null;
-				base.LayoutSubviews();
-				this.GraphicsContext = context;
-				this.MakeCurrent();
-			}
-			else {
-				base.LayoutSubviews();
-			}
+			// mike: the basic implementation recreates GL context each time user rotates a device.
+			// This is a workaround.
+			AutoResize = false;
+			base.LayoutSubviews();
 		}
 
 		public override void TouchesCancelled(NSSet touches, UIEvent evt)
@@ -176,11 +170,6 @@ namespace Lime
 
 		protected override void CreateFrameBuffer()
 		{
-			// OpenTK bug - sometimes CreateFrameBuffer is being called twise, 
-			// so within OpenTK an exception ocurred cause of duplication GraphicsContext keys in a dictionary.
-			// Force garbage collection to eliminate weak keys in the dictionary.
-			System.GC.Collect();
-			System.GC.WaitForPendingFinalizers();
 			ContextRenderingApi = EAGLRenderingAPI.OpenGLES1;
 			base.CreateFrameBuffer();
 		}
