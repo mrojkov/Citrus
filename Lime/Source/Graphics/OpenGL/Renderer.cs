@@ -243,14 +243,8 @@ namespace Lime
 		{
 			if (Application.Instance != null) {
 				var windowSize = Application.Instance.WindowSize;
-#if iOS
-				if (GameView.Instance.IsRetinaDisplay) {
-					windowSize.Width *= 2;
-					windowSize.Height *= 2;
-				}
-#endif
 				Viewport = new WindowRect { 
-					X = 0, Y = 0, 
+					X = 0, Y = 0,
 					Width = windowSize.Width, 
 					Height = windowSize.Height 
 				};

@@ -18,6 +18,7 @@ namespace Lime
 	{
 		UITextField textField;
 		UITouch[] activeTouches = new UITouch[Input.MaxTouches];
+		float screenScale;
 
 		class TextFieldDelegate : UITextFieldDelegate
 		{
@@ -31,10 +32,10 @@ namespace Lime
 		internal static event Action DidUpdated;
 
 		public static GameView Instance;
-		public bool IsRetinaDisplay { get; internal set; }
 
 		public GameView() : base(UIScreen.MainScreen.Bounds)
 		{
+			AutoResize = true;
 			Instance = this;
 			LayerRetainsBacking = false;
 			LayerColorFormat = EAGLColorFormat.RGB565;
@@ -42,23 +43,8 @@ namespace Lime
 			textField = new MonoTouch.UIKit.UITextField();
 			textField.Delegate = new TextFieldDelegate();
 			textField.AutocorrectionType = UITextAutocorrectionType.No;
+			screenScale = UIScreen.MainScreen.Scale;
 			this.Add(textField);
-		}
-		
-		public static System.Drawing.PointF GetTouchLocationInView(UITouch touch, UIView view)
-		{
-			// This code absolute equivalent to:
-			//		return touch.LocationInView(this.View);
-			// but later line causes crash when being run under XCode,
-			// so we managed this workaround:
-			System.Drawing.PointF result;
-			var selector = Selector.GetHandle("locationInView:");
-			if (MonoTouch.ObjCRuntime.Runtime.Arch == Arch.DEVICE) {
-				Messaging.PointF_objc_msgSend_stret_IntPtr(out result, touch.Handle, selector, (view != null) ? view.Handle : IntPtr.Zero);
-			} else {
-				result = Messaging.PointF_objc_msgSend_IntPtr(touch.Handle, selector, (view != null) ? view.Handle : IntPtr.Zero);
-			}
-			return result;
 		}
 
 		public override void TouchesBegan(NSSet touches, UIEvent evt)
@@ -66,8 +52,8 @@ namespace Lime
 			foreach (var touch in touches.ToArray<UITouch>()) {
 				for (int i = 0; i < Input.MaxTouches; i++) {
 					if (activeTouches[i] == null) {
-						var pt = GetTouchLocationInView(touch, this);
-						Vector2 position = new Vector2(pt.X, pt.Y) * Input.ScreenToWorldTransform;
+						var pt = touch.LocationInView(this);
+						Vector2 position = new Vector2(pt.X, pt.Y) * screenScale * Input.ScreenToWorldTransform;
 						if (i == 0) {
 							Input.MousePosition = position;
 							Input.SetKeyState(Key.Mouse0, true);
@@ -87,8 +73,8 @@ namespace Lime
 			foreach (var touch in touches.ToArray<UITouch>()) {
 				for (int i = 0; i < Input.MaxTouches; i++) {
 					if (activeTouches[i] == touch) {
-						var pt = GetTouchLocationInView(touch, this);
-						Vector2 position = new Vector2(pt.X, pt.Y) * Input.ScreenToWorldTransform;
+						var pt = touch.LocationInView(this);
+						Vector2 position = new Vector2(pt.X, pt.Y) * screenScale * Input.ScreenToWorldTransform;
 						if (i == 0) {
 							Input.MousePosition = position;
 						}
@@ -103,8 +89,8 @@ namespace Lime
 			foreach (var touch in touches.ToArray<UITouch>()) {
 				for (int i = 0; i < Input.MaxTouches; i++) {
 					if (activeTouches[i] == touch) {
-						var pt = GetTouchLocationInView(touch, this);
-						Vector2 position = new Vector2(pt.X, pt.Y) * Input.ScreenToWorldTransform;
+						var pt = touch.LocationInView(this);
+						Vector2 position = new Vector2(pt.X, pt.Y) * screenScale * Input.ScreenToWorldTransform;
 						if (i == 0) {
 							Input.SetKeyState(Key.Mouse0, false);
 						}
@@ -120,8 +106,15 @@ namespace Lime
 		{
 			// mike: the basic implementation recreates GL context each time user rotates a device.
 			// This is a workaround.
-			AutoResize = false;
+			//var ctx = this.GraphicsContext;
+			//if (ctx != null) {
+			//	this.GraphicsContext = null;
 			base.LayoutSubviews();
+			//	this.GraphicsContext = ctx;
+			//} else {
+			//	base.LayoutSubviews();
+			//}
+			TexturePool.Instance.DiscardAllTextures();
 		}
 
 		public override void TouchesCancelled(NSSet touches, UIEvent evt)
@@ -162,10 +155,7 @@ namespace Lime
 			// read
 			// http://stackoverflow.com/questions/4884176/retina-display-image-quality-problem/9644622
 			// for more information.
-			eaglLayer.ContentsScale = UIScreen.MainScreen.Scale;
-			if (UIScreen.MainScreen.Scale > 1.0f) {
-				IsRetinaDisplay = true;
-			}
+			eaglLayer.ContentsScale = screenScale;
 		}
 
 		protected override void CreateFrameBuffer()

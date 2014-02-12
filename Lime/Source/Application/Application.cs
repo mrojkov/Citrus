@@ -140,8 +140,15 @@ namespace Lime
 #if iOS
 		public Size WindowSize {
 			get {
-				var size = GameView.Instance.Size;
-				return new Size(size.Width, size.Height);
+				var mainScreen = UIScreen.MainScreen;
+				var size = new Size {
+					Width = (int)(mainScreen.Bounds.Width * mainScreen.Scale),
+					Height = (int)(mainScreen.Bounds.Height * mainScreen.Scale)
+				};
+				if (CurrentDeviceOrientation.IsLandscape()) {
+					size = new Size(size.Height, size.Width);
+				}
+				return size;
 			}
 			set {}
 		}
