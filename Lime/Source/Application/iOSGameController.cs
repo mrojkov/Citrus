@@ -73,6 +73,7 @@ namespace Lime
 
 		public override void DidRotate(UIInterfaceOrientation fromInterfaceOrientation)
 		{
+			TexturePool.Instance.DiscardAllTextures();
 			UIView.AnimationsEnabled = true;
 			base.DidRotate(fromInterfaceOrientation);
 			Application.Instance.OnDeviceRotated();

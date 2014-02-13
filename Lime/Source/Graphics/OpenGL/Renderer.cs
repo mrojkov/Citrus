@@ -260,16 +260,6 @@ namespace Lime
 
 		private static void SetViewport(WindowRect value)
 		{
-#if iOS
-			// This is a work around Xamarin OpenTK bug.
-			// OpenTK creates a new GL context without sharing resources with the previous one.
-			// So I disabled rectreating context during changing device orientation, but this
-			// solution requires a manual rotation handling.
-			if (GameView.Instance.IsRotatedFromInitialState()) {
-				Toolbox.Swap(ref value.X, ref value.Y);
-				Toolbox.Swap(ref value.Width, ref value.Height);
-			}
-#endif
 			viewport = value;
 #if GLES11
 			GL.Viewport(value.X, value.Y, value.Width, value.Height);

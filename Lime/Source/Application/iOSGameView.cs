@@ -3,7 +3,7 @@ using System;
 using OpenTK;
 using OpenTK.Graphics.ES11;
 using GL1 = OpenTK.Graphics.ES11.GL;
-using All1 = OpenTK.Graphics.ES11.All;
+//using All1 = OpenTK.Graphics.ES11.All;
 using OpenTK.Platform.iPhoneOS;
 using System.Drawing;
 using MonoTouch.Foundation;
@@ -36,13 +36,7 @@ namespace Lime
 
 		public GameView() : base(UIScreen.MainScreen.Bounds)
 		{
-			// Disable auto resizing.
-			// This is a work around Xamarin OpenTK bug.
-			// OpenTK creates a new GL context without sharing resources with the previous one.
-			// So I disabled rectreating context during changing device orientation which
-			// occurs inside LayoutSubviews() method.
-			AutoResize = false;
-
+			AutoResize = true;
 			Instance = this;
 			LayerRetainsBacking = false;
 			LayerColorFormat = EAGLColorFormat.RGB565;
@@ -53,13 +47,6 @@ namespace Lime
 			screenScale = UIScreen.MainScreen.Scale;
 			this.Add(textField);
 		}
-
-		internal bool IsRotatedFromInitialState()
-		{
-			return Lime.Application.Instance.CurrentDeviceOrientation.IsPortrait() != 
-				originalOrientation.IsPortrait();
-		}
-
 
 		public override void TouchesBegan(NSSet touches, UIEvent evt)
 		{
