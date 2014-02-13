@@ -148,7 +148,7 @@ namespace Lime
 			string currSysVer = UIDevice.CurrentDevice.SystemVersion;
 			if (currSysVer[0] >= '6') {
 				Window.RootViewController = GameController;
-				GameController.View.AutoResize = true;
+			//	GameController.View.AutoResize = true;
 			} else {
 				Window.AddSubview(GameController.View);
 			}

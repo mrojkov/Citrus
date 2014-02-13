@@ -8,6 +8,7 @@ using MonoTouch.ObjCRuntime;
 using MonoTouch.OpenGLES;
 using MonoTouch.UIKit;
 using System.Collections.Generic;
+using OpenTK.Graphics.ES11;
 
 namespace Lime
 {
@@ -60,10 +61,22 @@ namespace Lime
 			return false;
 		}
 
+		public override void WillRotate(UIInterfaceOrientation toInterfaceOrientation, double duration)
+		{
+			UIView.AnimationsEnabled = false;
+			Application.Instance.Active = false;
+			Renderer.ClearRenderTarget(0, 0, 0, 1);
+			OpenTK.Graphics.ES11.GL.Finish();
+			OpenTK.Graphics.GraphicsContext.CurrentContext.SwapBuffers();
+			base.WillRotate(toInterfaceOrientation, duration);
+		}
+
 		public override void DidRotate(UIInterfaceOrientation fromInterfaceOrientation)
 		{
+			UIView.AnimationsEnabled = true;
 			base.DidRotate(fromInterfaceOrientation);
 			Application.Instance.OnDeviceRotated();
+			Application.Instance.Active = true;
 		}
 	}
 }

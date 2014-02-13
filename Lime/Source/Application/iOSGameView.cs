@@ -1,7 +1,7 @@
 #if iOS
 using System;
 using OpenTK;
-using OpenTK.Graphics.ES20;
+using OpenTK.Graphics.ES11;
 using GL1 = OpenTK.Graphics.ES11.GL;
 using All1 = OpenTK.Graphics.ES11.All;
 using OpenTK.Platform.iPhoneOS;
@@ -32,10 +32,17 @@ namespace Lime
 		internal static event Action DidUpdated;
 
 		public static GameView Instance;
+		private DeviceOrientation originalOrientation = Lime.Application.Instance.CurrentDeviceOrientation;
 
 		public GameView() : base(UIScreen.MainScreen.Bounds)
 		{
-			AutoResize = true;
+			// Disable auto resizing.
+			// This is a work around Xamarin OpenTK bug.
+			// OpenTK creates a new GL context without sharing resources with the previous one.
+			// So I disabled rectreating context during changing device orientation which
+			// occurs inside LayoutSubviews() method.
+			AutoResize = false;
+
 			Instance = this;
 			LayerRetainsBacking = false;
 			LayerColorFormat = EAGLColorFormat.RGB565;
@@ -46,6 +53,13 @@ namespace Lime
 			screenScale = UIScreen.MainScreen.Scale;
 			this.Add(textField);
 		}
+
+		internal bool IsRotatedFromInitialState()
+		{
+			return Lime.Application.Instance.CurrentDeviceOrientation.IsPortrait() != 
+				originalOrientation.IsPortrait();
+		}
+
 
 		public override void TouchesBegan(NSSet touches, UIEvent evt)
 		{
@@ -101,21 +115,6 @@ namespace Lime
 				}
 			}
 		}
-	
-		public override void LayoutSubviews()
-		{
-			// mike: the basic implementation recreates GL context each time user rotates a device.
-			// This is a workaround.
-			//var ctx = this.GraphicsContext;
-			//if (ctx != null) {
-			//	this.GraphicsContext = null;
-			base.LayoutSubviews();
-			//	this.GraphicsContext = ctx;
-			//} else {
-			//	base.LayoutSubviews();
-			//}
-			TexturePool.Instance.DiscardAllTextures();
-		}
 
 		public override void TouchesCancelled(NSSet touches, UIEvent evt)
 		{
@@ -161,7 +160,7 @@ namespace Lime
 		protected override void CreateFrameBuffer()
 		{
 			ContextRenderingApi = EAGLRenderingAPI.OpenGLES1;
-			base.CreateFrameBuffer();
+			base.CreateFrameBuffer();	
 		}
 
 		public void UpdateFrame()
