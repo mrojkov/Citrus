@@ -41,6 +41,7 @@ namespace Lime
 					float w = (parentSize.X / count).Floor();
 					node.AsWidget.Position = new Vector2(x, 0);
 					node.AsWidget.Size = new Vector2(w, parentSize.Y);
+					lastWidget = node.AsWidget;
 					x += w;
 				}
 			}
