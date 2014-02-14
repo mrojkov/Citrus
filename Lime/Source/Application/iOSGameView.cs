@@ -14,7 +14,7 @@ using MonoTouch.UIKit;
 
 namespace Lime
 {
-	public class GameView : iPhoneOSGameView
+	public class GameView : Lime.Xamarin.iPhoneOSGameView
 	{
 		UITextField textField;
 		UITouch[] activeTouches = new UITouch[Input.MaxTouches];
@@ -32,12 +32,11 @@ namespace Lime
 		internal static event Action DidUpdated;
 
 		public static GameView Instance;
-		private DeviceOrientation originalOrientation = Lime.Application.Instance.CurrentDeviceOrientation;
 
 		public GameView() : base(UIScreen.MainScreen.Bounds)
 		{
-			AutoResize = true;
 			Instance = this;
+			AutoResize = true;
 			LayerRetainsBacking = false;
 			LayerColorFormat = EAGLColorFormat.RGB565;
 			MultipleTouchEnabled = true;
@@ -46,6 +45,26 @@ namespace Lime
 			textField.AutocorrectionType = UITextAutocorrectionType.No;
 			screenScale = UIScreen.MainScreen.Scale;
 			this.Add(textField);
+			RefreshWindowSize();
+		}
+
+		public override void LayoutSubviews()
+		{
+			if (backgroundContext == null) {
+				backgroundContext = Lime.Xamarin.Utilities.CreateGraphicsContext(EAGLRenderingAPI.OpenGLES1);
+			}
+			RefreshWindowSize();
+			base.LayoutSubviews();
+		}
+
+		void RefreshWindowSize()
+		{
+			var scale = UIScreen.MainScreen.Scale;
+			var size = new Size {
+				Width = (int)(Bounds.Width * scale),
+				Height = (int)(Bounds.Height * scale)
+			};
+			Application.Instance.WindowSize = size;
 		}
 
 		public override void TouchesBegan(NSSet touches, UIEvent evt)
@@ -143,6 +162,9 @@ namespace Lime
 			// for more information.
 			eaglLayer.ContentsScale = screenScale;
 		}
+
+		// Background context shares all resources while the main context is being recreated
+		OpenTK.Graphics.IGraphicsContext backgroundContext;
 
 		protected override void CreateFrameBuffer()
 		{

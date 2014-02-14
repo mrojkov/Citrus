@@ -22,6 +22,7 @@ namespace Lime
 			base.View = new GameView();
 			UIAccelerometer.SharedAccelerometer.UpdateInterval = 0.05;
 			UIAccelerometer.SharedAccelerometer.Acceleration += OnAcceleration;
+			Application.Instance.CurrentDeviceOrientation = ConvertInterfaceOrientation(InterfaceOrientation);
 		}
 
 		public new GameView View { get { return (GameView)base.View; } }
@@ -61,23 +62,47 @@ namespace Lime
 			return false;
 		}
 
+		DeviceOrientation ConvertInterfaceOrientation(UIInterfaceOrientation orientation)
+		{
+			switch (orientation) {
+			case UIInterfaceOrientation.LandscapeLeft:
+				return DeviceOrientation.LandscapeLeft;
+			case UIInterfaceOrientation.LandscapeRight:
+				return DeviceOrientation.LandscapeRight;
+			case UIInterfaceOrientation.Portrait:
+				return DeviceOrientation.Portrait;
+			case UIInterfaceOrientation.PortraitUpsideDown:
+				return DeviceOrientation.PortraitUpsideDown;
+			default:
+				throw new ArgumentException("Wrong interface orientation");
+			}
+		}
+
 		public override void WillRotate(UIInterfaceOrientation toInterfaceOrientation, double duration)
 		{
-			UIView.AnimationsEnabled = false;
+			var fromOrientation = ConvertInterfaceOrientation(this.InterfaceOrientation);
+			var toOrientation = ConvertInterfaceOrientation(toInterfaceOrientation);
+			Application.Instance.CurrentDeviceOrientation = toOrientation;
+			if (fromOrientation.IsPortrait() != toOrientation.IsPortrait()) {
+				var size = Application.Instance.WindowSize;
+				size = new Size(size.Height, size.Width);
+				Application.Instance.WindowSize = size;
+				Renderer.RotateViewport = true;
+			}
+			Application.Instance.OnDeviceRotating(toOrientation);
+			GameView.Instance.UpdateFrame();
+			GameView.Instance.RenderFrame();
 			Application.Instance.Active = false;
-			Renderer.ClearRenderTarget(0, 0, 0, 1);
-			OpenTK.Graphics.ES11.GL.Finish();
-			OpenTK.Graphics.GraphicsContext.CurrentContext.SwapBuffers();
+			Renderer.RotateViewport = false;
 			base.WillRotate(toInterfaceOrientation, duration);
 		}
 
 		public override void DidRotate(UIInterfaceOrientation fromInterfaceOrientation)
 		{
-			TexturePool.Instance.DiscardAllTextures();
-			UIView.AnimationsEnabled = true;
-			base.DidRotate(fromInterfaceOrientation);
-			Application.Instance.OnDeviceRotated();
 			Application.Instance.Active = true;
+			base.DidRotate(fromInterfaceOrientation);
+			var fromOrientation = ConvertInterfaceOrientation(fromInterfaceOrientation);
+			Application.Instance.OnDeviceRotated(fromOrientation);
 		}
 	}
 }

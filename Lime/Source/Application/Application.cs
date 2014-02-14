@@ -139,20 +139,7 @@ namespace Lime
 			}
 		}
 #if iOS
-		public Size WindowSize {
-			get {
-				var mainScreen = UIScreen.MainScreen;
-				var size = new Size {
-					Width = (int)(mainScreen.Bounds.Width * mainScreen.Scale),
-					Height = (int)(mainScreen.Bounds.Height * mainScreen.Scale)
-				};
-				if (CurrentDeviceOrientation.IsLandscape()) {
-					size = new Size(size.Height, size.Width);
-				}
-				return size;
-			}
-			set {}
-		}
+		public Size WindowSize { get; internal set; }
 
 		public void ShowOnscreenKeyboard(bool show, string text)
 		{
@@ -164,21 +151,7 @@ namespace Lime
 		public bool FullScreen { get { return true; } set {} }
 		public float FrameRate { get { return GameView.Instance.FrameRate; } }
 
-		public DeviceOrientation CurrentDeviceOrientation {
-			get {
-				switch (GameController.Instance.InterfaceOrientation) {
-				case UIInterfaceOrientation.Portrait:
-					return DeviceOrientation.Portrait;
-				case UIInterfaceOrientation.PortraitUpsideDown:
-					return DeviceOrientation.PortraitUpsideDown;
-				case UIInterfaceOrientation.LandscapeLeft:
-					return DeviceOrientation.LandscapeLeft;
-				case UIInterfaceOrientation.LandscapeRight:
-				default:
-					return DeviceOrientation.LandscapeRight;
-				}
-			}
-		}
+		public DeviceOrientation CurrentDeviceOrientation { get; internal set; }
 #elif MAC
 		public void Exit()
 		{
@@ -271,7 +244,8 @@ namespace Lime
 		public virtual void OnCreate() {}
 		public virtual void OnUpdateFrame(int delta) {}
 		public virtual void OnRenderFrame() {}
-		public virtual void OnDeviceRotated() {}
+		public virtual void OnDeviceRotating(DeviceOrientation toOrientation) {}
+		public virtual void OnDeviceRotated(DeviceOrientation fromOrientation) {}
 		public virtual DeviceOrientation GetSupportedDeviceOrientations() { return DeviceOrientation.LandscapeLeft; }
 
 		public void SetCursor(string name, IntVector2 hotSpot)

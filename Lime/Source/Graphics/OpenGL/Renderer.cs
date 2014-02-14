@@ -258,9 +258,16 @@ namespace Lime
 			set { SetViewport(value); }
 		}
 
+		// Viewport rotation is being used for portrait/landscape orientation changing.
+		internal static bool RotateViewport;
+
 		private static void SetViewport(WindowRect value)
 		{
 			viewport = value;
+			if (RotateViewport) {
+				Toolbox.Swap(ref value.X, ref value.Y);
+				Toolbox.Swap(ref value.Width, ref value.Height);
+			}
 #if GLES11
 			GL.Viewport(value.X, value.Y, value.Width, value.Height);
 #elif OPENGL

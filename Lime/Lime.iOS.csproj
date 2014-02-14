@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -164,8 +164,11 @@
     <Compile Include="Source\Types\Matrix44.cs" />
     <Compile Include="Source\Graphics\OpacityMask.cs" />
     <Compile Include="Source\Widgets\LinearLayout.cs" />
-    <Compile Include="Source\Application\iOSMonoGame\iOSGameView.cs" />
-    <Compile Include="Source\Application\iOSMonoGame\iOSGameView_GLAbstraction.cs" />
+    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGameView.cs" />
+    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGraphicsContext.cs" />
+    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\GraphicsContext.cs" />
+    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Factory.iPhone.cs" />
+    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Utilities.iPhone.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Application\WinCursors.cs">
@@ -180,8 +183,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Source\Application\Xamarin.iOS\" />
     <Folder Include="Source\Application\" />
-    <Folder Include="Source\Application\iOSMonoGame\" />
   </ItemGroup>
 </Project>
