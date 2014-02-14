@@ -60,6 +60,8 @@ namespace Lime
 		public static Matrix32 Transform1 = Matrix32.Identity;
 		public static Matrix32 Transform2 = Matrix32.Identity;
 
+		public static int DefaultFramebuffer { get; private set; }
+
 		static readonly Stack<Matrix44> projectionStack;
 
 		static Renderer()
@@ -118,9 +120,21 @@ namespace Lime
 				DrawCalls++;
 			}
 		}
+
+		public static int GetCurrentFramebuffer()
+		{
+			int currentFramebuffer = 0;
+#if GLES11
+			GL.GetInteger(All.FramebufferBindingOes, ref currentFramebuffer);
+#elif OPENGL
+			OGL.GetInteger(GetPName.FramebufferBindingExt, out currentFramebuffer);
+#endif
+			return currentFramebuffer;
+		}
 		
 		public static void BeginFrame()
 		{
+			DefaultFramebuffer = GetCurrentFramebuffer();
 			SetDefaultViewport();
 			if (batchIndices == null) {
 				batchIndices = (ushort*)System.Runtime.InteropServices.Marshal.AllocHGlobal(sizeof(ushort) * MaxVertices * 4);
@@ -257,17 +271,10 @@ namespace Lime
 			get { return viewport; }
 			set { SetViewport(value); }
 		}
-
-		// Viewport rotation is being used for portrait/landscape orientation changing.
-		internal static bool RotateViewport;
-
+		
 		private static void SetViewport(WindowRect value)
 		{
 			viewport = value;
-			if (RotateViewport) {
-				Toolbox.Swap(ref value.X, ref value.Y);
-				Toolbox.Swap(ref value.Width, ref value.Height);
-			}
 #if GLES11
 			GL.Viewport(value.X, value.Y, value.Width, value.Height);
 #elif OPENGL
@@ -292,6 +299,7 @@ namespace Lime
 		public static void SetScissorRectangle(WindowRect value)
 		{
 			FlushSpriteBatch();
+			scissorRectangle = value;
 #if GLES11
 			GL.Scissor(value.X, value.Y, value.Width, value.Height);
 #else

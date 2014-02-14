@@ -78,23 +78,26 @@ namespace Lime
 			}
 		}
 
+		bool rotating;
+
 		public override void WillRotate(UIInterfaceOrientation toInterfaceOrientation, double duration)
 		{
-			var fromOrientation = ConvertInterfaceOrientation(this.InterfaceOrientation);
-			var toOrientation = ConvertInterfaceOrientation(toInterfaceOrientation);
-			Application.Instance.CurrentDeviceOrientation = toOrientation;
-			if (fromOrientation.IsPortrait() != toOrientation.IsPortrait()) {
-				var size = Application.Instance.WindowSize;
-				size = new Size(size.Height, size.Width);
-				Application.Instance.WindowSize = size;
-				Renderer.RotateViewport = true;
-			}
-			Application.Instance.OnDeviceRotating(toOrientation);
-			GameView.Instance.UpdateFrame();
-			GameView.Instance.RenderFrame();
-			Application.Instance.Active = false;
-			Renderer.RotateViewport = false;
+			rotating = true;
 			base.WillRotate(toInterfaceOrientation, duration);
+		}
+
+		public override void ViewDidLayoutSubviews()
+		{
+			if (rotating) {
+				rotating = false;
+				var toOrientation = ConvertInterfaceOrientation(this.InterfaceOrientation);
+				Application.Instance.CurrentDeviceOrientation = toOrientation;
+				Application.Instance.OnDeviceRotating(toOrientation);
+				GameView.Instance.UpdateFrame();
+				GameView.Instance.RenderFrame();
+				Application.Instance.Active = false;
+			}
+			base.ViewDidLayoutSubviews();
 		}
 
 		public override void DidRotate(UIInterfaceOrientation fromInterfaceOrientation)

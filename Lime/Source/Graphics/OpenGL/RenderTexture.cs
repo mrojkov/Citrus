@@ -106,15 +106,17 @@ namespace Lime
 		public void SetAsRenderTarget()
 		{
 			Renderer.FlushSpriteBatch();
-			int currentFramebuffer = 0;
+			int currentFramebuffer = Renderer.GetCurrentFramebuffer();
+			BindFramebuffer(framebuffer);
+			framebufferStack.Push(currentFramebuffer);
+		}
+
+		private static void BindFramebuffer(int framebuffer)
+		{
 #if GLES11
-			GL.GetInteger(All.FramebufferBinding, ref currentFramebuffer);
 			GL.BindFramebuffer(All.Framebuffer, framebuffer);
-			framebufferStack.Push(currentFramebuffer);
 #elif OPENGL
-			OGL.GetInteger(GetPName.FramebufferBindingExt, out currentFramebuffer);
 			OGL.BindFramebuffer(FramebufferTarget.FramebufferExt, framebuffer);
-			framebufferStack.Push(currentFramebuffer);
 #endif
 		}
 
@@ -122,11 +124,7 @@ namespace Lime
 		{
 			Renderer.FlushSpriteBatch();
 			int prevFramebuffer = framebufferStack.Pop();
-#if GLES11
-			GL.BindFramebuffer(All.Framebuffer, prevFramebuffer);
-#elif OPENGL
-			OGL.BindFramebuffer(FramebufferTarget.FramebufferExt, prevFramebuffer);
-#endif
+			BindFramebuffer(prevFramebuffer);
 		}
 
 		public bool IsTransparentPixel(int x, int y)
