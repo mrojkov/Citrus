@@ -246,13 +246,7 @@ namespace Lime
 			if (PremulAlphaMode) {
 				color = Color4.PremulAlpha(color);
 			}
-			Rectangle textureRect = texture.UVRect;
-			float textureWidth = textureRect.Width;
-			float textureHeight = textureRect.Height;
-			uv0.X = textureRect.Left + textureWidth * uv0.X;
-			uv0.Y = textureRect.Top + textureHeight * uv0.Y;
-			uv1.X = textureRect.Left + textureWidth * uv1.X;
-			uv1.Y = textureRect.Top + textureHeight * uv1.Y;
+			texture.TransformUVCoordinatesToAtlasSpace(ref uv0, ref uv1);
 			int i = currentVertex;
 			int j = currentIndex;
 			var matrix = Transform2.IsIdentity() ? Transform1 : Transform1 * Transform2;
@@ -359,8 +353,8 @@ namespace Lime
 			if (numVertices < 3 || (numVertices - 2) * 3 > MaxVertices * 4) {
 				throw new Lime.Exception("Wrong number of vertices");
 			}
-			Rectangle uvRect1 = (texture1 != null) ? texture1.UVRect : new Rectangle();
-			Rectangle uvRect2 = (texture2 != null) ? texture2.UVRect : new Rectangle();
+			Rectangle uvRect1 = (texture1 != null) ? texture1.AtlasUVRect : new Rectangle();
+			Rectangle uvRect2 = (texture2 != null) ? texture2.AtlasUVRect : new Rectangle();
 			int baseVertex = currentVertex;
 			var transform = Transform2.IsIdentity() ? Transform1 : Transform1 * Transform2;
 			for (int i = 0; i < numVertices; i++) {

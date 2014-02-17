@@ -54,7 +54,11 @@ namespace Lime
 			}
 		}
 
-		public Rectangle UVRect { get { return uvRect; } }
+		public Rectangle AtlasUVRect { get { return uvRect; } }
+
+		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv0, ref Vector2 uv1)
+		{
+		}
 
 		public bool IsStubTexture { get { return false; } }
 

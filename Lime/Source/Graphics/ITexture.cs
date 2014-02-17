@@ -10,7 +10,8 @@ namespace Lime
 	{
 		Size ImageSize { get; }
 		Size SurfaceSize { get; }
-		Rectangle UVRect { get; }
+		Rectangle AtlasUVRect { get; }
+		void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv0, ref Vector2 uv1);
 		uint GetHandle();
 		void SetAsRenderTarget();
 		void RestoreRenderTarget();

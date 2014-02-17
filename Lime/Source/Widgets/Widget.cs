@@ -133,12 +133,13 @@ namespace Lime
 		[ProtoMember(13)]
 		public BoneArray BoneArray;
 
-		public Matrix32 LocalToWorldTransform { get; protected set; }
+		protected Matrix32 localToWorldTransform;
+		public Matrix32 LocalToWorldTransform { get { return localToWorldTransform; } }
 		public Color4 GlobalColor { get; protected set; }
 		public Blending GlobalBlending { get; protected set; }
 		public bool GloballyVisible { get; protected set; }
-		public Vector2 GlobalPosition { get { return LocalToWorldTransform * Vector2.Zero; } }
-		public Vector2 GlobalCenter { get { return LocalToWorldTransform * (Size / 2); } }
+		public Vector2 GlobalPosition { get { return localToWorldTransform * Vector2.Zero; } }
+		public Vector2 GlobalCenter { get { return localToWorldTransform * (Size / 2); } }
 
 		#endregion
 		#region Methods
@@ -227,14 +228,15 @@ namespace Lime
 			if (Parent != null) {
 				var parentWidget = Parent.AsWidget;
 				if (parentWidget != null && !parentWidget.RenderedToTexture) {
-					LocalToWorldTransform = CalcLocalToParentTransform() * parentWidget.LocalToWorldTransform;
+					var localToParent = CalcLocalToParentTransform();
+					Matrix32.Multiply(ref localToParent, ref parentWidget.localToWorldTransform, out localToWorldTransform);
 					GlobalColor = Color * parentWidget.GlobalColor;
 					GlobalBlending = Blending == Blending.Default ? parentWidget.GlobalBlending : Blending;
 					GloballyVisible = (Visible && color.A != 0) && parentWidget.GloballyVisible;
 					return;
 				}
 			}
-			LocalToWorldTransform = CalcLocalToParentTransform();
+			localToWorldTransform = CalcLocalToParentTransform();
 			GlobalColor = color;
 			GlobalBlending = Blending;
 			GloballyVisible = Visible && color.A != 0;
@@ -242,15 +244,24 @@ namespace Lime
 
 		public Matrix32 CalcLocalToParentTransform()
 		{
+			Matrix32 matrix;
+			Vector2 center = new Vector2 { X = Size.X * Pivot.X, Y = Size.Y * Pivot.Y };
+			Vector2 scale = Scale;
+			if (rotation == 0 && SkinningWeights == null) {
+				matrix.U.X = scale.X;
+				matrix.U.Y = 0;
+				matrix.V.X = 0;
+				matrix.V.Y = scale.Y;
+				matrix.T.X = position.X - center.X * scale.X;
+				matrix.T.Y = position.Y - center.Y * scale.Y;
+				return matrix;
+			}
 			Vector2 u, v;
 			Vector2 translation = position;
-			Vector2 center = Size * Pivot;
-			Vector2 scale = Scale;
 			u.X = direction.X * scale.X;
 			u.Y = direction.Y * scale.X;
 			v.X = -direction.Y * scale.Y;
 			v.Y = direction.X * scale.Y;
-			Matrix32 matrix;
 			if (SkinningWeights != null && Parent != null && Parent.AsWidget != null) {
 				BoneArray a = Parent.AsWidget.BoneArray;
 				translation = a.ApplySkinningToVector(position, SkinningWeights);

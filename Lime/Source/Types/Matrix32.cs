@@ -109,6 +109,16 @@ namespace Lime
 			return m;
 		}
 
+		public static void Multiply(ref Matrix32 a, ref Matrix32 b, out Matrix32 result)
+		{
+			result.U.X = a.U.X * b.U.X + a.U.Y * b.V.X;
+			result.U.Y = a.U.X * b.U.Y + a.U.Y * b.V.Y;
+			result.V.X = a.V.X * b.U.X + a.V.Y * b.V.X;
+			result.V.Y = a.V.X * b.U.Y + a.V.Y * b.V.Y;
+			result.T.X = a.T.X * b.U.X + a.T.Y * b.V.X + b.T.X;
+			result.T.Y = a.T.X * b.U.Y + a.T.Y * b.V.Y + b.T.Y;
+		}
+
 		public static Vector2 operator *(Matrix32 a, Vector2 b)
 		{
 			Vector2 v;

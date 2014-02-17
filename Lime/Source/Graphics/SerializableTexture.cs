@@ -29,53 +29,69 @@ namespace Lime
 
 		public string SerializationPath {
 			get {
-                var path = core.Path;
-                if (!string.IsNullOrEmpty(path) && path[0] == '#') {
-                    return path;
-                } else {
-                    return Serialization.ShrinkPath(path);
-                }
+				return GetSerializationPath();
 			}
 			set {
-                string path = value;
-                if (!string.IsNullOrEmpty(value) && value[0] != '#') {
-                    path = Serialization.ExpandPath(value);
-                }
-				core = TexturePool.Instance.GetSerializableTextureCore(path);
+				SetSerializationPath(value);
 			}
+		}
+
+		private string GetSerializationPath()
+		{
+			var path = core.Path;
+			if (!string.IsNullOrEmpty(path) && path[0] == '#') {
+				return path;
+			} else {
+				return Serialization.ShrinkPath(path);
+			}
+		}
+
+		private void SetSerializationPath(string value)
+		{
+			string path = value;
+			if (!string.IsNullOrEmpty(value) && value[0] != '#') {
+				path = Serialization.ExpandPath(value);
+			}
+			core = TexturePool.Instance.GetSerializableTextureCore(path);
 		}
 
 		public bool IsStubTexture
 		{
 			get {
-				core.GetInstance();
+				core.GetMainTexture();
 				return core.IsStubTexture;
 			}
 		}
 
 		public Size ImageSize {
 			get {
-				core.GetInstance();
+				core.GetMainTexture();
 				return core.ImageSize; 
 			}
 		}
 
 		public Size SurfaceSize {
 			get {
-				return core.GetInstance().SurfaceSize;
+				core.GetMainTexture();
+				return core.SurfaceSize; 
 			}
 		}
 
-		public Rectangle UVRect { 
+		public Rectangle AtlasUVRect {
 			get {
-				core.GetInstance();
-				return core.UVRect;
+				core.GetMainTexture();
+				return core.UVRect; 
 			}
+		}
+
+		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv0, ref Vector2 uv1)
+		{
+			core.TransformUVCoordinates(ref uv0, ref uv1);
 		}
 
 		public uint GetHandle()
 		{
-			return core.GetInstance().GetHandle();
+			return core.GetMainTexture().GetHandle();
 		}
 
 #if UNITY
@@ -87,22 +103,22 @@ namespace Lime
 
 		public void SetAsRenderTarget()
 		{
-			core.GetInstance().SetAsRenderTarget();
+			core.GetMainTexture().SetAsRenderTarget();
 		}
 
 		public void RestoreRenderTarget()
 		{
-			core.GetInstance().RestoreRenderTarget();
+			core.GetMainTexture().RestoreRenderTarget();
 		}
 
 		public bool IsTransparentPixel(int x, int y)
 		{
-			var texture = core.GetInstance();
-			var size = (Size)(UVRect.Size * (Vector2)texture.SurfaceSize);
+			var texture = core.GetMainTexture();
+			var size = (Size)(AtlasUVRect.Size * (Vector2)texture.SurfaceSize);
 			if (x < 0 || y < 0 || x >= size.Width || y >= size.Height) {
 				return false;
 			}
-			var offset = (IntVector2)(UVRect.A * (Vector2)texture.SurfaceSize);
+			var offset = (IntVector2)(AtlasUVRect.A * (Vector2)texture.SurfaceSize);
 			return texture.IsTransparentPixel(x + offset.X, y + offset.Y);
 		}
 
@@ -119,9 +135,11 @@ namespace Lime
 		public readonly string Path;
 		int usedAtRenderCycle = 0;
 		
-		ITexture instance;
+		ITexture mainTexture;
 		internal Rectangle UVRect;
 		internal Size ImageSize;
+		internal Size SurfaceSize;
+
 		public bool IsStubTexture { get; private set; }
 
 		public SerializableTextureCore(string path)
@@ -134,7 +152,7 @@ namespace Lime
 			Discard();
 		}
 		
-		static Texture2D CreateStubTexture()
+		private static Texture2D CreateStubTexture()
 		{
 			var texture = new Texture2D();
 			var pixels = new Color4[128 * 128];
@@ -150,11 +168,11 @@ namespace Lime
 		/// </summary>
 		public void Discard()
 		{
-			if (instance == null) {
+			if (mainTexture == null) {
 				return;
 			}
-			instance.Dispose();
-			instance = null;
+			mainTexture.Dispose();
+			mainTexture = null;
 		}
 
 		/// <summary>
@@ -166,6 +184,16 @@ namespace Lime
 			if ((Renderer.RenderCycle - usedAtRenderCycle) >= numCycles)
 				Discard();
 		}
+
+		public void TransformUVCoordinates(ref Vector2 uv0, ref Vector2 uv1)
+		{
+			float width = UVRect.B.X - UVRect.A.X;
+			float height = UVRect.B.Y - UVRect.A.Y;
+			uv0.X = UVRect.Left + width * uv0.X;
+			uv0.Y = UVRect.Top + height * uv0.Y;
+			uv1.X = UVRect.Left + width * uv1.X;
+			uv1.Y = UVRect.Top + height * uv1.Y;
+		}
 		
 		private bool TryCreateRenderTarget(string path)
 		{
@@ -175,22 +203,23 @@ namespace Lime
 			switch(Path) {
 				case "#a":
 				case "#b":
-					instance = new RenderTexture(256, 256);
+					mainTexture = new RenderTexture(256, 256);
 					break;
 				case "#c":
-					instance = new RenderTexture(512, 512);
+					mainTexture = new RenderTexture(512, 512);
 					break;
 				case "#d":
-					instance = new RenderTexture(1024, 1024);
+					mainTexture = new RenderTexture(1024, 1024);
 					break;
 				default:
-					instance = CreateStubTexture();
+					mainTexture = CreateStubTexture();
 					IsStubTexture = true;
 					break;
 			}
 			UVRect.A = Vector2.Zero;
 			UVRect.B = Vector2.One;
-			ImageSize = instance.ImageSize;
+			ImageSize = mainTexture.ImageSize;
+			SurfaceSize = mainTexture.SurfaceSize;
 			return true;
 		}
 		
@@ -200,10 +229,11 @@ namespace Lime
 				return false;
 			}
 			var texParams = TextureAtlasPart.ReadFromBundle(path);
-			instance = new SerializableTexture(texParams.AtlasTexture);
-			UVRect.A = (Vector2)texParams.AtlasRect.A / (Vector2)instance.SurfaceSize;
-			UVRect.B = (Vector2)texParams.AtlasRect.B / (Vector2)instance.SurfaceSize;
+			mainTexture = new SerializableTexture(texParams.AtlasTexture);
+			UVRect.A = (Vector2)texParams.AtlasRect.A / (Vector2)mainTexture.SurfaceSize;
+			UVRect.B = (Vector2)texParams.AtlasRect.B / (Vector2)mainTexture.SurfaceSize;
 			ImageSize = (Size)texParams.AtlasRect.Size;
+			SurfaceSize = mainTexture.SurfaceSize;
 			return true;
 		}
 		
@@ -212,40 +242,43 @@ namespace Lime
 			if (!AssetsBundle.Instance.FileExists(path)) {
 				return false;
 			}
-			instance = new Texture2D();
-			(instance as Texture2D).LoadImage(path);
+			mainTexture = new Texture2D();
+			(mainTexture as Texture2D).LoadImage(path);
 			UVRect.A = Vector2.Zero;
-			UVRect.B = (Vector2)instance.ImageSize / (Vector2)instance.SurfaceSize;
-			ImageSize = instance.ImageSize;
+			UVRect.B = (Vector2)mainTexture.ImageSize / (Vector2)mainTexture.SurfaceSize;
+			ImageSize = mainTexture.ImageSize;
+			SurfaceSize = mainTexture.SurfaceSize;
 			return true;
 		}
 
-		public ITexture GetInstance()
+		public ITexture GetMainTexture()
 		{
-			if (instance == null) {
-				bool loaded = !string.IsNullOrEmpty(Path) && (TryCreateRenderTarget(Path) ||
-					TryLoadTextureAtlasPart(Path + ".atlasPart") ||
-#if iOS
-					TryLoadImage(Path + ".pvr")
-#elif UNITY
-					TryLoadImage(Path + ".png")
-#else
-					TryLoadImage(Path + ".dds") ||
-					TryLoadImage(Path + ".png")
-#endif
-				);
-				if (!loaded) {
-					if (!string.IsNullOrEmpty(Path)) {
-						Console.WriteLine("Missing texture '{0}'", Path);
-					}
-					instance = CreateStubTexture();
-					IsStubTexture = true;
-					UVRect = instance.UVRect;
-					ImageSize = instance.ImageSize;
-				}
-			}
 			usedAtRenderCycle = Renderer.RenderCycle;
-			return instance;
+			if (mainTexture != null) {
+				return mainTexture;
+			}
+			bool loaded = !string.IsNullOrEmpty(Path) && (TryCreateRenderTarget(Path) ||
+				TryLoadTextureAtlasPart(Path + ".atlasPart") ||
+#if iOS
+				TryLoadImage(Path + ".pvr")
+#elif UNITY
+				TryLoadImage(Path + ".png")
+#else
+				TryLoadImage(Path + ".dds") ||
+				TryLoadImage(Path + ".png")
+#endif
+			);
+			if (!loaded) {
+				if (!string.IsNullOrEmpty(Path)) {
+					Console.WriteLine("Missing texture '{0}'", Path);
+				}
+				mainTexture = CreateStubTexture();
+				IsStubTexture = true;
+				UVRect = mainTexture.AtlasUVRect;
+				ImageSize = mainTexture.ImageSize;
+				SurfaceSize = mainTexture.SurfaceSize;
+			}
+			return mainTexture;
 		}
 	}
 }
