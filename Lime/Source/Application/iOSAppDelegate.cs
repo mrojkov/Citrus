@@ -32,7 +32,7 @@ namespace Lime
 		public event Action WillTerminateEvent;
 
 		// class-level declarations
-		public UIWindow Window { get; private set; }
+		public new UIWindow Window { get; private set; }
 		public GameController GameController { get; private set; }
 
 		public AppDelegate()

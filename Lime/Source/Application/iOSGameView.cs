@@ -172,7 +172,7 @@ namespace Lime
 			base.CreateFrameBuffer();	
 		}
 
-		public void UpdateFrame()
+		public new void UpdateFrame()
 		{
 			OnUpdateFrame(null);
 		}
@@ -211,7 +211,7 @@ namespace Lime
 			prevText = currText;
 		}
 
-		public void RenderFrame()
+		public new void RenderFrame()
 		{
 			OnRenderFrame(null);
 		}

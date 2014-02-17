@@ -47,6 +47,7 @@ namespace Lime
 			return mask;
 		}
 
+		[Obsolete]
 		public override bool ShouldAutorotateToInterfaceOrientation(UIInterfaceOrientation toInterfaceOrientation)
 		{
 			switch (toInterfaceOrientation) {

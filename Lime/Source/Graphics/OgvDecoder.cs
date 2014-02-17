@@ -13,6 +13,7 @@ namespace Lime
 		const byte MinAlphaThreshold = 45;
 		const byte MaxAlphaThreshold = 250;
 
+#pragma warning disable 414
 		Stream stream;
 		int streamHandle;
 		Lemon.Api.FileSystem fileSystem;
