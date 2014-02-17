@@ -17,6 +17,8 @@ namespace Lime
 		PortraitUpsideDown = 2,
 		LandscapeLeft = 4,
 		LandscapeRight = 8,
+		AllPortraits = Portrait | PortraitUpsideDown,
+		AllLandscapes = LandscapeLeft | LandscapeRight,
 		All = 15,
 	}
 
