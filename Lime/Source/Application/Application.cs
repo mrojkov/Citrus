@@ -11,6 +11,7 @@ using MonoMac.AppKit;
 namespace Lime
 {
 	[Flags]
+	[ProtoBuf.ProtoContract]
 	public enum DeviceOrientation
 	{
 		Portrait = 1,

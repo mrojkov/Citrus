@@ -41,8 +41,8 @@ namespace Lime
 				this.WindowState = OpenTK.WindowState.Maximized;
 			} else {
 				this.Location = new System.Drawing.Point {
-					X = (displayBounds.Width - this.Width) / 2 + displayBounds.X,
-					Y = (displayBounds.Height - this.Height) / 2 + displayBounds.Y
+					X = Math.Max(0, (displayBounds.Width - this.Width) / 2 + displayBounds.X),
+					Y = Math.Max(0, (displayBounds.Height - this.Height) / 2 + displayBounds.Y)
 				};
 			}
 		}

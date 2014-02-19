@@ -181,10 +181,10 @@ namespace Lime
 			var result = new WindowRect();
 			var min = new Vector2(viewport.X, viewport.Y);
 			var max = new Vector2(viewport.X + viewport.Width, viewport.Y + viewport.Height);
-			result.X = (int)Mathf.Lerp(aabb.Left, min.X, max.X);
-			result.Width = (int)Mathf.Lerp(aabb.Right, min.X, max.X) - result.X;
-			result.Y = (int)Mathf.Lerp(aabb.Bottom, min.Y, max.Y);
-			result.Height = (int)Mathf.Lerp(aabb.Top, min.Y, max.Y) - result.Y;
+			result.X = Mathf.Lerp(aabb.Left, min.X, max.X).Round();
+			result.Width = Mathf.Lerp(aabb.Right, min.X, max.X).Round() - result.X;
+			result.Y = Mathf.Lerp(aabb.Bottom, min.Y, max.Y).Round();
+			result.Height = Mathf.Lerp(aabb.Top, min.Y, max.Y).Round() - result.Y;
 			return result;
 		}
 
