@@ -14,7 +14,10 @@ namespace Lime
 		Top = 4,
 		Bottom = 8,
 		CenterH = 16,
-		CenterV = 32
+		CenterV = 32,
+		LeftAndRight = Left | Right,
+		TopAndBottom = Top | Bottom,
+		Center = CenterH | CenterV,
 	}
 
 	public enum HitTestMethod
