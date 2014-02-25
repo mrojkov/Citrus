@@ -10,6 +10,7 @@ namespace Lime
 	public class TextBox : Widget
 	{
 		private string text;
+		private int caretBlinkPhase;
 
 		[ProtoMember(1)]
 		public SerializableFont Font = new SerializableFont();
@@ -38,10 +39,11 @@ namespace Lime
 		[ProtoMember(9)]
 		public HAlignment HAlignment;
 
-		int caretBlinkPhase;
-
 		[ProtoMember(10)]
 		public bool Enabled { get; set; }
+
+		[ProtoMember(11)]
+		public bool Autofocus { get; set; }
 
 		public TextBox()
 		{
@@ -69,7 +71,7 @@ namespace Lime
 				}
 				base.Update(delta);
 			} else {
-				if (world.ActiveTextWidget == null) {
+				if (world.ActiveTextWidget == null && Autofocus) {
 					world.ActiveTextWidget = this;
 				}
 				if (Input.WasKeyPressed(Key.Mouse0) && HitTest(Input.MousePosition)) {
