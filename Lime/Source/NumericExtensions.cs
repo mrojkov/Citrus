@@ -59,7 +59,7 @@ namespace Lime
 
 		public static int Round(this float x)
 		{
-			return (int)(x + 0.5f);
+			return (int)(x + Sign(x) * 0.5f);
 		}
 
 		public static int Floor(this float x)
