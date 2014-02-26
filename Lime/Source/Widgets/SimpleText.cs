@@ -126,18 +126,17 @@ namespace Lime
 				return;
 			}
 			var lines = SplitText(localizedText);
-			var pos = new Vector2();
-			var totalHeight = FontHeight * lines.Count + Spacing * (lines.Count - 1);
-			switch (VAlignment) {
-				case VAlignment.Bottom:
-					pos.Y = Size.Y - totalHeight;
+			var pos = Vector2.Down * CalcVerticalTextPosition(lines);
+			for (int i = 0; i < lines.Count; i++) {
+				bool lastLine = (i == lines.Count - 1);
+				bool nextLineBelowBottom = !lastLine && (pos.Y + FontHeight * 2 + Spacing > Height);
+				if (nextLineBelowBottom) {
+					lines[i] += "...";
+				}
+				RenderSingleTextLine(spriteList, ref extent, ref pos, lines[i]);
+				if (nextLineBelowBottom) {
 					break;
-				case VAlignment.Center:
-					pos.Y = (Size.Y - totalHeight) * 0.5f;
-					break;
-			}
-			foreach (var line in lines) {
-				RenderSingleTextLine(spriteList, ref extent, ref pos, line);
+				}
 			}
 			extent.Y = lines.Count * (FontHeight + Spacing);
 			if (extent.Y > 0) {
@@ -145,22 +144,47 @@ namespace Lime
 			}
 		}
 
+		private float CalcVerticalTextPosition(List<string> lines)
+		{
+			var totalHeight = FontHeight * lines.Count + Spacing * (lines.Count - 1);
+			if (VAlignment == VAlignment.Bottom) {
+				return Size.Y - totalHeight;
+			} else if (VAlignment == VAlignment.Center) {
+				return (Size.Y - totalHeight) * 0.5f;
+			}
+			return 0;
+		}
+
 		private void RenderSingleTextLine(Renderer.SpriteList spriteList, ref Vector2 extent, ref Vector2 pos, string line)
 		{
-			var lineExtent = MeasureTextLine(line);
+			float lineWidth;
+			TruncLineWithEllipsis(ref line, out lineWidth, Width);
 			switch (HAlignment) {
 				case HAlignment.Right:
-					pos.X = Size.X - lineExtent.X;
+					pos.X = Size.X - lineWidth;
 					break;
 				case HAlignment.Center:
-					pos.X = (Size.X - lineExtent.X) * 0.5f;
+					pos.X = (Size.X - lineWidth) * 0.5f;
 					break;
 			}
 			if (spriteList != null) {
 				Renderer.DrawTextLine(spriteList, Font.Instance, pos, line, Color4.White, FontHeight, 0, line.Length);
 			}
-			extent.X = Mathf.Max(extent.X, pos.X + lineExtent.X);
+			extent.X = Mathf.Max(extent.X, pos.X + lineWidth);
 			pos.Y += Spacing + FontHeight;
+		}
+
+		private void TruncLineWithEllipsis(ref string line, out float lineWidth, float maxWidth)
+		{
+			lineWidth = MeasureTextLine(line).X;
+			if (lineWidth <= Width) {
+				return;
+			}
+			while (line.Length > 0 && lineWidth > Width) {
+				lineWidth = MeasureTextLine(line + "...").X;
+				line = line.Substring(0, line.Length - 1);
+			}
+			line += "...";
 		}
 
 		public void FitTextInsideWidgetArea(float minFontHeight = 10)
