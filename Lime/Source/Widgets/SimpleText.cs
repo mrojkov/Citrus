@@ -37,7 +37,6 @@ namespace Lime
 		private float spacing;
 		private HAlignment hAlignment;
 		private VAlignment vAlignment;
-		private bool autoFit;
 		private Vector2 prevSize;
 
 		[ProtoMember(1)]
@@ -76,15 +75,8 @@ namespace Lime
 			set { SetVAlignment(value); }
 		}
 
-		[ProtoMember(7)]
-		public bool AutoFit {
-			get { return autoFit; }
-			set { SetAutoFit(value); }
-		}
-
 		public SimpleText()
 		{
-			AutoFit = true;
 			Text = "";
 			FontHeight = 15;
 			Font = new SerializableFont();
@@ -126,7 +118,6 @@ namespace Lime
 				return;
 			}
 			var lines = SplitText(localizedText);
-			TruncateEndingLines(lines);
 			var pos = Vector2.Down * CalcVerticalTextPosition(lines);
 			foreach (var line in lines) {
 				RenderSingleTextLine(spriteList, ref extent, ref pos, line);
@@ -137,21 +128,9 @@ namespace Lime
 			}
 		}
 
-		private void TruncateEndingLines(List<string> lines)
-		{
-			bool truncated = false;
-			while (CalcTotalHeight(lines) > Height && lines.Count > 1) {
-				lines.RemoveAt(lines.Count - 1);
-				truncated = true;
-			}
-			if (truncated) {
-				lines[lines.Count - 1] += "...";
-			}
-		}
-
 		private float CalcVerticalTextPosition(List<string> lines)
 		{
-			var totalHeight = CalcTotalHeight(lines);
+			var totalHeight = CalcTotalHeight(lines.Count);
 			if (VAlignment == VAlignment.Bottom) {
 				return Size.Y - totalHeight;
 			} else if (VAlignment == VAlignment.Center) {
@@ -160,16 +139,15 @@ namespace Lime
 			return 0;
 		}
 
-		private float CalcTotalHeight(List<string> lines)
+		private float CalcTotalHeight(int numLines)
 		{
-			var totalHeight = FontHeight * lines.Count + Spacing * (lines.Count - 1);
+			var totalHeight = FontHeight * numLines + Spacing * (numLines - 1);
 			return totalHeight;
 		}
 
 		private void RenderSingleTextLine(Renderer.SpriteList spriteList, ref Vector2 extent, ref Vector2 pos, string line)
 		{
-			float lineWidth;
-			TruncLineWithEllipsis(ref line, out lineWidth, Width);
+			float lineWidth = MeasureTextLine(line).X;
 			switch (HAlignment) {
 				case HAlignment.Right:
 					pos.X = Size.X - lineWidth;
@@ -185,46 +163,22 @@ namespace Lime
 			pos.Y += Spacing + FontHeight;
 		}
 
-		private void TruncLineWithEllipsis(ref string line, out float lineWidth, float maxWidth)
-		{
-			lineWidth = MeasureTextLine(line).X;
-			if (lineWidth <= Width) {
-				return;
-			}
-			while (line.Length > 0 && lineWidth > Width) {
-				lineWidth = MeasureTextLine(line + "...").X;
-				line = line.Substring(0, line.Length - 1);
-			}
-			line += "...";
-		}
-
-		public void FitTextInsideWidgetArea(float minFontHeight = 10)
-		{
-			var minH = minFontHeight;
-			var maxH = FontHeight;
-			if (maxH <= minH) {
-				return;
-			}
-			var spacingKoeff = Spacing / FontHeight;
-			while (maxH - minH > 1) {
-				FontHeight = (minH + maxH) / 2;
-				Spacing = FontHeight * spacingKoeff;
-				var extent = MeasureText();
-				var fit = (extent.X < Width && extent.Y < Height);
-				if (fit) {
-					minH = FontHeight;
-				} else {
-					maxH = FontHeight;
-				}
-			}
-		}
-
 		private List<string> SplitText(string text)
 		{
 			var strings = new List<string>(text.Split('\n'));
 			for (var i = 0; i < strings.Count; i++) {
+				// Truncating the last line of the text
+				if (CalcTotalHeight(i + 2) > Height) {
+					strings[i] = TruncLineWithEllipsis(strings[i]);
+					while (strings.Count > i + 1) {
+						strings.RemoveAt(strings.Count - 1);
+					}
+					break;
+				}
+				// Trying to split long lines. If a line can't be split it get truncated.
 				while (MeasureTextLine(strings[i]).X > Width) {
 					if (!CarryLastWordToNextLine(strings, i)) {
+						strings[i] = TruncLineWithEllipsis(strings[i]);
 						break;
 					}
 				}
@@ -253,6 +207,20 @@ namespace Lime
 				return false;
 			}
 			return true;
+		}
+
+		private string TruncLineWithEllipsis(string line)
+		{
+			var lineWidth = MeasureTextLine(line).X;
+			if (lineWidth <= Width) {
+				return line;
+			}
+			while (line.Length > 0 && lineWidth > Width) {
+				lineWidth = MeasureTextLine(line + "...").X;
+				line = line.Substring(0, line.Length - 1);
+			}
+			line += "...";
+			return line;
 		}
 
 		private void SetFont(SerializableFont value)
@@ -291,14 +259,6 @@ namespace Lime
 		{
 			if (value != vAlignment) {
 				vAlignment = value;
-				DisposeSpriteList();
-			}
-		}
-
-		private void SetAutoFit(bool value)
-		{
-			if (value != autoFit) {
-				autoFit = value;
 				DisposeSpriteList();
 			}
 		}
