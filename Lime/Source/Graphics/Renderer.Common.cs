@@ -228,16 +228,9 @@ namespace Lime
 		{
 			if (blending == Blending.Glow) {
 				Blending = Blending.Default;
-				DrawSpriteHelper(texture, color, position, size, uv0, uv1);
+				DrawSprite(texture, color, position, size, uv0, uv1);
 				Blending = Blending.Glow;
-				DrawSpriteHelper(texture, color, position, size, uv0, uv1);
-			} else {
-				DrawSpriteHelper(texture, color, position, size, uv0, uv1);
 			}
-		}
-
-		public static void DrawSpriteHelper(ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1)
-		{
 			SetTexture(texture, 0);
 			SetTexture(null, 1);
 			if (currentVertex >= MaxVertices - 4 || currentIndex >= MaxVertices * 4 - 6) {

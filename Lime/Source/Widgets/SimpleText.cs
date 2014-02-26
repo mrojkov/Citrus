@@ -137,25 +137,30 @@ namespace Lime
 					break;
 			}
 			foreach (var line in lines) {
-				var lineExtent = Renderer.MeasureTextLine(Font.Instance, line, FontHeight);
-				switch (HAlignment) {
-					case HAlignment.Right:
-						pos.X = Size.X - lineExtent.X;
-						break;
-					case HAlignment.Center:
-						pos.X = (Size.X - lineExtent.X) * 0.5f;
-						break;
-				}
-				if (spriteList != null) {
-					Renderer.DrawTextLine(spriteList, Font.Instance, pos, line, Color4.White, FontHeight, 0, line.Length);
-				}
-				extent.X = Mathf.Max(extent.X, pos.X + lineExtent.X);
-				pos.Y += Spacing + FontHeight;
+				RenderSingleTextLine(spriteList, ref extent, ref pos, line);
 			}
 			extent.Y = lines.Count * (FontHeight + Spacing);
 			if (extent.Y > 0) {
 				extent.Y -= Spacing;
 			}
+		}
+
+		private void RenderSingleTextLine(Renderer.SpriteList spriteList, ref Vector2 extent, ref Vector2 pos, string line)
+		{
+			var lineExtent = MeasureTextLine(line);
+			switch (HAlignment) {
+				case HAlignment.Right:
+					pos.X = Size.X - lineExtent.X;
+					break;
+				case HAlignment.Center:
+					pos.X = (Size.X - lineExtent.X) * 0.5f;
+					break;
+			}
+			if (spriteList != null) {
+				Renderer.DrawTextLine(spriteList, Font.Instance, pos, line, Color4.White, FontHeight, 0, line.Length);
+			}
+			extent.X = Mathf.Max(extent.X, pos.X + lineExtent.X);
+			pos.Y += Spacing + FontHeight;
 		}
 
 		public void FitTextInsideWidgetArea(float minFontHeight = 10)
@@ -183,23 +188,36 @@ namespace Lime
 		{
 			var strings = new List<string>(text.Split('\n'));
 			for (var i = 0; i < strings.Count; i++) {
-				while (Renderer.MeasureTextLine(Font.Instance, strings[i], FontHeight).X > Width) {
-					var lastSpacePosition = strings[i].LastIndexOf(' ');
-					if (lastSpacePosition >= 0) {
-						if (i + 1 >= strings.Count) {
-							strings.Add("");
-						}
-						if (strings[i + 1] != "") {
-							strings[i + 1] = ' ' + strings[i + 1];
-						}
-						strings[i + 1] = strings[i].Substring(lastSpacePosition + 1) + strings[i + 1];
-						strings[i] = strings[i].Substring(0, lastSpacePosition);
-					} else {
+				while (MeasureTextLine(strings[i]).X > Width) {
+					if (!CarryLastWordToNextLine(strings, i)) {
 						break;
 					}
 				}
 			}
 			return strings;
+		}
+
+		private Vector2 MeasureTextLine(string line)
+		{
+			return Renderer.MeasureTextLine(Font.Instance, line, FontHeight);
+		}
+
+		private static bool CarryLastWordToNextLine(List<string> strings, int line)
+		{
+			var lastSpaceAt = strings[line].LastIndexOf(' ');
+			if (lastSpaceAt >= 0) {
+				if (line + 1 >= strings.Count) {
+					strings.Add("");
+				}
+				if (strings[line + 1] != "") {
+					strings[line + 1] = ' ' + strings[line + 1];
+				}
+				strings[line + 1] = strings[line].Substring(lastSpaceAt + 1) + strings[line + 1];
+				strings[line] = strings[line].Substring(0, lastSpaceAt);
+			} else {
+				return false;
+			}
+			return true;
 		}
 
 		private void SetFont(SerializableFont value)
