@@ -126,17 +126,10 @@ namespace Lime
 				return;
 			}
 			var lines = SplitText(localizedText);
+			TruncateEndingLines(lines);
 			var pos = Vector2.Down * CalcVerticalTextPosition(lines);
-			for (int i = 0; i < lines.Count; i++) {
-				bool lastLine = (i == lines.Count - 1);
-				bool nextLineBelowBottom = !lastLine && (pos.Y + FontHeight * 2 + Spacing > Height);
-				if (nextLineBelowBottom) {
-					lines[i] += "...";
-				}
-				RenderSingleTextLine(spriteList, ref extent, ref pos, lines[i]);
-				if (nextLineBelowBottom) {
-					break;
-				}
+			foreach (var line in lines) {
+				RenderSingleTextLine(spriteList, ref extent, ref pos, line);
 			}
 			extent.Y = lines.Count * (FontHeight + Spacing);
 			if (extent.Y > 0) {
@@ -144,15 +137,33 @@ namespace Lime
 			}
 		}
 
+		private void TruncateEndingLines(List<string> lines)
+		{
+			bool truncated = false;
+			while (CalcTotalHeight(lines) > Height && lines.Count > 1) {
+				lines.RemoveAt(lines.Count - 1);
+				truncated = true;
+			}
+			if (truncated) {
+				lines[lines.Count - 1] += "...";
+			}
+		}
+
 		private float CalcVerticalTextPosition(List<string> lines)
 		{
-			var totalHeight = FontHeight * lines.Count + Spacing * (lines.Count - 1);
+			var totalHeight = CalcTotalHeight(lines);
 			if (VAlignment == VAlignment.Bottom) {
 				return Size.Y - totalHeight;
 			} else if (VAlignment == VAlignment.Center) {
 				return (Size.Y - totalHeight) * 0.5f;
 			}
 			return 0;
+		}
+
+		private float CalcTotalHeight(List<string> lines)
+		{
+			var totalHeight = FontHeight * lines.Count + Spacing * (lines.Count - 1);
+			return totalHeight;
 		}
 
 		private void RenderSingleTextLine(Renderer.SpriteList spriteList, ref Vector2 extent, ref Vector2 pos, string line)
