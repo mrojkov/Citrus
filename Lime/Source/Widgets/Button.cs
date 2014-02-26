@@ -5,6 +5,7 @@ using System.Collections.Generic;
 namespace Lime
 {
 	using StateFunc = Func<IEnumerator<int>>;
+	using System.Diagnostics;
 
 	[ProtoContract]
 	public class Button : Widget
@@ -184,6 +185,11 @@ namespace Lime
 		private void HandleClick()
 		{
 			if (Clicked != null) {
+#if !iOS
+				if (Debug.BreakOnButtonClick) {
+					Debugger.Break();
+				}
+#endif
 				Clicked();
 			}
 			wasClicked = true;
