@@ -13,5 +13,14 @@ namespace Lime
 		{
 			Debugger.Log(0, null, message);
 		}
+
+		public static void Print(string message, params object[] args)
+		{
+			Write(string.Format(message, args));
+		}
+
+		public static void Indent()
+		{
+		}
 	}
 }
