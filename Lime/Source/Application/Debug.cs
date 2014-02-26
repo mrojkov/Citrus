@@ -22,5 +22,9 @@ namespace Lime
 		public static void Indent()
 		{
 		}
+
+		public static void Unindent()
+		{
+		}
 	}
 }
