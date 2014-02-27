@@ -110,6 +110,27 @@ namespace Lime
 			return extent;
 		}
 
+		public void FitTextInsideWidgetArea(float minFontHeight = 10)
+		{
+			var minH = minFontHeight;
+			var maxH = FontHeight;
+			if (maxH <= minH) {
+				return;
+			}
+			var spacingKoeff = Spacing / FontHeight;
+			while (maxH - minH > 1) {
+				FontHeight = (minH + maxH) / 2;
+				Spacing = FontHeight * spacingKoeff;
+				var extent = MeasureText();
+				var fit = (extent.X < Width && extent.Y < Height);
+				if (fit) {
+					minH = FontHeight;
+				} else {
+					maxH = FontHeight;
+				}
+			}
+		}
+
 		private void RenderHelper(Renderer.SpriteList spriteList, out Vector2 extent)
 		{
 			extent = Vector2.Zero;

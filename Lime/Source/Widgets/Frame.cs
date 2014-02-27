@@ -151,6 +151,8 @@ namespace Lime
 
 		private void RenderWithScissorTest()
 		{
+			var savedScissorTest = Renderer.ScissorTestEnabled;
+			var savedScissorRect = Renderer.ScissorRectangle;
 			Renderer.ScissorTestEnabled = true;
 			Renderer.ScissorRectangle = CalculateScissorRectangle();
 			try {
@@ -160,7 +162,8 @@ namespace Lime
 				}
 				chain.RenderAndClear();
 			} finally {
-				Renderer.ScissorTestEnabled = false;
+				Renderer.ScissorTestEnabled = savedScissorTest;
+				Renderer.ScissorRectangle = savedScissorRect;
 			}
 		}
 

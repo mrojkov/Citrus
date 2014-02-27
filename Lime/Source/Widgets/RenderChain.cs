@@ -10,20 +10,15 @@ namespace Lime
 
 		readonly Node[] layers = new Node[MaxLayers];
 
-		public void Add(Node node)
-		{
-			node.NextToRender = layers[currentLayer];
-			layers[currentLayer] = node;
-		}
-
-		public void Add(Node node, int layer)
+		public void Add(Node node, int layer = 0)
 		{
 			if (layer != 0) {
 				int oldLayer = SetLayer(layer);
-				Add(node);
+				Add(node, 0);
 				SetLayer(oldLayer);
 			} else {
-				Add(node);
+				node.NextToRender = layers[currentLayer];
+				layers[currentLayer] = node;
 			}
 		}
 
@@ -33,9 +28,7 @@ namespace Lime
 				maxUsedLayer = layer;
 			}
 			int oldLayer = currentLayer;
-			if (layer != 0) {
-				currentLayer = layer;
-			}
+			currentLayer = layer;
 			return oldLayer;
 		}
 
