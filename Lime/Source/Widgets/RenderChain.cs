@@ -13,16 +13,16 @@ namespace Lime
 		public void Add(Node node, int layer = 0)
 		{
 			if (layer != 0) {
-				int oldLayer = SetLayer(layer);
+				int oldLayer = SetCurrentLayer(layer);
 				Add(node, 0);
-				SetLayer(oldLayer);
+				SetCurrentLayer(oldLayer);
 			} else {
 				node.NextToRender = layers[currentLayer];
 				layers[currentLayer] = node;
 			}
 		}
 
-		public int SetLayer(int layer)
+		public int SetCurrentLayer(int layer)
 		{
 			if (layer > maxUsedLayer) {
 				maxUsedLayer = layer;

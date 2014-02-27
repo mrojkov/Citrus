@@ -284,12 +284,12 @@ namespace Lime
 				return;
 			}
 			if (Layer != 0) {
-				int oldLayer = chain.SetLayer(Layer);
+				int oldLayer = chain.SetCurrentLayer(Layer);
 				foreach (Node node in Nodes.AsArray) {
 					node.AddToRenderChain(chain);
 				}
 				chain.Add(this);
-				chain.SetLayer(oldLayer);
+				chain.SetCurrentLayer(oldLayer);
 			} else {
 				foreach (Node node in Nodes.AsArray) {
 					node.AddToRenderChain(chain);

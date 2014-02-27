@@ -53,12 +53,12 @@ namespace Lime
 		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (GloballyVisible) {
-				int oldLayer = chain.SetLayer(Layer);
+				int oldLayer = chain.SetCurrentLayer(Layer);
 				chain.Add(this);
 				foreach (Node node in Nodes.AsArray) {
 					node.AddToRenderChain(chain);
 				}
-				chain.SetLayer(oldLayer);
+				chain.SetCurrentLayer(oldLayer);
 			}
 		}
 
