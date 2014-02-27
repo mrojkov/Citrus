@@ -28,6 +28,17 @@ namespace Lime
 	}
 
 	[ProtoContract]
+	public enum TextOverflowMode
+	{
+		[ProtoEnum]
+		Default,
+		[ProtoEnum]
+		Minify,
+		[ProtoEnum]
+		Ellipsis,
+	}
+
+	[ProtoContract]
 	public sealed class SimpleText : Widget
 	{
 		private Renderer.SpriteList spriteList;
@@ -75,6 +86,9 @@ namespace Lime
 			set { SetVAlignment(value); }
 		}
 
+		[ProtoMember(8)]
+		public TextOverflowMode OverflowMode { get; set; }
+
 		public SimpleText()
 		{
 			Text = "";
@@ -94,6 +108,9 @@ namespace Lime
 				prevSize = Size;
 			}
 			if (spriteList == null) {
+				if (OverflowMode == TextOverflowMode.Minify) {
+					FitTextInsideWidgetArea();
+				}
 				spriteList = new Renderer.SpriteList();
 				Vector2 extent;
 				RenderHelper(spriteList, out extent);
@@ -188,18 +205,22 @@ namespace Lime
 		{
 			var strings = new List<string>(text.Split('\n'));
 			for (var i = 0; i < strings.Count; i++) {
-				// Truncating the last line of the text
-				if (CalcTotalHeight(i + 2) > Height) {
-					strings[i] = TruncLineWithEllipsis(strings[i]);
-					while (strings.Count > i + 1) {
-						strings.RemoveAt(strings.Count - 1);
+				if (OverflowMode == TextOverflowMode.Ellipsis) {
+					// Clipping the last line of the text
+					if (CalcTotalHeight(i + 2) > Height) {
+						strings[i] = ClipLineWithEllipsis(strings[i]);
+						while (strings.Count > i + 1) {
+							strings.RemoveAt(strings.Count - 1);
+						}
+						break;
 					}
-					break;
 				}
-				// Trying to split long lines. If a line can't be split it get truncated.
+				// Trying to split long lines. If a line can't be split it gets clipped.
 				while (MeasureTextLine(strings[i]).X > Width) {
 					if (!CarryLastWordToNextLine(strings, i)) {
-						strings[i] = TruncLineWithEllipsis(strings[i]);
+						if (OverflowMode == TextOverflowMode.Ellipsis) {
+							strings[i] = ClipLineWithEllipsis(strings[i]);
+						}
 						break;
 					}
 				}
@@ -230,7 +251,7 @@ namespace Lime
 			return true;
 		}
 
-		private string TruncLineWithEllipsis(string line)
+		private string ClipLineWithEllipsis(string line)
 		{
 			var lineWidth = MeasureTextLine(line).X;
 			if (lineWidth <= Width) {
