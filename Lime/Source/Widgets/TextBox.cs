@@ -16,7 +16,10 @@ namespace Lime
 		public SerializableFont Font = new SerializableFont();
 
 		[ProtoMember(2)]
-		public override string Text { get { return text ?? ""; } set { text = value; } }
+		public override string Text {
+			get { return text ?? ""; } 
+			set { text = value; } 
+		}
 
 		[ProtoMember(3)]
 		public int MaxTextLength = 50;
@@ -48,18 +51,6 @@ namespace Lime
 		public TextBox()
 		{
 			Enabled = true;
-		}
-
-		public override void AddToRenderChain(RenderChain chain)
-		{
-			if (GloballyVisible) {
-				int oldLayer = chain.SetCurrentLayer(Layer);
-				chain.Add(this);
-				foreach (Node node in Nodes.AsArray) {
-					node.AddToRenderChain(chain);
-				}
-				chain.SetCurrentLayer(oldLayer);
-			}
 		}
 
 		public override void Update(int delta)
