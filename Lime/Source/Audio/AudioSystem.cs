@@ -18,7 +18,9 @@ namespace Lime
 		[ProtoEnum]
 		Effects,
 		[ProtoEnum]
-		Music
+		Music,
+		[ProtoEnum]
+		Voice
 	}
 
 	public static partial class AudioSystem
@@ -27,7 +29,7 @@ namespace Lime
 		static AudioContext context;
 #endif
 		static readonly List<AudioChannel> channels = new List<AudioChannel>();
-		static readonly float[] groupVolumes = new float[2] {1, 1};
+		static readonly float[] groupVolumes = new float[3] {1, 1, 1};
 
 		static Thread streamingThread;
 		static volatile bool shouldTerminateThread;
