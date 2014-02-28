@@ -28,7 +28,7 @@ namespace Lime
 		[ProtoMember(3)]
 		public float FadeTime { get; set; }
 
-		private float volume = 1;
+		private float volume = 0.5f;
 		[ProtoMember(4)]
 		public float Volume
 		{
