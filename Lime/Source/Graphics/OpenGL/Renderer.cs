@@ -69,7 +69,8 @@ namespace Lime
 		private static WindowRect scissorRectangle = new WindowRect();
 		private static bool scissorTestEnabled = false;
 		private static Blending blending = Blending.None;
-		
+		private static ShaderProgram currentShaderProgram;
+
 		static Renderer()
 		{
 			projectionStack = new Stack<Matrix44>();
@@ -106,9 +107,8 @@ namespace Lime
 		{
 			if (currentIndex > 0) {
 				int numTextures = textures[1] != 0 ? 2 : (textures[0] != 0 ? 1 : 0);
-				var currentProgram = ShaderPrograms.GetShaderProgram(blending, numTextures);
-				currentProgram.Use();
-				LoadProjectionMatrix(currentProgram);
+				var program = ShaderPrograms.GetShaderProgram(blending, numTextures);
+				SetShaderProgram(program);
 				GL.DrawElements(PrimitiveType.Triangles, currentIndex, DrawElementsType.UnsignedShort, (IntPtr)batchIndices);
 				CheckErrors();
 				currentIndex = currentVertex = 0;
@@ -116,11 +116,13 @@ namespace Lime
 			}
 		}
 
-		private static void LoadProjectionMatrix(ShaderProgram currentProgram)
+		public static void SetShaderProgram(ShaderProgram program)
 		{
-			var matrix = projectionStack.Peek();
-			float* p = (float*)&matrix;
-			GL.UniformMatrix4(currentProgram.ProjectionMatrixUniformId, 1, false, p);
+			if (program != currentShaderProgram) {
+				currentShaderProgram = program;
+				program.Use();
+				program.LoadMatrix(program.ProjectionMatrixUniformId, projectionStack.Peek());
+			}
 		}
 
 		public static int GetCurrentFramebuffer()
@@ -141,6 +143,7 @@ namespace Lime
 			GL.Enable(EnableCap.Blend);
 			blending = Blending.None;
 			Blending = Blending.Default;
+			currentShaderProgram = null;
 			SetupVertexAttribPointers();
 			CheckErrors();
 		}
@@ -308,6 +311,7 @@ namespace Lime
 		{
 			projectionStack.Pop();
 			projectionStack.Push(value);
+			currentShaderProgram = null;
 		}
 	}
 }

@@ -69,6 +69,14 @@ namespace Lime
 			GL.UseProgram(handle);
 		}
 
+		public void LoadMatrix(int uniformId, Matrix44 matrix)
+		{
+			unsafe {
+				float* p = (float*)&matrix;
+				GL.UniformMatrix4(uniformId, 1, false, p);
+			}
+		}
+
 		public void BindSampler(string name, int stage)
 		{
 			Use();
