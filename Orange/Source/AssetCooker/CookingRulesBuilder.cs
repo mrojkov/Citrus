@@ -90,6 +90,7 @@ namespace Orange
 				case "DXTi":
 					return DDSFormat.DXTi;
 				case "ARGB8":
+				case "RGBA8":
 					return DDSFormat.Uncompressed;
 				default:
 					throw new Lime.Exception("Error parsing DDS format. Must be either DXTi or ARGB8");
@@ -106,6 +107,8 @@ namespace Orange
 				case "RGB565":
 					return PVRFormat.RGB565;
 				case "ARGB8":
+					return PVRFormat.ARGB8;
+				case "RGBA8":
 					return PVRFormat.ARGB8;
 				default:
 					throw new Lime.Exception("Error parsing PVR format. Must be one of: PVRTC4, RGBA4, RGB565, ARGB8");
