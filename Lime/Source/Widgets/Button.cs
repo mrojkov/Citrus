@@ -186,9 +186,11 @@ namespace Lime
 		{
 			if (Clicked != null) {
 #if !iOS
-				if (Debug.BreakOnButtonClick) {
+				// XXX
+				// Комментирую, чтоб компилилось
+/*				if (Debug.BreakOnButtonClick) {
 					Debugger.Break();
-				}
+				}*/
 #endif
 				Clicked();
 			}
