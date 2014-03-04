@@ -80,11 +80,6 @@ namespace Lime
 	{
 		public const int Rgb = (int)All.Rgb;
 		public const int Rgba = (int)All.Rgba;
-#if !iOS
-		public const All CompressedRgbS3tcDxt1Ext = All.CompressedRgbS3tcDxt1Ext;
-		public const All CompressedRgbaS3tcDxt3Ext = All.CompressedRgbaS3tcDxt3Ext;
-		public const All CompressedRgbaS3tcDxt5Ext = All.CompressedRgbaS3tcDxt5Ext;
-#endif
 	}
 
 	static class PixelFormat

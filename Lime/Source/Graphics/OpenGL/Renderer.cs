@@ -4,6 +4,7 @@ using System;
 using OpenTK.Graphics.ES20;
 #elif MAC
 using MonoMac.OpenGL;
+using PrimitiveType = MonoMac.OpenGL.BeginMode;
 #elif WIN
 using OpenTK;
 using OpenTK.Graphics;
@@ -102,7 +103,7 @@ namespace Lime
 			throw new Exception("OpenGL error(s): " + errors);
 #endif
 		}
-		
+				
 		public static void FlushSpriteBatch()
 		{
 			if (currentIndex > 0) {

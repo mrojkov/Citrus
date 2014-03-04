@@ -43,6 +43,9 @@
     <Reference Include="OpenTK">
       <HintPath>..\3rdParty\OpenTK\OpenTK.dll</HintPath>
     </Reference>
+    <Reference Include="MonoMac">
+      <HintPath>..\3rdParty\MonoMac.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Types\Matrix44.cs" />
