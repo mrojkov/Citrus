@@ -39,9 +39,6 @@
     <Reference Include="protobuf-net">
       <HintPath>..\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
     </Reference>
-    <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral">
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="OpenTK">
       <HintPath>..\3rdParty\OpenTK\OpenTK.dll</HintPath>
@@ -51,6 +48,16 @@
     <Compile Include="Source\Types\Matrix44.cs" />
     <Compile Include="Source\Graphics\OpacityMask.cs" />
     <Compile Include="Source\Widgets\LinearLayout.cs" />
+    <Compile Include="Source\Application\Debug.cs" />
+    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Factory.iPhone.cs" />
+    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\GraphicsContext.cs" />
+    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Utilities.iPhone.cs" />
+    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGameView.cs" />
+    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGraphicsContext.cs" />
+    <Compile Include="Source\Graphics\OpenGL\Shader.cs" />
+    <Compile Include="Source\Graphics\OpenGL\ShaderProgram.cs" />
+    <Compile Include="Source\Graphics\OpenGL\Shaders.cs" />
+    <Compile Include="Source\Graphics\OpenGL\XamarinAdapter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -147,7 +154,6 @@
     <Compile Include="Source\Graphics\ITexture.cs" />
     <Compile Include="Source\AssetsBundle\UnityAssetsBundle.cs" />
     <Compile Include="Source\Graphics\Renderer.Common.cs" />
-    <Compile Include="Source\Graphics\OpenGL\OpenGL.cs" />
     <Compile Include="Source\Graphics\OpenGL\RenderTexture.cs" />
     <Compile Include="Source\Graphics\OpenGL\Renderer.cs" />
     <Compile Include="Source\Graphics\OpenGL\Texture2D.DDS.cs" />
@@ -174,4 +180,14 @@
       <Name>Lemon.Mac</Name>
     </ProjectReference>
   </ItemGroup>
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <Policies>
+          <TextStylePolicy TabsToSpaces="False" inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp" />
+          <CSharpFormattingPolicy IndentSwitchBody="True" AnonymousMethodBraceStyle="NextLine" PropertyBraceStyle="NextLine" PropertyGetBraceStyle="NextLine" PropertySetBraceStyle="NextLine" EventBraceStyle="NextLine" EventAddBraceStyle="NextLine" EventRemoveBraceStyle="NextLine" StatementBraceStyle="NextLine" ElseNewLinePlacement="NewLine" CatchNewLinePlacement="NewLine" FinallyNewLinePlacement="NewLine" WhileNewLinePlacement="DoNotCare" ArrayInitializerWrapping="DoNotChange" ArrayInitializerBraceStyle="NextLine" BeforeMethodDeclarationParentheses="False" BeforeMethodCallParentheses="False" BeforeConstructorDeclarationParentheses="False" BeforeDelegateDeclarationParentheses="False" NewParentheses="False" SpacesBeforeBrackets="False" inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
+        </Policies>
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
 </Project>

@@ -236,7 +236,7 @@ namespace Lime
 			if (currentVertex >= MaxVertices - 4 || currentIndex >= MaxVertices * 4 - 6) {
 				FlushSpriteBatch();
 			}
-			if (PremulAlphaMode) {
+			if (PremultipliedAlphaMode) {
 				color = Color4.PremulAlpha(color);
 			}
 			texture.TransformUVCoordinatesToAtlasSpace(ref uv0, ref uv1);
@@ -286,25 +286,18 @@ namespace Lime
 			batchVertices[i].UV1 = uv1;
 		}
 
-		public static void DrawTriangleFan(ITexture texture1, Vertex[] vertices, int numVertices)
+		public static void DrawTriangleFan(ITexture texture, Vertex[] vertices, int numVertices)
 		{
-			DrawTriangleFan(texture1, null, vertices, numVertices);
+			DrawTriangleFan(texture, null, vertices, numVertices);
 		}
 
 		public static void DrawTriangleFan(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
 		{
 			if (blending == Lime.Blending.Glow) {
 				Blending = Lime.Blending.Default;
-				DrawTriangleFanHelper(texture1, texture2, vertices, numVertices);
+				DrawTriangleFan(texture1, texture2, vertices, numVertices);
 				Blending = Lime.Blending.Glow;
-				DrawTriangleFanHelper(texture1, texture2, vertices, numVertices);
-			} else {
-				DrawTriangleFanHelper(texture1, texture2, vertices, numVertices);
 			}
-		}
-
-		private static void DrawTriangleFanHelper(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
-		{
 			int baseVertex = DrawTrianglesHelper(texture1, texture2, vertices, numVertices);
 			for (int i = 1; i <= numVertices - 2; i++) {
 				batchIndices[currentIndex++] = (ushort)baseVertex;
@@ -317,16 +310,9 @@ namespace Lime
 		{
 			if (blending == Lime.Blending.Glow) {
 				Blending = Lime.Blending.Default;
-				DrawTriangleStripHelper(texture1, texture2, vertices, numVertices);
+				DrawTriangleStrip(texture1, texture2, vertices, numVertices);
 				Blending = Lime.Blending.Glow;
-				DrawTriangleStripHelper(texture1, texture2, vertices, numVertices);
-			} else {
-				DrawTriangleStripHelper(texture1, texture2, vertices, numVertices);
 			}
-		}
-
-		private static void DrawTriangleStripHelper(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
-		{
 			int vertex = DrawTrianglesHelper(texture1, texture2, vertices, numVertices);
 			for (int i = 0; i < numVertices - 2; i++) {
 				batchIndices[currentIndex++] = (ushort)vertex;
@@ -352,7 +338,7 @@ namespace Lime
 			var transform = Transform2.IsIdentity() ? Transform1 : Transform1 * Transform2;
 			for (int i = 0; i < numVertices; i++) {
 				Vertex v = vertices[i];
-				if (PremulAlphaMode) {
+				if (PremultipliedAlphaMode) {
 					v.Color = Color4.PremulAlpha(v.Color);
 				}
 				v.Pos = transform * v.Pos;

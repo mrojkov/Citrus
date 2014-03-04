@@ -1,17 +1,14 @@
-#if OPENGL || GLES11
+#if iOS && OPENGL
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-#if iOS
-using OpenTK.Graphics.ES11;
-#endif
+using OpenTK.Graphics.ES20;
 
 namespace Lime
 {
 	public partial class Texture2D : ITexture
 	{
-#if iOS
 		// Values taken from PVRTexture.h from http://www.imgtec.com
 		enum PVRTextureFlag {
 			Mipmap			= (1<<8),		// has mip map levels
@@ -127,7 +124,6 @@ namespace Lime
 			}
 			Application.InvokeOnMainThread(glCommands);
 		}
-#endif
 	}
 }
 #endif

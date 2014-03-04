@@ -397,27 +397,16 @@ namespace Orange
 						}
 					}
 					Console.WriteLine("+ " + atlasPath);
-					string inFile = GetTempFilePathWithExtension(".png");
-					if (!atlas.Save(inFile, "png")) {
-						var error = (Gdk.PixbufError)Gdk.Pixbuf.ErrorQuark();
-						throw new Lime.Exception("Can't save '{0}' (error: {1})", inFile, error.ToString()); 
-					}
-					if (!File.Exists(inFile)) {
-						throw new Lime.Exception("'{0}' doesn't exist!");
-					}
 					if (platform == TargetPlatform.Unity) {
-						assetsBundle.ImportFile(inFile, atlasPath, 0);
+						throw new NotImplementedException();
+						// assetsBundle.ImportFile(inFile, atlasPath, 0);
 					} else {
-						string outFile = Path.ChangeExtension(inFile, GetPlatformTextureExtension());
+						var tmpFile = GetTempFilePathWithExtension(GetPlatformTextureExtension());
 						string maskPath = Path.ChangeExtension(atlasPath, ".mask");
-						OpacityMaskCreator.CreateMask(assetsBundle, inFile, maskPath);
-						TextureConverter.Convert(inFile, outFile, rules, platform);
-						assetsBundle.ImportFile(outFile, atlasPath, 0, compress: true);
-						File.Delete(outFile);
-					}
-					File.Delete(inFile);
-					while (File.Exists(inFile)) {
-						System.Threading.Thread.Sleep(1);
+						OpacityMaskCreator.CreateMask(assetsBundle, atlas, maskPath);
+						TextureConverter.Convert(atlas, tmpFile, rules, platform);
+						assetsBundle.ImportFile(tmpFile, atlasPath, 0, compress: true);
+						File.Delete(tmpFile);
 					}
 					items.RemoveAll(x => x.Allocated);
 					break;

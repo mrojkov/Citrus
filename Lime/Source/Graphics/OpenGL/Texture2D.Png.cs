@@ -1,17 +1,16 @@
-﻿#if OPENGL || GLES11
+﻿#if OPENGL
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
 #if WIN
+using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
-using OGL = OpenTK.Graphics.OpenGL.GL;
 #elif MAC
 using MonoMac.OpenGL;
 using OGL = MonoMac.OpenGL.GL;
 #endif
-
 
 #if WIN || MAC
 using SDI = System.Drawing.Imaging;
@@ -39,18 +38,57 @@ namespace Lime
 			if (bitmap.PixelFormat == SDI.PixelFormat.Format24bppRgb) {
 				PrepareOpenGLTexture();
 				var data = bitmap.LockBits(lockRect, lockMode, SDI.PixelFormat.Format24bppRgb);
-				OGL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, data.Width, data.Height, 0,
-					PixelFormat.Bgr, PixelType.UnsignedByte, data.Scan0);
+				SwapRedAndGreen24(data);
+				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, data.Width, data.Height, 0,
+					PixelFormat.Rgb, PixelType.UnsignedByte, data.Scan0);
 				bitmap.UnlockBits(data);
 			} else {
 				PrepareOpenGLTexture();
 				var data = bitmap.LockBits(lockRect, lockMode, SDI.PixelFormat.Format32bppPArgb);
-				OGL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width, data.Height, 0,
-					PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
+				SwapRedAndGreen32(data);
+				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width, data.Height, 0,
+					PixelFormat.Rgba, PixelType.UnsignedByte, data.Scan0);
 				bitmap.UnlockBits(data);
 			}
 			Renderer.CheckErrors();
 		}
+
+		private void SwapRedAndGreen24(SDI.BitmapData data)
+		{
+			unsafe {
+				for (int j = 0; j < data.Height; j++) {
+					byte* p = (byte*)data.Scan0 + data.Stride * j;
+					for (int i = 0; i < data.Width; i++) {
+						byte r = *p;
+						byte g = *(p + 1);
+						byte b = *(p + 2);
+						*p++ = b;
+						*p++ = g;
+						*p++ = r;
+					}
+				}
+			}
+		}
+
+		private void SwapRedAndGreen32(SDI.BitmapData data)
+		{
+			unsafe {
+				for (int j = 0; j < data.Height; j++) {
+					byte* p = (byte*)data.Scan0 + data.Stride * j;
+					for (int i = 0; i < data.Width; i++) {
+						byte r = *p;
+						byte g = *(p + 1);
+						byte b = *(p + 2);
+						byte a = *(p + 3);
+						*p++ = b;
+						*p++ = g;
+						*p++ = r;
+						*p++ = a;
+					}
+				}
+			}
+		}
+
 #elif iOS
 		private void InitWithPngOrJpgBitmap(Stream stream)
 		{

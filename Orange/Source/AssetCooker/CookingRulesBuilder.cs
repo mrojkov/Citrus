@@ -17,7 +17,7 @@ namespace Orange
 	public enum DDSFormat
 	{
 		DXTi,
-		ARGB8
+		Uncompressed
 	}
 
 	public struct CookingRules
@@ -90,7 +90,7 @@ namespace Orange
 				case "DXTi":
 					return DDSFormat.DXTi;
 				case "ARGB8":
-					return DDSFormat.ARGB8;
+					return DDSFormat.Uncompressed;
 				default:
 					throw new Lime.Exception("Error parsing DDS format. Must be either DXTi or ARGB8");
 			}

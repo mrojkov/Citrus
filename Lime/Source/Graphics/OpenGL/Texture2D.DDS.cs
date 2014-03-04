@@ -1,12 +1,12 @@
-﻿#if OPENGL || GLES11
+﻿#if OPENGL
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
 #if WIN
+using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
-using OGL = OpenTK.Graphics.OpenGL.GL;
 #elif MAC
 using MonoMac.OpenGL;
 using OGL = MonoMac.OpenGL.GL;
@@ -107,15 +107,15 @@ namespace Lime
 			byte[] buffer = new byte[pitchOrLinearSize * height];
 			reader.Read(buffer, 0, buffer.Length);
 			glCommands += () => {
-				OGL.TexImage2D(TextureTarget.Texture2D, level, PixelInternalFormat.Rgba8, width, height, 0,
-					PixelFormat.Bgra, PixelType.UnsignedByte, buffer);
+				GL.TexImage2D(TextureTarget.Texture2D, level, PixelInternalFormat.Rgba, width, height, 0,
+					PixelFormat.Rgba, PixelType.UnsignedByte, buffer);
 				Renderer.CheckErrors();
 			};
 		}
 
 		private void ReadCompressedImage(ref Action glCommands, BinaryReader reader, int level, int width, int height, UInt32 linearSize, UInt32 pfFourCC)
 		{
-			PixelInternalFormat pif;
+			var pif = PixelInternalFormat.CompressedRgbS3tcDxt1Ext;
 			switch ((DDSFourCC)pfFourCC) {
 				case DDSFourCC.DXT1:
 					pif = PixelInternalFormat.CompressedRgbS3tcDxt1Ext;
@@ -132,7 +132,7 @@ namespace Lime
 			byte[] buffer = new byte[linearSize];
 			reader.Read(buffer, 0, buffer.Length);
 			glCommands += () => {
-				OGL.CompressedTexImage2D(TextureTarget.Texture2D, level, pif, width, height, 0, buffer.Length, buffer);
+				GL.CompressedTexImage2D(TextureTarget.Texture2D, level, pif, width, height, 0, buffer.Length, buffer);
 				Renderer.CheckErrors();
 			};
 		}

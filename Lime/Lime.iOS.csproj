@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\iOS\Debug</OutputPath>
-    <DefineConstants>DEBUG;iOS;GLES11;OPENAL</DefineConstants>
+    <DefineConstants>DEBUG;iOS;OPENGL;OPENAL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>False</ConsolePause>
@@ -32,7 +32,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>False</ConsolePause>
-    <DefineConstants>iOS;GLES11;OPENAL</DefineConstants>
+    <DefineConstants>iOS;OPENGL;OPENAL</DefineConstants>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
@@ -140,7 +140,6 @@
     <Compile Include="Source\Graphics\ITexture.cs" />
     <Compile Include="Source\AssetsBundle\UnityAssetsBundle.cs" />
     <Compile Include="Source\Graphics\Renderer.Common.cs" />
-    <Compile Include="Source\Graphics\OpenGL\OpenGL.cs" />
     <Compile Include="Source\Graphics\OpenGL\RenderTexture.cs" />
     <Compile Include="Source\Graphics\OpenGL\Renderer.cs" />
     <Compile Include="Source\Graphics\OpenGL\Texture2D.DDS.cs" />
@@ -169,6 +168,12 @@
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\GraphicsContext.cs" />
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Factory.iPhone.cs" />
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Utilities.iPhone.cs" />
+    <Compile Include="Source\Application\Debug.cs" />
+    <Compile Include="Source\Graphics\OpenGL\Shader.cs" />
+    <Compile Include="Source\Graphics\OpenGL\ShaderProgram.cs" />
+    <Compile Include="Source\Graphics\OpenGL\Shaders.cs" />
+    <Compile Include="Source\Graphics\OpenGL\XamarinAdapter.cs" />
+    <Compile Include="obj\Debug\.NETFramework,Version=v4.0.AssemblyAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Application\WinCursors.cs">

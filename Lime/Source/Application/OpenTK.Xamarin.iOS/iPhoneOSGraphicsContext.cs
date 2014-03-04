@@ -106,11 +106,6 @@ namespace Lime.Xamarin {
             set {throw new NotSupportedException();}
         }
 
-//        int IGraphicsContext.SwapInterval {
-//            get {throw new NotSupportedException();}
-//            set {throw new NotSupportedException();}
-//        }
-
         public void Update(IWindowInfo window)
         {
             throw new NotSupportedException();
@@ -130,10 +125,6 @@ namespace Lime.Xamarin {
         void IGraphicsContextInternal.LoadAll()
         {
         }
-
-//        void IGraphicsContext.LoadAll ()
-//        {
-//        }
 
         ContextHandle contextHandle;
         ContextHandle IGraphicsContextInternal.Context {

@@ -37,6 +37,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -53,9 +54,12 @@
     <Compile Include="Source\Application\ApplicationToolbox.cs" />
     <Compile Include="Source\Application\Debug.cs" />
     <Compile Include="Source\AssetsBundle\UnityAssetsBundle.cs" />
-    <Compile Include="Source\Graphics\OpenGL\OpenGL.cs" />
+    <Compile Include="Source\Graphics\OpenGL\XamarinAdapter.cs" />
+    <Compile Include="Source\Graphics\OpenGL\Shaders.cs" />
     <Compile Include="Source\Graphics\OpenGL\Renderer.cs" />
     <Compile Include="Source\Graphics\OpenGL\RenderTexture.cs" />
+    <Compile Include="Source\Graphics\OpenGL\Shader.cs" />
+    <Compile Include="Source\Graphics\OpenGL\ShaderProgram.cs" />
     <Compile Include="Source\Graphics\OpenGL\Texture2D.cs" />
     <Compile Include="Source\Graphics\OpenGL\Texture2D.DDS.cs" />
     <Compile Include="Source\Graphics\OpenGL\Texture2D.Png.cs" />
@@ -175,20 +179,28 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\3rdParty\AngleProject\libEGL.dll">
-      <Link>libEGL.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\3rdParty\AngleProject\libGLESv2.dll">
-      <Link>libGLESv2.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">
       <Link>OpenAL32.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\3rdParty\OpenAL\wrap_oal.dll">
       <Link>wrap_oal.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\3rdParty\OpenTK\Dependencies_x86\d3dcompiler_46.dll">
+      <Link>d3dcompiler_46.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\3rdParty\OpenTK\Dependencies_x86\libEGL.dll">
+      <Link>libEGL.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\3rdParty\OpenTK\Dependencies_x86\libGLESv2.dll">
+      <Link>libGLESv2.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\3rdParty\OpenTK\Dependencies_x86\SDL2.dll">
+      <Link>SDL2.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

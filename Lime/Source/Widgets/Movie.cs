@@ -82,9 +82,9 @@ namespace Lime
 
 		public override void Render()
 		{
-			var pam = Renderer.PremulAlphaMode;
+			var pam = Renderer.PremultipliedAlphaMode;
 			try {
-				Renderer.PremulAlphaMode = false;
+				Renderer.PremultipliedAlphaMode = false;
 				Renderer.Blending = Blending.None;
 				Renderer.Blending = GlobalBlending;
 				Renderer.Transform1 = LocalToWorldTransform;
@@ -92,7 +92,7 @@ namespace Lime
 				Renderer.FlushSpriteBatch();
 			} finally {
 				Renderer.Blending = Blending.None;
-				Renderer.PremulAlphaMode = pam;
+				Renderer.PremultipliedAlphaMode = pam;
 			}
 		}
 

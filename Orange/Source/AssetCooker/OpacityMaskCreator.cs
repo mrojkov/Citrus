@@ -13,27 +13,28 @@ namespace Orange
 
 		struct RGBA
 		{
+#pragma warning disable 649
 			public byte R, G, B, A;
 		}
 
-		public static void CreateMask(AssetsBundle assetsBundle, string pngPath, string maskPath)
+		public static void CreateMask(AssetsBundle assetsBundle, string srcPath, string maskPath)
 		{
-			int width, height;
-			bool hasAlpha;
-			if (!TextureConverterUtils.GetPngFileInfo(pngPath, out width, out height, out hasAlpha)) {
-				throw new Lime.Exception("Wrong png file: " + pngPath);
+			using (var pixbuf = new Gdk.Pixbuf(srcPath)) {
+				CreateMask(assetsBundle, pixbuf, maskPath);
 			}
-			if (!hasAlpha) {
+		}
+
+		public static void CreateMask(AssetsBundle assetsBundle, Gdk.Pixbuf pixbuf, string maskPath)
+		{
+			if (!pixbuf.HasAlpha) {
 				return;
 			}
-			using (var pixbuf = new Gdk.Pixbuf(pngPath)) {
-				int newWidth = Math.Max(pixbuf.Width / 2, 1);
-				int newHeight = Math.Max(pixbuf.Height / 2, 1);
-				using (var pixbufDownscaled = pixbuf.ScaleSimple(newWidth, newHeight, Gdk.InterpType.Bilinear)) {
-					bool bundled = assetsBundle.FileExists(maskPath);
-					Console.WriteLine((bundled ? "* " : "+ ") + maskPath);
-					WriteMask(assetsBundle, maskPath, pixbufDownscaled);
-				}
+			int newWidth = Math.Max(pixbuf.Width / 2, 1);
+			int newHeight = Math.Max(pixbuf.Height / 2, 1);
+			using (var pixbufDownscaled = pixbuf.ScaleSimple(newWidth, newHeight, Gdk.InterpType.Bilinear)) {
+				bool bundled = assetsBundle.FileExists(maskPath);
+				Console.WriteLine((bundled ? "* " : "+ ") + maskPath);
+				WriteMask(assetsBundle, maskPath, pixbufDownscaled);
 			}
 		}
 

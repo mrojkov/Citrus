@@ -8,7 +8,6 @@ using MonoTouch.ObjCRuntime;
 using MonoTouch.OpenGLES;
 using MonoTouch.UIKit;
 using System.Collections.Generic;
-using OpenTK.Graphics.ES11;
 
 namespace Lime
 {

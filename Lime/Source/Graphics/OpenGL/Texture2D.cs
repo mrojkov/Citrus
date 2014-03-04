@@ -1,16 +1,14 @@
-#if OPENGL || GLES11
+#if OPENGL
 using System;
 using System.IO;
 using System.Collections.Generic;
 #if iOS
-using OpenTK.Graphics.ES11;
+using OpenTK.Graphics.ES20;
 #elif MAC
 using MonoMac.OpenGL;
-using OGL = MonoMac.OpenGL.GL;
 #elif WIN
+using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
-using OGL = OpenTK.Graphics.OpenGL.GL;
-// using System.ComponentModel;
 #endif
 
 namespace Lime
@@ -20,7 +18,7 @@ namespace Lime
 	/// </summary>
 	public partial class Texture2D : ITexture
 	{
-		uint id;
+		uint handle;
 		public OpacityMask OpacityMask { get; private set; }
 		public Size ImageSize { get; protected set; }
 		public Size SurfaceSize { get; protected set; }
@@ -34,11 +32,7 @@ namespace Lime
 				if (TexturesToDelete.Count > 0) {
 					var ids = new uint[TexturesToDelete.Count];
 					TexturesToDelete.CopyTo(ids);
-#if GLES11
 					GL.DeleteTextures(ids.Length, ids);
-#elif OPENGL
-					OGL.DeleteTextures(ids.Length, ids);
-#endif
 					TexturesToDelete.Clear();
 					Renderer.CheckErrors();
 				}
@@ -115,31 +109,18 @@ namespace Lime
 		private void PrepareOpenGLTexture()
 		{
 			DeleteScheduledTextures();
-#if GLES11
 			// Generate a new texture.
-			GL.Enable(All.Texture2D);
-			if (id == 0) {
-				GL.GenTextures(1, ref id);
+			if (handle == 0) {
+				var t = new int[1];
+				GL.GenTextures(1, t);
+				handle = (uint)t[0];
 			}
-			Renderer.SetTexture(id, 0);
-			GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)All.Linear);
-			GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
-			GL.TexParameter(All.Texture2D, All.TextureWrapS, (int)All.ClampToEdge);
-			GL.TexParameter(All.Texture2D, All.TextureWrapT, (int)All.ClampToEdge);
-			GL.Hint(All.PerspectiveCorrectionHint, All.Fastest);
+			Renderer.SetTexture(handle, 0);
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)All.ClampToEdge);
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)All.ClampToEdge);
 			Renderer.CheckErrors();
-#elif OPENGL
-			// Generate a new texture
-			if (id == 0) {
-				id = (uint)OGL.GenTexture();
-			}
-			Renderer.SetTexture(id, 0);
-			OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-			OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-			OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureParameterName.ClampToEdge);
-			OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureParameterName.ClampToEdge);
-			OGL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Fastest);
-#endif
 		}
 
 		/// <summary>
@@ -149,17 +130,12 @@ namespace Lime
 		{
 			Application.InvokeOnMainThread(() => {
 				PrepareOpenGLTexture();
-#if GLES11
-				GL.TexImage2D(All.Texture2D, 0, (int)All.Rgba, width, height, 0,
-					All.Rgba, All.UnsignedByte, pixels);
-#elif OPENGL
-				OGL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0,
-					PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
+				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
 				if (generateMips) {
-					throw new NotImplementedException("MipMap generation is not implemented yet");
-					// OGL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
-				}
+#if !MAC && !iOS
+					GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 #endif
+				}
 				Renderer.CheckErrors();
 			});
 
@@ -175,13 +151,8 @@ namespace Lime
 		{
 			Application.InvokeOnMainThread(() => {
 				PrepareOpenGLTexture();
-#if GLES11
-				GL.TexSubImage2D(All.Texture2D, 0, x, y, width, height,
-					All.Rgba, All.UnsignedByte, pixels);
-#elif OPENGL
-				OGL.TexSubImage2D(TextureTarget.Texture2D, 0, x, y, width, height, 
+				GL.TexSubImage2D(TextureTarget.Texture2D, 0, x, y, width, height,
 					PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
-#endif
 				Renderer.CheckErrors();
 			});
 		}
@@ -198,11 +169,11 @@ namespace Lime
 
 		protected void DisposeOpenGLTexture()
 		{
-			if (id != 0) {
+			if (handle != 0) {
 				lock (TexturesToDelete) {
-					TexturesToDelete.Add(id);
+					TexturesToDelete.Add(handle);
 				}
-				id = 0;
+				handle = 0;
 			}
 		}
 
@@ -212,7 +183,7 @@ namespace Lime
 		/// <returns></returns>
 		public uint GetHandle()
 		{
-			return id;
+			return handle;
 		}
 
 		/// <summary>

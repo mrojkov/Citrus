@@ -2,18 +2,24 @@
 using System;
 using OpenTK;
 using OpenTK.Input;
+using OpenTK.Graphics;
+using OpenTK.Graphics.ES20;
 
 namespace Lime
 {
 	public class GameView : OpenTK.GameWindow
 	{
+		private Application app;
+
 		public static GameView Instance;
-		Application app;
+		public bool ES20 { get; private set; }
 		public bool PowerSaveMode { get; set; }
 		internal static event Action DidUpdated;
 
 		public GameView(Application app, string[] args = null)
-			: base(640, 480, new OpenTK.Graphics.GraphicsMode(32, 0, 0, 1))
+			: base(800, 600, GraphicsMode.Default, 
+			"Citrus", GameWindowFlags.Default, DisplayDevice.Default,
+			2, 0, GetGraphicContextFlags(args))
 		{
 			Instance = this;
 			this.app = app;
@@ -29,6 +35,12 @@ namespace Lime
 			this.Mouse.WheelChanged += HandleMouseWheel;
 			SetupWindowLocationAndSize(args);
 			PowerSaveMode = CheckPowerSaveFlag(args);
+			ES20 = CheckES20Flag(args);
+		}
+
+		private static GraphicsContextFlags GetGraphicContextFlags(string[] args)
+		{
+			return CheckES20Flag(args) ? GraphicsContextFlags.Embedded : GraphicsContextFlags.Default;
 		}
 
 		private void SetupWindowLocationAndSize(string[] args)
@@ -50,6 +62,11 @@ namespace Lime
 		private static bool CheckMaximizedFlag(string[] args)
 		{
 			return args != null && Array.IndexOf(args, "--Maximized") >= 0;
+		}
+
+		private static bool CheckES20Flag(string[] args)
+		{
+			return args != null && Array.IndexOf(args, "--ES20") >= 0;
 		}
 
 		private static bool CheckPowerSaveFlag(string[] args)

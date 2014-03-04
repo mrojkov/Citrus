@@ -1,22 +1,22 @@
-using System.Collections.Generic;
-#if OPENGL || GLES11
+#if OPENGL
 using System;
 using System.Diagnostics;
 #if iOS
 using OpenTK.Graphics.ES20;
 #elif MAC
 using MonoMac.OpenGL;
-using OGL = MonoMac.OpenGL.GL;
+using MonoMac.OpenGL;
 #elif WIN
+using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
-using OGL = OpenTK.Graphics.OpenGL.GL;
 #endif
+using System.Collections.Generic;
 
 namespace Lime
 {
 	public class RenderTexture : ITexture, IDisposable
 	{
-		uint id;
+		uint handle;
 		readonly int framebuffer;
 		readonly Size size = new Size(0, 0);
 		readonly Rectangle uvRect;
@@ -27,36 +27,22 @@ namespace Lime
 			size.Width = width;
 			size.Height = height;
 			uvRect = new Rectangle(0, 0, 1, 1);
-#if GLES11
-			int defaultFramebuffer = 0;
-			GL.GetInteger(All.FramebufferBinding, ref defaultFramebuffer);
-			GL.GenFramebuffers(1, ref framebuffer);
-			GL.GenTextures(1, ref id);
-			GL.BindTexture(All.Texture2D, id);
-			GL.TexParameter(All.Texture2D, All.TextureMinFilter, (int)All.Linear);
-			GL.TexParameter(All.Texture2D, All.TextureMagFilter, (int)All.Linear);
-			GL.TexImage2D(All.Texture2D, 0, (int)All.Rgba, width, height, 0,
-				All.Bgra, All.UnsignedByte, (IntPtr)null);
-			GL.BindFramebuffer(All.Framebuffer, framebuffer);
-			GL.FramebufferTexture2D(All.Framebuffer, All.ColorAttachment0, All.Texture2D, id, 0);
-			if (GL.CheckFramebufferStatus(All.Framebuffer) != All.FramebufferComplete)
+			var t = new int[1];
+			GL.GenFramebuffers(1, t);
+			framebuffer = t[0];
+			GL.GenTextures(1, t);
+			handle = (uint)t[0];
+			GL.BindTexture(TextureTarget.Texture2D, handle);
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
+			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
+			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0,
+				PixelFormat.Rgba, PixelType.UnsignedByte, (IntPtr)null);
+			GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer);
+			Renderer.CheckErrors();
+			GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, handle, 0);
+			if ((int)GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != (int)FramebufferErrorCode.FramebufferComplete)
 				throw new Exception("Failed to create render texture. Framebuffer is incomplete.");
-			GL.BindFramebuffer(All.Framebuffer, defaultFramebuffer);
-#elif OPENGL
-			OGL.GenFramebuffers(1, out framebuffer);
-			id = (uint)OGL.GenTexture();
-			OGL.BindTexture(TextureTarget.Texture2D, id);
-			OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-			OGL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-			OGL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Fastest);
-			OGL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0,
-				PixelFormat.Bgra, PixelType.UnsignedByte, (IntPtr)null);
-			OGL.BindFramebuffer(FramebufferTarget.FramebufferExt, framebuffer);
-			OGL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0Ext, TextureTarget.Texture2D, id, 0);
-			if (OGL.CheckFramebufferStatus(FramebufferTarget.FramebufferExt) != FramebufferErrorCode.FramebufferCompleteExt)
-				throw new Exception("Failed to create render texture. Framebuffer is incomplete.");
-			OGL.BindFramebuffer(FramebufferTarget.FramebufferExt, 0);
-#endif
+			GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
 			Renderer.CheckErrors();
 		}
 
@@ -78,11 +64,11 @@ namespace Lime
 		
 		public void Dispose()
 		{
-			if (id != 0) {
+			if (handle != 0) {
 				lock (Texture2D.TexturesToDelete) {
-					Texture2D.TexturesToDelete.Add(id);
+					Texture2D.TexturesToDelete.Add(handle);
 				}
-				id = 0;
+				handle = 0;
 			}
 		}
 
@@ -93,7 +79,7 @@ namespace Lime
 
 		public uint GetHandle()
 		{
-			return id;
+			return handle;
 		}
 
 		public bool IsStubTexture { get { return false; } }
@@ -117,11 +103,7 @@ namespace Lime
 
 		private static void BindFramebuffer(int framebuffer)
 		{
-#if GLES11
-			GL.BindFramebuffer(All.Framebuffer, framebuffer);
-#elif OPENGL
-			OGL.BindFramebuffer(FramebufferTarget.FramebufferExt, framebuffer);
-#endif
+			GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer);
 		}
 
 		public void RestoreRenderTarget()

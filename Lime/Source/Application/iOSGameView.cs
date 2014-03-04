@@ -1,9 +1,6 @@
 #if iOS
 using System;
 using OpenTK;
-using OpenTK.Graphics.ES11;
-using GL1 = OpenTK.Graphics.ES11.GL;
-//using All1 = OpenTK.Graphics.ES11.All;
 using OpenTK.Platform.iPhoneOS;
 using System.Drawing;
 using MonoTouch.Foundation;
@@ -51,7 +48,7 @@ namespace Lime
 		public override void LayoutSubviews()
 		{
 			if (backgroundContext == null) {
-				backgroundContext = Lime.Xamarin.Utilities.CreateGraphicsContext(EAGLRenderingAPI.OpenGLES1);
+				backgroundContext = Lime.Xamarin.Utilities.CreateGraphicsContext(EAGLRenderingAPI.OpenGLES2);
 			}
 			RefreshWindowSize();
 			base.LayoutSubviews();
@@ -168,7 +165,7 @@ namespace Lime
 
 		protected override void CreateFrameBuffer()
 		{
-			ContextRenderingApi = EAGLRenderingAPI.OpenGLES1;
+			ContextRenderingApi = EAGLRenderingAPI.OpenGLES2;
 			base.CreateFrameBuffer();	
 		}
 
