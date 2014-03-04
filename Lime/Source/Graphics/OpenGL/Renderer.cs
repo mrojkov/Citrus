@@ -108,13 +108,19 @@ namespace Lime
 				int numTextures = textures[1] != 0 ? 2 : (textures[0] != 0 ? 1 : 0);
 				var currentProgram = ShaderPrograms.GetShaderProgram(blending, numTextures);
 				currentProgram.Use();
-				var matrix = projectionStack.Peek().ToFloatArray();
-				GL.UniformMatrix4(currentProgram.ProjectionMatrixUniformId, 1, false, matrix);
+				LoadProjectionMatrix(currentProgram);
 				GL.DrawElements(PrimitiveType.Triangles, currentIndex, DrawElementsType.UnsignedShort, (IntPtr)batchIndices);
 				CheckErrors();
 				currentIndex = currentVertex = 0;
 				DrawCalls++;
 			}
+		}
+
+		private static void LoadProjectionMatrix(ShaderProgram currentProgram)
+		{
+			var matrix = projectionStack.Peek();
+			float* p = (float*)&matrix;
+			GL.UniformMatrix4(currentProgram.ProjectionMatrixUniformId, 1, false, p);
 		}
 
 		public static int GetCurrentFramebuffer()
