@@ -110,7 +110,7 @@ namespace Lime
 				currentProgram.Use();
 				var matrix = projectionStack.Peek().ToFloatArray();
 				GL.UniformMatrix4(currentProgram.ProjectionMatrixUniformId, 1, false, matrix);
-				GL.DrawElements(BeginMode.Triangles, currentIndex, DrawElementsType.UnsignedShort, (IntPtr)batchIndices);
+				GL.DrawElements(PrimitiveType.Triangles, currentIndex, DrawElementsType.UnsignedShort, (IntPtr)batchIndices);
 				CheckErrors();
 				currentIndex = currentVertex = 0;
 				DrawCalls++;

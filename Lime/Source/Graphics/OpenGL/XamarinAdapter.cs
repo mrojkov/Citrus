@@ -13,7 +13,7 @@ namespace Lime
 		public const All UnsignedByte = All.UnsignedByte;
 	}
 
-	static class BeginMode
+	static class PrimitiveType
 	{
 		public const All Triangles = All.Triangles;
 	}
@@ -128,13 +128,9 @@ namespace Lime
 	static class GetProgramParameterName
 	{
 		public const All LinkStatus = All.LinkStatus;
-	}
-		
-	static class ProgramParameter
-	{
 		public const All InfoLogLength = All.InfoLogLength;
 	}
-
+		
 	static class ErrorCode
 	{
 		public const All NoError = All.NoError;

@@ -24,17 +24,24 @@ namespace Lime
 			var result = new int[1];
 			GL.GetShader(handle, ShaderParameter.CompileStatus, result);
 			if (result[0] == 0) {
-				var logLength = new int[1];
-				GL.GetShader(handle, ShaderParameter.InfoLogLength, logLength);
-				if (logLength[0] > 0) {
-					var infoLog = new System.Text.StringBuilder(logLength[0]);
-					unsafe {
-						GL.GetShaderInfoLog(handle, logLength[0], (int*)null, infoLog);
-					}
-					Logger.Write("Shader compile log:\n{0}", infoLog);
-					throw new Lime.Exception(infoLog.ToString());
-				}
+				var infoLog = GetCompileLog();
+				Logger.Write("Shader compile log:\n{0}", infoLog);
+				throw new Lime.Exception(infoLog);
 			}
+		}
+
+		private string GetCompileLog()
+		{
+			var logLength = new int[1];
+			GL.GetShader(handle, ShaderParameter.InfoLogLength, logLength);
+			if (logLength[0] > 0) {
+				var infoLog = new System.Text.StringBuilder(logLength[0]);
+				unsafe {
+					GL.GetShaderInfoLog(handle, logLength[0], (int*)null, infoLog);
+				}
+				return infoLog.ToString();
+			}
+			return "";
 		}
 
 		private static string ReplacePrecisionModifiers(string source)
