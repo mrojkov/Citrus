@@ -97,7 +97,7 @@ namespace Lime
 		private bool looping;
 		private float fadeVolume;
 		private float fadeSpeed;
-		private int lastBumpedRenderCycle;
+		private volatile int lastBumpedRenderCycle;
 		private List<int> allBuffers;
 		private Stack<int> processedBuffers;
 
@@ -194,6 +194,7 @@ namespace Lime
 
 		public void Resume(float fadeinTime = 0)
 		{
+			Bump();
 			if (decoder == null) {
 				throw new InvalidOperationException("Audio decoder is not set");
 			}
