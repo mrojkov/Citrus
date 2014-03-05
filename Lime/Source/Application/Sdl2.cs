@@ -13,6 +13,10 @@ namespace Lime
 		const string lib = "SDL2.dll";
 
 		[SuppressUnmanagedCodeSecurity]
+		[DllImport(lib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_ShowSimpleMessageBox")]
+		public static extern IntPtr ShowSimpleMessageBox(uint flags, string title, string message, IntPtr window);
+
+		[SuppressUnmanagedCodeSecurity]
 		[DllImport(lib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_CreateColorCursor")]
 		public static extern IntPtr CreateColorCursor(IntPtr surface, int hotX, int hotY);
 

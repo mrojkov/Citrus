@@ -90,9 +90,8 @@ namespace Lime
 					GameView.Instance.FullScreen = false;
 					title = GameView.Instance.Title;
 				}
-				// XXX
-				//WinApi.MessageBox(IntPtr.Zero, e.ExceptionObject.ToString(), 
-				//	string.Format("{0} has terminated with an error", title), 0);
+				WinApi.MessageBox((IntPtr)null, e.ExceptionObject.ToString(), 
+					string.Format("{0} has terminated with an error", title), 0);
 #endif
 			};
 		}
@@ -121,9 +120,6 @@ namespace Lime
 				action();
 				return;
 			}
-//#if UNITY
-//			throw new NotImplementedException();
-//#else
 			// Now we use unified way on iOS and PC platform
 			lock (scheduledActionsSync) {
 				scheduledActions += action;
