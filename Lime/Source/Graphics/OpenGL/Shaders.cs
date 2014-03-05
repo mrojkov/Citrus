@@ -25,8 +25,8 @@ namespace Lime
 			"attribute vec4 inPos;			" +	
 			"attribute vec4 inColor;		" +
 			"attribute vec2 inTexCoords1;	" + 
-			"varying {lowp} vec4 color;			" +
-			"varying {lowp} vec2 texCoords;		" +
+			"varying {lowp} vec4 color;		" +
+			"varying {lowp} vec2 texCoords;	" +
 			"uniform mat4 matProjection;	" +
 			"void main()					" +
 			"{											" +

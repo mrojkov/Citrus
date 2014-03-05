@@ -188,6 +188,8 @@ namespace Lime
 			SwapBuffers();
 		}
 
+		bool b = false;
+
 		private void Update(float delta)
 		{
 			Input.ProcessPendingKeyEvents();

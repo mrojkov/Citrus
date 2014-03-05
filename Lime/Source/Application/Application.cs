@@ -90,8 +90,9 @@ namespace Lime
 					GameView.Instance.FullScreen = false;
 					title = GameView.Instance.Title;
 				}
-				WinApi.MessageBox(IntPtr.Zero, e.ExceptionObject.ToString(), 
-					string.Format("{0} has terminated with an error", title), 0);
+				// XXX
+				//WinApi.MessageBox(IntPtr.Zero, e.ExceptionObject.ToString(), 
+				//	string.Format("{0} has terminated with an error", title), 0);
 #endif
 			};
 		}
@@ -256,7 +257,7 @@ namespace Lime
 		public void SetCursor(string name, IntVector2 hotSpot)
 		{
 #if WIN
-			WinCursors.SetCursor(name, hotSpot);
+			Cursors.SetCursor(name, hotSpot);
 #endif
 		}
 	}

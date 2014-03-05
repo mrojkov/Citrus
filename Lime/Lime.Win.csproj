@@ -78,8 +78,7 @@
     <Compile Include="Source\NumericExtensions.cs" />
     <Compile Include="Source\Application\Application.cs" />
     <Compile Include="Source\Application\Logger.cs" />
-    <Compile Include="Source\Application\WinApi.cs" />
-    <Compile Include="Source\Application\WinCursors.cs" />
+    <Compile Include="Source\Application\Cursors.cs" />
     <Compile Include="Source\AssetsBundle\AssetsBundle.cs" />
     <Compile Include="Source\Audio\OggDecoder.cs" />
     <Compile Include="Source\Audio\AudioCache.cs" />
@@ -203,6 +202,7 @@
       <Link>SDL2.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Compile Include="Source\Application\Sdl2.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Widgets\Widget.Debugging.cs" />
