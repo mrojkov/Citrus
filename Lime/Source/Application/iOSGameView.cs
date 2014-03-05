@@ -26,6 +26,8 @@ namespace Lime
 			}
 		}
 
+		public readonly RenderingApi RenderingApi = RenderingApi.ES20;
+
 		internal static event Action DidUpdated;
 
 		public static GameView Instance;

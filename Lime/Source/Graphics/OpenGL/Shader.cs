@@ -46,15 +46,11 @@ namespace Lime
 
 		private static string ReplacePrecisionModifiers(string source)
 		{
-#if WIN
-			bool embedded = GameView.Instance.ES20;
-#elif iOS
-			bool embedded = true;
-#elif MAC
-			bool embedded = false;
-#endif
-			source = source.Replace("{lowp}", embedded ? "lowp" : "");
-			source = source.Replace("{highp}", embedded ? "highp" : "");
+			if (GameView.Instance.RenderingApi == RenderingApi.OpenGL) {
+				source = source.Replace(" lowp ", " ");
+				source = source.Replace(" mediump ", " ");
+				source = source.Replace(" highp ", " ");
+			}
 			return source;
 		}
 

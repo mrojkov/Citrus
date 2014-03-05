@@ -12,7 +12,8 @@ namespace Lime
 		private Application app;
 
 		public static GameView Instance;
-		public bool ES20 { get; private set; }
+		// Indicates whether the game uses OpenGL or OpenGL ES 2.0
+		public RenderingApi RenderingApi { get; private set; }
 		public bool PowerSaveMode { get; set; }
 		internal static event Action DidUpdated;
 
@@ -35,12 +36,13 @@ namespace Lime
 			this.Mouse.WheelChanged += HandleMouseWheel;
 			SetupWindowLocationAndSize(args);
 			PowerSaveMode = CheckPowerSaveFlag(args);
-			ES20 = CheckES20Flag(args);
+			RenderingApi = GetRenderingApi(args);
 		}
 
 		private static GraphicsContextFlags GetGraphicContextFlags(string[] args)
 		{
-			return CheckES20Flag(args) ? GraphicsContextFlags.Embedded : GraphicsContextFlags.Default;
+			return GetRenderingApi(args) == RenderingApi.OpenGL ? 
+				GraphicsContextFlags.Default : GraphicsContextFlags.Embedded;
 		}
 
 		private void SetupWindowLocationAndSize(string[] args)
@@ -64,9 +66,10 @@ namespace Lime
 			return args != null && Array.IndexOf(args, "--Maximized") >= 0;
 		}
 
-		private static bool CheckES20Flag(string[] args)
+		private static RenderingApi GetRenderingApi(string[] args)
 		{
-			return args != null && Array.IndexOf(args, "--ES20") >= 0;
+			bool openGL = args != null && Array.IndexOf(args, "--OpenGL") >= 0;
+			return openGL ? RenderingApi.OpenGL : RenderingApi.ES20;
 		}
 
 		private static bool CheckPowerSaveFlag(string[] args)
@@ -187,8 +190,6 @@ namespace Lime
 			app.OnRenderFrame();
 			SwapBuffers();
 		}
-
-		bool b = false;
 
 		private void Update(float delta)
 		{

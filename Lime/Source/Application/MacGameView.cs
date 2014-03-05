@@ -12,6 +12,8 @@ namespace Lime
 		public static GameView Instance;
 		internal static Action DidUpdated;
 
+		public readonly RenderingApi RenderingApi = RenderingApi.OpenGL;
+
 		public GameView(RectangleF frame, NSOpenGLContext context) : base(frame, context)
 		{
 			Instance = this;

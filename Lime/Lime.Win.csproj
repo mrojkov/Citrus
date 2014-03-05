@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="Source\Application\ApplicationToolbox.cs" />
     <Compile Include="Source\Application\Debug.cs" />
+    <Compile Include="Source\Application\RenderingApi.cs" />
     <Compile Include="Source\Application\WinApi.cs" />
     <Compile Include="Source\AssetsBundle\UnityAssetsBundle.cs" />
     <Compile Include="Source\Graphics\OpenGL\XamarinAdapter.cs" />

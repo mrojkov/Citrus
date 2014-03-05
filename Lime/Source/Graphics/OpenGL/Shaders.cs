@@ -25,8 +25,8 @@ namespace Lime
 			"attribute vec4 inPos;			" +	
 			"attribute vec4 inColor;		" +
 			"attribute vec2 inTexCoords1;	" + 
-			"varying {lowp} vec4 color;		" +
-			"varying {lowp} vec2 texCoords;	" +
+			"varying lowp vec4 color;		" +
+			"varying lowp vec2 texCoords;	" +
 			"uniform mat4 matProjection;	" +
 			"void main()					" +
 			"{											" +
@@ -41,9 +41,9 @@ namespace Lime
 			"attribute vec4 inColor;		" +
 			"attribute vec2 inTexCoords1;	" +
 			"attribute vec2 inTexCoords2;	" +
-			"varying {lowp} vec4 color;		" +
-			"varying {lowp} vec2 texCoords1;" +
-			"varying {lowp} vec2 texCoords2;" +
+			"varying lowp vec4 color;		" +
+			"varying lowp vec2 texCoords1;" +
+			"varying lowp vec2 texCoords2;" +
 			"uniform mat4 matProjection;	" +
 			"void main()					" +
 			"{											" +
@@ -55,7 +55,7 @@ namespace Lime
 		);
 
 		static readonly Shader colorOnlyFragmentShader = new FragmentShader(
-			"varying {lowp} vec4 color;		" +
+			"varying lowp vec4 color;		" +
 			"void main()					" +
 			"{								" +
 			"	gl_FragColor = color;		" +
@@ -63,9 +63,9 @@ namespace Lime
 		);
 
 		static readonly Shader oneTextureFragmentShader = new FragmentShader(
-			"varying {lowp} vec4 color;		" +
-			"varying {lowp} vec2 texCoords;	" +
-			"uniform {lowp} sampler2D tex1;	" +
+			"varying lowp vec4 color;		" +
+			"varying lowp vec2 texCoords;	" +
+			"uniform lowp sampler2D tex1;	" +
 			"void main()					" +
 			"{								" +
 			"	gl_FragColor = color * texture2D(tex1, texCoords); " +
@@ -73,11 +73,11 @@ namespace Lime
 		);
 
 		static readonly Shader twoTexturesFragmentShader = new FragmentShader(
-			"varying {lowp} vec4 color;		" +
-			"varying {lowp} vec2 texCoords1;" +
-			"varying {lowp} vec2 texCoords2;" +
-			"uniform {lowp} sampler2D tex1;	" +
-			"uniform {lowp} sampler2D tex2;	" +
+			"varying lowp vec4 color;		" +
+			"varying lowp vec2 texCoords1;" +
+			"varying lowp vec2 texCoords2;" +
+			"uniform lowp sampler2D tex1;	" +
+			"uniform lowp sampler2D tex2;	" +
 			"void main()					" +
 			"{								" +
 			"	gl_FragColor = color * texture2D(tex1, texCoords1) * texture2D(tex2, texCoords2); " +
@@ -85,9 +85,9 @@ namespace Lime
 		);
 
 		static readonly Shader silhouetteFragmentShader = new FragmentShader(
-			"varying {lowp} vec4 color;		" +
-			"varying {lowp} vec2 texCoords;	" +
-			"uniform {lowp} sampler2D tex;	" +
+			"varying lowp vec4 color;		" +
+			"varying lowp vec2 texCoords;	" +
+			"uniform lowp sampler2D tex;	" +
 			"void main()					" +
 			"{								" +
 			"	gl_FragColor = vec4(color.rgb, color.a * texture2D(tex, texCoords).a);	" +
