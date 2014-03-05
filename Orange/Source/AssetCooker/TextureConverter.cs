@@ -89,6 +89,9 @@ namespace Orange
 			bool compressed = format == DDSFormat.DXTi;
 			if (pixbuf.HasAlpha) {
 				TextureConverterUtils.PremultiplyAlpha(pixbuf, swapChannels: compressed);
+			} else if (compressed) {
+				// DXT1
+				TextureConverterUtils.SwapRGBChannels(pixbuf);
 			}
 			string tga = Path.ChangeExtension(dstPath, ".tga");
 			try {
