@@ -42,7 +42,7 @@ namespace Lime
 		private static GraphicsContextFlags GetGraphicContextFlags(string[] args)
 		{
 			return GetRenderingApi(args) == RenderingApi.OpenGL ? 
-				GraphicsContextFlags.Default : GraphicsContextFlags.Embedded;
+				 GraphicsContextFlags.Default : GraphicsContextFlags.Embedded;
 		}
 
 		private void SetupWindowLocationAndSize(string[] args)
@@ -68,8 +68,11 @@ namespace Lime
 
 		private static RenderingApi GetRenderingApi(string[] args)
 		{
-			bool openGL = args != null && Array.IndexOf(args, "--OpenGL") >= 0;
-			return openGL ? RenderingApi.OpenGL : RenderingApi.ES20;
+			// XXX
+			// Temporary disable ES2.0 backend until SDL2.0.2 get released
+			return RenderingApi.OpenGL;
+			//bool openGL = args != null && Array.IndexOf(args, "--OpenGL") >= 0;
+			//return openGL ? RenderingApi.OpenGL : RenderingApi.ES20;
 		}
 
 		private static bool CheckPowerSaveFlag(string[] args)
