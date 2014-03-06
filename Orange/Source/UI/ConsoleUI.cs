@@ -112,6 +112,21 @@ namespace Orange
 			return false;
 		}
 
+		public override bool AskChoice(string text, out bool yes)
+		{
+			Console.WriteLine(text + " (Y/N/C)");
+			var ch = Console.Read();
+			if (ch == 'Y' || ch == 'y') {
+				yes = true;
+				return true;
+			}
+			yes = false;
+			if (ch == 'N' || ch == 'n') {
+				return true;
+			}
+			return false;
+		}
+
 		public override TargetPlatform GetActivePlatform()
 		{
 			var platform = Toolbox.GetCommandLineArg("--platform");

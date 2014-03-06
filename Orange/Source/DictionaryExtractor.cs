@@ -16,7 +16,7 @@ namespace Orange
 			TagUntaggedStrings
 		}
 
-		public void ExtractDictionary()
+		public void ExtractDictionary(bool extractTextWithoutBrackets)
 		{
 			const string dictionary = "Dictionary.txt";
 			Localization.Dictionary.Clear();
@@ -45,7 +45,9 @@ namespace Orange
 						// Сначала прогоним все строки вида: "[]blah-blah.."
 						ProcessSourceFile(fileInfo.Path, (Pass)pass);
 						// Затем прогоним все строки вида: Text "blah-blah.."
-						ProcessSceneFile(fileInfo.Path, (Pass)pass);
+						if (extractTextWithoutBrackets) {
+							ProcessSceneFile(fileInfo.Path, (Pass)pass);
+						}
 					}
 				}
 			}

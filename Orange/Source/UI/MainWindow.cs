@@ -87,6 +87,23 @@ namespace Orange
 			return result == (int)Gtk.ResponseType.Yes;
 		}
 
+		public override bool AskChoice(string text, out bool yes)
+		{
+			var dialog = new Gtk.Dialog("Orange", NativeWindow, Gtk.DialogFlags.Modal,
+				Gtk.Stock.Yes, Gtk.ResponseType.Yes,
+				Gtk.Stock.No, Gtk.ResponseType.No,
+				Gtk.Stock.Cancel, Gtk.ResponseType.Cancel);
+			var label = new Gtk.Label(text);
+			label.Justify = Gtk.Justification.Center;
+			label.SetPadding(50, 30);
+			dialog.VBox.Add(label);
+			dialog.ShowAll();
+			int result = dialog.Run();
+			dialog.Destroy();
+			yes = (result == (int)Gtk.ResponseType.Yes);
+			return (result == (int)Gtk.ResponseType.Yes) || (result == (int)Gtk.ResponseType.No);
+		}
+
 		public override void RefreshMenu()
 		{
 			var picker = ActionPicker;

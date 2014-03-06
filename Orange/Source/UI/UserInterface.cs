@@ -31,6 +31,8 @@ namespace Orange
 
 		public abstract bool AskConfirmation(string text);
 
+		public abstract bool AskChoice(string text, out bool yes);
+
 		public abstract TargetPlatform GetActivePlatform();
 
 		public virtual void ProcessPendingEvents() { }
