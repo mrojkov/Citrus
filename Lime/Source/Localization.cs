@@ -23,6 +23,26 @@ namespace Lime
 			return strings.TryGetValue(tag, out value);
 		}
 
+		public int GenerateTag()
+		{
+			string s;
+			for (int tag = 1; ; tag++) {
+				if (!TryGetString(tag, out s))
+					return tag;
+			}
+		}
+
+		// Сначала пытается поискать value в словаре, и если оно там есть, то возвращает имеющийся ключ
+		public int GenerateTagForValue(string value)
+		{
+			foreach (var pair in strings) {
+				if (pair.Value == value) {
+					return pair.Key;
+				}
+			}
+			return GenerateTag();
+		}
+
 		public void ReadFromStream(Stream stream)
 		{
 			using (var r = new StreamReader(stream)) {

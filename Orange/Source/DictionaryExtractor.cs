@@ -111,14 +111,14 @@ namespace Orange
 					return str;
 				} else {
 					// case of "[]..."
-					int tag = GenerateTag();
 					string value = match.Groups[2].Value;
+					int tag = Localization.Dictionary.GenerateTagForValue(ReplaceNewlines(value));
 					Localization.Dictionary.Add(tag, ReplaceNewlines(value));
 					str = string.Format("[{0}]{1}", tag, value);
 					return str;
 				}
 			} else {
-				int tag = GenerateTag();
+				int tag = Localization.Dictionary.GenerateTagForValue(ReplaceNewlines(str));
 				Localization.Dictionary.Add(tag, ReplaceNewlines(str));
 				str = string.Format("[{0}]{1}", tag, str);
 				return str;
@@ -128,15 +128,6 @@ namespace Orange
 		string ReplaceNewlines(string s)
 		{
 			return s.Replace("\\n", "\n");
-		}
-
-		int GenerateTag()
-		{
-			string s;
-			for (int tag = 1; ; tag++) {
-				if (!Localization.Dictionary.TryGetString(tag, out s))
-					return tag;
-			}
 		}
 
 		static string EscapeQuotes(string str)
