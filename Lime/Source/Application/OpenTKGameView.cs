@@ -87,6 +87,11 @@ namespace Lime
 
 		void HandleKeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
 		{
+			// XXX
+			// SDL backend bug: OpenTK doesn't send key press event for backspace
+			if (e.Key == OpenTK.Input.Key.BackSpace) {
+				Input.TextInput += '\b';
+			}
 			Input.SetKeyState((Key)e.Key, true);
 		}
 
