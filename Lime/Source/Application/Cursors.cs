@@ -13,8 +13,11 @@ namespace Lime
 
 		public static void SetCursor(string resourceName, IntVector2 hotSpot)
 		{
-			currentCursor = GetCursor(resourceName, hotSpot);
-			Sdl.SetCursor(currentCursor);
+			var cursor = GetCursor(resourceName, hotSpot);
+			if (cursor != currentCursor) {
+				currentCursor = cursor;
+				Sdl.SetCursor(currentCursor);
+			}
 		}
 
 		private static IntPtr GetCursor(string resourceName, IntVector2 hotSpot)
