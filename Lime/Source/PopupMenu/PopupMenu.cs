@@ -12,13 +12,16 @@ namespace Lime.PopupMenu
 
 		public event Action Hidden;
 		public Frame Frame = new Frame() { Tag = "$PopupMenu.cs" };
-		List<MenuItem> items = new List<MenuItem>();
-		int layer;
+		private List<MenuItem> items = new List<MenuItem>();
+		private int layer;
+		private int maxHeight;
+		private int itemWidth;
 
-		public Menu(int layer, int width = 350)
+		public Menu(int layer, int itemWidth = 350, int maxHeight = 768)
 		{
 			this.layer = layer;
-			Frame.Width = width;
+			this.maxHeight = maxHeight;
+			this.itemWidth = itemWidth;
 			Frame.AddNode(rectangle);
 			Frame.Updating += Frame_Updating;
 			Frame.DialogMode = true;
@@ -46,17 +49,24 @@ namespace Lime.PopupMenu
 					Hide();
 				}
 			}
-			Frame.Height = MenuItem.Height * Count + MenuItem.Height;
+			float totalItemsHeigth = MenuItem.Height * Count;
+			int columnsCount = Math.Max((totalItemsHeigth / maxHeight).Ceiling(), 1);
+			int itemsPerColumn = ((float)Count / columnsCount).Ceiling();
+			Frame.Height = MenuItem.Height * itemsPerColumn + MenuItem.Height;
+			Frame.Width = itemWidth * columnsCount;
 			UpdateBackground();
-			UpdateItems();
+			UpdateItems(itemsPerColumn);
 		}
 
-		private void UpdateItems()
+		private void UpdateItems(int itemsPerColumn)
 		{
 			int i = 0;
 			foreach (var item in items) {
-				item.Frame.Y = i * MenuItem.Height + MenuItem.Height / 2;
-				item.Frame.Width = Frame.Width;
+				int column = i / itemsPerColumn;
+				int row = i % itemsPerColumn;
+				item.Frame.X = column * itemWidth;
+				item.Frame.Y = row * MenuItem.Height + MenuItem.Height / 2;
+				item.Frame.Width = itemWidth;
 				item.Frame.Height = MenuItem.Height;
 				i++;
 			}
