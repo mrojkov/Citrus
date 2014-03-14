@@ -31,12 +31,12 @@ namespace Lime
 		static readonly List<AudioChannel> channels = new List<AudioChannel>();
 		static readonly float[] groupVolumes = new float[3] {1, 1, 1};
 
-		static Thread streamingThread;
-		static volatile bool shouldTerminateThread;
+        static Thread streamingThread = null;
+        static volatile bool shouldTerminateThread;
 		static bool active = true;
 		static public bool SilentMode { get; private set; }
 
-		public static void Initialize(int numStereoChannels = 8, int numMonoChannels = 16)
+		public static void Initialize()
 		{
 #if OPENAL
 #if !iOS
@@ -48,24 +48,30 @@ namespace Lime
 			context = new AudioContext();
 #endif
 #endif
+            var options = Application.Instance.Options;
+
 			if (!HasError()) {
 				// iOS dislike to mix stereo and mono buffers on one audio source, so separate them
-				for (int i = 0; i < numStereoChannels; i++) {
+                for (int i = 0; i < options.NumStereoChannels; i++) {
 					channels.Add(new AudioChannel(i, AudioFormat.Stereo16));
 				}
-				for (int i = 0; i < numMonoChannels; i++) {
+                for (int i = 0; i < options.NumMonoChannels; i++) {
 					channels.Add(new AudioChannel(i, AudioFormat.Mono16));
 				}
 			}
-			streamingThread = new Thread(RunStreamingLoop);
-			streamingThread.IsBackground = true;
-			streamingThread.Start();
+            if (options.DecodeAudioInSeparateThread) {
+                streamingThread = new Thread(RunStreamingLoop);
+                streamingThread.IsBackground = true;
+                streamingThread.Start();
+            }
 		}
 
 		public static void Terminate()
 		{
-			shouldTerminateThread = true;
-			streamingThread.Join();
+            if (streamingThread != null) {
+                shouldTerminateThread = true;
+                streamingThread.Join();
+            }
 			foreach (var channel in channels) {
 				channel.Dispose();
 			}
@@ -90,16 +96,26 @@ namespace Lime
 			return delta;
 		}
 
-		static void RunStreamingLoop()
+        static void RunStreamingLoop()
 		{
 			while (!shouldTerminateThread) {
 				float delta = GetTimeDelta() * 0.001f;
 				foreach (var channel in channels) {
-					channel.Update(delta);
+                    channel.Update(delta);
 				}
 				Thread.Sleep(10);
 			}
 		}
+
+        public static void Update()
+        {
+            if (streamingThread == null) {
+                float delta = GetTimeDelta() * 0.001f;
+                foreach (var channel in channels) {
+                    channel.Update(delta);
+                }
+            }
+        }
 
 		public static bool Active
 		{

@@ -224,6 +224,7 @@ namespace Lime
 			} finally {
 				cyclicDependencyTracker.Remove(path);
 			}
+            AudioSystem.Update();
 		}
 
 		public static Frame CreateSubframe(string path)

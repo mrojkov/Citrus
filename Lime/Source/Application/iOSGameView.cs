@@ -187,6 +187,7 @@ namespace Lime
 			Input.ProcessPendingKeyEvents();
 			Input.MouseVisible = true;
 			Application.Instance.OnUpdateFrame(delta);
+            AudioSystem.Update();
 			Input.TextInput = null;
 			Input.CopyKeysState();
 			Input.SetKeyState(Key.Enter, false);

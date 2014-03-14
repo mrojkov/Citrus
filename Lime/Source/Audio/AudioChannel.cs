@@ -80,7 +80,7 @@ namespace Lime
 #else
 	internal class AudioChannel : IDisposable, IAudioChannel
 	{
-		public const int BufferSize = 1024 * 16;
+        public const int BufferSize = 1024 * 32;
 		public const int NumBuffers = 4;
 
 		public AudioChannelGroup Group;

@@ -41,6 +41,7 @@ namespace Lime
 			// and multiple updates of node hierarchy.
  			delta = Math.Min(delta, 60);
 			Application.Instance.OnUpdateFrame((int)delta);
+            AudioSystem.Update();
 			Input.TextInput = null;
 			Input.CopyKeysState();
 			if (DidUpdated != null) {

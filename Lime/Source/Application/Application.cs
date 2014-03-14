@@ -47,6 +47,13 @@ namespace Lime
 
 	public class Application
 	{
+        public class StartupOptions
+        {
+            public bool DecodeAudioInSeparateThread = true;
+            public int NumStereoChannels = 8;
+            public int NumMonoChannels = 16;
+        }
+
 		public static Thread MainThread { get; private set; }
 		public static bool IsMainThread { get { return Thread.CurrentThread == MainThread; } }
 
@@ -55,10 +62,12 @@ namespace Lime
 		private static Action scheduledActions;
 
 		public static readonly bool JerkyMode = CheckCommandLineArg("--Jerky");
+        public readonly StartupOptions Options;
 
-		public Application()
+        public Application(StartupOptions options = null)
 		{
 			Instance = this;
+            Options = options ?? new StartupOptions();
 			MainThread = Thread.CurrentThread;
 			// Use '.' as decimal separator.
 			var culture = System.Globalization.CultureInfo.InvariantCulture;

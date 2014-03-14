@@ -248,6 +248,7 @@ namespace Lime
 			UVRect.B = (Vector2)mainTexture.ImageSize / (Vector2)mainTexture.SurfaceSize;
 			ImageSize = mainTexture.ImageSize;
 			SurfaceSize = mainTexture.SurfaceSize;
+            AudioSystem.Update();
 			return true;
 		}
 
