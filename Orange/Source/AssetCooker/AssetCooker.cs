@@ -216,7 +216,7 @@ namespace Orange
 					OpacityMaskCreator.CreateMask(assetsBundle, srcPath, maskPath);
 					string tmpFile = Path.ChangeExtension(srcPath, GetPlatformTextureExtension());
 					TextureConverter.Convert(srcPath, tmpFile, rules, platform);
-					assetsBundle.ImportFile(tmpFile, dstPath, reserve: 0, compress: true);
+                    assetsBundle.ImportFile(tmpFile, dstPath, reserve: 0, compress: (platform == TargetPlatform.Desktop));
 					File.Delete(tmpFile);
 				}
 				return true;
