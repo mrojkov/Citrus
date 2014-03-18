@@ -317,7 +317,7 @@ namespace Lime
 			}
 			UnqueueProcessedBuffers();
 			bool addedbuffers = false;
-			while (QueueOneBuffer()) {
+			/*while*/if (QueueOneBuffer()) {
 				addedbuffers = true;
 			}
 			if (addedbuffers) {
