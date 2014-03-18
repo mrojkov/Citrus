@@ -266,7 +266,7 @@ namespace Lime
 			if (streaming) {
 				lock (streamingSync) {
 					if (streaming) {
-						QueueBuffer(resumePlay: true);
+						QueueBuffers();
 					}
 				}
 			}
@@ -287,13 +287,8 @@ namespace Lime
 			}
 		}
 
-		void QueueBuffer(bool resumePlay)
+		bool QueueOneBuffer()
 		{
-			if (decoder == null) {
-				throw new InvalidOperationException("Audio decoder is not set");
-			}
-			UnqueueProcessedBuffers();
-			// queue one buffer
 			int buffer = AcquireBuffer();
 			if (buffer != 0) {
 				if (FillBuffer(buffer)) {
@@ -306,12 +301,26 @@ namespace Lime
 							RecreateBuffers();
 						}
 					}
+					return true;
 				} else {
 					processedBuffers.Push(buffer);
 					streaming = false;
 				}
 			}
-			if (resumePlay) {
+			return false;
+		}
+
+		void QueueBuffers()
+		{
+			if (decoder == null) {
+				throw new InvalidOperationException("Audio decoder is not set");
+			}
+			UnqueueProcessedBuffers();
+			bool addedbuffers = false;
+			while (QueueOneBuffer()) {
+				addedbuffers = true;
+			}
+			if (addedbuffers) {
 				if (State == ALSourceState.Stopped || State == ALSourceState.Initial) {
 					AL.SourcePlay(source);
 				}
