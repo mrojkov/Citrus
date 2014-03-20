@@ -88,13 +88,13 @@ namespace Lime
 
 		public override void ViewDidLayoutSubviews()
 		{
-			if (rotating) {
-				rotating = false;
-				var toOrientation = ConvertInterfaceOrientation(this.InterfaceOrientation);
-				Application.Instance.CurrentDeviceOrientation = toOrientation;
-				Application.Instance.OnDeviceRotating(toOrientation);
-				Application.Instance.Active = false;
-			}
+			var toOrientation = ConvertInterfaceOrientation(this.InterfaceOrientation);
+			Application.Instance.CurrentDeviceOrientation = toOrientation;
+            if (rotating) {
+                rotating = false;
+                Application.Instance.OnDeviceRotating(toOrientation);
+                Application.Instance.Active = false;
+            }			
 			base.ViewDidLayoutSubviews();
 		}
 

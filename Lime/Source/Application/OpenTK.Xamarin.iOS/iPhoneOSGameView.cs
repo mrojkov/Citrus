@@ -765,6 +765,7 @@ namespace Lime.Xamarin
 
             if (!framebufferReady) {
                 CreateFrameBuffer();
+                Application.Instance.OnDeviceRotated(Application.Instance.CurrentDeviceOrientation); // notify resolution changers & stuff...
             }
 
 			gl.BindFramebuffer(All.FramebufferOes, framebuffer);
