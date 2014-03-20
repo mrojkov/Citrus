@@ -93,8 +93,6 @@ namespace Lime
 				var toOrientation = ConvertInterfaceOrientation(this.InterfaceOrientation);
 				Application.Instance.CurrentDeviceOrientation = toOrientation;
 				Application.Instance.OnDeviceRotating(toOrientation);
-				GameView.Instance.UpdateFrame();
-				GameView.Instance.RenderFrame();
 				Application.Instance.Active = false;
 			}
 			base.ViewDidLayoutSubviews();
