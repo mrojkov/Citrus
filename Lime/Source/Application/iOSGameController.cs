@@ -90,11 +90,11 @@ namespace Lime
 		{
 			var toOrientation = ConvertInterfaceOrientation(this.InterfaceOrientation);
 			Application.Instance.CurrentDeviceOrientation = toOrientation;
-            if (rotating) {
-                rotating = false;
-                Application.Instance.OnDeviceRotating(toOrientation);
-                Application.Instance.Active = false;
-            }			
+			if (rotating) {
+				rotating = false;
+				Application.Instance.OnDeviceRotating(toOrientation);
+				Application.Instance.Active = false;
+			}
 			base.ViewDidLayoutSubviews();
 		}
 
