@@ -22,13 +22,16 @@ namespace Orange
 			get { return GetValue(path); }
 		}
 
-		public object GetValue(string path)
+		public object GetValue(string path, object @default = null)
 		{
 			JObject json = obj;
 			JValue result = null;
 			foreach (var element in path.Split('/')) {
 				JToken token = null;
 				if (json == null || !json.TryGetValue(element, out token)) {
+					if (@default != null) {
+						return @default;
+					}
 					throw new Lime.Exception("{0} is not defined in {1}", path, sourcePath);
 				}
 				result = token as JValue;

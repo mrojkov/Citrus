@@ -16,7 +16,7 @@ namespace Orange
 			TagUntaggedStrings
 		}
 
-		public void ExtractDictionary(bool extractTextWithoutBrackets)
+		public void ExtractDictionary()
 		{
 			const string dictionary = "Dictionary.txt";
 			Localization.Dictionary.Clear();
@@ -45,7 +45,7 @@ namespace Orange
 						// Сначала прогоним все строки вида: "[]blah-blah.."
 						ProcessSourceFile(fileInfo.Path, (Pass)pass);
 						// Затем прогоним все строки вида: Text "blah-blah.."
-						if (extractTextWithoutBrackets) {
+						if (!ShouldLocalizeOnlyTaggedSceneTexts()) {
 							ProcessSceneFile(fileInfo.Path, (Pass)pass);
 						}
 					}
@@ -56,6 +56,11 @@ namespace Orange
 					Localization.Dictionary.WriteToStream(stream);
 				}
 			}
+		}
+
+		private bool ShouldLocalizeOnlyTaggedSceneTexts()
+		{
+			return (bool)The.Workspace.ProjectJson.GetValue("LocalizeOnlyTaggedSceneTexts", false);
 		}
 
 		void ProcessSourceFile(string file, Pass pass)
