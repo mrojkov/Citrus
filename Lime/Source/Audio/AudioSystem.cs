@@ -280,7 +280,7 @@ namespace Lime
 					channel.Priority = priority;
 					channel.Volume = volume;
 					channel.Pitch = pitch;
-					channel.Pan = 0;
+					channel.Pan = pan;
 				}
 				return channel;
 			};

@@ -8,7 +8,7 @@ namespace Lime
 {
 	public static partial class AudioSystem
 	{
-		public class ErrorChecker : IDisposable
+		public struct ErrorChecker : IDisposable
 		{
 			string comment;
 			bool throwException;

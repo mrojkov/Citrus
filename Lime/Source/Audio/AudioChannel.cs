@@ -94,6 +94,7 @@ namespace Lime
 		private readonly int source;
 		private float volume = 1;
 		private float pitch = 1;
+		private float pan = 0;
 		private bool looping;
 		private float fadeVolume;
 		private float fadeSpeed;
@@ -125,8 +126,10 @@ namespace Lime
 
 		public Sound Sound { get; private set; }
 
-		// Not implemented yet
-		public float Pan { get; set; }
+		public float Pan {
+			get { return pan; }
+			set { SetPan(value); }
+		}
 
 		public string SamplePath { get; set; }
 
@@ -154,6 +157,15 @@ namespace Lime
 			AL.DeleteSource(source);
 			AL.DeleteBuffers(allBuffers.ToArray());
 			Marshal.FreeHGlobal(decodedData);
+		}
+
+		private void SetPan(float value)
+		{
+			pan = value.Clamp(-1, 1);
+			var sourcePosition = Vector2.HeadingRad(pan * Mathf.HalfPi);
+			using (new AudioSystem.ErrorChecker()) {
+				AL.Source(source, ALSource3f.Position, sourcePosition.Y, 0, sourcePosition.X);
+			}
 		}
 
 		internal void Play(Sound sound, IAudioDecoder decoder, bool looping, bool paused, float fadeinTime)
@@ -287,6 +299,23 @@ namespace Lime
 			}
 		}
 
+		void QueueBuffers()
+		{
+			if (decoder == null) {
+				throw new InvalidOperationException("Audio decoder is not set");
+			}
+			UnqueueProcessedBuffers();
+			bool addedbuffers = false;
+			while (QueueOneBuffer()) {
+				addedbuffers = true;
+			}
+			if (addedbuffers) {
+				if (State == ALSourceState.Stopped || State == ALSourceState.Initial) {
+					AL.SourcePlay(source);
+				}
+			}
+		}
+
 		bool QueueOneBuffer()
 		{
 			int buffer = AcquireBuffer();
@@ -308,23 +337,6 @@ namespace Lime
 				}
 			}
 			return false;
-		}
-
-		void QueueBuffers()
-		{
-			if (decoder == null) {
-				throw new InvalidOperationException("Audio decoder is not set");
-			}
-			UnqueueProcessedBuffers();
-			bool addedbuffers = false;
-			while (QueueOneBuffer()) {
-				addedbuffers = true;
-			}
-			if (addedbuffers) {
-				if (State == ALSourceState.Stopped || State == ALSourceState.Initial) {
-					AL.SourcePlay(source);
-				}
-			}
 		}
 
 		private void RecreateBuffers()
