@@ -67,6 +67,13 @@ namespace Orange
 				using (Lime.AssetsBundle.Instance = new Lime.PackedAssetsBundle(bundlePath, Lime.AssetBundleFlags.Writable)) {
 					CookHelper();
 				}
+				// Нужно закрыть бандл, а потом открыть для того чтобы получить достук к 
+				// сериализованным сценам (фреймам) для генерации кода - Гриша
+				using (Lime.AssetsBundle.Instance = new Lime.PackedAssetsBundle(bundlePath, Lime.AssetBundleFlags.Writable)) {
+					using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
+						PluginLoader.AfterAssetsCooked();
+					}
+				}
 			}
 		}
 

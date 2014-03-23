@@ -48,6 +48,11 @@ namespace Orange
 			}
 		}
 
+		public static void AfterAssetsCooked()
+		{
+			RunCurrentPluginStaticMethodWithAttribute<PluginAssetsCookedAttribute>();
+		}
+
 		private static void ResetCurrentPlugin()
 		{
 			CurrentPlugin = null;
@@ -56,39 +61,17 @@ namespace Orange
 
 		private static void LoadPlugin(string pluginAssembly)
 		{
-			if (CurrentPlugin != null) {
-				DoPluginFinalization(CurrentPlugin);
-			}
+			RunCurrentPluginStaticMethodWithAttribute<PluginFinalizationAttribute>();
 			using (new DirectoryChanger(Path.GetDirectoryName(pluginAssembly))) {
 				var assembly = LoadAssembly(pluginAssembly);
 				CurrentPlugin = assembly;
-				DoPluginInitialization(assembly);
+				RunCurrentPluginStaticMethodWithAttribute<PluginInitializationAttribute>();
 				if (!LoadedPlugins.Contains(assembly)) {
 					The.MenuController.CreateAssemblyMenuItems(assembly);
 				} else {
 					The.UI.RefreshMenu();
 				}
 				LoadedPlugins.Add(assembly);
-			}
-		}
-
-		private static void DoPluginFinalization(System.Reflection.Assembly assembly)
-		{
-			foreach (var method in assembly.GetAllMethodsWithAttribute(typeof(PluginFinalizationAttribute))) {
-				if (!method.IsStatic) {
-					new System.Exception(string.Format("'{0}' must be a static method", method.Name));
-				}
-				method.Invoke(null, null);
-			}			
-		}
-
-		private static void DoPluginInitialization(System.Reflection.Assembly assembly)
-		{
-			foreach (var method in assembly.GetAllMethodsWithAttribute(typeof(PluginInitializationAttribute))) {
-				if (!method.IsStatic) {
-					new System.Exception(string.Format("'{0}' must be a static method", method.Name));
-				}
-				method.Invoke(null, null);
 			}
 		}
 
@@ -125,6 +108,18 @@ namespace Orange
 				result = result + method.Invoke(null, null) + " ";
 			}
 			return result;
+		}
+
+		private static void RunCurrentPluginStaticMethodWithAttribute<T>() where T : Attribute
+		{
+			if (CurrentPlugin != null) {
+				foreach (var method in CurrentPlugin.GetAllMethodsWithAttribute(typeof(T))) {
+					if (!method.IsStatic) {
+						new System.Exception(string.Format("'{0}' must be a static method", method.Name));
+					}
+					method.Invoke(null, null);
+				}
+			}
 		}
 
 	}

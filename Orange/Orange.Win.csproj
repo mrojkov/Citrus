@@ -93,9 +93,10 @@
     <Compile Include="Source\Actions\UpdateXCodeProject.cs" />
     <Compile Include="Source\Actions\UpgradeOrange.cs" />
     <Compile Include="Source\AssetCooker\OpacityMaskCreator.cs" />
-    <Compile Include="Source\PluginCommandLineArgumentsAttribute.cs" />
-    <Compile Include="Source\PluginFinalizationAttribute.cs" />
-    <Compile Include="Source\PluginInitializationAttribute.cs" />
+    <Compile Include="Source\PuginAttributes\PluginAssetsCookedAttribute.cs" />
+    <Compile Include="Source\PuginAttributes\PluginCommandLineArgumentsAttribute.cs" />
+    <Compile Include="Source\PuginAttributes\PluginFinalizationAttribute.cs" />
+    <Compile Include="Source\PuginAttributes\PluginInitializationAttribute.cs" />
     <Compile Include="Source\CsprojSynchronization\CsprojSynchronization.cs" />
     <Compile Include="Source\Toolbox\Json.cs" />
     <Compile Include="Source\Toolbox\Process.cs" />
