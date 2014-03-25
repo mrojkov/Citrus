@@ -154,14 +154,14 @@ namespace Lime
 			Setter = (SetterDelegate)Delegate.CreateDelegate(typeof(SetterDelegate), owner, mi);
 		}
 		
-		protected virtual void InterpolateValue(float t, T a, T b)
+		protected virtual void InterpolateAndSet(float t, Keyframe<T> a, Keyframe<T> b)
 		{
-			Setter(a);
+			Setter(a.Value);
 		}
 
-		protected virtual void InterpolateValue(float t, T a, T b, T c, T d)
+		protected virtual void InterpolateAndSet(float t, Keyframe<T> a, Keyframe<T> b, Keyframe<T> c, Keyframe<T> d)
 		{
-			InterpolateValue(t, b, c);
+			InterpolateAndSet(t, b, c);
 		}
 
 		public void Clear()
@@ -214,14 +214,14 @@ namespace Lime
 				float t = (time - t0) / (float)(t1 - t0);
 				switch (function) {
 				case KeyFunction.Linear:
-					InterpolateValue(t, key1.Value, key2.Value);
+					InterpolateAndSet(t, key1, key2);
 					break;
 				case KeyFunction.Spline:
 					{
 						int count = ReadonlyKeys.Count;
 						var key0 = ReadonlyKeys[i < 1 ? 0 : i - 1];
 						var key3 = ReadonlyKeys[i + 1 >= count - 1 ? count - 1 : i + 1];
-						InterpolateValue(t, key0.Value, key1.Value, key2.Value, key3.Value);
+						InterpolateAndSet(t, key0, key1, key2, key3);
 					}
 					break;
 				case KeyFunction.ClosedSpline:
@@ -229,7 +229,7 @@ namespace Lime
 						int count = ReadonlyKeys.Count;
 						var key0 = ReadonlyKeys[i < 1 ? count - 1 : i - 1];
 						var key3 = ReadonlyKeys[i + 1 >= count - 1 ? 0 : i + 1];
-						InterpolateValue(t, key0.Value, key1.Value, key2.Value, key3.Value);
+						InterpolateAndSet(t, key0, key1, key2, key3);
 					}
 					break;
 				}
@@ -265,37 +265,37 @@ namespace Lime
 	[ProtoContract]
 	public class Vector2Animator : Animator<Vector2>
 	{		
-		protected override void InterpolateValue(float t, Vector2 a, Vector2 b)
+		protected override void InterpolateAndSet(float t, Keyframe<Vector2> a, Keyframe<Vector2> b)
 		{
-			Setter(Vector2.Lerp(t, a, b));
+			Setter(Vector2.Lerp(t, a.Value, b.Value));
 		}
 
-		protected override void InterpolateValue(float t, Vector2 a, Vector2 b, Vector2 c, Vector2 d)
+		protected override void InterpolateAndSet(float t, Keyframe<Vector2> a, Keyframe<Vector2> b, Keyframe<Vector2> c, Keyframe<Vector2> d)
 		{
-			Setter(Mathf.CatmullRomSpline(t, a, b, c, d));
+			Setter(Mathf.CatmullRomSpline(t, a.Value, b.Value, c.Value, d.Value));
 		}
 	}
 
 	[ProtoContract]
 	public class NumericAnimator : Animator<float>
 	{
-		protected override void InterpolateValue(float t, float a, float b)
+		protected override void InterpolateAndSet(float t, Keyframe<float> a, Keyframe<float> b)
 		{
-			Setter(t * (b - a) + a);
+			Setter(t * (b.Value - a.Value) + a.Value);
 		}
 
-		protected override void InterpolateValue(float t, float a, float b, float c, float d)
+		protected override void InterpolateAndSet(float t, Keyframe<float> a, Keyframe<float> b, Keyframe<float> c, Keyframe<float> d)
 		{
-			Setter(Mathf.CatmullRomSpline(t, a, b, c, d));
+			Setter(Mathf.CatmullRomSpline(t, a.Value, b.Value, c.Value, d.Value));
 		}
 	}
 
 	[ProtoContract]
 	public class Color4Animator : Animator<Color4>
 	{
-		protected override void InterpolateValue(float t, Color4 a, Color4 b)
+		protected override void InterpolateAndSet(float t, Keyframe<Color4> a, Keyframe<Color4> b)
 		{
-			Setter(Color4.Lerp(t, a, b));
+			Setter(Color4.Lerp(t, a.Value, b.Value));
 		}
 	}
 }
