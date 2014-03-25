@@ -132,6 +132,7 @@
     <Compile Include="Source\Types\Vector2.cs" />
     <Compile Include="Source\Types\Vector3.cs" />
     <Compile Include="Source\AssetsBundle\UnpackedAssetsBundle.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimationUtils.cs" />
     <Compile Include="Source\Widgets\Animation\Animator.cs" />
     <Compile Include="Source\Widgets\Animation\AnimatorCollection.cs" />
     <Compile Include="Source\Widgets\Animation\AnimatorRegistry.cs" />
