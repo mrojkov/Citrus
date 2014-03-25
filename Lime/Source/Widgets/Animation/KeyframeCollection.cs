@@ -15,11 +15,11 @@ namespace Lime
 		void Add(int frame, object value, KeyFunction function = KeyFunction.Linear);
 	}
 
-	public class BoxedKeyframeCollection<T> : IKeyframeCollection
+	public class KeyframeCollectionProxy<T> : IKeyframeCollection
 	{
 		KeyframeCollection<T> source;
 
-		public BoxedKeyframeCollection(KeyframeCollection<T> source)
+		public KeyframeCollectionProxy(KeyframeCollection<T> source)
 		{
 			this.source = source;
 		}
@@ -83,7 +83,9 @@ namespace Lime
 
 		public IEnumerator<IKeyframe> GetEnumerator()
 		{
-			return source.GetEnumerator();
+			foreach (var i in source) {
+				yield return (IKeyframe)i;
+			}
 		}
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
@@ -93,74 +95,22 @@ namespace Lime
 	}
 
 	[ProtoContract]
-	public class KeyframeCollection<T> : ICollection<Keyframe<T>>
+	public class KeyframeCollection<T> : List<Keyframe<T>>
 	{
 		internal bool Shared;
-
-		List<Keyframe<T>> items = new List<Keyframe<T>>();
-
-		public Keyframe<T> this[int index] {
-			get { return items[index]; }
-			set { items[index] = value; }
-		}
 
 		public KeyframeCollection<T> Clone()
 		{
 			var clone = new KeyframeCollection<T>();
-			foreach (var i in this.items) {
+			foreach (var i in this) {
 				clone.Add(i.Clone());
 			}
 			return clone;
 		}
 
-		public void Add(Keyframe<T> item)
-		{
-			items.Add(item);
-		}
-
 		public void Add(int frame, T value, KeyFunction function = KeyFunction.Linear)
 		{
-			items.Add(new Keyframe<T>(frame, value, function));
-		}
-
-		public void Clear()
-		{
-			items.Clear();
-		}
-
-		public bool Contains(Keyframe<T> item)
-		{
-			return items.Contains(item);
-		}
-
-		public void CopyTo(Keyframe<T>[] array, int arrayIndex)
-		{
-			items.CopyTo(array, arrayIndex);
-		}
-
-		public int Count
-		{
-			get { return items.Count; }
-		}
-
-		public bool IsReadOnly
-		{
-			get { return false; }
-		}
-
-		public bool Remove(Keyframe<T> item)
-		{
-			return items.Remove(item);
-		}
-
-		public IEnumerator<Keyframe<T>> GetEnumerator()
-		{
-			return items.GetEnumerator();
-		}
-
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-		{
-			return items.GetEnumerator();
+			Add(new Keyframe<T>(frame, value, function));
 		}
 	}
 }

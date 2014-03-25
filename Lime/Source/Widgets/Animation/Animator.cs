@@ -28,9 +28,9 @@ namespace Lime
 			public bool Triggerable;
 		}
 		
-		static Dictionary<string, List<PropertyData>> propertyCache = new Dictionary<string, List<PropertyData>>();
+		private static Dictionary<string, List<PropertyData>> propertyCache = new Dictionary<string, List<PropertyData>>();
 		
-		public static PropertyData GetProperty(Type ownerType, string propertyName)
+		internal static PropertyData GetProperty(Type ownerType, string propertyName)
 		{
 			List<PropertyData> plist;
 			if (!propertyCache.TryGetValue(propertyName, out plist)) {
@@ -119,21 +119,21 @@ namespace Lime
 			}
 		}
 			
-		IKeyframeCollection boxedKeys;
+		IKeyframeCollection proxyKeys;
 		IKeyframeCollection IAnimator.Keys {
 			get {
-				if (boxedKeys == null) {
-					boxedKeys = new BoxedKeyframeCollection<T>(Keys);
+				if (proxyKeys == null) {
+					proxyKeys = new KeyframeCollectionProxy<T>(Keys);
 				}
-				return boxedKeys;
+				return proxyKeys;
 			}
 		}
 			
 		public IAnimator Clone()
 		{
 			var clone = (Animator<T>)MemberwiseClone();
-			clone.boxedKeys = null;
-			boxedKeys = null;
+			clone.proxyKeys = null;
+			proxyKeys = null;
 			ReadonlyKeys.Shared = true;
 			return clone;
 		}
@@ -153,20 +153,15 @@ namespace Lime
 			}
 			Setter = (SetterDelegate)Delegate.CreateDelegate(typeof(SetterDelegate), owner, mi);
 		}
-
-		protected void ApplyValue(int i)
-		{
-			Setter(ReadonlyKeys[i].Value);
-		}
 		
-		protected virtual void ApplyValue(float t, int a, int b)
+		protected virtual void InterpolateValue(float t, T a, T b)
 		{
-			ApplyValue(a);
+			Setter(a);
 		}
 
-		protected virtual void ApplyValue(float t, int a, int b, int c, int d)
+		protected virtual void InterpolateValue(float t, T a, T b, T c, T d)
 		{
-			ApplyValue(t, b, c);
+			InterpolateValue(t, b, c);
 		}
 
 		public void Clear()
@@ -196,10 +191,10 @@ namespace Lime
 			while (currentKey >= 0 && frame < ReadonlyKeys[currentKey].Frame)
 				currentKey--;
 			if (currentKey < 0) {
-				ApplyValue(0);
+				Setter(ReadonlyKeys[0].Value);
 				currentKey = 0;
 			} else if (currentKey == count - 1) {
-				ApplyValue(count - 1);
+				Setter(ReadonlyKeys[count - 1].Value);
 			} else {
 				ApplyHelper(time);
 			}
@@ -208,35 +203,33 @@ namespace Lime
 		private void ApplyHelper(int time)
 		{
 			int i = currentKey;
-			KeyFunction function = ReadonlyKeys[i].Function;
+			var key1 = ReadonlyKeys[i];
+			KeyFunction function = key1.Function;
 			if (function == KeyFunction.Steep) {
-				ApplyValue(i);
+				Setter(key1.Value);
 			} else {
-				int t0 = AnimationUtils.FramesToMsecs(ReadonlyKeys[i].Frame);
-				int t1 = AnimationUtils.FramesToMsecs(ReadonlyKeys[i + 1].Frame);
+				var key2 = ReadonlyKeys[i + 1];
+				int t0 = AnimationUtils.FramesToMsecs(key1.Frame);
+				int t1 = AnimationUtils.FramesToMsecs(key2.Frame);
 				float t = (time - t0) / (float)(t1 - t0);
 				switch (function) {
 				case KeyFunction.Linear:
-					ApplyValue(t, i, i + 1);
+					InterpolateValue(t, key1.Value, key2.Value);
 					break;
 				case KeyFunction.Spline:
 					{
 						int count = ReadonlyKeys.Count;
-						int a = i < 1 ? 0 : i - 1;
-						int b = i;
-						int c = i + 1;
-						int d = c + 1 >= count - 1 ? count - 1 : c + 1;
-						ApplyValue(t, a, b, c, d);
+						var key0 = ReadonlyKeys[i < 1 ? 0 : i - 1];
+						var key3 = ReadonlyKeys[i + 1 >= count - 1 ? count - 1 : i + 1];
+						InterpolateValue(t, key0.Value, key1.Value, key2.Value, key3.Value);
 					}
 					break;
 				case KeyFunction.ClosedSpline:
 					{
 						int count = ReadonlyKeys.Count;
-						int a = i < 1 ? count - 1 : i - 1;
-						int b = i;
-						int c = i + 1;
-						int d = c + 1 >= count - 1 ? 0 : c + 1;
-						ApplyValue(t, a, b, c, d);
+						var key0 = ReadonlyKeys[i < 1 ? count - 1 : i - 1];
+						var key3 = ReadonlyKeys[i + 1 >= count - 1 ? 0 : i + 1];
+						InterpolateValue(t, key0.Value, key1.Value, key2.Value, key3.Value);
 					}
 					break;
 				}
@@ -272,39 +265,37 @@ namespace Lime
 	[ProtoContract]
 	public class Vector2Animator : Animator<Vector2>
 	{		
-		protected override void ApplyValue(float t, int a, int b)
+		protected override void InterpolateValue(float t, Vector2 a, Vector2 b)
 		{
-			Setter(Vector2.Lerp(t, ReadonlyKeys[a].Value, ReadonlyKeys[b].Value));
+			Setter(Vector2.Lerp(t, a, b));
 		}
 
-		protected override void ApplyValue(float t, int a, int b, int c, int d)
+		protected override void InterpolateValue(float t, Vector2 a, Vector2 b, Vector2 c, Vector2 d)
 		{
-			Setter(Mathf.CatmullRomSpline(t, ReadonlyKeys[a].Value, ReadonlyKeys[b].Value, ReadonlyKeys[c].Value, ReadonlyKeys[d].Value));
+			Setter(Mathf.CatmullRomSpline(t, a, b, c, d));
 		}
 	}
 
 	[ProtoContract]
 	public class NumericAnimator : Animator<float>
 	{
-		protected override void ApplyValue(float t, int a, int b)
+		protected override void InterpolateValue(float t, float a, float b)
 		{
-			float va = ReadonlyKeys[a].Value;
-			float vb = ReadonlyKeys[b].Value;
-			Setter(t * (vb - va) + va);
+			Setter(t * (b - a) + a);
 		}
 
-		protected override void ApplyValue(float t, int a, int b, int c, int d)
+		protected override void InterpolateValue(float t, float a, float b, float c, float d)
 		{
-			Setter(Mathf.CatmullRomSpline(t, ReadonlyKeys[a].Value, ReadonlyKeys[b].Value, ReadonlyKeys[c].Value, ReadonlyKeys[d].Value));
+			Setter(Mathf.CatmullRomSpline(t, a, b, c, d));
 		}
 	}
 
 	[ProtoContract]
 	public class Color4Animator : Animator<Color4>
 	{
-		protected override void ApplyValue(float t, int a, int b)
+		protected override void InterpolateValue(float t, Color4 a, Color4 b)
 		{
-			Setter(Color4.Lerp(t, ReadonlyKeys[a].Value, ReadonlyKeys[b].Value));
+			Setter(Color4.Lerp(t, a, b));
 		}
 	}
 }
