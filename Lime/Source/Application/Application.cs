@@ -75,7 +75,6 @@ namespace Lime
 			SetGlobalExceptionHandler();
 			GameView.DidUpdated += RunScheduledActions;
 		}
-
 		private void RunScheduledActions()
 		{
 			lock (scheduledActionsSync) {

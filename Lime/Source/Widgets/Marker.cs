@@ -26,7 +26,7 @@ namespace Lime
 		[ProtoMember(2)]
 		public int Frame { get; set; }
 
-		public int Time { get { return Animator.FramesToMsecs(Frame); } }
+		public int Time { get { return AnimationUtils.FramesToMsecs(Frame); } }
 
 		[ProtoMember(3)]
 		public MarkerAction Action { get; set; }

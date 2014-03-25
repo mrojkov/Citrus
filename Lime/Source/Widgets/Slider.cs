@@ -71,8 +71,8 @@ namespace Lime
 				}
 				if (m1 != null && m2 != null) {
 					if (RangeMax > RangeMin) {
-						float t1 = Animator.FramesToMsecs(m1.Frame);
-						float t2 = Animator.FramesToMsecs(m2.Frame);
+						float t1 = AnimationUtils.FramesToMsecs(m1.Frame);
+						float t2 = AnimationUtils.FramesToMsecs(m2.Frame);
 						AnimationTime = (int)(t1 + (Value - RangeMin) / (RangeMax - RangeMin) * (t2 - t1));
 					}
 				}

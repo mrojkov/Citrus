@@ -11,12 +11,12 @@ namespace Lime
 	public sealed class TriggerAttribute : Attribute {}
 
 	[ProtoContract]
-	public sealed class AnimatorCollection : ICollection<Animator>
+	public sealed class AnimatorCollection : ICollection<IAnimator>
 	{
-		static List<Animator> emptyList = new List<Animator>();
-		static Animator[] emptyArray = new Animator[0];
-		List<Animator> animatorList = emptyList;
-		Animator[] animatorArray;
+		static List<IAnimator> emptyList = new List<IAnimator>();
+		static IAnimator[] emptyArray = new IAnimator[0];
+		List<IAnimator> animatorList = emptyList;
+		IAnimator[] animatorArray;
 		Node owner;
 
 		public AnimatorCollection() { /* ctor for ProtoBuf only */ }
@@ -26,7 +26,7 @@ namespace Lime
 			this.owner = owner;
 		}
 
-		public Animator[] AsArray
+		public IAnimator[] AsArray
 		{
 			get
 			{
@@ -45,15 +45,15 @@ namespace Lime
 		{
 			var result = new AnimatorCollection(owner);
 			foreach (var animator in source.animatorList) {
-				result.Add(animator.SharedClone());
+				result.Add(animator.Clone());
 			}
 			return result;
 		}
 
-		public Animator this[string propertyName]
+		public IAnimator this[string propertyName]
 		{
 			get {
-				foreach (Animator a in animatorList) {
+				foreach (IAnimator a in animatorList) {
 					if (a.TargetProperty == propertyName) {
 						return a;
 					}
@@ -69,25 +69,25 @@ namespace Lime
 			}
 		}
 		
-		public bool Contains(Animator item)
+		public bool Contains(IAnimator item)
 		{
 			return animatorList.Contains(item);
 		}
 		
-		void ICollection<Animator>.CopyTo(Animator[] a, int index)
+		void ICollection<IAnimator>.CopyTo(IAnimator[] a, int index)
 		{
 			animatorList.CopyTo(a, index);
 		}
 		
-		bool ICollection<Animator>.IsReadOnly { 
+		bool ICollection<IAnimator>.IsReadOnly { 
 			get { return false; }
 		}
 		
-		public Animator this[int index] { 
+		public IAnimator this[int index] { 
 			get { return animatorList[index]; }
 		}
 		
-		public bool Remove(Animator item)
+		public bool Remove(IAnimator item)
 		{
 			bool result = animatorList.Remove(item);
 			if (animatorList.Count == 0) {
@@ -101,7 +101,7 @@ namespace Lime
 		
 		public int Count { get { return AsArray.Length; } }
 	
-		IEnumerator<Animator> IEnumerable<Animator>.GetEnumerator()
+		IEnumerator<IAnimator> IEnumerable<IAnimator>.GetEnumerator()
 		{
 			return animatorList.GetEnumerator();
 		}
@@ -111,10 +111,10 @@ namespace Lime
 			return animatorList.GetEnumerator();
 		}
 		 
-		public void Add(Animator animator)
+		public void Add(IAnimator animator)
 		{
 			if (animatorList == emptyList) {
-				animatorList = new List<Animator>();
+				animatorList = new List<IAnimator>();
 			}
 			animatorArray = null;
 			animator.Bind(owner);

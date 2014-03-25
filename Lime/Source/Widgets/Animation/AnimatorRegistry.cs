@@ -17,13 +17,13 @@ namespace Lime
 			map.Add(propertyType, animatorType);
 		}
 		
-		public Animator CreateAnimator(Type propertyType)
+		public IAnimator CreateAnimator(Type propertyType)
 		{
 			Type animatorType;
 			if (!map.TryGetValue(propertyType, out animatorType))
 				throw new Lime.Exception("Can't find animator type for property of {0}", propertyType.Name);
 			var ctr = animatorType.GetConstructor(System.Type.EmptyTypes);
-			var animator = ctr.Invoke(new object[] {}) as Animator;
+			var animator = ctr.Invoke(new object[] {}) as IAnimator;
 			return animator;
 		}
 
@@ -32,17 +32,17 @@ namespace Lime
 			Add(typeof(Vector2), typeof(Vector2Animator));
 			Add(typeof(float), typeof(NumericAnimator));
 			Add(typeof(Color4), typeof(Color4Animator));
-			Add(typeof(string), typeof(GenericAnimator<string>));
-			Add(typeof(bool), typeof(GenericAnimator<bool>));
-			Add(typeof(NumericRange), typeof(GenericAnimator<NumericRange>));
-			Add(typeof(Blending), typeof(GenericAnimator<Blending>));
-			Add(typeof(ITexture), typeof(GenericAnimator<ITexture>));
-			Add(typeof(SerializableSample), typeof(GenericAnimator<SerializableSample>));
-			Add(typeof(EmitterShape), typeof(GenericAnimator<EmitterShape>));
-			Add(typeof(AudioAction), typeof(GenericAnimator<AudioAction>));
-			Add(typeof(MovieAction), typeof(GenericAnimator<MovieAction>));
-			Add(typeof(HAlignment), typeof(GenericAnimator<HAlignment>));
-			Add(typeof(VAlignment), typeof(GenericAnimator<VAlignment>));
+			Add(typeof(string), typeof(Animator<string>));
+			Add(typeof(bool), typeof(Animator<bool>));
+			Add(typeof(NumericRange), typeof(Animator<NumericRange>));
+			Add(typeof(Blending), typeof(Animator<Blending>));
+			Add(typeof(ITexture), typeof(Animator<ITexture>));
+			Add(typeof(SerializableSample), typeof(Animator<SerializableSample>));
+			Add(typeof(EmitterShape), typeof(Animator<EmitterShape>));
+			Add(typeof(AudioAction), typeof(Animator<AudioAction>));
+			Add(typeof(MovieAction), typeof(Animator<MovieAction>));
+			Add(typeof(HAlignment), typeof(Animator<HAlignment>));
+			Add(typeof(VAlignment), typeof(Animator<VAlignment>));
 		}
 		
 		Dictionary<Type, Type> map = new Dictionary<Type, Type>();

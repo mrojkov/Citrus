@@ -57,7 +57,7 @@ namespace Orange
 
 		void ParseAnimator(Node node)
 		{
-			Animator animator = null;
+			IAnimator animator = null;
 			string type = lexer.ParseQuotedString();
 			frames.Clear();
 			functions.Clear();
@@ -118,7 +118,7 @@ namespace Orange
 						animator = new Color4Animator();
 						break;
 					case "Blending@Hot::MaskedEffect":
-						animator = new GenericAnimator<Blending>();
+						animator = new Animator<Blending>();
 						break;
 					default:
 						animator = node.Animators[propertyName]; 
@@ -150,7 +150,7 @@ namespace Orange
 			}
 			lexer.ParseToken('}');
 			for (int i = 0; i < frames.Count; i++) {
-				animator.Add(frames[i], values[i], functions[i]);
+				animator.Keys.Add(frames[i], values[i], functions[i]);
 			}
 		}
 	}

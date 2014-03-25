@@ -78,24 +78,24 @@ namespace Lime.PopupMenu
 			var arColor = arrowLabel.Animators["Color"];
 
 			Markers.AddStopMarker("Normal", 0);
-			bgColor.Add(0, Color4.White);
-			lbColor.Add(0, Color4.Black);
-			arColor.Add(0, Color4.Gray);
+			bgColor.Keys.Add(0, Color4.White);
+			lbColor.Keys.Add(0, Color4.Black);
+			arColor.Keys.Add(0, Color4.Gray);
 
 			Markers.AddStopMarker("Focus", 10);
-			bgColor.Add(10, Color4.Gray);
-			lbColor.Add(10, Color4.Black);
-			arColor.Add(10, Color4.Black);
+			bgColor.Keys.Add(10, Color4.Gray);
+			lbColor.Keys.Add(10, Color4.Black);
+			arColor.Keys.Add(10, Color4.Black);
 
 			Markers.AddStopMarker("Press", 20);
-			bgColor.Add(20, Color4.Black);
-			lbColor.Add(20, Color4.White);
-			arColor.Add(20, Color4.White);
+			bgColor.Keys.Add(20, Color4.Black);
+			lbColor.Keys.Add(20, Color4.White);
+			arColor.Keys.Add(20, Color4.White);
 
 			Markers.AddStopMarker("Disable", 30);
-			bgColor.Add(30, Color4.White);
-			lbColor.Add(30, Color4.Gray);
-			arColor.Add(30, Color4.Gray);
+			bgColor.Keys.Add(30, Color4.White);
+			lbColor.Keys.Add(30, Color4.Gray);
+			arColor.Keys.Add(30, Color4.Gray);
 		}
 	}
 }

@@ -2,6 +2,7 @@ using System;
 using Lime;
 using ProtoBuf;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Lime
 {
@@ -347,13 +348,13 @@ namespace Lime
 		{
 			Position += deltaPosition;
 			Size += deltaSize;
-			Vector2Animator positionAnimator = (Vector2Animator)Animators["Position"];
-			for (int i = 0; i < positionAnimator.values.Length; i++) {
-				positionAnimator.values[i] += deltaPosition;
+			var positionAnimator = (Animator<Vector2>)Animators["Position"];
+			foreach (var key in positionAnimator.ReadonlyKeys) {
+				key.Value += deltaPosition;
 			}
-			Vector2Animator sizeAnimator = (Vector2Animator)Animators["Size"];
-			for (int i = 0; i < sizeAnimator.values.Length; i++) {
-				sizeAnimator.values[i] += deltaSize;
+			var sizeAnimator = (Animator<Vector2>)Animators["Size"];
+			foreach (var key in sizeAnimator.ReadonlyKeys) {
+				key.Value += deltaPosition;
 			}
 		}
 

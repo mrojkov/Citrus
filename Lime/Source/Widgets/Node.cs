@@ -161,8 +161,8 @@ namespace Lime
 		}
 
 		public int AnimationFrame {
-			get { return Animator.MsecsToFrames(AnimationTime); }
-			set { AnimationTime = Animator.FramesToMsecs(value); }
+			get { return AnimationUtils.MsecsToFrames(AnimationTime); }
+			set { AnimationTime = AnimationUtils.FramesToMsecs(value); }
 		}
 
 		static public void UnlinkScheduledNodes()
@@ -407,7 +407,7 @@ namespace Lime
 
 		public void AdvanceAnimation(int delta)
 		{
-			const int maxTimeDelta = 1000 / Animator.FramesPerSecond - 1;
+			const int maxTimeDelta = 1000 / AnimationUtils.FramesPerSecond - 1;
 			while (delta > maxTimeDelta) {
 				AdvanceAnimationShort(maxTimeDelta);
 				delta -= maxTimeDelta;
@@ -418,8 +418,8 @@ namespace Lime
 		private void AdvanceAnimationShort(int delta)
 		{
 			if (IsRunning) {
-				int prevFrame = Animator.MsecsToFrames(animationTime - 1);
-				int currFrame = Animator.MsecsToFrames(animationTime + delta - 1);
+				int prevFrame = AnimationUtils.MsecsToFrames(animationTime - 1);
+				int currFrame = AnimationUtils.MsecsToFrames(animationTime + delta - 1);
 				animationTime += delta;
 				if (prevFrame != currFrame && Markers.Count > 0) {
 					Marker marker = Markers.GetByFrame(currFrame);
@@ -449,18 +449,18 @@ namespace Lime
 					var gotoMarker = Markers.TryFind(marker.JumpTo);
 					if (gotoMarker != null) {
 						int hopFrames = gotoMarker.Frame - AnimationFrame;
-						animationTime += Animator.FramesToMsecs(hopFrames);
+						animationTime += AnimationUtils.FramesToMsecs(hopFrames);
 						prevFrame += hopFrames;
 						currFrame += hopFrames;
 					}
 					break;
 				case MarkerAction.Stop:
-					animationTime = Animator.FramesToMsecs(marker.Frame);
+					animationTime = AnimationUtils.FramesToMsecs(marker.Frame);
 					prevFrame = currFrame - 1;
 					IsRunning = false;
 					break;
 				case MarkerAction.Destroy:
-					animationTime = Animator.FramesToMsecs(marker.Frame);
+					animationTime = AnimationUtils.FramesToMsecs(marker.Frame);
 					prevFrame = currFrame - 1;
 					IsRunning = false;
 					UnlinkAfterUpdate();
@@ -500,12 +500,12 @@ namespace Lime
 			}
 		}
 
-		private static void PreloadAnimatedTextures(Animator animator)
+		private static void PreloadAnimatedTextures(IAnimator animator)
 		{
-			var textureAnimator = animator as GenericAnimator<ITexture>;
+			var textureAnimator = animator as Animator<ITexture>;
 			if (textureAnimator != null) {
-				foreach (var texture in textureAnimator.values) {
-					texture.GetHandle();
+				foreach (var key in textureAnimator.ReadonlyKeys) {
+					key.Value.GetHandle();
 				}
 			}
 		}

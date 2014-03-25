@@ -132,9 +132,10 @@
     <Compile Include="Source\Types\Vector2.cs" />
     <Compile Include="Source\Types\Vector3.cs" />
     <Compile Include="Source\AssetsBundle\UnpackedAssetsBundle.cs" />
-    <Compile Include="Source\Widgets\Animator.cs" />
-    <Compile Include="Source\Widgets\AnimatorCollection.cs" />
-    <Compile Include="Source\Widgets\AnimatorRegistry.cs" />
+    <Compile Include="Source\Widgets\Animation\Animator.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimatorCollection.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimatorRegistry.cs" />
+    <Compile Include="Source\Widgets\Animation\Keyframe.cs" />
     <Compile Include="Source\Widgets\Audio.cs" />
     <Compile Include="Source\Widgets\Bone.cs" />
     <Compile Include="Source\Widgets\BoneArray.cs" />
@@ -144,6 +145,7 @@
     <Compile Include="Source\Widgets\Frame.cs" />
     <Compile Include="Source\Widgets\Image.cs" />
     <Compile Include="Source\Widgets\ImageCombiner.cs" />
+    <Compile Include="Source\Widgets\Animation\KeyframeCollection.cs" />
     <Compile Include="Source\Widgets\LinearLayout.cs" />
     <Compile Include="Source\Widgets\Marker.cs" />
     <Compile Include="Source\Widgets\MarkerCollection.cs" />
