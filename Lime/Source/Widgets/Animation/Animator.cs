@@ -81,8 +81,6 @@ namespace Lime
 
 		string TargetProperty { get; set; }
 
-		bool IsEvaluable();
-
 		int Duration { get; }
 
 		void InvokeTrigger(int frame);
@@ -205,34 +203,26 @@ namespace Lime
 			int i = currentKey;
 			var key1 = ReadonlyKeys[i];
 			KeyFunction function = key1.Function;
-			if (function == KeyFunction.Steep) {
+			if (function == KeyFunction.Steep || !IsInterpolable()) {
 				Setter(key1.Value);
-			} else {
-				var key2 = ReadonlyKeys[i + 1];
-				int t0 = AnimationUtils.FramesToMsecs(key1.Frame);
-				int t1 = AnimationUtils.FramesToMsecs(key2.Frame);
-				float t = (time - t0) / (float)(t1 - t0);
-				switch (function) {
-				case KeyFunction.Linear:
-					InterpolateAndSet(t, key1, key2);
-					break;
-				case KeyFunction.Spline:
-					{
-						int count = ReadonlyKeys.Count;
-						var key0 = ReadonlyKeys[i < 1 ? 0 : i - 1];
-						var key3 = ReadonlyKeys[i + 1 >= count - 1 ? count - 1 : i + 1];
-						InterpolateAndSet(t, key0, key1, key2, key3);
-					}
-					break;
-				case KeyFunction.ClosedSpline:
-					{
-						int count = ReadonlyKeys.Count;
-						var key0 = ReadonlyKeys[i < 1 ? count - 1 : i - 1];
-						var key3 = ReadonlyKeys[i + 1 >= count - 1 ? 0 : i + 1];
-						InterpolateAndSet(t, key0, key1, key2, key3);
-					}
-					break;
-				}
+				return;
+			}
+			var key2 = ReadonlyKeys[i + 1];
+			int t0 = AnimationUtils.FramesToMsecs(key1.Frame);
+			int t1 = AnimationUtils.FramesToMsecs(key2.Frame);
+			float t = (time - t0) / (float)(t1 - t0);
+			if (function == KeyFunction.Linear) {
+				InterpolateAndSet(t, key1, key2);
+			} else if (function == KeyFunction.Spline) {
+				int count = ReadonlyKeys.Count;
+				var key0 = ReadonlyKeys[i < 1 ? 0 : i - 1];
+				var key3 = ReadonlyKeys[i + 1 >= count - 1 ? count - 1 : i + 1];
+				InterpolateAndSet(t, key0, key1, key2, key3);
+			} else if (function == KeyFunction.ClosedSpline) {
+				int count = ReadonlyKeys.Count;
+				var key0 = ReadonlyKeys[i < 1 ? count - 1 : i - 1];
+				var key3 = ReadonlyKeys[i + 1 >= count - 1 ? 0 : i + 1];
+				InterpolateAndSet(t, key0, key1, key2, key3);
 			}
 		}
 
@@ -244,27 +234,20 @@ namespace Lime
 			}
 		}
 
-		public void Add(Keyframe<T> key)
+		protected virtual bool IsInterpolable()
 		{
-			if (!IsEvaluable()) {
-				key.Function = KeyFunction.Steep;
-			}
-			int c = ReadonlyKeys.Count;
-			if (c > 0 && ReadonlyKeys[c - 1].Frame >= key.Frame) {
-				throw new Lime.Exception("Key frames must be added in ascendant order");
-			}
-			ReadonlyKeys.Add(key);
-		}
-
-		public bool IsEvaluable()
-		{
-			return true;
+			return false;
 		}
 	}
 
 	[ProtoContract]
 	public class Vector2Animator : Animator<Vector2>
-	{		
+	{
+		protected override bool IsInterpolable()
+		{
+			return true;
+		}
+
 		protected override void InterpolateAndSet(float t, Keyframe<Vector2> a, Keyframe<Vector2> b)
 		{
 			Setter(Vector2.Lerp(t, a.Value, b.Value));
@@ -279,6 +262,11 @@ namespace Lime
 	[ProtoContract]
 	public class NumericAnimator : Animator<float>
 	{
+		protected override bool IsInterpolable()
+		{
+			return true;
+		}
+
 		protected override void InterpolateAndSet(float t, Keyframe<float> a, Keyframe<float> b)
 		{
 			Setter(t * (b.Value - a.Value) + a.Value);
@@ -293,6 +281,11 @@ namespace Lime
 	[ProtoContract]
 	public class Color4Animator : Animator<Color4>
 	{
+		protected override bool IsInterpolable()
+		{
+			return true;
+		}
+
 		protected override void InterpolateAndSet(float t, Keyframe<Color4> a, Keyframe<Color4> b)
 		{
 			Setter(Color4.Lerp(t, a.Value, b.Value));
