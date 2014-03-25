@@ -40,9 +40,9 @@ namespace Lime
 	}
 
 	[ProtoContract]
-	[ProtoInclude(101, typeof(NumericAnimator))]
-	[ProtoInclude(102, typeof(Vector2Animator))]
-	[ProtoInclude(103, typeof(Color4Animator))]
+	[ProtoInclude(151, typeof(NumericAnimator))]
+	[ProtoInclude(152, typeof(Vector2Animator))]
+	[ProtoInclude(153, typeof(Color4Animator))]
 	public class Animator<T> : IAnimator
 	{
 		private Node owner;

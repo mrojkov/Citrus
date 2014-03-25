@@ -61,6 +61,15 @@
     <Compile Include="Source\Graphics\OpenGL\ShaderProgram.cs" />
     <Compile Include="Source\Graphics\OpenGL\Shaders.cs" />
     <Compile Include="Source\Graphics\OpenGL\XamarinAdapter.cs" />
+    <Compile Include="Source\Application\Cursors.cs" />
+    <Compile Include="Source\Application\RenderingApi.cs" />
+    <Compile Include="Source\Application\Sdl2.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimationUtils.cs" />
+    <Compile Include="Source\Widgets\Animation\Animator.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimatorCollection.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimatorRegistry.cs" />
+    <Compile Include="Source\Widgets\Animation\Keyframe.cs" />
+    <Compile Include="Source\Widgets\Animation\KeyframeCollection.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -83,9 +92,6 @@
     <Compile Include="Source\Types\Rectangle.cs" />
     <Compile Include="Source\Types\Size.cs" />
     <Compile Include="Source\Types\Vector2.cs" />
-    <Compile Include="Source\Widgets\Animator.cs" />
-    <Compile Include="Source\Widgets\AnimatorCollection.cs" />
-    <Compile Include="Source\Widgets\AnimatorRegistry.cs" />
     <Compile Include="Source\Widgets\Audio.cs" />
     <Compile Include="Source\Widgets\Bone.cs" />
     <Compile Include="Source\Widgets\BoneArray.cs" />
@@ -136,7 +142,6 @@
     <Compile Include="Source\Application\Logger.cs" />
     <Compile Include="Source\Types\TangerineClassAttribute.cs" />
     <Compile Include="Source\Types\TangerinePropertyAttribute.cs" />
-    <Compile Include="Source\Application\WinCursors.cs" />
     <Compile Include="Source\Application\WinApi.cs" />
     <Compile Include="Source\AssetsBundle\AssetsBundle.cs" />
     <Compile Include="Source\AssetsBundle\PackedAssetsBundle.cs" />
