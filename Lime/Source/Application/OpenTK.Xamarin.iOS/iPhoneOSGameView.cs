@@ -207,7 +207,7 @@ namespace Lime.Xamarin
         bool disposed;
 
         int framebuffer, renderbuffer;
-        bool framebufferReady;
+        bool framebufferReady; // buz
 
         GLCalls gl;
 
@@ -489,7 +489,7 @@ namespace Lime.Xamarin
 
             frameBufferWindow = new WeakReference(Window);
             frameBufferLayer = new WeakReference(Layer);
-            framebufferReady = true;
+            framebufferReady = true; // buz
         }
 
         protected virtual void ConfigureLayer(CAEAGLLayer eaglLayer)
@@ -516,7 +516,7 @@ namespace Lime.Xamarin
             GraphicsContext.Dispose();
             GraphicsContext = null;
             gl = null;
-            framebufferReady = false;
+            framebufferReady = false; // buz
         }
 
         public virtual void Close()
@@ -763,6 +763,7 @@ namespace Lime.Xamarin
             OnUpdateFrame(updateEventArgs);
             prevUpdateTime = curUpdateTime;
 
+            // buz
             if (!framebufferReady) {
                 CreateFrameBuffer();
                 Application.Instance.OnDeviceRotated(Application.Instance.CurrentDeviceOrientation); // notify resolution changers & stuff...
