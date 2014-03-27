@@ -36,6 +36,8 @@ namespace Lime
 
 		void Apply(int time);
 
+		IKeyframeCollection ReadonlyKeys { get; }
+
 		IKeyframeCollection Keys { get; }
 	}
 
@@ -69,8 +71,20 @@ namespace Lime
 		IKeyframeCollection proxyKeys;
 		IKeyframeCollection IAnimator.Keys {
 			get {
+				if (ReadonlyKeys.Shared) {
+					proxyKeys = null;
+				}
 				if (proxyKeys == null) {
 					proxyKeys = new KeyframeCollectionProxy<T>(Keys);
+				}
+				return proxyKeys;
+			}
+		}
+
+		IKeyframeCollection IAnimator.ReadonlyKeys {
+			get {
+				if (proxyKeys == null) {
+					proxyKeys = new KeyframeCollectionProxy<T>(ReadonlyKeys);
 				}
 				return proxyKeys;
 			}

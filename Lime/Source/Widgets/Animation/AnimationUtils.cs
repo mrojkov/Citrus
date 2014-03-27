@@ -20,7 +20,7 @@ namespace Lime
 			return frames << 6;
 		}
 
-		public struct PropertyData
+		internal struct PropertyData
 		{
 			public Type OwnerType;
 			public PropertyInfo Info;
