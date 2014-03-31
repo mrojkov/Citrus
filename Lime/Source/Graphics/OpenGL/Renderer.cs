@@ -252,6 +252,7 @@ namespace Lime
 		public static void SetScissorTestEnabled(bool value)
 		{
 			FlushSpriteBatch();
+			scissorTestEnabled = value;
 			if (value) {
 				GL.Enable(EnableCap.ScissorTest);
 			} else {
