@@ -110,14 +110,14 @@ namespace Lime.Xamarin
                 if (minor < 0)
                     minor = 0;
 
-                Debug.Print("Creating GraphicsContext.");
+                // Debug.Print("Creating GraphicsContext.");
                 try
                 {
-                    Debug.Indent();
-                    Debug.Print("GraphicsMode: {0}", mode);
-                    Debug.Print("IWindowInfo: {0}", window);
-                    Debug.Print("GraphicsContextFlags: {0}", flags);
-                    Debug.Print("Requested version: {0}.{1}", major, minor);
+                    // Debug.Indent();
+                    // Debug.Print("GraphicsMode: {0}", mode);
+                    // Debug.Print("IWindowInfo: {0}", window);
+                    // Debug.Print("GraphicsContextFlags: {0}", flags);
+                    // Debug.Print("Requested version: {0}.{1}", major, minor);
 
                     IGraphicsContext shareContext = FindSharedContext();
                     
@@ -155,7 +155,7 @@ namespace Lime.Xamarin
                 }
                 finally
                 {
-                    Debug.Unindent();
+                    // Debug.Unindent();
                 }
             }
         }
@@ -562,7 +562,7 @@ namespace Lime.Xamarin
         {
             if (!IsDisposed)
             {
-                Debug.Print("Disposing context {0}.", (this as IGraphicsContextInternal).Context.ToString());
+                // Debug.Print("Disposing context {0}.", (this as IGraphicsContextInternal).Context.ToString());
                 lock (SyncRoot)
                 {
                     available_contexts.Remove((this as IGraphicsContextInternal).Context);
