@@ -54,6 +54,11 @@ namespace Lime
 			return (float)Math.Sin(radians);
 		}
 
+		public static float Atan2(Vector2 v)
+		{
+			return (float)Math.Atan2(v.Y, v.X);
+		}
+
 		public static int Wrap(int x, int lowerBound, int upperBound)
 		{
 			int range = upperBound - lowerBound + 1;
