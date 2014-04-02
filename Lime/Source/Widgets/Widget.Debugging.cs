@@ -14,20 +14,27 @@ namespace Lime
 		{
 			private Widget widget;
 
-			public struct Geometry
+			public struct WidgetBasis
 			{
 				public Vector2 Position;
 				public Vector2 Scale;
-				public Vector2 Pivot;
-				public Vector2 Size;
 				public float Rotation;
-				public Color4 Color;
-				public bool Visible;
-				public Blending Blending;
 
 				public override string ToString()
 				{
-					return string.Format("Position: {0}", Position);
+					return string.Format("Position: {0}; Scale: {1}; Rotation: {2}",
+						Position, Scale, Rotation);
+				}
+			}
+
+			public struct WidgetPainting
+			{
+				public Color4 Color;
+				public Blending Blending;
+				public bool Visible;
+				public override string ToString()
+				{
+					return string.Format("Visible: {0}, Color: {1}; Blending: {2}", Visible, Color, Blending);
 				}
 			}
 
@@ -36,47 +43,68 @@ namespace Lime
 				this.widget = widget;
 			}
 
+			public string Id { get { return widget.Id; } }
+
 			public Node Parent { get { return widget.Parent; } }
 
 			public Marker[] Markers { get { return widget.Markers.AsArray(); } }
 
-			public Geometry LocalGeometry
+			public Vector2 Size { get { return widget.Size; } }
+
+			public Vector2 Pivot { get { return widget.Pivot; } }
+
+			public WidgetBasis LocalBasis
 			{
 				get
 				{
-					return new Geometry {
-						Color = widget.Color,
+					return new WidgetBasis {
 						Position = widget.Position,
-						Size = widget.Size,
 						Scale = widget.Scale,
 						Rotation = widget.Rotation,
-						Blending = widget.Blending,
-						Visible = widget.Visible,
-						Pivot = widget.Pivot
 					};
 				}
 			}
 
-			public Geometry GlobalGeometry
+			public WidgetPainting LocalPainting
+			{
+				get
+				{
+					return new WidgetPainting {
+						Visible = widget.Visible,
+						Color = widget.Color,
+						Blending = widget.Blending
+					};
+				}
+			}
+
+			public WidgetBasis GlobalBasis
 			{
 				get
 				{
 					widget.RecalcGlobalMatrixAndColor();
 					var b = widget.CalcTransformFromMatrix(widget.LocalToWorldTransform);
-					return new Geometry {
+					return new WidgetBasis {
 						Position = b.Position,
-						Pivot = widget.Pivot,
 						Rotation = b.Rotation,
 						Scale = b.Scale,
-						Size = widget.Size,
-						Visible = widget.GloballyVisible,
-						Blending = widget.GlobalBlending,
-						Color = widget.GlobalColor
 					};
 				}
 			}
 
-			[DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
+			public WidgetPainting GlobalPainting
+			{
+				get
+				{
+					widget.RecalcGlobalMatrixAndColor();
+					return new WidgetPainting {
+						Visible = widget.GloballyVisible,
+						Color = widget.GlobalColor,
+						Blending = widget.GlobalBlending
+					};
+				}
+			}
+
+			//[DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
 			public Node[] Nodes { get { return widget.Nodes.AsArray; } }
 
 			public List<string> DiagnoseVisibility

@@ -217,7 +217,7 @@ namespace Lime
 
 		public override string ToString()
 		{
-			return string.Format("{0}, {1}", GetType().Name, GetHierarchyPath());
+			return string.Format("{0}, \"{1}\", {2}", GetType().Name, Id ?? "", GetHierarchyPath());
 		}
 
 		private string GetHierarchyPath()

@@ -114,7 +114,7 @@ namespace Lime
 
 		public override string ToString()
 		{
-			return String.Format("{0}, {1}, {2}, {3}", R, G, B, A);
+			return String.Format("#{0:X}{1:X}{2:X}{3:X}", R, G, B, A);
 		}
 	}
 }
