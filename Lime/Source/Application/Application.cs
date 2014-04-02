@@ -155,6 +155,11 @@ namespace Lime
 		{
 			GameView.Instance.ShowOnscreenKeyboard(show, text);
 		}
+		
+		public void ChangeOnscreenKeyboardText(string text)
+		{
+			GameView.Instance.ChangeOnscreenKeyboardText(text);
+		}
 
 		public bool Active { get; internal set; }
 
