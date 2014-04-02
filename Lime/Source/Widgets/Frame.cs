@@ -50,6 +50,8 @@ namespace Lime
 
 		public ClipMethod ClipChildren { get; set; }
 
+		public Widget ClipByWidget { get; set; }
+
 		RenderTarget renderTarget;
 		ITexture renderTexture;
 
@@ -154,7 +156,7 @@ namespace Lime
 			var savedScissorTest = Renderer.ScissorTestEnabled;
 			var savedScissorRect = Renderer.ScissorRectangle;
 			Renderer.ScissorTestEnabled = true;
-			Renderer.ScissorRectangle = CalculateScissorRectangle();
+			Renderer.ScissorRectangle = CalculateScissorRectangle(ClipByWidget ?? this);
 			try {
 				var chain = new RenderChain();
 				foreach (var node in Nodes) {
@@ -167,9 +169,9 @@ namespace Lime
 			}
 		}
 
-		private WindowRect CalculateScissorRectangle()
+		private WindowRect CalculateScissorRectangle(Widget widget)
 		{
-			var aabb = CalcAABBInSpaceOf(World.Instance);
+			var aabb = widget.CalcAABBInSpaceOf(World.Instance);
 			// Get the projected AABB coordinates in the normalized OpenGL space
 			Matrix44 proj = Renderer.Projection;
 			aabb.A = proj.TransformVector(aabb.A);
