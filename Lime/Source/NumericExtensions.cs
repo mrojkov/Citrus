@@ -71,5 +71,10 @@ namespace Lime
 		{
 			return (int)Math.Ceiling(x);
 		}
+
+		public static int RoundTo(this int x, int y)
+		{
+			return (x + y / 2) / y * y;
+		}
 	}
 }
