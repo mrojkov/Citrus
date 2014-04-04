@@ -146,7 +146,7 @@ namespace Lime
 				suggestions.Add(string.Format("Widget is possible out of the screen (Position: {0})", basis.Position));
 			}
 			if (!(this is Image) && (this.Nodes.Count == 0)) {
-				suggestions.Add("Widget has no any drawable node");
+				suggestions.Add("Widget hasn't any drawable node");
 			}
 		}
 	}

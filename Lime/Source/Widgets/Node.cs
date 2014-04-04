@@ -103,6 +103,28 @@ namespace Lime
 			Nodes = new NodeCollection(this);
 		}
 
+		private Activity preactivity;
+		public Activity Preactivity
+		{
+			get {
+				if (preactivity == null) {
+					preactivity = new Activity();
+				}
+				return preactivity;
+			}
+		}
+
+		private Activity postactivity;
+		public Activity Postactivity
+		{
+			get {
+				if (postactivity == null) {
+					postactivity = new Activity();
+				}
+				return postactivity;
+			}
+		}
+
 		public Node GetRoot()
 		{
 			Node node = this;
@@ -203,6 +225,8 @@ namespace Lime
 			clone.AsWidget = clone as Widget;
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Nodes = NodeCollection.DeepCloneFast(clone, Nodes);
+			clone.preactivity = null;
+			clone.postactivity = null;
 			return clone;
 		}
 
@@ -283,12 +307,18 @@ namespace Lime
 
 		public void FullUpdate(int delta)
 		{
+			if (preactivity != null) {
+				preactivity.Update(delta * 0.001f);
+			}
 			if (Updating != null) {
 				Updating(delta * 0.001f);
 			}
 			Update(delta);
 			if (Updated != null) {
 				Updated(delta * 0.001f);
+			}
+			if (postactivity != null) {
+				postactivity.Update(delta * 0.001f);
 			}
 		}
 
