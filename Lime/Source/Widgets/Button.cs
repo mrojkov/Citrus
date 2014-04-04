@@ -53,6 +53,16 @@ namespace Lime
 		/// </summary>
 		public static float ButtonEffectiveRadius = 400;
 
+		/// <summary>
+		/// Indicates whether all buttons should use tablet control scheme that doesn't includes
+		/// 'focused' state support, but behaves better when multiple buttons overlap eachother.
+		/// </summary>
+#if iOS
+		public static bool TabletControlScheme = true;
+#else
+		public static bool TabletControlScheme = false;
+#endif
+
 		public Button()
 		{
 			Enabled = true;
@@ -87,20 +97,20 @@ namespace Lime
 			}
 			TryRunAnimation("Normal");
 			while (true) {
-#if iOS
-				if (Input.WasMousePressed() && HitTest(Input.MousePosition) && TheActiveWidget == null) {
-					World.Instance.ActiveWidget = this;
-					if (Draggable) {
-						State = DetectDraggingState;
-					} else {
-						State = PressedState;
+				if (TabletControlScheme) {
+					if (Input.WasMousePressed() && HitTest(Input.MousePosition) && TheActiveWidget == null) {
+						World.Instance.ActiveWidget = this;
+						if (Draggable) {
+							State = DetectDraggingState;
+						} else {
+							State = PressedState;
+						}
+					}
+				} else {
+					if (HitTest(Input.MousePosition) && TheActiveWidget == null) {
+						State = FocusedState;
 					}
 				}
-#else
-				if (HitTest(Input.MousePosition) && TheActiveWidget == null) {
-					State = FocusedState;
-				}
-#endif
 				yield return 0;
 			}
 		}
@@ -113,7 +123,7 @@ namespace Lime
 			}
 		}
 
-#if !iOS
+		// Used only in desktop control scheme
 		private IEnumerator<int> FocusedState()
 		{
 			World.Instance.ActiveWidget = this;
@@ -131,7 +141,6 @@ namespace Lime
 				yield return 0;
 			}
 		}
-#endif
 
 		private IEnumerator<int> DetectDraggingState()
 		{
@@ -208,15 +217,15 @@ namespace Lime
 					}
 				}
 			}
-#if iOS
-			State = NormalState;
-#else
-			if (HitTest(Input.MousePosition)) {
-				State = FocusedState;
-			} else {
+			if (TabletControlScheme) {
 				State = NormalState;
+			} else {
+				if (HitTest(Input.MousePosition)) {
+					State = FocusedState;
+				} else {
+					State = NormalState;
+				}
 			}
-#endif
 		}
 
 		private IEnumerator<int> DisabledState()
