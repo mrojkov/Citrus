@@ -5,8 +5,6 @@ using System.Text;
 
 namespace Lime
 {
-	using EnumType = IEnumerator<object>;
-
 	public class TaskResult<T>
 	{
 		public T Value;
@@ -18,11 +16,11 @@ namespace Lime
 		public T2 Value2;
 	}
 
-	public partial class Activity : List<Task>
+	public class TaskList : List<Task>
 	{
 		[ThreadStatic]
-		private static Activity current;
-		public static Activity Current { 
+		private static TaskList current;
+		public static TaskList Current { 
 			get { return current; } 
 			private set { current = value; } 
 		}
@@ -30,7 +28,7 @@ namespace Lime
 		public float Time;
 		public float Delta;
 
-		public Activity() {}
+		public TaskList() {}
 
 		public void Stop()
 		{
@@ -50,7 +48,7 @@ namespace Lime
 			RemoveAll(match);
 		}
 
-		public Task Add(EnumType e, object tag = null)
+		public Task Add(IEnumerator<object> e, object tag = null)
 		{
 			var task = new Task(e, tag);
 			Add(task);
@@ -65,7 +63,7 @@ namespace Lime
 				return;
 			}
 			isBeingUpdated = true;
-			Activity savedCurrent = Current;
+			TaskList savedCurrent = Current;
 			Current = this;
 			try {
 				Time += delta;
@@ -83,7 +81,7 @@ namespace Lime
 			}
 		}
 
-		#region Workflow Utilities
+		#region Utility methods
 		public static IEnumerable<float> SinMotion(float timePeriod, float from, float to)
 		{
 			for (float t = 0; t < timePeriod; t += Current.Delta) {

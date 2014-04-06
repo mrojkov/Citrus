@@ -103,25 +103,25 @@ namespace Lime
 			Nodes = new NodeCollection(this);
 		}
 
-		private Activity preactivity;
-		public Activity Preactivity
+		private TaskList tasks;
+		public TaskList Tasks
 		{
 			get {
-				if (preactivity == null) {
-					preactivity = new Activity();
+				if (tasks == null) {
+					tasks = new TaskList();
 				}
-				return preactivity;
+				return tasks;
 			}
 		}
 
-		private Activity postactivity;
-		public Activity Postactivity
+		private TaskList lateTasks;
+		public TaskList LateTasks
 		{
 			get {
-				if (postactivity == null) {
-					postactivity = new Activity();
+				if (lateTasks == null) {
+					lateTasks = new TaskList();
 				}
-				return postactivity;
+				return lateTasks;
 			}
 		}
 
@@ -225,8 +225,8 @@ namespace Lime
 			clone.AsWidget = clone as Widget;
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Nodes = NodeCollection.DeepCloneFast(clone, Nodes);
-			clone.preactivity = null;
-			clone.postactivity = null;
+			clone.tasks = null;
+			clone.lateTasks = null;
 			return clone;
 		}
 
@@ -307,22 +307,32 @@ namespace Lime
 
 		public void FullUpdate(int delta)
 		{
-			if (preactivity != null) {
-				preactivity.Update(delta * 0.001f);
-			}
-			if (Updating != null) {
-				Updating(delta * 0.001f);
-			}
-			Update(delta);
-			if (Updated != null) {
-				Updated(delta * 0.001f);
-			}
-			if (postactivity != null) {
-				postactivity.Update(delta * 0.001f);
+			if (tasks != null || lateTasks != null || Updating != null || Updated != null) {
+				FullUpdateHelper(delta);
+			} else {
+				Update(delta);
 			}
 		}
 
-		internal virtual void OnParentChanged() {}
+		private void FullUpdateHelper(int delta)
+		{
+			using (new Input.ContextChanger(this)) {
+				float realDelta = delta * 0.001f;
+				if (tasks != null) {
+					tasks.Update(realDelta);
+				}
+				if (Updating != null) {
+					Updating(realDelta);
+				}
+				Update(delta);
+				if (Updated != null) {
+					Updated(realDelta);
+				}
+				if (lateTasks != null) {
+					lateTasks.Update(realDelta);
+				}
+			}
+		}
 
 		public virtual void Render() {}
 
