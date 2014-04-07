@@ -316,7 +316,7 @@ namespace Lime
 
 		private void FullUpdateHelper(int delta)
 		{
-			using (new Input.ContextChanger(this)) {
+			//using (new Input.ContextChanger(this)) {
 				float realDelta = delta * 0.001f;
 				if (tasks != null) {
 					tasks.Update(realDelta);
@@ -331,7 +331,7 @@ namespace Lime
 				if (lateTasks != null) {
 					lateTasks.Update(realDelta);
 				}
-			}
+			//}
 		}
 
 		public virtual void Render() {}

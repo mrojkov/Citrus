@@ -133,8 +133,6 @@
     <Compile Include="Source\Types\Vector2.cs" />
     <Compile Include="Source\Types\Vector3.cs" />
     <Compile Include="Source\AssetsBundle\UnpackedAssetsBundle.cs" />
-    <Compile Include="Source\Widgets\Activity.cs" />
-    <Compile Include="Source\Widgets\Activity.Task.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationUtils.cs" />
     <Compile Include="Source\Widgets\Animation\Animator.cs" />
     <Compile Include="Source\Widgets\Animation\AnimatorCollection.cs" />
@@ -180,6 +178,8 @@
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGameView.cs" />
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGraphicsContext.cs" />
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Utilities.iPhone.cs" />
+    <Compile Include="Source\Widgets\Task.cs" />
+    <Compile Include="Source\Widgets\TaskList.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
