@@ -96,9 +96,9 @@ namespace Lime
 			}
 		}
 
-		public override bool HitTest(Vector2 point)
+		protected override bool SelfHitTest(Vector2 point)
 		{
-			if (!GloballyVisible || skipRender) {
+			if (!GloballyVisible || skipRender || !InsideClipRect(point)) {
 				return false;
 			}
 			return base.HitTest(point);

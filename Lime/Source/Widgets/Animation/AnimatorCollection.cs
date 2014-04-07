@@ -48,19 +48,38 @@ namespace Lime
 			return result;
 		}
 
+		public bool TryGet(string propertyName, out IAnimator animator)
+		{
+			foreach (IAnimator a in animatorList) {
+				if (a.TargetProperty == propertyName) {
+					animator = a;
+					return true;
+				}
+			}
+			animator = null;
+			return false;
+		}
+
+		public bool TryGet<T>(string propertyName, out Animator<T> animator)
+		{
+			IAnimator a;
+			TryGet(propertyName, out a);
+			animator = a as Animator<T>;
+			return animator != null;
+		}
+
 		public IAnimator this[string propertyName]
 		{
 			get {
-				foreach (IAnimator a in animatorList) {
-					if (a.TargetProperty == propertyName) {
-						return a;
-					}
+				IAnimator animator;
+				if (TryGet(propertyName, out animator)) {
+					return animator;
 				}
 				PropertyInfo pi = owner.GetType().GetProperty(propertyName);
 				if (pi == null) {
 					throw new Lime.Exception("Unknown property {0} in {1}", propertyName, owner.GetType().Name);
 				}
-				var animator = AnimatorRegistry.Instance.CreateAnimator(pi.PropertyType);
+				animator = AnimatorRegistry.Instance.CreateAnimator(pi.PropertyType);
 				animator.TargetProperty = propertyName;
 				Add(animator);
 				return animator;

@@ -80,30 +80,31 @@ namespace Lime
 			base.Update(delta);
 		}
 
-		public override bool HitTest(Vector2 point)
+		protected override bool SelfHitTest(Vector2 point)
 		{
-			if (GloballyVisible && !skipRender) {
-				if (HitTestMethod == HitTestMethod.Contents) {
-					Vector2 localPoint = LocalToWorldTransform.CalcInversed().TransformVector(point);
-					Vector2 size = Size;
-					if (size.X < 0) {
-						localPoint.X = -localPoint.X;
-						size.X = -size.X;
-					}
-					if (size.Y < 0) {
-						localPoint.Y = -localPoint.Y;
-						size.Y = -size.Y;
-					}
-					if (localPoint.X >= 0 && localPoint.Y >= 0 && localPoint.X < size.X && localPoint.Y < size.Y) {
-						int u = (int)(Texture.ImageSize.Width * (localPoint.X / size.X));
-						int v = (int)(Texture.ImageSize.Height * (localPoint.Y / size.Y));
-						return !Texture.IsTransparentPixel(u, v);
-					} else
-						return false;
-				} else
-					return base.HitTest(point);
+			if (!GloballyVisible || skipRender || !InsideClipRect(point)) {
+				return false;
 			}
-			return false;
+			if (HitTestMethod != HitTestMethod.Contents) {
+				return base.SelfHitTest(point);
+			}
+			Vector2 localPoint = LocalToWorldTransform.CalcInversed().TransformVector(point);
+			Vector2 size = Size;
+			if (size.X < 0) {
+				localPoint.X = -localPoint.X;
+				size.X = -size.X;
+			}
+			if (size.Y < 0) {
+				localPoint.Y = -localPoint.Y;
+				size.Y = -size.Y;
+			}
+			if (localPoint.X >= 0 && localPoint.Y >= 0 && localPoint.X < size.X && localPoint.Y < size.Y) {
+				int u = (int)(Texture.ImageSize.Width * (localPoint.X / size.X));
+				int v = (int)(Texture.ImageSize.Height * (localPoint.Y / size.Y));
+				return !Texture.IsTransparentPixel(u, v);
+			} else {
+				return false;
+			}
 		}
 	}
 }

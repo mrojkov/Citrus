@@ -119,17 +119,18 @@ namespace Lime
 			}
 		}
 
-		public override bool HitTest(Vector2 point)
+		protected override bool SelfHitTest(Vector2 point)
 		{
-			if (GloballyVisible) {
-				if (HitTestMethod == HitTestMethod.Contents) {
-					BuildLayout(layout);
-					for (int i = 0; i < layout.Length; i++) {
-						if (PartHitTest(layout[i], point))
-							return true;
-					}
-					return false;
+			if (!GloballyVisible || !InsideClipRect(point)) {
+				return false;
+			}
+			if (HitTestMethod == HitTestMethod.Contents) {
+				BuildLayout(layout);
+				for (int i = 0; i < layout.Length; i++) {
+					if (PartHitTest(layout[i], point))
+						return true;
 				}
+				return false;
 			}
 			return base.HitTest(point);
 		}

@@ -45,6 +45,9 @@ namespace Lime
 	[TangerineClass]
 	public partial class Widget : Node
 	{
+		public const int EmptyHitTestMask = 0;
+		public const int ControlsHitTestMask = 1;
+
 		private Vector2 position;
 		private Vector2 size;
 		private float rotation;
@@ -52,7 +55,6 @@ namespace Lime
 		private Color4 color;
 		private Action clicked;
 		public Vector2 ParentSize;
-
 		protected bool RenderedToTexture;
 
 		#region Properties
@@ -133,6 +135,7 @@ namespace Lime
 
 		[ProtoMember(11)]
 		public HitTestMethod HitTestMethod { get; set; }
+		public uint HitTestMask;
 
 		[ProtoMember(13)]
 		public BoneArray BoneArray;
@@ -301,20 +304,18 @@ namespace Lime
 
 		private void ApplyAnchors()
 		{
-			Vector2 s = Parent.AsWidget.Size;
-			if (!ParentSize.Equals(s)) {
-				float deltaX;
-				float deltaY;
-				float deltaWidth;
-				float deltaHeight;
-				CalcChangesAlongXAxis(out deltaX, out deltaWidth);
-				CalcChangesAlongYAxis(out deltaY, out deltaHeight);
-				ApplyChanges(new Vector2(deltaX, deltaY), new Vector2(deltaWidth, deltaHeight));
+			var actualParentSize = Parent.AsWidget.Size;
+			if (!ParentSize.Equals(actualParentSize)) {
+				Vector2 deltaPosition;
+				Vector2 deltaSize;
+				CalcAnchorChangesAlongXAxis(out deltaPosition.X, out deltaSize.X);
+				CalcAnchorChangesAlongYAxis(out deltaPosition.Y, out deltaSize.Y);
+				ApplyAnchorChanges(deltaPosition, deltaSize);
 			}
-			ParentSize = s;
+			ParentSize = actualParentSize;
 		}
 
-		private void CalcChangesAlongXAxis(out float deltaX, out float deltaWidth)
+		private void CalcAnchorChangesAlongXAxis(out float deltaX, out float deltaWidth)
 		{
 			deltaX = 0;
 			deltaWidth = 0;
@@ -329,7 +330,7 @@ namespace Lime
 			}
 		}
 
-		private void CalcChangesAlongYAxis(out float deltaY, out float deltaHeight)
+		private void CalcAnchorChangesAlongYAxis(out float deltaY, out float deltaHeight)
 		{
 			deltaY = 0;
 			deltaHeight = 0;
@@ -344,43 +345,95 @@ namespace Lime
 			}
 		}
 
-		private void ApplyChanges(Vector2 deltaPosition, Vector2 deltaSize)
+		private void ApplyAnchorChanges(Vector2 deltaPosition, Vector2 deltaSize)
 		{
 			Position += deltaPosition;
 			Size += deltaSize;
-			var positionAnimator = (Animator<Vector2>)Animators["Position"];
-			foreach (var key in positionAnimator.ReadonlyKeys) {
-				key.Value += deltaPosition;
-			}
-			var sizeAnimator = (Animator<Vector2>)Animators["Size"];
-			foreach (var key in sizeAnimator.ReadonlyKeys) {
-				key.Value += deltaPosition;
+			if (Animators.Count > 0) {
+				Animator<Vector2> animator;
+				if (Animators.TryGet("Position", out animator)) {
+					foreach (var key in animator.Keys) {
+						key.Value += deltaPosition;
+					}
+				}
+				if (Animators.TryGet("Size", out animator)) {
+					foreach (var key in animator.Keys) {
+						key.Value += deltaSize;
+					}
+				}
 			}
 		}
 
-		public virtual bool HitTest(Vector2 point)
+		#endregion
+
+		#region HitTest handling
+
+		public bool HitTest(Vector2 point)
 		{
-			return HitTest(point, HitTestMethod);
+			return SelfHitTest(point) && !ObscuredByOtherHitTestTargets(point);
 		}
 
-		public virtual bool HitTest(Vector2 point, HitTestMethod method)
+		private bool ObscuredByOtherHitTestTargets(Vector2 point)
 		{
-			if (!GloballyVisible) {
+			if (HitTestMask == 0) {
 				return false;
 			}
-			if (method == HitTestMethod.BoundingRect) {
-				Vector2 p = LocalToWorldTransform.CalcInversed().TransformVector(point);
-				Vector2 s = Size;
-				if (s.X < 0) {
-					p.X = -p.X;
-					s.X = -s.X;
+			var targets = new List<Widget>();
+			World.Instance.AsWidget.EnumerateHitTestTargets(targets, HitTestMask);
+			int thisLayer = GetEffectiveLayer();
+			bool passedThis = false;
+			foreach (var target in targets) {
+				if (target == this) {
+					passedThis = true;
+					continue;
 				}
-				if (s.Y < 0) {
-					p.Y = -p.Y;
-					s.Y = -s.Y;
+				int targetLayer = target.GetEffectiveLayer();
+				if (targetLayer < thisLayer) {
+					continue;
 				}
-				return p.X >= 0 && p.Y >= 0 && p.X < s.X && p.Y < s.Y;
-			} else if (method == HitTestMethod.Contents) {
+				if (targetLayer == thisLayer && passedThis) {
+					continue;
+				}
+				if (target.SelfHitTest(point)) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		public int GetEffectiveLayer()
+		{
+			for (Node node = this; node != null; node = node.Parent) {
+				if (node.AsWidget.Layer != 0) {
+					return node.AsWidget.Layer;
+				}
+			}
+			return 0;
+		}
+
+		private void EnumerateHitTestTargets(List<Widget> targets, uint mask)
+		{
+			if (!GloballyVisible) {
+				return;
+			}
+			if ((HitTestMask & mask) != 0) {
+				targets.Add(this);
+			}
+			foreach (var i in Nodes.AsArray) {
+				if (i.AsWidget != null) {
+					i.AsWidget.EnumerateHitTestTargets(targets, mask);
+				}
+			}
+		}
+
+		protected virtual bool SelfHitTest(Vector2 point)
+		{
+			if (!GloballyVisible || !InsideClipRect(point)) {
+				return false;
+			}
+			if (HitTestMethod == HitTestMethod.BoundingRect) {
+				return HitTestBoundingRect(point);
+			} else if (HitTestMethod == HitTestMethod.Contents) {
 				foreach (Node node in Nodes.AsArray) {
 					if (node.AsWidget != null && node.AsWidget.HitTest(point))
 						return true;
@@ -388,6 +441,38 @@ namespace Lime
 				return false;
 			}
 			return false;
+		}
+
+		private bool HitTestBoundingRect(Vector2 point)
+		{
+			Vector2 position = LocalToWorldTransform.CalcInversed().TransformVector(point);
+			Vector2 size = Size;
+			if (size.X < 0) {
+				position.X = -position.X;
+				size.X = -size.X;
+			}
+			if (size.Y < 0) {
+				position.Y = -position.Y;
+				size.Y = -size.Y;
+			}
+			return position.X >= 0 && position.Y >= 0 && position.X < size.X && position.Y < size.Y;
+		}
+
+		protected bool InsideClipRect(Vector2 point)
+		{
+			var clipper = GetEffectiveClipperWidget();
+			if (clipper != null) {
+				return clipper.HitTestBoundingRect(point);
+			}
+			return true;
+		}
+
+		protected virtual Widget GetEffectiveClipperWidget()
+		{
+			if (Parent != null && Parent.AsWidget != null) {
+				return Parent.AsWidget;
+			}
+			return null;
 		}
 
 		#endregion

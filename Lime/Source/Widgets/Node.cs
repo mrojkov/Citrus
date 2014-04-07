@@ -59,6 +59,7 @@ namespace Lime
 		public Widget AsWidget { get; internal set; }
 
 		internal Node NextToRender;
+
 		public int Layer { get; set; }
 
 		[ProtoMember(5)]
