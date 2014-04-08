@@ -207,16 +207,6 @@ namespace Lime
 			get { return Find<Widget>(string.Format(format, arg)); }
 		}
 
-		public void MakeInvisible()
-		{
-			Visible = false;
-		}
-
-		public void MakeVisible()
-		{
-			Visible = true;
-		}
-
 		public override Node DeepCloneFast()
 		{
 			var clone = base.DeepCloneFast();
