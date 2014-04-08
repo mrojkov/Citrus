@@ -163,10 +163,5 @@ namespace Lime
 			}
 			return null;
 		}
-
-		public T TryFind<T>(string id) where T : Node
-		{
-			return TryFind(id) as T;
-		}
 	}
 }
