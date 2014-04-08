@@ -469,11 +469,9 @@ namespace Lime
 
 		protected virtual Widget GetEffectiveClipperWidget()
 		{
-			// buz: это условие блокирует нормальную работу некоторых кнопок в WorldSaga.
-			// “ам далеко не всегда кнопки попадают в границы родительского виджета.
-			/*if (Parent != null && Parent.AsWidget != null) {
-				return Parent.AsWidget;
-			}*/
+			if (Parent != null && Parent.AsWidget != null) {
+				return Parent.AsWidget.GetEffectiveClipperWidget();
+			}
 			return null;
 		}
 
