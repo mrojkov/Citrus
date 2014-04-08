@@ -130,7 +130,7 @@ namespace Lime
 			renderer.AddStyle(defaultStyle ?? TextStyle.Default);
 			// Fill up style list.
 			foreach (var styleName in parser.Styles) {
-				var style = Nodes.Find(styleName) as TextStyle;
+				var style = Nodes.TryFind(styleName) as TextStyle;
 				renderer.AddStyle(style ?? TextStyle.Default);
 			}
 			// Add text fragments.

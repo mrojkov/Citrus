@@ -20,8 +20,8 @@ namespace Lime
 		{
 			base.Update(delta);
 			if (Parent != null) {
-				Spline spline = Parent.Nodes.Find<Spline>(SplineId);
-				Widget widget = Parent.Nodes.Find<Widget>(WidgetId);
+				Spline spline = Parent.Nodes.TryFind<Spline>(SplineId);
+				Widget widget = Parent.Nodes.TryFind<Widget>(WidgetId);
 				if (spline != null && widget != null) {
 					float length = spline.CalcLength();
 					Vector2 point = spline.CalcPoint(SplineOffset * length);

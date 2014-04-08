@@ -155,7 +155,7 @@ namespace Lime
 			nodeList = emptyList;
 		}
 
-		public Node Find(string id)
+		public Node TryFind(string id)
 		{
 			foreach (Node child in AsArray) {
 				if (child.Id == id)
@@ -164,9 +164,9 @@ namespace Lime
 			return null;
 		}
 
-		public T Find<T>(string id) where T : Node
+		public T TryFind<T>(string id) where T : Node
 		{
-			return Find(id) as T;
+			return TryFind(id) as T;
 		}
 	}
 }
