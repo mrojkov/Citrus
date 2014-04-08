@@ -16,11 +16,6 @@ namespace Lime
 
 	public partial class Widget : Node
 	{
-		public void MatchByPositionWith(Widget widget)
-		{
-			Position = widget.CalcPositionInSpaceOf(Parent.AsWidget);
-		}
-
 		public void RenderToTexture(ITexture texture)
 		{
 			if (Width > 0 && Height > 0) {
