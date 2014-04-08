@@ -360,8 +360,9 @@ namespace Lime
 		public T Find<T>(string id) where T : Node
 		{
 			T result = TryFindNode(id) as T;
-			if (result == null)
+			if (result == null) {
 				throw new Lime.Exception("'{0}' of {1} not found for '{2}'", id, typeof(T).Name, ToString());
+			}
 			return result;
 		}
 
@@ -406,8 +407,9 @@ namespace Lime
 						break;
 				}
 				return child;
-			} else
+			} else {
 				return TryFindNodeHelper(path);
+			}
 		}
 
 		private Node TryFindNodeHelper(string id)
@@ -420,18 +422,18 @@ namespace Lime
 					if (child.Id == id)
 						return child;
 				}
-				foreach (Node child in node.Nodes.AsArray)
+				foreach (Node child in node.Nodes.AsArray) {
 					queue.Enqueue(child);
+				}
 			}
 			return null;
 		}
 
 		public void AdvanceAnimation(int delta)
 		{
-			const int maxTimeDelta = 1000 / AnimationUtils.FramesPerSecond - 1;
-			while (delta > maxTimeDelta) {
-				AdvanceAnimationShort(maxTimeDelta);
-				delta -= maxTimeDelta;
+			while (delta > AnimationUtils.MsecsPerFrame) {
+				AdvanceAnimationShort(AnimationUtils.MsecsPerFrame);
+				delta -= AnimationUtils.MsecsPerFrame;
 			}
 			AdvanceAnimationShort(delta);
 		}

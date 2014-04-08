@@ -17,7 +17,7 @@ namespace Lime
 		public bool Enabled { get; set; }
 
 		/// <summary>
-		/// Indicates whether a button has draggable behaviour. 
+		/// Indicates whether a button has draggable behavior. 
 		/// It means that if a user has quickly passed his finger through the button it would not be pressed.
 		/// </summary>
 		[ProtoMember(3)]
@@ -55,7 +55,7 @@ namespace Lime
 
 		/// <summary>
 		/// Indicates whether all buttons should use tablet control scheme that doesn't includes
-		/// 'focused' state support, but behaves better when multiple buttons overlap eachother.
+		/// 'focused' state support, but behaves better when multiple buttons overlap each other.
 		/// </summary>
 #if iOS
 		public static bool TabletControlScheme = true;

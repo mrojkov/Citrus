@@ -9,6 +9,7 @@ namespace Lime
 	public static class AnimationUtils
 	{
 		public const int FramesPerSecond = 16;
+		public const int MsecsPerFrame = 1000 / AnimationUtils.FramesPerSecond - 1;
 
 		public static int MsecsToFrames(int msecs)
 		{
