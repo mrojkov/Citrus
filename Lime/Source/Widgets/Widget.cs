@@ -370,12 +370,12 @@ namespace Lime
 			Size += deltaSize;
 			if (Animators.Count > 0) {
 				Animator<Vector2> animator;
-				if (Animators.TryGet("Position", out animator)) {
+				if (Animators.TryFind("Position", out animator)) {
 					foreach (var key in animator.Keys) {
 						key.Value += deltaPosition;
 					}
 				}
-				if (Animators.TryGet("Size", out animator)) {
+				if (Animators.TryFind("Size", out animator)) {
 					foreach (var key in animator.Keys) {
 						key.Value += deltaSize;
 					}

@@ -32,10 +32,9 @@ namespace Lime
 			}
 		}
 
-		public IAnimator[] AsArray
+		public IAnimator[] AsArray 
 		{
-			get
-			{
+			get {
 				if (animatorArray == null) {
 					if (animatorList.Count > 0) {
 						animatorArray = animatorList.ToArray();
@@ -56,9 +55,9 @@ namespace Lime
 			return result;
 		}
 
-		public bool TryGet(string propertyName, out IAnimator animator)
+		public bool TryFind(string propertyName, out IAnimator animator)
 		{
-			foreach (IAnimator a in animatorList) {
+			foreach (IAnimator a in AsArray) {
 				if (a.TargetProperty == propertyName) {
 					animator = a;
 					return true;
@@ -68,19 +67,19 @@ namespace Lime
 			return false;
 		}
 
-		public bool TryGet<T>(string propertyName, out Animator<T> animator)
+		public bool TryFind<T>(string propertyName, out Animator<T> animator)
 		{
 			IAnimator a;
-			TryGet(propertyName, out a);
+			TryFind(propertyName, out a);
 			animator = a as Animator<T>;
 			return animator != null;
 		}
 
-		public IAnimator this[string propertyName]
+		public IAnimator this[string propertyName] 
 		{
 			get {
 				IAnimator animator;
-				if (TryGet(propertyName, out animator)) {
+				if (TryFind(propertyName, out animator)) {
 					return animator;
 				}
 				PropertyInfo pi = owner.GetType().GetProperty(propertyName);
