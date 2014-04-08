@@ -127,7 +127,7 @@ namespace Lime
 		float dragInitialOffset;
 		float dragInitialDelta;
 
-		public void SetValueFromCurrentMousePosition(bool draggingJustBegun)
+		private void SetValueFromCurrentMousePosition(bool draggingJustBegun)
 		{
 			if (Rail == null) {
 				return;
