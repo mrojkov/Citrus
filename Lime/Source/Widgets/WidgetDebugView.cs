@@ -105,48 +105,10 @@ namespace Lime
 		//[DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
 		public Node[] Nodes { get { return widget.Nodes.AsArray; } }
 
-		public List<string> DiagnoseVisibility
+		public string[] VisibilityIssues
 		{
-			get
-			{
-				var suggestions = new List<string>();
-				widget.GetReasonsWhyItCanBeInvisible(suggestions);
-				return suggestions;
-			}
-		}
-	}
-
-	public partial class Widget : Node
-	{
-		public virtual void GetReasonsWhyItCanBeInvisible(List<string> suggestions)
-		{
-			RecalcGlobalMatrixAndColor();
-			if (!ChildOf(World.Instance) && (this != World.Instance)) {
-				suggestions.Add("Widget is not added to the main hierarchy");
-			}
-			if (!Visible) {
-				suggestions.Add("Flag 'Visible' is not set");
-			} else if (Opacity == 0) {
-				suggestions.Add("It is fully transparent! Check up 'Opacity' property!");
-			} else if (Opacity < 0.1f) {
-				suggestions.Add("It is almost transparent! Check up 'Opacity' property!");
-			} else if (!GloballyVisible) {
-				suggestions.Add("One of its parent has 'Visible' flag not set");
-			} else if (GlobalColor.A < 10) {
-				suggestions.Add("One of its parent has 'Opacity' close to zero");
-			}
-			var basis = CalcTransformInSpaceOf(World.Instance);
-			if (Mathf.Abs(basis.Scale.X) < 0.01f || Mathf.Abs(basis.Scale.Y) < 0.01f) {
-				suggestions.Add(string.Format("Widget is probably too small (Scale: {0})", basis.Scale));
-			}
-			bool withinScreenBounds =
-				basis.Position.X > 10 && basis.Position.X < World.Instance.Width - 10 &&
-				basis.Position.Y > 10 && basis.Position.Y < World.Instance.Height - 10;
-			if (!withinScreenBounds) {
-				suggestions.Add(string.Format("Widget is possible out of the screen (Position: {0})", basis.Position));
-			}
-			if (!(this is Image) && (this.Nodes.Count == 0)) {
-				suggestions.Add("Widget hasn't any drawable node");
+			get {
+				return widget.GetVisibilityIssues().ToArray();
 			}
 		}
 	}

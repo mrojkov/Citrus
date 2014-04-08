@@ -3,6 +3,7 @@ using Lime;
 using ProtoBuf;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
 
 namespace Lime
 {
@@ -48,6 +49,7 @@ namespace Lime
 	[ProtoInclude(110, typeof(RichText))]
 	[ProtoInclude(111, typeof(TextBox))]
 	[ProtoInclude(112, typeof(Movie))]
+	[DebuggerTypeProxy(typeof(WidgetDebugView))]
 	[TangerineClass]
 	public partial class Widget : Node
 	{

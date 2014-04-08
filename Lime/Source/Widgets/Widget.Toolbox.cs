@@ -162,5 +162,44 @@ namespace Lime
 		{
 			return CalcTransformInSpaceOf(container).Position;
 		}
+
+		public virtual IEnumerable<string> GetVisibilityIssues()
+		{
+			var world = World.Instance;
+			RecalcGlobalMatrixAndColor();
+			if (!ChildOf(world) && (this != world)) {
+				yield return "The widget is not included to the world hierarchy";
+			}
+			if (!Visible) {
+				yield return "The flag 'Visible' is not set";
+			} else if (Opacity == 0) {
+				yield return "It is fully transparent! Check up 'Opacity' property!";
+			} else if (Opacity < 0.1f) {
+				yield return "It is almost transparent! Check up 'Opacity' property!";
+			} else if (!GloballyVisible) {
+				yield return "One of its parent has 'Visible' flag not set";
+			} else if (GlobalColor.A < 10) {
+				yield return "One of its parent has 'Opacity' close to zero";
+			}
+			var basis = CalcTransformInSpaceOf(world);
+			if ((basis.Scale.X * Size.X).Abs() < 1 || (basis.Scale.Y * Size.Y).Abs() < 1) {
+				yield return string.Format("The widget is probably too small");
+			}
+			bool passedHitTest = false;
+			var hitTestLT = world.Position;
+			var hitTestRB = hitTestLT + world.Size;
+			for (float y = hitTestLT.Y; y < hitTestRB.Y && !passedHitTest; y++) {
+				for (float x = hitTestLT.X; x < hitTestRB.X && !passedHitTest; x++) {					if (this.SelfHitTest(new Vector2(x, y))) {
+						passedHitTest = true;
+					}
+				}
+			}
+			if (!passedHitTest) {
+				yield return string.Format("SelfHitTest() returns false in range [{0}] x [{1}].", hitTestLT, hitTestRB);
+			}
+			if (!(this is Image) && (this.Nodes.Count == 0)) {
+				yield return "The widget doesn't contain any drawable node";
+			}
+		}
 	}
 }
