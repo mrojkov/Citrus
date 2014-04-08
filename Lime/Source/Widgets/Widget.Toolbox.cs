@@ -16,27 +16,6 @@ namespace Lime
 
 	public partial class Widget : Node
 	{
-		public Transform Transform
-		{
-			get
-			{
-				// Vector2 cs = Mathf.CosSin(Mathf.DegreesToRadians * Rotation);
-				return new Transform {
-					Position = Position,
-					Rotation = Rotation,
-					Scale = Scale,
-					// U = new Vector2(cs.X, cs.Y),
-					// V = new Vector2(-cs.Y, cs.X)
-				};
-			}
-			set
-			{
-				Position = value.Position;
-				Rotation = value.Rotation;
-				Scale = value.Scale;
-			}
-		}
-
 		public void MatchByPositionWith(Widget widget)
 		{
 			Position = widget.CalcPositionInSpaceOf(Parent.AsWidget);
