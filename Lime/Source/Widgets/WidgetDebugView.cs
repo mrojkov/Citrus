@@ -102,7 +102,6 @@ namespace Lime
 			}
 		}
 
-		//[DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
 		public Node[] Nodes { get { return widget.Nodes.AsArray; } }
 
 		public string[] VisibilityIssues

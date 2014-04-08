@@ -7,7 +7,7 @@ namespace Lime
 		int currentLayer;
 		int maxUsedLayer;
 
-		readonly Node[] layers = new Node[Widget.MaxLayer];
+		readonly Node[] layers = new Node[Widget.MaxLayer + 1];
 
 		public void Add(Node node, int layer = 0)
 		{
