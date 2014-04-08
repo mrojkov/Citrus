@@ -43,7 +43,7 @@ namespace Lime.PopupMenu
 
 		public override void Update(int delta)
 		{
-			var stretch = Parent.Nodes.Get(StretchWidget);
+			var stretch = Parent.Nodes.Find(StretchWidget);
 			float w = 0;
 			foreach (var item in Parent.Nodes.OfType<Widget>()) {
 				if (item != stretch) {

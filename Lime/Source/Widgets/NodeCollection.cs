@@ -42,8 +42,7 @@ namespace Lime
 
 		public Node[] AsArray
 		{
-			get
-			{
+			get {
 				if (nodeArray == null) {
 					nodeArray = nodeList.Count > 0 ? nodeList.ToArray() : emptyArray;
 				}
@@ -60,15 +59,6 @@ namespace Lime
 				i++;
 			}
 			return -1;
-		}
-
-		public IEnumerable<T> All<T>() where T : Node
-		{
-			foreach (var node in AsArray) {
-				if (node is T) {
-					yield return node as T;
-				}
-			}
 		}
 
 		public Node this[int index] {
@@ -165,18 +155,18 @@ namespace Lime
 			nodeList = emptyList;
 		}
 
-		public Node Get(string id)
+		public Node Find(string id)
 		{
-			foreach (Node child in this) {
+			foreach (Node child in AsArray) {
 				if (child.Id == id)
 					return child;
 			}
 			return null;
 		}
 
-		public T Get<T>(string id) where T : Node
+		public T Find<T>(string id) where T : Node
 		{
-			return Get(id) as T;
+			return Find(id) as T;
 		}
 	}
 }
