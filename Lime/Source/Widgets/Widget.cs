@@ -55,6 +55,8 @@ namespace Lime
 	{
 		public const int EmptyHitTestMask = 0;
 		public const int ControlsHitTestMask = 1;
+		public const int MinLayer = 0;
+		public const int MaxLayer = 99;
 
 		private Vector2 position;
 		private Vector2 size;

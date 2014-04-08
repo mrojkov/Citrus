@@ -4,11 +4,10 @@ namespace Lime
 {
 	public class RenderChain
 	{
-		const int MaxLayers = 100;
 		int currentLayer;
 		int maxUsedLayer;
 
-		readonly Node[] layers = new Node[MaxLayers];
+		readonly Node[] layers = new Node[Widget.MaxLayer];
 
 		public void Add(Node node, int layer = 0)
 		{
