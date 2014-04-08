@@ -28,6 +28,12 @@ namespace Lime
 		Skip
 	}
 
+	/// <summary>
+	/// The Widget class is the base class of all 2D drawable and user interface objects.
+	/// The widget is the atom of the user interface: it receives mouse, keyboard and other
+	/// events from the input system, and paints a representation of itself on the screen.
+	/// Every widget is rectangular, and they are sorted in a Z-order. 
+	/// </summary>
 	[ProtoContract]
 	[ProtoInclude(100, typeof(Frame))]
 	[ProtoInclude(101, typeof(Image))]
