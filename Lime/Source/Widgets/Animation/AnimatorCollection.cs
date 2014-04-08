@@ -27,7 +27,9 @@ namespace Lime
 		public AnimatorCollection(Node owner, int capacity)
 		{
 			this.owner = owner;
-			animatorList = new List<IAnimator>(capacity);
+			if (capacity > 0) {
+				animatorList = new List<IAnimator>(capacity);
+			}
 		}
 
 		public IAnimator[] AsArray

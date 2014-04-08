@@ -23,9 +23,17 @@ namespace Lime
 			this.owner = owner;
 		}
 
+		public NodeCollection(Node owner, int capacity)
+		{
+			if (capacity > 0) {
+				nodeList = new List<Node>(capacity);
+			}
+			this.owner = owner;
+		}
+
 		internal static NodeCollection DeepCloneFast(Node owner, NodeCollection source)
 		{
-			var result = new NodeCollection(owner);
+			var result = new NodeCollection(owner, source.Count);
 			foreach (var node in source.AsArray) {
 				result.Add(node.DeepCloneFast());
 			}
