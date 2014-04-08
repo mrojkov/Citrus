@@ -506,7 +506,7 @@ namespace Lime
 			}
 		}
 
-		public void Preload()
+		public void PreloadAssets()
 		{
 			foreach (var prop in GetType().GetProperties()) {
 				if (prop.PropertyType == typeof(ITexture)) {
@@ -519,7 +519,7 @@ namespace Lime
 				PreloadAnimatedTextures(animator);
 			}
 			foreach (var node in Nodes.AsArray) {
-				node.Preload();
+				node.PreloadAssets();
 			}
 		}
 
