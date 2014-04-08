@@ -70,9 +70,9 @@ namespace Lime
 		{
 			// XXX
 			// Temporary disable ES2.0 backend until SDL2.0.2 get released
-			// return RenderingApi.OpenGL;
-			bool openGL = args != null && Array.IndexOf(args, "--OpenGL") >= 0;
-			return openGL ? RenderingApi.OpenGL : RenderingApi.ES20;
+			return RenderingApi.OpenGL;
+			//bool openGL = args != null && Array.IndexOf(args, "--OpenGL") >= 0;
+			//return openGL ? RenderingApi.OpenGL : RenderingApi.ES20;
 		}
 
 		private static bool CheckPowerSaveFlag(string[] args)
