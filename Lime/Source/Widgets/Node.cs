@@ -36,8 +36,6 @@ namespace Lime
 
 		public event Action AnimationStopped;
 	
-		private static readonly List<Node> nodesToUnlink = new List<Node>();
-
 		private int animationTime;
 
 		#region properties
@@ -73,7 +71,10 @@ namespace Lime
 
 		[ProtoMember(9)]
 		public bool IsRunning { get; set; }
-		public bool IsStopped { get { return !IsRunning; } set { IsRunning = !value; } }
+		public bool IsStopped { 
+			get { return !IsRunning; } 
+			set { IsRunning = !value; } 
+		}
 
 		[ProtoMember(10)]
 		public int AnimationTime {
@@ -137,16 +138,6 @@ namespace Lime
 			return node;
 		}
 
-		public bool HasChild(Node node)
-		{
-			return node.ChildOf(this);
-		}
-
-		public bool HasChild(string path)
-		{
-			return this.TryFindNode(path) != null;
-		}
-
 		public bool ChildOf(Node node)
 		{
 			for (Node n = Parent; n != null; n = n.Parent) {
@@ -179,16 +170,6 @@ namespace Lime
 		public int AnimationFrame {
 			get { return AnimationUtils.MsecsToFrames(AnimationTime); }
 			set { AnimationTime = AnimationUtils.FramesToMsecs(value); }
-		}
-
-		static public void UnlinkScheduledNodes()
-		{
-			foreach (Node node in nodesToUnlink) {
-				if (node.Parent != null) {
-					node.Parent.Nodes.Remove(node);
-				}
-			}
-			nodesToUnlink.Clear();
 		}
 
 		/// <summary>
@@ -251,6 +232,9 @@ namespace Lime
 			return r;
 		}
 
+		/// <summary>
+		/// Unlinks the node from its parent. Can be safely invoked inside Node.Update() method.
+		/// </summary>
 		public void Unlink()
 		{
 			if (Parent != null) {
@@ -259,11 +243,6 @@ namespace Lime
 			}
 		}
 		
-		public void UnlinkAfterUpdate()
-		{
-			nodesToUnlink.Add(this);
-		}
-
 		public virtual void Update(int delta)
 		{
 			if (IsRunning) {
@@ -486,7 +465,7 @@ namespace Lime
 					animationTime = AnimationUtils.FramesToMsecs(marker.Frame);
 					prevFrame = currFrame - 1;
 					IsRunning = false;
-					UnlinkAfterUpdate();
+					Unlink();
 					break;
 			}
 		}
