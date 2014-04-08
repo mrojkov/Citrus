@@ -202,7 +202,6 @@ namespace Lime
 		private void Update(float delta)
 		{
 			Input.ProcessPendingKeyEvents();
-			Input.MouseVisible = true;
 			app.OnUpdateFrame((int)delta);
             AudioSystem.Update();
 			Input.TextInput = null;

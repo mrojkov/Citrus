@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Lime
 {
-	public static class Input
+	public static class DirectInput
 	{
 		struct KeyEvent
 		{

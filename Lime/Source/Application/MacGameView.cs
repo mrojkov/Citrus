@@ -35,7 +35,6 @@ namespace Lime
 				tickCount += delta;
 			}
 			Input.ProcessPendingKeyEvents();
-			Input.MouseVisible = true;
 			// Ensure time delta lower bound is 16.6 frames per second.
 			// This is protection against time leap on inactive state
 			// and multiple updates of node hierarchy.

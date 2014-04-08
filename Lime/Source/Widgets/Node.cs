@@ -31,8 +31,8 @@ namespace Lime
 	[DebuggerTypeProxy(typeof(NodeDebugView))]
 	public class Node
 	{
-		public UpdateHandler Updating;
-		public UpdateHandler Updated;
+		public event UpdateHandler Updating;
+		public event UpdateHandler Updated;
 
 		public event Action AnimationStopped;
 	
@@ -110,6 +110,7 @@ namespace Lime
 			get {
 				if (tasks == null) {
 					tasks = new TaskList();
+					Updating += tasks.Update;
 				}
 				return tasks;
 			}
@@ -121,6 +122,7 @@ namespace Lime
 			get {
 				if (lateTasks == null) {
 					lateTasks = new TaskList();
+					Updated += lateTasks.Update;
 				}
 				return lateTasks;
 			}
@@ -226,6 +228,7 @@ namespace Lime
 			clone.AsWidget = clone as Widget;
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Nodes = NodeCollection.DeepCloneFast(clone, Nodes);
+			clone.Markers = MarkerCollection.DeepClone(Markers);
 			clone.tasks = null;
 			clone.lateTasks = null;
 			return clone;
@@ -308,31 +311,17 @@ namespace Lime
 
 		public void FullUpdate(int delta)
 		{
-			if (tasks != null || lateTasks != null || Updating != null || Updated != null) {
-				FullUpdateHelper(delta);
-			} else {
-				Update(delta);
+			if (Updating != null) {
+				Updating(delta * 0.001f);
+			}
+			Update(delta);
+			if (Updated != null) {
+				Updated(delta * 0.001f);
 			}
 		}
 
 		private void FullUpdateHelper(int delta)
 		{
-			//using (new Input.ContextChanger(this)) {
-				float realDelta = delta * 0.001f;
-				if (tasks != null) {
-					tasks.Update(realDelta);
-				}
-				if (Updating != null) {
-					Updating(realDelta);
-				}
-				Update(delta);
-				if (Updated != null) {
-					Updated(realDelta);
-				}
-				if (lateTasks != null) {
-					lateTasks.Update(realDelta);
-				}
-			//}
 		}
 
 		public virtual void Render() {}

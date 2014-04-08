@@ -24,7 +24,7 @@ namespace Lime.PopupMenu
 			this.itemWidth = itemWidth;
 			Frame.AddNode(rectangle);
 			Frame.Updating += Frame_Updating;
-			Frame.DialogMode = true;
+			Frame.Input.CaptureMouse();
 		}
 
 		public void Show()

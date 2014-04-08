@@ -15,17 +15,19 @@ namespace Lime
 		[ProtoMember(3)]
 		public float Value
 		{
-			get { return Mathf.Clamp(value, RangeMin, RangeMax); }
+			get { return value.Clamp(RangeMin, RangeMax); }
 			set { this.value = value; }
 		}
 
-		public Action Released;
-		public Action ValueChanged;
+		public event Action Released;
+		public event Action Changed;
+
 		public bool Enabled;
 
 		float value;
-		float offset0;
-		float delta0;
+
+		Widget thumb;
+		Spline rail;
 
 		public Slider()
 		{
@@ -35,91 +37,126 @@ namespace Lime
 			Enabled = true;
 		}
 
-		void UpdateHelper(int delta)
+		private Widget Thumb
 		{
-			var thumb = TryFind<Widget>("SliderThumb");
-			if (thumb != null) {
-				if (thumb.HitTest(Input.MousePosition) && Input.WasKeyPressed(Key.Mouse0)) {
-					if (World.Instance.ActiveWidget == null) {
-						thumb.TryRunAnimation("Focus");
-						World.Instance.ActiveWidget = this;
-					}
-				} else {
-					if (World.Instance.ActiveWidget == this && !Input.IsKeyPressed(Key.Mouse0)) {
-						thumb.TryRunAnimation("Normal");
-						World.Instance.ActiveWidget = null;
-						if (Released != null) {
-							Released();
-						}
-					}
+			get {
+				if (thumb == null) {
+					TryFind("SliderThumb", out thumb);
 				}
-				if (World.Instance.ActiveWidget == this && Enabled) {
-					if (Input.WasKeyPressed(Key.Mouse0)) {
-						Input.ConsumeKeyEvent(Key.Mouse0, true);
-						ScrollSlider(true);
-					} else if (Input.IsKeyPressed(Key.Mouse0)) {
-						ScrollSlider(false);
-					}
-				}
-				Marker m1, m2;
-				if (World.Instance.ActiveWidget == this) {
-					m1 = Markers.TryFind("FocusLow");
-					m2 = Markers.TryFind("FocusHigh");
-				} else {
-					m1 = Markers.TryFind("NormalLow");
-					m2 = Markers.TryFind("NormalHigh");
-				}
-				if (m1 != null && m2 != null) {
-					if (RangeMax > RangeMin) {
-						float t1 = AnimationUtils.FramesToMsecs(m1.Frame);
-						float t2 = AnimationUtils.FramesToMsecs(m2.Frame);
-						AnimationTime = (int)(t1 + (Value - RangeMin) / (RangeMax - RangeMin) * (t2 - t1));
-					}
-				}
+				return thumb;
 			}
-			if (World.Instance.ActiveWidget != this && thumb.CurrentAnimation != "Normal") {
-				thumb.TryRunAnimation("Normal");
-			}
-			if (World.Instance.ActiveWidget == this) {
-				World.Instance.IsActiveWidgetUpdated = true;
+		}
+
+		private Spline Rail
+		{
+			get {
+				if (rail == null) {
+					TryFind("Rail", out rail);
+				}
+				return rail;
 			}
 		}
 
 		public override void Update(int delta)
 		{
 			if (GloballyVisible) {
-				UpdateHelper(delta);
+				Advance();
 			}
 			base.Update(delta);
 		}
 
-		public void ScrollSlider(bool begin)
+		void Advance()
 		{
-			Spline rail = TryFind<Spline>("Rail");
-			if (rail != null) {
-				float railLength = rail.CalcLength();
-				if (railLength > 0) {
-					Matrix32 transform = rail.LocalToWorldTransform.CalcInversed();
-					Vector2 p = transform.TransformVector(Input.MousePosition);
-					float offset = rail.CalcOffset(p) / railLength;
-					if (RangeMax > RangeMin) {
-						float v = offset * (RangeMax - RangeMin) + RangeMin;
-						if (begin) {
-							delta0 = Value - v;
-							offset0 = offset;
-						} else {
-							if (offset > offset0 && offset0 < 1)
-								Value = v + delta0 * (1 - (offset - offset0) / (1 - offset0));
-							else if (offset < offset0 && offset0 > 0)
-								Value = v + delta0 * (1 - (offset0 - offset) / offset0);
-							else
-								Value = v + delta0;
-							if (ValueChanged != null) {
-								ValueChanged();
-							}
-						}
-					}
+			if (Thumb == null) {
+				return;
+			}
+			if (Input.WasMousePressed() && Thumb.IsMouseOver()) {
+				Thumb.TryRunAnimation("Focus");
+				Input.CaptureMouse();
+			} else if (Input.IsMouseOwner() && !Input.IsMousePressed()) {
+				Release();
+			}
+			if (Input.IsMouseOwner() && Enabled) {
+				if (Input.WasMousePressed()) {
+					SetValueFromCurrentMousePosition(draggingJustBegun: true);
+				} else if (Input.IsMousePressed()) {
+					SetValueFromCurrentMousePosition(draggingJustBegun: false);
 				}
+			}
+			RefreshThumbPosition();
+			if (!Input.IsMouseOwner()) {
+				Release();
+			}
+		}
+
+		private void RefreshThumbPosition()
+		{
+			Marker startMarker, endMarker;
+			GetStartEndMarkers(out startMarker, out endMarker);
+			if (startMarker != null && endMarker != null) {
+				if (RangeMax > RangeMin) {
+					float t1 = AnimationUtils.FramesToMsecs(startMarker.Frame);
+					float t2 = AnimationUtils.FramesToMsecs(endMarker.Frame);
+					AnimationTime = (t1 + (Value - RangeMin) / (RangeMax - RangeMin) * (t2 - t1)).Round();
+				}
+			}
+		}
+
+		private void Release()
+		{
+			if (Thumb.CurrentAnimation != "Normal") {
+				Input.ReleaseMouse();
+				Thumb.TryRunAnimation("Normal");
+				if (Released != null) {
+					Released();
+				}
+			}
+		}
+
+		private void GetStartEndMarkers(out Marker startMarker, out Marker endMarker)
+		{
+			if (Input.IsMouseOwner()) {
+				startMarker = Markers.TryFind("FocusLow");
+				endMarker = Markers.TryFind("FocusHigh");
+			} else {
+				startMarker = Markers.TryFind("NormalLow");
+				endMarker = Markers.TryFind("NormalHigh");
+			}
+		}
+
+		float dragInitialOffset;
+		float dragInitialDelta;
+
+		public void SetValueFromCurrentMousePosition(bool draggingJustBegun)
+		{
+			if (Rail == null) {
+				return;
+			}
+			float railLength = Rail.CalcLength();
+			if (railLength <= 0) {
+				return;
+			}
+			Matrix32 transform = Rail.LocalToWorldTransform.CalcInversed();
+			Vector2 p = transform.TransformVector(Input.MousePosition);
+			float offset = Rail.CalcOffset(p) / railLength;
+			if (RangeMax <= RangeMin) {
+				return;
+			}
+			float v = offset * (RangeMax - RangeMin) + RangeMin;
+			if (draggingJustBegun) {
+				dragInitialDelta = Value - v;
+				dragInitialOffset = offset;
+				return;
+			}
+			if (offset > dragInitialOffset && dragInitialOffset < 1) {
+				Value = v + dragInitialDelta * (1 - (offset - dragInitialOffset) / (1 - dragInitialOffset));
+			} else if (offset < dragInitialOffset && dragInitialOffset > 0) {
+				Value = v + dragInitialDelta * (1 - (dragInitialOffset - offset) / dragInitialOffset);
+			} else {
+				Value = v + dragInitialDelta;
+			}
+			if (Changed != null) {
+				Changed();
 			}
 		}
 	}

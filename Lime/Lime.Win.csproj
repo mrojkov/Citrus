@@ -72,9 +72,10 @@
     <Compile Include="Source\Graphics\Unity\Renderer.cs" />
     <Compile Include="Source\Graphics\Unity\RenderTexture.cs" />
     <Compile Include="Source\Graphics\Unity\Texture2D.cs" />
-    <Compile Include="Source\Input\Input.Common.cs" />
     <Compile Include="Source\Input\Input.Native.cs" />
     <Compile Include="Source\Input\Input.Unity.cs" />
+    <Compile Include="Source\Widgets\WidgetInput.cs" />
+    <Compile Include="Source\Input\Key.cs" />
     <Compile Include="Source\RewindableStream.cs" />
     <Compile Include="Source\Toolbox.cs" />
     <Compile Include="Source\NumericExtensions.cs" />
@@ -133,6 +134,8 @@
     <Compile Include="Source\Types\Vector2.cs" />
     <Compile Include="Source\Types\Vector3.cs" />
     <Compile Include="Source\AssetsBundle\UnpackedAssetsBundle.cs" />
+    <Compile Include="Source\Widgets\TaskList.cs" />
+    <Compile Include="Source\Widgets\Task.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationUtils.cs" />
     <Compile Include="Source\Widgets\Animation\Animator.cs" />
     <Compile Include="Source\Widgets\Animation\AnimatorCollection.cs" />
@@ -178,8 +181,6 @@
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGameView.cs" />
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGraphicsContext.cs" />
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Utilities.iPhone.cs" />
-    <Compile Include="Source\Widgets\Task.cs" />
-    <Compile Include="Source\Widgets\TaskList.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

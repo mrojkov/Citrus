@@ -14,7 +14,17 @@ namespace Lime
 
 		public static float Abs(this float x)
 		{
-			return Math.Abs(x);
+			return x < 0 ? -x : x;
+		}
+
+		public static int Abs(this int x)
+		{
+			return x < 0 ? -x : x;
+		}
+
+		public static long Abs(this long x)
+		{
+			return x < 0 ? -x : x;
 		}
 
 		public static float Sqr(this float x)
@@ -33,6 +43,16 @@ namespace Lime
 		}
 
 		public static int Sign(this float x)
+		{
+			return Math.Sign(x);
+		}
+
+		public static int Sign(this int x)
+		{
+			return Math.Sign(x);
+		}
+
+		public static int Sign(this long x)
 		{
 			return Math.Sign(x);
 		}

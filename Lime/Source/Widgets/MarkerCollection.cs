@@ -6,57 +6,36 @@ using ProtoBuf;
 namespace Lime
 {
 	[ProtoContract]
-	public class MarkerCollection : ICollection<Marker>
+	public class MarkerCollection : List<Marker>
 	{
-		static List<Marker> emptyList = new List<Marker>();
-		List<Marker> markers = emptyList;
-
-		public Marker[] AsArray()
-		{
-			return markers.ToArray();
-		}
+		public MarkerCollection() { }
+		public MarkerCollection(int capacity) 
+			: base(capacity)
+		{ }
 
 		internal static MarkerCollection DeepClone(MarkerCollection source)
 		{
-			var result = new MarkerCollection();
-			foreach (var marker in source.markers) {
-				var clone = marker.Clone();
-				result.Add(clone);
+			var result = new MarkerCollection(source.Count);
+			foreach (var marker in source) {
+				result.Add(marker.Clone());
 			}
 			return result;
 		}
-
-		public Marker this[int index] { 
-			get { return markers[index]; }
-		}
 		
-		void ICollection<Marker>.CopyTo(Marker[] a, int index)
-		{
-			markers.CopyTo(a, index);
-		}
-
-		public int Count { get { return markers.Count; } }
-
-		IEnumerator<Marker> IEnumerable<Marker>.GetEnumerator()
-		{
-			return markers.GetEnumerator();
-		}
-		
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return markers.GetEnumerator();
-		}
-
 		public Marker TryFind(string id)
 		{
-			int count = markers.Count;
-			for (int i = 0; i < count; i++) {
-				var marker = markers[i];
+			foreach (var marker in this) {
 				if (marker.Id == id) {
 					return marker;
 				}
 			}
 			return null;
+		}
+
+		public bool TryFind(string id, out Marker marker)
+		{
+			marker = TryFind(id);
+			return marker != null;
 		}
 
 		public Marker Find(string id)
@@ -70,22 +49,12 @@ namespace Lime
 
 		public Marker GetByFrame(int frame)
 		{
-			int count = markers.Count;
-			for (int i = 0; i < count; i++) {
-				var marker = markers[i];
+			foreach (var marker in this) {
 				if (marker.Frame == frame) {
 					return marker;
 				}
 			}
 			return null;
-		}
-
-		public void Add(Marker marker)
-		{
-			if (markers == emptyList) {
-				markers = new List<Marker>();
-			}
-			markers.Add(marker);
 		}
 
 		public void AddStopMarker(string id, int frame)
@@ -96,29 +65,6 @@ namespace Lime
 		public void AddPlayMarker(string id, int frame)
 		{
 			Add(new Marker() { Id = id, Action = MarkerAction.Play, Frame = frame });
-		}
-
-		public void Clear()
-		{
-			markers = emptyList;
-		}
-		
-		public bool Contains(Marker item)
-		{
-			return markers.Contains(item);
-		}
-		
-		public bool Remove(Marker item)
-		{
-			bool result = markers.Remove(item);
-			if (markers.Count == 0) {
-				markers = emptyList;
-			}
-			return result;
-		}
-		
-		bool ICollection<Marker>.IsReadOnly { 
-			get { return false; }
 		}
 	}
 }

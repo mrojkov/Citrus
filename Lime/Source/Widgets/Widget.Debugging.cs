@@ -47,7 +47,7 @@ namespace Lime
 
 			public Node Parent { get { return widget.Parent; } }
 
-			public Marker[] Markers { get { return widget.Markers.AsArray(); } }
+			public Marker[] Markers { get { return widget.Markers.ToArray(); } }
 
 			public Vector2 Size { get { return widget.Size; } }
 

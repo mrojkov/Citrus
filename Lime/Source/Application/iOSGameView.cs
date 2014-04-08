@@ -185,7 +185,6 @@ namespace Lime
 			prevTime = currentTime;
 			delta = delta.Clamp(0, 40);
 			Input.ProcessPendingKeyEvents();
-			Input.MouseVisible = true;
 			Application.Instance.OnUpdateFrame(delta);
 			AudioSystem.Update();
 			Input.TextInput = null;

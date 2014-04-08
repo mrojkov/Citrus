@@ -20,6 +20,8 @@ namespace Lime
 		public static readonly Vector2 South = new Vector2(0, 1);
 		public static readonly Vector2 East = new Vector2(1, 0);
 		public static readonly Vector2 West = new Vector2(-1, 0);
+		public static readonly Vector2 PositiveInfinity = new Vector2(float.PositiveInfinity, float.PositiveInfinity);
+		public static readonly Vector2 NegativeInfinity = new Vector2(float.NegativeInfinity, float.NegativeInfinity);
 		public static readonly Vector2 Up = North;
 		public static readonly Vector2 Down = South;
 		public static readonly Vector2 Left = West;

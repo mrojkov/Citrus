@@ -51,7 +51,7 @@ namespace Lime
 		private Vector2 position;
 		private Vector2 size;
 		private float rotation;
-		private Vector2 direction = new Vector2(1, 0);
+		private Vector2 direction;
 		private Color4 color;
 		private Action clicked;
 		public Vector2 ParentSize;
@@ -159,6 +159,18 @@ namespace Lime
 			Scale = Vector2.One;
 			Visible = true;
 			Blending = Blending.Default;
+			direction = new Vector2(1, 0);
+		}
+
+		WidgetInput input;
+		public WidgetInput Input
+		{
+			get {
+				if (input == null) {
+					input = new WidgetInput(this);
+				}
+				return input;
+			}
 		}
 
 		[ProtoAfterDeserialization]
@@ -195,6 +207,13 @@ namespace Lime
 		public void MakeVisible()
 		{
 			Visible = true;
+		}
+
+		public override Node DeepCloneFast()
+		{
+			var clone = base.DeepCloneFast();
+			clone.AsWidget.input = null;
+			return clone;
 		}
 
 		public override void Update(int delta)
@@ -367,6 +386,11 @@ namespace Lime
 		#endregion
 
 		#region HitTest handling
+
+		public bool IsMouseOver()
+		{
+			return Input.IsAcceptingMouse() && HitTest(Input.MousePosition);
+		}
 
 		public bool HitTest(Vector2 point)
 		{

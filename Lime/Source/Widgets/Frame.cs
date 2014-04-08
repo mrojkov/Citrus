@@ -22,11 +22,6 @@ namespace Lime
 		D,
 	}
 	
-	public class KeyEventArgs : EventArgs 
-	{
-		public bool Consumed;
-	}
-
 	[ProtoContract]
 	public enum ClipMethod
 	{
@@ -43,10 +38,6 @@ namespace Lime
 	public class Frame : Widget, IImageCombinerArg
 	{
 		public Action Rendered;
-
-		// In dialog mode frame acts like a modal dialog, all controls behind the dialog are frozen.
-		// If dialog is being shown or hidden then all controls on dialog are frozen either.
-		public bool DialogMode { get; set; }
 
 		public ClipMethod ClipChildren { get; set; }
 
@@ -82,11 +73,6 @@ namespace Lime
 			}
 		}
 
-		public bool IsTopDialog()
-		{
-			return World.Instance.GetTopDialog() == this;
-		}
-
 		private void SetRenderTarget(RenderTarget value)
 		{
 			renderTarget = value;
@@ -94,43 +80,6 @@ namespace Lime
 			renderTexture = CreateRenderTargetTexture(value);
 		}
 
-		private void UpdateForDialogMode(int delta)
-		{
-			if (!World.Instance.IsTopDialogUpdated) {
-				if (GloballyVisible && Input.MouseVisible) {
-					if (World.Instance.ActiveWidget != null && !World.Instance.ActiveWidget.ChildOf(this)) {
-						// Discard active widget if it's not a child of the topmost dialog.
-						World.Instance.ActiveWidget = null;
-					}
-				}
-				if (GloballyVisible && World.Instance.ActiveTextWidget != null && !World.Instance.ActiveTextWidget.ChildOf(this)) {
-					// Discard active text widget if it's not a child of the topmost dialog.
-					World.Instance.ActiveTextWidget = null;
-				}
-			}
-			if (!IsRunning) {
-				base.Update(delta);
-			}
-			if (GloballyVisible) {
-				// Consume all input events and drive mouse out of the screen.
-				Input.ConsumeAllKeyEvents(true);
-				Input.MouseVisible = false;
-				Input.TextInput = null;
-			}
-			if (IsRunning) {
-				base.Update(delta);
-			}
-			World.Instance.IsTopDialogUpdated = true;
-		}
-
-		public override void Update(int delta)
-		{
-			if (DialogMode) {
-				UpdateForDialogMode(delta);
-			} else {
-				base.Update(delta);
-			}
-		}
 
 		public override void Render()
 		{

@@ -93,14 +93,11 @@ namespace Lime
 
 		private IEnumerator<int> NormalState()
 		{
-			if (TheActiveWidget == this) {
-				TheActiveWidget = null;
-			}
+			Input.ReleaseMouse();
 			TryRunAnimation("Normal");
 			while (true) {
 				if (TabletControlScheme) {
-					if (Input.WasMousePressed() && HitTest(Input.MousePosition) && TheActiveWidget == null) {
-						World.Instance.ActiveWidget = this;
+					if (Input.WasMousePressed() && IsMouseOver()) {
 						if (Draggable) {
 							State = DetectDraggingState;
 						} else {
@@ -108,7 +105,7 @@ namespace Lime
 						}
 					}
 				} else {
-					if (HitTest(Input.MousePosition) && TheActiveWidget == null) {
+					if (IsMouseOver()) {
 						State = FocusedState;
 					}
 				}
@@ -124,13 +121,12 @@ namespace Lime
 			}
 		}
 
-		// Used only in desktop control scheme
+		// Used only in the desktop control scheme
 		private IEnumerator<int> FocusedState()
 		{
-			World.Instance.ActiveWidget = this;
 			TryRunAnimation("Focus");
 			while (true) {
-				if (!HitTest(Input.MousePosition)) {
+				if (!IsMouseOver()) {
 					State = NormalState;
 				} else if (Input.WasMousePressed()) {
 					if (Draggable) {
@@ -150,7 +146,7 @@ namespace Lime
 				yield return 0;
 				if ((mouse - Input.MousePosition).Length > DragDistanceThreshold) {
 					State = NormalState;
-				} else if (!Input.IsMousePressed() && HitTest(Input.MousePosition)) {
+				} else if (!Input.IsMousePressed() && IsMouseOver()) {
 					State = QuickClickOnDraggableButtonState;
 					yield break;
 				}
@@ -160,6 +156,7 @@ namespace Lime
 
 		private IEnumerator<int> QuickClickOnDraggableButtonState()
 		{
+			Input.CaptureMouse();
 			if (TryRunAnimation("Press")) {
 				while (IsRunning) {
 					yield return 0;
@@ -171,16 +168,18 @@ namespace Lime
 
 		private IEnumerator<int> PressedState()
 		{
-			var mouse = Input.VisibleMousePosition;
+			Input.CaptureMouse();
+			var mouse = Input.MousePosition;
 			TryRunAnimation("Press");
 			bool wasPressed = true;
 			while (true) {
-				bool isPressed = HitTest(Input.VisibleMousePosition) ||
-					(Input.VisibleMousePosition - this.GlobalCenter).Length < ButtonEffectiveRadius;
+				bool isPressed = IsMouseOver() ||
+					(Input.MousePosition - this.GlobalCenter).Length < ButtonEffectiveRadius;
 				if (!Input.IsMousePressed()) {
 					if (isPressed) {
 						HandleClick();
 					}
+					Input.ReleaseMouse();
 					State = ReleaseState;
 				} else if (wasPressed && !isPressed) {
 					TryRunAnimation("Release");
@@ -208,9 +207,7 @@ namespace Lime
 		private IEnumerator<int> ReleaseState()
 		{
 			// buz: это позволяет быстро прокликивать по кнопкам не дожидаясь, пока полностью проиграется анимация отжатия предыдущей
-			if (TheActiveWidget == this) {
-				TheActiveWidget = null;
-			}
+			Input.ReleaseMouse();
 			if (CurrentAnimation != "Release") {
 				if (TryRunAnimation("Release")) {
 					while (IsRunning) {
@@ -221,7 +218,7 @@ namespace Lime
 			if (TabletControlScheme) {
 				State = NormalState;
 			} else {
-				if (HitTest(Input.MousePosition)) {
+				if (IsMouseOver()) {
 					State = FocusedState;
 				} else {
 					State = NormalState;
@@ -231,9 +228,7 @@ namespace Lime
 
 		private IEnumerator<int> DisabledState()
 		{
-			if (TheActiveWidget == this) {
-				TheActiveWidget = null;
-			}
+			Input.ReleaseMouse();
 			TryRunAnimation("Disable");
 			while (IsRunning) {
 				yield return 0;
@@ -251,7 +246,7 @@ namespace Lime
 		private void UpdateLabel()
 		{
 			if (textPresenter == null) {
-				TryFind<SimpleText>("TextPresenter", out textPresenter);
+				TryFind("TextPresenter", out textPresenter);
 			}
 			if (textPresenter != null) {
 				textPresenter.Text = Text;
@@ -264,7 +259,7 @@ namespace Lime
 			if (GloballyVisible) {
 				stateMachine.Advance();
 				UpdateLabel();
-				SyncActiveWidget();
+				ReleaseIfLostMouseCaptivity();
 			}
 			// buz: Иногда хочется задизейблить кнопку по клику на неё, но анимацию отжатия проиграть всё равно нужно.
 			if (!Enabled && State != DisabledState && State != ReleaseState) {
@@ -273,25 +268,16 @@ namespace Lime
 			base.Update(delta);
 		}
 
-		void SyncActiveWidget()
+		void ReleaseIfLostMouseCaptivity()
 		{
 			if (!Enabled) {
 				return;
 			}
-			if (World.Instance.ActiveWidget != this && State != NormalState) {
+			if (!Input.IsMouseOwner() && State != NormalState && State != DetectDraggingState) {
 				if (CurrentAnimation != "Release") {
 					State = NormalState;
 				}
 			}
-			if (TheActiveWidget == this) {
-				World.Instance.IsActiveWidgetUpdated = true;
-			}
-		}
-
-		private static Widget TheActiveWidget
-		{
-			get { return World.Instance.ActiveWidget; }
-			set { World.Instance.ActiveWidget = value; }
 		}
 
 #region StateMachine

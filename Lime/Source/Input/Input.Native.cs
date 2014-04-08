@@ -8,21 +8,18 @@ namespace Lime
 {
 	public static class Input
 	{
+		public const int MaxTouches = 4;
+
 		struct KeyEvent
 		{
 			public Key Key;
 			public bool State;
 		}
 
-		public static Vector2 MouseRefuge = new Vector2(-123456, -123456);
-
 		private static Vector2[] touchPositions = new Vector2[MaxTouches];
-		private static Vector2 mousePosition;
 
 		private static List<KeyEvent> keyEventQueue = new List<KeyEvent>();
 		
-		public const int MaxTouches = 4;
-
 		static bool[] previousKeysState = new bool[(int)Key.KeyCount];
 		static bool[] currentKeysState = new bool[(int)Key.KeyCount];
 
@@ -33,27 +30,8 @@ namespace Lime
 
 		/// <summary>
 		/// The current mouse position in virtual coordinates coordinates. (read only)
-		/// When mouse is invisible this property has an offscreen value.
 		/// </summary>
-		public static Vector2 MousePosition {
-			get { return MouseVisible ? mousePosition : MouseRefuge; }
-			internal set { mousePosition = value; }
-		}
-
-		public static Vector2 VisibleMousePosition
-		{
-			get { return mousePosition; }
-		}
-
-		/// <summary>
-		/// Use this property for hiding mouse away. E.g. after processing modal dialog controls.
-		/// </summary>
-		static bool mouseVisible;
-		public static bool MouseVisible
-		{
-			get { return mouseVisible; }
-			set { mouseVisible = value; }
-		}
+		public static Vector2 MousePosition { get; internal set; }
 
 		/// <summary>
 		/// The current accelerometer state (read only).
@@ -99,25 +77,6 @@ namespace Lime
 			return IsKeyPressed(Key.Mouse0);
 		}
 
-		/// <summary>
-		/// After consumption, WasKeyPressed(), WasKeyReleased() will return false.
-		/// </summary>
-		public static void ConsumeKeyEvent(Key key, bool value)
-		{
-			if (value) {
-				previousKeysState[(int)key] = currentKeysState[(int)key];
-			}
-		}
-
-		public static void ConsumeAllKeyEvents(bool value = true)
-		{
-			if (value) {
-				for (int i = 1; i < (int)Key.KeyCount; i++) {
-					previousKeysState[i] = currentKeysState[i];
-				}
-			}
-		}
-
 		public static bool WasTouchBegan(int index)
 		{
 			return WasKeyPressed((Key)((int)Key.Touch0 + index));
@@ -135,7 +94,7 @@ namespace Lime
 
 		public static Vector2 GetTouchPosition(int index)
 		{
-			return MouseVisible ? touchPositions[index] : MouseRefuge;
+			return touchPositions[index];
 		}
 
 		internal static void SetTouchPosition(int index, Vector2 position)

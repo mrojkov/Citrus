@@ -24,6 +24,12 @@ namespace Lime
 			this.owner = owner;
 		}
 
+		public AnimatorCollection(Node owner, int capacity)
+		{
+			this.owner = owner;
+			animatorList = new List<IAnimator>(capacity);
+		}
+
 		public IAnimator[] AsArray
 		{
 			get
@@ -41,7 +47,7 @@ namespace Lime
 
 		internal static AnimatorCollection SharedClone(Node owner, AnimatorCollection source)
 		{
-			var result = new AnimatorCollection(owner);
+			var result = new AnimatorCollection(owner, source.Count);
 			foreach (var animator in source.animatorList) {
 				result.Add(animator.Clone());
 			}
