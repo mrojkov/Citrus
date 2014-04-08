@@ -132,7 +132,7 @@ namespace Lime
 				}
 				return false;
 			}
-			return base.HitTest(point);
+			return base.SelfHitTest(point);
 		}
 
 		bool PartHitTest(Part part, Vector2 point)
