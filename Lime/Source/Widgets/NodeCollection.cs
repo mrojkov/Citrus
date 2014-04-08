@@ -62,6 +62,15 @@ namespace Lime
 			return -1;
 		}
 
+		public IEnumerable<T> All<T>() where T : Node
+		{
+			foreach (var node in AsArray) {
+				if (node is T) {
+					yield return node as T;
+				}
+			}
+		}
+
 		public Node this[int index] {
 			get { return AsArray[index]; }
 		}

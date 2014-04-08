@@ -9,7 +9,7 @@ namespace Lime.PopupMenu
 	{
 		public override void Update(int delta)
 		{
-			foreach (var item in Parent.GetNodesOfType<Widget>()) {
+			foreach (var item in Parent.Nodes.OfType<Widget>()) {
 				item.Position = Vector2.Zero;
 				item.Size = Parent.AsWidget.Size;
 				item.Pivot = Vector2.Zero;
@@ -22,7 +22,7 @@ namespace Lime.PopupMenu
 	{
 		public override void Update(int delta)
 		{
-			foreach (var item in Parent.GetNodesOfType<Widget>()) {
+			foreach (var item in Parent.Nodes.OfType<Widget>()) {
 				item.Y = (Parent.AsWidget.Height - item.Height) / 2;
 				item.Pivot *= new Vector2(1, 0);
 			}
@@ -45,13 +45,13 @@ namespace Lime.PopupMenu
 		{
 			var stretch = Parent.Nodes.Get(StretchWidget);
 			float w = 0;
-			foreach (var item in Parent.GetNodesOfType<Widget>()) {
+			foreach (var item in Parent.Nodes.OfType<Widget>()) {
 				if (item != stretch) {
 					w += item.Width;
 				}
 			}
 			float x = 0;
-			foreach (var item in Parent.GetNodesOfType<Widget>()) {
+			foreach (var item in Parent.Nodes.OfType<Widget>()) {
 				item.X = x;
 				if (item == stretch) {
 					item.Width = Math.Max(0, Parent.AsWidget.Width - w);

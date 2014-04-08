@@ -156,15 +156,6 @@ namespace Lime
 			return false;
 		}
 
-		public IEnumerable<T> GetNodesOfType<T>() where T : Node
-		{
-			foreach (var node in Nodes) {
-				if (node is T) {
-					yield return node as T;
-				}
-			}
-		}
-
 		public bool TryRunAnimation(string markerId)
 		{
 			Marker marker = Markers.TryFind(markerId);
