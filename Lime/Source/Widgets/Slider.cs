@@ -38,10 +38,10 @@ namespace Lime
 		{
 			get {
 				if (thumb == null) {
-					TryFind("Thumb", out thumb);
+					thumb = Nodes.TryFind("Thumb") as Widget;
 				}
 				if (thumb == null) {
-					TryFind("SliderThumb", out thumb);
+					thumb = Nodes.TryFind("SliderThumb") as Widget;
 				}
 				return thumb;
 			}
@@ -51,7 +51,7 @@ namespace Lime
 		{
 			get {
 				if (rail == null) {
-					TryFind("Rail", out rail);
+					rail = Nodes.TryFind("Rail") as Spline;
 				}
 				return rail;
 			}

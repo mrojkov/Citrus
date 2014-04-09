@@ -17,6 +17,7 @@ namespace Lime
 		// NB: TouchScreen and mouse share the same capture stack
 		static List<Widget> mouseCaptureStack;
 		static List<Widget> keyboardCaptureStack;
+		static bool skipCaptivitiesCleanup;
 
 		static WidgetInput()
 		{
@@ -64,8 +65,9 @@ namespace Lime
 		{
 			mouseCaptureStack.Remove(widget);
 			mouseCaptureStack.Add(widget);
-			// Make sure the widget is globally visible
-			widget.RecalcGlobalMatrixAndColor();
+			// The widget may be invisible right after creation, 
+			// so omit the stack cleaning up on this frame.
+			skipCaptivitiesCleanup = true;
 		}
 
 		public void ReleaseMouse()
@@ -98,8 +100,9 @@ namespace Lime
 		{
 			keyboardCaptureStack.Remove(widget);
 			keyboardCaptureStack.Add(widget);
-			// Make sure the widget is globally visible
-			widget.RecalcGlobalMatrixAndColor();
+			// The widget may be invisible right after creation, 
+			// so omit the stack cleaning up on this frame.
+			skipCaptivitiesCleanup = true;
 		}
 
 		public void ReleaseKeyboard()
@@ -205,8 +208,11 @@ namespace Lime
 
 		internal static void RemoveInvalidatedCaptivities()
 		{
-			keyboardCaptureStack.RemoveAll(i => !IsVisibleWidget(i));
-			mouseCaptureStack.RemoveAll(i => !IsVisibleWidget(i));
+			if (!skipCaptivitiesCleanup) {
+				keyboardCaptureStack.RemoveAll(i => !IsVisibleWidget(i));
+				mouseCaptureStack.RemoveAll(i => !IsVisibleWidget(i));
+			}
+			skipCaptivitiesCleanup = false;
 		}
 
 		private static bool IsVisibleWidget(Widget widget)
