@@ -19,15 +19,12 @@ namespace Lime
 			set { this.value = value; }
 		}
 
-		public event Action Released;
 		public event Action Changed;
-
 		public bool Enabled;
 
-		float value;
-
-		Widget thumb;
-		Spline rail;
+		private float value;
+		private Widget thumb;
+		private Spline rail;
 
 		public Slider()
 		{
@@ -40,6 +37,9 @@ namespace Lime
 		private Widget Thumb
 		{
 			get {
+				if (thumb == null) {
+					TryFind("Thumb", out thumb);
+				}
 				if (thumb == null) {
 					TryFind("SliderThumb", out thumb);
 				}
@@ -71,7 +71,7 @@ namespace Lime
 				return;
 			}
 			if (Input.WasMousePressed() && Thumb.IsMouseOver()) {
-				Thumb.TryRunAnimation("Focus");
+				TryRunAnimation("Press");
 				Input.CaptureMouse();
 			} else if (Input.IsMouseOwner() && !Input.IsMousePressed()) {
 				Release();
@@ -91,36 +91,18 @@ namespace Lime
 
 		private void RefreshThumbPosition()
 		{
-			Marker startMarker, endMarker;
-			GetStartEndMarkers(out startMarker, out endMarker);
-			if (startMarker != null && endMarker != null) {
-				if (RangeMax > RangeMin) {
-					float t1 = AnimationUtils.FramesToMsecs(startMarker.Frame);
-					float t2 = AnimationUtils.FramesToMsecs(endMarker.Frame);
-					AnimationTime = (t1 + (Value - RangeMin) / (RangeMax - RangeMin) * (t2 - t1)).Round();
-				}
+			if (RangeMax > RangeMin) {
+				var t = (Value - RangeMin) / (RangeMax - RangeMin);
+				var pos = Rail.CalcPoint(t * Rail.CalcLengthRough());
+				Thumb.Position = Rail.CalcTransitionToSpaceOf(this) * pos;
 			}
 		}
 
 		private void Release()
 		{
-			if (Thumb.CurrentAnimation != "Normal") {
-				Input.ReleaseMouse();
-				Thumb.TryRunAnimation("Normal");
-				if (Released != null) {
-					Released();
-				}
-			}
-		}
-
-		private void GetStartEndMarkers(out Marker startMarker, out Marker endMarker)
-		{
+			TryRunAnimation("Normal");
 			if (Input.IsMouseOwner()) {
-				startMarker = Markers.TryFind("FocusLow");
-				endMarker = Markers.TryFind("FocusHigh");
-			} else {
-				startMarker = Markers.TryFind("NormalLow");
-				endMarker = Markers.TryFind("NormalHigh");
+				Input.ReleaseMouse();
 			}
 		}
 
@@ -132,13 +114,13 @@ namespace Lime
 			if (Rail == null) {
 				return;
 			}
-			float railLength = Rail.CalcLength();
+			float railLength = Rail.CalcLengthRough();
 			if (railLength <= 0) {
 				return;
 			}
 			Matrix32 transform = Rail.LocalToWorldTransform.CalcInversed();
 			Vector2 p = transform.TransformVector(Input.MousePosition);
-			float offset = Rail.CalcOffset(p) / railLength;
+			float offset = Rail.CalcSplineLengthToNearestPoint(p) / railLength;
 			if (RangeMax <= RangeMin) {
 				return;
 			}
@@ -148,6 +130,7 @@ namespace Lime
 				dragInitialOffset = offset;
 				return;
 			}
+			float prevValue = Value;
 			if (offset > dragInitialOffset && dragInitialOffset < 1) {
 				Value = v + dragInitialDelta * (1 - (offset - dragInitialOffset) / (1 - dragInitialOffset));
 			} else if (offset < dragInitialOffset && dragInitialOffset > 0) {
@@ -155,7 +138,7 @@ namespace Lime
 			} else {
 				Value = v + dragInitialDelta;
 			}
-			if (Changed != null) {
+			if (Changed != null && Value != prevValue) {
 				Changed();
 			}
 		}

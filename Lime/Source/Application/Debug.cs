@@ -14,6 +14,11 @@ namespace Lime
 			Logger.Write(message);
 		}
 
+		public static void Write(object value)
+		{
+			Write(value.ToString());
+		}
+
 		public static void Write(string msg, params object[] args)
 		{
 			Logger.Write(msg, args);

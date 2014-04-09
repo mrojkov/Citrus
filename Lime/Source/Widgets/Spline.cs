@@ -7,7 +7,7 @@ namespace Lime
 	[ProtoContract]
 	public class Spline : Widget
 	{
-		public float CalcLength()
+		public float CalcLengthRough()
 		{
 			float length = 0;
 			SplinePoint p = null;
@@ -40,7 +40,7 @@ namespace Lime
 			return result;
 		}
 
-		private float CalcAccurateSegmentLength(SplinePoint point1, SplinePoint point2, int approximateCount)
+		private float CalcSegmentLengthAccurate(SplinePoint point1, SplinePoint point2, int approximateCount)
 		{
 			float length = 0;
 			Vector2 prevPosition = point1.Position;
@@ -53,20 +53,20 @@ namespace Lime
 			return length;
 		}
 
-		public float CalcAccurateLength(int approximateCount)
+		public float CalcLengthAccurate(int approximateCount)
 		{
 			float length = 0;
 			SplinePoint prevPoint = null;
 			foreach (SplinePoint curPoint in Nodes) {
 				if (prevPoint != null) {
-					length += CalcAccurateSegmentLength(prevPoint, curPoint, approximateCount);
+					length += CalcSegmentLengthAccurate(prevPoint, curPoint, approximateCount);
 				}
 				prevPoint = curPoint;
 			}
 			return length;
 		}
 
-		public Vector2 CalcPoint(float t)
+		public Vector2 CalcPoint(float lengthFromBeginning)
 		{
 			float length = 0.0f;
 			SplinePoint p = null;
@@ -74,12 +74,12 @@ namespace Lime
 				SplinePoint v = node as SplinePoint;
 				if (v == null)
 					continue;
-				if (t < 0.0f)
+				if (lengthFromBeginning < 0.0f)
 					return v.Position * Size;
 				if (p != null) {
 					float segmentLength = ((v.Position - p.Position) * Size).Length;
-					if (length <= t && t < length + segmentLength) {
-						return Interpolate(p, v, (t - length) / segmentLength);
+					if (length <= lengthFromBeginning && lengthFromBeginning < length + segmentLength) {
+						return Interpolate(p, v, (lengthFromBeginning - length) / segmentLength);
 					}
 					length += segmentLength;
 				}
@@ -111,7 +111,7 @@ namespace Lime
 			}
 		}
 
-		public float CalcOffset(Vector2 point)
+		public float CalcSplineLengthToNearestPoint(Vector2 point)
 		{
 			float length = 0;
 			SplinePoint p = null;
@@ -124,7 +124,7 @@ namespace Lime
 				if (p != null) {
 					float segmentLength = ((v.Position - p.Position) * Size).Length;
 					float minDistance_, offset_;
-					if (CalcOffsetHelper(p, v, point, out minDistance_, out offset_)) {
+					if (CalcSplineLengthToNearestPointHelper(p, v, point, out minDistance_, out offset_)) {
 						if (minDistance_ < minDistance) {
 							offset = offset_ * segmentLength + length;
 							minDistance = minDistance_;
@@ -137,7 +137,7 @@ namespace Lime
 			return offset;
 		}
 	
-		bool CalcOffsetHelper(SplinePoint v1, SplinePoint v2, Vector2 point, out float minDistance, out float offset)
+		private bool CalcSplineLengthToNearestPointHelper(SplinePoint v1, SplinePoint v2, Vector2 point, out float minDistance, out float offset)
 		{
 			const int SegmentCount = 10;
 			float ta = 0;
@@ -148,7 +148,7 @@ namespace Lime
 				float tb = (float)(i + 1) / SegmentCount;
 				Vector2 b = Interpolate(v1, v2, tb);
 				float minDistance_, offset_;
-				if (CalcLineOffset(a, b, point, out minDistance_, out offset_ )) {
+				if (ProjectPointToLine(a, b, point, out minDistance_, out offset_ )) {
 					if (minDistance_ < minDistance) {
 						offset = offset_ * (tb - ta) + ta;
 						minDistance = minDistance_;
@@ -160,7 +160,7 @@ namespace Lime
 			return minDistance < float.MaxValue;
 		}
 
-		bool CalcLineOffset(Vector2 a, Vector2 b, Vector2 point, out float minDistance, out float offset )
+		private bool ProjectPointToLine(Vector2 a, Vector2 b, Vector2 point, out float minDistance, out float offset)
 		{
 			Vector2 v = b - a;
 			float len = v.Length;

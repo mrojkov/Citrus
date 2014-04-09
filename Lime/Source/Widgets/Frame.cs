@@ -37,7 +37,7 @@ namespace Lime
 	[TangerineClass]
 	public class Frame : Widget, IImageCombinerArg
 	{
-		public Action Rendered;
+		public event Action Rendered;
 
 		public ClipMethod ClipChildren { get; set; }
 

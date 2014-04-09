@@ -17,7 +17,7 @@ namespace Lime.PopupMenu
 		private int maxHeight;
 		private int itemWidth;
 
-		public Menu(int layer, int itemWidth = 350, int maxHeight = 768)
+		public Menu(int layer = Widget.MaxLayer, int itemWidth = 350, int maxHeight = 768)
 		{
 			this.layer = layer;
 			this.maxHeight = maxHeight;
