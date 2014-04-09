@@ -6,7 +6,7 @@ using System.Text;
 namespace Lime
 {
 	/// <summary>
-	/// This class allows a widget to capture an input device (mouse, keyboard, touchscreen).
+	/// The WidgetInput class allows a widget to capture an input device (mouse, keyboard, touchscreen).
 	/// After capturing the device, the widget and all its children receive an actual buttons and device axes state (e.g. mouse position). Other widgets receive released buttons state and frozen axes values.
 	/// </summary>
 	public class WidgetInput
@@ -115,19 +115,19 @@ namespace Lime
 			}
 		}
 
-		public bool IsMousePressed()
+		public bool IsMousePressed(int button = 0)
 		{
-			return IsKeyPressed(Key.Mouse0);
+			return IsAcceptingMouse() && Input.IsMousePressed(button);
 		}
 
-		public bool WasMousePressed()
+		public bool WasMousePressed(int button = 0)
 		{
-			return WasKeyPressed(Key.Mouse0);
+			return IsAcceptingMouse() && Input.WasMousePressed(button);
 		}
 
-		public bool WasMouseReleased()
+		public bool WasMouseReleased(int button = 0)
 		{
-			return WasKeyPressed(Key.Mouse0);
+			return IsAcceptingMouse() && Input.WasMouseReleased(button);
 		}
 
 		public bool IsKeyPressed(Key key)

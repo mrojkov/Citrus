@@ -62,24 +62,32 @@ namespace Lime
 			return currentKeysState[(int)key] && !previousKeysState[(int)key];
 		}
 
-		public static bool WasMousePressed()
+		public static bool WasMousePressed(int button = 0)
 		{
-			return WasKeyPressed(Key.Mouse0);
+			return WasKeyPressed(GetMouseButtonByIndex(button));
 		}
 
-		public static bool WasMouseReleased()
+		public static bool WasMouseReleased(int button = 0)
 		{
-			return WasKeyReleased(Key.Mouse0);
+			return WasKeyReleased(GetMouseButtonByIndex(button));
 		}
 
-		public static bool IsMousePressed()
+		public static bool IsMousePressed(int button = 0)
 		{
-			return IsKeyPressed(Key.Mouse0);
+			return IsKeyPressed(GetMouseButtonByIndex(button));
 		}
 
 		public static bool WasTouchBegan(int index)
 		{
 			return WasKeyPressed((Key)((int)Key.Touch0 + index));
+		}
+
+		private static Key GetMouseButtonByIndex(int button)
+		{
+			if (button < 0 || button > 2) {
+				throw new ArgumentException();
+			}
+			return (Key)((int)Key.Mouse0 + button);
 		}
 
 		public static bool WasTouchEnded(int index)
