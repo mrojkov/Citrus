@@ -24,7 +24,6 @@ namespace Lime.PopupMenu
 			this.itemWidth = itemWidth;
 			Frame.AddNode(rectangle);
 			Frame.Updating += Frame_Updating;
-			Frame.Input.CaptureMouse();
 		}
 
 		public void Show()
@@ -32,6 +31,7 @@ namespace Lime.PopupMenu
 			World.Instance.PushNode(Frame);
 			Frame.CenterOnParent();
 			Frame.Layer = layer;
+			Frame.Input.CaptureAll();
 		}
 
 		public void Hide()

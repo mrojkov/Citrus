@@ -64,6 +64,8 @@ namespace Lime
 		{
 			mouseCaptureStack.Remove(widget);
 			mouseCaptureStack.Add(widget);
+			// Make sure the widget is globally visible
+			widget.RecalcGlobalMatrixAndColor();
 		}
 
 		public void ReleaseMouse()
@@ -96,6 +98,8 @@ namespace Lime
 		{
 			keyboardCaptureStack.Remove(widget);
 			keyboardCaptureStack.Add(widget);
+			// Make sure the widget is globally visible
+			widget.RecalcGlobalMatrixAndColor();
 		}
 
 		public void ReleaseKeyboard()
