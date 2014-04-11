@@ -47,9 +47,12 @@ namespace Lime
 			Stop();
 			rgbStream = AssetsBundle.Instance.OpenFile(Path + ".ogv");
 			rgbDecoder = new OgvDecoder(rgbStream);
-			if (AssetsBundle.Instance.FileExists(Path + "_alpha.ogv")) {
-				alphaStream = AssetsBundle.Instance.OpenFile(Path + "_alpha.ogv");
-				alphaDecoder = new OgvDecoder(alphaStream);
+			foreach (var i in new string[] { "_alpha.ogv", "_Alpha.ogv" }) {
+				if (AssetsBundle.Instance.FileExists(Path + i)) {
+					alphaStream = AssetsBundle.Instance.OpenFile(Path + i);
+					alphaDecoder = new OgvDecoder(alphaStream);
+					break;
+				}
 			}
 			this.ImageSize = rgbDecoder.FrameSize;
 			this.SurfaceSize = ImageSize;
