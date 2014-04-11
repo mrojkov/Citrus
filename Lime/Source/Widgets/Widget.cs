@@ -145,7 +145,9 @@ namespace Lime
 
 		[ProtoMember(11)]
 		public HitTestMethod HitTestMethod { get; set; }
-		public uint HitTestMask;
+		
+		[ProtoMember(12)]
+		public uint HitTestMask { get; set; }
 
 		[ProtoMember(13)]
 		public BoneArray BoneArray;
