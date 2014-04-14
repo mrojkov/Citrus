@@ -53,7 +53,8 @@ namespace Lime
 		[TangerineProperty(1)]
 		public string Trigger { get; set; }
 
-		public Node Parent;
+		public Node Parent { get; internal set; }
+
 		public Widget AsWidget { get; internal set; }
 
 		internal Node NextToRender;

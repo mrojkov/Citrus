@@ -65,14 +65,17 @@ namespace Lime
 		private Color4 color;
 		private Action clicked;
 		public Vector2 ParentSize;
-		protected bool RenderedToTexture;
 
 		#region Properties
+
+		public Widget ParentWidget { get { return Parent != null ? Parent.AsWidget : null; } }
 
 		public virtual string Text { 
 			get { throw new NotImplementedException(); }
 			set { throw new NotImplementedException(); }
 		}
+
+		internal virtual bool IsRenderedToTexture() { return false; }
 
 		public virtual Action Clicked {
 			get { return clicked; }
@@ -255,7 +258,7 @@ namespace Lime
 		{
 			if (Parent != null) {
 				var parentWidget = Parent.AsWidget;
-				if (parentWidget != null && !parentWidget.RenderedToTexture) {
+				if (parentWidget != null && !parentWidget.IsRenderedToTexture()) {
 					var localToParent = CalcLocalToParentTransform();
 					Matrix32.Multiply(ref localToParent, ref parentWidget.localToWorldTransform, out localToWorldTransform);
 					GlobalColor = Color * parentWidget.GlobalColor;

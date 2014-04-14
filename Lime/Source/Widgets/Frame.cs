@@ -76,10 +76,13 @@ namespace Lime
 		private void SetRenderTarget(RenderTarget value)
 		{
 			renderTarget = value;
-			RenderedToTexture = value != RenderTarget.None;
 			renderTexture = CreateRenderTargetTexture(value);
 		}
 
+		internal override bool IsRenderedToTexture()
+		{
+			return renderTarget != RenderTarget.None;
+		}
 
 		public override void Render()
 		{

@@ -304,7 +304,7 @@ namespace Lime
 		public bool firstUpdate = true;
 
 		[ProtoMember(28)]
-		public float pendingParticles;
+		public float particlesToSpawn;
 
 		[ProtoMember(29)]
 		public LinkedList<Particle> particles = new LinkedList<Particle>();
@@ -354,13 +354,14 @@ namespace Lime
 		{
 			switch(ParticlesLinkage) {
 			case ParticlesLinkage.Parent:
-				return (Parent != null) ? Parent.AsWidget : null;
+				return (Parent != null && !ParentWidget.IsRenderedToTexture()) ? 
+					ParentWidget : null;
 			case ParticlesLinkage.Other: {
-				Node node = Parent;
-				while (node != null) {
-					if (node.Id == LinkageWidgetName)
-						return node.AsWidget;
-					node = node.Parent;
+				var widget = ParentWidget;
+				while (widget != null) {
+					if (widget.Id == LinkageWidgetName)
+						return widget;
+					widget = widget.ParentWidget;
 				}
 				return null;
 			}
@@ -397,40 +398,37 @@ namespace Lime
 			float deltaSec = delta * Speed * 0.001f;
 			if (ImmortalParticles) {
 				if (TimeShift > 0)
-					pendingParticles += Number * deltaSec / TimeShift;
+					particlesToSpawn += Number * deltaSec / TimeShift;
 				else
-					pendingParticles = Number;
-				pendingParticles = Math.Min(pendingParticles, Number - particles.Count);
+					particlesToSpawn = Number;
+				particlesToSpawn = Math.Min(particlesToSpawn, Number - particles.Count);
 				while (particles.Count > Number) {
 					FreeParticle(particles.Last);
 				}
 			} else {
-				pendingParticles += Number * deltaSec;
+				particlesToSpawn += Number * deltaSec;
 			}
-
-			while (pendingParticles >= 1f) {
+			while (particlesToSpawn >= 1f) {
 				LinkedListNode<Particle> particleNode = AllocParticle();
 				if (GloballyEnabled && Nodes.Count > 0 && InitializeParticle(particleNode.Value)) {
 					AdvanceParticle(particleNode.Value, 0);
 				} else {
 					FreeParticle(particleNode);
 				}
-				pendingParticles -= 1;
+				particlesToSpawn -= 1;
 			}
-			
 			if (MagnetAmount.Median != 0 || MagnetAmount.Dispersion != 0) {
 				EnumerateMagnets();
 			}
-
-			LinkedListNode<Particle> node = particles.First;
-			for (; node != null; node = node.Next) {
-				Particle particle = node.Value;
+			LinkedListNode<Particle> p = particles.First;
+			for (; p != null; p = p.Next) {
+				Particle particle = p.Value;
 				AdvanceParticle(particle, deltaSec);
 				if (!ImmortalParticles && particle.Age > particle.Lifetime) {
-					LinkedListNode<Particle> n = node.Next;
-					FreeParticle(node);
-					node = n;
-					if (node == null)
+					LinkedListNode<Particle> n = p.Next;
+					FreeParticle(p);
+					p = n;
+					if (p == null)
 						break;
 				}
 			}
@@ -470,19 +468,9 @@ namespace Lime
 
 		bool InitializeParticle(Particle p)
 		{
-			// Calculating particle initial orientation & color
-			Color4 color = Color;
-			Matrix32 transform = CalcLocalToParentTransform();
-
-			Widget basicWidget = GetBasicWidget();
-			if (basicWidget != null) {
-				for (Node node = Parent; node != basicWidget; node = node.Parent) {
-					if (node.AsWidget != null) {
-						transform *= node.AsWidget.CalcLocalToParentTransform();
-						color *= node.AsWidget.Color;
-					}
-				}
-			}
+			Color4 color;
+			Matrix32 transform;
+			CalcInitialColorAndTransform(out color, out transform);
 			float emitterScaleAmount = 1;
 			Vector2 emitterScale = new Vector2();
 			emitterScale.X = transform.U.Length;
@@ -547,7 +535,7 @@ namespace Lime
 				p.RegularDirection = Direction.UniformRandomNumber() + emitterAngle - 90.0f;
 				break;
 			default:
-				throw new Lime.Exception("Unknown emitter shape");
+				throw new Lime.Exception("Invalid particle emitter shape");
 			}
 
 			p.RegularPosition = transform.TransformVector(position);
@@ -578,6 +566,21 @@ namespace Lime
 			p.FullDirection = p.RegularDirection;
 			p.FullPosition = p.RegularPosition;
 			return true;
+		}
+
+		private void CalcInitialColorAndTransform(out Color4 color, out Matrix32 transform)
+		{
+			color = Color;
+			transform = CalcLocalToParentTransform();
+			Widget basicWidget = GetBasicWidget();
+			if (basicWidget != null) {
+				for (Node node = Parent; node != basicWidget; node = node.Parent) {
+					if (node.AsWidget != null) {
+						transform *= node.AsWidget.CalcLocalToParentTransform();
+						color *= node.AsWidget.Color;
+					}
+				}
+			}
 		}
 
 		bool AdvanceParticle(Particle p, float delta)
@@ -682,22 +685,25 @@ namespace Lime
 
 		void RenderParticle(Particle p, Matrix32 matrix, Color4 color)
 		{
-			if (p.ColorCurrent.A > 0) {
-				float angle = p.Angle;
-				if (AlongPathOrientation)
-					angle += p.FullDirection;
-				ITexture texture = p.Modifier.GetTexture((int)p.TextureIndex - 1);
-				Vector2 imageSize = (Vector2)texture.ImageSize;
-				Vector2 particleSize = p.ScaleCurrent * imageSize;
-				Vector2 orientation = Vector2.HeadingDeg(angle);
-				var globalMatrix = new Matrix32 {
-					U = particleSize.X * orientation,
-					V = particleSize.Y * new Vector2(-orientation.Y, orientation.X),
-					T = p.FullPosition
-				};
-				Renderer.Transform1 = globalMatrix * matrix;
-				Renderer.DrawSprite(texture, p.ColorCurrent, -Vector2.Half, Vector2.One, Vector2.Zero, Vector2.One);
+			if (p.ColorCurrent.A <= 0) {
+				return;
 			}
+			float angle = p.Angle;
+			if (AlongPathOrientation) {
+				angle += p.FullDirection;
+			}
+			ITexture texture = p.Modifier.GetTexture((int)p.TextureIndex - 1);
+			var imageSize = (Vector2)texture.ImageSize;
+			var particleSize = p.ScaleCurrent * imageSize;
+			var orientation = Vector2.HeadingDeg(angle);
+			var perpendicularOrientation = new Vector2(-orientation.Y, orientation.X);
+			var globalMatrix = new Matrix32 {
+				U = particleSize.X * orientation,
+				V = particleSize.Y * perpendicularOrientation,
+				T = p.FullPosition
+			};
+			Renderer.Transform1 = globalMatrix * matrix;
+			Renderer.DrawSprite(texture, p.ColorCurrent, -Vector2.Half, Vector2.One, Vector2.Zero, Vector2.One);
 		}
 
 		public override void Render()
