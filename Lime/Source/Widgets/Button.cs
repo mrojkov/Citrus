@@ -173,13 +173,15 @@ namespace Lime
 			TryRunAnimation("Press");
 			bool wasPressed = true;
 			while (true) {
+				if (!Input.IsMouseOwner()) {
+					State = ReleaseState;
+				}
 				bool isPressed = IsMouseOver() ||
 					(Input.MousePosition - this.GlobalCenter).Length < ButtonEffectiveRadius;
 				if (!Input.IsMousePressed()) {
 					if (isPressed) {
 						HandleClick();
 					}
-					Input.ReleaseMouse();
 					State = ReleaseState;
 				} else if (wasPressed && !isPressed) {
 					TryRunAnimation("Release");
@@ -206,7 +208,6 @@ namespace Lime
 
 		private IEnumerator<int> ReleaseState()
 		{
-			// buz: это позволяет быстро прокликивать по кнопкам не дожидаясь, пока полностью проиграется анимация отжатия предыдущей
 			Input.ReleaseMouse();
 			if (CurrentAnimation != "Release") {
 				if (TryRunAnimation("Release")) {
@@ -229,6 +230,13 @@ namespace Lime
 		private IEnumerator<int> DisabledState()
 		{
 			Input.ReleaseMouse();
+			if (CurrentAnimation == "Release") {
+				// The release animation should be played if we disable the button 
+				// right after click on it.
+				while (IsRunning) {
+					yield return 0;
+				}
+			}
 			TryRunAnimation("Disable");
 			while (IsRunning) {
 				yield return 0;
@@ -259,25 +267,11 @@ namespace Lime
 			if (GloballyVisible) {
 				stateMachine.Advance();
 				UpdateLabel();
-				ReleaseIfLostMouseCaptivity();
 			}
-			// buz: Иногда хочется задизейблить кнопку по клику на неё, но анимацию отжатия проиграть всё равно нужно.
-			if (!Enabled && State != DisabledState && State != ReleaseState) {
+			if (!Enabled && State != DisabledState) {
 				State = DisabledState;
 			}
 			base.Update(delta);
-		}
-
-		void ReleaseIfLostMouseCaptivity()
-		{
-			if (!Enabled) {
-				return;
-			}
-			if (!Input.IsMouseOwner() && State != NormalState && State != DetectDraggingState) {
-				if (CurrentAnimation != "Release") {
-					State = NormalState;
-				}
-			}
 		}
 
 #region StateMachine

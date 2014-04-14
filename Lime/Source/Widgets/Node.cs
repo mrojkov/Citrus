@@ -79,7 +79,10 @@ namespace Lime
 		[ProtoMember(10)]
 		public int AnimationTime {
 			get { return animationTime; }
-			set { animationTime = value; ApplyAnimators(false); }
+			set { 
+				animationTime = value; 
+				ApplyAnimators(invokeTriggers: false); 
+			}
 		}
 
 		public DateTime CreationTime = DateTime.Now; 
