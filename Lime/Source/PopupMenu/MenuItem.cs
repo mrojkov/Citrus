@@ -11,5 +11,7 @@ namespace Lime.PopupMenu
 
 		public Frame Frame = new Frame() { Tag = "$MenuItem.cs" };
 		public Menu Menu;
+
+		public bool Visible = true;
 	}
 }

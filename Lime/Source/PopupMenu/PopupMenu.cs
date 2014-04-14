@@ -44,14 +44,13 @@ namespace Lime.PopupMenu
 
 		void Frame_Updating(float delta)
 		{
-			if (Input.WasMousePressed()) {
-				if (!Frame.HitTest(Input.MousePosition)) {
-					Hide();
-				}
+			if (Input.WasMousePressed() && !Frame.IsMouseOver()) {
+				Hide();
 			}
-			float totalItemsHeigth = MenuItem.Height * Count;
+			int visibleCount = items.Count(i => i.Visible);
+			float totalItemsHeigth = MenuItem.Height * visibleCount;
 			int columnsCount = Math.Max((totalItemsHeigth / maxHeight).Ceiling(), 1);
-			int itemsPerColumn = ((float)Count / columnsCount).Ceiling();
+			int itemsPerColumn = ((float)visibleCount / columnsCount).Ceiling();
 			Frame.Height = MenuItem.Height * itemsPerColumn + MenuItem.Height;
 			Frame.Width = itemWidth * columnsCount;
 			UpdateBackground();
@@ -62,6 +61,10 @@ namespace Lime.PopupMenu
 		{
 			int i = 0;
 			foreach (var item in items) {
+				item.Frame.Visible = item.Visible;
+				if (!item.Visible) {
+					continue;
+				}
 				int column = i / itemsPerColumn;
 				int row = i % itemsPerColumn;
 				item.Frame.X = column * itemWidth;
@@ -101,7 +104,7 @@ namespace Lime.PopupMenu
 
 		public void CopyTo(MenuItem[] array, int arrayIndex)
 		{
-			throw new NotImplementedException();
+			items.CopyTo(array, arrayIndex);
 		}
 
 		public bool Remove(MenuItem item)

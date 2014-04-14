@@ -68,11 +68,7 @@ namespace Lime
 
 		private static RenderingApi GetRenderingApi(string[] args)
 		{
-			// XXX
-			// Temporary disable ES2.0 backend until SDL2.0.2 get released
 			return RenderingApi.OpenGL;
-			//bool openGL = args != null && Array.IndexOf(args, "--OpenGL") >= 0;
-			//return openGL ? RenderingApi.OpenGL : RenderingApi.ES20;
 		}
 
 		private static bool CheckPowerSaveFlag(string[] args)
@@ -87,7 +83,6 @@ namespace Lime
 
 		void HandleKeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
 		{
-			// XXX
 			// SDL backend bug: OpenTK doesn't send key press event for backspace
 			if (e.Key == OpenTK.Input.Key.BackSpace) {
 				Input.TextInput += '\b';

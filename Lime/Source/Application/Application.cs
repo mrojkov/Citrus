@@ -126,11 +126,11 @@ namespace Lime
 		{
 			if (IsMainThread) {
 				action();
-				return;
-			}
-			// Now we use unified way on iOS and PC platform
-			lock (scheduledActionsSync) {
-				scheduledActions += action;
+			} else {
+				// Now we use unified way on iOS and PC platform
+				lock (scheduledActionsSync) {
+					scheduledActions += action;
+				}
 			}
 		}
 

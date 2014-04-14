@@ -139,7 +139,7 @@ namespace Lime
 			if (alphaDecoder != null) {
 				alphaDecoder.FillTextureAlpha(pixels, ImageSize.Width, ImageSize.Height);
 			}
-			LoadImage(pixels, ImageSize.Width, ImageSize.Height, false);
+			LoadImage(pixels, ImageSize.Width, ImageSize.Height, generateMips: false);
 #endif
 		}
 
