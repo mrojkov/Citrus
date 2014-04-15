@@ -110,7 +110,6 @@
     <Compile Include="Source\Widgets\Widget.Toolbox.cs" />
     <Compile Include="Source\Geometry.cs" />
     <Compile Include="Source\Widgets\Polyline.cs" />
-    <Compile Include="Source\Widgets\Widget.Debugging.cs" />
     <Compile Include="Source\StringExtensions.cs" />
     <Compile Include="Source\Widgets\World.cs" />
     <Compile Include="Source\Application\Logger.cs" />
@@ -147,7 +146,6 @@
     <Compile Include="Source\Graphics\Unity\RenderTexture.cs" />
     <Compile Include="Source\Graphics\Unity\Renderer.cs" />
     <Compile Include="Source\Graphics\Unity\Texture2D.cs" />
-    <Compile Include="Source\Input\Input.Common.cs" />
     <Compile Include="Source\Input\Input.Native.cs" />
     <Compile Include="Source\Input\Input.Unity.cs" />
     <Compile Include="Source\Audio\AudioCache.cs" />
@@ -178,6 +176,12 @@
     <Compile Include="Source\Widgets\Animation\AnimatorRegistry.cs" />
     <Compile Include="Source\Widgets\Animation\Keyframe.cs" />
     <Compile Include="Source\Widgets\Animation\KeyframeCollection.cs" />
+    <Compile Include="obj\Release\.NETFramework,Version=v4.0.AssemblyAttribute.cs" />
+    <Compile Include="Source\Widgets\Task.cs" />
+    <Compile Include="Source\Widgets\TaskList.cs" />
+    <Compile Include="Source\Input\Key.cs" />
+    <Compile Include="Source\Widgets\WidgetDebugView.cs" />
+    <Compile Include="Source\Widgets\WidgetInput.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
