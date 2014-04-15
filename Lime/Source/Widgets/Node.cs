@@ -65,7 +65,7 @@ namespace Lime
 		public AnimatorCollection Animators;
 
 		[ProtoMember(6)]
-		public NodeCollection Nodes;
+		public NodeList Nodes;
 
 		[ProtoMember(7)]
 		public MarkerCollection Markers;
@@ -106,7 +106,7 @@ namespace Lime
 			AnimationSpeed = 1;
 			Animators = new AnimatorCollection(this);
 			Markers = new MarkerCollection();
-			Nodes = new NodeCollection(this);
+			Nodes = new NodeList(this);
 		}
 
 		private TaskList tasks;
@@ -203,7 +203,7 @@ namespace Lime
 			clone.Parent = null;
 			clone.AsWidget = clone as Widget;
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
-			clone.Nodes = NodeCollection.DeepCloneFast(clone, Nodes);
+			clone.Nodes = NodeList.DeepCloneFast(clone, Nodes);
 			clone.Markers = MarkerCollection.DeepClone(Markers);
 			clone.tasks = null;
 			clone.lateTasks = null;

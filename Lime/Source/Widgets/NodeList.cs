@@ -7,7 +7,7 @@ using ProtoBuf;
 namespace Lime
 {
 	[ProtoContract]
-	public sealed class NodeCollection : ICollection<Node>
+	public sealed class NodeList : IList<Node>
 	{
 		static readonly List<Node> emptyList = new List<Node>();
 		static readonly Node[] emptyArray = new Node[0];
@@ -16,14 +16,14 @@ namespace Lime
 		Node[] nodeArray;
 		readonly Node owner;
 
-		public NodeCollection() { /* ctor for ProtoBuf only */ }
+		public NodeList() { /* ctor for ProtoBuf only */ }
 
-		public NodeCollection(Node owner)
+		public NodeList(Node owner)
 		{
 			this.owner = owner;
 		}
 
-		public NodeCollection(Node owner, int capacity)
+		public NodeList(Node owner, int capacity)
 		{
 			if (capacity > 0) {
 				nodeList = new List<Node>(capacity);
@@ -31,9 +31,9 @@ namespace Lime
 			this.owner = owner;
 		}
 
-		internal static NodeCollection DeepCloneFast(Node owner, NodeCollection source)
+		internal static NodeList DeepCloneFast(Node owner, NodeList source)
 		{
-			var result = new NodeCollection(owner, source.Count);
+			var result = new NodeList(owner, source.Count);
 			foreach (var node in source.AsArray) {
 				result.Add(node.DeepCloneFast());
 			}
@@ -61,11 +61,7 @@ namespace Lime
 			return -1;
 		}
 
-		public Node this[int index] {
-			get { return AsArray[index]; }
-		}
-
-		void ICollection<Node>.CopyTo(Node[] n, int index)
+		public void CopyTo(Node[] n, int index)
 		{
 			nodeList.CopyTo(n, index);
 		}
@@ -168,6 +164,31 @@ namespace Lime
 					return child;
 			}
 			return null;
+		}
+
+
+		public void RemoveAt(int index)
+		{
+			var node = nodeList[index];
+			nodeList.RemoveAt(index);
+			node.Parent = null;
+			nodeArray = null;
+			if (nodeList.Count == 0) {
+				nodeList = emptyList;
+			}
+		}
+
+		public Node this[int index]
+		{
+			get { return AsArray[index]; }
+			set
+			{
+				RuntimeChecksBeforeInsertion(value);
+				nodeArray = null;
+				value.Parent = owner;
+				nodeList[index].Parent = null;
+				nodeList[index] = value;
+			}
 		}
 	}
 }

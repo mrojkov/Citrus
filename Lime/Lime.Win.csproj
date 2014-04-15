@@ -156,7 +156,7 @@
     <Compile Include="Source\Widgets\MarkerCollection.cs" />
     <Compile Include="Source\Widgets\NineGrid.cs" />
     <Compile Include="Source\Widgets\Node.cs" />
-    <Compile Include="Source\Widgets\NodeCollection.cs" />
+    <Compile Include="Source\Widgets\NodeList.cs" />
     <Compile Include="Source\Widgets\NodeDebugView.cs" />
     <Compile Include="Source\Widgets\ParticleEmitter.cs" />
     <Compile Include="Source\Widgets\ParticleModifier.cs" />

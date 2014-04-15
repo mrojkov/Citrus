@@ -167,6 +167,12 @@ namespace Lime
 		public float FrameRate { get { return GameView.Instance.FrameRate; } }
 
 		public DeviceOrientation CurrentDeviceOrientation { get; internal set; }
+
+		public void Exit()
+		{
+			throw new NotImplementedException();
+		}
+
 #elif MAC
 		public void Exit()
 		{
