@@ -294,7 +294,11 @@ namespace Lime
 					break;
 				case Blending.Add:
 				case Blending.Glow:
-					GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
+					if (PremultipliedAlphaMode) {
+						GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.One);
+					} else {
+						GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
+					}
 					break;
 				case Blending.Silhuette:
 					GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
