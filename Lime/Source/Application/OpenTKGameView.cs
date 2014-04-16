@@ -162,6 +162,7 @@ namespace Lime
 
 		protected override void OnClosed(EventArgs e)
 		{
+			app.OnTerminate();
 			TexturePool.Instance.DiscardAllTextures();
 			AudioSystem.Terminate();
 		}
