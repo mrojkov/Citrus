@@ -98,6 +98,8 @@ namespace Lime
 
 		public float AnimationSpeed { get; set; }
 
+		public object UserData { get; set; }
+
 		#endregion
 		#region Methods
 
