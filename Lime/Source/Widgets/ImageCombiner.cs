@@ -25,6 +25,8 @@ namespace Lime
 		Matrix32 CalcLocalToParentTransform();
 	
 		bool GloballyVisible { get; }
+
+		Blending Blending { get; }
 	}
 
 	[ProtoContract]
@@ -177,7 +179,15 @@ namespace Lime
 					return;
 				}
 				Renderer.Transform1 = Parent.AsWidget.LocalToWorldTransform;
-				Renderer.Blending = Blending == Blending.Default ? Parent.AsWidget.GlobalBlending : Blending;
+				Blending blending = Blending == Blending.Default ? Parent.AsWidget.GlobalBlending : Blending;
+				if (arg2.Blending == Blending.Silhuette) {
+					Renderer.SetBlendingEx(blending, Blending.Silhuette);
+				} else if (arg1.Blending == Blending.Silhuette) {
+					Toolbox.Swap(ref arg1, ref arg2);
+					Renderer.SetBlendingEx(blending, Blending.Silhuette);
+				} else {
+					Renderer.Blending = blending;
+				}
 				RenderHelper(arg1, arg2);
 			}
 		}

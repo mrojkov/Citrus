@@ -70,6 +70,7 @@ namespace Lime
 		private static WindowRect scissorRectangle = new WindowRect();
 		private static bool scissorTestEnabled = false;
 		private static Blending blending = Blending.None;
+		private static Blending textureBlending = Blending.None; // overrides "blending" value when != Blending.None
 		private static ShaderProgram currentShaderProgram;
 
 		static Renderer()
@@ -108,7 +109,7 @@ namespace Lime
 		{
 			if (currentIndex > 0) {
 				int numTextures = textures[1] != 0 ? 2 : (textures[0] != 0 ? 1 : 0);
-				var program = ShaderPrograms.GetShaderProgram(blending, numTextures);
+				var program = ShaderPrograms.GetShaderProgram(textureBlending == Blending.None ? blending : textureBlending, numTextures);
 				SetShaderProgram(program);
 				GL.DrawElements(PrimitiveType.Triangles, currentIndex, DrawElementsType.UnsignedShort, (IntPtr)batchIndices);
 				CheckErrors();
@@ -144,6 +145,7 @@ namespace Lime
 			GL.Enable(EnableCap.Blend);
 			blending = Blending.None;
 			Blending = Blending.Default;
+			textureBlending = Blending.None;
 			currentShaderProgram = null;
 			SetupVertexAttribPointers();
 			CheckErrors();
@@ -273,11 +275,17 @@ namespace Lime
 
 		public static Blending Blending {
 			set {
-				if (value == blending)
-					return;
-				FlushSpriteBatch();
-				ApplyBlending(value);
+				SetBlendingEx(value, Blending.None);
 			}
+		}
+
+		public static void SetBlendingEx(Blending newBlending, Blending newTextureBlending)
+		{
+			if (newBlending == blending && newTextureBlending == textureBlending)
+				return;
+			FlushSpriteBatch();
+			ApplyBlending(newBlending);
+			textureBlending = newTextureBlending;
 		}
 
 		private static void ApplyBlending(Blending value)

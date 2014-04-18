@@ -10,7 +10,10 @@ namespace Lime
 		public static ShaderProgram GetShaderProgram(Blending blending, int numTextures)
 		{
 			if (blending == Blending.Silhuette) {
-				return silhuetteBlendingProgram;
+				if (numTextures == 2)
+					return twoTexturesSilhuetteBlendingProgram;
+				else
+					return silhuetteBlendingProgram;
 			}
 			if (numTextures == 0) {
 				return colorOnlyBlendingProgram;
@@ -93,10 +96,23 @@ namespace Lime
 			"	gl_FragColor = vec4(color.rgb, color.a * texture2D(tex, texCoords).a);	" +
 			"}");
 
+		static readonly Shader twoTexturesSilhouetteFragmentShader = new FragmentShader(
+			"varying lowp vec4 color;		" +
+			"varying lowp vec2 texCoords1;" +
+			"varying lowp vec2 texCoords2;" +
+			"uniform lowp sampler2D tex1;	" +
+			"uniform lowp sampler2D tex2;	" +
+			"void main()					" +
+			"{								" +
+			"	gl_FragColor = texture2D(tex1, texCoords1) * vec4(color.rgb, color.a * texture2D(tex2, texCoords2).a);" +
+			"}"
+		);
+
 		private static readonly ShaderProgram colorOnlyBlendingProgram = CreateBlendingProgram(oneTextureVertexShader, colorOnlyFragmentShader);
 		private static readonly ShaderProgram oneTextureBlengingProgram = CreateBlendingProgram(oneTextureVertexShader, oneTextureFragmentShader);
 		private static readonly ShaderProgram twoTexturesBlengingProgram = CreateBlendingProgram(twoTexturesVertexShader, twoTexturesFragmentShader);
 		private static readonly ShaderProgram silhuetteBlendingProgram = CreateBlendingProgram(oneTextureVertexShader, silhouetteFragmentShader);
+		private static readonly ShaderProgram twoTexturesSilhuetteBlendingProgram = CreateBlendingProgram(twoTexturesVertexShader, twoTexturesSilhouetteFragmentShader);
 
 		private static ShaderProgram CreateBlendingProgram(Shader vertexShader, Shader fragmentShader)
 		{
