@@ -256,9 +256,16 @@ namespace Lime
 
 		private void RecalcGlobalMatrixAndColorHelper()
 		{
+			if (IsRenderedToTexture()) {
+				localToWorldTransform = Matrix32.Identity;
+				GlobalColor = color;
+				GlobalBlending = Lime.Blending.Default;
+				GloballyVisible = Visible && color.A != 0;
+				return;
+			}
 			if (Parent != null) {
 				var parentWidget = Parent.AsWidget;
-				if (parentWidget != null && !parentWidget.IsRenderedToTexture()) {
+				if (parentWidget != null) {
 					var localToParent = CalcLocalToParentTransform();
 					Matrix32.Multiply(ref localToParent, ref parentWidget.localToWorldTransform, out localToWorldTransform);
 					GlobalColor = Color * parentWidget.GlobalColor;
