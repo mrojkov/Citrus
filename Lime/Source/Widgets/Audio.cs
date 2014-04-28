@@ -86,7 +86,7 @@ namespace Lime
 
 		public void Stop()
 		{
-			sound.Stop();
+			sound.Stop(FadeTime);
 		}
 
 		public bool IsPlaying()
