@@ -388,9 +388,12 @@ namespace Lime
 			stream.Seek(0, SeekOrigin.Begin);
 			var signature = reader.ReadInt32();
 			if (signature != Signature) {
-				throw new Exception("Assets bundle has been corrupted");
+				throw new Exception("The assets bundle has been corrupted");
 			}
 			reader.ReadInt32(); // CheckSum
+			if (reader.ReadInt32() != Lime.Version.GetBundleFormatVersion()) {
+				throw new Exception("The bundle format or serialization scheme has been changed. Please rebuild the game and serializer.dll");
+			}
 			indexOffset = reader.ReadInt32();
 			stream.Seek(indexOffset, SeekOrigin.Begin);
 			int numDescriptors = reader.ReadInt32();
@@ -412,6 +415,7 @@ namespace Lime
 			stream.Seek(0, SeekOrigin.Begin);
 			writer.Write(Signature);
 			writer.Write(0);
+			writer.Write(Lime.Version.GetBundleFormatVersion());
 			writer.Write(indexOffset);
 			stream.Seek(indexOffset, SeekOrigin.Begin);
 			Int32 numDescriptors = index.Count;
