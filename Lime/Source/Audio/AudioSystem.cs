@@ -253,7 +253,9 @@ namespace Lime
 			foreach (var channel in channels) {
 				if (channel.Priority <= priority) {
 					channel.Stop();
-					return channel;
+					if (channel.State == ALSourceState.Stopped) {
+						return channel;
+					}
 				}
 			}
 			return null;
