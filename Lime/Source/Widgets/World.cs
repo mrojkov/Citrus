@@ -14,13 +14,16 @@
 
 		public static World Instance = new World();
 
-		public override void Update(int delta)
+		protected override void SelfUpdate(int delta)
 		{
 			WidgetInput.RemoveInvalidatedCaptivities();
 			var prevActiveTextWidget = ActiveTextWidget;
 			ParticleEmitter.NumberOfUpdatedParticles = 0;
 			IsActiveTextWidgetUpdated = false;
-			base.Update(delta);
+		}
+
+		protected override void SelfLateUpdate(int delta)
+		{
 			if (!IsActiveTextWidgetUpdated) {
 				ActiveTextWidget = null;
 			}

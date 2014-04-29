@@ -12,7 +12,7 @@ namespace Lime
 		[ProtoMember(1)]
 		public bool Horizontal { get; set; }
 
-		public override void Update(int delta)
+		protected override void SelfUpdate(int delta)
 		{
 			if (Parent != null && Parent.AsWidget != null) {
 				if (Horizontal) {
@@ -21,7 +21,6 @@ namespace Lime
 					UpdateForVerticalOrientation();
 				}
 			}
-			base.Update(delta);
 		}
 
 		private void UpdateForHorizontalOrientation()

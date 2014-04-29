@@ -261,7 +261,7 @@ namespace Lime
 			}
 		}
 
-		public override void Update(int delta)
+		protected override void SelfUpdate(int delta)
 		{
 			wasClicked = false;
 			if (GloballyVisible) {
@@ -271,7 +271,6 @@ namespace Lime
 			if (!Enabled && State != DisabledState) {
 				State = DisabledState;
 			}
-			base.Update(delta);
 		}
 
 #region StateMachine

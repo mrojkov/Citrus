@@ -64,9 +64,8 @@ namespace Lime
 			return false;
 		}
 
-		public override void Update(int delta)
+		protected override void SelfLateUpdate(int delta)
 		{
-			base.Update(delta);
 			IImageCombinerArg arg1, arg2;
 			if (Enabled && GetArgs(out arg1, out arg2)) {
 				arg1.SkipRender();

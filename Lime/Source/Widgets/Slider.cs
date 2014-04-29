@@ -57,12 +57,11 @@ namespace Lime
 			}
 		}
 
-		public override void Update(int delta)
+		protected override void SelfUpdate(int delta)
 		{
 			if (GloballyVisible) {
 				Advance();
 			}
-			base.Update(delta);
 		}
 
 		void Advance()

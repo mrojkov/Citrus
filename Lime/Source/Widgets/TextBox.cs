@@ -53,15 +53,20 @@ namespace Lime
 			Enabled = true;
 		}
 
-		public override void Update(int delta)
+		protected override void SelfUpdate(int delta)
 		{
 			var world = World.Instance;
 			if (!Enabled) {
 				if (world.ActiveTextWidget == this) {
 					world.ActiveTextWidget = null;
 				}
-				base.Update(delta);
-			} else {
+			}
+		}
+
+		protected override void SelfLateUpdate(int delta)
+		{
+			var world = World.Instance;
+			if (Enabled) {
 				if (world.ActiveTextWidget == null && Autofocus) {
 					world.ActiveTextWidget = this;
 				}

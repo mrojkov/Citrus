@@ -33,10 +33,9 @@ namespace Lime.PopupMenu
 			Image.Pivot = Vector2.Half;
 		}
 
-		public override void Update(int delta)
+		protected override void SelfUpdate(int delta)
 		{
 			AdjustImage();
-			base.Update(delta);
 		}
 	}
 }

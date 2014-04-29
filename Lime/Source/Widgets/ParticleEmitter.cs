@@ -434,9 +434,8 @@ namespace Lime
 			}
 		}
 
-		public override void Update(int delta)
+		protected override void SelfLateUpdate(int delta)
 		{
-			base.Update(delta);
 			if (firstUpdate) {
 				firstUpdate = false;
 				const int ModellingStep = 40;

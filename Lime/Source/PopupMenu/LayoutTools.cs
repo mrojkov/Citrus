@@ -7,26 +7,24 @@ namespace Lime.PopupMenu
 {
 	public class ExpandSiblingsToParent : Node
 	{
-		public override void Update(int delta)
+		protected override void SelfUpdate(int delta)
 		{
 			foreach (var item in Parent.Nodes.OfType<Widget>()) {
 				item.Position = Vector2.Zero;
 				item.Size = Parent.AsWidget.Size;
 				item.Pivot = Vector2.Zero;
 			}
-			base.Update(delta);
 		}
 	}
 
 	public class CenterSiblingsVertically : Node
 	{
-		public override void Update(int delta)
+		protected override void SelfUpdate(int delta)
 		{
 			foreach (var item in Parent.Nodes.OfType<Widget>()) {
 				item.Y = (Parent.AsWidget.Height - item.Height) / 2;
 				item.Pivot *= new Vector2(1, 0);
 			}
-			base.Update(delta);
 		}
 	}
 
@@ -41,7 +39,7 @@ namespace Lime.PopupMenu
 			StretchWidget = stretch;
 		}
 
-		public override void Update(int delta)
+		protected override void SelfUpdate(int delta)
 		{
 			var stretch = Parent.Nodes.TryFind(StretchWidget);
 			float w = 0;
@@ -59,7 +57,6 @@ namespace Lime.PopupMenu
 				item.Pivot *= new Vector2(0, 1);
 				x += item.Width;
 			}
-			base.Update(delta);
 		}
 	}
 

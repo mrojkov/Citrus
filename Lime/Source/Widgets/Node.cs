@@ -23,9 +23,6 @@ namespace Lime
 	[DebuggerTypeProxy(typeof(NodeDebugView))]
 	public class Node
 	{
-		public event UpdateHandler Updating;
-		public event UpdateHandler Updated;
-
 		public event Action AnimationStopped;
 	
 		private int animationTime;
@@ -101,30 +98,6 @@ namespace Lime
 			Nodes = new NodeList(this);
 		}
 
-		private TaskList tasks;
-		public TaskList Tasks
-		{
-			get {
-				if (tasks == null) {
-					tasks = new TaskList();
-					Updating += tasks.Update;
-				}
-				return tasks;
-			}
-		}
-
-		private TaskList lateTasks;
-		public TaskList LateTasks
-		{
-			get {
-				if (lateTasks == null) {
-					lateTasks = new TaskList();
-					Updated += lateTasks.Update;
-				}
-				return lateTasks;
-			}
-		}
-
 		public Node GetRoot()
 		{
 			Node node = this;
@@ -195,8 +168,6 @@ namespace Lime
 			clone.AsWidget = clone as Widget;
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Markers = MarkerCollection.DeepClone(Markers);
-			clone.tasks = null;
-			clone.lateTasks = null;
 			clone.Nodes = Nodes.DeepCloneFast(clone);
 			return clone;
 		}
@@ -237,38 +208,33 @@ namespace Lime
 				Parent = null;
 			}
 		}
-		
+
 		public virtual void Update(int delta)
 		{
+			if (AnimationSpeed != 1) {
+				delta = ScaleDeltaWithAnimationSpeed(delta);
+			}
 			if (IsRunning) {
 				AdvanceAnimation(delta);
 			}
-			if (Nodes.Count > 0) {
-				UpdateChildren(delta);
-			}
-		}
-
-		protected void UpdateChildren(int delta)
-		{
+			SelfUpdate(delta);
 			foreach (Node node in Nodes.AsArray) {
-				if (node.AnimationSpeed != 1) {
-					int delta2 = (int)(node.AnimationSpeed * delta + 0.5f);
-					node.FullUpdate(delta2);
-				} else {
-					node.FullUpdate(delta);
-				}
+				node.Update(delta);
 			}
+			SelfLateUpdate(delta);
 		}
 
-		public void FullUpdate(int delta)
+		protected int ScaleDeltaWithAnimationSpeed(int delta)
 		{
-			if (Updating != null) {
-				Updating(delta * 0.001f);
-			}
-			Update(delta);
-			if (Updated != null) {
-				Updated(delta * 0.001f);
-			}
+			return (int)(AnimationSpeed * delta + 0.5f);
+		}
+
+		protected virtual void SelfUpdate(int delta)
+		{
+		}
+
+		protected virtual void SelfLateUpdate(int delta)
+		{
 		}
 
 		public virtual void Render() {}

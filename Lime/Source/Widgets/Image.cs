@@ -73,11 +73,10 @@ namespace Lime
 			requestSkipRender = true;
 		}
 
-		public override void Update(int delta)
+		protected override void SelfUpdate(int delta)
 		{
 			skipRender = requestSkipRender;
 			requestSkipRender = false;
-			base.Update(delta);
 		}
 
 		protected override bool SelfHitTest(Vector2 point)

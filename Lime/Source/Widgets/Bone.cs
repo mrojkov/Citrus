@@ -73,9 +73,8 @@ namespace Lime
 			IKStopper = true;
 		}
 
-		public override void Update(int delta)
+		protected override void SelfLateUpdate(int delta)
 		{
-			base.Update(delta);
 			if (Index > 0 && Parent != null) {
 				BoneArray.Entry e;
 				e.Joint = Position;

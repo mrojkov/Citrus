@@ -164,6 +164,35 @@ namespace Lime
 		public Vector2 GlobalPosition { get { return localToWorldTransform * Vector2.Zero; } }
 		public Vector2 GlobalCenter { get { return localToWorldTransform * (Size / 2); } }
 
+		private TaskList tasks;
+		public TaskList Tasks
+		{
+			get
+			{
+				if (tasks == null) {
+					tasks = new TaskList();
+					Updating += tasks.Update;
+				}
+				return tasks;
+			}
+		}
+
+		private TaskList lateTasks;
+		public TaskList LateTasks
+		{
+			get
+			{
+				if (lateTasks == null) {
+					lateTasks = new TaskList();
+					Updated += lateTasks.Update;
+				}
+				return lateTasks;
+			}
+		}
+
+		public event UpdateHandler Updating;
+		public event UpdateHandler Updated;
+
 		#endregion
 		#region Methods
 
@@ -219,24 +248,38 @@ namespace Lime
 		{
 			var clone = base.DeepCloneFast();
 			clone.AsWidget.input = null;
+			(clone as Widget).tasks = null;
+			(clone as Widget).lateTasks = null;
 			return clone;
 		}
 
 		public override void Update(int delta)
 		{
+			if (AnimationSpeed != 1) {
+				delta = ScaleDeltaWithAnimationSpeed(delta);
+			}
+			if (Updating != null) {
+				Updating(delta * 0.001f);
+			}
 			if (Anchors != Anchors.None && ParentWidget != null) {
 				ApplyAnchors();
 			}
 			RecalcGlobalMatrixAndColorHelper();
-			if (!GloballyVisible) {
-				return;
+			if (GloballyVisible) {
+				if (IsRunning) {
+					AdvanceAnimation(delta);
+				}
+				SelfUpdate(delta);
+				foreach (Node node in Nodes.AsArray) {
+					node.Update(delta);
+				} 
+				SelfLateUpdate(delta);
+				if (clicked != null) {
+					HandleClick();
+				}
 			}
-			if (IsRunning) {
-				AdvanceAnimation(delta);
-			}
-			UpdateChildren(delta);
-			if (clicked != null) {
-				HandleClick();
+			if (Updated != null) {
+				Updated(delta * 0.001f);
 			}
 		}
 
