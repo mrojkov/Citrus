@@ -70,9 +70,16 @@ namespace Lime
 
 		public Widget ParentWidget { get { return Parent != null ? Parent.AsWidget : null; } }
 
-		public virtual string Text { 
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+		public virtual string Text 
+		{ 
+			get { return null; }
+			set { }
+		}
+
+		public virtual ITexture Texture
+		{
+			get { return null; }
+			set { }
 		}
 
 		internal virtual bool IsRenderedToTexture() { return false; }
@@ -85,12 +92,6 @@ namespace Lime
 		public virtual bool WasClicked()
 		{
 			return Input.WasMouseReleased() && HitTest(Input.MousePosition);
-		}
-
-		public virtual ITexture Texture
-		{
-			get { return null; }
-			set { throw new NotImplementedException(); }
 		}
 
 		[ProtoMember(1)]

@@ -34,7 +34,7 @@ namespace Lime
 		internal static NodeList DeepCloneFast(Node owner, NodeList source)
 		{
 			var result = new NodeList(owner, source.Count);
-			foreach (var node in source.AsArray) {
+			foreach (var node in source.nodeList) {
 				result.Add(node.DeepCloneFast());
 			}
 			return result;

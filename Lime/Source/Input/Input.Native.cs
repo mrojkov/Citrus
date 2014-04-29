@@ -124,7 +124,7 @@ namespace Lime
 
 		internal static void SetKeyState(Key key, bool value)
 		{
-			keyEventQueue.Add(new KeyEvent{Key = key, State = value});
+			keyEventQueue.Add(new KeyEvent { Key = key, State = value });
 		}
 		
 		internal static void ProcessPendingKeyEvents()

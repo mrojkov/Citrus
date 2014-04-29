@@ -8,14 +8,6 @@ using System.Diagnostics;
 
 namespace Lime
 {
-	public class NodeTreeStatistics
-	{
-		public int TotalNodes;
-		public int VisibileNodes;
-		public int OldNodes;
-		public DateTime OldNodeBarrier = DateTime.Now.AddMinutes(-5);
-	}
-
 	public delegate void UpdateHandler(float delta);
 
 	[ProtoContract]
@@ -85,8 +77,6 @@ namespace Lime
 				ApplyAnimators(invokeTriggers: false); 
 			}
 		}
-
-		public DateTime CreationTime = DateTime.Now; 
 
 		[ProtoMember(11)]
 		public string Tag { get; set; }
@@ -201,7 +191,6 @@ namespace Lime
 		public virtual Node DeepCloneFast()
 		{
 			var clone = (Node)MemberwiseClone();
-			clone.CreationTime = DateTime.Now;
 			clone.Parent = null;
 			clone.AsWidget = clone as Widget;
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
@@ -256,20 +245,6 @@ namespace Lime
 			}
 			if (!Nodes.Empty) {
 				UpdateChildren(delta);
-			}
-		}
-
-		public void CollectStatistics(NodeTreeStatistics stat)
-		{
-			stat.TotalNodes++;
-			if (CreationTime < stat.OldNodeBarrier) {
-				stat.OldNodes++;
-			}
-			if (AsWidget != null && AsWidget.GloballyVisible) {
-				stat.VisibileNodes++;
-			}
-			foreach (var child in Nodes.AsArray) {
-				child.CollectStatistics(stat);
 			}
 		}
 

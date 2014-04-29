@@ -51,7 +51,7 @@ namespace Lime
 		/// <summary>
 		/// Once button has been clicked, its active area includes circle with a given radius.
 		/// </summary>
-		public static float ButtonEffectiveRadius = 400;
+		public static float ButtonEffectiveRadius = 200;
 
 		/// <summary>
 		/// Indicates whether all buttons should use tablet control scheme that doesn't includes
