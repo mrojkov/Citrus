@@ -6,78 +6,71 @@ using ProtoBuf;
 
 namespace Lime
 {
-	[ProtoContract]
-	public sealed class NodeList : IList<Node>
+	[ProtoContract(IgnoreListHandling = true)]
+	public struct NodeList : IList<Node>
 	{
-		static readonly List<Node> emptyList = new List<Node>();
-		static readonly Node[] emptyArray = new Node[0];
+		private readonly Node owner;
 
-		List<Node> nodeList = emptyList;
-		Node[] nodeArray;
-		readonly Node owner;
+		/// <summary>
+		/// This member can be used only for fast serialization and children traverse.
+		/// Avoid to use it in the game code.
+		/// </summary>
+		[ProtoMember(1)]
+		public Node[] AsArray;
 
-		public NodeList() { /* ctor for ProtoBuf only */ }
+		private static Node[] EmptyNodeArray = new Node[0];
 
 		public NodeList(Node owner)
 		{
+			AsArray = EmptyNodeArray;
 			this.owner = owner;
 		}
 
-		public NodeList(Node owner, int capacity)
+		internal NodeList DeepCloneFast(Node clone)
 		{
-			if (capacity > 0) {
-				nodeList = new List<Node>(capacity);
-			}
-			this.owner = owner;
-		}
-
-		internal static NodeList DeepCloneFast(Node owner, NodeList source)
-		{
-			var result = new NodeList(owner, source.Count);
-			foreach (var node in source.nodeList) {
-				result.Add(node.DeepCloneFast());
+			var result = new NodeList(clone);
+			if (Count > 0) {
+				result.AsArray = new Node[Count];
+				int i = 0;
+				foreach (var node in AsArray) {
+					var n = node.DeepCloneFast();
+					n.Parent = clone;
+					result.AsArray[i++] = n;
+				}
 			}
 			return result;
 		}
 
-		public Node[] AsArray
+		[ProtoAfterDeserialization]
+		public void AfterDeserialization()
 		{
-			get {
-				if (nodeArray == null) {
-					nodeArray = nodeList.Count > 0 ? nodeList.ToArray() : emptyArray;
-				}
-				return nodeArray;
+			foreach (var node in AsArray) {
+				node.Parent = owner;
 			}
 		}
 
 		public int IndexOf(Node node)
 		{
-			int i = 0;
-			foreach (var current in AsArray) {
-				if (current == node)
-					return i;
-				i++;
-			}
-			return -1;
+			return Array.IndexOf(AsArray, node);
 		}
 
-		public void CopyTo(Node[] n, int index)
+		public void CopyTo(Node[] array, int index)
 		{
-			nodeList.CopyTo(n, index);
+			AsArray.CopyTo(array, index);
 		}
-
-		public bool Empty { get { return AsArray == emptyArray; } }
 
 		public int Count { get { return AsArray.Length; } }
 
 		public IEnumerator<Node> GetEnumerator()
 		{
-			return nodeList.GetEnumerator();
+			foreach (var node in AsArray) {
+				yield return node;
+			}
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return nodeList.GetEnumerator();
+			return AsArray.GetEnumerator();
 		}
 
 		bool ICollection<Node>.IsReadOnly {
@@ -86,15 +79,12 @@ namespace Lime
 
 		public void Sort(Comparison<Node> comparison)
 		{
-			nodeList.Sort(comparison);
-			if (nodeArray != null) {
-				nodeList.CopyTo(nodeArray);
-			}
+			Array.Sort(AsArray, comparison);
 		}
 
 		public bool Contains(Node node)
 		{
-			return nodeList.Contains(node);
+			return IndexOf(node) >= 0;
 		}
 
 		public void Push(Node node)
@@ -105,23 +95,33 @@ namespace Lime
 		public void Add(Node node)
 		{
 			RuntimeChecksBeforeInsertion(node); 
-			nodeArray = null;
-			if (nodeList == emptyList) {
-				nodeList = new List<Node>();
-			}
 			node.Parent = owner;
-			nodeList.Add(node);
+			Array.Resize(ref AsArray, Count + 1);
+			AsArray[Count - 1] = node;
+		}
+
+		public void AddRange(IEnumerable<Node> collection)
+		{
+			int count = 0;
+			foreach (var node in collection) {
+				RuntimeChecksBeforeInsertion(node);
+				count++;
+			}
+			Array.Resize(ref AsArray, Count + count);
+			int i = Count - count;
+			foreach (var node in collection) {
+				node.Parent = owner;
+				AsArray[i++] = node;
+			}
 		}
 
 		public void Insert(int index, Node node)
 		{
 			RuntimeChecksBeforeInsertion(node);
-			nodeArray = null;
-			if (nodeList == emptyList) {
-				nodeList = new List<Node>();
-			}
+			Array.Resize(ref AsArray, Count + 1);
+			Array.Copy(AsArray, index, AsArray, index + 1, Count - index - 1);
+			AsArray[index] = node;
 			node.Parent = owner;
-			nodeList.Insert(index, node);
 		}
 
 		private void RuntimeChecksBeforeInsertion(Node node)
@@ -136,45 +136,48 @@ namespace Lime
 
 		public bool Remove(Node node)
 		{
-			bool result = false;
-			if (nodeList.Remove(node)) {
-				node.Parent = null;
-				result = true;
-				nodeArray = null;
+			int index = IndexOf(node);
+			if (index >= 0) {
+				RemoveAt(index);
+				return true;
 			}
-			if (nodeList.Count == 0) {
-				nodeList = emptyList;
-			}
-			return result;
+			return false;
 		}
 
 		public void Clear()
 		{
-			foreach (var node in nodeList) {
+			foreach (var node in AsArray) {
 				node.Parent = null;
 			}
-			nodeArray = null;
-			nodeList = emptyList;
+			AsArray = EmptyNodeArray;
 		}
 
 		public Node TryFind(string id)
 		{
-			foreach (Node child in AsArray) {
-				if (child.Id == id)
-					return child;
+			foreach (Node node in AsArray) {
+				if (node.Id == id) {
+					return node;
+				}
 			}
 			return null;
 		}
 
-
 		public void RemoveAt(int index)
 		{
-			var node = nodeList[index];
-			nodeList.RemoveAt(index);
+			var node = AsArray[index];
 			node.Parent = null;
-			nodeArray = null;
-			if (nodeList.Count == 0) {
-				nodeList = emptyList;
+			Node last = null;
+			int count = AsArray.Length;
+			if (count > 0) {
+				last = AsArray[count - 1];
+			}
+			Array.Resize(ref AsArray, count - 1);
+			count -= 1;
+			if (count - index - 1 > 0) {
+				Array.Copy(AsArray, index + 1, AsArray, index, count - index - 1);
+			}
+			if (index < count) {
+				AsArray[count - 1] = last;
 			}
 		}
 
@@ -184,10 +187,9 @@ namespace Lime
 			set
 			{
 				RuntimeChecksBeforeInsertion(value);
-				nodeArray = null;
 				value.Parent = owner;
-				nodeList[index].Parent = null;
-				nodeList[index] = value;
+				AsArray[index].Parent = null;
+				AsArray[index] = value;
 			}
 		}
 	}

@@ -224,7 +224,7 @@ namespace Lime
 
 		public override void Update(int delta)
 		{
-			if (Anchors != Anchors.None && Parent != null && Parent.AsWidget != null) {
+			if (Anchors != Anchors.None && ParentWidget != null) {
 				ApplyAnchors();
 			}
 			RecalcGlobalMatrixAndColorHelper();
@@ -242,7 +242,7 @@ namespace Lime
 
 		private void HandleClick()
 		{
-			if (Input.WasMouseReleased() && HitTest(Input.MousePosition)) {
+			if (Input.WasMouseReleased() && IsMouseOver()) {
 				clicked();
 			}
 		}

@@ -194,10 +194,10 @@ namespace Lime
 			clone.Parent = null;
 			clone.AsWidget = clone as Widget;
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
-			clone.Nodes = NodeList.DeepCloneFast(clone, Nodes);
 			clone.Markers = MarkerCollection.DeepClone(Markers);
 			clone.tasks = null;
 			clone.lateTasks = null;
+			clone.Nodes = Nodes.DeepCloneFast(clone);
 			return clone;
 		}
 
@@ -243,7 +243,7 @@ namespace Lime
 			if (IsRunning) {
 				AdvanceAnimation(delta);
 			}
-			if (!Nodes.Empty) {
+			if (Nodes.Count > 0) {
 				UpdateChildren(delta);
 			}
 		}
@@ -269,10 +269,6 @@ namespace Lime
 			if (Updated != null) {
 				Updated(delta * 0.001f);
 			}
-		}
-
-		private void FullUpdateHelper(int delta)
-		{
 		}
 
 		public virtual void Render() {}
@@ -538,13 +534,10 @@ namespace Lime
 				content.AsWidget.Size = AsWidget.Size;
 				content.Update(0);
 			}
-			foreach (Marker marker in content.Markers) {
-				Markers.Add(marker);
-			}
-			foreach (Node node in content.Nodes.AsArray) {
-				node.Unlink();
-				Nodes.Add(node);
-			}
+			Markers.AddRange(content.Markers);
+			var array = content.Nodes.AsArray;
+			content.Nodes.Clear();
+			Nodes.AddRange(array);
 		}
 		#endregion
 	}
