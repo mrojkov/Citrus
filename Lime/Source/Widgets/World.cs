@@ -14,10 +14,12 @@
 
 		public static World Instance = new World();
 
+		private TextBox prevActiveTextWidget;
+
 		protected override void SelfUpdate(int delta)
 		{
 			WidgetInput.RemoveInvalidatedCaptivities();
-			var prevActiveTextWidget = ActiveTextWidget;
+			prevActiveTextWidget = ActiveTextWidget;
 			ParticleEmitter.NumberOfUpdatedParticles = 0;
 			IsActiveTextWidgetUpdated = false;
 		}
