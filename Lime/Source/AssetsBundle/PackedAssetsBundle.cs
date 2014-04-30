@@ -381,7 +381,7 @@ namespace Lime
 		private void ReadIndexTable()
 		{
 			if (stream.Length == 0) {
-				indexOffset = sizeof(Int32) * 3;
+				indexOffset = sizeof(Int32) * 4;
 				index.Clear();
 				return;
 			}
