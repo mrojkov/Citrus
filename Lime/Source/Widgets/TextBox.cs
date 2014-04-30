@@ -60,6 +60,13 @@ namespace Lime
 				if (world.ActiveTextWidget == this) {
 					world.ActiveTextWidget = null;
 				}
+			} else {
+				if (world.ActiveTextWidget == null && Autofocus) {
+					world.ActiveTextWidget = this;
+				}
+				if (Input.WasKeyPressed(Key.Mouse0) && HitTest(Input.MousePosition)) {
+					world.ActiveTextWidget = this;
+				}
 			}
 		}
 
@@ -67,13 +74,6 @@ namespace Lime
 		{
 			var world = World.Instance;
 			if (Enabled) {
-				if (world.ActiveTextWidget == null && Autofocus) {
-					world.ActiveTextWidget = this;
-				}
-				if (Input.WasKeyPressed(Key.Mouse0) && HitTest(Input.MousePosition)) {
-					world.ActiveTextWidget = this;
-				}
-				base.Update(delta);
 				if (world.ActiveTextWidget == this && Input.TextInput != null) {
 					ProcessInput();
 				}
