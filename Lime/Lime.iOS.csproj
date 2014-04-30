@@ -182,6 +182,8 @@
     <Compile Include="Source\Input\Key.cs" />
     <Compile Include="Source\Widgets\WidgetDebugView.cs" />
     <Compile Include="Source\Widgets\WidgetInput.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Source\Version.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
