@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System;
 using System.Reflection;
+using System.Linq;
 using ProtoBuf;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -202,18 +203,11 @@ namespace Lime
 
 		/// <summary>
 		/// Unlinks the node from its parent. 
-		/// This method does not clear NextSibling, so following loop will not be broken:
-		///		foreach (var node in Nodes) {
-		///			node.Unlink();
-		///			...
-		///		}
 		/// </summary>
 		public void Unlink()
 		{
 			if (Parent != null) {
-				var nextSibling = NextSibling;
 				Parent.Nodes.Remove(this);
-				NextSibling = nextSibling;
 			}
 		}
 
@@ -226,8 +220,10 @@ namespace Lime
 				AdvanceAnimation(delta);
 			}
 			SelfUpdate(delta);
-			for (Node node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
+			for (var node = Nodes.FirstOrNull(); node != null; ) {
+				var next = node.NextSibling;
 				node.Update(delta);
+				node = next;
 			}
 			SelfLateUpdate(delta);
 		}
@@ -509,7 +505,7 @@ namespace Lime
 				content.Update(0);
 			}
 			Markers.AddRange(content.Markers);
-			foreach (var node in content.Nodes) {
+			foreach (var node in content.Nodes.ToArray()) {
 				node.Unlink();
 				Nodes.Add(node);
 			}

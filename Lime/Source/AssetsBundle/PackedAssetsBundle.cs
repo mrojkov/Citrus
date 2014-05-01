@@ -392,7 +392,7 @@ namespace Lime
 			}
 			reader.ReadInt32(); // CheckSum
 			if (reader.ReadInt32() != Lime.Version.GetBundleFormatVersion()) {
-				throw new Exception("The bundle format or serialization scheme has been changed. Please rebuild the game and serializer.dll");
+				throw new Exception("The bundle format or serialization scheme has been changed. Please update Orange, rebuild the game and serializer.dll");
 			}
 			indexOffset = reader.ReadInt32();
 			stream.Seek(indexOffset, SeekOrigin.Begin);

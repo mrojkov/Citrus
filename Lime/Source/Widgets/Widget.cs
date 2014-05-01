@@ -270,8 +270,10 @@ namespace Lime
 					AdvanceAnimation(delta);
 				}
 				SelfUpdate(delta);
-				for (Node node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
+				for (var node = Nodes.FirstOrNull(); node != null; ) {
+					var next = node.NextSibling;
 					node.Update(delta);
+					node = next;
 				} 
 				SelfLateUpdate(delta);
 				if (clicked != null) {
