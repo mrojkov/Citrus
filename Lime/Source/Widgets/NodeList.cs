@@ -58,6 +58,8 @@ namespace Lime
 		private readonly Node owner;
 		private List<Node> list;
 
+		public NodeList() { /* ctor for ProtoBuf only */ }
+
 		public NodeList(Node owner)
 		{
 			this.list = null;
