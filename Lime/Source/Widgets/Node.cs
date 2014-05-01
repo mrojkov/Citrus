@@ -325,30 +325,41 @@ namespace Lime
 		public Node TryFindNode(string path)
 		{
 			if (path.IndexOf('/') >= 0) {
-				Node child = this;
-				string[] ids = path.Split('/');
-				foreach (string id in ids) {
-					child = child.TryFindNode(id);
-					if (child == null)
-						break;
-				}
-				return child;
+				return TryFindNodeByPath(path);
 			} else {
-				return TryFindNodeHelper(path);
+				return TryFindNodeById(path);
 			}
 		}
 
-		private Node TryFindNodeHelper(string id)
+		private Node TryFindNodeByPath(string path)
 		{
-			var queue = new Queue<Node>();
+			Node child = this;
+			foreach (string id in path.Split('/')) {
+				child = child.TryFindNodeById(id);
+				if (child == null)
+					break;
+			}
+			return child;
+		}
+
+		[ThreadStatic]
+		private static Queue<Node> nodeSearchQueue;
+
+		private Node TryFindNodeById(string id)
+		{
+			if (nodeSearchQueue == null) {
+				nodeSearchQueue = new Queue<Node>();
+			}
+			var queue = nodeSearchQueue;
 			queue.Enqueue(this);
 			while (queue.Count > 0) {
-				Node node = queue.Dequeue();
-				foreach (Node child in node.Nodes) {
-					if (child.Id == id)
+				var parent = queue.Dequeue();
+				var child = parent.Nodes.FirstOrNull();
+				for (; child != null; child = child.NextSibling) {
+					if (child.Id == id) {
+						queue.Clear();
 						return child;
-				}
-				foreach (Node child in node.Nodes) {
+					}
 					queue.Enqueue(child);
 				}
 			}

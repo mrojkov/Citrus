@@ -23,8 +23,6 @@ namespace Lime
 		public bool Enabled;
 
 		private float value;
-		private Widget thumb;
-		private Spline rail;
 
 		public Slider()
 		{
@@ -41,7 +39,7 @@ namespace Lime
 
 		private Widget GetThumb()
 		{
-			thumb = Nodes.TryFind("SliderThumb") as Widget;
+			var thumb = Nodes.TryFind("SliderThumb") as Widget;
 			if (thumb == null) {
 				thumb = Nodes.TryFind("Thumb") as Widget;
 			}
