@@ -484,7 +484,7 @@ namespace Lime
 			if (!string.IsNullOrEmpty(ContentsPath)) {
 				LoadContentHelper();
 			} else {
-				foreach (var node in Nodes) {
+				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
 					node.LoadContent();
 				}
 			}
@@ -505,10 +505,9 @@ namespace Lime
 				content.Update(0);
 			}
 			Markers.AddRange(content.Markers);
-			foreach (var node in content.Nodes.ToArray()) {
-				node.Unlink();
-				Nodes.Add(node);
-			}
+			var nodes = content.Nodes.ToArray();
+			content.Nodes.Clear();
+			Nodes.AddRange(nodes);
 		}
 		#endregion
 	}

@@ -173,5 +173,10 @@ namespace Lime
 		{
 			return T.X == 0 && T.Y == 0 && U.X == 1 && U.Y == 0 && V.X == 0 && V.Y == 1;
 		}
+
+		public override string ToString()
+		{
+			return string.Format("U: {0}; V: {1}; T: {2}", U, V, T);
+		}
 	}
 }

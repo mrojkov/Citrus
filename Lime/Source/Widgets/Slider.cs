@@ -36,25 +36,21 @@ namespace Lime
 
 		private Widget Thumb
 		{
-			get {
-				if (thumb == null) {
-					thumb = Nodes.TryFind("Thumb") as Widget;
-				}
-				if (thumb == null) {
-					thumb = Nodes.TryFind("SliderThumb") as Widget;
-				}
-				return thumb;
+			get { return GetThumb(); }
+		}
+
+		private Widget GetThumb()
+		{
+			thumb = Nodes.TryFind("SliderThumb") as Widget;
+			if (thumb == null) {
+				thumb = Nodes.TryFind("Thumb") as Widget;
 			}
+			return thumb;
 		}
 
 		private Spline Rail
 		{
-			get {
-				if (rail == null) {
-					rail = Nodes.TryFind("Rail") as Spline;
-				}
-				return rail;
-			}
+			get { return Nodes.TryFind("Rail") as Spline; }
 		}
 
 		protected override void SelfUpdate(int delta)
@@ -105,8 +101,8 @@ namespace Lime
 			}
 		}
 
-		float dragInitialOffset;
-		float dragInitialDelta;
+		private float dragInitialOffset;
+		private float dragInitialDelta;
 
 		private void SetValueFromCurrentMousePosition(bool draggingJustBegun)
 		{
@@ -137,7 +133,14 @@ namespace Lime
 			} else {
 				Value = v + dragInitialDelta;
 			}
-			if (Changed != null && Value != prevValue) {
+			if (Value != prevValue) {
+				RaiseChanged();
+			}
+		}
+
+		private void RaiseChanged()
+		{
+			if (Changed != null) {
 				Changed();
 			}
 		}
