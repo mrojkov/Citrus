@@ -69,6 +69,14 @@
     <Compile Include="Source\Widgets\Animation\AnimatorRegistry.cs" />
     <Compile Include="Source\Widgets\Animation\Keyframe.cs" />
     <Compile Include="Source\Widgets\Animation\KeyframeCollection.cs" />
+    <Compile Include="Source\Version.cs" />
+    <Compile Include="Source\Application\Debug.cs" />
+    <Compile Include="Source\Input\Key.cs" />
+    <Compile Include="Source\Widgets\NodeList.cs" />
+    <Compile Include="Source\Widgets\Task.cs" />
+    <Compile Include="Source\Widgets\TaskList.cs" />
+    <Compile Include="Source\Widgets\WidgetDebugView.cs" />
+    <Compile Include="Source\Widgets\WidgetInput.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -103,7 +111,6 @@
     <Compile Include="Source\Widgets\Marker.cs" />
     <Compile Include="Source\Widgets\MarkerCollection.cs" />
     <Compile Include="Source\Widgets\Node.cs" />
-    <Compile Include="Source\Widgets\NodeCollection.cs" />
     <Compile Include="Source\Widgets\ParticleEmitter.cs" />
     <Compile Include="Source\Widgets\ParticleModifier.cs" />
     <Compile Include="Source\Widgets\ParticlesMagnet.cs" />
@@ -135,7 +142,6 @@
     <Compile Include="Source\Widgets\Widget.Toolbox.cs" />
     <Compile Include="Source\Geometry.cs" />
     <Compile Include="Source\Widgets\Polyline.cs" />
-    <Compile Include="Source\Widgets\Widget.Debugging.cs" />
     <Compile Include="Source\StringExtensions.cs" />
     <Compile Include="Source\Widgets\World.cs" />
     <Compile Include="Source\Application\Logger.cs" />
@@ -171,7 +177,6 @@
     <Compile Include="Source\Graphics\Unity\RenderTexture.cs" />
     <Compile Include="Source\Graphics\Unity\Renderer.cs" />
     <Compile Include="Source\Graphics\Unity\Texture2D.cs" />
-    <Compile Include="Source\Input\Input.Common.cs" />
     <Compile Include="Source\Input\Input.Native.cs" />
     <Compile Include="Source\Input\Input.Unity.cs" />
     <Compile Include="Source\Audio\AudioCache.cs" />

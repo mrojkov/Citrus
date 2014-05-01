@@ -176,7 +176,6 @@
     <Compile Include="Source\Widgets\Animation\AnimatorRegistry.cs" />
     <Compile Include="Source\Widgets\Animation\Keyframe.cs" />
     <Compile Include="Source\Widgets\Animation\KeyframeCollection.cs" />
-    <Compile Include="obj\Release\.NETFramework,Version=v4.0.AssemblyAttribute.cs" />
     <Compile Include="Source\Widgets\Task.cs" />
     <Compile Include="Source\Widgets\TaskList.cs" />
     <Compile Include="Source\Input\Key.cs" />
@@ -184,6 +183,7 @@
     <Compile Include="Source\Widgets\WidgetInput.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Source\Version.cs" />
+    <Compile Include="obj\Release\.NETFramework,Version=v4.0.AssemblyAttribute.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
