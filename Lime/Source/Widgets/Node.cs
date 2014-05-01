@@ -47,6 +47,7 @@ namespace Lime
 		public Widget AsWidget { get; internal set; }
 
 		internal Node NextToRender;
+		internal Node NextSibling;
 
 		public int Layer { get; set; }
 
@@ -165,6 +166,7 @@ namespace Lime
 		{
 			var clone = (Node)MemberwiseClone();
 			clone.Parent = null;
+			clone.NextSibling = null;
 			clone.AsWidget = clone as Widget;
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Markers = MarkerCollection.DeepClone(Markers);
@@ -199,13 +201,19 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Unlinks the node from its parent. Can be safely invoked inside Node.Update() method.
+		/// Unlinks the node from its parent. 
+		/// This method does not clear NextSibling, so following loop will not be broken:
+		///		foreach (var node in Nodes) {
+		///			node.Unlink();
+		///			...
+		///		}
 		/// </summary>
 		public void Unlink()
 		{
 			if (Parent != null) {
+				var nextSibling = NextSibling;
 				Parent.Nodes.Remove(this);
-				Parent = null;
+				NextSibling = nextSibling;
 			}
 		}
 
@@ -218,7 +226,7 @@ namespace Lime
 				AdvanceAnimation(delta);
 			}
 			SelfUpdate(delta);
-			foreach (Node node in Nodes.AsArray) {
+			for (Node node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
 				node.Update(delta);
 			}
 			SelfLateUpdate(delta);
@@ -241,7 +249,7 @@ namespace Lime
 
 		public virtual void AddToRenderChain(RenderChain chain)
 		{
-			foreach (Node node in Nodes.AsArray) {
+			for (Node node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
 				node.AddToRenderChain(chain);
 			}
 		}
@@ -340,11 +348,11 @@ namespace Lime
 			queue.Enqueue(this);
 			while (queue.Count > 0) {
 				Node node = queue.Dequeue();
-				foreach (Node child in node.Nodes.AsArray) {
+				foreach (Node child in node.Nodes) {
 					if (child.Id == id)
 						return child;
 				}
-				foreach (Node child in node.Nodes.AsArray) {
+				foreach (Node child in node.Nodes) {
 					queue.Enqueue(child);
 				}
 			}
@@ -415,7 +423,7 @@ namespace Lime
 
 		private void ApplyAnimators(bool invokeTriggers)
 		{
-			foreach (Node node in Nodes.AsArray) {
+			for (Node node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
 				var animators = node.Animators;
 				animators.Apply(animationTime);
 				if (invokeTriggers) {
@@ -440,7 +448,7 @@ namespace Lime
 			foreach (var animator in Animators) {
 				PreloadAnimatedTextures(animator);
 			}
-			foreach (var node in Nodes.AsArray) {
+			foreach (var node in Nodes) {
 				node.PreloadAssets();
 			}
 		}
@@ -480,7 +488,7 @@ namespace Lime
 			if (!string.IsNullOrEmpty(ContentsPath)) {
 				LoadContentHelper();
 			} else {
-				foreach (var node in Nodes.AsArray) {
+				foreach (var node in Nodes) {
 					node.LoadContent();
 				}
 			}
@@ -501,9 +509,10 @@ namespace Lime
 				content.Update(0);
 			}
 			Markers.AddRange(content.Markers);
-			var array = content.Nodes.AsArray;
-			content.Nodes.Clear();
-			Nodes.AddRange(array);
+			foreach (var node in content.Nodes) {
+				node.Unlink();
+				Nodes.Add(node);
+			}
 		}
 		#endregion
 	}

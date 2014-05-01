@@ -6,23 +6,61 @@ using ProtoBuf;
 
 namespace Lime
 {
-	[ProtoContract(IgnoreListHandling = true)]
-	public struct NodeList : IList<Node>
+	[ProtoContract]
+	public class NodeList : IList<Node>
 	{
+		struct EmptyEnumerator : IEnumerator<Node>
+		{
+			object IEnumerator.Current { get { return null; } }
+
+			public bool MoveNext() { return false; }
+
+			public void Reset() { }
+
+			public Node Current { get { return null; } }
+
+			public void Dispose() { }
+		}
+
+		struct Enumerator : IEnumerator<Node>
+		{
+			private Node first;
+			private Node current;
+
+			public Enumerator(Node first)
+			{
+				this.first = first;
+				current = null;
+			}
+
+			object IEnumerator.Current { get { return current; } }
+
+			public bool MoveNext() 
+			{
+				if (current == null) {
+					current = first;
+				} else {
+					current = current.NextSibling;
+				}
+				return current != null;
+			}
+
+			public void Reset()
+			{
+				current = null;
+			}
+
+			public Node Current { get { return current; } }
+
+			public void Dispose() { }
+		}
+
 		private readonly Node owner;
-
-		/// <summary>
-		/// This member can be used only for fast serialization and children traverse.
-		/// Avoid to use it in the game code.
-		/// </summary>
-		[ProtoMember(1)]
-		public Node[] AsArray;
-
-		private static Node[] EmptyNodeArray = new Node[0];
+		private List<Node> list;
 
 		public NodeList(Node owner)
 		{
-			AsArray = EmptyNodeArray;
+			this.list = null;
 			this.owner = owner;
 		}
 
@@ -30,47 +68,48 @@ namespace Lime
 		{
 			var result = new NodeList(clone);
 			if (Count > 0) {
-				result.AsArray = new Node[Count];
-				int i = 0;
-				foreach (var node in AsArray) {
-					var n = node.DeepCloneFast();
-					n.Parent = clone;
-					result.AsArray[i++] = n;
+				result.list = new List<Node>(Count);
+				foreach (var node in this) {
+					result.Add(node.DeepCloneFast());
 				}
 			}
 			return result;
 		}
 
-		[ProtoAfterDeserialization]
-		public void AfterDeserialization()
-		{
-			foreach (var node in AsArray) {
-				node.Parent = owner;
-			}
-		}
-
 		public int IndexOf(Node node)
 		{
-			return Array.IndexOf(AsArray, node);
+			if (list == null) {
+				return -1;
+			}
+			return list.IndexOf(node);
 		}
 
 		public void CopyTo(Node[] array, int index)
 		{
-			AsArray.CopyTo(array, index);
+			if (list == null) {
+				return;
+			}
+			list.CopyTo(array, index);
 		}
 
-		public int Count { get { return AsArray.Length; } }
+		public int Count { get { return list != null ? list.Count : 0; } }
 
 		public IEnumerator<Node> GetEnumerator()
 		{
-			foreach (var node in AsArray) {
-				yield return node;
+			if (Count == 0) {
+				return new EmptyEnumerator();
+			} else {
+				return new Enumerator(list[0]);
 			}
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return AsArray.GetEnumerator();
+			if (Count == 0) {
+				return new EmptyEnumerator();
+			} else {
+				return new Enumerator(list[0]);
+			}
 		}
 
 		bool ICollection<Node>.IsReadOnly {
@@ -79,7 +118,16 @@ namespace Lime
 
 		public void Sort(Comparison<Node> comparison)
 		{
-			Array.Sort(AsArray, comparison);
+			if (list == null) {
+				return;
+			}
+			list.Sort(comparison);
+			for (int i = 1; i < Count; i++) {
+				list[i - 1].NextSibling = list[i];
+			}
+			if (Count > 0) {
+				list[Count - 1].NextSibling = null;
+			}
 		}
 
 		public bool Contains(Node node)
@@ -95,33 +143,45 @@ namespace Lime
 		public void Add(Node node)
 		{
 			RuntimeChecksBeforeInsertion(node); 
+			CreateListIfNeeded();
 			node.Parent = owner;
-			Array.Resize(ref AsArray, Count + 1);
-			AsArray[Count - 1] = node;
+			if (Count > 0) {
+				list[Count - 1].NextSibling = node;
+			}
+			list.Add(node);
+		}
+
+		private void CreateListIfNeeded()
+		{
+			if (list == null) {
+				list = new List<Node>();
+			}
 		}
 
 		public void AddRange(IEnumerable<Node> collection)
 		{
-			int count = 0;
 			foreach (var node in collection) {
-				RuntimeChecksBeforeInsertion(node);
-				count++;
+				Add(node);
 			}
-			Array.Resize(ref AsArray, Count + count);
-			int i = Count - count;
-			foreach (var node in collection) {
-				node.Parent = owner;
-				AsArray[i++] = node;
-			}
+		}
+
+		public Node FirstOrNull()
+		{
+			return list == null || list.Count == 0 ? null : list[0];
 		}
 
 		public void Insert(int index, Node node)
 		{
 			RuntimeChecksBeforeInsertion(node);
-			Array.Resize(ref AsArray, Count + 1);
-			Array.Copy(AsArray, index, AsArray, index + 1, Count - index - 1);
-			AsArray[index] = node;
+			CreateListIfNeeded();
+			list.Insert(index, node);
 			node.Parent = owner;
+			if (index > 0) {
+				list[index - 1].NextSibling = node;
+			}
+			if (index + 1 < Count) {
+				list[index].NextSibling = list[index + 1];
+			}
 		}
 
 		private void RuntimeChecksBeforeInsertion(Node node)
@@ -146,15 +206,19 @@ namespace Lime
 
 		public void Clear()
 		{
-			foreach (var node in AsArray) {
-				node.Parent = null;
+			if (list == null) {
+				return;
 			}
-			AsArray = EmptyNodeArray;
+			foreach (var node in list) {
+				node.Parent = null;
+				node.NextSibling = null;
+			}
+			list.Clear();
 		}
 
 		public Node TryFind(string id)
 		{
-			foreach (Node node in AsArray) {
+			foreach (var node in this) {
 				if (node.Id == id) {
 					return node;
 				}
@@ -164,32 +228,40 @@ namespace Lime
 
 		public void RemoveAt(int index)
 		{
-			var node = AsArray[index];
-			node.Parent = null;
-			Node last = null;
-			int count = AsArray.Length;
-			if (count > 0) {
-				last = AsArray[count - 1];
+			if (list == null) {
+				throw new IndexOutOfRangeException();
 			}
-			Array.Resize(ref AsArray, count - 1);
-			count -= 1;
-			if (count - index - 1 > 0) {
-				Array.Copy(AsArray, index + 1, AsArray, index, count - index - 1);
-			}
-			if (index < count) {
-				AsArray[count - 1] = last;
-			}
+			list[index].Parent = null;
+			list[index].NextSibling = null;
+			list.RemoveAt(index);
+			if (index > 0) {
+				list[index - 1].NextSibling = index < Count ? list[index] : null;
+			} 
 		}
 
 		public Node this[int index]
 		{
-			get { return AsArray[index]; }
+			get 
+			{
+				if (list == null) {
+					throw new IndexOutOfRangeException();				
+				}
+				return list[index]; 
+			}
 			set
 			{
 				RuntimeChecksBeforeInsertion(value);
+				CreateListIfNeeded();
 				value.Parent = owner;
-				AsArray[index].Parent = null;
-				AsArray[index] = value;
+				list[index].Parent = null;
+				list[index].NextSibling = null;
+				list[index] = value;
+				if (index > 0) {
+					list[index - 1].NextSibling = value;
+				}
+				if (index + 1 < Count) {
+					value.NextSibling = list[index + 1];
+				}
 			}
 		}
 	}

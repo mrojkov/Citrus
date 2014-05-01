@@ -222,7 +222,7 @@ namespace Lime
 		public void AfterDeserialization()
 		{
 			ParentSize = Size; 	// This assignment sets the parentSize for a top parentless widget
-			foreach (var node in Nodes.AsArray) {
+			foreach (var node in Nodes) {
 				if (node.AsWidget != null) {
 					node.AsWidget.ParentSize = Size;
 				}
@@ -270,7 +270,7 @@ namespace Lime
 					AdvanceAnimation(delta);
 				}
 				SelfUpdate(delta);
-				foreach (Node node in Nodes.AsArray) {
+				for (Node node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
 					node.Update(delta);
 				} 
 				SelfLateUpdate(delta);
@@ -364,13 +364,13 @@ namespace Lime
 			}
 			if (Layer != 0) {
 				int oldLayer = chain.SetCurrentLayer(Layer);
-				foreach (Node node in Nodes.AsArray) {
+				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
 					node.AddToRenderChain(chain);
 				}
 				chain.Add(this);
 				chain.SetCurrentLayer(oldLayer);
 			} else {
-				foreach (Node node in Nodes.AsArray) {
+				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
 					node.AddToRenderChain(chain);
 				}
 				chain.Add(this);
@@ -499,7 +499,7 @@ namespace Lime
 			if ((HitTestMask & mask) != 0) {
 				targets.Add(this);
 			}
-			foreach (var i in Nodes.AsArray) {
+			foreach (var i in Nodes) {
 				if (i.AsWidget != null) {
 					i.AsWidget.EnumerateHitTestTargets(targets, mask);
 				}
@@ -514,7 +514,7 @@ namespace Lime
 			if (HitTestMethod == HitTestMethod.BoundingRect) {
 				return HitTestBoundingRect(point);
 			} else if (HitTestMethod == HitTestMethod.Contents) {
-				foreach (Node node in Nodes.AsArray) {
+				foreach (Node node in Nodes) {
 					if (node.AsWidget != null && node.AsWidget.HitTest(point))
 						return true;
 				}

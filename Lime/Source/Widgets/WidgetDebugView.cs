@@ -102,7 +102,7 @@ namespace Lime
 			}
 		}
 
-		public Node[] Nodes { get { return widget.Nodes.AsArray; } }
+		public Node[] Nodes { get { return widget.Nodes.ToArray(); } }
 
 		public string[] VisibilityIssues
 		{

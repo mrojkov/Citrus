@@ -12,7 +12,7 @@ namespace Lime
 		private Node node;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-		public Node[] Nodes { get { return node.Nodes.AsArray; } }
+		public Node[] Nodes { get { return node.Nodes.ToArray(); } }
 
 		public Marker[] Markers { get { return node.Markers.ToArray(); } }
 

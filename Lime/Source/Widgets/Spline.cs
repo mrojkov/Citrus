@@ -11,7 +11,7 @@ namespace Lime
 		{
 			float length = 0;
 			SplinePoint p = null;
-			foreach (Node node in Nodes.AsArray) {
+			foreach (Node node in Nodes) {
 				SplinePoint v = node as SplinePoint;
 				if (v == null)
 					continue;
@@ -70,7 +70,7 @@ namespace Lime
 		{
 			float length = 0.0f;
 			SplinePoint p = null;
-			foreach (Node node in Nodes.AsArray) {
+			foreach (Node node in Nodes) {
 				SplinePoint v = node as SplinePoint;
 				if (v == null)
 					continue;
@@ -117,7 +117,7 @@ namespace Lime
 			SplinePoint p = null;
 			float minDistance = float.MaxValue;
 			float offset = 0;
-			foreach (Node node in Nodes.AsArray) {
+			foreach (Node node in Nodes) {
 				SplinePoint v = node as SplinePoint;
 				if (v == null)
 					continue;
