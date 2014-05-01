@@ -218,7 +218,7 @@ namespace Lime
 
 		public Node TryFind(string id)
 		{
-			foreach (var node in this) {
+			for (var node = FirstOrNull(); node != null; node = node.NextSibling) {
 				if (node.Id == id) {
 					return node;
 				}
