@@ -391,8 +391,10 @@ namespace Lime
 				throw new Exception("The assets bundle has been corrupted");
 			}
 			reader.ReadInt32(); // CheckSum
-			if (reader.ReadInt32() != Lime.Version.GetBundleFormatVersion()) {
-				throw new Exception("The bundle format or serialization scheme has been changed. Please update Orange, rebuild the game and serializer.dll");
+			var version = reader.ReadInt32();
+			if (version != Lime.Version.GetBundleFormatVersion()) {
+				throw new Exception(string.Format("The bundle format or serialization scheme has been changed. Please update Orange, rebuild the game and serializer.dll.\n" +
+					"Bundle format version: {0}, but expected: {1}", version, Lime.Version.GetBundleFormatVersion()));
 			}
 			indexOffset = reader.ReadInt32();
 			stream.Seek(indexOffset, SeekOrigin.Begin);
