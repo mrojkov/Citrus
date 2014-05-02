@@ -202,6 +202,13 @@ namespace Lime
 #endif
 		}
 
+		public static void BumpAll()
+		{
+			foreach (var channel in channels) {
+				channel.Bump();
+			}
+		}
+
 		delegate AudioChannel ChannelSelector(AudioFormat format);
 
 		static readonly AudioCache cache = new AudioCache();
