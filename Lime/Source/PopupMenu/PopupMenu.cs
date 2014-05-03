@@ -23,7 +23,7 @@ namespace Lime.PopupMenu
 			this.maxHeight = maxHeight;
 			this.itemWidth = itemWidth;
 			Frame.AddNode(rectangle);
-			Frame.LateTasks.Add(RefreshMenuTask());
+			Frame.Tasks.Add(RefreshMenuTask());
 		}
 
 		public void Show()
@@ -36,6 +36,7 @@ namespace Lime.PopupMenu
 
 		public void Hide()
 		{
+			Frame.Input.ReleaseMouse();	
 			Frame.Unlink();
 			if (Hidden != null) {
 				Hidden();
@@ -44,11 +45,8 @@ namespace Lime.PopupMenu
 
 		IEnumerator<object> RefreshMenuTask()
 		{
+			Frame.Input.CaptureMouse();
 			while (true) {
-				yield return 0;
-				if (Input.WasMousePressed() && !Frame.IsMouseOver()) {
-					Hide();
-				}
 				int visibleCount = items.Count(i => i.Visible);
 				float totalItemsHeigth = MenuItem.Height * visibleCount;
 				int columnsCount = Math.Max((totalItemsHeigth / maxHeight).Ceiling(), 1);
@@ -57,6 +55,11 @@ namespace Lime.PopupMenu
 				Frame.Width = itemWidth * columnsCount;
 				UpdateBackground();
 				UpdateItems(itemsPerColumn);
+				yield return 0;	
+				if (Frame.Input.WasMousePressed() && !Frame.IsMouseOver()) {
+					Hide();
+					yield break;
+				}	
 			}
 		}
 
