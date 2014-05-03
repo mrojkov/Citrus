@@ -18,7 +18,10 @@ namespace Lime
 		static List<Widget> mouseCaptureStack;
 		static List<Widget> keyboardCaptureStack;
 		static bool skipCaptivitiesCleanup;
-
+		
+		public static IEnumerable<Widget> MouseCaptureStack { get { return mouseCaptureStack; } }
+		public static IEnumerable<Widget> KeyboardCaptureStack { get { return keyboardCaptureStack; } }
+		
 		static WidgetInput()
 		{
 			mouseCaptureStack = new List<Widget>();
