@@ -23,7 +23,7 @@ namespace Lime.PopupMenu
 			this.maxHeight = maxHeight;
 			this.itemWidth = itemWidth;
 			Frame.AddNode(rectangle);
-			Frame.Updating += Frame_Updating;
+			Frame.LateTasks.Add(RefreshMenuTask());
 		}
 
 		public void Show()
@@ -42,19 +42,22 @@ namespace Lime.PopupMenu
 			}
 		}
 
-		void Frame_Updating(float delta)
+		IEnumerator<object> RefreshMenuTask()
 		{
-			if (Input.WasMousePressed() && !Frame.IsMouseOver()) {
-				Hide();
+			while (true) {
+				yield return 0;
+				if (Input.WasMousePressed() && !Frame.IsMouseOver()) {
+					Hide();
+				}
+				int visibleCount = items.Count(i => i.Visible);
+				float totalItemsHeigth = MenuItem.Height * visibleCount;
+				int columnsCount = Math.Max((totalItemsHeigth / maxHeight).Ceiling(), 1);
+				int itemsPerColumn = ((float)visibleCount / columnsCount).Ceiling();
+				Frame.Height = MenuItem.Height * itemsPerColumn + MenuItem.Height;
+				Frame.Width = itemWidth * columnsCount;
+				UpdateBackground();
+				UpdateItems(itemsPerColumn);
 			}
-			int visibleCount = items.Count(i => i.Visible);
-			float totalItemsHeigth = MenuItem.Height * visibleCount;
-			int columnsCount = Math.Max((totalItemsHeigth / maxHeight).Ceiling(), 1);
-			int itemsPerColumn = ((float)visibleCount / columnsCount).Ceiling();
-			Frame.Height = MenuItem.Height * itemsPerColumn + MenuItem.Height;
-			Frame.Width = itemWidth * columnsCount;
-			UpdateBackground();
-			UpdateItems(itemsPerColumn);
 		}
 
 		private void UpdateItems(int itemsPerColumn)
