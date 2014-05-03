@@ -30,11 +30,13 @@
 				ActiveTextWidget = null;
 			}
 #if iOS
-			bool showKeyboard = ActiveTextWidget != null && ActiveTextWidget.Visible;
-			Application.Instance.ShowOnscreenKeyboard(showKeyboard, ActiveTextWidget != null ? ActiveTextWidget.Text : "");
-			// Handle switching between different text widgets
-			if (prevActiveTextWidget != ActiveTextWidget && ActiveTextWidget != null && prevActiveTextWidget != null) {
-				Application.Instance.ChangeOnscreenKeyboardText(ActiveTextWidget.Text);
+			if (Application.IsMainThread) {
+				bool showKeyboard = ActiveTextWidget != null && ActiveTextWidget.Visible;
+				Application.Instance.ShowOnscreenKeyboard(showKeyboard, ActiveTextWidget != null ? ActiveTextWidget.Text : "");
+				// Handle switching between different text widgets
+				if (prevActiveTextWidget != ActiveTextWidget && ActiveTextWidget != null && prevActiveTextWidget != null) {
+					Application.Instance.ChangeOnscreenKeyboardText(ActiveTextWidget.Text);
+				}
 			}
 #endif
 		}
