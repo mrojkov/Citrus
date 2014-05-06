@@ -11,6 +11,7 @@ namespace Lime
 	{
 		public abstract class WaitPredicate
 		{
+			public float TotalTime;
 			public abstract bool Evaluate();
 		}
 
@@ -32,10 +33,13 @@ namespace Lime
 				waitTime -= delta;
 				return;
 			}
-			if (waitPredicate != null && waitPredicate.Evaluate()) {
-				return;
+			if (waitPredicate != null) {
+				waitPredicate.TotalTime += delta;
+				if (waitPredicate.Evaluate()) {
+					return;
+				}
+				waitPredicate = null;
 			}
-			waitPredicate = null;
 			var e = stack.Peek();
 			if (e.MoveNext()) {
 				HandleYieldedResult(e.Current);
@@ -77,6 +81,11 @@ namespace Lime
 		{
 			return new BooleanWaitPredicate() { Preducate = predicate };
 		}
+
+		public static WaitPredicate WaitWhile(Func<float, bool> timePredicate)
+		{
+			return new TimeWaitPredicate() { Preducate = timePredicate };
+		}
 		
 		public static WaitPredicate WaitForAnimation(Lime.Node node)
 		{
@@ -95,6 +104,13 @@ namespace Lime
 			public Func<bool> Preducate;
 
 			public override bool Evaluate() { return Preducate(); }
+		}
+
+		private class TimeWaitPredicate : WaitPredicate
+		{
+			public Func<float, bool> Preducate;
+
+			public override bool Evaluate() { return Preducate(TotalTime); }
 		}
 	}
 }
