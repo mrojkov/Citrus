@@ -58,7 +58,7 @@ namespace Lime
 #elif MAC
 			string path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal);
 #else
-			string path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.CommonApplicationData);
+			string path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
 #endif
 #if !iOS
 			if (string.IsNullOrEmpty(companyName)) {
