@@ -37,6 +37,11 @@ namespace Lime
 			get { return GetThumb(); }
 		}
 
+		private Widget ActiveBar
+		{
+			get { return GetActiveBar(); }
+		}
+
 		private Widget GetThumb()
 		{
 			var thumb = Nodes.TryFind("SliderThumb") as Widget;
@@ -44,6 +49,12 @@ namespace Lime
 				thumb = Nodes.TryFind("Thumb") as Widget;
 			}
 			return thumb;
+		}
+
+		private Widget GetActiveBar()
+		{
+			var activeBar = Nodes.TryFind("SliderActive") as Widget;
+			return activeBar;
 		}
 
 		private Spline Rail
@@ -88,6 +99,10 @@ namespace Lime
 				var t = (Value - RangeMin) / (RangeMax - RangeMin);
 				var pos = Rail.CalcPoint(t * Rail.CalcLengthRough());
 				Thumb.Position = Rail.CalcTransitionToSpaceOf(this) * pos;
+				if (ActiveBar != null) {
+					ActiveBar.Visible = true;
+					ActiveBar.Scale = new Vector2(t, 1.0f);
+				}
 			}
 		}
 
