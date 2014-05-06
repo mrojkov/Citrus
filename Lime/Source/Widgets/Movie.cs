@@ -116,16 +116,31 @@ namespace Lime
 		{
 			switch (Action) {
 				case MovieAction.Play:
-					movieTexture.Play();
-					textureInitialized = true;
+					Play();
 					break;
 				case MovieAction.Pause:
-					movieTexture.Pause(true);
+					Pause();
 					break;
 				case MovieAction.Stop:
-					movieTexture.Stop();
+					Stop();
 					break;
 			}
+		}
+
+		public void Stop()
+		{
+			movieTexture.Stop();
+		}
+
+		public void Pause()
+		{
+			movieTexture.Pause(true);
+		}
+
+		public void Play()
+		{
+			movieTexture.Play();
+			textureInitialized = true;
 		}
 	}
 }
