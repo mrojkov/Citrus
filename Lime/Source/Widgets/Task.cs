@@ -9,10 +9,15 @@ namespace Lime
 
 	public class Task : IDisposable
 	{
+		public abstract class WaitPredicate
+		{
+			public abstract bool Evaluate();
+		}
+
 		public object Tag { get; set; }
 		public bool Completed { get { return stack.Count == 0; } }
-		private float sleepTime;
-		private Node animationToWait;
+		private float waitTime;
+		private WaitPredicate waitPredicate;
 		private Stack<EnumType> stack = new Stack<EnumType>();
 
 		public Task(EnumType e, object tag = null)
@@ -23,13 +28,14 @@ namespace Lime
 
 		public void Advance(float delta)
 		{
-			if (sleepTime > 0) {
-				sleepTime -= delta;
+			if (waitTime > 0) {
+				waitTime -= delta;
 				return;
 			}
-			if (animationToWait != null && animationToWait.IsRunning) {
+			if (waitPredicate != null && waitPredicate.Evaluate()) {
 				return;
 			}
+			waitPredicate = null;
 			var e = stack.Peek();
 			if (e.MoveNext()) {
 				HandleYieldedResult(e.Current);
@@ -44,24 +50,51 @@ namespace Lime
 				var e = stack.Pop();
 				e.Dispose();
 			}
+			waitPredicate = null;
 		}
 
 		private void HandleYieldedResult(object result)
 		{
 			if (result is int) {
-				sleepTime = (int)result;
+				waitTime = (int)result;
 			} else if (result is float) {
-				sleepTime = (float)result;
+				waitTime = (float)result;
 			} else if (result is IEnumerator<object>) {
 				stack.Push(result as IEnumerator<object>);
 				Advance(0);
+			} else if (result is WaitPredicate) {
+				waitPredicate = result as WaitPredicate;
 			} else if (result is Lime.Node) {
-				animationToWait = result as Lime.Node;
+				waitPredicate = WaitForAnimation(result as Lime.Node);
 			} else if (result is IEnumerable<object>) {
 				throw new Lime.Exception("Use IEnumerator<object> instead of IEnumerable<object> for " + result);
 			} else {
 				throw new Lime.Exception("Invalid object yielded " + result);
 			}
+		}
+
+		public static WaitPredicate WaitWhile(Func<bool> predicate)
+		{
+			return new BooleanWaitPredicate() { Preducate = predicate };
+		}
+		
+		public static WaitPredicate WaitForAnimation(Lime.Node node)
+		{
+			return new AnimationWaitPredicate() { Node = node };
+		}
+
+		private class AnimationWaitPredicate : WaitPredicate
+		{
+			public Node Node;
+
+			public override bool Evaluate() { return Node.IsRunning; }
+		}
+
+		private class BooleanWaitPredicate : WaitPredicate
+		{
+			public Func<bool> Preducate;
+
+			public override bool Evaluate() { return Preducate(); }
 		}
 	}
 }
