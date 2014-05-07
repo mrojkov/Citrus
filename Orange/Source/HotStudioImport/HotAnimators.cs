@@ -109,6 +109,9 @@ namespace Orange
 					case "VAlign":
 						propertyName = "VAlignment";
 						break;
+					case "SplineName":
+						propertyName = "SplineId";
+						break;
 					}
 					switch(propertyName + '@' + className) {
 					case "TextColor@Hot::Text":
