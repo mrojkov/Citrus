@@ -37,11 +37,6 @@ namespace Lime
 			get { return GetThumb(); }
 		}
 
-		private Widget ActiveBar
-		{
-			get { return GetActiveBar(); }
-		}
-
 		private Widget GetThumb()
 		{
 			var thumb = Nodes.TryFind("SliderThumb") as Widget;
@@ -49,12 +44,6 @@ namespace Lime
 				thumb = Nodes.TryFind("Thumb") as Widget;
 			}
 			return thumb;
-		}
-
-		private Widget GetActiveBar()
-		{
-			var activeBar = Nodes.TryFind("SliderActive") as Widget;
-			return activeBar;
 		}
 
 		private Spline Rail
@@ -87,23 +76,34 @@ namespace Lime
 					SetValueFromCurrentMousePosition(draggingJustBegun: false);
 				}
 			}
+			InterpolateGraphicsBetweenMinAndMaxMarkers();
 			RefreshThumbPosition();
 			if (!Input.IsMouseOwner()) {
 				Release();
 			}
 		}
 
+		private void InterpolateGraphicsBetweenMinAndMaxMarkers()
+		{
+			if (RangeMax - RangeMin < float.Epsilon) {
+				return;
+			}
+			var mn = this.Markers.TryFind("NormalMin");
+			var mx = this.Markers.TryFind("NormalMax");
+			if (mn != null && mx != null) {
+				var t = (Value - RangeMin) / (RangeMax - RangeMin);
+				AnimationTime = Mathf.Lerp(t, mn.Time, mx.Time).Round();
+			}
+		}
+
 		private void RefreshThumbPosition()
 		{
-			if (RangeMax > RangeMin) {
-				var t = (Value - RangeMin) / (RangeMax - RangeMin);
-				var pos = Rail.CalcPoint(t * Rail.CalcLengthRough());
-				Thumb.Position = Rail.CalcTransitionToSpaceOf(this) * pos;
-				if (ActiveBar != null) {
-					ActiveBar.Visible = true;
-					ActiveBar.Scale = new Vector2(t, 1.0f);
-				}
+			if (RangeMax - RangeMin < float.Epsilon) {
+				return;
 			}
+			var t = (Value - RangeMin) / (RangeMax - RangeMin);
+			var pos = Rail.CalcPoint(t * Rail.CalcLengthRough());
+			Thumb.Position = Rail.CalcTransitionToSpaceOf(this) * pos;
 		}
 
 		private void Release()
