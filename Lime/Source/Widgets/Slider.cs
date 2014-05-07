@@ -64,7 +64,7 @@ namespace Lime
 				return;
 			}
 			if (Input.WasMousePressed() && Thumb.IsMouseOver()) {
-				TryRunAnimation("Press");
+				RunThumbAnimation("Press");
 				Input.CaptureMouse();
 			} else if (Input.IsMouseOwner() && !Input.IsMousePressed()) {
 				Release();
@@ -108,9 +108,16 @@ namespace Lime
 
 		private void Release()
 		{
-			TryRunAnimation("Normal");
+			RunThumbAnimation("Normal");
 			if (Input.IsMouseOwner()) {
 				Input.ReleaseMouse();
+			}
+		}
+
+		private void RunThumbAnimation(string name)
+		{
+			if (Thumb != null) {
+				Thumb.TryRunAnimation(name);
 			}
 		}
 
