@@ -38,6 +38,11 @@ namespace Lime
 			return marker != null;
 		}
 
+		public Marker this[string id]
+		{
+			get { return Find(id); }
+		}
+
 		public Marker Find(string id)
 		{
 			var marker = TryFind(id);
