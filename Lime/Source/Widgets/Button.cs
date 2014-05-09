@@ -1,5 +1,6 @@
 using System;
 using ProtoBuf;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace Lime
@@ -25,7 +26,7 @@ namespace Lime
 
 		public override Action Clicked { get; set; }
 		
-		private SimpleText textPresenter;
+		private List<Widget> textPresenters;
 		private bool wasClicked;
 		private StateMachine stateMachine = new StateMachine();
 		private StateFunc State
@@ -253,11 +254,12 @@ namespace Lime
 
 		private void UpdateLabel()
 		{
-			if (textPresenter == null) {
-				TryFind("TextPresenter", out textPresenter);
+			if (textPresenters == null) {
+				textPresenters = new List<Widget>();
+				textPresenters.AddRange(Descendants().Where(i => i.Id == "TextPresenter"));
 			}
-			if (textPresenter != null) {
-				textPresenter.Text = Text;
+			foreach (var i in textPresenters) {
+				i.Text = Text;
 			}
 		}
 

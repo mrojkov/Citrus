@@ -36,6 +36,18 @@ namespace Lime
 			}
 		}
 
+		public IEnumerable<Widget> Descendants()
+		{
+			for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
+				if (node.AsWidget != null) {
+					yield return node.AsWidget;
+					foreach (var i in node.AsWidget.Descendants()) {
+						yield return i;
+					}
+				}
+			}
+		}
+
 		public static bool AreWidgetsIntersected(Widget a, Widget b)
 		{
 			Vector2[] rect = new Vector2[4] {
