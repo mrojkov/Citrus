@@ -256,7 +256,7 @@ namespace Lime
 		{
 			if (textPresenters == null) {
 				textPresenters = new List<Widget>();
-				textPresenters.AddRange(Descendants().OfType<Widget>().Where(i => i.Id == "TextPresenter"));
+				textPresenters.AddRange(Descendants.OfType<Widget>().Where(i => i.Id == "TextPresenter"));
 			}
 			foreach (var i in textPresenters) {
 				i.Text = Text;
