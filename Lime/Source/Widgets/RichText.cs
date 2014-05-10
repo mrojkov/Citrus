@@ -181,6 +181,11 @@ namespace Lime
 				spriteList = null;
 			}
 		}
+
+		public void Invalidate()
+		{
+			DisposeSpriteList();
+		}
 	}
 
 	class TextParser
@@ -378,9 +383,9 @@ namespace Lime
 				bullet = style.ImageSize.X;
 			if (word.Length == 1) {
 				var c = font.Chars[word.Text[word.Start]];
-                if (c == FontChar.Null) {
-                    return 0;
-                }
+				if (c == FontChar.Null) {
+					return 0;
+				}
 				float fontScale = style.Size / c.Height;
 				float width = bullet + (c.ACWidths.X + c.ACWidths.Y + c.Width) * fontScale;
 				return width;

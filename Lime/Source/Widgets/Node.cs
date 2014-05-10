@@ -342,6 +342,16 @@ namespace Lime
 			return child;
 		}
 
+		public IEnumerable<Node> Descendants()
+		{
+			for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
+				yield return node;
+				foreach (var i in node.Descendants()) {
+					yield return i;
+				}
+			}
+		}
+
 		[ThreadStatic]
 		private static Queue<Node> nodeSearchQueue;
 
