@@ -96,5 +96,10 @@ namespace Lime
 		{
 			return (x + y / 2) / y * y;
 		}
+
+		public static float Lerp(this float value, float min, float max)
+		{
+			return Mathf.Lerp(value, min, max);
+		}
 	}
 }
