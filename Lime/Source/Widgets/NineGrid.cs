@@ -31,6 +31,7 @@ namespace Lime
 		public NineGrid()
 		{
 			HitTestMethod = HitTestMethod.Contents;
+			Texture = new SerializableTexture();
 		}
 
 		void BuildLayout(Part[] layout)
