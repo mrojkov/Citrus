@@ -184,6 +184,7 @@
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGameView.cs" />
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGraphicsContext.cs" />
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Utilities.iPhone.cs" />
+    <Compile Include="Source\Widgets\WebBrowser.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
