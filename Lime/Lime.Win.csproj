@@ -77,6 +77,7 @@
     <Compile Include="Source\Input\Input.Native.cs" />
     <Compile Include="Source\Input\Input.Unity.cs" />
     <Compile Include="Source\Version.cs" />
+    <Compile Include="Source\Widgets\WebBrowser.Win.cs" />
     <Compile Include="Source\Widgets\WidgetInput.cs" />
     <Compile Include="Source\Input\Key.cs" />
     <Compile Include="Source\RewindableStream.cs" />
@@ -184,7 +185,7 @@
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGameView.cs" />
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGraphicsContext.cs" />
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Utilities.iPhone.cs" />
-    <Compile Include="Source\Widgets\WebBrowser.cs" />
+    <Compile Include="Source\Widgets\WebBrowser.iOS.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

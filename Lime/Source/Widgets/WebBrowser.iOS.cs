@@ -1,10 +1,11 @@
-﻿using System;
+﻿#if iOS
+using System;
 using System.Drawing;
 using Lime;
 using MonoTouch.Foundation;
 using MonoTouch.UIKit;
 
-namespace Lime.iOS
+namespace Lime
 {
     public class WebBrowser
     {
@@ -99,3 +100,4 @@ namespace Lime.iOS
 		}
     }
 }
+#endif
