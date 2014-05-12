@@ -14,7 +14,6 @@ namespace Lime
 		
 		private void SetUrl(Uri value)
 		{
-			throw new NotImplementedException();
 		}	
 
 		public void Dispose() { }
