@@ -105,12 +105,6 @@ namespace BigFish_iOS_SDK
 		[Static, Export("logOptionsShown")]
 		void LogOptionsShown();
 	
-		[Static, Export("logPurchaseSuccessful")]
-		void LogPurchaseSuccessful();
-
-		[Static, Export("logPurchaseSuccessful:")]
-		void LogPurchaseSuccessful(string purchaseID);
-	
 		[Static, Export("logPurchaseMainMenuShown")]
 		void LogPurchaseMainMenuShown();
 
@@ -135,9 +129,6 @@ namespace BigFish_iOS_SDK
 		[Static, Export("logAchievementEarned:")]
 		void LogAchievementEarned(string achievementID);
 
-		[Static, Export("logTellAFriendTapped")]
-		void LogTellAFriendTapped();
-
 		[Static, Export("logGameCompleted")]
 		void LogGameCompleted();
 
@@ -161,97 +152,49 @@ namespace BigFish_iOS_SDK
 	[BaseType(typeof(NSObject), Name = "bfgManager")]
 	interface BfgManager
 	{
-		[Static, Export("sharedInstance")]
-		BfgManager SharedInstance { get; }
-
-		[Static, Export("initializeWithViewController:")]
+        [Static, Export("initializeWithViewController:")]
 		void InitializeWithViewController(UIViewController controller);
 
-		[Static, Export("initializeWithWindow:")]
-		void InitializeWithWindow(UIWindow rootWindow);
-
-		[Static, Export("showMoreGames")]
+    	[Static, Export("showMoreGames")]
 		void ShowMoreGames();
 
 		[Static, Export("removeMoreGames")]
 		void RemoveMoreGames();
 
-		[Static, Export("sendContinueMessage")]
-		void SendContinueMessage();
-
-		[Static, Export("sendMainMenuMessage")]
-		void SendMainMenuMessage();
-
 		[Static, Export("isInitialized")]
 		bool IsInitialized { get; }
-
-		[Static, Export("isWindowed")]
-		bool IsWindowed { get; }
-
-		[Static, Export("setWindowed:")]
-		void SetWindowed(bool bWindowed);
 
 		[Static, Export("isFirstTime")]
 		bool IsFirstTime { get; }
 
-		[Static, Export("isSkinned")]
-		bool IsSkinned { get; }
-
-		[Static, Export("getGameScreenShot")]
-		UIImage GetGameScreenShot();
-
-		[Static, Export("getGameScreenShotTransform")]
-		CGAffineTransform GetGameScreenShotTransform();
-
-		[Static, Export("currentOrientation")]
-		UIInterfaceOrientation CurrentOrientation { get; }
-
-		[Static, Export("navigateToLinkShareURL:")]
-		bool NavigateToLinkShareURL(string url);
-
-		[Static, Export("currentUIType")]
+    	[Static, Export("currentUIType")]
 		int CurrentUIType { get; }
-
-		[Static, Export("currentUITypeAsString")]
-		string CurrentUITypeAsString { get; }
 
 		[Static, Export("setParentViewController:")]
 		void SetParentViewController(UIViewController parent);
 
-		[Static, Export("getParentViewController")]
-		UIViewController GetParentViewController();
-
-		[Static, Export("getServerWithDomain:")]
-		string GetServerWithDomain(string server);
-
-		[Export("adsRunning")]
+        [Static, Export("adsRunning")]
 		bool AdsRunning { get; }
 
-		[Export("startAds:")]
+        [Static, Export("startAds:")]
 		bool StartAds(AdsOrigin origin);
 
-		[Export("stopAds")]
-		bool StopAds();
+        [Static, Export("stopAds")]
+        void StopAds();
 
-		[Export("pauseAds")]
-		void PauseAds();
-
-		[Export("resumeAds")]
-		void ResumeAds();
-
-		[Export("startBranding")]
+        [Static, Export("startBranding")]
 		bool StartBranding();
 
-		[Export("stopBranding")]
+        [Static, Export("stopBranding")]
 		void StopBranding();
 
-		[Export("showSupport")]
+        [Static, Export("showSupport")]
 		void ShowSupport();
 
-		[Export("showTerms")]
+        [Static, Export("showTerms")]
 		void ShowTerms();
 
-		[Export("showPrivacy")]
+        [Static, Export("showPrivacy")]
 		void ShowPrivacy();
 	}
 
