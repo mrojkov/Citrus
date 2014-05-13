@@ -7,9 +7,14 @@ namespace Lime
 	{
 		public Uri Url { get { return null; } set { SetUrl(value); } }
 
+		public WebBrowser()
+		{
+		}
+
 		public WebBrowser(Widget parentWidget)
 		{
 			parentWidget.AddNode(this);
+
 		}
 		
 		private void SetUrl(Uri value)

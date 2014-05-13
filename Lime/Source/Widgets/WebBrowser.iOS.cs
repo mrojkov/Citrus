@@ -7,17 +7,60 @@ using MonoTouch.UIKit;
 
 namespace Lime
 {
-    public class WebBrowser
-    {
-		private UIWebView webView = null;
+	public class WebBrowser : IDisposable
+	{
+		public Uri Url { get { return GetUrl(); } set { SetUrl(value); } }	
 		
-		private Widget linkedWidget = null;
+		public WebBrowser(Widget widgetToLink)
+			: this()
+		{
+			linkedWidget = widgetToLink;
+			SetUpdateHandler(linkedWidget);
+			linkedWidget.Updating += updateHandler;
+		}
 		
-		private UpdateHandler updateHandler = null;
+		public WebBrowser()
+		{
+			webView = new UIWebView();
+			webView.AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;
+			webView.ScalesPageToFit = true;
+			webView.Opaque = false;
+			webView.BackgroundColor = new UIColor(0.0f, 0.0f, 0.0f, 1.0f);
+			webView.Hidden = true;
+			GameView.Instance.AddSubview(webView);
+		}
 		
-		private float screenH;
+		public void Dispose()
+		{
+			if (linkedWidget != null) {
+				linkedWidget.Updating -= updateHandler;
+				linkedWidget = null;
+			}
+			if (webView != null) {
+				webView.RemoveFromSuperview();
+				webView.Dispose();
+				webView = null;
+			}
+		}
 		
-		private WindowRect CalculateWidgetRectangle(Widget widget)
+		private Widget linkedWidget;
+		private UpdateHandler updateHandler;
+		
+		private void SetUpdateHandler(Widget linkedWidget)
+		{
+			updateHandler = new UpdateHandler((delta) => {
+				float screenHeight = GameView.Instance.Size.Height;
+				WindowRect wr = CalculateAABBInWorldSpace(linkedWidget);
+				float Height = (float)wr.Height * 0.5f;
+				float offsetY = (screenHeight) - Height;
+				var position = new PointF((float)wr.X * 0.5f, (float)(wr.Y * 0.5f) + offsetY);
+				var size = new SizeF((float)wr.Width * 0.5f, Height);
+				webView.Frame = new RectangleF(position, size);
+				webView.Hidden = false;
+			});
+		}
+	
+		private WindowRect CalculateAABBInWorldSpace(Widget widget)
 		{
 			var aabb = widget.CalcAABBInSpaceOf(World.Instance);
 			// Get the projected AABB coordinates in the normalized OpenGL space
@@ -41,63 +84,19 @@ namespace Lime
 			return result;
 		}
 		
-        public WebBrowser()
-        {
-			webView = new UIWebView();
-			webView.AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;
-			webView.ScalesPageToFit = true;
-			webView.Hidden = true;	
-			GameView.Instance.AddSubview(webView);
-        }
-		
-		public void SetURLToWidget(Widget widget, string url, float sh)
+		private UIWebView webView;	
+
+		private Uri GetUrl()
 		{
-			screenH = sh;
-			linkedWidget = widget;
-			SetUpdateHandler();
-			widget.Updating += updateHandler;
-			NSUrlRequest request = new NSUrlRequest(new NSUrl(url));
+			return new Uri(webView.Request.Url.AbsoluteString);
+		}
+
+		private void SetUrl(Uri value)
+		{
+			NSUrlRequest request = new NSUrlRequest(new NSUrl(value.AbsoluteUri));
 			webView.LoadRequest(request);
 		}
 		
-		public void UpdateURL(string url)
-		{
-			NSUrlRequest request = new NSUrlRequest(new NSUrl(url));
-			webView.LoadRequest(request);
-		}
-		
-		public void Delete()
-		{
-			if (linkedWidget != null) {
-				linkedWidget.Updating -= updateHandler;
-				linkedWidget = null;
-			}
-			webView.RemoveFromSuperview();
-		}
-		
-		public void Hide()
-		{
-			webView.Hidden = true;
-		}
-		
-		public void Show()
-		{
-			webView.Hidden = false;
-		}
-		
-		private void SetUpdateHandler()
-		{
-			updateHandler = new UpdateHandler((delta) => {
-				WindowRect wr = CalculateWidgetRectangle(linkedWidget);
-				float Height = (float)wr.Height * 0.5f;
-				
-				float offsetY = (screenH * 0.5f) - Height;
-				
-				webView.Frame = new RectangleF(new PointF((float)wr.X * 0.5f, (float)(wr.Y * 0.5f) + offsetY),
-											   new SizeF((float)wr.Width * 0.5f, Height));
-				webView.Hidden = !linkedWidget.GloballyVisible;	
-			});
-		}
-    }
+	}
 }
 #endif
