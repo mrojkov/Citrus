@@ -184,6 +184,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Source\Version.cs" />
     <Compile Include="obj\Release\.NETFramework,Version=v4.0.AssemblyAttribute.cs" />
+    <Compile Include="Source\Widgets\WebBrowser.Win.cs" />
+    <Compile Include="Source\Widgets\WebBrowser.iOS.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

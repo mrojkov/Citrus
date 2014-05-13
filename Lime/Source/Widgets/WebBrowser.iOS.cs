@@ -7,16 +7,19 @@ using MonoTouch.UIKit;
 
 namespace Lime
 {
-	public class WebBrowser : IDisposable
+	public class WebBrowser : Widget, IDisposable
 	{
+		private UIWebView webView;
+	
 		public Uri Url { get { return GetUrl(); } set { SetUrl(value); } }	
 		
-		public WebBrowser(Widget widgetToLink)
+		public WebBrowser(Widget parentWidget)
 			: this()
 		{
-			linkedWidget = widgetToLink;
-			SetUpdateHandler(linkedWidget);
-			linkedWidget.Updating += updateHandler;
+			parentWidget.Nodes.Add(this);
+			Size = parentWidget.Size;
+			ParentSize = parentWidget.Size;
+			Anchors = Anchors.LeftAndRight | Anchors.TopAndBottom;
 		}
 		
 		public WebBrowser()
@@ -32,32 +35,26 @@ namespace Lime
 		
 		public void Dispose()
 		{
-			if (linkedWidget != null) {
-				linkedWidget.Updating -= updateHandler;
-				linkedWidget = null;
-			}
 			if (webView != null) {
 				webView.RemoveFromSuperview();
 				webView.Dispose();
 				webView = null;
 			}
 		}
-		
-		private Widget linkedWidget;
-		private UpdateHandler updateHandler;
-		
-		private void SetUpdateHandler(Widget linkedWidget)
+				
+		protected override void SelfUpdate(int delta)
 		{
-			updateHandler = new UpdateHandler((delta) => {
-				float screenHeight = GameView.Instance.Size.Height;
-				WindowRect wr = CalculateAABBInWorldSpace(linkedWidget);
-				float Height = (float)wr.Height * 0.5f;
-				float offsetY = (screenHeight) - Height;
-				var position = new PointF((float)wr.X * 0.5f, (float)(wr.Y * 0.5f) + offsetY);
-				var size = new SizeF((float)wr.Width * 0.5f, Height);
-				webView.Frame = new RectangleF(position, size);
-				webView.Hidden = false;
-			});
+			if (webView == null) {
+				return;
+			}
+			float screenHeight = GameView.Instance.Size.Height;
+			WindowRect wr = CalculateAABBInWorldSpace(this);
+			float Height = (float)wr.Height * 0.5f;
+			float offsetY = (screenHeight) - Height;
+			var position = new PointF((float)wr.X * 0.5f, (float)(wr.Y * 0.5f) + offsetY);
+			var size = new SizeF((float)wr.Width * 0.5f, Height);
+			webView.Frame = new RectangleF(position, size);
+			webView.Hidden = false;
 		}
 	
 		private WindowRect CalculateAABBInWorldSpace(Widget widget)
@@ -83,8 +80,6 @@ namespace Lime
 			result.Height = Mathf.Lerp(aabb.Top, min.Y, max.Y).Round() - result.Y;
 			return result;
 		}
-		
-		private UIWebView webView;	
 
 		private Uri GetUrl()
 		{
