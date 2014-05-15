@@ -25,6 +25,7 @@ namespace Lime
 		static GameView()
 		{
 			if (GetRenderingApi() == RenderingApi.ES20) {
+				Sdl2.Init(Sdl2.SystemFlags.VIDEO);
 				Sdl2.SetAttribute(Sdl2.ContextAttribute.CONTEXT_PROFILE_MASK, 4);
 				Sdl2.SetAttribute(Sdl2.ContextAttribute.CONTEXT_MAJOR_VERSION, 2);
 				Sdl2.SetAttribute(Sdl2.ContextAttribute.CONTEXT_MAJOR_VERSION, 0);

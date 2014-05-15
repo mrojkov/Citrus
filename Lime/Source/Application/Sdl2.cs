@@ -10,6 +10,21 @@ namespace Lime
 {
 	class Sdl2
 	{
+		[Flags]
+		public enum SystemFlags : uint
+		{
+			Default = 0,
+			TIMER = 0x00000001,
+			AUDIO = 0x00000010,
+			VIDEO = 0x00000020,
+			JOYSTICK = 0x00000200,
+			HAPTIC = 0x00001000,
+			GAMECONTROLLER = 0x00002000,
+			NOPARACHUTE = 0x00100000,
+			EVERYTHING = TIMER | AUDIO | VIDEO |
+				JOYSTICK | HAPTIC | GAMECONTROLLER
+		}
+
 		public enum ContextAttribute
 		{
 			RED_SIZE,
@@ -38,6 +53,10 @@ namespace Lime
 		}
 
         const string lib = "SDL2.dll";
+
+		[SuppressUnmanagedCodeSecurity]
+		[DllImport(lib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_Init", ExactSpelling = true)]
+		public static extern int Init(SystemFlags flags);
 
 		[SuppressUnmanagedCodeSecurity]
 		[DllImport(lib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_GL_SetAttribute", ExactSpelling = true)]
