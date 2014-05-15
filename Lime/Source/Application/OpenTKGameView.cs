@@ -68,7 +68,7 @@ namespace Lime
 
 		private static RenderingApi GetRenderingApi(string[] args)
 		{
-			return RenderingApi.OpenGL;
+			return RenderingApi.ES20;
 		}
 
 		private static bool CheckPowerSaveFlag(string[] args)
