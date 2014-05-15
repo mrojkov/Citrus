@@ -21,10 +21,21 @@ namespace Lime
 		public bool PowerSaveMode { get; set; }
 		internal static event Action DidUpdated;
 
+#if WIN
+		static GameView()
+		{
+			if (GetRenderingApi() == RenderingApi.ES20) {
+				Sdl2.SetAttribute(Sdl2.ContextAttribute.CONTEXT_PROFILE_MASK, 4);
+				Sdl2.SetAttribute(Sdl2.ContextAttribute.CONTEXT_MAJOR_VERSION, 2);
+				Sdl2.SetAttribute(Sdl2.ContextAttribute.CONTEXT_MAJOR_VERSION, 0);
+			}
+		}
+#endif
+
 		public GameView(Application app, string[] args = null)
 			: base(800, 600, GraphicsMode.Default, 
 			"Citrus", GameWindowFlags.Default, DisplayDevice.Default,
-			2, 0, GetGraphicContextFlags(args))
+			2, 0, GetGraphicContextFlags())
 		{
 			Instance = this;
 			this.app = app;
@@ -40,12 +51,12 @@ namespace Lime
 			this.Mouse.WheelChanged += HandleMouseWheel;
 			SetupWindowLocationAndSize(args);
 			PowerSaveMode = CheckPowerSaveFlag(args);
-			RenderingApi = GetRenderingApi(args);
+			RenderingApi = GetRenderingApi();
 		}
 
-		private static GraphicsContextFlags GetGraphicContextFlags(string[] args)
+		private static GraphicsContextFlags GetGraphicContextFlags()
 		{
-			return GetRenderingApi(args) == RenderingApi.OpenGL ? 
+			return GetRenderingApi() == RenderingApi.OpenGL ? 
 				 GraphicsContextFlags.Default : GraphicsContextFlags.Embedded;
 		}
 
@@ -70,9 +81,13 @@ namespace Lime
 			return args != null && Array.IndexOf(args, "--Maximized") >= 0;
 		}
 
-		private static RenderingApi GetRenderingApi(string[] args)
+		private static RenderingApi GetRenderingApi()
 		{
-			return RenderingApi.OpenGL;
+			if (Application.CheckCommandLineArg("--GL")) {
+				return RenderingApi.OpenGL;
+			} else {
+				return RenderingApi.ES20;
+			}
 		}
 
 		private static bool CheckPowerSaveFlag(string[] args)
