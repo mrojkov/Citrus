@@ -85,7 +85,6 @@
     <Compile Include="Source\NumericExtensions.cs" />
     <Compile Include="Source\Application\Application.cs" />
     <Compile Include="Source\Application\Logger.cs" />
-    <Compile Include="Source\Application\Cursors.cs" />
     <Compile Include="Source\AssetsBundle\AssetsBundle.cs" />
     <Compile Include="Source\Audio\OggDecoder.cs" />
     <Compile Include="Source\Audio\AudioCache.cs" />
@@ -209,11 +208,6 @@
       <Link>libGLESv2.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\3rdParty\OpenTK\Dependencies_x86\SDL2.dll">
-      <Link>SDL2.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Compile Include="Source\Application\Sdl2.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Widgets\WidgetDebugView.cs" />

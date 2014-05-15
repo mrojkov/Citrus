@@ -4,12 +4,16 @@ using OpenTK;
 using OpenTK.Input;
 using OpenTK.Graphics;
 using OpenTK.Graphics.ES20;
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace Lime
 {
 	public class GameView : OpenTK.GameWindow
 	{
 		private Application app;
+		private Dictionary<string, MouseCursor> cursors = new Dictionary<string, MouseCursor>();
+		private MouseCursor currentCursor;
 
 		public static GameView Instance;
 		// Indicates whether the game uses OpenGL or OpenGL ES 2.0
@@ -68,7 +72,7 @@ namespace Lime
 
 		private static RenderingApi GetRenderingApi(string[] args)
 		{
-			return RenderingApi.ES20;
+			return RenderingApi.OpenGL;
 		}
 
 		private static bool CheckPowerSaveFlag(string[] args)
@@ -220,6 +224,45 @@ namespace Lime
 
 		public float FrameRate { 
 			get { return ApplicationToolbox.FrameRate; } 
+		}
+
+		public void SetCursor(string resourceName, IntVector2 hotSpot)
+		{
+			var cursor = GetCursor(resourceName, hotSpot);
+			if (cursor != currentCursor) {
+				currentCursor = cursor;
+				base.Cursor = cursor;
+			}
+		}
+
+		private MouseCursor GetCursor(string resourceName, IntVector2 hotSpot)
+		{
+			MouseCursor cursor;
+			if (cursors.TryGetValue(resourceName, out cursor)) {
+				return cursor;
+			}
+			cursor = CreateCursorFromResource(resourceName, hotSpot);
+			cursors[resourceName] = cursor;
+			return cursor;
+		}
+
+		private MouseCursor CreateCursorFromResource(string resourceName, IntVector2 hotSpot)
+		{
+			var entryAssembly = System.Reflection.Assembly.GetEntryAssembly();
+			var fullResourceName = entryAssembly.GetName().Name + "." + resourceName;
+			var file = entryAssembly.GetManifestResourceStream(fullResourceName);
+			using (var bitmap = new Bitmap(file)) {
+				var lockRect = new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height);
+				var lockMode = System.Drawing.Imaging.ImageLockMode.ReadOnly;
+				var data = bitmap.LockBits(lockRect, lockMode, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+				if (data.Width * 4 != data.Stride) {
+					throw new Lime.Exception("Invalid cursor bitmap (resource name: {0}, stride: {1}, width: {2})",
+						resourceName, data.Stride, data.Width);
+				}
+				var cursor = new MouseCursor(hotSpot.X, hotSpot.Y, data.Width, data.Height, data.Scan0);
+				bitmap.UnlockBits(data);
+				return cursor;
+			}
 		}
 	}
 }

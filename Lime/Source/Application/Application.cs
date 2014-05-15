@@ -271,10 +271,11 @@ namespace Lime
 		public virtual void OnDeviceRotated(DeviceOrientation fromOrientation) {}
 		public virtual DeviceOrientation GetSupportedDeviceOrientations() { return DeviceOrientation.LandscapeLeft; }
 
+		[Obsolete("Use GameView.SetCursor() instead")]
 		public void SetCursor(string name, IntVector2 hotSpot)
 		{
 #if WIN
-			Cursors.SetCursor(name, hotSpot);
+			GameView.Instance.SetCursor(name, hotSpot);
 #endif
 		}
 	}
