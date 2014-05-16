@@ -150,7 +150,6 @@
     <Compile Include="Source\Input\Input.Unity.cs" />
     <Compile Include="Source\Audio\AudioCache.cs" />
     <Compile Include="Source\Graphics\TexturePool.cs" />
-    <Compile Include="Source\Application\ApplicationToolbox.cs" />
     <Compile Include="Source\Audio\AudioSystem.ErrorChecker.cs" />
     <Compile Include="Source\Graphics\MovieTexture.cs" />
     <Compile Include="Source\Widgets\Movie.cs" />
@@ -166,10 +165,8 @@
     <Compile Include="Source\Graphics\OpenGL\ShaderProgram.cs" />
     <Compile Include="Source\Graphics\OpenGL\Shaders.cs" />
     <Compile Include="Source\Graphics\OpenGL\XamarinAdapter.cs" />
-    <Compile Include="Source\Application\Cursors.cs" />
     <Compile Include="Source\Application\RenderingApi.cs" />
     <Compile Include="Source\Application\Sdl2.cs" />
-    <Compile Include="Source\Application\Debug.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationUtils.cs" />
     <Compile Include="Source\Widgets\Animation\Animator.cs" />
     <Compile Include="Source\Widgets\Animation\AnimatorCollection.cs" />
@@ -183,9 +180,12 @@
     <Compile Include="Source\Widgets\WidgetInput.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Source\Version.cs" />
-    <Compile Include="obj\Release\.NETFramework,Version=v4.0.AssemblyAttribute.cs" />
+    <Compile Include="Source\Application\Debug.cs" />
     <Compile Include="Source\Widgets\WebBrowser.Win.cs" />
     <Compile Include="Source\Widgets\WebBrowser.iOS.cs" />
+    <Compile Include="Source\Application\CommandLineArgs.cs" />
+    <Compile Include="Source\Application\ExternalStorageLagsSimulator.cs" />
+    <Compile Include="Source\Application\FPSCalculator.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

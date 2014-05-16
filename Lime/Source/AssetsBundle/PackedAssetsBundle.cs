@@ -201,7 +201,7 @@ namespace Lime
 					return true;
 				}
 				var reader = new BinaryReader(stream);
-				int sign = reader.ReadInt32();
+				reader.ReadInt32(); // Bundle signature
 				int storedCheckSum = reader.ReadInt32();
 				int actualCheckSum = CalcBundleCheckSum(bundlePath);
 				return storedCheckSum != actualCheckSum;

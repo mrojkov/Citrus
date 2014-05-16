@@ -110,8 +110,6 @@ namespace Lime
 			foreach (var touch in touches.ToArray<UITouch>()) {
 				for (int i = 0; i < Input.MaxTouches; i++) {
 					if (activeTouches[i] == touch) {
-						var pt = touch.LocationInView(this);
-						Vector2 position = new Vector2(pt.X, pt.Y) * screenScale * Input.ScreenToWorldTransform;
 						if (i == 0) {
 							Input.SetKeyState(Key.Mouse0, false);
 						}
@@ -238,12 +236,12 @@ namespace Lime
 			MakeCurrent();
 			Application.Instance.OnRenderFrame();
 			SwapBuffers();
-			ApplicationToolbox.RefreshFrameRate();
+			FPSCalculator.Refresh();
 		}
 
 		public float FrameRate {
 			get {
-				return ApplicationToolbox.FrameRate;
+				return FPSCalculator.FPS;
 			}
 		}
 	}
