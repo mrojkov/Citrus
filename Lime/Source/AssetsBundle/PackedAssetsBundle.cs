@@ -284,8 +284,8 @@ namespace Lime
 		{
 			var stream = new AssetStream(this, path);
 			var desc = stream.descriptor;
-			if (Application.JerkyMode) {
-				ApplicationToolbox.SimulateReadDelay(path, desc.Length);
+			if (CommandLineArgs.SimulateSlowExternalStorage) {
+				ExternalStorageLagsSimulator.SimulateReadDelay(path, desc.Length);
 			}
 			if ((desc.Attributes & AssetAttributes.Zipped) != 0) {
 				return DecompressStream(stream);

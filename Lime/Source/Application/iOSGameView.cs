@@ -13,6 +13,8 @@ namespace Lime
 {
 	public class GameView : Lime.Xamarin.iPhoneOSGameView
 	{
+		private const int MaxFrameDelta = 40;
+
 		UITextField textField;
 		UITouch[] activeTouches = new UITouch[Input.MaxTouches];
 		float screenScale;
@@ -176,14 +178,10 @@ namespace Lime
 			OnUpdateFrame(null);
 		}
 
-		private long prevTime = 0;
-
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{
-			long currentTime = ApplicationToolbox.GetMillisecondsSinceGameStarted();
-			int delta = (int)(currentTime - prevTime);
-			prevTime = currentTime;
-			delta = delta.Clamp(0, 40);
+			int delta;
+			RefreshFrameTimeStamp(out delta);
 			Input.ProcessPendingKeyEvents();
 			Application.Instance.OnUpdateFrame(delta);
 			AudioSystem.Update();
@@ -194,6 +192,16 @@ namespace Lime
 			if (DidUpdated != null) {
 				DidUpdated();
 			}
+		}
+		
+		private DateTime lastFrameTimeStamp = DateTime.UtcNow;
+
+		private void RefreshFrameTimeStamp(out int delta)
+		{
+			var now = DateTime.UtcNow;
+			delta = ((float)(now - lastFrameTimeStamp).TotalMilliseconds).Round();
+			delta = delta.Clamp(0, MaxFrameDelta);
+			lastFrameTimeStamp = now;
 		}
 
 		void ProcessTextInput()

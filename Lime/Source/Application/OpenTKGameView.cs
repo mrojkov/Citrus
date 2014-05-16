@@ -11,6 +11,8 @@ namespace Lime
 {
 	public class GameView : OpenTK.GameWindow
 	{
+		private const int MaxFrameDelta = 40;
+
 		private Application app;
 		private Dictionary<string, MouseCursor> cursors = new Dictionary<string, MouseCursor>();
 		private MouseCursor currentCursor;
@@ -18,7 +20,6 @@ namespace Lime
 		public static GameView Instance;
 		// Indicates whether the game uses OpenGL or OpenGL ES 2.0
 		public RenderingApi RenderingApi { get; private set; }
-		public bool PowerSaveMode { get; set; }
 		internal static event Action DidUpdated;
 
 #if WIN
@@ -54,7 +55,6 @@ namespace Lime
 			this.Mouse.Move += HandleMouseMove;
 			this.Mouse.WheelChanged += HandleMouseWheel;
 			SetupWindowLocationAndSize();
-			PowerSaveMode = CheckPowerSaveFlag();
 			RenderingApi = GetRenderingApi();
 		}
 
@@ -67,9 +67,9 @@ namespace Lime
 		private void SetupWindowLocationAndSize()
 		{
 			var displayBounds = OpenTK.DisplayDevice.Default.Bounds;
-			if (CheckFullscreenArg()) {
+			if (CommandLineArgs.FullscreenMode) {
 				this.WindowState = OpenTK.WindowState.Fullscreen;
-			} else if (CheckMaximizedFlag()) {
+			} else if (CommandLineArgs.MaximizedWindow) {
 				this.Location = displayBounds.Location;
 				this.WindowState = OpenTK.WindowState.Maximized;
 			} else {
@@ -80,28 +80,13 @@ namespace Lime
 			}
 		}
 
-		private static bool CheckMaximizedFlag()
-		{
-			return Application.CheckCommandLineArg("--Maximized");
-		}
-
 		private static RenderingApi GetRenderingApi()
 		{
-			if (Application.CheckCommandLineArg("--GL")) {
+			if (CommandLineArgs.OpenGL) {
 				return RenderingApi.OpenGL;
 			} else {
 				return RenderingApi.ES20;
 			}
-		}
-
-		private static bool CheckPowerSaveFlag()
-		{
-			return Application.CheckCommandLineArg("--PowerSave");
-		}
-
-		private static bool CheckFullscreenArg()
-		{
-			return Application.CheckCommandLineArg("--Fullscreen");
 		}
 
 		void HandleKeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
@@ -190,29 +175,42 @@ namespace Lime
 			AudioSystem.Terminate();
 		}
 
-		private long lastMillisecondsCount = 0;
-
 		protected override void OnRenderFrame(OpenTK.FrameEventArgs e)
 		{
-			long millisecondsCount = ApplicationToolbox.GetMillisecondsSinceGameStarted();
-			int delta = (int)(millisecondsCount - lastMillisecondsCount);
-			delta = delta.Clamp(0, 40);
-			lastMillisecondsCount = millisecondsCount;
+			int delta;
+			RefreshFrameTimeStamp(out delta);
 			Update(delta);
 			if (DidUpdated != null) {
 				DidUpdated();
 			}
 			Render();
-			if (PowerSaveMode) {
-				millisecondsCount = ApplicationToolbox.GetMillisecondsSinceGameStarted();
-				delta = (int)(millisecondsCount - lastMillisecondsCount);
-				System.Threading.Thread.Sleep(Math.Max(0, (1000 / 25) - delta));
+			if (CommandLineArgs.Limit25FPS) {
+				Limit25FPS();
 			}
+		}
+
+		private void Limit25FPS()
+		{
+			int delta = (int)(DateTime.UtcNow - lastFrameTimeStamp).TotalMilliseconds;
+			int delay = (1000 / 25) - delta;
+			if (delay > 0) {
+				System.Threading.Thread.Sleep(delay);
+			}
+		}
+
+		private DateTime lastFrameTimeStamp = DateTime.UtcNow;
+
+		private void RefreshFrameTimeStamp(out int delta)
+		{
+			var now = DateTime.UtcNow;
+			delta = ((float)(now - lastFrameTimeStamp).TotalMilliseconds).Round();
+			delta = delta.Clamp(0, MaxFrameDelta);
+			lastFrameTimeStamp = now;
 		}
 
 		private void Render()
 		{
-			ApplicationToolbox.RefreshFrameRate();
+			FPSCalculator.Refresh();
 			MakeCurrent();
 			app.OnRenderFrame();
 			SwapBuffers();
@@ -242,7 +240,7 @@ namespace Lime
 		}
 
 		public float FrameRate { 
-			get { return ApplicationToolbox.FrameRate; } 
+			get { return FPSCalculator.FPS; } 
 		}
 
 		public void SetCursor(string resourceName, IntVector2 hotSpot)

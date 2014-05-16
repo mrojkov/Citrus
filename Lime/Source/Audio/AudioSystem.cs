@@ -34,14 +34,12 @@ namespace Lime
         static Thread streamingThread = null;
         static volatile bool shouldTerminateThread;
 		static bool active = true;
-		static public bool SilentMode { get; private set; }
 
 		public static void Initialize()
 		{
 #if OPENAL
 #if !iOS
-			SilentMode = Application.CheckCommandLineArg("--Silent");
-			if (!SilentMode) {
+			if (!CommandLineArgs.NoAudio) {
 				context = new AudioContext();
 			}
 #else
@@ -215,7 +213,7 @@ namespace Lime
 
 		private static Sound LoadSoundToChannel(ChannelSelector channelSelector, string path, bool looping, bool paused, float fadeinTime)
 		{
-			if (SilentMode) {
+			if (CommandLineArgs.NoAudio) {
 				return new Sound();
 			}
 			path += ".sound";
