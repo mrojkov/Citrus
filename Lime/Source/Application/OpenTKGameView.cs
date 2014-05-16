@@ -36,7 +36,7 @@ namespace Lime
 		}
 #endif
 
-		public GameView(Application app, string[] args = null)
+		public GameView(Application app)
 			: base(800, 600, GraphicsMode.Default, 
 			"Citrus", GameWindowFlags.Default, DisplayDevice.Default,
 			2, 0, GetGraphicContextFlags())
@@ -53,8 +53,8 @@ namespace Lime
 			this.Mouse.ButtonUp += HandleMouseButtonUp;
 			this.Mouse.Move += HandleMouseMove;
 			this.Mouse.WheelChanged += HandleMouseWheel;
-			SetupWindowLocationAndSize(args);
-			PowerSaveMode = CheckPowerSaveFlag(args);
+			SetupWindowLocationAndSize();
+			PowerSaveMode = CheckPowerSaveFlag();
 			RenderingApi = GetRenderingApi();
 		}
 
@@ -64,12 +64,12 @@ namespace Lime
 				 GraphicsContextFlags.Default : GraphicsContextFlags.Embedded;
 		}
 
-		private void SetupWindowLocationAndSize(string[] args)
+		private void SetupWindowLocationAndSize()
 		{
 			var displayBounds = OpenTK.DisplayDevice.Default.Bounds;
-			if (CheckFullscreenArg(args)) {
+			if (CheckFullscreenArg()) {
 				this.WindowState = OpenTK.WindowState.Fullscreen;
-			} else if (CheckMaximizedFlag(args)) {
+			} else if (CheckMaximizedFlag()) {
 				this.Location = displayBounds.Location;
 				this.WindowState = OpenTK.WindowState.Maximized;
 			} else {
@@ -80,9 +80,9 @@ namespace Lime
 			}
 		}
 
-		private static bool CheckMaximizedFlag(string[] args)
+		private static bool CheckMaximizedFlag()
 		{
-			return args != null && Array.IndexOf(args, "--Maximized") >= 0;
+			return Application.CheckCommandLineArg("--Maximized");
 		}
 
 		private static RenderingApi GetRenderingApi()
@@ -94,14 +94,14 @@ namespace Lime
 			}
 		}
 
-		private static bool CheckPowerSaveFlag(string[] args)
+		private static bool CheckPowerSaveFlag()
 		{
-			return args != null && Array.IndexOf(args, "--PowerSave") >= 0;
+			return Application.CheckCommandLineArg("--PowerSave");
 		}
 
-		private static bool CheckFullscreenArg(string[] args)
+		private static bool CheckFullscreenArg()
 		{
-			return args != null && Array.IndexOf(args, "--Fullscreen") >= 0;
+			return Application.CheckCommandLineArg("--Fullscreen");
 		}
 
 		void HandleKeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
