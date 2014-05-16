@@ -18,7 +18,7 @@
 
 		protected override void SelfUpdate(int delta)
 		{
-			WidgetInput.RemoveInvalidatedCaptivities();
+			WidgetInput.RemoveInvalidatedCaptures();
 			prevActiveTextWidget = ActiveTextWidget;
 			ParticleEmitter.NumberOfUpdatedParticles = 0;
 			IsActiveTextWidgetUpdated = false;

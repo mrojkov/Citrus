@@ -17,7 +17,7 @@ namespace Lime
 		// NB: TouchScreen and mouse share the same capture stack
 		static List<Widget> mouseCaptureStack;
 		static List<Widget> keyboardCaptureStack;
-		static bool skipCaptivitiesCleanup;
+		static bool skipCapturesCleanup;
 		
 		public static IEnumerable<Widget> MouseCaptureStack { get { return mouseCaptureStack; } }
 		public static IEnumerable<Widget> KeyboardCaptureStack { get { return keyboardCaptureStack; } }
@@ -66,11 +66,18 @@ namespace Lime
 
 		public void CaptureMouse()
 		{
-			mouseCaptureStack.Remove(widget);
-			mouseCaptureStack.Add(widget);
+			Capture(mouseCaptureStack);
+		}
+
+		private void Capture(List<Widget> stack)
+		{
+			stack.Remove(widget);
+			var thisLayer = widget.GetEffectiveLayer();
+			var i = stack.FindLastIndex(w => w.GetEffectiveLayer() <= thisLayer);
+			stack.Insert(i + 1, widget);
 			// The widget may be invisible right after creation, 
 			// so omit the stack cleaning up on this frame.
-			skipCaptivitiesCleanup = true;
+			skipCapturesCleanup = true;
 		}
 
 		public void ReleaseMouse()
@@ -101,11 +108,7 @@ namespace Lime
 
 		public void CaptureKeyboard()
 		{
-			keyboardCaptureStack.Remove(widget);
-			keyboardCaptureStack.Add(widget);
-			// The widget may be invisible right after creation, 
-			// so omit the stack cleaning up on this frame.
-			skipCaptivitiesCleanup = true;
+			Capture(keyboardCaptureStack);
 		}
 
 		public void ReleaseKeyboard()
@@ -209,13 +212,13 @@ namespace Lime
 			ReleaseKeyboard();
 		}
 
-		internal static void RemoveInvalidatedCaptivities()
+		internal static void RemoveInvalidatedCaptures()
 		{
-			if (!skipCaptivitiesCleanup) {
+			if (!skipCapturesCleanup) {
 				keyboardCaptureStack.RemoveAll(i => !IsVisibleWidget(i));
 				mouseCaptureStack.RemoveAll(i => !IsVisibleWidget(i));
 			}
-			skipCaptivitiesCleanup = false;
+			skipCapturesCleanup = false;
 		}
 
 		private static bool IsVisibleWidget(Widget widget)
