@@ -181,7 +181,7 @@ namespace Lime
 		/// </summary>
 		public T DeepCloneFast<T>() where T : Node
 		{
-			return DeepCloneFast() as T;
+			return (T)DeepCloneFast();
 		}
 
 		public override string ToString()

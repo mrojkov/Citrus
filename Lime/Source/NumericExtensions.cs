@@ -12,6 +12,26 @@ namespace Lime
 			return Mathf.Wrap(x, lowerBound, upperBound);
 		}
 
+		public static float Max(this float a, float b)
+		{
+			return a > b ? a : b;
+		}
+
+		public static float Min(this float a, float b)
+		{
+			return a < b ? a : b;
+		}
+
+		public static float Max(this int a, int b)
+		{
+			return a > b ? a : b;
+		}
+
+		public static float Min(this int a, int b)
+		{
+			return a < b ? a : b;
+		}
+
 		public static float Abs(this float x)
 		{
 			return x < 0 ? -x : x;
