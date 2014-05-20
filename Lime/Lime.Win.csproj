@@ -53,10 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Source\Application\CommandLineArgs.cs" />
     <Compile Include="Source\Application\Debug.cs" />
-    <Compile Include="Source\Application\ExternalStorageLagsSimulator.cs" />
-    <Compile Include="Source\Application\FPSCalculator.cs" />
     <Compile Include="Source\Application\RenderingApi.cs" />
     <Compile Include="Source\Application\WinApi.cs" />
     <Compile Include="Source\AssetsBundle\UnityAssetsBundle.cs" />
@@ -188,6 +185,9 @@
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGraphicsContext.cs" />
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Utilities.iPhone.cs" />
     <Compile Include="Source\Widgets\WebBrowser.iOS.cs" />
+    <Compile Include="Source\Application\CommandLineArgs.cs" />
+    <Compile Include="Source\Application\ExternalStorageLagsSimulator.cs" />
+    <Compile Include="Source\Application\FPSCalculator.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
