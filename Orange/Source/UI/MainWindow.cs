@@ -144,11 +144,11 @@ namespace Orange
 					The.Workspace.AssetFiles.Rescan();
 					action();
 				} catch (System.Exception exc) {
-					if (exc.InnerException != null) {
-						Console.WriteLine(exc.InnerException.Message);
-					} else {
-						Console.WriteLine(exc.Message);
+					System.Exception deepestException = exc;
+					while (deepestException.InnerException != null) {
+						deepestException = deepestException.InnerException;
 					}
+					Console.WriteLine(deepestException.Message);
 				}
 				ScrollLogToEnd();
 			} finally {
