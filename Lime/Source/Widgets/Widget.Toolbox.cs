@@ -163,7 +163,8 @@ namespace Lime
 			var hitTestLT = world.Position;
 			var hitTestRB = hitTestLT + world.Size;
 			for (float y = hitTestLT.Y; y < hitTestRB.Y && !passedHitTest; y++) {
-				for (float x = hitTestLT.X; x < hitTestRB.X && !passedHitTest; x++) {					if (this.SelfHitTest(new Vector2(x, y))) {
+				for (float x = hitTestLT.X; x < hitTestRB.X && !passedHitTest; x++) {
+					if (this.SelfHitTest(new Vector2(x, y))) {
 						passedHitTest = true;
 					}
 				}
