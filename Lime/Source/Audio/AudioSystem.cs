@@ -39,7 +39,8 @@ namespace Lime
 		{
 #if OPENAL
 #if !iOS
-			if (!CommandLineArgs.NoAudio) {
+			bool isDeviceAvailable = !String.IsNullOrEmpty(AudioContext.DefaultDevice);
+			if (isDeviceAvailable && !CommandLineArgs.NoAudio) {
 				context = new AudioContext();
 			}
 #else
