@@ -51,6 +51,7 @@ namespace Lime
 		public TextBox()
 		{
 			Enabled = true;
+			HitTestMask = ControlsHitTestMask;
 		}
 
 		protected override void SelfUpdate(int delta)
@@ -64,7 +65,7 @@ namespace Lime
 				if (world.ActiveTextWidget == null && Autofocus) {
 					world.ActiveTextWidget = this;
 				}
-				if (Input.WasKeyPressed(Key.Mouse0) && HitTest(Input.MousePosition)) {
+				if (Input.WasMouseReleased() && IsMouseOver()) {
 					world.ActiveTextWidget = this;
 				}
 			}
