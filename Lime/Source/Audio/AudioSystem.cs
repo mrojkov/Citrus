@@ -298,6 +298,9 @@ namespace Lime
 
 		public static Sound PlayMusic(string path, bool looping = true, float priority = 100f, float fadeinTime = 0.5f, bool paused = false, float volume = 1f, float pan = 0f, float pitch = 1f)
 		{
+			if (CommandLineArgs.NoMusic) {
+				return new Sound();
+			}
 			return Play(path, AudioChannelGroup.Music, looping, priority, fadeinTime, paused, volume, pan, pitch);
 		}
 

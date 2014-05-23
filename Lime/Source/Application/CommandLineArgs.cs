@@ -13,6 +13,7 @@ namespace Lime
 		public static readonly bool FullscreenMode = CheckFlag("--Fullscreen");
 		public static readonly bool SimulateSlowExternalStorage = CheckFlag("--SimulateSlowExternalStorage");
 		public static readonly bool NoAudio = CheckFlag("--NoAudio");
+		public static readonly bool NoMusic = CheckFlag("--NoMusic");
 
 		public static string[] Get()
 		{
