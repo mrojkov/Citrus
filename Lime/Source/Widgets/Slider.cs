@@ -51,7 +51,7 @@ namespace Lime
 			get { return Nodes.TryFind("Rail") as Spline; }
 		}
 
-		protected override void SelfUpdate(int delta)
+		protected override void SelfUpdate(float delta)
 		{
 			if (GloballyVisible) {
 				Advance();

@@ -12,7 +12,7 @@ namespace Lime
 		[ProtoMember(1)]
 		public bool Horizontal { get; set; }
 
-		protected override void SelfUpdate(int delta)
+		protected override void SelfUpdate(float delta)
 		{
 			if (Parent != null && Parent.AsWidget != null) {
 				if (Horizontal) {

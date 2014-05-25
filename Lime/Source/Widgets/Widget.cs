@@ -253,13 +253,11 @@ namespace Lime
 			return clone;
 		}
 
-		public override void Update(int delta)
+		public override void Update(float delta)
 		{
-			if (AnimationSpeed != 1) {
-				delta = ScaleDeltaWithAnimationSpeed(delta);
-			}
+			delta *= AnimationSpeed;
 			if (Updating != null) {
-				Updating(delta * 0.001f);
+				Updating(delta);
 			}
 			if (Anchors != Anchors.None && ParentWidget != null) {
 				ApplyAnchors();
@@ -281,7 +279,7 @@ namespace Lime
 				}
 			}
 			if (Updated != null) {
-				Updated(delta * 0.001f);
+				Updated(delta);
 			}
 		}
 

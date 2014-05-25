@@ -94,7 +94,7 @@ namespace Lime
 			return !sound.IsStopped;
 		}
 
-		protected override void SelfUpdate(int delta)
+		protected override void SelfUpdate(float delta)
 		{
 			sound.Bump();
 		}

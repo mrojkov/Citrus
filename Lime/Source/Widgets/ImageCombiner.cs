@@ -64,7 +64,7 @@ namespace Lime
 			return false;
 		}
 
-		protected override void SelfLateUpdate(int delta)
+		protected override void SelfLateUpdate(float delta)
 		{
 			IImageCombinerArg arg1, arg2;
 			if (Enabled && GetArgs(out arg1, out arg2)) {

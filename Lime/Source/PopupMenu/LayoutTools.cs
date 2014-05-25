@@ -7,7 +7,7 @@ namespace Lime.PopupMenu
 {
 	public class ExpandSiblingsToParent : Node
 	{
-		protected override void SelfUpdate(int delta)
+		protected override void SelfUpdate(float delta)
 		{
 			foreach (var item in Parent.Nodes.OfType<Widget>()) {
 				item.Position = Vector2.Zero;
@@ -19,7 +19,7 @@ namespace Lime.PopupMenu
 
 	public class CenterSiblingsVertically : Node
 	{
-		protected override void SelfUpdate(int delta)
+		protected override void SelfUpdate(float delta)
 		{
 			foreach (var item in Parent.Nodes.OfType<Widget>()) {
 				item.Y = (Parent.AsWidget.Height - item.Height) / 2;
@@ -39,7 +39,7 @@ namespace Lime.PopupMenu
 			StretchWidget = stretch;
 		}
 
-		protected override void SelfUpdate(int delta)
+		protected override void SelfUpdate(float delta)
 		{
 			var stretch = Parent.Nodes.TryFind(StretchWidget);
 			float w = 0;

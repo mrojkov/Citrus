@@ -73,7 +73,7 @@ namespace Lime
 			IKStopper = true;
 		}
 
-		protected override void SelfLateUpdate(int delta)
+		protected override void SelfLateUpdate(float delta)
 		{
 			if (Index > 0 && Parent != null) {
 				BoneArray.Entry e;

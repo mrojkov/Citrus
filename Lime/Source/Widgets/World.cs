@@ -16,7 +16,7 @@
 
 		private TextBox prevActiveTextWidget;
 
-		protected override void SelfUpdate(int delta)
+		protected override void SelfUpdate(float delta)
 		{
 			WidgetInput.RemoveInvalidatedCaptures();
 			prevActiveTextWidget = ActiveTextWidget;
@@ -24,7 +24,7 @@
 			IsActiveTextWidgetUpdated = false;
 		}
 
-		protected override void SelfLateUpdate(int delta)
+		protected override void SelfLateUpdate(float delta)
 		{
 			if (!IsActiveTextWidgetUpdated) {
 				ActiveTextWidget = null;

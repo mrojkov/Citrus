@@ -11,7 +11,7 @@ namespace Lime
 {
 	public class GameView : OpenTK.GameWindow
 	{
-		private const int MaxFrameDelta = 40;
+		private const float MaxFrameDelta = 0.04f;
 
 		private Application app;
 		private Dictionary<string, MouseCursor> cursors = new Dictionary<string, MouseCursor>();
@@ -177,7 +177,7 @@ namespace Lime
 
 		protected override void OnRenderFrame(OpenTK.FrameEventArgs e)
 		{
-			int delta;
+			float delta;
 			RefreshFrameTimeStamp(out delta);
 			Update(delta);
 			if (DidUpdated != null) {
@@ -200,10 +200,10 @@ namespace Lime
 
 		private DateTime lastFrameTimeStamp = DateTime.UtcNow;
 
-		private void RefreshFrameTimeStamp(out int delta)
+		private void RefreshFrameTimeStamp(out float delta)
 		{
 			var now = DateTime.UtcNow;
-			delta = ((float)(now - lastFrameTimeStamp).TotalMilliseconds).Round();
+			delta = (float)(now - lastFrameTimeStamp).TotalSeconds;
 			delta = delta.Clamp(0, MaxFrameDelta);
 			lastFrameTimeStamp = now;
 		}
@@ -219,7 +219,7 @@ namespace Lime
 		private void Update(float delta)
 		{
 			Input.ProcessPendingKeyEvents();
-			app.OnUpdateFrame((int)delta);
+			app.OnUpdateFrame(delta);
             AudioSystem.Update();
 			Input.TextInput = null;
 			Input.CopyKeysState();

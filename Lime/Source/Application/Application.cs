@@ -251,7 +251,7 @@ namespace Lime
 
 		public virtual void OnCreate() {}
 		public virtual void OnTerminate() {}
-		public virtual void OnUpdateFrame(int delta) {}
+		public virtual void OnUpdateFrame(float delta) {}
 		public virtual void OnRenderFrame() {}
 		public virtual void OnDeviceRotating(DeviceOrientation toOrientation) {}
 		public virtual void OnDeviceRotated(DeviceOrientation fromOrientation) {}

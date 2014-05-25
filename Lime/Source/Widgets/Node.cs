@@ -211,11 +211,9 @@ namespace Lime
 			}
 		}
 
-		public virtual void Update(int delta)
+		public virtual void Update(float delta)
 		{
-			if (AnimationSpeed != 1) {
-				delta = ScaleDeltaWithAnimationSpeed(delta);
-			}
+			delta *= AnimationSpeed;
 			if (IsRunning) {
 				AdvanceAnimation(delta);
 			}
@@ -228,16 +226,11 @@ namespace Lime
 			SelfLateUpdate(delta);
 		}
 
-		protected int ScaleDeltaWithAnimationSpeed(int delta)
-		{
-			return (int)(AnimationSpeed * delta + 0.5f);
-		}
-
-		protected virtual void SelfUpdate(int delta)
+		protected virtual void SelfUpdate(float delta)
 		{
 		}
 
-		protected virtual void SelfLateUpdate(int delta)
+		protected virtual void SelfLateUpdate(float delta)
 		{
 		}
 
@@ -379,13 +372,14 @@ namespace Lime
 			return null;
 		}
 
-		public void AdvanceAnimation(int delta)
+		public void AdvanceAnimation(float delta)
 		{
-			while (delta > AnimationUtils.MsecsPerFrame) {
+			int deltaMs = (int)(delta * 1000 + 0.5f);
+			while (deltaMs > AnimationUtils.MsecsPerFrame) {
 				AdvanceAnimationShort(AnimationUtils.MsecsPerFrame);
-				delta -= AnimationUtils.MsecsPerFrame;
+				deltaMs -= AnimationUtils.MsecsPerFrame;
 			}
-			AdvanceAnimationShort(delta);
+			AdvanceAnimationShort(deltaMs);
 		}
 
 		private void AdvanceAnimationShort(int delta)

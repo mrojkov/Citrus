@@ -263,7 +263,7 @@ namespace Lime
 			}
 		}
 
-		protected override void SelfUpdate(int delta)
+		protected override void SelfUpdate(float delta)
 		{
 			wasClicked = false;
 			if (GloballyVisible) {

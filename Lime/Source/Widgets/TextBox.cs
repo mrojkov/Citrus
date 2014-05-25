@@ -10,7 +10,7 @@ namespace Lime
 	public class TextBox : Widget
 	{
 		private string text;
-		private int caretBlinkPhase;
+		private float caretBlinkPhase;
 
 		[ProtoMember(1)]
 		public SerializableFont Font = new SerializableFont();
@@ -54,7 +54,7 @@ namespace Lime
 			HitTestMask = ControlsHitTestMask;
 		}
 
-		protected override void SelfUpdate(int delta)
+		protected override void SelfUpdate(float delta)
 		{
 			var world = World.Instance;
 			if (!Enabled) {
@@ -71,7 +71,7 @@ namespace Lime
 			}
 		}
 
-		protected override void SelfLateUpdate(int delta)
+		protected override void SelfLateUpdate(float delta)
 		{
 			var world = World.Instance;
 			if (Enabled) {
@@ -117,9 +117,8 @@ namespace Lime
 				length--;
 				extent = Renderer.MeasureTextLine(Font.Instance, text, FontHeight, start, length);
 			}
-			int period = (int)(CaretBlinkPeriod * 1000);
 			if (World.Instance.ActiveTextWidget == this) {
-				if (caretBlinkPhase % period < period / 2 && length > 0) {
+				if (caretBlinkPhase % CaretBlinkPeriod < CaretBlinkPeriod / 2 && length > 0) {
 					length--;
 				}
 			}

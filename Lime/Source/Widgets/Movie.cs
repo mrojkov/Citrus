@@ -71,12 +71,12 @@ namespace Lime
 			}
 		}
 
-		protected override void SelfUpdate(int delta)
+		protected override void SelfUpdate(float delta)
 		{
 			skipRender = requestSkipRender;
 			requestSkipRender = false;
 			movieTexture.Looped = Looped;
-			movieTexture.Update(delta * 0.001f);
+			movieTexture.Update(delta);
 		}
 
 		public override void Render()

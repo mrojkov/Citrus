@@ -393,12 +393,12 @@ namespace Lime
 			particlePool.AddFirst(particleNode);
 		}
 
-		void UpdateHelper(int delta)
+		void UpdateHelper(float delta)
 		{
-			float deltaSec = delta * Speed * 0.001f;
+			delta *= Speed;
 			if (ImmortalParticles) {
 				if (TimeShift > 0)
-					particlesToSpawn += Number * deltaSec / TimeShift;
+					particlesToSpawn += Number * delta / TimeShift;
 				else
 					particlesToSpawn = Number;
 				particlesToSpawn = Math.Min(particlesToSpawn, Number - particles.Count);
@@ -406,7 +406,7 @@ namespace Lime
 					FreeParticle(particles.Last);
 				}
 			} else {
-				particlesToSpawn += Number * deltaSec;
+				particlesToSpawn += Number * delta;
 			}
 			while (particlesToSpawn >= 1f) {
 				LinkedListNode<Particle> particleNode = AllocParticle();
@@ -423,7 +423,7 @@ namespace Lime
 			LinkedListNode<Particle> p = particles.First;
 			for (; p != null; p = p.Next) {
 				Particle particle = p.Value;
-				AdvanceParticle(particle, deltaSec);
+				AdvanceParticle(particle, delta);
 				if (!ImmortalParticles && particle.Age > particle.Lifetime) {
 					LinkedListNode<Particle> n = p.Next;
 					FreeParticle(p);
@@ -434,12 +434,12 @@ namespace Lime
 			}
 		}
 
-		protected override void SelfLateUpdate(int delta)
+		protected override void SelfLateUpdate(float delta)
 		{
 			if (firstUpdate) {
 				firstUpdate = false;
-				const int ModellingStep = 40;
-				delta = Math.Max(delta, (int)(TimeShift * 1000));
+				const float ModellingStep = 0.004f;
+				delta = Math.Max(delta, TimeShift);
 				while (delta >= ModellingStep) {
 					UpdateHelper(ModellingStep);
 					delta -= ModellingStep;

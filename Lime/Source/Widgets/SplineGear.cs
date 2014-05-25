@@ -16,7 +16,7 @@ namespace Lime
 		[ProtoMember(3)]
 		public float SplineOffset { get; set; }
 
-		protected override void SelfLateUpdate(int delta)
+		protected override void SelfLateUpdate(float delta)
 		{
 			if (Parent == null) {
 				return;

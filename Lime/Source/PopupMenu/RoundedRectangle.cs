@@ -22,7 +22,7 @@ namespace Lime.PopupMenu
 			this.AddNode(outerFrame);
 		}
 
-		protected override void SelfUpdate(int delta)
+		protected override void SelfUpdate(float delta)
 		{
 			SetupInnerRect();
 			SetupBorder(outerFrame, Width, Height, CornerRadius, -2);
