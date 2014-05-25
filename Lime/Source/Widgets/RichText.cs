@@ -507,7 +507,7 @@ namespace Lime
 				if (word.LineBreak) {
 					x = 0;
 				}
-				if (x > 0 && x + word.Width > maxWidth) {
+				if (x > 0 && x + word.Width > maxWidth && word.Text[word.Start] > ' ') {
 					x = word.Width;
 					word.X = 0;
 					word.LineBreak = true;
