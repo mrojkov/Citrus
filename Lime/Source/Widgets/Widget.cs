@@ -17,8 +17,9 @@ namespace Lime
 		Bottom = 8,
 		CenterH = 16,
 		CenterV = 32,
-		LeftAndRight = Left | Right,
-		TopAndBottom = Top | Bottom,
+		LeftRight = Left | Right,
+		TopBottom = Top | Bottom,
+		LeftRightTopBottom = Left | Right | Top | Bottom,
 		Center = CenterH | CenterV,
 	}
 
@@ -64,7 +65,6 @@ namespace Lime
 		private Vector2 direction;
 		private Color4 color;
 		private Action clicked;
-		public Vector2 ParentSize;
 
 		#region Properties
 
@@ -102,9 +102,26 @@ namespace Lime
 
 		[ProtoMember(2)]
 		[TangerineProperty(7)]
-		public Vector2 Size { get { return size; } set { size = value; } }
-		public float Width { get { return size.X; } set { size.X = value; } }
-		public float Height { get { return size.Y; } set { size.Y = value; } }
+		public Vector2 Size
+		{
+			get { return size; }
+			set
+			{
+				var sizeDelta = value - size;
+				size = value;
+				LayoutChildren(sizeDelta);
+			}
+		}
+
+		public float Width { 
+			get { return size.X; } 
+			set { Size = new Vector2(value, Height); } 
+		}
+
+		public float Height { 
+			get { return size.Y; } 
+			set { Size = new Vector2(Width, value); } 
+		}
 
 		[ProtoMember(3)]
 		[TangerineProperty(6)]
@@ -218,17 +235,6 @@ namespace Lime
 			}
 		}
 
-		[ProtoAfterDeserialization]
-		public void AfterDeserialization()
-		{
-			ParentSize = Size; 	// This assignment sets the parentSize for a top parentless widget
-			foreach (var node in Nodes) {
-				if (node.AsWidget != null) {
-					node.AsWidget.ParentSize = Size;
-				}
-			}
-		}
-
 		public virtual Vector2 CalcContentSize()
 		{
 			return Size;
@@ -258,9 +264,6 @@ namespace Lime
 			delta *= AnimationSpeed;
 			if (Updating != null) {
 				Updating(delta);
-			}
-			if (Anchors != Anchors.None && ParentWidget != null) {
-				ApplyAnchors();
 			}
 			RecalcGlobalMatrixAndColorHelper();
 			if (GloballyVisible) {
@@ -377,63 +380,60 @@ namespace Lime
 			}
 		}
 
-		private void ApplyAnchors()
+		protected override void Layout(Vector2 parentSizeDelta)
 		{
-			var actualParentSize = Parent.AsWidget.Size;
-			if (!ParentSize.Equals(actualParentSize)) {
-				Vector2 deltaPosition;
-				Vector2 deltaSize;
-				CalcAnchorChangesAlongXAxis(out deltaPosition.X, out deltaSize.X);
-				CalcAnchorChangesAlongYAxis(out deltaPosition.Y, out deltaSize.Y);
-				ApplyAnchorChanges(deltaPosition, deltaSize);
+			if (Anchors == Anchors.None || ParentWidget == null) {
+				return;
 			}
-			ParentSize = actualParentSize;
+			Vector2 positionDelta;
+			Vector2 sizeDelta;
+			CalcXAndWidthDeltas(parentSizeDelta.X, out positionDelta.X, out sizeDelta.X);
+			CalcYAndHeightDeltas(parentSizeDelta.Y, out positionDelta.Y, out sizeDelta.Y);
+			ApplyPositionAndSizeDelta(positionDelta, sizeDelta);
 		}
 
-		private void CalcAnchorChangesAlongXAxis(out float deltaX, out float deltaWidth)
+		private void CalcXAndWidthDeltas(float parentWidthDelta, out float xDelta, out float widthDelta)
 		{
-			deltaX = 0;
-			deltaWidth = 0;
-			Vector2 s = Parent.AsWidget.Size;
+			xDelta = 0;
+			widthDelta = 0;
 			if ((Anchors & Anchors.CenterH) != 0) {
-				deltaX = (s.X - ParentSize.X) / 2;
+				xDelta = parentWidthDelta * 0.5f;
 			} else if ((Anchors & Anchors.Left) != 0 && (Anchors & Anchors.Right) != 0) {
-				deltaWidth = s.X - ParentSize.X;
-				deltaX = (s.X - ParentSize.X) * Pivot.X;
+				widthDelta = parentWidthDelta;
+				xDelta = parentWidthDelta * Pivot.X;
 			} else if ((Anchors & Anchors.Right) != 0) {
-				deltaX = s.X - ParentSize.X;
+				xDelta = parentWidthDelta;
 			}
 		}
 
-		private void CalcAnchorChangesAlongYAxis(out float deltaY, out float deltaHeight)
+		private void CalcYAndHeightDeltas(float parentHeightDelta, out float yDelta, out float heightDelta)
 		{
-			deltaY = 0;
-			deltaHeight = 0;
-			Vector2 s = Parent.AsWidget.Size;
+			yDelta = 0;
+			heightDelta = 0;
 			if ((Anchors & Anchors.CenterV) != 0) {
-				deltaY = (s.Y - ParentSize.Y) / 2;
+				yDelta = parentHeightDelta * 0.5f;
 			} else if ((Anchors & Anchors.Top) != 0 && (Anchors & Anchors.Bottom) != 0) {
-				deltaHeight = s.Y - ParentSize.Y;
-				deltaY = (s.Y - ParentSize.Y) * Pivot.Y;
+				heightDelta = parentHeightDelta;
+				yDelta = parentHeightDelta * Pivot.Y;
 			} else if ((Anchors & Anchors.Bottom) != 0) {
-				deltaY = s.Y - ParentSize.Y;
+				yDelta = parentHeightDelta;
 			}
 		}
 
-		private void ApplyAnchorChanges(Vector2 deltaPosition, Vector2 deltaSize)
+		private void ApplyPositionAndSizeDelta(Vector2 positionDelta, Vector2 sizeDelta)
 		{
-			Position += deltaPosition;
-			Size += deltaSize;
+			Position += positionDelta;
+			Size += sizeDelta;
 			if (Animators.Count > 0) {
 				Animator<Vector2> animator;
 				if (Animators.TryFind("Position", out animator)) {
 					foreach (var key in animator.Keys) {
-						key.Value += deltaPosition;
+						key.Value += positionDelta;
 					}
 				}
 				if (Animators.TryFind("Size", out animator)) {
 					foreach (var key in animator.Keys) {
-						key.Value += deltaSize;
+						key.Value += sizeDelta;
 					}
 				}
 			}
