@@ -13,7 +13,7 @@ namespace Lime
 {
 	public class GameView : Lime.Xamarin.iPhoneOSGameView
 	{
-		private const float MaxFrameDelta = 0.004f;
+		private const float MaxFrameDelta = 0.04f;
 
 		UITextField textField;
 		UITouch[] activeTouches = new UITouch[Input.MaxTouches];
