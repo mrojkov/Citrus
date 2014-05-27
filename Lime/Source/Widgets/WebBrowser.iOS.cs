@@ -18,8 +18,7 @@ namespace Lime
 		{
 			parentWidget.Nodes.Add(this);
 			Size = parentWidget.Size;
-			ParentSize = parentWidget.Size;
-			Anchors = Anchors.LeftAndRight | Anchors.TopAndBottom;
+			Anchors = Anchors.LeftRight | Anchors.TopBottom;
 		}
 		
 		public WebBrowser()
@@ -42,7 +41,7 @@ namespace Lime
 			}
 		}
 				
-		protected override void SelfUpdate(int delta)
+		protected override void SelfUpdate(float delta)
 		{
 			if (webView == null) {
 				return;
