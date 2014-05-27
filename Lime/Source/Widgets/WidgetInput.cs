@@ -223,7 +223,19 @@ namespace Lime
 
 		private static bool IsVisibleWidget(Widget widget)
 		{
-			return (widget.GetRoot() == World.Instance) && widget.GloballyVisible;
+			return (widget.GetRoot() == World.Instance) && IsWidgetGloballyVisible(widget);
+		}
+
+		// TODO: It is a usual case: GloballyVisible == true, meantime the widget is invisible.
+		// A proper solution is required.
+		private static bool IsWidgetGloballyVisible(Widget widget)
+		{
+			for (var p = widget; p != null; p = p.ParentWidget) {
+				if (!p.GloballyVisible) {
+					return false;
+				}
+			}
+			return true;
 		}
 	}
 }
