@@ -22,10 +22,7 @@ namespace Lime
 
 		public static bool CheckFlag(string name)
 		{
-			if (Array.IndexOf(Get(), name) >= 0) {
-				return true;
-			}
-			return false;
+			return Array.IndexOf(Get(), name) >= 0;
 		}
 	}
 }
