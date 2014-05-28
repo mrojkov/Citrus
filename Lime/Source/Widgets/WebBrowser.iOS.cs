@@ -10,6 +10,9 @@ namespace Lime
 	public class WebBrowser : Widget, IDisposable
 	{
 		private UIWebView webView;
+		private UIActivityIndicatorView activityIndicator;
+
+		private bool isActivityIndicatorVisible = false;
 	
 		public Uri Url { get { return GetUrl(); } set { SetUrl(value); } }	
 		
@@ -34,13 +37,21 @@ namespace Lime
 		
 		public void Dispose()
 		{
+			if (activityIndicator != null) {
+				if (isActivityIndicatorVisible) {
+					activityIndicator.RemoveFromSuperview();
+					isActivityIndicatorVisible = false;
+				}
+				activityIndicator.Dispose();
+				activityIndicator = null;
+			}
 			if (webView != null) {
 				webView.RemoveFromSuperview();
 				webView.Dispose();
 				webView = null;
 			}
 		}
-				
+			
 		protected override void SelfUpdate(float delta)
 		{
 			if (webView == null) {
@@ -54,6 +65,24 @@ namespace Lime
 			var size = new SizeF((float)wr.Width * 0.5f, Height);
 			webView.Frame = new RectangleF(position, size);
 			webView.Hidden = false;
+
+			var activityIndicatorPosition = new PointF((size.Width * 0.5f) + position.X, (size.Height * 0.5f) + position.Y);
+
+			if (activityIndicator == null) {
+				activityIndicator = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.WhiteLarge);
+				activityIndicator.Center = activityIndicatorPosition;
+				webView.LoadStarted += (object sender, EventArgs e) => {
+					activityIndicator.StartAnimating();
+					GameView.Instance.AddSubview(activityIndicator);
+					isActivityIndicatorVisible = true;
+				};
+				webView.LoadFinished += (object sender, EventArgs e) => {
+					activityIndicator.StopAnimating();
+					activityIndicator.RemoveFromSuperview();
+					isActivityIndicatorVisible = false;
+				};
+			}
+			activityIndicator.Center = activityIndicatorPosition;
 		}
 	
 		private WindowRect CalculateAABBInWorldSpace(Widget widget)
