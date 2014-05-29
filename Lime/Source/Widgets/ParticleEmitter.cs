@@ -721,5 +721,12 @@ namespace Lime
 				RenderParticle(particle, matrix, color);
 			}
 		}
+
+		public void DeleteAllParticles()
+		{
+			while (particles.Count > 0) {
+				FreeParticle(particles.Last);
+			}
+		}
 	}
 }
