@@ -33,17 +33,26 @@ namespace Lime
 
 		public void RenderAndClear()
 		{
+            for (int i = 0; i <= maxUsedLayer; i++) {
+                Node node = layers[i];
+                while (node != null) {
+                    node.Render();
+                    Node next = node.NextToRender;
+                    node.NextToRender = null;
+                    node = next;
+                }
+                layers[i] = null;
+            }
+            maxUsedLayer = 0;
+		}
+        
+		public IEnumerable<Node> Enumerate()
+		{
 			for (int i = 0; i <= maxUsedLayer; i++) {
-				Node node = layers[i];
-				while (node != null) {
-					node.Render();
-					Node next = node.NextToRender;
-					node.NextToRender = null;
-					node = next;
+				for (var node = layers[i]; node != null; node = node.NextToRender) {
+					yield return node;
 				}
-				layers[i] = null;
 			}
-			maxUsedLayer = 0;
 		}
 	}
 }
