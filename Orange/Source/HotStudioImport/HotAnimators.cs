@@ -112,6 +112,18 @@ namespace Orange
 					case "SplineName":
 						propertyName = "SplineId";
 						break;
+					case "RandMotionRadius":
+						propertyName = "RandomMotionRadius";
+						break;
+					case "RandMotionRotation":
+						propertyName = "RandomMotionRotation";
+						break;
+					case "RandMotionSpeed":
+						propertyName = "RandomMotionSpeed";
+						break;
+					case "RandMotionAspectRatio":
+						propertyName = "RandomMotionAspectRatio";
+						break;
 					}
 					switch(propertyName + '@' + className) {
 					case "TextColor@Hot::Text":
