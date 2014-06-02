@@ -340,6 +340,17 @@ namespace Lime
 			ImmortalParticles = false;
 		}
 
+		[ProtoAfterDeserialization]
+		void AfterDeserialization()
+		{
+			// If particle was deserialized, particle.Modifier would be null. In some cases 
+			// particles are rendered before update, but particle.Modifier is required for 
+			// the render. AdvanceParticle() sets particle.Modifier.
+			foreach (var particle in particles) {
+				AdvanceParticle(particle, 0);
+			}
+		}
+
 		public override Node DeepCloneFast()
 		{
 			// Do not clone particle instances
