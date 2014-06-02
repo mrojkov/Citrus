@@ -214,7 +214,7 @@ namespace Lime
 
 		private static Sound LoadSoundToChannel(ChannelSelector channelSelector, string path, bool looping, bool paused, float fadeinTime)
 		{
-			if (CommandLineArgs.NoAudio) {
+			if (context == null) {
 				return new Sound();
 			}
 			path += ".sound";
