@@ -23,7 +23,7 @@ namespace Lime
 			Size = parentWidget.Size;
 			Anchors = Anchors.LeftRight | Anchors.TopBottom;
 		}
-		
+
 		public WebBrowser()
 		{
 			webView = new UIWebView();
@@ -46,12 +46,14 @@ namespace Lime
 				activityIndicator = null;
 			}
 			if (webView != null) {
+				webView.StopLoading();
+				webView.Delegate = null;
 				webView.RemoveFromSuperview();
 				webView.Dispose();
 				webView = null;
 			}
 		}
-			
+
 		protected override void SelfUpdate(float delta)
 		{
 			if (webView == null) {
@@ -71,6 +73,7 @@ namespace Lime
 			if (activityIndicator == null) {
 				activityIndicator = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.WhiteLarge);
 				activityIndicator.Center = activityIndicatorPosition;
+
 				webView.LoadStarted += (object sender, EventArgs e) => {
 					activityIndicator.StartAnimating();
 					GameView.Instance.AddSubview(activityIndicator);
