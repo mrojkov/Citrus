@@ -29,6 +29,18 @@ namespace Lime
 			webView = new UIWebView();
 			webView.AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;
 			webView.ScalesPageToFit = true;
+			webView.ScrollView.ShowsHorizontalScrollIndicator = false;
+			webView.ScrollView.Scrolled += (object sender, EventArgs e) => {
+				webView.ScrollView.ShowsVerticalScrollIndicator = true;
+				if (webView.ScrollView.ContentOffset.X != 0.0f) {
+					webView.ScrollView.SetContentOffset(new PointF(0.0f, webView.ScrollView.ContentOffset.Y), false);
+					webView.ScrollView.ShowsVerticalScrollIndicator = false;
+				}
+				if (webView.ScrollView.ContentOffset.Y < 0.0f) {
+					webView.ScrollView.SetContentOffset(new PointF(webView.ScrollView.ContentOffset.X, 0.0f), false);
+					webView.ScrollView.ShowsVerticalScrollIndicator = false;
+				}
+			};
 			webView.Opaque = false;
 			webView.BackgroundColor = new UIColor(0.0f, 0.0f, 0.0f, 1.0f);
 			webView.Hidden = true;
