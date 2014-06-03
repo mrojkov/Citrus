@@ -341,7 +341,7 @@ namespace Lime
 		}
 
 		[ProtoAfterDeserialization]
-		void AfterDeserialization()
+		public void AfterDeserialization()
 		{
 			// If particle was deserialized, particle.Modifier would be null. In some cases 
 			// particles are rendered before update, but particle.Modifier is required for 
