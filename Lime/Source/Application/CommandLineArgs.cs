@@ -14,6 +14,7 @@ namespace Lime
 		public static readonly bool SimulateSlowExternalStorage = CheckFlag("--SimulateSlowExternalStorage");
 		public static readonly bool NoAudio = CheckFlag("--NoAudio");
 		public static readonly bool NoMusic = CheckFlag("--NoMusic");
+		public static readonly bool Debug = CheckFlag("--Debug");
 
 		public static string[] Get()
 		{
