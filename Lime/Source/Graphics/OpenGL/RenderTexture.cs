@@ -17,7 +17,7 @@ namespace Lime
 	public class RenderTexture : ITexture, IDisposable
 	{
 		uint handle;
-		readonly int framebuffer;
+		int framebuffer;
 		readonly Size size = new Size(0, 0);
 		readonly Rectangle uvRect;
 		static readonly Stack<int> framebufferStack = new Stack<int>();
@@ -32,17 +32,18 @@ namespace Lime
 			framebuffer = t[0];
 			GL.GenTextures(1, t);
 			handle = (uint)t[0];
-			GL.BindTexture(TextureTarget.Texture2D, handle);
+            GL.BindTexture(TextureTarget.Texture2D, handle);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
 			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0,
 				PixelFormat.Rgba, PixelType.UnsignedByte, (IntPtr)null);
-			GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer);
+            int currentFramebuffer = Renderer.GetCurrentFramebuffer();
+            BindFramebuffer(framebuffer);
 			Renderer.CheckErrors();
 			GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, handle, 0);
 			if ((int)GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != (int)FramebufferErrorCode.FramebufferComplete)
 				throw new Exception("Failed to create render texture. Framebuffer is incomplete.");
-			GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+            BindFramebuffer(currentFramebuffer);
 			Renderer.CheckErrors();
 		}
 
@@ -64,6 +65,10 @@ namespace Lime
 		
 		public void Dispose()
 		{
+            if (framebuffer != 0) {
+                GL.DeleteFramebuffers(1, ref framebuffer);
+                framebuffer = 0;
+            }
 			if (handle != 0) {
 				lock (Texture2D.TexturesToDelete) {
 					Texture2D.TexturesToDelete.Add(handle);
