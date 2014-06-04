@@ -17,33 +17,33 @@ namespace Lime
 	public class RenderTexture : ITexture, IDisposable
 	{
 		uint handle;
-		int framebuffer;
+		uint framebuffer;
 		readonly Size size = new Size(0, 0);
 		readonly Rectangle uvRect;
-		static readonly Stack<int> framebufferStack = new Stack<int>();
+		static readonly Stack<uint> framebufferStack = new Stack<uint>();
 
 		public RenderTexture(int width, int height)
 		{
 			size.Width = width;
 			size.Height = height;
 			uvRect = new Rectangle(0, 0, 1, 1);
-			var t = new int[1];
+			var t = new uint[1];
 			GL.GenFramebuffers(1, t);
 			framebuffer = t[0];
 			GL.GenTextures(1, t);
-			handle = (uint)t[0];
-            GL.BindTexture(TextureTarget.Texture2D, handle);
+			handle = t[0];
+			GL.BindTexture(TextureTarget.Texture2D, handle);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
 			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0,
 				PixelFormat.Rgba, PixelType.UnsignedByte, (IntPtr)null);
-            int currentFramebuffer = Renderer.GetCurrentFramebuffer();
-            BindFramebuffer(framebuffer);
+			uint currentFramebuffer = (uint)Renderer.GetCurrentFramebuffer();
+			BindFramebuffer(framebuffer);
 			Renderer.CheckErrors();
 			GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, handle, 0);
 			if ((int)GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != (int)FramebufferErrorCode.FramebufferComplete)
 				throw new Exception("Failed to create render texture. Framebuffer is incomplete.");
-            BindFramebuffer(currentFramebuffer);
+			BindFramebuffer(currentFramebuffer);
 			Renderer.CheckErrors();
 		}
 
@@ -65,10 +65,12 @@ namespace Lime
 		
 		public void Dispose()
 		{
-            if (framebuffer != 0) {
-                GL.DeleteFramebuffers(1, ref framebuffer);
-                framebuffer = 0;
-            }
+			if (framebuffer != 0) {
+				lock (Texture2D.FramebuffersToDelete) {
+					Texture2D.FramebuffersToDelete.Add(framebuffer);
+				}
+				framebuffer = 0;
+			}
 			if (handle != 0) {
 				lock (Texture2D.TexturesToDelete) {
 					Texture2D.TexturesToDelete.Add(handle);
@@ -101,12 +103,12 @@ namespace Lime
 		public void SetAsRenderTarget()
 		{
 			Renderer.FlushSpriteBatch();
-			int currentFramebuffer = Renderer.GetCurrentFramebuffer();
+			uint currentFramebuffer = (uint)Renderer.GetCurrentFramebuffer();
 			BindFramebuffer(framebuffer);
 			framebufferStack.Push(currentFramebuffer);
 		}
 
-		private static void BindFramebuffer(int framebuffer)
+		private static void BindFramebuffer(uint framebuffer)
 		{
 			GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer);
 		}
@@ -114,7 +116,7 @@ namespace Lime
 		public void RestoreRenderTarget()
 		{
 			Renderer.FlushSpriteBatch();
-			int prevFramebuffer = framebufferStack.Pop();
+			uint prevFramebuffer = framebufferStack.Pop();
 			BindFramebuffer(prevFramebuffer);
 		}
 

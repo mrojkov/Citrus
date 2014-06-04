@@ -25,6 +25,7 @@ namespace Lime
 		Rectangle uvRect;
 
 		public static List<uint> TexturesToDelete = new List<uint>();
+		public static List<uint> FramebuffersToDelete = new List<uint>();
 
 		public static void DeleteScheduledTextures()
 		{
@@ -34,6 +35,15 @@ namespace Lime
 					TexturesToDelete.CopyTo(ids);
 					GL.DeleteTextures(ids.Length, ids);
 					TexturesToDelete.Clear();
+					Renderer.CheckErrors();
+				}
+			}
+			lock (FramebuffersToDelete) {
+				if (FramebuffersToDelete.Count > 0) {
+					var ids = new uint[FramebuffersToDelete.Count];
+					FramebuffersToDelete.CopyTo(ids);
+					GL.DeleteFramebuffers(ids.Length, ids);
+					FramebuffersToDelete.Clear();
 					Renderer.CheckErrors();
 				}
 			}
