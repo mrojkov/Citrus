@@ -133,8 +133,14 @@ namespace Lime
 		// This method is invoked when the application has loaded its UI and is ready to run
 		public override bool FinishedLaunching(UIApplication app, NSDictionary options)
 		{
+            bool allowSleepMode = false;
+            var obj = NSBundle.MainBundle.ObjectForInfoDictionary("AllowSleepMode");
+            if (obj != null && obj.ToString() == "1") {
+                allowSleepMode = true;
+            }
+
 			UIApplication.SharedApplication.StatusBarHidden = true;
-			UIApplication.SharedApplication.IdleTimerDisabled = true;
+            UIApplication.SharedApplication.IdleTimerDisabled = !allowSleepMode;
 		
 			LaunchOptions = options;
 
