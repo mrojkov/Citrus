@@ -100,28 +100,33 @@ namespace Lime
 				if (image == null) {
 					throw new Lime.Exception("Error loading texture from stream");
 				}
-				CGImage imageRef = image.CGImage;
-				int width = (int)image.Size.Width;
-				int height = (int)image.Size.Height;
-				SurfaceSize = ImageSize = new Size(width, height);
-
-				int bitsPerComponent = 8;
-				int bytesPerPixel = 4;
-				int bytesPerRow = bytesPerPixel * width;
-				byte[] data = new byte[height * bytesPerRow];
-
-				CGImageAlphaInfo alphaInfo = imageRef.AlphaInfo;
-				if (alphaInfo == CGImageAlphaInfo.None) {
-					alphaInfo = CGImageAlphaInfo.NoneSkipLast;
-				}
-				using (var colorSpace = CGColorSpace.CreateDeviceRGB())
-				using (var context = new MonoTouch.CoreGraphics.CGBitmapContext(data, width, height, bitsPerComponent, bytesPerRow, colorSpace, alphaInfo)) {
-					context.DrawImage(new System.Drawing.RectangleF(0, 0, width, height), imageRef);
-					PrepareOpenGLTexture();
-					GL.TexImage2D(All.Texture2D, 0, (int)All.Rgba, width, height, 0, All.Rgba, All.UnsignedByte, data);
-				}
+                InitWithUIImage(image);
 			}
 		}
+
+        public void InitWithUIImage(UIImage image)
+        {
+            CGImage imageRef = image.CGImage;
+            int width = (int)image.Size.Width;
+            int height = (int)image.Size.Height;
+            SurfaceSize = ImageSize = new Size(width, height);
+
+            int bitsPerComponent = 8;
+            int bytesPerPixel = 4;
+            int bytesPerRow = bytesPerPixel * width;
+            byte[] data = new byte[height * bytesPerRow];
+
+            CGImageAlphaInfo alphaInfo = imageRef.AlphaInfo;
+            if (alphaInfo == CGImageAlphaInfo.None) {
+                alphaInfo = CGImageAlphaInfo.NoneSkipLast;
+            }
+            using (var colorSpace = CGColorSpace.CreateDeviceRGB())
+            using (var context = new MonoTouch.CoreGraphics.CGBitmapContext(data, width, height, bitsPerComponent, bytesPerRow, colorSpace, alphaInfo)) {
+                context.DrawImage(new System.Drawing.RectangleF(0, 0, width, height), imageRef);
+                PrepareOpenGLTexture();
+                GL.TexImage2D(All.Texture2D, 0, (int)All.Rgba, width, height, 0, All.Rgba, All.UnsignedByte, data);
+            }
+        }
 #endif
 	}
 }
