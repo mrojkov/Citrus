@@ -133,14 +133,8 @@ namespace Lime
 		// This method is invoked when the application has loaded its UI and is ready to run
 		public override bool FinishedLaunching(UIApplication app, NSDictionary options)
 		{
-            bool allowSleepMode = false;
-            var obj = NSBundle.MainBundle.ObjectForInfoDictionary("AllowSleepMode");
-            if (obj != null && obj.ToString() == "1") {
-                allowSleepMode = true;
-            }
-
 			UIApplication.SharedApplication.StatusBarHidden = true;
-            UIApplication.SharedApplication.IdleTimerDisabled = !allowSleepMode;
+            UIApplication.SharedApplication.IdleTimerDisabled = !IsAllowedGoingToSleepMode();
 		
 			LaunchOptions = options;
 
@@ -163,6 +157,12 @@ namespace Lime
 
 			GameView.Instance.Run();
 			return true;
+		}
+
+		private bool IsAllowedGoingToSleepMode()
+		{
+			var obj = NSBundle.MainBundle.ObjectForInfoDictionary("AllowSleepMode");
+			return (obj != null && obj.ToString() == "1");
 		}
 	}
 }
