@@ -112,5 +112,14 @@ namespace Lime
 
 			public override bool Evaluate() { return Preducate(TotalTime); }
 		}
+
+		public static IEnumerator<object> ExecuteAsync(Action action)
+		{
+			var t = new System.Threading.Tasks.Task(action);
+			t.Start();
+			while (!t.IsCompleted && !t.IsCanceled && !t.IsFaulted) {
+				yield return 0;
+			}
+		}
 	}
 }
