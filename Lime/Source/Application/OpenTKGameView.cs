@@ -39,7 +39,7 @@ namespace Lime
 
 		public GameView(Application app)
 			: base(800, 600, GraphicsMode.Default, 
-			"Citrus", GameWindowFlags.Default, DisplayDevice.Default,
+			app.Title, GameWindowFlags.Default, DisplayDevice.Default,
 			2, 0, GetGraphicContextFlags())
 		{
 			Instance = this;

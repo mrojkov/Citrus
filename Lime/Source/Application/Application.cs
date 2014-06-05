@@ -61,6 +61,7 @@ namespace Lime
 		private static readonly object scheduledActionsSync = new object();
 		private static Action scheduledActions;
 		public readonly StartupOptions Options;
+		public string Title = "Citrus";
 
 		public Application(StartupOptions options = null)
 		{
