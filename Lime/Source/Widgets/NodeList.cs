@@ -9,20 +9,7 @@ namespace Lime
 	[ProtoContract]
 	public class NodeList : IList<Node>
 	{
-		struct EmptyEnumerator : IEnumerator<Node>
-		{
-			object IEnumerator.Current { get { return null; } }
-
-			public bool MoveNext() { return false; }
-
-			public void Reset() { }
-
-			public Node Current { get { return null; } }
-
-			public void Dispose() { }
-		}
-
-		struct Enumerator : IEnumerator<Node>
+		public struct Enumerator : IEnumerator<Node>
 		{
 			private Node first;
 			private Node current;
@@ -96,22 +83,19 @@ namespace Lime
 
 		public int Count { get { return list != null ? list.Count : 0; } }
 
-		public IEnumerator<Node> GetEnumerator()
+		public Enumerator GetEnumerator()
 		{
-			if (Count == 0) {
-				return new EmptyEnumerator();
-			} else {
-				return new Enumerator(list[0]);
-			}
+			return new Enumerator(FirstOrNull());
+		}
+
+		IEnumerator<Node> IEnumerable<Node>.GetEnumerator()
+		{
+			return new Enumerator(FirstOrNull());
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			if (Count == 0) {
-				return new EmptyEnumerator();
-			} else {
-				return new Enumerator(list[0]);
-			}
+			return new Enumerator(FirstOrNull());
 		}
 
 		bool ICollection<Node>.IsReadOnly {
