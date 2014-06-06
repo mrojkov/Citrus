@@ -23,6 +23,9 @@ namespace Lime
 
 		public int SetCurrentLayer(int layer)
 		{
+			if (layer == 0) {
+				return currentLayer;
+			}
 			if (layer > maxUsedLayer) {
 				maxUsedLayer = layer;
 			}
