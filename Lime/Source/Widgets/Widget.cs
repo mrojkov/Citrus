@@ -109,7 +109,9 @@ namespace Lime
 			{
 				var sizeDelta = value - size;
 				size = value;
-				LayoutChildren(sizeDelta);
+				if (sizeDelta.X != 0 || sizeDelta.Y != 0) {
+					LayoutChildren(sizeDelta);
+				}
 			}
 		}
 
