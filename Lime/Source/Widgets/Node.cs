@@ -347,11 +347,11 @@ namespace Lime
 		protected void LayoutChildren(Vector2 sizeDelta)
 		{
 			for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
-				node.Layout(sizeDelta);
+				node.OnParentSizeChanged(sizeDelta);
 			}
 		}
 
-		protected virtual void Layout(Vector2 parentSizeDelta) { }
+		protected virtual void OnParentSizeChanged(Vector2 parentSizeDelta) { }
 
 		[ThreadStatic]
 		private static Queue<Node> nodeSearchQueue;

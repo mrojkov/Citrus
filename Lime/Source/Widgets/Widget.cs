@@ -107,13 +107,16 @@ namespace Lime
 			get { return size; }
 			set
 			{
-				var sizeDelta = value - size;
-				size = value;
-				if (sizeDelta.X != 0 || sizeDelta.Y != 0) {
+				if (value.X != size.X || value.Y != size.Y) {
+					var sizeDelta = value - size;
+					size = value;
+					OnSizeChanged(sizeDelta);
 					LayoutChildren(sizeDelta);
 				}
 			}
 		}
+
+		protected virtual void OnSizeChanged(Vector2 sizeDelta) { }
 
 		public float Width { 
 			get { return size.X; } 
@@ -382,7 +385,7 @@ namespace Lime
 			}
 		}
 
-		protected override void Layout(Vector2 parentSizeDelta)
+		protected override void OnParentSizeChanged(Vector2 parentSizeDelta)
 		{
 			if (Anchors == Anchors.None || ParentWidget == null) {
 				return;

@@ -72,7 +72,6 @@ namespace Lime
 		private HAlignment hAlignment;
 		private VAlignment vAlignment;
 		private Renderer.SpriteList spriteList;
-		private Vector2 prevSize;
 
 		[ProtoMember(1)]
 		public override string Text
@@ -97,12 +96,13 @@ namespace Lime
 
 		public string ErrorMessage { get; private set; }
 
+		protected override void OnSizeChanged(Vector2 sizeDelta)
+		{
+			DisposeSpriteList();
+		}
+
 		public override void Render()
 		{
-			if (prevSize != Size) {
-				DisposeSpriteList();
-				prevSize = Size;
-			}
 			if (spriteList == null) {
 				var renderer = PrepareRenderer();
 				spriteList = new Renderer.SpriteList();

@@ -28,8 +28,6 @@ namespace Lime
 		public float Time;
 		public float Delta;
 
-		public TaskList() {}
-
 		public void Stop()
 		{
 			foreach (var i in ToArray()) {
@@ -68,11 +66,13 @@ namespace Lime
 			try {
 				Time += delta;
 				Delta = delta;
-				foreach (var i in ToArray()) {
-					if (i.Completed) {
-						Remove(i);
+				for (int i = 0; i < Count; ) {
+					var task = this[i];
+					if (task.Completed) {
+						Remove(task);
 					} else {
-						i.Advance(delta);
+						task.Advance(delta);
+						i++;
 					}
 				}
 			} finally {

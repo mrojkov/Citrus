@@ -48,7 +48,6 @@ namespace Lime
 		private float spacing;
 		private HAlignment hAlignment;
 		private VAlignment vAlignment;
-		private Vector2 prevSize;
 
 		[ProtoMember(1)]
 		public SerializableFont Font {
@@ -101,12 +100,13 @@ namespace Lime
 			return Renderer.MeasureTextLine(Font.Instance, Text, FontHeight);
 		}
 
+		protected override void OnSizeChanged(Vector2 sizeDelta)
+		{
+			DisposeSpriteList();
+		}
+
 		public override void Render()
 		{
-			if (prevSize != Size) {
-				DisposeSpriteList();
-				prevSize = Size;
-			}
 			if (spriteList == null) {
 				if (OverflowMode == TextOverflowMode.Minify) {
 					FitTextInsideWidgetArea();
