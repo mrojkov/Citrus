@@ -53,7 +53,7 @@ namespace Orange
 					if (response.StatusCode == HttpStatusCode.OK) {
 						Console.WriteLine("Build uploaded to TestFlight");
 					} else {
-						Console.WriteLine("Build not uploaded, testflight returned error");
+						Console.WriteLine("Build was not uploaded. HTTP error: {0}", response.StatusCode);
 					}
 					Console.WriteLine(response.Content);
 				}
