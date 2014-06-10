@@ -136,8 +136,6 @@ namespace Lime
 			}
 			var spacingKoeff = Spacing / FontHeight;
 			while (maxH - minH > 1) {
-				FontHeight = (minH + maxH) / 2;
-				Spacing = FontHeight * spacingKoeff;
 				var extent = MeasureText();
 				var fit = (extent.X < Width && extent.Y < Height);
 				if (fit) {
@@ -145,6 +143,8 @@ namespace Lime
 				} else {
 					maxH = FontHeight;
 				}
+				FontHeight = (minH + maxH) / 2;
+				Spacing = FontHeight * spacingKoeff;
 			}
 		}
 
