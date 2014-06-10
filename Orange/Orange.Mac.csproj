@@ -117,10 +117,10 @@
     <Compile Include="Source\Toolbox\Toolbox.cs" />
     <Compile Include="Source\Actions\UpdateXCodeProject.cs" />
     <Compile Include="Source\AssetCooker\OpacityMaskCreator.cs" />
-    <Compile Include="Source\PuginAttributes\PluginAssetsCookedAttribute.cs" />
-    <Compile Include="Source\PuginAttributes\PluginCommandLineArgumentsAttribute.cs" />
-    <Compile Include="Source\PuginAttributes\PluginFinalizationAttribute.cs" />
-    <Compile Include="Source\PuginAttributes\PluginInitializationAttribute.cs" />
+    <Compile Include="Source\PluginAttributes\PluginAssetsCookedAttribute.cs" />
+    <Compile Include="Source\PluginAttributes\PluginCommandLineArgumentsAttribute.cs" />
+    <Compile Include="Source\PluginAttributes\PluginFinalizationAttribute.cs" />
+    <Compile Include="Source\PluginAttributes\PluginInitializationAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lime\Lime.Mac.csproj">
