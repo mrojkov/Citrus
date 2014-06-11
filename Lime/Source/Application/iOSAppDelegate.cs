@@ -76,11 +76,6 @@ namespace Lime
 			Logger.Write("========================= CRASH REPORT ============================\n" + e.ExceptionObject.ToString());
 		}
 
-		public override bool HandleOpenURL (UIApplication application, NSUrl url)
-		{
-			return InvokeUrlOpenedDelegate(url);
-		}
-		
 		public override bool OpenUrl (UIApplication application, NSUrl url, string sourceApplication, NSObject annotation)
 		{
 			return InvokeUrlOpenedDelegate(url);
