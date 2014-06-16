@@ -62,17 +62,32 @@ namespace Lime
 			return currentKeysState[(int)key] && !previousKeysState[(int)key];
 		}
 
-		public static bool WasMousePressed(int button = 0)
+		public static bool WasMousePressed()
+		{
+			return WasKeyPressed(GetMouseButtonByIndex(0));
+		}
+
+		public static bool WasMouseReleased()
+		{
+			return WasKeyReleased(GetMouseButtonByIndex(0));
+		}
+
+		public static bool IsMousePressed()
+		{
+			return IsKeyPressed(GetMouseButtonByIndex(0));
+		}
+
+		public static bool WasMousePressed(int button)
 		{
 			return WasKeyPressed(GetMouseButtonByIndex(button));
 		}
 
-		public static bool WasMouseReleased(int button = 0)
+		public static bool WasMouseReleased(int button)
 		{
 			return WasKeyReleased(GetMouseButtonByIndex(button));
 		}
 
-		public static bool IsMousePressed(int button = 0)
+		public static bool IsMousePressed(int button)
 		{
 			return IsKeyPressed(GetMouseButtonByIndex(button));
 		}
