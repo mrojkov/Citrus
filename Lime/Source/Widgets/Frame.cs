@@ -31,6 +31,8 @@ namespace Lime
 		ScissorTest,
 		[ProtoEnum]
 		StencilBuffer,
+		[ProtoEnum]
+		NoRender,
 	}
 
 	[ProtoContract]
@@ -141,7 +143,7 @@ namespace Lime
 
 		public override void AddToRenderChain(RenderChain chain)
 		{
-			if (!GloballyVisible) {
+			if (!GloballyVisible || ClipChildren == ClipMethod.NoRender) {
 				return;
 			}
 			if (renderTexture != null || ClipChildren == ClipMethod.ScissorTest) {

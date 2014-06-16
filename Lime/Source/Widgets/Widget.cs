@@ -659,7 +659,7 @@ namespace Lime
 
 		protected virtual Widget GetEffectiveClipperWidget()
 		{
-			if (Parent != null && Parent.AsWidget != null) {
+			if (Parent != null) {
 				return Parent.AsWidget.GetEffectiveClipperWidget();
 			}
 			return null;
