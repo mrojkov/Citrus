@@ -65,6 +65,10 @@ namespace Lime
 		private Vector2 direction;
 		private Color4 color;
 		private Action clicked;
+		private Blending blending;
+		private Vector2 pivot;
+		private Vector2 scale;
+		private bool visible;
 
 		#region Properties
 
@@ -96,9 +100,38 @@ namespace Lime
 
 		[ProtoMember(1)]
 		[TangerineProperty(4)]
-		public Vector2 Position { get { return position; } set { position = value; } }
-		public float X { get { return position.X; } set { position.X = value; } }
-		public float Y { get { return position.Y; } set { position.Y = value; } }
+		public Vector2 Position
+		{
+			get { return position; }
+			set
+			{
+				if (position.X != value.X || position.Y != value.Y) {
+					position = value;
+					if (GlobalValuesValid) InvalidateGlobalValues();
+				}
+			}
+		}
+		public float X 
+		{ 
+			get { return position.X; } 
+			set {
+				if (position.X != value) {
+					position.X = value;
+					if (GlobalValuesValid) InvalidateGlobalValues();
+				}
+			} 
+		}
+		public float Y
+		{
+			get { return position.Y; }
+			set
+			{
+				if (position.Y != value) {
+					position.Y = value;
+					if (GlobalValuesValid) InvalidateGlobalValues();
+				}
+			}
+		}
 
 		[ProtoMember(2)]
 		[TangerineProperty(7)]
@@ -112,6 +145,7 @@ namespace Lime
 					size = value;
 					OnSizeChanged(sizeDelta);
 					LayoutChildren(sizeDelta);
+					if (GlobalValuesValid) InvalidateGlobalValues();
 				}
 			}
 		}
@@ -130,29 +164,70 @@ namespace Lime
 
 		[ProtoMember(3)]
 		[TangerineProperty(6)]
-		public Vector2 Pivot { get; set; }
+		public Vector2 Pivot 
+		{ 
+			get { return pivot; } 
+			set 
+			{
+				if (pivot.X != value.X || pivot.Y != value.Y) {
+					pivot = value;
+					if (GlobalValuesValid) InvalidateGlobalValues();
+				}
+			} 
+		}
 
 		[ProtoMember(4)]
 		[TangerineProperty(5)]
-		public Vector2 Scale { get; set; }
+		public Vector2 Scale 
+		{ 
+			get { return scale; } 
+			set 
+			{
+				if (scale.X != value.X || scale.Y != value.Y) {
+					scale = value;
+					if (GlobalValuesValid) InvalidateGlobalValues();
+				}
+			} 
+		}
 
 		[ProtoMember(5)]
 		[TangerineProperty(3)]
 		public float Rotation { 
 			get { return rotation; }
-			set {
-				rotation = value;
-				direction = Mathf.CosSin(Mathf.DegreesToRadians * value);
+			set 
+			{
+				if (rotation != value) {
+					rotation = value;
+					direction = Mathf.CosSin(Mathf.DegreesToRadians * value);
+					if (GlobalValuesValid) InvalidateGlobalValues();
+				}
 			}
 		}
 
 		[ProtoMember(6)]
 		[TangerineProperty(8)]
-		public Color4 Color { get { return color; } set { color = value; } }
+		public Color4 Color 
+		{ 
+			get { return color; } 
+			set {
+				if (color.ABGR != value.ABGR) {
+					color = value;
+					if (GlobalValuesValid) InvalidateGlobalValues();
+				}
+			} 
+		}
 
-		public float Opacity { 
+		public float Opacity
+		{
 			get { return (float)color.A * (1 / 255f); }
-			set { color.A = (byte)(value * 255f); }
+			set 
+			{
+				var a = (byte)(value * 255f);
+				if (color.A != a) {
+					color.A = a;
+					if (GlobalValuesValid) InvalidateGlobalValues();
+				}
+			}
 		}
 
 		[ProtoMember(7)]
@@ -160,11 +235,31 @@ namespace Lime
 
 		[ProtoMember(8)]
 		[TangerineProperty(9)]
-		public Blending Blending { get; set; }
+		public Blending Blending 
+		{ 
+			get { return blending; } 
+			set 
+			{
+				if (blending != value) {
+					blending = value;
+					if (GlobalValuesValid) InvalidateGlobalValues();
+				}
+			} 
+		}
 
 		[ProtoMember(9)]
 		[TangerineProperty(2)]
-		public bool Visible { get; set; }
+		public bool Visible 
+		{ 
+			get { return visible; } 
+			set 
+			{
+				if (visible != value) {
+					visible = value;
+					if (GlobalValuesValid) InvalidateGlobalValues();
+				}
+			}
+		}
 
 		[ProtoMember(10)]
 		public SkinningWeights SkinningWeights { get; set; }
@@ -178,13 +273,33 @@ namespace Lime
 		[ProtoMember(13)]
 		public BoneArray BoneArray;
 
-		protected Matrix32 localToWorldTransform;
-		public Matrix32 LocalToWorldTransform { get { return localToWorldTransform; } }
-		public Color4 GlobalColor { get; protected set; }
-		public Blending GlobalBlending { get; protected set; }
-		public bool GloballyVisible { get; protected set; }
-		public Vector2 GlobalPosition { get { return localToWorldTransform * Vector2.Zero; } }
-		public Vector2 GlobalCenter { get { return localToWorldTransform * (Size / 2); } }
+		private Matrix32 localToWorldTransform;
+		private Color4 globalColor;
+		private Blending globalBlending;
+		private bool globallyVisible;
+
+		public Matrix32 LocalToWorldTransform
+		{
+			get { if (!GlobalValuesValid) RecalcGlobalValues(); return localToWorldTransform; }
+		}
+
+		public Color4 GlobalColor 
+		{
+			get { if (!GlobalValuesValid) RecalcGlobalValues(); return globalColor; }
+		}
+		
+		public Blending GlobalBlending
+		{
+			get { if (!GlobalValuesValid) RecalcGlobalValues(); return globalBlending; }
+		}
+
+		public bool GloballyVisible 
+		{
+			get { if (!GlobalValuesValid) RecalcGlobalValues(); return globallyVisible; }
+		}
+		
+		public Vector2 GlobalPosition { get { return LocalToWorldTransform * Vector2.Zero; } }
+		public Vector2 GlobalCenter { get { return LocalToWorldTransform * (Size / 2); } }
 
 		private TaskList tasks;
 		public TaskList Tasks
@@ -270,7 +385,6 @@ namespace Lime
 			if (Updating != null) {
 				Updating(delta);
 			}
-			RecalcGlobalMatrixAndColorHelper();
 			if (GloballyVisible) {
 				if (IsRunning) {
 					AdvanceAnimation(delta);
@@ -298,21 +412,13 @@ namespace Lime
 			}
 		}
 
-		public void RecalcGlobalMatrixAndColor()
-		{
-			if (Parent != null) {
-				Parent.AsWidget.RecalcGlobalMatrixAndColor();
-			}
-			RecalcGlobalMatrixAndColorHelper();
-		}
-
-		private void RecalcGlobalMatrixAndColorHelper()
+		protected override void RecalcGlobalValuesUsingParentsOnes()
 		{
 			if (IsRenderedToTexture()) {
 				localToWorldTransform = Matrix32.Identity;
-				GlobalColor = color;
-				GlobalBlending = Lime.Blending.Default;
-				GloballyVisible = Visible && color.A != 0;
+				globalColor = color;
+				globalBlending = Lime.Blending.Default;
+				globallyVisible = Visible && color.A != 0;
 				return;
 			}
 			if (Parent != null) {
@@ -320,23 +426,22 @@ namespace Lime
 				if (parentWidget != null) {
 					var localToParent = CalcLocalToParentTransform();
 					Matrix32.Multiply(ref localToParent, ref parentWidget.localToWorldTransform, out localToWorldTransform);
-					GlobalColor = Color * parentWidget.GlobalColor;
-					GlobalBlending = Blending == Blending.Default ? parentWidget.GlobalBlending : Blending;
-					GloballyVisible = (Visible && color.A != 0) && parentWidget.GloballyVisible;
+					globalColor = Color * parentWidget.GlobalColor;
+					globalBlending = Blending == Blending.Default ? parentWidget.GlobalBlending : Blending;
+					globallyVisible = (Visible && color.A != 0) && parentWidget.GloballyVisible;
 					return;
 				}
 			}
 			localToWorldTransform = CalcLocalToParentTransform();
-			GlobalColor = color;
-			GlobalBlending = Blending;
-			GloballyVisible = Visible && color.A != 0;
+			globalColor = color;
+			globalBlending = Blending;
+			globallyVisible = Visible && color.A != 0;
 		}
 
 		public Matrix32 CalcLocalToParentTransform()
 		{
 			Matrix32 matrix;
-			Vector2 center = new Vector2 { X = Size.X * Pivot.X, Y = Size.Y * Pivot.Y };
-			Vector2 scale = Scale;
+			var center = new Vector2 { X = Size.X * Pivot.X, Y = Size.Y * Pivot.Y };
 			if (rotation == 0 && SkinningWeights == null) {
 				matrix.U.X = scale.X;
 				matrix.U.Y = 0;

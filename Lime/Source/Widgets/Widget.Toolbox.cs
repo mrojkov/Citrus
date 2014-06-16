@@ -42,8 +42,6 @@ namespace Lime
 				new Vector2(0, 0), new Vector2(1, 0),
 				new Vector2(1, 1), new Vector2(0, 1)
 			};
-			a.RecalcGlobalMatrixAndColor();
-			b.RecalcGlobalMatrixAndColor();
 			var sizes = new Vector2[2] { a.Size, b.Size };
 			var matrices = new Matrix32[2] { a.LocalToWorldTransform, b.LocalToWorldTransform };
 			var det = new float[2] { matrices[0].CalcDeterminant(), matrices[1].CalcDeterminant() };
@@ -76,8 +74,6 @@ namespace Lime
 
 		public Matrix32 CalcTransitionToSpaceOf(Widget container)
 		{
-			RecalcGlobalMatrixAndColor();
-			container.RecalcGlobalMatrixAndColor();
 			Matrix32 mtx1 = container.LocalToWorldTransform.CalcInversed();
 			Matrix32 mtx2 = LocalToWorldTransform;
 			return mtx2 * mtx1;
@@ -140,7 +136,6 @@ namespace Lime
 		public virtual IEnumerable<string> GetVisibilityIssues()
 		{
 			var world = World.Instance;
-			RecalcGlobalMatrixAndColor();
 			if (!ChildOf(world) && (this != world)) {
 				yield return "The widget is not included to the world hierarchy";
 			}

@@ -28,6 +28,8 @@ namespace Lime
 	
 		private int animationTime;
 
+		internal protected bool GlobalValuesValid;
+
 		#region properties
 #if WIN
 		public Guid Guid { get; set; }
@@ -100,6 +102,27 @@ namespace Lime
 			Nodes = new NodeList(this);
 		}
 
+		internal protected void InvalidateGlobalValues()
+		{
+			GlobalValuesValid = false;
+			for (var n = Nodes.FirstOrNull(); n != null; n = n.NextSibling) {
+				if (n.GlobalValuesValid) {
+					n.InvalidateGlobalValues();
+				}
+			}
+		}
+
+		protected void RecalcGlobalValues()
+		{
+			if (Parent != null && !Parent.GlobalValuesValid) {
+				Parent.RecalcGlobalValues();
+			}
+			RecalcGlobalValuesUsingParentsOnes();
+			GlobalValuesValid = true;
+		}
+
+		protected virtual void RecalcGlobalValuesUsingParentsOnes() { }
+
 		public Node GetRoot()
 		{
 			Node node = this;
@@ -169,6 +192,7 @@ namespace Lime
 			clone.Parent = null;
 			clone.NextSibling = null;
 			clone.AsWidget = clone as Widget;
+			clone.GlobalValuesValid = false;
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Markers = MarkerCollection.DeepClone(Markers);
 			clone.Nodes = Nodes.DeepCloneFast(clone);

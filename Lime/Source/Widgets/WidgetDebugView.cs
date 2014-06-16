@@ -79,7 +79,6 @@ namespace Lime
 		{
 			get
 			{
-				widget.RecalcGlobalMatrixAndColor();
 				var b = widget.CalcTransformFromMatrix(widget.LocalToWorldTransform);
 				return new WidgetBasis {
 					Position = b.Position,
@@ -93,7 +92,6 @@ namespace Lime
 		{
 			get
 			{
-				widget.RecalcGlobalMatrixAndColor();
 				return new WidgetPainting {
 					Visible = widget.GloballyVisible,
 					Color = widget.GlobalColor,

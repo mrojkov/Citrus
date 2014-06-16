@@ -135,6 +135,9 @@ namespace Lime
 				list[Count - 1].NextSibling = node;
 			}
 			list.Add(node);
+			if (node.GlobalValuesValid) {
+				node.InvalidateGlobalValues();
+			}
 		}
 
 		private void CreateListIfNeeded()
@@ -168,6 +171,9 @@ namespace Lime
 			if (index + 1 < Count) {
 				list[index].NextSibling = list[index + 1];
 			}
+			if (node.GlobalValuesValid) {
+				node.InvalidateGlobalValues();
+			}
 		}
 
 		private void RuntimeChecksBeforeInsertion(Node node)
@@ -198,6 +204,7 @@ namespace Lime
 			foreach (var node in list) {
 				node.Parent = null;
 				node.NextSibling = null;
+				node.InvalidateGlobalValues();
 			}
 			list.Clear();
 		}
@@ -217,8 +224,10 @@ namespace Lime
 			if (list == null) {
 				throw new IndexOutOfRangeException();
 			}
-			list[index].Parent = null;
-			list[index].NextSibling = null;
+			var node = list[index];
+			node.Parent = null;
+			node.NextSibling = null;
+			node.InvalidateGlobalValues();
 			list.RemoveAt(index);
 			if (index > 0) {
 				list[index - 1].NextSibling = index < Count ? list[index] : null;
@@ -239,14 +248,19 @@ namespace Lime
 				RuntimeChecksBeforeInsertion(value);
 				CreateListIfNeeded();
 				value.Parent = owner;
-				list[index].Parent = null;
-				list[index].NextSibling = null;
+				var oldNode = list[index];
+				oldNode.Parent = null;
+				oldNode.NextSibling = null;
+				oldNode.InvalidateGlobalValues();
 				list[index] = value;
 				if (index > 0) {
 					list[index - 1].NextSibling = value;
 				}
 				if (index + 1 < Count) {
 					value.NextSibling = list[index + 1];
+				}
+				if (value.GlobalValuesValid) {
+					value.InvalidateGlobalValues();
 				}
 			}
 		}
