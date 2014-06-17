@@ -94,11 +94,20 @@ namespace Lime
 			set { SetVAlignment(value); } 
 		}
 
-		public string ErrorMessage { get; private set; }
+		private string errorMessage;
+
+		public string ErrorMessage
+		{ 
+			get 
+			{
+				ParseText();
+				return errorMessage;
+			}
+		}
 
 		protected override void OnSizeChanged(Vector2 sizeDelta)
 		{
-			DisposeSpriteList();
+			Invalidate();
 		}
 
 		public override void Render()
@@ -121,6 +130,7 @@ namespace Lime
 
 		private TextRenderer PrepareRenderer()
 		{
+			ParseText();
 			var renderer = new TextRenderer();
 			// Setup default style(take first one from node list or TextStyle.Default).
 			TextStyle defaultStyle = null;
@@ -147,7 +157,7 @@ namespace Lime
 				return;
 			}
 			hAlignment = value;
-			DisposeSpriteList();
+			Invalidate();
 		}
 
 		private void SetVAlignment(Lime.VAlignment value)
@@ -156,7 +166,7 @@ namespace Lime
 				return;
 			}
 			vAlignment = value;
-			DisposeSpriteList();
+			Invalidate();
 		}
 
 		private void SetText(string value)
@@ -164,27 +174,30 @@ namespace Lime
 			if (value == text) {
 				return;
 			}
-			DisposeSpriteList();
+			Invalidate();
 			text = value;
-			var localizedText = Localization.GetString(text);
-			parser = new TextParser(localizedText);
-			ErrorMessage = parser.ErrorMessage;
-			if (ErrorMessage != null) {
-				parser = new TextParser("Error: " + ErrorMessage);
-			}
 		}
 
-		private void DisposeSpriteList()
+		private void ParseText()
 		{
-			if (spriteList != null) {
-				spriteList.Dispose();
-				spriteList = null;
+			if (parser != null) {
+				return;
+			}
+			var localizedText = Localization.GetString(text);
+			parser = new TextParser(localizedText);
+			errorMessage = parser.ErrorMessage;
+			if (errorMessage != null) {
+				parser = new TextParser("Error: " + errorMessage);
 			}
 		}
 
 		public void Invalidate()
 		{
-			DisposeSpriteList();
+			if (spriteList != null) {
+				spriteList.Dispose();
+				spriteList = null;
+			}
+			parser = null;
 		}
 	}
 
