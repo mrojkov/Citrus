@@ -298,7 +298,7 @@ namespace Lime
 			get { if (!GlobalValuesValid) RecalcGlobalValues(); return globallyVisible; }
 		}
 		
-		public Vector2 GlobalPosition { get { return LocalToWorldTransform * Vector2.Zero; } }
+		public Vector2 GlobalPosition { get { return LocalToWorldTransform.T; } }
 		public Vector2 GlobalCenter { get { return LocalToWorldTransform * (Size / 2); } }
 
 		private TaskList tasks;
