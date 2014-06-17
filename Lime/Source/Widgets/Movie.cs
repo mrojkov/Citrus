@@ -100,7 +100,7 @@ namespace Lime
 			if (!GloballyVisible || skipRender || !InsideClipRect(point)) {
 				return false;
 			}
-			return base.HitTest(point);
+			return base.SelfHitTest(point);
 		}
 
 		protected internal override void OnTrigger(string property)
