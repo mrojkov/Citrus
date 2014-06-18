@@ -239,7 +239,9 @@ namespace Lime
 			if (PremultipliedAlphaMode) {
 				color = Color4.PremulAlpha(color);
 			}
-			texture.TransformUVCoordinatesToAtlasSpace(ref uv0, ref uv1);
+            if (texture != null) {
+                texture.TransformUVCoordinatesToAtlasSpace(ref uv0, ref uv1);
+            }
 			int i = currentVertex;
 			int j = currentIndex;
 			var matrix = Transform2.IsIdentity() ? Transform1 : Transform1 * Transform2;
