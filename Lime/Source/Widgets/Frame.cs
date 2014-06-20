@@ -103,8 +103,14 @@ namespace Lime
 		{
 			var savedScissorTest = Renderer.ScissorTestEnabled;
 			var savedScissorRect = Renderer.ScissorRectangle;
+			var rect = CalculateScissorRectangle(ClipByWidget ?? this);
+			if (savedScissorTest) {
+				if (!IntersectRectangles(rect, savedScissorRect, out rect)) {
+					return;
+				}
+			}
 			Renderer.ScissorTestEnabled = true;
-			Renderer.ScissorRectangle = CalculateScissorRectangle(ClipByWidget ?? this);
+			Renderer.ScissorRectangle = rect;
 			try {
 				var chain = new RenderChain();
 				foreach (var node in Nodes) {
@@ -115,6 +121,12 @@ namespace Lime
 				Renderer.ScissorTestEnabled = savedScissorTest;
 				Renderer.ScissorRectangle = savedScissorRect;
 			}
+		}
+
+		private bool IntersectRectangles(WindowRect a, WindowRect b, out WindowRect r)
+		{
+			r = (WindowRect)IntRectangle.Intersect((IntRectangle)a, (IntRectangle)b);
+			return r.Width > 0 && r.Height > 0;
 		}
 
 		private WindowRect CalculateScissorRectangle(Widget widget)
