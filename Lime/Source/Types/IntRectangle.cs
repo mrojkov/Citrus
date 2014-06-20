@@ -12,6 +12,8 @@ namespace Lime
 
 		[ProtoMember(2)]
 		public IntVector2 B;
+
+		public static readonly IntRectangle Empty = new IntRectangle();
 		
 		public IntRectangle(int left, int top, int right, int bottom)
 		{
@@ -30,6 +32,11 @@ namespace Lime
 		public static explicit operator Rectangle(IntRectangle r)
 		{
 			return new Rectangle(r.Left, r.Top, r.Right, r.Bottom);
+		}
+
+		public static explicit operator WindowRect(IntRectangle r)
+		{
+			return new WindowRect { X = r.Left, Y = r.Top, Width = r.Width, Height = r.Height };
 		}
 
 		public Lime.IntRectangle Normalize()
@@ -100,6 +107,19 @@ namespace Lime
 		public override string ToString()
 		{
 			return String.Format("{0}, {1}, {2}, {3}", A.X, A.Y, B.X, B.Y);
+		}
+
+		public static IntRectangle Intersect(IntRectangle a, IntRectangle b)
+		{
+			int x0 = Math.Max(a.A.X, b.A.X);
+			int x1 = Math.Min(a.B.X, b.B.X);
+			int y0 = Math.Max(a.A.Y, b.A.Y);
+			int y1 = Math.Min(a.B.Y, b.B.Y);
+			if (x1 >= x0 && y1 >= y0) {
+				return new IntRectangle(x0, y0, x1, y1);
+			} else {
+				return Empty;
+			}
 		}
 	}
 }

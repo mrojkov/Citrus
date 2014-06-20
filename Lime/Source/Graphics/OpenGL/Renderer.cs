@@ -22,6 +22,11 @@ namespace Lime
 		public int Y;
 		public int Width;
 		public int Height;
+
+		public static explicit operator IntRectangle(WindowRect r)
+		{
+			return new IntRectangle(r.X, r.Y, r.X + r.Width, r.Y + r.Height);
+		}
 	}
 
 	public unsafe static partial class Renderer

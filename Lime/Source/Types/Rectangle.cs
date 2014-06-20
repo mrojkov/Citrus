@@ -12,6 +12,8 @@ namespace Lime
 
 		[ProtoMember(2)]
 		public Vector2 B;
+
+		public static readonly Rectangle Empty = new Rectangle();
 		
 		public Rectangle(float left, float top, float right, float bottom)
 		{
@@ -88,6 +90,19 @@ namespace Lime
 
 		public Vector2 Size { 
 			get { return B - A; }
+		}
+
+		public static Rectangle Intersect(Rectangle a, Rectangle b)
+		{
+			float x0 = Math.Max(a.A.X, b.A.X);
+			float x1 = Math.Min(a.B.X, b.B.X);
+			float y0 = Math.Max(a.A.Y, b.A.Y);
+			float y1 = Math.Min(a.B.Y, b.B.Y);
+			if (x1 >= x0 && y1 >= y0) {
+				return new Rectangle(x0, y0, x1, y1);
+			} else {
+				return Empty;
+			}
 		}
 				
 		public override string ToString()
