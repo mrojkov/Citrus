@@ -203,7 +203,9 @@ namespace Lime
 		/// Call on user-supplied parts of text.
 		public static string Escape(string text)
 		{
-			return text.Replace("<", "&lt;").Replace(">", "&gt;");
+			return text.
+				Replace("&amp;", "&amp;amp;").Replace("&lt;", "&amp;lt;").Replace("&gt;", "&amp;&gt").
+				Replace("<", "&lt;").Replace(">", "&gt;");
 		}
 	}
 
@@ -334,6 +336,7 @@ namespace Lime
 		{
 			text = text.Replace("&lt;", "<");
 			text = text.Replace("&gt;", ">");
+			text = text.Replace("&amp;", "&");
 			return text;
 		}
 
