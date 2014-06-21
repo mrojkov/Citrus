@@ -199,6 +199,12 @@ namespace Lime
 			}
 			parser = null;
 		}
+
+		/// Call on user-supplied parts of text.
+		public static string Escape(string text)
+		{
+			return text.Replace("<", "&lt;").Replace(">", "&gt;");
+		}
 	}
 
 	class TextParser
