@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.0</ProductVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{DC16EEBF-404D-4610-B87A-15B57464D707}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -76,6 +76,13 @@
     <Compile Include="Source\Widgets\TaskList.cs" />
     <Compile Include="Source\Widgets\WidgetDebugView.cs" />
     <Compile Include="Source\Widgets\WidgetInput.cs" />
+    <Compile Include="Source\Application\CommandLineArgs.cs" />
+    <Compile Include="Source\Application\ExternalStorageLagsSimulator.cs" />
+    <Compile Include="Source\Application\FPSCalculator.cs" />
+    <Compile Include="Source\Widgets\WebBrowser.Win.cs" />
+    <Compile Include="Source\Widgets\WebBrowser.iOS.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="obj\Release\.NETFramework,Version=v4.0.AssemblyAttribute.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
