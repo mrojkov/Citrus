@@ -88,6 +88,9 @@ namespace Lime
 		[ProtoMember(8)]
 		public TextOverflowMode OverflowMode { get; set; }
 
+		[ProtoMember(9)]
+		public bool IsDivisionOfWordAllowed { get; set; }
+
 		public SimpleText()
 		{
 			Text = "";
@@ -217,7 +220,7 @@ namespace Lime
 				}
 				// Trying to split long lines. If a line can't be split it gets clipped.
 				while (MeasureTextLine(strings[i]).X > Width) {
-					if (!CarryLastWordToNextLine(strings, i)) {
+					if (!CarryLastWordToNextLine(strings, i) && !CarryPartOfLastWordToNextLine(strings, i)) {
 						if (OverflowMode == TextOverflowMode.Ellipsis) {
 							strings[i] = ClipLineWithEllipsis(strings[i]);
 						}
@@ -249,6 +252,28 @@ namespace Lime
 				return false;
 			}
 			return true;
+		}
+
+		private bool CarryPartOfLastWordToNextLine(List<string> strings, int line)
+		{
+			bool isCarried = false;
+			if (IsDivisionOfWordAllowed) {
+				bool isFirstCarriedSymbol = true;
+				while (strings[line].Length > 1 && MeasureTextLine(strings[line]).X > Width) {
+					var lastSymbol = strings[line].Substring(strings[line].Length - 1);
+					if (line + 1 >= strings.Count) {
+						strings.Add("");
+					}
+					if (isFirstCarriedSymbol && strings[line + 1] != "") {
+						isFirstCarriedSymbol = false;
+						strings[line + 1] = ' ' + strings[line + 1];
+					}
+					strings[line + 1] = lastSymbol + strings[line + 1];
+					strings[line] = strings[line].Substring(0, strings[line].Length - 1);
+					isCarried = true;
+				}
+			}
+			return isCarried;
 		}
 
 		private string ClipLineWithEllipsis(string line)
