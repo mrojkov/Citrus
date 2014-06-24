@@ -220,11 +220,13 @@ namespace Lime
 				}
 				// Trying to split long lines. If a line can't be split it gets clipped.
 				while (MeasureTextLine(strings[i]).X > Width) {
-					if (!CarryLastWordToNextLine(strings, i) && !CarryPartOfLastWordToNextLine(strings, i)) {
-						if (OverflowMode == TextOverflowMode.Ellipsis) {
-							strings[i] = ClipLineWithEllipsis(strings[i]);
+					if (!CarryLastWordToNextLine(strings, i)) {
+						if (!IsDivisionOfWordAllowed || !CarryPartOfLastWordToNextLine(strings, i)) {
+							if (OverflowMode == TextOverflowMode.Ellipsis) {
+								strings[i] = ClipLineWithEllipsis(strings[i]);
+							}
+							break;
 						}
-						break;
 					}
 				}
 			}
@@ -256,22 +258,25 @@ namespace Lime
 
 		private bool CarryPartOfLastWordToNextLine(List<string> strings, int line)
 		{
-			bool isCarried = false;
-			if (IsDivisionOfWordAllowed) {
-				bool isFirstCarriedSymbol = true;
-				while (strings[line].Length > 1 && MeasureTextLine(strings[line]).X > Width) {
-					var lastSymbol = strings[line].Substring(strings[line].Length - 1);
-					if (line + 1 >= strings.Count) {
-						strings.Add("");
-					}
-					if (isFirstCarriedSymbol && strings[line + 1] != "") {
-						isFirstCarriedSymbol = false;
-						strings[line + 1] = ' ' + strings[line + 1];
-					}
-					strings[line + 1] = lastSymbol + strings[line + 1];
-					strings[line] = strings[line].Substring(0, strings[line].Length - 1);
+			var textLine = strings[line];
+			var symbolsToCarry = 0;
+			var isCarried = false;
+			while (symbolsToCarry < textLine.Length) {
+				if (Renderer.MeasureTextLine(Font.Instance, textLine, fontHeight, 0, textLine.Length - symbolsToCarry).X <= Width) {
 					isCarried = true;
+					break;
 				}
+				symbolsToCarry += 1;
+			}
+			if (isCarried) {
+				if (line + 1 >= strings.Count) {
+					strings.Add("");
+				}
+				if (strings[line + 1] != "") {
+					strings[line + 1] = ' ' + strings[line + 1];
+				}
+				strings[line + 1] = textLine.Substring(textLine.Length - symbolsToCarry) + strings[line + 1];
+				strings[line] = strings[line].Substring(0, strings[line].Length - symbolsToCarry);
 			}
 			return isCarried;
 		}
