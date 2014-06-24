@@ -130,6 +130,7 @@ namespace Lime
 			{
 				if (position.X != value.X || position.Y != value.Y) {
 					position = value;
+					DoubleBufferValid = false;
 					if (GlobalValuesValid) InvalidateGlobalValues();
 				}
 			}
@@ -141,6 +142,7 @@ namespace Lime
 			set {
 				if (position.X != value) {
 					position.X = value;
+					DoubleBufferValid = false;
 					if (GlobalValuesValid) InvalidateGlobalValues();
 				}
 			} 
@@ -153,6 +155,7 @@ namespace Lime
 			{
 				if (position.Y != value) {
 					position.Y = value;
+					DoubleBufferValid = false;
 					if (GlobalValuesValid) InvalidateGlobalValues();
 				}
 			}
@@ -170,6 +173,7 @@ namespace Lime
 					size = value;
 					OnSizeChanged(sizeDelta);
 					LayoutChildren(sizeDelta);
+					DoubleBufferValid = false;
 					if (GlobalValuesValid) InvalidateGlobalValues();
 				}
 			}
@@ -203,6 +207,7 @@ namespace Lime
 			{
 				if (pivot.X != value.X || pivot.Y != value.Y) {
 					pivot = value;
+					DoubleBufferValid = false;
 					if (GlobalValuesValid) InvalidateGlobalValues();
 				}
 			} 
@@ -217,6 +222,7 @@ namespace Lime
 			{
 				if (scale.X != value.X || scale.Y != value.Y) {
 					scale = value;
+					DoubleBufferValid = false;
 					if (GlobalValuesValid) InvalidateGlobalValues();
 				}
 			} 
@@ -230,6 +236,7 @@ namespace Lime
 			{
 				if (rotation != value) {
 					rotation = value;
+					DoubleBufferValid = false;
 					direction = Mathf.CosSin(Mathf.DegreesToRadians * value);
 					if (GlobalValuesValid) InvalidateGlobalValues();
 				}
@@ -244,6 +251,7 @@ namespace Lime
 			set {
 				if (color.ABGR != value.ABGR) {
 					color = value;
+					DoubleBufferValid = false;
 					if (GlobalValuesValid) InvalidateGlobalValues();
 				}
 			} 
@@ -257,6 +265,7 @@ namespace Lime
 				var a = (byte)(value * 255f);
 				if (color.A != a) {
 					color.A = a;
+					DoubleBufferValid = false;
 					if (GlobalValuesValid) InvalidateGlobalValues();
 				}
 			}
@@ -274,6 +283,7 @@ namespace Lime
 			{
 				if (blending != value) {
 					blending = value;
+					DoubleBufferValid = false;
 					if (GlobalValuesValid) InvalidateGlobalValues();
 				}
 			} 
@@ -288,6 +298,7 @@ namespace Lime
 			{
 				if (visible != value) {
 					visible = value;
+					DoubleBufferValid = false;
 					if (GlobalValuesValid) InvalidateGlobalValues();
 				}
 			}

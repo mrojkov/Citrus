@@ -36,7 +36,9 @@ namespace Lime
 		{
 			bool r = node.DoubleBufferValid;
 			for (var n = node.Nodes.FirstOrDefault(); n != null; n = n.NextSibling) {
-				r = r && CheckAndRestoreDoubleBufferValidFlag(n);
+				if (!CheckAndRestoreDoubleBufferValidFlag(n)) {
+					r = false;
+				}
 			}
 			node.DoubleBufferValid = true;
 			return r;
