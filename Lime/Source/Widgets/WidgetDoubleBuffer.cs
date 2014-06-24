@@ -10,6 +10,8 @@ namespace Lime
 		private Widget widget;
 		public RenderTexture Texture { get; private set; }
 
+		public bool CheckOnlyWidgetContents = true;
+
 		public WidgetDoubleBuffer(Widget widget)
 		{
 			this.widget = widget;
@@ -23,6 +25,9 @@ namespace Lime
 			}
 			if (Texture == null) {
 				Texture = new RenderTexture(widgetSize.Width, widgetSize.Height, RenderTextureFormat.RGB565);
+			}
+			if (CheckOnlyWidgetContents) {
+				widget.DoubleBufferValid = true;
 			}
 			if (!CheckAndRestoreDoubleBufferValidFlag(widget)) {
 				widget.RenderToTexture(Texture);
