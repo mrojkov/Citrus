@@ -19,6 +19,10 @@ namespace Lime
 		public void RenderToTexture(ITexture texture)
 		{
 			if (Width > 0 && Height > 0) {
+				var scissorTest = Renderer.ScissorTestEnabled;
+				if (scissorTest) {
+					Renderer.ScissorTestEnabled = false;
+				}
 				texture.SetAsRenderTarget();
 				Renderer.ClearRenderTarget(0, 0, 0, 0);
 				var savedViewport = Renderer.Viewport;
@@ -33,6 +37,9 @@ namespace Lime
 				texture.RestoreRenderTarget();
 				Renderer.Viewport = savedViewport;
 				Renderer.PopProjectionMatrix();
+				if (scissorTest) {
+					Renderer.ScissorTestEnabled = true;
+				}
 			}
 		}
 

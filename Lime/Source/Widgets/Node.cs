@@ -89,6 +89,8 @@ namespace Lime
 
 		public float AnimationSpeed;
 
+		public bool DoubleBufferValid;
+
 		public object UserData { get; set; }
 
 		#endregion
@@ -104,6 +106,7 @@ namespace Lime
 
 		internal protected void InvalidateGlobalValues()
 		{
+			DoubleBufferValid = false;
 			GlobalValuesValid = false;
 			for (var n = Nodes.FirstOrNull(); n != null; n = n.NextSibling) {
 				if (n.GlobalValuesValid) {

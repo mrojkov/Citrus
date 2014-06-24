@@ -344,6 +344,7 @@ namespace Lime
 				spriteList.Dispose();
 				spriteList = null;
 			}
+			DoubleBufferValid = false;
 		}
 	}
 }

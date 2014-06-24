@@ -79,16 +79,19 @@ namespace Lime
 		{
 			renderTarget = value;
 			renderTexture = CreateRenderTargetTexture(value);
+			if (GlobalValuesValid) InvalidateGlobalValues();
 		}
 
-		internal override bool IsRenderedToTexture()
+		internal protected override bool IsRenderedToTexture()
 		{
-			return renderTarget != RenderTarget.None;
+			return base.IsRenderedToTexture() || renderTarget != RenderTarget.None;
 		}
 
 		public override void Render()
 		{
-			if (renderTexture != null) {
+			if (DoubleBuffer != null) {
+				base.Render();
+			} else if (renderTexture != null) {
 				RenderToTexture(renderTexture);
 			} else if (ClipChildren == ClipMethod.ScissorTest) {
 				RenderWithScissorTest();

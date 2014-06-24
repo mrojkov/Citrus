@@ -82,11 +82,34 @@ namespace Lime
 
 		public virtual ITexture Texture
 		{
-			get { return null; }
+			get { return doubleBuffer != null ? doubleBuffer.Texture : null; }
 			set { }
 		}
 
-		internal virtual bool IsRenderedToTexture() { return false; }
+		public bool DoubleBuffered
+		{
+			get { return doubleBuffer != null; }
+			set
+			{
+				if (value && doubleBuffer == null) {
+					doubleBuffer = new WidgetDoubleBuffer(this);
+				} else if (!value && doubleBuffer != null) {
+					doubleBuffer = null;
+				}
+				if (GlobalValuesValid) InvalidateGlobalValues();
+			}
+		}
+
+		internal protected virtual bool IsRenderedToTexture() 
+		{ 
+			return doubleBuffer != null; 
+		}
+
+		protected WidgetDoubleBuffer doubleBuffer;
+		public WidgetDoubleBuffer DoubleBuffer
+		{
+			get { return doubleBuffer; }
+		}
 
 		public virtual Action Clicked {
 			get { return clicked; }
@@ -111,6 +134,7 @@ namespace Lime
 				}
 			}
 		}
+	
 		public float X 
 		{ 
 			get { return position.X; } 
@@ -121,6 +145,7 @@ namespace Lime
 				}
 			} 
 		}
+
 		public float Y
 		{
 			get { return position.Y; }
@@ -150,6 +175,13 @@ namespace Lime
 			}
 		}
 
+		public override void Render()
+		{
+			if (doubleBuffer != null) {
+				doubleBuffer.Render();
+			}
+		}
+
 		protected virtual void OnSizeChanged(Vector2 sizeDelta) { }
 
 		public float Width { 
@@ -157,7 +189,7 @@ namespace Lime
 			set { Size = new Vector2(value, Height); } 
 		}
 
-		public float Height { 
+		public float Height {
 			get { return size.Y; } 
 			set { Size = new Vector2(Width, value); } 
 		}
@@ -414,28 +446,19 @@ namespace Lime
 
 		protected override void RecalcGlobalValuesUsingParentsOnes()
 		{
-			if (IsRenderedToTexture()) {
-				localToWorldTransform = Matrix32.Identity;
+			if (Parent == null || Parent.AsWidget.IsRenderedToTexture()) {
+				localToWorldTransform = CalcLocalToParentTransform();
 				globalColor = color;
-				globalBlending = Lime.Blending.Default;
+				globalBlending = Blending;
 				globallyVisible = Visible && color.A != 0;
-				return;
-			}
-			if (Parent != null) {
+			} else {
 				var parentWidget = Parent.AsWidget;
-				if (parentWidget != null) {
-					var localToParent = CalcLocalToParentTransform();
-					Matrix32.Multiply(ref localToParent, ref parentWidget.localToWorldTransform, out localToWorldTransform);
-					globalColor = Color * parentWidget.GlobalColor;
-					globalBlending = Blending == Blending.Default ? parentWidget.GlobalBlending : Blending;
-					globallyVisible = (Visible && color.A != 0) && parentWidget.GloballyVisible;
-					return;
-				}
+				var localToParent = CalcLocalToParentTransform();
+				Matrix32.Multiply(ref localToParent, ref parentWidget.localToWorldTransform, out localToWorldTransform);
+				globalColor = Color * parentWidget.GlobalColor;
+				globalBlending = Blending == Blending.Default ? parentWidget.GlobalBlending : Blending;
+				globallyVisible = (Visible && color.A != 0) && parentWidget.GloballyVisible;
 			}
-			localToWorldTransform = CalcLocalToParentTransform();
-			globalColor = color;
-			globalBlending = Blending;
-			globallyVisible = Visible && color.A != 0;
 		}
 
 		public Matrix32 CalcLocalToParentTransform()
@@ -473,6 +496,10 @@ namespace Lime
 		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (!GloballyVisible) {
+				return;
+			}
+			if (doubleBuffer != null) {
+				chain.Add(this);
 				return;
 			}
 			if (Layer != 0) {

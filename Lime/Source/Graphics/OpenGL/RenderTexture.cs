@@ -14,6 +14,12 @@ using System.Collections.Generic;
 
 namespace Lime
 {
+	public enum RenderTextureFormat
+	{
+		RGBA8,
+		RGB565
+	}
+
 	public class RenderTexture : ITexture, IDisposable
 	{
 		uint handle;
@@ -22,7 +28,7 @@ namespace Lime
 		readonly Rectangle uvRect;
 		static readonly Stack<uint> framebufferStack = new Stack<uint>();
 
-		public RenderTexture(int width, int height)
+		public RenderTexture(int width, int height, RenderTextureFormat format = RenderTextureFormat.RGBA8)
 		{
 			size.Width = width;
 			size.Height = height;
@@ -35,8 +41,11 @@ namespace Lime
 			GL.BindTexture(TextureTarget.Texture2D, handle);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
-			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0,
-				PixelFormat.Rgba, PixelType.UnsignedByte, (IntPtr)null);
+			if (format == RenderTextureFormat.RGBA8) {
+				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, (IntPtr)null);
+			} else {
+				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, width, height, 0, PixelFormat.Rgb, PixelType.UnsignedShort565, (IntPtr)null);
+			}
 			uint currentFramebuffer = (uint)Renderer.GetCurrentFramebuffer();
 			BindFramebuffer(framebuffer);
 			Renderer.CheckErrors();

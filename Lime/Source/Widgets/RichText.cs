@@ -198,6 +198,7 @@ namespace Lime
 				spriteList = null;
 			}
 			parser = null;
+			DoubleBufferValid = false;
 		}
 
 		/// Call on user-supplied parts of text.
