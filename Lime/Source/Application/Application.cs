@@ -54,6 +54,8 @@ namespace Lime
 			public int NumMonoChannels = 16;
 		}
 
+		public static float LowFPSLimit = 20;
+
 		public static Thread MainThread { get; private set; }
 		public static bool IsMainThread { get { return Thread.CurrentThread == MainThread; } }
 

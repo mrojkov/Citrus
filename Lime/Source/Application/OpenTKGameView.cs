@@ -11,8 +11,6 @@ namespace Lime
 {
 	public class GameView : OpenTK.GameWindow
 	{
-		private const float MaxFrameDelta = 0.04f;
-
 		private Application app;
 		private Dictionary<string, MouseCursor> cursors = new Dictionary<string, MouseCursor>();
 		private MouseCursor currentCursor;
@@ -204,7 +202,7 @@ namespace Lime
 		{
 			var now = DateTime.UtcNow;
 			delta = (float)(now - lastFrameTimeStamp).TotalSeconds;
-			delta = delta.Clamp(0, MaxFrameDelta);
+			delta = delta.Clamp(0, 1 / Application.LowFPSLimit);
 			lastFrameTimeStamp = now;
 		}
 
