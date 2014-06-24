@@ -91,6 +91,7 @@ namespace Lime
 	static class PixelType
 	{
 		public const All UnsignedByte = All.UnsignedByte;
+        public const All UnsignedShort565 = All.UnsignedShort565;
 	}
 
 	static class FramebufferTarget
