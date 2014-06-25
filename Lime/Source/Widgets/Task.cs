@@ -9,6 +9,8 @@ namespace Lime
 
 	public class Task : IDisposable
 	{
+		public static int TotalTasksUpdated = 0;
+
 		public abstract class WaitPredicate
 		{
 			public float TotalTime;
@@ -29,6 +31,7 @@ namespace Lime
 
 		public void Advance(float delta)
 		{
+			TotalTasksUpdated++;
 			if (waitTime > 0) {
 				waitTime -= delta;
 				return;
