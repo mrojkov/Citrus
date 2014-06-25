@@ -234,7 +234,6 @@ namespace Lime
 			}
 			MakeCurrent();
 			Application.Instance.OnRenderFrame();
-			SwapBuffers();
 			FPSCalculator.Refresh();
 		}
 

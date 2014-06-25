@@ -759,6 +759,7 @@ namespace Lime.Xamarin
             if (prevUpdateTime == TimeSpan.Zero)
                 prevUpdateTime = curUpdateTime;
             var t = (curUpdateTime - prevUpdateTime).TotalSeconds;
+            OnRenderFrame(renderEventArgs);
             // updateEventArgs.Time = t;
             OnUpdateFrame(updateEventArgs);
             prevUpdateTime = curUpdateTime;
@@ -776,7 +777,7 @@ namespace Lime.Xamarin
                 prevRenderTime = curRenderTime;
             t = (curRenderTime - prevRenderTime).TotalSeconds;
             // renderEventArgs.Time = t;
-            OnRenderFrame(renderEventArgs);
+			SwapBuffers();
             prevRenderTime = curRenderTime;
         }
 
