@@ -24,7 +24,7 @@ namespace Lime
 				Texture.Dispose();
 			}
 			if (Texture == null) {
-				Texture = new RenderTexture(widgetSize.Width, widgetSize.Height, RenderTextureFormat.RGB565);
+				Texture = new RenderTexture(widgetSize.Width, widgetSize.Height, RenderTextureFormat.RGBA8);
 			}
 			if (CheckOnlyWidgetContents) {
 				widget.DoubleBufferValid = true;
