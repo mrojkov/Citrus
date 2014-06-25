@@ -554,7 +554,7 @@ namespace Lime
 				content.Update(0);
 			}
 			Markers.AddRange(content.Markers);
-			var nodes = content.Nodes.ToArray();
+			var nodes = content.Nodes.ToList();
 			content.Nodes.Clear();
 			Nodes.AddRange(nodes);
 		}
