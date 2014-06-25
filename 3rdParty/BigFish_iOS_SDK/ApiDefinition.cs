@@ -137,6 +137,9 @@ namespace BigFish_iOS_SDK
 
 		[Static, Export("logCustomEvent:value:level:details1:details2:details3:additionalDetails:")]
 		void LogCustomEvent(string name, int value, int level, string details1, string details2, string details3, NSDictionary additionalDetails);
+		
+		[Static, Export("logCustomPlacement:")]
+		void LogCustomPlacement(string placementName);
 	}
 
 	[BaseType(typeof(NSObject), Name = "bfgSplash")]
