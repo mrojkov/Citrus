@@ -91,6 +91,9 @@ namespace BigFish_iOS_SDK
 
 		[Static, Export("startService")]
 		bool StartService();
+
+        [Static, Export("startService:")]
+        bool StartService(out NSError error);
 	}
 
 	[BaseType(typeof(NSObject), Name = "bfgGameReporting")]
