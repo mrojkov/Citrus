@@ -32,7 +32,7 @@ namespace Lime
 		private StateFunc State
 		{
 			get { return stateMachine.State; }
-			set { stateMachine.SetState(value); }
+			set { stateMachine.SetState(value); Logger.Write(this.Id); }
 		}
 
 		/// <summary>
