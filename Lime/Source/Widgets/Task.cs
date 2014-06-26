@@ -9,7 +9,15 @@ namespace Lime
 
 	public class Task : IDisposable
 	{
-		public static int TotalTasksUpdated = 0;
+		public static long TotalTasksUpdated = 0;
+		public static bool ProfilingEnabled;
+		private static Dictionary<Type, ProfileEntry> profile = new Dictionary<Type, ProfileEntry>();
+
+		public struct ProfileEntry
+		{
+			public long MemoryAllocated;
+			public int CallCount;
+		}
 
 		public abstract class WaitPredicate
 		{
@@ -30,6 +38,28 @@ namespace Lime
 		}
 
 		public void Advance(float delta)
+		{
+			if (ProfilingEnabled) {
+				var type = stack.Peek().GetType();
+				var memoryAllocated = System.GC.GetTotalMemory(forceFullCollection: false);
+				try {
+					AdvanceHelper(delta);
+				} finally {
+					memoryAllocated = System.GC.GetTotalMemory(forceFullCollection: false) - memoryAllocated;
+					ProfileEntry pe;
+					profile.TryGetValue(type, out pe);
+					pe.CallCount++;
+					if (memoryAllocated > 0) {
+						pe.MemoryAllocated += memoryAllocated;
+					}
+					profile[type] = pe;
+				}
+			} else {
+				AdvanceHelper(delta);
+			}
+		}
+
+		private void AdvanceHelper(float delta)
 		{
 			TotalTasksUpdated++;
 			if (waitTime > 0) {
@@ -122,6 +152,19 @@ namespace Lime
 			t.Start();
 			while (!t.IsCompleted && !t.IsCanceled && !t.IsFaulted) {
 				yield return 0;
+			}
+		}
+
+		public static void DumpProfile(System.IO.TextWriter writer)
+		{
+			var items = profile.Select(p => new { 
+				Method = p.Key.ToString(), 
+				Memory = p.Value.MemoryAllocated, 
+				CallCount = p.Value.CallCount }).OrderByDescending(a => a.Memory);
+			writer.WriteLine("Memory allocated\tCall count\tMethod Name");
+			writer.WriteLine("===================================================================================================");
+			foreach (var i in items) {
+				writer.WriteLine("{0:N0}\t\t\t{1:N0}\t\t{2}", i.Memory, i.CallCount, i.Method);
 			}
 		}
 	}
