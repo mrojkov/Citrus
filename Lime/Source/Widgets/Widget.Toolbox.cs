@@ -16,7 +16,7 @@ namespace Lime
 
 	public partial class Widget : Node
 	{
-		public void RenderToTexture(ITexture texture)
+		public void RenderToTexture(ITexture texture, RenderChain renderChain)
 		{
 			if (Width > 0 && Height > 0) {
 				var scissorTest = Renderer.ScissorTestEnabled;
@@ -29,11 +29,10 @@ namespace Lime
 				Renderer.Viewport = new WindowRect { X = 0, Y = 0, Width = texture.ImageSize.Width, Height = texture.ImageSize.Height };
 				Renderer.PushProjectionMatrix();
 				Renderer.SetOrthogonalProjection(0, Height, Width, 0);
-				var chain = new RenderChain();
-				foreach (var node in Nodes) {
-					node.AddToRenderChain(chain);
+				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
+					node.AddToRenderChain(renderChain);
 				}
-				chain.RenderAndClear();
+				renderChain.RenderAndClear();
 				texture.RestoreRenderTarget();
 				Renderer.Viewport = savedViewport;
 				Renderer.PopProjectionMatrix();

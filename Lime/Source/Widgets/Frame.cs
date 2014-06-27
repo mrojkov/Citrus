@@ -92,7 +92,8 @@ namespace Lime
 			if (DoubleBuffer != null) {
 				base.Render();
 			} else if (renderTexture != null) {
-				RenderToTexture(renderTexture);
+				EnsureRenderChain();
+				RenderToTexture(renderTexture, renderChain);
 			} else if (ClipChildren == ClipMethod.ScissorTest) {
 				RenderWithScissorTest();
 			}
@@ -101,6 +102,8 @@ namespace Lime
 				Rendered();
 			}
 		}
+
+		private RenderChain renderChain;
 
 		private void RenderWithScissorTest()
 		{
@@ -115,14 +118,22 @@ namespace Lime
 			Renderer.ScissorTestEnabled = true;
 			Renderer.ScissorRectangle = rect;
 			try {
-				var chain = new RenderChain();
+				EnsureRenderChain();
+				renderChain = new RenderChain();
 				foreach (var node in Nodes) {
-					node.AddToRenderChain(chain);
+					node.AddToRenderChain(renderChain);
 				}
-				chain.RenderAndClear();
+				renderChain.RenderAndClear();
 			} finally {
 				Renderer.ScissorTestEnabled = savedScissorTest;
 				Renderer.ScissorRectangle = savedScissorRect;
+			}
+		}
+
+		private void EnsureRenderChain()
+		{
+			if (renderChain == null) {
+				renderChain = new RenderChain();
 			}
 		}
 

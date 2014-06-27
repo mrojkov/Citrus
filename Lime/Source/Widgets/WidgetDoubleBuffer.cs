@@ -8,6 +8,7 @@ namespace Lime
 	public class WidgetDoubleBuffer
 	{
 		private Widget widget;
+		private RenderChain renderChain = new RenderChain();
 		public RenderTexture Texture { get; private set; }
 
 		public bool CheckOnlyWidgetContents = true;
@@ -30,7 +31,7 @@ namespace Lime
 				widget.DoubleBufferValid = true;
 			}
 			if (!CheckAndRestoreDoubleBufferValidFlag(widget)) {
-				widget.RenderToTexture(Texture);
+				widget.RenderToTexture(Texture, renderChain);
 			}
 			Renderer.Blending = widget.GlobalBlending;
 			Renderer.Transform1 = widget.LocalToWorldTransform;
