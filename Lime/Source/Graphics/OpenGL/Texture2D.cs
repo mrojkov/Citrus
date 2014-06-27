@@ -84,7 +84,7 @@ namespace Lime
 			}
 		}
 
-		private void LoadImage(Stream stream)
+		public void LoadImage(Stream stream)
 		{
 			LoadImageHelper(stream);
 		}
