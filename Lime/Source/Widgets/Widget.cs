@@ -457,19 +457,28 @@ namespace Lime
 
 		protected override void RecalcGlobalValuesUsingParentsOnes()
 		{
-			if (Parent == null || Parent.AsWidget.IsRenderedToTexture()) {
-				localToWorldTransform = CalcLocalToParentTransform();
+			if (IsRenderedToTexture()) {
+				localToWorldTransform = Matrix32.Identity;
 				globalColor = color;
-				globalBlending = Blending;
+				globalBlending = Lime.Blending.Default;
 				globallyVisible = Visible && color.A != 0;
-			} else {
-				var parentWidget = Parent.AsWidget;
-				var localToParent = CalcLocalToParentTransform();
-				Matrix32.Multiply(ref localToParent, ref parentWidget.localToWorldTransform, out localToWorldTransform);
-				globalColor = Color * parentWidget.GlobalColor;
-				globalBlending = Blending == Blending.Default ? parentWidget.GlobalBlending : Blending;
-				globallyVisible = (Visible && color.A != 0) && parentWidget.GloballyVisible;
+				return;
 			}
+			if (Parent != null) {
+				var parentWidget = Parent.AsWidget;
+				if (parentWidget != null) {
+					var localToParent = CalcLocalToParentTransform();
+					Matrix32.Multiply(ref localToParent, ref parentWidget.localToWorldTransform, out localToWorldTransform);
+					globalColor = Color * parentWidget.GlobalColor;
+					globalBlending = Blending == Blending.Default ? parentWidget.GlobalBlending : Blending;
+					globallyVisible = (Visible && color.A != 0) && parentWidget.GloballyVisible;
+					return;
+				}
+			}
+			localToWorldTransform = CalcLocalToParentTransform();
+			globalColor = color;
+			globalBlending = Blending;
+			globallyVisible = Visible && color.A != 0;
 		}
 
 		public Matrix32 CalcLocalToParentTransform()
