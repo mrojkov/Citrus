@@ -500,7 +500,7 @@ namespace Lime
 			u.Y = direction.Y * scale.X;
 			v.X = -direction.Y * scale.Y;
 			v.Y = direction.X * scale.Y;
-			if (SkinningWeights != null && Parent != null && Parent.AsWidget != null) {
+			if (SkinningWeights != null && Parent != null) {
 				BoneArray a = Parent.AsWidget.BoneArray;
 				translation = a.ApplySkinningToVector(position, SkinningWeights);
 				u = a.ApplySkinningToVector(u + position, SkinningWeights) - translation;

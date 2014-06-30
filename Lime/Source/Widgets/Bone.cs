@@ -101,6 +101,7 @@ namespace Lime
 				} else
 					e.RelativeTransform = Matrix32.Identity;
 				Parent.AsWidget.BoneArray[Index] = e;
+				Parent.InvalidateGlobalValues();
 			}
 		}
 
