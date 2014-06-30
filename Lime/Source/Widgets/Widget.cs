@@ -656,9 +656,9 @@ namespace Lime
 			if ((HitTestMask & mask) != 0) {
 				targets.Add(this);
 			}
-			foreach (var i in Nodes) {
-				if (i.AsWidget != null) {
-					i.AsWidget.EnumerateHitTestTargets(targets, mask);
+			for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
+				if (node.AsWidget != null) {
+					node.AsWidget.EnumerateHitTestTargets(targets, mask);
 				}
 			}
 		}
