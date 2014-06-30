@@ -13,7 +13,7 @@ namespace Lime
 		public static bool ProfilingEnabled;
 		private static Dictionary<Type, ProfileEntry> profile = new Dictionary<Type, ProfileEntry>();
 
-		public struct ProfileEntry
+		struct ProfileEntry
 		{
 			public long MemoryAllocated;
 			public int CallCount;
