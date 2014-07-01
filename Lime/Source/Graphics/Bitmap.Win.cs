@@ -29,7 +29,7 @@ namespace Lime
 			// http://stackoverflow.com/questions/336387/image-save-throws-a-gdi-exception-because-the-memory-stream-is-closed
 			// Так как мы не можем быть уверены, что снаружи стрим не уничтожат, копируем его.
 			var streamClone = new MemoryStream();
-			CopyStream(stream, streamClone);
+			Toolbox.CopyStream(stream, streamClone);
 
 			InitWithPngOrJpgBitmap(streamClone);
 		}
@@ -51,16 +51,6 @@ namespace Lime
 		public void Dispose()
 		{
 			bitmap.Dispose();
-		}
-
-		private static void CopyStream(Stream input, MemoryStream output)
-		{
-			var bufferSize = 32768;
-			byte[] buffer = new byte[bufferSize];
-			int read;
-			while ((read = input.Read(buffer, 0, buffer.Length)) > 0) {
-				output.Write(buffer, 0, read);
-			}
 		}
 
 		private void InitWithPngOrJpgBitmap(Stream stream)

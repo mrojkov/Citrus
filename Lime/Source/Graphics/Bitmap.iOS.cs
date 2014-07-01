@@ -4,39 +4,53 @@ using System.IO;
 using System.Collections.Generic;
 using System;
 using ProtoBuf;
+using MonoTouch.UIKit;
+using MonoTouch.CoreGraphics;
+using System.Drawing;
 
 namespace Lime
 {
 	class BitmapImplementation : IBitmapImplementation
 	{
+		private UIImage bitmap;
+
 		public int GetWidth()
 		{
-			throw new NotImplementedException();
+			return bitmap.Size.Width.Round();
 		}
 
 		public int GetHeight()
 		{
-			throw new NotImplementedException();
+			return bitmap.Size.Height.Round();
 		}
 
 		public void LoadFromStream(Stream stream)
 		{
-			throw new NotImplementedException();
+			using (var nsData = MonoTouch.Foundation.NSData.FromStream(stream)) {
+				bitmap = UIImage.LoadFromData(nsData);
+			}
 		}
 
 		public void SaveToStream(Stream stream)
 		{
-			throw new NotImplementedException();
+			using (var bitmapStream = bitmap.AsPNG().AsStream()) { 
+				Toolbox.CopyStream(bitmapStream, stream);
+			}
 		}
 
 		public IBitmapImplementation Crop(Rectangle cropArea)
 		{
-			throw new NotImplementedException();
+			var rect = new RectangleF(cropArea.Left, cropArea.Top, cropArea.Width, cropArea.Height);
+			var cgimage = bitmap.CGImage;
+			cgimage = cgimage.WithImageInRect(rect);
+			var cropped = new BitmapImplementation();
+			cropped.bitmap = new UIImage(cgimage);
+			return cropped;
 		}
 
 		public void Dispose()
 		{
-			throw new NotImplementedException();
+			bitmap.Dispose();
 		}
 	}
 }
