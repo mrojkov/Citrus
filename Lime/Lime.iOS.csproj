@@ -187,6 +187,7 @@
     <Compile Include="Source\Application\FPSCalculator.cs" />
     <Compile Include="Source\Application\Sdl2.cs" />
     <Compile Include="Source\Widgets\WidgetDoubleBuffer.cs" />
+    <Compile Include="obj\Release\.NETFramework,Version=v4.0.AssemblyAttribute.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
