@@ -236,22 +236,24 @@ namespace Lime
 			if (currentVertex >= MaxVertices - 4 || currentIndex >= MaxVertices * 4 - 6) {
 				FlushSpriteBatch();
 			}
-			if (PremultipliedAlphaMode) {
+			if (PremultipliedAlphaMode && color.A != 255) {
 				color = Color4.PremulAlpha(color);
 			}
             if (texture != null) {
                 texture.TransformUVCoordinatesToAtlasSpace(ref uv0, ref uv1);
             }
+			Matrix32 matrix;
+			if (transform2Set) {
+				matrix = Transform1 * transform2;
+			} else {
+				matrix = Transform1;
+			}
 			int i = currentVertex;
-			int j = currentIndex;
-			var matrix = Transform2.IsIdentity() ? Transform1 : Transform1 * Transform2;
+			Int32* ip = (Int32*)&batchIndices[currentIndex];
+			*ip++ = (i << 16) | (i + 1);
+			*ip++ = ((i + 2) << 16) | (i + 2);
+			*ip++ = ((i + 1) << 16) | (i + 3);
 			currentIndex += 6;
-			batchIndices[j++] = (ushort)(i + 0);
-			batchIndices[j++] = (ushort)(i + 1);
-			batchIndices[j++] = (ushort)(i + 2);
-			batchIndices[j++] = (ushort)(i + 2);
-			batchIndices[j++] = (ushort)(i + 1);
-			batchIndices[j++] = (ushort)(i + 3);
 			currentVertex += 4;
 			float x0 = position.X;
 			float y0 = position.Y;

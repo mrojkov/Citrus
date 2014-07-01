@@ -68,7 +68,17 @@ namespace Lime
 		private static int currentIndex;
 		
 		public static Matrix32 Transform1 = Matrix32.Identity;
-		public static Matrix32 Transform2 = Matrix32.Identity;
+		private static Matrix32 transform2 = Matrix32.Identity;
+		private static bool transform2Set;
+		public static Matrix32 Transform2
+		{
+			get { return transform2; }
+			set
+			{
+				transform2 = value;
+				transform2Set = !value.IsIdentity();
+			}
+		}
 
 		private static readonly Stack<Matrix44> projectionStack;
 		private static WindowRect viewport;
