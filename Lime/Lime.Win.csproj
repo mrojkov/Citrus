@@ -57,6 +57,9 @@
     <Compile Include="Source\Application\RenderingApi.cs" />
     <Compile Include="Source\Application\WinApi.cs" />
     <Compile Include="Source\AssetsBundle\UnityAssetsBundle.cs" />
+    <Compile Include="Source\Graphics\Bitmap.cs" />
+    <Compile Include="Source\Graphics\Bitmap.Win.cs" />
+    <Compile Include="Source\Graphics\Bitmap.iOS.cs" />
     <Compile Include="Source\Graphics\OpenGL\XamarinAdapter.cs" />
     <Compile Include="Source\Graphics\OpenGL\Shaders.cs" />
     <Compile Include="Source\Graphics\OpenGL\Renderer.cs" />

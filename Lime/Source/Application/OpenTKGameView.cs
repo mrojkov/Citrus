@@ -266,7 +266,7 @@ namespace Lime
 			var entryAssembly = System.Reflection.Assembly.GetEntryAssembly();
 			var fullResourceName = entryAssembly.GetName().Name + "." + resourceName;
 			var file = entryAssembly.GetManifestResourceStream(fullResourceName);
-			using (var bitmap = new Bitmap(file)) {
+			using (var bitmap = new System.Drawing.Bitmap(file)) {
 				var lockRect = new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height);
 				var lockMode = System.Drawing.Imaging.ImageLockMode.ReadOnly;
 				var data = bitmap.LockBits(lockRect, lockMode, System.Drawing.Imaging.PixelFormat.Format32bppArgb);

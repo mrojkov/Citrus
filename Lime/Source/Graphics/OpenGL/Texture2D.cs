@@ -89,6 +89,15 @@ namespace Lime
 			LoadImageHelper(stream);
 		}
 
+		public void LoadImage(Bitmap bitmap)
+		{
+			using (var stream = new MemoryStream()) {
+				bitmap.SaveToStream(stream);
+				stream.Position = 0;
+				LoadImageHelper(stream);
+			}
+		}
+
 		private void LoadImageHelper(Stream stream)
 		{
 			// Discard current texture

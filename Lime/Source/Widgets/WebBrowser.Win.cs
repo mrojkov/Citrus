@@ -32,7 +32,7 @@ namespace Lime
 		void browser_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
 		{
 			// FIXME: It's hard to make a browser to work over an OpenGL surface, so at least draw it as a picture.
-			var bitmap = new Bitmap((int)Width, (int)Height);
+			var bitmap = new System.Drawing.Bitmap((int)Width, (int)Height);
 			browser.DrawToBitmap(bitmap, new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height));
 			var m = new MemoryStream(1024 * 1024);
 			bitmap.Save(m, System.Drawing.Imaging.ImageFormat.Png);
