@@ -455,7 +455,7 @@ namespace Lime
 			}
 		}
 
-		protected override void RecalcGlobalValuesUsingParentsOnes()
+		protected override void RecalcGlobalValuesUsingParents()
 		{
 			if (IsRenderedToTexture()) {
 				localToWorldTransform = Matrix32.Identity;

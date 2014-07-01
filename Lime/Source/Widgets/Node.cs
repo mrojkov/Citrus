@@ -119,11 +119,11 @@ namespace Lime
 			if (Parent != null && !Parent.GlobalValuesValid) {
 				Parent.RecalcGlobalValues();
 			}
-			RecalcGlobalValuesUsingParentsOnes();
+			RecalcGlobalValuesUsingParents();
 			GlobalValuesValid = true;
 		}
 
-		protected virtual void RecalcGlobalValuesUsingParentsOnes() { }
+		protected virtual void RecalcGlobalValuesUsingParents() { }
 
 		public Node GetRoot()
 		{
