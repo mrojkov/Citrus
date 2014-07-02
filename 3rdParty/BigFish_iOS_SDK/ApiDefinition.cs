@@ -213,5 +213,30 @@ namespace BigFish_iOS_SDK
 		[Static, Export("getMACAddress")]
 		string GetMACAddress { get; }
 	}
+	
+	[BaseType(typeof(NSObject), Name = "bfgPushNotificationManager")]
+	interface BfgPushNotificationManager
+	{
+		[Static, Export("registerForPlayHavenPushNotifications")]
+		void RegisterForPlayHavenPushNotifications();
+		
+		[Static, Export("handleRemoteNotificationWithLaunchOption:")]
+		void HandleRemoteNotificationWithLaunchOption(NSDictionary launchOptions);
+		
+		[Static, Export("registerDeviceToken:")]
+		void RegisterDeviceToken(NSData deviceToken);
+		
+		[Static, Export("didFailToRegisterWithError:")]
+		void DidFailToRegisterWithError(NSError error);
+		
+		[Static, Export("handlePush:")]
+		void HandlePush(NSDictionary userInfo);
+		
+		[Static, Export("setIconBadgeNumber:")]
+		void SetIconBadgeNumber(int newNumber);
+		
+		[Static, Export("pushRegistrationInProgress")]
+		bool PushRegistrationInProgress();
+	}
 }
 
