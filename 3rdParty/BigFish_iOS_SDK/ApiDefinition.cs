@@ -22,6 +22,12 @@ namespace BigFish_iOS_SDK
 
 		[Static, Export("immediateTrigger")]
 		void ImmediateTrigger();
+
+        [Static, Export("hasRatedApp")]
+        bool HasRatedApp();
+
+        [Static, Export("canShowMainMenuRateButton")]
+        bool CanShowMainMenuRateButton();
 	}
 
 	[BaseType(typeof(NSObject), Name = "bfgSettings")]
