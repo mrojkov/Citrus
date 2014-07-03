@@ -202,6 +202,9 @@ namespace BigFish_iOS_SDK
 
         [Static, Export("showPrivacy")]
 		void ShowPrivacy();
+
+        [Static, Export("launchSDKByURLScheme:")]
+        bool LaunchSDKByURLScheme(string urlScheme);
 	}
 
 	[BaseType(typeof(NSObject), Name = "bfgutils")]
@@ -221,7 +224,7 @@ namespace BigFish_iOS_SDK
 		void RegisterForPlayHavenPushNotifications();
 		
 		[Static, Export("handleRemoteNotificationWithLaunchOption:")]
-		void HandleRemoteNotificationWithLaunchOption(NSDictionary launchOptions);
+        void HandleRemoteNotificationWithLaunchOption([NullAllowed] NSDictionary launchOptions);
 		
 		[Static, Export("registerDeviceToken:")]
 		void RegisterDeviceToken(NSData deviceToken);

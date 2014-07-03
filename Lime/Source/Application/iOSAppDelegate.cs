@@ -25,10 +25,14 @@ namespace Lime
 		// handlers
 		public delegate void AlertClickHandler(int buttonIdx);
 		public delegate bool OpenURLHandler(NSUrl url);
-		public delegate void RegisteredForRemoteNotificationsHandler(NSData deviceToken);
+        public delegate void ReceivedRemoteNotificationsHandler(NSDictionary userInfo);
+        public delegate void RegisteredForRemoteNotificationsHandler(NSData deviceToken);
+        public delegate void FailedToRegisterForRemoteNotificationsHandler(NSError error);
 
 		public event OpenURLHandler UrlOpened;
+        public event ReceivedRemoteNotificationsHandler ReceivedRemoteNotificationsHandlerEvent;
 		public event RegisteredForRemoteNotificationsHandler RegisteredForRemoteNotificationsEvent;
+        public event FailedToRegisterForRemoteNotificationsHandler FailedToRegisterForRemoteNotificationsEvent;
 		public event Action WillTerminateEvent;
 
 		// class-level declarations
@@ -118,12 +122,26 @@ namespace Lime
 			Application.Instance.Active = false;
 		}
 
+        public override void ReceivedRemoteNotification(UIApplication application, NSDictionary userInfo)
+        {
+            if (ReceivedRemoteNotificationsHandlerEvent != null) {
+                ReceivedRemoteNotificationsHandlerEvent(userInfo);
+            }
+        }
+
 		public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken)
 		{
 			if (RegisteredForRemoteNotificationsEvent != null) {
 				RegisteredForRemoteNotificationsEvent(deviceToken);
 			}
 		}
+
+        public override void FailedToRegisterForRemoteNotifications(UIApplication application, NSError error)
+        {
+            if (FailedToRegisterForRemoteNotificationsEvent != null) {
+                FailedToRegisterForRemoteNotificationsEvent(error);
+            }
+        }
 
 		// This method is invoked when the application has loaded its UI and is ready to run
 		public override bool FinishedLaunching(UIApplication app, NSDictionary options)
