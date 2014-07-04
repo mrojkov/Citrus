@@ -104,13 +104,17 @@ namespace Lime
 			}
 		}
 
-		static byte[] block = new byte[1024 * 16];
+		[ThreadStatic]
+		static byte[] block;
 		
 #if iOS
 		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.Api.ReadCallback))]
 #endif
 		public static uint OggRead(IntPtr buffer, uint size, uint nmemb, int handle)
 		{
+			if (block == null) {
+				block = new byte[1024 * 16];
+			}
 			int actualCount = 0;
 			int requestCount = (int)(size * nmemb);
 			while (true) {
