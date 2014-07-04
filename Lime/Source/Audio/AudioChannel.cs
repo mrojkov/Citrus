@@ -293,8 +293,7 @@ namespace Lime
 					Stop();
 				}
 				Volume = volume;
-			}
-			if (Sound != null && Sound.IsBumpable && Renderer.RenderCycle - lastBumpedRenderCycle > 3) {
+			} else if (streaming && Sound != null && Sound.IsBumpable && Renderer.RenderCycle - lastBumpedRenderCycle > 3) {
 				Stop(0.1f);
 			}
 		}
