@@ -143,5 +143,10 @@ namespace Lime
 			movieTexture.Play();
 			textureInitialized = true;
 		}
+
+		public override void Dispose()
+		{
+			movieTexture.Dispose();
+		}
 	}
 }

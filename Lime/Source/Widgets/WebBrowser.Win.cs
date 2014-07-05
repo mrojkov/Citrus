@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace Lime
 {
-	public class WebBrowser : Image, IDisposable
+	public class WebBrowser : Image
 	{
 		public Uri Url { get { return browser.Url; } set { SetUrl(value); } }
 
@@ -45,7 +45,7 @@ namespace Lime
 			browser.Navigate(value);
 		}
 
-		public void Dispose()
+		public override void Dispose()
 		{
 			if (browser != null)
 				browser.Dispose();

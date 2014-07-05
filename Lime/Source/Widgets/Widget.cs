@@ -188,6 +188,14 @@ namespace Lime
 			}
 		}
 
+		public override void Dispose()
+		{
+			if (renderList != null) {
+				renderList.Clear();
+			}
+			base.Dispose();
+		}
+
 		protected virtual void OnSizeChanged(Vector2 sizeDelta) { }
 
 		public float Width { 

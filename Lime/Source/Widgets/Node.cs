@@ -22,7 +22,7 @@ namespace Lime
 	[ProtoInclude(108, typeof(TextStyle))]
 	[ProtoInclude(109, typeof(LinearLayout))]
 	[DebuggerTypeProxy(typeof(NodeDebugView))]
-	public class Node
+	public class Node : IDisposable
 	{
 		public event Action AnimationStopped;
 	
@@ -100,6 +100,13 @@ namespace Lime
 			Animators = new AnimatorCollection(this);
 			Markers = new MarkerCollection();
 			Nodes = new NodeList(this);
+		}
+
+		public virtual void Dispose()
+		{
+			for (var n = Nodes.FirstOrNull(); n != null; n = n.NextSibling) {
+				n.Dispose();
+			}
 		}
 
 		internal protected void InvalidateGlobalValues()

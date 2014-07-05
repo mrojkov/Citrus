@@ -7,7 +7,7 @@ using MonoTouch.UIKit;
 
 namespace Lime
 {
-	public class WebBrowser : Widget, IDisposable
+	public class WebBrowser : Widget
 	{
 		private UIWebView webView;
 		private UIActivityIndicatorView activityIndicator;
@@ -47,7 +47,7 @@ namespace Lime
 			GameView.Instance.AddSubview(webView);
 		}
 		
-		public void Dispose()
+		public override void Dispose()
 		{
 			if (activityIndicator != null) {
 				if (isActivityIndicatorVisible) {
