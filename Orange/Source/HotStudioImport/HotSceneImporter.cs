@@ -120,7 +120,9 @@ namespace Orange
 				widget.Rotation = lexer.ParseFloat();
 				break;
 			case "BlendMode":
-				widget.Blending = lexer.ParseBlendMode();
+				var t = lexer.ParseBlendMode();
+				widget.Blending = t.Item1;
+				widget.Shader = t.Item2;
 				break;
 			case "SuppressSkin":
 				lexer.ParseBool();
@@ -384,7 +386,9 @@ namespace Orange
 				combiner.Enabled = lexer.ParseBool();
 				break;
 			case "BlendMode":
-				combiner.Blending = lexer.ParseBlendMode();
+				var t = lexer.ParseBlendMode();
+				combiner.Blending = t.Item1;
+				combiner.Shader = t.Item2;
 				break;
 			default:
 				ParseActorProperty(combiner, name);

@@ -35,7 +35,7 @@ namespace Lime
 					TexturesToDelete.CopyTo(ids);
 					GL.DeleteTextures(ids.Length, ids);
 					TexturesToDelete.Clear();
-					Renderer.CheckErrors();
+					PlatformRenderer.CheckErrors();
 				}
 			}
 			lock (FramebuffersToDelete) {
@@ -44,7 +44,7 @@ namespace Lime
 					FramebuffersToDelete.CopyTo(ids);
 					GL.DeleteFramebuffers(ids.Length, ids);
 					FramebuffersToDelete.Clear();
-					Renderer.CheckErrors();
+					PlatformRenderer.CheckErrors();
 				}
 			}
 		}
@@ -134,12 +134,12 @@ namespace Lime
 				GL.GenTextures(1, t);
 				handle = (uint)t[0];
 			}
-			Renderer.SetTexture(handle, 0);
+			PlatformRenderer.SetTexture(handle, 0);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)All.ClampToEdge);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)All.ClampToEdge);
-			Renderer.CheckErrors();
+			PlatformRenderer.CheckErrors();
 		}
 
 		/// <summary>
@@ -155,7 +155,7 @@ namespace Lime
 					GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 #endif
 				}
-				Renderer.CheckErrors();
+				PlatformRenderer.CheckErrors();
 			});
 
 			ImageSize = new Size(width, height);
@@ -172,7 +172,7 @@ namespace Lime
 				PrepareOpenGLTexture();
 				GL.TexSubImage2D(TextureTarget.Texture2D, 0, x, y, width, height,
 					PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
-				Renderer.CheckErrors();
+				PlatformRenderer.CheckErrors();
 			});
 		}
 

@@ -66,6 +66,7 @@ namespace Lime
 		private Color4 color;
 		private Action clicked;
 		private Blending blending;
+		private ShaderId shader;
 		private Vector2 pivot;
 		private Vector2 scale;
 		private bool visible;
@@ -82,33 +83,34 @@ namespace Lime
 
 		public virtual ITexture Texture
 		{
-			get { return doubleBuffer != null ? doubleBuffer.Texture : null; }
+			get { return null; }
 			set { }
 		}
 
-		public bool DoubleBuffered
+		protected Matrix32 renderListInversedWorldTransform;
+		protected RenderList renderList;
+		public RenderList RenderList
 		{
-			get { return doubleBuffer != null; }
+			get { return renderList; }
+		}
+
+		public bool CachedRendering
+		{
+			get { return renderList != null; }
 			set
 			{
-				if (value && doubleBuffer == null) {
-					doubleBuffer = new WidgetDoubleBuffer(this);
-				} else if (!value && doubleBuffer != null) {
-					doubleBuffer = null;
+				if (value && renderList == null) {
+					renderList = new RenderList();
+				} else if (!value && renderList != null) {
+					renderList = null;
 				}
 				if (GlobalValuesValid) InvalidateGlobalValues();
 			}
 		}
 
 		internal protected virtual bool IsRenderedToTexture() 
-		{ 
-			return doubleBuffer != null; 
-		}
-
-		protected WidgetDoubleBuffer doubleBuffer;
-		public WidgetDoubleBuffer DoubleBuffer
 		{
-			get { return doubleBuffer; }
+			return false; 
 		}
 
 		public virtual Action Clicked {
@@ -130,7 +132,6 @@ namespace Lime
 			{
 				if (position.X != value.X || position.Y != value.Y) {
 					position = value;
-					DoubleBufferValid = false;
 					if (GlobalValuesValid) InvalidateGlobalValues();
 				}
 			}
@@ -142,7 +143,6 @@ namespace Lime
 			set {
 				if (position.X != value) {
 					position.X = value;
-					DoubleBufferValid = false;
 					if (GlobalValuesValid) InvalidateGlobalValues();
 				}
 			} 
@@ -155,7 +155,6 @@ namespace Lime
 			{
 				if (position.Y != value) {
 					position.Y = value;
-					DoubleBufferValid = false;
 					if (GlobalValuesValid) InvalidateGlobalValues();
 				}
 			}
@@ -173,7 +172,6 @@ namespace Lime
 					size = value;
 					OnSizeChanged(sizeDelta);
 					LayoutChildren(sizeDelta);
-					DoubleBufferValid = false;
 					if (GlobalValuesValid) InvalidateGlobalValues();
 				}
 			}
@@ -181,8 +179,12 @@ namespace Lime
 
 		public override void Render()
 		{
-			if (doubleBuffer != null) {
-				doubleBuffer.Render();
+			if (renderList != null) {
+				Renderer.Flush();
+				Renderer.PushProjectionMatrix();
+				Renderer.Projection = (Matrix44)(renderListInversedWorldTransform * localToWorldTransform) * Renderer.Projection;
+				renderList.Render();
+				Renderer.PopProjectionMatrix();
 			}
 		}
 
@@ -207,7 +209,6 @@ namespace Lime
 			{
 				if (pivot.X != value.X || pivot.Y != value.Y) {
 					pivot = value;
-					DoubleBufferValid = false;
 					if (GlobalValuesValid) InvalidateGlobalValues();
 				}
 			} 
@@ -222,7 +223,6 @@ namespace Lime
 			{
 				if (scale.X != value.X || scale.Y != value.Y) {
 					scale = value;
-					DoubleBufferValid = false;
 					if (GlobalValuesValid) InvalidateGlobalValues();
 				}
 			} 
@@ -236,7 +236,6 @@ namespace Lime
 			{
 				if (rotation != value) {
 					rotation = value;
-					DoubleBufferValid = false;
 					direction = Mathf.CosSin(Mathf.DegreesToRadians * value);
 					if (GlobalValuesValid) InvalidateGlobalValues();
 				}
@@ -251,7 +250,6 @@ namespace Lime
 			set {
 				if (color.ABGR != value.ABGR) {
 					color = value;
-					DoubleBufferValid = false;
 					if (GlobalValuesValid) InvalidateGlobalValues();
 				}
 			} 
@@ -265,7 +263,6 @@ namespace Lime
 				var a = (byte)(value * 255f);
 				if (color.A != a) {
 					color.A = a;
-					DoubleBufferValid = false;
 					if (GlobalValuesValid) InvalidateGlobalValues();
 				}
 			}
@@ -283,13 +280,26 @@ namespace Lime
 			{
 				if (blending != value) {
 					blending = value;
-					DoubleBufferValid = false;
 					if (GlobalValuesValid) InvalidateGlobalValues();
 				}
 			} 
 		}
 
 		[ProtoMember(9)]
+		[TangerineProperty(10)]
+		public ShaderId Shader
+		{
+			get { return shader; }
+			set
+			{
+				if (shader != value) {
+					shader = value;
+					if (GlobalValuesValid) InvalidateGlobalValues();
+				}
+			}
+		}
+
+		[ProtoMember(10)]
 		[TangerineProperty(2)]
 		public bool Visible 
 		{ 
@@ -298,27 +308,27 @@ namespace Lime
 			{
 				if (visible != value) {
 					visible = value;
-					DoubleBufferValid = false;
 					if (GlobalValuesValid) InvalidateGlobalValues();
 				}
 			}
 		}
 
-		[ProtoMember(10)]
+		[ProtoMember(11)]
 		public SkinningWeights SkinningWeights { get; set; }
 
-		[ProtoMember(11)]
+		[ProtoMember(12)]
 		public HitTestMethod HitTestMethod { get; set; }
 		
-		[ProtoMember(12)]
+		[ProtoMember(13)]
 		public uint HitTestMask { get; set; }
 
-		[ProtoMember(13)]
+		[ProtoMember(14)]
 		public BoneArray BoneArray;
 
 		private Matrix32 localToWorldTransform;
 		private Color4 globalColor;
 		private Blending globalBlending;
+		private ShaderId globalShader;
 		private bool globallyVisible;
 
 		public Matrix32 LocalToWorldTransform
@@ -336,9 +346,24 @@ namespace Lime
 			get { if (!GlobalValuesValid) RecalcGlobalValues(); return globalBlending; }
 		}
 
+		public ShaderId GlobalShader
+		{
+			get { if (!GlobalValuesValid) RecalcGlobalValues(); return globalShader; }
+		}
+
 		public bool GloballyVisible 
 		{
-			get { if (!GlobalValuesValid) RecalcGlobalValues(); return globallyVisible; }
+			get 
+			{
+				if (GlobalValuesValid) {
+					return globallyVisible;
+				}
+				if (!visible || color.A == 0) {
+					return false;
+				}
+				RecalcGlobalValues(); 
+				return globallyVisible; 
+			}
 		}
 		
 		public Vector2 GlobalPosition { get { return LocalToWorldTransform.T; } }
@@ -384,6 +409,7 @@ namespace Lime
 			Scale = Vector2.One;
 			Visible = true;
 			Blending = Blending.Default;
+			Shader = ShaderId.Default;
 			direction = new Vector2(1, 0);
 		}
 
@@ -415,10 +441,13 @@ namespace Lime
 
 		public override Node DeepCloneFast()
 		{
-			var clone = base.DeepCloneFast();
-			clone.AsWidget.input = null;
-			(clone as Widget).tasks = null;
-			(clone as Widget).lateTasks = null;
+			var clone = base.DeepCloneFast().AsWidget;
+			clone.input = null;
+			if (clone.renderList != null) {
+				clone.renderList = new RenderList();
+			}
+			clone.tasks = null;
+			clone.lateTasks = null;
 			return clone;
 		}
 
@@ -461,6 +490,7 @@ namespace Lime
 				localToWorldTransform = Matrix32.Identity;
 				globalColor = color;
 				globalBlending = Lime.Blending.Default;
+				globalShader = Shader;
 				globallyVisible = Visible && color.A != 0;
 				return;
 			}
@@ -469,15 +499,17 @@ namespace Lime
 				if (parentWidget != null) {
 					var localToParent = CalcLocalToParentTransform();
 					Matrix32.Multiply(ref localToParent, ref parentWidget.localToWorldTransform, out localToWorldTransform);
-					globalColor = Color * parentWidget.GlobalColor;
-					globalBlending = Blending == Blending.Default ? parentWidget.GlobalBlending : Blending;
-					globallyVisible = (Visible && color.A != 0) && parentWidget.GloballyVisible;
+					globalColor = Color * parentWidget.globalColor;
+					globalBlending = Blending == Blending.Default ? parentWidget.globalBlending : Blending;
+					globalShader = Shader == ShaderId.Default ? parentWidget.globalShader : Shader;
+					globallyVisible = (Visible && color.A != 0) && parentWidget.globallyVisible;
 					return;
 				}
 			}
 			localToWorldTransform = CalcLocalToParentTransform();
 			globalColor = color;
 			globalBlending = Blending;
+			globalShader = Shader;
 			globallyVisible = Visible && color.A != 0;
 		}
 
@@ -513,13 +545,22 @@ namespace Lime
 			return matrix;
 		}
 
+		private static RenderChain renderChainForBatching = new RenderChain();
+
 		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (!GloballyVisible) {
 				return;
 			}
-			if (doubleBuffer != null) {
-				chain.Add(this);
+			if (renderList != null) {
+				chain.Add(this, Layer);
+				if (!renderList.IsEmpty) {
+					return;
+				}
+				renderListInversedWorldTransform = localToWorldTransform.CalcInversed();
+				Renderer.CurrentRenderList = renderList;
+				RenderForStaticBatching();
+				Renderer.CurrentRenderList = Renderer.MainRenderList;
 				return;
 			}
 			if (Layer != 0) {
@@ -535,6 +576,14 @@ namespace Lime
 				}
 				chain.Add(this);
 			}
+		}
+
+		protected virtual void RenderForStaticBatching()
+		{
+			for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
+				node.AddToRenderChain(renderChainForBatching);
+			}
+			renderChainForBatching.RenderAndClear();
 		}
 
 		protected override void OnParentSizeChanged(Vector2 parentSizeDelta)

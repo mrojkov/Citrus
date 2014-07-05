@@ -2,26 +2,39 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ProtoBuf;
 
 namespace Lime
 {
+	[ProtoContract]
+	public enum ShaderId
+	{
+		[ProtoEnum]
+		None,
+		[ProtoEnum]
+		Default,
+		[ProtoEnum]
+		Silhuette
+	}
+
 	static class ShaderPrograms
 	{
-		public static ShaderProgram GetShaderProgram(Blending blending, int numTextures)
+		public static ShaderProgram GetShaderProgram(ShaderId shader, int numTextures)
 		{
-			if (blending == Blending.Silhuette) {
-				if (numTextures == 2)
-					return twoTexturesSilhuetteBlendingProgram;
-				else
+			if (shader == ShaderId.Default) {
+				if (numTextures == 1) {
+					return oneTextureBlengingProgram;
+				} else if (numTextures == 2) {
+					return twoTexturesBlengingProgram;
+				}
+			} else if (shader == ShaderId.Silhuette) {
+				if (numTextures == 1) {
 					return silhuetteBlendingProgram;
+				} else if (numTextures == 2) {
+					return twoTexturesSilhuetteBlendingProgram;
+				}
 			}
-			if (numTextures == 0) {
-				return colorOnlyBlendingProgram;
-			} else if (numTextures == 1) {
-				return oneTextureBlengingProgram;
-			} else {
-				return twoTexturesBlengingProgram;
-			}
+			return colorOnlyBlendingProgram;
 		}
 
 		static readonly Shader oneTextureVertexShader = new VertexShader(
@@ -119,10 +132,7 @@ namespace Lime
 			var p = new ShaderProgram();
 			p.AttachShader(vertexShader);
 			p.AttachShader(fragmentShader);
-			p.BindAttribLocation(Renderer.Attributes.Position, "inPos");
-			p.BindAttribLocation(Renderer.Attributes.UV1, "inTexCoords1");
-			p.BindAttribLocation(Renderer.Attributes.UV2, "inTexCoords2");
-			p.BindAttribLocation(Renderer.Attributes.Color, "inColor");
+			VertexBuffer.Attributes.BindLocations(p);
 			p.Link();
 			p.BindSampler("tex1", 0);
 			p.BindSampler("tex2", 1);

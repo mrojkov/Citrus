@@ -46,12 +46,12 @@ namespace Lime
 			}
 		}
 
-		static Renderer.Vertex[] polygon = new Renderer.Vertex[6];
+		static Vertex[] polygon = new Vertex[6];
 		static DistortionMeshPoint[] points = new DistortionMeshPoint[4];
 		
-		Renderer.Vertex CalculateCenterVertex()
+		Vertex CalculateCenterVertex()
 		{
-			var v = new Renderer.Vertex();
+			var v = new Vertex();
 			v.UV1 = Vector2.Zero;
 			v.Pos = Vector2.Zero;
 			Vector2 colorAR, colorGB;

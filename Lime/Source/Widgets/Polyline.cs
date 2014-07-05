@@ -23,6 +23,7 @@ namespace Lime
 		public override void Render()
 		{
 			Renderer.Blending = GlobalBlending;
+			Renderer.Shader = GlobalShader;
 			Renderer.Transform1 = LocalToWorldTransform;
 			int n = Points.Count;
 			if (n >= 2) {
@@ -71,11 +72,11 @@ namespace Lime
 
 		private void DrawQuad(Vector2 a, Vector2 b, Vector2 c, Vector2 d)
 		{
-			var v = new Renderer.Vertex[4];
-			v[0] = new Renderer.Vertex { Pos = a, Color = GlobalColor };
-			v[1] = new Renderer.Vertex { Pos = b, Color = GlobalColor };
-			v[2] = new Renderer.Vertex { Pos = c, Color = GlobalColor };
-			v[3] = new Renderer.Vertex { Pos = d, Color = GlobalColor };
+			var v = new Vertex[4];
+			v[0] = new Vertex { Pos = a, Color = GlobalColor };
+			v[1] = new Vertex { Pos = b, Color = GlobalColor };
+			v[2] = new Vertex { Pos = c, Color = GlobalColor };
+			v[3] = new Vertex { Pos = d, Color = GlobalColor };
 			Renderer.DrawTriangleFan(null, null, v, v.Length);
 		}
 
@@ -89,13 +90,13 @@ namespace Lime
 			if (angle2 - angle1 > 180) {
 				angle2 -= 360;
 			}
-			var v = new Renderer.Vertex[10];
-			v[0] = new Renderer.Vertex { Pos = p, Color = GlobalColor };
+			var v = new Vertex[10];
+			v[0] = new Vertex { Pos = p, Color = GlobalColor };
 			float length = n2.Length;
 			for (int i = 0; i < v.Length - 1; i++) {
 				float t = (float)i / (v.Length - 2);
 				p = -Vector2.HeadingDeg(Mathf.Lerp(t, angle1, angle2)) * length + b;
-				v[i + 1] = new Renderer.Vertex { Pos = p, Color = GlobalColor };
+				v[i + 1] = new Vertex { Pos = p, Color = GlobalColor };
 			}
 			Renderer.DrawTriangleFan(null, null, v, v.Length);
 		}
@@ -109,12 +110,12 @@ namespace Lime
 		private void DrawRoundPart(Vector2 center, float angle1, float angle2)
 		{
 			const int numPoints = 10;
-			var v = new Renderer.Vertex[numPoints + 2];
-			v[0] = new Renderer.Vertex { Pos = center, Color = GlobalColor };
+			var v = new Vertex[numPoints + 2];
+			v[0] = new Vertex { Pos = center, Color = GlobalColor };
 			for (int i = 0; i <= numPoints; i++) {
 				float t = (float)i / numPoints;
 				Vector2 p = Vector2.HeadingDeg(Mathf.Lerp(t, angle1, angle2));
-				v[i + 1] = new Renderer.Vertex { Pos = center + p * Thickness / 2, Color = GlobalColor };
+				v[i + 1] = new Vertex { Pos = center + p * Thickness / 2, Color = GlobalColor };
 			}
 			Renderer.DrawTriangleFan(null, null, v, v.Length);
 		}
@@ -122,11 +123,11 @@ namespace Lime
 		private void DrawSegment(Vector2 a, Vector2 b)
 		{
 			Vector2 n = GetVectorNormal(b - a) * Thickness / 2;
-			var v = new Renderer.Vertex[4];
-			v[0] = new Renderer.Vertex { Pos = a - n, Color = GlobalColor };
-			v[1] = new Renderer.Vertex { Pos = b - n, Color = GlobalColor };
-			v[2] = new Renderer.Vertex { Pos = b + n, Color = GlobalColor };
-			v[3] = new Renderer.Vertex { Pos = a + n, Color = GlobalColor };
+			var v = new Vertex[4];
+			v[0] = new Vertex { Pos = a - n, Color = GlobalColor };
+			v[1] = new Vertex { Pos = b - n, Color = GlobalColor };
+			v[2] = new Vertex { Pos = b + n, Color = GlobalColor };
+			v[3] = new Vertex { Pos = a + n, Color = GlobalColor };
 			Renderer.DrawTriangleFan(null, null, v, v.Length);
 		}
 	}

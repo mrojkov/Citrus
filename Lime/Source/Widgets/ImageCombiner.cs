@@ -27,6 +27,8 @@ namespace Lime
 		bool GloballyVisible { get; }
 
 		Blending Blending { get; }
+
+		ShaderId Shader { get; }
 	}
 
 	[ProtoContract]
@@ -38,10 +40,14 @@ namespace Lime
 		[ProtoMember(2)]
 		public Blending Blending { get; set; }
 
+		[ProtoMember(3)]
+		public ShaderId Shader { get; set; }
+
 		public ImageCombiner()
 		{
 			Enabled = true;
 			Blending = Blending.Default;
+			Shader = ShaderId.Default;
 		}
 
 		static bool AreVectorsClockwiseOrdered(Vector2 u, Vector2 v, Vector2 w)
@@ -121,7 +127,7 @@ namespace Lime
 
 		static readonly Vector2[] coords = new Vector2[8];
 		static readonly Vector2[] stencil = new Vector2[4];
-		static readonly Renderer.Vertex[] vertices = new Renderer.Vertex[8];
+		static readonly Vertex[] vertices = new Vertex[8];
 		static readonly Vector2[] rect = new Vector2[4] { 
 			new Vector2(0, 0), 
 			new Vector2(1, 0), 
@@ -159,36 +165,38 @@ namespace Lime
 				vertices[i].Pos = coords[i];
 				vertices[i].Color = color;
 				vertices[i].UV1 = coords[i] * uvTransform1;
-				vertices[i].UV2 = coords[i] * uvTransform2;
+				// vertices[i].UV2 = coords[i] * uvTransform2;
 			}
 			Renderer.DrawTriangleFan(texture1, texture2, vertices, numCoords);
 		}
 
 		public override void Render()
 		{
-			if (Parent.AsWidget != null) {
-				IImageCombinerArg arg1, arg2;
-				if (!GetArgs(out arg1, out arg2)) {
-					return;
-				}
-				if (!arg1.GloballyVisible || !arg2.GloballyVisible) {
-					return;
-				}
-				if (arg1.GetTexture() == null || arg2.GetTexture() == null) {
-					return;
-				}
-				Renderer.Transform1 = Parent.AsWidget.LocalToWorldTransform;
-				Blending blending = Blending == Blending.Default ? Parent.AsWidget.GlobalBlending : Blending;
-				if (arg2.Blending == Blending.Silhuette) {
-					Renderer.SetBlendingEx(blending, Blending.Silhuette);
-				} else if (arg1.Blending == Blending.Silhuette) {
-					Toolbox.Swap(ref arg1, ref arg2);
-					Renderer.SetBlendingEx(blending, Blending.Silhuette);
-				} else {
-					Renderer.Blending = blending;
-				}
-				RenderHelper(arg1, arg2);
+			if (Parent.AsWidget == null) {
+				return;
 			}
+			IImageCombinerArg arg1, arg2;
+			if (!GetArgs(out arg1, out arg2)) {
+				return;
+			}
+			if (!arg1.GloballyVisible || !arg2.GloballyVisible) {
+				return;
+			}
+			if (arg1.GetTexture() == null || arg2.GetTexture() == null) {
+				return;
+			}
+			Renderer.Transform1 = Parent.AsWidget.LocalToWorldTransform;
+			Renderer.Blending = Blending == Blending.Default ? Parent.AsWidget.GlobalBlending : Blending;
+			var shader = Shader == ShaderId.Default ? Parent.AsWidget.GlobalShader : Shader;
+			if (arg2.Shader == ShaderId.Silhuette) {
+				Renderer.Shader = ShaderId.Silhuette;
+			} else if (arg1.Shader == ShaderId.Silhuette) {
+				Renderer.Shader = ShaderId.Silhuette;
+				Toolbox.Swap(ref arg1, ref arg2);
+			} else {
+				Renderer.Shader = shader;
+			}
+			RenderHelper(arg1, arg2);
 		}
 	}
 }

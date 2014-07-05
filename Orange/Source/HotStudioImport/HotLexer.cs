@@ -102,22 +102,31 @@ namespace Orange
 			return result;
 		}
 		
-		public Blending ParseBlendMode()
+		public Tuple<Blending, ShaderId> ParseBlendMode()
 		{
+			Blending blending = Blending.Default;
+			ShaderId shader = ShaderId.Default;
 			switch(ParseInt()) {
 			case 0:
-				return Blending.Default;
+				break;
 			case 2:
-				return Blending.Add;
+				blending = Blending.Add;
+				break;
 			case 3:
-				return Blending.Burn;
+				blending = Blending.Burn;
+				break;
 			case 5:
-				return Blending.Modulate;
+				blending = Blending.Modulate;
+				break;
 			case 7:
-				return Blending.Silhuette;
+				blending = Blending.Add;
+				shader = ShaderId.Silhuette;
+				break;
 			default:
-				return Blending.Alpha;
+				blending = Blending.Alpha;
+				break;
 			}
+			return new Tuple<Blending, ShaderId>(blending, shader);
 		}
 		
 		public uint ParseHex()

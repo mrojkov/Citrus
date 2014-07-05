@@ -10,7 +10,7 @@ namespace Lime.PopupMenu
 		Widget hbox = new Widget();
 
 		Image background = new Image() {
-			Blending = Blending.Silhuette,
+			Shader = ShaderId.Silhuette,
 		};
 
 		ImageBox imageBox = new ImageBox(new Image()) {

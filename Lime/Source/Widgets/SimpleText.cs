@@ -41,7 +41,7 @@ namespace Lime
 	[ProtoContract]
 	public sealed class SimpleText : Widget
 	{
-		private Renderer.SpriteList spriteList;
+		private SpriteList spriteList;
 		private SerializableFont font;
 		private string text;
 		private float fontHeight;
@@ -93,6 +93,7 @@ namespace Lime
 
 		public SimpleText()
 		{
+			// StaticBatching = true;
 			Text = "";
 			FontHeight = 15;
 			Font = new SerializableFont();
@@ -114,12 +115,13 @@ namespace Lime
 				if (OverflowMode == TextOverflowMode.Minify) {
 					FitTextInsideWidgetArea();
 				}
-				spriteList = new Renderer.SpriteList();
+				spriteList = new SpriteList();
 				Vector2 extent;
 				RenderHelper(spriteList, out extent);
 			}
 			Renderer.Transform1 = LocalToWorldTransform;
 			Renderer.Blending = GlobalBlending;
+			Renderer.Shader = GlobalShader;
 			spriteList.Render(GlobalColor);
 		}
 
@@ -151,7 +153,7 @@ namespace Lime
 			}
 		}
 
-		private void RenderHelper(Renderer.SpriteList spriteList, out Vector2 extent)
+		private void RenderHelper(SpriteList spriteList, out Vector2 extent)
 		{
 			extent = Vector2.Zero;
 			var localizedText = Localization.GetString(Text);
@@ -186,7 +188,7 @@ namespace Lime
 			return totalHeight;
 		}
 
-		private void RenderSingleTextLine(Renderer.SpriteList spriteList, ref Vector2 extent, ref Vector2 pos, string line)
+		private void RenderSingleTextLine(SpriteList spriteList, ref Vector2 extent, ref Vector2 pos, string line)
 		{
 			float lineWidth = MeasureTextLine(line).X;
 			switch (HAlignment) {
@@ -349,7 +351,6 @@ namespace Lime
 				spriteList.Dispose();
 				spriteList = null;
 			}
-			DoubleBufferValid = false;
 		}
 	}
 }

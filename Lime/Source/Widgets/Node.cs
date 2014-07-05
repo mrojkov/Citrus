@@ -89,8 +89,6 @@ namespace Lime
 
 		public float AnimationSpeed;
 
-		public bool DoubleBufferValid;
-
 		public object UserData { get; set; }
 
 		#endregion

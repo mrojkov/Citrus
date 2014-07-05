@@ -76,7 +76,7 @@ namespace Lime
 					reader.Read(buffer, 0, buffer.Length);
 					glCommands += () => {
 						GL.CompressedTexImage2D(All.Texture2D, mipLevel, All.CompressedRgbaPvrtc4Bppv1Img, width2, height2, 0, buffer.Length, buffer);
-						Renderer.CheckErrors();
+						PlatformRenderer.CheckErrors();
 					};
 					break;
 				}
@@ -85,7 +85,7 @@ namespace Lime
 					reader.Read(buffer, 0, buffer.Length);
 					glCommands += () => {
 						GL.CompressedTexImage2D(All.Texture2D, mipLevel, All.CompressedRgbaPvrtc2Bppv1Img, width2, height2, 0, buffer.Length, buffer);
-						Renderer.CheckErrors();
+						PlatformRenderer.CheckErrors();
 					};
 					break;
 				}
@@ -94,7 +94,7 @@ namespace Lime
 					reader.Read(buffer, 0, buffer.Length);
 					glCommands += () => {
 						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgba, width2, height2, 0, All.Rgba, All.UnsignedShort4444, buffer);
-						Renderer.CheckErrors();
+						PlatformRenderer.CheckErrors();
 					};
 					break;
 				}
@@ -103,7 +103,7 @@ namespace Lime
 					reader.Read(buffer, 0, buffer.Length);
 					glCommands += () => {
 						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgb, width2, height2, 0, All.Rgb, All.UnsignedShort565, buffer);
-						Renderer.CheckErrors();
+						PlatformRenderer.CheckErrors();
 					};
 					break;
 				}
@@ -112,7 +112,7 @@ namespace Lime
 					reader.Read(buffer, 0, buffer.Length);
 					glCommands += () => {
 						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgba, width2, height2, 0, All.Rgba, All.UnsignedByte, buffer);
-						Renderer.CheckErrors();
+						PlatformRenderer.CheckErrors();
 					};
 					break;
 				}

@@ -33,7 +33,7 @@ namespace Lime.PopupMenu
 
 		private void SetupInnerRect()
 		{
-			innerRect.Blending = Lime.Blending.Silhuette;
+			innerRect.Shader = ShaderId.Silhuette;
 			innerRect.Position = CornerRadius * Vector2.One;
 			innerRect.Size = Size - 2 * CornerRadius * Vector2.One;
 			innerRect.Color = InnerColor;

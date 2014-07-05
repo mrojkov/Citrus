@@ -182,6 +182,7 @@ namespace Lime
 				DidUpdated();
 			}
 			Render();
+			SwapBuffers();
 			if (CommandLineArgs.Limit25FPS) {
 				Limit25FPS();
 			}
@@ -211,7 +212,6 @@ namespace Lime
 			FPSCalculator.Refresh();
 			MakeCurrent();
 			app.OnRenderFrame();
-			SwapBuffers();
 		}
 
 		private void Update(float delta)

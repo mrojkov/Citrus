@@ -91,7 +91,7 @@ namespace Lime
 
 		public uint GetHandle()
 		{
-			return core.GetMainTexture().GetHandle();
+			return core.GetHandle();
 		}
 
 #if UNITY
@@ -133,12 +133,13 @@ namespace Lime
 	class SerializableTextureCore
 	{
 		public readonly string Path;
-		int usedAtRenderCycle = 0;
-		
-		ITexture mainTexture;
-		internal Rectangle UVRect;
-		internal Size ImageSize;
-		internal Size SurfaceSize;
+		public Rectangle UVRect;
+		public Size ImageSize;
+		public Size SurfaceSize;
+
+		private int usedAtRenderCycle = 0;
+		private uint cachedHandle;
+		private ITexture mainTexture;
 
 		public bool IsStubTexture { get; private set; }
 
@@ -173,6 +174,16 @@ namespace Lime
 			}
 			mainTexture.Dispose();
 			mainTexture = null;
+			cachedHandle = 0;
+		}
+
+		public uint GetHandle()
+		{
+			usedAtRenderCycle = Renderer.RenderCycle;
+			if (cachedHandle == 0) {
+				cachedHandle = GetMainTexture().GetHandle();
+			}
+			return cachedHandle;
 		}
 
 		/// <summary>

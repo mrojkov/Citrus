@@ -50,7 +50,7 @@ namespace Lime
 					PixelFormat.Rgba, PixelType.UnsignedByte, data.Scan0);
 				bitmap.UnlockBits(data);
 			}
-			Renderer.CheckErrors();
+			PlatformRenderer.CheckErrors();
 		}
 
 		private void SwapRedAndGreen24(SDI.BitmapData data)

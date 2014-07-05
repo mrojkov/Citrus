@@ -726,6 +726,7 @@ namespace Lime
 				color = basicWidget.GlobalColor;
 			}
 			Renderer.Blending = GlobalBlending;
+			Renderer.Shader = GlobalShader;
 			LinkedListNode<Particle> node = particles.First;
 			for (; node != null; node = node.Next) {
 				Particle particle = node.Value;

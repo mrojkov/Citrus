@@ -86,9 +86,10 @@ namespace Lime
 				Renderer.PremultipliedAlphaMode = false;
 				Renderer.Blending = Blending.None;
 				Renderer.Blending = GlobalBlending;
+				Renderer.Shader = GlobalShader;
 				Renderer.Transform1 = LocalToWorldTransform;
 				Renderer.DrawSprite(movieTexture, GlobalColor, Vector2.Zero, Size, Vector2.Zero, Vector2.One);
-				Renderer.FlushSpriteBatch();
+				Renderer.Flush();
 			} finally {
 				Renderer.Blending = Blending.None;
 				Renderer.PremultipliedAlphaMode = pam;

@@ -89,7 +89,7 @@ namespace Lime
 
 		public override void Render()
 		{
-			if (DoubleBuffer != null) {
+			if (renderList != null) {
 				base.Render();
 			} else if (renderTexture != null) {
 				EnsureRenderChain();

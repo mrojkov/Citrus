@@ -9,7 +9,7 @@ namespace Lime.PopupMenu
 	{
 		Image line = new Image() {
 			Id = "Line",
-			Blending = Blending.Silhuette,
+			Shader = ShaderId.Silhuette,
 			Height = 2,
 			Color = Color4.Black
 		};

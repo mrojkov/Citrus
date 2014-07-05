@@ -11,7 +11,7 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Lime
 {
-	public class ShaderProgram
+	class ShaderProgram
 	{
 		int handle;
 		public int ProjectionMatrixUniformId { get; private set; }
@@ -47,7 +47,7 @@ namespace Lime
 				throw new Lime.Exception(infoLog.ToString());
 			}
 			ProjectionMatrixUniformId = GL.GetUniformLocation(handle, "matProjection");
-			Renderer.CheckErrors();
+			PlatformRenderer.CheckErrors();
 		}
 
 		private string GetLinkLog()
@@ -81,7 +81,7 @@ namespace Lime
 		{
 			Use();
 			GL.Uniform1(GL.GetUniformLocation(handle, name), stage);
-			Renderer.CheckErrors();
+			PlatformRenderer.CheckErrors();
 		}
 	}
 }

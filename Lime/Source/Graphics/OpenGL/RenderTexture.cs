@@ -48,14 +48,14 @@ namespace Lime
 			} else {
 				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, width, height, 0, PixelFormat.Rgb, PixelType.UnsignedShort565, (IntPtr)null);
 			}
-			uint currentFramebuffer = (uint)Renderer.GetCurrentFramebuffer();
+			uint currentFramebuffer = (uint)PlatformRenderer.GetCurrentFramebuffer();
 			BindFramebuffer(framebuffer);
-			Renderer.CheckErrors();
+			PlatformRenderer.CheckErrors();
 			GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, handle, 0);
 			if ((int)GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != (int)FramebufferErrorCode.FramebufferComplete)
 				throw new Exception("Failed to create render texture. Framebuffer is incomplete.");
 			BindFramebuffer(currentFramebuffer);
-			Renderer.CheckErrors();
+			PlatformRenderer.CheckErrors();
 		}
 
 		public Size ImageSize {
@@ -113,8 +113,8 @@ namespace Lime
 
 		public void SetAsRenderTarget()
 		{
-			Renderer.FlushSpriteBatch();
-			uint currentFramebuffer = (uint)Renderer.GetCurrentFramebuffer();
+			Renderer.Flush();
+			uint currentFramebuffer = (uint)PlatformRenderer.GetCurrentFramebuffer();
 			BindFramebuffer(framebuffer);
 			framebufferStack.Push(currentFramebuffer);
 		}
@@ -126,7 +126,7 @@ namespace Lime
 
 		public void RestoreRenderTarget()
 		{
-			Renderer.FlushSpriteBatch();
+			Renderer.Flush();
 			uint prevFramebuffer = framebufferStack.Pop();
 			BindFramebuffer(prevFramebuffer);
 		}

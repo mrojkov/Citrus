@@ -126,6 +126,11 @@ namespace Lime
 		public const All LinkStatus = All.LinkStatus;
 		public const All InfoLogLength = All.InfoLogLength;
 	}
+
+	static class BufferTarget
+	{
+		public const All ArrayBuffer = All.ArrayBuffer;
+	}
 		
 	static class ErrorCode
 	{

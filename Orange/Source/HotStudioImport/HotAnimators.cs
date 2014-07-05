@@ -22,7 +22,7 @@ namespace Orange
 			case "Hot::TypedAnimator<Hot::EmitterShape>":
 				return () => (EmitterShape)lexer.ParseInt();
 			case "Hot::TypedAnimator<Hot::BlendMode>":
-				return () => lexer.ParseBlendMode();
+				return () => lexer.ParseBlendMode().Item1;
 			case "Hot::TypedAnimator<Hot::Color>":
 				return () => lexer.ParseColor4();
 			case "Hot::TypedAnimator<Hot::Vector2>":

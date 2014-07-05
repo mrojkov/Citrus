@@ -71,7 +71,7 @@ namespace Lime
 		private string text;
 		private HAlignment hAlignment;
 		private VAlignment vAlignment;
-		private Renderer.SpriteList spriteList;
+		private SpriteList spriteList;
 
 		[ProtoMember(1)]
 		public override string Text
@@ -94,6 +94,11 @@ namespace Lime
 			set { SetVAlignment(value); } 
 		}
 
+		public RichText()
+		{
+			// StaticBatching = true;
+		}
+
 		private string errorMessage;
 
 		public string ErrorMessage
@@ -114,11 +119,12 @@ namespace Lime
 		{
 			if (spriteList == null) {
 				var renderer = PrepareRenderer();
-				spriteList = new Renderer.SpriteList();
+				spriteList = new SpriteList();
 				renderer.Render(spriteList, Size, HAlignment, VAlignment);
 			}
 			Renderer.Transform1 = LocalToWorldTransform;
 			Renderer.Blending = GlobalBlending;
+			Renderer.Shader = GlobalShader;
 			spriteList.Render(GlobalColor);
 		}
 
@@ -198,7 +204,6 @@ namespace Lime
 				spriteList = null;
 			}
 			parser = null;
-			DoubleBufferValid = false;
 		}
 
 		/// Call on user-supplied parts of text.
@@ -419,7 +424,7 @@ namespace Lime
 			}
 		}
 
-		public void Render(Renderer.SpriteList spriteList, Vector2 area, HAlignment hAlign, VAlignment vAlign)
+		public void Render(SpriteList spriteList, Vector2 area, HAlignment hAlign, VAlignment vAlign)
 		{
 			List<Fragment> words;
 			List<int> lines;

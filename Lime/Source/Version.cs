@@ -10,7 +10,7 @@ namespace Lime
 	{
 		public static int GetBundleFormatVersion()
 		{
-			return 4;
+			return 5;
 		}
 	}
 }

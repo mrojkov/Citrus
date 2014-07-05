@@ -109,7 +109,7 @@ namespace Lime
 			glCommands += () => {
 				GL.TexImage2D(TextureTarget.Texture2D, level, PixelInternalFormat.Rgba, width, height, 0,
 					PixelFormat.Rgba, PixelType.UnsignedByte, buffer);
-				Renderer.CheckErrors();
+				PlatformRenderer.CheckErrors();
 			};
 		}
 
@@ -133,7 +133,7 @@ namespace Lime
 			reader.Read(buffer, 0, buffer.Length);
 			glCommands += () => {
 				GL.CompressedTexImage2D(TextureTarget.Texture2D, level, pif, width, height, 0, buffer.Length, buffer);
-				Renderer.CheckErrors();
+				PlatformRenderer.CheckErrors();
 			};
 		}
 #endif
