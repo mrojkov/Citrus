@@ -89,10 +89,6 @@ namespace Lime
 
 		protected Matrix32 renderListInversedWorldTransform;
 		protected RenderList renderList;
-		public RenderList RenderList
-		{
-			get { return renderList; }
-		}
 
 		public bool CachedRendering
 		{
@@ -105,6 +101,13 @@ namespace Lime
 					renderList = null;
 				}
 				if (GlobalValuesValid) InvalidateGlobalValues();
+			}
+		}
+
+		public void InvalidateRenderCache()
+		{
+			if (renderList != null) {
+				renderList.Clear();
 			}
 		}
 
