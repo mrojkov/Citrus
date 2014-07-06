@@ -242,6 +242,12 @@ namespace Lime
 			}
 		}
 
+		public void UnlinkAndDispose()
+		{
+			Unlink();
+			Dispose();
+		}
+
 		public virtual void Update(float delta)
 		{
 			delta *= AnimationSpeed;
