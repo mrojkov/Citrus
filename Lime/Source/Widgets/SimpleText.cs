@@ -93,7 +93,7 @@ namespace Lime
 
 		public SimpleText()
 		{
-			// StaticBatching = true;
+			// CachedRendering = true;
 			Text = "";
 			FontHeight = 15;
 			Font = new SerializableFont();
@@ -347,6 +347,7 @@ namespace Lime
 
 		private void DisposeSpriteList()
 		{
+			InvalidateRenderCache();
 			if (spriteList != null) {
 				spriteList.Dispose();
 				spriteList = null;

@@ -96,7 +96,7 @@ namespace Lime
 
 		public RichText()
 		{
-			// StaticBatching = true;
+			// CachedRendering = true;
 		}
 
 		private string errorMessage;
@@ -199,6 +199,7 @@ namespace Lime
 
 		public void Invalidate()
 		{
+			InvalidateRenderCache();
 			if (spriteList != null) {
 				spriteList.Dispose();
 				spriteList = null;

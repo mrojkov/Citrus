@@ -87,18 +87,17 @@ namespace Lime
 			set { }
 		}
 
-		protected Matrix32 renderListInversedWorldTransform;
-		protected RenderList renderList;
+		private WidgetCachedRenderer cachedRenderer;
 
 		public bool CachedRendering
 		{
-			get { return renderList != null; }
+			get { return cachedRenderer != null; }
 			set
 			{
-				if (value && renderList == null) {
-					renderList = new RenderList();
-				} else if (!value && renderList != null) {
-					renderList = null;
+				if (value && cachedRenderer == null) {
+					cachedRenderer = new WidgetCachedRenderer(this);
+				} else if (!value && cachedRenderer != null) {
+					cachedRenderer = null;
 				}
 				if (GlobalValuesValid) InvalidateGlobalValues();
 			}
@@ -106,8 +105,8 @@ namespace Lime
 
 		public void InvalidateRenderCache()
 		{
-			if (renderList != null) {
-				renderList.Clear();
+			if (cachedRenderer != null) {
+				cachedRenderer.Invalidate();
 			}
 		}
 
@@ -180,21 +179,10 @@ namespace Lime
 			}
 		}
 
-		public override void Render()
-		{
-			if (renderList != null) {
-				Renderer.Flush();
-				Renderer.PushProjectionMatrix();
-				Renderer.Projection = (Matrix44)(renderListInversedWorldTransform * localToWorldTransform) * Renderer.Projection;
-				renderList.Render();
-				Renderer.PopProjectionMatrix();
-			}
-		}
-
 		public override void Dispose()
 		{
-			if (renderList != null) {
-				renderList.Clear();
+			if (cachedRenderer != null) {
+				cachedRenderer.Dispose();
 			}
 			base.Dispose();
 		}
@@ -454,8 +442,8 @@ namespace Lime
 		{
 			var clone = base.DeepCloneFast().AsWidget;
 			clone.input = null;
-			if (clone.renderList != null) {
-				clone.renderList = new RenderList();
+			if (clone.cachedRenderer != null) {
+				clone.cachedRenderer = new WidgetCachedRenderer(clone);
 			}
 			clone.tasks = null;
 			clone.lateTasks = null;
@@ -556,23 +544,16 @@ namespace Lime
 			return matrix;
 		}
 
-		private static RenderChain renderChainForBatching = new RenderChain();
-
 		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (!GloballyVisible) {
 				return;
 			}
-			if (renderList != null) {
-				chain.Add(this, Layer);
-				if (!renderList.IsEmpty) {
+			if (cachedRenderer != null) {
+				if (cachedRenderer.Prepare()) {
+					chain.Add(cachedRenderer, Layer);
 					return;
 				}
-				renderListInversedWorldTransform = localToWorldTransform.CalcInversed();
-				Renderer.CurrentRenderList = renderList;
-				RenderForStaticBatching();
-				Renderer.CurrentRenderList = Renderer.MainRenderList;
-				return;
 			}
 			if (Layer != 0) {
 				int oldLayer = chain.SetCurrentLayer(Layer);
@@ -587,14 +568,6 @@ namespace Lime
 				}
 				chain.Add(this);
 			}
-		}
-
-		protected virtual void RenderForStaticBatching()
-		{
-			for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
-				node.AddToRenderChain(renderChainForBatching);
-			}
-			renderChainForBatching.RenderAndClear();
 		}
 
 		protected override void OnParentSizeChanged(Vector2 parentSizeDelta)

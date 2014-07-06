@@ -89,9 +89,7 @@ namespace Lime
 
 		public override void Render()
 		{
-			if (renderList != null) {
-				base.Render();
-			} else if (renderTexture != null) {
+			if (renderTexture != null) {
 				EnsureRenderChain();
 				RenderToTexture(renderTexture, renderChain);
 			} else if (ClipChildren == ClipMethod.ScissorTest) {

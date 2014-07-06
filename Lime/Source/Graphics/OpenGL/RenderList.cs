@@ -9,7 +9,7 @@ namespace Lime
 		private VertexBuffer lastBuffer;
 		private RenderBatch lastBatch;
 
-		public bool IsEmpty { get { return lastBuffer == null; } }
+		public bool Empty { get { return lastBuffer == null; } }
 		
 		public RenderBatch RequestForBatch(ITexture texture1, ITexture texture2, Blending blending, ShaderId shader, int numVertices, int numIndices)
 		{

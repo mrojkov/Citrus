@@ -174,6 +174,7 @@
     <Compile Include="Source\Widgets\RenderChain.cs" />
     <Compile Include="Source\Widgets\RichText.cs" />
     <Compile Include="Source\Widgets\Movie.cs" />
+    <Compile Include="Source\Widgets\WidgetCachedRenderer.cs" />
     <Compile Include="Source\Widgets\World.cs" />
     <Compile Include="Source\Widgets\SimpleText.cs" />
     <Compile Include="Source\Widgets\Slider.cs" />
