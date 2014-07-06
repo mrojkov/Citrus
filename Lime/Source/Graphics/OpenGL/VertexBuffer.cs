@@ -46,10 +46,10 @@ namespace Lime
 
 		private static void DoubleVertexBuffers()
 		{
-			//var c = Math.Max(1, VertexBuffer.TotalVertexBuffers);
-			//for (int i = 0; i < c; i++) {
+			var c = Math.Max(1, VertexBuffer.TotalVertexBuffers);
+			for (int i = 0; i < c; i++) {
 				items.Enqueue(new VertexBuffer());
-			//}
+			}
 		}
 
 		public static void Release(VertexBuffer item)
