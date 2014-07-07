@@ -71,7 +71,7 @@ namespace Lime
 			} else {
 				IndexBuffer.Bind();
 			}
-			GL.DrawElements(PrimitiveType.Triangles, IndexBuffer.IndexCount, DrawElementsType.UnsignedShort, offset);
+			GL.DrawElements(PrimitiveType.Triangles, IndexBuffer.IndexCount, DrawElementsType.UnsignedShort, (IntPtr)offset);
 			Renderer.DrawCalls++;
 		}
 

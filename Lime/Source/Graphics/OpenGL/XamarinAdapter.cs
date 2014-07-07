@@ -130,11 +130,17 @@ namespace Lime
 	static class BufferTarget
 	{
 		public const All ArrayBuffer = All.ArrayBuffer;
+		public const All ElementArrayBuffer = All.ElementArrayBuffer;
 	}
 		
 	static class ErrorCode
 	{
 		public const All NoError = All.NoError;
+	}
+
+	static class BufferUsageHint
+	{
+		public const All DynamicDraw = All.DynamicDraw;
 	}
 }
 #endif
