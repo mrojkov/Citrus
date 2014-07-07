@@ -111,7 +111,6 @@ namespace Lime
 				GL.BindTexture(TextureTarget.Texture2D, glTexNum);
 			}
 			textures[stage] = glTexNum;
-			CheckErrors();
 		}
 				
 		public static void SetViewport(WindowRect value)

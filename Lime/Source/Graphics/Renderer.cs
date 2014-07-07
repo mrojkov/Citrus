@@ -289,13 +289,13 @@ namespace Lime
 				Blending = Blending.Glow;
 			}
 			var batch = DrawTrianglesHelper(texture1, texture2, vertices, numVertices);
-			var iptr = &batch.Indices[batch.IndexCount];
+			var iptr = &batch.IndexBuffer.Indices[batch.IndexBuffer.IndexCount];
 			var baseVertex = batch.VertexBuffer.VertexCount;
 			for (int i = 1; i <= numVertices - 2; i++) {
 				*iptr++ = (ushort)baseVertex;
 				*iptr++ = (ushort)(baseVertex + i);
 				*iptr++ = (ushort)(baseVertex + i + 1);
-				batch.IndexCount += 3;
+				batch.IndexBuffer.IndexCount += 3;
 			}
 			batch.VertexBuffer.VertexCount += numVertices;
 		}
@@ -308,14 +308,14 @@ namespace Lime
 				Blending = Blending.Glow;
 			}
 			var batch = DrawTrianglesHelper(texture1, texture2, vertices, numVertices);
-			var iptr = &batch.Indices[batch.IndexCount];
+			var iptr = &batch.IndexBuffer.Indices[batch.IndexBuffer.IndexCount];
 			var vertex = batch.VertexBuffer.VertexCount;
 			for (int i = 0; i < numVertices - 2; i++) {
 				*iptr++ = (ushort)vertex;
 				*iptr++ = (ushort)(vertex + 1);
 				*iptr++ = (ushort)(vertex + 2);
 				vertex++;
-				batch.IndexCount += 3;
+				batch.IndexBuffer.IndexCount += 3;
 			}
 			batch.VertexBuffer.VertexCount += numVertices;
 		}
@@ -327,6 +327,7 @@ namespace Lime
 			Rectangle uvRect2 = (texture2 != null) ? texture2.AtlasUVRect : new Rectangle();
 			var transform = GetEffectiveTransform();
 			var buffer = batch.VertexBuffer;
+			buffer.SpritesOnly = false;
 			var vptr = &buffer.Vertices[buffer.VertexCount];
 			for (int i = 0; i < numVertices; i++) {
 				Vertex v = vertices[i];
@@ -359,9 +360,9 @@ namespace Lime
 			}
 			var buffer = batch.VertexBuffer;
 			int i = buffer.VertexCount;
-			Int32* ip = (Int32*)&batch.Indices[batch.IndexCount];
+			Int32* ip = (Int32*)&batch.IndexBuffer.Indices[batch.IndexBuffer.IndexCount];
 			Vertex* vp = &buffer.Vertices[i];
-			batch.IndexCount += 6;
+			batch.IndexBuffer.IndexCount += 6;
 			buffer.VertexCount += 4;
 			*ip++ = (i << 16) | (i + 1);
 			*ip++ = ((i + 2) << 16) | (i + 2);

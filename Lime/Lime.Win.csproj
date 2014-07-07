@@ -60,6 +60,7 @@
     <Compile Include="Source\AssetsBundle\UnityAssetsBundle.cs" />
     <Compile Include="Source\Graphics\OpenGL\RenderBatch.cs" />
     <Compile Include="Source\Graphics\OpenGL\RenderList.cs" />
+    <Compile Include="Source\Graphics\OpenGL\IndexBuffer.cs" />
     <Compile Include="Source\Graphics\OpenGL\VertexBuffer.cs" />
     <Compile Include="Source\Graphics\OpenGL\XamarinAdapter.cs" />
     <Compile Include="Source\Graphics\OpenGL\Shaders.cs" />

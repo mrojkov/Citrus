@@ -61,14 +61,17 @@ namespace Lime
 
 	public unsafe class VertexBuffer : IDisposable
 	{
-		public const int Capacity = 1000;
+		public const int DefaultCapacity = 1000;
+		public readonly int Capacity;
 		public Vertex* Vertices;
 		public int VertexCount;
 		public bool Uploaded;
-
+		/// <summary>
+		/// If true, the specially prepared index buffer will be used
+		/// </summary>
+		public bool SpritesOnly = true;
 		public static int TotalVertexBuffers;
 		private uint vboHandle;
-		private uint vaoHandle;
 		private bool disposed;
 
 		internal static class Attributes
@@ -87,24 +90,12 @@ namespace Lime
 			}
 		}
 
-		public VertexBuffer()
+		public VertexBuffer(int capacity = DefaultCapacity)
 		{
+			Capacity = capacity;
 			TotalVertexBuffers++;
 			Vertices = (Vertex*)Marshal.AllocHGlobal(sizeof(Vertex) * Capacity);
 			AllocateVBOHandle();
-			AllocateVAOHandle();
-			GL.BindVertexArray(vaoHandle);
-			GL.BindBuffer(BufferTarget.ArrayBuffer, vboHandle);
-			GL.EnableVertexAttribArray(Attributes.Position);
-			GL.EnableVertexAttribArray(Attributes.UV1);
-			GL.EnableVertexAttribArray(Attributes.Color);
-			GL.EnableVertexAttribArray(Attributes.UV2);
-			GL.VertexAttribPointer(Attributes.Position, 2, VertexAttribPointerType.Float, false, sizeof(Vertex), (IntPtr)0);
-			GL.VertexAttribPointer(Attributes.UV1, 2, VertexAttribPointerType.Float, false, sizeof(Vertex), (IntPtr)8);
-			GL.VertexAttribPointer(Attributes.Color, 4, VertexAttribPointerType.UnsignedByte, true, sizeof(Vertex), (IntPtr)16);
-			GL.VertexAttribPointer(Attributes.UV2, 2, VertexAttribPointerType.Float, false, sizeof(Vertex), (IntPtr)20);
-			GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-			GL.BindVertexArray(0);
 			PlatformRenderer.CheckErrors();
 		}
 
@@ -113,17 +104,11 @@ namespace Lime
 			Dispose();
 		}
 
-		private void AllocateVAOHandle()
-		{
-			var t = new int[1];
-			GL.GenVertexArrays(1, t);
-			vaoHandle = (uint)t[0];
-		}
-
 		public void Clear()
 		{
 			VertexCount = 0;
 			Uploaded = false;
+			SpritesOnly = true;
 		}
 
 		private void AllocateVBOHandle()
@@ -135,7 +120,16 @@ namespace Lime
 
 		public void Bind()
 		{
-			GL.BindVertexArray(vaoHandle);
+			GL.BindVertexArray(vboHandle);
+			GL.BindBuffer(BufferTarget.ArrayBuffer, vboHandle);
+			GL.EnableVertexAttribArray(Attributes.Position);
+			GL.EnableVertexAttribArray(Attributes.UV1);
+			GL.EnableVertexAttribArray(Attributes.Color);
+			GL.EnableVertexAttribArray(Attributes.UV2);
+			GL.VertexAttribPointer(Attributes.Position, 2, VertexAttribPointerType.Float, false, sizeof(Vertex), (IntPtr)0);
+			GL.VertexAttribPointer(Attributes.UV1, 2, VertexAttribPointerType.Float, false, sizeof(Vertex), (IntPtr)8);
+			GL.VertexAttribPointer(Attributes.Color, 4, VertexAttribPointerType.UnsignedByte, true, sizeof(Vertex), (IntPtr)16);
+			GL.VertexAttribPointer(Attributes.UV2, 2, VertexAttribPointerType.Float, false, sizeof(Vertex), (IntPtr)20);
 			if (!Uploaded) {
 				Uploaded = true;
 				GL.BindBuffer(BufferTarget.ArrayBuffer, vboHandle);
@@ -152,9 +146,7 @@ namespace Lime
 				Vertices = null;
 				if (OpenTK.Graphics.GraphicsContext.CurrentContext != null) {
 					GL.DeleteBuffers(1, new uint[] { vboHandle });
-					GL.DeleteVertexArrays(1, new uint[] { vaoHandle });
 				}
-				vaoHandle = 0;
 				vboHandle = 0;
 				disposed = true;
 			}

@@ -15,21 +15,32 @@ namespace Lime
 	/// <summary>
 	/// This class contains an index array related to a single draw call.
 	/// </summary>
-	public unsafe class RenderBatch : IDisposable
+	public class RenderBatch : IDisposable
 	{
-		public const int Capacity = 500;
 		public Blending Blending;
 		public ShaderId Shader;
 		public ITexture Texture1;
 		public ITexture Texture2;
-		public int IndexCount;
 		public VertexBuffer VertexBuffer;
-		public ushort* Indices;
+		public IndexBuffer IndexBuffer;
 		private bool disposed;
 
-		public RenderBatch()
+		private static IndexBuffer spriteOnlyIndexBuffer = CreateSpriteOnlyIndexBuffer();
+
+		private unsafe static Lime.IndexBuffer CreateSpriteOnlyIndexBuffer()
 		{
-			Indices = (ushort*)Marshal.AllocHGlobal(sizeof(ushort) * Capacity);
+			var ib = new IndexBuffer((VertexBuffer.DefaultCapacity >> 2) * 6);
+			ib.IndexCount = ib.Capacity;
+			int v = 0;
+			int c = ib.Capacity / 6;
+			Int32* ip = (Int32*)ib.Indices;
+			for (int i = 0; i < c; i++) {
+				*ip++ = (v << 16) | (v + 1);
+				*ip++ = ((v + 2) << 16) | (v + 2);
+				*ip++ = ((v + 1) << 16) | (v + 3);
+				v += 4;
+			}
+			return ib;
 		}
 
 		~RenderBatch()
@@ -40,18 +51,27 @@ namespace Lime
 		public void Clear()
 		{
 			Texture1 = Texture2 = null;
-			IndexCount = 0;
 			Blending = Lime.Blending.None;
 			Shader = ShaderId.None;
 			VertexBuffer = null;
+			if (IndexBuffer != null) {
+				IndexBufferPool.Release(IndexBuffer);
+			}
 		}
 
-		public void Render()
+		public unsafe void Render()
 		{
 			PlatformRenderer.SetTexture(Texture1, 0);
 			PlatformRenderer.SetTexture(Texture2, 1);
 			PlatformRenderer.SetShader(Shader);
-			GL.DrawElements(PrimitiveType.Triangles, IndexCount, DrawElementsType.UnsignedShort, (IntPtr)Indices);
+			int offset = 0;
+			if (VertexBuffer.SpritesOnly) {
+				spriteOnlyIndexBuffer.Bind();
+				offset = ((IndexBuffer.Indices[0] - 1) >> 2) * 6 * sizeof(ushort);
+			} else {
+				IndexBuffer.Bind();
+			}
+			GL.DrawElements(PrimitiveType.Triangles, IndexBuffer.IndexCount, DrawElementsType.UnsignedShort, offset);
 			Renderer.DrawCalls++;
 		}
 
@@ -59,8 +79,7 @@ namespace Lime
 		{
 			if (!disposed) {
 				disposed = true;
-				Marshal.FreeHGlobal((IntPtr)Indices);
-				Indices = null;
+				Clear();
 			}
 			GC.SuppressFinalize(this);
 		}
