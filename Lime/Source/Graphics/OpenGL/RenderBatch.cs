@@ -64,6 +64,7 @@ namespace Lime
 			PlatformRenderer.SetTexture(Texture1, 0);
 			PlatformRenderer.SetTexture(Texture2, 1);
 			PlatformRenderer.SetShader(Shader);
+			PlatformRenderer.SetBlending(Blending);
 			int offset = 0;
 			if (VertexBuffer.SpritesOnly) {
 				spriteOnlyIndexBuffer.Bind();
