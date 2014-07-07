@@ -22,9 +22,19 @@ namespace Lime
 		{
 			parentWidget.AddNode(this);
 			Size = parentWidget.Size;
+			Anchors = Anchors.LeftRightTopBottom;
 			browser.Width = (int)Width;
 			browser.Height = (int)Height;
 			browser.ScrollBarsEnabled = false;
+		}
+
+		protected override void OnSizeChanged(Vector2 sizeDelta)
+		{
+			base.OnSizeChanged(sizeDelta);
+			if (browser != null) {
+				browser.Width = (int)Width;
+				browser.Height = (int)Height;
+			}
 		}
 
 		private Texture2D browserImage = new Texture2D();
