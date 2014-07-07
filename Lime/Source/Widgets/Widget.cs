@@ -97,6 +97,7 @@ namespace Lime
 				if (value && cachedRenderer == null) {
 					cachedRenderer = new WidgetCachedRenderer(this);
 				} else if (!value && cachedRenderer != null) {
+					cachedRenderer.Dispose();
 					cachedRenderer = null;
 				}
 				if (GlobalValuesValid) InvalidateGlobalValues();
