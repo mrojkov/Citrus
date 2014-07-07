@@ -165,7 +165,7 @@ namespace Lime
 				vertices[i].Pos = coords[i];
 				vertices[i].Color = color;
 				vertices[i].UV1 = coords[i] * uvTransform1;
-				// vertices[i].UV2 = coords[i] * uvTransform2;
+				vertices[i].UV2 = coords[i] * uvTransform2;
 			}
 			Renderer.DrawTriangleFan(texture1, texture2, vertices, numCoords);
 		}
