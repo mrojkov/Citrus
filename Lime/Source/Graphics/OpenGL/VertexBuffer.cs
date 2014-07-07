@@ -120,7 +120,6 @@ namespace Lime
 
 		public void Bind()
 		{
-			GL.BindVertexArray(vboHandle);
 			GL.BindBuffer(BufferTarget.ArrayBuffer, vboHandle);
 			GL.EnableVertexAttribArray(Attributes.Position);
 			GL.EnableVertexAttribArray(Attributes.UV1);
