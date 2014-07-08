@@ -33,8 +33,10 @@ namespace Lime
 
 		public void SaveToStream(Stream stream)
 		{
-			using (var bitmapStream = bitmap.AsPNG().AsStream()) { 
-				Toolbox.CopyStream(bitmapStream, stream);
+			if (bitmap != null) {
+				using (var bitmapStream = bitmap.AsPNG().AsStream()) { 
+					Toolbox.CopyStream(bitmapStream, stream);
+				}
 			}
 		}
 
@@ -50,7 +52,9 @@ namespace Lime
 
 		public void Dispose()
 		{
-			bitmap.Dispose();
+			if (bitmap != null) {
+				bitmap.Dispose();
+			}
 		}
 	}
 }

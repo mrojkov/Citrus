@@ -15,12 +15,20 @@ namespace Lime
 		IBitmapImplementation Crop(Rectangle cropArea);
 	}
 
+	[ProtoContract]
 	public class Bitmap : IDisposable
 	{
 		IBitmapImplementation implementation;
 		public Vector2 Size { get { return new Vector2(Width, Height); } }
 		public int Width { get { return implementation.GetWidth(); } }
 		public int Height { get { return implementation.GetHeight(); } }
+
+		[ProtoMember(1)]
+		public byte[] AsByteArray
+		{
+			get { return GetByteArray(); }
+			set { LoadFromByteArray(value); }
+		}
 
 		public Bitmap()
 		{
@@ -53,5 +61,23 @@ namespace Lime
 		{
 			implementation.Dispose();
 		}
+
+		private void LoadFromByteArray(byte[] data)
+		{
+			using (var stream = new MemoryStream(data)) {
+				LoadFromStream(stream);
+			}
+		}
+
+		private byte[] GetByteArray()
+		{
+			byte[] result;
+			using (var stream = new MemoryStream()) {
+				SaveToStream(stream);
+				result = stream.ToArray();
+			}
+			return result;
+		}
+
 	}
 }

@@ -36,7 +36,9 @@ namespace Lime
 
 		public void SaveToStream(Stream stream)
 		{
-			bitmap.Save(stream, SD.Imaging.ImageFormat.Png);
+			if (bitmap != null) {
+				bitmap.Save(stream, SD.Imaging.ImageFormat.Png);
+			}
 		}
 
 		public IBitmapImplementation Crop(Rectangle cropArea)
@@ -50,7 +52,9 @@ namespace Lime
 
 		public void Dispose()
 		{
-			bitmap.Dispose();
+			if (bitmap != null) {
+				bitmap.Dispose();
+			}
 		}
 
 		private void InitWithPngOrJpgBitmap(Stream stream)
