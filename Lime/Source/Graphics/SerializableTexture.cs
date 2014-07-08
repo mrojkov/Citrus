@@ -180,9 +180,9 @@ namespace Lime
 		public uint GetHandle()
 		{
 			usedAtRenderCycle = Renderer.RenderCycle;
-			if (cachedHandle == 0) {
+			//if (cachedHandle == 0) {
 				cachedHandle = GetMainTexture().GetHandle();
-			}
+			//}
 			return cachedHandle;
 		}
 

@@ -78,26 +78,14 @@ namespace Lime
 			}
 		}
 
-		public override void WillRotate(UIInterfaceOrientation toInterfaceOrientation, double duration)
-		{
-			base.WillRotate(toInterfaceOrientation, duration);
-            var toOrientation = ConvertInterfaceOrientation(toInterfaceOrientation);
-            Application.Instance.OnDeviceRotating(toOrientation);
-		}
-
 		public override void ViewDidLayoutSubviews()
 		{
 			var toOrientation = ConvertInterfaceOrientation(this.InterfaceOrientation);
 			Application.Instance.CurrentDeviceOrientation = toOrientation;
 			base.ViewDidLayoutSubviews();
+			Application.Instance.OnLayoutChange();
 		}
 
-		public override void DidRotate(UIInterfaceOrientation fromInterfaceOrientation)
-		{
-			base.DidRotate(fromInterfaceOrientation);
-            var fromOrientation = ConvertInterfaceOrientation(fromInterfaceOrientation);
-            Application.Instance.OnDeviceRotated(fromOrientation);
-		}
 	}
 }
 #endif

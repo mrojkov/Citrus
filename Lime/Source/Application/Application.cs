@@ -256,8 +256,7 @@ namespace Lime
 		public virtual void OnTerminate() {}
 		public virtual void OnUpdateFrame(float delta) {}
 		public virtual void OnRenderFrame() {}
-		public virtual void OnDeviceRotating(DeviceOrientation toOrientation) {}
-		public virtual void OnDeviceRotated(DeviceOrientation fromOrientation) {}
+		public virtual void OnLayoutChange() {}
 		public virtual DeviceOrientation GetSupportedDeviceOrientations() { return DeviceOrientation.LandscapeLeft; }
 
 		[Obsolete("Use GameView.SetCursor() instead")]

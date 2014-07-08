@@ -82,14 +82,9 @@ namespace Lime
 			iboHandle = (uint)t[0];
 		}
 
-		private static uint boundHandle = 0;
-
 		public void Bind()
 		{
-			if (boundHandle != iboHandle) {
-				boundHandle = iboHandle;
-				GL.BindBuffer(BufferTarget.ElementArrayBuffer, iboHandle);
-			}
+			GL.BindBuffer(BufferTarget.ElementArrayBuffer, iboHandle);
 			if (!Uploaded) {
 				Uploaded = true;
 				GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(ushort) * IndexCount), (IntPtr)Indices, BufferUsageHint.DynamicDraw);

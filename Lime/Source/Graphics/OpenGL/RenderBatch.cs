@@ -68,7 +68,11 @@ namespace Lime
 			int offset = 0;
 			if (VertexBuffer.SpritesOnly) {
 				spriteOnlyIndexBuffer.Bind();
-				offset = ((IndexBuffer.Indices[0] - 1) >> 2) * 6 * sizeof(ushort);
+				var firstElement = ((IndexBuffer.Indices[0] - 1) >> 2) * 6;
+				if (firstElement + IndexBuffer.IndexCount > spriteOnlyIndexBuffer.Capacity) {
+					throw new IndexOutOfRangeException();
+				}
+				offset = firstElement * sizeof(ushort);
 			} else {
 				IndexBuffer.Bind();
 			}
