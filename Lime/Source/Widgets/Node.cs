@@ -50,7 +50,7 @@ namespace Lime
 		public Widget AsWidget { get; internal set; }
 
 		internal Node NextToRender;
-		internal Node NextSibling;
+		public Node NextSibling;
 
 		public int Layer { get; set; }
 
