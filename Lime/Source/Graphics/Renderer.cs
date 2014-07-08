@@ -13,7 +13,7 @@ namespace Lime
 		[ProtoEnum]
 		None,
 		[ProtoEnum]
-		Default,
+		Inherited,
 		[ProtoEnum]
 		Alpha,
 		[ProtoEnum]
@@ -284,7 +284,7 @@ namespace Lime
 		public static void DrawTriangleFan(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
 		{
 			if (Blending == Blending.Glow) {
-				Blending = Blending.Default;
+				Blending = Blending.Alpha;
 				DrawTriangleFan(texture1, texture2, vertices, numVertices);
 				Blending = Blending.Glow;
 			}
@@ -303,7 +303,7 @@ namespace Lime
 		public static void DrawTriangleStrip(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
 		{
 			if (Blending == Blending.Glow) {
-				Blending = Blending.Default;
+				Blending = Blending.Alpha;
 				DrawTriangleStrip(texture1, texture2, vertices, numVertices);
 				Blending = Blending.Glow;
 			}
@@ -347,9 +347,9 @@ namespace Lime
 		public static void DrawSprite(ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 uv0, Vector2 uv1)
 		{
 			if (Blending == Blending.Glow) {
-				Blending = Blending.Default;
+				Blending = Blending.Alpha;
 				DrawSprite(texture, color, position, size, uv0, uv1);
-				Blending = Blending.Add;
+				Blending = Blending.Glow;
 			}
 			var batch = CurrentRenderList.RequestForBatch(texture, null, Blending, Shader, 4, 6);
 			if (Renderer.PremultipliedAlphaMode && color.A != 255) {

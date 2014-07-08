@@ -12,6 +12,8 @@ namespace Lime
 		[ProtoEnum]
 		None,
 		[ProtoEnum]
+		Inherited,
+		[ProtoEnum]
 		Default,
 		[ProtoEnum]
 		Silhuette
@@ -21,7 +23,7 @@ namespace Lime
 	{
 		public static ShaderProgram GetShaderProgram(ShaderId shader, int numTextures)
 		{
-			if (shader == ShaderId.Default) {
+			if (shader == ShaderId.Default || shader == ShaderId.Inherited) {
 				if (numTextures == 1) {
 					return oneTextureBlengingProgram;
 				} else if (numTextures == 2) {
@@ -106,7 +108,8 @@ namespace Lime
 			"uniform lowp sampler2D tex;	" +
 			"void main()					" +
 			"{								" +
-			"	gl_FragColor = vec4(color.rgb, color.a * texture2D(tex, texCoords).a);	" +
+			"	lowp float a = color.a * texture2D(tex, texCoords).a; " +
+			"	gl_FragColor = vec4(color.rgb * a, a);	" +
 			"}");
 
 		static readonly Shader twoTexturesSilhouetteFragmentShader = new FragmentShader(

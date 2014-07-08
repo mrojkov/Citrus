@@ -433,8 +433,8 @@ namespace Lime
 			Color = Color4.White;
 			Scale = Vector2.One;
 			Visible = true;
-			Blending = Blending.Default;
-			Shader = ShaderId.Default;
+			Blending = Blending.Inherited;
+			Shader = ShaderId.Inherited;
 			direction = new Vector2(1, 0);
 		}
 
@@ -529,8 +529,8 @@ namespace Lime
 			if (IsRenderedToTexture()) {
 				localToWorldTransform = Matrix32.Identity;
 				globalColor = color;
-				globalBlending = Lime.Blending.Default;
-				globalShader = Shader;
+				globalBlending = Blending.Inherited;
+				globalShader = ShaderId.Inherited;
 				globallyVisible = Visible && color.A != 0;
 				return;
 			}
@@ -540,8 +540,8 @@ namespace Lime
 					var localToParent = CalcLocalToParentTransform();
 					Matrix32.Multiply(ref localToParent, ref parentWidget.localToWorldTransform, out localToWorldTransform);
 					globalColor = Color * parentWidget.globalColor;
-					globalBlending = Blending == Blending.Default ? parentWidget.globalBlending : Blending;
-					globalShader = Shader == ShaderId.Default ? parentWidget.globalShader : Shader;
+					globalBlending = Blending == Blending.Inherited ? parentWidget.globalBlending : Blending;
+					globalShader = Shader == ShaderId.Inherited ? parentWidget.globalShader : Shader;
 					globallyVisible = (Visible && color.A != 0) && parentWidget.globallyVisible;
 					return;
 				}

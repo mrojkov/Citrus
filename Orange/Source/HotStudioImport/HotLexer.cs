@@ -104,19 +104,22 @@ namespace Orange
 		
 		public Tuple<Blending, ShaderId> ParseBlendMode()
 		{
-			Blending blending = Blending.Default;
-			ShaderId shader = ShaderId.Default;
+			Blending blending = Blending.Inherited;
+			ShaderId shader = ShaderId.Inherited;
 			switch(ParseInt()) {
 			case 0:
 				break;
 			case 2:
 				blending = Blending.Add;
+				shader = ShaderId.Default;
 				break;
 			case 3:
 				blending = Blending.Burn;
+				shader = ShaderId.Default;
 				break;
 			case 5:
 				blending = Blending.Modulate;
+				shader = ShaderId.Default;
 				break;
 			case 7:
 				blending = Blending.Alpha;
@@ -124,6 +127,7 @@ namespace Orange
 				break;
 			default:
 				blending = Blending.Alpha;
+				shader = ShaderId.Default;
 				break;
 			}
 			return new Tuple<Blending, ShaderId>(blending, shader);

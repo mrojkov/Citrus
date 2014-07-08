@@ -80,7 +80,7 @@ namespace Lime
 			blending = Blending.None;
 			premultipliedAlphaMode = false;
 			shaderProgram = null;
-			SetBlending(Blending.Default);
+			SetBlending(Blending.Inherited);
 			SetShader(ShaderId.Default);
 			ClearRenderTarget(0, 0, 0, 0);
 			CheckErrors();
@@ -143,7 +143,7 @@ namespace Lime
 			premultipliedAlphaMode = Renderer.PremultipliedAlphaMode;
 			blending = value;
 			switch (blending) {
-				case Blending.Default:
+				case Blending.Inherited:
 				case Blending.Alpha:
 					var sfactor = Renderer.PremultipliedAlphaMode ? BlendingFactorSrc.One : BlendingFactorSrc.SrcAlpha;
 					GL.BlendFunc(sfactor, BlendingFactorDest.OneMinusSrcAlpha);

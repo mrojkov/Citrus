@@ -46,7 +46,7 @@ namespace Lime
 		public ImageCombiner()
 		{
 			Enabled = true;
-			Blending = Blending.Default;
+			Blending = Blending.Inherited;
 			Shader = ShaderId.Default;
 		}
 
@@ -186,8 +186,8 @@ namespace Lime
 				return;
 			}
 			Renderer.Transform1 = Parent.AsWidget.LocalToWorldTransform;
-			Renderer.Blending = Blending == Blending.Default ? Parent.AsWidget.GlobalBlending : Blending;
-			var shader = Shader == ShaderId.Default ? Parent.AsWidget.GlobalShader : Shader;
+			Renderer.Blending = Blending == Blending.Inherited ? Parent.AsWidget.GlobalBlending : Blending;
+			var shader = Shader == ShaderId.Inherited ? Parent.AsWidget.GlobalShader : Shader;
 			if (arg2.Shader == ShaderId.Silhuette) {
 				Renderer.Shader = ShaderId.Silhuette;
 			} else if (arg1.Shader == ShaderId.Silhuette) {
