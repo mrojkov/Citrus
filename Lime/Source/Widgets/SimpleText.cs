@@ -119,6 +119,7 @@ namespace Lime
 				Vector2 extent;
 				RenderHelper(spriteList, out extent);
 			}
+
 			Renderer.Transform1 = LocalToWorldTransform;
 			Renderer.Blending = GlobalBlending;
 			Renderer.Shader = GlobalShader;
