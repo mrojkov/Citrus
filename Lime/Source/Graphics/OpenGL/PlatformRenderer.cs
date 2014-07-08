@@ -82,6 +82,7 @@ namespace Lime
 			shaderProgram = null;
 			SetBlending(Blending.Default);
 			SetShader(ShaderId.Default);
+			ClearRenderTarget(0, 0, 0, 0);
 			CheckErrors();
 		}
 
