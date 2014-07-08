@@ -88,6 +88,7 @@ namespace Lime
 		}
 
 		private WidgetCachedRenderer cachedRenderer;
+		private WidgetCachedRenderer effectiveCachedRenderer;
 
 		public bool CachedRendering
 		{
@@ -100,14 +101,37 @@ namespace Lime
 					cachedRenderer.Dispose();
 					cachedRenderer = null;
 				}
-				if (GlobalValuesValid) InvalidateGlobalValues();
+				PropagateCachedRendererToHierarchy(cachedRenderer);
+			}
+		}
+
+		private void PropagateCachedRendererToHierarchy(WidgetCachedRenderer renderer)
+		{
+			effectiveCachedRenderer = renderer;
+			for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
+				if (node.AsWidget != null) {
+					node.AsWidget.PropagateCachedRendererToHierarchy(renderer);
+				}
+			}
+		}
+
+		protected void InvalidateGlobalValuesAndCachedRenderer(bool geometryChanged = false)
+		{
+			if (effectiveCachedRenderer != null) {
+				// Cached renderer is transformation-agnostic
+				if (!geometryChanged || cachedRenderer == null) {
+					effectiveCachedRenderer.Invalidate();
+				}
+			}
+			if (GlobalValuesValid) {
+				InvalidateGlobalValues();
 			}
 		}
 
 		public void InvalidateRenderCache()
 		{
-			if (cachedRenderer != null) {
-				cachedRenderer.Invalidate();
+			if (effectiveCachedRenderer != null) {
+				effectiveCachedRenderer.Invalidate();
 			}
 		}
 
@@ -135,7 +159,7 @@ namespace Lime
 			{
 				if (position.X != value.X || position.Y != value.Y) {
 					position = value;
-					if (GlobalValuesValid) InvalidateGlobalValues();
+					InvalidateGlobalValuesAndCachedRenderer(true);
 				}
 			}
 		}
@@ -146,7 +170,7 @@ namespace Lime
 			set {
 				if (position.X != value) {
 					position.X = value;
-					if (GlobalValuesValid) InvalidateGlobalValues();
+					InvalidateGlobalValuesAndCachedRenderer(true);
 				}
 			} 
 		}
@@ -158,7 +182,7 @@ namespace Lime
 			{
 				if (position.Y != value) {
 					position.Y = value;
-					if (GlobalValuesValid) InvalidateGlobalValues();
+					InvalidateGlobalValuesAndCachedRenderer(true);
 				}
 			}
 		}
@@ -175,7 +199,7 @@ namespace Lime
 					size = value;
 					OnSizeChanged(sizeDelta);
 					LayoutChildren(sizeDelta);
-					if (GlobalValuesValid) InvalidateGlobalValues();
+					InvalidateGlobalValuesAndCachedRenderer();
 				}
 			}
 		}
@@ -209,7 +233,7 @@ namespace Lime
 			{
 				if (pivot.X != value.X || pivot.Y != value.Y) {
 					pivot = value;
-					if (GlobalValuesValid) InvalidateGlobalValues();
+					InvalidateGlobalValuesAndCachedRenderer();
 				}
 			} 
 		}
@@ -223,7 +247,7 @@ namespace Lime
 			{
 				if (scale.X != value.X || scale.Y != value.Y) {
 					scale = value;
-					if (GlobalValuesValid) InvalidateGlobalValues();
+					InvalidateGlobalValuesAndCachedRenderer();
 				}
 			} 
 		}
@@ -237,7 +261,7 @@ namespace Lime
 				if (rotation != value) {
 					rotation = value;
 					direction = Mathf.CosSin(Mathf.DegreesToRadians * value);
-					if (GlobalValuesValid) InvalidateGlobalValues();
+					InvalidateGlobalValuesAndCachedRenderer();
 				}
 			}
 		}
@@ -250,7 +274,7 @@ namespace Lime
 			set {
 				if (color.ABGR != value.ABGR) {
 					color = value;
-					if (GlobalValuesValid) InvalidateGlobalValues();
+					InvalidateGlobalValuesAndCachedRenderer();
 				}
 			} 
 		}
@@ -263,7 +287,7 @@ namespace Lime
 				var a = (byte)(value * 255f);
 				if (color.A != a) {
 					color.A = a;
-					if (GlobalValuesValid) InvalidateGlobalValues();
+					InvalidateGlobalValuesAndCachedRenderer();
 				}
 			}
 		}
@@ -280,7 +304,7 @@ namespace Lime
 			{
 				if (blending != value) {
 					blending = value;
-					if (GlobalValuesValid) InvalidateGlobalValues();
+					InvalidateGlobalValuesAndCachedRenderer();
 				}
 			} 
 		}
@@ -294,7 +318,7 @@ namespace Lime
 			{
 				if (shader != value) {
 					shader = value;
-					if (GlobalValuesValid) InvalidateGlobalValues();
+					InvalidateGlobalValuesAndCachedRenderer();
 				}
 			}
 		}
@@ -308,7 +332,7 @@ namespace Lime
 			{
 				if (visible != value) {
 					visible = value;
-					if (GlobalValuesValid) InvalidateGlobalValues();
+					InvalidateGlobalValuesAndCachedRenderer(true);
 				}
 			}
 		}
@@ -472,6 +496,20 @@ namespace Lime
 					HandleClick();
 				}
 			}
+			if (Updated != null) {
+				Updated(delta);
+			}
+		}
+
+		protected void OnUpdating(float delta)
+		{
+			if (Updating != null) {
+				Updating(delta);
+			}
+		}
+
+		protected void OnUpdated(float delta)
+		{
 			if (Updated != null) {
 				Updated(delta);
 			}
