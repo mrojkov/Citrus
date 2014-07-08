@@ -21,6 +21,7 @@ namespace Lime
 		public static int DefaultFramebuffer { get; private set; }
 		private static Blending blending;
 		private static ShaderProgram shaderProgram;
+		private static bool premultipliedAlphaMode;
 		private static readonly uint[] textures = new uint[2];
 
 		public static void CheckErrors()
@@ -77,6 +78,7 @@ namespace Lime
 			Texture2D.DeleteScheduledTextures();
 			GL.Enable(EnableCap.Blend);
 			blending = Blending.None;
+			premultipliedAlphaMode = false;
 			shaderProgram = null;
 			SetBlending(Blending.Default);
 			SetShader(ShaderId.Default);
@@ -134,9 +136,10 @@ namespace Lime
 
 		public static void SetBlending(Blending value)
 		{
-			if (value == blending) {
+			if (value == blending && premultipliedAlphaMode == Renderer.PremultipliedAlphaMode) {
 				return;
 			}
+			premultipliedAlphaMode = Renderer.PremultipliedAlphaMode;
 			blending = value;
 			switch (blending) {
 				case Blending.Default:
