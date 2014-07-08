@@ -119,7 +119,6 @@ namespace Orange
 				blending = Blending.Modulate;
 				break;
 			case 7:
-				blending = Blending.Add;
 				shader = ShaderId.Silhuette;
 				break;
 			default:
