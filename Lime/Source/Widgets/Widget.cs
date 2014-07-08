@@ -470,6 +470,7 @@ namespace Lime
 			if (clone.cachedRenderer != null) {
 				clone.cachedRenderer = new WidgetCachedRenderer(clone);
 			}
+			clone.effectiveCachedRenderer = null;
 			clone.tasks = null;
 			clone.lateTasks = null;
 			return clone;
