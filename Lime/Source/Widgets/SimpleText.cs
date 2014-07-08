@@ -91,6 +91,9 @@ namespace Lime
 		[ProtoMember(9)]
 		public bool IsDivisionOfWordAllowed { get; set; }
 
+		[ProtoMember(10)]
+		public bool IsAutoTransferDisabled = false;
+
 		public SimpleText()
 		{
 			// CachedRendering = true;
@@ -210,25 +213,27 @@ namespace Lime
 		private List<string> SplitText(string text)
 		{
 			var strings = new List<string>(text.Split('\n'));
-			for (var i = 0; i < strings.Count; i++) {
-				if (OverflowMode == TextOverflowMode.Ellipsis) {
-					// Clipping the last line of the text
-					if (CalcTotalHeight(i + 2) > Height) {
-						strings[i] = ClipLineWithEllipsis(strings[i]);
-						while (strings.Count > i + 1) {
-							strings.RemoveAt(strings.Count - 1);
-						}
-						break;
-					}
-				}
-				// Trying to split long lines. If a line can't be split it gets clipped.
-				while (MeasureTextLine(strings[i]).X > Width) {
-					if (!CarryLastWordToNextLine(strings, i)) {
-						if (!IsDivisionOfWordAllowed || !CarryPartOfLastWordToNextLine(strings, i)) {
-							if (OverflowMode == TextOverflowMode.Ellipsis) {
-								strings[i] = ClipLineWithEllipsis(strings[i]);
+			if (!IsAutoTransferDisabled) {
+				for (var i = 0; i < strings.Count; i++) {
+					if (OverflowMode == TextOverflowMode.Ellipsis) {
+						// Clipping the last line of the text
+						if (CalcTotalHeight(i + 2) > Height) {
+							strings[i] = ClipLineWithEllipsis(strings[i]);
+							while (strings.Count > i + 1) {
+								strings.RemoveAt(strings.Count - 1);
 							}
 							break;
+						}
+					}
+					// Trying to split long lines. If a line can't be split it gets clipped.
+					while (MeasureTextLine(strings[i]).X > Width) {
+						if (!CarryLastWordToNextLine(strings, i)) {
+							if (!IsDivisionOfWordAllowed || !CarryPartOfLastWordToNextLine(strings, i)) {
+								if (OverflowMode == TextOverflowMode.Ellipsis) {
+									strings[i] = ClipLineWithEllipsis(strings[i]);
+								}
+								break;
+							}
 						}
 					}
 				}
@@ -236,7 +241,7 @@ namespace Lime
 			return strings;
 		}
 
-		private Vector2 MeasureTextLine(string line)
+		public Vector2 MeasureTextLine(string line)
 		{
 			return Renderer.MeasureTextLine(Font.Instance, line, FontHeight);
 		}
