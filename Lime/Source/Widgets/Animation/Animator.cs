@@ -20,6 +20,7 @@ namespace Lime
 	[ProtoInclude(114, typeof(Animator<VAlignment>))]
 	[ProtoInclude(115, typeof(Animator<SerializableSample>))]
 	[ProtoInclude(116, typeof(Animator<MovieAction>))]
+	[ProtoInclude(117, typeof(Animator<ShaderId>))]
 	public interface IAnimator
 	{
 		void Bind(Node owner);

@@ -1,6 +1,7 @@
 using System.IO;
 using Lime;
 using System.Collections.Generic;
+using System;
 
 namespace Orange
 {
@@ -22,7 +23,7 @@ namespace Orange
 			case "Hot::TypedAnimator<Hot::EmitterShape>":
 				return () => (EmitterShape)lexer.ParseInt();
 			case "Hot::TypedAnimator<Hot::BlendMode>":
-				return () => lexer.ParseBlendMode().Item1;
+				return () => lexer.ParseBlendMode();
 			case "Hot::TypedAnimator<Hot::Color>":
 				return () => lexer.ParseColor4();
 			case "Hot::TypedAnimator<Hot::Vector2>":
@@ -51,7 +52,7 @@ namespace Orange
 			case "Hot::TypedAnimator<Hot::Movie::Action>":
 				return () => (MovieAction)lexer.ParseInt();
 			default:
-				throw new Exception("Unknown type of animator '{0}'", animatorType);
+				throw new Lime.Exception("Unknown type of animator '{0}'", animatorType);
 			}
 		}
 
@@ -160,12 +161,26 @@ namespace Orange
 					lexer.ParseToken(']');
 					break;
 				default:
-					throw new Exception("Unknown property '{0}'. Parsing: {1}", name, animator);
+					throw new Lime.Exception("Unknown property '{0}'. Parsing: {1}", name, animator);
 				}
 			}
 			lexer.ParseToken('}');
+			if (values.Count > 0 && values[0] is Tuple<Blending, ShaderId>) {
+				ProcessBlendingAndShaderAnimators(node, animator);
+			} else {
+				for (int i = 0; i < frames.Count; i++) {
+					animator.Keys.Add(frames[i], values[i], functions[i]);
+				}
+			}
+		}
+
+		private void ProcessBlendingAndShaderAnimators(Node node, IAnimator animator)
+		{
+			var shaderAnimator = node.Animators["Shader"];
 			for (int i = 0; i < frames.Count; i++) {
-				animator.Keys.Add(frames[i], values[i], functions[i]);
+				var type = values[i] as Tuple<Blending, ShaderId>;
+				animator.Keys.Add(frames[i], type.Item1, functions[i]);
+				shaderAnimator.Keys.Add(frames[i], type.Item2, functions[i]);
 			}
 		}
 	}
