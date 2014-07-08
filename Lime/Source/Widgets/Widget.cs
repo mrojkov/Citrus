@@ -167,7 +167,8 @@ namespace Lime
 		public float X 
 		{ 
 			get { return position.X; } 
-			set {
+			set 
+			{
 				if (position.X != value) {
 					position.X = value;
 					InvalidateGlobalValuesAndCachedRenderer(true);
