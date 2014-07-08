@@ -256,7 +256,12 @@ namespace Lime
 		public virtual void OnTerminate() {}
 		public virtual void OnUpdateFrame(float delta) {}
 		public virtual void OnRenderFrame() {}
-		public virtual void OnLayoutChange() {}
+
+		/// <summary>
+		/// Called before a device rotation get finished, 
+		/// but screen resolution and device orientation are already in the final state.
+		/// </summary>
+		public virtual void OnDeviceRotate() {}
 		public virtual DeviceOrientation GetSupportedDeviceOrientations() { return DeviceOrientation.LandscapeLeft; }
 
 		[Obsolete("Use GameView.SetCursor() instead")]
