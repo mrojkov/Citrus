@@ -83,6 +83,18 @@
     <Compile Include="Source\Widgets\WebBrowser.iOS.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="obj\Release\.NETFramework,Version=v4.0.AssemblyAttribute.cs" />
+    <Compile Include="Source\Graphics\OpenGL\IndexBuffer.cs" />
+    <Compile Include="Source\Graphics\OpenGL\PlatformRenderer.cs" />
+    <Compile Include="Source\Graphics\OpenGL\RenderBatch.cs" />
+    <Compile Include="Source\Graphics\OpenGL\RenderList.cs" />
+    <Compile Include="Source\Graphics\OpenGL\VertexBuffer.cs" />
+    <Compile Include="Source\Graphics\Bitmap.cs" />
+    <Compile Include="Source\Graphics\Bitmap.iOS.cs" />
+    <Compile Include="Source\Graphics\Bitmap.Win.cs" />
+    <Compile Include="Source\Graphics\Renderer.cs" />
+    <Compile Include="Source\Graphics\SpriteList.cs" />
+    <Compile Include="Source\Widgets\WebBrowser.Mac.cs" />
+    <Compile Include="Source\Widgets\WidgetCachedRenderer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -172,9 +184,7 @@
     <Compile Include="Source\RewindableStream.cs" />
     <Compile Include="Source\Graphics\ITexture.cs" />
     <Compile Include="Source\AssetsBundle\UnityAssetsBundle.cs" />
-    <Compile Include="Source\Graphics\Renderer.Common.cs" />
     <Compile Include="Source\Graphics\OpenGL\RenderTexture.cs" />
-    <Compile Include="Source\Graphics\OpenGL\Renderer.cs" />
     <Compile Include="Source\Graphics\OpenGL\Texture2D.DDS.cs" />
     <Compile Include="Source\Graphics\OpenGL\Texture2D.Png.cs" />
     <Compile Include="Source\Graphics\OpenGL\Texture2D.Pvr.cs" />
