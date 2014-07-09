@@ -81,7 +81,7 @@ namespace Lime
 			premultipliedAlphaMode = false;
 			shaderProgram = null;
 			SetBlending(Blending.Inherited);
-			SetShader(ShaderId.Default);
+			SetShader(ShaderId.Diffuse);
 			ClearRenderTarget(0, 0, 0, 0);
 			CheckErrors();
 		}

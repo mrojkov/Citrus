@@ -14,7 +14,7 @@ namespace Lime
 		[ProtoEnum]
 		Inherited,
 		[ProtoEnum]
-		Default,
+		Diffuse,
 		[ProtoEnum]
 		Silhuette
 	}
@@ -23,7 +23,7 @@ namespace Lime
 	{
 		public static ShaderProgram GetShaderProgram(ShaderId shader, int numTextures)
 		{
-			if (shader == ShaderId.Default || shader == ShaderId.Inherited) {
+			if (shader == ShaderId.Diffuse || shader == ShaderId.Inherited) {
 				if (numTextures == 1) {
 					return oneTextureBlengingProgram;
 				} else if (numTextures == 2) {

@@ -111,15 +111,15 @@ namespace Orange
 				break;
 			case 2:
 				blending = Blending.Add;
-				shader = ShaderId.Default;
+				shader = ShaderId.Diffuse;
 				break;
 			case 3:
 				blending = Blending.Burn;
-				shader = ShaderId.Default;
+				shader = ShaderId.Diffuse;
 				break;
 			case 5:
 				blending = Blending.Modulate;
-				shader = ShaderId.Default;
+				shader = ShaderId.Diffuse;
 				break;
 			case 7:
 				blending = Blending.Alpha;
@@ -127,7 +127,7 @@ namespace Orange
 				break;
 			default:
 				blending = Blending.Alpha;
-				shader = ShaderId.Default;
+				shader = ShaderId.Diffuse;
 				break;
 			}
 			return new Tuple<Blending, ShaderId>(blending, shader);

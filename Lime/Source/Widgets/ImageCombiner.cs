@@ -47,7 +47,7 @@ namespace Lime
 		{
 			Enabled = true;
 			Blending = Blending.Inherited;
-			Shader = ShaderId.Default;
+			Shader = ShaderId.Diffuse;
 		}
 
 		static bool AreVectorsClockwiseOrdered(Vector2 u, Vector2 v, Vector2 w)
