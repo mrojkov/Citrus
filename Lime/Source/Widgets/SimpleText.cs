@@ -1,7 +1,5 @@
-using System.Runtime.InteropServices;
-using Lime;
-using ProtoBuf;
 using System.Collections.Generic;
+using ProtoBuf;
 
 namespace Lime
 {
@@ -228,65 +226,25 @@ namespace Lime
 				}
 				// Trying to split long lines. If a line can't be split it gets clipped.
 				while (MeasureTextLine(strings[i]).X > Width) {
-					if (!CarryLastWordToNextLine(strings, i)) {
-						if (!WordSplitAllowed || !CarryPartOfLastWordToNextLine(strings, i)) {
-							if (OverflowMode == TextOverflowMode.Ellipsis) {
-								strings[i] = ClipLineWithEllipsis(strings[i]);
-							}
-							break;
+					if (!TextLineSplitter.CarryLastWordToNextLine(strings, i, WordSplitAllowed, IsTextLinePartFitToWidth)) {
+						if (OverflowMode == TextOverflowMode.Ellipsis) {
+							strings[i] = ClipLineWithEllipsis(strings[i]);
 						}
+						break;
 					}
 				}
 			}
 			return strings;
 		}
 
+		private bool IsTextLinePartFitToWidth(string line, int start, int count)
+		{
+			return Renderer.MeasureTextLine(Font.Instance, line, FontHeight, start, count).X <= Width;
+		}
+
 		public Vector2 MeasureTextLine(string line)
 		{
 			return Renderer.MeasureTextLine(Font.Instance, line, FontHeight);
-		}
-
-		private static bool CarryLastWordToNextLine(List<string> strings, int line)
-		{
-			var lastSpaceAt = strings[line].LastIndexOf(' ');
-			if (lastSpaceAt >= 0) {
-				if (line + 1 >= strings.Count) {
-					strings.Add("");
-				}
-				if (strings[line + 1] != "") {
-					strings[line + 1] = ' ' + strings[line + 1];
-				}
-				strings[line + 1] = strings[line].Substring(lastSpaceAt + 1) + strings[line + 1];
-				strings[line] = strings[line].Substring(0, lastSpaceAt);
-			} else {
-				return false;
-			}
-			return true;
-		}
-
-		private bool CarryPartOfLastWordToNextLine(List<string> strings, int line)
-		{
-			var textLine = strings[line];
-			var symbolsToCarry = 0;
-			var isCarried = false;
-			while (symbolsToCarry < textLine.Length) {
-				if (Renderer.MeasureTextLine(Font.Instance, textLine, fontHeight, 0, textLine.Length - symbolsToCarry).X <= Width) {
-					isCarried = true;
-					break;
-				}
-				symbolsToCarry += 1;
-			}
-			if (isCarried) {
-				if (line + 1 >= strings.Count) {
-					strings.Add("");
-				}
-				if (strings[line + 1] != "") {
-					strings[line + 1] = ' ' + strings[line + 1];
-				}
-				strings[line + 1] = textLine.Substring(textLine.Length - symbolsToCarry) + strings[line + 1];
-				strings[line] = strings[line].Substring(0, strings[line].Length - symbolsToCarry);
-			}
-			return isCarried;
 		}
 
 		private string ClipLineWithEllipsis(string line)
@@ -359,5 +317,95 @@ namespace Lime
 				spriteList = null;
 			}
 		}
+
+		private static class TextLineSplitter
+		{
+			public delegate bool MeasureTextLineWidthDelegate(string line, int start, int count);
+
+			public static bool CarryLastWordToNextLine(List<string> strings, int line, bool isWordSplitAllowed, MeasureTextLineWidthDelegate measureHandler)
+			{
+				string lastWord;
+				string lineWithoutLastWord;
+				if (TrySplitLine(strings[line], isWordSplitAllowed, measureHandler, out lineWithoutLastWord, out lastWord)) {
+					PushWordToLine(lastWord, strings, line + 1);
+					strings[line] = lineWithoutLastWord;
+					return true;
+				} else {
+					return false;
+				}
+			}
+
+			private static bool TrySplitLine(string line, bool isWordSplitAllowed, MeasureTextLineWidthDelegate measureHandler, out string lineWithoutLastWord, out string lastWord)
+			{
+				return
+					TryCutLastWord(line, out lineWithoutLastWord, out lastWord)
+					|| (
+						isWordSplitAllowed
+						&& TryCutWordTail(line, measureHandler, out lineWithoutLastWord, out lastWord)
+					);
+			}
+
+			private static bool TryCutLastWord(string text, out string lineWithoutLastWord, out string lastWord)
+			{
+				lineWithoutLastWord = null;
+				lastWord = null;
+				var lastSpaceAt = text.LastIndexOf(' ');
+				if (lastSpaceAt >= 0) {
+					lineWithoutLastWord = text.Substring(0, lastSpaceAt);
+					lastWord = text.Substring(lastSpaceAt + 1);
+					return true;
+				} else {
+					return false;
+				}
+			}
+
+			private static bool TryCutWordTail(string textLine, MeasureTextLineWidthDelegate measureHandler, out string currentLinePart, out string nextLinePart)
+			{
+				currentLinePart = null;
+				nextLinePart = null;
+				var cutFrom = CalcFittedCharactersCount(textLine, measureHandler);
+				if (cutFrom > 0) {
+					nextLinePart = textLine.Substring(cutFrom);
+					currentLinePart = textLine.Substring(0, cutFrom);
+					return true;
+				} else {
+					return false;
+				}
+			}
+
+			private static int CalcFittedCharactersCount(string textLine, MeasureTextLineWidthDelegate measureHandler)
+			{
+				int min = 0;
+				int max = textLine.Length;
+				int mid = 0;
+				bool isLineLonger = false;
+
+				do {
+					mid = min + ((max - min) / 2);
+					isLineLonger = !measureHandler(textLine, 0, mid);
+					if (isLineLonger) {
+						max = mid;
+					} else {
+						min = mid;
+					}
+				}
+				while (min < max && !(!isLineLonger && ((max - min) / 2) == 0));
+
+				return mid;
+			}
+
+			private static void PushWordToLine(string word, List<string> strings, int line)
+			{
+				if (line >= strings.Count) {
+					strings.Add("");
+				}
+				if (strings[line] != "") {
+					strings[line] = ' ' + strings[line];
+				}
+				strings[line] = word + strings[line];
+			}
+
+		}
+
 	}
 }
