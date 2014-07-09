@@ -36,6 +36,8 @@ namespace Lime
 		Minify,
 		[ProtoEnum]
 		Ellipsis,
+		[ProtoEnum]
+		Ignore,
 	}
 
 	[ProtoContract]
@@ -213,7 +215,7 @@ namespace Lime
 		private List<string> SplitText(string text)
 		{
 			var strings = new List<string>(text.Split('\n'));
-			if (IsAutoTransferDisabled) {
+			if (OverflowMode == TextOverflowMode.Ignore) {
 				return strings;
 			}
 			for (var i = 0; i < strings.Count; i++) {
