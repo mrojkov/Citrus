@@ -93,9 +93,6 @@ namespace Lime
 		[ProtoMember(9)]
 		public bool WordSplitAllowed { get; set; }
 
-		[ProtoMember(10)]
-		public bool IsAutoTransferDisabled = false;
-
 		public SimpleText()
 		{
 			// CachedRendering = true;
