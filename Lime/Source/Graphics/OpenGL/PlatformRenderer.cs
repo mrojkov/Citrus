@@ -66,11 +66,8 @@ namespace Lime
 
 		public static void BeginFrame()
 		{
-			if (DefaultFramebuffer == uint.MaxValue) {
-				var p = new int[1];
-				GL.GetInteger(GetPName.FramebufferBinding, p);
-				DefaultFramebuffer = (uint)p[0];
-			}
+			SaveDefaultFramebuffer();
+			CurrentFramebuffer = DefaultFramebuffer;
 			Texture2D.DeleteScheduledTextures();
 			GL.Enable(EnableCap.Blend);
 			blending = Blending.None;
@@ -80,6 +77,15 @@ namespace Lime
 			SetShader(ShaderId.Diffuse);
 			ClearRenderTarget(0, 0, 0, 0);
 			CheckErrors();
+		}
+
+		private static void SaveDefaultFramebuffer()
+		{
+			if (DefaultFramebuffer == uint.MaxValue) {
+				var p = new int[1];
+				GL.GetInteger(GetPName.FramebufferBinding, p);
+				DefaultFramebuffer = (uint)p[0];
+			}
 		}
 
 		public static void EndFrame()
@@ -161,6 +167,7 @@ namespace Lime
 
 		public static void BindFramebuffer(uint framebuffer)
 		{
+			CurrentFramebuffer = framebuffer;
 			GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer);
 		}
 	}
