@@ -18,7 +18,8 @@ namespace Lime
 {
 	unsafe static class PlatformRenderer
 	{
-		public static int DefaultFramebuffer { get; private set; }
+		public static uint CurrentFramebuffer { get; private set; }
+		public static uint DefaultFramebuffer { get; private set; }
 		private static Blending blending;
 		private static ShaderProgram shaderProgram;
 		private static bool premultipliedAlphaMode;
@@ -58,22 +59,17 @@ namespace Lime
 			shaderProgram.LoadMatrix(program.ProjectionMatrixUniformId, Renderer.Projection);
 		}
 
-		public static int GetCurrentFramebuffer()
-		{
-			var currentFramebuffer = new int[1];
-			GL.GetInteger(GetPName.FramebufferBinding, currentFramebuffer);
-			return currentFramebuffer[0];
-		}
-
 		static PlatformRenderer()
 		{
-			DefaultFramebuffer = -1;
+			DefaultFramebuffer = uint.MaxValue;
 		}
 
 		public static void BeginFrame()
 		{
-			if (DefaultFramebuffer < 0) {
-				DefaultFramebuffer = GetCurrentFramebuffer();
+			if (DefaultFramebuffer == uint.MaxValue) {
+				var p = new int[1];
+				GL.GetInteger(GetPName.FramebufferBinding, p);
+				DefaultFramebuffer = (uint)p[0];
 			}
 			Texture2D.DeleteScheduledTextures();
 			GL.Enable(EnableCap.Blend);
@@ -161,6 +157,11 @@ namespace Lime
 					break;
 			}
 			CheckErrors();
+		}
+
+		public static void BindFramebuffer(uint framebuffer)
+		{
+			GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer);
 		}
 	}
 }
