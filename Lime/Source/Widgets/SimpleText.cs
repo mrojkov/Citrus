@@ -89,7 +89,7 @@ namespace Lime
 		public TextOverflowMode OverflowMode { get; set; }
 
 		[ProtoMember(9)]
-		public bool IsDivisionOfWordAllowed { get; set; }
+		public bool WordSplitAllowed { get; set; }
 
 		[ProtoMember(10)]
 		public bool IsAutoTransferDisabled = false;
@@ -213,27 +213,28 @@ namespace Lime
 		private List<string> SplitText(string text)
 		{
 			var strings = new List<string>(text.Split('\n'));
-			if (!IsAutoTransferDisabled) {
-				for (var i = 0; i < strings.Count; i++) {
-					if (OverflowMode == TextOverflowMode.Ellipsis) {
-						// Clipping the last line of the text
-						if (CalcTotalHeight(i + 2) > Height) {
-							strings[i] = ClipLineWithEllipsis(strings[i]);
-							while (strings.Count > i + 1) {
-								strings.RemoveAt(strings.Count - 1);
+			if (IsAutoTransferDisabled) {
+				return strings;
+			}
+			for (var i = 0; i < strings.Count; i++) {
+				if (OverflowMode == TextOverflowMode.Ellipsis) {
+					// Clipping the last line of the text
+					if (CalcTotalHeight(i + 2) > Height) {
+						strings[i] = ClipLineWithEllipsis(strings[i]);
+						while (strings.Count > i + 1) {
+							strings.RemoveAt(strings.Count - 1);
+						}
+						break;
+					}
+				}
+				// Trying to split long lines. If a line can't be split it gets clipped.
+				while (MeasureTextLine(strings[i]).X > Width) {
+					if (!CarryLastWordToNextLine(strings, i)) {
+						if (!WordSplitAllowed || !CarryPartOfLastWordToNextLine(strings, i)) {
+							if (OverflowMode == TextOverflowMode.Ellipsis) {
+								strings[i] = ClipLineWithEllipsis(strings[i]);
 							}
 							break;
-						}
-					}
-					// Trying to split long lines. If a line can't be split it gets clipped.
-					while (MeasureTextLine(strings[i]).X > Width) {
-						if (!CarryLastWordToNextLine(strings, i)) {
-							if (!IsDivisionOfWordAllowed || !CarryPartOfLastWordToNextLine(strings, i)) {
-								if (OverflowMode == TextOverflowMode.Ellipsis) {
-									strings[i] = ClipLineWithEllipsis(strings[i]);
-								}
-								break;
-							}
 						}
 					}
 				}
