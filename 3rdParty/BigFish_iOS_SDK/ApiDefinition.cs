@@ -28,6 +28,9 @@ namespace BigFish_iOS_SDK
 
         [Static, Export("canShowMainMenuRateButton")]
         bool CanShowMainMenuRateButton();
+		
+		[Static, Export("userDidSignificantEvent:")]
+		void UserDidSignificantEvent(bool canPromptForRating);
 	}
 
 	[BaseType(typeof(NSObject), Name = "bfgSettings")]
