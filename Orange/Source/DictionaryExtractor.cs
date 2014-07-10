@@ -76,7 +76,7 @@ namespace Orange
 				});
 			text = UnescapeQuotes(text);
 			if (text != origText) {
-				File.WriteAllText(file, text);
+				File.WriteAllText(file, text, Encoding.UTF8);
 			}
 		}
 
@@ -93,7 +93,7 @@ namespace Orange
 					return result;
 				}, RegexOptions.Multiline);
 			if (origText != text) {
-				File.WriteAllText(file, text);
+				File.WriteAllText(file, text, Encoding.UTF8);
 			}
 		}
 
