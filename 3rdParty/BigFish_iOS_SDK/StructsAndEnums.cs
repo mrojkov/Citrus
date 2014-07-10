@@ -9,14 +9,10 @@ namespace BigFish_iOS_SDK
 		public const string NotificationRestoreFailed = "NOTIFICATION_RESTORE_FAILED";
 		public const string NotificationRestoreSucceeded = "NOTIFICATION_RESTORE_SUCCEEDED";
 		public const string NotificationPurchaseProductionInformation = "NOTIFICATION_PURCHASE_PRODUCTINFORMATION";
+        public const string NotificationPlacementContentStartPurchase = "BFG_NOTIFICATION_PLACEMENT_CONTENT_START_PURCHASE";
 		public const string BrandingNotificationCompleted = "BFGBRANDING_NOTIFICATION_COMPLETED";
 		public const string SplashNotificationCompleted = "BFGSPLASH_NOTIFICATION_COMPLETED";
 		public const string PromoDashboardNotificationMoreGamesClosed = "BFGPROMODASHBOARD_NOTIFICATION_MOREGAMES_CLOSED";
-		public const string NotificationPlacementContentStartPurchase = "BFG_NOTIFICATION_PLACEMENT_CONTENT_START_PURCHASE";
-		public const string PlacementPurchaseProductIDKey = "purchaseProductID";
-		public const string PlacementPurchaseItemKey = "purchaseItem";
-		public const string PlacementPurchaseQuantityKey = "purchaseQuantity";
-		public const string PlacementPurchaseReceiptKey = "purchaseReceipt";
 	}
 
 	public enum AdsOrigin
