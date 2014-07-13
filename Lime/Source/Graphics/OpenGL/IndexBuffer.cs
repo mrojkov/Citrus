@@ -84,7 +84,7 @@ namespace Lime
 
 		public void Bind()
 		{
-			GL.BindBuffer(BufferTarget.ElementArrayBuffer, iboHandle);
+			PlatformRenderer.BindIndexBuffer(iboHandle);
 			if (!Uploaded) {
 				Uploaded = true;
 				GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(ushort) * IndexCount), (IntPtr)Indices, BufferUsageHint.DynamicDraw);

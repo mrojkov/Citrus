@@ -120,7 +120,7 @@ namespace Lime
 
 		public void Bind()
 		{
-			GL.BindBuffer(BufferTarget.ArrayBuffer, vboHandle);
+			PlatformRenderer.BindVertexBuffer(vboHandle);
 			GL.EnableVertexAttribArray(Attributes.Position);
 			GL.EnableVertexAttribArray(Attributes.UV1);
 			GL.EnableVertexAttribArray(Attributes.Color);
@@ -131,7 +131,6 @@ namespace Lime
 			GL.VertexAttribPointer(Attributes.UV2, 2, VertexAttribPointerType.Float, false, sizeof(Vertex), (IntPtr)20);
 			if (!Uploaded) {
 				Uploaded = true;
-				GL.BindBuffer(BufferTarget.ArrayBuffer, vboHandle);
 				GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(sizeof(Vertex) * VertexCount), (IntPtr)Vertices, BufferUsageHint.DynamicDraw);
 			}
 			PlatformRenderer.CheckErrors();

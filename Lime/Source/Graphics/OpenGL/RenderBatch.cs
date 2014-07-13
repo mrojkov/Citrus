@@ -56,6 +56,7 @@ namespace Lime
 			VertexBuffer = null;
 			if (IndexBuffer != null) {
 				IndexBufferPool.Release(IndexBuffer);
+				IndexBuffer = null;
 			}
 		}
 
