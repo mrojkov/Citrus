@@ -80,18 +80,17 @@ namespace Orange
 
 		void ProcessSourceFile(string file, LocalizationPass pass)
 		{
+			const string quotedStringPattern = @"""([^""\\]*(?:\\.[^""\\]*)*)""";
 			var originalCode = File.ReadAllText(file, Encoding.Default);
-			var processedCode = EscapeQuotes(originalCode);
 			var context = GetContext(file);
-			processedCode = Regex.Replace(processedCode, @"""(\[\d*\][^""]*)""",
+			var processedCode = Regex.Replace(originalCode, quotedStringPattern,
 				(match) => {
 					string s = match.Groups[1].Value;
-					if (pass == LocalizationPass.TagUntaggedStrings || IsStringTagged(s)) {
-						s = EscapeQuotes(ProcessTextLine(UnescapeQuotes(s), context));
+ 					if (pass == LocalizationPass.TagUntaggedStrings || IsStringTagged(s)) {
+						s = ProcessTextLine(s, context, processStringsWithoutBrackets: false);
 					}
 					return '"' + s + '"';
 				});
-			processedCode = UnescapeQuotes(processedCode);
 			if (processedCode != originalCode) {
 				File.WriteAllText(file, processedCode, Encoding.UTF8);
 			}
@@ -100,13 +99,13 @@ namespace Orange
 		void ProcessSceneFile(string file, LocalizationPass pass)
 		{
 			var originalCode = File.ReadAllText(file, Encoding.Default);
-			var processedCode = Regex.Replace(originalCode, @"^(\s*Text)\s""([^""]*)""$", 
+			var processedCode = Regex.Replace(originalCode, @"^(\s*Text)\s""([^""\\]*(?:\\.[^""\\]*)*)""$", 
 				(match) => {
 					string context = GetContext(file);
 					string prefix = match.Groups[1].Value;
 					string text = match.Groups[2].Value;
 					if (pass == LocalizationPass.TagUntaggedStrings || IsStringTagged(text)) {
-						text = ProcessTextLine(text, context);
+						text = ProcessTextLine(text, context, processStringsWithoutBrackets: true);
 					}
 					string result = string.Format(@"{0} ""{1}""", prefix, text);
 					return result;
@@ -126,7 +125,7 @@ namespace Orange
 			return Regex.Match(str, @"^\[(\d+)\](.*)$").Success;
 		}
 
-		string ProcessTextLine(string text, string context)
+		string ProcessTextLine(string text, string context, bool processStringsWithoutBrackets)
 		{
 			var match = Regex.Match(text, @"^\[(\d*)\](.*)$");
 			if (match.Success) {
@@ -137,27 +136,34 @@ namespace Orange
 						// Put a text from the dictionary back to the source file
 						text = Localization.Dictionary[tag].Text;
 						AddTextToDictionary(tag, text, context);
-						text = string.Format("[{0}]{1}", tag, EscapeLinebreaks(text));
+						text = string.Format("[{0}]{1}", tag, Escape(text));
 					} else {
-						AddTextToDictionary(tag, UnescapeLinebreaks(text), context);
+						AddTextToDictionary(tag, Unescape(text), context);
 					}
-					return text;
 				} else {
 					// The line starts with "[]..."
 					string value = match.Groups[2].Value;
-					int tag = GenerateTagForText(UnescapeLinebreaks(value));
-					AddTextToDictionary(tag, UnescapeLinebreaks(value), context);
-					text = string.Format("[{0}]{1}", tag, value);
-					return text;
+					if (HasAlphabeticCharacters(value)) {
+						int tag = GenerateTagForText(Unescape(value));
+						AddTextToDictionary(tag, Unescape(value), context);
+						text = string.Format("[{0}]{1}", tag, value);
+					}
 				}
-			} else {
-				// The line has no [] prefix, but still should be localized. 
-				// E.g. most of texts in scene files.
-				int tag = GenerateTagForText(UnescapeLinebreaks(text));
-				AddTextToDictionary(tag, UnescapeLinebreaks(text), context);
-				text = string.Format("[{0}]{1}", tag, text);
-				return text;
+			} else if (processStringsWithoutBrackets) {
+				if (HasAlphabeticCharacters(text)) {
+					// The line has no [] prefix, but still should be localized. 
+					// E.g. most of texts in scene files.
+					int tag = GenerateTagForText(Unescape(text));
+					AddTextToDictionary(tag, Unescape(text), context);
+					text = string.Format("[{0}]{1}", tag, text);
+				}
 			}
+			return text;
+		}
+
+		private bool HasAlphabeticCharacters(string text)
+		{
+			return text.Any(c => char.IsLetter(c));
 		}
 
 		private static void AddTextToDictionary(int tag, string value, string context)
@@ -174,24 +180,14 @@ namespace Orange
 			e.Context = string.Join("\n", ctx);
 		}
 
-		static string EscapeLinebreaks(string s)
+		private static string Escape(string text)
 		{
-			return s.Replace("\n", "\\n");
+			return text.Replace("\n", "\\n").Replace("\"", "\\\"").Replace("'", "\\'");
 		}
 
-		static string UnescapeLinebreaks(string s)
+		private static string Unescape(string text)
 		{
-			return s.Replace("\\n", "\n");
-		}
-
-		static string EscapeQuotes(string str)
-		{
-			return str.Replace("\\\"", "&quote;");
-		}
-
-		static string UnescapeQuotes(string str)
-		{
-			return str.Replace("&quote;", "\\\"");
+			return text.Replace("\\n", "\n").Replace("\\\"", "\"").Replace("\\'", "'");
 		}
 
 		// Try to look up the value in the dictionary, and if success return an existing key, 
