@@ -85,11 +85,11 @@ namespace Orange
 			var context = GetContext(file);
 			processedCode = Regex.Replace(processedCode, @"""(\[\d*\][^""]*)""",
 				(match) => {
-					string str = match.Groups[1].Value;
-					if (pass == LocalizationPass.TagUntaggedStrings || IsStringTagged(str)) {
-						str = EscapeQuotes(AddStringToDictionary(UnescapeQuotes(str), context));
+					string s = match.Groups[1].Value;
+					if (pass == LocalizationPass.TagUntaggedStrings || IsStringTagged(s)) {
+						s = EscapeQuotes(ProcessTextLine(UnescapeQuotes(s), context));
 					}
-					return '"' + str + '"';
+					return '"' + s + '"';
 				});
 			processedCode = UnescapeQuotes(processedCode);
 			if (processedCode != originalCode) {
@@ -106,7 +106,7 @@ namespace Orange
 					string prefix = match.Groups[1].Value;
 					string text = match.Groups[2].Value;
 					if (pass == LocalizationPass.TagUntaggedStrings || IsStringTagged(text)) {
-						text = AddStringToDictionary(text, context);
+						text = ProcessTextLine(text, context);
 					}
 					string result = string.Format(@"{0} ""{1}""", prefix, text);
 					return result;
@@ -126,29 +126,35 @@ namespace Orange
 			return Regex.Match(str, @"^\[(\d+)\](.*)$").Success;
 		}
 
-		string AddStringToDictionary(string text, string context)
+		string ProcessTextLine(string text, string context)
 		{
 			var match = Regex.Match(text, @"^\[(\d*)\](.*)$");
 			if (match.Success) {
 				if (match.Groups[1].Length > 0) {
-					// case of "[123]..."
+					// The line starts with "[123]..."
 					int tag = int.Parse(match.Groups[1].Value);
-					string value = match.Groups[2].Value;
-					if (!Localization.Dictionary.ContainsKey(tag)) {
-						AddTextToDictionary(tag, UnescapeNewlines(value), context);
+					if (Localization.Dictionary.ContainsKey(tag)) {
+						// Put a text from the dictionary back to the source file
+						text = Localization.Dictionary[tag].Text;
+						AddTextToDictionary(tag, text, context);
+						text = string.Format("[{0}]{1}", tag, EscapeLinebreaks(text));
+					} else {
+						AddTextToDictionary(tag, UnescapeLinebreaks(text), context);
 					}
 					return text;
 				} else {
-					// case of "[]..."
+					// The line starts with "[]..."
 					string value = match.Groups[2].Value;
-					int tag = GenerateTagForText(UnescapeNewlines(value));
-					AddTextToDictionary(tag, UnescapeNewlines(value), context);
+					int tag = GenerateTagForText(UnescapeLinebreaks(value));
+					AddTextToDictionary(tag, UnescapeLinebreaks(value), context);
 					text = string.Format("[{0}]{1}", tag, value);
 					return text;
 				}
 			} else {
-				int tag = GenerateTagForText(UnescapeNewlines(text));
-				AddTextToDictionary(tag, UnescapeNewlines(text), context);
+				// The line has no [] prefix, but still should be localized. 
+				// E.g. most of texts in scene files.
+				int tag = GenerateTagForText(UnescapeLinebreaks(text));
+				AddTextToDictionary(tag, UnescapeLinebreaks(text), context);
 				text = string.Format("[{0}]{1}", tag, text);
 				return text;
 			}
@@ -168,7 +174,12 @@ namespace Orange
 			e.Context = string.Join("\n", ctx);
 		}
 
-		static string UnescapeNewlines(string s)
+		static string EscapeLinebreaks(string s)
+		{
+			return s.Replace("\n", "\\n");
+		}
+
+		static string UnescapeLinebreaks(string s)
 		{
 			return s.Replace("\\n", "\n");
 		}
