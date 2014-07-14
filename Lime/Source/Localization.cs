@@ -4,43 +4,41 @@ using System.Text;
 
 namespace Lime
 {
-	public class LocalizationDictionary
+	public class LocalizationEntry
 	{
-		Dictionary<int, string> strings = new Dictionary<int, string>();
+		public string Text;
+		public string Context;
+	}
 
-		public void Add(int tag, string value)
+	public class LocalizationDictionary : Dictionary<int, LocalizationEntry>
+	{
+		public LocalizationEntry GetEntry(int tag)
 		{
-			strings[tag] = value;
-		}
-
-		public bool Contains(int tag)
-		{
-			return strings.ContainsKey(tag);
-		}
-
-		public bool TryGetString(int tag, out string value)
-		{
-			return strings.TryGetValue(tag, out value);
-		}
-
-		public int GenerateTag()
-		{
-			string s;
-			for (int tag = 1; ; tag++) {
-				if (!TryGetString(tag, out s))
-					return tag;
+			LocalizationEntry e;
+			if (TryGetValue(tag, out e)) {
+				return e;
+			} else {
+				e = new LocalizationEntry();
+				Add(tag, e);
+				return e;
 			}
 		}
 
-		// Сначала пытается поискать value в словаре, и если оно там есть, то возвращает имеющийся ключ
-		public int GenerateTagForValue(string value)
+		public void Add(int tag, string text, string context)
 		{
-			foreach (var pair in strings) {
-				if (pair.Value == value) {
-					return pair.Key;
-				}
+			var e = GetEntry(tag);
+			e.Text = text;
+			e.Context = context;
+		}
+
+		public bool TryGetText(int tag, out string value)
+		{
+			value = null;
+			LocalizationEntry e;
+			if (TryGetValue(tag, out e)) {
+				value = e.Text;
 			}
-			return GenerateTag();
+			return value != null;
 		}
 
 		public void ReadFromStream(Stream stream)
@@ -55,15 +53,23 @@ namespace Lime
 					int tag;
 					if (!int.TryParse(tagLine, out tag))
 						throw new Lime.Exception("Invalid tag");
+					string context = null;
 					string text = "";
 					while (true) {
 						line = r.ReadLine();
 						if (line == null || line.Length > 0 && line[0] == '[')
 							break;
-						text += line + '\n';
+						if (line.Length > 0 && line[0] == '#') {
+							context = (context ?? "") + line.Substring(1).Trim() + '\n';
+						} else {
+							text += line + '\n';
+						}
 					}
 					text = text.TrimEnd('\n');
-					strings[tag] = text;
+					if (context != null) {
+						context = context.TrimEnd('\n');
+					}
+					Add(tag, text, context);
 				}
 			}
 		}
@@ -71,17 +77,17 @@ namespace Lime
 		public void WriteToStream(Stream stream)
 		{
 			using (var w = new StreamWriter(stream, new UTF8Encoding(true))) {
-				foreach (KeyValuePair<int, string> p in strings) {
+				foreach (var p in this) {
 					w.WriteLine(string.Format("[{0}]", p.Key));
-					w.WriteLine(p.Value);
+					if (!string.IsNullOrWhiteSpace(p.Value.Context)) {
+						foreach (var i in p.Value.Context.Split('\n')) {
+							w.WriteLine("# " + i);
+						}
+					}
+					w.WriteLine(p.Value.Text);
 					w.WriteLine();
 				}
 			}
-		}
-
-		public void Clear()
-		{
-			strings.Clear();
 		}
 	}
 
@@ -119,7 +125,7 @@ namespace Lime
 					string text;
 					if (closeBrackedPos > 1) {
 						int key = ParseInt(taggedString, 1, closeBrackedPos - 1);
-						if (Dictionary.TryGetString(key, out text)) {
+						if (Dictionary.TryGetText(key, out text)) {
 							return text;
 						}
 					}
