@@ -10,64 +10,80 @@ namespace Orange
 {
 	public class DictionaryExtractor
 	{
-		enum LocalizationPass
-		{
-			ExtractTaggedStrings,
-			TagUntaggedStrings
-		}
+		private LocalizationDictionary dictionary;
 
 		public void ExtractDictionary()
 		{
-			const string dictionary = "Dictionary.txt";
-			LoadDictionary(dictionary);
-			RunLocalizationPass(LocalizationPass.ExtractTaggedStrings);
-			RunLocalizationPass(LocalizationPass.TagUntaggedStrings);
-			SaveDictionary(dictionary);
+			dictionary = new LocalizationDictionary();
+			ExtractTexts();
+			CleanupAndSaveDictionary("Dictionary.txt");
 		}
 
-		private static void SaveDictionary(string dictionary)
+		private void CleanupAndSaveDictionary(string path)
+		{
+			var result = new LocalizationDictionary();
+			LoadDictionary(result, path);
+			MergeDictionaries(result, dictionary);
+			SaveDictionary(result, path);
+		}
+
+		private void MergeDictionaries(LocalizationDictionary current, LocalizationDictionary modified)
+		{
+			int added = 0, deleted = 0;
+			foreach (var key in modified.Keys.ToList()) {
+				if (!current.ContainsKey(key)) {
+					Logger.Write("+ " + key);
+					added++;
+				}
+				current[key] = modified[key];
+			}
+			foreach (var key in current.Keys.ToList()) {
+				if (!modified.ContainsKey(key)) {
+					Logger.Write("- " + key);
+					deleted++;
+					current.Remove(key);
+				}
+			}
+			Logger.Write("Added {0}\nDeleted {1}", added, deleted);
+		}
+
+		private static void SaveDictionary(LocalizationDictionary dictionary, string path)
 		{
 			using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
-				using (var stream = new FileStream(dictionary, FileMode.Create)) {
-					Localization.Dictionary.WriteToStream(stream);
+				using (var stream = new FileStream(path, FileMode.Create)) {
+					dictionary.WriteToStream(stream);
 				}
 			}
 		}
 
-		private static void LoadDictionary(string dictionary)
+		private static void LoadDictionary(LocalizationDictionary dictionary, string path)
 		{
-			Localization.Dictionary.Clear();
 			using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
-				if (File.Exists(dictionary)) {
-					using (var stream = new FileStream(dictionary, FileMode.Open)) {
-						Localization.Dictionary.ReadFromStream(stream);
+				if (File.Exists(path)) {
+					using (var stream = new FileStream(path, FileMode.Open)) {
+						dictionary.ReadFromStream(stream);
 					}
 				}
 			}
 		}
 
-		private void RunLocalizationPass(LocalizationPass pass)
+		private void ExtractTexts()
 		{
 			var sourceFiles = new FileEnumerator(The.Workspace.ProjectDirectory);
 			using (new DirectoryChanger(The.Workspace.ProjectDirectory)) {
 				var files = sourceFiles.Enumerate(".cs");
 				foreach (var fileInfo in files) {
-					if (pass == 0) {
-						Console.WriteLine("* " + fileInfo.Path);
-					}
-					ProcessSourceFile(fileInfo.Path, pass);
+					ProcessSourceFile(fileInfo.Path);
 				}
 			}
 			using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
 				var files = The.Workspace.AssetFiles.Enumerate(".scene");
 				foreach (var fileInfo in files) {
-					if (pass == 0)
-						Console.WriteLine("* " + fileInfo.Path);
-					// Сначала прогоним все строки вида: "[]blah-blah.."
-					ProcessSourceFile(fileInfo.Path, pass);
-					// Затем прогоним все строки вида: Text "blah-blah.."
+					// First of all scan lines like this: "[]..."
+					ProcessSourceFile(fileInfo.Path);
+					// Then like this: Text "..."
 					if (!ShouldLocalizeOnlyTaggedSceneTexts()) {
-						ProcessSceneFile(fileInfo.Path, pass);
+						ProcessSceneFile(fileInfo.Path);
 					}
 				}
 			}
@@ -78,40 +94,29 @@ namespace Orange
 			return (bool)The.Workspace.ProjectJson.GetValue("LocalizeOnlyTaggedSceneTexts", false);
 		}
 
-		void ProcessSourceFile(string file, LocalizationPass pass)
+		private void ProcessSourceFile(string file)
 		{
 			const string quotedStringPattern = @"""([^""\\]*(?:\\.[^""\\]*)*)""";
-			var originalCode = File.ReadAllText(file, Encoding.Default);
+			var code = File.ReadAllText(file, Encoding.Default);
 			var context = GetContext(file);
-			var processedCode = Regex.Replace(originalCode, quotedStringPattern,
-				(match) => {
-					string s = match.Groups[1].Value;
- 					if (pass == LocalizationPass.TagUntaggedStrings || IsStringTagged(s)) {
-						s = ProcessTextLine(s, context, processStringsWithoutBrackets: false);
-					}
-					return '"' + s + '"';
-				});
-			if (processedCode != originalCode) {
-				File.WriteAllText(file, processedCode, Encoding.UTF8);
+			foreach (var match in Regex.Matches(code, quotedStringPattern)) {
+				var s = ((Match)match).Groups[1].Value;
+				if (HasAlphabeticCharacters(s) && IsStringStartsWithBrackets(s)) {
+					AddToDictionary(s, context);
+				}
 			}
 		}
 
-		void ProcessSceneFile(string file, LocalizationPass pass)
+		void ProcessSceneFile(string file)
 		{
-			var originalCode = File.ReadAllText(file, Encoding.Default);
-			var processedCode = Regex.Replace(originalCode, @"^(\s*Text)\s""([^""\\]*(?:\\.[^""\\]*)*)""$", 
-				(match) => {
-					string context = GetContext(file);
-					string prefix = match.Groups[1].Value;
-					string text = match.Groups[2].Value;
-					if (pass == LocalizationPass.TagUntaggedStrings || IsStringTagged(text)) {
-						text = ProcessTextLine(text, context, processStringsWithoutBrackets: true);
-					}
-					string result = string.Format(@"{0} ""{1}""", prefix, text);
-					return result;
-				}, RegexOptions.Multiline);
-			if (originalCode != processedCode) {
-				File.WriteAllText(file, processedCode, Encoding.UTF8);
+			const string textPropertiesPattern = @"^(\s*Text)\s""([^""\\]*(?:\\.[^""\\]*)*)""$";
+			var code = File.ReadAllText(file, Encoding.Default);
+			var context = GetContext(file);
+			foreach (var match in Regex.Matches(code, textPropertiesPattern, RegexOptions.Multiline)) {
+				var s = ((Match)match).Groups[2].Value;
+				if (HasAlphabeticCharacters(s)) {
+					AddToDictionary(s, context);
+				}
 			}
 		}
 
@@ -120,55 +125,36 @@ namespace Orange
 			return file;	
 		}
 
-		bool IsStringTagged(string str)
+		private static bool IsStringStartsWithBrackets(string str)
 		{
-			return Regex.Match(str, @"^\[(\d+)\](.*)$").Success;
+			return Regex.Match(str, @"^\[.*\](.*)$").Success;
 		}
 
-		string ProcessTextLine(string text, string context, bool processStringsWithoutBrackets)
+		private void AddToDictionary(string key, string context)
 		{
-			var match = Regex.Match(text, @"^\[(\d*)\](.*)$");
+			var match = Regex.Match(key, @"^\[(.*)\](.*)$");
 			if (match.Success) {
-				if (match.Groups[1].Length > 0) {
-					// The line starts with "[123]..."
-					var key = match.Groups[1].Value;
-					if (Localization.Dictionary.ContainsKey(key)) {
-						// Put a text from the dictionary back to the source file
-						text = Localization.Dictionary[key].Text;
-						AddTextToDictionary(key, text, context);
-						text = string.Format("[{0}]{1}", key, Escape(text));
-					} else {
-						AddTextToDictionary(key, Unescape(text), context);
-					}
-				} else {
-					// The line starts with "[]..."
-					string value = match.Groups[2].Value;
-					if (HasAlphabeticCharacters(value)) {
-						var key = GenerateTagForText(Unescape(value));
-						AddTextToDictionary(key, Unescape(value), context);
-						text = string.Format("[{0}]{1}", key, value);
-					}
+				// The line starts with "[...]..."
+				var value = Unescape(match.Groups[2].Value);
+				if (key.StartsWith("[]")) {
+					key = key.Substring(2);
 				}
-			} else if (processStringsWithoutBrackets) {
-				if (HasAlphabeticCharacters(text)) {
-					// The line has no [] prefix, but still should be localized. 
-					// E.g. most of texts in scene files.
-					var key = GenerateTagForText(Unescape(text));
-					AddTextToDictionary(key, Unescape(text), context);
-					text = string.Format("[{0}]{1}", key, text);
-				}
+				AddToDictionaryHelper(key, value, context);
+			} else {
+				// The line has no [] prefix, but still should be localized. 
+				// E.g. most of texts in scene files.
+				AddToDictionaryHelper(key, Unescape(key), context);
 			}
-			return text;
 		}
 
-		private bool HasAlphabeticCharacters(string text)
+		private static bool HasAlphabeticCharacters(string text)
 		{
 			return text.Any(c => char.IsLetter(c));
 		}
 
-		private static void AddTextToDictionary(string key, string value, string context)
+		private void AddToDictionaryHelper(string key, string value, string context)
 		{
-			var e = Localization.Dictionary.GetEntry(key);
+			var e = dictionary.GetEntry(key);
 			e.Text = value;
 			var ctx = new List<string>();
 			if (!string.IsNullOrWhiteSpace(e.Context)) {
@@ -188,27 +174,6 @@ namespace Orange
 		private static string Unescape(string text)
 		{
 			return text.Replace("\\n", "\n").Replace("\\\"", "\"").Replace("\\'", "'");
-		}
-
-		// Try to look up the value in the dictionary, and if success return an existing key, 
-		// else generate a new one
-		private static string GenerateTagForText(string text)
-		{
-			foreach (var pair in Localization.Dictionary) {
-				if (pair.Value.Text == text) {
-					return pair.Key;
-				}
-			}
-			return GenerateKey();
-		}
-
-		private static string GenerateKey()
-		{
-			for (int i = 1; ; i++) {
-				if (!Localization.Dictionary.ContainsKey(i.ToString())) {
-					return i.ToString();
-				}
-			}
 		}
 	}
 }

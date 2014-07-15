@@ -12,30 +12,30 @@ namespace Lime
 
 	public class LocalizationDictionary : Dictionary<string, LocalizationEntry>
 	{
-		public LocalizationEntry GetEntry(string tag)
+		public LocalizationEntry GetEntry(string key)
 		{
 			LocalizationEntry e;
-			if (TryGetValue(tag, out e)) {
+			if (TryGetValue(key, out e)) {
 				return e;
 			} else {
 				e = new LocalizationEntry();
-				Add(tag, e);
+				Add(key, e);
 				return e;
 			}
 		}
 
-		public void Add(string tag, string text, string context)
+		public void Add(string key, string text, string context)
 		{
-			var e = GetEntry(tag);
+			var e = GetEntry(key);
 			e.Text = text;
 			e.Context = context;
 		}
 
-		public bool TryGetText(string tag, out string value)
+		public bool TryGetText(string key, out string value)
 		{
 			value = null;
 			LocalizationEntry e;
-			if (TryGetValue(tag, out e)) {
+			if (TryGetValue(key, out e)) {
 				value = e.Text;
 			}
 			return value != null;
@@ -47,14 +47,14 @@ namespace Lime
 				string line = r.ReadLine();
 				while (line != null) {
 					line = line.Trim();
-					if (line.Length < 2 || line[0] != '[')
-						throw new Lime.Exception("Invalid key");
+					if (!ValidateKey(line))
+						throw new Lime.Exception("Invalid key format: {0}", line);
 					var key = line.Substring(1, line.Length - 2);
 					string context = null;
 					string text = "";
 					while (true) {
 						line = r.ReadLine();
-						if (line == null || line.Length > 0 && line[0] == '[')
+						if (line == null || ValidateKey(line))
 							break;
 						if (line.Length > 0 && line[0] == '#') {
 							context = (context ?? "") + line.Substring(1).Trim() + '\n';
@@ -71,11 +71,17 @@ namespace Lime
 			}
 		}
 
+		private static bool ValidateKey(string s)
+		{
+			var l = s.Length;
+			return l >= 2 && s[0] == '[' && s[l - 1] == ']';
+		}
+
 		public void WriteToStream(Stream stream)
 		{
 			using (var w = new StreamWriter(stream, new UTF8Encoding(true))) {
 				foreach (var p in this) {
-					w.WriteLine(p.Key);
+					w.WriteLine('[' + p.Key + ']');
 					if (!string.IsNullOrWhiteSpace(p.Value.Context)) {
 						foreach (var i in p.Value.Context.Split('\n')) {
 							w.WriteLine("# " + i);
@@ -97,41 +103,22 @@ namespace Lime
 			return System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
 		}
 
-		public static string GetString(string taggedFormat, params object[] args)
+		public static string GetString(string format, params object[] args)
 		{
-			string s = GetString(taggedFormat);
+			string s = GetString(format);
 			return string.Format(s, args);
 		}
 
-		public static string GetString(string taggedString)
+		public static string GetString(string key)
 		{
-			if (string.IsNullOrEmpty(taggedString))
-				return taggedString;
-			if (taggedString[0] == '[') {
-				int closeBrackedPos = 0;
-				for (int i = 1; i < taggedString.Length; i++) {
-					if (taggedString[i] == ']') {
-						closeBrackedPos = i;
-						break;
-					}
-					if (!char.IsDigit(taggedString, i)) {
-						break;
-					}
-				}
-				if (closeBrackedPos >= 1) {
-					string text;
-					if (closeBrackedPos > 1) {
-						var key = taggedString.Substring(1, closeBrackedPos - 1);
-						if (Dictionary.TryGetText(key, out text)) {
-							return text;
-						}
-					}
-					// key/value pair not defined or key is empty ("[]" case).
-					text = taggedString.Substring(closeBrackedPos + 1);
-					return text;
-				}
+			if (string.IsNullOrEmpty(key)) {
+				return key;
 			}
-			return taggedString;
+			if (key.Length >= 2 && key[0] == '[' && key[1] == ']') {
+				key = key.Substring(2);
+			}
+			string text;
+			return Dictionary.TryGetText(key, out text) ? text : key;
 		}
 	}
 }
