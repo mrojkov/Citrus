@@ -131,31 +131,31 @@ namespace Orange
 			if (match.Success) {
 				if (match.Groups[1].Length > 0) {
 					// The line starts with "[123]..."
-					int tag = int.Parse(match.Groups[1].Value);
-					if (Localization.Dictionary.ContainsKey(tag)) {
+					var key = match.Groups[1].Value;
+					if (Localization.Dictionary.ContainsKey(key)) {
 						// Put a text from the dictionary back to the source file
-						text = Localization.Dictionary[tag].Text;
-						AddTextToDictionary(tag, text, context);
-						text = string.Format("[{0}]{1}", tag, Escape(text));
+						text = Localization.Dictionary[key].Text;
+						AddTextToDictionary(key, text, context);
+						text = string.Format("[{0}]{1}", key, Escape(text));
 					} else {
-						AddTextToDictionary(tag, Unescape(text), context);
+						AddTextToDictionary(key, Unescape(text), context);
 					}
 				} else {
 					// The line starts with "[]..."
 					string value = match.Groups[2].Value;
 					if (HasAlphabeticCharacters(value)) {
-						int tag = GenerateTagForText(Unescape(value));
-						AddTextToDictionary(tag, Unescape(value), context);
-						text = string.Format("[{0}]{1}", tag, value);
+						var key = GenerateTagForText(Unescape(value));
+						AddTextToDictionary(key, Unescape(value), context);
+						text = string.Format("[{0}]{1}", key, value);
 					}
 				}
 			} else if (processStringsWithoutBrackets) {
 				if (HasAlphabeticCharacters(text)) {
 					// The line has no [] prefix, but still should be localized. 
 					// E.g. most of texts in scene files.
-					int tag = GenerateTagForText(Unescape(text));
-					AddTextToDictionary(tag, Unescape(text), context);
-					text = string.Format("[{0}]{1}", tag, text);
+					var key = GenerateTagForText(Unescape(text));
+					AddTextToDictionary(key, Unescape(text), context);
+					text = string.Format("[{0}]{1}", key, text);
 				}
 			}
 			return text;
@@ -166,9 +166,9 @@ namespace Orange
 			return text.Any(c => char.IsLetter(c));
 		}
 
-		private static void AddTextToDictionary(int tag, string value, string context)
+		private static void AddTextToDictionary(string key, string value, string context)
 		{
-			var e = Localization.Dictionary.GetEntry(tag);
+			var e = Localization.Dictionary.GetEntry(key);
 			e.Text = value;
 			var ctx = new List<string>();
 			if (!string.IsNullOrWhiteSpace(e.Context)) {
@@ -192,22 +192,21 @@ namespace Orange
 
 		// Try to look up the value in the dictionary, and if success return an existing key, 
 		// else generate a new one
-		private static int GenerateTagForText(string text)
+		private static string GenerateTagForText(string text)
 		{
 			foreach (var pair in Localization.Dictionary) {
 				if (pair.Value.Text == text) {
 					return pair.Key;
 				}
 			}
-			return GenerateTag();
+			return GenerateKey();
 		}
 
-		private static int GenerateTag()
+		private static string GenerateKey()
 		{
-			string s;
-			for (int tag = 1; ; tag++) {
-				if (!Localization.Dictionary.TryGetText(tag, out s)) {
-					return tag;
+			for (int i = 1; ; i++) {
+				if (!Localization.Dictionary.ContainsKey(i.ToString())) {
+					return i.ToString();
 				}
 			}
 		}

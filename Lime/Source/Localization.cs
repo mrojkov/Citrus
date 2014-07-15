@@ -10,9 +10,9 @@ namespace Lime
 		public string Context;
 	}
 
-	public class LocalizationDictionary : Dictionary<int, LocalizationEntry>
+	public class LocalizationDictionary : Dictionary<string, LocalizationEntry>
 	{
-		public LocalizationEntry GetEntry(int tag)
+		public LocalizationEntry GetEntry(string tag)
 		{
 			LocalizationEntry e;
 			if (TryGetValue(tag, out e)) {
@@ -24,14 +24,14 @@ namespace Lime
 			}
 		}
 
-		public void Add(int tag, string text, string context)
+		public void Add(string tag, string text, string context)
 		{
 			var e = GetEntry(tag);
 			e.Text = text;
 			e.Context = context;
 		}
 
-		public bool TryGetText(int tag, out string value)
+		public bool TryGetText(string tag, out string value)
 		{
 			value = null;
 			LocalizationEntry e;
@@ -47,12 +47,9 @@ namespace Lime
 				string line = r.ReadLine();
 				while (line != null) {
 					line = line.Trim();
-					if (line.Length < 3 || line[0] != '[' || line[line.Length - 1] != ']')
-						throw new Lime.Exception("Invalid tag");
-					string tagLine = line.Substring(1, line.Length - 2);
-					int tag;
-					if (!int.TryParse(tagLine, out tag))
-						throw new Lime.Exception("Invalid tag");
+					if (line.Length < 2 || line[0] != '[')
+						throw new Lime.Exception("Invalid key");
+					var key = line.Substring(1, line.Length - 2);
 					string context = null;
 					string text = "";
 					while (true) {
@@ -69,7 +66,7 @@ namespace Lime
 					if (context != null) {
 						context = context.TrimEnd('\n');
 					}
-					Add(tag, text, context);
+					Add(key, text, context);
 				}
 			}
 		}
@@ -78,7 +75,7 @@ namespace Lime
 		{
 			using (var w = new StreamWriter(stream, new UTF8Encoding(true))) {
 				foreach (var p in this) {
-					w.WriteLine(string.Format("[{0}]", p.Key));
+					w.WriteLine(p.Key);
 					if (!string.IsNullOrWhiteSpace(p.Value.Context)) {
 						foreach (var i in p.Value.Context.Split('\n')) {
 							w.WriteLine("# " + i);
@@ -124,7 +121,7 @@ namespace Lime
 				if (closeBrackedPos >= 1) {
 					string text;
 					if (closeBrackedPos > 1) {
-						int key = ParseInt(taggedString, 1, closeBrackedPos - 1);
+						var key = taggedString.Substring(1, closeBrackedPos - 1);
 						if (Dictionary.TryGetText(key, out text)) {
 							return text;
 						}
@@ -135,16 +132,6 @@ namespace Lime
 				}
 			}
 			return taggedString;
-		}
-
-		static int ParseInt(string source, int index, int length)
-		{
-			int v = 0;
-			for (int i = index; i < index + length; i++) {
-				v *= 10;
-				v += (int)source[i] - (int)'0';
-			}
-			return v;
 		}
 	}
 }
