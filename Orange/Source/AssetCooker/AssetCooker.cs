@@ -92,15 +92,16 @@ namespace Orange
 		{
 			AddStage(SyncAtlases);
 			AddStage(SyncDeleted);
-			AddStage(SyncTxtAssets);
+			AddStage(() => SyncRawAssets(".txt"));
 			AddStage(SyncTextures);
 			AddStage(DeleteOrphanedMasks);
 			AddStage(SyncFonts);
-			AddStage(SyncVideoAssets);
+			AddStage(() => SyncRawAssets(".ogv"));
 			AddStage(SyncScenes);
 			AddStage(SyncSounds);
-			AddStage(SyncUnityShaders);
-			AddStage(SyncRawAssets);
+			AddStage(() => SyncRawAssets(".shader"));
+			AddStage(() => SyncRawAssets(".xml"));
+			AddStage(() => SyncRawAssets(".raw"));
 		}
 
 		private static void DeleteOrphanedMasks()
@@ -126,26 +127,9 @@ namespace Orange
 			}
 		}
 
-		private static void SyncUnityShaders()
+		private static void SyncRawAssets(string extension)
 		{
-			// Unity3D shaders
-			SyncUpdated(".shader", ".shader", (srcPath, dstPath) => {
-				assetsBundle.ImportFile(srcPath, dstPath, 0);
-				return true;
-			});
-		}
-
-		private static void SyncVideoAssets()
-		{
-			SyncUpdated(".ogv", ".ogv", (srcPath, dstPath) => {
-				assetsBundle.ImportFile(srcPath, dstPath, 0);
-				return true;
-			});
-		}
-
-		private static void SyncRawAssets()
-		{
-			SyncUpdated(".raw", ".raw", (srcPath, dstPath) => {
+			SyncUpdated(extension, extension, (srcPath, dstPath) => {
 				assetsBundle.ImportFile(srcPath, dstPath, 0);
 				return true;
 			});
@@ -226,14 +210,6 @@ namespace Orange
                     assetsBundle.ImportFile(tmpFile, dstPath, reserve: 0, compress: (platform == TargetPlatform.Desktop));
 					File.Delete(tmpFile);
 				}
-				return true;
-			});
-		}
-
-		private static void SyncTxtAssets()
-		{
-			SyncUpdated(".txt", ".txt", (srcPath, dstPath) => {
-				assetsBundle.ImportFile(srcPath, dstPath, 0);
 				return true;
 			});
 		}

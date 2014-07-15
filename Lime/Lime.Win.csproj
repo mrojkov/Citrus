@@ -82,6 +82,9 @@
     <Compile Include="Source\Input\Input.Native.cs" />
     <Compile Include="Source\Input\Input.Unity.cs" />
     <Compile Include="Source\Application\Sdl2.cs" />
+    <Compile Include="Source\Localization\LocalizationDictionary.cs" />
+    <Compile Include="Source\Localization\LocalizationDictionaryXmlSerializer.cs" />
+    <Compile Include="Source\Localization\LocalizationDictionaryTextSerializer.cs" />
     <Compile Include="Source\Version.cs" />
     <Compile Include="Source\Widgets\WebBrowser.Win.cs" />
     <Compile Include="Source\Widgets\WidgetInput.cs" />
@@ -124,7 +127,7 @@
     <Compile Include="Source\Graphics\TextureAtlasPart.cs" />
     <Compile Include="Source\Graphics\OgvDecoder.cs" />
     <Compile Include="Source\Graphics\MovieTexture.cs" />
-    <Compile Include="Source\Localization.cs" />
+    <Compile Include="Source\Localization\Localization.cs" />
     <Compile Include="Source\Mathf.cs" />
     <Compile Include="Source\PopupMenu\Separator.cs" />
     <Compile Include="Source\PopupMenu\StringItem.cs" />

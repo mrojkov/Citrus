@@ -16,7 +16,12 @@ namespace Orange
 		{
 			dictionary = new LocalizationDictionary();
 			ExtractTexts();
-			CleanupAndSaveDictionary("Dictionary.txt");
+			CleanupAndSaveDictionary(GetFileName());
+		}
+
+		private static string GetFileName()
+		{
+			return Path.ChangeExtension("Dictionary.txt", CreateSerializer().GetFileExtension());
 		}
 
 		private void CleanupAndSaveDictionary(string path)
@@ -51,8 +56,20 @@ namespace Orange
 		{
 			using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
 				using (var stream = new FileStream(path, FileMode.Create)) {
-					dictionary.WriteToStream(stream);
+					dictionary.WriteToStream(CreateSerializer(), stream);
 				}
+			}
+		}
+
+		private static ILocalizationDictionarySerializer CreateSerializer()
+		{
+			var format = (string)The.Workspace.ProjectJson.GetValue("LocalizationDictionaryFormat", "Text");
+			if (format == "Text") {
+				return new LocalizationDictionaryTextSerializer();
+			} else if (format == "Xml") {
+				return new LocalizationDictionaryXmlSerializer();
+			} else {
+				throw new Lime.Exception();
 			}
 		}
 
@@ -61,7 +78,7 @@ namespace Orange
 			using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
 				if (File.Exists(path)) {
 					using (var stream = new FileStream(path, FileMode.Open)) {
-						dictionary.ReadFromStream(stream);
+						dictionary.ReadFromStream(CreateSerializer(), stream);
 					}
 				}
 			}
@@ -139,11 +156,11 @@ namespace Orange
 				if (key.StartsWith("[]")) {
 					key = key.Substring(2);
 				}
-				AddToDictionaryHelper(key, value, context);
+				AddToDictionaryHelper(Unescape(key), value, context);
 			} else {
 				// The line has no [] prefix, but still should be localized. 
 				// E.g. most of texts in scene files.
-				AddToDictionaryHelper(key, Unescape(key), context);
+				AddToDictionaryHelper(Unescape(key), Unescape(key), context);
 			}
 		}
 
@@ -164,11 +181,6 @@ namespace Orange
 				ctx.Add(context);
 			}
 			e.Context = string.Join("\n", ctx);
-		}
-
-		private static string Escape(string text)
-		{
-			return text.Replace("\n", "\\n").Replace("\"", "\\\"").Replace("'", "\\'");
 		}
 
 		private static string Unescape(string text)

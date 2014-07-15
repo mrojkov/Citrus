@@ -10,7 +10,7 @@ namespace Orange.Source.Actions
 {
 	static partial class Actions
 	{
-		[MenuItem("Convert Dictionary.txt to the new format")]
+		[MenuItem("Convert Dictionary.txt to the New Format")]
 		public static void ConvertDictionaryTxt()
 		{
 			LoadDictionary("Dictionary.txt");

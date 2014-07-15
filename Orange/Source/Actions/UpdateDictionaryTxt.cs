@@ -7,8 +7,8 @@ namespace Orange
 {
 	static partial class Actions
 	{
-		[MenuItem("Update Dictionary.txt")]
-		public static void UpdateDictionaryTxt()
+		[MenuItem("Update Localization Dictionary")]
+		public static void UpdateLocalizationDictionary()
 		{
 			if (!The.UI.AskConfirmation("Are you sure you want to update the dictionary?")) {
 				return;
