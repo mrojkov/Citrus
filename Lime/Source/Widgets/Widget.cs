@@ -503,17 +503,17 @@ namespace Lime
 			}
 		}
 
-		protected void OnUpdating(float delta)
+		public void RaiseUpdating(float delta)
 		{
 			if (Updating != null) {
-				Updating(delta);
+				Updating(delta * AnimationSpeed);
 			}
 		}
 
-		protected void OnUpdated(float delta)
+		public void RaiseUpdated(float delta)
 		{
 			if (Updated != null) {
-				Updated(delta);
+				Updated(delta * AnimationSpeed);
 			}
 		}
 
