@@ -50,6 +50,14 @@ namespace Lime
 			return result;
 		}
 
+		public IBitmapImplementation Rescale(int newWidth, int newHeight)
+		{
+			var rescaledBitmap = new SD.Bitmap(bitmap, newWidth, newHeight);
+			var result = new BitmapImplementation();
+			result.bitmap = rescaledBitmap;
+			return result;
+		}
+
 		public void Dispose()
 		{
 			if (bitmap != null) {

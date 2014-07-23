@@ -13,6 +13,7 @@ namespace Lime
 		void LoadFromStream(Stream stream);
 		void SaveToStream(Stream stream);
 		IBitmapImplementation Crop(Rectangle cropArea);
+		IBitmapImplementation Rescale(int newWidth, int newHeight);
 	}
 
 	[ProtoContract]
@@ -55,11 +56,16 @@ namespace Lime
 			return Crop(new Rectangle(0, 0, Width - 1, Height - 1));
 		}
 
+		public Bitmap Rescale(int newWidth, int newHeight)
+		{
+			var newImplementation = implementation.Rescale(newWidth, newHeight);
+			return new Bitmap(newImplementation);
+		}
+
 		public Bitmap Crop(Rectangle cropArea)
 		{
 			var newImplementation = implementation.Crop(cropArea);
-			var cropped = new Bitmap(newImplementation);
-			return cropped;
+			return new Bitmap(newImplementation);
 		}
 
 		public void Dispose()
