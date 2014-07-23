@@ -50,6 +50,11 @@ namespace Lime
 			implementation.SaveToStream(stream);
 		}
 
+		public Bitmap Clone()
+		{
+			return Crop(new Rectangle(0, 0, Width - 1, Height - 1));
+		}
+
 		public Bitmap Crop(Rectangle cropArea)
 		{
 			var newImplementation = implementation.Crop(cropArea);
@@ -78,6 +83,5 @@ namespace Lime
 			}
 			return result;
 		}
-
 	}
 }
