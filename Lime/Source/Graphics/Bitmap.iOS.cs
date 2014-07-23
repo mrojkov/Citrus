@@ -40,6 +40,14 @@ namespace Lime
 			}
 		}
 
+		public IBitmapImplementation Rescale(int newWidth, int newHeight)
+		{
+			var scaledImage = bitmap.Scale(new SizeF(newWidth, newHeight));
+			var cropped = new BitmapImplementation();
+			cropped.bitmap = scaledImage;
+			return cropped;
+		}
+
 		public IBitmapImplementation Crop(Rectangle cropArea)
 		{
 			var rect = new RectangleF(cropArea.Left, cropArea.Top, cropArea.Width, cropArea.Height);
