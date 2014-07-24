@@ -14,6 +14,7 @@ namespace Lime
 {
 	public class Logger
 	{
+		public static event Action<string> OnWrite;
 #if iOS
 		[DllImport(MonoTouch.Constants.FoundationLibrary)]
 		private extern static void NSLog(IntPtr message);
@@ -37,15 +38,14 @@ namespace Lime
 #else
 			Console.WriteLine(msg);
 #endif
+			if (OnWrite != null) {
+				OnWrite(msg);
+			}
 		}
 
-		public static void Write(string msg, params object[] args)
+		public static void Write(string format, params object[] args)
 		{
-#if UNITY
-			UnityEngine.Debug.Log(string.Format(msg, args));
-#else
-			Console.WriteLine(msg, args);
-#endif
+			Write(string.Format(format, args));
 		}
 #endif
 	}
