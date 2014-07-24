@@ -16,7 +16,9 @@ namespace Lime
 		[ProtoEnum]
 		Diffuse,
 		[ProtoEnum]
-		Silhuette
+		Silhuette,
+		[ProtoEnum]
+		InversedSilhuette,
 	}
 
 	static class ShaderPrograms
@@ -35,6 +37,8 @@ namespace Lime
 				} else if (numTextures == 2) {
 					return twoTexturesSilhuetteBlendingProgram;
 				}
+			} else if (shader == ShaderId.InversedSilhuette && numTextures == 1) {
+				return inversedSilhuetteBlendingProgram;
 			}
 			return colorOnlyBlendingProgram;
 		}
@@ -108,9 +112,10 @@ namespace Lime
 			"uniform lowp sampler2D tex;	" +
 			"void main()					" +
 			"{								" +
-			"	lowp float a = color.a * texture2D(tex, texCoords).a; " +
-			"	gl_FragColor = vec4(color.rgb * a, a);	" +
-			"}");
+			"	lowp float a = texture2D(tex, texCoords).a; " +
+			"	gl_FragColor = color * vec4(a, a, a, a);	" +
+			"}"
+		);
 
 		static readonly Shader twoTexturesSilhouetteFragmentShader = new FragmentShader(
 			"varying lowp vec4 color;		" +
@@ -124,11 +129,23 @@ namespace Lime
 			"}"
 		);
 
+		static readonly Shader inversedSilhouetteFragmentShader = new FragmentShader(
+			"varying lowp vec4 color;		" +
+			"varying lowp vec2 texCoords;	" +
+			"uniform lowp sampler2D tex;	" +
+			"void main()					" +
+			"{								" +
+			"	lowp float a = 1.0 - texture2D(tex, texCoords).a; " +
+			"	gl_FragColor = color * vec4(a, a, a, a);	      " +
+			"}"
+		);
+
 		private static readonly ShaderProgram colorOnlyBlendingProgram = CreateBlendingProgram(oneTextureVertexShader, colorOnlyFragmentShader);
 		private static readonly ShaderProgram oneTextureBlengingProgram = CreateBlendingProgram(oneTextureVertexShader, oneTextureFragmentShader);
 		private static readonly ShaderProgram twoTexturesBlengingProgram = CreateBlendingProgram(twoTexturesVertexShader, twoTexturesFragmentShader);
 		private static readonly ShaderProgram silhuetteBlendingProgram = CreateBlendingProgram(oneTextureVertexShader, silhouetteFragmentShader);
 		private static readonly ShaderProgram twoTexturesSilhuetteBlendingProgram = CreateBlendingProgram(twoTexturesVertexShader, twoTexturesSilhouetteFragmentShader);
+		private static readonly ShaderProgram inversedSilhuetteBlendingProgram = CreateBlendingProgram(oneTextureVertexShader, inversedSilhouetteFragmentShader);
 
 		private static ShaderProgram CreateBlendingProgram(Shader vertexShader, Shader fragmentShader)
 		{
