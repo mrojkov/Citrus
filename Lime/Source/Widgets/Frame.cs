@@ -171,7 +171,7 @@ namespace Lime
 				return;
 			}
 			if (renderTexture != null || ClipChildren == ClipMethod.ScissorTest) {
-				chain.Add(this);
+				chain.Add(this, Layer);
 			} else {
 				base.AddToRenderChain(chain);
 			}
