@@ -12,7 +12,7 @@ namespace Lime
 		int GetHeight();
 		void LoadFromStream(Stream stream);
 		void SaveToStream(Stream stream);
-		IBitmapImplementation Crop(Rectangle cropArea);
+		IBitmapImplementation Crop(IntRectangle cropArea);
 		IBitmapImplementation Rescale(int newWidth, int newHeight);
 	}
 
@@ -53,7 +53,7 @@ namespace Lime
 
 		public Bitmap Clone()
 		{
-			return Crop(new Rectangle(0, 0, Width - 1, Height - 1));
+			return Crop(new IntRectangle(0, 0, Width - 1, Height - 1));
 		}
 
 		public Bitmap Rescale(int newWidth, int newHeight)
@@ -62,7 +62,7 @@ namespace Lime
 			return new Bitmap(newImplementation);
 		}
 
-		public Bitmap Crop(Rectangle cropArea)
+		public Bitmap Crop(IntRectangle cropArea)
 		{
 			var newImplementation = implementation.Crop(cropArea);
 			return new Bitmap(newImplementation);

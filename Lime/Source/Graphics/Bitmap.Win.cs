@@ -41,9 +41,9 @@ namespace Lime
 			}
 		}
 
-		public IBitmapImplementation Crop(Rectangle cropArea)
+		public IBitmapImplementation Crop(IntRectangle cropArea)
 		{
-			var rect = new SD.RectangleF(cropArea.Left, cropArea.Top, cropArea.Width, cropArea.Height);
+			var rect = new SD.Rectangle(cropArea.Left, cropArea.Top, cropArea.Width, cropArea.Height);
 			var croppedBitmap = bitmap.Clone(rect, bitmap.PixelFormat);
 			var result = new BitmapImplementation();
 			result.bitmap = croppedBitmap;

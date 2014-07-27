@@ -48,9 +48,9 @@ namespace Lime
 			return newImplementation;
 		}
 
-		public IBitmapImplementation Crop(Rectangle cropArea)
+		public IBitmapImplementation Crop(IntRectangle cropArea)
 		{
-			var rect = new RectangleF(cropArea.Left, cropArea.Top, cropArea.Width, cropArea.Height);
+			var rect = new Rectangle(cropArea.Left, cropArea.Top, cropArea.Width, cropArea.Height);
 			var cgimage = bitmap.CGImage;
 			cgimage = cgimage.WithImageInRect(rect);
 			var cropped = new BitmapImplementation();
