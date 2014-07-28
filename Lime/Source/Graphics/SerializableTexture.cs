@@ -192,6 +192,7 @@ namespace Lime
 
 		public void TransformUVCoordinates(ref Vector2 uv0, ref Vector2 uv1)
 		{
+			GetMainTexture();
 			float width = UVRect.B.X - UVRect.A.X;
 			float height = UVRect.B.Y - UVRect.A.Y;
 			uv0.X = UVRect.Left + width * uv0.X;
