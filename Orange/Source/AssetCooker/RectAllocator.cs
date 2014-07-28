@@ -7,9 +7,15 @@ namespace Orange
 	public class RectAllocator
 	{
 		List<IntRectangle> rects = new List<IntRectangle>();
-		
+
+		int totalSquare;
+		int allocatedSquare;
+
+		public double GetPackRate() { return allocatedSquare / (double)totalSquare; }
+
 		public RectAllocator(Size size)
 		{
+			totalSquare = size.Width * size.Height;
 			rects.Add(new IntRectangle(0, 0, size.Width, size.Height));
 		}
 		
@@ -29,7 +35,7 @@ namespace Orange
 				}
 			}
 			if (j < 0) {
-				rect = new IntRectangle(0, 0, 0, 0);
+				rect = IntRectangle.Empty;
 				return false;
 			}
 			// Split the rest, minimizing the sum of parts perimeters.
@@ -44,6 +50,7 @@ namespace Orange
 				rects[j] = new IntRectangle(r.A.X, r.A.Y + size.Height, r.A.X + size.Width, r.B.Y);
 				rects.Add(new IntRectangle(r.A.X + size.Width, r.A.Y, r.B.X, r.B.Y));
 			}
+			allocatedSquare += size.Width * size.Height;
 			return true;
 		}
 	}
