@@ -15,7 +15,12 @@ namespace Lime
 		public override string Text { get; set; }
 
 		[ProtoMember(2)]
-		public bool Enabled { get; set; }
+        private bool enabled;
+        public bool Enabled
+        {
+            get { return enabled; }
+            set { enabled = value; }
+        }
 
 		/// <summary>
 		/// Indicates whether a button has draggable behavior. 
