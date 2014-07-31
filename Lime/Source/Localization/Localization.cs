@@ -1,5 +1,5 @@
-﻿
-using System;
+﻿using System;
+
 namespace Lime
 {
 	public static class Localization
@@ -21,6 +21,11 @@ namespace Lime
 		public static string GetString(string format, params object[] args)
 		{
 			string s = GetString(format);
+			for (int i = 0; i < args.Length; i++) {
+				if (args[i] is string) {
+					args[i] = GetString((string)args[i]);
+				}
+			}
 			return string.Format(s, args);
 		}
 
