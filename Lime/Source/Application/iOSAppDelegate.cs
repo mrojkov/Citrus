@@ -157,6 +157,8 @@ namespace Lime
 			Window = new UIWindow(UIScreen.MainScreen.Bounds);
 
 			GameController = new GameController();
+
+			Application.Instance.PreCreate();
 			
 			Window.RootViewController = GameController;
 

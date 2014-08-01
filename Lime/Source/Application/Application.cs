@@ -163,6 +163,10 @@ namespace Lime
 			throw new NotImplementedException();
 		}
 
+		// buz: Called before GameController is assigned to Window.RootViewController
+		// Kochava SDK requires to be initialized at that point.
+		public virtual void PreCreate() {}
+
 #elif MAC
 		public void Exit()
 		{
