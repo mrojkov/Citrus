@@ -25,18 +25,13 @@ namespace Lime
 
 		private void UpdateForHorizontalOrientation()
 		{
-			int count = 0;
-			foreach (var node in Parent.Nodes) {
-				if (node.AsWidget != null) {
-					count++;
-				}
-			}
+			int count = CalcVisibleWidgetsCount();
 			if (count == 0) return;
 			Vector2 parentSize = Parent.AsWidget.Size;
 			float x = 0;
 			Widget lastWidget = null;
 			foreach (var node in Parent.Nodes) {
-				if (node.AsWidget != null) {
+				if (IsVisibleWidget(node)) {
 					float w = (parentSize.X / count).Floor();
 					node.AsWidget.Position = new Vector2(x, 0);
 					node.AsWidget.Size = new Vector2(w, parentSize.Y);
@@ -49,20 +44,31 @@ namespace Lime
 			}
 		}
 
-		private void UpdateForVerticalOrientation()
+		private int CalcVisibleWidgetsCount()
 		{
 			int count = 0;
 			foreach (var node in Parent.Nodes) {
-				if (node.AsWidget != null) {
+				if (IsVisibleWidget(node)) {
 					count++;
 				}
 			}
+			return count;
+		}
+
+		private static bool IsVisibleWidget(Node node)
+		{
+			return node.AsWidget != null && node.AsWidget.GloballyVisible;
+		}
+
+		private void UpdateForVerticalOrientation()
+		{
+			int count = CalcVisibleWidgetsCount(); 
 			if (count == 0) return;
 			Vector2 parentSize = Parent.AsWidget.Size;
 			float y = 0;
 			Widget lastWidget = null;
 			foreach (var node in Parent.Nodes) {
-				if (node.AsWidget != null) {
+				if (IsVisibleWidget(node)) {
 					float h = (parentSize.Y / count).Floor();
 					node.AsWidget.Position = new Vector2(0, y);
 					node.AsWidget.Size = new Vector2(parentSize.X, h);
