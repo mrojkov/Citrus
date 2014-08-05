@@ -381,6 +381,14 @@ namespace Lime
 			}
 		}
 
+		public void RefreshLayout()
+		{
+			OnParentSizeChanged(Vector2.Zero);
+			for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
+				node.RefreshLayout();
+			}
+		}
+
 		protected void LayoutChildren(Vector2 sizeDelta)
 		{
 			for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
