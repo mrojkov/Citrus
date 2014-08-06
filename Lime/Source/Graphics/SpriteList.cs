@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Lime
 {
-	public class SpriteList : IDisposable
+	public class SpriteList
 	{
 		public class Item
 		{
@@ -23,18 +23,11 @@ namespace Lime
 			}
 		}
 
-		static Item pool;
-		Item head;
-		Item tail;
+		private Item head;
+		private Item tail;
 
-		~SpriteList()
+		public void Add(Item item)
 		{
-			Dispose();
-		}
-
-		public Item Add()
-		{
-			var item = AllocateItem();
 			if (head == null) {
 				head = item;
 				tail = item;
@@ -42,19 +35,18 @@ namespace Lime
 				tail.Next = item;
 				tail = item;
 			}
-			return item;
 		}
 
-		public Item Add(ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 UV0, Vector2 UV1)
+		public void Add(ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 UV0, Vector2 UV1)
 		{
-			var item = Add();
-			item.Texture = texture;
-			item.Color = color;
-			item.Position = position;
-			item.Size = size;
-			item.UV0 = UV0;
-			item.UV1 = UV1;
-			return item;
+			Add(new Item() {
+				Texture = texture,
+				Color = color,
+				Position = position,
+				Size = size,
+				UV0 = UV0,
+				UV1 = UV1
+			});
 		}
 
 		public void Render()
@@ -66,28 +58,6 @@ namespace Lime
 		{
 			for (var item = head; item != null; item = item.Next) {
 				item.Draw(color);
-			}
-		}
-
-		public void Dispose()
-		{
-			if (head != null) {
-				tail.Next = pool;
-				pool = head;
-				head = null;
-				tail = null;
-			}
-		}
-
-		private static Item AllocateItem()
-		{
-			if (pool == null) {
-				return new Item();
-			} else {
-				var item = pool;
-				pool = pool.Next;
-				item.Next = null;
-				return item;
 			}
 		}
 	}

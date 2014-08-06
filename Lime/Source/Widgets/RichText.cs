@@ -200,10 +200,7 @@ namespace Lime
 		public void Invalidate()
 		{
 			InvalidateRenderCache();
-			if (spriteList != null) {
-				spriteList.Dispose();
-				spriteList = null;
-			}
+			spriteList = null;
 			parser = null;
 		}
 
@@ -477,11 +474,11 @@ namespace Lime
 					yOffset = new Vector2(0, (maxHeight - style.Size) * 0.5f);
 					if (style.CastShadow) {
 						for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
-							Renderer.DrawTextLine(spriteList, font, position + style.ShadowOffset + yOffset, word.Text, style.ShadowColor, style.Size, word.Start, word.Length);
+							Renderer.DrawTextLine(font, position + style.ShadowOffset + yOffset, word.Text, style.ShadowColor, style.Size, word.Start, word.Length, spriteList);
 						}
 					}
 					for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
-						Renderer.DrawTextLine(spriteList, font, position + yOffset, word.Text, style.TextColor, style.Size, word.Start, word.Length);
+						Renderer.DrawTextLine(font, position + yOffset, word.Text, style.TextColor, style.Size, word.Start, word.Length, spriteList);
 					}
 				}
 				// Draw overlays

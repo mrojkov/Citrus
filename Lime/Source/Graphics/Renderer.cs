@@ -230,15 +230,7 @@ namespace Lime
 			return size;
 		}
 
-		public static void DrawTextLine(Font font, Vector2 position, string text, Color4 color, float fontHeight, int start, int length)
-		{
-			using (var list = new SpriteList()) {
-				DrawTextLine(list, font, position, text, color, fontHeight, start, length);
-				list.Render();
-			}
-		}
-
-		public static void DrawTextLine(SpriteList list, Font font, Vector2 position, string text, Color4 color, float fontHeight, int start, int length)
+		public static void DrawTextLine(Font font, Vector2 position, string text, Color4 color, float fontHeight, int start, int length, SpriteList list = null)
 		{
 			FontChar prevChar = null;
 			float savedX = position.X;
@@ -264,13 +256,21 @@ namespace Lime
 				}
 				float scale = fontHeight / fontChar.Height;
 				position.X += scale * (fontChar.ACWidths.X + kerning);
-				var item = list.Add();
-				item.Texture = font.Textures[fontChar.TextureIndex];
-				item.Color = color;
-				item.Position = position;
-				item.Size = new Vector2(scale * fontChar.Width, fontHeight);
-				item.UV0 = fontChar.UV0;
-				item.UV1 = fontChar.UV1;
+				var texture = font.Textures[fontChar.TextureIndex];
+				var size = new Vector2(scale * fontChar.Width, fontHeight);
+				if (list == null) {
+					DrawSprite(texture, color, position, size, fontChar.UV0, fontChar.UV1);
+				} else {
+					var item = new SpriteList.Item() {
+						Texture = texture,
+						Color = color,
+						Position = position,
+						Size = size,
+						UV0 = fontChar.UV0,
+						UV1 = fontChar.UV1
+					};
+					list.Add(item);
+				}
 				position.X += scale * (fontChar.Width + fontChar.ACWidths.Y);
 				prevChar = fontChar;
 			}

@@ -201,7 +201,7 @@ namespace Lime
 					break;
 			}
 			if (spriteList != null) {
-				Renderer.DrawTextLine(spriteList, Font.Instance, pos, line, Color4.White, FontHeight, 0, line.Length);
+				Renderer.DrawTextLine(Font.Instance, pos, line, Color4.White, FontHeight, 0, line.Length, spriteList);
 			}
 			extent.X = Mathf.Max(extent.X, pos.X + lineWidth);
 			pos.Y += Spacing + FontHeight;
@@ -312,10 +312,7 @@ namespace Lime
 		private void DisposeSpriteList()
 		{
 			InvalidateRenderCache();
-			if (spriteList != null) {
-				spriteList.Dispose();
-				spriteList = null;
-			}
+			spriteList = null;
 		}
 
 		private static class TextLineSplitter
