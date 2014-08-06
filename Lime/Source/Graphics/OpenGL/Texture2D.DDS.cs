@@ -14,7 +14,7 @@ using OGL = MonoMac.OpenGL.GL;
 
 namespace Lime
 {
-	public partial class Texture2D : ITexture
+	public partial class Texture2D : CommonTexture, ITexture
 	{
 #if WIN || MAC
 		enum DDSFourCC
@@ -45,7 +45,7 @@ namespace Lime
 			reader.ReadUInt32();
 			int height = reader.ReadInt32();
 			int width = reader.ReadInt32();
-			UInt32 pitchOrLinearSize = reader.ReadUInt32();
+			int pitchOrLinearSize = (int)reader.ReadUInt32();
 			// UInt32 depth =
 			reader.ReadUInt32();
 			UInt32 mipMapCount = reader.ReadUInt32();
@@ -81,6 +81,7 @@ namespace Lime
 			Action glCommands = () => {
 				PrepareOpenGLTexture();
 			};
+			MemoryUsed = 0;
 			for (int level = 0; level < mipMapCount; level++) {
 				if (width < 8 || height < 8) {
 					break;
@@ -99,13 +100,12 @@ namespace Lime
 			Application.InvokeOnMainThread(glCommands);
 		}
 
-		private void ReadRGBAImage(ref Action glCommands, BinaryReader reader, int level, int width, int height, uint pitchOrLinearSize)
+		private void ReadRGBAImage(ref Action glCommands, BinaryReader reader, int level, int width, int height, int pitch)
 		{
-			if (pitchOrLinearSize != width * 4) {
+			if (pitch != width * 4) {
 				throw new Lime.Exception("Error reading RGBA texture. Must be 32 bit rgba");
 			}
-			byte[] buffer = new byte[pitchOrLinearSize * height];
-			reader.Read(buffer, 0, buffer.Length);
+			var buffer = ReadTextureData(reader, pitch * height);
 			glCommands += () => {
 				GL.TexImage2D(TextureTarget.Texture2D, level, PixelInternalFormat.Rgba, width, height, 0,
 					PixelFormat.Rgba, PixelType.UnsignedByte, buffer);
@@ -113,7 +113,7 @@ namespace Lime
 			};
 		}
 
-		private void ReadCompressedImage(ref Action glCommands, BinaryReader reader, int level, int width, int height, UInt32 linearSize, UInt32 pfFourCC)
+		private void ReadCompressedImage(ref Action glCommands, BinaryReader reader, int level, int width, int height, int linearSize, UInt32 pfFourCC)
 		{
 			var pif = PixelInternalFormat.CompressedRgbS3tcDxt1Ext;
 			switch ((DDSFourCC)pfFourCC) {
@@ -129,8 +129,7 @@ namespace Lime
 				default:
 					throw new Lime.Exception("Unsupported texture format");
 			}
-			byte[] buffer = new byte[linearSize];
-			reader.Read(buffer, 0, buffer.Length);
+			var buffer = ReadTextureData(reader, linearSize);
 			glCommands += () => {
 				GL.CompressedTexImage2D(TextureTarget.Texture2D, level, pif, width, height, 0, buffer.Length, buffer);
 				PlatformRenderer.CheckErrors();

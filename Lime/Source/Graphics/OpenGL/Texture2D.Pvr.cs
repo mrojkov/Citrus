@@ -7,7 +7,7 @@ using OpenTK.Graphics.ES20;
 
 namespace Lime
 {
-	public partial class Texture2D : ITexture
+	public partial class Texture2D : CommonTexture, ITexture
 	{
 		// Values taken from PVRTexture.h from http://www.imgtec.com
 		enum PVRTextureFlag {
@@ -61,6 +61,7 @@ namespace Lime
 			Action glCommands = () => {
 				PrepareOpenGLTexture();
 			};
+			MemoryUsed = 0;
 			for (int i = 0; i <= numMipmaps; i++) {
 				if (i > 0 && (width < 8 || height < 8)) {
 					continue;
@@ -72,8 +73,7 @@ namespace Lime
 				PVRFormat format = (PVRFormat)(flags & 0xFF);
 				switch(format)	{
 				case PVRFormat.PVRTC_4: {
-					byte[] buffer = new byte[width * height * 4 / 8];
-					reader.Read(buffer, 0, buffer.Length);
+					var buffer = ReadTextureData(reader, width * height * 4 / 8);
 					glCommands += () => {
 						GL.CompressedTexImage2D(All.Texture2D, mipLevel, All.CompressedRgbaPvrtc4Bppv1Img, width2, height2, 0, buffer.Length, buffer);
 						PlatformRenderer.CheckErrors();
@@ -81,8 +81,7 @@ namespace Lime
 					break;
 				}
 				case PVRFormat.PVRTC_2: {
-					byte[] buffer = new byte[width * height * 2 / 8];
-					reader.Read(buffer, 0, buffer.Length);
+					var buffer = ReadTextureData(reader, width * height * 2 / 8);
 					glCommands += () => {
 						GL.CompressedTexImage2D(All.Texture2D, mipLevel, All.CompressedRgbaPvrtc2Bppv1Img, width2, height2, 0, buffer.Length, buffer);
 						PlatformRenderer.CheckErrors();
@@ -90,8 +89,7 @@ namespace Lime
 					break;
 				}
 				case PVRFormat.GLARGB_4444: {
-					byte[] buffer = new byte[width * height * 2];
-					reader.Read(buffer, 0, buffer.Length);
+					var buffer = ReadTextureData(reader, width * height * 2);
 					glCommands += () => {
 						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgba, width2, height2, 0, All.Rgba, All.UnsignedShort4444, buffer);
 						PlatformRenderer.CheckErrors();
@@ -99,8 +97,7 @@ namespace Lime
 					break;
 				}
 				case PVRFormat.GLRGB_565: {
-					byte[] buffer = new byte[width * height * 2];
-					reader.Read(buffer, 0, buffer.Length);
+					var buffer = ReadTextureData(reader, width * height * 2);
 					glCommands += () => {
 						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgb, width2, height2, 0, All.Rgb, All.UnsignedShort565, buffer);
 						PlatformRenderer.CheckErrors();
@@ -108,8 +105,7 @@ namespace Lime
 					break;
 				}
 				case PVRFormat.GLARGB_8888: {
-					byte[] buffer = new byte[width * height * 4];
-					reader.Read(buffer, 0, buffer.Length);
+					var buffer = ReadTextureData(reader, width * height * 4);
 					glCommands += () => {
 						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgba, width2, height2, 0, All.Rgba, All.UnsignedByte, buffer);
 						PlatformRenderer.CheckErrors();

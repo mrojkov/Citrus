@@ -19,8 +19,31 @@ namespace Lime
 		bool IsStubTexture { get; }
 		[ProtoMember(1)]
 		string SerializationPath { get; set; }
+		int MemoryUsed { get; }
 #if UNITY
 		UnityEngine.Texture GetUnityTexture();
 #endif
+	}
+
+	public class CommonTexture : IDisposable
+	{
+		public static int TotalMemoryUsed { get; private set; }
+		public static int TotalMemoryUsedMb { get { return TotalMemoryUsed / (1024 * 1024); } }
+
+		private int memoryUsed;
+		public int MemoryUsed 
+		{
+			get { return memoryUsed; }
+			set
+			{
+				TotalMemoryUsed += value - memoryUsed;
+				memoryUsed = value;
+			}
+		}
+
+		public virtual void Dispose()
+		{
+			MemoryUsed = 0;
+		}
 	}
 }

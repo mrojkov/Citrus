@@ -20,7 +20,7 @@ namespace Lime
 		RGB565
 	}
 
-	public class RenderTexture : ITexture, IDisposable
+	public class RenderTexture : CommonTexture, ITexture
 	{
 		uint handle;
 		uint framebuffer;
@@ -28,8 +28,11 @@ namespace Lime
 		readonly Rectangle uvRect;
 		static readonly Stack<uint> framebufferStack = new Stack<uint>();
 
+		public RenderTextureFormat Format { get; private set; }
+
 		public RenderTexture(int width, int height, RenderTextureFormat format = RenderTextureFormat.RGBA8)
 		{
+			Format = format;
 			size.Width = width;
 			size.Height = height;
 			uvRect = new Rectangle(0, 0, 1, 1);
@@ -58,6 +61,15 @@ namespace Lime
 			PlatformRenderer.CheckErrors();
 		}
 
+		public int MemoryUsed
+		{
+			get
+			{
+				var bpp = Format == RenderTextureFormat.RGBA8 ? 4 : 2;
+				return SurfaceSize.Width * SurfaceSize.Height * bpp;
+			}
+		}
+
 		public Size ImageSize {
 			get { return size; }
 		}
@@ -74,7 +86,7 @@ namespace Lime
 		{
 		}
 		
-		public void Dispose()
+		public override void Dispose()
 		{
 			if (framebuffer != 0) {
 				lock (Texture2D.FramebuffersToDelete) {
@@ -88,6 +100,7 @@ namespace Lime
 				}
 				handle = 0;
 			}
+			base.Dispose();
 		}
 
 		~RenderTexture()

@@ -16,7 +16,7 @@ namespace Lime
 	/// <summary>
 	/// Represents 2D texture
 	/// </summary>
-	public partial class Texture2D : ITexture
+	public partial class Texture2D : CommonTexture, ITexture
 	{
 		uint handle;
 		public OpacityMask OpacityMask { get; private set; }
@@ -31,8 +31,8 @@ namespace Lime
 		{
 			lock (TexturesToDelete) {
 				if (TexturesToDelete.Count > 0) {
-					var ids = new uint[TexturesToDelete.Count];
-					TexturesToDelete.CopyTo(ids);
+					Debug.Write("Discarded {0} texture(s). Total texture memory: {1}mb", TexturesToDelete.Count, CommonTexture.TotalMemoryUsedMb);
+					var ids = TexturesToDelete.ToArray();
 					GL.DeleteTextures(ids.Length, ids);
 					TexturesToDelete.Clear();
 					PlatformRenderer.CheckErrors();
@@ -40,8 +40,7 @@ namespace Lime
 			}
 			lock (FramebuffersToDelete) {
 				if (FramebuffersToDelete.Count > 0) {
-					var ids = new uint[FramebuffersToDelete.Count];
-					FramebuffersToDelete.CopyTo(ids);
+					var ids = FramebuffersToDelete.ToArray();
 					GL.DeleteFramebuffers(ids.Length, ids);
 					FramebuffersToDelete.Clear();
 					PlatformRenderer.CheckErrors();
@@ -181,9 +180,10 @@ namespace Lime
 			Dispose();
 		}
 
-		public virtual void Dispose()
+		public override void Dispose()
 		{
 			DisposeOpenGLTexture();
+			base.Dispose();
 		}
 
 		protected void DisposeOpenGLTexture()
@@ -233,6 +233,12 @@ namespace Lime
 				return !OpacityMask.TestPixel(x1, y1);
 			}
 			return false;
+		}
+
+		private byte[] ReadTextureData(BinaryReader reader, int length)
+		{
+			MemoryUsed += length;
+			return reader.ReadBytes(length);
 		}
 	}
 }

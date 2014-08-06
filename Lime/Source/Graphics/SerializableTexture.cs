@@ -7,7 +7,7 @@ using ProtoBuf;
 namespace Lime
 {
 	[ProtoContract]
-	public class SerializableTexture : ITexture
+	public class SerializableTexture : CommonTexture, ITexture
 	{
 		SerializableTextureCore core;
 
@@ -126,8 +126,6 @@ namespace Lime
 		{
 			return core.Path;
 		}
-
-		public void Dispose() {}
 	}
 
 	class SerializableTextureCore

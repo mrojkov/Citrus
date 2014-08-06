@@ -23,7 +23,7 @@ using MonoTouch.CoreGraphics;
 
 namespace Lime
 {
-	public partial class Texture2D : ITexture
+	public partial class Texture2D : CommonTexture, ITexture
 	{
 #if WIN || MAC
 		private void InitWithPngOrJpgBitmap(Stream stream)
@@ -42,6 +42,7 @@ namespace Lime
 				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, data.Width, data.Height, 0,
 					PixelFormat.Rgb, PixelType.UnsignedByte, data.Scan0);
 				bitmap.UnlockBits(data);
+				MemoryUsed = data.Width * data.Height * 3;
 			} else {
 				PrepareOpenGLTexture();
 				var data = bitmap.LockBits(lockRect, lockMode, SDI.PixelFormat.Format32bppPArgb);
@@ -49,6 +50,7 @@ namespace Lime
 				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width, data.Height, 0,
 					PixelFormat.Rgba, PixelType.UnsignedByte, data.Scan0);
 				bitmap.UnlockBits(data);
+				MemoryUsed = data.Width * data.Height * 4;
 			}
 			PlatformRenderer.CheckErrors();
 		}
@@ -115,6 +117,7 @@ namespace Lime
             int bytesPerPixel = 4;
             int bytesPerRow = bytesPerPixel * width;
             byte[] data = new byte[height * bytesPerRow];
+			MemoryUsed = data.Length;
 
             CGImageAlphaInfo alphaInfo = imageRef.AlphaInfo;
             if (alphaInfo == CGImageAlphaInfo.None) {
