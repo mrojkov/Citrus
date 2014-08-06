@@ -57,7 +57,7 @@ namespace Lime
 
 		private static bool IsVisibleWidget(Node node)
 		{
-			return node.AsWidget != null && node.AsWidget.GloballyVisible;
+			return node.AsWidget != null && node.AsWidget.Visible;
 		}
 
 		private void UpdateForVerticalOrientation()
