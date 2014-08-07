@@ -55,7 +55,7 @@ namespace Orange
 					if (pass == 0) {
 						Console.WriteLine("* " + fileInfo.Path);
 					}
-					ProcessSourceFile(fileInfo.Path, pass);
+					ProcessSourceFile(fileInfo.Path, pass, Encoding.UTF8);
 				}
 			}
 			using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
@@ -64,7 +64,7 @@ namespace Orange
 					if (pass == 0)
 						Console.WriteLine("* " + fileInfo.Path);
 					// Сначала прогоним все строки вида: "[]blah-blah.."
-					ProcessSourceFile(fileInfo.Path, pass);
+					ProcessSourceFile(fileInfo.Path, pass, Encoding.Default);
 					// Затем прогоним все строки вида: Text "blah-blah.."
 					if (!ShouldLocalizeOnlyTaggedSceneTexts()) {
 						ProcessSceneFile(fileInfo.Path, pass);
@@ -78,10 +78,10 @@ namespace Orange
 			return (bool)The.Workspace.ProjectJson.GetValue("LocalizeOnlyTaggedSceneTexts", false);
 		}
 
-		void ProcessSourceFile(string file, LocalizationPass pass)
+		void ProcessSourceFile(string file, LocalizationPass pass, Encoding saveEncoding)
 		{
 			const string quotedStringPattern = @"""([^""\\]*(?:\\.[^""\\]*)*)""";
-			var originalCode = File.ReadAllText(file, Encoding.Default);
+			var originalCode = File.ReadAllText(file);
 			var processedCode = Regex.Replace(originalCode, quotedStringPattern,
 				(match) => {
 					string s = match.Groups[1].Value;
@@ -91,7 +91,7 @@ namespace Orange
 					return '"' + s + '"';
 				});
 			if (processedCode != originalCode) {
-				File.WriteAllText(file, processedCode, Encoding.UTF8);
+				File.WriteAllText(file, processedCode, saveEncoding);
 			}
 		}
 
@@ -127,9 +127,10 @@ namespace Orange
 					var key = match.Groups[1].Value;
 					if (Localization.Dictionary.ContainsKey(key)) {
 						// Put a text from the dictionary back to the source file
-						text = Localization.Dictionary[key].Text;
+						// buz: отключил
+						/*text = Localization.Dictionary[key].Text;
 						AddTextToDictionary(key, text);
-						text = string.Format("[{0}]{1}", key, Escape(text));
+						text = string.Format("[{0}]{1}", key, Escape(text));*/
 					} else {
 						AddTextToDictionary(key, Unescape(text));
 					}
