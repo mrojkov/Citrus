@@ -204,7 +204,7 @@ namespace Lime
 		public float FrameRate { get { return GameView.Instance.FrameRate; } }
 
 		public DeviceOrientation CurrentDeviceOrientation {
-			get { return DeviceOrientation.LandscapeLeft; }
+			get { return DeviceOrientation.Portrait; }
 		}
 
 		public Size WindowSize {
