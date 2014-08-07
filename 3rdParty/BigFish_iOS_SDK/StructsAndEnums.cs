@@ -10,6 +10,7 @@ namespace BigFish_iOS_SDK
 		public const string NotificationRestoreSucceeded = "NOTIFICATION_RESTORE_SUCCEEDED";
 		public const string NotificationPurchaseProductionInformation = "NOTIFICATION_PURCHASE_PRODUCTINFORMATION";
         public const string NotificationPlacementContentStartPurchase = "BFG_NOTIFICATION_PLACEMENT_CONTENT_START_PURCHASE";
+		public const string NotificationUDIDUpdated = "BFG_NOTIFICATION_UDID_UPDATED";
 		public const string BrandingNotificationCompleted = "BFGBRANDING_NOTIFICATION_COMPLETED";
 		public const string SplashNotificationCompleted = "BFGSPLASH_NOTIFICATION_COMPLETED";
 		public const string PromoDashboardNotificationMoreGamesClosed = "BFGPROMODASHBOARD_NOTIFICATION_MOREGAMES_CLOSED";

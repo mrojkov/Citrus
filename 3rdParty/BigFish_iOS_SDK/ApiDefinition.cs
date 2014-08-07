@@ -214,6 +214,9 @@ namespace BigFish_iOS_SDK
 
         [Static, Export("launchSDKByURLScheme:")]
         bool LaunchSDKByURLScheme(string urlScheme);
+
+		[Static, Export("userID")]
+		NSNumber UserId { get; }
 	}
 
 	[BaseType(typeof(NSObject), Name = "bfgutils")]
