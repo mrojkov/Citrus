@@ -46,11 +46,15 @@ namespace Lime
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)All.ClampToEdge);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)All.ClampToEdge);
+			int bpp;
 			if (format == RenderTextureFormat.RGBA8) {
 				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, (IntPtr)null);
+				bpp = 4;
 			} else {
 				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, width, height, 0, PixelFormat.Rgb, PixelType.UnsignedShort565, (IntPtr)null);
+				bpp = 2;
 			}
+			MemoryUsed = SurfaceSize.Width * SurfaceSize.Height * bpp;
 			uint currentFramebuffer = PlatformRenderer.CurrentFramebuffer;
 			PlatformRenderer.BindFramebuffer(framebuffer);
 			PlatformRenderer.CheckErrors();
@@ -59,15 +63,6 @@ namespace Lime
 				throw new Exception("Failed to create render texture. Framebuffer is incomplete.");
 			PlatformRenderer.BindFramebuffer(currentFramebuffer);
 			PlatformRenderer.CheckErrors();
-		}
-
-		public int MemoryUsed
-		{
-			get
-			{
-				var bpp = Format == RenderTextureFormat.RGBA8 ? 4 : 2;
-				return SurfaceSize.Width * SurfaceSize.Height * bpp;
-			}
 		}
 
 		public Size ImageSize {
