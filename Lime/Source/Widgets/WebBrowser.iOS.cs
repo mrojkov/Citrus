@@ -60,8 +60,11 @@ namespace Lime
 			if (webView != null) {
 				webView.StopLoading();
 				webView.Delegate = null;
-				webView.RemoveFromSuperview();
-				webView.Dispose();
+				var localWebView = webView;
+				Application.InvokeOnMainThread(() => {
+					localWebView.RemoveFromSuperview(); // RemoveFromSuperview must run in main thread only.
+					localWebView.Dispose();
+				});
 				webView = null;
 			}
 		}
