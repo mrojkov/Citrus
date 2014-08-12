@@ -104,6 +104,16 @@ namespace Lime
 				return Empty;
 			}
 		}
+
+		public static Rectangle Bounds(Rectangle a, Rectangle b)
+		{
+			return new Rectangle(
+				Mathf.Min(a.Left, b.Left),
+				Mathf.Min(a.Top, b.Top),
+				Mathf.Max(a.Right, b.Right),
+				Mathf.Max(a.Bottom, b.Bottom)
+			);
+		}
 				
 		public override string ToString()
 		{

@@ -116,7 +116,7 @@ namespace Lime
 					FitTextInsideWidgetArea();
 				}
 				spriteList = new SpriteList();
-				Vector2 extent;
+				Rectangle extent;
 				RenderHelper(spriteList, out extent);
 			}
 
@@ -126,49 +126,57 @@ namespace Lime
 			spriteList.Render(GlobalColor);
 		}
 
-		public Vector2 MeasureText()
+		public Rectangle MeasureText()
 		{
-			Vector2 extent;
-			RenderHelper(null, out extent);
-			return extent;
+			Rectangle rect;
+			RenderHelper(null, out rect);
+			return rect;
 		}
 
 		public void FitTextInsideWidgetArea(float minFontHeight = 10)
 		{
 			var minH = minFontHeight;
 			var maxH = FontHeight;
-			if (maxH <= minH) {
+			if (maxH - minH < 1) {
 				return;
 			}
 			var spacingKoeff = Spacing / FontHeight;
-			while (maxH - minH > 1) {
-				var extent = MeasureText();
-				var fit = (extent.X < Width && extent.Y < Height);
+			while (true) {
+				var rect = MeasureText();
+				var fit = (rect.Width < Width && rect.Height < Height);
 				if (fit) {
 					minH = FontHeight;
 				} else {
 					maxH = FontHeight;
+				}
+				if (maxH - minH < 1) {
+					break;
 				}
 				FontHeight = (minH + maxH) / 2;
 				Spacing = FontHeight * spacingKoeff;
 			}
 		}
 
-		private void RenderHelper(SpriteList spriteList, out Vector2 extent)
+		private void RenderHelper(SpriteList spriteList, out Rectangle rect)
 		{
-			extent = Vector2.Zero;
+			rect = Rectangle.Empty;
 			var localizedText = Localization.GetString(Text);
 			if (string.IsNullOrEmpty(localizedText)) {
 				return;
 			}
 			var lines = SplitText(localizedText);
 			var pos = Vector2.Down * CalcVerticalTextPosition(lines);
+			bool firstLine = true;
 			foreach (var line in lines) {
-				RenderSingleTextLine(spriteList, ref extent, ref pos, line);
-			}
-			extent.Y = lines.Count * (FontHeight + Spacing);
-			if (extent.Y > 0) {
-				extent.Y -= Spacing;
+				Rectangle lineRect;
+				RenderSingleTextLine(spriteList, out lineRect, pos, line);
+				pos.Y += Spacing + FontHeight;
+				if (firstLine) {
+					rect = lineRect;
+					firstLine = false;
+				} else {
+					rect = Rectangle.Bounds(rect, lineRect);
+				}
 			}
 		}
 
@@ -189,7 +197,7 @@ namespace Lime
 			return totalHeight;
 		}
 
-		private void RenderSingleTextLine(SpriteList spriteList, ref Vector2 extent, ref Vector2 pos, string line)
+		private void RenderSingleTextLine(SpriteList spriteList, out Rectangle extent, Vector2 pos, string line)
 		{
 			float lineWidth = MeasureTextLine(line).X;
 			switch (HAlignment) {
@@ -203,8 +211,7 @@ namespace Lime
 			if (spriteList != null) {
 				Renderer.DrawTextLine(Font.Instance, pos, line, Color4.White, FontHeight, 0, line.Length, spriteList);
 			}
-			extent.X = Mathf.Max(extent.X, pos.X + lineWidth);
-			pos.Y += Spacing + FontHeight;
+			extent = new Rectangle(pos.X, pos.Y, pos.X + lineWidth, pos.Y + FontHeight);
 		}
 
 		private List<string> SplitText(string text)
