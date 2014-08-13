@@ -31,6 +31,9 @@ namespace Lime
 					if (c != null)
 						return c;
 				}
+				if (code == 160) { // неразрывный пробел
+					return this[' ']; // ищем как обычный пробел
+				}
 				return FontChar.Null;
 			}
 		}
