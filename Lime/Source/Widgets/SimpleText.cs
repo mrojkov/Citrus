@@ -137,24 +137,25 @@ namespace Lime
 		{
 			var minH = minFontHeight;
 			var maxH = FontHeight;
-			if (maxH - minH < 1) {
+			if (maxH <= minH) {
 				return;
 			}
+			var bestHeight = minH;
 			var spacingKoeff = Spacing / FontHeight;
-			while (true) {
+			while (maxH - minH > 1) {
 				var rect = MeasureText();
-				var fit = (rect.Width < Width && rect.Height < Height);
+				var fit = (rect.Width <= Width && rect.Height <= Height);
 				if (fit) {
 					minH = FontHeight;
+					bestHeight = Mathf.Max(bestHeight, FontHeight);
 				} else {
 					maxH = FontHeight;
-				}
-				if (maxH - minH < 1) {
-					break;
 				}
 				FontHeight = (minH + maxH) / 2;
 				Spacing = FontHeight * spacingKoeff;
 			}
+			FontHeight = bestHeight;
+			Spacing = bestHeight * spacingKoeff;
 		}
 
 		private void RenderHelper(SpriteList spriteList, out Rectangle rect)
