@@ -294,16 +294,26 @@ namespace Orange
 					break;
 				}
 			}
+#if NEW_PACK
 			var maxAtlasSize = GetMaxAtlasSize();
+#else
+			int maxAtlasSize = (platform == TargetPlatform.Desktop) ? 2048 : 1024;
+#endif
 			var items = new List<AtlasItem>();
 			foreach (var p in cookingRulesMap) {
 				if (p.Value.TextureAtlas == atlasChain && Path.GetExtension(p.Key) == ".png") {
 					var srcTexturePath = Lime.AssetPath.Combine(The.Workspace.AssetsDirectory, p.Key);
 					var pixbuf = new Gdk.Pixbuf(srcTexturePath);
 					// Ensure that no image exceede maxAtlasSize limit
+#if NEW_PACK
 					if (pixbuf.Width > maxAtlasSize.Width || pixbuf.Height > maxAtlasSize.Height) {
 						int w = Math.Min(pixbuf.Width, maxAtlasSize.Width);
 						int h = Math.Min(pixbuf.Height, maxAtlasSize.Height);
+#else
+					if (pixbuf.Width > maxAtlasSize || pixbuf.Height > maxAtlasSize) {
+						int w = Math.Min(pixbuf.Width, maxAtlasSize);
+						int h = Math.Min(pixbuf.Height, maxAtlasSize);
+#endif
 						pixbuf = pixbuf.ScaleSimple(w, h, Gdk.InterpType.Bilinear);
 						Console.WriteLine(
 							String.Format("WARNING: {0} downscaled to {1}x{2}", srcTexturePath, w, h));
@@ -324,6 +334,7 @@ namespace Orange
 				int b = Math.Max(y.Pixbuf.Width, y.Pixbuf.Height);
 				return b - a;
 			});	
+#if NEW_PACK
 			// PVRTC4 textures must be square
 			var squareAtlas = (platform == TargetPlatform.iOS) && items.Max(i => i.PVRFormat) == PVRFormat.PVRTC4;
 			for (int atlasId = 0; items.Count > 0; atlasId++) {
@@ -347,8 +358,84 @@ namespace Orange
 				CopyAllocatedItemsToAtlas(items, atlasChain, atlasId, bestSize);
 				items.RemoveAll(x => x.Allocated);
 			}
+#else
+			for (int atlasId = 0; items.Count > 0; atlasId++) {
+				for (int i = 64; i <= maxAtlasSize; i *= 2) {
+					foreach (AtlasItem item in items) {
+						item.Allocated = false;
+					}
+					// Take in account 1 pixel border for each side.
+					var a = new RectAllocator(new Lime.Size(i + 2, i + 2));
+					bool allAllocated = true;
+					foreach (AtlasItem item in items) {
+						var size = new Lime.Size(item.Pixbuf.Width + 2, item.Pixbuf.Height + 2);
+						if (a.Allocate(size, out item.AtlasRect)) {
+							item.Allocated = true;
+						} else {
+							allAllocated = false;
+						}
+					}
+					if (i != maxAtlasSize && !allAllocated) {
+						continue;
+					}
+					if (atlasId > 99) {
+						throw new Lime.Exception("Too many textures in the atlas chain {0}", atlasChain);
+					}
+					string atlasPath = GetAtlasPath(atlasChain, atlasId);
+					var atlas = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, true, 8, i, i);
+					atlas.Fill(0);
+					var rules = new CookingRules()
+					{
+						MipMaps = false,
+						PVRFormat = PVRFormat.PVRTC4,
+						DDSFormat = DDSFormat.DXTi
+					};
+					foreach (AtlasItem item in items) {
+						if (!item.Allocated) {
+							continue;
+						}
+						if (item.PVRFormat > rules.PVRFormat)
+							rules.PVRFormat = item.PVRFormat;
+						if (item.DDSFormat > rules.DDSFormat)
+							rules.DDSFormat = item.DDSFormat;
+						rules.MipMaps |= item.MipMapped;
+						var p = item.Pixbuf;
+						p.CopyArea(0, 0, p.Width, p.Height, atlas, item.AtlasRect.A.X, item.AtlasRect.A.Y);
+						var atlasPart = new Lime.TextureAtlasPart();
+						atlasPart.AtlasRect = item.AtlasRect;
+						atlasPart.AtlasRect.B -= new Lime.IntVector2(2, 2);
+						atlasPart.AtlasTexture = Path.ChangeExtension(atlasPath, null);
+
+						//Console.WriteLine("+ " + item.Path);
+						Lime.Serialization.WriteObjectToBundle<Lime.TextureAtlasPart>(assetsBundle, item.Path, atlasPart);
+
+						// Delete non-atlased texture since now its useless
+						var texturePath = Path.ChangeExtension(item.Path, GetPlatformTextureExtension());
+						if (assetsBundle.FileExists(texturePath)) {
+							Console.WriteLine("- " + texturePath);
+							assetsBundle.DeleteFile(texturePath);
+						}
+					}
+					Console.WriteLine("+ " + atlasPath);
+					if (platform == TargetPlatform.Unity) {
+						throw new NotImplementedException();
+						// assetsBundle.ImportFile(inFile, atlasPath, 0);
+					} else {
+						var tmpFile = GetTempFilePathWithExtension(GetPlatformTextureExtension());
+						string maskPath = Path.ChangeExtension(atlasPath, ".mask");
+						OpacityMaskCreator.CreateMask(assetsBundle, atlas, maskPath);
+						TextureConverter.Convert(atlas, tmpFile, rules, platform);
+						assetsBundle.ImportFile(tmpFile, atlasPath, 0, compress: true);
+						File.Delete(tmpFile);
+					}
+					items.RemoveAll(x => x.Allocated);
+					break;
+				}
+			}
+#endif
 		}
 
+#if NEW_PACK
 		private static IEnumerable<Lime.Size> EnumerateAtlasSizes(bool squareAtlas)
 		{
 			if (squareAtlas) {
@@ -430,6 +517,7 @@ namespace Orange
 				File.Delete(tmpFile);
 			}
 		}
+#endif
 
 		static string GetTempFilePathWithExtension(string extension)
 		{
