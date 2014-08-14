@@ -1,0 +1,50 @@
+using System.Collections.Generic;
+using ProtoBuf;
+
+namespace Lime
+{
+	[ProtoContract]
+	public enum HAlignment
+	{
+		[ProtoEnum]
+		Left,
+		[ProtoEnum]
+		Center,
+		[ProtoEnum]
+		Right,
+	}
+
+	[ProtoContract]
+	public enum VAlignment
+	{
+		[ProtoEnum]
+		Top,
+		[ProtoEnum]
+		Center,
+		[ProtoEnum]
+		Bottom,
+	}
+
+	[ProtoContract]
+	public enum TextOverflowMode
+	{
+		[ProtoEnum]
+		Default,
+		[ProtoEnum]
+		Minify,
+		[ProtoEnum]
+		Ellipsis,
+		[ProtoEnum]
+		Ignore,
+	}
+
+	public interface IText
+	{
+		string Text { get; set; }
+		HAlignment HAlignment { get; set; }
+		VAlignment VAlignment { get; set; }
+		TextOverflowMode OverflowMode { get; set; }
+		bool WordSplitAllowed { get; set; }
+	}
+
+}
