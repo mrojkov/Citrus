@@ -174,7 +174,7 @@ namespace Orange
 				text.FontHeight = lexer.ParseFloat();
 				break;
 			case "TextColor":
-				text.Color = text.Color * lexer.ParseColor4();
+				text.TextColor = lexer.ParseColor4();
 				break;
 			case "ShadowColor":
 				lexer.ParseColor4();

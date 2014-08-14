@@ -48,6 +48,7 @@ namespace Lime
 		private float spacing;
 		private HAlignment hAlignment;
 		private VAlignment vAlignment;
+		private Color4 textColor;
 
 		[ProtoMember(1)]
 		public SerializableFont Font {
@@ -91,12 +92,20 @@ namespace Lime
 		[ProtoMember(9)]
 		public bool WordSplitAllowed { get; set; }
 
+		[ProtoMember(10)]
+		public Color4 TextColor
+		{
+			get { return textColor; }
+			set { textColor = value; }
+		}
+
 		public SimpleText()
 		{
 			// CachedRendering = true;
 			Text = "";
 			FontHeight = 15;
 			Font = new SerializableFont();
+			TextColor = Color4.White;
 		}
 
 		public override Vector2 CalcContentSize()
@@ -123,7 +132,7 @@ namespace Lime
 			Renderer.Transform1 = LocalToWorldTransform;
 			Renderer.Blending = GlobalBlending;
 			Renderer.Shader = GlobalShader;
-			spriteList.Render(GlobalColor);
+			spriteList.Render(GlobalColor * textColor);
 		}
 
 		public Rectangle MeasureText()

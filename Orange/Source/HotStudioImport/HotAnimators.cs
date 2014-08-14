@@ -125,9 +125,11 @@ namespace Orange
 					case "RandMotionAspectRatio":
 						propertyName = "RandomMotionAspectRatio";
 						break;
+					case "TextColor":
+						propertyName = "TextColor";
+						break;
 					}
 					switch(propertyName + '@' + className) {
-					case "TextColor@Hot::Text":
 					case "ShadowColor@Hot::Text":
 					case "TextColor@Hot::TextPresenter":
 					case "ShadowColor@Hot::TextPresenter":
