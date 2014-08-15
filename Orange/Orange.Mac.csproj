@@ -12,6 +12,7 @@
     <AssemblyName>Orange</AssemblyName>
     <newfilesearch>OnLoad</newfilesearch>
     <SuppressXamMacUpsell>True</SuppressXamMacUpsell>
+    <SuppressXamMacMigration>True</SuppressXamMacMigration>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>True</DebugSymbols>

@@ -99,6 +99,10 @@
     <Compile Include="Source\Localization\LocalizationDictionary.cs" />
     <Compile Include="Source\Localization\LocalizationDictionaryTextSerializer.cs" />
     <Compile Include="Source\Localization\LocalizationDictionaryXmlSerializer.cs" />
+    <Compile Include="Source\Widgets\TextStyle.cs" />
+    <Compile Include="Source\Widgets\IText.cs" />
+    <Compile Include="Source\Widgets\Text\TextParser.cs" />
+    <Compile Include="Source\Widgets\Text\TextRenderer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
