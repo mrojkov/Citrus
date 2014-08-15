@@ -200,6 +200,10 @@
     <Compile Include="Source\Localization\LocalizationDictionary.cs" />
     <Compile Include="Source\Localization\LocalizationDictionaryTextSerializer.cs" />
     <Compile Include="Source\Localization\LocalizationDictionaryXmlSerializer.cs" />
+    <Compile Include="Source\Widgets\Text\TextParser.cs" />
+    <Compile Include="Source\Widgets\Text\TextRenderer.cs" />
+    <Compile Include="Source\Widgets\IText.cs" />
+    <Compile Include="Source\Widgets\TextStyle.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
