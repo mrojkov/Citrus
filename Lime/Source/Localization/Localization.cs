@@ -1,4 +1,7 @@
 ﻿using System;
+#if iOS
+using MonoTouch.Foundation;
+#endif
 
 namespace Lime
 {
@@ -12,10 +15,20 @@ namespace Lime
 		public static bool UseNumericKeys { get { return useNumericKeys; } set { useNumericKeys = value; } }
 
 		public static LocalizationDictionary Dictionary = new LocalizationDictionary();
-		
+
+		/// <summary>
+		/// This will return a two letter code for the currently selected language.
+		/// "en" for English, "es" for Spanish, "de" for German, etc.
+		/// For more examples, please see this Wikipedia entry (in particular, the 639-1 column):
+		/// http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
+		/// </summary>
 		public static string GetCurrentLanguage()
 		{
+#if iOS
+			return NSLocale.PreferredLanguages[0];
+#else
 			return System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+#endif
 		}
 
 		public static string GetString(string format, params object[] args)
