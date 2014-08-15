@@ -169,19 +169,19 @@ namespace Lime.Text
 			var minScale = 0.0f;
 			var maxScale = 1.0f;
 			scaleFactor = maxScale;
-			while (true) {
+			float bestScaleFactor = minScale;
+			while (maxScale - minScale >= 0.1f) {
 				var textSize = MeasureText(size.X, size.Y);
-				var fit = (textSize.X < size.X && textSize.Y < size.Y);
+				var fit = (textSize.X <= size.X && textSize.Y <= size.Y);
 				if (fit) {
 					minScale = scaleFactor;
+					bestScaleFactor = Mathf.Max(bestScaleFactor, scaleFactor);
 				} else {
 					maxScale = scaleFactor;
 				}
-				if (maxScale - minScale < 0.1f) {
-					break;
-				}
 				scaleFactor = (minScale + maxScale) / 2;
 			}
+			scaleFactor = bestScaleFactor;
 		}
 
 		public Vector2 MeasureText(float maxWidth, float maxHeight)
@@ -299,7 +299,9 @@ namespace Lime.Text
 					}
 				}
 				words[i] = word;
-				longestLineWidth = Math.Max(longestLineWidth, word.X + word.Width);
+				if (isText) { // buz: при автопереносе на концах строк остаются пробелы, они не должны влиять на значение длины строки
+					longestLineWidth = Math.Max(longestLineWidth, word.X + word.Width);
+				}
 			}
 		}
 
