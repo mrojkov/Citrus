@@ -122,6 +122,9 @@
     <Compile Include="Source\PluginAttributes\PluginCommandLineArgumentsAttribute.cs" />
     <Compile Include="Source\PluginAttributes\PluginFinalizationAttribute.cs" />
     <Compile Include="Source\PluginAttributes\PluginInitializationAttribute.cs" />
+    <Compile Include="Source\DictionaryOldFormatExtractor.cs" />
+    <Compile Include="Source\Actions\ConvertDictionaryToNewFormat.cs" />
+    <Compile Include="Source\Actions\UpdateDictionaryTxtOldFormat.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lime\Lime.Mac.csproj">
