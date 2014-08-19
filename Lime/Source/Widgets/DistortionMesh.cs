@@ -88,6 +88,7 @@ namespace Lime
 		public override void Render()
 		{
 			Renderer.Blending = GlobalBlending;
+			Renderer.Shader = GlobalShader;
 			Renderer.Transform1 = LocalToWorldTransform;
 			for (int i = 0; i < NumRows; ++i) {
 				for (int j = 0; j < NumCols; ++j) {
