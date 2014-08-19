@@ -16,6 +16,8 @@ namespace Orange
 		private static TargetPlatform platform;
 		private static Dictionary<string, CookingRules> cookingRulesMap;
 
+		const int MaxAtlasChainLength = 1000;
+
 		public static void CookForActivePlatform()
 		{
 			Cook(The.Workspace.ActivePlatform);
@@ -285,7 +287,7 @@ namespace Orange
 
 		static void BuildAtlasChain(string atlasChain)
 		{
-			for (int i = 0; i < 100; i++) {
+			for (int i = 0; i < MaxAtlasChainLength; i++) {
 				string atlasPath = GetAtlasPath(atlasChain, i);
 				if (assetsBundle.FileExists(atlasPath)) {
 					Console.WriteLine("- " + atlasPath);
@@ -327,7 +329,7 @@ namespace Orange
 			// PVRTC4 textures must be square
 			var squareAtlas = (platform == TargetPlatform.iOS) && items.Max(i => i.PVRFormat) == PVRFormat.PVRTC4;
 			for (int atlasId = 0; items.Count > 0; atlasId++) {
-				if (atlasId > 999) {
+				if (atlasId >= MaxAtlasChainLength) {
 					throw new Lime.Exception("Too many textures in the atlas chain {0}", atlasChain);
 				}
 				var bestSize = new Lime.Size(0, 0);
