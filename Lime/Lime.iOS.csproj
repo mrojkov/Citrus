@@ -203,6 +203,7 @@
     <Compile Include="Source\Widgets\Text\TextRenderer.cs" />
     <Compile Include="Source\Widgets\IText.cs" />
     <Compile Include="Source\Widgets\TextStyle.cs" />
+    <Compile Include="obj\Release\.NETFramework,Version=v4.0.AssemblyAttribute.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
