@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
 #if OPENAL
 using OpenTK.Audio;
 using OpenTK.Audio.OpenAL;
@@ -9,6 +10,10 @@ using System.Threading;
 using System.IO;
 using ProtoBuf;
 using System.ComponentModel;
+#if iOS
+using MonoTouch.Foundation;
+using MonoTouch.AVFoundation;
+#endif
 
 namespace Lime
 {
@@ -37,6 +42,18 @@ namespace Lime
 
 		public static void Initialize()
 		{
+#if iOS
+			AVAudioSession.SharedInstance().Init();
+			AVAudioSession.Notifications.ObserveInterruption((sender, args) => {
+				if (args.InterruptionType == AVAudioSessionInterruptionType.Began) {
+					Alc.MakeContextCurrent(new OpenTK.ContextHandle((IntPtr)null));
+			    } else if (args.InterruptionType == AVAudioSessionInterruptionType.Ended) {
+					if (context != null) {
+						context.MakeCurrent();
+					}
+			    }
+			});	
+#endif
 #if OPENAL
 #if !iOS
 			bool isDeviceAvailable = !String.IsNullOrEmpty(AudioContext.DefaultDevice);
@@ -45,10 +62,10 @@ namespace Lime
 			}
 #else
 			context = new AudioContext();
+
 #endif
 #endif
             var options = Application.Instance.Options;
-
 			if (!HasError()) {
 				// iOS dislike to mix stereo and mono buffers on one audio source, so separate them
                 for (int i = 0; i < options.NumStereoChannels; i++) {
