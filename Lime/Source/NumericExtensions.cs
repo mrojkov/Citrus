@@ -116,5 +116,15 @@ namespace Lime
 		{
 			return Mathf.Lerp(value, min, max);
 		}
+
+		public static string Localize(this int value)
+		{
+			string result = value.ToString("N0");
+			if (string.IsNullOrEmpty(AssetsBundle.Instance.CurrentLanguage) || AssetsBundle.Instance.CurrentLanguage == "EN") {
+				return result;
+			} else {
+				return result.Replace(',', (char)160); // заменяем запятые на неразрывные пробелы
+			}
+		}
 	}
 }
