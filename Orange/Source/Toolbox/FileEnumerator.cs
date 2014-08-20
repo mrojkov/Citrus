@@ -28,12 +28,23 @@ namespace Orange
 		{
 			files.Clear();
 			var dirInfo = new System.IO.DirectoryInfo(Directory);
+			var ignorePaths = new List<string>();
+#if MAC
+			foreach (var fileInfo in dirInfo.GetFiles("#IgnoreDirectoryOnMac.txt", SearchOption.AllDirectories)) {
+				var directory = fileInfo.DirectoryName + '/';
+				directory = directory.Remove(0, dirInfo.FullName.Length + 1);
+				directory = Lime.AssetPath.CorrectSlashes(directory);
+				ignorePaths.Add(directory);
+			}
+#endif
 			foreach (var fileInfo in dirInfo.GetFiles("*.*", SearchOption.AllDirectories)) {
 				var file = fileInfo.FullName;
 				if (file.Contains(".svn"))
 					continue;
 				file = file.Remove(0, dirInfo.FullName.Length + 1);
 				file = Lime.AssetPath.CorrectSlashes(file);
+				if (ignorePaths.Any(path => file.StartsWith(path)))
+					continue;
 				files.Add(new FileInfo { Path = file, LastWriteTime = fileInfo.LastWriteTime });
 			}
 		}
