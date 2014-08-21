@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using ProtoBuf;
 
@@ -14,6 +15,8 @@ namespace Lime
 		private HAlignment hAlignment;
 		private VAlignment vAlignment;
 		private Color4 textColor;
+
+		public Func<string, string> LocalizationHandler;
 
 		[ProtoMember(1)]
 		public SerializableFont Font {
@@ -135,7 +138,7 @@ namespace Lime
 		private void RenderHelper(SpriteList spriteList, out Rectangle rect)
 		{
 			rect = Rectangle.Empty;
-			var localizedText = Localization.GetString(Text);
+			var localizedText = LocalizationHandler != null ? LocalizationHandler(Text) : Localization.GetString(Text);
 			if (string.IsNullOrEmpty(localizedText)) {
 				return;
 			}
