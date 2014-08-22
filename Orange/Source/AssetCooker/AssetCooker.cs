@@ -66,16 +66,50 @@ namespace Orange
 			if (platform == TargetPlatform.Unity) {
 				CookForUnity();
 			} else {
-				string bundlePath = The.Workspace.GetBundlePath(platform);
-				using (Lime.AssetsBundle.Instance = new Lime.PackedAssetsBundle(bundlePath, Lime.AssetBundleFlags.Writable)) {
-					CookHelper();
+				HashSet<string> extraBundles = new HashSet<string>();
+				foreach (var dictionaryItem in cookingRulesMap) {
+					if (dictionaryItem.Value.Bundle != null) {
+						extraBundles.Add(dictionaryItem.Value.Bundle);
+					}
+				}
+				string mainBundlePath = The.Workspace.GetBundlePath(platform);
+				CookBundle(mainBundlePath, null);
+				foreach (var extraBundle in extraBundles) {
+					string bundlePath = Path.Combine(Path.GetDirectoryName(mainBundlePath), extraBundle + Path.GetExtension(mainBundlePath));
+					CookBundle(bundlePath, extraBundle);
 				}
 				// Нужно закрыть бандл, а потом открыть для того чтобы получить достук к 
 				// сериализованным сценам (фреймам) для генерации кода - Гриша
-				using (Lime.AssetsBundle.Instance = new Lime.PackedAssetsBundle(bundlePath, Lime.AssetBundleFlags.Writable)) {
+				using (Lime.AssetsBundle.Instance = new Lime.PackedAssetsBundle(mainBundlePath, Lime.AssetBundleFlags.Writable)) {
 					using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
 						PluginLoader.AfterAssetsCooked();
 					}
+				}
+			}
+		}
+
+		private static void CookBundle(string bundlePath, string bundleFilter)
+		{
+			using (Lime.AssetsBundle.Instance = new Lime.PackedAssetsBundle(bundlePath, Lime.AssetBundleFlags.Writable)) {
+				if (bundleFilter == null) {
+					Console.WriteLine("------------- Cooking Assets -------------"); 
+				} else {
+					Console.WriteLine("------------- Cooking Assets ({0}) -------------", bundleFilter);
+				}
+				The.Workspace.AssetFiles.EnumerationFilter = (info) => {
+					CookingRules rules;
+					if (cookingRulesMap.TryGetValue(info.Path, out rules)) {
+						return rules.Bundle == bundleFilter;
+					} else {
+						// для текстовых файлов cooking rules отсутствуют, считаем их принадлежащими к главному бандлу.
+						return bundleFilter == null;
+					}
+				};
+				try {
+					CookHelper();
+				}
+				finally {
+					The.Workspace.AssetFiles.EnumerationFilter = null;
 				}
 			}
 		}
@@ -87,6 +121,7 @@ namespace Orange
 				throw new Lime.Exception("Output directory '{0}' doesn't exist", resourcesPath);
 			}
 			using (Lime.AssetsBundle.Instance = new UnityAssetBundle(resourcesPath)) {
+				Console.WriteLine("------------- Cooking Assets -------------");
 				CookHelper();
 			}
 		}
@@ -123,7 +158,6 @@ namespace Orange
 		private static void CookHelper()
 		{
 			using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
-				Console.WriteLine("------------- Cooking Assets -------------");
 				foreach (var stage in CookStages) {
 					stage();
 				}
@@ -298,9 +332,10 @@ namespace Orange
 			}
 			var maxAtlasSize = GetMaxAtlasSize();
 			var items = new List<AtlasItem>();
-			foreach (var p in cookingRulesMap) {
-				if (p.Value.TextureAtlas == atlasChain && Path.GetExtension(p.Key) == ".png") {
-					var srcTexturePath = Lime.AssetPath.Combine(The.Workspace.AssetsDirectory, p.Key);
+			foreach (var fileInfo in The.Workspace.AssetFiles.Enumerate(".png")) {
+				CookingRules cookingRules = cookingRulesMap[fileInfo.Path];
+				if (cookingRules.TextureAtlas == atlasChain) {
+					var srcTexturePath = Lime.AssetPath.Combine(The.Workspace.AssetsDirectory, fileInfo.Path);
 					var pixbuf = new Gdk.Pixbuf(srcTexturePath);
 					// Ensure that no image exceede maxAtlasSize limit
 					if (pixbuf.Width > maxAtlasSize.Width || pixbuf.Height > maxAtlasSize.Height) {
@@ -311,11 +346,11 @@ namespace Orange
 							String.Format("WARNING: {0} downscaled to {1}x{2}", srcTexturePath, w, h));
 					}
 					var item = new AtlasItem {
-						Path = Path.ChangeExtension(p.Key, ".atlasPart"), 
+						Path = Path.ChangeExtension(fileInfo.Path, ".atlasPart"), 
 						Pixbuf = pixbuf,
-						MipMapped = p.Value.MipMaps,
-						PVRFormat = p.Value.PVRFormat,
-						DDSFormat = p.Value.DDSFormat
+						MipMapped = cookingRules.MipMaps,
+						PVRFormat = cookingRules.PVRFormat,
+						DDSFormat = cookingRules.DDSFormat
 					};
 					items.Add(item);
 				}
@@ -474,12 +509,12 @@ namespace Orange
 				}
 			}
 			// Find which new textures must be added to the atlas chain
-			foreach (var p in cookingRulesMap) {
-				string atlasPartPath = Path.ChangeExtension(p.Key, ".atlasPart");
-				bool atlasNeedRebuld = p.Value.TextureAtlas != null && 
-					Path.GetExtension(p.Key) == ".png" && !assetsBundle.FileExists(atlasPartPath);
+			foreach (var t in textures) {
+				string atlasPartPath = Path.ChangeExtension(t.Key, ".atlasPart");
+				var cookingRules = cookingRulesMap[t.Key];
+				bool atlasNeedRebuld = cookingRules.TextureAtlas != null && !assetsBundle.FileExists(atlasPartPath);
 				if (atlasNeedRebuld) {
-					atlasChainsToRebuild.Add(p.Value.TextureAtlas);
+					atlasChainsToRebuild.Add(cookingRules.TextureAtlas);
 				}
 			}
 			foreach (string atlasChain in atlasChainsToRebuild) {

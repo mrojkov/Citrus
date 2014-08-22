@@ -27,13 +27,15 @@ namespace Orange
 		public PVRFormat PVRFormat;
 		public DDSFormat DDSFormat;
 		public DateTime LastChangeTime;
+		public string Bundle;
 
 		public static CookingRules Default = new CookingRules {
 			TextureAtlas = null,
 			MipMaps = false,
 			PVRFormat = PVRFormat.PVRTC4, 
 			DDSFormat = DDSFormat.DXTi,
-			LastChangeTime = new DateTime(0)
+			LastChangeTime = new DateTime(0),
+			Bundle = null
 		};
 	}
 	
@@ -50,7 +52,7 @@ namespace Orange
 			using (new DirectoryChanger(fileEnumerator.Directory)) {
 				foreach (var fileInfo in fileEnumerator.Enumerate()) {
 					var path = fileInfo.Path;
-					if (!path.StartsWith(pathStack.Peek())) {
+					while (!path.StartsWith(pathStack.Peek())) {
 						rulesStack.Pop();
 						pathStack.Pop();
 					}
@@ -133,30 +135,37 @@ namespace Orange
 							throw new Lime.Exception("Invalid rule format");
 						}
 						switch (words[0]) {
-						case "TextureAtlas":
-							if (words[1] == "None")
-								rules.TextureAtlas = null;
-							else if (words[1] == "${DirectoryName}") {
-								string atlasName = Path.GetFileName(Lime.AssetPath.GetDirectoryName(path));
-								if (string.IsNullOrEmpty(atlasName)) {
-									throw new Lime.Exception("Atlas directory is empty. Choose another atlas name");
+							case "TextureAtlas":
+								if (words[1] == "None")
+									rules.TextureAtlas = null;
+								else if (words[1] == "${DirectoryName}") {
+									string atlasName = Path.GetFileName(Lime.AssetPath.GetDirectoryName(path));
+									if (string.IsNullOrEmpty(atlasName)) {
+										throw new Lime.Exception("Atlas directory is empty. Choose another atlas name");
+									}
+									rules.TextureAtlas = atlasName;
+								} else {
+									rules.TextureAtlas = words[1];
 								}
-								rules.TextureAtlas = atlasName;
-							} else {
-								rules.TextureAtlas = words[1];
-							}
-							break;
-						case "MipMaps":
-							rules.MipMaps = ParseBool(words[1]);
-							break;
-						case "PVRFormat":
-							rules.PVRFormat = ParsePVRFormat(words[1]);
-							break;
-						case "DDSFormat":
-							rules.DDSFormat = ParseDDSFormat(words[1]);
-							break;
-						default:
-							throw new Lime.Exception("Unknown attribute {0}", words[0]);
+								break;
+							case "MipMaps":
+								rules.MipMaps = ParseBool(words[1]);
+								break;
+							case "PVRFormat":
+								rules.PVRFormat = ParsePVRFormat(words[1]);
+								break;
+							case "DDSFormat":
+								rules.DDSFormat = ParseDDSFormat(words[1]);
+								break;
+							case "Bundle":
+								if (words[1].ToLowerInvariant() == "<default>" || words[1].ToLowerInvariant() == "data") {
+									rules.Bundle = null;
+								} else {
+									rules.Bundle = words[1];
+								}
+								break;
+							default:
+								throw new Lime.Exception("Unknown attribute {0}", words[0]);
 						}
 					}
 				}
