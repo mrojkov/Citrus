@@ -16,6 +16,8 @@ namespace Orange
 		private static TargetPlatform platform;
 		private static Dictionary<string, CookingRules> cookingRulesMap;
 
+		private static string atlasesPostfix = "";
+
 		const int MaxAtlasChainLength = 1000;
 
 		public static void CookForActivePlatform()
@@ -105,11 +107,14 @@ namespace Orange
 						return bundleFilter == null;
 					}
 				};
+				// у каждого бандла должна быть своя папка с атласами, чтобы они друг с другом не пересекались
+				atlasesPostfix = bundleFilter != null ? bundleFilter : "";
 				try {
 					CookHelper();
 				}
 				finally {
 					The.Workspace.AssetFiles.EnumerationFilter = null;
+					atlasesPostfix = "";
 				}
 			}
 		}
@@ -315,7 +320,7 @@ namespace Orange
 
 		static string GetAtlasPath(string atlasChain, int index)
 		{
-			var path = Lime.AssetPath.Combine("Atlases", atlasChain + "." + index.ToString("000") + GetPlatformTextureExtension());
+			var path = Lime.AssetPath.Combine("Atlases" + atlasesPostfix, atlasChain + "." + index.ToString("000") + GetPlatformTextureExtension());
 			return path;
 		}
 
