@@ -138,6 +138,14 @@
    typedef unsigned int ogg_uint32_t;
    typedef long long int ogg_int64_t;
 
+#elif defined(__ANDROID__)
+
+   typedef signed short ogg_int16_t;
+   typedef unsigned short ogg_uint16_t;
+   typedef signed int ogg_int32_t;
+   typedef unsigned int ogg_uint32_t;
+   typedef long long int ogg_int64_t;
+
 #else
 
 #  include <ogg/config_types.h>

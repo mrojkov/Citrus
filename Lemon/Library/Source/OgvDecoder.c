@@ -134,11 +134,7 @@ int OgvReadPage(OgvDecoder* ogv, ogg_page* page)
 		// Returns a buffer that can be written too
 		// with the given size. This buffer is stored
 			// in the ogg synchronization structure.
-#if defined(ANDROID)
-		char* buffer = ogg_sync_bufferin(&ogv->state, 4096);
-#else
 		char* buffer = ogg_sync_buffer(&ogv->state, 4096);
-#endif
 		if (buffer == NULL) {
 			return -1;
 		}
