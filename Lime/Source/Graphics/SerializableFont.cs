@@ -64,5 +64,10 @@ namespace Lime
 				return font;
 			}
 		}
+
+		public void Clear()
+		{
+			fonts.Clear();
+		}
 	}
 }
