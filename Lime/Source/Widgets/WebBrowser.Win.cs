@@ -8,11 +8,13 @@ namespace Lime
 {
 	public class WebBrowser : Image
 	{
-		public Uri Url { get { return browser.Url; } set { SetUrl(value); } }
+		public Uri Url { get { return browser.Url; } set { browser.Url = value; } }
 
 		private System.Windows.Forms.WebBrowser browser;
 
-		public WebBrowser() : base(new Texture2D())
+		static Texture2D texture = new Texture2D();
+
+		public WebBrowser() : base(texture)
 		{
 			browser = new System.Windows.Forms.WebBrowser();
 			browser.DocumentCompleted += browser_DocumentCompleted;
@@ -47,18 +49,14 @@ namespace Lime
 			var m = new MemoryStream(1024 * 1024);
 			bitmap.Save(m, System.Drawing.Imaging.ImageFormat.Png);
 			m.Position = 0;
-			(Texture as Texture2D).LoadImage(m);
+			texture.LoadImage(m);
 		}
 		
-		private void SetUrl(Uri value)
-		{
-			browser.Navigate(value);
-		}
-
 		public override void Dispose()
 		{
 			if (browser != null)
 				browser.Dispose();
+			texture.LoadImage(new Color4[] { }, 0, 0, false);
 		}
 	}
 }
