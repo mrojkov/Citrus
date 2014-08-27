@@ -22,8 +22,10 @@ namespace Orange
 		static bool CleanupGame()
 		{
 			string bundlePath = The.Workspace.GetBundlePath();
-			if (File.Exists(bundlePath)) {
-				File.Delete(bundlePath);
+			var dirInfo = new System.IO.DirectoryInfo(Path.GetDirectoryName(bundlePath));
+			foreach (var fileInfo in dirInfo.GetFiles('*' + Path.GetExtension(bundlePath), SearchOption.TopDirectoryOnly)) {
+				Console.WriteLine("Deleting {0}", fileInfo.Name);
+				File.Delete(fileInfo.FullName);
 			}
 			var builder = new SolutionBuilder(The.Workspace.ActivePlatform);
 			if (!builder.Clean()) {

@@ -12,6 +12,14 @@ namespace Orange
 		public static void Unpack(TargetPlatform platform)
 		{
 			string bundlePath = The.Workspace.GetBundlePath(platform);
+			var dirInfo = new System.IO.DirectoryInfo(Path.GetDirectoryName(bundlePath));
+			foreach (var fileInfo in dirInfo.GetFiles('*' + Path.GetExtension(bundlePath), SearchOption.TopDirectoryOnly)) {
+				UnpackBundle(fileInfo.FullName);
+			}
+		}
+
+		private static void UnpackBundle(string bundlePath)
+		{
 			string outputDirectory = bundlePath + ".Unpacked";
 			using (AssetsBundle.Instance = new PackedAssetsBundle(bundlePath, AssetBundleFlags.None)) {
 				Console.WriteLine("Extracting game content into \"{0}\"", outputDirectory);
