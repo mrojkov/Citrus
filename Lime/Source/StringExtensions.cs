@@ -21,5 +21,16 @@ namespace Lime
 		{
 			return Localization.GetString(format, args);
 		}
+
+		public static bool HasJapaneseSymbols(this string text, int start = 0, int length = -1)
+		{
+			int end = (length < 0) ? text.Length : Math.Min(text.Length, start + length);
+			for (int i = start; i < end; i++) {
+				char c = text[i];
+				if ((c >= 0x3040 && c <= 0x309f) /* Hiragana */ || (c >= 0x30a0 && c <= 0x30ff) /* Katakana */ || (c >= 0x4e00 && c <= 0x9faf) /* Kanji */)
+					return true;
+			}
+			return false;
+		}
 	}
 }

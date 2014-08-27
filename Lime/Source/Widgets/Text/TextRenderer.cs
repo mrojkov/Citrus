@@ -275,17 +275,24 @@ namespace Lime.Text
 				}
 				var isLongerThanWidth = x + word.Width > maxWidth;
 				var isText = word.Text[word.Start] > ' ';
-				if (x > 0 && isLongerThanWidth && isText) {
-					if (wordSplitAllowed) {
-						var fittedCharsCount = CalcFittedCharactersCount(word, maxWidth);
+				if (isLongerThanWidth && isText && (wordSplitAllowed || word.Text.HasJapaneseSymbols(word.Start, word.Length))) {
+					var fittedCharsCount = CalcFittedCharactersCount(word, maxWidth - x);
+					if (fittedCharsCount > 0) {
 						var newWord = word;
 						newWord.Start = word.Start + fittedCharsCount;
 						newWord.Length = word.Length - fittedCharsCount;
 						newWord.Width = CalcWordWidth(newWord);
+						newWord.LineBreak = true;
 						word.Length = fittedCharsCount;
 						word.Width = CalcWordWidth(word);
+						word.X = x;
+						x += word.Width;
 						words.Insert(i + 1, newWord);
+						goto skip_default_placement;
 					}
+				}
+
+				if (isLongerThanWidth && isText && x > 0) {
 					x = word.Width;
 					word.X = 0;
 					word.LineBreak = true;
@@ -293,6 +300,8 @@ namespace Lime.Text
 					word.X = x;
 					x += word.Width;
 				}
+			skip_default_placement:
+
 				if (overflowMode == TextOverflowMode.Ellipsis) {
 					if (word.X == 0 && word.Width > maxWidth) {
 						word = ClipWordWithEllipsis(word, maxWidth);

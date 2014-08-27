@@ -322,7 +322,7 @@ namespace Lime
 				return
 					TryCutLastWord(line, out lineWithoutLastWord, out lastWord)
 					|| (
-						isWordSplitAllowed
+						(isWordSplitAllowed || line.HasJapaneseSymbols())
 						&& TryCutWordTail(line, measureHandler, out lineWithoutLastWord, out lastWord)
 					);
 			}
