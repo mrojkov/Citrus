@@ -79,6 +79,7 @@ namespace Orange
 				foreach (var extraBundle in extraBundles) {
 					string bundlePath = Path.Combine(Path.GetDirectoryName(mainBundlePath), extraBundle + Path.GetExtension(mainBundlePath));
 					CookBundle(bundlePath, extraBundle);
+					Lime.PackedAssetsBundle.RefreshBundleCheckSum(bundlePath);
 				}
 				// Нужно закрыть бандл, а потом открыть для того чтобы получить достук к 
 				// сериализованным сценам (фреймам) для генерации кода - Гриша
@@ -87,6 +88,7 @@ namespace Orange
 						PluginLoader.AfterAssetsCooked();
 					}
 				}
+				Lime.PackedAssetsBundle.RefreshBundleCheckSum(mainBundlePath);
 			}
 		}
 

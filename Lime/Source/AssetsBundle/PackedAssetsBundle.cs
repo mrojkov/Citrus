@@ -230,9 +230,10 @@ namespace Lime
 			int checkSum = CalcBundleCheckSum(bundlePath);
 			using (var stream = new FileStream(bundlePath, FileMode.Open, FileAccess.Write)) {
 				if (stream.Length > 8) {
-					stream.Seek(4, SeekOrigin.Begin);
-					var reader = new BinaryWriter(stream);
-					reader.Write(checkSum);
+					using (var writer = new BinaryWriter(stream)) {
+						writer.Seek(4, SeekOrigin.Begin);
+						writer.Write(checkSum);
+					}
 				}
 			}
 		}
