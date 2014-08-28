@@ -181,17 +181,34 @@ namespace Lime
 
 		public static int CalcBundleCheckSum(string bundlePath)
 		{
-			// It would be better read whole file by chunks
-			var contents = File.ReadAllBytes(bundlePath);
-			if (contents.Length < 8) {
-				return 0;
+			using (var stream = new FileStream(bundlePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
+				var data = new byte[16 * 1024];
+				int size = stream.Read(data, 0, data.Length);
+				if (size < 8) {
+					return 0;
+				}
+				data[4] = 0;
+				data[5] = 0;
+				data[6] = 0;
+				data[7] = 0;
+				unchecked {
+					const int p = 16777619;
+					int hash = (int)2166136261;
+					while (size > 0) {
+						for (int i = 0; i < size; i++) {
+							hash = (hash ^ data[i]) * p;
+						}
+						size = stream.Read(data, 0, data.Length);
+					}
+					// are these actually needed?
+					hash += hash << 13;
+					hash ^= hash >> 7;
+					hash += hash << 3;
+					hash ^= hash >> 17;
+					hash += hash << 5;
+					return hash;
+				}
 			}
-			contents[4] = 0;
-			contents[5] = 0;
-			contents[6] = 0;
-			contents[7] = 0;
-			int checkSum = Toolbox.ComputeHash(contents, contents.Length);
-			return checkSum;
 		}
 
 		public static bool IsBundleCorrupted(string bundlePath)
