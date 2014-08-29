@@ -41,6 +41,7 @@ namespace Lime
 	public enum PlatformId
 	{
 		iOS,
+		Android,
 		Mac,
 		Win
 	}
@@ -131,6 +132,8 @@ namespace Lime
 				return PlatformId.iOS;
 #elif WIN
 				return PlatformId.Win;
+#elif ANDROID
+				return PlatformId.Android;
 #elif MAC
 				return PlatformId.Mac;
 #else
@@ -210,6 +213,30 @@ namespace Lime
 		public Size WindowSize {
 			get { return GameView.Instance.WindowSize; }
 			set { GameView.Instance.WindowSize = value; }
+		}
+#elif ANDROID
+		public Size WindowSize { get; internal set; }
+
+		public void ShowOnscreenKeyboard(bool show, string text)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void ChangeOnscreenKeyboardText(string text)
+		{
+			throw new NotImplementedException();
+		}
+
+		public bool Active { get; internal set; }
+
+		public bool FullScreen { get { return true; } set {} }
+		public float FrameRate { get { return GameView.Instance.FrameRate; } }
+
+		public DeviceOrientation CurrentDeviceOrientation { get; internal set; }
+
+		public void Exit()
+		{
+			throw new NotImplementedException();
 		}
 #elif UNITY
 		public void Exit()

@@ -103,6 +103,9 @@ namespace Lime
 #elif UNITY
 			var r = UnityEngine.Screen.currentResolution;
 			return new Vector2(r.width, r.height);
+#elif ANDROID
+			var s = GameView.Instance.Size;
+			return new Vector2(s.Width, s.Height);
 #else
 			var device = OpenTK.DisplayDevice.Default;
 			return new Vector2(device.Width, device.Height);

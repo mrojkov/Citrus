@@ -3,49 +3,217 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.0</ProductVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{72E2DDBB-C320-4356-89EC-BDED6036D29B}</ProjectGuid>
     <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <RootNamespace>Lime.Android</RootNamespace>
     <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
-    <AndroidUseLatestPlatformSdk>True</AndroidUseLatestPlatformSdk>
+    <AndroidUseLatestPlatformSdk>False</AndroidUseLatestPlatformSdk>
     <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
     <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
     <AndroidResgenClass>Resource</AndroidResgenClass>
-    <AssemblyName>Lime.Android</AssemblyName>
-    <TargetFrameworkVersion>v4.0.3</TargetFrameworkVersion>
+    <AssemblyName>Lime</AssemblyName>
+    <TargetFrameworkVersion>v2.3</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;__MOBILE__;__ANDROID__;</DefineConstants>
+    <DefineConstants>DEBUG;__MOBILE__;ANDROID;OPENGL;OPENAL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidLinkMode>None</AndroidLinkMode>
     <ConsolePause>false</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
-    <DefineConstants>__MOBILE__;__ANDROID__;</DefineConstants>
+    <DefineConstants>__MOBILE__;ANDROID;OPENGL;OPENAL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
     <ConsolePause>false</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="Mono.Android" />
-  </ItemGroup>
-  <ItemGroup>
-    <AndroidResource Include="Resources\values\Strings.xml" />
+    <Reference Include="protobuf-net">
+      <HintPath>..\3rdParty\ProtoBuf-Net\Android\protobuf-net.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenTK" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
+  <ItemGroup>
+    <Compile Include="Source\Application\Application.cs" />
+    <Compile Include="Source\Application\CommandLineArgs.cs" />
+    <Compile Include="Source\Application\Debug.cs" />
+    <Compile Include="Source\Application\ExternalStorageLagsSimulator.cs" />
+    <Compile Include="Source\Application\FPSCalculator.cs" />
+    <Compile Include="Source\Application\iOSAppDelegate.cs" />
+    <Compile Include="Source\Application\iOSGameController.cs" />
+    <Compile Include="Source\Application\iOSGameView.cs" />
+    <Compile Include="Source\Application\Logger.cs" />
+    <Compile Include="Source\Application\MacAppDelegate.cs" />
+    <Compile Include="Source\Application\MacGameController.cs" />
+    <Compile Include="Source\Application\MacGameView.cs" />
+    <Compile Include="Source\Application\OpenTKGameView.cs" />
+    <Compile Include="Source\Application\RenderingApi.cs" />
+    <Compile Include="Source\Application\Sdl2.cs" />
+    <Compile Include="Source\Application\WinApi.cs" />
+    <Compile Include="Source\AssetsBundle\AssetsBundle.cs" />
+    <Compile Include="Source\AssetsBundle\PackedAssetsBundle.cs" />
+    <Compile Include="Source\AssetsBundle\UnityAssetsBundle.cs" />
+    <Compile Include="Source\AssetsBundle\UnpackedAssetsBundle.cs" />
+    <Compile Include="Source\Audio\AudioCache.cs" />
+    <Compile Include="Source\Audio\AudioChannel.cs" />
+    <Compile Include="Source\Audio\AudioDecoder.cs" />
+    <Compile Include="Source\Audio\AudioSystem.cs" />
+    <Compile Include="Source\Audio\AudioSystem.ErrorChecker.cs" />
+    <Compile Include="Source\Audio\OggDecoder.cs" />
+    <Compile Include="Source\Audio\SerializableSample.cs" />
+    <Compile Include="Source\Audio\Sound.cs" />
+    <Compile Include="Source\Audio\WaveIMA4Decoder.cs" />
+    <Compile Include="Source\Graphics\OpenGL\IndexBuffer.cs" />
+    <Compile Include="Source\Graphics\OpenGL\PlatformRenderer.cs" />
+    <Compile Include="Source\Graphics\OpenGL\RenderBatch.cs" />
+    <Compile Include="Source\Graphics\OpenGL\RenderList.cs" />
+    <Compile Include="Source\Graphics\OpenGL\RenderTexture.cs" />
+    <Compile Include="Source\Graphics\OpenGL\Shader.cs" />
+    <Compile Include="Source\Graphics\OpenGL\ShaderProgram.cs" />
+    <Compile Include="Source\Graphics\OpenGL\Shaders.cs" />
+    <Compile Include="Source\Graphics\OpenGL\Texture2D.cs" />
+    <Compile Include="Source\Graphics\OpenGL\Texture2D.DDS.cs" />
+    <Compile Include="Source\Graphics\OpenGL\Texture2D.Png.cs" />
+    <Compile Include="Source\Graphics\OpenGL\Texture2D.Pvr.cs" />
+    <Compile Include="Source\Graphics\OpenGL\VertexBuffer.cs" />
+    <Compile Include="Source\Graphics\OpenGL\XamarinAdapter.cs" />
+    <Compile Include="Source\Graphics\Unity\MaterialFactory.cs" />
+    <Compile Include="Source\Graphics\Unity\Renderer.cs" />
+    <Compile Include="Source\Graphics\Unity\RenderTexture.cs" />
+    <Compile Include="Source\Graphics\Unity\Texture2D.cs" />
+    <Compile Include="Source\Graphics\Bitmap.cs" />
+    <Compile Include="Source\Graphics\Bitmap.iOS.cs" />
+    <Compile Include="Source\Graphics\Bitmap.Win.cs" />
+    <Compile Include="Source\Graphics\Font.cs" />
+    <Compile Include="Source\Graphics\ITexture.cs" />
+    <Compile Include="Source\Graphics\MovieTexture.cs" />
+    <Compile Include="Source\Graphics\OgvDecoder.cs" />
+    <Compile Include="Source\Graphics\OpacityMask.cs" />
+    <Compile Include="Source\Graphics\Renderer.cs" />
+    <Compile Include="Source\Graphics\SerializableFont.cs" />
+    <Compile Include="Source\Graphics\SerializableTexture.cs" />
+    <Compile Include="Source\Graphics\SpriteList.cs" />
+    <Compile Include="Source\Graphics\TextureAtlasPart.cs" />
+    <Compile Include="Source\Graphics\TexturePool.cs" />
+    <Compile Include="Source\Input\Input.Native.cs" />
+    <Compile Include="Source\Input\Input.Unity.cs" />
+    <Compile Include="Source\Input\Key.cs" />
+    <Compile Include="Source\Localization\Localization.cs" />
+    <Compile Include="Source\Localization\LocalizationDictionary.cs" />
+    <Compile Include="Source\Localization\LocalizationDictionaryTextSerializer.cs" />
+    <Compile Include="Source\Localization\LocalizationDictionaryXmlSerializer.cs" />
+    <Compile Include="Source\PopupMenu\ImageBox.cs" />
+    <Compile Include="Source\PopupMenu\LayoutTools.cs" />
+    <Compile Include="Source\PopupMenu\MenuButton.cs" />
+    <Compile Include="Source\PopupMenu\MenuItem.cs" />
+    <Compile Include="Source\PopupMenu\PopupMenu.cs" />
+    <Compile Include="Source\PopupMenu\RoundedRectangle.cs" />
+    <Compile Include="Source\PopupMenu\Separator.cs" />
+    <Compile Include="Source\PopupMenu\StringItem.cs" />
+    <Compile Include="Source\Types\Color4.cs" />
+    <Compile Include="Source\Types\IntRectangle.cs" />
+    <Compile Include="Source\Types\IntVector2.cs" />
+    <Compile Include="Source\Types\Matrix32.cs" />
+    <Compile Include="Source\Types\Matrix44.cs" />
+    <Compile Include="Source\Types\NumericRange.cs" />
+    <Compile Include="Source\Types\Rectangle.cs" />
+    <Compile Include="Source\Types\Size.cs" />
+    <Compile Include="Source\Types\TangerineClassAttribute.cs" />
+    <Compile Include="Source\Types\TangerinePropertyAttribute.cs" />
+    <Compile Include="Source\Types\Vector2.cs" />
+    <Compile Include="Source\Types\Vector3.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimationUtils.cs" />
+    <Compile Include="Source\Widgets\Animation\Animator.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimatorCollection.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimatorRegistry.cs" />
+    <Compile Include="Source\Widgets\Animation\Keyframe.cs" />
+    <Compile Include="Source\Widgets\Animation\KeyframeCollection.cs" />
+    <Compile Include="Source\Widgets\Text\TextParser.cs" />
+    <Compile Include="Source\Widgets\Text\TextRenderer.cs" />
+    <Compile Include="Source\Widgets\Audio.cs" />
+    <Compile Include="Source\Widgets\Bone.cs" />
+    <Compile Include="Source\Widgets\BoneArray.cs" />
+    <Compile Include="Source\Widgets\Button.cs" />
+    <Compile Include="Source\Widgets\DistortionMesh.cs" />
+    <Compile Include="Source\Widgets\DistortionMeshPoint.cs" />
+    <Compile Include="Source\Widgets\Frame.cs" />
+    <Compile Include="Source\Widgets\Image.cs" />
+    <Compile Include="Source\Widgets\ImageCombiner.cs" />
+    <Compile Include="Source\Widgets\IText.cs" />
+    <Compile Include="Source\Widgets\LinearLayout.cs" />
+    <Compile Include="Source\Widgets\Marker.cs" />
+    <Compile Include="Source\Widgets\MarkerCollection.cs" />
+    <Compile Include="Source\Widgets\Movie.cs" />
+    <Compile Include="Source\Widgets\NineGrid.cs" />
+    <Compile Include="Source\Widgets\Node.cs" />
+    <Compile Include="Source\Widgets\NodeDebugView.cs" />
+    <Compile Include="Source\Widgets\NodeList.cs" />
+    <Compile Include="Source\Widgets\ParticleEmitter.cs" />
+    <Compile Include="Source\Widgets\ParticleModifier.cs" />
+    <Compile Include="Source\Widgets\ParticlesMagnet.cs" />
+    <Compile Include="Source\Widgets\PointObject.cs" />
+    <Compile Include="Source\Widgets\Polyline.cs" />
+    <Compile Include="Source\Widgets\RenderChain.cs" />
+    <Compile Include="Source\Widgets\RichText.cs" />
+    <Compile Include="Source\Widgets\SimpleText.cs" />
+    <Compile Include="Source\Widgets\Slider.cs" />
+    <Compile Include="Source\Widgets\Spline.cs" />
+    <Compile Include="Source\Widgets\SplineGear.cs" />
+    <Compile Include="Source\Widgets\SplinePoint.cs" />
+    <Compile Include="Source\Widgets\Task.cs" />
+    <Compile Include="Source\Widgets\TaskList.cs" />
+    <Compile Include="Source\Widgets\TextBox.cs" />
+    <Compile Include="Source\Widgets\TextStyle.cs" />
+    <Compile Include="Source\Widgets\WebBrowser.iOS.cs" />
+    <Compile Include="Source\Widgets\WebBrowser.Mac.cs" />
+    <Compile Include="Source\Widgets\WebBrowser.Win.cs" />
+    <Compile Include="Source\Widgets\Widget.cs" />
+    <Compile Include="Source\Widgets\Widget.Toolbox.cs" />
+    <Compile Include="Source\Widgets\WidgetCachedRenderer.cs" />
+    <Compile Include="Source\Widgets\WidgetDebugView.cs" />
+    <Compile Include="Source\Widgets\WidgetInput.cs" />
+    <Compile Include="Source\Widgets\World.cs" />
+    <Compile Include="Source\Environment.cs" />
+    <Compile Include="Source\Exception.cs" />
+    <Compile Include="Source\Geometry.cs" />
+    <Compile Include="Source\Mathf.cs" />
+    <Compile Include="Source\NumericExtensions.cs" />
+    <Compile Include="Source\RewindableStream.cs" />
+    <Compile Include="Source\Serialization.cs" />
+    <Compile Include="Source\StringExtensions.cs" />
+    <Compile Include="Source\Toolbox.cs" />
+    <Compile Include="Source\Version.cs" />
+    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Factory.iPhone.cs" />
+    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\GraphicsContext.cs" />
+    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGameView.cs" />
+    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGraphicsContext.cs" />
+    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Utilities.iPhone.cs" />
+    <Compile Include="Source\Application\AndroidGameView.cs" />
+    <Compile Include="Source\Application\AndroidMainActivity.cs" />
+    <Compile Include="Source\Graphics\Bitmap.Android.cs" />
+    <Compile Include="Source\Widgets\WebBrowser.Android.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Lemon\Lemon.Android.csproj">
+      <Project>{B4435A5F-51DA-42BA-9315-61691A5F58AC}</Project>
+      <Name>Lemon.Android</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

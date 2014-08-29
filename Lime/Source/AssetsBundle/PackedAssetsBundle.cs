@@ -2,6 +2,7 @@ using System.IO;
 using System.IO.Compression;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Lime
 {
@@ -159,21 +160,37 @@ namespace Lime
 		Int32 indexOffset;
 		BinaryReader reader;
 		BinaryWriter writer;
-		FileStream stream;
+		Stream stream;
+		AssetBundleFlags flags;
 		internal Dictionary <string, AssetDescriptor> index = new Dictionary<string, AssetDescriptor>();
 		List<AssetDescriptor> trash = new List<AssetDescriptor>();
+		System.Reflection.Assembly resourcesAssembly;
 
 		PackedAssetsBundle() {}
+
+		public PackedAssetsBundle(string resourceId, string assemblyName)
+		{
+			this.path = resourceId;
+			resourcesAssembly = AppDomain.CurrentDomain.GetAssemblies().
+				SingleOrDefault(a => a.GetName().Name == "Assets.Android");
+			if (resourcesAssembly == null) {
+				throw new Lime.Exception("Assembly '{0}' doesn't exist", assemblyName);
+			}
+			stream = AllocStream();
+			reader = new BinaryReader(stream);
+			ReadIndexTable();
+		}
 
 		public PackedAssetsBundle(string path, AssetBundleFlags flags = Lime.AssetBundleFlags.None)
 		{
 			this.path = path;
+			this.flags = flags;
 			if ((flags & AssetBundleFlags.Writable) != 0) {
 				stream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.ReadWrite);
 				reader = new BinaryReader(stream);
 				writer = new BinaryWriter(stream);
 			} else {
-				stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+				stream = AllocStream();
 				reader = new BinaryReader(stream);
 			}
 			ReadIndexTable();
@@ -398,11 +415,13 @@ namespace Lime
 
 		private void ReadIndexTable()
 		{
+#if !ANDROID
 			if (stream.Length == 0) {
 				indexOffset = sizeof(Int32) * 4;
 				index.Clear();
 				return;
 			}
+#endif
 			stream.Seek(0, SeekOrigin.Begin);
 			var signature = reader.ReadInt32();
 			if (signature != Signature) {
@@ -464,7 +483,15 @@ namespace Lime
 					return streamPool.Pop();
 				}
 			}
-			return new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+			if (resourcesAssembly != null) {
+				var stream = resourcesAssembly.GetManifestResourceStream(path);
+				if (stream == null) {
+					throw new Lime.Exception("Resource '{0}' doesn't exist", path);
+				}
+				return stream;
+			} else {
+				return new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+			}
 		}
 		
 		internal void ReleaseStream(Stream stream)

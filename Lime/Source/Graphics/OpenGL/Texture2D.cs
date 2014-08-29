@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-#if iOS
+#if iOS || ANDROID
 using OpenTK.Graphics.ES20;
 #elif MAC
 using MonoMac.OpenGL;

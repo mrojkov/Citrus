@@ -1,7 +1,7 @@
 #if OPENGL
 using System;
 using System.Diagnostics;
-#if iOS
+#if iOS || ANDROID
 using OpenTK.Graphics.ES20;
 #elif MAC
 using MonoMac.OpenGL;

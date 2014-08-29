@@ -55,14 +55,17 @@ namespace Lime
 			});	
 #endif
 #if OPENAL
-#if !iOS
+#if iOS 
+			context = new AudioContext();
+#elif ANDROID
+			// LoadLibrary() ivokes JNI_OnLoad()
+			Java.Lang.JavaSystem.LoadLibrary("openal32");
+			context = new AudioContext();
+#else
 			bool isDeviceAvailable = !String.IsNullOrEmpty(AudioContext.DefaultDevice);
 			if (isDeviceAvailable && !CommandLineArgs.NoAudio) {
 				context = new AudioContext();
 			}
-#else
-			context = new AudioContext();
-
 #endif
 #endif
             var options = Application.Instance.Options;

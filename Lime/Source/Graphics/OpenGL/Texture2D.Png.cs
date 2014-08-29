@@ -16,9 +16,12 @@ using OGL = MonoMac.OpenGL.GL;
 using SDI = System.Drawing.Imaging;
 using SD = System.Drawing;
 #elif iOS
-using OpenTK.Graphics.ES11;
+using OpenTK.Graphics.ES20;
 using MonoTouch.UIKit;
 using MonoTouch.CoreGraphics;
+#elif ANDROID
+using OpenTK.Graphics.ES20;
+using SD = System.Drawing;
 #endif
 
 namespace Lime
@@ -130,6 +133,34 @@ namespace Lime
                 GL.TexImage2D(All.Texture2D, 0, (int)All.Rgba, width, height, 0, All.Rgba, All.UnsignedByte, data);
             }
         }
+#elif ANDROID
+		private void InitWithPngOrJpgBitmap(Stream stream)
+		{
+			if (!Application.IsMainThread) {
+				throw new NotSupportedException("Calling from non-main thread currently is not supported");
+			}
+			using (var bitmap = Android.Graphics.BitmapFactory.DecodeStream(stream)) {
+				SurfaceSize = ImageSize = new Size(bitmap.Width, bitmap.Height);
+				if (!bitmap.HasAlpha) {
+					PrepareOpenGLTexture ();
+					var pixels = new int[bitmap.Width * bitmap.Height];
+					bitmap.GetPixels(pixels, 0, bitmap.Width, 0, 0, bitmap.Width, bitmap.Height);
+					// SwapRedAndGreen24(data);
+					GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, bitmap.Width, bitmap.Height, 0,
+						PixelFormat.Rgb, PixelType.UnsignedByte, pixels);
+					MemoryUsed = bitmap.Width * bitmap.Height * 3;
+				} else {
+					PrepareOpenGLTexture();
+					var pixels = new int[bitmap.Width * bitmap.Height];
+					bitmap.GetPixels(pixels, 0, bitmap.Width, 0, 0, bitmap.Width, bitmap.Height);
+					// SwapRedAndGreen32(data);
+					GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0,
+						PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
+					MemoryUsed = bitmap.Width * bitmap.Height * 4;
+				}
+			}
+			PlatformRenderer.CheckErrors();
+		}
 #endif
 	}
 }

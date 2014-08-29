@@ -1,6 +1,6 @@
 ﻿#if OPENGL
 using System;
-#if iOS
+#if iOS || ANDROID
 using OpenTK.Graphics.ES20;
 #elif MAC
 using MonoMac.OpenGL;
@@ -43,6 +43,15 @@ namespace Lime
 			throw new Exception("OpenGL error(s): " + errors);
 #endif
 		}
+
+//		private static ErrorCode GetErrorCode()
+//		{
+////#if ANDROID
+////			return GL.GetErrorCode();
+////#else
+//			return GL.GetError();
+////#endif
+//		}
 
 		public static void ResetShader()
 		{

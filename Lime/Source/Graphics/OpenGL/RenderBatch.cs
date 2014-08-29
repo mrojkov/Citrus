@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-#if iOS
+#if iOS || ANDROID
 using OpenTK.Graphics.ES20;
 #elif MAC
 using MonoMac.OpenGL;

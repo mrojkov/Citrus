@@ -9,14 +9,15 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 #elif MAC
 using MonoMac.OpenGL;
-using OGL = MonoMac.OpenGL.GL;
+#elif ANDROID
+using OpenTK.Graphics.ES20;
 #endif
 
 namespace Lime
 {
 	public partial class Texture2D : CommonTexture, ITexture
 	{
-#if WIN || MAC
+#if WIN || MAC || ANDROID
 		enum DDSFourCC
 		{
 			DXT1 = ('D' | ('X' << 8) | ('T' << 16) | ('1' << 24)),
@@ -115,6 +116,10 @@ namespace Lime
 
 		private void ReadCompressedImage(ref Action glCommands, BinaryReader reader, int level, int width, int height, int linearSize, UInt32 pfFourCC)
 		{
+#if ANDROID
+			// XXX
+			// throw new NotSupportedException();
+#else
 			var pif = PixelInternalFormat.CompressedRgbS3tcDxt1Ext;
 			switch ((DDSFourCC)pfFourCC) {
 				case DDSFourCC.DXT1:
@@ -134,6 +139,7 @@ namespace Lime
 				GL.CompressedTexImage2D(TextureTarget.Texture2D, level, pif, width, height, 0, buffer.Length, buffer);
 				PlatformRenderer.CheckErrors();
 			};
+#endif
 		}
 #endif
 	}
