@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if ANDROID
+
+using System;
 
 namespace Lime
 {
@@ -28,3 +30,4 @@ namespace Lime
 	}
 }
 
+#endif
