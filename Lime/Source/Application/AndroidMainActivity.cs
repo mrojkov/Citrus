@@ -4,6 +4,7 @@ using Android.App;
 using Android.OS;
 using Android.Content.PM;
 using Android.Views;
+using Android.Views.InputMethods;
 
 namespace Lime
 {
@@ -11,6 +12,7 @@ namespace Lime
 	{
 		public static MainActivity Instance { get; private set; }
 		GameView view;
+		InputMethodManager imm;
 
 		protected override void OnCreate (Bundle bundle)
 		{
@@ -19,6 +21,7 @@ namespace Lime
 			view = new GameView(this);
 			SetContentView(view);
 			Instance = this;
+			imm = (InputMethodManager)ApplicationContext.GetSystemService(Android.Content.Context.InputMethodService);
 		}
 
 		protected override void OnPause()
@@ -28,6 +31,7 @@ namespace Lime
 			Lime.Application.Instance.OnDeactivate();
 			AudioSystem.Active = false;
 			view.Pause();
+			view.ClearFocus();
 		}
 
 		protected override void OnResume()
@@ -37,6 +41,22 @@ namespace Lime
 			Lime.Application.Instance.Active = true;
 			Lime.Application.Instance.OnActivate();
 			base.OnResume();
+			if (!view.IsFocused) {
+				view.RequestFocus();
+			}
+		}
+			
+		public void ShowOnscreenKeyboard(bool show, string text)
+		{
+			if (show) {
+				imm.ShowSoftInput(view, ShowFlags.Implicit);
+			} else {
+				imm.HideSoftInputFromWindow(view.WindowToken, 0);
+			}
+		}
+
+		public void ChangeOnscreenKeyboardText(string text)
+		{
 		}
 	}
 }

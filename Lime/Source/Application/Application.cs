@@ -219,12 +219,12 @@ namespace Lime
 
 		public void ShowOnscreenKeyboard(bool show, string text)
 		{
-			throw new NotImplementedException();
+			MainActivity.Instance.ShowOnscreenKeyboard(show, text);
 		}
 
 		public void ChangeOnscreenKeyboardText(string text)
 		{
-			throw new NotImplementedException();
+			MainActivity.Instance.ChangeOnscreenKeyboardText(text);
 		}
 
 		public bool Active { get; internal set; }

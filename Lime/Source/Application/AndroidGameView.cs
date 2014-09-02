@@ -7,24 +7,61 @@ using Android.Content;
 using OpenTK.Graphics;
 using System.Collections.Generic;
 using Android.Views;
+using Android.Views.InputMethods;
+using Android.Widget;
 
 namespace Lime
 {
 	public class GameView : AndroidGameView
 	{
-		internal static event Action DidUpdated;
+		class InputConnection : BaseInputConnection
+		{
+			public string TextInput;
 
+			public InputConnection(View view)
+				: base(view, true)
+			{
+			}
+
+			public override bool SendKeyEvent(KeyEvent e)
+			{
+				if (e.KeyCode == Keycode.Del && e.Action != KeyEventActions.Up) {
+					TextInput += '\b';
+				}
+				if (e.IsPrintingKey && e.Action == KeyEventActions.Down) {
+					CommitText(new String((char)e.UnicodeChar, 1), 1);
+				}
+				return base.SendKeyEvent(e);
+			}
+
+			public override bool CommitText(Java.Lang.ICharSequence text, int newCursorPosition)
+			{
+				TextInput += text.ToString();
+				return base.CommitText(text, newCursorPosition);
+			}
+		}
+
+		internal static event Action DidUpdated;
 		public static GameView Instance;
 
 		public readonly RenderingApi RenderingApi = RenderingApi.ES20;
 
+		private InputConnection inputConnection;
+
 		public GameView(Context context)
 			: base(context)
 		{
+			Focusable = true;
+			FocusableInTouchMode = true;
 			Instance = this;
 			for (int i = 0; i < Input.MaxTouches; i++) {
 				pointerIds[i] = -1;
 			}
+		}
+
+		public override bool OnCheckIsTextEditor()
+		{
+			return true;
 		}
 			
 		protected override void OnLoad(EventArgs e)
@@ -39,6 +76,14 @@ namespace Lime
 			this.GLContextVersion = GLContextVersion.Gles2_0;
 			GraphicsMode = new AndroidGraphicsMode(0, 0, 0, 0, 0, false);
 			base.CreateFrameBuffer();	
+		}
+
+		public override Android.Views.InputMethods.IInputConnection OnCreateInputConnection(Android.Views.InputMethods.EditorInfo outAttrs)
+		{
+			if (inputConnection == null) {
+				inputConnection = new InputConnection(this);
+			}
+			return inputConnection;
 		}
 			
 		protected override void OnRenderFrame(FrameEventArgs e)
@@ -152,9 +197,9 @@ namespace Lime
 			Input.ProcessPendingKeyEvents();
 			Application.Instance.OnUpdateFrame(delta);
 			AudioSystem.Update();
-			Input.TextInput = null;
+			Input.TextInput = inputConnection.TextInput;
+			inputConnection.TextInput = null;
 			Input.CopyKeysState();
-			// ProcessTextInput();
 			if (DidUpdated != null) {
 				DidUpdated();
 			}

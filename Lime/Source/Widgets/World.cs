@@ -29,7 +29,7 @@
 			if (!IsActiveTextWidgetUpdated) {
 				ActiveTextWidget = null;
 			}
-#if iOS
+#if iOS || ANDROID
 			if (Application.IsMainThread) {
 				bool showKeyboard = ActiveTextWidget != null && ActiveTextWidget.Visible;
 				Application.Instance.ShowOnscreenKeyboard(showKeyboard, ActiveTextWidget != null ? ActiveTextWidget.Text : "");
