@@ -204,6 +204,10 @@
     <Compile Include="Source\Widgets\IText.cs" />
     <Compile Include="Source\Widgets\TextStyle.cs" />
     <Compile Include="obj\Release\.NETFramework,Version=v4.0.AssemblyAttribute.cs" />
+    <Compile Include="Source\Application\AndroidGameView.cs" />
+    <Compile Include="Source\Application\AndroidMainActivity.cs" />
+    <Compile Include="Source\Graphics\Bitmap.Android.cs" />
+    <Compile Include="Source\Widgets\WebBrowser.Android.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
