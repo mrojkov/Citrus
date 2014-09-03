@@ -245,7 +245,7 @@ namespace Lime
 		public static void RefreshBundleCheckSum(string bundlePath)
 		{
 			int checkSum = CalcBundleCheckSum(bundlePath);
-			using (var stream = new FileStream(bundlePath, FileMode.Open, FileAccess.Write)) {
+			using (var stream = new FileStream(bundlePath, FileMode.Open, FileAccess.Write, FileShare.ReadWrite)) {
 				if (stream.Length > 8) {
 					using (var writer = new BinaryWriter(stream)) {
 						writer.Seek(4, SeekOrigin.Begin);
