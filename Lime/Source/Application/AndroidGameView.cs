@@ -224,7 +224,21 @@ namespace Lime
 		{
 			base.OnResize(e);
 			Lime.Application.Instance.WindowSize = new Lime.Size(Width, Height);
-			//MakeCurrent();
+			var orientation = Resources.Configuration.Orientation;
+			Lime.Application.Instance.CurrentDeviceOrientation = ConvertOrientation(orientation);
+			Lime.Application.Instance.OnDeviceRotate();
+		}
+			
+		private static DeviceOrientation ConvertOrientation(Android.Content.Res.Orientation orientation)
+		{
+			switch (orientation) {
+			case Android.Content.Res.Orientation.Landscape:
+				return DeviceOrientation.LandscapeLeft;
+			case Android.Content.Res.Orientation.Portrait:
+				return DeviceOrientation.Portrait;
+			default:
+				throw new ArgumentException();
+			}
 		}
 	}
 }

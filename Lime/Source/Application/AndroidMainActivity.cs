@@ -5,23 +5,27 @@ using Android.OS;
 using Android.Content.PM;
 using Android.Views;
 using Android.Views.InputMethods;
+using Android.Widget;
 
 namespace Lime
 {
 	public class MainActivity : Activity
 	{
 		public static MainActivity Instance { get; private set; }
-		GameView view;
-		InputMethodManager imm;
+		public GameView GameView { get; private set; }
+		public RelativeLayout ContentView { get; private set; }
+		private InputMethodManager imm;
 
-		protected override void OnCreate (Bundle bundle)
+		protected override void OnCreate(Bundle bundle)
 		{
 			base.OnCreate(bundle);
 			AudioSystem.Initialize();
-			view = new GameView(this);
-			SetContentView(view);
-			Instance = this;
+			GameView = new GameView(this);
+			ContentView = new RelativeLayout(ApplicationContext);
+			ContentView.AddView(GameView);
+			SetContentView(ContentView);
 			imm = (InputMethodManager)ApplicationContext.GetSystemService(Android.Content.Context.InputMethodService);
+			Instance = this;
 		}
 
 		protected override void OnPause()
@@ -30,28 +34,28 @@ namespace Lime
 			Lime.Application.Instance.Active = false;
 			Lime.Application.Instance.OnDeactivate();
 			AudioSystem.Active = false;
-			view.Pause();
-			view.ClearFocus();
+			GameView.Pause();
+			GameView.ClearFocus();
 		}
 
 		protected override void OnResume()
 		{
-			view.Resume();
+			GameView.Resume();
 			AudioSystem.Active = true;
 			Lime.Application.Instance.Active = true;
 			Lime.Application.Instance.OnActivate();
 			base.OnResume();
-			if (!view.IsFocused) {
-				view.RequestFocus();
+			if (!GameView.IsFocused) {
+				GameView.RequestFocus();
 			}
 		}
 			
 		public void ShowOnscreenKeyboard(bool show, string text)
 		{
 			if (show) {
-				imm.ShowSoftInput(view, ShowFlags.Implicit);
+				imm.ShowSoftInput(GameView, 0);
 			} else {
-				imm.HideSoftInputFromWindow(view.WindowToken, 0);
+				imm.HideSoftInputFromWindow(GameView.WindowToken, 0);
 			}
 		}
 
