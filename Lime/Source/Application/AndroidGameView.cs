@@ -65,20 +65,6 @@ namespace Lime
 			return true;
 		}
 
-		private bool applicationCreated;
-			
-		protected override void OnLoad(EventArgs e)
-		{
-			base.OnLoad(e);
-			if (applicationCreated) {
-				// OnLoad() called each time the application get activated
-				return;
-			}
-			applicationCreated = true;
-			Lime.Application.Instance.OnCreate();
-			Run(60);
-		}
-			
 		protected override void CreateFrameBuffer()
 		{
 			GLContextVersion = GLContextVersion.Gles2_0;
@@ -242,13 +228,21 @@ namespace Lime
 			OnRenderFrame(null);
 		}
 
+		private bool applicationCreated;
+
 		protected override void OnResize(EventArgs e)
 		{
 			base.OnResize(e);
 			Lime.Application.Instance.WindowSize = new Lime.Size(Width, Height);
 			var orientation = Resources.Configuration.Orientation;
 			Lime.Application.Instance.CurrentDeviceOrientation = ConvertOrientation(orientation);
-			Lime.Application.Instance.OnDeviceRotate();
+			if (!applicationCreated) {
+				applicationCreated = true;
+				Lime.Application.Instance.OnCreate();
+				Run(60);
+			} else {
+				Lime.Application.Instance.OnDeviceRotate();
+			}
 		}
 			
 		private static DeviceOrientation ConvertOrientation(Android.Content.Res.Orientation orientation)
