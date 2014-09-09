@@ -144,6 +144,11 @@ namespace Lime
 #if iOS
 		public Size WindowSize { get; internal set; }
 
+		public Vector2 ScreenDPI 
+		{
+			get { return 320 * Vector2.One; }
+		}
+
 		public void ShowOnscreenKeyboard(bool show, string text)
 		{
 			GameView.Instance.ShowOnscreenKeyboard(show, text);
@@ -197,6 +202,11 @@ namespace Lime
 			GameView.Instance.Exit();
 		}
 
+		public Vector2 ScreenDPI 
+		{
+			get { return 240 * Vector2.One; }
+		}
+
 		public bool FullScreen {
 			get { return GameView.Instance.FullScreen; }
 			set { GameView.Instance.FullScreen = value; }
@@ -216,6 +226,15 @@ namespace Lime
 		}
 #elif ANDROID
 		public Size WindowSize { get; internal set; }
+
+		public Vector2 ScreenDPI 
+		{
+			get
+			{ 
+				var dm = GameView.Instance.Context.Resources.DisplayMetrics;
+				return new Vector2(dm.Xdpi, dm.Ydpi);
+			}
+		}
 
 		public void ShowOnscreenKeyboard(bool show, string text)
 		{
@@ -293,6 +312,7 @@ namespace Lime
 		/// but screen resolution and device orientation are already in the final state.
 		/// </summary>
 		public virtual void OnDeviceRotate() {}
+
 		public virtual DeviceOrientation GetSupportedDeviceOrientations() { return DeviceOrientation.LandscapeLeft; }
 
 		[Obsolete("Use GameView.SetCursor() instead")]
