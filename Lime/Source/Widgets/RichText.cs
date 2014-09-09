@@ -83,6 +83,18 @@ namespace Lime
 			return renderer.MeasureText(Size.X, Size.Y);
 		}
 
+		public override void StaticScale(float ratio, bool roundCoordinates)
+		{
+			foreach (var node in Nodes) {
+				var style = node as TextStyle;
+				if (style != null) {
+					style.Size *= ratio;
+				}
+			}
+			base.StaticScale(ratio, roundCoordinates);
+		}
+
+
 		private TextRenderer PrepareRenderer()
 		{
 			ParseText();

@@ -585,6 +585,46 @@ namespace Lime
 			return matrix;
 		}
 
+		public override void StaticScale(float ratio, bool roundCoordinates)
+		{
+			if (Animators.Count > 0) {
+				var savedPropagateAnimation = PropagateAnimation;
+				PropagateAnimation = false;
+				Animator<Vector2> animator;
+				if (Animators.TryFind("Position", out animator)) {
+					var savedAnimationTime = AnimationTime;
+					foreach (var k in animator.Keys) {
+						AnimationFrame = k.Frame;
+						var savedSize = size;
+						StaticScaleHelper(ratio, roundCoordinates);
+						size = savedSize;
+						k.Value = position;
+					}
+					AnimationTime = savedAnimationTime;
+				}
+				if (Animators.TryFind("Size", out animator)) {
+					animator.Keys.ForEach(k => k.Value = RoundVectorIf(k.Value * ratio, roundCoordinates));
+				}
+				PropagateAnimation = savedPropagateAnimation;
+			}
+			StaticScaleHelper(ratio, roundCoordinates);
+			base.StaticScale(ratio, roundCoordinates);
+		}
+
+		private static Vector2 RoundVectorIf(Vector2 v, bool round)
+		{
+			return round ? new Vector2(v.X.Round(), v.Y.Round()) : v;
+		}
+
+		private void StaticScaleHelper(float ratio, bool round)
+		{
+			var p1 = CalcLocalToParentTransform() * Vector2.Zero;
+			p1 = RoundVectorIf(p1 * ratio, round);
+			size = RoundVectorIf(size * ratio, round);
+			var p2 = CalcLocalToParentTransform() * Vector2.Zero;
+			position += (p1 - p2);
+		}
+
 		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (!GloballyVisible) {

@@ -110,6 +110,12 @@ namespace Lime
 			return rect;
 		}
 
+		public override void StaticScale(float ratio, bool roundCoordinates)
+		{
+			fontHeight *= ratio;
+			base.StaticScale(ratio, roundCoordinates);
+		}
+
 		public void FitTextInsideWidgetArea(float minFontHeight = 10)
 		{
 			var minH = minFontHeight;

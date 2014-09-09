@@ -389,6 +389,22 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Этот метод масштабирует позицию и размер данного нода и всех его потомков.
+		/// Метод полезен для адаптирования сцены под экраны с нестандартным DPI.
+		/// Если позиция или размер виджета анинимированы, то ключи анимации также подвергаются соответствующему
+		/// преобразованию.
+		/// Для текстовых виджетов, размер шрифта масштабируется.
+		/// </summary>
+		/// <param name="roundCoordinates">Если true, то после масштабирования виджета, его размер округляется, а сам виджет сдвигается таким образом,
+		/// чтобы его левый верхний угол (точка (0,0) в локальных координатах виджета) перешел в целочисленную позицию.</param>
+		public virtual void StaticScale(float ratio, bool roundCoordinates)
+		{
+			foreach (var node in Nodes) {
+				node.StaticScale(ratio, roundCoordinates);
+			}
+		}
+
 		protected void LayoutChildren(Vector2 sizeDelta)
 		{
 			for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
