@@ -40,10 +40,10 @@ namespace Lime
 
 		protected override void OnResume()
 		{
-			GameView.Resume();
 			AudioSystem.Active = true;
 			Lime.Application.Instance.Active = true;
 			Lime.Application.Instance.OnActivate();
+			GameView.Resume();
 			base.OnResume();
 			if (!GameView.IsFocused) {
 				GameView.RequestFocus();

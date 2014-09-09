@@ -1,4 +1,5 @@
-﻿#if ANDROID
+﻿
+#if ANDROID
 using System;
 using OpenTK.Platform;
 using OpenTK.Platform.Android;
@@ -63,19 +64,43 @@ namespace Lime
 		{
 			return true;
 		}
+
+		private bool applicationCreated;
 			
 		protected override void OnLoad(EventArgs e)
 		{
 			base.OnLoad(e);
+			if (applicationCreated) {
+				// OnLoad() called each time the application get activated
+				return;
+			}
+			applicationCreated = true;
 			Lime.Application.Instance.OnCreate();
 			Run(60);
 		}
 			
 		protected override void CreateFrameBuffer()
 		{
-			this.GLContextVersion = GLContextVersion.Gles2_0;
-			GraphicsMode = new AndroidGraphicsMode(0, 0, 0, 0, 0, false);
-			base.CreateFrameBuffer();	
+			GLContextVersion = GLContextVersion.Gles2_0;
+			// the default GraphicsMode that is set consists of (16, 16, 0, 0, 2, false)
+			try {
+				Debug.Write("Creating framebuffer with default settings");
+				base.CreateFrameBuffer();
+				return;
+			} catch (Exception ex) {
+				Debug.Write("{0}", ex);
+			}
+			// this is a graphics setting that sets everything to the lowest mode possible so
+			// the device returns a reliable graphics setting.
+			try {
+				Debug.Write("Creating framebuffer with custom Android settings (low mode)");
+				GraphicsMode = new AndroidGraphicsMode(0, 0, 0, 0, 0, false);
+				base.CreateFrameBuffer();
+				return;
+			} catch (Exception ex) {
+				Debug.Write("{0}", ex);
+			}
+			throw new Lime.Exception("Can't create framebuffer, aborting");
 		}
 
 		public override Android.Views.InputMethods.IInputConnection OnCreateInputConnection(Android.Views.InputMethods.EditorInfo outAttrs)
@@ -88,11 +113,8 @@ namespace Lime
 			
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
-			if (!Application.Instance.Active) {
-				return;
-			}
+			base.OnRenderFrame(e);
 			FPSCalculator.Refresh();
-			MakeCurrent();
 			Application.Instance.OnRenderFrame();
 			SwapBuffers();
 			FPSCalculator.Refresh();
