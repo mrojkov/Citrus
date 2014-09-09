@@ -588,27 +588,40 @@ namespace Lime
 		public override void StaticScale(float ratio, bool roundCoordinates)
 		{
 			if (Animators.Count > 0) {
-				var savedPropagateAnimation = PropagateAnimation;
-				PropagateAnimation = false;
-				Animator<Vector2> animator;
-				if (Animators.TryFind("Position", out animator)) {
-					var savedAnimationTime = AnimationTime;
-					foreach (var k in animator.Keys) {
-						AnimationFrame = k.Frame;
-						var savedSize = size;
-						StaticScaleHelper(ratio, roundCoordinates);
-						size = savedSize;
-						k.Value = position;
-					}
-					AnimationTime = savedAnimationTime;
-				}
-				if (Animators.TryFind("Size", out animator)) {
-					animator.Keys.ForEach(k => k.Value = RoundVectorIf(k.Value * ratio, roundCoordinates));
-				}
-				PropagateAnimation = savedPropagateAnimation;
+				StaticScaleAnimationKeys(ratio, roundCoordinates);
 			}
-			StaticScaleHelper(ratio, roundCoordinates);
+			StaticScalePositionAndSize(ratio, roundCoordinates);
 			base.StaticScale(ratio, roundCoordinates);
+		}
+
+		private void StaticScaleAnimationKeys(float ratio, bool roundCoordinates)
+		{
+			Animator<Vector2> posAnimator, sizeAnimator;
+			if (Animators.TryFind("Position", out posAnimator)) {
+				var geometryProperties = new string[] { "Position", "Size", "Pivot", "Rotation", "Scale" };
+				var geometryAnimators = Animators.Where(a => geometryProperties.Contains(a.TargetProperty)).ToList();
+				var savedPivot = pivot;
+				var savedRotation = rotation;
+				var savedScale = scale;
+				var savedPosition = position;
+				foreach (var k in posAnimator.Keys) {
+					var savedSize = size;
+					foreach (var a in Animators) {
+						a.Apply(AnimationUtils.FramesToMsecs(k.Frame));
+					}
+					StaticScalePositionAndSize(ratio, roundCoordinates);
+					k.Value = position;
+					size = savedSize;
+				}
+				pivot = savedPivot;
+				rotation = savedRotation;
+				scale = savedScale;
+				position = savedPosition;
+			}
+			Animators.TryFind("Size", out sizeAnimator);
+			if (sizeAnimator != null) {
+				sizeAnimator.Keys.ForEach(k => k.Value = RoundVectorIf(k.Value * ratio, roundCoordinates));
+			}
 		}
 
 		private static Vector2 RoundVectorIf(Vector2 v, bool round)
@@ -616,7 +629,7 @@ namespace Lime
 			return round ? new Vector2(v.X.Round(), v.Y.Round()) : v;
 		}
 
-		private void StaticScaleHelper(float ratio, bool round)
+		private void StaticScalePositionAndSize(float ratio, bool round)
 		{
 			var p1 = CalcLocalToParentTransform() * Vector2.Zero;
 			p1 = RoundVectorIf(p1 * ratio, round);
