@@ -1,5 +1,4 @@
-﻿
-#if ANDROID
+﻿#if ANDROID
 using System;
 using OpenTK.Platform;
 using OpenTK.Platform.Android;
