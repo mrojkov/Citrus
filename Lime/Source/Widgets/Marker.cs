@@ -34,6 +34,8 @@ namespace Lime
 		[ProtoMember(4)]
 		public string JumpTo { get; set; }
 
+		public Action CustomAction { get; set; }
+
 		internal Marker Clone()
 		{
 			return (Marker)MemberwiseClone();

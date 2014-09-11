@@ -499,6 +499,9 @@ namespace Lime
 					Unlink();
 					break;
 			}
+			if (marker.CustomAction != null) {
+				marker.CustomAction();
+			}
 		}
 
 		private void ApplyAnimators(bool invokeTriggers)
