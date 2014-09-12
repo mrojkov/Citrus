@@ -61,27 +61,23 @@ namespace Lime
 			}
 		}
 
+		private RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(0, 0);
+
 		protected override void SelfUpdate(float delta)
 		{
 			if (webView == null) {
 				return;
 			}
-			float screenHeight = GameView.Instance.Size.Height;
+			var screenHeight = GameView.Instance.Size.Height;
 			WindowRect wr = CalculateAABBInWorldSpace(this);
-			float screenScale = 1;
-			float Height = (float)wr.Height / screenScale;
-			float offsetY = (screenHeight) - Height;
-			var position = new PointF((float)wr.X / screenScale, (float)(wr.Y / screenScale) + offsetY);
-			var size = new SizeF((float)wr.Width / screenScale, Height);
+			layoutParams.Width = wr.Width;
+			layoutParams.Height = wr.Height;
+			layoutParams.LeftMargin = wr.X;
+			layoutParams.TopMargin = wr.Y + screenHeight - wr.Height;
 			if (webView.Parent == null) {
-				var p = new RelativeLayout.LayoutParams(size.Width.Round(), size.Height.Round());
-				p.LeftMargin = (int)position.X;
-				p.TopMargin = (int)position.Y;
-				MainActivity.Instance.ContentView.AddView(webView, p);
+				MainActivity.Instance.ContentView.AddView(webView, layoutParams);
 			} else {
-				webView.Layout(position.X.Round(), position.Y.Round(), 
-					(position.X + size.Width).Round(), 
-					(position.Y + size.Height).Round());
+				webView.LayoutParameters = layoutParams;
 			}
 		}
 
