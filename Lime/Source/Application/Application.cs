@@ -255,7 +255,9 @@ namespace Lime
 
 		public void Exit()
 		{
-			throw new NotImplementedException();
+			// There is no way to terminate an android application. 
+			// The only way is to finish each its activity one by one.
+			MainActivity.Instance.Finish();
 		}
 #elif UNITY
 		public void Exit()
