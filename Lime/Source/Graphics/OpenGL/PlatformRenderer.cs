@@ -44,15 +44,6 @@ namespace Lime
 #endif
 		}
 
-//		private static ErrorCode GetErrorCode()
-//		{
-////#if ANDROID
-////			return GL.GetErrorCode();
-////#else
-//			return GL.GetError();
-////#endif
-//		}
-
 		public static void ResetShader()
 		{
 			shaderProgram = null;
