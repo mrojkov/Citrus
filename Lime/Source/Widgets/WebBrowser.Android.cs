@@ -28,13 +28,19 @@ namespace Lime
 
 		public WebBrowser()
 		{
+			CreateWebView();
+		}
+
+		private void CreateWebView()
+		{
 			webView = new WebView(GameView.Instance.Context);
+			webView.SetWebViewClient(new WebViewClient());
 		}
 
 		public override Node DeepCloneFast()
 		{
 			var result = (WebBrowser)base.DeepCloneFast();
-			result.webView = new WebView(GameView.Instance.Context);
+			result.CreateWebView();
 			return result;
 		}
 
