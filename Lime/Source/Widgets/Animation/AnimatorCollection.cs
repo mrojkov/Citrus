@@ -120,8 +120,8 @@ namespace Lime
 			animatorArray = null;
 			return result;
 		}
-		
-		public void Clear() { animatorList = emptyList; }
+
+		public void Clear() { animatorList = emptyList; animatorArray = null;  }
 		
 		public int Count { get { return AsArray.Length; } }
 	

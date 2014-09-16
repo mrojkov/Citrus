@@ -87,7 +87,7 @@ namespace Lime
 
 		public string CurrentAnimation { get; private set; }
 
-		public float AnimationSpeed;
+		public float AnimationSpeed { get; set; }
 
 		public object UserData { get; set; }
 
