@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Net;
+using Gdk;
 
 namespace Orange
 {
@@ -15,15 +16,36 @@ namespace Orange
 			public byte R, G, B, A;
 		}
 
+		public static void CopyAlphaToRGBChannels(Gdk.Pixbuf pixbuf)
+		{
+			int stride = pixbuf.Rowstride;
+			if ((stride & 0x3) != 0 || !pixbuf.HasAlpha) {
+				throw new Lime.Exception("Invalid pixbuf format");
+			}
+			unsafe {
+				int width = pixbuf.Width;
+				int height = pixbuf.Height;
+				RGBA* pixels = (RGBA*)pixbuf.Pixels;
+				for (int i = 0; i < height; i++) {
+					for (int j = 0; j < width; j++) {
+						RGBA p = *pixels;
+						p.R = p.G = p.B = p.A;
+						*pixels++ = p;
+					}
+					pixels += stride / 4 - width;
+				}
+			}
+		}
+			
 		public static void ReduceColorsToRGBA4444WithFloydSteinbergDithering(Gdk.Pixbuf pixbuf)
 		{
-			int width = pixbuf.Width;
-			int height = pixbuf.Height;
 			int stride = pixbuf.Rowstride;
 			if ((stride & 0x3) != 0) {
 				throw new Lime.Exception("Invalid pixbuf format");
 			}
 			unsafe {
+				int	width = pixbuf.Width;
+				int height = pixbuf.Height;
 				RGBA* pixels = (RGBA*)pixbuf.Pixels;
 				for (int i = 0; i < height; i++) {
 					for (int j = 0; j < width; j++) {

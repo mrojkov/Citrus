@@ -15,6 +15,9 @@ namespace Lime
 	{
 		int handle;
 		public int ProjectionMatrixUniformId { get; private set; }
+		public int UseAlphaTexture1UniformId { get; private set; }
+		public int UseAlphaTexture2UniformId { get; private set; }
+		private Dictionary<string, int> uniformIds = new Dictionary<string, int>();
 
 		public ShaderProgram()
 		{
@@ -46,8 +49,21 @@ namespace Lime
 				Logger.Write("Shader program link log:\n{0}", infoLog);
 				throw new Lime.Exception(infoLog.ToString());
 			}
-			ProjectionMatrixUniformId = GL.GetUniformLocation(handle, "matProjection");
+			ProjectionMatrixUniformId = GetUniformId("matProjection");
+			UseAlphaTexture1UniformId = GetUniformId("useAlphaTexture1");
+			UseAlphaTexture2UniformId = GetUniformId("useAlphaTexture2");
 			PlatformRenderer.CheckErrors();
+		}
+
+		public int GetUniformId(string name)
+		{
+			int id;
+			if (uniformIds.TryGetValue(name, out id)) {
+				return id;
+			}
+			id = GL.GetUniformLocation(handle, name);
+			uniformIds[name] = id;
+			return id;
 		}
 
 		private string GetLinkLog()
@@ -75,6 +91,21 @@ namespace Lime
 				float* p = (float*)&matrix;
 				GL.UniformMatrix4(uniformId, 1, false, p);
 			}
+		}
+
+		public void LoadInteger(int uniformId, int value)
+		{
+			GL.Uniform1(uniformId, value);
+		}
+
+		public void LoadBoolean(int uniformId, bool value)
+		{
+			GL.Uniform1(uniformId, value ? 1 : 0);
+		}
+
+		public void LoadVector2(int uniformId, Vector2 vector)
+		{
+			GL.Uniform2(uniformId, vector.X, vector.Y);
 		}
 
 		public void BindSampler(string name, int stage)

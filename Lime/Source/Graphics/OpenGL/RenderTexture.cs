@@ -77,6 +77,8 @@ namespace Lime
 			get { return uvRect; }
 		}
 
+		public ITexture AlphaTexture { get { return null; } }
+
 		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv0, ref Vector2 uv1)
 		{
 		}

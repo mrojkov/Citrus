@@ -84,6 +84,8 @@ namespace Lime
 			}
 		}
 
+		public ITexture AlphaTexture { get { return core.GetMainTexture().AlphaTexture; } }
+
 		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv0, ref Vector2 uv1)
 		{
 			core.TransformUVCoordinates(ref uv0, ref uv1);
@@ -252,7 +254,7 @@ namespace Lime
 			UVRect.B = (Vector2)mainTexture.ImageSize / (Vector2)mainTexture.SurfaceSize;
 			ImageSize = mainTexture.ImageSize;
 			SurfaceSize = mainTexture.SurfaceSize;
-            AudioSystem.Update();
+			AudioSystem.Update();
 			return true;
 		}
 
@@ -264,7 +266,7 @@ namespace Lime
 			}
 			bool loaded = !string.IsNullOrEmpty(Path) && (TryCreateRenderTarget(Path) ||
 				TryLoadTextureAtlasPart(Path + ".atlasPart") ||
-#if iOS
+#if iOS || ANDROID
 				TryLoadImage(Path + ".pvr")
 #elif UNITY
 				TryLoadImage(Path + ".png")

@@ -51,6 +51,8 @@ namespace Orange
 				return "Desktop";
 			case TargetPlatform.iOS:
 				return "iOS";
+			case TargetPlatform.Android:
+				return "Android";
 			default:
 				throw new Lime.Exception("Invalid target platform");
 			}

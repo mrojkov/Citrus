@@ -11,7 +11,7 @@ namespace Lime
 		
 		[ProtoMember(2)]
 		public IntRectangle AtlasRect;
-		
+
 		public static TextureAtlasPart ReadFromBundle(string path) {
 			return Serialization.ReadObject<TextureAtlasPart>(path);
 		}

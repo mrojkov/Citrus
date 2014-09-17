@@ -28,7 +28,7 @@ namespace Lime
 		[Flags]
 		enum DDSPFFlags
 		{
-			Apha = 0x01,
+			Alpha = 0x01,
 			FourCC = 0x04,
 			RGB = 0x40
 		}
@@ -79,9 +79,7 @@ namespace Lime
 
 			SurfaceSize = ImageSize = new Size(width, height);
 			mipMapCount = 1;
-			Action glCommands = () => {
-				PrepareOpenGLTexture();
-			};
+			Action glCommands = PrepareOpenGLTexture;
 			MemoryUsed = 0;
 			for (int level = 0; level < mipMapCount; level++) {
 				if (width < 8 || height < 8) {
@@ -117,8 +115,7 @@ namespace Lime
 		private void ReadCompressedImage(ref Action glCommands, BinaryReader reader, int level, int width, int height, int linearSize, UInt32 pfFourCC)
 		{
 #if ANDROID
-			// XXX
-			// throw new NotSupportedException();
+			throw new NotSupportedException();
 #else
 			var pif = PixelInternalFormat.CompressedRgbS3tcDxt1Ext;
 			switch ((DDSFourCC)pfFourCC) {

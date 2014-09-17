@@ -58,6 +58,7 @@ namespace Lime
 		}
 
 		public Rectangle AtlasUVRect { get { return uvRect; } }
+		public ITexture AlphaTexture { get; private set; }
 
 		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv0, ref Vector2 uv1)
 		{
@@ -69,6 +70,11 @@ namespace Lime
 		{
 			using (Stream stream = AssetsBundle.Instance.OpenFileLocalized(path)) {
 				LoadImage(stream);
+			}
+			var alphaPath = Path.ChangeExtension(path, ".alpha.pvr");
+			if (AssetsBundle.Instance.FileExists(alphaPath)) {
+				AlphaTexture = new Texture2D();
+				((Texture2D)AlphaTexture).LoadImage(alphaPath);
 			}
 			var maskPath = Path.ChangeExtension(path, ".mask");
 			if (AssetsBundle.Instance.FileExists(maskPath)) {
@@ -103,10 +109,12 @@ namespace Lime
 			Dispose();
 			using (var rewindableStream = new RewindableStream(stream))
 			using (var reader = new BinaryReader(rewindableStream)) {
-#if iOS
+#if iOS || ANDROID
 				int sign = reader.ReadInt32();
 				rewindableStream.Rewind();
-				if (sign == PVRMagic) {
+				if (sign == LegacyPVRMagic) {
+					InitWithLegacyPVRTexture(reader);
+				} else if (sign == PVRMagic) {
 					InitWithPVRTexture(reader);
 				} else {
 					InitWithPngOrJpgBitmap(rewindableStream);
@@ -182,6 +190,10 @@ namespace Lime
 
 		public override void Dispose()
 		{
+			if (AlphaTexture != null) {
+				AlphaTexture.Dispose();
+				AlphaTexture = null;
+			}
 			DisposeOpenGLTexture();
 			base.Dispose();
 		}

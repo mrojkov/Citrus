@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
+using Lime;
 
 namespace Orange
 {
@@ -54,6 +55,8 @@ namespace Orange
 		{
 			if (platform == TargetPlatform.iOS) {
 				return ".pvr";
+			} else if (platform == TargetPlatform.Android) {
+				return ".pvr";
 			} else if (platform == TargetPlatform.Unity) {
 				return ".png";
 			} else {
@@ -68,7 +71,7 @@ namespace Orange
 			if (platform == TargetPlatform.Unity) {
 				CookForUnity();
 			} else {
-				HashSet<string> extraBundles = new HashSet<string>();
+				var extraBundles = new HashSet<string>();
 				foreach (var dictionaryItem in cookingRulesMap) {
 					if (dictionaryItem.Value.Bundle != null) {
 						extraBundles.Add(dictionaryItem.Value.Bundle);
@@ -77,7 +80,7 @@ namespace Orange
 				string mainBundlePath = The.Workspace.GetBundlePath(platform);
 				CookBundle(mainBundlePath, null);
 				foreach (var extraBundle in extraBundles) {
-					string bundlePath = Path.Combine(Path.GetDirectoryName(mainBundlePath), extraBundle + Path.GetExtension(mainBundlePath));
+					var bundlePath = Path.Combine(Path.GetDirectoryName(mainBundlePath), extraBundle + Path.GetExtension(mainBundlePath));
 					CookBundle(bundlePath, extraBundle);
 					Lime.PackedAssetsBundle.RefreshBundleCheckSum(bundlePath);
 				}
@@ -110,7 +113,7 @@ namespace Orange
 					}
 				};
 				// у каждого бандла должна быть своя папка с атласами, чтобы они друг с другом не пересекались
-				atlasesPostfix = bundleFilter != null ? bundleFilter : "";
+				atlasesPostfix = bundleFilter ?? "";
 				try {
 					CookHelper();
 				}
@@ -140,6 +143,7 @@ namespace Orange
 			AddStage(() => SyncRawAssets(".txt"));
 			AddStage(SyncTextures);
 			AddStage(DeleteOrphanedMasks);
+			AddStage(DeleteOrphanedAlphaTextures);
 			AddStage(SyncFonts);
 			AddStage(() => SyncRawAssets(".ogv"));
 			AddStage(SyncScenes);
@@ -147,6 +151,20 @@ namespace Orange
 			AddStage(() => SyncRawAssets(".shader"));
 			AddStage(() => SyncRawAssets(".xml"));
 			AddStage(() => SyncRawAssets(".raw"));
+		}
+
+		private static void DeleteOrphanedAlphaTextures()
+		{
+			var alphaExt = ".alpha" + GetPlatformTextureExtension();
+			foreach (var path in assetsBundle.EnumerateFiles()) {
+				if (path.EndsWith(alphaExt)) {
+					var origImageFile = path.Substring(0, path.Length - alphaExt.Length) + GetPlatformTextureExtension();
+					if (!assetsBundle.FileExists(origImageFile)) {
+						Console.WriteLine("- " + path);
+						assetsBundle.DeleteFile(path);
+					}
+				}
+			}
 		}
 
 		private static void DeleteOrphanedMasks()
@@ -251,7 +269,7 @@ namespace Orange
 					OpacityMaskCreator.CreateMask(assetsBundle, srcPath, maskPath);
 					string tmpFile = Path.ChangeExtension(srcPath, GetPlatformTextureExtension());
 					TextureConverter.Convert(srcPath, tmpFile, rules, platform);
-                    assetsBundle.ImportFile(tmpFile, dstPath, reserve: 0, compress: true);
+					assetsBundle.ImportFile(tmpFile, dstPath, reserve: 0, compress: true);
 					File.Delete(tmpFile);
 				}
 				return true;
@@ -337,27 +355,28 @@ namespace Orange
 					break;
 				}
 			}
-			var maxAtlasSize = GetMaxAtlasSize();
 			var items = new List<AtlasItem>();
 			foreach (var fileInfo in The.Workspace.AssetFiles.Enumerate(".png")) {
 				CookingRules cookingRules = cookingRulesMap[fileInfo.Path];
 				if (cookingRules.TextureAtlas == atlasChain) {
+					var maxAtlasSize = GetMaxAtlasSize();
 					var srcTexturePath = Lime.AssetPath.Combine(The.Workspace.AssetsDirectory, fileInfo.Path);
 					var pixbuf = new Gdk.Pixbuf(srcTexturePath);
-					// Ensure that no image exceede maxAtlasSize limit
+					// Ensure that no image exceeded maxAtlasSize limit
 					if (pixbuf.Width > maxAtlasSize.Width || pixbuf.Height > maxAtlasSize.Height) {
 						int w = Math.Min(pixbuf.Width, maxAtlasSize.Width);
 						int h = Math.Min(pixbuf.Height, maxAtlasSize.Height);
-						pixbuf = pixbuf.ScaleSimple(w, h, Gdk.InterpType.Bilinear);
-						Console.WriteLine(
-							String.Format("WARNING: {0} downscaled to {1}x{2}", srcTexturePath, w, h));
+						var pixbufScaled = pixbuf.ScaleSimple(w, h, Gdk.InterpType.Bilinear);
+						pixbuf.Dispose();
+						pixbuf = pixbufScaled;
+						Console.WriteLine("WARNING: '{0}' downscaled to {1}x{2}", srcTexturePath, w, h);
 					}
 					var item = new AtlasItem {
 						Path = Path.ChangeExtension(fileInfo.Path, ".atlasPart"), 
 						Pixbuf = pixbuf,
 						MipMapped = cookingRules.MipMaps,
 						PVRFormat = cookingRules.PVRFormat,
-						DDSFormat = cookingRules.DDSFormat
+						DDSFormat = cookingRules.DDSFormat,
 					};
 					items.Add(item);
 				}
@@ -369,7 +388,7 @@ namespace Orange
 				return b - a;
 			});	
 			// PVRTC4 textures must be square
-			var squareAtlas = (platform == TargetPlatform.iOS) && items.Max(i => i.PVRFormat) == PVRFormat.PVRTC4;
+			var squareAtlas = (platform == TargetPlatform.iOS) && items.Max(i => i.PVRFormat) == PVRFormat.Compressed;
 			for (int atlasId = 0; items.Count > 0; atlasId++) {
 				if (atlasId >= MaxAtlasChainLength) {
 					throw new Lime.Exception("Too many textures in the atlas chain {0}", atlasChain);
@@ -391,6 +410,11 @@ namespace Orange
 				CopyAllocatedItemsToAtlas(items, atlasChain, atlasId, bestSize);
 				items.RemoveAll(x => x.Allocated);
 			}
+		}
+
+		private static string GetAlphaTexturePath(string path)
+		{
+			return Path.ChangeExtension(path, ".alpha" + GetPlatformTextureExtension());
 		}
 
 		private static IEnumerable<Lime.Size> EnumerateAtlasSizes(bool squareAtlas)
@@ -419,13 +443,40 @@ namespace Orange
 			items.ForEach(i => i.Allocated = false);
 			// Take in account 1 pixel border for each side.
 			var a = new RectAllocator(new Lime.Size(size.Width + 2, size.Height + 2));
+			AtlasItem firstAllocatedItem = null;
 			foreach (var item in items) {
 				var sz = new Lime.Size(item.Pixbuf.Width + 2, item.Pixbuf.Height + 2);
-				if (a.Allocate(sz, out item.AtlasRect)) {
-					item.Allocated = true;
+				if (firstAllocatedItem == null || AreAtlasItemsCompatible(firstAllocatedItem, item)) {
+					if (a.Allocate(sz, out item.AtlasRect)) {
+						item.Allocated = true;
+						firstAllocatedItem = firstAllocatedItem ?? item;
+					}
 				}
 			}
 			packRate = a.GetPackRate();
+		}
+
+		/// <summary>
+		/// Checks whether two items can be packed to the same texture
+		/// </summary>
+		private static bool AreAtlasItemsCompatible(AtlasItem item1, AtlasItem item2)
+		{
+			if (item1.MipMapped != item2.MipMapped) {
+				return false;
+			}
+			switch (platform) {
+				case TargetPlatform.Android:
+					if (item1.PVRFormat != item2.PVRFormat) {
+						return false;
+					}
+					return item1.PVRFormat != PVRFormat.Compressed || item1.Pixbuf.HasAlpha == item2.Pixbuf.HasAlpha;
+				case TargetPlatform.iOS:
+					return item1.PVRFormat == item2.PVRFormat;
+				case TargetPlatform.Desktop:
+					return item1.DDSFormat == item2.DDSFormat;
+				default:
+					throw new ArgumentException();
+			}
 		}
 
 		private static void CopyAllocatedItemsToAtlas(List<AtlasItem> items, string atlasChain, int atlasId, Lime.Size size)
@@ -433,27 +484,14 @@ namespace Orange
 			string atlasPath = GetAtlasPath(atlasChain, atlasId);
 			var atlas = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, true, 8, size.Width, size.Height);
 			atlas.Fill(0);
-			var rules = new CookingRules() {
-				MipMaps = false,
-				PVRFormat = PVRFormat.PVRTC4,
-				DDSFormat = DDSFormat.DXTi
-			};
 			foreach (var item in items.Where(i => i.Allocated)) {
-				if (item.PVRFormat > rules.PVRFormat)
-					rules.PVRFormat = item.PVRFormat;
-				if (item.DDSFormat > rules.DDSFormat)
-					rules.DDSFormat = item.DDSFormat;
-				rules.MipMaps |= item.MipMapped;
 				var p = item.Pixbuf;
 				p.CopyArea(0, 0, p.Width, p.Height, atlas, item.AtlasRect.A.X, item.AtlasRect.A.Y);
 				var atlasPart = new Lime.TextureAtlasPart();
 				atlasPart.AtlasRect = item.AtlasRect;
 				atlasPart.AtlasRect.B -= new Lime.IntVector2(2, 2);
 				atlasPart.AtlasTexture = Path.ChangeExtension(atlasPath, null);
-
-				//Console.WriteLine("+ " + item.Path);
 				Lime.Serialization.WriteObjectToBundle<Lime.TextureAtlasPart>(assetsBundle, item.Path, atlasPart);
-
 				// Delete non-atlased texture since now its useless
 				var texturePath = Path.ChangeExtension(item.Path, GetPlatformTextureExtension());
 				if (assetsBundle.FileExists(texturePath)) {
@@ -464,14 +502,30 @@ namespace Orange
 			Console.WriteLine("+ " + atlasPath);
 			if (platform == TargetPlatform.Unity) {
 				throw new NotImplementedException();
-				// assetsBundle.ImportFile(inFile, atlasPath, 0);
 			} else {
+				var firstItem = items.First(i => i.Allocated);
+				var rules = new CookingRules() {
+					MipMaps = firstItem.MipMapped,
+					PVRFormat = firstItem.PVRFormat,
+					DDSFormat = firstItem.DDSFormat
+				};
 				var tmpFile = GetTempFilePathWithExtension(GetPlatformTextureExtension());
 				string maskPath = Path.ChangeExtension(atlasPath, ".mask");
 				OpacityMaskCreator.CreateMask(assetsBundle, atlas, maskPath);
 				TextureConverter.Convert(atlas, tmpFile, rules, platform);
 				assetsBundle.ImportFile(tmpFile, atlasPath, 0, compress: true);
 				File.Delete(tmpFile);
+				// ETC1 textures on Android use separate alpha channel
+				var needSeparateAlpha = platform == TargetPlatform.Android && 
+					rules.PVRFormat == PVRFormat.Compressed && firstItem.Pixbuf.HasAlpha;
+				if (needSeparateAlpha) {
+					TextureConverterUtils.CopyAlphaToRGBChannels(atlas);
+					TextureConverter.Convert(atlas, tmpFile, rules, platform);
+					var atlasAlphaPath = GetAlphaTexturePath(atlasPath);
+					Console.WriteLine("+ " + atlasAlphaPath);
+					assetsBundle.ImportFile(tmpFile, atlasAlphaPath, 0, compress: true);
+					File.Delete(tmpFile);
+				}
 			}
 		}
 
@@ -489,7 +543,7 @@ namespace Orange
 				textures[fileInfo.Path] = fileInfo.LastWriteTime;
 			}
 			var atlasChainsToRebuild = new HashSet<string>();
-			// Figure out atlas chains to rebuld
+			// Figure out atlas chains to rebuild
 			foreach (string atlasPartPath in assetsBundle.EnumerateFiles()) {
 				if (Path.GetExtension(atlasPartPath) != ".atlasPart")
 					continue;

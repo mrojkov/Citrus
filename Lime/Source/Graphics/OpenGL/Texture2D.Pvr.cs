@@ -1,4 +1,4 @@
-#if iOS && OPENGL
+#if (iOS || ANDROID) && OPENGL
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +22,7 @@ namespace Lime
 			VerticalFlip	= (1<<16),		// v2.1 is the texture vertically flipped
 		}
 
-		enum PVRFormat
+		enum LegacyPVRFormat
 		{
 			RGBA_4444 = 0x0,
 			RGBA_1555 = 0x1,
@@ -37,13 +37,26 @@ namespace Lime
 			GLRGB_565 = 0x13,
 		}
 
-		private UInt32 PVRMagic = 52;
+		enum PVRFormat : ulong
+		{
+			RGBA8888 = 'r' | ('g' << 8) | ('b' << 16) | ('a' << 24) | (8L << 32) | (8L << 40) | (8L << 48) | (8L << 56),
+			RGBA4444 = 'r' | ('g' << 8) | ('b' << 16) | ('a' << 24) | (4L << 32) | (4L << 40) | (4L << 48) | (4L << 56),
+			RGB565 = 'r' | ('g' << 8) | ('b' << 16) | (5L << 32) | (6L << 40) | (5L << 48),
+			PVRTC_2_RGB = 0,
+			PVRTC_2_RGBA = 1 << 32,
+			PVRTC_4_RGB = 2 << 32,
+			PVRTC_4_RGBA = 3 << 32,
+			ETC1 = 6 << 32,
+		}
 
-		private void InitWithPVRTexture(BinaryReader reader)
+		private UInt32 LegacyPVRMagic = 52;
+		private UInt32 PVRMagic = 0x03525650;
+
+		private void InitWithLegacyPVRTexture(BinaryReader reader)
 		{
 			UInt32 headerLength = reader.ReadUInt32();
-			if (headerLength != PVRMagic) {
-				throw new Exception("Invalid PVRT header");
+			if (headerLength != LegacyPVRMagic) {
+				throw new Exception("Invalid PVR header");
 			}
 			Int32 height = reader.ReadInt32();
 			Int32 width = reader.ReadInt32();
@@ -58,9 +71,7 @@ namespace Lime
 			reader.ReadUInt32(); // UInt32 pvrTag
 			reader.ReadUInt32(); // UInt32 numSurfs
 			SurfaceSize = ImageSize = new Size(width, height);
-			Action glCommands = () => {
-				PrepareOpenGLTexture();
-			};
+			Action glCommands = PrepareOpenGLTexture;
 			MemoryUsed = 0;
 			for (int i = 0; i <= numMipmaps; i++) {
 				if (i > 0 && (width < 8 || height < 8)) {
@@ -70,9 +81,9 @@ namespace Lime
 				int mipLevel = i;
 				int width2 = width;
 				int height2 = height;
-				PVRFormat format = (PVRFormat)(flags & 0xFF);
+				var format = (LegacyPVRFormat)(flags & 0xFF);
 				switch(format)	{
-				case PVRFormat.PVRTC_4: {
+				case LegacyPVRFormat.PVRTC_4: {
 					var buffer = ReadTextureData(reader, width * height * 4 / 8);
 					glCommands += () => {
 						GL.CompressedTexImage2D(All.Texture2D, mipLevel, All.CompressedRgbaPvrtc4Bppv1Img, width2, height2, 0, buffer.Length, buffer);
@@ -80,7 +91,7 @@ namespace Lime
 					};
 					break;
 				}
-				case PVRFormat.PVRTC_2: {
+				case LegacyPVRFormat.PVRTC_2: {
 					var buffer = ReadTextureData(reader, width * height * 2 / 8);
 					glCommands += () => {
 						GL.CompressedTexImage2D(All.Texture2D, mipLevel, All.CompressedRgbaPvrtc2Bppv1Img, width2, height2, 0, buffer.Length, buffer);
@@ -88,7 +99,7 @@ namespace Lime
 					};
 					break;
 				}
-				case PVRFormat.GLARGB_4444: {
+				case LegacyPVRFormat.GLARGB_4444: {
 					var buffer = ReadTextureData(reader, width * height * 2);
 					glCommands += () => {
 						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgba, width2, height2, 0, All.Rgba, All.UnsignedShort4444, buffer);
@@ -96,7 +107,7 @@ namespace Lime
 					};
 					break;
 				}
-				case PVRFormat.GLRGB_565: {
+				case LegacyPVRFormat.GLRGB_565: {
 					var buffer = ReadTextureData(reader, width * height * 2);
 					glCommands += () => {
 						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgb, width2, height2, 0, All.Rgb, All.UnsignedShort565, buffer);
@@ -104,7 +115,96 @@ namespace Lime
 					};
 					break;
 				}
-				case PVRFormat.GLARGB_8888: {
+				case LegacyPVRFormat.GLARGB_8888: {
+					var buffer = ReadTextureData(reader, width * height * 4);
+					glCommands += () => {
+						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgba, width2, height2, 0, All.Rgba, All.UnsignedByte, buffer);
+						PlatformRenderer.CheckErrors();
+					};
+					break;
+				}
+				default:
+					throw new NotImplementedException();
+				}
+				width /= 2;
+				height /= 2;
+			}
+			Application.InvokeOnMainThread(glCommands);
+		}
+
+		private void InitWithPVRTexture(BinaryReader reader)
+		{
+			var version = reader.ReadUInt32();
+			if (version != PVRMagic) {
+				throw new Exception("Invalid PVR header");
+			}
+			var flags = reader.ReadUInt32();
+			var pixelFormat = (PVRFormat)reader.ReadUInt64();
+			var colorSpace = reader.ReadUInt32();
+			var channelType = reader.ReadUInt32();
+			var height = reader.ReadInt32();
+			var width = reader.ReadInt32();
+			var depth = reader.ReadUInt32();
+			var numSurfaces = reader.ReadUInt32();
+			var numFaces = reader.ReadUInt32();
+			var numMipmaps = reader.ReadInt32();
+			var metaDataSize = reader.ReadInt32();
+			if (metaDataSize > 0) {
+				reader.ReadChars(metaDataSize);
+			}
+			SurfaceSize = ImageSize = new Size(width, height);
+			Action glCommands = PrepareOpenGLTexture;
+			MemoryUsed = 0;
+			for (int i = 0; i < numMipmaps; i++) {
+				if (i > 0 && (width < 4 || height < 4)) {
+					continue;
+				}
+				// Cloning variables to prevent wrong capturing
+				int mipLevel = i;
+				int width2 = width;
+				int height2 = height;
+				switch(pixelFormat)	{
+				case PVRFormat.PVRTC_4_RGBA: {
+					var buffer = ReadTextureData(reader, width * height * 4 / 8);
+					glCommands += () => {
+						GL.CompressedTexImage2D(All.Texture2D, mipLevel, All.CompressedRgbaPvrtc4Bppv1Img, width2, height2, 0, buffer.Length, buffer);
+						PlatformRenderer.CheckErrors();
+					};
+					break;
+				}
+				case PVRFormat.PVRTC_2_RGBA: {
+					var buffer = ReadTextureData(reader, width * height * 2 / 8);
+					glCommands += () => {
+						GL.CompressedTexImage2D(All.Texture2D, mipLevel, All.CompressedRgbaPvrtc2Bppv1Img, width2, height2, 0, buffer.Length, buffer);
+						PlatformRenderer.CheckErrors();
+					};
+					break;
+				}
+				case PVRFormat.ETC1: {
+					var buffer = ReadTextureData(reader, width * height * 4 / 8);
+					glCommands += () => {
+						GL.CompressedTexImage2D(All.Texture2D, mipLevel, All.Etc1Rgb8Oes, width2, height2, 0, buffer.Length, buffer);
+						PlatformRenderer.CheckErrors();
+					};
+					break;
+				}
+				case PVRFormat.RGBA4444: {
+					var buffer = ReadTextureData(reader, width * height * 2);
+					glCommands += () => {
+						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgba, width2, height2, 0, All.Rgba, All.UnsignedShort4444, buffer);
+						PlatformRenderer.CheckErrors();
+					};
+					break;
+				}
+				case PVRFormat.RGB565: {
+					var buffer = ReadTextureData(reader, width * height * 2);
+					glCommands += () => {
+						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgb, width2, height2, 0, All.Rgb, All.UnsignedShort565, buffer);
+						PlatformRenderer.CheckErrors();
+					};
+					break;
+				}
+				case PVRFormat.RGBA8888: {
 					var buffer = ReadTextureData(reader, width * height * 4);
 					glCommands += () => {
 						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgba, width2, height2, 0, All.Rgba, All.UnsignedByte, buffer);

@@ -415,13 +415,11 @@ namespace Lime
 
 		private void ReadIndexTable()
 		{
-#if !ANDROID
 			if (stream.Length == 0) {
 				indexOffset = sizeof(Int32) * 4;
 				index.Clear();
 				return;
 			}
-#endif
 			stream.Seek(0, SeekOrigin.Begin);
 			var signature = reader.ReadInt32();
 			if (signature != Signature) {

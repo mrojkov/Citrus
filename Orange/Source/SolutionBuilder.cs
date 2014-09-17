@@ -17,7 +17,11 @@ namespace Orange
 			projectName = The.Workspace.Title;
 			projectDirectory = Path.Combine(The.Workspace.ProjectDirectory, projectName);
 #if WIN
-			projectDirectory += ".Win";
+			if (platform == TargetPlatform.Android) {
+				projectDirectory += ".Android";
+			} else {
+				projectDirectory += ".Win";
+			}
 #elif MAC
 			if (platform == TargetPlatform.iOS) {
 				projectDirectory += ".iOS";

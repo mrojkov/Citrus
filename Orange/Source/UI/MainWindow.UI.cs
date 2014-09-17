@@ -116,6 +116,7 @@ namespace Orange
 			PlatformPicker = Gtk.ComboBox.NewText();
 			PlatformPicker.AppendText("Desktop (PC, Mac, Linux)");
 			PlatformPicker.AppendText("iPhone/iPad");
+			PlatformPicker.AppendText("Android");
 			PlatformPicker.AppendText("Unity");
 			PlatformPicker.Active = 0;
 			table.Attach(PlatformPicker, 1, 2, 0, 1);

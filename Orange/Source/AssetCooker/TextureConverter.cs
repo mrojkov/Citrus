@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Net;
+using Gtk;
 using Lime;
 using System.Runtime.InteropServices;
 
@@ -17,19 +18,24 @@ namespace Orange
 
 		public static void Convert(Gdk.Pixbuf pixbuf, string dstPath, CookingRules cookingRules, TargetPlatform platform)
 		{
-			if (platform == TargetPlatform.Unity) {
-				throw new Lime.Exception("No need to convert textures for Unity platform!");
-			}
-			if (Path.GetExtension(dstPath) == ".pvr") {
-				ToPVRTexture(pixbuf, dstPath, cookingRules.PVRFormat, cookingRules.MipMaps);
-			} else if (Path.GetExtension(dstPath) == ".dds") {
-				ToDDSTexture(pixbuf, dstPath, cookingRules.DDSFormat, cookingRules.MipMaps);
-			} else {
-				throw new Lime.Exception("Unknown texture format for: {0}", dstPath);
+			switch (platform) {
+				case TargetPlatform.Unity:
+					throw new Lime.Exception("No need to convert textures for Unity platform!");
+				case TargetPlatform.Android:
+					CookForAndroid(pixbuf, dstPath, cookingRules.PVRFormat, cookingRules.MipMaps);
+					break;
+				case TargetPlatform.iOS:
+					CookForIOS(pixbuf, dstPath, cookingRules.PVRFormat, cookingRules.MipMaps);
+					break;
+				case TargetPlatform.Desktop:
+					CookForDesktop(pixbuf, dstPath, cookingRules.DDSFormat, cookingRules.MipMaps);
+					break;
+				default:
+					throw new ArgumentException();
 			}
 		}
 
-		private static void ToPVRTexture(Gdk.Pixbuf pixbuf, string dstPath, PVRFormat pvrFormat, bool mipMaps)
+		private static void CookForIOS(Gdk.Pixbuf pixbuf, string dstPath, PVRFormat pvrFormat, bool mipMaps)
 		{
 			int width = pixbuf.Width;
 			int height = pixbuf.Height;
@@ -39,18 +45,16 @@ namespace Orange
 			int potHeight = TextureConverterUtils.GetNearestPowerOf2(height, 8, 1024);
 			
 			int maxDimension = Math.Max(potWidth, potHeight);
-			int pvrtc4DataLength = maxDimension * maxDimension / 2;
-			int rgba16DataLength = potWidth * potHeight * 2;
-			
+
 			string formatArguments = "";
 			switch (pvrFormat) {
-			case PVRFormat.PVRTC4:
+			case PVRFormat.Compressed:
 				formatArguments = "-f PVRTC4";
 				potWidth = potHeight = maxDimension;
 				break;
 			case PVRFormat.RGB565:
 				if (hasAlpha) {
-					Console.WriteLine("WARNING: texture has alpha channel. Used 'OGL4444' format instead of 'OGL565'.");
+					Console.WriteLine("WARNING: texture has alpha channel. Used 'RGBA4444' format instead of 'RGB565'.");
 					formatArguments = "-f OGL4444 -nt -yflip0";
 					TextureConverterUtils.ReduceColorsToRGBA4444WithFloydSteinbergDithering(pixbuf);
 				} else {
@@ -83,8 +87,63 @@ namespace Orange
 				File.Delete(tga);
 			}
 		}
-		
-		private static void ToDDSTexture(Gdk.Pixbuf pixbuf, string dstPath, DDSFormat format, bool mipMaps)
+
+		private static void CookForAndroid(Gdk.Pixbuf pixbuf, string dstPath, PVRFormat pvrFormat, bool mipMaps)
+		{
+			string formatArguments;
+			switch (pvrFormat) {
+			case PVRFormat.Compressed:
+				formatArguments = "-f etc1 -q etcfast";
+				break;
+			case PVRFormat.RGB565:
+				if (pixbuf.HasAlpha) {
+					Console.WriteLine("WARNING: texture has alpha channel. Used 'RGBA4444' format instead of 'RGB565'.");
+					formatArguments = "-f r4g4b4a4";
+					TextureConverterUtils.ReduceColorsToRGBA4444WithFloydSteinbergDithering(pixbuf);
+				} else {
+					formatArguments = "-f r5g6b5";
+				}
+				break;
+			case PVRFormat.RGBA4:
+				formatArguments = "-f r4g4b4a4";
+				TextureConverterUtils.ReduceColorsToRGBA4444WithFloydSteinbergDithering(pixbuf);
+				break;
+			case PVRFormat.ARGB8:
+				formatArguments = "-f r8g8b8a8";
+				break;
+			default:
+				throw new ArgumentException();
+			}
+			var tga = Path.ChangeExtension(dstPath, ".tga");
+			try {
+				TextureConverterUtils.SwapRGBChannels(pixbuf);
+				TextureConverterUtils.SaveToTGA(pixbuf, tga);
+				var pvrTexTool = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Win", "PVRTexToolCli");
+				// -p - premultiply alpha
+				// -shh - silent
+				tga = MakeAbsolutePath(tga);
+				dstPath = MakeAbsolutePath(dstPath);
+				var args = String.Format("{0} -i \"{1}\" -o \"{2}\" {3} -p -shh", formatArguments, tga, dstPath, mipMaps ? "-m" : "");
+				int result = Process.Start(pvrTexTool, args, Process.Options.RedirectErrors);
+				if (result != 0) {
+					throw new Lime.Exception("Error converting '{0}'\nCommand line: {1}", tga, pvrTexTool + " " + args);
+				}
+			} finally {
+				try {
+					File.Delete(tga);
+				} catch { }
+			}
+		}
+
+		private static string MakeAbsolutePath(string path)
+		{
+			if (!Path.IsPathRooted(path)) {
+				path = Path.Combine(System.IO.Directory.GetCurrentDirectory(), path);
+			}
+			return path;
+		}
+
+		private static void CookForDesktop(Gdk.Pixbuf pixbuf, string dstPath, DDSFormat format, bool mipMaps)
 		{
 			bool compressed = format == DDSFormat.DXTi;
 			if (pixbuf.HasAlpha) {
@@ -93,7 +152,7 @@ namespace Orange
 				// DXT1
 				TextureConverterUtils.SwapRGBChannels(pixbuf);
 			}
-			string tga = Path.ChangeExtension(dstPath, ".tga");
+			var tga = Path.ChangeExtension(dstPath, ".tga");
 			try {
 				TextureConverterUtils.SaveToTGA(pixbuf, tga);
 				ToDDSTextureHelper(tga, dstPath, pixbuf.HasAlpha, compressed, mipMaps);

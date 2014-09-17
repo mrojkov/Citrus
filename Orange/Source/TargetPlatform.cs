@@ -6,6 +6,7 @@ namespace Orange
 	{
 		Desktop,
 		iOS,
+		Android,
 		Unity,
 	}
 }

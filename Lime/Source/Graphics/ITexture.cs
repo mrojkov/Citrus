@@ -11,6 +11,10 @@ namespace Lime
 		Size ImageSize { get; }
 		Size SurfaceSize { get; }
 		Rectangle AtlasUVRect { get; }
+		/// <summary>
+		/// Used on Android for ETC1 compressed textures
+		/// </summary>
+		ITexture AlphaTexture { get; }
 		void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv0, ref Vector2 uv1);
 		uint GetHandle();
 		void SetAsRenderTarget();

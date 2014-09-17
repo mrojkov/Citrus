@@ -8,7 +8,7 @@ namespace Orange
 	// amoung all atlas items.
 	public enum PVRFormat
 	{
-		PVRTC4,
+		Compressed,
 		RGB565,
 		RGBA4,
 		ARGB8,
@@ -32,7 +32,7 @@ namespace Orange
 		public static CookingRules Default = new CookingRules {
 			TextureAtlas = null,
 			MipMaps = false,
-			PVRFormat = PVRFormat.PVRTC4, 
+			PVRFormat = PVRFormat.Compressed, 
 			DDSFormat = DDSFormat.DXTi,
 			LastChangeTime = new DateTime(0),
 			Bundle = null
@@ -103,7 +103,7 @@ namespace Orange
 		{
 			switch (value) {
 				case "PVRTC4":
-					return PVRFormat.PVRTC4;
+					return PVRFormat.Compressed;
 				case "RGBA4":
 					return PVRFormat.RGBA4;
 				case "RGB565":

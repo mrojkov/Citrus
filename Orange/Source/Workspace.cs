@@ -19,7 +19,7 @@ namespace Orange
 		public string GetPlatformSuffix()
 		{
 #if WIN
-			return ".Win";
+			return ActivePlatform == TargetPlatform.Desktop ? ".Win" : ".Android";
 #else
 			return ActivePlatform == TargetPlatform.Desktop ? ".Mac" : ".iOS";
 #endif
@@ -73,7 +73,7 @@ namespace Orange
 			var config = WorkspaceConfig.Load();
 			Open(config.CitrusProject);
 //#if MAC
-			//The.UI.PlatformPicker.Active = TargetPlatform.iOS;			
+			//The.UI.PlatformPicker.Active = TargetPlatform.iOS;
 //#endif
 			// The.MainWindow.PlatformPicker.Active = config.TargetPlatform;
 			// The.MainWindow.UpdateBeforeBuildCheckbox.Active = config.UpdateBeforeBuild;

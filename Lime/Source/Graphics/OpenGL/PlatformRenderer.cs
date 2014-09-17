@@ -25,7 +25,8 @@ namespace Lime
 		private static uint indexBuffer;
 		private static uint vertexBuffer;
 		private static bool premultipliedAlphaMode;
-		private static readonly uint[] textures = new uint[2];
+		// First texture pair is used for creation mask effect, second pair - for representing ETC1 alpha channel
+		private static readonly uint[] textures = new uint[4];
 
 		public static void CheckErrors()
 		{
@@ -48,17 +49,20 @@ namespace Lime
 		{
 			shaderProgram = null;
 		}
-				
+
 		public static void SetShader(ShaderId value)
 		{
 			int numTextures = textures[1] != 0 ? 2 : (textures[0] != 0 ? 1 : 0);
 			var program = ShaderPrograms.GetShaderProgram(value, numTextures);
-			if (shaderProgram == program) {
-				return;
+			if (shaderProgram != program) {
+				shaderProgram = program;
+				shaderProgram.Use();
+				shaderProgram.LoadMatrix(program.ProjectionMatrixUniformId, Renderer.Projection);
 			}
-			shaderProgram = program;
-			shaderProgram.Use();
-			shaderProgram.LoadMatrix(program.ProjectionMatrixUniformId, Renderer.Projection);
+#if ANDROID
+			shaderProgram.LoadBoolean(shaderProgram.UseAlphaTexture1UniformId, textures[2] != 0); 
+			shaderProgram.LoadBoolean(shaderProgram.UseAlphaTexture2UniformId, textures[3] != 0); 
+#endif
 		}
 
 		static PlatformRenderer()
@@ -103,8 +107,19 @@ namespace Lime
 
 		public static void SetTexture(ITexture texture, int stage)
 		{
-			uint handle = texture != null ? texture.GetHandle() : 0;
+			var handle = texture != null ? texture.GetHandle() : 0;
 			SetTexture(handle, stage);
+#if ANDROID
+			// Only Android supports ETC1 without embedded alpha channel
+			if (texture != null) {
+				var alphaTexture = texture.AlphaTexture;
+				if (alphaTexture != null) {
+					SetTexture(alphaTexture.GetHandle(), stage + 2);
+					return;
+				}
+			}
+			SetTexture(0, stage + 2);
+#endif
 		}
 
 		internal static void SetTexture(uint glTexNum, int stage)
@@ -120,7 +135,7 @@ namespace Lime
 			}
 			textures[stage] = glTexNum;
 		}
-				
+
 		public static void SetViewport(WindowRect value)
 		{
 			GL.Viewport(value.X, value.Y, value.Width, value.Height);

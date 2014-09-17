@@ -64,8 +64,8 @@ namespace Lime
 			"attribute vec2 inTexCoords1;	" +
 			"attribute vec2 inTexCoords2;	" +
 			"varying lowp vec4 color;		" +
-			"varying lowp vec2 texCoords1;" +
-			"varying lowp vec2 texCoords2;" +
+			"varying lowp vec2 texCoords1;	" +
+			"varying lowp vec2 texCoords2;	" +
 			"uniform mat4 matProjection;	" +
 			"void main()					" +
 			"{											" +
@@ -88,55 +88,82 @@ namespace Lime
 			"varying lowp vec4 color;		" +
 			"varying lowp vec2 texCoords;	" +
 			"uniform lowp sampler2D tex1;	" +
+			"uniform bool useAlphaTexture1;	" +
+			"uniform lowp sampler2D tex1a;	" +
 			"void main()					" +
 			"{								" +
-			"	gl_FragColor = color * texture2D(tex1, texCoords); " +
+			"	lowp vec4 t1 = texture2D(tex1, texCoords); " +
+			"	if (useAlphaTexture1)			" +
+			"		t1.a = texture2D(tex1a, texCoords).r; " +
+			"	gl_FragColor = color * t1;	" +
 			"}"
 		);
 
 		static readonly Shader twoTexturesFragmentShader = new FragmentShader(
 			"varying lowp vec4 color;		" +
-			"varying lowp vec2 texCoords1;" +
-			"varying lowp vec2 texCoords2;" +
+			"varying lowp vec2 texCoords1;	" +
+			"varying lowp vec2 texCoords2;	" +
 			"uniform lowp sampler2D tex1;	" +
 			"uniform lowp sampler2D tex2;	" +
+			"uniform bool useAlphaTexture1;	" +
+			"uniform bool useAlphaTexture2;	" +
+			"uniform lowp sampler2D tex1a;	" +
+			"uniform lowp sampler2D tex2a;	" +
 			"void main()					" +
 			"{								" +
-			"	gl_FragColor = color * texture2D(tex1, texCoords1) * texture2D(tex2, texCoords2); " +
+			"	lowp vec4 t1 = texture2D(tex1, texCoords1);	" +
+			"	lowp vec4 t2 = texture2D(tex2, texCoords2);	" +
+			"	if (useAlphaTexture1)			" +
+			"		t1.a = texture2D(tex1a, texCoords1).r; " +
+			"	if (useAlphaTexture2)			" +
+			"		t2.a = texture2D(tex2a, texCoords2).r; " +
+			"	gl_FragColor = color * t1 * t2; " +
 			"}"
 		);
 
 		static readonly Shader silhouetteFragmentShader = new FragmentShader(
 			"varying lowp vec4 color;		" +
 			"varying lowp vec2 texCoords;	" +
-			"uniform lowp sampler2D tex;	" +
+			"uniform lowp sampler2D tex1;	" +
+			"uniform lowp sampler2D tex1a;	" +
+			"uniform bool useAlphaTexture1;	" +
 			"void main()					" +
 			"{								" +
-			"	lowp float a = texture2D(tex, texCoords).a; " +
+			"	lowp float a = useAlphaTexture1 ? texture2D(tex1a, texCoords).r : texture2D(tex1, texCoords).a; " +
 			"	gl_FragColor = color * vec4(a, a, a, a);	" +
 			"}"
 		);
 
 		static readonly Shader twoTexturesSilhouetteFragmentShader = new FragmentShader(
 			"varying lowp vec4 color;		" +
-			"varying lowp vec2 texCoords1;" +
-			"varying lowp vec2 texCoords2;" +
+			"varying lowp vec2 texCoords1;	" +
+			"varying lowp vec2 texCoords2;	" +
+			"uniform bool useAlphaTexture1;	" +
+			"uniform bool useAlphaTexture2;	" +
 			"uniform lowp sampler2D tex1;	" +
+			"uniform lowp sampler2D tex1a;	" +
 			"uniform lowp sampler2D tex2;	" +
+			"uniform lowp sampler2D tex2a;	" +
 			"void main()					" +
 			"{								" +
-			"	gl_FragColor = texture2D(tex1, texCoords1) * vec4(color.rgb, color.a * texture2D(tex2, texCoords2).a);" +
+			"	lowp vec4 t1 = texture2D(tex1, texCoords1);	" +
+			"	if (useAlphaTexture1)			" +
+			"		t1.a = texture2D(tex1a, texCoords1).r; " +
+			"	lowp float a2 = useAlphaTexture2 ? texture2D(tex2a, texCoords2).r : texture2D(tex2, texCoords2).a; " +
+			"	gl_FragColor = t1 * vec4(color.rgb, color.a * a2);" +
 			"}"
 		);
 
 		static readonly Shader inversedSilhouetteFragmentShader = new FragmentShader(
 			"varying lowp vec4 color;		" +
 			"varying lowp vec2 texCoords;	" +
-			"uniform lowp sampler2D tex;	" +
+			"uniform bool useAlphaTexture1;	" +
+			"uniform lowp sampler2D tex1;	" +
+			"uniform lowp sampler2D tex1a;	" +
 			"void main()					" +
 			"{								" +
-			"	lowp float a = 1.0 - texture2D(tex, texCoords).a; " +
-			"	gl_FragColor = color * vec4(a, a, a, a);	      " +
+			"	lowp float a = 1.0 - (useAlphaTexture1 ? texture2D(tex1a, texCoords).r : texture2D(tex1, texCoords).a); " +
+			"	gl_FragColor = color * vec4(a, a, a, a); " +
 			"}"
 		);
 
@@ -156,6 +183,8 @@ namespace Lime
 			p.Link();
 			p.BindSampler("tex1", 0);
 			p.BindSampler("tex2", 1);
+			p.BindSampler("tex1a", 2);
+			p.BindSampler("tex2a", 3);
 			return p;
 		}
 	}

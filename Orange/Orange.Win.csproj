@@ -155,6 +155,9 @@
     <Content Include="Toolchain.Win\nvtt.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Toolchain.Win\PVRTexToolCLI.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Win.csproj">
