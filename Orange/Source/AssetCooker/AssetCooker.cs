@@ -500,7 +500,7 @@ namespace Orange
 					var part = Lime.TextureAtlasPart.ReadFromBundle(atlasPartPath);
 					string atlasChain = Path.GetFileNameWithoutExtension(part.AtlasTexture);
 					atlasChainsToRebuild.Add(atlasChain);
-					if (!File.Exists(srcTexturePath)) {
+					if (!textures.ContainsKey(srcTexturePath)) {
 						Console.WriteLine("- " + atlasPartPath);
 						assetsBundle.DeleteFile(atlasPartPath);
 					} else {
