@@ -92,7 +92,8 @@ namespace Lime
 		{
 			var yPlane = Lemon.Api.OgvGetBuffer(ogvHandle, 0);
 			if (yPlane.Width != width || yPlane.Height != height) {
-				throw new ArgumentException();
+				throw new ArgumentException(
+					string.Format("YPlane size: {0}x{1}; Texture size: {2}x{3}", yPlane.Width, yPlane.Height, width, height));
 			}
 			unsafe {
 				fixed (byte* alphaTablePtr = &alphaSaturateTable[0])
