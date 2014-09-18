@@ -31,7 +31,7 @@ namespace Lime
 			}
 		}
 
-		public virtual string CurrentLanguage { get; set; }
+		public static string CurrentLanguage;
 
 		public abstract Stream OpenFile(string path);
 		public abstract DateTime GetFileLastWriteTime(string path);
