@@ -180,6 +180,7 @@ namespace Lime
 					};
 					break;
 				}
+#if ANDROID
 				case PVRFormat.ETC1: {
 					var buffer = ReadTextureData(reader, width * height * 4 / 8);
 					glCommands += () => {
@@ -188,6 +189,7 @@ namespace Lime
 					};
 					break;
 				}
+#endif
 				case PVRFormat.RGBA4444: {
 					var buffer = ReadTextureData(reader, width * height * 2);
 					glCommands += () => {
