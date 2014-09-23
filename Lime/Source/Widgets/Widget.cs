@@ -207,6 +207,12 @@ namespace Lime
 
 		public override void Dispose()
 		{
+			if (tasks != null) {
+				tasks.Stop();
+			}
+			if (lateTasks != null) {
+				lateTasks.Stop();
+			}
 			if (cachedRenderer != null) {
 				cachedRenderer.Dispose();
 			}
