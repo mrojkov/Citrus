@@ -120,7 +120,11 @@ namespace Lime
 		public static string Localize(this int value)
 		{
 			string result = value.ToString("N0");
-			if (string.IsNullOrEmpty(AssetsBundle.CurrentLanguage) || AssetsBundle.CurrentLanguage == "EN") {
+			if (
+				string.IsNullOrEmpty(AssetsBundle.CurrentLanguage) 
+				|| AssetsBundle.CurrentLanguage == "EN"
+				|| AssetsBundle.CurrentLanguage == "JP"
+			) {
 				return result;
 			} else {
 				return result.Replace(',', (char)160); // заменяем запятые на неразрывные пробелы
