@@ -87,6 +87,13 @@
     <Compile Include="Source\Localization\LocalizationDictionaryTextSerializer.cs" />
     <Compile Include="Source\Version.cs" />
     <Compile Include="Source\Widgets\IText.cs" />
+    <Compile Include="Source\Widgets\ListView\ExpandableListItem.cs" />
+    <Compile Include="Source\Widgets\ListView\ListView.cs" />
+    <Compile Include="Source\Widgets\ListView\ListView.ItemDrag.cs" />
+    <Compile Include="Source\Widgets\ListView\ListView.RefreshGesture.cs" />
+    <Compile Include="Source\Widgets\ListView\ScrollView.cs" />
+    <Compile Include="Source\Widgets\ListView\ScrollView.SpeedMeter.cs" />
+    <Compile Include="Source\Widgets\ListView\ScrollViewWithSlider.cs" />
     <Compile Include="Source\Widgets\TextStyle.cs" />
     <Compile Include="Source\Widgets\Text\TextRenderer.cs" />
     <Compile Include="Source\Widgets\Text\TextParser.cs" />
