@@ -120,14 +120,6 @@
     <Compile Include="Source\AssetsBundle\PackedAssetsBundle.cs" />
     <Compile Include="Source\AssetsBundle\UnpackedAssetsBundle.cs" />
     <Compile Include="Source\Graphics\OgvDecoder.cs" />
-    <Compile Include="Source\PopupMenu\ImageBox.cs" />
-    <Compile Include="Source\PopupMenu\LayoutTools.cs" />
-    <Compile Include="Source\PopupMenu\MenuButton.cs" />
-    <Compile Include="Source\PopupMenu\MenuItem.cs" />
-    <Compile Include="Source\PopupMenu\PopupMenu.cs" />
-    <Compile Include="Source\PopupMenu\RoundedRectangle.cs" />
-    <Compile Include="Source\PopupMenu\Separator.cs" />
-    <Compile Include="Source\PopupMenu\StringItem.cs" />
     <Compile Include="Source\Widgets\NodeDebugView.cs" />
     <Compile Include="Source\NumericExtensions.cs" />
     <Compile Include="Source\Toolbox.cs" />
@@ -208,6 +200,21 @@
     <Compile Include="Source\Application\AndroidMainActivity.cs" />
     <Compile Include="Source\Graphics\Bitmap.Android.cs" />
     <Compile Include="Source\Widgets\WebBrowser.Android.cs" />
+    <Compile Include="Source\Widgets\ListView\ExpandableListItem.cs" />
+    <Compile Include="Source\Widgets\ListView\ListView.ItemDrag.cs" />
+    <Compile Include="Source\Widgets\ListView\ListView.RefreshGesture.cs" />
+    <Compile Include="Source\Widgets\ListView\ListView.cs" />
+    <Compile Include="Source\Widgets\ListView\ScrollView.SpeedMeter.cs" />
+    <Compile Include="Source\Widgets\ListView\ScrollView.cs" />
+    <Compile Include="Source\Widgets\ListView\ScrollViewWithSlider.cs" />
+    <Compile Include="Source\Widgets\PopupMenu\ImageBox.cs" />
+    <Compile Include="Source\Widgets\PopupMenu\LayoutTools.cs" />
+    <Compile Include="Source\Widgets\PopupMenu\MenuButton.cs" />
+    <Compile Include="Source\Widgets\PopupMenu\MenuItem.cs" />
+    <Compile Include="Source\Widgets\PopupMenu\PopupMenu.cs" />
+    <Compile Include="Source\Widgets\PopupMenu\RoundedRectangle.cs" />
+    <Compile Include="Source\Widgets\PopupMenu\Separator.cs" />
+    <Compile Include="Source\Widgets\PopupMenu\StringItem.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
