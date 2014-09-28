@@ -44,6 +44,8 @@ namespace Lime
 		static readonly FontPool instance = new FontPool();
 		public static FontPool Instance { get { return instance; } }
 
+		public Func<string, string> FontNameChanger;
+
 		private FontPool() { }
 
 		public Font DefaultFont { get { return this[null]; } }
@@ -51,6 +53,8 @@ namespace Lime
 		public Font this[string name]
 		{
 			get	{
+				if (FontNameChanger != null)
+					name = FontNameChanger(name);
 				if (string.IsNullOrEmpty(name))
 					name = "Default";
 				Font font;
