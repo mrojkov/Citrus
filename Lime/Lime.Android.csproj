@@ -208,6 +208,13 @@
     <Compile Include="Source\Widgets\PopupMenu\RoundedRectangle.cs" />
     <Compile Include="Source\Widgets\PopupMenu\Separator.cs" />
     <Compile Include="Source\Widgets\PopupMenu\StringItem.cs" />
+    <Compile Include="Source\Widgets\ListView\ExpandableListItem.cs" />
+    <Compile Include="Source\Widgets\ListView\ListView.cs" />
+    <Compile Include="Source\Widgets\ListView\ListView.ItemDrag.cs" />
+    <Compile Include="Source\Widgets\ListView\ListView.RefreshGesture.cs" />
+    <Compile Include="Source\Widgets\ListView\ScrollView.cs" />
+    <Compile Include="Source\Widgets\ListView\ScrollView.SpeedMeter.cs" />
+    <Compile Include="Source\Widgets\ListView\ScrollViewWithSlider.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">

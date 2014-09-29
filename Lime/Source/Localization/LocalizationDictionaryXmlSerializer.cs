@@ -21,10 +21,13 @@ namespace Lime
 				xml.ReadStartElement("resources");
 				while (xml.IsStartElement("string")) {
 					var key = xml.GetAttribute("name");
+					var isElementEmpty = xml.IsEmptyElement;
 					xml.ReadStartElement();
 					var value = xml.ReadString();
-					dictionary.Add(key, new LocalizationEntry() { Text = value });
-					xml.ReadEndElement();
+					dictionary.Add (key, new LocalizationEntry () { Text = value });
+					if (!isElementEmpty) {
+						xml.ReadEndElement();
+					}
 				}
 				xml.ReadEndElement();
 			}
