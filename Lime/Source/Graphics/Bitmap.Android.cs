@@ -1,48 +1,54 @@
 ﻿#if ANDROID
-using System.Collections;
-using System.IO;
-using System.Collections.Generic;
 using System;
-using ProtoBuf;
-using System.Drawing;
+using Android.Graphics;
+using System.IO;
+using Android.Graphics.Drawables;
 
 namespace Lime
 {
 	class BitmapImplementation : IBitmapImplementation
 	{
+		Android.Graphics.Bitmap bitmap;
+
 		public int GetWidth()
 		{
-			throw new NotImplementedException();
+			return bitmap.Width;
 		}
 
 		public int GetHeight()
 		{
-			throw new NotImplementedException();
+			return bitmap.Height;
 		}
 
 		public void LoadFromStream(Stream stream)
 		{
-			throw new NotImplementedException();		
+			bitmap = BitmapFactory.DecodeStream(stream);
 		}
 
 		public void SaveToStream(Stream stream)
 		{
-			throw new NotImplementedException();
+			bitmap.Compress(Android.Graphics.Bitmap.CompressFormat.Png, 100, stream);
 		}
 
 		public IBitmapImplementation Rescale(int newWidth, int newHeight)
 		{
-			throw new NotImplementedException();
+			var scaledBitmap = Android.Graphics.Bitmap.CreateScaledBitmap(bitmap, newWidth, newHeight, true);
+			var result = new BitmapImplementation();
+			result.bitmap = scaledBitmap;
+			return result;
 		}
 
 		public IBitmapImplementation Crop(IntRectangle cropArea)
 		{
-			throw new NotImplementedException();
+			var croppedBitmap = Android.Graphics.Bitmap.CreateBitmap(bitmap, cropArea.Left, cropArea.Top, cropArea.Width, cropArea.Height);
+			var result = new BitmapImplementation();
+			result.bitmap = croppedBitmap;
+			return result;
 		}
 
 		public void Dispose()
 		{
-			throw new NotImplementedException();
+			bitmap.Dispose();
 		}
 	}
 }
