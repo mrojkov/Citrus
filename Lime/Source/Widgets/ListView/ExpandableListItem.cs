@@ -13,6 +13,8 @@ namespace Lime
 		public readonly ListView ListView;
 		public bool Expanded { get; private set; }
 		public bool Animating { get; private set; }
+		public bool PinHeader { get; set; }
+
 		public Widget Content
 		{
 			get { return content; }
@@ -39,6 +41,7 @@ namespace Lime
 			Width = listView.Frame.Width;
 			Height = header.Height;
 			Anchors = Anchors.LeftRight;
+			PinHeader = true;
 			Tasks.Add(AutoLayoutTask());
 			subContainer = new Frame() { Width = listView.Frame.Width, Anchors = Anchors.LeftRight };
 			AddNode(header);
@@ -55,8 +58,8 @@ namespace Lime
 				if (!Animating) {
 					StackWidgetsVertically(subContainer);
 					StackWidgetsVertically(this);
-					if (Expanded) {
-						PinHeader();
+					if (Expanded && PinHeader) {
+						DoPinHeader();
 					}
 				}
 				yield return 0;
@@ -76,7 +79,7 @@ namespace Lime
 			container.Height = y;
 		}
 
-		private void PinHeader()
+		private void DoPinHeader()
 		{
 			float y = -Header.CalcPositionInSpaceOf(ListView.Frame).Y;
 			Header.Y = y.Clamp(0, subContainer.Height);
@@ -116,7 +119,7 @@ namespace Lime
 			foreach (var t in TaskList.SinMotion(0.25f, subContainer.Height, minHeight)) {
 				subContainer.Height = t;
 				StackWidgetsVertically(this);
-				PinHeader();
+				DoPinHeader();
 				yield return 0;
 			}
 			subContainer.Height = 0;
