@@ -141,26 +141,31 @@ namespace Lime
 			}
 			using (var bitmap = Android.Graphics.BitmapFactory.DecodeStream(stream)) {
 				SurfaceSize = ImageSize = new Size(bitmap.Width, bitmap.Height);
-				if (!bitmap.HasAlpha) {
-					PrepareOpenGLTexture ();
-					var pixels = new int[bitmap.Width * bitmap.Height];
-					bitmap.GetPixels(pixels, 0, bitmap.Width, 0, 0, bitmap.Width, bitmap.Height);
-					// SwapRedAndGreen24(data);
-					GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, bitmap.Width, bitmap.Height, 0,
-						PixelFormat.Rgb, PixelType.UnsignedByte, pixels);
-					MemoryUsed = bitmap.Width * bitmap.Height * 3;
-				} else {
-					PrepareOpenGLTexture();
-					var pixels = new int[bitmap.Width * bitmap.Height];
-					bitmap.GetPixels(pixels, 0, bitmap.Width, 0, 0, bitmap.Width, bitmap.Height);
-					// SwapRedAndGreen32(data);
-					GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0,
-						PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
-					MemoryUsed = bitmap.Width * bitmap.Height * 4;
-				}
+				PrepareOpenGLTexture();
+				var pixels = new int[bitmap.Width * bitmap.Height];
+				bitmap.GetPixels(pixels, 0, bitmap.Width, 0, 0, bitmap.Width, bitmap.Height);
+				SwapRedAndBlue(ref pixels);
+				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0,
+					PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
+				MemoryUsed = bitmap.Width * bitmap.Height * 4;
 			}
 			PlatformRenderer.CheckErrors();
 		}
+
+		private void SwapRedAndBlue(ref int[] data)
+		{
+			unsafe {
+				for (int i = 0; i < data.Length; i++) {
+					var l = (long)data[i];
+					l = 
+						(0x000000FF) & (l >> 16)
+						| (0x00FF0000) & (l << 16)
+						| (0xFF00FF00) & (l);
+					data[i] = (int)l;
+				}
+			}
+		}
+
 #endif
 	}
 }
