@@ -208,6 +208,7 @@
     <Compile Include="Source\Widgets\PopupMenu\RoundedRectangle.cs" />
     <Compile Include="Source\Widgets\PopupMenu\Separator.cs" />
     <Compile Include="Source\Widgets\PopupMenu\StringItem.cs" />
+    <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Source\Widgets\ListView\ExpandableListItem.cs" />
     <Compile Include="Source\Widgets\ListView\ListView.cs" />
     <Compile Include="Source\Widgets\ListView\ListView.ItemDrag.cs" />

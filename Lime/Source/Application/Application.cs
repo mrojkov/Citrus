@@ -238,12 +238,11 @@ namespace Lime
 
 		public void ShowOnscreenKeyboard(bool show, string text)
 		{
-			MainActivity.Instance.ShowOnscreenKeyboard(show, text);
+			GameView.Instance.ShowOnscreenKeyboard(show, text);
 		}
 
 		public void ChangeOnscreenKeyboardText(string text)
 		{
-			MainActivity.Instance.ChangeOnscreenKeyboardText(text);
 		}
 
 		public bool Active { get; internal set; }
@@ -257,7 +256,6 @@ namespace Lime
 		{
 			// There is no way to terminate an android application. 
 			// The only way is to finish each its activity one by one.
-			MainActivity.Instance.Finish();
 		}
 #elif UNITY
 		public void Exit()

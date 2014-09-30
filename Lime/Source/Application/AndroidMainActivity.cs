@@ -9,28 +9,32 @@ using Android.Widget;
 
 namespace Lime
 {
-	public class MainActivity : Activity
+	/// <summary>
+	/// This class is useful when we can't directly inherit the app activity 
+	/// from Lime.MainActivity
+	/// </summary>
+	public class MainActivityImplementation
 	{
-		public static MainActivity Instance { get; private set; }
+		Activity activity;
 		public GameView GameView { get; private set; }
 		public RelativeLayout ContentView { get; private set; }
-		private InputMethodManager imm;
 
-		protected override void OnCreate(Bundle bundle)
+		public MainActivityImplementation(Activity activity)
 		{
-			base.OnCreate(bundle);
-			AudioSystem.Initialize();
-			GameView = new GameView(this);
-			ContentView = new RelativeLayout(ApplicationContext);
-			ContentView.AddView(GameView);
-			SetContentView(ContentView);
-			imm = (InputMethodManager)ApplicationContext.GetSystemService(Android.Content.Context.InputMethodService);
-			Instance = this;
+			this.activity = activity;
 		}
 
-		protected override void OnPause()
+		public void OnCreate(Bundle bundle)
 		{
-			base.OnPause();
+			AudioSystem.Initialize();
+			GameView = new GameView(activity);
+			ContentView = new RelativeLayout(activity.ApplicationContext);
+			ContentView.AddView(GameView);
+			activity.SetContentView(ContentView);
+		}
+
+		public void OnPause()
+		{
 			Lime.Application.Instance.Active = false;
 			Lime.Application.Instance.OnDeactivate();
 			AudioSystem.Active = false;
@@ -38,36 +42,51 @@ namespace Lime
 			GameView.ClearFocus();
 		}
 
-		protected override void OnResume()
+		public void OnResume()
 		{
 			AudioSystem.Active = true;
 			Lime.Application.Instance.Active = true;
 			Lime.Application.Instance.OnActivate();
 			GameView.Resume();
-			base.OnResume();
 			if (!GameView.IsFocused) {
 				GameView.RequestFocus();
 			}
 		}
-			
-		public void ShowOnscreenKeyboard(bool show, string text)
-		{
-			if (show) {
-				imm.ShowSoftInput(GameView, 0);
-			} else {
-				imm.HideSoftInputFromWindow(GameView.WindowToken, 0);
-			}
-		}
 
-		public void ChangeOnscreenKeyboardText(string text)
-		{
-		}
-
-		public override void OnLowMemory()
+		public void OnLowMemory()
 		{
 			Logger.Write("Memory warning, texture memory: {0}mb", CommonTexture.TotalMemoryUsedMb);
 			Lime.TexturePool.Instance.DiscardUnusedTextures(2);
 			System.GC.Collect();
+		}
+	}
+
+	public class MainActivity : Activity
+	{
+		public MainActivityImplementation Implementation { get; private set; }
+
+		protected override void OnCreate(Bundle bundle)
+		{
+			base.OnCreate(bundle);
+			Implementation = new MainActivityImplementation(this);
+			Implementation.OnCreate(bundle);
+		}
+
+		protected override void OnPause()
+		{
+			base.OnPause();
+			Implementation.OnPause();
+		}
+
+		protected override void OnResume()
+		{
+			Implementation.OnResume();
+			base.OnResume();
+		}
+
+		public override void OnLowMemory()
+		{
+			Implementation.OnLowMemory();
 			base.OnLowMemory();
 		}
 	}

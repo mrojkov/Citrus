@@ -54,7 +54,7 @@ namespace Lime
 				// Workaround for a crash in RelativeLayout.onLayout() while rotating the device
 				Action a = null;
 				a = () => {
-					MainActivity.Instance.ContentView.RemoveView(webView);
+					((RelativeLayout)GameView.Instance.Parent).RemoveView(webView);
 					GameView.DidUpdated -= a;
 				};
 				GameView.DidUpdated += a;
@@ -76,7 +76,7 @@ namespace Lime
 			layoutParams.LeftMargin = wr.X;
 			layoutParams.TopMargin = wr.Y + screenHeight - wr.Height;
 			if (webView.Parent == null) {
-				MainActivity.Instance.ContentView.AddView(webView, layoutParams);
+				((RelativeLayout)GameView.Instance.Parent).AddView(webView, layoutParams);
 			} else {
 				webView.LayoutParameters = layoutParams;
 			}

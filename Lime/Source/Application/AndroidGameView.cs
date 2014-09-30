@@ -47,6 +47,7 @@ namespace Lime
 		public readonly RenderingApi RenderingApi = RenderingApi.ES20;
 
 		private InputConnection inputConnection;
+		private InputMethodManager imm;
 
 		public GameView(Context context)
 			: base(context)
@@ -56,6 +57,16 @@ namespace Lime
 			Instance = this;
 			for (int i = 0; i < Input.MaxTouches; i++) {
 				pointerIds[i] = -1;
+			}
+			imm = (InputMethodManager)context.GetSystemService(Android.Content.Context.InputMethodService);
+		}
+
+		public void ShowOnscreenKeyboard(bool show, string text)
+		{
+			if (show) {
+				imm.ShowSoftInput(this, 0);
+			} else {
+				imm.HideSoftInputFromWindow(WindowToken, 0);
 			}
 		}
 
@@ -204,8 +215,10 @@ namespace Lime
 			Input.ProcessPendingKeyEvents();
 			Application.Instance.OnUpdateFrame(delta);
 			AudioSystem.Update();
-			Input.TextInput = inputConnection.TextInput;
-			inputConnection.TextInput = null;
+			if (inputConnection != null) {
+				Input.TextInput = inputConnection.TextInput;
+				inputConnection.TextInput = null;
+			}
 			Input.CopyKeysState();
 			if (DidUpdated != null) {
 				DidUpdated();
