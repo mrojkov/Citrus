@@ -25,3 +25,10 @@ http://malideveloper.arm.com/develop-for-mali/sample-code/etcv1-texture-compress
 =======================
 OpenAL для андроида скачивается с http://repo.or.cz/w/openal-soft/android.git
 Чтобы OpenTK не падал нужно пропатчить модуль ALc.с. При возвращении из alcGetString() нужно делать поверку на NULL: return (value == NULL) ? "" : value;
+
+КАК ПЕРЕСОБИРАТЬ BIGFISH SDK
+============================
+1) В файле bfgLib/project.properties поставить target=android-12
+2) Настроить путь к Android SDK в bfgLib/local.properties
+3) Сделать ant clean release (apache ant нужно предварительно установить)
+4) Заархивировать папку bin и res в BFGLib.zip и положить архив рядом с BFGLib.csproj

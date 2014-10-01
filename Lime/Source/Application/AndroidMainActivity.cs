@@ -64,10 +64,14 @@ namespace Lime
 	public class MainActivity : Activity
 	{
 		public MainActivityImplementation Implementation { get; private set; }
+		// In case if the app's main activity isn't inherited from this class
+		// this property should be set manually
+		public static Activity Instance { get; set; }
 
 		protected override void OnCreate(Bundle bundle)
 		{
 			base.OnCreate(bundle);
+			Instance = this;
 			Implementation = new MainActivityImplementation(this);
 			Implementation.OnCreate(bundle);
 		}
