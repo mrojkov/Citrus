@@ -23,8 +23,8 @@ namespace Lime
 					var key = xml.GetAttribute("name");
 					var isElementEmpty = xml.IsEmptyElement;
 					xml.ReadStartElement();
-					var value = xml.ReadString();
-					dictionary.Add (key, new LocalizationEntry () { Text = value });
+					// Empty elements in English localization mean that source text should be used as-is.
+					dictionary.Add(key, new LocalizationEntry() { Text = isElementEmpty ? key : xml.ReadString() });
 					if (!isElementEmpty) {
 						xml.ReadEndElement();
 					}
