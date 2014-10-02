@@ -71,6 +71,19 @@ namespace Lime
 #endif
 		}
 
+		public void DiscardAllStubTextures()
+		{
+			foreach (WeakReference r in textures.Values) {
+				var target = r.Target as SerializableTextureCore;
+				if (target != null && target.IsStubTexture) {
+					target.Discard();
+				}
+			}
+#if !UNITY
+			Texture2D.DeleteScheduledTextures();
+#endif
+		}
+
 		internal SerializableTextureCore GetSerializableTextureCore(string path)
 		{
 			SerializableTextureCore core;
