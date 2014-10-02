@@ -485,6 +485,7 @@ namespace Lime
 						animationTime += AnimationUtils.FramesToMsecs(hopFrames);
 						prevFrame += hopFrames;
 						currFrame += hopFrames;
+						ProcessMarker(gotoMarker, ref prevFrame, ref currFrame);
 					}
 					break;
 				case MarkerAction.Stop:
