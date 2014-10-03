@@ -461,22 +461,16 @@ namespace Lime.Xamarin
             GraphicsContext = Utilities.CreateGraphicsContext(ContextRenderingApi);
             gl = GLCalls.GetGLCalls(ContextRenderingApi);
 
-            int oldFramebuffer = 0, oldRenderbuffer = 1;
-			gl.GetInteger(All.FramebufferBindingOes, ref oldFramebuffer);
-			gl.GetInteger(All.RenderbufferBindingOes, ref oldRenderbuffer);
+			gl.GenFramebuffers (1, ref framebuffer);
+			gl.BindFramebuffer (All.FramebufferOes, framebuffer);
 
             gl.GenRenderbuffers(1, ref renderbuffer);
 			gl.BindRenderbuffer(All.RenderbufferOes, renderbuffer);
 
 			if (!EAGLContext.RenderBufferStorage((uint) All.RenderbufferOes, eaglLayer)) {
-                gl.DeleteRenderbuffers(1, ref renderbuffer);
-                renderbuffer = 0;
-				gl.BindRenderbuffer(All.RenderbufferBindingOes, oldRenderbuffer);
                 throw new InvalidOperationException("Error with EAGLContext.RenderBufferStorage!");
             }
 
-            gl.GenFramebuffers (1, ref framebuffer);
-			gl.BindFramebuffer (All.FramebufferOes, framebuffer);
 			gl.FramebufferRenderbuffer (All.FramebufferOes, All.ColorAttachment0Oes, All.RenderbufferOes, renderbuffer);
 
             Size newSize = new Size(
@@ -504,6 +498,8 @@ namespace Lime.Xamarin
             if (!GraphicsContext.IsCurrent)
                 MakeCurrent();
 
+			DetachRenderBufferStorage(EAGLContext, (uint)All.RenderbufferOes);
+
             gl.DeleteFramebuffers (1, ref framebuffer);
             gl.DeleteRenderbuffers (1, ref renderbuffer);
             framebuffer = renderbuffer = 0;
@@ -518,6 +514,11 @@ namespace Lime.Xamarin
             gl = null;
             framebufferReady = false; // buz
         }
+
+		static private bool DetachRenderBufferStorage(EAGLContext me, uint target)
+		{
+			return Messaging.bool_objc_msgSend_UInt32_IntPtr(me.Handle, Selector.GetHandle("renderbufferStorage:fromDrawable:"), target, (IntPtr)0);
+		}
 
         public virtual void Close()
         {
