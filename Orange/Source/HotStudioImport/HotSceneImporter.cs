@@ -76,8 +76,13 @@ namespace Orange
 				break;
 			case "Markers":
 				lexer.ParseToken('[');
-				while (lexer.PeekChar() != ']')
-					node.Markers.Add(ParseMarker());
+				while (lexer.PeekChar() != ']') {
+					var marker = ParseMarker();
+					if (marker.Action == MarkerAction.Jump && marker.JumpTo == null) {
+						throw new Exception("Jump marker '{0}' in node '{1}' have no JumpTo property.", marker.Id ?? "<noname>", node.ToString());
+					}
+					node.Markers.Add(marker);
+				}
 				lexer.ParseToken(']');
 				break;
 			default:
