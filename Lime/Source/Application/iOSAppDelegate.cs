@@ -168,9 +168,10 @@ namespace Lime
 			// Set the current directory.
 			Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
 
-			Application.Instance.OnCreate();
-
+			// Run() creates OpenGL context, so calls it before Application.OnCreate()
 			GameView.Instance.Run();
+
+			Application.Instance.OnCreate();
 			return true;
 		}
 
