@@ -77,8 +77,7 @@ namespace Lime
 			float screenHeight = GameView.Instance.Size.Height;
 			WindowRect wr = CalculateAABBInWorldSpace(this);
 			float Height = (float)wr.Height / UIScreen.MainScreen.Scale;
-			float offsetY = (screenHeight) - Height;
-			var position = new PointF((float)wr.X / UIScreen.MainScreen.Scale, (float)(wr.Y / UIScreen.MainScreen.Scale) + offsetY);
+			var position = new PointF((float)wr.X / UIScreen.MainScreen.Scale, screenHeight - (float)(wr.Y / UIScreen.MainScreen.Scale) - Height);
 			var size = new SizeF((float)wr.Width / UIScreen.MainScreen.Scale, Height);
 			webView.Frame = new RectangleF(position, size);
 			webView.Hidden = false;
