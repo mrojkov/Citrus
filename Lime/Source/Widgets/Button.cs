@@ -28,6 +28,7 @@ namespace Lime
 		
 		private List<Widget> textPresenters;
 		private bool wasClicked;
+		private bool skipReleaseAnimation;
 		private StateMachine stateMachine = new StateMachine();
 		private StateFunc State
 		{
@@ -94,6 +95,7 @@ namespace Lime
 
 		private IEnumerator<int> NormalState()
 		{
+			skipReleaseAnimation = false;
 			Input.ReleaseMouse();
 			TryRunAnimation("Normal");
 			while (true) {
@@ -182,6 +184,10 @@ namespace Lime
 				if (!Input.IsMousePressed()) {
 					if (isPressed) {
 						HandleClick();
+						if (!GloballyVisible) {
+							// buz: если в результате нажатия родитель кнопки стал невидим, то по его появлению не надо доигрывать анимацию отжатия
+							skipReleaseAnimation = true;
+						}
 					}
 					State = ReleaseState;
 				} else if (wasPressed && !isPressed) {
@@ -210,13 +216,14 @@ namespace Lime
 		private IEnumerator<int> ReleaseState()
 		{
 			Input.ReleaseMouse();
-			if (CurrentAnimation != "Release") {
+			if (CurrentAnimation != "Release" && !skipReleaseAnimation) {
 				if (TryRunAnimation("Release")) {
 					while (IsRunning) {
 						yield return 0;
 					}
 				}
 			}
+			skipReleaseAnimation = false;
 			if (TabletControlScheme) {
 				State = NormalState;
 			} else {
