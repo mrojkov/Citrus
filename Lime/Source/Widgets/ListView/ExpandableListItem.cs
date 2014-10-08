@@ -14,25 +14,9 @@ namespace Lime
 		public bool Expanded { get; private set; }
 		public bool Animating { get; private set; }
 		public bool PinHeader { get; set; }
+		public NodeList ContentItems { get { return subContainer.Nodes; } }
 
-		public Widget Content
-		{
-			get { return content; }
-			set
-			{
-				DisposeContent();
-				content = value;
-				if (content != null) {
-					content.Position = Vector2.Zero;
-					content.Pivot = Vector2.Zero;
-					content.Width = Width;
-					subContainer.AddNode(content);
-				}
-			}
-		}
-
-		private Widget content;
-		private Frame subContainer;
+		private readonly Frame subContainer;
 
 		public ExpandableListItem(Widget header, ListView listView)
 		{
@@ -47,9 +31,19 @@ namespace Lime
 			AddNode(header);
 			AddNode(subContainer);
 			SetExpanded(false, animated: false);
-			header.Position = Vector2.Zero;
-			header.Pivot = Vector2.Zero;
-			header.Width = Width;
+			AlignTop(header);
+		}
+
+		public void AddContentItem(Widget item) {
+			AlignTop(item);
+			subContainer.Nodes.Add(item);
+		}
+
+		private void AlignTop(Widget w)
+		{
+			w.Position = Vector2.Zero;
+			w.Pivot = Vector2.Zero;
+			w.Width = Width;
 		}
 
 		private IEnumerator<object> AutoLayoutTask()
@@ -136,12 +130,10 @@ namespace Lime
 			}
 		}
 
-		private void DisposeContent()
+		public void DisposeContent()
 		{
-			if (content != null) {
-				content.UnlinkAndDispose();
-				content = null;
-			}
+			foreach (var w in subContainer.Nodes)
+				w.AsWidget.UnlinkAndDispose();
 		}
 
 		public void SetExpanded(bool value, bool animated, Action onAnimationFinished = null)
