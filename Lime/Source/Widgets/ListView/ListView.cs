@@ -46,38 +46,23 @@ namespace Lime
 			ContentLength = p;
 		}
 
-		public bool ScrollToItem(Widget widget, bool instantly = false)
+		public void ScrollToItem(Widget widget, bool instantly = false)
 		{
-			int index = IndexOf(widget);
-			if (index < 0) {
-				return false;
-			}
-			ScrollToItem(index, instantly);
-			return true;
-		}
-
-		public void ScrollToItem(int index, bool instantly = false)
-		{
-			var position = ProjectToScrollAxis(this[index].Size);
-			if (instantly) {
-				ScrollPosition = position.Clamp(MinScrollPosition, MaxScrollPosition);
-			} else {
-				Frame.Tasks.Add(ScrollToTask(position));
-			}
+			ScrollTo(ProjectToScrollAxis(widget.CalcPositionInSpaceOf(Content)), instantly);
 		}
 
 		public void ScrollTo(float position, bool instantly = false)
 		{
+			var p = position.Clamp(MinScrollPosition, MaxScrollPosition);
 			if (instantly) {
-				ScrollPosition = position.Clamp(MinScrollPosition, MaxScrollPosition);
+				ScrollPosition = p;
 			} else {
-				Frame.Tasks.Add(ScrollToTask(position));
+				Frame.Tasks.Add(ScrollToTask(p));
 			}
 		}
 
 		private IEnumerator<object> ScrollToTask(float position)
 		{
-			position = position.Clamp(MinScrollPosition, MaxScrollPosition);
 			float time = (position - ScrollPosition).Abs() / ScrollToItemVelocity;
 			foreach (var t in TaskList.SinMotion(time, ScrollPosition, position)) {
 				ScrollPosition = t;
