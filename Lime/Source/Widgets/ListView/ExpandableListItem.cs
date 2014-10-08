@@ -124,7 +124,7 @@ namespace Lime
 			StackWidgets(subContainer);
 			var minSize = (FramePos(Header) + ProjectedSize(Header) - FramePos(subContainer)).Max(0);
 			var bottomPadding = new Widget();
-			//ListView.SetProjectedSize(bottomPadding, minSize);
+			ListView.SetProjectedSize(bottomPadding, minSize);
 			ListView.Add(bottomPadding);
 			yield return ResizeSubContainerTask(ProjectedSize(subContainer), minSize, DoPinHeader);
 			ListView.SetProjectedSize(subContainer, 0);
