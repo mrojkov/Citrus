@@ -94,7 +94,6 @@ namespace Lime
 			// http://forums.xamarin.com/discussion/931/how-to-prevent-ios-crash-reporters-from-crashing-monotouch-apps
 
 			AppDomain.CurrentDomain.UnhandledException += (sender, e) => {
-				Console.WriteLine(e.ExceptionObject.ToString());
 #if WIN
 				var title = "The application";
 				if (GameView.Instance != null) {
@@ -103,6 +102,8 @@ namespace Lime
 				}
 				WinApi.MessageBox((IntPtr)null, e.ExceptionObject.ToString(), 
 					string.Format("{0} has terminated with an error", title), 0);
+#else
+				Console.WriteLine(e.ExceptionObject.ToString());
 #endif
 			};
 		}
