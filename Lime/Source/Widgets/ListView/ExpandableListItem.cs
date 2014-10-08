@@ -93,8 +93,6 @@ namespace Lime
 			IsAnimating = false;
 			subContainer.ClipChildren = ClipMethod.None;
 			IsExpanded = true;
-			float y = Header.CalcPositionInSpaceOf(ListView.Content).Y;
-			ListView.ScrollTo(y);
 			if (onAnimationFinished != null) {
 				onAnimationFinished();
 			}
