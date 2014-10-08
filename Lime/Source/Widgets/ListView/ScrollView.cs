@@ -71,11 +71,31 @@ namespace Lime
 			Content.Tasks.Add(MainTask());
 		}
 
-		protected float ProjectToScrollAxis(Vector2 vector)
+		public float ProjectToScrollAxis(Vector2 vector)
 		{
 			return (ScrollDirection == ScrollDirection.Horizontal) ? vector.X : vector.Y;
 		}
-		
+
+		public void SetProjectedPosition(Widget w, float position)
+		{
+			if (ScrollDirection == ScrollDirection.Vertical) {
+				w.Y = position;
+			}
+			else {
+				w.X = position;
+			}
+		}
+
+		public void SetProjectedSize(Widget w, float position)
+		{
+			if (ScrollDirection == ScrollDirection.Vertical) {
+				w.Height = position;
+			}
+			else {
+				w.Width = position;
+			}
+		}
+
 		public virtual void Dispose()
 		{
 			Content.Unlink();
@@ -93,13 +113,8 @@ namespace Lime
 
 		private void SetScrollingPosition(float value)
 		{
-			if (IsBeingRefreshed) {
-				return;
-			}
-			if (ScrollDirection == ScrollDirection.Vertical) {
-				Content.Y = -value;
-			} else {
-				Content.X = -value;
+			if (!IsBeingRefreshed) {
+				SetProjectedPosition(Content, -value);
 			}
 		}
 

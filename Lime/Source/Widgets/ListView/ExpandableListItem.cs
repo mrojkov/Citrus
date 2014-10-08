@@ -22,12 +22,14 @@ namespace Lime
 		{
 			Header = header;
 			ListView = listView;
-			Width = listView.Frame.Width;
-			Height = header.Height;
-			Anchors = Anchors.LeftRight;
+			Size = listView.Frame.Size;
+			ListView.SetProjectedSize(this, ProjectedSize(Header));
 			PinHeader = true;
 			Tasks.Add(AutoLayoutTask());
-			subContainer = new Frame() { Width = listView.Frame.Width, Anchors = Anchors.LeftRight };
+			subContainer = new Frame() {
+				Size = listView.Frame.Size,
+				Anchors = ListView.ScrollDirection == ScrollDirection.Vertical ? Anchors.LeftRight : Anchors.TopBottom,
+			};
 			AddNode(header);
 			AddNode(subContainer);
 			SetExpanded(false, animated: false);
@@ -50,8 +52,8 @@ namespace Lime
 		{
 			while (true) {
 				if (!IsAnimating) {
-					StackWidgetsVertically(subContainer);
-					StackWidgetsVertically(this);
+					StackWidgets(subContainer);
+					StackWidgets(this);
 					if (IsExpanded && PinHeader) {
 						DoPinHeader();
 					}
@@ -60,39 +62,56 @@ namespace Lime
 			}
 		}
 
-		protected static void StackWidgetsVertically(Widget container)
+		private void StackWidgets(Widget container)
 		{
-			float y = 0;
+			float pos = 0;
 			for (var node = container.Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
 				var widget = node.AsWidget;
 				if (widget != null && widget.Visible) {
-					widget.Y = y;
-					y += widget.Height;
+					ListView.SetProjectedPosition(widget, pos);
+					pos += ProjectedSize(widget);
 				}
 			}
-			container.Height = y;
+			ListView.SetProjectedSize(container, pos);
+		}
+
+		private float FramePos(Widget w)
+		{
+			return ListView.ProjectToScrollAxis(w.CalcPositionInSpaceOf(ListView.Frame));
+		}
+
+		private float ProjectedSize(Widget w)
+		{
+			return ListView.ProjectToScrollAxis(w.Size);
 		}
 
 		private void DoPinHeader()
 		{
-			float y = -Header.CalcPositionInSpaceOf(ListView.Frame).Y;
-			Header.Y = y.Clamp(0, subContainer.Height);
+			float p = -FramePos(Header);
+			ListView.SetProjectedPosition(Header, p.Clamp(0, ProjectedSize(subContainer)));
+		}
+
+		private IEnumerator<object> ResizeSubContainerTask(float from, float to, Action onStep)
+		{
+			subContainer.ClipChildren = ClipMethod.ScissorTest;
+			IsAnimating = true;
+			foreach (var t in TaskList.SinMotion(0.25f, from, to)) {
+				ListView.SetProjectedSize(subContainer, t);
+				StackWidgets(this);
+				onStep();
+				yield return 0;
+			}
+			IsAnimating = false;
+			subContainer.ClipChildren = ClipMethod.None;
 		}
 
 		private IEnumerator<object> ExpandAnimatedTask(Action onAnimationFinished)
 		{
 			subContainer.Visible = true;
-			subContainer.ClipChildren = ClipMethod.ScissorTest;
-			StackWidgetsVertically(subContainer);
-			IsAnimating = true;
-			foreach (var t in TaskList.SinMotion(0.25f, 0, subContainer.Height)) {
-				subContainer.Height = t;
-				StackWidgetsVertically(this);
-				ListView.ScrollPosition = ListView.PositionToViewFully(this);
-				yield return 0;
-			}
-			IsAnimating = false;
-			subContainer.ClipChildren = ClipMethod.None;
+			StackWidgets(subContainer);
+			yield return ResizeSubContainerTask(
+				0, ProjectedSize(subContainer),
+				() => ListView.ScrollPosition = ListView.PositionToViewFully(this));
 			IsExpanded = true;
 			if (onAnimationFinished != null) {
 				onAnimationFinished();
@@ -101,28 +120,18 @@ namespace Lime
 
 		private IEnumerator<object> CollapseAnimatedTask(Action onAnimationFinished)
 		{
-			subContainer.ClipChildren = ClipMethod.ScissorTest;
-			StackWidgetsVertically(subContainer);
-			IsAnimating = true;
-			var subContainerPos = subContainer.CalcPositionInSpaceOf(ListView.Frame);
-			var headerPos = Header.CalcPositionInSpaceOf(ListView.Frame);
-			var minHeight = (headerPos.Y + Header.Height - subContainerPos.Y).Max(0);
-			var bottomPadding = new Widget() { Height = minHeight };
+			StackWidgets(subContainer);
+			var minSize = (FramePos(Header) + ProjectedSize(Header) - FramePos(subContainer)).Max(0);
+			var bottomPadding = new Widget();
+			ListView.SetProjectedSize(bottomPadding, minSize);
 			ListView.Add(bottomPadding);
-			foreach (var t in TaskList.SinMotion(0.25f, subContainer.Height, minHeight)) {
-				subContainer.Height = t;
-				StackWidgetsVertically(this);
-				DoPinHeader();
-				yield return 0;
-			}
-			subContainer.Height = 0;
-			IsAnimating = false;
-			subContainer.ClipChildren = ClipMethod.None;
+			yield return ResizeSubContainerTask(ProjectedSize(subContainer), minSize, DoPinHeader);
+			ListView.SetProjectedSize(subContainer, 0);
 			subContainer.Visible = false;
 			IsExpanded = false;
 			ListView.Remove(bottomPadding);
-			StackWidgetsVertically(this);
-			ListView.ScrollPosition -= minHeight;
+			StackWidgets(this);
+			ListView.ScrollPosition -= minSize;
 			ListView.Frame.Update(0);
 			if (onAnimationFinished != null) {
 				onAnimationFinished();
@@ -139,9 +148,9 @@ namespace Lime
 		{
 			if (!animated) {
 				subContainer.Visible = value;
-				StackWidgetsVertically(subContainer);
-				StackWidgetsVertically(this);
-				DisposeContent();
+				StackWidgets(subContainer);
+				StackWidgets(this);
+				IsExpanded = value;
 			} else if (value) {
 				Tasks.Add(ExpandAnimatedTask(onAnimationFinished));
 			} else {
