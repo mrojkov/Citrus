@@ -11,8 +11,8 @@ namespace Lime
 	{
 		public readonly Widget Header;
 		public readonly ListView ListView;
-		public bool Expanded { get; private set; }
-		public bool Animating { get; private set; }
+		public bool IsExpanded { get; private set; }
+		public bool IsAnimating { get; private set; }
 		public bool PinHeader { get; set; }
 		public NodeList ContentItems { get { return subContainer.Nodes; } }
 
@@ -49,10 +49,10 @@ namespace Lime
 		private IEnumerator<object> AutoLayoutTask()
 		{
 			while (true) {
-				if (!Animating) {
+				if (!IsAnimating) {
 					StackWidgetsVertically(subContainer);
 					StackWidgetsVertically(this);
-					if (Expanded && PinHeader) {
+					if (IsExpanded && PinHeader) {
 						DoPinHeader();
 					}
 				}
@@ -84,15 +84,15 @@ namespace Lime
 			subContainer.Visible = true;
 			subContainer.ClipChildren = ClipMethod.ScissorTest;
 			StackWidgetsVertically(subContainer);
-			Animating = true;
+			IsAnimating = true;
 			foreach (var t in TaskList.SinMotion(0.25f, 0, subContainer.Height)) {
 				subContainer.Height = t;
 				StackWidgetsVertically(this);
 				yield return 0;
 			}
-			Animating = false;
+			IsAnimating = false;
 			subContainer.ClipChildren = ClipMethod.None;
-			Expanded = true;
+			IsExpanded = true;
 			float y = Header.CalcPositionInSpaceOf(ListView.Content).Y;
 			ListView.ScrollTo(y);
 			if (onAnimationFinished != null) {
@@ -104,7 +104,7 @@ namespace Lime
 		{
 			subContainer.ClipChildren = ClipMethod.ScissorTest;
 			StackWidgetsVertically(subContainer);
-			Animating = true;
+			IsAnimating = true;
 			var subContainerPos = subContainer.CalcPositionInSpaceOf(ListView.Frame);
 			var headerPos = Header.CalcPositionInSpaceOf(ListView.Frame);
 			var minHeight = (headerPos.Y + Header.Height - subContainerPos.Y).Max(0);
@@ -117,10 +117,10 @@ namespace Lime
 				yield return 0;
 			}
 			subContainer.Height = 0;
-			Animating = false;
+			IsAnimating = false;
 			subContainer.ClipChildren = ClipMethod.None;
 			subContainer.Visible = false;
-			Expanded = false;
+			IsExpanded = false;
 			ListView.Remove(bottomPadding);
 			StackWidgetsVertically(this);
 			ListView.ScrollPosition -= minHeight;
