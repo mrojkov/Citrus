@@ -81,6 +81,16 @@ namespace Lime
 			Content.Unlink();
 		}
 
+		/// <summary>
+		/// Include whole widget into frame. If the widget is too large, display top part.
+		/// </summary>
+		public float PositionToViewFully(Widget w)
+		{
+			var p = ProjectToScrollAxis(w.CalcPositionInSpaceOf(Content));
+			return Mathf.Clamp(
+				p + ProjectToScrollAxis(w.Size) - ProjectToScrollAxis(Frame.Size), ScrollPosition, p);
+		}
+
 		private void SetScrollingPosition(float value)
 		{
 			if (IsBeingRefreshed) {

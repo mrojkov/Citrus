@@ -88,6 +88,7 @@ namespace Lime
 			foreach (var t in TaskList.SinMotion(0.25f, 0, subContainer.Height)) {
 				subContainer.Height = t;
 				StackWidgetsVertically(this);
+				ListView.ScrollPosition = ListView.PositionToViewFully(this);
 				yield return 0;
 			}
 			IsAnimating = false;
