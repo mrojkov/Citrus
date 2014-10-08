@@ -102,6 +102,8 @@ namespace Lime
 				yield return 0;
 			}
 			IsAnimating = false;
+			IsExpanded = !IsExpanded;
+			subContainer.Visible = IsExpanded;
 			subContainer.ClipChildren = ClipMethod.None;
 		}
 
@@ -112,7 +114,6 @@ namespace Lime
 			yield return ResizeSubContainerTask(
 				0, ProjectedSize(subContainer),
 				() => ListView.ScrollPosition = ListView.PositionToViewFully(this));
-			IsExpanded = true;
 			if (onAnimationFinished != null) {
 				onAnimationFinished();
 			}
@@ -123,12 +124,10 @@ namespace Lime
 			StackWidgets(subContainer);
 			var minSize = (FramePos(Header) + ProjectedSize(Header) - FramePos(subContainer)).Max(0);
 			var bottomPadding = new Widget();
-			ListView.SetProjectedSize(bottomPadding, minSize);
+			//ListView.SetProjectedSize(bottomPadding, minSize);
 			ListView.Add(bottomPadding);
 			yield return ResizeSubContainerTask(ProjectedSize(subContainer), minSize, DoPinHeader);
 			ListView.SetProjectedSize(subContainer, 0);
-			subContainer.Visible = false;
-			IsExpanded = false;
 			ListView.Remove(bottomPadding);
 			StackWidgets(this);
 			ListView.ScrollPosition -= minSize;
