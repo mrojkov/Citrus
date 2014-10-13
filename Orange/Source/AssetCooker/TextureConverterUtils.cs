@@ -16,7 +16,10 @@ namespace Orange
 			public byte R, G, B, A;
 		}
 
-		public static void CopyAlphaToRGBChannels(Gdk.Pixbuf pixbuf)
+		/// <summary>
+		/// Fills RGB channels with 255, Alpha remains untouched
+		/// </summary>
+		public static void ConvertBitmapToAlphaMask(Gdk.Pixbuf pixbuf)
 		{
 			int stride = pixbuf.Rowstride;
 			if ((stride & 0x3) != 0 || !pixbuf.HasAlpha) {
@@ -29,7 +32,7 @@ namespace Orange
 				for (int i = 0; i < height; i++) {
 					for (int j = 0; j < width; j++) {
 						RGBA p = *pixels;
-						p.R = p.G = p.B = p.A;
+						p.R = p.G = p.B = 255;
 						*pixels++ = p;
 					}
 					pixels += stride / 4 - width;

@@ -519,7 +519,7 @@ namespace Orange
 				var needSeparateAlpha = platform == TargetPlatform.Android && 
 					rules.PVRFormat == PVRFormat.Compressed && firstItem.Pixbuf.HasAlpha;
 				if (needSeparateAlpha) {
-					TextureConverterUtils.CopyAlphaToRGBChannels(atlas);
+					TextureConverterUtils.ConvertBitmapToAlphaMask(atlas);
 					TextureConverter.Convert(atlas, tmpFile, rules, platform);
 					var atlasAlphaPath = GetAlphaTexturePath(atlasPath);
 					Console.WriteLine("+ " + atlasAlphaPath);
