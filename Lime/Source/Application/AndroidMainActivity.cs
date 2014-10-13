@@ -84,8 +84,8 @@ namespace Lime
 
 		protected override void OnResume()
 		{
-			Implementation.OnResume();
 			base.OnResume();
+			Implementation.OnResume();
 		}
 
 		public override void OnLowMemory()
