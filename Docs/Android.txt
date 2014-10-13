@@ -32,3 +32,8 @@ OpenAL для андроида скачивается с http://repo.or.cz/w/openal-soft/android.git
 2) Настроить путь к Android SDK в bfgLib/local.properties
 3) Сделать ant clean release (apache ant нужно предварительно установить)
 4) Заархивировать папку bin и res в BFGLib.zip и положить архив рядом с BFGLib.csproj
+
+КАК ПОСТАВИТЬ ADB-ДРАЙВЕР ДЛЯ KINDLE FIRE PHONE
+===============================================
+Дравера качаются отсюда, а не из Android SDK Manager:
+https://s3.amazonaws.com/android-sdk-manager/redist/Fire_Phone.zip
