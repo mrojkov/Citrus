@@ -71,6 +71,11 @@ namespace Lime
 			Content.Tasks.Add(MainTask());
 		}
 
+		public bool IsItemOnscreen(Widget item)
+		{
+			return Content.IsItemOnscreen(item);
+		}
+
 		public float ProjectToScrollAxis(Vector2 vector)
 		{
 			return (ScrollDirection == ScrollDirection.Horizontal) ? vector.X : vector.Y;
@@ -286,7 +291,7 @@ namespace Lime
 			private void AddToRenderChainDirect(RenderChain chain)
 			{
 				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
-					if (ItemInsideVisibleArea(node.AsWidget)) {
+					if (IsItemOnscreen(node.AsWidget)) {
 						node.AddToRenderChain(chain);
 					}
 				}
@@ -296,7 +301,7 @@ namespace Lime
 			{
 				for (int i = Nodes.Count - 1; i >= 0; i--) {
 					var item = Nodes[i].AsWidget;
-					if (ItemInsideVisibleArea(item)) {
+					if (IsItemOnscreen(item)) {
 						item.AddToRenderChain(chain);
 					}
 				}
@@ -307,7 +312,7 @@ namespace Lime
 				RaiseUpdating(delta);
 				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
 					var widget = node.AsWidget;
-					if (ItemInsideVisibleArea(widget)) {
+					if (IsItemOnscreen(widget)) {
 						widget.Update(delta);
 					} else {
 						widget.RaiseUpdating(delta);
@@ -317,7 +322,7 @@ namespace Lime
 				RaiseUpdated(delta);
 			}
 
-			private bool ItemInsideVisibleArea(Widget item)
+			public bool IsItemOnscreen(Widget item)
 			{
 				var frame = Parent.AsWidget;
 				if (ScrollDirection == ScrollDirection.Vertical) {
