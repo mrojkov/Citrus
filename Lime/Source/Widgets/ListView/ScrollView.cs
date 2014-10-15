@@ -32,7 +32,7 @@ namespace Lime
 		public float ScrollPosition
 		{
 			get { return ProjectToScrollAxis(-Content.Position); }
-			set { SetScrollingPosition(value); }
+			set { SetScrollPosition(value); }
 		}
 
 		public readonly float MinScrollPosition = 0;
@@ -112,7 +112,7 @@ namespace Lime
 				p + ProjectToScrollAxis(w.Size) - ProjectToScrollAxis(Frame.Size), ScrollPosition, p);
 		}
 
-		private void SetScrollingPosition(float value)
+		protected virtual void SetScrollPosition(float value)
 		{
 			if (!IsBeingRefreshed) {
 				SetProjectedPosition(Content, -value);
