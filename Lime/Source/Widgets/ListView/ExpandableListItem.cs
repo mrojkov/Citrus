@@ -139,7 +139,7 @@ namespace Lime
 
 		public void DisposeContent()
 		{
-			foreach (var w in subContainer.Nodes)
+			foreach (var w in subContainer.Nodes.ToList())
 				w.AsWidget.UnlinkAndDispose();
 		}
 
