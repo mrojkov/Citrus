@@ -26,13 +26,7 @@ namespace Lime
 		public float ContentLength
 		{ 
 			get { return ProjectToScrollAxis(Content.Size); }
-			set {
-				if (ScrollDirection == ScrollDirection.Vertical) {
-					Content.Height = value;
-				} else {
-					Content.Width = value;
-				}
-			}
+			set { SetProjectedSize(Content, value); }
 		}
 
 		public float ScrollPosition
@@ -238,25 +232,24 @@ namespace Lime
 
 		private IEnumerator<object> HandleDragTask(VelocityMeter velocityMeter, float mouseProjectedPosition)
 		{
-			if (CanScroll) {
-				IsDragging = true;
-				Frame.Input.CaptureMouse();
-				float realScrollPosition = ScrollPosition;
-				do {
-					if (IsItemDragInProgress()) {
-						break;
-					}
-					realScrollPosition += mouseProjectedPosition - ProjectToScrollAxis(Input.MousePosition);
-					// Round scrolling position to prevent blurring
-					ScrollPosition = ClampScrollPositionWithinBounceZone(realScrollPosition).Round(); 
-					mouseProjectedPosition = ProjectToScrollAxis(Input.MousePosition);
-					velocityMeter.AddSample(realScrollPosition);
-					yield return 0;
-				} while (Input.IsMousePressed());
-				Frame.Input.ReleaseMouse();
-				velocity = velocityMeter.CalcVelocity();
-				IsDragging = false;
-			}
+			if (!CanScroll)
+				yield break;
+			IsDragging = true;
+			Frame.Input.CaptureMouse();
+			float realScrollPosition = ScrollPosition;
+			do {
+				if (IsItemDragInProgress())
+					break;
+				realScrollPosition += mouseProjectedPosition - ProjectToScrollAxis(Input.MousePosition);
+				// Round scrolling position to prevent blurring
+				ScrollPosition = ClampScrollPositionWithinBounceZone(realScrollPosition).Round(); 
+				mouseProjectedPosition = ProjectToScrollAxis(Input.MousePosition);
+				velocityMeter.AddSample(realScrollPosition);
+				yield return 0;
+			} while (Input.IsMousePressed());
+			Frame.Input.ReleaseMouse();
+			velocity = velocityMeter.CalcVelocity();
+			IsDragging = false;
 		}
 
 		private float ClampScrollPositionWithinBounceZone(float scrollPosition)
