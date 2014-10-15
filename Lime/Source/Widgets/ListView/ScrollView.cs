@@ -112,6 +112,8 @@ namespace Lime
 		public float PositionToViewFully(Widget w)
 		{
 			var p = ProjectToScrollAxis(w.CalcPositionInSpaceOf(Content));
+			if (p < ScrollPosition)
+				return p;
 			return Mathf.Clamp(
 				p + ProjectToScrollAxis(w.Size) - ProjectToScrollAxis(Frame.Size), ScrollPosition, p);
 		}
