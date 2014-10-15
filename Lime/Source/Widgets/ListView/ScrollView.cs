@@ -21,7 +21,7 @@ namespace Lime
 		public bool RejectOrtogonalSwipes { get; set; }
 		public float BounceZoneThickness = 100;
 		public ScrollDirection ScrollDirection { get; private set; }
-		protected bool IsDragging { get; private set; }
+		protected virtual bool IsDragging { get; set; }
 		
 		public float ContentLength
 		{ 
