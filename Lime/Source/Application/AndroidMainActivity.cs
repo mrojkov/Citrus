@@ -53,6 +53,11 @@ namespace Lime
 			}
 		}
 
+		public void OnDestroy()
+		{
+			Lime.Application.Instance.OnTerminate();
+		}
+
 		public void OnLowMemory()
 		{
 			Logger.Write("Memory warning, texture memory: {0}mb", CommonTexture.TotalMemoryUsedMb);

@@ -290,6 +290,8 @@ namespace Lime
 
 		public event Action Activated;
 		public event Action Deactivated;
+		public event Action Created;
+		public event Action Terminating;
 
 		public virtual void OnActivate()
 		{
@@ -305,8 +307,20 @@ namespace Lime
 			}
 		}
 
-		public virtual void OnCreate() {}
-		public virtual void OnTerminate() {}
+		public virtual void OnCreate() 
+		{
+			if (Created != null) {
+				Created();
+			}
+		}
+
+		public virtual void OnTerminate() 
+		{
+			if (Terminating != null) {
+				Terminating();
+			}
+		}
+
 		public virtual void OnUpdateFrame(float delta) {}
 		public virtual void OnRenderFrame() {}
 
