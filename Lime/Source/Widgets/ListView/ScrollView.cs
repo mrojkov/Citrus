@@ -238,11 +238,14 @@ namespace Lime
 			Frame.Input.CaptureMouse();
 			float realScrollPosition = ScrollPosition;
 			do {
-				if (IsItemDragInProgress())
-					break;
+				if (IsItemDragInProgress()) {
+					Frame.Input.ReleaseMouse();
+					IsDragging = false;
+					yield break;
+				}
 				realScrollPosition += mouseProjectedPosition - ProjectToScrollAxis(Input.MousePosition);
 				// Round scrolling position to prevent blurring
-				ScrollPosition = ClampScrollPositionWithinBounceZone(realScrollPosition).Round(); 
+				ScrollPosition = ClampScrollPositionWithinBounceZone(realScrollPosition).Round();
 				mouseProjectedPosition = ProjectToScrollAxis(Input.MousePosition);
 				velocityMeter.AddSample(realScrollPosition);
 				yield return 0;
