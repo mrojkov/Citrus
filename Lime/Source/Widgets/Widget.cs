@@ -465,7 +465,7 @@ namespace Lime
 			get { return Find<Widget>(id); }
 		}
 
-		public Widget this[string format, object arg]
+		public Widget this[string format, params object[] arg]
 		{
 			get { return Find<Widget>(string.Format(format, arg)); }
 		}
