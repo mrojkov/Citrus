@@ -126,6 +126,8 @@ namespace Lime
 				|| AssetsBundle.CurrentLanguage == "JP"
 			) {
 				return result;
+			} else if (AssetsBundle.CurrentLanguage == "BR") {
+				return result.Replace(',', '.'); // заменяем запятые на точки
 			} else {
 				return result.Replace(',', (char)160); // заменяем запятые на неразрывные пробелы
 			}
