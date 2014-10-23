@@ -45,7 +45,7 @@ namespace Lime
 		private float velocity;
 		private Task interialScrollingTask;
 
-		public ScrollView(Frame frame, ScrollDirection scrollDirection = ScrollDirection.Vertical)
+		public ScrollView(Frame frame, ScrollDirection scrollDirection = ScrollDirection.Vertical, bool processChildrenFirst = false)
 		{
 			this.ScrollDirection = scrollDirection;
 			RejectOrtogonalSwipes = true;
@@ -62,7 +62,11 @@ namespace Lime
 			}
 			Content.Anchors = (ScrollDirection == ScrollDirection.Vertical) ? Anchors.LeftRight : Anchors.TopBottom;
 			Content.PushToNode(Frame);
-			Content.Tasks.Add(MainTask());
+			if (processChildrenFirst) {
+				Content.LateTasks.Add(MainTask());
+			} else {
+				Content.Tasks.Add(MainTask());
+			}
 		}
 
 		public bool IsItemOnscreen(Widget item)
