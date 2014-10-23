@@ -18,8 +18,8 @@ namespace Lime
 			set { SetSlider(value); }
 		}
 
-		public ScrollViewWithSlider(Frame frame, ScrollDirection scrollDirection = ScrollDirection.Vertical)
-			: base(frame, scrollDirection)
+		public ScrollViewWithSlider(Frame frame, ScrollDirection scrollDirection = ScrollDirection.Vertical, bool processChildrenFirst = false)
+			: base(frame, scrollDirection, processChildrenFirst)
 		{
 			Content.LateTasks.Add(ShowSliderWhenScrollingTask());
 			Content.LateTasks.Add(AdjustSliderTask());

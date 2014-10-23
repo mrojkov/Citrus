@@ -10,8 +10,8 @@ namespace Lime
 		public float ScrollToItemVelocity = 800;
 		public bool ManualItemsPositioning;
 
-		public ListView(Frame frame, ScrollDirection scrollDirection = ScrollDirection.Vertical)
-			: base(frame, scrollDirection)
+		public ListView(Frame frame, ScrollDirection scrollDirection = ScrollDirection.Vertical, bool processChildrenFirst = false)
+			: base(frame, scrollDirection, processChildrenFirst)
 		{
 			Content.ReverseOrderRendering = true;
 			Content.Tasks.Add(RefreshLayoutTask());
