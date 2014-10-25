@@ -85,7 +85,7 @@ namespace Lime
 		[ProtoMember(12)]
 		public bool PropagateAnimation { get; set; }
 
-		public string CurrentAnimation { get; private set; }
+		public string CurrentAnimation { get; set; }
 
 		public float AnimationSpeed { get; set; }
 
