@@ -188,15 +188,15 @@ namespace Lime
 
 		private void DoIntertialScrolling(float delta)
 		{
-			const float minVelocity = 10;
 			if (ScrollPosition < MinScrollPosition) {
 				BounceFromTop(delta);
 			} else if (ScrollPosition > MaxScrollPosition) {
 				BounceFromBottom(delta);
 			} else {
 				float damping = velocity * 2.0f;
+				var prevVelocity = velocity;
 				velocity -= damping * delta;
-				if (velocity.Abs() < minVelocity) {
+				if (velocity.Sign() != prevVelocity.Sign()) {
 					velocity = 0;
 				}
 				AdvanceScrollPosition(delta);
