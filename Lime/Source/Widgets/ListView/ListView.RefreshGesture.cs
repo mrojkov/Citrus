@@ -50,7 +50,6 @@ namespace Lime
 					while (listView.ScrollPosition < threshold) {
 						if (!listView.Frame.Input.IsMousePressed()) {
 							arrow.Visible = false;
-							listView.StopScrolling();
 							yield return RefreshTask();
 							break;
 						}
@@ -73,6 +72,7 @@ namespace Lime
 					}
 				} finally {
 					listView.IsBeingRefreshed = false;
+					listView.StopScrolling();
 				}
 			}
 		}
