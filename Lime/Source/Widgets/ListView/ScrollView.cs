@@ -221,7 +221,7 @@ namespace Lime
 			} else {
 				velocity = (-ScrollPosition * 10).Clamp(300, 5000);
 				AdvanceScrollPosition(delta);
-				if (ScrollPosition >= 0) {
+				if (ScrollPosition > -float.Epsilon) {
 					ScrollPosition = 0;
 					velocity = 0;
 				}
