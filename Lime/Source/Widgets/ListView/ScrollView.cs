@@ -74,6 +74,11 @@ namespace Lime
 			return Content.IsItemOnscreen(item);
 		}
 
+		public bool IsItemFullyOnscreen(Widget item)
+		{
+			return Content.IsItemFullyOnscreen(item);
+		}
+
 		public float ProjectToScrollAxis(Vector2 vector)
 		{
 			return (ScrollDirection == ScrollDirection.Horizontal) ? vector.X : vector.Y;
@@ -335,6 +340,20 @@ namespace Lime
 					var x0 = item.X + X;
 					var x1 = x0 + item.Width;
 					return x1 >= 0 && x0 < frame.Width;
+				}
+			}
+
+			public bool IsItemFullyOnscreen(Widget item)
+			{
+				var frame = Parent.AsWidget;
+				if (ScrollDirection == ScrollDirection.Vertical) {
+					var y0 = item.Y + Y;
+					var y1 = y0 + item.Height;
+					return y0 >= 0 && y1 < frame.Height;
+				} else {
+					var x0 = item.X + X;
+					var x1 = x0 + item.Width;
+					return x0 >= 0 && x1 < frame.Width;
 				}
 			}
 		}
