@@ -230,7 +230,9 @@ namespace Lime
 			return size;
 		}
 
-		public static void DrawTextLine(Font font, Vector2 position, string text, Color4 color, float fontHeight, int start, int length, SpriteList list = null)
+		public static void DrawTextLine(
+			Font font, Vector2 position, string text, Color4 color, float fontHeight, int start, int length, SpriteList list = null,
+			Action<int, Vector2, Vector2> onDrawChar = null)
 		{
 			FontChar prevChar = null;
 			float savedX = position.X;
@@ -258,6 +260,9 @@ namespace Lime
 				position.X += scale * (fontChar.ACWidths.X + kerning);
 				var texture = font.Textures[fontChar.TextureIndex];
 				var size = new Vector2(scale * fontChar.Width, fontHeight);
+				if (onDrawChar != null) {
+					onDrawChar(i, position, size);
+				}
 				if (list == null) {
 					DrawSprite(texture, color, position, size, fontChar.UV0, fontChar.UV1);
 				} else {
@@ -273,6 +278,9 @@ namespace Lime
 				}
 				position.X += scale * (fontChar.Width + fontChar.ACWidths.Y);
 				prevChar = fontChar;
+			}
+			if (onDrawChar != null) {
+				onDrawChar(length, position, Vector2.Down * fontHeight);
 			}
 		}
 
