@@ -58,6 +58,7 @@
     <Compile Include="Source\Application\RenderingApi.cs" />
     <Compile Include="Source\Application\WinApi.cs" />
     <Compile Include="Source\AssetsBundle\UnityAssetsBundle.cs" />
+    <Compile Include="Source\Widgets\Editor.cs" />
     <Compile Include="Source\Graphics\OpenGL\RenderBatch.cs" />
     <Compile Include="Source\Graphics\OpenGL\RenderList.cs" />
     <Compile Include="Source\Graphics\OpenGL\IndexBuffer.cs" />
