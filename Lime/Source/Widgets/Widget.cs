@@ -605,7 +605,6 @@ namespace Lime
 			Animator<Vector2> posAnimator, sizeAnimator;
 			if (Animators.TryFind("Position", out posAnimator)) {
 				var geometryProperties = new string[] { "Position", "Size", "Pivot", "Rotation", "Scale" };
-				var geometryAnimators = Animators.Where(a => geometryProperties.Contains(a.TargetProperty)).ToList();
 				var savedPivot = pivot;
 				var savedRotation = rotation;
 				var savedScale = scale;

@@ -126,11 +126,6 @@ namespace Lime
 				set { isVisible = value; }
 			}
 
-			private static bool IsVectorAbsLess(Vector2 a, Vector2 b)
-			{
-				return Mathf.Abs(a.X) < b.X && Mathf.Abs(a.Y) < b.Y;
-			}
-
 			public void Sync(int index, Vector2 charPos, Vector2 size)
 			{
 				switch (Valid) {
