@@ -72,7 +72,8 @@ namespace Lime
 
 	public interface IEditorParams
 	{
-		float KeyPressInterval { get; set; }
+		float KeyRepeatDelay { get; set; }
+		float KeyRepeatInterval { get; set; }
 		int MaxLength { get; set; }
 		int MaxLines { get; set; }
 
@@ -82,13 +83,15 @@ namespace Lime
 
 	public class EditorParams : IEditorParams
 	{
-		public float KeyPressInterval { get; set; }
+		public float KeyRepeatDelay { get; set; }
+		public float KeyRepeatInterval { get; set; }
 		public int MaxLength { get; set; }
 		public int MaxLines { get; set; }
 
 		public EditorParams()
 		{
-			KeyPressInterval = 0.05f;
+			KeyRepeatDelay = 0.5f;
+			KeyRepeatInterval = 0.05f;
 		}
 
 		public bool IsAcceptableLength(int length) { return MaxLength <= 0 || length <= MaxLength; }
@@ -140,9 +143,12 @@ namespace Lime
 			if (!container.Input.IsKeyPressed(key) || keyPressed != 0)
 				return false;
 			keyPressed = key;
-			if (key == prevKeyPressed && cursorKeyDownTime < editorParams.KeyPressInterval)
+			if (key != prevKeyPressed)
+				cursorKeyDownTime = editorParams.KeyRepeatDelay;
+			else if (cursorKeyDownTime <= 0)
+				cursorKeyDownTime = editorParams.KeyRepeatInterval;
+			else
 				return false;
-			cursorKeyDownTime = 0;
 			return true;
 		}
 
@@ -159,7 +165,7 @@ namespace Lime
 
 		private void HandleCursorKeys()
 		{
-			cursorKeyDownTime += container.Tasks.Delta;
+			cursorKeyDownTime -= container.Tasks.Delta;
 			keyPressed = 0;
 			if (CheckCursorKey(Key.Left))
 				caretPos.TextPos--;
