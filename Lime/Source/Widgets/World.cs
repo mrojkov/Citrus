@@ -6,7 +6,7 @@
 		/// Widget which holds text input focus. Before processing Input.TextInput string you should test whether ActiveTextWidget == this.
 		/// For revoking text input focus from widget you should nullify ActiveTextWidget.
 		/// </summary>
-		public TextBox ActiveTextWidget;
+		public IKeyboardInputProcessor ActiveTextWidget;
 		/// <summary>
 		/// On each update cycle active text widget must set this flag true.
 		/// </summary>
@@ -14,7 +14,7 @@
 
 		public static World Instance = new World();
 
-		private TextBox prevActiveTextWidget;
+		private IKeyboardInputProcessor prevActiveTextWidget;
 
 		protected override void SelfUpdate(float delta)
 		{

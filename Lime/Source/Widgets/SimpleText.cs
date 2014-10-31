@@ -5,7 +5,7 @@ using ProtoBuf;
 namespace Lime
 {
 	[ProtoContract]
-	public sealed class SimpleText : Widget, IText
+	public sealed class SimpleText : Widget, IText, IKeyboardInputProcessor
 	{
 		private SpriteList spriteList;
 		private SerializableFont font;

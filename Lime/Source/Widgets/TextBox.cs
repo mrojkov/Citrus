@@ -6,8 +6,10 @@ using ProtoBuf;
 
 namespace Lime
 {
+	public interface IKeyboardInputProcessor {}
+
 	[ProtoContract]
-	public class TextBox : Widget
+	public class TextBox : Widget, IKeyboardInputProcessor
 	{
 		private string text;
 		private float caretBlinkPhase;
