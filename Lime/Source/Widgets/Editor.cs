@@ -58,7 +58,7 @@ namespace Lime
 					blinkOn = !blinkOn;
 					time = 0f;
 				}
-				var newPos = caretPos.GetWorldPosition();
+				var newPos = caretPos.WorldPos;
 				if (!w.Position.Equals(newPos)) {
 					w.Position = newPos;
 					blinkOn = true;

@@ -67,23 +67,105 @@ namespace Lime
 			set { textColor = value; }
 		}
 
-		public class CaretPosition: ICaretPosition
+		private class CaretPosition: ICaretPosition
 		{
+			public enum ValidState { None, All, LinePos, WorldPos, TextPos };
+			public ValidState Valid;
+			public int RenderingLineNumber;
+			public int RenderingTextPos;
+
 			private int line;
 			private int pos;
-			public Vector2 WorldPosition = Vector2.Zero;
-			public bool IsWorldPositionValid = false;
+			private int textPos;
+			private Vector2 worldPos;
+			private bool isVisible;
 
-			public int Line { get { return line; } set { IsWorldPositionValid &= line == value; line = value; } }
-			public int Pos { get { return pos; } set { IsWorldPositionValid &= pos == value; pos = value; } }
-			public bool IsVisible { get; set; }
-			public Vector2 GetWorldPosition()
+			public int Line {
+				get { return line; }
+				set {
+					if (line == value) return;
+					Valid = ValidState.LinePos;
+					line = value;
+				}
+			}
+
+			public int Pos {
+				get { return pos; }
+				set {
+					if (pos == value) return;
+					Valid = ValidState.LinePos;
+					pos = value;
+				}
+			}
+
+			public int TextPos
 			{
-				return WorldPosition;
+				get { return textPos; }
+				set
+				{
+					if (textPos == value) return;
+					Valid = ValidState.TextPos;
+					textPos = value;
+				}
+			}
+
+			public Vector2 WorldPos
+			{
+				get { return worldPos; }
+				set
+				{
+					if (worldPos.Equals(value)) return;
+					Valid = ValidState.WorldPos;
+					worldPos = value;
+				}
+			}
+
+			public bool IsVisible {
+				get { return isVisible && Valid != ValidState.None; }
+				set { isVisible = value; }
+			}
+
+			private static bool IsVectorAbsLess(Vector2 a, Vector2 b)
+			{
+				return Mathf.Abs(a.X) < b.X && Mathf.Abs(a.Y) < b.Y;
+			}
+
+			public void Sync(int index, Vector2 charPos, Vector2 size)
+			{
+				switch (Valid) {
+					case ValidState.None:
+					case ValidState.All:
+						break;
+					case ValidState.LinePos:
+						if (Line == RenderingLineNumber && Pos == index) {
+							TextPos = RenderingTextPos;
+							WorldPos = charPos;
+							Valid = CaretPosition.ValidState.All;
+						}
+						break;
+					case CaretPosition.ValidState.TextPos:
+						if (TextPos == RenderingTextPos) {
+							Line = RenderingLineNumber;
+							Pos = index;
+							WorldPos = charPos;
+							Valid = CaretPosition.ValidState.All;
+						}
+						break;
+					case CaretPosition.ValidState.WorldPos:
+						if (IsVectorAbsLess(WorldPos - charPos, size)) {
+							Line = RenderingLineNumber;
+							Pos = index;
+							TextPos = RenderingTextPos;
+							Valid = CaretPosition.ValidState.All;
+						}
+						break;
+				}
+				++RenderingTextPos;
 			}
 		}
 
-		public CaretPosition Caret = new CaretPosition();
+		private CaretPosition caret = new CaretPosition();
+		public ICaretPosition Caret { get { return caret; } }
 
 		public SimpleText()
 		{
@@ -106,7 +188,7 @@ namespace Lime
 
 		public override void Render()
 		{
-			if (!Caret.IsWorldPositionValid)
+			if (caret.Valid != CaretPosition.ValidState.All)
 				spriteList = null;
 			if (spriteList == null) {
 				if (OverflowMode == TextOverflowMode.Minify) {
@@ -170,18 +252,18 @@ namespace Lime
 			}
 			var lines = SplitText(localizedText);
 			var pos = Vector2.Down * CalcVerticalTextPosition(lines);
-			var lineNumber = 0;
+			caret.RenderingLineNumber = 0;
+			caret.RenderingTextPos = 0;
 			bool firstLine = true;
-			Caret.Line = Caret.Line.Clamp(0, lines.Count - 1);
+			if (caret.Valid == CaretPosition.ValidState.TextPos)
+				Caret.TextPos = Caret.TextPos.Clamp(0, text.Length);
+			if (caret.Valid == CaretPosition.ValidState.LinePos)
+				Caret.Line = Caret.Line.Clamp(0, lines.Count - 1);
 			foreach (var line in lines) {
-				if (Caret.Line == lineNumber) {
-					Caret.WorldPosition.Y = pos.Y;
-					Caret.Pos = Caret.Pos.Clamp(0, line.Length);
-				}
 				Rectangle lineRect;
-				RenderSingleTextLine(spriteList, out lineRect, pos, line, lineNumber);
+				RenderSingleTextLine(spriteList, out lineRect, pos, line);
 				pos.Y += Spacing + FontHeight;
-				++lineNumber;
+				++caret.RenderingLineNumber;
 				if (firstLine) {
 					rect = lineRect;
 					firstLine = false;
@@ -189,7 +271,7 @@ namespace Lime
 					rect = Rectangle.Bounds(rect, lineRect);
 				}
 			}
-			Caret.IsWorldPositionValid = true;
+			caret.Valid = CaretPosition.ValidState.All;
 		}
 
 		private float CalcVerticalTextPosition(List<string> lines)
@@ -209,14 +291,8 @@ namespace Lime
 			return totalHeight;
 		}
 
-		private void OnDrawChar(int index, Vector2 charPos, Vector2 size)
-		{
-			if (Caret.Pos == index)
-				Caret.WorldPosition.X = charPos.X;
-		}
-
 		private void RenderSingleTextLine(
-			SpriteList spriteList, out Rectangle extent, Vector2 pos, string line, int lineNumber)
+			SpriteList spriteList, out Rectangle extent, Vector2 pos, string line)
 		{
 			float lineWidth = MeasureTextLine(line).X;
 			switch (HAlignment) {
@@ -227,12 +303,12 @@ namespace Lime
 					pos.X = (Size.X - lineWidth) * 0.5f;
 					break;
 			}
-			Action<int, Vector2, Vector2> onDrawChar = null;
-			if (Caret.Line == lineNumber)
-				onDrawChar = OnDrawChar;
+			if (caret.Valid == CaretPosition.ValidState.LinePos && caret.Line == caret.RenderingLineNumber) {
+				Caret.Pos = Caret.Pos.Clamp(0, line.Length);
+			}
 			if (spriteList != null) {
 				Renderer.DrawTextLine(
-					Font.Instance, pos, line, Color4.White, FontHeight, 0, line.Length, spriteList, onDrawChar);
+					Font.Instance, pos, line, Color4.White, FontHeight, 0, line.Length, spriteList, caret.Sync);
 			}
 			extent = new Rectangle(pos.X, pos.Y, pos.X + lineWidth, pos.Y + FontHeight);
 		}

@@ -42,8 +42,9 @@ namespace Lime
 	{
 		int Line { get; set; }
 		int Pos { get; set; }
+		int TextPos { get; set; }
+		Vector2 WorldPos { get; set; }
 		bool IsVisible { get; set; }
-		Vector2 GetWorldPosition();
 	}
 
 	public interface IText
