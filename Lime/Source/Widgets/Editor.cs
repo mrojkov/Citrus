@@ -110,7 +110,7 @@ namespace Lime
 		{
 			var world = World.Instance;
 			while (true) {
-				if (Input.WasMouseReleased() && container.IsMouseOver()) {
+				if (container.Input.WasMouseReleased() && container.IsMouseOver()) {
 					world.ActiveTextWidget = textInputProcessor;
 					world.IsActiveTextWidgetUpdated = true;
 				}
@@ -127,7 +127,7 @@ namespace Lime
 
 		private bool CheckCursorKey(Key key)
 		{
-			if (!Input.IsKeyPressed(key) || keyPressed != 0)
+			if (!container.Input.IsKeyPressed(key) || keyPressed != 0)
 				return false;
 			keyPressed = key;
 			if (key == prevKeyPressed && cursorKeyDownTime < editorParams.KeyPressInterval)
@@ -180,11 +180,19 @@ namespace Lime
 
 		private void HandleTextInput()
 		{
-			if (Input.TextInput == null)
+			if (container.Input.TextInput == null)
 				return;
 			foreach (var ch in Input.TextInput) {
 				if (ch >= ' ')
 					InsertChar(ch);
+			}
+		}
+
+		private void HandleMouse()
+		{
+			if (container.WasClicked()) {
+				caretPos.WorldPos =
+					container.LocalToWorldTransform.CalcInversed().TransformVector(container.Input.MousePosition);
 			}
 		}
 
@@ -194,6 +202,7 @@ namespace Lime
 				if (IsActive()) {
 					HandleCursorKeys();
 					HandleTextInput();
+					HandleMouse();
 				}
 				yield return 0;
 			}

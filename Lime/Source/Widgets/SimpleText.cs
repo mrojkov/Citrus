@@ -140,23 +140,24 @@ namespace Lime
 						if (Line == RenderingLineNumber && Pos == index) {
 							TextPos = RenderingTextPos;
 							WorldPos = charPos;
-							Valid = CaretPosition.ValidState.All;
+							Valid = ValidState.All;
 						}
 						break;
-					case CaretPosition.ValidState.TextPos:
+					case ValidState.TextPos:
 						if (TextPos == RenderingTextPos) {
 							Line = RenderingLineNumber;
 							Pos = index;
 							WorldPos = charPos;
-							Valid = CaretPosition.ValidState.All;
+							Valid = ValidState.All;
 						}
 						break;
-					case CaretPosition.ValidState.WorldPos:
+					case ValidState.WorldPos:
 						if (IsVectorAbsLess(WorldPos - charPos, size)) {
 							Line = RenderingLineNumber;
 							Pos = index;
 							TextPos = RenderingTextPos;
-							Valid = CaretPosition.ValidState.All;
+							WorldPos = charPos;
+							Valid = ValidState.All;
 						}
 						break;
 				}
