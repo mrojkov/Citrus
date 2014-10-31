@@ -22,6 +22,16 @@ namespace Lime
 		}
 	}
 
+	public class VertiсalLineCaret : Polyline
+	{
+		public VertiсalLineCaret(SimpleText text) : base(2.0f)
+		{
+			Points.Add(Vector2.Zero);
+			Points.Add(Vector2.Down * text.FontHeight);
+			Color = text.Color;
+		}
+	}
+
 	public class CaretDisplay
 	{
 		private Widget container;
