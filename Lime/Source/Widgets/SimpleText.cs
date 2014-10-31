@@ -73,6 +73,7 @@ namespace Lime
 			public ValidState Valid;
 			public int RenderingLineNumber;
 			public int RenderingTextPos;
+			public Vector2 NearestCharPos;
 
 			private int line;
 			private int pos;
@@ -152,12 +153,12 @@ namespace Lime
 						}
 						break;
 					case ValidState.WorldPos:
-						if (IsVectorAbsLess(WorldPos - charPos, size)) {
+						if ((WorldPos - charPos).SqrLength < (WorldPos - NearestCharPos).SqrLength) {
 							Line = RenderingLineNumber;
 							Pos = index;
 							TextPos = RenderingTextPos;
-							WorldPos = charPos;
-							Valid = ValidState.All;
+							NearestCharPos = charPos;
+							Valid = ValidState.WorldPos;
 						}
 						break;
 				}
@@ -249,12 +250,15 @@ namespace Lime
 			rect = Rectangle.Empty;
 			var localizedText = LocalizationHandler != null ? LocalizationHandler(Text) : Localization.GetString(Text);
 			if (string.IsNullOrEmpty(localizedText)) {
+				caret.Line = caret.Pos = caret.TextPos = 0;
+				caret.WorldPos = Vector2.Zero;
 				return;
 			}
 			var lines = SplitText(localizedText);
 			var pos = Vector2.Down * CalcVerticalTextPosition(lines);
 			caret.RenderingLineNumber = 0;
 			caret.RenderingTextPos = 0;
+			caret.NearestCharPos = Vector2.Zero;
 			bool firstLine = true;
 			if (caret.Valid == CaretPosition.ValidState.TextPos)
 				Caret.TextPos = Caret.TextPos.Clamp(0, text.Length);
@@ -271,6 +275,9 @@ namespace Lime
 				} else {
 					rect = Rectangle.Bounds(rect, lineRect);
 				}
+			}
+			if (caret.Valid == CaretPosition.ValidState.WorldPos) {
+				caret.WorldPos = caret.NearestCharPos;
 			}
 			caret.Valid = CaretPosition.ValidState.All;
 		}
