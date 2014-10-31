@@ -104,6 +104,8 @@ namespace Lime
 			container.Tasks.Add(HandleKeyboardTask());
 		}
 
+		private bool IsActive() { return World.Instance.ActiveTextWidget == textInputProcessor; }
+
 		private IEnumerator<object> FocusTask()
 		{
 			var world = World.Instance;
@@ -112,36 +114,88 @@ namespace Lime
 					world.ActiveTextWidget = textInputProcessor;
 					world.IsActiveTextWidgetUpdated = true;
 				}
-				caretPos.IsVisible = world.ActiveTextWidget == textInputProcessor;
-				if (caretPos.IsVisible)
+				caretPos.IsVisible = IsActive();
+				if (IsActive())
 					world.IsActiveTextWidgetUpdated = true;
 				yield return 0;
 			}
 		}
 
+		private float cursorKeyDownTime;
+		private Key prevKeyPressed = 0;
+		private Key keyPressed;
+
+		private bool CheckCursorKey(Key key)
+		{
+			if (!Input.IsKeyPressed(key) || keyPressed != 0)
+				return false;
+			keyPressed = key;
+			if (key == prevKeyPressed && cursorKeyDownTime < editorParams.KeyPressInterval)
+				return false;
+			cursorKeyDownTime = 0;
+			return true;
+		}
+
+		private void InsertChar(char ch)
+		{
+			if (caretPos.TextPos >= 0 && caretPos.TextPos <= text.Text.Length) {
+				text.Text = text.Text.Insert(caretPos.TextPos, ch.ToString());
+				caretPos.TextPos++;
+			}
+		}
+
 		private void HandleCursorKeys()
 		{
-			if (Input.IsKeyPressed(Key.Left))
-				caretPos.Pos--;
-			if (Input.IsKeyPressed(Key.Right))
-				caretPos.Pos++;
-			if (Input.IsKeyPressed(Key.Up))
+			cursorKeyDownTime += container.Tasks.Delta;
+			keyPressed = 0;
+			if (CheckCursorKey(Key.Left))
+				caretPos.TextPos--;
+			if (CheckCursorKey(Key.Right))
+				caretPos.TextPos++;
+			if (CheckCursorKey(Key.Up))
 				caretPos.Line--;
-			if (Input.IsKeyPressed(Key.Down))
+			if (CheckCursorKey(Key.Down))
 				caretPos.Line++;
+			if (CheckCursorKey(Key.Home))
+				caretPos.Pos = 0;
+			if (CheckCursorKey(Key.End))
+				caretPos.Pos = int.MaxValue;
+			if (CheckCursorKey(Key.BackSpace)) {
+				if (caretPos.TextPos > 0) {
+					caretPos.TextPos--;
+					text.Text = text.Text.Remove(caretPos.TextPos, 1);
+				}
+			}
+			if (CheckCursorKey(Key.Delete)) {
+				if (caretPos.TextPos >= 0 && caretPos.TextPos < text.Text.Length) {
+					text.Text = text.Text.Remove(caretPos.TextPos, 1);
+					caretPos.TextPos--;
+					caretPos.TextPos++; // Enforce revalidation.
+				}
+			}
+			if (CheckCursorKey(Key.Enter))
+				InsertChar('\n');
+			prevKeyPressed = keyPressed;
+		}
+
+		private void HandleTextInput()
+		{
+			if (Input.TextInput == null)
+				return;
+			foreach (var ch in Input.TextInput) {
+				if (ch >= ' ')
+					InsertChar(ch);
+			}
 		}
 
 		private IEnumerator<object> HandleKeyboardTask()
 		{
-			var world = World.Instance;
 			while (true) {
-				if (caretPos.IsVisible) {
+				if (IsActive()) {
 					HandleCursorKeys();
-					yield return editorParams.KeyPressInterval;
+					HandleTextInput();
 				}
-				else {
-					yield return 0;
-				}
+				yield return 0;
 			}
 		}
 	}
