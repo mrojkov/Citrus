@@ -26,7 +26,7 @@ namespace Lime
 
 		[ProtoMember(2)]
 		public override string Text {
-			get { return text; }
+			get { return text ?? ""; }
 			set { SetText(value); }
 		}
 
