@@ -5,26 +5,56 @@ using System.Text;
 
 namespace Lime
 {
+	public interface ICaretParams
+	{
+		Widget CaretWidget { get; set; }
+		float BlinkInterval { get; set; }
+	}
+
+	public class CaretParams : ICaretParams
+	{
+		public Widget CaretWidget { get; set; }
+		public float BlinkInterval { get; set; }
+
+		public CaretParams()
+		{
+			BlinkInterval = 0.5f;
+		}
+	}
+
 	public class CaretDisplay
 	{
 		private Widget container;
 		private ICaretPosition caretPos;
-		private Widget caretWidget;
+		private ICaretParams caretParams;
 
-		public CaretDisplay(Widget container, ICaretPosition caretPos, Widget caretWidget)
+		public CaretDisplay(Widget container, ICaretPosition caretPos, ICaretParams caretParams)
 		{
 			this.container = container;
 			this.caretPos = caretPos;
-			this.caretWidget = caretWidget;
-			container.AddNode(caretWidget);
+			this.caretParams = caretParams;
+			container.AddNode(caretParams.CaretWidget);
 			container.Tasks.Add(CaretDisplayTask());
 		}
 
 		private IEnumerator<object> CaretDisplayTask()
 		{
+			var w = caretParams.CaretWidget;
+			var time = 0f;
+			bool blinkOn = true;
 			while (true) {
-				caretWidget.Position = caretPos.GetWorldPosition();
-				caretWidget.Visible = caretPos.IsVisible;
+				time += container.Tasks.Delta;
+				if (time > caretParams.BlinkInterval && caretParams.BlinkInterval > 0f) {
+					blinkOn = !blinkOn;
+					time = 0f;
+				}
+				var newPos = caretPos.GetWorldPosition();
+				if (!w.Position.Equals(newPos)) {
+					w.Position = newPos;
+					blinkOn = true;
+					time = 0f;
+				}
+				w.Visible = caretPos.IsVisible && blinkOn;
 				yield return 0;
 			}
 		}
