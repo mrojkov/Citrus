@@ -6,7 +6,11 @@ using ProtoBuf;
 
 namespace Lime
 {
-	public interface IKeyboardInputProcessor {}
+	public interface IKeyboardInputProcessor
+	{
+		bool Visible { get; }
+		string Text { get; }
+	}
 
 	[ProtoContract]
 	public class TextBox : Widget, IKeyboardInputProcessor
