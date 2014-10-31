@@ -201,7 +201,7 @@ namespace Lime
 		{
 			if (container.Input.TextInput == null)
 				return;
-			foreach (var ch in Input.TextInput) {
+			foreach (var ch in container.Input.TextInput) {
 				if (ch >= ' ')
 					InsertChar(ch);
 			}
