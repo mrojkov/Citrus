@@ -38,6 +38,14 @@ namespace Lime
 		Ignore,
 	}
 
+	public interface ICaretPosition
+	{
+		int Line { get; set; }
+		int Pos { get; set; }
+		bool IsVisible { get; set; }
+		Vector2 GetWorldPosition();
+	}
+
 	public interface IText
 	{
 		string Text { get; set; }

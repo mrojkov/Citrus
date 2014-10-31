@@ -67,6 +67,24 @@ namespace Lime
 			set { textColor = value; }
 		}
 
+		public class CaretPosition: ICaretPosition
+		{
+			private int line;
+			private int pos;
+			public Vector2 WorldPosition = Vector2.Zero;
+			public bool IsWorldPositionValid = false;
+
+			public int Line { get { return line; } set { IsWorldPositionValid &= line == value; line = value; } }
+			public int Pos { get { return pos; } set { IsWorldPositionValid &= pos == value; pos = value; } }
+			public bool IsVisible { get; set; }
+			public Vector2 GetWorldPosition()
+			{
+				return WorldPosition;
+			}
+		}
+
+		public CaretPosition Caret = new CaretPosition();
+
 		public SimpleText()
 		{
 			// CachedRendering = true;
@@ -88,6 +106,8 @@ namespace Lime
 
 		public override void Render()
 		{
+			if (!Caret.IsWorldPositionValid)
+				spriteList = null;
 			if (spriteList == null) {
 				if (OverflowMode == TextOverflowMode.Minify) {
 					FitTextInsideWidgetArea();
@@ -150,11 +170,18 @@ namespace Lime
 			}
 			var lines = SplitText(localizedText);
 			var pos = Vector2.Down * CalcVerticalTextPosition(lines);
+			var lineNumber = 0;
 			bool firstLine = true;
+			Caret.Line = Caret.Line.Clamp(0, lines.Count - 1);
 			foreach (var line in lines) {
+				if (Caret.Line == lineNumber) {
+					Caret.WorldPosition.Y = pos.Y;
+					Caret.Pos = Caret.Pos.Clamp(0, line.Length);
+				}
 				Rectangle lineRect;
-				RenderSingleTextLine(spriteList, out lineRect, pos, line);
+				RenderSingleTextLine(spriteList, out lineRect, pos, line, lineNumber);
 				pos.Y += Spacing + FontHeight;
+				++lineNumber;
 				if (firstLine) {
 					rect = lineRect;
 					firstLine = false;
@@ -162,6 +189,7 @@ namespace Lime
 					rect = Rectangle.Bounds(rect, lineRect);
 				}
 			}
+			Caret.IsWorldPositionValid = true;
 		}
 
 		private float CalcVerticalTextPosition(List<string> lines)
@@ -181,7 +209,14 @@ namespace Lime
 			return totalHeight;
 		}
 
-		private void RenderSingleTextLine(SpriteList spriteList, out Rectangle extent, Vector2 pos, string line)
+		private void OnDrawChar(int index, Vector2 charPos, Vector2 size)
+		{
+			if (Caret.Pos == index)
+				Caret.WorldPosition.X = charPos.X;
+		}
+
+		private void RenderSingleTextLine(
+			SpriteList spriteList, out Rectangle extent, Vector2 pos, string line, int lineNumber)
 		{
 			float lineWidth = MeasureTextLine(line).X;
 			switch (HAlignment) {
@@ -192,8 +227,12 @@ namespace Lime
 					pos.X = (Size.X - lineWidth) * 0.5f;
 					break;
 			}
+			Action<int, Vector2, Vector2> onDrawChar = null;
+			if (Caret.Line == lineNumber)
+				onDrawChar = OnDrawChar;
 			if (spriteList != null) {
-				Renderer.DrawTextLine(Font.Instance, pos, line, Color4.White, FontHeight, 0, line.Length, spriteList);
+				Renderer.DrawTextLine(
+					Font.Instance, pos, line, Color4.White, FontHeight, 0, line.Length, spriteList, onDrawChar);
 			}
 			extent = new Rectangle(pos.X, pos.Y, pos.X + lineWidth, pos.Y + FontHeight);
 		}
