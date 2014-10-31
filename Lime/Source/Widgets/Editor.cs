@@ -73,16 +73,26 @@ namespace Lime
 	public interface IEditorParams
 	{
 		float KeyPressInterval { get; set; }
+		int MaxLength { get; set; }
+		int MaxLines { get; set; }
+
+		bool IsAcceptableLength(int length);
+		bool IsAcceptableLines(int lines);
 	}
 
 	public class EditorParams : IEditorParams
 	{
 		public float KeyPressInterval { get; set; }
+		public int MaxLength { get; set; }
+		public int MaxLines { get; set; }
 
 		public EditorParams()
 		{
 			KeyPressInterval = 0.05f;
 		}
+
+		public bool IsAcceptableLength(int length) { return MaxLength <= 0 || length <= MaxLength; }
+		public bool IsAcceptableLines(int lines) { return MaxLines <= 0 || lines <= MaxLines; }
 	}
 
 	public class Editor
@@ -138,7 +148,10 @@ namespace Lime
 
 		private void InsertChar(char ch)
 		{
-			if (caretPos.TextPos >= 0 && caretPos.TextPos <= text.Text.Length) {
+			if (
+				caretPos.TextPos >= 0 && caretPos.TextPos <= text.Text.Length &&
+				editorParams.IsAcceptableLength(text.Text.Length + 1)
+			) {
 				text.Text = text.Text.Insert(caretPos.TextPos, ch.ToString());
 				caretPos.TextPos++;
 			}
@@ -173,7 +186,7 @@ namespace Lime
 					caretPos.TextPos++; // Enforce revalidation.
 				}
 			}
-			if (CheckCursorKey(Key.Enter))
+			if (CheckCursorKey(Key.Enter) && editorParams.IsAcceptableLines(text.Text.Count(ch => ch == '\n') + 2))
 				InsertChar('\n');
 			prevKeyPressed = keyPressed;
 		}
