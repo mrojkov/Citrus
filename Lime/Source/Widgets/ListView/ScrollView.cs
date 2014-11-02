@@ -20,6 +20,7 @@ namespace Lime
 		public bool CanScroll { get; set; }
 		public bool RejectOrtogonalSwipes { get; set; }
 		public float BounceZoneThickness = 100;
+		public float ScrollToItemVelocity = 800;
 		public ScrollDirection ScrollDirection { get; private set; }
 		protected virtual bool IsDragging { get; set; }
 		
@@ -125,6 +126,26 @@ namespace Lime
 		{
 			if (!IsBeingRefreshed) {
 				SetProjectedPosition(Content, -value);
+			}
+		}
+
+		public void ScrollTo(float position, bool instantly = false)
+		{
+			var p = position.Clamp(MinScrollPosition, MaxScrollPosition);
+			if (instantly) {
+				ScrollPosition = p;
+			}
+			else {
+				Frame.Tasks.Add(ScrollToTask(p));
+			}
+		}
+
+		private IEnumerator<object> ScrollToTask(float position)
+		{
+			float time = (position - ScrollPosition).Abs() / ScrollToItemVelocity;
+			foreach (var t in TaskList.SinMotion(time, ScrollPosition, position)) {
+				ScrollPosition = t;
+				yield return 0;
 			}
 		}
 

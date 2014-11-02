@@ -7,7 +7,6 @@ namespace Lime
 {
 	public partial class ListView : ScrollViewWithSlider, IList<Widget>
 	{
-		public float ScrollToItemVelocity = 800;
 		public bool ManualItemsPositioning;
 
 		public ListView(Frame frame, ScrollDirection scrollDirection = ScrollDirection.Vertical, bool processChildrenFirst = false)
@@ -49,25 +48,6 @@ namespace Lime
 		public void ScrollToItem(Widget widget, bool instantly = false)
 		{
 			ScrollTo(ProjectToScrollAxis(widget.CalcPositionInSpaceOf(Content)), instantly);
-		}
-
-		public void ScrollTo(float position, bool instantly = false)
-		{
-			var p = position.Clamp(MinScrollPosition, MaxScrollPosition);
-			if (instantly) {
-				ScrollPosition = p;
-			} else {
-				Frame.Tasks.Add(ScrollToTask(p));
-			}
-		}
-
-		private IEnumerator<object> ScrollToTask(float position)
-		{
-			float time = (position - ScrollPosition).Abs() / ScrollToItemVelocity;
-			foreach (var t in TaskList.SinMotion(time, ScrollPosition, position)) {
-				ScrollPosition = t;
-				yield return 0;
-			}
 		}
 
 		private IEnumerator<object> RefreshLayoutTask()
