@@ -147,6 +147,11 @@ namespace Lime
 			return median + (RandomFloat() - 0.5f) * dispersion;
 		}
 
+		public static bool InRange(float x, float upper, float lower)
+		{
+			return lower <= x && x <= upper;
+		}
+
 		public static float Clamp(float value, float min, float max)
 		{
 			return (value < min) ? min : (value > max ? max : value);

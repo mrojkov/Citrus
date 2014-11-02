@@ -82,6 +82,11 @@ namespace Lime
 			return Mathf.Wrap360(x);
 		}
 
+		public static bool InRange(this float x, float upper, float lower)
+		{
+			return Mathf.InRange(x, lower, upper);
+		}
+
 		public static float Clamp(this float value, float min, float max)
 		{
 			return Mathf.Clamp(value, min, max);
