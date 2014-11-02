@@ -17,6 +17,7 @@ namespace Lime
 		{
 			public long MemoryAllocated;
 			public int CallCount;
+			public int TaskCount;
 		}
 
 		public abstract class WaitPredicate
@@ -35,6 +36,11 @@ namespace Lime
 		{
 			Tag = tag;
 			stack.Push(e);
+			var type = e.GetType();
+			ProfileEntry pe;
+			profile.TryGetValue(type, out pe);
+			pe.TaskCount++;
+			profile[type] = pe;
 		}
 
 		public void Advance(float delta)
@@ -160,11 +166,13 @@ namespace Lime
 			var items = profile.Select(p => new { 
 				Method = p.Key.ToString(), 
 				Memory = p.Value.MemoryAllocated, 
-				CallCount = p.Value.CallCount }).OrderByDescending(a => a.Memory);
+				CallCount = p.Value.CallCount,
+				TaskCount = p.Value.TaskCount,
+			}).OrderByDescending(a => a.Memory);
 			writer.WriteLine("Memory allocated\tCall count\tMethod Name");
 			writer.WriteLine("===================================================================================================");
 			foreach (var i in items) {
-				writer.WriteLine("{0:N0}\t\t\t{1:N0}\t\t{2}", i.Memory, i.CallCount, i.Method);
+				writer.WriteLine("{0:N0}\t\t\t{1:N0}\t\t{2}\t\t{3}", i.Memory, i.CallCount, i.TaskCount, i.Method);
 			}
 		}
 	}
