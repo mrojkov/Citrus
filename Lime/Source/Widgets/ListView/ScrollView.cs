@@ -43,8 +43,7 @@ namespace Lime
 			get { return Mathf.Max(0, ProjectToScrollAxis(Content.Size - Frame.Size).Round()); }
 		}
 
-		private float velocity;
-		private Task interialScrollingTask;
+		private Task scrollingTask;
 
 		public ScrollView(Frame frame, ScrollDirection scrollDirection = ScrollDirection.Vertical, bool processChildrenFirst = false)
 		{
@@ -136,7 +135,7 @@ namespace Lime
 				ScrollPosition = p;
 			}
 			else {
-				Frame.Tasks.Add(ScrollToTask(p));
+				StartScrolling(ScrollToTask(p));
 			}
 		}
 
@@ -147,21 +146,36 @@ namespace Lime
 				ScrollPosition = t;
 				yield return 0;
 			}
+			scrollingTask = null;
 		}
 
 		public bool IsScrolling()
 		{
-			return velocity != 0;
+			return scrollingTask != null;
 		}
 
 		public void StopScrolling()
 		{
-			velocity = 0;
+			if (scrollingTask != null) {
+				scrollingTask.Dispose();
+				scrollingTask = null;
+			}
 		}
 
-		private void StartIntertialScrolling()
+		private void StartScrolling(IEnumerator<object> newScrollingTask)
 		{
-			interialScrollingTask = Content.Tasks.Add(IntertialScrollingTask());
+			StopScrolling();
+			scrollingTask = Content.Tasks.Add(newScrollingTask);
+		}
+
+		private void Bounce()
+		{
+			if (IsScrolling())
+				return;
+			if (ScrollPosition < MinScrollPosition)
+				ScrollTo(MinScrollPosition);
+			else if (ScrollPosition > MaxScrollPosition)
+				ScrollTo(MaxScrollPosition);
 		}
 
 		private IEnumerator<object> MainTask()
@@ -169,11 +183,10 @@ namespace Lime
 			while (true) {
 				// Wait until a user starts dragging the widget
 				while (!Frame.Input.WasMousePressed() || !Frame.IsMouseOver()) {
+					Bounce();
 					yield return 0;
 				}
-				if (interialScrollingTask != null) {
-					interialScrollingTask.Dispose();
-				}
+				StopScrolling();
 				Vector2 mousePos = Input.MousePosition;
 				var velocityMeter = new VelocityMeter();
 				velocityMeter.AddSample(ScrollPosition);
@@ -186,7 +199,6 @@ namespace Lime
 				} else {
 					yield return HandleDragTask(velocityMeter, ProjectToScrollAxis(mousePos));
 				}
-				StartIntertialScrolling();
 			}
 		}
 
@@ -204,60 +216,20 @@ namespace Lime
 			}
 		}
 
-		private IEnumerator<object> IntertialScrollingTask()
+		private IEnumerator<object> IntertialScrollingTask(float velocity)
 		{
 			while (true) {
-				DoIntertialScrolling(TaskList.Current.Delta);
+				var delta = TaskList.Current.Delta;
+				float damping = ScrollPosition.InRange(MinScrollPosition, MaxScrollPosition) ? 2.0f : 20.0f;
+				velocity -= velocity * damping * delta;
+				if (velocity.Abs() < 40.0f) {
+					break;
+				}
+				// Round scrolling position to prevent blurring
+				ScrollPosition = (ScrollPosition + velocity * delta).Round();
 				yield return 0;
 			}
-		}
-
-		private void DoIntertialScrolling(float delta)
-		{
-			if (ScrollPosition < MinScrollPosition) {
-				BounceFromTop(delta);
-			} else if (ScrollPosition > MaxScrollPosition) {
-				BounceFromBottom(delta);
-			} else {
-				float damping = velocity * 2.0f;
-				var prevVelocity = velocity;
-				velocity -= damping * delta;
-				if (velocity.Sign() != prevVelocity.Sign()) {
-					velocity = 0;
-				}
-				AdvanceScrollPosition(delta);
-			}
-		}
-
-		private void BounceFromBottom(float delta)
-		{
-			velocity = -velocity;
-			ScrollPosition = MaxScrollPosition - ScrollPosition;
-			BounceFromTop(delta);
-			velocity = -velocity;
-			ScrollPosition = MaxScrollPosition - ScrollPosition;
-		}
-
-		private void BounceFromTop(float delta)
-		{
-			if (velocity < 0) {
-				velocity += 50000 * delta;
-				velocity = velocity.Clamp(-10000, 0);
-				AdvanceScrollPosition(delta);
-			} else {
-				velocity = (-ScrollPosition * 10).Clamp(300, 5000);
-				AdvanceScrollPosition(delta);
-				if (ScrollPosition > -float.Epsilon) {
-					ScrollPosition = 0;
-					velocity = 0;
-				}
-			}
-		}
-
-		private void AdvanceScrollPosition(float delta)
-		{
-			// Round scrolling position to prevent blurring
-			ScrollPosition = (ScrollPosition + velocity * delta).Round();
+			scrollingTask = null;
 		}
 
 		private IEnumerator<object> HandleDragTask(VelocityMeter velocityMeter, float mouseProjectedPosition)
@@ -281,7 +253,7 @@ namespace Lime
 				yield return 0;
 			} while (Input.IsMousePressed());
 			Frame.Input.ReleaseMouse();
-			velocity = velocityMeter.CalcVelocity();
+			StartScrolling(IntertialScrollingTask(velocityMeter.CalcVelocity()));
 			IsDragging = false;
 		}
 

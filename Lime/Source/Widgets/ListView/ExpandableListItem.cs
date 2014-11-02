@@ -113,7 +113,7 @@ namespace Lime
 			StackWidgets(subContainer);
 			yield return ResizeSubContainerTask(
 				0, ProjectedSize(subContainer),
-				() => ListView.ScrollPosition = ListView.PositionToViewFully(this));
+				() => ListView.ScrollTo(ListView.PositionToViewFully(this)));
 			if (onAnimationFinished != null) {
 				onAnimationFinished();
 			}
