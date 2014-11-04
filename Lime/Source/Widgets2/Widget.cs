@@ -485,28 +485,28 @@ namespace Lime.Widgets2
 
 		public override void Update(float delta)
 		{
-			delta *= AnimationSpeed;
-			if (Updating != null) {
-				Updating(delta);
-			}
-			if (GloballyVisible) {
-				if (IsRunning) {
-					AdvanceAnimation(delta);
-				}
-				SelfUpdate(delta);
-				for (var node = Nodes.FirstOrNull(); node != null; ) {
-					var next = node.NextSibling;
-					node.Update(delta);
-					node = next;
-				} 
-				SelfLateUpdate(delta);
-				if (clicked != null) {
-					HandleClick();
-				}
-			}
-			if (Updated != null) {
-				Updated(delta);
-			}
+			//delta *= AnimationSpeed;
+			//if (Updating != null) {
+			//	Updating(delta);
+			//}
+			//if (GloballyVisible) {
+			//	if (IsRunning) {
+			//		AdvanceAnimation(delta);
+			//	}
+			//	SelfUpdate(delta);
+			//	for (var node = Nodes.FirstOrNull(); node != null; ) {
+			//		var next = node.NextSibling;
+			//		node.Update(delta);
+			//		node = next;
+			//	} 
+			//	SelfLateUpdate(delta);
+			//	if (clicked != null) {
+			//		HandleClick();
+			//	}
+			//}
+			//if (Updated != null) {
+			//	Updated(delta);
+			//}
 		}
 
 		public void RaiseUpdating(float delta)

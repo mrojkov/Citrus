@@ -58,6 +58,7 @@
     <Compile Include="Source\Application\RenderingApi.cs" />
     <Compile Include="Source\Application\WinApi.cs" />
     <Compile Include="Source\AssetsBundle\UnityAssetsBundle.cs" />
+    <Compile Include="Source\Widgets2\Animation\Animation.cs" />
     <Compile Include="Source\Widgets2\Animation\AnimationUtils.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -82,6 +83,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Source\Widgets2\Button.cs" />
+    <Compile Include="Source\Widgets2\Component.cs" />
+    <Compile Include="Source\Widgets2\ComponentList.cs" />
     <Compile Include="Source\Widgets2\DistortionMesh.cs" />
     <Compile Include="Source\Widgets2\DistortionMeshPoint.cs" />
     <Compile Include="Source\Widgets2\Editor.cs" />

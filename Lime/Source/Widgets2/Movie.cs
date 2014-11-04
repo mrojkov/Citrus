@@ -103,14 +103,15 @@ namespace Lime.Widgets2
 			return base.SelfHitTest(point);
 		}
 
-		protected internal override void OnTrigger(string property)
-		{
-			if (property == "Action") {
-				HandleAction();
-			} else {
-				base.OnTrigger(property);
-			}
-		}
+		// XXX
+		//protected internal override void OnTrigger(string property)
+		//{
+		//	if (property == "Action") {
+		//		HandleAction();
+		//	} else {
+		//		base.OnTrigger(property);
+		//	}
+		//}
 
 		private void HandleAction()
 		{

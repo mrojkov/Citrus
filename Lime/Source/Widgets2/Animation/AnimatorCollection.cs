@@ -15,16 +15,16 @@ namespace Lime.Widgets2
 		static IAnimator[] emptyArray = new IAnimator[0];
 		List<IAnimator> animatorList = emptyList;
 		IAnimator[] animatorArray;
-		Node owner;
+		Component owner;
 
 		public AnimatorCollection() { /* ctor for ProtoBuf only */ }
 
-		public AnimatorCollection(Node owner)
+		public AnimatorCollection(Component owner)
 		{
 			this.owner = owner;
 		}
 
-		public AnimatorCollection(Node owner, int capacity)
+		public AnimatorCollection(Component owner, int capacity)
 		{
 			this.owner = owner;
 			if (capacity > 0) {
@@ -46,7 +46,7 @@ namespace Lime.Widgets2
 			}
 		}
 
-		internal static AnimatorCollection SharedClone(Node owner, AnimatorCollection source)
+		internal static AnimatorCollection SharedClone(Component owner, AnimatorCollection source)
 		{
 			var result = new AnimatorCollection(owner, source.Count);
 			foreach (var animator in source.animatorList) {

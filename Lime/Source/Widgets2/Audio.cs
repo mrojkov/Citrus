@@ -99,17 +99,17 @@ namespace Lime.Widgets2
 			sound.Bump();
 		}
 
-		protected internal override void OnTrigger(string property)
-		{
-			if (property == "Action") {
-				if (Action == AudioAction.Play) {
-					Play();
-				} else {
-					Stop();
-				}
-			} else {
-				base.OnTrigger(property);
-			}
-		}
+		//protected internal override void OnTrigger(string property)
+		//{
+		//	if (property == "Action") {
+		//		if (Action == AudioAction.Play) {
+		//			Play();
+		//		} else {
+		//			Stop();
+		//		}
+		//	} else {
+		//		base.OnTrigger(property);
+		//	}
+		//}
 	}
 }

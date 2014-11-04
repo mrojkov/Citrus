@@ -4,6 +4,28 @@ using ProtoBuf;
 namespace Lime.Widgets2
 {
 	[ProtoContract]
+	public enum HAlignment
+	{
+		[ProtoEnum]
+		Left,
+		[ProtoEnum]
+		Center,
+		[ProtoEnum]
+		Right,
+	}
+
+	[ProtoContract]
+	public enum VAlignment
+	{
+		[ProtoEnum]
+		Top,
+		[ProtoEnum]
+		Center,
+		[ProtoEnum]
+		Bottom,
+	}
+
+	[ProtoContract]
 	public enum TextOverflowMode
 	{
 		[ProtoEnum]

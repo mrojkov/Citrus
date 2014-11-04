@@ -23,13 +23,15 @@ namespace Lime.Widgets2
 	[ProtoInclude(117, typeof(Animator<ShaderId>))]
 	public interface IAnimator
 	{
-		void Bind(Node owner);
+		void Bind(Component owner);
 
 		IAnimator Clone();
 
 		bool IsTriggerable { get; set; }
 
 		string TargetProperty { get; set; }
+
+		string TargetComponent { get; set; }
 
 		int Duration { get; }
 
@@ -48,7 +50,7 @@ namespace Lime.Widgets2
 	[ProtoInclude(153, typeof(Color4Animator))]
 	public class Animator<T> : IAnimator
 	{
-		private Node owner;
+		private Component owner;
 		private int currentKey = 0;
 
 		public bool IsTriggerable { get; set; }
@@ -57,6 +59,9 @@ namespace Lime.Widgets2
 		public string TargetProperty { get; set; }
 
 		[ProtoMember(2)]
+		public string TargetComponent { get; set; }
+
+		[ProtoMember(3)]
 		public KeyframeCollection<T> ReadonlyKeys = new KeyframeCollection<T>();
 
 		public KeyframeCollection<T> Keys
@@ -104,7 +109,7 @@ namespace Lime.Widgets2
 
 		protected SetterDelegate Setter;
 
-		public void Bind(Node owner)
+		public void Bind(Component owner)
 		{
 			this.owner = owner;
 			var p = AnimationUtils.GetProperty(owner.GetType(), TargetProperty);

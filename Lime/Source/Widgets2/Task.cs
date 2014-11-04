@@ -101,7 +101,7 @@ namespace Lime.Widgets2
 				Advance(0);
 			} else if (result is WaitPredicate) {
 				waitPredicate = result as WaitPredicate;
-			} else if (result is Lime.Node) {
+			} else if (result is Node) {
 				waitPredicate = WaitForAnimation(result as Node);
 			} else if (result is IEnumerable<object>) {
 				throw new Lime.Exception("Use IEnumerator<object> instead of IEnumerable<object> for " + result);

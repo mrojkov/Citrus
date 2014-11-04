@@ -24,10 +24,6 @@ namespace Lime.Widgets2
 	[DebuggerTypeProxy(typeof(NodeDebugView))]
 	public class Node : IDisposable
 	{
-		public event Action AnimationStopped;
-	
-		private int animationTime;
-
 		internal protected bool GlobalValuesValid;
 
 		#region properties
@@ -41,10 +37,6 @@ namespace Lime.Widgets2
 		[ProtoMember(2)]
 		public string ContentsPath { get; set; }
 
-		[Trigger]
-		[TangerineProperty(1)]
-		public string Trigger { get; set; }
-
 		public Node Parent { get; internal set; }
 
 		public Widget AsWidget { get; internal set; }
@@ -54,59 +46,56 @@ namespace Lime.Widgets2
 
 		public int Layer { get; set; }
 
-		[ProtoMember(5)]
-		public AnimatorCollection Animators;
-
 		[ProtoMember(6)]
 		public NodeList Nodes;
 
-		[ProtoMember(7)]
-		public MarkerCollection Markers;
+		public Animation Animation;
 
-		[ProtoMember(9)]
-		public bool IsRunning { get; set; }
-		public bool IsStopped { 
-			get { return !IsRunning; } 
-			set { IsRunning = !value; } 
-		}
-
-		[ProtoMember(10)]
-		public int AnimationTime {
-			get { return animationTime; }
-			set { 
-				animationTime = value; 
-				ApplyAnimators(invokeTriggers: false); 
-			}
-		}
-
-		[ProtoMember(11)]
+		[ProtoMember(8)]
 		public string Tag { get; set; }
 
-		[ProtoMember(12)]
-		public bool PropagateAnimation { get; set; }
-
-		public string CurrentAnimation { get; set; }
-
-		public float AnimationSpeed { get; set; }
-
 		public object UserData { get; set; }
+
+		public ComponentList Components;
 
 		#endregion
 		#region Methods
 
 		public Node()
 		{
-			AnimationSpeed = 1;
-			Animators = new AnimatorCollection(this);
-			Markers = new MarkerCollection();
 			Nodes = new NodeList(this);
 		}
+
+		#region Animation fallbacks
+		public bool TryRunAnimation(string markerId)
+		{
+			return Animation.TryRun(markerId);
+		}
+
+		public void RunAnimation(string markerId)
+		{
+			Animation.Run(markerId);
+		}
+
+		public bool IsRunning { get { return Animation.IsRunning; } set { Animation.IsRunning = value; } }
+		public bool IsStopped { get { return Animation.IsStopped; } set { Animation.IsStopped = value; } }
+		public string CurrentAnimation { get { return Animation.Current; } set { Animation.Current = value; } }
+		public MarkerCollection Markers { get { return Animation.Markers; } }
+		public AnimatorCollection Animators { get { return Animation.Animators; } }
+		public float AnimationSpeed { get { return Animation.Speed; } set { Animation.Speed = value; } }
+		public int AnimationTime { get { return Animation.Time; } set { Animation.Time = value; } }
+		public int AnimationFrame { get { return Animation.Frame; } set { Animation.Frame = value; } }
+		#endregion
 
 		public virtual void Dispose()
 		{
 			for (var n = Nodes.FirstOrNull(); n != null; n = n.NextSibling) {
 				n.Dispose();
 			}
+			foreach (var c in Components) {
+				c.Dispose();
+			}
+			Components.Clear();
 		}
 
 		internal protected void InvalidateGlobalValues()
@@ -148,31 +137,6 @@ namespace Lime.Widgets2
 			return false;
 		}
 
-		public bool TryRunAnimation(string markerId)
-		{
-			Marker marker = Markers.TryFind(markerId);
-			if (marker == null) {
-				return false;
-			}
-			AnimationStopped = null;
-			AnimationFrame = marker.Frame;
-			CurrentAnimation = markerId;
-			IsRunning = true;
-			return true;
-		}
-
-		public void RunAnimation(string markerId)
-		{
-			if (!TryRunAnimation(markerId)) {
-				throw new Lime.Exception("Unknown animation '{0}' in node '{1}'", markerId, this.ToString());
-			}
-		}
-
-		public int AnimationFrame {
-			get { return AnimationUtils.MsecsToFrames(AnimationTime); }
-			set { AnimationTime = AnimationUtils.FramesToMsecs(value); }
-		}
-
 		/// <summary>
 		/// Slow but safe deep cloning. This function is based on protobuf-net serialization.
 		/// </summary>
@@ -200,9 +164,8 @@ namespace Lime.Widgets2
 			clone.NextSibling = null;
 			clone.AsWidget = clone as Widget;
 			clone.GlobalValuesValid = false;
-			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
-			clone.Markers = MarkerCollection.DeepClone(Markers);
 			clone.Nodes = Nodes.DeepCloneFast(clone);
+			clone.Components = Components.Clone(clone);
 			return clone;
 		}
 
@@ -250,9 +213,12 @@ namespace Lime.Widgets2
 
 		public virtual void Update(float delta)
 		{
-			delta *= AnimationSpeed;
-			if (IsRunning) {
-				AdvanceAnimation(delta);
+			//delta *= AnimationSpeed;
+			//if (IsRunning) {
+			//	AdvanceAnimation(delta);
+			//}
+			foreach (var c in Components.Behaviours) {
+				c.Update(delta);
 			}
 			SelfUpdate(delta);
 			for (var node = Nodes.FirstOrNull(); node != null; ) {
@@ -260,9 +226,10 @@ namespace Lime.Widgets2
 				node.Update(delta);
 				node = next;
 			}
-			SelfLateUpdate(delta);
+			foreach (var c in Components.LateBehaviours) {
+				c.Update(delta);
+			}
 		}
-
 		protected virtual void SelfUpdate(float delta) { }
 
 		protected virtual void SelfLateUpdate(float delta) { }
@@ -273,19 +240,6 @@ namespace Lime.Widgets2
 		{
 			for (Node node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
 				node.AddToRenderChain(chain);
-			}
-		}
-
-		protected internal virtual void OnTrigger(string property)
-		{
-			if (property != "Trigger") {
-				return;
-			}
-			if (String.IsNullOrEmpty(Trigger)) {
-				AnimationTime = 0;
-				IsRunning = true;
-			} else {
-				TryRunAnimation(Trigger);
 			}
 		}
 
@@ -438,88 +392,6 @@ namespace Lime.Widgets2
 			return null;
 		}
 
-		public void AdvanceAnimation(float delta)
-		{
-			int deltaMs = (int)(delta * 1000 + 0.5f);
-			while (deltaMs > AnimationUtils.MsecsPerFrame) {
-				AdvanceAnimationShort(AnimationUtils.MsecsPerFrame);
-				deltaMs -= AnimationUtils.MsecsPerFrame;
-			}
-			AdvanceAnimationShort(deltaMs);
-		}
-
-		private void AdvanceAnimationShort(int delta)
-		{
-			if (IsRunning) {
-				int prevFrame = AnimationUtils.MsecsToFrames(animationTime - 1);
-				int currFrame = AnimationUtils.MsecsToFrames(animationTime + delta - 1);
-				animationTime += delta;
-				if (prevFrame != currFrame && Markers.Count > 0) {
-					Marker marker = Markers.GetByFrame(currFrame);
-					if (marker != null) {
-						ProcessMarker(marker, ref prevFrame, ref currFrame);
-					}
-				}
-				bool invokeTriggers = prevFrame != currFrame;
-				ApplyAnimators(invokeTriggers);
-				if (!IsRunning) {
-					OnAnimationStopped();
-				}
-			}
-		}
-
-		protected virtual void OnAnimationStopped()
-		{
-			if (AnimationStopped != null) {
-				AnimationStopped();
-			}
-		}
-
-		private void ProcessMarker(Marker marker, ref int prevFrame, ref int currFrame)
-		{
-			switch (marker.Action) {
-				case MarkerAction.Jump:
-					var gotoMarker = Markers.TryFind(marker.JumpTo);
-					if (gotoMarker != null) {
-						int hopFrames = gotoMarker.Frame - AnimationFrame;
-						animationTime += AnimationUtils.FramesToMsecs(hopFrames);
-						prevFrame += hopFrames;
-						currFrame += hopFrames;
-						ProcessMarker(gotoMarker, ref prevFrame, ref currFrame);
-					}
-					break;
-				case MarkerAction.Stop:
-					animationTime = AnimationUtils.FramesToMsecs(marker.Frame);
-					prevFrame = currFrame - 1;
-					IsRunning = false;
-					break;
-				case MarkerAction.Destroy:
-					animationTime = AnimationUtils.FramesToMsecs(marker.Frame);
-					prevFrame = currFrame - 1;
-					IsRunning = false;
-					Unlink();
-					break;
-			}
-			if (marker.CustomAction != null) {
-				marker.CustomAction();
-			}
-		}
-
-		private void ApplyAnimators(bool invokeTriggers)
-		{
-			for (Node node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
-				var animators = node.Animators;
-				animators.Apply(animationTime);
-				if (invokeTriggers) {
-					animators.InvokeTriggers(AnimationFrame);
-				}
-				if (PropagateAnimation) {
-					node.animationTime = animationTime;
-					node.ApplyAnimators(invokeTriggers);
-				}
-			}
-		}
-
 		public void PreloadAssets()
 		{
 			foreach (var prop in GetType().GetProperties()) {
@@ -592,10 +464,10 @@ namespace Lime.Widgets2
 				content.AsWidget.Size = AsWidget.Size;
 				content.Update(0);
 			}
-			Markers.AddRange(content.Markers);
-			var nodes = content.Nodes.ToList();
-			content.Nodes.Clear();
-			Nodes.AddRange(nodes);
+			//Markers.AddRange(content.Markers);
+			//var nodes = content.Nodes.ToList();
+			//content.Nodes.Clear();
+			//Nodes.AddRange(nodes);
 		}
 		#endregion
 	}

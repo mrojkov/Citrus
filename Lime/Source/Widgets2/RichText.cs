@@ -98,7 +98,7 @@ namespace Lime.Widgets2
 		private TextRenderer PrepareRenderer()
 		{
 			ParseText();
-			var renderer = new Lime.Widgets2.Text.TextRenderer(OverflowMode, WordSplitAllowed);
+			var renderer = new TextRenderer(OverflowMode, WordSplitAllowed);
 			// Setup default style(take first one from node list or TextStyle.Default).
 			TextStyle defaultStyle = null;
 			if (Nodes.Count > 0) {
