@@ -36,9 +36,16 @@ namespace Lime
 			AlignTop(header);
 		}
 
-		public void AddContentItem(Widget item) {
+		public void AddContentItem(Widget item) 
+		{
 			AlignTop(item);
 			subContainer.Nodes.Add(item);
+		}
+
+		public void InsertContentItem(int index, Widget item)
+		{
+			AlignTop(item);
+			subContainer.Nodes.Insert(0, item);
 		}
 
 		private void AlignTop(Widget w)
