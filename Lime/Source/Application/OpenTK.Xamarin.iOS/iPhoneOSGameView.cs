@@ -207,7 +207,6 @@ namespace Lime.Xamarin
         bool disposed;
 
         int framebuffer, renderbuffer;
-        bool framebufferReady; // buz
 
         GLCalls gl;
 
@@ -483,7 +482,6 @@ namespace Lime.Xamarin
 
             frameBufferWindow = new WeakReference(Window);
             frameBufferLayer = new WeakReference(Layer);
-            framebufferReady = true; // buz
         }
 
         protected virtual void ConfigureLayer(CAEAGLLayer eaglLayer)
@@ -512,7 +510,6 @@ namespace Lime.Xamarin
             GraphicsContext.Dispose();
             GraphicsContext = null;
             gl = null;
-            framebufferReady = false; // buz
         }
 
 		static private bool DetachRenderBufferStorage(EAGLContext me, uint target)
@@ -568,8 +565,7 @@ namespace Lime.Xamarin
             if (AutoResize && (Math.Round(bounds.Width) != Size.Width ||
                         Math.Round(bounds.Height) != Size.Height)) {
                 DestroyFrameBuffer();
-                // buz: sometimes you can't create framebuffer here, defer it until next drawing
-                //CreateFrameBuffer();
+                CreateFrameBuffer();
             }
         }
 
@@ -763,11 +759,6 @@ namespace Lime.Xamarin
             // updateEventArgs.Time = t;
             OnUpdateFrame(updateEventArgs);
             prevUpdateTime = curUpdateTime;
-
-            // buz
-            if (!framebufferReady) {
-                CreateFrameBuffer();
-            }
 
 			gl.BindFramebuffer(All.FramebufferOes, framebuffer);
 
