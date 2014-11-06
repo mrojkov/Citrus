@@ -287,12 +287,17 @@ namespace Lime
 		{
 			private IEnumerator<int> stateHandler;
 			public StateFunc State { get; private set; }
+			private bool isChanging;
 
 			public void SetState(StateFunc state)
 			{
 				State = state;
 				stateHandler = state();
-				stateHandler.MoveNext();
+				if (!isChanging) {
+					isChanging = true;
+					stateHandler.MoveNext();
+					isChanging = false;
+				}
 			}
 
 			public void Advance()
