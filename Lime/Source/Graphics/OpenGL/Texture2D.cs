@@ -18,14 +18,76 @@ namespace Lime
 	/// </summary>
 	public partial class Texture2D : CommonTexture, ITexture
 	{
-		uint handle;
+		#region TextureReloader
+		abstract class TextureReloader
+		{
+			public abstract void Reload(Texture2D texture);
+		}
+
+		class TextureBundleReloader : TextureReloader
+		{
+			public string path;
+
+			public TextureBundleReloader(string path)
+			{
+				this.path = path;
+			}
+
+			public override void Reload(Texture2D texture)
+			{
+				texture.LoadImage(path);
+			}
+		}
+
+		class TexturePixelArrayReloader : TextureReloader
+		{
+			Color4[] pixels;
+			int width;
+			int height;
+			bool generateMips;
+
+			public TexturePixelArrayReloader(Color4[] pixels, int width, int height, bool generateMips)
+			{
+				this.pixels = pixels;
+				this.width = width;
+				this.height = height;
+				this.generateMips = generateMips;
+			}
+
+			public override void Reload(Texture2D texture)
+			{
+				texture.LoadImage(pixels, width, height, generateMips);
+			}
+		}
+
+		class TextureStreamReloader : TextureReloader
+		{
+			MemoryStream stream;
+
+			public TextureStreamReloader(Stream stream)
+			{
+				this.stream = new MemoryStream();
+				stream.CopyTo(this.stream);
+				stream.Seek(0, SeekOrigin.Begin);
+			}
+
+			public override void Reload(Texture2D texture)
+			{
+				texture.LoadImage(stream);
+			}
+		}
+		#endregion
+
+		private uint handle;
 		public OpacityMask OpacityMask { get; private set; }
 		public Size ImageSize { get; protected set; }
 		public Size SurfaceSize { get; protected set; }
-		Rectangle uvRect;
+		private Rectangle uvRect;
+		private TextureReloader reloader;
+		private int graphicsContext;
 
-		public static List<uint> TexturesToDelete = new List<uint>();
-		public static List<uint> FramebuffersToDelete = new List<uint>();
+		internal static List<uint> TexturesToDelete = new List<uint>();
+		internal static List<uint> FramebuffersToDelete = new List<uint>();
 
 		public static void DeleteScheduledTextures()
 		{
@@ -68,9 +130,10 @@ namespace Lime
 
 		public void LoadImage(string path)
 		{
-			using (Stream stream = AssetsBundle.Instance.OpenFileLocalized(path)) {
-				LoadImage(stream);
+			using (var stream = AssetsBundle.Instance.OpenFileLocalized(path)) {
+				LoadImageHelper(stream, createReloader: false);
 			}
+			reloader = new TextureBundleReloader(path);
 			var alphaPath = Path.ChangeExtension(path, ".alpha.pvr");
 			if (AssetsBundle.Instance.FileExists(alphaPath)) {
 				AlphaTexture = new Texture2D();
@@ -91,7 +154,7 @@ namespace Lime
 
 		public void LoadImage(Stream stream)
 		{
-			LoadImageHelper(stream);
+			LoadImageHelper(stream, createReloader: true);
 		}
 
 		public void LoadImage(Bitmap bitmap)
@@ -99,12 +162,13 @@ namespace Lime
 			using (var stream = new MemoryStream()) {
 				bitmap.SaveToStream(stream);
 				stream.Position = 0;
-				LoadImageHelper(stream);
+				LoadImageHelper(stream, createReloader: true);
 			}
 		}
 
-		private void LoadImageHelper(Stream stream)
+		private void LoadImageHelper(Stream stream, bool createReloader)
 		{
+			reloader = createReloader ? new TextureStreamReloader(stream) : null;
 			// Discard current texture
 			Dispose();
 			using (var rewindableStream = new RewindableStream(stream))
@@ -140,6 +204,7 @@ namespace Lime
 				var t = new int[1];
 				GL.GenTextures(1, t);
 				handle = (uint)t[0];
+				graphicsContext = Application.GraphicsContextId;
 			}
 			PlatformRenderer.SetTexture(handle, 0);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
@@ -154,12 +219,16 @@ namespace Lime
 		/// </summary>
 		public void LoadImage(Color4[] pixels, int width, int height, bool generateMips)
 		{
+			reloader = new TexturePixelArrayReloader(pixels, width, height, generateMips);
+			DisposeAlphaTexture();
 			Application.InvokeOnMainThread(() => {
 				PrepareOpenGLTexture();
 				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
+				MemoryUsed = 4 * width * height;
 				if (generateMips) {
 #if !MAC && !iOS
 					GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+					MemoryUsed += (int)(MemoryUsed * 0.33f);
 #endif
 				}
 				PlatformRenderer.CheckErrors();
@@ -170,8 +239,17 @@ namespace Lime
 			uvRect = new Rectangle(0, 0, 1, 1);
 		}
 
+		private void DisposeAlphaTexture()
+		{
+			if (AlphaTexture != null) {
+				AlphaTexture.Dispose();
+				AlphaTexture = null;
+			}
+		}
+
 		/// <summary>
 		/// Load subtexture from pixel array
+		/// Warning: this method doesn't support automatic texture reload after restoring graphics context
 		/// </summary>
 		public void LoadSubImage(Color4[] pixels, int x, int y, int width, int height)
 		{
@@ -190,22 +268,19 @@ namespace Lime
 
 		public override void Dispose()
 		{
-			if (AlphaTexture != null) {
-				AlphaTexture.Dispose();
-				AlphaTexture = null;
-			}
+			DisposeAlphaTexture();
 			DisposeOpenGLTexture();
 			base.Dispose();
 		}
 
 		protected void DisposeOpenGLTexture()
 		{
-			if (handle != 0) {
+			if (handle != 0 && graphicsContext == Application.GraphicsContextId) {
 				lock (TexturesToDelete) {
 					TexturesToDelete.Add(handle);
 				}
-				handle = 0;
 			}
+			handle = 0;
 		}
 
 		/// <summary>
@@ -214,7 +289,22 @@ namespace Lime
 		/// <returns></returns>
 		public uint GetHandle()
 		{
+			if (Application.GraphicsContextId != graphicsContext) {
+				ReloadIfContextWasRestored();
+			}
 			return handle;
+		}
+
+		private void ReloadIfContextWasRestored()
+		{
+			if (reloader != null) {
+				reloader.Reload(this);
+			} else {
+				Application.InvokeOnMainThread(() => {
+					PrepareOpenGLTexture();
+					PlatformRenderer.CheckErrors();
+				});
+			}
 		}
 
 		/// <summary>

@@ -13,33 +13,58 @@ namespace Lime
 {
 	class ShaderProgram
 	{
-		int handle;
+		public class AttribLocation
+		{
+			public string Name;
+			public int Index;
+		}
+
+		public class Sampler
+		{
+			public string Name;
+			public int Stage;
+		}
+
+		private int handle;
+		private int graphicsContext;
 		public int ProjectionMatrixUniformId { get; private set; }
 		public int UseAlphaTexture1UniformId { get; private set; }
 		public int UseAlphaTexture2UniformId { get; private set; }
 		private Dictionary<string, int> uniformIds = new Dictionary<string, int>();
+		private List<Shader> shaders = new List<Shader>();
+		private List<AttribLocation> attribLocations;
+		private List<Sampler> samplers;
 
-		public ShaderProgram()
+		public ShaderProgram(IEnumerable<Shader> shaders, IEnumerable<AttribLocation> attribLocations, IEnumerable<Sampler> samplers)
 		{
+			this.shaders = new List<Shader>(shaders);
+			this.attribLocations = new List<AttribLocation>(attribLocations);
+			this.samplers = new List<Sampler>(samplers);
+			Create();
+		}
+
+		private void Create()
+		{
+			graphicsContext = Application.GraphicsContextId;
 			handle = GL.CreateProgram();
+			foreach (var shader in shaders) {
+				GL.AttachShader(handle, shader.GetHandle());
+			}
+			foreach (var i in attribLocations) {
+				BindAttribLocation(i.Index, i.Name);
+			}
+			Link();
+			foreach (var i in samplers) {
+				BindSampler(i.Name, i.Stage);
+			}
 		}
 
-		public void AttachShader(Shader shader)
-		{
-			GL.AttachShader(handle, shader.GetHandle());
-		}
-
-		public void DetachShader(Shader shader)
-		{
-			GL.DetachShader(handle, shader.GetHandle());
-		}
-
-		public void BindAttribLocation(int index, string name)
+		private void BindAttribLocation(int index, string name)
 		{
 			GL.BindAttribLocation(handle, index, name);
 		}
 
-		public void Link()
+		private void Link()
 		{
 			GL.LinkProgram(handle);
 			var result = new int[1];
@@ -55,7 +80,7 @@ namespace Lime
 			PlatformRenderer.CheckErrors();
 		}
 
-		public int GetUniformId(string name)
+		private int GetUniformId(string name)
 		{
 			int id;
 			if (uniformIds.TryGetValue(name, out id)) {
@@ -82,6 +107,9 @@ namespace Lime
 
 		public void Use()
 		{
+			if (graphicsContext != Application.GraphicsContextId) {
+				Create();
+			}
 			GL.UseProgram(handle);
 		}
 
@@ -108,7 +136,7 @@ namespace Lime
 			GL.Uniform2(uniformId, vector.X, vector.Y);
 		}
 
-		public void BindSampler(string name, int stage)
+		private void BindSampler(string name, int stage)
 		{
 			Use();
 			GL.Uniform1(GL.GetUniformLocation(handle, name), stage);

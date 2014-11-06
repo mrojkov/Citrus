@@ -1,10 +1,39 @@
-﻿#if iOS || ANDROID
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using OpenTK.Graphics.ES20;
 
+#if ANDROID
+namespace Lime
+{
+	static class BufferUsageHint
+	{
+		public const BufferUsage DynamicDraw = BufferUsage.DynamicDraw;
+	}
+
+	static class PrimitiveType
+	{
+		public const BeginMode Triangles = BeginMode.Triangles;
+	}
+
+	static class FramebufferAttachment
+	{
+		public const FramebufferSlot ColorAttachment0 = FramebufferSlot.ColorAttachment0;
+	}
+
+	static class GetProgramParameterName
+	{
+		public const ProgramParameter LinkStatus = ProgramParameter.LinkStatus;
+		public const ProgramParameter InfoLogLength = ProgramParameter.InfoLogLength;
+	}
+
+	static class GenerateMipmapTarget
+	{
+		public const TextureTarget Texture2D = TextureTarget.Texture2D;
+	}
+}		
+#elif iOS
 namespace Lime
 {
 	static class VertexAttribPointerType

@@ -292,6 +292,9 @@ namespace Lime
 		public event Action Deactivated;
 		public event Action Created;
 		public event Action Terminating;
+		public event Action GraphicsContextReset;
+
+		internal static int GraphicsContextId { get; private set; }
 
 		public virtual void OnActivate()
 		{
@@ -318,6 +321,14 @@ namespace Lime
 		{
 			if (Terminating != null) {
 				Terminating();
+			}
+		}
+
+		public void OnGraphicsContextReset() 
+		{
+			GraphicsContextId++;
+			if (GraphicsContextReset != null) {
+				GraphicsContextReset();
 			}
 		}
 

@@ -31,7 +31,7 @@ namespace Lime
 		public static void CheckErrors()
 		{
 #if DEBUG
-			var errCode = GL.GetError();
+			var errCode = GetErrorCode();
 			if (errCode == ErrorCode.NoError)
 				return;
 			string errors = "";
@@ -39,10 +39,20 @@ namespace Lime
 				if (errors != "")
 					errors += ", ";
 				errors += errCode.ToString();
-				errCode = GL.GetError();
+				errCode = GetErrorCode();
 			}
 			throw new Exception("OpenGL error(s): " + errors);
 #endif
+		}
+
+		static ErrorCode GetErrorCode()
+		{
+#if ANDROID
+			var errCode = GL.GetErrorCode();
+#else
+			var errCode = GL.GetError();
+#endif
+			return errCode;
 		}
 
 		public static void ResetShader()
@@ -53,7 +63,7 @@ namespace Lime
 		public static void SetShader(ShaderId value)
 		{
 			int numTextures = textures[1] != 0 ? 2 : (textures[0] != 0 ? 1 : 0);
-			var program = ShaderPrograms.GetShaderProgram(value, numTextures);
+			var program = ShaderPrograms.Instance.GetShaderProgram(value, numTextures);
 			if (shaderProgram != program) {
 				shaderProgram = program;
 				shaderProgram.Use();

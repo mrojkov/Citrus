@@ -13,11 +13,21 @@ namespace Lime
 {
 	class Shader
 	{
-		int handle;
+		private int handle;
+		private int graphicsContext;
+		private string source;
+		private bool fragmentOrVertex;
 
 		public Shader(bool fragmentOrVertex, string source)
 		{
-			source = ReplacePrecisionModifiers(source);
+			this.fragmentOrVertex = fragmentOrVertex;
+			this.source = ReplacePrecisionModifiers(source);
+			CreateShader();
+		}
+
+		private void CreateShader()
+		{
+			graphicsContext = Application.GraphicsContextId;
 			handle = GL.CreateShader(fragmentOrVertex ? ShaderType.FragmentShader : ShaderType.VertexShader);
 			GL.ShaderSource(handle, 1, new string[] { source }, new int[] { source.Length });
 			GL.CompileShader(handle);
@@ -56,6 +66,9 @@ namespace Lime
 
 		public int GetHandle()
 		{
+			if (graphicsContext != Application.GraphicsContextId) {
+				CreateShader();
+			}
 			return handle;
 		}
 	}

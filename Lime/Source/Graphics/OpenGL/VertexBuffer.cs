@@ -73,6 +73,7 @@ namespace Lime
 		public static int TotalVertexBuffers;
 		private uint vboHandle;
 		private bool disposed;
+		private int graphicsContext;
 
 		internal static class Attributes
 		{
@@ -81,12 +82,14 @@ namespace Lime
 			public const int UV2 = 2;
 			public const int Color = 3;
 
-			public static void BindLocations(ShaderProgram p)
+			public static IEnumerable<ShaderProgram.AttribLocation> GetLocations()
 			{
-				p.BindAttribLocation(VertexBuffer.Attributes.Position, "inPos");
-				p.BindAttribLocation(VertexBuffer.Attributes.UV1, "inTexCoords1");
-				p.BindAttribLocation(VertexBuffer.Attributes.UV2, "inTexCoords2");
-				p.BindAttribLocation(VertexBuffer.Attributes.Color, "inColor");
+				return new ShaderProgram.AttribLocation[] {
+					new ShaderProgram.AttribLocation { Index = VertexBuffer.Attributes.Position, Name = "inPos" },
+					new ShaderProgram.AttribLocation { Index = VertexBuffer.Attributes.UV1, Name = "inTexCoords1" },
+					new ShaderProgram.AttribLocation { Index = VertexBuffer.Attributes.UV2, Name = "inTexCoords2" },
+					new ShaderProgram.AttribLocation { Index = VertexBuffer.Attributes.Color, Name = "inColor" },
+				};
 			}
 		}
 
@@ -113,13 +116,18 @@ namespace Lime
 
 		private void AllocateVBOHandle()
 		{
+			graphicsContext = Application.GraphicsContextId;
 			var t = new int[1];
 			GL.GenBuffers(1, t);
 			vboHandle = (uint)t[0];
+			Uploaded = false;
 		}
 
 		public void Bind()
 		{
+			if (Application.GraphicsContextId != graphicsContext) {
+				AllocateVBOHandle();
+			}
 			PlatformRenderer.BindVertexBuffer(vboHandle);
 			GL.EnableVertexAttribArray(Attributes.Position);
 			GL.EnableVertexAttribArray(Attributes.UV1);
@@ -142,8 +150,10 @@ namespace Lime
 				TotalVertexBuffers--;
 				Marshal.FreeHGlobal((IntPtr)Vertices);
 				Vertices = null;
-				if (OpenTK.Graphics.GraphicsContext.CurrentContext != null) {
-					GL.DeleteBuffers(1, new uint[] { vboHandle });
+				if (graphicsContext == Application.GraphicsContextId) {
+					if (OpenTK.Graphics.GraphicsContext.CurrentContext != null) {
+						GL.DeleteBuffers(1, new uint[] { vboHandle });
+					}
 				}
 				vboHandle = 0;
 				disposed = true;

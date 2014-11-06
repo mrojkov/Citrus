@@ -38,7 +38,7 @@ namespace Lime
 		public int MemoryUsed 
 		{
 			get { return memoryUsed; }
-			set
+			protected set
 			{
 				TotalMemoryUsed += value - memoryUsed;
 				memoryUsed = value;

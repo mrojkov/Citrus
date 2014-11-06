@@ -75,9 +75,28 @@ namespace Lime
 			return true;
 		}
 
+		private bool contextLost;
+
+		protected override void OnContextLost(EventArgs e)
+		{
+			Debug.Write("Graphics context was lost");
+			base.OnContextLost(e);
+			contextLost = true;
+		}
+			
+		protected override void OnContextSet(EventArgs e)
+		{
+			base.OnContextSet(e);
+			if (contextLost) {
+				contextLost = false;
+				Debug.Write("Resetting graphics context");
+				Application.Instance.OnGraphicsContextReset();
+			}
+		}
+
 		protected override void CreateFrameBuffer()
 		{
-			GLContextVersion = GLContextVersion.Gles2_0;
+			ContextRenderingApi = GLVersion.ES2;
 			// the default GraphicsMode that is set consists of (16, 16, 0, 0, 2, false)
 			try {
 				Debug.Write("Creating framebuffer with default settings");

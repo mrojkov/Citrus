@@ -21,9 +21,21 @@ namespace Lime
 		InversedSilhuette,
 	}
 
-	static class ShaderPrograms
+	class ShaderPrograms
 	{
-		public static ShaderProgram GetShaderProgram(ShaderId shader, int numTextures)
+		public static ShaderPrograms Instance = new ShaderPrograms();
+
+		private ShaderPrograms()
+		{
+			colorOnlyBlendingProgram = CreateBlendingProgram(oneTextureVertexShader, colorOnlyFragmentShader);
+			oneTextureBlengingProgram = CreateBlendingProgram(oneTextureVertexShader, oneTextureFragmentShader);
+			twoTexturesBlengingProgram = CreateBlendingProgram(twoTexturesVertexShader, twoTexturesFragmentShader);
+			silhuetteBlendingProgram = CreateBlendingProgram(oneTextureVertexShader, silhouetteFragmentShader);
+			twoTexturesSilhuetteBlendingProgram = CreateBlendingProgram(twoTexturesVertexShader, twoTexturesSilhouetteFragmentShader);
+			inversedSilhuetteBlendingProgram = CreateBlendingProgram(oneTextureVertexShader, inversedSilhouetteFragmentShader);
+		}
+
+		public ShaderProgram GetShaderProgram(ShaderId shader, int numTextures)
 		{
 			if (shader == ShaderId.Diffuse || shader == ShaderId.Inherited) {
 				if (numTextures == 1) {
@@ -43,7 +55,7 @@ namespace Lime
 			return colorOnlyBlendingProgram;
 		}
 
-		static readonly Shader oneTextureVertexShader = new VertexShader(
+		readonly Shader oneTextureVertexShader = new VertexShader(
 			"attribute vec4 inPos;			" +	
 			"attribute vec4 inColor;		" +
 			"attribute vec2 inTexCoords1;	" + 
@@ -58,7 +70,7 @@ namespace Lime
 			"}"
 		);
 
-		static readonly Shader twoTexturesVertexShader = new VertexShader(
+		readonly Shader twoTexturesVertexShader = new VertexShader(
 			"attribute vec4 inPos;			" +
 			"attribute vec4 inColor;		" +
 			"attribute vec2 inTexCoords1;	" +
@@ -76,7 +88,7 @@ namespace Lime
 			"}"
 		);
 
-		static readonly Shader colorOnlyFragmentShader = new FragmentShader(
+		readonly Shader colorOnlyFragmentShader = new FragmentShader(
 			"varying lowp vec4 color;		" +
 			"void main()					" +
 			"{								" +
@@ -84,7 +96,7 @@ namespace Lime
 			"}"
 		);
 
-		static readonly Shader oneTextureFragmentShader = new FragmentShader(
+		readonly Shader oneTextureFragmentShader = new FragmentShader(
 			"varying lowp vec4 color;		" +
 			"varying lowp vec2 texCoords;	" +
 			"uniform lowp sampler2D tex1;	" +
@@ -99,7 +111,7 @@ namespace Lime
 			"}"
 		);
 
-		static readonly Shader twoTexturesFragmentShader = new FragmentShader(
+		readonly Shader twoTexturesFragmentShader = new FragmentShader(
 			"varying lowp vec4 color;		" +
 			"varying lowp vec2 texCoords1;	" +
 			"varying lowp vec2 texCoords2;	" +
@@ -121,7 +133,7 @@ namespace Lime
 			"}"
 		);
 
-		static readonly Shader silhouetteFragmentShader = new FragmentShader(
+		readonly Shader silhouetteFragmentShader = new FragmentShader(
 			"varying lowp vec4 color;		" +
 			"varying lowp vec2 texCoords;	" +
 			"uniform lowp sampler2D tex1;	" +
@@ -134,7 +146,7 @@ namespace Lime
 			"}"
 		);
 
-		static readonly Shader twoTexturesSilhouetteFragmentShader = new FragmentShader(
+		readonly Shader twoTexturesSilhouetteFragmentShader = new FragmentShader(
 			"varying lowp vec4 color;		" +
 			"varying lowp vec2 texCoords1;	" +
 			"varying lowp vec2 texCoords2;	" +
@@ -154,7 +166,7 @@ namespace Lime
 			"}"
 		);
 
-		static readonly Shader inversedSilhouetteFragmentShader = new FragmentShader(
+		readonly Shader inversedSilhouetteFragmentShader = new FragmentShader(
 			"varying lowp vec4 color;		" +
 			"varying lowp vec2 texCoords;	" +
 			"uniform bool useAlphaTexture1;	" +
@@ -167,25 +179,31 @@ namespace Lime
 			"}"
 		);
 
-		private static readonly ShaderProgram colorOnlyBlendingProgram = CreateBlendingProgram(oneTextureVertexShader, colorOnlyFragmentShader);
-		private static readonly ShaderProgram oneTextureBlengingProgram = CreateBlendingProgram(oneTextureVertexShader, oneTextureFragmentShader);
-		private static readonly ShaderProgram twoTexturesBlengingProgram = CreateBlendingProgram(twoTexturesVertexShader, twoTexturesFragmentShader);
-		private static readonly ShaderProgram silhuetteBlendingProgram = CreateBlendingProgram(oneTextureVertexShader, silhouetteFragmentShader);
-		private static readonly ShaderProgram twoTexturesSilhuetteBlendingProgram = CreateBlendingProgram(twoTexturesVertexShader, twoTexturesSilhouetteFragmentShader);
-		private static readonly ShaderProgram inversedSilhuetteBlendingProgram = CreateBlendingProgram(oneTextureVertexShader, inversedSilhouetteFragmentShader);
+		private readonly ShaderProgram colorOnlyBlendingProgram;
+		private readonly ShaderProgram oneTextureBlengingProgram;
+		private readonly ShaderProgram twoTexturesBlengingProgram;
+		private readonly ShaderProgram silhuetteBlendingProgram;
+		private readonly ShaderProgram twoTexturesSilhuetteBlendingProgram;
+		private readonly ShaderProgram inversedSilhuetteBlendingProgram;
 
 		private static ShaderProgram CreateBlendingProgram(Shader vertexShader, Shader fragmentShader)
 		{
-			var p = new ShaderProgram();
-			p.AttachShader(vertexShader);
-			p.AttachShader(fragmentShader);
-			VertexBuffer.Attributes.BindLocations(p);
-			p.Link();
-			p.BindSampler("tex1", 0);
-			p.BindSampler("tex2", 1);
-			p.BindSampler("tex1a", 2);
-			p.BindSampler("tex2a", 3);
+			var p = new ShaderProgram(
+				new Shader[] { vertexShader, fragmentShader }, 
+				VertexBuffer.Attributes.GetLocations(),
+				GetSamplers()
+			);
 			return p;
+		}
+
+		private static IEnumerable<ShaderProgram.Sampler> GetSamplers()
+		{
+			return new ShaderProgram.Sampler[] {
+				new ShaderProgram.Sampler { Name = "tex1", Stage = 0 },
+				new ShaderProgram.Sampler { Name = "tex2", Stage = 1 },
+				new ShaderProgram.Sampler { Name = "tex1a", Stage = 2 },
+				new ShaderProgram.Sampler { Name = "tex2a", Stage = 3 }
+			};
 		}
 	}
 }

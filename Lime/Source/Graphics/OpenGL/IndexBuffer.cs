@@ -54,6 +54,7 @@ namespace Lime
 		public static int TotalIndexBuffers;
 		private uint iboHandle;
 		private bool disposed;
+		private int graphicsContext;
 
 		public IndexBuffer(int capacity = DefaultCapacity)
 		{
@@ -80,10 +81,15 @@ namespace Lime
 			var t = new int[1];
 			GL.GenBuffers(1, t);
 			iboHandle = (uint)t[0];
+			graphicsContext = Application.GraphicsContextId;
+			Uploaded = false;
 		}
 
 		public void Bind()
 		{
+			if (graphicsContext != Application.GraphicsContextId) {
+				AllocateIBOHandle();
+			}
 			PlatformRenderer.BindIndexBuffer(iboHandle);
 			if (!Uploaded) {
 				Uploaded = true;
@@ -97,8 +103,10 @@ namespace Lime
 				TotalIndexBuffers--;
 				Marshal.FreeHGlobal((IntPtr)Indices);
 				Indices = null;
-				if (OpenTK.Graphics.GraphicsContext.CurrentContext != null) {
-					GL.DeleteBuffers(1, new uint[] { iboHandle });
+				if (graphicsContext == Application.GraphicsContextId) {
+					if (OpenTK.Graphics.GraphicsContext.CurrentContext != null) {
+						GL.DeleteBuffers(1, new uint[] { iboHandle });
+					}
 				}
 				iboHandle = 0;
 				disposed = true;

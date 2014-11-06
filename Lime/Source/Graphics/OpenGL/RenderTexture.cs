@@ -22,11 +22,12 @@ namespace Lime
 
 	public class RenderTexture : CommonTexture, ITexture
 	{
-		uint handle;
-		uint framebuffer;
-		readonly Size size = new Size(0, 0);
-		readonly Rectangle uvRect;
-		static readonly Stack<uint> framebufferStack = new Stack<uint>();
+		private uint handle;
+		private uint framebuffer;
+		private readonly Size size = new Size(0, 0);
+		private readonly Rectangle uvRect;
+		private static readonly Stack<uint> framebufferStack = new Stack<uint>();
+		private int graphicsContext;
 
 		public RenderTextureFormat Format { get; private set; }
 
@@ -36,6 +37,12 @@ namespace Lime
 			size.Width = width;
 			size.Height = height;
 			uvRect = new Rectangle(0, 0, 1, 1);
+			CreateTexture();
+		}
+
+		private void CreateTexture()
+		{
+			graphicsContext = Application.GraphicsContextId;
 			var t = new uint[1];
 			GL.GenFramebuffers(1, t);
 			framebuffer = t[0];
@@ -47,11 +54,11 @@ namespace Lime
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)All.ClampToEdge);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)All.ClampToEdge);
 			int bpp;
-			if (format == RenderTextureFormat.RGBA8) {
-				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, (IntPtr)null);
+			if (Format == RenderTextureFormat.RGBA8) {
+				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, size.Width, size.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, (IntPtr)null);
 				bpp = 4;
 			} else {
-				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, width, height, 0, PixelFormat.Rgb, PixelType.UnsignedShort565, (IntPtr)null);
+				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, size.Width, size.Height, 0, PixelFormat.Rgb, PixelType.UnsignedShort565, (IntPtr)null);
 				bpp = 2;
 			}
 			MemoryUsed = SurfaceSize.Width * SurfaceSize.Height * bpp;
@@ -86,14 +93,18 @@ namespace Lime
 		public override void Dispose()
 		{
 			if (framebuffer != 0) {
-				lock (Texture2D.FramebuffersToDelete) {
-					Texture2D.FramebuffersToDelete.Add(framebuffer);
+				if (graphicsContext == Application.GraphicsContextId) {
+					lock (Texture2D.FramebuffersToDelete) {
+						Texture2D.FramebuffersToDelete.Add(framebuffer);
+					}
 				}
 				framebuffer = 0;
 			}
 			if (handle != 0) {
-				lock (Texture2D.TexturesToDelete) {
-					Texture2D.TexturesToDelete.Add(handle);
+				if (graphicsContext == Application.GraphicsContextId) {
+					lock (Texture2D.TexturesToDelete) {
+						Texture2D.TexturesToDelete.Add(handle);
+					}
 				}
 				handle = 0;
 			}
@@ -107,6 +118,9 @@ namespace Lime
 
 		public uint GetHandle()
 		{
+			if (graphicsContext != Application.GraphicsContextId) {
+				CreateTexture();
+			}
 			return handle;
 		}
 
