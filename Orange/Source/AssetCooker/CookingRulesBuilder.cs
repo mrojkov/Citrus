@@ -22,12 +22,15 @@ namespace Orange
 
 	public struct CookingRules
 	{
+		public const string MainBundle = "";
+
 		public string TextureAtlas;
 		public bool MipMaps;
 		public PVRFormat PVRFormat;
 		public DDSFormat DDSFormat;
 		public DateTime LastChangeTime;
-		public string Bundle;
+		public string Bundle1;
+		public string Bundle2;
 
 		public static CookingRules Default = new CookingRules {
 			TextureAtlas = null,
@@ -35,7 +38,8 @@ namespace Orange
 			PVRFormat = PVRFormat.Compressed, 
 			DDSFormat = DDSFormat.DXTi,
 			LastChangeTime = new DateTime(0),
-			Bundle = null
+			Bundle1 = MainBundle,
+			Bundle2 = null,
 		};
 	}
 	
@@ -131,7 +135,7 @@ namespace Orange
 							continue;
 						}
 						var words = line.Split(' ');
-						if (words.Length != 2) {
+						if (words.Length < 2) {
 							throw new Lime.Exception("Invalid rule format");
 						}
 						switch (words[0]) {
@@ -158,11 +162,9 @@ namespace Orange
 								rules.DDSFormat = ParseDDSFormat(words[1]);
 								break;
 							case "Bundle":
-								if (words[1].ToLowerInvariant() == "<default>" || words[1].ToLowerInvariant() == "data") {
-									rules.Bundle = null;
-								} else {
-									rules.Bundle = words[1];
-								}
+								rules.Bundle1 = ParseBundle(words[1]);
+								if (words.Length > 2)
+									rules.Bundle2 = ParseBundle(words[2]);
 								break;
 							default:
 								throw new Lime.Exception("Unknown attribute {0}", words[0]);
@@ -173,6 +175,15 @@ namespace Orange
 				throw new Lime.Exception("Syntax error in {0}: {1}", path, e.Message);
 			}
 			return rules;
+		}
+
+		static string ParseBundle(string word)
+		{
+			if (word.ToLowerInvariant() == "<default>" || word.ToLowerInvariant() == "data") {
+				return CookingRules.MainBundle;
+			} else {
+				return word;
+			}
 		}
 	}
 }

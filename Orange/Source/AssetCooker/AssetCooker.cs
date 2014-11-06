@@ -73,12 +73,13 @@ namespace Orange
 			} else {
 				var extraBundles = new HashSet<string>();
 				foreach (var dictionaryItem in cookingRulesMap) {
-					if (dictionaryItem.Value.Bundle != null) {
-						extraBundles.Add(dictionaryItem.Value.Bundle);
-					}
+					if (!string.IsNullOrEmpty(dictionaryItem.Value.Bundle1))
+						extraBundles.Add(dictionaryItem.Value.Bundle1);
+					if (!string.IsNullOrEmpty(dictionaryItem.Value.Bundle2))
+						extraBundles.Add(dictionaryItem.Value.Bundle2);
 				}
 				string mainBundlePath = The.Workspace.GetBundlePath(platform);
-				CookBundle(mainBundlePath, null);
+				CookBundle(mainBundlePath, CookingRules.MainBundle);
 				foreach (var extraBundle in extraBundles) {
 					var bundlePath = Path.Combine(Path.GetDirectoryName(mainBundlePath), extraBundle + Path.GetExtension(mainBundlePath));
 					CookBundle(bundlePath, extraBundle);
@@ -106,10 +107,10 @@ namespace Orange
 				The.Workspace.AssetFiles.EnumerationFilter = (info) => {
 					CookingRules rules;
 					if (cookingRulesMap.TryGetValue(info.Path, out rules)) {
-						return rules.Bundle == bundleFilter;
+						return rules.Bundle1 == bundleFilter || rules.Bundle2 == bundleFilter;
 					} else {
 						// для текстовых файлов cooking rules отсутствуют, считаем их принадлежащими к главному бандлу.
-						return bundleFilter == null;
+						return bundleFilter == CookingRules.MainBundle;
 					}
 				};
 				// у каждого бандла должна быть своя папка с атласами, чтобы они друг с другом не пересекались
