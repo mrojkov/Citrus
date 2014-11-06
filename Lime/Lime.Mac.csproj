@@ -177,7 +177,6 @@
     <Compile Include="Source\AssetsBundle\PackedAssetsBundle.cs" />
     <Compile Include="Source\AssetsBundle\UnpackedAssetsBundle.cs" />
     <Compile Include="Source\Graphics\OgvDecoder.cs" />
-    <Compile Include="Source\PopupMenu\ImageBox.cs" />
     <Compile Include="Source\PopupMenu\LayoutTools.cs" />
     <Compile Include="Source\PopupMenu\MenuButton.cs" />
     <Compile Include="Source\PopupMenu\MenuItem.cs" />
