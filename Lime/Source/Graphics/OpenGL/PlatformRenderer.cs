@@ -31,7 +31,11 @@ namespace Lime
 		public static void CheckErrors()
 		{
 #if DEBUG
-			var errCode = GetErrorCode();
+#if ANDROID
+			var errCode = GL.GetErrorCode();
+#else
+			var errCode = GL.GetError();
+#endif
 			if (errCode == ErrorCode.NoError)
 				return;
 			string errors = "";
@@ -39,20 +43,14 @@ namespace Lime
 				if (errors != "")
 					errors += ", ";
 				errors += errCode.ToString();
-				errCode = GetErrorCode();
+#if ANDROID
+				errCode = GL.GetErrorCode();
+#else
+				errCode = GL.GetError();
+#endif
 			}
 			throw new Exception("OpenGL error(s): " + errors);
 #endif
-		}
-
-		static ErrorCode GetErrorCode()
-		{
-#if ANDROID
-			var errCode = GL.GetErrorCode();
-#else
-			var errCode = GL.GetError();
-#endif
-			return errCode;
 		}
 
 		public static void ResetShader()
