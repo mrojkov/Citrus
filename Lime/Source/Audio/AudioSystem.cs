@@ -58,6 +58,10 @@ namespace Lime
 #if iOS 
 			context = new AudioContext();
 #elif ANDROID
+			if (context != null) {
+				// Audio system may be alread initialized if we called it from Activity.OnCreate()
+				return;
+			}
 			// LoadLibrary() ivokes JNI_OnLoad()
 			Java.Lang.JavaSystem.LoadLibrary("openal32");
 			context = new AudioContext();
@@ -90,13 +94,16 @@ namespace Lime
             if (streamingThread != null) {
                 shouldTerminateThread = true;
                 streamingThread.Join();
+				streamingThread = null;
             }
 			foreach (var channel in channels) {
 				channel.Dispose();
 			}
+			channels.Clear();
 #if OPENAL
 			if (context != null) {
 				context.Dispose();
+				context = null;
 			}
 #endif
 		}
