@@ -8,6 +8,8 @@ using System.Reflection;
 using MonoTouch.UIKit;
 #elif MAC
 using MonoMac.AppKit;
+#elif ANDROID
+using Android.App;
 #endif
 
 namespace Lime
@@ -228,13 +230,18 @@ namespace Lime
 			set { GameView.Instance.WindowSize = value; }
 		}
 #elif ANDROID
-		public Size WindowSize { get; internal set; }
+		public Size WindowSize 
+		{
+			get;
+			// AndroidGameView changes the window size
+			internal set;
+		}
 
 		public Vector2 ScreenDPI 
 		{
 			get
 			{ 
-				var dm = GameView.Instance.Context.Resources.DisplayMetrics;
+				var dm = Android.Content.Res.Resources.System.DisplayMetrics;
 				return new Vector2(dm.Xdpi, dm.Ydpi);
 			}
 		}
@@ -287,7 +294,6 @@ namespace Lime
 			set { UnityEngine.Screen.SetResolution(value.Width, value.Height, FullScreen); }
 		}
 #endif
-
 		public event Action Activated;
 		public event Action Deactivated;
 		public event Action Created;
