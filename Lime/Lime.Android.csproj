@@ -196,7 +196,6 @@
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGraphicsContext.cs" />
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Utilities.iPhone.cs" />
     <Compile Include="Source\Application\AndroidGameView.cs" />
-    <Compile Include="Source\Application\AndroidMainActivity.cs" />
     <Compile Include="Source\Graphics\Bitmap.Android.cs" />
     <Compile Include="Source\Widgets\WebBrowser.Android.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -272,6 +271,7 @@
     <Compile Include="Source\Widgets2\Animation\KeyframeCollection.cs" />
     <Compile Include="Source\Widgets2\Text\TextParser.cs" />
     <Compile Include="Source\Widgets2\Text\TextRenderer.cs" />
+    <Compile Include="Source\Application\AndroidActivityDelegate.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">
