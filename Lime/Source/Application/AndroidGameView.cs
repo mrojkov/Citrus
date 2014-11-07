@@ -79,7 +79,6 @@ namespace Lime
 
 		protected override void OnContextLost(EventArgs e)
 		{
-			Debug.Write("Graphics context was lost");
 			base.OnContextLost(e);
 			contextLost = true;
 		}
@@ -89,10 +88,14 @@ namespace Lime
 			base.OnContextSet(e);
 			if (contextLost) {
 				contextLost = false;
+				Application.Instance.OnGraphicsContextReset();
 			}
-			// For some reason OpenTK doesn't fire OnContextLost() event. So, reset context every OnContextSet()
-			Debug.Write("Resetting graphics context");
+		}
+
+		protected override void OnUnload(EventArgs e)
+		{
 			Application.Instance.OnGraphicsContextReset();
+			base.OnUnload(e);
 		}
 
 		protected override void CreateFrameBuffer()
@@ -260,23 +263,13 @@ namespace Lime
 			OnRenderFrame(null);
 		}
 
-		private static bool applicationCreated;
-
 		protected override void OnResize(EventArgs e)
 		{
 			base.OnResize(e);
-			//Lime.Application.Instance.WindowSize = new Lime.Size(Width, Height);
+			Lime.Application.Instance.WindowSize = new Lime.Size(Width, Height);
 			var orientation = Resources.Configuration.Orientation;
 			Lime.Application.Instance.CurrentDeviceOrientation = ConvertOrientation(orientation);
-			if (!applicationCreated) {
-				applicationCreated = true;
-				Lime.Application.Instance.WindowSize = new Lime.Size(Width, Height);
-				Lime.Application.Instance.OnCreate();
-			} else {
-				Lime.Application.Instance.WindowSize = new Lime.Size(Width, Height);
-				Lime.Application.Instance.OnDeviceRotate();
-			}
-			Run();
+			Lime.Application.Instance.OnDeviceRotate();
 		}
 			
 		private static DeviceOrientation ConvertOrientation(Android.Content.Res.Orientation orientation)
