@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Orange
 {
-	static partial class Actions
+	public static partial class Actions
 	{
 		[MenuItem("Build & Run", 0)]
 		public static void BuildAndRunAction()

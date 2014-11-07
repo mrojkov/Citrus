@@ -98,6 +98,19 @@ namespace Orange
 			return result;
 		}
 
+		public static void FilterFiles(List<FileInfo> files)
+		{
+			if (CurrentPlugin != null) {
+				foreach (var method in CurrentPlugin.GetAllMethodsWithAttribute(typeof(PluginFileIgoranceAttribute))) {
+					if (!method.IsStatic) {
+						new System.Exception(string.Format("'{0}' must be a static method", method.Name));
+					}
+					var parameters = new object[1] { files };
+					method.Invoke(null, parameters);
+				}
+			}
+		}
+
 		private static string GetPluginCommandLineArgumets(System.Reflection.Assembly assembly)
 		{
 			string result = "";

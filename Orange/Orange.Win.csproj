@@ -96,6 +96,7 @@
     <Compile Include="Source\Actions\UpgradeOrange.cs" />
     <Compile Include="Source\AssetCooker\OpacityMaskCreator.cs" />
     <Compile Include="Source\DictionaryOldFormatExtractor.cs" />
+    <Compile Include="Source\PluginAttributes\PluginFileIgoranceAttribute.cs" />
     <Compile Include="Source\PluginAttributes\PluginAssetsCookedAttribute.cs" />
     <Compile Include="Source\PluginAttributes\PluginCommandLineArgumentsAttribute.cs" />
     <Compile Include="Source\PluginAttributes\PluginFinalizationAttribute.cs" />

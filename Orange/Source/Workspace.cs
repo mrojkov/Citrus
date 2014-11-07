@@ -101,8 +101,8 @@ namespace Orange
 				if (!Directory.Exists(AssetsDirectory)) {
 					throw new Lime.Exception("Assets folder '{0}' doesn't exist", AssetsDirectory);
 				}
-				AssetFiles = new FileEnumerator(AssetsDirectory);
 				PluginLoader.ScanForPlugins(file);
+				AssetFiles = new FileEnumerator(AssetsDirectory);
 				The.UI.OnWorkspaceOpened();
 			} catch (System.Exception e) {
 				Console.WriteLine(string.Format("Can't open {0}:\n{1}", file, e.Message));
