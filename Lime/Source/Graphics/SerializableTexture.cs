@@ -11,20 +11,19 @@ namespace Lime
 	{
 		SerializableTextureCore core;
 
-		public SerializableTexture()
-		{
-			core = TexturePool.Instance.GetSerializableTextureCore("");
-		}
-
 		public SerializableTexture(string path)
 		{
 			core = TexturePool.Instance.GetSerializableTextureCore(path);
 		}
 
-		public SerializableTexture(string format, params object[] args)
+		public SerializableTexture()
+			: this("")
 		{
-			var path = string.Format(format, args);
-			core = TexturePool.Instance.GetSerializableTextureCore(path);
+		}
+
+		public SerializableTexture(string format, params object[] args)
+			: this(string.Format(format, args))
+		{
 		}
 
 		public string SerializationPath {
