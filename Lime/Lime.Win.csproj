@@ -232,7 +232,7 @@
     <Compile Include="Source\Graphics\SerializableFont.cs" />
     <Compile Include="Source\Graphics\SerializableTexture.cs" />
     <Compile Include="Source\Graphics\ITexture.cs" />
-    <Compile Include="Source\Graphics\TextureAtlasPart.cs" />
+    <Compile Include="Source\Graphics\TextureAtlasElement.cs" />
     <Compile Include="Source\Graphics\OgvDecoder.cs" />
     <Compile Include="Source\Graphics\MovieTexture.cs" />
     <Compile Include="Source\Localization\Localization.cs" />

@@ -289,13 +289,18 @@ namespace Lime
 		/// <returns></returns>
 		public uint GetHandle()
 		{
-			if (Application.GraphicsContextId != graphicsContext) {
-				ReloadIfContextWasRestored();
+			if (Application.GraphicsContextId != graphicsContext || handle == 0) {
+				Reload();
 			}
 			return handle;
 		}
 
-		private void ReloadIfContextWasRestored()
+		public void Unload()
+		{
+			Dispose();
+		}
+
+		private void Reload()
 		{
 			if (reloader != null) {
 				reloader.Reload(this);
@@ -312,6 +317,7 @@ namespace Lime
 		/// </summary>
 		public void SetAsRenderTarget()
 		{
+			throw new NotSupportedException();
 		}
 
 		/// <summary>
@@ -319,6 +325,7 @@ namespace Lime
 		/// </summary>
 		public void RestoreRenderTarget()
 		{
+			throw new NotSupportedException();
 		}
 
 		/// <summary>

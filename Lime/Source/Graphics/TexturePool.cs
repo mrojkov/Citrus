@@ -18,88 +18,110 @@ namespace Lime
 			textures = new ConcurrentDictionary<string, WeakReference>();
 		}
 
-		public IEnumerable<ITexture> PreloadAll(string pathPrefix)
-		{
-			var textures = new List<ITexture>();
-			foreach (var i in AssetsBundle.Instance.EnumerateFiles()) {
-				if (i.StartsWith(pathPrefix)) {
-					var ext = Path.GetExtension(i);
-					if (ext == ".atlasPart" || ext == ".pvr" || ext == ".dds" || ext == ".png") {
-						var texturePath = Path.ChangeExtension(i, null);
-						var texture = Preload(texturePath);
-						textures.Add(texture);
-					}
-				}
-			}
-			return textures;
-		}
-
-		public ITexture Preload(string path)
-		{
-			var texture = new SerializableTexture(path);
-			texture.GetHandle();
-			return texture;
-		}
-
-		/// <summary>
-		/// Discards textures which have not been used 
-		/// for given number of render cycles.
-		/// </summary>
 		public void DiscardUnusedTextures(int numCycles)
 		{
-			foreach (WeakReference r in textures.Values) {
-				var target = r.Target as SerializableTextureCore;
-				if (target != null) {
-					target.DiscardIfNotUsed(numCycles);
-				}
-			}
-#if !UNITY
-			Texture2D.DeleteScheduledTextures();
-#endif
+			DiscardAllTextures();
 		}
 
 		public void DiscardAllTextures()
 		{
 			foreach (WeakReference r in textures.Values) {
-				var target = r.Target as SerializableTextureCore;
-				if (target != null) {
-					target.Discard();
+				var texture = r.Target as ITexture;
+				if (texture != null) {
+					texture.Unload();
 				}
 			}
-#if !UNITY
 			Texture2D.DeleteScheduledTextures();
-#endif
 		}
 
-		public void DiscardAllStubTextures()
+		public ITexture GetTexture(string path)
 		{
-			foreach (WeakReference r in textures.Values) {
-				var target = r.Target as SerializableTextureCore;
-				if (target != null && target.IsStubTexture) {
-					target.Discard();
-				}
-			}
-#if !UNITY
-			Texture2D.DeleteScheduledTextures();
-#endif
-		}
-
-		internal SerializableTextureCore GetSerializableTextureCore(string path)
-		{
-			SerializableTextureCore core;
+			ITexture texture;
 			WeakReference r;
 			if (!textures.TryGetValue(path, out r)) {
-				core = new SerializableTextureCore(path);
-				textures[path] = new WeakReference(core);
-				return core;
+				texture = CreateTexture(path);
+				textures[path] = new WeakReference(texture);
+				return texture;
 			}
-			core = r.Target as SerializableTextureCore;
-			if (core == null) {
-				core = new SerializableTextureCore(path);
-				textures[path] = new WeakReference(core);
-				return core;
+			texture = r.Target as ITexture;
+			if (texture == null) {
+				texture = CreateTexture(path);
+				textures[path] = new WeakReference(texture);
+				return texture;
 			}
-			return core;
+			return texture;
+		}
+
+		private static ITexture CreateTexture(string path)
+		{
+			if (string.IsNullOrEmpty(path)) {
+				return CreateStubTexture();
+			}
+			var texture = TryCreateRenderTarget(path) ??
+				TryLoadTextureAtlasPart(path + ".atlasPart") ??
+#if iOS || ANDROID
+				TryLoadImage(path + ".pvr")
+#elif UNITY
+				TryLoadImage(path + ".png")
+#else
+				TryLoadImage(path + ".dds") ??
+				TryLoadImage(path + ".png");
+#endif
+			if (texture == null) {
+				Console.WriteLine("Missing texture '{0}'", path);
+				texture = CreateStubTexture();
+			}
+			return texture;
+		}
+
+		private static Texture2D CreateStubTexture()
+		{
+			var texture = new Texture2D();
+			var pixels = new Color4[128 * 128];
+			for (int i = 0; i < 128; i++)
+				for (int j = 0; j < 128; j++)
+					pixels[i * 128 + j] = (((i + (j & ~7)) & 8) == 0) ? Color4.Blue : Color4.White;
+			texture.LoadImage(pixels, 128, 128, false);
+			return texture;
+		}
+
+		private static ITexture TryLoadImage(string path)
+		{
+			if (!AssetsBundle.Instance.FileExists(path)) {
+				return null;
+			}
+			var texture = new Texture2D();
+			texture.LoadImage(path);
+			AudioSystem.Update();
+			return texture;
+		}
+
+		private static ITexture TryCreateRenderTarget(string path)
+		{
+			if (path.Length <= 0 || path[0] != '#') {
+				return null;
+			}
+			switch (path) {
+				case "#a":
+				case "#b":
+					return new RenderTexture(256, 256);
+				case "#c":
+					return new RenderTexture(512, 512);
+				case "#d":
+					return new RenderTexture(1024, 1024);
+				default:
+					return null;
+			}
+		}
+
+		private static ITexture TryLoadTextureAtlasPart(string path)
+		{
+			if (!AssetsBundle.Instance.FileExists(path)) {
+				return null;
+			}
+			var data = TextureAtlasElement.Params.ReadFromBundle(path);
+			var texture = new TextureAtlasElement(data);
+			return texture;
 		}
 	}
 }

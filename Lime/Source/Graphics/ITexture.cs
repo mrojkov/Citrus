@@ -27,6 +27,12 @@ namespace Lime
 #if UNITY
 		UnityEngine.Texture GetUnityTexture();
 #endif
+		/// <summary>
+		/// Unloads the texture from memory, frees OpenGL resources.
+		/// The texture will be loaded again on the next GetHandle().
+		/// RenderTexture.Unload() does nothing.
+		/// </summary>
+		void Unload();
 	}
 
 	public class CommonTexture : IDisposable

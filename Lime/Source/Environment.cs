@@ -16,7 +16,7 @@ namespace Lime
 			model.UseImplicitZeroDefaults = false;
 			model.Add(typeof(ITexture), true);
 			model.Add(typeof(Node), true);
-			model.Add(typeof(TextureAtlasPart), true);
+			model.Add(typeof(TextureAtlasElement.Params), true);
 			model.Add(typeof(Font), true);
 			model.Add(typeof(Bitmap), true);
 			foreach (var type in types) {

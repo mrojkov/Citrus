@@ -488,11 +488,11 @@ namespace Orange
 			foreach (var item in items.Where(i => i.Allocated)) {
 				var p = item.Pixbuf;
 				p.CopyArea(0, 0, p.Width, p.Height, atlas, item.AtlasRect.A.X, item.AtlasRect.A.Y);
-				var atlasPart = new Lime.TextureAtlasPart();
+				var atlasPart = new Lime.TextureAtlasElement.Params();
 				atlasPart.AtlasRect = item.AtlasRect;
 				atlasPart.AtlasRect.B -= new Lime.IntVector2(2, 2);
-				atlasPart.AtlasTexture = Path.ChangeExtension(atlasPath, null);
-				Lime.Serialization.WriteObjectToBundle<Lime.TextureAtlasPart>(assetsBundle, item.Path, atlasPart);
+				atlasPart.AtlasPath = Path.ChangeExtension(atlasPath, null);
+				Lime.Serialization.WriteObjectToBundle<Lime.TextureAtlasElement.Params>(assetsBundle, item.Path, atlasPart);
 				// Delete non-atlased texture since now its useless
 				var texturePath = Path.ChangeExtension(item.Path, GetPlatformTextureExtension());
 				if (assetsBundle.FileExists(texturePath)) {
@@ -552,8 +552,8 @@ namespace Orange
 				string srcTexturePath =  Path.ChangeExtension(atlasPartPath, ".png");
 				if (!textures.ContainsKey(srcTexturePath) || assetsBundle.GetFileLastWriteTime(atlasPartPath) < textures[srcTexturePath]) {
 					srcTexturePath = Lime.AssetPath.Combine(The.Workspace.AssetsDirectory, srcTexturePath);
-					var part = Lime.TextureAtlasPart.ReadFromBundle(atlasPartPath);
-					string atlasChain = Path.GetFileNameWithoutExtension(part.AtlasTexture);
+					var part = Lime.TextureAtlasElement.Params.ReadFromBundle(atlasPartPath);
+					string atlasChain = Path.GetFileNameWithoutExtension(part.AtlasPath);
 					atlasChainsToRebuild.Add(atlasChain);
 					if (!textures.ContainsKey(srcTexturePath)) {
 						Console.WriteLine("- " + atlasPartPath);
