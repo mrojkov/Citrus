@@ -134,7 +134,9 @@ namespace Lime
             using (var context = new MonoTouch.CoreGraphics.CGBitmapContext(data, width, height, bitsPerComponent, bytesPerRow, colorSpace, alphaInfo)) {
                 context.DrawImage(new System.Drawing.RectangleF(0, 0, width, height), imageRef);
                 PrepareOpenGLTexture();
+				PlatformRenderer.PushTexture(handle, 0);
                 GL.TexImage2D(All.Texture2D, 0, (int)All.Rgba, width, height, 0, All.Rgba, All.UnsignedByte, data);
+				PlatformRenderer.PopTexture(0);
             }
         }
 #elif ANDROID
@@ -149,8 +151,10 @@ namespace Lime
 				var pixels = new int[bitmap.Width * bitmap.Height];
 				bitmap.GetPixels(pixels, 0, bitmap.Width, 0, 0, bitmap.Width, bitmap.Height);
 				SwapRedAndBlue(ref pixels);
+				PlatformRenderer.PushTexture(handle, 0);
 				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0,
 					PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
+				PlatformRenderer.PopTexture(0);
 				MemoryUsed = bitmap.Width * bitmap.Height * 4;
 			}
 			PlatformRenderer.CheckErrors();
