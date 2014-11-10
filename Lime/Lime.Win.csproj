@@ -313,6 +313,7 @@
     <Compile Include="Source\Application\AndroidGameView.cs" />
     <Compile Include="Source\Graphics\Bitmap.Android.cs" />
     <Compile Include="Source\Widgets\WebBrowser.Android.cs" />
+    <Compile Include="Source\Application\AndroidActivityDelegate.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
