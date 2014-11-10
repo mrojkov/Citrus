@@ -117,7 +117,7 @@ namespace Lime
 			return texture.GetHandle();
 		}
 
-		public void Unload() { }
+		public void Discard() { }
 
 #if UNITY
 		public UnityEngine.Texture GetUnityTexture()

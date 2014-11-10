@@ -43,7 +43,7 @@ namespace Lime
 		}
 	}
 
-	public unsafe class IndexBuffer : IDisposable
+	public unsafe class IndexBuffer : IDisposable, IGLObject
 	{
 		public const int DefaultCapacity = 400;
 		public readonly int Capacity;
@@ -54,15 +54,13 @@ namespace Lime
 		public static int TotalIndexBuffers;
 		private uint iboHandle;
 		private bool disposed;
-		private int graphicsContext;
 
 		public IndexBuffer(int capacity = DefaultCapacity)
 		{
 			this.Capacity = capacity;
 			TotalIndexBuffers++;
 			Indices = (ushort*)Marshal.AllocHGlobal(sizeof(ushort) * Capacity);
-			AllocateIBOHandle();
-			PlatformRenderer.CheckErrors();
+			GLObjectRegistry.Instance.Add(this);
 		}
 
 		~IndexBuffer()
@@ -81,13 +79,12 @@ namespace Lime
 			var t = new int[1];
 			GL.GenBuffers(1, t);
 			iboHandle = (uint)t[0];
-			graphicsContext = Application.GraphicsContextId;
 			Uploaded = false;
 		}
 
 		public void Bind()
 		{
-			if (graphicsContext != Application.GraphicsContextId) {
+			if (iboHandle == 0) {
 				AllocateIBOHandle();
 			}
 			PlatformRenderer.BindIndexBuffer(iboHandle);
@@ -103,15 +100,22 @@ namespace Lime
 				TotalIndexBuffers--;
 				Marshal.FreeHGlobal((IntPtr)Indices);
 				Indices = null;
-				if (graphicsContext == Application.GraphicsContextId) {
-					if (OpenTK.Graphics.GraphicsContext.CurrentContext != null) {
-						GL.DeleteBuffers(1, new uint[] { iboHandle });
-					}
-				}
-				iboHandle = 0;
+				Discard();
 				disposed = true;
 			}
 			GC.SuppressFinalize(this);
+		}
+
+		public void Discard()
+		{
+			if (iboHandle != 0) {
+				Application.InvokeOnMainThread(() => {
+					if (OpenTK.Graphics.GraphicsContext.CurrentContext != null) {
+						GL.DeleteBuffers(1, new uint[] { iboHandle });
+					}
+				});
+				iboHandle = 0;
+			}
 		}
 	}
 }

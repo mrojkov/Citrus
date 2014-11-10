@@ -58,6 +58,7 @@
     <Compile Include="Source\Application\RenderingApi.cs" />
     <Compile Include="Source\Application\WinApi.cs" />
     <Compile Include="Source\AssetsBundle\UnityAssetsBundle.cs" />
+    <Compile Include="Source\Graphics\OpenGL\OpenGLObjectRegistry.cs" />
     <Compile Include="Source\Widgets2\Animation\Animation.cs" />
     <Compile Include="Source\Widgets2\Animation\AnimationUtils.cs">
       <SubType>Code</SubType>

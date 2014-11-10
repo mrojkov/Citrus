@@ -16,7 +16,7 @@ namespace Lime
 	/// <summary>
 	/// Represents 2D texture
 	/// </summary>
-	public partial class Texture2D : CommonTexture, ITexture
+	public partial class Texture2D : CommonTexture, ITexture, IGLObject
 	{
 		#region TextureReloader
 		abstract class TextureReloader
@@ -84,49 +84,24 @@ namespace Lime
 		public Size SurfaceSize { get; protected set; }
 		private Rectangle uvRect;
 		private TextureReloader reloader;
-		private int graphicsContext;
 
-		internal static List<uint> TexturesToDelete = new List<uint>();
-		internal static List<uint> FramebuffersToDelete = new List<uint>();
-
-		public static void DeleteScheduledTextures()
+		public virtual string SerializationPath 
 		{
-			lock (TexturesToDelete) {
-				if (TexturesToDelete.Count > 0) {
-					Debug.Write("Discarded {0} texture(s). Total texture memory: {1}mb", TexturesToDelete.Count, CommonTexture.TotalMemoryUsedMb);
-					var ids = TexturesToDelete.ToArray();
-					GL.DeleteTextures(ids.Length, ids);
-					TexturesToDelete.Clear();
-					PlatformRenderer.CheckErrors();
-				}
-			}
-			lock (FramebuffersToDelete) {
-				if (FramebuffersToDelete.Count > 0) {
-					var ids = FramebuffersToDelete.ToArray();
-					GL.DeleteFramebuffers(ids.Length, ids);
-					FramebuffersToDelete.Clear();
-					PlatformRenderer.CheckErrors();
-				}
-			}
-		}
-
-		public virtual string SerializationPath {
-			get {
-				throw new NotSupportedException();
-			}
-			set {
-				throw new NotSupportedException();
-			}
+			get { throw new NotSupportedException(); }
+			set { throw new NotSupportedException(); }
 		}
 
 		public Rectangle AtlasUVRect { get { return uvRect; } }
 		public ITexture AlphaTexture { get; private set; }
 
-		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv0, ref Vector2 uv1)
-		{
-		}
+		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv0, ref Vector2 uv1) { }
 
 		public bool IsStubTexture { get { return false; } }
+
+		public Texture2D()
+		{
+			GLObjectRegistry.Instance.Add(this);
+		}
 
 		public void LoadImage(string path)
 		{
@@ -198,19 +173,18 @@ namespace Lime
 
 		private void PrepareOpenGLTexture()
 		{
-			DeleteScheduledTextures();
 			// Generate a new texture.
 			if (handle == 0) {
 				var t = new int[1];
 				GL.GenTextures(1, t);
 				handle = (uint)t[0];
-				graphicsContext = Application.GraphicsContextId;
 			}
-			PlatformRenderer.SetTexture(handle, 0);
+			PlatformRenderer.PushTexture(handle, 0);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)All.ClampToEdge);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)All.ClampToEdge);
+			PlatformRenderer.PopTexture(0);
 			PlatformRenderer.CheckErrors();
 		}
 
@@ -220,9 +194,9 @@ namespace Lime
 		public void LoadImage(Color4[] pixels, int width, int height, bool generateMips)
 		{
 			reloader = new TexturePixelArrayReloader(pixels, width, height, generateMips);
-			DisposeAlphaTexture();
 			Application.InvokeOnMainThread(() => {
 				PrepareOpenGLTexture();
+				PlatformRenderer.PushTexture(handle, 0);
 				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
 				MemoryUsed = 4 * width * height;
 				if (generateMips) {
@@ -231,20 +205,13 @@ namespace Lime
 					MemoryUsed += (int)(MemoryUsed * 0.33f);
 #endif
 				}
+				PlatformRenderer.PopTexture(0);
 				PlatformRenderer.CheckErrors();
 			});
 
 			ImageSize = new Size(width, height);
 			SurfaceSize = ImageSize;
 			uvRect = new Rectangle(0, 0, 1, 1);
-		}
-
-		private void DisposeAlphaTexture()
-		{
-			if (AlphaTexture != null) {
-				AlphaTexture.Dispose();
-				AlphaTexture = null;
-			}
 		}
 
 		/// <summary>
@@ -255,9 +222,11 @@ namespace Lime
 		{
 			Application.InvokeOnMainThread(() => {
 				PrepareOpenGLTexture();
+				PlatformRenderer.PushTexture(handle, 0);
 				GL.TexSubImage2D(TextureTarget.Texture2D, 0, x, y, width, height,
 					PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
 				PlatformRenderer.CheckErrors();
+				PlatformRenderer.PopTexture(0);
 			});
 		}
 
@@ -268,19 +237,8 @@ namespace Lime
 
 		public override void Dispose()
 		{
-			DisposeAlphaTexture();
-			DisposeOpenGLTexture();
+			Discard();
 			base.Dispose();
-		}
-
-		protected void DisposeOpenGLTexture()
-		{
-			if (handle != 0 && graphicsContext == Application.GraphicsContextId) {
-				lock (TexturesToDelete) {
-					TexturesToDelete.Add(handle);
-				}
-			}
-			handle = 0;
 		}
 
 		/// <summary>
@@ -289,15 +247,25 @@ namespace Lime
 		/// <returns></returns>
 		public uint GetHandle()
 		{
-			if (Application.GraphicsContextId != graphicsContext || handle == 0) {
+			if (handle == 0) {
 				Reload();
 			}
 			return handle;
 		}
 
-		public void Unload()
+		public void Discard()
 		{
-			Dispose();
+			MemoryUsed = 0;
+			if (AlphaTexture != null) {
+				AlphaTexture.Dispose();
+				AlphaTexture = null;
+			}
+			if (handle != 0) {
+				Application.InvokeOnMainThread(() => {
+					GL.DeleteTexture(handle);
+				});
+				handle = 0;
+			}
 		}
 
 		private void Reload()

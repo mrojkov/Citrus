@@ -11,7 +11,7 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Lime
 {
-	class ShaderProgram
+	class ShaderProgram : IGLObject
 	{
 		public class AttribLocation
 		{
@@ -26,7 +26,6 @@ namespace Lime
 		}
 
 		private int handle;
-		private int graphicsContext;
 		public int ProjectionMatrixUniformId { get; private set; }
 		public int UseAlphaTexture1UniformId { get; private set; }
 		public int UseAlphaTexture2UniformId { get; private set; }
@@ -41,11 +40,11 @@ namespace Lime
 			this.attribLocations = new List<AttribLocation>(attribLocations);
 			this.samplers = new List<Sampler>(samplers);
 			Create();
+			GLObjectRegistry.Instance.Add(this);
 		}
 
 		private void Create()
 		{
-			graphicsContext = Application.GraphicsContextId;
 			handle = GL.CreateProgram();
 			foreach (var shader in shaders) {
 				GL.AttachShader(handle, shader.GetHandle());
@@ -56,6 +55,26 @@ namespace Lime
 			Link();
 			foreach (var i in samplers) {
 				BindSampler(i.Name, i.Stage);
+			}
+		}
+
+		~ShaderProgram()
+		{
+			Dispose();
+		}
+
+		public void Dispose()
+		{
+			Discard();
+		}
+
+		public void Discard()
+		{
+			if (handle != 0) {
+				Application.InvokeOnMainThread(() => {
+					GL.DeleteProgram(handle);
+				});
+				handle = 0;
 			}
 		}
 
@@ -107,7 +126,7 @@ namespace Lime
 
 		public void Use()
 		{
-			if (graphicsContext != Application.GraphicsContextId) {
+			if (handle == 0) {
 				Create();
 			}
 			GL.UseProgram(handle);

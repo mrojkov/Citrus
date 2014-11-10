@@ -20,14 +20,13 @@ namespace Lime
 		RGB565
 	}
 
-	public class RenderTexture : CommonTexture, ITexture
+	public class RenderTexture : CommonTexture, ITexture, IGLObject
 	{
 		private uint handle;
 		private uint framebuffer;
 		private readonly Size size = new Size(0, 0);
 		private readonly Rectangle uvRect;
 		private static readonly Stack<uint> framebufferStack = new Stack<uint>();
-		private int graphicsContext;
 
 		public RenderTextureFormat Format { get; private set; }
 
@@ -37,18 +36,20 @@ namespace Lime
 			size.Width = width;
 			size.Height = height;
 			uvRect = new Rectangle(0, 0, 1, 1);
-			CreateTexture();
+			GLObjectRegistry.Instance.Add(this);
 		}
 
 		private void CreateTexture()
 		{
-			graphicsContext = Application.GraphicsContextId;
+			if (!Application.IsMainThread) {
+				throw new Lime.Exception("Attempt to create a RenderTexture not from the main thread");
+			}
 			var t = new uint[1];
 			GL.GenFramebuffers(1, t);
 			framebuffer = t[0];
 			GL.GenTextures(1, t);
 			handle = t[0];
-			GL.BindTexture(TextureTarget.Texture2D, handle);
+			PlatformRenderer.PushTexture(handle, 0);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
 			GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)All.ClampToEdge);
@@ -62,13 +63,15 @@ namespace Lime
 				bpp = 2;
 			}
 			MemoryUsed = SurfaceSize.Width * SurfaceSize.Height * bpp;
-			uint currentFramebuffer = PlatformRenderer.CurrentFramebuffer;
+			uint oldFramebuffer = PlatformRenderer.CurrentFramebuffer;
 			PlatformRenderer.BindFramebuffer(framebuffer);
 			PlatformRenderer.CheckErrors();
 			GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, handle, 0);
 			if ((int)GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != (int)FramebufferErrorCode.FramebufferComplete)
 				throw new Exception("Failed to create render texture. Framebuffer is incomplete.");
-			PlatformRenderer.BindFramebuffer(currentFramebuffer);
+			Renderer.ClearRenderTarget(1, 0, 0, 0);
+			PlatformRenderer.PopTexture(0);
+			PlatformRenderer.BindFramebuffer(oldFramebuffer);
 			PlatformRenderer.CheckErrors();
 		}
 
@@ -88,26 +91,28 @@ namespace Lime
 
 		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv0, ref Vector2 uv1) {}
 
-		public void Unload() { }
-		
-		public override void Dispose()
+		public void Discard() 
 		{
+			MemoryUsed = 0;
 			if (framebuffer != 0) {
-				if (graphicsContext == Application.GraphicsContextId) {
-					lock (Texture2D.FramebuffersToDelete) {
-						Texture2D.FramebuffersToDelete.Add(framebuffer);
-					}
-				}
+				Application.InvokeOnMainThread(() => {
+					GL.DeleteFramebuffers(1, new uint[] { framebuffer });
+					PlatformRenderer.CheckErrors();
+				});
 				framebuffer = 0;
 			}
 			if (handle != 0) {
-				if (graphicsContext == Application.GraphicsContextId) {
-					lock (Texture2D.TexturesToDelete) {
-						Texture2D.TexturesToDelete.Add(handle);
-					}
-				}
+				Application.InvokeOnMainThread(() => {
+					GL.DeleteTexture(handle);
+					PlatformRenderer.CheckErrors();
+				});
 				handle = 0;
 			}
+		}
+		
+		public override void Dispose()
+		{
+			Discard();
 			base.Dispose();
 		}
 
@@ -118,7 +123,7 @@ namespace Lime
 
 		public uint GetHandle()
 		{
-			if (graphicsContext != Application.GraphicsContextId) {
+			if (handle == 0) {
 				CreateTexture();
 			}
 			return handle;
@@ -127,12 +132,8 @@ namespace Lime
 		public bool IsStubTexture { get { return false; } }
 
 		public string SerializationPath {
-			get {
-				throw new NotSupportedException();
-			}
-			set {
-				throw new NotSupportedException();
-			}
+			get { throw new NotSupportedException(); }
+			set { throw new NotSupportedException(); }
 		}
 
 		public void SetAsRenderTarget()

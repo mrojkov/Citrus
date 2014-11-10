@@ -11,10 +11,9 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Lime
 {
-	class Shader
+	class Shader : IGLObject, IDisposable
 	{
 		private int handle;
-		private int graphicsContext;
 		private string source;
 		private bool fragmentOrVertex;
 
@@ -23,11 +22,31 @@ namespace Lime
 			this.fragmentOrVertex = fragmentOrVertex;
 			this.source = ReplacePrecisionModifiers(source);
 			CreateShader();
+			GLObjectRegistry.Instance.Add(this);
+		}
+
+		~Shader()
+		{
+			Dispose();
+		}
+
+		public void Dispose()
+		{
+			Discard();
+		}
+
+		public void Discard()
+		{
+			if (handle != 0) {
+				Application.InvokeOnMainThread(() => {
+					GL.DeleteShader(handle);
+				});
+				handle = 0;
+			}
 		}
 
 		private void CreateShader()
 		{
-			graphicsContext = Application.GraphicsContextId;
 			handle = GL.CreateShader(fragmentOrVertex ? ShaderType.FragmentShader : ShaderType.VertexShader);
 			GL.ShaderSource(handle, 1, new string[] { source }, new int[] { source.Length });
 			GL.CompileShader(handle);
@@ -66,7 +85,7 @@ namespace Lime
 
 		public int GetHandle()
 		{
-			if (graphicsContext != Application.GraphicsContextId) {
+			if (handle == 0) {
 				CreateShader();
 			}
 			return handle;

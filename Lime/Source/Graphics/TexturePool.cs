@@ -27,11 +27,11 @@ namespace Lime
 		{
 			foreach (WeakReference r in textures.Values) {
 				var texture = r.Target as ITexture;
-				if (texture != null) {
-					texture.Unload();
+				// Unload all but render textures
+				if (texture != null && (texture is Texture2D)) {
+					texture.Discard();
 				}
 			}
-			Texture2D.DeleteScheduledTextures();
 		}
 
 		public ITexture GetTexture(string path)
@@ -60,9 +60,9 @@ namespace Lime
 			var texture = TryCreateRenderTarget(path) ??
 				TryLoadTextureAtlasPart(path + ".atlasPart") ??
 #if iOS || ANDROID
-				TryLoadImage(path + ".pvr")
+				TryLoadImage(path + ".pvr");
 #elif UNITY
-				TryLoadImage(path + ".png")
+				TryLoadImage(path + ".png");
 #else
 				TryLoadImage(path + ".dds") ??
 				TryLoadImage(path + ".png");

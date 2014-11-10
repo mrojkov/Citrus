@@ -32,7 +32,7 @@ namespace Lime
 		/// The texture will be loaded again on the next GetHandle().
 		/// RenderTexture.Unload() does nothing.
 		/// </summary>
-		void Unload();
+		void Discard();
 	}
 
 	public class CommonTexture : IDisposable

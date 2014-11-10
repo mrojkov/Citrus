@@ -300,8 +300,6 @@ namespace Lime
 		public event Action Terminating;
 		public event Action GraphicsContextReset;
 
-		internal static int GraphicsContextId { get; private set; }
-
 		public virtual void OnActivate()
 		{
 			if (Activated != null) {
@@ -332,7 +330,7 @@ namespace Lime
 
 		public void OnGraphicsContextReset() 
 		{
-			GraphicsContextId++;
+			GLObjectRegistry.Instance.DiscardObjects();
 			if (GraphicsContextReset != null) {
 				GraphicsContextReset();
 			}

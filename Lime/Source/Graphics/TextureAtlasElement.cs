@@ -89,7 +89,7 @@ namespace Lime
 			return atlasTexture.IsTransparentPixel(x + offset.X, y + offset.Y);
 		}
 
-		public void Unload() { }
+		public void Discard() { }
 
 		public bool IsStubTexture
 		{

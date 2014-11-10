@@ -82,7 +82,6 @@ namespace Lime
 		{
 			SaveDefaultFramebuffer();
 			CurrentFramebuffer = DefaultFramebuffer;
-			Texture2D.DeleteScheduledTextures();
 			GL.Enable(EnableCap.Blend);
 			blending = Blending.None;
 			premultipliedAlphaMode = false;
@@ -142,6 +141,19 @@ namespace Lime
 				GL.BindTexture(TextureTarget.Texture2D, glTexNum);
 			}
 			textures[stage] = glTexNum;
+		}
+
+		private static Stack<uint> textureStack = new Stack<uint>();
+
+		public static void PushTexture(uint handle, int stage)
+		{
+			textureStack.Push(textures[stage]);
+			SetTexture(handle, stage);
+		}
+
+		public static void PopTexture(int stage)
+		{
+			SetTexture(textureStack.Pop(), stage);
 		}
 
 		public static void SetViewport(WindowRect value)

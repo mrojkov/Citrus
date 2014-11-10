@@ -59,7 +59,7 @@ namespace Lime
 		}
 	}
 
-	public unsafe class VertexBuffer : IDisposable
+	public unsafe class VertexBuffer : IDisposable, IGLObject
 	{
 		public const int DefaultCapacity = 1000;
 		public readonly int Capacity;
@@ -73,7 +73,6 @@ namespace Lime
 		public static int TotalVertexBuffers;
 		private uint vboHandle;
 		private bool disposed;
-		private int graphicsContext;
 
 		internal static class Attributes
 		{
@@ -98,8 +97,7 @@ namespace Lime
 			Capacity = capacity;
 			TotalVertexBuffers++;
 			Vertices = (Vertex*)Marshal.AllocHGlobal(sizeof(Vertex) * Capacity);
-			AllocateVBOHandle();
-			PlatformRenderer.CheckErrors();
+			GLObjectRegistry.Instance.Add(this);
 		}
 
 		~VertexBuffer()
@@ -116,7 +114,6 @@ namespace Lime
 
 		private void AllocateVBOHandle()
 		{
-			graphicsContext = Application.GraphicsContextId;
 			var t = new int[1];
 			GL.GenBuffers(1, t);
 			vboHandle = (uint)t[0];
@@ -125,7 +122,7 @@ namespace Lime
 
 		public void Bind()
 		{
-			if (Application.GraphicsContextId != graphicsContext) {
+			if (vboHandle == 0) {
 				AllocateVBOHandle();
 			}
 			PlatformRenderer.BindVertexBuffer(vboHandle);
@@ -150,15 +147,22 @@ namespace Lime
 				TotalVertexBuffers--;
 				Marshal.FreeHGlobal((IntPtr)Vertices);
 				Vertices = null;
-				if (graphicsContext == Application.GraphicsContextId) {
-					if (OpenTK.Graphics.GraphicsContext.CurrentContext != null) {
-						GL.DeleteBuffers(1, new uint[] { vboHandle });
-					}
-				}
-				vboHandle = 0;
+				Discard();
 				disposed = true;
 			}
 			GC.SuppressFinalize(this);
+		}
+
+		public void Discard()
+		{
+			if (vboHandle != 0) {
+				Application.InvokeOnMainThread(() => {
+					if (OpenTK.Graphics.GraphicsContext.CurrentContext != null) {
+						GL.DeleteBuffers(1, new uint[] { vboHandle });
+					}
+				});
+				vboHandle = 0;
+			}
 		}
 	}
 }

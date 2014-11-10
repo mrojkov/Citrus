@@ -40,20 +40,24 @@ namespace Lime
 			var lockMode = SDI.ImageLockMode.ReadOnly;
 			if (bitmap.PixelFormat == SDI.PixelFormat.Format24bppRgb) {
 				PrepareOpenGLTexture();
+				PlatformRenderer.PushTexture(handle, 0);
 				var data = bitmap.LockBits(lockRect, lockMode, SDI.PixelFormat.Format24bppRgb);
 				SwapRedAndGreen24(data);
 				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, data.Width, data.Height, 0,
 					PixelFormat.Rgb, PixelType.UnsignedByte, data.Scan0);
 				bitmap.UnlockBits(data);
 				MemoryUsed = data.Width * data.Height * 3;
+				PlatformRenderer.PopTexture(0);
 			} else {
 				PrepareOpenGLTexture();
+				PlatformRenderer.PushTexture(handle, 0);
 				var data = bitmap.LockBits(lockRect, lockMode, SDI.PixelFormat.Format32bppPArgb);
 				SwapRedAndGreen32(data);
 				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width, data.Height, 0,
 					PixelFormat.Rgba, PixelType.UnsignedByte, data.Scan0);
 				bitmap.UnlockBits(data);
 				MemoryUsed = data.Width * data.Height * 4;
+				PlatformRenderer.PopTexture(0);
 			}
 			PlatformRenderer.CheckErrors();
 		}

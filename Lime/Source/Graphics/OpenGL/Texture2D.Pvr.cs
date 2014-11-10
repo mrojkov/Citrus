@@ -86,7 +86,9 @@ namespace Lime
 				case LegacyPVRFormat.PVRTC_4: {
 					var buffer = ReadTextureData(reader, width * height * 4 / 8);
 					glCommands += () => {
+						PlatformRenderer.PushTexture(handle, 0);
 						GL.CompressedTexImage2D(All.Texture2D, mipLevel, All.CompressedRgbaPvrtc4Bppv1Img, width2, height2, 0, buffer.Length, buffer);
+						PlatformRenderer.PopTexture(0);
 						PlatformRenderer.CheckErrors();
 					};
 					break;
@@ -94,7 +96,9 @@ namespace Lime
 				case LegacyPVRFormat.PVRTC_2: {
 					var buffer = ReadTextureData(reader, width * height * 2 / 8);
 					glCommands += () => {
+						PlatformRenderer.PushTexture(handle, 0);
 						GL.CompressedTexImage2D(All.Texture2D, mipLevel, All.CompressedRgbaPvrtc2Bppv1Img, width2, height2, 0, buffer.Length, buffer);
+						PlatformRenderer.PopTexture(0);
 						PlatformRenderer.CheckErrors();
 					};
 					break;
@@ -102,7 +106,9 @@ namespace Lime
 				case LegacyPVRFormat.GLARGB_4444: {
 					var buffer = ReadTextureData(reader, width * height * 2);
 					glCommands += () => {
+						PlatformRenderer.PushTexture(handle, 0);
 						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgba, width2, height2, 0, All.Rgba, All.UnsignedShort4444, buffer);
+						PlatformRenderer.PopTexture(0);
 						PlatformRenderer.CheckErrors();
 					};
 					break;
@@ -110,7 +116,9 @@ namespace Lime
 				case LegacyPVRFormat.GLRGB_565: {
 					var buffer = ReadTextureData(reader, width * height * 2);
 					glCommands += () => {
+						PlatformRenderer.PushTexture(handle, 0);
 						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgb, width2, height2, 0, All.Rgb, All.UnsignedShort565, buffer);
+						PlatformRenderer.PopTexture(0);
 						PlatformRenderer.CheckErrors();
 					};
 					break;
@@ -118,7 +126,9 @@ namespace Lime
 				case LegacyPVRFormat.GLARGB_8888: {
 					var buffer = ReadTextureData(reader, width * height * 4);
 					glCommands += () => {
+						PlatformRenderer.PushTexture(handle, 0);
 						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgba, width2, height2, 0, All.Rgba, All.UnsignedByte, buffer);
+						PlatformRenderer.PopTexture(0);
 						PlatformRenderer.CheckErrors();
 					};
 					break;
@@ -167,7 +177,9 @@ namespace Lime
 				case PVRFormat.PVRTC_4_RGBA: {
 					var buffer = ReadTextureData(reader, width * height * 4 / 8);
 					glCommands += () => {
+						PlatformRenderer.PushTexture(handle, 0);
 						GL.CompressedTexImage2D(All.Texture2D, mipLevel, All.CompressedRgbaPvrtc4Bppv1Img, width2, height2, 0, buffer.Length, buffer);
+						PlatformRenderer.PopTexture(0);
 						PlatformRenderer.CheckErrors();
 					};
 					break;
@@ -175,7 +187,9 @@ namespace Lime
 				case PVRFormat.PVRTC_2_RGBA: {
 					var buffer = ReadTextureData(reader, width * height * 2 / 8);
 					glCommands += () => {
+						PlatformRenderer.PushTexture(handle, 0);
 						GL.CompressedTexImage2D(All.Texture2D, mipLevel, All.CompressedRgbaPvrtc2Bppv1Img, width2, height2, 0, buffer.Length, buffer);
+						PlatformRenderer.PopTexture(0);
 						PlatformRenderer.CheckErrors();
 					};
 					break;
@@ -184,7 +198,9 @@ namespace Lime
 				case PVRFormat.ETC1: {
 					var buffer = ReadTextureData(reader, width * height * 4 / 8);
 					glCommands += () => {
+						PlatformRenderer.PushTexture(handle, 0);
 						GL.CompressedTexImage2D(All.Texture2D, mipLevel, All.Etc1Rgb8Oes, width2, height2, 0, buffer.Length, buffer);
+						PlatformRenderer.PopTexture(0);
 						PlatformRenderer.CheckErrors();
 					};
 					break;
@@ -193,7 +209,9 @@ namespace Lime
 				case PVRFormat.RGBA4444: {
 					var buffer = ReadTextureData(reader, width * height * 2);
 					glCommands += () => {
+						PlatformRenderer.PushTexture(handle, 0);
 						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgba, width2, height2, 0, All.Rgba, All.UnsignedShort4444, buffer);
+						PlatformRenderer.PopTexture(0);
 						PlatformRenderer.CheckErrors();
 					};
 					break;
@@ -201,7 +219,9 @@ namespace Lime
 				case PVRFormat.RGB565: {
 					var buffer = ReadTextureData(reader, width * height * 2);
 					glCommands += () => {
+						PlatformRenderer.PushTexture(handle, 0);
 						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgb, width2, height2, 0, All.Rgb, All.UnsignedShort565, buffer);
+						PlatformRenderer.PopTexture(0);
 						PlatformRenderer.CheckErrors();
 					};
 					break;
@@ -209,7 +229,9 @@ namespace Lime
 				case PVRFormat.RGBA8888: {
 					var buffer = ReadTextureData(reader, width * height * 4);
 					glCommands += () => {
+						PlatformRenderer.PushTexture(handle, 0);
 						GL.TexImage2D(All.Texture2D, mipLevel, (int)All.Rgba, width2, height2, 0, All.Rgba, All.UnsignedByte, buffer);
+						PlatformRenderer.PopTexture(0);
 						PlatformRenderer.CheckErrors();
 					};
 					break;
