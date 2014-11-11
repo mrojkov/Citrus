@@ -265,11 +265,11 @@ namespace Lime
 
 		protected override void OnResize(EventArgs e)
 		{
-			base.OnResize(e);
 			Lime.Application.Instance.WindowSize = new Lime.Size(Width, Height);
 			var orientation = Resources.Configuration.Orientation;
 			Lime.Application.Instance.CurrentDeviceOrientation = ConvertOrientation(orientation);
 			Lime.Application.Instance.OnDeviceRotate();
+			base.OnResize(e);
 		}
 			
 		private static DeviceOrientation ConvertOrientation(Android.Content.Res.Orientation orientation)

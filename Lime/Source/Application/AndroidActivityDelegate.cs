@@ -99,13 +99,15 @@ namespace Lime
 			ContentView = new RelativeLayout(activity.ApplicationContext);
 			ContentView.AddView(GameView);
 			activity.SetContentView(ContentView);
-			GameView.Load += (object sender, EventArgs e) => {
+			GameView.Resize += (object sender, EventArgs e) => {
+				// Initialize the application on Resize (not Load) event,
+				// because we may need a valid screen resolution
 				if (!applicationCreated) {
 					applicationCreated = true;
 					application.OnCreate();
 				}
-				GameView.Run();
 			};
+			GameView.Run();
 			base.OnCreate(activity, bundle);
 		}
 
