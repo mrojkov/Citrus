@@ -11,21 +11,29 @@ namespace Lime
 	/// </summary>
 	public class WidgetInput
 	{
+		public struct StackItem
+		{
+			public Widget Widget;
+#if DEBUG
+			public string StackTrace;
+#endif
+		}
+
 		private Widget widget;
 		private Vector2 lastMousePosition;
 		private Vector2[] lastTouchPositions;
 		// NB: TouchScreen and mouse share the same capture stack
-		static List<Widget> mouseCaptureStack;
-		static List<Widget> keyboardCaptureStack;
+		static List<StackItem> mouseCaptureStack;
+		static List<StackItem> keyboardCaptureStack;
 		static bool skipCapturesCleanup;
-		
-		public static IEnumerable<Widget> MouseCaptureStack { get { return mouseCaptureStack; } }
-		public static IEnumerable<Widget> KeyboardCaptureStack { get { return keyboardCaptureStack; } }
+
+		public static IEnumerable<StackItem> MouseCaptureStack { get { return mouseCaptureStack; } }
+		public static IEnumerable<StackItem> KeyboardCaptureStack { get { return keyboardCaptureStack; } }
 		
 		static WidgetInput()
 		{
-			mouseCaptureStack = new List<Widget>();
-			keyboardCaptureStack = new List<Widget>();
+			mouseCaptureStack = new List<StackItem>();
+			keyboardCaptureStack = new List<StackItem>();
 		}
 
 		public WidgetInput(Widget widget)
@@ -69,12 +77,16 @@ namespace Lime
 			Capture(mouseCaptureStack);
 		}
 
-		private void Capture(List<Widget> stack)
+		private void Capture(List<StackItem> stack)
 		{
-			stack.Remove(widget);
+			stack.RemoveAll(i => i.Widget == widget);
 			var thisLayer = widget.GetEffectiveLayer();
-			var i = stack.FindLastIndex(w => w.GetEffectiveLayer() <= thisLayer);
-			stack.Insert(i + 1, widget);
+			var t = stack.FindLastIndex(i => i.Widget.GetEffectiveLayer() <= thisLayer);
+#if DEBUG
+			stack.Insert(t + 1, new StackItem() { Widget = widget, StackTrace = System.Environment.StackTrace });
+#else
+			stack.Insert(t + 1, new StackItem() { Widget = widget });
+#endif
 			// The widget may be invisible right after creation, 
 			// so omit the stack cleaning up on this frame.
 			skipCapturesCleanup = true;
@@ -82,13 +94,13 @@ namespace Lime
 
 		public void ReleaseMouse()
 		{
-			mouseCaptureStack.Remove(widget);
+			mouseCaptureStack.RemoveAll(i => i.Widget == widget);
 		}
 
 		public bool IsMouseOwner()
 		{
 			int c = mouseCaptureStack.Count;
-			return (c > 0) && mouseCaptureStack[c - 1] == widget;
+			return (c > 0) && mouseCaptureStack[c - 1].Widget == widget;
 		}
 
 		public void CaptureTouchScreen()
@@ -113,13 +125,13 @@ namespace Lime
 
 		public void ReleaseKeyboard()
 		{
-			keyboardCaptureStack.Remove(widget);
+			keyboardCaptureStack.RemoveAll(i => i.Widget == widget);
 		}
 
 		public bool IsKeyboardOwner()
 		{
 			int c = keyboardCaptureStack.Count;
-			return (c > 0) && keyboardCaptureStack[c - 1] == widget;
+			return (c > 0) && keyboardCaptureStack[c - 1].Widget == widget;
 		}
 
 		public string TextInput { 
@@ -182,7 +194,7 @@ namespace Lime
 				return true;
 			}
 			var context = mouseCaptureStack[c - 1];
-			return context == widget || widget.ChildOf(context);
+			return context.Widget == widget || widget.ChildOf(context.Widget);
 		}
 
 		public bool IsAcceptingTouchScreen()
@@ -197,7 +209,7 @@ namespace Lime
 				return true;
 			}
 			var context = keyboardCaptureStack[c - 1];
-			return context == widget || widget.ChildOf(context);
+			return context.Widget == widget || widget.ChildOf(context.Widget);
 		}
 
 		public void CaptureAll()
@@ -215,8 +227,8 @@ namespace Lime
 		internal static void RemoveInvalidatedCaptures()
 		{
 			if (!skipCapturesCleanup) {
-				keyboardCaptureStack.RemoveAll(i => !IsVisibleWidget(i));
-				mouseCaptureStack.RemoveAll(i => !IsVisibleWidget(i));
+				keyboardCaptureStack.RemoveAll(i => !IsVisibleWidget(i.Widget));
+				mouseCaptureStack.RemoveAll(i => !IsVisibleWidget(i.Widget));
 			}
 			skipCapturesCleanup = false;
 		}
