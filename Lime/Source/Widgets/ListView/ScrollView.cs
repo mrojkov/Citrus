@@ -307,21 +307,6 @@ namespace Lime
 				}
 			}
 
-			public override void Update(float delta)
-			{
-				RaiseUpdating(delta);
-				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
-					var widget = node.AsWidget;
-					if (IsItemOnscreen(widget)) {
-						widget.Update(delta);
-					} else {
-						widget.RaiseUpdating(delta);
-						widget.RaiseUpdated(delta);
-					}
-				}
-				RaiseUpdated(delta);
-			}
-
 			public bool IsItemOnscreen(Widget item)
 			{
 				var frame = Parent.AsWidget;
