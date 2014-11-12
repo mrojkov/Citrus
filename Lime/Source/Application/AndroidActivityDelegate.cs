@@ -83,7 +83,7 @@ namespace Lime
 			}
 		}
 
-		public void OnActivityResult(int requestCode, Result resultCode, Intent data)
+		public virtual void OnActivityResult(int requestCode, Result resultCode, Intent data)
 		{
 			if (ActivityResult != null) {
 				ActivityResult(requestCode, resultCode, data);
