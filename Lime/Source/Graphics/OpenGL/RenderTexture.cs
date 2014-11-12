@@ -69,7 +69,7 @@ namespace Lime
 			GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, handle, 0);
 			if ((int)GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != (int)FramebufferErrorCode.FramebufferComplete)
 				throw new Exception("Failed to create render texture. Framebuffer is incomplete.");
-			Renderer.ClearRenderTarget(1, 0, 0, 0);
+			Renderer.ClearRenderTarget(0, 0, 0, 0);
 			PlatformRenderer.PopTexture(0);
 			PlatformRenderer.BindFramebuffer(oldFramebuffer);
 			PlatformRenderer.CheckErrors();
