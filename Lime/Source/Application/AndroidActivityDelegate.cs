@@ -6,11 +6,14 @@ using Android.Content.PM;
 using Android.Views;
 using Android.Views.InputMethods;
 using Android.Widget;
+using Android.Content;
 
 namespace Lime
 {
 	public class ActivityDelegate
 	{
+		public delegate void ActivityResultDelegate(int requestCode, Result resultCode, Intent data);
+
 		public static ActivityDelegate Instance { get; private set; }
 
 		public event Action<Activity, Bundle> Created;
@@ -20,6 +23,7 @@ namespace Lime
 		public event Action<Activity> Stopped;
 		public event Action<Activity> Destroying;
 		public event Action LowMemory;
+		public event ActivityResultDelegate ActivityResult;
 
 		public Activity Activity { get; private set; }
 
@@ -76,6 +80,13 @@ namespace Lime
 		{
 			if (LowMemory != null) {
 				LowMemory();
+			}
+		}
+
+		public void OnActivityResult(int requestCode, Result resultCode, Intent data)
+		{
+			if (ActivityResult != null) {
+				ActivityResult(requestCode, resultCode, data);
 			}
 		}
 	}
