@@ -139,6 +139,7 @@ namespace Lime
 		public void SetAsRenderTarget()
 		{
 			Renderer.Flush();
+			GetHandle();
 			uint currentFramebuffer = (uint)PlatformRenderer.CurrentFramebuffer;
 			PlatformRenderer.BindFramebuffer(framebuffer);
 			framebufferStack.Push(currentFramebuffer);
