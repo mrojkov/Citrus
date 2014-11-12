@@ -151,6 +151,9 @@ namespace Lime
 				var pixels = new int[bitmap.Width * bitmap.Height];
 				bitmap.GetPixels(pixels, 0, bitmap.Width, 0, 0, bitmap.Width, bitmap.Height);
 				SwapRedAndBlue(ref pixels);
+				if (bitmap.HasAlpha) {
+					PremultiplyAlpha(ref pixels);
+				}
 				PlatformRenderer.PushTexture(handle, 0);
 				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0,
 					PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
@@ -160,17 +163,32 @@ namespace Lime
 			PlatformRenderer.CheckErrors();
 		}
 
-		private void SwapRedAndBlue(ref int[] data)
+		private void PremultiplyAlpha(ref int[] pixels)
 		{
-			unsafe {
-				for (int i = 0; i < data.Length; i++) {
-					var l = (long)data[i];
-					l = 
-						(0x000000FF) & (l >> 16)
-						| (0x00FF0000) & (l << 16)
-						| (0xFF00FF00) & (l);
-					data[i] = (int)l;
+			for (int i = 0; i < pixels.Length; i++) {
+				var color = new Color4((uint)pixels[i]);
+				int a = color.A;
+				if (a == 0) {
+					pixels[i] = 0;
+				} else if (a < 255) {
+					a = (a << 8) + a;
+					color.R = (byte)((color.R * a + 255) >> 16);
+					color.G = (byte)((color.G * a + 255) >> 16);
+					color.B = (byte)((color.B * a + 255) >> 16); 
+					pixels[i] = (int)color.ABGR;
 				}
+			}
+		}
+
+		private void SwapRedAndBlue(ref int[] pixels)
+		{
+			for (int i = 0; i < pixels.Length; i++) {
+				var l = (long)pixels[i];
+				l = 
+					(0x000000FF) & (l >> 16)
+					| (0x00FF0000) & (l << 16)
+					| (0xFF00FF00) & (l);
+				pixels[i] = (int)l;
 			}
 		}
 
