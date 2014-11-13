@@ -103,6 +103,8 @@
     <Compile Include="Source\Widgets\IText.cs" />
     <Compile Include="Source\Widgets\Text\TextParser.cs" />
     <Compile Include="Source\Widgets\Text\TextRenderer.cs" />
+    <Compile Include="Source\Graphics\TextureAtlasElement.cs" />
+    <Compile Include="Source\Graphics\OpenGL\IGLObject.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -116,7 +118,6 @@
     <Compile Include="Source\Application\iOSGameController.cs" />
     <Compile Include="Source\Application\iOSGameView.cs" />
     <Compile Include="Source\Graphics\Font.cs" />
-    <Compile Include="Source\Graphics\TextureAtlasPart.cs" />
     <Compile Include="Source\Types\Color4.cs" />
     <Compile Include="Source\Types\IntRectangle.cs" />
     <Compile Include="Source\Types\IntVector2.cs" />

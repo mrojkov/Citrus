@@ -269,6 +269,8 @@
     <Compile Include="Source\Widgets2\Animation\Animation.cs" />
     <Compile Include="Source\Graphics\TextureAtlasElement.cs" />
     <Compile Include="Source\Graphics\OpenGL\IGLObject.cs" />
+    <Compile Include="Source\Application\AndroidActivityDelegate.cs" />
+    <Compile Include="obj\Release\.NETFramework,Version=v4.0.AssemblyAttribute.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

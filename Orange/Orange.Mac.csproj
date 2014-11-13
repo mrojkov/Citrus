@@ -125,6 +125,7 @@
     <Compile Include="Source\DictionaryOldFormatExtractor.cs" />
     <Compile Include="Source\Actions\ConvertDictionaryToNewFormat.cs" />
     <Compile Include="Source\Actions\UpdateDictionaryTxtOldFormat.cs" />
+    <Compile Include="Source\PluginAttributes\PluginFileIgoranceAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lime\Lime.Mac.csproj">
