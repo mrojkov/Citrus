@@ -179,12 +179,6 @@ namespace Lime
 				caretPos.Pos = 0;
 			if (CheckCursorKey(Key.End))
 				caretPos.Pos = int.MaxValue;
-			if (CheckCursorKey(Key.BackSpace)) {
-				if (caretPos.TextPos > 0) {
-					caretPos.TextPos--;
-					text.Text = text.Text.Remove(caretPos.TextPos, 1);
-				}
-			}
 			if (CheckCursorKey(Key.Delete)) {
 				if (caretPos.TextPos >= 0 && caretPos.TextPos < text.Text.Length) {
 					text.Text = text.Text.Remove(caretPos.TextPos, 1);
@@ -202,7 +196,15 @@ namespace Lime
 			if (container.Input.TextInput == null)
 				return;
 			foreach (var ch in container.Input.TextInput) {
-				if (ch >= ' ')
+				// Some platforms, notably iOS, do not generate Key.BackSpace.
+				// OTOH, '\b' is emulated everywhere.
+				if (ch == '\b') {
+					if (caretPos.TextPos > 0) {
+						caretPos.TextPos--;
+						text.Text = text.Text.Remove(caretPos.TextPos, 1);
+					}
+				}
+				else if (ch >= ' ')
 					InsertChar(ch);
 			}
 		}
