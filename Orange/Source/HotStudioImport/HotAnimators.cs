@@ -74,6 +74,9 @@ namespace Orange
 					propertyName = s[0];
 					className = s[1];
 					switch(propertyName) {
+					case "AlongTrackOrientation":
+						propertyName = "AlongPathOrientation";
+						break;
 					case "File":
 						propertyName = "Sample";
 						break;
@@ -137,6 +140,9 @@ namespace Orange
 						break;
 					case "Blending@Hot::MaskedEffect":
 						animator = new Animator<Blending>();
+						break;
+					case "AlongTrackOrientation@Hot::ParticleEmitter":
+						animator = new Animator<bool>();
 						break;
 					default:
 						animator = node.Animators[propertyName]; 
