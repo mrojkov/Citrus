@@ -28,9 +28,9 @@ namespace Lime
 		// First texture pair is used for creation mask effect, second pair - for representing ETC1 alpha channel
 		private static readonly uint[] textures = new uint[4];
 
+		[System.Diagnostics.Conditional("DEBUG")]
 		public static void CheckErrors()
 		{
-#if DEBUG
 #if ANDROID
 			var errCode = GL.GetErrorCode();
 #else
@@ -50,7 +50,6 @@ namespace Lime
 #endif
 			}
 			throw new Exception("OpenGL error(s): " + errors);
-#endif
 		}
 
 		public static void ResetShader()
