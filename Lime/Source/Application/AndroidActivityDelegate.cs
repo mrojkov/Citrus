@@ -118,7 +118,6 @@ namespace Lime
 					application.OnCreate();
 				}
 			};
-			GameView.Run();
 			base.OnCreate(activity, bundle);
 		}
 
@@ -141,6 +140,7 @@ namespace Lime
 			if (!GameView.IsFocused) {
 				GameView.RequestFocus();
 			}
+			GameView.Run();
 			base.OnResume();
 		}
 
