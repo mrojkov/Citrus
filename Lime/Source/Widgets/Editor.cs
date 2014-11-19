@@ -123,7 +123,7 @@ namespace Lime
 		{
 			var world = World.Instance;
 			while (true) {
-				if (container.Input.WasMouseReleased() && container.IsMouseOver()) {
+				if (container.WasClicked()) {
 					world.ActiveTextWidget = textInputProcessor;
 					world.IsActiveTextWidgetUpdated = true;
 				}
