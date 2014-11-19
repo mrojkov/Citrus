@@ -222,13 +222,19 @@ namespace Lime
 		protected virtual void OnSizeChanged(Vector2 sizeDelta) { }
 
 		public float Width { 
-			get { return size.X; } 
-			set { Size = new Vector2(value, Height); } 
+			get { return size.X; }
+			set {
+				if (size.X != value)
+					Size = new Vector2(value, Height);
+			} 
 		}
 
 		public float Height {
 			get { return size.Y; } 
-			set { Size = new Vector2(Width, value); } 
+			set {
+				if (size.Y != value)
+					Size = new Vector2(Width, value);
+			} 
 		}
 
 		[ProtoMember(3)]
@@ -800,6 +806,8 @@ namespace Lime
 			if (!GloballyVisible || !InsideClipRect(point)) {
 				return false;
 			}
+			if (Color.Equals(Color4.DarkGray))
+				return true;
 			if (HitTestMethod == HitTestMethod.BoundingRect) {
 				return HitTestBoundingRect(point);
 			} else if (HitTestMethod == HitTestMethod.Contents) {
