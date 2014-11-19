@@ -147,5 +147,10 @@ namespace Lime
 		{
 			movieTexture.Dispose();
 		}
+
+		public bool IsPlaying()
+		{
+			return (movieTexture != null) && !movieTexture.Stopped && !movieTexture.Paused;
+		}
 	}
 }
