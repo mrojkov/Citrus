@@ -52,22 +52,22 @@ namespace Lime
 		public GameView(Context context)
 			: base(context)
 		{
-			Focusable = true;
-			FocusableInTouchMode = true;
+			//Focusable = true;
+			//FocusableInTouchMode = true;
 			Instance = this;
 			for (int i = 0; i < Input.MaxTouches; i++) {
 				pointerIds[i] = -1;
 			}
-			imm = (InputMethodManager)context.GetSystemService(Android.Content.Context.InputMethodService);
+			//imm = (InputMethodManager)context.GetSystemService(Android.Content.Context.InputMethodService);
 		}
 
 		public void ShowOnscreenKeyboard(bool show, string text)
 		{
-			if (show) {
-				imm.ShowSoftInput(this, 0);
-			} else {
-				imm.HideSoftInputFromWindow(WindowToken, 0);
-			}
+//			if (show) {
+//				imm.ShowSoftInput(this, 0);
+//			} else {
+//				imm.HideSoftInputFromWindow(WindowToken, 0);
+//			}
 		}
 
 		public override bool OnCheckIsTextEditor()
@@ -122,13 +122,13 @@ namespace Lime
 			throw new Lime.Exception("Can't create framebuffer, aborting");
 		}
 
-		public override Android.Views.InputMethods.IInputConnection OnCreateInputConnection(Android.Views.InputMethods.EditorInfo outAttrs)
-		{
-			if (inputConnection == null) {
-				inputConnection = new InputConnection(this);
-			}
-			return inputConnection;
-		}
+//		public override Android.Views.InputMethods.IInputConnection OnCreateInputConnection(Android.Views.InputMethods.EditorInfo outAttrs)
+//		{
+//			if (inputConnection == null) {
+//				inputConnection = new InputConnection(this);
+//			}
+//			return inputConnection;
+//		}
 			
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
