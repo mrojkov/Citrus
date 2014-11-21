@@ -806,8 +806,6 @@ namespace Lime
 			if (!GloballyVisible || !InsideClipRect(point)) {
 				return false;
 			}
-			if (Color.Equals(Color4.DarkGray))
-				return true;
 			if (HitTestMethod == HitTestMethod.BoundingRect) {
 				return HitTestBoundingRect(point);
 			} else if (HitTestMethod == HitTestMethod.Contents) {
