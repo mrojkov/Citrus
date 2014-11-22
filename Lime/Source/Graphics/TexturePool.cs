@@ -18,17 +18,27 @@ namespace Lime
 			textures = new ConcurrentDictionary<string, WeakReference>();
 		}
 
+		[Obsolete("Use DiscardTexturesUnderPressure()")]
 		public void DiscardUnusedTextures(int numCycles)
 		{
-			DiscardAllTextures();
+			DiscardTexturesUnderPressure();
+		}
+
+		public void DiscardTexturesUnderPressure()
+		{
+			foreach (WeakReference r in textures.Values) {
+				var texture = r.Target as ITexture;
+				if (texture != null) {
+					texture.MaybeDiscardUnderPressure();
+				}
+			}
 		}
 
 		public void DiscardAllTextures()
 		{
 			foreach (WeakReference r in textures.Values) {
 				var texture = r.Target as ITexture;
-				// Unload all but render textures
-				if (texture != null && (texture is Texture2D)) {
+				if (texture != null) {
 					texture.Discard();
 				}
 			}

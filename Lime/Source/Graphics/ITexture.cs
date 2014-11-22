@@ -33,6 +33,7 @@ namespace Lime
 		/// RenderTexture.Unload() does nothing.
 		/// </summary>
 		void Discard();
+		void MaybeDiscardUnderPressure();
 	}
 
 	public class CommonTexture : IDisposable
@@ -50,6 +51,8 @@ namespace Lime
 				memoryUsed = value;
 			}
 		}
+
+		public virtual void MaybeDiscardUnderPressure() { }
 
 		public virtual void Dispose()
 		{

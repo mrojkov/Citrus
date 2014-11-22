@@ -71,7 +71,7 @@ namespace Lime
 		public override void ReceiveMemoryWarning(UIApplication application)
 		{
 			Logger.Write("Memory warning, texture memory: {0}mb", CommonTexture.TotalMemoryUsedMb);
-			Lime.TexturePool.Instance.DiscardUnusedTextures(2);
+			Lime.TexturePool.Instance.DiscardTexturesUnderPressure();
 			System.GC.Collect();
 		}
 

@@ -84,6 +84,7 @@ namespace Lime
 		public Size SurfaceSize { get; protected set; }
 		private Rectangle uvRect;
 		private TextureReloader reloader;
+		private int usedOnRenderCycle;
 
 		public virtual string SerializationPath 
 		{
@@ -250,6 +251,7 @@ namespace Lime
 			if (handle == 0) {
 				Reload();
 			}
+			usedOnRenderCycle = Renderer.RenderCycle;
 			return handle;
 		}
 
@@ -265,6 +267,13 @@ namespace Lime
 					GL.DeleteTextures(1, new uint[] { handle });
 				});
 				handle = 0;
+			}
+		}
+
+		public override void MaybeDiscardUnderPressure()
+		{
+			if (Renderer.RenderCycle - usedOnRenderCycle > 3) {
+				Discard();
 			}
 		}
 
