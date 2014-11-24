@@ -266,7 +266,6 @@ namespace Lime
 			if (handle != 0) {
 				Application.InvokeOnMainThread(() => {
 					GL.DeleteTextures(1, new uint[] { handle });
-					PlatformRenderer.CheckErrors();
 				});
 				handle = 0;
 			}
