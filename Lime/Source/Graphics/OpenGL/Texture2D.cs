@@ -112,7 +112,9 @@ namespace Lime
 			reloader = new TextureBundleReloader(path);
 			var alphaPath = Path.ChangeExtension(path, ".alpha.pvr");
 			if (AssetsBundle.Instance.FileExists(alphaPath)) {
-				AlphaTexture = new Texture2D();
+				if (AlphaTexture == null) {
+					AlphaTexture = new Texture2D();
+				}
 				((Texture2D)AlphaTexture).LoadImage(alphaPath);
 			}
 			var maskPath = Path.ChangeExtension(path, ".mask");
@@ -146,7 +148,7 @@ namespace Lime
 		{
 			reloader = createReloader ? new TextureStreamReloader(stream) : null;
 			// Discard current texture
-			Dispose();
+			Discard();
 			using (var rewindableStream = new RewindableStream(stream))
 			using (var reader = new BinaryReader(rewindableStream)) {
 #if iOS || ANDROID
@@ -259,12 +261,12 @@ namespace Lime
 		{
 			MemoryUsed = 0;
 			if (AlphaTexture != null) {
-				AlphaTexture.Dispose();
-				AlphaTexture = null;
+				AlphaTexture.Discard();
 			}
 			if (handle != 0) {
 				Application.InvokeOnMainThread(() => {
 					GL.DeleteTextures(1, new uint[] { handle });
+					PlatformRenderer.CheckErrors();
 				});
 				handle = 0;
 			}
@@ -276,7 +278,6 @@ namespace Lime
 				Discard();
 			}
 		}
-
 		private void Reload()
 		{
 			if (reloader != null) {
