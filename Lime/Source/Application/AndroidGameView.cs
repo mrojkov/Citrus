@@ -82,7 +82,7 @@ namespace Lime
 			base.OnContextLost(e);
 			contextLost = true;
 		}
-			
+
 		protected override void OnContextSet(EventArgs e)
 		{
 			base.OnContextSet(e);
@@ -90,12 +90,6 @@ namespace Lime
 				contextLost = false;
 				Application.Instance.OnGraphicsContextReset();
 			}
-		}
-
-		protected override void OnUnload(EventArgs e)
-		{
-			Application.Instance.OnGraphicsContextReset();
-			base.OnUnload(e);
 		}
 
 		protected override void CreateFrameBuffer()
@@ -132,6 +126,12 @@ namespace Lime
 			
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
+			if (GraphicsContext == null || GraphicsContext.IsDisposed) {
+				return;
+			}
+			if (!GraphicsContext.IsCurrent) {
+				MakeCurrent();
+			}
 			base.OnRenderFrame(e);
 			FPSCalculator.Refresh();
 			Application.Instance.OnRenderFrame();
