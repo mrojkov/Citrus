@@ -93,7 +93,7 @@ namespace Lime
 
 	public class DefaultActivityDelegate : ActivityDelegate
 	{
-		public GameView GameView { get; private set; }
+		public static GameView GameView { get; private set; }
 		public RelativeLayout ContentView { get; private set; }
 		private bool applicationCreated;
 		private Application application;
@@ -106,7 +106,11 @@ namespace Lime
 
 		public override void OnCreate(Activity activity, Bundle bundle)
 		{
-			GameView = new GameView(activity);
+			if (GameView == null) {
+				GameView = new GameView(activity);
+			}
+			Debug.Write("Activity.OnCreate");
+			RemoveGameViewFromParent();
 			ContentView = new RelativeLayout(activity.ApplicationContext);
 			ContentView.AddView(GameView);
 			activity.SetContentView(ContentView);
@@ -119,6 +123,13 @@ namespace Lime
 				}
 			};
 			base.OnCreate(activity, bundle);
+		}
+
+		private void RemoveGameViewFromParent()
+		{
+			if (GameView.Instance.Parent != null) {
+				(GameView.Instance.Parent as RelativeLayout).RemoveView(GameView);
+			}
 		}
 
 		public override void OnPause()
@@ -147,7 +158,7 @@ namespace Lime
 		public override void OnLowMemory()
 		{
 			Logger.Write("Memory warning, texture memory: {0}mb", CommonTexture.TotalMemoryUsedMb);
-			TexturePool.Instance.DiscardUnusedTextures(2);
+			TexturePool.Instance.DiscardTexturesUnderPressure();
 			System.GC.Collect();
 			base.OnLowMemory();
 		}
