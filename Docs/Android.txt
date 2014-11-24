@@ -37,3 +37,9 @@ OpenAL для андроида скачивается с http://repo.or.cz/w/openal-soft/android.git
 ===============================================
 Дравера качаются отсюда, а не из Android SDK Manager:
 https://s3.amazonaws.com/android-sdk-manager/redist/Fire_Phone.zip
+
+КАК ЗАЛЕПИТЬ ПРОБЛЕМУ "JARTOXML ... Unsupported major.minor version 51.0"
+=========================================================================
+Нужно установить Jdk1.7
+http://download.oracle.com/otn-pub/java/jdk/7u71-b14/jdk-7u71-windows-i586.exe
+Затем в Program Files(x86)/Java, переименовать jdk.1.6.0_39 во что-то непотребное
