@@ -18,6 +18,7 @@ namespace Lime
 	[Register("AppDelegate")]
 	public class AppDelegate : UIApplicationDelegate
 	{
+		DateTime lastMemoryWarningTime;
 		public static AppDelegate Instance;
 
 		public NSDictionary LaunchOptions;
@@ -70,6 +71,10 @@ namespace Lime
 
 		public override void ReceiveMemoryWarning(UIApplication application)
 		{
+			if ((DateTime.UtcNow - lastMemoryWarningTime).TotalSeconds < 15) {
+				return;
+			}
+			lastMemoryWarningTime = DateTime.UtcNow;
 			Logger.Write("Memory warning, texture memory: {0}mb", CommonTexture.TotalMemoryUsedMb);
 			Lime.TexturePool.Instance.DiscardTexturesUnderPressure();
 			System.GC.Collect();
