@@ -30,6 +30,7 @@ namespace Lime
 				SeekFunc = OgvSeek, TellFunc = OgvTell
 			};
 			streamHandle = streamMap.Allocate(stream);
+
 			ogvHandle = Lemon.Api.OgvCreate(streamHandle, fileSystem);
 			if (ogvHandle.ToInt32() == 0) {
 				throw new Lime.Exception("Failed to open Ogv/Theora file");
@@ -44,6 +45,11 @@ namespace Lime
 			streamMap.Release(streamHandle);
 			ogvHandle = new IntPtr(0);
 			streamHandle = 0;
+		}
+
+		public static void ClearStreamMap()
+		{
+			streamMap.ReleaseAllSlots();
 		}
 
 		public bool DecodeFrame()
