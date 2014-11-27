@@ -152,6 +152,16 @@ namespace Orange
 			AddStage(() => SyncRawAssets(".shader"));
 			AddStage(() => SyncRawAssets(".xml"));
 			AddStage(() => SyncRawAssets(".raw"));
+			AddStage(() => WarnAboutNPOTTextures());
+		}
+
+		private static void WarnAboutNPOTTextures()
+		{
+			foreach (var path in assetsBundle.EnumerateFiles()) {
+				if ((assetsBundle.GetAttributes(path) & AssetAttributes.NonPowerOf2Texture) != 0) {
+					Console.WriteLine("Warning non-power of two texture: {0}", path);
+				}
+			}
 		}
 
 		private static void DeleteOrphanedAlphaTextures()
@@ -269,8 +279,16 @@ namespace Orange
 					string maskPath = Path.ChangeExtension(srcPath, ".mask");
 					OpacityMaskCreator.CreateMask(assetsBundle, srcPath, maskPath);
 					string tmpFile = Path.ChangeExtension(srcPath, GetPlatformTextureExtension());
-					TextureConverter.Convert(srcPath, tmpFile, rules, platform);
-					assetsBundle.ImportFile(tmpFile, dstPath, reserve: 0, compress: true);
+
+					var attributes = AssetAttributes.Zipped;
+					using (var pixbuf = new Gdk.Pixbuf(srcPath)) {
+						var isPot = TextureConverterUtils.IsPowerOf2(pixbuf.Width) && TextureConverterUtils.IsPowerOf2(pixbuf.Height);
+						if (!isPot) {
+							attributes |= AssetAttributes.NonPowerOf2Texture;
+						}
+						TextureConverter.Convert(pixbuf, dstPath, rules, platform);
+					}
+					assetsBundle.ImportFile(tmpFile, dstPath, reserve: 0, attributes: attributes);
 					File.Delete(tmpFile);
 				}
 				return true;
@@ -514,7 +532,7 @@ namespace Orange
 				string maskPath = Path.ChangeExtension(atlasPath, ".mask");
 				OpacityMaskCreator.CreateMask(assetsBundle, atlas, maskPath);
 				TextureConverter.Convert(atlas, tmpFile, rules, platform);
-				assetsBundle.ImportFile(tmpFile, atlasPath, 0, compress: true);
+				assetsBundle.ImportFile(tmpFile, atlasPath, 0, AssetAttributes.Zipped);
 				File.Delete(tmpFile);
 				// ETC1 textures on Android use separate alpha channel
 				var needSeparateAlpha = platform == TargetPlatform.Android && 
@@ -524,7 +542,7 @@ namespace Orange
 					TextureConverter.Convert(atlas, tmpFile, rules, platform);
 					var atlasAlphaPath = GetAlphaTexturePath(atlasPath);
 					Console.WriteLine("+ " + atlasAlphaPath);
-					assetsBundle.ImportFile(tmpFile, atlasAlphaPath, 0, compress: true);
+					assetsBundle.ImportFile(tmpFile, atlasAlphaPath, 0, AssetAttributes.Zipped);
 					File.Delete(tmpFile);
 				}
 			}

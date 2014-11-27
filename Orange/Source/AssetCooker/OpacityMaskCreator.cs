@@ -48,7 +48,7 @@ namespace Orange
 					bw.Write(mask, 0, mask.Length);
 					bw.Flush();
 					ms.Seek(0, SeekOrigin.Begin);
-					assetsBundle.ImportFile(maskPath, ms, 0, compress: true);
+					assetsBundle.ImportFile(maskPath, ms, 0, AssetAttributes.Zipped);
 				}
 			};
 		}

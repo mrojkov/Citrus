@@ -42,9 +42,9 @@ namespace Orange
 			return base.FileExists(AdjustExtensionForBinaryAsset(path));
 		}
 
-		public override void ImportFile(string path, Stream stream, int reserve, bool compress)
+		public override void ImportFile(string path, Stream stream, int reserve, Lime.AssetAttributes attributes)
 		{
-			base.ImportFile(AdjustExtensionForBinaryAsset(path), stream, reserve, compress);
+			base.ImportFile(AdjustExtensionForBinaryAsset(path), stream, reserve, attributes);
 		}
 
 		public override IEnumerable<string> EnumerateFiles()

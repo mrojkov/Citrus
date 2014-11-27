@@ -6,6 +6,14 @@ using System.Text;
 
 namespace Lime
 {
+	[Flags]
+	public enum AssetAttributes
+	{
+		None = 0,
+		Zipped = 1 << 0,
+		NonPowerOf2Texture = 1 << 1
+	}
+
 	public abstract class AssetsBundle : IDisposable
 	{
 		private static AssetsBundle instance;
@@ -37,13 +45,13 @@ namespace Lime
 		public abstract DateTime GetFileLastWriteTime(string path);
 		public abstract void DeleteFile(string path);
 		public abstract bool FileExists(string path);
-		public abstract void ImportFile(string path, Stream stream, int reserve, bool compress = false);
+		public abstract void ImportFile(string path, Stream stream, int reserve, AssetAttributes attributes = AssetAttributes.None);
 		public abstract IEnumerable<string> EnumerateFiles();
-		
-		public void ImportFile(string srcPath, string dstPath, int reserve, bool compress = false)
+
+		public void ImportFile(string srcPath, string dstPath, int reserve, AssetAttributes attributes = AssetAttributes.None)
 		{
 			using (var stream = new FileStream(srcPath, FileMode.Open)) {
-				ImportFile(dstPath, stream, reserve, compress);
+				ImportFile(dstPath, stream, reserve, attributes);
 			}
 		}
 
@@ -64,6 +72,15 @@ namespace Lime
 				return localizedParth;
 			}
 			return path;
+		}
+
+		public virtual AssetAttributes GetAttributes(string path)
+		{
+			return AssetAttributes.None;
+		}
+
+		public virtual void SetAttributes(string path, AssetAttributes attributes)
+		{
 		}
 	}
 }

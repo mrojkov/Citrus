@@ -39,7 +39,7 @@ namespace Lime
 			return File.Exists(Path.Combine(BaseDirectory, path));
 		}
 
-		public override void ImportFile(string path, Stream stream, int reserve, bool compress)
+		public override void ImportFile(string path, Stream stream, int reserve, AssetAttributes attributes)
 		{
 #if UNITY_WEBPLAYER
 			throw new NotImplementedException();

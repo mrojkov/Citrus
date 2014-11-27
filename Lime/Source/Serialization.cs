@@ -96,7 +96,7 @@ namespace Lime
 			using (MemoryStream stream = new MemoryStream()) {
 				WriteObject(path, stream, instance);
 				stream.Seek(0, SeekOrigin.Begin);
-				bundle.ImportFile(path, stream, 0, compress: compress);
+				bundle.ImportFile(path, stream, 0, compress ? AssetAttributes.Zipped : 0);
 			}
 		}
 

@@ -9,13 +9,6 @@ namespace Orange
 {
 	public static class TextureConverter
 	{
-		public static void Convert(string srcPath, string dstPath, CookingRules cookingRules, TargetPlatform platform)
-		{
-			using (var pixbuf = new Gdk.Pixbuf(srcPath)) {
-				Convert(pixbuf, dstPath, cookingRules, platform);
-			}
-		}
-
 		public static void Convert(Gdk.Pixbuf pixbuf, string dstPath, CookingRules cookingRules, TargetPlatform platform)
 		{
 			switch (platform) {

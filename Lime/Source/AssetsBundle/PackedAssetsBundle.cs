@@ -6,12 +6,6 @@ using System.Linq;
 
 namespace Lime
 {
-	[Flags]
-	public enum AssetAttributes
-	{
-		Zipped = 1 << 0,
-	}
-
 	struct AssetDescriptor
 	{
 		public DateTime ModificationTime;
@@ -356,12 +350,21 @@ namespace Lime
 			return index.ContainsKey(AssetPath.CorrectSlashes(path));
 		}
 
-		public override void ImportFile(string path, Stream stream, int reserve, bool compress)
+		public override AssetAttributes GetAttributes(string path)
+		{
+			return GetDescriptor(path).Attributes;
+		}
+
+		public override void SetAttributes(string path, AssetAttributes attributes)
+		{
+			var desc = GetDescriptor(path);
+			index[AssetPath.CorrectSlashes(path)] = desc;
+		}
+
+		public override void ImportFile(string path, Stream stream, int reserve, AssetAttributes attributes)
 		{
 			AssetDescriptor d;
-			AssetAttributes attributes = 0;
-			if (compress) {
-				attributes |= AssetAttributes.Zipped;
+			if ((attributes & AssetAttributes.Zipped) != 0) {
 				stream = CompressStream(stream);
 			}
 			bool reuseExistingDescriptor = index.TryGetValue(AssetPath.CorrectSlashes(path), out d) && 

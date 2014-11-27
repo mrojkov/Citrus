@@ -14,8 +14,6 @@
     <AndroidResgenClass>Resource</AndroidResgenClass>
     <AssemblyName>Lime</AssemblyName>
     <TargetFrameworkVersion>v3.1</TargetFrameworkVersion>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -275,6 +273,7 @@
     <Compile Include="Source\Application\AndroidActivityDelegate.cs" />
     <Compile Include="Source\Graphics\TextureAtlasElement.cs" />
     <Compile Include="Source\Graphics\OpenGL\IGLObject.cs" />
+    <Compile Include="Resources\Resource.designer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">
