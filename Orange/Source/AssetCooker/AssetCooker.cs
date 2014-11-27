@@ -159,7 +159,7 @@ namespace Orange
 		{
 			foreach (var path in assetsBundle.EnumerateFiles()) {
 				if ((assetsBundle.GetAttributes(path) & AssetAttributes.NonPowerOf2Texture) != 0) {
-					Console.WriteLine("Warning non-power of two texture: {0}", path);
+					Console.WriteLine("Warning: non-power of two texture: {0}", path);
 				}
 			}
 		}
