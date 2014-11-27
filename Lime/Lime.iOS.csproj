@@ -271,6 +271,7 @@
     <Compile Include="Source\Graphics\OpenGL\IGLObject.cs" />
     <Compile Include="Source\Application\AndroidActivityDelegate.cs" />
     <Compile Include="obj\Release\.NETFramework,Version=v4.0.AssemblyAttribute.cs" />
+    <Compile Include="Resources\Resource.designer.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
