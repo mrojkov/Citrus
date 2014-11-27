@@ -49,14 +49,14 @@ namespace Orange
 				if (hasAlpha) {
 					Console.WriteLine("WARNING: texture has alpha channel. Used 'RGBA4444' format instead of 'RGB565'.");
 					formatArguments = "-f OGL4444 -nt -yflip0";
-					TextureConverterUtils.ReduceColorsToRGBA4444WithFloydSteinbergDithering(pixbuf);
+					TextureConverterUtils.ReduceTo4BitsPerChannelWithFloydSteinbergDithering(pixbuf);
 				} else {
 					formatArguments = "-f OGL565 -nt -yflip0";
 				}
 				break;
 			case PVRFormat.RGBA4:
 				formatArguments = "-f OGL4444 -nt -yflip0";
-				TextureConverterUtils.ReduceColorsToRGBA4444WithFloydSteinbergDithering(pixbuf);
+				TextureConverterUtils.ReduceTo4BitsPerChannelWithFloydSteinbergDithering(pixbuf);
 				break;
 			case PVRFormat.ARGB8:
 				formatArguments = "-f OGL8888 -nt -yflip0";
@@ -92,14 +92,14 @@ namespace Orange
 				if (pixbuf.HasAlpha) {
 					Console.WriteLine("WARNING: texture has alpha channel. Used 'RGBA4444' format instead of 'RGB565'.");
 					formatArguments = "-f r4g4b4a4";
-					TextureConverterUtils.ReduceColorsToRGBA4444WithFloydSteinbergDithering(pixbuf);
+					TextureConverterUtils.ReduceTo4BitsPerChannelWithFloydSteinbergDithering(pixbuf);
 				} else {
 					formatArguments = "-f r5g6b5";
 				}
 				break;
 			case PVRFormat.RGBA4:
 				formatArguments = "-f r4g4b4a4";
-				TextureConverterUtils.ReduceColorsToRGBA4444WithFloydSteinbergDithering(pixbuf);
+				TextureConverterUtils.ReduceTo4BitsPerChannelWithFloydSteinbergDithering(pixbuf);
 				break;
 			case PVRFormat.ARGB8:
 				formatArguments = "-f r8g8b8a8";

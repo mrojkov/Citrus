@@ -276,20 +276,9 @@ namespace Orange
 				if (platform == TargetPlatform.Unity) {
 					assetsBundle.ImportFile(srcPath, dstPath, reserve: 0);
 				} else {
-					string maskPath = Path.ChangeExtension(srcPath, ".mask");
-					OpacityMaskCreator.CreateMask(assetsBundle, srcPath, maskPath);
-					string tmpFile = Path.ChangeExtension(srcPath, GetPlatformTextureExtension());
-
-					var attributes = AssetAttributes.Zipped;
 					using (var pixbuf = new Gdk.Pixbuf(srcPath)) {
-						var isPot = TextureConverterUtils.IsPowerOf2(pixbuf.Width) && TextureConverterUtils.IsPowerOf2(pixbuf.Height);
-						if (!isPot) {
-							attributes |= AssetAttributes.NonPowerOf2Texture;
-						}
-						TextureConverter.Convert(pixbuf, dstPath, rules, platform);
+						ImportTexture(dstPath, pixbuf, rules);
 					}
-					assetsBundle.ImportFile(tmpFile, dstPath, reserve: 0, attributes: attributes);
-					File.Delete(tmpFile);
 				}
 				return true;
 			});
@@ -501,7 +490,9 @@ namespace Orange
 		private static void CopyAllocatedItemsToAtlas(List<AtlasItem> items, string atlasChain, int atlasId, Lime.Size size)
 		{
 			string atlasPath = GetAtlasPath(atlasChain, atlasId);
-			var atlas = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, true, 8, size.Width, size.Height);
+			var firstItem = items.First(i => i.Allocated);
+			var hasAlpha = firstItem.Pixbuf.HasAlpha;
+			var atlas = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, hasAlpha, 8, size.Width, size.Height);
 			atlas.Fill(0);
 			foreach (var item in items.Where(i => i.Allocated)) {
 				var p = item.Pixbuf;
@@ -522,29 +513,38 @@ namespace Orange
 			if (platform == TargetPlatform.Unity) {
 				throw new NotImplementedException();
 			} else {
-				var firstItem = items.First(i => i.Allocated);
 				var rules = new CookingRules() {
 					MipMaps = firstItem.MipMapped,
 					PVRFormat = firstItem.PVRFormat,
 					DDSFormat = firstItem.DDSFormat
 				};
-				var tmpFile = GetTempFilePathWithExtension(GetPlatformTextureExtension());
-				string maskPath = Path.ChangeExtension(atlasPath, ".mask");
-				OpacityMaskCreator.CreateMask(assetsBundle, atlas, maskPath);
-				TextureConverter.Convert(atlas, tmpFile, rules, platform);
-				assetsBundle.ImportFile(tmpFile, atlasPath, 0, AssetAttributes.Zipped);
+				ImportTexture(atlasPath, atlas, rules);
+			}
+		}
+
+		private static void ImportTexture(string path, Gdk.Pixbuf texture, CookingRules rules)
+		{
+			var tmpFile = GetTempFilePathWithExtension(GetPlatformTextureExtension());
+			string maskPath = Path.ChangeExtension(path, ".mask");
+			OpacityMaskCreator.CreateMask(assetsBundle, texture, maskPath);
+			TextureConverter.Convert(texture, tmpFile, rules, platform);
+			var attributes = AssetAttributes.Zipped;
+			var isPot = TextureConverterUtils.IsPowerOf2(texture.Width) && TextureConverterUtils.IsPowerOf2(texture.Height);
+			if (!isPot) {
+				attributes |= AssetAttributes.NonPowerOf2Texture;
+			}
+			assetsBundle.ImportFile(tmpFile, path, 0, attributes);
+			File.Delete(tmpFile);
+			// ETC1 textures on Android use separate alpha channel
+			var needSeparateAlpha = platform == TargetPlatform.Android &&
+				rules.PVRFormat == PVRFormat.Compressed && texture.HasAlpha;
+			if (needSeparateAlpha) {
+				TextureConverterUtils.ConvertBitmapToAlphaMask(texture);
+				TextureConverter.Convert(texture, tmpFile, rules, platform);
+				var atlasAlphaPath = GetAlphaTexturePath(path);
+				Console.WriteLine("+ " + atlasAlphaPath);
+				assetsBundle.ImportFile(tmpFile, atlasAlphaPath, 0, AssetAttributes.Zipped);
 				File.Delete(tmpFile);
-				// ETC1 textures on Android use separate alpha channel
-				var needSeparateAlpha = platform == TargetPlatform.Android && 
-					rules.PVRFormat == PVRFormat.Compressed && firstItem.Pixbuf.HasAlpha;
-				if (needSeparateAlpha) {
-					TextureConverterUtils.ConvertBitmapToAlphaMask(atlas);
-					TextureConverter.Convert(atlas, tmpFile, rules, platform);
-					var atlasAlphaPath = GetAlphaTexturePath(atlasPath);
-					Console.WriteLine("+ " + atlasAlphaPath);
-					assetsBundle.ImportFile(tmpFile, atlasAlphaPath, 0, AssetAttributes.Zipped);
-					File.Delete(tmpFile);
-				}
 			}
 		}
 

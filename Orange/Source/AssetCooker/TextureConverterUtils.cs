@@ -16,6 +16,11 @@ namespace Orange
 			public byte R, G, B, A;
 		}
 
+		struct RGB
+		{
+			public byte R, G, B;
+		}
+
 		/// <summary>
 		/// Fills RGB channels with 255, Alpha remains untouched
 		/// </summary>
@@ -39,8 +44,17 @@ namespace Orange
 				}
 			}
 		}
-			
-		public static void ReduceColorsToRGBA4444WithFloydSteinbergDithering(Gdk.Pixbuf pixbuf)
+
+		public static void ReduceTo4BitsPerChannelWithFloydSteinbergDithering(Gdk.Pixbuf pixbuf)
+		{
+			if (pixbuf.HasAlpha) {
+				ReduceRGBATo4BitsPerChannelWithFloydSteinbergDithering(pixbuf);
+			} else {
+				ReduceRGBTo4BitsPerChannelWithFloydSteinbergDithering(pixbuf);
+			}
+		}
+
+		private static void ReduceRGBATo4BitsPerChannelWithFloydSteinbergDithering(Gdk.Pixbuf pixbuf)
 		{
 			int stride = pixbuf.Rowstride;
 			if ((stride & 0x3) != 0) {
@@ -86,9 +100,58 @@ namespace Orange
 			}
 		}
 
+		private static void ReduceRGBTo4BitsPerChannelWithFloydSteinbergDithering(Pixbuf pixbuf)
+		{
+			int stride = pixbuf.Rowstride;
+			unsafe {
+				int width = pixbuf.Width;
+				int height = pixbuf.Height;
+				RGB* pixels = (RGB*)pixbuf.Pixels;
+				for (int i = 0; i < height; i++) {
+					for (int j = 0; j < width; j++) {
+						RGB quantError = *pixels;
+						quantError.R &= 0x0F;
+						quantError.G &= 0x0F;
+						quantError.B &= 0x0F;
+						RGB pixel = *pixels;
+						pixel.R &= 0xF0;
+						pixel.G &= 0xF0;
+						pixel.B &= 0xF0;
+						*pixels = pixel;
+						if (j < width - 1) {
+							RGB* p = pixels + 1; // pixel[x + 1][y]
+							*p = AddQuantError(*p, 7, quantError);
+						}
+						if (j > 0 && i < height - 1) {
+							RGB* p = pixels - 1 + stride / 4; // pixel[x - 1][y + 1]
+							*p = AddQuantError(*p, 3, quantError);
+						}
+						if (i < height - 1) {
+							RGB* p = pixels + stride / 4; // pixel[x][y + 1]
+							*p = AddQuantError(*p, 5, quantError);
+						}
+						if (j < width - 1 && i < height - 1) {
+							RGB* p = pixels + 1 + stride / 4; // pixel[x + 1][y + 1]
+							*p = AddQuantError(*p, 1, quantError);
+						}
+						pixels++;
+					}
+					pixels += stride / 4 - width;
+				}
+			}
+		}
+
 		private static RGBA AddQuantError(RGBA pixel, int koeff, RGBA error)
 		{
 			pixel.A = (byte)Math.Min((int)pixel.A + (error.A * koeff >> 4), 255);
+			pixel.R = (byte)Math.Min((int)pixel.R + (error.R * koeff >> 4), 255);
+			pixel.G = (byte)Math.Min((int)pixel.G + (error.G * koeff >> 4), 255);
+			pixel.B = (byte)Math.Min((int)pixel.B + (error.B * koeff >> 4), 255);
+			return pixel;
+		}
+
+		private static RGB AddQuantError(RGB pixel, int koeff, RGB error)
+		{
 			pixel.R = (byte)Math.Min((int)pixel.R + (error.R * koeff >> 4), 255);
 			pixel.G = (byte)Math.Min((int)pixel.G + (error.G * koeff >> 4), 255);
 			pixel.B = (byte)Math.Min((int)pixel.B + (error.B * koeff >> 4), 255);
