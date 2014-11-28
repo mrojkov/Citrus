@@ -22,6 +22,8 @@ namespace Lime
 		public float BounceZoneThickness = 100;
 		public float ScrollToItemVelocity = 800;
 		public ScrollDirection ScrollDirection { get; private set; }
+		public bool ScrollWhenContentFits = true;
+
 		protected virtual bool IsDragging { get; set; }
 		
 		public float ContentLength
@@ -248,7 +250,7 @@ namespace Lime
 
 		private IEnumerator<object> HandleDragTask(VelocityMeter velocityMeter, float mouseProjectedPosition)
 		{
-			if (!CanScroll)
+			if (!CanScroll || !ScrollWhenContentFits && MaxScrollPosition == 0)
 				yield break;
 			IsDragging = true;
 			Frame.Input.CaptureMouse();
