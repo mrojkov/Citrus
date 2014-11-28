@@ -490,8 +490,7 @@ namespace Orange
 		private static void CopyAllocatedItemsToAtlas(List<AtlasItem> items, string atlasChain, int atlasId, Lime.Size size)
 		{
 			string atlasPath = GetAtlasPath(atlasChain, atlasId);
-			var firstItem = items.First(i => i.Allocated);
-			var hasAlpha = firstItem.Pixbuf.HasAlpha;
+			var hasAlpha = items.Where(i => i.Allocated).Any(i => i.Pixbuf.HasAlpha);
 			var atlas = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, hasAlpha, 8, size.Width, size.Height);
 			atlas.Fill(0);
 			foreach (var item in items.Where(i => i.Allocated)) {
@@ -513,6 +512,7 @@ namespace Orange
 			if (platform == TargetPlatform.Unity) {
 				throw new NotImplementedException();
 			} else {
+				var firstItem = items.First(i => i.Allocated);
 				var rules = new CookingRules() {
 					MipMaps = firstItem.MipMapped,
 					PVRFormat = firstItem.PVRFormat,
