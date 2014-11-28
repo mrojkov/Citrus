@@ -159,7 +159,7 @@ namespace Lime
 
 	class StreamMap
 	{
-		Stream[] map = new Stream[128];
+		Stream[] map = new Stream[64];
 
 		public int Allocate(Stream stream)
 		{
