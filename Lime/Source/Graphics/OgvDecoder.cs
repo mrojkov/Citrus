@@ -47,11 +47,6 @@ namespace Lime
 			streamHandle = 0;
 		}
 
-		public static void ClearStreamMap()
-		{
-			streamMap.ReleaseAllSlots();
-		}
-
 		public bool DecodeFrame()
 		{
 			return Lemon.Api.OgvDecodeFrame(ogvHandle) == 0;

@@ -194,15 +194,6 @@ namespace Lime
 			return count;
 		}
 
-		public void ReleaseAllSlots()
-		{
-			lock (map) {
-				for (int i = 1; i < map.Length; i++) {
-					map[i] = null;
-				}
-			}
-		}
-
 		public Stream this[int slot] {
 			get {
 				return map[slot];
