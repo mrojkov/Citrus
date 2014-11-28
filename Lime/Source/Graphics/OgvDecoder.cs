@@ -62,6 +62,11 @@ namespace Lime
 			return Lemon.Api.OgvGetPlaybackTime(ogvHandle);
 		}
 
+		public static int GetCurrentStreamsCount()
+		{
+			return streamMap.GetCurrentStreamsCount();
+		}
+
 		public void FillTextureRGBX8(Color4[] pixels, int width, int height)
 		{
 			var yPlane = Lemon.Api.OgvGetBuffer(ogvHandle, 0);

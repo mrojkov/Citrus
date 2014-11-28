@@ -181,6 +181,19 @@ namespace Lime
 			}
 		}
 
+		public int GetCurrentStreamsCount()
+		{
+			int count = 0;
+			lock (map) {
+				for (int i = 1; i < map.Length; i++) {
+					if (map[i] != null) {
+						count++;
+					}
+				}
+			}
+			return count;
+		}
+
 		public void ReleaseAllSlots()
 		{
 			lock (map) {
