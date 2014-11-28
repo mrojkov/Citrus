@@ -162,6 +162,20 @@ namespace Lime
 			}
 		}
 
+		public void AssimilateChildren()
+		{
+			foreach (var ch in Frame.Nodes.ToArray()) {
+				if (ch == Content) continue;
+				ch.Unlink();
+				Content.AddNode(ch);
+				var w = ch.AsWidget;
+				if (w == null) continue;
+				var end = ProjectToScrollAxis(w.Position + w.Size) * (1 - ProjectToScrollAxis(w.Pivot));
+				if (end > Content.Height)
+					Content.Height = end;
+			}
+		}
+
 		private void StartScrolling(IEnumerator<object> newScrollingTask)
 		{
 			StopScrolling();
