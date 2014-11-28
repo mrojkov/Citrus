@@ -135,10 +135,16 @@ namespace Orange
 			Console.WriteLine("------------- Starting Application -------------");
 #if WIN
 			string app = GetApplicationPath();
-			string dir = Path.GetDirectoryName(app);
-			using (new DirectoryChanger(dir)) {
-				int exitCode = Process.Start(app, arguments);
-				return exitCode;
+
+			if (File.Exists(app)) {
+				string dir = Path.GetDirectoryName(app);
+				using (new DirectoryChanger(dir)) {
+					int exitCode = Process.Start(app, arguments);
+					return exitCode;
+				}
+			} else {
+				Console.WriteLine("Error: File not found: " + app);
+				return 1;
 			}
 #else
 			var args = "--installdev=" + GetIOSAppName();
