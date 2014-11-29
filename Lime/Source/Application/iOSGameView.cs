@@ -42,6 +42,7 @@ namespace Lime
 			textField = new MonoTouch.UIKit.UITextField();
 			textField.Delegate = new TextFieldDelegate();
 			textField.AutocorrectionType = UITextAutocorrectionType.No;
+			textField.AutocapitalizationType = UITextAutocapitalizationType.None;
 			screenScale = UIScreen.MainScreen.Scale;
 			this.Add(textField);
 			RefreshWindowSize();
