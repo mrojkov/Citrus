@@ -166,7 +166,7 @@ namespace Lime
 		{
 			this.path = resourceId;
 			resourcesAssembly = AppDomain.CurrentDomain.GetAssemblies().
-				SingleOrDefault(a => a.GetName().Name == "Assets.Android");
+				SingleOrDefault(a => a.GetName().Name == assemblyName);
 			if (resourcesAssembly == null) {
 				throw new Lime.Exception("Assembly '{0}' doesn't exist", assemblyName);
 			}
