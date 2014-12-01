@@ -45,9 +45,6 @@ namespace Lime
 				throw new ArgumentException();
 			}
 			Stop();
-
-			Debug.Write("movie opening : {0}", Path + ".ogv");
-
 			rgbStream = AssetsBundle.Instance.OpenFile(Path + ".ogv");
 			rgbDecoder = new OgvDecoder(rgbStream);
 			foreach (var i in new string[] { "_alpha.ogv", "_Alpha.ogv" }) {
