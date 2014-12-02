@@ -12,12 +12,12 @@ namespace Lime
 
 		public int GetWidth()
 		{
-			return bitmap.Width;
+			return bitmap == null ? 0 : bitmap.Width;
 		}
 
 		public int GetHeight()
 		{
-			return bitmap.Height;
+			return bitmap == null ? 0 : bitmap.Height;
 		}
 
 		public void LoadFromStream(Stream stream)
