@@ -67,8 +67,12 @@ namespace Lime
 				shaderProgram.LoadMatrix(program.ProjectionMatrixUniformId, Renderer.Projection);
 			}
 #if ANDROID
-			shaderProgram.LoadBoolean(shaderProgram.UseAlphaTexture1UniformId, textures[2] != 0); 
-			shaderProgram.LoadBoolean(shaderProgram.UseAlphaTexture2UniformId, textures[3] != 0); 
+			if (numTextures > 0) {
+				shaderProgram.LoadBoolean(shaderProgram.UseAlphaTexture1UniformId, textures[2] != 0); 
+			}
+			if (numTextures > 1) {
+				shaderProgram.LoadBoolean(shaderProgram.UseAlphaTexture2UniformId, textures[3] != 0); 
+			}
 #endif
 		}
 
