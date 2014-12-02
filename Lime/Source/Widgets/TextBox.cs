@@ -17,6 +17,9 @@ namespace Lime
 	{
 		private string text;
 		private float caretBlinkPhase;
+		private float lastCharTimer;
+		private char lastChar;
+		private float lastCharShowTime = 0.5f;
 
 		[ProtoMember(1)]
 		public SerializableFont Font = new SerializableFont();
@@ -54,6 +57,9 @@ namespace Lime
 		[ProtoMember(11)]
 		public bool Autofocus { get; set; }
 
+		[ProtoMember(12)]
+		public bool PasswordField { get; set; }
+
 		public TextBox()
 		{
 			Enabled = true;
@@ -62,6 +68,7 @@ namespace Lime
 
 		protected override void SelfUpdate(float delta)
 		{
+			lastCharTimer -= delta;
 			var world = World.Instance;
 			if (!Enabled) {
 				if (world.ActiveTextWidget == this) {
@@ -95,13 +102,19 @@ namespace Lime
 		{
 			foreach (char c in Input.TextInput) {
 				if (c >= 32 && Text.Length < MaxTextLength) {
+					char? charToAdd = null;
 					if (Numeric) {
 						float foo;
 						if ((c == '-' && Text == "") || float.TryParse(Text + c, out foo)) {
-							Text += c;
+							charToAdd = c;
 						}
 					} else {
-						Text += c;
+						charToAdd = c;
+					}
+					if (charToAdd != null) {
+						Text += charToAdd.Value;
+						lastChar = charToAdd.Value;
+						lastCharTimer = lastCharShowTime;
 					}
 				} else if (Text.Length > 0 && c == 8) {
 					Text = Text.Remove(Text.Length - 1);
@@ -112,6 +125,14 @@ namespace Lime
 		public override void Render()
 		{
 			string text = Text;
+			if (PasswordField && Text.Length > 0) {
+				text = new string('*', Text.Length - 1);
+				if (lastCharTimer > 0) {
+					text += lastChar;
+				} else {
+					text += '*';
+				}
+			}
 			if (World.Instance.ActiveTextWidget == this) {
 				text += CaretChar;
 			}
