@@ -33,7 +33,7 @@ namespace Lime
 
 		public void SaveToStream(Stream stream)
 		{
-			if (bitmap != null) {
+			if (bitmap != null && bitmap.AsPNG() != null) {
 				using (var bitmapStream = bitmap.AsPNG().AsStream()) { 
 					Toolbox.CopyStream(bitmapStream, stream);
 				}
