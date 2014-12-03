@@ -14,6 +14,9 @@ namespace Lime
 	public class GameController : UIViewController
 	{
 		public static GameController Instance;
+		private NSObject keyboardShowNotification;
+
+		public float KeyboardHeight { get; private set; }
 
 		public GameController() : base()
 		{
@@ -30,6 +33,35 @@ namespace Lime
 		{
 			Input.Acceleration = new Vector3((float)e.Acceleration.X,
 				(float)e.Acceleration.Y, (float)e.Acceleration.Z);
+		}
+
+		public override void ViewWillAppear(bool animated)
+		{
+			base.ViewWillAppear(animated);
+			keyboardShowNotification = UIKeyboard.Notifications.ObserveWillShow(KeyboardShowCallback);
+		}
+
+		public override void ViewWillDisappear(bool animated)
+		{
+			base.ViewWillDisappear(animated);
+			if (keyboardShowNotification != null) {
+				keyboardShowNotification.Dispose();
+			}
+		}
+
+		private void KeyboardShowCallback(object sender, UIKeyboardEventArgs args)
+		{
+			var scale = UIScreen.MainScreen.Scale;
+
+			// iPad 2 return keyboard height in Height, but iPad 3 return keyboard height in Width.
+			// So, trying to determine where the real height is. 
+			var rectEnd = args.FrameEnd;
+			var rectBegin = args.FrameBegin;
+			if (rectEnd.X == 0 && rectBegin.X == 0) {
+				KeyboardHeight = rectEnd.Height * scale;
+			} else {
+				KeyboardHeight = rectEnd.Width * scale;
+			}
 		}
 
 		public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations ()
