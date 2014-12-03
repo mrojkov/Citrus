@@ -90,6 +90,8 @@ namespace Lime
 			var clone = (Button)base.DeepCloneFast();
 			clone.stateMachine = new StateMachine();
 			clone.State = clone.NormalState;
+			// Should reference children copies, not originals. [PK-45446]
+			clone.textPresenters = null;
 			return clone;
 		}
 
