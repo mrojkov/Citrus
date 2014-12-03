@@ -152,7 +152,7 @@ namespace Orange
 			AddStage(() => SyncRawAssets(".shader"));
 			AddStage(() => SyncRawAssets(".xml"));
 			AddStage(() => SyncRawAssets(".raw"));
-			AddStage(() => WarnAboutNPOTTextures());
+			AddStage(WarnAboutNPOTTextures);
 		}
 
 		private static void WarnAboutNPOTTextures()
