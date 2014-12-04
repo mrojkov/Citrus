@@ -22,6 +22,11 @@ namespace Lime
 
 		public WebBrowser(Widget parentWidget): this()
 		{
+			AddToWidget(parentWidget);
+		}
+
+		public void AddToWidget(Widget parentWidget)
+		{
 			parentWidget.AddNode(this);
 			Size = parentWidget.Size;
 			Anchors = Anchors.LeftRightTopBottom;
