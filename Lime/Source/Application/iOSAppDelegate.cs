@@ -123,7 +123,7 @@ namespace Lime
 			Application.Instance.OnDeactivate();
 			GameController.Instance.View.RenderFrame();
 			OpenTK.Graphics.ES11.GL.Finish();
-			TexturePool.Instance.DiscardUnusedTextures(5);
+			TexturePool.Instance.DiscardTexturesUnderPressure();
 			Application.Instance.Active = false;
 		}
 
