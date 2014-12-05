@@ -354,5 +354,10 @@ namespace Lime
 			GameView.Instance.SetCursor(name, hotSpot);
 #endif
 		}
+
+		public virtual void OnScreenKeyboardHide()
+		{
+			World.Instance.ActiveTextWidget = null;
+		}
 	}
 }

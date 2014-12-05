@@ -15,8 +15,11 @@ namespace Lime
 	{
 		public static GameController Instance;
 		private NSObject keyboardShowNotification;
+		private NSObject keyboardWillChangeFrameNotification;
+		private NSObject keyboardDidChangeFrameNotification;
 
 		public float KeyboardHeight { get; private set; }
+		public bool IsKeyboardChanging { get; private set; }
 
 		public GameController() : base()
 		{
@@ -39,6 +42,8 @@ namespace Lime
 		{
 			base.ViewWillAppear(animated);
 			keyboardShowNotification = UIKeyboard.Notifications.ObserveWillShow(KeyboardShowCallback);
+			keyboardWillChangeFrameNotification = UIKeyboard.Notifications.ObserveWillChangeFrame(KeyboardWillChangeFrameCallback);
+			keyboardDidChangeFrameNotification = UIKeyboard.Notifications.ObserveDidChangeFrame(KeyboardDidChangeFrameCallback);
 		}
 
 		public override void ViewWillDisappear(bool animated)
@@ -47,6 +52,27 @@ namespace Lime
 			if (keyboardShowNotification != null) {
 				keyboardShowNotification.Dispose();
 			}
+			if (keyboardWillChangeFrameNotification != null) {
+				keyboardWillChangeFrameNotification.Dispose();
+			}
+			if (keyboardDidChangeFrameNotification != null) {
+				keyboardDidChangeFrameNotification.Dispose();
+			}
+		}
+
+		private void KeyboardWillChangeFrameCallback(object sender, UIKeyboardEventArgs args)
+		{
+			IsKeyboardChanging = true;
+		}
+
+		private void KeyboardDidChangeFrameCallback(object sender, UIKeyboardEventArgs args)
+		{
+			IsKeyboardChanging = false;
+			var endFrame = args.FrameEnd;
+			var screenRect = UIScreen.MainScreen.Bounds;
+			if (!endFrame.IntersectsWith(screenRect)) {
+				Application.Instance.OnScreenKeyboardHide();
+			}		
 		}
 
 		private void KeyboardShowCallback(object sender, UIKeyboardEventArgs args)

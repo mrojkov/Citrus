@@ -177,6 +177,9 @@ namespace Lime
 
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{
+			if (GameController.Instance.IsKeyboardChanging) {
+				return;
+			}
 			float delta;
 			RefreshFrameTimeStamp(out delta);
 			Input.ProcessPendingKeyEvents();
@@ -230,7 +233,7 @@ namespace Lime
 
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
-			if (!Application.Instance.Active) {
+			if (!Application.Instance.Active || GameController.Instance.IsKeyboardChanging) {
 				return;
 			}
 			MakeCurrent();
