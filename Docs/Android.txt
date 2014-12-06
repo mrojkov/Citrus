@@ -43,3 +43,12 @@ https://s3.amazonaws.com/android-sdk-manager/redist/Fire_Phone.zip
 Нужно установить Jdk1.7
 http://download.oracle.com/otn-pub/java/jdk/7u71-b14/jdk-7u71-windows-i586.exe
 Затем в Program Files(x86)/Java, переименовать jdk.1.6.0_39 во что-то непотребное
+
+КАК СОБИРАТЬ БИЛД В БФГ
+=======================
+1) Увеличить version code
+2) Собрать apk
+3) Из неподписанного apk (e.g: com.bigfishgames.gummydropgoogle.apk) удалить файл assets/Cheats
+4) Установить путь к продакшен серверу в файле assets/ServerURL.txt: https://f2p.bigfishgames.com/WorldSaga
+5) Закоммитить AndroidManifest.xml с комментарием "Android: bump version code"
+6) Залить apk в BFG SVN папку Google/December_XX и туда же положить словари
