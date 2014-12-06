@@ -147,11 +147,17 @@ namespace Lime
 #if iOS
 		public Size WindowSize { get; internal set; }
 
-		private float pixelsPerPoints = UIScreen.MainScreen.Scale;
+		private float pixelsPerPoints = 0f;
 
 		public Vector2 ScreenDPI 
 		{
-			get { return 160 * pixelsPerPoints * Vector2.One; }
+			get {
+				// Class-level initialization fails on iOS simulator in debug mode,
+				// because it is called before main UI thread.
+				if (pixelsPerPoints == 0)
+					pixelsPerPoints = UIScreen.MainScreen.Scale;
+				return 160 * pixelsPerPoints * Vector2.One;
+			}
 		}
 
 		public void ShowOnscreenKeyboard(bool show, string text)
