@@ -76,6 +76,8 @@ namespace Lime
 		float KeyRepeatInterval { get; set; }
 		int MaxLength { get; set; }
 		int MaxLines { get; set; }
+		char? PasswordChar { get; set; }
+		float PasswordLastCharShowTime { get; set; }
 
 		bool IsAcceptableLength(int length);
 		bool IsAcceptableLines(int lines);
@@ -87,11 +89,14 @@ namespace Lime
 		public float KeyRepeatInterval { get; set; }
 		public int MaxLength { get; set; }
 		public int MaxLines { get; set; }
+		public char? PasswordChar { get; set; }
+		public float PasswordLastCharShowTime { get; set; }
 
 		public EditorParams()
 		{
 			KeyRepeatDelay = 0.5f;
 			KeyRepeatInterval = 0.05f;
+			PasswordLastCharShowTime = 1.0f;
 		}
 
 		public bool IsAcceptableLength(int length) { return MaxLength <= 0 || length <= MaxLength; }
@@ -115,6 +120,7 @@ namespace Lime
 			this.editorParams = editorParams;
 			container.Tasks.Add(FocusTask());
 			container.Tasks.Add(HandleKeyboardTask());
+			container.Tasks.Add(PasswordTask());
 		}
 
 		private bool IsActive() { return World.Instance.ActiveTextWidget == textInputProcessor; }
@@ -191,6 +197,7 @@ namespace Lime
 			prevKeyPressed = keyPressed;
 		}
 
+		private float lastCharShowTimeLeft = 0f;
 		private void HandleTextInput()
 		{
 			if (container.Input.TextInput == null)
@@ -204,8 +211,10 @@ namespace Lime
 						text.Text = text.Text.Remove(caretPos.TextPos, 1);
 					}
 				}
-				else if (ch >= ' ')
+				else if (ch >= ' ') {
 					InsertChar(ch);
+					lastCharShowTimeLeft = editorParams.PasswordLastCharShowTime;
+				}
 			}
 		}
 
@@ -228,5 +237,22 @@ namespace Lime
 				yield return 0;
 			}
 		}
+
+		private IEnumerator<object> PasswordTask()
+		{
+			while (true) {
+				if (editorParams.PasswordChar != null) {
+					if (text.Text == "")
+						text.DisplayText = "";
+					else {
+						lastCharShowTimeLeft -= TaskList.Current.Delta;
+						text.DisplayText = new string(editorParams.PasswordChar.Value, text.Text.Length - 1);
+						text.DisplayText += lastCharShowTimeLeft > 0 ? text.Text.Last() : editorParams.PasswordChar; 
+					}
+				}
+				yield return 0;
+			}
+		}
+
 	}
 }
