@@ -50,6 +50,7 @@ namespace Lime
 	public interface IText
 	{
 		string Text { get; set; }
+		string DisplayText { get; set; }
 		HAlignment HAlignment { get; set; }
 		VAlignment VAlignment { get; set; }
 		TextOverflowMode OverflowMode { get; set; }

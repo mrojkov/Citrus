@@ -10,6 +10,7 @@ namespace Lime
 		private SpriteList spriteList;
 		private SerializableFont font;
 		private string text;
+		private string displayText;
 		private float fontHeight;
 		private float spacing;
 		private HAlignment hAlignment;
@@ -28,6 +29,15 @@ namespace Lime
 		public override string Text {
 			get { return text ?? ""; }
 			set { SetText(value); }
+		}
+
+		public string DisplayText {
+			get { return displayText; }
+			set { 
+				if (displayText == value) return;
+				displayText = value;
+				DisposeSpriteList();
+			}
 		}
 
 		[ProtoMember(3)]
@@ -175,7 +185,7 @@ namespace Lime
 
 		public override Vector2 CalcContentSize()
 		{
-			return Renderer.MeasureTextLine(Font.Instance, Text, FontHeight);
+			return Renderer.MeasureTextLine(Font.Instance, DisplayText ?? Text, FontHeight);
 		}
 
 		protected override void OnSizeChanged(Vector2 sizeDelta)
@@ -243,7 +253,8 @@ namespace Lime
 		private void RenderHelper(SpriteList spriteList, out Rectangle rect)
 		{
 			rect = Rectangle.Empty;
-			var localizedText = LocalizationHandler != null ? LocalizationHandler(Text) : Localization.GetString(Text);
+			var t = DisplayText ?? Text;
+			var localizedText = LocalizationHandler != null ? LocalizationHandler(t) : Localization.GetString(t);
 			if (string.IsNullOrEmpty(localizedText)) {
 				caret.Line = caret.Pos = caret.TextPos = 0;
 				caret.WorldPos = Vector2.Zero;

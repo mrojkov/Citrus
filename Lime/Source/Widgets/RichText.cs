@@ -23,6 +23,12 @@ namespace Lime
 			set { SetText(value); }
 		}
 
+		public string DisplayText // TODO
+		{
+			get { return text; }
+			set { SetText(value); }
+		}
+
 		[ProtoMember(2)]
 		public HAlignment HAlignment 
 		{ 
