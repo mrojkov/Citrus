@@ -67,7 +67,12 @@ namespace Lime
 
 		private void InitWithPngOrJpgBitmap(Stream stream)
 		{
-			bitmap = new SD.Bitmap(stream);
+			try {
+				bitmap = new SD.Bitmap(stream);
+			} catch (System.Exception e) {
+				Logger.Write("Bitmap.Win: failed to load bitmap. {0}", e.Message);
+			}
+
 		}
 	}
 }
