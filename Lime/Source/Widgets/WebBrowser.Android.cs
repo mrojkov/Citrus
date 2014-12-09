@@ -21,6 +21,13 @@ namespace Lime
 			Anchors = Anchors.LeftRight | Anchors.TopBottom;
 		}
 
+		public void AddToWidget(Widget parentWidget)
+		{
+			parentWidget.Nodes.Add(this);
+			Size = parentWidget.Size;
+			Anchors = Anchors.LeftRight | Anchors.TopBottom;
+		}
+
 		~WebBrowser()
 		{
 			Dispose();
