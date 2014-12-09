@@ -45,6 +45,11 @@ namespace Lime
 			get { return Mathf.Max(0, ProjectToScrollAxis(Content.Size - Frame.Size).Round()); }
 		}
 
+		public float MaxOverscroll
+		{
+			get { return ProjectToScrollAxis(Frame.Size * Vector2.Half); }
+		}
+
 		private Task scrollingTask;
 
 		public ScrollView(Frame frame, ScrollDirection scrollDirection = ScrollDirection.Vertical, bool processChildrenFirst = false)
@@ -242,7 +247,11 @@ namespace Lime
 					break;
 				}
 				// Round scrolling position to prevent blurring
-				ScrollPosition = (ScrollPosition + velocity * delta).Round();
+				ScrollPosition = Mathf.Clamp(
+					value: (ScrollPosition + velocity * delta).Round(), 
+					min: MinScrollPosition - MaxOverscroll, 
+					max: MaxScrollPosition + MaxOverscroll
+				);
 				yield return 0;
 			}
 			scrollingTask = null;
