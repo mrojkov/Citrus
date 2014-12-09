@@ -23,6 +23,7 @@ namespace Lime
 		public event Action<Activity> Stopped;
 		public event Action<Activity> Destroying;
 		public event Action LowMemory;
+		public event Action BackPressed;
 		public event ActivityResultDelegate ActivityResult;
 
 		public Activity Activity { get; private set; }
@@ -80,6 +81,13 @@ namespace Lime
 		{
 			if (LowMemory != null) {
 				LowMemory();
+			}
+		}
+
+		public virtual void OnBackPressed()
+		{
+			if (BackPressed != null) {
+				BackPressed();
 			}
 		}
 
