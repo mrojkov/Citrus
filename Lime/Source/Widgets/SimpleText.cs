@@ -255,16 +255,16 @@ namespace Lime
 			rect = Rectangle.Empty;
 			var t = DisplayText ?? Text;
 			var localizedText = LocalizationHandler != null ? LocalizationHandler(t) : Localization.GetString(t);
-			if (string.IsNullOrEmpty(localizedText)) {
-				caret.Line = caret.Pos = caret.TextPos = 0;
-				caret.WorldPos = Vector2.Zero;
-				return;
-			}
 			var lines = SplitText(localizedText);
 			var pos = Vector2.Down * CalcVerticalTextPosition(lines);
 			caret.RenderingLineNumber = 0;
 			caret.RenderingTextPos = 0;
 			caret.NearestCharPos = Vector2.Zero;
+			if (string.IsNullOrEmpty(localizedText)) {
+				caret.WorldPos = pos;
+				caret.Line = caret.Pos = caret.TextPos = 0;
+				return;
+			}
 			bool firstLine = true;
 			if (caret.Valid == CaretPosition.ValidState.TextPos)
 				Caret.TextPos = Caret.TextPos.Clamp(0, text.Length);
@@ -301,8 +301,7 @@ namespace Lime
 
 		private float CalcTotalHeight(int numLines)
 		{
-			var totalHeight = FontHeight * numLines + Spacing * (numLines - 1);
-			return totalHeight;
+			return Math.Max(FontHeight * numLines + Spacing * (numLines - 1), FontHeight);
 		}
 
 		private void RenderSingleTextLine(
