@@ -300,6 +300,11 @@ namespace Orange
 				if (ext == ".atlasPart" || ext == ".mask") {
 					continue;
 				}
+				var pathWithoutExt = Path.GetFileNameWithoutExtension(path);
+				if (!string.IsNullOrEmpty(pathWithoutExt) && Path.GetExtension(pathWithoutExt) == ".alpha") {
+					// Alpha mask
+					continue;
+				}
 				string assetPath = Path.ChangeExtension(path, GetOriginalAssetExtension(path));
 				if (!assetsFiles.Contains(assetPath)) {
 					Console.WriteLine("- " + path);
