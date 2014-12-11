@@ -52,8 +52,8 @@ namespace Lime
 		public GameView(Context context)
 			: base(context)
 		{
-			Focusable = true;
-			FocusableInTouchMode = true;
+			//Focusable = true;
+			//FocusableInTouchMode = true;
 			Instance = this;
 			for (int i = 0; i < Input.MaxTouches; i++) {
 				pointerIds[i] = -1;
@@ -63,26 +63,26 @@ namespace Lime
 
 		private bool isOnscreenKeyboardVisible;
 
-		protected override void OnLayout(bool changed, int left, int top, int right, int bottom)
-		{
-			base.OnLayout(changed, left, top, right, bottom);
-			var r = new Android.Graphics.Rect();
-			this.GetWindowVisibleDisplayFrame(r);
-			var totalHeight = bottom - top;
-			var visibleHeight = r.Bottom - r.Top;
-			if (visibleHeight == totalHeight) {
-				isOnscreenKeyboardVisible = false;
-			}
-		}
+//		protected override void OnLayout(bool changed, int left, int top, int right, int bottom)
+//		{
+//			base.OnLayout(changed, left, top, right, bottom);
+//			var r = new Android.Graphics.Rect();
+//			this.GetWindowVisibleDisplayFrame(r);
+//			var totalHeight = bottom - top;
+//			var visibleHeight = r.Bottom - r.Top;
+//			if (visibleHeight == totalHeight) {
+//				isOnscreenKeyboardVisible = false;
+//			}
+//		}
 
 		public void ShowOnscreenKeyboard(bool show, string text)
 		{
-			if (show) {
-				imm.ShowSoftInput(this, ShowFlags.Forced);
-			} else if (!show) {
-				imm.HideSoftInputFromWindow(WindowToken, 0);
-			}
-			isOnscreenKeyboardVisible = show;
+//			if (show) {
+//				imm.ShowSoftInput(this, ShowFlags.Forced);
+//			} else if (!show) {
+//				imm.HideSoftInputFromWindow(WindowToken, 0);
+//			}
+//			isOnscreenKeyboardVisible = show;
 		}
 
 		public bool IsOnscreenKeyboardVisible()
@@ -136,13 +136,13 @@ namespace Lime
 			throw new Lime.Exception("Can't create framebuffer, aborting");
 		}
 
-		public override Android.Views.InputMethods.IInputConnection OnCreateInputConnection(Android.Views.InputMethods.EditorInfo outAttrs)
-		{
-			if (inputConnection == null) {
-				inputConnection = new InputConnection(this);
-			}
-			return inputConnection;
-		}
+//		public override Android.Views.InputMethods.IInputConnection OnCreateInputConnection(Android.Views.InputMethods.EditorInfo outAttrs)
+//		{
+//			if (inputConnection == null) {
+//				inputConnection = new InputConnection(this);
+//			}
+//			return inputConnection;
+//		}
 			
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
