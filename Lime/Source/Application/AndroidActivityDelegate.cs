@@ -12,6 +12,12 @@ namespace Lime
 {
 	public class ActivityDelegate
 	{
+		public class BackButtonEventArgs
+		{
+			public bool Handled;
+		}
+
+		public delegate void BackButtonDelegate(BackButtonEventArgs args);
 		public delegate void ActivityResultDelegate(int requestCode, Result resultCode, Intent data);
 
 		public static ActivityDelegate Instance { get; private set; }
@@ -23,7 +29,7 @@ namespace Lime
 		public event Action<Activity> Stopped;
 		public event Action<Activity> Destroying;
 		public event Action LowMemory;
-		public event Action BackPressed;
+		public event BackButtonDelegate BackPressed;
 		public event ActivityResultDelegate ActivityResult;
 
 		public Activity Activity { get; private set; }
@@ -84,11 +90,13 @@ namespace Lime
 			}
 		}
 
-		public virtual void OnBackPressed()
+		public virtual bool OnBackPressed()
 		{
+			var args = new BackButtonEventArgs();
 			if (BackPressed != null) {
-				BackPressed();
+				BackPressed(args);
 			}
+			return args.Handled;
 		}
 
 		public virtual void OnActivityResult(int requestCode, Result resultCode, Intent data)
