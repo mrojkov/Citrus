@@ -49,6 +49,6 @@ http://download.oracle.com/otn-pub/java/jdk/7u71-b14/jdk-7u71-windows-i586.exe
 1) Увеличить version code
 2) Собрать apk
 3) Из неподписанного apk (e.g: com.bigfishgames.gummydropgoogle.apk) удалить файл assets/Cheats
-4) Установить путь к продакшен серверу в файле assets/ServerURL.txt: http://cdn-f2p.bigfishgames.com/WorldSaga/DLC/
+4) Установить путь к продакшен серверу в файле assets/ServerURL.txt: http://cdn-f2p.bigfishgames.com/WorldSaga
 5) Закоммитить AndroidManifest.xml с комментарием "Android: bump version code"
 6) Залить apk в BFG SVN папку Google/December_XX и туда же положить словари
