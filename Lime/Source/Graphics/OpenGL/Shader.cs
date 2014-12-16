@@ -84,9 +84,9 @@ namespace Lime
 		private static string ReplacePrecisionModifiers(string source)
 		{
 			if (GameView.Instance.RenderingApi == RenderingApi.OpenGL) {
-				source = source.Replace(" lowp ", " ");
-				source = source.Replace(" mediump ", " ");
-				source = source.Replace(" highp ", " ");
+				source = source.Replace("lowp ", "");
+				source = source.Replace("mediump ", "");
+				source = source.Replace("highp ", "");
 			}
 			return source;
 		}
