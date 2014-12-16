@@ -19,6 +19,8 @@ namespace Lime
 			set { this.value = value; }
 		}
 
+		public event Action DragStarted;
+		public event Action DragEnded;
 		public event Action Changed;
 		public bool Enabled;
 
@@ -66,6 +68,7 @@ namespace Lime
 			if (Input.WasMousePressed() && Thumb.IsMouseOver()) {
 				RunThumbAnimation("Press");
 				Input.CaptureMouse();
+				RaiseDragStarted();
 			} else if (Input.IsMouseOwner() && !Input.IsMousePressed()) {
 				Release();
 			}
@@ -80,6 +83,20 @@ namespace Lime
 			RefreshThumbPosition();
 			if (!Input.IsMouseOwner()) {
 				Release();
+			}
+		}
+
+		private void RaiseDragEnded()
+		{
+			if (DragEnded != null) {
+				DragEnded();
+			}
+		}
+
+		private void RaiseDragStarted()
+		{
+			if (DragStarted != null) {
+				DragStarted();
 			}
 		}
 
@@ -108,6 +125,7 @@ namespace Lime
 
 		private void Release()
 		{
+			RaiseDragEnded();
 			RunThumbAnimation("Normal");
 			if (Input.IsMouseOwner()) {
 				Input.ReleaseMouse();
