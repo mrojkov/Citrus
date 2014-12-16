@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using OpenTK.Graphics;
 #if iOS || ANDROID
+using OpenTK.Graphics;
 using OpenTK.Graphics.ES20;
+#elif MAC
+using MonoMac.OpenGL;
 #else
+using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 #endif
 
@@ -48,7 +51,12 @@ namespace Lime
 		private void CreateShader()
 		{
 			handle = GL.CreateShader(fragmentOrVertex ? ShaderType.FragmentShader : ShaderType.VertexShader);
+#if MAC
+			var length = source.Length;
+			GL.ShaderSource(handle, 1, new string[] { source }, ref length);
+#else
 			GL.ShaderSource(handle, 1, new string[] { source }, new int[] { source.Length });
+#endif
 			GL.CompileShader(handle);
 			var result = new int[1];
 			GL.GetShader(handle, ShaderParameter.CompileStatus, result);

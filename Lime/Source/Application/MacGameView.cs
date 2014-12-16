@@ -7,7 +7,7 @@ using MonoMac.AppKit;
 
 namespace Lime
 {
-	internal class GameView : MonoMac.OpenGL.MonoMacGameView
+	public class GameView : MonoMac.OpenGL.MonoMacGameView
 	{
 		public static GameView Instance;
 		internal static Action DidUpdated;
@@ -23,31 +23,33 @@ namespace Lime
 				| NSViewResizingMask.WidthSizable;
 		}
 
-		private long tickCount;
-
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{
-			long delta = (System.DateTime.Now.Ticks / 10000) - tickCount;
-			if (tickCount == 0) {
-				tickCount = delta;
-				delta = 0;
-			} else {
-				tickCount += delta;
-			}
+			float delta;
+			RefreshFrameTimeStamp(out delta);
 			Input.ProcessPendingKeyEvents();
-			// Ensure time delta lower bound is 16.6 frames per second.
-			// This is protection against time leap on inactive state
-			// and multiple updates of node hierarchy.
- 			delta = Math.Min(delta, 60);
-			Application.Instance.OnUpdateFrame((int)delta);
-            AudioSystem.Update();
+			Application.Instance.OnUpdateFrame(delta);
+			AudioSystem.Update();
+
+			var p = Window.MouseLocationOutsideOfEventStream;
+			Input.MousePosition = new Vector2(p.X, Size.Height - p.Y);
+
 			Input.TextInput = null;
 			Input.CopyKeysState();
 			if (DidUpdated != null) {
 				DidUpdated();
 			}
 		}
-		
+
+		private DateTime lastFrameTimeStamp = DateTime.UtcNow;
+		private void RefreshFrameTimeStamp(out float delta)
+		{
+			var now = DateTime.UtcNow;
+			delta = (float)(now - lastFrameTimeStamp).TotalSeconds;
+			delta = delta.Clamp(0, 1 / Application.LowFPSLimit);
+			lastFrameTimeStamp = now;
+		}
+
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
 			UpdateFrameRate();
@@ -70,7 +72,7 @@ namespace Lime
 			Input.SetKeyState(Key.Mouse0, false);
 			base.MouseUp(theEvent);
 		}
-		
+
 		private long timeStamp;
 		private int countedFrames;
 		private float frameRate;

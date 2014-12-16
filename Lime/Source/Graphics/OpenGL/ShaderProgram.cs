@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using OpenTK.Graphics;
 #if iOS || ANDROID
+using OpenTK.Graphics;
 using OpenTK.Graphics.ES20;
+#elif MAC
+using MonoMac.OpenGL;
 #else
+using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 #endif
 
@@ -72,7 +75,11 @@ namespace Lime
 		{
 			if (handle != 0) {
 				Application.InvokeOnMainThread(() => {
+#if MAC
+					GL.DeleteProgram(1, new int[] { handle });
+#else
 					GL.DeleteProgram(handle);
+#endif
 				});
 				handle = 0;
 			}
@@ -87,7 +94,11 @@ namespace Lime
 		{
 			GL.LinkProgram(handle);
 			var result = new int[1];
+#if MAC
+			GL.GetProgram(handle, ProgramParameter.LinkStatus, result);
+#else
 			GL.GetProgram(handle, GetProgramParameterName.LinkStatus, result);
+#endif
 			if (result[0] == 0) {
 				var infoLog = GetLinkLog();
 				Logger.Write("Shader program link log:\n{0}", infoLog);
@@ -113,7 +124,11 @@ namespace Lime
 		private string GetLinkLog()
 		{
 			var logLength = new int[1];
+#if MAC
+			GL.GetProgram(handle, ProgramParameter.InfoLogLength, logLength);
+#else
 			GL.GetProgram(handle, GetProgramParameterName.InfoLogLength, logLength);
+#endif
 			if (logLength[0] > 0) {
 				var infoLog = new System.Text.StringBuilder(logLength[0]);
 				unsafe {
