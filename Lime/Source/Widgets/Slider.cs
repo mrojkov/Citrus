@@ -189,5 +189,12 @@ namespace Lime
 				Changed();
 			}
 		}
+
+		public void SetValue(float newValue)
+		{
+			if (Value == newValue) return;
+			value = newValue;
+			RaiseChanged();
+		}
 	}
 }
