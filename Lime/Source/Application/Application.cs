@@ -6,8 +6,10 @@ using System.Reflection;
 
 #if iOS
 using MonoTouch.UIKit;
+
 #elif MAC
 using MonoMac.AppKit;
+
 #elif ANDROID
 using Android.App;
 #endif
@@ -60,6 +62,7 @@ namespace Lime
 		public static float LowFPSLimit = 20;
 
 		public static Thread MainThread { get; private set; }
+
 		public static bool IsMainThread { get { return Thread.CurrentThread == MainThread; } }
 
 		public static Application Instance;
@@ -79,11 +82,13 @@ namespace Lime
 			SetGlobalExceptionHandler();
 			GameView.DidUpdated += RunScheduledActions;
 		}
-		
+
 		private void RunScheduledActions()
 		{
-			lock (scheduledActionsSync) {
-				if (scheduledActions != null) {
+			lock (scheduledActionsSync)
+			{
+				if (scheduledActions != null)
+				{
 					scheduledActions();
 					scheduledActions = null;
 				}
@@ -95,7 +100,8 @@ namespace Lime
 			// Почитать и применить:	
 			// http://forums.xamarin.com/discussion/931/how-to-prevent-ios-crash-reporters-from-crashing-monotouch-apps
 
-			AppDomain.CurrentDomain.UnhandledException += (sender, e) => {
+			AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+			{
 #if WIN
 				var title = "The application";
 				if (GameView.Instance != null) {
@@ -118,17 +124,22 @@ namespace Lime
 		/// <param name="action"></param>
 		public static void InvokeOnMainThread(Action action)
 		{
-			if (IsMainThread) {
+			if (IsMainThread)
+			{
 				action();
-			} else {
+			}
+			else
+			{
 				// Now we use unified way on iOS and PC platform
-				lock (scheduledActionsSync) {
+				lock (scheduledActionsSync)
+				{
 					scheduledActions += action;
 				}
 			}
 		}
 
-		public PlatformId Platform {
+		public PlatformId Platform
+		{
 			get
 			{
 #if iOS
@@ -144,7 +155,7 @@ namespace Lime
 #endif
 			}
 		}
-#if iOS
+		#if iOS
 		public Size WindowSize { get; internal set; }
 
 		private float pixelsPerPoints = 0f;
@@ -186,7 +197,7 @@ namespace Lime
 		// Kochava SDK requires to be initialized at that point.
 		public virtual void PreCreate() {}
 
-#elif MAC
+		/*#elif MAC
 		public void Exit()
 		{
 			GameController.Instance.Exit();
@@ -206,19 +217,21 @@ namespace Lime
 		public Size WindowSize {
 			get { return GameController.Instance.WindowSize; }
 			set { GameController.Instance.WindowSize = value; }
-		}
-#elif WIN
+		}*/
+		
+#elif WIN || MAC
 		public void Exit()
 		{
 			GameView.Instance.Exit();
 		}
 
-		public Vector2 ScreenDPI 
+		public Vector2 ScreenDPI
 		{
 			get { return 240 * Vector2.One; }
 		}
 
-		public bool FullScreen {
+		public bool FullScreen
+		{
 			get { return GameView.Instance.FullScreen; }
 			set { GameView.Instance.FullScreen = value; }
 		}
@@ -227,15 +240,17 @@ namespace Lime
 
 		public float FrameRate { get { return GameView.Instance.FrameRate; } }
 
-		public DeviceOrientation CurrentDeviceOrientation {
+		public DeviceOrientation CurrentDeviceOrientation
+		{
 			get { return DeviceOrientation.LandscapeLeft; }
 		}
 
-		public Size WindowSize {
+		public Size WindowSize
+		{
 			get { return GameView.Instance.WindowSize; }
 			set { GameView.Instance.WindowSize = value; }
 		}
-#elif ANDROID
+		#elif ANDROID
 		public Size WindowSize 
 		{
 			get;
@@ -278,6 +293,7 @@ namespace Lime
 			// There is no way to terminate an android application. 
 			// The only way is to finish each its activity one by one.
 		}
+
 #elif UNITY
 		public void Exit()
 		{
@@ -313,50 +329,65 @@ namespace Lime
 
 		public virtual void OnActivate()
 		{
-			if (Activated != null) {
+			if (Activated != null)
+			{
 				Activated();
 			}
 		}
 
 		public virtual void OnDeactivate()
 		{
-			if (Deactivated != null) {
+			if (Deactivated != null)
+			{
 				Deactivated();
 			}
 		}
 
-		public virtual void OnCreate() 
+		public virtual void OnCreate()
 		{
-			if (Created != null) {
+			if (Created != null)
+			{
 				Created();
 			}
 		}
 
-		public virtual void OnTerminate() 
+		public virtual void OnTerminate()
 		{
-			if (Terminating != null) {
+			if (Terminating != null)
+			{
 				Terminating();
 			}
 		}
 
-		public void OnGraphicsContextReset() 
+		public void OnGraphicsContextReset()
 		{
 			GLObjectRegistry.Instance.DiscardObjects();
-			if (GraphicsContextReset != null) {
+			if (GraphicsContextReset != null)
+			{
 				GraphicsContextReset();
 			}
 		}
 
-		public virtual void OnUpdateFrame(float delta) {}
-		public virtual void OnRenderFrame() {}
+		public virtual void OnUpdateFrame(float delta)
+		{
+		}
+
+		public virtual void OnRenderFrame()
+		{
+		}
 
 		/// <summary>
 		/// Called before a device rotation get finished, 
 		/// but screen resolution and device orientation are already in the final state.
 		/// </summary>
-		public virtual void OnDeviceRotate() {}
+		public virtual void OnDeviceRotate()
+		{
+		}
 
-		public virtual DeviceOrientation GetSupportedDeviceOrientations() { return DeviceOrientation.LandscapeLeft; }
+		public virtual DeviceOrientation GetSupportedDeviceOrientations()
+		{
+			return DeviceOrientation.LandscapeLeft;
+		}
 
 		[Obsolete("Use GameView.SetCursor() instead")]
 		public void SetCursor(string name, IntVector2 hotSpot)

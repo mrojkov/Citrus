@@ -40,11 +40,11 @@
       <HintPath>..\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="System.Drawing" />
-    <Reference Include="OpenTK">
-      <HintPath>..\3rdParty\OpenTK\OpenTK.dll</HintPath>
-    </Reference>
     <Reference Include="MonoMac">
       <HintPath>..\3rdParty\MonoMac.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenTK">
+      <HintPath>..\..\Main\MM6.Mac\packages\OpenTK.1.1.1589.5942\lib\NET40\OpenTK.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -82,7 +82,6 @@
     <Compile Include="Source\Widgets\WebBrowser.Win.cs" />
     <Compile Include="Source\Widgets\WebBrowser.iOS.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="obj\Release\.NETFramework,Version=v4.0.AssemblyAttribute.cs" />
     <Compile Include="Source\Graphics\OpenGL\IndexBuffer.cs" />
     <Compile Include="Source\Graphics\OpenGL\PlatformRenderer.cs" />
     <Compile Include="Source\Graphics\OpenGL\RenderBatch.cs" />
@@ -105,14 +104,88 @@
     <Compile Include="Source\Widgets\Text\TextRenderer.cs" />
     <Compile Include="Source\Graphics\TextureAtlasElement.cs" />
     <Compile Include="Source\Graphics\OpenGL\IGLObject.cs" />
+    <Compile Include="Resources\Resource.designer.cs" />
+    <Compile Include="Source\Application\AndroidActivityDelegate.cs" />
+    <Compile Include="Source\Application\AndroidGameView.cs" />
+    <Compile Include="Source\Graphics\Bitmap.Android.cs" />
+    <Compile Include="Source\Widgets\Editor.cs" />
+    <Compile Include="Source\Widgets\WebBrowser.Android.cs" />
+    <Compile Include="Source\Widgets\ListView\ExpandableListItem.cs" />
+    <Compile Include="Source\Widgets\ListView\ListView.ItemDrag.cs" />
+    <Compile Include="Source\Widgets\ListView\ListView.RefreshGesture.cs" />
+    <Compile Include="Source\Widgets\ListView\ListView.cs" />
+    <Compile Include="Source\Widgets\ListView\ScrollView.SpeedMeter.cs" />
+    <Compile Include="Source\Widgets\ListView\ScrollView.cs" />
+    <Compile Include="Source\Widgets\ListView\ScrollViewWithSlider.cs" />
+    <Compile Include="Source\Widgets\PopupMenu\ImageBox.cs" />
+    <Compile Include="Source\Widgets\PopupMenu\LayoutTools.cs" />
+    <Compile Include="Source\Widgets\PopupMenu\MenuButton.cs" />
+    <Compile Include="Source\Widgets\PopupMenu\MenuItem.cs" />
+    <Compile Include="Source\Widgets\PopupMenu\PopupMenu.cs" />
+    <Compile Include="Source\Widgets\PopupMenu\RoundedRectangle.cs" />
+    <Compile Include="Source\Widgets\PopupMenu\Separator.cs" />
+    <Compile Include="Source\Widgets\PopupMenu\StringItem.cs" />
+    <Compile Include="Source\Widgets2\Audio.cs" />
+    <Compile Include="Source\Widgets2\Bone.cs" />
+    <Compile Include="Source\Widgets2\BoneArray.cs" />
+    <Compile Include="Source\Widgets2\Button.cs" />
+    <Compile Include="Source\Widgets2\Component.cs" />
+    <Compile Include="Source\Widgets2\ComponentList.cs" />
+    <Compile Include="Source\Widgets2\DistortionMesh.cs" />
+    <Compile Include="Source\Widgets2\DistortionMeshPoint.cs" />
+    <Compile Include="Source\Widgets2\Editor.cs" />
+    <Compile Include="Source\Widgets2\Frame.cs" />
+    <Compile Include="Source\Widgets2\IText.cs" />
+    <Compile Include="Source\Widgets2\Image.cs" />
+    <Compile Include="Source\Widgets2\ImageCombiner.cs" />
+    <Compile Include="Source\Widgets2\LinearLayout.cs" />
+    <Compile Include="Source\Widgets2\Marker.cs" />
+    <Compile Include="Source\Widgets2\MarkerCollection.cs" />
+    <Compile Include="Source\Widgets2\Movie.cs" />
+    <Compile Include="Source\Widgets2\NineGrid.cs" />
+    <Compile Include="Source\Widgets2\Node.cs" />
+    <Compile Include="Source\Widgets2\NodeDebugView.cs" />
+    <Compile Include="Source\Widgets2\NodeList.cs" />
+    <Compile Include="Source\Widgets2\ParticleEmitter.cs" />
+    <Compile Include="Source\Widgets2\ParticleModifier.cs" />
+    <Compile Include="Source\Widgets2\ParticlesMagnet.cs" />
+    <Compile Include="Source\Widgets2\PointObject.cs" />
+    <Compile Include="Source\Widgets2\Polyline.cs" />
+    <Compile Include="Source\Widgets2\RenderChain.cs" />
+    <Compile Include="Source\Widgets2\RichText.cs" />
+    <Compile Include="Source\Widgets2\SimpleText.cs" />
+    <Compile Include="Source\Widgets2\Slider.cs" />
+    <Compile Include="Source\Widgets2\Spline.cs" />
+    <Compile Include="Source\Widgets2\SplineGear.cs" />
+    <Compile Include="Source\Widgets2\SplinePoint.cs" />
+    <Compile Include="Source\Widgets2\Task.cs" />
+    <Compile Include="Source\Widgets2\TaskList.cs" />
+    <Compile Include="Source\Widgets2\TextBox.cs" />
+    <Compile Include="Source\Widgets2\TextStyle.cs" />
+    <Compile Include="Source\Widgets2\WebBrowser.Android.cs" />
+    <Compile Include="Source\Widgets2\WebBrowser.Mac.cs" />
+    <Compile Include="Source\Widgets2\WebBrowser.Win.cs" />
+    <Compile Include="Source\Widgets2\WebBrowser.iOS.cs" />
+    <Compile Include="Source\Widgets2\Widget.Toolbox.cs" />
+    <Compile Include="Source\Widgets2\Widget.cs" />
+    <Compile Include="Source\Widgets2\WidgetCachedRenderer.cs" />
+    <Compile Include="Source\Widgets2\WidgetDebugView.cs" />
+    <Compile Include="Source\Widgets2\WidgetInput.cs" />
+    <Compile Include="Source\Widgets2\World.cs" />
+    <Compile Include="Source\Widgets2\Animation\Animation.cs" />
+    <Compile Include="Source\Widgets2\Animation\AnimationUtils.cs" />
+    <Compile Include="Source\Widgets2\Animation\Animator.cs" />
+    <Compile Include="Source\Widgets2\Animation\AnimatorCollection.cs" />
+    <Compile Include="Source\Widgets2\Animation\AnimatorRegistry.cs" />
+    <Compile Include="Source\Widgets2\Animation\Keyframe.cs" />
+    <Compile Include="Source\Widgets2\Animation\KeyframeCollection.cs" />
+    <Compile Include="Source\Widgets2\Text\TextParser.cs" />
+    <Compile Include="Source\Widgets2\Text\TextRenderer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
     <Compile Include="Source\Serialization.cs" />
-    <Compile Include="Source\Application\MacAppDelegate.cs" />
-    <Compile Include="Source\Application\MacGameController.cs" />
-    <Compile Include="Source\Application\MacGameView.cs" />
     <Compile Include="Source\Application\OpenTKGameView.cs" />
     <Compile Include="Source\Application\iOSAppDelegate.cs" />
     <Compile Include="Source\Application\iOSGameController.cs" />
@@ -217,4 +290,7 @@
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>
+  <ItemGroup>
+    <None Include="Source\packages.config" />
+  </ItemGroup>
 </Project>

@@ -99,7 +99,8 @@ namespace Lime
 
 		private static Key GetMouseButtonByIndex(int button)
 		{
-			if (button < 0 || button > 2) {
+			if (button < 0 || button > 2)
+			{
 				throw new ArgumentException();
 			}
 			return (Key)((int)Key.Mouse0 + button);
@@ -124,31 +125,35 @@ namespace Lime
 		{
 			touchPositions[index] = position;
 		}
-		
+
 		public static int GetNumTouches()
 		{
 			int j = 0;
-			for (int i = 0; i < MaxTouches; i++) {
+			for (int i = 0; i < MaxTouches; i++)
+			{
 				if (IsTouching(i))
 					j++;
 			}
 			return j;
 		}
-		
+
 		public static string TextInput { get; internal set; }
 
 		internal static void SetKeyState(Key key, bool value)
 		{
 			keyEventQueue.Add(new KeyEvent { Key = key, State = value });
 		}
-		
+
 		internal static void ProcessPendingKeyEvents()
 		{
-			if (keyEventQueue.Count > 0) {
+			if (keyEventQueue.Count > 0)
+			{
 				var processedKeys = new bool[(int)Key.KeyCount];
-				for (int i = 0; i < keyEventQueue.Count(); i++) {
+				for (int i = 0; i < keyEventQueue.Count(); i++)
+				{
 					var evt = keyEventQueue[i];
-					if (!processedKeys[(int)evt.Key]) {
+					if (!processedKeys[(int)evt.Key])
+					{
 						processedKeys[(int)evt.Key] = true;
 						currentKeysState[(int)evt.Key] = evt.State;
 						keyEventQueue.RemoveAt(i);
