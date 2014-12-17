@@ -19,6 +19,9 @@ namespace Lime
 			set { this.value = value; }
 		}
 
+		[ProtoMember(4)]
+		public float Step { get; set; }
+
 		public event Action DragStarted;
 		public event Action DragEnded;
 		public event Action Changed;
@@ -31,6 +34,7 @@ namespace Lime
 			RangeMin = 0;
 			RangeMax = 100;
 			Value = 0;
+			Step = 0;
 			Enabled = true;
 		}
 
@@ -170,6 +174,9 @@ namespace Lime
 				Value = v + dragInitialDelta * (1 - (dragInitialOffset - offset) / dragInitialOffset);
 			} else {
 				Value = v + dragInitialDelta;
+			}
+			if (Step > 0) {
+				Value = (float)Math.Round(Value / Step) * Step;
 			}
 			if (Value != prevValue) {
 				RaiseChanged();
