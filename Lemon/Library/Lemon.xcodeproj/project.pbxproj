@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		25733EB01A414C390051EBAB /* vorbis_info.c in Sources */ = {isa = PBXBuildFile; fileRef = 88979EE917CED66C0076343C /* vorbis_info.c */; };
+		25733EB11A41520C0051EBAB /* OggDecoder.c in Sources */ = {isa = PBXBuildFile; fileRef = 88979EE317CECEF70076343C /* OggDecoder.c */; };
+		25733EB21A41520F0051EBAB /* OgvDecoder.c in Sources */ = {isa = PBXBuildFile; fileRef = 88A9A9FD1828948000587876 /* OgvDecoder.c */; };
+		25733EB31A4152140051EBAB /* TheoraDecoder.c in Sources */ = {isa = PBXBuildFile; fileRef = 88979EE417CECEF70076343C /* TheoraDecoder.c */; };
 		278A44F2148C6B5A007283B6 /* ogg.h in Headers */ = {isa = PBXBuildFile; fileRef = 278A44C2148C6B5A007283B6 /* ogg.h */; };
 		278A44F3148C6B5A007283B6 /* ogg.h in Headers */ = {isa = PBXBuildFile; fileRef = 278A44C2148C6B5A007283B6 /* ogg.h */; };
 		278A44F4148C6B5A007283B6 /* os_types.h in Headers */ = {isa = PBXBuildFile; fileRef = 278A44C3148C6B5A007283B6 /* os_types.h */; };
@@ -881,8 +885,10 @@
 				278A4516148C6B5A007283B6 /* codebook.c in Sources */,
 				278A451E148C6B5A007283B6 /* floor0.c in Sources */,
 				278A4520148C6B5A007283B6 /* floor1.c in Sources */,
+				25733EB01A414C390051EBAB /* vorbis_info.c in Sources */,
 				278A452A148C6B5A007283B6 /* mapping0.c in Sources */,
 				278A452C148C6B5A007283B6 /* mdct.c in Sources */,
+				25733EB31A4152140051EBAB /* TheoraDecoder.c in Sources */,
 				278A4536148C6B5A007283B6 /* registry.c in Sources */,
 				278A453A148C6B5A007283B6 /* res012.c in Sources */,
 				278A453C148C6B5A007283B6 /* sharedbook.c in Sources */,
@@ -913,6 +919,7 @@
 				88A9AAC918289A6E00587876 /* fragment.c in Sources */,
 				88A9AACB18289A6E00587876 /* huffdec.c in Sources */,
 				88A9AACF18289A6E00587876 /* huffenc.c in Sources */,
+				25733EB21A41520F0051EBAB /* OgvDecoder.c in Sources */,
 				88A9AAD518289A6E00587876 /* idct.c in Sources */,
 				88A9AAD718289A6E00587876 /* info.c in Sources */,
 				88A9AAD918289A6E00587876 /* internal.c in Sources */,
@@ -920,6 +927,7 @@
 				88A9AAE118289A6E00587876 /* mcenc.c in Sources */,
 				88A9AAE718289A6E00587876 /* quant.c in Sources */,
 				88A9AAEB18289A6E00587876 /* rate.c in Sources */,
+				25733EB11A41520C0051EBAB /* OggDecoder.c in Sources */,
 				88A9AAED18289A6E00587876 /* state.c in Sources */,
 				88A9AAF118289A6E00587876 /* theora.exp in Sources */,
 				88A9AAF318289A6E00587876 /* theoradec.exp in Sources */,
@@ -1062,14 +1070,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				EXECUTABLE_PREFIX = lib;
+				GCC_VERSION = "";
 				INFOPLIST_FILE = "$(BUILD_DIR)/$(PLATFORM_NAME)/$(CONFIGURATION)";
 				LLVM_LTO = NO;
 				MACH_O_TYPE = mh_dylib;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx10.6;
+				SDKROOT = macosx10.8;
 				SHARED_PRECOMPS_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 				SYMROOT = bin/Mac;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1081,15 +1090,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				EXECUTABLE_PREFIX = lib;
 				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_VERSION = "";
 				INFOPLIST_FILE = "$(BUILD_DIR)/$(PLATFORM_NAME)/$(CONFIGURATION)";
 				LLVM_LTO = NO;
 				MACH_O_TYPE = mh_dylib;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx10.6;
+				SDKROOT = macosx10.8;
 				SHARED_PRECOMPS_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 				SYMROOT = bin/Mac;
 				TARGETED_DEVICE_FAMILY = "1,2";

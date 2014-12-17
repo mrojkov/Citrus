@@ -39,7 +39,7 @@ namespace Lime
 
 		private void Open()
 		{
-#if UNITY || MAC
+#if UNITY
 #else
 			if (Path == null) {
 				throw new ArgumentException();
@@ -84,7 +84,7 @@ namespace Lime
 
 		public void Stop()
 		{
-#if UNITY || MAC
+#if UNITY
 #else
 			Stopped = true;
 			videoTime = 0;
@@ -110,7 +110,7 @@ namespace Lime
 
 		public void Update(float delta)
 		{
-#if UNITY || MAC
+#if UNITY
 #else
 			if (Paused || Stopped) {
 				return;

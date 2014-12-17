@@ -181,6 +181,7 @@
     <Compile Include="Source\Widgets2\Animation\KeyframeCollection.cs" />
     <Compile Include="Source\Widgets2\Text\TextParser.cs" />
     <Compile Include="Source\Widgets2\Text\TextRenderer.cs" />
+    <Compile Include="Source\Graphics\OgvDecoder.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -250,7 +251,6 @@
     <Compile Include="Source\AssetsBundle\AssetsBundle.cs" />
     <Compile Include="Source\AssetsBundle\PackedAssetsBundle.cs" />
     <Compile Include="Source\AssetsBundle\UnpackedAssetsBundle.cs" />
-    <Compile Include="Source\Graphics\OgvDecoder.cs" />
     <Compile Include="Source\Widgets\NodeDebugView.cs" />
     <Compile Include="Source\NumericExtensions.cs" />
     <Compile Include="Source\Toolbox.cs" />
