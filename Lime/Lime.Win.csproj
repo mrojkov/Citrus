@@ -219,9 +219,6 @@
     <Compile Include="Source\Application\iOSAppDelegate.cs" />
     <Compile Include="Source\Application\iOSGameController.cs" />
     <Compile Include="Source\Application\iOSGameView.cs" />
-    <Compile Include="Source\Application\MacAppDelegate.cs" />
-    <Compile Include="Source\Application\MacGameController.cs" />
-    <Compile Include="Source\Application\MacGameView.cs" />
     <Compile Include="Source\Application\OpenTKGameView.cs" />
     <Compile Include="Source\AssetsBundle\PackedAssetsBundle.cs" />
     <Compile Include="Source\Audio\AudioChannel.cs" />
