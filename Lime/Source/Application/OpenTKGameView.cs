@@ -87,14 +87,18 @@ namespace Lime
 
 		private static RenderingApi GetRenderingApi()
 		{
-			//if (CommandLineArgs.OpenGL)
+#if MAC
+			return RenderingApi.OpenGL;
+#else
+			if (CommandLineArgs.OpenGL)
 			{
 				return RenderingApi.OpenGL;
 			}
-			//else
-			//{
-			//	return RenderingApi.ES20;
-			//}
+			else
+			{
+				return RenderingApi.ES20;
+			}
+#endif
 		}
 
 		void HandleKeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
