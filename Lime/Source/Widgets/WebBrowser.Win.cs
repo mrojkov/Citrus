@@ -12,12 +12,11 @@ namespace Lime
 
 		private System.Windows.Forms.WebBrowser browser;
 
-		static Texture2D texture = new Texture2D();
-
-		public WebBrowser() : base(texture)
+		public WebBrowser() : base()
 		{
 			browser = new System.Windows.Forms.WebBrowser();
 			browser.DocumentCompleted += browser_DocumentCompleted;
+			ClearTexture();
 		}
 
 		public WebBrowser(Widget parentWidget): this()
@@ -44,8 +43,6 @@ namespace Lime
 			}
 		}
 
-		private Texture2D browserImage = new Texture2D();
-
 		void browser_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
 		{
 			// FIXME: It's hard to make a browser to work over an OpenGL surface, so at least draw it as a picture.
@@ -54,14 +51,33 @@ namespace Lime
 			var m = new MemoryStream(1024 * 1024);
 			bitmap.Save(m, System.Drawing.Imaging.ImageFormat.Png);
 			m.Position = 0;
-			texture.LoadImage(m);
+			var t2d = new Texture2D();
+			t2d.LoadImage(m);
+			Texture = t2d;
+		}
+
+		public override void Update(float delta)
+		{
+			base.Update(delta);
+		}
+
+		public override void Render()
+		{
+			base.Render();
 		}
 		
 		public override void Dispose()
 		{
 			if (browser != null)
 				browser.Dispose();
-			texture.LoadImage(new Color4[] { }, 0, 0, false);
+			ClearTexture();
+		}
+
+		private void ClearTexture()
+		{
+			var t2d = new Texture2D();
+			t2d.LoadImage(new Color4[] { }, 0, 0, false);
+			Texture = t2d;
 		}
 	}
 }
