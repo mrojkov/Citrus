@@ -532,6 +532,9 @@ namespace Lime
 		private void HandleClick()
 		{
 			if (Input.WasMouseReleased() && IsMouseOver()) {
+				if (Lime.Debug.BreakOnButtonClick) {
+					Debugger.Break();
+				}
 				clicked();
 			}
 		}
