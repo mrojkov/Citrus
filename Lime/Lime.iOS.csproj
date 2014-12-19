@@ -48,9 +48,6 @@
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
     <Compile Include="Source\Serialization.cs" />
-    <Compile Include="Source\Application\MacAppDelegate.cs" />
-    <Compile Include="Source\Application\MacGameController.cs" />
-    <Compile Include="Source\Application\MacGameView.cs" />
     <Compile Include="Source\Application\OpenTKGameView.cs" />
     <Compile Include="Source\Application\iOSAppDelegate.cs" />
     <Compile Include="Source\Application\iOSGameController.cs" />
@@ -271,7 +268,6 @@
     <Compile Include="Source\Graphics\OpenGL\IGLObject.cs" />
     <Compile Include="Source\Application\AndroidActivityDelegate.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
-    <Compile Include="obj\Release\.NETFramework,Version=v4.0.AssemblyAttribute.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

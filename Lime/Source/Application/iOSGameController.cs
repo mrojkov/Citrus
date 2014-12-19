@@ -93,6 +93,9 @@ namespace Lime
 		public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations ()
 		{
 			UIInterfaceOrientationMask mask = 0;
+			if (!Application.Instance.Active && Application.Instance.CurrentDeviceOrientation != 0) {
+				return mask | ConvertDeviceOrientationToInterfaceOrientationMask(Application.Instance.CurrentDeviceOrientation);
+			}
 			if ((Application.Instance.GetSupportedDeviceOrientations() & DeviceOrientation.LandscapeLeft) != 0)
 				mask = mask | UIInterfaceOrientationMask.LandscapeLeft;
 			if ((Application.Instance.GetSupportedDeviceOrientations() & DeviceOrientation.LandscapeRight) != 0)
@@ -107,6 +110,9 @@ namespace Lime
 		[Obsolete]
 		public override bool ShouldAutorotateToInterfaceOrientation(UIInterfaceOrientation toInterfaceOrientation)
 		{
+			if (!Application.Instance.Active) {
+				return false;
+			}
 			switch (toInterfaceOrientation) {
 			case UIInterfaceOrientation.LandscapeLeft:
 				return (Application.Instance.GetSupportedDeviceOrientations() & DeviceOrientation.LandscapeLeft) != 0;
@@ -118,6 +124,22 @@ namespace Lime
 				return (Application.Instance.GetSupportedDeviceOrientations() & DeviceOrientation.PortraitUpsideDown) != 0;
 			}
 			return false;
+		}
+
+		UIInterfaceOrientationMask ConvertDeviceOrientationToInterfaceOrientationMask(DeviceOrientation orientation)
+		{
+			switch (orientation) {
+			case DeviceOrientation.LandscapeLeft:
+				return UIInterfaceOrientationMask.LandscapeLeft;
+			case DeviceOrientation.LandscapeRight:
+				return UIInterfaceOrientationMask.LandscapeRight;
+			case DeviceOrientation.Portrait:
+				return UIInterfaceOrientationMask.Portrait;
+			case DeviceOrientation.PortraitUpsideDown:
+				return UIInterfaceOrientationMask.PortraitUpsideDown;
+			default:
+				throw new ArgumentException("Wrong interface orientation");
+			}
 		}
 
 		DeviceOrientation ConvertInterfaceOrientation(UIInterfaceOrientation orientation)
