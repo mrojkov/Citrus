@@ -88,6 +88,11 @@ namespace Lime
 			return (float)Math.Sqrt(x);
 		}
 
+		public static float Dist2(Vector2 a, Vector2 b)
+		{
+			return Sqr(a.X - b.X) + Sqr(a.Y - b.Y);
+		}
+
 		public static float Pow(float x, float y)
 		{
 			return (float)Math.Pow(x, y);
