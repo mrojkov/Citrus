@@ -28,7 +28,6 @@ namespace Lime
 
 		public object Tag { get; set; }
 		public bool Completed { get { return stack.Count == 0; } }
-		public string Name { get; private set; }
 		private float waitTime;
 		private WaitPredicate waitPredicate;
 		private Stack<EnumType> stack = new Stack<EnumType>();
@@ -42,7 +41,11 @@ namespace Lime
 			profile.TryGetValue(type, out pe);
 			pe.TaskCount++;
 			profile[type] = pe;
-			Name = type.ToString();
+		}
+
+		public override string ToString()
+		{
+			return stack.Peek().GetType().ToString();
 		}
 
 		public void Advance(float delta)
