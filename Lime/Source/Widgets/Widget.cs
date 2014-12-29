@@ -405,6 +405,7 @@ namespace Lime
 		
 		public Vector2 GlobalPosition { get { return LocalToWorldTransform.T; } }
 		public Vector2 GlobalCenter { get { return LocalToWorldTransform * (Size / 2); } }
+		public Vector2 Center { get { return Position + (Vector2.Half - Pivot) * Size; } }
 
 		private TaskList tasks;
 		public TaskList Tasks
