@@ -150,7 +150,7 @@ namespace Lime
 
 		public bool IsPlaying()
 		{
-			return (movieTexture != null) && !movieTexture.Stopped && !movieTexture.Paused;
+			return (movieTexture != null) && /*!movieTexture.Stopped &&*/ !movieTexture.Paused;
 		}
 	}
 }
