@@ -22,6 +22,15 @@ namespace Lime
 		[ProtoMember(4)]
 		public float Step { get; set; }
 
+		[Flags]
+		public enum SliderOptions
+		{
+			None = 0,
+			ClickOnRail = 1,
+		}
+
+		public SliderOptions Options;
+
 		public event Action DragStarted;
 		public event Action DragEnded;
 		public event Action Changed;
@@ -69,19 +78,24 @@ namespace Lime
 			if (Thumb == null) {
 				return;
 			}
-			if (Input.WasMousePressed() && Thumb.IsMouseOver()) {
-				RunThumbAnimation("Press");
-				Input.CaptureMouse();
-				RaiseDragStarted();
-			} else if (Input.IsMouseOwner() && !Input.IsMousePressed()) {
+			var draggingJustBegun = false;
+			if (Enabled && RangeMax > RangeMin && Input.WasMousePressed()) {
+				if (Thumb.IsMouseOver()) {
+					StartDrag();
+					draggingJustBegun = true;
+				}
+				else if (Options.HasFlag(SliderOptions.ClickOnRail) && IsMouseOver()) {
+					StartDrag();
+					dragInitialDelta = 0;
+					dragInitialOffset = (Value - RangeMin) / (RangeMax - RangeMin);
+					draggingJustBegun = false;
+				}
+			}
+			else if (Input.IsMouseOwner() && !Input.IsMousePressed()) {
 				Release();
 			}
-			if (Input.IsMouseOwner() && Enabled) {
-				if (Input.WasMousePressed()) {
-					SetValueFromCurrentMousePosition(draggingJustBegun: true);
-				} else if (Input.IsMousePressed()) {
-					SetValueFromCurrentMousePosition(draggingJustBegun: false);
-				}
+			if (Enabled && Input.IsMouseOwner()) {
+				SetValueFromCurrentMousePosition(draggingJustBegun);
 			}
 			InterpolateGraphicsBetweenMinAndMaxMarkers();
 			RefreshThumbPosition();
@@ -97,8 +111,10 @@ namespace Lime
 			}
 		}
 
-		private void RaiseDragStarted()
+		private void StartDrag()
 		{
+			RunThumbAnimation("Press");
+			Input.CaptureMouse();
 			if (DragStarted != null) {
 				DragStarted();
 			}
