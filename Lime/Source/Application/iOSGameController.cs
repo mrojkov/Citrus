@@ -63,6 +63,11 @@ namespace Lime
 		private void KeyboardWillChangeFrameCallback(object sender, UIKeyboardEventArgs args)
 		{
 			IsKeyboardChanging = true;
+			var beginFrame = args.FrameBegin;
+			var screenRect = UIScreen.MainScreen.Bounds;
+			if (!beginFrame.IntersectsWith(screenRect)) {
+				IsKeyboardChanging = false;
+			}
 		}
 
 		private void KeyboardDidChangeFrameCallback(object sender, UIKeyboardEventArgs args)
