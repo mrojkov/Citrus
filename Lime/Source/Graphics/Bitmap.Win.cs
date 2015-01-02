@@ -1,9 +1,10 @@
-#if WIN || MAC
+#if WIN
 using System.Collections;
 using System.IO;
 using System.Collections.Generic;
 using System;
 using ProtoBuf;
+using System.Runtime.InteropServices;
 
 using SD = System.Drawing;
 
@@ -63,6 +64,19 @@ namespace Lime
 			if (bitmap != null) {
 				bitmap.Dispose();
 			}
+		}
+
+		public byte[] GetImageData()
+		{		
+			var lockRect = new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height);
+			var lockMode = System.Drawing.Imaging.ImageLockMode.ReadOnly;
+			var data = bitmap.LockBits(lockRect, lockMode, bitmap.PixelFormat);		
+			byte[] pixelData = new byte[data.Stride * data.Height];
+
+			Marshal.Copy(data.Scan0, pixelData, 0, pixelData.Length);
+			bitmap.UnlockBits(data);
+
+			return pixelData;
 		}
 
 		private void InitWithPngOrJpgBitmap(Stream stream)

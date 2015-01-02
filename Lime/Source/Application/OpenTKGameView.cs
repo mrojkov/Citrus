@@ -265,30 +265,27 @@ namespace Lime
 			return cursor;
 		}
 
+		private void WriteToLog(string format, params string[] args)
+		{
+#if MAC
+			Logger.Write(format, args);
+#endif
+		}
+
 		private MouseCursor CreateCursorFromResource(string resourceName, IntVector2 hotSpot)
 		{
 			var entryAssembly = System.Reflection.Assembly.GetEntryAssembly();
 			var fullResourceName = entryAssembly.GetName().Name + "." + resourceName;
-			var file = entryAssembly.GetManifestResourceStream(fullResourceName);
-			// TODO: OSX bug, Bitmap constructor can stuck on the first launch for a while.
-			// https://bugzilla.xamarin.com/show_bug.cgi?id=17225
-#if MAC
-			Logger.Write("Loading cursor {0}...", fullResourceName);
-#endif
-			using (var bitmap = new System.Drawing.Bitmap(file)) {
-#if MAC
-				Logger.Write("Cursor loaded");
-#endif
-				var lockRect = new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height);
-				var lockMode = System.Drawing.Imaging.ImageLockMode.ReadOnly;
-				var data = bitmap.LockBits(lockRect, lockMode, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-				if (data.Width * 4 != data.Stride) {
-					throw new Lime.Exception("Invalid cursor bitmap (resource name: {0}, stride: {1}, width: {2})",
-						resourceName, data.Stride, data.Width);
-				}
-				var cursor = new MouseCursor(hotSpot.X, hotSpot.Y, data.Width, data.Height, data.Scan0);
-				bitmap.UnlockBits(data);
-				return cursor;
+			var stream = entryAssembly.GetManifestResourceStream(fullResourceName);
+
+			WriteToLog("Loading cursor {0}...", fullResourceName);
+
+			using (var bitmap = new BitmapImplementation())
+			{
+				bitmap.LoadFromStream(stream);
+				WriteToLog("Cursor loaded");
+
+				return new MouseCursor(hotSpot.X, hotSpot.Y, bitmap.GetWidth(), bitmap.GetHeight(), bitmap.GetImageData());
 			}
 		}
 	}

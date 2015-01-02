@@ -78,6 +78,11 @@ namespace Lime
 			System.Threading.Thread.CurrentThread.CurrentCulture = culture;
 			SetGlobalExceptionHandler();
 			GameView.DidUpdated += RunScheduledActions;
+
+#if MAC
+			// Need for BitmapImplementation
+			NSApplication.Init();
+#endif
 		}
 		
 		private void RunScheduledActions()

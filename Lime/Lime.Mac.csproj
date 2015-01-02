@@ -182,6 +182,7 @@
     <Compile Include="Source\Widgets2\Text\TextParser.cs" />
     <Compile Include="Source\Widgets2\Text\TextRenderer.cs" />
     <Compile Include="Source\Graphics\OgvDecoder.cs" />
+    <Compile Include="Source\Graphics\Bitmap.Mac.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -292,5 +293,8 @@
   </ProjectExtensions>
   <ItemGroup>
     <None Include="Source\packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Source\Graphics\" />
   </ItemGroup>
 </Project>
