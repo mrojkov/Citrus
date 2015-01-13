@@ -313,6 +313,7 @@
     <Compile Include="Source\Widgets\WebBrowser.Android.cs" />
     <Compile Include="Source\Application\AndroidActivityDelegate.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
+    <Compile Include="Source\Graphics\Bitmap.Mac.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
