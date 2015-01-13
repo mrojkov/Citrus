@@ -253,16 +253,16 @@ namespace Lime
 		private void RenderHelper(SpriteList spriteList, out Rectangle rect)
 		{
 			rect = Rectangle.Empty;
-			var t = DisplayText ?? Text;
-			var localizedText = LocalizationHandler != null ? LocalizationHandler(t) : Localization.GetString(t);
-			var lines = SplitText(localizedText);
+			var t = DisplayText ?? (LocalizationHandler != null ? LocalizationHandler(Text) : Text.Localize());
+			var lines = SplitText(t);
 			var pos = Vector2.Down * CalcVerticalTextPosition(lines);
 			caret.RenderingLineNumber = 0;
 			caret.RenderingTextPos = 0;
 			caret.NearestCharPos = Vector2.Zero;
-			if (string.IsNullOrEmpty(localizedText)) {
+			if (String.IsNullOrEmpty(t)) {
 				caret.WorldPos = pos;
 				caret.Line = caret.Pos = caret.TextPos = 0;
+				caret.Valid = CaretPosition.ValidState.All;
 				return;
 			}
 			bool firstLine = true;

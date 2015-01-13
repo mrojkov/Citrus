@@ -120,7 +120,7 @@ namespace Lime
 			this.editorParams = editorParams;
 			container.Tasks.Add(FocusTask());
 			container.Tasks.Add(HandleKeyboardTask());
-			container.Tasks.Add(PasswordTask());
+			container.Tasks.Add(EnforceDisplayTextTask());
 		}
 
 		private bool IsActive() { return World.Instance.ActiveTextWidget == textInputProcessor; }
@@ -238,17 +238,16 @@ namespace Lime
 			}
 		}
 
-		private IEnumerator<object> PasswordTask()
+		private IEnumerator<object> EnforceDisplayTextTask()
 		{
 			while (true) {
-				if (editorParams.PasswordChar != null) {
-					if (text.Text == "")
-						text.DisplayText = "";
-					else {
-						lastCharShowTimeLeft -= TaskList.Current.Delta;
-						text.DisplayText = new string(editorParams.PasswordChar.Value, text.Text.Length - 1);
-						text.DisplayText += lastCharShowTimeLeft > 0 ? text.Text.Last() : editorParams.PasswordChar; 
-					}
+				if (editorParams.PasswordChar != null && text.Text != "") {
+					lastCharShowTimeLeft -= TaskList.Current.Delta;
+					text.DisplayText = new string(editorParams.PasswordChar.Value, text.Text.Length - 1);
+					text.DisplayText += lastCharShowTimeLeft > 0 ? text.Text.Last() : editorParams.PasswordChar; 
+				}
+				else {
+					text.DisplayText = text.Text; // Disable localization.
 				}
 				yield return 0;
 			}
