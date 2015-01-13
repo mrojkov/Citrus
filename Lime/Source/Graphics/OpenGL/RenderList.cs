@@ -11,7 +11,7 @@ namespace Lime
 
 		public bool Empty { get { return lastBuffer == null; } }
 		
-		public RenderBatch RequestForBatch(ITexture texture1, ITexture texture2, Blending blending, ShaderId shader, int numVertices, int numIndices)
+		public RenderBatch RequestForBatch(ITexture texture1, ITexture texture2, Blending blending, ShaderId shader, ShaderProgram customShaderProgram, int numVertices, int numIndices)
 		{
 			if (lastBuffer == null || lastBuffer.VertexCount + numVertices > lastBuffer.Capacity) {
 				lastBuffer = VertexBufferPool.Acquire();
@@ -20,7 +20,8 @@ namespace Lime
 				(GetTextureHandle(lastBatch.Texture2) == GetTextureHandle(texture2)) &&
 				lastBatch.IndexBuffer.IndexCount + numIndices <= lastBatch.IndexBuffer.Capacity &&
 				lastBatch.Blending == blending &&
-				lastBatch.Shader == shader) 
+				lastBatch.Shader == shader &&
+				lastBatch.CustomShaderProgram == customShaderProgram) 
 			{
 				return lastBatch;
 			}
@@ -31,6 +32,7 @@ namespace Lime
 			lastBatch.Texture2 = texture2;
 			lastBatch.Blending = blending;
 			lastBatch.Shader = shader;
+			lastBatch.CustomShaderProgram = customShaderProgram;
 			Batches.Add(lastBatch);
 			return lastBatch;
 		}

@@ -74,7 +74,7 @@ namespace Lime
 		private uint vboHandle;
 		private bool disposed;
 
-		internal static class Attributes
+		public static class Attributes
 		{
 			public const int Position = 0;
 			public const int UV1 = 1;

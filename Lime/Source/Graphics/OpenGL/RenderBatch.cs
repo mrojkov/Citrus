@@ -19,6 +19,7 @@ namespace Lime
 	{
 		public Blending Blending;
 		public ShaderId Shader;
+		public ShaderProgram CustomShaderProgram;
 		public ITexture Texture1;
 		public ITexture Texture2;
 		public VertexBuffer VertexBuffer;
@@ -64,7 +65,7 @@ namespace Lime
 		{
 			PlatformRenderer.SetTexture(Texture1, 0);
 			PlatformRenderer.SetTexture(Texture2, 1);
-			PlatformRenderer.SetShader(Shader);
+			PlatformRenderer.SetShader(Shader, CustomShaderProgram);
 			PlatformRenderer.SetBlending(Blending);
 			int offset = 0;
 			if (VertexBuffer.SpritesOnly) {

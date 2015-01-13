@@ -46,10 +46,10 @@ namespace Lime
 			}
 		}
 
-		static Vertex[] polygon = new Vertex[6];
-		static DistortionMeshPoint[] points = new DistortionMeshPoint[4];
+		protected static Vertex[] polygon = new Vertex[6];
+		protected static DistortionMeshPoint[] points = new DistortionMeshPoint[4];
 		
-		Vertex CalculateCenterVertex()
+		protected Vertex CalculateCenterVertex()
 		{
 			var v = new Vertex();
 			v.UV1 = Vector2.Zero;
@@ -73,7 +73,7 @@ namespace Lime
 			return v;
 		}
 		
-		void RenderTile()
+		protected virtual void RenderTile()
 		{
 			polygon[0] = CalculateCenterVertex();
 			for (int t = 0; t < 5; t++) {

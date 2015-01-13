@@ -14,7 +14,7 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Lime
 {
-	class ShaderProgram : IGLObject
+	public class ShaderProgram : IGLObject
 	{
 		public class AttribLocation
 		{
@@ -104,13 +104,18 @@ namespace Lime
 				Logger.Write("Shader program link log:\n{0}", infoLog);
 				throw new Lime.Exception(infoLog.ToString());
 			}
-			ProjectionMatrixUniformId = GetUniformId("matProjection");
-			UseAlphaTexture1UniformId = GetUniformId("useAlphaTexture1");
-			UseAlphaTexture2UniformId = GetUniformId("useAlphaTexture2");
+			InitializeUniformIds();
 			PlatformRenderer.CheckErrors();
 		}
 
-		private int GetUniformId(string name)
+		protected virtual void InitializeUniformIds()
+		{
+			ProjectionMatrixUniformId = GetUniformId("matProjection");
+			UseAlphaTexture1UniformId = GetUniformId("useAlphaTexture1");
+			UseAlphaTexture2UniformId = GetUniformId("useAlphaTexture2");
+		}
+
+		protected int GetUniformId(string name)
 		{
 			int id;
 			if (uniformIds.TryGetValue(name, out id)) {
@@ -145,6 +150,11 @@ namespace Lime
 				Create();
 			}
 			GL.UseProgram(handle);
+			LoadUniformValues();
+		}
+
+		protected virtual void LoadUniformValues()
+		{
 		}
 
 		public void LoadMatrix(int uniformId, Matrix44 matrix)
@@ -153,6 +163,11 @@ namespace Lime
 				float* p = (float*)&matrix;
 				GL.UniformMatrix4(uniformId, 1, false, p);
 			}
+		}
+
+		public void LoadFloat(int uniformId, float value)
+		{
+			GL.Uniform1(uniformId, value);
 		}
 
 		public void LoadInteger(int uniformId, int value)

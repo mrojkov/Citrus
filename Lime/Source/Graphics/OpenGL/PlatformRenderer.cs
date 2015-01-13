@@ -57,10 +57,10 @@ namespace Lime
 			shaderProgram = null;
 		}
 
-		public static void SetShader(ShaderId value)
+		public static void SetShader(ShaderId value, ShaderProgram customShaderProgram)
 		{
 			int numTextures = textures[1] != 0 ? 2 : (textures[0] != 0 ? 1 : 0);
-			var program = ShaderPrograms.Instance.GetShaderProgram(value, numTextures);
+			var program = value == ShaderId.Custom ? customShaderProgram : ShaderPrograms.Instance.GetShaderProgram(value, numTextures);
 			if (shaderProgram != program) {
 				shaderProgram = program;
 				shaderProgram.Use();
@@ -91,7 +91,7 @@ namespace Lime
 			shaderProgram = null;
 			indexBuffer = vertexBuffer = 0;
 			SetBlending(Blending.Inherited);
-			SetShader(ShaderId.Diffuse);
+			SetShader(ShaderId.Diffuse, null);
 			ClearRenderTarget(0, 0, 0, 0);
 			CheckErrors();
 		}

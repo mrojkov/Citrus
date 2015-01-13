@@ -50,6 +50,7 @@ namespace Lime
 
 		public static Blending Blending;
 		public static ShaderId Shader;
+		public static ShaderProgram CustomShaderProgram;
 		public static Matrix32 Transform1;
 		public static int RenderCycle { get; private set; }
 		public static bool PremultipliedAlphaMode;
@@ -330,7 +331,7 @@ namespace Lime
 
 		private static RenderBatch DrawTrianglesHelper(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
 		{
-			var batch = CurrentRenderList.RequestForBatch(texture1, texture2, Blending, Shader, numVertices, (numVertices - 2) * 3);
+			var batch = CurrentRenderList.RequestForBatch(texture1, texture2, Blending, Shader, CustomShaderProgram, numVertices, (numVertices - 2) * 3);
 			Rectangle uvRect1 = (texture1 != null) ? texture1.AtlasUVRect : new Rectangle();
 			Rectangle uvRect2 = (texture2 != null) ? texture2.AtlasUVRect : new Rectangle();
 			var transform = GetEffectiveTransform();
@@ -359,7 +360,7 @@ namespace Lime
 				DrawSprite(texture, color, position, size, uv0, uv1);
 				Blending = Blending.Glow;
 			}
-			var batch = CurrentRenderList.RequestForBatch(texture, null, Blending, Shader, 4, 6);
+			var batch = CurrentRenderList.RequestForBatch(texture, null, Blending, Shader, CustomShaderProgram, 4, 6);
 			if (Renderer.PremultipliedAlphaMode && color.A != 255) {
 				color = Color4.PremulAlpha(color);
 			}

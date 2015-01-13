@@ -19,9 +19,11 @@ namespace Lime
 		Silhuette,
 		[ProtoEnum]
 		InversedSilhuette,
+		[ProtoEnum]
+		Custom,
 	}
 
-	class ShaderPrograms
+	public class ShaderPrograms
 	{
 		public static ShaderPrograms Instance = new ShaderPrograms();
 
@@ -196,7 +198,7 @@ namespace Lime
 			return p;
 		}
 
-		private static IEnumerable<ShaderProgram.Sampler> GetSamplers()
+		public static IEnumerable<ShaderProgram.Sampler> GetSamplers()
 		{
 			return new ShaderProgram.Sampler[] {
 				new ShaderProgram.Sampler { Name = "tex1", Stage = 0 },

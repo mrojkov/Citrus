@@ -14,7 +14,7 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Lime
 {
-	class Shader : IGLObject, IDisposable
+	public class Shader : IGLObject, IDisposable
 	{
 		private int handle;
 		private string source;
@@ -100,7 +100,7 @@ namespace Lime
 		}
 	}
 
-	class VertexShader : Shader
+	public class VertexShader : Shader
 	{
 		public VertexShader(string source)
 			: base(fragmentOrVertex: false, source: source)
@@ -108,7 +108,7 @@ namespace Lime
 		}
 	}
 
-	class FragmentShader : Shader
+	public class FragmentShader : Shader
 	{
 		public FragmentShader(string source)
 			: base(fragmentOrVertex: true, source: source)
