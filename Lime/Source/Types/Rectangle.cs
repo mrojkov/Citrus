@@ -124,5 +124,10 @@ namespace Lime
 		{
 			return A.GetHashCode() ^ B.GetHashCode();
 		}
+
+		public Rectangle Transform(Matrix32 m)
+		{
+			return new Rectangle(A * m, B * m);
+		}
 	}
 }
