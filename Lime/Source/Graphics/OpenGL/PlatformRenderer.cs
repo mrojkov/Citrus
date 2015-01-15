@@ -1,5 +1,6 @@
 ﻿#if OPENGL
 using System;
+
 #if iOS || ANDROID
 using OpenTK.Graphics.ES20;
 #elif MAC
@@ -143,6 +144,16 @@ namespace Lime
 			} else {
 				GL.BindTexture(TextureTarget.Texture2D, glTexNum);
 			}
+			// This is a temporary workaround for Amazon Game Circle.
+			// Once Amazon UI plate with playername gets hidden, the game looses textures.
+			// Thank you, Amazon!
+#if ANDROID
+			if (Renderer.AmazonBindTextureWorkaround) {
+				if (GL.GetErrorCode() != ErrorCode.NoError) {
+					GLObjectRegistry.Instance.DiscardObjects();
+				}
+			}
+#endif
 			textures[stage] = glTexNum;
 		}
 

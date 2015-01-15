@@ -57,7 +57,9 @@ namespace Lime
 		public static int DrawCalls = 0;
 		public static readonly RenderList MainRenderList = new RenderList();
 		public static RenderList CurrentRenderList;
-
+#if ANDROID
+		public static bool AmazonBindTextureWorkaround;
+#endif
 		public static Matrix32 Transform2
 		{
 			get { return transform2; }
