@@ -83,10 +83,12 @@ namespace Lime
 			spriteList.Render(GlobalColor);
 		}
 
-		public Vector2 MeasureText()
+		// TODO: return effective AABB, not only extent
+		public Rectangle MeasureText()
 		{
 			var renderer = PrepareRenderer();
-			return renderer.MeasureText(Size.X, Size.Y);
+			var extent = renderer.MeasureText(Size.X, Size.Y);
+			return new Rectangle(Vector2.Zero, extent);
 		}
 
 		public override void StaticScale(float ratio, bool roundCoordinates)
