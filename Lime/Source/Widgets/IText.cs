@@ -49,6 +49,7 @@ namespace Lime
 
 	public interface IText
 	{
+		Rectangle MeasureText();
 		string Text { get; set; }
 		string DisplayText { get; set; }
 		HAlignment HAlignment { get; set; }

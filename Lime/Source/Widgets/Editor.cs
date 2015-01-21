@@ -76,11 +76,13 @@ namespace Lime
 		float KeyRepeatInterval { get; set; }
 		int MaxLength { get; set; }
 		int MaxLines { get; set; }
+		float MaxHeight { get; set; }
 		char? PasswordChar { get; set; }
 		float PasswordLastCharShowTime { get; set; }
 
 		bool IsAcceptableLength(int length);
 		bool IsAcceptableLines(int lines);
+		bool IsAcceptableHeight(float height);
 	}
 
 	public class EditorParams : IEditorParams
@@ -89,6 +91,7 @@ namespace Lime
 		public float KeyRepeatInterval { get; set; }
 		public int MaxLength { get; set; }
 		public int MaxLines { get; set; }
+		public float MaxHeight { get; set; }
 		public char? PasswordChar { get; set; }
 		public float PasswordLastCharShowTime { get; set; }
 
@@ -101,6 +104,7 @@ namespace Lime
 
 		public bool IsAcceptableLength(int length) { return MaxLength <= 0 || length <= MaxLength; }
 		public bool IsAcceptableLines(int lines) { return MaxLines <= 0 || lines <= MaxLines; }
+		public bool IsAcceptableHeight(float height) { return MaxHeight <= 0 || height <= MaxHeight; }
 	}
 
 	public class Editor
@@ -164,9 +168,21 @@ namespace Lime
 				caretPos.TextPos >= 0 && caretPos.TextPos <= text.Text.Length &&
 				editorParams.IsAcceptableLength(text.Text.Length + 1)
 			) {
-				text.Text = text.Text.Insert(caretPos.TextPos, ch.ToString());
-				caretPos.TextPos++;
+				var newText = text.Text.Insert(caretPos.TextPos, ch.ToString());
+				if (editorParams.MaxHeight <= 0 || editorParams.IsAcceptableHeight(CalcTextHeight(newText))) {
+					text.Text = newText;
+					caretPos.TextPos++;
+				}
 			}
+		}
+
+		private float CalcTextHeight(string s)
+		{
+			var displayText = text.DisplayText;
+			text.DisplayText = s;
+			var height = text.MeasureText().Height;
+			text.DisplayText = displayText;
+			return height;
 		}
 
 		private void HandleCursorKeys()
