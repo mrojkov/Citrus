@@ -19,7 +19,6 @@
 		protected override void SelfUpdate(float delta)
 		{
 			WidgetInput.RemoveInvalidatedCaptures();
-			prevActiveTextWidget = ActiveTextWidget;
 			ParticleEmitter.NumberOfUpdatedParticles = 0;
 			IsActiveTextWidgetUpdated = false;
 		}
@@ -44,6 +43,8 @@
 				if (prevActiveTextWidget != ActiveTextWidget && ActiveTextWidget != null && prevActiveTextWidget != null) {
 					Application.Instance.ChangeOnscreenKeyboardText(ActiveTextWidget.Text);
 				}
+
+				prevActiveTextWidget = ActiveTextWidget;
 			}
 #endif
 		}
