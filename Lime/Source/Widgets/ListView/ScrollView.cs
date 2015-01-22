@@ -239,22 +239,27 @@ namespace Lime
 
 		private IEnumerator<object> IntertialScrollingTask(float velocity)
 		{
-			while (true) {
-				var delta = TaskList.Current.Delta;
-				float damping = ScrollPosition.InRange(MinScrollPosition, MaxScrollPosition) ? 2.0f : 20.0f;
-				velocity -= velocity * damping * delta;
-				if (velocity.Abs() < 40.0f) {
-					break;
+			Frame.HitTestMask = Widget.ControlsHitTestMask;
+			try {
+				while (true) {
+					var delta = TaskList.Current.Delta;
+					float damping = ScrollPosition.InRange(MinScrollPosition, MaxScrollPosition) ? 2.0f : 20.0f;
+					velocity -= velocity * damping * delta;
+					if (velocity.Abs() < 40.0f) {
+						break;
+					}
+					// Round scrolling position to prevent blurring
+					ScrollPosition = Mathf.Clamp(
+						value: (ScrollPosition + velocity * delta).Round(),
+						min: MinScrollPosition - MaxOverscroll,
+						max: MaxScrollPosition + MaxOverscroll
+					);
+					yield return 0;
 				}
-				// Round scrolling position to prevent blurring
-				ScrollPosition = Mathf.Clamp(
-					value: (ScrollPosition + velocity * delta).Round(), 
-					min: MinScrollPosition - MaxOverscroll, 
-					max: MaxScrollPosition + MaxOverscroll
-				);
-				yield return 0;
+				scrollingTask = null;
+			} finally {
+				Frame.HitTestMask = Widget.EmptyHitTestMask;
 			}
-			scrollingTask = null;
 		}
 
 		private IEnumerator<object> HandleDragTask(VelocityMeter velocityMeter, float mouseProjectedPosition)
