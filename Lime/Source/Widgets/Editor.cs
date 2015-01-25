@@ -222,7 +222,7 @@ namespace Lime
 				// Some platforms, notably iOS, do not generate Key.BackSpace.
 				// OTOH, '\b' is emulated everywhere.
 				if (ch == '\b') {
-					if (caretPos.TextPos > 0) {
+					if (caretPos.TextPos > 0 && caretPos.TextPos <= text.Text.Length) {
 						caretPos.TextPos--;
 						text.Text = text.Text.Remove(caretPos.TextPos, 1);
 					}
