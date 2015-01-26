@@ -242,12 +242,18 @@ namespace Lime
 			for (int i = 0; i < length; i++) {
 				char ch = text[i + start];
 				if (ch == '\n') {
+					if (onDrawChar != null) {
+						onDrawChar(i, position, Vector2.Down * fontHeight);
+					}
 					position.X = savedX;
 					position.Y += fontHeight;
 					continue;
 				}
 				FontChar fontChar = font.Chars[ch];
 				if (fontChar == FontChar.Null) {
+					if (onDrawChar != null) {
+						onDrawChar(i, position, Vector2.Down * fontHeight);
+					}
 					continue;
 				}
 				float kerning = 0;
@@ -281,9 +287,6 @@ namespace Lime
 				}
 				position.X += scale * (fontChar.Width + fontChar.ACWidths.Y);
 				prevChar = fontChar;
-			}
-			if (onDrawChar != null) {
-				onDrawChar(length, position, Vector2.Down * fontHeight);
 			}
 		}
 

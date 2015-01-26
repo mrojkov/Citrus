@@ -267,12 +267,21 @@ namespace Lime
 			}
 			bool firstLine = true;
 			if (caret.Valid == CaretPosition.ValidState.TextPos)
-				Caret.TextPos = Caret.TextPos.Clamp(0, text.Length);
+				Caret.TextPos = Caret.TextPos.Clamp(0, Text.Length);
 			if (caret.Valid == CaretPosition.ValidState.LinePos)
 				Caret.Line = Caret.Line.Clamp(0, lines.Count - 1);
+			int i = 0;
 			foreach (var line in lines) {
+				bool lastLine = ++i == lines.Count;
+				if (caret.Valid == CaretPosition.ValidState.LinePos && caret.Line == caret.RenderingLineNumber) {
+					Caret.Pos = Caret.Pos.Clamp(0, line.Length - (lastLine ? 0 : 1));
+				}
 				Rectangle lineRect;
 				RenderSingleTextLine(spriteList, out lineRect, pos, line);
+				if (lastLine) {
+					// There is no end-of-text character, so simulate it.
+					caret.Sync(line.Length, new Vector2(lineRect.Right, lineRect.Top), Vector2.Down * fontHeight);
+				}
 				pos.Y += Spacing + FontHeight;
 				++caret.RenderingLineNumber;
 				if (firstLine) {
@@ -316,9 +325,6 @@ namespace Lime
 					pos.X = (Size.X - lineWidth) * 0.5f;
 					break;
 			}
-			if (caret.Valid == CaretPosition.ValidState.LinePos && caret.Line == caret.RenderingLineNumber) {
-				Caret.Pos = Caret.Pos.Clamp(0, line.Length);
-			}
 			if (spriteList != null) {
 				Renderer.DrawTextLine(
 					Font.Instance, pos, line, Color4.White, FontHeight, 0, line.Length, spriteList, caret.Sync);
@@ -329,12 +335,16 @@ namespace Lime
 		private List<string> SplitText(string text)
 		{
 			var strings = new List<string>(text.Split('\n'));
+			// Add linebreaks to make editor happy.
+			for (int i = 0; i < strings.Count - 1; i++) {
+				strings[i] += '\n';
+			}
 			if (OverflowMode == TextOverflowMode.Ignore) {
 				return strings;
 			}
 			for (var i = 0; i < strings.Count; i++) {
 				if (OverflowMode == TextOverflowMode.Ellipsis) {
-					// Clipping the last line of the text
+					// Clipping the last line of the text.
 					if (CalcTotalHeight(i + 2) > Height) {
 						strings[i] = ClipLineWithEllipsis(strings[i]);
 						while (strings.Count > i + 1) {
@@ -430,6 +440,8 @@ namespace Lime
 
 		private void DisposeSpriteList()
 		{
+			caret.TextPos--;
+			caret.TextPos++; // Enforce revalidation.
 			InvalidateRenderCache();
 			spriteList = null;
 		}
@@ -466,13 +478,18 @@ namespace Lime
 				lineWithoutLastWord = null;
 				lastWord = null;
 				var lastSpaceAt = text.LastIndexOf(' ');
-				if (lastSpaceAt >= 0) {
-					lineWithoutLastWord = text.Substring(0, lastSpaceAt);
-					lastWord = text.Substring(lastSpaceAt + 1);
-					return true;
-				} else {
+				if (lastSpaceAt < 0) {
 					return false;
 				}
+				if (lastSpaceAt == text.Length - 1) {
+					// Treat a space character as a word
+					lastWord = " ";
+					lineWithoutLastWord = text.Substring(0, lastSpaceAt);
+				} else {
+					lineWithoutLastWord = text.Substring(0, lastSpaceAt + 1);
+					lastWord = text.Substring(lastSpaceAt + 1);
+				}
+				return true;
 			}
 
 			private static bool TryCutWordTail(string textLine, MeasureTextLineWidthDelegate measureHandler, out string currentLinePart, out string nextLinePart)
@@ -512,16 +529,18 @@ namespace Lime
 
 			private static void PushWordToLine(string word, List<string> strings, int line)
 			{
-				if (line >= strings.Count) {
-					strings.Add("");
+				if (line >= strings.Count || EndsWith(word, '\n')) {
+					strings.Insert(line, word);
+				} else {
+					strings[line] = word + strings[line];
 				}
-				if (strings[line] != "") {
-					strings[line] = ' ' + strings[line];
-				}
-				strings[line] = word + strings[line];
 			}
 
+			private static bool EndsWith(string s, char c)
+			{
+				int i = s.Length;
+				return i > 0 && s[i - 1] == c;
+			}
 		}
-
 	}
 }
