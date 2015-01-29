@@ -16,7 +16,7 @@ using System.Runtime.InteropServices;
 using System.Reflection;
 using System.Diagnostics;
 
-using MonoTouch.OpenGLES;
+using OpenGLES;
 using OpenTK.Platform;
 using OpenTK.Graphics;
 

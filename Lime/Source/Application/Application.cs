@@ -5,7 +5,7 @@ using System.Threading;
 using System.Reflection;
 
 #if iOS
-using MonoTouch.UIKit;
+using UIKit;
 #elif MAC
 using MonoMac.AppKit;
 #elif ANDROID
@@ -92,7 +92,7 @@ namespace Lime
 
 		private void SetGlobalExceptionHandler()
 		{
-			// Почитать и применить:	
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ:	
 			// http://forums.xamarin.com/discussion/931/how-to-prevent-ios-crash-reporters-from-crashing-monotouch-apps
 
 			AppDomain.CurrentDomain.UnhandledException += (sender, e) => {
@@ -155,7 +155,7 @@ namespace Lime
 				// Class-level initialization fails on iOS simulator in debug mode,
 				// because it is called before main UI thread.
 				if (pixelsPerPoints == 0)
-					pixelsPerPoints = UIScreen.MainScreen.Scale;
+					pixelsPerPoints = (float)UIScreen.MainScreen.Scale;
 				return 160 * pixelsPerPoints * Vector2.One;
 			}
 		}

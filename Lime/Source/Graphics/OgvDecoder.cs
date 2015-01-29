@@ -1,10 +1,13 @@
-﻿#if !UNITY
+#if !UNITY
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+#if iOS
+using ObjCRuntime;
+#endif
 
 namespace Lime
 {
@@ -117,7 +120,7 @@ namespace Lime
 		}
 
 #if iOS
-		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.Api.ReadCallback))]
+		[MonoPInvokeCallback(typeof(Lemon.Api.ReadCallback))]
 #endif
 		private static uint OgvRead(IntPtr buffer, uint size, uint nmemb, int handle)
 		{
@@ -136,7 +139,7 @@ namespace Lime
 		}
 
 #if iOS
-		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.Api.TellCallback))]
+		[MonoPInvokeCallback(typeof(Lemon.Api.TellCallback))]
 #endif
 		private static int OgvTell(int handle)
 		{
@@ -145,7 +148,7 @@ namespace Lime
 		}
 		
 #if iOS
-		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.Api.SeekCallback))]
+		[MonoPInvokeCallback(typeof(Lemon.Api.SeekCallback))]
 #endif
 		private static int OgvSeek(int handle, long offset, SeekOrigin whence)
 		{
@@ -154,7 +157,7 @@ namespace Lime
 		}
 		
 #if iOS
-		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.Api.CloseCallback))]
+		[MonoPInvokeCallback(typeof(Lemon.Api.CloseCallback))]
 #endif
 		private static int OgvClose(int handle)
 		{

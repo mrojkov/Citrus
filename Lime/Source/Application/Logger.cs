@@ -1,13 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 
-
 #if iOS
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using ObjCRuntime;
+using Foundation;
+using UIKit;
 #endif
 
 namespace Lime
@@ -16,7 +16,7 @@ namespace Lime
 	{
 		public static event Action<string> OnWrite;
 #if iOS
-		[DllImport(MonoTouch.Constants.FoundationLibrary)]
+		[DllImport(Constants.FoundationLibrary)]
 		private extern static void NSLog(IntPtr message);
 
 		public static void Write(string msg)

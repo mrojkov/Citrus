@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,8 +11,8 @@ using System.IO;
 using ProtoBuf;
 using System.ComponentModel;
 #if iOS
-using MonoTouch.Foundation;
-using MonoTouch.AVFoundation;
+using Foundation;
+using AVFoundation;
 #endif
 
 namespace Lime

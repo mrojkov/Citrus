@@ -1,4 +1,4 @@
-﻿#if OPENGL
+#if OPENGL
 using System;
 
 #if iOS || ANDROID

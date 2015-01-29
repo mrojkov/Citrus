@@ -1,9 +1,9 @@
-﻿#if iOS
+#if iOS
 using System;
 using System.Drawing;
 using Lime;
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using Foundation;
+using UIKit;
 
 namespace Lime
 {
@@ -38,11 +38,11 @@ namespace Lime
 			webView.ScrollView.Scrolled += (object sender, EventArgs e) => {
 				webView.ScrollView.ShowsVerticalScrollIndicator = true;
 				if (webView.ScrollView.ContentOffset.X != 0.0f) {
-					webView.ScrollView.SetContentOffset(new PointF(0.0f, webView.ScrollView.ContentOffset.Y), false);
+					webView.ScrollView.SetContentOffset(new PointF(0.0f, (float)webView.ScrollView.ContentOffset.Y), false);
 					webView.ScrollView.ShowsVerticalScrollIndicator = false;
 				}
 				if (webView.ScrollView.ContentOffset.Y < 0.0f) {
-					webView.ScrollView.SetContentOffset(new PointF(webView.ScrollView.ContentOffset.X, 0.0f), false);
+					webView.ScrollView.SetContentOffset(new PointF((float)webView.ScrollView.ContentOffset.X, 0.0f), false);
 					webView.ScrollView.ShowsVerticalScrollIndicator = false;
 				}
 			};
@@ -81,9 +81,9 @@ namespace Lime
 			}
 			float screenHeight = GameView.Instance.Size.Height;
 			WindowRect wr = CalculateAABBInWorldSpace(this);
-			float Height = (float)wr.Height / UIScreen.MainScreen.Scale;
-			var position = new PointF((float)wr.X / UIScreen.MainScreen.Scale, screenHeight - (float)(wr.Y / UIScreen.MainScreen.Scale) - Height);
-			var size = new SizeF((float)wr.Width / UIScreen.MainScreen.Scale, Height);
+			float Height = (float)wr.Height / (float)UIScreen.MainScreen.Scale;
+			var position = new PointF((float)wr.X / (float)UIScreen.MainScreen.Scale, screenHeight - (float)(wr.Y / UIScreen.MainScreen.Scale) - Height);
+			var size = new SizeF((float)wr.Width / (float)UIScreen.MainScreen.Scale, Height);
 			webView.Frame = new RectangleF(position, size);
 			webView.Hidden = false;
 

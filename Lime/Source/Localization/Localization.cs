@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 #if iOS
-using MonoTouch.Foundation;
+using Foundation;
 #endif
 
 namespace Lime

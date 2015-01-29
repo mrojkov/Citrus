@@ -2,7 +2,7 @@ using System;
 using System.IO;
 #if iOS
 using MonoTouch;
-using MonoTouch.UIKit;
+using UIKit;
 #elif ANDROID
 using Android.Content;
 using Android.App;
@@ -32,8 +32,8 @@ namespace Lime
 		public static void OpenBrowser(string url)
 		{
 #if iOS
-			var nsUrl = new MonoTouch.Foundation.NSUrl(url);
-			MonoTouch.UIKit.UIApplication.SharedApplication.OpenUrl(nsUrl);
+			var nsUrl = new Foundation.NSUrl(url);
+			UIKit.UIApplication.SharedApplication.OpenUrl(nsUrl);
 #elif ANDROID
 			var uri = Android.Net.Uri.Parse(url);
 			var intent = new Intent(Intent.ActionView, uri);
@@ -106,7 +106,7 @@ namespace Lime
 		{
 #if iOS
 			UIScreen screen = UIScreen.MainScreen;
-			return new Vector2(screen.Bounds.Width, screen.Bounds.Height); 
+			return new Vector2((float)screen.Bounds.Width, (float)screen.Bounds.Height); 
 #elif UNITY
 			var r = UnityEngine.Screen.currentResolution;
 			return new Vector2(r.width, r.height);

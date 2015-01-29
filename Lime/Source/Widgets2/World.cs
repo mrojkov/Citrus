@@ -1,4 +1,4 @@
-﻿namespace Lime.Widgets2
+namespace Lime.Widgets2
 {
 	public sealed class World : Frame
 	{

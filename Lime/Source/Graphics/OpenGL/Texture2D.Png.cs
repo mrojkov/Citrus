@@ -1,4 +1,4 @@
-﻿#if OPENGL
+#if OPENGL
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,8 +17,8 @@ using SDI = System.Drawing.Imaging;
 using SD = System.Drawing;
 #elif iOS
 using OpenTK.Graphics.ES20;
-using MonoTouch.UIKit;
-using MonoTouch.CoreGraphics;
+using UIKit;
+using CoreGraphics;
 #elif ANDROID
 using OpenTK.Graphics.ES20;
 using SD = System.Drawing;
@@ -104,7 +104,7 @@ namespace Lime
 			if (!Application.IsMainThread) {
 				throw new NotSupportedException("Calling from non-main thread currently is not supported");
 			}
-			using (var nsData = MonoTouch.Foundation.NSData.FromStream(stream))
+			using (var nsData = Foundation.NSData.FromStream(stream))
 			using (UIImage image = UIImage.LoadFromData(nsData)) {
 				if (image == null) {
 					throw new Lime.Exception("Error loading texture from stream");
@@ -131,7 +131,7 @@ namespace Lime
                 alphaInfo = CGImageAlphaInfo.NoneSkipLast;
             }
             using (var colorSpace = CGColorSpace.CreateDeviceRGB())
-            using (var context = new MonoTouch.CoreGraphics.CGBitmapContext(data, width, height, bitsPerComponent, bytesPerRow, colorSpace, alphaInfo)) {
+            using (var context = new CoreGraphics.CGBitmapContext(data, width, height, bitsPerComponent, bytesPerRow, colorSpace, alphaInfo)) {
                 context.DrawImage(new System.Drawing.RectangleF(0, 0, width, height), imageRef);
                 PrepareOpenGLTexture();
 				PlatformRenderer.PushTexture(handle, 0);

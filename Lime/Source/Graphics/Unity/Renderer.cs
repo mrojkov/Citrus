@@ -1,4 +1,4 @@
-﻿#if UNITY
+#if UNITY
 using System;
 using ProtoBuf;
 using System.Collections.Generic;

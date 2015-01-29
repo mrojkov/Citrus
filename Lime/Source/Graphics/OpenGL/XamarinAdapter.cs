@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,15 +36,26 @@ namespace Lime
 #elif iOS
 namespace Lime
 {
-	static class VertexAttribPointerType
+	static class FramebufferAttachment
 	{
-		public const All Float = All.Float;
-		public const All UnsignedByte = All.UnsignedByte;
+		public const FramebufferSlot ColorAttachment0 = FramebufferSlot.ColorAttachment0;
+	}
+
+	static class BufferUsageHint
+	{
+		public const BufferUsage DynamicDraw = BufferUsage.DynamicDraw;
 	}
 
 	static class PrimitiveType
 	{
-		public const All Triangles = All.Triangles;
+		public const BeginMode Triangles = BeginMode.Triangles;
+	}
+		
+/*
+	static class VertexAttribPointerType
+	{
+		public const All Float = All.Float;
+		public const All UnsignedByte = All.UnsignedByte;
 	}
 
 	static class DrawElementsType
@@ -52,7 +63,11 @@ namespace Lime
 		public const All UnsignedShort = All.UnsignedShort;
 	}
 
-	static class GetPName
+	static class GetPName	static class BufferUsageHint
+	{
+		public const All DynamicDraw = All.DynamicDraw;
+	}
+
 	{
 		public const All FramebufferBinding = All.FramebufferBinding;
 	}
@@ -128,11 +143,6 @@ namespace Lime
 		public const All Framebuffer = All.Framebuffer;
 	}
 
-	static class FramebufferAttachment
-	{
-		public const All ColorAttachment0 = All.ColorAttachment0;
-	}
-
 	static class FramebufferErrorCode
 	{
 		public const All FramebufferComplete = All.FramebufferComplete;
@@ -171,5 +181,6 @@ namespace Lime
 	{
 		public const All DynamicDraw = All.DynamicDraw;
 	}
+*/	
 }
 #endif

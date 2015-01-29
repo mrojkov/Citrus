@@ -1,4 +1,4 @@
-﻿using Lime;
+using Lime;
 using System;
 using System.Collections.Generic;
 using System.Linq;

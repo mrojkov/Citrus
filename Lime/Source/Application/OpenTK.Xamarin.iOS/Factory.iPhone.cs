@@ -34,7 +34,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using OpenTK;
-using MonoTouch.OpenGLES;
+using OpenGLES;
 
 using OpenTK.Graphics;
 

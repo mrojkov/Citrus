@@ -2,11 +2,11 @@
 using System;
 using OpenTK;
 using System.Drawing;
-using MonoTouch.Foundation;
-using MonoTouch.CoreAnimation;
-using MonoTouch.ObjCRuntime;
-using MonoTouch.OpenGLES;
-using MonoTouch.UIKit;
+using Foundation;
+using CoreAnimation;
+using ObjCRuntime;
+using OpenGLES;
+using UIKit;
 using System.Collections.Generic;
 
 namespace Lime
@@ -89,9 +89,9 @@ namespace Lime
 			var rectEnd = args.FrameEnd;
 			var rectBegin = args.FrameBegin;
 			if (rectEnd.X == 0 && rectBegin.X == 0) {
-				KeyboardHeight = rectEnd.Height * scale;
+				KeyboardHeight = (float)(rectEnd.Height * scale);
 			} else {
-				KeyboardHeight = rectEnd.Width * scale;
+				KeyboardHeight = (float)(rectEnd.Width * scale);
 			}
 		}
 

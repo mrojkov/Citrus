@@ -1,4 +1,4 @@
 using System;
-using MonoTouch.ObjCRuntime;
+using ObjCRuntime;
 
-[assembly: LinkWith ("libLemonUniversal.a", LinkTarget.ArmV6 | LinkTarget.ArmV7 | LinkTarget.Simulator, ForceLoad = true)]
+[assembly: LinkWith ("libLemonUniversal.a", LinkTarget.ArmV6 | LinkTarget.ArmV7 | LinkTarget.Simulator | LinkTarget.Arm64, ForceLoad = true)]

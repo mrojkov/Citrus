@@ -479,6 +479,11 @@ namespace Lime.Xamarin
             set { implementation.VSync = value;  }
         }
 
+		int IGraphicsContext.SwapInterval {
+			get;
+			set;
+		}
+
         /// <summary>
         /// Updates the graphics context.  This must be called when the render target
         /// is resized for proper behavior on Mac OS X.

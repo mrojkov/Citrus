@@ -1,6 +1,10 @@
-﻿using System;
+using System;
 using System.IO;
 using Lemon;
+#if iOS
+using ObjCRuntime;
+#endif
+
 #if OPENAL
 using OpenTK.Audio.OpenAL;
 #endif
@@ -108,7 +112,7 @@ namespace Lime
 		static byte[] block;
 		
 #if iOS
-		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.Api.ReadCallback))]
+		[MonoPInvokeCallback(typeof(Lemon.Api.ReadCallback))]
 #endif
 		public static uint OggRead(IntPtr buffer, uint size, uint nmemb, int handle)
 		{
@@ -129,7 +133,7 @@ namespace Lime
 		}
 
 #if iOS
-		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.Api.TellCallback))]
+		[MonoPInvokeCallback(typeof(Lemon.Api.TellCallback))]
 #endif
 		public static int OggTell(int handle)
 		{
@@ -138,7 +142,7 @@ namespace Lime
 		}
 		
 #if iOS
-		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.Api.SeekCallback))]
+		[MonoPInvokeCallback(typeof(Lemon.Api.SeekCallback))]
 #endif
 		public static int OggSeek(int handle, long offset,SeekOrigin whence)
 		{
@@ -147,7 +151,7 @@ namespace Lime
 		}
 		
 #if iOS
-		[MonoTouch.MonoPInvokeCallback(typeof(Lemon.Api.CloseCallback))]
+		[MonoPInvokeCallback(typeof(Lemon.Api.CloseCallback))]
 #endif
 		public static int OggClose(int handle)
 		{

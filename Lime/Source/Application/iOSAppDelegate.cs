@@ -3,10 +3,10 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
-using MonoTouch.Foundation;
-using MonoTouch.UIKit;
+using Foundation;
+using UIKit;
 using System.Runtime.InteropServices;
-using MonoTouch.MessageUI;
+using MessageUI;
 
 namespace Lime
 {
@@ -63,7 +63,7 @@ namespace Lime
 				pleaseRateMessage = new UIAlertView(title, text, null, cancelTitle, otherButtons);
 				pleaseRateMessage.Show();
 				pleaseRateMessage.Clicked += (sender, buttonArgs) => {
-					onClick(buttonArgs.ButtonIndex);
+					onClick((int)buttonArgs.ButtonIndex);
 					pleaseRateMessage = null;
 				};
 			}

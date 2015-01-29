@@ -3,11 +3,11 @@ using System;
 using OpenTK;
 using OpenTK.Platform.iPhoneOS;
 using System.Drawing;
-using MonoTouch.Foundation;
-using MonoTouch.CoreAnimation;
-using MonoTouch.ObjCRuntime;
-using MonoTouch.OpenGLES;
-using MonoTouch.UIKit;
+using Foundation;
+using CoreAnimation;
+using ObjCRuntime;
+using OpenGLES;
+using UIKit;
 
 namespace Lime
 {
@@ -39,11 +39,11 @@ namespace Lime
 			LayerRetainsBacking = false;
 			LayerColorFormat = EAGLColorFormat.RGB565;
 			MultipleTouchEnabled = true;
-			textField = new MonoTouch.UIKit.UITextField();
+			textField = new UIKit.UITextField();
 			textField.Delegate = new TextFieldDelegate();
 			textField.AutocorrectionType = UITextAutocorrectionType.No;
 			textField.AutocapitalizationType = UITextAutocapitalizationType.None;
-			screenScale = UIScreen.MainScreen.Scale;
+			screenScale = (float)UIScreen.MainScreen.Scale;
 			this.Add(textField);
 			RefreshWindowSize();
 		}
@@ -73,7 +73,7 @@ namespace Lime
 				for (int i = 0; i < Input.MaxTouches; i++) {
 					if (activeTouches[i] == null) {
 						var pt = touch.LocationInView(this);
-						Vector2 position = new Vector2(pt.X, pt.Y) * screenScale * Input.ScreenToWorldTransform;
+						Vector2 position = new Vector2((float)pt.X, (float)pt.Y) * screenScale * Input.ScreenToWorldTransform;
 						if (i == 0) {
 							Input.MousePosition = position;
 							Input.SetKeyState(Key.Mouse0, true);
@@ -94,7 +94,7 @@ namespace Lime
 				for (int i = 0; i < Input.MaxTouches; i++) {
 					if (activeTouches[i] == touch) {
 						var pt = touch.LocationInView(this);
-						Vector2 position = new Vector2(pt.X, pt.Y) * screenScale * Input.ScreenToWorldTransform;
+						Vector2 position = new Vector2((float)pt.X, (float)pt.Y) * screenScale * Input.ScreenToWorldTransform;
 						if (i == 0) {
 							Input.MousePosition = position;
 						}

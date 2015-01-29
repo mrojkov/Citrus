@@ -1,4 +1,4 @@
-﻿namespace Lime
+namespace Lime
 {
 	public sealed class World : Frame
 	{

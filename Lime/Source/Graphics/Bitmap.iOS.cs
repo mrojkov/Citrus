@@ -4,8 +4,8 @@ using System.IO;
 using System.Collections.Generic;
 using System;
 using ProtoBuf;
-using MonoTouch.UIKit;
-using MonoTouch.CoreGraphics;
+using UIKit;
+using CoreGraphics;
 using System.Drawing;
 
 namespace Lime
@@ -16,17 +16,17 @@ namespace Lime
 
 		public int GetWidth()
 		{
-			return bitmap == null ? 0 : bitmap.Size.Width.Round();
+			return bitmap == null ? 0 : ((float)bitmap.Size.Width).Round();
 		}
 
 		public int GetHeight()
 		{
-			return bitmap == null ? 0 : bitmap.Size.Height.Round();
+			return bitmap == null ? 0 : ((float)bitmap.Size.Height).Round();
 		}
 
 		public void LoadFromStream(Stream stream)
 		{
-			using (var nsData = MonoTouch.Foundation.NSData.FromStream(stream)) {
+			using (var nsData = Foundation.NSData.FromStream(stream)) {
 				bitmap = UIImage.LoadFromData(nsData);
 			}
 		}

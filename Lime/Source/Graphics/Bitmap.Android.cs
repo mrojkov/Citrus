@@ -1,4 +1,4 @@
-﻿#if ANDROID
+#if ANDROID
 using System;
 using Android.Graphics;
 using System.IO;

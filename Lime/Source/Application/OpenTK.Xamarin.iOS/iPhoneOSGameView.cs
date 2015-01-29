@@ -1,4 +1,8 @@
 #if iOS
+using ApiDefinition;
+using System.Runtime.InteropServices;
+
+
 #region --- License ---
 /* Licensed under the MIT/X11 license.
  * Copyright (c) 2009 Novell, Inc.
@@ -13,12 +17,12 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 
-using MonoTouch.CoreAnimation;
-using MonoTouch.CoreGraphics;
-using MonoTouch.Foundation;
-using MonoTouch.OpenGLES;
-using MonoTouch.UIKit;
-using MonoTouch.ObjCRuntime;
+using CoreAnimation;
+using CoreGraphics;
+using Foundation;
+using OpenGLES;
+using UIKit;
+using ObjCRuntime;
 
 using OpenTK;
 using OpenTK.Graphics;
@@ -77,12 +81,12 @@ namespace Lime.Xamarin
                 DeleteFramebuffers      = (int n, ref int f)  => ES11.GL.Oes.DeleteFramebuffers(n, ref f),
                 DeleteRenderbuffers     = (int n, ref int r)  => ES11.GL.Oes.DeleteRenderbuffers(n, ref r),
                 FramebufferRenderbuffer = (t, a, rt, rb)      => ES11.GL.Oes.FramebufferRenderbuffer(t, a, rt, rb),
-                GenFramebuffers         = (int n, ref int f)  => ES11.GL.Oes.GenFramebuffers(n, ref f),
-                GenRenderbuffers        = (int n, ref int r)  => ES11.GL.Oes.GenRenderbuffers(n, ref r),
-                GetInteger              = (All n, ref int v)  => ES11.GL.GetInteger(n, ref v),
+                GenFramebuffers         = (int n, ref int f)  => ES11.GL.Oes.GenFramebuffers(n, out f),
+                GenRenderbuffers        = (int n, ref int r)  => ES11.GL.Oes.GenRenderbuffers(n, out r),
+                GetInteger              = (All n, ref int v)  => ES11.GL.GetInteger(n, out v),
                 Scissor                 = (x, y, w, h)        => ES11.GL.Scissor(x, y, w, h),
                 Viewport                = (x, y, w, h)        => ES11.GL.Viewport(x, y, w, h),
-                GetRenderbufferParameter= (All t, All p, ref int a) => ES11.GL.Oes.GetRenderbufferParameter (t, p, ref a),
+                GetRenderbufferParameter= (All t, All p, ref int a) => ES11.GL.Oes.GetRenderbufferParameter (t, p, out a),
                 PixelStore              = (n, p)                    => ES11.GL.PixelStore(n, p),
                 ReadPixels              = (x, y, w, h, f, t, d)     => ES11.GL.ReadPixels(x, y, w, h, f, t, d),
             };
@@ -96,8 +100,8 @@ namespace Lime.Xamarin
                 DeleteFramebuffers      = (int n, ref int f)  => ES20.GL.DeleteFramebuffers(n, ref f),
                 DeleteRenderbuffers     = (int n, ref int r)  => ES20.GL.DeleteRenderbuffers(n, ref r),
 				FramebufferRenderbuffer = (t, a, rt, rb)      => ES20.GL.FramebufferRenderbuffer((ES20.All) t, (ES20.All) a, (ES20.All) rt, rb),
-                GenFramebuffers         = (int n, ref int f)  => ES20.GL.GenFramebuffers(n, ref f),
-                GenRenderbuffers        = (int n, ref int r)  => ES20.GL.GenRenderbuffers(n, ref r),
+                GenFramebuffers         = (int n, ref int f)  => ES20.GL.GenFramebuffers(n, out f),
+                GenRenderbuffers        = (int n, ref int r)  => ES20.GL.GenRenderbuffers(n, out r),
 				GetInteger              = (All n, ref int v)  => ES20.GL.GetInteger((ES20.All) n, ref v),
                 Scissor                 = (x, y, w, h)        => ES20.GL.Scissor(x, y, w, h),
                 Viewport                = (x, y, w, h)        => ES20.GL.Viewport(x, y, w, h),
@@ -157,7 +161,7 @@ namespace Lime.Xamarin
         [Preserve (Conditional = true)]
         void RunIteration ()
         {
-            view.RunIteration ();
+            view.RunIteration (null);
         }
     }
 
@@ -189,7 +193,7 @@ namespace Lime.Xamarin
         public void Resume ()
         {
             if (timeout != new TimeSpan (-1))
-                timer = NSTimer.CreateRepeatingScheduledTimer (timeout, view.RunIteration);
+                timer = NSTimer.CreateRepeatingScheduledTimer(timeout, view.RunIteration);
         }
 
         public void Invalidate ()
@@ -224,7 +228,7 @@ namespace Lime.Xamarin
         }
 
         [Export("initWithFrame:")]
-        public iPhoneOSGameView(RectangleF frame)
+		public iPhoneOSGameView(CGRect frame)
             : base(frame)
         {
             stopwatch = new System.Diagnostics.Stopwatch ();
@@ -511,10 +515,15 @@ namespace Lime.Xamarin
             GraphicsContext = null;
             gl = null;
         }
+			
+		[DllImport("/usr/lib/libobjc.dylib", EntryPoint = "objc_msgSend")]
+		private static extern bool bool_objc_msgSend_nuint_IntPtr (IntPtr receiver, IntPtr selector, nuint arg1, IntPtr arg2);
 
 		static private bool DetachRenderBufferStorage(EAGLContext me, uint target)
 		{
-			return Messaging.bool_objc_msgSend_UInt32_IntPtr(me.Handle, Selector.GetHandle("renderbufferStorage:fromDrawable:"), target, (IntPtr)0);
+			// return me.RenderBufferStorage(target, (CAEAGLLayer)null);
+			return bool_objc_msgSend_nuint_IntPtr(me.Handle, Selector.GetHandle("renderbufferStorage:fromDrawable:"), target, 
+					(IntPtr)0);
 		}
 
         public virtual void Close()
@@ -705,7 +714,7 @@ namespace Lime.Xamarin
                         // OpenGL ES measures data in PIXELS
                         // Create a graphics context with the target size measured in POINTS
                         int widthInPoints, heightInPoints;
-                        float scale = ContentScaleFactor;
+						float scale = (float)ContentScaleFactor;
                         widthInPoints = (int) (width / scale);
                         heightInPoints = (int) (height / scale);
                         UIGraphics.BeginImageContextWithOptions (new System.Drawing.SizeF (widthInPoints, heightInPoints), false, scale);
@@ -750,7 +759,7 @@ namespace Lime.Xamarin
         FrameEventArgs updateEventArgs = new FrameEventArgs();
         FrameEventArgs renderEventArgs = new FrameEventArgs();
 
-        internal void RunIteration ()
+		internal void RunIteration (NSTimer timer)
         {
             var curUpdateTime = stopwatch.Elapsed;
             if (prevUpdateTime == TimeSpan.Zero)

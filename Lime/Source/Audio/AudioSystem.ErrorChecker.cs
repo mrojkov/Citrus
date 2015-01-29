@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 #if OPENAL
 using OpenTK.Audio;
 using OpenTK.Audio.OpenAL;

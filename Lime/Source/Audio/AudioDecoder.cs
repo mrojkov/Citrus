@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 #if !UNITY
 using OpenTK.Audio.OpenAL;
 #endif

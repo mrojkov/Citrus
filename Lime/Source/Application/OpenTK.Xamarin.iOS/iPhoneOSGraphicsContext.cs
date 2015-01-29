@@ -13,8 +13,8 @@ using OpenTK.Platform;
 
 using System;
 
-using MonoTouch.ObjCRuntime;
-using MonoTouch.OpenGLES;
+using ObjCRuntime;
+using OpenGLES;
 
 using OpenTK;
 using OpenTK.Graphics;
@@ -121,6 +121,15 @@ namespace Lime.Xamarin {
         IGraphicsContext IGraphicsContextInternal.Implementation {
             get {return this;}
         }
+
+		int IGraphicsContext.SwapInterval {
+			get;
+			set;
+		}
+
+		void IGraphicsContext.LoadAll()
+		{
+		}
 
         void IGraphicsContextInternal.LoadAll()
         {
