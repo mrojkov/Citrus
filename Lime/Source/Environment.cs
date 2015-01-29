@@ -3,6 +3,9 @@ using System.IO;
 #if iOS
 using MonoTouch;
 using MonoTouch.UIKit;
+#elif ANDROID
+using Android.Content;
+using Android.App;
 #endif
 
 namespace Lime
@@ -31,6 +34,10 @@ namespace Lime
 #if iOS
 			var nsUrl = new MonoTouch.Foundation.NSUrl(url);
 			MonoTouch.UIKit.UIApplication.SharedApplication.OpenUrl(nsUrl);
+#elif ANDROID
+			var uri = Android.Net.Uri.Parse(url);
+			var intent = new Intent(Intent.ActionView, uri);
+			ActivityDelegate.Instance.Activity.StartActivity(intent);
 #elif UNITY_WEBPLAYER
 			throw new NotImplementedException();
 #else
