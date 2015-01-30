@@ -39,8 +39,8 @@ namespace Orange
 				if (!current.ContainsKey(key)) {
 					Logger.Write("+ " + key);
 					added++;
+					current[key] = modified[key];
 				}
-				current[key] = modified[key];
 			}
 			foreach (var key in current.Keys.ToList()) {
 				if (!modified.ContainsKey(key)) {
