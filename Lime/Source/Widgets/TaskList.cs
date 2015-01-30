@@ -46,11 +46,22 @@ namespace Lime
 			RemoveAll(match);
 		}
 
+		public void StopByTag(object tag)
+		{
+			Stop(t => t.Tag == tag);
+		}
+
 		public Task Add(IEnumerator<object> e, object tag = null)
 		{
 			var task = new Task(e, tag);
 			Add(task);
 			return task;
+		}
+
+		public Task Replace(IEnumerator<object> e, object tag)
+		{
+			StopByTag(tag);
+			return Add(e, tag);
 		}
 
 		private bool isBeingUpdated;
