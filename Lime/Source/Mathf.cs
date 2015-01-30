@@ -128,6 +128,18 @@ namespace Lime
 			return objects[RandomInt(objects.Length)];
 		}
 
+		public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source, Random rng = null)
+		{
+			if (rng == null)
+				rng = RandomGenerator;
+			var elements = source.ToArray();
+			for (int i = elements.Length; i > 0; i--) {
+				int j = rng.Next(i);
+				yield return elements[j];
+				elements[j] = elements[i - 1];
+			}
+		}
+
 		public static int RandomInt(int maxValue)
 		{
 			return RandomGenerator.Next(maxValue);
