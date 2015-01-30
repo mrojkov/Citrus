@@ -105,7 +105,7 @@ namespace Lime
 					char? charToAdd = null;
 					if (Numeric) {
 						float foo;
-						if ((c == '-' && Text == "") || float.TryParse(Text + c, out foo)) {
+						if (c != ' ' && ((c == '-' && Text == "") || float.TryParse(Text + c, out foo))) {
 							charToAdd = c;
 						}
 					} else {
