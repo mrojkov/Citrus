@@ -208,6 +208,7 @@ namespace Lime
 					GL.BlendFunc(sfactor, BlendingFactorDest.One);
 					break;
 				case Blending.Burn:
+				case Blending.Darken:
 					GL.BlendFunc(BlendingFactorSrc.DstColor, BlendingFactorDest.OneMinusSrcAlpha);
 					break;
 				case Blending.Modulate:

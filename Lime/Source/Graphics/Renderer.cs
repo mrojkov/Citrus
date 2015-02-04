@@ -24,6 +24,8 @@ namespace Lime
 		Modulate,
 		[ProtoEnum]
 		Burn,
+		[ProtoEnum]
+		Darken
 	}
 
 	public struct WindowRect
@@ -302,6 +304,11 @@ namespace Lime
 				DrawTriangleFan(texture1, texture2, vertices, numVertices);
 				Blending = Blending.Glow;
 			}
+			if (Blending == Blending.Darken) {
+				Blending = Blending.Alpha;
+				DrawTriangleFan(texture1, texture2, vertices, numVertices);
+				Blending = Blending.Darken;
+			}
 			var batch = DrawTrianglesHelper(texture1, texture2, vertices, numVertices);
 			var iptr = &batch.IndexBuffer.Indices[batch.IndexBuffer.IndexCount];
 			var baseVertex = batch.VertexBuffer.VertexCount;
@@ -320,6 +327,11 @@ namespace Lime
 				Blending = Blending.Alpha;
 				DrawTriangleStrip(texture1, texture2, vertices, numVertices);
 				Blending = Blending.Glow;
+			}
+			if (Blending == Blending.Darken) {
+				Blending = Blending.Alpha;
+				DrawTriangleStrip(texture1, texture2, vertices, numVertices);
+				Blending = Blending.Darken;
 			}
 			var batch = DrawTrianglesHelper(texture1, texture2, vertices, numVertices);
 			var iptr = &batch.IndexBuffer.Indices[batch.IndexBuffer.IndexCount];
@@ -364,6 +376,11 @@ namespace Lime
 				Blending = Blending.Alpha;
 				DrawSprite(texture, color, position, size, uv0, uv1);
 				Blending = Blending.Glow;
+			}
+			if (Blending == Blending.Darken) {
+				Blending = Blending.Alpha;
+				DrawSprite(texture, color, position, size, uv0, uv1);
+				Blending = Blending.Darken;
 			}
 			var batch = CurrentRenderList.RequestForBatch(texture, null, Blending, Shader, CustomShaderProgram, 4, 6);
 			if (Renderer.PremultipliedAlphaMode && color.A != 255) {
