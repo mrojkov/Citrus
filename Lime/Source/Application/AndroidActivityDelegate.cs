@@ -7,18 +7,75 @@ using Android.Views;
 using Android.Views.InputMethods;
 using Android.Widget;
 using Android.Content;
+using Android.Hardware;
 
 namespace Lime
 {
 	public class ActivityDelegate
 	{
+		#region SensorListener
+
+		/// <summary>
+		/// The sensor listener used for capture accelerometer data
+		/// </summary>
+		class AccelerometerListener : Java.Lang.Object, ISensorEventListener
+		{
+			private static AccelerometerListener listener = null;
+
+			public void OnAccuracyChanged(Sensor sensor, SensorStatus accuracy)
+			{
+
+			}
+
+			public void OnSensorChanged(SensorEvent e)
+			{
+#if DEBUG
+				if (e.Values.Count != 3) {
+					throw new Lime.Exception("Invalid accelerometer data");
+				}
+#endif
+				if (e.Values.Count == 3) { 
+					Lime.Input.Acceleration = new Lime.Vector3(e.Values[0], e.Values[1], e.Values[2]);
+				}
+
+				Console.WriteLine();
+			}
+
+			public void Dispose()
+			{
+			}
+
+			public static void StartListening()
+			{
+				if (listener == null) {
+					listener = new AccelerometerListener();
+					var activity = Lime.ActivityDelegate.Instance.Activity;
+					var sensorManager = (SensorManager)activity.GetSystemService(Context.SensorService);
+					sensorManager.RegisterListener(listener, sensorManager.GetDefaultSensor(SensorType.Accelerometer), SensorDelay.Ui);
+				}
+			}
+
+			public static void StopListening()
+			{
+				if (listener != null) {
+					var activity = Lime.ActivityDelegate.Instance.Activity;
+					var sensorManager = (SensorManager)activity.GetSystemService(Context.SensorService);
+					sensorManager.UnregisterListener(listener);
+					listener = null;
+				}
+			}
+		}
+
+		#endregion
+
 		public class BackButtonEventArgs
 		{
 			public bool Handled;
 		}
 
 		public delegate void BackButtonDelegate(BackButtonEventArgs args);
-		public delegate void ActivityResultDelegate(int requestCode, Result resultCode, Intent data);
+
+		public delegate void ActivityResultDelegate(int requestCode,Result resultCode,Intent data);
 
 		public static ActivityDelegate Instance { get; private set; }
 
@@ -52,6 +109,8 @@ namespace Lime
 			if (Started != null) {
 				Started(Activity);
 			}
+
+			AccelerometerListener.StartListening();
 		}
 
 		public virtual void OnResume()
@@ -59,6 +118,8 @@ namespace Lime
 			if (Resumed != null) {
 				Resumed(Activity);
 			}
+
+			AccelerometerListener.StartListening();
 		}
 
 		public virtual void OnPause()
@@ -66,6 +127,8 @@ namespace Lime
 			if (Paused != null) {
 				Paused(Activity);
 			}
+
+			AccelerometerListener.StopListening();
 		}
 
 		public virtual void OnStop()
@@ -73,6 +136,8 @@ namespace Lime
 			if (Stopped != null) {
 				Stopped(Activity);
 			}
+
+			AccelerometerListener.StopListening();           
 		}
 
 		public virtual void OnDestroy()
@@ -80,6 +145,8 @@ namespace Lime
 			if (Destroying != null) {
 				Destroying(Activity);
 			}
+
+			AccelerometerListener.StopListening();
 			Activity = null;
 		}
 
