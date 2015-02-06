@@ -239,6 +239,7 @@ namespace Lime
 
 		private IEnumerator<object> IntertialScrollingTask(float velocity)
 		{
+			var oldMask = Frame.HitTestMask;
 			Frame.HitTestMask = Widget.ControlsHitTestMask;
 			try {
 				while (true) {
@@ -258,7 +259,7 @@ namespace Lime
 				}
 				scrollingTask = null;
 			} finally {
-				Frame.HitTestMask = Widget.EmptyHitTestMask;
+				Frame.HitTestMask = oldMask;
 			}
 		}
 
