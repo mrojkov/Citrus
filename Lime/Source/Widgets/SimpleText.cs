@@ -77,6 +77,8 @@ namespace Lime
 			set { textColor = value; }
 		}
 
+		public bool TrimWhitespaces { get; set; }
+
 		private class CaretPosition: ICaretPosition
 		{
 			public enum ValidState { None, All, LinePos, WorldPos, TextPos };
@@ -176,6 +178,7 @@ namespace Lime
 
 		public SimpleText()
 		{
+			TrimWhitespaces = true;
 			// CachedRendering = true;
 			Text = "";
 			FontHeight = 15;
@@ -255,6 +258,9 @@ namespace Lime
 			rect = Rectangle.Empty;
 			var t = DisplayText ?? (LocalizationHandler != null ? LocalizationHandler(Text) : Text.Localize());
 			var lines = SplitText(t);
+			if (TrimWhitespaces) {
+				TrimLinesWhitespaces(lines);
+			}
 			var pos = Vector2.Down * CalcVerticalTextPosition(lines);
 			caret.RenderingLineNumber = 0;
 			caret.RenderingTextPos = 0;
@@ -295,6 +301,13 @@ namespace Lime
 				caret.WorldPos = caret.NearestCharPos;
 			}
 			caret.Valid = CaretPosition.ValidState.All;
+		}
+
+		private static void TrimLinesWhitespaces(List<string> lines)
+		{
+			for (int i = 0; i < lines.Count; i++) {
+				lines[i] = lines[i].Trim();
+			}
 		}
 
 		private float CalcVerticalTextPosition(List<string> lines)

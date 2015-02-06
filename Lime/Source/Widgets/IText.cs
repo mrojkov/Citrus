@@ -56,6 +56,7 @@ namespace Lime
 		VAlignment VAlignment { get; set; }
 		TextOverflowMode OverflowMode { get; set; }
 		bool WordSplitAllowed { get; set; }
+		bool TrimWhitespaces { get; set; }
 	}
 
 }

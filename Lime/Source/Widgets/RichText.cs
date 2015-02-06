@@ -49,6 +49,9 @@ namespace Lime
 		[ProtoMember(5)]
 		public bool WordSplitAllowed { get; set; }
 
+		// TODO
+		public bool TrimWhitespaces { get; set; }
+
 		public RichText()
 		{
 			// CachedRendering = true;

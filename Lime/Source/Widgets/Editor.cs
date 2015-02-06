@@ -120,6 +120,7 @@ namespace Lime
 			this.container = container;
 			this.textInputProcessor = (IKeyboardInputProcessor)container;
 			text = (IText)container;
+			text.TrimWhitespaces = false;
 			this.caretPos = caretPos;
 			this.editorParams = editorParams;
 			container.Tasks.Add(FocusTask());
