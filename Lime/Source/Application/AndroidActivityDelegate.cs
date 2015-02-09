@@ -85,6 +85,7 @@ namespace Lime
 		public event Action<Activity> Paused;
 		public event Action<Activity> Stopped;
 		public event Action<Activity> Destroying;
+		public event Action<TrimMemory> TrimmingMemory;
 		public event Action LowMemory;
 		public event BackButtonDelegate BackPressed;
 		public event ActivityResultDelegate ActivityResult;
@@ -154,6 +155,13 @@ namespace Lime
 		{
 			if (LowMemory != null) {
 				LowMemory();
+			}
+		}
+
+		public virtual void OnTrimMemory(TrimMemory level)
+		{
+			if (TrimmingMemory != null) {
+				TrimmingMemory(level);
 			}
 		}
 
@@ -244,6 +252,13 @@ namespace Lime
 			TexturePool.Instance.DiscardTexturesUnderPressure();
 			System.GC.Collect();
 			base.OnLowMemory();
+		}
+
+		public override void OnTrimMemory(TrimMemory level)
+		{
+			Logger.Write("Memory warning, texture memory: {0}mb", CommonTexture.TotalMemoryUsedMb);
+			System.GC.Collect();
+			base.OnTrimMemory(level);
 		}
 	}
 }
