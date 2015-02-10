@@ -13,37 +13,24 @@ namespace Lime
 {
 	public class ActivityDelegate
 	{
-		#region SensorListener
+		#region AccelerometerListener
 
 		/// <summary>
-		/// The sensor listener used for capture accelerometer data
+		/// The AccelerometerListener is used for capture accelerometer data
 		/// </summary>
 		class AccelerometerListener : Java.Lang.Object, ISensorEventListener
 		{
-			private static AccelerometerListener listener = null;
-
-			public void OnAccuracyChanged(Sensor sensor, SensorStatus accuracy)
-			{
-
-			}
+			private static AccelerometerListener listener;
 
 			public void OnSensorChanged(SensorEvent e)
 			{
-#if DEBUG
 				if (e.Values.Count != 3) {
 					throw new Lime.Exception("Invalid accelerometer data");
 				}
-#endif
-				if (e.Values.Count == 3) { 
-					Lime.Input.Acceleration = new Lime.Vector3(e.Values[0], e.Values[1], e.Values[2]);
-				}
-
-				Console.WriteLine();
+				Lime.Input.Acceleration = new Lime.Vector3(e.Values[0], e.Values[1], e.Values[2]);
 			}
 
-			public void Dispose()
-			{
-			}
+			public void Dispose() {}
 
 			public static void StartListening()
 			{
@@ -74,8 +61,7 @@ namespace Lime
 		}
 
 		public delegate void BackButtonDelegate(BackButtonEventArgs args);
-
-		public delegate void ActivityResultDelegate(int requestCode,Result resultCode,Intent data);
+		public delegate void ActivityResultDelegate(int requestCode, Result resultCode, Intent data);
 
 		public static ActivityDelegate Instance { get; private set; }
 
@@ -119,7 +105,6 @@ namespace Lime
 			if (Resumed != null) {
 				Resumed(Activity);
 			}
-
 			AccelerometerListener.StartListening();
 		}
 
@@ -128,7 +113,6 @@ namespace Lime
 			if (Paused != null) {
 				Paused(Activity);
 			}
-
 			AccelerometerListener.StopListening();
 		}
 
@@ -137,8 +121,7 @@ namespace Lime
 			if (Stopped != null) {
 				Stopped(Activity);
 			}
-
-			AccelerometerListener.StopListening();           
+			AccelerometerListener.StopListening();
 		}
 
 		public virtual void OnDestroy()
@@ -146,7 +129,6 @@ namespace Lime
 			if (Destroying != null) {
 				Destroying(Activity);
 			}
-
 			AccelerometerListener.StopListening();
 			Activity = null;
 		}
