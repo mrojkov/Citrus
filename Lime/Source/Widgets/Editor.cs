@@ -211,6 +211,12 @@ namespace Lime
 			}
 			if (CheckCursorKey(Key.Enter) && editorParams.IsAcceptableLines(text.Text.Count(ch => ch == '\n') + 2))
 				InsertChar('\n');
+#if WIN
+			if (container.Input.IsKeyPressed(Key.ControlLeft) && CheckCursorKey(Key.V)) {
+				foreach (var ch in System.Windows.Forms.Clipboard.GetText())
+					InsertChar(ch);
+			}
+#endif
 			prevKeyPressed = keyPressed;
 		}
 
