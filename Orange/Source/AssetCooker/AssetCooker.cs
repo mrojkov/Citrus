@@ -171,11 +171,16 @@ namespace Orange
 				if (path.EndsWith(alphaExt)) {
 					var origImageFile = path.Substring(0, path.Length - alphaExt.Length) + GetPlatformTextureExtension();
 					if (!assetsBundle.FileExists(origImageFile)) {
-						Console.WriteLine("- " + path);
-						assetsBundle.DeleteFile(path);
+						DeleteFileFromBundle(path);
 					}
 				}
 			}
+		}
+
+		private static void DeleteFileFromBundle(string path)
+		{
+			Console.WriteLine("- " + path);
+			assetsBundle.DeleteFile(path);
 		}
 
 		private static void DeleteOrphanedMasks()
@@ -184,8 +189,7 @@ namespace Orange
 				if (Path.GetExtension(maskPath) == ".mask") {
 					var origImageFile = Path.ChangeExtension(maskPath, GetPlatformTextureExtension());
 					if (!assetsBundle.FileExists(origImageFile)) {
-						Console.WriteLine("- " + maskPath);
-						assetsBundle.DeleteFile(maskPath);
+						DeleteFileFromBundle(maskPath);
 					}
 				}
 			}
@@ -307,8 +311,7 @@ namespace Orange
 				}
 				string assetPath = Path.ChangeExtension(path, GetOriginalAssetExtension(path));
 				if (!assetsFiles.Contains(assetPath)) {
-					Console.WriteLine("- " + path);
-					assetsBundle.DeleteFile(path);
+					DeleteFileFromBundle(path);
 				}
 			}
 		}
@@ -362,8 +365,11 @@ namespace Orange
 			for (int i = 0; i < MaxAtlasChainLength; i++) {
 				string atlasPath = GetAtlasPath(atlasChain, i);
 				if (assetsBundle.FileExists(atlasPath)) {
-					Console.WriteLine("- " + atlasPath);
-					assetsBundle.DeleteFile(atlasPath);
+					DeleteFileFromBundle(atlasPath);
+					var alphaPath = GetAlphaTexturePath(atlasPath);
+					if (assetsBundle.FileExists(alphaPath)) {
+						DeleteFileFromBundle(alphaPath);
+					}
 				} else {
 					break;
 				}
@@ -487,6 +493,8 @@ namespace Orange
 					return item1.PVRFormat == item2.PVRFormat;
 				case TargetPlatform.Desktop:
 					return item1.DDSFormat == item2.DDSFormat;
+				case TargetPlatform.Unity:
+					return true;
 				default:
 					throw new ArgumentException();
 			}
@@ -509,22 +517,17 @@ namespace Orange
 				// Delete non-atlased texture since now its useless
 				var texturePath = Path.ChangeExtension(item.Path, GetPlatformTextureExtension());
 				if (assetsBundle.FileExists(texturePath)) {
-					Console.WriteLine("- " + texturePath);
-					assetsBundle.DeleteFile(texturePath);
+					DeleteFileFromBundle(texturePath);
 				}
 			}
 			Console.WriteLine("+ " + atlasPath);
-			if (platform == TargetPlatform.Unity) {
-				throw new NotImplementedException();
-			} else {
-				var firstItem = items.First(i => i.Allocated);
-				var rules = new CookingRules() {
-					MipMaps = firstItem.MipMapped,
-					PVRFormat = firstItem.PVRFormat,
-					DDSFormat = firstItem.DDSFormat
-				};
-				ImportTexture(atlasPath, atlas, rules);
-			}
+			var firstItem = items.First(i => i.Allocated);
+			var rules = new CookingRules() {
+				MipMaps = firstItem.MipMapped,
+				PVRFormat = firstItem.PVRFormat,
+				DDSFormat = firstItem.DDSFormat
+			};
+			ImportTexture(atlasPath, atlas, rules);
 		}
 
 		private static void ImportTexture(string path, Gdk.Pixbuf texture, CookingRules rules)
@@ -579,16 +582,14 @@ namespace Orange
 					string atlasChain = Path.GetFileNameWithoutExtension(part.AtlasPath);
 					atlasChainsToRebuild.Add(atlasChain);
 					if (!textures.ContainsKey(srcTexturePath)) {
-						Console.WriteLine("- " + atlasPartPath);
-						assetsBundle.DeleteFile(atlasPartPath);
+						DeleteFileFromBundle(atlasPartPath);
 					} else {
 						srcTexturePath = Path.ChangeExtension(atlasPartPath, ".png");
 						if (cookingRulesMap[srcTexturePath].TextureAtlas != null) {
 							CookingRules rules = cookingRulesMap[srcTexturePath];
 							atlasChainsToRebuild.Add(rules.TextureAtlas);
 						} else {
-							Console.WriteLine("- " + atlasPartPath);
-							assetsBundle.DeleteFile(atlasPartPath);
+							DeleteFileFromBundle(atlasPartPath);
 						}
 					}
 				}

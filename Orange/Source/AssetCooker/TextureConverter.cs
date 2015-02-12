@@ -13,7 +13,8 @@ namespace Orange
 		{
 			switch (platform) {
 				case TargetPlatform.Unity:
-					throw new Lime.Exception("No need to convert textures for Unity platform!");
+					pixbuf.Save(dstPath, "png");
+					break;
 				case TargetPlatform.Android:
 					CookForAndroid(pixbuf, dstPath, cookingRules.PVRFormat, cookingRules.MipMaps);
 					break;

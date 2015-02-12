@@ -133,7 +133,7 @@ namespace Orange
 
 		public string GetUnityResourcesDirectory()
 		{
-			string path = Path.Combine(Path.GetDirectoryName(ProjectDirectory),
+			string path = Path.Combine(ProjectDirectory,
 				Path.GetFileName(ProjectDirectory) + ".Unity", "Assets", "Resources");
 			return path;
 		}
