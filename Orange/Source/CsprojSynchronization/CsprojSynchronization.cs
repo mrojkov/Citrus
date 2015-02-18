@@ -83,7 +83,7 @@ namespace Orange
 		{
 			foreach (var item in group.EnumerateElements("Compile")) {
 				var path = item.Attributes["Include"].Value;
-				if (!File.Exists(ToUnixSlashes(path))) {
+				if (!File.Exists(ToUnixSlashes(path)) || IsPathIgnored(path)) {
 					group.RemoveChild(item);
 					changed = true;
 					Console.WriteLine("Removed a missing file: " + path);
@@ -113,7 +113,7 @@ namespace Orange
 
 		private static bool IsItemShouldBeAdded(string filePath)
 		{
-			if (filePath.StartsWith("packages")) {
+			if (IsPathIgnored(filePath)) {
 				return false;
 			}
 			// Ignore .cs files related to sub-projects 
@@ -128,6 +128,11 @@ namespace Orange
 				}
 			}
 			return true;
+		}
+
+		private static bool IsPathIgnored(string filePath)
+		{
+			return filePath.StartsWith("packages") || filePath.StartsWith("obj");
 		}
 	}
 }
