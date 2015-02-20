@@ -1,3 +1,4 @@
+#if !UNITY
 using System;
 using System.IO;
 using Lemon;
@@ -12,7 +13,6 @@ using System.Runtime.InteropServices;
 
 namespace Lime
 {
-#if !UNITY
 	public class OggDecoder : IAudioDecoder
 	{
 		Stream stream;
@@ -204,5 +204,5 @@ namespace Lime
 			}
 		}
 	}
-#endif
 }
+#endif

@@ -69,6 +69,13 @@ namespace Lime
 			return atlasTexture.GetHandle();
 		}
 
+#if UNITY
+		public UnityEngine.Texture GetUnityTexture()
+		{
+			return atlasTexture.GetUnityTexture();
+		}
+#endif
+
 		public void SetAsRenderTarget()
 		{
 			throw new NotSupportedException();

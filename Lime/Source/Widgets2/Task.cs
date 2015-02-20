@@ -148,11 +148,15 @@ namespace Lime.Widgets2
 
 		public static IEnumerator<object> ExecuteAsync(Action action)
 		{
+#if UNITY
+			throw new NotImplementedException();
+#else
 			var t = new System.Threading.Tasks.Task(action);
 			t.Start();
 			while (!t.IsCompleted && !t.IsCanceled && !t.IsFaulted) {
 				yield return 0;
 			}
+#endif
 		}
 
 		public static void DumpProfile(System.IO.TextWriter writer)

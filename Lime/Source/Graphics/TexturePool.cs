@@ -1,22 +1,24 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 using System.IO;
+#if !UNITY
+using System.Collections.Concurrent;
+#endif
 
 namespace Lime
 {
 	public sealed class TexturePool
 	{
-		private readonly ConcurrentDictionary<string, WeakReference> textures;
-
+#if UNITY
+		private readonly Dictionary<string, WeakReference> textures = new Dictionary<string, WeakReference>();
+#else
+		private readonly ConcurrentDictionary<string, WeakReference> textures = new ConcurrentDictionary<string, WeakReference>();
+#endif
 		public readonly static TexturePool Instance = new TexturePool();
 
-		private TexturePool()
-		{
-			textures = new ConcurrentDictionary<string, WeakReference>();
-		}
+		private TexturePool() {}
 
 		[Obsolete("Use DiscardTexturesUnderPressure()")]
 		public void DiscardUnusedTextures(int numCycles)

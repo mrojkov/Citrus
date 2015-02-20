@@ -54,7 +54,7 @@ namespace Lime
 			using (var w = new StreamWriter(stream, new UTF8Encoding(true))) {
 				foreach (var p in dictionary) {
 					w.WriteLine('[' + Escape(p.Key) + ']');
-					if (!string.IsNullOrWhiteSpace(p.Value.Context)) {
+					if (!string.IsNullOrEmpty(p.Value.Context)) {
 						foreach (var i in p.Value.Context.Split('\n')) {
 							w.WriteLine("# " + i);
 						}

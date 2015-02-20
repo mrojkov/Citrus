@@ -84,7 +84,7 @@ namespace Lime
 					StartDrag();
 					draggingJustBegun = true;
 				}
-				else if (Options.HasFlag(SliderOptions.ClickOnRail) && IsMouseOver()) {
+				else if ((Options & SliderOptions.ClickOnRail) != 0 && IsMouseOver()) {
 					StartDrag();
 					dragInitialDelta = 0;
 					dragInitialOffset = (Value - RangeMin) / (RangeMax - RangeMin);

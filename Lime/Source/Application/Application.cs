@@ -77,9 +77,12 @@ namespace Lime
 			var culture = System.Globalization.CultureInfo.InvariantCulture;
 			System.Threading.Thread.CurrentThread.CurrentCulture = culture;
 			SetGlobalExceptionHandler();
+#if !UNITY
 			GameView.DidUpdated += RunScheduledActions;
+#endif
 		}
-		
+
+#if !UNITY
 		private void RunScheduledActions()
 		{
 			lock (scheduledActionsSync) {
@@ -89,6 +92,7 @@ namespace Lime
 				}
 			}
 		}
+#endif
 
 		private void SetGlobalExceptionHandler()
 		{
@@ -121,10 +125,14 @@ namespace Lime
 			if (IsMainThread) {
 				action();
 			} else {
+#if UNITY
+				throw new NotImplementedException();
+#else
 				// Now we use unified way on iOS and PC platform
 				lock (scheduledActionsSync) {
 					scheduledActions += action;
 				}
+#endif
 			}
 		}
 
@@ -318,6 +326,7 @@ namespace Lime
 			}
 		}
 
+#if !UNITY
 		public void OnGraphicsContextReset() 
 		{
 			GLObjectRegistry.Instance.DiscardObjects();
@@ -325,6 +334,7 @@ namespace Lime
 				GraphicsContextReset();
 			}
 		}
+#endif
 
 		public virtual void OnUpdateFrame(float delta) {}
 		public virtual void OnRenderFrame() {}

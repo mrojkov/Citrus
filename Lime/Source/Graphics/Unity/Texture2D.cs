@@ -32,10 +32,14 @@ namespace Lime
 			set { throw new NotSupportedException(); }
 		}
 
-		public Rectangle UVRect
+		public Rectangle AtlasUVRect
 		{
 			get { return new Rectangle(0, 0, 1, 1); }
 		}
+
+		public ITexture AlphaTexture { get; private set; }
+		
+		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv0, ref Vector2 uv1) { }
 
 		public Texture2D()
 		{
@@ -89,7 +93,12 @@ namespace Lime
 			Dispose();
 		}
 
-		public void Dispose()
+		public void Discard() {}
+		public void MaybeDiscardUnderPressure() {}
+
+		public int MemoryUsed { get { return 0; } }
+
+		public virtual void Dispose()
 		{
 			//UnityAssetsBundle.Instance.UnloadUnityAsset(unityTexture);
 		}

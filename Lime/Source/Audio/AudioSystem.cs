@@ -237,6 +237,7 @@ namespace Lime
 
 		private static Sound LoadSoundToChannel(ChannelSelector channelSelector, string path, bool looping, bool paused, float fadeinTime)
 		{
+#if OPENAL
 			if (context == null) {
 				return new Sound();
 			}
@@ -254,6 +255,9 @@ namespace Lime
 			channel.SamplePath = path;
 			channel.Play(sound, decoder, looping, paused, fadeinTime);
 			return sound;
+#else
+			return new Sound();
+#endif
 		}
 
 		static AudioChannel AllocateChannel(float priority, AudioFormat format)

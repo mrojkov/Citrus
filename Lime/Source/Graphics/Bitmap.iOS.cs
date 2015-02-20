@@ -35,7 +35,7 @@ namespace Lime
 		{
 			if (bitmap != null && bitmap.AsPNG() != null) {
 				using (var bitmapStream = bitmap.AsPNG().AsStream()) { 
-					Toolbox.CopyStream(bitmapStream, stream);
+					bitmapStream.CopyTo(stream);
 				}
 			}
 		}

@@ -7,6 +7,18 @@ namespace Lime
 {
 	public static class Toolbox
 	{
+#if UNITY
+		public static void CopyTo(this Stream source, Stream destination)
+		{
+			var bufferSize = 32768;
+			byte[] buffer = new byte[bufferSize];
+			int read;
+			while ((read = source.Read(buffer, 0, buffer.Length)) > 0) {
+				destination.Write(buffer, 0, read);
+			}
+		}
+#endif
+
 		public static void Swap<T>(ref T lhs, ref T rhs)
 		{
 			T temp;
@@ -31,16 +43,5 @@ namespace Lime
 				return hash;
 			}
 		}
-
-		public static void CopyStream(Stream input, Stream output)
-		{
-			var bufferSize = 32768;
-			byte[] buffer = new byte[bufferSize];
-			int read;
-			while ((read = input.Read(buffer, 0, buffer.Length)) > 0) {
-				output.Write(buffer, 0, read);
-			}
-		}
-
 	}
 }

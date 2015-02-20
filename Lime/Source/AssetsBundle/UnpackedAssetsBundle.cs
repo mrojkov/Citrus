@@ -22,7 +22,7 @@ namespace Lime
 
 		public override DateTime GetFileLastWriteTime(string path)
 		{
-#if UNITY_WEBPLAYER
+#if UNITY
 			throw new NotImplementedException();
 #else
 			return File.GetLastWriteTime(Path.Combine(BaseDirectory, path));
@@ -41,7 +41,7 @@ namespace Lime
 
 		public override void ImportFile(string path, Stream stream, int reserve, AssetAttributes attributes)
 		{
-#if UNITY_WEBPLAYER
+#if UNITY
 			throw new NotImplementedException();
 #else
 			stream.Seek(0, SeekOrigin.Begin);
@@ -55,12 +55,16 @@ namespace Lime
 
 		public override IEnumerable<string> EnumerateFiles()
 		{
+#if UNITY
+			throw new NotImplementedException();
+#else
 			var baseDir = new Uri(BaseDirectory + "/");
 			foreach (var i in Directory.EnumerateFiles(BaseDirectory, "*.*", SearchOption.AllDirectories)) {
 				var relativePath = baseDir.MakeRelativeUri(new Uri(i)).ToString();
 				relativePath = Uri.UnescapeDataString(relativePath);
 				yield return relativePath;
 			}
+#endif
 		}
 	}
 }

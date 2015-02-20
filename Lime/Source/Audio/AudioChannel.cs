@@ -52,11 +52,13 @@ namespace Lime
 		public AudioChannelGroup Group;
 		public float Priority;
 		public DateTime StartupTime = DateTime.Now;
+		public AudioFormat AudioFormat { get; private set; }
 		public int Id;
 
-		public AudioChannel(int index)
+		public AudioChannel(int index, AudioFormat format)
 		{
 			Id = index;
+			AudioFormat = format;
 		}
 
 		public void Update(float delta)

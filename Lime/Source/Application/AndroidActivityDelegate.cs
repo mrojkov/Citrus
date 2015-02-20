@@ -22,6 +22,8 @@ namespace Lime
 		{
 			private static AccelerometerListener listener;
 
+			public void OnAccuracyChanged (Sensor sensor, SensorStatus accuracy) { }
+
 			public void OnSensorChanged(SensorEvent e)
 			{
 				if (e.Values.Count != 3) {
@@ -29,8 +31,6 @@ namespace Lime
 				}
 				Lime.Input.Acceleration = new Lime.Vector3(e.Values[0], e.Values[1], e.Values[2]);
 			}
-
-			public void Dispose() {}
 
 			public static void StartListening()
 			{

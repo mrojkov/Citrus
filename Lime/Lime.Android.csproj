@@ -77,8 +77,6 @@
     <Compile Include="Source\Audio\WaveIMA4Decoder.cs" />
     <Compile Include="Source\Graphics\OpenGL\IndexBuffer.cs" />
     <Compile Include="Source\Graphics\OpenGL\PlatformRenderer.cs" />
-    <Compile Include="Source\Graphics\OpenGL\RenderBatch.cs" />
-    <Compile Include="Source\Graphics\OpenGL\RenderList.cs" />
     <Compile Include="Source\Graphics\OpenGL\RenderTexture.cs" />
     <Compile Include="Source\Graphics\OpenGL\Shader.cs" />
     <Compile Include="Source\Graphics\OpenGL\ShaderProgram.cs" />
@@ -90,7 +88,8 @@
     <Compile Include="Source\Graphics\OpenGL\VertexBuffer.cs" />
     <Compile Include="Source\Graphics\OpenGL\XamarinAdapter.cs" />
     <Compile Include="Source\Graphics\Unity\MaterialFactory.cs" />
-    <Compile Include="Source\Graphics\Unity\Renderer.cs" />
+    <Compile Include="Source\Graphics\Unity\PlatformMesh.cs" />
+    <Compile Include="Source\Graphics\Unity\PlatformRenderer.cs" />
     <Compile Include="Source\Graphics\Unity\RenderTexture.cs" />
     <Compile Include="Source\Graphics\Unity\Texture2D.cs" />
     <Compile Include="Source\Graphics\Bitmap.cs" />
@@ -271,6 +270,11 @@
     <Compile Include="Source\Graphics\TextureAtlasElement.cs" />
     <Compile Include="Source\Graphics\OpenGL\IGLObject.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
+    <Compile Include="Source\Graphics\Bitmap.Mac.cs" />
+    <Compile Include="Source\Graphics\Mesh.cs" />
+    <Compile Include="Source\Graphics\RenderBatch.cs" />
+    <Compile Include="Source\Graphics\RenderList.cs" />
+    <Compile Include="Source\Graphics\OpenGL\PlatformMesh.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">
@@ -278,8 +282,5 @@
       <Name>Lemon.Android</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Source\Widgets\PopupMenu\" />
-    <Folder Include="Resources\" />
-  </ItemGroup>
+  <ItemGroup />
 </Project>

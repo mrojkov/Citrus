@@ -55,10 +55,6 @@ namespace Lime
 		public GameView(Context context)
 			: base(context)
 		{
-			if (AllowOnscreenKeyboard) {
-				Focusable = true;
-				FocusableInTouchMode = true;
-			}
 			Instance = this;
 			for (int i = 0; i < Input.MaxTouches; i++) {
 				pointerIds[i] = -1;
@@ -86,8 +82,13 @@ namespace Lime
 		{
 			if (AllowOnscreenKeyboard) {
 				if (show) {
+					Focusable = true;
+					FocusableInTouchMode = true;
+					this.RequestFocus();
 					imm.ShowSoftInput(this, ShowFlags.Forced);
 				} else if (!show) {
+					Focusable = false;
+					FocusableInTouchMode = false;
 					imm.HideSoftInputFromWindow(WindowToken, 0);
 				}
 				isOnscreenKeyboardVisible = show;

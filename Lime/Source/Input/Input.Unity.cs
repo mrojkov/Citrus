@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Lime
 {
-	public static class DirectInput
+	public static class Input
 	{
 		struct KeyEvent
 		{
@@ -74,19 +74,19 @@ namespace Lime
 			return currentKeysState[(int)key] && !previousKeysState[(int)key];
 		}
 
-		public static bool WasMousePressed()
+		public static bool WasMousePressed(int button = 0)
 		{
-			return WasKeyPressed(Key.Mouse0);
+			return WasKeyPressed((Key)((int)Key.Mouse0 + button));
 		}
 
-		public static bool WasMouseReleased()
+		public static bool WasMouseReleased(int button = 0)
 		{
-			return WasKeyReleased(Key.Mouse0);
+			return WasKeyReleased((Key)((int)Key.Mouse0 + button));
 		}
 
-		public static bool IsMousePressed()
+		public static bool IsMousePressed(int button = 0)
 		{
-			return IsKeyPressed(Key.Mouse0);
+			return IsKeyPressed((Key)((int)Key.Mouse0 + button));
 		}
 
 		/// <summary>

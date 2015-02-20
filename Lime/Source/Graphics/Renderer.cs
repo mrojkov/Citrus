@@ -28,6 +28,23 @@ namespace Lime
 		Darken
 	}
 
+	[ProtoContract]
+	public enum ShaderId
+	{
+		[ProtoEnum]
+		None,
+		[ProtoEnum]
+		Inherited,
+		[ProtoEnum]
+		Diffuse,
+		[ProtoEnum]
+		Silhuette,
+		[ProtoEnum]
+		InversedSilhuette,
+		[ProtoEnum]
+		Custom,
+	}
+
 	public struct WindowRect
 	{
 		public int X;
@@ -41,7 +58,15 @@ namespace Lime
 		}
 	}
 
-	public static unsafe class Renderer
+	public struct Vertex
+	{
+		public Vector2 Pos;
+		public Color4 Color;
+		public Vector2 UV1;
+		public Vector2 UV2;
+	}
+
+	public static class Renderer
 	{
 		private static Matrix32 transform2 = Matrix32.Identity;
 		private static Stack<Matrix44> projectionStack;
@@ -75,10 +100,13 @@ namespace Lime
 		public static Matrix44 Projection
 		{
 			get { return projectionStack.Peek(); }
-			set 
+			set
 			{
 				projectionStack.Pop();
 				projectionStack.Push(value);
+#if UNITY
+				// PlatformRenderer.SetProjectionMatrix(value);
+#endif
 				PlatformRenderer.ResetShader();
 			}
 		}
@@ -135,6 +163,9 @@ namespace Lime
 
 		public static void SetOrthogonalProjection(float left, float top, float right, float bottom)
 		{
+#if UNITY
+			PlatformRenderer.SetOrthogonalProjection(left, top, right, bottom);
+#endif
 			Projection = Matrix44.CreateOrthographicOffCenter(left, right, bottom, top, 0, 1);
 		}
 
@@ -310,15 +341,17 @@ namespace Lime
 				Blending = Blending.Darken;
 			}
 			var batch = DrawTrianglesHelper(texture1, texture2, vertices, numVertices);
-			var iptr = &batch.IndexBuffer.Indices[batch.IndexBuffer.IndexCount];
-			var baseVertex = batch.VertexBuffer.VertexCount;
+			var baseVertex = batch.LastVertex;
+			int j = batch.LastIndex;
+			var indices = batch.Mesh.Indices;
 			for (int i = 1; i <= numVertices - 2; i++) {
-				*iptr++ = (ushort)baseVertex;
-				*iptr++ = (ushort)(baseVertex + i);
-				*iptr++ = (ushort)(baseVertex + i + 1);
-				batch.IndexBuffer.IndexCount += 3;
+				indices[j++] = baseVertex;
+				indices[j++] = baseVertex + i;
+				indices[j++] = baseVertex + i + 1;
+				batch.LastIndex += 3;
 			}
-			batch.VertexBuffer.VertexCount += numVertices;
+			batch.Mesh.IndicesDirty = true;
+			batch.LastVertex += numVertices;
 		}
 
 		public static void DrawTriangleStrip(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
@@ -334,38 +367,41 @@ namespace Lime
 				Blending = Blending.Darken;
 			}
 			var batch = DrawTrianglesHelper(texture1, texture2, vertices, numVertices);
-			var iptr = &batch.IndexBuffer.Indices[batch.IndexBuffer.IndexCount];
-			var vertex = batch.VertexBuffer.VertexCount;
+			var vertex = batch.LastVertex;
+			int j = batch.LastIndex;
+			var indices = batch.Mesh.Indices;
 			for (int i = 0; i < numVertices - 2; i++) {
-				*iptr++ = (ushort)vertex;
-				*iptr++ = (ushort)(vertex + 1);
-				*iptr++ = (ushort)(vertex + 2);
+				indices[j++] = vertex;
+				indices[j++] = vertex + 1;
+				indices[j++] = vertex + 2;
 				vertex++;
-				batch.IndexBuffer.IndexCount += 3;
+				batch.LastIndex += 3;
 			}
-			batch.VertexBuffer.VertexCount += numVertices;
+			batch.Mesh.IndicesDirty = true;
+			batch.LastVertex += numVertices;
 		}
 
 		private static RenderBatch DrawTrianglesHelper(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
 		{
-			var batch = CurrentRenderList.RequestForBatch(texture1, texture2, Blending, Shader, CustomShaderProgram, numVertices, (numVertices - 2) * 3);
+			var batch = CurrentRenderList.GetBatch(texture1, texture2, Blending, Shader, CustomShaderProgram, numVertices, (numVertices - 2) * 3);
 			Rectangle uvRect1 = (texture1 != null) ? texture1.AtlasUVRect : new Rectangle();
 			Rectangle uvRect2 = (texture2 != null) ? texture2.AtlasUVRect : new Rectangle();
 			var transform = GetEffectiveTransform();
-			var buffer = batch.VertexBuffer;
-			buffer.SpritesOnly = false;
-			var vptr = &buffer.Vertices[buffer.VertexCount];
+			var mesh = batch.Mesh;
+			mesh.DirtyAttributes |= Mesh.Attributes.VertexColorUV12 | (texture2 != null ? Mesh.Attributes.UV2 : Mesh.Attributes.None);
+			int j = batch.LastVertex;
 			for (int i = 0; i < numVertices; i++) {
-				Vertex v = vertices[i];
+				var v = vertices[i];
 				if (PremultipliedAlphaMode && v.Color.A != 255) {
 					v.Color = Color4.PremulAlpha(v.Color);
 				}
-				v.Pos = transform * v.Pos;
-				v.UV1 = uvRect1.A + uvRect1.Size * v.UV1;
+				mesh.Colors[j] = v.Color;
+				mesh.Vertices[j] = transform * v.Pos;
+				mesh.UV1[j] = uvRect1.A + uvRect1.Size * v.UV1;
 				if (texture2 != null) {
-					v.UV2 = uvRect2.A + uvRect2.Size * v.UV2;
+					mesh.UV2[j] = uvRect2.A + uvRect2.Size * v.UV2;
 				}
-				*vptr++ = v;
+				j++;
 			}
 			return batch;
 		}
@@ -382,22 +418,27 @@ namespace Lime
 				DrawSprite(texture, color, position, size, uv0, uv1);
 				Blending = Blending.Darken;
 			}
-			var batch = CurrentRenderList.RequestForBatch(texture, null, Blending, Shader, CustomShaderProgram, 4, 6);
+			var batch = CurrentRenderList.GetBatch(texture, null, Blending, Shader, CustomShaderProgram, 4, 6);
 			if (Renderer.PremultipliedAlphaMode && color.A != 255) {
 				color = Color4.PremulAlpha(color);
 			}
 			if (texture != null) {
 				texture.TransformUVCoordinatesToAtlasSpace(ref uv0, ref uv1);
 			}
-			var buffer = batch.VertexBuffer;
-			int i = buffer.VertexCount;
-			Int32* ip = (Int32*)&batch.IndexBuffer.Indices[batch.IndexBuffer.IndexCount];
-			Vertex* vp = &buffer.Vertices[i];
-			batch.IndexBuffer.IndexCount += 6;
-			buffer.VertexCount += 4;
-			*ip++ = (i << 16) | (i + 1);
-			*ip++ = ((i + 2) << 16) | (i + 2);
-			*ip++ = ((i + 1) << 16) | (i + 3);
+			var mesh = batch.Mesh;
+			mesh.DirtyAttributes |= Mesh.Attributes.VertexColorUV12;
+			mesh.IndicesDirty = true;
+			int bv = batch.LastVertex;
+			int bi = batch.LastIndex;
+			batch.LastIndex += 6;
+			batch.LastVertex += 4;
+			var indices = mesh.Indices;
+			indices[bi++] = bv + 1;
+			indices[bi++] = bv;
+			indices[bi++] = bv + 2;
+			indices[bi++] = bv + 2;
+			indices[bi++] = bv + 3;
+			indices[bi++] = bv + 1;
 			float x0 = position.X;
 			float y0 = position.Y;
 			float x1 = position.X + size.X;
@@ -411,27 +452,21 @@ namespace Lime
 			float x1uy = x1 * matrix.U.Y;
 			float y1vx = y1 * matrix.V.X;
 			float y1vy = y1 * matrix.V.Y;
-			vp->Pos.X = x0ux + y0vx + matrix.T.X;
-			vp->Pos.Y = x0uy + y0vy + matrix.T.Y;
-			vp->Color = color;
-			vp->UV1 = uv0;
-			vp++;
-			vp->Pos.X = x1ux + y0vx + matrix.T.X;
-			vp->Pos.Y = x1uy + y0vy + matrix.T.Y;
-			vp->Color = color;
-			vp->UV1.X = uv1.X;
-			vp->UV1.Y = uv0.Y;
-			vp++;
-			vp->Pos.X = x0ux + y1vx + matrix.T.X;
-			vp->Pos.Y = x0uy + y1vy + matrix.T.Y;
-			vp->Color = color;
-			vp->UV1.X = uv0.X;
-			vp->UV1.Y = uv1.Y;
-			vp++;
-			vp->Pos.X = x1ux + y1vx + matrix.T.X;
-			vp->Pos.Y = x1uy + y1vy + matrix.T.Y;
-			vp->Color = color;
-			vp->UV1 = uv1;
+			var v = mesh.Vertices;
+			v[bv + 0] = new Vector2() { X = x0ux + y0vx + matrix.T.X, Y = x0uy + y0vy + matrix.T.Y };
+			v[bv + 1] = new Vector2() { X = x1ux + y0vx + matrix.T.X, Y = x1uy + y0vy + matrix.T.Y };
+			v[bv + 2] = new Vector2() { X = x0ux + y1vx + matrix.T.X, Y = x0uy + y1vy + matrix.T.Y };
+			v[bv + 3] = new Vector2() { X = x1ux + y1vx + matrix.T.X, Y = x1uy + y1vy + matrix.T.Y };
+			var c = mesh.Colors;
+			c[bv + 0] = color;
+			c[bv + 1] = color;
+			c[bv + 2] = color;
+			c[bv + 3] = color;
+			var uv = mesh.UV1;
+			uv[bv + 0] = uv0;
+			uv[bv + 1] = new Vector2() { X = uv1.X, Y = uv0.Y };
+			uv[bv + 2] = new Vector2() { X = uv0.X, Y = uv1.Y };
+			uv[bv + 3] = uv1;
 		}
 
 		private static Matrix32 GetEffectiveTransform()

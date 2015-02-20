@@ -34,7 +34,7 @@ namespace Lime
 			get { return size; }
 		}		
 		
-		public Rectangle UVRect {
+		public Rectangle AtlasUVRect {
 			get { return uvRect; }
 		}
 
@@ -70,18 +70,25 @@ namespace Lime
 
 		public void SetAsRenderTarget()
 		{
-			Renderer.FlushSpriteBatch();
 		}
 
 		public void RestoreRenderTarget()
 		{
-			Renderer.FlushSpriteBatch();
 		}
 
 		public bool IsTransparentPixel(int x, int y)
 		{
 			return false;
 		}
+
+		public ITexture AlphaTexture { get; private set; }
+		
+		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv0, ref Vector2 uv1) { }
+
+		public void Discard() {}
+		public void MaybeDiscardUnderPressure() {}
+		
+		public int MemoryUsed { get { return 0; } }
 	}
 }
 #endif

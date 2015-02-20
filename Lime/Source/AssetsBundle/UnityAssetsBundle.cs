@@ -76,12 +76,12 @@ namespace Lime
 			return fileList.Contains(path);
 		}
 
-		public override void ImportFile(string path, Stream stream, int reserve, bool compress)
+		public override void ImportFile(string path, Stream stream, int reserve, AssetAttributes attributes)
 		{
 			throw new NotImplementedException();
 		}
-
-		public override string[] EnumerateFiles()
+		
+		public override IEnumerable<string> EnumerateFiles()
 		{
 			return fileList.ToArray();
 		}

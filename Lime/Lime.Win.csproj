@@ -59,6 +59,8 @@
     <Compile Include="Source\Application\WinApi.cs" />
     <Compile Include="Source\AssetsBundle\UnityAssetsBundle.cs" />
     <Compile Include="Source\Graphics\OpenGL\IGLObject.cs" />
+    <Compile Include="Source\Graphics\Mesh.cs" />
+    <Compile Include="Source\Graphics\OpenGL\PlatformMesh.cs" />
     <Compile Include="Source\Widgets2\Animation\Animation.cs" />
     <Compile Include="Source\Widgets2\Animation\AnimationUtils.cs">
       <SubType>Code</SubType>
@@ -156,8 +158,8 @@
     </Compile>
     <Compile Include="Source\Widgets2\World.cs" />
     <Compile Include="Source\Widgets\Editor.cs" />
-    <Compile Include="Source\Graphics\OpenGL\RenderBatch.cs" />
-    <Compile Include="Source\Graphics\OpenGL\RenderList.cs" />
+    <Compile Include="Source\Graphics\RenderBatch.cs" />
+    <Compile Include="Source\Graphics\RenderList.cs" />
     <Compile Include="Source\Graphics\OpenGL\IndexBuffer.cs" />
     <Compile Include="Source\Graphics\OpenGL\VertexBuffer.cs" />
     <Compile Include="Source\Graphics\OpenGL\XamarinAdapter.cs" />

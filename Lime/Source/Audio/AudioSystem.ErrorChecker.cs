@@ -17,8 +17,10 @@ namespace Lime
 			{
 				this.comment = comment;
 				this.throwException = throwException;
+#if OPENAL
 				// Clear current error
 				AL.GetError();
+#endif
 			}
 
 			void IDisposable.Dispose()

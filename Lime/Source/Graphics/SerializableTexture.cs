@@ -122,7 +122,7 @@ namespace Lime
 #if UNITY
 		public UnityEngine.Texture GetUnityTexture()
 		{
-			return core.GetInstance().GetUnityTexture();
+			return texture.GetUnityTexture();
 		}
 #endif
 

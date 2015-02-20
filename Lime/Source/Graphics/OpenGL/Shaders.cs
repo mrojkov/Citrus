@@ -1,3 +1,4 @@
+#if OPENGL
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,23 +7,6 @@ using ProtoBuf;
 
 namespace Lime
 {
-	[ProtoContract]
-	public enum ShaderId
-	{
-		[ProtoEnum]
-		None,
-		[ProtoEnum]
-		Inherited,
-		[ProtoEnum]
-		Diffuse,
-		[ProtoEnum]
-		Silhuette,
-		[ProtoEnum]
-		InversedSilhuette,
-		[ProtoEnum]
-		Custom,
-	}
-
 	public class ShaderPrograms
 	{
 		public static ShaderPrograms Instance = new ShaderPrograms();
@@ -192,7 +176,7 @@ namespace Lime
 		{
 			var p = new ShaderProgram(
 				new Shader[] { vertexShader, fragmentShader }, 
-				VertexBuffer.Attributes.GetLocations(),
+				PlatformMesh.Attributes.GetLocations(),
 				GetSamplers()
 			);
 			return p;
@@ -209,3 +193,4 @@ namespace Lime
 		}
 	}
 }
+#endif

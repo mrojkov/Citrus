@@ -1,3 +1,4 @@
+#if OPENGL
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -46,3 +47,4 @@ namespace Lime
 		}
 	}
 }
+#endif

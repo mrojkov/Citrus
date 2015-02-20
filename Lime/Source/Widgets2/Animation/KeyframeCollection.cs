@@ -21,6 +21,11 @@ namespace Lime.Widgets2
 			this.source = source;
 		}
 
+		public void Add(IKeyframe item)
+		{
+			source.Add((Keyframe<T>)item);
+		}
+
 		public void Add(int frame, object value, KeyFunction function = KeyFunction.Linear)
 		{
 			Add(new Keyframe<T> {
@@ -28,11 +33,6 @@ namespace Lime.Widgets2
 				Value = (T)value,
 				Function = function
 			});
-		}
-
-		public void Add(IKeyframe item)
-		{
-			source.Add((Keyframe<T>)item);
 		}
 
 		public IKeyframe CreateKeyframe()

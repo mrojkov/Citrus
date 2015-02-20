@@ -23,8 +23,6 @@ namespace Lime
 		public static uint DefaultFramebuffer { get; private set; }
 		private static Blending blending;
 		private static ShaderProgram shaderProgram;
-		private static uint indexBuffer;
-		private static uint vertexBuffer;
 		private static bool premultipliedAlphaMode;
 		// First texture pair is used for creation mask effect, second pair - for representing ETC1 alpha channel
 		private static readonly uint[] textures = new uint[4];
@@ -90,7 +88,6 @@ namespace Lime
 			blending = Blending.None;
 			premultipliedAlphaMode = false;
 			shaderProgram = null;
-			indexBuffer = vertexBuffer = 0;
 			SetBlending(Blending.Inherited);
 			SetShader(ShaderId.Diffuse, null);
 			ClearRenderTarget(0, 0, 0, 0);
@@ -222,22 +219,6 @@ namespace Lime
 		{
 			CurrentFramebuffer = framebuffer;
 			GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer);
-		}
-
-		public static void BindIndexBuffer(uint handle)
-		{
-			if (indexBuffer != handle) {
-				indexBuffer = handle;
-				GL.BindBuffer(BufferTarget.ElementArrayBuffer, handle);
-			}
-		}
-
-		public static void BindVertexBuffer(uint handle)
-		{
-			if (vertexBuffer != handle) {
-				vertexBuffer = handle;
-				GL.BindBuffer(BufferTarget.ArrayBuffer, handle);
-			}
 		}
 	}
 }
