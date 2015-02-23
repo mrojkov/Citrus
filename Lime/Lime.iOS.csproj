@@ -12,6 +12,8 @@
     <newfilesearch>OnLoad</newfilesearch>
     <TargetFrameworkIdentifier>Xamarin.iOS</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v1.0</TargetFrameworkVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
@@ -128,7 +130,6 @@
     <Compile Include="Source\Graphics\OpenGL\Texture2D.cs" />
     <Compile Include="Source\Graphics\Unity\MaterialFactory.cs" />
     <Compile Include="Source\Graphics\Unity\RenderTexture.cs" />
-    <Compile Include="Source\Graphics\Unity\Renderer.cs" />
     <Compile Include="Source\Graphics\Unity\Texture2D.cs" />
     <Compile Include="Source\Input\Input.Native.cs" />
     <Compile Include="Source\Input\Input.Unity.cs" />
@@ -177,8 +178,6 @@
     <Compile Include="Source\Graphics\SpriteList.cs" />
     <Compile Include="Source\Graphics\OpenGL\IndexBuffer.cs" />
     <Compile Include="Source\Graphics\OpenGL\PlatformRenderer.cs" />
-    <Compile Include="Source\Graphics\OpenGL\RenderBatch.cs" />
-    <Compile Include="Source\Graphics\OpenGL\RenderList.cs" />
     <Compile Include="Source\Graphics\OpenGL\VertexBuffer.cs" />
     <Compile Include="Source\Widgets\WidgetCachedRenderer.cs" />
     <Compile Include="Source\Widgets\WebBrowser.Mac.cs" />
@@ -270,6 +269,13 @@
     <Compile Include="Source\Application\AndroidActivityDelegate.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Source\Graphics\Bitmap.Mac.cs" />
+    <Compile Include="Source\Graphics\Bitmap.Unity.cs" />
+    <Compile Include="Source\Graphics\Mesh.cs" />
+    <Compile Include="Source\Graphics\RenderBatch.cs" />
+    <Compile Include="Source\Graphics\RenderList.cs" />
+    <Compile Include="Source\Graphics\OpenGL\PlatformMesh.cs" />
+    <Compile Include="Source\Graphics\Unity\PlatformMesh.cs" />
+    <Compile Include="Source\Graphics\Unity\PlatformRenderer.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
