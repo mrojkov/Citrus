@@ -105,7 +105,7 @@ namespace Lime
 				projectionStack.Pop();
 				projectionStack.Push(value);
 #if UNITY
-				// PlatformRenderer.SetProjectionMatrix(value);
+				PlatformRenderer.SetProjectionMatrix(value);
 #endif
 				PlatformRenderer.ResetShader();
 			}
@@ -163,10 +163,7 @@ namespace Lime
 
 		public static void SetOrthogonalProjection(float left, float top, float right, float bottom)
 		{
-#if UNITY
-			PlatformRenderer.SetOrthogonalProjection(left, top, right, bottom);
-#endif
-			Projection = Matrix44.CreateOrthographicOffCenter(left, right, bottom, top, 0, 1);
+			Projection = Matrix44.CreateOrthographicOffCenter(left, right, bottom, top, -50, 50);
 		}
 
 		public static void PushProjectionMatrix()

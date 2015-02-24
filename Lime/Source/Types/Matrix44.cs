@@ -926,39 +926,21 @@ namespace Lime
 		{
 			var r = new UnityEngine.Matrix4x4();
 			r.m00 = m.M11;
-			r.m10 = m.M12;
-			r.m20 = m.M13;
-			r.m30 = m.M14;
 			r.m01 = m.M21;
-			r.m11 = m.M22;
-			r.m21 = m.M23;
-			r.m31 = m.M24;
 			r.m02 = m.M31;
-			r.m12 = m.M32;
-			r.m22 = m.M33;
-			r.m32 = m.M34;
 			r.m03 = m.M41;
+			r.m10 = m.M12;
+			r.m11 = m.M22;
+			r.m12 = m.M32;
 			r.m13 = m.M42;
+			r.m20 = m.M13;
+			r.m21 = m.M23;
+			r.m22 = m.M33;
 			r.m23 = m.M43;
+			r.m30 = m.M14;
+			r.m31 = m.M24;
+			r.m32 = m.M34;
 			r.m33 = m.M44;
-
-//			r.m00 = m.M11;
-//			r.m01 = m.M12;
-//			r.m02 = m.M13;
-//			r.m03 = m.M14;
-//			r.m10 = m.M21;
-//			r.m11 = m.M22;
-//			r.m12 = m.M23;
-//			r.m13 = m.M24;
-//			r.m20 = m.M31;
-//			r.m21 = m.M32;
-//			r.m22 = m.M33;
-//			r.m23 = m.M34;
-//			r.m30 = m.M41;
-//			r.m31 = m.M42;
-//			r.m32 = m.M43;
-//			r.m33 = m.M44;
-//
 			return r;
 		}
 #endif

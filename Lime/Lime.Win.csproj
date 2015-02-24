@@ -176,7 +176,6 @@
     <Compile Include="Source\Graphics\SpriteList.cs" />
     <Compile Include="Source\Graphics\TexturePool.cs" />
     <Compile Include="Source\Graphics\Unity\MaterialFactory.cs" />
-    <Compile Include="Source\Graphics\Unity\Renderer.cs" />
     <Compile Include="Source\Graphics\Unity\RenderTexture.cs" />
     <Compile Include="Source\Graphics\Unity\Texture2D.cs" />
     <Compile Include="Source\Input\Input.Native.cs" />
