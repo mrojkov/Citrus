@@ -56,8 +56,9 @@ namespace Lime
 		{
 			UploadVertices();
 			UploadIndices();
-			int offset = startIndex * sizeof(int);
-			GL.DrawElements(PrimitiveType.Triangles, count, DrawElementsType.UnsignedInt, (IntPtr)offset);
+			int offset = startIndex * sizeof(short);
+			GL.DrawElements(PrimitiveType.Triangles, count, DrawElementsType.UnsignedShort, (IntPtr)offset);
+			PlatformRenderer.CheckErrors();
 		}
 
 		private void UploadIndices()

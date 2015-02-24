@@ -31,7 +31,7 @@ namespace Lime
 		public Vector2[] UV2;
 		public Vector2[] UV3;
 		public Vector2[] UV4;
-		public int[] Indices;
+		public ushort[] Indices;
 
 		public Attributes DirtyAttributes;
 		public bool IndicesDirty;

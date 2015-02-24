@@ -42,7 +42,7 @@ namespace Lime
 			iboHandle = (uint)t[0];
 		}
 
-		public void Bind(int[] indices, bool forceUpload)
+		public void Bind(ushort[] indices, bool forceUpload)
 		{
 			if (iboHandle == 0) {
 				forceUpload = true;
@@ -50,7 +50,7 @@ namespace Lime
 			}
 			GL.BindBuffer(BufferTarget.ElementArrayBuffer, iboHandle);
 			if (forceUpload) {
-				GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(int) * indices.Length), indices, BufferUsageHint.DynamicDraw);
+				GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(short) * indices.Length), indices, BufferUsageHint.DynamicDraw);
 			}
 		}
 

@@ -342,9 +342,9 @@ namespace Lime
 			int j = batch.LastIndex;
 			var indices = batch.Mesh.Indices;
 			for (int i = 1; i <= numVertices - 2; i++) {
-				indices[j++] = baseVertex;
-				indices[j++] = baseVertex + i;
-				indices[j++] = baseVertex + i + 1;
+				indices[j++] = (ushort)(baseVertex);
+				indices[j++] = (ushort)(baseVertex + i);
+				indices[j++] = (ushort)(baseVertex + i + 1);
 				batch.LastIndex += 3;
 			}
 			batch.Mesh.IndicesDirty = true;
@@ -368,9 +368,9 @@ namespace Lime
 			int j = batch.LastIndex;
 			var indices = batch.Mesh.Indices;
 			for (int i = 0; i < numVertices - 2; i++) {
-				indices[j++] = vertex;
-				indices[j++] = vertex + 1;
-				indices[j++] = vertex + 2;
+				indices[j++] = (ushort)vertex;
+				indices[j++] = (ushort)(vertex + 1);
+				indices[j++] = (ushort)(vertex + 2);
 				vertex++;
 				batch.LastIndex += 3;
 			}
@@ -430,12 +430,12 @@ namespace Lime
 			batch.LastIndex += 6;
 			batch.LastVertex += 4;
 			var indices = mesh.Indices;
-			indices[bi++] = bv + 1;
-			indices[bi++] = bv;
-			indices[bi++] = bv + 2;
-			indices[bi++] = bv + 2;
-			indices[bi++] = bv + 3;
-			indices[bi++] = bv + 1;
+			indices[bi++] = (ushort)(bv + 1);
+			indices[bi++] = (ushort)bv;
+			indices[bi++] = (ushort)(bv + 2);
+			indices[bi++] = (ushort)(bv + 2);
+			indices[bi++] = (ushort)(bv + 3);
+			indices[bi++] = (ushort)(bv + 1);
 			float x0 = position.X;
 			float y0 = position.Y;
 			float x1 = position.X + size.X;
