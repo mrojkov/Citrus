@@ -82,6 +82,10 @@ namespace Lime
 			layoutParams.Height = wr.Height;
 			layoutParams.LeftMargin = wr.X;
 			layoutParams.TopMargin = wr.Y + screenHeight - wr.Height;
+			// Unlink webView once its window got invisible. This fixes webview's disappearance on device rotation
+			if (webView.Parent != null && webView.WindowVisibility != ViewStates.Visible) {
+				((RelativeLayout)webView.Parent).RemoveView(webView);
+			}
 			if (webView.Parent == null) {
 				((RelativeLayout)GameView.Instance.Parent).AddView(webView, layoutParams);
 			} else {
