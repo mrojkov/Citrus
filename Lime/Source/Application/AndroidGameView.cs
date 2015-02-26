@@ -300,22 +300,11 @@ namespace Lime
 		protected override void OnResize(EventArgs e)
 		{
 			Lime.Application.Instance.WindowSize = new Lime.Size(Width, Height);
-			var orientation = Resources.Configuration.Orientation;
-			Lime.Application.Instance.CurrentDeviceOrientation = ConvertOrientation(orientation);
+			// Determine orientation using screen dimensions, because Amazon FireOS sometimes reports wrong device orientation.
+			var orientation = Width < Height ? DeviceOrientation.Portrait : DeviceOrientation.LandscapeLeft;
+			Lime.Application.Instance.CurrentDeviceOrientation = orientation;
 			Lime.Application.Instance.OnDeviceRotate();
 			base.OnResize(e);
-		}
-
-		private static DeviceOrientation ConvertOrientation(Android.Content.Res.Orientation orientation)
-		{
-			switch (orientation) {
-			case Android.Content.Res.Orientation.Landscape:
-				return DeviceOrientation.LandscapeLeft;
-			case Android.Content.Res.Orientation.Portrait:
-				return DeviceOrientation.Portrait;
-			default:
-				throw new ArgumentException();
-			}
 		}
 	}
 }
