@@ -76,12 +76,12 @@ namespace Lime
 			if (webView == null) {
 				return;
 			}
-			var screenHeight = GameView.Instance.Size.Height;
 			WindowRect wr = CalculateAABBInWorldSpace(this);
 			layoutParams.Width = wr.Width;
 			layoutParams.Height = wr.Height;
+
 			layoutParams.LeftMargin = wr.X;
-			layoutParams.TopMargin = wr.Y + screenHeight - wr.Height;
+			layoutParams.TopMargin = wr.Y;
 			// Unlink webView once its window got invisible. This fixes webview's disappearance on device rotation
 			if (webView.Parent != null && webView.WindowVisibility != ViewStates.Visible) {
 				((RelativeLayout)webView.Parent).RemoveView(webView);
@@ -96,25 +96,14 @@ namespace Lime
 		private WindowRect CalculateAABBInWorldSpace(Widget widget)
 		{
 			var aabb = widget.CalcAABBInSpaceOf(World.Instance);
-			// Get the projected AABB coordinates in the normalized OpenGL space
-			Matrix44 proj = Renderer.Projection;
-			aabb.A = proj.TransformVector(aabb.A);
-			aabb.B = proj.TransformVector(aabb.B);
-			// Transform to 0,0 - 1,1 coordinate space
-			aabb.Left = (1 + aabb.Left) / 2;
-			aabb.Right = (1 + aabb.Right) / 2;
-			aabb.Top = (1 + aabb.Top) / 2;
-			aabb.Bottom = (1 + aabb.Bottom) / 2;
-			// Transform to window coordinates
 			var viewport = Renderer.Viewport;
-			var result = new WindowRect();
-			var min = new Vector2(viewport.X, viewport.Y);
-			var max = new Vector2(viewport.X + viewport.Width, viewport.Y + viewport.Height);
-			result.X = Mathf.Lerp(aabb.Left, min.X, max.X).Round();
-			result.Width = Mathf.Lerp(aabb.Right, min.X, max.X).Round() - result.X;
-			result.Y = Mathf.Lerp(aabb.Bottom, min.Y, max.Y).Round();
-			result.Height = Mathf.Lerp(aabb.Top, min.Y, max.Y).Round() - result.Y;
-			return result;
+			var scale = new Vector2(viewport.Width, viewport.Height) / World.Instance.Size;
+			return new WindowRect {
+				X = (viewport.X + aabb.Left * scale.X).Round(),
+				Y = (viewport.Y + aabb.Top * scale.Y).Round(),
+				Width = (aabb.Width * scale.X).Round(),
+				Height = (aabb.Height * scale.Y).Round()
+			};
 		}
 
 		private Uri GetUrl()
