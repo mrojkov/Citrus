@@ -51,16 +51,16 @@ namespace Lime
 			A = a;
 		}
 
-#if !UNITY // .NET 3.5 generates ambiguous error
-		public Color4(float r, float g, float b, float a = 1)
+		// Unity mono compiler doesn't allow another constructor because of ambiguity
+		public static Color4 FromFloats(float r, float g, float b, float a = 1)
 		{
-			ABGR = 0;
-			R = (byte)(Mathf.Clamp(r, 0, 1) * 255);
-			G = (byte)(Mathf.Clamp(g, 0, 1) * 255);
-			B = (byte)(Mathf.Clamp(b, 0, 1) * 255);
-			A = (byte)(Mathf.Clamp(a, 0, 1) * 255);
+			return new Color4 {
+				R = (byte)(Mathf.Clamp(r, 0, 1) * 255),
+				G = (byte)(Mathf.Clamp(g, 0, 1) * 255),
+				B = (byte)(Mathf.Clamp(b, 0, 1) * 255),
+				A = (byte)(Mathf.Clamp(a, 0, 1) * 255)
+			};
 		}
-#endif
 
 		public static Color4 operator *(Color4 lhs, Color4 rhs)
 		{
