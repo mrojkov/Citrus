@@ -315,6 +315,9 @@
     <Compile Include="Source\Application\AndroidActivityDelegate.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Source\Graphics\Bitmap.Mac.cs" />
+    <Compile Include="Source\Graphics\Bitmap.Unity.cs" />
+    <Compile Include="Source\Graphics\Unity\PlatformMesh.cs" />
+    <Compile Include="Source\Graphics\Unity\PlatformRenderer.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
