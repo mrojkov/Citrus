@@ -16,7 +16,7 @@ namespace Orange
 	{
 		public string Directory { get; private set; }
 
-		public Func<FileInfo, bool> EnumerationFilter;
+		public Predicate<FileInfo> EnumerationFilter;
 
 		List<FileInfo> files = new List<FileInfo>();
 

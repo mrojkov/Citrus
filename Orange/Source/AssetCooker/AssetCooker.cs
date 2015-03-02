@@ -83,46 +83,43 @@ namespace Orange
 				foreach (var extraBundle in extraBundles) {
 					var bundlePath = Path.Combine(Path.GetDirectoryName(mainBundlePath), extraBundle + Path.GetExtension(mainBundlePath));
 					CookBundle(bundlePath, extraBundle);
-					Lime.PackedAssetsBundle.RefreshBundleCheckSum(bundlePath);
 				}
-				// Ќужно закрыть бандл, а потом открыть дл€ того чтобы получить достук к 
-				// сериализованным сценам (фреймам) дл€ генерации кода - √риша
-				using (Lime.AssetsBundle.Instance = new Lime.PackedAssetsBundle(mainBundlePath, Lime.AssetBundleFlags.Writable)) {
-					using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
-						PluginLoader.AfterAssetsCooked();
-					}
-				}
-				Lime.PackedAssetsBundle.RefreshBundleCheckSum(mainBundlePath);
 			}
 		}
 
-		private static void CookBundle(string bundlePath, string bundleFilter)
+		private static void CookBundle(string bundlePath, string bundleName)
 		{
 			using (Lime.AssetsBundle.Instance = new Lime.PackedAssetsBundle(bundlePath, Lime.AssetBundleFlags.Writable)) {
-				if (bundleFilter == null) {
+				if (bundleName == null) {
 					Console.WriteLine("------------- Cooking Assets -------------"); 
 				} else {
-					Console.WriteLine("------------- Cooking Assets ({0}) -------------", bundleFilter);
+					Console.WriteLine("------------- Cooking Assets ({0}) -------------", bundleName);
 				}
 				The.Workspace.AssetFiles.EnumerationFilter = (info) => {
 					CookingRules rules;
 					if (cookingRulesMap.TryGetValue(info.Path, out rules)) {
-						return rules.Bundle1 == bundleFilter || rules.Bundle2 == bundleFilter;
+						return rules.Bundle1 == bundleName || rules.Bundle2 == bundleName;
 					} else {
-						// дл€ текстовых файлов cooking rules отсутствуют, считаем их принадлежащими к главному бандлу.
-						return bundleFilter == CookingRules.MainBundle;
+						// There are no cooking rules for text files, consider them as part of the main bundle.
+						return bundleName == CookingRules.MainBundle;
 					}
 				};
-				// у каждого бандла должна быть сво€ папка с атласами, чтобы они друг с другом не пересекались
-				atlasesPostfix = bundleFilter ?? "";
+				// Every asset bundle must has its own atlases folder, so they aren't conflict with each other
+				atlasesPostfix = bundleName ?? "";
 				try {
 					CookHelper();
-				}
-				finally {
+				} finally {
 					The.Workspace.AssetFiles.EnumerationFilter = null;
 					atlasesPostfix = "";
 				}
 			}
+			// Open the bundle again in order to make some plugin postprocessing (e.g. generating code from serialized scenes)
+			using (Lime.AssetsBundle.Instance = new Lime.PackedAssetsBundle(bundlePath)) {
+				using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
+					PluginLoader.AfterAssetsCooked();
+				}
+			}
+			Lime.PackedAssetsBundle.RefreshBundleCheckSum(bundlePath);
 		}
 
 		private static void CookForUnity()
