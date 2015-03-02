@@ -71,15 +71,9 @@ namespace Orange
 			if (platform == TargetPlatform.Unity) {
 				CookForUnity();
 			} else {
-				var extraBundles = new HashSet<string>();
-				foreach (var dictionaryItem in cookingRulesMap) {
-					if (!string.IsNullOrEmpty(dictionaryItem.Value.Bundle1))
-						extraBundles.Add(dictionaryItem.Value.Bundle1);
-					if (!string.IsNullOrEmpty(dictionaryItem.Value.Bundle2))
-						extraBundles.Add(dictionaryItem.Value.Bundle2);
-				}
+				var extraBundles = cookingRulesMap.Select(i => i.Value.BundleName).Distinct().Where(i => i != CookingRules.MainBundleName);
 				string mainBundlePath = The.Workspace.GetBundlePath(platform);
-				CookBundle(mainBundlePath, CookingRules.MainBundle);
+				CookBundle(mainBundlePath, CookingRules.MainBundleName);
 				foreach (var extraBundle in extraBundles) {
 					var bundlePath = Path.Combine(Path.GetDirectoryName(mainBundlePath), extraBundle + Path.GetExtension(mainBundlePath));
 					CookBundle(bundlePath, extraBundle);
@@ -90,22 +84,18 @@ namespace Orange
 		private static void CookBundle(string bundlePath, string bundleName)
 		{
 			using (Lime.AssetsBundle.Instance = new Lime.PackedAssetsBundle(bundlePath, Lime.AssetBundleFlags.Writable)) {
-				if (bundleName == null) {
-					Console.WriteLine("------------- Cooking Assets -------------"); 
-				} else {
-					Console.WriteLine("------------- Cooking Assets ({0}) -------------", bundleName);
-				}
+				Console.WriteLine("------------- Cooking Assets ({0}) -------------", bundleName);
 				The.Workspace.AssetFiles.EnumerationFilter = (info) => {
 					CookingRules rules;
 					if (cookingRulesMap.TryGetValue(info.Path, out rules)) {
-						return rules.Bundle1 == bundleName || rules.Bundle2 == bundleName;
+						return rules.BundleName == bundleName;
 					} else {
 						// There are no cooking rules for text files, consider them as part of the main bundle.
-						return bundleName == CookingRules.MainBundle;
+						return bundleName == CookingRules.MainBundleName;
 					}
 				};
 				// Every asset bundle must has its own atlases folder, so they aren't conflict with each other
-				atlasesPostfix = bundleName ?? "";
+				atlasesPostfix = bundleName != CookingRules.MainBundleName ? bundleName : "";
 				try {
 					CookHelper();
 				} finally {
