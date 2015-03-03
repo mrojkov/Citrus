@@ -11,6 +11,8 @@ namespace Orange
 		string projectName;
 		TargetPlatform platform;
 
+		public static string ConfigurationName = "Release";
+
 		public SolutionBuilder(TargetPlatform platform)
 		{
 			this.platform = platform;
@@ -61,10 +63,10 @@ namespace Orange
 			app = "/Applications/Xamarin Studio.app/Contents/MacOS/mdtool";
 			if (platform == TargetPlatform.iOS) {
 				slnFile = Path.Combine(projectDirectory, projectName + ".iOS.sln");
-				args = String.Format("build \"{0}\" -t:Build -c:\"Release|iPhone\"", slnFile);
+				args = String.Format("build \"{0}\" -t:Build -c:\"{1}|iPhone\"", slnFile, ConfigurationName);
 			} else {
 				slnFile = Path.Combine(projectDirectory, projectName + ".Mac.sln");
-				args = String.Format("build \"{0}\" -t:Build -c:\"Release|x86\"", slnFile);
+				args = String.Format("build \"{0}\" -t:Build -c:\"{1}|x86\"", slnFile, ConfigurationName);
 			}
 #elif WIN
 			// Uncomment follow block if you would like to use mdtool instead of MSBuild
@@ -76,7 +78,7 @@ namespace Orange
 
 			app = Path.Combine(System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(), "MSBuild.exe");
 			slnFile = Path.Combine(projectDirectory, projectName + ".Win.sln");
-			args = String.Format("\"{0}\" /verbosity:minimal /p:Configuration=Release", slnFile);
+			args = String.Format("\"{0}\" /verbosity:minimal /p:Configuration={1}", slnFile, ConfigurationName);
 #endif
 			if (Process.Start(app, args, output: output) != 0) {
 				return false;
@@ -92,10 +94,10 @@ namespace Orange
 			app = "/Applications/Xamarin Studio.app/Contents/MacOS/mdtool";
 			if (platform == TargetPlatform.iOS) {
 				slnFile = Path.Combine(projectDirectory, projectName + ".iOS.sln");
-				args = String.Format("build \"{0}\" -t:Clean -c:\"Release|iPhone\"", slnFile);
+				args = String.Format("build \"{0}\" -t:Clean -c:\"{1}|iPhone\"", slnFile, configurationName);
 			} else {
 				slnFile = Path.Combine(projectDirectory, projectName + ".Mac.sln");
-				args = String.Format("build \"{0}\" -t:Clean -c:\"Release|x86\"", slnFile);
+				args = String.Format("build \"{0}\" -t:Clean -c:\"{1}|x86\"", slnFile, configurationName);
 			}
 #elif WIN
 			// Uncomment follow block if you would like to use mdtool instead of MSBuild
@@ -107,7 +109,7 @@ namespace Orange
 
 			app = Path.Combine(System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(), "MSBuild.exe");
 			slnFile = Path.Combine(projectDirectory, projectName + ".Win.sln");
-			args = String.Format("\"{0}\" /t:Clean /p:Configuration=Release", slnFile);
+			args = String.Format("\"{0}\" /t:Clean /p:Configuration={1}", slnFile, ConfigurationName);
 #endif
 			if (Process.Start(app, args) != 0) {
 				return false;
@@ -120,12 +122,12 @@ namespace Orange
 			string app;
 #if MAC
 			if (platform == TargetPlatform.Desktop) {
-				app = Path.Combine(projectDirectory, "bin/Release", projectName + ".app", "Contents/MacOS", projectName);
+				app = Path.Combine(projectDirectory, string.Format("bin/{0}", ConfigurationName), projectName + ".app", "Contents/MacOS", projectName);
 			} else {
 				throw new NotImplementedException();
 			}
 #elif WIN
-			app = Path.Combine(projectDirectory, "bin/Release", projectName + ".exe");
+			app = Path.Combine(projectDirectory, string.Format("bin/{0}", ConfigurationName), projectName + ".exe");
 #endif
 			return app;
 		}
@@ -161,7 +163,7 @@ namespace Orange
 
 		private string GetIOSAppName()
 		{
-			var directory = Path.Combine(projectDirectory, "bin", "iPhone", "Release");
+			var directory = Path.Combine(projectDirectory, "bin", "iPhone", ConfigurationName);
 			// var directory = Path.Combine(Path.GetDirectoryName(The.Workspace.GetSolutionFilePath()), "bin", "iPhone", "Release");
 			var dirInfo = new System.IO.DirectoryInfo(directory);
 			var all = new List<System.IO.DirectoryInfo>(dirInfo.EnumerateDirectories("*.app"));
@@ -174,4 +176,3 @@ namespace Orange
 		}
 	}
 }
-
