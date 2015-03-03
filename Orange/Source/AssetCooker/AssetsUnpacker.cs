@@ -11,7 +11,7 @@ namespace Orange
 	{
 		public static void Unpack(TargetPlatform platform)
 		{
-			string bundlePath = The.Workspace.GetBundlePath(platform);
+			string bundlePath = The.Workspace.GetMainBundlePath(platform);
 			var dirInfo = new System.IO.DirectoryInfo(Path.GetDirectoryName(bundlePath));
 			foreach (var fileInfo in dirInfo.GetFiles('*' + Path.GetExtension(bundlePath), SearchOption.TopDirectoryOnly)) {
 				UnpackBundle(fileInfo.FullName);
@@ -46,7 +46,7 @@ namespace Orange
 
 		public static void UnpackTangerineScenes()
 		{
-			string bundlePath = The.Workspace.GetBundlePath();
+			string bundlePath = The.Workspace.GetMainBundlePath();
 			string outputDirectory = The.Workspace.AssetsDirectory;
 			using (AssetsBundle.Instance = new PackedAssetsBundle(bundlePath, AssetBundleFlags.None)) {
 				Console.WriteLine("Extracting tangerine scenes into \"{0}\"", outputDirectory);

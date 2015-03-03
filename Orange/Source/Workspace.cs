@@ -121,21 +121,33 @@ namespace Orange
 			return Toolbox.GetTargetPlatformString(ActivePlatform);
 		}
 
-		public string GetBundlePath(TargetPlatform platform)
+		public string GetMainBundlePath()
+		{
+			return GetMainBundlePath(ActivePlatform);
+		}
+
+		public string GetMainBundlePath(TargetPlatform platform)
 		{
 			return Path.ChangeExtension(AssetsDirectory, Toolbox.GetTargetPlatformString(platform));
 		}
 
-		public string GetBundlePath()
+		public string GetBundlePath(string bundleName)
 		{
-			return Path.ChangeExtension(AssetsDirectory, GetActivePlatformString());
+			return GetBundlePath(bundleName, ActivePlatform);
 		}
 
-		public string GetUnityResourcesDirectory()
+		public string GetBundlePath(string bundleName, TargetPlatform platform)
 		{
-			string path = Path.Combine(ProjectDirectory,
-				Path.GetFileName(ProjectDirectory) + ".Unity", "Assets", "Resources");
-			return path;
+			if (bundleName == CookingRules.MainBundleName) {
+				return The.Workspace.GetMainBundlePath(platform);
+			} else {
+				return Path.Combine(Path.GetDirectoryName(AssetsDirectory), bundleName + "." + Toolbox.GetTargetPlatformString(platform));
+			}
+		}
+
+		public string GetUnityProjectDirectory()
+		{
+			return Path.Combine(ProjectDirectory, Title + ".Unity");
 		}
 	}
 }

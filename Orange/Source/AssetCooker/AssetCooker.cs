@@ -68,59 +68,70 @@ namespace Orange
 		{
 			AssetCooker.platform = platform;
 			cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles);
-			if (platform == TargetPlatform.Unity) {
-				CookForUnity();
-			} else {
-				var extraBundles = cookingRulesMap.Select(i => i.Value.BundleName).Distinct().Where(i => i != CookingRules.MainBundleName);
-				string mainBundlePath = The.Workspace.GetBundlePath(platform);
-				CookBundle(mainBundlePath, CookingRules.MainBundleName);
-				foreach (var extraBundle in extraBundles) {
-					var bundlePath = Path.Combine(Path.GetDirectoryName(mainBundlePath), extraBundle + Path.GetExtension(mainBundlePath));
-					CookBundle(bundlePath, extraBundle);
-				}
+			var extraBundles = cookingRulesMap.Select(i => i.Value.BundleName).Distinct().Where(i => i != CookingRules.MainBundleName);
+			CookBundle(CookingRules.MainBundleName);
+			foreach (var extraBundle in extraBundles) {
+				CookBundle(extraBundle);
 			}
 		}
 
-		private static void CookBundle(string bundlePath, string bundleName)
+		private static void CookBundle(string bundleName)
 		{
-			using (Lime.AssetsBundle.Instance = new Lime.PackedAssetsBundle(bundlePath, Lime.AssetBundleFlags.Writable)) {
-				Console.WriteLine("------------- Cooking Assets ({0}) -------------", bundleName);
-				The.Workspace.AssetFiles.EnumerationFilter = (info) => {
-					CookingRules rules;
-					if (cookingRulesMap.TryGetValue(info.Path, out rules)) {
-						return rules.BundleName == bundleName;
-					} else {
-						// There are no cooking rules for text files, consider them as part of the main bundle.
-						return bundleName == CookingRules.MainBundleName;
-					}
-				};
-				// Every asset bundle must has its own atlases folder, so they aren't conflict with each other
-				atlasesPostfix = bundleName != CookingRules.MainBundleName ? bundleName : "";
-				try {
-					CookHelper();
-				} finally {
-					The.Workspace.AssetFiles.EnumerationFilter = null;
-					atlasesPostfix = "";
-				}
+			using (Lime.AssetsBundle.Instance = CreateBundle(bundleName)) {
+				CookBundleHelper(bundleName);
 			}
-			// Open the bundle again in order to make some plugin postprocessing (e.g. generating code from serialized scenes)
-			using (Lime.AssetsBundle.Instance = new Lime.PackedAssetsBundle(bundlePath)) {
+			// Open the bundle again in order to make some plugin postprocessing (e.g. generate code from scene assets)
+			using (Lime.AssetsBundle.Instance = CreateBundle(bundleName)) {
 				using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
 					PluginLoader.AfterAssetsCooked();
 				}
 			}
-			Lime.PackedAssetsBundle.RefreshBundleCheckSum(bundlePath);
+			if (platform != TargetPlatform.Unity) {
+				var bundlePath = The.Workspace.GetBundlePath(bundleName);
+				Lime.PackedAssetsBundle.RefreshBundleCheckSum(bundlePath);
+			}
 		}
 
-		private static void CookForUnity()
+		private static AssetsBundle CreateBundle(string bundleName)
 		{
-			string resourcesPath = The.Workspace.GetUnityResourcesDirectory();
-			if (!System.IO.Directory.Exists(resourcesPath)) {
-				throw new Lime.Exception("Output directory '{0}' doesn't exist", resourcesPath);
+			if (platform == TargetPlatform.Unity) {
+				string path = The.Workspace.GetUnityProjectDirectory();
+				if (bundleName == CookingRules.MainBundleName) {
+					path = Path.Combine(path, "Assets", "Resources");
+				} else {
+					path = Path.Combine(path, "Assets", "Bundles", bundleName);
+				}
+				Directory.CreateDirectory(path);
+				return new UnityAssetBundle(path);
+			} else {
+				var bundlePath = The.Workspace.GetBundlePath(bundleName);
+				return new Lime.PackedAssetsBundle(bundlePath, Lime.AssetBundleFlags.Writable);
 			}
-			using (Lime.AssetsBundle.Instance = new UnityAssetBundle(resourcesPath)) {
-				Console.WriteLine("------------- Cooking Assets -------------");
-				CookHelper();
+		}
+
+		private static void CookBundleHelper(string bundleName)
+		{
+			Console.WriteLine("------------- Cooking Assets ({0}) -------------", bundleName);
+			The.Workspace.AssetFiles.EnumerationFilter = (info) => {
+				CookingRules rules;
+				if (cookingRulesMap.TryGetValue(info.Path, out rules)) {
+					return rules.BundleName == bundleName;
+				} else {
+					// There are no cooking rules for text files, consider them as part of the main bundle.
+					return bundleName == CookingRules.MainBundleName;
+				}
+			};
+			// Every asset bundle must has its own atlases folder, so they aren't conflict with each other
+			atlasesPostfix = bundleName != CookingRules.MainBundleName ? bundleName : "";
+			try {
+				using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
+					foreach (var stage in CookStages) {
+						stage();
+					}
+				}
+			} finally {
+				The.Workspace.AssetFiles.EnumerationFilter = null;
+				atlasesPostfix = "";
 			}
 		}
 
@@ -178,15 +189,6 @@ namespace Orange
 					if (!assetsBundle.FileExists(origImageFile)) {
 						DeleteFileFromBundle(maskPath);
 					}
-				}
-			}
-		}
-
-		private static void CookHelper()
-		{
-			using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
-				foreach (var stage in CookStages) {
-					stage();
 				}
 			}
 		}

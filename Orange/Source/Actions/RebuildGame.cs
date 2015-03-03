@@ -20,7 +20,7 @@ namespace Orange
 
 		static bool CleanupGame()
 		{
-			string bundlePath = The.Workspace.GetBundlePath();
+			string bundlePath = The.Workspace.GetMainBundlePath();
 			var dirInfo = new System.IO.DirectoryInfo(Path.GetDirectoryName(bundlePath));
 			foreach (var fileInfo in dirInfo.GetFiles('*' + Path.GetExtension(bundlePath), SearchOption.TopDirectoryOnly)) {
 				Console.WriteLine("Deleting {0}", fileInfo.Name);
