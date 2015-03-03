@@ -18,7 +18,11 @@ namespace Lime
 
 		public static string[] Get()
 		{
+#if UNITY_WEB
+			return new string[] {};
+#else
 			return System.Environment.GetCommandLineArgs();
+#endif
 		}
 
 		public static bool CheckFlag(string name)
