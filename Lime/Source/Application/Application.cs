@@ -223,6 +223,11 @@ namespace Lime
 			set { GameView.Instance.WindowSize = value; }
 		}
 #elif ANDROID
+		/// <summary>
+		/// The height of the on-screen keyboard. Zero, until the keyboard is shown for the first time.
+		/// </summary>
+		public float OnscreenKeyboardHeight { get; internal set; }
+
 		public Size WindowSize 
 		{
 			get;
