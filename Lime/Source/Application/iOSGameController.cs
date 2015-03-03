@@ -18,7 +18,6 @@ namespace Lime
 		private NSObject keyboardWillChangeFrameNotification;
 		private NSObject keyboardDidChangeFrameNotification;
 
-		public float KeyboardHeight { get; private set; }
 		public bool IsKeyboardChanging { get; private set; }
 
 		public GameController() : base()
@@ -89,9 +88,9 @@ namespace Lime
 			var rectEnd = args.FrameEnd;
 			var rectBegin = args.FrameBegin;
 			if (rectEnd.X == 0 && rectBegin.X == 0) {
-				KeyboardHeight = (float)(rectEnd.Height * scale);
+				Application.Instance.OnscreenKeyboardHeight = (float)(rectEnd.Height * scale);
 			} else {
-				KeyboardHeight = (float)(rectEnd.Width * scale);
+				Application.Instance.OnscreenKeyboardHeight = (float)(rectEnd.Width * scale);
 			}
 		}
 

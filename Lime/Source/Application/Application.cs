@@ -153,6 +153,8 @@ namespace Lime
 			}
 		}
 #if iOS
+		public float OnscreenKeyboardHeight { get; internal set; }
+
 		public Size WindowSize { get; internal set; }
 
 		private float pixelsPerPoints = 0f;
