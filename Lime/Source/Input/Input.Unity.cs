@@ -14,10 +14,7 @@ namespace Lime
 			public bool State;
 		}
 
-		public static Vector2 MouseRefuge = new Vector2(-123456, -123456);
-
 		private static Vector2[] touchPositions = new Vector2[MaxTouches];
-		private static Vector2 mousePosition;
 
 		private static List<KeyEvent> keyEventQueue = new List<KeyEvent>();
 		
@@ -33,17 +30,8 @@ namespace Lime
 
 		/// <summary>
 		/// The current mouse position in virtual coordinates coordinates. (read only)
-		/// When mouse is invisible this property has an offscreen value.
 		/// </summary>
-		public static Vector2 MousePosition {
-			get { return MouseVisible ? mousePosition : MouseRefuge; }
-			internal set { mousePosition = value; }
-		}
-
-		/// <summary>
-		/// Use this property for hiding mouse away. E.g. after processing modal dialog controls.
-		/// </summary>
-		public static bool MouseVisible;
+		public static Vector2 MousePosition { get; private set; }
 
 		/// <summary>
 		/// The current accelerometer state (read only).
@@ -89,25 +77,6 @@ namespace Lime
 			return IsKeyPressed((Key)((int)Key.Mouse0 + button));
 		}
 
-		/// <summary>
-		/// After consumption, WasKeyPressed(), WasKeyReleased() will return false.
-		/// </summary>
-		public static void ConsumeKeyEvent(Key key, bool value)
-		{
-			if (value) {
-				previousKeysState[(int)key] = currentKeysState[(int)key];
-			}
-		}
-
-		public static void ConsumeAllKeyEvents(bool value = true)
-		{
-			if (value) {
-				for (int i = 1; i < (int)Key.KeyCount; i++) {
-					previousKeysState[i] = currentKeysState[i];
-				}
-			}
-		}
-
 		public static bool WasTouchBegan(int index)
 		{
 			return WasKeyPressed((Key)((int)Key.Touch0 + index));
@@ -125,7 +94,7 @@ namespace Lime
 
 		public static Vector2 GetTouchPosition(int index)
 		{
-			return MouseVisible ? touchPositions[index] : MouseRefuge;
+			return touchPositions[index];
 		}
 
 		internal static void SetTouchPosition(int index, Vector2 position)
@@ -174,14 +143,13 @@ namespace Lime
 			currentKeysState[(int)Key.Mouse0] = UnityEngine.Input.GetMouseButton(0);
 			currentKeysState[(int)Key.Mouse1] = UnityEngine.Input.GetMouseButton(1);
 			currentKeysState[(int)Key.Mouse2] = UnityEngine.Input.GetMouseButton(2);
-			MouseVisible = true;
 		}
 
 		private static void RefreshMousePosition()
 		{
 			var p = UnityEngine.Input.mousePosition;
-			mousePosition = new Vector2(p.x, UnityEngine.Screen.height - p.y);
-			mousePosition *= ScreenToWorldTransform;
+			MousePosition = new Vector2(p.x, UnityEngine.Screen.height - p.y);
+			MousePosition *= ScreenToWorldTransform;
 		}
 
 		internal static void CopyKeysState()
