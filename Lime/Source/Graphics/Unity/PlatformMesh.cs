@@ -81,8 +81,9 @@ namespace Lime
 				foreach (var v in mesh.UV3) {
 					uv3[i].x = v.X; 
 					uv3[i++].y = 1 - v.Y;
-				}                                         
-				unityMesh.uv3 = uv3;
+				} 
+				// Only UNITY 5 supports it
+				// unityMesh.uv3 = uv3;
 			}
 			if (mesh.UV4 != null && (dm & Mesh.Attributes.UV4) != 0) {
 				Array.Resize(ref uv4, mesh.UV4.Length);
@@ -90,8 +91,9 @@ namespace Lime
 				foreach (var v in mesh.UV4) {
 					uv4[i].x = v.X; 
 					uv4[i++].y = 1 - v.Y;
-				}                                         
-				unityMesh.uv4 = uv4;
+				}  
+				// Only UNITY 5 supports it
+				// unityMesh.uv4 = uv4;
 			}
 			mesh.DirtyAttributes = Mesh.Attributes.None;
 		}

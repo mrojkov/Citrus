@@ -18,9 +18,11 @@ namespace Lime
 		uint id;
 		Size size = new Size(0, 0);
 		Rectangle uvRect;
+		UnityEngine.Texture unityTexture;
 
 		public RenderTexture(int width, int height)
 		{
+			unityTexture = new UnityEngine.RenderTexture(width, height, 0);
 			size.Width = width;
 			size.Height = height;
 			uvRect = new Rectangle(0, 0, 1, 1);
@@ -40,7 +42,7 @@ namespace Lime
 
 		public UnityEngine.Texture GetUnityTexture()
 		{
-			throw new NotImplementedException();
+			return unityTexture;
 		}
 		
 		public void Dispose()

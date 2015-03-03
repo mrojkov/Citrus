@@ -29,7 +29,7 @@ namespace Lime
 				mat = new UnityEngine.Material(defaultShader);
 			}
 			if (textures[0] != null) {
-				mat.mainTexture = textures[0].GetUnityTexture ();
+				mat.mainTexture = textures[0].GetUnityTexture();
 			}
 			if (textures[1] != null) {
 				mat.SetTexture("SecondTex", textures[1].GetUnityTexture());
