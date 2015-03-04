@@ -72,18 +72,25 @@ namespace Lime
 				this.GetWindowVisibleDisplayFrame(r);
 				var totalHeight = bottom - top;
 				var visibleHeight = r.Bottom - r.Top;
+				var app = Application.Instance;
 				if (visibleHeight == totalHeight) {
 					isOnscreenKeyboardVisible = false;
+					app.OnscreenKeyboardHeight = 0;
 				} else {
-					Application.Instance.OnscreenKeyboardHeight = totalHeight - visibleHeight;
+					app.OnscreenKeyboardHeight = totalHeight - visibleHeight;
 				}
 			}
-			Lime.Application.Instance.WindowSize = new Lime.Size(right - left, bottom - top);
+		}
+
+		protected override void OnResize(EventArgs e)
+		{
+			var app = Lime.Application.Instance;
+			app.WindowSize = new Lime.Size(Width, Height);
 			// Determine orientation using screen dimensions, because Amazon FireOS sometimes reports wrong device orientation.
 			var orientation = Width < Height ? DeviceOrientation.Portrait : DeviceOrientation.LandscapeLeft;
-			Lime.Application.Instance.CurrentDeviceOrientation = orientation;
-			// Handle OnDeviceRotate() here, because we need to take in account on-screen keyboard height for some applications.
-			Lime.Application.Instance.OnDeviceRotate();
+			app.CurrentDeviceOrientation = orientation;
+			app.OnDeviceRotate();
+			base.OnResize(e);
 		}
 
 		public void ShowOnscreenKeyboard(bool show, string text)
