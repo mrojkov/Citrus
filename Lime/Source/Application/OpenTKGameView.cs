@@ -192,6 +192,11 @@ namespace Lime
 			}
 		}
 
+		protected override void OnMove(EventArgs e)
+		{
+			app.OnMove();
+		}
+
 		private void Limit25FPS()
 		{
 			int delta = (int)(DateTime.UtcNow - lastFrameTimeStamp).TotalMilliseconds;

@@ -304,6 +304,7 @@ namespace Lime
 		public event Action Created;
 		public event Action Terminating;
 		public event Action GraphicsContextReset;
+		public event Action Moved;
 
 		public virtual void OnActivate()
 		{
@@ -342,6 +343,13 @@ namespace Lime
 			}
 		}
 #endif
+
+		public virtual void OnMove()
+		{
+			if (Moved != null) {
+				Moved();
+			}
+		}
 
 		public virtual void OnUpdateFrame(float delta) {}
 		public virtual void OnRenderFrame() {}
