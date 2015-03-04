@@ -69,29 +69,20 @@ namespace Lime
 			}
 		}
 
-		private RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(0, 0);
-		private WindowRect prevRect;
-
 		protected override void SelfUpdate(float delta)
 		{
 			if (webView == null) {
 				return;
 			}
 			WindowRect wr = CalculateAABBInWorldSpace(this);
-			layoutParams.Width = wr.Width;
-			layoutParams.Height = wr.Height;
-			layoutParams.LeftMargin = wr.X;
-			layoutParams.TopMargin = wr.Y;
 			// Unlink webView once its window got invisible. This fixes webview's disappearance on device rotation
 			if (webView.Parent != null && webView.WindowVisibility != ViewStates.Visible) {
 				((RelativeLayout)webView.Parent).RemoveView(webView);
 			}
 			if (webView.Parent == null) {
-				((RelativeLayout)GameView.Instance.Parent).AddView(webView, layoutParams);
-			} else if (!prevRect.Equals(wr)) {
-				webView.LayoutParameters = layoutParams;
-				prevRect = wr;
+				((RelativeLayout)GameView.Instance.Parent).AddView(webView);
 			}
+			webView.Layout (wr.X, wr.Y, wr.Width + wr.X, wr.Height + wr.Y);
 		}
 
 		private WindowRect CalculateAABBInWorldSpace(Widget widget)
