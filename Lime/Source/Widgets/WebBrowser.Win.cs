@@ -1,6 +1,10 @@
 #if WIN
+using Microsoft.Win32;
 using System;
+using System.IO;
+using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Lime
@@ -11,6 +15,51 @@ namespace Lime
 
 		private System.Windows.Forms.WebBrowser browser;
 		private Form form;
+
+		private static void SetBrowserFeatureControlKey(string feature, string appName, UInt32 value)
+		{
+			using (var key = Registry.CurrentUser.CreateSubKey(
+				@"Software\Microsoft\Internet Explorer\Main\FeatureControl\" + feature,
+				RegistryKeyPermissionCheck.ReadWriteSubTree)
+			) {
+				key.SetValue(appName, value, RegistryValueKind.DWord);
+			}
+		}
+
+		private static UInt32 GetIEVersion()
+		{
+			using (var ieKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Internet Explorer",
+				RegistryKeyPermissionCheck.ReadSubTree,
+				System.Security.AccessControl.RegistryRights.QueryValues)
+			) {
+				var version = ieKey.GetValue("svcVersion") ?? ieKey.GetValue("Version") ?? "IE required";
+				return UInt32.Parse(version.ToString().Split('.')[0]);
+			}
+		}
+
+		private static UInt32 GetBrowserEmulationMode()
+		{
+			switch (GetIEVersion()) {
+				case 7: return 7000;
+				case 8: return 8000;
+				case 9: return 9000;
+				case 10: return 10000;
+				case 11: return 11001; // [sic]
+				default: return 10000;
+			}
+		}
+
+		static WebBrowser()
+		{
+			// By default embedded IE emulates version 7.0. We need to add ourselves to registry to enable more recent versiion.
+			// http://msdn.microsoft.com/en-us/library/ee330720(v=vs.85).aspx
+
+			var fileName = Path.GetFileName(Process.GetCurrentProcess().MainModule.FileName);
+			var ideNames = new[] { "devenv.exe", "xdesproc.exe" };
+			if (ideNames.Any(s => String.Equals(fileName, s, StringComparison.InvariantCultureIgnoreCase)))
+				return;
+			SetBrowserFeatureControlKey("FEATURE_BROWSER_EMULATION", fileName, GetBrowserEmulationMode());
+		}
 
 		public WebBrowser() : base()
 		{
