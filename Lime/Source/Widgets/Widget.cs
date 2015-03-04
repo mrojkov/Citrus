@@ -150,6 +150,12 @@ namespace Lime
 			return Input.WasMouseReleased() && HitTest(Input.MousePosition);
 		}
 
+		private void AssertIsNumber(float x)
+		{
+			if (float.IsNaN(x) || float.IsInfinity(x))
+				throw new ArithmeticException();
+		}
+
 		[ProtoMember(1)]
 		[TangerineProperty(4)]
 		public Vector2 Position
@@ -157,6 +163,10 @@ namespace Lime
 			get { return position; }
 			set
 			{
+#if LIME_CHECK_FLOATS
+				AssertIsNumber(value.X);
+				AssertIsNumber(value.Y);
+#endif
 				if (position.X != value.X || position.Y != value.Y) {
 					position = value;
 					InvalidateGlobalValuesAndCachedRenderer(true);
@@ -169,6 +179,9 @@ namespace Lime
 			get { return position.X; } 
 			set 
 			{
+#if LIME_CHECK_FLOATS
+				AssertIsNumber(value);
+#endif
 				if (position.X != value) {
 					position.X = value;
 					InvalidateGlobalValuesAndCachedRenderer(true);
@@ -181,6 +194,9 @@ namespace Lime
 			get { return position.Y; }
 			set
 			{
+#if LIME_CHECK_FLOATS
+				AssertIsNumber(value);
+#endif
 				if (position.Y != value) {
 					position.Y = value;
 					InvalidateGlobalValuesAndCachedRenderer(true);
@@ -195,6 +211,10 @@ namespace Lime
 			get { return size; }
 			set
 			{
+#if LIME_CHECK_FLOATS
+				AssertIsNumber(value.X);
+				AssertIsNumber(value.Y);
+#endif
 				if (value.X != size.X || value.Y != size.Y) {
 					var sizeDelta = value - size;
 					size = value;
@@ -244,6 +264,10 @@ namespace Lime
 			get { return pivot; } 
 			set 
 			{
+#if LIME_CHECK_FLOATS
+				AssertIsNumber(value.X);
+				AssertIsNumber(value.Y);
+#endif
 				if (pivot.X != value.X || pivot.Y != value.Y) {
 					pivot = value;
 					InvalidateGlobalValuesAndCachedRenderer();
@@ -258,6 +282,10 @@ namespace Lime
 			get { return scale; } 
 			set 
 			{
+#if LIME_CHECK_FLOATS
+				AssertIsNumber(value.X);
+				AssertIsNumber(value.Y);
+#endif
 				if (scale.X != value.X || scale.Y != value.Y) {
 					scale = value;
 					InvalidateGlobalValuesAndCachedRenderer();
@@ -271,6 +299,9 @@ namespace Lime
 			get { return rotation; }
 			set 
 			{
+#if LIME_CHECK_FLOATS
+				AssertIsNumber(value);
+#endif
 				if (rotation != value) {
 					rotation = value;
 					direction = Mathf.CosSin(Mathf.DegreesToRadians * value);
