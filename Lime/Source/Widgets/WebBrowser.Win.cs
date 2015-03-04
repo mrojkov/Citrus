@@ -1,83 +1,96 @@
 #if WIN
 using System;
-using System.IO;
 using System.Drawing;
 using System.Windows.Forms;
 
 namespace Lime
 {
-	public class WebBrowser : Image
+	public class WebBrowser : Widget
 	{
 		public Uri Url { get { return browser.Url; } set { browser.Url = value; } }
 
 		private System.Windows.Forms.WebBrowser browser;
+		private Form form;
 
 		public WebBrowser() : base()
 		{
+			Application.Instance.Moved += CalcGeometry;
+			var mainForm = Control.FromHandle(System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle);
+			form = new Form();
+			form.StartPosition = FormStartPosition.Manual;
+			form.FormBorderStyle = FormBorderStyle.None;
+			form.ShowInTaskbar = false;
 			browser = new System.Windows.Forms.WebBrowser();
-			browser.DocumentCompleted += browser_DocumentCompleted;
-			ClearTexture();
+			browser.Parent = form;
+			browser.ScriptErrorsSuppressed = true;
 		}
 
-		public WebBrowser(Widget parentWidget): this()
+		public WebBrowser(Widget parentWidget)
+			: this()
 		{
 			AddToWidget(parentWidget);
+		}
+
+		private IntRectangle CalculateAABBInWorldSpace(Widget widget)
+		{
+			var aabb = widget.CalcAABBInSpaceOf(World.Instance);
+			var viewport = Renderer.Viewport;
+			var scale = new Vector2(viewport.Width, viewport.Height) / World.Instance.Size;
+			return new IntRectangle(
+				(viewport.X + aabb.Left * scale.X).Round(),
+				(viewport.Y + aabb.Top * scale.Y).Round(),
+				(viewport.X + aabb.Right * scale.X).Round(),
+				(viewport.Y + aabb.Bottom * scale.Y).Round()
+			);
+		}
+
+		private IntRectangle SysToIntRect(System.Drawing.Rectangle r)
+		{
+			return new IntRectangle(r.Left, r.Top, r.Right, r.Bottom);
+		}
+
+		private void CalcGeometry()
+		{
+			if (form == null)
+				return;
+			var r = IntRectangle.Intersect(
+				CalculateAABBInWorldSpace(this),
+				SysToIntRect(GameView.Instance.ClientRectangle)
+			).OffsetBy(new IntVector2(GameView.Instance.X, GameView.Instance.Y));
+			form.Left = r.Left;
+			form.Top = r.Top;
+			form.Width = r.Width;
+			form.Height = r.Height;
+			browser.SetBounds(0, 0, form.Width, form.Height);
+		}
+
+		public override void Render()
+		{
+			if (form == null)
+				return;
+			if (GloballyVisible) {
+				CalcGeometry();
+				form.Show();
+				form.BringToFront();
+			}
+			else {
+				form.Hide();
+			}
 		}
 
 		public void AddToWidget(Widget parentWidget)
 		{
 			parentWidget.AddNode(this);
-			Size = parentWidget.Size;
 			Anchors = Anchors.LeftRightTopBottom;
-			browser.Width = (int)Width;
-			browser.Height = (int)Height;
-			browser.ScrollBarsEnabled = false;
+			Size = parentWidget.Size;
 		}
 
-		protected override void OnSizeChanged(Vector2 sizeDelta)
-		{
-			base.OnSizeChanged(sizeDelta);
-			if (browser != null) {
-				browser.Width = (int)Width;
-				browser.Height = (int)Height;
-			}
-		}
-
-		void browser_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
-		{
-			// FIXME: It's hard to make a browser to work over an OpenGL surface, so at least draw it as a picture.
-			var bitmap = new System.Drawing.Bitmap((int)Width, (int)Height);
-			browser.DrawToBitmap(bitmap, new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height));
-			var m = new MemoryStream(1024 * 1024);
-			bitmap.Save(m, System.Drawing.Imaging.ImageFormat.Png);
-			m.Position = 0;
-			var t2d = new Texture2D();
-			t2d.LoadImage(m);
-			Texture = t2d;
-		}
-
-		public override void Update(float delta)
-		{
-			base.Update(delta);
-		}
-
-		public override void Render()
-		{
-			base.Render();
-		}
-		
 		public override void Dispose()
 		{
 			if (browser != null)
 				browser.Dispose();
-			ClearTexture();
-		}
-
-		private void ClearTexture()
-		{
-			var t2d = new Texture2D();
-			t2d.LoadImage(new Color4[] { }, 0, 0, false);
-			Texture = t2d;
+			if (form != null)
+				form.Dispose();
 		}
 	}
 }
