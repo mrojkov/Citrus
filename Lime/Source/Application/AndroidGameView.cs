@@ -67,7 +67,12 @@ namespace Lime
 		protected override void OnLayout(bool changed, int left, int top, int right, int bottom)
 		{
 			base.OnLayout(changed, left, top, right, bottom);
-			if (AllowOnscreenKeyboard) {
+			if (AllowOnscreenKeyboard) { 
+				if (changed) {
+					// Changed == true never seemed go along with showing and hiding keyboard, but 
+					// it results in isOnscreenKeyboardVisible = false right after device rotation.
+					return;
+				}
 				var r = new Android.Graphics.Rect();
 				this.GetWindowVisibleDisplayFrame(r);
 				var totalHeight = bottom - top;
