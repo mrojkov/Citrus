@@ -73,6 +73,8 @@ namespace Lime
 		public int Bottom { get { return B.Y; } set { B.Y = value; } }
 		public IntVector2 Center { get { return new IntVector2((A.X + B.X) / 2, (A.Y + B.Y) / 2); } }
 
+		public IntRectangle OffsetBy(IntVector2 ofs) { return new IntRectangle(A + ofs, B + ofs); }
+
 		public static bool operator ==(IntRectangle lhs, IntRectangle rhs)
 		{
 			return lhs.A == rhs.A && lhs.B == rhs.B;
