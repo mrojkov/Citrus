@@ -70,6 +70,7 @@ namespace Lime
 		}
 
 		private RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(0, 0);
+		private WindowRect prevRect;
 
 		protected override void SelfUpdate(float delta)
 		{
@@ -79,7 +80,6 @@ namespace Lime
 			WindowRect wr = CalculateAABBInWorldSpace(this);
 			layoutParams.Width = wr.Width;
 			layoutParams.Height = wr.Height;
-
 			layoutParams.LeftMargin = wr.X;
 			layoutParams.TopMargin = wr.Y;
 			// Unlink webView once its window got invisible. This fixes webview's disappearance on device rotation
@@ -88,8 +88,9 @@ namespace Lime
 			}
 			if (webView.Parent == null) {
 				((RelativeLayout)GameView.Instance.Parent).AddView(webView, layoutParams);
-			} else {
+			} else if (!prevRect.Equals(wr)) {
 				webView.LayoutParameters = layoutParams;
+				prevRect = wr;
 			}
 		}
 

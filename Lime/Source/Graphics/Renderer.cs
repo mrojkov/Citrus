@@ -45,7 +45,7 @@ namespace Lime
 		Custom,
 	}
 
-	public struct WindowRect
+	public struct WindowRect : IEquatable<WindowRect>
 	{
 		public int X;
 		public int Y;
@@ -55,6 +55,11 @@ namespace Lime
 		public static explicit operator IntRectangle(WindowRect r)
 		{
 			return new IntRectangle(r.X, r.Y, r.X + r.Width, r.Y + r.Height);
+		}
+
+		public bool Equals(WindowRect other)
+		{
+			return X == other.X && Y == other.Y && Width == other.Width && Height == other.Height;
 		}
 	}
 
