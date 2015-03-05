@@ -28,7 +28,7 @@ namespace Lime
 				Renderer.Viewport = new WindowRect { X = 0, Y = 0, Width = texture.ImageSize.Width, Height = texture.ImageSize.Height };
 				Renderer.ClearRenderTarget(0, 0, 0, 0);
 				Renderer.PushProjectionMatrix();
-				Renderer.SetOrthogonalProjection(0, Height, Width, 0);
+				Renderer.SetOrthogonalProjection(0, 0, Width, Height);
 				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
 					node.AddToRenderChain(renderChain);
 				}

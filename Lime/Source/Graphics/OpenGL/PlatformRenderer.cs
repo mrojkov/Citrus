@@ -63,7 +63,12 @@ namespace Lime
 			if (shaderProgram != program) {
 				shaderProgram = program;
 				shaderProgram.Use();
-				shaderProgram.LoadMatrix(program.ProjectionMatrixUniformId, Renderer.Projection);
+				var projection = Renderer.Projection;
+				// OpenGL has a nice peculiarity: for render targets we must flip Y axis.
+				if (CurrentFramebuffer != DefaultFramebuffer) {
+					FlipProjectionYAxis(ref projection);
+				}
+				shaderProgram.LoadMatrix(program.ProjectionMatrixUniformId, projection);
 			}
 #if ANDROID
 			if (numTextures > 0) {
@@ -73,6 +78,13 @@ namespace Lime
 				shaderProgram.LoadBoolean(shaderProgram.UseAlphaTexture2UniformId, textures[3] != 0); 
 			}
 #endif
+		}
+
+		private static void FlipProjectionYAxis(ref Matrix44 matrix)
+		{
+			matrix.M22 = -matrix.M22;
+			matrix.M32 = -matrix.M32;
+			matrix.M42 = -matrix.M42;
 		}
 
 		static PlatformRenderer()
