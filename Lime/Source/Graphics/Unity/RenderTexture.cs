@@ -1,14 +1,7 @@
 #if UNITY
 using System;
 using System.Diagnostics;
-#if iOS
-using OpenTK.Graphics.ES20;
-#elif MAC
-using MonoMac.OpenGL;
-using OGL = MonoMac.OpenGL.GL;
-#elif OPENGL
-using OpenTK.Graphics.OpenGL;
-#endif
+using System.Collections.Generic;
 
 namespace Lime
 {
@@ -18,11 +11,14 @@ namespace Lime
 		uint id;
 		Size size = new Size(0, 0);
 		Rectangle uvRect;
-		UnityEngine.Texture unityTexture;
+		UnityEngine.RenderTexture unityTexture;
+
+		private static readonly Stack<UnityEngine.RenderTexture> textureStack = new Stack<UnityEngine.RenderTexture>();
 
 		public RenderTexture(int width, int height)
 		{
 			unityTexture = new UnityEngine.RenderTexture(width, height, 0);
+			unityTexture.Create();
 			size.Width = width;
 			size.Height = height;
 			uvRect = new Rectangle(0, 0, 1, 1);
@@ -72,10 +68,17 @@ namespace Lime
 
 		public void SetAsRenderTarget()
 		{
+			Renderer.Flush();
+			var currentTexture = UnityEngine.RenderTexture.active;
+			textureStack.Push(currentTexture);
+			UnityEngine.RenderTexture.active = unityTexture;
 		}
 
 		public void RestoreRenderTarget()
 		{
+			Renderer.Flush();
+			var prevTexture = textureStack.Pop();
+			UnityEngine.RenderTexture.active = prevTexture;
 		}
 
 		public bool IsTransparentPixel(int x, int y)

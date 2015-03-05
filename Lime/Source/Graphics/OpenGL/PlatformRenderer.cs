@@ -51,7 +51,7 @@ namespace Lime
 			throw new Exception("OpenGL error(s): " + errors);
 		}
 
-		public static void ResetShader()
+		public static void SetProjectionMatrix(Matrix44 matrix)
 		{
 			shaderProgram = null;
 		}
@@ -114,11 +114,7 @@ namespace Lime
 				DefaultFramebuffer = (uint)p[0];
 			}
 		}
-
-		public static void EndFrame()
-		{
-		}
-
+		
 		public static void ClearRenderTarget(float r, float g, float b, float a)
 		{
 			GL.ClearColor(r, g, b, a);

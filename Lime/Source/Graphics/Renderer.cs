@@ -109,10 +109,7 @@ namespace Lime
 			{
 				projectionStack.Pop();
 				projectionStack.Push(value);
-#if UNITY
 				PlatformRenderer.SetProjectionMatrix(value);
-#endif
-				PlatformRenderer.ResetShader();
 			}
 		}
 
@@ -184,7 +181,9 @@ namespace Lime
 
 		static Renderer()
 		{
+#if !UNITY
 			PremultipliedAlphaMode = true;
+#endif
 			projectionStack = new Stack<Matrix44>();
 			projectionStack.Push(Matrix44.Identity);
 		}
@@ -205,7 +204,6 @@ namespace Lime
 		public static void EndFrame()
 		{
 			Flush();
-			PlatformRenderer.EndFrame();
 		}
 
 		public static void Flush()

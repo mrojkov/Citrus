@@ -39,10 +39,9 @@ namespace Lime
 
 		public static void SetMaterial(ITexture texture1, ITexture texture2, ShaderId shader, Blending blending)
 		{
-			var m = MaterialFactory.CreateMaterial(blending, new ITexture[] { texture1, texture2 });
+			var m = MaterialFactory.CreateMaterial(blending, shader, new ITexture[] { texture1, texture2 });
 			m.SetPass(0);
 		}
-		// PlatformRenderer.SetMaterial(Texture1, Texture2, Shader, Blending);
 
 //		public static void FlushSpriteBatch()
 //		{
@@ -58,39 +57,8 @@ namespace Lime
 //			}
 //		}
 //
-//		private static void UpdateMesh()
-//		{
-//			mesh.Clear(true);
-//			mesh.MarkDynamic();
-//			var colors32 = new UnityEngine.Color32[currentVertex];
-//			var vertices = new UnityEngine.Vector3[currentVertex];
-//			var uv1 = new UnityEngine.Vector2[currentVertex];
-//			var uv2 = new UnityEngine.Vector2[currentVertex];
-//			for (int i = 0; i < currentVertex; i++) {
-//				Vertex v = batchVertices[i];
-//				colors32[i].a = v.Color.A;
-//				colors32[i].r = v.Color.R;
-//				colors32[i].g = v.Color.G;
-//				colors32[i].b = v.Color.B;
-//				vertices[i].x = v.Pos.X;
-//				vertices[i].y = v.Pos.Y;
-//				uv1[i].x = v.UV1.X;
-//				uv1[i].y = 1 - v.UV1.Y;
-//				uv2[i].x = v.UV2.X;
-//				uv2[i].y = 1 - v.UV2.Y;
-//			}
-//			mesh.vertices = vertices;
-//			mesh.colors32 = colors32;
-//			mesh.uv = uv1;
-//			mesh.uv1 = uv2;
-//			int[] indices = new int[currentIndex];
-//			Array.Copy(batchIndices, indices, currentIndex);
-//			mesh.triangles = indices;
-//		}
-		
 		public static void BeginFrame()
 		{
-			// Texture2D.DeleteScheduledTextures();
 			DrawCalls = 0;
 			RenderCycle++;
 		}
@@ -107,13 +75,6 @@ namespace Lime
 //				textures[stage] = texture;
 //			}
 //		}
-		
-		public static void EndFrame()
-		{
-//			FlushSpriteBatch();
-//			SetTexture(null, 0);
-//			SetTexture(null, 1);
-		}
 
 		public static void SetOrthogonalProjection(Vector2 leftTop, Vector2 rightBottom)
 		{
@@ -135,21 +96,6 @@ namespace Lime
 		{
 			var m = (UnityEngine.Matrix4x4)matrix;
 			UnityEngine.GL.LoadProjectionMatrix(m);
-		}
-
-
-//		public static void PushProjectionMatrix()
-//		{
-//			UnityEngine.GL.PushMatrix();
-//		}
-//
-//		public static void PopProjectionMatrix()
-//		{
-//			UnityEngine.GL.PopMatrix();
-//		}
-
-		public static void ResetShader()
-		{
 		}
 
 		public static void SetScissorRectangle(WindowRect value)
