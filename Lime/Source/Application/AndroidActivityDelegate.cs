@@ -181,6 +181,7 @@ namespace Lime
 		{
 			if (GameView == null) {
 				GameView = new GameView(activity);
+				GameView.OnCreate();
 			}
 			Debug.Write("Activity.OnCreate");
 			RemoveGameViewFromParent();

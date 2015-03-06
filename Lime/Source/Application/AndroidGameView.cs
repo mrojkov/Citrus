@@ -17,30 +17,21 @@ namespace Lime
 		// TODO: resolve keyboard flickering bug and remove this field;
 		public static bool AllowOnscreenKeyboard;
 
-		class InputConnection : BaseInputConnection
+		class KeyboardHandler : Java.Lang.Object, IOnKeyListener
 		{
 			public string TextInput;
 
-			public InputConnection(View view)
-				: base(view, true)
-			{
-			}
-
-			public override bool SendKeyEvent(KeyEvent e)
+			public bool OnKey(View v, Keycode keyCode, KeyEvent e)
 			{
 				if (e.KeyCode == Keycode.Del && e.Action != KeyEventActions.Up) {
 					TextInput += '\b';
 				}
-				if (e.IsPrintingKey && e.Action == KeyEventActions.Down) {
-					CommitText(new String((char)e.UnicodeChar, 1), 1);
+				if (keyCode == Keycode.Unknown) {
+					TextInput += e.Characters;
+				} else if (e.IsPrintingKey && e.Action != KeyEventActions.Up) {
+					TextInput += (char)e.UnicodeChar;
 				}
-				return base.SendKeyEvent(e);
-			}
-
-			public override bool CommitText(Java.Lang.ICharSequence text, int newCursorPosition)
-			{
-				TextInput += text.ToString();
-				return base.CommitText(text, newCursorPosition);
+				return true;
 			}
 		}
 
@@ -49,7 +40,7 @@ namespace Lime
 
 		public readonly RenderingApi RenderingApi = RenderingApi.ES20;
 
-		private InputConnection inputConnection;
+		private KeyboardHandler keyboardHandler;
 		private InputMethodManager imm;
 
 		public GameView(Context context)
@@ -63,6 +54,12 @@ namespace Lime
 		}
 
 		private bool isOnscreenKeyboardVisible;
+
+		public void OnCreate()
+		{
+			keyboardHandler = new KeyboardHandler();
+			SetOnKeyListener(keyboardHandler);
+		}
 
 		protected override void OnLayout(bool changed, int left, int top, int right, int bottom)
 		{
@@ -166,18 +163,6 @@ namespace Lime
 			throw new Lime.Exception("Can't create framebuffer, aborting");
 		}
 
-		public override Android.Views.InputMethods.IInputConnection OnCreateInputConnection(Android.Views.InputMethods.EditorInfo outAttrs)
-		{
-			if (!AllowOnscreenKeyboard) {
-				return base.OnCreateInputConnection(outAttrs);
-			} else {
-				if (inputConnection == null) {
-					inputConnection = new InputConnection(this);
-				}
-				return inputConnection;
-			}
-		}
-			
 		protected override void OnRenderFrame(FrameEventArgs e)
 		{
 			if (GraphicsContext == null || GraphicsContext.IsDisposed) {
@@ -322,10 +307,8 @@ namespace Lime
 			Input.ProcessPendingKeyEvents();
 			Application.Instance.OnUpdateFrame(delta);
 			AudioSystem.Update();
-			if (inputConnection != null) {
-				Input.TextInput = inputConnection.TextInput;
-				inputConnection.TextInput = null;
-			}
+			Input.TextInput = keyboardHandler.TextInput;
+			keyboardHandler.TextInput = null;
 			Input.CopyKeysState();
 			if (DidUpdated != null) {
 				DidUpdated();
