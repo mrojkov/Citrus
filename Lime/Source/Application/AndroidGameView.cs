@@ -186,11 +186,41 @@ namespace Lime
 			if (!GraphicsContext.IsCurrent) {
 				MakeCurrent();
 			}
+			RestrictSupportedOrientationsWith(Application.Instance.SupportedDeviceOrientations);
 			base.OnRenderFrame(e);
 			FPSCalculator.Refresh();
 			Application.Instance.OnRenderFrame();
 			SwapBuffers();
 			FPSCalculator.Refresh();
+		}
+
+		private void RestrictSupportedOrientationsWith(DeviceOrientation orientation)
+		{
+			Android.Content.PM.ScreenOrientation o;
+			switch (orientation) {
+				case DeviceOrientation.LandscapeLeft:
+					o = Android.Content.PM.ScreenOrientation.Landscape;
+					break;
+				case DeviceOrientation.LandscapeRight:
+					o = Android.Content.PM.ScreenOrientation.ReverseLandscape;
+					break;
+				case DeviceOrientation.AllLandscapes:
+					o = Android.Content.PM.ScreenOrientation.SensorLandscape;
+					break;
+				case DeviceOrientation.Portrait:
+					o = Android.Content.PM.ScreenOrientation.Portrait;
+					break;
+				case DeviceOrientation.PortraitUpsideDown:
+					o = Android.Content.PM.ScreenOrientation.ReversePortrait;
+					break;
+				case DeviceOrientation.AllPortraits:
+					o = Android.Content.PM.ScreenOrientation.SensorPortrait;
+					break;
+				default:
+					o = Android.Content.PM.ScreenOrientation.FullSensor;
+					break;
+			}
+			((Android.App.Activity)Context).RequestedOrientation = o;
 		}
 
 		public float FrameRate {

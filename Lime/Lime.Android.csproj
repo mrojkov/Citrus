@@ -275,6 +275,7 @@
     <Compile Include="Source\Graphics\RenderBatch.cs" />
     <Compile Include="Source\Graphics\RenderList.cs" />
     <Compile Include="Source\Graphics\OpenGL\PlatformMesh.cs" />
+    <Compile Include="Source\Graphics\Bitmap.Unity.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">

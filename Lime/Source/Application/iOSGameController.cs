@@ -100,13 +100,13 @@ namespace Lime
 			if (!Application.Instance.Active && Application.Instance.CurrentDeviceOrientation != 0) {
 				return mask | ConvertDeviceOrientationToInterfaceOrientationMask(Application.Instance.CurrentDeviceOrientation);
 			}
-			if ((Application.Instance.GetSupportedDeviceOrientations() & DeviceOrientation.LandscapeLeft) != 0)
+			if ((Application.Instance.SupportedDeviceOrientations & DeviceOrientation.LandscapeLeft) != 0)
 				mask = mask | UIInterfaceOrientationMask.LandscapeLeft;
-			if ((Application.Instance.GetSupportedDeviceOrientations() & DeviceOrientation.LandscapeRight) != 0)
+			if ((Application.Instance.SupportedDeviceOrientations & DeviceOrientation.LandscapeRight) != 0)
 				mask = mask | UIInterfaceOrientationMask.LandscapeRight;
-			if ((Application.Instance.GetSupportedDeviceOrientations() & DeviceOrientation.Portrait) != 0)
+			if ((Application.Instance.SupportedDeviceOrientations & DeviceOrientation.Portrait) != 0)
 				mask = mask | UIInterfaceOrientationMask.Portrait;
-			if ((Application.Instance.GetSupportedDeviceOrientations() & DeviceOrientation.PortraitUpsideDown) != 0)
+			if ((Application.Instance.SupportedDeviceOrientations & DeviceOrientation.PortraitUpsideDown) != 0)
 				mask = mask | UIInterfaceOrientationMask.PortraitUpsideDown;
 			return mask;
 		}
@@ -119,13 +119,13 @@ namespace Lime
 			}
 			switch (toInterfaceOrientation) {
 			case UIInterfaceOrientation.LandscapeLeft:
-				return (Application.Instance.GetSupportedDeviceOrientations() & DeviceOrientation.LandscapeLeft) != 0;
+				return (Application.Instance.SupportedDeviceOrientations & DeviceOrientation.LandscapeLeft) != 0;
 			case UIInterfaceOrientation.LandscapeRight:
-				return (Application.Instance.GetSupportedDeviceOrientations() & DeviceOrientation.LandscapeRight) != 0;
+				return (Application.Instance.SupportedDeviceOrientations & DeviceOrientation.LandscapeRight) != 0;
 			case UIInterfaceOrientation.Portrait:
-				return (Application.Instance.GetSupportedDeviceOrientations() & DeviceOrientation.Portrait) != 0;
+				return (Application.Instance.SupportedDeviceOrientations & DeviceOrientation.Portrait) != 0;
 			case UIInterfaceOrientation.PortraitUpsideDown:
-				return (Application.Instance.GetSupportedDeviceOrientations() & DeviceOrientation.PortraitUpsideDown) != 0;
+				return (Application.Instance.SupportedDeviceOrientations & DeviceOrientation.PortraitUpsideDown) != 0;
 			}
 			return false;
 		}

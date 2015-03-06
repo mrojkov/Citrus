@@ -360,7 +360,7 @@ namespace Lime
 		/// </summary>
 		public virtual void OnDeviceRotate() {}
 
-		public virtual DeviceOrientation GetSupportedDeviceOrientations() { return DeviceOrientation.LandscapeLeft; }
+		public DeviceOrientation SupportedDeviceOrientations = DeviceOrientation.All;
 
 		[Obsolete("Use GameView.SetCursor() instead")]
 		public void SetCursor(string name, IntVector2 hotSpot)
