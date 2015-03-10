@@ -13,6 +13,10 @@ namespace Lime
 		private UnityEngine.AudioSource source;
 		public int Id;
 		private bool paused;
+		private float volume = 1;
+		private float fadeVolume;
+		private float fadeSpeed;
+		private volatile int lastBumpedRenderCycle;
 
 		public Sound Sound { get; private set; }
 
@@ -30,6 +34,20 @@ namespace Lime
 
 		public void Update(float delta)
 		{
+			if (fadeSpeed != 0) {
+				fadeVolume += delta * fadeSpeed;
+				if (fadeVolume > 1) {
+					fadeSpeed = 0;
+					fadeVolume = 1;
+				} else if (fadeVolume < 0) {
+					fadeSpeed = 0;
+					fadeVolume = 0;
+					Stop();
+				}
+				Volume = volume;
+			} else if (Sound != null && Sound.IsBumpable && Renderer.RenderCycle - lastBumpedRenderCycle > 3) {
+				Stop(0.1f);
+			}
 		}
 
 		internal void Play(Sound sound, UnityEngine.AudioClip clip, bool looping, bool paused, float fadeinTime)
@@ -70,18 +88,30 @@ namespace Lime
 		}
 
 		public float Volume {
-			get { return source.volume; }
-			set { source.volume = value; }
+			get { return volume; }
+			set
+			{
+				volume = Mathf.Clamp(value, 0, 1);
+				float gain = volume * AudioSystem.GetGroupVolume(Group) * fadeVolume;
+				source.volume = gain; 
+			}
 		}
 
 		public float Pitch { 
 			get { return source.pitch; }
-			set { source.pitch = value; }
+			set
+			{
+				value = Mathf.Clamp(value, 0.0625f, 16);
+				source.pitch = value; 
+			}
 		}
 
 		public string SamplePath { get; set; }
 
-		public void Bump() {}
+		public void Bump()
+		{
+			lastBumpedRenderCycle = Renderer.RenderCycle;
+		}
 
 		public void Pause()
 		{
@@ -91,12 +121,28 @@ namespace Lime
 
 		public void Resume(float fadeinTime = 0)
 		{
+			Bump();
+			if (fadeinTime > 0) {
+				fadeVolume = 0;
+				fadeSpeed = 1 / fadeinTime;
+			} else {
+				fadeSpeed = 0;
+				fadeVolume = 1;
+			}
+			Volume = volume;
 			paused = false;
 			source.Play();
 		}
 		
 		public void Stop(float fadeoutTime = 0)
 		{
+			if (fadeoutTime > 0) {
+				fadeSpeed = -1 / fadeoutTime;
+				return;
+			} else {
+				fadeSpeed = 0;
+				fadeVolume = 0;
+			}
 			source.Stop();
 		}
 

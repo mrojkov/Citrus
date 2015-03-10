@@ -13,6 +13,9 @@ namespace Lime
 		public static void Initialize()
 		{
 			var options = Application.Instance.Options;
+			if (options.DecodeAudioInSeparateThread) {
+				throw new Lime.Exception("Unity3D doesn't support setting audio volume in separate thread. Set DecodeAudioInSeparateThread = false and use AudioSystem.Update()");
+			}
 			for (int i = 0; i < options.NumStereoChannels + options.NumMonoChannels; i++) {
 				channels.Add(new AudioChannel(i));
 			}
@@ -26,7 +29,12 @@ namespace Lime
 			channels.Clear();
 		}
 	
-		public static void Update() {}
+		public static void Update()
+		{
+			foreach (var channel in channels) {
+				channel.Update(UnityEngine.Time.deltaTime);
+			}
+		}
 
 		public static void SetGroupVolume(AudioChannelGroup group, float value)
 		{
