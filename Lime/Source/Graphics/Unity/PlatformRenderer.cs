@@ -39,7 +39,7 @@ namespace Lime
 
 		public static void SetMaterial(ITexture texture1, ITexture texture2, ShaderId shader, Blending blending)
 		{
-			var m = MaterialFactory.CreateMaterial(blending, shader, new ITexture[] { texture1, texture2 });
+			var m = MaterialFactory.GetMaterial(blending, shader, new ITexture[] { texture1, texture2 });
 			m.SetPass(0);
 		}
 
