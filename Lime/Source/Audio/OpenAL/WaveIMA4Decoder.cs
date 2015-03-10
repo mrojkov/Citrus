@@ -1,4 +1,4 @@
-#if !UNITY
+#if OPENAL
 using System;
 using System.IO;
 using System.Text;

@@ -1,91 +1,17 @@
+#if OPENAL
 using System;
 using System.Collections.Generic;
-#if OPENAL
 using OpenTK.Audio.OpenAL;
-#endif
 using System.Runtime.InteropServices;
-
-#if !OPENAL
-public enum ALSourceState
-{
-	Initial,
-	Playing,
-	Stopped
-}
-#endif
 
 namespace Lime
 {
-	public interface IAudioChannel
-	{
-		bool Streaming { get; }
-		ALSourceState State { get; }
-		float Pan { get; set; }
-		void Resume(float fadeinTime = 0);
-		void Stop(float fadeoutTime = 0);
-		float Volume { get; set; }
-		float Pitch { get; set; }
-		string SamplePath { get; set; }
-		Sound Sound { get; }
-		void Bump();
-	}
-
-	public class NullAudioChannel : IAudioChannel
-	{
-		public static NullAudioChannel Instance = new NullAudioChannel();
-
-		public ALSourceState State { get { return ALSourceState.Stopped; } }
-		public bool Streaming { get { return false; } }
-		public float Pan { get { return 0; } set { } }
-		public void Resume(float fadeinTime = 0) {}
-		public void Stop(float fadeoutTime = 0) {}
-		public float Volume { get { return 0; } set { } }
-		public float Pitch { get { return 1; } set { } }
-		public void Bump() {}
-		public string SamplePath { get; set; }
-		public Sound Sound { get { return null; } }
-	}
-
-#if !OPENAL
-	internal class AudioChannel : NullAudioChannel, IDisposable
-	{
-		public AudioChannelGroup Group;
-		public float Priority;
-		public DateTime StartupTime = DateTime.Now;
-		public AudioFormat AudioFormat { get; private set; }
-		public int Id;
-
-		public AudioChannel(int index, AudioFormat format)
-		{
-			Id = index;
-			AudioFormat = format;
-		}
-
-		public void Update(float delta)
-		{
-		}
-
-		public Sound Play(IAudioDecoder decoder, bool looping)
-		{
-			return new Sound();
-		}
-
-		public void Pause()
-		{
-		}
-
-		public void Dispose()
-		{
-		}
-	}
-
-#else
 	internal class AudioChannel : IDisposable, IAudioChannel
 	{
         public const int BufferSize = 1024 * 32;
 		public const int NumBuffers = 8;
 
-		public AudioChannelGroup Group;
+		public AudioChannelGroup Group { get; set; }
 		public float Priority;
 		public DateTime StartupTime;
 		public int Id;
@@ -121,9 +47,22 @@ namespace Lime
 			set { SetVolume(value); }
 		}
 
-		public ALSourceState State
+		public AudioChannelState State
 		{
-			get { return AL.GetSourceState(source); }
+			get
+			{
+				switch (AL.GetSourceState(source)) {
+					case ALSourceState.Initial:
+						return AudioChannelState.Initial;
+					case ALSourceState.Paused:
+						return AudioChannelState.Paused;
+					case ALSourceState.Playing:
+						return AudioChannelState.Playing;
+					case ALSourceState.Stopped:
+					default:
+						return AudioChannelState.Stopped;
+				}
+			}
 		}
 
 		public Sound Sound { get; private set; }
@@ -143,7 +82,7 @@ namespace Lime
 			Sound = null;
 			this.Id = index;
 			decodedData = Marshal.AllocHGlobal(BufferSize);
-			using (new AudioSystem.ErrorChecker()) {
+			using (new PlatformAudioSystem.ErrorChecker()) {
 				allBuffers = new List<int>(AL.GenBuffers(NumBuffers));
 				source = AL.GenSource();
 			}
@@ -165,7 +104,7 @@ namespace Lime
 		{
 			pan = value.Clamp(-1, 1);
 			var sourcePosition = Vector2.HeadingRad(pan * Mathf.HalfPi);
-			using (new AudioSystem.ErrorChecker()) {
+			using (new PlatformAudioSystem.ErrorChecker()) {
 				AL.Source(source, ALSource3f.Position, sourcePosition.Y, 0, sourcePosition.X);
 			}
 		}
@@ -178,7 +117,7 @@ namespace Lime
 			}
 			lock (streamingSync) {
 				if (streaming) {
-					throw new Lime.Exception("Can't play on the channel because it is already being played");
+					throw new Lime.Exception("Can't play on channel because it is in use");
 				}
 				this.looping = looping;
 				if (this.decoder != null) {
@@ -200,7 +139,7 @@ namespace Lime
 
 		private void DetachBuffers()
 		{
-			using (new AudioSystem.ErrorChecker(throwException: false)) {
+			using (new PlatformAudioSystem.ErrorChecker(throwException: false)) {
 				AL.Source(source, ALSourcei.Buffer, 0);
 			}
 			processedBuffers = new Stack<int>(allBuffers);
@@ -221,8 +160,8 @@ namespace Lime
 			}
 			Volume = volume;
 			streaming = true;
-			if (State == ALSourceState.Paused) {
-				using (new AudioSystem.ErrorChecker()) {
+			if (State == AudioChannelState.Paused) {
+				using (new PlatformAudioSystem.ErrorChecker()) {
 					AL.SourcePlay(source);
 				}
 			}
@@ -230,7 +169,7 @@ namespace Lime
 
 		public void Pause()
 		{
-			using (new AudioSystem.ErrorChecker()) {
+			using (new PlatformAudioSystem.ErrorChecker()) {
 				AL.SourcePause(source);
 			}
 		}
@@ -247,7 +186,7 @@ namespace Lime
 			}
 			lock (streamingSync) {
 				streaming = false;
-				using (new AudioSystem.ErrorChecker(throwException: false)) {
+				using (new PlatformAudioSystem.ErrorChecker(throwException: false)) {
 					AL.SourceStop(source);
 				}
 			}
@@ -256,7 +195,7 @@ namespace Lime
 		private void SetPitch(float value)
 		{
 			pitch = Mathf.Clamp(value, 0.0625f, 16);
-			using (new AudioSystem.ErrorChecker()) {
+			using (new PlatformAudioSystem.ErrorChecker()) {
 				AL.Source(source, ALSourcef.Pitch, pitch);
 			}
 		}
@@ -265,7 +204,7 @@ namespace Lime
 		{
 			volume = Mathf.Clamp(value, 0, 1);
 			float gain = volume * AudioSystem.GetGroupVolume(Group) * fadeVolume;
-			using (new AudioSystem.ErrorChecker()) {
+			using (new PlatformAudioSystem.ErrorChecker()) {
 				AL.Source(source, ALSourcef.Gain, gain);
 			}
 		}
@@ -311,7 +250,7 @@ namespace Lime
 				addedbuffers = true;
 			}
 			if (addedbuffers) {
-				if (State == ALSourceState.Stopped || State == ALSourceState.Initial) {
+				if (State == AudioChannelState.Stopped || State == AudioChannelState.Initial) {
 					AL.SourcePlay(source);
 				}
 			}
@@ -397,5 +336,5 @@ namespace Lime
 			}
 		}
 	}
-#endif
 }
+#endif

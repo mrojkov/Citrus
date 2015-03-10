@@ -14,7 +14,7 @@ namespace Lime
 		public IAudioChannel Channel { get; internal set; }
 		public bool IsBumpable { get; set; }
 		public bool IsLoading { get; internal set; }
-		public bool IsStopped { get { return Channel.State == ALSourceState.Stopped; } }
+		public bool IsStopped { get { return Channel.State == AudioChannelState.Stopped; } }
 		
 		public float Volume
 		{

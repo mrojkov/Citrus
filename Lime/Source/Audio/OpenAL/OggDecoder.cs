@@ -1,14 +1,11 @@
-#if !UNITY
+#if OPENAL
 using System;
 using System.IO;
 using Lemon;
 #if iOS
 using ObjCRuntime;
 #endif
-
-#if OPENAL
 using OpenTK.Audio.OpenAL;
-#endif
 using System.Runtime.InteropServices;
 
 namespace Lime
