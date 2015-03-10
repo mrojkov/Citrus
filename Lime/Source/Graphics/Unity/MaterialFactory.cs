@@ -8,34 +8,29 @@ namespace Lime
 {
 	internal static class MaterialFactory
 	{
-		static UnityEngine.Shader diffuseShader;
-		static UnityEngine.Shader imageCombinerShader;
-		static UnityEngine.Shader silhuetteShader;
+		static UnityEngine.Material diffuseMat;
+		static UnityEngine.Material imageCombinerMat;
+		static UnityEngine.Material silhuetteMat;
 
 		static MaterialFactory()
 		{
-			diffuseShader = UnityEngine.Shader.Find("Diffuse");
-			imageCombinerShader = UnityEngine.Shader.Find("ImageCombiner");
-			silhuetteShader = UnityEngine.Shader.Find("Silhuette");
-			if (diffuseShader == null || imageCombinerShader == null || silhuetteShader == null) {
-				throw new Lime.Exception("One of standard shaders not found");
-			}
+			diffuseMat = new UnityEngine.Material(UnityEngine.Shader.Find("Diffuse"));
+			imageCombinerMat = new UnityEngine.Material(UnityEngine.Shader.Find("ImageCombiner"));
+			silhuetteMat = new UnityEngine.Material(UnityEngine.Shader.Find("Silhuette"));
 		}
 
-		public static UnityEngine.Material CreateMaterial(Blending blending, ShaderId shaderId, ITexture[] textures)
+		public static UnityEngine.Material GetMaterial(Blending blending, ShaderId shaderId, ITexture[] textures)
 		{
 			UnityEngine.Material mat;
 			var texCount = textures[1] != null ? 2 : 1;
-			UnityEngine.Shader shader;
 			switch (shaderId) {
 			case ShaderId.Silhuette:
-				shader = silhuetteShader;
+				mat = silhuetteMat;
 				break;
 			default:
-				shader = texCount == 2 ? imageCombinerShader : diffuseShader;
+				mat = texCount == 2 ? imageCombinerMat : diffuseMat;
 				break;
 			}
-			mat = new UnityEngine.Material(shader);
 			if (textures[0] != null) {
 				mat.mainTexture = textures[0].GetUnityTexture();
 			}
