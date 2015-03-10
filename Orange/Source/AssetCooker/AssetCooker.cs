@@ -203,6 +203,10 @@ namespace Orange
 
 		private static void SyncSounds()
 		{
+			if (platform == TargetPlatform.Unity) {
+				SyncRawAssets(".ogg");
+				return;
+			}
 			SyncUpdated(".ogg", ".sound", (srcPath, dstPath) => {
 				using (var stream = new FileStream(srcPath, FileMode.Open)) {
 					// All sounds below 100kb size are converted from OGG to Wav/Adpcm
