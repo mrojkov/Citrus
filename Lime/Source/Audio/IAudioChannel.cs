@@ -27,7 +27,6 @@ namespace Lime
 
 	public interface IAudioChannel
 	{
-		bool Streaming { get; }
 		AudioChannelState State { get; }
 		AudioChannelGroup Group { get; set; }
 		float Pan { get; set; }
@@ -46,7 +45,6 @@ namespace Lime
 
 		public AudioChannelState State { get { return AudioChannelState.Stopped; } }
 		public AudioChannelGroup Group { get; set; }
-		public bool Streaming { get { return false; } }
 		public float Pan { get { return 0; } set { } }
 		public void Resume(float fadeinTime = 0) {}
 		public void Stop(float fadeoutTime = 0) {}

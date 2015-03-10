@@ -16,7 +16,6 @@ namespace Lime
 			PlatformAudioSystem.Terminate();
 		}
 
-
 		public static bool Active
 		{
 			get { return active; }
