@@ -66,15 +66,9 @@
     <Compile Include="Source\AssetsBundle\PackedAssetsBundle.cs" />
     <Compile Include="Source\AssetsBundle\UnityAssetsBundle.cs" />
     <Compile Include="Source\AssetsBundle\UnpackedAssetsBundle.cs" />
-    <Compile Include="Source\Audio\AudioCache.cs" />
-    <Compile Include="Source\Audio\AudioChannel.cs" />
-    <Compile Include="Source\Audio\AudioDecoder.cs" />
     <Compile Include="Source\Audio\AudioSystem.cs" />
-    <Compile Include="Source\Audio\AudioSystem.ErrorChecker.cs" />
-    <Compile Include="Source\Audio\OggDecoder.cs" />
     <Compile Include="Source\Audio\SerializableSample.cs" />
     <Compile Include="Source\Audio\Sound.cs" />
-    <Compile Include="Source\Audio\WaveIMA4Decoder.cs" />
     <Compile Include="Source\Graphics\OpenGL\IndexBuffer.cs" />
     <Compile Include="Source\Graphics\OpenGL\PlatformRenderer.cs" />
     <Compile Include="Source\Graphics\OpenGL\RenderTexture.cs" />
@@ -276,6 +270,15 @@
     <Compile Include="Source\Graphics\RenderList.cs" />
     <Compile Include="Source\Graphics\OpenGL\PlatformMesh.cs" />
     <Compile Include="Source\Graphics\Bitmap.Unity.cs" />
+    <Compile Include="Source\Audio\IAudioChannel.cs" />
+    <Compile Include="Source\Audio\OpenAL\AudioCache.cs" />
+    <Compile Include="Source\Audio\OpenAL\AudioChannel.cs" />
+    <Compile Include="Source\Audio\OpenAL\AudioDecoder.cs" />
+    <Compile Include="Source\Audio\OpenAL\OggDecoder.cs" />
+    <Compile Include="Source\Audio\OpenAL\PlatformAudioSystem.cs" />
+    <Compile Include="Source\Audio\OpenAL\WaveIMA4Decoder.cs" />
+    <Compile Include="Source\Audio\Unity\AudioChannel.cs" />
+    <Compile Include="Source\Audio\Unity\PlatformAudioSystem.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">
