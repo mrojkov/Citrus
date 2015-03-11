@@ -11,6 +11,19 @@ namespace Lime
 {
 	public class WebBrowser : Widget
 	{
+		private class HiddenForm : Form
+		{
+			protected override CreateParams CreateParams
+			{
+				get
+				{
+					var p = base.CreateParams;
+					p.ExStyle |= 0x80; // WS_EX_TOOLWINDOW
+					return p;
+				}
+			}
+		}
+
 		public Uri Url { get { return browser.Url; } set { browser.Url = value; } }
 
 		private System.Windows.Forms.WebBrowser browser;
@@ -65,7 +78,7 @@ namespace Lime
 		{
 			Application.Instance.Moved += CalcGeometry;
 			var mainForm = Control.FromHandle(System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle);
-			form = new Form();
+			form = new HiddenForm();
 			form.StartPosition = FormStartPosition.Manual;
 			form.FormBorderStyle = FormBorderStyle.None;
 			form.ShowInTaskbar = false;
