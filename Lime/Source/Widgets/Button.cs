@@ -82,7 +82,8 @@ namespace Lime
 
 		public override bool WasClicked()
 		{
-			return wasClicked;
+			// If the button if hidden by clicking on it, it might became WasClicked forever.
+			return wasClicked && GloballyVisible;
 		}
 
 		public override Node DeepCloneFast()
