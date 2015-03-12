@@ -143,6 +143,7 @@ namespace Lime
 			currentKeysState[(int)Key.Mouse0] = UnityEngine.Input.GetMouseButton(0);
 			currentKeysState[(int)Key.Mouse1] = UnityEngine.Input.GetMouseButton(1);
 			currentKeysState[(int)Key.Mouse2] = UnityEngine.Input.GetMouseButton(2);
+			currentKeysState[(int)Key.Touch0] = UnityEngine.Input.GetMouseButton(0);
 		}
 
 		private static void RefreshMousePosition()
