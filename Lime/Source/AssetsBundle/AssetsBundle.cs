@@ -74,6 +74,13 @@ namespace Lime
 			return path;
 		}
 
+#if UNITY
+		public virtual T LoadUnityAsset<T>(string path) where T : UnityEngine.Object
+		{
+			throw new NotImplementedException();
+		}
+#endif
+
 		public virtual AssetAttributes GetAttributes(string path)
 		{
 			return AssetAttributes.None;

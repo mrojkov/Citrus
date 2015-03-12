@@ -7,12 +7,14 @@ using System.IO;
 
 namespace Lime
 {
-	public sealed class UnityAssetsBundle : AssetsBundle
+	public sealed class UnityDownloadableBundle : AssetsBundle
 	{
-		List<string> fileList;
+		private List<string> fileList;
+		private UnityEngine.AssetBundle bundle;
 
-		public UnityAssetsBundle()
+		public UnityDownloadableBundle(UnityEngine.AssetBundle bundle)
 		{
+			this.bundle = bundle;
 			ReadFileList();
 		}
 
@@ -26,6 +28,16 @@ namespace Lime
 			}
 		}
 
+		public override T LoadUnityAsset<T>(string path)
+		{
+			path = GetAssetPathWOExtension(path);
+			var result = bundle.Load(path, typeof(T)) as T;
+			if (result == null) {
+				throw new Lime.Exception("Asset not found: {0}", path);
+			}
+			return result;
+		}
+
 		private string GetAssetPathWOExtension(string path)
 		{
 			var ext = Path.GetExtension(path);
@@ -33,16 +45,6 @@ namespace Lime
 				path = System.IO.Path.ChangeExtension(path, null);
 			}
 			return path;
-		}
-
-		public override T LoadUnityAsset<T>(string path)
-		{
-			path = GetAssetPathWOExtension(path);
-			var result = UnityEngine.Resources.Load(path, typeof(T)) as T;
-			if (result == null) {
-				throw new Lime.Exception("Asset not found: {0}", path);
-			}
-			return result;
 		}
 
 		public override Stream OpenFile(string path)
