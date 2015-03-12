@@ -71,7 +71,9 @@ namespace Lime
 		public event Action<Activity> Paused;
 		public event Action<Activity> Stopped;
 		public event Action<Activity> Destroying;
+#if __ANDROID_14__
 		public event Action<TrimMemory> TrimmingMemory;
+#endif
 		public event Action LowMemory;
 		public event BackButtonDelegate BackPressed;
 		public event ActivityResultDelegate ActivityResult;
@@ -140,12 +142,14 @@ namespace Lime
 			}
 		}
 
+#if __ANDROID_14__
 		public virtual void OnTrimMemory(TrimMemory level)
 		{
 			if (TrimmingMemory != null) {
 				TrimmingMemory(level);
 			}
 		}
+#endif
 
 		public virtual bool OnBackPressed()
 		{
@@ -237,12 +241,15 @@ namespace Lime
 			base.OnLowMemory();
 		}
 
+#if __ANDROID_14__
 		public override void OnTrimMemory(TrimMemory level)
 		{
 			Logger.Write("Memory warning, texture memory: {0}mb", CommonTexture.TotalMemoryUsedMb);
 			System.GC.Collect();
 			base.OnTrimMemory(level);
 		}
+#endif
 	}
+
 }
 #endif
