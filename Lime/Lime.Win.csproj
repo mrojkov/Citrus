@@ -322,6 +322,7 @@
     <Compile Include="Source\Graphics\Unity\PlatformMesh.cs" />
     <Compile Include="Source\Graphics\Unity\PlatformRenderer.cs" />
     <Compile Include="Source\Audio\Unity\PlatformAudioSystem.cs" />
+    <Compile Include="Source\AssetsBundle\UnityDownloadableBundle.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
