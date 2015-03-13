@@ -48,7 +48,10 @@ namespace Lime
 
 		public void Dispose()
 		{
-			bitmap.Dispose();
+			if (bitmap != null) {
+				bitmap.Dispose();
+				bitmap = null;
+			}
 		}
 	}
 }

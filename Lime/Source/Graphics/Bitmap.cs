@@ -82,6 +82,9 @@ namespace Lime
 
 		private byte[] GetByteArray()
 		{
+			if (Width == 0 || Height == 0) {
+				return null;
+			}
 			byte[] result;
 			using (var stream = new MemoryStream()) {
 				SaveToStream(stream);
