@@ -12,8 +12,6 @@
     <newfilesearch>OnLoad</newfilesearch>
     <TargetFrameworkIdentifier>Xamarin.iOS</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v1.0</TargetFrameworkVersion>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
@@ -87,12 +85,8 @@
     <Compile Include="Source\Widgets\SplinePoint.cs" />
     <Compile Include="Source\Widgets\Widget.cs" />
     <Compile Include="Source\Audio\AudioSystem.cs" />
-    <Compile Include="Source\Audio\AudioChannel.cs" />
     <Compile Include="Source\Graphics\SerializableFont.cs" />
     <Compile Include="Source\Graphics\SerializableTexture.cs" />
-    <Compile Include="Source\Audio\AudioDecoder.cs" />
-    <Compile Include="Source\Audio\WaveIMA4Decoder.cs" />
-    <Compile Include="Source\Audio\OggDecoder.cs" />
     <Compile Include="Source\Audio\SerializableSample.cs" />
     <Compile Include="Source\Audio\Sound.cs" />
     <Compile Include="Source\Widgets\NineGrid.cs" />
@@ -133,9 +127,7 @@
     <Compile Include="Source\Graphics\Unity\Texture2D.cs" />
     <Compile Include="Source\Input\Input.Native.cs" />
     <Compile Include="Source\Input\Input.Unity.cs" />
-    <Compile Include="Source\Audio\AudioCache.cs" />
     <Compile Include="Source\Graphics\TexturePool.cs" />
-    <Compile Include="Source\Audio\AudioSystem.ErrorChecker.cs" />
     <Compile Include="Source\Graphics\MovieTexture.cs" />
     <Compile Include="Source\Widgets\Movie.cs" />
     <Compile Include="Source\Types\Matrix44.cs" />
@@ -276,10 +268,21 @@
     <Compile Include="Source\Graphics\OpenGL\PlatformMesh.cs" />
     <Compile Include="Source\Graphics\Unity\PlatformMesh.cs" />
     <Compile Include="Source\Graphics\Unity\PlatformRenderer.cs" />
+    <Compile Include="Source\Audio\IAudioChannel.cs" />
+    <Compile Include="Source\Audio\OpenAL\AudioCache.cs" />
+    <Compile Include="Source\Audio\OpenAL\AudioChannel.cs" />
+    <Compile Include="Source\Audio\OpenAL\AudioDecoder.cs" />
+    <Compile Include="Source\Audio\OpenAL\OggDecoder.cs" />
+    <Compile Include="Source\Audio\OpenAL\PlatformAudioSystem.cs" />
+    <Compile Include="Source\Audio\OpenAL\WaveIMA4Decoder.cs" />
+    <Compile Include="Source\Audio\Unity\AudioChannel.cs" />
+    <Compile Include="Source\Audio\Unity\PlatformAudioSystem.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
     <Folder Include="Source\Application\" />
+    <Folder Include="Source\Audio\OpenAL\" />
+    <Folder Include="Source\Audio\Unity\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.iOS.csproj">
