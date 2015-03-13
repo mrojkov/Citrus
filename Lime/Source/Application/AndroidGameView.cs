@@ -25,13 +25,49 @@ namespace Lime
 			{
 				if (e.KeyCode == Keycode.Del && e.Action != KeyEventActions.Up) {
 					TextInput += '\b';
-				}
-				if (keyCode == Keycode.Unknown) {
+				} else if (keyCode == Keycode.Unknown) {
 					TextInput += e.Characters;
 				} else if (e.IsPrintingKey && e.Action != KeyEventActions.Up) {
 					TextInput += (char)e.UnicodeChar;
+				} else if (e.KeyCode == Keycode.Space && e.Action != KeyEventActions.Up) {
+					TextInput += ' ';
+				} else if (e.Action != KeyEventActions.Multiple) {
+					var key = TranslateKeycode(keyCode);
+					if (key != Key.KeyCount) {
+						var state = e.Action != KeyEventActions.Up;
+						Input.SetKeyState(key, state);
+					}
 				}
 				return true;
+			}
+		}
+
+		private static Key TranslateKeycode(Keycode key)
+		{
+			switch (key) {
+				case Keycode.DpadLeft:
+					return Key.Left;
+				case Keycode.DpadRight:
+					return Key.Right;
+				case Keycode.DpadUp:
+					return Key.Up;
+				case Keycode.DpadDown:
+					return Key.Down;
+				case Keycode.ForwardDel:
+					return Key.Delete;
+				case Keycode.Escape:
+					return Key.Escape;
+				case Keycode.Tab:
+					return Key.Tab;
+				case Keycode.Enter:
+					return Key.Enter;
+				case Keycode.MoveHome:
+					return Key.Home;
+				case Keycode.MoveEnd:
+					return Key.End;
+				// TODO: add all alpha-numeric keys
+				default:
+					return Key.KeyCount;
 			}
 		}
 
