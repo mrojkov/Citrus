@@ -57,7 +57,11 @@ namespace Lime
 			GC.SuppressFinalize(this);
 			if (webView != null) {
 				webView.StopLoading();
-				webView.Visibility = ViewStates.Gone;
+				try {
+					webView.Visibility = ViewStates.Gone;
+				} catch (System.Exception) {
+					// If the device is locked, setting Visibility causes an exception
+				}
 				// Workaround for a crash in RelativeLayout.onLayout() while rotating the device
 				Action a = null;
 				a = () => {
