@@ -31,6 +31,7 @@ namespace Lime.PopupMenu
 			Id = "TextPresenter",
 			FontHeight = MenuItem.Height * 0.8f,
 			Color = Color4.Black,
+			OverflowMode = TextOverflowMode.Ellipsis,
 		};
 
 		SimpleText arrowLabel = new SimpleText() {
