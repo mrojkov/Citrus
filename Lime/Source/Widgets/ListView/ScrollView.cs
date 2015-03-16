@@ -24,7 +24,7 @@ namespace Lime
 		public ScrollDirection ScrollDirection { get; private set; }
 		public bool ScrollWhenContentFits = true;
 
-		protected virtual bool IsDragging { get; set; }
+		public virtual bool IsDragging { get; protected set; }
 		
 		public float ContentLength
 		{ 
