@@ -29,7 +29,9 @@ namespace Lime
 				if (e.Values.Count != 3) {
 					throw new Lime.Exception("Invalid accelerometer data");
 				}
-				Lime.Input.Acceleration = new Lime.Vector3(e.Values[0], e.Values[1], e.Values[2]);
+				// Translate into iOS accelerometer units: g-forces instead of m/s^2
+				var a = -new Lime.Vector3(e.Values[0], e.Values[1], e.Values[2]) / 9.81f;
+				Lime.Input.Acceleration = a;
 			}
 
 			public static void StartListening()
