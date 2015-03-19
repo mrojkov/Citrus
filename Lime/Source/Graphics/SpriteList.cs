@@ -9,6 +9,7 @@ namespace Lime
 	{
 		public class Item
 		{
+			public int Tag;
 			public ITexture Texture;
 			public Color4 Color;
 			public Vector2 UV0;
@@ -37,7 +38,7 @@ namespace Lime
 			}
 		}
 
-		public void Add(ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 UV0, Vector2 UV1)
+		public void Add(ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 UV0, Vector2 UV1, int tag)
 		{
 			Add(new Item() {
 				Texture = texture,
@@ -45,7 +46,8 @@ namespace Lime
 				Position = position,
 				Size = size,
 				UV0 = UV0,
-				UV1 = UV1
+				UV1 = UV1,
+				Tag = tag
 			});
 		}
 
@@ -59,6 +61,21 @@ namespace Lime
 			for (var item = head; item != null; item = item.Next) {
 				item.Draw(color);
 			}
+		}
+
+		public bool HitTest(Matrix32 worldTransform, Vector2 point, out int tag)
+		{
+			point = worldTransform.CalcInversed().TransformVector(point);
+			for (var item = head; item != null; item = item.Next) {
+				var a = item.Position;
+				var b = item.Position + item.Size;
+				if (point.X >= a.X && point.Y >= a.Y && point.X < b.X && point.Y < b.Y) {
+					tag = item.Tag;
+					return true;
+				}
+			}
+			tag = -1;
+			return false;
 		}
 	}
 }

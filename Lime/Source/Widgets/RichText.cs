@@ -183,6 +183,25 @@ namespace Lime
 				Replace("&amp;", "&amp;amp;").Replace("&lt;", "&amp;lt;").Replace("&gt;", "&amp;&gt").
 				Replace("<", "&lt;").Replace(">", "&gt;");
 		}
+
+		/// <summary>
+		/// Make a hit test. Returns style of a text chunk a user hit to.
+		/// TODO: implement more advanced system with tag attributes like <link url="...">...</link>
+		/// </summary>
+		public bool HitTest(Vector2 point, out TextStyle style)
+		{
+			style = null;
+			int tag;
+			if (spriteList.HitTest(LocalToWorldTransform, point, out tag) && tag >= 0) {
+				style = null;
+				if (tag == 0) {
+					style = Nodes[0] as TextStyle;
+				} else {
+					style = Nodes.TryFind(parser.Styles[tag - 1]) as TextStyle;
+				}
+				return true;
+			}
+			return false;
+		}
 	}
-	
 }

@@ -268,7 +268,7 @@ namespace Lime
 
 		public static void DrawTextLine(
 			Font font, Vector2 position, string text, Color4 color, float fontHeight, int start, int length, SpriteList list = null,
-			Action<int, Vector2, Vector2> onDrawChar = null)
+			Action<int, Vector2, Vector2> onDrawChar = null, int tag = -1)
 		{
 			FontChar prevChar = null;
 			float savedX = position.X;
@@ -314,7 +314,8 @@ namespace Lime
 						Position = position,
 						Size = size,
 						UV0 = fontChar.UV0,
-						UV1 = fontChar.UV1
+						UV1 = fontChar.UV1,
+						Tag = tag
 					};
 					list.Add(item);
 				}

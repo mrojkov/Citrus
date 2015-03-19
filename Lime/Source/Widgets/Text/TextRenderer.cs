@@ -124,7 +124,7 @@ namespace Lime.Text
 					if (word.IsTagBegin && style.ImageUsage == TextStyle.ImageUsageEnum.Bullet) {
 						yOffset = new Vector2(0, (maxHeight - style.ImageSize.Y * scaleFactor) * 0.5f);
 						if (style.ImageTexture.SerializationPath != null) {
-							spriteList.Add(style.ImageTexture, Color4.White, position + yOffset, style.ImageSize * scaleFactor, Vector2.Zero, Vector2.One);
+							spriteList.Add(style.ImageTexture, Color4.White, position + yOffset, style.ImageSize * scaleFactor, Vector2.Zero, Vector2.One, tag: word.Style);
 							// Renderer.DrawSprite(SpriteList, style.ImageTexture, color, position + yOffset, style.ImageSize, Vector2.Zero, Vector2.One);
 						}
 						position.X += style.ImageSize.X * scaleFactor;
@@ -132,11 +132,11 @@ namespace Lime.Text
 					yOffset = new Vector2(0, (maxHeight - style.Size * scaleFactor) * 0.5f);
 					if (style.CastShadow) {
 						for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
-							Renderer.DrawTextLine(font, position + style.ShadowOffset + yOffset, word.Text, style.ShadowColor, style.Size * scaleFactor, word.Start, word.Length, spriteList);
+							Renderer.DrawTextLine(font, position + style.ShadowOffset + yOffset, word.Text, style.ShadowColor, style.Size * scaleFactor, word.Start, word.Length, spriteList, tag: word.Style);
 						}
 					}
 					for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
-						Renderer.DrawTextLine(font, position + yOffset, word.Text, style.TextColor, style.Size * scaleFactor, word.Start, word.Length, spriteList);
+						Renderer.DrawTextLine(font, position + yOffset, word.Text, style.TextColor, style.Size * scaleFactor, word.Start, word.Length, spriteList, tag: word.Style);
 					}
 				}
 				// Draw overlays
@@ -155,7 +155,7 @@ namespace Lime.Text
 						float yOffset = (maxHeight - style.ImageSize.Y * scaleFactor) * 0.5f;
 						spriteList.Add(style.ImageTexture, Color4.White, lt + new Vector2(0, yOffset),
 							rb - lt + new Vector2(0, style.ImageSize.Y),
-							Vector2.Zero, Vector2.One);
+							Vector2.Zero, Vector2.One, tag: word.Style);
 						j = k;
 					}
 				}

@@ -124,7 +124,7 @@ namespace Lime.Widgets2.Text
 					if (word.IsTagBegin && style.ImageUsage == TextStyle.ImageUsageEnum.Bullet) {
 						yOffset = new Vector2(0, (maxHeight - style.ImageSize.Y * scaleFactor) * 0.5f);
 						if (style.ImageTexture.SerializationPath != null) {
-							spriteList.Add(style.ImageTexture, Color4.White, position + yOffset, style.ImageSize * scaleFactor, Vector2.Zero, Vector2.One);
+							spriteList.Add(style.ImageTexture, Color4.White, position + yOffset, style.ImageSize * scaleFactor, Vector2.Zero, Vector2.One, word.Style);
 							// Renderer.DrawSprite(SpriteList, style.ImageTexture, color, position + yOffset, style.ImageSize, Vector2.Zero, Vector2.One);
 						}
 						position.X += style.ImageSize.X * scaleFactor;
@@ -155,7 +155,7 @@ namespace Lime.Widgets2.Text
 						float yOffset = (maxHeight - style.ImageSize.Y * scaleFactor) * 0.5f;
 						spriteList.Add(style.ImageTexture, Color4.White, lt + new Vector2(0, yOffset),
 							rb - lt + new Vector2(0, style.ImageSize.Y),
-							Vector2.Zero, Vector2.One);
+							Vector2.Zero, Vector2.One, word.Style);
 						j = k;
 					}
 				}
