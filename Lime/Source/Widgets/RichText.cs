@@ -75,15 +75,20 @@ namespace Lime
 
 		public override void Render()
 		{
+			EnsureSpriteList();
+			Renderer.Transform1 = LocalToWorldTransform;
+			Renderer.Blending = GlobalBlending;
+			Renderer.Shader = GlobalShader;
+			spriteList.Render(GlobalColor);
+		}
+
+		private void EnsureSpriteList()
+		{
 			if (spriteList == null) {
 				var renderer = PrepareRenderer();
 				spriteList = new SpriteList();
 				renderer.Render(spriteList, Size, HAlignment, VAlignment);
 			}
-			Renderer.Transform1 = LocalToWorldTransform;
-			Renderer.Blending = GlobalBlending;
-			Renderer.Shader = GlobalShader;
-			spriteList.Render(GlobalColor);
 		}
 
 		// TODO: return effective AABB, not only extent
@@ -192,6 +197,7 @@ namespace Lime
 		{
 			style = null;
 			int tag;
+			EnsureSpriteList();
 			if (spriteList.HitTest(LocalToWorldTransform, point, out tag) && tag >= 0) {
 				style = null;
 				if (tag == 0) {
