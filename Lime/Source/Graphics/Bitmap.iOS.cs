@@ -7,12 +7,22 @@ using ProtoBuf;
 using UIKit;
 using CoreGraphics;
 using System.Drawing;
+using Foundation;
 
 namespace Lime
 {
 	class BitmapImplementation : IBitmapImplementation
 	{
 		private UIImage bitmap;
+		private readonly SizeF avatarSize = new SizeF(84, 84); // default avatar size
+
+		public BitmapImplementation(float w, float h) {
+			bitmap = new UIImage();
+			bitmap.Scale( new CGSize(w,h));
+		}
+		public BitmapImplementation() {
+			bitmap.Scale(avatarSize); 
+		}
 
 		public int GetWidth()
 		{
@@ -64,6 +74,11 @@ namespace Lime
 				bitmap.Dispose();
 			}
 		}
+		public bool IsValid()
+		{
+			return (bitmap != null && (bitmap.Size.Height > 0 && bitmap.Size.Width > 0));
+		}
+
 	}
 }
 #endif

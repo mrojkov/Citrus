@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System;
 using ProtoBuf;
 using System.Runtime.InteropServices;
-
+using System.Windows.Forms.VisualStyles;
 using SD = System.Drawing;
 
 namespace Lime
@@ -13,6 +13,16 @@ namespace Lime
 	class BitmapImplementation : IBitmapImplementation
 	{
 		private SD.Bitmap bitmap;
+		private Size avatarSize = new Size(84, 84); // default avatar size
+
+
+		public BitmapImplementation(int w, int h) {
+		bitmap = new SD.Bitmap(w, h); 
+		}
+
+		public BitmapImplementation() {
+		bitmap = new SD.Bitmap(avatarSize.Width, avatarSize.Height); 
+		}
 
 		public int GetWidth()
 		{
@@ -31,7 +41,7 @@ namespace Lime
 			// ��� ��� �� �� ����� ���� �������, ��� ������� ����� �� ���������, �������� ���.
 			var streamClone = new MemoryStream();
 			stream.CopyTo(streamClone);
-			InitWithPngOrJpgBitmap(streamClone);
+			bitmap = new SD.Bitmap(streamClone);
 		}
 
 		public void SaveToStream(Stream stream)
@@ -77,16 +87,12 @@ namespace Lime
 
 			return pixelData;
 		}
-
-		private void InitWithPngOrJpgBitmap(Stream stream)
+		public bool IsValid()
 		{
-			try {
-				bitmap = new SD.Bitmap(stream);
-			} catch (System.Exception e) {
-				Logger.Write("Bitmap.Win: failed to load bitmap. {0}", e.Message);
-			}
-
+			return (bitmap != null && (bitmap.Height > 0 && bitmap.Width > 0));
 		}
+
+
 	}
 }
 #endif

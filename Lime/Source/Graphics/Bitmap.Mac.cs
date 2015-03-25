@@ -11,11 +11,13 @@ namespace Lime
 	class BitmapImplementation : IBitmapImplementation
 	{
 		private NSImage bitmap;
+		private Size avatarSize = new Size(84, 84); // default avatar size
 
 		/// <summary>
 		/// Constructor. Use LoadFromStream to load image data
 		/// </summary>
-		public BitmapImplementation() { }
+		public BitmapImplementation(int w, int h) {  bitmap = new NSImage(w,h);}
+		public BitmapImplementation() {  bitmap = new NSImage(avatarSize.Width, avatarSize.Height);}
 
 		/// <summary>
 		/// Returns image width or 0 (if image isn't loaded)
@@ -138,6 +140,10 @@ namespace Lime
 				bitmap = null;
 			}
 		}
+		public bool IsValid() {
+			return (bitmap != null && (bitmap.Size.Height > 0 && bitmap.Size.Width >0));
+		}
+
 	}
 }
 

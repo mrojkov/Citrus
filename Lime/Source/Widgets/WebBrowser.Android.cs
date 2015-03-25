@@ -84,7 +84,7 @@ namespace Lime
 				((RelativeLayout)webView.Parent).RemoveView(webView);
 			}
 			if (webView.Parent == null) {
-				((RelativeLayout)GameView.Instance.Parent).AddView(webView);
+				((RelativeLayout)GameView.Instance.Parent).AddView(webView, new ViewGroup.LayoutParams(wr.Width + wr.X, wr.Height + wr.Y));
 			}
 			webView.Layout (wr.X, wr.Y, wr.Width + wr.X, wr.Height + wr.Y);
 		}

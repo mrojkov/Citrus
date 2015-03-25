@@ -14,12 +14,14 @@ namespace Lime
 		void SaveToStream(Stream stream);
 		IBitmapImplementation Crop(IntRectangle cropArea);
 		IBitmapImplementation Rescale(int newWidth, int newHeight);
+		bool IsValid();
 	}
 
 	[ProtoContract]
 	public class Bitmap : IDisposable
 	{
 		IBitmapImplementation implementation;
+
 		public Vector2 Size { get { return new Vector2(Width, Height); } }
 		public int Width { get { return implementation.GetWidth(); } }
 		public int Height { get { return implementation.GetHeight(); } }
@@ -33,7 +35,7 @@ namespace Lime
 
 		public Bitmap()
 		{
-			implementation = new BitmapImplementation();
+			implementation = new BitmapImplementation(); // standart avatar bitmap size (84,84)
 		}
 
 		private Bitmap(IBitmapImplementation implementation)
@@ -75,9 +77,9 @@ namespace Lime
 
 		private void LoadFromByteArray(byte[] data)
 		{
-			using (var stream = new MemoryStream(data)) {
-				LoadFromStream(stream);
-			}
+				using (var stream = new MemoryStream(data)) {
+					LoadFromStream(stream);
+				}
 		}
 
 		private byte[] GetByteArray()
@@ -91,6 +93,11 @@ namespace Lime
 				result = stream.ToArray();
 			}
 			return result;
+		}
+
+		bool IsValid() {
+
+			return implementation != null && implementation.IsValid();
 		}
 	}
 }

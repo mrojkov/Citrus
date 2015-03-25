@@ -9,7 +9,15 @@ namespace Lime
 	class BitmapImplementation : IBitmapImplementation
 	{
 		Android.Graphics.Bitmap bitmap;
+		private Size avatarSize = new Size(84, 84); // default avatar size
 
+		public BitmapImplementation(int w, int h) {
+			bitmap = Android.Graphics.Bitmap.CreateBitmap(w, h, Android.Graphics.Bitmap.Config.Rgb565);
+		}
+		public BitmapImplementation()
+		{
+			bitmap = Android.Graphics.Bitmap.CreateBitmap(avatarSize.Width, avatarSize.Height, Android.Graphics.Bitmap.Config.Rgb565);
+		}
 		public int GetWidth()
 		{
 			return bitmap == null ? 0 : bitmap.Width;
@@ -52,6 +60,10 @@ namespace Lime
 				bitmap.Dispose();
 				bitmap = null;
 			}
+		}
+		public bool IsValid()
+		{
+			return (bitmap != null && (bitmap.Height > 0 && bitmap.Width > 0));
 		}
 	}
 }
