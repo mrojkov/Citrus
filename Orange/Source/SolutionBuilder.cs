@@ -94,10 +94,10 @@ namespace Orange
 			app = "/Applications/Xamarin Studio.app/Contents/MacOS/mdtool";
 			if (platform == TargetPlatform.iOS) {
 				slnFile = Path.Combine(projectDirectory, projectName + ".iOS.sln");
-				args = String.Format("build \"{0}\" -t:Clean -c:\"{1}|iPhone\"", slnFile, configurationName);
+				args = String.Format("build \"{0}\" -t:Clean -c:\"{1}|iPhone\"", slnFile, ConfigurationName);
 			} else {
 				slnFile = Path.Combine(projectDirectory, projectName + ".Mac.sln");
-				args = String.Format("build \"{0}\" -t:Clean -c:\"{1}|x86\"", slnFile, configurationName);
+				args = String.Format("build \"{0}\" -t:Clean -c:\"{1}|x86\"", slnFile, ConfigurationName);
 			}
 #elif WIN
 			// Uncomment follow block if you would like to use mdtool instead of MSBuild

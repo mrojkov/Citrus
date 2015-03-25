@@ -57,7 +57,11 @@ namespace Lime
 			UploadVertices();
 			UploadIndices();
 			int offset = startIndex * sizeof(short);
+			#if !MAC
 			GL.DrawElements(PrimitiveType.Triangles, count, DrawElementsType.UnsignedShort, (IntPtr)offset);
+			#else
+			// TO DO : PrimitiveType structure not exists. Need to find replacement.
+			#endif
 			PlatformRenderer.CheckErrors();
 		}
 

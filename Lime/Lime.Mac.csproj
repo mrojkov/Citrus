@@ -28,6 +28,7 @@
     <EnablePackageSigning>false</EnablePackageSigning>
     <IncludeMonoRuntime>false</IncludeMonoRuntime>
     <UseSGen>false</UseSGen>
+    <UseRefCounting>false</UseRefCounting>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -44,6 +45,7 @@
     <EnablePackageSigning>false</EnablePackageSigning>
     <IncludeMonoRuntime>false</IncludeMonoRuntime>
     <UseSGen>false</UseSGen>
+    <UseRefCounting>false</UseRefCounting>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -93,8 +95,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Source\Graphics\OpenGL\IndexBuffer.cs" />
     <Compile Include="Source\Graphics\OpenGL\PlatformRenderer.cs" />
-    <Compile Include="Source\Graphics\OpenGL\RenderBatch.cs" />
-    <Compile Include="Source\Graphics\OpenGL\RenderList.cs" />
     <Compile Include="Source\Graphics\OpenGL\VertexBuffer.cs" />
     <Compile Include="Source\Graphics\Bitmap.cs" />
     <Compile Include="Source\Graphics\Bitmap.iOS.cs" />
@@ -192,6 +192,17 @@
     <Compile Include="Source\Widgets2\Text\TextRenderer.cs" />
     <Compile Include="Source\Graphics\OgvDecoder.cs" />
     <Compile Include="Source\Graphics\Bitmap.Mac.cs" />
+    <Compile Include="Source\Graphics\RenderList.cs" />
+    <Compile Include="Source\Graphics\RenderBatch.cs" />
+    <Compile Include="Source\Audio\OpenAL\AudioCache.cs" />
+    <Compile Include="Source\Audio\OpenAL\AudioChannel.cs" />
+    <Compile Include="Source\Audio\OpenAL\AudioDecoder.cs" />
+    <Compile Include="Source\Audio\OpenAL\OggDecoder.cs" />
+    <Compile Include="Source\Audio\OpenAL\PlatformAudioSystem.cs" />
+    <Compile Include="Source\Audio\OpenAL\WaveIMA4Decoder.cs" />
+    <Compile Include="Source\Audio\IAudioChannel.cs" />
+    <Compile Include="Source\Graphics\Mesh.cs" />
+    <Compile Include="Source\Graphics\OpenGL\PlatformMesh.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -232,12 +243,8 @@
     <Compile Include="Source\Widgets\SplinePoint.cs" />
     <Compile Include="Source\Widgets\Widget.cs" />
     <Compile Include="Source\Audio\AudioSystem.cs" />
-    <Compile Include="Source\Audio\AudioChannel.cs" />
-    <Compile Include="Source\Audio\AudioDecoder.cs" />
     <Compile Include="Source\Graphics\SerializableFont.cs" />
     <Compile Include="Source\Graphics\SerializableTexture.cs" />
-    <Compile Include="Source\Audio\WaveIMA4Decoder.cs" />
-    <Compile Include="Source\Audio\OggDecoder.cs" />
     <Compile Include="Source\Audio\SerializableSample.cs" />
     <Compile Include="Source\Audio\Sound.cs" />
     <Compile Include="Source\Widgets\NineGrid.cs" />
@@ -274,13 +281,10 @@
     <Compile Include="Source\Graphics\OpenGL\Texture2D.cs" />
     <Compile Include="Source\Graphics\Unity\MaterialFactory.cs" />
     <Compile Include="Source\Graphics\Unity\RenderTexture.cs" />
-    <Compile Include="Source\Graphics\Unity\Renderer.cs" />
     <Compile Include="Source\Graphics\Unity\Texture2D.cs" />
     <Compile Include="Source\Input\Input.Native.cs" />
     <Compile Include="Source\Input\Input.Unity.cs" />
-    <Compile Include="Source\Audio\AudioCache.cs" />
     <Compile Include="Source\Graphics\TexturePool.cs" />
-    <Compile Include="Source\Audio\AudioSystem.ErrorChecker.cs" />
     <Compile Include="Source\Graphics\MovieTexture.cs" />
     <Compile Include="Source\Widgets\Movie.cs" />
   </ItemGroup>
@@ -305,5 +309,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Source\Graphics\" />
+    <Folder Include="Source\Audio\OpenAL\" />
   </ItemGroup>
 </Project>
