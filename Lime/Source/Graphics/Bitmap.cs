@@ -27,15 +27,21 @@ namespace Lime
 		public int Height { get { return implementation.GetHeight(); } }
 
 		[ProtoMember(1)]
-		public byte[] AsByteArray
+		public byte[] SerializationData
 		{
-			get { return GetByteArray(); }
-			set { LoadFromByteArray(value); }
+			get { return IsValid() ? GetByteArray() : null; }
+			set {
+				if (value != null) {
+					LoadFromByteArray(value);
+				} else {
+					Dispose();
+				}
+			}
 		}
 
 		public Bitmap()
 		{
-			implementation = new BitmapImplementation(); // standart avatar bitmap size (84,84)
+			implementation = new BitmapImplementation();
 		}
 
 		private Bitmap(IBitmapImplementation implementation)
@@ -77,26 +83,21 @@ namespace Lime
 
 		private void LoadFromByteArray(byte[] data)
 		{
-				using (var stream = new MemoryStream(data)) {
-					LoadFromStream(stream);
-				}
+			using (var stream = new MemoryStream(data)) {
+				LoadFromStream(stream);
+			}
 		}
 
 		private byte[] GetByteArray()
 		{
-			if (Width == 0 || Height == 0) {
-				return null;
-			}
-			byte[] result;
 			using (var stream = new MemoryStream()) {
 				SaveToStream(stream);
-				result = stream.ToArray();
+				return stream.ToArray();
 			}
-			return result;
 		}
 
-		 public bool IsValid() {
-
+		public bool IsValid()
+		{
 			return implementation != null && implementation.IsValid();
 		}
 	}

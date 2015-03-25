@@ -14,15 +14,6 @@ namespace Lime
 	class BitmapImplementation : IBitmapImplementation
 	{
 		private UIImage bitmap;
-		private readonly SizeF avatarSize = new SizeF(84, 84); // default avatar size
-
-		public BitmapImplementation(float w, float h) {
-			bitmap = new UIImage();
-			bitmap.Scale( new CGSize(w,h));
-		}
-		public BitmapImplementation() {
-			bitmap.Scale(avatarSize); 
-		}
 
 		public int GetWidth()
 		{
@@ -36,6 +27,10 @@ namespace Lime
 
 		public void LoadFromStream(Stream stream)
 		{
+			if (!IsValid()) {
+				throw new InvalidOperationException();
+			}
+			Dispose();
 			using (var nsData = Foundation.NSData.FromStream(stream)) {
 				bitmap = UIImage.LoadFromData(nsData);
 			}
@@ -43,8 +38,11 @@ namespace Lime
 
 		public void SaveToStream(Stream stream)
 		{
+			if (!IsValid()) {
+				throw new InvalidOperationException();
+			}
 			if (bitmap != null && bitmap.AsPNG() != null) {
-				using (var bitmapStream = bitmap.AsPNG().AsStream()) { 
+				using (var bitmapStream = bitmap.AsPNG().AsStream()) {
 					bitmapStream.CopyTo(stream);
 				}
 			}
@@ -52,28 +50,38 @@ namespace Lime
 
 		public IBitmapImplementation Rescale(int newWidth, int newHeight)
 		{
+			if (!IsValid()) {
+				throw new InvalidOperationException();
+			}
 			var scaledImage = bitmap.Scale(new SizeF(newWidth, newHeight));
-			var newImplementation = new BitmapImplementation();
-			newImplementation.bitmap = scaledImage;
-			return newImplementation;
+			return new BitmapImplementation { bitmap = scaledImage };
 		}
 
 		public IBitmapImplementation Crop(IntRectangle cropArea)
 		{
+			if (!IsValid()) {
+				throw new InvalidOperationException();
+			}
 			var rect = new RectangleF(cropArea.Left, cropArea.Top, cropArea.Width, cropArea.Height);
 			var cgimage = bitmap.CGImage;
 			cgimage = cgimage.WithImageInRect(rect);
-			var cropped = new BitmapImplementation();
-			cropped.bitmap = new UIImage(cgimage);
-			return cropped;
+			return new BitmapImplementation { bitmap = new UIImage(cgimage) };
 		}
 
 		public void Dispose()
 		{
 			if (bitmap != null) {
 				bitmap.Dispose();
+				bitmap = null;
 			}
+			GC.SuppressFinalize(this);
 		}
+
+		~BitmapImplementation() 
+		{
+			Dispose();
+		}
+		
 		public bool IsValid()
 		{
 			return (bitmap != null && (bitmap.Size.Height > 0 && bitmap.Size.Width > 0));

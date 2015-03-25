@@ -13,16 +13,6 @@ namespace Lime
 	class BitmapImplementation : IBitmapImplementation
 	{
 		private SD.Bitmap bitmap;
-		private Size avatarSize = new Size(84, 84); // default avatar size
-
-
-		public BitmapImplementation(int w, int h) {
-		bitmap = new SD.Bitmap(w, h); 
-		}
-
-		public BitmapImplementation() {
-		bitmap = new SD.Bitmap(avatarSize.Width, avatarSize.Height); 
-		}
 
 		public int GetWidth()
 		{
@@ -39,6 +29,7 @@ namespace Lime
 			// System.Drawing.Bitmap �������, ����� stream ��������� �������� �� ����� ������������� �������.
 			// http://stackoverflow.com/questions/336387/image-save-throws-a-gdi-exception-because-the-memory-stream-is-closed
 			// ��� ��� �� �� ����� ���� �������, ��� ������� ����� �� ���������, �������� ���.
+			Dispose();
 			var streamClone = new MemoryStream();
 			stream.CopyTo(streamClone);
 			bitmap = new SD.Bitmap(streamClone);
@@ -46,37 +37,45 @@ namespace Lime
 
 		public void SaveToStream(Stream stream)
 		{
-			if (bitmap != null) {
-				bitmap.Save(stream, SD.Imaging.ImageFormat.Png);
+			if (!IsValid()) {
+				throw new InvalidOperationException();
 			}
+			bitmap.Save(stream, SD.Imaging.ImageFormat.Png);
 		}
 
 		public IBitmapImplementation Crop(IntRectangle cropArea)
 		{
+			if (!IsValid()) {
+				throw new InvalidOperationException();
+			}
 			var rect = new SD.Rectangle(cropArea.Left, cropArea.Top, cropArea.Width, cropArea.Height);
 			var croppedBitmap = bitmap.Clone(rect, bitmap.PixelFormat);
-			var result = new BitmapImplementation();
-			result.bitmap = croppedBitmap;
-			return result;
+			return new BitmapImplementation {bitmap = croppedBitmap};
 		}
 
 		public IBitmapImplementation Rescale(int newWidth, int newHeight)
 		{
+			if (!IsValid()) {
+				throw new InvalidOperationException();
+			}
 			var rescaledBitmap = new SD.Bitmap(bitmap, newWidth, newHeight);
-			var result = new BitmapImplementation();
-			result.bitmap = rescaledBitmap;
-			return result;
+			return new BitmapImplementation { bitmap = rescaledBitmap };
 		}
 
 		public void Dispose()
 		{
 			if (bitmap != null) {
 				bitmap.Dispose();
+				bitmap = null;
 			}
+			GC.SuppressFinalize(this);
 		}
 
 		public byte[] GetImageData()
-		{		
+		{
+			if (!IsValid()) {
+				throw new InvalidOperationException();
+			}
 			var lockRect = new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height);
 			var lockMode = System.Drawing.Imaging.ImageLockMode.ReadOnly;
 			var data = bitmap.LockBits(lockRect, lockMode, bitmap.PixelFormat);		
@@ -87,12 +86,16 @@ namespace Lime
 
 			return pixelData;
 		}
+
 		public bool IsValid()
 		{
 			return (bitmap != null && (bitmap.Height > 0 && bitmap.Width > 0));
 		}
 
-
+		~BitmapImplementation()
+		{
+			Dispose();
+		}
 	}
 }
 #endif
