@@ -1,5 +1,3 @@
 
-(Orange:16672): Gtk-WARNING **: Locale not supported by C library.
+(Orange:1759): Gtk-WARNING **: Locale not supported by C library.
 	Using the fallback 'C' locale.
-Feb 18 14:03:40 mac_triceratops Orange[16672] <Error>: The function ‘CGFontGetGlyphPath’ is obsolete and will be removed in an upcoming update. Unfortunately, this application, or a library it uses, is using this obsolete function, and is thereby contributing to an overall degradation of system performance.
-Feb 18 14:03:40 mac_triceratops Orange[16672] <Error>: The function ‘CGFontGetGlyphPaths’ is obsolete and will be removed in an upcoming update. Unfortunately, this application, or a library it uses, is using this obsolete function, and is thereby contributing to an overall degradation of system performance.
