@@ -11,112 +11,69 @@ namespace Lime
 	class BitmapImplementation : IBitmapImplementation
 	{
 		private NSImage bitmap;
-		private Size avatarSize = new Size(84, 84); // default avatar size
 
-		/// <summary>
-		/// Constructor. Use LoadFromStream to load image data
-		/// </summary>
-		public BitmapImplementation(int w, int h) {  bitmap = new NSImage(w,h);}
-		public BitmapImplementation() {  bitmap = new NSImage(avatarSize.Width, avatarSize.Height);}
+		public BitmapImplementation() {}
 
-		/// <summary>
-		/// Returns image width or 0 (if image isn't loaded)
-		/// </summary>
 		public int GetWidth()
 		{
 			return bitmap != null ? bitmap.CGImage.Width : 0;
 		}
 
-		/// <summary>
-		/// Returns image height or 0 (if image isn't loaded)
-		/// </summary>
 		public int GetHeight()
 		{
 			return bitmap != null ? bitmap.CGImage.Height : 0;
 		}
 
-		/// <summary>
-		/// Loads from stream
-		/// </summary>
 		public void LoadFromStream(Stream stream)
 		{
+			Dispose();
 			bitmap = NSImage.FromStream(stream);
 		}
 
 		/// <summary>
-		/// Throws NotImplementedException
+		/// TODO: NSImage cannot be saved in PNG format (TIF only)
 		/// </summary>
 		public void SaveToStream(Stream steam)
 		{
-			// TODO BitmapImplementation SaveToStream
-			// NSImage cannot be saved in PNG format (TIF only)
-
-			/*
-			if (bitmap == null) {
-				throw new InvalidOperationException("Image is not loaded. Use LoadFromStream first");
-			}
-			*/
 			throw new NotImplementedException();
 		}
 
-		/// <summary>
-		/// Crops the image
-		/// </summary>
 		public IBitmapImplementation Crop(IntRectangle cropArea)
 		{
-			if (bitmap == null) {
-				throw new InvalidOperationException("Image is not loaded. Use LoadFromStream first");
+			if (!IsValid()) {
+				throw new InvalidOperationException();
 			}
-
 			var rect = new RectangleF(cropArea.Left, cropArea.Top, cropArea.Width, cropArea.Height);
-
 			CGImage cgimage = bitmap.CGImage.WithImageInRect(rect);
 			SizeF size = new SizeF(cgimage.Width, cgimage.Height);
-
-			var result = new BitmapImplementation();
-			result.bitmap = new NSImage(cgimage, size);
-
-			return result;
+			return new BitmapImplementation() { bitmap = new NSImage(cgimage, size) };
 		}
 
 		/// <summary>
-		/// Not implemented. Returns itself
+		/// TODO: implement. I didn't find easy way to rescale
 		/// </summary>
 		public IBitmapImplementation Rescale(int newWidth, int newHeight)
 		{
-			// TODO BitmapImplementation Rescale
-			// I didn't find easy way to rescale
-
-			if (bitmap == null) {
-				throw new InvalidOperationException("Image is not loaded. Use LoadFromStream first");
-			}
-
-			return this;
+			throw new NotImplementedException();
 		}
 
-		/// <summary>
-		/// Returns image pixel data
-		/// </summary>
 		public byte[] GetImageData()
-		{		
-			if (bitmap == null) {
-				throw new InvalidOperationException("Image is not loaded. Use LoadFromStream first");
+		{
+			if (!IsValid()) {
+				throw new InvalidOperationException();
 			}
-
 			int bytesPerPixel = 4;
 			byte[] imageData = new byte[GetWidth() * GetHeight() * bytesPerPixel];
 			var handle = GCHandle.Alloc(imageData);
-
-			using (var colorSpace = CGColorSpace.CreateDeviceRGB())
-			{
-				using (var context = new CGBitmapContext(Marshal.UnsafeAddrOfPinnedArrayElement(imageData, 0), GetWidth(), GetHeight(), 8, bytesPerPixel * GetWidth(), colorSpace, CGBitmapFlags.ByteOrder32Big | CGBitmapFlags.PremultipliedLast))
+			using (var colorSpace = CGColorSpace.CreateDeviceRGB()) {
+				using (
+					var context = new CGBitmapContext(Marshal.UnsafeAddrOfPinnedArrayElement(imageData, 0), GetWidth(), GetHeight(), 8,
+						bytesPerPixel * GetWidth(), colorSpace, CGBitmapFlags.ByteOrder32Big | CGBitmapFlags.PremultipliedLast)) 
 				{
 					context.DrawImage(new RectangleF(0, 0, GetWidth(), GetHeight()), bitmap.CGImage);
 				}					
 			}
-
 			handle.Free();
-
 			// Swap R ang B channels
 			byte temp;
 			for (int i = 0; i < imageData.Length; i+=4)
@@ -125,26 +82,27 @@ namespace Lime
 				imageData[i + 0] = imageData[i + 2];
 				imageData[i + 2] = temp;
 			}
-
 			return imageData;
 		}
 
-		/// <summary>
-		/// Releases all resource used
-		/// </summary>
 		public void Dispose()
 		{
-			if (bitmap != null)
-			{
+			if (bitmap != null) {
 				bitmap.Dispose();
 				bitmap = null;
 			}
+			GC.SuppressFinalize(this);
 		}
-		public bool IsValid() {
+
+		~BitmapImplementation() 
+		{
+			Dispose();
+		}
+
+		public bool IsValid() 
+		{
 			return (bitmap != null && (bitmap.Size.Height > 0 && bitmap.Size.Width >0));
 		}
-
 	}
 }
-
 #endif
