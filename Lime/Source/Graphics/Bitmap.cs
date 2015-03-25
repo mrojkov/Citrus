@@ -95,7 +95,7 @@ namespace Lime
 			return result;
 		}
 
-		bool IsValid() {
+		 public bool IsValid() {
 
 			return implementation != null && implementation.IsValid();
 		}
