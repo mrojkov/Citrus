@@ -86,7 +86,6 @@ namespace Lime
 		{
 			return (bitmap != null && (bitmap.Size.Height > 0 && bitmap.Size.Width > 0));
 		}
-
 	}
 }
 #endif
