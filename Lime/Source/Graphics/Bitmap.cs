@@ -44,6 +44,11 @@ namespace Lime
 			implementation = new BitmapImplementation();
 		}
 
+		public Bitmap(Stream stream) : this()
+		{
+			LoadFromStream(stream);
+		}
+
 		private Bitmap(IBitmapImplementation implementation)
 		{
 			this.implementation = implementation;
