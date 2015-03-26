@@ -27,9 +27,6 @@ namespace Lime
 
 		public void LoadFromStream(Stream stream)
 		{
-			if (!IsValid()) {
-				throw new InvalidOperationException();
-			}
 			Dispose();
 			using (var nsData = Foundation.NSData.FromStream(stream)) {
 				bitmap = UIImage.LoadFromData(nsData);
