@@ -83,8 +83,8 @@ namespace Lime
 		public AudioChannelGroup Group { get; set; }
 
 		public float Pan { 
-			get { return source.pan; }
-			set { source.pan = value; }
+			get { return source.panStereo; }
+			set { source.panStereo = value; }
 		}
 
 		public float Volume {
