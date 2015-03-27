@@ -31,7 +31,7 @@ namespace Lime
 		public override T LoadUnityAsset<T>(string path)
 		{
 			path = GetAssetPathWOExtension(path);
-			var result = bundle.Load(path, typeof(T)) as T;
+			var result = bundle.LoadAsset(path) as T;
 			if (result == null) {
 				throw new Lime.Exception("Asset not found: {0}", path);
 			}
