@@ -67,8 +67,15 @@ namespace Kill3.OrangePlugin
 			var files = new DirectoryInfo(source).GetFiles(searchPattern);
 			foreach (var file in files) {
 				var destFile = Path.Combine(destination, file.Name);
-				Console.WriteLine("Writing " + destFile); 
+				Console.WriteLine("Writing " + destFile);
 				file.CopyTo(destFile, overwrite: true);
+			}
+			var dirs = new DirectoryInfo(source).GetDirectories(searchPattern);
+			foreach (var dir in dirs) {
+				var destDir = Path.Combine(destination, dir.Name);
+				Console.WriteLine("Writing " + destDir);
+				Directory.CreateDirectory(destDir);
+				CopyDirectoryRecursive(dir.FullName, destDir);
 			}
 		}
 
@@ -89,9 +96,15 @@ namespace Kill3.OrangePlugin
 		private static string GetGeneratedAppPath(string mtouch)
 		{
 			string[] args = mtouch.Trim().Split(' ');
+			string x;
 			var dev = Array.IndexOf(args, "-dev");
-			var x = args[dev + 1];
-			x = x.Substring(1, x.Length - 2);
+			if (dev >= 0) {
+				x = args[dev + 1];
+				x = x.Substring(1, x.Length - 2);
+			} else {
+				dev = Array.IndexOf(args, "--dev");
+				x = args[dev + 1];
+			}
 			return x;
 		}
 
@@ -101,10 +114,22 @@ namespace Kill3.OrangePlugin
 			Console.WriteLine("Generating unsigned application bundle");
 			Console.WriteLine("======================================");
 			mtouch = mtouch.TrimStart();
-			var x = mtouch.IndexOf(' ');
-			var app = mtouch.Substring(0, x);
-			var args = mtouch.Substring(x + 1);
-			Process.Start(app, args);
+			string app, args;
+			if (mtouch.StartsWith ("Tool ")) {
+				mtouch = mtouch.Substring (5);
+				var s = mtouch.Split(new string[] { "execution started with arguments:" }, StringSplitOptions.None);
+				app = s[0].Trim();
+				args = s[1];
+				var dir = Path.GetDirectoryName(The.Workspace.GetSolutionFilePath());
+				using (new DirectoryChanger(dir)) {
+					Process.Start(app, args);
+				}
+			} else {
+				var x = mtouch.IndexOf(' ');
+				app = mtouch.Substring(0, x);
+				args = mtouch.Substring(x + 1);
+				Process.Start(app, args);
+			}
 		}
 	}
 }
