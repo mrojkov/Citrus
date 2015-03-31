@@ -8,12 +8,14 @@ namespace Lime
 {
 	internal static class MaterialFactory
 	{
+		static UnityEngine.Material flatMat;
 		static UnityEngine.Material diffuseMat;
 		static UnityEngine.Material imageCombinerMat;
 		static UnityEngine.Material silhuetteMat;
 
 		static MaterialFactory()
 		{
+			flatMat = new UnityEngine.Material(UnityEngine.Shader.Find("Flat"));
 			diffuseMat = new UnityEngine.Material(UnityEngine.Shader.Find("Diffuse"));
 			imageCombinerMat = new UnityEngine.Material(UnityEngine.Shader.Find("ImageCombiner"));
 			silhuetteMat = new UnityEngine.Material(UnityEngine.Shader.Find("Silhuette"));
@@ -22,13 +24,13 @@ namespace Lime
 		public static UnityEngine.Material GetMaterial(Blending blending, ShaderId shaderId, ITexture[] textures)
 		{
 			UnityEngine.Material mat;
-			var texCount = textures[1] != null ? 2 : 1;
+			var texCount = textures[0] != null ? (textures[1] != null ? 2 : 1) : 0;
 			switch (shaderId) {
 			case ShaderId.Silhuette:
 				mat = silhuetteMat;
 				break;
 			default:
-				mat = texCount == 2 ? imageCombinerMat : diffuseMat;
+				mat = texCount == 2 ? imageCombinerMat : (texCount == 1 ? diffuseMat : flatMat);
 				break;
 			}
 			if (textures[0] != null) {
