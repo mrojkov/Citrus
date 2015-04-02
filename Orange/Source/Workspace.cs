@@ -16,6 +16,8 @@ namespace Orange
 		public FileEnumerator AssetFiles { get; private set; }
 		public Json ProjectJson { get; private set; }
 
+		private string dataFolderName;
+
 		public string GetPlatformSuffix()
 		{
 #if WIN
@@ -97,7 +99,7 @@ namespace Orange
 				ProjectFile = file;
 				ReadProject(file);
 				ProjectDirectory = Path.GetDirectoryName(file);
-				AssetsDirectory = Path.Combine(ProjectDirectory, "Data");
+				AssetsDirectory = Path.Combine(ProjectDirectory, dataFolderName);
 				if (!Directory.Exists(AssetsDirectory)) {
 					throw new Lime.Exception("Assets folder '{0}' doesn't exist", AssetsDirectory);
 				}
@@ -114,6 +116,14 @@ namespace Orange
 			var jobject = JObject.Parse(File.ReadAllText(file));
 			ProjectJson = new Json(jobject, file);
 			Title = ProjectJson["Title"] as string;
+			try {
+				var dataFolderValue = ProjectJson.GetValue("DataFolderName");
+				if (dataFolderValue != null) {
+					dataFolderName = dataFolderValue as string;
+				}
+			} catch {
+				dataFolderName = "Data";
+			}
 		}
 
 		public string GetActivePlatformString()
