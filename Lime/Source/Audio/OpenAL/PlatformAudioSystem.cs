@@ -55,11 +55,9 @@ namespace Lime
 			AVAudioSession.SharedInstance().Init();
 			AVAudioSession.Notifications.ObserveInterruption((sender, args) => {
 				if (args.InterruptionType == AVAudioSessionInterruptionType.Began) {
-					Alc.MakeContextCurrent(new OpenTK.ContextHandle((IntPtr)null));
+					Active = false;
 				} else if (args.InterruptionType == AVAudioSessionInterruptionType.Ended) {
-					if (context != null) {
-						context.MakeCurrent();
-					}
+					Active = true;
 				}
 			});	
 			context = new AudioContext();
@@ -76,10 +74,10 @@ namespace Lime
 			var options = Application.Instance.Options;
 			if (AL.GetError() == ALError.NoError) {
 				// iOS dislike to mix stereo and mono buffers on one audio source, so separate them
-                for (int i = 0; i < options.NumStereoChannels; i++) {
+				for (int i = 0; i < options.NumStereoChannels; i++) {
 					channels.Add(new AudioChannel(i, AudioFormat.Stereo16));
 				}
-                for (int i = 0; i < options.NumMonoChannels; i++) {
+				for (int i = 0; i < options.NumMonoChannels; i++) {
 					channels.Add(new AudioChannel(i, AudioFormat.Mono16));
 				}
 			}
@@ -87,6 +85,29 @@ namespace Lime
 				streamingThread = new Thread(RunStreamingLoop);
 				streamingThread.IsBackground = true;
 				streamingThread.Start();
+			}
+		}
+
+		public static bool Active
+		{
+			get { return context != null && Alc.GetCurrentContext().Handle != IntPtr.Zero; }
+			set
+			{
+				if (Active == value) {
+					return;
+				}
+				if (value && context != null) {
+					context.MakeCurrent();
+				} else {
+					Alc.MakeContextCurrent(OpenTK.ContextHandle.Zero);
+				}
+#if !iOS
+				if (value) {
+					ResumeAll();
+				} else {
+					PauseAll();
+				}
+#endif
 			}
 		}
 
@@ -107,13 +128,6 @@ namespace Lime
 			}
 		}
 
-		private static void SetContext()
-		{
-			if (context != null) {
-				context.MakeCurrent();
-			}
-		}
-
 		private static long tickCount;
 
 		private static long GetTimeDelta()
@@ -131,10 +145,7 @@ namespace Lime
 		static void RunStreamingLoop()
 		{
 			while (!shouldTerminateThread) {
-				float delta = GetTimeDelta() * 0.001f;
-				foreach (var channel in channels) {
-					channel.Update(delta);
-				}
+				UpdateChannels();
 				Thread.Sleep(10);
 			}
 		}
@@ -142,10 +153,15 @@ namespace Lime
 		public static void Update()
 		{
 			if (streamingThread == null) {
-				float delta = GetTimeDelta() * 0.001f;
-				foreach (var channel in channels) {
-					channel.Update(delta);
-				}
+				UpdateChannels();
+			}
+		}
+
+		private static void UpdateChannels()
+		{
+			float delta = GetTimeDelta() * 0.001f;
+			foreach (var channel in channels) {
+				channel.Update(delta);
 			}
 		}
 
@@ -169,7 +185,6 @@ namespace Lime
 
 		public static void ResumeGroup(AudioChannelGroup group)
 		{
-			SetContext();
 			foreach (var channel in channels) {
 				if (channel.Group == group && channel.State == AudioChannelState.Paused) {
 					channel.Resume();
@@ -189,7 +204,6 @@ namespace Lime
 
 		public static void ResumeAll()
 		{
-			SetContext();
 			foreach (var channel in channels) {
 				if (channel.State == AudioChannelState.Paused) {
 					channel.Resume();

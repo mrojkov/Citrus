@@ -8,7 +8,7 @@ namespace Lime
 {
 	internal class AudioChannel : IDisposable, IAudioChannel
 	{
-        public const int BufferSize = 1024 * 32;
+		public const int BufferSize = 1024 * 32;
 		public const int NumBuffers = 8;
 
 		public AudioChannelGroup Group { get; set; }
@@ -91,6 +91,9 @@ namespace Lime
 		
 		public void Dispose()
 		{
+			if (!AudioSystem.Active) {
+				return;
+			}
 			if (decoder != null) {
 				decoder.Dispose();
 			}
@@ -111,6 +114,9 @@ namespace Lime
 
 		internal void Play(Sound sound, IAudioDecoder decoder, bool looping, bool paused, float fadeinTime)
 		{
+			if (!AudioSystem.Active) {
+				return;
+			}
 			var state = AL.GetSourceState(source);
 			if (state != ALSourceState.Initial && state != ALSourceState.Stopped) {
 				throw new Lime.Exception("AudioSource must be stopped before play");
@@ -147,6 +153,9 @@ namespace Lime
 
 		public void Resume(float fadeinTime = 0)
 		{
+			if (!AudioSystem.Active) {
+				return;
+			}
 			Bump();
 			if (decoder == null) {
 				throw new InvalidOperationException("Audio decoder is not set");
@@ -169,6 +178,9 @@ namespace Lime
 
 		public void Pause()
 		{
+			if (!AudioSystem.Active) {
+				return;
+			}
 			using (new PlatformAudioSystem.ErrorChecker()) {
 				AL.SourcePause(source);
 			}
@@ -176,6 +188,9 @@ namespace Lime
 
 		public void Stop(float fadeoutTime = 0)
 		{
+			if (!AudioSystem.Active) {
+				return;
+			}
 			if (fadeoutTime > 0) {
 				// fadeVolume = 1;
 				fadeSpeed = -1 / fadeoutTime;
@@ -194,6 +209,9 @@ namespace Lime
 
 		private void SetPitch(float value)
 		{
+			if (!AudioSystem.Active) {
+				return;
+			}
 			pitch = Mathf.Clamp(value, 0.0625f, 16);
 			using (new PlatformAudioSystem.ErrorChecker()) {
 				AL.Source(source, ALSourcef.Pitch, pitch);
@@ -202,6 +220,9 @@ namespace Lime
 
 		private void SetVolume(float value)
 		{
+			if (!AudioSystem.Active) {
+				return;
+			}
 			volume = Mathf.Clamp(value, 0, 1);
 			float gain = volume * AudioSystem.GetGroupVolume(Group) * fadeVolume;
 			using (new PlatformAudioSystem.ErrorChecker()) {
@@ -216,6 +237,9 @@ namespace Lime
 
 		public void Update(float delta)
 		{
+			if (!AudioSystem.Active) {
+				return;
+			}
 			if (streaming) {
 				lock (streamingSync) {
 					if (streaming) {

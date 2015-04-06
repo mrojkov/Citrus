@@ -4,8 +4,6 @@ namespace Lime
 	{
 		static readonly float[] groupVolumes = new float[3] {1, 1, 1};
 
-		static bool active = true;
-
 		public static void Initialize()
 		{
 			PlatformAudioSystem.Initialize();
@@ -18,21 +16,8 @@ namespace Lime
 
 		public static bool Active
 		{
-			get { return active; }
-			set
-			{
-				if (active == value) {
-					return;
-				}
-				active = value;
-#if !iOS
-				if (active) {
-					ResumeAll();
-				} else {
-					PauseAll();
-				}
-#endif
-			}
+			get { return PlatformAudioSystem.Active; }
+			set { PlatformAudioSystem.Active = value; }
 		}
 
 		public static float GetGroupVolume(AudioChannelGroup group)
