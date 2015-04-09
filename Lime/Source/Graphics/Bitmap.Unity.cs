@@ -51,6 +51,11 @@ namespace Lime
 		{
 			throw new NotImplementedException();
 		}
+
+		public bool IsValid()
+		{
+			throw new NotImplementedException();
+		}
 	}
 }
 #endif

@@ -10,6 +10,8 @@ namespace Lime
 	{
 		static readonly List<AudioChannel> channels = new List<AudioChannel>();
 
+		public static bool Active;
+
 		public static void Initialize()
 		{
 			var options = Application.Instance.Options;
