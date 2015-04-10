@@ -34,6 +34,10 @@ namespace Lime
 				if (code == 160) { // ����������� ������
 					return this[' ']; // ���� ��� ������� ������
 				}
+				// Use 'middle dot' char instead of 'bullet operator'
+				if (code == 8729) {
+					return this[(char)183];
+				}
 				return FontChar.Null;
 			}
 		}
