@@ -20,16 +20,20 @@ namespace Lime
 
 		public static AssetsBundle Instance
 		{
-			get { return GetInstance(); }
-			set { instance = value; }
-		}
-
-		private static AssetsBundle GetInstance()
-		{
-			if (instance == null) {
-				throw new Lime.Exception("AssetsBundle.Instance should be initialized before the usage");
+			get
+			{
+				if (instance == null) {
+					throw new Lime.Exception("AssetsBundle.Instance should be initialized before the usage");
+				}
+				return instance;
 			}
-			return instance;
+			set 
+			{
+				instance = value;
+				// The game could use some of textures from this bundle, and if they are missing
+				// we should notify texture pool to search them again.
+				TexturePool.Instance.DiscardAllStubTextures();
+			}
 		}
 
 		public virtual void Dispose()

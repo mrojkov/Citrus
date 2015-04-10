@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -42,6 +42,16 @@ namespace Lime
 				var texture = r.Target as ITexture;
 				if (texture != null) {
 					texture.Discard();
+				}
+			}
+		}
+
+		public void DiscardAllStubTextures()
+		{
+			foreach (WeakReference r in textures.Values) {
+				var target = r.Target as ITexture;
+				if (target != null && target.IsStubTexture) {
+					target.Discard();
 				}
 			}
 		}
