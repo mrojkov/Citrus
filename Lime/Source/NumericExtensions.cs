@@ -130,6 +130,7 @@ namespace Lime
 				|| AssetsBundle.CurrentLanguage == "EN"
 				|| AssetsBundle.CurrentLanguage == "JP"
 				|| AssetsBundle.CurrentLanguage == "KR"
+				|| AssetsBundle.CurrentLanguage == "CN"
 			) {
 				return result;
 			} else if (AssetsBundle.CurrentLanguage == "BR") {
