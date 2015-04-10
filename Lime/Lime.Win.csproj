@@ -323,6 +323,7 @@
     <Compile Include="Source\Graphics\Unity\PlatformRenderer.cs" />
     <Compile Include="Source\Audio\Unity\PlatformAudioSystem.cs" />
     <Compile Include="Source\AssetsBundle\UnityDownloadableBundle.cs" />
+    <Compile Include="Source\Types\BitSet32.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
