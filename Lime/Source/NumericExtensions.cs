@@ -129,6 +129,7 @@ namespace Lime
 				string.IsNullOrEmpty(AssetsBundle.CurrentLanguage) 
 				|| AssetsBundle.CurrentLanguage == "EN"
 				|| AssetsBundle.CurrentLanguage == "JP"
+				|| AssetsBundle.CurrentLanguage == "KR"
 			) {
 				return result;
 			} else if (AssetsBundle.CurrentLanguage == "BR") {
