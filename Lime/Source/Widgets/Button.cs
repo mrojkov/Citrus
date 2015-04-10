@@ -11,11 +11,16 @@ namespace Lime
 	[ProtoContract]
 	public class Button : Widget
 	{
+		public BitSet32 EnableMask = BitSet32.Full;
+
 		[ProtoMember(1)]
 		public override string Text { get; set; }
 
 		[ProtoMember(2)]
-		public bool Enabled { get; set; }
+		public bool Enabled {
+			get { return EnableMask[0]; }
+			set { EnableMask[0] = value; }
+		}
 
 		/// <summary>
 		/// Indicates whether a button has draggable behavior. 
@@ -25,7 +30,7 @@ namespace Lime
 		public bool Draggable { get; set; }
 
 		public override Action Clicked { get; set; }
-		
+
 		private List<Widget> textPresenters;
 		private bool wasClicked;
 		private bool skipReleaseAnimation;
@@ -68,7 +73,6 @@ namespace Lime
 		public Button()
 		{
 			HitTestMask = ControlsHitTestMask;
-			Enabled = true;
 			// On the current frame the button contents may not be loaded, 
 			// so delay its initialization until the next frame.
 			State = InitialState;
@@ -252,7 +256,7 @@ namespace Lime
 			while (IsRunning) {
 				yield return 0;
 			}
-			while (!Enabled) {
+			while (!EnableMask.All()) {
 				yield return 0;
 			}
 			TryRunAnimation("Enable");
@@ -280,7 +284,7 @@ namespace Lime
 				stateMachine.Advance();
 				UpdateLabel();
 			}
-			if (!Enabled && State != DisabledState) {
+			if (!EnableMask.All() && State != DisabledState) {
 				State = DisabledState;
 			}
 		}
