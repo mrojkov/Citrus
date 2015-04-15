@@ -15,6 +15,7 @@ namespace Lime
 		private HAlignment hAlignment;
 		private VAlignment vAlignment;
 		private SpriteList spriteList;
+		private TextRenderer renderer;
 
 		[ProtoMember(1)]
 		public override string Text
@@ -85,17 +86,15 @@ namespace Lime
 		private void EnsureSpriteList()
 		{
 			if (spriteList == null) {
-				var renderer = PrepareRenderer();
 				spriteList = new SpriteList();
-				renderer.Render(spriteList, Size, HAlignment, VAlignment);
+				PrepareRenderer().Render(spriteList, Size, HAlignment, VAlignment);
 			}
 		}
 
 		// TODO: return effective AABB, not only extent
 		public Rectangle MeasureText()
 		{
-			var renderer = PrepareRenderer();
-			var extent = renderer.MeasureText(Size.X, Size.Y);
+			var extent = PrepareRenderer().MeasureText(Size.X, Size.Y);
 			return new Rectangle(Vector2.Zero, extent);
 		}
 
@@ -113,8 +112,10 @@ namespace Lime
 
 		private TextRenderer PrepareRenderer()
 		{
+			if (renderer != null)
+				return renderer;
 			ParseText();
-			var renderer = new TextRenderer(OverflowMode, WordSplitAllowed);
+			renderer = new TextRenderer(OverflowMode, WordSplitAllowed);
 			// Setup default style(take first one from node list or TextStyle.Default).
 			TextStyle defaultStyle = null;
 			if (Nodes.Count > 0) {
@@ -179,6 +180,7 @@ namespace Lime
 			InvalidateRenderCache();
 			spriteList = null;
 			parser = null;
+			renderer = null;
 		}
 
 		/// Call on user-supplied parts of text.
