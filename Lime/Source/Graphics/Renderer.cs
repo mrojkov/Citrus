@@ -272,6 +272,9 @@ namespace Lime
 		{
 			FontChar prevChar = null;
 			float savedX = position.X;
+			if (list != null) {
+				list.Reserve(length);
+			}
 			for (int i = 0; i < length; i++) {
 				char ch = text[i + start];
 				if (ch == '\n') {

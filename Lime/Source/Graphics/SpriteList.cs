@@ -7,7 +7,7 @@ namespace Lime
 {
 	public class SpriteList
 	{
-		private class Item
+		private struct Sprite
 		{
 			public int Tag;
 			public ITexture Texture;
@@ -16,7 +16,6 @@ namespace Lime
 			public Vector2 UV1;
 			public Vector2 Position;
 			public Vector2 Size;
-			internal Item Next;
 
 			public void Draw(Color4 color)
 			{
@@ -24,24 +23,17 @@ namespace Lime
 			}
 		}
 
-		private Item head;
-		private Item tail;
+		private List<Sprite> items = new List<Sprite>();
 
-		private void Add(Item item)
+		public void Reserve(int count)
 		{
-			if (head == null) {
-				head = item;
-				tail = item;
-			} else {
-				tail.Next = item;
-				tail = item;
-			}
+			items.Capacity += count;
 		}
 
 		public void Add(
 			ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 UV0, Vector2 UV1, int tag)
 		{
-			Add(new Item() {
+			items.Add(new Sprite() {
 				Texture = texture,
 				Color = color,
 				Position = position,
@@ -59,19 +51,19 @@ namespace Lime
 
 		public void Render(Color4 color)
 		{
-			for (var item = head; item != null; item = item.Next) {
-				item.Draw(color);
+			foreach (var s in items) {
+				s.Draw(color);
 			}
 		}
 
 		public bool HitTest(Matrix32 worldTransform, Vector2 point, out int tag)
 		{
 			point = worldTransform.CalcInversed().TransformVector(point);
-			for (var item = head; item != null; item = item.Next) {
-				var a = item.Position;
-				var b = item.Position + item.Size;
+			foreach (var s in items) {
+				var a = s.Position;
+				var b = s.Position + s.Size;
 				if (point.X >= a.X && point.Y >= a.Y && point.X < b.X && point.Y < b.Y) {
-					tag = item.Tag;
+					tag = s.Tag;
 					return true;
 				}
 			}
