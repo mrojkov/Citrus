@@ -96,6 +96,11 @@ namespace Lime
 				if (Active == value) {
 					return;
 				}
+#if !iOS
+				if (!value) {
+					PauseAll();
+				}
+#endif
 				if (value && context != null) {
 					context.MakeCurrent();
 				} else {
@@ -104,8 +109,6 @@ namespace Lime
 #if !iOS
 				if (value) {
 					ResumeAll();
-				} else {
-					PauseAll();
 				}
 #endif
 			}
