@@ -11,7 +11,6 @@ namespace Lime.Text
 	{
 		private readonly List<Fragment> fragments = new List<Fragment>();
 		private readonly List<TextStyle> styles = new List<TextStyle>();
-		private readonly List<SerializableFont> fonts = new List<SerializableFont>();
 
 		private float scaleFactor = 1.0f;
 		private readonly TextOverflowMode overflowMode;
@@ -52,13 +51,12 @@ namespace Lime.Text
 		public void AddStyle(TextStyle style)
 		{
 			styles.Add(style);
-			fonts.Add(style.Font);
 		}
 
 		float CalcWordWidth(Fragment word)
 		{
-			Font font = fonts[word.Style].Instance;
 			TextStyle style = styles[word.Style];
+			var font = style.Font.Instance;
 			float bullet = 0;
 			if (word.IsTagBegin && style.ImageUsage == TextStyle.ImageUsageEnum.Bullet)
 				bullet = style.ImageSize.X * scaleFactor;
@@ -120,7 +118,7 @@ namespace Lime.Text
 					TextStyle style = styles[word.Style];
 					Vector2 yOffset;
 					Vector2 position = new Vector2(word.X, y) + offset;
-					Font font = fonts[word.Style].Instance;
+					var font = style.Font.Instance;
 					if (word.IsTagBegin && style.ImageUsage == TextStyle.ImageUsageEnum.Bullet) {
 						yOffset = new Vector2(0, (maxHeight - style.ImageSize.Y * scaleFactor) * 0.5f);
 						if (style.ImageTexture.SerializationPath != null) {
@@ -252,8 +250,8 @@ namespace Lime.Text
 			int lastWordInLastLine = firstWordInLastLineIndex + lines[lines.Count - 1] - 1;
 			while (true) {
 				var word = words[lastWordInLastLine];
-				var font = fonts[word.Style].Instance;
 				var style = styles[word.Style];
+				var font = style.Font.Instance;
 				float dotsWidth = Renderer.MeasureTextLine(font, "...", style.Size * scaleFactor).X;
 				if (
 					lastWordInLastLine > firstWordInLastLineIndex 
@@ -329,11 +327,12 @@ namespace Lime.Text
 			int max = word.Length;
 			int mid = 0;
 			bool isLineLonger = false;
-			var font = fonts[word.Style].Instance;
 			var style = styles[word.Style];
+			var font = style.Font.Instance;
 			do {
 				mid = min + ((max - min) / 2);
-				isLineLonger = word.X + Renderer.MeasureTextLine(font, word.Text, style.Size * scaleFactor, word.Start, mid).X > maxWidth;
+				var w = Renderer.MeasureTextLine(font, word.Text, style.Size * scaleFactor, word.Start, mid).X;
+				isLineLonger = word.X + w > maxWidth;
 				if (isLineLonger) {
 					max = mid;
 				} else {
@@ -347,9 +346,8 @@ namespace Lime.Text
 
 		private Fragment ClipWordWithEllipsis(Fragment word, float maxWidth)
 		{
-			var font = fonts[word.Style].Instance;
 			var style = styles[word.Style];
-			float dotsWidth = Renderer.MeasureTextLine(font, "...", style.Size * scaleFactor).X;
+			float dotsWidth = Renderer.MeasureTextLine(style.Font.Instance, "...", style.Size * scaleFactor).X;
 			while (word.Length > 1 && word.X + word.Width + dotsWidth > maxWidth) {
 				word.Length -= 1;
 				word.Width = CalcWordWidth(word);
