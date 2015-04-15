@@ -113,7 +113,7 @@ namespace Lime
 
 		public virtual void Dispose()
 		{
-			Content.Unlink();
+			Content.UnlinkAndDispose();
 		}
 
 		/// <summary>
