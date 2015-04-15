@@ -248,17 +248,8 @@ namespace Lime
 				if (fontChar == FontChar.Null) {
 					continue;
 				}
-				float kerning = 0;
-				if (prevChar != null && prevChar.KerningPairs != null) {
-					foreach (var pair in prevChar.KerningPairs) {
-						if (pair.Char == fontChar.Char) {
-							kerning = pair.Kerning;
-							break;
-						}
-					}
-				}
 				float scale = fontHeight / fontChar.Height;
-				width += scale * (fontChar.ACWidths.X + kerning);
+				width += scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar));
 				width += scale * (fontChar.Width + fontChar.ACWidths.Y);
 				size.X = Math.Max(size.X, width);
 				prevChar = fontChar;
@@ -292,17 +283,8 @@ namespace Lime
 					}
 					continue;
 				}
-				float kerning = 0;
-				if (prevChar != null && prevChar.KerningPairs != null) {
-					foreach (var pair in prevChar.KerningPairs) {
-						if (pair.Char == fontChar.Char) {
-							kerning = pair.Kerning;
-							break;
-						}
-					}
-				}
 				float scale = fontHeight / fontChar.Height;
-				position.X += scale * (fontChar.ACWidths.X + kerning);
+				position.X += scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar));
 				var texture = font.Textures[fontChar.TextureIndex];
 				var size = new Vector2(scale * fontChar.Width, fontHeight);
 				if (onDrawChar != null) {

@@ -136,5 +136,16 @@ namespace Lime
 		[ProtoMember(8)]
 		public int TextureIndex;
 		public static FontChar Null = new FontChar();
+
+		public float Kerning(FontChar prevChar)
+		{
+			if (prevChar != null && prevChar.KerningPairs != null)
+				foreach (var pair in prevChar.KerningPairs) {
+					if (pair.Char == Char) {
+						return pair.Kerning;
+					}
+				}
+			return 0;
+		}
 	}
 }
