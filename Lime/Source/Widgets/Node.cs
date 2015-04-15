@@ -94,12 +94,16 @@ namespace Lime
 		#endregion
 		#region Methods
 
+		public static int CreatedCount = 0;
+		public static int FinalizedCount = 0;
+
 		public Node()
 		{
 			AnimationSpeed = 1;
 			Animators = new AnimatorCollection(this);
 			Markers = new MarkerCollection();
 			Nodes = new NodeList(this);
+			++CreatedCount;
 		}
 
 		public virtual void Dispose()
@@ -109,6 +113,12 @@ namespace Lime
 			}
 			Nodes.Clear();
 		}
+
+#if LIME_COUNT_NODES
+		~Node() {
+			++FinalizedCount;
+		}
+#endif
 
 		internal protected void InvalidateGlobalValues()
 		{
@@ -197,6 +207,7 @@ namespace Lime
 		public virtual Node DeepCloneFast()
 		{
 			var clone = (Node)MemberwiseClone();
+			++CreatedCount;
 			clone.Parent = null;
 			clone.NextSibling = null;
 			clone.AsWidget = clone as Widget;
