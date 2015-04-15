@@ -7,7 +7,7 @@ namespace Lime
 {
 	public class SpriteList
 	{
-		public class Item
+		private class Item
 		{
 			public int Tag;
 			public ITexture Texture;
@@ -27,7 +27,7 @@ namespace Lime
 		private Item head;
 		private Item tail;
 
-		public void Add(Item item)
+		private void Add(Item item)
 		{
 			if (head == null) {
 				head = item;
@@ -38,7 +38,8 @@ namespace Lime
 			}
 		}
 
-		public void Add(ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 UV0, Vector2 UV1, int tag)
+		public void Add(
+			ITexture texture, Color4 color, Vector2 position, Vector2 size, Vector2 UV0, Vector2 UV1, int tag)
 		{
 			Add(new Item() {
 				Texture = texture,

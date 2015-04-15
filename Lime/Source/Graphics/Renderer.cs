@@ -308,16 +308,7 @@ namespace Lime
 				if (list == null) {
 					DrawSprite(texture, color, position, size, fontChar.UV0, fontChar.UV1);
 				} else {
-					var item = new SpriteList.Item() {
-						Texture = texture,
-						Color = color,
-						Position = position,
-						Size = size,
-						UV0 = fontChar.UV0,
-						UV1 = fontChar.UV1,
-						Tag = tag
-					};
-					list.Add(item);
+					list.Add(texture, color, position, size, fontChar.UV0, fontChar.UV1, tag);
 				}
 				position.X += scale * (fontChar.Width + fontChar.ACWidths.Y);
 				prevChar = fontChar;
