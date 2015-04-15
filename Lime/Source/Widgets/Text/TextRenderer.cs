@@ -9,7 +9,7 @@ namespace Lime.Text
 
 	class TextRenderer
 	{
-		private readonly List<Fragment> fragments = new List<Fragment>();
+		private readonly List<Fragment> words = new List<Fragment>();
 		private readonly List<TextStyle> styles = new List<TextStyle>();
 
 		private float scaleFactor = 1.0f;
@@ -36,16 +36,43 @@ namespace Lime.Text
 
 		public void AddFragment(string text, int style)
 		{
-			fragments.Add(new Fragment { 
+			var word = new Fragment {
 				Text = text,
 				Style = style,
-				Start = 0, 
-				Length = text.Length, 
-				X = 0, 
+				Start = 0,
+				Length = text.Length,
+				X = 0,
 				Width = 0,
 				LineBreak = false,
-				IsTagBegin = false,
-			});
+				IsTagBegin = true,
+			};
+			int length = word.Length;
+			if (length == 0) {
+				words.Add(word);
+				return;
+			}
+			int curr = word.Start;
+			int start = word.Start;
+			while (curr < length) {
+				bool lineBreak = false;
+				if (word.Text[curr] <= ' ') {
+					if (word.Text[curr] == '\n') {
+						lineBreak = true;
+					}
+					curr++;
+				}
+				else {
+					while (curr < length && word.Text[curr] > ' ') {
+						curr++;
+					}
+				}
+				word.Start = start;
+				word.Length = curr - start;
+				word.LineBreak = lineBreak;
+				words.Add(word);
+				word.IsTagBegin = false;
+				start = curr;
+			}
 		}
 
 		public void AddStyle(TextStyle style)
@@ -80,11 +107,10 @@ namespace Lime.Text
 			if (overflowMode == TextOverflowMode.Minify) {
 				FitTextInsideArea(area);
 			}
-			List<Fragment> words;
 			List<int> lines;
 			float totalHeight;
 			float longestLineWidth;
-			PrepareWordsAndLines(area.X, area.Y, out words, out lines, out totalHeight, out longestLineWidth);
+			PrepareWordsAndLines(area.X, area.Y, out lines, out totalHeight, out longestLineWidth);
 			// Draw all lines.
 			int b = 0;
 			float y = 0;
@@ -190,20 +216,17 @@ namespace Lime.Text
 
 		public Vector2 MeasureText(float maxWidth, float maxHeight)
 		{
-			List<Fragment> words;
 			List<int> lines;
 			float totalHeight;
 			float longestLineWidth;
-			PrepareWordsAndLines(maxWidth, maxHeight, out words, out lines, out totalHeight, out longestLineWidth);
+			PrepareWordsAndLines(maxWidth, maxHeight, out lines, out totalHeight, out longestLineWidth);
 			var extent = new Vector2(longestLineWidth, totalHeight);
 			return extent;
 		}
 
 		private void PrepareWordsAndLines(
-			float maxWidth, float maxHeight, out List<Fragment> words, out List<int> lines,
-			out float totalHeight, out float longestLineWidth)
+			float maxWidth, float maxHeight, out List<int> lines, out float totalHeight, out float longestLineWidth)
 		{
-			words = GetWords();
 			PositionWordsHorizontally(maxWidth, words, out longestLineWidth);
 
 			// Calculate word count for every string.
@@ -358,47 +381,5 @@ namespace Lime.Text
 			return word;
 		}
 
-		private List<Fragment> GetWords()
-		{
-			var words = new List<Fragment>();
-			foreach (var fragment in fragments) {
-				SplitFragmentIntoWords(words, fragment);
-			}
-			return words;
-		}
-
-		private static void SplitFragmentIntoWords(List<Fragment> words, Fragment fragment)
-		{
-			var word = fragment;
-			int curr = word.Start;
-			int start = word.Start;
-			int length = word.Length;
-			if (length == 0) {
-				word.IsTagBegin = true;
-				words.Add(word);
-			} else {
-				bool isTagBegin = true;
-				while (curr < length) {
-					bool lineBreak = false;
-					if (word.Text[curr] <= ' ') {
-						if (word.Text[curr] == '\n') {
-							lineBreak = true;
-						}
-						curr++;
-					} else {
-						while (curr < length && word.Text[curr] > ' ') {
-							curr++;
-						}
-					}
-					word.Start = start;
-					word.Length = curr - start;
-					word.LineBreak = lineBreak;
-					word.IsTagBegin = isTagBegin;
-					words.Add(word);
-					start = curr;
-					isTagBegin = false;
-				}
-			}
-		}
 	}
 }
