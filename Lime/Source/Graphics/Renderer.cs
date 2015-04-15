@@ -461,5 +461,88 @@ namespace Lime
 		{
 			PlatformRenderer.ClearRenderTarget(r, g, b, a);
 		}
+
+		public static void DrawSpriteList(SpriteList spriteList, Color4 color)
+		{
+			if (Blending == Blending.Glow) {
+				Blending = Blending.Alpha;
+				DrawSpriteList(spriteList, color);
+				Blending = Blending.Glow;
+			}
+			if (Blending == Blending.Darken) {
+				Blending = Blending.Alpha;
+				DrawSpriteList(spriteList, color);
+				Blending = Blending.Darken;
+			}
+			var matrix = GetEffectiveTransform();
+			int batchLength = 0;
+			for (int i = 0; i < spriteList.Count; i += batchLength) {
+				var texture = spriteList[i].Texture;
+				batchLength = Math.Min(spriteList.Count - i, 20);
+				for (int j = 1; j < batchLength; j++) {
+					if (spriteList[i + j].Texture != texture) {
+						batchLength = j;
+						break;
+					}
+				}
+				var batch = CurrentRenderList.GetBatch(texture, null, Blending, Shader, CustomShaderProgram, 4 * batchLength, 6 * batchLength);
+				int bv = batch.LastVertex;
+				int bi = batch.LastIndex;
+				var mesh = batch.Mesh;
+				mesh.DirtyAttributes |= Mesh.Attributes.VertexColorUV12;
+				mesh.IndicesDirty = true;
+				var indices = mesh.Indices;
+				var v = mesh.Vertices;
+				var c = mesh.Colors;
+				var uv = mesh.UV1;
+				var uvRect = texture.AtlasUVRect;
+				for (int j = 0; j < batchLength; j++) {
+					var sprite = spriteList[i + j];
+					var effectiveColor = color * sprite.Color;
+					if (Renderer.PremultipliedAlphaMode && color.A != 255) {
+						effectiveColor = Color4.PremulAlpha(color);
+					}
+					var uv0 = sprite.UV0;
+					var uv1 = sprite.UV1;
+					uv0.X = uvRect.A.X + (uvRect.B.X - uvRect.A.X) * uv0.X;
+					uv0.Y = uvRect.A.Y + (uvRect.B.Y - uvRect.A.Y) * uv0.Y;
+					uv1.X = uvRect.A.X + (uvRect.B.X - uvRect.A.X) * uv1.X;
+					uv1.Y = uvRect.A.Y + (uvRect.B.Y - uvRect.A.Y) * uv1.Y;
+					indices[bi++] = (ushort)(bv + 1);
+					indices[bi++] = (ushort)bv;
+					indices[bi++] = (ushort)(bv + 2);
+					indices[bi++] = (ushort)(bv + 2);
+					indices[bi++] = (ushort)(bv + 3);
+					indices[bi++] = (ushort)(bv + 1);
+					float x0 = sprite.Position.X;
+					float y0 = sprite.Position.Y;
+					float x1 = sprite.Position.X + sprite.Size.X;
+					float y1 = sprite.Position.Y + sprite.Size.Y;
+					float x0ux = x0 * matrix.U.X;
+					float x0uy = x0 * matrix.U.Y;
+					float y0vx = y0 * matrix.V.X;
+					float y0vy = y0 * matrix.V.Y;
+					float x1ux = x1 * matrix.U.X;
+					float x1uy = x1 * matrix.U.Y;
+					float y1vx = y1 * matrix.V.X;
+					float y1vy = y1 * matrix.V.Y;
+					v[bv + 0] = new Vector2() { X = x0ux + y0vx + matrix.T.X, Y = x0uy + y0vy + matrix.T.Y };
+					v[bv + 1] = new Vector2() { X = x1ux + y0vx + matrix.T.X, Y = x1uy + y0vy + matrix.T.Y };
+					v[bv + 2] = new Vector2() { X = x0ux + y1vx + matrix.T.X, Y = x0uy + y1vy + matrix.T.Y };
+					v[bv + 3] = new Vector2() { X = x1ux + y1vx + matrix.T.X, Y = x1uy + y1vy + matrix.T.Y };
+					c[bv + 0] = effectiveColor;
+					c[bv + 1] = effectiveColor;
+					c[bv + 2] = effectiveColor;
+					c[bv + 3] = effectiveColor;
+					uv[bv + 0] = uv0;
+					uv[bv + 1] = new Vector2() { X = uv1.X, Y = uv0.Y };
+					uv[bv + 2] = new Vector2() { X = uv0.X, Y = uv1.Y };
+					uv[bv + 3] = uv1;
+					bv += 4;
+				}
+				batch.LastIndex = bi;
+				batch.LastVertex = bv;
+			}
+		}
 	}
 }
