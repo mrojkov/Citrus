@@ -242,6 +242,7 @@ namespace Lime
 				if (ch == '\n') {
 					size.Y += fontHeight;
 					width = 0;
+					prevChar = null;
 					continue;
 				}
 				var fontChar = font.Chars[ch];
@@ -274,6 +275,7 @@ namespace Lime
 					}
 					position.X = savedX;
 					position.Y += fontHeight;
+					prevChar = null;
 					continue;
 				}
 				FontChar fontChar = font.Chars[ch];
