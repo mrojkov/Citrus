@@ -142,20 +142,19 @@ namespace Lime.Text
 				for (int j = 0; j < count; j++) {
 					Fragment word = words[b + j];
 					TextStyle style = styles[word.Style];
-					Vector2 yOffset;
 					Vector2 position = new Vector2(word.X, y) + offset;
-					var font = style.Font.Instance;
-					if (word.IsTagBegin && style.ImageUsage == TextStyle.ImageUsageEnum.Bullet) {
-						yOffset = new Vector2(0, (maxHeight - style.ImageSize.Y * scaleFactor) * 0.5f);
-						if (style.ImageTexture.SerializationPath != null) {
-							spriteList.Add(
-								style.ImageTexture, Color4.White, position + yOffset, style.ImageSize * scaleFactor,
-								Vector2.Zero, Vector2.One, tag: word.Style);
-							// Renderer.DrawSprite(SpriteList, style.ImageTexture, color, position + yOffset, style.ImageSize, Vector2.Zero, Vector2.One);
-						}
-						position.X += style.ImageSize.X * scaleFactor;
+					if (
+						word.IsTagBegin && style.ImageUsage == TextStyle.ImageUsageEnum.Bullet &&
+						!String.IsNullOrEmpty(style.ImageTexture.SerializationPath)
+					) {
+						var sz = style.ImageSize * scaleFactor;
+						spriteList.Add(
+							style.ImageTexture, Color4.White, position + new Vector2(0, (maxHeight - sz.Y) * 0.5f),
+							sz, Vector2.Zero, Vector2.One, tag: word.Style);
+						position.X += sz.X;
 					}
-					yOffset = new Vector2(0, (maxHeight - style.Size * scaleFactor) * 0.5f);
+					var yOffset = new Vector2(0, (maxHeight - style.Size * scaleFactor) * 0.5f);
+					var font = style.Font.Instance;
 					if (style.CastShadow) {
 						for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
 							Renderer.DrawTextLine(

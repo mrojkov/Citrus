@@ -7,7 +7,7 @@ namespace Lime
 {
 	public class SpriteList
 	{
-		private struct Sprite
+		private class Sprite
 		{
 			public int Tag;
 			public ITexture Texture;
