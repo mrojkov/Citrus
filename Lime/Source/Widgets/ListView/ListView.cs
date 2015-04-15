@@ -17,12 +17,6 @@ namespace Lime
 			Content.Tasks.Add(DragItemMainTask());
 		}
 
-		public override void Dispose()
-		{
-			Clear();
-			base.Dispose();
-		}
-
 		public void Refresh()
 		{
 			float p = 0;

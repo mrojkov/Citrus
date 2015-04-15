@@ -107,6 +107,7 @@ namespace Lime
 			for (var n = Nodes.FirstOrNull(); n != null; n = n.NextSibling) {
 				n.Dispose();
 			}
+			Nodes.Clear();
 		}
 
 		internal protected void InvalidateGlobalValues()
