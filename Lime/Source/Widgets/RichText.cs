@@ -58,6 +58,12 @@ namespace Lime
 			// CachedRendering = true;
 		}
 
+		public override void Dispose()
+		{
+			Invalidate();
+			base.Dispose();
+		}
+
 		private string errorMessage;
 
 		public string ErrorMessage
