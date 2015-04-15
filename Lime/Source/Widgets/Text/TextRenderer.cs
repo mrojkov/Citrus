@@ -9,15 +9,15 @@ namespace Lime.Text
 
 	class TextRenderer
 	{
-		readonly List<Fragment> fragments = new List<Fragment>();
-		readonly List<TextStyle> styles = new List<TextStyle>();
-		readonly List<SerializableFont> fonts = new List<SerializableFont>();
+		private readonly List<Fragment> fragments = new List<Fragment>();
+		private readonly List<TextStyle> styles = new List<TextStyle>();
+		private readonly List<SerializableFont> fonts = new List<SerializableFont>();
 
 		private float scaleFactor = 1.0f;
-		private TextOverflowMode overflowMode;
-		private bool wordSplitAllowed;
+		private readonly TextOverflowMode overflowMode;
+		private readonly bool wordSplitAllowed;
 
-		struct Fragment
+		private struct Fragment
 		{
 			public string Text;
 			public int Style;
@@ -38,14 +38,14 @@ namespace Lime.Text
 		public void AddFragment(string text, int style)
 		{
 			fragments.Add(new Fragment { 
-				Text = text, 
+				Text = text,
+				Style = style,
 				Start = 0, 
 				Length = text.Length, 
-				Style = style, 
-				IsTagBegin = false, 
-				LineBreak = false, 
 				X = 0, 
-				Width = 0 
+				Width = 0,
+				LineBreak = false,
+				IsTagBegin = false,
 			});
 		}
 
@@ -124,7 +124,9 @@ namespace Lime.Text
 					if (word.IsTagBegin && style.ImageUsage == TextStyle.ImageUsageEnum.Bullet) {
 						yOffset = new Vector2(0, (maxHeight - style.ImageSize.Y * scaleFactor) * 0.5f);
 						if (style.ImageTexture.SerializationPath != null) {
-							spriteList.Add(style.ImageTexture, Color4.White, position + yOffset, style.ImageSize * scaleFactor, Vector2.Zero, Vector2.One, tag: word.Style);
+							spriteList.Add(
+								style.ImageTexture, Color4.White, position + yOffset, style.ImageSize * scaleFactor,
+								Vector2.Zero, Vector2.One, tag: word.Style);
 							// Renderer.DrawSprite(SpriteList, style.ImageTexture, color, position + yOffset, style.ImageSize, Vector2.Zero, Vector2.One);
 						}
 						position.X += style.ImageSize.X * scaleFactor;
@@ -132,11 +134,15 @@ namespace Lime.Text
 					yOffset = new Vector2(0, (maxHeight - style.Size * scaleFactor) * 0.5f);
 					if (style.CastShadow) {
 						for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
-							Renderer.DrawTextLine(font, position + style.ShadowOffset + yOffset, word.Text, style.ShadowColor, style.Size * scaleFactor, word.Start, word.Length, spriteList, tag: word.Style);
+							Renderer.DrawTextLine(
+								font, position + style.ShadowOffset + yOffset, word.Text, style.ShadowColor, style.Size * scaleFactor,
+								word.Start, word.Length, spriteList, tag: word.Style);
 						}
 					}
 					for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
-						Renderer.DrawTextLine(font, position + yOffset, word.Text, style.TextColor, style.Size * scaleFactor, word.Start, word.Length, spriteList, tag: word.Style);
+						Renderer.DrawTextLine(
+							font, position + yOffset, word.Text, style.TextColor, style.Size * scaleFactor,
+							word.Start, word.Length, spriteList, tag: word.Style);
 					}
 				}
 				// Draw overlays
@@ -195,7 +201,9 @@ namespace Lime.Text
 			return extent;
 		}
 
-		private void PrepareWordsAndLines(float maxWidth, float maxHeight, out List<Fragment> words, out List<int> lines, out float totalHeight, out float longestLineWidth)
+		private void PrepareWordsAndLines(
+			float maxWidth, float maxHeight, out List<Fragment> words, out List<int> lines,
+			out float totalHeight, out float longestLineWidth)
 		{
 			words = GetWords();
 			PositionWordsHorizontally(maxWidth, words, out longestLineWidth);
@@ -250,7 +258,8 @@ namespace Lime.Text
 				if (
 					lastWordInLastLine > firstWordInLastLineIndex 
 					&& (
-						word.X + Renderer.MeasureTextLine(font, word.Text.Substring(word.Start, 1), style.Size * scaleFactor).X + dotsWidth > maxWidth
+						word.X + Renderer.MeasureTextLine(
+							font, word.Text.Substring(word.Start, 1), style.Size * scaleFactor).X + dotsWidth > maxWidth
 						|| (word.Length == 1 && word.Text[word.Start] == ' ')
 					)
 				) {

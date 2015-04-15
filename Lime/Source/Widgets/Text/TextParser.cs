@@ -54,7 +54,7 @@ namespace Lime.Text
 				}
 			}
 			if (p != pos) {
-				ProcessTextBlock (text.Substring(p, pos - p));
+				ProcessTextBlock(text.Substring(p, pos - p));
 			}
 		}
 
