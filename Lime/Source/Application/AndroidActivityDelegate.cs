@@ -77,6 +77,8 @@ namespace Lime
 		public event Action<TrimMemory> TrimmingMemory;
 #endif
 		public event Action LowMemory;
+		
+		public event Action<Android.Content.Res.Configuration> ConfigurationChanged;
 		public event BackButtonDelegate BackPressed;
 		public event ActivityResultDelegate ActivityResult;
 
@@ -162,6 +164,13 @@ namespace Lime
 			return args.Handled;
 		}
 
+		public virtual void OnConfigurationChanged(Android.Content.Res.Configuration newConfig)
+		{
+			if (ConfigurationChanged != null) {
+				ConfigurationChanged(newConfig);
+			}
+		}
+		
 		public virtual void OnActivityResult(int requestCode, Result resultCode, Intent data)
 		{
 			if (ActivityResult != null) {
