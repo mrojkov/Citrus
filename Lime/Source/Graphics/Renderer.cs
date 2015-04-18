@@ -262,11 +262,20 @@ namespace Lime
 			Font font, Vector2 position, string text, Color4 color, float fontHeight, int start, int length, SpriteList list = null,
 			Action<int, Vector2, Vector2> onDrawChar = null, int tag = -1)
 		{
+			int j = 0;
+			if (list != null) {
+				for (int i = 0; i < length; i++) {
+					char ch = text[i + start];
+					if (ch != '\n' && font.Chars[ch] != FontChar.Null)
+						++j;
+				}
+			}
+			// Use array instead of list to reduce memory consumption.
+			var chars = new SpriteList.CharDef[j];
+			j = 0;
+
 			FontChar prevChar = null;
 			float savedX = position.X;
-			if (list != null) {
-				list.Reserve(length);
-			}
 			for (int i = 0; i < length; i++) {
 				char ch = text[i + start];
 				if (ch == '\n') {
@@ -295,11 +304,15 @@ namespace Lime
 				if (list == null) {
 					DrawSprite(texture, color, position, size, fontChar.UV0, fontChar.UV1);
 				} else {
-					list.Add(texture, color, position, size, fontChar.UV0, fontChar.UV1, tag);
+					chars[j].FontChar = fontChar;
+					chars[j].Position = position;
+					++j;
 				}
 				position.X += scale * (fontChar.Width + fontChar.ACWidths.Y);
 				prevChar = fontChar;
 			}
+			if (list != null)
+				list.Add(font, color, fontHeight, chars, tag);
 		}
 
 		public static void DrawTriangleFan(ITexture texture, Vertex[] vertices, int numVertices)
@@ -462,7 +475,8 @@ namespace Lime
 			PlatformRenderer.ClearRenderTarget(r, g, b, a);
 		}
 
-		public static void DrawSpriteList(SpriteList spriteList, Color4 color)
+		// Last sprite should be a sentinel.
+		public static void DrawSpriteList(IEnumerable<Sprite> spriteList, Color4 color)
 		{
 			if (Blending == Blending.Glow) {
 				Blending = Blending.Alpha;
@@ -476,16 +490,14 @@ namespace Lime
 			}
 			var matrix = GetEffectiveTransform();
 			int batchLength = 0;
-			for (int i = 0; i < spriteList.Count; i += batchLength) {
-				var texture = spriteList[i].Texture;
-				batchLength = Math.Min(spriteList.Count - i, 20);
-				for (int j = 1; j < batchLength; j++) {
-					if (spriteList[i + j].Texture != texture) {
-						batchLength = j;
-						break;
-					}
+			var batchedSprites = new Sprite[20];
+			foreach (var s in spriteList) {
+				if (batchLength == 0 || batchLength < batchedSprites.Length && s.Texture == batchedSprites[0].Texture) {
+					batchedSprites[batchLength++] = s;
+					continue;
 				}
-				var batch = CurrentRenderList.GetBatch(texture, null, Blending, Shader, CustomShaderProgram, 4 * batchLength, 6 * batchLength);
+				var batch = CurrentRenderList.GetBatch(
+					batchedSprites[0].Texture, null, Blending, Shader, CustomShaderProgram, 4 * batchLength, 6 * batchLength);
 				int bv = batch.LastVertex;
 				int bi = batch.LastIndex;
 				var mesh = batch.Mesh;
@@ -495,9 +507,9 @@ namespace Lime
 				var v = mesh.Vertices;
 				var c = mesh.Colors;
 				var uv = mesh.UV1;
-				var uvRect = texture.AtlasUVRect;
+				var uvRect = batchedSprites[0].Texture.AtlasUVRect;
 				for (int j = 0; j < batchLength; j++) {
-					var sprite = spriteList[i + j];
+					var sprite = batchedSprites[j];
 					var effectiveColor = color * sprite.Color;
 					if (Renderer.PremultipliedAlphaMode && color.A != 255) {
 						effectiveColor = Color4.PremulAlpha(color);
@@ -542,6 +554,8 @@ namespace Lime
 				}
 				batch.LastIndex = bi;
 				batch.LastVertex = bv;
+				batchLength = 1;
+				batchedSprites[0] = s;
 			}
 		}
 	}
