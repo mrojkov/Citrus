@@ -141,6 +141,18 @@ namespace Lime
 			return renderer;
 		}
 
+		public void RemoveUnusedStyles()
+		{
+			PrepareRenderer();
+			for (int i = 1; i < Nodes.Count; ) {
+				var node = Nodes[i];
+				if (node is TextStyle && !renderer.HasStyle(node as TextStyle))
+					Nodes.RemoveAt(i);
+				else
+					++i;
+			}
+		}
+
 		private void SetHAlignment(Lime.HAlignment value)
 		{
 			if (value == hAlignment) {

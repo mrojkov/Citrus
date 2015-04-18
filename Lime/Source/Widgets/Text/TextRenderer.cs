@@ -80,6 +80,11 @@ namespace Lime.Text
 			styles.Add(style);
 		}
 
+		public bool HasStyle(TextStyle style)
+		{
+			return styles.Contains(style);
+		}
+
 		float CalcWordWidth(Fragment word)
 		{
 			TextStyle style = styles[word.Style];
