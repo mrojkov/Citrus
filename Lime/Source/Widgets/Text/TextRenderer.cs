@@ -98,27 +98,17 @@ namespace Lime.Text
 			return styles.Contains(style);
 		}
 
+		private bool IsBullet(Fragment word)
+		{
+			return word.IsTagBegin && styles[word.Style].ImageUsage == TextStyle.ImageUsageEnum.Bullet;
+		}
+
 		float CalcWordWidth(Fragment word)
 		{
-			TextStyle style = styles[word.Style];
-			var font = style.Font.Instance;
-			float bullet = 0;
-			if (word.IsTagBegin && style.ImageUsage == TextStyle.ImageUsageEnum.Bullet)
-				bullet = style.ImageSize.X * scaleFactor;
-			var t = texts[word.TextIndex];
-			if (word.Length == 1) {
-				var c = font.Chars[t[word.Start]];
-				if (c == FontChar.Null) {
-					return 0;
-				}
-				float fontScale = (style.Size * scaleFactor) / c.Height;
-				float width = bullet + (c.ACWidths.X + c.ACWidths.Y + c.Width) * fontScale;
-				return width;
-			} else {
-				Vector2 size = Renderer.MeasureTextLine(font, t, style.Size * scaleFactor, word.Start, word.Length);
-				size.X += bullet;
-				return size.X;
-			}
+			var style = styles[word.Style];
+			Vector2 size = Renderer.MeasureTextLine(
+				style.Font.Instance, texts[word.TextIndex], style.Size * scaleFactor, word.Start, word.Length);
+			return size.X + (IsBullet(word) ? style.ImageSize.X * scaleFactor : 0);
 		}
 
 		public void Render(SpriteList spriteList, Vector2 area, HAlignment hAlign, VAlignment vAlign)
@@ -163,10 +153,7 @@ namespace Lime.Text
 					var t = texts[word.TextIndex];
 					TextStyle style = styles[word.Style];
 					Vector2 position = new Vector2(word.X, y) + offset;
-					if (
-						word.IsTagBegin && style.ImageUsage == TextStyle.ImageUsageEnum.Bullet &&
-						!String.IsNullOrEmpty(style.ImageTexture.SerializationPath)
-					) {
+					if (IsBullet(word) && !String.IsNullOrEmpty(style.ImageTexture.SerializationPath)) {
 						var sz = style.ImageSize * scaleFactor;
 						spriteList.Add(
 							style.ImageTexture, Color4.White, position + new Vector2(0, (maxHeight - sz.Y) * 0.5f),
