@@ -14,7 +14,9 @@ namespace Lime
 
 		public static World Instance = new World();
 
+#if iOS || ANDROID
 		private IKeyboardInputProcessor prevActiveTextWidget;
+#endif
 
 		protected override void SelfUpdate(float delta)
 		{
