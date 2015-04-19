@@ -267,6 +267,7 @@ namespace Lime
 		{
 			if (!CanScroll || !ScrollWhenContentFits && MaxScrollPosition == 0)
 				yield break;
+			IsBeingRefreshed = false; // Do not block scrollview on refresh gesture
 			IsDragging = true;
 			Frame.Input.CaptureMouse();
 			float realScrollPosition = ScrollPosition;
