@@ -136,7 +136,8 @@ namespace Lime
 
 		public Vector2 CalcPositionInSpaceOf(Widget container)
 		{
-			return CalcTransformInSpaceOf(container).Position;
+			Matrix32 matrix = CalcTransitionToSpaceOf(container);
+			return matrix.TransformVector(Pivot * Size);
 		}
 
 		public virtual IEnumerable<string> GetVisibilityIssues()
