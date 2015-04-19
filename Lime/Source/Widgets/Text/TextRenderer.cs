@@ -246,7 +246,7 @@ namespace Lime.Text
 		private void PrepareWordsAndLines(
 			float maxWidth, float maxHeight, out List<int> lines, out float totalHeight, out float longestLineWidth)
 		{
-			PositionWordsHorizontally(maxWidth, words, out longestLineWidth);
+			PositionWordsHorizontally(maxWidth, out longestLineWidth);
 
 			// Calculate word count for every string.
 			lines = new List<int>();
@@ -257,7 +257,7 @@ namespace Lime.Text
 				TextStyle style = styles[word.Style];
 				if (word.LineBreak && c > 0) {
 					if (overflowMode == TextOverflowMode.Ellipsis && totalHeight + lineHeight > maxHeight) {
-						ClipLastLineWithEllipsis(words, lines, maxWidth);
+						ClipLastLineWithEllipsis(lines, maxWidth);
 						c = 0;
 						break;
 					} else {
@@ -275,7 +275,7 @@ namespace Lime.Text
 			}
 			if (c > 0) {
 				if (overflowMode == TextOverflowMode.Ellipsis && totalHeight + lineHeight > maxHeight) {
-					ClipLastLineWithEllipsis(words, lines, maxWidth);
+					ClipLastLineWithEllipsis(lines, maxWidth);
 				} else {
 					totalHeight += lineHeight;
 					lines.Add(c);
@@ -283,7 +283,7 @@ namespace Lime.Text
 			}
 		}
 
-		private void ClipLastLineWithEllipsis(List<Fragment> words, List<int> lines, float maxWidth)
+		private void ClipLastLineWithEllipsis(List<int> lines, float maxWidth)
 		{
 			int firstWordInLastLineIndex = 0;
 			for (int i = 0; i < lines.Count - 1; i++) {
@@ -310,10 +310,10 @@ namespace Lime.Text
 					break;
 				}
 			}
-			words[lastWordInLastLine] = ClipWordWithEllipsis(words[lastWordInLastLine], maxWidth);
+			ClipWordWithEllipsis(words[lastWordInLastLine], maxWidth);
 		}
 
-		private void PositionWordsHorizontally(float maxWidth, List<Fragment> words, out float longestLineWidth)
+		private void PositionWordsHorizontally(float maxWidth, out float longestLineWidth)
 		{
 			longestLineWidth = 0;
 			float x = 0;
@@ -355,7 +355,7 @@ namespace Lime.Text
 
 				if (overflowMode == TextOverflowMode.Ellipsis) {
 					if (word.X == 0 && word.Width > maxWidth) {
-						word = ClipWordWithEllipsis(word, maxWidth);
+						ClipWordWithEllipsis(word, maxWidth);
 					}
 				}
 				words[i] = word;
@@ -389,12 +389,12 @@ namespace Lime.Text
 			return mid;
 		}
 
-		private Fragment ClipWordWithEllipsis(Fragment word, float maxWidth)
+		private void ClipWordWithEllipsis(Fragment word, float maxWidth)
 		{
 			var style = styles[word.Style];
 			float dotsWidth = Renderer.MeasureTextLine(style.Font.Instance, "...", style.Size * scaleFactor).X;
 			while (word.Length > 1 && word.X + word.Width + dotsWidth > maxWidth) {
-				word.Length -= 1;
+				word.Length--;
 				word.Width = CalcWordWidth(word);
 			}
 			var t = texts[word.TextIndex];
@@ -402,7 +402,6 @@ namespace Lime.Text
 			word.TextIndex = AddText(newText);
 			word.Start = 0;
 			word.Length = newText.Length;
-			return word;
 		}
 
 	}
