@@ -59,20 +59,26 @@ namespace Lime
 			public Font Font;
 			public float FontHeight;
 			public CharDef[] CharDefs;
+			// This buffer should be larger than batch size in DrawSpriteList.
+			private static Sprite[] buffer = new Sprite[50];
+			public static int Index = 0;
 
 			public IEnumerable<Sprite> GetSprites()
 			{
 				foreach (var cd in CharDefs) {
 					var ch = cd.FontChar;
-					yield return new Sprite {
-						Tag = Tag,
-						Texture = Font.Textures[ch.TextureIndex],
-						Color = this.Color,
-						Position = cd.Position,
-						Size = cd.Size(FontHeight),
-						UV0 = ch.UV0,
-						UV1 = ch.UV1,
-					};
+					if (buffer[Index] == null)
+						buffer[Index] = new Sprite();
+					var s = buffer[Index];
+					Index = (Index + 1) % buffer.Length;
+					s.Tag = Tag;
+					s.Texture = Font.Textures[ch.TextureIndex];
+					s.Color = Color;
+					s.Position = cd.Position;
+					s.Size = cd.Size(FontHeight);
+					s.UV0 = ch.UV0;
+					s.UV1 = ch.UV1;
+					yield return s;
 				}
 			}
 
@@ -127,6 +133,7 @@ namespace Lime
 
 		private IEnumerable<Sprite> GetSprites()
 		{
+			TextSprite.Index = 0;
 			foreach (var w in items)
 				foreach (var s in w.GetSprites())
 					yield return s;
