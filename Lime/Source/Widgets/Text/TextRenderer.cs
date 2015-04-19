@@ -11,14 +11,15 @@ namespace Lime.Text
 	{
 		private readonly List<Fragment> words = new List<Fragment>();
 		private readonly List<TextStyle> styles = new List<TextStyle>();
+		private readonly List<string> texts = new List<string>();
 
 		private float scaleFactor = 1.0f;
 		private readonly TextOverflowMode overflowMode;
 		private readonly bool wordSplitAllowed;
 
-		private struct Fragment
+		private class Fragment
 		{
-			public string Text;
+			public int TextIndex;
 			public int Style;
 			public int Start;
 			public int Length;
@@ -26,6 +27,7 @@ namespace Lime.Text
 			public float Width;
 			public bool LineBreak; // Line break before the fragment
 			public bool IsTagBegin;
+			public Fragment Clone() { return (Fragment)MemberwiseClone(); }
 		};
 
 		public TextRenderer(TextOverflowMode overflowMode, bool wordSplitAllowed)
@@ -34,10 +36,19 @@ namespace Lime.Text
 			this.wordSplitAllowed = wordSplitAllowed;
 		}
 
+		public int AddText(string text)
+		{
+			int i = texts.IndexOf(text);
+			if (i >= 0)
+				return i;
+			texts.Add(String.Intern(text));
+			return texts.Count - 1;
+		}
+
 		public void AddFragment(string text, int style)
 		{
 			var word = new Fragment {
-				Text = text,
+				TextIndex = AddText(text),
 				Style = style,
 				Start = 0,
 				Length = text.Length,
@@ -53,19 +64,21 @@ namespace Lime.Text
 			}
 			int curr = word.Start;
 			int start = word.Start;
+			var t = texts[word.TextIndex];
 			while (curr < length) {
 				bool lineBreak = false;
-				if (word.Text[curr] <= ' ') {
-					if (word.Text[curr] == '\n') {
+				if (t[curr] <= ' ') {
+					if (t[curr] == '\n') {
 						lineBreak = true;
 					}
 					curr++;
 				}
 				else {
-					while (curr < length && word.Text[curr] > ' ') {
+					while (curr < length && t[curr] > ' ') {
 						curr++;
 					}
 				}
+				word = word.Clone();
 				word.Start = start;
 				word.Length = curr - start;
 				word.LineBreak = lineBreak;
@@ -92,8 +105,9 @@ namespace Lime.Text
 			float bullet = 0;
 			if (word.IsTagBegin && style.ImageUsage == TextStyle.ImageUsageEnum.Bullet)
 				bullet = style.ImageSize.X * scaleFactor;
+			var t = texts[word.TextIndex];
 			if (word.Length == 1) {
-				var c = font.Chars[word.Text[word.Start]];
+				var c = font.Chars[t[word.Start]];
 				if (c == FontChar.Null) {
 					return 0;
 				}
@@ -101,7 +115,7 @@ namespace Lime.Text
 				float width = bullet + (c.ACWidths.X + c.ACWidths.Y + c.Width) * fontScale;
 				return width;
 			} else {
-				Vector2 size = Renderer.MeasureTextLine(font, word.Text, style.Size * scaleFactor, word.Start, word.Length);
+				Vector2 size = Renderer.MeasureTextLine(font, t, style.Size * scaleFactor, word.Start, word.Length);
 				size.X += bullet;
 				return size.X;
 			}
@@ -146,6 +160,7 @@ namespace Lime.Text
 				// Draw string.
 				for (int j = 0; j < count; j++) {
 					Fragment word = words[b + j];
+					var t = texts[word.TextIndex];
 					TextStyle style = styles[word.Style];
 					Vector2 position = new Vector2(word.X, y) + offset;
 					if (
@@ -163,13 +178,13 @@ namespace Lime.Text
 					if (style.CastShadow) {
 						for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
 							Renderer.DrawTextLine(
-								font, position + style.ShadowOffset + yOffset, word.Text, style.ShadowColor, style.Size * scaleFactor,
+								font, position + style.ShadowOffset + yOffset, t, style.ShadowColor, style.Size * scaleFactor,
 								word.Start, word.Length, spriteList, tag: word.Style);
 						}
 					}
 					for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
 						Renderer.DrawTextLine(
-							font, position + yOffset, word.Text, style.TextColor, style.Size * scaleFactor,
+							font, position + yOffset, t, style.TextColor, style.Size * scaleFactor,
 							word.Start, word.Length, spriteList, tag: word.Style);
 					}
 				}
@@ -279,13 +294,14 @@ namespace Lime.Text
 				var word = words[lastWordInLastLine];
 				var style = styles[word.Style];
 				var font = style.Font.Instance;
+				var t = texts[word.TextIndex];
 				float dotsWidth = Renderer.MeasureTextLine(font, "...", style.Size * scaleFactor).X;
 				if (
 					lastWordInLastLine > firstWordInLastLineIndex 
 					&& (
 						word.X + Renderer.MeasureTextLine(
-							font, word.Text.Substring(word.Start, 1), style.Size * scaleFactor).X + dotsWidth > maxWidth
-						|| (word.Length == 1 && word.Text[word.Start] == ' ')
+							font, t.Substring(word.Start, 1), style.Size * scaleFactor).X + dotsWidth > maxWidth
+						|| (word.Length == 1 && t[word.Start] == ' ')
 					)
 				) {
 					lastWordInLastLine -= 1;
@@ -308,8 +324,9 @@ namespace Lime.Text
 					x = 0;
 				}
 				var isLongerThanWidth = x + word.Width > maxWidth;
-				var isText = word.Text[word.Start] > ' ';
-				if (isLongerThanWidth && isText && (wordSplitAllowed || word.Text.HasJapaneseSymbols(word.Start, word.Length))) {
+				var t = texts[word.TextIndex];
+				var isText = t[word.Start] > ' ';
+				if (isLongerThanWidth && isText && (wordSplitAllowed || t.HasJapaneseSymbols(word.Start, word.Length))) {
 					var fittedCharsCount = CalcFittedCharactersCount(word, maxWidth - x);
 					if (fittedCharsCount > 0) {
 						var newWord = word;
@@ -356,9 +373,10 @@ namespace Lime.Text
 			bool isLineLonger = false;
 			var style = styles[word.Style];
 			var font = style.Font.Instance;
+			var t = texts[word.TextIndex];
 			do {
 				mid = min + ((max - min) / 2);
-				var w = Renderer.MeasureTextLine(font, word.Text, style.Size * scaleFactor, word.Start, mid).X;
+				var w = Renderer.MeasureTextLine(font, t, style.Size * scaleFactor, word.Start, mid).X;
 				isLineLonger = word.X + w > maxWidth;
 				if (isLineLonger) {
 					max = mid;
@@ -379,9 +397,11 @@ namespace Lime.Text
 				word.Length -= 1;
 				word.Width = CalcWordWidth(word);
 			}
-			word.Text = word.Text.Substring(word.Start, word.Length) + "...";
+			var t = texts[word.TextIndex];
+			var newText = t.Substring(word.Start, word.Length) + "...";
+			word.TextIndex = AddText(newText);
 			word.Start = 0;
-			word.Length = word.Text.Length;
+			word.Length = newText.Length;
 			return word;
 		}
 
