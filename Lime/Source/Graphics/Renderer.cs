@@ -512,7 +512,7 @@ namespace Lime
 					var sprite = batchedSprites[j];
 					var effectiveColor = color * sprite.Color;
 					if (Renderer.PremultipliedAlphaMode && color.A != 255) {
-						effectiveColor = Color4.PremulAlpha(color);
+						effectiveColor = Color4.PremulAlpha(effectiveColor);
 					}
 					var uv0 = sprite.UV0;
 					var uv1 = sprite.UV1;
