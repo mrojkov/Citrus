@@ -78,11 +78,11 @@ namespace Lime.Text
 						curr++;
 					}
 				}
-				word = word.Clone();
 				word.Start = start;
 				word.Length = curr - start;
 				word.LineBreak = lineBreak;
 				words.Add(word);
+				word = word.Clone();
 				word.IsTagBegin = false;
 				start = curr;
 			}
