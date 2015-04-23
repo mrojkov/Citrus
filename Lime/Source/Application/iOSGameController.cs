@@ -15,6 +15,7 @@ namespace Lime
 	{
 		public static GameController Instance;
 		private NSObject keyboardShowNotification;
+		private NSObject keyboardHideNotification;
 		private NSObject keyboardWillChangeFrameNotification;
 		private NSObject keyboardDidChangeFrameNotification;
 
@@ -40,6 +41,8 @@ namespace Lime
 		public override void ViewWillAppear(bool animated)
 		{
 			base.ViewWillAppear(animated);
+
+			keyboardHideNotification = UIKeyboard.Notifications.ObserveDidHide(KeyboardHideCallback);
 			keyboardShowNotification = UIKeyboard.Notifications.ObserveWillShow(KeyboardShowCallback);
 			keyboardWillChangeFrameNotification = UIKeyboard.Notifications.ObserveWillChangeFrame(KeyboardWillChangeFrameCallback);
 			keyboardDidChangeFrameNotification = UIKeyboard.Notifications.ObserveDidChangeFrame(KeyboardDidChangeFrameCallback);
@@ -50,6 +53,9 @@ namespace Lime
 			base.ViewWillDisappear(animated);
 			if (keyboardShowNotification != null) {
 				keyboardShowNotification.Dispose();
+			}
+			if (keyboardHideNotification != null) {
+				keyboardHideNotification.Dispose();
 			}
 			if (keyboardWillChangeFrameNotification != null) {
 				keyboardWillChangeFrameNotification.Dispose();
@@ -81,19 +87,27 @@ namespace Lime
 
 		private void KeyboardShowCallback(object sender, UIKeyboardEventArgs args)
 		{
+			GameView.Instance.OnscreenKeyboardVisible = true;
 			var scale = UIScreen.MainScreen.Scale;
 
 			// iPad 2 return keyboard height in Height, but iPad 3 return keyboard height in Width.
 			// So, trying to determine where the real height is. 
 			var rectEnd = args.FrameEnd;
 			var rectBegin = args.FrameBegin;
-			if (rectEnd.X == 0 && rectBegin.X == 0) {
+			rectBegin.X  = rectBegin.X < 0? 0 : rectBegin.X;
+			rectEnd.X = rectEnd.X < 0 ? 0 : rectEnd.X;
+			if (rectEnd.X == 0 && rectBegin.X == 0 && rectEnd.Height < rectEnd.Width) {
 				Application.Instance.OnscreenKeyboardHeight = (float)(rectEnd.Height * scale);
 			} else {
 				Application.Instance.OnscreenKeyboardHeight = (float)(rectEnd.Width * scale);
 			}
 		}
 
+		private void KeyboardHideCallback(object sender, UIKeyboardEventArgs args)
+		{
+			GameView.Instance.OnscreenKeyboardVisible = false;
+		}
+		 
 		public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations ()
 		{
 			UIInterfaceOrientationMask mask = 0;

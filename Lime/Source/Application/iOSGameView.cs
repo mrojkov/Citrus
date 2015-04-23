@@ -32,6 +32,8 @@ namespace Lime
 
 		public static GameView Instance;
 
+		public bool OnscreenKeyboardVisible { get;  set; }
+
 		public GameView() : base(UIScreen.MainScreen.Bounds)
 		{
 			Instance = this;
