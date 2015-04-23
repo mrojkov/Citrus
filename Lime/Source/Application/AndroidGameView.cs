@@ -17,7 +17,7 @@ namespace Lime
 		// TODO: resolve keyboard flickering bug and remove this field;
 		public static bool AllowOnscreenKeyboard;
 
-		class KeyboardHandler : Java.Lang.Object, IOnKeyListener
+		private class KeyboardHandler : Java.Lang.Object, IOnKeyListener
 		{
 			public string TextInput;
 
@@ -28,7 +28,7 @@ namespace Lime
 				} else if (keyCode == Keycode.Unknown) {
 					TextInput += e.Characters;
 				} else if (e.IsPrintingKey && e.Action != KeyEventActions.Up) {
-					TextInput += (char)e.UnicodeChar;
+					TextInput += (char) e.UnicodeChar;
 				} else if (e.KeyCode == Keycode.Space && e.Action != KeyEventActions.Up) {
 					TextInput += ' ';
 				} else if (e.Action != KeyEventActions.Multiple) {
@@ -79,17 +79,16 @@ namespace Lime
 		private KeyboardHandler keyboardHandler;
 		private InputMethodManager imm;
 
-		public GameView(Context context)
-			: base(context)
+		public GameView(Context context) : base(context)
 		{
 			Instance = this;
 			for (int i = 0; i < Input.MaxTouches; i++) {
 				pointerIds[i] = -1;
 			}
-			imm = (InputMethodManager)context.GetSystemService(Android.Content.Context.InputMethodService);
+			imm = (InputMethodManager) context.GetSystemService(Android.Content.Context.InputMethodService);
 		}
 
-		private bool isOnscreenKeyboardVisible;
+		public bool OnscreenKeyboardVisible { get; private set; }
 
 		public void OnCreate()
 		{
@@ -100,7 +99,7 @@ namespace Lime
 		protected override void OnLayout(bool changed, int left, int top, int right, int bottom)
 		{
 			base.OnLayout(changed, left, top, right, bottom);
-			if (AllowOnscreenKeyboard) { 
+			if (AllowOnscreenKeyboard) {
 				if (changed) {
 					// Changed == true never seemed go along with showing and hiding keyboard, but 
 					// it results in isOnscreenKeyboardVisible = false right after device rotation.
@@ -112,10 +111,11 @@ namespace Lime
 				var visibleHeight = r.Bottom - r.Top;
 				var app = Application.Instance;
 				if (visibleHeight == totalHeight) {
-					isOnscreenKeyboardVisible = false;
+					OnscreenKeyboardVisible = false;
 					app.OnscreenKeyboardHeight = 0;
 				} else {
 					app.OnscreenKeyboardHeight = totalHeight - visibleHeight;
+					OnscreenKeyboardVisible = true;
 				}
 			}
 		}
@@ -139,20 +139,15 @@ namespace Lime
 					FocusableInTouchMode = true;
 					this.RequestFocus();
 					imm.ShowSoftInput(this, ShowFlags.Forced);
-				} else if (!show) {
+				} else {
 					Focusable = false;
 					FocusableInTouchMode = false;
 					imm.HideSoftInputFromWindow(WindowToken, 0);
 				}
-				isOnscreenKeyboardVisible = show;
+				OnscreenKeyboardVisible = show;
 			}
 		}
 
-		public bool IsOnscreenKeyboardVisible()
-		{
-			return isOnscreenKeyboardVisible;
-		}
-			
 		public override bool OnCheckIsTextEditor()
 		{
 			return true;
