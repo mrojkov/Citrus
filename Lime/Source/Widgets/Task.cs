@@ -103,7 +103,9 @@ namespace Lime
 
 		private void HandleYieldedResult(object result)
 		{
-			if (result is int) {
+			if (result == null) {
+				waitTime = 0;
+			} else if (result is int) {
 				waitTime = (int)result;
 			} else if (result is float) {
 				waitTime = (float)result;
@@ -165,7 +167,7 @@ namespace Lime
 			var t = new System.Threading.Tasks.Task(action);
 			t.Start();
 			while (!t.IsCompleted && !t.IsCanceled && !t.IsFaulted) {
-				yield return 0;
+				yield return null;
 			}
 #endif
 		}

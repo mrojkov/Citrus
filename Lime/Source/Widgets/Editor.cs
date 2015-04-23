@@ -65,7 +65,7 @@ namespace Lime
 					time = 0f;
 				}
 				w.Visible = caretPos.IsVisible && blinkOn;
-				yield return 0;
+				yield return null;
 			}
 		}
 	}
@@ -141,7 +141,7 @@ namespace Lime
 				caretPos.IsVisible = IsActive();
 				if (IsActive())
 					world.IsActiveTextWidgetUpdated = true;
-				yield return 0;
+				yield return null;
 			}
 		}
 
@@ -257,7 +257,7 @@ namespace Lime
 					HandleTextInput();
 					HandleMouse();
 				}
-				yield return 0;
+				yield return null;
 			}
 		}
 
@@ -272,7 +272,7 @@ namespace Lime
 				else {
 					text.DisplayText = text.Text; // Disable localization.
 				}
-				yield return 0;
+				yield return null;
 			}
 		}
 

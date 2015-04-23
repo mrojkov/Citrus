@@ -55,7 +55,7 @@ namespace Lime.PopupMenu
 				Frame.Width = itemWidth * columnsCount;
 				UpdateBackground();
 				UpdateItems(itemsPerColumn);
-				yield return 0;	
+				yield return null;	
 				if (Frame.Input.WasMousePressed() && !Frame.IsMouseOver()) {
 					Hide();
 					yield break;

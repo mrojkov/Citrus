@@ -154,7 +154,7 @@ namespace Lime.Widgets2
 			var t = new System.Threading.Tasks.Task(action);
 			t.Start();
 			while (!t.IsCompleted && !t.IsCanceled && !t.IsFaulted) {
-				yield return 0;
+				yield return null;
 			}
 #endif
 		}

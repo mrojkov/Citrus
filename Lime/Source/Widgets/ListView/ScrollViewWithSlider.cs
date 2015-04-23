@@ -37,7 +37,7 @@ namespace Lime
 				if (IsScrolling() || IsDragging) {
 					sliderTimeToLive = 1;
 				}
-				yield return 0;
+				yield return null;
 			}
 		}
 
@@ -60,7 +60,7 @@ namespace Lime
 				ShowSliderIfNeeded();
 				MoveSlider();
 				ResizeSlider();
-				yield return 0;
+				yield return null;
 			}
 		}
 

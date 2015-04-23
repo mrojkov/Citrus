@@ -35,7 +35,7 @@ namespace Lime
 				animation.Width = listView.Frame.Width;
 				while (true) {
 					animation.Y = -listView.ScrollPosition;
-					yield return 0;
+					yield return null;
 				}
 			}
 
@@ -53,7 +53,7 @@ namespace Lime
 							yield return RefreshTask();
 							break;
 						}
-						yield return 0;
+						yield return null;
 					}
 					arrow.RunAnimation("Restore");
 					yield return Task.WaitWhile(() => listView.ScrollPosition < threshold);
@@ -68,7 +68,7 @@ namespace Lime
 					yield return refreshTask.GetEnumerator();
 					animation.RunAnimation("Hide");
 					while (animation.IsRunning) {
-						yield return 0;
+						yield return null;
 					}
 				} finally {
 					listView.IsBeingRefreshed = false;

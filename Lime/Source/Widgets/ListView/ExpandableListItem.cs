@@ -65,7 +65,7 @@ namespace Lime
 						DoPinHeader();
 					}
 				}
-				yield return 0;
+				yield return null;
 			}
 		}
 
@@ -106,7 +106,7 @@ namespace Lime
 				ListView.SetProjectedSize(subContainer, t);
 				StackWidgets(this);
 				onStep();
-				yield return 0;
+				yield return null;
 			}
 			IsAnimating = false;
 			IsExpanded = !IsExpanded;

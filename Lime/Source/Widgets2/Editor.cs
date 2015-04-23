@@ -65,7 +65,7 @@ namespace Lime.Widgets2
 					time = 0f;
 				}
 				w.Visible = caretPos.IsVisible && blinkOn;
-				yield return 0;
+				yield return null;
 			}
 		}
 	}
@@ -130,7 +130,7 @@ namespace Lime.Widgets2
 				caretPos.IsVisible = IsActive();
 				if (IsActive())
 					world.IsActiveTextWidgetUpdated = true;
-				yield return 0;
+				yield return null;
 			}
 		}
 
@@ -223,7 +223,7 @@ namespace Lime.Widgets2
 					HandleTextInput();
 					HandleMouse();
 				}
-				yield return 0;
+				yield return null;
 			}
 		}
 	}

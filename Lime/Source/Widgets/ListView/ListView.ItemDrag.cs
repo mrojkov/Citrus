@@ -20,12 +20,12 @@ namespace Lime
 		private IEnumerator<object> DragItemMainTask()
 		{
 			while (true) {
-				yield return 0;
+				yield return null;
 				if (!CanDragItems) {
 					continue;
 				}
 				while (!Frame.Input.WasMousePressed()) {
-					yield return 0;
+					yield return null;
 				}
 				var item = this.FirstOrDefault(i => i.IsMouseOver());
 				if (item == null) {
@@ -37,7 +37,7 @@ namespace Lime
 					yield return DragItemTask(item);
 				}
 				while (Input.IsMousePressed()) {
-					yield return 0;
+					yield return null;
 				}
 			}
 		}
@@ -62,7 +62,7 @@ namespace Lime
 							yield return SwapItemsTask(item, this[i + 1]);
 						}
 					}
-					yield return 0;
+					yield return null;
 				}
 			} finally {
 				dragInProgress = false;
@@ -82,7 +82,7 @@ namespace Lime
 			foreach (float t in TaskList.SinMotion(0.15f, 0, 1)) {
 				item1.Position = Vector2.Lerp(t, a, a + item2.Height * Vector2.Down);
 				item2.Position = Vector2.Lerp(t, b, a);
-				yield return 0;
+				yield return null;
 			}
 			SwapWidgets(item1, item2);
 		}

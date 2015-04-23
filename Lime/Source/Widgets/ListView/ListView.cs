@@ -48,7 +48,7 @@ namespace Lime
 		{
 			while (true) {
 				Refresh();
-				yield return 0;
+				yield return null;
 			}
 		}
 	

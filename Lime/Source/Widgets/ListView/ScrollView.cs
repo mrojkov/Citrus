@@ -151,7 +151,7 @@ namespace Lime
 			float time = (position - ScrollPosition).Abs() / ScrollToItemVelocity;
 			foreach (var t in TaskList.SinMotion(time, ScrollPosition, position)) {
 				ScrollPosition = t;
-				yield return 0;
+				yield return null;
 			}
 			scrollingTask = null;
 		}
@@ -205,7 +205,7 @@ namespace Lime
 				// Wait until a user starts dragging the widget
 				while (!Frame.Input.WasMousePressed() || !Frame.IsMouseOver()) {
 					Bounce();
-					yield return 0;
+					yield return null;
 				}
 				StopScrolling();
 				Vector2 mousePos = Input.MousePosition;
@@ -227,7 +227,7 @@ namespace Lime
 		{
 			Vector2 mousePos = Input.MousePosition;
 			while (Input.IsMousePressed() && (Input.MousePosition - mousePos).Length < 10) {
-				yield return 0;
+				yield return null;
 			}
 			Vector2 d = Input.MousePosition - mousePos;
 			if (ScrollDirection == ScrollDirection.Vertical) {
@@ -255,7 +255,7 @@ namespace Lime
 						min: MinScrollPosition - MaxOverscroll,
 						max: MaxScrollPosition + MaxOverscroll
 					);
-					yield return 0;
+					yield return null;
 				}
 				scrollingTask = null;
 			} finally {
@@ -282,7 +282,7 @@ namespace Lime
 				ScrollPosition = ClampScrollPositionWithinBounceZone(realScrollPosition).Round();
 				mouseProjectedPosition = ProjectToScrollAxis(Input.MousePosition);
 				velocityMeter.AddSample(realScrollPosition);
-				yield return 0;
+				yield return null;
 			} while (Input.IsMousePressed());
 			Frame.Input.ReleaseMouse();
 			StartScrolling(IntertialScrollingTask(velocityMeter.CalcVelocity()));
