@@ -61,6 +61,8 @@ namespace Lime
 
 		public static Thread MainThread { get; private set; }
 		public static bool IsMainThread { get { return Thread.CurrentThread == MainThread; } }
+		public bool OnscreenKeyboardVisible { get { return GameView.Instance.OnscreenKeyboardVisible; } }
+		public float OnscreenKeyboardHeight { get; internal set; }
 
 		public static Application Instance;
 		private static readonly object scheduledActionsSync = new object();
@@ -153,7 +155,6 @@ namespace Lime
 			}
 		}
 #if iOS
-		public float OnscreenKeyboardHeight { get; internal set; }
 
 		public Size WindowSize { get; internal set; }
 
@@ -228,7 +229,6 @@ namespace Lime
 		/// <summary>
 		/// The height of the on-screen keyboard. Zero, until the keyboard is shown for the first time.
 		/// </summary>
-		public float OnscreenKeyboardHeight { get; internal set; }
 
 		public Size WindowSize 
 		{
@@ -249,11 +249,6 @@ namespace Lime
 		public void ShowOnscreenKeyboard(bool show, string text)
 		{
 			GameView.Instance.ShowOnscreenKeyboard(show, text);
-		}
-
-		public bool IsOnscreenKeyboardVisible()
-		{
-			return GameView.Instance.IsOnscreenKeyboardVisible();
 		}
 
 		public void ChangeOnscreenKeyboardText(string text)
