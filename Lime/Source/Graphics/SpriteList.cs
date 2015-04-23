@@ -20,16 +20,15 @@ namespace Lime
 	{
 		private interface ISpriteWrapper
 		{
-			IEnumerable<Sprite> GetSprites();
+			void AddToList(List<Sprite> sprites);
 			bool HitTest(Vector2 point, out int tag);
 		}
 
-
 		private class NormalSprite : Sprite, ISpriteWrapper
 		{
-			public IEnumerable<Sprite> GetSprites()
+			public void AddToList(List<Sprite> sprites)
 			{
-				yield return this;
+				sprites.Add(this);
 			}
 
 			public bool HitTest(Vector2 point, out int tag)
@@ -59,18 +58,20 @@ namespace Lime
 			public Font Font;
 			public float FontHeight;
 			public CharDef[] CharDefs;
-			// This buffer should be larger than batch size in DrawSpriteList.
 			private static Sprite[] buffer = new Sprite[50];
 			public static int Index = 0;
 
-			public IEnumerable<Sprite> GetSprites()
+			public void AddToList(List<Sprite> sprites)
 			{
 				foreach (var cd in CharDefs) {
 					var ch = cd.FontChar;
+					if (Index >= buffer.Length) {
+						Array.Resize(ref buffer, (int)(buffer.Length * 1.5));
+					}
 					if (buffer[Index] == null)
 						buffer[Index] = new Sprite();
 					var s = buffer[Index];
-					Index = (Index + 1) % buffer.Length;
+					Index++;
 					s.Tag = Tag;
 					s.Texture = Font.Textures[ch.TextureIndex];
 					s.Color = Color;
@@ -78,7 +79,7 @@ namespace Lime
 					s.Size = cd.Size(FontHeight);
 					s.UV0 = ch.UV0;
 					s.UV1 = ch.UV1;
-					yield return s;
+					sprites.Add(s);
 				}
 			}
 
@@ -129,20 +130,18 @@ namespace Lime
 			Render(Color4.White);
 		}
 
+		private static List<Sprite> sprites = new List<Sprite>();
 		private static Sprite sentinel = new Sprite();
-
-		private IEnumerable<Sprite> GetSprites()
-		{
-			TextSprite.Index = 0;
-			foreach (var w in items)
-				foreach (var s in w.GetSprites())
-					yield return s;
-			yield return sentinel;
-		}
 
 		public void Render(Color4 color)
 		{
-			Renderer.DrawSpriteList(GetSprites(), color);
+			TextSprite.Index = 0;
+			foreach (var w in items) {
+				w.AddToList(sprites);
+			}
+			sprites.Add(sentinel);
+			Renderer.DrawSpriteList(sprites, color);
+			sprites.Clear();
 		}
 
 		public bool HitTest(Matrix32 worldTransform, Vector2 point, out int tag)

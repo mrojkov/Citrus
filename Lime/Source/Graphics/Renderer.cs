@@ -475,8 +475,10 @@ namespace Lime
 			PlatformRenderer.ClearRenderTarget(r, g, b, a);
 		}
 
+		private static Sprite[] batchedSprites = new Sprite[20];
+
 		// Last sprite should be a sentinel.
-		public static void DrawSpriteList(IEnumerable<Sprite> spriteList, Color4 color)
+		public static void DrawSpriteList(List<Sprite> spriteList, Color4 color)
 		{
 			if (Blending == Blending.Glow) {
 				Blending = Blending.Alpha;
@@ -490,7 +492,6 @@ namespace Lime
 			}
 			var matrix = GetEffectiveTransform();
 			int batchLength = 0;
-			var batchedSprites = new Sprite[20];
 			foreach (var s in spriteList) {
 				if (batchLength == 0 || batchLength < batchedSprites.Length && s.Texture == batchedSprites[0].Texture) {
 					batchedSprites[batchLength++] = s;
