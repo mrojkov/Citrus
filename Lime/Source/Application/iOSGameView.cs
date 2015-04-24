@@ -32,8 +32,6 @@ namespace Lime
 
 		public static GameView Instance;
 
-		public bool OnscreenKeyboardVisible { get;  set; }
-
 		public GameView() : base(UIScreen.MainScreen.Bounds)
 		{
 			Instance = this;
@@ -135,16 +133,16 @@ namespace Lime
 
 		string prevText;
 
-		public void ChangeOnscreenKeyboardText(string text)
+		public void ChangeSoftKeyboardText(string text)
 		{
 			prevText = text;
 			textField.Text = text;
 		}
 
-		public void ShowOnscreenKeyboard(bool show, string text)
+		public void ShowSoftKeyboard(bool show, string text)
 		{
 			if (show != textField.IsFirstResponder) {
-				ChangeOnscreenKeyboardText(text);
+				ChangeSoftKeyboardText(text);
 				if (show) {
 					textField.BecomeFirstResponder();
 				} else {

@@ -81,13 +81,13 @@ namespace Lime
 			var endFrame = args.FrameEnd;
 			var screenRect = UIScreen.MainScreen.Bounds;
 			if (!endFrame.IntersectsWith(screenRect)) {
-				Application.Instance.OnScreenKeyboardHide();
+				Application.Instance.SoftKeyboard.RaiseHidden();
 			}		
 		}
 
 		private void KeyboardShowCallback(object sender, UIKeyboardEventArgs args)
 		{
-			GameView.Instance.OnscreenKeyboardVisible = true;
+			Application.Instance.SoftKeyboard.Visible = true;
 			var scale = UIScreen.MainScreen.Scale;
 
 			// iPad 2 return keyboard height in Height, but iPad 3 return keyboard height in Width.
@@ -97,15 +97,15 @@ namespace Lime
 			rectBegin.X  = rectBegin.X < 0? 0 : rectBegin.X;
 			rectEnd.X = rectEnd.X < 0 ? 0 : rectEnd.X;
 			if (rectEnd.X == 0 && rectBegin.X == 0 && rectEnd.Height < rectEnd.Width) {
-				Application.Instance.OnscreenKeyboardHeight = (float)(rectEnd.Height * scale);
+				Application.Instance.SoftKeyboard.Height = (float)(rectEnd.Height * scale);
 			} else {
-				Application.Instance.OnscreenKeyboardHeight = (float)(rectEnd.Width * scale);
+				Application.Instance.SoftKeyboard.Height = (float)(rectEnd.Width * scale);
 			}
 		}
 
 		private void KeyboardHideCallback(object sender, UIKeyboardEventArgs args)
 		{
-			GameView.Instance.OnscreenKeyboardVisible = false;
+			Application.Instance.SoftKeyboard.Visible = false;
 		}
 		 
 		public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations ()
