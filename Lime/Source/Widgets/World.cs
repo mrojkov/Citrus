@@ -34,16 +34,16 @@ namespace Lime
 			if (Application.IsMainThread) {
 				bool showKeyboard = ActiveTextWidget != null && ActiveTextWidget.Visible;
 				if (prevActiveTextWidget != ActiveTextWidget) {
-					Application.Instance.ShowOnscreenKeyboard(showKeyboard, ActiveTextWidget != null ? ActiveTextWidget.Text : "");
+					Application.Instance.SoftKeyboard.Show(showKeyboard, ActiveTextWidget != null ? ActiveTextWidget.Text : "");
 				}
 #if ANDROID
-				if (!Application.Instance.IsOnscreenKeyboardVisible()) {
+				if (!Application.Instance.SoftKeyboard.Visible) {
 					ActiveTextWidget = null;
 				}
 #endif
 				// Handle switching between various text widgets
 				if (prevActiveTextWidget != ActiveTextWidget && ActiveTextWidget != null && prevActiveTextWidget != null) {
-					Application.Instance.ChangeOnscreenKeyboardText(ActiveTextWidget.Text);
+					Application.Instance.SoftKeyboard.ChangeText(ActiveTextWidget.Text);
 				}
 
 				prevActiveTextWidget = ActiveTextWidget;

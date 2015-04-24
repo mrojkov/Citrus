@@ -32,10 +32,10 @@ namespace Lime.Widgets2
 #if iOS || ANDROID
 			if (Application.IsMainThread) {
 				bool showKeyboard = ActiveTextWidget != null && ActiveTextWidget.Visible;
-				Application.Instance.ShowOnscreenKeyboard(showKeyboard, ActiveTextWidget != null ? ActiveTextWidget.Text : "");
+				Application.Instance.SoftKeyboard.Show(showKeyboard, ActiveTextWidget != null ? ActiveTextWidget.Text : "");
 				// Handle switching between different text widgets
 				if (prevActiveTextWidget != ActiveTextWidget && ActiveTextWidget != null && prevActiveTextWidget != null) {
-					Application.Instance.ChangeOnscreenKeyboardText(ActiveTextWidget.Text);
+					Application.Instance.SoftKeyboard.ChangeText(ActiveTextWidget.Text);
 				}
 			}
 #endif

@@ -69,6 +69,7 @@
     <Compile Include="Source\Graphics\OpenGL\IGLObject.cs" />
     <Compile Include="Source\Graphics\Mesh.cs" />
     <Compile Include="Source\Graphics\OpenGL\PlatformMesh.cs" />
+    <Compile Include="Source\Input\SoftKeyboard.cs" />
     <Compile Include="Source\Widgets2\Animation\Animation.cs" />
     <Compile Include="Source\Widgets2\Animation\AnimationUtils.cs">
       <SubType>Code</SubType>

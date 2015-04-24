@@ -61,8 +61,7 @@ namespace Lime
 
 		public static Thread MainThread { get; private set; }
 		public static bool IsMainThread { get { return Thread.CurrentThread == MainThread; } }
-		public bool OnscreenKeyboardVisible { get { return GameView.Instance.OnscreenKeyboardVisible; } }
-		public float OnscreenKeyboardHeight { get; internal set; }
+		public readonly SoftKeyboard SoftKeyboard = new SoftKeyboard();
 
 		public static Application Instance;
 		private static readonly object scheduledActionsSync = new object();
@@ -171,16 +170,6 @@ namespace Lime
 			}
 		}
 
-		public void ShowOnscreenKeyboard(bool show, string text)
-		{
-			GameView.Instance.ShowOnscreenKeyboard(show, text);
-		}
-		
-		public void ChangeOnscreenKeyboardText(string text)
-		{
-			GameView.Instance.ChangeOnscreenKeyboardText(text);
-		}
-
 		public bool Active { get; internal set; }
 
 		public bool FullScreen { get { return true; } set {} }
@@ -226,10 +215,6 @@ namespace Lime
 			set { GameView.Instance.WindowSize = value; }
 		}
 #elif ANDROID
-		/// <summary>
-		/// The height of the on-screen keyboard. Zero, until the keyboard is shown for the first time.
-		/// </summary>
-
 		public Size WindowSize 
 		{
 			get;
@@ -244,15 +229,6 @@ namespace Lime
 				var dm = Android.Content.Res.Resources.System.DisplayMetrics;
 				return new Vector2(dm.Xdpi, dm.Ydpi);
 			}
-		}
-
-		public void ShowOnscreenKeyboard(bool show, string text)
-		{
-			GameView.Instance.ShowOnscreenKeyboard(show, text);
-		}
-
-		public void ChangeOnscreenKeyboardText(string text)
-		{
 		}
 
 		public bool Active { get; internal set; }
@@ -363,11 +339,6 @@ namespace Lime
 #if WIN
 			GameView.Instance.SetCursor(name, hotSpot);
 #endif
-		}
-
-		public virtual void OnScreenKeyboardHide()
-		{
-			World.Instance.ActiveTextWidget = null;
 		}
 	}
 }

@@ -78,6 +78,7 @@ namespace Lime
 
 		private KeyboardHandler keyboardHandler;
 		private InputMethodManager imm;
+		internal bool SoftKeyboardVisible { get; private set; }
 
 		public GameView(Context context) : base(context)
 		{
@@ -87,8 +88,6 @@ namespace Lime
 			}
 			imm = (InputMethodManager) context.GetSystemService(Android.Content.Context.InputMethodService);
 		}
-
-		public bool OnscreenKeyboardVisible { get; private set; }
 
 		public void OnCreate()
 		{
@@ -102,7 +101,7 @@ namespace Lime
 			if (AllowOnscreenKeyboard) {
 				if (changed) {
 					// Changed == true never seemed go along with showing and hiding keyboard, but 
-					// it results in isOnscreenKeyboardVisible = false right after device rotation.
+					// it results in softKeyboard.Visible = false right after device rotation.
 					return;
 				}
 				var r = new Android.Graphics.Rect();
@@ -111,11 +110,11 @@ namespace Lime
 				var visibleHeight = r.Bottom - r.Top;
 				var app = Application.Instance;
 				if (visibleHeight == totalHeight) {
-					OnscreenKeyboardVisible = false;
-					app.OnscreenKeyboardHeight = 0;
+					SoftKeyboardVisible = false;
+					app.SoftKeyboard.Height = 0;
 				} else {
-					app.OnscreenKeyboardHeight = totalHeight - visibleHeight;
-					OnscreenKeyboardVisible = true;
+					app.SoftKeyboard.Height = totalHeight - visibleHeight;
+					SoftKeyboardVisible = true;
 				}
 			}
 		}
@@ -131,7 +130,7 @@ namespace Lime
 			base.OnResize(e);
 		}
 
-		public void ShowOnscreenKeyboard(bool show, string text)
+		public void ShowSoftKeyboard(bool show, string text)
 		{
 			if (AllowOnscreenKeyboard) {
 				if (show) {
@@ -144,8 +143,12 @@ namespace Lime
 					FocusableInTouchMode = false;
 					imm.HideSoftInputFromWindow(WindowToken, 0);
 				}
-				OnscreenKeyboardVisible = show;
+				Application.Instance.SoftKeyboard.Visible = show;
 			}
+		}
+
+		public void ChangeSoftKeyboardText(string text)
+		{
 		}
 
 		public override bool OnCheckIsTextEditor()
