@@ -1,5 +1,0 @@
-
-(Orange:5879): Gtk-WARNING **: Locale not supported by C library.
-	Using the fallback 'C' locale.
-Mar 30 22:21:39 mac-stegosaurus.local Orange[5879] <Error>: The function ‘CGFontGetGlyphPath’ is obsolete and will be removed in an upcoming update. Unfortunately, this application, or a library it uses, is using this obsolete function, and is thereby contributing to an overall degradation of system performance.
-Mar 30 22:21:39 mac-stegosaurus.local Orange[5879] <Error>: The function ‘CGFontGetGlyphPaths’ is obsolete and will be removed in an upcoming update. Unfortunately, this application, or a library it uses, is using this obsolete function, and is thereby contributing to an overall degradation of system performance.
