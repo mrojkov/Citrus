@@ -63,12 +63,19 @@ namespace Orange
 				return ".dds";
 			}
 		}
-	
+
 		public static void Cook(TargetPlatform platform)
 		{
 			AssetCooker.platform = platform;
 			cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles);
-			var extraBundles = cookingRulesMap.Select(i => i.Value.BundleName).Distinct().Where(i => i != CookingRules.MainBundleName);
+			var extraBundles = new HashSet<string>();
+			foreach (var dictionaryItem in cookingRulesMap) {
+				foreach (var bundle in dictionaryItem.Value.Bundles) {
+					if (bundle != CookingRules.MainBundleName) {
+						extraBundles.Add(bundle);
+					}
+				}
+			}
 			CookBundle(CookingRules.MainBundleName);
 			foreach (var extraBundle in extraBundles) {
 				CookBundle(extraBundle);
@@ -115,7 +122,7 @@ namespace Orange
 			The.Workspace.AssetFiles.EnumerationFilter = (info) => {
 				CookingRules rules;
 				if (cookingRulesMap.TryGetValue(info.Path, out rules)) {
-					return rules.BundleName == bundleName;
+					return Array.IndexOf(rules.Bundles, bundleName) != -1;
 				} else {
 					// There are no cooking rules for text files, consider them as part of the main bundle.
 					return bundleName == CookingRules.MainBundleName;

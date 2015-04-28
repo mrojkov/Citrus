@@ -29,15 +29,15 @@ namespace Orange
 		public PVRFormat PVRFormat;
 		public DDSFormat DDSFormat;
 		public DateTime LastChangeTime;
-		public string BundleName;
+		public string[] Bundles;
 
-		public static CookingRules Default = new CookingRules {
+		public static readonly CookingRules Default = new CookingRules {
 			TextureAtlas = null,
 			MipMaps = false,
-			PVRFormat = PVRFormat.Compressed, 
+			PVRFormat = PVRFormat.Compressed,
 			DDSFormat = DDSFormat.DXTi,
 			LastChangeTime = new DateTime(0),
-			BundleName = MainBundleName
+			Bundles = new[] { MainBundleName }
 		};
 	}
 	
@@ -160,7 +160,10 @@ namespace Orange
 								rules.DDSFormat = ParseDDSFormat(words[1]);
 								break;
 							case "Bundle":
-								rules.BundleName = ConvertBundleName(words[1]);
+								rules.Bundles = new string[words.Length - 1];
+								for (var i = 0; i < rules.Bundles.Length; i++) {
+									rules.Bundles[i] = ParseBundle(words[i + 1]);
+								}
 								break;
 							default:
 								throw new Lime.Exception("Unknown attribute {0}", words[0]);
@@ -173,9 +176,13 @@ namespace Orange
 			return rules;
 		}
 
-		static string ConvertBundleName(string name)
+		static string ParseBundle(string word)
 		{
-			return name == "Data" || string.IsNullOrWhiteSpace(name) ? CookingRules.MainBundleName : name;
+			if (word.ToLowerInvariant() == "<default>" || word.ToLowerInvariant() == "data") {
+				return CookingRules.MainBundleName;
+			} else {
+				return word;
+			}
 		}
 	}
 }
