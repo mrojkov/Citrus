@@ -71,6 +71,18 @@ namespace Orange
 					}
 				}
 			}
+			// Gummy Drop extension
+			using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
+				var files = The.Workspace.AssetFiles.Enumerate(".txt");
+				foreach (var fileInfo in files) {
+					if (Path.GetDirectoryName(fileInfo.Path) == "Levels")
+					{
+						if (pass == 0)
+							Console.WriteLine("* " + fileInfo.Path);
+						ProcessGummyDropLevelFile(fileInfo.Path, pass, Encoding.UTF8);
+					}
+				}
+			}
 		}
 
 		private bool ShouldLocalizeOnlyTaggedSceneTexts()
@@ -92,6 +104,60 @@ namespace Orange
 				});
 			if (processedCode != originalCode) {
 				File.WriteAllText(file, processedCode, saveEncoding);
+			}
+		}
+
+		static List<string> ReadStrings(string file)
+		{
+			List<string> result = new List<string>();
+			using (var stream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
+				using (var r = new StreamReader(stream)) {
+					while (true) {
+						string line = r.ReadLine();
+						if (line == null) {
+							break;
+						}
+						result.Add(line);
+					}
+				}
+			}
+			return result;
+		}
+
+		static void WriteStrings(string file, List<string> strings)
+		{
+			List<string> result = new List<string>();
+			using (var stream = new FileStream(file, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)) {
+				using (var w = new StreamWriter(stream)) {
+					foreach(var str in strings) {
+						w.WriteLine(str);
+					}
+				}
+			}
+		}
+
+		void ProcessGummyDropLevelFile(string file, LocalizationPass pass, Encoding saveEncoding)
+		{
+			if (pass != LocalizationPass.TagUntaggedStrings) {
+				return;
+			}
+			bool changed = false;
+			var lines = ReadStrings(file);
+			for (int i = 0; i < lines.Count; i++) {
+				string line = lines[i];
+				int pos = line.IndexOf(": []");
+				if (pos > 0) {
+					string value = line.Substring(pos + 4);
+					if (HasAlphabeticCharacters(value)) {
+						var key = GenerateTagForText(Unescape(value));
+						AddTextToDictionary(key, Unescape(value));
+						lines[i] = line.Substring(0, pos) + string.Format(": [{0}]{1}", key, value);
+						changed = true;
+					}
+				}
+			}
+			if (changed) {
+				WriteStrings(file, lines);
 			}
 		}
 
