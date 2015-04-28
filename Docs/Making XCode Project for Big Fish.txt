@@ -4,7 +4,7 @@
 	XCodeProject: {
 		DoSvnUpdate: false,
 		DoSvnCommit: false,
-		Resources: '*.dll *.exe *.png MM6 Data.iOS monotouch-32 monotouch-64',
+		Resources: '*.dll *.exe *.png MM6 Data.iOS .monotouch-32 .monotouch-64',
 		DataFolder: 'MM6_XCode_Project_Data',
 		Version: '6.55'
 	}
