@@ -105,6 +105,7 @@ namespace Lime
 
 		private void KeyboardHideCallback(object sender, UIKeyboardEventArgs args)
 		{
+			Application.Instance.SoftKeyboard.Height = 0;
 			Application.Instance.SoftKeyboard.Visible = false;
 		}
 		 
