@@ -329,7 +329,7 @@ namespace Orange
 							if (converter(srcPath, dstPath)) {
 								Console.WriteLine((bundled ? "* " : "+ ") + dstPath);
 							}
-						} catch (System.Exception) {
+						} catch (System.Exception e) {
 							Console.WriteLine("An exception was caught while processing '{0}'\n", srcPath);
 							throw;
 						}

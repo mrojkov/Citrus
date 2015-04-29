@@ -53,10 +53,10 @@
       <HintPath>..\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="System.Drawing" />
-    <Reference Include="OpenTK">
-      <HintPath>..\..\Main\MM6.Mac\packages\OpenTK.1.1.1589.5942\lib\NET40\OpenTK.dll</HintPath>
-    </Reference>
     <Reference Include="XamMac, Version=0.0.0.0, Culture=neutral, PublicKeyToken=84e04ff9cfb79065" />
+    <Reference Include="OpenTK">
+      <HintPath>..\..\..\..\Desktop\Projects\PokerClient\Citrus\3rdParty\OpenTK\OpenTK.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Types\Matrix44.cs" />
@@ -203,6 +203,8 @@
     <Compile Include="Source\Audio\IAudioChannel.cs" />
     <Compile Include="Source\Graphics\Mesh.cs" />
     <Compile Include="Source\Graphics\OpenGL\PlatformMesh.cs" />
+    <Compile Include="Source\Types\BitSet32.cs" />
+    <Compile Include="Source\Input\SoftKeyboard.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -288,12 +290,6 @@
     <Compile Include="Source\Graphics\MovieTexture.cs" />
     <Compile Include="Source\Widgets\Movie.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Lemon\Lemon.Mac.csproj">
-      <Project>{4604AA2E-129F-4814-AD0D-8BA35346ECC4}</Project>
-      <Name>Lemon.Mac</Name>
-    </ProjectReference>
-  </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>
@@ -305,10 +301,13 @@
     </MonoDevelop>
   </ProjectExtensions>
   <ItemGroup>
-    <None Include="Source\packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Source\Graphics\" />
     <Folder Include="Source\Audio\OpenAL\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Lemon\Lemon.Mac.csproj">
+      <Project>{4604AA2E-129F-4814-AD0D-8BA35346ECC4}</Project>
+      <Name>Lemon.Mac</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

@@ -1,0 +1,5 @@
+Apr 29 16:12:13 Mac-Monoclonius.local Orange[7593] <Error>: The function ‘CGFontGetGlyphPath’ is obsolete and will be removed in an upcoming update. Unfortunately, this application, or a library it uses, is using this obsolete function, and is thereby contributing to an overall degradation of system performance.
+Apr 29 16:12:13 Mac-Monoclonius.local Orange[7593] <Error>: The function ‘CGFontGetGlyphPaths’ is obsolete and will be removed in an upcoming update. Unfortunately, this application, or a library it uses, is using this obsolete function, and is thereby contributing to an overall degradation of system performance.
+dyld: Library not loaded: /Users/mike/Downloads/nvidia-texture-tools-read-only/build-release/src/nvcore/Debug/libnvcore.dylib
+  Referenced from: /Users/asing/Documents/Projects/Citrus/Orange/bin/Mac/Release/Orange.app/Contents/MonoBundle/Toolchain.Mac/nvcompress
+  Reason: image not found
