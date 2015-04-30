@@ -511,7 +511,7 @@ namespace Lime
 				nextLinePart = null;
 				var cutFrom = CalcFittedCharactersCount(textLine, measureHandler);
 				if (cutFrom > 0) {
-					cutFrom += Toolbox.AdjustLineBreakPosition(textLine, cutFrom);
+					Toolbox.AdjustLineBreakPosition(textLine, ref cutFrom);
 					nextLinePart = textLine.Substring(cutFrom);
 					currentLinePart = textLine.Substring(0, cutFrom);
 					return true;

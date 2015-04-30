@@ -51,15 +51,13 @@ namespace Lime
 		const string NotAllowedAtTheEnd =
 			"$(*,£¥·‘“〈《「『【〔〖〝﹗﹙﹛＄（．［｛￡￥([｛〔〘｟«";
 
-		internal static int AdjustLineBreakPosition(string text, int position)
+		internal static void AdjustLineBreakPosition(string text, ref int position)
 		{
 			if (position > 1 && NotAllowedAtTheStart.IndexOf(text[position]) >= 0) {
-				return -1;
+				position -= 1;
 			} else if (position > 2 && NotAllowedAtTheEnd.IndexOf(text[position - 1]) >= 0) {
-				return -2;
+				position -= 2;
 			}
-			return 0;
 		}
-
 	}
 }
