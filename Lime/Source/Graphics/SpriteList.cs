@@ -139,8 +139,12 @@ namespace Lime
 			foreach (var w in items) {
 				w.AddToList(sprites);
 			}
-			sprites.Add(sentinel);
-			Renderer.DrawSpriteList(sprites, color);
+			// Temporarily disable optimization
+			foreach (var i in sprites) {
+				Renderer.DrawSprite(i.Texture, i.Color * color, i.Position, i.Size, i.UV0, i.UV1);
+			}
+			//sprites.Add(sentinel);
+			//Renderer.DrawSpriteList(sprites, color);
 			sprites.Clear();
 		}
 
