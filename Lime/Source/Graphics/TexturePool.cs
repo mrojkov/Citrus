@@ -82,7 +82,8 @@ namespace Lime
 			var texture = TryCreateRenderTarget(path) ??
 				TryLoadTextureAtlasPart(path + ".atlasPart") ??
 #if iOS || ANDROID
-				TryLoadImage(path + ".pvr");
+				TryLoadImage(path + ".pvr") ??
+				TryLoadImage(path + ".jpg");
 #elif UNITY
 				TryLoadImage(path + ".png");
 #else

@@ -188,17 +188,25 @@ namespace Lime
 			if (!Application.IsMainThread) {
 				throw new NotSupportedException("Calling from non-main thread currently is not supported");
 			}
-			if (alphaStream != null) {
-				throw new NotSupportedException("Separate alpha-stream is not supported on this platform");
-			}
 			using (var bitmap = Android.Graphics.BitmapFactory.DecodeStream(stream)) {
 				SurfaceSize = ImageSize = new Size(bitmap.Width, bitmap.Height);
 				PrepareOpenGLTexture();
 				var pixels = new int[bitmap.Width * bitmap.Height];
 				bitmap.GetPixels(pixels, 0, bitmap.Width, 0, 0, bitmap.Width, bitmap.Height);
-				SwapRedAndBlue(ref pixels);
-				if (bitmap.HasAlpha) {
-					PremultiplyAlpha(ref pixels);
+				if (alphaStream != null) {
+					using (var alphaBitmap = Android.Graphics.BitmapFactory.DecodeStream(alphaStream)) {
+						if (alphaBitmap.Width != bitmap.Width || alphaBitmap.Height != bitmap.Height) {
+							throw new Lime.Exception("Alpha bitmap size and main bitmap size must be qual");
+						}
+						var alphaPixels = new int[bitmap.Width * bitmap.Height];
+						alphaBitmap.GetPixels(alphaPixels, 0, bitmap.Width, 0, 0, bitmap.Width, bitmap.Height);
+						MixColorAndAlphaAndSwapRB(ref pixels, ref alphaPixels);
+					}
+				} else {
+					SwapRedAndBlue(ref pixels);
+					if (bitmap.HasAlpha) {
+						PremultiplyAlpha(ref pixels);
+					}
 				}
 				PlatformRenderer.PushTexture(handle, 0);
 				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, bitmap.Width, bitmap.Height, 0,
@@ -207,6 +215,23 @@ namespace Lime
 				MemoryUsed = bitmap.Width * bitmap.Height * 4;
 			}
 			PlatformRenderer.CheckErrors();
+		}
+
+		private void MixColorAndAlphaAndSwapRB(ref int[] pixelsColor, ref int[] pixelsAlpha)
+		{
+			// pixelsAlpha's R goes to pixelsColor's A
+			// pixelsColor's RGB goes to pixelsColor's BGR
+			// pixelsColor is the result.
+			for (int i = 0; i < pixelsColor.Length; i++) {
+				var color = new Color4((uint)pixelsColor[i]);
+				var colorA = new Color4((uint)pixelsAlpha[i]);
+				byte r = color.R;
+				byte b = color.B;
+				color.B = r;
+				color.R = b;
+				color.A = colorA.R;
+				pixelsColor[i] = (int)color.ABGR;
+			}
 		}
 
 		private void PremultiplyAlpha(ref int[] pixels)
