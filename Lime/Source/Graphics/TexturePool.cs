@@ -87,6 +87,7 @@ namespace Lime
 				TryLoadImage(path + ".png");
 #else
 				TryLoadImage(path + ".dds") ??
+				TryLoadImage(path + ".jpg") ??
 				TryLoadImage(path + ".png");
 #endif
 			if (texture == null) {

@@ -29,35 +29,52 @@ namespace Lime
 	public partial class Texture2D : CommonTexture, ITexture
 	{
 #if WIN || MAC
-		private void InitWithPngOrJpgBitmap(Stream stream)
+		private void InitWithPngOrJpgBitmap(Stream stream, Stream alphaStream)
 		{
 			if (!Application.IsMainThread) {
 				throw new NotSupportedException("Calling from non-main thread currently is not supported");
 			}
-			var bitmap = new SD.Bitmap(stream);
-			SurfaceSize = ImageSize = new Size(bitmap.Width, bitmap.Height);
-			var lockRect = new SD.Rectangle(0, 0, bitmap.Width, bitmap.Height);
-			var lockMode = SDI.ImageLockMode.ReadOnly;
-			if (bitmap.PixelFormat == SDI.PixelFormat.Format24bppRgb) {
-				PrepareOpenGLTexture();
-				PlatformRenderer.PushTexture(handle, 0);
-				var data = bitmap.LockBits(lockRect, lockMode, SDI.PixelFormat.Format24bppRgb);
-				SwapRedAndGreen24(data);
-				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, data.Width, data.Height, 0,
-					PixelFormat.Rgb, PixelType.UnsignedByte, data.Scan0);
-				bitmap.UnlockBits(data);
-				MemoryUsed = data.Width * data.Height * 3;
-				PlatformRenderer.PopTexture(0);
-			} else {
-				PrepareOpenGLTexture();
-				PlatformRenderer.PushTexture(handle, 0);
-				var data = bitmap.LockBits(lockRect, lockMode, SDI.PixelFormat.Format32bppPArgb);
-				SwapRedAndGreen32(data);
-				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width, data.Height, 0,
-					PixelFormat.Rgba, PixelType.UnsignedByte, data.Scan0);
-				bitmap.UnlockBits(data);
-				MemoryUsed = data.Width * data.Height * 4;
-				PlatformRenderer.PopTexture(0);
+			using (var bitmap = new SD.Bitmap(alphaStream ?? stream)) {
+				SurfaceSize = ImageSize = new Size(bitmap.Width, bitmap.Height);
+				var lockRect = new SD.Rectangle(0, 0, bitmap.Width, bitmap.Height);
+				if (alphaStream != null) {
+					if (bitmap.PixelFormat != SDI.PixelFormat.Format32bppArgb) {
+						throw new Lime.Exception("Unexpected alpha bitmap format: " + bitmap.PixelFormat.ToString());
+					}
+					using (var colorBitmap = new SD.Bitmap(stream)) {
+						if (colorBitmap.Width != bitmap.Width || colorBitmap.Height != bitmap.Height) {
+							throw new Lime.Exception("Alpha bitmap size and main bitmap size must be qual");
+						}
+						var alphaData = bitmap.LockBits(lockRect, SDI.ImageLockMode.ReadWrite, SDI.PixelFormat.Format32bppArgb);
+						var colorData = colorBitmap.LockBits(lockRect, SDI.ImageLockMode.ReadOnly, SDI.PixelFormat.Format24bppRgb);
+						MixColorAndAlphaAndSwapRB(colorData, alphaData);
+						colorBitmap.UnlockBits(colorData);
+						bitmap.UnlockBits(alphaData);
+					}
+				}
+				if (bitmap.PixelFormat == SDI.PixelFormat.Format24bppRgb) {
+					PrepareOpenGLTexture();
+					PlatformRenderer.PushTexture(handle, 0);
+					var data = bitmap.LockBits(lockRect, SDI.ImageLockMode.ReadOnly, SDI.PixelFormat.Format24bppRgb);
+					SwapRedAndGreen24(data);
+					GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, data.Width, data.Height, 0,
+						PixelFormat.Rgb, PixelType.UnsignedByte, data.Scan0);
+					bitmap.UnlockBits(data);
+					MemoryUsed = data.Width * data.Height * 3;
+					PlatformRenderer.PopTexture(0);
+				} else {
+					PrepareOpenGLTexture();
+					PlatformRenderer.PushTexture(handle, 0);
+					var data = bitmap.LockBits(lockRect, SDI.ImageLockMode.ReadOnly, alphaStream != null ? SDI.PixelFormat.Format32bppArgb : SDI.PixelFormat.Format32bppPArgb);
+					if (alphaStream == null) {
+						SwapRedAndGreen32(data);
+					}
+					GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width, data.Height, 0,
+						PixelFormat.Rgba, PixelType.UnsignedByte, data.Scan0);
+					bitmap.UnlockBits(data);
+					MemoryUsed = data.Width * data.Height * 4;
+					PlatformRenderer.PopTexture(0);
+				}
 			}
 			PlatformRenderer.CheckErrors();
 		}
@@ -98,13 +115,39 @@ namespace Lime
 			}
 		}
 
+		private void MixColorAndAlphaAndSwapRB(SDI.BitmapData colorData24, SDI.BitmapData alphaData32)
+		{
+			// alphaData's R goes to alphaData's A
+			// colorData's RGB goes to alphaData's BGR
+			// alphaData is the result.
+			unsafe {
+				for (int j = 0; j < alphaData32.Height; j++) {
+					byte* pc = (byte*)colorData24.Scan0 + colorData24.Stride * j;
+					byte* pa = (byte*)alphaData32.Scan0 + alphaData32.Stride * j;
+					for (int i = 0; i < alphaData32.Width; i++) {
+						byte r = *pc++;
+						byte g = *pc++;
+						byte b = *pc++;
+						byte a = *pa;
+						*pa++ = b;
+						*pa++ = g;
+						*pa++ = r;
+						*pa++ = a;
+					}
+				}
+			}
+		}
+
 #elif iOS
-		private void InitWithPngOrJpgBitmap(Stream stream)
+		private void InitWithPngOrJpgBitmap(Stream stream, Stream alphaStream)
 		{
 			if (!Application.IsMainThread) {
 				throw new NotSupportedException("Calling from non-main thread currently is not supported");
 			}
-			using (var nsData = Foundation.NSData.FromStream(stream))
+			if (alphaStream != null) {
+				throw new NotSupportedException("Separate alpha-stream is not supported on this platform");
+			}
+			using (var nsData = MonoTouch.Foundation.NSData.FromStream(stream))
 			using (UIImage image = UIImage.LoadFromData(nsData)) {
 				if (image == null) {
 					throw new Lime.Exception("Error loading texture from stream");
@@ -140,10 +183,13 @@ namespace Lime
             }
         }
 #elif ANDROID
-		private void InitWithPngOrJpgBitmap(Stream stream)
+		private void InitWithPngOrJpgBitmap(Stream stream, Stream alphaStream)
 		{
 			if (!Application.IsMainThread) {
 				throw new NotSupportedException("Calling from non-main thread currently is not supported");
+			}
+			if (alphaStream != null) {
+				throw new NotSupportedException("Separate alpha-stream is not supported on this platform");
 			}
 			using (var bitmap = Android.Graphics.BitmapFactory.DecodeStream(stream)) {
 				SurfaceSize = ImageSize = new Size(bitmap.Width, bitmap.Height);

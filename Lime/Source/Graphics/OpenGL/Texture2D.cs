@@ -107,15 +107,22 @@ namespace Lime
 		public void LoadImage(string path)
 		{
 			using (var stream = AssetsBundle.Instance.OpenFileLocalized(path)) {
-				LoadImageHelper(stream, createReloader: false);
+				var alphaPath = Path.ChangeExtension(path, ".alpha.png");
+				if (Path.GetExtension(path) == ".jpg" && AssetsBundle.Instance.FileExists(alphaPath)) {
+					using (var alphaStream = AssetsBundle.Instance.OpenFileLocalized(alphaPath)) {
+						InitWithPngOrJpgBitmap(stream, alphaStream); // Device-independent jpg(RGB) + png(A) compression
+					}
+				} else {
+					LoadImageHelper(stream, createReloader: false);
+				}
 			}
 			reloader = new TextureBundleReloader(path);
-			var alphaPath = Path.ChangeExtension(path, ".alpha.pvr");
-			if (AssetsBundle.Instance.FileExists(alphaPath)) {
+			var alphaTexturePath = Path.ChangeExtension(path, ".alpha.pvr");
+			if (AssetsBundle.Instance.FileExists(alphaTexturePath)) {
 				if (AlphaTexture == null) {
 					AlphaTexture = new Texture2D();
 				}
-				((Texture2D)AlphaTexture).LoadImage(alphaPath);
+				((Texture2D)AlphaTexture).LoadImage(alphaTexturePath);
 			}
 			var maskPath = Path.ChangeExtension(path, ".mask");
 			if (AssetsBundle.Instance.FileExists(maskPath)) {
@@ -159,7 +166,7 @@ namespace Lime
 				} else if (sign == PVRMagic) {
 					InitWithPVRTexture(reader);
 				} else {
-					InitWithPngOrJpgBitmap(rewindableStream);
+					InitWithPngOrJpgBitmap(rewindableStream, null);
 				}
 #elif OPENGL
 				int sign = reader.ReadInt32();
@@ -167,7 +174,7 @@ namespace Lime
 				if (sign == DDSMagic) {
 					InitWithDDSBitmap(reader);
 				} else {
-					InitWithPngOrJpgBitmap(rewindableStream);
+					InitWithPngOrJpgBitmap(rewindableStream, null);
 				}
 #endif
 			}
