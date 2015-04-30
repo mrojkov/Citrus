@@ -316,8 +316,10 @@ namespace Lime.Text
 				if (isLongerThanWidth && isText && (wordSplitAllowed || t.HasJapaneseSymbols(word.Start, word.Length))) {
 					var fittedCharsCount = CalcFittedCharactersCount(word, maxWidth - x);
 					if (fittedCharsCount > 0) {
-						fittedCharsCount += word.Start;
-						Toolbox.AdjustLineBreakPosition(t, ref fittedCharsCount);
+						var wordEnd = word.Start + fittedCharsCount;
+						Toolbox.AdjustLineBreakPosition(t, ref wordEnd);
+						if (wordEnd > word.Start)
+							fittedCharsCount = wordEnd - word.Start;
 						var newWord = word.Clone();
 						newWord.Start = word.Start + fittedCharsCount;
 						newWord.Length = word.Length - fittedCharsCount;
