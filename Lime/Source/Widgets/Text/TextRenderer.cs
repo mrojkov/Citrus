@@ -316,7 +316,7 @@ namespace Lime.Text
 				if (isLongerThanWidth && isText && (wordSplitAllowed || t.HasJapaneseSymbols(word.Start, word.Length))) {
 					var fittedCharsCount = CalcFittedCharactersCount(word, maxWidth - x);
 					if (fittedCharsCount > 0) {
-						int adjusted = fittedCharsCount += Toolbox.AdjustLineBreakPosition(word.Text, word.Start + fittedCharsCount);
+						int adjusted = fittedCharsCount += Toolbox.AdjustLineBreakPosition(t, word.Start + fittedCharsCount);
 						if (adjusted > 0)
 							fittedCharsCount = adjusted;
 						var newWord = word.Clone();
