@@ -170,7 +170,7 @@ namespace Lime
 			if (alphaStream != null) {
 				throw new NotSupportedException("Separate alpha-stream is not supported on this platform");
 			}
-			using (var nsData = MonoTouch.Foundation.NSData.FromStream(stream))
+			using (var nsData = Foundation.NSData.FromStream(stream))
 			using (UIImage image = UIImage.LoadFromData(nsData)) {
 				if (image == null) {
 					throw new Lime.Exception("Error loading texture from stream");
