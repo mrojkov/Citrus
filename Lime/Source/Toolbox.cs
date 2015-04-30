@@ -43,5 +43,23 @@ namespace Lime
 				return hash;
 			}
 		}
+
+		// In asian languages some characters are not allowed at the start or the end of the line.
+		const string NotAllowedAtTheStart =
+			"!%),.:;>?]}¢¨°·ˇˉ―‖’”„‟†‡›℃∶、。〃〆〈《「『〕〗〞︵︹︽︿﹃﹘﹚﹜！＂％＇），．：；？］｀｜｝～" +
+			"ヽヾーァィゥェォッャュョヮヵヶぁぃぅぇぉっゃゅょゎゕゖㇰㇱㇲㇳㇴㇵㇶㇷㇸㇹㇺㇻㇼㇽㇾㇿ々〻";
+		const string NotAllowedAtTheEnd =
+			"$(*,£¥·‘“〈《「『【〔〖〝﹗﹙﹛＄（．［｛￡￥([｛〔〘｟«";
+
+		internal static int AdjustLineBreakPosition(string text, int position)
+		{
+			if (position > 1 && NotAllowedAtTheStart.IndexOf(text[position]) >= 0) {
+				return -1;
+			} else if (position > 2 && NotAllowedAtTheEnd.IndexOf(text[position - 1]) >= 0) {
+				return -2;
+			}
+			return 0;
+		}
+
 	}
 }
