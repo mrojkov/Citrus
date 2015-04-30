@@ -43,13 +43,21 @@ namespace Lime
 					}
 					using (var colorBitmap = new SD.Bitmap(stream)) {
 						if (colorBitmap.Width != bitmap.Width || colorBitmap.Height != bitmap.Height) {
-							throw new Lime.Exception("Alpha bitmap size and main bitmap size must be qual");
+							if (colorBitmap.Width == 1 && colorBitmap.Height == 1) {
+								// For 1x1 bitmaps, propagate alpha value to red, green and blue channels.
+								var imageData = bitmap.LockBits(lockRect, SDI.ImageLockMode.ReadWrite, SDI.PixelFormat.Format32bppArgb);
+								CopyRedToGreenBlueAlphaChannels(imageData);
+								bitmap.UnlockBits(imageData);
+							} else {
+								throw new Lime.Exception("Alpha bitmap size and main bitmap size must be equal");
+							}
+						} else {
+							var alphaData = bitmap.LockBits(lockRect, SDI.ImageLockMode.ReadWrite, SDI.PixelFormat.Format32bppArgb);
+							var colorData = colorBitmap.LockBits(lockRect, SDI.ImageLockMode.ReadOnly, SDI.PixelFormat.Format24bppRgb);
+							MixColorAndAlphaAndSwapRB(colorData, alphaData);
+							colorBitmap.UnlockBits(colorData);
+							bitmap.UnlockBits(alphaData);
 						}
-						var alphaData = bitmap.LockBits(lockRect, SDI.ImageLockMode.ReadWrite, SDI.PixelFormat.Format32bppArgb);
-						var colorData = colorBitmap.LockBits(lockRect, SDI.ImageLockMode.ReadOnly, SDI.PixelFormat.Format24bppRgb);
-						MixColorAndAlphaAndSwapRB(colorData, alphaData);
-						colorBitmap.UnlockBits(colorData);
-						bitmap.UnlockBits(alphaData);
 					}
 				}
 				if (bitmap.PixelFormat == SDI.PixelFormat.Format24bppRgb) {
@@ -138,6 +146,21 @@ namespace Lime
 			}
 		}
 
+		private void CopyRedToGreenBlueAlphaChannels(SDI.BitmapData data)
+		{
+			unsafe {
+				for (int j = 0; j < data.Height; j++) {
+					byte* p = (byte*)data.Scan0 + data.Stride * j;
+					for (int i = 0; i < data.Width; i++) {
+						byte intensity = *p++;
+						*p++ = intensity;
+						*p++ = intensity;
+						*p++ = intensity;
+					}
+				}
+			}
+		}
+
 #elif iOS
 		private void InitWithPngOrJpgBitmap(Stream stream, Stream alphaStream)
 		{
@@ -188,19 +211,25 @@ namespace Lime
 			if (!Application.IsMainThread) {
 				throw new NotSupportedException("Calling from non-main thread currently is not supported");
 			}
-			using (var bitmap = Android.Graphics.BitmapFactory.DecodeStream(stream)) {
+			using (var bitmap = Android.Graphics.BitmapFactory.DecodeStream(alphaStream ?? stream)) {
 				SurfaceSize = ImageSize = new Size(bitmap.Width, bitmap.Height);
 				PrepareOpenGLTexture();
 				var pixels = new int[bitmap.Width * bitmap.Height];
 				bitmap.GetPixels(pixels, 0, bitmap.Width, 0, 0, bitmap.Width, bitmap.Height);
 				if (alphaStream != null) {
-					using (var alphaBitmap = Android.Graphics.BitmapFactory.DecodeStream(alphaStream)) {
-						if (alphaBitmap.Width != bitmap.Width || alphaBitmap.Height != bitmap.Height) {
-							throw new Lime.Exception("Alpha bitmap size and main bitmap size must be qual");
+					using (var colorBitmap = Android.Graphics.BitmapFactory.DecodeStream(stream)) {
+						if (colorBitmap.Width != bitmap.Width || colorBitmap.Height != bitmap.Height) {
+							if (colorBitmap.Width == 1 && colorBitmap.Height == 1) {
+								// For 1x1 bitmaps, propagate alpha value to red, green and blue channels.
+								CopyRedToGreenBlueAlphaChannels(ref pixels);
+							} else {
+								throw new Lime.Exception ("Alpha bitmap size and main bitmap size must be qual");
+							}
+						} else {
+							var colorPixels = new int[colorBitmap.Width * colorBitmap.Height];
+							colorBitmap.GetPixels(colorPixels, 0, bitmap.Width, 0, 0, bitmap.Width, bitmap.Height);
+							MixColorAndAlphaAndSwapRB(ref colorPixels, ref pixels);
 						}
-						var alphaPixels = new int[bitmap.Width * bitmap.Height];
-						alphaBitmap.GetPixels(alphaPixels, 0, bitmap.Width, 0, 0, bitmap.Width, bitmap.Height);
-						MixColorAndAlphaAndSwapRB(ref pixels, ref alphaPixels);
 					}
 				} else {
 					SwapRedAndBlue(ref pixels);
@@ -219,18 +248,31 @@ namespace Lime
 
 		private void MixColorAndAlphaAndSwapRB(ref int[] pixelsColor, ref int[] pixelsAlpha)
 		{
-			// pixelsAlpha's R goes to pixelsColor's A
-			// pixelsColor's RGB goes to pixelsColor's BGR
-			// pixelsColor is the result.
+			// pixelsAlpha's R goes to pixelsAlpha's A
+			// pixelsColor's RGB goes to pixelsAlpha's BGR
+			// pixelsAlpha is the result.
 			for (int i = 0; i < pixelsColor.Length; i++) {
-				var color = new Color4((uint)pixelsColor[i]);
+				var colorRGB = new Color4((uint)pixelsColor[i]);
 				var colorA = new Color4((uint)pixelsAlpha[i]);
-				byte r = color.R;
-				byte b = color.B;
-				color.B = r;
-				color.R = b;
-				color.A = colorA.R;
-				pixelsColor[i] = (int)color.ABGR;
+				byte r = colorRGB.R;
+				byte g = colorRGB.G;
+				byte b = colorRGB.B;
+				colorA.A = colorA.R;
+				colorA.B = r;
+				colorA.G = g;
+				colorA.R = b;
+				pixelsAlpha[i] = (int)colorA.ABGR;
+			}
+		}
+
+		private void CopyRedToGreenBlueAlphaChannels(ref int[] pixels)
+		{
+			for (int i = 0; i < pixels.Length; i++) {
+				var color = new Color4((uint)pixels[i]);
+				color.A = color.R;
+				color.G = color.R;
+				color.B = color.R;
+				pixels[i] = (int)color.ABGR;
 			}
 		}
 
