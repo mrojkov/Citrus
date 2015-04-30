@@ -376,8 +376,6 @@ namespace Lime
 		private static RenderBatch DrawTrianglesHelper(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
 		{
 			var batch = CurrentRenderList.GetBatch(texture1, texture2, Blending, Shader, CustomShaderProgram, numVertices, (numVertices - 2) * 3);
-			Rectangle uvRect1 = (texture1 != null) ? texture1.AtlasUVRect : new Rectangle();
-			Rectangle uvRect2 = (texture2 != null) ? texture2.AtlasUVRect : new Rectangle();
 			var transform = GetEffectiveTransform();
 			var mesh = batch.Mesh;
 			mesh.DirtyAttributes |= Mesh.Attributes.VertexColorUV12 | (texture2 != null ? Mesh.Attributes.UV2 : Mesh.Attributes.None);
@@ -389,9 +387,13 @@ namespace Lime
 				}
 				mesh.Colors[j] = v.Color;
 				mesh.Vertices[j] = transform * v.Pos;
-				mesh.UV1[j] = uvRect1.A + uvRect1.Size * v.UV1;
+				if (texture1 != null) {
+					mesh.UV1[j] = v.UV1;
+					texture1.TransformUVCoordinatesToAtlasSpace(ref mesh.UV1[j]);
+				}
 				if (texture2 != null) {
-					mesh.UV2[j] = uvRect2.A + uvRect2.Size * v.UV2;
+					mesh.UV2[j] = v.UV2;
+					texture2.TransformUVCoordinatesToAtlasSpace(ref mesh.UV2[j]);
 				}
 				j++;
 			}
@@ -415,7 +417,8 @@ namespace Lime
 				color = Color4.PremulAlpha(color);
 			}
 			if (texture != null) {
-				texture.TransformUVCoordinatesToAtlasSpace(ref uv0, ref uv1);
+				texture.TransformUVCoordinatesToAtlasSpace(ref uv0);
+				texture.TransformUVCoordinatesToAtlasSpace(ref uv1);
 			}
 			var mesh = batch.Mesh;
 			mesh.DirtyAttributes |= Mesh.Attributes.VertexColorUV12;

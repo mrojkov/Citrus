@@ -101,12 +101,12 @@ namespace Lime
 			}
 		}
 
-		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv0, ref Vector2 uv1)
+		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv)
 		{
 			if (texture == null) {
 				texture = LoadTexture();
 			}
-			texture.TransformUVCoordinatesToAtlasSpace(ref uv0, ref uv1);
+			texture.TransformUVCoordinatesToAtlasSpace(ref uv);
 		}
 
 		public uint GetHandle()

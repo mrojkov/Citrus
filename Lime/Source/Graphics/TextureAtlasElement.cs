@@ -54,14 +54,12 @@ namespace Lime
 			get { return atlasTexture.AlphaTexture; }
 		}
 
-		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv0, ref Vector2 uv1)
+		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv)
 		{
 			float width = AtlasUVRect.B.X - AtlasUVRect.A.X;
 			float height = AtlasUVRect.B.Y - AtlasUVRect.A.Y;
-			uv0.X = AtlasUVRect.Left + width * uv0.X;
-			uv0.Y = AtlasUVRect.Top + height * uv0.Y;
-			uv1.X = AtlasUVRect.Left + width * uv1.X;
-			uv1.Y = AtlasUVRect.Top + height * uv1.Y;
+			uv.X = AtlasUVRect.Left + width * uv.X;
+			uv.Y = AtlasUVRect.Top + height * uv.Y;
 		}
 
 		public uint GetHandle()

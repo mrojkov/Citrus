@@ -95,7 +95,7 @@ namespace Lime
 		public Rectangle AtlasUVRect { get { return uvRect; } }
 		public ITexture AlphaTexture { get; private set; }
 
-		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv0, ref Vector2 uv1) { }
+		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv) { }
 
 		public bool IsStubTexture { get { return false; } }
 
