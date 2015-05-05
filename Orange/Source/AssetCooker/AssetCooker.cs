@@ -43,6 +43,7 @@ namespace Orange
 			case ".pvr":
 			case ".atlasPart":
 			case ".mask":
+			case ".jpg":
 				return ".png";
 			case ".sound":
 				return ".ogg";
@@ -59,15 +60,26 @@ namespace Orange
 				return ".pvr";
 			} else if (platform == TargetPlatform.Unity) {
 				return ".png";
+			} else if (platform == TargetPlatform.UltraCompression) {
+				return ".jpg";
 			} else {
 				return ".dds";
 			}
 		}
 
+		static string GetPlatformAlphaTextureExtension()
+		{
+			if (platform == TargetPlatform.UltraCompression) {
+				return ".png";
+			} else {
+				return GetPlatformTextureExtension();
+			}
+		}
+	
 		public static void Cook(TargetPlatform platform)
 		{
 			AssetCooker.platform = platform;
-			cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles);
+			cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, platform);
 			var extraBundles = new HashSet<string>();
 			foreach (var dictionaryItem in cookingRulesMap) {
 				foreach (var bundle in dictionaryItem.Value.Bundles) {
@@ -171,7 +183,7 @@ namespace Orange
 
 		private static void DeleteOrphanedAlphaTextures()
 		{
-			var alphaExt = ".alpha" + GetPlatformTextureExtension();
+			var alphaExt = ".alpha" + GetPlatformAlphaTextureExtension();
 			foreach (var path in assetsBundle.EnumerateFiles()) {
 				if (path.EndsWith(alphaExt)) {
 					var origImageFile = path.Substring(0, path.Length - alphaExt.Length) + GetPlatformTextureExtension();
@@ -433,7 +445,7 @@ namespace Orange
 
 		private static string GetAlphaTexturePath(string path)
 		{
-			return Path.ChangeExtension(path, ".alpha" + GetPlatformTextureExtension());
+			return Path.ChangeExtension(path, ".alpha" + GetPlatformAlphaTextureExtension());
 		}
 
 		private static IEnumerable<Lime.Size> EnumerateAtlasSizes(bool squareAtlas)
@@ -535,23 +547,21 @@ namespace Orange
 			var tmpFile = GetTempFilePathWithExtension(GetPlatformTextureExtension());
 			string maskPath = Path.ChangeExtension(path, ".mask");
 			OpacityMaskCreator.CreateMask(assetsBundle, texture, maskPath);
-			TextureConverter.Convert(texture, tmpFile, rules, platform);
-			var attributes = AssetAttributes.Zipped;
+			TextureConverter.Convert(texture, tmpFile, rules, platform, isAlpha: false);
+			var attributes = platform == TargetPlatform.UltraCompression ? AssetAttributes.None : AssetAttributes.Zipped;
 			var isPot = TextureConverterUtils.IsPowerOf2(texture.Width) && TextureConverterUtils.IsPowerOf2(texture.Height);
-			if (!isPot) {
-				attributes |= AssetAttributes.NonPowerOf2Texture;
-			}
-			assetsBundle.ImportFile(tmpFile, path, 0, attributes);
+			assetsBundle.ImportFile(tmpFile, path, 0, attributes | (isPot ? 0 : AssetAttributes.NonPowerOf2Texture));
 			File.Delete(tmpFile);
-			// ETC1 textures on Android use separate alpha channel
-			var needSeparateAlpha = platform == TargetPlatform.Android &&
-				rules.PVRFormat == PVRFormat.Compressed && texture.HasAlpha;
+			// ETC1 textures on Android or UltraCompressed use separate alpha channel
+			var needSeparateAlpha = texture.HasAlpha && (
+				(platform == TargetPlatform.Android && rules.PVRFormat == PVRFormat.Compressed) ||
+				(platform == TargetPlatform.UltraCompression));
 			if (needSeparateAlpha) {
-				TextureConverterUtils.ConvertBitmapToAlphaMask(texture);
-				TextureConverter.Convert(texture, tmpFile, rules, platform);
+				tmpFile = GetTempFilePathWithExtension(GetPlatformAlphaTextureExtension());
+				TextureConverter.Convert(texture, tmpFile, rules, platform, isAlpha: true);
 				var atlasAlphaPath = GetAlphaTexturePath(path);
 				Console.WriteLine("+ " + atlasAlphaPath);
-				assetsBundle.ImportFile(tmpFile, atlasAlphaPath, 0, AssetAttributes.Zipped);
+				assetsBundle.ImportFile(tmpFile, atlasAlphaPath, 0, attributes);
 				File.Delete(tmpFile);
 			}
 		}

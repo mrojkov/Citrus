@@ -9,13 +9,16 @@ namespace Orange
 {
 	public static class TextureConverter
 	{
-		public static void Convert(Gdk.Pixbuf pixbuf, string dstPath, CookingRules cookingRules, TargetPlatform platform)
+		public static void Convert(Gdk.Pixbuf pixbuf, string dstPath, CookingRules cookingRules, TargetPlatform platform, bool isAlpha)
 		{
 			switch (platform) {
 				case TargetPlatform.Unity:
 					pixbuf.Save(dstPath, "png");
 					break;
 				case TargetPlatform.Android:
+					if (isAlpha) {
+						TextureConverterUtils.ConvertBitmapToAlphaMask(pixbuf);
+					}
 					CookForAndroid(pixbuf, dstPath, cookingRules.PVRFormat, cookingRules.MipMaps);
 					break;
 				case TargetPlatform.iOS:
@@ -23,6 +26,13 @@ namespace Orange
 					break;
 				case TargetPlatform.Desktop:
 					CookForDesktop(pixbuf, dstPath, cookingRules.DDSFormat, cookingRules.MipMaps);
+					break;
+				case TargetPlatform.UltraCompression:
+					if (isAlpha) {
+						CookUltaCompressedAlphaTexture(pixbuf, dstPath, cookingRules.MipMaps);
+					} else {
+						CookUltraCompressedRGBTexture(pixbuf, dstPath, cookingRules.MipMaps);
+					}
 					break;
 				default:
 					throw new ArgumentException();
@@ -182,6 +192,30 @@ namespace Orange
 				throw new Lime.Exception("Failed to convert '{0}' to DDS format(error code: {1})", srcPath, p.ExitCode);
 			}
 #endif
+		}
+
+		private static void CookUltraCompressedRGBTexture(Gdk.Pixbuf pixbuf, string dstPath, bool mipMaps)
+		{
+			if (pixbuf.HasAlpha) {
+				TextureConverterUtils.PremultiplyAlpha(pixbuf, false);
+			}
+			pixbuf.Savev(dstPath, "jpeg", new string[] { "quality" }, new string[] { "80" });
+		}
+
+		private static void CookUltaCompressedAlphaTexture(Gdk.Pixbuf pixbuf, string dstPath, bool mipMaps)
+		{
+			TextureConverterUtils.ConvertBitmapToGrayscaleAlphaMask(pixbuf);
+			pixbuf.Save(dstPath, "png");
+			var pngcrushTool = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Win", "pngcrush_1_7_83_w32");
+			// -ow - overwrite
+			// -s - silent
+			// -c 0 - change color type to greyscale
+			dstPath = MakeAbsolutePath(dstPath);
+			var args = String.Format("-ow -s -c 0 \"{0}\"", dstPath);
+			int result = Process.Start(pngcrushTool, args, Process.Options.RedirectErrors);
+			if (result != 0) {
+				throw new Lime.Exception("Error converting '{0}'\nCommand line: {1}", dstPath, pngcrushTool + " " + args);
+			}
 		}
 	}
 }

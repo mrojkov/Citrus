@@ -8,5 +8,6 @@ namespace Orange
 		iOS,
 		Android,
 		Unity,
+		UltraCompression,
 	}
 }

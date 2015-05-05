@@ -207,17 +207,28 @@ namespace Orange
 			var platform = (TargetPlatform)this.PlatformPicker.Active;
 #if WIN
 			if (platform == Orange.TargetPlatform.iOS) {
-				var message = new Gtk.MessageDialog(NativeWindow,
-					Gtk.DialogFlags.DestroyWithParent,
-					Gtk.MessageType.Error, Gtk.ButtonsType.Close,
-					"iOS target is not supported on Windows platform");
-				message.Title = "Orange";
-				message.Run();
-				message.Destroy();
+				ShowError("iOS target is not supported on Windows platform");
+				return false;
+			}
+#else
+			if (platform == Orange.TargetPlatform.UltraCompression) {
+				// TODO: find pngcrush tool for Mac
+				ShowError("Ultra compression cooking is currently supported only on Windows platform");
 				return false;
 			}
 #endif
 			return true;
+		}
+
+		public override void ShowError(string message)
+		{
+			var dialog = new Gtk.MessageDialog(NativeWindow,
+				Gtk.DialogFlags.DestroyWithParent,
+				Gtk.MessageType.Error, Gtk.ButtonsType.Close,
+				message);
+			dialog.Title = "Orange";
+			dialog.Run();
+			dialog.Destroy();
 		}
 
 		protected void Window_Hidden(object sender, System.EventArgs e)

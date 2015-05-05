@@ -43,7 +43,7 @@ namespace Orange
 	
 	public class CookingRulesBuilder
 	{
-		public static Dictionary<string, CookingRules> Build(FileEnumerator fileEnumerator)
+		public static Dictionary<string, CookingRules> Build(FileEnumerator fileEnumerator, TargetPlatform platform)
 		{
 			var shouldRescanEnumerator = false;
 			var pathStack = new Stack<string>();
@@ -60,12 +60,12 @@ namespace Orange
 					}
 					if (Path.GetFileName(path) == "#CookingRules.txt") {
 						pathStack.Push(Lime.AssetPath.GetDirectoryName(path));
-						rulesStack.Push(ParseCookingRules(rulesStack.Peek(), path));
+						rulesStack.Push(ParseCookingRules(rulesStack.Peek(), path, platform));
 					} else if (Path.GetExtension(path) != ".txt") {
 						var rules = rulesStack.Peek();
 						var rulesFile = path + ".txt";
 						if (File.Exists(rulesFile)) {
-							rules = ParseCookingRules(rulesStack.Peek(), rulesFile);
+							rules = ParseCookingRules(rulesStack.Peek(), rulesFile, platform);
 						}
 						if (rules.LastChangeTime > fileInfo.LastWriteTime) {
 							File.SetLastWriteTime(path, rules.LastChangeTime);
@@ -119,7 +119,7 @@ namespace Orange
 			}
 		}
 
-		static CookingRules ParseCookingRules(CookingRules basicRules, string path)
+		static CookingRules ParseCookingRules(CookingRules basicRules, string path, TargetPlatform platform)
 		{ 
 			var rules = basicRules;
 			try {
@@ -138,7 +138,10 @@ namespace Orange
 						}
 						switch (words[0]) {
 							case "TextureAtlas":
-								if (words[1] == "None")
+								if (platform == TargetPlatform.UltraCompression)
+									// Disable atlases for now, since they could make decompression more jerky and increase memory footprint.
+									rules.TextureAtlas = null;
+								else if (words[1] == "None")
 									rules.TextureAtlas = null;
 								else if (words[1] == "${DirectoryName}") {
 									string atlasName = Path.GetFileName(Lime.AssetPath.GetDirectoryName(path));

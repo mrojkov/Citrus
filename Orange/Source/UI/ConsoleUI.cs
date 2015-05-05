@@ -80,7 +80,7 @@ namespace Orange
 
 		private static void WriteHelpAndExit()
 		{
-			Console.WriteLine("Orange --console citrus_project --platform:[desktop|ios|android] --command:command [--autoupdate]");
+			Console.WriteLine("Orange --console citrus_project --platform:[desktop|ios|android|uc] --command:command [--autoupdate]");
 			var commands = The.MenuController.GetVisibleAndSortedItems();
 			if (commands.Count > 0) {
 				Console.WriteLine("Available commands are:");
@@ -127,6 +127,11 @@ namespace Orange
 			return false;
 		}
 
+		public override void ShowError(string message)
+		{
+			Console.WriteLine(message);
+		}
+
 		public override TargetPlatform GetActivePlatform()
 		{
 			var platform = Toolbox.GetCommandLineArg("--platform");
@@ -136,6 +141,8 @@ namespace Orange
 				return TargetPlatform.Desktop;
 			} else if (platform == "android") {
 				return TargetPlatform.Android;
+			} else if (platform == "uc") {
+				return TargetPlatform.UltraCompression;
 			} else if (platform == null) {
 				return TargetPlatform.Desktop;
 			} else {
