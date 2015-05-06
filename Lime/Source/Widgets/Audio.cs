@@ -73,15 +73,19 @@ namespace Lime
 		[ProtoMember(10)]
 		public float Priority { get; set; }
 
+		[ProtoMember(11)]
+		public bool Bumpable { get; set; }
+
 		public Audio()
 		{
 			Priority = 0.5f;
+			Bumpable = true;
 		}
 
 		public void Play()
 		{
 			sound = Sample.Play(Group, false, 0f, Looping, Priority, Volume, Pan, Pitch);
-			sound.IsBumpable = true;
+			sound.IsBumpable = Bumpable;
 		}
 
 		public void Stop()
