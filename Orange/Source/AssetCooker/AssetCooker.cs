@@ -547,6 +547,7 @@ namespace Orange
 
 		private static void ImportTexture(string path, Gdk.Pixbuf texture, CookingRules rules)
 		{
+			DownscaleTextureIfNeeded(ref texture, path);
 			var tmpFile = GetTempFilePathWithExtension(GetPlatformTextureExtension());
 			string maskPath = Path.ChangeExtension(path, ".mask");
 			OpacityMaskCreator.CreateMask(assetsBundle, texture, maskPath);
@@ -566,6 +567,26 @@ namespace Orange
 				Console.WriteLine("+ " + atlasAlphaPath);
 				assetsBundle.ImportFile(tmpFile, atlasAlphaPath, 0, attributes);
 				File.Delete(tmpFile);
+			}
+		}
+
+		private static void DownscaleTextureIfNeeded(ref Gdk.Pixbuf texture, string path)
+		{
+			if (platform == TargetPlatform.UltraCompression) {
+				const int maxSize = 1024;
+				const float scaleRatio = 0.75f;
+				const int scaleLargerThan = 256;
+				if (texture.Width > scaleLargerThan || texture.Height > scaleLargerThan) {
+					float ratio = scaleRatio;
+					if (texture.Width > maxSize || texture.Height > maxSize) {
+						int max = Math.Max(texture.Width, texture.Height);
+						ratio *= (float)maxSize / (float)max;
+					}
+					int w = Math.Min((texture.Width * ratio).Round(), maxSize);
+					int h = Math.Min((texture.Height * ratio).Round(), maxSize);
+					Console.WriteLine("{0} downscaled to {1}x{2}", path, w, h);
+					texture = texture.ScaleSimple(w, h, Gdk.InterpType.Bilinear);
+				}
 			}
 		}
 
