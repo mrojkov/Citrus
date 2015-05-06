@@ -232,7 +232,7 @@ namespace Orange
 			SyncUpdated(".ogg", ".sound", (srcPath, dstPath) => {
 				using (var stream = new FileStream(srcPath, FileMode.Open)) {
 					// All sounds below 100kb size are converted from OGG to Wav/Adpcm
-					if (stream.Length > 100 * 1024) {
+					if (stream.Length > 100 * 1024 || platform == TargetPlatform.UltraCompression) {
 						assetsBundle.ImportFile(dstPath, stream, 0);
 					} else {
 						Console.WriteLine("Converting sound to ADPCM/IMA4 format...");
@@ -548,24 +548,61 @@ namespace Orange
 		private static void ImportTexture(string path, Gdk.Pixbuf texture, CookingRules rules)
 		{
 			DownscaleTextureIfNeeded(ref texture, path);
-			var tmpFile = GetTempFilePathWithExtension(GetPlatformTextureExtension());
-			string maskPath = Path.ChangeExtension(path, ".mask");
+			var maskPath = Path.ChangeExtension(path, ".mask");
 			OpacityMaskCreator.CreateMask(assetsBundle, texture, maskPath);
-			TextureConverter.Convert(texture, tmpFile, rules, platform, isAlpha: false);
-			var attributes = platform == TargetPlatform.UltraCompression ? AssetAttributes.None : AssetAttributes.Zipped;
-			var isPot = TextureConverterUtils.IsPowerOf2(texture.Width) && TextureConverterUtils.IsPowerOf2(texture.Height);
-			assetsBundle.ImportFile(tmpFile, path, 0, attributes | (isPot ? 0 : AssetAttributes.NonPowerOf2Texture));
-			File.Delete(tmpFile);
-			// ETC1 textures on Android or UltraCompressed use separate alpha channel
-			var needSeparateAlpha = texture.HasAlpha && (
-				(platform == TargetPlatform.Android && rules.PVRFormat == PVRFormat.Compressed) ||
-				(platform == TargetPlatform.UltraCompression));
-			if (needSeparateAlpha) {
-				tmpFile = GetTempFilePathWithExtension(GetPlatformAlphaTextureExtension());
-				TextureConverter.Convert(texture, tmpFile, rules, platform, isAlpha: true);
-				var atlasAlphaPath = GetAlphaTexturePath(path);
-				Console.WriteLine("+ " + atlasAlphaPath);
-				assetsBundle.ImportFile(tmpFile, atlasAlphaPath, 0, attributes);
+			var attributes = AssetAttributes.Zipped;
+			if (!TextureConverterUtils.IsPowerOf2(texture.Width) || !TextureConverterUtils.IsPowerOf2(texture.Height)) {
+				attributes |= AssetAttributes.NonPowerOf2Texture;
+			}
+			var alphaPath = GetAlphaTexturePath(path);
+			switch (platform) {
+				case TargetPlatform.Unity:
+					ConvertTexture(path, attributes, file => texture.Save(file, "png"));
+					break;
+				case TargetPlatform.Android:
+					ConvertTexture(path, attributes, file => TextureConverter.ToPVR_ETC1(texture, file, rules.PVRFormat, rules.MipMaps));
+					// ETC1 textures on Android use separate alpha channel
+					if (texture.HasAlpha && rules.PVRFormat == PVRFormat.Compressed) {
+						using (var alphaTexture = new Gdk.Pixbuf(texture, 0, 0, texture.Width, texture.Height)) {
+							TextureConverterUtils.ConvertBitmapToAlphaMask(alphaTexture);
+							ConvertTexture(alphaPath, AssetAttributes.Zipped, file => TextureConverter.ToPVR_ETC1(alphaTexture, file, PVRFormat.Compressed, rules.MipMaps));
+						}
+					}
+					break;
+				case TargetPlatform.iOS:
+					ConvertTexture(path, attributes, file => TextureConverter.ToPVR_PVRTC(texture, file, rules.PVRFormat, rules.MipMaps));
+					break;
+				case TargetPlatform.Desktop:
+					ConvertTexture(path, attributes, file => TextureConverter.ToDDS_DXTi(texture, file, rules.DDSFormat, rules.MipMaps));
+					break;
+				case TargetPlatform.UltraCompression:
+					attributes = AssetAttributes.None;
+					if (TextureConverterUtils.IsWhiteImageWithAlpha(texture)) {
+						// Optimization for fonts: they are usually completely RGB-white and premultiplied jpg is heavier then separate alpha.
+						using (var specialPixbuf = new Gdk.Pixbuf(texture, 0, 0, 1, 1)) {
+							ConvertTexture(path, attributes, file => TextureConverter.ToJPG(specialPixbuf, file, mipMaps: false));
+						}
+					} else {
+						ConvertTexture(path, attributes, file => TextureConverter.ToJPG(texture, file, rules.MipMaps));
+					}
+					if (texture.HasAlpha) {
+						using (var alphaTexture = new Gdk.Pixbuf(texture, 0, 0, texture.Width, texture.Height)) {
+							ConvertTexture(alphaPath, attributes, file => TextureConverter.ToGrayscaleAlphaPNG(texture, file, rules.MipMaps));
+						}
+					}
+					break;
+				default:
+					throw new Lime.Exception();
+			}
+		}
+
+		private static void ConvertTexture(string path, AssetAttributes attributes, Action<string> converter)
+		{
+			var tmpFile = Toolbox.GetTempFilePathWithExtension(Path.GetExtension(path));
+			try {
+				converter(tmpFile);
+				assetsBundle.ImportFile(tmpFile, path, 0, attributes);
+			} finally {
 				File.Delete(tmpFile);
 			}
 		}
@@ -588,13 +625,6 @@ namespace Orange
 					texture = texture.ScaleSimple(w, h, Gdk.InterpType.Bilinear);
 				}
 			}
-		}
-
-		static string GetTempFilePathWithExtension(string extension)
-		{
-			var path = Path.GetTempPath();
-			var fileName = Guid.NewGuid().ToString() + extension;
-			return Path.Combine(path, fileName);
 		}
 
 		static void SyncAtlases()

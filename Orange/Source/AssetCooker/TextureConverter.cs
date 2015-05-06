@@ -9,37 +9,7 @@ namespace Orange
 {
 	public static class TextureConverter
 	{
-		public static void Convert(Gdk.Pixbuf pixbuf, string dstPath, CookingRules cookingRules, TargetPlatform platform, bool isAlpha)
-		{
-			switch (platform) {
-				case TargetPlatform.Unity:
-					pixbuf.Save(dstPath, "png");
-					break;
-				case TargetPlatform.Android:
-					if (isAlpha) {
-						TextureConverterUtils.ConvertBitmapToAlphaMask(pixbuf);
-					}
-					CookForAndroid(pixbuf, dstPath, cookingRules.PVRFormat, cookingRules.MipMaps);
-					break;
-				case TargetPlatform.iOS:
-					CookForIOS(pixbuf, dstPath, cookingRules.PVRFormat, cookingRules.MipMaps);
-					break;
-				case TargetPlatform.Desktop:
-					CookForDesktop(pixbuf, dstPath, cookingRules.DDSFormat, cookingRules.MipMaps);
-					break;
-				case TargetPlatform.UltraCompression:
-					if (isAlpha) {
-						CookUltaCompressedAlphaTexture(pixbuf, dstPath, cookingRules.MipMaps);
-					} else {
-						CookUltraCompressedRGBTexture(pixbuf, dstPath, cookingRules.MipMaps);
-					}
-					break;
-				default:
-					throw new ArgumentException();
-			}
-		}
-
-		private static void CookForIOS(Gdk.Pixbuf pixbuf, string dstPath, PVRFormat pvrFormat, bool mipMaps)
+		public static void ToPVR_PVRTC(Gdk.Pixbuf pixbuf, string dstPath, PVRFormat pvrFormat, bool mipMaps)
 		{
 			int width = pixbuf.Width;
 			int height = pixbuf.Height;
@@ -92,7 +62,7 @@ namespace Orange
 			}
 		}
 
-		private static void CookForAndroid(Gdk.Pixbuf pixbuf, string dstPath, PVRFormat pvrFormat, bool mipMaps)
+		public static void ToPVR_ETC1(Gdk.Pixbuf pixbuf, string dstPath, PVRFormat pvrFormat, bool mipMaps)
 		{
 			string formatArguments;
 			switch (pvrFormat) {
@@ -139,15 +109,7 @@ namespace Orange
 			}
 		}
 
-		private static string MakeAbsolutePath(string path)
-		{
-			if (!Path.IsPathRooted(path)) {
-				path = Path.Combine(System.IO.Directory.GetCurrentDirectory(), path);
-			}
-			return path;
-		}
-
-		private static void CookForDesktop(Gdk.Pixbuf pixbuf, string dstPath, DDSFormat format, bool mipMaps)
+		public static void ToDDS_DXTi(Gdk.Pixbuf pixbuf, string dstPath, DDSFormat format, bool mipMaps)
 		{
 			bool compressed = format == DDSFormat.DXTi;
 			if (pixbuf.HasAlpha) {
@@ -194,7 +156,7 @@ namespace Orange
 #endif
 		}
 
-		private static void CookUltraCompressedRGBTexture(Gdk.Pixbuf pixbuf, string dstPath, bool mipMaps)
+		public static void ToJPG(Gdk.Pixbuf pixbuf, string dstPath, bool mipMaps)
 		{
 			if (pixbuf.HasAlpha) {
 				TextureConverterUtils.PremultiplyAlpha(pixbuf, false);
@@ -202,7 +164,7 @@ namespace Orange
 			pixbuf.Savev(dstPath, "jpeg", new string[] { "quality" }, new string[] { "80" });
 		}
 
-		private static void CookUltaCompressedAlphaTexture(Gdk.Pixbuf pixbuf, string dstPath, bool mipMaps)
+		public static void ToGrayscaleAlphaPNG(Gdk.Pixbuf pixbuf, string dstPath, bool mipMaps)
 		{
 			TextureConverterUtils.ConvertBitmapToGrayscaleAlphaMask(pixbuf);
 			pixbuf.Save(dstPath, "png");
@@ -216,6 +178,14 @@ namespace Orange
 			if (result != 0) {
 				throw new Lime.Exception("Error converting '{0}'\nCommand line: {1}", dstPath, pngcrushTool + " " + args);
 			}
+		}
+
+		private static string MakeAbsolutePath(string path)
+		{
+			if (!Path.IsPathRooted(path)) {
+				path = Path.Combine(System.IO.Directory.GetCurrentDirectory(), path);
+			}
+			return path;
 		}
 	}
 }

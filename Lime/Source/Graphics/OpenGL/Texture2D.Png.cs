@@ -223,7 +223,7 @@ namespace Lime
 								// For 1x1 bitmaps, propagate alpha value to red, green and blue channels.
 								CopyRedToGreenBlueAlphaChannels(ref pixels);
 							} else {
-								throw new Lime.Exception ("Alpha bitmap size and main bitmap size must be qual");
+								throw new Lime.Exception ("Alpha bitmap size and main bitmap size must be the same");
 							}
 						} else {
 							var colorPixels = new int[colorBitmap.Width * colorBitmap.Height];

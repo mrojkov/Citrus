@@ -69,6 +69,33 @@ namespace Orange
 			}
 		}
 
+		public static bool IsWhiteImageWithAlpha(Gdk.Pixbuf pixbuf)
+		{
+			if (pixbuf.NChannels != 4 || !pixbuf.HasAlpha) {
+				return false;
+			}
+			if ((pixbuf.Rowstride & 0x3) != 0 || pixbuf.BitsPerSample != 8) {
+				throw new Lime.Exception("Invalid pixbuf format");
+			}
+			unsafe {
+				RGBA* pixels = (RGBA*)pixbuf.Pixels;
+				int width = pixbuf.Width;
+				for (int i = 0; i < pixbuf.Height; i++) {
+					for (int j = 0; j < width; j++) {
+						RGBA c = *pixels;
+						if (c.A > 0) {
+							if (c.R != 255 || c.G != 255 || c.B != 255) {
+								return false;
+							}
+						}
+						pixels++;
+					}
+					pixels += pixbuf.Rowstride / 4 - width;
+				}
+			}
+			return true;
+		}
+
 		public static void ReduceTo4BitsPerChannelWithFloydSteinbergDithering(Gdk.Pixbuf pixbuf)
 		{
 			if (pixbuf.HasAlpha) {
