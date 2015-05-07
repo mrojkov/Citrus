@@ -250,6 +250,12 @@ namespace Lime
 			get { return FPSCalculator.FPS; } 
 		}
 
+		public void SetDefaultCursor()
+		{
+			currentCursor = MouseCursor.Default;
+			base.Cursor = currentCursor;
+		}
+
 		public void SetCursor(string resourceName, IntVector2 hotSpot)
 		{
 			var cursor = GetCursor(resourceName, hotSpot);
