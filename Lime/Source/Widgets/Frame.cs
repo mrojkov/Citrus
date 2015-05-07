@@ -117,7 +117,9 @@ namespace Lime
 			Renderer.ScissorRectangle = rect;
 			try {
 				EnsureRenderChain();
-				renderChain = new RenderChain();
+				if (renderChain == null) {
+					renderChain = new RenderChain();
+				}
 				foreach (var node in Nodes) {
 					node.AddToRenderChain(renderChain);
 				}
