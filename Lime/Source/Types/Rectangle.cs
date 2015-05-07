@@ -114,7 +114,15 @@ namespace Lime
 				Mathf.Max(a.Bottom, b.Bottom)
 			);
 		}
-				
+
+		public void IncludePoint(Vector2 v)
+		{
+			Left = Mathf.Min(v.X, Left);
+			Right = Mathf.Max(v.X, Right);
+			Top = Mathf.Min(v.Y, Top);
+			Bottom = Mathf.Max(v.Y, Bottom);
+		}
+
 		public override string ToString()
 		{
 			return String.Format("{0}, {1}, {2}, {3}", A.X, A.Y, B.X, B.Y);

@@ -14,6 +14,14 @@ namespace Lime
 		public Vector2 V;
 	}
 
+	public struct WidgetHull
+	{
+		public Vector2 V1;
+		public Vector2 V2;
+		public Vector2 V3;
+		public Vector2 V4;
+	}
+
 	public partial class Widget : Node
 	{
 		public void RenderToTexture(ITexture texture, RenderChain renderChain)
@@ -85,27 +93,24 @@ namespace Lime
 			return mtx2 * mtx1;
 		}
 
-		public Vector2[] CalcHullInSpaceOf(Widget container)
+		public void CalcHullInSpaceOf(out WidgetHull hull, Widget container)
 		{
-			Vector2[] vertices = new Vector2[4];
 			var transform = CalcTransformInSpaceOf(container);
-			vertices[0] = transform.Position - transform.U * Size.X * Pivot.X - transform.V * Size.Y * Pivot.Y;
-			vertices[1] = vertices[0] + transform.U * Size.X;
-			vertices[2] = vertices[0] + transform.U * Size.X + transform.V * Size.Y;
-			vertices[3] = vertices[0] + transform.V * Size.Y;
-			return vertices;
+			hull.V1 = transform.Position - transform.U * Size.X * Pivot.X - transform.V * Size.Y * Pivot.Y;
+			hull.V2 = hull.V1 + transform.U * Size.X;
+			hull.V3 = hull.V1 + transform.U * Size.X + transform.V * Size.Y;
+			hull.V4 = hull.V1 + transform.V * Size.Y;
 		}
 
 		public Rectangle CalcAABBInSpaceOf(Widget container)
 		{
-			var vertices = CalcHullInSpaceOf(container);
+			WidgetHull hull;
+			CalcHullInSpaceOf(out hull, container);
 			var aabb = new Rectangle(float.MaxValue, float.MaxValue, float.MinValue, float.MinValue);
-			foreach (var v in vertices) {
-				aabb.Left = Mathf.Min(v.X, aabb.Left);
-				aabb.Right = Mathf.Max(v.X, aabb.Right);
-				aabb.Top = Mathf.Min(v.Y, aabb.Top);
-				aabb.Bottom = Mathf.Max(v.Y, aabb.Bottom);
-			}
+			aabb.IncludePoint(hull.V1);
+			aabb.IncludePoint(hull.V2);
+			aabb.IncludePoint(hull.V3);
+			aabb.IncludePoint(hull.V4);
 			return aabb;
 		}
 
