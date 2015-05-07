@@ -41,7 +41,7 @@ namespace Lime.Text
 			int i = texts.IndexOf(text);
 			if (i >= 0)
 				return i;
-			texts.Add(String.Intern(text));
+			texts.Add(text);
 			return texts.Count - 1;
 		}
 
