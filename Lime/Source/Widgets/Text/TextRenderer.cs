@@ -24,10 +24,12 @@ namespace Lime.Text
 			public int Style;
 			public int Start;
 			public int Length;
+			public bool ForceLineBreak; // Line break come from text. It applies to the beginning of the word.
+			public bool IsTagBegin;
+			// Following fields are mutable:
 			public float X;
 			public float Width;
-			public bool LineBreak; // Line break before the word
-			public bool IsTagBegin;
+			public bool LineBreak; // Effective line break after the text formatting.
 			public Word Clone() { return (Word)MemberwiseClone(); }
 		};
 
@@ -55,7 +57,7 @@ namespace Lime.Text
 				Length = text.Length,
 				X = 0,
 				Width = 0,
-				LineBreak = false,
+				ForceLineBreak = false,
 				IsTagBegin = true,
 			};
 			int length = word.Length;
@@ -81,7 +83,7 @@ namespace Lime.Text
 				}
 				word.Start = start;
 				word.Length = curr - start;
-				word.LineBreak = lineBreak;
+				word.ForceLineBreak = lineBreak;
 				words.Add(word);
 				word = word.Clone();
 				word.IsTagBegin = false;
@@ -308,6 +310,7 @@ namespace Lime.Text
 			float x = 0;
 			for (int i = 0; i < words.Count; i++) {
 				var word = words[i];
+				word.LineBreak = word.ForceLineBreak;
 				fittedWords.Add(word);
 				word.Width = CalcWordWidth(word);
 				if (word.LineBreak) {
@@ -339,7 +342,6 @@ namespace Lime.Text
 				}
 
 				if (isLongerThanWidth && isText && x > 0) {
-					word = word.Clone();
 					x = word.Width;
 					word.X = 0;
 					word.LineBreak = true;
