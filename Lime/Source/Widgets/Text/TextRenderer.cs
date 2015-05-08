@@ -10,6 +10,7 @@ namespace Lime.Text
 	class TextRenderer
 	{
 		private readonly List<Word> words = new List<Word>();
+		private readonly List<Word> fittedWords = new List<Word>();
 		private readonly List<TextStyle> styles = new List<TextStyle>();
 		private readonly List<string> texts = new List<string>();
 
@@ -25,7 +26,7 @@ namespace Lime.Text
 			public int Length;
 			public float X;
 			public float Width;
-			public bool LineBreak; // Line break before the fragment
+			public bool LineBreak; // Line break before the word
 			public bool IsTagBegin;
 			public Word Clone() { return (Word)MemberwiseClone(); }
 		};
@@ -117,10 +118,9 @@ namespace Lime.Text
 				FitTextInsideArea(area);
 			}
 			List<int> lines;
-			List<Word> fittedWords;
 			float totalHeight;
 			float longestLineWidth;
-			PrepareWordsAndLines(area.X, area.Y, out lines, out fittedWords, out totalHeight, out longestLineWidth);
+			PrepareWordsAndLines(area.X, area.Y, out lines, out totalHeight, out longestLineWidth);
 			// Draw all lines.
 			int b = 0;
 			float y = 0;
@@ -223,19 +223,18 @@ namespace Lime.Text
 
 		public Vector2 MeasureText(float maxWidth, float maxHeight)
 		{
-			List<Word> fittedWords;
 			List<int> lines;
 			float totalHeight;
 			float longestLineWidth;
-			PrepareWordsAndLines(maxWidth, maxHeight, out lines, out fittedWords, out totalHeight, out longestLineWidth);
+			PrepareWordsAndLines(maxWidth, maxHeight, out lines, out totalHeight, out longestLineWidth);
 			var extent = new Vector2(longestLineWidth, totalHeight);
 			return extent;
 		}
 
 		private void PrepareWordsAndLines(
-			float maxWidth, float maxHeight, out List<int> lines, out List<Word> fittedWords, out float totalHeight, out float longestLineWidth)
+			float maxWidth, float maxHeight, out List<int> lines, out float totalHeight, out float longestLineWidth)
 		{
-			PositionWordsHorizontally(maxWidth, out longestLineWidth, out fittedWords);
+			PositionWordsHorizontally(maxWidth, out longestLineWidth);
 
 			// Calculate word count for every string.
 			lines = new List<int>();
@@ -302,13 +301,13 @@ namespace Lime.Text
 			ClipWordWithEllipsis(fittedWords[lastWordInLastLine], maxWidth);
 		}
 
-		private void PositionWordsHorizontally(float maxWidth, out float longestLineWidth, out List<Word> fittedWords)
+		private void PositionWordsHorizontally(float maxWidth, out float longestLineWidth)
 		{
-			fittedWords = new List<Word>();
+			fittedWords.Clear();
 			longestLineWidth = 0;
 			float x = 0;
 			for (int i = 0; i < words.Count; i++) {
-				var word = words[i].Clone();
+				var word = words[i];
 				fittedWords.Add(word);
 				word.Width = CalcWordWidth(word);
 				if (word.LineBreak) {
@@ -329,6 +328,7 @@ namespace Lime.Text
 						newWord.Length = word.Length - fittedCharsCount;
 						newWord.Width = CalcWordWidth(newWord);
 						newWord.LineBreak = true;
+						word = word.Clone();
 						word.Length = fittedCharsCount;
 						word.Width = CalcWordWidth(word);
 						word.X = x;
@@ -339,6 +339,7 @@ namespace Lime.Text
 				}
 
 				if (isLongerThanWidth && isText && x > 0) {
+					word = word.Clone();
 					x = word.Width;
 					word.X = 0;
 					word.LineBreak = true;
@@ -350,12 +351,14 @@ namespace Lime.Text
 
 				if (overflowMode == TextOverflowMode.Ellipsis) {
 					if (word.X == 0 && word.Width > maxWidth) {
+						word = word.Clone();
 						ClipWordWithEllipsis(word, maxWidth);
 					}
 				}
 				if (isText) { // buz: при автопереносе на концах строк остаются пробелы, они не должны влиять на значение длины строки
 					longestLineWidth = Math.Max(longestLineWidth, word.X + word.Width);
 				}
+				fittedWords[i] = word;
 			}
 		}
 
