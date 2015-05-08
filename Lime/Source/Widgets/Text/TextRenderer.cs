@@ -9,7 +9,7 @@ namespace Lime.Text
 
 	class TextRenderer
 	{
-		private readonly List<Fragment> words = new List<Fragment>();
+		private readonly List<Word> words = new List<Word>();
 		private readonly List<TextStyle> styles = new List<TextStyle>();
 		private readonly List<string> texts = new List<string>();
 
@@ -17,7 +17,7 @@ namespace Lime.Text
 		private readonly TextOverflowMode overflowMode;
 		private readonly bool wordSplitAllowed;
 
-		private class Fragment
+		private class Word
 		{
 			public int TextIndex;
 			public int Style;
@@ -27,7 +27,7 @@ namespace Lime.Text
 			public float Width;
 			public bool LineBreak; // Line break before the fragment
 			public bool IsTagBegin;
-			public Fragment Clone() { return (Fragment)MemberwiseClone(); }
+			public Word Clone() { return (Word)MemberwiseClone(); }
 		};
 
 		public TextRenderer(TextOverflowMode overflowMode, bool wordSplitAllowed)
@@ -36,7 +36,7 @@ namespace Lime.Text
 			this.wordSplitAllowed = wordSplitAllowed;
 		}
 
-		public int AddText(string text)
+		private int AddText(string text)
 		{
 			int i = texts.IndexOf(text);
 			if (i >= 0)
@@ -47,7 +47,7 @@ namespace Lime.Text
 
 		public void AddFragment(string text, int style)
 		{
-			var word = new Fragment {
+			var word = new Word {
 				TextIndex = AddText(text),
 				Style = style,
 				Start = 0,
@@ -98,12 +98,12 @@ namespace Lime.Text
 			return styles.Contains(style);
 		}
 
-		private bool IsBullet(Fragment word)
+		private bool IsBullet(Word word)
 		{
 			return word.IsTagBegin && styles[word.Style].ImageUsage == TextStyle.ImageUsageEnum.Bullet;
 		}
 
-		float CalcWordWidth(Fragment word)
+		float CalcWordWidth(Word word)
 		{
 			var style = styles[word.Style];
 			Vector2 size = Renderer.MeasureTextLine(
@@ -117,7 +117,7 @@ namespace Lime.Text
 				FitTextInsideArea(area);
 			}
 			List<int> lines;
-			List<Fragment> fittedWords;
+			List<Word> fittedWords;
 			float totalHeight;
 			float longestLineWidth;
 			PrepareWordsAndLines(area.X, area.Y, out lines, out fittedWords, out totalHeight, out longestLineWidth);
@@ -223,7 +223,7 @@ namespace Lime.Text
 
 		public Vector2 MeasureText(float maxWidth, float maxHeight)
 		{
-			List<Fragment> fittedWords;
+			List<Word> fittedWords;
 			List<int> lines;
 			float totalHeight;
 			float longestLineWidth;
@@ -233,7 +233,7 @@ namespace Lime.Text
 		}
 
 		private void PrepareWordsAndLines(
-			float maxWidth, float maxHeight, out List<int> lines, out List<Fragment> fittedWords, out float totalHeight, out float longestLineWidth)
+			float maxWidth, float maxHeight, out List<int> lines, out List<Word> fittedWords, out float totalHeight, out float longestLineWidth)
 		{
 			PositionWordsHorizontally(maxWidth, out longestLineWidth, out fittedWords);
 
@@ -272,7 +272,7 @@ namespace Lime.Text
 			}
 		}
 
-		private void ClipLastLineWithEllipsis(List<int> lines, List<Fragment> fittedWords, float maxWidth)
+		private void ClipLastLineWithEllipsis(List<int> lines, List<Word> fittedWords, float maxWidth)
 		{
 			int firstWordInLastLineIndex = 0;
 			for (int i = 0; i < lines.Count - 1; i++) {
@@ -302,9 +302,9 @@ namespace Lime.Text
 			ClipWordWithEllipsis(fittedWords[lastWordInLastLine], maxWidth);
 		}
 
-		private void PositionWordsHorizontally(float maxWidth, out float longestLineWidth, out List<Fragment> fittedWords)
+		private void PositionWordsHorizontally(float maxWidth, out float longestLineWidth, out List<Word> fittedWords)
 		{
-			fittedWords = new List<Fragment>();
+			fittedWords = new List<Word>();
 			longestLineWidth = 0;
 			float x = 0;
 			for (int i = 0; i < words.Count; i++) {
@@ -359,7 +359,7 @@ namespace Lime.Text
 			}
 		}
 
-		private int CalcFittedCharactersCount(Fragment word, float maxWidth)
+		private int CalcFittedCharactersCount(Word word, float maxWidth)
 		{
 			int min = 0;
 			int max = word.Length;
@@ -383,7 +383,7 @@ namespace Lime.Text
 			return mid;
 		}
 
-		private void ClipWordWithEllipsis(Fragment word, float maxWidth)
+		private void ClipWordWithEllipsis(Word word, float maxWidth)
 		{
 			var style = styles[word.Style];
 			float dotsWidth = Renderer.MeasureTextLine(style.Font.Instance, "...", style.Size * scaleFactor).X;
