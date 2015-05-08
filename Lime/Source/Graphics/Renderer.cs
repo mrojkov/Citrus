@@ -286,6 +286,8 @@ namespace Lime
 					position.Y += fontHeight;
 					prevChar = null;
 					continue;
+				} else if (ch == '\r') {
+					continue;
 				}
 				FontChar fontChar = font.Chars[ch];
 				if (fontChar == FontChar.Null) {
