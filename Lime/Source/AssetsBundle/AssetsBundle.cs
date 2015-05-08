@@ -36,6 +36,8 @@ namespace Lime
 			}
 		}
 
+		public static bool Initialized { get { return instance != null; } }
+
 		public virtual void Dispose()
 		{
 			if (instance == this) {
