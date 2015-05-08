@@ -115,7 +115,6 @@ namespace Lime
 			base.StaticScale(ratio, roundCoordinates);
 		}
 
-
 		private TextRenderer PrepareRenderer()
 		{
 			if (renderer != null)

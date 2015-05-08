@@ -117,9 +117,10 @@ namespace Lime.Text
 				FitTextInsideArea(area);
 			}
 			List<int> lines;
+			List<Fragment> fittedWords;
 			float totalHeight;
 			float longestLineWidth;
-			PrepareWordsAndLines(area.X, area.Y, out lines, out totalHeight, out longestLineWidth);
+			PrepareWordsAndLines(area.X, area.Y, out lines, out fittedWords, out totalHeight, out longestLineWidth);
 			// Draw all lines.
 			int b = 0;
 			float y = 0;
@@ -128,8 +129,8 @@ namespace Lime.Text
 				float maxHeight = 0;
 				float totalWidth = 0;
 				for (int j = 0; j < count; j++) {
-					Fragment word = words[b + j];
-					TextStyle style = styles[word.Style];
+					var word = fittedWords[b + j];
+					var style = styles[word.Style];
 					maxHeight = Math.Max(maxHeight, (style.Size + style.SpaceAfter) * scaleFactor);
 					if (word.IsTagBegin) {
 						maxHeight = Math.Max(maxHeight, (style.ImageSize.Y + style.SpaceAfter) * scaleFactor);
@@ -149,7 +150,7 @@ namespace Lime.Text
 					offset.Y = (area.Y - totalHeight) * 0.5f;
 				// Draw string.
 				for (int j = 0; j < count; j++) {
-					Fragment word = words[b + j];
+					var word = fittedWords[b + j];
 					var t = texts[word.TextIndex];
 					TextStyle style = styles[word.Style];
 					Vector2 position = new Vector2(word.X, y) + offset;
@@ -177,17 +178,17 @@ namespace Lime.Text
 				}
 				// Draw overlays
 				for (int j = 0; j < count; j++) {
-					var word = words[b + j];
+					var word = fittedWords[b + j];
 					TextStyle style = styles[word.Style];
 					if (style.ImageUsage == TextStyle.ImageUsageEnum.Overlay) {
 						int k = j + 1;
 						for (; k < count; k++) {
-							if (words[b + k].IsTagBegin)
+							if (fittedWords[b + k].IsTagBegin)
 								break;
 						}
 						k -= 1;
-						Vector2 lt = new Vector2(words[b + j].X, y) + offset;
-						Vector2 rb = new Vector2(words[b + k].X + words[b + k].Width, y) + offset;
+						Vector2 lt = new Vector2(fittedWords[b + j].X, y) + offset;
+						Vector2 rb = new Vector2(fittedWords[b + k].X + fittedWords[b + k].Width, y) + offset;
 						float yOffset = (maxHeight - style.ImageSize.Y * scaleFactor) * 0.5f;
 						spriteList.Add(style.ImageTexture, Color4.White, lt + new Vector2(0, yOffset),
 							rb - lt + new Vector2(0, style.ImageSize.Y),
@@ -222,29 +223,30 @@ namespace Lime.Text
 
 		public Vector2 MeasureText(float maxWidth, float maxHeight)
 		{
+			List<Fragment> fittedWords;
 			List<int> lines;
 			float totalHeight;
 			float longestLineWidth;
-			PrepareWordsAndLines(maxWidth, maxHeight, out lines, out totalHeight, out longestLineWidth);
+			PrepareWordsAndLines(maxWidth, maxHeight, out lines, out fittedWords, out totalHeight, out longestLineWidth);
 			var extent = new Vector2(longestLineWidth, totalHeight);
 			return extent;
 		}
 
 		private void PrepareWordsAndLines(
-			float maxWidth, float maxHeight, out List<int> lines, out float totalHeight, out float longestLineWidth)
+			float maxWidth, float maxHeight, out List<int> lines, out List<Fragment> fittedWords, out float totalHeight, out float longestLineWidth)
 		{
-			PositionWordsHorizontally(maxWidth, out longestLineWidth);
+			PositionWordsHorizontally(maxWidth, out longestLineWidth, out fittedWords);
 
 			// Calculate word count for every string.
 			lines = new List<int>();
 			totalHeight = 0;
 			float lineHeight = 0;
 			int c = 0;
-			foreach (Fragment word in words) {
-				TextStyle style = styles[word.Style];
+			foreach (var word in fittedWords) {
+				var style = styles[word.Style];
 				if (word.LineBreak && c > 0) {
 					if (overflowMode == TextOverflowMode.Ellipsis && totalHeight + lineHeight > maxHeight) {
-						ClipLastLineWithEllipsis(lines, maxWidth);
+						ClipLastLineWithEllipsis(lines, fittedWords, maxWidth);
 						c = 0;
 						break;
 					} else {
@@ -262,7 +264,7 @@ namespace Lime.Text
 			}
 			if (c > 0) {
 				if (overflowMode == TextOverflowMode.Ellipsis && totalHeight + lineHeight > maxHeight) {
-					ClipLastLineWithEllipsis(lines, maxWidth);
+					ClipLastLineWithEllipsis(lines, fittedWords, maxWidth);
 				} else {
 					totalHeight += lineHeight;
 					lines.Add(c);
@@ -270,7 +272,7 @@ namespace Lime.Text
 			}
 		}
 
-		private void ClipLastLineWithEllipsis(List<int> lines, float maxWidth)
+		private void ClipLastLineWithEllipsis(List<int> lines, List<Fragment> fittedWords, float maxWidth)
 		{
 			int firstWordInLastLineIndex = 0;
 			for (int i = 0; i < lines.Count - 1; i++) {
@@ -278,7 +280,7 @@ namespace Lime.Text
 			}
 			int lastWordInLastLine = firstWordInLastLineIndex + lines[lines.Count - 1] - 1;
 			while (true) {
-				var word = words[lastWordInLastLine];
+				var word = fittedWords[lastWordInLastLine];
 				var style = styles[word.Style];
 				var font = style.Font.Instance;
 				var t = texts[word.TextIndex];
@@ -297,15 +299,17 @@ namespace Lime.Text
 					break;
 				}
 			}
-			ClipWordWithEllipsis(words[lastWordInLastLine], maxWidth);
+			ClipWordWithEllipsis(fittedWords[lastWordInLastLine], maxWidth);
 		}
 
-		private void PositionWordsHorizontally(float maxWidth, out float longestLineWidth)
+		private void PositionWordsHorizontally(float maxWidth, out float longestLineWidth, out List<Fragment> fittedWords)
 		{
+			fittedWords = new List<Fragment>();
 			longestLineWidth = 0;
 			float x = 0;
 			for (int i = 0; i < words.Count; i++) {
-				Fragment word = words[i];
+				var word = words[i].Clone();
+				fittedWords.Add(word);
 				word.Width = CalcWordWidth(word);
 				if (word.LineBreak) {
 					x = 0;
@@ -329,7 +333,7 @@ namespace Lime.Text
 						word.Width = CalcWordWidth(word);
 						word.X = x;
 						x += word.Width;
-						words.Insert(i + 1, newWord);
+						fittedWords.Insert(i + 1, newWord);
 						goto skip_default_placement;
 					}
 				}
@@ -349,7 +353,6 @@ namespace Lime.Text
 						ClipWordWithEllipsis(word, maxWidth);
 					}
 				}
-				words[i] = word;
 				if (isText) { // buz: при автопереносе на концах строк остаются пробелы, они не должны влиять на значение длины строки
 					longestLineWidth = Math.Max(longestLineWidth, word.X + word.Width);
 				}
