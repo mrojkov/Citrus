@@ -306,12 +306,12 @@ namespace Lime.Text
 		private void PositionWordsHorizontally(float maxWidth, out float longestLineWidth)
 		{
 			fittedWords.Clear();
+			fittedWords.AddRange(words);
 			longestLineWidth = 0;
 			float x = 0;
-			for (int i = 0; i < words.Count; i++) {
-				var word = words[i];
+			for (int i = 0; i < fittedWords.Count; i++) {
+				var word = fittedWords[i];
 				word.LineBreak = word.ForceLineBreak;
-				fittedWords.Add(word);
 				word.Width = CalcWordWidth(word);
 				if (word.LineBreak) {
 					x = 0;
