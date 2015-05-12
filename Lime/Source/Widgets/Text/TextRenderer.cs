@@ -330,7 +330,7 @@ namespace Lime.Text
 						newWord.Start = word.Start + fittedCharsCount;
 						newWord.Length = word.Length - fittedCharsCount;
 						newWord.Width = CalcWordWidth(newWord);
-						newWord.LineBreak = true;
+						newWord.ForceLineBreak = true;
 						word = word.Clone();
 						word.Length = fittedCharsCount;
 						word.Width = CalcWordWidth(word);
