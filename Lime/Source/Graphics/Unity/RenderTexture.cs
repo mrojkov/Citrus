@@ -88,7 +88,7 @@ namespace Lime
 
 		public ITexture AlphaTexture { get; private set; }
 		
-		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv0, ref Vector2 uv1) { }
+		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv) { }
 
 		public void Discard() {}
 		public void MaybeDiscardUnderPressure() {}
