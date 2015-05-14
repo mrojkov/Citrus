@@ -222,5 +222,32 @@ namespace Lime
 		{
 			return String.Format("{0}, {1}", X, Y);
 		}
+
+		public static bool TryParse(string s, out Vector2 vector)
+		{
+			vector = Vector2.Zero;
+			if (string.IsNullOrWhiteSpace(s)) {
+				return false;
+			}
+
+			var parts = s.Split(new string[] {", "}, StringSplitOptions.None);
+			if (parts.Length != 2 || string.IsNullOrWhiteSpace(parts[0]) || string.IsNullOrWhiteSpace(parts[1])) {
+				return false;
+			}
+
+			return float.TryParse(parts[0], out vector.X) & float.TryParse(parts[1], out vector.Y);
+		}
+
+		public static Vector2 Parse(string s)
+		{
+			if (s == null) {
+				throw new ArgumentNullException();
+			}
+			var vector = Vector2.Zero;
+			if (!TryParse(s, out vector)) {
+				throw new FormatException();
+			}
+			return vector;
+		}
 	}
 }
