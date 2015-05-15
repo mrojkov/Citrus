@@ -209,6 +209,7 @@ namespace Lime
 		private void InitWithPngOrJpgBitmap(Stream stream, Stream alphaStream)
 		{
 			if (!Application.IsMainThread) {
+				// why?
 				throw new NotSupportedException("Calling from non-main thread currently is not supported");
 			}
 			using (var bitmap = Android.Graphics.BitmapFactory.DecodeStream(alphaStream ?? stream)) {
