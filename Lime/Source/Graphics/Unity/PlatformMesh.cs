@@ -31,6 +31,7 @@ namespace Lime
 			var indices = new int[count];
 			Array.Copy(mesh.Indices, startIndex, indices, 0, count);
 			unityMesh.triangles = indices;
+			PlatformRenderer.SetViewportAndProject();
 			UnityEngine.Graphics.DrawMeshNow(unityMesh, UnityEngine.Matrix4x4.identity);
 		}
 

@@ -19,23 +19,17 @@ namespace Lime
 		
 		public static int DrawCalls = 0;
 
-//		static UnityEngine.Mesh mesh;
-//		static ITexture[] textures; 
-//		static Blending blending;
-
 		static int currentVertex = 0;
 		static int currentIndex = 0;
 
 		public static Matrix32 Transform1 = Matrix32.Identity;
 		public static Matrix32 Transform2 = Matrix32.Identity;
 
-		static PlatformRenderer()
-		{
-//			batchVertices = new Vertex[MaxVertices];
-//			batchIndices = new int[MaxVertices * 3]; 
-//			blending = Blending.None;
-//			mesh = new UnityEngine.Mesh();
-		}
+		private static UnityEngine.Matrix4x4 projection;
+		private static WindowRect viewport;
+		private static WindowRect scissorRect;
+		private static bool scissorTest;
+		private static bool viewportOrProjectionChanged;
 
 		public static void SetMaterial(ITexture texture1, ITexture texture2, ShaderId shader, Blending blending)
 		{
@@ -43,20 +37,6 @@ namespace Lime
 			m.SetPass(0);
 		}
 
-//		public static void FlushSpriteBatch()
-//		{
-//			if (currentIndex > 0) {
-//				var mat = MaterialFactory.CreateMaterial(blending, textures);
-//				if (!mat.SetPass(0)) {
-//					throw new Lime.Exception("Material.SetPass(0) failed");
-//				}
-//				UpdateMesh();
-//				UnityEngine.Graphics.DrawMeshNow(mesh, UnityEngine.Matrix4x4.identity); 
-//				currentIndex = currentVertex = 0;
-//				DrawCalls++;
-//			}
-//		}
-//
 		public static void BeginFrame()
 		{
 			DrawCalls = 0;
@@ -68,42 +48,58 @@ namespace Lime
 			UnityEngine.GL.Clear(false, true, new UnityEngine.Color(r, g, b, a));
 		}
 
-//		public static void SetTexture(ITexture texture, int stage)
-//		{
-//			if (textures[stage] != texture) {
-//				FlushSpriteBatch();
-//				textures[stage] = texture;
-//			}
-//		}
-
-		public static void SetOrthogonalProjection(Vector2 leftTop, Vector2 rightBottom)
-		{
-			SetOrthogonalProjection(leftTop.X, leftTop.Y, rightBottom.X, rightBottom.Y);
-		}
-
-		public static void SetOrthogonalProjection(float left, float top, float right, float bottom)
-		{
-			var mat = UnityEngine.Matrix4x4.Ortho(left, right, bottom, top, -50, 50);
-			UnityEngine.GL.LoadProjectionMatrix(mat);
-		}
-
 		public static void SetViewport(WindowRect value)
 		{
-			UnityEngine.GL.Viewport(new UnityEngine.Rect(value.X, value.Y, value.Width, value.Height)); 
+			viewport = value;
+			viewportOrProjectionChanged = true;
 		}
 
 		public static void SetProjectionMatrix(Matrix44 matrix)
 		{
-			var m = (UnityEngine.Matrix4x4)matrix;
-			UnityEngine.GL.LoadProjectionMatrix(m);
+			projection = (UnityEngine.Matrix4x4)matrix;
+			viewportOrProjectionChanged = true;
 		}
 
 		public static void SetScissorRectangle(WindowRect value)
 		{
+			scissorRect = value;
+			viewportOrProjectionChanged = true;
 		}
-		
+
 		public static void EnableScissorTest(bool value)
 		{
+			scissorTest = value;
+			viewportOrProjectionChanged = true;
+		}
+
+		public static void SetViewportAndProject()
+		{
+			if (!viewportOrProjectionChanged) {
+				return;
+			}
+			viewportOrProjectionChanged = false;
+			if (scissorTest) {
+				// TODO: handle non-fullscreen viewport
+				UnityEngine.GL.Viewport(new UnityEngine.Rect(scissorRect.X, scissorRect.Y, scissorRect.Width, scissorRect.Height));
+				var w = (float)viewport.Width;
+				var h = (float)viewport.Height;
+				var r = new Rectangle {
+					Left = scissorRect.X / w,
+					Top = scissorRect.Y / h,
+					Right = (scissorRect.X + scissorRect.Width) / w,
+					Bottom = (scissorRect.Y + scissorRect.Height) / h,
+				};
+				var m1 = UnityEngine.Matrix4x4.TRS(new UnityEngine.Vector3(r.Left, r.Top, 0), 
+					UnityEngine.Quaternion.identity, new UnityEngine.Vector3(r.Width, r.Height, 1));
+				var m2 = UnityEngine.Matrix4x4.TRS(new UnityEngine.Vector3((1 / r.Width - 1), (1 / r.Height - 1), 0), 
+					UnityEngine.Quaternion.identity, new UnityEngine.Vector3(1 / r.Width, 1 / r.Height, 1));
+				var m3 = UnityEngine.Matrix4x4.TRS(new UnityEngine.Vector3(-r.Left * 2 / r.Width, -r.Top * 2 / r.Height, 0), 
+					UnityEngine.Quaternion.identity, UnityEngine.Vector3.one);
+				UnityEngine.GL.LoadProjectionMatrix(m3 * m2 * projection);
+			} else {
+				UnityEngine.GL.Viewport(new UnityEngine.Rect(viewport.X, viewport.Y, viewport.Width, viewport.Height));
+				UnityEngine.GL.LoadProjectionMatrix(projection);
+			}
 		}
 	}
 }
