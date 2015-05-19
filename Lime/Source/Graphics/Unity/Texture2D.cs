@@ -44,7 +44,7 @@ namespace Lime
 		public Texture2D()
 		{
 			unityTexture = new UnityEngine.Texture2D(4, 4);
-			RefreshTextureParameters();
+			SetTextureDefaultParameters();
 		}
 
 		public bool IsStubTexture { get { return false; } }
@@ -53,10 +53,10 @@ namespace Lime
 		{
 			Dispose();
 			unityTexture = UnityAssetsBundle.Instance.LoadUnityAsset<UnityEngine.Texture2D>(path);
-			RefreshTextureParameters();
+			SetTextureDefaultParameters();
 		}
 
-		void RefreshTextureParameters()
+		void SetTextureDefaultParameters()
 		{
 			unityTexture.wrapMode = UnityEngine.TextureWrapMode.Clamp;
 			unityTexture.filterMode = UnityEngine.FilterMode.Bilinear;
@@ -122,7 +122,7 @@ namespace Lime
 		{
 			Dispose();
 			unityTexture = new UnityEngine.Texture2D(width, height);
-			RefreshTextureParameters();
+			SetTextureDefaultParameters();
 			var c = new UnityEngine.Color32[pixels.Length];
 			for (int i = 0; i < pixels.Length; i++) {
 				c[i].a = pixels[i].A;
