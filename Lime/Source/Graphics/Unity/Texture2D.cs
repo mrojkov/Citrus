@@ -44,6 +44,7 @@ namespace Lime
 		public Texture2D()
 		{
 			unityTexture = new UnityEngine.Texture2D(4, 4);
+			RefreshTextureParameters();
 		}
 
 		public bool IsStubTexture { get { return false; } }
@@ -52,6 +53,13 @@ namespace Lime
 		{
 			Dispose();
 			unityTexture = UnityAssetsBundle.Instance.LoadUnityAsset<UnityEngine.Texture2D>(path);
+			RefreshTextureParameters();
+		}
+
+		void RefreshTextureParameters()
+		{
+			unityTexture.wrapMode = UnityEngine.TextureWrapMode.Clamp;
+			unityTexture.filterMode = UnityEngine.FilterMode.Bilinear;
 		}
 
 		public void LoadImage(byte[] data)
@@ -71,12 +79,50 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// Load subtexture from pixel array
+		/// Warning: this method doesn't support automatic texture reload after restoring graphics context
+		/// </summary>
+		public void LoadSubImage(Color4[] pixels, int x, int y, int width, int height)
+		{
+			// This mindblowing code:
+			// 1) Rearranges pixels in bottom to top layout;
+			// 2) Clips pixels outside the texture rectangle.
+			y = unityTexture.height - y - height;
+			var x0 = Math.Max(0, x);
+			var y0 = Math.Max(0, y);
+			var x1 = Math.Min(unityTexture.width, x + width);
+			var y1 = Math.Min(unityTexture.height, y + height);
+			if (x1 <= x0 || y1 <= y0) {
+				return;
+			}
+			var stride = width;
+			width = x1 - x0;
+			height = y1 - y0;
+			var c = new UnityEngine.Color32[width * height];
+			int k = 0;
+			for (var i = y1 - 1; i >= y0; i--) {
+				var p = (i - y) * stride + (x0 - x);
+				for (var j = x0; j < x1; j++) {
+					c[k].a = pixels[p].A;
+					c[k].r = pixels[p].R;
+					c[k].g = pixels[p].G;
+					c[k].b = pixels[p].B;
+					k++;
+					p++;
+				}
+			}
+			unityTexture.SetPixels32(x0, y0, width, height, c);
+			unityTexture.Apply();
+		}
+
+		/// <summary>
 		/// Create texture from pixel array
 		/// </summary>
 		public void LoadImage(Color4[] pixels, int width, int height, bool generateMips)
 		{
 			Dispose();
 			unityTexture = new UnityEngine.Texture2D(width, height);
+			RefreshTextureParameters();
 			var c = new UnityEngine.Color32[pixels.Length];
 			for (int i = 0; i < pixels.Length; i++) {
 				c[i].a = pixels[i].A;
