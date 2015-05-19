@@ -83,8 +83,7 @@ namespace Lime
 					uv3[i].x = v.X; 
 					uv3[i++].y = 1 - v.Y;
 				} 
-				// Only UNITY 5 supports it
-				// unityMesh.uv3 = uv3;
+				unityMesh.uv3 = uv3;
 			}
 			if (mesh.UV4 != null && (dm & Mesh.Attributes.UV4) != 0) {
 				Array.Resize(ref uv4, mesh.UV4.Length);
@@ -93,8 +92,7 @@ namespace Lime
 					uv4[i].x = v.X; 
 					uv4[i++].y = 1 - v.Y;
 				}  
-				// Only UNITY 5 supports it
-				// unityMesh.uv4 = uv4;
+				unityMesh.uv4 = uv4;
 			}
 			mesh.DirtyAttributes = Mesh.Attributes.None;
 		}
