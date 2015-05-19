@@ -97,7 +97,7 @@ namespace Lime
 
 		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv) { }
 
-		public bool IsStubTexture { get { return false; } }
+		public virtual bool IsStubTexture { get { return false; } }
 
 		public Texture2D()
 		{

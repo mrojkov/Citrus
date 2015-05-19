@@ -11,6 +11,23 @@ namespace Lime
 {
 	public sealed class TexturePool
 	{
+		private class StubTexture : Texture2D
+		{
+			public override bool IsStubTexture
+			{
+				get { return true; }
+			}
+
+			public StubTexture()
+			{
+				var pixels = new Color4[128 * 128];
+				for (int i = 0; i < 128; i++)
+					for (int j = 0; j < 128; j++)
+						pixels[i * 128 + j] = (((i + (j & ~7)) & 8) == 0) ? Color4.Blue : Color4.White;
+				LoadImage(pixels, 128, 128, false);
+			}
+		}
+
 #if UNITY
 		private readonly Dictionary<string, WeakReference> textures = new Dictionary<string, WeakReference>();
 #else
@@ -77,7 +94,7 @@ namespace Lime
 		private static ITexture CreateTexture(string path)
 		{
 			if (string.IsNullOrEmpty(path)) {
-				return CreateStubTexture();
+				return new StubTexture();
 			}
 			var texture = TryCreateRenderTarget(path) ??
 				TryLoadTextureAtlasPart(path + ".atlasPart") ??
@@ -93,19 +110,8 @@ namespace Lime
 #endif
 			if (texture == null) {
 				Console.WriteLine("Missing texture '{0}'", path);
-				texture = CreateStubTexture();
+				texture = new StubTexture();
 			}
-			return texture;
-		}
-
-		private static Texture2D CreateStubTexture()
-		{
-			var texture = new Texture2D();
-			var pixels = new Color4[128 * 128];
-			for (int i = 0; i < 128; i++)
-				for (int j = 0; j < 128; j++)
-					pixels[i * 128 + j] = (((i + (j & ~7)) & 8) == 0) ? Color4.Blue : Color4.White;
-			texture.LoadImage(pixels, 128, 128, false);
 			return texture;
 		}
 
