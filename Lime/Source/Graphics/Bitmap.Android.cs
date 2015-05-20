@@ -54,16 +54,7 @@ namespace Lime
 
 		public void Dispose()
 		{
-			if (bitmap != null) {
-				bitmap.Dispose();
-				bitmap = null;
-			}
-			GC.SuppressFinalize(this);
-		}
-
-		~BitmapImplementation()
-		{
-			Dispose();
+			// For some reason bitmap.Dispose() causes NRE on Android L.
 		}
 
 		public bool IsValid()
