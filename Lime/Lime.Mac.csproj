@@ -6,14 +6,12 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{DC16EEBF-404D-4610-B87A-15B57464D707}</ProjectGuid>
-    <ProjectTypeGuids>{A3F8F2AB-B479-4A4A-A458-A89E7DC349F1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectTypeGuids>{42C0BBD9-55CE-4FC1-8D90-A7348ABAFB23};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <RootNamespace>Lime</RootNamespace>
     <AssemblyName>Lime</AssemblyName>
     <BaseDirectory>Source</BaseDirectory>
     <newfilesearch>OnLoad</newfilesearch>
-    <TargetFrameworkIdentifier>Xamarin.Mac</TargetFrameworkIdentifier>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
@@ -51,23 +49,30 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="Xamarin.Mac" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml" />
-    <Reference Include="OpenTK" />
     <Reference Include="protobuf-net">
       <HintPath>..\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="XamMac, Version=0.0.0.0, Culture=neutral, PublicKeyToken=84e04ff9cfb79065" />
+    <Reference Include="OpenTK">
+      <HintPath>..\..\..\..\Desktop\Projects\PokerClient\Citrus\3rdParty\OpenTK\OpenTK.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Types\Matrix44.cs" />
     <Compile Include="Source\Graphics\OpacityMask.cs" />
     <Compile Include="Source\Widgets\LinearLayout.cs" />
+    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Factory.iPhone.cs" />
+    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\GraphicsContext.cs" />
+    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Utilities.iPhone.cs" />
+    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGameView.cs" />
+    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGraphicsContext.cs" />
     <Compile Include="Source\Graphics\OpenGL\Shader.cs" />
     <Compile Include="Source\Graphics\OpenGL\ShaderProgram.cs" />
     <Compile Include="Source\Graphics\OpenGL\Shaders.cs" />
     <Compile Include="Source\Graphics\OpenGL\XamarinAdapter.cs" />
     <Compile Include="Source\Application\RenderingApi.cs" />
+    <Compile Include="Source\Application\Sdl2.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationUtils.cs" />
     <Compile Include="Source\Widgets\Animation\Animator.cs" />
     <Compile Include="Source\Widgets\Animation\AnimatorCollection.cs" />
@@ -109,6 +114,8 @@
     <Compile Include="Source\Graphics\TextureAtlasElement.cs" />
     <Compile Include="Source\Graphics\OpenGL\IGLObject.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
+    <Compile Include="Source\Application\AndroidActivityDelegate.cs" />
+    <Compile Include="Source\Application\AndroidGameView.cs" />
     <Compile Include="Source\Graphics\Bitmap.Android.cs" />
     <Compile Include="Source\Widgets\Editor.cs" />
     <Compile Include="Source\Widgets\WebBrowser.Android.cs" />
@@ -127,6 +134,62 @@
     <Compile Include="Source\Widgets\PopupMenu\RoundedRectangle.cs" />
     <Compile Include="Source\Widgets\PopupMenu\Separator.cs" />
     <Compile Include="Source\Widgets\PopupMenu\StringItem.cs" />
+    <Compile Include="Source\Widgets2\Audio.cs" />
+    <Compile Include="Source\Widgets2\Bone.cs" />
+    <Compile Include="Source\Widgets2\BoneArray.cs" />
+    <Compile Include="Source\Widgets2\Button.cs" />
+    <Compile Include="Source\Widgets2\Component.cs" />
+    <Compile Include="Source\Widgets2\ComponentList.cs" />
+    <Compile Include="Source\Widgets2\DistortionMesh.cs" />
+    <Compile Include="Source\Widgets2\DistortionMeshPoint.cs" />
+    <Compile Include="Source\Widgets2\Editor.cs" />
+    <Compile Include="Source\Widgets2\Frame.cs" />
+    <Compile Include="Source\Widgets2\IText.cs" />
+    <Compile Include="Source\Widgets2\Image.cs" />
+    <Compile Include="Source\Widgets2\ImageCombiner.cs" />
+    <Compile Include="Source\Widgets2\LinearLayout.cs" />
+    <Compile Include="Source\Widgets2\Marker.cs" />
+    <Compile Include="Source\Widgets2\MarkerCollection.cs" />
+    <Compile Include="Source\Widgets2\Movie.cs" />
+    <Compile Include="Source\Widgets2\NineGrid.cs" />
+    <Compile Include="Source\Widgets2\Node.cs" />
+    <Compile Include="Source\Widgets2\NodeDebugView.cs" />
+    <Compile Include="Source\Widgets2\NodeList.cs" />
+    <Compile Include="Source\Widgets2\ParticleEmitter.cs" />
+    <Compile Include="Source\Widgets2\ParticleModifier.cs" />
+    <Compile Include="Source\Widgets2\ParticlesMagnet.cs" />
+    <Compile Include="Source\Widgets2\PointObject.cs" />
+    <Compile Include="Source\Widgets2\Polyline.cs" />
+    <Compile Include="Source\Widgets2\RenderChain.cs" />
+    <Compile Include="Source\Widgets2\RichText.cs" />
+    <Compile Include="Source\Widgets2\SimpleText.cs" />
+    <Compile Include="Source\Widgets2\Slider.cs" />
+    <Compile Include="Source\Widgets2\Spline.cs" />
+    <Compile Include="Source\Widgets2\SplineGear.cs" />
+    <Compile Include="Source\Widgets2\SplinePoint.cs" />
+    <Compile Include="Source\Widgets2\Task.cs" />
+    <Compile Include="Source\Widgets2\TaskList.cs" />
+    <Compile Include="Source\Widgets2\TextBox.cs" />
+    <Compile Include="Source\Widgets2\TextStyle.cs" />
+    <Compile Include="Source\Widgets2\WebBrowser.Android.cs" />
+    <Compile Include="Source\Widgets2\WebBrowser.Mac.cs" />
+    <Compile Include="Source\Widgets2\WebBrowser.Win.cs" />
+    <Compile Include="Source\Widgets2\WebBrowser.iOS.cs" />
+    <Compile Include="Source\Widgets2\Widget.Toolbox.cs" />
+    <Compile Include="Source\Widgets2\Widget.cs" />
+    <Compile Include="Source\Widgets2\WidgetCachedRenderer.cs" />
+    <Compile Include="Source\Widgets2\WidgetDebugView.cs" />
+    <Compile Include="Source\Widgets2\WidgetInput.cs" />
+    <Compile Include="Source\Widgets2\World.cs" />
+    <Compile Include="Source\Widgets2\Animation\Animation.cs" />
+    <Compile Include="Source\Widgets2\Animation\AnimationUtils.cs" />
+    <Compile Include="Source\Widgets2\Animation\Animator.cs" />
+    <Compile Include="Source\Widgets2\Animation\AnimatorCollection.cs" />
+    <Compile Include="Source\Widgets2\Animation\AnimatorRegistry.cs" />
+    <Compile Include="Source\Widgets2\Animation\Keyframe.cs" />
+    <Compile Include="Source\Widgets2\Animation\KeyframeCollection.cs" />
+    <Compile Include="Source\Widgets2\Text\TextParser.cs" />
+    <Compile Include="Source\Widgets2\Text\TextRenderer.cs" />
     <Compile Include="Source\Graphics\OgvDecoder.cs" />
     <Compile Include="Source\Graphics\Bitmap.Mac.cs" />
     <Compile Include="Source\Graphics\RenderList.cs" />
@@ -135,46 +198,22 @@
     <Compile Include="Source\Audio\OpenAL\AudioChannel.cs" />
     <Compile Include="Source\Audio\OpenAL\AudioDecoder.cs" />
     <Compile Include="Source\Audio\OpenAL\OggDecoder.cs" />
+    <Compile Include="Source\Audio\OpenAL\PlatformAudioSystem.cs" />
     <Compile Include="Source\Audio\OpenAL\WaveIMA4Decoder.cs" />
     <Compile Include="Source\Audio\IAudioChannel.cs" />
     <Compile Include="Source\Graphics\Mesh.cs" />
     <Compile Include="Source\Graphics\OpenGL\PlatformMesh.cs" />
     <Compile Include="Source\Types\BitSet32.cs" />
     <Compile Include="Source\Input\SoftKeyboard.cs" />
-    <Compile Include="Source\Application\Application.cs" />
-    <Compile Include="Source\Application\Platform.iOS\GraphicsContext.cs" />
-    <Compile Include="Source\Application\MouseCursor.cs" />
-    <Compile Include="Source\Audio\OpenAL\AudioSystem.cs" />
-    <Compile Include="Source\Audio\OpenAL\AudioSystem.iOS.cs" />
-    <Compile Include="Source\Audio\OpenAL\AudioSystem.Mac.cs" />
-    <Compile Include="Source\Application\IGameWindow.cs" />
-    <Compile Include="Source\Application\Platform.Win\Sdl2.cs" />
-    <Compile Include="Source\Application\Platform.Win\WinApi.cs" />
-    <Compile Include="Source\Application\Platform.Android\ActivityDelegate.cs" />
-    <Compile Include="Source\Application\Platform.Android\GameView.cs" />
-    <Compile Include="Source\Application\Platform.iOS\AppDelegate.cs" />
-    <Compile Include="Source\Application\Platform.iOS\Application.cs" />
-    <Compile Include="Source\Application\Platform.iOS\Factory.cs" />
-    <Compile Include="Source\Application\Platform.iOS\GameController.cs" />
-    <Compile Include="Source\Application\Platform.iOS\GameView.cs" />
-    <Compile Include="Source\Application\Platform.iOS\NativeGameView.cs" />
-    <Compile Include="Source\Application\Platform.iOS\NativeGraphicsContext.cs" />
-    <Compile Include="Source\Application\Platform.iOS\Utilities.cs" />
-    <Compile Include="Source\Application\Platform.Android\Application.cs" />
-    <Compile Include="Source\Application\Platform.Win\GameView.cs" />
-    <Compile Include="Source\Application\Shared\Exceptions.cs" />
-    <Compile Include="Source\Application\Shared\EventsArgs.cs" />
-    <Compile Include="Source\Application\Platform.Mac\Application.cs" />
-    <Compile Include="Source\Application\Platform.Mac\GameView.cs" />
-    <Compile Include="Source\Application\Shared\INativeWindow.cs" />
-    <Compile Include="Source\Application\Platform.Mac\MacKeyCode.cs" />
-    <Compile Include="Source\Application\Platform.Mac\MacKeyCodeMap.cs" />
-    <Compile Include="Source\Application\Platform.Mac\NativeGameView.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
     <Compile Include="Source\Serialization.cs" />
+    <Compile Include="Source\Application\OpenTKGameView.cs" />
+    <Compile Include="Source\Application\iOSAppDelegate.cs" />
+    <Compile Include="Source\Application\iOSGameController.cs" />
+    <Compile Include="Source\Application\iOSGameView.cs" />
     <Compile Include="Source\Graphics\Font.cs" />
     <Compile Include="Source\Types\Color4.cs" />
     <Compile Include="Source\Types\IntRectangle.cs" />
@@ -217,6 +256,7 @@
     <Compile Include="Source\Types\Vector3.cs" />
     <Compile Include="Source\Environment.cs" />
     <Compile Include="Source\Widgets\TextBox.cs" />
+    <Compile Include="Source\Application\Application.cs" />
     <Compile Include="Source\Mathf.cs" />
     <Compile Include="Source\Widgets\Widget.Toolbox.cs" />
     <Compile Include="Source\Geometry.cs" />
@@ -226,6 +266,7 @@
     <Compile Include="Source\Application\Logger.cs" />
     <Compile Include="Source\Types\TangerineClassAttribute.cs" />
     <Compile Include="Source\Types\TangerinePropertyAttribute.cs" />
+    <Compile Include="Source\Application\WinApi.cs" />
     <Compile Include="Source\AssetsBundle\AssetsBundle.cs" />
     <Compile Include="Source\AssetsBundle\PackedAssetsBundle.cs" />
     <Compile Include="Source\AssetsBundle\UnpackedAssetsBundle.cs" />
@@ -253,8 +294,8 @@
     <MonoDevelop>
       <Properties>
         <Policies>
-          <TextStylePolicy inheritsSet="null" scope="text/x-csharp" />
-          <CSharpFormattingPolicy IndentSwitchBody="True" IndentCaseBody="False" IndentBreakStatements="False" IndentPreprocessorDirectives="False" PropertyBraceStyle="NextLine" PropertyGetBraceStyle="NextLine" PropertySetBraceStyle="NextLine" EventBraceStyle="NextLine" BeforeMethodDeclarationParentheses="False" BeforeMethodCallParentheses="False" BeforeConstructorDeclarationParentheses="False" NewLineBeforeConstructorInitializerColon="NewLine" NewLineAfterConstructorInitializerColon="SameLine" BeforeDelegateDeclarationParentheses="False" NewParentheses="False" SpacesBeforeBrackets="False" inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
+          <TextStylePolicy TabsToSpaces="False" inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp" />
+          <CSharpFormattingPolicy IndentSwitchBody="True" AnonymousMethodBraceStyle="NextLine" PropertyBraceStyle="NextLine" PropertyGetBraceStyle="NextLine" PropertySetBraceStyle="NextLine" EventBraceStyle="NextLine" EventAddBraceStyle="NextLine" EventRemoveBraceStyle="NextLine" StatementBraceStyle="NextLine" ElseNewLinePlacement="NewLine" CatchNewLinePlacement="NewLine" FinallyNewLinePlacement="NewLine" WhileNewLinePlacement="DoNotCare" ArrayInitializerWrapping="DoNotChange" ArrayInitializerBraceStyle="NextLine" BeforeMethodDeclarationParentheses="False" BeforeMethodCallParentheses="False" BeforeConstructorDeclarationParentheses="False" BeforeDelegateDeclarationParentheses="False" NewParentheses="False" SpacesBeforeBrackets="False" inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
         </Policies>
       </Properties>
     </MonoDevelop>
@@ -262,12 +303,6 @@
   <ItemGroup>
     <Folder Include="Source\Graphics\" />
     <Folder Include="Source\Audio\OpenAL\" />
-    <Folder Include="Source\Application\" />
-    <Folder Include="Source\Application\Platform.Mac\" />
-    <Folder Include="Source\Application\Platform.Win\" />
-    <Folder Include="Source\Application\Platform.Android\" />
-    <Folder Include="Source\Application\Platform.iOS\" />
-    <Folder Include="Source\Application\Shared\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Mac.csproj">
