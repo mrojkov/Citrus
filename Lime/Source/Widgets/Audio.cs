@@ -22,13 +22,23 @@ namespace Lime
 		[ProtoMember(1)]
 		public SerializableSample Sample { get; set; }
 
+		/// <summary>
+		/// Зацикленное проигрывание
+		/// </summary>
 		[ProtoMember(2)]
 		public bool Looping { get; set; }
 
+		/// <summary>
+		/// Время затухания в секундах
+		/// </summary>
 		[ProtoMember(3)]
 		public float FadeTime { get; set; }
 
 		private float volume = 0.5f;
+		
+		/// <summary>
+		/// Громкость (0 - 1)
+		/// </summary>
 		[ProtoMember(4)]
 		public float Volume
 		{
@@ -41,6 +51,10 @@ namespace Lime
 		}
 
 		private float pan = 0;
+
+		/// <summary>
+		/// Сдвиг влево/вправо (0 - влево, 1 - вправо, 0.5 - посередине)
+		/// </summary>
 		[ProtoMember(5)]
 		public float Pan
 		{
@@ -53,6 +67,10 @@ namespace Lime
 		}
 
 		private float pitch = 1;
+
+		/// <summary>
+		/// Высота звука
+		/// </summary>
 		[ProtoMember(9)]
 		public float Pitch
 		{
@@ -67,6 +85,9 @@ namespace Lime
 		[Trigger]
 		public AudioAction Action { get; set; }
 
+		/// <summary>
+		/// Группа звуков. Например голос, фоновый звук, эффект. Группа позволяет задавать общие параметры для всех членов группы
+		/// </summary>
 		[ProtoMember(7)]
 		public AudioChannelGroup Group { get; set; }
 

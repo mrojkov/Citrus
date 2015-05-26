@@ -7,6 +7,9 @@ using System.Diagnostics;
 
 namespace Lime
 {
+	/// <summary>
+	/// Якоря. Задают привязку границ виджета к границам его родителя
+	/// </summary>
 	[Flags]
 	public enum Anchors
 	{
@@ -23,18 +26,33 @@ namespace Lime
 		Center = CenterH | CenterV,
 	}
 
+	/// <summary>
+	/// Способы проверки столкновений
+	/// </summary>
 	public enum HitTestMethod
 	{
+		/// <summary>
+		/// Ограничивающий прямоугольник. Проверка без рекурсии. Грубо, но быстро
+		/// </summary>
 		BoundingRect,
+
+		/// <summary>
+		/// Содержимое. Проверка с рекурсией. Проверка всех вложенных контейнеров.
+		/// Картинки проверяются по маске. Точно, но медленно
+		/// </summary>
 		Contents,
+
+		/// <summary>
+		/// Пропуск проверки столкновений
+		/// </summary>
 		Skip
 	}
 
 	/// <summary>
-	/// The Widget class is the base class of all 2D drawable and user interface objects.
-	/// The widget is the atom of the user interface: it receives mouse, keyboard and other
-	/// events from the input system, and paints a representation of itself on the screen.
-	/// Every widget is rectangular, and they are sorted in a Z-order. 
+	/// Виджет. Базовый класс всех визуальных 2D объектов и интерфейса пользователя.
+	/// Атомарный объект пользовательского интерфейса. Подписан на события мыши, клавиатуры
+	/// и других устройств ввода. Представляет собой прямоугольный контейнер, содержащий
+	/// любые объекты сцены, в том числе и визуальные
 	/// </summary>
 	[ProtoContract]
 	[ProtoInclude(100, typeof(Frame))]
@@ -56,7 +74,15 @@ namespace Lime
 	{
 		public const int EmptyHitTestMask = 0;
 		public const int ControlsHitTestMask = 1;
+
+		/// <summary>
+		/// Минимально возможный номер слоя (свойство Layer)
+		/// </summary>
 		public const int MinLayer = 0;
+
+		/// <summary>
+		/// Максимально возможный номер слоя (свойство Layer)
+		/// </summary>
 		public const int MaxLayer = 99;
 
 		private Vector2 position;
@@ -73,14 +99,23 @@ namespace Lime
 
 		#region Properties
 
+		/// <summary>
+		/// Виджет-родитель (виджет, в котором находится этот виджет). Тоже самое, что и свойство Parent as Widget;
+		/// </summary>
 		public Widget ParentWidget { get { return Parent != null ? Parent.AsWidget : null; } }
 
+		/// <summary>
+		/// Используется только для виджетов, умеющих отображать текст. Если виджет не умеет отображать текст, возвращает null
+		/// </summary>
 		public virtual string Text 
 		{ 
 			get { return null; }
 			set { }
 		}
 
+		/// <summary>
+		/// Используется только для виджетов, умеющих отображать текстуры. Если виджет не умеет отображать текстуры, возвращает null
+		/// </summary>
 		public virtual ITexture Texture
 		{
 			get { return null; }
@@ -140,11 +175,17 @@ namespace Lime
 			return false; 
 		}
 
+		/// <summary>
+		/// Действие, генерируемое, когда на виджет кликнули или нажали пальцем (для сенсорного экрана)
+		/// </summary>
 		public virtual Action Clicked {
 			get { return clicked; }
 			set { clicked = value; }
 		}
 
+		/// <summary>
+		/// Возвращает true, если на виджет кликнули или нажали пальцем (для сенсорного экрана)
+		/// </summary>
 		public virtual bool WasClicked()
 		{
 			return Input.WasMouseReleased() && HitTest(Input.MousePosition);
@@ -156,6 +197,9 @@ namespace Lime
 				throw new ArithmeticException();
 		}
 
+		/// <summary>
+		/// Позиция виджета в контейнере его родителя
+		/// </summary>
 		[ProtoMember(1)]
 		[TangerineProperty(4)]
 		public Vector2 Position
@@ -174,6 +218,9 @@ namespace Lime
 			}
 		}
 	
+		/// <summary>
+		/// Позиция X виджета в контейнере его родителя (аналогично Position.X)
+		/// </summary>
 		public float X 
 		{ 
 			get { return position.X; } 
@@ -189,6 +236,9 @@ namespace Lime
 			} 
 		}
 
+		/// <summary>
+		/// Позиция Y виджета в контейнере его родителя (аналогично Position.Y)
+		/// </summary>
 		public float Y
 		{
 			get { return position.Y; }
@@ -204,6 +254,10 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Определяет размеры его контейнера, по которому проверяются столкновения. Не влияет на визуальный размер
+		/// Для изменения визуального размера используйте Scale
+		/// </summary>
 		[ProtoMember(2)]
 		[TangerineProperty(7)]
 		public Vector2 Size
@@ -225,6 +279,10 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Останавливает все таски этого виджета (Tasks). Вызывает Dispose для всех виджетов,
+		/// вложенных в этот виджет
+		/// </summary>
 		public override void Dispose()
 		{
 			if (tasks != null) {
@@ -241,6 +299,9 @@ namespace Lime
 
 		protected virtual void OnSizeChanged(Vector2 sizeDelta) { }
 
+		/// <summary>
+		/// Ширина (см свойство Size)
+		/// </summary>
 		public float Width { 
 			get { return size.X; }
 			set {
@@ -249,6 +310,9 @@ namespace Lime
 			} 
 		}
 
+		/// <summary>
+		/// Высота (см свойство Size)
+		/// </summary>
 		public float Height {
 			get { return size.Y; } 
 			set {
@@ -257,6 +321,10 @@ namespace Lime
 			} 
 		}
 
+		/// <summary>
+		/// Точка опоры. Определяет точку поворота и масштабирования.
+		/// [0, 0] - верхний левый угол виджета, [1, 1] - правый нижний
+		/// </summary>
 		[ProtoMember(3)]
 		[TangerineProperty(6)]
 		public Vector2 Pivot 
@@ -275,6 +343,9 @@ namespace Lime
 			} 
 		}
 
+		/// <summary>
+		/// Масштаб (от 0 до 1)
+		/// </summary>
 		[ProtoMember(4)]
 		[TangerineProperty(5)]
 		public Vector2 Scale 
@@ -293,6 +364,9 @@ namespace Lime
 			} 
 		}
 
+		/// <summary>
+		/// Угол поворота в градусах против часовой стрелки
+		/// </summary>
 		[ProtoMember(5)]
 		[TangerineProperty(3)]
 		public float Rotation { 
@@ -310,6 +384,9 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Оттенок. При отрисовке цвет текстуры умножается на этот цвет.
+		/// </summary>
 		[ProtoMember(6)]
 		[TangerineProperty(8)]
 		public Color4 Color 
@@ -323,6 +400,9 @@ namespace Lime
 			} 
 		}
 
+		/// <summary>
+		/// Непрозрачность (0 - 1)
+		/// </summary>
 		public float Opacity
 		{
 			get { return (float)color.A * (1 / 255f); }
@@ -336,9 +416,15 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Якоря. Задают привязку границ виджета к границам его родителя
+		/// </summary>
 		[ProtoMember(7)]
 		public Anchors Anchors { get; set; }
 
+		/// <summary>
+		/// Задает способ смешивания при отрисовке
+		/// </summary>
 		[ProtoMember(8)]
 		[TangerineProperty(9)]
 		public Blending Blending 
@@ -353,6 +439,9 @@ namespace Lime
 			} 
 		}
 
+		/// <summary>
+		/// Идентификатор шейдера, который будет использоваться при отрисовке виджета
+		/// </summary>
 		[ProtoMember(9)]
 		[TangerineProperty(10)]
 		public ShaderId Shader
@@ -384,6 +473,9 @@ namespace Lime
 		[ProtoMember(11)]
 		public SkinningWeights SkinningWeights { get; set; }
 
+		/// <summary>
+		/// Способ проверки столкновений
+		/// </summary>
 		[ProtoMember(12)]
 		public HitTestMethod HitTestMethod { get; set; }
 		
@@ -439,6 +531,10 @@ namespace Lime
 		public Vector2 Center { get { return Position + (Vector2.Half - Pivot) * Size; } }
 
 		private TaskList tasks;
+		
+		/// <summary>
+		/// Задачи (таски) этого виджета
+		/// </summary>
 		public TaskList Tasks
 		{
 			get
@@ -464,10 +560,18 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Генерируется в начале процедуры обновления виджета (вызова метода Update)
+		/// </summary>
 		public event UpdateHandler Updating;
+
+		/// <summary>
+		/// Генерируется в конце процедуры обновления виджета (вызова метода Update)
+		/// </summary>
 		public event UpdateHandler Updated;
 
 		#endregion
+
 		#region Methods
 
 		public Widget()
@@ -493,21 +597,37 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Возвращает размер содержимого, находящегося в контейнере этого виджета
+		/// </summary>
 		public virtual Vector2 CalcContentSize()
 		{
 			return Size;
 		}
 
+		/// <summary>
+		/// Ищет виджет, находящийся в контейнере этого виджета (рекурсивно).
+		/// Если виджета с таким Id нет, генерирует исключение
+		/// </summary>
+		/// <param name="id">Id искомого виджета</param>
 		public Widget this[string id]
 		{
 			get { return Find<Widget>(id); }
 		}
 
+		/// <summary>
+		/// Ищет виджет, находящийся в контейнере этого виджета (рекурсивно).
+		/// Если виджета с таким Id нет, генерирует исключение
+		/// </summary>
+		/// <param name="id">Id искомого виджета</param>
 		public Widget this[string format, params object[] arg]
 		{
 			get { return Find<Widget>(string.Format(format, arg)); }
 		}
 
+		/// <summary>
+		/// Возвращает клон этого виджета. Используйте DeepCloneFast() as Widget, т.к. он возвращает Node (базовый объект виджета)
+		/// </summary>
 		public override Node DeepCloneFast()
 		{
 			var clone = base.DeepCloneFast().AsWidget;
@@ -521,6 +641,11 @@ namespace Lime
 			return clone;
 		}
 
+		/// <summary>
+		/// Обновляет состояние виджета (обновляет его анимации, генерирует события и. т.д.).
+		/// Вызывает Update для всех дочерних виджетов. В нормальных условиях этот метод должен вызываться 1 раз за кадр.
+		/// </summary>
+		/// <param name="delta">Количество секунд, прошедшее с момента предыдущего вызова Update</param>
 		public override void Update(float delta)
 		{
 			delta *= AnimationSpeed;
@@ -547,6 +672,10 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Генерирует событие Updating
+		/// </summary>
+		/// <param name="delta">Количество секунд, прошедшее с момента предыдущего вызова Update</param>
 		public void RaiseUpdating(float delta)
 		{
 			if (Updating != null) {
@@ -554,6 +683,10 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Генерирует событие Updated
+		/// </summary>
+		/// <param name="delta">Количество секунд, прошедшее с момента предыдущего вызова Update</param>
 		public void RaiseUpdated(float delta)
 		{
 			if (Updated != null) {
@@ -684,6 +817,9 @@ namespace Lime
 			position += (p1 - p2);
 		}
 
+		/// <summary>
+		/// Добавляет виджет и все его дочерние виджеты в очередь отрисовки
+		/// </summary>
 		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (!GloballyVisible) {
@@ -773,11 +909,17 @@ namespace Lime
 
 		#region HitTest handling
 
+		/// <summary>
+		/// Возвращает true, если курсор мыши попадает в виджет
+		/// </summary>
 		public bool IsMouseOver()
 		{
 			return Input.IsAcceptingMouse() && HitTest(Input.MousePosition);
 		}
 
+		/// <summary>
+		/// Возвращает true, если точка попадает в виджет
+		/// </summary>
 		public bool HitTest(Vector2 point)
 		{
 			return SelfHitTest(point) && !ObscuredByOtherHitTestTargets(point);

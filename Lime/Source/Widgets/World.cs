@@ -1,14 +1,18 @@
 namespace Lime
 {
+	/// <summary>
+	/// Виджет самого верхнего уровня (корень иерархии). Содержит все виджеты сцены
+	/// </summary>
 	public sealed class World : Frame
 	{
 		/// <summary>
-		/// Widget which holds text input focus. Before processing Input.TextInput string you should test whether ActiveTextWidget == this.
-		/// For revoking text input focus from widget you should nullify ActiveTextWidget.
+		/// Виджет, который в данный момент содержит фокус ввода. Прежде чем обращаться к строке Input.TextInput, проверьте ActiveTextWidget == this.
+		/// Для сброса фокуса ввода с виджета, обнулите ActiveTextWidget
 		/// </summary>
 		public IKeyboardInputProcessor ActiveTextWidget;
+
 		/// <summary>
-		/// On each update cycle active text widget must set this flag true.
+		/// В каждом цикле обновления ActiveTextWidget должен устанавливать этот флаг в true
 		/// </summary>
 		public bool IsActiveTextWidgetUpdated;
 

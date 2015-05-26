@@ -4,18 +4,30 @@ using ProtoBuf;
 
 namespace Lime
 {
+	/// <summary>
+	/// Виджет, содержащий в себе изображение
+	/// </summary>
 	[ProtoContract]
 	public class Image : Widget, IImageCombinerArg
 	{
 		bool skipRender;
 		bool requestSkipRender;
 
+		/// <summary>
+		/// Изображение, отображаемое этим виджетом
+		/// </summary>
 		[ProtoMember(1)]
 		public override sealed ITexture Texture { get; set; }
 
+		/// <summary>
+		/// Текстурная координата левого верхнего угла текстуры
+		/// </summary>
 		[ProtoMember(2)]
 		public Vector2 UV0 { get; set; }
 
+		/// <summary>
+		/// Текстурная координата правого нижнего угла текстуры
+		/// </summary>
 		[ProtoMember(3)]
 		public Vector2 UV1 { get; set; }
 
@@ -44,6 +56,9 @@ namespace Lime
 			Size = (Vector2)Texture.ImageSize;
 		}
 
+		/// <summary>
+		/// Возвращает размер текстуры
+		/// </summary>
 		public override Vector2 CalcContentSize()
 		{
 			return (Vector2)Texture.ImageSize;
@@ -57,6 +72,9 @@ namespace Lime
 			Renderer.DrawSprite(Texture, GlobalColor, Vector2.Zero, Size, UV0, UV1);
 		}
 
+		/// <summary>
+		/// Добавляет виджет и все его дочерние виджеты в очередь отрисовки
+		/// </summary>
 		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (GloballyVisible && !skipRender) {
