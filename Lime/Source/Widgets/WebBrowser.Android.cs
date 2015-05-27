@@ -10,6 +10,9 @@ namespace Lime
 {
 	public class WebBrowser : Widget
 	{
+		// buz: Фикс Жени 211726 ломает браузер в GummyDrop на амазоновском девайсе (CDCHINA-74)
+		public bool DisableEugenesFix;
+		
 		private WebView webView;
 		public Uri Url { get { return GetUrl(); } set { SetUrl(value); } }
 
@@ -84,7 +87,11 @@ namespace Lime
 				((RelativeLayout)webView.Parent).RemoveView(webView);
 			}
 			if (webView.Parent == null) {
-				((RelativeLayout)GameView.Instance.Parent).AddView(webView, new ViewGroup.LayoutParams(wr.Width + wr.X, wr.Height + wr.Y));
+				if (DisableEugenesFix) {
+					((RelativeLayout)GameView.Instance.Parent).AddView(webView);
+				} else {
+					((RelativeLayout)GameView.Instance.Parent).AddView(webView, new ViewGroup.LayoutParams (wr.Width + wr.X, wr.Height + wr.Y));
+				}
 			}
 			webView.Layout (wr.X, wr.Y, wr.Width + wr.X, wr.Height + wr.Y);
 		}
