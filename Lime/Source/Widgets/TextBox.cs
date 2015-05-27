@@ -12,6 +12,9 @@ namespace Lime
 		string Text { get; }
 	}
 
+	/// <summary>
+	/// Поле ввода текста
+	/// </summary>
 	[ProtoContract]
 	public class TextBox : Widget, IKeyboardInputProcessor
 	{
@@ -45,9 +48,15 @@ namespace Lime
 		[ProtoMember(7)]
 		public float CaretBlinkPeriod = 0.5f;
 
+		/// <summary>
+		/// Можно вводить только цифры
+		/// </summary>
 		[ProtoMember(8)]
 		public bool Numeric;
 
+		/// <summary>
+		/// Выравнивание текста по горизонтали
+		/// </summary>
 		[ProtoMember(9)]
 		public HAlignment HAlignment;
 
@@ -57,6 +66,9 @@ namespace Lime
 		[ProtoMember(11)]
 		public bool Autofocus { get; set; }
 
+		/// <summary>
+		/// Текст заменяется звездочками
+		/// </summary>
 		[ProtoMember(12)]
 		public bool PasswordField { get; set; }
 

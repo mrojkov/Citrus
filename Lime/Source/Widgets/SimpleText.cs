@@ -4,6 +4,9 @@ using ProtoBuf;
 
 namespace Lime
 {
+	/// <summary>
+	/// Виджет, выводящий текст без форматирования
+	/// </summary>
 	[ProtoContract]
 	public sealed class SimpleText : Widget, IText, IKeyboardInputProcessor
 	{
@@ -25,12 +28,18 @@ namespace Lime
 			set { SetFont(value); }
 		}
 
+		/// <summary>
+		/// Текст, заданный в HotStudio. Этот текст не выводится на экран (см DisplayText)
+		/// </summary>
 		[ProtoMember(2)]
 		public override string Text {
 			get { return text ?? ""; }
 			set { SetText(value); }
 		}
 
+		/// <summary>
+		/// Выводимый фактически текст. Свойство Text, прошедшее локализацию
+		/// </summary>
 		public string DisplayText {
 			get { return displayText; }
 			set { 
@@ -40,36 +49,57 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Размер шрифта
+		/// </summary>
 		[ProtoMember(3)]
 		public float FontHeight {
 			get { return fontHeight; }
 			set { SetFontHeight(value); }
 		}
 
+		/// <summary>
+		/// Расстояние между строками
+		/// </summary>
 		[ProtoMember(4)]
 		public float Spacing {
 			get { return spacing; }
 			set { SetSpacing(value); }
 		}
 
+		/// <summary>
+		/// Горизонтальное выравнивание текста
+		/// </summary>
 		[ProtoMember(5)]
 		public HAlignment HAlignment {
 			get { return hAlignment; }
 			set { SetHAlignment(value); }
 		}
 
+		/// <summary>
+		/// Вертикальное выравнивание текста
+		/// </summary>
 		[ProtoMember(6)]
 		public VAlignment VAlignment {
 			get { return vAlignment; }
 			set { SetVAlignment(value); }
 		}
 
+		/// <summary>
+		/// Способ обрезания текста, выходящего за пределы контейнера виджета
+		/// </summary>
 		[ProtoMember(8)]
 		public TextOverflowMode OverflowMode { get; set; }
 
+		/// <summary>
+		/// Можно переносить слова (если текст не помещается в одну строку)
+		/// </summary>
 		[ProtoMember(9)]
 		public bool WordSplitAllowed { get; set; }
 
+		/// <summary>
+		/// Цвет текста
+		/// </summary>
 		[ProtoMember(10)]
 		public Color4 TextColor
 		{
@@ -77,6 +107,9 @@ namespace Lime
 			set { textColor = value; }
 		}
 
+		/// <summary>
+		/// Удалять лишние пробелы
+		/// </summary>
 		public bool TrimWhitespaces { get; set; }
 
 		private class CaretPosition: ICaretPosition
@@ -174,6 +207,10 @@ namespace Lime
 		}
 
 		private CaretPosition caret = new CaretPosition();
+		
+		/// <summary>
+		/// Если текст находится в состоянии редактирования, возвращает интерфейс каретки
+		/// </summary>
 		public ICaretPosition Caret { get { return caret; } }
 
 		public SimpleText()
@@ -186,6 +223,9 @@ namespace Lime
 			TextColor = Color4.White;
 		}
 
+		/// <summary>
+		/// Возвращает размер текста
+		/// </summary>
 		public override Vector2 CalcContentSize()
 		{
 			return Renderer.MeasureTextLine(Font.Instance, DisplayText ?? Text, FontHeight);
@@ -215,6 +255,9 @@ namespace Lime
 			spriteList.Render(GlobalColor * textColor);
 		}
 
+		/// <summary>
+		/// Измеряет размер текста и возвращает прямоугольник, описывающий размер текста
+		/// </summary>
 		public Rectangle MeasureText()
 		{
 			Rectangle rect;
@@ -228,6 +271,10 @@ namespace Lime
 			base.StaticScale(ratio, roundCoordinates);
 		}
 
+		/// <summary>
+		/// Изменяет параметры текста таким образом, чтобы он помещался в область этого виджета
+		/// </summary>
+		/// <param name="minFontHeight">Минимально возможный размер шрифта</param>
 		public void FitTextInsideWidgetArea(float minFontHeight = 10)
 		{
 			var minH = minFontHeight;

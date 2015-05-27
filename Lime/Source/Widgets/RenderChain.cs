@@ -2,6 +2,9 @@ using System.Collections.Generic;
 
 namespace Lime
 {
+	/// <summary>
+	/// Очередь отрисовки. Представляет собой коллекцию, которая умеет сортировать объекты, учитывая их иерархию и Z-Order
+	/// </summary>
 	public class RenderChain
 	{
 		int currentLayer;
@@ -9,6 +12,11 @@ namespace Lime
 
 		readonly Node[] layers = new Node[Widget.MaxLayer + 1];
 
+		/// <summary>
+		/// Добавляет объект и все его дочерние объекты в очередь отрисовки
+		/// </summary>
+		/// <param name="node">Добавляемый объект</param>
+		/// <param name="layer">Слой. Задает порядок отрисовки. Чем больше значение, тем позднее будет отрисован объект. 0 - значение по умолчанию. От 0 до 99</param>
 		public void Add(Node node, int layer = 0)
 		{
 			if (layer != 0) {
@@ -46,6 +54,9 @@ namespace Lime
             maxUsedLayer = 0;
 		}
         
+		/// <summary>
+		/// Перечисляет все объекты в том порядке, в каком они должны отрисоваться
+		/// </summary>
 		public IEnumerable<Node> Enumerate()
 		{
 			for (int i = 0; i <= maxUsedLayer; i++) {

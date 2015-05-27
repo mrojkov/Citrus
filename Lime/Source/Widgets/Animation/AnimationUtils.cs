@@ -8,14 +8,27 @@ namespace Lime
 {
 	public static class AnimationUtils
 	{
+		/// <summary>
+		///  оличнство кадров в одной секунде
+		/// </summary>
 		public const int FramesPerSecond = 16;
+
+		/// <summary>
+		///  оличество миллисекунд в одном кадре
+		/// </summary>
 		public const int MsecsPerFrame = 1000 / AnimationUtils.FramesPerSecond - 1;
 
+		/// <summary>
+		/// ѕереводит врем€ в миллисекундах во врем€, измер€емое кадрами
+		/// </summary>
 		public static int MsecsToFrames(int msecs)
 		{
 			return msecs >> 6;
 		}
 
+		/// <summary>
+		/// ѕереводит врем€, измер€емое кадрами во врем€ в миллисекунды
+		/// </summary>
 		public static int FramesToMsecs(int frames)
 		{
 			return frames << 6;

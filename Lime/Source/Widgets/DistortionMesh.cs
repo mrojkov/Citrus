@@ -3,18 +3,33 @@ using ProtoBuf;
 
 namespace Lime
 {
+	/// <summary>
+	/// Плоскость с точками, которые можно анимировать, вызывая эффект искажения поверхности
+	/// </summary>
 	[ProtoContract]
 	public class DistortionMesh : Widget
 	{
+		/// <summary>
+		/// Количество колонок
+		/// </summary>
 		[ProtoMember(1)]
 		public int NumCols { get; set; }
 
+		/// <summary>
+		/// Количество горизонтальных рядов
+		/// </summary>
 		[ProtoMember(2)]
 		public int NumRows { get; set; }
 
+		/// <summary>
+		/// Текстура
+		/// </summary>
 		[ProtoMember(3)]
 		public override ITexture Texture { get; set; }
 
+		/// <summary>
+		/// Создает DistortionMesh с 2 колонками, 2 рядами и пустой текстурой
+		/// </summary>
 		public DistortionMesh()
 		{
 			NumCols = 2;
@@ -22,6 +37,11 @@ namespace Lime
 			Texture = new SerializableTexture();
 		}
 		
+		/// <summary>
+		/// Возвращает точку в указанном ряде и колонке. Точку можно анимировать, вызывая искажения поверхности
+		/// </summary>
+		/// <param name="row">Номер ряда (x)</param>
+		/// <param name="col">Номер колонки (y)</param>
 		public DistortionMeshPoint GetPoint(int row, int col)
 		{
 			if (row < 0 || col < 0 || row > NumRows || col > NumCols)
@@ -30,6 +50,9 @@ namespace Lime
 			return Nodes[i] as DistortionMeshPoint;
 		}
 
+		/// <summary>
+		/// Возвращает все точки в начальное состояние
+		/// </summary>
 		public void ResetPoints()
 		{
 			Nodes.Clear();

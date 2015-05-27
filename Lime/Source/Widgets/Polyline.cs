@@ -5,9 +5,19 @@ using System.Text;
 
 namespace Lime
 {
+	/// <summary>
+	/// Ломаная линия
+	/// </summary>
 	public class Polyline : Widget
 	{
+		/// <summary>
+		/// Толщина
+		/// </summary>
 		public float Thickness;
+
+		/// <summary>
+		/// Точки, по которым строится линия
+		/// </summary>
 		public List<Vector2> Points = new List<Vector2>();
 
 		public Polyline(float thickness = 20)

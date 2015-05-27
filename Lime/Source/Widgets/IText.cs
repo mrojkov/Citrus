@@ -3,6 +3,9 @@ using ProtoBuf;
 
 namespace Lime
 {
+	/// <summary>
+	/// ¬арианты горизонтального выравнивани€ текста
+	/// </summary>
 	[ProtoContract]
 	public enum HAlignment
 	{
@@ -14,6 +17,9 @@ namespace Lime
 		Right,
 	}
 
+	/// <summary>
+	/// ¬арианты вертикального выравнивани€ текста
+	/// </summary>
 	[ProtoContract]
 	public enum VAlignment
 	{

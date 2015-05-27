@@ -4,6 +4,9 @@ using ProtoBuf;
 
 namespace Lime
 {
+	/// <summary>
+	/// Магнит создает эффект притяжения частиц
+	/// </summary>
 	[ProtoContract]
 	public class ParticlesMagnet : Widget
 	{
@@ -14,12 +17,21 @@ namespace Lime
 			Strength = 1000;
 		}
 
+		/// <summary>
+		/// Форма магнита
+		/// </summary>
 		[ProtoMember(1)]
 		public EmitterShape Shape { get; set; }
 
+		/// <summary>
+		/// Задает на сколько будет уменьшаться сила (Strength) в зависимости от расстояния до центра магнита
+		/// </summary>
 		[ProtoMember(2)]
 		public float Attenuation { get; set; }
 
+		/// <summary>
+		/// Сила воздействия
+		/// </summary>
 		[ProtoMember(3)]
 		public float Strength { get; set; }
 	}

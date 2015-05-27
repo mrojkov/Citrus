@@ -6,9 +6,15 @@ using ProtoBuf;
 
 namespace Lime
 {
+	/// <summary>
+	/// Список объектов сцены. Поведение аналогично стандартному списку List
+	/// </summary>
 	[ProtoContract]
 	public class NodeList : IList<Node>
 	{
+		/// <summary>
+		/// Перечислитель объектов сцены
+		/// </summary>
 		public struct Enumerator : IEnumerator<Node>
 		{
 			private Node first;
@@ -45,8 +51,15 @@ namespace Lime
 		private readonly Node owner;
 		private List<Node> list;
 
+		/// <summary>
+		/// Конструктор только для ProtoBuf
+		/// </summary>
 		public NodeList() { /* ctor for ProtoBuf only */ }
 
+		/// <summary>
+		/// Конструктор
+		/// </summary>
+		/// <param name="owner">Объект, которому будет принадлежать этот список</param>
 		public NodeList(Node owner)
 		{
 			this.list = null;
@@ -121,11 +134,17 @@ namespace Lime
 			return IndexOf(node) >= 0;
 		}
 
+		/// <summary>
+		/// Добавляет объект в начало списка
+		/// </summary>
 		public void Push(Node node)
 		{
 			Insert(0, node);
 		}
 
+		/// <summary>
+		/// Добавляет объект в конец списка
+		/// </summary>
 		public void Add(Node node)
 		{
 			RuntimeChecksBeforeInsertion(node); 

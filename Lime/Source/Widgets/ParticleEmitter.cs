@@ -5,45 +5,97 @@ using ProtoBuf;
 
 namespace Lime
 {
+	/// <summary>
+	/// Форма эмиттера частиц
+	/// </summary>
 	[ProtoContract]
 	public enum EmitterShape
 	{
+		/// <summary>
+		/// Точечный. Частицы генерируются в точке
+		/// </summary>
 		[ProtoEnum]
 		Point,
+
+		/// <summary>
+		/// Линейный. Частицы генерируются равномерно по линии, длина которой соответствует ширине эмиттера
+		/// </summary>
 		[ProtoEnum]
 		Line,
-		[ProtoEnum]
+
+		/// <summary>
+		/// Частицы генерируются равномерно по границам эллипса, описанного по границам эмиттера
+		/// </summary>
+		[ProtoEnum]		
 		Ellipse,
+
+		/// <summary>
+		/// Частицы генерируются равномерно по области эмиттера
+		/// </summary>
 		[ProtoEnum]
 		Area,
 	};
 
+	/// <summary>
+	/// Тип генерации частиц
+	/// </summary>
 	[Flags]
 	[ProtoContract]
 	public enum EmissionType
 	{
+		/// <summary>
+		/// Частицы генерироваться не будут
+		/// </summary>
 		[ProtoEnum]
 		None,
+
+		/// <summary>
+		/// Частицы генерируются внутрь области эмиттера
+		/// </summary>
 		[ProtoEnum]
 		Inner = 1,
+
+		/// <summary>
+		/// Частицы генерируются наружу области эмиттера
+		/// </summary>
 		[ProtoEnum]
 		Outer = 2,
 	}
 
+	/// <summary>
+	/// Тип привязки частиц. Привязанные частицы двигаются вместе с объектом, к которому они привязаны
+	/// </summary>
 	[ProtoContract]
 	public enum ParticlesLinkage
 	{
+		/// <summary>
+		/// Частицы не привязаны ни к какому объекту (стандартное поведение)
+		/// </summary>
 		[ProtoEnum]
 		Root,
-		[ProtoEnum]
+
+		/// <summary>
+		/// Частицы привязаны к контейнеру, в котором находится эмиттер
+		/// </summary>
+		[ProtoEnum]		
 		Parent,
+
+		/// <summary>
+		/// Частицы привязаны к объекту, указанному пользователем
+		/// </summary>
 		[ProtoEnum]
 		Other
 	}
 
+	/// <summary>
+	/// Эмиттер частиц (специальный невидимый объект, из которого вылетают частицы)
+	/// </summary>
 	[ProtoContract]
 	public partial class ParticleEmitter : Widget
 	{
+		/// <summary>
+		/// Частица, сгенерированная эмиттером
+		/// </summary>
 		[ProtoContract]
 		public class Particle
 		{
@@ -145,49 +197,51 @@ namespace Lime
 		public static bool EnabledGlobally = true;
 
 		/// <summary>
-		/// Whether particles never die.
+		/// Сгенерированные частицы будут жить вечно. Генерация происходит один раз
 		/// </summary>
 		[ProtoMember(1)]
 		public bool ImmortalParticles;
 
 		/// <summary>
-		/// Shape of emitter.
+		/// Форма эмиттера
 		/// </summary>
 		[ProtoMember(2)]
 		public EmitterShape Shape { get; set; }
 
 		/// <summary>
-		/// Type of emission.
+		/// Тип генерации частиц
 		/// </summary>
 		[ProtoMember(3)]
 		public EmissionType EmissionType { get; set; }
 
 		/// <summary>
-		/// Type of particles linkage.
+		///  Тип привязки частиц. Привязанные частицы двигаются вместе с объектом, к которому они привязаны
 		/// </summary>
 		[ProtoMember(4)]
 		public ParticlesLinkage ParticlesLinkage;
 
 		/// <summary>
-		/// A name of widget particles moving with(ParticlesLinkage = Other).
+		/// Имя виджета, к которому привязаны частицы (имеет смысл только при ParticlesLinkage = Other)
 		/// </summary>
 		[ProtoMember(5)]
 		public string LinkageWidgetName;
 
 		/// <summary>
-		/// Number of spawned particles per second.
+		/// Количество сгенерированных частиц в секунду
 		/// </summary>
 		[ProtoMember(6)]
 		public float Number { get; set; }
 
 		/// <summary>
-		/// Offset of initial state emitter in seconds to make an effect of "particles explosion".
+		/// На сколько кадров раньше эмиттер начнет генерацию.
+		/// Используется для того, чтобы в 0 кадре частицы была уже сгенерирована
+		/// (Например значение 3 означает, что эмиттер начнет генерацию на 3 кадра раньше)
 		/// </summary>
 		[ProtoMember(7)]
 		public float TimeShift;
 
 		/// <summary>
-		/// General speed of effect.
+		/// Скорость жизненного цикла частицы
 		/// </summary>
 		[ProtoMember(8)]
 		public float Speed { get; set; }
@@ -199,113 +253,124 @@ namespace Lime
 		public bool AlongPathOrientation { get; set; }
 
 		/// <summary>
-		/// Specifiecs direction of particles windage(0 - right, 90 - down).
+		/// Направление ветра, градусы (0 - вправо, 90 - вниз)
 		/// </summary>
 		[ProtoMember(10)]
 		public NumericRange WindDirection { get; set; }
 
 		/// <summary>
-		/// Specifiecs strength of particles windage. 
+		/// Сила ветра
 		/// </summary>
 		[ProtoMember(11)]
 		public NumericRange WindAmount { get; set; }
 
 		/// <summary>
-		/// Specifiecs direction of gravitation(0 - right, 90 - down).
+		/// Направление гравитации, градусы (0 - вправо, 90 - вниз)
 		/// </summary>
 		[ProtoMember(12)]
 		public NumericRange GravityDirection { get; set; }
 
 		/// <summary>
-		/// Specifiecs strength of gravitation. 
+		/// Сила гравитации
 		/// </summary>
 		[ProtoMember(13)]
 		public NumericRange GravityAmount { get; set; }
 
 		/// <summary>
-		/// Specifiecs strength of magnets gravitation. 
+		/// Задает силу притяжения магнита
 		/// </summary>
 		[ProtoMember(14)]
 		public NumericRange MagnetAmount { get; set; }
 
 		/// <summary>
-		/// Specifies rotation of particle in degrees.
+		/// Задает угол поворота сгенерированных частиц
 		/// </summary>
 		[ProtoMember(15)]
 		public NumericRange Orientation { get; set; }
 
 		/// <summary>
-		/// Specifies direction of particles motion(degrees).
+		/// Угол поворота эмиттера, градусы (поворот по часовой стрелке)
 		/// </summary>
 		[ProtoMember(16)]
 		public NumericRange Direction { get; set; }
 
 		/// <summary>
-		/// Specifies lifetime of particles in seconds.
+		/// Время жизни частицы в секундах
 		/// </summary>
 		[ProtoMember(17)]
 		public NumericRange Lifetime { get; set; }
 
 		/// <summary>
-		/// Specifies zoom of particles.
+		/// Масштаб сгенерированных частиц
 		/// </summary>
 		[ProtoMember(18)]
 		public NumericRange Zoom { get; set; }
 
 		/// <summary>
-		/// Specifies aspect ratio of particles(width/height).
+		/// Задает соотношение ширины и длины частицы (для создания вытянутых частиц)
 		/// </summary>
 		[ProtoMember(19)]
 		public NumericRange AspectRatio { get; set; }
 
 		/// <summary>
-		/// Specifies velocity of particles.
+		/// Скорость движения частицы
 		/// </summary>
 		[ProtoMember(20)]
 		public NumericRange Velocity { get; set; }
-
+		
 		/// <summary>
-		/// Specifies velocity of rotation particle around the center.
+		/// Скорость вращения частиц
 		/// </summary>
 		[ProtoMember(21)]
 		public NumericRange Spin { get; set; }
 
 		/// <summary>
-		/// Specifies velocity of changing particle direction(degrees/second).
+		/// Скорость изменения направления движения по кругу (градусы в секунду)
 		/// </summary>
 		[ProtoMember(22)]
 		public NumericRange AngularVelocity { get; set; }
 
 		/// <summary>
-		/// Specifies radius within random motion has occurred.
+		/// Радиус окружности, в котором частицы хаотично двигаются
 		/// </summary>
 		[ProtoMember(23)]
 		public NumericRange RandomMotionRadius { get; set; }
 
 		/// <summary>
-		/// Specifies velocity of random motion.
+		/// Скорость хаотичного движения частиц
 		/// </summary>
 		[ProtoMember(24)]
 		public NumericRange RandomMotionSpeed { get; set; }
 
 		/// <summary>
-		/// Coefficient of random motion trajectory flatness.
+		/// Коэффицент 'плоской формы' для траектории заотичного движения
+		/// (задает распространение хаотичного движения по нескольким осям)
 		/// </summary>
 		[ProtoMember(25)]
 		public float RandomMotionAspectRatio { get; set; }
 
 		/// <summary>
-		/// Specifies an angle of control point rotation, in order to get new a control point.
+		/// Скорость вращения частиц при хаотичном движении
 		/// </summary>
 		[ProtoMember(26)]
 		public NumericRange RandomMotionRotation { get; set; }
 
+		/// <summary>
+		/// Флаг, сбрасывающийся в false после первого обновления
+		/// </summary>
 		[ProtoMember(27)]
 		public bool firstUpdate = true;
 
+		/// <summary>
+		/// Количество частиц, которое должен сгенерировать эмиттер в цикле обновления (Update)
+		/// Используется, чтобы количество сгенерированных частиц не зависело от FPS
+		/// </summary>
 		[ProtoMember(28)]
 		public float particlesToSpawn;
 
+		/// <summary>
+		/// Список сгенерированных частиц
+		/// </summary>
 		[ProtoMember(29)]
 		public LinkedList<Particle> particles = new LinkedList<Particle>();
 		
@@ -340,6 +405,9 @@ namespace Lime
 			ImmortalParticles = false;
 		}
 
+		/// <summary>
+		/// Для ProtoBuf. Действия, выполняемые после десериализации
+		/// </summary>
 		[ProtoAfterDeserialization]
 		public void AfterDeserialization()
 		{

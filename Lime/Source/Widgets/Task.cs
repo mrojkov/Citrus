@@ -7,6 +7,10 @@ namespace Lime
 {
 	using EnumType = IEnumerator<object>;
 
+	/// <summary>
+	/// Задача (таск). Бывает, что нужно задать какую-нибудь последовательность действий и ждать окончания ее выполнения.
+	/// Задачи основаны на перечислителях (IEnumerator<object>) и их операторе yield return
+	/// </summary>
 	public class Task : IDisposable
 	{
 		public static long TotalTasksUpdated = 0;
@@ -27,7 +31,12 @@ namespace Lime
 		}
 
 		public object Tag { get; set; }
+
+		/// <summary>
+		/// Возвращает true, если задача выполнена
+		/// </summary>
 		public bool Completed { get { return stack.Count == 0; } }
+		
 		private float waitTime;
 		private WaitPredicate waitPredicate;
 		private Stack<EnumType> stack = new Stack<EnumType>();
@@ -159,6 +168,10 @@ namespace Lime
 			public override bool Evaluate() { return Preducate(TotalTime); }
 		}
 
+		/// <summary>
+		/// Выполняет задачу асинхронно в другом потоке. Возвращает null до тех пор, пока задача не будет выполнена или отменена
+		/// </summary>
+		/// <param name="action">Действия, которые должны быть выполнены</param>
 		public static IEnumerator<object> ExecuteAsync(Action action)
 		{
 #if UNITY

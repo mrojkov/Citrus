@@ -8,14 +8,23 @@ namespace Lime
 	using StateFunc = Func<IEnumerator<int>>;
 	using System.Diagnostics;
 
+	/// <summary>
+	/// Виджет с поведением кнопки
+	/// </summary>
 	[ProtoContract]
 	public class Button : Widget
 	{
 		public BitSet32 EnableMask = BitSet32.Full;
 
+		/// <summary>
+		/// Текст кнопки
+		/// </summary>
 		[ProtoMember(1)]
 		public override string Text { get; set; }
 
+		/// <summary>
+		/// Кнопка включена и принимает ввод от пользователя
+		/// </summary>
 		[ProtoMember(2)]
 		public bool Enabled {
 			get { return EnableMask[0]; }
@@ -23,12 +32,15 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Indicates whether a button has draggable behavior. 
-		/// It means that if a user has quickly passed his finger through the button it would not be pressed.
+		/// Для реализации кнопки, которую можно перетащить.
+		/// Если пользователь нажмет кнопку, и не отпуская палец быстро передвинет его, кнопка не нажмется
 		/// </summary>
 		[ProtoMember(3)]
 		public bool Draggable { get; set; }
 
+		/// <summary>
+		/// Генерируется при нажатии кнопки
+		/// </summary>
 		public override Action Clicked { get; set; }
 
 		private List<Widget> textPresenters;
@@ -56,13 +68,16 @@ namespace Lime
 		private const float DragDetectionTime = 0.15f;
 
 		/// <summary>
-		/// Once button has been clicked, its active area includes circle with a given radius.
+		/// Для маленьких кнопок: радиус круга, в который нужно попасть, чтобы кнопка нажалась
+		/// (иначе в маленькую кнопку невозможно было бы попасть)
 		/// </summary>
 		public static float ButtonEffectiveRadius = 200;
 
 		/// <summary>
 		/// Indicates whether all buttons should use tablet control scheme that doesn't includes
 		/// 'focused' state support, but behaves better when multiple buttons overlap each other.
+		/// 
+		/// Означает, что поведение всех кнопок подстроено под ввод с сенсорного экрана.
 		/// </summary>
 #if iOS
 		public static bool TabletControlScheme = true;
@@ -84,12 +99,18 @@ namespace Lime
 			State = NormalState;
 		}
 
+		/// <summary>
+		/// Возвращает true, если кнопка нажата
+		/// </summary>
 		public override bool WasClicked()
 		{
 			// If the button if hidden by clicking on it, it might became WasClicked forever.
 			return wasClicked && GloballyVisible;
 		}
 
+		/// <summary>
+		/// Возвращает клон этого виджета. Используйте DeepCloneFast() as Widget, т.к. он возвращает Node (базовый объект виджета)
+		/// </summary>
 		public override Node DeepCloneFast()
 		{
 			var clone = (Button)base.DeepCloneFast();

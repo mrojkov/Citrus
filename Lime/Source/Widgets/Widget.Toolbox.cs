@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Lime
 {
+	/// <summary>
+	/// Информация о трансформации. Аналогично матрице, но представляет данные в более удобном виде
+	/// </summary>
 	public struct Transform
 	{
 		public Vector2 Position;
@@ -24,6 +27,11 @@ namespace Lime
 
 	public partial class Widget : Node
 	{
+		/// <summary>
+		/// Рендерит виджет в текстуру
+		/// </summary>
+		/// <param name="texture">Текстура, в которую будет отрендерен виджет (должна быть типа RenderTexture)</param>
+		/// <param name="renderChain">Очередь отрисовки (задает порядок отрисовки объектов с иерархической структурой)</param>
 		public void RenderToTexture(ITexture texture, RenderChain renderChain)
 		{
 			if (Width > 0 && Height > 0) {
@@ -50,6 +58,10 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Возвращает true, если два виджета пересекаются. Результат не зависит от свойств HitTestMethod.
+		/// Проверяется только пересечение границ виджетов
+		/// </summary>
 		public static bool AreWidgetsIntersected(Widget a, Widget b)
 		{
 			Vector2[] rect = new Vector2[4] {
@@ -102,6 +114,9 @@ namespace Lime
 			hull.V4 = hull.V1 + transform.V * Size.Y;
 		}
 
+		/// <summary>
+		/// Возвращает ограничивающий прямоугольник этого виджета, если бы он находился в этой же экранной координате, но в другом контейнере
+		/// </summary>
 		public Rectangle CalcAABBInSpaceOf(Widget container)
 		{
 			WidgetHull hull;
@@ -133,18 +148,27 @@ namespace Lime
 			return transform;
 		}
 
+		/// <summary>
+		/// Возвращает информацию о трансформации этого виджета, если бы он находился в этой же экранной координате, но в другом контейнере
+		/// </summary>
 		public Transform CalcTransformInSpaceOf(Widget container)
 		{
 			Matrix32 matrix = CalcTransitionToSpaceOf(container);
 			return CalcTransformFromMatrix(matrix);
 		}
 
+		/// <summary>
+		/// Возвращает позицию этого виджета, если бы он находился в этой же экранной координате, но в другом контейнере
+		/// </summary>
 		public Vector2 CalcPositionInSpaceOf(Widget container)
 		{
 			Matrix32 matrix = CalcTransitionToSpaceOf(container);
 			return matrix.TransformVector(Pivot * Size);
 		}
 
+		/// <summary>
+		/// Отладочный метод, позволяющий узнать причины, по которым виджет не отрисовывается
+		/// </summary>
 		public virtual IEnumerable<string> GetVisibilityIssues()
 		{
 			var world = World.Instance;
