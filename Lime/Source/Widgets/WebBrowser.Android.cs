@@ -11,7 +11,7 @@ namespace Lime
 	public class WebBrowser : Widget
 	{
 		// buz: Фикс Жени 211726 ломает браузер в GummyDrop на амазоновском девайсе (CDCHINA-74)
-		public bool DisableEugenesFix;
+		static public bool DisableEugenesFix;
 		
 		private WebView webView;
 		public Uri Url { get { return GetUrl(); } set { SetUrl(value); } }
