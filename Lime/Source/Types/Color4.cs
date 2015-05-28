@@ -4,6 +4,9 @@ using System.Runtime.InteropServices;
 
 namespace Lime
 {
+	/// <summary>
+	/// Цвет в формате RGBA или ABGR. Должен использоваться только в одном из форматов
+	/// </summary>
 	[ProtoContract]
 	[System.Diagnostics.DebuggerStepThrough]
 	[StructLayout(LayoutKind.Explicit)]
@@ -35,7 +38,7 @@ namespace Lime
 		public static readonly Color4 Yellow = new Color4(255, 255, 0, 255);
 		public static readonly Color4 Orange = new Color4(255, 128, 0, 255);
 		public static readonly Color4 Transparent = new Color4(255, 255, 255, 0);
-
+		
 		public Color4(UInt32 abgr)
 		{
 			R = G = B = A = 0;
@@ -62,6 +65,9 @@ namespace Lime
 			};
 		}
 
+		/// <summary>
+		/// Покомпонентое умножение двух цветов
+		/// </summary>
 		public static Color4 operator *(Color4 lhs, Color4 rhs)
 		{
 			if (lhs.ABGR == 0xFFFFFFFF)
@@ -76,6 +82,9 @@ namespace Lime
 			return c;
 		}
 		
+		/// <summary>
+		/// Умножает каждый компонент цвета на альфу (Premultiplied alpha)
+		/// </summary>
 		public static Color4 PremulAlpha(Color4 color)
 		{
 			int a = color.A;
@@ -88,6 +97,10 @@ namespace Lime
 			return color;
 		}
 
+		/// <summary>
+		/// Выполняет линейную интерполяцию
+		/// </summary>
+		/// <param name="t">Значение интерполяции [0 - 1]</param>
 		public static Color4 Lerp(float t, Color4 a, Color4 b)
 		{
 			if (a.ABGR == b.ABGR)
@@ -107,6 +120,9 @@ namespace Lime
 			return r;
 		}
 
+		/// <summary>
+		/// Сравнивает поле ABGR двух цветов
+		/// </summary>
 		public bool Equals(Color4 other)
 		{
 			return ABGR == other.ABGR;

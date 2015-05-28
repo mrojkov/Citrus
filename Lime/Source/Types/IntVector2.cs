@@ -3,6 +3,9 @@ using ProtoBuf;
 
 namespace Lime
 {
+	/// <summary>
+	/// Представляет точку в двумерном пространстве. Компоненты вектора представлены целыми числами
+	/// </summary>
 	[ProtoContract]
 	[System.Diagnostics.DebuggerStepThrough]
 	public struct IntVector2 : IEquatable<IntVector2>

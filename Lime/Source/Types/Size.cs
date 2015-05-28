@@ -3,6 +3,9 @@ using ProtoBuf;
 
 namespace Lime
 {
+	/// <summary>
+	/// Структура, представляющая ширину и высоту
+	/// </summary>
 	[System.Diagnostics.DebuggerStepThrough]
 	[ProtoContract]
 	public struct Size : IEquatable<Size>
