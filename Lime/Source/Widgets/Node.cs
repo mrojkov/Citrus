@@ -674,7 +674,7 @@ namespace Lime
 			}
 		}
 
-		private void ApplyAnimators(bool invokeTriggers)
+		public void ApplyAnimators(bool invokeTriggers)
 		{
 			for (Node node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
 				var animators = node.Animators;
