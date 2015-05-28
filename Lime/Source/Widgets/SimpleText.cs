@@ -5,7 +5,7 @@ using ProtoBuf;
 namespace Lime
 {
 	/// <summary>
-	/// ¬иджет, вывод€щий текст без форматировани€
+	/// ¬иджет, вывод€щий текст с упрощенным форматированием
 	/// </summary>
 	[ProtoContract]
 	public sealed class SimpleText : Widget, IText, IKeyboardInputProcessor
@@ -92,7 +92,8 @@ namespace Lime
 		public TextOverflowMode OverflowMode { get; set; }
 
 		/// <summary>
-		/// ћожно переносить слова (если текст не помещаетс€ в одну строку)
+		/// ≈сли текст не помещаетс€ в одну строку, то он может разбиватьс€ в любом месте
+		/// (если false, то текст может разбиватьс€ только на месте пробелов)
 		/// </summary>
 		[ProtoMember(9)]
 		public bool WordSplitAllowed { get; set; }
@@ -108,7 +109,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// ”дал€ть лишние пробелы
+		/// ”дал€ть лишние пробелы между словами
 		/// </summary>
 		public bool TrimWhitespaces { get; set; }
 

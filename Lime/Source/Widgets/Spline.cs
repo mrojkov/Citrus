@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Lime
 {
 	/// <summary>
-	/// Сплайн. Вспомогательная кривая линия, задающая траекторию для чего-либо
+	/// Сплайн. Вспомогательная кривая линия, построенная по алгоритму Catmull-Rom, задающая траекторию для чего-либо
 	/// </summary>
 	[ProtoContract]
 	public class Spline : Widget
