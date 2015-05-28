@@ -5,10 +5,24 @@ using System.Text;
 
 namespace Lime.PopupMenu
 {
+	/// <summary>
+	/// Виджет, рисующий прямоугольник со скругленными краями
+	/// </summary>
 	public class RoundedRectangle : Widget
 	{
+		/// <summary>
+		/// Радиус угла
+		/// </summary>
 		public float CornerRadius = 25;
+
+		/// <summary>
+		/// Основной цвет
+		/// </summary>
 		public Color4 InnerColor = Color4.White;
+
+		/// <summary>
+		/// Цвет контура
+		/// </summary>
 		public Color4 OuterColor = Color4.Black;
 
 		private Polyline outerFrame = new Polyline();

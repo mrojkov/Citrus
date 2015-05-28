@@ -13,25 +13,25 @@ namespace Lime
 		public struct Entry
 		{
 			/// <summary>
-			/// Current absolute bone rotation.
+			/// Текущий абсолютный поворот кости
 			/// </summary>
 			[ProtoMember(1)]
 			public float Rotation;
 
 			/// <summary>
-			/// Current bone length.
+			/// Текущая длина кости
 			/// </summary>
 			[ProtoMember(2)]
 			public float Length;
 
 			/// <summary>
-			/// Current absolute position of bone beginning.
+			/// Текущая абсолютная позиция начала кости
 			/// </summary>
 			[ProtoMember(3)]
 			public Vector2 Joint;
 
 			/// <summary>
-			/// Current absolute position of bone ending.
+			/// Текущая абсолютная позиция конца кости
 			/// </summary>
 			[ProtoMember(4)]
 			public Vector2 Tip;

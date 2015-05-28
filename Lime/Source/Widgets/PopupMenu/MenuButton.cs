@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Lime.PopupMenu
 {
+	/// <summary>
+	/// Виджет, отображающий элементы отладочного меню
+	/// </summary>
 	public class MenuButton : Button
 	{
 		Widget hbox = new Widget();
@@ -18,6 +21,9 @@ namespace Lime.PopupMenu
 			Visible = false
 		};
 
+		/// <summary>
+		/// Путь к текстуре
+		/// </summary>
 		public string ImagePath
 		{
 			get { return imageBox.Image.Texture.SerializationPath; }
@@ -40,6 +46,9 @@ namespace Lime.PopupMenu
 			Text = ">",
 		};
 
+		/// <summary>
+		/// Видна ли стрелка справа (показывает, что есть вложенное меню)
+		/// </summary>
 		public bool ArrowVisible
 		{
 			get { return arrowLabel.Visible; }

@@ -6,6 +6,9 @@ using System.Text;
 
 namespace Lime.PopupMenu
 {
+	/// <summary>
+	/// Контекстное отладочное меню
+	/// </summary>
 	public class Menu : ICollection<MenuItem>
 	{
 		RoundedRectangle rectangle = new RoundedRectangle();
@@ -17,6 +20,12 @@ namespace Lime.PopupMenu
 		private int maxHeight;
 		private int itemWidth;
 
+		/// <summary>
+		/// Конструктор
+		/// </summary>
+		/// <param name="layer">Слой (свойство виджета Layer), на котором будет рисоваться меню</param>
+		/// <param name="itemWidth">Ширина меню в пикселях</param>
+		/// <param name="maxHeight">Максимально возможная высота меню в пикселях</param>
 		public Menu(int layer = Widget.MaxLayer, int itemWidth = 350, int maxHeight = 768)
 		{
 			this.layer = layer;
@@ -26,6 +35,9 @@ namespace Lime.PopupMenu
 			Frame.Tasks.Add(RefreshMenuTask());
 		}
 
+		/// <summary>
+		/// Показывает меню
+		/// </summary>
 		public void Show()
 		{
 			World.Instance.PushNode(Frame);
@@ -34,6 +46,9 @@ namespace Lime.PopupMenu
 			Frame.Input.CaptureAll();
 		}
 
+		/// <summary>
+		/// Прячет меню
+		/// </summary>
 		public void Hide()
 		{
 			Frame.Input.ReleaseMouse();	

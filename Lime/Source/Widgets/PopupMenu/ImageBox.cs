@@ -6,7 +6,7 @@ using System.Text;
 namespace Lime.PopupMenu
 {
 	/// <summary>
-	/// This class provides proportional scaling of inner image
+	/// ¬иджет, пропорционально измен€ющий масштаб вложенного изображени€
 	/// </summary>
 	public class ImageBox : Widget
 	{

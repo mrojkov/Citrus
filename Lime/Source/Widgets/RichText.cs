@@ -7,6 +7,9 @@ using Lime.Text;
 
 namespace Lime
 {
+	/// <summary>
+	/// Виджет, отображающий текст и использующий продвинутое форматирование
+	/// </summary>
 	[ProtoContract]
 	public class RichText : Widget, IText
 	{

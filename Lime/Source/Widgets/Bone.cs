@@ -4,15 +4,29 @@ using System.ComponentModel;
 
 namespace Lime
 {
+	/// <summary>
+	/// Хранит номер кости и силу влияния
+	/// </summary>
 	[ProtoContract]
 	public struct BoneWeight
 	{
+		/// <summary>
+		/// Номер кости
+		/// </summary>
 		[ProtoMember(1)]
 		public int Index;
+
+		/// <summary>
+		/// Сила влияния кости
+		/// </summary>
 		[ProtoMember(2)]
 		public float Weight;
 	}
 
+	/// <summary>
+	/// Содержит информацию о степени влияния костей на точку DistortionMesh
+	/// Поддерживается влияние 4 костей одновременно
+	/// </summary>
 	[ProtoContract]
 	public class SkinningWeights
 	{
@@ -29,30 +43,58 @@ namespace Lime
 		public BoneWeight Bone3;
 	}
 
+	/// <summary>
+	/// Кость. Управляет движением точек DistortionMesh
+	/// </summary>
 	[ProtoContract]
 	public class Bone : Node
 	{
+		/// <summary>
+		/// Позиция в сцене
+		/// </summary>
 		[ProtoMember(1)]
 		public Vector2 Position { get; set; }
 
+		/// <summary>
+		/// Угол поворота кости в градусах по часовой стрелке
+		/// </summary>
 		[ProtoMember(2)]
 		public float Rotation { get; set; }
 
+		/// <summary>
+		/// Длина кости
+		/// </summary>
 		[ProtoMember(3)]
 		public float Length { get; set; }
 
+		/// <summary>
+		/// Ограничитель обратной кинематики.
+		/// Обратная кинематика не будет распространяться на кость-родитель и далее
+		/// </summary>
 		[ProtoMember(4)]
 		public bool IKStopper { get; set; }
 
+		/// <summary>
+		/// Порядковый номер кости в сцене
+		/// </summary>
 		[ProtoMember(5)]
 		public int Index { get; set; }
 
+		/// <summary>
+		/// Номер родительской кости
+		/// </summary>
 		[ProtoMember(6)]
 		public int BaseIndex { get; set; }
 
+		/// <summary>
+		/// Область влияния, в которой кость оказывает максимальный эффект
+		/// </summary>
 		[ProtoMember(7)]
 		public float EffectiveRadius { get; set; }
 
+		/// <summary>
+		/// Область влияния, в которой кость оказывает минимальный эффект
+		/// </summary>
 		[ProtoMember(8)]
 		public float FadeoutZone { get; set; }
 

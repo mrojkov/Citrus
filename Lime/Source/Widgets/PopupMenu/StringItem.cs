@@ -5,25 +5,49 @@ using System.Text;
 
 namespace Lime.PopupMenu
 {
+	/// <summary>
+	/// Элемент отладочного меню в виде текстовой строки
+	/// </summary>
 	public class StringItem : MenuItem
 	{
 		MenuButton button;
 
+		/// <summary>
+		/// Действие, генерируемое при клике на этот элемент
+		/// </summary>
 		public Action Activated;
+
+		/// <summary>
+		/// Вложенное меню
+		/// </summary>
 		public Menu Submenu;
 
+		/// <summary>
+		/// Отображаемый текст
+		/// </summary>
 		public string Text
 		{
 			get { return button.Text; }
 			set { button.Text = value; }
 		}
 
+		/// <summary>
+		/// Конструктор
+		/// </summary>
+		/// <param name="text">Отображаемый текст</param>
+		/// <param name="activated">Действие, генерируемое при клике на этот элемент</param>
 		public StringItem(string text, Action activated = null)
 		{
 			Activated = activated;
 			Setup(text);
 		}
 
+		/// <summary>
+		/// Конструктор
+		/// </summary>
+		/// <param name="text">Отображаемый текст</param>
+		/// <param name="iconPath">Путь к файлу изображения, который будет в качестве иконки (путь относительно папки Data проекта)</param>
+		/// <param name="activated">Действие, генерируемое при клике на этот элемент</param>
 		public StringItem(string text, string iconPath, Action activated = null)
 		{
 			Activated = activated;
@@ -31,6 +55,11 @@ namespace Lime.PopupMenu
 			button.ImagePath = iconPath;
 		}
 
+		/// <summary>
+		/// Конструктор
+		/// </summary>
+		/// <param name="text">Отображаемый текст</param>
+		/// <param name="submenu">Вложенное меню</param>
 		public StringItem(string text, Menu submenu)
 		{
 			Submenu = submenu;

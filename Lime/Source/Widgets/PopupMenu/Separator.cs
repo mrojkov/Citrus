@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Lime.PopupMenu
 {
+	/// <summary>
+	/// Разделитель элементов для отладочного меню
+	/// </summary>
 	public class Separator : MenuItem
 	{
 		Image line = new Image() {
