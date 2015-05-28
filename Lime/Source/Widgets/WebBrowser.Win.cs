@@ -149,10 +149,14 @@ namespace Lime
 
 		public override void Dispose()
 		{
-			if (browser != null && !browser.Disposing)
-				browser.Dispose();
-			if (form != null)
-				form.Dispose();
+			if (browser != null) {
+				Application.InvokeOnMainThread(browser.Dispose);
+				browser = null;
+			}
+			if (form != null) {
+				Application.InvokeOnMainThread(form.Dispose);
+				form = null;
+			}
 		}
 	}
 }
