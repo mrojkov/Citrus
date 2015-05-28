@@ -42,7 +42,6 @@
   <ItemGroup>
     <ObjcBindingCoreSource Include="Api.cs" />
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Xamarin.ObjcBinding.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.ObjCBinding.CSharp.targets" />
   <ItemGroup>
     <ObjcBindingApiDefinition Include="ApiDefinition.cs" />
