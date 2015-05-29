@@ -11,14 +11,32 @@ using Android.App;
 
 namespace Lime
 {
+	/// <summary>
+	/// Предоставляет функции для работы с переменными окружения
+	/// </summary>
 	public static class Environment
 	{
 #if !iOS && !UNITY
+		/// <summary>
+		/// Создает Serializer.dll. Этот метод не должен вызываться в игровом цикле.
+		/// Он должен вызываться, только если приложение запущено с параметром --GenerateSerializationAssembly.
+		/// После вызова этого метода приложение должно завершить работу.
+		/// </summary>
+		/// <param name="assemblyName">Должно быть "Serializer" (имя сборки)</param>
+		/// <param name="types">Типы, которые нужно включить в Serizlizer.dll</param>
 		public static void GenerateSerializationAssembly(string assemblyName, params Type[] types)
 		{
 			GenerateSerializationAssembly(assemblyName, types, null);
 		}
 
+		/// <summary>
+		/// Создает Serializer.dll. Этот метод не должен вызываться в игровом цикле.
+		/// Он должен вызываться, только если приложение запущено с параметром --GenerateSerializationAssembly.
+		/// После вызова этого метода приложение должно завершить работу.
+		/// </summary>
+		/// <param name="assemblyName">Должно быть "Serializer" (имя сборки)</param>
+		/// <param name="types">Типы, которые нужно включить в Serizlizer.dll</param>
+		/// <param name="subTypes">(Нужно разобраться что это и написать документацию)</param>
 		public static void GenerateSerializationAssembly(string assemblyName, Type[] types, Dictionary<Type, List<KeyValuePair<int, Type>>> subTypes)
 		{
 			var model = ProtoBuf.Meta.TypeModel.Create();
@@ -42,7 +60,9 @@ namespace Lime
 		}
 
 #endif
-		
+		/// <summary>
+		/// Открывает веб-браузер как отдельное приложение
+		/// </summary>
 		public static void OpenBrowser(string url)
 		{
 #if iOS
@@ -59,6 +79,10 @@ namespace Lime
 #endif
 		}
 
+		/// <summary>
+		/// Возвращает папку, где приложение может хранить свою служебную информацию (например для Windows это ApplicationData + имя приложения)
+		/// </summary>
+		/// <param name="appName">Название приложения (влияет только на название папки)</param>
 		public static string GetDataDirectory(string appName)
 		{
 			return GetDataDirectory(null, appName, "1.0");
@@ -69,6 +93,13 @@ namespace Lime
 			return Path.Combine(GetDataDirectory(appName), path);
 		}
 
+		/// <summary>
+		/// Возвращает папку, где приложение может хранить свою служебную информацию (например для Windows это ApplicationData + имя приложения)
+		/// Параметры функции влияют только на название папки
+		/// </summary>
+		/// <param name="companyName">Название компании-разработчика (можно null)</param>
+		/// <param name="appName">Название приложения</param>
+		/// <param name="appVersion">Версия приложения</param>
 		public static string GetDataDirectory(string companyName, string appName, string appVersion)
 		{
 #if UNITY
@@ -94,11 +125,22 @@ namespace Lime
 #endif
 		}
 
+		/// <summary>
+		/// Возвращает папку, в которую сохраняется контент, загруженный из интернета
+		/// </summary>
+		/// <param name="appName">Название приложения (влияет только на имя папки)</param>
 		public static string GetDownloadableContentDirectory(string appName)
 		{
 			return GetDownloadableContentDirectory(null, appName, "1.0");
 		}
 
+		/// <summary>
+		/// Возвращает папку, в которую сохраняется контент, загруженный из интернета.
+		/// Параметры функции влияют только на название папки
+		/// </summary>
+		/// <param name="companyName">Название компании-разработчика (можно null)</param>
+		/// <param name="appName">Название приложения</param>
+		/// <param name="appVersion">Версия приложения</param>
 		public static string GetDownloadableContentDirectory(string companyName, string appName, string appVersion)
 		{
 #if UNITY
@@ -116,6 +158,9 @@ namespace Lime
 #endif
 		}
 
+		/// <summary>
+		/// Возвращает размер рабочего стола (для десктопа), либо размер экрана (для мобильных устройств)
+		/// </summary>
 		public static Vector2 GetDesktopSize()
 		{
 #if iOS
@@ -132,7 +177,5 @@ namespace Lime
 			return new Vector2(device.Width, device.Height);
 #endif
 		}
-
-
 	}
 }

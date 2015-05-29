@@ -3,6 +3,9 @@ using ProtoBuf;
 
 namespace Lime
 {
+	/// <summary>
+	/// Прямоугольник
+	/// </summary>
 	[System.Diagnostics.DebuggerStepThrough]
 	[ProtoContract]
 	public struct Rectangle : IEquatable<Rectangle>
@@ -55,12 +58,18 @@ namespace Lime
 			return !lhs.Equals(rhs);
 		}
 
+		/// <summary>
+		/// Ширина прямоугольника
+		/// </summary>
 		public float Width
 		{
 			get { return B.X - A.X; }
 			set { B.X = A.X + value; }
 		}
 
+		/// <summary>
+		/// Высота прямоугольника
+		/// </summary>
 		public float Height
 		{
 			get { return B.Y - A.Y; }
@@ -73,6 +82,11 @@ namespace Lime
 		public float Bottom { get { return B.Y; } set { B.Y = value; } }
 		public Vector2 Center { get { return (A + B) / 2; } }
 
+		/// <summary>
+		/// Если координаты левого верхнего (A) и правого нижнего угла (B) перепутаны местами,
+		/// то ширина и высота будут отрицательными. Этот метод меняет координаты местами,
+		/// чтобы ширина и высота были всегда положительными
+		/// </summary>
 		public void Normalize()
 		{
 			if (A.X > B.X) {
@@ -83,15 +97,25 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Возвращает true, если указанная точка попадает в область прямоугольника
+		/// </summary>
 		public bool Contains(Vector2 v)
 		{
 			return (v.X >= A.X) && (v.Y >= A.Y) && (v.X < B.X) && (v.Y < B.Y);
 		}
 
+		/// <summary>
+		/// Возвращает размеры прямоугольника в виде вектора
+		/// </summary>
 		public Vector2 Size { 
 			get { return B - A; }
 		}
 
+		/// <summary>
+		/// Возвращает прямоугольник, построенный по области пересечения указанный прямоугольников.
+		/// Если прямоугольники не пересекаются, возвращает пустой прямоугольник (IntRectangle.Empty)
+		/// </summary>
 		public static Rectangle Intersect(Rectangle a, Rectangle b)
 		{
 			float x0 = Math.Max(a.A.X, b.A.X);
@@ -105,6 +129,9 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Возвращает прямоугольник, охватывающий оба указанных прямоугольника
+		/// </summary>
 		public static Rectangle Bounds(Rectangle a, Rectangle b)
 		{
 			return new Rectangle(
@@ -115,6 +142,10 @@ namespace Lime
 			);
 		}
 
+		/// <summary>
+		/// Изменяет границы прямоугольника таким образом, чтобы точка попадала в его область.
+		/// Если точка уже в области фигуры, то ничего не делает
+		/// </summary>
 		public void IncludePoint(Vector2 v)
 		{
 			Left = Mathf.Min(v.X, Left);
@@ -133,6 +164,9 @@ namespace Lime
 			return A.GetHashCode() ^ B.GetHashCode();
 		}
 
+		/// <summary>
+		/// Применяет матрицу трансформации
+		/// </summary>
 		public Rectangle Transform(Matrix32 m)
 		{
 			return new Rectangle(A * m, B * m);

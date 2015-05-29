@@ -6,6 +6,9 @@ using System.Text;
 
 namespace Lime
 {
+	/// <summary>
+	/// Состояния звукового канала
+	/// </summary>
 	public enum AudioChannelState
 	{
 		Initial,
@@ -14,6 +17,9 @@ namespace Lime
 		Paused
 	}
 
+	/// <summary>
+	/// Группы звуковых каналов
+	/// </summary>
 	[ProtoContract]
 	public enum AudioChannelGroup
 	{
@@ -25,20 +31,67 @@ namespace Lime
 		Voice
 	}
 
+	/// <summary>
+	/// Интерфейс звукового канала
+	/// </summary>
 	public interface IAudioChannel
 	{
+		/// <summary>
+		/// Текущее состояние
+		/// </summary>
 		AudioChannelState State { get; }
+
+		/// <summary>
+		/// Группа
+		/// </summary>
 		AudioChannelGroup Group { get; set; }
+
+		/// <summary>
+		/// Смещение. 0 - слева, 1 - справа, 0.5 - посередине
+		/// </summary>
 		float Pan { get; set; }
+
+		/// <summary>
+		/// Проиграть звук с момента его остановки методом Stop
+		/// </summary>
+		/// <param name="fadeinTime">Время плавного нарастания громкости в секундах</param>
 		void Resume(float fadeinTime = 0);
+
+		/// <summary>
+		/// Остановить проигрывание звука
+		/// </summary>
+		/// <param name="fadeoutTime">Время плавного уменьшения громкости в секундах</param>
 		void Stop(float fadeoutTime = 0);
+
+		/// <summary>
+		/// Громкость. От 0 до 1.
+		/// </summary>
 		float Volume { get; set; }
+
+		/// <summary>
+		/// Высота звука
+		/// </summary>
 		float Pitch { get; set; }
+
+		/// <summary>
+		/// Путь к файлу, из которого был загружен звук
+		/// </summary>
 		string SamplePath { get; set; }
+
+		/// <summary>
+		/// Звук, назначенный этому каналу
+		/// </summary>
 		Sound Sound { get; }
+
+		/// <summary>
+		/// Оповестить звук, что он все еще нужен. Звуки, которых долго не оповещали, автоматически останавливаются
+		/// </summary>
 		void Bump();
 	}
 
+	/// <summary>
+	/// Звуковой канал, не проигрывающий никаких звуков
+	/// </summary>
 	public class NullAudioChannel : IAudioChannel
 	{
 		public static NullAudioChannel Instance = new NullAudioChannel();

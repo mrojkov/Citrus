@@ -8,6 +8,9 @@ using System.Xml;
 
 namespace Lime
 {
+	/// <summary>
+	/// Сериалайзер, работающий со словарями в формате xml
+	/// </summary>
 	public class LocalizationDictionaryXmlSerializer : ILocalizationDictionarySerializer
 	{
 		public string GetFileExtension()

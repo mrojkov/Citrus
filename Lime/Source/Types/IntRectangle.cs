@@ -3,6 +3,9 @@ using ProtoBuf;
 
 namespace Lime
 {
+	/// <summary>
+	/// Прямоугольник, свойства которого заданы целыми числами
+	/// </summary>
 	[System.Diagnostics.DebuggerStepThrough]
 	[ProtoContract]
 	public struct IntRectangle : IEquatable<IntRectangle>
@@ -39,6 +42,11 @@ namespace Lime
 			return new WindowRect { X = r.Left, Y = r.Top, Width = r.Width, Height = r.Height };
 		}
 
+		/// <summary>
+		/// Если координаты левого верхнего (A) и правого нижнего угла (B) перепутаны местами,
+		/// то ширина и высота будут отрицательными. Этот метод меняет координаты местами,
+		/// чтобы ширина и высота были всегда положительными
+		/// </summary>
 		public Lime.IntRectangle Normalize()
 		{
 			var rect = this;
@@ -53,16 +61,25 @@ namespace Lime
 			return rect;
 		}
 		
+		/// <summary>
+		/// Ширина прямоугольника
+		/// </summary>
 		public int Width {
 			get { return B.X - A.X; }
 			set { B.X = A.X + value; }
 		}
 
+		/// <summary>
+		/// Высота прямоугольника
+		/// </summary>
 		public int Height {
 			get { return B.Y - A.Y; }
 			set { B.Y = A.Y + value; }
 		}
 
+		/// <summary>
+		/// Возвращает размеры прямоугольника в виде вектора
+		/// </summary>
 		public IntVector2 Size { 
 			get { return B - A; }
 		}
@@ -73,6 +90,9 @@ namespace Lime
 		public int Bottom { get { return B.Y; } set { B.Y = value; } }
 		public IntVector2 Center { get { return new IntVector2((A.X + B.X) / 2, (A.Y + B.Y) / 2); } }
 
+		/// <summary>
+		/// Сдвигает прямоугольник на указанное значение
+		/// </summary>
 		public IntRectangle OffsetBy(IntVector2 ofs) { return new IntRectangle(A + ofs, B + ofs); }
 
 		public static bool operator ==(IntRectangle lhs, IntRectangle rhs)
@@ -101,6 +121,9 @@ namespace Lime
 			return A.GetHashCode() ^ B.GetHashCode();
 		}
 
+		/// <summary>
+		/// Возвращает true, если указанная точка попадает в область прямоугольника
+		/// </summary>
 		public bool Contains(IntVector2 v)
 		{
 			return (v.X >= A.X) && (v.Y >= A.Y) && (v.X < B.X) && (v.Y < B.Y);
@@ -111,6 +134,10 @@ namespace Lime
 			return String.Format("{0}, {1}, {2}, {3}", A.X, A.Y, B.X, B.Y);
 		}
 
+		/// <summary>
+		/// Возвращает прямоугольник, построенный по области пересечения указанный прямоугольников.
+		/// Если прямоугольники не пересекаются, возвращает пустой прямоугольник (IntRectangle.Empty)
+		/// </summary>
 		public static IntRectangle Intersect(IntRectangle a, IntRectangle b)
 		{
 			int x0 = Math.Max(a.A.X, b.A.X);

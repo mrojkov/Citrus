@@ -6,6 +6,9 @@ using System.Text;
 
 namespace Lime
 {
+	/// <summary>
+	/// Сериалайзер, работающий с текстовыми словарями (словари, использующиеся в большинстве проектов)
+	/// </summary>
 	public class LocalizationDictionaryTextSerializer : ILocalizationDictionarySerializer
 	{
 		public string GetFileExtension()

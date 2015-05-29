@@ -122,6 +122,10 @@ namespace Lime
 			return Mathf.Lerp(value, min, max);
 		}
 
+		/// <summary>
+		/// Применяет функцию локализации к указаному числу, возвращает результат в виде строки.
+		/// На разных языках числа записываются в разном формате (особенно касается знака, отделяющего целую и дробную часть)
+		/// </summary>
 		public static string Localize(this int value)
 		{
 			string result = value.ToString("N0");

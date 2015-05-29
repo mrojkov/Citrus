@@ -7,16 +7,25 @@ namespace Lime
 {
 	public static class StringExtensions
 	{
+		/// <summary>
+		/// Функция, аналогичная String.Format, но сделанная в виде функции-расширения
+		/// </summary>
 		public static string Format(this string format, params object[] args)
 		{
 			return string.Format(format, args);
 		}
 
+		/// <summary>
+		/// Локализует строку для текущего языка (с качестве ключа для словаря используется вся строка)
+		/// </summary>
 		public static string Localize(this string text)
 		{
 			return Localization.GetString(text);
 		}
 
+		/// <summary>
+		/// Локализует строку для текущего языка (с качестве ключа для словаря используется вся строка)
+		/// </summary>
 		public static string Localize(this string format, params object[] args)
 		{
 			return Localization.GetString(format, args);

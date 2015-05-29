@@ -5,21 +5,29 @@ using Foundation;
 
 namespace Lime
 {
+	/// <summary>
+	/// Класс, предоставляющий функции локализации
+	/// </summary>
 	public static class Localization
 	{
 		private static bool useNumericKeys;
+
 		/// <summary>
-		/// Use this flag only for compatibility reasons
+		/// Устаревший. Использовать только для совместимости со старыми проектами.
+		/// Раньше в словаре в качестве ключей использовались числа. Сейчас - вся строка. Этот флаг включает старый режим
 		/// </summary>
 		[Obsolete]
 		public static bool UseNumericKeys { get { return useNumericKeys; } set { useNumericKeys = value; } }
 
+		/// <summary>
+		/// Текущий словарь локализации
+		/// </summary>
 		public static LocalizationDictionary Dictionary = new LocalizationDictionary();
 
 		/// <summary>
-		/// This will return a two letter code for the currently selected language.
-		/// "en" for English, "es" for Spanish, "de" for German, etc.
-		/// For more examples, please see this Wikipedia entry (in particular, the 639-1 column):
+		/// Возвращает две буквы для имени текущего языка.
+		/// Например "en" для English, "es" для Spanish, "de" для Deutch и т.п.
+		/// Для более подробной информации см ссылку (особенно раздел 639-1)
 		/// http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
 		/// </summary>
 		public static string GetCurrentLanguage()
@@ -31,6 +39,9 @@ namespace Lime
 #endif
 		}
 
+		/// <summary>
+		/// Возвращает локализованную строку из текущего словаря по ее ключу
+		/// </summary>
 		public static string GetString(string format, params object[] args)
 		{
 			string s = GetString(format);
@@ -42,6 +53,9 @@ namespace Lime
 			return string.Format(s, args);
 		}
 
+		/// <summary>
+		/// Возвращает локализованную строку из текущего словаря по ее ключу
+		/// </summary>
 		public static string GetString(string key)
 		{
 			if (string.IsNullOrEmpty(key)) {

@@ -3,6 +3,9 @@ using ProtoBuf;
 
 namespace Lime
 {
+	/// <summary>
+	/// Матрица трансформации
+	/// </summary>
 	[ProtoContract]
 	[System.Diagnostics.DebuggerStepThrough]
 	public struct Matrix32 : IEquatable<Matrix32>
@@ -16,6 +19,9 @@ namespace Lime
 		[ProtoMember(3)]
 		public Vector2 T;
 
+		/// <summary>
+		/// Возвращает единичную матрицу. Единичная матрица не оказывает эффекта при трансформации
+		/// </summary>
 		public static readonly Matrix32 Identity = new Matrix32(new Vector2(1, 0), new Vector2(0, 1), new Vector2(0, 0));
 
 		public Matrix32(Vector2 u, Vector2 v, Vector2 t)
@@ -30,11 +36,17 @@ namespace Lime
 			return U.Equals(rhs.U) && V.Equals(rhs.V) && T.Equals(rhs.T);
 		}
 
+		/// <summary>
+		/// Возвращает детерминант (определитель) матрицы
+		/// </summary>
 		public float CalcDeterminant()
 		{
 			return U.X * V.Y - U.Y * V.X;
 		}
 
+		/// <summary>
+		/// Возвращает обратную матрицу
+		/// </summary>
 		public Matrix32 CalcInversed()
 		{
 			Matrix32 m;
@@ -46,6 +58,9 @@ namespace Lime
 			return m;
 		}
 
+		/// <summary>
+		/// Возвращает матрицу поворота
+		/// </summary>
 		public static Matrix32 Rotation(float radians)
 		{
 			Vector2 cs = Mathf.CosSin(radians);
@@ -59,6 +74,9 @@ namespace Lime
 			return m;
 		}
 
+		/// <summary>
+		/// Возвращает матрицу масштабирования
+		/// </summary>
 		public static Matrix32 Scaling(Vector2 scaling)
 		{
 			Matrix32 m = Identity;
@@ -67,11 +85,17 @@ namespace Lime
 			return m;
 		}
 
+		/// <summary>
+		/// Возвращает матрицу масштабирования
+		/// </summary>
 		public static Matrix32 Scaling(float x, float y)
 		{
 			return Scaling(new Vector2(x, y));
 		}
 
+		/// <summary>
+		/// Возвращает матрицу смещения
+		/// </summary>
 		public static Matrix32 Translation(Vector2 translation)
 		{
 			Matrix32 m = Identity;
@@ -79,11 +103,21 @@ namespace Lime
 			return m;
 		}
 
+		/// <summary>
+		/// Возвращает матрицу смещения
+		/// </summary>
 		public static Matrix32 Translation(float x, float y)
 		{
 			return Translation(new Vector2(x, y));
 		}
 
+		/// <summary>
+		/// Возвращает матрицу трансформации
+		/// </summary>
+		/// <param name="center">Центр поворота и масштабирования</param>
+		/// <param name="scaling">Масштабирование</param>
+		/// <param name="rotation">Поворот (в радианах)</param>
+		/// <param name="translation">Смещение</param>
 		public static Matrix32 Transformation(Vector2 center, Vector2 scaling, float rotation, Vector2 translation)
 		{
 			Vector2 cs = Mathf.CosSin(rotation);
@@ -97,6 +131,9 @@ namespace Lime
 			return m;
 		}
 
+		/// <summary>
+		/// Перемножает матрицы. Результат будет содержать трансформацию обеих матриц (операция не коммуникативна)
+		/// </summary>
 		public static Matrix32 operator *(Matrix32 a, Matrix32 b)
 		{
 			Matrix32 m;
@@ -109,6 +146,9 @@ namespace Lime
 			return m;
 		}
 
+		/// <summary>
+		/// Перемножает матрицы. Результат будет содержать трансформацию обеих матриц (операция не коммуникативна)
+		/// </summary>
 		public static void Multiply(ref Matrix32 a, ref Matrix32 b, out Matrix32 result)
 		{
 			result.U.X = a.U.X * b.U.X + a.U.Y * b.V.X;
@@ -119,6 +159,9 @@ namespace Lime
 			result.T.Y = a.T.X * b.U.Y + a.T.Y * b.V.Y + b.T.Y;
 		}
 
+		/// <summary>
+		/// Умножает матрицу на вектор, представляющий матрицу 2х1
+		/// </summary>
 		public static Vector2 operator *(Matrix32 a, Vector2 b)
 		{
 			Vector2 v;
@@ -160,6 +203,10 @@ namespace Lime
 			return r;
 		}
 
+		/// <summary>
+		/// Выполняет линейную интерполяцию двух матриц
+		/// </summary>
+		/// <param name="t">Значение интерполяции [0 - 1]</param>
 		public static Matrix32 Lerp(float t, Matrix32 a, Matrix32 b)
 		{
 			Matrix32 r;
@@ -169,6 +216,10 @@ namespace Lime
 			return r;
 		}
 
+		/// <summary>
+		/// Возвращает true, если это единичная матрица
+		/// (единичные матрицы не оказывают эффекта трансформации)
+		/// </summary>
 		public bool IsIdentity()
 		{
 			return T.X == 0 && T.Y == 0 && U.X == 1 && U.Y == 0 && V.X == 0 && V.Y == 1;

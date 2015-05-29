@@ -14,26 +14,62 @@ using Android.App;
 
 namespace Lime
 {
+	/// <summary>
+	/// Варианты ориентации телефона или планшета
+	/// </summary>
 	[Flags]
 	[ProtoBuf.ProtoContract]
 	public enum DeviceOrientation
 	{
+		/// <summary>
+		/// Портретная. Высота экрана больше ширины, аппаратные кнопки внизу
+		/// </summary>
 		Portrait = 1,
+
+		/// <summary>
+		/// Портретная перевернутая. Высота экрана больше ширины, аппаратные кнопки вверху
+		/// </summary>
 		PortraitUpsideDown = 2,
+
+		/// <summary>
+		/// Альбомная. Ширина экрана больше высоты, аппаратные кнопки слева
+		/// </summary>
 		LandscapeLeft = 4,
+
+		/// <summary>
+		/// Альбомная. Ширина экрана больше высоты, аппаратные кнопки справа
+		/// </summary>
 		LandscapeRight = 8,
+
+		/// <summary>
+		/// Портретные ориентации. Высота экрана больше ширины
+		/// </summary>
 		AllPortraits = Portrait | PortraitUpsideDown,
+
+		/// <summary>
+		/// Альбомные ориентации. Ширина экрана больше высоты
+		/// </summary>
 		AllLandscapes = LandscapeLeft | LandscapeRight,
+
+		/// <summary>
+		/// Все ориентации устройства
+		/// </summary>
 		All = 15,
 	}
 
 	public static class DeviceOrientationExtensions
 	{
+		/// <summary>
+		/// Портретная ориентация. Высота экрана больше ширины
+		/// </summary>
 		public static bool IsPortrait(this DeviceOrientation value)
 		{
 			return (value == DeviceOrientation.Portrait) || (value == DeviceOrientation.PortraitUpsideDown);
 		}
 
+		/// <summary>
+		/// Альбомная ориентация. Ширина экрана больше высоты
+		/// </summary>
 		public static bool IsLandscape(this DeviceOrientation value)
 		{
 			return !value.IsPortrait();
@@ -48,6 +84,10 @@ namespace Lime
 		Win
 	}
 
+	/// <summary>
+	/// Класс, предоставляющий промежуточное звено между игровой логикой и подсистемами движка.
+	/// Экземпляр этого класса является синглтоном
+	/// </summary>
 	public class Application
 	{
 		public class StartupOptions
@@ -59,16 +99,43 @@ namespace Lime
 
 		public static float LowFPSLimit = 20;
 
+		/// <summary>
+		/// Главный поток приложения. Вся игровая логика и рендеринг выполняются в главном потоке
+		/// </summary>
 		public static Thread MainThread { get; private set; }
+
+		/// <summary>
+		/// Возвращает true, если это главный поток
+		/// </summary>
 		public static bool IsMainThread { get { return Thread.CurrentThread == MainThread; } }
+
+		/// <summary>
+		/// Предоставляет доступ к программной клавиатуре (как на телефоне)
+		/// </summary>
 		public readonly SoftKeyboard SoftKeyboard = new SoftKeyboard();
 
+		/// <summary>
+		/// Ссылка на экземпляр класса (других экземпляров быть не должно)
+		/// </summary>
 		public static Application Instance;
+
 		private static readonly object scheduledActionsSync = new object();
 		private static Action scheduledActions;
+
+		/// <summary>
+		/// Начальные опции, которые были переданы в конструкторе
+		/// </summary>
 		public readonly StartupOptions Options;
+		
+		/// <summary>
+		/// Заголовок окна приложения (актуально только для десктопных приложений)
+		/// </summary>
 		public string Title = "Citrus";
 
+		/// <summary>
+		/// Конструктор
+		/// </summary>
+		/// <param name="options">Начальные опции</param>
 		public Application(StartupOptions options = null)
 		{
 			Instance = this;
@@ -117,10 +184,9 @@ namespace Lime
 
 
 		/// <summary>
-		/// Invokes given action on the main thread between update and render. 
-		/// If we are on main thread, invokes action immediately.
+		/// Вызывает указанное действие в главном потоке между вызовом OnUpdateFrame и OnRenderFrame
+		/// Если мы и так в главном потоке, то действие выполняется сразу
 		/// </summary>
-		/// <param name="action"></param>
 		public static void InvokeOnMainThread(Action action)
 		{
 			if (IsMainThread) {
@@ -137,6 +203,9 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Платформа, на которой запускается приложение
+		/// </summary>
 		public PlatformId Platform {
 			get
 			{
@@ -154,11 +223,16 @@ namespace Lime
 			}
 		}
 #if iOS
-
+		/// <summary>
+		/// Возвращает размер экрана
+		/// </summary>
 		public Size WindowSize { get; internal set; }
 
 		private float pixelsPerPoints = 0f;
 
+		/// <summary>
+		/// Возвращает количество пикселей в дюйме по горизонтали и вертикали
+		/// </summary>
 		public Vector2 ScreenDPI 
 		{
 			get {
@@ -170,51 +244,97 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Приложение активно (не свернуто). Если приложение не активно, его работа частично приостанавливается
+		/// </summary>
 		public bool Active { get; internal set; }
 
+		/// <summary>
+		/// Всегда возвращает true (на мобильном устройсве невозможно запустить приложение в окне)
+		/// </summary>
 		public bool FullScreen { get { return true; } set {} }
+
+		/// <summary>
+		/// Возвращает FPS
+		/// </summary>
 		public float FrameRate { get { return GameView.Instance.FrameRate; } }
 
+		/// <summary>
+		/// Возвращает ориентацию устройства
+		/// </summary>
 		public DeviceOrientation CurrentDeviceOrientation { get; internal set; }
 
+		/// <summary>
+		/// Генерирует исключение NotImplementedException.
+		/// На iOS завершить работу приложения таким образом невозможно. Приложения завершаются по усмотрению операционной системы
+		/// </summary>
+		/// <exception cref="NotImplementedException"/>		
 		public void Exit()
 		{
 			throw new NotImplementedException();
 		}
 
-		// buz: Called before GameController is assigned to Window.RootViewController
-		// Kochava SDK requires to be initialized at that point.
+		/// <summary>
+		/// buz:
+		/// Вызывается перед тем, как GameController назначен Window.RootViewController
+		/// Kochava SDK требует, чтобы он был инициализирован в этом месте
+		/// </summary>
 		public virtual void PreCreate() {}
 
 #elif WIN || MAC
+
+		/// <summary>
+		/// Завершает работу приложения
+		/// </summary>
 		public void Exit()
 		{
 			GameView.Instance.Exit();
 		}
 
+		/// <summary>
+		/// Возвращает количество пикселей в дюйме по горизонтали и вертикали (всегда возвращает (240, 240))
+		/// </summary>
 		public Vector2 ScreenDPI 
 		{
 			get { return 240 * Vector2.One; }
 		}
 
+		/// <summary>
+		/// Полноэкранный режим
+		/// </summary>
 		public bool FullScreen {
 			get { return GameView.Instance.FullScreen; }
 			set { GameView.Instance.FullScreen = value; }
 		}
 
+		/// <summary>
+		/// Приложение активно (не свернуто и его окно имеет фокус)
+		/// </summary>
 		public bool Active { get; internal set; }
 
+		/// <summary>
+		/// Возвращает FPS
+		/// </summary>
 		public float FrameRate { get { return GameView.Instance.FrameRate; } }
 
+		/// <summary>
+		/// Всегда возвращает DeviceOrientation.LandscapeLeft. Имеет смысл только для мобильных устройств
+		/// </summary>
 		public DeviceOrientation CurrentDeviceOrientation {
 			get { return DeviceOrientation.LandscapeLeft; }
 		}
 
+		/// <summary>
+		/// Размер окна приложения (учитываются границы окна)
+		/// </summary>
 		public Size WindowSize {
 			get { return GameView.Instance.WindowSize; }
 			set { GameView.Instance.WindowSize = value; }
 		}
 #elif ANDROID
+		/// <summary>
+		/// Возвращает размер экрана
+		/// </summary>
 		public Size WindowSize 
 		{
 			get;
@@ -222,6 +342,9 @@ namespace Lime
 			internal set;
 		}
 
+		/// <summary>
+		/// Возвращает количество пикселей в дюйме по горизонтали и вертикали
+		/// </summary>
 		public Vector2 ScreenDPI 
 		{
 			get
@@ -231,13 +354,29 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Приложение активно (не свернуто). Если приложение не активно, его работа частично приостанавливается
+		/// </summary>
 		public bool Active { get; internal set; }
 
+		/// <summary>
+		/// Всегда возвращает true (на мобильном устройсве невозможно запустить приложение в окне)
+		/// </summary>
 		public bool FullScreen { get { return true; } set {} }
+
+		/// <summary>
+		/// Возвращает FPS
+		/// </summary>
 		public float FrameRate { get { return GameView.Instance.FrameRate; } }
 
+		/// <summary>
+		/// Возвращает ориентацию устройства
+		/// </summary>
 		public DeviceOrientation CurrentDeviceOrientation { get; internal set; }
 
+		/// <summary>
+		/// Ничего не делает. На Андроиде завершить работу приложения таким образом невозможно. Приложения завершаются по усмотрению операционной системы
+		/// </summary>
 		public void Exit()
 		{
 			// There is no way to terminate an android application. 
@@ -270,13 +409,40 @@ namespace Lime
 			set { UnityEngine.Screen.SetResolution(value.Width, value.Height, FullScreen); }
 		}
 #endif
+		/// <summary>
+		/// Генерируется, когда свойство Active стало false (например приложение было свернуто или его окно потеряло фокус)
+		/// </summary>
 		public event Action Activated;
+
+		/// <summary>
+		/// Генерируется, когда свойство Active стало true (например приложение было развернуто или его окно получило фокус)
+		/// </summary>
 		public event Action Deactivated;
+
+		/// <summary>
+		/// Генерируется при создании окна приложения
+		/// </summary>
 		public event Action Created;
+
+		/// <summary>
+		/// Генерируется при уничтожении окна приложения
+		/// </summary>
 		public event Action Terminating;
+
+		/// <summary>
+		/// Генерируется, когда был потерян графический контекст (область памяти, куда рисуется графика) и был пересоздан.
+		/// Такое случается, когда окно приложения сворачивают и разворачивают
+		/// </summary>
 		public event Action GraphicsContextReset;
+
+		/// <summary>
+		/// Генерируется при перемещении окна
+		/// </summary>
 		public event Action Moved;
 
+		/// <summary>
+		/// Вызывается, когда свойство Active стало true (например приложение было развернуто или его окно получило фокус)
+		/// </summary>
 		public virtual void OnActivate()
 		{
 			if (Activated != null) {
@@ -284,6 +450,9 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Вызывается, когда свойство Active стало false (например приложение было свернуто или его окно потеряло фокус)
+		/// </summary>
 		public virtual void OnDeactivate()
 		{
 			if (Deactivated != null) {
@@ -291,6 +460,9 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Вызывается при создании окна приложения
+		/// </summary>
 		public virtual void OnCreate() 
 		{
 			if (Created != null) {
@@ -298,6 +470,9 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Вызывается при уничтожении окна приложения
+		/// </summary>
 		public virtual void OnTerminate() 
 		{
 			if (Terminating != null) {
@@ -306,6 +481,10 @@ namespace Lime
 		}
 
 #if !UNITY
+		/// <summary>
+		/// Вызывается, когда был потерян графический контекст (область памяти, куда рисуется графика) и был пересоздан.
+		/// Такое случается, когда окно приложения сворачивают и разворачивают
+		/// </summary>
 		public void OnGraphicsContextReset() 
 		{
 			GLObjectRegistry.Instance.DiscardObjects();
@@ -314,7 +493,9 @@ namespace Lime
 			}
 		}
 #endif
-
+		/// <summary>
+		/// Вызывается при перемещении окна
+		/// </summary>
 		public virtual void OnMove()
 		{
 			if (Moved != null) {
@@ -322,17 +503,34 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Вызывается при обновлении кадра. Здесь нужно вызвать Update для всех игровых объектов
+		/// </summary>
+		/// <param name="delta">Количество секунд, прошедшее с момента предыдущего кадра</param>
 		public virtual void OnUpdateFrame(float delta) {}
+
+		/// <summary>
+		/// Вызывается при отрисовке кадра
+		/// </summary>
 		public virtual void OnRenderFrame() {}
 
 		/// <summary>
-		/// Called before a device rotation get finished, 
-		/// but screen resolution and device orientation are already in the final state.
+		/// Вызывается перед тем, как устройство выполнит процедуру поворота,
+		/// но разрешение экрана и ориентация устройства уже изменят свое состояние
 		/// </summary>
 		public virtual void OnDeviceRotate() {}
 
+		/// <summary>
+		/// Поддерживаемые ориентации устройства (только для мобильных платформ)
+		/// </summary>
 		public DeviceOrientation SupportedDeviceOrientations = DeviceOrientation.All;
 
+		/// <summary>
+		/// Устанавливает картинку курсора мыши
+		/// Устаревший. Используйте GameView.SetCursor()
+		/// </summary>
+		/// <param name="name">Название картинки курсора из ресурсов</param>
+		/// <param name="hotSpot">Активная точка</param>
 		[Obsolete("Use GameView.SetCursor() instead")]
 		public void SetCursor(string name, IntVector2 hotSpot)
 		{

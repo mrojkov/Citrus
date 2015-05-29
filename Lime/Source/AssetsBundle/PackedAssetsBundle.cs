@@ -146,6 +146,9 @@ namespace Lime
 		Writable = 1,
 	}
 
+	/// <summary>
+	/// Архив игровых ресурсов в виде запакованного файла
+	/// </summary>
 	public class PackedAssetsBundle : AssetsBundle
 	{
 		Stack<Stream> streamPool = new Stack<Stream>();
@@ -162,6 +165,11 @@ namespace Lime
 
 		PackedAssetsBundle() {}
 
+		/// <summary>
+		/// Создает бандл из встроенных ресурсов (например если бандл встроен в .dll)
+		/// </summary>
+		/// <param name="resourceId">Имя ресурса</param>
+		/// <param name="assemblyName">Сборка, содержащая ресурс</param>
 		public PackedAssetsBundle(string resourceId, string assemblyName)
 		{
 			this.path = resourceId;
@@ -175,6 +183,11 @@ namespace Lime
 			ReadIndexTable();
 		}
 
+		/// <summary>
+		/// Создает бандл из файла на диске
+		/// </summary>
+		/// <param name="path">Имя файла</param>
+		/// <param name="flags">Дополнительные флаги</param>
 		public PackedAssetsBundle(string path, AssetBundleFlags flags = Lime.AssetBundleFlags.None)
 		{
 			this.path = path;
@@ -190,6 +203,9 @@ namespace Lime
 			ReadIndexTable();
 		}
 
+		/// <summary>
+		/// Вычисляет контрольную сумму (хеш) бандла
+		/// </summary>
 		public static int CalcBundleCheckSum(string bundlePath)
 		{
 			using (var stream = new FileStream(bundlePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
@@ -222,6 +238,9 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Вычисляет контрольную сумму и возвращает true, если она не совпадает с той, которая в бандле
+		/// </summary>
 		public static bool IsBundleCorrupted(string bundlePath)
 		{
 			using (var stream = new FileStream(bundlePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
@@ -236,6 +255,9 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Вычисляет контрольную сумму и записывает ее в бандл
+		/// </summary>
 		public static void RefreshBundleCheckSum(string bundlePath)
 		{
 			int checkSum = CalcBundleCheckSum(bundlePath);
@@ -265,6 +287,9 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Удаляет из бандла файлы, подлежащие удалению (чтобы пометить файл, используйте метод DeleteFile)
+		/// </summary>
 		public void CleanupBundle()
 		{
 			trash.Sort((x, y) => {
@@ -290,6 +315,9 @@ namespace Lime
 			stream.SetLength(stream.Length - moveDelta);
 		}
 
+		/// <summary>
+		/// Закрывает файловые потоки, выполняет операцию CleanupBundle
+		/// </summary>
 		public override void Dispose()
 		{
 			base.Dispose();
@@ -309,6 +337,10 @@ namespace Lime
 			streamPool.Clear();
 		}
 
+		/// <summary>
+		/// Открывает файл в бандле
+		/// </summary>
+		/// <param name="path">Путь к файлу в бандле</param>
 		public override Stream OpenFile(string path)
 		{
 			var stream = new AssetStream(this, path);
@@ -332,11 +364,18 @@ namespace Lime
 #endif
 		}
 
+		/// <summary>
+		/// Возвращает время записи файла (время, когда файл был изменен)
+		/// </summary>
+		/// <param name="path">Путь к проверяемому файлу в бандле</param>
 		public override DateTime GetFileLastWriteTime(string path)
 		{
 			return GetDescriptor(path).ModificationTime;
 		}
 
+		/// <summary>
+		/// Помечает файл в бандле как подлежащий удалению (для удаления из бандла используйте метод CleanupBundle)
+		/// </summary>
 		public override void DeleteFile(string path)
 		{
 			path = AssetPath.CorrectSlashes(path);
@@ -361,6 +400,13 @@ namespace Lime
 			index[AssetPath.CorrectSlashes(path)] = desc;
 		}
 
+		/// <summary>
+		/// Импортирует файл в бандл
+		/// </summary>
+		/// <param name="path">По какому пути разместить файл в бандле. Если такой файл уже есть, он будет удален</param>
+		/// <param name="stream">поток импортируемого файла</param>
+		/// <param name="reserve">Сколько байт зарезервировать (будет фактически записано 'Длина_Файла + reserve' байт)</param>
+		/// <param name="attributes">Атрибуты импортируемого файла</param>
 		public override void ImportFile(string path, Stream stream, int reserve, AssetAttributes attributes)
 		{
 			AssetDescriptor d;
@@ -470,6 +516,9 @@ namespace Lime
 			}
 		}
 		
+		/// <summary>
+		/// Перечисляет все файлы в бандле
+		/// </summary>
 		public override IEnumerable<string> EnumerateFiles()
 		{
 			string[] files = new string[index.Keys.Count];
