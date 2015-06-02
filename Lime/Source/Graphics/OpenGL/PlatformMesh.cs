@@ -5,9 +5,7 @@ using System.Linq;
 using System.Text;
 #if iOS || ANDROID
 using OpenTK.Graphics.ES20;
-#elif MAC
-using MonoMac.OpenGL;
-#elif WIN
+#else
 using OpenTK.Graphics.OpenGL;
 #endif
 

@@ -1,9 +1,8 @@
 #if MAC
 using System;
 using System.IO;
-using MonoMac.CoreGraphics;
-using MonoMac.AppKit;
-using System.Drawing;
+using CoreGraphics;
+using AppKit;
 using System.Runtime.InteropServices;
 
 namespace Lime
@@ -16,12 +15,12 @@ namespace Lime
 
 		public int GetWidth()
 		{
-			return bitmap != null ? bitmap.CGImage.Width : 0;
+			return bitmap != null ? (int)bitmap.CGImage.Width : 0;
 		}
 
 		public int GetHeight()
 		{
-			return bitmap != null ? bitmap.CGImage.Height : 0;
+			return bitmap != null ? (int)bitmap.CGImage.Height : 0;
 		}
 
 		public void LoadFromStream(Stream stream)
@@ -43,9 +42,9 @@ namespace Lime
 			if (!IsValid()) {
 				throw new InvalidOperationException();
 			}
-			var rect = new RectangleF(cropArea.Left, cropArea.Top, cropArea.Width, cropArea.Height);
+			var rect = new CGRect(cropArea.Left, cropArea.Top, cropArea.Width, cropArea.Height);
 			CGImage cgimage = bitmap.CGImage.WithImageInRect(rect);
-			SizeF size = new SizeF(cgimage.Width, cgimage.Height);
+			var size = new CGSize(cgimage.Width, cgimage.Height);
 			return new BitmapImplementation() { bitmap = new NSImage(cgimage, size) };
 		}
 
@@ -70,7 +69,7 @@ namespace Lime
 					var context = new CGBitmapContext(Marshal.UnsafeAddrOfPinnedArrayElement(imageData, 0), GetWidth(), GetHeight(), 8,
 						bytesPerPixel * GetWidth(), colorSpace, CGBitmapFlags.ByteOrder32Big | CGBitmapFlags.PremultipliedLast)) 
 				{
-					context.DrawImage(new RectangleF(0, 0, GetWidth(), GetHeight()), bitmap.CGImage);
+					context.DrawImage(new CGRect(0, 0, GetWidth(), GetHeight()), bitmap.CGImage);
 				}					
 			}
 			handle.Free();

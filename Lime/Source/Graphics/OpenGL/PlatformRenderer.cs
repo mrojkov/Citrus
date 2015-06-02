@@ -3,12 +3,7 @@ using System;
 
 #if iOS || ANDROID
 using OpenTK.Graphics.ES20;
-#elif MAC
-using MonoMac.OpenGL;
-using PrimitiveType = MonoMac.OpenGL.BeginMode;
-#elif WIN
-using OpenTK;
-using OpenTK.Graphics;
+#else
 using OpenTK.Graphics.OpenGL;
 #endif
 using ProtoBuf;

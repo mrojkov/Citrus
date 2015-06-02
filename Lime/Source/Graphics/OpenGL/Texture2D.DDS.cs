@@ -4,11 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-#if WIN
-using OpenTK.Graphics;
+#if WIN || MAC
 using OpenTK.Graphics.OpenGL;
-#elif MAC
-using MonoMac.OpenGL;
 #elif ANDROID
 using OpenTK.Graphics.ES20;
 #endif

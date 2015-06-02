@@ -1,0 +1,4 @@
+2015-06-02 16:23:06.658 Orange[695:42851] *** WARNING: Method userSpaceScaleFactor in class NSView is deprecated on 10.7 and later. It should not be used in new applications. Use convertRectToBacking: instead. 
+dyld: Library not loaded: /usr/X11/lib/libX11.6.dylib
+  Referenced from: /Users/mike/Documents/Dev/Citrus/Orange/bin/Mac/Release/Orange.app/Contents/MonoBundle/Toolchain.Mac/PVRTexTool
+  Reason: image not found

@@ -4,10 +4,7 @@ using System.IO;
 using System.Collections.Generic;
 #if iOS || ANDROID
 using OpenTK.Graphics.ES20;
-#elif MAC
-using MonoMac.OpenGL;
-#elif WIN
-using OpenTK.Graphics;
+#else
 using OpenTK.Graphics.OpenGL;
 #endif
 

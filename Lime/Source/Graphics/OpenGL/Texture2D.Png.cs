@@ -4,15 +4,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-#if WIN
-using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL;
-#elif MAC
-using MonoMac.OpenGL;
-using OGL = MonoMac.OpenGL.GL;
-#endif
-
 #if WIN || MAC
+using OpenTK.Graphics.OpenGL;
 using SDI = System.Drawing.Imaging;
 using SD = System.Drawing;
 #elif iOS

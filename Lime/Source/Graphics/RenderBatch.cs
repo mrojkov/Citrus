@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 #if iOS || ANDROID
 using OpenTK.Graphics.ES20;
-#elif MAC
-using MonoMac.OpenGL;
-using PrimitiveType = MonoMac.OpenGL.BeginMode;
-#elif WIN
+#else
 using OpenTK.Graphics.OpenGL;
 #endif
 

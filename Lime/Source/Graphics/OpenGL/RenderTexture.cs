@@ -3,11 +3,7 @@ using System;
 using System.Diagnostics;
 #if iOS || ANDROID
 using OpenTK.Graphics.ES20;
-#elif MAC
-using MonoMac.OpenGL;
-using MonoMac.OpenGL;
-#elif WIN
-using OpenTK.Graphics;
+#else
 using OpenTK.Graphics.OpenGL;
 #endif
 using System.Collections.Generic;

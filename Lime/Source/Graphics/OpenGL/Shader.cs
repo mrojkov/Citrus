@@ -3,13 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using OpenTK.Graphics;
 #if iOS || ANDROID
-using OpenTK.Graphics;
 using OpenTK.Graphics.ES20;
-#elif MAC
-using MonoMac.OpenGL;
 #else
-using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 #endif
 
