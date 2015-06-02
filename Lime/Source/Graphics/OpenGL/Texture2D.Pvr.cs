@@ -166,7 +166,7 @@ namespace Lime
 			Action glCommands = PrepareOpenGLTexture;
 			MemoryUsed = 0;
 			for (int i = 0; i < numMipmaps; i++) {
-				if (i > 0 && (width < 4 || height < 4)) {
+				if (i > 0 && (width < 8 || height < 8)) {
 					continue;
 				}
 				// Cloning variables to prevent wrong capturing
