@@ -47,7 +47,7 @@ namespace Lime
 		AudioChannelGroup Group { get; set; }
 
 		/// <summary>
-		/// Смещение. 0 - слева, 1 - справа, 0.5 - посередине
+		/// Смещение. -1 - слева, 1 - справа, 0 - посередине
 		/// </summary>
 		float Pan { get; set; }
 

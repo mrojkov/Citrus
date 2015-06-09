@@ -53,7 +53,7 @@ namespace Lime
 		private float pan = 0;
 
 		/// <summary>
-		/// Сдвиг влево/вправо (0 - влево, 1 - вправо, 0.5 - посередине)
+		/// Сдвиг влево/вправо (-1 - влево, 1 - вправо, 0 - посередине)
 		/// </summary>
 		[ProtoMember(5)]
 		public float Pan
