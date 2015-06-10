@@ -25,6 +25,8 @@ namespace Lime
 		bool textureInitialized;
 		MovieTexture movieTexture;
 
+		public Matrix32 UVTransform { get { return Matrix32.Identity; } }
+
 		[ProtoMember(1)]
 		public string Path
 		{

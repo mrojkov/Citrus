@@ -54,6 +54,8 @@ namespace Lime
 
 		public Widget ClipByWidget { get; set; }
 
+		public Matrix32 UVTransform { get { return Matrix32.Identity; } }
+
 		RenderTarget renderTarget;
 		ITexture renderTexture;
 

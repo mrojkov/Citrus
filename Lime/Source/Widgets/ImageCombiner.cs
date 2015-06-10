@@ -29,6 +29,8 @@ namespace Lime
 		Blending Blending { get; }
 
 		ShaderId Shader { get; }
+
+		Matrix32 UVTransform { get; }
 	}
 
 	[ProtoContract]
@@ -164,8 +166,8 @@ namespace Lime
 			for (int i = 0; i < numCoords; i++) {
 				vertices[i].Pos = coords[i];
 				vertices[i].Color = color;
-				vertices[i].UV1 = coords[i] * uvTransform1;
-				vertices[i].UV2 = coords[i] * uvTransform2;
+				vertices[i].UV1 = coords[i] * uvTransform1 * arg1.UVTransform;
+				vertices[i].UV2 = coords[i] * uvTransform2 * arg2.UVTransform;
 			}
 			Renderer.DrawTriangleFan(texture1, texture2, vertices, numCoords);
 		}
