@@ -115,7 +115,7 @@ namespace Lime
 		/// <param name="fadeinTime">Время плавного нарастания громкости в момент начала воспроизведения</param>
 		/// <param name="paused">Изначально звук будет на паузе</param>
 		/// <param name="volume">Громкость. От 0 до 1</param>
-		/// <param name="pan">Смещение. 0 - слева, 1 - справа, 0.5 - посередине</param>
+		/// <param name="pan">Смещение. -1 - слева, 1 - справа, 0 - посередине</param>
 		/// <param name="pitch">Высота звука</param>
 		public static Sound Play(string path, AudioChannelGroup group, bool looping = false, float priority = 0.5f, float fadeinTime = 0f, bool paused = false, float volume = 1f, float pan = 0f, float pitch = 1f)
 		{
@@ -135,7 +135,7 @@ namespace Lime
 		/// <param name="fadeinTime">Время плавного нарастания громкости в момент начала воспроизведения</param>
 		/// <param name="paused">Изначально звук будет на паузе</param>
 		/// <param name="volume">Громкость. От 0 до 1</param>
-		/// <param name="pan">Смещение. 0 - слева, 1 - справа, 0.5 - посередине</param>
+		/// <param name="pan">Смещение. -1 - слева, 1 - справа, 0 - посередине</param>
 		/// <param name="pitch">Высота звука</param>
 		public static Sound PlayMusic(string path, bool looping = true, float priority = 100f, float fadeinTime = 0.5f, bool paused = false, float volume = 1f, float pan = 0f, float pitch = 1f)
 		{
@@ -152,7 +152,7 @@ namespace Lime
 		/// <param name="fadeinTime">Время плавного нарастания громкости в момент начала воспроизведения</param>
 		/// <param name="paused">Изначально звук будет на паузе</param>
 		/// <param name="volume">Громкость. От 0 до 1</param>
-		/// <param name="pan">Смещение. 0 - слева, 1 - справа, 0.5 - посередине</param>
+		/// <param name="pan">Смещение. -1 - слева, 1 - справа, 0 - посередине</param>
 		/// <param name="pitch">Высота звука</param>
 		public static Sound PlayEffect(string path, bool looping = false, float priority = 0.5f, float fadeinTime = 0f, bool paused = false, float volume = 1f, float pan = 0f, float pitch = 1f)
 		{
