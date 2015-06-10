@@ -16,7 +16,6 @@ namespace Lime
 		/// Устаревший. Использовать только для совместимости со старыми проектами.
 		/// Раньше в словаре в качестве ключей использовались числа. Сейчас - вся строка. Этот флаг включает старый режим
 		/// </summary>
-		[Obsolete]
 		public static bool UseNumericKeys { get { return useNumericKeys; } set { useNumericKeys = value; } }
 
 		/// <summary>
