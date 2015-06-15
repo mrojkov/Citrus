@@ -875,6 +875,9 @@ namespace Orange
 				case "Horizontal":
 					layout.Horizontal = lexer.ParseBool();
 					break;
+				case "ProcessHidden":
+					layout.ProcessHidden = lexer.ParseBool();
+					break;
 				default:
 					ParseActorProperty(node, name);
 					break;
