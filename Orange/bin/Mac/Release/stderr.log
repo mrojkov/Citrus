@@ -1,4 +1,1 @@
-2015-06-02 17:19:01.375 Orange[781:54711] *** WARNING: Method userSpaceScaleFactor in class NSView is deprecated on 10.7 and later. It should not be used in new applications. Use convertRectToBacking: instead. 
-2015-06-02 17:19:38.307 Orange[781:54711] IMK Stall detected, *please Report* your user scenario in <rdar://problem/16792073> - (imkxpc_attributesForCharacterIndex:reply:) block performed very slowly (2.30 secs)
-2015-06-02 17:21:57.863 Orange[781:54711] IMK Stall detected, *please Report* your user scenario in <rdar://problem/16792073> - (imkxpc_selectedRangeWithReply:) block performed very slowly (2.29 secs)
-2015-06-02 17:24:05.007 Orange[781:54711] IMK Stall detected, *please Report* your user scenario in <rdar://problem/16792073> - (imkxpc_selectedRangeWithReply:) block performed very slowly (1.26 secs)
+2015-06-17 11:07:04.055 Orange[10308:389583] *** WARNING: Method userSpaceScaleFactor in class NSView is deprecated on 10.7 and later. It should not be used in new applications. Use convertRectToBacking: instead. 
