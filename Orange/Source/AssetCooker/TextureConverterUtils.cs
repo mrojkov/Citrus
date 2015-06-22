@@ -22,7 +22,7 @@ namespace Orange
 		}
 
 		/// <summary>
-		/// Fills RGB channels with 255, Alpha remains untouched
+		/// Fills RGB channels with alpha values.
 		/// </summary>
 		public static void ConvertBitmapToAlphaMask(Gdk.Pixbuf pixbuf)
 		{
@@ -37,7 +37,7 @@ namespace Orange
 				for (int i = 0; i < height; i++) {
 					for (int j = 0; j < width; j++) {
 						RGBA p = *pixels;
-						p.R = p.G = p.B = 255;
+						p.R = p.G = p.B = p.A;
 						*pixels++ = p;
 					}
 					pixels += stride / 4 - width;
@@ -323,41 +323,6 @@ namespace Orange
 					image[i + 2] = (byte)(b / count);
 				}
 				Lime.Toolbox.Swap(ref pending, ref pendingNext);
-			}
-		}
-
-		public static void PremultiplyAlpha(Gdk.Pixbuf pixbuf, bool swapChannels)
-		{
-			if ((pixbuf.Rowstride & 0x3) != 0 || pixbuf.BitsPerSample != 8 || pixbuf.NChannels != 4) {
-				throw new Lime.Exception("Invalid pixbuf format");
-			}
-			unsafe {
-				RGBA* pixels = (RGBA*)pixbuf.Pixels;
-				int width = pixbuf.Width;
-				for (int i = 0; i < pixbuf.Height; i++) {
-					for (int j = 0; j < width; j++) {
-						RGBA c = *pixels;
-						if (c.A == 0) {
-							c.R = c.G = c.B = 0;
-						} else if (c.A < 255) {
-							c.R = (byte)(c.R * c.A / 255);
-							c.G = (byte)(c.G * c.A / 255);
-							c.B = (byte)(c.B * c.A / 255);
-						}
-						if (swapChannels) {
-							RGBA c2;
-							c2.A = c.A;
-							c2.R = c.B;
-							c2.G = c.G;
-							c2.B = c.R;
-							*pixels = c2;
-						} else {
-							*pixels = c;
-						}
-						pixels++;
-					}
-					pixels += pixbuf.Rowstride / 4 - width;
-				}
 			}
 		}
 		

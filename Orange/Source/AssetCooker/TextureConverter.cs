@@ -9,7 +9,13 @@ namespace Orange
 {
 	public static class TextureConverter
 	{
-		public static void ToPVR_PVRTC(Gdk.Pixbuf pixbuf, string dstPath, PVRFormat pvrFormat, bool mipMaps)
+		public enum PVRCompressionScheme
+		{
+			PVRTC4,
+			ETC1,
+		}
+
+		public static void ToPVR(Gdk.Pixbuf pixbuf, string dstPath, bool mipMaps, PVRFormat pvrFormat, PVRCompressionScheme compression)
 		{
 			int width = pixbuf.Width;
 			int height = pixbuf.Height;
@@ -17,31 +23,33 @@ namespace Orange
 
 			int potWidth = TextureConverterUtils.GetNearestPowerOf2(width, 8, 1024);
 			int potHeight = TextureConverterUtils.GetNearestPowerOf2(height, 8, 1024);
-			
-			int maxDimension = Math.Max(potWidth, potHeight);
 
-			string args = "-shh";
+			string args = "";
 			switch (pvrFormat) {
-			case PVRFormat.Compressed:
-				args += " -f PVRTC1_4";
-				width = height = maxDimension;
-				break;
-			case PVRFormat.RGB565:
-				if (hasAlpha) {
-					Console.WriteLine("WARNING: texture has alpha channel. Used 'RGBA4444' format instead of 'RGB565'.");
+				case PVRFormat.Compressed:
+					if (compression == PVRCompressionScheme.PVRTC4) {
+						args += " -f PVRTC1_4";
+						width = height = Math.Max(potWidth, potHeight);
+					} else {
+						args = " -f ETC1 -q etcfast";
+					}
+					break;
+				case PVRFormat.RGB565:
+					if (hasAlpha) {
+						Console.WriteLine("WARNING: texture has alpha channel. Used 'RGBA4444' format instead of 'RGB565'.");
+						args += " -f r4g4b4a4";
+						TextureConverterUtils.ReduceTo4BitsPerChannelWithFloydSteinbergDithering(pixbuf);
+					} else {
+						args += " -f r5g6b5";
+					}
+					break;
+				case PVRFormat.RGBA4:
 					args += " -f r4g4b4a4";
 					TextureConverterUtils.ReduceTo4BitsPerChannelWithFloydSteinbergDithering(pixbuf);
-				} else {
-					args += " -f r5g6b5";
-				}
-				break;
-			case PVRFormat.RGBA4:
-				args += " -f r4g4b4a4";
-				TextureConverterUtils.ReduceTo4BitsPerChannelWithFloydSteinbergDithering(pixbuf);
-				break;
-			case PVRFormat.ARGB8:
-				args += " -f r8g8b8a8";
-				break;
+					break;
+				case PVRFormat.ARGB8:
+					args += " -f r8g8b8a8";
+					break;
 			}
 			string tga = Path.ChangeExtension(dstPath, ".tga");
 			try {
@@ -53,67 +61,36 @@ namespace Orange
 				if (mipMaps) {
 					args += " -m";
 				}
-				args += String.Format(" -i '{0}' -o '{1}' -r {2},{3}", tga, dstPath, width, height);
+				args += String.Format(" -i \"{0}\" -o \"{1}\" -r {2},{3} -shh", tga, dstPath, width, height);
+#if MAC
 				var pvrTexTool = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Mac", "PVRTexTool");
 				Mono.Unix.Native.Syscall.chmod(pvrTexTool, Mono.Unix.Native.FilePermissions.S_IXOTH | Mono.Unix.Native.FilePermissions.S_IXUSR);
-				var p = System.Diagnostics.Process.Start(pvrTexTool, args);
-				p.WaitForExit();
-				if (p.ExitCode != 0) {
-					throw new Lime.Exception("Failed to convert '{0}' to PVR format(error code: {1})", tga, p.ExitCode);
-				}
-			} finally {
-				File.Delete(tga);
-			}
-		}
-
-		public static void ToPVR_ETC1(Gdk.Pixbuf pixbuf, string dstPath, PVRFormat pvrFormat, bool mipMaps)
-		{
-			string formatArguments;
-			switch (pvrFormat) {
-			case PVRFormat.Compressed:
-				formatArguments = "-f etc1 -q etcfast";
-				break;
-			case PVRFormat.RGB565:
-				if (pixbuf.HasAlpha) {
-					Console.WriteLine("WARNING: texture has alpha channel. Used 'RGBA4444' format instead of 'RGB565'.");
-					formatArguments = "-f r4g4b4a4";
-					TextureConverterUtils.ReduceTo4BitsPerChannelWithFloydSteinbergDithering(pixbuf);
-				} else {
-					formatArguments = "-f r5g6b5";
-				}
-				break;
-			case PVRFormat.RGBA4:
-				formatArguments = "-f r4g4b4a4";
-				TextureConverterUtils.ReduceTo4BitsPerChannelWithFloydSteinbergDithering(pixbuf);
-				break;
-			case PVRFormat.ARGB8:
-				formatArguments = "-f r8g8b8a8";
-				break;
-			default:
-				throw new ArgumentException();
-			}
-			var tga = Path.ChangeExtension(dstPath, ".tga");
-			try {
-				TextureConverterUtils.SwapRGBChannels(pixbuf);
-				TextureConverterUtils.SaveToTGA(pixbuf, tga);
+#else
 				var pvrTexTool = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Win", "PVRTexToolCli");
-				// -p - premultiply alpha
-				// -shh - silent
-				tga = MakeAbsolutePath(tga);
-				dstPath = MakeAbsolutePath(dstPath);
-				var args = String.Format("{0} -i \"{1}\" -o \"{2}\" {3} -p -shh", formatArguments, tga, dstPath, mipMaps ? "-m" : "");
-				int result = Process.Start(pvrTexTool, args, Process.Options.RedirectErrors);
+#endif
+				int result = Process.Start(pvrTexTool, args);
 				if (result != 0) {
-					throw new Lime.Exception("Error converting '{0}'\nCommand line: {1}", tga, pvrTexTool + " " + args);
+					throw new Lime.Exception("Failed to convert '{0}' to PVR format(error code: {1})", tga, result);
 				}
 			} finally {
-				try {
-					File.Delete(tga);
-				} catch { }
+				DeletePossibleLockedFile(tga);
 			}
 		}
 
-		public static void ToDDS_DXTi(Gdk.Pixbuf pixbuf, string dstPath, DDSFormat format, bool mipMaps)
+		private static void DeletePossibleLockedFile(string file)
+		{
+			while (true) {
+				try {
+					File.Delete(file);
+				} catch (System.Exception) {
+					System.Threading.Thread.Sleep(100);
+					continue;
+				}
+				break;
+			}
+		}
+
+		public static void ToDDS(Gdk.Pixbuf pixbuf, string dstPath, DDSFormat format, bool mipMaps)
 		{
 			bool compressed = format == DDSFormat.DXTi;
 			if (pixbuf.HasAlpha) {
@@ -163,7 +140,7 @@ namespace Orange
 		public static void ToJPG(Gdk.Pixbuf pixbuf, string dstPath, bool mipMaps)
 		{
 			if (pixbuf.HasAlpha) {
-				TextureConverterUtils.PremultiplyAlpha(pixbuf, false);
+				TextureConverterUtils.BleedAlpha(pixbuf);
 			}
 			pixbuf.Savev(dstPath, "jpeg", new string[] { "quality" }, new string[] { "80" });
 		}

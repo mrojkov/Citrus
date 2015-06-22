@@ -560,20 +560,21 @@ namespace Orange
 					ConvertTexture(path, attributes, file => texture.Save(file, "png"));
 					break;
 				case TargetPlatform.Android:
-					ConvertTexture(path, attributes, file => TextureConverter.ToPVR_ETC1(texture, file, rules.PVRFormat, rules.MipMaps));
+					ConvertTexture(path, attributes, file => TextureConverter.ToPVR(texture, file, rules.MipMaps, rules.PVRFormat, TextureConverter.PVRCompressionScheme.ETC1));
 					// ETC1 textures on Android use separate alpha channel
 					if (texture.HasAlpha && rules.PVRFormat == PVRFormat.Compressed) {
 						using (var alphaTexture = new Gdk.Pixbuf(texture, 0, 0, texture.Width, texture.Height)) {
 							TextureConverterUtils.ConvertBitmapToAlphaMask(alphaTexture);
-							ConvertTexture(alphaPath, AssetAttributes.Zipped, file => TextureConverter.ToPVR_ETC1(alphaTexture, file, PVRFormat.Compressed, rules.MipMaps));
+							ConvertTexture(alphaPath, AssetAttributes.Zipped, file => TextureConverter.ToPVR(alphaTexture, file, rules.MipMaps, PVRFormat.Compressed,
+								TextureConverter.PVRCompressionScheme.ETC1));
 						}
 					}
 					break;
 				case TargetPlatform.iOS:
-					ConvertTexture(path, attributes, file => TextureConverter.ToPVR_PVRTC(texture, file, rules.PVRFormat, rules.MipMaps));
+					ConvertTexture(path, attributes, file => TextureConverter.ToPVR(texture, file, rules.MipMaps, rules.PVRFormat, TextureConverter.PVRCompressionScheme.PVRTC4));
 					break;
 				case TargetPlatform.Desktop:
-					ConvertTexture(path, attributes, file => TextureConverter.ToDDS_DXTi(texture, file, rules.DDSFormat, rules.MipMaps));
+					ConvertTexture(path, attributes, file => TextureConverter.ToDDS(texture, file, rules.DDSFormat, rules.MipMaps));
 					break;
 				case TargetPlatform.UltraCompression:
 					attributes = AssetAttributes.None;
