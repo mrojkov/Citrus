@@ -244,6 +244,87 @@ namespace Orange
 				}
 			}
 		}
+		public static unsafe void BleedAlpha(Gdk.Pixbuf pixbuf)
+		{
+			if (!pixbuf.HasAlpha) {
+				return;
+			}
+			var pixels = (byte*)pixbuf.Pixels;
+			if (pixbuf.Rowstride != pixbuf.Width * 4) {
+				throw new InvalidOperationException();
+			}
+			BleedAlpha(pixels, pixbuf.Width, pixbuf.Height);
+		}
+
+		unsafe static void BleedAlpha(byte* image, int width, int height)
+		{
+			int N = width * height;
+			var processed = new bool[N];
+			var pending = new List<int>(N);
+			var pendingNext = new List<int>(N);
+			var hOffsets = new int[8] { -1, 0, 1, -1, 1, -1, 0, 1 };
+			var vOffsets = new int[8] { -1, -1, -1, 0, 0, 1, 1, 1 };
+			for (int i = 0, j = 3; i < N; i++, j += 4) {
+				// If the pixel alpha != 0
+				if (image[j] != 0) {
+					processed[i] = true;
+				} else {
+					int x = i % width;
+					int y = i / width;
+					// Iterate across 8 adjacent pixels
+					for (int k = 0; k < 8; k++) {
+						int s = hOffsets[k];
+						int t = vOffsets[k];
+						if (x + s >= 0 && x + s < width && y + t >= 0 && y + t < height) {
+							var index = j + 4 * (s + t * width);
+							if (image[index] != 0) {
+								pending.Add(i);
+								break;
+							}
+						}
+					}
+				}
+			}
+			while (pending.Count > 0) {
+				pendingNext.Clear();
+				for (int p = 0; p < pending.Count; p++) {
+					var j = pending[p];
+					if (processed[j])
+						continue;
+					processed[j] = true;
+					var i = pending[p] * 4;
+					int x = j % width;
+					int y = j / width;
+					int r = 0;
+					int g = 0;
+					int b = 0;
+					int count = 0;
+					for (int k = 0; k < 8; k++) {
+						int s = hOffsets[k];
+						int t = vOffsets[k];
+						if (x + s >= 0 && x + s < width && y + t >= 0 && y + t < height) {
+							t *= width;
+							if (processed[j + s + t]) {
+								var index = i + 4 * (s + t);
+								r += image[index + 0];
+								g += image[index + 1];
+								b += image[index + 2];
+								count++;
+							} else {
+								pendingNext.Add(j + s + t);
+							}
+						}
+					}
+					if (count == 0) {
+						throw new InvalidOperationException();
+					}
+					image[i + 0] = (byte)(r / count);
+					image[i + 1] = (byte)(g / count);
+					image[i + 2] = (byte)(b / count);
+				}
+				Lime.Toolbox.Swap(ref pending, ref pendingNext);
+			}
+		}
 
 		public static void PremultiplyAlpha(Gdk.Pixbuf pixbuf, bool swapChannels)
 		{

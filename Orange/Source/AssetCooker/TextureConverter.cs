@@ -117,9 +117,9 @@ namespace Orange
 		{
 			bool compressed = format == DDSFormat.DXTi;
 			if (pixbuf.HasAlpha) {
-				TextureConverterUtils.PremultiplyAlpha(pixbuf, swapChannels: compressed);
-			} else if (compressed) {
-				// DXT1
+				TextureConverterUtils.BleedAlpha(pixbuf);
+			}
+			if (compressed) {
 				TextureConverterUtils.SwapRGBChannels(pixbuf);
 			}
 			var tga = Path.ChangeExtension(dstPath, ".tga");
@@ -139,7 +139,7 @@ namespace Orange
 			string nvcompress = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Win", "nvcompress.exe");
 			srcPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), srcPath);
 			dstPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), dstPath);
-			string args = String.Format("-silent -fast {0} {1} \"{2}\" \"{3}\"", mipsFlag, compressionFlag, srcPath, dstPath);
+			string args = String.Format("{0} {1} \"{2}\" \"{3}\"", mipsFlag, compressionFlag, srcPath, dstPath);
 			int result = Process.Start(nvcompress, args, Process.Options.RedirectErrors);
 			if (result != 0) {
 				throw new Lime.Exception("Failed to convert '{0}' to DDS format(error code: {1})", srcPath, result);
@@ -147,7 +147,7 @@ namespace Orange
 #else
 			string nvcompress = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Mac", "nvcompress");
 			Mono.Unix.Native.Syscall.chmod(nvcompress, Mono.Unix.Native.FilePermissions.S_IXOTH | Mono.Unix.Native.FilePermissions.S_IXUSR);
-			string args = String.Format("-silent -fast {0} {1} '{2}' '{3}'", mipsFlag, compressionFlag, srcPath, dstPath);
+			string args = String.Format("{0} {1} '{2}' '{3}'", mipsFlag, compressionFlag, srcPath, dstPath);
 			Console.WriteLine(nvcompress);
 			var psi = new System.Diagnostics.ProcessStartInfo(nvcompress, args);
 			var p = System.Diagnostics.Process.Start(psi);
