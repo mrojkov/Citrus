@@ -20,38 +20,42 @@ namespace Orange
 			
 			int maxDimension = Math.Max(potWidth, potHeight);
 
-			string formatArguments = "";
+			string args = "-shh";
 			switch (pvrFormat) {
 			case PVRFormat.Compressed:
-				formatArguments = "-f PVRTC1_4";
-				potWidth = potHeight = maxDimension;
+				args += " -f PVRTC1_4";
+				width = height = maxDimension;
 				break;
 			case PVRFormat.RGB565:
 				if (hasAlpha) {
 					Console.WriteLine("WARNING: texture has alpha channel. Used 'RGBA4444' format instead of 'RGB565'.");
-					formatArguments = "-f r4g4b4a4";
+					args += " -f r4g4b4a4";
 					TextureConverterUtils.ReduceTo4BitsPerChannelWithFloydSteinbergDithering(pixbuf);
 				} else {
-					formatArguments = "-f r5g6b5";
+					args += " -f r5g6b5";
 				}
 				break;
 			case PVRFormat.RGBA4:
-				formatArguments = "-f r4g4b4a4";
+				args += " -f r4g4b4a4";
 				TextureConverterUtils.ReduceTo4BitsPerChannelWithFloydSteinbergDithering(pixbuf);
 				break;
 			case PVRFormat.ARGB8:
-				formatArguments = "-f r8g8b8a8";
+				args += " -f r8g8b8a8";
 				break;
 			}
 			string tga = Path.ChangeExtension(dstPath, ".tga");
 			try {
+				if (pixbuf.HasAlpha) {
+					args += " -l"; // Enable alpha bleed
+				}
 				TextureConverterUtils.SwapRGBChannels(pixbuf);
 				TextureConverterUtils.SaveToTGA(pixbuf, tga);
-				string mipsFlag = mipMaps ? "-m" : "";
-				string pvrTexTool = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Mac", "PVRTexTool");
+				if (mipMaps) {
+					args += " -m";
+				}
+				args += String.Format(" -i '{0}' -o '{1}' -r {2},{3}", tga, dstPath, width, height);
+				var pvrTexTool = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Mac", "PVRTexTool");
 				Mono.Unix.Native.Syscall.chmod(pvrTexTool, Mono.Unix.Native.FilePermissions.S_IXOTH | Mono.Unix.Native.FilePermissions.S_IXUSR);
-				string args = String.Format("{0} -i '{1}' -o '{2}' {3} -p -r {4},{5} -shh",
-					formatArguments, tga, dstPath, mipsFlag, width, height);
 				var p = System.Diagnostics.Process.Start(pvrTexTool, args);
 				p.WaitForExit();
 				if (p.ExitCode != 0) {
