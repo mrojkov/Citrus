@@ -28,19 +28,18 @@ namespace Orange
 
 		public static string GetApplicationDirectory()
 		{
-			string appPath;
-			appPath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().
-				GetName().CodeBase);
+			var assemblyPath = System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase;
 #if MAC
-			if (appPath.StartsWith("file:")) {
-				appPath = appPath.Remove(0, 5);
+			if (assemblyPath.StartsWith("file:")) {
+				assemblyPath = assemblyPath.Remove(0, 5);
 			}
 #elif WIN
-			if (appPath.StartsWith("file:\\")) {
-				appPath = appPath.Remove(0, 6);
+			if (assemblyPath.StartsWith("file:///")) {
+				assemblyPath = assemblyPath.Remove(0, 8);
 			}
 #endif
-			return appPath;
+			var dir = System.IO.Path.GetDirectoryName(assemblyPath);
+			return dir;
 		}
 
 		public static string GetTargetPlatformString(TargetPlatform platform)
