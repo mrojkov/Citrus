@@ -181,9 +181,6 @@ namespace Lime
 
 		static Renderer()
 		{
-#if !UNITY
-			PremultipliedAlphaMode = true;
-#endif
 			projectionStack = new Stack<Matrix44>();
 			projectionStack.Push(Matrix44.Identity);
 		}
