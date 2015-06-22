@@ -15,7 +15,7 @@ namespace Lime
 		[ProtoMember(2)]
 		public bool ProcessHidden { get; set; }
 
-		protected override void OnParentSizeChanged(Vector2 parentSizeDelta)
+		public void Refresh()
 		{
 			if (Parent != null && Parent.AsWidget != null) {
 				if (Horizontal) {
@@ -24,6 +24,11 @@ namespace Lime
 					UpdateForVerticalOrientation();
 				}
 			}
+		}
+
+		protected override void OnParentSizeChanged(Vector2 parentSizeDelta)
+		{
+			Refresh();
 		}
 
 		private void UpdateForHorizontalOrientation()
