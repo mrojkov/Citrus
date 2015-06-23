@@ -93,6 +93,7 @@ namespace Lime
 		private Action clicked;
 		private Blending blending;
 		private ShaderId shader;
+		private Material material;
 		private Vector2 pivot;
 		private Vector2 scale;
 		private bool visible;
@@ -122,51 +123,10 @@ namespace Lime
 			set { }
 		}
 
-		private WidgetCachedRenderer cachedRenderer;
-		private WidgetCachedRenderer effectiveCachedRenderer;
-
-		public bool CachedRendering
-		{
-			get { return cachedRenderer != null; }
-			set
-			{
-				if (value && cachedRenderer == null) {
-					cachedRenderer = new WidgetCachedRenderer(this);
-				} else if (!value && cachedRenderer != null) {
-					cachedRenderer.Dispose();
-					cachedRenderer = null;
-				}
-				PropagateCachedRendererToHierarchy(cachedRenderer);
-			}
-		}
-
-		private void PropagateCachedRendererToHierarchy(WidgetCachedRenderer renderer)
-		{
-			effectiveCachedRenderer = renderer;
-			for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
-				if (node.AsWidget != null) {
-					node.AsWidget.PropagateCachedRendererToHierarchy(renderer);
-				}
-			}
-		}
-
 		protected void InvalidateGlobalValuesAndCachedRenderer(bool geometryChanged = false)
 		{
-			if (effectiveCachedRenderer != null) {
-				// Cached renderer is transformation-agnostic
-				if (!geometryChanged || cachedRenderer == null) {
-					effectiveCachedRenderer.Invalidate();
-				}
-			}
 			if (GlobalValuesValid) {
 				InvalidateGlobalValues();
-			}
-		}
-
-		public void InvalidateRenderCache()
-		{
-			if (effectiveCachedRenderer != null) {
-				effectiveCachedRenderer.Invalidate();
 			}
 		}
 
@@ -290,9 +250,6 @@ namespace Lime
 			}
 			if (lateTasks != null) {
 				lateTasks.Stop();
-			}
-			if (cachedRenderer != null) {
-				cachedRenderer.Dispose();
 			}
 			base.Dispose();
 		}
@@ -485,10 +442,22 @@ namespace Lime
 		[ProtoMember(14)]
 		public BoneArray BoneArray;
 
+		public Material Material
+		{
+			get { return material; }
+			set
+			{
+				if (material != value) {
+					material = value;
+					InvalidateGlobalValuesAndCachedRenderer();
+				}
+			}
+		}
+
 		private Matrix32 localToWorldTransform;
 		private Color4 globalColor;
 		private Blending globalBlending;
-		private ShaderId globalShader;
+		private Material globalMaterial;
 		private bool globallyVisible;
 
 		public Matrix32 LocalToWorldTransform
@@ -506,9 +475,9 @@ namespace Lime
 			get { if (!GlobalValuesValid) RecalcGlobalValues(); return globalBlending; }
 		}
 
-		public ShaderId GlobalShader
+		public Material GlobalMaterial
 		{
-			get { if (!GlobalValuesValid) RecalcGlobalValues(); return globalShader; }
+			get { if (!GlobalValuesValid) RecalcGlobalValues(); return globalMaterial; }
 		}
 
 		public bool GloballyVisible 
@@ -632,10 +601,6 @@ namespace Lime
 		{
 			var clone = base.DeepCloneFast().AsWidget;
 			clone.input = null;
-			if (clone.cachedRenderer != null) {
-				clone.cachedRenderer = new WidgetCachedRenderer(clone);
-			}
-			clone.effectiveCachedRenderer = null;
 			clone.tasks = null;
 			clone.lateTasks = null;
 			return clone;
@@ -710,7 +675,7 @@ namespace Lime
 				localToWorldTransform = Matrix32.Identity;
 				globalColor = color;
 				globalBlending = Blending.Inherited;
-				globalShader = ShaderId.Inherited;
+				globalMaterial = StandardMaterial.Diffuse;
 				globallyVisible = Visible && color.A != 0;
 				return;
 			}
@@ -721,7 +686,7 @@ namespace Lime
 					Matrix32.Multiply(ref localToParent, ref parentWidget.localToWorldTransform, out localToWorldTransform);
 					globalColor = Color * parentWidget.globalColor;
 					globalBlending = Blending == Blending.Inherited ? parentWidget.globalBlending : Blending;
-					globalShader = Shader == ShaderId.Inherited ? parentWidget.globalShader : Shader;
+					globalMaterial = Material.FromShaderId(Shader, ifInherited: parentWidget.globalMaterial, ifCustom: Material);
 					globallyVisible = (Visible && color.A != 0) && parentWidget.globallyVisible;
 					return;
 				}
@@ -729,7 +694,7 @@ namespace Lime
 			localToWorldTransform = CalcLocalToParentTransform();
 			globalColor = color;
 			globalBlending = Blending;
-			globalShader = Shader;
+			globalMaterial = Material.FromShaderId(Shader, ifInherited: StandardMaterial.Diffuse, ifCustom: Material);
 			globallyVisible = Visible && color.A != 0;
 		}
 
@@ -824,12 +789,6 @@ namespace Lime
 		{
 			if (!GloballyVisible) {
 				return;
-			}
-			if (cachedRenderer != null) {
-				if (cachedRenderer.Prepare()) {
-					chain.Add(cachedRenderer, Layer);
-					return;
-				}
 			}
 			if (Layer != 0) {
 				int oldLayer = chain.SetCurrentLayer(Layer);

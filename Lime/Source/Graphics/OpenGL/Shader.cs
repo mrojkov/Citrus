@@ -1,26 +1,30 @@
 #if OPENGL
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Reflection;
 using OpenTK.Graphics;
 #if iOS || ANDROID
 using OpenTK.Graphics.ES20;
+using ShaderInfoKind = OpenTK.Graphics.ES20.ShaderParameter;
 #else
 using OpenTK.Graphics.OpenGL;
+using ShaderInfoKind = OpenTK.Graphics.OpenGL.ShaderParameter;
 #endif
 
 namespace Lime
 {
-	public class Shader : IGLObject, IDisposable
+	internal class Shader : IGLObject, IDisposable
 	{
 		private int handle;
 		private string source;
-		private bool fragmentOrVertex;
+		private ShaderType type;
 
-		public Shader(bool fragmentOrVertex, string source)
+		public Shader(ShaderType type, string source)
 		{
-			this.fragmentOrVertex = fragmentOrVertex;
+			this.type = type;
 			this.source = ReplacePrecisionModifiers(source);
 			CreateShader();
 			GLObjectRegistry.Instance.Add(this);
@@ -28,12 +32,13 @@ namespace Lime
 
 		~Shader()
 		{
-			Dispose();
+			Discard();
 		}
 
 		public void Dispose()
 		{
 			Discard();
+			GC.SuppressFinalize(this);
 		}
 
 		public void Discard()
@@ -48,7 +53,7 @@ namespace Lime
 
 		private void CreateShader()
 		{
-			handle = GL.CreateShader(fragmentOrVertex ? ShaderType.FragmentShader : ShaderType.VertexShader);
+			handle = GL.CreateShader(type);
 #if MAC
 			var length = source.Length;
 			GL.ShaderSource(handle, 1, new string[] { source }, ref length);
@@ -57,7 +62,7 @@ namespace Lime
 #endif
 			GL.CompileShader(handle);
 			var result = new int[1];
-			GL.GetShader(handle, ShaderParameter.CompileStatus, result);
+			GL.GetShader(handle, ShaderInfoKind.CompileStatus, result);
 			if (result[0] == 0) {
 				var infoLog = GetCompileLog();
 				Logger.Write("Shader compile log:\n{0}", infoLog);
@@ -68,7 +73,7 @@ namespace Lime
 		private string GetCompileLog()
 		{
 			var logLength = new int[1];
-			GL.GetShader(handle, ShaderParameter.InfoLogLength, logLength);
+			GL.GetShader(handle, ShaderInfoKind.InfoLogLength, logLength);
 			if (logLength[0] > 0) {
 				var infoLog = new System.Text.StringBuilder(logLength[0]);
 				unsafe {
@@ -96,21 +101,44 @@ namespace Lime
 			}
 			return handle;
 		}
-	}
 
-	public class VertexShader : Shader
-	{
-		public VertexShader(string source)
-			: base(fragmentOrVertex: false, source: source)
+		public static Shader LoadFromResources(string name, ShaderPool pool)
 		{
+			name = string.Format("Lime.Resources.Shaders.{0}.glsl", name);
+			using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(name))
+			using (var reader = new StreamReader(stream)) {
+				return pool[reader.ReadToEnd()];
+			}
 		}
 	}
 
-	public class FragmentShader : Shader
+	internal sealed class ShaderPool
 	{
-		public FragmentShader(string source)
-			: base(fragmentOrVertex: true, source: source)
+		public static readonly ShaderPool VertexShaders = new ShaderPool(ShaderType.VertexShader);
+		public static readonly ShaderPool FragmentShaders = new ShaderPool(ShaderType.FragmentShader);
+
+		private ShaderType itemType;
+		private Dictionary<string, Shader> items = new Dictionary<string, Shader>();
+
+		public Shader this[string source]
 		{
+			get { return GetShaderBySource(source); }
+		}
+
+		private ShaderPool(ShaderType itemType)
+		{
+			this.itemType = itemType;
+		}
+
+		private Shader GetShaderBySource(string source)
+		{
+			Shader shader;
+			if (items.TryGetValue(source, out shader)) {
+				return shader;
+			}
+			shader = new Shader(itemType, source);
+			items[source] = shader;
+			return shader;
 		}
 	}
 }

@@ -130,7 +130,7 @@ namespace Lime
 			BuildLayout(layout);
 			Renderer.Transform1 = LocalToWorldTransform;
 			Renderer.Blending = GlobalBlending;
-			Renderer.Shader = GlobalShader;
+			Renderer.Material = GlobalMaterial;
 			for (int i = 0; i < layout.Length; i++) {
 				var part = layout[i];
 				Renderer.DrawSprite(Texture, GlobalColor, part.Rect.A, part.Rect.Size, part.UV.A, part.UV.B);

@@ -88,7 +88,7 @@ namespace Lime
 				Renderer.Flush();
 				Renderer.PremultipliedAlphaMode = false;
 				Renderer.Blending = GlobalBlending;
-				Renderer.Shader = GlobalShader;
+				Renderer.Material = GlobalMaterial;
 				Renderer.Transform1 = LocalToWorldTransform;
 				Renderer.DrawSprite(movieTexture, GlobalColor, Vector2.Zero, Size, Vector2.Zero, Vector2.One);
 				Renderer.Flush();

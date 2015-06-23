@@ -33,7 +33,7 @@ namespace Lime
 		public override void Render()
 		{
 			Renderer.Blending = GlobalBlending;
-			Renderer.Shader = GlobalShader;
+			Renderer.Material = GlobalMaterial;
 			Renderer.Transform1 = LocalToWorldTransform;
 			int n = Points.Count;
 			if (n >= 2) {

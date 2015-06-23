@@ -46,6 +46,7 @@ namespace Lime
 			model.Add(typeof(TextureAtlasElement.Params), true);
 			model.Add(typeof(Font), true);
 			model.Add(typeof(Bitmap), true);
+			model.Add(typeof(ShaderProgram.Asset), true);
 			foreach (var type in types) {
 				model.Add(type, true);
 			}

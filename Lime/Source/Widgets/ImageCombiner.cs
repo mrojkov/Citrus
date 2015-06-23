@@ -45,6 +45,8 @@ namespace Lime
 		[ProtoMember(3)]
 		public ShaderId Shader { get; set; }
 
+		public Material Material { get; set; }
+
 		public ImageCombiner()
 		{
 			Enabled = true;
@@ -189,14 +191,13 @@ namespace Lime
 			}
 			Renderer.Transform1 = Parent.AsWidget.LocalToWorldTransform;
 			Renderer.Blending = Blending == Blending.Inherited ? Parent.AsWidget.GlobalBlending : Blending;
-			var shader = Shader == ShaderId.Inherited ? Parent.AsWidget.GlobalShader : Shader;
 			if (arg2.Shader == ShaderId.Silhuette) {
-				Renderer.Shader = ShaderId.Silhuette;
+				Renderer.Material = StandardMaterial.Silhouette;
 			} else if (arg1.Shader == ShaderId.Silhuette) {
-				Renderer.Shader = ShaderId.Silhuette;
+				Renderer.Material = StandardMaterial.Silhouette;
 				Toolbox.Swap(ref arg1, ref arg2);
 			} else {
-				Renderer.Shader = shader;
+				Renderer.Material = Material.FromShaderId(Shader, ifInherited: Parent.AsWidget.GlobalMaterial, ifCustom: Material);
 			}
 			RenderHelper(arg1, arg2);
 		}

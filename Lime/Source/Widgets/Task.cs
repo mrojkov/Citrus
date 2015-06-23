@@ -32,18 +32,6 @@ namespace Lime
 
 		public object Tag { get; set; }
 
-		[ThreadStatic]
-		private static Task current;
-		public static Task Current { 
-			get { return current; } 
-			private set { current = value; } 
-		}
-
-		/// <summary>
-		/// The watcher. Being invoked on every task update. Useful for diposing the task by some condition.
-		/// </summary>
-		public Action Watcher;
-
 		/// <summary>
 		/// Возвращает true, если задача выполнена
 		/// </summary>
@@ -93,35 +81,23 @@ namespace Lime
 
 		private void AdvanceHelper(float delta)
 		{
-			var savedCurrent = current;
-			current = this;
-			try {
-				if (Watcher != null) {
-					Watcher();
-					if (Completed) {
-						return;
-					}
-				}
-				TotalTasksUpdated++;
-				if (waitTime > 0) {
-					waitTime -= delta;
+			TotalTasksUpdated++;
+			if (waitTime > 0) {
+				waitTime -= delta;
+				return;
+			}
+			if (waitPredicate != null) {
+				waitPredicate.TotalTime += delta;
+				if (waitPredicate.Evaluate()) {
 					return;
 				}
-				if (waitPredicate != null) {
-					waitPredicate.TotalTime += delta;
-					if (waitPredicate.Evaluate()) {
-						return;
-					}
-					waitPredicate = null;
-				}
-				var e = stack.Peek();
-				if (e.MoveNext()) {
-					HandleYieldedResult(e.Current);
-				} else if (!Completed) {
-					stack.Pop();
-				}
-			} finally {
-				current = savedCurrent;
+				waitPredicate = null;
+			}
+			var e = stack.Peek();
+			if (e.MoveNext()) {
+				HandleYieldedResult(e.Current);
+			} else if (!Completed) {
+				stack.Pop();
 			}
 		}
 
@@ -132,7 +108,6 @@ namespace Lime
 				e.Dispose();
 			}
 			waitPredicate = null;
-			Watcher = null;
 		}
 
 		private void HandleYieldedResult(object result)

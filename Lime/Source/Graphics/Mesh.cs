@@ -25,7 +25,7 @@ namespace Lime
 			VertexColorUV12 = Vertex | Color | UV1 | UV2
 		}
 
-		public Vector2[] Vertices;
+		public Vector3[] Vertices;
 		public Color4[] Colors;
 		public Vector2[] UV1;
 		public Vector2[] UV2;
