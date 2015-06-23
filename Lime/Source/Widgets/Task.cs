@@ -224,5 +224,14 @@ namespace Lime
 				writer.WriteLine("{0:N0}\t\t\t{1:N0}\t\t{2}\t\t{3}", i.Memory, i.CallCount, i.TaskCount, i.Method);
 			}
 		}
+
+		public static void KillMeIf(Func<bool> pred)
+		{
+			Current.Watcher = () => {
+				if (pred()) {
+					Current.Dispose();
+				}
+			};
+		}
 	}
 }
