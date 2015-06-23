@@ -252,7 +252,7 @@ namespace Lime
 
 			Renderer.Transform1 = LocalToWorldTransform;
 			Renderer.Blending = GlobalBlending;
-			Renderer.Material = GlobalMaterial;
+			Renderer.Shader = GlobalShader;
 			spriteList.Render(GlobalColor * textColor);
 		}
 
@@ -503,6 +503,7 @@ namespace Lime
 		{
 			caret.TextPos--;
 			caret.TextPos++; // Enforce revalidation.
+			InvalidateRenderCache();
 			spriteList = null;
 		}
 

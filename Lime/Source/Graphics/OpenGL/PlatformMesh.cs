@@ -25,12 +25,12 @@ namespace Lime
 			public static IEnumerable<ShaderProgram.AttribLocation> GetLocations()
 			{
 				return new ShaderProgram.AttribLocation[] {
-					new ShaderProgram.AttribLocation { Index = Vertex, Name = "in_Position" },
-					new ShaderProgram.AttribLocation { Index = Color, Name = "in_Color" },
-					new ShaderProgram.AttribLocation { Index = UV1, Name = "in_UV1" },
-					new ShaderProgram.AttribLocation { Index = UV2, Name = "in_UV2" },
-					new ShaderProgram.AttribLocation { Index = UV3, Name = "in_UV3" },
-					new ShaderProgram.AttribLocation { Index = UV4, Name = "in_UV4" },
+					new ShaderProgram.AttribLocation { Index = Vertex, Name = "inPos" },
+					new ShaderProgram.AttribLocation { Index = Color, Name = "inColor" },
+					new ShaderProgram.AttribLocation { Index = UV1, Name = "inTexCoords1" },
+					new ShaderProgram.AttribLocation { Index = UV2, Name = "inTexCoords2" },
+					new ShaderProgram.AttribLocation { Index = UV3, Name = "inTexCoords3" },
+					new ShaderProgram.AttribLocation { Index = UV4, Name = "inTexCoords4" },
 				};
 			}
 		}
@@ -74,7 +74,7 @@ namespace Lime
 			var dm = mesh.DirtyAttributes;
 			if (mesh.Vertices != null) {
 				if (verticesVBO == null) {
-					verticesVBO = new VertexBuffer(Attributes.Vertex, VertexAttribPointerType.Float, 3);
+					verticesVBO = new VertexBuffer(Attributes.Vertex, VertexAttribPointerType.Float, 2);
 				}
 				verticesVBO.Bind(mesh.Vertices, (dm & Mesh.Attributes.Vertex) != 0);
 			}

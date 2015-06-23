@@ -14,8 +14,6 @@
     <AndroidResgenClass>Resource</AndroidResgenClass>
     <AssemblyName>Lime</AssemblyName>
     <TargetFrameworkVersion>v4.0.3</TargetFrameworkVersion>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -206,9 +204,66 @@
     <Compile Include="Source\Widgets\ListView\ScrollView.SpeedMeter.cs" />
     <Compile Include="Source\Widgets\ListView\ScrollViewWithSlider.cs" />
     <Compile Include="Source\Widgets\Editor.cs" />
+    <Compile Include="Source\Widgets2\Audio.cs" />
+    <Compile Include="Source\Widgets2\Bone.cs" />
+    <Compile Include="Source\Widgets2\BoneArray.cs" />
+    <Compile Include="Source\Widgets2\Button.cs" />
+    <Compile Include="Source\Widgets2\Component.cs" />
+    <Compile Include="Source\Widgets2\ComponentList.cs" />
+    <Compile Include="Source\Widgets2\DistortionMesh.cs" />
+    <Compile Include="Source\Widgets2\DistortionMeshPoint.cs" />
+    <Compile Include="Source\Widgets2\Editor.cs" />
+    <Compile Include="Source\Widgets2\Frame.cs" />
+    <Compile Include="Source\Widgets2\Image.cs" />
+    <Compile Include="Source\Widgets2\ImageCombiner.cs" />
+    <Compile Include="Source\Widgets2\IText.cs" />
+    <Compile Include="Source\Widgets2\LinearLayout.cs" />
+    <Compile Include="Source\Widgets2\Marker.cs" />
+    <Compile Include="Source\Widgets2\MarkerCollection.cs" />
+    <Compile Include="Source\Widgets2\Movie.cs" />
+    <Compile Include="Source\Widgets2\NineGrid.cs" />
+    <Compile Include="Source\Widgets2\Node.cs" />
+    <Compile Include="Source\Widgets2\NodeDebugView.cs" />
+    <Compile Include="Source\Widgets2\NodeList.cs" />
+    <Compile Include="Source\Widgets2\ParticleEmitter.cs" />
+    <Compile Include="Source\Widgets2\ParticleModifier.cs" />
+    <Compile Include="Source\Widgets2\ParticlesMagnet.cs" />
+    <Compile Include="Source\Widgets2\PointObject.cs" />
+    <Compile Include="Source\Widgets2\Polyline.cs" />
+    <Compile Include="Source\Widgets2\RenderChain.cs" />
+    <Compile Include="Source\Widgets2\RichText.cs" />
+    <Compile Include="Source\Widgets2\SimpleText.cs" />
+    <Compile Include="Source\Widgets2\Slider.cs" />
+    <Compile Include="Source\Widgets2\Spline.cs" />
+    <Compile Include="Source\Widgets2\SplineGear.cs" />
+    <Compile Include="Source\Widgets2\SplinePoint.cs" />
+    <Compile Include="Source\Widgets2\Task.cs" />
+    <Compile Include="Source\Widgets2\TaskList.cs" />
+    <Compile Include="Source\Widgets2\TextBox.cs" />
+    <Compile Include="Source\Widgets2\TextStyle.cs" />
+    <Compile Include="Source\Widgets2\WebBrowser.Android.cs" />
+    <Compile Include="Source\Widgets2\WebBrowser.iOS.cs" />
+    <Compile Include="Source\Widgets2\WebBrowser.Mac.cs" />
+    <Compile Include="Source\Widgets2\WebBrowser.Win.cs" />
+    <Compile Include="Source\Widgets2\Widget.cs" />
+    <Compile Include="Source\Widgets2\Widget.Toolbox.cs" />
+    <Compile Include="Source\Widgets2\WidgetCachedRenderer.cs" />
+    <Compile Include="Source\Widgets2\WidgetDebugView.cs" />
+    <Compile Include="Source\Widgets2\WidgetInput.cs" />
+    <Compile Include="Source\Widgets2\World.cs" />
+    <Compile Include="Source\Widgets2\Animation\Animation.cs" />
+    <Compile Include="Source\Widgets2\Animation\AnimationUtils.cs" />
+    <Compile Include="Source\Widgets2\Animation\Animator.cs" />
+    <Compile Include="Source\Widgets2\Animation\AnimatorCollection.cs" />
+    <Compile Include="Source\Widgets2\Animation\AnimatorRegistry.cs" />
+    <Compile Include="Source\Widgets2\Animation\Keyframe.cs" />
+    <Compile Include="Source\Widgets2\Animation\KeyframeCollection.cs" />
+    <Compile Include="Source\Widgets2\Text\TextParser.cs" />
+    <Compile Include="Source\Widgets2\Text\TextRenderer.cs" />
     <Compile Include="Source\Application\AndroidActivityDelegate.cs" />
     <Compile Include="Source\Graphics\TextureAtlasElement.cs" />
     <Compile Include="Source\Graphics\OpenGL\IGLObject.cs" />
+    <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Source\Graphics\Bitmap.Mac.cs" />
     <Compile Include="Source\Graphics\Mesh.cs" />
     <Compile Include="Source\Graphics\RenderBatch.cs" />
@@ -227,46 +282,12 @@
     <Compile Include="Source\Types\BitSet32.cs" />
     <Compile Include="Source\Input\SoftKeyboard.cs" />
     <Compile Include="Source\AssetsBundle\UnityDownloadableBundle.cs" />
-    <Compile Include="Source\Graphics\Effect.cs" />
-    <Compile Include="Source\Graphics\MeshRenderer.cs" />
-    <Compile Include="Source\Graphics\StandardEffect.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Lemon\Lemon.Android.csproj">
+      <Project>{B4435A5F-51DA-42BA-9315-61691A5F58AC}</Project>
+      <Name>Lemon.Android</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
-  <ItemGroup>
-    <Folder Include="Resources\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Shaders\Android\FS_Default.glsl" />
-    <None Include="Resources\Shaders\Android\FS_DualTextureDiffuse.glsl" />
-    <None Include="Resources\Shaders\Android\FS_DualTextureSilhouette.glsl" />
-    <None Include="Resources\Shaders\Android\FS_InversedSilhouette.glsl" />
-    <None Include="Resources\Shaders\Android\FS_SingleTextureDiffuse.glsl" />
-    <None Include="Resources\Shaders\Android\FS_SingleTextureSilhouette.glsl" />
-    <None Include="Resources\Shaders\Android\VS_Default.glsl" />
-    <None Include="Resources\Shaders\Android\VS_DualTextureDiffuse.glsl" />
-    <None Include="Resources\Shaders\Android\VS_DualTextureSilhouette.glsl" />
-    <None Include="Resources\Shaders\Android\VS_InversedSilhouette.glsl" />
-    <None Include="Resources\Shaders\Android\VS_SingleTextureDiffuse.glsl" />
-    <None Include="Resources\Shaders\Android\VS_SingleTextureSilhouette.glsl" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Shaders\Android\Assets\Default.shader">
-      <LogicalName>Lime.Resources.Shaders.Android.Assets.Default.shader</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Shaders\Android\Assets\DualTextureDiffuse.shader">
-      <LogicalName>Lime.Resources.Shaders.Android.Assets.DualTextureDiffuse.shader</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Shaders\Android\Assets\DualTextureSilhouette.shader">
-      <LogicalName>Lime.Resources.Shaders.Android.Assets.DualTextureSilhouette.shader</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Shaders\Android\Assets\InversedSilhouette.shader">
-      <LogicalName>Lime.Resources.Shaders.Android.Assets.InversedSilhouette.shader</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Shaders\Android\Assets\SingleTextureDiffuse.shader">
-      <LogicalName>Lime.Resources.Shaders.Android.Assets.SingleTextureDiffuse.shader</LogicalName>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Shaders\Android\Assets\SingleTextureSilhouette.shader">
-      <LogicalName>Lime.Resources.Shaders.Android.Assets.SingleTextureSilhouette.shader</LogicalName>
-    </EmbeddedResource>
-  </ItemGroup>
 </Project>

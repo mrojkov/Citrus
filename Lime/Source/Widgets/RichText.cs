@@ -88,7 +88,7 @@ namespace Lime
 			EnsureSpriteList();
 			Renderer.Transform1 = LocalToWorldTransform;
 			Renderer.Blending = GlobalBlending;
-			Renderer.Material = GlobalMaterial;
+			Renderer.Shader = GlobalShader;
 			spriteList.Render(GlobalColor);
 		}
 
@@ -197,6 +197,7 @@ namespace Lime
 
 		public void Invalidate()
 		{
+			InvalidateRenderCache();
 			spriteList = null;
 			parser = null;
 			renderer = null;

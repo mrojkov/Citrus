@@ -12,7 +12,10 @@ namespace Lime
 		[ProtoMember(1)]
 		public bool Horizontal { get; set; }
 
-		protected override void OnParentSizeChanged(Vector2 parentSizeDelta)
+		[ProtoMember(2)]
+		public bool ProcessHidden { get; set; }
+
+		public void Refresh()
 		{
 			if (Parent != null && Parent.AsWidget != null) {
 				if (Horizontal) {
@@ -23,6 +26,11 @@ namespace Lime
 			}
 		}
 
+		protected override void OnParentSizeChanged(Vector2 parentSizeDelta)
+		{
+			Refresh();
+		}
+
 		private void UpdateForHorizontalOrientation()
 		{
 			int count = CalcVisibleWidgetsCount();
@@ -31,7 +39,7 @@ namespace Lime
 			float x = 0;
 			Widget lastWidget = null;
 			foreach (var node in Parent.Nodes) {
-				if (IsVisibleWidget(node)) {
+				if (ShouldProcessNode(node)) {
 					float w = (parentSize.X / count).Floor();
 					node.AsWidget.Position = new Vector2(x, 0);
 					node.AsWidget.Size = new Vector2(w, parentSize.Y);
@@ -48,16 +56,16 @@ namespace Lime
 		{
 			int count = 0;
 			foreach (var node in Parent.Nodes) {
-				if (IsVisibleWidget(node)) {
+				if (ShouldProcessNode(node)) {
 					count++;
 				}
 			}
 			return count;
 		}
 
-		private static bool IsVisibleWidget(Node node)
+		private bool ShouldProcessNode(Node node)
 		{
-			return node.AsWidget != null && node.AsWidget.Visible;
+			return node.AsWidget != null && (node.AsWidget.Visible || ProcessHidden);
 		}
 
 		private void UpdateForVerticalOrientation()
@@ -68,7 +76,7 @@ namespace Lime
 			float y = 0;
 			Widget lastWidget = null;
 			foreach (var node in Parent.Nodes) {
-				if (IsVisibleWidget(node)) {
+				if (ShouldProcessNode(node)) {
 					float h = (parentSize.Y / count).Floor();
 					node.AsWidget.Position = new Vector2(0, y);
 					node.AsWidget.Size = new Vector2(parentSize.X, h);

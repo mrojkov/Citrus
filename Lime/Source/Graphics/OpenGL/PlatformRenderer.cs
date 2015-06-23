@@ -51,8 +51,10 @@ namespace Lime
 			shaderProgram = null;
 		}
 
-		public static void SetShaderProgram(ShaderProgram program)
+		public static void SetShader(ShaderId value, ShaderProgram customShaderProgram)
 		{
+			int numTextures = textures[1] != 0 ? 2 : (textures[0] != 0 ? 1 : 0);
+			var program = value == ShaderId.Custom ? customShaderProgram : ShaderPrograms.Instance.GetShaderProgram(value, numTextures);
 			if (shaderProgram != program) {
 				shaderProgram = program;
 				shaderProgram.Use();
@@ -61,8 +63,16 @@ namespace Lime
 				if (CurrentFramebuffer != DefaultFramebuffer) {
 					FlipProjectionYAxis(ref projection);
 				}
-				shaderProgram.ProjectionParameter.SetMatrix44(projection);
+				shaderProgram.LoadMatrix(program.ProjectionMatrixUniformId, projection);
 			}
+#if ANDROID
+			if (numTextures > 0) {
+				shaderProgram.LoadBoolean(shaderProgram.UseAlphaTexture1UniformId, textures[2] != 0); 
+			}
+			if (numTextures > 1) {
+				shaderProgram.LoadBoolean(shaderProgram.UseAlphaTexture2UniformId, textures[3] != 0); 
+			}
+#endif
 		}
 
 		private static void FlipProjectionYAxis(ref Matrix44 matrix)
@@ -86,6 +96,7 @@ namespace Lime
 			premultipliedAlphaMode = false;
 			shaderProgram = null;
 			SetBlending(Blending.Inherited);
+			SetShader(ShaderId.Diffuse, null);
 			ClearRenderTarget(0, 0, 0, 0);
 			CheckErrors();
 		}
@@ -109,13 +120,23 @@ namespace Lime
 		{
 			var handle = texture != null ? texture.GetHandle() : 0;
 			SetTexture(handle, stage);
+#if ANDROID
+			// Only Android supports ETC1 without embedded alpha channel
+			if (texture != null) {
+				var alphaTexture = texture.AlphaTexture;
+				if (alphaTexture != null) {
+					SetTexture(alphaTexture.GetHandle(), stage + 2);
+					return;
+				}
+			}
+			SetTexture(0, stage + 2);
+#endif
 		}
 
 		internal static void SetTexture(uint glTexNum, int stage)
 		{
-			if (glTexNum == textures[stage]) {
+			if (glTexNum == textures[stage])
 				return;
-			}
 			if (stage > 0) {
 				GL.ActiveTexture(TextureUnit.Texture0 + stage);
 				GL.BindTexture(TextureTarget.Texture2D, glTexNum);

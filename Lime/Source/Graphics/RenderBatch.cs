@@ -15,67 +15,89 @@ namespace Lime
 		public const int IndexBufferCapacity = 600;
 
 		public Blending Blending;
-		public Material Material;
+		public ShaderId Shader;
+		public ShaderProgram CustomShaderProgram;
 		public ITexture Texture1;
 		public ITexture Texture2;
-		public int VertexCount;
-		public int IndexCount;
+		public int LastVertex;
+		public int StartIndex;
+		public int LastIndex;
 		public Mesh Mesh;
 		public bool OwnsMesh;
 
-		public bool IsEmpty { get { return IndexCount == 0; } }
-
 		public RenderBatch()
 		{
-			Mesh = new Mesh();
-			Mesh.Allocate(VertexBufferCapacity, IndexBufferCapacity, Lime.Mesh.Attributes.VertexColorUV12);
-		}
-
-		public void Prepare(ITexture texture1, ITexture texture2, Blending blending, Material material, int vertexCount, int indexCount)
-		{
-			if (!IsEmpty) {
-				if ((GetTextureHandle(Texture1) != GetTextureHandle(texture1)) ||
-					(GetTextureHandle(Texture2) != GetTextureHandle(texture2)) ||
-					Blending != blending ||
-					Material != material ||
-					VertexCount + vertexCount > Mesh.Vertices.Length ||
-					IndexCount + indexCount > Mesh.Indices.Length)
-				{
-					Render();
-					Clear();
-				}
-			}
-			Texture1 = texture1;
-			Texture2 = texture2;
-			Blending = blending;
-			Material = material;
-		}
-
-		private static uint GetTextureHandle(ITexture texture)
-		{
-			return texture == null ? 0 : texture.GetHandle();
+			Clear();
 		}
 
 		public void Clear()
 		{
-			IndexCount = VertexCount = 0;
+			Texture1 = Texture2 = null;
+			Blending = Lime.Blending.None;
+			Shader = ShaderId.None;
+			CustomShaderProgram = null;
+			StartIndex = LastIndex = LastVertex = 0;
+			if (Mesh != null) {
+				if (OwnsMesh) {
+					MeshesForBatchingPool.Release(Mesh);
+				}
+				Mesh = null;
+			}
+			OwnsMesh = false;
 		}
 
 		public void Render()
 		{
-			if (IsEmpty) {
-				return;
-			}
 #if UNITY
 			PlatformRenderer.SetMaterial(Texture1, Texture2, Shader, Blending);
 #else
-			Renderer.MaterialRenderer.SetMesh(Mesh, 0, IndexCount);
-			Material.Texture1 = Texture1;
-			Material.Texture2 = Texture2;
-			Material.Blending = Blending;
-			Material.Render(Renderer.MaterialRenderer);
+			PlatformRenderer.SetTexture(Texture1, 0);
+			PlatformRenderer.SetTexture(Texture2, 1);
+			PlatformRenderer.SetShader(Shader, CustomShaderProgram);
+			PlatformRenderer.SetBlending(Blending);
 #endif
+			Mesh.Render(StartIndex, LastIndex - StartIndex);
 			Renderer.DrawCalls++;
 		}
 	}
+
+	static class RenderBatchPool
+	{
+		private static Stack<RenderBatch> items = new Stack<RenderBatch>();
+
+		public static RenderBatch Acquire()
+		{
+			if (items.Count == 0) {
+				return new RenderBatch();
+			}
+			return items.Pop();
+		}
+
+		public static void Release(RenderBatch item)
+		{
+			item.Clear();
+			items.Push(item);
+		}
+	}
+
+	static class MeshesForBatchingPool
+	{
+		private static Stack<Mesh> items = new Stack<Mesh>();
+
+		public static Mesh Acquire()
+		{
+			if (items.Count == 0) {
+				var mesh = new Mesh();
+				mesh.Allocate(RenderBatch.VertexBufferCapacity, RenderBatch.IndexBufferCapacity, Mesh.Attributes.VertexColorUV12);
+				return mesh;
+			}
+			return items.Pop();
+		}
+
+		public static void Release(Mesh item)
+		{
+			items.Push(item);
+		}
+	}
+
 }

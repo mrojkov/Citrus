@@ -79,15 +79,16 @@ namespace Lime
 		private static WindowRect scissorRectangle = new WindowRect();
 		private static bool scissorTestEnabled = false;
 		private static bool Transform2Active;
-		private static readonly RenderBatch batch = new RenderBatch();
-		internal static readonly MaterialRenderer MaterialRenderer = new MaterialRenderer();
 
 		public static Blending Blending;
-		public static Material Material;
+		public static ShaderId Shader;
+		public static ShaderProgram CustomShaderProgram;
 		public static Matrix32 Transform1;
 		public static int RenderCycle { get; private set; }
 		public static bool PremultipliedAlphaMode;
 		public static int DrawCalls = 0;
+		public static readonly RenderList MainRenderList = new RenderList();
+		public static RenderList CurrentRenderList;
 #if ANDROID
 		public static bool AmazonBindTextureWorkaround;
 #endif
@@ -106,7 +107,6 @@ namespace Lime
 			get { return projectionStack.Peek(); }
 			set
 			{
-				Flush();
 				projectionStack.Pop();
 				projectionStack.Push(value);
 				PlatformRenderer.SetProjectionMatrix(value);
@@ -118,7 +118,7 @@ namespace Lime
 			get { return scissorRectangle; }
 			set 
 			{
-				Flush();
+				MainRenderList.Flush();
 				scissorRectangle = value;
 				PlatformRenderer.SetScissorRectangle(value);
 			}
@@ -129,7 +129,7 @@ namespace Lime
 			get { return scissorTestEnabled; }
 			set 
 			{
-				Flush();
+				MainRenderList.Flush();
 				scissorTestEnabled = value;
 				PlatformRenderer.EnableScissorTest(value);
 			}
@@ -143,12 +143,6 @@ namespace Lime
 				viewport = value;
 				PlatformRenderer.SetViewport(value);
 			}
-		}
-
-		public static ShaderId Shader
-		{
-			get { return Material.GetShaderId(); }
-			set { Material = Material.FromShaderId(value); }
 		}
 
 		public static void SetDefaultViewport()
@@ -187,9 +181,6 @@ namespace Lime
 
 		static Renderer()
 		{
-#if !UNITY
-			PremultipliedAlphaMode = true;
-#endif
 			projectionStack = new Stack<Matrix44>();
 			projectionStack.Push(Matrix44.Identity);
 		}
@@ -199,9 +190,10 @@ namespace Lime
 			PlatformRenderer.BeginFrame();
 			DrawCalls = 0;
 			Blending = Blending.None;
-			Material = StandardMaterial.None;
+			Shader = ShaderId.None;
 			Transform1 = Matrix32.Identity;
 			Transform2 = Matrix32.Identity;
+			CurrentRenderList = MainRenderList;
 			SetDefaultViewport();
 			RenderCycle++;
 		}
@@ -213,10 +205,7 @@ namespace Lime
 
 		public static void Flush()
 		{
-			if (!batch.IsEmpty) {
-				batch.Render();
-				batch.Clear();
-			}
+			MainRenderList.Flush();
 		}
 
 		public static void DrawTextLine(float x, float y, string text, float fontHeight = 20, uint abgr = 0xFFFFFFFF)
@@ -343,17 +332,17 @@ namespace Lime
 				Blending = Blending.Darken;
 			}
 			var batch = DrawTrianglesHelper(texture1, texture2, vertices, numVertices);
-			var baseVertex = batch.VertexCount;
-			int j = batch.IndexCount;
+			var baseVertex = batch.LastVertex;
+			int j = batch.LastIndex;
 			var indices = batch.Mesh.Indices;
 			for (int i = 1; i <= numVertices - 2; i++) {
 				indices[j++] = (ushort)(baseVertex);
 				indices[j++] = (ushort)(baseVertex + i);
 				indices[j++] = (ushort)(baseVertex + i + 1);
-				batch.IndexCount += 3;
+				batch.LastIndex += 3;
 			}
 			batch.Mesh.IndicesDirty = true;
-			batch.VertexCount += numVertices;
+			batch.LastVertex += numVertices;
 		}
 
 		public static void DrawTriangleStrip(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
@@ -369,34 +358,34 @@ namespace Lime
 				Blending = Blending.Darken;
 			}
 			var batch = DrawTrianglesHelper(texture1, texture2, vertices, numVertices);
-			var vertex = batch.VertexCount;
-			int j = batch.IndexCount;
+			var vertex = batch.LastVertex;
+			int j = batch.LastIndex;
 			var indices = batch.Mesh.Indices;
 			for (int i = 0; i < numVertices - 2; i++) {
 				indices[j++] = (ushort)vertex;
 				indices[j++] = (ushort)(vertex + 1);
 				indices[j++] = (ushort)(vertex + 2);
 				vertex++;
-				batch.IndexCount += 3;
+				batch.LastIndex += 3;
 			}
 			batch.Mesh.IndicesDirty = true;
-			batch.VertexCount += numVertices;
+			batch.LastVertex += numVertices;
 		}
 
 		private static RenderBatch DrawTrianglesHelper(ITexture texture1, ITexture texture2, Vertex[] vertices, int numVertices)
 		{
-			batch.Prepare(texture1, texture2, Blending, Material, numVertices, (numVertices - 2) * 3);
+			var batch = CurrentRenderList.GetBatch(texture1, texture2, Blending, Shader, CustomShaderProgram, numVertices, (numVertices - 2) * 3);
 			var transform = GetEffectiveTransform();
 			var mesh = batch.Mesh;
 			mesh.DirtyAttributes |= Mesh.Attributes.VertexColorUV12 | (texture2 != null ? Mesh.Attributes.UV2 : Mesh.Attributes.None);
-			int j = batch.VertexCount;
+			int j = batch.LastVertex;
 			for (int i = 0; i < numVertices; i++) {
 				var v = vertices[i];
 				if (PremultipliedAlphaMode && v.Color.A != 255) {
 					v.Color = Color4.PremulAlpha(v.Color);
 				}
 				mesh.Colors[j] = v.Color;
-				mesh.Vertices[j] = (Vector3)(transform * v.Pos);
+				mesh.Vertices[j] = transform * v.Pos;
 				if (texture1 != null) {
 					mesh.UV1[j] = v.UV1;
 					texture1.TransformUVCoordinatesToAtlasSpace(ref mesh.UV1[j]);
@@ -422,7 +411,7 @@ namespace Lime
 				DrawSprite(texture, color, position, size, uv0, uv1);
 				Blending = Blending.Darken;
 			}
-			batch.Prepare(texture, null, Blending, Material, 4, 6);
+			var batch = CurrentRenderList.GetBatch(texture, null, Blending, Shader, CustomShaderProgram, 4, 6);
 			if (Renderer.PremultipliedAlphaMode && color.A != 255) {
 				color = Color4.PremulAlpha(color);
 			}
@@ -433,10 +422,10 @@ namespace Lime
 			var mesh = batch.Mesh;
 			mesh.DirtyAttributes |= Mesh.Attributes.VertexColorUV12;
 			mesh.IndicesDirty = true;
-			int bv = batch.VertexCount;
-			int bi = batch.IndexCount;
-			batch.IndexCount += 6;
-			batch.VertexCount += 4;
+			int bv = batch.LastVertex;
+			int bi = batch.LastIndex;
+			batch.LastIndex += 6;
+			batch.LastVertex += 4;
 			var indices = mesh.Indices;
 			indices[bi++] = (ushort)(bv + 1);
 			indices[bi++] = (ushort)bv;
@@ -458,10 +447,10 @@ namespace Lime
 			float y1vx = y1 * matrix.V.X;
 			float y1vy = y1 * matrix.V.Y;
 			var v = mesh.Vertices;
-			v[bv + 0] = new Vector3() { X = x0ux + y0vx + matrix.T.X, Y = x0uy + y0vy + matrix.T.Y };
-			v[bv + 1] = new Vector3() { X = x1ux + y0vx + matrix.T.X, Y = x1uy + y0vy + matrix.T.Y };
-			v[bv + 2] = new Vector3() { X = x0ux + y1vx + matrix.T.X, Y = x0uy + y1vy + matrix.T.Y };
-			v[bv + 3] = new Vector3() { X = x1ux + y1vx + matrix.T.X, Y = x1uy + y1vy + matrix.T.Y };
+			v[bv + 0] = new Vector2() { X = x0ux + y0vx + matrix.T.X, Y = x0uy + y0vy + matrix.T.Y };
+			v[bv + 1] = new Vector2() { X = x1ux + y0vx + matrix.T.X, Y = x1uy + y0vy + matrix.T.Y };
+			v[bv + 2] = new Vector2() { X = x0ux + y1vx + matrix.T.X, Y = x0uy + y1vy + matrix.T.Y };
+			v[bv + 3] = new Vector2() { X = x1ux + y1vx + matrix.T.X, Y = x1uy + y1vy + matrix.T.Y };
 			var c = mesh.Colors;
 			c[bv + 0] = color;
 			c[bv + 1] = color;
@@ -510,10 +499,10 @@ namespace Lime
 					batchedSprites[batchLength++] = s;
 					continue;
 				}
-				batch.Prepare(
-					batchedSprites[0].Texture, null, Blending, Material, 4 * batchLength, 6 * batchLength);
-				int bv = batch.VertexCount;
-				int bi = batch.IndexCount;
+				var batch = CurrentRenderList.GetBatch(
+					batchedSprites[0].Texture, null, Blending, Shader, CustomShaderProgram, 4 * batchLength, 6 * batchLength);
+				int bv = batch.LastVertex;
+				int bi = batch.LastIndex;
 				var mesh = batch.Mesh;
 				mesh.DirtyAttributes |= Mesh.Attributes.VertexColorUV12;
 				mesh.IndicesDirty = true;
@@ -552,10 +541,10 @@ namespace Lime
 					float x1uy = x1 * matrix.U.Y;
 					float y1vx = y1 * matrix.V.X;
 					float y1vy = y1 * matrix.V.Y;
-					v[bv + 0] = new Vector3() { X = x0ux + y0vx + matrix.T.X, Y = x0uy + y0vy + matrix.T.Y };
-					v[bv + 1] = new Vector3() { X = x1ux + y0vx + matrix.T.X, Y = x1uy + y0vy + matrix.T.Y };
-					v[bv + 2] = new Vector3() { X = x0ux + y1vx + matrix.T.X, Y = x0uy + y1vy + matrix.T.Y };
-					v[bv + 3] = new Vector3() { X = x1ux + y1vx + matrix.T.X, Y = x1uy + y1vy + matrix.T.Y };
+					v[bv + 0] = new Vector2() { X = x0ux + y0vx + matrix.T.X, Y = x0uy + y0vy + matrix.T.Y };
+					v[bv + 1] = new Vector2() { X = x1ux + y0vx + matrix.T.X, Y = x1uy + y0vy + matrix.T.Y };
+					v[bv + 2] = new Vector2() { X = x0ux + y1vx + matrix.T.X, Y = x0uy + y1vy + matrix.T.Y };
+					v[bv + 3] = new Vector2() { X = x1ux + y1vx + matrix.T.X, Y = x1uy + y1vy + matrix.T.Y };
 					c[bv + 0] = effectiveColor;
 					c[bv + 1] = effectiveColor;
 					c[bv + 2] = effectiveColor;
@@ -566,33 +555,11 @@ namespace Lime
 					uv[bv + 3] = uv1;
 					bv += 4;
 				}
-				batch.IndexCount = bi;
-				batch.VertexCount = bv;
+				batch.LastIndex = bi;
+				batch.LastVertex = bv;
 				batchLength = 1;
 				batchedSprites[0] = s;
 			}
-		}
-
-		public static void DrawMesh(Mesh mesh, int startIndex, int count)
-		{
-			DrawMesh(mesh, startIndex, count, Blending, Material);
-		}
-
-		public static void DrawMesh(Mesh mesh, int startIndex, int count, Material material)
-		{
-			DrawMesh(mesh, startIndex, count, Blending, material);
-		}
-
-		public static void DrawMesh(Mesh mesh, int startIndex, int count, Blending blending)
-		{
-			DrawMesh(mesh, startIndex, count, blending, Material);
-		}
-
-		public static void DrawMesh(Mesh mesh, int startIndex, int count, Blending blending, Material material)
-		{
-			Flush();
-			MaterialRenderer.SetMesh(mesh, startIndex, count);
-			material.Render(MaterialRenderer);
 		}
 	}
 }

@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using OpenTK.Graphics;
 #if iOS || ANDROID
@@ -11,100 +10,63 @@ using OpenTK.Graphics.ES20;
 using OpenTK.Graphics.OpenGL;
 #endif
 
-using ProtoBuf;
-
 namespace Lime
 {
 	public class ShaderProgram : IGLObject
 	{
-		[ProtoContract]
-		public class Asset
-		{
-			[ProtoMember(1)]
-			public string VertexShaderSource;
-
-			[ProtoMember(2)]
-			public string FragmentShaderSource;
-		}
-
 		public class AttribLocation
 		{
 			public string Name;
 			public int Index;
 		}
 
-		public static readonly ShaderProgram Default = LoadFromResources("Default");
-		public static readonly ShaderProgram SingleTextureDiffuse = LoadFromResources("SingleTextureDiffuse");
-		public static readonly ShaderProgram SingleTextureSilhouette = LoadFromResources("SingleTextureSilhouette");
-		public static readonly ShaderProgram DualTextureDiffuse = LoadFromResources("DualTextureDiffuse");
-		public static readonly ShaderProgram DualTextureSilhouette = LoadFromResources("DualTextureSilhouette");
-		public static readonly ShaderProgram InversedSilhouette = LoadFromResources("InversedSilhouette");
+		public class Sampler
+		{
+			public string Name;
+			public int Stage;
+		}
 
 		private int handle;
-		private Shader vertexShader;
-		private Shader fragmentShader;
-		private Dictionary<string, ShaderParameter> parameters;
+		public int ProjectionMatrixUniformId { get; private set; }
+		public int UseAlphaTexture1UniformId { get; private set; }
+		public int UseAlphaTexture2UniformId { get; private set; }
+		private Dictionary<string, int> uniformIds = new Dictionary<string, int>();
+		private List<Shader> shaders = new List<Shader>();
+		private List<AttribLocation> attribLocations;
+		private List<Sampler> samplers;
 
-		public ShaderParameter ProjectionParameter { get; private set; }
-		
-		internal MaterialPass CachedMaterialPass;
-
-		private ShaderProgram(Shader vertexShader, Shader fragmentShader)
+		public ShaderProgram(IEnumerable<Shader> shaders, IEnumerable<AttribLocation> attribLocations, IEnumerable<Sampler> samplers)
 		{
-			this.vertexShader = vertexShader;
-			this.fragmentShader = fragmentShader;
+			this.shaders = new List<Shader>(shaders);
+			this.attribLocations = new List<AttribLocation>(attribLocations);
+			this.samplers = new List<Sampler>(samplers);
+			Create();
 			GLObjectRegistry.Instance.Add(this);
 		}
 
 		private void Create()
 		{
 			handle = GL.CreateProgram();
-			GL.AttachShader(handle, vertexShader.GetHandle());
-			GL.AttachShader(handle, fragmentShader.GetHandle());
-			BindAttributes();
+			foreach (var shader in shaders) {
+				GL.AttachShader(handle, shader.GetHandle());
+			}
+			foreach (var i in attribLocations) {
+				BindAttribLocation(i.Index, i.Name);
+			}
 			Link();
-			PrepareParameters();
-			BindSamplers();
-			CachedMaterialPass = null;
-		}
-
-		private void PrepareParameters()
-		{
-			if (parameters == null) {
-				InitializeParameters();
-				ProjectionParameter = FindParameter("Projection");
+			foreach (var i in samplers) {
+				BindSampler(i.Name, i.Stage);
 			}
-		}
-
-		private void BindAttributes()
-		{
-			foreach (var i in PlatformMesh.Attributes.GetLocations()) {
-				GL.BindAttribLocation(handle, i.Index, i.Name);
-			}
-		}
-
-		private void BindSamplers()
-		{
-			Use();
-			foreach (var i in GetSamplers()) {
-				i.SetInt(i.SamplerStage);
-			}
-		}
-
-		private IEnumerable<ShaderParameter> GetSamplers()
-		{
-			return parameters.Values.Where(p => p.IsSampler);
 		}
 
 		~ShaderProgram()
 		{
-			Discard();
+			Dispose();
 		}
 
 		public void Dispose()
 		{
 			Discard();
-			GC.SuppressFinalize(this);
 		}
 
 		public void Discard()
@@ -117,6 +79,11 @@ namespace Lime
 			}
 		}
 
+		private void BindAttribLocation(int index, string name)
+		{
+			GL.BindAttribLocation(handle, index, name);
+		}
+
 		private void Link()
 		{
 			GL.LinkProgram(handle);
@@ -127,7 +94,26 @@ namespace Lime
 				Logger.Write("Shader program link log:\n{0}", infoLog);
 				throw new Lime.Exception(infoLog.ToString());
 			}
+			InitializeUniformIds();
 			PlatformRenderer.CheckErrors();
+		}
+
+		protected virtual void InitializeUniformIds()
+		{
+			ProjectionMatrixUniformId = GetUniformId("matProjection");
+			UseAlphaTexture1UniformId = GetUniformId("useAlphaTexture1");
+			UseAlphaTexture2UniformId = GetUniformId("useAlphaTexture2");
+		}
+
+		protected int GetUniformId(string name)
+		{
+			int id;
+			if (uniformIds.TryGetValue(name, out id)) {
+				return id;
+			}
+			id = GL.GetUniformLocation(handle, name);
+			uniformIds[name] = id;
+			return id;
 		}
 
 		private string GetLinkLog()
@@ -150,90 +136,46 @@ namespace Lime
 				Create();
 			}
 			GL.UseProgram(handle);
+			LoadUniformValues();
 		}
 
-		private void InitializeParameters()
+		protected virtual void LoadUniformValues()
 		{
-			parameters = new Dictionary<string, ShaderParameter>();
-			int count;
-			GL.GetProgram(handle, ProgramParameter.ActiveUniforms, out count);
-			var samplerCount = 0;
-			for (var i = 0; i < count; i++) {
-				ActiveUniformType type;
-				int size;
-				var name = GL.GetActiveUniform(handle, i, out size, out type);
-				var p = new ShaderParameter {
-					Location = GL.GetUniformLocation(handle, name)
-				};
-				if (type == ActiveUniformType.Sampler2D) {
-					p.SamplerStage = samplerCount++;
-					if (name.EndsWith(".opaque")) {
-						name = name.Remove(name.Length - ".opaque".Length);
-						p.SamplerBlendLocation = GL.GetUniformLocation(handle, name + ".blend");
-						p.SamplerAlphaLocation = GL.GetUniformLocation(handle, name + ".alpha");
-						p.SamplerAlphaStage = samplerCount++;
-					}
-				}
-				parameters[name] = p;
+		}
+
+		public void LoadMatrix(int uniformId, Matrix44 matrix)
+		{
+			unsafe {
+				float* p = (float*)&matrix;
+				GL.UniformMatrix4(uniformId, 1, false, p);
 			}
 		}
 
-		public ShaderParameter FindParameter(string name)
+		public void LoadFloat(int uniformId, float value)
 		{
-			ShaderParameter p;
-			return parameters.TryGetValue(name, out p) ? p : ShaderParameter.Null;
+			GL.Uniform1(uniformId, value);
 		}
 
-		public static ShaderProgram LoadFromBundle(string path)
+		public void LoadInteger(int uniformId, int value)
 		{
-			var asset = Serialization.ReadObject<Asset>(path);
-			return LoadFromAsset(asset);
+			GL.Uniform1(uniformId, value);
 		}
 
-		private static ShaderProgram LoadFromResources(string name)
+		public void LoadBoolean(int uniformId, bool value)
 		{
-#if ANDROID
-			name = string.Format("Lime.Resources.Shaders.Android.Assets.{0}.shader", name);
-#else
-			name = string.Format("Lime.Resources.Shaders.Win.iOS.Assets.{0}.shader", name);
-#endif
-			using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(name)) {
-				var asset = Serialization.ReadObject<Asset>(name, stream);
-				return LoadFromAsset(asset);
-			}
+			GL.Uniform1(uniformId, value ? 1 : 0);
 		}
 
-		private static ShaderProgram LoadFromAsset(Asset asset)
+		public void LoadVector2(int uniformId, Vector2 vector)
 		{
-			return new ShaderProgram(
-				ShaderPool.VertexShaders[asset.VertexShaderSource],
-				ShaderPool.FragmentShaders[asset.FragmentShaderSource]
-			);
-		}
-	}
-
-	public sealed class ShaderProgramPool
-	{
-		public static readonly ShaderProgramPool Instance = new ShaderProgramPool();
-
-		private Dictionary<string, ShaderProgram> items = new Dictionary<string, ShaderProgram>();
-
-		public ShaderProgram this[string path]
-		{
-			get { return GetProgram(path); }
+			GL.Uniform2(uniformId, vector.X, vector.Y);
 		}
 
-		private ShaderProgramPool() { }
-
-		private ShaderProgram GetProgram(string path)
+		private void BindSampler(string name, int stage)
 		{
-			ShaderProgram program;
-			if (items.TryGetValue(path, out program)) {
-				return program;
-			}
-			program = ShaderProgram.LoadFromBundle(path);
-			items[path] = program;
-			return program;
+			Use();
+			GL.Uniform1(GL.GetUniformLocation(handle, name), stage);
+			PlatformRenderer.CheckErrors();
 		}
 	}
 }
