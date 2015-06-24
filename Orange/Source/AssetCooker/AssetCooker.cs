@@ -158,7 +158,7 @@ namespace Orange
 		{
 			AddStage(SyncAtlases);
 			AddStage(SyncDeleted);
-			AddStage(() => SyncRawAssets(".txt"));
+			AddStage(() => SyncRawAssets(".txt", true));
 			AddStage(SyncTextures);
 			AddStage(DeleteOrphanedMasks);
 			AddStage(DeleteOrphanedAlphaTextures);
@@ -215,10 +215,10 @@ namespace Orange
 			}
 		}
 
-		private static void SyncRawAssets(string extension)
+		private static void SyncRawAssets(string extension, bool zipped = false)
 		{
 			SyncUpdated(extension, extension, (srcPath, dstPath) => {
-				assetsBundle.ImportFile(srcPath, dstPath, 0);
+				assetsBundle.ImportFile(srcPath, dstPath, 0, zipped ? AssetAttributes.Zipped : AssetAttributes.None);
 				return true;
 			});
 		}
