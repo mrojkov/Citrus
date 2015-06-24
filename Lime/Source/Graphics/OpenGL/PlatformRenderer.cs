@@ -73,6 +73,7 @@ namespace Lime
 				shaderProgram.LoadBoolean(shaderProgram.UseAlphaTexture2UniformId, textures[3] != 0); 
 			}
 #endif
+			shaderProgram.LoadBoolean(shaderProgram.PremultiplyAlphaUniformId, !premultipliedAlphaMode && (blending == Blending.Burn || blending == Blending.Darken));
 		}
 
 		private static void FlipProjectionYAxis(ref Matrix44 matrix)
@@ -199,13 +200,11 @@ namespace Lime
 			switch (blending) {
 				case Blending.Inherited:
 				case Blending.Alpha:
-					var sfactor = Renderer.PremultipliedAlphaMode ? BlendingFactorSrc.One : BlendingFactorSrc.SrcAlpha;
-					GL.BlendFunc(sfactor, BlendingFactorDest.OneMinusSrcAlpha);
+					GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 					break;
 				case Blending.Add:
 				case Blending.Glow:
-					sfactor = Renderer.PremultipliedAlphaMode ? BlendingFactorSrc.One : BlendingFactorSrc.SrcAlpha;
-					GL.BlendFunc(sfactor, BlendingFactorDest.One);
+					GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
 					break;
 				case Blending.Burn:
 				case Blending.Darken:

@@ -87,12 +87,15 @@ namespace Lime
 			"varying lowp vec2 texCoords;	" +
 			"uniform lowp sampler2D tex1;	" +
 			"uniform bool useAlphaTexture1;	" +
+			"uniform bool premultiplyAlpha;	" +
 			"uniform lowp sampler2D tex1a;	" +
 			"void main()					" +
 			"{								" +
 			"	lowp vec4 t1 = texture2D(tex1, texCoords); " +
 			"	if (useAlphaTexture1)			" +
 			"		t1.a = texture2D(tex1a, texCoords).r; " +
+			"	if (premultiplyAlpha)		" +
+			"		t1.rgb *= t1.a;			" +
 			"	gl_FragColor = color * t1;	" +
 			"}"
 		);
@@ -105,6 +108,7 @@ namespace Lime
 			"uniform lowp sampler2D tex2;	" +
 			"uniform bool useAlphaTexture1;	" +
 			"uniform bool useAlphaTexture2;	" +
+			"uniform bool premultiplyAlpha;	" +
 			"uniform lowp sampler2D tex1a;	" +
 			"uniform lowp sampler2D tex2a;	" +
 			"void main()					" +
@@ -115,6 +119,10 @@ namespace Lime
 			"		t1.a = texture2D(tex1a, texCoords1).r; " +
 			"	if (useAlphaTexture2)			" +
 			"		t2.a = texture2D(tex2a, texCoords2).r; " +
+			"	if (premultiplyAlpha) {		" +
+			"		t1.rgb *= t1.a;			" +
+			"		t2.rgb *= t2.a;			" +
+			"	}							" +
 			"	gl_FragColor = color * t1 * t2; " +
 			"}"
 		);

@@ -53,8 +53,8 @@ namespace Lime
 #else
 			PlatformRenderer.SetTexture(Texture1, 0);
 			PlatformRenderer.SetTexture(Texture2, 1);
-			PlatformRenderer.SetShader(Shader, CustomShaderProgram);
 			PlatformRenderer.SetBlending(Blending);
+			PlatformRenderer.SetShader(Shader, CustomShaderProgram);
 #endif
 			Mesh.Render(StartIndex, LastIndex - StartIndex);
 			Renderer.DrawCalls++;
