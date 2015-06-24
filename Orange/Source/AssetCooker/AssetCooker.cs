@@ -345,7 +345,7 @@ namespace Orange
 								Console.WriteLine((bundled ? "* " : "+ ") + dstPath);
 							}
 						} catch (System.Exception e) {
-							Console.WriteLine("An exception was caught while processing '{0}'\n", srcPath);
+							Console.WriteLine("An exception was caught while processing '{0}': {1}\n", srcPath, e.Message);
 							throw;
 						}
 					} else {

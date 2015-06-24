@@ -246,7 +246,7 @@ namespace Orange
 		}
 		public static unsafe void BleedAlpha(Gdk.Pixbuf pixbuf)
 		{
-			if (!pixbuf.HasAlpha) {
+			if (!pixbuf.HasAlpha || (pixbuf.Width == 1 && pixbuf.Height == 1)) {
 				return;
 			}
 			var pixels = (byte*)pixbuf.Pixels;
