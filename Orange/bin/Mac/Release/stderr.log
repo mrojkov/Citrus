@@ -1,1 +1,1 @@
-2015-06-22 10:48:28.793 Orange[19817:1112326] *** WARNING: Method userSpaceScaleFactor in class NSView is deprecated on 10.7 and later. It should not be used in new applications. Use convertRectToBacking: instead. 
+2015-06-24 17:29:17.450 Orange[441:4918] *** WARNING: Method userSpaceScaleFactor in class NSView is deprecated on 10.7 and later. It should not be used in new applications. Use convertRectToBacking: instead. 
