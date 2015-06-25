@@ -37,9 +37,9 @@ namespace Lime
 					using (var colorBitmap = new SD.Bitmap(stream)) {
 						if (colorBitmap.Width != bitmap.Width || colorBitmap.Height != bitmap.Height) {
 							if (colorBitmap.Width == 1 && colorBitmap.Height == 1) {
-								// For 1x1 bitmaps, propagate alpha value to red, green and blue channels.
+								// For 1x1 bitmaps, fill RGB with white.
 								var imageData = bitmap.LockBits(lockRect, SDI.ImageLockMode.ReadWrite, SDI.PixelFormat.Format32bppArgb);
-								CopyRedToGreenBlueAlphaChannels(imageData);
+								CopyRedToAlphaChannelAndFillWhite(imageData);
 								bitmap.UnlockBits(imageData);
 							} else {
 								throw new Lime.Exception("Alpha bitmap size and main bitmap size must be equal");
@@ -139,15 +139,16 @@ namespace Lime
 			}
 		}
 
-		private void CopyRedToGreenBlueAlphaChannels(SDI.BitmapData data)
+		private void CopyRedToAlphaChannelAndFillWhite(SDI.BitmapData data)
 		{
 			unsafe {
 				for (int j = 0; j < data.Height; j++) {
 					byte* p = (byte*)data.Scan0 + data.Stride * j;
 					for (int i = 0; i < data.Width; i++) {
-						byte intensity = *p++;
-						*p++ = intensity;
-						*p++ = intensity;
+						byte intensity = *p;
+						*p++ = 255;
+						*p++ = 255;
+						*p++ = 255;
 						*p++ = intensity;
 					}
 				}
@@ -214,8 +215,8 @@ namespace Lime
 					using (var colorBitmap = Android.Graphics.BitmapFactory.DecodeStream(stream)) {
 						if (colorBitmap.Width != bitmap.Width || colorBitmap.Height != bitmap.Height) {
 							if (colorBitmap.Width == 1 && colorBitmap.Height == 1) {
-								// For 1x1 bitmaps, propagate alpha value to red, green and blue channels.
-								CopyRedToGreenBlueAlphaChannels(ref pixels);
+								// For 1x1 bitmaps, fill RGB with white.
+								CopyRedToAlphaChannelAndFillWhite(ref pixels);
 							} else {
 								throw new Lime.Exception ("Alpha bitmap size and main bitmap size must be the same");
 							}
@@ -259,13 +260,14 @@ namespace Lime
 			}
 		}
 
-		private void CopyRedToGreenBlueAlphaChannels(ref int[] pixels)
+		private void CopyRedToAlphaChannelAndFillWhite(ref int[] pixels)
 		{
 			for (int i = 0; i < pixels.Length; i++) {
 				var color = new Color4((uint)pixels[i]);
 				color.A = color.R;
-				color.G = color.R;
-				color.B = color.R;
+				color.R = 255;
+				color.G = 255;
+				color.B = 255;
 				pixels[i] = (int)color.ABGR;
 			}
 		}
