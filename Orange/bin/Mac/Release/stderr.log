@@ -1,1 +1,4 @@
-2015-06-24 17:29:17.450 Orange[441:4918] *** WARNING: Method userSpaceScaleFactor in class NSView is deprecated on 10.7 and later. It should not be used in new applications. Use convertRectToBacking: instead. 
+2015-06-25 16:15:49.541 Orange[8006:344597] *** WARNING: Method userSpaceScaleFactor in class NSView is deprecated on 10.7 and later. It should not be used in new applications. Use convertRectToBacking: instead. 
+dyld: Library not loaded: /Users/mike/Downloads/nvidia-texture-tools-read-only/build-release/src/nvcore/Debug/libnvcore.dylib
+  Referenced from: /Users/mike/Documents/Dev/Citrus/Orange/bin/Mac/Release/Orange.app/Contents/MonoBundle/Toolchain.Mac/nvcompress
+  Reason: image not found

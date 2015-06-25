@@ -500,12 +500,13 @@ namespace Orange
 			}
 			switch (platform) {
 				case TargetPlatform.Android:
+				case TargetPlatform.iOS:
 					if (item1.PVRFormat != item2.PVRFormat) {
 						return false;
 					}
+					// On Android we use separate alpha for compressed textures
+					// On iOS - pvrtc4 for transparent compressed textures and pvrtc2 - for opaque
 					return item1.PVRFormat != PVRFormat.Compressed || item1.Pixbuf.HasAlpha == item2.Pixbuf.HasAlpha;
-				case TargetPlatform.iOS:
-					return item1.PVRFormat == item2.PVRFormat;
 				case TargetPlatform.Desktop:
 					return item1.DDSFormat == item2.DDSFormat;
 				case TargetPlatform.Unity:

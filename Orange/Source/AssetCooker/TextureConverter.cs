@@ -28,7 +28,11 @@ namespace Orange
 			switch (pvrFormat) {
 				case PVRFormat.Compressed:
 					if (compression == PVRCompressionScheme.PVRTC4) {
-						args += " -f PVRTC1_4";
+						if (pixbuf.HasAlpha) {
+							args += " -f PVRTC1_4";
+						} else {
+							args += " -f PVRTC1_2";
+						}
 						width = height = Math.Max(potWidth, potHeight);
 					} else {
 						args = " -f ETC1 -q etcfast";
