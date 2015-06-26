@@ -136,7 +136,7 @@ namespace Lime
 			"void main()					" +
 			"{								" +
 			"	lowp float a = useAlphaTexture1 ? texture2D(tex1a, texCoords).r : texture2D(tex1, texCoords).a; " +
-			"	gl_FragColor = color * vec4(a, a, a, a);	" +
+			"	gl_FragColor = color * vec4(1.0, 1.0, 1.0, a);	" +
 			"}"
 		);
 
@@ -156,7 +156,7 @@ namespace Lime
 			"	if (useAlphaTexture1)			" +
 			"		t1.a = texture2D(tex1a, texCoords1).r; " +
 			"	lowp float a2 = useAlphaTexture2 ? texture2D(tex2a, texCoords2).r : texture2D(tex2, texCoords2).a; " +
-			"	gl_FragColor = t1 * color * vec4(a2, a2, a2, a2);" +
+			"	gl_FragColor = t1 * color * vec4(1.0, 1.0, 1.0, a2);" +
 			"}"
 		);
 
@@ -169,7 +169,7 @@ namespace Lime
 			"void main()					" +
 			"{								" +
 			"	lowp float a = 1.0 - (useAlphaTexture1 ? texture2D(tex1a, texCoords).r : texture2D(tex1, texCoords).a); " +
-			"	gl_FragColor = color * vec4(a, a, a, a); " +
+			"	gl_FragColor = color * vec4(1.0, 1.0, 1.0, a); " +
 			"}"
 		);
 
