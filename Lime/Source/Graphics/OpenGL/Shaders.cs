@@ -91,12 +91,12 @@ namespace Lime
 			"uniform lowp sampler2D tex1a;	" +
 			"void main()					" +
 			"{								" +
-			"	lowp vec4 t1 = texture2D(tex1, texCoords); " +
-			"	if (useAlphaTexture1)			" +
-			"		t1.a = texture2D(tex1a, texCoords).r; " +
-			"	if (premultiplyAlpha)		" +
-			"		t1.rgb *= t1.a;			" +
-			"	gl_FragColor = color * t1;	" +
+			"	lowp vec4 t1 = texture2D(tex1, texCoords);	" +
+			"	if (useAlphaTexture1)						" +
+			"		t1.a = texture2D(tex1a, texCoords).r;	" +
+			"	gl_FragColor = color * t1;					" +
+			"	if (premultiplyAlpha)						" +
+			"		gl_FragColor.rgb *= gl_FragColor.a;		" +
 			"}"
 		);
 
@@ -115,15 +115,13 @@ namespace Lime
 			"{								" +
 			"	lowp vec4 t1 = texture2D(tex1, texCoords1);	" +
 			"	lowp vec4 t2 = texture2D(tex2, texCoords2);	" +
-			"	if (useAlphaTexture1)			" +
-			"		t1.a = texture2D(tex1a, texCoords1).r; " +
-			"	if (useAlphaTexture2)			" +
-			"		t2.a = texture2D(tex2a, texCoords2).r; " +
-			"	if (premultiplyAlpha) {		" +
-			"		t1.rgb *= t1.a;			" +
-			"		t2.rgb *= t2.a;			" +
-			"	}							" +
-			"	gl_FragColor = color * t1 * t2; " +
+			"	if (useAlphaTexture1)						" +
+			"		t1.a = texture2D(tex1a, texCoords1).r;	" +
+			"	if (useAlphaTexture2)						" +
+			"		t2.a = texture2D(tex2a, texCoords2).r;	" +
+			"	gl_FragColor = color * t1 * t2;				" +
+			"	if (premultiplyAlpha)						" +
+			"		gl_FragColor.rgb *= gl_FragColor.a;		" +
 			"}"
 		);
 
