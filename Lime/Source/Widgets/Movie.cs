@@ -25,8 +25,6 @@ namespace Lime
 		bool textureInitialized;
 		MovieTexture movieTexture;
 
-		public Matrix32 UVTransform { get { return Matrix32.Identity; } }
-
 		[ProtoMember(1)]
 		public string Path
 		{
@@ -65,6 +63,8 @@ namespace Lime
 		{
 			requestSkipRender = true;
 		}
+
+		Matrix32 IImageCombinerArg.UVTransform { get { return Matrix32.Identity; } }
 
 		public override void AddToRenderChain(RenderChain chain)
 		{

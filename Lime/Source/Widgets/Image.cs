@@ -13,12 +13,6 @@ namespace Lime
 		bool skipRender;
 		bool requestSkipRender;
 
-		public Matrix32 UVTransform {
-			get {
-				return new Matrix32(new Vector2(UV1.X - UV0.X, 0), new Vector2(0, UV1.Y - UV0.Y), UV0);
-			}
-		}
-
 		/// <summary>
 		/// Изображение, отображаемое этим виджетом
 		/// </summary>
@@ -96,6 +90,11 @@ namespace Lime
 		void IImageCombinerArg.SkipRender()
 		{
 			requestSkipRender = true;
+		}
+
+		Matrix32 IImageCombinerArg.UVTransform
+		{
+			get { return new Matrix32(new Vector2(UV1.X - UV0.X, 0), new Vector2(0, UV1.Y - UV0.Y), UV0); }
 		}
 
 		protected override void SelfUpdate(float delta)
