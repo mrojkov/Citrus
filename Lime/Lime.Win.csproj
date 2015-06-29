@@ -56,7 +56,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Source\Application\Debug.cs" />
     <Compile Include="Source\Application\RenderingApi.cs" />
-    <Compile Include="Source\Application\WinApi.cs" />
     <Compile Include="Source\AssetsBundle\UnityAssetsBundle.cs" />
     <Compile Include="Source\Audio\IAudioChannel.cs" />
     <Compile Include="Source\Audio\OpenAL\AudioCache.cs" />
@@ -70,102 +69,6 @@
     <Compile Include="Source\Graphics\Mesh.cs" />
     <Compile Include="Source\Graphics\OpenGL\PlatformMesh.cs" />
     <Compile Include="Source\Input\SoftKeyboard.cs" />
-    <Compile Include="Source\Widgets2\Animation\Animation.cs" />
-    <Compile Include="Source\Widgets2\Animation\AnimationUtils.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Source\Widgets2\Animation\Animator.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Source\Widgets2\Animation\AnimatorCollection.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Source\Widgets2\Animation\AnimatorRegistry.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Source\Widgets2\Animation\Keyframe.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Source\Widgets2\Animation\KeyframeCollection.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Source\Widgets2\Audio.cs" />
-    <Compile Include="Source\Widgets2\Bone.cs" />
-    <Compile Include="Source\Widgets2\BoneArray.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Source\Widgets2\Button.cs" />
-    <Compile Include="Source\Widgets2\Component.cs" />
-    <Compile Include="Source\Widgets2\ComponentList.cs" />
-    <Compile Include="Source\Widgets2\DistortionMesh.cs" />
-    <Compile Include="Source\Widgets2\DistortionMeshPoint.cs" />
-    <Compile Include="Source\Widgets2\Editor.cs" />
-    <Compile Include="Source\Widgets2\Frame.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Source\Widgets2\Image.cs" />
-    <Compile Include="Source\Widgets2\ImageCombiner.cs" />
-    <Compile Include="Source\Widgets2\IText.cs" />
-    <Compile Include="Source\Widgets2\LinearLayout.cs" />
-    <Compile Include="Source\Widgets2\Marker.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Source\Widgets2\MarkerCollection.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Source\Widgets2\Movie.cs" />
-    <Compile Include="Source\Widgets2\NineGrid.cs" />
-    <Compile Include="Source\Widgets2\Node.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Source\Widgets2\NodeDebugView.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Source\Widgets2\NodeList.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Source\Widgets2\ParticleEmitter.cs" />
-    <Compile Include="Source\Widgets2\ParticleModifier.cs" />
-    <Compile Include="Source\Widgets2\ParticlesMagnet.cs" />
-    <Compile Include="Source\Widgets2\PointObject.cs" />
-    <Compile Include="Source\Widgets2\Polyline.cs" />
-    <Compile Include="Source\Widgets2\RenderChain.cs" />
-    <Compile Include="Source\Widgets2\RichText.cs" />
-    <Compile Include="Source\Widgets2\SimpleText.cs" />
-    <Compile Include="Source\Widgets2\Slider.cs" />
-    <Compile Include="Source\Widgets2\Spline.cs" />
-    <Compile Include="Source\Widgets2\SplineGear.cs" />
-    <Compile Include="Source\Widgets2\SplinePoint.cs" />
-    <Compile Include="Source\Widgets2\Task.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Source\Widgets2\TaskList.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Source\Widgets2\TextBox.cs" />
-    <Compile Include="Source\Widgets2\TextStyle.cs" />
-    <Compile Include="Source\Widgets2\Text\TextParser.cs" />
-    <Compile Include="Source\Widgets2\Text\TextRenderer.cs" />
-    <Compile Include="Source\Widgets2\WebBrowser.Android.cs" />
-    <Compile Include="Source\Widgets2\WebBrowser.iOS.cs" />
-    <Compile Include="Source\Widgets2\WebBrowser.Mac.cs" />
-    <Compile Include="Source\Widgets2\WebBrowser.Win.cs" />
-    <Compile Include="Source\Widgets2\Widget.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Source\Widgets2\Widget.Toolbox.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Source\Widgets2\WidgetCachedRenderer.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Source\Widgets2\WidgetDebugView.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Source\Widgets2\WidgetInput.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Source\Widgets2\World.cs" />
     <Compile Include="Source\Widgets\Editor.cs" />
     <Compile Include="Source\Graphics\RenderBatch.cs" />
     <Compile Include="Source\Graphics\RenderList.cs" />
@@ -189,7 +92,6 @@
     <Compile Include="Source\Graphics\Unity\Texture2D.cs" />
     <Compile Include="Source\Input\Input.Native.cs" />
     <Compile Include="Source\Input\Input.Unity.cs" />
-    <Compile Include="Source\Application\Sdl2.cs" />
     <Compile Include="Source\Localization\LocalizationDictionary.cs" />
     <Compile Include="Source\Localization\LocalizationDictionaryXmlSerializer.cs" />
     <Compile Include="Source\Localization\LocalizationDictionaryTextSerializer.cs" />
@@ -224,10 +126,6 @@
     <Compile Include="Source\Environment.cs" />
     <Compile Include="Source\Widgets\PopupMenu\RoundedRectangle.cs" />
     <Compile Include="Source\Geometry.cs" />
-    <Compile Include="Source\Application\iOSAppDelegate.cs" />
-    <Compile Include="Source\Application\iOSGameController.cs" />
-    <Compile Include="Source\Application\iOSGameView.cs" />
-    <Compile Include="Source\Application\OpenTKGameView.cs" />
     <Compile Include="Source\AssetsBundle\PackedAssetsBundle.cs" />
     <Compile Include="Source\Audio\AudioSystem.cs" />
     <Compile Include="Source\Exception.cs" />
@@ -300,11 +198,6 @@
     <Compile Include="Source\Widgets\Widget.cs" />
     <Compile Include="Source\Widgets\Widget.Toolbox.cs" />
     <Compile Include="Source\Graphics\OpacityMask.cs" />
-    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Factory.iPhone.cs" />
-    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\GraphicsContext.cs" />
-    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGameView.cs" />
-    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGraphicsContext.cs" />
-    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Utilities.iPhone.cs" />
     <Compile Include="Source\Widgets\WebBrowser.iOS.cs" />
     <Compile Include="Source\Application\CommandLineArgs.cs" />
     <Compile Include="Source\Application\ExternalStorageLagsSimulator.cs" />
@@ -313,10 +206,8 @@
     <Compile Include="Source\Graphics\Bitmap.iOS.cs" />
     <Compile Include="Source\Graphics\Bitmap.Win.cs" />
     <Compile Include="Source\Widgets\WebBrowser.Mac.cs" />
-    <Compile Include="Source\Application\AndroidGameView.cs" />
     <Compile Include="Source\Graphics\Bitmap.Android.cs" />
     <Compile Include="Source\Widgets\WebBrowser.Android.cs" />
-    <Compile Include="Source\Application\AndroidActivityDelegate.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Source\Graphics\Bitmap.Mac.cs" />
     <Compile Include="Source\Graphics\Bitmap.Unity.cs" />
@@ -325,6 +216,75 @@
     <Compile Include="Source\Audio\Unity\PlatformAudioSystem.cs" />
     <Compile Include="Source\AssetsBundle\UnityDownloadableBundle.cs" />
     <Compile Include="Source\Types\BitSet32.cs" />
+    <Compile Include="Source\Application\AndroidActivityDelegate.cs" />
+    <Compile Include="Source\Application\AndroidGameView.cs" />
+    <Compile Include="Source\Application\iOSAppDelegate.cs" />
+    <Compile Include="Source\Application\iOSGameController.cs" />
+    <Compile Include="Source\Application\iOSGameView.cs" />
+    <Compile Include="Source\Application\OpenTKGameView.cs" />
+    <Compile Include="Source\Application\Sdl2.cs" />
+    <Compile Include="Source\Application\WinApi.cs" />
+    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Factory.iPhone.cs" />
+    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\GraphicsContext.cs" />
+    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGameView.cs" />
+    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGraphicsContext.cs" />
+    <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Utilities.iPhone.cs" />
+    <Compile Include="Source\Widgets2\Audio.cs" />
+    <Compile Include="Source\Widgets2\Bone.cs" />
+    <Compile Include="Source\Widgets2\BoneArray.cs" />
+    <Compile Include="Source\Widgets2\Button.cs" />
+    <Compile Include="Source\Widgets2\Component.cs" />
+    <Compile Include="Source\Widgets2\ComponentList.cs" />
+    <Compile Include="Source\Widgets2\DistortionMesh.cs" />
+    <Compile Include="Source\Widgets2\DistortionMeshPoint.cs" />
+    <Compile Include="Source\Widgets2\Editor.cs" />
+    <Compile Include="Source\Widgets2\Frame.cs" />
+    <Compile Include="Source\Widgets2\Image.cs" />
+    <Compile Include="Source\Widgets2\ImageCombiner.cs" />
+    <Compile Include="Source\Widgets2\IText.cs" />
+    <Compile Include="Source\Widgets2\LinearLayout.cs" />
+    <Compile Include="Source\Widgets2\Marker.cs" />
+    <Compile Include="Source\Widgets2\MarkerCollection.cs" />
+    <Compile Include="Source\Widgets2\Movie.cs" />
+    <Compile Include="Source\Widgets2\NineGrid.cs" />
+    <Compile Include="Source\Widgets2\Node.cs" />
+    <Compile Include="Source\Widgets2\NodeDebugView.cs" />
+    <Compile Include="Source\Widgets2\NodeList.cs" />
+    <Compile Include="Source\Widgets2\ParticleEmitter.cs" />
+    <Compile Include="Source\Widgets2\ParticleModifier.cs" />
+    <Compile Include="Source\Widgets2\ParticlesMagnet.cs" />
+    <Compile Include="Source\Widgets2\PointObject.cs" />
+    <Compile Include="Source\Widgets2\Polyline.cs" />
+    <Compile Include="Source\Widgets2\RenderChain.cs" />
+    <Compile Include="Source\Widgets2\RichText.cs" />
+    <Compile Include="Source\Widgets2\SimpleText.cs" />
+    <Compile Include="Source\Widgets2\Slider.cs" />
+    <Compile Include="Source\Widgets2\Spline.cs" />
+    <Compile Include="Source\Widgets2\SplineGear.cs" />
+    <Compile Include="Source\Widgets2\SplinePoint.cs" />
+    <Compile Include="Source\Widgets2\Task.cs" />
+    <Compile Include="Source\Widgets2\TaskList.cs" />
+    <Compile Include="Source\Widgets2\TextBox.cs" />
+    <Compile Include="Source\Widgets2\TextStyle.cs" />
+    <Compile Include="Source\Widgets2\WebBrowser.Android.cs" />
+    <Compile Include="Source\Widgets2\WebBrowser.iOS.cs" />
+    <Compile Include="Source\Widgets2\WebBrowser.Mac.cs" />
+    <Compile Include="Source\Widgets2\WebBrowser.Win.cs" />
+    <Compile Include="Source\Widgets2\Widget.cs" />
+    <Compile Include="Source\Widgets2\Widget.Toolbox.cs" />
+    <Compile Include="Source\Widgets2\WidgetCachedRenderer.cs" />
+    <Compile Include="Source\Widgets2\WidgetDebugView.cs" />
+    <Compile Include="Source\Widgets2\WidgetInput.cs" />
+    <Compile Include="Source\Widgets2\World.cs" />
+    <Compile Include="Source\Widgets2\Animation\Animation.cs" />
+    <Compile Include="Source\Widgets2\Animation\AnimationUtils.cs" />
+    <Compile Include="Source\Widgets2\Animation\Animator.cs" />
+    <Compile Include="Source\Widgets2\Animation\AnimatorCollection.cs" />
+    <Compile Include="Source\Widgets2\Animation\AnimatorRegistry.cs" />
+    <Compile Include="Source\Widgets2\Animation\Keyframe.cs" />
+    <Compile Include="Source\Widgets2\Animation\KeyframeCollection.cs" />
+    <Compile Include="Source\Widgets2\Text\TextParser.cs" />
+    <Compile Include="Source\Widgets2\Text\TextRenderer.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
