@@ -37,9 +37,11 @@ namespace Lime
 		public bool Enabled;
 
 		private float value;
+		private Widget thumb;
 
 		public Slider()
 		{
+			HitTestMask = ControlsHitTestMask;
 			RangeMin = 0;
 			RangeMax = 100;
 			Value = 0;
@@ -49,14 +51,14 @@ namespace Lime
 
 		private Widget Thumb
 		{
-			get { return GetThumb(); }
+			get { return thumb ?? MaybeThumb("SliderThumb") ?? MaybeThumb("Thumb"); }
 		}
 
-		private Widget GetThumb()
-		{
-			var thumb = Nodes.TryFind("SliderThumb") as Widget;
+		private Widget MaybeThumb(string name) {
 			if (thumb == null) {
-				thumb = Nodes.TryFind("Thumb") as Widget;
+				thumb = Nodes.TryFind(name) as Widget;
+				if (thumb != null)
+					thumb.HitTestMask = ControlsHitTestMask;
 			}
 			return thumb;
 		}
