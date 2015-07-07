@@ -134,26 +134,14 @@
       <Project>{4604AA2E-129F-4814-AD0D-8BA35346ECC4}</Project>
       <Name>Lemon.Mac</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Lime\Lime.Mac.csproj">
+    <ProjectReference Include="..\Lime\Lime.MonoMac.csproj">
       <Project>{DC16EEBF-404D-4610-B87A-15B57464D707}</Project>
-      <Name>Lime.Mac</Name>
+      <Name>Lime.MonoMac</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Info.plist" />
     <Content Include="Toolchain.Mac\PVRTexTool">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Toolchain.Mac\libnvcore.dylib">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Toolchain.Mac\libnvimage.dylib">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Toolchain.Mac\libnvmath.dylib">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Toolchain.Mac\libnvtt.dylib">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Toolchain.Mac\nvcompress">

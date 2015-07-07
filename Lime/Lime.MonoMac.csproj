@@ -213,14 +213,6 @@
     <Compile Include="Source\Graphics\Bitmap.Unity.cs" />
     <Compile Include="Source\Graphics\Unity\PlatformMesh.cs" />
     <Compile Include="Source\Graphics\Unity\PlatformRenderer.cs" />
-    <Compile Include="Source\Application\Mac\GameView.cs" />
-    <Compile Include="Source\Application\Mac\MacKeyCode.cs" />
-    <Compile Include="Source\Application\Mac\MacKeyCodeMap.cs" />
-    <Compile Include="Source\Application\Mac\NativeGameView.cs" />
-    <Compile Include="Source\Application\Mac\GraphicsMode.cs" />
-    <Compile Include="Source\Application\Mac\ColorFormat.cs" />
-    <Compile Include="Source\Application\Mac\Exceptions.cs" />
-    <Compile Include="Source\Application\Mac\MouseCursor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
