@@ -215,7 +215,7 @@ namespace Lime
 				return PlatformId.Win;
 #elif ANDROID
 				return PlatformId.Android;
-#elif MAC
+#elif MAC || MONOMAC
 				return PlatformId.Mac;
 #else
 				throw new Lime.Exception("Unknown platform");
@@ -281,14 +281,14 @@ namespace Lime
 		/// </summary>
 		public virtual void PreCreate() {}
 
-#elif WIN || MAC
+#elif WIN || MAC || MONOMAC
 
 		/// <summary>
 		/// Завершает работу приложения
 		/// </summary>
 		public void Exit()
 		{
-			GameView.Instance.Exit();
+			GameView.Instance.Close();
 		}
 
 		/// <summary>

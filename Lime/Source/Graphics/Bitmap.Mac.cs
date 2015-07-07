@@ -1,8 +1,15 @@
-#if MAC
+#if MAC || MONOMAC
 using System;
 using System.IO;
+#if MONOMAC
+using MonoMac.CoreGraphics;
+using MonoMac.AppKit;
+using CGRect = System.Drawing.RectangleF;
+using CGSize = System.Drawing.SizeF;
+#else
 using CoreGraphics;
 using AppKit;
+#endif
 using System.Runtime.InteropServices;
 
 namespace Lime

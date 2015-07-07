@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-#if WIN || MAC
+#if WIN || MAC || MONOMAC
 using OpenTK.Graphics.OpenGL;
 #elif ANDROID
 using OpenTK.Graphics.ES20;
@@ -14,7 +14,7 @@ namespace Lime
 {
 	public partial class Texture2D : CommonTexture, ITexture
 	{
-#if WIN || MAC || ANDROID
+#if WIN || MAC || ANDROID || MONOMAC
 		enum DDSFourCC
 		{
 			DXT1 = ('D' | ('X' << 8) | ('T' << 16) | ('1' << 24)),

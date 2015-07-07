@@ -1,9 +1,11 @@
-#if WIN || MAC
+#if WIN || MONOMAC || MAC
 using System;
 using OpenTK;
 using OpenTK.Input;
 using OpenTK.Graphics;
+#if !MAC
 using OpenTK.Graphics.ES20;
+#endif
 using System.Collections.Generic;
 using System.Drawing;
 
@@ -36,9 +38,11 @@ namespace Lime
 #endif
 
 		public GameView(Application app)
-			: base(800, 600, GraphicsMode.Default, 
-			app.Title, GameWindowFlags.Default, DisplayDevice.Default,
-			2, 0, GetGraphicContextFlags())
+			: base(800, 600, GraphicsMode.Default, app.Title
+#if !MAC
+			, GameWindowFlags.Default, DisplayDevice.Default, 2, 0, GetGraphicContextFlags()
+#endif
+			)
 		{
 			Instance = this;
 			this.app = app;
@@ -56,11 +60,13 @@ namespace Lime
 			RenderingApi = GetRenderingApi();
 		}
 
+#if !MAC
 		private static GraphicsContextFlags GetGraphicContextFlags()
 		{
 			return GetRenderingApi() == RenderingApi.OpenGL ? 
 				 GraphicsContextFlags.Default : GraphicsContextFlags.Embedded;
 		}
+#endif
 
 		private void SetupWindowLocationAndSize()
 		{

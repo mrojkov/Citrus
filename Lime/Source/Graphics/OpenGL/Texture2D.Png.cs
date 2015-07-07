@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-#if WIN || MAC
+#if WIN
 using OpenTK.Graphics.OpenGL;
 using SDI = System.Drawing.Imaging;
 using SD = System.Drawing;
@@ -21,7 +21,17 @@ namespace Lime
 {
 	public partial class Texture2D : CommonTexture, ITexture
 	{
-#if WIN || MAC
+#if MONOMAC
+		private void InitWithPngOrJpgBitmap(Stream stream, Stream alphaStream)
+		{
+			throw new NotImplementedException();
+		}
+#elif MAC
+		private void InitWithPngOrJpgBitmap(Stream stream, Stream alphaStream)
+		{
+			throw new NotImplementedException();
+		}
+#elif WIN
 		private void InitWithPngOrJpgBitmap(Stream stream, Stream alphaStream)
 		{
 			if (!Application.IsMainThread) {

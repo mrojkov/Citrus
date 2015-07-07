@@ -7,6 +7,8 @@ using UIKit;
 #elif ANDROID
 using Android.Content;
 using Android.App;
+#elif MAC
+using AppKit;
 #endif
 
 namespace Lime

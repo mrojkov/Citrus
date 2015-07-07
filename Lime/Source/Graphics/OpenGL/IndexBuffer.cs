@@ -63,9 +63,11 @@ namespace Lime
 		{
 			if (iboHandle != 0) {
 				Application.InvokeOnMainThread(() => {
-					if (OpenTK.Graphics.GraphicsContext.CurrentContext != null) {
-						GL.DeleteBuffers(1, new uint[] { iboHandle });
-					}
+#if !MAC
+					if (OpenTK.Graphics.GraphicsContext.CurrentContext == null)
+						return;
+#endif
+					GL.DeleteBuffers(1, new uint[] { iboHandle });
 				});
 				iboHandle = 0;
 			}

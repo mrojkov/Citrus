@@ -4,21 +4,21 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{DC16EEBF-404D-4610-B87A-15B57464D707}</ProjectGuid>
-    <ProjectTypeGuids>{A3F8F2AB-B479-4A4A-A458-A89E7DC349F1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectTypeGuids>{42C0BBD9-55CE-4FC1-8D90-A7348ABAFB23};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <RootNamespace>Lime</RootNamespace>
     <AssemblyName>Lime</AssemblyName>
     <BaseDirectory>Source</BaseDirectory>
     <newfilesearch>OnLoad</newfilesearch>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
-    <TargetFrameworkIdentifier>Xamarin.Mac</TargetFrameworkIdentifier>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\Mac\Debug</OutputPath>
-    <DefineConstants>DEBUG;OPENGL;OPENAL;MAC</DefineConstants>
+    <DefineConstants>DEBUG;OPENGL;OPENAL;MONOMAC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>False</ConsolePause>
@@ -38,7 +38,7 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>False</ConsolePause>
     <DebugSymbols>True</DebugSymbols>
-    <DefineConstants>MAC;OPENGL;OPENAL</DefineConstants>
+    <DefineConstants>MONOMAC;OPENGL;OPENAL</DefineConstants>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <EnableCodeSigning>false</EnableCodeSigning>
     <CreatePackage>false</CreatePackage>
@@ -52,9 +52,13 @@
     <Reference Include="protobuf-net">
       <HintPath>..\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
     </Reference>
-    <Reference Include="Xamarin.Mac" />
     <Reference Include="System.Core" />
-    <Reference Include="OpenTK" />
+    <Reference Include="OpenTK">
+      <HintPath>..\3rdParty\OpenTK\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral" />
+    <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Types\Matrix44.cs" />
@@ -85,9 +89,7 @@
     <Compile Include="Source\Widgets\TaskList.cs" />
     <Compile Include="Source\Widgets\WidgetDebugView.cs" />
     <Compile Include="Source\Widgets\WidgetInput.cs" />
-    <Compile Include="Source\Application\CommandLineArgs.cs">
-      <DependentUpon>iOSAppDelegate.cs</DependentUpon>
-    </Compile>
+    <Compile Include="Source\Application\CommandLineArgs.cs" />
     <Compile Include="Source\Application\ExternalStorageLagsSimulator.cs" />
     <Compile Include="Source\Application\FPSCalculator.cs" />
     <Compile Include="Source\Widgets\WebBrowser.Win.cs" />
@@ -211,11 +213,19 @@
     <Compile Include="Source\Graphics\Bitmap.Unity.cs" />
     <Compile Include="Source\Graphics\Unity\PlatformMesh.cs" />
     <Compile Include="Source\Graphics\Unity\PlatformRenderer.cs" />
-    <Compile Include="Source\Application\OpenTKGameView.cs" />
+    <Compile Include="Source\Application\Mac\GameView.cs" />
+    <Compile Include="Source\Application\Mac\MacKeyCode.cs" />
+    <Compile Include="Source\Application\Mac\MacKeyCodeMap.cs" />
+    <Compile Include="Source\Application\Mac\NativeGameView.cs" />
+    <Compile Include="Source\Application\Mac\GraphicsMode.cs" />
+    <Compile Include="Source\Application\Mac\ColorFormat.cs" />
+    <Compile Include="Source\Application\Mac\Exceptions.cs" />
+    <Compile Include="Source\Application\Mac\MouseCursor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
     <Compile Include="Source\Serialization.cs" />
+    <Compile Include="Source\Application\OpenTKGameView.cs" />
     <Compile Include="Source\Application\iOSAppDelegate.cs" />
     <Compile Include="Source\Application\iOSGameController.cs" />
     <Compile Include="Source\Application\iOSGameView.cs" />
@@ -308,19 +318,12 @@
   <ItemGroup>
     <Folder Include="Source\Graphics\" />
     <Folder Include="Source\Audio\OpenAL\" />
-    <Folder Include="Source\Application\OpenTK.Xamarin.Mac\Input\" />
-    <Folder Include="Source\Application\OpenTK.Xamarin.Mac\" />
-    <Folder Include="Source\Application\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Mac.csproj">
       <Project>{4604AA2E-129F-4814-AD0D-8BA35346ECC4}</Project>
       <Name>Lemon.Mac</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\3rdParty\OpenTK.Xamarin\OpenTK.Xamarin.csproj">
-      <Project>{670A98AF-7AAD-43A8-A80B-B202A7745EA5}</Project>
-      <Name>OpenTK.Xamarin</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

@@ -88,9 +88,11 @@ namespace Lime
 		{
 			if (vboHandle != 0) {
 				Application.InvokeOnMainThread(() => {
-					if (OpenTK.Graphics.GraphicsContext.CurrentContext != null) {
-						GL.DeleteBuffers(1, new uint[] { vboHandle });
-					}
+#if !MAC
+					if (OpenTK.Graphics.GraphicsContext.CurrentContext == null)
+						return;
+#endif
+					GL.DeleteBuffers(1, new uint[] { vboHandle });
 				});
 				vboHandle = 0;
 			}

@@ -7,6 +7,7 @@ namespace Lime
 {
 	public enum Key
 	{
+		Unknown = 0,
 		LShift = 1,
 		ShiftLeft = 1,
 		RShift = 2,

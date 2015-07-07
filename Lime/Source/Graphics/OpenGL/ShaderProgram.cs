@@ -74,7 +74,11 @@ namespace Lime
 		{
 			if (handle != 0) {
 				Application.InvokeOnMainThread(() => {
+#if MAC
+					GL.DeleteProgram(1, new int[] { handle });
+#else
 					GL.DeleteProgram(handle);
+#endif
 				});
 				handle = 0;
 			}
