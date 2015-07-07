@@ -104,20 +104,22 @@ namespace Orange
 				TextureConverterUtils.SwapRGBChannels(pixbuf);
 			}
 			var tga = Path.ChangeExtension(dstPath, ".tga");
-			try {
-				TextureConverterUtils.SaveToTGA(pixbuf, tga);
-				ToDDSTextureHelper(tga, dstPath, pixbuf.HasAlpha, compressed, mipMaps);
-			} finally {
-				File.Delete(tga);
-			}
+			TextureConverterUtils.SaveToTGA(pixbuf, tga);
+			ToDDSTextureHelper(tga, dstPath, pixbuf.HasAlpha, compressed, mipMaps);
+			// Do not delete the bitmap if an exception has occurred
+			File.Delete(tga);
 		}
 		
 		private static void ToDDSTextureHelper(string srcPath, string dstPath, bool hasAlpha, bool compressed, bool mipMaps)
 		{
 			string mipsFlag = mipMaps ? "" : "-nomips";
-			string compressionFlag = compressed ? (hasAlpha ? "-bc3" : "-bc1") : "-rgb";
+			string compressionFlag = compressed ? (hasAlpha ? "-bc3" : "-bc1") : "-rgb -rgbfmt bgra8";
 #if WIN
 			string nvcompress = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Win", "nvcompress.exe");
+#else
+			string nvcompress = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Mac", "nvcompress");
+			Mono.Unix.Native.Syscall.chmod(nvcompress, Mono.Unix.Native.FilePermissions.S_IXOTH | Mono.Unix.Native.FilePermissions.S_IXUSR);
+#endif
 			srcPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), srcPath);
 			dstPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), dstPath);
 			string args = String.Format("{0} {1} \"{2}\" \"{3}\"", mipsFlag, compressionFlag, srcPath, dstPath);
@@ -125,20 +127,6 @@ namespace Orange
 			if (result != 0) {
 				throw new Lime.Exception("Failed to convert '{0}' to DDS format(error code: {1})", srcPath, result);
 			}
-#else
-			string nvcompress = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Mac", "nvcompress");
-			Mono.Unix.Native.Syscall.chmod(nvcompress, Mono.Unix.Native.FilePermissions.S_IXOTH | Mono.Unix.Native.FilePermissions.S_IXUSR);
-			string args = String.Format("{0} {1} '{2}' '{3}'", mipsFlag, compressionFlag, srcPath, dstPath);
-			Console.WriteLine(nvcompress);
-			var psi = new System.Diagnostics.ProcessStartInfo(nvcompress, args);
-			var p = System.Diagnostics.Process.Start(psi);
-			while (!p.HasExited) {
-				p.WaitForExit();
-			}
-			if (p.ExitCode != 0) {
-				throw new Lime.Exception("Failed to convert '{0}' to DDS format(error code: {1})", srcPath, p.ExitCode);
-			}
-#endif
 		}
 
 		public static void ToJPG(Gdk.Pixbuf pixbuf, string dstPath, bool mipMaps)
