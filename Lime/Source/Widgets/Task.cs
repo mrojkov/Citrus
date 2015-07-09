@@ -159,12 +159,12 @@ namespace Lime
 
 		public static WaitPredicate WaitWhile(Func<bool> predicate)
 		{
-			return new BooleanWaitPredicate() { Preducate = predicate };
+			return new BooleanWaitPredicate() { Predicate = predicate };
 		}
 
 		public static WaitPredicate WaitWhile(Func<float, bool> timePredicate)
 		{
-			return new TimeWaitPredicate() { Preducate = timePredicate };
+			return new TimeWaitPredicate() { Predicate = timePredicate };
 		}
 		
 		public static WaitPredicate WaitForAnimation(Lime.Node node)
@@ -181,16 +181,16 @@ namespace Lime
 
 		private class BooleanWaitPredicate : WaitPredicate
 		{
-			public Func<bool> Preducate;
+			public Func<bool> Predicate;
 
-			public override bool Evaluate() { return Preducate(); }
+			public override bool Evaluate() { return Predicate(); }
 		}
 
 		private class TimeWaitPredicate : WaitPredicate
 		{
-			public Func<float, bool> Preducate;
+			public Func<float, bool> Predicate;
 
-			public override bool Evaluate() { return Preducate(TotalTime); }
+			public override bool Evaluate() { return Predicate(TotalTime); }
 		}
 
 		/// <summary>
