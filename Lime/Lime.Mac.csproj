@@ -85,9 +85,7 @@
     <Compile Include="Source\Widgets\TaskList.cs" />
     <Compile Include="Source\Widgets\WidgetDebugView.cs" />
     <Compile Include="Source\Widgets\WidgetInput.cs" />
-    <Compile Include="Source\Application\CommandLineArgs.cs">
-      <DependentUpon>iOSAppDelegate.cs</DependentUpon>
-    </Compile>
+    <Compile Include="Source\Application\CommandLineArgs.cs" />
     <Compile Include="Source\Application\ExternalStorageLagsSimulator.cs" />
     <Compile Include="Source\Application\FPSCalculator.cs" />
     <Compile Include="Source\Widgets\WebBrowser.Win.cs" />
