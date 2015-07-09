@@ -63,9 +63,8 @@ namespace OpenTK
 			window.DidResize += (s, e) => view.UpdateGLContext();
 			// window.DidBecomeKey += OnFocusedChanged;
 			window.ContentView = view;
-			window.MakeKeyAndOrderFront(view);
 			window.ReleasedWhenClosed = true;
-			window.DidMove += (s, e) => OnMove(e);	
+			window.DidMove += (s, e) => OnMove(e);
 			view.RenderFrame += (s, e) => {
 				view.MakeCurrent();
 				OnRenderFrame(new OpenTK.FrameEventArgs());
@@ -106,6 +105,7 @@ namespace OpenTK
 
 		public void Run(float updatesPerSecond)
 		{
+			window.MakeKeyAndOrderFront(window);
 			view.Run(updatesPerSecond);
 			NSApplication.SharedApplication.Run();
 		}
