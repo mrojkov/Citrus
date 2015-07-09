@@ -113,7 +113,16 @@ namespace Orange
 		private static void ToDDSTextureHelper(string srcPath, string dstPath, bool hasAlpha, bool compressed, bool mipMaps)
 		{
 			string mipsFlag = mipMaps ? "" : "-nomips";
-			string compressionFlag = compressed ? (hasAlpha ? "-bc3" : "-bc1") : "-rgb -rgbfmt bgra8";
+			string compressionMethod;
+			if (compressed) {
+				compressionMethod = hasAlpha ? "-bc3" : "-bc1";
+			} else {
+#if WIN
+				compressionMethod = "-rgb";
+#else
+				compressionMethod = "-rgb -rgbfmt bgra8";
+#endif
+			}
 #if WIN
 			string nvcompress = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Win", "nvcompress.exe");
 #else
@@ -122,7 +131,7 @@ namespace Orange
 #endif
 			srcPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), srcPath);
 			dstPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), dstPath);
-			string args = String.Format("{0} {1} \"{2}\" \"{3}\"", mipsFlag, compressionFlag, srcPath, dstPath);
+			string args = String.Format("{0} {1} \"{2}\" \"{3}\"", mipsFlag, compressionMethod, srcPath, dstPath);
 			int result = Process.Start(nvcompress, args, Process.Options.RedirectErrors);
 			if (result != 0) {
 				throw new Lime.Exception("Failed to convert '{0}' to DDS format(error code: {1})", srcPath, result);
