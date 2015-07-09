@@ -30,6 +30,7 @@ namespace Orange
 		public DDSFormat DDSFormat;
 		public DateTime LastChangeTime;
 		public string[] Bundles;
+		public bool Ignore;
 
 		public static readonly CookingRules Default = new CookingRules {
 			TextureAtlas = null,
@@ -37,7 +38,8 @@ namespace Orange
 			PVRFormat = PVRFormat.Compressed,
 			DDSFormat = DDSFormat.DXTi,
 			LastChangeTime = new DateTime(0),
-			Bundles = new[] { MainBundleName }
+			Bundles = new[] { MainBundleName },
+			Ignore = false,
 		};
 	}
 	
@@ -60,12 +62,21 @@ namespace Orange
 					}
 					if (Path.GetFileName(path) == "#CookingRules.txt") {
 						pathStack.Push(Lime.AssetPath.GetDirectoryName(path));
-						rulesStack.Push(ParseCookingRules(rulesStack.Peek(), path, platform));
+						var rules = ParseCookingRules(rulesStack.Peek(), path, platform);
+						rulesStack.Push(rules);
+						// Add 'ignore' cooking rules for this #CookingRules.txt itself
+						var ignoreRules = rules;
+						ignoreRules.Ignore = true;
+						map[path] = ignoreRules;
 					} else if (Path.GetExtension(path) != ".txt") {
 						var rules = rulesStack.Peek();
 						var rulesFile = path + ".txt";
 						if (File.Exists(rulesFile)) {
 							rules = ParseCookingRules(rulesStack.Peek(), rulesFile, platform);
+							// Add 'ignore' cooking rules for this cooking rules text file
+							var ignoreRules = rules;
+							ignoreRules.Ignore = true;
+							map[rulesFile] = ignoreRules;
 						}
 						if (rules.LastChangeTime > fileInfo.LastWriteTime) {
 							File.SetLastWriteTime(path, rules.LastChangeTime);
@@ -167,6 +178,9 @@ namespace Orange
 								for (var i = 0; i < rules.Bundles.Length; i++) {
 									rules.Bundles[i] = ParseBundle(words[i + 1]);
 								}
+								break;
+							case "Ignore":
+								rules.Ignore = ParseBool(words[1]);
 								break;
 							default:
 								throw new Lime.Exception("Unknown attribute {0}", words[0]);

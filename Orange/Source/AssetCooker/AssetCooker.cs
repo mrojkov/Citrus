@@ -134,13 +134,15 @@ namespace Orange
 			The.Workspace.AssetFiles.EnumerationFilter = (info) => {
 				CookingRules rules;
 				if (cookingRulesMap.TryGetValue(info.Path, out rules)) {
+					if (rules.Ignore)
+						return false;
 					return Array.IndexOf(rules.Bundles, bundleName) != -1;
 				} else {
 					// There are no cooking rules for text files, consider them as part of the main bundle.
 					return bundleName == CookingRules.MainBundleName;
 				}
 			};
-			// Every asset bundle must has its own atlases folder, so they aren't conflict with each other
+			// Every asset bundle must have its own atlases folder, so they aren't conflict with each other
 			atlasesPostfix = bundleName != CookingRules.MainBundleName ? bundleName : "";
 			try {
 				using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
