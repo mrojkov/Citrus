@@ -38,6 +38,7 @@ namespace Orange
 					for (int j = 0; j < width; j++) {
 						RGBA p = *pixels;
 						p.R = p.G = p.B = p.A;
+						p.A = 255;
 						*pixels++ = p;
 					}
 					pixels += stride / 4 - width;
