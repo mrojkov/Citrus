@@ -25,7 +25,9 @@ namespace Lime
 		[ProtoEnum]
 		Burn,
 		[ProtoEnum]
-		Darken
+		Darken,
+		[ProtoEnum]
+		Opaque
 	}
 
 	[ProtoContract]

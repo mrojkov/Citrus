@@ -125,6 +125,10 @@ namespace Orange
 				blending = Blending.Alpha;
 				shader = ShaderId.Silhuette;
 				break;
+			case 8:
+				blending = Blending.Opaque;
+				shader = ShaderId.Diffuse;
+				break;
 			default:
 				blending = Blending.Alpha;
 				shader = ShaderId.Diffuse;

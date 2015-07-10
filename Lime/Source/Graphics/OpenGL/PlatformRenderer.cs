@@ -213,6 +213,9 @@ namespace Lime
 				case Blending.Modulate:
 					GL.BlendFunc(BlendingFactorSrc.DstColor, BlendingFactorDest.Zero);
 					break;
+				case Blending.Opaque:
+					GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.Zero);
+					break;
 			}
 			CheckErrors();
 		}
