@@ -80,7 +80,8 @@ namespace Lime.PopupMenu
 		{
 			if (Submenu != null) {
 				Submenu.Show();
-				Submenu.Frame.X += 50;
+				Submenu.Scale = Menu.Scale;
+				Submenu.Frame.X += 50 * Menu.Scale.X;
 				Submenu.Hidden += Menu.Hide;
 			} else {
 				Menu.Hide();

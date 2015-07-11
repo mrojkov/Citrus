@@ -20,6 +20,8 @@ namespace Lime.PopupMenu
 		private int maxHeight;
 		private int itemWidth;
 
+		public Vector2 Scale { get { return Frame.Scale; } set { Frame.Scale = value; } }
+
 		/// <summary>
 		/// Конструктор
 		/// </summary>
