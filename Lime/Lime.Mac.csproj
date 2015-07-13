@@ -55,6 +55,7 @@
     <Reference Include="Xamarin.Mac" />
     <Reference Include="System.Core" />
     <Reference Include="OpenTK" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Types\Matrix44.cs" />
@@ -312,13 +313,13 @@
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\Lemon\Lemon.Mac.csproj">
-      <Project>{4604AA2E-129F-4814-AD0D-8BA35346ECC4}</Project>
-      <Name>Lemon.Mac</Name>
-    </ProjectReference>
     <ProjectReference Include="..\3rdParty\OpenTK.Xamarin\OpenTK.Xamarin.csproj">
       <Project>{670A98AF-7AAD-43A8-A80B-B202A7745EA5}</Project>
       <Name>OpenTK.Xamarin</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lemon\Lemon.Mac.csproj">
+      <Project>{4604AA2E-129F-4814-AD0D-8BA35346ECC4}</Project>
+      <Name>Lemon.Mac</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>
