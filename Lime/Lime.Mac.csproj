@@ -318,7 +318,7 @@
       <Name>OpenTK.Xamarin</Name>
     </ProjectReference>
     <ProjectReference Include="..\Lemon\Lemon.Mac.csproj">
-      <Project>{4604AA2E-129F-4814-AD0D-8BA35346ECC4}</Project>
+      <Project>{BB697671-700C-455D-B8EE-66A6B122B949}</Project>
       <Name>Lemon.Mac</Name>
     </ProjectReference>
   </ItemGroup>
