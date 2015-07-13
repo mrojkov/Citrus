@@ -28,6 +28,12 @@ namespace OpenTK
 			get { return new Size((int)view.Bounds.Width, (int)view.Bounds.Height); }
 			set { window.SetContentSize(new CGSize(value.Width, value.Height)); }
 		}
+
+		public string Title
+		{
+			get { return window.Title; }
+			set { window.Title = value; }
+		}
 		
 		public Point Location
 		{
