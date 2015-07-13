@@ -8,7 +8,7 @@ using System.Xml;
 namespace Lime
 {
 	/// <summary>
-	/// Сериалайзер, работающий со словарями в формате xml
+	/// Serializer that handles xml dictionaries
 	/// </summary>
 	public class LocalizationDictionaryXmlSerializer : ILocalizationDictionarySerializer
 	{
