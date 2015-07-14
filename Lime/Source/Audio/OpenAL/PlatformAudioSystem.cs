@@ -45,11 +45,7 @@ namespace Lime
 		}
 
 		static readonly List<AudioChannel> channels = new List<AudioChannel>();
-#if MAC
-		static ContextHandle? context;
-#else
 		static AudioContext context;
-#endif
 		static Thread streamingThread = null;
 		static volatile bool shouldTerminateThread;
 
@@ -69,7 +65,7 @@ namespace Lime
 			// LoadLibrary() ivokes JNI_OnLoad()
 			Java.Lang.JavaSystem.LoadLibrary("openal32");
 			context = new AudioContext();
-#elif !MAC
+#else
 			bool isDeviceAvailable = !String.IsNullOrEmpty(AudioContext.DefaultDevice);
 			if (isDeviceAvailable && !CommandLineArgs.NoAudio) {
 				context = new AudioContext();
@@ -105,13 +101,11 @@ namespace Lime
 					PauseAll();
 				}
 #endif
-#if !MAC
 				if (value && context != null) {
 					context.MakeCurrent();
 				} else {
-					Alc.MakeContextCurrent(OpenTK.ContextHandle.Zero);
+					Alc.MakeContextCurrent(ContextHandle.Zero);
 				}
-#endif
 #if !iOS
 				if (value) {
 					ResumeAll();
@@ -131,12 +125,10 @@ namespace Lime
 				channel.Dispose();
 			}
 			channels.Clear();
-#if !MAC
 			if (context != null) {
 				context.Dispose();
 				context = null;
 			}
-#endif
 		}
 
 		private static long tickCount;
