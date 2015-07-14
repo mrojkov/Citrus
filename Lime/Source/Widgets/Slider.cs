@@ -49,7 +49,7 @@ namespace Lime
 			Enabled = true;
 		}
 
-		private Widget Thumb
+		public Widget Thumb
 		{
 			get { return thumb ?? MaybeThumb("SliderThumb") ?? MaybeThumb("Thumb"); }
 		}
@@ -61,6 +61,13 @@ namespace Lime
 					thumb.HitTestMask = ControlsHitTestMask;
 			}
 			return thumb;
+		}
+
+		public override Node DeepCloneFast()
+		{
+			var result = base.DeepCloneFast() as Slider;
+			result.thumb = null;
+			return result;
 		}
 
 		private Spline Rail
