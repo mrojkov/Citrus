@@ -313,9 +313,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\Lemon\Lemon.Mac.csproj">
+    <ProjectReference Include="..\Lemon\Lemon.MonoMac.csproj">
       <Project>{4604AA2E-129F-4814-AD0D-8BA35346ECC4}</Project>
-      <Name>Lemon.Mac</Name>
+      <Name>Lemon.MonoMac</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

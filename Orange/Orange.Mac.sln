@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orange.Mac", "Orange.Mac.csproj", "{4B2BDD5A-2AAE-46AE-AA1A-8C9308BAA50D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lemon.Mac", "..\Lemon\Lemon.Mac.csproj", "{4604AA2E-129F-4814-AD0D-8BA35346ECC4}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.MonoMac", "..\Lime\Lime.MonoMac.csproj", "{DC16EEBF-404D-4610-B87A-15B57464D707}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lemon.MonoMac", "..\Lemon\Lemon.MonoMac.csproj", "{4604AA2E-129F-4814-AD0D-8BA35346ECC4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

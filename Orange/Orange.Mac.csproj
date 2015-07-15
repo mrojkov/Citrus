@@ -130,10 +130,6 @@
     <Compile Include="Source\PluginAttributes\PluginFileIgoranceAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Lemon\Lemon.Mac.csproj">
-      <Project>{4604AA2E-129F-4814-AD0D-8BA35346ECC4}</Project>
-      <Name>Lemon.Mac</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Lime\Lime.MonoMac.csproj">
       <Project>{DC16EEBF-404D-4610-B87A-15B57464D707}</Project>
       <Name>Lime.MonoMac</Name>
