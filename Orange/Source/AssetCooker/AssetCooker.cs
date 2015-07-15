@@ -233,8 +233,9 @@ namespace Orange
 			}
 			SyncUpdated(".ogg", ".sound", (srcPath, dstPath) => {
 				using (var stream = new FileStream(srcPath, FileMode.Open)) {
-					// All sounds below 100kb size are converted from OGG to Wav/Adpcm
-					if (stream.Length > 100 * 1024 || platform == TargetPlatform.UltraCompression) {
+					// All sounds below 100kb size (can be changed with cooking rules) are converted from OGG to Wav/Adpcm
+					CookingRules rules = cookingRulesMap[srcPath];
+					if (stream.Length > rules.ADPCMLimit * 1024 || platform == TargetPlatform.UltraCompression) {
 						assetsBundle.ImportFile(dstPath, stream, 0);
 					} else {
 						Console.WriteLine("Converting sound to ADPCM/IMA4 format...");

@@ -31,6 +31,7 @@ namespace Orange
 		public DateTime LastChangeTime;
 		public string[] Bundles;
 		public bool Ignore;
+		public int ADPCMLimit; // Kb
 
 		public static readonly CookingRules Default = new CookingRules {
 			TextureAtlas = null,
@@ -40,6 +41,7 @@ namespace Orange
 			LastChangeTime = new DateTime(0),
 			Bundles = new[] { MainBundleName },
 			Ignore = false,
+			ADPCMLimit = 100,
 		};
 	}
 	
@@ -147,6 +149,17 @@ namespace Orange
 						if (words.Length < 2) {
 							throw new Lime.Exception("Invalid rule format");
 						}
+						// platform-specific cooking rules
+						if (words[0].EndsWith(")")) {
+							int cut = words[0].LastIndexOf('(');
+							if (cut >= 0) {
+								string platformTag = words[0].Substring(cut + 1, words[0].Length - cut - 2);
+								words[0] = words[0].Substring(0, cut);
+								if (platformTag != Toolbox.GetTargetPlatformString(platform)) {
+									continue;
+								}
+							}
+						}
 						switch (words[0]) {
 							case "TextureAtlas":
 								if (platform == TargetPlatform.UltraCompression)
@@ -181,6 +194,9 @@ namespace Orange
 								break;
 							case "Ignore":
 								rules.Ignore = ParseBool(words[1]);
+								break;
+							case "ADPCMLimit":
+								rules.ADPCMLimit = int.Parse(words[1]);
 								break;
 							default:
 								throw new Lime.Exception("Unknown attribute {0}", words[0]);
