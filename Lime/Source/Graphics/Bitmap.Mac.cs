@@ -2,10 +2,8 @@
 using System;
 using System.IO;
 #if MONOMAC
-using MonoMac.CoreGraphics;
-using MonoMac.AppKit;
-using CGRect = System.Drawing.RectangleF;
-using CGSize = System.Drawing.SizeF;
+using AppKit;
+using CoreGraphics;
 #else
 using CoreGraphics;
 using AppKit;

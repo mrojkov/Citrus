@@ -4,7 +4,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{DC16EEBF-404D-4610-B87A-15B57464D707}</ProjectGuid>
-    <ProjectTypeGuids>{42C0BBD9-55CE-4FC1-8D90-A7348ABAFB23};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectTypeGuids>{A3F8F2AB-B479-4A4A-A458-A89E7DC349F1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <RootNamespace>Lime</RootNamespace>
     <AssemblyName>Lime</AssemblyName>
@@ -12,6 +12,7 @@
     <newfilesearch>OnLoad</newfilesearch>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
+    <UseXamMacFullFramework>true</UseXamMacFullFramework>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
@@ -59,6 +60,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral" />
     <Reference Include="System.Drawing" />
+    <Reference Include="Xamarin.Mac" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Types\Matrix44.cs" />
