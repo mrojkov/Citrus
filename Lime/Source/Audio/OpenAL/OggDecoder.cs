@@ -19,6 +19,11 @@ namespace Lime
 		readonly Lemon.Api.FileSystem fileSystem;
 		static readonly StreamMap streamMap = new StreamMap();
 
+		public static int GetCurrentStreamsCount()
+		{
+			return streamMap.GetCurrentStreamsCount();
+		}
+
 		public OggDecoder(Stream stream)
 		{
 			this.stream = stream;
