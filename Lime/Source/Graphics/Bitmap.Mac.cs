@@ -1,3 +1,4 @@
+#if MAC || MONOMAC
 using System;
 using System.IO;
 using AppKit;
