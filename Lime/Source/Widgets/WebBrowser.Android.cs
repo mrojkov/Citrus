@@ -44,7 +44,7 @@ namespace Lime
 		private void CreateWebView()
 		{
 			webView = new WebView(GameView.Instance.Context);
-			webView.SetBackgroundColor(Android.Graphics.Color.White);
+			webView.SetBackgroundColor(Android.Graphics.Color.Transparent);
 			webView.Settings.JavaScriptEnabled = true;
 			webView.SetWebViewClient(new WebViewClient());
 		}
@@ -75,6 +75,11 @@ namespace Lime
 				GameView.DidUpdated += a;
 				webView = null;
 			}
+		}
+
+		public void SetBackgroundColor(Android.Graphics.Color color)
+		{
+			webView.SetBackgroundColor(color);
 		}
 
 		protected override void SelfUpdate(float delta)
