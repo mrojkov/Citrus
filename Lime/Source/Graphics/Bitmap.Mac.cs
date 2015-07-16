@@ -1,13 +1,7 @@
-#if MAC || MONOMAC
 using System;
 using System.IO;
-#if MONOMAC
 using AppKit;
 using CoreGraphics;
-#else
-using CoreGraphics;
-using AppKit;
-#endif
 using System.Runtime.InteropServices;
 
 namespace Lime
