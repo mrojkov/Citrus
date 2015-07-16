@@ -250,6 +250,7 @@ namespace Lime
 			var decoder = AudioDecoderFactory.CreateDecoder(stream);
 			var channel = channelSelector(decoder.GetFormat());
 			if (channel == null) {
+				decoder.Dispose();
 				return sound;
 			}
 			channel.SamplePath = path;
