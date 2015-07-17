@@ -38,6 +38,7 @@ namespace Lime
 
 		private float value;
 		private Widget thumb;
+		private bool dragging;
 
 		public Slider()
 		{
@@ -127,6 +128,7 @@ namespace Lime
 			if (DragStarted != null) {
 				DragStarted();
 			}
+			dragging = true;
 		}
 
 		private void InterpolateGraphicsBetweenMinAndMaxMarkers()
@@ -154,10 +156,13 @@ namespace Lime
 
 		private void Release()
 		{
-			RaiseDragEnded();
-			RunThumbAnimation("Normal");
-			if (Input.IsMouseOwner()) {
-				Input.ReleaseMouse();
+			if (dragging) {
+				RaiseDragEnded();
+				RunThumbAnimation("Normal");
+				if (Input.IsMouseOwner()) {
+					Input.ReleaseMouse();
+				}
+				dragging = false;
 			}
 		}
 
