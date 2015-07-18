@@ -46,11 +46,6 @@ namespace OpenTK
 				window.SetFrame(frame, true);
 			}
 		}		
-		
-		static GameWindow()
-		{
-			NSApplication.Init();	
-		}
 
 		public GameWindow(int width, int height, GraphicsMode graphicsMode, string title)
 		{
