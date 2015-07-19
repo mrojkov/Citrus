@@ -15,7 +15,7 @@ namespace YuzuTest
 		}
 
 		[TestMethod]
-		public void TestMethod1()
+		public void TestJsonSimple()
 		{
 			var v1 = new Sample1 { X = 345, Y = "test" };
 			var js = new JsonSerializer();
@@ -28,8 +28,31 @@ namespace YuzuTest
 			Assert.AreEqual(v1.Y, v2.Y);
 		}
 
+		[TestMethod]
+		public void TestProtobufSimple()
+		{
+			var v1 = new Sample1 { X = 150, Y = "test" };
+			var ps = new ProtobufSerializer();
+			var result = ps.SerializeToBytes(v1);
+			CollectionAssert.AreEqual(new byte[] {
+				0x08, 0x96, 0x01, 0x12, 0x04, (byte)'t', (byte)'e', (byte)'s', (byte)'t' }, result);
+			Sample1 v2 = new Sample1();
+			(new ProtobufDeserializer()).DeserializeFromBytes(v2, result);
+			Assert.AreEqual(v1.X, v2.X);
+			Assert.AreEqual(v1.Y, v2.Y);
+		}
+
 		public static void Main()
 		{
+			var v1 = new Sample1 { X = 150, Y = "test" };
+			var ps = new ProtobufSerializer();
+			var result = ps.SerializeToBytes(v1);
+			CollectionAssert.AreEqual(new byte[] {
+				0x08, 0x96, 0x01, 0x12, 0x04, (byte)'t', (byte)'e', (byte)'s', (byte)'t' }, result);
+			Sample1 v2 = new Sample1();
+			(new ProtobufDeserializer()).DeserializeFromBytes(v2, result);
+			Assert.AreEqual(v1.X, v2.X);
+			Assert.AreEqual(v1.Y, v2.Y);
 		}
 	}
 }

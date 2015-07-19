@@ -30,6 +30,16 @@ namespace Yuzu
 			return Encoding.UTF8.GetString(ms.GetBuffer(), 0, (int)ms.Length);
 		}
 
+		public byte[] SerializeToBytes(object obj)
+		{
+			var ms = new MemoryStream();
+			Writer = new BinaryWriter(ms);
+			Serialize(obj);
+			var result = ms.GetBuffer();
+			Array.Resize(ref result, (int)ms.Length);
+			return result;
+		}
+
 		public void SerializeToStream(object obj, Stream target)
 		{
 			Writer = new BinaryWriter(target);
@@ -55,6 +65,14 @@ namespace Yuzu
 			Reader = new BinaryReader(source);
 			Deserialize(obj);
 		}
+
+		public void DeserializeFromBytes(object obj, byte[] bytes)
+		{
+			var ms = new MemoryStream(bytes, false);
+			Reader = new BinaryReader(ms);
+			Deserialize(obj);
+		}
+
 	};
 
 }

@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Json.cs" />
+    <Compile Include="ProtoBuf.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Yuzu.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
