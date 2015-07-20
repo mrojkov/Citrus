@@ -22,10 +22,10 @@ namespace YuzuTest
 			var v1 = new Sample1 { X = 345, Y = "test" };
 			var js = new JsonSerializer();
 			js.JsonOptions.Indent = "";
-			var result = js.SerializeToStringUTF8(v1);
+			var result = js.ToStringUTF8(v1);
 			Assert.AreEqual("{\n\"X\":345,\n\"Y\":\"test\"\n}", result);
 			Sample1 v2 = new Sample1();
-			(new JsonDeserializer()).DeserializeFromStringUTF8(v2, result);
+			(new JsonDeserializer()).FromStringUTF8(v2, result);
 			Assert.AreEqual(v1.X, v2.X);
 			Assert.AreEqual(v1.Y, v2.Y);
 		}
@@ -35,11 +35,11 @@ namespace YuzuTest
 		{
 			var v1 = new Sample1 { X = 150, Y = "test" };
 			var ps = new ProtobufSerializer();
-			var result = ps.SerializeToBytes(v1);
+			var result = ps.ToBytes(v1);
 			CollectionAssert.AreEqual(new byte[] {
 				0x08, 0x96, 0x01, 0x12, 0x04, (byte)'t', (byte)'e', (byte)'s', (byte)'t' }, result);
 			Sample1 v2 = new Sample1();
-			(new ProtobufDeserializer()).DeserializeFromBytes(v2, result);
+			(new ProtobufDeserializer()).FromBytes(v2, result);
 			Assert.AreEqual(v1.X, v2.X);
 			Assert.AreEqual(v1.Y, v2.Y);
 		}
@@ -49,7 +49,7 @@ namespace YuzuTest
 		{
 			var v1 = new Sample1 { X = 150, Y = "test" };
 			var cs = new CodeAssignSerializer();
-			var result = cs.SerializeToStringUTF8(v1);
+			var result = cs.ToStringUTF8(v1);
 			Assert.AreEqual("void Init(Sample1 obj) {\n\tobj.X = 150;\n\tobj.Y = \"test\";\n}\n", result);
 			Sample1 v2 = new Sample1();
 		}

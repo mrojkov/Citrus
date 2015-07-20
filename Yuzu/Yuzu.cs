@@ -20,35 +20,38 @@ namespace Yuzu
 		public CommonOptions Options = new CommonOptions();
 		public BinaryWriter Writer;
 
-		public abstract void Serialize(object obj);
+		public abstract void ToWriter(object obj);
+
+		public void ToWriter(object obj, BinaryWriter writer)
+		{
+			Writer = writer;
+			ToWriter(obj);
+		}
 
 		protected void WriteStr(string s)
 		{
 			Writer.Write(Encoding.UTF8.GetBytes(s));
 		}
 
-		public string SerializeToStringUTF8(object obj)
+		public string ToStringUTF8(object obj)
 		{
 			var ms = new MemoryStream();
-			Writer = new BinaryWriter(ms);
-			Serialize(obj);
+			ToStream(obj, ms);
 			return Encoding.UTF8.GetString(ms.GetBuffer(), 0, (int)ms.Length);
 		}
 
-		public byte[] SerializeToBytes(object obj)
+		public byte[] ToBytes(object obj)
 		{
 			var ms = new MemoryStream();
-			Writer = new BinaryWriter(ms);
-			Serialize(obj);
+			ToStream(obj, ms);
 			var result = ms.GetBuffer();
 			Array.Resize(ref result, (int)ms.Length);
 			return result;
 		}
 
-		public void SerializeToStream(object obj, Stream target)
+		public void ToStream(object obj, Stream target)
 		{
-			Writer = new BinaryWriter(target);
-			Serialize(obj);
+			ToWriter(obj, new BinaryWriter(target));
 		}
 	};
 
@@ -57,25 +60,27 @@ namespace Yuzu
 		public CommonOptions Options = new CommonOptions();
 		public BinaryReader Reader;
 
-		public abstract void Deserialize(object obj);
+		public abstract void FromReader(object obj);
 
-		public void DeserializeFromStringUTF8(object obj, string source)
+		public void FromReader(object obj, BinaryReader reader)
 		{
-			Reader = new BinaryReader(new MemoryStream(Encoding.UTF8.GetBytes(source), false));
-			Deserialize(obj);
+			Reader = reader;
+			FromReader(obj);
 		}
 
-		public void DeserializeFromStream(object obj, Stream source)
+		public void FromStringUTF8(object obj, string source)
 		{
-			Reader = new BinaryReader(source);
-			Deserialize(obj);
+			FromReader(obj, new BinaryReader(new MemoryStream(Encoding.UTF8.GetBytes(source), false)));
 		}
 
-		public void DeserializeFromBytes(object obj, byte[] bytes)
+		public void FromStream(object obj, Stream source)
 		{
-			var ms = new MemoryStream(bytes, false);
-			Reader = new BinaryReader(ms);
-			Deserialize(obj);
+			FromReader(obj, new BinaryReader(source));
+		}
+
+		public void FromBytes(object obj, byte[] bytes)
+		{
+			FromStream(obj, new MemoryStream(bytes, false));
 		}
 
 	};

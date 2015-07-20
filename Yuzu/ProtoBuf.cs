@@ -32,7 +32,7 @@ namespace Yuzu
 			} while (value != 0);
 		}
 
-		public override void Serialize(object obj)
+		public override void ToWriter(object obj)
 		{
 			int count = 1;
 			foreach (var f in obj.GetType().GetFields()) {
@@ -76,7 +76,7 @@ namespace Yuzu
 			return result;
 		}
 
-		public override void Deserialize(object obj)
+		public override void FromReader(object obj)
 		{
 			int count = 1;
 			foreach (var f in obj.GetType().GetFields()) {

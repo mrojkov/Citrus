@@ -13,7 +13,7 @@ namespace Yuzu
 	{
 		public JsonSerializeOptions JsonOptions = new JsonSerializeOptions();
 
-		public override void Serialize(object obj)
+		public override void ToWriter(object obj)
 		{
 			Writer.Write('{');
 			Writer.Write('\n');
@@ -128,7 +128,7 @@ namespace Yuzu
 			return int.Parse(result);
 		}
 
-		public override void Deserialize(object obj)
+		public override void FromReader(object obj)
 		{
 			var first = true;
 			Require('{');
