@@ -42,7 +42,8 @@ namespace Yuzu
 					throw new NotImplementedException(t.Name);
 				}
 			}
-			Writer.Write('\n');
+			if (!first)
+				Writer.Write('\n');
 			Writer.Write('}');
 		}
 	};

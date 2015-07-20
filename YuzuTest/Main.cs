@@ -10,6 +10,11 @@ namespace YuzuTest
 	[TestClass]
 	public class TestMain
 	{
+
+		private class Empty
+		{
+		}
+
 		private class Sample1
 		{
 			public int X;
@@ -19,8 +24,10 @@ namespace YuzuTest
 		[TestMethod]
 		public void TestJsonSimple()
 		{
-			var v1 = new Sample1 { X = 345, Y = "test" };
 			var js = new JsonSerializer();
+			Assert.AreEqual("{\n}", js.ToStringUTF8(new Empty()));
+
+			var v1 = new Sample1 { X = 345, Y = "test" };
 			js.JsonOptions.Indent = "";
 			var result = js.ToStringUTF8(v1);
 			Assert.AreEqual("{\n\"X\":345,\n\"Y\":\"test\"\n}", result);
