@@ -169,46 +169,96 @@ namespace Lime
 		private void InitWithPngOrJpgBitmap(Stream stream, Stream alphaStream)
 		{
 			if (!Application.IsMainThread) {
-				throw new NotSupportedException("Calling from non-main thread currently is not supported");
+				throw new NotSupportedException ("Calling from non-main thread currently is not supported");
 			}
-			if (alphaStream != null) {
-				throw new NotSupportedException("Separate alpha-stream is not supported on this platform");
-			}
-			using (var nsData = Foundation.NSData.FromStream(stream))
-			using (UIImage image = UIImage.LoadFromData(nsData)) {
-				if (image == null) {
-					throw new Lime.Exception("Error loading texture from stream");
+			using (var nsData = Foundation.NSData.FromStream(alphaStream ?? stream))
+			using (var image = UIImage.LoadFromData(nsData)) {
+				PrepareOpenGLTexture();
+				var pixels = GetPixels(image);
+				if (alphaStream != null) {
+					using (var nsColorData = Foundation.NSData.FromStream(stream))
+					using (var colorImage = UIImage.LoadFromData(nsColorData)) {
+						if (colorImage.Size != image.Size) {
+							if (colorImage.Size.Width == 1 && colorImage.Size.Height == 1) {
+								// For 1x1 bitmaps, fill RGB with white.
+								CopyRedToAlphaChannelAndFillWhite(ref pixels);
+							} else {
+								throw new Lime.Exception("Alpha bitmap size and main bitmap size must be the same");
+							}
+						} else {
+							var colorPixels = GetPixels(colorImage);
+							MixColorAndAlpha(ref colorPixels, ref pixels);
+						}
+					}
 				}
-                InitWithUIImage(image);
+				PlatformRenderer.PushTexture(handle, 0);
+				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, (int)image.Size.Width, (int)image.Size.Height, 0,
+					PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
+				PlatformRenderer.PopTexture(0);
 			}
 		}
 
-        public void InitWithUIImage(UIImage image)
-        {
-            CGImage imageRef = image.CGImage;
-            int width = (int)image.Size.Width;
-            int height = (int)image.Size.Height;
-            SurfaceSize = ImageSize = new Size(width, height);
+		private int[] GetPixels(UIImage image)
+		{
+			CGImage imageRef = image.CGImage;
+			int width = (int)image.Size.Width;
+			int height = (int)image.Size.Height;
+			SurfaceSize = ImageSize = new Size (width, height);
 
-            int bitsPerComponent = 8;
-            int bytesPerPixel = 4;
-            int bytesPerRow = bytesPerPixel * width;
-            byte[] data = new byte[height * bytesPerRow];
+			int bitsPerComponent = 8;
+			int bytesPerPixel = 4;
+			int bytesPerRow = bytesPerPixel * width;
+			int[] data = new int[height * width];
 			MemoryUsed = data.Length;
 
-            CGImageAlphaInfo alphaInfo = imageRef.AlphaInfo;
-            if (alphaInfo == CGImageAlphaInfo.None) {
-                alphaInfo = CGImageAlphaInfo.NoneSkipLast;
-            }
-            using (var colorSpace = CGColorSpace.CreateDeviceRGB())
-            using (var context = new CoreGraphics.CGBitmapContext(data, width, height, bitsPerComponent, bytesPerRow, colorSpace, alphaInfo)) {
-                context.DrawImage(new System.Drawing.RectangleF(0, 0, width, height), imageRef);
-                PrepareOpenGLTexture();
-				PlatformRenderer.PushTexture(handle, 0);
-                GL.TexImage2D(All.Texture2D, 0, (int)All.Rgba, width, height, 0, All.Rgba, All.UnsignedByte, data);
-				PlatformRenderer.PopTexture(0);
-            }
-        }
+			CGImageAlphaInfo alphaInfo = imageRef.AlphaInfo;
+			if (alphaInfo == CGImageAlphaInfo.None) {
+				alphaInfo = CGImageAlphaInfo.NoneSkipLast;
+			}
+
+			unsafe {
+				fixed (int* dataPtr = data) {
+					using (var colorSpace = CGColorSpace.CreateDeviceRGB())
+					using (var context = new CoreGraphics.CGBitmapContext((IntPtr)dataPtr, width, height, bitsPerComponent, bytesPerRow, colorSpace, alphaInfo)) {
+						context.DrawImage(new System.Drawing.RectangleF(0, 0, width, height), imageRef);
+					}
+				}
+			}
+			return data;
+		}
+
+		private void MixColorAndAlpha(ref int[] pixelsColor, ref int[] pixelsAlpha)
+		{
+			// pixelsAlpha's R goes to pixelsAlpha's A
+			// pixelsColor's RGB goes to pixelsAlpha's BGR
+			// pixelsAlpha is the result.
+			unchecked {
+				for (int i = 0; i < pixelsColor.Length; i++) {
+					var colorRGB = new Color4((uint)pixelsColor[i]);
+					var colorA = new Color4((uint)pixelsAlpha[i]);
+					colorA.A = colorA.R;
+					colorA.R = colorRGB.R;
+					colorA.G = colorRGB.G;
+					colorA.B = colorRGB.B;
+					pixelsAlpha[i] = (int)colorA.ABGR;
+				}
+			}
+		}
+
+		private void CopyRedToAlphaChannelAndFillWhite(ref int[] pixels)
+		{
+			unchecked {
+				for (int i = 0; i < pixels.Length; i++) {
+					var color = new Color4((uint)pixels[i]);
+					color.A = color.R;
+					color.R = 255;
+					color.G = 255;
+					color.B = 255;
+					pixels[i] = (int)color.ABGR;
+				}
+			}
+		}
+
 #elif ANDROID
 		private void InitWithPngOrJpgBitmap(Stream stream, Stream alphaStream)
 		{
