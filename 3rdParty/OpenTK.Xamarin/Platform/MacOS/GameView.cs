@@ -114,7 +114,15 @@ namespace OpenTK
 				Mouse.OnButtonUp(new MouseButtonEventArgs() { Button = MouseButton.Left });
 			}
 		}	
-		
+
+		public override void MouseDragged(NSEvent theEvent)
+		{
+			if (Mouse != null) {
+				var point = new Point((int)theEvent.LocationInWindow.X, (int)Frame.Height - (int)theEvent.LocationInWindow.Y);			
+				Mouse.OnMove(new MouseMoveEventArgs() { X = point.X, Y = point.Y });
+			}
+		}
+
 		public override void MouseMoved(NSEvent theEvent)
 		{
 			if (Mouse != null) {
