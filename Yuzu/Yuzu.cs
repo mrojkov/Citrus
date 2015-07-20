@@ -22,6 +22,11 @@ namespace Yuzu
 
 		public abstract void Serialize(object obj);
 
+		protected void WriteStr(string s)
+		{
+			Writer.Write(Encoding.UTF8.GetBytes(s));
+		}
+
 		public string SerializeToStringUTF8(object obj)
 		{
 			var ms = new MemoryStream();

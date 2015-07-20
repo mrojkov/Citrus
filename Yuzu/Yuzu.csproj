@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Code.cs" />
     <Compile Include="Json.cs" />
     <Compile Include="ProtoBuf.cs" />
     <Compile Include="Utils.cs" />

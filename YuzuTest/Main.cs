@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Yuzu;
@@ -42,17 +44,18 @@ namespace YuzuTest
 			Assert.AreEqual(v1.Y, v2.Y);
 		}
 
-		public static void Main()
+		[TestMethod]
+		public void TestCodeAssignSimple()
 		{
 			var v1 = new Sample1 { X = 150, Y = "test" };
-			var ps = new ProtobufSerializer();
-			var result = ps.SerializeToBytes(v1);
-			CollectionAssert.AreEqual(new byte[] {
-				0x08, 0x96, 0x01, 0x12, 0x04, (byte)'t', (byte)'e', (byte)'s', (byte)'t' }, result);
+			var cs = new CodeAssignSerializer();
+			var result = cs.SerializeToStringUTF8(v1);
+			Assert.AreEqual("void Init(Sample1 obj) {\n\tobj.X = 150;\n\tobj.Y = \"test\";\n}\n", result);
 			Sample1 v2 = new Sample1();
-			(new ProtobufDeserializer()).DeserializeFromBytes(v2, result);
-			Assert.AreEqual(v1.X, v2.X);
-			Assert.AreEqual(v1.Y, v2.Y);
+		}
+
+		public static void Main()
+		{
 		}
 	}
 }

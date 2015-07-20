@@ -13,11 +13,6 @@ namespace Yuzu
 	{
 		public JsonSerializeOptions JsonOptions = new JsonSerializeOptions();
 
-		private void WriteStr(string s)
-		{
-			Writer.Write(Encoding.UTF8.GetBytes(s));
-		}
-
 		public override void Serialize(object obj)
 		{
 			Writer.Write('{');
