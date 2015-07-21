@@ -13,7 +13,7 @@ using OpenTK.Input;
 
 namespace OpenTK
 {
-	public class GameView : NSView
+	public class NSGameView : NSView
 	{
 		private NSOpenGLContext openGLContext;
 		private NSOpenGLPixelFormat pixelFormat;
@@ -34,27 +34,27 @@ namespace OpenTK
 		public Input.Mouse Mouse;
 		public Input.Keyboard Keyboard;
 
-		public GameView(CGRect frame)
+		public NSGameView(CGRect frame)
 			: this(frame, null, GraphicsMode.Default, 1, 0)
 		{
 		}
 
-		public GameView(CGRect frame, NSOpenGLContext context)
+		public NSGameView(CGRect frame, NSOpenGLContext context)
 			: this(frame, context, GraphicsMode.Default, 1, 0)
 		{
 		}
 
-		public GameView(CGRect frame, int major, int minor)
+		public NSGameView(CGRect frame, int major, int minor)
 			: this(frame, null, GraphicsMode.Default, major, minor)
 		{
 		}
 
-		public GameView(CGRect frame, GraphicsMode mode, int major, int minor)
+		public NSGameView(CGRect frame, GraphicsMode mode, int major, int minor)
 			: this(frame, null, mode, major, minor)
 		{
 		}
 
-		public GameView(CGRect frame, NSOpenGLContext shareContext, GraphicsMode mode, int major, int minor)
+		public NSGameView(CGRect frame, NSOpenGLContext shareContext, GraphicsMode mode, int major, int minor)
 			: base(frame)
 		{
 			pixelFormat = SelectPixelFormat(mode, major, minor);

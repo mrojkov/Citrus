@@ -8,7 +8,7 @@ namespace OpenTK
 {
 	public class GameWindow : IDisposable
 	{
-		private readonly GameView view;
+		public readonly NSGameView View;
 		private readonly NSWindow window;
 		
 		public readonly Input.Mouse Mouse = new Input.Mouse();
@@ -25,7 +25,7 @@ namespace OpenTK
 
 		public Size ClientSize
 		{
-			get { return new Size((int)view.Bounds.Width, (int)view.Bounds.Height); }
+			get { return new Size((int)View.Bounds.Width, (int)View.Bounds.Height); }
 			set { window.SetContentSize(new CGSize(value.Width, value.Height)); }
 		}
 
@@ -50,24 +50,24 @@ namespace OpenTK
 		public GameWindow(int width, int height, GraphicsMode graphicsMode, string title)
 		{
 			var rect = new CGRect(0, 0, width, height);
-			view = new GameView(rect) {
+			View = new NSGameView(rect) {
 				Mouse = Mouse,
 				Keyboard = Keyboard
 			};
 			window = new NSWindow(rect, NSWindowStyle.Titled | NSWindowStyle.Closable | NSWindowStyle.Resizable, NSBackingStore.Buffered, false);
 			window.Title = title;
 			window.WillClose += (s, e) => {
-				view.Stop();
-				NSApplication.SharedApplication.Terminate(view);
+				View.Stop();
+				NSApplication.SharedApplication.Terminate(View);
 				OnClosed(e);	
 			};
-			window.DidResize += (s, e) => view.UpdateGLContext();
+			window.DidResize += (s, e) => View.UpdateGLContext();
 			// window.DidBecomeKey += OnFocusedChanged;
-			window.ContentView = view;
+			window.ContentView = View;
 			window.ReleasedWhenClosed = true;
 			window.DidMove += (s, e) => OnMove(e);
-			view.RenderFrame += (s, e) => {
-				view.MakeCurrent();
+			View.RenderFrame += (s, e) => {
+				View.MakeCurrent();
 				OnRenderFrame(new OpenTK.FrameEventArgs());
 			};
 		}
@@ -79,12 +79,12 @@ namespace OpenTK
 
 		public void SwapBuffers()
 		{
-			view.SwapBuffers();
+			View.SwapBuffers();
 		}
 
 		public void MakeCurrent()
 		{
-			view.MakeCurrent();
+			View.MakeCurrent();
 		}
 
 		protected virtual void OnFocusedChanged(EventArgs e)
@@ -101,13 +101,13 @@ namespace OpenTK
 		
 		public void Close()
 		{
-			view.Close();
+			View.Close();
 		}
 
 		public void Run(float updatesPerSecond)
 		{
 			window.MakeKeyAndOrderFront(window);
-			view.Run(updatesPerSecond);
+			View.Run(updatesPerSecond);
 			NSApplication.SharedApplication.Run();
 		}
 

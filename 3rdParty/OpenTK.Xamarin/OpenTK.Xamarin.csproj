@@ -70,7 +70,6 @@
     <Compile Include="Platform\MacOS\GameWindow.cs" />
     <Compile Include="Platform\MacOS\GraphicsMode.cs" />
     <Compile Include="Platform\MacOS\MouseCursor.cs" />
-    <Compile Include="Platform\MacOS\GameView.cs" />
     <Compile Include="Audio\AudioCapture.cs" />
     <Compile Include="Audio\AudioContext.cs" />
     <Compile Include="Audio\AudioContextException.cs" />
@@ -79,6 +78,7 @@
     <Compile Include="Audio\AudioDeviceException.cs" />
     <Compile Include="Audio\AudioException.cs" />
     <Compile Include="Audio\AudioValueException.cs" />
+    <Compile Include="Platform\MacOS\NSGameView.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
 </Project>
