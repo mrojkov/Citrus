@@ -79,6 +79,8 @@
     <Compile Include="Audio\AudioException.cs" />
     <Compile Include="Audio\AudioValueException.cs" />
     <Compile Include="Platform\MacOS\NSGameView.cs" />
+    <Compile Include="Input\MacOSKeyMap.cs" />
+    <Compile Include="Input\MacOSKeys.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
 </Project>

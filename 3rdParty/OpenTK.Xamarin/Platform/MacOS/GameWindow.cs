@@ -18,7 +18,10 @@ namespace OpenTK
 		public OpenTK.WindowState WindowState { get; set; }
 		public bool Focused { get; set; }
 
-		public event EventHandler<KeyPressEventArgs> KeyPress;
+		public event EventHandler<KeyPressEventArgs> KeyPress {
+			add { Keyboard.KeyPress += value; }
+			remove { Keyboard.KeyPress -= value; }
+		}
 
 		public int Width { get { return ClientSize.Width; } }
 		public int Height { get { return ClientSize.Height; } }

@@ -131,6 +131,26 @@ namespace OpenTK
 			}
 		}
 
+		public override void KeyDown(NSEvent theEvent)
+		{
+			if (Keyboard != null) {				
+				var key = MacOSKeyMap.GetKey((MacOSKeyCode)theEvent.KeyCode);
+				Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = key});			
+				foreach(var c in theEvent.Characters)
+					// Imitation of original OpenTK backspace bug
+					if ((int)c != 127)
+						Keyboard.OnKeyPress(new KeyPressEventArgs{KeyChar = c});
+			}
+		}
+
+		public override void KeyUp(NSEvent theEvent)
+		{
+			if (Keyboard != null) {
+				var key = MacOSKeyMap.GetKey((MacOSKeyCode)theEvent.KeyCode);
+				Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = key});
+			}
+		}
+
 		private NSOpenGLPixelFormat SelectPixelFormat(GraphicsMode mode, int majorVersion, int minorVersion)
 		{
 			var attributes = new List<NSOpenGLPixelFormatAttribute>();
