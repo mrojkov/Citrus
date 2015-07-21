@@ -21,7 +21,6 @@ namespace Yuzu
 	public abstract class AbstractSerializer
 	{
 		public CommonOptions Options = new CommonOptions();
-		public abstract void ToWriter(object obj);
 		public abstract void ToWriter(object obj, BinaryWriter writer);
 		public abstract string ToString(object obj);
 		public abstract byte[] ToBytes(object obj);
@@ -30,17 +29,19 @@ namespace Yuzu
 
 	public abstract class AbstractWriterSerializer: AbstractSerializer
 	{
-		public BinaryWriter Writer;
+		protected BinaryWriter writer;
+
+		protected abstract void ToWriter(object obj);
 
 		public override void ToWriter(object obj, BinaryWriter writer)
 		{
-			Writer = writer;
+			this.writer = writer;
 			ToWriter(obj);
 		}
 
 		protected void WriteStr(string s)
 		{
-			Writer.Write(Encoding.UTF8.GetBytes(s));
+			writer.Write(Encoding.UTF8.GetBytes(s));
 		}
 
 		public override string ToString(object obj)
@@ -62,6 +63,36 @@ namespace Yuzu
 		public override void ToStream(object obj, Stream target)
 		{
 			ToWriter(obj, new BinaryWriter(target));
+		}
+	};
+
+	public abstract class AbstractStringSerializer : AbstractSerializer
+	{
+		protected StringBuilder builder;
+
+		protected abstract void ToBuilder(object obj);
+
+		public override void ToWriter(object obj, BinaryWriter writer)
+		{
+			writer.Write(ToBytes(obj));
+		}
+
+		public override string ToString(object obj)
+		{
+			builder = new StringBuilder();
+			ToBuilder(obj);
+			return builder.ToString();
+		}
+
+		public override byte[] ToBytes(object obj)
+		{
+			return Encoding.UTF8.GetBytes(ToString(obj));
+		}
+
+		public override void ToStream(object obj, Stream target)
+		{
+			var b = ToBytes(obj);
+			target.Write(b, 0, b.Length);
 		}
 	};
 

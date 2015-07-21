@@ -12,7 +12,7 @@ namespace Yuzu
 	{
 		public CodeConstructSerializeOptions CodeConstructOptions = new CodeConstructSerializeOptions();
 
-		public override void ToWriter(object obj)
+		protected override void ToWriter(object obj)
 		{
 			WriteStr(String.Format("var {0} = new {1} {{\n", CodeConstructOptions.VarName, obj.GetType().Name));
 			var first = true;
@@ -29,9 +29,9 @@ namespace Yuzu
 					WriteStr(f.GetValue(obj).ToString());
 				}
 				else if (t == typeof(string)) {
-					Writer.Write('"');
+					writer.Write('"');
 					WriteStr(f.GetValue(obj).ToString());
-					Writer.Write('"');
+					writer.Write('"');
 				}
 				else {
 					throw new NotImplementedException(t.Name);
@@ -51,7 +51,7 @@ namespace Yuzu
 	{
 		public CodeAssignSerializeOptions CodeAssignOptions = new CodeAssignSerializeOptions();
 
-		public override void ToWriter(object obj)
+		protected override void ToWriter(object obj)
 		{
 			WriteStr(String.Format("void {0}({1} obj) {{\n", CodeAssignOptions.FuncName, obj.GetType().Name));
 			foreach (var f in obj.GetType().GetFields()) {

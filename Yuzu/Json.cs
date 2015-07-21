@@ -13,38 +13,38 @@ namespace Yuzu
 	{
 		public JsonSerializeOptions JsonOptions = new JsonSerializeOptions();
 
-		public override void ToWriter(object obj)
+		protected override void ToWriter(object obj)
 		{
-			Writer.Write('{');
-			Writer.Write('\n');
+			writer.Write('{');
+			writer.Write('\n');
 			var first = true;
 			foreach (var f in obj.GetType().GetFields()) {
 				if (!first) {
-					Writer.Write(',');
+					writer.Write(',');
 					WriteStr(JsonOptions.FieldSeparator);
 				}
 				first = false;
 				WriteStr(JsonOptions.Indent);
-				Writer.Write('"');
+				writer.Write('"');
 				WriteStr(f.Name);
-				Writer.Write('"');
-				Writer.Write(':');
+				writer.Write('"');
+				writer.Write(':');
 				var t = f.FieldType;
 				if (t == typeof(int)) {
 					WriteStr(f.GetValue(obj).ToString());
 				}
 				else if (t == typeof(string)) {
-					Writer.Write('"');
+					writer.Write('"');
 					WriteStr(f.GetValue(obj).ToString());
-					Writer.Write('"');
+					writer.Write('"');
 				}
 				else {
 					throw new NotImplementedException(t.Name);
 				}
 			}
 			if (!first)
-				Writer.Write('\n');
-			Writer.Write('}');
+				writer.Write('\n');
+			writer.Write('}');
 		}
 	};
 

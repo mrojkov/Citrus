@@ -28,11 +28,11 @@ namespace Yuzu
 				if (value != 0) {
 					b |= 0x80;
 				}
-				Writer.Write(b);
+				writer.Write(b);
 			} while (value != 0);
 		}
 
-		public override void ToWriter(object obj)
+		protected override void ToWriter(object obj)
 		{
 			int count = 1;
 			foreach (var f in obj.GetType().GetFields()) {
@@ -45,7 +45,7 @@ namespace Yuzu
 					var s = f.GetValue(obj).ToString();
 					WriteVarint((count << 3) + (int)WireType.LengthDelimited);
 					WriteVarint(Encoding.UTF8.GetByteCount(s));
-					Writer.Write(Encoding.UTF8.GetBytes(s));
+					writer.Write(Encoding.UTF8.GetBytes(s));
 				}
 				else {
 					throw new NotImplementedException(t.Name);
