@@ -8,36 +8,34 @@ namespace Yuzu
 		public string Indent = "\t";
 	};
 
-	public class CodeConstructSerializer : AbstractWriterSerializer
+	public class CodeConstructSerializer : AbstractStringSerializer
 	{
 		public CodeConstructSerializeOptions CodeConstructOptions = new CodeConstructSerializeOptions();
 
-		protected override void ToWriter(object obj)
+		protected override void ToBuilder(object obj)
 		{
-			WriteStr(String.Format("var {0} = new {1} {{\n", CodeConstructOptions.VarName, obj.GetType().Name));
+			builder.AppendFormat("var {0} = new {1} {{\n", CodeConstructOptions.VarName, obj.GetType().Name);
 			var first = true;
 			foreach (var f in obj.GetType().GetFields()) {
 				if (!first) {
-					WriteStr(",\n");
+					builder.Append(",\n");
 				}
 				first = false;
-				WriteStr(CodeConstructOptions.Indent);
-				WriteStr(f.Name);
-				WriteStr(" = ");
+				builder.Append(CodeConstructOptions.Indent);
+				builder.Append(f.Name);
+				builder.Append(" = ");
 				var t = f.FieldType;
 				if (t == typeof(int)) {
-					WriteStr(f.GetValue(obj).ToString());
+					builder.Append(f.GetValue(obj).ToString());
 				}
 				else if (t == typeof(string)) {
-					writer.Write('"');
-					WriteStr(f.GetValue(obj).ToString());
-					writer.Write('"');
+					builder.AppendFormat("\"{0}\"", f.GetValue(obj).ToString());
 				}
 				else {
 					throw new NotImplementedException(t.Name);
 				}
 			}
-			WriteStr("\n};\n");
+			builder.Append("\n};\n");
 		}
 	}
 
@@ -47,13 +45,13 @@ namespace Yuzu
 		public string Indent = "\t";
 	};
 
-	public class CodeAssignSerializer : AbstractWriterSerializer
+	public class CodeAssignSerializer : AbstractStringSerializer
 	{
 		public CodeAssignSerializeOptions CodeAssignOptions = new CodeAssignSerializeOptions();
 
-		protected override void ToWriter(object obj)
+		protected override void ToBuilder(object obj)
 		{
-			WriteStr(String.Format("void {0}({1} obj) {{\n", CodeAssignOptions.FuncName, obj.GetType().Name));
+			builder.AppendFormat("void {0}({1} obj) {{\n", CodeAssignOptions.FuncName, obj.GetType().Name);
 			foreach (var f in obj.GetType().GetFields()) {
 				string valueStr;
 				var t = f.FieldType;
@@ -66,9 +64,9 @@ namespace Yuzu
 				else {
 					throw new NotImplementedException(t.Name);
 				}
-				WriteStr(String.Format("{0}obj.{1} = {2};\n", CodeAssignOptions.Indent, f.Name, valueStr));
+				builder.AppendFormat("{0}obj.{1} = {2};\n", CodeAssignOptions.Indent, f.Name, valueStr);
 			}
-			WriteStr("}\n");
+			builder.Append("}\n");
 		}
 	}
 }
