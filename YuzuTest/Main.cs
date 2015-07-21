@@ -26,12 +26,12 @@ namespace YuzuTest
 		public void TestJsonSimple()
 		{
 			var js = new JsonSerializer();
-			Assert.AreEqual("{\n}", js.ToStringUTF8(new Empty()));
+			Assert.AreEqual("{\n}", js.ToString(new Empty()));
 
 			var v1 = new Sample1 { X = 345, Y = "test" };
 			js.JsonOptions.Indent = "";
 
-			var result = js.ToStringUTF8(v1);
+			var result = js.ToString(v1);
 			Assert.AreEqual("{\n\"X\":345,\n\"Y\":\"test\"\n}", result);
 			Sample1 v2 = new Sample1();
 
@@ -64,7 +64,7 @@ namespace YuzuTest
 		{
 			var v1 = new Sample1 { X = 150, Y = "test" };
 			var cs = new CodeAssignSerializer();
-			var result = cs.ToStringUTF8(v1);
+			var result = cs.ToString(v1);
 			Assert.AreEqual("void Init(Sample1 obj) {\n\tobj.X = 150;\n\tobj.Y = \"test\";\n}\n", result);
 			Sample1 v2 = new Sample1();
 		}

@@ -16,7 +16,7 @@ namespace Yuzu
 	{
 	}
 
-	public class ProtobufSerializer : AbstractSerializer
+	public class ProtobufSerializer : AbstractWriterSerializer
 	{
 		public ProtobufSerializeOptions ProtobufOptions = new ProtobufSerializeOptions();
 

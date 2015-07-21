@@ -9,7 +9,7 @@ namespace Yuzu
 		public string Indent = "\t";
 	};
 
-	public class JsonSerializer : AbstractSerializer
+	public class JsonSerializer : AbstractWriterSerializer
 	{
 		public JsonSerializeOptions JsonOptions = new JsonSerializeOptions();
 

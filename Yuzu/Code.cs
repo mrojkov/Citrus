@@ -8,7 +8,7 @@ namespace Yuzu
 		public string Indent = "\t";
 	};
 
-	public class CodeConstructSerializer : AbstractSerializer
+	public class CodeConstructSerializer : AbstractWriterSerializer
 	{
 		public CodeConstructSerializeOptions CodeConstructOptions = new CodeConstructSerializeOptions();
 
@@ -47,7 +47,7 @@ namespace Yuzu
 		public string Indent = "\t";
 	};
 
-	public class CodeAssignSerializer : AbstractSerializer
+	public class CodeAssignSerializer : AbstractWriterSerializer
 	{
 		public CodeAssignSerializeOptions CodeAssignOptions = new CodeAssignSerializeOptions();
 

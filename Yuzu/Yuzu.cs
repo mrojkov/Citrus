@@ -21,11 +21,18 @@ namespace Yuzu
 	public abstract class AbstractSerializer
 	{
 		public CommonOptions Options = new CommonOptions();
+		public abstract void ToWriter(object obj);
+		public abstract void ToWriter(object obj, BinaryWriter writer);
+		public abstract string ToString(object obj);
+		public abstract byte[] ToBytes(object obj);
+		public abstract void ToStream(object obj, Stream target);
+	};
+
+	public abstract class AbstractWriterSerializer: AbstractSerializer
+	{
 		public BinaryWriter Writer;
 
-		public abstract void ToWriter(object obj);
-
-		public void ToWriter(object obj, BinaryWriter writer)
+		public override void ToWriter(object obj, BinaryWriter writer)
 		{
 			Writer = writer;
 			ToWriter(obj);
@@ -36,14 +43,14 @@ namespace Yuzu
 			Writer.Write(Encoding.UTF8.GetBytes(s));
 		}
 
-		public string ToStringUTF8(object obj)
+		public override string ToString(object obj)
 		{
 			var ms = new MemoryStream();
 			ToStream(obj, ms);
 			return Encoding.UTF8.GetString(ms.GetBuffer(), 0, (int)ms.Length);
 		}
 
-		public byte[] ToBytes(object obj)
+		public override byte[] ToBytes(object obj)
 		{
 			var ms = new MemoryStream();
 			ToStream(obj, ms);
@@ -52,7 +59,7 @@ namespace Yuzu
 			return result;
 		}
 
-		public void ToStream(object obj, Stream target)
+		public override void ToStream(object obj, Stream target)
 		{
 			ToWriter(obj, new BinaryWriter(target));
 		}
