@@ -153,25 +153,26 @@ namespace Lime
 			reloader = createReloader ? new TextureStreamReloader(stream) : null;
 			// Discard current texture
 			Discard();
-			using (var rewindableStream = new RewindableStream(stream))
-			using (var reader = new BinaryReader(rewindableStream)) {
-#if iOS || ANDROID
+			if (stream is System.IO.Compression.DeflateStream) {
+				// DeflateStream doesn't support Seek
+				stream = new RewindableStream(stream);
+			}
+			using (var reader = new BinaryReader(stream)) {
 				int sign = reader.ReadInt32();
-				rewindableStream.Rewind();
+				stream.Seek(0, SeekOrigin.Begin);
+#if iOS || ANDROID
 				if (sign == LegacyPVRMagic) {
 					InitWithLegacyPVRTexture(reader);
 				} else if (sign == PVRMagic) {
 					InitWithPVRTexture(reader);
 				} else {
-					InitWithPngOrJpgBitmap(rewindableStream, null);
+					InitWithPngOrJpgBitmap(stream, null);
 				}
 #elif OPENGL
-				int sign = reader.ReadInt32();
-				rewindableStream.Rewind();
 				if (sign == DDSMagic) {
 					InitWithDDSBitmap(reader);
 				} else {
-					InitWithPngOrJpgBitmap(rewindableStream, null);
+					InitWithPngOrJpgBitmap(stream, null);
 				}
 #endif
 			}
