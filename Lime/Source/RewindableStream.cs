@@ -20,13 +20,17 @@ namespace Lime
 			firstPass = true;
 		}
 
-		public void Rewind()
+		public override long Seek(long offset, SeekOrigin origin)
 		{
+			if (offset != 0 || origin != SeekOrigin.Begin) {
+				throw new InvalidOperationException();
+			}
 			if (!firstPass) {
-				throw new InvalidOperationException("Attempt to call Rewind() twise");
+				throw new InvalidOperationException("Attempt to call Seek() twice");
 			}
 			firstPass = false;
 			position = 0;
+			return 0;
 		}
 
 		public override int Read(byte[] buffer, int offset, int count)
@@ -48,12 +52,11 @@ namespace Lime
 		}
 
 		public override bool CanRead { get { return true; } }
-		public override bool CanSeek { get { return false; } }
+		public override bool CanSeek { get { return true; } }
 		public override bool CanWrite { get { return false; } }
 		public override void Flush() { throw new InvalidOperationException(); }
 		public override long Length { get { return baseStream.Length; } }
 		public override void Write(byte[] buffer, int offset, int count) { throw new InvalidOperationException(); }
-		public override long Seek(long offset, SeekOrigin origin) { throw new InvalidOperationException(); }
 		public override void SetLength(long value) { throw new InvalidOperationException(); }
 		public override long Position
 		{
