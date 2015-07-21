@@ -18,7 +18,8 @@ namespace YuzuTest
 		private class Sample1
 		{
 			public int X;
-			public string Y;
+			[YuzuDefault]
+			public string Y = "zzz";
 		}
 
 		[TestMethod]
@@ -29,11 +30,18 @@ namespace YuzuTest
 
 			var v1 = new Sample1 { X = 345, Y = "test" };
 			js.JsonOptions.Indent = "";
+
 			var result = js.ToStringUTF8(v1);
 			Assert.AreEqual("{\n\"X\":345,\n\"Y\":\"test\"\n}", result);
 			Sample1 v2 = new Sample1();
-			(new JsonDeserializer()).FromStringUTF8(v2, result);
+
+			var jd = new JsonDeserializer();
+			jd.FromStringUTF8(v2, result);
 			Assert.AreEqual(v1.X, v2.X);
+			Assert.AreEqual(v1.Y, v2.Y);
+
+			jd.FromStringUTF8(v2, "{\"X\":999}");
+			Assert.AreEqual(999, v2.X);
 			Assert.AreEqual(v1.Y, v2.Y);
 		}
 

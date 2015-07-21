@@ -129,17 +129,33 @@ namespace Yuzu
 			return int.Parse(result);
 		}
 
+		private string GetNextName(bool first)
+		{
+			var ch = SkipSpaces();
+			if (ch == ',') {
+				if (first)
+					throw new YuzuException();
+				ch = SkipSpaces();
+			}
+			PutBack(ch);
+			if (ch == '}')
+				return "";
+			var result = RequireString();
+			Require(':');
+			return result;
+		}
+
 		public override void FromReader(object obj)
 		{
-			var first = true;
+			buf = null;
 			Require('{');
+			string name = GetNextName(true);
 			foreach (var f in obj.GetType().GetFields()) {
-				if (!first) {
-					Require(',');
+				if (f.Name != name) {
+					if (!f.IsDefined(Options.DefaultAttribute, true))
+						throw new YuzuException();
+					continue;
 				}
-				first = false;
-				var s = RequireString();
-				Require(':');
 				var t = f.FieldType;
 				if (t == typeof(int)) {
 					f.SetValue(obj, RequireInt());
@@ -150,6 +166,7 @@ namespace Yuzu
 				else {
 					throw new NotImplementedException(t.Name);
 				}
+				name = GetNextName(false);
 			}
 		}
 	}

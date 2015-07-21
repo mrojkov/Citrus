@@ -7,8 +7,11 @@ using System.Threading.Tasks;
 
 namespace Yuzu
 {
+	public class YuzuDefault : Attribute { }
+
 	public class CommonOptions
 	{
+		public Type DefaultAttribute = typeof(YuzuDefault);
 	}
 
 	public class YuzuException: Exception
