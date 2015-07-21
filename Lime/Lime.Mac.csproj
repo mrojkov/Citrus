@@ -307,19 +307,17 @@
   <ItemGroup>
     <Folder Include="Source\Graphics\" />
     <Folder Include="Source\Audio\OpenAL\" />
-    <Folder Include="Source\Application\OpenTK.Xamarin.Mac\Input\" />
-    <Folder Include="Source\Application\OpenTK.Xamarin.Mac\" />
     <Folder Include="Source\Application\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\3rdParty\OpenTK.Xamarin\OpenTK.Xamarin.csproj">
-      <Project>{670A98AF-7AAD-43A8-A80B-B202A7745EA5}</Project>
-      <Name>OpenTK.Xamarin</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Lemon\Lemon.Mac.csproj">
       <Project>{BB697671-700C-455D-B8EE-66A6B122B949}</Project>
       <Name>Lemon.Mac</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\3rdParty\OpenTK.Xamarin\OpenTK.Xamarin.csproj">
+      <Project>{670A98AF-7AAD-43A8-A80B-B202A7745EA5}</Project>
+      <Name>OpenTK.Xamarin</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>
