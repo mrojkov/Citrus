@@ -69,6 +69,9 @@ namespace Lime
 				var target = r.Target as ITexture;
 				if (target != null && target.IsStubTexture) {
 					target.Discard();
+
+					//TODO: Вместо следующей строки, нужно реализовать нормальный Discard у StubTexture
+					r.Target = null;
 				}
 			}
 		}
