@@ -17,12 +17,13 @@ namespace Orange
 
 			int potWidth = TextureConverterUtils.GetNearestPowerOf2(width, 8, 1024);
 			int potHeight = TextureConverterUtils.GetNearestPowerOf2(height, 8, 1024);
-
-			pvrFormat = PVRFormat.PVRTC4;
 			string args = "";
 			switch (pvrFormat) {
 				case PVRFormat.PVRTC4:
-					args += " -f PVRTC1_4";
+					if (!pixbuf.HasAlpha)
+						args += " -f PVRTC1_2";
+					 else
+						args += " -f PVRTC1_4";
 					width = height = Math.Max(potWidth, potHeight);
 					break;
 				case PVRFormat.PVRTC2:

@@ -79,7 +79,7 @@ namespace Orange
 		public static void Cook(TargetPlatform platform)
 		{
 			AssetCooker.platform = platform;
-			cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, platform);
+			cookingRulesMap = CookingRulesBuilder.Build(The.Workspace.AssetFiles, platform, The.Workspace.Target);
 			var extraBundles = new HashSet<string>();
 			foreach (var dictionaryItem in cookingRulesMap) {
 				foreach (var bundle in dictionaryItem.Value.Bundles) {

@@ -15,6 +15,7 @@ namespace Orange
 		public string Title { get; private set; }
 		public FileEnumerator AssetFiles { get; private set; }
 		public Json ProjectJson { get; private set; }
+		public string Target { get; private set; }
 
 		private string dataFolderName;
 
@@ -116,6 +117,7 @@ namespace Orange
 			var jobject = JObject.Parse(File.ReadAllText(file));
 			ProjectJson = new Json(jobject, file);
 			Title = ProjectJson["Title"] as string;
+			Target = ProjectJson.GetValue("Target", "") as string;
 			dataFolderName = ProjectJson.GetValue("DataFolderName", "Data") as string;
 		}
 

@@ -49,7 +49,7 @@ namespace Orange
 	
 	public class CookingRulesBuilder
 	{
-		public static Dictionary<string, CookingRules> Build(FileEnumerator fileEnumerator, TargetPlatform platform)
+		public static Dictionary<string, CookingRules> Build(FileEnumerator fileEnumerator, TargetPlatform platform, string target)
 		{
 			var shouldRescanEnumerator = false;
 			var pathStack = new Stack<string>();
@@ -66,7 +66,7 @@ namespace Orange
 					}
 					if (Path.GetFileName(path) == "#CookingRules.txt") {
 						pathStack.Push(Lime.AssetPath.GetDirectoryName(path));
-						var rules = ParseCookingRules(rulesStack.Peek(), path, platform);
+						var rules = ParseCookingRules(rulesStack.Peek(), path, platform, target);
 						rulesStack.Push(rules);
 						// Add 'ignore' cooking rules for this #CookingRules.txt itself
 						var ignoreRules = rules;
@@ -76,7 +76,7 @@ namespace Orange
 						var rules = rulesStack.Peek();
 						var rulesFile = path + ".txt";
 						if (File.Exists(rulesFile)) {
-							rules = ParseCookingRules(rulesStack.Peek(), rulesFile, platform);
+							rules = ParseCookingRules(rulesStack.Peek(), rulesFile, platform, target);
 							// Add 'ignore' cooking rules for this cooking rules text file
 							var ignoreRules = rules;
 							ignoreRules.Ignore = true;
@@ -137,7 +137,7 @@ namespace Orange
 			}
 		}
 
-		static CookingRules ParseCookingRules(CookingRules basicRules, string path, TargetPlatform platform)
+		static CookingRules ParseCookingRules(CookingRules basicRules, string path, TargetPlatform platform, string target)
 		{ 
 			var rules = basicRules;
 			try {
@@ -145,9 +145,17 @@ namespace Orange
 				using (var s = new FileStream(path, FileMode.Open)) {
 					TextReader r = new StreamReader(s);
 					string line;
+					string currentTarget = null;
 					while ((line = r.ReadLine()) != null) {
 						line = line.Trim();
 						if (line == "") {
+							continue;
+						}
+						if (line[0] == '[') {
+							currentTarget = line.Split('[', ']')[1];
+							continue;
+						}
+						if (currentTarget != null && currentTarget != target) {
 							continue;
 						}
 						var words = line.Split(' ');
