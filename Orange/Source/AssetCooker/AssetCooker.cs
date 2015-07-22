@@ -424,8 +424,9 @@ namespace Orange
 				int b = Math.Max(y.Pixbuf.Width, y.Pixbuf.Height);
 				return b - a;
 			});	
-			// PVRTC4 textures must be square
-			var squareAtlas = (platform == TargetPlatform.iOS) && items.Any(i => i.PVRFormat == PVRFormat.Compressed);
+			// PVRTC2/4 textures must be square
+			var squareAtlas = (platform == TargetPlatform.iOS) && items.Any(i => 
+				i.PVRFormat == PVRFormat.PVRTC4 || i.PVRFormat == PVRFormat.PVRTC2);
 			for (int atlasId = 0; items.Count > 0; atlasId++) {
 				if (atlasId >= MaxAtlasChainLength) {
 					throw new Lime.Exception("Too many textures in the atlas chain {0}", atlasChain);
@@ -504,12 +505,7 @@ namespace Orange
 			switch (platform) {
 				case TargetPlatform.Android:
 				case TargetPlatform.iOS:
-					if (item1.PVRFormat != item2.PVRFormat) {
-						return false;
-					}
-					// On Android we use separate alpha for compressed textures
-					// On iOS - pvrtc4 for transparent compressed textures and pvrtc2 - for opaque
-					return item1.PVRFormat != PVRFormat.Compressed || item1.Pixbuf.HasAlpha == item2.Pixbuf.HasAlpha;
+					return item1.PVRFormat == item2.PVRFormat && item1.Pixbuf.HasAlpha == item2.Pixbuf.HasAlpha;
 				case TargetPlatform.Desktop:
 					return item1.DDSFormat == item2.DDSFormat;
 				case TargetPlatform.Unity:
@@ -564,18 +560,17 @@ namespace Orange
 					ConvertTexture(path, attributes, file => texture.Save(file, "png"));
 					break;
 				case TargetPlatform.Android:
-					ConvertTexture(path, attributes, file => TextureConverter.ToPVR(texture, file, rules.MipMaps, rules.PVRFormat, TextureConverter.PVRCompressionScheme.ETC1));
+					ConvertTexture(path, attributes, file => TextureConverter.ToPVR(texture, file, rules.MipMaps, rules.PVRFormat));
 					// ETC1 textures on Android use separate alpha channel
-					if (texture.HasAlpha && rules.PVRFormat == PVRFormat.Compressed) {
+					if (texture.HasAlpha && rules.PVRFormat == PVRFormat.ETC1) {
 						using (var alphaTexture = new Gdk.Pixbuf(texture, 0, 0, texture.Width, texture.Height)) {
 							TextureConverterUtils.ConvertBitmapToAlphaMask(alphaTexture);
-							ConvertTexture(alphaPath, AssetAttributes.Zipped, file => TextureConverter.ToPVR(alphaTexture, file, rules.MipMaps, PVRFormat.Compressed,
-								TextureConverter.PVRCompressionScheme.ETC1));
+							ConvertTexture(alphaPath, AssetAttributes.Zipped, file => TextureConverter.ToPVR(alphaTexture, file, rules.MipMaps, PVRFormat.ETC1));
 						}
 					}
 					break;
 				case TargetPlatform.iOS:
-					ConvertTexture(path, attributes, file => TextureConverter.ToPVR(texture, file, rules.MipMaps, rules.PVRFormat, TextureConverter.PVRCompressionScheme.PVRTC4));
+					ConvertTexture(path, attributes, file => TextureConverter.ToPVR(texture, file, rules.MipMaps, rules.PVRFormat));
 					break;
 				case TargetPlatform.Desktop:
 					ConvertTexture(path, attributes, file => TextureConverter.ToDDS(texture, file, rules.DDSFormat, rules.MipMaps));

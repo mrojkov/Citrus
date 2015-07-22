@@ -9,13 +9,7 @@ namespace Orange
 {
 	public static class TextureConverter
 	{
-		public enum PVRCompressionScheme
-		{
-			PVRTC4,
-			ETC1,
-		}
-
-		public static void ToPVR(Gdk.Pixbuf pixbuf, string dstPath, bool mipMaps, PVRFormat pvrFormat, PVRCompressionScheme compression)
+		public static void ToPVR(Gdk.Pixbuf pixbuf, string dstPath, bool mipMaps, PVRFormat pvrFormat)
 		{
 			int width = pixbuf.Width;
 			int height = pixbuf.Height;
@@ -24,19 +18,19 @@ namespace Orange
 			int potWidth = TextureConverterUtils.GetNearestPowerOf2(width, 8, 1024);
 			int potHeight = TextureConverterUtils.GetNearestPowerOf2(height, 8, 1024);
 
+			pvrFormat = PVRFormat.PVRTC4;
 			string args = "";
 			switch (pvrFormat) {
-				case PVRFormat.Compressed:
-					if (compression == PVRCompressionScheme.PVRTC4) {
-						if (pixbuf.HasAlpha) {
-							args += " -f PVRTC1_4";
-						} else {
-							args += " -f PVRTC1_2";
-						}
-						width = height = Math.Max(potWidth, potHeight);
-					} else {
-						args = " -f ETC1 -q etcfast";
-					}
+				case PVRFormat.PVRTC4:
+					args += " -f PVRTC1_4";
+					width = height = Math.Max(potWidth, potHeight);
+					break;
+				case PVRFormat.PVRTC2:
+					args += " -f PVRTC1_2";
+					width = height = Math.Max(potWidth, potHeight);
+					break;
+				case PVRFormat.ETC1:
+					args = " -f ETC1 -q etcfast";
 					break;
 				case PVRFormat.RGB565:
 					if (hasAlpha) {

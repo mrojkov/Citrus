@@ -185,6 +185,9 @@ namespace Lime
 					break;
 				}
 				case PVRFormat.PVRTC_2_RGBA: {
+					if (i > 0 && height < 16) {
+						continue;
+					}				
 					var buffer = ReadTextureData(reader, width * height * 2 / 8);
 					glCommands += () => {
 						PlatformRenderer.PushTexture(handle, 0);

@@ -8,7 +8,9 @@ namespace Orange
 	// amoung all atlas items.
 	public enum PVRFormat
 	{
-		Compressed,
+		PVRTC4,
+		PVRTC2,
+		ETC1,
 		RGB565,
 		RGBA4,
 		ARGB8,
@@ -36,7 +38,7 @@ namespace Orange
 		public static readonly CookingRules Default = new CookingRules {
 			TextureAtlas = null,
 			MipMaps = false,
-			PVRFormat = PVRFormat.Compressed,
+			PVRFormat = PVRFormat.PVRTC4,
 			DDSFormat = DDSFormat.DXTi,
 			LastChangeTime = new DateTime(0),
 			Bundles = new[] { MainBundleName },
@@ -114,11 +116,14 @@ namespace Orange
 			}
 		}
 
-		static PVRFormat ParsePVRFormat(string value)
+		static PVRFormat ParsePVRFormat(string value, TargetPlatform platform)
 		{
 			switch (value) {
+				case "":
 				case "PVRTC4":
-					return PVRFormat.Compressed;
+					return (platform == TargetPlatform.Android) ? PVRFormat.ETC1 : PVRFormat.PVRTC4;
+				case "PVRTC2":
+					return (platform == TargetPlatform.Android) ? PVRFormat.ETC1 : PVRFormat.PVRTC2;
 				case "RGBA4":
 					return PVRFormat.RGBA4;
 				case "RGB565":
@@ -128,7 +133,7 @@ namespace Orange
 				case "RGBA8":
 					return PVRFormat.ARGB8;
 				default:
-					throw new Lime.Exception("Error parsing PVR format. Must be one of: PVRTC4, RGBA4, RGB565, ARGB8");
+					throw new Lime.Exception("Error parsing PVR format. Must be one of: PVRTC4, PVRTC2, RGBA4, RGB565, ARGB8");
 			}
 		}
 
@@ -181,7 +186,7 @@ namespace Orange
 								rules.MipMaps = ParseBool(words[1]);
 								break;
 							case "PVRFormat":
-								rules.PVRFormat = ParsePVRFormat(words[1]);
+								rules.PVRFormat = ParsePVRFormat(words[1], platform);
 								break;
 							case "DDSFormat":
 								rules.DDSFormat = ParseDDSFormat(words[1]);

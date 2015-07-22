@@ -103,6 +103,9 @@ namespace Lime
 
 		public void LoadImage(string path)
 		{
+			if (path.Contains("Buttons.030")) {
+				Debug.Write("Gear");
+			}
 			using (var stream = AssetsBundle.Instance.OpenFileLocalized(path)) {
 				var alphaPath = Path.ChangeExtension(path, ".alpha.png");
 				if (Path.GetExtension(path) == ".jpg" && AssetsBundle.Instance.FileExists(alphaPath)) {
