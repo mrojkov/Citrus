@@ -7,21 +7,77 @@ using ProtoBuf;
 
 namespace Lime
 {
+	[Flags]
+	public enum ShaderFlags
+	{
+		None = 0,
+		UseAlphaTexture1 = 1,
+		UseAlphaTexture2 = 2,
+		PremultiplyAlpha = 4,
+		Count = 3
+	}
+
 	public class ShaderPrograms
 	{
+		class MultiShaderProgram
+		{
+			private ShaderProgram[] programs;
+
+			public MultiShaderProgram(string vertexShader, string fragmentShader, IEnumerable<ShaderProgram.AttribLocation> attribLocations, IEnumerable<ShaderProgram.Sampler> samplers, ShaderFlags mask)
+			{
+				var maxEntries = 1 << (int)ShaderFlags.Count;
+				programs = new ShaderProgram[maxEntries];
+				for (int i = 0; i < maxEntries; i++) {
+					if ((i & (int)mask) == i) {
+						programs[i] = new ShaderProgram(
+							new Shader[] { 
+								new VertexShader(vertexShader), 
+								new FragmentShader(AddHeaderWithDefines((ShaderFlags)i, fragmentShader))
+							},
+							attribLocations, samplers);
+					}
+				}
+			}
+
+			private string AddHeaderWithDefines(ShaderFlags shaderFlags, string shader)
+			{
+				for (int i = 0; i < (int)ShaderFlags.Count; i++) {
+					int bit = 1 << i;
+					if (((int)shaderFlags & bit) != 0) {
+						var name = Enum.GetName(typeof(ShaderFlags), (ShaderFlags)bit);
+						shader = "#define " + name + "\n" + shader;
+					}
+				}
+				return shader;
+			}
+
+			public ShaderProgram GetProgram(ShaderFlags flags)
+			{
+				return programs[(int)flags];
+			}
+		}
+
 		public static ShaderPrograms Instance = new ShaderPrograms();
 
 		private ShaderPrograms()
 		{
-			colorOnlyBlendingProgram = CreateBlendingProgram(oneTextureVertexShader, colorOnlyFragmentShader);
-			oneTextureBlengingProgram = CreateBlendingProgram(oneTextureVertexShader, oneTextureFragmentShader);
-			twoTexturesBlengingProgram = CreateBlendingProgram(twoTexturesVertexShader, twoTexturesFragmentShader);
-			silhuetteBlendingProgram = CreateBlendingProgram(oneTextureVertexShader, silhouetteFragmentShader);
-			twoTexturesSilhuetteBlendingProgram = CreateBlendingProgram(twoTexturesVertexShader, twoTexturesSilhouetteFragmentShader);
-			inversedSilhuetteBlendingProgram = CreateBlendingProgram(oneTextureVertexShader, inversedSilhouetteFragmentShader);
+			colorOnlyBlendingProgram = CreateShaderProgram(oneTextureVertexShader, colorOnlyFragmentShader, ShaderFlags.None);
+			oneTextureBlengingProgram = CreateShaderProgram(oneTextureVertexShader, oneTextureFragmentShader,
+				ShaderFlags.UseAlphaTexture1 | ShaderFlags.PremultiplyAlpha);
+			twoTexturesBlengingProgram = CreateShaderProgram(twoTexturesVertexShader, twoTexturesFragmentShader,
+				ShaderFlags.UseAlphaTexture1 | ShaderFlags.UseAlphaTexture2 | ShaderFlags.PremultiplyAlpha);
+			silhuetteBlendingProgram = CreateShaderProgram(oneTextureVertexShader, silhouetteFragmentShader,
+				ShaderFlags.UseAlphaTexture1);
+			twoTexturesSilhuetteBlendingProgram = CreateShaderProgram(twoTexturesVertexShader, twoTexturesSilhouetteFragmentShader, ShaderFlags.UseAlphaTexture1 | ShaderFlags.UseAlphaTexture2);
+			inversedSilhuetteBlendingProgram = CreateShaderProgram(oneTextureVertexShader, inversedSilhouetteFragmentShader, ShaderFlags.UseAlphaTexture1);
 		}
 
-		public ShaderProgram GetShaderProgram(ShaderId shader, int numTextures)
+		public ShaderProgram GetShaderProgram(ShaderId shader, int numTextures, ShaderFlags flags)
+		{
+			return GetShaderProgram(shader, numTextures).GetProgram(flags);
+		}
+
+		private MultiShaderProgram GetShaderProgram(ShaderId shader, int numTextures)
 		{
 			if (shader == ShaderId.Diffuse || shader == ShaderId.Inherited) {
 				if (numTextures == 1) {
@@ -41,151 +97,149 @@ namespace Lime
 			return colorOnlyBlendingProgram;
 		}
 
-		readonly Shader oneTextureVertexShader = new VertexShader(
-			"attribute vec4 inPos;			" +	
-			"attribute vec4 inColor;		" +
-			"attribute vec2 inTexCoords1;	" + 
-			"varying lowp vec4 color;		" +
-			"varying lowp vec2 texCoords;	" +
-			"uniform mat4 matProjection;	" +
-			"void main()					" +
-			"{											" +
-			"	gl_Position = matProjection * inPos;	" +
-			"	color = inColor;						" +
-			"	texCoords = inTexCoords1;				" +
-			"}"
-		);
+		readonly string oneTextureVertexShader = @"
+			attribute vec4 inPos;
+			attribute vec4 inColor;
+			attribute vec2 inTexCoords1;
+			varying lowp vec4 color;
+			varying lowp vec2 texCoords;
+			uniform mat4 matProjection;
+			void main()
+			{
+				gl_Position = matProjection * inPos;
+				color = inColor;					
+				texCoords = inTexCoords1;
+			}";
 
-		readonly Shader twoTexturesVertexShader = new VertexShader(
-			"attribute vec4 inPos;			" +
-			"attribute vec4 inColor;		" +
-			"attribute vec2 inTexCoords1;	" +
-			"attribute vec2 inTexCoords2;	" +
-			"varying lowp vec4 color;		" +
-			"varying lowp vec2 texCoords1;	" +
-			"varying lowp vec2 texCoords2;	" +
-			"uniform mat4 matProjection;	" +
-			"void main()					" +
-			"{											" +
-			"	gl_Position = matProjection * inPos;	" +
-			"	color = inColor;						" +
-			"	texCoords1 = inTexCoords1;				" +
-			"	texCoords2 = inTexCoords2;				" +
-			"}"
-		);
+		readonly string twoTexturesVertexShader = @"
+			attribute vec4 inPos;
+			attribute vec4 inColor;
+			attribute vec2 inTexCoords1;
+			attribute vec2 inTexCoords2;
+			varying lowp vec4 color;
+			varying lowp vec2 texCoords1;
+			varying lowp vec2 texCoords2;
+			uniform mat4 matProjection;
+			void main()
+			{
+				gl_Position = matProjection * inPos;
+				color = inColor;
+				texCoords1 = inTexCoords1;
+				texCoords2 = inTexCoords2;
+			}";
 
-		readonly Shader colorOnlyFragmentShader = new FragmentShader(
-			"varying lowp vec4 color;		" +
-			"void main()					" +
-			"{								" +
-			"	gl_FragColor = color;		" +
-			"}"
-		);
+		readonly string colorOnlyFragmentShader = @"
+			varying lowp vec4 color;
+			void main()
+			{
+				gl_FragColor = color;
+			}";
 
-		readonly Shader oneTextureFragmentShader = new FragmentShader(
-			"varying lowp vec4 color;		" +
-			"varying lowp vec2 texCoords;	" +
-			"uniform lowp sampler2D tex1;	" +
-			"uniform bool useAlphaTexture1;	" +
-			"uniform bool premultiplyAlpha;	" +
-			"uniform lowp sampler2D tex1a;	" +
-			"void main()					" +
-			"{								" +
-			"	lowp vec4 t1 = texture2D(tex1, texCoords);	" +
-			"	if (useAlphaTexture1)						" +
-			"		t1.a = texture2D(tex1a, texCoords).r;	" +
-			"	gl_FragColor = color * t1;					" +
-			"	if (premultiplyAlpha)						" +
-			"		gl_FragColor.rgb *= gl_FragColor.a;		" +
-			"}"
-		);
+		readonly string oneTextureFragmentShader = @"
+			varying lowp vec4 color;
+			varying lowp vec2 texCoords;
+			uniform lowp sampler2D tex1;
+			uniform lowp sampler2D tex1a;
+			void main()
+			{
+				lowp vec4 t1 = texture2D(tex1, texCoords);
+				#ifdef UseAlphaTexture1
+					t1.a = texture2D(tex1a, texCoords).r;
+				#endif
+				gl_FragColor = color * t1;
+				#ifdef PremultiplyAlpha
+					gl_FragColor.rgb *= gl_FragColor.a;
+				#endif
+			}";
 
-		readonly Shader twoTexturesFragmentShader = new FragmentShader(
-			"varying lowp vec4 color;		" +
-			"varying lowp vec2 texCoords1;	" +
-			"varying lowp vec2 texCoords2;	" +
-			"uniform lowp sampler2D tex1;	" +
-			"uniform lowp sampler2D tex2;	" +
-			"uniform bool useAlphaTexture1;	" +
-			"uniform bool useAlphaTexture2;	" +
-			"uniform bool premultiplyAlpha;	" +
-			"uniform lowp sampler2D tex1a;	" +
-			"uniform lowp sampler2D tex2a;	" +
-			"void main()					" +
-			"{								" +
-			"	lowp vec4 t1 = texture2D(tex1, texCoords1);	" +
-			"	lowp vec4 t2 = texture2D(tex2, texCoords2);	" +
-			"	if (useAlphaTexture1)						" +
-			"		t1.a = texture2D(tex1a, texCoords1).r;	" +
-			"	if (useAlphaTexture2)						" +
-			"		t2.a = texture2D(tex2a, texCoords2).r;	" +
-			"	gl_FragColor = color * t1 * t2;				" +
-			"	if (premultiplyAlpha)						" +
-			"		gl_FragColor.rgb *= gl_FragColor.a;		" +
-			"}"
-		);
+		readonly string twoTexturesFragmentShader = @"
+			varying lowp vec4 color;
+			varying lowp vec2 texCoords1;
+			varying lowp vec2 texCoords2;
+			uniform lowp sampler2D tex1;
+			uniform lowp sampler2D tex2;
+			uniform lowp sampler2D tex1a;
+			uniform lowp sampler2D tex2a;
+			void main()
+			{
+				lowp vec4 t1 = texture2D(tex1, texCoords1);
+				lowp vec4 t2 = texture2D(tex2, texCoords2);
+				#ifdef UseAlphaTexture1
+					t1.a = texture2D(tex1a, texCoords1).r;
+				#endif
+				#ifdef UseAlphaTexture2
+					t2.a = texture2D(tex2a, texCoords2).r;
+				#endif
+				gl_FragColor = color * t1 * t2;
+				#ifdef PremultiplyAlpha
+					gl_FragColor.rgb *= gl_FragColor.a;
+				#endif
+			}";
 
-		readonly Shader silhouetteFragmentShader = new FragmentShader(
-			"varying lowp vec4 color;		" +
-			"varying lowp vec2 texCoords;	" +
-			"uniform lowp sampler2D tex1;	" +
-			"uniform lowp sampler2D tex1a;	" +
-			"uniform bool useAlphaTexture1;	" +
-			"void main()					" +
-			"{								" +
-			"	lowp float a = useAlphaTexture1 ? texture2D(tex1a, texCoords).r : texture2D(tex1, texCoords).a; " +
-			"	gl_FragColor = color * vec4(1.0, 1.0, 1.0, a);	" +
-			"}"
-		);
+		readonly string silhouetteFragmentShader = @"
+			varying lowp vec4 color;
+			varying lowp vec2 texCoords;
+			uniform lowp sampler2D tex1;
+			uniform lowp sampler2D tex1a;
+			void main()
+			{
+				#ifdef UseAlphaTexture1
+					lowp float a = texture2D(tex1a, texCoords).r;
+				#else
+					lowp float a = texture2D(tex1, texCoords).a;
+				#endif
+				gl_FragColor = color * vec4(1.0, 1.0, 1.0, a);
+			}";
 
-		readonly Shader twoTexturesSilhouetteFragmentShader = new FragmentShader(
-			"varying lowp vec4 color;		" +
-			"varying lowp vec2 texCoords1;	" +
-			"varying lowp vec2 texCoords2;	" +
-			"uniform bool useAlphaTexture1;	" +
-			"uniform bool useAlphaTexture2;	" +
-			"uniform lowp sampler2D tex1;	" +
-			"uniform lowp sampler2D tex1a;	" +
-			"uniform lowp sampler2D tex2;	" +
-			"uniform lowp sampler2D tex2a;	" +
-			"void main()					" +
-			"{								" +
-			"	lowp vec4 t1 = texture2D(tex1, texCoords1);	" +
-			"	if (useAlphaTexture1)			" +
-			"		t1.a = texture2D(tex1a, texCoords1).r; " +
-			"	lowp float a2 = useAlphaTexture2 ? texture2D(tex2a, texCoords2).r : texture2D(tex2, texCoords2).a; " +
-			"	gl_FragColor = t1 * color * vec4(1.0, 1.0, 1.0, a2);" +
-			"}"
-		);
+		readonly string twoTexturesSilhouetteFragmentShader = @"
+			varying lowp vec4 color;
+			varying lowp vec2 texCoords1;
+			varying lowp vec2 texCoords2;
+			uniform lowp sampler2D tex1;
+			uniform lowp sampler2D tex1a;
+			uniform lowp sampler2D tex2;
+			uniform lowp sampler2D tex2a;
+			void main()
+			{
+				lowp vec4 t1 = texture2D(tex1, texCoords1);
+				#ifdef UseAlphaTexture1
+					t1.a = texture2D(tex1a, texCoords1).r;
+				#endif
+				#ifdef UseAlphaTexture2
+					lowp float a2 = texture2D(tex2a, texCoords2).r;
+				#else
+					lowp float a2 = texture2D(tex2, texCoords2).a;
+				#endif
+				gl_FragColor = t1 * color * vec4(1.0, 1.0, 1.0, a2);
+			}";
 
-		readonly Shader inversedSilhouetteFragmentShader = new FragmentShader(
-			"varying lowp vec4 color;		" +
-			"varying lowp vec2 texCoords;	" +
-			"uniform bool useAlphaTexture1;	" +
-			"uniform lowp sampler2D tex1;	" +
-			"uniform lowp sampler2D tex1a;	" +
-			"void main()					" +
-			"{								" +
-			"	lowp float a = 1.0 - (useAlphaTexture1 ? texture2D(tex1a, texCoords).r : texture2D(tex1, texCoords).a); " +
-			"	gl_FragColor = color * vec4(1.0, 1.0, 1.0, a); " +
-			"}"
-		);
+		readonly string inversedSilhouetteFragmentShader = @"
+			varying lowp vec4 color;
+			varying lowp vec2 texCoords;
+			uniform lowp sampler2D tex1;
+			uniform lowp sampler2D tex1a;
+			void main()
+			{
+				#ifdef UseAlphaTexture1
+					lowp float a = 1.0 - texture2D(tex1a, texCoords).r;
+				#else
+					lowp float a = 1.0 - texture2D(tex1, texCoords).a;
+				#endif
+				gl_FragColor = color * vec4(1.0, 1.0, 1.0, a);
+			}";
 
-		private readonly ShaderProgram colorOnlyBlendingProgram;
-		private readonly ShaderProgram oneTextureBlengingProgram;
-		private readonly ShaderProgram twoTexturesBlengingProgram;
-		private readonly ShaderProgram silhuetteBlendingProgram;
-		private readonly ShaderProgram twoTexturesSilhuetteBlendingProgram;
-		private readonly ShaderProgram inversedSilhuetteBlendingProgram;
+		private readonly MultiShaderProgram colorOnlyBlendingProgram;
+		private readonly MultiShaderProgram oneTextureBlengingProgram;
+		private readonly MultiShaderProgram twoTexturesBlengingProgram;
+		private readonly MultiShaderProgram silhuetteBlendingProgram;
+		private readonly MultiShaderProgram twoTexturesSilhuetteBlendingProgram;
+		private readonly MultiShaderProgram inversedSilhuetteBlendingProgram;
 
-		private static ShaderProgram CreateBlendingProgram(Shader vertexShader, Shader fragmentShader)
+		private static MultiShaderProgram CreateShaderProgram(string vertexShader, string fragmentShader, ShaderFlags mask)
 		{
-			var p = new ShaderProgram(
-				new Shader[] { vertexShader, fragmentShader }, 
-				PlatformMesh.Attributes.GetLocations(),
-				GetSamplers()
-			);
-			return p;
+			return new MultiShaderProgram(
+				vertexShader, fragmentShader, PlatformMesh.Attributes.GetLocations(), 
+				GetSamplers(), mask);
 		}
 
 		public static IEnumerable<ShaderProgram.Sampler> GetSamplers()

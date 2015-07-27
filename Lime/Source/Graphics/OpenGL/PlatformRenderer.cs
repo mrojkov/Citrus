@@ -54,7 +54,19 @@ namespace Lime
 		public static void SetShader(ShaderId value, ShaderProgram customShaderProgram)
 		{
 			int numTextures = textures[1] != 0 ? 2 : (textures[0] != 0 ? 1 : 0);
-			var program = value == ShaderId.Custom ? customShaderProgram : ShaderPrograms.Instance.GetShaderProgram(value, numTextures);
+			var flags = ShaderFlags.None;
+#if ANDROID
+			if (textures[2] != 0) {
+				flags |= ShaderFlags.UseAlphaTexture1;
+			}
+			if (textures[3] != 0) {
+				flags |= ShaderFlags.UseAlphaTexture2;
+			}
+#endif
+			if (!premultipliedAlphaMode && (blending == Blending.Burn || blending == Blending.Darken)) {
+				flags |= ShaderFlags.PremultiplyAlpha;
+			}
+			var program = value == ShaderId.Custom ? customShaderProgram : ShaderPrograms.Instance.GetShaderProgram(value, numTextures, flags);
 			if (shaderProgram != program) {
 				shaderProgram = program;
 				shaderProgram.Use();
@@ -65,15 +77,6 @@ namespace Lime
 				}
 				shaderProgram.LoadMatrix(program.ProjectionMatrixUniformId, projection);
 			}
-#if ANDROID
-			if (numTextures > 0) {
-				shaderProgram.LoadBoolean(shaderProgram.UseAlphaTexture1UniformId, textures[2] != 0); 
-			}
-			if (numTextures > 1) {
-				shaderProgram.LoadBoolean(shaderProgram.UseAlphaTexture2UniformId, textures[3] != 0); 
-			}
-#endif
-			shaderProgram.LoadBoolean(shaderProgram.PremultiplyAlphaUniformId, !premultipliedAlphaMode && (blending == Blending.Burn || blending == Blending.Darken));
 		}
 
 		private static void FlipProjectionYAxis(ref Matrix44 matrix)

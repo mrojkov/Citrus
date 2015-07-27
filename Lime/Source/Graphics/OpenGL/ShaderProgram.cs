@@ -28,9 +28,6 @@ namespace Lime
 
 		private int handle;
 		public int ProjectionMatrixUniformId { get; private set; }
-		public int UseAlphaTexture1UniformId { get; private set; }
-		public int UseAlphaTexture2UniformId { get; private set; }
-		public int PremultiplyAlphaUniformId { get; private set; }
 		private Dictionary<string, int> uniformIds = new Dictionary<string, int>();
 		private List<Shader> shaders = new List<Shader>();
 		private List<AttribLocation> attribLocations;
@@ -106,9 +103,6 @@ namespace Lime
 		protected virtual void InitializeUniformIds()
 		{
 			ProjectionMatrixUniformId = GetUniformId("matProjection");
-			UseAlphaTexture1UniformId = GetUniformId("useAlphaTexture1");
-			UseAlphaTexture2UniformId = GetUniformId("useAlphaTexture2");
-			PremultiplyAlphaUniformId = GetUniformId("premultiplyAlpha");
 		}
 
 		protected int GetUniformId(string name)
