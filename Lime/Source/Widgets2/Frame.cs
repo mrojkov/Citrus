@@ -36,7 +36,6 @@ namespace Lime.Widgets2
 	}
 
 	[ProtoContract]
-	[TangerineClass]
 	public class Frame : Widget, IImageCombinerArg
 	{
 		public event Action Rendered;

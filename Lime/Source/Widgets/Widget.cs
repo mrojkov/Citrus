@@ -69,7 +69,6 @@ namespace Lime
 	[ProtoInclude(111, typeof(TextBox))]
 	[ProtoInclude(112, typeof(Movie))]
 	[DebuggerTypeProxy(typeof(WidgetDebugView))]
-	[TangerineClass]
 	public partial class Widget : Node
 	{
 		public const int EmptyHitTestMask = 0;
@@ -201,7 +200,6 @@ namespace Lime
 		/// Позиция виджета в контейнере его родителя
 		/// </summary>
 		[ProtoMember(1)]
-		[TangerineProperty(4)]
 		public Vector2 Position
 		{
 			get { return position; }
@@ -259,7 +257,6 @@ namespace Lime
 		/// Для изменения визуального размера используйте Scale
 		/// </summary>
 		[ProtoMember(2)]
-		[TangerineProperty(7)]
 		public Vector2 Size
 		{
 			get { return size; }
@@ -326,7 +323,6 @@ namespace Lime
 		/// [0, 0] - верхний левый угол виджета, [1, 1] - правый нижний
 		/// </summary>
 		[ProtoMember(3)]
-		[TangerineProperty(6)]
 		public Vector2 Pivot 
 		{ 
 			get { return pivot; } 
@@ -347,7 +343,6 @@ namespace Lime
 		/// Масштаб (от 0 до 1)
 		/// </summary>
 		[ProtoMember(4)]
-		[TangerineProperty(5)]
 		public Vector2 Scale 
 		{ 
 			get { return scale; } 
@@ -368,7 +363,6 @@ namespace Lime
 		/// Угол поворота в градусах против часовой стрелки
 		/// </summary>
 		[ProtoMember(5)]
-		[TangerineProperty(3)]
 		public float Rotation { 
 			get { return rotation; }
 			set 
@@ -388,7 +382,6 @@ namespace Lime
 		/// Оттенок. При отрисовке цвет текстуры умножается на этот цвет.
 		/// </summary>
 		[ProtoMember(6)]
-		[TangerineProperty(8)]
 		public Color4 Color 
 		{ 
 			get { return color; } 
@@ -426,7 +419,6 @@ namespace Lime
 		/// Задает способ смешивания при отрисовке
 		/// </summary>
 		[ProtoMember(8)]
-		[TangerineProperty(9)]
 		public Blending Blending 
 		{ 
 			get { return blending; } 
@@ -443,7 +435,6 @@ namespace Lime
 		/// Идентификатор шейдера, который будет использоваться при отрисовке виджета
 		/// </summary>
 		[ProtoMember(9)]
-		[TangerineProperty(10)]
 		public ShaderId Shader
 		{
 			get { return shader; }
@@ -457,7 +448,6 @@ namespace Lime
 		}
 
 		[ProtoMember(10)]
-		[TangerineProperty(2)]
 		public bool Visible 
 		{ 
 			get { return visible; } 

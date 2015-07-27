@@ -51,7 +51,6 @@ namespace Lime
 		public string ContentsPath { get; set; }
 
 		[Trigger]
-		[TangerineProperty(1)]
 		public string Trigger { get; set; }
 
 		/// <summary>

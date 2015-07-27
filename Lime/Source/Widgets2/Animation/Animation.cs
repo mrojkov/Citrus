@@ -31,7 +31,6 @@ namespace Lime.Widgets2
 		}
 
 		[Trigger]
-		[TangerineProperty(6)]
 		public string Trigger { get; set; }
 
 		private int time;
