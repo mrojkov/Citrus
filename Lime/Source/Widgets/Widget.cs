@@ -579,12 +579,7 @@ namespace Lime
 		WidgetInput input;
 		public WidgetInput Input
 		{
-			get {
-				if (input == null) {
-					input = new WidgetInput(this);
-				}
-				return input;
-			}
+			get { return input ?? (input = new WidgetInput(this)); }
 		}
 
 		/// <summary>
@@ -737,13 +732,13 @@ namespace Lime
 				return matrix;
 			}
 			Vector2 u, v;
-			Vector2 translation = position;
+			var translation = position;
 			u.X = direction.X * scale.X;
 			u.Y = direction.Y * scale.X;
 			v.X = -direction.Y * scale.Y;
 			v.Y = direction.X * scale.Y;
 			if (SkinningWeights != null && Parent != null) {
-				BoneArray a = Parent.AsWidget.BoneArray;
+				var a = Parent.AsWidget.BoneArray;
 				translation = a.ApplySkinningToVector(position, SkinningWeights);
 				u = a.ApplySkinningToVector(u + position, SkinningWeights) - translation;
 				v = a.ApplySkinningToVector(v + position, SkinningWeights) - translation;
@@ -822,7 +817,7 @@ namespace Lime
 				}
 			}
 			if (Layer != 0) {
-				int oldLayer = chain.SetCurrentLayer(Layer);
+				var oldLayer = chain.SetCurrentLayer(Layer);
 				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
 					node.AddToRenderChain(chain);
 				}
@@ -880,17 +875,18 @@ namespace Lime
 		{
 			Position += positionDelta;
 			Size += sizeDelta;
-			if (Animators.Count > 0) {
-				Animator<Vector2> animator;
-				if (Animators.TryFind("Position", out animator)) {
-					foreach (var key in animator.Keys) {
-						key.Value += positionDelta;
-					}
+			if (Animators.Count <= 0) {
+				return;
+			}
+			Animator<Vector2> animator;
+			if (Animators.TryFind("Position", out animator)) {
+				foreach (var key in animator.Keys) {
+					key.Value += positionDelta;
 				}
-				if (Animators.TryFind("Size", out animator)) {
-					foreach (var key in animator.Keys) {
-						key.Value += sizeDelta;
-					}
+			}
+			if (Animators.TryFind("Size", out animator)) {
+				foreach (var key in animator.Keys) {
+					key.Value += sizeDelta;
 				}
 			}
 		}
@@ -922,14 +918,14 @@ namespace Lime
 			}
 			var targets = new List<Widget>();
 			World.Instance.AsWidget.EnumerateHitTestTargets(targets, HitTestMask);
-			int thisLayer = GetEffectiveLayer();
-			bool passedThis = false;
+			var thisLayer = GetEffectiveLayer();
+			var passedThis = false;
 			foreach (var target in targets) {
 				if (target == this) {
 					passedThis = true;
 					continue;
 				}
-				int targetLayer = target.GetEffectiveLayer();
+				var targetLayer = target.GetEffectiveLayer();
 				if (targetLayer < thisLayer) {
 					continue;
 				}
@@ -973,22 +969,19 @@ namespace Lime
 			if (!GloballyVisible || !InsideClipRect(point)) {
 				return false;
 			}
-			if (HitTestMethod == HitTestMethod.BoundingRect) {
-				return HitTestBoundingRect(point);
-			} else if (HitTestMethod == HitTestMethod.Contents) {
-				foreach (Node node in Nodes) {
-					if (node.AsWidget != null && node.AsWidget.HitTest(point))
-						return true;
-				}
-				return false;
+			switch (HitTestMethod) {
+				case HitTestMethod.BoundingRect:
+					return HitTestBoundingRect(point);
+				case HitTestMethod.Contents:
+					return Nodes.Any(node => node.AsWidget != null && node.AsWidget.HitTest(point));
 			}
 			return false;
 		}
 
 		private bool HitTestBoundingRect(Vector2 point)
 		{
-			Vector2 position = LocalToWorldTransform.CalcInversed().TransformVector(point);
-			Vector2 size = Size;
+			var position = LocalToWorldTransform.CalcInversed().TransformVector(point);
+			var size = Size;
 			if (size.X < 0) {
 				position.X = -position.X;
 				size.X = -size.X;
@@ -1003,18 +996,12 @@ namespace Lime
 		protected bool InsideClipRect(Vector2 point)
 		{
 			var clipper = GetEffectiveClipperWidget();
-			if (clipper != null) {
-				return clipper.HitTestBoundingRect(point);
-			}
-			return true;
+			return clipper == null || clipper.HitTestBoundingRect(point);
 		}
 
 		protected virtual Widget GetEffectiveClipperWidget()
 		{
-			if (Parent != null) {
-				return Parent.AsWidget.GetEffectiveClipperWidget();
-			}
-			return null;
+			return Parent != null ? Parent.AsWidget.GetEffectiveClipperWidget() : null;
 		}
 
 		#endregion
