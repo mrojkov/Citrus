@@ -38,6 +38,12 @@ namespace Lime
 
 		private float value;
 		private Widget thumb;
+		private bool dragging;
+
+		// buz: когда € попыталс€ применить слайдеры в GummyDrop, то столкнулс€ с тем, что событие Release вызываетс€ каждый кадр,
+		// из-за чего анимаци€ Thumb'а отображалась неправильно, а также не было возможности реализовать проигрывание звука при отпускании.
+		// я исправил, однако мой фикс что-то сломал в другом проекте, поэтому в качестве временного решени€ использую флажок.
+		static public bool EnableDraggingFix = false;
 
 		public Slider()
 		{
@@ -127,6 +133,7 @@ namespace Lime
 			if (DragStarted != null) {
 				DragStarted();
 			}
+			dragging = true;
 		}
 
 		private void InterpolateGraphicsBetweenMinAndMaxMarkers()
@@ -154,10 +161,13 @@ namespace Lime
 
 		private void Release()
 		{
-			RaiseDragEnded();
-			RunThumbAnimation("Normal");
-			if (Input.IsMouseOwner()) {
-				Input.ReleaseMouse();
+			if (dragging || !EnableDraggingFix) {
+				RaiseDragEnded();
+				RunThumbAnimation("Normal");
+				if (Input.IsMouseOwner()) {
+					Input.ReleaseMouse();
+				}
+				dragging = false;
 			}
 		}
 
