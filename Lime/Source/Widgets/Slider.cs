@@ -38,12 +38,7 @@ namespace Lime
 
 		private float value;
 		private Widget thumb;
-		private bool dragging;
-
-		// buz: когда € попыталс€ применить слайдеры в GummyDrop, то столкнулс€ с тем, что событие Release вызываетс€ каждый кадр,
-		// из-за чего анимаци€ Thumb'а отображалась неправильно, а также не было возможности реализовать проигрывание звука при отпускании.
-		// я исправил, однако мой фикс что-то сломал в другом проекте, поэтому в качестве временного решени€ использую флажок.
-		static public bool EnableDraggingFix = false;
+		private bool mouseOwnerOnLastUpdate;
 
 		public Slider()
 		{
@@ -60,7 +55,8 @@ namespace Lime
 			get { return thumb ?? MaybeThumb("SliderThumb") ?? MaybeThumb("Thumb"); }
 		}
 
-		private Widget MaybeThumb(string name) {
+		private Widget MaybeThumb(string name)
+		{
 			if (thumb == null) {
 				thumb = Nodes.TryFind(name) as Widget;
 				if (thumb != null)
@@ -98,25 +94,26 @@ namespace Lime
 				if (Thumb.IsMouseOver()) {
 					StartDrag();
 					draggingJustBegun = true;
-				}
-				else if ((Options & SliderOptions.ClickOnRail) != 0 && IsMouseOver()) {
+				} else if ((Options & SliderOptions.ClickOnRail) != 0 && IsMouseOver()) {
 					StartDrag();
 					dragInitialDelta = 0;
 					dragInitialOffset = (Value - RangeMin) / (RangeMax - RangeMin);
 					draggingJustBegun = false;
 				}
-			}
-			else if (Input.IsMouseOwner() && !Input.IsMousePressed()) {
+			} else if (Input.IsMouseOwner() && !Input.IsMousePressed()) {
 				Release();
+				mouseOwnerOnLastUpdate = false;
 			}
 			if (Enabled && Input.IsMouseOwner()) {
 				SetValueFromCurrentMousePosition(draggingJustBegun);
 			}
 			InterpolateGraphicsBetweenMinAndMaxMarkers();
 			RefreshThumbPosition();
-			if (!Input.IsMouseOwner()) {
+			// Handle occasional mouse lose
+			if (!Input.IsMouseOwner() && mouseOwnerOnLastUpdate) {
 				Release();
 			}
+			mouseOwnerOnLastUpdate = Input.IsMouseOwner();
 		}
 
 		private void RaiseDragEnded()
@@ -133,7 +130,6 @@ namespace Lime
 			if (DragStarted != null) {
 				DragStarted();
 			}
-			dragging = true;
 		}
 
 		private void InterpolateGraphicsBetweenMinAndMaxMarkers()
@@ -161,13 +157,10 @@ namespace Lime
 
 		private void Release()
 		{
-			if (dragging || !EnableDraggingFix) {
-				RaiseDragEnded();
-				RunThumbAnimation("Normal");
-				if (Input.IsMouseOwner()) {
-					Input.ReleaseMouse();
-				}
-				dragging = false;
+			RaiseDragEnded();
+			RunThumbAnimation("Normal");
+			if (Input.IsMouseOwner()) {
+				Input.ReleaseMouse();
 			}
 		}
 
