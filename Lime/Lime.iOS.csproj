@@ -108,8 +108,6 @@
     <Compile Include="Source\Widgets\World.cs" />
     <Compile Include="Source\Application\Logger.cs" />
     <Compile Include="Source\Application\Application.cs" />
-    <Compile Include="Source\Types\TangerineClassAttribute.cs" />
-    <Compile Include="Source\Types\TangerinePropertyAttribute.cs" />
     <Compile Include="Source\Application\WinApi.cs" />
     <Compile Include="Source\AssetsBundle\AssetsBundle.cs" />
     <Compile Include="Source\AssetsBundle\PackedAssetsBundle.cs" />
