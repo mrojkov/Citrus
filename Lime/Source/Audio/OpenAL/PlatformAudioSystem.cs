@@ -50,15 +50,20 @@ namespace Lime
 		static AudioContext context;
 		static Thread streamingThread = null;
 		static volatile bool shouldTerminateThread;
-
+#if iOS
+		static NSObject interruptionNotification;
+#endif
+		
 		public static void Initialize()
 		{
 #if iOS
 			AVAudioSession.SharedInstance().Init();
-			AVAudioSession.Notifications.ObserveInterruption((sender, args) => {
+			interruptionNotification = AVAudioSession.Notifications.ObserveInterruption((sender, args) => {
 				if (args.InterruptionType == AVAudioSessionInterruptionType.Began) {
 					Active = false;
+					AVAudioSession.SharedInstance().SetActive(false);
 				} else if (args.InterruptionType == AVAudioSessionInterruptionType.Ended) {
+					AVAudioSession.SharedInstance().SetActive(true);
 					Active = true;
 				}
 			});	
@@ -98,21 +103,31 @@ namespace Lime
 				if (Active == value) {
 					return;
 				}
-#if !iOS
-				if (!value) {
-					PauseAll();
-				}
+
+				if (value) {
+					if (context != null) {
+						try {
+							context.MakeCurrent();
+#if iOS
+							context.Process();
 #endif
-				if (value && context != null) {
-					context.MakeCurrent();
+						} catch (AudioContextException) {
+							Logger.Write("Error: failed to resume OpenAL after interruption ended");
+						}
+					}
+#if !iOS
+					ResumeAll();
+#endif
 				} else {
+#if iOS
+					if (context != null) {
+						context.Suspend();
+					}
+#else
+					PauseAll();
+#endif
 					Alc.MakeContextCurrent(ContextHandle.Zero);
 				}
-#if !iOS
-				if (value) {
-					ResumeAll();
-				}
-#endif
 			}
 		}
 
@@ -131,6 +146,12 @@ namespace Lime
 				context.Dispose();
 				context = null;
 			}
+#if iOS
+			if (interruptionNotification != null) {
+				interruptionNotification.Dispose();
+				interruptionNotification = null;
+			}
+#endif
 		}
 
 		private static long tickCount;
