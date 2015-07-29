@@ -44,17 +44,19 @@ namespace Orange
 
 		private void Create()
 		{
-			NativeWindow = new Gtk.Window(Gtk.WindowType.Toplevel);
-
-			NativeWindow.Title = "Citrus Aurantium";
-			NativeWindow.WindowPosition = Gtk.WindowPosition.Center;
-			NativeWindow.DefaultSize = new Gdk.Size(500, 400);
-
-			var mainHBox = new Gtk.HBox();
-			mainHBox.Name = "MainHBox";
-			
-			var mainVBox = new Gtk.VBox() { Spacing = 6, BorderWidth = 6 };
-			mainVBox.Name = "MainVBox";
+			NativeWindow = new Gtk.Window(Gtk.WindowType.Toplevel) {
+				Title = "Citrus Aurantium",
+				WindowPosition = Gtk.WindowPosition.Center,
+				DefaultSize = new Gdk.Size(500, 400)
+			};
+			var mainHBox = new Gtk.HBox {
+				Name = "MainHBox"
+			};
+			var mainVBox = new Gtk.VBox {
+				Spacing = 6,
+				BorderWidth = 6,
+				Name = "MainVBox"
+			};
 
 			CreateHeaderSection(mainVBox);
 

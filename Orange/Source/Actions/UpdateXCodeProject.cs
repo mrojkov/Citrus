@@ -17,7 +17,8 @@ namespace Kill3.OrangePlugin
 			var builder = new Orange.SolutionBuilder(TargetPlatform.iOS);
 			var output = new StringBuilder();
 			builder.Clean();
-			if (builder.Build(output)) {
+			if (builder.Build(output))
+			{
 				The.UI.ScrollLogToEnd();
 				string allText = output.ToString();
 				foreach (var line in allText.Split('\n')) {
