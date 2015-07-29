@@ -8,7 +8,7 @@ namespace Orange
 {
 	static partial class Actions
 	{
-		[MenuItem("Rebuild Game")]
+		[MenuItem("Rebuild Game", 1)]
 		public static void RebuildGameAction()
 		{
 			if (The.UI.AskConfirmation("Are you sure you want to rebuild the game?")) {

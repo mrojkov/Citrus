@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
+using Orange.Source;
 
 namespace Orange
 {
@@ -48,74 +49,43 @@ namespace Orange
 
 		public static void CopyFile(string srcDir, string dstDir, string fileName)
 		{
-			string srcFile = Path.Combine(srcDir, fileName);
-			string dstFile = Path.Combine(dstDir, fileName);
+			var srcFile = Path.Combine(srcDir, fileName);
+			var dstFile = Path.Combine(dstDir, fileName);
 			Console.WriteLine("Copying: {0}", dstFile);
-			System.IO.File.Copy(srcFile, dstFile, true);
+			File.Copy(srcFile, dstFile, true);
 		}
 
 		public bool Build(StringBuilder output = null)
 		{
 			Console.WriteLine("------------- Building Application -------------");
 			CsprojSynchronization.SynchronizeAll();
-			string app, args, slnFile;
-#if MAC
-			app = "/Applications/Xamarin Studio.app/Contents/MacOS/mdtool";
-			if (platform == TargetPlatform.iOS) {
-				slnFile = Path.Combine(projectDirectory, projectName + ".iOS.sln");
-				args = String.Format("build \"{0}\" -t:Build -c:\"{1}|iPhone\"", slnFile, ConfigurationName);
-			} else {
-				slnFile = Path.Combine(projectDirectory, projectName + ".Mac.sln");
-				args = String.Format("build \"{0}\" -t:Build -c:\"{1}|x86\"", slnFile, ConfigurationName);
-			}
-#elif WIN
-			// Uncomment follow block if you would like to use mdtool instead of MSBuild
-			/*
-			app = @"C:\Program Files(x86)\MonoDevelop\bin\mdtool.exe";
-			slnFile = Path.Combine(projectDirectory, projectName + ".Win.sln");
-			args = String.Format("build \"{0}\" -t:Build -c:\"Release|x86\"", slnFile);
-			*/
-
-			app = Path.Combine(System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(), "MSBuild.exe");
-			slnFile = Path.Combine(projectDirectory, projectName + ".Win.sln");
-			args = String.Format("\"{0}\" /verbosity:minimal /p:Configuration={1}", slnFile, ConfigurationName);
-#endif
-			if (Process.Start(app, args, output: output) != 0) {
-				return false;
-			}
-			return true;
+			var buildSystem = GetBuildSystem();
+			buildSystem.PrepareForBuild();
+			return buildSystem.Execute(output) == 0;
 		}
 
 		public bool Clean()
 		{
 			Console.WriteLine("------------- Cleanup Game Application -------------");
-			string app, args, slnFile;
-#if MAC
-			app = "/Applications/Xamarin Studio.app/Contents/MacOS/mdtool";
-			if (platform == TargetPlatform.iOS) {
-				slnFile = Path.Combine(projectDirectory, projectName + ".iOS.sln");
-				args = String.Format("build \"{0}\" -t:Clean -c:\"{1}|iPhone\"", slnFile, ConfigurationName);
-			} else {
-				slnFile = Path.Combine(projectDirectory, projectName + ".Mac.sln");
-				args = String.Format("build \"{0}\" -t:Clean -c:\"{1}|x86\"", slnFile, ConfigurationName);
-			}
-#elif WIN
-			// Uncomment follow block if you would like to use mdtool instead of MSBuild
-			/*
-			app = @"C:\Program Files(x86)\MonoDevelop\bin\mdtool.exe";
-			slnFile = Path.Combine(projectDirectory, projectName + ".Win.sln");
-			args = String.Format("build \"{0}\" -t:Clean -c:\"Release|x86\"", slnFile);
-			*/
-
-			app = Path.Combine(System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(), "MSBuild.exe");
-			slnFile = Path.Combine(projectDirectory, projectName + ".Win.sln");
-			args = String.Format("\"{0}\" /t:Clean /p:Configuration={1}", slnFile, ConfigurationName);
-#endif
-			if (Process.Start(app, args) != 0) {
-				return false;
-			}
-			return true;
+			var buildSystem = GetBuildSystem();
+			buildSystem.PrepareForClean();
+			return buildSystem.Execute() == 0;
 		}
+
+		private BuildSystem GetBuildSystem()
+		{
+#if WIN
+			var buildSystem = new MSBuild(projectDirectory, projectName, platform);
+#elif MAC
+			var buildSystem = new MDTool(projectDirectory, projectName, platform);
+#else
+			throw new NotSupportedException();
+#endif
+			buildSystem.Configuration = ConfigurationName;
+			return buildSystem;
+		}
+
+
 
 		public string GetApplicationPath()
 		{
@@ -136,12 +106,12 @@ namespace Orange
 		{
 			Console.WriteLine("------------- Starting Application -------------");
 #if WIN
-			string app = GetApplicationPath();
+			var app = GetApplicationPath();
 
 			if (File.Exists(app)) {
-				string dir = Path.GetDirectoryName(app);
+				var dir = Path.GetDirectoryName(app);
 				using (new DirectoryChanger(dir)) {
-					int exitCode = Process.Start(app, arguments);
+					var exitCode = Process.Start(app, arguments);
 					return exitCode;
 				}
 			} else {
