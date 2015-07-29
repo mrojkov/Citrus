@@ -87,12 +87,13 @@ namespace Lime
 		public void Discard()
 		{
 			if (vboHandle != 0) {
+				var capturedVboHandle = vboHandle;
 				Application.InvokeOnMainThread(() => {
 #if !MAC
 					if (OpenTK.Graphics.GraphicsContext.CurrentContext == null)
 						return;
 #endif
-					GL.DeleteBuffers(1, new uint[] { vboHandle });
+					GL.DeleteBuffers(1, new uint[] { capturedVboHandle });
 				});
 				vboHandle = 0;
 			}

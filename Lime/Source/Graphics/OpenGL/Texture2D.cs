@@ -269,8 +269,9 @@ namespace Lime
 				AlphaTexture.Discard();
 			}
 			if (handle != 0) {
+				var capturedHandle = handle;
 				Application.InvokeOnMainThread(() => {
-					GL.DeleteTextures(1, new uint[] { handle });
+					GL.DeleteTextures(1, new uint[] { capturedHandle });
 				});
 				handle = 0;
 			}

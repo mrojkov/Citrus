@@ -39,8 +39,9 @@ namespace Lime
 		public void Discard()
 		{
 			if (handle != 0) {
+				var capturedHandle = handle;
 				Application.InvokeOnMainThread(() => {
-					GL.DeleteShader(handle);
+					GL.DeleteShader(capturedHandle);
 				});
 				handle = 0;
 			}

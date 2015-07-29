@@ -70,11 +70,12 @@ namespace Lime
 		public void Discard()
 		{
 			if (handle != 0) {
+				var capturedHandle = handle;
 				Application.InvokeOnMainThread(() => {
 #if MAC
-					GL.DeleteProgram(1, new int[] { handle });
+					GL.DeleteProgram(1, new int[] { capturedHandle });
 #else
-					GL.DeleteProgram(handle);
+					GL.DeleteProgram(capturedHandle);
 #endif
 				});
 				handle = 0;

@@ -91,15 +91,17 @@ namespace Lime
 		{
 			MemoryUsed = 0;
 			if (framebuffer != 0) {
+				var capturedFramebuffer = framebuffer;
 				Application.InvokeOnMainThread(() => {
-					GL.DeleteFramebuffers(1, new uint[] { framebuffer });
+					GL.DeleteFramebuffers(1, new uint[] { capturedFramebuffer });
 					PlatformRenderer.CheckErrors();
 				});
 				framebuffer = 0;
 			}
 			if (handle != 0) {
+				var capturedHandle = handle;
 				Application.InvokeOnMainThread(() => {
-					GL.DeleteTextures(1, new uint[] { handle });
+					GL.DeleteTextures(1, new uint[] { capturedHandle });
 					PlatformRenderer.CheckErrors();
 				});
 				handle = 0;
