@@ -42,13 +42,14 @@ namespace Orange
 			PluginLoader.FilterFiles(files);
 		}
 
-		public IEnumerable<FileInfo> Enumerate(string extension = null)
+		public List<FileInfo> Enumerate(string extension = null)
 		{
 			if (extension == null && EnumerationFilter == null) {
 				return files;
 			}
 			return files.Where(file => extension == null || Path.GetExtension(file.Path) == extension)
-				.Where(file => EnumerationFilter == null || EnumerationFilter(file));
+				.Where(file => EnumerationFilter == null || EnumerationFilter(file))
+				.ToList();
 		}
 	}
 }
