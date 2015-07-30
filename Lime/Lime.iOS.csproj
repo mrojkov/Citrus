@@ -226,6 +226,7 @@
     <Compile Include="Source\AssetsBundle\UnityDownloadableBundle.cs" />
     <Compile Include="Source\Types\BitSet32.cs" />
     <Compile Include="Source\Input\SoftKeyboard.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimationEngine.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
