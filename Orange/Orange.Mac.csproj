@@ -97,7 +97,6 @@
     <Compile Include="Source\The.cs" />
     <Compile Include="Source\Workspace.cs" />
     <Compile Include="Source\WorkspaceConfig.cs" />
-    <Compile Include="Source\Actions\Build.cs" />
     <Compile Include="Source\Actions\BuildGameAndRun.cs" />
     <Compile Include="Source\Actions\ExtractTangerineScenes.cs" />
     <Compile Include="Source\Actions\GenerateSerializerDll.cs" />
