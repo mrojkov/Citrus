@@ -27,7 +27,7 @@ namespace Lime
 				foreach (var i in items) {
 					if (!i.IsAlive) {
 						i.Target = item;
-						break;
+						return;
 					}
 				}
 				items.Add(new WeakReference(item));
