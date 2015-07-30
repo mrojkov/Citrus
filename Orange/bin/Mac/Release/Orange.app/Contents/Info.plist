@@ -15,7 +15,7 @@
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>BuildMachineOSBuild</key>
-	<string>14A389</string>
+	<string>14C109</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -35,17 +35,17 @@
 	<key>DTCompiler</key>
 	<string>com.apple.compilers.llvm.clang.1_0</string>
 	<key>DTPlatformBuild</key>
-	<string>6E35b</string>
+	<string>6A2008a</string>
 	<key>DTPlatformVersion</key>
 	<string>GM</string>
 	<key>DTSDKBuild</key>
-	<string>14A389</string>
+	<string>14C109</string>
 	<key>DTSDKName</key>
 	<string>macosx10.10</string>
 	<key>DTXcode</key>
-	<string>0640</string>
+	<string>0611</string>
 	<key>DTXcodeBuild</key>
-	<string>6E35b</string>
+	<string>6A2008a</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © gameforest</string>
 </dict>
