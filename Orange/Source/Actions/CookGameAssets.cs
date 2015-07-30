@@ -7,7 +7,7 @@ namespace Orange
 {
 	static partial class CookGameAssets
 	{
-		[MenuItem("Cook Game Assets", 1)]
+		[MenuItem("Cook Game Assets", 4)]
 		public static void CookGameAssetsAction()
 		{
 			AssetCooker.CookForActivePlatform();
