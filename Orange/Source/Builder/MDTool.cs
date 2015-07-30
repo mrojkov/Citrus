@@ -9,7 +9,7 @@ namespace Orange.Source
 			: base(projectDirectory, projectName, platform)
 		{
 #if MAC
-			BuilderPath = "/Applications/MDTool Studio.app/Contents/MacOS/mdtool";
+			BuilderPath = "/Applications/Xamarin Studio.app/Contents/MacOS/mdtool";
 #elif WIN
 			BuilderPath = @"C:\Program Files(x86)\MonoDevelop\bin\mdtool.exe";
 #endif
@@ -35,18 +35,20 @@ namespace Orange.Source
 			string platformSpecification;
 			switch (Platform) {
 				case TargetPlatform.iOS: {
-					platformSpecification = "iPhone";
+					platformSpecification = "|iPhone";
 					break;
 				}
 				case TargetPlatform.Desktop: {
-					platformSpecification = "x86";
+					// Need to research strange behaviour due to this string
+					//platformSpecification = "|x86";
+					platformSpecification = "";
 					break;
 				}
 				default: {
 					throw new NotSupportedException();
 				}
 			}
-			Args += string.Format(" -c:\"{0}|{1}\"", Configuration, platformSpecification);
+			Args += string.Format(" -c:\"{0}{1}\"", Configuration, platformSpecification);
 		}
 	}
 }
