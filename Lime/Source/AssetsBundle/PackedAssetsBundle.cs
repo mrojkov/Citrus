@@ -536,7 +536,8 @@ namespace Lime
 			if (resourcesAssembly != null) {
 				var stream = resourcesAssembly.GetManifestResourceStream(path);
 				if (stream == null) {
-					throw new Lime.Exception("Resource '{0}' doesn't exist", path);
+					throw new Lime.Exception("Resource '{0}' doesn't exist. Available resources: {1}", path,
+						string.Join(", ", resourcesAssembly.GetManifestResourceNames()));
 				}
 				return stream;
 			} else {
