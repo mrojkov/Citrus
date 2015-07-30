@@ -138,6 +138,10 @@
       <Project>{DC16EEBF-404D-4610-B87A-15B57464D707}</Project>
       <Name>Lime.MonoMac</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Lemon\Lemon.MonoMac.csproj">
+      <Project>{4604AA2E-129F-4814-AD0D-8BA35346ECC4}</Project>
+      <Name>Lemon.MonoMac</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Info.plist" />
