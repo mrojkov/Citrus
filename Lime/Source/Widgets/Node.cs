@@ -32,9 +32,11 @@ namespace Lime
 		/// </summary>
 		public event Action AnimationStopped;
 	
-		private int animationTime;
+		internal int animationTime;
 
 		internal protected bool GlobalValuesValid;
+
+		public AnimationEngine AnimationEngine = DefaultAnimationEngine.Instance;
 
 		#region properties
 #if WIN
@@ -220,15 +222,11 @@ namespace Lime
 		/// <param name="markerId">Название маркера анимации</param>
 		public bool TryRunAnimation(string markerId)
 		{
-			Marker marker = Markers.TryFind(markerId);
-			if (marker == null) {
-				return false;
+			if (AnimationEngine.TryRunAnimation(this, markerId)) {
+				AnimationStopped = null;
+				return true;
 			}
-			AnimationStopped = null;
-			AnimationFrame = marker.Frame;
-			CurrentAnimation = markerId;
-			IsRunning = true;
-			return true;
+			return false;
 		}
 
 		/// <summary>
@@ -608,84 +606,19 @@ namespace Lime
 		/// <param name="delta">Время в секундах</param>
 		public void AdvanceAnimation(float delta)
 		{
-			int deltaMs = (int)(delta * 1000 + 0.5f);
-			while (deltaMs > AnimationUtils.MsecsPerFrame) {
-				AdvanceAnimationShort(AnimationUtils.MsecsPerFrame);
-				deltaMs -= AnimationUtils.MsecsPerFrame;
-			}
-			AdvanceAnimationShort(deltaMs);
+			AnimationEngine.AdvanceAnimation(this, delta);
 		}
 
-		private void AdvanceAnimationShort(int delta)
-		{
-			if (IsRunning) {
-				int prevFrame = AnimationUtils.MsecsToFrames(animationTime - 1);
-				int currFrame = AnimationUtils.MsecsToFrames(animationTime + delta - 1);
-				animationTime += delta;
-				if (prevFrame != currFrame && Markers.Count > 0) {
-					Marker marker = Markers.GetByFrame(currFrame);
-					if (marker != null) {
-						ProcessMarker(marker, ref prevFrame, ref currFrame);
-					}
-				}
-				bool invokeTriggers = prevFrame != currFrame;
-				ApplyAnimators(invokeTriggers);
-				if (!IsRunning) {
-					OnAnimationStopped();
-				}
-			}
-		}
-
-		protected virtual void OnAnimationStopped()
+		internal protected virtual void OnAnimationStopped()
 		{
 			if (AnimationStopped != null) {
 				AnimationStopped();
 			}
 		}
 
-		private void ProcessMarker(Marker marker, ref int prevFrame, ref int currFrame)
-		{
-			switch (marker.Action) {
-				case MarkerAction.Jump:
-					var gotoMarker = Markers.TryFind(marker.JumpTo);
-					if (gotoMarker != null) {
-						int hopFrames = gotoMarker.Frame - AnimationFrame;
-						animationTime += AnimationUtils.FramesToMsecs(hopFrames);
-						prevFrame += hopFrames;
-						currFrame += hopFrames;
-						ProcessMarker(gotoMarker, ref prevFrame, ref currFrame);
-					}
-					break;
-				case MarkerAction.Stop:
-					animationTime = AnimationUtils.FramesToMsecs(marker.Frame);
-					prevFrame = currFrame - 1;
-					IsRunning = false;
-					break;
-				case MarkerAction.Destroy:
-					animationTime = AnimationUtils.FramesToMsecs(marker.Frame);
-					prevFrame = currFrame - 1;
-					IsRunning = false;
-					Unlink();
-					break;
-			}
-			if (marker.CustomAction != null) {
-				marker.CustomAction();
-			}
-		}
-
 		public void ApplyAnimators(bool invokeTriggers)
 		{
-			for (Node node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
-				var animators = node.Animators;
-				animators.Apply(animationTime);
-				if (invokeTriggers) {
-					animators.InvokeTriggers(AnimationFrame);
-				}
-				if (PropagateAnimation) {
-					node.animationTime = animationTime;
-					node.ApplyAnimators(invokeTriggers);
-				}
-			}
+			AnimationEngine.ApplyAnimators(this, invokeTriggers);
 		}
 
 		/// <summary>
