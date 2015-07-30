@@ -155,6 +155,7 @@
     <Compile Include="Source\Graphics\Unity\PlatformMesh.cs" />
     <Compile Include="Source\Graphics\Unity\PlatformRenderer.cs" />
     <Compile Include="Source\Application\OpenTKGameView.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimationEngine.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
