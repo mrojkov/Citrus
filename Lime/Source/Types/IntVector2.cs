@@ -15,9 +15,36 @@ namespace Lime
 		
 		[ProtoMember(2)]
 		public int Y;
-		
+
+		/// <summary>
+		/// Возвращает вектор (0, 0)
+		/// </summary>
 		public static readonly IntVector2 Zero = new IntVector2(0, 0);
+
+		/// <summary>
+		/// Возвращает вектор (1, 1)
+		/// </summary>
 		public static readonly IntVector2 One = new IntVector2(1, 1);
+
+		/// <summary>
+		/// Возвращает вектор (0, -1)
+		/// </summary>
+		public static readonly IntVector2 Up = new IntVector2(0, -1);
+
+		/// <summary>
+		/// Возвращает вектор (0, 1)
+		/// </summary>
+		public static readonly IntVector2 Down = new IntVector2(0, 1);
+
+		/// <summary>
+		/// Возвращает вектор (-1, 0)
+		/// </summary>
+		public static readonly IntVector2 Left = new IntVector2(-1, 0);
+
+		/// <summary>
+		/// Возвращает вектор (1, 0)
+		/// </summary>
+		public static readonly IntVector2 Right = new IntVector2(1, 0);
 
 		public IntVector2(int x, int y)
 		{
@@ -96,9 +123,9 @@ namespace Lime
 			return String.Format("{0}, {1}", X, Y);
 		}
 
-        public Vector2 ToVector2()
-        {
-            return new Vector2(X, Y);
-        }
+		public Vector2 ToVector2()
+		{
+			return new Vector2(X, Y);
+		}
 	}
 }
