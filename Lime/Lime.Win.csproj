@@ -228,10 +228,6 @@
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\iPhoneOSGraphicsContext.cs" />
     <Compile Include="Source\Application\OpenTK.Xamarin.iOS\Utilities.iPhone.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationEngine.cs" />
-    <Compile Include="Source\AnchorLayout.cs" />
-    <Compile Include="Source\Layout.cs" />
-    <Compile Include="Source\Margin.cs" />
-    <Compile Include="Source\TableLayout.cs" />
     <Compile Include="Source\RichUI\BorderedPane.cs" />
     <Compile Include="Source\RichUI\Button.cs" />
     <Compile Include="Source\RichUI\ColorGradient.cs" />
