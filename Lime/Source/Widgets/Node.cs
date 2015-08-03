@@ -541,17 +541,6 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Вызывает метод OnParentSizeChanged для себя и всех дочерних объектов (рекурсивно).
-		/// </summary>
-		public void RefreshLayout()
-		{
-			OnParentSizeChanged(Vector2.Zero);
-			for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
-				node.RefreshLayout();
-			}
-		}
-
-		/// <summary>
 		/// Этот метод масштабирует позицию и размер данного нода и всех его потомков.
 		/// Метод полезен для адаптирования сцены под экраны с нестандартным DPI.
 		/// Если позиция или размер виджета анинимированы, то ключи анимации также подвергаются соответствующему
@@ -566,15 +555,6 @@ namespace Lime
 				node.StaticScale(ratio, roundCoordinates);
 			}
 		}
-
-		protected void LayoutChildren(Vector2 sizeDelta)
-		{
-			for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
-				node.OnParentSizeChanged(sizeDelta);
-			}
-		}
-
-		protected virtual void OnParentSizeChanged(Vector2 parentSizeDelta) { }
 
 		[ThreadStatic]
 		private static Queue<Node> nodeSearchQueue;

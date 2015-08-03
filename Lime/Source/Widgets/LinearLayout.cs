@@ -7,6 +7,7 @@ using System.Text;
 namespace Lime
 {
 	[ProtoContract]
+	// TODO: Get rid of the class, use Widget.Layout technology instead.
 	public class LinearLayout : Node
 	{
 		[ProtoMember(1)]
@@ -15,7 +16,7 @@ namespace Lime
 		[ProtoMember(2)]
 		public bool ProcessHidden { get; set; }
 
-		public void Refresh()
+		public override void Update(float delta)
 		{
 			if (Parent != null && Parent.AsWidget != null) {
 				if (Horizontal) {
@@ -24,11 +25,6 @@ namespace Lime
 					UpdateForVerticalOrientation();
 				}
 			}
-		}
-
-		protected override void OnParentSizeChanged(Vector2 parentSizeDelta)
-		{
-			Refresh();
 		}
 
 		private void UpdateForHorizontalOrientation()

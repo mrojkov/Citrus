@@ -103,6 +103,13 @@ namespace Lime
 		/// </summary>
 		public Widget ParentWidget { get { return Parent != null ? Parent.AsWidget : null; } }
 
+		public Layout Layout = AnchorLayout.Instance;
+
+		/// <summary>
+		/// Keeps layout-specific data, used by parent widget's Layout. E.g: TableLayoutCell object, if parent widget has TableLayout.
+		/// </summary>
+		public object LayoutCell;
+
 		/// <summary>
 		/// Используется только для виджетов, умеющих отображать текст. Если виджет не умеет отображать текст, возвращает null
 		/// </summary>
@@ -270,7 +277,6 @@ namespace Lime
 					var sizeDelta = value - size;
 					size = value;
 					OnSizeChanged(sizeDelta);
-					LayoutChildren(sizeDelta);
 					InvalidateGlobalValuesAndCachedRenderer();
 				}
 			}
@@ -294,7 +300,15 @@ namespace Lime
 			base.Dispose();
 		}
 
-		protected virtual void OnSizeChanged(Vector2 sizeDelta) { }
+		public void RefreshLayout()
+		{
+			OnSizeChanged(Vector2.Zero);
+		}
+
+		protected virtual void OnSizeChanged(Vector2 sizeDelta)
+		{
+			Layout.OnSizeChanged(this, sizeDelta);
+		}
 
 		/// <summary>
 		/// Ширина (см свойство Size)
@@ -566,6 +580,7 @@ namespace Lime
 
 		public Widget()
 		{
+			Layout = AnchorLayout.Instance;
 			AsWidget = this;
 			Size = new Vector2(100, 100);
 			Color = Color4.White;
@@ -828,66 +843,6 @@ namespace Lime
 					node.AddToRenderChain(chain);
 				}
 				chain.Add(this);
-			}
-		}
-
-		protected override void OnParentSizeChanged(Vector2 parentSizeDelta)
-		{
-			if (Anchors == Anchors.None || ParentWidget == null) {
-				return;
-			}
-			Vector2 positionDelta;
-			Vector2 sizeDelta;
-			CalcXAndWidthDeltas(parentSizeDelta.X, out positionDelta.X, out sizeDelta.X);
-			CalcYAndHeightDeltas(parentSizeDelta.Y, out positionDelta.Y, out sizeDelta.Y);
-			ApplyPositionAndSizeDelta(positionDelta, sizeDelta);
-		}
-
-		private void CalcXAndWidthDeltas(float parentWidthDelta, out float xDelta, out float widthDelta)
-		{
-			xDelta = 0;
-			widthDelta = 0;
-			if ((Anchors & Anchors.CenterH) != 0) {
-				xDelta = parentWidthDelta * 0.5f;
-			} else if ((Anchors & Anchors.Left) != 0 && (Anchors & Anchors.Right) != 0) {
-				widthDelta = parentWidthDelta;
-				xDelta = parentWidthDelta * Pivot.X;
-			} else if ((Anchors & Anchors.Right) != 0) {
-				xDelta = parentWidthDelta;
-			}
-		}
-
-		private void CalcYAndHeightDeltas(float parentHeightDelta, out float yDelta, out float heightDelta)
-		{
-			yDelta = 0;
-			heightDelta = 0;
-			if ((Anchors & Anchors.CenterV) != 0) {
-				yDelta = parentHeightDelta * 0.5f;
-			} else if ((Anchors & Anchors.Top) != 0 && (Anchors & Anchors.Bottom) != 0) {
-				heightDelta = parentHeightDelta;
-				yDelta = parentHeightDelta * Pivot.Y;
-			} else if ((Anchors & Anchors.Bottom) != 0) {
-				yDelta = parentHeightDelta;
-			}
-		}
-
-		private void ApplyPositionAndSizeDelta(Vector2 positionDelta, Vector2 sizeDelta)
-		{
-			Position += positionDelta;
-			Size += sizeDelta;
-			if (Animators.Count <= 0) {
-				return;
-			}
-			Animator<Vector2> animator;
-			if (Animators.TryFind("Position", out animator)) {
-				foreach (var key in animator.Keys) {
-					key.Value += positionDelta;
-				}
-			}
-			if (Animators.TryFind("Size", out animator)) {
-				foreach (var key in animator.Keys) {
-					key.Value += sizeDelta;
-				}
 			}
 		}
 

@@ -80,6 +80,7 @@ namespace Lime
 
 		protected override void OnSizeChanged(Vector2 sizeDelta)
 		{
+			base.OnSizeChanged(sizeDelta);
 			Invalidate();
 		}
 
