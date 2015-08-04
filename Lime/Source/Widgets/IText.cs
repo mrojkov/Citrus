@@ -15,6 +15,8 @@ namespace Lime
 		Center,
 		[ProtoEnum]
 		Right,
+		[ProtoEnum]
+		Expand,
 	}
 
 	/// <summary>
@@ -29,6 +31,8 @@ namespace Lime
 		Center,
 		[ProtoEnum]
 		Bottom,
+		[ProtoEnum]
+		Expand,
 	}
 
 	[ProtoContract]
