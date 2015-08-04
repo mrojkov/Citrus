@@ -227,6 +227,10 @@
     <Compile Include="Source\Types\BitSet32.cs" />
     <Compile Include="Source\Input\SoftKeyboard.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationEngine.cs" />
+    <Compile Include="Source\Widgets\Layout\AnchorLayout.cs" />
+    <Compile Include="Source\Widgets\Layout\Layout.cs" />
+    <Compile Include="Source\Widgets\Layout\Margin.cs" />
+    <Compile Include="Source\Widgets\Layout\TableLayout.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
