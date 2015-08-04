@@ -104,7 +104,7 @@ namespace Lime
 		/// </summary>
 		public override bool WasClicked()
 		{
-			// If the button if hidden by clicking on it, it might became WasClicked forever.
+			// If the button is hidden by clicking on it, it might became WasClicked forever.
 			return wasClicked && GloballyVisible;
 		}
 
@@ -213,7 +213,10 @@ namespace Lime
 					if (isPressed) {
 						HandleClick();
 						if (!GloballyVisible) {
-							// buz: ���� � ���������� ������� �������� ������ ���� �������, �� �� ��� ��������� �� ���� ���������� �������� �������
+							// buz: don't play release animation
+							// if button's parent became invisible due to
+							// button press (or it will be played when
+							// parent is visible again)
 							skipReleaseAnimation = true;
 						}
 					}
