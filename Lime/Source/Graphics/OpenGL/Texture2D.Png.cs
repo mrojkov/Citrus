@@ -67,7 +67,7 @@ namespace Lime
 					PrepareOpenGLTexture();
 					PlatformRenderer.PushTexture(handle, 0);
 					var data = bitmap.LockBits(lockRect, SDI.ImageLockMode.ReadOnly, SDI.PixelFormat.Format24bppRgb);
-					SwapRedAndGreen24(data);
+					SwapRedAndBlue24(data);
 					GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, data.Width, data.Height, 0,
 						PixelFormat.Rgb, PixelType.UnsignedByte, data.Scan0);
 					bitmap.UnlockBits(data);
@@ -78,7 +78,7 @@ namespace Lime
 					PlatformRenderer.PushTexture(handle, 0);
 					var data = bitmap.LockBits(lockRect, SDI.ImageLockMode.ReadOnly, alphaStream != null ? SDI.PixelFormat.Format32bppArgb : SDI.PixelFormat.Format32bppPArgb);
 					if (alphaStream == null) {
-						SwapRedAndGreen32(data);
+						SwapRedAndBlue32(data);
 					}
 					GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width, data.Height, 0,
 						PixelFormat.Rgba, PixelType.UnsignedByte, data.Scan0);
@@ -90,7 +90,7 @@ namespace Lime
 			PlatformRenderer.CheckErrors();
 		}
 
-		private void SwapRedAndGreen24(SDI.BitmapData data)
+		private void SwapRedAndBlue24(SDI.BitmapData data)
 		{
 			unsafe {
 				for (int j = 0; j < data.Height; j++) {
@@ -107,7 +107,7 @@ namespace Lime
 			}
 		}
 
-		private void SwapRedAndGreen32(SDI.BitmapData data)
+		private void SwapRedAndBlue32(SDI.BitmapData data)
 		{
 			unsafe {
 				for (int j = 0; j < data.Height; j++) {
