@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 #if iOS || ANDROID
 using OpenTK.Graphics.ES20;
 #else
@@ -200,22 +201,32 @@ namespace Lime
 		/// Create texture from pixel array
 		/// </summary>
 		public void LoadImage(Color4[] pixels, int width, int height, bool generateMips)
+ 		{
+ 			reloader = new TexturePixelArrayReloader(pixels, width, height, generateMips);
+			var pinnedArray = GCHandle.Alloc(pixels, GCHandleType.Pinned);
+			var pointer = pinnedArray.AddrOfPinnedObject();
+			LoadImage(pointer, width, height, generateMips);
+			pinnedArray.Free();
+		}
+
+		internal void LoadImage(IntPtr pixels, int width, int height, bool generateMips)
 		{
-			reloader = new TexturePixelArrayReloader(pixels, width, height, generateMips);
-			Application.InvokeOnMainThread(() => {
-				PrepareOpenGLTexture();
-				PlatformRenderer.PushTexture(handle, 0);
-				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
-				MemoryUsed = 4 * width * height;
-				if (generateMips) {
+			if (!Application.IsMainThread)
+			{
+				throw new InvalidOperationException();
+			}
+			PrepareOpenGLTexture();
+			PlatformRenderer.PushTexture(handle, 0);
+			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
+			MemoryUsed = 4 * width * height;
+			if (generateMips) {
 #if !MAC && !iOS
-					GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
-					MemoryUsed += (int)(MemoryUsed * 0.33f);
+				GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+				MemoryUsed += (int)(MemoryUsed * 0.33f);
 #endif
-				}
-				PlatformRenderer.PopTexture(0);
-				PlatformRenderer.CheckErrors();
-			});
+			}
+			PlatformRenderer.PopTexture(0);
+			PlatformRenderer.CheckErrors();
 
 			ImageSize = new Size(width, height);
 			SurfaceSize = ImageSize;
