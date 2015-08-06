@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
 namespace Lime
 {
 	/// <summary>
@@ -9,7 +10,7 @@ namespace Lime
 	/// </summary>
 	public static class Mathf
 	{
-		public static readonly System.Random RandomGenerator = new System.Random();
+		public static System.Random RandomGenerator = new System.Random();
 
 		/// <summary>
 		/// Возвращает число Пи
@@ -223,7 +224,7 @@ namespace Lime
 			return new Vector2(CatmullRomSpline(t, p0.X, p1.X, p2.X, p3.X),
 				CatmullRomSpline(t, p0.Y, p1.Y, p2.Y, p3.Y));
 		}
-		
+
 		public static float CatmullRomSpline(float t, float p0, float p1, float p2, float p3)
 		{
 			float t2 = t * t;
@@ -249,8 +250,8 @@ namespace Lime
 			return result;
 		}
 
-		static Vector2[] sinTable0;
-		static Vector2[] sinTable1;
+		private static Vector2[] sinTable0;
+		private static Vector2[] sinTable1;
 
 		private static void BuildSinTable()
 		{
