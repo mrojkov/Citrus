@@ -1,4 +1,5 @@
 #if !UNITY
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +9,22 @@ namespace Lime
 {
 	public static class Input
 	{
+		public static class Simulator
+		{
+			public static void SetMousePosition(Vector2 position)
+			{
+				Input.MousePosition = position;
+			}
+
+			public static void SetKeyState(Key key, bool value)
+			{
+				Input.SetKeyState(key, value);
+			}
+		}
+
 		public const int MaxTouches = 4;
 
-		struct KeyEvent
+		private struct KeyEvent
 		{
 			public Key Key;
 			public bool State;
@@ -19,9 +33,9 @@ namespace Lime
 		private static Vector2[] touchPositions = new Vector2[MaxTouches];
 
 		private static List<KeyEvent> keyEventQueue = new List<KeyEvent>();
-		
-		static bool[] previousKeysState = new bool[(int)Key.KeyCount];
-		static bool[] currentKeysState = new bool[(int)Key.KeyCount];
+
+		private static bool[] previousKeysState = new bool[(int)Key.KeyCount];
+		private static bool[] currentKeysState = new bool[(int)Key.KeyCount];
 
 		/// <summary>
 		/// The matrix describes transition from pixels to virtual coordinates.
@@ -124,7 +138,7 @@ namespace Lime
 		{
 			touchPositions[index] = position;
 		}
-		
+
 		public static int GetNumTouches()
 		{
 			int j = 0;
@@ -134,14 +148,14 @@ namespace Lime
 			}
 			return j;
 		}
-		
+
 		public static string TextInput { get; internal set; }
 
 		internal static void SetKeyState(Key key, bool value)
 		{
 			keyEventQueue.Add(new KeyEvent { Key = key, State = value });
 		}
-		
+
 		internal static void ProcessPendingKeyEvents()
 		{
 			if (keyEventQueue.Count > 0) {
@@ -164,4 +178,5 @@ namespace Lime
 		}
 	}
 }
+
 #endif
