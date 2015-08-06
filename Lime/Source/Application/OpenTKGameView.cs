@@ -262,22 +262,22 @@ namespace Lime
 			base.Cursor = currentCursor;
 		}
 
-		public void SetCursor(string resourceName, IntVector2 hotSpot)
+		public void SetCursor(string resourceName, IntVector2 hotSpot, string assemblyName = null)
 		{
-			var cursor = GetCursor(resourceName, hotSpot);
+			var cursor = GetCursor(resourceName, hotSpot, assemblyName);
 			if (cursor != currentCursor) {
 				currentCursor = cursor;
 				base.Cursor = cursor;
 			}
 		}
 
-		private MouseCursor GetCursor(string resourceName, IntVector2 hotSpot)
+		private MouseCursor GetCursor(string resourceName, IntVector2 hotSpot, string assemblyName = null)
 		{
 			MouseCursor cursor;
 			if (cursors.TryGetValue(resourceName, out cursor)) {
 				return cursor;
 			}
-			cursor = CreateCursorFromResource(resourceName, hotSpot);
+			cursor = CreateCursorFromResource(resourceName, hotSpot, assemblyName);
 			cursors[resourceName] = cursor;
 			return cursor;
 		}
@@ -289,10 +289,13 @@ namespace Lime
 #endif
 		}
 
-		private MouseCursor CreateCursorFromResource(string resourceName, IntVector2 hotSpot)
+		private MouseCursor CreateCursorFromResource(string resourceName, IntVector2 hotSpot, string assemblyName = null)
 		{
-			var entryAssembly = System.Reflection.Assembly.GetEntryAssembly();
+			var entryAssembly = assemblyName == null
+				? System.Reflection.Assembly.GetEntryAssembly()
+				: System.Reflection.Assembly.Load(assemblyName);
 			var fullResourceName = entryAssembly.GetName().Name + "." + resourceName;
+			var a = entryAssembly.GetManifestResourceNames();
 			var stream = entryAssembly.GetManifestResourceStream(fullResourceName);
 
 			WriteToLog("Loading cursor {0}...", fullResourceName);
