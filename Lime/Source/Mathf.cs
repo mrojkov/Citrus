@@ -131,24 +131,44 @@ namespace Lime
 			return a + (b - a) * t;
 		}
 
+		public static float RandomFloat(this System.Random rng, float min, float max)
+		{
+			return rng.RandomFloat() * (max - min) + min;
+		}
+
 		public static float RandomFloat(float min, float max)
 		{
-			return RandomFloat() * (max - min) + min;
+			return RandomGenerator.RandomFloat(min, max);
+		}
+
+		public static bool RandomBool(this System.Random rng)
+		{
+			return rng.RandomInt(2) == 0;
 		}
 
 		public static bool RandomBool()
 		{
-			return RandomInt(2) == 0;
+			return RandomGenerator.RandomBool();
+		}
+
+		public static int RandomInt(this System.Random rng, int min, int max)
+		{
+			return rng.RandomInt(max - min + 1) + min;
 		}
 
 		public static int RandomInt(int min, int max)
 		{
-			return RandomInt(max - min + 1) + min;
+			return RandomGenerator.RandomInt(min, max);
+		}
+
+		public static T RandomOf<T>(this System.Random rng, params T[] objects)
+		{
+			return objects[rng.RandomInt(objects.Length)];
 		}
 
 		public static T RandomOf<T>(params T[] objects)
 		{
-			return objects[RandomInt(objects.Length)];
+			return RandomGenerator.RandomOf(objects);
 		}
 
 		/// <summary>
@@ -166,28 +186,48 @@ namespace Lime
 			}
 		}
 
+		public static int RandomInt(this System.Random rng, int maxValue)
+		{
+			return rng.Next(maxValue);
+		}
+
 		public static int RandomInt(int maxValue)
 		{
-			return RandomGenerator.Next(maxValue);
+			return RandomGenerator.RandomInt(maxValue);
+		}
+
+		public static float RandomFloat(this System.Random rng)
+		{
+			return (float)rng.NextDouble();
 		}
 
 		public static float RandomFloat()
 		{
-			return (float)RandomGenerator.NextDouble();
+			return RandomGenerator.RandomFloat();
 		}
 
-		public static float NormalRandom(float median, float dispersion)
+		public static float NormalRandom(this System.Random rng, float median, float dispersion)
 		{
 			float x = 0;
 			for (int i = 0; i < 12; ++i)
-				x += RandomFloat();
+				x += rng.RandomFloat();
 			x -= 6;
 			return median + x * dispersion;
 		}
 
+		public static float NormalRandom(float median, float dispersion)
+		{
+			return RandomGenerator.NormalRandom(median, dispersion);
+		}
+
+		public static float UniformRandom(this System.Random rng, float median, float dispersion)
+		{
+			return median + (rng.RandomFloat() - 0.5f) * dispersion;
+		}
+
 		public static float UniformRandom(float median, float dispersion)
 		{
-			return median + (RandomFloat() - 0.5f) * dispersion;
+			return RandomGenerator.UniformRandom(median, dispersion);
 		}
 
 		public static bool InRange(float x, float upper, float lower)
