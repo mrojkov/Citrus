@@ -1,5 +1,5 @@
-using System;
 using ProtoBuf;
+using System;
 
 namespace Lime
 {
@@ -42,12 +42,22 @@ namespace Lime
 			return Mathf.NormalRandom(Median, Dispersion);
 		}
 
+		public float NormalRandomNumber(System.Random rng)
+		{
+			return rng.NormalRandom(Median, Dispersion);
+		}
+
 		/// <summary>
 		/// Возвращает случайное число, полученное с учетом среднего значения и дисперсии
 		/// </summary>
 		public float UniformRandomNumber()
 		{
 			return Mathf.UniformRandom(Median, Dispersion);
+		}
+
+		public float UniformRandomNumber(System.Random rng)
+		{
+			return rng.UniformRandom(Median, Dispersion);
 		}
 
 		bool IEquatable<NumericRange>.Equals(NumericRange rhs)
