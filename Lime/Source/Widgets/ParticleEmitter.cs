@@ -1,7 +1,7 @@
-using System;
 using Lime;
-using System.Collections.Generic;
 using ProtoBuf;
+using System;
+using System.Collections.Generic;
 
 namespace Lime
 {
@@ -26,7 +26,7 @@ namespace Lime
 		/// <summary>
 		/// Частицы генерируются равномерно по границам эллипса, описанного по границам эмиттера
 		/// </summary>
-		[ProtoEnum]		
+		[ProtoEnum]
 		Ellipse,
 
 		/// <summary>
@@ -77,7 +77,7 @@ namespace Lime
 		/// <summary>
 		/// Частицы привязаны к контейнеру, в котором находится эмиттер
 		/// </summary>
-		[ProtoEnum]		
+		[ProtoEnum]
 		Parent,
 
 		/// <summary>
@@ -93,6 +93,8 @@ namespace Lime
 	[ProtoContract]
 	public partial class ParticleEmitter : Widget
 	{
+		internal static System.Random Rng = new System.Random();
+
 		/// <summary>
 		/// Частица, сгенерированная эмиттером
 		/// </summary>
@@ -101,94 +103,126 @@ namespace Lime
 		{
 			[ProtoMember(1)]
 			public int ModifierIndex;
+
 			public ParticleModifier Modifier;
+
 			// Position of particle with random motion.
 			[ProtoMember(2)]
 			public Vector2 FullPosition;
+
 			// Position if particle without random motion.
 			[ProtoMember(3)]
 			public Vector2 RegularPosition;
+
 			// Motion direction with random motion(in degrees).
 			[ProtoMember(4)]
 			public float FullDirection;
+
 			// Motion direction without random motion(in degrees).
 			[ProtoMember(5)]
 			public float RegularDirection;
+
 			// Veclocity of motion.
 			[ProtoMember(6)]
 			public float Velocity;
+
 			// Velocity of changing motion direction(degrees/sec).
 			[ProtoMember(7)]
 			public float AngularVelocity;
+
 			// Direction of particle windage(0 - right, 90 - down).
 			[ProtoMember(8)]
 			public float WindDirection;
-			// Velocity of particle windage. 
+
+			// Velocity of particle windage.
 			[ProtoMember(9)]
 			public float WindAmount;
+
 			// Direction of gravity(0 - right, 90 - down)
 			[ProtoMember(10)]
 			public float GravityDirection;
+
 			// Strength of gravity.
 			[ProtoMember(11)]
 			public float GravityAmount;
+
 			// Acceleration of gravity(calculated thru gravityAmount).
 			[ProtoMember(12)]
 			public float GravityAcceleration;
+
 			// Velocity of the particle caused by gravity(calculated thru gravityAcceleration).
 			[ProtoMember(13)]
 			public float GravityVelocity;
+
 			// Strength of magnet's gravity at the moment of particle birth.
 			[ProtoMember(14)]
 			public float MagnetAmountInitial;
+
 			// Strength of magnet's gravity in the current moment.
 			[ProtoMember(15)]
 			public float MagnetAmountCurrent;
+
 			// Scale of particle at the moment of particle birth.
 			[ProtoMember(16)]
 			public Vector2 ScaleInitial;
+
 			// Scale of particle in the current moment.
 			[ProtoMember(17)]
 			public Vector2 ScaleCurrent;
+
 			// Rotation of particle relative to its center.
 			[ProtoMember(18)]
 			public float Angle;
+
 			// Velocity of particle rotation(degrees/sec).
 			[ProtoMember(19)]
 			public float Spin;
+
 			// Age of particle in seconds.
 			[ProtoMember(20)]
 			public float Age;
+
 			// Full life time of particle in seconds.
 			[ProtoMember(21)]
 			public float Lifetime;
+
 			// Color of the particle at the moment of birth.
 			[ProtoMember(22)]
 			public Color4 ColorInitial;
+
 			// Current color of the particle.
 			[ProtoMember(23)]
 			public Color4 ColorCurrent;
+
 			// Velocty of random motion.
 			[ProtoMember(24)]
 			public float RandomMotionSpeed;
+
 			// Splined path of random particle motion.
 			[ProtoMember(25)]
 			public Vector2 RandomSplineVertex0;
+
 			[ProtoMember(26)]
 			public Vector2 RandomSplineVertex1;
+
 			[ProtoMember(27)]
 			public Vector2 RandomSplineVertex2;
+
 			[ProtoMember(28)]
 			public Vector2 RandomSplineVertex3;
+
 			// Current angle of spline control point, relative to center of random motion.
 			[ProtoMember(29)]
 			public float RandomRayDirection;
+
 			// Current offset of spline beginning(0..1).
 			[ProtoMember(30)]
 			public float RandomSplineOffset;
+
 			// Current texture of the particle.
 			[ProtoMember(31)]
 			public float TextureIndex;
+
 			// modifier.Animators.OverallDuration / LifeTime
 			[ProtoMember(32)]
 			public float AgeToFrame;
@@ -317,7 +351,7 @@ namespace Lime
 		/// </summary>
 		[ProtoMember(20)]
 		public NumericRange Velocity { get; set; }
-		
+
 		/// <summary>
 		/// Скорость вращения частиц
 		/// </summary>
@@ -373,9 +407,9 @@ namespace Lime
 		/// </summary>
 		[ProtoMember(29)]
 		public LinkedList<Particle> particles = new LinkedList<Particle>();
-		
-		static LinkedList<Particle> particlePool = new LinkedList<Particle>();
-		
+
+		private static LinkedList<Particle> particlePool = new LinkedList<Particle>();
+
 		public ParticleEmitter()
 		{
 			Shape = EmitterShape.Point;
@@ -411,8 +445,8 @@ namespace Lime
 		[ProtoAfterDeserialization]
 		public void AfterDeserialization()
 		{
-			// If particle was deserialized, particle.Modifier would be null. In some cases 
-			// particles are rendered before update, but particle.Modifier is required for 
+			// If particle was deserialized, particle.Modifier would be null. In some cases
+			// particles are rendered before update, but particle.Modifier is required for
 			// the render. AdvanceParticle() sets particle.Modifier.
 			foreach (var particle in particles) {
 				AdvanceParticle(particle, 0);
@@ -429,12 +463,13 @@ namespace Lime
 			return clone;
 		}
 
-		Widget GetBasicWidget()
+		private Widget GetBasicWidget()
 		{
-			switch(ParticlesLinkage) {
+			switch (ParticlesLinkage) {
 			case ParticlesLinkage.Parent:
-				return (Parent != null && !ParentWidget.IsRenderedToTexture()) ? 
+				return (Parent != null && !ParentWidget.IsRenderedToTexture()) ?
 					ParentWidget : null;
+
 			case ParticlesLinkage.Other: {
 				var widget = ParentWidget;
 				while (widget != null) {
@@ -452,27 +487,27 @@ namespace Lime
 
 		public static int NumberOfUpdatedParticles = 0;
 		public static bool GloballyEnabled = true;
-		
-		LinkedListNode<Particle> AllocParticle()
+
+		private LinkedListNode<Particle> AllocParticle()
 		{
 			LinkedListNode<Particle> result;
 			if (particlePool.Count == 0) {
 				result = new LinkedListNode<Particle>(new Particle());
 			} else {
-			 	result = particlePool.First;
+				result = particlePool.First;
 				particlePool.RemoveFirst();
 			}
 			particles.AddLast(result);
 			return result;
 		}
-		
-		void FreeParticle(LinkedListNode<Particle> particleNode)
+
+		private void FreeParticle(LinkedListNode<Particle> particleNode)
 		{
 			particles.Remove(particleNode);
 			particlePool.AddFirst(particleNode);
 		}
 
-		void UpdateHelper(float delta)
+		private void UpdateHelper(float delta)
 		{
 			delta *= Speed;
 			if (ImmortalParticles) {
@@ -529,14 +564,14 @@ namespace Lime
 				UpdateHelper(delta);
 		}
 
-		Vector2 GenerateRandomMotionControlPoint(ref float rayDirection)
+		private Vector2 GenerateRandomMotionControlPoint(ref float rayDirection)
 		{
-			rayDirection += RandomMotionRotation.UniformRandomNumber();
+			rayDirection += RandomMotionRotation.UniformRandomNumber(Rng);
 			Vector2 result = Vector2.HeadingDeg(rayDirection);
 			NumericRange radius = RandomMotionRadius;
 			if (radius.Dispersion == 0)
 				radius.Dispersion = radius.Median;
-			result *= Math.Abs(radius.NormalRandomNumber());
+			result *= Math.Abs(radius.NormalRandomNumber(Rng));
 			if (RandomMotionAspectRatio != 1f && RandomMotionAspectRatio > 0f) {
 				result.X *= RandomMotionAspectRatio;
 				result.Y /= RandomMotionAspectRatio;
@@ -544,7 +579,7 @@ namespace Lime
 			return result;
 		}
 
-		bool InitializeParticle(Particle p)
+		private bool InitializeParticle(Particle p)
 		{
 			Color4 color;
 			Matrix32 transform;
@@ -560,58 +595,62 @@ namespace Lime
 			float emitterAngle = transform.U.Atan2Deg;
 
 			NumericRange aspectRatioVariationPair = new NumericRange(0, Math.Max(0.0f, AspectRatio.Dispersion));
-			float zoom = Zoom.NormalRandomNumber();
+			float zoom = Zoom.NormalRandomNumber(Rng);
 			float aspectRatio = Math.Max(0.00001f, AspectRatio.Median *
-				(1 + Math.Abs(aspectRatioVariationPair.NormalRandomNumber())) /
-				(1 + Math.Abs(aspectRatioVariationPair.NormalRandomNumber())));
+				(1 + Math.Abs(aspectRatioVariationPair.NormalRandomNumber(Rng))) /
+				(1 + Math.Abs(aspectRatioVariationPair.NormalRandomNumber(Rng))));
 
 			p.TextureIndex = 0.0f;
-			p.Velocity = Velocity.NormalRandomNumber() * emitterScaleAmount;
+			p.Velocity = Velocity.NormalRandomNumber(Rng) * emitterScaleAmount;
 			p.ScaleInitial = emitterScale * new Vector2(zoom * aspectRatio, zoom / aspectRatio);
 			p.ScaleCurrent = p.ScaleInitial;
-			p.WindDirection = WindDirection.UniformRandomNumber();
-			p.WindAmount = WindAmount.NormalRandomNumber() * emitterScaleAmount;
+			p.WindDirection = WindDirection.UniformRandomNumber(Rng);
+			p.WindAmount = WindAmount.NormalRandomNumber(Rng) * emitterScaleAmount;
 			p.GravityVelocity = 0.0f;
 			p.GravityAcceleration = 0.0f;
-			p.GravityAmount = GravityAmount.NormalRandomNumber() * emitterScaleAmount;
-			p.GravityDirection = GravityDirection.NormalRandomNumber();
-			p.MagnetAmountInitial = MagnetAmount.NormalRandomNumber();
-			p.Lifetime = Math.Max(Lifetime.NormalRandomNumber(), 0.1f);
+			p.GravityAmount = GravityAmount.NormalRandomNumber(Rng) * emitterScaleAmount;
+			p.GravityDirection = GravityDirection.NormalRandomNumber(Rng);
+			p.MagnetAmountInitial = MagnetAmount.NormalRandomNumber(Rng);
+			p.Lifetime = Math.Max(Lifetime.NormalRandomNumber(Rng), 0.1f);
 			p.Age = 0.0f;
-			p.AngularVelocity = AngularVelocity.NormalRandomNumber();
-			p.Angle = Orientation.UniformRandomNumber() + emitterAngle;
-			p.Spin = Spin.NormalRandomNumber();
+			p.AngularVelocity = AngularVelocity.NormalRandomNumber(Rng);
+			p.Angle = Orientation.UniformRandomNumber(Rng) + emitterAngle;
+			p.Spin = Spin.NormalRandomNumber(Rng);
 			p.ColorInitial = color;
 			p.ColorCurrent = color;
-			p.RandomRayDirection = (new NumericRange(0, 360)).UniformRandomNumber();
+			p.RandomRayDirection = (new NumericRange(0, 360)).UniformRandomNumber(Rng);
 			p.RandomSplineVertex0 = GenerateRandomMotionControlPoint(ref p.RandomRayDirection);
 			p.RandomSplineVertex1 = Vector2.Zero;
 			p.RandomSplineVertex2 = GenerateRandomMotionControlPoint(ref p.RandomRayDirection);
 			p.RandomSplineVertex3 = GenerateRandomMotionControlPoint(ref p.RandomRayDirection);
-			p.RandomMotionSpeed = RandomMotionSpeed.NormalRandomNumber();
+			p.RandomMotionSpeed = RandomMotionSpeed.NormalRandomNumber(Rng);
 			p.RandomSplineOffset = 0;
 
 			Vector2 position;
-			switch(Shape) {
+			switch (Shape) {
 			case EmitterShape.Point:
 				position = 0.5f * Size;
-				p.RegularDirection = Direction.UniformRandomNumber() + emitterAngle - 90.0f;
+				p.RegularDirection = Direction.UniformRandomNumber(Rng) + emitterAngle - 90.0f;
 				break;
+
 			case EmitterShape.Line:
-				position = new Vector2(Mathf.RandomFloat() * Size.X, Size.Y * 0.5f);
-				p.RegularDirection = Direction.UniformRandomNumber() + emitterAngle - 90.0f;
+				position = new Vector2(Rng.RandomFloat() * Size.X, Size.Y * 0.5f);
+				p.RegularDirection = Direction.UniformRandomNumber(Rng) + emitterAngle - 90.0f;
 				break;
+
 			case EmitterShape.Ellipse:
-				float angle = Mathf.RandomFloat(0, 360);
+				float angle = Rng.RandomFloat(0, 360);
 				Vector2 sincos = Vector2.HeadingDeg(angle);
 				position = 0.5f * ((sincos + Vector2.One) * Size);
-				p.RegularDirection = Direction.UniformRandomNumber() + emitterAngle - 90 + angle;
+				p.RegularDirection = Direction.UniformRandomNumber(Rng) + emitterAngle - 90 + angle;
 				break;
+
 			case EmitterShape.Area:
-				position.X = Mathf.RandomFloat() * Size.X;
-				position.Y = Mathf.RandomFloat() * Size.Y;
-				p.RegularDirection = Direction.UniformRandomNumber() + emitterAngle - 90.0f;
+				position.X = Rng.RandomFloat() * Size.X;
+				position.Y = Rng.RandomFloat() * Size.Y;
+				p.RegularDirection = Direction.UniformRandomNumber(Rng) + emitterAngle - 90.0f;
 				break;
+
 			default:
 				throw new Lime.Exception("Invalid particle emitter shape");
 			}
@@ -620,7 +659,7 @@ namespace Lime
 			p.ModifierIndex = -1;
 			p.Modifier = null;
 			for (int counter = 0; counter < 10; counter++) {
-				int i = Mathf.RandomInt(Nodes.Count);
+				int i = Rng.RandomInt(Nodes.Count);
 				p.Modifier = Nodes[i] as ParticleModifier;
 				if (p.Modifier != null) {
 					p.ModifierIndex = i;
@@ -629,14 +668,14 @@ namespace Lime
 			}
 			if (p.ModifierIndex < 0)
 				return false;
-			
+
 			int duration = p.Modifier.Animators.GetOverallDuration();
 			p.AgeToFrame = duration / p.Lifetime;
 
 			if (EmissionType == EmissionType.Inner)
 				p.RegularDirection += 180;
 			else if ((EmissionType & EmissionType.Inner) != 0) {
-				if (Mathf.RandomInt(2) == 0)
+				if (Rng.RandomInt(2) == 0)
 					p.RegularDirection += 180;
 			} else if (EmissionType == 0)
 				return false;
@@ -661,7 +700,7 @@ namespace Lime
 			}
 		}
 
-		bool AdvanceParticle(Particle p, float delta)
+		private bool AdvanceParticle(Particle p, float delta)
 		{
 			NumberOfUpdatedParticles++;
 			p.Age += delta;
@@ -670,7 +709,7 @@ namespace Lime
 				p.Modifier = Nodes[p.ModifierIndex] as ParticleModifier;
 			}
 			var modifier = p.Modifier;
-			
+
 			if (p.AgeToFrame > 0) {
 				p.Modifier.Animators.Apply(AnimationUtils.FramesToMsecs((int)(p.Age * p.AgeToFrame)));
 			}
@@ -761,7 +800,7 @@ namespace Lime
 			return true;
 		}
 
-		void RenderParticle(Particle p, Matrix32 matrix, Color4 color)
+		private void RenderParticle(Particle p, Matrix32 matrix, Color4 color)
 		{
 			if (p.ColorCurrent.A <= 0) {
 				return;
