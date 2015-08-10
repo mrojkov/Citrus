@@ -1,90 +1,36 @@
-#if WIN
-using Microsoft.Win32;
+﻿#if WIN
 using System;
-using System.IO;
-using System.Diagnostics;
-using System.Drawing;
+using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Forms;
+using CefSharp;
+using Lime.Chromium;
 
 namespace Lime
 {
-	public class WebBrowser : Widget
+	public class WebBrowser : Image
 	{
-		private class HiddenForm : Form
+		private ChromiumWebBrowser browser;
+		private Texture2D texture = new Texture2D();
+		private int mouseWheelSpeed = 100;
+		private CefEventFlags modifiers = CefEventFlags.None;
+
+		public Uri Url
 		{
-			protected override CreateParams CreateParams
-			{
-				get
-				{
-					var p = base.CreateParams;
-					p.ExStyle |= 0x80; // WS_EX_TOOLWINDOW
-					return p;
-				}
-			}
+			get { return new Uri(browser.Address); }
+			set { browser.Load(value.AbsoluteUri); }
 		}
 
-		public Uri Url { get { return browser.Url; } set { browser.Url = value; } }
-
-		private System.Windows.Forms.WebBrowser browser;
-		private Form form;
-
-		private static void SetBrowserFeatureControlKey(string feature, string appName, UInt32 value)
+		public WebBrowser()
 		{
-			using (var key = Registry.CurrentUser.CreateSubKey(
-				@"Software\Microsoft\Internet Explorer\Main\FeatureControl\" + feature,
-				RegistryKeyPermissionCheck.ReadWriteSubTree)
-			) {
-				key.SetValue(appName, value, RegistryValueKind.DWord);
-			}
-		}
-
-		private static UInt32 GetIEVersion()
-		{
-			using (var ieKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Internet Explorer",
-				RegistryKeyPermissionCheck.ReadSubTree,
-				System.Security.AccessControl.RegistryRights.QueryValues)
-			) {
-				var version = ieKey.GetValue("svcVersion") ?? ieKey.GetValue("Version") ?? "IE required";
-				return UInt32.Parse(version.ToString().Split('.')[0]);
-			}
-		}
-
-		private static UInt32 GetBrowserEmulationMode()
-		{
-			switch (GetIEVersion()) {
-				case 7: return 7000;
-				case 8: return 8000;
-				case 9: return 9000;
-				case 10: return 10000;
-				case 11: return 11001; // [sic]
-				default: return 10000;
-			}
-		}
-
-		static WebBrowser()
-		{
-			// By default embedded IE emulates version 7.0. We need to add ourselves to registry to enable more recent versiion.
-			// http://msdn.microsoft.com/en-us/library/ee330720(v=vs.85).aspx
-
-			var fileName = Path.GetFileName(Process.GetCurrentProcess().MainModule.FileName);
-			var ideNames = new[] { "devenv.exe", "xdesproc.exe" };
-			if (ideNames.Any(s => String.Equals(fileName, s, StringComparison.InvariantCultureIgnoreCase)))
-				return;
-			SetBrowserFeatureControlKey("FEATURE_BROWSER_EMULATION", fileName, GetBrowserEmulationMode());
-		}
-
-		public WebBrowser() : base()
-		{
-			Application.Instance.Moved += CalcGeometry;
-			var mainForm = Control.FromHandle(System.Diagnostics.Process.GetCurrentProcess().MainWindowHandle);
-			form = new HiddenForm();
-			form.StartPosition = FormStartPosition.Manual;
-			form.FormBorderStyle = FormBorderStyle.None;
-			form.ShowInTaskbar = false;
-			browser = new System.Windows.Forms.WebBrowser();
-			browser.Parent = form;
-			browser.ScriptErrorsSuppressed = true;
+			Texture = texture;
+			var browserSettings = new BrowserSettings {
+				OffScreenTransparentBackground = false
+			};
+			browser = new ChromiumWebBrowser(browserSettings: browserSettings) {
+				LifeSpanHandler = new LifeSpanHandler()
+			};
+			browser.NewScreenshot += LoadTexture;
+			Tasks.Add(HandleInput());
 		}
 
 		public WebBrowser(Widget parentWidget)
@@ -93,69 +39,194 @@ namespace Lime
 			AddToWidget(parentWidget);
 		}
 
-		private IntRectangle CalculateAABBInWorldSpace(Widget widget)
+		private void LoadTexture(object sender, EventArgs eventArgs)
 		{
-			var aabb = widget.CalcAABBInSpaceOf(World.Instance);
-			var viewport = Renderer.Viewport;
-			var scale = new Vector2(viewport.Width, viewport.Height) / World.Instance.Size;
-			return new IntRectangle(
-				(viewport.X + aabb.Left * scale.X).Round(),
-				(viewport.Y + aabb.Top * scale.Y).Round(),
-				(viewport.X + aabb.Right * scale.X).Round(),
-				(viewport.Y + aabb.Bottom * scale.Y).Round()
-			);
-		}
-
-		private IntRectangle SysToIntRect(System.Drawing.Rectangle r)
-		{
-			return new IntRectangle(r.Left, r.Top, r.Right, r.Bottom);
-		}
-
-		private void CalcGeometry()
-		{
-			if (form == null)
+			var bitmapInfo = browser.BitmapInfo;
+			if (bitmapInfo == null)
 				return;
-			var r = IntRectangle.Intersect(
-				CalculateAABBInWorldSpace(this),
-				SysToIntRect(GameView.Instance.ClientRectangle)
-			).OffsetBy(new IntVector2(GameView.Instance.X, GameView.Instance.Y));
-			form.Left = r.Left;
-			form.Top = r.Top;
-			form.Width = r.Width;
-			form.Height = r.Height;
-			browser.SetBounds(0, 0, form.Width, form.Height);
+			Application.InvokeOnMainThread(() => {
+				var bitmapPointer = bitmapInfo.BackBufferHandle;
+				SwapRedAndBlue32(bitmapPointer, browser.Size.Width * browser.Size.Height);
+				texture.LoadImage(bitmapPointer, browser.Size.Width, browser.Size.Height, false);
+			});
 		}
 
-		public override void Render()
+		public override void Dispose()
 		{
-			if (form == null)
-				return;
-			if (GloballyVisible) {
-				CalcGeometry();
-				form.Show();
-				form.BringToFront();
-			}
-			else {
-				form.Hide();
+			base.Dispose();
+			browser.Dispose();
+			texture.Dispose();
+		}
+
+		protected override void OnSizeChanged(Vector2 sizeDelta)
+		{
+			if (browser != null) {
+				browser.Size = new Size((int) Size.X, (int) Size.Y);
 			}
 		}
 
 		public void AddToWidget(Widget parentWidget)
 		{
-			parentWidget.AddNode(this);
+			AddToNode(parentWidget);
 			Anchors = Anchors.LeftRightTopBottom;
+			CenterOnParent();
 			Size = parentWidget.Size;
 		}
 
-		public override void Dispose()
+		private IEnumerator<object> HandleInput()
 		{
-			if (browser != null) {
-				Application.InvokeOnMainThread(browser.Dispose);
-				browser = null;
+			while (true) {
+				UpdateModifiers();
+				HandleMouse();
+				HandleKeyboard();
+				yield return null;
 			}
-			if (form != null) {
-				Application.InvokeOnMainThread(form.Dispose);
-				form = null;
+		}
+
+		private void HandleMouse()
+		{
+			var position = Input.MousePosition - GlobalPosition;
+			var x = (int)position.X;
+			var y = (int)position.Y;
+			if (IsMouseOver()) {
+				browser.SendMouseMove(x, y, false, modifiers);
+			}
+			else {
+				browser.SendMouseMove(-1, -1, true, modifiers);
+			}
+			HandleLeftMouseButton(x, y);
+			HandleRightMouseButton(x, y);
+			HandleMouseWheel(x, y);
+		}
+
+		private void HandleLeftMouseButton(int x, int y)
+		{
+			HandleMouseButton(x, y, 0, 0);
+		}
+
+		private void HandleRightMouseButton(int x, int y)
+		{
+			HandleMouseButton(x, y, 1, 2);
+		}
+
+		private void HandleMouseWheel(int x, int y)
+		{
+			HandleMouseButton(x, y, 2, 1);
+			if (Input.WasKeyPressed(Key.MouseWheelUp)) {
+				browser.SendMouseWheelEvent(x, y, 0, mouseWheelSpeed);
+			}
+			if (Input.WasKeyPressed(Key.MouseWheelDown)) {
+				browser.SendMouseWheelEvent(x, y, 0, -mouseWheelSpeed);
+			}
+		}
+
+		private void HandleMouseButton(int x, int y, int limeButton, int chromiumButon)
+		{
+			if (Input.WasMousePressed(limeButton)) {
+				browser.SendMouseClick(x, y, chromiumButon, false, modifiers);
+			}
+			if (Input.WasMouseReleased(limeButton)) {
+				browser.SendMouseClick(x, y, chromiumButon, true, modifiers);
+			}
+		}
+
+		private void HandleKeyboard()
+		{
+			HandleKeys();
+			HandleTextInput();
+		}
+
+		private void HandleKeys()
+		{
+			var keys = Enum.GetValues(typeof(Key))
+				.Cast<int>()
+				.Distinct()
+				.Cast<Key>();
+			foreach (var key in keys) {
+				var cefKey = CefButtonKeyMap.GetButton(key);
+				if (cefKey == null) {
+					continue;
+				}
+				if (Input.WasKeyPressed(key)) {
+					browser.SendKeyPress((int)CefMessage.KeyDown, (int)cefKey, modifiers);
+					// OpenTK doesn't get character for Enter
+					if (cefKey == CefKey.Return) {
+						browser.SendKeyPress((int)CefMessage.Char, '\r', modifiers);
+					}
+				}
+				if (Input.WasKeyReleased(key)) {
+					browser.SendKeyPress((int)CefMessage.KeyUp, (int)cefKey, modifiers);
+				}
+			}
+		}
+
+		private void HandleTextInput()
+		{
+			if (Input.TextInput == null) {
+				return;
+			}
+			foreach (var character in Input.TextInput) {
+				browser.SendKeyPress((int)CefMessage.Char, character, modifiers);
+			}
+		}
+
+		private void UpdateModifiers()
+		{
+			modifiers = 0;
+
+			if (Input.IsMousePressed(0))
+			{
+				modifiers |= CefEventFlags.LeftMouseButton;
+			}
+			if (Input.IsMousePressed(2))
+			{
+				modifiers |= CefEventFlags.MiddleMouseButton;
+			}
+			if (Input.IsMousePressed(1))
+			{
+				modifiers |= CefEventFlags.RightMouseButton;
+			}
+
+			if (Input.IsKeyPressed(Key.LControl))
+			{
+				modifiers |= CefEventFlags.ControlDown | CefEventFlags.IsLeft;
+			}
+
+			if (Input.IsKeyPressed(Key.RControl))
+			{
+				modifiers |= CefEventFlags.ControlDown | CefEventFlags.IsRight;
+			}
+
+			if (Input.IsKeyPressed(Key.LShift))
+			{
+				modifiers |= CefEventFlags.ShiftDown | CefEventFlags.IsLeft;
+			}
+
+			if (Input.IsKeyPressed(Key.RShift))
+			{
+				modifiers |= CefEventFlags.ShiftDown | CefEventFlags.IsRight;
+			}
+
+			if (Input.IsKeyPressed(Key.LAlt))
+			{
+				modifiers |= CefEventFlags.AltDown | CefEventFlags.IsLeft;
+			}
+
+			if (Input.IsKeyPressed(Key.RAlt))
+			{
+				modifiers |= CefEventFlags.AltDown | CefEventFlags.IsRight;
+			}
+		}
+
+		private void SwapRedAndBlue32(IntPtr data, int count)
+		{
+			unsafe {
+				var p = (uint*) data;
+				while (count-- > 0) {
+					// ABGR -> ARGB
+					var pixel = *p;
+					*p++ = (pixel & 0xFF00FF00U) | (pixel & 0x000000FFU) << 16 | (pixel & 0x00FF0000U) >> 16;
+				}
 			}
 		}
 	}
