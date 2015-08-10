@@ -32,7 +32,6 @@ namespace Lime
 			throw new NotImplementedException();
 		}
 #elif WIN
-		// TODO: Deal with duplicating code
 		private void InitWithPngOrJpgBitmap(Stream stream, Stream alphaStream)
 		{
 			if (!Application.IsMainThread) {
@@ -91,7 +90,6 @@ namespace Lime
 			PlatformRenderer.CheckErrors();
 		}
 
-		// TODO: Use bitwise operations instead of simple assigning
 		private void SwapRedAndBlue24(SDI.BitmapData data)
 		{
 			unsafe {
@@ -109,7 +107,6 @@ namespace Lime
 			}
 		}
 
-		// TODO: Use bitwise operations instead of simple assigning
 		private void SwapRedAndBlue32(SDI.BitmapData data)
 		{
 			unsafe {
@@ -129,7 +126,6 @@ namespace Lime
 			}
 		}
 
-		// TODO: Use bitwise operations instead of simple assigning
 		private void MixColorAndAlphaAndSwapRB(SDI.BitmapData colorData24, SDI.BitmapData alphaData32)
 		{
 			// alphaData's R goes to alphaData's A
@@ -153,7 +149,6 @@ namespace Lime
 			}
 		}
 
-		// TODO: Use bitwise operations instead of simple assigning
 		private void CopyRedToAlphaChannelAndFillWhite(SDI.BitmapData data)
 		{
 			unsafe {
