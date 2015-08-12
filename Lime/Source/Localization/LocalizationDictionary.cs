@@ -40,6 +40,16 @@ namespace Lime
 	public class LocalizationDictionary : Dictionary<string, LocalizationEntry>
 	{
 		/// <summary>
+		/// Счётчик добавленных комментариев. Нужен чтобы заносить в словарь каждый комментарий с уникальным айди
+		/// </summary>
+		private int commentsCounter;
+
+		/// <summary>
+		/// Префикс ключа для комментариев
+		/// </summary>
+		private const string commentKeyPrefix = "_COMMENT";
+
+		/// <summary>
 		/// Получить значение по ключу
 		/// </summary>
 		public LocalizationEntry GetEntry(string key)
@@ -65,6 +75,28 @@ namespace Lime
 			var e = GetEntry(key);
 			e.Text = text;
 			e.Context = context;
+		}
+
+		/// <summary>
+		/// Проверяет не является ли ключ специальным ключом для комментариев
+		/// </summary>
+		/// <param name="key"></param>
+		/// <returns></returns>
+		public static bool IsComment(string key)
+		{
+			return key.StartsWith(commentKeyPrefix);
+		}
+
+		/// <summary>
+		/// Добавляет в словарь запись комментария
+		/// </summary>
+		/// <param name="comment">Текст комментария</param>
+		public void AddComment(string comment)
+		{
+			var e = GetEntry(commentKeyPrefix + commentsCounter.ToString());
+			e.Context = comment;
+
+			commentsCounter += 1;
 		}
 
 		/// <summary>

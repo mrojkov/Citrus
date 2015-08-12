@@ -43,7 +43,7 @@ namespace Orange
 				}
 			}
 			foreach (var key in current.Keys.ToList()) {
-				if (!modified.ContainsKey(key)) {
+				if (!modified.ContainsKey(key) && !LocalizationDictionary.IsComment(key)) {
 					Logger.Write("- " + key);
 					deleted++;
 					current.Remove(key);

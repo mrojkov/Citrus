@@ -22,16 +22,23 @@ namespace Lime
 				string line = r.ReadLine();
 				while (line != null) {
 					line = line.Trim();
-					if (!ValidateKey(line))
+					if (ValidateComment(line) || ValidateSpace(line)) {
+						dictionary.AddComment(ValidateSpace(line) ? null : line.Substring(1).Trim());
+						line = r.ReadLine();
+						continue;
+					}
+					if (!ValidateKey(line)) {
 						throw new Lime.Exception("Invalid key format: {0}", line);
+					}
 					var key = Unescape(line.Substring(1, line.Length - 2));
 					string context = null;
 					string text = "";
 					while (true) {
 						line = r.ReadLine();
-						if (line == null || ValidateKey(line))
+						var isCommentAfterValue = line != null && !string.IsNullOrEmpty(text) && ValidateComment(line);
+						if (line == null || ValidateKey(line) || isCommentAfterValue)
 							break;
-						if (line.Length > 0 && line[0] == '#') {
+						if (ValidateComment(line)) {
 							context = (context ?? "") + line.Substring(1).Trim() + '\n';
 						} else {
 							text += line + '\n';
@@ -52,18 +59,38 @@ namespace Lime
 			return l >= 2 && s[0] == '[' && s[l - 1] == ']';
 		}
 
+		private static bool ValidateComment(string s)
+		{
+			return s.Length > 0 && s[0] == '#';
+		}
+
+		private static bool ValidateSpace(string s)
+		{
+			return s == "";
+		}
+
 		public void Write(LocalizationDictionary dictionary, Stream stream)
 		{
 			using (var w = new StreamWriter(stream, new UTF8Encoding(true))) {
 				foreach (var p in dictionary) {
-					w.WriteLine('[' + Escape(p.Key) + ']');
-					if (!string.IsNullOrEmpty(p.Value.Context)) {
-						foreach (var i in p.Value.Context.Split('\n')) {
-							w.WriteLine("# " + i);
+					if (LocalizationDictionary.IsComment(p.Key)) {
+						if (!string.IsNullOrEmpty(p.Value.Context)) {
+							foreach (var i in p.Value.Context.Split('\n')) {
+								w.WriteLine("# " + i);
+							}
+						} else {
+							w.WriteLine();
 						}
+					} else {
+						w.WriteLine('[' + Escape(p.Key) + ']');
+						if (!string.IsNullOrEmpty(p.Value.Context)) {
+							foreach (var i in p.Value.Context.Split('\n')) {
+								w.WriteLine("# " + i);
+							}
+						}
+						w.WriteLine(p.Value.Text);
+						w.WriteLine();
 					}
-					w.WriteLine(p.Value.Text);
-					w.WriteLine();
 				}
 			}
 		}
