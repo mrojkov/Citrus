@@ -1,8 +1,6 @@
 using System;
 using System.IO;
-using Lime;
-using System.Reflection;
-using System.Collections.Generic;
+using Gtk;
 
 namespace Orange
 {
@@ -20,12 +18,12 @@ namespace Orange
 				
 		class LogWriter : TextWriter
 		{
-			Gtk.TextView textView;
+			TextView textView;
 #if !WIN
 			int bufferedLines;
 #endif
 			
-			public LogWriter(Gtk.TextView textView)
+			public LogWriter(TextView textView)
 			{
 				this.textView = textView;
 			}
@@ -39,8 +37,8 @@ namespace Orange
 			{
 				#pragma warning disable 618
 				textView.Buffer.Insert(textView.Buffer.EndIter, value);
-				while (Gtk.Application.EventsPending())
-					Gtk.Application.RunIteration();
+				while (Application.EventsPending())
+					Application.RunIteration();
 #if !WIN
 				if (bufferedLines > 4) {
 					bufferedLines = 0;
@@ -76,44 +74,45 @@ namespace Orange
 
 		public override bool AskConfirmation(string text)
 		{
-			var box = new Gtk.MessageDialog(NativeWindow,
-				Gtk.DialogFlags.Modal, Gtk.MessageType.Question,
-				Gtk.ButtonsType.YesNo,
+			var box = new MessageDialog(NativeWindow,
+				DialogFlags.Modal, MessageType.Question,
+				ButtonsType.YesNo,
 				text);
 			box.Title = "Orange";
 			box.Modal = true;
-			int result = box.Run();
+			var result = box.Run();
 			box.Destroy();
-			return result == (int)Gtk.ResponseType.Yes;
+			return result == (int)ResponseType.Yes;
 		}
 
 		public override bool AskChoice(string text, out bool yes)
 		{
-			var dialog = new Gtk.Dialog("Orange", NativeWindow, Gtk.DialogFlags.Modal,
-				Gtk.Stock.Yes, Gtk.ResponseType.Yes,
-				Gtk.Stock.No, Gtk.ResponseType.No,
-				Gtk.Stock.Cancel, Gtk.ResponseType.Cancel);
-			var label = new Gtk.Label(text);
-			label.Justify = Gtk.Justification.Center;
+			var dialog = new Dialog("Orange", NativeWindow, DialogFlags.Modal,
+				Stock.Yes, ResponseType.Yes,
+				Stock.No, ResponseType.No,
+				Stock.Cancel, ResponseType.Cancel);
+			var label = new Label(text) {
+				Justify = Justification.Center
+			};
 			label.SetPadding(50, 30);
 			dialog.VBox.Add(label);
 			dialog.ShowAll();
-			int result = dialog.Run();
+			var result = dialog.Run();
 			dialog.Destroy();
-			yes = (result == (int)Gtk.ResponseType.Yes);
-			return (result == (int)Gtk.ResponseType.Yes) || (result == (int)Gtk.ResponseType.No);
+			yes = (result == (int)ResponseType.Yes);
+			return (result == (int)ResponseType.Yes) || (result == (int)ResponseType.No);
 		}
 
 		public override void RefreshMenu()
 		{
 			var picker = ActionPicker;
 			var activeText = picker.ActiveText;
-			int count = picker.Model.IterNChildren();
-			for (int i = 0; i < count; i++) {
+			var count = picker.Model.IterNChildren();
+			for (var i = 0; i < count; i++) {
 				picker.RemoveText(0);
 			}
-			int active = 0;
-			int c = 0;
+			var active = 0;
+			var c = 0;
 			var items = The.MenuController.GetVisibleAndSortedItems();
 			foreach (var item in items) {
 				picker.AppendText(item.Label);
@@ -126,14 +125,14 @@ namespace Orange
 		}
 
 
-		private void Execute(Action action)
+		private void Execute(System.Action action)
 		{
 			if (!CheckTargetAvailability())
 				return;
-			DateTime startTime = DateTime.Now;
+			var startTime = DateTime.Now;
 			The.Workspace.Save();
 			EnableControls(false);
-			var platform = (TargetPlatform)this.PlatformPicker.Active;
+			var platform = (TargetPlatform)PlatformPicker.Active;
 			try {
 				try {
 					ClearLog();
@@ -143,8 +142,8 @@ namespace Orange
 					}
 					The.Workspace.AssetFiles.Rescan();
 					action();
-				} catch (System.Exception exc) {
-					System.Exception deepestException = exc;
+				} catch (Exception exc) {
+					var deepestException = exc;
 					while (deepestException.InnerException != null) {
 						deepestException = deepestException.InnerException;
 					}
@@ -159,11 +158,11 @@ namespace Orange
 
 		private void EnableControls(bool value)
 		{
-			this.GoButton.Sensitive = value;
-			this.ActionPicker.Sensitive = value;
-			this.PlatformPicker.Sensitive = value;
-			this.CitrusProjectChooser.Sensitive = value;
-			this.UpdateBeforeBuildCheckbox.Sensitive = value;
+			GoButton.Sensitive = value;
+			ActionPicker.Sensitive = value;
+			PlatformPicker.Sensitive = value;
+			CitrusProjectChooser.Sensitive = value;
+			UpdateBeforeBuildCheckbox.Sensitive = value;
 		}
 
 		public override bool DoesNeedSvnUpdate()
@@ -173,14 +172,14 @@ namespace Orange
 
 		void ShowTimeStatistics(DateTime startTime)
 		{
-			DateTime endTime = DateTime.Now;
-			TimeSpan delta = endTime - startTime;
+			var endTime = DateTime.Now;
+			var delta = endTime - startTime;
 			Console.WriteLine("Elapsed time {0}:{1}:{2}", delta.Hours, delta.Minutes, delta.Seconds);
 		}
 
 		bool citrusProjectChooserRecursed = false;
 
-		void CitrusProjectChooser_SelectionChanged(object sender, System.EventArgs e)
+		void CitrusProjectChooser_SelectionChanged(object sender, EventArgs e)
 		{
 			if (!citrusProjectChooserRecursed) {
 				citrusProjectChooserRecursed = true;
@@ -194,7 +193,7 @@ namespace Orange
 			}
 		}
 
-		void GoButton_Clicked(object sender, System.EventArgs e)
+		void GoButton_Clicked(object sender, EventArgs e)
 		{
 			var menuItem = The.MenuController.Items.Find(i => i.Label == ActionPicker.ActiveText);
 			if (menuItem != null) {
@@ -204,9 +203,9 @@ namespace Orange
 
 		private bool CheckTargetAvailability()
 		{
-			var platform = (TargetPlatform)this.PlatformPicker.Active;
+			var platform = (TargetPlatform)PlatformPicker.Active;
 #if WIN
-			if (platform == Orange.TargetPlatform.iOS) {
+			if (platform == TargetPlatform.iOS) {
 				ShowError("iOS target is not supported on Windows platform");
 				return false;
 			}
@@ -222,19 +221,19 @@ namespace Orange
 
 		public override void ShowError(string message)
 		{
-			var dialog = new Gtk.MessageDialog(NativeWindow,
-				Gtk.DialogFlags.DestroyWithParent,
-				Gtk.MessageType.Error, Gtk.ButtonsType.Close,
+			var dialog = new MessageDialog(NativeWindow,
+				DialogFlags.DestroyWithParent,
+				MessageType.Error, ButtonsType.Close,
 				message);
 			dialog.Title = "Orange";
 			dialog.Run();
 			dialog.Destroy();
 		}
 
-		protected void Window_Hidden(object sender, System.EventArgs e)
+		protected void Window_Hidden(object sender, EventArgs e)
 		{
 			The.Workspace.Save();
-			Gtk.Application.Quit();
+			Application.Quit();
 		}
 	}
 }

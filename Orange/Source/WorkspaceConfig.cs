@@ -4,7 +4,7 @@ using ProtoBuf;
 
 namespace Orange
 {
-    [ProtoContract]
+	[ProtoContract]
 	public class WorkspaceConfig
 	{
 		[ProtoMember(1)]

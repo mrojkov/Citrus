@@ -1,21 +1,22 @@
 using System;
 using System.IO;
+using Gtk;
 
 namespace Orange
 {
 	public partial class MainWindow : UserInterface
 	{
-		public Gtk.Window NativeWindow;
-		public Gtk.FileChooserButton CitrusProjectChooser;
-		public Gtk.ComboBox PlatformPicker;
-		public Gtk.TextView OutputPane;
-		public Gtk.ComboBox ActionPicker;
-		public Gtk.CheckButton UpdateBeforeBuildCheckbox;
-		public Gtk.Button GoButton;
+		public Window NativeWindow;
+		public FileChooserButton CitrusProjectChooser;
+		public ComboBox PlatformPicker;
+		public TextView OutputPane;
+		public ComboBox ActionPicker;
+		public CheckButton UpdateBeforeBuildCheckbox;
+		public Button GoButton;
 
 		public override void Initialize()
 		{
-			Gtk.Application.Init();
+			Application.Init();
 
 			Create();
 			TextWriter writer = new LogWriter(OutputPane);
@@ -26,13 +27,13 @@ namespace Orange
 
 			CreateMenuItems();
 			The.Workspace.Load();
-			Gtk.Application.Run();
+			Application.Run();
 		}
 
 		public override void ProcessPendingEvents()
 		{
-			while (Gtk.Application.EventsPending()) {
-				Gtk.Application.RunIteration();
+			while (Application.EventsPending()) {
+				Application.RunIteration();
 			}
 		}
 
@@ -44,15 +45,15 @@ namespace Orange
 
 		private void Create()
 		{
-			NativeWindow = new Gtk.Window(Gtk.WindowType.Toplevel) {
+			NativeWindow = new Window(WindowType.Toplevel) {
 				Title = "Citrus Aurantium",
-				WindowPosition = Gtk.WindowPosition.Center,
+				WindowPosition = WindowPosition.Center,
 				DefaultSize = new Gdk.Size(500, 400)
 			};
-			var mainHBox = new Gtk.HBox {
+			var mainHBox = new HBox {
 				Name = "MainHBox"
 			};
-			var mainVBox = new Gtk.VBox {
+			var mainVBox = new VBox {
 				Spacing = 6,
 				BorderWidth = 6,
 				Name = "MainVBox"
@@ -76,46 +77,46 @@ namespace Orange
 			NativeWindow.ShowAll();
 		}
 
-		private Gtk.Widget CreateFooterSection()
+		private Widget CreateFooterSection()
 		{
-			var hbox = new Gtk.HBox();
+			var hbox = new HBox();
 			
 			// ActionPicker section
-			ActionPicker = Gtk.ComboBox.NewText();
+			ActionPicker = ComboBox.NewText();
 			hbox.PackStart(ActionPicker);
 			hbox.Spacing = 5;
 
 			// GoButton section
-			this.GoButton = new Gtk.Button() { WidthRequest = 80, Label = "Go" };
+			GoButton = new Button() { WidthRequest = 80, Label = "Go" };
 			hbox.PackEnd(GoButton, expand: false, fill: true, padding: 0);
 			return hbox;
 		}
 
-		private Gtk.Widget CreateOutputPane()
+		private Widget CreateOutputPane()
 		{
-			var scrolledWindow = new Gtk.ScrolledWindow() { ShadowType = Gtk.ShadowType.In };
-			OutputPane = new Gtk.TextView() {
+			var scrolledWindow = new ScrolledWindow() { ShadowType = ShadowType.In };
+			OutputPane = new TextView() {
 				CanFocus = true,
 				Editable = false,
 				CursorVisible = false
 			};
-			scrolledWindow.Add(this.OutputPane);
+			scrolledWindow.Add(OutputPane);
 			return scrolledWindow;
 		}
 
-		private void CreateHeaderSection(Gtk.VBox mainVBox)
+		private void CreateHeaderSection(VBox mainVBox)
 		{
-			var table = new Gtk.Table(2, 2, homogeneous: false) { 
+			var table = new Table(2, 2, homogeneous: false) { 
 				RowSpacing = 6, 
 				ColumnSpacing = 6
 			};
 			
 			// Platform section
-			var label1 = new Gtk.Label() { Xalign = 1, LabelProp = "Target platform" };
-			table.Attach(label1, 0, 1, 0, 1, xoptions: Gtk.AttachOptions.Fill, yoptions: 0,
+			var label1 = new Label() { Xalign = 1, LabelProp = "Target platform" };
+			table.Attach(label1, 0, 1, 0, 1, xoptions: AttachOptions.Fill, yoptions: 0,
 				xpadding: 0, ypadding: 0);
 
-			PlatformPicker = Gtk.ComboBox.NewText();
+			PlatformPicker = ComboBox.NewText();
 			PlatformPicker.AppendText("Desktop (PC, Mac, Linux)");
 			PlatformPicker.AppendText("iPhone/iPad");
 			PlatformPicker.AppendText("Android");
@@ -125,16 +126,16 @@ namespace Orange
 			table.Attach(PlatformPicker, 1, 2, 0, 1);
 
 			// Citrus project section
-			var label2 = new Gtk.Label() { Xalign = 1, LabelProp = "Citrus Project" };
-			table.Attach(label2, 0, 1, 1, 2, xoptions: Gtk.AttachOptions.Fill, yoptions: 0,
+			var label2 = new Label() { Xalign = 1, LabelProp = "Citrus Project" };
+			table.Attach(label2, 0, 1, 1, 2, xoptions: AttachOptions.Fill, yoptions: 0,
 				xpadding: 0, ypadding: 0);
 
-			CitrusProjectChooser = new Gtk.FileChooserButton("Select a File", Gtk.FileChooserAction.Open);
+			CitrusProjectChooser = new FileChooserButton("Select a File", FileChooserAction.Open);
 			table.Attach(CitrusProjectChooser, 1, 2, 1, 2);
 			CitrusProjectChooser.FileSet += CitrusProjectChooser_SelectionChanged;
 			
 			// Svn update section
-			UpdateBeforeBuildCheckbox = new Gtk.CheckButton() { Xalign = 1, Label = "Update project before build" };
+			UpdateBeforeBuildCheckbox = new CheckButton() { Xalign = 1, Label = "Update project before build" };
 
 			// Pack everything to vbox
 			mainVBox.PackStart(table, expand: false, fill: false, padding: 0);
