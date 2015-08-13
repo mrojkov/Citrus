@@ -236,6 +236,10 @@
     <Compile Include="Source\Widgets\Layout\Layout.cs" />
     <Compile Include="Source\Widgets\Layout\Margin.cs" />
     <Compile Include="Source\Widgets\Layout\TableLayout.cs" />
+    <Compile Include="Source\Widgets\WebBrowser.Android.cs" />
+    <Compile Include="Source\Widgets\WebBrowser.iOS.cs" />
+    <Compile Include="Source\Widgets\WebBrowser.Mac.cs" />
+    <Compile Include="Source\Widgets\WebBrowser.Win.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
