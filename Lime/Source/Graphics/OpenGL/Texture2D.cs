@@ -209,7 +209,7 @@ namespace Lime
 			pinnedArray.Free();
 		}
 
-		internal void LoadImage(IntPtr pixels, int width, int height, bool generateMips)
+		public void LoadImage(IntPtr pixels, int width, int height, bool generateMips)
 		{
 			if (!Application.IsMainThread)
 			{
