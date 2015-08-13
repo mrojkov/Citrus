@@ -25,7 +25,7 @@ namespace Lime
 			AddToWidget(parentWidget);
 		}
 
-		private void AddToWidget(Widget parentWidget)
+		public void AddToWidget(Widget parentWidget)
 		{
 			parentWidget.AddNode(this);
 			Anchors = Anchors.LeftRightTopBottom;
