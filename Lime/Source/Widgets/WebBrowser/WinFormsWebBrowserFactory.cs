@@ -1,4 +1,5 @@
-﻿namespace Lime
+﻿#if WIN
+namespace Lime
 {
 	class WinFormsWebBrowserFactory: IWebBrowserFactory
 	{
@@ -8,3 +9,4 @@
 		}
 	}
 }
+#endif

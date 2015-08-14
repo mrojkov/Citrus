@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if WIN
+using System;
 
 namespace Lime
 {
@@ -11,3 +12,4 @@ namespace Lime
 		void OnSizeChanged(Widget widget, Vector2 sizeDelta);
 	}
 }
+#endif
