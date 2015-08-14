@@ -159,8 +159,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Source\Version.cs" />
     <Compile Include="Source\Application\Debug.cs" />
-    <Compile Include="Source\Widgets\WebBrowser.Win.cs" />
-    <Compile Include="Source\Widgets\WebBrowser.iOS.cs" />
     <Compile Include="Source\Application\CommandLineArgs.cs" />
     <Compile Include="Source\Application\ExternalStorageLagsSimulator.cs" />
     <Compile Include="Source\Application\FPSCalculator.cs" />
@@ -174,7 +172,6 @@
     <Compile Include="Source\Graphics\OpenGL\PlatformRenderer.cs" />
     <Compile Include="Source\Graphics\OpenGL\VertexBuffer.cs" />
     <Compile Include="Source\Widgets\WidgetCachedRenderer.cs" />
-    <Compile Include="Source\Widgets\WebBrowser.Mac.cs" />
     <Compile Include="Source\Localization\Localization.cs" />
     <Compile Include="Source\Localization\LocalizationDictionary.cs" />
     <Compile Include="Source\Localization\LocalizationDictionaryTextSerializer.cs" />
@@ -185,7 +182,6 @@
     <Compile Include="Source\Widgets\TextStyle.cs" />
     <Compile Include="Source\Application\AndroidGameView.cs" />
     <Compile Include="Source\Graphics\Bitmap.Android.cs" />
-    <Compile Include="Source\Widgets\WebBrowser.Android.cs" />
     <Compile Include="Source\Widgets\ListView\ExpandableListItem.cs" />
     <Compile Include="Source\Widgets\ListView\ListView.ItemDrag.cs" />
     <Compile Include="Source\Widgets\ListView\ListView.RefreshGesture.cs" />
@@ -231,6 +227,14 @@
     <Compile Include="Source\Widgets\Layout\Layout.cs" />
     <Compile Include="Source\Widgets\Layout\Margin.cs" />
     <Compile Include="Source\Widgets\Layout\TableLayout.cs" />
+    <Compile Include="Source\Widgets\WebBrowser\IWebBrowserFactory.cs" />
+    <Compile Include="Source\Widgets\WebBrowser\IWebBrowserImplementation.cs" />
+    <Compile Include="Source\Widgets\WebBrowser\WebBrowser.Android.cs" />
+    <Compile Include="Source\Widgets\WebBrowser\WebBrowser.Mac.cs" />
+    <Compile Include="Source\Widgets\WebBrowser\WebBrowser.Win.cs" />
+    <Compile Include="Source\Widgets\WebBrowser\WebBrowser.iOS.cs" />
+    <Compile Include="Source\Widgets\WebBrowser\WinFormsWebBrowser.cs" />
+    <Compile Include="Source\Widgets\WebBrowser\WinFormsWebBrowserFactory.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
