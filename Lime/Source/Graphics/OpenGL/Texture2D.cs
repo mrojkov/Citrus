@@ -201,8 +201,8 @@ namespace Lime
 		/// Create texture from pixel array
 		/// </summary>
 		public void LoadImage(Color4[] pixels, int width, int height, bool generateMips)
- 		{
- 			reloader = new TexturePixelArrayReloader(pixels, width, height, generateMips);
+		{
+			reloader = new TexturePixelArrayReloader(pixels, width, height, generateMips);
 			var pinnedArray = GCHandle.Alloc(pixels, GCHandleType.Pinned);
 			var pointer = pinnedArray.AddrOfPinnedObject();
 			LoadImage(pointer, width, height, generateMips);
@@ -294,16 +294,17 @@ namespace Lime
 				Discard();
 			}
 		}
+
 		private void Reload()
 		{
-			if (reloader != null) {
-				reloader.Reload(this);
-			} else {
-				Application.InvokeOnMainThread(() => {
+			Application.InvokeOnMainThread(() => {
+				if (reloader != null) {
+					reloader.Reload(this);
+				} else {
 					PrepareOpenGLTexture();
 					PlatformRenderer.CheckErrors();
-				});
-			}
+				}
+			});
 		}
 
 		/// <summary>
