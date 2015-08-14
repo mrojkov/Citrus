@@ -8,7 +8,6 @@ using Exception = Lime.Exception;
 
 namespace ChromiumWebBrowser
 {
-	// TODO: Extract ILimeWebBrowser to support other implementations
 	/// <summary>
 	///		An offscreen instance of Chromium that you can use to render
 	///		webpages or evaluate JavaScript.
@@ -106,6 +105,7 @@ namespace ChromiumWebBrowser
 		// It can be done via creating new class that implements IMenuHandler and assigning it to
 		// this property.
 		// https://github.com/cefsharp/CefSharp/issues/943#issuecomment-92788784
+		// Or, when CefSharp 43 released we can get from there
 		public IMenuHandler MenuHandler { get; set; }
 
 		public IFocusHandler FocusHandler { get; set; }
