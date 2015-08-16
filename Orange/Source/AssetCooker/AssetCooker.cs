@@ -104,6 +104,10 @@ namespace Orange
 			}
 			if (platform != TargetPlatform.Unity) {
 				var bundlePath = The.Workspace.GetBundlePath(bundleName);
+
+				// Create directory for bundle if it placed in subdirectory
+				Directory.CreateDirectory(Path.GetDirectoryName(bundlePath)); 
+
 				PackedAssetsBundle.RefreshBundleCheckSum(bundlePath);
 			}
 		}
