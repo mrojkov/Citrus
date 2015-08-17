@@ -117,7 +117,7 @@ namespace Lime
 		public static void ClearRenderTarget(float r, float g, float b, float a)
 		{
 			GL.ClearColor(r, g, b, a);
-			GL.Clear(ClearBufferMask.ColorBufferBit);
+			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 		}
 
 		public static void SetTexture(ITexture texture, int stage)

@@ -40,7 +40,7 @@ namespace Orange
 			// It is assumed that the second <ItemGroup> tag contains compile items
 			var compileItems = itemGroups[1];
 			foreach (var file in new FileEnumerator(".").Enumerate(".cs")) {
-				var path = ToWindowsSlashes(file.Path);
+				var path = Toolbox.ToWindowsSlashes(file.Path);
 				if (Path.GetFileName(path).StartsWith("TemporaryGeneratedFile")) {
 					continue;
 				}
@@ -83,22 +83,12 @@ namespace Orange
 		{
 			foreach (var item in group.EnumerateElements("Compile")) {
 				var path = item.Attributes["Include"].Value;
-				if (!File.Exists(ToUnixSlashes(path)) || IsPathIgnored(path)) {
+				if (!File.Exists(Toolbox.ToUnixSlashes(path)) || IsPathIgnored(path)) {
 					group.RemoveChild(item);
 					changed = true;
 					Console.WriteLine("Removed a missing file: " + path);
 				}
 			}
-		}
-
-		static string ToWindowsSlashes(string path)
-		{
-			return path.Replace('/', '\\');
-		}
-
-		static string ToUnixSlashes(string path)
-		{
-			return path.Replace('\\', '/');
 		}
 
 		private static IEnumerable<XmlNode> EnumerateElements(this XmlNode parent, string tag)
@@ -117,7 +107,7 @@ namespace Orange
 				return false;
 			}
 			// Ignore .cs files related to sub-projects 
-			var dir = ToUnixSlashes(filePath);
+			var dir = Toolbox.ToUnixSlashes(filePath);
 			while (true) {
 				dir = Path.GetDirectoryName(dir);
 				if (string.IsNullOrEmpty(dir)) {

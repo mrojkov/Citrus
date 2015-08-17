@@ -21,6 +21,8 @@ namespace Lime
 	[ProtoInclude(115, typeof(Animator<SerializableSample>))]
 	[ProtoInclude(116, typeof(Animator<MovieAction>))]
 	[ProtoInclude(117, typeof(Animator<ShaderId>))]
+	[ProtoInclude(118, typeof(Animator<Vector3>))]
+	[ProtoInclude(119, typeof(Animator<Quaternion>))]
 	public interface IAnimator
 	{
 		void Bind(Node owner);
@@ -30,6 +32,8 @@ namespace Lime
 		bool IsTriggerable { get; set; }
 
 		string TargetProperty { get; set; }
+
+		string AnimationId { get; set; }
 
 		int Duration { get; }
 
@@ -50,6 +54,9 @@ namespace Lime
 	[ProtoInclude(151, typeof(NumericAnimator))]
 	[ProtoInclude(152, typeof(Vector2Animator))]
 	[ProtoInclude(153, typeof(Color4Animator))]
+	[ProtoInclude(154, typeof(QuaternionAnimator))]
+	[ProtoInclude(155, typeof(Vector3Animator))]
+	[ProtoInclude(156, typeof(Matrix44Animator))]
 	public class Animator<T> : IAnimator
 	{
 		private Node owner;
@@ -68,6 +75,9 @@ namespace Lime
 		/// </summary>
 		[ProtoMember(2)]
 		public KeyframeCollection<T> ReadonlyKeys = new KeyframeCollection<T>();
+
+		[ProtoMember(3)]
+		public string AnimationId { get; set; }
 
 		/// <summary>
 		/// Возвращает коллекцию ключей анимации
@@ -254,6 +264,25 @@ namespace Lime
 	}
 
 	[ProtoContract]
+	public class Vector3Animator : Animator<Vector3>
+	{
+		protected override bool IsInterpolable()
+		{
+			return true;
+		}
+
+		protected override void InterpolateAndSet(float t, Keyframe<Vector3> a, Keyframe<Vector3> b)
+		{
+			Setter(Vector3.Lerp(t, a.Value, b.Value));
+		}
+
+		protected override void InterpolateAndSet(float t, Keyframe<Vector3> a, Keyframe<Vector3> b, Keyframe<Vector3> c, Keyframe<Vector3> d)
+		{
+			Setter(Mathf.CatmullRomSpline(t, a.Value, b.Value, c.Value, d.Value));
+		}
+	}
+
+	[ProtoContract]
 	public class NumericAnimator : Animator<float>
 	{
 		protected override bool IsInterpolable()
@@ -283,6 +312,39 @@ namespace Lime
 		protected override void InterpolateAndSet(float t, Keyframe<Color4> a, Keyframe<Color4> b)
 		{
 			Setter(Color4.Lerp(t, a.Value, b.Value));
+		}
+	}
+
+	[ProtoContract]
+	public class QuaternionAnimator : Animator<Quaternion>
+	{
+		protected override bool IsInterpolable()
+		{
+			return true;
+		}
+
+		protected override void InterpolateAndSet(float t, Keyframe<Quaternion> a, Keyframe<Quaternion> b)
+		{
+			Setter(Quaternion.Slerp(a.Value, b.Value, t));
+		}
+	}
+
+	[ProtoContract]
+	public class Matrix44Animator : Animator<Matrix44>
+	{
+		protected override bool IsInterpolable()
+		{
+			return true;
+		}
+
+		protected override void InterpolateAndSet(float t, Keyframe<Matrix44> a, Keyframe<Matrix44> b)
+		{
+			Setter(Matrix44.Lerp(a.Value, b.Value, t));
+		}
+
+		protected override void InterpolateAndSet(float t, Keyframe<Matrix44> a, Keyframe<Matrix44> b, Keyframe<Matrix44> c, Keyframe<Matrix44> d)
+		{
+			Setter(Matrix44.Lerp(b.Value, c.Value, t));
 		}
 	}
 }

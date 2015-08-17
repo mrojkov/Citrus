@@ -38,7 +38,7 @@ namespace Lime
 #endif
 
 		public GameView(Application app)
-			: base(800, 600, GraphicsMode.Default, app.Title
+			: base(800, 600, new GraphicsMode(new ColorFormat(32), depth: 24), app.Title
 #if !MAC
 			, GameWindowFlags.Default, DisplayDevice.Default, 2, 0, GetGraphicContextFlags()
 #endif

@@ -198,7 +198,6 @@ namespace Lime
 
 		public void Invalidate()
 		{
-			InvalidateRenderCache();
 			spriteList = null;
 			parser = null;
 			renderer = null;

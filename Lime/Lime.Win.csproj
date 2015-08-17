@@ -35,6 +35,9 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AssimpNet">
+      <HintPath>..\3rdParty\AssimpNet\AssimpNet.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.DebuggerVisualizers, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -69,6 +72,12 @@
     <Compile Include="Source\Graphics\Mesh.cs" />
     <Compile Include="Source\Graphics\OpenGL\PlatformMesh.cs" />
     <Compile Include="Source\Input\SoftKeyboard.cs" />
+    <Compile Include="Source\Types\BoundingSphere.cs" />
+    <Compile Include="Source\Types\ContainmentType.cs" />
+    <Compile Include="Source\Types\Quaternion.cs" />
+    <Compile Include="Source\Types\Ray.cs" />
+    <Compile Include="Source\Widgets\Animation\Animation.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimationList.cs" />
     <Compile Include="Source\Widgets\Editor.cs" />
     <Compile Include="Source\Graphics\RenderBatch.cs" />
     <Compile Include="Source\Graphics\RenderList.cs" />
@@ -104,6 +113,11 @@
     <Compile Include="Source\Widgets\ListView\ScrollView.cs" />
     <Compile Include="Source\Widgets\ListView\ScrollView.SpeedMeter.cs" />
     <Compile Include="Source\Widgets\ListView\ScrollViewWithSlider.cs" />
+    <Compile Include="Source\Widgets\Model\ModelCamera.cs" />
+    <Compile Include="Source\Widgets\Model\ModelMaterial.cs" />
+    <Compile Include="Source\Widgets\Model\ModelMesh.cs" />
+    <Compile Include="Source\Widgets\Model\ModelNode.cs" />
+    <Compile Include="Source\Widgets\Model\ModelViewport.cs" />
     <Compile Include="Source\Widgets\TextStyle.cs" />
     <Compile Include="Source\Widgets\Text\TextRenderer.cs" />
     <Compile Include="Source\Widgets\Text\TextParser.cs" />
@@ -239,6 +253,10 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <None Include="..\3rdParty\AssimpNet\Assimp32.dll">
+      <Link>Assimp32.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">
       <Link>OpenAL32.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

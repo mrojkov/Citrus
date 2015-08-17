@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ProtoBuf;
 
 namespace Lime
 {
@@ -10,6 +11,7 @@ namespace Lime
 		void Render(int startIndex, int count);
 	}
 
+	[ProtoContract]
 	public class Mesh : IDisposable
 	{
 		[Flags]
@@ -25,12 +27,25 @@ namespace Lime
 			VertexColorUV12 = Vertex | Color | UV1 | UV2
 		}
 
-		public Vector2[] Vertices;
+		[ProtoMember(1)]
+		public Vector3[] Vertices;
+
+		[ProtoMember(2)]
 		public Color4[] Colors;
+
+		[ProtoMember(3)]
 		public Vector2[] UV1;
+
+		[ProtoMember(4)]
 		public Vector2[] UV2;
+
+		[ProtoMember(5)]
 		public Vector2[] UV3;
+
+		[ProtoMember(6)]
 		public Vector2[] UV4;
+
+		[ProtoMember(7)]
 		public ushort[] Indices;
 
 		public Attributes DirtyAttributes;

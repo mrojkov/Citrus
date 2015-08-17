@@ -57,7 +57,6 @@ namespace Lime.PopupMenu
 
 		public MenuButton()
 		{
-			PropagateAnimation = true;
 			CreateNodes();
 			SetupStates();
 			ArrowVisible = false;

@@ -8,6 +8,16 @@ namespace Orange
 {
 	public static class Toolbox
 	{
+		public static string ToWindowsSlashes(string path)
+		{
+			return path.Replace('/', '\\');
+		}
+
+		public static string ToUnixSlashes(string path)
+		{
+			return path.Replace('\\', '/');
+		}
+
 		public static string GetCommandLineArg(string name)
 		{
 			var args = System.Environment.GetCommandLineArgs();
@@ -76,6 +86,13 @@ namespace Orange
 			var path = Path.GetTempPath();
 			var fileName = Guid.NewGuid().ToString() + extension;
 			return Path.Combine(path, fileName);
+		}
+
+		public static string GetRelativePath(string path, string basePath)
+		{
+			var baseUri = new Uri(Path.GetFullPath(basePath), UriKind.Absolute);
+			var uri = new Uri(Path.GetFullPath(path), UriKind.Absolute);
+			return baseUri.MakeRelativeUri(uri).OriginalString;
 		}
 	}
 }

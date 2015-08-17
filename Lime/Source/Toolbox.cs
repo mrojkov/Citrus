@@ -59,5 +59,16 @@ namespace Lime
 				position -= 2;
 			}
 		}
+
+		internal static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> d, TKey key)
+		{
+			return GetValueOrDefault(d, key, default(TValue));
+		}
+
+		internal static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> d, TKey key, TValue defaultValue)
+		{
+			TValue value;
+			return d.TryGetValue(key, out value) ? value : defaultValue;
+		}
 	}
 }

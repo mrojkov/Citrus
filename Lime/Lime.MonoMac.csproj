@@ -160,6 +160,18 @@
     <Compile Include="Source\Graphics\Unity\PlatformMesh.cs" />
     <Compile Include="Source\Graphics\Unity\PlatformRenderer.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationEngine.cs" />
+    <Compile Include="Source\Widgets\Model\ModelCamera.cs" />
+    <Compile Include="Source\Widgets\Model\ModelMaterial.cs" />
+    <Compile Include="Source\Widgets\Model\ModelMesh.cs" />
+    <Compile Include="Source\Widgets\Model\ModelNode.cs" />
+    <Compile Include="Source\Widgets\Model\ModelViewport.cs" />
+    <Compile Include="Source\Types\Quaternion.cs" />
+    <Compile Include="Source\Widgets\Animation\Animation.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimationList.cs" />
+    <Compile Include="Source\Widgets\Layout\AnchorLayout.cs" />
+    <Compile Include="Source\Widgets\Layout\Layout.cs" />
+    <Compile Include="Source\Widgets\Layout\Margin.cs" />
+    <Compile Include="Source\Widgets\Layout\TableLayout.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

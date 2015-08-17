@@ -56,6 +56,10 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AssimpNet, Version=3.3.1.0, Culture=neutral, PublicKeyToken=0d51b391f59f42a6, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\3rdParty\AssimpNet\AssimpNet.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>packages\Newtonsoft.Json.5.0.6\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -99,6 +103,7 @@
     <Compile Include="Source\Builder\MSBuild.cs" />
     <Compile Include="Source\Builder\MDTool.cs" />
     <Compile Include="Source\DictionaryOldFormatExtractor.cs" />
+    <Compile Include="Source\ModelImport\ModelImporter.cs" />
     <Compile Include="Source\PluginAttributes\PluginFileIgoranceAttribute.cs" />
     <Compile Include="Source\PluginAttributes\PluginAssetsCookedAttribute.cs" />
     <Compile Include="Source\PluginAttributes\PluginCommandLineArgumentsAttribute.cs" />
@@ -140,6 +145,14 @@
     <Compile Include="Source\Workspace.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\3rdParty\AssimpNet\Assimp32.dll">
+      <Link>Assimp32.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\3rdParty\AssimpNet\Assimp64.dll">
+      <Link>Assimp64.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Content Include="Orange.ico" />
     <Content Include="Toolchain.Win\cudart32_30_14.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

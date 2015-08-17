@@ -1,7 +1,9 @@
 using System;
+using ProtoBuf;
 
 namespace Lime
 {
+	[ProtoContract]
 	public struct Matrix44 : IEquatable<Matrix44>
 	{
 		#region Public Constructors
@@ -31,21 +33,52 @@ namespace Lime
 
 		#region Public Fields
 
+		[ProtoMember(1)]
 		public float M11;
+
+		[ProtoMember(2)]
 		public float M12;
+
+		[ProtoMember(3)]
 		public float M13;
+
+		[ProtoMember(4)]
 		public float M14;
+
+		[ProtoMember(5)]
 		public float M21;
+
+		[ProtoMember(6)]
 		public float M22;
+
+		[ProtoMember(7)]
 		public float M23;
+
+		[ProtoMember(8)]
 		public float M24;
+
+		[ProtoMember(9)]
 		public float M31;
+
+		[ProtoMember(10)]
 		public float M32;
+
+		[ProtoMember(11)]
 		public float M33;
+
+		[ProtoMember(12)]
 		public float M34;
+
+		[ProtoMember(13)]
 		public float M41;
+
+		[ProtoMember(14)]
 		public float M42;
+
+		[ProtoMember(15)]
 		public float M43;
+
+		[ProtoMember(16)]
 		public float M44;
 
 		#endregion Public Fields
@@ -176,6 +209,30 @@ namespace Lime
 				this.M23 = value.Z;
 			}
 		}
+
+		public Vector3 Scale
+		{
+			get
+			{
+				return new Vector3(
+					(float)Math.Sqrt((M11 * M11) + (M12 * M12) + (M13 * M13)),
+					(float)Math.Sqrt((M21 * M21) + (M22 * M22) + (M23 * M23)),
+					(float)Math.Sqrt((M31 * M31) + (M32 * M32) + (M33 * M33))
+				);
+			}
+		}
+
+		public Quaternion Rotation
+		{
+			get
+			{
+				Vector3 scale, translation;
+				Quaternion rotation;
+				Decompose(out scale, out rotation, out translation);
+				return rotation;
+			}
+		}
+		
 		#endregion Public Properties
 
 		#region Public Methods
@@ -505,6 +562,42 @@ namespace Lime
 			result.M22 = val1;
 		}
 
+		public static Matrix44 CreateRotation(Quaternion quaternion)
+		{
+			Matrix44 result;
+			CreateRotation(ref quaternion, out result);
+			return result;
+		}
+
+		public static void CreateRotation(ref Quaternion quaternion, out Matrix44 result)
+		{
+			float num9 = quaternion.X * quaternion.X;
+			float num8 = quaternion.Y * quaternion.Y;
+			float num7 = quaternion.Z * quaternion.Z;
+			float num6 = quaternion.X * quaternion.Y;
+			float num5 = quaternion.Z * quaternion.W;
+			float num4 = quaternion.Z * quaternion.X;
+			float num3 = quaternion.Y * quaternion.W;
+			float num2 = quaternion.Y * quaternion.Z;
+			float num = quaternion.X * quaternion.W;
+			result.M11 = 1f - (2f * (num8 + num7));
+			result.M12 = 2f * (num6 + num5);
+			result.M13 = 2f * (num4 - num3);
+			result.M14 = 0f;
+			result.M21 = 2f * (num6 - num5);
+			result.M22 = 1f - (2f * (num7 + num9));
+			result.M23 = 2f * (num2 + num);
+			result.M24 = 0f;
+			result.M31 = 2f * (num4 + num3);
+			result.M32 = 2f * (num2 - num);
+			result.M33 = 1f - (2f * (num8 + num9));
+			result.M34 = 0f;
+			result.M41 = 0f;
+			result.M42 = 0f;
+			result.M43 = 0f;
+			result.M44 = 1f;
+		}
+
 		public static Matrix44 CreateScale(Vector3 scales)
 		{
 			Matrix44 result;
@@ -697,6 +790,76 @@ namespace Lime
 			return matrix1;
 		}
 
+		/// <summary>
+		/// Decomposes a matrix into a scale, rotation, and translation.
+		/// </summary>
+		/// <param name="scale">When the method completes, contains the scaling component of the decomposed matrix.</param>
+		/// <param name="rotation">When the method completes, contains the rtoation component of the decomposed matrix.</param>
+		/// <param name="translation">When the method completes, contains the translation component of the decomposed matrix.</param>
+		/// <remarks>
+		/// This method is designed to decompose an SRT transformation matrix only.
+		/// </remarks>
+		public bool Decompose(out Vector3 scale, out Quaternion rotation, out Vector3 translation)
+		{
+			Matrix44 rotationMatrix;
+			if (Decompose(out scale, out rotationMatrix, out translation)) {
+				Quaternion.CreateFromRotationMatrix(ref rotationMatrix, out rotation);
+				return true;
+			}
+			rotation = default(Quaternion);
+			return false;
+		}
+
+		/// <summary>
+		/// Decomposes a matrix into a scale, rotation, and translation.
+		/// </summary>
+		/// <param name="scale">When the method completes, contains the scaling component of the decomposed matrix.</param>
+		/// <param name="rotation">When the method completes, contains the rtoation component of the decomposed matrix.</param>
+		/// <param name="translation">When the method completes, contains the translation component of the decomposed matrix.</param>
+		/// <remarks>
+		/// This method is designed to decompose an SRT transformation matrix only.
+		/// </remarks>
+		public bool Decompose(out Vector3 scale, out Matrix44 rotation, out Vector3 translation)
+		{
+			//Source: Unknown
+			//References: http://www.gamedev.net/community/forums/topic.asp?topic_id=441695
+
+			//Get the translation.
+			translation.X = this.M41;
+			translation.Y = this.M42;
+			translation.Z = this.M43;
+
+			//Scaling is the length of the rows.
+			scale.X = (float)Math.Sqrt((M11 * M11) + (M12 * M12) + (M13 * M13));
+			scale.Y = (float)Math.Sqrt((M21 * M21) + (M22 * M22) + (M23 * M23));
+			scale.Z = (float)Math.Sqrt((M31 * M31) + (M32 * M32) + (M33 * M33));
+
+			//If any of the scaling factors are zero, than the rotation matrix can not exist.
+			if (Math.Abs(scale.X) < Mathf.ZeroTolerance ||
+				Math.Abs(scale.Y) < Mathf.ZeroTolerance ||
+				Math.Abs(scale.Z) < Mathf.ZeroTolerance) {
+				rotation = Matrix44.Identity;
+				return false;
+			}
+
+			// Calculate an perfect orthonormal matrix (no reflections)
+			var at = new Vector3(M31 / scale.Z, M32 / scale.Z, M33 / scale.Z);
+			var up = Vector3.CrossProduct(at, new Vector3(M11 / scale.X, M12 / scale.X, M13 / scale.X));
+			var right = Vector3.CrossProduct(up, at);
+
+			rotation = Identity;
+			rotation.Right = right;
+			rotation.Up = up;
+			rotation.Backward = at;
+
+			// In case of reflexions
+			scale.X = Vector3.DotProduct(right, Right) > 0.0f ? scale.X : -scale.X;
+			scale.Y = Vector3.DotProduct(up, Up) > 0.0f ? scale.Y : -scale.Y;
+			scale.Z = Vector3.DotProduct(at, Backward) > 0.0f ? scale.Z : -scale.Z;
+
+			return true;
+		}
+
 		public static bool operator ==(Matrix44 matrix1, Matrix44 matrix2)
 		{
 			return
@@ -866,6 +1029,15 @@ namespace Lime
 				(position.X * M12) + (position.Y * M22) + (position.Z * M32) + M42,
 				(position.X * M13) + (position.Y * M23) + (position.Z * M33) + M43);
 			return result;
+		}
+
+		public Vector3 ProjectVector(Vector3 position)
+		{
+			var x = position.X * M11 + position.Y * M21 + position.Z * M31 + M41;
+			var y = position.X * M12 + position.Y * M22 + position.Z * M32 + M42;
+			var z = position.X * M13 + position.Y * M23 + position.Z * M33 + M43;
+			var w = position.X * M14 + position.Y * M24 + position.Z * M34 + M44;
+			return new Vector3(x / w, y / w, z / w);
 		}
 
 		public Vector2 TransformVector(Vector2 position)

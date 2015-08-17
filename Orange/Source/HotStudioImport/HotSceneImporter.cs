@@ -884,6 +884,25 @@ namespace Orange
 			}
 		}
 
+		private void ParseModelViewProperty(Node node, string name)
+		{
+			var viewport = (ModelViewport)node;
+			switch (name) {
+				case "ModelPath":
+					viewport.ContentsPath = lexer.ParsePath();
+					break;
+				case "Frame":
+					viewport.Frame = lexer.ParseFloat();
+					break;
+				case "Camera":
+					lexer.ParseQuotedString();
+					break;
+				default:
+					ParseGraphicProperty(node, name);
+					break;
+			}
+		}
+
 		#endregion
 
 		protected virtual void RegisterKnownActorTypes()
@@ -916,7 +935,9 @@ namespace Orange
 				new KnownActorType {ActorClass = "Hot::TextStyle", NodeClass = "Lime.TextStyle, Lime", PropReader = ParseTextStyleProperty},
 				new KnownActorType {ActorClass = "Hot::Edit", NodeClass = "Lime.TextBox, Lime", PropReader = ParseEditProperty},
 				new KnownActorType {ActorClass = "Hot::Movie", NodeClass = "Lime.Movie, Lime", PropReader = ParseVideoProperty},
+				new KnownActorType {ActorClass = "Hot::ModelView", NodeClass = "Lime.ModelViewport, Lime", PropReader = ParseModelViewProperty},
 				new KnownActorType {ActorClass = "LinearLayout", NodeClass = "Lime.LinearLayout, Lime", PropReader = ParseLinearLayoutProperty},
+
 			};
 		}
 	}

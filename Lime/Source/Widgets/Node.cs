@@ -24,19 +24,29 @@ namespace Lime
 	[ProtoInclude(107, typeof(SplineGear))]
 	[ProtoInclude(108, typeof(TextStyle))]
 	[ProtoInclude(109, typeof(LinearLayout))]
+	[ProtoInclude(110, typeof(ModelNode))]
 	[DebuggerTypeProxy(typeof(NodeDebugView))]
 	public class Node : IDisposable
 	{
+		protected internal enum DirtyFlags
+		{
+			None			= 0,
+			Visible			= 1 << 0,
+			Color			= 1 << 1,
+			Transform		= 1 << 2,
+			All				= ~None
+		}
+
 		/// <summary>
 		/// Генерируется при завершении анимации (например достигнут маркер типа Stop). После генерации сбрасывается в null.
 		/// </summary>
-		public event Action AnimationStopped;
-	
-		internal int animationTime;
+		public event Action AnimationStopped
+		{
+			add { DefaultAnimation.Stopped += value; }
+			remove { DefaultAnimation.Stopped -= value; }
+		}
 
 		internal protected bool GlobalValuesValid;
-
-		public AnimationEngine AnimationEngine = DefaultAnimationEngine.Instance;
 
 		#region properties
 #if WIN
@@ -65,6 +75,8 @@ namespace Lime
 		/// </summary>
 		public Widget AsWidget { get; internal set; }
 
+		public ModelNode AsModelNode { get; internal set; }
+
 		internal Node NextToRender;
 
 		public Node NextSibling;
@@ -89,19 +101,17 @@ namespace Lime
 		/// <summary>
 		/// Маркеры анимации
 		/// </summary>
-		[ProtoMember(7)]
-		public MarkerCollection Markers;
+		public MarkerCollection Markers { get { return DefaultAnimation.Markers; } }
 
 		/// <summary>
 		/// Возвращает true, если проигрывается анимация
 		/// </summary>
-		[ProtoMember(9)]
-		public bool IsRunning { get; set; }
+		public bool IsRunning { get { return DefaultAnimation.IsRunning; } set { DefaultAnimation.IsRunning = value; } }
 
 		/// <summary>
 		/// Возвращает true, если в данный момент анимация не проигрывается (например анимация не была запущена или доигралась до конца)
 		/// </summary>
-		public bool IsStopped { 
+		public bool IsStopped {
 			get { return !IsRunning; } 
 			set { IsRunning = !value; } 
 		}
@@ -109,12 +119,24 @@ namespace Lime
 		/// <summary>
 		/// Время текущего кадра анимации (в миллисекундах)
 		/// </summary>
-		[ProtoMember(10)]
-		public int AnimationTime {
-			get { return animationTime; }
-			set { 
-				animationTime = value; 
-				ApplyAnimators(invokeTriggers: false); 
+		public int AnimationTime
+		{
+			get { return DefaultAnimation.Time; }
+			set
+			{
+				DefaultAnimation.Time = value;
+				DefaultAnimation.ApplyAnimators(this, invokeTriggers: false);
+			}
+		}
+
+		public Animation DefaultAnimation
+		{
+			get
+			{
+				if (Animations.Count == 0) {
+					Animations.Add(new Animation());
+				}
+				return Animations[0];
 			}
 		}
 		
@@ -126,14 +148,18 @@ namespace Lime
 		[ProtoMember(11)]
 		public string Tag { get; set; }
 
-		[ProtoMember(12)]
-		public bool PropagateAnimation { get; set; }
+		[ProtoMember(13)]
+		public AnimationList Animations;
 
 		/// <summary>
 		/// Название текущей анимации. Название берется из названия маркера Play.
 		/// Если анимация остановилась, это свойство не изменится
 		/// </summary>
-		public string CurrentAnimation { get; set; }
+		public string CurrentAnimation
+		{
+			get { return DefaultAnimation.RunningMarkerId; }
+			set { DefaultAnimation.RunningMarkerId = value; }
+		}
 
 		/// <summary>
 		/// Множитель скорости анимации
@@ -145,6 +171,10 @@ namespace Lime
 		/// </summary>
 		public object UserData { get; set; }
 
+		protected DirtyFlags DirtyMask;
+		
+		protected bool IsDirty(DirtyFlags mask) { return (DirtyMask & mask) != 0; }
+
 		#endregion
 		#region Methods
 
@@ -155,7 +185,7 @@ namespace Lime
 		{
 			AnimationSpeed = 1;
 			Animators = new AnimatorCollection(this);
-			Markers = new MarkerCollection();
+			Animations = new AnimationList();
 			Nodes = new NodeList(this);
 			++CreatedCount;
 		}
@@ -168,32 +198,37 @@ namespace Lime
 			Nodes.Clear();
 		}
 
+		protected internal void PropagateDirtyFlags(DirtyFlags mask = DirtyFlags.All)
+		{
+			if ((DirtyMask & mask) == mask)
+				return;
+			DirtyMask |= mask;
+			for (var n = Nodes.FirstOrNull(); n != null; n = n.NextSibling) {
+				if ((n.DirtyMask & mask) != mask) {
+					n.PropagateDirtyFlags(mask);
+				}
+			}
+		}
+
+		protected void RecalcDirtyGlobals()
+		{
+			if (DirtyMask == DirtyFlags.None) {
+				return;
+			}
+			if (Parent != null && Parent.DirtyMask != DirtyFlags.None) {
+				Parent.RecalcDirtyGlobals();
+			}
+			RecalcDirtyGlobalsUsingParents();
+			DirtyMask = DirtyFlags.None;
+		}
+
+		protected virtual void RecalcDirtyGlobalsUsingParents() { }
+
 #if LIME_COUNT_NODES
 		~Node() {
 			++FinalizedCount;
 		}
 #endif
-
-		internal protected void InvalidateGlobalValues()
-		{
-			GlobalValuesValid = false;
-			for (var n = Nodes.FirstOrNull(); n != null; n = n.NextSibling) {
-				if (n.GlobalValuesValid) {
-					n.InvalidateGlobalValues();
-				}
-			}
-		}
-
-		protected void RecalcGlobalValues()
-		{
-			if (Parent != null && !Parent.GlobalValuesValid) {
-				Parent.RecalcGlobalValues();
-			}
-			RecalcGlobalValuesUsingParents();
-			GlobalValuesValid = true;
-		}
-
-		protected virtual void RecalcGlobalValuesUsingParents() { }
 
 		/// <summary>
 		/// Возвращает самый верхний объект в иерархии этого объекта
@@ -220,13 +255,9 @@ namespace Lime
 		/// Запускает анимацию и возвращает true. Если такой анимации нет, возвращает false
 		/// </summary>
 		/// <param name="markerId">Название маркера анимации</param>
-		public bool TryRunAnimation(string markerId)
+		public bool TryRunAnimation(string markerId, string animationId = null)
 		{
-			if (AnimationEngine.TryRunAnimation(this, markerId)) {
-				AnimationStopped = null;
-				return true;
-			}
-			return false;
+			return Animations.TryRun(animationId, markerId);
 		}
 
 		/// <summary>
@@ -234,11 +265,9 @@ namespace Lime
 		/// </summary>
 		/// <param name="markerId">Название маркера анимации</param>
 		/// <exception cref="Lime.Exception"/>
-		public void RunAnimation(string markerId)
+		public void RunAnimation(string markerId, string animationId = null)
 		{
-			if (!TryRunAnimation(markerId)) {
-				throw new Lime.Exception("Unknown animation '{0}' in node '{1}'", markerId, this.ToString());
-			}
+			Animations.Run(animationId, markerId);
 		}
 
 		/// <summary>
@@ -278,8 +307,8 @@ namespace Lime
 			clone.NextSibling = null;
 			clone.AsWidget = clone as Widget;
 			clone.GlobalValuesValid = false;
+			clone.Animations = Animations.Clone();
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
-			clone.Markers = MarkerCollection.DeepClone(Markers);
 			clone.Nodes = Nodes.DeepCloneFast(clone);
 			return clone;
 		}
@@ -341,9 +370,7 @@ namespace Lime
 		public virtual void Update(float delta)
 		{
 			delta *= AnimationSpeed;
-			if (IsRunning) {
-				AdvanceAnimation(delta);
-			}
+			AdvanceAnimation(delta);
 			SelfUpdate(delta);
 			for (var node = Nodes.FirstOrNull(); node != null; ) {
 				var next = node.NextSibling;
@@ -586,19 +613,12 @@ namespace Lime
 		/// <param name="delta">Время в секундах</param>
 		public void AdvanceAnimation(float delta)
 		{
-			AnimationEngine.AdvanceAnimation(this, delta);
-		}
-
-		internal protected virtual void OnAnimationStopped()
-		{
-			if (AnimationStopped != null) {
-				AnimationStopped();
+			for (var i = 0; i < Animations.Count; i++) {
+				var a = Animations[i];
+				if (a.IsRunning) {
+					a.Advance(this, delta);
+				}
 			}
-		}
-
-		public void ApplyAnimators(bool invokeTriggers)
-		{
-			AnimationEngine.ApplyAnimators(this, invokeTriggers);
 		}
 
 		/// <summary>
@@ -666,8 +686,8 @@ namespace Lime
 		{
 			Nodes.Clear();
 			Markers.Clear();
-			var contentsPath = Path.ChangeExtension(ContentsPath, "scene");
-			if (!AssetsBundle.Instance.FileExists(contentsPath)) {
+			var contentsPath = ResolveScenePath(ContentsPath);
+			if (contentsPath == null) {
 				return;
 			}
 			var content = new Frame(ContentsPath);
@@ -680,6 +700,17 @@ namespace Lime
 			var nodes = content.Nodes.ToList();
 			content.Nodes.Clear();
 			Nodes.AddRange(nodes);
+		}
+
+		private static readonly string[] sceneExtensions = new[] { ".scene", ".model" };
+
+		internal static string ResolveScenePath(string path)
+		{
+			var candidates = sceneExtensions.Select(ext => Path.ChangeExtension(path, ext)).Where(AssetsBundle.Instance.FileExists);
+			if (candidates.Count() > 1) {
+				throw new Lime.Exception("Ambiguity between: {0}", string.Join("; ", candidates));
+			}
+			return candidates.FirstOrDefault();
 		}
 		#endregion
 	}

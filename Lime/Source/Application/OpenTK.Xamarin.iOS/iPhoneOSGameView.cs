@@ -464,18 +464,17 @@ namespace Lime.Xamarin
             GraphicsContext = Utilities.CreateGraphicsContext(ContextRenderingApi);
             gl = GLCalls.GetGLCalls(ContextRenderingApi);
 
-			gl.GenFramebuffers (1, ref framebuffer);
-			gl.BindFramebuffer (All.FramebufferOes, framebuffer);
+			gl.GenFramebuffers(1, ref framebuffer);
+			gl.BindFramebuffer(All.FramebufferOes, framebuffer);
 
             gl.GenRenderbuffers(1, ref renderbuffer);
 			gl.BindRenderbuffer(All.RenderbufferOes, renderbuffer);
 
-			if (!EAGLContext.RenderBufferStorage((uint) All.RenderbufferOes, eaglLayer)) {
-                throw new InvalidOperationException("Error with EAGLContext.RenderBufferStorage!");
+			if (!EAGLContext.RenderBufferStorage((uint)All.RenderbufferOes, eaglLayer)) {
+				throw new InvalidOperationException("Error with EAGLContext.RenderBufferStorage!");
             }
-
-			gl.FramebufferRenderbuffer (All.FramebufferOes, All.ColorAttachment0Oes, All.RenderbufferOes, renderbuffer);
-
+			gl.FramebufferRenderbuffer(All.FramebufferOes, All.ColorAttachment0Oes, All.RenderbufferOes, renderbuffer);
+			
             Size newSize = new Size(
                     (int) Math.Round(eaglLayer.Bounds.Size.Width), 
                     (int) Math.Round(eaglLayer.Bounds.Size.Height));
@@ -500,11 +499,7 @@ namespace Lime.Xamarin
             if (!GraphicsContext.IsCurrent)
                 MakeCurrent();
 
-			DetachRenderBufferStorage(EAGLContext, (uint)All.RenderbufferOes);
-
-            gl.DeleteFramebuffers (1, ref framebuffer);
-            gl.DeleteRenderbuffers (1, ref renderbuffer);
-            framebuffer = renderbuffer = 0;
+			DeleteBuffers();
 
             if (oldContext != EAGLContext)
                 EAGLContext.SetCurrentContext(oldContext);
@@ -514,6 +509,14 @@ namespace Lime.Xamarin
             GraphicsContext.Dispose();
             GraphicsContext = null;
             gl = null;
+        }
+        
+        protected virtual void DeleteBuffers()
+        {
+			DetachRenderBufferStorage(EAGLContext, (uint)All.RenderbufferOes); 
+			gl.DeleteFramebuffers(1, ref framebuffer);
+			gl.DeleteRenderbuffers(1, ref renderbuffer);
+			framebuffer = renderbuffer = 0;
         }
 			
 		[DllImport("/usr/lib/libobjc.dylib", EntryPoint = "objc_msgSend")]

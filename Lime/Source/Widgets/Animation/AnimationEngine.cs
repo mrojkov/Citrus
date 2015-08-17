@@ -7,79 +7,83 @@ namespace Lime
 {
 	public class AnimationEngine
 	{
-		public virtual bool TryRunAnimation(Node node, string markerId) { return false; }
-		public virtual void AdvanceAnimation(Node node, float delta) { }
-		public virtual void ApplyAnimators(Node node, bool invokeTriggers) { }
+		public virtual bool TryRunAnimation(Animation animation, string markerId) { return false; }
+		public virtual void AdvanceAnimation(Node node, Animation animation, float delta) { }
+		public virtual void ApplyAnimators(Node node, Animation animation, bool invokeTriggers) { }
 	}
 
 	public class DefaultAnimationEngine : AnimationEngine
 	{
 		public static readonly DefaultAnimationEngine Instance = new DefaultAnimationEngine();
 
-		public override bool TryRunAnimation(Node node, string markerId)
+		public override bool TryRunAnimation(Animation animation, string markerId)
 		{
-			Marker marker = node.Markers.TryFind(markerId);
-			if (marker == null) {
-				return false;
+			var frame = 0;
+			if (markerId != null) {
+				var marker = animation.Markers.TryFind(markerId);
+				if (marker == null) {
+					return false;
+				}
+				frame = marker.Frame;
 			}
-			node.AnimationFrame = marker.Frame;
-			node.CurrentAnimation = markerId;
-			node.IsRunning = true;
+			animation.Frame = frame;
+			animation.RunningMarkerId = markerId;
+			animation.IsRunning = true;
 			return true;
 		}
 
-		public override void AdvanceAnimation(Node node, float delta)
+		public override void AdvanceAnimation(Node node, Animation animation, float delta)
 		{
-			int deltaMs = (int)(delta * 1000 + 0.5f);
+			var deltaMs = (int)(delta * 1000 + 0.5f);
 			while (deltaMs > AnimationUtils.MsecsPerFrame) {
-				AdvanceAnimationShort(node, AnimationUtils.MsecsPerFrame);
+				AdvanceAnimationShort(node, animation, AnimationUtils.MsecsPerFrame);
 				deltaMs -= AnimationUtils.MsecsPerFrame;
 			}
-			AdvanceAnimationShort(node, deltaMs);
+			AdvanceAnimationShort(node, animation, deltaMs);
 		}
 
-		private void AdvanceAnimationShort(Node node, int delta)
+		private void AdvanceAnimationShort(Node node, Animation animation, int delta)
 		{
-			if (node.IsRunning) {
-				int prevFrame = AnimationUtils.MsecsToFrames(node.AnimationTime - 1);
-				int currFrame = AnimationUtils.MsecsToFrames(node.AnimationTime + delta - 1);
-				node.animationTime += delta;
-				if (prevFrame != currFrame && node.Markers.Count > 0) {
-					Marker marker = node.Markers.GetByFrame(currFrame);
+			if (animation.IsRunning) {
+				var prevFrame = AnimationUtils.MsecsToFrames(animation.Time - 1);
+				var currFrame = AnimationUtils.MsecsToFrames(animation.Time + delta - 1);
+				animation.Time += delta;
+				if (prevFrame != currFrame && animation.Markers.Count > 0) {
+					var marker = animation.Markers.GetByFrame(currFrame);
 					if (marker != null) {
-						ProcessMarker(node, marker, ref prevFrame, ref currFrame);
+						ProcessMarker(node, animation, marker, ref prevFrame, ref currFrame);
 					}
 				}
-				bool invokeTriggers = prevFrame != currFrame;
-				ApplyAnimators(node, invokeTriggers);
-				if (!node.IsRunning) {
-					node.OnAnimationStopped();
+				var invokeTriggers = prevFrame != currFrame;
+				ApplyAnimators(node, animation, invokeTriggers);
+				if (!animation.IsRunning) {
+					animation.OnStopped();
 				}
 			}
 		}
 
-		private void ProcessMarker(Node node, Marker marker, ref int prevFrame, ref int currFrame)
+		private void ProcessMarker(Node node, Animation animation, Marker marker, ref int prevFrame, ref int currFrame)
 		{
 			switch (marker.Action) {
 				case MarkerAction.Jump:
-					var gotoMarker = node.Markers.TryFind(marker.JumpTo);
+					var gotoMarker = animation.Markers.TryFind(marker.JumpTo);
 					if (gotoMarker != null) {
-						int hopFrames = gotoMarker.Frame - node.AnimationFrame;
-						node.animationTime += AnimationUtils.FramesToMsecs(hopFrames);
+						var hopFrames = gotoMarker.Frame - animation.Frame;
+						animation.Time += AnimationUtils.FramesToMsecs(hopFrames);
 						prevFrame += hopFrames;
 						currFrame += hopFrames;
-						ProcessMarker(node, gotoMarker, ref prevFrame, ref currFrame);
+						ProcessMarker(node, animation, gotoMarker, ref prevFrame, ref currFrame);
 					}
 					break;
 				case MarkerAction.Stop:
-					node.animationTime = AnimationUtils.FramesToMsecs(marker.Frame);
+					animation.Time = AnimationUtils.FramesToMsecs(marker.Frame);
 					prevFrame = currFrame - 1;
-					node.IsRunning = false;
+					animation.IsRunning = false;
 					break;
 				case MarkerAction.Destroy:
-					node.animationTime = AnimationUtils.FramesToMsecs(marker.Frame);
+					animation.Time = AnimationUtils.FramesToMsecs(marker.Frame);
 					prevFrame = currFrame - 1;
-					node.IsRunning = false;
+					animation.IsRunning = false;
 					node.Unlink();
 					break;
 			}
@@ -88,17 +92,16 @@ namespace Lime
 			}
 		}
 
-		public override void ApplyAnimators(Node node, bool invokeTriggers)
+		public override void ApplyAnimators(Node node, Animation animation, bool invokeTriggers)
 		{
 			for (var child = node.Nodes.FirstOrNull(); child != null; child = child.NextSibling) {
 				var animators = child.Animators;
-				animators.Apply(node.animationTime);
+				animators.Apply(animation.Time, animation.Id);
 				if (invokeTriggers) {
-					animators.InvokeTriggers(node.AnimationFrame);
+					animators.InvokeTriggers(animation.Frame);
 				}
-				if (node.PropagateAnimation) {
-					child.animationTime = node.animationTime;
-					child.ApplyAnimators(invokeTriggers);
+				if (animation.Id != null) {
+					ApplyAnimators(child, animation, invokeTriggers);
 				}
 			}
 		}

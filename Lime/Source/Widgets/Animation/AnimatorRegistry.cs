@@ -30,6 +30,9 @@ namespace Lime
 		public AnimatorRegistry()
 		{
 			Add(typeof(Vector2), typeof(Vector2Animator));
+			Add(typeof(Vector3), typeof(Vector3Animator));
+			Add(typeof(Quaternion), typeof(QuaternionAnimator));
+			Add(typeof(Matrix44), typeof(Matrix44Animator));
 			Add(typeof(float), typeof(NumericAnimator));
 			Add(typeof(Color4), typeof(Color4Animator));
 			Add(typeof(string), typeof(Animator<string>));

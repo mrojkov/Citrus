@@ -154,9 +154,7 @@ namespace Lime
 				list[Count - 1].NextSibling = node;
 			}
 			list.Add(node);
-			if (node.GlobalValuesValid) {
-				node.InvalidateGlobalValues();
-			}
+			node.PropagateDirtyFlags();
 		}
 
 		private void CreateListIfNeeded()
@@ -190,9 +188,7 @@ namespace Lime
 			if (index + 1 < Count) {
 				list[index].NextSibling = list[index + 1];
 			}
-			if (node.GlobalValuesValid) {
-				node.InvalidateGlobalValues();
-			}
+			node.PropagateDirtyFlags();
 		}
 
 		private void RuntimeChecksBeforeInsertion(Node node)
@@ -223,7 +219,7 @@ namespace Lime
 			foreach (var node in list) {
 				node.Parent = null;
 				node.NextSibling = null;
-				node.InvalidateGlobalValues();
+				node.PropagateDirtyFlags();
 			}
 			list.Clear();
 		}
@@ -246,7 +242,7 @@ namespace Lime
 			var node = list[index];
 			node.Parent = null;
 			node.NextSibling = null;
-			node.InvalidateGlobalValues();
+			node.PropagateDirtyFlags();
 			list.RemoveAt(index);
 			if (index > 0) {
 				list[index - 1].NextSibling = index < Count ? list[index] : null;
@@ -270,7 +266,7 @@ namespace Lime
 				var oldNode = list[index];
 				oldNode.Parent = null;
 				oldNode.NextSibling = null;
-				oldNode.InvalidateGlobalValues();
+				oldNode.PropagateDirtyFlags();
 				list[index] = value;
 				if (index > 0) {
 					list[index - 1].NextSibling = value;
@@ -279,7 +275,7 @@ namespace Lime
 					value.NextSibling = list[index + 1];
 				}
 				if (value.GlobalValuesValid) {
-					value.InvalidateGlobalValues();
+					value.PropagateDirtyFlags();
 				}
 			}
 		}

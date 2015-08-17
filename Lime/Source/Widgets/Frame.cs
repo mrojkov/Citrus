@@ -94,7 +94,7 @@ namespace Lime
 		{
 			renderTarget = value;
 			renderTexture = CreateRenderTargetTexture(value);
-			if (GlobalValuesValid) InvalidateGlobalValues();
+			PropagateDirtyFlags();
 		}
 
 		internal protected override bool IsRenderedToTexture()
@@ -202,9 +202,13 @@ namespace Lime
 			if (cyclicDependencyTracker == null) {
 				cyclicDependencyTracker = new HashSet<string>();
 			}
-			path = Path.ChangeExtension(path, "scene");
-			if (cyclicDependencyTracker.Contains(path))
+			path = ResolveScenePath(path);
+			if (path == null) {
+				return;
+			}
+			if (cyclicDependencyTracker.Contains(path)) {
 				throw new Lime.Exception("Cyclic dependency of scenes was detected: {0}", path);
+			}
 			cyclicDependencyTracker.Add(path);
 			try {
 				using (Stream stream = AssetsBundle.Instance.OpenFileLocalized(path)) {

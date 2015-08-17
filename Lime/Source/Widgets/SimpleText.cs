@@ -504,7 +504,6 @@ namespace Lime
 		{
 			caret.TextPos--;
 			caret.TextPos++; // Enforce revalidation.
-			InvalidateRenderCache();
 			spriteList = null;
 		}
 

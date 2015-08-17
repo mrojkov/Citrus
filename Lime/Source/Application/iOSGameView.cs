@@ -8,6 +8,9 @@ using CoreAnimation;
 using ObjCRuntime;
 using OpenGLES;
 using UIKit;
+using OpenTK.Graphics.ES20;
+using GL = OpenTK.Graphics.ES20.GL;
+using All = OpenTK.Graphics.ES20.All;
 
 namespace Lime
 {
@@ -163,13 +166,34 @@ namespace Lime
 
 		// Background context shares all resources while the main context is being recreated
 		OpenTK.Graphics.IGraphicsContext backgroundContext;
+		private uint depthRenderBuffer;
 
 		protected override void CreateFrameBuffer()
 		{
 			ContextRenderingApi = EAGLRenderingAPI.OpenGLES2;
-			base.CreateFrameBuffer();	
+			base.CreateFrameBuffer();
+			// Create a depth renderbuffer
+			GL.GenRenderbuffers(1, out depthRenderBuffer);
+			GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, depthRenderBuffer);
+			
+			// Allocate storage for the new renderbuffer
+			GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferInternalFormat.DepthComponent16, 
+				(int)(Size.Width * screenScale), (int)(Size.Height * screenScale));
+			
+			// Attach the renderbuffer to the framebuffer's depth attachment point
+			GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferSlot.DepthAttachment, RenderbufferTarget.Renderbuffer, depthRenderBuffer);
+			
+			GL.ClearDepth(1.0f); // Depth Buffer Setup
+			GL.DepthFunc(All.Lequal); // The Type Of Depth Test To Do				
 		}
-
+		
+		protected override void DeleteBuffers()
+		{
+			base.DeleteBuffers();
+			GL.DeleteRenderbuffers(1, ref depthRenderBuffer);
+			depthRenderBuffer = 0;
+		}
+		
 		public new void UpdateFrame()
 		{
 			OnUpdateFrame(null);

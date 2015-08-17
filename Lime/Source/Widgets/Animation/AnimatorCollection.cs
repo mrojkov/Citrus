@@ -55,10 +55,10 @@ namespace Lime
 			return result;
 		}
 
-		public bool TryFind(string propertyName, out IAnimator animator)
+		public bool TryFind(string propertyName, out IAnimator animator, string animationId = null)
 		{
 			foreach (IAnimator a in AsArray) {
-				if (a.TargetProperty == propertyName) {
+				if (a.TargetProperty == propertyName && a.AnimationId == animationId) {
 					animator = a;
 					return true;
 				}
@@ -67,19 +67,19 @@ namespace Lime
 			return false;
 		}
 
-		public bool TryFind<T>(string propertyName, out Animator<T> animator)
+		public bool TryFind<T>(string propertyName, out Animator<T> animator, string animationId = null)
 		{
 			IAnimator a;
-			TryFind(propertyName, out a);
+			TryFind(propertyName, out a, animationId);
 			animator = a as Animator<T>;
 			return animator != null;
 		}
 
-		public IAnimator this[string propertyName] 
+		public IAnimator this[string propertyName, string animationId = null] 
 		{
 			get {
 				IAnimator animator;
-				if (TryFind(propertyName, out animator)) {
+				if (TryFind(propertyName, out animator, animationId)) {
 					return animator;
 				}
 				PropertyInfo pi = owner.GetType().GetProperty(propertyName);
@@ -88,11 +88,12 @@ namespace Lime
 				}
 				animator = AnimatorRegistry.Instance.CreateAnimator(pi.PropertyType);
 				animator.TargetProperty = propertyName;
+				animator.AnimationId = animationId;
 				Add(animator);
 				return animator;
 			}
 		}
-		
+
 		public bool Contains(IAnimator item)
 		{
 			return animatorList.Contains(item);
@@ -154,10 +155,12 @@ namespace Lime
 			return val;
 		}
 
-		public void Apply(int time)
+		public void Apply(int time, string animationId = null)
 		{
 			foreach (var animator in AsArray) {
-				animator.Apply(time);
+				if (animator.AnimationId == animationId) {
+					animator.Apply(time);
+				}
 			}
 		}
 

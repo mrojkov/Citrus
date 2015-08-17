@@ -387,7 +387,7 @@ namespace Lime
 					v.Color = Color4.PremulAlpha(v.Color);
 				}
 				mesh.Colors[j] = v.Color;
-				mesh.Vertices[j] = transform * v.Pos;
+				mesh.Vertices[j] = (Vector3)(transform * v.Pos);
 				if (texture1 != null) {
 					mesh.UV1[j] = v.UV1;
 					texture1.TransformUVCoordinatesToAtlasSpace(ref mesh.UV1[j]);
@@ -449,10 +449,10 @@ namespace Lime
 			float y1vx = y1 * matrix.V.X;
 			float y1vy = y1 * matrix.V.Y;
 			var v = mesh.Vertices;
-			v[bv + 0] = new Vector2() { X = x0ux + y0vx + matrix.T.X, Y = x0uy + y0vy + matrix.T.Y };
-			v[bv + 1] = new Vector2() { X = x1ux + y0vx + matrix.T.X, Y = x1uy + y0vy + matrix.T.Y };
-			v[bv + 2] = new Vector2() { X = x0ux + y1vx + matrix.T.X, Y = x0uy + y1vy + matrix.T.Y };
-			v[bv + 3] = new Vector2() { X = x1ux + y1vx + matrix.T.X, Y = x1uy + y1vy + matrix.T.Y };
+			v[bv + 0] = new Vector3() { X = x0ux + y0vx + matrix.T.X, Y = x0uy + y0vy + matrix.T.Y };
+			v[bv + 1] = new Vector3() { X = x1ux + y0vx + matrix.T.X, Y = x1uy + y0vy + matrix.T.Y };
+			v[bv + 2] = new Vector3() { X = x0ux + y1vx + matrix.T.X, Y = x0uy + y1vy + matrix.T.Y };
+			v[bv + 3] = new Vector3() { X = x1ux + y1vx + matrix.T.X, Y = x1uy + y1vy + matrix.T.Y };
 			var c = mesh.Colors;
 			c[bv + 0] = color;
 			c[bv + 1] = color;
@@ -543,10 +543,10 @@ namespace Lime
 					float x1uy = x1 * matrix.U.Y;
 					float y1vx = y1 * matrix.V.X;
 					float y1vy = y1 * matrix.V.Y;
-					v[bv + 0] = new Vector2() { X = x0ux + y0vx + matrix.T.X, Y = x0uy + y0vy + matrix.T.Y };
-					v[bv + 1] = new Vector2() { X = x1ux + y0vx + matrix.T.X, Y = x1uy + y0vy + matrix.T.Y };
-					v[bv + 2] = new Vector2() { X = x0ux + y1vx + matrix.T.X, Y = x0uy + y1vy + matrix.T.Y };
-					v[bv + 3] = new Vector2() { X = x1ux + y1vx + matrix.T.X, Y = x1uy + y1vy + matrix.T.Y };
+					v[bv + 0] = new Vector3() { X = x0ux + y0vx + matrix.T.X, Y = x0uy + y0vy + matrix.T.Y };
+					v[bv + 1] = new Vector3() { X = x1ux + y0vx + matrix.T.X, Y = x1uy + y0vy + matrix.T.Y };
+					v[bv + 2] = new Vector3() { X = x0ux + y1vx + matrix.T.X, Y = x0uy + y1vy + matrix.T.Y };
+					v[bv + 3] = new Vector3() { X = x1ux + y1vx + matrix.T.X, Y = x1uy + y1vy + matrix.T.Y };
 					c[bv + 0] = effectiveColor;
 					c[bv + 1] = effectiveColor;
 					c[bv + 2] = effectiveColor;

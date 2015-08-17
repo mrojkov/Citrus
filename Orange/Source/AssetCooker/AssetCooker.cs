@@ -47,6 +47,8 @@ namespace Orange
 				return ".png";
 			case ".sound":
 				return ".ogg";
+			case ".model":
+				return ".dae";
 			default:
 				return Path.GetExtension(path);
 			}
@@ -166,6 +168,7 @@ namespace Orange
 			AddStage(DeleteOrphanedAlphaTextures);
 			AddStage(SyncFonts);
 			AddStage(() => SyncRawAssets(".ogv"));
+			AddStage(SyncModels);
 			AddStage(SyncScenes);
 			AddStage(SyncSounds);
 			AddStage(() => SyncRawAssets(".shader"));
@@ -670,6 +673,16 @@ namespace Orange
 			foreach (var atlasChain in atlasChainsToRebuild) {
 				BuildAtlasChain(atlasChain);
 			}
+		}
+
+		private static void SyncModels()
+		{
+			SyncUpdated(".dae", ".model", (srcPath, dstPath) => {
+				var rootNode = new Lime.Frame();
+				rootNode.AddNode(new ModelImporter(srcPath).RootNode);
+				Serialization.WriteObjectToBundle(assetsBundle, dstPath, rootNode);
+				return true;
+			});
 		}
 	}
 }

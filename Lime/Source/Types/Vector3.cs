@@ -49,9 +49,14 @@ namespace Lime
 			return new Vector2(v.X, v.Y);
 		}
 
-		bool IEquatable<Vector3>.Equals(Vector3 rhs)
+		public bool Equals(Vector3 rhs)
 		{
-			return X == rhs.X && Y == rhs.Y && Z == rhs.Z;
+			return this == rhs;
+		}
+
+		public override bool Equals(object obj)
+		{
+			return Equals((Vector3)obj);
 		}
 
 		/// <summary>
@@ -99,6 +104,16 @@ namespace Lime
 		public static Vector3 Scale(Vector3 lhs, Vector3 rhs)
 		{
 			return new Vector3(lhs.X * rhs.X, lhs.Y * rhs.Y, lhs.Z * rhs.Z);
+		}
+
+		public static bool operator ==(Vector3 lhs, Vector3 rhs)
+		{
+			return lhs.X == rhs.X && lhs.Y == rhs.Y && lhs.Z == rhs.Z;
+		}
+
+		public static bool operator !=(Vector3 lhs, Vector3 rhs)
+		{
+			return !(lhs == rhs);
 		}
 
 		/// <summary>

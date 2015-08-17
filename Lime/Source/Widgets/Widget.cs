@@ -68,6 +68,7 @@ namespace Lime
 	[ProtoInclude(110, typeof(RichText))]
 	[ProtoInclude(111, typeof(TextBox))]
 	[ProtoInclude(112, typeof(Movie))]
+	[ProtoInclude(113, typeof(ModelViewport))]
 	[DebuggerTypeProxy(typeof(WidgetDebugView))]
 	public partial class Widget : Node
 	{
@@ -127,55 +128,7 @@ namespace Lime
 			get { return null; }
 			set { }
 		}
-
-		private WidgetCachedRenderer cachedRenderer;
-		private WidgetCachedRenderer effectiveCachedRenderer;
-
-		public bool CachedRendering
-		{
-			get { return cachedRenderer != null; }
-			set
-			{
-				if (value && cachedRenderer == null) {
-					cachedRenderer = new WidgetCachedRenderer(this);
-				} else if (!value && cachedRenderer != null) {
-					cachedRenderer.Dispose();
-					cachedRenderer = null;
-				}
-				PropagateCachedRendererToHierarchy(cachedRenderer);
-			}
-		}
-
-		private void PropagateCachedRendererToHierarchy(WidgetCachedRenderer renderer)
-		{
-			effectiveCachedRenderer = renderer;
-			for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
-				if (node.AsWidget != null) {
-					node.AsWidget.PropagateCachedRendererToHierarchy(renderer);
-				}
-			}
-		}
-
-		protected void InvalidateGlobalValuesAndCachedRenderer(bool geometryChanged = false)
-		{
-			if (effectiveCachedRenderer != null) {
-				// Cached renderer is transformation-agnostic
-				if (!geometryChanged || cachedRenderer == null) {
-					effectiveCachedRenderer.Invalidate();
-				}
-			}
-			if (GlobalValuesValid) {
-				InvalidateGlobalValues();
-			}
-		}
-
-		public void InvalidateRenderCache()
-		{
-			if (effectiveCachedRenderer != null) {
-				effectiveCachedRenderer.Invalidate();
-			}
-		}
-
+				
 		internal protected virtual bool IsRenderedToTexture() 
 		{
 			return false; 
@@ -218,7 +171,7 @@ namespace Lime
 #endif
 				if (position.X != value.X || position.Y != value.Y) {
 					position = value;
-					InvalidateGlobalValuesAndCachedRenderer(true);
+					PropagateDirtyFlags(DirtyFlags.Transform);
 				}
 			}
 		}
@@ -236,7 +189,7 @@ namespace Lime
 #endif
 				if (position.X != value) {
 					position.X = value;
-					InvalidateGlobalValuesAndCachedRenderer(true);
+					PropagateDirtyFlags(DirtyFlags.Transform);
 				}
 			} 
 		}
@@ -254,7 +207,7 @@ namespace Lime
 #endif
 				if (position.Y != value) {
 					position.Y = value;
-					InvalidateGlobalValuesAndCachedRenderer(true);
+					PropagateDirtyFlags(DirtyFlags.Transform);
 				}
 			}
 		}
@@ -277,7 +230,7 @@ namespace Lime
 					var sizeDelta = value - size;
 					size = value;
 					OnSizeChanged(sizeDelta);
-					InvalidateGlobalValuesAndCachedRenderer();
+					PropagateDirtyFlags(DirtyFlags.Transform);
 				}
 			}
 		}
@@ -293,9 +246,6 @@ namespace Lime
 			}
 			if (lateTasks != null) {
 				lateTasks.Stop();
-			}
-			if (cachedRenderer != null) {
-				cachedRenderer.Dispose();
 			}
 			base.Dispose();
 		}
@@ -348,7 +298,7 @@ namespace Lime
 #endif
 				if (pivot.X != value.X || pivot.Y != value.Y) {
 					pivot = value;
-					InvalidateGlobalValuesAndCachedRenderer();
+					PropagateDirtyFlags(DirtyFlags.Transform);
 				}
 			} 
 		}
@@ -368,7 +318,7 @@ namespace Lime
 #endif
 				if (scale.X != value.X || scale.Y != value.Y) {
 					scale = value;
-					InvalidateGlobalValuesAndCachedRenderer();
+					PropagateDirtyFlags(DirtyFlags.Transform);
 				}
 			} 
 		}
@@ -387,7 +337,7 @@ namespace Lime
 				if (rotation != value) {
 					rotation = value;
 					direction = Mathf.CosSin(Mathf.DegreesToRadians * value);
-					InvalidateGlobalValuesAndCachedRenderer();
+					PropagateDirtyFlags(DirtyFlags.Transform);
 				}
 			}
 		}
@@ -402,7 +352,7 @@ namespace Lime
 			set {
 				if (color.ABGR != value.ABGR) {
 					color = value;
-					InvalidateGlobalValuesAndCachedRenderer();
+					PropagateDirtyFlags(DirtyFlags.Color);
 				}
 			} 
 		}
@@ -418,7 +368,7 @@ namespace Lime
 				var a = (byte)(value * 255f);
 				if (color.A != a) {
 					color.A = a;
-					InvalidateGlobalValuesAndCachedRenderer();
+					PropagateDirtyFlags(DirtyFlags.Color);
 				}
 			}
 		}
@@ -440,7 +390,7 @@ namespace Lime
 			{
 				if (blending != value) {
 					blending = value;
-					InvalidateGlobalValuesAndCachedRenderer();
+					PropagateDirtyFlags(DirtyFlags.Color);
 				}
 			} 
 		}
@@ -456,7 +406,7 @@ namespace Lime
 			{
 				if (shader != value) {
 					shader = value;
-					InvalidateGlobalValuesAndCachedRenderer();
+					PropagateDirtyFlags(DirtyFlags.Color);
 				}
 			}
 		}
@@ -469,7 +419,7 @@ namespace Lime
 			{
 				if (visible != value) {
 					visible = value;
-					InvalidateGlobalValuesAndCachedRenderer(true);
+					PropagateDirtyFlags(DirtyFlags.Visible);
 				}
 			}
 		}
@@ -497,35 +447,35 @@ namespace Lime
 
 		public Matrix32 LocalToWorldTransform
 		{
-			get { if (!GlobalValuesValid) RecalcGlobalValues(); return localToWorldTransform; }
+			get { RecalcDirtyGlobals(); return localToWorldTransform; }
 		}
 
 		public Color4 GlobalColor 
 		{
-			get { if (!GlobalValuesValid) RecalcGlobalValues(); return globalColor; }
+			get { RecalcDirtyGlobals(); return globalColor; }
 		}
 		
 		public Blending GlobalBlending
 		{
-			get { if (!GlobalValuesValid) RecalcGlobalValues(); return globalBlending; }
+			get { RecalcDirtyGlobals(); return globalBlending; }
 		}
 
 		public ShaderId GlobalShader
 		{
-			get { if (!GlobalValuesValid) RecalcGlobalValues(); return globalShader; }
+			get { RecalcDirtyGlobals(); return globalShader; }
 		}
 
 		public bool GloballyVisible 
 		{
 			get 
 			{
-				if (GlobalValuesValid) {
+				if ((DirtyMask & (DirtyFlags.Visible | DirtyFlags.Color)) == 0) {
 					return globallyVisible;
 				}
 				if (!visible || color.A == 0) {
 					return false;
 				}
-				RecalcGlobalValues(); 
+				RecalcDirtyGlobals(); 
 				return globallyVisible; 
 			}
 		}
@@ -632,10 +582,6 @@ namespace Lime
 		{
 			var clone = base.DeepCloneFast().AsWidget;
 			clone.input = null;
-			if (clone.cachedRenderer != null) {
-				clone.cachedRenderer = new WidgetCachedRenderer(clone);
-			}
-			clone.effectiveCachedRenderer = null;
 			clone.tasks = null;
 			clone.lateTasks = null;
 			return clone;
@@ -653,9 +599,7 @@ namespace Lime
 				Updating(delta);
 			}
 			if (GloballyVisible) {
-				if (IsRunning) {
-					AdvanceAnimation(delta);
-				}
+				AdvanceAnimation(delta);
 				SelfUpdate(delta);
 				for (var node = Nodes.FirstOrNull(); node != null; ) {
 					var next = node.NextSibling;
@@ -704,8 +648,9 @@ namespace Lime
 			}
 		}
 
-		protected override void RecalcGlobalValuesUsingParents()
+		protected override void RecalcDirtyGlobalsUsingParents()
 		{
+			// TODO: Optimize using DirtyMask
 			if (IsRenderedToTexture()) {
 				localToWorldTransform = Matrix32.Identity;
 				globalColor = color;
@@ -824,12 +769,6 @@ namespace Lime
 		{
 			if (!GloballyVisible) {
 				return;
-			}
-			if (cachedRenderer != null) {
-				if (cachedRenderer.Prepare()) {
-					chain.Add(cachedRenderer, Layer);
-					return;
-				}
 			}
 			if (Layer != 0) {
 				var oldLayer = chain.SetCurrentLayer(Layer);

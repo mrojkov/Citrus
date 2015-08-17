@@ -74,7 +74,7 @@ namespace Lime
 			var dm = mesh.DirtyAttributes;
 			if (mesh.Vertices != null) {
 				if (verticesVBO == null) {
-					verticesVBO = new VertexBuffer(Attributes.Vertex, VertexAttribPointerType.Float, 2);
+					verticesVBO = new VertexBuffer(Attributes.Vertex, VertexAttribPointerType.Float, 3);
 				}
 				verticesVBO.Bind(mesh.Vertices, (dm & Mesh.Attributes.Vertex) != 0);
 			}
