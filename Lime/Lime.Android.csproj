@@ -233,6 +233,17 @@
     <Compile Include="Source\Widgets\WebBrowser\WebBrowser.Win.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WinFormsWebBrowser.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WinFormsWebBrowserFactory.cs" />
+    <Compile Include="Source\Types\BoundingSphere.cs" />
+    <Compile Include="Source\Types\ContainmentType.cs" />
+    <Compile Include="Source\Types\Quaternion.cs" />
+    <Compile Include="Source\Types\Ray.cs" />
+    <Compile Include="Source\Widgets\Animation\Animation.cs" />
+    <Compile Include="Source\Widgets\Animation\AnimationList.cs" />
+    <Compile Include="Source\Widgets\Model\ModelCamera.cs" />
+    <Compile Include="Source\Widgets\Model\ModelMaterial.cs" />
+    <Compile Include="Source\Widgets\Model\ModelMesh.cs" />
+    <Compile Include="Source\Widgets\Model\ModelNode.cs" />
+    <Compile Include="Source\Widgets\Model\ModelViewport.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">
