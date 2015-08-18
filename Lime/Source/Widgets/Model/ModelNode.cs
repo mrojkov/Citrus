@@ -107,7 +107,7 @@ namespace Lime
 			}
 		}
 
-		public bool HitTest(Vector2 point, out Ray ray)
+		public bool HitTest(Vector2 point)
 		{
 			var vp = GetViewport();
 			if (vp == null || vp.Camera == null) {
@@ -125,7 +125,7 @@ namespace Lime
 			var cameraTransform = camera.GlobalTransform;
 			cameraTransform.Translation = Vector3.Zero; // Discard the camera position
 			direction = cameraTransform.TransformVector(direction);
-			ray = new Ray() {
+			var ray = new Ray() {
 				Direction = Vector3.Normalize(direction),
 				Position = Vector3.Zero * camera.GlobalTransform
 			};
