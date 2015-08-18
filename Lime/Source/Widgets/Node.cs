@@ -176,6 +176,21 @@ namespace Lime
 		protected bool IsDirty(DirtyFlags mask) { return (DirtyMask & mask) != 0; }
 
 		#endregion
+		#region Compatibility
+
+		[ProtoMember(7)]
+		public MarkerCollection _Markers;
+
+		[ProtoAfterDeserialization]
+		void AfterDeserialization()
+		{
+			if (_Markers != null && _Markers.Count > 0) {
+				Markers.AddRange(_Markers);
+			}
+			_Markers = null;
+		}
+
+		#endregion
 		#region Methods
 
 		public static int CreatedCount = 0;
