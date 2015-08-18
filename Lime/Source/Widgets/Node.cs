@@ -182,7 +182,7 @@ namespace Lime
 		public MarkerCollection _Markers;
 
 		[ProtoAfterDeserialization]
-		void AfterDeserialization()
+		public void AfterDeserialization()
 		{
 			if (_Markers != null && _Markers.Count > 0) {
 				Markers.AddRange(_Markers);
