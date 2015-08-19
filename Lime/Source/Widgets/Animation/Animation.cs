@@ -9,14 +9,27 @@ namespace Lime
 	[ProtoContract]
 	public class Animation : ICloneable
 	{
+		internal int TimeInternal;
+
 		[ProtoMember(1)]
 		public MarkerCollection Markers { get; private set; }
 
 		[ProtoMember(2)]
 		public string Id;
-
+		
 		[ProtoMember(3)]
-		public int Time;
+		public int Time
+		{
+			get { return TimeInternal; }
+			set
+			{
+				TimeInternal = value;
+				if (Owner == null) {
+					return; // Protect us against protobuf
+				}
+				AnimationEngine.ApplyAnimators(this, false);
+			}
+		}
 
 		public int Frame
 		{
@@ -26,6 +39,8 @@ namespace Lime
 
 		[ProtoMember(4)]
 		public bool IsRunning;
+
+		public Node Owner;
 
 		public event Action Stopped;
 
@@ -43,7 +58,7 @@ namespace Lime
 			if (!IsRunning) {
 				return;
 			}
-			AnimationEngine.AdvanceAnimation(owner, this, delta);
+			AnimationEngine.AdvanceAnimation(this, delta);
 		}
 
 		public void Run(string markerId = null)
@@ -64,7 +79,7 @@ namespace Lime
 
 		public void ApplyAnimators(Node owner, bool invokeTriggers)
 		{
-			AnimationEngine.ApplyAnimators(owner, this, invokeTriggers);
+			AnimationEngine.ApplyAnimators(this, invokeTriggers);
 		}
 
 		internal void OnStopped()
@@ -77,6 +92,7 @@ namespace Lime
 		public Animation Clone()
 		{
 			var clone = (Animation)MemberwiseClone();
+			clone.Owner = null;
 			clone.Markers = MarkerCollection.DeepClone(Markers);
 			return clone;
 		}

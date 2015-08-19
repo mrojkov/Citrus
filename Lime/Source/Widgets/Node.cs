@@ -122,11 +122,7 @@ namespace Lime
 		public int AnimationTime
 		{
 			get { return DefaultAnimation.Time; }
-			set
-			{
-				DefaultAnimation.Time = value;
-				DefaultAnimation.ApplyAnimators(this, invokeTriggers: false);
-			}
+			set { DefaultAnimation.Time = value; }
 		}
 
 		public Animation DefaultAnimation
@@ -200,7 +196,7 @@ namespace Lime
 		{
 			AnimationSpeed = 1;
 			Animators = new AnimatorCollection(this);
-			Animations = new AnimationList();
+			Animations = new AnimationList(this);
 			Nodes = new NodeList(this);
 			++CreatedCount;
 		}
@@ -322,7 +318,7 @@ namespace Lime
 			clone.NextSibling = null;
 			clone.AsWidget = clone as Widget;
 			clone.GlobalValuesValid = false;
-			clone.Animations = Animations.Clone();
+			clone.Animations = Animations.Clone(clone);
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Nodes = Nodes.DeepCloneFast(clone);
 			return clone;
