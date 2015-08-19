@@ -41,6 +41,11 @@ namespace Lime
 			get { return Find(id); }
 		}
 
+		public AnimationList()
+		{
+			list = new List<Animation>();
+		}
+
 		public AnimationList(Node owner)
 		{
 			this.owner = owner;

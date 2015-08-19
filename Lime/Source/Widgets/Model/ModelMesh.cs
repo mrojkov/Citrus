@@ -13,6 +13,8 @@ namespace Lime
 		[ProtoMember(2)]
 		public BoundingSphere BoundingSphere { get; set; }
 
+		public bool SkipRender;
+
 		public ModelMesh()
 		{
 			Submeshes = new List<ModelSubmesh>();
@@ -40,6 +42,9 @@ namespace Lime
 
 		public override void Render()
 		{
+			if (SkipRender) {
+				return;
+			}
 			foreach (var sm in Submeshes) {
 				var viewProjection = Renderer.Projection;
 				Renderer.Projection = GlobalTransform * viewProjection;
@@ -52,17 +57,21 @@ namespace Lime
 			}
 		}
 
-		public override bool HitTest(Ray ray, out float distance)
+		public override MeshHitTestResult HitTest(Ray ray)
 		{
-			var childIntersected = base.HitTest(ray, out distance);
-			distance = float.MaxValue;
+			if (!GloballyVisible) {
+				return MeshHitTestResult.Default;
+			}
+			var result = base.HitTest(ray);
 			var sphereInWorldSpace = BoundingSphere;
 			sphereInWorldSpace.Center *= globalTransform;
 			Vector3 scale = globalTransform.Scale;
 			sphereInWorldSpace.Radius *= Math.Max(Math.Abs(scale.X), Math.Max(Math.Abs(scale.Y), Math.Abs(scale.Z)));
 			var d = ray.Intersects(sphereInWorldSpace);
-			distance = Mathf.Min(distance, d.HasValue ? d.Value : float.MaxValue);
-			return childIntersected || d.HasValue;
+			if (d.HasValue && d.Value < result.Distance) {
+				result = new MeshHitTestResult() { Distance = d.Value, Mesh = this };
+			}
+			return result;
 		}
 	}
 

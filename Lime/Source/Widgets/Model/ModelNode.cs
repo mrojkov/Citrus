@@ -107,7 +107,7 @@ namespace Lime
 			}
 		}
 
-		public bool HitTest(Vector2 point)
+		public MeshHitTestResult HitTest(Vector2 point)
 		{
 			var vp = GetViewport();
 			if (vp == null || vp.Camera == null) {
@@ -129,8 +129,7 @@ namespace Lime
 				Direction = Vector3.Normalize(direction),
 				Position = Vector3.Zero * camera.GlobalTransform
 			};
-			float d;
-			return HitTest(ray, out d);
+			return HitTest(ray);
 		}
 
 		public ModelViewport GetViewport()
@@ -142,18 +141,34 @@ namespace Lime
 			return p as ModelViewport;
 		}
 
-		public virtual bool HitTest(Ray ray, out float distance)
+		public struct MeshHitTestResult
 		{
-			distance = float.MaxValue;
+			public ModelMesh Mesh;
+			public float Distance;
+
+			public static readonly MeshHitTestResult Default = new MeshHitTestResult { Distance = float.MaxValue };
+		}
+
+		public virtual MeshHitTestResult HitTest(Ray ray)
+		{
+			var result = MeshHitTestResult.Default;
 			if (!GloballyVisible)
-				return false;
+				return result;
 			foreach (var node in Nodes) {
-				float d;
-				if (node.AsModelNode != null && node.AsModelNode.HitTest(ray, out d)) {
-					distance = Math.Min(distance, d);
+				if (node.AsModelNode != null) {
+					var r = node.AsModelNode.HitTest(ray);
+					if (r.Distance < result.Distance) {
+						result = r;
+					}
 				}
 			}
-			return distance != float.MaxValue;
+			return result;
+		}
+
+		protected virtual bool SelfHitTest(Ray ray, out float distance)
+		{
+			distance = float.MaxValue;
+			return false;
 		}
 	}
 }
