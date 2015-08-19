@@ -10,10 +10,19 @@ namespace Lime
 	[ProtoContract]
 	public class ModelViewport : Widget
 	{
+		private ModelCamera camera;
 		private RenderChain chain = new RenderChain();
 		private float frame;
 
-		public ModelCamera Camera { get; set; }
+		public ModelCamera Camera
+		{
+			get { return camera; }
+			set
+			{
+				camera = value;
+				AdjustCameraAspectRatio();
+			}
+		}
 
 		[ProtoMember(1)]
 		public float Frame
@@ -23,6 +32,19 @@ namespace Lime
 			{
 				frame = value;
 				RefreshChildren();
+			}
+		}
+
+		protected override void OnSizeChanged(Vector2 sizeDelta)
+		{
+			base.OnSizeChanged(sizeDelta);
+			AdjustCameraAspectRatio();
+		}
+
+		private void AdjustCameraAspectRatio()
+		{
+			if (camera != null) {
+				camera.AspectRatio = Width / Height;
 			}
 		}
 

@@ -83,7 +83,7 @@ namespace Lime
 				if (projectionDirty) {
 					projectionDirty = false;
 					projection = Matrix44.CreatePerspectiveFieldOfView(
-						fieldOfView,
+						fieldOfView / aspectRatio,
 						aspectRatio,
 						nearClipPlane,
 						farClipPlane
