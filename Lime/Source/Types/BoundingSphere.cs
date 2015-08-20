@@ -117,19 +117,19 @@ namespace Lime
 			// The current bounding sphere is just a good approximation and may not enclose all points.            
 			// From: Mathematics for 3D Game Programming and Computer Graphics, Eric Lengyel, Third Edition.
 			// Page 218
-			//float sqRadius = radius * radius;
-			//foreach (var pt in points) {
-			//	Vector3 diff = (pt - center);
-			//	float sqDist = diff.SquaredLength;
-			//	if (sqDist > sqRadius) {
-			//		float distance = (float)Math.Sqrt(sqDist);
-			//		Vector3 direction = diff / distance;
-			//		Vector3 G = center - radius * direction;
-			//		center = (G + pt) / 2;
-			//		radius = (pt - center).Length;
-			//		sqRadius = radius * radius;
-			//	}
-			//}
+			float sqRadius = radius * radius;
+			foreach (var pt in points) {
+				Vector3 diff = (pt - center);
+				float sqDist = diff.SquaredLength;
+				if (sqDist > sqRadius) {
+					float distance = (float)Math.Sqrt(sqDist);
+					Vector3 direction = diff / distance;
+					Vector3 G = center - radius * direction;
+					center = (G + pt) / 2;
+					radius = (pt - center).Length;
+					sqRadius = radius * radius;
+				}
+			}
 
 			return new BoundingSphere(center, radius);
 		}

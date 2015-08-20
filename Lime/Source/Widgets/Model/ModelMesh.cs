@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ProtoBuf;
 
 namespace Lime
@@ -63,10 +64,13 @@ namespace Lime
 				return MeshHitTestResult.Default;
 			}
 			var result = base.HitTest(ray);
-			var sphereInWorldSpace = BoundingSphere;
-			sphereInWorldSpace.Center *= globalTransform;
-			Vector3 scale = globalTransform.Scale;
-			sphereInWorldSpace.Radius *= Math.Max(Math.Abs(scale.X), Math.Max(Math.Abs(scale.Y), Math.Abs(scale.Z)));
+			//var sphereInWorldSpace = BoundingSphere;
+			//sphereInWorldSpace.Center *= GlobalTransform;
+			//Vector3 scale = GlobalTransform.Scale;
+			//sphereInWorldSpace.Radius *= Math.Max(Math.Abs(scale.X), Math.Max(Math.Abs(scale.Y), Math.Abs(scale.Z)));
+
+			var sphereInWorldSpace = BoundingSphere.CreateFromPoints(Submeshes.SelectMany(sm => sm.Geometry.Vertices).Select(v => v * GlobalTransform));
+			//sphereInWorldSpace = sphereInWorldSpace.Transform(GlobalTransform);
 			var d = ray.Intersects(sphereInWorldSpace);
 			if (d.HasValue && d.Value < result.Distance) {
 				result = new MeshHitTestResult() { Distance = d.Value, Mesh = this };
