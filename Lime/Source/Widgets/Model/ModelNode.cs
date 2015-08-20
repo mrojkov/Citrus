@@ -115,11 +115,10 @@ namespace Lime
 			}
 			// Get the point coordinates in the normalized screen space <-1, 1>
 			var camera = vp.Camera;
-			point = Input.ScreenToWorldTransform * point;
 			point = vp.LocalToWorldTransform.CalcInversed().TransformVector(point);
-			point = (point / World.Instance.Size - Vector2.Half) * 2;
+			point = (point / vp.Size - Vector2.Half) * 2;
 			// Calc the ray direction
-			var direction = new Vector3(point.X, -point.Y, 0);
+			var direction = new Vector3(point.X, -point.Y, -1);
 			direction = camera.Projection.CalcInverted().ProjectVector(direction);
 			// Rotate the direction according to the camera orientation
 			var cameraTransform = camera.GlobalTransform;
@@ -163,12 +162,6 @@ namespace Lime
 				}
 			}
 			return result;
-		}
-
-		protected virtual bool SelfHitTest(Ray ray, out float distance)
-		{
-			distance = float.MaxValue;
-			return false;
 		}
 	}
 }
