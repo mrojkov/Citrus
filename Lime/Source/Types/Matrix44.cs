@@ -425,40 +425,17 @@ namespace Lime
 
 		public static Matrix44 CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance)
 		{
-			//Matrix44 matrix;
-			//if ((fieldOfView <= 0f) || (fieldOfView >= 3.141593f)) {
-			//	throw new ArgumentException("fieldOfView <= 0 O >= PI");
-			//}
-			//if (nearPlaneDistance <= 0f) {
-			//	throw new ArgumentException("nearPlaneDistance <= 0");
-			//}
-			//if (farPlaneDistance <= 0f) {
-			//	throw new ArgumentException("farPlaneDistance <= 0");
-			//}
-			//if (nearPlaneDistance >= farPlaneDistance) {
-			//	throw new ArgumentException("nearPlaneDistance >= farPlaneDistance");
-			//}
-			//float num = 1f / ((float)Math.Tan((double)(fieldOfView * 0.5f)));
-			//float num9 = num / aspectRatio;
-			//matrix.M11 = num9;
-			//matrix.M12 = matrix.M13 = matrix.M14 = 0f;
-			//matrix.M22 = num;
-			//matrix.M21 = matrix.M23 = matrix.M24 = 0f;
-			//matrix.M31 = matrix.M32 = 0f;
-			//matrix.M33 = farPlaneDistance / (nearPlaneDistance - farPlaneDistance);
-			//matrix.M34 = -1f;
-			//matrix.M41 = matrix.M42 = matrix.M44 = 0f;
-			//matrix.M43 = (nearPlaneDistance * farPlaneDistance) / (nearPlaneDistance - farPlaneDistance);
-			//return matrix;
-
-			var m = OpenTK.Matrix4.CreatePerspectiveFieldOfView(fieldOfView, aspectRatio, nearPlaneDistance, farPlaneDistance);
-			return new Matrix44(
-				m.M11, m.M12, m.M13, m.M14,
-				m.M21, m.M22, m.M23, m.M24,
-				m.M31, m.M32, m.M33, m.M34,
-				m.M41, m.M42, m.M43, m.M44
-			);
-        }
+			var num1 = 1f / ((float)Math.Tan((double)(fieldOfView * 0.5f)));
+			var num2 = num1 / aspectRatio;
+			var zDistance = farPlaneDistance - nearPlaneDistance;
+			return new Matrix44 {
+				M11 = num2,
+				M22 = num1,
+				M33 = -(farPlaneDistance + nearPlaneDistance) / zDistance,
+				M34 = -1f,
+				M43 = -2f * farPlaneDistance * nearPlaneDistance / zDistance
+			};
+		}
 
 		public static Matrix44 CreatePerspectiveOffCenter(float left, float right, float bottom, float top, float nearPlaneDistance, float farPlaneDistance)
 		{
