@@ -6,6 +6,7 @@ using OpenTK;
 using Android.Content;
 using OpenTK.Graphics;
 using System.Collections.Generic;
+using Android.Content.PM;
 using Android.Views;
 using Android.Views.InputMethods;
 using Android.Widget;
@@ -205,7 +206,10 @@ namespace Lime
 			if (!GraphicsContext.IsCurrent) {
 				MakeCurrent();
 			}
-			RestrictSupportedOrientationsWith(Application.Instance.SupportedDeviceOrientations);
+			var allowedOrientaion = IsRotationEnabled()
+				? Application.Instance.SupportedDeviceOrientations
+				: Application.Instance.CurrentDeviceOrientation;
+			RestrictSupportedOrientationsWith(allowedOrientaion);
 			base.OnRenderFrame(e);
 			FPSCalculator.Refresh();
 			Application.Instance.OnRenderFrame();
@@ -213,33 +217,36 @@ namespace Lime
 			FPSCalculator.Refresh();
 		}
 
+		private static bool IsRotationEnabled()
+		{
+			var settingCode = Android.Provider.Settings.System.GetInt(Android.App.Application.Context.ContentResolver,
+				Android.Provider.Settings.System.AccelerometerRotation);
+			return settingCode == 1;
+		}
+
 		private void RestrictSupportedOrientationsWith(DeviceOrientation orientation)
 		{
-			Android.Content.PM.ScreenOrientation o;
+			((Android.App.Activity)Context).RequestedOrientation = GetScreenOrientation(orientation);
+		}
+
+		private static ScreenOrientation GetScreenOrientation(DeviceOrientation orientation)
+		{
 			switch (orientation) {
 				case DeviceOrientation.LandscapeLeft:
-					o = Android.Content.PM.ScreenOrientation.Landscape;
-					break;
+					return ScreenOrientation.Landscape;
 				case DeviceOrientation.LandscapeRight:
-					o = Android.Content.PM.ScreenOrientation.ReverseLandscape;
-					break;
+					return ScreenOrientation.ReverseLandscape;
 				case DeviceOrientation.AllLandscapes:
-					o = Android.Content.PM.ScreenOrientation.SensorLandscape;
-					break;
+					return ScreenOrientation.SensorLandscape;
 				case DeviceOrientation.Portrait:
-					o = Android.Content.PM.ScreenOrientation.Portrait;
-					break;
+					return ScreenOrientation.Portrait;
 				case DeviceOrientation.PortraitUpsideDown:
-					o = Android.Content.PM.ScreenOrientation.ReversePortrait;
-					break;
+					return ScreenOrientation.ReversePortrait;
 				case DeviceOrientation.AllPortraits:
-					o = Android.Content.PM.ScreenOrientation.SensorPortrait;
-					break;
+					return ScreenOrientation.SensorPortrait;
 				default:
-					o = Android.Content.PM.ScreenOrientation.FullSensor;
-					break;
+					return ScreenOrientation.FullSensor;
 			}
-			((Android.App.Activity)Context).RequestedOrientation = o;
 		}
 
 		public float FrameRate {
