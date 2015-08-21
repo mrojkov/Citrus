@@ -39,20 +39,26 @@ namespace ChromiumWebBrowser
 
 		private void LoadTexture(object sender, EventArgs eventArgs)
 		{
-			var bitmapInfo = browserLogic.BitmapInfo;
-			if (bitmapInfo == null)
-				return;
 			Application.InvokeOnMainThread(() => {
-				var bitmapPointer = bitmapInfo.BackBufferHandle;
-				SwapRedAndBlue32(bitmapPointer, browserLogic.Size.Width * browserLogic.Size.Height);
-				texture.LoadImage(bitmapPointer, browserLogic.Size.Width, browserLogic.Size.Height, false);
+				if (browserLogic == null)
+					return;
+				var bitmapInfo = browserLogic.BitmapInfo;
+				if (bitmapInfo == null)
+					return;
+				lock (bitmapInfo.BitmapLock) {
+					var bitmapPointer = bitmapInfo.BackBufferHandle;
+					SwapRedAndBlue32(bitmapPointer, bitmapInfo.Width * bitmapInfo.Height);
+					texture.LoadImage(bitmapPointer, bitmapInfo.Width, bitmapInfo.Height, false);
+				}
 			});
 		}
 
 		public void Dispose()
 		{
 			browserLogic.Dispose();
+			browserLogic = null;
 			texture.Dispose();
+			texture = null;
 		}
 
 		public void Render(Widget widget)
@@ -205,7 +211,7 @@ namespace ChromiumWebBrowser
 			}
 		}
 
-		private void SwapRedAndBlue32(IntPtr data, int count)
+		private static void SwapRedAndBlue32(IntPtr data, int count)
 		{
 			unsafe {
 				var p = (uint*) data;
