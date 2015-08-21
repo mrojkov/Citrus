@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using ProtoBuf;
 
 namespace Lime
@@ -267,14 +268,14 @@ namespace Lime
 		/// <summary>
 		/// Нормализует вектор
 		/// </summary>
-        public void Normalize()
-        {
-            float length = this.Length;
-            if (length > 0) {
-                this.X /= length;
-                this.Y /= length;
-            }
-        }
+		public void Normalize()
+		{
+			float length = this.Length;
+			if (length > 0) {
+				this.X /= length;
+				this.Y /= length;
+			}
+		}
 
 		/// <summary>
 		/// Возвращает вектор направления
@@ -381,7 +382,8 @@ namespace Lime
 				return false;
 			}
 
-			return float.TryParse(parts[0], out vector.X) & float.TryParse(parts[1], out vector.Y);
+			return float.TryParse(parts[0], NumberStyles.Float, CultureInfo.InvariantCulture, out vector.X)
+				&& float.TryParse(parts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out vector.Y);
 		}
 
 		/// <summary>
