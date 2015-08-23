@@ -162,6 +162,9 @@ namespace Lime
 		/// </summary>
 		/// <param name="obj">The <see cref="Object"/> to compare.</param>
 		/// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
+		/// <remarks>
+		/// Compairing is done without taking floating point error into account.
+		/// </remarks>
 		public override bool Equals(object obj)
 		{
 			return obj is Vector2 && Equals((Vector2) obj);
@@ -182,6 +185,9 @@ namespace Lime
 		/// <param name="left"><see cref="Vector2"/> instance on the left of the equal sign.</param>
 		/// <param name="right"><see cref="Vector2"/> instance on the right of the equal sign.</param>
 		/// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
+		/// <remarks>
+		/// Compairing is done without taking floating point error into account.
+		/// </remarks>
 		public static bool operator == (Vector2 left, Vector2 right)
 		{
 			return left.X == right.X && left.Y == right.Y;
@@ -193,6 +199,9 @@ namespace Lime
 		/// <param name="left"><see cref="Vector2"/> instance on the left of the not equal sign.</param>
 		/// <param name="right"><see cref="Vector2"/> instance on the right of the not equal sign.</param>
 		/// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>	
+		/// <remarks>
+		/// Compairing is done without taking floating point error into account.
+		/// </remarks>
 		public static bool operator != (Vector2 left, Vector2 right)
 		{
 			return left.X != right.X || left.Y != right.Y;
