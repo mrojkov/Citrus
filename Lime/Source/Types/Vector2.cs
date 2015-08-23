@@ -490,7 +490,7 @@ namespace Lime
 
 		/// <summary>
 		/// Returns the <see cref="String"/> representation of this <see cref="Vector2"/> in the format:
-		/// "[<see cref="X"/>], [<see cref="Y"/>]".
+		/// "<see cref="X"/>, <see cref="Y"/>".
 		/// </summary>
 		/// <returns>The <see cref="String"/> representation of this <see cref="Vector2"/>.</returns>
 		public override string ToString()

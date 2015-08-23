@@ -327,7 +327,7 @@ namespace Lime
 
 		/// <summary>
 		/// Returns the <see cref="String"/> representation of this <see cref="Vector3"/> in the format:
-		/// "[<see cref="X"/>], [<see cref="Y"/>], [<see cref="Z"/>]".
+		/// "<see cref="X"/>, <see cref="Y"/>, <see cref="Z"/>".
 		/// </summary>
 		/// <returns>The <see cref="String"/> representation of this <see cref="Vector3"/>.</returns>
 		public override string ToString()
