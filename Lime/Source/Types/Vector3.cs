@@ -4,36 +4,51 @@ using ProtoBuf;
 namespace Lime
 {
 	/// <summary>
-	/// Представляет точку с в трехмерном пространстве
+	/// Representation of 3D vectors and points.
 	/// </summary>
 	[System.Diagnostics.DebuggerStepThrough]
 	[ProtoContract]
 	public struct Vector3 : IEquatable<Vector3>
 	{
+		/// <summary>
+		/// X component of this <see cref="Vector3"/>.
+		/// </summary>
 		[ProtoMember(1)]
 		public float X;
 
+		/// <summary>
+		/// Y component of this <see cref="Vector3"/>.
+		/// </summary>
 		[ProtoMember(2)]
 		public float Y;
 
+		/// <summary>
+		/// Z component of this <see cref="Vector3"/>.
+		/// </summary>
 		[ProtoMember(3)]
 		public float Z;
 
 		/// <summary>
-		/// Возвращает вектор (0, 0, 0)
+		/// Returns a <see cref="Vector3"/> with components 0, 0, 0.
 		/// </summary>
 		public static readonly Vector3 Zero = new Vector3(0, 0, 0);
 
 		/// <summary>
-		/// Возвращает вектор (1, 1, 1)
+		/// Returns a <see cref="Vector3"/> with components 1, 1, 1.
 		/// </summary>
 		public static readonly Vector3 One = new Vector3(1, 1, 1);
 
 		/// <summary>
-		/// Возвращает вектор (0.5, 0.5, 0.5)
+		/// Returns a <see cref="Vector3"/> with components 0.5, 0.5, 0.5.
 		/// </summary>
 		public static readonly Vector3 Half = new Vector3(0.5f, 0.5f, 0.5f);
 
+		/// <summary>
+		/// Constructs a 3D vector with X, Y and Z from three values.
+		/// </summary>
+		/// <param name="x">The x coordinate in 3d-space.</param>
+		/// <param name="y">The y coordinate in 3d-space.</param>
+		/// <param name="z">The z coordinate in 3d-space.</param>
 		public Vector3(float x, float y, float z)
 		{
 			X = x;
@@ -42,173 +57,282 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Преобразует Vector3 в Vector2. Координата Z не учитывается
+		/// Explicit cast from <see cref="Vector3"/> to <see cref="Vector2"/>.
 		/// </summary>
-		public static explicit operator Vector2(Vector3 v)
+		/// <param name="value">Source <see cref="Vector3"/>.</param>
+		/// <returns>
+		/// New <see cref="Vector2"/> with X and Y of source <see cref="Vector3"/>.
+		/// </returns>
+		public static explicit operator Vector2(Vector3 value)
 		{
-			return new Vector2(v.X, v.Y);
+			return new Vector2(value.X, value.Y);
 		}
 
-		public bool Equals(Vector3 rhs)
+		/// <summary>
+		/// Compares whether current instance is equal to specified <see cref="Vector3"/>.
+		/// </summary>
+		/// <param name="other">The <see cref="Vector3"/> to compare.</param>
+		/// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
+		/// <remarks>
+		/// Compairing is done without taking floating point error into account.
+		/// </remarks>
+		public bool Equals(Vector3 other)
 		{
-			return this == rhs;
+			return X == other.X 
+				&& Y == other.Y 
+				&& Z == other.Z;
 		}
 
+		/// <summary>
+		/// Compares whether current instance is equal to specified <see cref="Object"/>.
+		/// </summary>
+		/// <param name="obj">The <see cref="Object"/> to compare.</param>
+		/// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
+		/// <remarks>
+		/// Compairing is done without taking floating point error into account.
+		/// </remarks>
 		public override bool Equals(object obj)
 		{
-			return Equals((Vector3)obj);
+			return obj is Vector3 && Equals((Vector3)obj);
 		}
 
 		/// <summary>
-		/// Возвращает результат линейной интерполяции двух векторов
+		/// Creates a new <see cref="Vector3"/> that contains 
+		/// linear interpolation of the specified vectors.
 		/// </summary>
-		/// <param name="t">Значение интерполяции [0, 1]</param>
-		/// <param name="a">Первый вектор</param>
-		/// <param name="b">Второй вектор</param>
-		public static Vector3 Lerp(float t, Vector3 a, Vector3 b)
+		/// <param name="amount">Weighting value(between 0.0 and 1.0).</param>
+		/// <param name="value1">The first <see cref="Vector3"/>.</param>
+		/// <param name="value2">The second <see cref="Vector3"/>.</param>
+		/// <returns>The result of linear interpolation of the specified vectors.</returns>
+		public static Vector3 Lerp(float amount, Vector3 value1, Vector3 value2)
 		{
-			Vector3 r = new Vector3();
-			r.X = (b.X - a.X) * t + a.X;
-			r.Y = (b.Y - a.Y) * t + a.Y;
-			r.Z = (b.Z - a.Z) * t + a.Z;
-			return r;
+			return new Vector3
+			{
+				X = Mathf.Lerp(amount, value1.X, value2.X),
+				Y = Mathf.Lerp(amount, value1.Y, value2.Y),
+				Z = Mathf.Lerp(amount, value1.Z, value2.Z)
+			};
 		}
 
 		/// <summary>
-		/// Покомпонентное умножение векторов
+		/// Multiplies the components of two <see cref="Vector3"/> instances by each other.
 		/// </summary>
-		public static Vector3 operator *(Vector3 lhs, Vector3 rhs)
+		/// <param name="left">Source <see cref="Vector3"/> on the left of the mul sign.</param>
+		/// <param name="right">Source <see cref="Vector3"/> on the right of the mul sign.</param>
+		/// <returns>The result of the <see cref="Vector3"/> multiplication.</returns>
+		public static Vector3 operator *(Vector3 left, Vector3 right)
 		{
-			return new Vector3(lhs.X * rhs.X, lhs.Y * rhs.Y, lhs.Z * rhs.Z);
+			return new Vector3(left.X * right.X, left.Y * right.Y, left.Z * right.Z);
 		}
 
 		/// <summary>
-		/// Покомпонентное деление векторов
+		/// Divides the components of the <see cref="Vector3"/> 
+		/// by the components of another <see cref="Vector3"/>.
 		/// </summary>
-		public static Vector3 operator /(Vector3 lhs, Vector3 rhs)
+		/// <param name="left">Source <see cref="Vector3"/> on the left of the div sign.</param>
+		/// <param name="right">Divisor <see cref="Vector3"/> on the right of the div sign.</param>
+		/// <returns>The result of the <see cref="Vector3"/> divide.</returns>
+		public static Vector3 operator /(Vector3 left, Vector3 right)
 		{
-			return new Vector3(lhs.X / rhs.X, lhs.Y / rhs.Y, lhs.Z / rhs.Z);
+			return new Vector3(left.X / right.X, left.Y / right.Y, left.Z / right.Z);
 		}
 
 		/// <summary>
-		/// Делит каждый компонент вектора на число
+		/// Divides the components of the <see cref="Vector3"/> by a scalar.
 		/// </summary>
-		public static Vector3 operator /(Vector3 lhs, float rhs)
+		/// <param name="value">Source <see cref="Vector3"/> on the left of the div sign.</param>
+		/// <param name="divider">Divisor scalar on the right of the div sign.</param>
+		/// <returns>The result of dividing the <see cref="Vector3"/> by a scalar.</returns>
+		public static Vector3 operator /(Vector3 value, float divider)
 		{
-			return new Vector3(lhs.X / rhs, lhs.Y / rhs, lhs.Z / rhs);
+			return new Vector3(value.X / divider, value.Y / divider, value.Z / divider);
 		}
 
 		/// <summary>
-		/// Покомпонентное умножение векторов (аналогично операции умножения)
+		/// Multiplies the components of two <see cref="Vector3"/> instances by each other.
 		/// </summary>
-		public static Vector3 Scale(Vector3 lhs, Vector3 rhs)
+		/// <param name="left">Source <see cref="Vector3"/> on the left of the mul sign.</param>
+		/// <param name="right">Source <see cref="Vector3"/> on the right of the mul sign.</param>
+		/// <returns>The result of the <see cref="Vector3"/> multiplication.</returns>
+		public static Vector3 Scale(Vector3 left, Vector3 right)
 		{
-			return new Vector3(lhs.X * rhs.X, lhs.Y * rhs.Y, lhs.Z * rhs.Z);
-		}
-
-		public static bool operator ==(Vector3 lhs, Vector3 rhs)
-		{
-			return lhs.X == rhs.X && lhs.Y == rhs.Y && lhs.Z == rhs.Z;
-		}
-
-		public static bool operator !=(Vector3 lhs, Vector3 rhs)
-		{
-			return !(lhs == rhs);
+			return new Vector3(left.X * right.X, left.Y * right.Y, left.Z * right.Z);
 		}
 
 		/// <summary>
-		/// Умножает каждый компонент вектора на число
+		/// Compares whether two <see cref="Vector3"/> instances are equal.
 		/// </summary>
-		public static Vector3 operator *(float lhs, Vector3 rhs)
+		/// <param name="left"><see cref="Vector3"/> instance on the left of the equal sign.</param>
+		/// <param name="right"><see cref="Vector3"/> instance on the right of the equal sign.</param>
+		/// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
+		/// <remarks>
+		/// Compairing is done without taking floating point error into account.
+		/// </remarks>
+		public static bool operator ==(Vector3 left, Vector3 right)
 		{
-			return new Vector3(lhs * rhs.X, lhs * rhs.Y, lhs * rhs.Z);
+			return left.X == right.X 
+				&& left.Y == right.Y 
+				&& left.Z == right.Z;
 		}
 
 		/// <summary>
-		/// Умножает каждый компонент вектора на число
+		/// Compares whether two <see cref="Vector3"/> instances are not equal.
 		/// </summary>
-		public static Vector3 operator *(Vector3 lhs, float rhs)
+		/// <param name="left"><see cref="Vector3"/> instance on the left of the not equal sign.</param>
+		/// <param name="right"><see cref="Vector3"/> instance on the right of the not equal sign.</param>
+		/// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>	
+		/// <remarks>
+		/// Compairing is done without taking floating point error into account.
+		/// </remarks>
+		public static bool operator !=(Vector3 left, Vector3 right)
 		{
-			return new Vector3(rhs * lhs.X, rhs * lhs.Y, rhs * lhs.Z);
+			return !(left == right);
 		}
 
 		/// <summary>
-		/// Покомпонентное сложение векторов
+		/// Multiplies the components of <see cref="Vector3"/> by a scalar.
 		/// </summary>
-		public static Vector3 operator +(Vector3 lhs, Vector3 rhs)
+		/// <param name="scaleFactor">Scalar value on the left of the mul sign.</param>
+		/// <param name="value">Source <see cref="Vector3"/> on the right of the mul sign.</param>
+		/// <returns>The result of the <see cref="Vector3"/> multiplication with a scalar.</returns>
+		public static Vector3 operator *(float scaleFactor, Vector3 value)
 		{
-			return new Vector3(lhs.X + rhs.X, lhs.Y + rhs.Y, lhs.Z + rhs.Z);
+			return new Vector3(scaleFactor * value.X, scaleFactor * value.Y, scaleFactor * value.Z);
 		}
 
 		/// <summary>
-		/// Покомпонентная разность векторов
+		/// Multiplies the components of <see cref="Vector3"/> by a scalar.
 		/// </summary>
-		public static Vector3 operator -(Vector3 lhs, Vector3 rhs)
+		/// <param name="value">Source <see cref="Vector3"/> on the right of the mul sign.</param>
+		/// <param name="scaleFactor">Scalar value on the left of the mul sign.</param>
+		/// <returns>The result of the <see cref="Vector3"/> multiplication with a scalar.</returns>
+		public static Vector3 operator *(Vector3 value, float scaleFactor)
 		{
-			return new Vector3(lhs.X - rhs.X, lhs.Y - rhs.Y, lhs.Z - rhs.Z);
+			return new Vector3(scaleFactor * value.X, scaleFactor * value.Y, scaleFactor * value.Z);
 		}
 
 		/// <summary>
-		/// Меняет знак у каждого компонента вектора
+		/// Adds the components of two <see cref="Vector3"/> instances.
 		/// </summary>
-		public static Vector3 operator -(Vector3 v)
+		/// <param name="left">Source <see cref="Vector3"/> on the left of the add sign.</param>
+		/// <param name="right">Source <see cref="Vector3"/> on the right of the add sign.</param>
+		/// <returns>The result of the <see cref="Vector3"/> sum.</returns>
+		public static Vector3 operator +(Vector3 left, Vector3 right)
 		{
-			return new Vector3(-v.X, -v.Y, -v.Z);
+			return new Vector3(left.X + right.X, left.Y + right.Y, left.Z + right.Z);
 		}
 
 		/// <summary>
-		/// Скалярное умножение векторов (операция dot)
+		/// Subtracts the components of another <see cref="Vector3"/> 
+		/// from components of the <see cref="Vector3"/>.
 		/// </summary>
-		public static float DotProduct(Vector3 lhs, Vector3 rhs)
+		/// <param name="left">Source <see cref="Vector3"/> on the left of the sub sign.</param>
+		/// <param name="right">Divisor <see cref="Vector3"/> on the right of the sub sign.</param>
+		/// <returns>The result of the <see cref="Vector3"/> subtract.</returns>
+		public static Vector3 operator -(Vector3 left, Vector3 right)
 		{
-			return lhs.X * rhs.X + lhs.Y * rhs.Y + lhs.Z * rhs.Z;
+			return new Vector3(left.X - right.X, left.Y - right.Y, left.Z - right.Z);
 		}
 
 		/// <summary>
-		/// Векторное умножение (операция cross)
+		/// Inverts values in the specified <see cref="Vector3"/>.
 		/// </summary>
-		public static Vector3 CrossProduct(Vector3 lhs, Vector3 rhs)
+		/// <param name="value">Source <see cref="Vector3"/> on the right of the sub sign.</param>
+		/// <returns>Result of the inversion.</returns>
+		public static Vector3 operator -(Vector3 value)
+		{
+			return new Vector3(-value.X, -value.Y, -value.Z);
+		}
+
+		/// <summary>
+		/// Returns a dot product of two <see cref="Vector3"/> instances.
+		/// </summary>
+		/// <param name="value1">The first <see cref="Vector3"/>.</param>
+		/// <param name="value2">The second <see cref="Vector3"/>.</param>
+		/// <returns>The dot product of two <see cref="Vector3"/> instances.</returns>
+		public static float DotProduct(Vector3 value1, Vector3 value2)
+		{
+			return value1.X * value2.X + value1.Y * value2.Y + value1.Z * value2.Z;
+		}
+
+		/// <summary>
+		/// Returns a cross product of two <see cref="Vector3"/> instances.
+		/// </summary>
+		/// <param name="value1">The first <see cref="Vector3"/>.</param>
+		/// <param name="value2">The second <see cref="Vector3"/>.</param>
+		/// <returns>The cross product of two <see cref="Vector3"/> instances.</returns>
+		public static Vector3 CrossProduct(Vector3 value1, Vector3 value2)
 		{
 			return new Vector3(
-				lhs.Y * rhs.Z - lhs.Z * rhs.Y,
-				lhs.Z * rhs.X - lhs.X * rhs.Z,
-				lhs.X * rhs.Y - lhs.Y * rhs.X
+				value1.Y * value2.Z - value1.Z * value2.Y,
+				value1.Z * value2.X - value1.X * value2.Z,
+				value1.X * value2.Y - value1.Y * value2.X
 			);
 		}
 
 		/// <summary>
-		/// Возвращает нормализованный вектор
+		/// Turns this <see cref="Vector3"/> to a unit vector with the same direction.
 		/// </summary>
-		public static Vector3 Normalize(Vector3 value)
+		public void Normalize()
 		{
-			float length = value.Length;
-			if (length > 0) {
-				value.X /= length;
-				value.Y /= length;
-				value.Z /= length;
+			var length = Length;
+			if (length > 0)
+			{
+				X /= length;
+				Y /= length;
+				Z /= length;
 			}
-			return value;
 		}
 
 		/// <summary>
-		/// Возвращает длину вектора (модуль вектора)
+		/// Returns this <see cref="Vector3"/> as a unit vector with the same direction.
 		/// </summary>
+		public Vector3 Normalized
+		{
+			get
+			{
+				var v = new Vector3(X, Y, Z);
+				v.Normalize();
+				return v;
+			}
+		}
+
+		/// <summary>
+		/// Returns specified <see cref="Vector3"/> as a unit vector with the same direction.
+		/// </summary>
+		/// <param name="value">Source <see cref="Vector3"/>.</param>
+		/// <returns>Source <see cref="Vector3"/> as a unit vector with the same direction.</returns>
+		public static Vector3 Normalize(Vector3 value)
+		{
+			return value.Normalized;
+		}
+
+		/// <summary>
+		/// Returns the length of this <see cref="Vector3"/>.
+		/// </summary>
+		/// <returns>The length of this <see cref="Vector3"/>.</returns>
 		public float Length
 		{
 			get { return (float)Math.Sqrt(X * X + Y * Y + Z * Z); }
 		}
 
 		/// <summary>
-		/// Возвращает длину вектора (модуль), возведенную в квадрат
+		/// Returns the squared length of this <see cref="Vector3"/>.
 		/// </summary>
+		/// <returns>The squared length of this <see cref="Vector3"/>.</returns>
 		public float SquaredLength
 		{
 			get { return X * X + Y * Y + Z * Z; }
 		}
 
+		/// <summary>
+		/// Returns the <see cref="String"/> representation of this <see cref="Vector3"/> in the format:
+		/// "[<see cref="X"/>], [<see cref="Y"/>], [<see cref="Z"/>]".
+		/// </summary>
+		/// <returns>The <see cref="String"/> representation of this <see cref="Vector3"/>.</returns>
 		public override string ToString()
 		{
-			return String.Format("{0}, {1}, {2}", X, Y, Z);
+			return string.Format("{0}, {1}, {2}", X, Y, Z);
 		}
 	}
 }
