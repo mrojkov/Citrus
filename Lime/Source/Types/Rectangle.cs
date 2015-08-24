@@ -98,29 +98,29 @@ namespace Lime
 		/// <summary>
 		/// Compares whether two <see cref="Rectangle"/> instances are equal.
 		/// </summary>
-		/// <param name="left"><see cref="Rectangle"/> instance on the left of the equal sign.</param>
-		/// <param name="right"><see cref="Rectangle"/> instance on the right of the equal sign.</param>
+		/// <param name="lhs"><see cref="Rectangle"/> instance on the left of the equal sign.</param>
+		/// <param name="rhs"><see cref="Rectangle"/> instance on the right of the equal sign.</param>
 		/// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
 		/// <remarks>
 		/// Compairing is done without taking floating point error into account.
 		/// </remarks>
-		public static bool operator ==(Rectangle left, Rectangle right)
+		public static bool operator ==(Rectangle lhs, Rectangle rhs)
 		{
-			return left.Equals(right);
+			return lhs.Equals(rhs);
 		}
 
 		/// <summary>
 		/// Compares whether two <see cref="Rectangle"/> instances are not equal.
 		/// </summary>
-		/// <param name="left"><see cref="Rectangle"/> instance on the left of the not equal sign.</param>
-		/// <param name="right"><see cref="Rectangle"/> instance on the right of the not equal sign.</param>
+		/// <param name="lhs"><see cref="Rectangle"/> instance on the left of the not equal sign.</param>
+		/// <param name="rhs"><see cref="Rectangle"/> instance on the right of the not equal sign.</param>
 		/// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>	
 		/// <remarks>
 		/// Compairing is done without taking floating point error into account.
 		/// </remarks>
-		public static bool operator !=(Rectangle left, Rectangle right)
+		public static bool operator !=(Rectangle lhs, Rectangle rhs)
 		{
-			return !left.Equals(right);
+			return !lhs.Equals(rhs);
 		}
 
 		/// <summary>

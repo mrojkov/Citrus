@@ -189,23 +189,23 @@ namespace Lime
 		/// <summary>
 		/// Compares whether two <see cref="IntRectangle"/> instances are equal.
 		/// </summary>
-		/// <param name="left"><see cref="IntRectangle"/> instance on the left of the equal sign.</param>
-		/// <param name="right"><see cref="IntRectangle"/> instance on the right of the equal sign.</param>
+		/// <param name="lhs"><see cref="IntRectangle"/> instance on the left of the equal sign.</param>
+		/// <param name="rhs"><see cref="IntRectangle"/> instance on the right of the equal sign.</param>
 		/// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
-		public static bool operator ==(IntRectangle left, IntRectangle right)
+		public static bool operator ==(IntRectangle lhs, IntRectangle rhs)
 		{
-			return left.A == right.A && left.B == right.B;
+			return lhs.A == rhs.A && lhs.B == rhs.B;
 		}
 
 		/// <summary>
 		/// Compares whether two <see cref="IntRectangle"/> instances are not equal.
 		/// </summary>
-		/// <param name="left"><see cref="IntRectangle"/> instance on the left of the not equal sign.</param>
-		/// <param name="right"><see cref="IntRectangle"/> instance on the right of the not equal sign.</param>
+		/// <param name="lhs"><see cref="IntRectangle"/> instance on the left of the not equal sign.</param>
+		/// <param name="rhs"><see cref="IntRectangle"/> instance on the right of the not equal sign.</param>
 		/// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>	
-		public static bool operator !=(IntRectangle left, IntRectangle right)
+		public static bool operator !=(IntRectangle lhs, IntRectangle rhs)
 		{
-			return left.A != right.A || left.B != right.B;
+			return lhs.A != rhs.A || lhs.B != rhs.B;
 		}
 
 		/// <summary>

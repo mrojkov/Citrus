@@ -182,29 +182,29 @@ namespace Lime
 		/// <summary>
 		/// Compares whether two <see cref="Vector2"/> instances are equal.
 		/// </summary>
-		/// <param name="left"><see cref="Vector2"/> instance on the left of the equal sign.</param>
-		/// <param name="right"><see cref="Vector2"/> instance on the right of the equal sign.</param>
+		/// <param name="lhs"><see cref="Vector2"/> instance on the left of the equal sign.</param>
+		/// <param name="rhs"><see cref="Vector2"/> instance on the right of the equal sign.</param>
 		/// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
 		/// <remarks>
 		/// Compairing is done without taking floating point error into account.
 		/// </remarks>
-		public static bool operator == (Vector2 left, Vector2 right)
+		public static bool operator == (Vector2 lhs, Vector2 rhs)
 		{
-			return left.X == right.X && left.Y == right.Y;
+			return lhs.X == rhs.X && lhs.Y == rhs.Y;
 		}
 
 		/// <summary>
 		/// Compares whether two <see cref="Vector2"/> instances are not equal.
 		/// </summary>
-		/// <param name="left"><see cref="Vector2"/> instance on the left of the not equal sign.</param>
-		/// <param name="right"><see cref="Vector2"/> instance on the right of the not equal sign.</param>
+		/// <param name="lhs"><see cref="Vector2"/> instance on the left of the not equal sign.</param>
+		/// <param name="rhs"><see cref="Vector2"/> instance on the right of the not equal sign.</param>
 		/// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>	
 		/// <remarks>
 		/// Compairing is done without taking floating point error into account.
 		/// </remarks>
-		public static bool operator != (Vector2 left, Vector2 right)
+		public static bool operator != (Vector2 lhs, Vector2 rhs)
 		{
-			return left.X != right.X || left.Y != right.Y;
+			return lhs.X != rhs.X || lhs.Y != rhs.Y;
 		}
 
 		/// <summary>
@@ -262,80 +262,80 @@ namespace Lime
 		/// <summary>
 		/// Multiplies the components of two <see cref="Vector2"/> instances by each other.
 		/// </summary>
-		/// <param name="left">Source <see cref="Vector2"/> on the left of the mul sign.</param>
-		/// <param name="right">Source <see cref="Vector2"/> on the right of the mul sign.</param>
+		/// <param name="lhs">Source <see cref="Vector2"/> on the left of the mul sign.</param>
+		/// <param name="rhs">Source <see cref="Vector2"/> on the right of the mul sign.</param>
 		/// <returns>The result of the <see cref="Vector2"/> multiplication.</returns>
-		public static Vector2 operator *(Vector2 left, Vector2 right)
+		public static Vector2 operator *(Vector2 lhs, Vector2 rhs)
 		{
-			return new Vector2(left.X * right.X, left.Y * right.Y);
+			return new Vector2(lhs.X * rhs.X, lhs.Y * rhs.Y);
 		}
 
 		/// <summary>
 		/// Divides the components of the <see cref="Vector2"/> 
 		/// by the components of another <see cref="Vector2"/>.
 		/// </summary>
-		/// <param name="left">Source <see cref="Vector2"/> on the left of the div sign.</param>
-		/// <param name="right">Divisor <see cref="Vector2"/> on the right of the div sign.</param>
+		/// <param name="lhs">Source <see cref="Vector2"/> on the left of the div sign.</param>
+		/// <param name="rhs">Divisor <see cref="Vector2"/> on the right of the div sign.</param>
 		/// <returns>The result of the <see cref="Vector2"/> divide.</returns>
-		public static Vector2 operator /(Vector2 left, Vector2 right)
+		public static Vector2 operator /(Vector2 lhs, Vector2 rhs)
 		{
-			return new Vector2(left.X / right.X, left.Y / right.Y);
+			return new Vector2(lhs.X / rhs.X, lhs.Y / rhs.Y);
 		}
 
 		/// <summary>
 		/// Divides the components of the <see cref="Vector2"/> by a scalar.
 		/// </summary>
-		/// <param name="value">Source <see cref="Vector2"/> on the left of the div sign.</param>
-		/// <param name="divider">Divisor scalar on the right of the div sign.</param>
+		/// <param name="lhs">Source <see cref="Vector2"/> on the left of the div sign.</param>
+		/// <param name="rhs">Divisor scalar on the right of the div sign.</param>
 		/// <returns>The result of dividing the <see cref="Vector2"/> by a scalar.</returns>
-		public static Vector2 operator /(Vector2 value, float divider)
+		public static Vector2 operator /(Vector2 lhs, float rhs)
 		{
-			return new Vector2(value.X / divider, value.Y / divider);
+			return new Vector2(lhs.X / rhs, lhs.Y / rhs);
 		}
 
 		/// <summary>
 		/// Multiplies the components of <see cref="Vector2"/> by a scalar.
 		/// </summary>
-		/// <param name="scaleFactor">Scalar value on the left of the mul sign.</param>
-		/// <param name="value">Source <see cref="Vector2"/> on the right of the mul sign.</param>
+		/// <param name="lhs">Scalar value on the left of the mul sign.</param>
+		/// <param name="rhs">Source <see cref="Vector2"/> on the right of the mul sign.</param>
 		/// <returns>The result of the <see cref="Vector2"/> multiplication with a scalar.</returns>
-		public static Vector2 operator *(float scaleFactor, Vector2 value)
+		public static Vector2 operator *(float lhs, Vector2 rhs)
 		{
-			return new Vector2(scaleFactor * value.X, scaleFactor * value.Y);
+			return new Vector2(lhs * rhs.X, lhs * rhs.Y);
 		}
 
 		/// <summary>
 		/// Multiplies the components of <see cref="Vector2"/> by a scalar.
 		/// </summary>
-		/// <param name="value">Source <see cref="Vector2"/> on the right of the mul sign.</param>
-		/// <param name="scaleFactor">Scalar value on the left of the mul sign.</param>
+		/// <param name="lhs">Source <see cref="Vector2"/> on the left of the mul sign.</param>
+		/// <param name="rhs">Scalar value on the right of the mul sign.</param>
 		/// <returns>The result of the <see cref="Vector2"/> multiplication with a scalar.</returns>
-		public static Vector2 operator *(Vector2 value, float scaleFactor)
+		public static Vector2 operator *(Vector2 lhs, float rhs)
 		{
-			return new Vector2(scaleFactor * value.X, scaleFactor * value.Y);
+			return new Vector2(rhs * lhs.X, rhs * lhs.Y);
 		}
 
 		/// <summary>
 		/// Adds the components of two <see cref="Vector2"/> instances.
 		/// </summary>
-		/// <param name="left">Source <see cref="Vector2"/> on the left of the add sign.</param>
-		/// <param name="right">Source <see cref="Vector2"/> on the right of the add sign.</param>
+		/// <param name="lhs">Source <see cref="Vector2"/> on the left of the add sign.</param>
+		/// <param name="rhs">Source <see cref="Vector2"/> on the right of the add sign.</param>
 		/// <returns>The result of the <see cref="Vector2"/> sum.</returns>
-		public static Vector2 operator +(Vector2 left, Vector2 right)
+		public static Vector2 operator +(Vector2 lhs, Vector2 rhs)
 		{
-			return new Vector2(left.X + right.X, left.Y + right.Y);
+			return new Vector2(lhs.X + rhs.X, lhs.Y + rhs.Y);
 		}
 
 		/// <summary>
 		/// Subtracts the components of another <see cref="Vector2"/> 
 		/// from components of the <see cref="Vector2"/>.
 		/// </summary>
-		/// <param name="left">Source <see cref="Vector2"/> on the left of the sub sign.</param>
-		/// <param name="right">Divisor <see cref="Vector2"/> on the right of the sub sign.</param>
+		/// <param name="lhs">Source <see cref="Vector2"/> on the left of the sub sign.</param>
+		/// <param name="rhs">Divisor <see cref="Vector2"/> on the right of the sub sign.</param>
 		/// <returns>The result of the <see cref="Vector2"/> subtract.</returns>
-		public static Vector2 operator -(Vector2 left, Vector2 right)
+		public static Vector2 operator -(Vector2 lhs, Vector2 rhs)
 		{
-			return new Vector2(left.X - right.X, left.Y - right.Y);
+			return new Vector2(lhs.X - rhs.X, lhs.Y - rhs.Y);
 		}
 
 		/// <summary>
