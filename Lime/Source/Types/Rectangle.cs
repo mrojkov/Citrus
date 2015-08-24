@@ -1,23 +1,41 @@
-using System;
+п»їusing System;
 using ProtoBuf;
 
 namespace Lime
 {
 	/// <summary>
-	/// Прямоугольник
+	/// Representation of 2D rectangles. 
 	/// </summary>
 	[System.Diagnostics.DebuggerStepThrough]
 	[ProtoContract]
 	public struct Rectangle : IEquatable<Rectangle>
 	{
+		/// <summary>
+		/// Left-top corner of this <see cref="Rectangle"/>.
+		/// </summary>
 		[ProtoMember(1)]
 		public Vector2 A;
 
+		/// <summary>
+		/// Right-bottom corner of this <see cref="Rectangle"/>.
+		/// </summary>
+		/// <remarks>Rectangle doesn't contain this point.</remarks>
 		[ProtoMember(2)]
 		public Vector2 B;
 
+		/// <summary>
+		/// Returns a <see cref="Rectangle"/> with both corners in 0, 0.
+		/// </summary>
 		public static readonly Rectangle Empty = new Rectangle();
-		
+
+		/// <summary>
+		/// Constructs a 2D rectangle with specified coordinates 
+		/// of left, top, right and bottom borders.
+		/// </summary>
+		/// <param name="left">The X coordinate of left border in 2D-space.</param>
+		/// <param name="top">The Y coordinate of top border in 2D-space.</param>
+		/// <param name="right">The X coordinate of right border in 2D-space.</param>
+		/// <param name="bottom">The Y coordinate of bottom border in 2D-space.</param>
 		public Rectangle(float left, float top, float right, float bottom)
 		{
 			A.X = left;
@@ -26,40 +44,87 @@ namespace Lime
 			B.Y = bottom;
 		}
 
+		/// <summary>
+		/// Constructs a 2D rectangle with specified coordinates 
+		/// of left-top and right-bottom corners.
+		/// </summary>
+		/// <param name="a">Coordinates of left-top corner of rectangle in 2D-space.</param>
+		/// <param name="b">Coordinates of right-bottom corner of rectangle in 2D-space.</param>
 		public Rectangle(Vector2 a, Vector2 b)
 		{
 			A = a;
 			B = b;
 		}
 
-		public static explicit operator IntRectangle(Rectangle r)
+		/// <summary>
+		/// Explicit cast from <see cref="Rectangle"/> to <see cref="IntRectangle"/>.
+		/// </summary>
+		/// <param name="value">Source <see cref="Rectangle"/>.</param>
+		/// <returns>
+		/// New <see cref="IntRectangle"/> with truncated coordinates of corners 
+		/// of source <see cref="Rectangle"/>.
+		/// </returns>
+		public static explicit operator IntRectangle(Rectangle value)
 		{
-			return new IntRectangle((int)r.Left, (int)r.Top, (int)r.Right, (int)r.Bottom);
+			return new IntRectangle((int)value.Left, (int)value.Top, (int)value.Right, (int)value.Bottom);
 		}
 
+		/// <summary>
+		/// Compares whether current instance is equal to specified <see cref="Object"/>.
+		/// </summary>
+		/// <param name="obj">The <see cref="Object"/> to compare.</param>
+		/// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
+		/// <remarks>
+		/// Compairing is done without taking floating point error into account.
+		/// </remarks>
 		public override bool Equals(object obj)
 		{
-			var rhs = (Rectangle)obj;
-			return A.Equals(rhs.A) && B.Equals(rhs.B);
+			return obj is Rectangle && Equals((Rectangle)obj);
 		}
 
+		/// <summary>
+		/// Compares whether current instance is equal to specified <see cref="Rectangle"/>.
+		/// </summary>
+		/// <param name="other">The <see cref="Rectangle"/> to compare.</param>
+		/// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
+		/// <remarks>
+		/// Compairing is done without taking floating point error into account.
+		/// </remarks>
 		public bool Equals(Rectangle other)
 		{
 			return A.Equals(other.A) && B.Equals(other.B);
 		}
 
-		public static bool operator ==(Rectangle lhs, Rectangle rhs)
+		/// <summary>
+		/// Compares whether two <see cref="Rectangle"/> instances are equal.
+		/// </summary>
+		/// <param name="left"><see cref="Rectangle"/> instance on the left of the equal sign.</param>
+		/// <param name="right"><see cref="Rectangle"/> instance on the right of the equal sign.</param>
+		/// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
+		/// <remarks>
+		/// Compairing is done without taking floating point error into account.
+		/// </remarks>
+		public static bool operator ==(Rectangle left, Rectangle right)
 		{
-			return lhs.Equals(rhs);
-		}
-
-		public static bool operator !=(Rectangle lhs, Rectangle rhs)
-		{
-			return !lhs.Equals(rhs);
+			return left.Equals(right);
 		}
 
 		/// <summary>
-		/// Ширина прямоугольника
+		/// Compares whether two <see cref="Rectangle"/> instances are not equal.
+		/// </summary>
+		/// <param name="left"><see cref="Rectangle"/> instance on the left of the not equal sign.</param>
+		/// <param name="right"><see cref="Rectangle"/> instance on the right of the not equal sign.</param>
+		/// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>	
+		/// <remarks>
+		/// Compairing is done without taking floating point error into account.
+		/// </remarks>
+		public static bool operator !=(Rectangle left, Rectangle right)
+		{
+			return !left.Equals(right);
+		}
+
+		/// <summary>
+		/// The width of this <see cref="Rectangle"/>.
 		/// </summary>
 		public float Width
 		{
@@ -68,7 +133,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Высота прямоугольника
+		/// The height of this <see cref="Rectangle"/>.
 		/// </summary>
 		public float Height
 		{
@@ -76,17 +141,38 @@ namespace Lime
 			set { B.Y = A.Y + value; }
 		}
 
+		/// <summary>
+		/// The X coordinate of left border of this <see cref="Rectangle"/>.
+		/// </summary>
 		public float Left { get { return A.X; } set { A.X = value; } }
+
+		/// <summary>
+		/// The Y coordinate of top border of this <see cref="Rectangle"/>.
+		/// </summary>
 		public float Top { get { return A.Y; } set { A.Y = value; } }
+
+		/// <summary>
+		/// The X coordinate of right border of this <see cref="Rectangle"/>.
+		/// </summary>
 		public float Right { get { return B.X; } set { B.X = value; } }
+
+		/// <summary>
+		/// The Y coordinate of bottom border of this <see cref="Rectangle"/>.
+		/// </summary>
 		public float Bottom { get { return B.Y; } set { B.Y = value; } }
+
+		/// <summary>
+		/// Coordinates of center point of this <see cref="Rectangle"/>.
+		/// </summary>
 		public Vector2 Center { get { return (A + B) / 2; } }
 
 		/// <summary>
-		/// Если координаты левого верхнего (A) и правого нижнего угла (B) перепутаны местами,
-		/// то ширина и высота будут отрицательными. Этот метод меняет координаты местами,
-		/// чтобы ширина и высота были всегда положительными
+		/// Swaps coordinates of borders if width or height is negative.
 		/// </summary>
+		/// <remarks>
+		/// Width or height can be negative if coordinates of borders are mixed up.
+		/// After this method width and height are guaranteed to be positive.
+		/// </remarks>>
 		public void Normalize()
 		{
 			if (A.X > B.X) {
@@ -98,78 +184,103 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Возвращает true, если указанная точка попадает в область прямоугольника
+		/// Gets whether or not the provided point lies within the bounds 
+		/// of this <see cref="Rectangle"/>.
 		/// </summary>
-		public bool Contains(Vector2 v)
+		/// <param name="value">The coordinates of point to check for containment.</param>
+		/// <returns>
+		/// <c>true</c> if the provided point lies inside this <see cref="Rectangle"/>; 
+		/// <c>false</c> otherwise.
+		/// </returns>
+		public bool Contains(Vector2 value)
 		{
-			return (v.X >= A.X) && (v.Y >= A.Y) && (v.X < B.X) && (v.Y < B.Y);
+			return (value.X >= A.X) && (value.Y >= A.Y) && (value.X < B.X) && (value.Y < B.Y);
 		}
 
 		/// <summary>
-		/// Возвращает размеры прямоугольника в виде вектора
+		/// The width-height coordinates of this <see cref="Rectangle"/>.
 		/// </summary>
 		public Vector2 Size { 
 			get { return B - A; }
 		}
 
 		/// <summary>
-		/// Возвращает прямоугольник, построенный по области пересечения указанный прямоугольников.
-		/// Если прямоугольники не пересекаются, возвращает пустой прямоугольник (IntRectangle.Empty)
+		/// Creates a new <see cref="Rectangle"/> that contains 
+		/// overlapping region of two other rectangles.
 		/// </summary>
-		public static Rectangle Intersect(Rectangle a, Rectangle b)
+		/// <param name="value1">The first <see cref="Rectangle"/>.</param>
+		/// <param name="value2">The second <see cref="Rectangle"/>.</param>
+		/// <returns>
+		/// Overlapping region of the two rectangles if they overlaps; 
+		/// <see cref="Rectangle.Empty"/> otherwise.
+		/// </returns>
+		public static Rectangle Intersect(Rectangle value1, Rectangle value2)
 		{
-			float x0 = Math.Max(a.A.X, b.A.X);
-			float x1 = Math.Min(a.B.X, b.B.X);
-			float y0 = Math.Max(a.A.Y, b.A.Y);
-			float y1 = Math.Min(a.B.Y, b.B.Y);
-			if (x1 >= x0 && y1 >= y0) {
-				return new Rectangle(x0, y0, x1, y1);
-			} else {
-				return Empty;
-			}
+			var x0 = Math.Max(value1.A.X, value2.A.X);
+			var x1 = Math.Min(value1.B.X, value2.B.X);
+			var y0 = Math.Max(value1.A.Y, value2.A.Y);
+			var y1 = Math.Min(value1.B.Y, value2.B.Y);
+			return x1 >= x0 && y1 >= y0 ? new Rectangle(x0, y0, x1, y1) : Empty;
 		}
 
 		/// <summary>
-		/// Возвращает прямоугольник, охватывающий оба указанных прямоугольника
+		/// Creates a new <see cref="Rectangle"/> that covers both of two other rectangles.
 		/// </summary>
-		public static Rectangle Bounds(Rectangle a, Rectangle b)
+		/// <param name="value1">The first <see cref="Rectangle"/>.</param>
+		/// <param name="value2">The second <see cref="Rectangle"/>.</param>
+		/// <returns>New <see cref="Rectangle"/> that covers both of two other rectangles.</returns>
+		public static Rectangle Bounds(Rectangle value1, Rectangle value2)
 		{
 			return new Rectangle(
-				Mathf.Min(a.Left, b.Left),
-				Mathf.Min(a.Top, b.Top),
-				Mathf.Max(a.Right, b.Right),
-				Mathf.Max(a.Bottom, b.Bottom)
+				Mathf.Min(value1.Left, value2.Left),
+				Mathf.Min(value1.Top, value2.Top),
+				Mathf.Max(value1.Right, value2.Right),
+				Mathf.Max(value1.Bottom, value2.Bottom)
 			);
 		}
 
 		/// <summary>
-		/// Изменяет границы прямоугольника таким образом, чтобы точка попадала в его область.
-		/// Если точка уже в области фигуры, то ничего не делает
+		/// Changes bounds of this <see cref="Rectangle"/> so it includes
+		/// the specified <see cref="Vector2"/>.
 		/// </summary>
-		public void IncludePoint(Vector2 v)
+		/// <param name="value">The <see cref="Vector2"/> to include.</param>
+		/// <remarks>Does nothing, if this <see cref="Rectangle"/> already includes
+		/// the specified <see cref="Vector2"/>.</remarks>
+		public void IncludePoint(Vector2 value)
 		{
-			Left = Mathf.Min(v.X, Left);
-			Right = Mathf.Max(v.X, Right);
-			Top = Mathf.Min(v.Y, Top);
-			Bottom = Mathf.Max(v.Y, Bottom);
+			Left = Mathf.Min(value.X, Left);
+			Right = Mathf.Max(value.X, Right);
+			Top = Mathf.Min(value.Y, Top);
+			Bottom = Mathf.Max(value.Y, Bottom);
 		}
 
+		// TODO: Maybe swap to return string.Format("{0}, {1}", A.ToString(), B.ToString());?
+		/// <summary>
+		/// Returns the <see cref="String"/> representation of this <see cref="Rectangle"/> in the format:
+		/// "<see cref="A.X"/>, <see cref="A.Y"/>, <see cref="B.X"/>, <see cref="B.Y"/>".
+		/// </summary>
+		/// <returns>The <see cref="String"/> representation of this <see cref="Rectangle"/>.</returns>
 		public override string ToString()
 		{
-			return String.Format("{0}, {1}, {2}, {3}", A.X, A.Y, B.X, B.Y);
+			return string.Format("{0}, {1}, {2}, {3}", A.X, A.Y, B.X, B.Y);
 		}
 
+		/// <summary>
+		/// Gets the hash code of this <see cref="Rectangle"/>.
+		/// </summary>
+		/// <returns>Hash code of this <see cref="Rectangle"/>.</returns>
 		public override int GetHashCode()
 		{
 			return A.GetHashCode() ^ B.GetHashCode();
 		}
 
 		/// <summary>
-		/// Применяет матрицу трансформации
+		/// Applies the transformation matrix to this <see cref="Rectangle"/>.
 		/// </summary>
-		public Rectangle Transform(Matrix32 m)
+		/// <param name="value">The <see cref="Matrix32"/> to apply.</param>
+		public Rectangle Transform(Matrix32 value)
 		{
-			return new Rectangle(A * m, B * m);
+			return new Rectangle(A * value, B * value);
 		}
 	}
 }
