@@ -151,13 +151,26 @@ namespace Lime
 		}
 
 #if !UNITY
-		private void RunScheduledActions()
+		private static void RunScheduledActions()
 		{
 			lock (scheduledActionsSync) {
 				if (scheduledActions != null) {
 					scheduledActions();
 					scheduledActions = null;
 				}
+			}
+		}
+
+		/// <summary>
+		/// Use in Orange to free references, since Orange doesn't invoke
+		/// Lime.Application RunScheduledActions in main thread.
+		/// This function MUST be removed as soon as new Orange will be
+		/// implemented with use of OpenTK and our Widget system.
+		/// </summary>
+		public static void FreeScheduledActions()
+		{
+			lock (scheduledActionsSync) {
+				scheduledActions = null;
 			}
 		}
 #endif
