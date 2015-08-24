@@ -148,6 +148,7 @@ namespace Orange
 						deepestException = deepestException.InnerException;
 					}
 					Console.WriteLine(deepestException.Message);
+					Console.WriteLine(deepestException.StackTrace);
 				}
 				ScrollLogToEnd();
 			} finally {
