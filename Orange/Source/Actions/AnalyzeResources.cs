@@ -1,18 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using Gtk;
 using System.Text.RegularExpressions;
 using Lime;
-using static Lime.Application;
-using Action = System.Action;
-using Application = Lime.Application;
 using Widget = Lime.Widget;
 
 namespace Orange
 {
-	static class FindStubTextures
+	static class AnalyzeResources
 	{
 		internal struct PathRequestRecord
 		{
