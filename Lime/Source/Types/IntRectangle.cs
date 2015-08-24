@@ -1,23 +1,41 @@
-using System;
+п»їusing System;
 using ProtoBuf;
 
 namespace Lime
 {
 	/// <summary>
-	/// Прямоугольник, свойства которого заданы целыми числами
+	/// Representation of integer 2D rectangles. 
 	/// </summary>
 	[System.Diagnostics.DebuggerStepThrough]
 	[ProtoContract]
 	public struct IntRectangle : IEquatable<IntRectangle>
 	{
+		/// <summary>
+		/// Left-top corner of this <see cref="IntRectangle"/>.
+		/// </summary>
 		[ProtoMember(1)]
 		public IntVector2 A;
 
+		/// <summary>
+		/// Right-bottom corner of this <see cref="IntRectangle"/>.
+		/// </summary>
+		/// <remarks>Rectangle doesn't contain this point.</remarks>
 		[ProtoMember(2)]
 		public IntVector2 B;
 
+		/// <summary>
+		/// Returns a <see cref="IntRectangle"/> with both corners in 0, 0.
+		/// </summary>
 		public static readonly IntRectangle Empty = new IntRectangle();
-		
+
+		/// <summary>
+		/// Constructs a 2D rectangle with specified coordinates 
+		/// of left, top, right and bottom borders.
+		/// </summary>
+		/// <param name="left">The X coordinate of left border in 2D-space.</param>
+		/// <param name="top">The Y coordinate of top border in 2D-space.</param>
+		/// <param name="right">The X coordinate of right border in 2D-space.</param>
+		/// <param name="bottom">The Y coordinate of bottom border in 2D-space.</param>
 		public IntRectangle(int left, int top, int right, int bottom)
 		{
 			A.X = left;
@@ -26,28 +44,47 @@ namespace Lime
 			B.Y = bottom;
 		}
 
+		/// <summary>
+		/// Constructs a 2D rectangle with specified coordinates 
+		/// of left-top and right-bottom corners.
+		/// </summary>
+		/// <param name="a">Coordinates of left-top corner of rectangle in 2D-space.</param>
+		/// <param name="b">Coordinates of right-bottom corner of rectangle in 2D-space.</param>
 		public IntRectangle(IntVector2 a, IntVector2 b)
 		{
 			A = a;
 			B = b;
 		}
 
-		public static explicit operator Rectangle(IntRectangle r)
+		/// <summary>
+		/// Explicit cast from <see cref="IntRectangle"/> to <see cref="Rectangle"/>.
+		/// </summary>
+		/// <param name="value">Source <see cref="IntRectangle"/>.</param>
+		/// <returns>
+		/// New <see cref="Rectangle"/> with coordinates of corners 
+		/// of source <see cref="IntRectangle"/>.
+		/// </returns>
+		public static explicit operator Rectangle(IntRectangle value)
 		{
-			return new Rectangle(r.Left, r.Top, r.Right, r.Bottom);
-		}
-
-		public static explicit operator WindowRect(IntRectangle r)
-		{
-			return new WindowRect { X = r.Left, Y = r.Top, Width = r.Width, Height = r.Height };
+			return new Rectangle(value.Left, value.Top, value.Right, value.Bottom);
 		}
 
 		/// <summary>
-		/// Если координаты левого верхнего (A) и правого нижнего угла (B) перепутаны местами,
-		/// то ширина и высота будут отрицательными. Этот метод меняет координаты местами,
-		/// чтобы ширина и высота были всегда положительными
+		/// Explicit cast from <see cref="IntRectangle"/> to <see cref="WindowRect"/>.
 		/// </summary>
-		public Lime.IntRectangle Normalize()
+		/// <param name="value">Source <see cref="IntRectangle"/>.</param>
+		/// <returns>
+		/// New <see cref="WindowRect"/> with coordinates of corners 
+		/// of source <see cref="IntRectangle"/>.
+		/// </returns>
+		public static explicit operator WindowRect(IntRectangle value)
+		{
+			return new WindowRect { X = value.Left, Y = value.Top, Width = value.Width, Height = value.Height };
+		}
+
+		// TODO: Remove after 23.09.15, implement self Normalize() after that
+		[Obsolete("Use \"Normalized\" property instead", true)]
+		public IntRectangle Normalize()
 		{
 			var rect = this;
 			if (Width < 0) {
@@ -60,9 +97,35 @@ namespace Lime
 			}
 			return rect;
 		}
-		
+
 		/// <summary>
-		/// Ширина прямоугольника
+		/// Returns this <see cref="IntRectangle"/> with swapped coordinates 
+		/// of borders if width or height is negative.
+		/// </summary>
+		/// <remarks>
+		/// Width or height can be negative if coordinates of borders are mixed up.
+		/// This property returns new <see cref="IntRectangle"/> with width and height
+		/// that are guaranteed to be positive.
+		/// </remarks>
+		public IntRectangle Normalized
+		{
+			get
+			{
+				var rect = this;
+				if (Width < 0) {
+					rect.A.X = B.X;
+					rect.B.X = A.X;
+				}
+				if (Height < 0) {
+					rect.A.Y = B.Y;
+					rect.B.Y = A.Y;
+				}
+				return rect;
+			}
+		}
+
+		/// <summary>
+		/// The width of this <see cref="IntRectangle"/>.
 		/// </summary>
 		public int Width {
 			get { return B.X - A.X; }
@@ -70,7 +133,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Высота прямоугольника
+		/// The height of this <see cref="IntRectangle"/>.
 		/// </summary>
 		public int Height {
 			get { return B.Y - A.Y; }
@@ -78,77 +141,147 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Возвращает размеры прямоугольника в виде вектора
+		/// The width-height coordinates of this <see cref="IntRectangle"/>.
 		/// </summary>
 		public IntVector2 Size { 
 			get { return B - A; }
 		}
 
+		/// <summary>
+		/// The X coordinate of left border of this <see cref="IntRectangle"/>.
+		/// </summary>
 		public int Left { get { return A.X; } set { A.X = value; } }
+
+		/// <summary>
+		/// The Y coordinate of top border of this <see cref="IntRectangle"/>.
+		/// </summary>
 		public int Top { get { return A.Y; } set { A.Y = value; } }
+
+		/// <summary>
+		/// The X coordinate of right border of this <see cref="IntRectangle"/>.
+		/// </summary>
 		public int Right { get { return B.X; } set { B.X = value; } }
+
+		/// <summary>
+		/// The Y coordinate of bottom border of this <see cref="IntRectangle"/>.
+		/// </summary>
 		public int Bottom { get { return B.Y; } set { B.Y = value; } }
+
+		/// <summary>
+		/// Coordinates of center point of this <see cref="IntRectangle"/>.
+		/// </summary>
 		public IntVector2 Center { get { return new IntVector2((A.X + B.X) / 2, (A.Y + B.Y) / 2); } }
 
 		/// <summary>
-		/// Сдвигает прямоугольник на указанное значение
+		/// Creates a new <see cref="IntRectangle"/> that has coordinates 
+		/// of this <see cref="IntRectangle"/> shifted by specified value.
 		/// </summary>
-		public IntRectangle OffsetBy(IntVector2 ofs) { return new IntRectangle(A + ofs, B + ofs); }
-
-		public static bool operator ==(IntRectangle lhs, IntRectangle rhs)
+		/// <param name="value">Offset of result <see cref="IntRectangle"/>.</param>
+		/// <returns>
+		/// New <see cref="IntRectangle"/> that has coordinates 
+		/// of this <see cref="IntRectangle"/> shifted by specified value.
+		/// </returns>
+		public IntRectangle OffsetBy(IntVector2 value)
 		{
-			return lhs.A == rhs.A && lhs.B == rhs.B;
+			return new IntRectangle(A + value, B + value);
 		}
 
-		public static bool operator !=(IntRectangle lhs, IntRectangle rhs)
+		/// <summary>
+		/// Compares whether two <see cref="IntRectangle"/> instances are equal.
+		/// </summary>
+		/// <param name="left"><see cref="IntRectangle"/> instance on the left of the equal sign.</param>
+		/// <param name="right"><see cref="IntRectangle"/> instance on the right of the equal sign.</param>
+		/// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
+		public static bool operator ==(IntRectangle left, IntRectangle right)
 		{
-			return lhs.A != rhs.A || lhs.B != rhs.B;
+			return left.A == right.A && left.B == right.B;
 		}
 
-		bool IEquatable<IntRectangle>.Equals(IntRectangle other)
+		/// <summary>
+		/// Compares whether two <see cref="IntRectangle"/> instances are not equal.
+		/// </summary>
+		/// <param name="left"><see cref="IntRectangle"/> instance on the left of the not equal sign.</param>
+		/// <param name="right"><see cref="IntRectangle"/> instance on the right of the not equal sign.</param>
+		/// <returns><c>true</c> if the instances are not equal; <c>false</c> otherwise.</returns>	
+		public static bool operator !=(IntRectangle left, IntRectangle right)
+		{
+			return left.A != right.A || left.B != right.B;
+		}
+
+		/// <summary>
+		/// Compares whether current instance is equal to specified <see cref="IntRectangle"/>.
+		/// </summary>
+		/// <param name="other">The <see cref="IntRectangle"/> to compare.</param>
+		/// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
+		public bool Equals(IntRectangle other)
 		{
 			return A.Equals(other.A) && B.Equals(other.B);
 		}
-		
-		public override bool Equals(object o)
+
+		/// <summary>
+		/// Compares whether current instance is equal to specified <see cref="Object"/>.
+		/// </summary>
+		/// <param name="obj">The <see cref="Object"/> to compare.</param>
+		/// <returns><c>true</c> if the instances are equal; <c>false</c> otherwise.</returns>
+		public override bool Equals(object obj)
 		{
-			var rhs = (IntRectangle)o;
-			return A == rhs.A && B == rhs.B;
+			return obj is IntRectangle && Equals((IntRectangle)obj);
 		}
 
+		/// <summary>
+		/// Gets the hash code of this <see cref="IntRectangle"/>.
+		/// </summary>
+		/// <returns>Hash code of this <see cref="IntRectangle"/>.</returns>
 		public override int GetHashCode()
 		{
 			return A.GetHashCode() ^ B.GetHashCode();
 		}
 
 		/// <summary>
-		/// Возвращает true, если указанная точка попадает в область прямоугольника
+		/// Gets whether or not the provided point lies within the bounds 
+		/// of this <see cref="IntRectangle"/>.
 		/// </summary>
-		public bool Contains(IntVector2 v)
+		/// <param name="value">The coordinates of point to check for containment.</param>
+		/// <returns>
+		/// <c>true</c> if the provided point lies inside this <see cref="IntRectangle"/>; 
+		/// <c>false</c> otherwise.
+		/// </returns>
+		public bool Contains(IntVector2 value)
 		{
-			return (v.X >= A.X) && (v.Y >= A.Y) && (v.X < B.X) && (v.Y < B.Y);
+			return value.X >= A.X
+				&& value.Y >= A.Y 
+				&& value.X < B.X 
+				&& value.Y < B.Y;
 		}
-		
+
+		// TODO: Maybe swap to return string.Format("{0}, {1}", A.ToString(), B.ToString());?
+		/// <summary>
+		/// Returns the <see cref="String"/> representation of this <see cref="IntRectangle"/> in the format:
+		/// "<see cref="A.X"/>, <see cref="A.Y"/>, <see cref="B.X"/>, <see cref="B.Y"/>".
+		/// </summary>
+		/// <returns>The <see cref="String"/> representation of this <see cref="IntRectangle"/>.</returns>
 		public override string ToString()
 		{
-			return String.Format("{0}, {1}, {2}, {3}", A.X, A.Y, B.X, B.Y);
+			return string.Format("{0}, {1}, {2}, {3}", A.X, A.Y, B.X, B.Y);
 		}
 
 		/// <summary>
-		/// Возвращает прямоугольник, построенный по области пересечения указанный прямоугольников.
-		/// Если прямоугольники не пересекаются, возвращает пустой прямоугольник (IntRectangle.Empty)
+		/// Creates a new <see cref="IntRectangle"/> that contains 
+		/// overlapping region of two other rectangles.
 		/// </summary>
-		public static IntRectangle Intersect(IntRectangle a, IntRectangle b)
+		/// <param name="value1">The first <see cref="IntRectangle"/>.</param>
+		/// <param name="value2">The second <see cref="IntRectangle"/>.</param>
+		/// <returns>
+		/// Overlapping region of the two rectangles if they overlaps; 
+		/// <see cref="IntRectangle.Empty"/> otherwise.
+		/// </returns>
+		public static IntRectangle Intersect(IntRectangle value1, IntRectangle value2)
 		{
-			int x0 = Math.Max(a.A.X, b.A.X);
-			int x1 = Math.Min(a.B.X, b.B.X);
-			int y0 = Math.Max(a.A.Y, b.A.Y);
-			int y1 = Math.Min(a.B.Y, b.B.Y);
-			if (x1 >= x0 && y1 >= y0) {
-				return new IntRectangle(x0, y0, x1, y1);
-			} else {
-				return Empty;
-			}
+			var x0 = Math.Max(value1.A.X, value2.A.X);
+			var x1 = Math.Min(value1.B.X, value2.B.X);
+			var y0 = Math.Max(value1.A.Y, value2.A.Y);
+			var y1 = Math.Min(value1.B.Y, value2.B.Y);
+			return x1 >= x0 && y1 >= y0 ? new IntRectangle(x0, y0, x1, y1) : Empty;
 		}
 	}
 }
