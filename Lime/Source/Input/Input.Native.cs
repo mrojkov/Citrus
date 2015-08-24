@@ -20,6 +20,11 @@ namespace Lime
 			{
 				Input.SetKeyState(key, value);
 			}
+
+			public static void ProcessPendingKeyEvents()
+			{
+				Input.ProcessPendingKeyEvents();
+			}
 		}
 
 		public const int MaxTouches = 4;
