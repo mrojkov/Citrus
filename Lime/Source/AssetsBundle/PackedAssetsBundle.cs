@@ -163,6 +163,12 @@ namespace Lime
 		List<AssetDescriptor> trash = new List<AssetDescriptor>();
 		System.Reflection.Assembly resourcesAssembly;
 
+		public string Path
+		{
+			get { return path; }
+			private set { path = value; }
+		}
+
 		PackedAssetsBundle() {}
 
 		/// <summary>
