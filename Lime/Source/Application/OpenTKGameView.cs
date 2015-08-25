@@ -233,7 +233,7 @@ namespace Lime
 		{
 			Input.ProcessPendingKeyEvents();
 			app.OnUpdateFrame(delta);
-            AudioSystem.Update();
+			AudioSystem.Update();
 			Input.TextInput = null;
 			Input.CopyKeysState();
 		}

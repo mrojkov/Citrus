@@ -21,8 +21,9 @@ namespace Lime
 				Input.SetKeyState(key, value);
 			}
 
-			public static void ProcessPendingKeyEvents()
+			public static void OnBetweenFrames()
 			{
+				Input.CopyKeysState();
 				Input.ProcessPendingKeyEvents();
 			}
 		}
