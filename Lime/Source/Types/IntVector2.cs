@@ -139,7 +139,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Adds the components of two <see cref="IntVector2"/> instances.
+		/// Adds vectors componentwise.
 		/// </summary>
 		/// <param name="lhs">Source <see cref="IntVector2"/> on the left of the add sign.</param>
 		/// <param name="rhs">Source <see cref="IntVector2"/> on the right of the add sign.</param>
@@ -150,8 +150,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Subtracts the components of another <see cref="IntVector2"/> 
-		/// from components of the <see cref="IntVector2"/>.
+		/// Subtracts vectors componentwise.
 		/// </summary>
 		/// <param name="lhs">Source <see cref="IntVector2"/> on the left of the sub sign.</param>
 		/// <param name="rhs">Divisor <see cref="IntVector2"/> on the right of the sub sign.</param>

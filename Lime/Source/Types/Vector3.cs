@@ -115,7 +115,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Multiplies the components of two <see cref="Vector3"/> instances by each other.
+		/// Multiplies vectors componentwise.
 		/// </summary>
 		/// <param name="lhs">Source <see cref="Vector3"/> on the left of the mul sign.</param>
 		/// <param name="rhs">Source <see cref="Vector3"/> on the right of the mul sign.</param>
@@ -126,8 +126,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Divides the components of the <see cref="Vector3"/> 
-		/// by the components of another <see cref="Vector3"/>.
+		/// Divides vectors componentwise.
 		/// </summary>
 		/// <param name="lhs">Source <see cref="Vector3"/> on the left of the div sign.</param>
 		/// <param name="rhs">Divisor <see cref="Vector3"/> on the right of the div sign.</param>
@@ -149,7 +148,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Multiplies the components of two <see cref="Vector3"/> instances by each other.
+		/// Multiplies vectors componentwise.
 		/// </summary>
 		/// <param name="lhs">Source <see cref="Vector3"/> on the left of the mul sign.</param>
 		/// <param name="rhs">Source <see cref="Vector3"/> on the right of the mul sign.</param>
@@ -212,7 +211,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Adds the components of two <see cref="Vector3"/> instances.
+		/// Adds vectors componentwise.
 		/// </summary>
 		/// <param name="lhs">Source <see cref="Vector3"/> on the left of the add sign.</param>
 		/// <param name="rhs">Source <see cref="Vector3"/> on the right of the add sign.</param>
@@ -223,8 +222,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Subtracts the components of another <see cref="Vector3"/> 
-		/// from components of the <see cref="Vector3"/>.
+		/// Subtracts vectors componentwise.
 		/// </summary>
 		/// <param name="lhs">Source <see cref="Vector3"/> on the left of the sub sign.</param>
 		/// <param name="rhs">Divisor <see cref="Vector3"/> on the right of the sub sign.</param>
