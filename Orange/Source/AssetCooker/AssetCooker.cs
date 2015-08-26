@@ -301,8 +301,13 @@ namespace Orange
 				if (platform == TargetPlatform.Unity) {
 					assetsBundle.ImportFile(srcPath, dstPath, reserve: 0);
 				} else {
-					using (var pixbuf = new Gdk.Pixbuf(srcPath)) {
+					Gdk.Pixbuf pixbuf = null;
+					try {
+						pixbuf = new Gdk.Pixbuf(srcPath);
+						DownscaleTextureIfNeeded(ref pixbuf, srcPath, rules);
 						ImportTexture(dstPath, pixbuf, rules);
+					} finally {
+						pixbuf.Dispose();
 					}
 				}
 				return true;
@@ -402,6 +407,7 @@ namespace Orange
 					var maxAtlasSize = GetMaxAtlasSize();
 					var srcTexturePath = AssetPath.Combine(The.Workspace.AssetsDirectory, fileInfo.Path);
 					var pixbuf = new Gdk.Pixbuf(srcTexturePath);
+					DownscaleTextureIfNeeded(ref pixbuf, srcTexturePath, cookingRules);
 					// Ensure that no image exceeded maxAtlasSize limit
 					if (pixbuf.Width > maxAtlasSize.Width || pixbuf.Height > maxAtlasSize.Height) {
 						var w = Math.Min(pixbuf.Width, maxAtlasSize.Width);
@@ -550,7 +556,6 @@ namespace Orange
 
 		private static void ImportTexture(string path, Gdk.Pixbuf texture, CookingRules rules)
 		{
-			DownscaleTextureIfNeeded(ref texture, path);
 			var maskPath = Path.ChangeExtension(path, ".mask");
 			OpacityMaskCreator.CreateMask(assetsBundle, texture, maskPath);
 			var attributes = AssetAttributes.Zipped;
@@ -610,20 +615,26 @@ namespace Orange
 			}
 		}
 
-		private static void DownscaleTextureIfNeeded(ref Gdk.Pixbuf texture, string path)
+		private static void DownscaleTextureIfNeeded(ref Gdk.Pixbuf texture, string path, CookingRules rules)
 		{
-			if (platform == TargetPlatform.UltraCompression) {
+			if (platform == TargetPlatform.UltraCompression || rules.TextureScaleFactor != 1.0f) {
 				const int maxSize = 1024;
 				const float scaleRatio = 0.75f;
-				const int scaleLargerThan = 256;
+				int scaleLargerThan = (platform == TargetPlatform.Android) ? 32 : 256;
 				if (texture.Width > scaleLargerThan || texture.Height > scaleLargerThan) {
 					var ratio = scaleRatio;
 					if (texture.Width > maxSize || texture.Height > maxSize) {
 						var max = Math.Max(texture.Width, texture.Height);
 						ratio *= maxSize / (float)max;
 					}
-					var w = Math.Min((texture.Width * ratio).Round(), maxSize);
-					var h = Math.Min((texture.Height * ratio).Round(), maxSize);
+					int w = texture.Width;
+					int h = texture.Height;
+					if (texture.Width > scaleLargerThan) {
+						w = Math.Min((texture.Width * ratio).Round(), maxSize);
+					}
+					if (texture.Height > scaleLargerThan) {
+						h = Math.Min((texture.Height * ratio).Round(), maxSize);
+					}
 					Console.WriteLine("{0} downscaled to {1}x{2}", path, w, h);
 					texture = texture.ScaleSimple(w, h, Gdk.InterpType.Bilinear);
 				}

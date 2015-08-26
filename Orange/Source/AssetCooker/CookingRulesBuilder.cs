@@ -28,6 +28,7 @@ namespace Orange
 
 		public string TextureAtlas;
 		public bool MipMaps;
+		public float TextureScaleFactor;
 		public PVRFormat PVRFormat;
 		public DDSFormat DDSFormat;
 		public DateTime LastChangeTime;
@@ -38,6 +39,7 @@ namespace Orange
 		public static readonly CookingRules Default = new CookingRules {
 			TextureAtlas = null,
 			MipMaps = false,
+			TextureScaleFactor = 1.0f,
 			PVRFormat = PVRFormat.PVRTC4,
 			DDSFormat = DDSFormat.DXTi,
 			LastChangeTime = new DateTime(0),
@@ -210,6 +212,9 @@ namespace Orange
 								break;
 							case "ADPCMLimit":
 								rules.ADPCMLimit = int.Parse(words[1]);
+								break;
+							case "TextureScaleFactor":
+								rules.TextureScaleFactor = float.Parse(words[1]);
 								break;
 							default:
 								throw new Lime.Exception("Unknown attribute {0}", words[0]);
