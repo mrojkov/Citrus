@@ -19,8 +19,6 @@ namespace Lime
 		private uint iboHandle;
 		private bool disposed;
 
-		private static uint activeIBO;
-
 		public IndexBuffer()
 		{
 			TotalIndexBuffers++;
@@ -41,15 +39,11 @@ namespace Lime
 
 		public void Bind(ushort[] indices, bool forceUpload)
 		{
-			var discarded = iboHandle == 0;
-			if (discarded || activeIBO != iboHandle) {
-				if (discarded) {
-					forceUpload = true;
-					AllocateIBOHandle();
-				}
-				GL.BindBuffer(BufferTarget.ElementArrayBuffer, iboHandle);
-				activeIBO = iboHandle;
+			if (iboHandle == 0) {
+				forceUpload = true;
+				AllocateIBOHandle();
 			}
+			GL.BindBuffer(BufferTarget.ElementArrayBuffer, iboHandle);
 			if (forceUpload) {
 				GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(short) * indices.Length), indices, BufferUsageHint.DynamicDraw);
 			}
