@@ -22,7 +22,9 @@ namespace Lime
 		private int stride;
 		private int componentCount;
 		private bool disposed;
-	
+
+		private static uint activeVBO;
+
 		public VertexBuffer(int attribute, VertexAttribPointerType attribType, int componentCount)
 		{
 			Attribute = attribute;
@@ -60,14 +62,18 @@ namespace Lime
 
 		public void Bind<T>(T[] vertices, bool forceUpload) where T : struct
 		{
-			if (vboHandle == 0) {
-				forceUpload = true;
-				AllocateVBOHandle();
+			var discarded = vboHandle == 0;
+			if (discarded || activeVBO != vboHandle) {
+				if (discarded) {
+					forceUpload = true;
+					AllocateVBOHandle();
+				}
+				GL.BindBuffer(BufferTarget.ArrayBuffer, vboHandle);
+				GL.EnableVertexAttribArray(Attribute);
+				var normalized = AttribType == VertexAttribPointerType.UnsignedByte;
+				GL.VertexAttribPointer(Attribute, componentCount, AttribType, normalized, 0, (IntPtr)0);
+				activeVBO = vboHandle;
 			}
-			GL.BindBuffer(BufferTarget.ArrayBuffer, vboHandle);
-			GL.EnableVertexAttribArray(Attribute);
-			var normalized = AttribType == VertexAttribPointerType.UnsignedByte;
-			GL.VertexAttribPointer(Attribute, componentCount, AttribType, normalized, 0, (IntPtr)0);
 			if (forceUpload) {
 				GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(stride * vertices.Length), vertices, BufferUsageHint.DynamicDraw);
 			}
