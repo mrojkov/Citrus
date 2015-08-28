@@ -44,8 +44,6 @@ namespace Lime
 		private VertexBuffer uv4VBO;
 		private IndexBuffer indexBuffer;
 
-		private static PlatformMesh activeMesh;
-
 		public PlatformMesh(Mesh mesh)
 		{
 			this.mesh = mesh;
@@ -74,9 +72,6 @@ namespace Lime
 		private void UploadVertices()
 		{
 			var dm = mesh.DirtyAttributes;
-			if (activeMesh == this && dm == Mesh.Attributes.None) {
-				return;
-			}
 			if (mesh.Vertices != null) {
 				if (verticesVBO == null) {
 					verticesVBO = new VertexBuffer(Attributes.Vertex, VertexAttribPointerType.Float, 3);
@@ -114,7 +109,6 @@ namespace Lime
 				uv4VBO.Bind(mesh.UV3, (dm & Mesh.Attributes.UV4) != 0);
 			}
 			mesh.DirtyAttributes = Mesh.Attributes.None;
-			activeMesh = this;
 		}
 
 		public void Dispose()
