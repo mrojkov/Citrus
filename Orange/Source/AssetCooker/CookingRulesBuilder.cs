@@ -36,17 +36,20 @@ namespace Orange
 		public bool Ignore;
 		public int ADPCMLimit; // Kb
 
-		public static readonly CookingRules Default = new CookingRules {
-			TextureAtlas = null,
-			MipMaps = false,
-			TextureScaleFactor = 1.0f,
-			PVRFormat = PVRFormat.PVRTC4,
-			DDSFormat = DDSFormat.DXTi,
-			LastChangeTime = new DateTime(0),
-			Bundles = new[] { MainBundleName },
-			Ignore = false,
-			ADPCMLimit = 100,
-		};
+		public static CookingRules GetDefault(TargetPlatform platform)
+		{
+			return new CookingRules() {
+				TextureAtlas = null,
+				MipMaps = false,
+				TextureScaleFactor = 1.0f,
+				PVRFormat = platform == TargetPlatform.Android ? PVRFormat.ETC1 : PVRFormat.PVRTC4,
+				DDSFormat = DDSFormat.DXTi,
+				LastChangeTime = new DateTime(0),
+				Bundles = new[] { MainBundleName },
+				Ignore = false,
+				ADPCMLimit = 100
+			};
+		}
 	}
 	
 	public class CookingRulesBuilder
@@ -58,7 +61,7 @@ namespace Orange
 			var rulesStack = new Stack<CookingRules>();
 			var map = new Dictionary<string, CookingRules>();
 			pathStack.Push("");
-			rulesStack.Push(CookingRules.Default);
+			rulesStack.Push(CookingRules.GetDefault(platform));
 			using (new DirectoryChanger(fileEnumerator.Directory)) {
 				foreach (var fileInfo in fileEnumerator.Enumerate()) {
 					var path = fileInfo.Path;

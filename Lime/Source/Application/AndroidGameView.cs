@@ -214,7 +214,6 @@ namespace Lime
 			FPSCalculator.Refresh();
 			Application.Instance.OnRenderFrame();
 			SwapBuffers();
-			FPSCalculator.Refresh();
 		}
 
 		private static bool IsRotationEnabled()
