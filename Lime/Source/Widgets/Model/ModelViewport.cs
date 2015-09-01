@@ -58,11 +58,9 @@ namespace Lime
 
 		private void RefreshChildren()
 		{
+			var time = (int)(Frame * 1000 / 16);
 			foreach (var n in Nodes) {
-				var time = (int)(Frame * 1000 / 16);
-				if (n.AnimationTime != time) {
-					n.AnimationTime = time;
-				}
+				n.AnimationTime = time;
 			}
 		}
 
