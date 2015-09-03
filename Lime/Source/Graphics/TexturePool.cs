@@ -143,6 +143,9 @@ namespace Lime
 				case "#c":
 					return new RenderTexture(512, 512);
 				case "#d":
+				case "#e":
+				case "#f":
+				case "#g":
 					return new RenderTexture(1024, 1024);
 				default:
 					return null;

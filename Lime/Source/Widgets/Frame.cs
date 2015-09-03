@@ -23,6 +23,12 @@ namespace Lime
 		C,
 		[ProtoEnum]
 		D,
+		[ProtoEnum]
+		E,
+		[ProtoEnum]
+		F,
+		[ProtoEnum]
+		G
 	}
 	
 	/// <summary>
@@ -240,6 +246,12 @@ namespace Lime
 					return new SerializableTexture("#c");
 				case RenderTarget.D:
 					return new SerializableTexture("#d");
+				case RenderTarget.E:
+					return new SerializableTexture("#e");
+				case RenderTarget.F:
+					return new SerializableTexture("#f");
+				case RenderTarget.G:
+					return new SerializableTexture("#g");
 				default:
 					return null;
 			}
