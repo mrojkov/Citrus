@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 
 namespace Yuzu
 {
-	public class YuzuDefault : Attribute { }
+	public class YuzuRequired : Attribute { }
+	public class YuzuOptional : Attribute { }
 
 	public class CommonOptions
 	{
-		public Type DefaultAttribute = typeof(YuzuDefault);
+		public Type RequiredAttribute = typeof(YuzuRequired);
+		public Type OptionalAttribute = typeof(YuzuOptional);
 	}
 
 	public class YuzuException: Exception
@@ -25,7 +27,7 @@ namespace Yuzu
 		public abstract string ToString(object obj);
 		public abstract byte[] ToBytes(object obj);
 		public abstract void ToStream(object obj, Stream target);
-	};
+	}
 
 	public abstract class AbstractWriterSerializer: AbstractSerializer
 	{
@@ -64,7 +66,7 @@ namespace Yuzu
 		{
 			ToWriter(obj, new BinaryWriter(target));
 		}
-	};
+	}
 
 	public abstract class AbstractStringSerializer : AbstractSerializer
 	{
@@ -94,7 +96,7 @@ namespace Yuzu
 			var b = ToBytes(obj);
 			target.Write(b, 0, b.Length);
 		}
-	};
+	}
 
 	public abstract class AbstractDeserializer
 	{
@@ -124,6 +126,6 @@ namespace Yuzu
 			FromStream(obj, new MemoryStream(bytes, false));
 		}
 
-	};
+	}
 
 }

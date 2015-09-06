@@ -46,7 +46,7 @@ namespace Yuzu
 				writer.Write('\n');
 			writer.Write('}');
 		}
-	};
+	}
 
 	public class JsonDeserializer : AbstractDeserializer
 	{
@@ -150,18 +150,18 @@ namespace Yuzu
 			buf = null;
 			Require('{');
 			string name = GetNextName(true);
-			foreach (var f in obj.GetType().GetFields()) {
-				if (f.Name != name) {
-					if (!f.IsDefined(Options.DefaultAttribute, true))
+			foreach (var yi in Utils.GetYuzuItems(obj.GetType(), Options)) {
+				if (yi.Name != name) {
+					if (!yi.IsOptional)
 						throw new YuzuException();
 					continue;
 				}
-				var t = f.FieldType;
+				var t = yi.FieldInfo.FieldType;
 				if (t == typeof(int)) {
-					f.SetValue(obj, RequireInt());
+					yi.FieldInfo.SetValue(obj, RequireInt());
 				}
 				else if (t == typeof(string)) {
-					f.SetValue(obj, RequireString());
+					yi.FieldInfo.SetValue(obj, RequireString());
 				}
 				else {
 					throw new NotImplementedException(t.Name);

@@ -17,8 +17,9 @@ namespace YuzuTest
 
 		private class Sample1
 		{
+			[YuzuRequired]
 			public int X;
-			[YuzuDefault]
+			[YuzuOptional]
 			public string Y = "zzz";
 		}
 
