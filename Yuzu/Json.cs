@@ -37,6 +37,9 @@ namespace Yuzu
 					WriteStr(yi.GetValue(obj).ToString());
 					writer.Write('"');
 				}
+				else if (yi.Type.IsClass) {
+					ToWriter(yi.GetValue(obj));
+				}
 				else {
 					throw new NotImplementedException(yi.Type.Name);
 				}
@@ -162,11 +165,17 @@ namespace Yuzu
 				else if (yi.Type == typeof(string)) {
 					yi.SetValue(obj, RequireString());
 				}
+				else if (yi.Type.IsClass) {
+					var value = Activator.CreateInstance(yi.Type);
+					FromReader(value);
+					yi.SetValue(obj, value);
+				}
 				else {
 					throw new NotImplementedException(yi.Type.Name);
 				}
 				name = GetNextName(false);
 			}
+			Require('}');
 		}
 	}
 
@@ -224,6 +233,7 @@ namespace Yuzu
 					throw new NotImplementedException(yi.Type.Name);
 				}
 				Put("name = GetNextName(false);\n");
+				Put("Require('}');\n");
 			}
 			Put("}\n");
 			Put("}\n");

@@ -31,6 +31,16 @@ namespace YuzuTest
 			public string Y { get; set; }
 		}
 
+		private class Sample3
+		{
+			[YuzuRequired(1)]
+			public Sample1 S1 { get; set; }
+			[YuzuOptional(2)]
+			public int F;
+			[YuzuOptional(3)]
+			public Sample2 S2;
+		}
+
 		private class SampleMethodOrder
 		{
 			[YuzuRequired(4)]
@@ -91,6 +101,38 @@ namespace YuzuTest
 		}
 
 		[TestMethod]
+		public void TestJsonNested()
+		{
+			var js = new JsonSerializer();
+
+			var v = new Sample3 {
+				S1 = new Sample1 { X = 345, Y = "test" },
+				F = 222,
+				S2 = new Sample2 { X = 346, Y = "test1" },
+			};
+			js.JsonOptions.Indent = "";
+
+			var result = js.ToString(v);
+			Assert.AreEqual(
+				"{\n\"S1\":" +
+				"{\n\"X\":345,\n\"Y\":\"test\"\n},\n" +
+				"\"F\":222,\n" +
+				"\"S2\":" +
+				"{\n\"X\":346,\n\"Y\":\"test1\"\n}\n" +
+				"}",
+				result);
+
+			var jd = new JsonDeserializer();
+			var w = new Sample3();
+			jd.FromStringUTF8(w, result);
+			Assert.AreEqual(v.S1.X, w.S1.X);
+			Assert.AreEqual(v.S1.Y, w.S1.Y);
+			Assert.AreEqual(v.F, w.F);
+			Assert.AreEqual(v.S2.X, w.S2.X);
+			Assert.AreEqual(v.S2.X, w.S2.X);
+		}
+
+		[TestMethod]
 		public void TestJsonMemberOrder()
 		{
 			var js = new JsonSerializer();
@@ -142,6 +184,7 @@ namespace YuzuTest
 
 		public static void Main()
 		{
+			//(new TestMain()).TestJsonMemberOrder();
 			JsonDeserializerGenerator.Instance.Generate<Sample1>();
 		}
 	}
