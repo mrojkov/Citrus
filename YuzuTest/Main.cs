@@ -23,11 +23,41 @@ namespace YuzuTest
 			public string Y = "zzz";
 		}
 
+		private class Sample2
+		{
+			[YuzuRequired]
+			public int X { get; set; }
+			[YuzuOptional]
+			public string Y { get; set; }
+		}
+
 		[TestMethod]
 		public void TestJsonSimple()
 		{
 			var js = new JsonSerializer();
 			Assert.AreEqual("{\n}", js.ToString(new Empty()));
+
+			var v1 = new Sample1 { X = 345, Y = "test" };
+			js.JsonOptions.Indent = "";
+
+			var result = js.ToString(v1);
+			Assert.AreEqual("{\n\"X\":345,\n\"Y\":\"test\"\n}", result);
+			Sample1 v2 = new Sample1();
+
+			var jd = new JsonDeserializer();
+			jd.FromStringUTF8(v2, result);
+			Assert.AreEqual(v1.X, v2.X);
+			Assert.AreEqual(v1.Y, v2.Y);
+
+			jd.FromStringUTF8(v2, "{\"X\":999}");
+			Assert.AreEqual(999, v2.X);
+			Assert.AreEqual(v1.Y, v2.Y);
+		}
+
+		[TestMethod]
+		public void TestJsonSimpleProps()
+		{
+			var js = new JsonSerializer();
 
 			var v1 = new Sample1 { X = 345, Y = "test" };
 			js.JsonOptions.Indent = "";

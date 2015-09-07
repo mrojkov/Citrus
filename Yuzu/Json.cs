@@ -18,7 +18,7 @@ namespace Yuzu
 			writer.Write('{');
 			writer.Write('\n');
 			var first = true;
-			foreach (var f in obj.GetType().GetFields()) {
+			foreach (var yi in Utils.GetYuzuItems(obj.GetType(), Options)) {
 				if (!first) {
 					writer.Write(',');
 					WriteStr(JsonOptions.FieldSeparator);
@@ -26,20 +26,19 @@ namespace Yuzu
 				first = false;
 				WriteStr(JsonOptions.Indent);
 				writer.Write('"');
-				WriteStr(f.Name);
+				WriteStr(yi.Name);
 				writer.Write('"');
 				writer.Write(':');
-				var t = f.FieldType;
-				if (t == typeof(int)) {
-					WriteStr(f.GetValue(obj).ToString());
+				if (yi.Type == typeof(int)) {
+					WriteStr(yi.GetValue(obj).ToString());
 				}
-				else if (t == typeof(string)) {
+				else if (yi.Type == typeof(string)) {
 					writer.Write('"');
-					WriteStr(f.GetValue(obj).ToString());
+					WriteStr(yi.GetValue(obj).ToString());
 					writer.Write('"');
 				}
 				else {
-					throw new NotImplementedException(t.Name);
+					throw new NotImplementedException(yi.Type.Name);
 				}
 			}
 			if (!first)
@@ -156,20 +155,21 @@ namespace Yuzu
 						throw new YuzuException();
 					continue;
 				}
-				var t = yi.FieldInfo.FieldType;
-				if (t == typeof(int)) {
-					yi.FieldInfo.SetValue(obj, RequireInt());
+
+				if (yi.Type == typeof(int)) {
+					yi.SetValue(obj, RequireInt());
 				}
-				else if (t == typeof(string)) {
-					yi.FieldInfo.SetValue(obj, RequireString());
+				else if (yi.Type == typeof(string)) {
+					yi.SetValue(obj, RequireString());
 				}
 				else {
-					throw new NotImplementedException(t.Name);
+					throw new NotImplementedException(yi.Type.Name);
 				}
 				name = GetNextName(false);
 			}
 		}
 	}
+
 	public class JsonDeserializerGenerator
 	{
 		public static JsonDeserializerGenerator Instance = new JsonDeserializerGenerator();
