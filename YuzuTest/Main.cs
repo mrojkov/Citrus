@@ -17,18 +17,32 @@ namespace YuzuTest
 
 		private class Sample1
 		{
-			[YuzuRequired]
+			[YuzuRequired(1)]
 			public int X;
-			[YuzuOptional]
+			[YuzuOptional(2)]
 			public string Y = "zzz";
 		}
 
 		private class Sample2
 		{
-			[YuzuRequired]
+			[YuzuRequired(1)]
 			public int X { get; set; }
-			[YuzuOptional]
+			[YuzuOptional(2)]
 			public string Y { get; set; }
+		}
+
+		private class SampleMethodOrder
+		{
+			[YuzuRequired(4)]
+			public int P2 { get; set; }
+			[YuzuRequired(2)]
+			public int P1 { get; set; }
+			public int F_no;
+			[YuzuRequired(1)]
+			public int F1;
+			[YuzuRequired(3)]
+			public int F2;
+			public int Func() { return 0; }
 		}
 
 		[TestMethod]
@@ -74,6 +88,15 @@ namespace YuzuTest
 			jd.FromStringUTF8(v2, "{\"X\":999}");
 			Assert.AreEqual(999, v2.X);
 			Assert.AreEqual(v1.Y, v2.Y);
+		}
+
+		[TestMethod]
+		public void TestJsonMemberOrder()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			var result = js.ToString(new SampleMethodOrder());
+			Assert.AreEqual("{\n\"F1\":0,\n\"P1\":0,\n\"F2\":0,\n\"P2\":0\n}", result);
 		}
 
 		[TestMethod]

@@ -7,13 +7,27 @@ using System.Threading.Tasks;
 
 namespace Yuzu
 {
-	public class YuzuRequired : Attribute { }
-	public class YuzuOptional : Attribute { }
+	public class YuzuOrder : Attribute
+	{
+		public readonly int Order = 0;
+		public YuzuOrder(int order) { Order = order; }
+	}
+
+	public class YuzuRequired : YuzuOrder
+	{
+		public YuzuRequired(int order): base(order) { }
+	}
+
+	public class YuzuOptional : YuzuOrder
+	{
+		public YuzuOptional(int order) : base(order) { }
+	}
 
 	public class CommonOptions
 	{
 		public Type RequiredAttribute = typeof(YuzuRequired);
 		public Type OptionalAttribute = typeof(YuzuOptional);
+		public Func<Attribute, int> GetOrder = attr => (attr as YuzuOrder).Order;
 	}
 
 	public class YuzuException: Exception
