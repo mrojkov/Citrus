@@ -170,4 +170,63 @@ namespace Yuzu
 			}
 		}
 	}
+	public class JsonDeserializerGenerator
+	{
+		public static JsonDeserializerGenerator Instance = new JsonDeserializerGenerator();
+
+		private int indent = 0;
+
+		public void PutPart(string s)
+		{
+			Console.Write(s);
+		}
+
+		public void Put(string s)
+		{
+			if (s == "}\n")
+				indent -= 1;
+			for (int i = 0; i < indent; ++i)
+				PutPart("\t");
+			PutPart(s);
+			if (s == "{\n")
+				indent += 1;
+		}
+
+		public void PutF(string format, params object[] p)
+		{
+			Put(String.Format(format, p));
+		}
+
+		public void Generate<T>()
+		{
+			PutF("class {0}_JsonDeserializer : JsonDeserializer\n", typeof(T).Name);
+			Put("{\n");
+			Put("public override void FromReader(object obj)\n");
+			Put("{\n");
+			Put("buf = null;\n");
+			Put("Require('{');\n");
+			Put("var name = GetNextName(true);\n");
+			PutF("var result = ({0})obj;\n", typeof(T).Name);
+			foreach (var yi in Utils.GetYuzuItems(typeof(T), new CommonOptions())) {
+				if (yi.IsOptional)
+					PutF("if (\"{0}\" == name) result.{0} = ", yi.Name);
+				else {
+					PutF("if (\"{0}\" != name) throw new YuzuException();\n", yi.Name);
+					PutF("result.{0} = ", yi.Name);
+				}
+				if (yi.Type == typeof(int)) {
+					PutPart("RequireInt()\n");
+				}
+				else if (yi.Type == typeof(string)) {
+					PutPart("RequireString()\n");
+				}
+				else {
+					throw new NotImplementedException(yi.Type.Name);
+				}
+				Put("name = GetNextName(false);\n");
+			}
+			Put("}\n");
+			Put("}\n");
+		}
+	}
 }
