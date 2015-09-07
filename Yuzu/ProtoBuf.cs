@@ -58,7 +58,7 @@ namespace Yuzu
 	{
 	}
 
-	public class ProtobufDeserializer : AbstractDeserializer
+	public class ProtobufDeserializer : AbstractReaderDeserializer
 	{
 		public ProtobufDeserializeOptions ProtobufOptions = new ProtobufDeserializeOptions();
 

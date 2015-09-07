@@ -69,11 +69,11 @@ namespace YuzuTest
 			Sample1 v2 = new Sample1();
 
 			var jd = new JsonDeserializer();
-			jd.FromStringUTF8(v2, result);
+			jd.FromString(v2, result);
 			Assert.AreEqual(v1.X, v2.X);
 			Assert.AreEqual(v1.Y, v2.Y);
 
-			jd.FromStringUTF8(v2, "{\"X\":999}");
+			jd.FromString(v2, "{\"X\":999}");
 			Assert.AreEqual(999, v2.X);
 			Assert.AreEqual(v1.Y, v2.Y);
 		}
@@ -91,11 +91,11 @@ namespace YuzuTest
 			Sample1 v2 = new Sample1();
 
 			var jd = new JsonDeserializer();
-			jd.FromStringUTF8(v2, result);
+			jd.FromString(v2, result);
 			Assert.AreEqual(v1.X, v2.X);
 			Assert.AreEqual(v1.Y, v2.Y);
 
-			jd.FromStringUTF8(v2, "{\"X\":999}");
+			jd.FromString(v2, "{\"X\":999}");
 			Assert.AreEqual(999, v2.X);
 			Assert.AreEqual(v1.Y, v2.Y);
 		}
@@ -124,7 +124,7 @@ namespace YuzuTest
 
 			var jd = new JsonDeserializer();
 			var w = new Sample3();
-			jd.FromStringUTF8(w, result);
+			jd.FromString(w, result);
 			Assert.AreEqual(v.S1.X, w.S1.X);
 			Assert.AreEqual(v.S1.Y, w.S1.Y);
 			Assert.AreEqual(v.F, w.F);
@@ -186,6 +186,7 @@ namespace YuzuTest
 		{
 			//(new TestMain()).TestJsonMemberOrder();
 			JsonDeserializerGenerator.Instance.Generate<Sample1>();
+			JsonDeserializerGenerator.Instance.Generate<Sample3>();
 		}
 	}
 }

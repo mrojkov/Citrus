@@ -115,27 +115,35 @@ namespace Yuzu
 	public abstract class AbstractDeserializer
 	{
 		public CommonOptions Options = new CommonOptions();
+		public abstract void FromReader(object obj, BinaryReader reader);
+		public abstract void FromString(object obj, string source);
+		public abstract void FromStream(object obj, Stream source);
+		public abstract void FromBytes(object obj, byte[] bytes);
+	}
+
+	public abstract class AbstractReaderDeserializer: AbstractDeserializer
+	{
 		public BinaryReader Reader;
 
 		public abstract void FromReader(object obj);
 
-		public void FromReader(object obj, BinaryReader reader)
+		public override void FromReader(object obj, BinaryReader reader)
 		{
 			Reader = reader;
 			FromReader(obj);
 		}
 
-		public void FromStringUTF8(object obj, string source)
+		public override void FromString(object obj, string source)
 		{
 			FromReader(obj, new BinaryReader(new MemoryStream(Encoding.UTF8.GetBytes(source), false)));
 		}
 
-		public void FromStream(object obj, Stream source)
+		public override void FromStream(object obj, Stream source)
 		{
 			FromReader(obj, new BinaryReader(source));
 		}
 
-		public void FromBytes(object obj, byte[] bytes)
+		public override void FromBytes(object obj, byte[] bytes)
 		{
 			FromStream(obj, new MemoryStream(bytes, false));
 		}

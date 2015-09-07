@@ -50,7 +50,7 @@ namespace Yuzu
 		}
 	}
 
-	public class JsonDeserializer : AbstractDeserializer
+	public class JsonDeserializer : AbstractReaderDeserializer
 	{
 		public static JsonDeserializer Instance = new JsonDeserializer();
 
