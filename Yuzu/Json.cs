@@ -197,7 +197,7 @@ namespace Yuzu
 			for (int i = 0; i < indent; ++i)
 				PutPart("\t");
 			PutPart(s);
-			if (s == "{\n")
+			if (s.EndsWith("{\n"))
 				indent += 1;
 		}
 
@@ -217,26 +217,35 @@ namespace Yuzu
 			Put("var name = GetNextName(true);\n");
 			PutF("var result = ({0})obj;\n", typeof(T).Name);
 			foreach (var yi in Utils.GetYuzuItems(typeof(T), new CommonOptions())) {
-				if (yi.IsOptional)
-					PutF("if (\"{0}\" == name) result.{0} = ", yi.Name);
+				if (yi.IsOptional) {
+					PutF("if (\"{0}\" == name) {{\n", yi.Name);
+					PutF("result.{0} = ", yi.Name);
+				}
 				else {
 					PutF("if (\"{0}\" != name) throw new YuzuException();\n", yi.Name);
 					PutF("result.{0} = ", yi.Name);
 				}
 				if (yi.Type == typeof(int)) {
-					PutPart("RequireInt()\n");
+					PutPart("RequireInt();\n");
 				}
 				else if (yi.Type == typeof(string)) {
-					PutPart("RequireString()\n");
+					PutPart("RequireString();\n");
+				}
+				else if (yi.Type.IsClass) {
+					PutPart(String.Format("new {0}();\n", yi.Type.Name));
+					PutF("(new {0}_JsonDeserializer()).FromReader(result.{1}, Reader);\n", yi.Type.Name, yi.Name);
 				}
 				else {
 					throw new NotImplementedException(yi.Type.Name);
 				}
+				if (yi.IsOptional)
+					Put("}\n");
 				Put("name = GetNextName(false);\n");
 				Put("Require('}');\n");
 			}
 			Put("}\n");
 			Put("}\n");
+			Put("\n");
 		}
 	}
 }
