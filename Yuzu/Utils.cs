@@ -19,45 +19,33 @@ namespace Yuzu
 	{
 		public static IEnumerable<YuzuItem> GetYuzuItems(Type t, CommonOptions options)
 		{
-			foreach (var f in t.GetFields()) {
-				if (f.IsDefined(options.OptionalAttribute, false))
+			foreach (var m in t.GetMembers()) {
+				var isOptional = m.IsDefined(options.OptionalAttribute, false);
+				var isRequired = m.IsDefined(options.RequiredAttribute, false);
+				if (!isOptional && !isRequired)
+					continue;
+				if (m.MemberType == MemberTypes.Field) {
+					var f = m as FieldInfo;
 					yield return new YuzuItem {
-						IsOptional = true,
-						Name = f.Name,
+						IsOptional = isOptional,
+						Name = m.Name,
 						Type = f.FieldType,
 						GetValue = f.GetValue,
 						SetValue = f.SetValue,
-						FieldInfo = f,
 					};
-				else if (f.IsDefined(options.RequiredAttribute, false))
+				}
+				else if (m.MemberType == MemberTypes.Property) {
+					var p = m as PropertyInfo;
 					yield return new YuzuItem {
-						IsOptional = false,
-						Name = f.Name,
-						Type = f.FieldType,
-						GetValue = f.GetValue,
-						SetValue = f.SetValue,
-						FieldInfo = f,
-					};
-			}
-			foreach (var p in t.GetProperties()) {
-				if (p.IsDefined(options.OptionalAttribute, false))
-					yield return new YuzuItem {
-						IsOptional = true,
-						Name = p.Name,
+						IsOptional = isOptional,
+						Name = m.Name,
 						Type = p.PropertyType,
 						GetValue = p.GetValue,
 						SetValue = p.SetValue,
-						PropInfo = p,
 					};
-				else if (p.IsDefined(options.RequiredAttribute, false))
-					yield return new YuzuItem {
-						IsOptional = false,
-						Name = p.Name,
-						Type = p.PropertyType,
-						GetValue = p.GetValue,
-						SetValue = p.SetValue,
-						PropInfo = p,
-					};
+				}
+				else
+					continue;
 			}
 		}
 	}
