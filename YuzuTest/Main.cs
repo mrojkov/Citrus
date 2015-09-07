@@ -109,9 +109,12 @@ namespace YuzuTest
 		{
 			var v1 = new Sample1 { X = 150, Y = "test" };
 			var cs = new CodeAssignSerializer();
-			var result = cs.ToString(v1);
-			Assert.AreEqual("void Init(Sample1 obj) {\n\tobj.X = 150;\n\tobj.Y = \"test\";\n}\n", result);
-			Sample1 v2 = new Sample1();
+			var result1 = cs.ToString(v1);
+			Assert.AreEqual("void Init(Sample1 obj) {\n\tobj.X = 150;\n\tobj.Y = \"test\";\n}\n", result1);
+
+			var v2 = new Sample2 { X = 150, Y = "test" };
+			var result2 = cs.ToString(v2);
+			Assert.AreEqual("void Init(Sample2 obj) {\n\tobj.X = 150;\n\tobj.Y = \"test\";\n}\n", result2);
 		}
 
 		public static void Main()
