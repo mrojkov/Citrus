@@ -84,7 +84,21 @@ namespace YuzuTest
 			var result = ps.ToBytes(v1);
 			CollectionAssert.AreEqual(new byte[] {
 				0x08, 0x96, 0x01, 0x12, 0x04, (byte)'t', (byte)'e', (byte)'s', (byte)'t' }, result);
-			Sample1 v2 = new Sample1();
+			var v2 = new Sample1();
+			(new ProtobufDeserializer()).FromBytes(v2, result);
+			Assert.AreEqual(v1.X, v2.X);
+			Assert.AreEqual(v1.Y, v2.Y);
+		}
+
+		[TestMethod]
+		public void TestProtobufSimpleProps()
+		{
+			var v1 = new Sample2 { X = 150, Y = "test" };
+			var ps = new ProtobufSerializer();
+			var result = ps.ToBytes(v1);
+			CollectionAssert.AreEqual(new byte[] {
+				0x08, 0x96, 0x01, 0x12, 0x04, (byte)'t', (byte)'e', (byte)'s', (byte)'t' }, result);
+			var v2 = new Sample2();
 			(new ProtobufDeserializer()).FromBytes(v2, result);
 			Assert.AreEqual(v1.X, v2.X);
 			Assert.AreEqual(v1.Y, v2.Y);
@@ -102,6 +116,7 @@ namespace YuzuTest
 
 		public static void Main()
 		{
+			JsonDeserializerGenerator.Instance.Generate<Sample1>();
 		}
 	}
 }

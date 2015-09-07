@@ -35,20 +35,19 @@ namespace Yuzu
 		protected override void ToWriter(object obj)
 		{
 			int count = 1;
-			foreach (var f in obj.GetType().GetFields()) {
-				var t = f.FieldType;
-				if (t == typeof(int)) {
+			foreach (var yi in Utils.GetYuzuItems(obj.GetType(), Options)) {
+				if (yi.Type == typeof(int)) {
 					WriteVarint((count << 3) + (int)WireType.Varint);
-					WriteVarint((int)f.GetValue(obj));
+					WriteVarint((int)yi.GetValue(obj));
 				}
-				else if (t == typeof(string)) {
-					var s = f.GetValue(obj).ToString();
+				else if (yi.Type == typeof(string)) {
+					var s = yi.GetValue(obj).ToString();
 					WriteVarint((count << 3) + (int)WireType.LengthDelimited);
 					WriteVarint(Encoding.UTF8.GetByteCount(s));
 					writer.Write(Encoding.UTF8.GetBytes(s));
 				}
 				else {
-					throw new NotImplementedException(t.Name);
+					throw new NotImplementedException(yi.Type.Name);
 				}
 				++count;
 			}
@@ -79,20 +78,19 @@ namespace Yuzu
 		public override void FromReader(object obj)
 		{
 			int count = 1;
-			foreach (var f in obj.GetType().GetFields()) {
-				var t = f.FieldType;
-				if (t == typeof(int)) {
+			foreach (var yi in Utils.GetYuzuItems(obj.GetType(), Options)) {
+				if (yi.Type == typeof(int)) {
 					if (ReadVarint() != (count << 3) + (int)WireType.Varint)
 						throw new YuzuException();
-					f.SetValue(obj, (int)ReadVarint());
+					yi.SetValue(obj, (int)ReadVarint());
 				}
-				else if (t == typeof(string)) {
+				else if (yi.Type == typeof(string)) {
 					if (ReadVarint() != (count << 3) + (int)WireType.LengthDelimited)
 						throw new YuzuException();
-					f.SetValue(obj, Encoding.UTF8.GetString(Reader.ReadBytes((int)ReadVarint())));
+					yi.SetValue(obj, Encoding.UTF8.GetString(Reader.ReadBytes((int)ReadVarint())));
 				}
 				else {
-					throw new NotImplementedException(t.Name);
+					throw new NotImplementedException(yi.Type.Name);
 				}
 				++count;
 			}
