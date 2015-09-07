@@ -20,45 +20,46 @@ namespace Yuzu
 
 	internal class Utils
 	{
-		public static IEnumerable<YuzuItem> GetYuzuItems(Type t, CommonOptions options)
+		private static Dictionary<Tuple<Type, CommonOptions>, List<YuzuItem>> yuzuItemsCache =
+			new Dictionary<Tuple<Type, CommonOptions>, List<YuzuItem>>();
+
+		public static List<YuzuItem> GetYuzuItems(Type t, CommonOptions options)
 		{
-			var items = new List<YuzuItem>();
+			List<YuzuItem> items;
+			if (!yuzuItemsCache.TryGetValue(Tuple.Create(t, options), out items))
+				items = new List<YuzuItem>();
 			foreach (var m in t.GetMembers()) {
+				if (m.MemberType != MemberTypes.Field && m.MemberType != MemberTypes.Property)
+					continue;
+
 				var optional = m.GetCustomAttribute(options.OptionalAttribute, false);
 				var required = m.GetCustomAttribute(options.RequiredAttribute, false);
-
 				if (optional == null && required == null)
 					continue;
 				if (optional != null && required != null)
 					throw new YuzuException();
-				var order = options.GetOrder(optional ?? required);
+				var item = new YuzuItem {
+						Order = options.GetOrder(optional ?? required),
+						IsOptional = optional != null,
+						Name = m.Name,
+				};
 
 				if (m.MemberType == MemberTypes.Field) {
 					var f = m as FieldInfo;
-					items.Add(new YuzuItem {
-						Order = order,
-						IsOptional = optional != null,
-						Name = m.Name,
-						Type = f.FieldType,
-						GetValue = f.GetValue,
-						SetValue = f.SetValue,
-						FieldInfo = f,
-					});
+					item.Type = f.FieldType;
+					item.GetValue = f.GetValue;
+					item.SetValue = f.SetValue;
+					item.FieldInfo = f;
 				}
-				else if (m.MemberType == MemberTypes.Property) {
+				else{
 					var p = m as PropertyInfo;
-					items.Add(new YuzuItem {
-						Order = order,
-						IsOptional = optional != null,
-						Name = m.Name,
-						Type = p.PropertyType,
-						GetValue = p.GetValue,
-						SetValue = p.SetValue,
-						PropInfo = p,
-					});
+					item.Type = p.PropertyType;
+					item.GetValue = p.GetValue;
+					item.SetValue = p.SetValue;
+					item.PropInfo = p;
 				}
-				else
-					continue;
+
+				items.Add(item);
 			}
 			items.Sort();
 			return items;
