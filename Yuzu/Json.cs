@@ -182,6 +182,8 @@ namespace Yuzu
 	public class JsonDeserializerGenerator
 	{
 		public static JsonDeserializerGenerator Instance = new JsonDeserializerGenerator();
+		public CommonOptions Options = new CommonOptions();
+		public JsonSerializeOptions JsonOptions = new JsonSerializeOptions();
 
 		private int indent = 0;
 
@@ -195,7 +197,7 @@ namespace Yuzu
 			if (s == "}\n")
 				indent -= 1;
 			for (int i = 0; i < indent; ++i)
-				PutPart("\t");
+				PutPart(JsonOptions.Indent);
 			PutPart(s);
 			if (s.EndsWith("{\n"))
 				indent += 1;
@@ -210,6 +212,22 @@ namespace Yuzu
 		{
 			PutF("class {0}_JsonDeserializer : JsonDeserializer\n", typeof(T).Name);
 			Put("{\n");
+
+			PutF("public {0}_JsonDeserializer()\n", typeof(T).Name);
+			Put("{\n");
+			foreach (var f in Options.GetType().GetFields()) {
+				var v = Utils.CodeValueFormat(f.GetValue(Options));
+				if (v != "") // TODO
+					PutF("Options.{0} = {1};\n", f.Name, v);
+			}
+			foreach (var f in JsonOptions.GetType().GetFields()) {
+				var v = Utils.CodeValueFormat(f.GetValue(JsonOptions));
+				if (v != "") // TODO
+					PutF("JsonOptions.{0} = {1};\n", f.Name, v);
+			}
+			Put("}\n");
+			Put("\n");
+
 			Put("public override void FromReader(object obj)\n");
 			Put("{\n");
 			Put("buf = null;\n");

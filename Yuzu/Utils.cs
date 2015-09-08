@@ -23,6 +23,18 @@ namespace Yuzu
 		private static Dictionary<Tuple<Type, CommonOptions>, List<YuzuItem>> yuzuItemsCache =
 			new Dictionary<Tuple<Type, CommonOptions>, List<YuzuItem>>();
 
+		public static string CodeValueFormat(object value)
+		{
+			if (value.GetType() == typeof(int))
+				return value.ToString();
+			if (value.GetType() == typeof(bool))
+				return value.ToString();
+			if (value.GetType() == typeof(string))
+				return '"' + value.ToString() + '"';
+			return "";
+			//throw new NotImplementedException();
+		}
+
 		public static List<YuzuItem> GetYuzuItems(Type t, CommonOptions options)
 		{
 			List<YuzuItem> items;
