@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -68,6 +69,21 @@ namespace YuzuTest
 		public int F2;
 		public int Func() { return 0; }
 	}
+
+	public class SampleList
+	{
+		[YuzuRequired(1)]
+		public List<string> E;
+	}
+
+	public class SampleTree
+	{
+		[YuzuRequired(1)]
+		public int Value;
+		[YuzuRequired(2)]
+		public List<SampleTree> Children;
+	}
+
 
 	[TestClass]
 	public class TestMain
@@ -199,6 +215,40 @@ namespace YuzuTest
 			var b = (SampleDerivedB)v;
 			Assert.AreEqual(3, b.FBase);
 			Assert.AreEqual(7, b.FB);
+		}
+
+		[TestMethod]
+		public void TestJsonList()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+
+			var v0 = new SampleList { E = new List<string> { "a", "b", "c" } };
+			Assert.AreEqual("{\n\"E\":[\n\"a\",\n\"b\",\n\"c\"\n]\n}", js.ToString(v0));
+
+			var v1 = new SampleTree { Value = 11, Children = new List<SampleTree>() };
+			Assert.AreEqual("{\n\"Value\":11,\n\"Children\":[]\n}", js.ToString(v1));
+
+			var v2 = new SampleTree {
+				Value = 11,
+				Children = new List<SampleTree> {
+					new SampleTree {
+						Value = 12,
+						Children = new List<SampleTree>(),
+					},
+					new SampleTree {
+						Value = 13,
+						Children = new List<SampleTree>(),
+					}
+				}
+			};
+
+			Assert.AreEqual(
+				"{\n\"Value\":11,\n\"Children\":[\n" +
+				"{\n\"Value\":12,\n\"Children\":[]\n},\n" +
+				"{\n\"Value\":13,\n\"Children\":[]\n}\n" +
+				"]\n}",
+				js.ToString(v2));
 		}
 
 		[TestMethod]

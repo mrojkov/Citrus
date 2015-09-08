@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.IO;
 
@@ -15,16 +16,61 @@ namespace Yuzu
 	{
 		public JsonSerializeOptions JsonOptions = new JsonSerializeOptions();
 
-		private void WriteName(string name, ref bool isFirst) {
+		private void WriteInt(object obj)
+		{
+			WriteStr(obj.ToString());
+		}
+
+		private void WriteString(object obj)
+		{
+			writer.Write('"');
+			WriteStr(obj.ToString());
+			writer.Write('"');
+		}
+
+		private void WriteList<T>(List<T> list)
+		{
+			var wf = GetWriteFunc(typeof(T));
+			writer.Write('[');
+			if (list.Count > 0) {
+				var isFirst = true;
+				foreach (var elem in list) {
+					if (!isFirst)
+						writer.Write(',');
+					isFirst = false;
+					writer.Write('\n');
+					wf(elem);
+				}
+				writer.Write('\n');
+			}
+			writer.Write(']');
+		}
+
+		private Action<object> GetWriteFunc(Type t)
+		{
+			if (t == typeof(int))
+				return WriteInt;
+			if (t == typeof(string))
+				return WriteString;
+			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>)) {
+				var m = GetType().GetMethod("WriteList", BindingFlags.Instance | BindingFlags.NonPublic).
+					MakeGenericMethod(t.GetGenericArguments()[0]);
+				return obj => m.Invoke(this, new object[] { obj });
+			}
+			if (t.IsClass)
+				return ToWriter;
+			throw new NotImplementedException(t.Name);
+		}
+
+		private void WriteName(string name, ref bool isFirst)
+		{
 			if (!isFirst) {
 				writer.Write(',');
 				WriteStr(JsonOptions.FieldSeparator);
 			}
 			isFirst = false;
 			WriteStr(JsonOptions.Indent);
-			writer.Write('"');
-			WriteStr(name);
-			writer.Write('"');
+			WriteString(name);
 			writer.Write(':');
 		}
 
@@ -35,26 +81,11 @@ namespace Yuzu
 			var isFirst = true;
 			if (Options.ClassNames) {
 				WriteName(JsonOptions.ClassTag, ref isFirst);
-				writer.Write('"');
-				WriteStr(obj.GetType().FullName);
-				writer.Write('"');
+				WriteString(obj.GetType().FullName);
 			}
 			foreach (var yi in Utils.GetYuzuItems(obj.GetType(), Options)) {
 				WriteName(yi.Name, ref isFirst);
-				if (yi.Type == typeof(int)) {
-					WriteStr(yi.GetValue(obj).ToString());
-				}
-				else if (yi.Type == typeof(string)) {
-					writer.Write('"');
-					WriteStr(yi.GetValue(obj).ToString());
-					writer.Write('"');
-				}
-				else if (yi.Type.IsClass) {
-					ToWriter(yi.GetValue(obj));
-				}
-				else {
-					throw new NotImplementedException(yi.Type.Name);
-				}
+				GetWriteFunc(yi.Type)(yi.GetValue(obj));
 			}
 			if (!isFirst)
 				writer.Write('\n');
