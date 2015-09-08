@@ -306,6 +306,24 @@ namespace Yuzu
 	public abstract class JsonDeserializerGenBase : JsonDeserializer
 	{
 		public abstract object FromReaderIntPartial(string name);
+		protected string className;
+
+		public override object FromReaderInt(object obj)
+		{
+			buf = null;
+			Require('{');
+			var name = GetNextName(true);
+			if (Options.ClassNames) {
+				if (name != JsonOptions.ClassTag)
+					throw new YuzuException();
+				if (RequireString() + "_JsonDeserializer" != GetType().Name)
+					throw new YuzuException();
+				name = GetNextName(false);
+			}
+			ReadFields(obj, name);
+			return obj;
+		}
+
 	}
 
 	public class JsonDeserializerGenerator: JsonDeserializer
@@ -405,6 +423,7 @@ namespace Yuzu
 
 			PutF("public {0}_JsonDeserializer()\n", typeof(T).Name);
 			Put("{\n");
+			PutF("className = \"{0}\";\n", typeof(T).FullName);
 			foreach (var f in Options.GetType().GetFields()) {
 				var v = Utils.CodeValueFormat(f.GetValue(Options));
 				if (v != "") // TODO
@@ -425,21 +444,6 @@ namespace Yuzu
 			Put("}\n");
 			Put("\n");
 
-			Put("public override object FromReaderInt(object obj)\n");
-			Put("{\n");
-			Put("buf = null;\n");
-			Put("Require('{');\n");
-			Put("var name = GetNextName(true);\n");
-			if (Options.ClassNames) {
-				Put("if (name != JsonOptions.ClassTag) throw new YuzuException();\n");
-				PutF("if (RequireString() != \"{0}\") throw new YuzuException();\n", typeof(T).FullName);
-				Put("name = GetNextName(false);\n");
-			}
-			Put("ReadFields(obj, name);\n");
-			Put("return obj;\n");
-			Put("}\n");
-			Put("\n");
-
 			Put("public override object FromReaderIntPartial(string name)\n");
 			Put("{\n");
 			PutF("var obj = new {0}();\n", typeof(T).Name);
@@ -448,7 +452,7 @@ namespace Yuzu
 			Put("}\n");
 			Put("\n");
 
-			Put("private new void ReadFields(object obj, string name)\n");
+			Put("protected override void ReadFields(object obj, string name)\n");
 			Put("{\n");
 			PutF("var result = ({0})obj;\n", typeof(T).Name);
 			tempCount = 0;
