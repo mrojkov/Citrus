@@ -130,6 +130,21 @@ namespace Yuzu
 			return ch;
 		}
 
+		private char SkipSpacesCarefully()
+		{
+			if (buf.HasValue)
+				throw new YuzuException();
+			while (true) {
+				var v = Reader.PeekChar();
+				if (v < 0)
+					return '\0';
+				var ch = (char)v;
+				if (ch != ' ' && ch != '\t' || ch != '\n' || ch != '\r')
+					return ch;
+				Reader.ReadChar();
+			}
+		}
+
 		protected char Require(params char[] chars)
 		{
 			var ch = SkipSpaces();
@@ -206,6 +221,36 @@ namespace Yuzu
 			return (JsonDeserializerGenBase)(Make(RequireString() + "_JsonDeserializer"));
 		}
 
+		private object ReadValue(Type t)
+		{
+			if (t == typeof(int))
+				return RequireInt();
+			if (t == typeof(string))
+				return RequireString();
+			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>)) {
+				var itemType = t.GetGenericArguments()[0];
+				var list = Activator.CreateInstance(t);
+				var add = t.GetMethod("Add");
+				Require('[');
+				// ReadValue might invoke a new serializer, so we must not rely on PutBack.
+				if (SkipSpacesCarefully() == ']')
+					Require(']');
+				else
+					do {
+						add.Invoke(list, new object[] { ReadValue(itemType) });
+					} while (Require(']', ',') == ',');
+				return list;
+			}
+			if (t.IsClass) {
+				if (Options.ClassNames)
+					return FromReaderInt();
+				var value = Activator.CreateInstance(t);
+				FromReaderInt(value);
+				return value;
+			}
+			throw new NotImplementedException(t.Name);
+		}
+
 		protected virtual void ReadFields(object obj, string name)
 		{
 			foreach (var yi in Utils.GetYuzuItems(obj.GetType(), Options)) {
@@ -214,26 +259,7 @@ namespace Yuzu
 						throw new YuzuException();
 					continue;
 				}
-
-				if (yi.Type == typeof(int)) {
-					yi.SetValue(obj, RequireInt());
-				}
-				else if (yi.Type == typeof(string)) {
-					yi.SetValue(obj, RequireString());
-				}
-				else if (yi.Type.IsClass) {
-					object value;
-					if (Options.ClassNames)
-						value = FromReaderInt();
-					else {
-						value = Activator.CreateInstance(yi.Type);
-						FromReaderInt(value);
-					}
-					yi.SetValue(obj, value);
-				}
-				else {
-					throw new NotImplementedException(yi.Type.Name);
-				}
+				yi.SetValue(obj, ReadValue(yi.Type));
 				name = GetNextName(false);
 			}
 			Require('}');
