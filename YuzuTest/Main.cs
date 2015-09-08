@@ -25,53 +25,53 @@ namespace YuzuTest
 		public int FB;
 	}
 
+	public class Empty
+	{
+	}
+
+	public class Sample1
+	{
+		[YuzuRequired(1)]
+		public int X;
+		[YuzuOptional(2)]
+		public string Y = "zzz";
+	}
+
+	public class Sample2
+	{
+		[YuzuRequired(1)]
+		public int X { get; set; }
+		[YuzuOptional(2)]
+		public string Y { get; set; }
+	}
+
+	public class Sample3
+	{
+		[YuzuRequired(1)]
+		public Sample1 S1 { get; set; }
+		[YuzuOptional(2)]
+		public int F;
+		[YuzuOptional(3)]
+		public Sample2 S2;
+	}
+
+	public class SampleMethodOrder
+	{
+		[YuzuRequired(4)]
+		public int P2 { get; set; }
+		[YuzuRequired(2)]
+		public int P1 { get; set; }
+		public int F_no;
+		[YuzuRequired(1)]
+		public int F1;
+		[YuzuRequired(3)]
+		public int F2;
+		public int Func() { return 0; }
+	}
+
 	[TestClass]
 	public class TestMain
 	{
-
-		private class Empty
-		{
-		}
-
-		private class Sample1
-		{
-			[YuzuRequired(1)]
-			public int X;
-			[YuzuOptional(2)]
-			public string Y = "zzz";
-		}
-
-		private class Sample2
-		{
-			[YuzuRequired(1)]
-			public int X { get; set; }
-			[YuzuOptional(2)]
-			public string Y { get; set; }
-		}
-
-		private class Sample3
-		{
-			[YuzuRequired(1)]
-			public Sample1 S1 { get; set; }
-			[YuzuOptional(2)]
-			public int F;
-			[YuzuOptional(3)]
-			public Sample2 S2;
-		}
-
-		private class SampleMethodOrder
-		{
-			[YuzuRequired(4)]
-			public int P2 { get; set; }
-			[YuzuRequired(2)]
-			public int P1 { get; set; }
-			public int F_no;
-			[YuzuRequired(1)]
-			public int F1;
-			[YuzuRequired(3)]
-			public int F2;
-			public int Func() { return 0; }
-		}
 
 		[TestMethod]
 		public void TestJsonSimple()
@@ -147,7 +147,27 @@ namespace YuzuTest
 			Assert.AreEqual(v.S1.Y, w.S1.Y);
 			Assert.AreEqual(v.F, w.F);
 			Assert.AreEqual(v.S2.X, w.S2.X);
-			Assert.AreEqual(v.S2.X, w.S2.X);
+			Assert.AreEqual(v.S2.Y, w.S2.Y);
+		}
+
+		[TestMethod]
+		public void TestJsonGenerated()
+		{
+			const string str =
+				"{\n\"S1\":" +
+				"{\n\"X\":345,\n\"Y\":\"test\"\n},\n" +
+				"\"F\":222,\n" +
+				"\"S2\":" +
+				"{\n\"X\":346,\n\"Y\":\"test1\"\n}\n" +
+				"}";
+
+			var jd = new Sample3_JsonDeserializer();
+			var w = (Sample3)jd.FromString(str);
+			Assert.AreEqual(345, w.S1.X);
+			Assert.AreEqual("test", w.S1.Y);
+			Assert.AreEqual(222, w.F);
+			Assert.AreEqual(346, w.S2.X);
+			Assert.AreEqual("test1", w.S2.Y);
 		}
 
 		[TestMethod]
@@ -225,10 +245,15 @@ namespace YuzuTest
 		public static void Main()
 		{
 			//(new TestMain()).TestJsonMemberOrder();
-			JsonDeserializerGenerator.Instance.JsonOptions.Indent = "  ";
-			JsonDeserializerGenerator.Instance.Options.ClassNames = true;
-			JsonDeserializerGenerator.Instance.Generate<Sample1>();
-			JsonDeserializerGenerator.Instance.Generate<Sample3>();
+			var jd = JsonDeserializerGenerator.Instance;
+			//jd.Options.ClassNames = true;
+			using (jd.GenWriter = new StreamWriter(new FileStream(@"..\..\Sample.cs", FileMode.Create))) {
+				jd.GenerateHeader("YuzuTest");
+				jd.Generate<Sample1>();
+				jd.Generate<Sample2>();
+				jd.Generate<Sample3>();
+				jd.GenerateFooter();
+			}
 		}
 	}
 }

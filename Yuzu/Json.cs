@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Reflection;
-using System.Text;
+using System.IO;
 
 namespace Yuzu
 {
@@ -137,7 +137,7 @@ namespace Yuzu
 			return result;
 		}
 
-		private int RequireInt()
+		protected int RequireInt()
 		{
 			var result = "";
 			var ch = SkipSpaces();
@@ -249,18 +249,20 @@ namespace Yuzu
 		public static new JsonDeserializerGenerator Instance = new JsonDeserializerGenerator();
 
 		private int indent = 0;
+		public StreamWriter GenWriter;
 
 		public void PutPart(string s)
 		{
-			Console.Write(s);
+			GenWriter.Write(s.Replace("\n", "\r\n"));
 		}
 
 		public void Put(string s)
 		{
 			if (s == "}\n")
 				indent -= 1;
-			for (int i = 0; i < indent; ++i)
-				PutPart(JsonOptions.Indent);
+			if (s != "\n")
+				for (int i = 0; i < indent; ++i)
+					PutPart(JsonOptions.Indent);
 			PutPart(s);
 			if (s.EndsWith("{\n"))
 				indent += 1;
@@ -269,6 +271,20 @@ namespace Yuzu
 		public void PutF(string format, params object[] p)
 		{
 			Put(String.Format(format, p));
+		}
+
+		public void GenerateHeader(string namespaceName)
+		{
+			Put("using Yuzu;\n");
+			Put("\n");
+			PutF("namespace {0}\n", namespaceName);
+			Put("{\n");
+			Put("\n");
+		}
+
+		public void GenerateFooter()
+		{
+			Put("}\n");
 		}
 
 		public void Generate<T>()
@@ -294,7 +310,7 @@ namespace Yuzu
 			Put("public override object FromReaderInt()\n");
 			Put("{\n");
 			// Since deserializer is dynamically constructed anyway, it is too late to determine object type here.
-			PutF("return FromReader(new {0}());\n", typeof(T).Name);
+			PutF("return FromReaderInt(new {0}());\n", typeof(T).Name);
 			Put("}\n");
 			Put("\n");
 
@@ -313,7 +329,7 @@ namespace Yuzu
 			Put("}\n");
 			Put("\n");
 
-			Put("public overide object FromReaderIntPartial(string name)\n");
+			Put("public override object FromReaderIntPartial(string name)\n");
 			Put("{\n");
 			PutF("var obj = new {0}();\n", typeof(T).Name);
 			Put("ReadFields(obj, name);\n");
@@ -321,7 +337,7 @@ namespace Yuzu
 			Put("}\n");
 			Put("\n");
 
-			Put("private void ReadFields(object obj, string name)\n");
+			Put("private new void ReadFields(object obj, string name)\n");
 			Put("{\n");
 			PutF("var result = ({0})obj;\n", typeof(T).Name);
 			foreach (var yi in Utils.GetYuzuItems(typeof(T), Options)) {
@@ -341,13 +357,14 @@ namespace Yuzu
 				}
 				else if (yi.Type.IsClass) {
 					if (Options.ClassNames) {
-						PutPart("MakeDeserializer(RequireString()).FromReader(Reader);\n");
+						PutPart(String.Format(
+							"({0})MakeDeserializer(RequireString()).FromReader(Reader);\n", yi.Type.Name));
 					}
 					else {
 						PutPart(String.Format("new {0}();\n", yi.Type.Name));
-						PutPart(String.Format(
+						PutF(
 							"(new {0}_JsonDeserializer()).FromReader(result.{1}, Reader);\n",
-							yi.Type.Name, yi.Name));
+							yi.Type.Name, yi.Name);
 					}
 				}
 				else {

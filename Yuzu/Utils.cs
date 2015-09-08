@@ -23,14 +23,19 @@ namespace Yuzu
 		private static Dictionary<Tuple<Type, CommonOptions>, List<YuzuItem>> yuzuItemsCache =
 			new Dictionary<Tuple<Type, CommonOptions>, List<YuzuItem>>();
 
+		public static string QuoteCSharpStringLiteral(string s)
+		{
+			return s.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\t", "\\t");
+		}
+
 		public static string CodeValueFormat(object value)
 		{
 			if (value.GetType() == typeof(int))
 				return value.ToString();
 			if (value.GetType() == typeof(bool))
-				return value.ToString();
+				return value.ToString().ToLower();
 			if (value.GetType() == typeof(string))
-				return '"' + value.ToString() + '"';
+				return '"' + QuoteCSharpStringLiteral(value.ToString()) + '"';
 			return "";
 			//throw new NotImplementedException();
 		}
