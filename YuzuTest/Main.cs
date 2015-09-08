@@ -85,6 +85,11 @@ namespace YuzuTest
 		public List<SampleTree> Children;
 	}
 
+	public class SampleClassList
+	{
+		[YuzuRequired(1)]
+		public List<SampleBase> E;
+	}
 
 	[TestClass]
 	public class TestMain
@@ -265,6 +270,41 @@ namespace YuzuTest
 		}
 
 		[TestMethod]
+		public void TestJsonClassList()
+		{
+			var js = new JsonSerializer();
+			js.Options.ClassNames = true;
+			var jd = new JsonDeserializer();
+			jd.Options.ClassNames = true;
+
+			var v = new SampleClassList {
+				E = new List<SampleBase> {
+					new SampleDerivedA(),
+					new SampleDerivedB { FB = 9 },
+					new SampleDerivedB { FB = 8 },
+				}
+			};
+
+			var result = js.ToString(v);
+			var w = (SampleClassList)jd.FromString(result);
+
+			Assert.AreEqual(3, w.E.Count);
+			Assert.IsInstanceOfType(w.E[0], typeof(SampleDerivedA));
+			Assert.IsInstanceOfType(w.E[1], typeof(SampleDerivedB));
+			Assert.AreEqual(9, ((SampleDerivedB)w.E[1]).FB);
+			Assert.IsInstanceOfType(w.E[2], typeof(SampleDerivedB));
+			Assert.AreEqual(8, ((SampleDerivedB)w.E[2]).FB);
+
+			w = (SampleClassList)SampleClassList_JsonDeserializer.Instance.FromString(result);
+			Assert.AreEqual(3, w.E.Count);
+			Assert.IsInstanceOfType(w.E[0], typeof(SampleDerivedA));
+			Assert.IsInstanceOfType(w.E[1], typeof(SampleDerivedB));
+			Assert.AreEqual(9, ((SampleDerivedB)w.E[1]).FB);
+			Assert.IsInstanceOfType(w.E[2], typeof(SampleDerivedB));
+			Assert.AreEqual(8, ((SampleDerivedB)w.E[2]).FB);
+		}
+
+		[TestMethod]
 		public void TestJsonLongList()
 		{
 			var list1 = new SampleList { E = new List<string>() };
@@ -332,13 +372,17 @@ namespace YuzuTest
 		{
 			//(new TestMain()).TestJsonMemberOrder();
 			var jd = JsonDeserializerGenerator.Instance;
-			//jd.Options.ClassNames = true;
 			using (jd.GenWriter = new StreamWriter(new FileStream(@"..\..\Sample.cs", FileMode.Create))) {
 				jd.GenerateHeader("YuzuTest");
 				jd.Generate<Sample1>();
 				jd.Generate<Sample2>();
 				jd.Generate<Sample3>();
 				jd.Generate<SampleList>();
+				jd.Generate<SampleBase>();
+				jd.Generate<SampleDerivedA>();
+				jd.Generate<SampleDerivedB>();
+				jd.Options.ClassNames = true;
+				jd.Generate<SampleClassList>();
 				jd.GenerateFooter();
 			}
 		}

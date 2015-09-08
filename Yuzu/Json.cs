@@ -219,7 +219,7 @@ namespace Yuzu
 			return Activator.CreateInstance(Options.Assembly.GetType(typeName));
 		}
 
-		protected JsonDeserializerGenBase MakeDeserializer(string typeName)
+		protected JsonDeserializerGenBase MakeDeserializer()
 		{
 			return (JsonDeserializerGenBase)(Make(RequireString() + "_JsonDeserializer"));
 		}
@@ -308,6 +308,20 @@ namespace Yuzu
 		public abstract object FromReaderIntPartial(string name);
 		protected string className;
 
+		public override object FromReaderInt()
+		{
+			if (!Options.ClassNames)
+				throw new YuzuException();
+			buf = null;
+			Require('{');
+			if (GetNextName(true) != JsonOptions.ClassTag)
+				throw new YuzuException();
+			var d = MakeDeserializer();
+			d.Reader = Reader;
+			Require(',');
+			return d.FromReaderIntPartial(GetNextName(false));
+		}
+
 		public override object FromReaderInt(object obj)
 		{
 			buf = null;
@@ -316,7 +330,7 @@ namespace Yuzu
 			if (Options.ClassNames) {
 				if (name != JsonOptions.ClassTag)
 					throw new YuzuException();
-				if (RequireString() + "_JsonDeserializer" != GetType().Name)
+				if (RequireString() != className)
 					throw new YuzuException();
 				name = GetNextName(false);
 			}
@@ -358,6 +372,7 @@ namespace Yuzu
 		public void GenerateHeader(string namespaceName)
 		{
 			Put("using System.Collections.Generic;\n");
+			Put("using System.Reflection;\n");
 			Put("\n");
 			Put("using Yuzu;\n");
 			Put("\n");
@@ -400,8 +415,7 @@ namespace Yuzu
 			}
 			else if (t.IsClass) {
 				if (Options.ClassNames) {
-					PutPart(String.Format(
-						"({0})MakeDeserializer(RequireString()).FromReader(Reader);\n", t.Name));
+					PutPart(String.Format("({0})base.FromReaderInt();\n", t.Name));
 				}
 				else {
 					PutPart(String.Format("new {0}();\n", t.Name));
@@ -424,6 +438,7 @@ namespace Yuzu
 			PutF("public {0}_JsonDeserializer()\n", typeof(T).Name);
 			Put("{\n");
 			PutF("className = \"{0}\";\n", typeof(T).FullName);
+			PutF("Options.Assembly = Assembly.Load(\"{0}\");\n", typeof(T).Assembly.FullName);
 			foreach (var f in Options.GetType().GetFields()) {
 				var v = Utils.CodeValueFormat(f.GetValue(Options));
 				if (v != "") // TODO
@@ -484,7 +499,10 @@ namespace Yuzu
 			Require('{');
 			if (GetNextName(true) != JsonOptions.ClassTag)
 				throw new YuzuException();
-			return MakeDeserializer(RequireString()).FromReaderIntPartial(GetNextName(false));
+			var d = MakeDeserializer();
+			d.Reader = Reader;
+			Require(',');
+			return d.FromReaderIntPartial(GetNextName(false));
 		}
 
 		public override object FromReaderInt(object obj)
