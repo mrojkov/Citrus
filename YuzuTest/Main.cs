@@ -91,6 +91,12 @@ namespace YuzuTest
 		public List<SampleBase> E;
 	}
 
+	public class SampleMatrix
+	{
+		[YuzuRequired(1)]
+		public List<List<int>> M;
+	}
+
 	[TestClass]
 	public class TestMain
 	{
@@ -305,6 +311,31 @@ namespace YuzuTest
 		}
 
 		[TestMethod]
+		public void TestJsonMatrix()
+		{
+			var src = "{\"M\":[[1,2,3],[4,5],[6],[]]}";
+			var v = new SampleMatrix();
+			(new JsonDeserializer()).FromString(v, src);
+			Assert.AreEqual(4, v.M.Count);
+			CollectionAssert.AreEqual(new int[] { 1, 2, 3 }, v.M[0]);
+			CollectionAssert.AreEqual(new int[] { 4, 5 }, v.M[1]);
+			CollectionAssert.AreEqual(new int[] { 6 }, v.M[2]);
+			Assert.AreEqual(0, v.M[3].Count);
+
+			v = (SampleMatrix)SampleMatrix_JsonDeserializer.Instance.FromString(src);
+			Assert.AreEqual(4, v.M.Count);
+			CollectionAssert.AreEqual(new int[] { 1, 2, 3 }, v.M[0]);
+			CollectionAssert.AreEqual(new int[] { 4, 5 }, v.M[1]);
+			CollectionAssert.AreEqual(new int[] { 6 }, v.M[2]);
+			Assert.AreEqual(0, v.M[3].Count);
+
+			var js = new JsonSerializer();
+			js.JsonOptions.FieldSeparator = "";
+			js.JsonOptions.Indent = "";
+			Assert.AreEqual(src, js.ToString(v));
+		}
+
+		[TestMethod]
 		public void TestJsonLongList()
 		{
 			var list1 = new SampleList { E = new List<string>() };
@@ -381,6 +412,7 @@ namespace YuzuTest
 				jd.Generate<SampleBase>();
 				jd.Generate<SampleDerivedA>();
 				jd.Generate<SampleDerivedB>();
+				jd.Generate<SampleMatrix>();
 				jd.Options.ClassNames = true;
 				jd.Generate<SampleClassList>();
 				jd.GenerateFooter();

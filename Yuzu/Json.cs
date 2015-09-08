@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Yuzu
@@ -371,6 +372,7 @@ namespace Yuzu
 
 		public void GenerateHeader(string namespaceName)
 		{
+			Put("using System;\n");
 			Put("using System.Collections.Generic;\n");
 			Put("using System.Reflection;\n");
 			Put("\n");
@@ -388,6 +390,15 @@ namespace Yuzu
 
 		private int tempCount = 0;
 
+		private string GetTypeSpec(Type t)
+		{
+			return t.IsGenericType ?
+				String.Format("{0}<{1}>",
+					t.Name.Remove(t.Name.IndexOf('`')),
+					String.Join(",", t.GetGenericArguments().Select(GetTypeSpec))) :
+				t.Name;
+		}
+
 		private void GenerateValue(Type t, string name)
 		{
 			if (t == typeof(int)) {
@@ -397,8 +408,7 @@ namespace Yuzu
 				PutPart("RequireString();\n");
 			}
 			else if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>)) {
-				var itemType = t.GetGenericArguments()[0];
-				PutPart(String.Format("new List<{0}>();\n", itemType));
+				PutPart(String.Format("new {0}();\n", GetTypeSpec(t)));
 				Put("Require('[');\n");
 				Put("if (SkipSpacesCarefully() == ']') {\n");
 				Put("Require(']');\n");
@@ -408,7 +418,7 @@ namespace Yuzu
 				tempCount += 1;
 				var tempName = "tmp" + tempCount.ToString();
 				PutF("var {0} = ", tempName);
-				GenerateValue(itemType, tempName);
+				GenerateValue(t.GetGenericArguments()[0], tempName);
 				PutF("{0}.Add({1});\n", name, tempName);
 				Put("} while (Require(']', ',') == ',');\n");
 				Put("}\n");

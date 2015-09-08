@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -162,7 +163,7 @@ namespace YuzuTest
 		{
 			var result = (SampleList)obj;
 			if ("E" != name) throw new YuzuException();
-			result.E = new List<System.String>();
+			result.E = new List<String>();
 			Require('[');
 			if (SkipSpacesCarefully() == ']') {
 				Require(']');
@@ -292,6 +293,62 @@ namespace YuzuTest
 		}
 	}
 
+	class SampleMatrix_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new SampleMatrix_JsonDeserializer Instance = new SampleMatrix_JsonDeserializer();
+
+		public SampleMatrix_JsonDeserializer()
+		{
+			className = "YuzuTest.SampleMatrix";
+			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+			Options.ClassNames = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderInt(new SampleMatrix());
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			var obj = new SampleMatrix();
+			ReadFields(obj, name);
+			return obj;
+		}
+
+		protected override void ReadFields(object obj, string name)
+		{
+			var result = (SampleMatrix)obj;
+			if ("M" != name) throw new YuzuException();
+			result.M = new List<List<Int32>>();
+			Require('[');
+			if (SkipSpacesCarefully() == ']') {
+				Require(']');
+			}
+			else {
+				do {
+					var tmp1 = new List<Int32>();
+					Require('[');
+					if (SkipSpacesCarefully() == ']') {
+						Require(']');
+					}
+					else {
+						do {
+							var tmp2 = RequireInt();
+							tmp1.Add(tmp2);
+						} while (Require(']', ',') == ',');
+					}
+					result.M.Add(tmp1);
+				} while (Require(']', ',') == ',');
+			}
+			name = GetNextName(false);
+			Require('}');
+		}
+	}
+
 	class SampleClassList_JsonDeserializer : JsonDeserializerGenBase
 	{
 		public static new SampleClassList_JsonDeserializer Instance = new SampleClassList_JsonDeserializer();
@@ -322,7 +379,7 @@ namespace YuzuTest
 		{
 			var result = (SampleClassList)obj;
 			if ("E" != name) throw new YuzuException();
-			result.E = new List<YuzuTest.SampleBase>();
+			result.E = new List<SampleBase>();
 			Require('[');
 			if (SkipSpacesCarefully() == ']') {
 				Require(']');
