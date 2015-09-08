@@ -19,6 +19,7 @@ namespace YuzuTest
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
+			JsonOptions.EnumAsString = false;
 		}
 
 		public override object FromReaderInt()
@@ -59,6 +60,7 @@ namespace YuzuTest
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
+			JsonOptions.EnumAsString = false;
 		}
 
 		public override object FromReaderInt()
@@ -99,6 +101,7 @@ namespace YuzuTest
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
+			JsonOptions.EnumAsString = false;
 		}
 
 		public override object FromReaderInt()
@@ -133,6 +136,44 @@ namespace YuzuTest
 		}
 	}
 
+	class Sample4_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new Sample4_JsonDeserializer Instance = new Sample4_JsonDeserializer();
+
+		public Sample4_JsonDeserializer()
+		{
+			className = "YuzuTest.Sample4";
+			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+			Options.ClassNames = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.EnumAsString = true;
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderInt(new Sample4());
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			var obj = new Sample4();
+			ReadFields(obj, name);
+			return obj;
+		}
+
+		protected override void ReadFields(object obj, string name)
+		{
+			var result = (Sample4)obj;
+			if ("E" == name) {
+				result.E = (SampleEnum)Enum.Parse(typeof(SampleEnum), RequireString());
+				name = GetNextName(false);
+			}
+			Require('}');
+		}
+	}
+
 	class SampleList_JsonDeserializer : JsonDeserializerGenBase
 	{
 		public static new SampleList_JsonDeserializer Instance = new SampleList_JsonDeserializer();
@@ -145,6 +186,7 @@ namespace YuzuTest
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
+			JsonOptions.EnumAsString = true;
 		}
 
 		public override object FromReaderInt()
@@ -191,6 +233,7 @@ namespace YuzuTest
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
+			JsonOptions.EnumAsString = true;
 		}
 
 		public override object FromReaderInt()
@@ -227,6 +270,7 @@ namespace YuzuTest
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
+			JsonOptions.EnumAsString = true;
 		}
 
 		public override object FromReaderInt()
@@ -266,6 +310,7 @@ namespace YuzuTest
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
+			JsonOptions.EnumAsString = true;
 		}
 
 		public override object FromReaderInt()
@@ -305,6 +350,7 @@ namespace YuzuTest
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
+			JsonOptions.EnumAsString = true;
 		}
 
 		public override object FromReaderInt()
@@ -361,6 +407,7 @@ namespace YuzuTest
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
+			JsonOptions.EnumAsString = true;
 		}
 
 		public override object FromReaderInt()

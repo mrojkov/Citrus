@@ -57,6 +57,14 @@ namespace YuzuTest
 		public Sample2 S2;
 	}
 
+	public enum SampleEnum { E1, E2, E3 };
+
+	public class Sample4
+	{
+		[YuzuOptional(1)]
+		public SampleEnum E;
+	}
+
 	public class SampleMethodOrder
 	{
 		[YuzuRequired(4)]
@@ -196,6 +204,35 @@ namespace YuzuTest
 			Assert.AreEqual(222, w.F);
 			Assert.AreEqual(346, w.S2.X);
 			Assert.AreEqual("test1", w.S2.Y);
+		}
+
+		[TestMethod]
+		public void TestJsonEnum()
+		{
+			var js = new JsonSerializer();
+
+			var v = new Sample4 { E = SampleEnum.E3 };
+			js.JsonOptions.Indent = "";
+
+			var result1 = js.ToString(v);
+			Assert.AreEqual("{\n\"E\":2\n}", result1);
+
+			js.JsonOptions.EnumAsString = true;
+			var result2 = js.ToString(v);
+			Assert.AreEqual("{\n\"E\":\"E3\"\n}", result2);
+
+			var jd = new JsonDeserializer();
+			var w = new Sample4();
+			jd.FromString(w, result1);
+			Assert.AreEqual(SampleEnum.E3, w.E);
+
+			w.E = SampleEnum.E1;
+			jd.JsonOptions.EnumAsString = true;
+			jd.FromString(w, result2);
+			Assert.AreEqual(SampleEnum.E3, w.E);
+
+			w = (Sample4)Sample4_JsonDeserializer.Instance.FromString(result2);
+			Assert.AreEqual(SampleEnum.E3, w.E);
 		}
 
 		[TestMethod]
@@ -408,6 +445,8 @@ namespace YuzuTest
 				jd.Generate<Sample1>();
 				jd.Generate<Sample2>();
 				jd.Generate<Sample3>();
+				jd.JsonOptions.EnumAsString = true;
+				jd.Generate<Sample4>();
 				jd.Generate<SampleList>();
 				jd.Generate<SampleBase>();
 				jd.Generate<SampleDerivedA>();

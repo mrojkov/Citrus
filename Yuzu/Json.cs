@@ -12,6 +12,7 @@ namespace Yuzu
 		public string FieldSeparator = "\n";
 		public string Indent = "\t";
 		public string ClassTag = "class";
+		public bool EnumAsString = false;
 	};
 
 	public class JsonSerializer : AbstractWriterSerializer
@@ -21,6 +22,11 @@ namespace Yuzu
 		private void WriteInt(object obj)
 		{
 			WriteStr(obj.ToString());
+		}
+
+		private void WriteEnumAsInt(object obj)
+		{
+			WriteStr(((int)obj).ToString());
 		}
 
 		private void WriteString(object obj)
@@ -54,6 +60,12 @@ namespace Yuzu
 				return WriteInt;
 			if (t == typeof(string))
 				return WriteString;
+			if (t.IsEnum) {
+				if (JsonOptions.EnumAsString)
+					return WriteString;
+				else
+					return WriteEnumAsInt;
+			}
 			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>)) {
 				var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteList", t);
 				return obj => m.Invoke(this, new object[] { obj });
@@ -238,6 +250,12 @@ namespace Yuzu
 				return RequireInt();
 			if (t == typeof(string))
 				return RequireString();
+			if (t.IsEnum) {
+				if (JsonOptions.EnumAsString)
+					return Enum.Parse(t, RequireString());
+				else
+					return Enum.ToObject(t, RequireInt());
+			}
 			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>)) {
 				var list = Activator.CreateInstance(t);
 				Require('[');
@@ -406,6 +424,13 @@ namespace Yuzu
 			}
 			else if (t == typeof(string)) {
 				PutPart("RequireString();\n");
+			}
+			else if (t.IsEnum) {
+				PutPart(String.Format(
+					JsonOptions.EnumAsString ?
+						"({0})Enum.Parse(typeof({0}), RequireString());\n" :
+						"({0})RequireInt();\n",
+					t.Name));
 			}
 			else if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>)) {
 				PutPart(String.Format("new {0}();\n", GetTypeSpec(t)));
