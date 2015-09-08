@@ -292,6 +292,9 @@ namespace Yuzu
 			PutF("class {0}_JsonDeserializer : JsonDeserializerGenBase\n", typeof(T).Name);
 			Put("{\n");
 
+			PutF("public static new {0}_JsonDeserializer Instance = new {0}_JsonDeserializer();\n", typeof(T).Name);
+			Put("\n");
+
 			PutF("public {0}_JsonDeserializer()\n", typeof(T).Name);
 			Put("{\n");
 			foreach (var f in Options.GetType().GetFields()) {
@@ -363,7 +366,7 @@ namespace Yuzu
 					else {
 						PutPart(String.Format("new {0}();\n", yi.Type.Name));
 						PutF(
-							"(new {0}_JsonDeserializer()).FromReader(result.{1}, Reader);\n",
+							"{0}_JsonDeserializer.Instance.FromReader(result.{1}, Reader);\n",
 							yi.Type.Name, yi.Name);
 					}
 				}

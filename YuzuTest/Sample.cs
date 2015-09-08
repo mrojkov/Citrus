@@ -5,6 +5,8 @@ namespace YuzuTest
 
 	class Sample1_JsonDeserializer : JsonDeserializerGenBase
 	{
+		public static new Sample1_JsonDeserializer Instance = new Sample1_JsonDeserializer();
+
 		public Sample1_JsonDeserializer()
 		{
 			Options.ClassNames = false;
@@ -50,6 +52,8 @@ namespace YuzuTest
 
 	class Sample2_JsonDeserializer : JsonDeserializerGenBase
 	{
+		public static new Sample2_JsonDeserializer Instance = new Sample2_JsonDeserializer();
+
 		public Sample2_JsonDeserializer()
 		{
 			Options.ClassNames = false;
@@ -95,6 +99,8 @@ namespace YuzuTest
 
 	class Sample3_JsonDeserializer : JsonDeserializerGenBase
 	{
+		public static new Sample3_JsonDeserializer Instance = new Sample3_JsonDeserializer();
+
 		public Sample3_JsonDeserializer()
 		{
 			Options.ClassNames = false;
@@ -129,7 +135,7 @@ namespace YuzuTest
 			var result = (Sample3)obj;
 			if ("S1" != name) throw new YuzuException();
 			result.S1 = new Sample1();
-			(new Sample1_JsonDeserializer()).FromReader(result.S1, Reader);
+			Sample1_JsonDeserializer.Instance.FromReader(result.S1, Reader);
 			name = GetNextName(false);
 			if ("F" == name) {
 				result.F = RequireInt();
@@ -137,7 +143,7 @@ namespace YuzuTest
 			}
 			if ("S2" == name) {
 				result.S2 = new Sample2();
-				(new Sample2_JsonDeserializer()).FromReader(result.S2, Reader);
+				Sample2_JsonDeserializer.Instance.FromReader(result.S2, Reader);
 				name = GetNextName(false);
 			}
 			Require('}');
