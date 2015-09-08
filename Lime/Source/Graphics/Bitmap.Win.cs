@@ -26,9 +26,9 @@ namespace Lime
 
 		public void LoadFromStream(Stream stream)
 		{
-			// System.Drawing.Bitmap �������, ����� stream ��������� �������� �� ����� ������������� �������.
+			// System.Drawing.Bitmap требует, чтобы stream оставался открытым всё время существования битмапа.
 			// http://stackoverflow.com/questions/336387/image-save-throws-a-gdi-exception-because-the-memory-stream-is-closed
-			// ��� ��� �� �� ����� ���� �������, ��� ������� ����� �� ���������, �������� ���.
+			// Так как мы не можем быть уверены, что снаружи стрим не уничтожат, копируем его.
 			Dispose();
 			var streamClone = new MemoryStream();
 			stream.CopyTo(streamClone);

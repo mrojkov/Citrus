@@ -31,8 +31,8 @@ namespace Lime
 					if (c != null)
 						return c;
 				}
-				if (code == 160) { // ����������� ������
-					return this[' ']; // ���� ��� ������� ������
+				if (code == 160) { // неразрывный пробел
+					return this[' ']; // ищем как обычный пробел
 				}
 				// Use 'middle dot' char instead of 'bullet operator'
 				if (code == 8729) {
