@@ -8,6 +8,7 @@ using Yuzu;
 
 namespace YuzuTest
 {
+
 	public class SampleBase
 	{
 		[YuzuRequired(1)]
@@ -262,6 +263,23 @@ namespace YuzuTest
 			Assert.AreEqual(v2.Value, w2.Value);
 			Assert.AreEqual(v2.Children.Count, w2.Children.Count);
 		}
+
+		[TestMethod]
+		public void TestJsonLongList()
+		{
+			var list1 = new SampleList { E = new List<string>() };
+			for (int i = 0; i < 100000; ++i)
+				list1.E.Add(i.ToString());
+			var js = new JsonSerializer();
+			var result1 = js.ToString(list1);
+			Assert.IsTrue(result1 != "");
+			var result2 = js.ToString(list1);
+			Assert.IsTrue(result1 == result2);
+
+			var list2 = new SampleList();
+			var jd = new JsonDeserializer();
+			jd.FromString(list2, result1);
+			Assert.AreEqual(list1.E.Count, list2.E.Count);
 		}
 
 		[TestMethod]
