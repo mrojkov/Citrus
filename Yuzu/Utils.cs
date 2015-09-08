@@ -40,7 +40,7 @@ namespace Yuzu
 			List<YuzuItem> items;
 			if (!yuzuItemsCache.TryGetValue(Tuple.Create(t, options), out items))
 				items = new List<YuzuItem>();
-			foreach (var m in t.GetMembers()) {
+			foreach (var m in t.GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy)) {
 				if (m.MemberType != MemberTypes.Field && m.MemberType != MemberTypes.Property)
 					continue;
 

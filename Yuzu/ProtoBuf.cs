@@ -34,6 +34,9 @@ namespace Yuzu
 
 		protected override void ToWriter(object obj)
 		{
+			if (Options.ClassNames)
+				throw new NotImplementedException();
+
 			int count = 1;
 			foreach (var yi in Utils.GetYuzuItems(obj.GetType(), Options)) {
 				if (yi.Type == typeof(int)) {
@@ -75,8 +78,16 @@ namespace Yuzu
 			return result;
 		}
 
-		public override void FromReader(object obj)
+		public override object FromReaderInt()
 		{
+			throw new NotImplementedException();
+		}
+
+		public override object FromReaderInt(object obj)
+		{
+			if (Options.ClassNames)
+				throw new NotImplementedException();
+
 			int count = 1;
 			foreach (var yi in Utils.GetYuzuItems(obj.GetType(), Options)) {
 				if (yi.Type == typeof(int)) {
@@ -94,6 +105,7 @@ namespace Yuzu
 				}
 				++count;
 			}
+			return obj;
 		}
 	}
 }

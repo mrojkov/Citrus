@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Yuzu
 {
@@ -28,6 +28,8 @@ namespace Yuzu
 		public Type RequiredAttribute = typeof(YuzuRequired);
 		public Type OptionalAttribute = typeof(YuzuOptional);
 		public Func<Attribute, int> GetOrder = attr => (attr as YuzuOrder).Order;
+		public bool ClassNames = false;
+		public Assembly Assembly = Assembly.GetCallingAssembly();
 	}
 
 	public class YuzuException: Exception
@@ -115,39 +117,66 @@ namespace Yuzu
 	public abstract class AbstractDeserializer
 	{
 		public CommonOptions Options = new CommonOptions();
-		public abstract void FromReader(object obj, BinaryReader reader);
-		public abstract void FromString(object obj, string source);
-		public abstract void FromStream(object obj, Stream source);
-		public abstract void FromBytes(object obj, byte[] bytes);
+
+		public abstract object FromReader(object obj, BinaryReader reader);
+		public abstract object FromString(object obj, string source);
+		public abstract object FromStream(object obj, Stream source);
+		public abstract object FromBytes(object obj, byte[] bytes);
+
+		public abstract object FromReader(BinaryReader reader);
+		public abstract object FromString(string source);
+		public abstract object FromStream(Stream source);
+		public abstract object FromBytes(byte[] bytes);
 	}
 
 	public abstract class AbstractReaderDeserializer: AbstractDeserializer
 	{
 		public BinaryReader Reader;
 
-		public abstract void FromReader(object obj);
+		public abstract object FromReaderInt();
+		public abstract object FromReaderInt(object obj);
 
-		public override void FromReader(object obj, BinaryReader reader)
+		public override object FromReader(object obj, BinaryReader reader)
 		{
 			Reader = reader;
-			FromReader(obj);
+			return FromReaderInt(obj);
 		}
 
-		public override void FromString(object obj, string source)
+		public override object FromString(object obj, string source)
 		{
-			FromReader(obj, new BinaryReader(new MemoryStream(Encoding.UTF8.GetBytes(source), false)));
+			return FromReader(obj, new BinaryReader(new MemoryStream(Encoding.UTF8.GetBytes(source), false)));
 		}
 
-		public override void FromStream(object obj, Stream source)
+		public override object FromStream(object obj, Stream source)
 		{
-			FromReader(obj, new BinaryReader(source));
+			return FromReader(obj, new BinaryReader(source));
 		}
 
-		public override void FromBytes(object obj, byte[] bytes)
+		public override object FromBytes(object obj, byte[] bytes)
 		{
-			FromStream(obj, new MemoryStream(bytes, false));
+			return FromStream(obj, new MemoryStream(bytes, false));
 		}
 
+		public override object FromReader(BinaryReader reader)
+		{
+			Reader = reader;
+			return FromReaderInt();
+		}
+
+		public override object FromString(string source)
+		{
+			return FromReader(new BinaryReader(new MemoryStream(Encoding.UTF8.GetBytes(source), false)));
+		}
+
+		public override object FromStream(Stream source)
+		{
+			return FromReader(new BinaryReader(source));
+		}
+
+		public override object FromBytes(byte[] bytes)
+		{
+			return FromStream(new MemoryStream(bytes, false));
+		}
 	}
 
 }

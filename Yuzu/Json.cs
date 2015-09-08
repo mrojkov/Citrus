@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Text;
 
 namespace Yuzu
@@ -7,28 +8,39 @@ namespace Yuzu
 	{
 		public string FieldSeparator = "\n";
 		public string Indent = "\t";
+		public string ClassTag = "class";
 	};
 
 	public class JsonSerializer : AbstractWriterSerializer
 	{
 		public JsonSerializeOptions JsonOptions = new JsonSerializeOptions();
 
+		private void WriteName(string name, ref bool isFirst) {
+			if (!isFirst) {
+				writer.Write(',');
+				WriteStr(JsonOptions.FieldSeparator);
+			}
+			isFirst = false;
+			WriteStr(JsonOptions.Indent);
+			writer.Write('"');
+			WriteStr(name);
+			writer.Write('"');
+			writer.Write(':');
+		}
+
 		protected override void ToWriter(object obj)
 		{
 			writer.Write('{');
 			writer.Write('\n');
-			var first = true;
+			var isFirst = true;
+			if (Options.ClassNames) {
+				WriteName(JsonOptions.ClassTag, ref isFirst);
+				writer.Write('"');
+				WriteStr(obj.GetType().FullName);
+				writer.Write('"');
+			}
 			foreach (var yi in Utils.GetYuzuItems(obj.GetType(), Options)) {
-				if (!first) {
-					writer.Write(',');
-					WriteStr(JsonOptions.FieldSeparator);
-				}
-				first = false;
-				WriteStr(JsonOptions.Indent);
-				writer.Write('"');
-				WriteStr(yi.Name);
-				writer.Write('"');
-				writer.Write(':');
+				WriteName(yi.Name, ref isFirst);
 				if (yi.Type == typeof(int)) {
 					WriteStr(yi.GetValue(obj).ToString());
 				}
@@ -44,7 +56,7 @@ namespace Yuzu
 					throw new NotImplementedException(yi.Type.Name);
 				}
 			}
-			if (!first)
+			if (!isFirst)
 				writer.Write('\n');
 			writer.Write('}');
 		}
@@ -53,8 +65,14 @@ namespace Yuzu
 	public class JsonDeserializer : AbstractReaderDeserializer
 	{
 		public static JsonDeserializer Instance = new JsonDeserializer();
+		public JsonSerializeOptions JsonOptions = new JsonSerializeOptions();
 
-		private char? buf;
+		public JsonDeserializer()
+		{
+			Options.Assembly = Assembly.GetCallingAssembly();
+		}
+
+		protected char? buf;
 
 		private char Next()
 		{
@@ -81,7 +99,7 @@ namespace Yuzu
 			return ch;
 		}
 
-		private char Require(params char[] chars)
+		protected char Require(params char[] chars)
 		{
 			var ch = SkipSpaces();
 			if (Array.IndexOf(chars, ch) < 0)
@@ -104,7 +122,7 @@ namespace Yuzu
 			throw new YuzuException();
 		}
 
-		private string RequireString()
+		protected string RequireString()
 		{
 			var result = "";
 			Require('"');
@@ -131,7 +149,7 @@ namespace Yuzu
 			return int.Parse(result);
 		}
 
-		private string GetNextName(bool first)
+		protected string GetNextName(bool first)
 		{
 			var ch = SkipSpaces();
 			if (ch == ',') {
@@ -147,11 +165,18 @@ namespace Yuzu
 			return result;
 		}
 
-		public override void FromReader(object obj)
+		protected object Make(string typeName)
 		{
-			buf = null;
-			Require('{');
-			string name = GetNextName(true);
+			return Activator.CreateInstance(Options.Assembly.GetType(typeName));
+		}
+
+		protected JsonDeserializerGenBase MakeDeserializer(string typeName)
+		{
+			return (JsonDeserializerGenBase)(Make(RequireString() + "_JsonDeserializer"));
+		}
+
+		protected virtual void ReadFields(object obj, string name)
+		{
 			foreach (var yi in Utils.GetYuzuItems(obj.GetType(), Options)) {
 				if (yi.Name != name) {
 					if (!yi.IsOptional)
@@ -166,8 +191,13 @@ namespace Yuzu
 					yi.SetValue(obj, RequireString());
 				}
 				else if (yi.Type.IsClass) {
-					var value = Activator.CreateInstance(yi.Type);
-					FromReader(value);
+					object value;
+					if (Options.ClassNames)
+						value = FromReaderInt();
+					else {
+						value = Activator.CreateInstance(yi.Type);
+						FromReaderInt(value);
+					}
 					yi.SetValue(obj, value);
 				}
 				else {
@@ -177,13 +207,46 @@ namespace Yuzu
 			}
 			Require('}');
 		}
+
+		public override object FromReaderInt()
+		{
+			if (!Options.ClassNames)
+				throw new YuzuException();
+			buf = null;
+			Require('{');
+			if (GetNextName(true) != JsonOptions.ClassTag)
+				throw new YuzuException();
+			var obj = Make(RequireString());
+			ReadFields(obj, GetNextName(false));
+			return obj;
+		}
+
+		public override object FromReaderInt(object obj)
+		{
+			buf = null;
+			Require('{');
+			string name = GetNextName(true);
+			if (Options.ClassNames) {
+				if (name != JsonOptions.ClassTag)
+					throw new YuzuException();
+				var className = RequireString();
+				if (className != obj.GetType().FullName)
+					throw new YuzuException();
+				name = GetNextName(false);
+			}
+			ReadFields(obj, name);
+			return obj;
+		}
 	}
 
-	public class JsonDeserializerGenerator
+	public abstract class JsonDeserializerGenBase : JsonDeserializer
 	{
-		public static JsonDeserializerGenerator Instance = new JsonDeserializerGenerator();
-		public CommonOptions Options = new CommonOptions();
-		public JsonSerializeOptions JsonOptions = new JsonSerializeOptions();
+		public abstract object FromReaderIntPartial(string name);
+	}
+
+	public class JsonDeserializerGenerator: JsonDeserializer
+	{
+		public static new JsonDeserializerGenerator Instance = new JsonDeserializerGenerator();
 
 		private int indent = 0;
 
@@ -210,7 +273,7 @@ namespace Yuzu
 
 		public void Generate<T>()
 		{
-			PutF("class {0}_JsonDeserializer : JsonDeserializer\n", typeof(T).Name);
+			PutF("class {0}_JsonDeserializer : JsonDeserializerGenBase\n", typeof(T).Name);
 			Put("{\n");
 
 			PutF("public {0}_JsonDeserializer()\n", typeof(T).Name);
@@ -228,13 +291,40 @@ namespace Yuzu
 			Put("}\n");
 			Put("\n");
 
-			Put("public override void FromReader(object obj)\n");
+			Put("public override object FromReaderInt()\n");
+			Put("{\n");
+			// Since deserializer is dynamically constructed anyway, it is too late to determine object type here.
+			PutF("return FromReader(new {0}());\n", typeof(T).Name);
+			Put("}\n");
+			Put("\n");
+
+			Put("public override object FromReaderInt(object obj)\n");
 			Put("{\n");
 			Put("buf = null;\n");
 			Put("Require('{');\n");
 			Put("var name = GetNextName(true);\n");
+			if (Options.ClassNames) {
+				Put("if (name != JsonOptions.ClassTag) throw new YuzuException();\n");
+				PutF("if (RequireString() != \"{0}\") throw new YuzuException();\n", typeof(T).FullName);
+				Put("name = GetNextName(false);\n");
+			}
+			Put("ReadFields(obj, name);\n");
+			Put("return obj;\n");
+			Put("}\n");
+			Put("\n");
+
+			Put("public overide object FromReaderIntPartial(string name)\n");
+			Put("{\n");
+			PutF("var obj = new {0}();\n", typeof(T).Name);
+			Put("ReadFields(obj, name);\n");
+			Put("return obj;\n");
+			Put("}\n");
+			Put("\n");
+
+			Put("private void ReadFields(object obj, string name)\n");
+			Put("{\n");
 			PutF("var result = ({0})obj;\n", typeof(T).Name);
-			foreach (var yi in Utils.GetYuzuItems(typeof(T), new CommonOptions())) {
+			foreach (var yi in Utils.GetYuzuItems(typeof(T), Options)) {
 				if (yi.IsOptional) {
 					PutF("if (\"{0}\" == name) {{\n", yi.Name);
 					PutF("result.{0} = ", yi.Name);
@@ -250,20 +340,55 @@ namespace Yuzu
 					PutPart("RequireString();\n");
 				}
 				else if (yi.Type.IsClass) {
-					PutPart(String.Format("new {0}();\n", yi.Type.Name));
-					PutF("(new {0}_JsonDeserializer()).FromReader(result.{1}, Reader);\n", yi.Type.Name, yi.Name);
+					if (Options.ClassNames) {
+						PutPart("MakeDeserializer(RequireString()).FromReader(Reader);\n");
+					}
+					else {
+						PutPart(String.Format("new {0}();\n", yi.Type.Name));
+						PutPart(String.Format(
+							"(new {0}_JsonDeserializer()).FromReader(result.{1}, Reader);\n",
+							yi.Type.Name, yi.Name));
+					}
 				}
 				else {
 					throw new NotImplementedException(yi.Type.Name);
 				}
+				Put("name = GetNextName(false);\n");
 				if (yi.IsOptional)
 					Put("}\n");
-				Put("name = GetNextName(false);\n");
-				Put("Require('}');\n");
 			}
+			Put("Require('}');\n");
 			Put("}\n");
 			Put("}\n");
 			Put("\n");
+		}
+
+		public override object FromReaderInt()
+		{
+			if (!Options.ClassNames)
+				throw new YuzuException();
+			buf = null;
+			Require('{');
+			if (GetNextName(true) != JsonOptions.ClassTag)
+				throw new YuzuException();
+			return MakeDeserializer(RequireString()).FromReaderIntPartial(GetNextName(false));
+		}
+
+		public override object FromReaderInt(object obj)
+		{
+			buf = null;
+			Require('{');
+			string name = GetNextName(true);
+			if (Options.ClassNames) {
+				if (name != JsonOptions.ClassTag)
+					throw new YuzuException();
+				var className = RequireString();
+				if (className != obj.GetType().FullName)
+					throw new YuzuException();
+				name = GetNextName(false);
+			}
+			ReadFields(obj, name);
+			return obj;
 		}
 	}
 }

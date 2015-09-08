@@ -7,6 +7,24 @@ using Yuzu;
 
 namespace YuzuTest
 {
+	public class SampleBase
+	{
+		[YuzuRequired(1)]
+		public int FBase;
+	}
+
+	public class SampleDerivedA : SampleBase
+	{
+		[YuzuRequired(2)]
+		public int FA;
+	}
+
+	public class SampleDerivedB : SampleBase
+	{
+		[YuzuRequired(2)]
+		public int FB;
+	}
+
 	[TestClass]
 	public class TestMain
 	{
@@ -142,6 +160,28 @@ namespace YuzuTest
 		}
 
 		[TestMethod]
+		public void TestJsonClassNames()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.Options.ClassNames = true;
+			Assert.AreEqual(
+				"{\n\"class\":\"YuzuTest.SampleBase\",\n\"FBase\":0\n}", js.ToString(new SampleBase()));
+			Assert.AreEqual(
+				"{\n\"class\":\"YuzuTest.SampleDerivedA\",\n\"FBase\":0,\n\"FA\":0\n}",
+				js.ToString(new SampleDerivedA()));
+
+			var jd = new JsonDeserializer();
+			jd.Options.ClassNames = true;
+			var v = jd.FromString(
+				"{\n\"class\":\"YuzuTest.SampleDerivedB\",\n\"FBase\":3,\n\"FB\":7\n}");
+			Assert.IsInstanceOfType(v, typeof(SampleDerivedB));
+			var b = (SampleDerivedB)v;
+			Assert.AreEqual(3, b.FBase);
+			Assert.AreEqual(7, b.FB);
+		}
+
+		[TestMethod]
 		public void TestProtobufSimple()
 		{
 			var v1 = new Sample1 { X = 150, Y = "test" };
@@ -185,6 +225,8 @@ namespace YuzuTest
 		public static void Main()
 		{
 			//(new TestMain()).TestJsonMemberOrder();
+			JsonDeserializerGenerator.Instance.JsonOptions.Indent = "  ";
+			JsonDeserializerGenerator.Instance.Options.ClassNames = true;
 			JsonDeserializerGenerator.Instance.Generate<Sample1>();
 			JsonDeserializerGenerator.Instance.Generate<Sample3>();
 		}
