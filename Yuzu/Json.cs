@@ -39,10 +39,10 @@ namespace Yuzu
 					if (!isFirst)
 						writer.Write(',');
 					isFirst = false;
-					writer.Write('\n');
+					WriteStr(JsonOptions.FieldSeparator);
 					wf(elem);
 				}
-				writer.Write('\n');
+				WriteStr(JsonOptions.FieldSeparator);
 			}
 			writer.Write(']');
 		}
@@ -77,7 +77,7 @@ namespace Yuzu
 		protected override void ToWriter(object obj)
 		{
 			writer.Write('{');
-			writer.Write('\n');
+			WriteStr(JsonOptions.FieldSeparator);
 			var isFirst = true;
 			if (Options.ClassNames) {
 				WriteName(JsonOptions.ClassTag, ref isFirst);
@@ -88,7 +88,7 @@ namespace Yuzu
 				GetWriteFunc(yi.Type)(yi.GetValue(obj));
 			}
 			if (!isFirst)
-				writer.Write('\n');
+				WriteStr(JsonOptions.FieldSeparator);
 			writer.Write('}');
 		}
 	}
