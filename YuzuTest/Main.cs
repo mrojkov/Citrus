@@ -270,6 +270,7 @@ namespace YuzuTest
 			var list1 = new SampleList { E = new List<string>() };
 			for (int i = 0; i < 100000; ++i)
 				list1.E.Add(i.ToString());
+
 			var js = new JsonSerializer();
 			var result1 = js.ToString(list1);
 			Assert.IsTrue(result1 != "");
@@ -280,6 +281,10 @@ namespace YuzuTest
 			var jd = new JsonDeserializer();
 			jd.FromString(list2, result1);
 			Assert.AreEqual(list1.E.Count, list2.E.Count);
+
+			var jdg = new SampleList_JsonDeserializer();
+			var list3 = (SampleList)jdg.FromString(result1);
+			Assert.AreEqual(list1.E.Count, list3.E.Count);
 		}
 
 		[TestMethod]
@@ -333,6 +338,7 @@ namespace YuzuTest
 				jd.Generate<Sample1>();
 				jd.Generate<Sample2>();
 				jd.Generate<Sample3>();
+				jd.Generate<SampleList>();
 				jd.GenerateFooter();
 			}
 		}

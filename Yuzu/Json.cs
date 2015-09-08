@@ -129,7 +129,7 @@ namespace Yuzu
 			return ch;
 		}
 
-		private char SkipSpacesCarefully()
+		protected char SkipSpacesCarefully()
 		{
 			if (buf.HasValue)
 				throw new YuzuException();
@@ -322,7 +322,7 @@ namespace Yuzu
 
 		public void Put(string s)
 		{
-			if (s == "}\n")
+			if (s.StartsWith("}")) // "}\n" or "} while"
 				indent -= 1;
 			if (s != "\n")
 				for (int i = 0; i < indent; ++i)
@@ -339,6 +339,8 @@ namespace Yuzu
 
 		public void GenerateHeader(string namespaceName)
 		{
+			Put("using System.Collections.Generic;\n");
+			Put("\n");
 			Put("using Yuzu;\n");
 			Put("\n");
 			PutF("namespace {0}\n", namespaceName);
@@ -349,6 +351,48 @@ namespace Yuzu
 		public void GenerateFooter()
 		{
 			Put("}\n");
+		}
+
+		private int tempCount = 0;
+
+		private void GenerateValue(Type t, string name)
+		{
+			if (t == typeof(int)) {
+				PutPart("RequireInt();\n");
+			}
+			else if (t == typeof(string)) {
+				PutPart("RequireString();\n");
+			}
+			else if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>)) {
+				var itemType = t.GetGenericArguments()[0];
+				PutPart(String.Format("new List<{0}>();\n", itemType));
+				Put("Require('[');\n");
+				Put("if (SkipSpacesCarefully() == ']') {\n");
+				Put("Require(']');\n");
+				Put("}\n");
+				Put("else {\n");
+				Put("do {\n");
+				tempCount += 1;
+				var tempName = "tmp" + tempCount.ToString();
+				PutF("var {0} = ", tempName);
+				GenerateValue(itemType, tempName);
+				PutF("{0}.Add({1});\n", name, tempName);
+				Put("} while (Require(']', ',') == ',');\n");
+				Put("}\n");
+			}
+			else if (t.IsClass) {
+				if (Options.ClassNames) {
+					PutPart(String.Format(
+						"({0})MakeDeserializer(RequireString()).FromReader(Reader);\n", t.Name));
+				}
+				else {
+					PutPart(String.Format("new {0}();\n", t.Name));
+					PutF("{0}_JsonDeserializer.Instance.FromReader({1}, Reader);\n", t.Name, name);
+				}
+			}
+			else {
+				throw new NotImplementedException(t.Name);
+			}
 		}
 
 		public void Generate<T>()
@@ -407,6 +451,7 @@ namespace Yuzu
 			Put("private new void ReadFields(object obj, string name)\n");
 			Put("{\n");
 			PutF("var result = ({0})obj;\n", typeof(T).Name);
+			tempCount = 0;
 			foreach (var yi in Utils.GetYuzuItems(typeof(T), Options)) {
 				if (yi.IsOptional) {
 					PutF("if (\"{0}\" == name) {{\n", yi.Name);
@@ -416,27 +461,7 @@ namespace Yuzu
 					PutF("if (\"{0}\" != name) throw new YuzuException();\n", yi.Name);
 					PutF("result.{0} = ", yi.Name);
 				}
-				if (yi.Type == typeof(int)) {
-					PutPart("RequireInt();\n");
-				}
-				else if (yi.Type == typeof(string)) {
-					PutPart("RequireString();\n");
-				}
-				else if (yi.Type.IsClass) {
-					if (Options.ClassNames) {
-						PutPart(String.Format(
-							"({0})MakeDeserializer(RequireString()).FromReader(Reader);\n", yi.Type.Name));
-					}
-					else {
-						PutPart(String.Format("new {0}();\n", yi.Type.Name));
-						PutF(
-							"{0}_JsonDeserializer.Instance.FromReader(result.{1}, Reader);\n",
-							yi.Type.Name, yi.Name);
-					}
-				}
-				else {
-					throw new NotImplementedException(yi.Type.Name);
-				}
+				GenerateValue(yi.Type, "result." + yi.Name);
 				Put("name = GetNextName(false);\n");
 				if (yi.IsOptional)
 					Put("}\n");

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using Yuzu;
 
 namespace YuzuTest
@@ -146,6 +148,59 @@ namespace YuzuTest
 				Sample2_JsonDeserializer.Instance.FromReader(result.S2, Reader);
 				name = GetNextName(false);
 			}
+			Require('}');
+		}
+	}
+
+	class SampleList_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new SampleList_JsonDeserializer Instance = new SampleList_JsonDeserializer();
+
+		public SampleList_JsonDeserializer()
+		{
+			Options.ClassNames = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderInt(new SampleList());
+		}
+
+		public override object FromReaderInt(object obj)
+		{
+			buf = null;
+			Require('{');
+			var name = GetNextName(true);
+			ReadFields(obj, name);
+			return obj;
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			var obj = new SampleList();
+			ReadFields(obj, name);
+			return obj;
+		}
+
+		private new void ReadFields(object obj, string name)
+		{
+			var result = (SampleList)obj;
+			if ("E" != name) throw new YuzuException();
+			result.E = new List<System.String>();
+			Require('[');
+			if (SkipSpacesCarefully() == ']') {
+				Require(']');
+			}
+			else {
+				do {
+					var tmp1 = RequireString();
+					result.E.Add(tmp1);
+				} while (Require(']', ',') == ',');
+			}
+			name = GetNextName(false);
 			Require('}');
 		}
 	}
