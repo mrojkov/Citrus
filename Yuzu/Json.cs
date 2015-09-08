@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.IO;
+using System.Text;
 
 namespace Yuzu
 {
@@ -53,8 +54,7 @@ namespace Yuzu
 			if (t == typeof(string))
 				return WriteString;
 			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>)) {
-				var m = GetType().GetMethod("WriteList", BindingFlags.Instance | BindingFlags.NonPublic).
-					MakeGenericMethod(t.GetGenericArguments()[0]);
+				var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteList", t);
 				return obj => m.Invoke(this, new object[] { obj });
 			}
 			if (t.IsClass)
@@ -123,10 +123,9 @@ namespace Yuzu
 
 		private char SkipSpaces()
 		{
-			char ch;
-			do {
-				ch = Next();
-			} while (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r');
+			char ch = Next();
+			while (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r')
+				ch = Reader.ReadChar();
 			return ch;
 		}
 
@@ -168,19 +167,23 @@ namespace Yuzu
 			throw new YuzuException();
 		}
 
+		// Optimization: avoid re-creating StringBuilder.
+		private StringBuilder requireStringResult = new StringBuilder();
+
 		protected string RequireString()
 		{
-			var result = "";
+			requireStringResult.Clear();
 			Require('"');
 			while (true) {
-				var ch = Next();
+				// Optimization: buf is guaranteed to be empty after Require, so no need to call Next.
+				var ch = Reader.ReadChar();
 				if (ch == '"')
 					break;
 				if (ch == '\\')
 					ch = JsonUnquote(Reader.ReadChar());
-				result += ch;
+				requireStringResult.Append(ch);
 			}
-			return result;
+			return requireStringResult.ToString();
 		}
 
 		protected int RequireInt()
@@ -221,6 +224,13 @@ namespace Yuzu
 			return (JsonDeserializerGenBase)(Make(RequireString() + "_JsonDeserializer"));
 		}
 
+		private void ReadList<T>(List<T> list)
+		{
+			do {
+				list.Add((T)ReadValue(typeof(T)));
+			} while (Require(']', ',') == ',');
+		}
+
 		private object ReadValue(Type t)
 		{
 			if (t == typeof(int))
@@ -228,17 +238,14 @@ namespace Yuzu
 			if (t == typeof(string))
 				return RequireString();
 			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>)) {
-				var itemType = t.GetGenericArguments()[0];
 				var list = Activator.CreateInstance(t);
-				var add = t.GetMethod("Add");
 				Require('[');
 				// ReadValue might invoke a new serializer, so we must not rely on PutBack.
 				if (SkipSpacesCarefully() == ']')
 					Require(']');
 				else
-					do {
-						add.Invoke(list, new object[] { ReadValue(itemType) });
-					} while (Require(']', ',') == ',');
+					Utils.GetPrivateCovariantGeneric(GetType(), "ReadList", t).
+						Invoke(this, new object[] { list });
 				return list;
 			}
 			if (t.IsClass) {

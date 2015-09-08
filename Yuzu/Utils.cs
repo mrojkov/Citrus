@@ -40,6 +40,12 @@ namespace Yuzu
 			//throw new NotImplementedException();
 		}
 
+		public static MethodInfo GetPrivateCovariantGeneric(Type callerType, string name, Type containerType)
+		{
+			return callerType.GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic).
+					MakeGenericMethod(containerType.GetGenericArguments()[0]);
+		}
+
 		public static List<YuzuItem> GetYuzuItems(Type t, CommonOptions options)
 		{
 			List<YuzuItem> items;
