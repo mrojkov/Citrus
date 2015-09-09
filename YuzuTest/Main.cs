@@ -93,6 +93,12 @@ namespace YuzuTest
 		public List<string> E;
 	}
 
+	public class SampleArray
+	{
+		[YuzuRequired(1)]
+		public string[] A;
+	}
+
 	public class SampleTree
 	{
 		[YuzuRequired(1)]
@@ -330,13 +336,13 @@ namespace YuzuTest
 			var v0 = new SampleList { E = new List<string> { "a", "b", "c" } };
 			var result0 = js.ToString(v0);
 			Assert.AreEqual("{\n\"E\":[\n\"a\",\n\"b\",\n\"c\"\n]\n}", result0);
-			SampleList w0 = new SampleList();
+			var w0 = new SampleList();
 			jd.FromString(w0, result0);
 			CollectionAssert.AreEqual(v0.E, w0.E);
 
 			var v1 = new SampleTree { Value = 11, Children = new List<SampleTree>() };
 			Assert.AreEqual("{\n\"Value\":11,\n\"Children\":[]\n}", js.ToString(v1));
-			SampleTree w1 = new SampleTree();
+			var w1 = new SampleTree();
 			jd.FromString(w1, js.ToString(v1));
 			Assert.AreEqual(0, w1.Children.Count);
 
@@ -364,6 +370,24 @@ namespace YuzuTest
 			jd.FromString(w2, result2);
 			Assert.AreEqual(v2.Value, w2.Value);
 			Assert.AreEqual(v2.Children.Count, w2.Children.Count);
+		}
+
+		[TestMethod]
+		public void TestJsonArray()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			var jd = new JsonDeserializer();
+
+			var v0 = new SampleArray { A = new string[] { "a", "b", "c" } };
+			var result0 = js.ToString(v0);
+			Assert.AreEqual("{\n\"A\":[\n\"a\",\n\"b\",\n\"c\"\n]\n}", result0);
+			var w0 = new SampleArray();
+			jd.FromString(w0, result0);
+			CollectionAssert.AreEqual(v0.A, w0.A);
+
+			var w1 = (SampleArray)SampleArray_JsonDeserializer.Instance.FromString(result0);
+			CollectionAssert.AreEqual(v0.A, w1.A);
 		}
 
 		[TestMethod]
@@ -529,6 +553,7 @@ namespace YuzuTest
 				jd.JsonOptions.EnumAsString = true;
 				jd.Generate<Sample4>();
 				jd.Generate<SampleList>();
+				jd.Generate<SampleArray>();
 				jd.Generate<SampleBase>();
 				jd.Generate<SampleDerivedA>();
 				jd.Generate<SampleDerivedB>();

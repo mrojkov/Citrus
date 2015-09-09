@@ -209,6 +209,53 @@ namespace YuzuTest
 		}
 	}
 
+	class SampleArray_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new SampleArray_JsonDeserializer Instance = new SampleArray_JsonDeserializer();
+
+		public SampleArray_JsonDeserializer()
+		{
+			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+			Options.ClassNames = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.EnumAsString = true;
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderInt(new SampleArray());
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new SampleArray(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (SampleArray)obj;
+			if ("A" != name) throw new YuzuException();
+			result.A = new String[0];
+			Require('[');
+			if (SkipSpacesCarefully() == ']') {
+				Require(']');
+			}
+			else {
+				var tmp1 = new List<String>();
+				do {
+					var tmp2 = RequireString();
+					tmp1.Add(tmp2);
+				} while (Require(']', ',') == ',');
+				result.A = tmp1.ToArray();
+			}
+			name = GetNextName(false);
+			Require('}');
+			return result;
+		}
+	}
+
 	class SampleBase_JsonDeserializer : JsonDeserializerGenBase
 	{
 		public static new SampleBase_JsonDeserializer Instance = new SampleBase_JsonDeserializer();

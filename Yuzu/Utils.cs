@@ -46,10 +46,10 @@ namespace Yuzu
 			return t.IsValueType && !t.IsPrimitive && !t.IsEnum && !t.IsPointer;
 		}
 
-		public static MethodInfo GetPrivateCovariantGeneric(Type callerType, string name, Type containerType)
+		public static MethodInfo GetPrivateCovariantGeneric(Type callerType, string name, Type container)
 		{
-			return callerType.GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic).
-					MakeGenericMethod(containerType.GetGenericArguments()[0]);
+			var t = container.HasElementType ? container.GetElementType() : container.GetGenericArguments()[0];
+			return callerType.GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic).MakeGenericMethod(t);
 		}
 
 		public static List<YuzuItem> GetYuzuItems(Type t, CommonOptions options)

@@ -65,6 +65,24 @@ namespace Yuzu
 			writer.Write(']');
 		}
 
+		private void WriteArray<T>(T[] array)
+		{
+			var wf = GetWriteFunc(typeof(T));
+			writer.Write('[');
+			if (array.Length > 0) {
+				var isFirst = true;
+				foreach (var elem in array) {
+					if (!isFirst)
+						writer.Write(',');
+					isFirst = false;
+					WriteStr(JsonOptions.FieldSeparator);
+					wf(elem);
+				}
+				WriteStr(JsonOptions.FieldSeparator);
+			}
+			writer.Write(']');
+		}
+
 		private Action<object> GetWriteFunc(Type t)
 		{
 			if (t == typeof(int) || t == typeof(uint))
@@ -83,6 +101,10 @@ namespace Yuzu
 			}
 			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>)) {
 				var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteList", t);
+				return obj => m.Invoke(this, new object[] { obj });
+			}
+			if (t.IsArray) {
+				var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteArray", t);
 				return obj => m.Invoke(this, new object[] { obj });
 			}
 			if (Utils.IsStruct(t))
@@ -323,6 +345,15 @@ namespace Yuzu
 			} while (Require(']', ',') == ',');
 		}
 
+		private T[] ReadArray<T>()
+		{
+			var list = new List<T>();
+			do {
+				list.Add((T)ReadValue(typeof(T)));
+			} while (Require(']', ',') == ',');
+			return list.ToArray();
+		}
+
 		private object ReadValue(Type t)
 		{
 			if (t == typeof(int))
@@ -351,6 +382,18 @@ namespace Yuzu
 					Utils.GetPrivateCovariantGeneric(GetType(), "ReadList", t).
 						Invoke(this, new object[] { list });
 				return list;
+			}
+			if (t.IsArray) {
+				Require('[');
+				// ReadValue might invoke a new serializer, so we must not rely on PutBack.
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+					return Activator.CreateInstance(t);
+				}
+				else
+					return
+						Utils.GetPrivateCovariantGeneric(GetType(), "ReadArray", t).
+						Invoke(this, new object[] { });
 			}
 			if (t.IsClass && Options.ClassNames)
 				return FromReaderInt();
@@ -550,6 +593,26 @@ namespace Yuzu
 				GenerateValue(t.GetGenericArguments()[0], tempName);
 				PutF("{0}.Add({1});\n", name, tempName);
 				Put("} while (Require(']', ',') == ',');\n");
+				Put("}\n");
+			}
+			else if (t.IsArray) {
+				PutPart(String.Format("new {0}[0];\n", GetTypeSpec(t.GetElementType())));
+				Put("Require('[');\n");
+				Put("if (SkipSpacesCarefully() == ']') {\n");
+				Put("Require(']');\n");
+				Put("}\n");
+				Put("else {\n");
+				tempCount += 1;
+				var tempListName = "tmp" + tempCount.ToString();
+				PutF("var {0} = new List<{1}>();\n", tempListName, GetTypeSpec(t.GetElementType()));
+				Put("do {\n");
+				tempCount += 1;
+				var tempName = "tmp" + tempCount.ToString();
+				PutF("var {0} = ", tempName);
+				GenerateValue(t.GetElementType(), tempName);
+				PutF("{0}.Add({1});\n", tempListName, tempName);
+				Put("} while (Require(']', ',') == ',');\n");
+				PutF("{0} = {1}.ToArray();\n", name, tempListName);
 				Put("}\n");
 			}
 			else if (t.IsClass && Options.ClassNames) {
