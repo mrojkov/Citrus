@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Yuzu
@@ -22,6 +23,16 @@ namespace Yuzu
 		private void WriteInt(object obj)
 		{
 			WriteStr(obj.ToString());
+		}
+
+		private void WriteDouble(object obj)
+		{
+			WriteStr(((double)obj).ToString(CultureInfo.InvariantCulture));
+		}
+
+		private void WriteSingle(object obj)
+		{
+			WriteStr(((float)obj).ToString(CultureInfo.InvariantCulture));
 		}
 
 		private void WriteEnumAsInt(object obj)
@@ -58,6 +69,10 @@ namespace Yuzu
 		{
 			if (t == typeof(int) || t == typeof(uint))
 				return WriteInt;
+			if (t == typeof(double))
+				return WriteDouble;
+			if (t == typeof(float))
+				return WriteSingle;
 			if (t == typeof(string))
 				return WriteString;
 			if (t.IsEnum) {
@@ -229,6 +244,53 @@ namespace Yuzu
 			return int.Parse(sb.ToString());
 		}
 
+		private string ParseFloat()
+		{
+			// Optimization: Do not extract helper methods.
+			sb.Clear();
+			var ch = SkipSpaces();
+			if (ch == '-') {
+				sb.Append(ch);
+				ch = Reader.ReadChar();
+			}
+			while ('0' <= ch && ch <= '9') {
+				sb.Append(ch);
+				ch = Reader.ReadChar();
+			}
+			if (ch == '.') {
+				sb.Append(ch);
+				ch = Reader.ReadChar();
+				while ('0' <= ch && ch <= '9') {
+					sb.Append(ch);
+					ch = Reader.ReadChar();
+				}
+			}
+			if (ch == 'e'|| ch == 'E') {
+				sb.Append(ch);
+				ch = Reader.ReadChar();
+				if (ch == '+' || ch == '-') {
+					sb.Append(ch);
+					ch = Reader.ReadChar();
+				}
+				while ('0' <= ch && ch <= '9') {
+					sb.Append(ch);
+					ch = Reader.ReadChar();
+				}
+			}
+			PutBack(ch);
+			return sb.ToString();
+		}
+
+		protected double RequireDouble()
+		{
+			return Double.Parse(ParseFloat(), CultureInfo.InvariantCulture);
+		}
+
+		protected float RequireSingle()
+		{
+			return Single.Parse(ParseFloat(), CultureInfo.InvariantCulture);
+		}
+
 		protected string GetNextName(bool first)
 		{
 			var ch = SkipSpaces();
@@ -268,6 +330,10 @@ namespace Yuzu
 				return RequireUInt();
 			if (t == typeof(string))
 				return RequireString();
+			if (t == typeof(float))
+				return RequireSingle();
+			if (t == typeof(double))
+				return RequireDouble();
 			if (t.IsEnum) {
 				if (JsonOptions.EnumAsString)
 					return Enum.Parse(t, RequireString());
@@ -455,6 +521,12 @@ namespace Yuzu
 			}
 			else if (t == typeof(string)) {
 				PutPart("RequireString();\n");
+			}
+			else if (t == typeof(float)) {
+				PutPart("RequireSingle();\n");
+			}
+			else if (t == typeof(double)) {
+				PutPart("RequireDouble();\n");
 			}
 			else if (t.IsEnum) {
 				PutPart(String.Format(

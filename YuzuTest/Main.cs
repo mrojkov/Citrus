@@ -65,6 +65,14 @@ namespace YuzuTest
 		public SampleEnum E;
 	}
 
+	public class SampleFloat
+	{
+		[YuzuRequired(1)]
+		public float F;
+		[YuzuRequired(2)]
+		public double D;
+	}
+
 	public class SampleMethodOrder
 	{
 		[YuzuRequired(4)]
@@ -261,6 +269,24 @@ namespace YuzuTest
 
 			w = (Sample4)Sample4_JsonDeserializer.Instance.FromString(result2);
 			Assert.AreEqual(SampleEnum.E3, w.E);
+		}
+
+		[TestMethod]
+		public void TestJsonFloat()
+		{
+			var js = new JsonSerializer();
+
+			var v = new SampleFloat { F = 1e-20f, D = -3.1415e100d };
+			js.JsonOptions.Indent = "";
+
+			var result1 = js.ToString(v);
+			Assert.AreEqual("{\n\"F\":1E-20,\n\"D\":-3.1415E+100\n}", result1);
+
+			var w = new SampleFloat();
+			var jd = new JsonDeserializer();
+			jd.FromString(w, result1);
+			Assert.AreEqual(v.F, w.F);
+			Assert.AreEqual(v.D, w.D);
 		}
 
 		[TestMethod]
