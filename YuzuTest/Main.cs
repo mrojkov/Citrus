@@ -162,7 +162,7 @@ namespace YuzuTest
 			var v = new Sample3 {
 				S1 = new Sample1 { X = 345, Y = "test" },
 				F = 222,
-				S2 = new Sample2 { X = 346, Y = "test1" },
+				S2 = new Sample2 { X = -346, Y = "test1" },
 			};
 			js.JsonOptions.Indent = "";
 
@@ -172,7 +172,7 @@ namespace YuzuTest
 				"{\n\"X\":345,\n\"Y\":\"test\"\n},\n" +
 				"\"F\":222,\n" +
 				"\"S2\":" +
-				"{\n\"X\":346,\n\"Y\":\"test1\"\n}\n" +
+				"{\n\"X\":-346,\n\"Y\":\"test1\"\n}\n" +
 				"}",
 				result);
 
@@ -194,7 +194,7 @@ namespace YuzuTest
 				"{\n\"X\":345,\n\"Y\":\"test\"\n},\n" +
 				"\"F\":222,\n" +
 				"\"S2\":" +
-				"{\n\"X\":346,\n\"Y\":\"test1\"\n}\n" +
+				"{\n\"X\":-346,\n\"Y\":\"test1\"\n}\n" +
 				"}";
 
 			var jd = new Sample3_JsonDeserializer();
@@ -202,7 +202,7 @@ namespace YuzuTest
 			Assert.AreEqual(345, w.S1.X);
 			Assert.AreEqual("test", w.S1.Y);
 			Assert.AreEqual(222, w.F);
-			Assert.AreEqual(346, w.S2.X);
+			Assert.AreEqual(-346, w.S2.X);
 			Assert.AreEqual("test1", w.S2.Y);
 		}
 

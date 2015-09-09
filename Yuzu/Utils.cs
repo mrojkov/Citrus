@@ -30,11 +30,12 @@ namespace Yuzu
 
 		public static string CodeValueFormat(object value)
 		{
-			if (value.GetType() == typeof(int))
+			var t = value.GetType();
+			if (t == typeof(int) || t == typeof(uint))
 				return value.ToString();
-			if (value.GetType() == typeof(bool))
+			if (t == typeof(bool))
 				return value.ToString().ToLower();
-			if (value.GetType() == typeof(string))
+			if (t == typeof(string))
 				return '"' + QuoteCSharpStringLiteral(value.ToString()) + '"';
 			return "";
 			//throw new NotImplementedException();

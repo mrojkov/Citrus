@@ -56,7 +56,7 @@ namespace Yuzu
 
 		private Action<object> GetWriteFunc(Type t)
 		{
-			if (t == typeof(int))
+			if (t == typeof(int) || t == typeof(uint))
 				return WriteInt;
 			if (t == typeof(string))
 				return WriteString;
@@ -181,11 +181,11 @@ namespace Yuzu
 		}
 
 		// Optimization: avoid re-creating StringBuilder.
-		private StringBuilder requireStringResult = new StringBuilder();
+		private StringBuilder sb = new StringBuilder();
 
 		protected string RequireString()
 		{
-			requireStringResult.Clear();
+			sb.Clear();
 			Require('"');
 			while (true) {
 				// Optimization: buf is guaranteed to be empty after Require, so no need to call Next.
@@ -194,21 +194,37 @@ namespace Yuzu
 					break;
 				if (ch == '\\')
 					ch = JsonUnquote(Reader.ReadChar());
-				requireStringResult.Append(ch);
+				sb.Append(ch);
 			}
-			return requireStringResult.ToString();
+			return sb.ToString();
+		}
+
+		protected int RequireUInt()
+		{
+			sb.Clear();
+			var ch = SkipSpaces();
+			while ('0' <= ch && ch <= '9') {
+				sb.Append(ch);
+				ch = Reader.ReadChar();
+			}
+			PutBack(ch);
+			return int.Parse(sb.ToString());
 		}
 
 		protected int RequireInt()
 		{
-			var result = "";
+			sb.Clear();
 			var ch = SkipSpaces();
+			if (ch == '-') {
+				sb.Append(ch);
+				ch = Reader.ReadChar();
+			}
 			while ('0' <= ch && ch <= '9') {
-				result += ch;
-				ch = Next();
+				sb.Append(ch);
+				ch = Reader.ReadChar();
 			}
 			PutBack(ch);
-			return int.Parse(result);
+			return int.Parse(sb.ToString());
 		}
 
 		protected string GetNextName(bool first)
@@ -248,6 +264,8 @@ namespace Yuzu
 		{
 			if (t == typeof(int))
 				return RequireInt();
+			if (t == typeof(uint))
+				return RequireUInt();
 			if (t == typeof(string))
 				return RequireString();
 			if (t.IsEnum) {
@@ -421,6 +439,9 @@ namespace Yuzu
 		{
 			if (t == typeof(int)) {
 				PutPart("RequireInt();\n");
+			}
+			else if (t == typeof(uint)) {
+				PutPart("RequireUInt();\n");
 			}
 			else if (t == typeof(string)) {
 				PutPart("RequireString();\n");

@@ -24,15 +24,10 @@ namespace Yuzu
 				builder.Append(CodeConstructOptions.Indent);
 				builder.Append(yi.Name);
 				builder.Append(" = ");
-				if (yi.Type == typeof(int)) {
-					builder.Append(yi.GetValue(obj).ToString());
-				}
-				else if (yi.Type == typeof(string)) {
-					builder.AppendFormat("\"{0}\"", yi.GetValue(obj).ToString());
-				}
-				else {
+				var v = Utils.CodeValueFormat(yi.GetValue(obj));
+				if (v == "")
 					throw new NotImplementedException(yi.Type.Name);
-				}
+				builder.Append(v);
 			}
 			builder.Append("\n};\n");
 		}
@@ -52,16 +47,9 @@ namespace Yuzu
 		{
 			builder.AppendFormat("void {0}({1} obj) {{\n", CodeAssignOptions.FuncName, obj.GetType().Name);
 			foreach (var yi in Utils.GetYuzuItems(obj.GetType(), Options)) {
-				string valueStr;
-				if (yi.Type == typeof(int)) {
-					valueStr = yi.GetValue(obj).ToString();
-				}
-				else if (yi.Type == typeof(string)) {
-					valueStr = '"' + yi.GetValue(obj).ToString() + '"';
-				}
-				else {
+				string valueStr = Utils.CodeValueFormat(yi.GetValue(obj));
+				if (valueStr == "")
 					throw new NotImplementedException(yi.Type.Name);
-				}
 				builder.AppendFormat("{0}obj.{1} = {2};\n", CodeAssignOptions.Indent, yi.Name, valueStr);
 			}
 			builder.Append("}\n");
