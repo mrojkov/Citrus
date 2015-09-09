@@ -14,6 +14,7 @@ namespace Yuzu
 		public string Indent = "\t";
 		public string ClassTag = "class";
 		public bool EnumAsString = false;
+		public bool ArrayLengthPrefix = false;
 	};
 
 	public class JsonSerializer : AbstractWriterSerializer
@@ -70,7 +71,9 @@ namespace Yuzu
 			var wf = GetWriteFunc(typeof(T));
 			writer.Write('[');
 			if (array.Length > 0) {
-				var isFirst = true;
+				if (JsonOptions.ArrayLengthPrefix)
+					WriteStr(array.Length.ToString());
+				var isFirst = !JsonOptions.ArrayLengthPrefix;
 				foreach (var elem in array) {
 					if (!isFirst)
 						writer.Write(',');
@@ -359,6 +362,24 @@ namespace Yuzu
 			return ReadList<T>().ToArray();
 		}
 
+		private T[] ReadArrayWithLengthPrefix<T>()
+		{
+			Require('[');
+			// ReadValue might invoke a new serializer, so we must not rely on PutBack.
+			if (SkipSpacesCarefully() == ']') {
+				Require(']');
+				return new T[0];
+			}
+			var array = new T[RequireUInt()];
+			var rf = ReadValueFunc(typeof(T));
+			for (int i = 0; i < array.Length; ++i) {
+				Require(',');
+				array[i] = (T)rf();
+			}
+			Require(']');
+			return array;
+		}
+
 		// Optimization: Avoid creating trivial closures.
 		private object RequireIntObj() { return RequireInt(); }
 		private object RequireStringObj() { return RequireString(); }
@@ -389,7 +410,8 @@ namespace Yuzu
 				return () => m.Invoke(this, new object[] {});
 			}
 			if (t.IsArray) {
-				var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadArray", t);
+				var n = JsonOptions.ArrayLengthPrefix ? "ReadArrayWithLengthPrefix" : "ReadArray";
+				var m = Utils.GetPrivateCovariantGeneric(GetType(), n, t);
 				return () => m.Invoke(this, new object[] { });
 			}
 			if (t.IsClass && Options.ClassNames)
@@ -589,7 +611,7 @@ namespace Yuzu
 				Put("} while (Require(']', ',') == ',');\n");
 				Put("}\n");
 			}
-			else if (t.IsArray) {
+			else if (t.IsArray  && !JsonOptions.ArrayLengthPrefix) {
 				PutPart(String.Format("new {0}[0];\n", GetTypeSpec(t.GetElementType())));
 				Put("Require('[');\n");
 				Put("if (SkipSpacesCarefully() == ']') {\n");
@@ -608,6 +630,24 @@ namespace Yuzu
 				Put("} while (Require(']', ',') == ',');\n");
 				PutF("{0} = {1}.ToArray();\n", name, tempListName);
 				Put("}\n");
+			}
+			else if (t.IsArray && JsonOptions.ArrayLengthPrefix) {
+				PutPart(String.Format("new {0}[0];\n", GetTypeSpec(t.GetElementType())));
+				Put("Require('[');\n");
+				Put("if (SkipSpacesCarefully() != ']') {\n");
+				tempCount += 1;
+				var tempArrayName = "tmp" + tempCount.ToString();
+				PutF("var {0} = new {1}[RequireUInt()];\n", tempArrayName, GetTypeSpec(t.GetElementType()));
+				tempCount += 1;
+				var tempIndexName = "tmp" + tempCount.ToString();
+				PutF("for(int {0} = 0; {0} < {1}.Length; ++{0}) {{\n", tempIndexName, tempArrayName);
+				Put("Require(',');\n");
+				PutF("{0}[{1}] = ", tempArrayName, tempIndexName);
+				GenerateValue(t.GetElementType(), String.Format("{0}[{1}]", tempArrayName, tempIndexName));
+				Put("}\n");
+				PutF("{0} = {1};\n", name, tempArrayName);
+				Put("}\n");
+				Put("Require(']');\n");
 			}
 			else if (t.IsClass && Options.ClassNames) {
 				PutPart(String.Format("({0})base.FromReaderInt();\n", t.Name));
