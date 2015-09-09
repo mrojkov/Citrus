@@ -105,6 +105,22 @@ namespace YuzuTest
 		public List<List<int>> M;
 	}
 
+	public struct SamplePoint
+	{
+		[YuzuRequired(1)]
+		public int X;
+		[YuzuRequired(2)]
+		public int Y;
+	}
+
+	public class SampleRect
+	{
+		[YuzuRequired(1)]
+		public SamplePoint A;
+		[YuzuRequired(2)]
+		public SamplePoint B;
+	}
+
 	[TestClass]
 	public class TestMain
 	{
@@ -204,6 +220,18 @@ namespace YuzuTest
 			Assert.AreEqual(222, w.F);
 			Assert.AreEqual(-346, w.S2.X);
 			Assert.AreEqual("test1", w.S2.Y);
+
+			var jdg = new JsonDeserializerGenerator();
+
+			var w1 = new Sample1();
+			jdg.FromString(w1, "{\"X\":88}");
+			Assert.IsInstanceOfType(w1, typeof(Sample1));
+			Assert.AreEqual(88, w1.X);
+
+			jdg.Options.ClassNames = true;
+			var w2 = jdg.FromString("{\"class\":\"YuzuTest.Sample1\",\"X\":99}");
+			Assert.IsInstanceOfType(w2, typeof(Sample1));
+			Assert.AreEqual(99, ((Sample1)w2).X);
 		}
 
 		[TestMethod]
@@ -372,6 +400,41 @@ namespace YuzuTest
 			Assert.AreEqual(src, js.ToString(v));
 		}
 
+		private void CheckSampleRect(SampleRect expected, SampleRect actual)
+		{
+			Assert.AreEqual(expected.A.X, actual.A.X);
+			Assert.AreEqual(expected.A.Y, actual.A.Y);
+			Assert.AreEqual(expected.B.X, actual.B.X);
+			Assert.AreEqual(expected.B.Y, actual.B.Y);
+		}
+
+		[TestMethod]
+		public void TestJsonStruct()
+		{
+			var v = new SampleRect {
+				A = new SamplePoint { X = 33, Y = 44 },
+				B = new SamplePoint { X = 55, Y = 66 },
+			};
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = " ";
+			var result = js.ToString(v);
+			Assert.AreEqual("{ \"A\":{ \"X\":33, \"Y\":44 }, \"B\":{ \"X\":55, \"Y\":66 } }", result);
+
+			var jd = new JsonDeserializer();
+			var w = new SampleRect();
+			jd.FromString(w, result);
+			CheckSampleRect(v, w);
+
+			w = (SampleRect)SampleRect_JsonDeserializer.Instance.FromString(result);
+			CheckSampleRect(v, w);
+
+			var p = (SamplePoint)(new JsonDeserializerGenerator()).
+				FromString(new SamplePoint(), "{ \"X\":34, \"Y\":45 }");
+			Assert.AreEqual(34, p.X);
+			Assert.AreEqual(45, p.Y);
+		}
+
 		[TestMethod]
 		public void TestJsonLongList()
 		{
@@ -452,6 +515,8 @@ namespace YuzuTest
 				jd.Generate<SampleDerivedA>();
 				jd.Generate<SampleDerivedB>();
 				jd.Generate<SampleMatrix>();
+				jd.Generate<SamplePoint>();
+				jd.Generate<SampleRect>();
 				jd.Options.ClassNames = true;
 				jd.Generate<SampleClassList>();
 				jd.GenerateFooter();

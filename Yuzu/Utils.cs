@@ -41,6 +41,11 @@ namespace Yuzu
 			//throw new NotImplementedException();
 		}
 
+		public static bool IsStruct(Type t)
+		{
+			return t.IsValueType && !t.IsPrimitive && !t.IsEnum && !t.IsPointer;
+		}
+
 		public static MethodInfo GetPrivateCovariantGeneric(Type callerType, string name, Type containerType)
 		{
 			return callerType.GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic).

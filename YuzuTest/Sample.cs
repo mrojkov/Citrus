@@ -13,7 +13,6 @@ namespace YuzuTest
 
 		public Sample1_JsonDeserializer()
 		{
-			className = "YuzuTest.Sample1";
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -29,12 +28,10 @@ namespace YuzuTest
 
 		public override object FromReaderIntPartial(string name)
 		{
-			var obj = new Sample1();
-			ReadFields(obj, name);
-			return obj;
+			return ReadFields(new Sample1(), name);
 		}
 
-		protected override void ReadFields(object obj, string name)
+		protected override object ReadFields(object obj, string name)
 		{
 			var result = (Sample1)obj;
 			if ("X" != name) throw new YuzuException();
@@ -45,6 +42,7 @@ namespace YuzuTest
 				name = GetNextName(false);
 			}
 			Require('}');
+			return result;
 		}
 	}
 
@@ -54,7 +52,6 @@ namespace YuzuTest
 
 		public Sample2_JsonDeserializer()
 		{
-			className = "YuzuTest.Sample2";
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -70,12 +67,10 @@ namespace YuzuTest
 
 		public override object FromReaderIntPartial(string name)
 		{
-			var obj = new Sample2();
-			ReadFields(obj, name);
-			return obj;
+			return ReadFields(new Sample2(), name);
 		}
 
-		protected override void ReadFields(object obj, string name)
+		protected override object ReadFields(object obj, string name)
 		{
 			var result = (Sample2)obj;
 			if ("X" != name) throw new YuzuException();
@@ -86,6 +81,7 @@ namespace YuzuTest
 				name = GetNextName(false);
 			}
 			Require('}');
+			return result;
 		}
 	}
 
@@ -95,7 +91,6 @@ namespace YuzuTest
 
 		public Sample3_JsonDeserializer()
 		{
-			className = "YuzuTest.Sample3";
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -111,28 +106,25 @@ namespace YuzuTest
 
 		public override object FromReaderIntPartial(string name)
 		{
-			var obj = new Sample3();
-			ReadFields(obj, name);
-			return obj;
+			return ReadFields(new Sample3(), name);
 		}
 
-		protected override void ReadFields(object obj, string name)
+		protected override object ReadFields(object obj, string name)
 		{
 			var result = (Sample3)obj;
 			if ("S1" != name) throw new YuzuException();
-			result.S1 = new Sample1();
-			Sample1_JsonDeserializer.Instance.FromReader(result.S1, Reader);
+			result.S1 = (Sample1)Sample1_JsonDeserializer.Instance.FromReader(new Sample1(), Reader);
 			name = GetNextName(false);
 			if ("F" == name) {
 				result.F = RequireInt();
 				name = GetNextName(false);
 			}
 			if ("S2" == name) {
-				result.S2 = new Sample2();
-				Sample2_JsonDeserializer.Instance.FromReader(result.S2, Reader);
+				result.S2 = (Sample2)Sample2_JsonDeserializer.Instance.FromReader(new Sample2(), Reader);
 				name = GetNextName(false);
 			}
 			Require('}');
+			return result;
 		}
 	}
 
@@ -142,7 +134,6 @@ namespace YuzuTest
 
 		public Sample4_JsonDeserializer()
 		{
-			className = "YuzuTest.Sample4";
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -158,12 +149,10 @@ namespace YuzuTest
 
 		public override object FromReaderIntPartial(string name)
 		{
-			var obj = new Sample4();
-			ReadFields(obj, name);
-			return obj;
+			return ReadFields(new Sample4(), name);
 		}
 
-		protected override void ReadFields(object obj, string name)
+		protected override object ReadFields(object obj, string name)
 		{
 			var result = (Sample4)obj;
 			if ("E" == name) {
@@ -171,6 +160,7 @@ namespace YuzuTest
 				name = GetNextName(false);
 			}
 			Require('}');
+			return result;
 		}
 	}
 
@@ -180,7 +170,6 @@ namespace YuzuTest
 
 		public SampleList_JsonDeserializer()
 		{
-			className = "YuzuTest.SampleList";
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -196,12 +185,10 @@ namespace YuzuTest
 
 		public override object FromReaderIntPartial(string name)
 		{
-			var obj = new SampleList();
-			ReadFields(obj, name);
-			return obj;
+			return ReadFields(new SampleList(), name);
 		}
 
-		protected override void ReadFields(object obj, string name)
+		protected override object ReadFields(object obj, string name)
 		{
 			var result = (SampleList)obj;
 			if ("E" != name) throw new YuzuException();
@@ -218,6 +205,7 @@ namespace YuzuTest
 			}
 			name = GetNextName(false);
 			Require('}');
+			return result;
 		}
 	}
 
@@ -227,7 +215,6 @@ namespace YuzuTest
 
 		public SampleBase_JsonDeserializer()
 		{
-			className = "YuzuTest.SampleBase";
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -243,18 +230,17 @@ namespace YuzuTest
 
 		public override object FromReaderIntPartial(string name)
 		{
-			var obj = new SampleBase();
-			ReadFields(obj, name);
-			return obj;
+			return ReadFields(new SampleBase(), name);
 		}
 
-		protected override void ReadFields(object obj, string name)
+		protected override object ReadFields(object obj, string name)
 		{
 			var result = (SampleBase)obj;
 			if ("FBase" != name) throw new YuzuException();
 			result.FBase = RequireInt();
 			name = GetNextName(false);
 			Require('}');
+			return result;
 		}
 	}
 
@@ -264,7 +250,6 @@ namespace YuzuTest
 
 		public SampleDerivedA_JsonDeserializer()
 		{
-			className = "YuzuTest.SampleDerivedA";
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -280,12 +265,10 @@ namespace YuzuTest
 
 		public override object FromReaderIntPartial(string name)
 		{
-			var obj = new SampleDerivedA();
-			ReadFields(obj, name);
-			return obj;
+			return ReadFields(new SampleDerivedA(), name);
 		}
 
-		protected override void ReadFields(object obj, string name)
+		protected override object ReadFields(object obj, string name)
 		{
 			var result = (SampleDerivedA)obj;
 			if ("FBase" != name) throw new YuzuException();
@@ -295,6 +278,7 @@ namespace YuzuTest
 			result.FA = RequireInt();
 			name = GetNextName(false);
 			Require('}');
+			return result;
 		}
 	}
 
@@ -304,7 +288,6 @@ namespace YuzuTest
 
 		public SampleDerivedB_JsonDeserializer()
 		{
-			className = "YuzuTest.SampleDerivedB";
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -320,12 +303,10 @@ namespace YuzuTest
 
 		public override object FromReaderIntPartial(string name)
 		{
-			var obj = new SampleDerivedB();
-			ReadFields(obj, name);
-			return obj;
+			return ReadFields(new SampleDerivedB(), name);
 		}
 
-		protected override void ReadFields(object obj, string name)
+		protected override object ReadFields(object obj, string name)
 		{
 			var result = (SampleDerivedB)obj;
 			if ("FBase" != name) throw new YuzuException();
@@ -335,6 +316,7 @@ namespace YuzuTest
 			result.FB = RequireInt();
 			name = GetNextName(false);
 			Require('}');
+			return result;
 		}
 	}
 
@@ -344,7 +326,6 @@ namespace YuzuTest
 
 		public SampleMatrix_JsonDeserializer()
 		{
-			className = "YuzuTest.SampleMatrix";
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -360,12 +341,10 @@ namespace YuzuTest
 
 		public override object FromReaderIntPartial(string name)
 		{
-			var obj = new SampleMatrix();
-			ReadFields(obj, name);
-			return obj;
+			return ReadFields(new SampleMatrix(), name);
 		}
 
-		protected override void ReadFields(object obj, string name)
+		protected override object ReadFields(object obj, string name)
 		{
 			var result = (SampleMatrix)obj;
 			if ("M" != name) throw new YuzuException();
@@ -392,6 +371,83 @@ namespace YuzuTest
 			}
 			name = GetNextName(false);
 			Require('}');
+			return result;
+		}
+	}
+
+	class SamplePoint_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new SamplePoint_JsonDeserializer Instance = new SamplePoint_JsonDeserializer();
+
+		public SamplePoint_JsonDeserializer()
+		{
+			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+			Options.ClassNames = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.EnumAsString = true;
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderInt(new SamplePoint());
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new SamplePoint(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (SamplePoint)obj;
+			if ("X" != name) throw new YuzuException();
+			result.X = RequireInt();
+			name = GetNextName(false);
+			if ("Y" != name) throw new YuzuException();
+			result.Y = RequireInt();
+			name = GetNextName(false);
+			Require('}');
+			return result;
+		}
+	}
+
+	class SampleRect_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new SampleRect_JsonDeserializer Instance = new SampleRect_JsonDeserializer();
+
+		public SampleRect_JsonDeserializer()
+		{
+			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+			Options.ClassNames = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.EnumAsString = true;
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderInt(new SampleRect());
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new SampleRect(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (SampleRect)obj;
+			if ("A" != name) throw new YuzuException();
+			result.A = (SamplePoint)SamplePoint_JsonDeserializer.Instance.FromReader(new SamplePoint(), Reader);
+			name = GetNextName(false);
+			if ("B" != name) throw new YuzuException();
+			result.B = (SamplePoint)SamplePoint_JsonDeserializer.Instance.FromReader(new SamplePoint(), Reader);
+			name = GetNextName(false);
+			Require('}');
+			return result;
 		}
 	}
 
@@ -401,7 +457,6 @@ namespace YuzuTest
 
 		public SampleClassList_JsonDeserializer()
 		{
-			className = "YuzuTest.SampleClassList";
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = true;
 			JsonOptions.FieldSeparator = "\n";
@@ -417,12 +472,10 @@ namespace YuzuTest
 
 		public override object FromReaderIntPartial(string name)
 		{
-			var obj = new SampleClassList();
-			ReadFields(obj, name);
-			return obj;
+			return ReadFields(new SampleClassList(), name);
 		}
 
-		protected override void ReadFields(object obj, string name)
+		protected override object ReadFields(object obj, string name)
 		{
 			var result = (SampleClassList)obj;
 			if ("E" != name) throw new YuzuException();
@@ -439,6 +492,7 @@ namespace YuzuTest
 			}
 			name = GetNextName(false);
 			Require('}');
+			return result;
 		}
 	}
 
