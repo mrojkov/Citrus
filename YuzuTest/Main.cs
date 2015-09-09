@@ -462,29 +462,6 @@ namespace YuzuTest
 		}
 
 		[TestMethod]
-		public void TestJsonLongList()
-		{
-			var list1 = new SampleList { E = new List<string>() };
-			for (int i = 0; i < 100000; ++i)
-				list1.E.Add(i.ToString());
-
-			var js = new JsonSerializer();
-			var result1 = js.ToString(list1);
-			Assert.IsTrue(result1 != "");
-			var result2 = js.ToString(list1);
-			Assert.IsTrue(result1 == result2);
-
-			var list2 = new SampleList();
-			var jd = new JsonDeserializer();
-			jd.FromString(list2, result1);
-			Assert.AreEqual(list1.E.Count, list2.E.Count);
-
-			var jdg = new SampleList_JsonDeserializer();
-			var list3 = (SampleList)jdg.FromString(result1);
-			Assert.AreEqual(list1.E.Count, list3.E.Count);
-		}
-
-		[TestMethod]
 		public void TestProtobufSimple()
 		{
 			var v1 = new Sample1 { X = 150, Y = "test" };
@@ -562,6 +539,60 @@ namespace YuzuTest
 				jd.Generate<SampleClassList>();
 				jd.GenerateFooter();
 			}
+		}
+
+		[TestClass]
+		public class TestSpeed
+		{
+			[TestMethod]
+			public void TestJsonLongListStr()
+			{
+				var list1 = new SampleList { E = new List<string>() };
+				for (int i = 0; i < 100000; ++i)
+					list1.E.Add(i.ToString());
+
+				var js = new JsonSerializer();
+				var result1 = js.ToString(list1);
+				Assert.IsTrue(result1 != "");
+				var result2 = js.ToString(list1);
+				Assert.IsTrue(result1 == result2);
+
+				var list2 = new SampleList();
+				var jd = new JsonDeserializer();
+				jd.FromString(list2, result1);
+				Assert.AreEqual(list1.E.Count, list2.E.Count);
+
+				var jdg = new SampleList_JsonDeserializer();
+				var list3 = (SampleList)jdg.FromString(result1);
+				Assert.AreEqual(list1.E.Count, list3.E.Count);
+			}
+
+			[TestMethod]
+			public void TestJsonLongListInt()
+			{
+				var list1 = new SampleMatrix { M = new List<List<int>>() };
+				for (int i = 0; i < 300; ++i) {
+					list1.M.Add(new List<int>());
+					for (int j = 0; j < 400; ++j)
+						list1.M[i].Add(i * j);
+				}
+
+				var js = new JsonSerializer();
+				var result1 = js.ToString(list1);
+				Assert.IsTrue(result1 != "");
+				var result2 = js.ToString(list1);
+				Assert.IsTrue(result1 == result2);
+
+				var list2 = new SampleMatrix();
+				var jd = new JsonDeserializer();
+				jd.FromString(list2, result1);
+				Assert.AreEqual(list1.M.Count, list2.M.Count);
+
+				var jdg = new SampleMatrix_JsonDeserializer();
+				var list3 = (SampleMatrix)jdg.FromString(result1);
+				Assert.AreEqual(list1.M.Count, list3.M.Count);
+			}
+
 		}
 	}
 }

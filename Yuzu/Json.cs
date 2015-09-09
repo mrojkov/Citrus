@@ -216,32 +216,33 @@ namespace Yuzu
 			return sb.ToString();
 		}
 
-		protected int RequireUInt()
+		protected uint RequireUInt()
 		{
-			sb.Clear();
 			var ch = SkipSpaces();
+			uint result = 0;
 			while ('0' <= ch && ch <= '9') {
-				sb.Append(ch);
+				checked { result = result * 10 + (uint)ch - (uint)'0'; }
 				ch = Reader.ReadChar();
 			}
 			PutBack(ch);
-			return int.Parse(sb.ToString());
+			return result;
 		}
 
 		protected int RequireInt()
 		{
-			sb.Clear();
 			var ch = SkipSpaces();
+			int sign = 1;
 			if (ch == '-') {
-				sb.Append(ch);
+				sign = -1;
 				ch = Reader.ReadChar();
 			}
+			int result = 0;
 			while ('0' <= ch && ch <= '9') {
-				sb.Append(ch);
+				checked { result = result * 10 + (int)ch - (int)'0'; }
 				ch = Reader.ReadChar();
 			}
 			PutBack(ch);
-			return int.Parse(sb.ToString());
+			return sign * result;
 		}
 
 		private string ParseFloat()
