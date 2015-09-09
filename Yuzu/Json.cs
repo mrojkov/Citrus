@@ -338,70 +338,64 @@ namespace Yuzu
 			return Activator.CreateInstance(t);
 		}
 
-		private void ReadList<T>(List<T> list)
+		private List<T> ReadList<T>()
 		{
-			do {
-				list.Add((T)ReadValue(typeof(T)));
-			} while (Require(']', ',') == ',');
+			var list = new List<T>();
+			Require('[');
+			// ReadValue might invoke a new serializer, so we must not rely on PutBack.
+			if (SkipSpacesCarefully() == ']')
+				Require(']');
+			else {
+				var rf = ReadValueFunc(typeof(T));
+				do {
+					list.Add((T)rf());
+				} while (Require(']', ',') == ',');
+			}
+			return list;
 		}
 
 		private T[] ReadArray<T>()
 		{
-			var list = new List<T>();
-			do {
-				list.Add((T)ReadValue(typeof(T)));
-			} while (Require(']', ',') == ',');
-			return list.ToArray();
+			return ReadList<T>().ToArray();
 		}
 
-		private object ReadValue(Type t)
+		// Optimization: Avoid creating trivial closures.
+		private object RequireIntObj() { return RequireInt(); }
+		private object RequireStringObj() { return RequireString(); }
+		private object RequireUIntObj() { return RequireUInt(); }
+		private object RequireSingleObj() { return RequireSingle(); }
+		private object RequireDoubleObj() { return RequireDouble(); }
+
+		private Func<object> ReadValueFunc(Type t)
 		{
 			if (t == typeof(int))
-				return RequireInt();
+				return RequireIntObj;
 			if (t == typeof(uint))
-				return RequireUInt();
+				return RequireUIntObj;
 			if (t == typeof(string))
-				return RequireString();
+				return RequireStringObj;
 			if (t == typeof(float))
-				return RequireSingle();
+				return RequireSingleObj;
 			if (t == typeof(double))
-				return RequireDouble();
+				return RequireDoubleObj;
 			if (t.IsEnum) {
 				if (JsonOptions.EnumAsString)
-					return Enum.Parse(t, RequireString());
+					return () => Enum.Parse(t, RequireString());
 				else
-					return Enum.ToObject(t, RequireInt());
+					return () => Enum.ToObject(t, RequireInt());
 			}
 			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>)) {
-				var list = Activator.CreateInstance(t);
-				Require('[');
-				// ReadValue might invoke a new serializer, so we must not rely on PutBack.
-				if (SkipSpacesCarefully() == ']')
-					Require(']');
-				else
-					Utils.GetPrivateCovariantGeneric(GetType(), "ReadList", t).
-						Invoke(this, new object[] { list });
-				return list;
+				var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadList", t);
+				return () => m.Invoke(this, new object[] {});
 			}
 			if (t.IsArray) {
-				Require('[');
-				// ReadValue might invoke a new serializer, so we must not rely on PutBack.
-				if (SkipSpacesCarefully() == ']') {
-					Require(']');
-					return Activator.CreateInstance(t);
-				}
-				else
-					return
-						Utils.GetPrivateCovariantGeneric(GetType(), "ReadArray", t).
-						Invoke(this, new object[] { });
+				var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadArray", t);
+				return () => m.Invoke(this, new object[] { });
 			}
 			if (t.IsClass && Options.ClassNames)
-				return FromReaderInt();
-			if (t.IsClass && !Options.ClassNames || Utils.IsStruct(t)) {
-				var value = Activator.CreateInstance(t);
-				FromReaderInt(value);
-				return value;
-			}
+				return FromReaderInt;
+			if (t.IsClass && !Options.ClassNames || Utils.IsStruct(t))
+				return () => FromReaderInt(Activator.CreateInstance(t));
 			throw new NotImplementedException(t.Name);
 		}
 
@@ -413,7 +407,7 @@ namespace Yuzu
 						throw new YuzuException();
 					continue;
 				}
-				yi.SetValue(obj, ReadValue(yi.Type));
+				yi.SetValue(obj, ReadValueFunc(yi.Type)());
 				name = GetNextName(false);
 			}
 			Require('}');
