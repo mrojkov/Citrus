@@ -23,10 +23,13 @@ namespace Yuzu
 		public YuzuOptional(int order) : base(order) { }
 	}
 
+	public class YuzuCompact : Attribute { }
+
 	public class CommonOptions
 	{
 		public Type RequiredAttribute = typeof(YuzuRequired);
 		public Type OptionalAttribute = typeof(YuzuOptional);
+		public Type CompactAttribute = typeof(YuzuCompact);
 		public Func<Attribute, int> GetOrder = attr => (attr as YuzuOrder).Order;
 		public bool ClassNames = false;
 		public Assembly Assembly = Assembly.GetCallingAssembly();

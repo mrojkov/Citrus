@@ -8,6 +8,7 @@ namespace Yuzu
 	internal class YuzuItem: IComparable<YuzuItem> {
 		public int Order;
 		public bool IsOptional;
+		public bool IsCompact;
 		public string Name;
 		public Type Type;
 		public Func<object, object> GetValue;
@@ -70,6 +71,9 @@ namespace Yuzu
 				var item = new YuzuItem {
 						Order = options.GetOrder(optional ?? required),
 						IsOptional = optional != null,
+						IsCompact =
+							m.IsDefined(options.CompactAttribute) ||
+							m.GetType().IsDefined(options.CompactAttribute),
 						Name = m.Name,
 				};
 

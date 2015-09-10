@@ -117,13 +117,18 @@ namespace Yuzu
 			throw new NotImplementedException(t.Name);
 		}
 
-		private void WriteName(string name, ref bool isFirst)
+		private void WriteSep(ref bool isFirst)
 		{
 			if (!isFirst) {
 				writer.Write(',');
 				WriteStr(JsonOptions.FieldSeparator);
 			}
 			isFirst = false;
+		}
+
+		private void WriteName(string name, ref bool isFirst)
+		{
+			WriteSep(ref isFirst);
 			WriteStr(JsonOptions.Indent);
 			WriteString(name);
 			writer.Write(':');
@@ -134,17 +139,37 @@ namespace Yuzu
 			writer.Write('{');
 			WriteStr(JsonOptions.FieldSeparator);
 			var isFirst = true;
-			if (Options.ClassNames) {
+			var t = obj.GetType();
+			if (Options.ClassNames && !Utils.IsStruct(t)) {
 				WriteName(JsonOptions.ClassTag, ref isFirst);
-				WriteString(obj.GetType().FullName);
+				WriteString(t.FullName);
 			}
-			foreach (var yi in Utils.GetYuzuItems(obj.GetType(), Options)) {
+			foreach (var yi in Utils.GetYuzuItems(t, Options)) {
 				WriteName(yi.Name, ref isFirst);
 				GetWriteFunc(yi.Type)(yi.GetValue(obj));
 			}
 			if (!isFirst)
 				WriteStr(JsonOptions.FieldSeparator);
 			writer.Write('}');
+		}
+
+		private void ToWriterCompact(object obj)
+		{
+			writer.Write('[');
+			WriteStr(JsonOptions.FieldSeparator);
+			var isFirst = true;
+			var t = obj.GetType();
+			if (Options.ClassNames && !Utils.IsStruct(t)) {
+				WriteSep(ref isFirst);
+				WriteString(t.FullName);
+			}
+			foreach (var yi in Utils.GetYuzuItems(t, Options)) {
+				WriteSep(ref isFirst);
+				GetWriteFunc(yi.Type)(yi.GetValue(obj));
+			}
+			if (!isFirst)
+				WriteStr(JsonOptions.FieldSeparator);
+			writer.Write(']');
 		}
 	}
 
