@@ -22,9 +22,9 @@ namespace Lime
 		}
 	}
 
-	public class VertiсalLineCaret : Polyline
+	public class VerticalLineCaret : Polyline
 	{
-		public VertiсalLineCaret(SimpleText text) : base(2.0f)
+		public VerticalLineCaret(SimpleText text) : base(2.0f)
 		{
 			Points.Add(Vector2.Zero);
 			Points.Add(Vector2.Down * text.FontHeight);
@@ -267,7 +267,7 @@ namespace Lime
 				if (editorParams.PasswordChar != null && text.Text != "") {
 					lastCharShowTimeLeft -= TaskList.Current.Delta;
 					text.DisplayText = new string(editorParams.PasswordChar.Value, text.Text.Length - 1);
-					text.DisplayText += lastCharShowTimeLeft > 0 ? text.Text.Last() : editorParams.PasswordChar; 
+					text.DisplayText += lastCharShowTimeLeft > 0 ? text.Text.Last() : editorParams.PasswordChar;
 				}
 				else {
 					text.DisplayText = text.Text; // Disable localization.
