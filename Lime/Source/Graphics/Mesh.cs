@@ -24,7 +24,8 @@ namespace Lime
 			UV2 = 8,
 			UV3 = 16,
 			UV4 = 32,
-			VertexColorUV12 = Vertex | Color | UV1 | UV2
+			VertexColorUV12 = Vertex | Color | UV1 | UV2,
+			All = Vertex | Color | UV1 | UV2 | UV3 | UV4
 		}
 
 		[ProtoMember(1)]
@@ -52,6 +53,12 @@ namespace Lime
 		public bool IndicesDirty;
 
 		private IPlatformMesh platformMesh;
+
+		[ProtoAfterDeserialization]
+		private void AfterDeserialization()
+		{
+			DirtyAttributes = Attributes.VertexColorUV12;
+		}
 
 		public void Render(int startIndex, int count)
 		{
