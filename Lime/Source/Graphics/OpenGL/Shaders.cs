@@ -238,7 +238,7 @@ namespace Lime
 		private static MultiShaderProgram CreateShaderProgram(string vertexShader, string fragmentShader, ShaderFlags mask)
 		{
 			// #ifdef - breaks Unity3D compiler
-			fragmentShader = fragmentShader.Replace("$ifdef", "#ifdef").Replace("$endif", "#endif");
+			fragmentShader = fragmentShader.Replace('$', '#');
 			return new MultiShaderProgram(
 				vertexShader, fragmentShader, PlatformMesh.Attributes.GetLocations(), 
 				GetSamplers(), mask);
