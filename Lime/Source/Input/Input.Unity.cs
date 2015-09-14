@@ -8,6 +8,25 @@ namespace Lime
 {
 	public static class Input
 	{
+		public static class Simulator
+		{
+			public static void SetMousePosition(Vector2 position)
+			{
+				Input.MousePosition = position;
+			}
+
+			public static void SetKeyState(Key key, bool value)
+			{
+				Input.SetKeyState(key, value);
+			}
+
+			public static void OnBetweenFrames()
+			{
+				Input.CopyKeysState();
+				Input.ProcessPendingKeyEvents();
+			}
+		}
+
 		struct KeyEvent
 		{
 			public Key Key;
