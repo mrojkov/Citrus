@@ -34,7 +34,7 @@ namespace Lime
 #else
 		public static bool IsNullOrWhiteSpace(this string value)
 		{
-			return string.IsNullOrWhiteSpace(Value);
+			return string.IsNullOrWhiteSpace(value);
 		}
 #endif
 
