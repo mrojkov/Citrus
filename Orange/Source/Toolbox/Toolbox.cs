@@ -64,6 +64,8 @@ namespace Orange
 				return "Android";
 			case TargetPlatform.UltraCompression:
 				return "UC";
+			case TargetPlatform.Unity:
+				return "Unity";
 			default:
 				throw new Lime.Exception("Invalid target platform");
 			}
