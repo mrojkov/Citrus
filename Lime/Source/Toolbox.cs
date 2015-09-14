@@ -17,6 +17,25 @@ namespace Lime
 				destination.Write(buffer, 0, read);
 			}
 		}
+
+		public static bool IsNullOrWhiteSpace(this string value)
+		{
+			if (value == null || value.Length == 0) {
+				return true;
+			}
+			for (int i = 0; i < value.Length; i++) {
+				char c = value[i];
+				if (!char.IsWhiteSpace(c)) {
+					return false;
+				}
+			}
+			return true;
+		}
+#else
+		public static bool IsNullOrWhiteSpace(this string value)
+		{
+			return string.IsNullOrWhiteSpace(Value);
+		}
 #endif
 
 		public static void Swap<T>(ref T lhs, ref T rhs)

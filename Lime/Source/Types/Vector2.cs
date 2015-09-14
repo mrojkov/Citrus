@@ -508,12 +508,12 @@ namespace Lime
 		public static bool TryParse(string s, out Vector2 vector)
 		{
 			vector = Zero;
-			if (string.IsNullOrWhiteSpace(s)) {
+			if (s.IsNullOrWhiteSpace()) {
 				return false;
 			}
 
 			var parts = s.Split(new [] {", "}, StringSplitOptions.None);
-			if (parts.Length != 2 || parts.Any(string.IsNullOrWhiteSpace)) {
+			if (parts.Length != 2 || parts.Any(i => i.IsNullOrWhiteSpace())) {
 				return false;
 			}
 

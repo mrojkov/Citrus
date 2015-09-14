@@ -705,7 +705,7 @@ namespace Lime
 		{
 			var candidates = sceneExtensions.Select(ext => Path.ChangeExtension(path, ext)).Where(AssetsBundle.Instance.FileExists);
 			if (candidates.Count() > 1) {
-				throw new Lime.Exception("Ambiguity between: {0}", string.Join("; ", candidates));
+				throw new Lime.Exception("Ambiguity between: {0}", string.Join("; ", candidates.ToArray()));
 			}
 			return candidates.FirstOrDefault();
 		}

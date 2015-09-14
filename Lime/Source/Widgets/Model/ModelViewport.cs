@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ProtoBuf;
+#if OPENGL
 using OpenTK.Graphics.ES20;
+#endif
 
 namespace Lime
 {
@@ -72,11 +74,15 @@ namespace Lime
 			Renderer.Flush();
 			Renderer.PushProjectionMatrix();
 			Renderer.Projection = TransformProjection(Renderer.Projection);
+#if OPENGL
 			GL.Enable(EnableCap.DepthTest);
 			GL.Enable(EnableCap.CullFace);
+#endif
 			chain.RenderAndClear();
+#if OPENGL
 			GL.Disable(EnableCap.DepthTest);
 			GL.Disable(EnableCap.CullFace);
+#endif
 			Renderer.PopProjectionMatrix();
 		}
 
