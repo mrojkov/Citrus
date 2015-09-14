@@ -143,13 +143,13 @@ namespace Lime
 			void main()
 			{
 				lowp vec4 t1 = texture2D(tex1, texCoords);
-				#ifdef UseAlphaTexture1
+				$ifdef UseAlphaTexture1
 					t1.a = texture2D(tex1a, texCoords).r;
-				#endif
+				$endif
 				gl_FragColor = color * t1;
-				#ifdef PremultiplyAlpha
+				$ifdef PremultiplyAlpha
 					gl_FragColor.rgb *= gl_FragColor.a;
-				#endif
+				$endif
 			}";
 
 		readonly string twoTexturesFragmentShader = @"
@@ -164,16 +164,16 @@ namespace Lime
 			{
 				lowp vec4 t1 = texture2D(tex1, texCoords1);
 				lowp vec4 t2 = texture2D(tex2, texCoords2);
-				#ifdef UseAlphaTexture1
+				$ifdef UseAlphaTexture1
 					t1.a = texture2D(tex1a, texCoords1).r;
-				#endif
-				#ifdef UseAlphaTexture2
+				$endif
+				$ifdef UseAlphaTexture2
 					t2.a = texture2D(tex2a, texCoords2).r;
-				#endif
+				$endif
 				gl_FragColor = color * t1 * t2;
-				#ifdef PremultiplyAlpha
+				$ifdef PremultiplyAlpha
 					gl_FragColor.rgb *= gl_FragColor.a;
-				#endif
+				$endif
 			}";
 
 		readonly string silhouetteFragmentShader = @"
@@ -183,11 +183,11 @@ namespace Lime
 			uniform lowp sampler2D tex1a;
 			void main()
 			{
-				#ifdef UseAlphaTexture1
+				$ifdef UseAlphaTexture1
 					lowp float a = texture2D(tex1a, texCoords).r;
-				#else
+				$else
 					lowp float a = texture2D(tex1, texCoords).a;
-				#endif
+				$endif
 				gl_FragColor = color * vec4(1.0, 1.0, 1.0, a);
 			}";
 
@@ -202,14 +202,14 @@ namespace Lime
 			void main()
 			{
 				lowp vec4 t1 = texture2D(tex1, texCoords1);
-				#ifdef UseAlphaTexture1
+				$ifdef UseAlphaTexture1
 					t1.a = texture2D(tex1a, texCoords1).r;
-				#endif
-				#ifdef UseAlphaTexture2
+				$endif
+				$ifdef UseAlphaTexture2
 					lowp float a2 = texture2D(tex2a, texCoords2).r;
-				#else
+				$else
 					lowp float a2 = texture2D(tex2, texCoords2).a;
-				#endif
+				$endif
 				gl_FragColor = t1 * color * vec4(1.0, 1.0, 1.0, a2);
 			}";
 
@@ -220,11 +220,11 @@ namespace Lime
 			uniform lowp sampler2D tex1a;
 			void main()
 			{
-				#ifdef UseAlphaTexture1
+				$ifdef UseAlphaTexture1
 					lowp float a = 1.0 - texture2D(tex1a, texCoords).r;
-				#else
+				$else
 					lowp float a = 1.0 - texture2D(tex1, texCoords).a;
-				#endif
+				$endif
 				gl_FragColor = color * vec4(1.0, 1.0, 1.0, a);
 			}";
 
@@ -237,6 +237,8 @@ namespace Lime
 
 		private static MultiShaderProgram CreateShaderProgram(string vertexShader, string fragmentShader, ShaderFlags mask)
 		{
+			// #ifdef - breaks Unity3D compiler
+			fragmentShader = fragmentShader.Replace("$ifdef", "#ifdef").Replace("$endif", "#endif");
 			return new MultiShaderProgram(
 				vertexShader, fragmentShader, PlatformMesh.Attributes.GetLocations(), 
 				GetSamplers(), mask);
