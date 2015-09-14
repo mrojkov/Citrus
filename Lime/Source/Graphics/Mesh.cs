@@ -57,7 +57,7 @@ namespace Lime
 		[ProtoAfterDeserialization]
 		private void AfterDeserialization()
 		{
-			DirtyAttributes = Attributes.VertexColorUV12;
+			DirtyAttributes = Attributes.All;
 		}
 
 		public void Render(int startIndex, int count)
