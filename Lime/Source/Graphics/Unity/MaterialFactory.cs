@@ -21,10 +21,10 @@ namespace Lime
 			silhuetteMat = new UnityEngine.Material(UnityEngine.Shader.Find("Silhuette"));
 		}
 
-		public static UnityEngine.Material GetMaterial(Blending blending, ShaderId shaderId, ITexture[] textures)
+		public static UnityEngine.Material GetMaterial(Blending blending, ShaderId shaderId, ITexture texture1, ITexture texture2)
 		{
 			UnityEngine.Material mat;
-			var texCount = textures[0] != null ? (textures[1] != null ? 2 : 1) : 0;
+			var texCount = texture1 != null ? (texture2 != null ? 2 : 1) : 0;
 			switch (shaderId) {
 			case ShaderId.Silhuette:
 				mat = silhuetteMat;
@@ -33,11 +33,11 @@ namespace Lime
 				mat = texCount == 2 ? imageCombinerMat : (texCount == 1 ? diffuseMat : flatMat);
 				break;
 			}
-			if (textures[0] != null) {
-				mat.mainTexture = textures[0].GetUnityTexture();
+			if (texture1 != null) {
+				mat.mainTexture = texture1.GetUnityTexture();
 			}
-			if (textures[1] != null) {
-				mat.SetTexture("SecondTex", textures[1].GetUnityTexture());
+			if (texture2 != null) {
+				mat.SetTexture("SecondTex", texture2.GetUnityTexture());
 			}
 			UnityEngine.Rendering.BlendMode srcMode, dstMode;
 			switch (blending) {

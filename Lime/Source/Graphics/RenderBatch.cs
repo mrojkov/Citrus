@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 #if iOS || ANDROID
 using OpenTK.Graphics.ES20;
-#else
+#elif !UNITY
 using OpenTK.Graphics.OpenGL;
 #endif
 
@@ -48,14 +48,10 @@ namespace Lime
 
 		public void Render()
 		{
-#if UNITY
-			PlatformRenderer.SetMaterial(Texture1, Texture2, Shader, Blending);
-#else
 			PlatformRenderer.SetTexture(Texture1, 0);
 			PlatformRenderer.SetTexture(Texture2, 1);
 			PlatformRenderer.SetBlending(Blending);
 			PlatformRenderer.SetShader(Shader, CustomShaderProgram);
-#endif
 			Mesh.Render(StartIndex, LastIndex - StartIndex);
 			Renderer.DrawCalls++;
 		}

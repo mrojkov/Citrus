@@ -31,10 +31,25 @@ namespace Lime
 		private static bool scissorTest;
 		private static bool viewportOrProjectionChanged;
 
-		public static void SetMaterial(ITexture texture1, ITexture texture2, ShaderId shader, Blending blending)
+		internal static Blending Blending;
+		internal static ShaderId Shader;
+		internal static ShaderProgram CustomShader;
+		internal static ITexture[] Textures = new ITexture[2];
+
+		public static void SetTexture(ITexture texture, int stage)
 		{
-			var m = MaterialFactory.GetMaterial(blending, shader, new ITexture[] { texture1, texture2 });
-			m.SetPass(0);
+			Textures[stage] = texture;
+		}
+
+		public static void SetShader(ShaderId shader, ShaderProgram customShader = null)
+		{
+			Shader = shader;
+			CustomShader = customShader;
+		}
+
+		public static void SetBlending(Blending blending)
+		{
+			Blending = blending;
 		}
 
 		public static void BeginFrame()

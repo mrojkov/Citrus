@@ -122,6 +122,9 @@ namespace Lime
 #if UNITY
 		public UnityEngine.Texture GetUnityTexture()
 		{
+			if (texture == null) {
+				texture = LoadTexture();
+			}
 			return texture.GetUnityTexture();
 		}
 #endif

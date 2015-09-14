@@ -26,7 +26,13 @@ namespace Lime
 
 		public void Render(int startIndex, int count)
 		{
-			//unityMesh.Clear(true);
+			MaterialFactory.GetMaterial(
+				PlatformRenderer.Blending, 
+				PlatformRenderer.Shader,
+				PlatformRenderer.Textures[0],
+				PlatformRenderer.Textures[1]
+			).SetPass(0);
+			// unityMesh.Clear(true);
 			UploadVertices();
 			var indices = new int[count];
 			Array.Copy(mesh.Indices, startIndex, indices, 0, count);
