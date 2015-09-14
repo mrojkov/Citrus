@@ -47,7 +47,7 @@ namespace Lime
 			SetTextureDefaultParameters();
 		}
 
-		public bool IsStubTexture { get { return false; } }
+		public virtual bool IsStubTexture { get { return false; } }
 
 		public void LoadImage(string path)
 		{
