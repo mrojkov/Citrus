@@ -55,7 +55,7 @@ namespace Lime
 		private IPlatformMesh platformMesh;
 
 		[ProtoAfterDeserialization]
-		private void AfterDeserialization()
+		public void AfterDeserialization()
 		{
 			DirtyAttributes = Attributes.All;
 		}
