@@ -113,7 +113,7 @@ namespace Orange
 				}
 			}
 			foreach (var i in bundles) {
-				AssetsBundle.Instance = new BundleSwitcher(new PackedAssetsBundle(The.Workspace.GetBundlePath(i)), 
+				AssetsBundle.Instance = new BundleSwitcher(new PackedAssetsBundle(The.Workspace.GetBundlePath(i)),
 					AssetsBundle.Instance);
 			}
 			The.Workspace.AssetFiles.EnumerationFilter = (info) => {
@@ -127,7 +127,7 @@ namespace Orange
 			foreach (var srcFileInfo in The.Workspace.AssetFiles.Enumerate(".scene")) {
 				var srcPath = srcFileInfo.Path;
 				using (Lime.Frame scene = new Lime.Frame(srcPath)) {
-          foreach (var j in scene.Descendants) {
+					foreach (var j in scene.Descendants) {
 						var checkTexture = new Action<ITexture>((Lime.ITexture t) => {
 							if (t == null) {
 								return;
@@ -143,7 +143,7 @@ namespace Orange
 							}
 							if (texPath.Length == 2 && texPath[0] == '#') {
 								switch (texPath[1]) {
-									case 'a': case'b': case 'c': case 'd':
+									case 'a': case'b': case 'c': case 'd': case 'e': case 'f': case 'g':
 										return;
 									default:
 										suspiciousTexturesReport.Add(string.Format("wrong render target: {0}, {1}", texPath, j.ToString()));
@@ -169,40 +169,40 @@ namespace Orange
 							missingResourcesReport.Add(string.Format("texture missing:\n\ttexture path: {0}\n\tscene path: {1}\n",
 								t.SerializationPath, j.ToString()));
 						});
-	          var checkAnimators = new Action<Node>((Node n) => {
+						var checkAnimators = new Action<Node>((Node n) => {
 							Lime.Animator<Lime.ITexture> ta;
 							if (n.Animators.TryFind<ITexture>("Texture", out ta)) {
 								foreach (var key in ta.ReadonlyKeys) {
 									checkTexture(key.Value);
 								}
 							}
-	          });
-	          if (j is Widget) {
-		          var w = j as Lime.Widget;
-		          checkTexture(w.Texture);
-		          checkAnimators(w);
-	          } else if (j is ParticleModifier) {
-		          var pm = j as Lime.ParticleModifier;
-		          checkTexture(pm.Texture);
-		          checkAnimators(pm);
-	          } else if (j is Lime.Audio) {
-		          var au = j as Lime.Audio;
-		          var path = au.Sample.SerializationPath + ".sound";
-		          if (!Lime.AssetsBundle.Instance.FileExists(path)) {
-			          missingResourcesReport.Add(string.Format("audio missing:\n\taudio path: {0}\n\tscene path: {1}\n",
-				          path, j.ToString()));
-		          } else {
-			          using (var tempStream = Lime.AssetsBundle.Instance.OpenFile(path)) {
-				          
-			          }
-		          }
+						});
+						if (j is Widget) {
+							var w = j as Lime.Widget;
+							checkTexture(w.Texture);
+							checkAnimators(w);
+						} else if (j is ParticleModifier) {
+							var pm = j as Lime.ParticleModifier;
+							checkTexture(pm.Texture);
+							checkAnimators(pm);
+						} else if (j is Lime.Audio) {
+							var au = j as Lime.Audio;
+							var path = au.Sample.SerializationPath + ".sound";
+							if (!Lime.AssetsBundle.Instance.FileExists(path)) {
+								missingResourcesReport.Add(string.Format("audio missing:\n\taudio path: {0}\n\tscene path: {1}\n",
+									path, j.ToString()));
+							} else {
+								using (var tempStream = Lime.AssetsBundle.Instance.OpenFile(path)) {
+
+								}
+							}
 							// FIXME: should we check for audio:Sample animators too?
-	          }
+						}
 					}
 				}
 				var reportList = new List<string>();
 				foreach (var rpr in requestedPaths) {
-					string pattern = String.Format(@".*[/\\](.*)\.{0}", 
+					string pattern = String.Format(@".*[/\\](.*)\.{0}",
 						Orange.Toolbox.GetTargetPlatformString(The.Workspace.ActivePlatform));
 					string bundle = "";
 					foreach (Match m in Regex.Matches(rpr.bundle, pattern, RegexOptions.IgnoreCase)) {
