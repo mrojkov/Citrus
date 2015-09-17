@@ -32,7 +32,9 @@ namespace Lime
 		public static string GetCurrentLanguage()
 		{
 #if iOS
-			return NSLocale.PreferredLanguages[0];
+			string language = NSLocale.PreferredLanguages[0];
+			language = language.Substring(0, 2);
+				return language;
 #else
 			return System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
 #endif
