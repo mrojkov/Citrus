@@ -192,11 +192,9 @@ namespace Orange
 
 		private SerializableTexture CreateSerializableTexture(Assimp.TextureSlot texture)
 		{
-			var texturePath = Path.Combine(Path.GetDirectoryName(path), 
-				Path.GetFileNameWithoutExtension(Toolbox.ToUnixSlashes(texture.FilePath)));
-            return new SerializableTexture(texturePath
-				//Toolbox.GetRelativePath(Path.Combine(path, "./", texture.FilePath), The.Workspace.AssetsDirectory)
-			);
+			var texturePath = Toolbox.ToUnixSlashes(Path.Combine(Path.GetDirectoryName(path), 
+				Path.GetFileNameWithoutExtension(texture.FilePath)));
+			return new SerializableTexture(texturePath);
 		}
 
 		private void ImportAnimations()
