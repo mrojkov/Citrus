@@ -74,7 +74,7 @@ namespace Lime
 				return rhs;
 			if (rhs.ABGR == 0xFFFFFFFF)
 				return lhs;
-			Color4 c = new Color4();
+			var c = new Color4();
 			c.R = (byte)((rhs.R *((lhs.R << 8) + lhs.R) + 255) >> 16);
 			c.G = (byte)((rhs.G *((lhs.G << 8) + lhs.G) + 255) >> 16);
 			c.B = (byte)((rhs.B *((lhs.B << 8) + lhs.B) + 255) >> 16);
@@ -99,7 +99,7 @@ namespace Lime
 
 		/// <summary>
 		/// Creates a new <see cref="Color4"/> that contains 
-		/// linear interpolation of the specified vectors.
+		/// linear interpolation of the specified colors.
 		/// </summary>
 		/// <param name="t">Weighting value(between 0.0 and 1.0).</param>
 		/// <param name="a">The first color.</param>
@@ -111,7 +111,7 @@ namespace Lime
 			int x, z;
 			x = (int)(t * 255);
 			x = (x < 0) ? 0 :((x > 255) ? 255 : x);
-			Color4 r = new Color4();
+			var r = new Color4();
 			z = (a.R << 8) - a.R + (b.R - a.R) * x;
 			r.R = (byte)(((z << 8) + z + 255) >> 16);
 			z = (a.G << 8) - a.G + (b.G - a.G) * x;
