@@ -227,7 +227,6 @@ namespace Lime
 				}
 			};
 			base.OnCreate(activity, bundle);
-			GameView.Run(60);
 		}
 
 		private void RemoveGameViewFromParent()
@@ -256,6 +255,7 @@ namespace Lime
 			if (!GameView.IsFocused) {
 				GameView.RequestFocus();
 			}
+			GameView.Run();
 			base.OnResume();
 		}
 
