@@ -28,7 +28,16 @@ namespace Lime
 		{
 			Points.Add(Vector2.Zero);
 			Points.Add(Vector2.Down * text.FontHeight);
-			Color = text.Color;
+			Tasks.Add(UpdateColor(text));
+		}
+
+		// Color of the text can be changed so we should copy it every frame
+		private IEnumerator<object> UpdateColor(Widget text)
+		{
+			while (true) {
+				Color = text.Color;
+				yield return 0;
+			}
 		}
 	}
 
@@ -123,9 +132,18 @@ namespace Lime
 			text.TrimWhitespaces = false;
 			this.caretPos = caretPos;
 			this.editorParams = editorParams;
-			container.Tasks.Add(FocusTask());
-			container.Tasks.Add(HandleKeyboardTask());
-			container.Tasks.Add(EnforceDisplayTextTask());
+			container.Tasks.Add(FocusTask(), this);
+			container.Tasks.Add(HandleKeyboardTask(), this);
+			container.Tasks.Add(EnforceDisplayTextTask(), this);
+		}
+
+		public void Unlink()
+		{
+			if (IsActive()) {
+				World.Instance.ActiveTextWidget = null;
+				caretPos.IsVisible = false;
+			}
+			container.Tasks.StopByTag(this);
 		}
 
 		private bool IsActive() { return World.Instance.ActiveTextWidget == textInputProcessor; }
