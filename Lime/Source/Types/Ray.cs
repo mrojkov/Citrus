@@ -17,19 +17,19 @@ namespace Lime
 
 		public Ray(Vector3 position, Vector3 direction)
 		{
-			this.Position = position;
-			this.Direction = direction;
+			Position = position;
+			Direction = direction;
 		}
 
 		public override bool Equals(object obj)
 		{
-			return Equals((Ray)obj);
+			return obj is Ray && Equals((Ray)obj);
 		}
 
 
 		public bool Equals(Ray other)
 		{
-			return this.Position.Equals(other.Position) && this.Direction.Equals(other.Direction);
+			return Position.Equals(other.Position) && Direction.Equals(other.Direction);
 		}
 
 
@@ -63,7 +63,7 @@ namespace Lime
 		public void Intersects(ref BoundingSphere sphere, out float? result)
 		{
 			// Find the vector between where the ray starts the the sphere's centre
-			Vector3 difference = sphere.Center - this.Position;
+			var difference = sphere.Center - Position;
 			float differenceLengthSquared = difference.SquaredLength;
 			float sphereRadiusSquared = sphere.Radius * sphere.Radius;
 
