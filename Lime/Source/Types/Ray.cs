@@ -3,6 +3,9 @@ using ProtoBuf;
 
 namespace Lime
 {
+	/// <summary>
+	/// Representation of endless ray.
+	/// </summary>
 	[ProtoContract]
 	public struct Ray : IEquatable<Ray>
 	{
@@ -35,6 +38,11 @@ namespace Lime
 			return Position.GetHashCode() ^ Direction.GetHashCode();
 		}
 
+		// TODO: Change name to Intersection()?
+		/// <summary>
+		/// Returns the distance between the center of this ray and border of sphere. 
+		/// </summary>
+		/// <seealso cref="Intersects(ref BoundingSphere, out float?)"/>
 		public float? Intersects(BoundingSphere sphere)
 		{
 			float? result;
@@ -42,6 +50,16 @@ namespace Lime
 			return result;
 		}
 
+		// TODO: Change return type to bool to match to this method name?
+		/// <summary>
+		/// Calculates the distance between the center of this ray and border of sphere. 
+		/// </summary>
+		/// <param name="sphere">Sphere to check intersection for.</param>
+		/// <param name="result">
+		/// The distance between the center of this ray and border of sphere.
+		/// Becomes 0.0f if ray is inside of sphere. 
+		/// Becomes null if ray is pointed away from sphere.
+		/// </param>
 		public void Intersects(ref BoundingSphere sphere, out float? result)
 		{
 			// Find the vector between where the ray starts the the sphere's centre
