@@ -24,7 +24,7 @@ namespace Lime
 
 		public static explicit operator Vector2(Size size)
 		{
-			return new Vector2((float)size.Width, (float)size.Height);
+			return new Vector2(size.Width, size.Height);
 		}
 
 		public static explicit operator IntVector2(Size size)
@@ -42,15 +42,14 @@ namespace Lime
 			return lhs.Width != rhs.Width || lhs.Height != rhs.Height;
 		}
 
-		bool IEquatable<Size>.Equals(Size rhs)
+		public bool Equals(Size rhs)
 		{
 			return Width == rhs.Width && Height == rhs.Height;
 		}
 
 		public override bool Equals(object o)
 		{
-			var rhs = (Size)o;
-			return Width == rhs.Width && Height == rhs.Height;
+			return o is Size && Equals((Size)o);
 		}
 
 		public override int GetHashCode()
@@ -64,7 +63,7 @@ namespace Lime
 		/// </summary>
 		public override string ToString()
 		{
-			return String.Format("{0}, {1}", Width, Height);
+			return string.Format("{0}, {1}", Width, Height);
 		}
 	}
 }
