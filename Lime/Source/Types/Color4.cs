@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using ProtoBuf;
 using System.Runtime.InteropServices;
 
@@ -74,12 +74,13 @@ namespace Lime
 				return rhs;
 			if (rhs.ABGR == 0xFFFFFFFF)
 				return lhs;
-			var c = new Color4();
-			c.R = (byte)((rhs.R *((lhs.R << 8) + lhs.R) + 255) >> 16);
-			c.G = (byte)((rhs.G *((lhs.G << 8) + lhs.G) + 255) >> 16);
-			c.B = (byte)((rhs.B *((lhs.B << 8) + lhs.B) + 255) >> 16);
-			c.A = (byte)((rhs.A *((lhs.A << 8) + lhs.A) + 255) >> 16);
-			return c;
+			return new Color4
+			{
+				R = (byte) ((rhs.R * ((lhs.R << 8) + lhs.R) + 255) >> 16),
+				G = (byte) ((rhs.G * ((lhs.G << 8) + lhs.G) + 255) >> 16),
+				B = (byte) ((rhs.B * ((lhs.B << 8) + lhs.B) + 255) >> 16),
+				A = (byte) ((rhs.A * ((lhs.A << 8) + lhs.A) + 255) >> 16)
+			};
 		}
 		
 		/// <summary>
@@ -88,12 +89,13 @@ namespace Lime
 		public static Color4 PremulAlpha(Color4 color)
 		{
 			int a = color.A;
-			if (a < 255) {
-				a = (a << 8) + a;
-				color.R = (byte)((color.R * a + 255) >> 16);
-				color.G = (byte)((color.G * a + 255) >> 16);
-				color.B = (byte)((color.B * a + 255) >> 16); 
+			if (a >= 255) {
+				return color;
 			}
+			a = (a << 8) + a;
+			color.R = (byte)((color.R * a + 255) >> 16);
+			color.G = (byte)((color.G * a + 255) >> 16);
+			color.B = (byte)((color.B * a + 255) >> 16);
 			return color;
 		}
 
@@ -101,24 +103,25 @@ namespace Lime
 		/// Creates a new <see cref="Color4"/> that contains 
 		/// linear interpolation of the specified colors.
 		/// </summary>
-		/// <param name="t">Weighting value(between 0.0 and 1.0).</param>
-		/// <param name="a">The first color.</param>
-		/// <param name="b">The second color.</param>
-		public static Color4 Lerp(float t, Color4 a, Color4 b)
+		/// <param name="amount">Weighting value(between 0.0 and 1.0).</param>
+		/// <param name="value1">The first color.</param>
+		/// <param name="value2">The second color.</param>
+		public static Color4 Lerp(float amount, Color4 value1, Color4 value2)
 		{
-			if (a.ABGR == b.ABGR)
-				return a;
+			if (value1.ABGR == value2.ABGR) {
+				return value1;
+			}
 			int x, z;
-			x = (int)(t * 255);
+			x = (int)(amount * 255);
 			x = (x < 0) ? 0 :((x > 255) ? 255 : x);
 			var r = new Color4();
-			z = (a.R << 8) - a.R + (b.R - a.R) * x;
+			z = (value1.R << 8) - value1.R + (value2.R - value1.R) * x;
 			r.R = (byte)(((z << 8) + z + 255) >> 16);
-			z = (a.G << 8) - a.G + (b.G - a.G) * x;
+			z = (value1.G << 8) - value1.G + (value2.G - value1.G) * x;
 			r.G = (byte)(((z << 8) + z + 255) >> 16);
-			z = (a.B << 8) - a.B + (b.B - a.B) * x;
+			z = (value1.B << 8) - value1.B + (value2.B - value1.B) * x;
 			r.B = (byte)(((z << 8) + z + 255) >> 16);
-			z = (a.A << 8) - a.A + (b.A - a.A) * x;
+			z = (value1.A << 8) - value1.A + (value2.A - value1.A) * x;
 			r.A = (byte)(((z << 8) + z + 255) >> 16);
 			return r;
 		}
