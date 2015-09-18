@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 namespace Lime
 {
 	/// <summary>
-	/// Цвет в формате RGBA или ABGR. Должен использоваться только в одном из форматов
+	/// Representation of 4-byte color (RGBA).
 	/// </summary>
 	[ProtoContract]
 	[System.Diagnostics.DebuggerStepThrough]
@@ -66,7 +66,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Покомпонентое умножение двух цветов
+		/// Componentwise multiplication of two colors.
 		/// </summary>
 		public static Color4 operator *(Color4 lhs, Color4 rhs)
 		{
@@ -83,7 +83,7 @@ namespace Lime
 		}
 		
 		/// <summary>
-		/// Умножает каждый компонент цвета на альфу (Premultiplied alpha)
+		/// Multiplies every component of color with it's alpha.
 		/// </summary>
 		public static Color4 PremulAlpha(Color4 color)
 		{
@@ -98,9 +98,12 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Выполняет линейную интерполяцию
+		/// Creates a new <see cref="Color4"/> that contains 
+		/// linear interpolation of the specified vectors.
 		/// </summary>
-		/// <param name="t">Значение интерполяции [0 - 1]</param>
+		/// <param name="t">Weighting value(between 0.0 and 1.0).</param>
+		/// <param name="a">The first color.</param>
+		/// <param name="b">The second color.</param>
 		public static Color4 Lerp(float t, Color4 a, Color4 b)
 		{
 			if (a.ABGR == b.ABGR)
@@ -120,14 +123,15 @@ namespace Lime
 			return r;
 		}
 
-		/// <summary>
-		/// Сравнивает поле ABGR двух цветов
-		/// </summary>
 		public bool Equals(Color4 other)
 		{
 			return ABGR == other.ABGR;
 		}
 
+		/// <summary>
+		/// Returns the <see cref="string"/> representation of this <see cref="Color4"/> 
+		/// in the format: "#R.G.B.A", where R, G, B, A are represented by hexademical numbers.
+		/// </summary>
 		public override string ToString()
 		{
 			return String.Format("#{0:X2}.{1:X2}.{2:X2}.{3:X2}", R, G, B, A);
