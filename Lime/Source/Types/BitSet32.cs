@@ -4,41 +4,35 @@ using ProtoBuf;
 
 namespace Lime
 {
+	// TODO: Implement as IEnumerable and/or IList?
 	/// <summary>
-	/// 32-битный массив битовых флагов
+	/// Representation of 32-bit array of bit flags.
 	/// </summary>
 	[ProtoContract]
 	public struct BitSet32 : IEquatable<BitSet32>
 	{
 		/// <summary>
-		/// Возвращает 0x00000000 (все биты установлены в 0)
+		/// Returns 0x00000000 (all bits are 0).
 		/// </summary>
 		public static readonly BitSet32 Empty = new BitSet32(0);
 
 		/// <summary>
-		/// Возвращает 0xffffffff (все биты установлены в 1)
+		/// Returns 0xffffffff (all bits are 1).
 		/// </summary>
 		public static readonly BitSet32 Full = new BitSet32(uint.MaxValue);
 
 		/// <summary>
-		/// Текущеее значение
+		/// Uint that is used for array representation.
 		/// </summary>
 		[ProtoMember(1)]
 		public uint Value;
 
-		/// <summary>
-		/// Конструктор
-		/// </summary>
-		/// <param name="value">Текущеее значение</param>
 		public BitSet32(uint value)
 		{
 			Value = value;
 		}
 
-		/// <summary>
-		/// Возвращает или задает указанный бит
-		/// </summary>
-		/// <param name="bit">Номер бита (0 - 31)</param>
+		/// <param name="bit">Bit index (0 - 31).</param>
 		public bool this[int bit]
 		{
 			get { return (Value & 1U << bit) != 0; }
@@ -53,12 +47,12 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Возвращает true, если все биты 1
+		/// Returns true if all bits are 1.
 		/// </summary>
 		public bool All() { return Value == uint.MaxValue; }
 
 		/// <summary>
-		/// Возвращает true, если какой-нибудь из битов 1
+		/// Returns true if any bit is 1.
 		/// </summary>
 		public bool Any() { return Value != 0; }
 
@@ -87,6 +81,10 @@ namespace Lime
 			return lhs.Value != rhs.Value;
 		}
 
+		/// <summary>
+		/// Returns the <see cref="string"/> representation of this <see cref="BitSet32"/>
+		/// as sequence of "0" and "1" (from 32 bit to 1 bit). Zeroes on the left are trimmed.
+		/// </summary>
 		public override string ToString()
 		{
 			return Convert.ToString(Value, 2);
