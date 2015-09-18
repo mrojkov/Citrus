@@ -26,7 +26,7 @@ namespace Lime
 		
 		[ProtoMember(1)]
 		[FieldOffset(0)]
-		public UInt32 ABGR;
+		public uint ABGR;
 
 		public static readonly Color4 Red = new Color4(255, 0, 0, 255);
 		public static readonly Color4 Green = new Color4(0, 255, 0, 255);
@@ -39,7 +39,7 @@ namespace Lime
 		public static readonly Color4 Orange = new Color4(255, 128, 0, 255);
 		public static readonly Color4 Transparent = new Color4(255, 255, 255, 0);
 		
-		public Color4(UInt32 abgr)
+		public Color4(uint abgr)
 		{
 			R = G = B = A = 0;
 			ABGR = abgr;
@@ -134,7 +134,7 @@ namespace Lime
 		/// </summary>
 		public override string ToString()
 		{
-			return String.Format("#{0:X2}.{1:X2}.{2:X2}.{3:X2}", R, G, B, A);
+			return string.Format("#{0:X2}.{1:X2}.{2:X2}.{3:X2}", R, G, B, A);
 		}
 	}
 }
