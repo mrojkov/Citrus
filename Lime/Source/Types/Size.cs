@@ -4,7 +4,7 @@ using ProtoBuf;
 namespace Lime
 {
 	/// <summary>
-	/// Структура, представляющая ширину и высоту
+	/// Representation of width and height.
 	/// </summary>
 	[System.Diagnostics.DebuggerStepThrough]
 	[ProtoContract]
@@ -58,6 +58,10 @@ namespace Lime
 			return Width.GetHashCode() ^ Height.GetHashCode();
 		}
 
+		/// <summary>
+		/// Returns string representation of this <see cref="Size"/> 
+		/// in the format: "Width, Height".
+		/// </summary>
 		public override string ToString()
 		{
 			return String.Format("{0}, {1}", Width, Height);
