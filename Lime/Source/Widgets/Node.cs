@@ -28,6 +28,7 @@ namespace Lime
 	[DebuggerTypeProxy(typeof(NodeDebugView))]
 	public class Node : IDisposable
 	{
+		[Flags]
 		protected internal enum DirtyFlags
 		{
 			None			= 0,
