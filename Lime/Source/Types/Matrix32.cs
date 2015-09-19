@@ -31,7 +31,7 @@ namespace Lime
 			T = t;
 		}
 
-		bool IEquatable<Matrix32>.Equals(Matrix32 rhs)
+		public bool Equals(Matrix32 rhs)
 		{
 			return U.Equals(rhs.U) && V.Equals(rhs.V) && T.Equals(rhs.T);
 		}
@@ -59,7 +59,7 @@ namespace Lime
 		/// </summary>
 		public static Matrix32 Rotation(float radians)
 		{
-			Vector2 cs = Mathf.CosSin(radians);
+			var cs = Mathf.CosSin(radians);
 			Matrix32 m;
 			m.U.X = cs.X;
 			m.U.Y = cs.Y;
@@ -75,7 +75,7 @@ namespace Lime
 		/// </summary>
 		public static Matrix32 Scaling(Vector2 scaling)
 		{
-			Matrix32 m = Identity;
+			var m = Identity;
 			m.U.X = scaling.X;
 			m.V.Y = scaling.Y;
 			return m;
@@ -94,7 +94,7 @@ namespace Lime
 		/// </summary>
 		public static Matrix32 Translation(Vector2 translation)
 		{
-			Matrix32 m = Identity;
+			var m = Identity;
 			m.T = translation;
 			return m;
 		}
@@ -114,7 +114,7 @@ namespace Lime
 		/// <param name="rotation">Rotation (in radians).</param>
 		public static Matrix32 Transformation(Vector2 center, Vector2 scaling, float rotation, Vector2 translation)
 		{
-			Vector2 cs = Mathf.CosSin(rotation);
+			var cs = Mathf.CosSin(rotation);
 			Matrix32 m;
 			m.U.X = scaling.X * cs.X;
 			m.U.Y = scaling.X * cs.Y;
