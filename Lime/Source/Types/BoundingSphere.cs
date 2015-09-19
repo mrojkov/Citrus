@@ -18,8 +18,8 @@ namespace Lime
 
 		public BoundingSphere(Vector3 center, float radius)
 		{
-			this.Center = center;
-			this.Radius = radius;
+			Center = center;
+			Radius = radius;
 		}
 
 		/// <summary>
@@ -137,12 +137,12 @@ namespace Lime
 			// Page 218
 			float sqRadius = radius * radius;
 			foreach (var pt in points) {
-				Vector3 diff = (pt - center);
+				var diff = (pt - center);
 				float sqDist = diff.SquaredLength;
 				if (sqDist > sqRadius) {
 					float distance = (float)Math.Sqrt(sqDist);
-					Vector3 direction = diff / distance;
-					Vector3 G = center - radius * direction;
+					var direction = diff / distance;
+					var G = center - radius * direction;
 					center = (G + pt) / 2;
 					radius = (pt - center).Length;
 					sqRadius = radius * radius;
@@ -154,17 +154,17 @@ namespace Lime
 
 		public bool Equals(BoundingSphere other)
 		{
-			return this.Center == other.Center && this.Radius == other.Radius;
+			return Center == other.Center && Radius == other.Radius;
 		}
 
 		public override bool Equals(object obj)
 		{
-			return Equals((BoundingSphere)obj);
+			return obj is BoundingSphere && Equals((BoundingSphere)obj);
 		}
 
 		public override int GetHashCode()
 		{
-			return this.Center.GetHashCode() + this.Radius.GetHashCode();
+			return Center.GetHashCode() + Radius.GetHashCode();
 		}
 
 		/// <summary>
@@ -173,10 +173,16 @@ namespace Lime
 		/// </summary>
 		public BoundingSphere Transform(Matrix44 matrix)
 		{
-			BoundingSphere sphere = new BoundingSphere();
-			sphere.Center = matrix.TransformVector(this.Center);
-			sphere.Radius = this.Radius * ((float)Math.Sqrt((double)Math.Max(((matrix.M11 * matrix.M11) + (matrix.M12 * matrix.M12)) + (matrix.M13 * matrix.M13), Math.Max(((matrix.M21 * matrix.M21) + (matrix.M22 * matrix.M22)) + (matrix.M23 * matrix.M23), ((matrix.M31 * matrix.M31) + (matrix.M32 * matrix.M32)) + (matrix.M33 * matrix.M33)))));
-			return sphere;
+			return new BoundingSphere
+			{
+				Center = matrix.TransformVector(Center),
+				Radius =
+					Radius *
+					((float)
+						Math.Sqrt(Math.Max(((matrix.M11 * matrix.M11) + (matrix.M12 * matrix.M12)) + (matrix.M13 * matrix.M13),
+							Math.Max(((matrix.M21 * matrix.M21) + (matrix.M22 * matrix.M22)) + (matrix.M23 * matrix.M23),
+								((matrix.M31 * matrix.M31) + (matrix.M32 * matrix.M32)) + (matrix.M33 * matrix.M33)))))
+			};
 		}
 
 		public static bool operator ==(BoundingSphere a, BoundingSphere b)
