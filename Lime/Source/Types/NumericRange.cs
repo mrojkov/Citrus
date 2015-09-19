@@ -1,41 +1,33 @@
-using ProtoBuf;
+п»їusing ProtoBuf;
 using System;
 
 namespace Lime
 {
 	/// <summary>
-	/// Представляет среднее значение и дисперсию. Используется для создания хаотичных значений
+	/// Representation of numeric range of numbers around median.
 	/// </summary>
 	[System.Diagnostics.DebuggerStepThrough]
 	[ProtoContract]
 	public struct NumericRange : IEquatable<NumericRange>
 	{
-		/// <summary>
-		/// Среднее значение
-		/// </summary>
 		[ProtoMember(1)]
 		public float Median;
 
 		/// <summary>
-		/// Отклонение от среднего значения
+		/// Variation of numbers around median.
 		/// </summary>
 		[ProtoMember(2)]
 		public float Dispersion;
 
-		/// <summary>
-		/// Конструктор
-		/// </summary>
-		/// <param name="median">Среднее значение</param>
-		/// <param name="variation">Отклонение от среднего значения</param>
 		public NumericRange(float median, float variation)
 		{
 			Median = median;
 			Dispersion = variation;
 		}
 
+		// BUG (in code or in documentation): Result can be greater than median.
 		/// <summary>
-		/// Возвращает случайное число, полученное с учетом среднего значения и дисперсии
-		/// Результат не может быть меньше среднего значения
+		/// Returns random number from this range. Result is always lesser than median.
 		/// </summary>
 		public float NormalRandomNumber()
 		{
@@ -48,7 +40,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Возвращает случайное число, полученное с учетом среднего значения и дисперсии
+		/// Returns random number from this range.
 		/// </summary>
 		public float UniformRandomNumber()
 		{
