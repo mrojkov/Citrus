@@ -34,7 +34,7 @@ namespace Lime
 			return Mathf.NormalRandom(Median, Dispersion);
 		}
 
-		public float NormalRandomNumber(System.Random rng)
+		public float NormalRandomNumber(Random rng)
 		{
 			return rng.NormalRandom(Median, Dispersion);
 		}
@@ -47,19 +47,19 @@ namespace Lime
 			return Mathf.UniformRandom(Median, Dispersion);
 		}
 
-		public float UniformRandomNumber(System.Random rng)
+		public float UniformRandomNumber(Random rng)
 		{
 			return rng.UniformRandom(Median, Dispersion);
 		}
 
-		bool IEquatable<NumericRange>.Equals(NumericRange rhs)
+		public bool Equals(NumericRange rhs)
 		{
 			return Median == rhs.Median && Dispersion == rhs.Dispersion;
 		}
 
 		public override string ToString()
 		{
-			return String.Format("{0}, {1}", Median, Dispersion);
+			return string.Format("{0}, {1}", Median, Dispersion);
 		}
 	}
 }
