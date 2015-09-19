@@ -209,9 +209,9 @@ namespace Lime
 		public static Matrix32 Lerp(float t, Matrix32 a, Matrix32 b)
 		{
 			Matrix32 r;
-			r.T = a.T + (b.T - a.T) * t;
-			r.U = a.U + (b.U - a.U) * t;
-			r.V = a.V + (b.V - a.V) * t;
+			r.T = Mathf.Lerp(t, a.T, b.T);
+			r.U = Mathf.Lerp(t, a.U, b.U);
+			r.V = Mathf.Lerp(t, a.V, b.V);
 			return r;
 		}
 
@@ -222,7 +222,7 @@ namespace Lime
 		/// <seealso cref="Identity"/>
 		public bool IsIdentity()
 		{
-			return T.X == 0 && T.Y == 0 && U.X == 1 && U.Y == 0 && V.X == 0 && V.Y == 1;
+			return Equals(Identity);
 		}
 
 		public override string ToString()
