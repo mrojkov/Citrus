@@ -203,16 +203,16 @@ namespace Lime
 		/// Creates a new <see cref="Matrix32"/> that contains 
 		/// linear interpolation of the specified matrixes.
 		/// </summary>
-		/// <param name="t">Weighting value(between 0.0 and 1.0).</param>
-		/// <param name="a">The first matrix.</param>
-		/// <param name="b">The second matrix.</param>
-		public static Matrix32 Lerp(float t, Matrix32 a, Matrix32 b)
+		/// <param name="amount">Weighting value(between 0.0 and 1.0).</param>
+		/// <param name="value1">The first matrix.</param>
+		/// <param name="value2">The second matrix.</param>
+		public static Matrix32 Lerp(float amount, Matrix32 value1, Matrix32 value2)
 		{
-			Matrix32 r;
-			r.T = Mathf.Lerp(t, a.T, b.T);
-			r.U = Mathf.Lerp(t, a.U, b.U);
-			r.V = Mathf.Lerp(t, a.V, b.V);
-			return r;
+			Matrix32 result;
+			result.T = Mathf.Lerp(amount, value1.T, value2.T);
+			result.U = Mathf.Lerp(amount, value1.U, value2.U);
+			result.V = Mathf.Lerp(amount, value1.V, value2.V);
+			return result;
 		}
 
 		// TODO: Transform to a property?
