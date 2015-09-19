@@ -4,6 +4,9 @@ using ProtoBuf;
 
 namespace Lime
 {
+	/// <summary>
+	/// Representation of solid sphere.
+	/// </summary>
 	[ProtoContract]
 	public struct BoundingSphere : IEquatable<BoundingSphere>
 	{
@@ -19,6 +22,9 @@ namespace Lime
 			this.Radius = radius;
 		}
 
+		/// <summary>
+		/// Test if a sphere is fully inside, outside, or just intersecting the sphere. 
+		/// </summary>
 		public ContainmentType Contains(BoundingSphere sphere)
 		{
 			ContainmentType result;
@@ -26,6 +32,9 @@ namespace Lime
 			return result;
 		}
 
+		/// <summary>
+		/// Test if a sphere is fully inside, outside, or just intersecting the sphere. 
+		/// </summary>
 		public void Contains(ref BoundingSphere sphere, out ContainmentType result)
 		{
 			var sqDistance = (sphere.Center - Center).SquaredLength;
@@ -38,6 +47,9 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Test if a vector is fully inside, outside, or just intersecting the sphere. 
+		/// </summary>
 		public ContainmentType Contains(Vector3 point)
 		{
 			ContainmentType result;
@@ -45,6 +57,9 @@ namespace Lime
 			return result;
 		}
 
+		/// <summary>
+		/// Test if a vector is fully inside, outside, or just intersecting the sphere. 
+		/// </summary>
 		public void Contains(ref Vector3 point, out ContainmentType result)
 		{
 			float sqRadius = Radius * Radius;
@@ -58,6 +73,9 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Creates the smallest sphere that can contain a specified list of points. 
+		/// </summary>
 		public static BoundingSphere CreateFromPoints(IEnumerable<Vector3> points)
 		{
 			if (points == null) {
@@ -149,6 +167,10 @@ namespace Lime
 			return this.Center.GetHashCode() + this.Radius.GetHashCode();
 		}
 
+		/// <summary>
+		/// Creates a new sphere that contains a transformation of translation and scale 
+		/// from this sphere by the specified Matrix.
+		/// </summary>
 		public BoundingSphere Transform(Matrix44 matrix)
 		{
 			BoundingSphere sphere = new BoundingSphere();
