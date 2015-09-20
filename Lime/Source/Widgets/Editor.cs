@@ -9,12 +9,14 @@ namespace Lime
 	{
 		Widget CaretWidget { get; set; }
 		float BlinkInterval { get; set; }
+		bool FollowTextColor { get; set; }
 	}
 
 	public class CaretParams : ICaretParams
 	{
 		public Widget CaretWidget { get; set; }
 		public float BlinkInterval { get; set; }
+		public bool FollowTextColor { get; set; }
 
 		public CaretParams()
 		{
@@ -28,16 +30,7 @@ namespace Lime
 		{
 			Points.Add(Vector2.Zero);
 			Points.Add(Vector2.Down * text.FontHeight);
-			Tasks.Add(UpdateColor(text));
-		}
-
-		// Color of the text can be changed so we should copy it every frame
-		private IEnumerator<object> UpdateColor(Widget text)
-		{
-			while (true) {
-				Color = text.Color;
-				yield return 0;
-			}
+			Color = text.Color;
 		}
 	}
 
@@ -74,6 +67,9 @@ namespace Lime
 					time = 0f;
 				}
 				w.Visible = caretPos.IsVisible && blinkOn;
+				if (caretParams.FollowTextColor) {
+					caretParams.CaretWidget.Color = container.Color;
+				}
 				yield return null;
 			}
 		}
