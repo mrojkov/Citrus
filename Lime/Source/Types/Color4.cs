@@ -84,7 +84,7 @@ namespace Lime
 		}
 		
 		/// <summary>
-		/// Multiplies every component of color with it's alpha.
+		/// Multiplies every component of color with its alpha.
 		/// </summary>
 		public static Color4 PremulAlpha(Color4 color)
 		{
