@@ -12,7 +12,8 @@ namespace Lime
 	public delegate void UpdateHandler(float delta);
 
 	/// <summary>
-	/// Базовый класс для всех объектов сцены. Представляет собой контейнер, в который может быть добавлен любой объект
+	/// Representation of container that can contain other nodes.
+	/// Base class for every object in scene.
 	/// </summary>
 	[ProtoContract]
 	[ProtoInclude(101, typeof(Widget))]
@@ -39,7 +40,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Генерируется при завершении анимации (например достигнут маркер типа Stop). После генерации сбрасывается в null.
+		/// Is invoked when current animation has been stopped (e.g. "Stop" marker has been hit).
+		/// After invocation is set to null.
 		/// </summary>
 		public event Action AnimationStopped
 		{
@@ -47,6 +49,9 @@ namespace Lime
 			remove { DefaultAnimation.Stopped -= value; }
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		internal protected bool GlobalValuesValid;
 
 		#region properties
@@ -55,61 +60,81 @@ namespace Lime
 #endif
 	
 		/// <summary>
-		/// Название виджета, назначенное ему в HotStudio. Может быть null
+		/// Name of this node (that is usually set via HotStudio).
 		/// </summary>
 		[ProtoMember(1)]
 		public string Id { get; set; }
 
+		/// <summary>
+		/// Relative (to HotStudio project root folder) path 
+		/// to source of this node, e.g. "Shell/GameScreen".
+		/// </summary>
 		[ProtoMember(2)]
 		public string ContentsPath { get; set; }
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		[Trigger]
 		public string Trigger { get; set; }
 
 		/// <summary>
-		/// Родительский объект (в его контейнере находится этот объект)
+		/// Node, that contains this node.
 		/// </summary>
 		public Node Parent { get; internal set; }
 
 		/// <summary>
-		/// Преобразует этот объект в объект типа Widget. Если это не Widget, возвращает null (аналогично return this as Widget)
+		/// Returns this node as Widget if it's Widget, null otherwise (just like "as" cast).
 		/// </summary>
 		public Widget AsWidget { get; internal set; }
 
+		/// <summary>
+		/// Returns this node as ModelNode if it's ModelNode, null otherwise (just like "as" cast).
+		/// </summary>
 		public ModelNode AsModelNode { get; internal set; }
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		internal Node NextToRender;
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public Node NextSibling;
 
 		/// <summary>
+		/// TODO: Translate
 		/// Позволяет вручную задать Z-order (порядок отрисовки). 0 - по умолчанию, 1 - самый нижний слой, 99 - самый верхний слой
 		/// </summary>
 		public int Layer { get; set; }
 
 		/// <summary>
+		/// TODO: Translate
 		/// Аниматоры, изменяющие анимированные параметры объекта в время обновления
 		/// </summary>
 		[ProtoMember(5)]
 		public AnimatorCollection Animators;
 
 		/// <summary>
-		/// Список дочерних объектов (объектов, находящихся в контейнере этого объекта)
+		/// Contains all child nodes (for all descendants use Descendants).
 		/// </summary>
 		[ProtoMember(6)]
 		public NodeList Nodes;
 
 		/// <summary>
-		/// Маркеры анимации
+		/// Returns markers of default animation.
 		/// </summary>
 		public MarkerCollection Markers { get { return DefaultAnimation.Markers; } }
 
 		/// <summary>
+		/// TODO: Translate
 		/// Возвращает true, если проигрывается анимация
 		/// </summary>
 		public bool IsRunning { get { return DefaultAnimation.IsRunning; } set { DefaultAnimation.IsRunning = value; } }
 
 		/// <summary>
+		/// TODO: Translate
 		/// Возвращает true, если в данный момент анимация не проигрывается (например анимация не была запущена или доигралась до конца)
 		/// </summary>
 		public bool IsStopped {
@@ -118,6 +143,7 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// TODO: Translate
 		/// Время текущего кадра анимации (в миллисекундах)
 		/// </summary>
 		public int AnimationTime
@@ -126,6 +152,10 @@ namespace Lime
 			set { DefaultAnimation.Time = value; }
 		}
 
+		/// <summary>
+		/// Returns first animation in animation list 
+		/// (or creates an empty animation if list is empty).
+		/// </summary>
 		public Animation DefaultAnimation
 		{
 			get
@@ -136,11 +166,9 @@ namespace Lime
 				return Animations[0];
 			}
 		}
-		
+
 		/// <summary>
-		/// Пользовательские данные (аналогично UserData)
-		/// Если сцена загружена из внешнего файла, то здесь будет храниться путь к этой сцене (внешние сцены)
-		/// Отличие от UserData в том, что Tag можно задавать из HotStudio, а UserData нет
+		/// Custom data. Can be set via HotStudio (this way it will contain path to external scene).
 		/// </summary>
 		[ProtoMember(11)]
 		public string Tag { get; set; }
@@ -149,6 +177,7 @@ namespace Lime
 		public AnimationList Animations;
 
 		/// <summary>
+		/// TODO: Translate
 		/// Название текущей анимации. Название берется из названия маркера Play.
 		/// Если анимация остановилась, это свойство не изменится
 		/// </summary>
@@ -159,17 +188,23 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Множитель скорости анимации
+		/// Animation speed multiplier.
 		/// </summary>
 		public float AnimationSpeed { get; set; }
 
 		/// <summary>
-		/// Пользовательские данные (аналогично Tag)
+		/// Custom data. Can only be set programmatically.
 		/// </summary>
 		public object UserData { get; set; }
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		protected DirtyFlags DirtyMask;
 		
+		/// <summary>
+		/// TODO
+		/// </summary>
 		protected bool IsDirty(DirtyFlags mask) { return (DirtyMask & mask) != 0; }
 
 		#endregion
@@ -188,6 +223,7 @@ namespace Lime
 			++CreatedCount;
 		}
 
+		// TODO: foreach?
 		public virtual void Dispose()
 		{
 			for (var n = Nodes.FirstOrNull(); n != null; n = n.NextSibling) {
@@ -196,6 +232,9 @@ namespace Lime
 			Nodes.Clear();
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		protected internal void PropagateDirtyFlags(DirtyFlags mask = DirtyFlags.All)
 		{
 			if ((DirtyMask & mask) == mask)
@@ -208,6 +247,9 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		protected void RecalcDirtyGlobals()
 		{
 			if (DirtyMask == DirtyFlags.None) {
@@ -220,6 +262,9 @@ namespace Lime
 			DirtyMask = DirtyFlags.None;
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		protected virtual void RecalcDirtyGlobalsUsingParents() { }
 
 #if LIME_COUNT_NODES
@@ -229,7 +274,7 @@ namespace Lime
 #endif
 
 		/// <summary>
-		/// Возвращает самый верхний объект в иерархии этого объекта
+		/// Returns the topmost node of hierarchy that contains this node.
 		/// </summary>
 		public Node GetRoot()
 		{
@@ -240,6 +285,9 @@ namespace Lime
 			return node;
 		}
 
+		/// <summary>
+		/// Returns true if provided node contatins this node in its descendants.
+		/// </summary>
 		public bool ChildOf(Node node)
 		{
 			for (Node n = Parent; n != null; n = n.Parent) {
@@ -250,6 +298,7 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// TODO: Translate
 		/// Запускает анимацию и возвращает true. Если такой анимации нет, возвращает false
 		/// </summary>
 		/// <param name="markerId">Название маркера анимации</param>
@@ -259,6 +308,7 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// TODO: Translate
 		/// Запускает анимацию. Если такой анимации нет, генерирует исключение
 		/// </summary>
 		/// <param name="markerId">Название маркера анимации</param>
@@ -269,6 +319,7 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// TODO: Translate
 		/// Текущий кадр анимации
 		/// </summary>
 		public int AnimationFrame {
@@ -277,7 +328,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Медленное, но безопасное клонирование. Эта функция основана на сериализации protobuf-net
+		/// Slow, but safe way to clone node. This function is based on ProtoBuf.
 		/// </summary>
 		public Node DeepCloneSafe()
 		{
@@ -285,7 +336,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Медленное, но безопасное клонирование. Эта функция основана на сериализации protobuf-net
+		/// Slow, but safe way to clone node. This function is based on ProtoBuf.
 		/// </summary>
 		public T DeepCloneSafe<T>() where T : Node
 		{
@@ -293,6 +344,7 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// TODO: Translate
 		/// Используйте для быстрого клонирования с сохранением иерархии для неанимированных объектов.
 		/// Функция основана на MemberwiseClone().
 		/// Свойства Animators, Markers, SkinningWeights будут общими у клона и оригинала
@@ -312,6 +364,7 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// TODO: Translate
 		/// Используйте для быстрого клонирования с сохранением иерархии для неанимированных объектов.
 		/// Функция основана на MemberwiseClone().
 		/// Свойства Animators, Markers, SkinningWeights будут общими у клона и оригинала
@@ -321,11 +374,17 @@ namespace Lime
 			return (T)DeepCloneFast();
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		public override string ToString()
 		{
 			return string.Format("{0}, \"{1}\", {2}", GetType().Name, Id ?? "", GetHierarchyPath());
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		private string GetHierarchyPath()
 		{
 			string r = string.IsNullOrEmpty(Id) ? String.Format("[{0}]", GetType().Name) : Id;
@@ -339,9 +398,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Удаляет этот объект из контейнера родителя. Если Parent == null, сгенерирует исключение
+		/// Removes this node from parent node.
 		/// </summary>
-		/// <exception cref="Lime.Exception"/>
 		public void Unlink()
 		{
 			if (Parent != null) {
@@ -349,11 +407,6 @@ namespace Lime
 			}
 		}
 
-		/// <summary>
-		/// Вызывает Unlink и Dispose
-		/// Если Parent == null, сгенерирует исключение
-		/// </summary>
-		/// <exception cref="Lime.Exception"/>
 		public void UnlinkAndDispose()
 		{
 			Unlink();
@@ -361,10 +414,10 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Обновляет состояние объекта (обновляет его анимации, генерирует события и. т.д.).
-		/// Вызывает Update для всех дочерних виджетов. В нормальных условиях этот метод должен вызываться 1 раз за кадр.
+		/// Advances animations of this node and calls Update of all its children.
+		/// Usually called once a frame.
 		/// </summary>
-		/// <param name="delta">Количество секунд, прошедшее с момента предыдущего вызова Update</param>
+		/// <param name="delta">Time delta from last Update.</param>
 		public virtual void Update(float delta)
 		{
 			delta *= AnimationSpeed;
@@ -378,14 +431,20 @@ namespace Lime
 			SelfLateUpdate(delta);
 		}
 
+		/// <summary>
+		/// Called before updating child nodes.
+		/// </summary>
 		protected virtual void SelfUpdate(float delta) { }
 
+		/// <summary>
+		/// Called after updating child nodes.
+		/// </summary>
 		protected virtual void SelfLateUpdate(float delta) { }
 
 		public virtual void Render() {}
 
 		/// <summary>
-		/// Добавляет виджет и все его дочерние виджеты в очередь отрисовки
+		/// Adds this node and all its descendants nodes to render chain.
 		/// </summary>
 		public virtual void AddToRenderChain(RenderChain chain)
 		{
@@ -394,6 +453,9 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		protected internal virtual void OnTrigger(string property)
 		{
 			if (property != "Trigger") {
@@ -408,50 +470,47 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Добавляет указанный объект в контейнер этого объекта. Добавляемый объект будет на самом нижнем слое (будет закрыт объектами сверху).
-		/// Добавляемый объект не должен находится в чьем-либо контейнере
-		/// (проверяйте свойство Parent == null и используйте метод Unlink, чтобы удалить его из контейнера)
+		/// Adds provided node to the lowermost layer of this node (i.e. it will be covered 
+		/// by other nodes). Provided node shouldn't belong to any node (check for Parent == null 
+		/// and use Unlink if needed).
 		/// </summary>
-		/// <exception cref="Lime.Exception"/>
 		public void AddNode(Node node)
 		{
 			Nodes.Add(node);
 		}
 
-		/// <summary>
-		/// Добавляет этот объект в контейнер указанного объекта. Добавляемый объект будет на самом нижнем слое (будет закрыт объектами сверху).
-		/// Объект не должен находится в чьем-либо контейнере
-		/// (проверяйте свойство Parent == null и используйте метод Unlink, чтобы удалить этот объект из контейнера)
+		/// <summary> 
+		/// Adds this node to the lowermost layer of provided node (i.e. it will be covered 
+		/// by other nodes). This node shouldn't belong to any node (check for Parent == null 
+		/// and use Unlink if needed).
 		/// </summary>
-		/// <exception cref="Lime.Exception"/>
 		public void AddToNode(Node node)
 		{
 			node.Nodes.Add(this);
 		}
 
-		/// <summary>
-		/// Добавляет указанный объект в контейнер этого объекта. Добавляемый объект будет на самом верхнем слое (будет над всеми объектами).
-		/// Добавляемый объект не должен находится в чьем-либо контейнере
-		/// (проверяйте свойство Parent == null и используйте метод Unlink, чтобы удалить его из контейнера)
+		/// <summary> 
+		/// Adds provided node to the topmost layer of this node (i.e. it will be covered 
+		/// by other nodes). Provided node shouldn't belong to any node (check for Parent == null 
+		/// and use Unlink if needed).
 		/// </summary>
-		/// <exception cref="Lime.Exception"/>
 		public void PushNode(Node node)
 		{
 			Nodes.Push(node);
 		}
 
 		/// <summary>
-		/// Добавляет этот объект в контейнер указанного объекта на самый верхний слой (будет над всеми объектами).
-		/// Объект не должен находится в чьем-либо контейнере
-		/// (проверяйте свойство Parent == null и используйте метод Unlink, чтобы удалить этот объект из контейнера)
+		/// Adds this node to the topmost layer of provided node (i.e. it will be covered 
+		/// by other nodes). This node shouldn't belong to any node (check for Parent == null 
+		/// and use Unlink if needed).
 		/// </summary>
-		/// <exception cref="Lime.Exception"/>
 		public void PushToNode(Node node)
 		{
 			node.Nodes.Push(this);
 		}
 
 		/// <summary>
+		/// TODO: Translate
 		/// Ищет дочерний объект (рекурсивно). Если такого объекта нет, генерирует исключение
 		/// </summary>
 		/// <typeparam name="T">Тип искомого объекта</typeparam>
@@ -467,6 +526,7 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// TODO: Translate
 		/// Ищет дочерний объект (рекурсивно). Если такого объекта нет, генерирует исключение
 		/// </summary>
 		/// <typeparam name="T">Тип искомого объекта</typeparam>
@@ -477,6 +537,7 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// TODO: Translate
 		/// Ищет дочерний объект (рекурсивно). Если такого объекта нет, возвращает false
 		/// </summary>
 		/// <typeparam name="T">Тип искомого объекта</typeparam>
@@ -489,6 +550,7 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// TODO: Translate
 		/// Ищет дочерний объект (рекурсивно). Если такого объекта нет, возвращает null
 		/// </summary>
 		/// <typeparam name="T">Тип искомого объекта</typeparam>
@@ -499,6 +561,7 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// TODO: Translate
 		/// Ищет дочерний объект (рекурсивно). Если такого объекта нет, возвращает null
 		/// </summary>
 		/// <typeparam name="T">Тип искомого объекта</typeparam>
@@ -508,6 +571,7 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// TODO: Translate
 		/// Ищет дочерний объект (рекурсивно). Если такого объекта нет, генерирует исключение
 		/// </summary>
 		/// <param name="path">Путь к виджету или Id, (пример пути: Root/Human/Head/Eye, где Eye - Id искомого виджета)</param>
@@ -522,6 +586,7 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// TODO: Translate
 		/// Ищет дочерний объект (рекурсивно). Если такого объекта нет, возвращает null
 		/// </summary>
 		/// <param name="path">Путь к виджету или Id, (пример пути: Root/Human/Head/Eye, где Eye - Id искомого виджета)</param>
@@ -535,6 +600,7 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// TODO: Translate
 		/// Ищет дочерний объект по его пути. Если такого объекта нет, возвращает null
 		/// </summary>
 		/// <param name="path">Путь к виджету, (пример пути: Root/Human/Head/Eye, где Eye - Id искомого виджета)</param>
@@ -550,7 +616,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Перечисляет все объекты, входящие в контейнер этого и объекта и дочерних объектов
+		/// Enumerates all nodes (except this one) of hierarchy inside this node.
 		/// </summary>
 		public IEnumerable<Node> Descendants
 		{
@@ -566,6 +632,7 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// TODO: Translate
 		/// Этот метод масштабирует позицию и размер данного нода и всех его потомков.
 		/// Метод полезен для адаптирования сцены под экраны с нестандартным DPI.
 		/// Если позиция или размер виджета анинимированы, то ключи анимации также подвергаются соответствующему
@@ -581,9 +648,15 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		[ThreadStatic]
 		private static Queue<Node> nodeSearchQueue;
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		private Node TryFindNodeById(string id)
 		{
 			if (nodeSearchQueue == null) {
@@ -606,9 +679,9 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Продвигает анимацию на указанное время
+		/// Advances animation by provided delta.
 		/// </summary>
-		/// <param name="delta">Время в секундах</param>
+		/// <param name="delta">Time delta (in seconds).</param>
 		public void AdvanceAnimation(float delta)
 		{
 			for (var i = 0; i < Animations.Count; i++) {
@@ -620,7 +693,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Загружает шрифты, текстуры и аниматоры для себя и всех дочерних объектов
+		/// Loads all textures, fonts and animators for this node and for all its descendants.
 		/// </summary>
 		public void PreloadAssets()
 		{
@@ -669,6 +742,9 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		protected void LoadContent()
 		{
 			if (!string.IsNullOrEmpty(ContentsPath)) {
@@ -680,6 +756,9 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		private void LoadContentHelper()
 		{
 			Nodes.Clear();
@@ -702,6 +781,9 @@ namespace Lime
 
 		private static readonly string[] sceneExtensions = new[] { ".scene", ".model" };
 
+		/// <summary>
+		/// TODO
+		/// </summary>
 		internal static string ResolveScenePath(string path)
 		{
 			var candidates = sceneExtensions.Select(ext => Path.ChangeExtension(path, ext)).Where(AssetsBundle.Instance.FileExists);
