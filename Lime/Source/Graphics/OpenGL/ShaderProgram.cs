@@ -91,7 +91,7 @@ namespace Lime
 		{
 			GL.LinkProgram(handle);
 			var result = new int[1];
-			GL.GetProgram(handle, ProgramParameter.LinkStatus, result);
+			GL.GetProgram(handle, GetProgramParameterName.LinkStatus, result);
 			if (result[0] == 0) {
 				var infoLog = GetLinkLog();
 				Logger.Write("Shader program link log:\n{0}", infoLog);
@@ -120,7 +120,7 @@ namespace Lime
 		private string GetLinkLog()
 		{
 			var logLength = new int[1];
-			GL.GetProgram(handle, ProgramParameter.InfoLogLength, logLength);
+			GL.GetProgram(handle, GetProgramParameterName.InfoLogLength, logLength);
 			if (logLength[0] > 0) {
 				var infoLog = new System.Text.StringBuilder(logLength[0]);
 				unsafe {
