@@ -12,8 +12,7 @@ namespace Lime
 	public delegate void UpdateHandler(float delta);
 
 	/// <summary>
-	/// Representation of container that can contain other nodes.
-	/// Base class for every object in scene.
+	/// Scene tree element.
 	/// </summary>
 	[ProtoContract]
 	[ProtoInclude(101, typeof(Widget))]
@@ -32,16 +31,16 @@ namespace Lime
 		[Flags]
 		protected internal enum DirtyFlags
 		{
-			None			= 0,
-			Visible			= 1 << 0,
-			Color			= 1 << 1,
-			Transform		= 1 << 2,
-			All				= ~None
+			None      = 0,
+			Visible   = 1 << 0,
+			Color     = 1 << 1,
+			Transform = 1 << 2,
+			All       = ~None
 		}
 
 		/// <summary>
-		/// Is invoked when current animation has been stopped (e.g. "Stop" marker has been hit).
-		/// After invocation is set to null.
+		/// Is invoked after default animation has been stopped (e.g. hit "Stop" marker).
+		/// Note: DefaultAnimation.Stopped will be set to null after invocation.
 		/// </summary>
 		public event Action AnimationStopped
 		{
@@ -58,15 +57,16 @@ namespace Lime
 #if WIN
 		public Guid Guid { get; set; }
 #endif
-	
+
 		/// <summary>
-		/// Name of this node (that is usually set via HotStudio).
+		/// Name field in HotStudio.
+		/// May be non-unique.
 		/// </summary>
 		[ProtoMember(1)]
 		public string Id { get; set; }
 
 		/// <summary>
-		/// Relative (to HotStudio project root folder) path 
+		/// Relative (to HotStudio project root folder) path
 		/// to source of this node, e.g. "Shell/GameScreen".
 		/// </summary>
 		[ProtoMember(2)]
@@ -78,19 +78,10 @@ namespace Lime
 		[Trigger]
 		public string Trigger { get; set; }
 
-		/// <summary>
-		/// Node, that contains this node.
-		/// </summary>
 		public Node Parent { get; internal set; }
 
-		/// <summary>
-		/// Returns this node as Widget if it's Widget, null otherwise (just like "as" cast).
-		/// </summary>
 		public Widget AsWidget { get; internal set; }
 
-		/// <summary>
-		/// Returns this node as ModelNode if it's ModelNode, null otherwise (just like "as" cast).
-		/// </summary>
 		public ModelNode AsModelNode { get; internal set; }
 
 		/// <summary>
@@ -117,13 +108,14 @@ namespace Lime
 		public AnimatorCollection Animators;
 
 		/// <summary>
-		/// Contains all child nodes (for all descendants use Descendants).
+		/// Child nodes.
+		/// For enumerating all descendants use Descendants.
 		/// </summary>
 		[ProtoMember(6)]
 		public NodeList Nodes;
 
 		/// <summary>
-		/// Returns markers of default animation.
+		/// Markers of default animation.
 		/// </summary>
 		public MarkerCollection Markers { get { return DefaultAnimation.Markers; } }
 
@@ -138,8 +130,8 @@ namespace Lime
 		/// Возвращает true, если в данный момент анимация не проигрывается (например анимация не была запущена или доигралась до конца)
 		/// </summary>
 		public bool IsStopped {
-			get { return !IsRunning; } 
-			set { IsRunning = !value; } 
+			get { return !IsRunning; }
+			set { IsRunning = !value; }
 		}
 
 		/// <summary>
@@ -153,7 +145,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Returns first animation in animation list 
+		/// Returns first animation in animation list
 		/// (or creates an empty animation if list is empty).
 		/// </summary>
 		public Animation DefaultAnimation
@@ -201,7 +193,7 @@ namespace Lime
 		/// TODO
 		/// </summary>
 		protected DirtyFlags DirtyMask;
-		
+
 		/// <summary>
 		/// TODO
 		/// </summary>
@@ -223,7 +215,6 @@ namespace Lime
 			++CreatedCount;
 		}
 
-		// TODO: foreach?
 		public virtual void Dispose()
 		{
 			for (var n = Nodes.FirstOrNull(); n != null; n = n.NextSibling) {
@@ -273,9 +264,6 @@ namespace Lime
 		}
 #endif
 
-		/// <summary>
-		/// Returns the topmost node of hierarchy that contains this node.
-		/// </summary>
 		public Node GetRoot()
 		{
 			Node node = this;
@@ -286,7 +274,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Returns true if provided node contatins this node in its descendants.
+		/// Returns true if this node is a descendant of provided node.
+		/// TODO: rename to DescendantOf?
 		/// </summary>
 		public bool ChildOf(Node node)
 		{
@@ -444,7 +433,7 @@ namespace Lime
 		public virtual void Render() {}
 
 		/// <summary>
-		/// Adds this node and all its descendants nodes to render chain.
+		/// Adds this node and all its descendant nodes to render chain.
 		/// </summary>
 		public virtual void AddToRenderChain(RenderChain chain)
 		{
@@ -470,8 +459,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Adds provided node to the lowermost layer of this node (i.e. it will be covered 
-		/// by other nodes). Provided node shouldn't belong to any node (check for Parent == null 
+		/// Adds provided node to the lowermost layer of this node (i.e. it will be covered
+		/// by other nodes). Provided node shouldn't belong to any node (check for Parent == null
 		/// and use Unlink if needed).
 		/// </summary>
 		public void AddNode(Node node)
@@ -479,9 +468,9 @@ namespace Lime
 			Nodes.Add(node);
 		}
 
-		/// <summary> 
-		/// Adds this node to the lowermost layer of provided node (i.e. it will be covered 
-		/// by other nodes). This node shouldn't belong to any node (check for Parent == null 
+		/// <summary>
+		/// Adds this node to the lowermost layer of provided node (i.e. it will be covered
+		/// by other nodes). This node shouldn't belong to any node (check for Parent == null
 		/// and use Unlink if needed).
 		/// </summary>
 		public void AddToNode(Node node)
@@ -489,9 +478,9 @@ namespace Lime
 			node.Nodes.Add(this);
 		}
 
-		/// <summary> 
-		/// Adds provided node to the topmost layer of this node (i.e. it will be covered 
-		/// by other nodes). Provided node shouldn't belong to any node (check for Parent == null 
+		/// <summary>
+		/// Adds provided node to the topmost layer of this node (i.e. it will cover
+		/// other nodes). Provided node shouldn't belong to any node (check for Parent == null
 		/// and use Unlink if needed).
 		/// </summary>
 		public void PushNode(Node node)
@@ -500,8 +489,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Adds this node to the topmost layer of provided node (i.e. it will be covered 
-		/// by other nodes). This node shouldn't belong to any node (check for Parent == null 
+		/// Adds this node to the topmost layer of provided node (i.e. it will cover
+		/// other nodes). This node shouldn't belong to any node (check for Parent == null
 		/// and use Unlink if needed).
 		/// </summary>
 		public void PushToNode(Node node)

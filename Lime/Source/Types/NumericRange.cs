@@ -13,16 +13,13 @@ namespace Lime
 		[ProtoMember(1)]
 		public float Median;
 
-		/// <summary>
-		/// Variation of numbers around median.
-		/// </summary>
 		[ProtoMember(2)]
 		public float Dispersion;
 
-		public NumericRange(float median, float variation)
+		public NumericRange(float median, float dispersion)
 		{
 			Median = median;
-			Dispersion = variation;
+			Dispersion = dispersion;
 		}
 
 		// BUG (in code or in documentation): Result can be greater than median.
