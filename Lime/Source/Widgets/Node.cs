@@ -49,7 +49,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO
+		/// TODO: Add summary
 		/// </summary>
 		internal protected bool GlobalValuesValid;
 
@@ -73,7 +73,7 @@ namespace Lime
 		public string ContentsPath { get; set; }
 
 		/// <summary>
-		/// TODO
+		/// TODO: Add summary
 		/// </summary>
 		[Trigger]
 		public string Trigger { get; set; }
@@ -85,12 +85,12 @@ namespace Lime
 		public ModelNode AsModelNode { get; internal set; }
 
 		/// <summary>
-		/// TODO
+		/// TODO: Add summary
 		/// </summary>
 		internal Node NextToRender;
 
 		/// <summary>
-		/// TODO
+		/// TODO: Add summary
 		/// </summary>
 		public Node NextSibling;
 
@@ -190,12 +190,12 @@ namespace Lime
 		public object UserData { get; set; }
 
 		/// <summary>
-		/// TODO
+		/// TODO: Add summary
 		/// </summary>
 		protected DirtyFlags DirtyMask;
 
 		/// <summary>
-		/// TODO
+		/// TODO: Add summary
 		/// </summary>
 		protected bool IsDirty(DirtyFlags mask) { return (DirtyMask & mask) != 0; }
 
@@ -224,7 +224,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO
+		/// TODO: Add summary
 		/// </summary>
 		protected internal void PropagateDirtyFlags(DirtyFlags mask = DirtyFlags.All)
 		{
@@ -239,7 +239,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO
+		/// TODO: Add summary
 		/// </summary>
 		protected void RecalcDirtyGlobals()
 		{
@@ -254,7 +254,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO
+		/// TODO: Add summary
 		/// </summary>
 		protected virtual void RecalcDirtyGlobalsUsingParents() { }
 
@@ -364,7 +364,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO
+		/// TODO: Add summary
 		/// </summary>
 		public override string ToString()
 		{
@@ -372,7 +372,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO
+		/// TODO: Add summary
 		/// </summary>
 		private string GetHierarchyPath()
 		{
@@ -443,7 +443,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO
+		/// TODO: Add summary
 		/// </summary>
 		protected internal virtual void OnTrigger(string property)
 		{
@@ -638,13 +638,13 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO
+		/// TODO: Add summary
 		/// </summary>
 		[ThreadStatic]
 		private static Queue<Node> nodeSearchQueue;
 
 		/// <summary>
-		/// TODO
+		/// TODO: Add summary
 		/// </summary>
 		private Node TryFindNodeById(string id)
 		{
@@ -732,7 +732,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO
+		/// TODO: Add summary
 		/// </summary>
 		protected void LoadContent()
 		{
@@ -746,7 +746,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO
+		/// TODO: Add summary
 		/// </summary>
 		private void LoadContentHelper()
 		{
@@ -771,7 +771,7 @@ namespace Lime
 		private static readonly string[] sceneExtensions = new[] { ".scene", ".model" };
 
 		/// <summary>
-		/// TODO
+		/// TODO: Add summary
 		/// </summary>
 		internal static string ResolveScenePath(string path)
 		{
