@@ -129,6 +129,9 @@ namespace Lime
 			app.CurrentDeviceOrientation = orientation;
 			app.OnDeviceRotate();
 			base.OnResize(e);
+			// RenderFrame once in case of Pause() has been called and
+			// there is another view overlaying this view. (e.g. Chartboost video)
+			RenderFrame();
 		}
 
 		public void ShowSoftKeyboard(bool show, string text)
