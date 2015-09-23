@@ -77,11 +77,15 @@ namespace Lime
 #if OPENGL
 			GL.Enable(EnableCap.DepthTest);
 			GL.Enable(EnableCap.CullFace);
+#elif UNITY
+			MaterialFactory.ThreeDimensionalRendering = true;
 #endif
 			chain.RenderAndClear();
 #if OPENGL
 			GL.Disable(EnableCap.DepthTest);
 			GL.Disable(EnableCap.CullFace);
+#elif UNITY
+			MaterialFactory.ThreeDimensionalRendering = false;
 #endif
 			Renderer.PopProjectionMatrix();
 		}

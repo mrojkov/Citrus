@@ -10,13 +10,16 @@ namespace Lime
 	{
 		static UnityEngine.Material flatMat;
 		static UnityEngine.Material diffuseMat;
+		static UnityEngine.Material diffuseMat3d;
 		static UnityEngine.Material imageCombinerMat;
 		static UnityEngine.Material silhuetteMat;
+		public static bool ThreeDimensionalRendering;
 
 		static MaterialFactory()
 		{
 			flatMat = new UnityEngine.Material(UnityEngine.Shader.Find("Flat"));
 			diffuseMat = new UnityEngine.Material(UnityEngine.Shader.Find("Diffuse"));
+			diffuseMat3d = new UnityEngine.Material(UnityEngine.Shader.Find("Diffuse3d"));
 			imageCombinerMat = new UnityEngine.Material(UnityEngine.Shader.Find("ImageCombiner"));
 			silhuetteMat = new UnityEngine.Material(UnityEngine.Shader.Find("Silhuette"));
 		}
@@ -30,7 +33,8 @@ namespace Lime
 				mat = silhuetteMat;
 				break;
 			default:
-				mat = texCount == 2 ? imageCombinerMat : (texCount == 1 ? diffuseMat : flatMat);
+				mat = texCount == 2 ? imageCombinerMat : (texCount == 1 ? 
+					(ThreeDimensionalRendering ? diffuseMat3d : diffuseMat) : flatMat);
 				break;
 			}
 			if (texture1 != null) {
