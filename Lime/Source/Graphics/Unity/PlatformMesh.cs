@@ -49,8 +49,9 @@ namespace Lime
 				int i = 0;
 				foreach (var v in mesh.Vertices) {
 					vertices[i].x = v.X; 
-					vertices[i++].y = v.Y;
-				}                                         
+					vertices[i].y = v.Y;
+					vertices[i++].z = v.Z;
+				}
 				unityMesh.vertices = vertices;
 			}
 			if (mesh.Colors != null && (dm & Mesh.Attributes.Color) != 0) {
