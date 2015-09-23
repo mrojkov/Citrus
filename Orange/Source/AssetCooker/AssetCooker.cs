@@ -690,7 +690,7 @@ namespace Orange
 		{
 			SyncUpdated(".dae", ".model", (srcPath, dstPath) => {
 				var rootNode = new Lime.Frame();
-				rootNode.AddNode(new ModelImporter(srcPath).RootNode);
+				rootNode.AddNode(new ModelImporter(srcPath, The.Workspace.ActivePlatform).RootNode);
 				Serialization.WriteObjectToBundle(assetsBundle, dstPath, rootNode);
 				return true;
 			});

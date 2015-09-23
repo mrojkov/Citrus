@@ -74,26 +74,22 @@ namespace Orange
 
 		private string path;
 		private Assimp.Scene aiScene;
+		private TargetPlatform platform;
 		private Dictionary<string, Assimp.Camera> aiCameras = new Dictionary<string, Assimp.Camera>();
 
 		public ModelNode RootNode { get; private set; }
 
-		public ModelImporter(string path)
+		public ModelImporter(string path, TargetPlatform platform)
 		{
 			this.path = path;
+			this.platform = platform;
 			using (var aiContext = new Assimp.AssimpContext()) {
 				aiContext.SetConfig(new Assimp.Configs.RemoveDegeneratePrimitivesConfig(true));
-				aiScene = aiContext.ImportFile(
-					path,
-					//Assimp.PostProcessSteps.FindDegenerates |
-					//Assimp.PostProcessSteps.FindInvalidData |
-					Assimp.PostProcessSteps.FlipUVs |
-					//Assimp.PostProcessSteps.FlipWindingOrder |
-					//Assimp.PostProcessSteps.JoinIdenticalVertices |
-					//Assimp.PostProcessSteps.ImproveCacheLocality |
-					//Assimp.PostProcessSteps.OptimizeMeshes |
-					Assimp.PostProcessSteps.Triangulate
-				);
+				var postProcess = Assimp.PostProcessSteps.Triangulate;
+				if (platform != TargetPlatform.Unity) {
+					postProcess |= Assimp.PostProcessSteps.FlipUVs;
+				}
+				aiScene = aiContext.ImportFile(path, postProcess);
 				FindCameras();
 				RootNode = ImportNode(aiScene.RootNode);
 				ImportAnimations();
