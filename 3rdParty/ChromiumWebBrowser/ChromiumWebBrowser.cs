@@ -45,7 +45,8 @@ namespace ChromiumWebBrowser
 				var bitmapInfo = browserLogic.BitmapInfo;
 				if (bitmapInfo == null)
 					return;
-				lock (bitmapInfo.BitmapLock) {
+				//lock (bitmapInfo.BitmapLock)
+				{
 					var bitmapPointer = bitmapInfo.BackBufferHandle;
 					SwapRedAndBlue32(bitmapPointer, bitmapInfo.Width * bitmapInfo.Height);
 					texture.LoadImage(bitmapPointer, bitmapInfo.Width, bitmapInfo.Height, false);
