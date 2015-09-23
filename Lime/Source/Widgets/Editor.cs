@@ -68,7 +68,7 @@ namespace Lime
 				}
 				w.Visible = caretPos.IsVisible && blinkOn;
 				if (caretParams.FollowTextColor) {
-					caretParams.CaretWidget.Color = container.Color;
+					w.Color = container.Color;
 				}
 				yield return null;
 			}
