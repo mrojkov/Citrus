@@ -344,6 +344,13 @@ namespace Lime
 			get { return GameView.Instance.WindowSize; }
 			set { GameView.Instance.WindowSize = value; }
 		}
+
+		public WindowBorder WindowBorder
+		{
+			get { return GameView.Instance.WindowBorder; }
+			set { GameView.Instance.WindowBorder = value; }
+		}
+		
 #elif ANDROID
 		/// <summary>
 		/// Возвращает размер экрана

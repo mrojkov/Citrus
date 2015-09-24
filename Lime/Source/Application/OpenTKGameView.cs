@@ -11,6 +11,40 @@ using System.Drawing;
 
 namespace Lime
 {
+	public enum WindowBorder
+	{
+		Resizeable,
+		Fixed,
+		Hidden
+	}
+
+	internal static class WindowBorderExtensions
+	{
+		public static OpenTK.WindowBorder ToOpenTK(this WindowBorder border)
+		{
+			switch (border) {
+				case WindowBorder.Hidden:
+					return OpenTK.WindowBorder.Hidden;
+				case WindowBorder.Fixed:
+					return OpenTK.WindowBorder.Fixed;
+				default:
+					return OpenTK.WindowBorder.Resizable;
+			}
+		}
+
+		public static WindowBorder FromOpenTK(this OpenTK.WindowBorder border)
+		{
+			switch (border) {
+				case OpenTK.WindowBorder.Hidden:
+					return WindowBorder.Hidden;
+				case OpenTK.WindowBorder.Fixed:
+					return WindowBorder.Fixed;
+				default:
+					return WindowBorder.Resizeable;
+			}
+		}
+	}
+
 	public class GameView : OpenTK.GameWindow
 	{
 		private Application app;
@@ -58,6 +92,12 @@ namespace Lime
 			this.Mouse.WheelChanged += HandleMouseWheel;
 			SetupWindowLocationAndSize();
 			RenderingApi = GetRenderingApi();
+		}
+
+		public new WindowBorder WindowBorder
+		{
+			get { return base.WindowBorder.FromOpenTK(); }
+			set { base.WindowBorder = value.ToOpenTK(); }
 		}
 
 #if !MAC

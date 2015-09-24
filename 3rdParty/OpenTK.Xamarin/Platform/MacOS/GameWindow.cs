@@ -15,7 +15,32 @@ namespace OpenTK
 		public readonly Input.Keyboard Keyboard = new Input.Keyboard();
 	
 		public MouseCursor Cursor { get; set; }
-		public OpenTK.WindowState WindowState { get; set; }
+		public OpenTK.WindowState WindowState 
+		{
+			get 
+			{
+				if (window.IsMiniaturized) {
+					return WindowState.Minimized;
+				}
+				if ((window.StyleMask & NSWindowStyle.FullScreenWindow) != 0) {
+					return WindowState.Fullscreen;
+				}
+				return WindowState.Normal;
+			}
+			set
+			{
+				if (value == WindowState.Minimized) {
+					window.Miniaturize(null);
+					return;
+				}
+				if (value == WindowState.Fullscreen && WindowState != WindowState.Fullscreen) {
+					window.ToggleFullScreen(null);
+				} else if (value != WindowState.Fullscreen && WindowState == WindowState.Fullscreen) {
+					window.ToggleFullScreen(null);
+				}
+			}
+		}
+		
 		public bool Focused { get; set; }
 
 		public event EventHandler<KeyPressEventArgs> KeyPress {
@@ -65,6 +90,7 @@ namespace OpenTK
 				OnClosed(e);	
 			};
 			window.DidResize += (s, e) => View.UpdateGLContext();
+			window.CollectionBehavior = NSWindowCollectionBehavior.FullScreenPrimary;			
 			// window.DidBecomeKey += OnFocusedChanged;
 			window.ContentView = View;
 			window.ReleasedWhenClosed = true;
@@ -73,6 +99,26 @@ namespace OpenTK
 				View.MakeCurrent();
 				OnRenderFrame(new OpenTK.FrameEventArgs());
 			};
+		}
+		
+		public WindowBorder WindowBorder
+		{
+			get 
+			{
+				if ((window.StyleMask & NSWindowStyle.Resizable) != 0) {
+					return WindowBorder.Resizable;
+				} else {
+					return WindowBorder.Fixed;
+				}
+			}
+			set
+			{
+				if (value == WindowBorder.Fixed) {
+					window.StyleMask &= ~NSWindowStyle.Resizable;
+				} else if (value == WindowBorder.Resizable) {
+					window.StyleMask |= NSWindowStyle.Resizable;
+				}
+			}
 		}
 
 		public void Dispose()
