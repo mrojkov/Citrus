@@ -4,7 +4,11 @@ using System.Linq;
 using System.Text;
 using ProtoBuf;
 #if OPENGL
+#if !MAC
+using OpenTK.Graphics.ES20;
+#else
 using OpenTK.Graphics.OpenGL;
+#endif
 #endif
 
 namespace Lime
