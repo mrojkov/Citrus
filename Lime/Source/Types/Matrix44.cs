@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using ProtoBuf;
 
 namespace Lime
@@ -754,25 +754,25 @@ namespace Lime
 			result.M44 = (float)((double)num1 * (double)num36 - (double)num2 * (double)num38 + (double)num3 * (double)num39) * num27;
 		}
 
-		public static Matrix44 Lerp(Matrix44 matrix1, Matrix44 matrix2, float amount)
+		public static Matrix44 Lerp(Matrix44 value1, Matrix44 value2, float amount)
 		{
-			matrix1.M11 = matrix1.M11 + ((matrix2.M11 - matrix1.M11) * amount);
-			matrix1.M12 = matrix1.M12 + ((matrix2.M12 - matrix1.M12) * amount);
-			matrix1.M13 = matrix1.M13 + ((matrix2.M13 - matrix1.M13) * amount);
-			matrix1.M14 = matrix1.M14 + ((matrix2.M14 - matrix1.M14) * amount);
-			matrix1.M21 = matrix1.M21 + ((matrix2.M21 - matrix1.M21) * amount);
-			matrix1.M22 = matrix1.M22 + ((matrix2.M22 - matrix1.M22) * amount);
-			matrix1.M23 = matrix1.M23 + ((matrix2.M23 - matrix1.M23) * amount);
-			matrix1.M24 = matrix1.M24 + ((matrix2.M24 - matrix1.M24) * amount);
-			matrix1.M31 = matrix1.M31 + ((matrix2.M31 - matrix1.M31) * amount);
-			matrix1.M32 = matrix1.M32 + ((matrix2.M32 - matrix1.M32) * amount);
-			matrix1.M33 = matrix1.M33 + ((matrix2.M33 - matrix1.M33) * amount);
-			matrix1.M34 = matrix1.M34 + ((matrix2.M34 - matrix1.M34) * amount);
-			matrix1.M41 = matrix1.M41 + ((matrix2.M41 - matrix1.M41) * amount);
-			matrix1.M42 = matrix1.M42 + ((matrix2.M42 - matrix1.M42) * amount);
-			matrix1.M43 = matrix1.M43 + ((matrix2.M43 - matrix1.M43) * amount);
-			matrix1.M44 = matrix1.M44 + ((matrix2.M44 - matrix1.M44) * amount);
-			return matrix1;
+			value1.M11 = value1.M11 + ((value2.M11 - value1.M11) * amount);
+			value1.M12 = value1.M12 + ((value2.M12 - value1.M12) * amount);
+			value1.M13 = value1.M13 + ((value2.M13 - value1.M13) * amount);
+			value1.M14 = value1.M14 + ((value2.M14 - value1.M14) * amount);
+			value1.M21 = value1.M21 + ((value2.M21 - value1.M21) * amount);
+			value1.M22 = value1.M22 + ((value2.M22 - value1.M22) * amount);
+			value1.M23 = value1.M23 + ((value2.M23 - value1.M23) * amount);
+			value1.M24 = value1.M24 + ((value2.M24 - value1.M24) * amount);
+			value1.M31 = value1.M31 + ((value2.M31 - value1.M31) * amount);
+			value1.M32 = value1.M32 + ((value2.M32 - value1.M32) * amount);
+			value1.M33 = value1.M33 + ((value2.M33 - value1.M33) * amount);
+			value1.M34 = value1.M34 + ((value2.M34 - value1.M34) * amount);
+			value1.M41 = value1.M41 + ((value2.M41 - value1.M41) * amount);
+			value1.M42 = value1.M42 + ((value2.M42 - value1.M42) * amount);
+			value1.M43 = value1.M43 + ((value2.M43 - value1.M43) * amount);
+			value1.M44 = value1.M44 + ((value2.M44 - value1.M44) * amount);
+			return value1;
 		}
 
 		/// <summary>

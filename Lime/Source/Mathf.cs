@@ -123,14 +123,14 @@ namespace Lime
 			return (float)Math.Pow(x, y);
 		}
 
-		public static float Lerp(float t, float a, float b)
+		public static float Lerp(float amount, float value1, float value2)
 		{
-			return a + (b - a) * t;
+			return value1 + (value2 - value1) * amount;
 		}
 
-		public static Vector2 Lerp(float t, Vector2 a, Vector2 b)
+		public static Vector2 Lerp(float amount, Vector2 value1, Vector2 value2)
 		{
-			return a + (b - a) * t;
+			return value1 + (value2 - value1) * amount;
 		}
 
 		public static float RandomFloat(this System.Random rng, float min, float max)

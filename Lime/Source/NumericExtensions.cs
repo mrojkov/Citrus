@@ -117,9 +117,9 @@ namespace Lime
 			return (int)Math.Ceiling(x);
 		}
 
-		public static float Lerp(this float value, float min, float max)
+		public static float Lerp(this float amount, float value1, float value2)
 		{
-			return Mathf.Lerp(value, min, max);
+			return Mathf.Lerp(amount, value1, value2);
 		}
 
 		/// <summary>

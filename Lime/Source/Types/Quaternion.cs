@@ -666,29 +666,29 @@ namespace Lime
         /// <summary>
         /// Performs a linear blend between two quaternions.
         /// </summary>
-        /// <param name="quaternion1">Source <see cref="Quaternion"/>.</param>
-        /// <param name="quaternion2">Source <see cref="Quaternion"/>.</param>
-        /// <param name="amount">The blend amount where 0 returns <paramref name="quaternion1"/> and 1 <paramref name="quaternion2"/>.</param>
+        /// <param name="value1">Source <see cref="Quaternion"/>.</param>
+        /// <param name="value2">Source <see cref="Quaternion"/>.</param>
+        /// <param name="amount">The blend amount where 0 returns <paramref name="value1"/> and 1 <paramref name="value2"/>.</param>
         /// <returns>The result of linear blending between two quaternions.</returns>
-        public static Quaternion Lerp(Quaternion quaternion1, Quaternion quaternion2, float amount)
+        public static Quaternion Lerp(Quaternion value1, Quaternion value2, float amount)
         {
             float num = amount;
 		    float num2 = 1f - num;
 		    Quaternion quaternion = new Quaternion();
-		    float num5 = (((quaternion1.X * quaternion2.X) + (quaternion1.Y * quaternion2.Y)) + (quaternion1.Z * quaternion2.Z)) + (quaternion1.W * quaternion2.W);
+		    float num5 = (((value1.X * value2.X) + (value1.Y * value2.Y)) + (value1.Z * value2.Z)) + (value1.W * value2.W);
 		    if (num5 >= 0f)
 		    {
-		        quaternion.X = (num2 * quaternion1.X) + (num * quaternion2.X);
-		        quaternion.Y = (num2 * quaternion1.Y) + (num * quaternion2.Y);
-		        quaternion.Z = (num2 * quaternion1.Z) + (num * quaternion2.Z);
-		        quaternion.W = (num2 * quaternion1.W) + (num * quaternion2.W);
+		        quaternion.X = (num2 * value1.X) + (num * value2.X);
+		        quaternion.Y = (num2 * value1.Y) + (num * value2.Y);
+		        quaternion.Z = (num2 * value1.Z) + (num * value2.Z);
+		        quaternion.W = (num2 * value1.W) + (num * value2.W);
 		    }
 		    else
 		    {
-		        quaternion.X = (num2 * quaternion1.X) - (num * quaternion2.X);
-		        quaternion.Y = (num2 * quaternion1.Y) - (num * quaternion2.Y);
-		        quaternion.Z = (num2 * quaternion1.Z) - (num * quaternion2.Z);
-		        quaternion.W = (num2 * quaternion1.W) - (num * quaternion2.W);
+		        quaternion.X = (num2 * value1.X) - (num * value2.X);
+		        quaternion.Y = (num2 * value1.Y) - (num * value2.Y);
+		        quaternion.Z = (num2 * value1.Z) - (num * value2.Z);
+		        quaternion.W = (num2 * value1.W) - (num * value2.W);
 		    }
 		    float num4 = (((quaternion.X * quaternion.X) + (quaternion.Y * quaternion.Y)) + (quaternion.Z * quaternion.Z)) + (quaternion.W * quaternion.W);
 		    float num3 = 1f / ((float) Math.Sqrt((double) num4));
@@ -702,28 +702,28 @@ namespace Lime
         /// <summary>
         /// Performs a linear blend between two quaternions.
         /// </summary>
-        /// <param name="quaternion1">Source <see cref="Quaternion"/>.</param>
-        /// <param name="quaternion2">Source <see cref="Quaternion"/>.</param>
-        /// <param name="amount">The blend amount where 0 returns <paramref name="quaternion1"/> and 1 <paramref name="quaternion2"/>.</param>
+        /// <param name="value1">Source <see cref="Quaternion"/>.</param>
+        /// <param name="value2">Source <see cref="Quaternion"/>.</param>
+        /// <param name="amount">The blend amount where 0 returns <paramref name="value1"/> and 1 <paramref name="value2"/>.</param>
         /// <param name="result">The result of linear blending between two quaternions as an output parameter.</param>
-        public static void Lerp(ref Quaternion quaternion1, ref Quaternion quaternion2, float amount, out Quaternion result)
+        public static void Lerp(ref Quaternion value1, ref Quaternion value2, float amount, out Quaternion result)
         {
             float num = amount;
 		    float num2 = 1f - num;
-		    float num5 = (((quaternion1.X * quaternion2.X) + (quaternion1.Y * quaternion2.Y)) + (quaternion1.Z * quaternion2.Z)) + (quaternion1.W * quaternion2.W);
+		    float num5 = (((value1.X * value2.X) + (value1.Y * value2.Y)) + (value1.Z * value2.Z)) + (value1.W * value2.W);
 		    if (num5 >= 0f)
 		    {
-		        result.X = (num2 * quaternion1.X) + (num * quaternion2.X);
-		        result.Y = (num2 * quaternion1.Y) + (num * quaternion2.Y);
-		        result.Z = (num2 * quaternion1.Z) + (num * quaternion2.Z);
-		        result.W = (num2 * quaternion1.W) + (num * quaternion2.W);
+		        result.X = (num2 * value1.X) + (num * value2.X);
+		        result.Y = (num2 * value1.Y) + (num * value2.Y);
+		        result.Z = (num2 * value1.Z) + (num * value2.Z);
+		        result.W = (num2 * value1.W) + (num * value2.W);
 		    }
 		    else
 		    {
-		        result.X = (num2 * quaternion1.X) - (num * quaternion2.X);
-		        result.Y = (num2 * quaternion1.Y) - (num * quaternion2.Y);
-		        result.Z = (num2 * quaternion1.Z) - (num * quaternion2.Z);
-		        result.W = (num2 * quaternion1.W) - (num * quaternion2.W);
+		        result.X = (num2 * value1.X) - (num * value2.X);
+		        result.Y = (num2 * value1.Y) - (num * value2.Y);
+		        result.Z = (num2 * value1.Z) - (num * value2.Z);
+		        result.W = (num2 * value1.W) - (num * value2.W);
 		    }
 		    float num4 = (((result.X * result.X) + (result.Y * result.Y)) + (result.Z * result.Z)) + (result.W * result.W);
 		    float num3 = 1f / ((float) Math.Sqrt((double) num4));
