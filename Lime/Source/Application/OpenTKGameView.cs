@@ -249,6 +249,7 @@ namespace Lime
 			app.OnResize();
 		}
 
+#if MAC
 		protected override void OnEnteredFullScreen(EventArgs e)
 		{
 			app.OnEnteredFullScreen();
@@ -258,6 +259,7 @@ namespace Lime
 		{
 			app.OnExitedFullScreen();
 		}
+#endif
 
 		private void Limit25FPS()
 		{
