@@ -460,6 +460,11 @@ namespace Lime
 		/// </summary>
 		public event Action Moved;
 
+		public event Action Resized;
+
+		public event Action EnteredFullScreen;
+		public event Action ExitedFullScreen;
+
 		/// <summary>
 		/// Вызывается, когда свойство Active стало true (например приложение было развернуто или его окно получило фокус)
 		/// </summary>
@@ -520,6 +525,27 @@ namespace Lime
 		{
 			if (Moved != null) {
 				Moved();
+			}
+		}
+
+		public virtual void OnResize()
+		{
+			if (Resized != null) {
+				Resized();
+			}
+		}
+
+		public virtual void OnEnteredFullScreen()
+		{
+			if (EnteredFullScreen != null) {
+				EnteredFullScreen();
+			}
+		}
+
+		public virtual void OnExitedFullScreen()
+		{
+			if (ExitedFullScreen != null) {
+				ExitedFullScreen();
 			}
 		}
 

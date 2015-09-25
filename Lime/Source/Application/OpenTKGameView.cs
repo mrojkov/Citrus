@@ -243,6 +243,22 @@ namespace Lime
 			app.OnMove();
 		}
 
+		protected override void OnResize(EventArgs e)
+		{
+			base.OnResize(e);
+			app.OnResize();
+		}
+
+		protected override void OnEnteredFullScreen(EventArgs e)
+		{
+			app.OnEnteredFullScreen();
+		}
+
+		protected override void OnExitedFullScreen(EventArgs e)
+		{
+			app.OnExitedFullScreen();
+		}
+
 		private void Limit25FPS()
 		{
 			int delta = (int)(DateTime.UtcNow - lastFrameTimeStamp).TotalMilliseconds;

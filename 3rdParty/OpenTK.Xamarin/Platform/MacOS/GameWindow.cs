@@ -13,7 +13,7 @@ namespace OpenTK
 		
 		public readonly Input.Mouse Mouse = new Input.Mouse();
 		public readonly Input.Keyboard Keyboard = new Input.Keyboard();
-	
+		
 		public MouseCursor Cursor { get; set; }
 		public OpenTK.WindowState WindowState 
 		{
@@ -43,7 +43,8 @@ namespace OpenTK
 		
 		public bool Focused { get; set; }
 
-		public event EventHandler<KeyPressEventArgs> KeyPress {
+		public event EventHandler<KeyPressEventArgs> KeyPress 
+		{
 			add { Keyboard.KeyPress += value; }
 			remove { Keyboard.KeyPress -= value; }
 		}
@@ -89,12 +90,13 @@ namespace OpenTK
 				NSApplication.SharedApplication.Terminate(View);
 				OnClosed(e);	
 			};
-			window.DidResize += (s, e) => View.UpdateGLContext();
+			window.DidResize += (s, e) => OnResize(e);
+			window.DidMove += (s, e) => OnMove(e);
+			window.DidEnterFullScreen += (s, e) => OnEnteredFullScreen(e);
+			window.DidExitFullScreen += (s, e) => OnExitedFullScreen(e);
 			window.CollectionBehavior = NSWindowCollectionBehavior.FullScreenPrimary;			
-			// window.DidBecomeKey += OnFocusedChanged;
 			window.ContentView = View;
 			window.ReleasedWhenClosed = true;
-			window.DidMove += (s, e) => OnMove(e);
 			View.RenderFrame += (s, e) => {
 				View.MakeCurrent();
 				OnRenderFrame(new OpenTK.FrameEventArgs());
@@ -147,6 +149,19 @@ namespace OpenTK
 		protected virtual void OnMove(EventArgs e)
 		{
 		}
+		
+		protected virtual void OnResize(EventArgs e)
+		{
+			View.UpdateGLContext();
+		}
+
+		protected virtual void OnEnteredFullScreen(EventArgs e)
+		{
+		}
+		
+		protected virtual void OnExitedFullScreen(EventArgs e)
+		{
+		}		
 		
 		public void Close()
 		{
