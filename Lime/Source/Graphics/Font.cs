@@ -31,12 +31,17 @@ namespace Lime
 					if (c != null)
 						return c;
 				}
-				if (code == 160) { // неразрывный пробел
-					return this[' ']; // ищем как обычный пробел
+				// Can use normal space instead of unbreakable space
+				if (code == 160) {
+					return this[' '];
 				}
-				// Use 'middle dot' char instead of 'bullet operator'
+				// Can use 'middle dot' instead of 'bullet operator'
 				if (code == 8729) {
 					return this[(char)183];
+				}
+				// Can use 'degree symbol' instead of 'masculine ordinal indicator'
+				if (code == 186) {
+					return this[(char)176];
 				}
 				return FontChar.Null;
 			}
