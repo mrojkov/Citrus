@@ -125,7 +125,7 @@ namespace Lime
 			cameraTransform.Translation = Vector3.Zero; // Discard the camera position
 			direction = cameraTransform.TransformVector(direction);
 			var ray = new Ray() {
-				Direction = Vector3.Normalize(direction),
+				Direction = direction.Normalized,
 				Position = Vector3.Zero * camera.GlobalTransform
 			};
 			return HitTest(ray);

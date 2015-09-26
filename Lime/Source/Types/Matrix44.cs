@@ -303,8 +303,8 @@ namespace Lime
 
 		public static Matrix44 CreateLookAt(Vector3 cameraPosition, Vector3 cameraTarget, Vector3 cameraUpVector)
 		{
-			Vector3 vector3_1 = Vector3.Normalize(cameraPosition - cameraTarget);
-			Vector3 vector3_2 = Vector3.Normalize(Vector3.CrossProduct(cameraUpVector, vector3_1));
+			Vector3 vector3_1 = (cameraPosition - cameraTarget).Normalized;
+			Vector3 vector3_2 = Vector3.CrossProduct(cameraUpVector, vector3_1).Normalized;
 			Vector3 vector1 = Vector3.CrossProduct(vector3_1, vector3_2);
 			Matrix44 matrix;
 			matrix.M11 = vector3_2.X;
@@ -328,8 +328,8 @@ namespace Lime
 
 		public static void CreateLookAt(ref Vector3 cameraPosition, ref Vector3 cameraTarget, ref Vector3 cameraUpVector, out Matrix44 result)
 		{
-			Vector3 vector = Vector3.Normalize(cameraPosition - cameraTarget);
-			Vector3 vector2 = Vector3.Normalize(Vector3.CrossProduct(cameraUpVector, vector));
+			Vector3 vector = (cameraPosition - cameraTarget).Normalized;
+			Vector3 vector2 = Vector3.CrossProduct(cameraUpVector, vector).Normalized;
 			Vector3 vector3 = Vector3.CrossProduct(vector, vector2);
 			result.M11 = vector2.X;
 			result.M12 = vector3.X;
