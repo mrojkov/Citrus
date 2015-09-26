@@ -36,13 +36,13 @@ namespace Lime
 			return U.Equals(rhs.U) && V.Equals(rhs.V) && T.Equals(rhs.T);
 		}
 
-		// TODO: Transform (kek) to property?
+		// TODO: Transform to Determinant property?
 		public float CalcDeterminant()
 		{
 			return U.X * V.Y - U.Y * V.X;
 		}
 
-		// TODO: Transform to property?
+		// TODO: Transform to Inversed property?
 		public Matrix32 CalcInversed()
 		{
 			Matrix32 m;
@@ -215,7 +215,7 @@ namespace Lime
 			return result;
 		}
 
-		// TODO: Transform to a property?
+		// TODO: Transform to IsIdentity property?
 		/// <summary>
 		/// Checks if this matrix is identity matrix.
 		/// </summary>
