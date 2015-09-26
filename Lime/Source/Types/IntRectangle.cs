@@ -52,8 +52,8 @@ namespace Lime
 			return new WindowRect { X = value.Left, Y = value.Top, Width = value.Width, Height = value.Height };
 		}
 
-		// TODO: Remove after 23.09.15, implement self Normalize() after that
-		[Obsolete("Use \"Normalized\" property instead", true)]
+		// TODO: Does it breaks rule of immutability?
+		[Obsolete("Use Normalized property instead", true)]
 		public IntRectangle Normalize()
 		{
 			var rect = this;

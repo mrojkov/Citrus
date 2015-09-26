@@ -146,9 +146,7 @@ namespace Lime
 			);
 		}
 
-		/// <summary>
-		/// Turns this <see cref="Vector3"/> to a unit vector with the same direction.
-		/// </summary>
+		[Obsolete("Use Normalized property instead", true)]
 		public void Normalize()
 		{
 			var length = Length;
@@ -168,14 +166,18 @@ namespace Lime
 			get
 			{
 				var v = new Vector3(X, Y, Z);
-				v.Normalize();
+				var length = Length;
+				if (length > 0)
+				{
+					v.X /= length;
+					v.Y /= length;
+					v.Z /= length;
+				}
 				return v;
 			}
 		}
 
-		/// <summary>
-		/// Returns specified <see cref="Vector3"/> as a unit vector with the same direction.
-		/// </summary>
+		[Obsolete("Use Normalized property instead", true)]
 		public static Vector3 Normalize(Vector3 value)
 		{
 			return value.Normalized;

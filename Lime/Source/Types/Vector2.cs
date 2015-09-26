@@ -227,9 +227,7 @@ namespace Lime
 			return value1.X * value2.Y - value1.Y * value2.X;
 		}
 
-		/// <summary>
-		/// Turns this <see cref="Vector2"/> to a unit vector with the same direction.
-		/// </summary>
+		[Obsolete("Use Normalized property instead", true)]
 		public void Normalize()
 		{
 			var length = Length;
@@ -311,7 +309,12 @@ namespace Lime
 			get 
 			{
 				var v = new Vector2(X, Y);
-				v.Normalize();
+				var length = Length;
+				if (length > 0)
+				{
+					v.X /= length;
+					v.Y /= length;
+				}
 				return v;
 			}
 		}

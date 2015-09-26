@@ -89,13 +89,14 @@ namespace Lime
 		
 		public Vector2 Center { get { return (A + B) / 2; } }
 
+		// TODO: Does it breaks rule of immutability?
 		/// <summary>
 		/// Swaps coordinates of borders if width or height is negative.
 		/// </summary>
 		/// <remarks>
 		/// Width or height can be negative if coordinates of borders are mixed up.
 		/// After this method width and height are guaranteed to be positive.
-		/// </remarks>>
+		/// </remarks>
 		public void Normalize()
 		{
 			if (A.X > B.X) {
