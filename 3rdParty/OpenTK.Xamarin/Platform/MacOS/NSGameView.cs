@@ -130,6 +130,13 @@ namespace OpenTK
 				Mouse.OnMove(new MouseMoveEventArgs() { X = point.X, Y = point.Y });
 			}
 		}
+		
+		public override void ScrollWheel(NSEvent theEvent)
+		{
+			if (Mouse != null) {
+				Mouse.OnWheelChanged(new MouseWheelEventArgs() { Delta = (int)theEvent.ScrollingDeltaY, Y = (int)theEvent.ScrollingDeltaY });
+			}
+		}
 
 		public override void KeyDown(NSEvent theEvent)
 		{

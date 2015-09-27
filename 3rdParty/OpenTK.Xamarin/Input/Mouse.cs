@@ -29,7 +29,14 @@ namespace OpenTK.Input
 			if (Move != null) {
 				Move(this, e);
 			}
-		}	
+		}
+		
+		internal void OnWheelChanged(MouseWheelEventArgs e)
+		{
+			if (WheelChanged != null) {
+				WheelChanged(this, e);
+			}
+		}
 	}
 }
 #endif
