@@ -89,7 +89,7 @@ namespace Lime
 		
 		public Vector2 Center { get { return (A + B) / 2; } }
 
-		// TODO: Does it breaks rule of immutability?
+		// UNCERTAINTY: Does it breaks rule of immutability?
 		/// <summary>
 		/// Swaps coordinates of borders if width or height is negative.
 		/// </summary>
@@ -154,7 +154,7 @@ namespace Lime
 			Bottom = Mathf.Max(value.Y, Bottom);
 		}
 
-		// TODO: Maybe swap to return string.Format("{0}, {1}", A.ToString(), B.ToString());?
+		// SUGGESTION: Swap to return string.Format("{0}, {1}", A.ToString(), B.ToString());?
 		/// <summary>
 		/// Returns the string representation of this <see cref="Rectangle"/> in the format:
 		/// "A.X, A.Y, B.X, B.Y".

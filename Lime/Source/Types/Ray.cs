@@ -38,7 +38,7 @@ namespace Lime
 			return Position.GetHashCode() ^ Direction.GetHashCode();
 		}
 
-		// TODO: Change name to Intersection()?
+		// SUGGESTION: Change name to Intersection()?
 		/// <summary>
 		/// Returns the distance between the center of this ray and border of sphere. 
 		/// </summary>
@@ -50,7 +50,7 @@ namespace Lime
 			return result;
 		}
 
-		// TODO: Change return type to bool to match to this method name?
+		// SUGGESTION: Change return type to bool to match to this method name?
 		/// <summary>
 		/// Calculates the distance between the center of this ray and border of sphere. 
 		/// </summary>

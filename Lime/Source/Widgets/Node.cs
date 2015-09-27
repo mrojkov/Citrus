@@ -273,9 +273,9 @@ namespace Lime
 			return node;
 		}
 
+		/// SUGGESTION: rename to DescendantOf?
 		/// <summary>
 		/// Returns true if this node is a descendant of provided node.
-		/// TODO: rename to DescendantOf?
 		/// </summary>
 		public bool ChildOf(Node node)
 		{
@@ -683,6 +683,7 @@ namespace Lime
 
 		/// <summary>
 		/// Loads all textures, fonts and animators for this node and for all its descendants.
+		/// Forces reloading of textures if they are null.
 		/// </summary>
 		public void PreloadAssets()
 		{
@@ -768,13 +769,16 @@ namespace Lime
 			Nodes.AddRange(nodes);
 		}
 
+		// SUGGESTION: Move to ResolveScenePath?
 		private static readonly string[] sceneExtensions = new[] { ".scene", ".model" };
 
 		/// <summary>
-		/// TODO: Add summary
+		/// Returns path to scene if it exists in bundle. Returns null otherwise.
+		/// Throws exception if there is more than one scene file with such path.
 		/// </summary>
 		internal static string ResolveScenePath(string path)
 		{
+			// SUGGESTION: Enumerate?
 			var candidates = sceneExtensions.Select(ext => Path.ChangeExtension(path, ext)).Where(AssetsBundle.Instance.FileExists);
 			if (candidates.Count() > 1) {
 				throw new Lime.Exception("Ambiguity between: {0}", string.Join("; ", candidates.ToArray()));

@@ -4,7 +4,7 @@ using ProtoBuf;
 
 namespace Lime
 {
-	// TODO: Implement as IEnumerable and/or IList?
+	// SUGGESTION: Implement as IEnumerable and/or IList?
 	/// <summary>
 	/// Representation of 32-bit array of bit flags.
 	/// </summary>

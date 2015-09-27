@@ -52,7 +52,7 @@ namespace Lime
 			return new WindowRect { X = value.Left, Y = value.Top, Width = value.Width, Height = value.Height };
 		}
 
-		// TODO: Does it breaks rule of immutability?
+		// UNCERTAINTY: Does it breaks rule of immutability?
 		[Obsolete("Use Normalized property instead", true)]
 		public IntRectangle Normalize()
 		{
@@ -160,7 +160,7 @@ namespace Lime
 				&& value.Y < B.Y;
 		}
 
-		// TODO: Maybe swap to return string.Format("{0}, {1}", A.ToString(), B.ToString());?
+		// SUGGESTION: Swap to return string.Format("{0}, {1}", A.ToString(), B.ToString());?
 		/// <summary>
 		/// Returns the string representation of this <see cref="IntRectangle"/> in the format:
 		/// "A.X, A.Y, B.X, B.Y".
