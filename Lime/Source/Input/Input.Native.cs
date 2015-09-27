@@ -54,6 +54,11 @@ namespace Lime
 		public static Vector2 MousePosition { get; internal set; }
 
 		/// <summary>
+		/// Indicates how much the mouse wheel was moved
+		/// </summary>
+		public static float WheelScrollAmount { get; internal set; }
+
+		/// <summary>
 		/// The current accelerometer state (read only) in g-force units
 		/// </summary>
 		public static Vector3 Acceleration { get; internal set; }
