@@ -90,7 +90,7 @@ namespace Lime
 		internal Node NextToRender;
 
 		/// <summary>
-		/// TODO: Add summary
+		/// Shortcut to the next element of nodes of this parent.
 		/// </summary>
 		public Node NextSibling;
 
@@ -119,15 +119,19 @@ namespace Lime
 		/// </summary>
 		public MarkerCollection Markers { get { return DefaultAnimation.Markers; } }
 
+		// SUGGESTION: This property should have private/protected setter
 		/// <summary>
-		/// TODO: Translate
-		/// Возвращает true, если проигрывается анимация
+		/// Returns true if this node is running animation.
 		/// </summary>
-		public bool IsRunning { get { return DefaultAnimation.IsRunning; } set { DefaultAnimation.IsRunning = value; } }
+		public bool IsRunning
+		{
+			get { return DefaultAnimation.IsRunning; }
+			set { DefaultAnimation.IsRunning = value; }
+		}
 
+		// SUGGESTION: This property should have private/protected setter
 		/// <summary>
-		/// TODO: Translate
-		/// Возвращает true, если в данный момент анимация не проигрывается (например анимация не была запущена или доигралась до конца)
+		/// Returns true if this node isn't running animation.
 		/// </summary>
 		public bool IsStopped {
 			get { return !IsRunning; }
@@ -135,8 +139,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Время текущего кадра анимации (в миллисекундах)
+		/// Gets or sets time of current frame of default animation (in milliseconds).
 		/// </summary>
 		public int AnimationTime
 		{
@@ -168,10 +171,9 @@ namespace Lime
 		[ProtoMember(13)]
 		public AnimationList Animations;
 
+		// SUGGESTION: This property should have private/protected setter
 		/// <summary>
-		/// TODO: Translate
-		/// Название текущей анимации. Название берется из названия маркера Play.
-		/// Если анимация остановилась, это свойство не изменится
+		/// Name of last started marker of default animation. Is set to null by default.
 		/// </summary>
 		public string CurrentAnimation
 		{
@@ -224,7 +226,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Add summary
+		/// Propagates dirty flags to all descendants by provided mask.
 		/// </summary>
 		protected internal void PropagateDirtyFlags(DirtyFlags mask = DirtyFlags.All)
 		{
@@ -273,7 +275,7 @@ namespace Lime
 			return node;
 		}
 
-		/// SUGGESTION: rename to DescendantOf?
+		// SUGGESTION: rename to DescendantOf?
 		/// <summary>
 		/// Returns true if this node is a descendant of provided node.
 		/// </summary>
