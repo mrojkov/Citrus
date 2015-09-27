@@ -24,6 +24,7 @@ namespace Lime
 		public ScrollDirection ScrollDirection { get; private set; }
 		public bool ScrollWhenContentFits = true;
 
+		protected bool IsScrollingByMouseWheel { get; private set; }
 		public virtual bool IsDragging { get; protected set; }
 		
 		public float ContentLength
@@ -74,6 +75,9 @@ namespace Lime
 			} else {
 				Content.Tasks.Add(MainTask());
 			}
+#if MAC || WIN
+			Content.Tasks.Add(ScrollByMouseWheelTask());
+#endif
 		}
 
 		public bool IsItemOnscreen(Widget item)
@@ -155,6 +159,26 @@ namespace Lime
 			}
 			scrollingTask = null;
 		}
+
+#if MAC || WIN
+		private IEnumerator<object> ScrollByMouseWheelTask()
+		{
+			while (true) {
+				yield return null;
+				IsScrollingByMouseWheel = 
+					(Frame.Input.WasKeyPressed(Key.MouseWheelDown) || Frame.Input.WasKeyPressed(Key.MouseWheelUp)) &&
+					(CanScroll && Frame.HitTest(Input.MousePosition));
+				if (IsScrollingByMouseWheel) {
+					StopScrolling();
+					ScrollPosition = Mathf.Clamp(
+						value: ScrollPosition - Input.WheelScrollAmount,
+						min: MinScrollPosition,
+						max: MaxScrollPosition
+					);
+				}
+			}
+		}
+#endif
 
 		public bool IsScrolling()
 		{

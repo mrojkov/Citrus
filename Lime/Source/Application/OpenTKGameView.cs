@@ -207,6 +207,7 @@ namespace Lime
 
 		void HandleMouseWheel(object sender, MouseWheelEventArgs e)
 		{
+			Input.WheelScrollAmount = e.Delta;
 			if (e.Delta > 0) {
 				Input.SetKeyState(Key.MouseWheelUp, true);
 				Input.SetKeyState(Key.MouseWheelUp, false);
@@ -246,7 +247,8 @@ namespace Lime
 		protected override void OnResize(EventArgs e)
 		{
 			base.OnResize(e);
-			app.OnResize();
+			if (app != null)
+				app.OnResize();
 		}
 
 #if MAC
