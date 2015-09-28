@@ -9,32 +9,44 @@ namespace Lime
 {
 	class BitmapImplementation : IBitmapImplementation
 	{
-		private NSImage bitmap;
+		private NSImage image;
 
 		public BitmapImplementation() {}
 
 		public int GetWidth()
 		{
-			return bitmap != null ? (int)bitmap.CGImage.Width : 0;
+			return image != null ? (int)image.Size.Width : 0;
 		}
 
 		public int GetHeight()
 		{
-			return bitmap != null ? (int)bitmap.CGImage.Height : 0;
+			return image != null ? (int)image.Size.Height : 0;
 		}
 
 		public void LoadFromStream(Stream stream)
 		{
-			Dispose();
-			bitmap = NSImage.FromStream(stream);
+			if (image != null) {
+				image.Dispose();
+				image = null;
+			}
+			image = NSImage.FromStream(stream);
 		}
 
-		/// <summary>
-		/// TODO: NSImage cannot be saved in PNG format (TIF only)
-		/// </summary>
-		public void SaveToStream(Stream steam)
+		public void SaveToStream(Stream stream)
 		{
-			throw new NotImplementedException();
+			if (!IsValid()) {
+				throw new InvalidOperationException();
+			}
+			if (image != null) {
+				using (var cgImage = image.CGImage)
+				using (var rep = new NSBitmapImageRep(cgImage)) {
+					rep.Size = image.Size;
+					using (var pngData = rep.RepresentationUsingTypeProperties(NSBitmapImageFileType.Png, null))
+					using (var bitmapStream = pngData.AsStream()) {
+						bitmapStream.CopyTo(stream);
+					}
+				}
+			}
 		}
 
 		public IBitmapImplementation Crop(IntRectangle cropArea)
@@ -43,17 +55,26 @@ namespace Lime
 				throw new InvalidOperationException();
 			}
 			var rect = new CGRect(cropArea.Left, cropArea.Top, cropArea.Width, cropArea.Height);
-			CGImage cgimage = bitmap.CGImage.WithImageInRect(rect);
+			CGImage cgimage = image.CGImage.WithImageInRect(rect);
 			var size = new CGSize(cgimage.Width, cgimage.Height);
-			return new BitmapImplementation() { bitmap = new NSImage(cgimage, size) };
+			return new BitmapImplementation() { image = new NSImage(cgimage, size) };
 		}
 
-		/// <summary>
-		/// TODO: implement. I didn't find easy way to rescale
-		/// </summary>
 		public IBitmapImplementation Rescale(int newWidth, int newHeight)
 		{
-			throw new NotImplementedException();
+			if (!IsValid()) {
+				throw new InvalidOperationException();
+			}
+			var newImage = new NSImage(new CGSize(newWidth, newHeight));
+			newImage.LockFocus();
+			var ctx = NSGraphicsContext.CurrentContext;
+			ctx.ImageInterpolation = NSImageInterpolation.High;
+			image.DrawInRect(
+				new CGRect(0, 0, newWidth, newHeight), 
+				new CGRect(0, 0, image.Size.Width, image.Size.Height), 
+				NSCompositingOperation.Copy, 1); 
+			newImage.UnlockFocus();
+			return new BitmapImplementation() { image = newImage };
 		}
 
 		public byte[] GetImageData()
@@ -69,13 +90,13 @@ namespace Lime
 					var context = new CGBitmapContext(Marshal.UnsafeAddrOfPinnedArrayElement(imageData, 0), GetWidth(), GetHeight(), 8,
 						bytesPerPixel * GetWidth(), colorSpace, CGBitmapFlags.ByteOrder32Big | CGBitmapFlags.PremultipliedLast)) 
 				{
-					context.DrawImage(new CGRect(0, 0, GetWidth(), GetHeight()), bitmap.CGImage);
+					context.DrawImage(new CGRect(0, 0, GetWidth(), GetHeight()), image.CGImage);
 				}					
 			}
 			handle.Free();
 			// Swap R ang B channels
 			byte temp;
-			for (int i = 0; i < imageData.Length; i+=4)
+			for (int i = 0; i < imageData.Length; i += 4)
 			{
 				temp = imageData[i + 0];
 				imageData[i + 0] = imageData[i + 2];
@@ -86,9 +107,9 @@ namespace Lime
 
 		public void Dispose()
 		{
-			if (bitmap != null) {
-				bitmap.Dispose();
-				bitmap = null;
+			if (image != null) {
+				image.Dispose();
+				image = null;
 			}
 			GC.SuppressFinalize(this);
 		}
@@ -100,7 +121,7 @@ namespace Lime
 
 		public bool IsValid() 
 		{
-			return (bitmap != null && (bitmap.Size.Height > 0 && bitmap.Size.Width >0));
+			return image != null && (image.Size.Height > 0 && image.Size.Width > 0);
 		}
 	}
 }

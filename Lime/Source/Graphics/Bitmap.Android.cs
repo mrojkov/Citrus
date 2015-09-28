@@ -22,7 +22,11 @@ namespace Lime
 
 		public void LoadFromStream(Stream stream)
 		{
-			Dispose();
+			// For some reason bitmap.Dispose() causes NRE on Android L.
+			//if (bitmap != null) {
+			//	bitmap.Dispose();
+			//	bitmap = null;
+			//}
 			bitmap = BitmapFactory.DecodeStream(stream);
 		}
 

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
-
 #if WIN
 using OpenTK.Graphics.OpenGL;
 using SDI = System.Drawing.Imaging;
@@ -15,6 +14,10 @@ using CoreGraphics;
 #elif ANDROID
 using OpenTK.Graphics.ES20;
 using SD = System.Drawing;
+#elif MAC
+using AppKit;
+using CoreGraphics;
+using OpenTK.Graphics.OpenGL;
 #endif
 
 namespace Lime
@@ -29,8 +32,51 @@ namespace Lime
 #elif MAC
 		private void InitWithPngOrJpgBitmap(Stream stream, Stream alphaStream)
 		{
-			throw new NotImplementedException();
+			if (!Application.IsMainThread) {
+				throw new NotSupportedException ("Calling from non-main thread currently is not supported");
+			}
+			using (var nsData = Foundation.NSData.FromStream(stream))
+			using (var image = new NSImage(nsData)) {
+				PrepareOpenGLTexture();
+				var pixels = GetPixels(image);
+				PlatformRenderer.PushTexture(handle, 0);
+				GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, (int)image.Size.Width, (int)image.Size.Height, 0,
+					PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
+				PlatformRenderer.PopTexture(0);
+			}
 		}
+
+		private int[] GetPixels(NSImage image)
+		{
+			CGImage imageRef = image.CGImage;
+			int width = (int)image.Size.Width;
+			int height = (int)image.Size.Height;
+			SurfaceSize = ImageSize = new Size (width, height);
+
+			int bitsPerComponent = 8;
+			int bytesPerPixel = 4;
+			int bytesPerRow = bytesPerPixel * width;
+			int[] data = new int[height * width];
+			MemoryUsed = data.Length;
+
+			CGImageAlphaInfo alphaInfo = imageRef.AlphaInfo;
+			if (alphaInfo == CGImageAlphaInfo.None) {
+				alphaInfo = CGImageAlphaInfo.NoneSkipLast;
+			} else if (alphaInfo == CGImageAlphaInfo.Last) {
+				// Only premultiplied alpha pixel format is supported, see https://developer.apple.com/library/ios/documentation/GraphicsImaging/Conceptual/drawingwithquartz2d/dq_context/dq_context.html
+				alphaInfo = CGImageAlphaInfo.PremultipliedLast;
+			}
+			unsafe {
+				fixed (int* dataPtr = data) {
+					using (var colorSpace = CGColorSpace.CreateDeviceRGB())
+					using (var context = new CoreGraphics.CGBitmapContext((IntPtr)dataPtr, width, height, bitsPerComponent, bytesPerRow, colorSpace, alphaInfo)) {
+						context.DrawImage(new System.Drawing.RectangleF(0, 0, width, height), imageRef);
+					}
+				}
+			}
+			return data;
+		}
+
 #elif WIN
 		private void InitWithPngOrJpgBitmap(Stream stream, Stream alphaStream)
 		{
