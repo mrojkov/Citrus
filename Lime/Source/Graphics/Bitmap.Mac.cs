@@ -15,12 +15,12 @@ namespace Lime
 
 		public int GetWidth()
 		{
-			return image != null ? (int)image.Size.Width : 0;
+			return image != null ? (int)image.CGImage.Width : 0;
 		}
 
 		public int GetHeight()
 		{
-			return image != null ? (int)image.Size.Height : 0;
+			return image != null ? (int)image.CGImage.Height : 0;
 		}
 
 		public void LoadFromStream(Stream stream)
@@ -55,7 +55,7 @@ namespace Lime
 				throw new InvalidOperationException();
 			}
 			var rect = new CGRect(cropArea.Left, cropArea.Top, cropArea.Width, cropArea.Height);
-			CGImage cgimage = image.CGImage.WithImageInRect(rect);
+			var cgimage = image.CGImage.WithImageInRect(rect);
 			var size = new CGSize(cgimage.Width, cgimage.Height);
 			return new BitmapImplementation() { image = new NSImage(cgimage, size) };
 		}
