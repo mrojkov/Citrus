@@ -10,9 +10,6 @@ namespace Lime
 {
 	public class WebBrowser : Widget
 	{
-		// buz: Фикс Жени 211726 ломает браузер в GummyDrop на амазоновском девайсе (CDCHINA-74)
-		static public bool DisableEugenesFix;
-		
 		private WebView webView;
 		public Uri Url { get { return GetUrl(); } set { SetUrl(value); } }
 
@@ -93,13 +90,14 @@ namespace Lime
 				((RelativeLayout)webView.Parent).RemoveView(webView);
 			}
 			if (webView.Parent == null) {
-				if (DisableEugenesFix) {
-					((RelativeLayout)GameView.Instance.Parent).AddView(webView);
-				} else {
-					((RelativeLayout)GameView.Instance.Parent).AddView(webView, new ViewGroup.LayoutParams (wr.Width + wr.X, wr.Height + wr.Y));
-				}
+				((RelativeLayout)GameView.Instance.Parent).AddView(webView);
 			}
-			webView.Layout (wr.X, wr.Y, wr.Width + wr.X, wr.Height + wr.Y);
+			var p = (RelativeLayout.MarginLayoutParams)webView.LayoutParameters;
+			p.LeftMargin = wr.X;
+			p.TopMargin = wr.Y;
+			p.Width = wr.Width;
+			p.Height = wr.Height;
+			webView.RequestLayout();
 		}
 
 		private WindowRect CalculateAABBInWorldSpace(Widget widget)
