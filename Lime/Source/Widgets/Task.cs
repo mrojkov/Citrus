@@ -13,6 +13,7 @@ namespace Lime
 	/// </summary>
 	public class Task : IDisposable
 	{
+		public static bool SkipFrameOnTaskCompletion;
 		public static long TotalTasksUpdated = 0;
 		public static bool ProfilingEnabled;
 		private static Dictionary<Type, ProfileEntry> profile = new Dictionary<Type, ProfileEntry>();
@@ -119,6 +120,9 @@ namespace Lime
 					HandleYieldedResult(e.Current);
 				} else if (!Completed) {
 					stack.Pop();
+					if (!SkipFrameOnTaskCompletion && !Completed) {
+						Advance(0);
+					}
 				}
 			} finally {
 				current = savedCurrent;
