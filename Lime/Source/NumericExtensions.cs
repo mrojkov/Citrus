@@ -22,12 +22,12 @@ namespace Lime
 			return a < b ? a : b;
 		}
 
-		public static float Max(this int a, int b)
+		public static int Max(this int a, int b)
 		{
 			return a > b ? a : b;
 		}
 
-		public static float Min(this int a, int b)
+		public static int Min(this int a, int b)
 		{
 			return a < b ? a : b;
 		}
