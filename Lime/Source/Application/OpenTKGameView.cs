@@ -207,13 +207,29 @@ namespace Lime
 
 		void HandleMouseWheel(object sender, MouseWheelEventArgs e)
 		{
-			Input.WheelScrollAmount = e.Delta;
+#if WIN
+			// Unfortunately SDL gives us only scrolling direction (-1 or 1), but several times per frame.
+			// So, presume minimum scrolling step - 15 pixels
+			var wheelDelta = e.Delta * 15;
+#else
+			var wheelDelta = e.Delta;
+#endif
 			if (e.Delta > 0) {
-				Input.SetKeyState(Key.MouseWheelUp, true);
-				Input.SetKeyState(Key.MouseWheelUp, false);
-			} else if (e.Delta < 0) {
-				Input.SetKeyState(Key.MouseWheelDown, true);
-				Input.SetKeyState(Key.MouseWheelDown, false);
+				if (!Input.HasPendingKeyEvent(Key.MouseWheelUp)) {
+					Input.SetKeyState(Key.MouseWheelUp, true);
+					Input.SetKeyState(Key.MouseWheelUp, false);
+					Input.WheelScrollAmount = wheelDelta;
+				} else {
+					Input.WheelScrollAmount += wheelDelta;
+				}
+			} else {
+				if (!Input.HasPendingKeyEvent(Key.MouseWheelDown)) {
+					Input.SetKeyState(Key.MouseWheelDown, true);
+					Input.SetKeyState(Key.MouseWheelDown, false);
+					Input.WheelScrollAmount = wheelDelta;
+				} else {
+					Input.WheelScrollAmount += wheelDelta;
+				}
 			}
 		}
 

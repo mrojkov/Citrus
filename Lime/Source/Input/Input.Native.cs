@@ -167,6 +167,12 @@ namespace Lime
 			keyEventQueue.Add(new KeyEvent { Key = key, State = value });
 		}
 
+		internal static bool HasPendingKeyEvent(Key key)
+		{
+			return keyEventQueue.Contains(new KeyEvent { Key = key, State = true }) ||
+				keyEventQueue.Contains(new KeyEvent { Key = key, State = false });
+		}
+
 		internal static void ProcessPendingKeyEvents()
 		{
 			if (keyEventQueue.Count > 0) {
