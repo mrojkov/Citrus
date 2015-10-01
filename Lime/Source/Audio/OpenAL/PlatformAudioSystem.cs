@@ -64,6 +64,7 @@ namespace Lime
 					AVAudioSession.SharedInstance().SetActive(false);
 				} else if (args.InterruptionType == AVAudioSessionInterruptionType.Ended) {
 					AVAudioSession.SharedInstance().SetActive(true);
+					AVAudioSession.SharedInstance().SetCategory(AVAudioSessionCategory.Playback);
 					Active = true;
 				}
 			});	
