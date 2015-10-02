@@ -112,14 +112,16 @@ namespace Lime
 			}
 		}
 
-		internal void Play(Sound sound, IAudioDecoder decoder, bool looping, bool paused, float fadeinTime)
+		internal bool Play(Sound sound, IAudioDecoder decoder, bool looping, bool paused, float fadeinTime)
 		{
 			if (!AudioSystem.Active) {
-				return;
+				return false;
 			}
 			var state = AL.GetSourceState(source);
 			if (state != ALSourceState.Initial && state != ALSourceState.Stopped) {
-				throw new Lime.Exception("AudioSource must be stopped before play");
+				// Don't know why is it happens, but it's better to warn than crush the game
+				Debug.Write("AudioSource must be stopped before play");
+				return false;
 			}
 			lock (streamingSync) {
 				if (streaming) {
@@ -141,6 +143,7 @@ namespace Lime
 			if (!paused) {
 				Resume(fadeinTime);
 			}
+			return true;
 		}
 
 		private void DetachBuffers()

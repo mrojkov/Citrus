@@ -271,12 +271,11 @@ namespace Lime
 			}
 			var decoder = AudioDecoderFactory.CreateDecoder(stream);
 			var channel = channelSelector(decoder.GetFormat());
-			if (channel == null) {
+			if (channel == null || !channel.Play(sound, decoder, looping, paused, fadeinTime)) {
 				decoder.Dispose();
 				return sound;
 			}
 			channel.SamplePath = path;
-			channel.Play(sound, decoder, looping, paused, fadeinTime);
 			return sound;
 		}
 
