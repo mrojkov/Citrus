@@ -73,6 +73,7 @@ namespace Lime
 		{
 			projection = (UnityEngine.Matrix4x4)matrix;
 			viewportOrProjectionChanged = true;
+			UnityEngine.GL.LoadProjectionMatrix(projection);
 		}
 
 		public static void SetScissorRectangle(WindowRect value)
