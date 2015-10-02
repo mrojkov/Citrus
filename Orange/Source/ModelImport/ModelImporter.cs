@@ -86,8 +86,9 @@ namespace Orange
 			using (var aiContext = new Assimp.AssimpContext()) {
 				aiContext.SetConfig(new Assimp.Configs.RemoveDegeneratePrimitivesConfig(true));
 				var postProcess = Assimp.PostProcessSteps.Triangulate;
-				if (platform != TargetPlatform.Unity) {
-					postProcess |= Assimp.PostProcessSteps.FlipUVs;
+				postProcess |= Assimp.PostProcessSteps.FlipUVs;
+				if (platform == TargetPlatform.Unity) {
+					postProcess |= Assimp.PostProcessSteps.FlipWindingOrder;
 				}
 				aiScene = aiContext.ImportFile(path, postProcess);
 				FindCameras();
