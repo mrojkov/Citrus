@@ -72,9 +72,11 @@ namespace Lime
 #endif
 
 		public GameView(Application app)
-			: base(800, 600, new GraphicsMode(new ColorFormat(32), depth: 24), app.Title
-#if !MAC
-			, GameWindowFlags.Default, DisplayDevice.Default, 2, 0, GetGraphicContextFlags()
+			: base(app.Options.WindowSize.Width, app.Options.WindowSize.Height, 
+				new GraphicsMode(new ColorFormat(32), depth: 24), app.Title,
+#if WIN
+				GetWindowFlags(app.Options),
+				DisplayDevice.Default, 2, 0, GetGraphicContextFlags()
 #endif
 			)
 		{
@@ -91,8 +93,18 @@ namespace Lime
 			this.Mouse.Move += HandleMouseMove;
 			this.Mouse.WheelChanged += HandleMouseWheel;
 			SetupWindowLocationAndSize();
+			// Setting fullscreen with GameWindowFlags.FullScreen in OpenTK.GameWindow constructor causes
+			// changing the display resolution. Desktop fullscreen is much more better.
+			this.FullScreen = app.Options.FullScreen;
 			RenderingApi = GetRenderingApi();
 		}
+
+#if WIN
+		private static GameWindowFlags GetWindowFlags(Application.StartupOptions options)
+		{
+			return options.FixedSizeWindow ? GameWindowFlags.FixedWindow : GameWindowFlags.Default;
+		}
+#endif
 
 		public new WindowBorder WindowBorder
 		{
@@ -158,11 +170,11 @@ namespace Lime
 
 		protected override void OnFocusedChanged(EventArgs e)
 		{
-			Application.Instance.Active = this.Focused;
+			app.Active = this.Focused;
 			if (this.Focused) {
-				Application.Instance.OnActivate();
+				app.OnActivate();
 			} else {
-				Application.Instance.OnDeactivate();
+				app.OnDeactivate();
 			}
 		}
 
@@ -320,11 +332,21 @@ namespace Lime
 		}
 		
 		public bool FullScreen { 
-			get { 
-				return this.WindowState == WindowState.Fullscreen;
-			}
-			set { 
-				this.WindowState = value ? WindowState.Fullscreen : WindowState.Normal;
+			get { return this.WindowState == WindowState.Fullscreen; }
+			set
+			{
+				var newState = value ? WindowState.Fullscreen : WindowState.Normal;
+				if (WindowState == newState) {
+					return;
+				}
+				this.WindowState = newState;
+#if WIN
+				if (value) {
+					app.OnEnteredFullScreen();
+				} else {
+					app.OnExitedFullScreen();
+				}
+#endif
 			}
 		}
 

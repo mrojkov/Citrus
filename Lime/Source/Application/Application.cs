@@ -95,6 +95,9 @@ namespace Lime
 			public bool DecodeAudioInSeparateThread = true;
 			public int NumStereoChannels = 8;
 			public int NumMonoChannels = 16;
+			public bool FullScreen = false;
+			public bool FixedSizeWindow = true;
+			public Size WindowSize = new Size(800, 600);
 		}
 
 		public static float LowFPSLimit = 20;
