@@ -258,9 +258,8 @@
       <Link>wrap_oal.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\3rdParty\OpenTK\Dependencies_x86\d3dcompiler_46.dll">
-      <Link>d3dcompiler_46.dll</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <Content Include="..\3rdParty\OpenTK\Dependencies_x86\d3dcompiler_47.dll">
+      <Link>d3dcompiler_47.dll</Link>
     </Content>
     <Content Include="..\3rdParty\OpenTK\Dependencies_x86\libEGL.dll">
       <Link>libEGL.dll</Link>
