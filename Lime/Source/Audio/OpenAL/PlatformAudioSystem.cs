@@ -58,13 +58,21 @@ namespace Lime
 		{
 #if iOS
 			AVAudioSession.SharedInstance().Init();
+			AVAudioSession.SharedInstance().SetCategory(AVAudioSessionCategory.Ambient);
+
 			interruptionNotification = AVAudioSession.Notifications.ObserveInterruption((sender, args) => {
 				if (args.InterruptionType == AVAudioSessionInterruptionType.Began) {
 					Active = false;
 					AVAudioSession.SharedInstance().SetActive(false);
 				} else if (args.InterruptionType == AVAudioSessionInterruptionType.Ended) {
+					
+					// Grisha: Workaround on "AUIOClient_StartIO failed" issue.
+					// On iOS sound not restores after incoming call. Making everything like in tutorial doesn't help much.
+					// So, we wait a bit before restoring - and it works.
+					Thread.Sleep(500);
+
+					AVAudioSession.SharedInstance().SetCategory(AVAudioSessionCategory.Ambient);
 					AVAudioSession.SharedInstance().SetActive(true);
-					AVAudioSession.SharedInstance().SetCategory(AVAudioSessionCategory.Playback);
 					Active = true;
 				}
 			});	
