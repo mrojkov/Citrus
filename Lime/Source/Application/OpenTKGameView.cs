@@ -73,9 +73,9 @@ namespace Lime
 
 		public GameView(Application app)
 			: base(app.Options.WindowSize.Width, app.Options.WindowSize.Height, 
-				new GraphicsMode(new ColorFormat(32), depth: 24), app.Title,
+				new GraphicsMode(new ColorFormat(32), depth: 24), app.Title
 #if WIN
-				GetWindowFlags(app.Options),
+				, GetWindowFlags(app.Options),
 				DisplayDevice.Default, 2, 0, GetGraphicContextFlags()
 #endif
 			)
