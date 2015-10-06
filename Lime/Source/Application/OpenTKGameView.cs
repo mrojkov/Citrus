@@ -129,11 +129,17 @@ namespace Lime
 				this.Location = displayBounds.Location;
 				this.WindowState = OpenTK.WindowState.Maximized;
 			} else {
-				this.Location = new System.Drawing.Point {
-					X = Math.Max(0, (displayBounds.Width - this.Width) / 2 + displayBounds.X),
-					Y = Math.Max(0, (displayBounds.Height - this.Height) / 2 + displayBounds.Y)
-				};
+				Center();
 			}
+		}
+
+		public void Center()
+		{
+			var displayBounds = OpenTK.DisplayDevice.Default.Bounds;
+			this.Location = new System.Drawing.Point {
+				X = Math.Max(0, (displayBounds.Width - this.Width) / 2 + displayBounds.X),
+				Y = Math.Max(0, (displayBounds.Height - this.Height) / 2 + displayBounds.Y)
+			};
 		}
 
 		private static RenderingApi GetRenderingApi()
@@ -279,18 +285,6 @@ namespace Lime
 				app.OnResize();
 		}
 
-#if MAC
-		protected override void OnEnteredFullScreen(EventArgs e)
-		{
-			app.OnEnteredFullScreen();
-		}
-
-		protected override void OnExitedFullScreen(EventArgs e)
-		{
-			app.OnExitedFullScreen();
-		}
-#endif
-
 		private void Limit25FPS()
 		{
 			int delta = (int)(DateTime.UtcNow - lastFrameTimeStamp).TotalMilliseconds;
@@ -340,13 +334,6 @@ namespace Lime
 					return;
 				}
 				this.WindowState = newState;
-#if WIN
-				if (value) {
-					app.OnEnteredFullScreen();
-				} else {
-					app.OnExitedFullScreen();
-				}
-#endif
 			}
 		}
 

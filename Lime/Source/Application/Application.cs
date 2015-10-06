@@ -348,6 +348,16 @@ namespace Lime
 			set { GameView.Instance.WindowSize = value; }
 		}
 
+		/// <summary>
+		/// Centers the game window on the default display
+		/// </summary>
+		public void CenterWindow()
+		{
+#if WIN || MAC
+			GameView.Instance.Center();
+#endif
+		}
+
 		public WindowBorder WindowBorder
 		{
 			get { return GameView.Instance.WindowBorder; }
@@ -465,9 +475,6 @@ namespace Lime
 
 		public event Action Resized;
 
-		public event Action EnteredFullScreen;
-		public event Action ExitedFullScreen;
-
 		/// <summary>
 		/// Вызывается, когда свойство Active стало true (например приложение было развернуто или его окно получило фокус)
 		/// </summary>
@@ -535,20 +542,6 @@ namespace Lime
 		{
 			if (Resized != null) {
 				Resized();
-			}
-		}
-
-		public virtual void OnEnteredFullScreen()
-		{
-			if (EnteredFullScreen != null) {
-				EnteredFullScreen();
-			}
-		}
-
-		public virtual void OnExitedFullScreen()
-		{
-			if (ExitedFullScreen != null) {
-				ExitedFullScreen();
 			}
 		}
 
