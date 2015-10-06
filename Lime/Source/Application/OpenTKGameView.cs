@@ -277,7 +277,6 @@ namespace Lime
 
 		protected override void OnResize(EventArgs e)
 		{
-			base.OnResize(e);
 			if (app != null)
 				app.OnResize();
 		}

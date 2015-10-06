@@ -101,9 +101,12 @@ namespace OpenTK
 				NSApplication.SharedApplication.Terminate(View);
 				OnClosed(e);	
 			};
-			window.DidResize += (s, e) => OnResize(e);
+			window.DidResize += (s, e) => {
+				View.UpdateGLContext();
+				OnResize(e);
+			};
 			window.DidMove += (s, e) => OnMove(e);
-			window.CollectionBehavior = NSWindowCollectionBehavior.FullScreenPrimary;			
+			window.CollectionBehavior = NSWindowCollectionBehavior.FullScreenPrimary;
 			window.ContentView = View;
 			window.ReleasedWhenClosed = true;
 			View.RenderFrame += (s, e) => {
@@ -161,7 +164,6 @@ namespace OpenTK
 		
 		protected virtual void OnResize(EventArgs e)
 		{
-			View.UpdateGLContext();
 		}
 
 		public void Close()
