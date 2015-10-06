@@ -6,6 +6,13 @@ using System.Drawing;
 
 namespace OpenTK
 {
+	public enum GameWindowFlags
+	{
+		Default = 0,
+		FullScreen = 1,	
+		FixedWindow = 2,
+	}
+
 	public class GameWindow : IDisposable
 	{
 		public readonly NSGameView View;
@@ -76,14 +83,18 @@ namespace OpenTK
 			}
 		}		
 
-		public GameWindow(int width, int height, GraphicsMode graphicsMode, string title)
+		public GameWindow(int width, int height, GraphicsMode graphicsMode, string title, GameWindowFlags flags = GameWindowFlags.Default)
 		{
 			var rect = new CGRect(0, 0, width, height);
 			View = new NSGameView(rect) {
 				Mouse = Mouse,
 				Keyboard = Keyboard
 			};
-			window = new NSWindow(rect, NSWindowStyle.Titled | NSWindowStyle.Closable | NSWindowStyle.Resizable, NSBackingStore.Buffered, false);
+			var style = NSWindowStyle.Titled | NSWindowStyle.Closable;
+			if ((flags & GameWindowFlags.FixedWindow) == 0) {
+				style |= NSWindowStyle.Resizable;
+			}
+			window = new NSWindow(rect, style, NSBackingStore.Buffered, false);
 			window.Title = title;
 			window.WillClose += (s, e) => {
 				View.Stop();
@@ -92,8 +103,6 @@ namespace OpenTK
 			};
 			window.DidResize += (s, e) => OnResize(e);
 			window.DidMove += (s, e) => OnMove(e);
-			window.DidEnterFullScreen += (s, e) => OnEnteredFullScreen(e);
-			window.DidExitFullScreen += (s, e) => OnExitedFullScreen(e);
 			window.CollectionBehavior = NSWindowCollectionBehavior.FullScreenPrimary;			
 			window.ContentView = View;
 			window.ReleasedWhenClosed = true;
@@ -155,14 +164,6 @@ namespace OpenTK
 			View.UpdateGLContext();
 		}
 
-		protected virtual void OnEnteredFullScreen(EventArgs e)
-		{
-		}
-		
-		protected virtual void OnExitedFullScreen(EventArgs e)
-		{
-		}		
-		
 		public void Close()
 		{
 			View.Close();
