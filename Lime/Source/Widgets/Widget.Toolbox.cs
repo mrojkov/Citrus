@@ -28,10 +28,12 @@ namespace Lime
 	public partial class Widget : Node
 	{
 		/// <summary>
-		/// Рендерит виджет в текстуру
+		/// Renders widget's descendants to texture. If you want to render widget itself
+		/// then add it to provided renderChain before calling RenderToTexture. Be sure
+		/// not to do this inside Render() call.
 		/// </summary>
-		/// <param name="texture">Текстура, в которую будет отрендерен виджет (должна быть типа RenderTexture)</param>
-		/// <param name="renderChain">Очередь отрисовки (задает порядок отрисовки объектов с иерархической структурой)</param>
+		/// <param name="texture">Texture to render to. Must be RenderTexture or SerializableTexture</param>
+		/// <param name="renderChain">Render queue (order relation of elements with tree structure and layers)</param>
 		public void RenderToTexture(ITexture texture, RenderChain renderChain)
 		{
 			if (Width > 0 && Height > 0) {
