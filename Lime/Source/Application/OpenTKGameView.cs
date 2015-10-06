@@ -73,10 +73,9 @@ namespace Lime
 
 		public GameView(Application app)
 			: base(app.Options.WindowSize.Width, app.Options.WindowSize.Height, 
-				new GraphicsMode(new ColorFormat(32), depth: 24), app.Title
+				new GraphicsMode(new ColorFormat(32), depth: 24), app.Title, GetWindowFlags(app.Options)
 #if WIN
-				, GetWindowFlags(app.Options),
-				DisplayDevice.Default, 2, 0, GetGraphicContextFlags()
+				, DisplayDevice.Default, 2, 0, GetGraphicContextFlags()
 #endif
 			)
 		{
@@ -99,12 +98,10 @@ namespace Lime
 			RenderingApi = GetRenderingApi();
 		}
 
-#if WIN
 		private static GameWindowFlags GetWindowFlags(Application.StartupOptions options)
 		{
 			return options.FixedSizeWindow ? GameWindowFlags.FixedWindow : GameWindowFlags.Default;
 		}
-#endif
 
 		public new WindowBorder WindowBorder
 		{
