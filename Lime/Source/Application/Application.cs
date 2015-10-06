@@ -98,6 +98,7 @@ namespace Lime
 			public bool FullScreen = false;
 			public bool FixedSizeWindow = true;
 			public Size WindowSize = new Size(800, 600);
+			public string WindowTitle = "Citrus";
 		}
 
 		public static float LowFPSLimit = 20;
@@ -133,7 +134,11 @@ namespace Lime
 		/// <summary>
 		/// Заголовок окна приложения (актуально только для десктопных приложений)
 		/// </summary>
-		public string Title = "Citrus";
+		public string Title
+		{
+			get { return GameView.Instance.Title; }
+			set { GameView.Instance.Title = value; }
+		}
 
 		/// <summary>
 		/// Конструктор
