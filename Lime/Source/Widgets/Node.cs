@@ -78,7 +78,19 @@ namespace Lime
 		[Trigger]
 		public string Trigger { get; set; }
 
-		public Node Parent { get; internal set; }
+		private Node parent;
+
+		public Node Parent
+		{
+			get { return parent; }
+			internal set
+			{
+				if (parent != value) {
+					parent = value;
+					PropagateDirtyFlags();
+				}
+			}
+		}
 
 		public Widget AsWidget { get; internal set; }
 
