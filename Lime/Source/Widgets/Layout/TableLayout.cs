@@ -159,10 +159,10 @@ namespace Lime
 		private Margin GetCellMargin(int i, int j)
 		{
 			return new Margin() {
-				Left = (j == 0) ? Margin.Left : ColumnSpacing / 2,
-				Right = (j == ColumnCount - 1) ? Margin.Right : ColumnSpacing / 2,
-				Top = (i == 0) ? Margin.Top : RowSpacing / 2,
-				Bottom = (i == RowCount - 1) ? Margin.Bottom : RowSpacing / 2
+				Left = (j == 0) ? Margin.Left : (ColumnSpacing / 2).Round(),
+				Right = (j == ColumnCount - 1) ? Margin.Right : (ColumnSpacing / 2).Round(),
+				Top = (i == 0) ? Margin.Top : (RowSpacing / 2).Round(),
+				Bottom = (i == RowCount - 1) ? Margin.Bottom : (RowSpacing / 2).Round()
 			};
 		}
 
@@ -174,7 +174,7 @@ namespace Lime
 				position.X += size.X - widget.Width;
 				size.X = widget.Width;
 			} else if (halign == HAlignment.Center) {
-				position.X += (size.X - widget.Width) / 2;
+				position.X += ((size.X - widget.Width) / 2).Round();
 				size.X = widget.Width;
 			}
 			if (valign == VAlignment.Top) {
@@ -183,7 +183,7 @@ namespace Lime
 				position.Y += size.Y - widget.Height;
 				size.Y = widget.Height;
 			} else if (valign == VAlignment.Center) {
-				position.Y += (size.Y - widget.Height) / 2;
+				position.Y += ((size.Y - widget.Height) / 2).Round();
 				size.Y = widget.Height;
 			}
 			widget.Position = position;
