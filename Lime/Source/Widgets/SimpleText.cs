@@ -365,7 +365,7 @@ namespace Lime
 			if (VAlignment == VAlignment.Bottom) {
 				return Size.Y - totalHeight;
 			} else if (VAlignment == VAlignment.Center) {
-				return (Size.Y - totalHeight) * 0.5f;
+				return ((Size.Y - totalHeight) * 0.5f).Round();
 			}
 			return 0;
 		}
@@ -384,7 +384,7 @@ namespace Lime
 					pos.X = Size.X - lineWidth;
 					break;
 				case HAlignment.Center:
-					pos.X = (Size.X - lineWidth) * 0.5f;
+					pos.X = ((Size.X - lineWidth) * 0.5f).Round();
 					break;
 			}
 			if (spriteList != null) {

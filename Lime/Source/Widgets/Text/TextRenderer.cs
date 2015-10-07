@@ -144,12 +144,12 @@ namespace Lime.Text
 				if (hAlign == HAlignment.Right)
 					offset.X = area.X - totalWidth;
 				else if (hAlign == HAlignment.Center)
-					offset.X = (area.X - totalWidth) * 0.5f;
+					offset.X = ((area.X - totalWidth) * 0.5f).Round();
 				// Calculate offset for vertical alignment.
 				if (vAlign == VAlignment.Bottom)
 					offset.Y = area.Y - totalHeight;
 				else if (vAlign == VAlignment.Center)
-					offset.Y = (area.Y - totalHeight) * 0.5f;
+					offset.Y = ((area.Y - totalHeight) * 0.5f).Round();
 				// Draw string.
 				for (int j = 0; j < count; j++) {
 					var word = fittedWords[b + j];
