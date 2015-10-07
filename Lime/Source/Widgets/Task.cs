@@ -41,13 +41,10 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// The watcher. Being invoked on every task update. Useful for diposing the task by some condition.
+		/// Invoked on every task update. Useful for disposing of the task on some condition.
 		/// </summary>
 		public Action Watcher;
 
-		/// <summary>
-		/// Возвращает true, если задача выполнена
-		/// </summary>
 		public bool Completed { get { return stack.Count == 0; } }
 		
 		private float waitTime;
@@ -143,20 +140,27 @@ namespace Lime
 		{
 			if (result == null) {
 				waitTime = 0;
-			} else if (result is int) {
+			}
+			else if (result is int) {
 				waitTime = (int)result;
-			} else if (result is float) {
+			}
+			else if (result is float) {
 				waitTime = (float)result;
-			} else if (result is IEnumerator<object>) {
+			}
+			else if (result is IEnumerator<object>) {
 				stack.Push(result as IEnumerator<object>);
 				Advance(0);
-			} else if (result is WaitPredicate) {
+			}
+			else if (result is WaitPredicate) {
 				waitPredicate = result as WaitPredicate;
-			} else if (result is Lime.Node) {
+			}
+			else if (result is Lime.Node) {
 				waitPredicate = WaitForAnimation(result as Lime.Node);
-			} else if (result is IEnumerable<object>) {
+			}
+			else if (result is IEnumerable<object>) {
 				throw new Lime.Exception("Use IEnumerator<object> instead of IEnumerable<object> for " + result);
-			} else {
+			}
+			else {
 				throw new Lime.Exception("Invalid object yielded " + result);
 			}
 		}
