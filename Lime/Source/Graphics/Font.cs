@@ -11,7 +11,7 @@ namespace Lime
 		[ProtoMember(1)]
 		public string About;
 		[ProtoMember(2)]
-		public List<SerializableTexture> Textures = new List<SerializableTexture>();
+		public List<ITexture> Textures = new List<ITexture>();
 		[ProtoMember(3)]
 		public readonly FontCharCollection Chars = new FontCharCollection();
 	}
@@ -121,25 +121,54 @@ namespace Lime
 		public float Kerning;
 	}
 
+	/// <summary>
+	/// Class representing the single font character and it's geometry
+	/// </summary>
 	[ProtoContract]
 	public class FontChar
 	{
 		[ProtoMember(1)]
 		public char Char;
+		/// <summary>
+		/// The left-top glyph's position in the font texture
+		/// </summary>
 		[ProtoMember(2)]
 		public Vector2 UV0;
+		/// <summary>
+		/// The right-bottom glyph's position in the font texture
+		/// </summary>
 		[ProtoMember(3)]
 		public Vector2 UV1;
+		/// <summary>
+		/// Width of the glyph in pixels
+		/// </summary>
 		[ProtoMember(4)]
 		public float Width;
+		/// <summary>
+		/// Height of the glyph in pixels
+		/// </summary>
 		[ProtoMember(5)]
 		public float Height;
+		/// <summary>
+		/// Contains the A and C spacing of the character.
+		/// The A spacing is the distance to add to the current position before drawing the character glyph.
+		/// The C spacing is the distance to add to the current position to provide white space to the right of the character glyph.
+		/// </summary>
 		[ProtoMember(6)]
-		public Vector2 ACWidths;
+        public Vector2 ACWidths;
+		/// <summary>
+		/// List of kerning pairs, related to this character
+		/// </summary>
 		[ProtoMember(7)]
 		public List<KerningPair> KerningPairs;
+		/// <summary>
+		/// Font texture's index which contains the given glyph
+		/// </summary>
 		[ProtoMember(8)]
 		public int TextureIndex;
+		/// <summary>
+		/// The null-character which denotes any missing character in a font
+		/// </summary>
 		public static FontChar Null = new FontChar();
 
 		public float Kerning(FontChar prevChar)
