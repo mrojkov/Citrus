@@ -61,14 +61,15 @@ namespace Lime
 		public string Id { get; set; }
 
 		/// <summary>
-		/// Relative (to HotStudio project root folder) path
-		/// to source of this node, e.g. "Shell/GameScreen".
+		/// Denotes the path to the external scene. 
+		/// If this path isn't null during node loading, the node children are replaced by the external scene nodes.
 		/// </summary>
 		[ProtoMember(2)]
 		public string ContentsPath { get; set; }
 
 		/// <summary>
-		/// TODO: Add summary
+		/// May contain the marker id of the default animation. 
+		/// When an animation hits a trigger keyframe, it automatically runs the child animation from the given marker id.
 		/// </summary>
 		[Trigger]
 		public string Trigger { get; set; }
