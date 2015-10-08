@@ -50,6 +50,11 @@ namespace Lime
 
 		public Font DefaultFont { get { return this[null]; } }
 
+		public void AddFont(string name, Font font)
+		{
+			fonts[name] = font;
+		}
+
 		public Font this[string name]
 		{
 			get	{
