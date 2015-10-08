@@ -274,9 +274,7 @@ namespace Lime
 				if (index + 1 < Count) {
 					value.NextSibling = list[index + 1];
 				}
-				if (value.GlobalValuesValid) {
-					value.PropagateDirtyFlags();
-				}
+				value.PropagateDirtyFlags();
 			}
 		}
 	}

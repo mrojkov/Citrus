@@ -48,11 +48,6 @@ namespace Lime
 			remove { DefaultAnimation.Stopped -= value; }
 		}
 
-		/// <summary>
-		/// TODO: Add summary
-		/// </summary>
-		internal protected bool GlobalValuesValid;
-
 		#region properties
 #if WIN
 		public Guid Guid { get; set; }
@@ -359,7 +354,6 @@ namespace Lime
 			clone.Parent = null;
 			clone.NextSibling = null;
 			clone.AsWidget = clone as Widget;
-			clone.GlobalValuesValid = false;
 			clone.Animations = Animations.Clone(clone);
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Nodes = Nodes.DeepCloneFast(clone);
