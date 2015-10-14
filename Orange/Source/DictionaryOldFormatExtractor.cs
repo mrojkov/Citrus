@@ -12,17 +12,43 @@ namespace Orange
 	{
 		enum LocalizationPass
 		{
+			CollectExtractedStrings,
 			ExtractTaggedStrings,
 			TagUntaggedStrings
 		}
+
+		public class StringInfo
+		{
+			public string Key;
+			public string Text;
+			public bool Allow;
+			public HashSet<string> Sources = new HashSet<string>();
+		}
+
+		LocalizationPass currentPass;
+		string currentSource;
+		Dictionary<string, StringInfo> extractedStrings;
 
 		public void ExtractDictionary()
 		{
 			const string dictionary = "Dictionary.txt";
 			LoadDictionary(dictionary);
-			RunLocalizationPass(LocalizationPass.ExtractTaggedStrings);
-			RunLocalizationPass(LocalizationPass.TagUntaggedStrings);
-			SaveDictionary(dictionary);
+			extractedStrings = new Dictionary<string, StringInfo>();
+			RunLocalizationPass(LocalizationPass.CollectExtractedStrings);
+			var stringsArray = new StringInfo[extractedStrings.Count];
+			extractedStrings.Values.CopyTo(stringsArray, 0);
+			Array.Sort(stringsArray, (item1, item2) => { return item1.Key.CompareTo(item2.Key); });
+			var window = new DictionaryExtractorWindow(stringsArray);
+			window.OnGo = () => {
+				DateTime startTime = DateTime.Now;
+				LoadDictionary(dictionary);
+				RunLocalizationPass(LocalizationPass.ExtractTaggedStrings);
+				RunLocalizationPass(LocalizationPass.TagUntaggedStrings);
+				SaveDictionary(dictionary);
+				var endTime = DateTime.Now;
+				var delta = endTime - startTime;
+				Console.WriteLine("Elapsed time {0}:{1}:{2}", delta.Hours, delta.Minutes, delta.Seconds);
+			};
 		}
 
 		private static void SaveDictionary(string dictionary)
@@ -46,23 +72,31 @@ namespace Orange
 			}
 		}
 
+		private bool NeedProcessFile(string path)
+		{
+			return !path.StartsWith("TravelMatch.Unity/Assets");
+		}
+
 		private void RunLocalizationPass(LocalizationPass pass)
 		{
+			currentPass = pass;
+			Console.WriteLine("=== Running localization pass " + pass.ToString() + " ===");
 			var sourceFiles = new FileEnumerator(The.Workspace.ProjectDirectory);
 			using (new DirectoryChanger(The.Workspace.ProjectDirectory)) {
 				var files = sourceFiles.Enumerate(".cs");
 				foreach (var fileInfo in files) {
-					if (pass == 0) {
-						Console.WriteLine("* " + fileInfo.Path);
-					}
+					if (!NeedProcessFile(fileInfo.Path))
+						continue;
+					Console.WriteLine("* " + fileInfo.Path);
 					ProcessSourceFile(fileInfo.Path, pass, Encoding.UTF8);
 				}
 			}
 			using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
 				var files = The.Workspace.AssetFiles.Enumerate(".scene");
 				foreach (var fileInfo in files) {
-					if (pass == 0)
-						Console.WriteLine("* " + fileInfo.Path);
+					if (!NeedProcessFile(fileInfo.Path))
+						continue;
+					Console.WriteLine("* " + fileInfo.Path);
 					// Сначала прогоним все строки вида: "[]blah-blah.."
 					ProcessSourceFile(fileInfo.Path, pass, Encoding.Default);
 					// Затем прогоним все строки вида: Text "blah-blah.."
@@ -75,10 +109,10 @@ namespace Orange
 			using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
 				var files = The.Workspace.AssetFiles.Enumerate(".txt");
 				foreach (var fileInfo in files) {
-					if (Path.GetDirectoryName(fileInfo.Path) == "Levels")
-					{
-						if (pass == 0)
-							Console.WriteLine("* " + fileInfo.Path);
+					if (!NeedProcessFile(fileInfo.Path))
+						continue;
+					if (Path.GetDirectoryName(fileInfo.Path) == "Levels") {
+						Console.WriteLine("* " + fileInfo.Path);
 						ProcessGummyDropLevelFile(fileInfo.Path, pass, Encoding.UTF8);
 					}
 				}
@@ -92,17 +126,18 @@ namespace Orange
 
 		void ProcessSourceFile(string file, LocalizationPass pass, Encoding saveEncoding)
 		{
+			currentSource = file;
 			const string quotedStringPattern = @"""([^""\\]*(?:\\.[^""\\]*)*)""";
 			var originalCode = File.ReadAllText(file);
 			var processedCode = Regex.Replace(originalCode, quotedStringPattern,
 				(match) => {
 					string s = match.Groups[1].Value;
- 					if (pass == LocalizationPass.TagUntaggedStrings || IsStringTagged(s)) {
+					if (pass != LocalizationPass.ExtractTaggedStrings || IsStringTagged(s)) {
 						s = ProcessTextLine(s, processStringsWithoutBrackets: false);
 					}
 					return '"' + s + '"';
 				});
-			if (processedCode != originalCode) {
+			if (pass != LocalizationPass.CollectExtractedStrings && processedCode != originalCode) {
 				File.WriteAllText(file, processedCode, saveEncoding);
 			}
 		}
@@ -141,6 +176,7 @@ namespace Orange
 			if (pass != LocalizationPass.TagUntaggedStrings) {
 				return;
 			}
+			currentSource = file;
 			bool changed = false;
 			var lines = ReadStrings(file);
 			for (int i = 0; i < lines.Count; i++) {
@@ -150,19 +186,21 @@ namespace Orange
 					string value = line.Substring(pos + 4);
 					if (HasAlphabeticCharacters(value)) {
 						var key = GenerateTagForText(Unescape(value));
-						AddTextToDictionary(key, Unescape(value));
-						lines[i] = line.Substring(0, pos) + string.Format(": [{0}]{1}", key, value);
-						changed = true;
+						if (AddTextToDictionary(key, Unescape(value))) {
+							lines[i] = line.Substring(0, pos) + string.Format(": [{0}]{1}", key, value);
+							changed = true;
+						}
 					}
 				}
 			}
-			if (changed) {
+			if (pass != LocalizationPass.CollectExtractedStrings && changed) {
 				WriteStrings(file, lines);
 			}
 		}
 
 		void ProcessSceneFile(string file, LocalizationPass pass)
 		{
+			currentSource = file;
 			var originalCode = File.ReadAllText(file, Encoding.Default);
 			var processedCode = Regex.Replace(originalCode, @"^(\s*Text)\s""([^""\\]*(?:\\.[^""\\]*)*)""$", 
 				(match) => {
@@ -174,7 +212,7 @@ namespace Orange
 					string result = string.Format(@"{0} ""{1}""", prefix, text);
 					return result;
 				}, RegexOptions.Multiline);
-			if (originalCode != processedCode) {
+			if (pass != LocalizationPass.CollectExtractedStrings && originalCode != processedCode) {
 				File.WriteAllText(file, processedCode, Encoding.UTF8);
 			}
 		}
@@ -205,8 +243,9 @@ namespace Orange
 					string value = match.Groups[2].Value;
 					if (HasAlphabeticCharacters(value)) {
 						var key = GenerateTagForText(Unescape(value));
-						AddTextToDictionary(key, Unescape(value));
-						text = string.Format("[{0}]{1}", key, value);
+						if (AddTextToDictionary(key, Unescape(value))) {
+							text = string.Format("[{0}]{1}", key, value);
+						}
 					}
 				}
 			} else if (processStringsWithoutBrackets) {
@@ -214,8 +253,9 @@ namespace Orange
 					// The line has no [] prefix, but still should be localized. 
 					// E.g. most of texts in scene files.
 					var key = GenerateTagForText(Unescape(text));
-					AddTextToDictionary(key, Unescape(text));
-					text = string.Format("[{0}]{1}", key, text);
+					if (AddTextToDictionary(key, Unescape(text))) {
+						text = string.Format("[{0}]{1}", key, text);
+					}
 				}
 			}
 			return text;
@@ -226,11 +266,30 @@ namespace Orange
 			return text.Any(c => char.IsLetter(c));
 		}
 
-		private static void AddTextToDictionary(string key, string value)
+		private bool AddTextToDictionary(string key, string value)
 		{
+			if (currentPass != LocalizationPass.CollectExtractedStrings) {
+				StringInfo info;
+				if (!extractedStrings.TryGetValue(value, out info))
+					return false;
+				if (!info.Allow)
+					return false;
+			}
 			var e = Localization.Dictionary.GetEntry(key);
 			e.Text = value;
 			e.Context = null;
+			if (currentPass == LocalizationPass.CollectExtractedStrings) {
+				StringInfo info;
+				if (!extractedStrings.TryGetValue(value, out info)) {
+					info = new StringInfo();
+					info.Key = key;
+					info.Text = value;
+					info.Allow = false;
+					extractedStrings.Add(value, info);
+				}
+				info.Sources.Add(currentSource);
+			}
+			return true;
 		}
 
 		private static string Escape(string text)

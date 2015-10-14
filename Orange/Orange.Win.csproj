@@ -103,6 +103,7 @@
     <Compile Include="Source\Builder\BuildSystem.cs" />
     <Compile Include="Source\Builder\MSBuild.cs" />
     <Compile Include="Source\Builder\MDTool.cs" />
+    <Compile Include="Source\DictionaryExtractorWindow.cs" />
     <Compile Include="Source\DictionaryOldFormatExtractor.cs" />
     <Compile Include="Source\ModelImport\ModelImporter.cs" />
     <Compile Include="Source\PluginAttributes\PluginFileIgoranceAttribute.cs" />
