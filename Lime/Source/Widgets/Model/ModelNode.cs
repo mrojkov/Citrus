@@ -163,5 +163,19 @@ namespace Lime
 			}
 			return result;
 		}
+
+		protected internal override void PerformHitTest()
+		{
+			if (!HitTestTarget) {
+				return;
+			}
+			var r = HitTest(Input.MousePosition);
+			if (r.Distance < World.Instance.DistanceToNodeUnderCursor) {
+				// TODO: Check Renderer.CurrentFrameBuffer == Renderer.DefaultFrameBuffer
+				// TODO: Check Renderer.ScissorTestEnabled and ScissorRectangle
+				World.Instance.DistanceToNodeUnderCursor = r.Distance;
+				World.Instance.NodeUnderCursor = this;
+			}
+		}
 	}
 }

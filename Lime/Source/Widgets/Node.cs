@@ -209,6 +209,8 @@ namespace Lime
 		/// </summary>
 		protected bool IsDirty(DirtyFlags mask) { return (DirtyMask & mask) != 0; }
 
+		public bool HitTestTarget;
+
 		#endregion
 
 		#region Methods
@@ -794,6 +796,9 @@ namespace Lime
 			}
 			return candidates.FirstOrDefault();
 		}
+
+		protected internal virtual void PerformHitTest() { }
+
 		#endregion
 	}
 }

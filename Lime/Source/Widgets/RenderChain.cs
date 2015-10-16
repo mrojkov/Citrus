@@ -44,6 +44,7 @@ namespace Lime
             for (int i = 0; i <= maxUsedLayer; i++) {
                 Node node = layers[i];
                 while (node != null) {
+					node.PerformHitTest();
                     node.Render();
                     Node next = node.NextToRender;
                     node.NextToRender = null;

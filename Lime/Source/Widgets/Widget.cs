@@ -898,6 +898,18 @@ namespace Lime
 			return Parent != null ? Parent.AsWidget.GetEffectiveClipperWidget() : null;
 		}
 
+		protected internal override void PerformHitTest()
+		{
+			if (!HitTestTarget) {
+				return;
+			}
+			if (SelfHitTest(Input.MousePosition)) {
+				// TODO: Check Renderer.CurrentFrameBuffer == Renderer.DefaultFrameBuffer
+				// TODO: Check Renderer.ScissorTestEnabled and ScissorRectangle
+				World.Instance.NodeUnderCursor = this;
+			}
+		}
+
 		#endregion
 	}
 }

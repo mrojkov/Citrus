@@ -16,6 +16,9 @@ namespace Lime
 		/// </summary>
 		public bool IsActiveTextWidgetUpdated;
 
+		internal float DistanceToNodeUnderCursor { get; set; }
+		public Node NodeUnderCursor { get; internal set; }
+
 		public static World Instance = new World();
 
 #if iOS || ANDROID
@@ -24,6 +27,7 @@ namespace Lime
 
 		protected override void SelfUpdate(float delta)
 		{
+			DistanceToNodeUnderCursor = float.MaxValue;
 			WidgetInput.RemoveInvalidatedCaptures();
 			ParticleEmitter.NumberOfUpdatedParticles = 0;
 			IsActiveTextWidgetUpdated = false;
