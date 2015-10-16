@@ -780,7 +780,6 @@ namespace Lime
 			Nodes.AddRange(nodes);
 		}
 
-		// SUGGESTION: Move to ResolveScenePath?
 		private static readonly string[] sceneExtensions = new[] { ".scene", ".model" };
 
 		/// <summary>
@@ -789,7 +788,6 @@ namespace Lime
 		/// </summary>
 		internal static string ResolveScenePath(string path)
 		{
-			// SUGGESTION: Enumerate?
 			var candidates = sceneExtensions.Select(ext => Path.ChangeExtension(path, ext)).Where(AssetsBundle.Instance.FileExists);
 			if (candidates.Count() > 1) {
 				throw new Lime.Exception("Ambiguity between: {0}", string.Join("; ", candidates.ToArray()));
