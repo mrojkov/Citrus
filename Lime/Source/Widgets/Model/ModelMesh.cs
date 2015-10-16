@@ -60,18 +60,18 @@ namespace Lime
 
 		public override MeshHitTestResult HitTest(Ray ray)
 		{
-			if (!GloballyVisible) {
-				return MeshHitTestResult.Default;
-			}
 			var result = base.HitTest(ray);
 			//var sphereInWorldSpace = BoundingSphere;
 			//sphereInWorldSpace.Center *= GlobalTransform;
 			//Vector3 scale = GlobalTransform.Scale;
 			//sphereInWorldSpace.Radius *= Math.Max(Math.Abs(scale.X), Math.Max(Math.Abs(scale.Y), Math.Abs(scale.Z)));
 
-			var sphereInWorldSpace = BoundingSphere.CreateFromPoints(Submeshes.SelectMany(sm => sm.Geometry.Vertices).Select(v => v * GlobalTransform));
-			//sphereInWorldSpace = sphereInWorldSpace.Transform(GlobalTransform);
-			var d = ray.Intersects(sphereInWorldSpace);
+			float? d = null;
+			if (HitTestTarget) {
+				var sphereInWorldSpace = BoundingSphere.CreateFromPoints(Submeshes.SelectMany(sm => sm.Geometry.Vertices).Select(v => v * GlobalTransform));
+				//sphereInWorldSpace = sphereInWorldSpace.Transform(GlobalTransform);
+				d = ray.Intersects(sphereInWorldSpace);
+			}
 			if (d.HasValue && d.Value < result.Distance) {
 				result = new MeshHitTestResult() { Distance = d.Value, Mesh = this };
 			}
