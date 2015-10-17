@@ -161,10 +161,10 @@ namespace Lime
 			return Input.WasMouseReleased() && HitTest(Input.MousePosition);
 		}
 
-		private void AssertIsNumber(float x)
+		private bool IsNumber(float x)
 		{
-			if (float.IsNaN(x) || float.IsInfinity(x))
-				throw new ArithmeticException();
+			return !float.IsNaN(x) &&
+					!float.IsInfinity(x);
 		}
 
 		/// <summary>
@@ -177,11 +177,8 @@ namespace Lime
 			get { return position; }
 			set
 			{
-				// TODO: Check through Debug.Assert
-#if LIME_CHECK_FLOATS
-				AssertIsNumber(value.X);
-				AssertIsNumber(value.Y);
-#endif
+				System.Diagnostics.Debug.Assert(IsNumber(value.X));
+				System.Diagnostics.Debug.Assert(IsNumber(value.Y));
 				if (position.X != value.X || position.Y != value.Y) {
 					position = value;
 					PropagateDirtyFlags(DirtyFlags.Transform);
@@ -196,11 +193,9 @@ namespace Lime
 		public float X 
 		{ 
 			get { return position.X; } 
-			set 
+			set
 			{
-#if LIME_CHECK_FLOATS
-				AssertIsNumber(value);
-#endif
+				System.Diagnostics.Debug.Assert(IsNumber(value));
 				if (position.X != value) {
 					position.X = value;
 					PropagateDirtyFlags(DirtyFlags.Transform);
@@ -217,9 +212,7 @@ namespace Lime
 			get { return position.Y; }
 			set
 			{
-#if LIME_CHECK_FLOATS
-				AssertIsNumber(value);
-#endif
+				System.Diagnostics.Debug.Assert(IsNumber(value));
 				if (position.Y != value) {
 					position.Y = value;
 					PropagateDirtyFlags(DirtyFlags.Transform);
@@ -238,10 +231,8 @@ namespace Lime
 			get { return size; }
 			set
 			{
-#if LIME_CHECK_FLOATS
-				AssertIsNumber(value.X);
-				AssertIsNumber(value.Y);
-#endif
+				System.Diagnostics.Debug.Assert(IsNumber(value.X));
+				System.Diagnostics.Debug.Assert(IsNumber(value.Y));
 				if (value.X != size.X || value.Y != size.Y) {
 					var sizeDelta = value - size;
 					size = value;
@@ -310,12 +301,10 @@ namespace Lime
 		public Vector2 Pivot 
 		{ 
 			get { return pivot; } 
-			set 
+			set
 			{
-#if LIME_CHECK_FLOATS
-				AssertIsNumber(value.X);
-				AssertIsNumber(value.Y);
-#endif
+				System.Diagnostics.Debug.Assert(IsNumber(value.X));
+				System.Diagnostics.Debug.Assert(IsNumber(value.Y));
 				if (pivot.X != value.X || pivot.Y != value.Y) {
 					pivot = value;
 					PropagateDirtyFlags(DirtyFlags.Transform);
@@ -331,12 +320,10 @@ namespace Lime
 		public Vector2 Scale 
 		{ 
 			get { return scale; } 
-			set 
+			set
 			{
-#if LIME_CHECK_FLOATS
-				AssertIsNumber(value.X);
-				AssertIsNumber(value.Y);
-#endif
+				System.Diagnostics.Debug.Assert(IsNumber(value.X));
+				System.Diagnostics.Debug.Assert(IsNumber(value.Y));
 				if (scale.X != value.X || scale.Y != value.Y) {
 					scale = value;
 					PropagateDirtyFlags(DirtyFlags.Transform);
@@ -351,11 +338,9 @@ namespace Lime
 		[ProtoMember(5)]
 		public float Rotation { 
 			get { return rotation; }
-			set 
+			set
 			{
-#if LIME_CHECK_FLOATS
-				AssertIsNumber(value);
-#endif
+				System.Diagnostics.Debug.Assert(IsNumber(value));
 				if (rotation != value) {
 					rotation = value;
 					direction = Mathf.CosSin(Mathf.DegreesToRadians * value);
