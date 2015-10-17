@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using Lime;
 using ProtoBuf;
 using System.Collections.Generic;
@@ -8,7 +8,8 @@ using System.Diagnostics;
 namespace Lime
 {
 	/// <summary>
-	/// Якоря. Задают привязку границ виджета к границам его родителя
+	/// TODO: Translate
+	/// РЇРєРѕСЂСЏ. Р—Р°РґР°СЋС‚ РїСЂРёРІСЏР·РєСѓ РіСЂР°РЅРёС† РІРёРґР¶РµС‚Р° Рє РіСЂР°РЅРёС†Р°Рј РµРіРѕ СЂРѕРґРёС‚РµР»СЏ
 	/// </summary>
 	[Flags]
 	public enum Anchors
@@ -27,32 +28,37 @@ namespace Lime
 	}
 
 	/// <summary>
-	/// Способы проверки столкновений
+	/// TODO: Translate
+	/// РЎРїРѕСЃРѕР±С‹ РїСЂРѕРІРµСЂРєРё СЃС‚РѕР»РєРЅРѕРІРµРЅРёР№
 	/// </summary>
 	public enum HitTestMethod
 	{
 		/// <summary>
-		/// Ограничивающий прямоугольник. Проверка без рекурсии. Грубо, но быстро
+		/// TODO: Translate
+		/// РћРіСЂР°РЅРёС‡РёРІР°СЋС‰РёР№ РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРє. РџСЂРѕРІРµСЂРєР° Р±РµР· СЂРµРєСѓСЂСЃРёРё. Р“СЂСѓР±Рѕ, РЅРѕ Р±С‹СЃС‚СЂРѕ
 		/// </summary>
 		BoundingRect,
 
 		/// <summary>
-		/// Содержимое. Проверка с рекурсией. Проверка всех вложенных контейнеров.
-		/// Картинки проверяются по маске. Точно, но медленно
+		/// TODO: Translate
+		/// РЎРѕРґРµСЂР¶РёРјРѕРµ. РџСЂРѕРІРµСЂРєР° СЃ СЂРµРєСѓСЂСЃРёРµР№. РџСЂРѕРІРµСЂРєР° РІСЃРµС… РІР»РѕР¶РµРЅРЅС‹С… РєРѕРЅС‚РµР№РЅРµСЂРѕРІ.
+		/// РљР°СЂС‚РёРЅРєРё РїСЂРѕРІРµСЂСЏСЋС‚СЃСЏ РїРѕ РјР°СЃРєРµ. РўРѕС‡РЅРѕ, РЅРѕ РјРµРґР»РµРЅРЅРѕ
 		/// </summary>
 		Contents,
 
 		/// <summary>
-		/// Пропуск проверки столкновений
+		/// TODO: Translate
+		/// РџСЂРѕРїСѓСЃРє РїСЂРѕРІРµСЂРєРё СЃС‚РѕР»РєРЅРѕРІРµРЅРёР№
 		/// </summary>
 		Skip
 	}
 
 	/// <summary>
-	/// Виджет. Базовый класс всех визуальных 2D объектов и интерфейса пользователя.
-	/// Атомарный объект пользовательского интерфейса. Подписан на события мыши, клавиатуры
-	/// и других устройств ввода. Представляет собой прямоугольный контейнер, содержащий
-	/// любые объекты сцены, в том числе и визуальные
+	/// TODO: Translate
+	/// Р’РёРґР¶РµС‚. Р‘Р°Р·РѕРІС‹Р№ РєР»Р°СЃСЃ РІСЃРµС… РІРёР·СѓР°Р»СЊРЅС‹С… 2D РѕР±СЉРµРєС‚РѕРІ Рё РёРЅС‚РµСЂС„РµР№СЃР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ.
+	/// РђС‚РѕРјР°СЂРЅС‹Р№ РѕР±СЉРµРєС‚ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕРіРѕ РёРЅС‚РµСЂС„РµР№СЃР°. РџРѕРґРїРёСЃР°РЅ РЅР° СЃРѕР±С‹С‚РёСЏ РјС‹С€Рё, РєР»Р°РІРёР°С‚СѓСЂС‹
+	/// Рё РґСЂСѓРіРёС… СѓСЃС‚СЂРѕР№СЃС‚РІ РІРІРѕРґР°. РџСЂРµРґСЃС‚Р°РІР»СЏРµС‚ СЃРѕР±РѕР№ РїСЂСЏРјРѕСѓРіРѕР»СЊРЅС‹Р№ РєРѕРЅС‚РµР№РЅРµСЂ, СЃРѕРґРµСЂР¶Р°С‰РёР№
+	/// Р»СЋР±С‹Рµ РѕР±СЉРµРєС‚С‹ СЃС†РµРЅС‹, РІ С‚РѕРј С‡РёСЃР»Рµ Рё РІРёР·СѓР°Р»СЊРЅС‹Рµ
 	/// </summary>
 	[ProtoContract]
 	[ProtoInclude(100, typeof(Frame))]
@@ -72,16 +78,19 @@ namespace Lime
 	[DebuggerTypeProxy(typeof(WidgetDebugView))]
 	public partial class Widget : Node
 	{
+		// TODO: This will be removed
 		public const int EmptyHitTestMask = 0;
 		public const int ControlsHitTestMask = 1;
 
 		/// <summary>
-		/// Минимально возможный номер слоя (свойство Layer)
+		/// TODO: Translate
+		/// РњРёРЅРёРјР°Р»СЊРЅРѕ РІРѕР·РјРѕР¶РЅС‹Р№ РЅРѕРјРµСЂ СЃР»РѕСЏ (СЃРІРѕР№СЃС‚РІРѕ Layer)
 		/// </summary>
 		public const int MinLayer = 0;
 
 		/// <summary>
-		/// Максимально возможный номер слоя (свойство Layer)
+		/// TODO: Translate
+		/// РњР°РєСЃРёРјР°Р»СЊРЅРѕ РІРѕР·РјРѕР¶РЅС‹Р№ РЅРѕРјРµСЂ СЃР»РѕСЏ (СЃРІРѕР№СЃС‚РІРѕ Layer)
 		/// </summary>
 		public const int MaxLayer = 99;
 
@@ -99,20 +108,19 @@ namespace Lime
 
 		#region Properties
 
-		/// <summary>
-		/// Виджет-родитель (виджет, в котором находится этот виджет). Тоже самое, что и свойство Parent as Widget;
-		/// </summary>
 		public Widget ParentWidget { get { return Parent != null ? Parent.AsWidget : null; } }
 
 		public Layout Layout = AnchorLayout.Instance;
 
 		/// <summary>
-		/// Keeps layout-specific data, used by parent widget's Layout. E.g: TableLayoutCell object, if parent widget has TableLayout.
+		/// Keeps layout-specific data, used by parent widget's Layout. 
+		/// E.g: TableLayoutCell object, if parent widget has TableLayout.
 		/// </summary>
 		public object LayoutCell;
 
 		/// <summary>
-		/// Используется только для виджетов, умеющих отображать текст. Если виджет не умеет отображать текст, возвращает null
+		/// TODO: Translate
+		/// РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ С‚РѕР»СЊРєРѕ РґР»СЏ РІРёРґР¶РµС‚РѕРІ, СѓРјРµСЋС‰РёС… РѕС‚РѕР±СЂР°Р¶Р°С‚СЊ С‚РµРєСЃС‚. Р•СЃР»Рё РІРёРґР¶РµС‚ РЅРµ СѓРјРµРµС‚ РѕС‚РѕР±СЂР°Р¶Р°С‚СЊ С‚РµРєСЃС‚, РІРѕР·РІСЂР°С‰Р°РµС‚ null
 		/// </summary>
 		public virtual string Text 
 		{ 
@@ -121,7 +129,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Используется только для виджетов, умеющих отображать текстуры. Если виджет не умеет отображать текстуры, возвращает null
+		/// TODO: Translate
+		/// РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ С‚РѕР»СЊРєРѕ РґР»СЏ РІРёРґР¶РµС‚РѕРІ, СѓРјРµСЋС‰РёС… РѕС‚РѕР±СЂР°Р¶Р°С‚СЊ С‚РµРєСЃС‚СѓСЂС‹. Р•СЃР»Рё РІРёРґР¶РµС‚ РЅРµ СѓРјРµРµС‚ РѕС‚РѕР±СЂР°Р¶Р°С‚СЊ С‚РµРєСЃС‚СѓСЂС‹, РІРѕР·РІСЂР°С‰Р°РµС‚ null
 		/// </summary>
 		public virtual ITexture Texture
 		{
@@ -135,7 +144,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Действие, генерируемое, когда на виджет кликнули или нажали пальцем (для сенсорного экрана)
+		/// TODO: Translate
+		/// Р”РµР№СЃС‚РІРёРµ, РіРµРЅРµСЂРёСЂСѓРµРјРѕРµ, РєРѕРіРґР° РЅР° РІРёРґР¶РµС‚ РєР»РёРєРЅСѓР»Рё РёР»Рё РЅР°Р¶Р°Р»Рё РїР°Р»СЊС†РµРј (РґР»СЏ СЃРµРЅСЃРѕСЂРЅРѕРіРѕ СЌРєСЂР°РЅР°)
 		/// </summary>
 		public virtual Action Clicked {
 			get { return clicked; }
@@ -143,7 +153,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Возвращает true, если на виджет кликнули или нажали пальцем (для сенсорного экрана)
+		/// TODO: Translate
+		/// Р’РѕР·РІСЂР°С‰Р°РµС‚ true, РµСЃР»Рё РЅР° РІРёРґР¶РµС‚ РєР»РёРєРЅСѓР»Рё РёР»Рё РЅР°Р¶Р°Р»Рё РїР°Р»СЊС†РµРј (РґР»СЏ СЃРµРЅСЃРѕСЂРЅРѕРіРѕ СЌРєСЂР°РЅР°)
 		/// </summary>
 		public virtual bool WasClicked()
 		{
@@ -157,7 +168,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Позиция виджета в контейнере его родителя
+		/// TODO: Translate
+		/// РџРѕР·РёС†РёСЏ РІРёРґР¶РµС‚Р° РІ РєРѕРЅС‚РµР№РЅРµСЂРµ РµРіРѕ СЂРѕРґРёС‚РµР»СЏ
 		/// </summary>
 		[ProtoMember(1)]
 		public Vector2 Position
@@ -165,6 +177,7 @@ namespace Lime
 			get { return position; }
 			set
 			{
+				// TODO: Check through Debug.Assert
 #if LIME_CHECK_FLOATS
 				AssertIsNumber(value.X);
 				AssertIsNumber(value.Y);
@@ -175,9 +188,10 @@ namespace Lime
 				}
 			}
 		}
-	
+
 		/// <summary>
-		/// Позиция X виджета в контейнере его родителя (аналогично Position.X)
+		/// TODO: Translate
+		/// РџРѕР·РёС†РёСЏ X РІРёРґР¶РµС‚Р° РІ РєРѕРЅС‚РµР№РЅРµСЂРµ РµРіРѕ СЂРѕРґРёС‚РµР»СЏ (Р°РЅР°Р»РѕРіРёС‡РЅРѕ Position.X)
 		/// </summary>
 		public float X 
 		{ 
@@ -195,7 +209,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Позиция Y виджета в контейнере его родителя (аналогично Position.Y)
+		/// TODO: Translate
+		/// РџРѕР·РёС†РёСЏ Y РІРёРґР¶РµС‚Р° РІ РєРѕРЅС‚РµР№РЅРµСЂРµ РµРіРѕ СЂРѕРґРёС‚РµР»СЏ (Р°РЅР°Р»РѕРіРёС‡РЅРѕ Position.Y)
 		/// </summary>
 		public float Y
 		{
@@ -213,8 +228,9 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Определяет размеры его контейнера, по которому проверяются столкновения. Не влияет на визуальный размер
-		/// Для изменения визуального размера используйте Scale
+		/// TODO: Translate
+		/// РћРїСЂРµРґРµР»СЏРµС‚ СЂР°Р·РјРµСЂС‹ РµРіРѕ РєРѕРЅС‚РµР№РЅРµСЂР°, РїРѕ РєРѕС‚РѕСЂРѕРјСѓ РїСЂРѕРІРµСЂСЏСЋС‚СЃСЏ СЃС‚РѕР»РєРЅРѕРІРµРЅРёСЏ. РќРµ РІР»РёСЏРµС‚ РЅР° РІРёР·СѓР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ
+		/// Р”Р»СЏ РёР·РјРµРЅРµРЅРёСЏ РІРёР·СѓР°Р»СЊРЅРѕРіРѕ СЂР°Р·РјРµСЂР° РёСЃРїРѕР»СЊР·СѓР№С‚Рµ Scale
 		/// </summary>
 		[ProtoMember(2)]
 		public Vector2 Size
@@ -236,8 +252,9 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Останавливает все таски этого виджета (Tasks). Вызывает Dispose для всех виджетов,
-		/// вложенных в этот виджет
+		/// TODO: Translate
+		/// РћСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ РІСЃРµ С‚Р°СЃРєРё СЌС‚РѕРіРѕ РІРёРґР¶РµС‚Р° (Tasks). Р’С‹Р·С‹РІР°РµС‚ Dispose РґР»СЏ РІСЃРµС… РІРёРґР¶РµС‚РѕРІ,
+		/// РІР»РѕР¶РµРЅРЅС‹С… РІ СЌС‚РѕС‚ РІРёРґР¶РµС‚
 		/// </summary>
 		public override void Dispose()
 		{
@@ -261,7 +278,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Ширина (см свойство Size)
+		/// TODO: Translate
+		/// РЁРёСЂРёРЅР° (СЃРј СЃРІРѕР№СЃС‚РІРѕ Size)
 		/// </summary>
 		public float Width { 
 			get { return size.X; }
@@ -272,7 +290,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Высота (см свойство Size)
+		/// TODO: Translate
+		/// Р’С‹СЃРѕС‚Р° (СЃРј СЃРІРѕР№СЃС‚РІРѕ Size)
 		/// </summary>
 		public float Height {
 			get { return size.Y; } 
@@ -283,8 +302,9 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Точка опоры. Определяет точку поворота и масштабирования.
-		/// [0, 0] - верхний левый угол виджета, [1, 1] - правый нижний
+		/// TODO: Translate
+		/// РўРѕС‡РєР° РѕРїРѕСЂС‹. РћРїСЂРµРґРµР»СЏРµС‚ С‚РѕС‡РєСѓ РїРѕРІРѕСЂРѕС‚Р° Рё РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёСЏ.
+		/// [0, 0] - РІРµСЂС…РЅРёР№ Р»РµРІС‹Р№ СѓРіРѕР» РІРёРґР¶РµС‚Р°, [1, 1] - РїСЂР°РІС‹Р№ РЅРёР¶РЅРёР№
 		/// </summary>
 		[ProtoMember(3)]
 		public Vector2 Pivot 
@@ -304,7 +324,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Масштаб (от 0 до 1)
+		/// TODO: Translate
+		/// РњР°СЃС€С‚Р°Р± (РѕС‚ 0 РґРѕ 1)
 		/// </summary>
 		[ProtoMember(4)]
 		public Vector2 Scale 
@@ -324,7 +345,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Угол поворота в градусах против часовой стрелки
+		/// TODO: Translate
+		/// РЈРіРѕР» РїРѕРІРѕСЂРѕС‚Р° РІ РіСЂР°РґСѓСЃР°С… РїСЂРѕС‚РёРІ С‡Р°СЃРѕРІРѕР№ СЃС‚СЂРµР»РєРё
 		/// </summary>
 		[ProtoMember(5)]
 		public float Rotation { 
@@ -343,7 +365,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Оттенок. При отрисовке цвет текстуры умножается на этот цвет.
+		/// TODO: Translate
+		/// РћС‚С‚РµРЅРѕРє. РџСЂРё РѕС‚СЂРёСЃРѕРІРєРµ С†РІРµС‚ С‚РµРєСЃС‚СѓСЂС‹ СѓРјРЅРѕР¶Р°РµС‚СЃСЏ РЅР° СЌС‚РѕС‚ С†РІРµС‚.
 		/// </summary>
 		[ProtoMember(6)]
 		public Color4 Color 
@@ -358,7 +381,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Непрозрачность (0 - 1)
+		/// TODO: Translate
+		/// РќРµРїСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ (0 - 1)
 		/// </summary>
 		public float Opacity
 		{
@@ -374,13 +398,15 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Якоря. Задают привязку границ виджета к границам его родителя
+		/// TODO: Translate
+		/// РЇРєРѕСЂСЏ. Р—Р°РґР°СЋС‚ РїСЂРёРІСЏР·РєСѓ РіСЂР°РЅРёС† РІРёРґР¶РµС‚Р° Рє РіСЂР°РЅРёС†Р°Рј РµРіРѕ СЂРѕРґРёС‚РµР»СЏ
 		/// </summary>
 		[ProtoMember(7)]
 		public Anchors Anchors { get; set; }
 
 		/// <summary>
-		/// Задает способ смешивания при отрисовке
+		/// TODO: Translate
+		/// Р—Р°РґР°РµС‚ СЃРїРѕСЃРѕР± СЃРјРµС€РёРІР°РЅРёСЏ РїСЂРё РѕС‚СЂРёСЃРѕРІРєРµ
 		/// </summary>
 		[ProtoMember(8)]
 		public Blending Blending 
@@ -396,7 +422,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Идентификатор шейдера, который будет использоваться при отрисовке виджета
+		/// TODO: Translate
+		/// РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С€РµР№РґРµСЂР°, РєРѕС‚РѕСЂС‹Р№ Р±СѓРґРµС‚ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊСЃСЏ РїСЂРё РѕС‚СЂРёСЃРѕРІРєРµ РІРёРґР¶РµС‚Р°
 		/// </summary>
 		[ProtoMember(9)]
 		public ShaderId Shader
@@ -424,18 +451,26 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// TODO: Add summary
+		/// </summary>
 		[ProtoMember(11)]
 		public SkinningWeights SkinningWeights { get; set; }
 
 		/// <summary>
-		/// Способ проверки столкновений
+		/// TODO: Translate
+		/// РЎРїРѕСЃРѕР± РїСЂРѕРІРµСЂРєРё СЃС‚РѕР»РєРЅРѕРІРµРЅРёР№
 		/// </summary>
 		[ProtoMember(12)]
 		public HitTestMethod HitTestMethod { get; set; }
 		
+		// TODO: Will be removed
 		[ProtoMember(13)]
 		public uint HitTestMask { get; set; }
 
+		/// <summary>
+		/// TODO: Add summary
+		/// </summary>
 		[ProtoMember(14)]
 		public BoneArray BoneArray;
 
@@ -481,13 +516,21 @@ namespace Lime
 		}
 		
 		public Vector2 GlobalPosition { get { return LocalToWorldTransform.T; } }
+
+		/// <summary>
+		/// TODO: Add summary
+		/// </summary>
 		public Vector2 GlobalCenter { get { return LocalToWorldTransform * (Size / 2); } }
+
+		/// <summary>
+		/// TODO: Add summary
+		/// </summary>
 		public Vector2 Center { get { return Position + (Vector2.Half - Pivot) * Size; } }
 
 		private TaskList tasks;
-		
+
 		/// <summary>
-		/// Задачи (таски) этого виджета
+		/// Tasks that are called before Update.
 		/// </summary>
 		public TaskList Tasks
 		{
@@ -502,6 +545,10 @@ namespace Lime
 		}
 
 		private TaskList lateTasks;
+		
+		/// <summary>
+		/// Tasks that are called after Update.
+		/// </summary>
 		public TaskList LateTasks
 		{
 			get
@@ -515,12 +562,14 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Генерируется в начале процедуры обновления виджета (вызова метода Update)
+		/// TODO: Translate
+		/// Р“РµРЅРµСЂРёСЂСѓРµС‚СЃСЏ РІ РЅР°С‡Р°Р»Рµ РїСЂРѕС†РµРґСѓСЂС‹ РѕР±РЅРѕРІР»РµРЅРёСЏ РІРёРґР¶РµС‚Р° (РІС‹Р·РѕРІР° РјРµС‚РѕРґР° Update)
 		/// </summary>
 		public event UpdateHandler Updating;
 
 		/// <summary>
-		/// Генерируется в конце процедуры обновления виджета (вызова метода Update)
+		/// TODO: Translate
+		/// Р“РµРЅРµСЂРёСЂСѓРµС‚СЃСЏ РІ РєРѕРЅС†Рµ РїСЂРѕС†РµРґСѓСЂС‹ РѕР±РЅРѕРІР»РµРЅРёСЏ РІРёРґР¶РµС‚Р° (РІС‹Р·РѕРІР° РјРµС‚РѕРґР° Update)
 		/// </summary>
 		public event UpdateHandler Updated;
 
@@ -548,7 +597,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Возвращает размер содержимого, находящегося в контейнере этого виджета
+		/// TODO: Translate
+		/// Р’РѕР·РІСЂР°С‰Р°РµС‚ СЂР°Р·РјРµСЂ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ, РЅР°С…РѕРґСЏС‰РµРіРѕСЃСЏ РІ РєРѕРЅС‚РµР№РЅРµСЂРµ СЌС‚РѕРіРѕ РІРёРґР¶РµС‚Р°
 		/// </summary>
 		public virtual Vector2 CalcContentSize()
 		{
@@ -556,27 +606,30 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Ищет виджет, находящийся в контейнере этого виджета (рекурсивно).
-		/// Если виджета с таким Id нет, генерирует исключение
+		/// TODO: Translate
+		/// РС‰РµС‚ РІРёРґР¶РµС‚, РЅР°С…РѕРґСЏС‰РёР№СЃСЏ РІ РєРѕРЅС‚РµР№РЅРµСЂРµ СЌС‚РѕРіРѕ РІРёРґР¶РµС‚Р° (СЂРµРєСѓСЂСЃРёРІРЅРѕ).
+		/// Р•СЃР»Рё РІРёРґР¶РµС‚Р° СЃ С‚Р°РєРёРј Id РЅРµС‚, РіРµРЅРµСЂРёСЂСѓРµС‚ РёСЃРєР»СЋС‡РµРЅРёРµ
 		/// </summary>
-		/// <param name="id">Id искомого виджета</param>
+		/// <param name="id">Id РёСЃРєРѕРјРѕРіРѕ РІРёРґР¶РµС‚Р°</param>
 		public Widget this[string id]
 		{
 			get { return Find<Widget>(id); }
 		}
 
 		/// <summary>
-		/// Ищет виджет, находящийся в контейнере этого виджета (рекурсивно).
-		/// Если виджета с таким Id нет, генерирует исключение
+		/// TODO: Translate
+		/// РС‰РµС‚ РІРёРґР¶РµС‚, РЅР°С…РѕРґСЏС‰РёР№СЃСЏ РІ РєРѕРЅС‚РµР№РЅРµСЂРµ СЌС‚РѕРіРѕ РІРёРґР¶РµС‚Р° (СЂРµРєСѓСЂСЃРёРІРЅРѕ).
+		/// Р•СЃР»Рё РІРёРґР¶РµС‚Р° СЃ С‚Р°РєРёРј Id РЅРµС‚, РіРµРЅРµСЂРёСЂСѓРµС‚ РёСЃРєР»СЋС‡РµРЅРёРµ
 		/// </summary>
-		/// <param name="id">Id искомого виджета</param>
+		/// <param name="id">Id РёСЃРєРѕРјРѕРіРѕ РІРёРґР¶РµС‚Р°</param>
 		public Widget this[string format, params object[] arg]
 		{
 			get { return Find<Widget>(string.Format(format, arg)); }
 		}
 
 		/// <summary>
-		/// Возвращает клон этого виджета. Используйте DeepCloneFast() as Widget, т.к. он возвращает Node (базовый объект виджета)
+		/// TODO: Translate
+		/// Р’РѕР·РІСЂР°С‰Р°РµС‚ РєР»РѕРЅ СЌС‚РѕРіРѕ РІРёРґР¶РµС‚Р°. РСЃРїРѕР»СЊР·СѓР№С‚Рµ DeepCloneFast() as Widget, С‚.Рє. РѕРЅ РІРѕР·РІСЂР°С‰Р°РµС‚ Node (Р±Р°Р·РѕРІС‹Р№ РѕР±СЉРµРєС‚ РІРёРґР¶РµС‚Р°)
 		/// </summary>
 		public override Node DeepCloneFast()
 		{
@@ -588,10 +641,11 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Обновляет состояние виджета (обновляет его анимации, генерирует события и. т.д.).
-		/// Вызывает Update для всех дочерних виджетов. В нормальных условиях этот метод должен вызываться 1 раз за кадр.
+		/// TODO: Translate
+		/// РћР±РЅРѕРІР»СЏРµС‚ СЃРѕСЃС‚РѕСЏРЅРёРµ РІРёРґР¶РµС‚Р° (РѕР±РЅРѕРІР»СЏРµС‚ РµРіРѕ Р°РЅРёРјР°С†РёРё, РіРµРЅРµСЂРёСЂСѓРµС‚ СЃРѕР±С‹С‚РёСЏ Рё. С‚.Рґ.).
+		/// Р’С‹Р·С‹РІР°РµС‚ Update РґР»СЏ РІСЃРµС… РґРѕС‡РµСЂРЅРёС… РІРёРґР¶РµС‚РѕРІ. Р’ РЅРѕСЂРјР°Р»СЊРЅС‹С… СѓСЃР»РѕРІРёСЏС… СЌС‚РѕС‚ РјРµС‚РѕРґ РґРѕР»Р¶РµРЅ РІС‹Р·С‹РІР°С‚СЊСЃСЏ 1 СЂР°Р· Р·Р° РєР°РґСЂ.
 		/// </summary>
-		/// <param name="delta">Количество секунд, прошедшее с момента предыдущего вызова Update</param>
+		/// <param name="delta">РљРѕР»РёС‡РµСЃС‚РІРѕ СЃРµРєСѓРЅРґ, РїСЂРѕС€РµРґС€РµРµ СЃ РјРѕРјРµРЅС‚Р° РїСЂРµРґС‹РґСѓС‰РµРіРѕ РІС‹Р·РѕРІР° Update</param>
 		public override void Update(float delta)
 		{
 			delta *= AnimationSpeed;
@@ -617,9 +671,10 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Генерирует событие Updating
+		/// TODO: Translate
+		/// Р“РµРЅРµСЂРёСЂСѓРµС‚ СЃРѕР±С‹С‚РёРµ Updating
 		/// </summary>
-		/// <param name="delta">Количество секунд, прошедшее с момента предыдущего вызова Update</param>
+		/// <param name="delta">РљРѕР»РёС‡РµСЃС‚РІРѕ СЃРµРєСѓРЅРґ, РїСЂРѕС€РµРґС€РµРµ СЃ РјРѕРјРµРЅС‚Р° РїСЂРµРґС‹РґСѓС‰РµРіРѕ РІС‹Р·РѕРІР° Update</param>
 		public void RaiseUpdating(float delta)
 		{
 			if (Updating != null) {
@@ -628,16 +683,20 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Генерирует событие Updated
+		/// TODO: Translate
+		/// Р“РµРЅРµСЂРёСЂСѓРµС‚ СЃРѕР±С‹С‚РёРµ Updated
 		/// </summary>
-		/// <param name="delta">Количество секунд, прошедшее с момента предыдущего вызова Update</param>
+		/// <param name="delta">РљРѕР»РёС‡РµСЃС‚РІРѕ СЃРµРєСѓРЅРґ, РїСЂРѕС€РµРґС€РµРµ СЃ РјРѕРјРµРЅС‚Р° РїСЂРµРґС‹РґСѓС‰РµРіРѕ РІС‹Р·РѕРІР° Update</param>
 		public void RaiseUpdated(float delta)
 		{
 			if (Updated != null) {
 				Updated(delta * AnimationSpeed);
 			}
 		}
-
+		
+		/// <summary>
+		/// TODO: Add summary
+		/// </summary>
 		private void HandleClick()
 		{
 			if (Input.WasMouseReleased() && IsMouseOver()) {
@@ -647,7 +706,10 @@ namespace Lime
 				clicked();
 			}
 		}
-
+		
+		/// <summary>
+		/// TODO: Add summary
+		/// </summary>
 		protected override void RecalcDirtyGlobalsUsingParents()
 		{
 			// TODO: Optimize using DirtyMask
@@ -677,7 +739,10 @@ namespace Lime
 			globalShader = Shader;
 			globallyVisible = Visible && color.A != 0;
 		}
-
+		
+		/// <summary>
+		/// TODO: Add summary
+		/// </summary>
 		public Matrix32 CalcLocalToParentTransform()
 		{
 			Matrix32 matrix;
@@ -709,7 +774,10 @@ namespace Lime
 			matrix.T.Y = -(center.X * u.Y) - center.Y * v.Y + translation.Y;
 			return matrix;
 		}
-
+		
+		/// <summary>
+		/// TODO: Add summary
+		/// </summary>
 		public override void StaticScale(float ratio, bool roundCoordinates)
 		{
 			if (Animators.Count > 0) {
@@ -719,6 +787,9 @@ namespace Lime
 			base.StaticScale(ratio, roundCoordinates);
 		}
 
+		/// <summary>
+		/// TODO: Add summary
+		/// </summary>
 		private void StaticScaleAnimationKeys(float ratio, bool roundCoordinates)
 		{
 			Animator<Vector2> posAnimator, sizeAnimator;
@@ -748,11 +819,17 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// TODO: Add summary
+		/// </summary>
 		private static Vector2 RoundVectorIf(Vector2 v, bool round)
 		{
 			return round ? new Vector2(v.X.Round(), v.Y.Round()) : v;
 		}
 
+		/// <summary>
+		/// TODO: Add summary
+		/// </summary>
 		private void StaticScalePositionAndSize(float ratio, bool round)
 		{
 			var p1 = CalcLocalToParentTransform() * Vector2.Zero;
@@ -763,7 +840,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Добавляет виджет и все его дочерние виджеты в очередь отрисовки
+		/// TODO: Translate
+		/// Р”РѕР±Р°РІР»СЏРµС‚ РІРёРґР¶РµС‚ Рё РІСЃРµ РµРіРѕ РґРѕС‡РµСЂРЅРёРµ РІРёРґР¶РµС‚С‹ РІ РѕС‡РµСЂРµРґСЊ РѕС‚СЂРёСЃРѕРІРєРё
 		/// </summary>
 		public override void AddToRenderChain(RenderChain chain)
 		{
@@ -790,7 +868,8 @@ namespace Lime
 		#region HitTest handling
 
 		/// <summary>
-		/// Возвращает true, если курсор мыши попадает в виджет
+		/// TODO: Translate
+		/// Р’РѕР·РІСЂР°С‰Р°РµС‚ true, РµСЃР»Рё РєСѓСЂСЃРѕСЂ РјС‹С€Рё РїРѕРїР°РґР°РµС‚ РІ РІРёРґР¶РµС‚
 		/// </summary>
 		public bool IsMouseOver()
 		{
@@ -798,7 +877,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Возвращает true, если точка попадает в виджет
+		/// TODO: Translate
+		/// Р’РѕР·РІСЂР°С‰Р°РµС‚ true, РµСЃР»Рё С‚РѕС‡РєР° РїРѕРїР°РґР°РµС‚ РІ РІРёРґР¶РµС‚
 		/// </summary>
 		public bool HitTest(Vector2 point)
 		{
