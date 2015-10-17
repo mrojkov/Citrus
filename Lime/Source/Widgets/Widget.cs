@@ -8,8 +8,7 @@ using System.Diagnostics;
 namespace Lime
 {
 	/// <summary>
-	/// TODO: Translate
-	/// Якоря. Задают привязку границ виджета к границам его родителя
+	/// Parent-relative layout.
 	/// </summary>
 	[Flags]
 	public enum Anchors
@@ -54,11 +53,7 @@ namespace Lime
 	}
 
 	/// <summary>
-	/// TODO: Translate
-	/// Виджет. Базовый класс всех визуальных 2D объектов и интерфейса пользователя.
-	/// Атомарный объект пользовательского интерфейса. Подписан на события мыши, клавиатуры
-	/// и других устройств ввода. Представляет собой прямоугольный контейнер, содержащий
-	/// любые объекты сцены, в том числе и визуальные
+	/// Base class for any rendered object.
 	/// </summary>
 	[ProtoContract]
 	[ProtoInclude(100, typeof(Frame))]
@@ -78,19 +73,16 @@ namespace Lime
 	[DebuggerTypeProxy(typeof(WidgetDebugView))]
 	public partial class Widget : Node
 	{
-		// TODO: This will be removed
 		public const int EmptyHitTestMask = 0;
 		public const int ControlsHitTestMask = 1;
 
 		/// <summary>
-		/// TODO: Translate
-		/// Минимально возможный номер слоя (свойство Layer)
+		/// Minimum possible layer.
 		/// </summary>
 		public const int MinLayer = 0;
 
 		/// <summary>
-		/// TODO: Translate
-		/// Максимально возможный номер слоя (свойство Layer)
+		/// Maximum possible layer.
 		/// </summary>
 		public const int MaxLayer = 99;
 
@@ -143,19 +135,13 @@ namespace Lime
 			return false; 
 		}
 
-		/// <summary>
-		/// TODO: Translate
-		/// Действие, генерируемое, когда на виджет кликнули или нажали пальцем (для сенсорного экрана)
-		/// </summary>
 		public virtual Action Clicked {
 			get { return clicked; }
 			set { clicked = value; }
 		}
 
-		/// <summary>
-		/// TODO: Translate
-		/// Возвращает true, если на виджет кликнули или нажали пальцем (для сенсорного экрана)
-		/// </summary>
+		// SUGGESTION: This one should use IsMouseOver instead of HitTest (as HandleClick does)
+		// SUGGESTION: Transform to property?
 		public virtual bool WasClicked()
 		{
 			return Input.WasMouseReleased() && HitTest(Input.MousePosition);
@@ -185,7 +171,8 @@ namespace Lime
 			}
 		}
 
-		// SUGGESTION: position.X = value breaks the rule of immutability
+		// SUGGESTION: position.X = value breaks the rule of immutability 
+		// (should be position = new Vector2(X, value))
 		/// <summary>
 		/// Parent-relative X position.
 		/// </summary>
@@ -203,6 +190,7 @@ namespace Lime
 		}
 
 		// SUGGESTION: position.Y = value breaks the rule of immutability
+		// (should be position = new Vector2(value, Y))
 		/// <summary>
 		/// Parent-relative Y position.
 		/// </summary>
@@ -220,9 +208,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Определяет размеры его контейнера, по которому проверяются столкновения. Не влияет на визуальный размер
-		/// Для изменения визуального размера используйте Scale
+		/// Size that is used for hit testing (not for rendering).
+		/// Use Scale to change visual size of this widget.
 		/// </summary>
 		[ProtoMember(2)]
 		public Vector2 Size
@@ -266,8 +253,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Ширина (см свойство Size)
+		/// Width that is used for hit testing (not for rendering).
+		/// Use Scale to change visual size of this widget.
 		/// </summary>
 		public float Width { 
 			get { return size.X; }
@@ -278,8 +265,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Высота (см свойство Size)
+		/// Height that is used for hit testing (not for rendering).
+		/// Use Scale to change visual size of this widget.
 		/// </summary>
 		public float Height {
 			get { return size.Y; } 
@@ -290,9 +277,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Точка опоры. Определяет точку поворота и масштабирования.
-		/// [0, 0] - верхний левый угол виджета, [1, 1] - правый нижний
+		/// Center point of rotation and scaling.
+		/// (0, 0) is top-left corner, (1, 1) is bottom-right corner.
 		/// </summary>
 		[ProtoMember(3)]
 		public Vector2 Pivot 
@@ -342,8 +328,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Оттенок. При отрисовке цвет текстуры умножается на этот цвет.
+		/// Hue of this widget. Contents color will be multiplied by it on render.
 		/// </summary>
 		[ProtoMember(6)]
 		public Color4 Color 
@@ -373,10 +358,6 @@ namespace Lime
 			}
 		}
 
-		/// <summary>
-		/// TODO: Translate
-		/// Якоря. Задают привязку границ виджета к границам его родителя
-		/// </summary>
 		[ProtoMember(7)]
 		public Anchors Anchors { get; set; }
 
@@ -419,22 +400,15 @@ namespace Lime
 			}
 		}
 
-		/// <summary>
-		/// TODO: Add summary
-		/// </summary>
 		[ProtoMember(11)]
 		public SkinningWeights SkinningWeights { get; set; }
 
 		[ProtoMember(12)]
 		public HitTestMethod HitTestMethod { get; set; }
 		
-		// TODO: Will be removed
 		[ProtoMember(13)]
 		public uint HitTestMask { get; set; }
 
-		/// <summary>
-		/// TODO: Add summary
-		/// </summary>
 		[ProtoMember(14)]
 		public BoneArray BoneArray;
 
@@ -494,18 +468,19 @@ namespace Lime
 			}
 		}
 
+		// UNCERTAINTY: World-relative or absolute position?
 		/// <summary>
-		/// TODO: Add summary
+		/// World-relative position of this widget.
 		/// </summary>
 		public Vector2 GlobalPosition { get { return LocalToWorldTransform.T; } }
 
 		/// <summary>
-		/// TODO: Add summary
+		/// World-relative position of center of this widget.
 		/// </summary>
 		public Vector2 GlobalCenter { get { return LocalToWorldTransform * (Size / 2); } }
 
 		/// <summary>
-		/// TODO: Add summary
+		/// Parent-relative position of center of this widget.
 		/// </summary>
 		public Vector2 Center { get { return Position + (Vector2.Half - Pivot) * Size; } }
 
@@ -669,9 +644,6 @@ namespace Lime
 			}
 		}
 		
-		/// <summary>
-		/// TODO: Add summary
-		/// </summary>
 		private void HandleClick()
 		{
 			if (Input.WasMouseReleased() && IsMouseOver()) {
