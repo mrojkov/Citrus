@@ -168,8 +168,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Позиция виджета в контейнере его родителя
+		/// Parent-relative position.
 		/// </summary>
 		[ProtoMember(1)]
 		public Vector2 Position
@@ -186,9 +185,9 @@ namespace Lime
 			}
 		}
 
+		// SUGGESTION: position.X = value breaks the rule of immutability
 		/// <summary>
-		/// TODO: Translate
-		/// Позиция X виджета в контейнере его родителя (аналогично Position.X)
+		/// Parent-relative X position.
 		/// </summary>
 		public float X 
 		{ 
@@ -203,9 +202,9 @@ namespace Lime
 			} 
 		}
 
+		// SUGGESTION: position.Y = value breaks the rule of immutability
 		/// <summary>
-		/// TODO: Translate
-		/// Позиция Y виджета в контейнере его родителя (аналогично Position.Y)
+		/// Parent-relative Y position.
 		/// </summary>
 		public float Y
 		{
@@ -243,9 +242,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Останавливает все таски этого виджета (Tasks). Вызывает Dispose для всех виджетов,
-		/// вложенных в этот виджет
+		/// Stops all tasks and calls Dispose of all descendants.
 		/// </summary>
 		public override void Dispose()
 		{
@@ -312,10 +309,6 @@ namespace Lime
 			} 
 		}
 
-		/// <summary>
-		/// TODO: Translate
-		/// Масштаб (от 0 до 1)
-		/// </summary>
 		[ProtoMember(4)]
 		public Vector2 Scale 
 		{ 
@@ -332,8 +325,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Угол поворота в градусах против часовой стрелки
+		/// Counter-clockwise rotation of this widget.
 		/// </summary>
 		[ProtoMember(5)]
 		public float Rotation { 
@@ -366,8 +358,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Непрозрачность (0 - 1)
+		/// 0 - fully transparent. 1 - fully opaque.
 		/// </summary>
 		public float Opacity
 		{
@@ -389,10 +380,6 @@ namespace Lime
 		[ProtoMember(7)]
 		public Anchors Anchors { get; set; }
 
-		/// <summary>
-		/// TODO: Translate
-		/// Задает способ смешивания при отрисовке
-		/// </summary>
 		[ProtoMember(8)]
 		public Blending Blending 
 		{ 
@@ -406,10 +393,6 @@ namespace Lime
 			} 
 		}
 
-		/// <summary>
-		/// TODO: Translate
-		/// Идентификатор шейдера, который будет использоваться при отрисовке виджета
-		/// </summary>
 		[ProtoMember(9)]
 		public ShaderId Shader
 		{
@@ -442,10 +425,6 @@ namespace Lime
 		[ProtoMember(11)]
 		public SkinningWeights SkinningWeights { get; set; }
 
-		/// <summary>
-		/// TODO: Translate
-		/// Способ проверки столкновений
-		/// </summary>
 		[ProtoMember(12)]
 		public HitTestMethod HitTestMethod { get; set; }
 		
@@ -464,27 +443,42 @@ namespace Lime
 		private Blending globalBlending;
 		private ShaderId globalShader;
 		private bool globallyVisible;
-
+		
+		/// <summary>
+		/// TODO: Add summary
+		/// </summary>
 		public Matrix32 LocalToWorldTransform
 		{
 			get { RecalcDirtyGlobals(); return localToWorldTransform; }
 		}
 
+		/// <summary>
+		/// TODO: Add summary
+		/// </summary>
 		public Color4 GlobalColor 
 		{
 			get { RecalcDirtyGlobals(); return globalColor; }
 		}
-		
+
+		/// <summary>
+		/// TODO: Add summary
+		/// </summary>
 		public Blending GlobalBlending
 		{
 			get { RecalcDirtyGlobals(); return globalBlending; }
 		}
 
+		/// <summary>
+		/// TODO: Add summary
+		/// </summary>
 		public ShaderId GlobalShader
 		{
 			get { RecalcDirtyGlobals(); return globalShader; }
 		}
 
+		/// <summary>
+		/// TODO: Add summary
+		/// </summary>
 		public bool GloballyVisible 
 		{
 			get 
@@ -499,7 +493,10 @@ namespace Lime
 				return globallyVisible; 
 			}
 		}
-		
+
+		/// <summary>
+		/// TODO: Add summary
+		/// </summary>
 		public Vector2 GlobalPosition { get { return LocalToWorldTransform.T; } }
 
 		/// <summary>
@@ -547,14 +544,12 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Генерируется в начале процедуры обновления виджета (вызова метода Update)
+		/// Called before Update.
 		/// </summary>
 		public event UpdateHandler Updating;
 
 		/// <summary>
-		/// TODO: Translate
-		/// Генерируется в конце процедуры обновления виджета (вызова метода Update)
+		/// Called after Update.
 		/// </summary>
 		public event UpdateHandler Updated;
 
@@ -581,10 +576,7 @@ namespace Lime
 			get { return input ?? (input = new WidgetInput(this)); }
 		}
 
-		/// <summary>
-		/// TODO: Translate
-		/// Возвращает размер содержимого, находящегося в контейнере этого виджета
-		/// </summary>
+		// SUGGESTION: Transform to ContentSize property?
 		public virtual Vector2 CalcContentSize()
 		{
 			return Size;
@@ -656,10 +648,9 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Генерирует событие Updating
+		/// Raises Updating event in respect of animation speed.
 		/// </summary>
-		/// <param name="delta">Количество секунд, прошедшее с момента предыдущего вызова Update</param>
+		/// <param name="delta">Time delta from last Update.</param>
 		public void RaiseUpdating(float delta)
 		{
 			if (Updating != null) {
@@ -668,10 +659,9 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Генерирует событие Updated
+		/// Raises Updated event in respect of animation speed.
 		/// </summary>
-		/// <param name="delta">Количество секунд, прошедшее с момента предыдущего вызова Update</param>
+		/// <param name="delta">Time delta from last Update.</param>
 		public void RaiseUpdated(float delta)
 		{
 			if (Updated != null) {
@@ -804,9 +794,6 @@ namespace Lime
 			}
 		}
 
-		/// <summary>
-		/// TODO: Add summary
-		/// </summary>
 		private static Vector2 RoundVectorIf(Vector2 v, bool round)
 		{
 			return round ? new Vector2(v.X.Round(), v.Y.Round()) : v;
@@ -825,8 +812,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Добавляет виджет и все его дочерние виджеты в очередь отрисовки
+		/// Adds widget and all its descendants to render chain.
 		/// </summary>
 		public override void AddToRenderChain(RenderChain chain)
 		{
@@ -852,18 +838,14 @@ namespace Lime
 
 		#region HitTest handling
 
-		/// <summary>
-		/// TODO: Translate
-		/// Возвращает true, если курсор мыши попадает в виджет
-		/// </summary>
+		// SUGGESTION: Transform to property?
 		public bool IsMouseOver()
 		{
 			return Input.IsAcceptingMouse() && HitTest(Input.MousePosition);
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Возвращает true, если точка попадает в виджет
+		/// Returns true if this widget contains provided point
 		/// </summary>
 		public bool HitTest(Vector2 point)
 		{
