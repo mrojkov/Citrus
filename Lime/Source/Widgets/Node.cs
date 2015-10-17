@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System;
 using System.Reflection;
@@ -48,7 +48,6 @@ namespace Lime
 			remove { DefaultAnimation.Stopped -= value; }
 		}
 
-		#region properties
 #if WIN
 		public Guid Guid { get; set; }
 #endif
@@ -210,10 +209,6 @@ namespace Lime
 		protected bool IsDirty(DirtyFlags mask) { return (DirtyMask & mask) != 0; }
 
 		public bool HitTestTarget;
-
-		#endregion
-
-		#region Methods
 
 		public static int CreatedCount = 0;
 		public static int FinalizedCount = 0;
@@ -796,7 +791,5 @@ namespace Lime
 		}
 
 		protected internal virtual void PerformHitTest() { }
-
-		#endregion
 	}
 }
