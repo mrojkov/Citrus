@@ -237,6 +237,8 @@ namespace Lime
 			}
 		}
 
+		// BUG: HeadingDeg(45) == (0.7071745, 0.707039), though it should be approx. (0.70711, 0.70711)
+		// (At least X and Y should be equal)
 		/// <summary>
 		/// Creates a new <see cref="Vector2"/> that represents specified direction.
 		/// </summary>
