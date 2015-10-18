@@ -60,21 +60,20 @@ namespace Lime
 		public string Id { get; set; }
 
 		/// <summary>
-		/// Denotes the path to the external scene. 
-		/// If this path isn't null during node loading, the node children are replaced by the external scene nodes.
+		/// Denotes the path to the external scene. If this path isn't null during node loading, 
+		/// the node children are replaced by the external scene nodes.
 		/// </summary>
 		[ProtoMember(2)]
 		public string ContentsPath { get; set; }
 
 		/// <summary>
-		/// May contain the marker id of the default animation. 
-		/// When an animation hits a trigger keyframe, it automatically runs the child animation from the given marker id.
+		/// May contain the marker id of the default animation.  When an animation hits a trigger keyframe, 
+		/// it automatically runs the child animation from the given marker id.
 		/// </summary>
 		[Trigger]
 		public string Trigger { get; set; }
 
 		private Node parent;
-
 		public Node Parent
 		{
 			get { return parent; }
@@ -126,7 +125,7 @@ namespace Lime
 		/// </summary>
 		public MarkerCollection Markers { get { return DefaultAnimation.Markers; } }
 
-		// SUGGESTION: This property should have private/protected setter
+		// SUGGESTION: This property should have private/protected setter.
 		/// <summary>
 		/// Returns true if this node is running animation.
 		/// </summary>
@@ -136,7 +135,7 @@ namespace Lime
 			set { DefaultAnimation.IsRunning = value; }
 		}
 
-		// SUGGESTION: This property should have private/protected setter
+		// SUGGESTION: This property should have private/protected setter.
 		/// <summary>
 		/// Returns true if this node isn't running animation.
 		/// </summary>
@@ -271,6 +270,7 @@ namespace Lime
 		}
 #endif
 
+		// SUGGESTION: Transform to Root property?
 		public Node GetRoot()
 		{
 			Node node = this;

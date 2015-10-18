@@ -172,7 +172,7 @@ namespace Lime
 		}
 
 		// SUGGESTION: position.X = value breaks the rule of immutability 
-		// (should be position = new Vector2(X, value))
+		// (should be position = new Vector2(X, value)).
 		/// <summary>
 		/// Parent-relative X position.
 		/// </summary>
@@ -190,7 +190,7 @@ namespace Lime
 		}
 
 		// SUGGESTION: position.Y = value breaks the rule of immutability
-		// (should be position = new Vector2(value, Y))
+		// (should be position = new Vector2(value, Y)).
 		/// <summary>
 		/// Parent-relative Y position.
 		/// </summary>
@@ -817,7 +817,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Returns true if this widget contains provided point
+		/// Returns true if this widget contains provided point.
 		/// </summary>
 		public bool HitTest(Vector2 point)
 		{
