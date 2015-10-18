@@ -51,8 +51,7 @@ namespace Lime
 		{
 			return new WindowRect { X = value.Left, Y = value.Top, Width = value.Width, Height = value.Height };
 		}
-
-		// UNCERTAINTY: Does it breaks rule of immutability?
+		
 		[Obsolete("Use Normalized property instead", true)]
 		public IntRectangle Normalize()
 		{

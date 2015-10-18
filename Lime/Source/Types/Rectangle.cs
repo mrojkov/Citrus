@@ -89,14 +89,34 @@ namespace Lime
 		
 		public Vector2 Center { get { return (A + B) / 2; } }
 
-		// UNCERTAINTY: Does it breaks rule of immutability?
+		// SUGGESTION: Current algorithm vs Toolbox.Swap vs new Rectangle()?
 		/// <summary>
-		/// Swaps coordinates of borders if width or height is negative.
+		/// Returns this rectangle with swapped coordinates 
+		/// of borders if width or height is negative.
 		/// </summary>
 		/// <remarks>
 		/// Width or height can be negative if coordinates of borders are mixed up.
-		/// After this method width and height are guaranteed to be positive.
+		/// This property returns new <see cref="Rectangle"/> with width and height
+		/// that are guaranteed to be positive.
 		/// </remarks>
+		public Rectangle Normalized
+		{
+			get
+			{
+				var rect = this;
+				if (Width < 0) {
+					rect.A.X = B.X;
+					rect.B.X = A.X;
+				}
+				if (Height < 0) {
+					rect.A.Y = B.Y;
+					rect.B.Y = A.Y;
+				}
+				return rect;
+			}
+		}
+
+		[Obsolete("Use Normalized property instead", true)]
 		public void Normalize()
 		{
 			if (A.X > B.X) {
