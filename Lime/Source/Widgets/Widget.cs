@@ -463,15 +463,14 @@ namespace Lime
 				return globallyVisible; 
 			}
 		}
-
-		// UNCERTAINTY: World-relative or absolute position?
+		
 		/// <summary>
-		/// World-relative position of this widget.
+		/// Absolute position of this widget.
 		/// </summary>
 		public Vector2 GlobalPosition { get { return LocalToWorldTransform.T; } }
 
 		/// <summary>
-		/// World-relative position of center of this widget.
+		/// Absolute position of center of this widget.
 		/// </summary>
 		public Vector2 GlobalCenter { get { return LocalToWorldTransform * (Size / 2); } }
 
