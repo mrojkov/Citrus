@@ -128,7 +128,7 @@ namespace Orange
 			if (CurrentPlugin != null) {
 				foreach (var method in CurrentPlugin.GetAllMethodsWithAttribute(typeof(T))) {
 					if (!method.IsStatic) {
-						new System.Exception(string.Format("'{0}' must be a static method", method.Name));
+						new Exception(string.Format("'{0}' must be a static method", method.Name));
 					}
 					method.Invoke(null, null);
 				}
