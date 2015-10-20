@@ -116,7 +116,7 @@ namespace Orange
 			string result = "";
 			foreach (var method in assembly.GetAllMethodsWithAttribute(typeof(PluginCommandLineArgumentsAttribute))) {
 				if (!method.IsStatic) {
-					new System.Exception(string.Format("'{0}' must be a static method", method.Name));
+					new Exception(string.Format("'{0}' must be a static method", method.Name));
 				}
 				result = result + method.Invoke(null, null) + " ";
 			}
