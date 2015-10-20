@@ -180,33 +180,25 @@ namespace Lime
 		protected override void CreateFrameBuffer()
 		{
 			ContextRenderingApi = GLVersion.ES2;
-			foreach (var mode in GetGraphicsModes()) {
-				if (mode != null) {
-					Debug.Write("Creating framebuffer: Color={0}; Depth={1}; Stensil={2}", mode.ColorFormat, mode.Depth, mode.Stencil);
-				} else {
-					Debug.Write("Creating framebuffer with default mode");
-				}
-				GraphicsMode = mode;
-				try {
-					base.CreateFrameBuffer();
-					return;
-				} catch (Exception ex) {
-					Debug.Write("{0}", ex);
-				}
+			// the default GraphicsMode that is set consists of (16, 16, 0, 0, 2, false)
+			try {
+				Debug.Write("Creating framebuffer with default settings");
+				base.CreateFrameBuffer();
+				return;
+			} catch (Exception ex) {
+				Debug.Write("{0}", ex);
+			}
+			// this is a graphics setting that sets everything to the lowest mode possible so
+			// the device returns a reliable graphics setting.
+			try {
+				Debug.Write("Creating framebuffer with custom Android settings (low mode)");
+				GraphicsMode = new AndroidGraphicsMode(0, 0, 0, 0, 0, false);
+				base.CreateFrameBuffer();
+				return;
+			} catch (Exception ex) {
+				Debug.Write("{0}", ex);
 			}
 			throw new Lime.Exception("Can't create framebuffer, aborting");
-		}
-
-		private IEnumerable<GraphicsMode> GetGraphicsModes()
-		{
-			yield return new AndroidGraphicsMode(new ColorFormat(8, 8, 8, 8), 24, 0, 0, 0, false);
-			yield return new AndroidGraphicsMode(new ColorFormat(5, 6, 5, 0), 24, 0, 0, 0, false);
-			yield return new AndroidGraphicsMode(0, 24, 0, 0, 0, false);
-			yield return new AndroidGraphicsMode(new ColorFormat(8, 8, 8, 8), 16, 0, 0, 0, false);
-			yield return new AndroidGraphicsMode(new ColorFormat(5, 6, 5, 0), 16, 0, 0, 0, false);
-			yield return new AndroidGraphicsMode(0, 16, 0, 0, 0, false);
-			yield return null; // default mode
-			yield return new AndroidGraphicsMode(0, 0, 0, 0, 0, false); // low mode
 		}
 
 		protected override void OnRenderFrame(FrameEventArgs e)
