@@ -43,6 +43,10 @@ namespace Lime
 				if (code == 186) {
 					return this[(char)176];
 				}
+				// Use '#' instead of 'numero sign'
+				if (code == 8470) {
+					return this['#'];
+				}
 				return FontChar.Null;
 			}
 		}
