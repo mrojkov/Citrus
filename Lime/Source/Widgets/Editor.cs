@@ -135,7 +135,7 @@ namespace Lime
 			this.caretPos = caretPos;
 			this.editorParams = editorParams;
 			container.Tasks.Add(FocusTask(), this);
-			container.Tasks.Add(HandleKeyboardTask(), this);
+			container.Tasks.Add(HandleInputTask(), this);
 			container.Tasks.Add(EnforceDisplayTextTask(), this);
 		}
 
@@ -299,5 +299,89 @@ namespace Lime
 			}
 		}
 
+	}
+
+	public struct Shortcut
+	{
+		public Key Modifier;
+		public Key Main;
+
+		public Shortcut(Key modifier, Key main)
+		{
+			Modifier = modifier;
+			Main = main;
+		}
+
+		public static implicit operator Shortcut(Key main) { return new Shortcut(Key.Unknown, main); }
+
+		public bool IsPressed(WidgetInput input)
+		{
+			return
+				Main != Key.Unknown && input.WasKeyPressed(Main) &&
+				input.IsSingleKeyPressed(Modifier, Key.Unknown + 1, Key.Menu);
+		}
+	}
+
+	public static class ShortcutExt
+	{
+		public static Shortcut Plus(this Key modifier, Key main) { return new Shortcut(modifier, main); }
+	}
+
+	/// <summary>
+	/// Controls switching of focus between <see cref="IFocusable"/> fields based on keyboard shortcuts.
+	/// </summary>
+	public class KeyboardFocusController
+	{
+		public Shortcut NextField = Key.Tab;
+		public Shortcut PreviousField = Key.LShift.Plus(Key.Tab);
+		public Shortcut NextFieldOrSubmit = Key.Enter;
+		public Shortcut Cancel = Key.Escape;
+
+		public event Action OnSubmit;
+		public event Action OnCancel;
+
+		public readonly Widget Parent;
+		public readonly List<IFocusable> Fields = new List<IFocusable>();
+
+		public KeyboardFocusController(Widget parent)
+		{
+			Parent = parent;
+			Parent.Tasks.Add(FocusTask());
+		}
+
+		private int Next()
+		{
+			var focused = Fields.FindIndex(i => i.IsFocused());
+			// Submit should work even without focusable entities.
+			if (NextFieldOrSubmit.IsPressed(Parent.Input)) {
+				if (focused + 1 < Fields.Count)
+					return focused + 1;
+				if (OnSubmit != null)
+					OnSubmit();
+			}
+			if (focused < 0)
+				return -1;
+			if (NextField.IsPressed(Parent.Input))
+				return (focused + 1) % Fields.Count;
+			if (PreviousField.IsPressed(Parent.Input))
+				return (focused + Fields.Count - 1) % Fields.Count;
+			return -1;
+		}
+
+		private IEnumerator<object> FocusTask()
+		{
+			while (true) {
+				if (Cancel.IsPressed(Parent.Input) && OnCancel != null) {
+					OnCancel();
+					yield break;
+				}
+				var next = Next();
+				if (next >= 0) {
+					yield return null;
+					Fields[next].Focus();
+				}
+				yield return null;
+			}
+		}
 	}
 }
