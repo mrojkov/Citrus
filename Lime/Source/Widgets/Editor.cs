@@ -114,7 +114,7 @@ namespace Lime
 
 	public class Editor
 	{
-		private Widget container;
+		public readonly Widget Container;
 		private IKeyboardInputProcessor textInputProcessor;
 		private IText text;
 		private ICaretPosition caretPos;
@@ -122,8 +122,8 @@ namespace Lime
 
 		public Editor(Widget container, ICaretPosition caretPos, IEditorParams editorParams)
 		{
-			this.container = container;
-			this.textInputProcessor = (IKeyboardInputProcessor)container;
+			Container = container;
+			textInputProcessor = (IKeyboardInputProcessor)container;
 			text = (IText)container;
 			text.TrimWhitespaces = false;
 			this.caretPos = caretPos;
@@ -139,7 +139,7 @@ namespace Lime
 				World.Instance.ActiveTextWidget = null;
 				caretPos.IsVisible = false;
 			}
-			container.Tasks.StopByTag(this);
+			Container.Tasks.StopByTag(this);
 		}
 
 		private bool IsActive() { return World.Instance.ActiveTextWidget == textInputProcessor; }
@@ -148,7 +148,7 @@ namespace Lime
 		{
 			var world = World.Instance;
 			while (true) {
-				if (container.WasClicked()) {
+				if (Container.WasClicked())
 					world.ActiveTextWidget = textInputProcessor;
 					world.IsActiveTextWidgetUpdated = true;
 				}
@@ -165,7 +165,7 @@ namespace Lime
 
 		private bool CheckCursorKey(Key key)
 		{
-			if (!container.Input.IsKeyPressed(key) || keyPressed != 0)
+			if (!Container.Input.IsKeyPressed(key) || keyPressed != 0)
 				return false;
 			keyPressed = key;
 			if (key != prevKeyPressed)
@@ -202,7 +202,7 @@ namespace Lime
 
 		private void HandleCursorKeys()
 		{
-			cursorKeyDownTime -= container.Tasks.Delta;
+			cursorKeyDownTime -= Container.Tasks.Delta;
 			keyPressed = 0;
 			if (CheckCursorKey(Key.Left))
 				caretPos.TextPos--;
@@ -226,7 +226,7 @@ namespace Lime
 			if (CheckCursorKey(Key.Enter) && editorParams.IsAcceptableLines(text.Text.Count(ch => ch == '\n') + 2))
 				InsertChar('\n');
 #if WIN
-			if (container.Input.IsKeyPressed(Key.ControlLeft) && CheckCursorKey(Key.V)) {
+			if (Container.Input.IsKeyPressed(Key.ControlLeft) && CheckCursorKey(Key.V)) {
 				foreach (var ch in System.Windows.Forms.Clipboard.GetText())
 					InsertChar(ch);
 			}
@@ -237,9 +237,9 @@ namespace Lime
 		private float lastCharShowTimeLeft = 0f;
 		private void HandleTextInput()
 		{
-			if (container.Input.TextInput == null)
+			if (Container.Input.TextInput == null)
 				return;
-			foreach (var ch in container.Input.TextInput) {
+			foreach (var ch in Container.Input.TextInput) {
 				// Some platforms, notably iOS, do not generate Key.BackSpace.
 				// OTOH, '\b' is emulated everywhere.
 				if (ch == '\b') {
@@ -257,9 +257,9 @@ namespace Lime
 
 		private void HandleMouse()
 		{
-			if (container.WasClicked()) {
+			if (Container.WasClicked()) {
 				caretPos.WorldPos =
-					container.LocalToWorldTransform.CalcInversed().TransformVector(container.Input.MousePosition);
+					Container.LocalToWorldTransform.CalcInversed().TransformVector(Container.Input.MousePosition);
 			}
 		}
 
