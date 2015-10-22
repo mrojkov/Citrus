@@ -301,10 +301,22 @@ namespace Lime
 
 	}
 
+	/// <summary>
+	/// Represents combitation of a key with a keyboard modifier used to trigger some action.
+	/// </summary>
 	public struct Shortcut
 	{
-		public Key Modifier;
-		public Key Main;
+		/// <summary>
+		/// Modifier is expected to be in range from Key.LShift to Key.Menu.<br/>
+		/// Set Modifier to Key.Unknown to get a key without any modifier.<br/>
+		/// </summary>
+		public readonly Key Modifier;
+		/// <summary>
+		/// Set Main to Key.Unknown to disable shortcut.
+		/// </summary>
+		public readonly Key Main;
+
+		public static Shortcut Disabled = Key.Unknown;
 
 		public Shortcut(Key modifier, Key main)
 		{
@@ -314,7 +326,7 @@ namespace Lime
 
 		public static implicit operator Shortcut(Key main) { return new Shortcut(Key.Unknown, main); }
 
-		public bool IsPressed(WidgetInput input)
+		public bool WasTriggered(WidgetInput input)
 		{
 			return
 				Main != Key.Unknown && input.WasKeyPressed(Main) &&
@@ -353,7 +365,7 @@ namespace Lime
 		{
 			var focused = Fields.FindIndex(i => i.IsFocused());
 			// Submit should work even without focusable entities.
-			if (NextFieldOrSubmit.IsPressed(Parent.Input)) {
+			if (NextFieldOrSubmit.WasTriggered(Parent.Input)) {
 				if (focused + 1 < Fields.Count)
 					return focused + 1;
 				if (OnSubmit != null)
@@ -361,9 +373,9 @@ namespace Lime
 			}
 			if (focused < 0)
 				return -1;
-			if (NextField.IsPressed(Parent.Input))
+			if (NextField.WasTriggered(Parent.Input))
 				return (focused + 1) % Fields.Count;
-			if (PreviousField.IsPressed(Parent.Input))
+			if (PreviousField.WasTriggered(Parent.Input))
 				return (focused + Fields.Count - 1) % Fields.Count;
 			return -1;
 		}
@@ -371,7 +383,7 @@ namespace Lime
 		private IEnumerator<object> FocusTask()
 		{
 			while (true) {
-				if (Cancel.IsPressed(Parent.Input) && OnCancel != null) {
+				if (Cancel.WasTriggered(Parent.Input) && OnCancel != null) {
 					OnCancel();
 					yield break;
 				}
