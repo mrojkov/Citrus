@@ -121,8 +121,9 @@ namespace Lime
 	public class Editor : IFocusable
 	{
 		public readonly Widget Container;
+		public readonly IText Text;
+
 		private IKeyboardInputProcessor textInputProcessor;
-		private IText text;
 		private ICaretPosition caretPos;
 		private IEditorParams editorParams;
 
@@ -130,8 +131,8 @@ namespace Lime
 		{
 			Container = container;
 			textInputProcessor = (IKeyboardInputProcessor)container;
-			text = (IText)container;
-			text.TrimWhitespaces = false;
+			Text = (IText)container;
+			Text.TrimWhitespaces = false;
 			this.caretPos = caretPos;
 			this.editorParams = editorParams;
 			container.Tasks.Add(HandleInputTask(), this);
@@ -176,12 +177,12 @@ namespace Lime
 		private void InsertChar(char ch)
 		{
 			if (
-				caretPos.TextPos >= 0 && caretPos.TextPos <= text.Text.Length &&
-				editorParams.IsAcceptableLength(text.Text.Length + 1)
+				caretPos.TextPos >= 0 && caretPos.TextPos <= Text.Text.Length &&
+				editorParams.IsAcceptableLength(Text.Text.Length + 1)
 			) {
-				var newText = text.Text.Insert(caretPos.TextPos, ch.ToString());
+				var newText = Text.Text.Insert(caretPos.TextPos, ch.ToString());
 				if (editorParams.MaxHeight <= 0 || editorParams.IsAcceptableHeight(CalcTextHeight(newText))) {
-					text.Text = newText;
+					Text.Text = newText;
 					caretPos.TextPos++;
 				}
 			}
@@ -189,10 +190,10 @@ namespace Lime
 
 		private float CalcTextHeight(string s)
 		{
-			var displayText = text.DisplayText;
-			text.DisplayText = s;
-			var height = text.MeasureText().Height;
-			text.DisplayText = displayText;
+			var displayText = Text.DisplayText;
+			Text.DisplayText = s;
+			var height = Text.MeasureText().Height;
+			Text.DisplayText = displayText;
 			return height;
 		}
 
@@ -213,13 +214,13 @@ namespace Lime
 			if (CheckCursorKey(Key.End))
 				caretPos.Pos = int.MaxValue;
 			if (CheckCursorKey(Key.Delete)) {
-				if (caretPos.TextPos >= 0 && caretPos.TextPos < text.Text.Length) {
-					text.Text = text.Text.Remove(caretPos.TextPos, 1);
+				if (caretPos.TextPos >= 0 && caretPos.TextPos < Text.Text.Length) {
+					Text.Text = Text.Text.Remove(caretPos.TextPos, 1);
 					caretPos.TextPos--;
 					caretPos.TextPos++; // Enforce revalidation.
 				}
 			}
-			if (CheckCursorKey(Key.Enter) && editorParams.IsAcceptableLines(text.Text.Count(ch => ch == '\n') + 2))
+			if (CheckCursorKey(Key.Enter) && editorParams.IsAcceptableLines(Text.Text.Count(ch => ch == '\n') + 2))
 				InsertChar('\n');
 #if WIN
 			if (Container.Input.IsKeyPressed(Key.ControlLeft) && CheckCursorKey(Key.V)) {
@@ -239,9 +240,9 @@ namespace Lime
 				// Some platforms, notably iOS, do not generate Key.BackSpace.
 				// OTOH, '\b' is emulated everywhere.
 				if (ch == '\b') {
-					if (caretPos.TextPos > 0 && caretPos.TextPos <= text.Text.Length) {
+					if (caretPos.TextPos > 0 && caretPos.TextPos <= Text.Text.Length) {
 						caretPos.TextPos--;
-						text.Text = text.Text.Remove(caretPos.TextPos, 1);
+						Text.Text = Text.Text.Remove(caretPos.TextPos, 1);
 						lastCharShowTimeLeft = editorParams.PasswordLastCharShowTime;
 					}
 				}
@@ -276,13 +277,13 @@ namespace Lime
 		private IEnumerator<object> EnforceDisplayTextTask()
 		{
 			while (true) {
-				if (editorParams.PasswordChar != null && text.Text != "") {
+				if (editorParams.PasswordChar != null && Text.Text != "") {
 					lastCharShowTimeLeft -= TaskList.Current.Delta;
-					text.DisplayText = new string(editorParams.PasswordChar.Value, text.Text.Length - 1);
-					text.DisplayText += lastCharShowTimeLeft > 0 ? text.Text.Last() : editorParams.PasswordChar;
+					Text.DisplayText = new string(editorParams.PasswordChar.Value, Text.Text.Length - 1);
+					Text.DisplayText += lastCharShowTimeLeft > 0 ? Text.Text.Last() : editorParams.PasswordChar;
 				}
 				else {
-					text.DisplayText = text.Text; // Disable localization.
+					Text.DisplayText = Text.Text; // Disable localization.
 				}
 				yield return null;
 			}
