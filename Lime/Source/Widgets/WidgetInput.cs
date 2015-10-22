@@ -160,6 +160,21 @@ namespace Lime
 			return IsAcceptingDeviceWithKey(key) && Input.IsKeyPressed(key);
 		}
 
+		/// <summary>
+		/// Returns true if only a single given key from the given range is pressed.
+		/// Useful for recognizing keyboard modifiers.
+		/// </summary>
+		public bool IsSingleKeyPressed(Key key, Key rangeMin, Key rangeMax)
+		{
+			if (!IsAcceptingDeviceWithKey(key))
+				return false;
+			for (var k = rangeMin; k <= rangeMax; ++k) {
+				if (Input.IsKeyPressed(k) != (k == key))
+					return false;
+			}
+			return true;
+		}
+
 		public bool WasKeyPressed(Key key)
 		{
 			return IsAcceptingDeviceWithKey(key) && Input.WasKeyPressed(key);
