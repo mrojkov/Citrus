@@ -118,6 +118,9 @@ namespace Lime
 		void Focus();
 	}
 
+	/// <summary>
+	/// Editor behaviour implemented over the given text display widget.
+	/// </summary>
 	public class Editor : IFocusable
 	{
 		public readonly Widget Container;
@@ -292,7 +295,7 @@ namespace Lime
 	}
 
 	/// <summary>
-	/// Represents combitation of a key with a keyboard modifier used to trigger some action.
+	/// Represents combination of a key with a keyboard modifier used to trigger some action.
 	/// </summary>
 	public struct Shortcut
 	{
