@@ -112,7 +112,13 @@ namespace Lime
 		public bool IsAcceptableHeight(float height) { return MaxHeight <= 0 || height <= MaxHeight; }
 	}
 
-	public class Editor
+	public interface IFocusable
+	{
+		bool IsFocused();
+		void Focus();
+	}
+
+	public class Editor : IFocusable
 	{
 		public readonly Widget Container;
 		private IKeyboardInputProcessor textInputProcessor;
@@ -135,26 +141,29 @@ namespace Lime
 
 		public void Unlink()
 		{
-			if (IsActive()) {
+			if (IsFocused()) {
 				World.Instance.ActiveTextWidget = null;
 				caretPos.IsVisible = false;
 			}
 			Container.Tasks.StopByTag(this);
 		}
 
-		private bool IsActive() { return World.Instance.ActiveTextWidget == textInputProcessor; }
+		public void Focus()
+		{
+			World.Instance.ActiveTextWidget = textInputProcessor;
+			World.Instance.IsActiveTextWidgetUpdated = true;
+		}
+
+		public bool IsFocused() { return World.Instance.ActiveTextWidget == textInputProcessor; }
 
 		private IEnumerator<object> FocusTask()
 		{
-			var world = World.Instance;
 			while (true) {
 				if (Container.WasClicked())
-					world.ActiveTextWidget = textInputProcessor;
-					world.IsActiveTextWidgetUpdated = true;
-				}
-				caretPos.IsVisible = IsActive();
-				if (IsActive())
-					world.IsActiveTextWidgetUpdated = true;
+					Focus();
+				caretPos.IsVisible = IsFocused();
+				if (IsFocused())
+					World.Instance.IsActiveTextWidgetUpdated = true;
 				yield return null;
 			}
 		}
@@ -263,10 +272,10 @@ namespace Lime
 			}
 		}
 
-		private IEnumerator<object> HandleKeyboardTask()
+		private IEnumerator<object> HandleInputTask()
 		{
 			while (true) {
-				if (IsActive()) {
+				if (IsFocused()) {
 					HandleCursorKeys();
 					HandleTextInput();
 					HandleMouse();
