@@ -255,6 +255,7 @@ namespace Lime
 					if (caretPos.TextPos > 0 && caretPos.TextPos <= text.Text.Length) {
 						caretPos.TextPos--;
 						text.Text = text.Text.Remove(caretPos.TextPos, 1);
+						lastCharShowTimeLeft = editorParams.PasswordLastCharShowTime;
 					}
 				}
 				else if (ch >= ' ') {
