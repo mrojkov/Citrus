@@ -134,7 +134,6 @@ namespace Lime
 			text.TrimWhitespaces = false;
 			this.caretPos = caretPos;
 			this.editorParams = editorParams;
-			container.Tasks.Add(FocusTask(), this);
 			container.Tasks.Add(HandleInputTask(), this);
 			container.Tasks.Add(EnforceDisplayTextTask(), this);
 		}
@@ -155,18 +154,6 @@ namespace Lime
 		}
 
 		public bool IsFocused() { return World.Instance.ActiveTextWidget == textInputProcessor; }
-
-		private IEnumerator<object> FocusTask()
-		{
-			while (true) {
-				if (Container.WasClicked())
-					Focus();
-				caretPos.IsVisible = IsFocused();
-				if (IsFocused())
-					World.Instance.IsActiveTextWidgetUpdated = true;
-				yield return null;
-			}
-		}
 
 		private float cursorKeyDownTime;
 		private Key prevKeyPressed = 0;
@@ -265,21 +252,22 @@ namespace Lime
 			}
 		}
 
-		private void HandleMouse()
-		{
-			if (Container.WasClicked()) {
-				caretPos.WorldPos =
-					Container.LocalToWorldTransform.CalcInversed().TransformVector(Container.Input.MousePosition);
-			}
-		}
-
 		private IEnumerator<object> HandleInputTask()
 		{
 			while (true) {
+				var wasClicked = Container.WasClicked();
+				if (wasClicked)
+					Focus();
+				caretPos.IsVisible = IsFocused();
+
 				if (IsFocused()) {
+					World.Instance.IsActiveTextWidgetUpdated = true;
 					HandleCursorKeys();
 					HandleTextInput();
-					HandleMouse();
+					if (wasClicked) {
+						var t = Container.LocalToWorldTransform.CalcInversed();
+						caretPos.WorldPos = t.TransformVector(Container.Input.MousePosition);
+					}
 				}
 				yield return null;
 			}
