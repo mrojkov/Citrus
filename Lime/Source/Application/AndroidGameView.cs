@@ -79,7 +79,6 @@ namespace Lime
 
 		private KeyboardHandler keyboardHandler;
 		private InputMethodManager imm;
-		internal bool SoftKeyboardVisible { get; private set; }
 
 		public GameView(Context context) : base(context)
 		{
@@ -111,11 +110,11 @@ namespace Lime
 				var visibleHeight = r.Bottom - r.Top;
 				var app = Application.Instance;
 				if (visibleHeight == totalHeight) {
-					SoftKeyboardVisible = false;
+					app.SoftKeyboard.Visible = false;
 					app.SoftKeyboard.Height = 0;
 				} else {
 					app.SoftKeyboard.Height = totalHeight - visibleHeight;
-					SoftKeyboardVisible = true;
+					app.SoftKeyboard.Visible = true;
 				}
 			}
 		}
