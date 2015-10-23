@@ -239,6 +239,7 @@ namespace Lime
 			AudioSystem.Active = false;
 			GameView.Pause();
 			GameView.ClearFocus();
+			GameView.ShowSoftKeyboard(false, null);
 			base.OnPause();
 		}
 
