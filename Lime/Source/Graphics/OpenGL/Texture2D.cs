@@ -216,7 +216,11 @@ namespace Lime
 
 		public void LoadImage(IntPtr pixels, int width, int height, bool generateMips, bool swapRedAndBlue)
 		{
+#if iOS || ANDROID
+			var format = PixelFormat.Rgba;
+#else
 			var format = swapRedAndBlue ? PixelFormat.Bgra : PixelFormat.Rgba;
+#endif
 			if (!Application.IsMainThread)
 			{
 				throw new InvalidOperationException();
