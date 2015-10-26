@@ -211,13 +211,19 @@ namespace Lime
 
 		public void LoadImage(IntPtr pixels, int width, int height, bool generateMips)
 		{
+			LoadImage(pixels, width, height, generateMips, swapRedAndBlue: false);
+		}
+
+		public void LoadImage(IntPtr pixels, int width, int height, bool generateMips, bool swapRedAndBlue)
+		{
+			var format = swapRedAndBlue ? PixelFormat.Bgra : PixelFormat.Rgba;
 			if (!Application.IsMainThread)
 			{
 				throw new InvalidOperationException();
 			}
 			PrepareOpenGLTexture();
 			PlatformRenderer.PushTexture(handle, 0);
-			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
+			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, format, PixelType.UnsignedByte, pixels);
 			MemoryUsed = 4 * width * height;
 			if (generateMips) {
 #if !MAC && !iOS
