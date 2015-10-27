@@ -23,6 +23,7 @@ namespace OpenTK.Input
         /// Gets the <see cref="Key"/> that generated this event.
         /// </summary>
         public Key Key { get; set; }
+		public List<Key> Modifiers { get; set; }
     
         #endregion
     }

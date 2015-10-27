@@ -193,6 +193,14 @@ namespace Lime
 		{
 			currentKeysState.CopyTo(previousKeysState, 0);
 		}
+
+		internal static void ResetModifiers()
+		{
+			for (int i = 1; i < 9; i++)
+			{
+				currentKeysState[i] = false;
+			}
+		}
 	}
 }
 

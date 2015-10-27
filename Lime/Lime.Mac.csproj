@@ -175,6 +175,9 @@
     <Compile Include="Source\Widgets\Model\ModelMesh.cs" />
     <Compile Include="Source\Widgets\Model\ModelNode.cs" />
     <Compile Include="Source\Widgets\Model\ModelViewport.cs" />
+    <Compile Include="Source\Widgets\Clipboard\Clipboard.Mac.cs" />
+    <Compile Include="Source\Widgets\Clipboard\Clipboard.cs" />
+    <Compile Include="Source\Widgets\Clipboard\Clipboard.Win.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
@@ -270,6 +273,7 @@
     <Folder Include="Source\Graphics\" />
     <Folder Include="Source\Audio\OpenAL\" />
     <Folder Include="Source\Application\" />
+    <Folder Include="Source\Widgets\Clipboard\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

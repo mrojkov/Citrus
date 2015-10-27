@@ -101,12 +101,51 @@ namespace Lime
 			var world = World.Instance;
 			if (Enabled) {
 				if (world.ActiveTextWidget == this && Input.TextInput != null) {
-					ProcessInput();
+					if (IsHotKeyPressed()) {
+						ProcessHotkeys();
+					} else {
+						ProcessInput();
+					}
 				}
 				if (world.ActiveTextWidget == this) {
 					world.IsActiveTextWidgetUpdated = true;
 				}
 				caretBlinkPhase += delta;
+			}
+		}
+
+		private bool IsHotKeyPressed()
+		{
+#if MAC
+			return (Input.IsKeyPressed(Key.LWin) || Input.IsKeyPressed(Key.RWin));
+#elif WIN
+			return (Input.IsKeyPressed(Key.LControl) || Input.IsKeyPressed(Key.RControl));
+#else
+			return false;
+#endif
+		}
+
+		private void ProcessHotkeys()
+		{
+			if (Input.IsKeyPressed(Key.V)) {
+				string pasteText = Clipboard.GetText();
+				int freeSpace = MaxTextLength - Text.Length;
+				if (freeSpace > 0) {
+					if (pasteText.Length > freeSpace) {
+						pasteText = pasteText.Substring(0, freeSpace);
+					}
+					pasteText = pasteText
+						.Replace(System.Environment.NewLine, " ")
+						.Replace('\t', ' ');
+					Text += pasteText;
+				}
+			} else if (Input.IsKeyPressed(Key.C)) {
+				Clipboard.PutText(Text);
+			} else if (Input.IsKeyPressed(Key.X)) {
+				Clipboard.PutText(Text);
+				Text = String.Empty;
+			} else if (Input.IsKeyPressed(Key.Z)) {
+				//TODO: undo last action
 			}
 		}
 
