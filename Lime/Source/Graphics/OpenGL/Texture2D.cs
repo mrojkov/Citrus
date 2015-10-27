@@ -217,6 +217,9 @@ namespace Lime
 		public void LoadImage(IntPtr pixels, int width, int height, bool generateMips, bool swapRedAndBlue)
 		{
 #if iOS || ANDROID
+			if (swapRedAndBlue) {
+				throw new NotImplementedException("Color swap doesnt work on mobile");
+			}
 			var format = PixelFormat.Rgba;
 #else
 			var format = swapRedAndBlue ? PixelFormat.Bgra : PixelFormat.Rgba;
