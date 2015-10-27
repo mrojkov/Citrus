@@ -160,12 +160,13 @@ namespace Lime
 			}
 			Input.SetKeyState((Key)e.Key, true);
 			Input.ResetModifiers();
-			foreach (var key in e.Modifiers)
+			var modifierKeys = Input.GetModifierKeysFromMask((ulong)e.Modifiers);
+			foreach (var key in modifierKeys)
 			{
-				Input.SetKeyState((Key)key, true);
+				Input.SetKeyState(key, true);
 #if MAC
 				//There is no KeyUp event on Mac if Command key pressed, so we release it manualy in the same frame
-				if (key == OpenTK.Input.Key.LWin || key == OpenTK.Input.Key.RWin) {
+				if (key == Key.LWin || key == Key.RWin) {
 					Input.SetKeyState((Key)e.Key, false);
 				}
 #endif

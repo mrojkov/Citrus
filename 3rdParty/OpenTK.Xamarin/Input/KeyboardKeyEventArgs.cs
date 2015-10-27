@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using AppKit;
 
 namespace OpenTK.Input
 {
@@ -23,7 +24,7 @@ namespace OpenTK.Input
         /// Gets the <see cref="Key"/> that generated this event.
         /// </summary>
         public Key Key { get; set; }
-		public List<Key> Modifiers { get; set; }
+		public NSEventModifierMask Modifiers { get; set; }
     
         #endregion
     }

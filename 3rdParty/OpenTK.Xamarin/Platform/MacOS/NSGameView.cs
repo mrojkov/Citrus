@@ -142,8 +142,7 @@ namespace OpenTK
 		{
 			if (Keyboard != null) {
 				var key = MacOSKeyMap.GetKey((MacOSKeyCode)theEvent.KeyCode);
-				var modifierKeys = GetModifierKeysFrom(theEvent.ModifierFlags);
-				Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = key, Modifiers = modifierKeys});
+				Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = key, Modifiers = theEvent.ModifierFlags});
 				foreach(var c in theEvent.Characters) {
 					// Imitation of original OpenTK backspace bug
 					if ((int)c != 127) {
@@ -151,36 +150,6 @@ namespace OpenTK
 					}
 				}
 			}
-		}
-
-		private List<Key> GetModifierKeysFrom(NSEventModifierMask modifierMask)
-		{
-			var modifierKeys = new List<Key>(8);
-			if (((int)modifierMask & 0x20002) == 0x20002) {
-				modifierKeys.Add(Key.LShift);
-			}
-			if (((int)modifierMask & 0x20004) == 0x20004) {
-				modifierKeys.Add(Key.RShift);
-			}
-			if (((int)modifierMask & 0x40001) == 0x40001) {
-				modifierKeys.Add(Key.LControl);
-			}
-			if (((int)modifierMask & 0x42000) == 0x42000) {
-				modifierKeys.Add(Key.RControl);
-			}
-			if (((int)modifierMask & 0x80020) == 0x80020) {
-				modifierKeys.Add(Key.LAlt);
-			}
-			if (((int)modifierMask & 0x80040) == 0x80040) {
-				modifierKeys.Add(Key.RAlt);
-			}
-			if (((int)modifierMask & 0x100008) == 0x100008) {
-				modifierKeys.Add(Key.LWin);
-			}
-			if (((int)modifierMask & 0x100010) == 0x100010) {
-				modifierKeys.Add(Key.RWin);
-			}
-			return modifierKeys;
 		}
 
 		public override void KeyUp(NSEvent theEvent)

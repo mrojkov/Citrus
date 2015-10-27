@@ -201,6 +201,36 @@ namespace Lime
 				currentKeysState[i] = false;
 			}
 		}
+
+		internal static List<Key> GetModifierKeysFromMask(ulong modifierMask)
+		{
+			var modifierKeys = new List<Key>(8);
+			if ((modifierMask & 0x20002) == 0x20002) {
+				modifierKeys.Add(Key.LShift);
+			}
+			if ((modifierMask & 0x20004) == 0x20004) {
+				modifierKeys.Add(Key.RShift);
+			}
+			if ((modifierMask & 0x40001) == 0x40001) {
+				modifierKeys.Add(Key.LControl);
+			}
+			if ((modifierMask & 0x42000) == 0x42000) {
+				modifierKeys.Add(Key.RControl);
+			}
+			if ((modifierMask & 0x80020) == 0x80020) {
+				modifierKeys.Add(Key.LAlt);
+			}
+			if ((modifierMask & 0x80040) == 0x80040) {
+				modifierKeys.Add(Key.RAlt);
+			}
+			if ((modifierMask & 0x100008) == 0x100008) {
+				modifierKeys.Add(Key.LWin);
+			}
+			if ((modifierMask & 0x100010) == 0x100010) {
+				modifierKeys.Add(Key.RWin);
+			}
+			return modifierKeys;
+		}
 	}
 }
 
