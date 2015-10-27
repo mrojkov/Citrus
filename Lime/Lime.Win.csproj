@@ -75,6 +75,8 @@
     <Compile Include="Source\Types\Ray.cs" />
     <Compile Include="Source\Widgets\Animation\Animation.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationList.cs" />
+    <Compile Include="Source\Widgets\Clipboard\Clipboard.cs" />
+    <Compile Include="Source\Widgets\Clipboard\Clipboard.Win.cs" />
     <Compile Include="Source\Widgets\Editor.cs" />
     <Compile Include="Source\Graphics\RenderBatch.cs" />
     <Compile Include="Source\Graphics\RenderList.cs" />
