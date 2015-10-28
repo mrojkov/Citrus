@@ -74,6 +74,14 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// Добавляет таск в конец списка
+		/// </summary>
+		public Task Add(Func<IEnumerator<object>> e, object tag = null)
+		{
+			return Add(e(), tag);
+		}
+
+		/// <summary>
 		/// Останавливает таск с указанным тегом, создает новую с таким-же тегом и добавляет ее в конец списка
 		/// </summary>
 		public Task Replace(IEnumerator<object> e, object tag)
