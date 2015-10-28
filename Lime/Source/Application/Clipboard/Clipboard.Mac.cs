@@ -12,18 +12,18 @@ namespace Lime
 	{
 		[DllImport("/usr/lib/libobjc.dylib", EntryPoint="objc_msgSend")]
 		private extern static global::System.IntPtr
-		IntPtr_objc_msgSend_IntPtr_IntPtr(IntPtr receiver, IntPtr selector, IntPtr arg1, IntPtr arg2);
+		SendMessageAndGetIntPtr(IntPtr receiver, IntPtr selector, IntPtr arg1, IntPtr arg2);
 
 		[DllImport("/usr/lib/libobjc.dylib", EntryPoint="objc_msgSend")]
 		private extern static bool
-		bool_objc_msgSend_IntPtr_IntPtr(IntPtr receiver, IntPtr selector, IntPtr arg1, IntPtr arg2);
+		SendMessageAndGetBool(IntPtr receiver, IntPtr selector, IntPtr arg1, IntPtr arg2);
 
 		private static string GetTextImpl()
 		{
 			var pasteBoard = NSPasteboard.GeneralPasteboard;
 			var classArray = NSArray.FromObjects(new Class("NSString"));
 
-			bool hasText = bool_objc_msgSend_IntPtr_IntPtr(
+			bool hasText = SendMessageAndGetBool(
 				pasteBoard.Handle,
 				Selector.GetHandle("canReadObjectForClasses:options:"),
 				classArray.Handle,
@@ -32,7 +32,7 @@ namespace Lime
 			string text = String.Empty;
 
 			if (hasText) {
-				NSObject[] objectsToPaste = NSArray.ArrayFromHandle<NSObject>(IntPtr_objc_msgSend_IntPtr_IntPtr(
+				NSObject[] objectsToPaste = NSArray.ArrayFromHandle<NSObject>(SendMessageAndGetIntPtr(
 					pasteBoard.Handle,
 					Selector.GetHandle("readObjectsForClasses:options:"),
 					classArray.Handle,
