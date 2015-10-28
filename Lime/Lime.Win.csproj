@@ -54,6 +54,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Source\Application\Clipboard\Clipboard.Android.cs" />
+    <Compile Include="Source\Application\Clipboard\Clipboard.cs" />
+    <Compile Include="Source\Application\Clipboard\Clipboard.iOS.cs" />
+    <Compile Include="Source\Application\Clipboard\Clipboard.Mac.cs" />
+    <Compile Include="Source\Application\Clipboard\Clipboard.Win.cs" />
     <Compile Include="Source\Application\Debug.cs" />
     <Compile Include="Source\Application\RenderingApi.cs" />
     <Compile Include="Source\AssetsBundle\UnityAssetsBundle.cs" />
@@ -68,6 +73,7 @@
     <Compile Include="Source\Graphics\OpenGL\IGLObject.cs" />
     <Compile Include="Source\Graphics\Mesh.cs" />
     <Compile Include="Source\Graphics\OpenGL\PlatformMesh.cs" />
+    <Compile Include="Source\Input\ModifierMaskParser.cs" />
     <Compile Include="Source\Input\SoftKeyboard.cs" />
     <Compile Include="Source\Types\BoundingSphere.cs" />
     <Compile Include="Source\Types\ContainmentType.cs" />
@@ -75,8 +81,6 @@
     <Compile Include="Source\Types\Ray.cs" />
     <Compile Include="Source\Widgets\Animation\Animation.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationList.cs" />
-    <Compile Include="Source\Widgets\Clipboard\Clipboard.cs" />
-    <Compile Include="Source\Widgets\Clipboard\Clipboard.Win.cs" />
     <Compile Include="Source\Widgets\Editor.cs" />
     <Compile Include="Source\Graphics\RenderBatch.cs" />
     <Compile Include="Source\Graphics\RenderList.cs" />
@@ -250,7 +254,9 @@
     <Compile Include="Source\Widgets\Layout\Margin.cs" />
     <Compile Include="Source\Widgets\Layout\TableLayout.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Source\Widgets\Clipboard\" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">
       <Link>OpenAL32.dll</Link>
