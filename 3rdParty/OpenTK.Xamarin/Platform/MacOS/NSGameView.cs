@@ -31,6 +31,8 @@ namespace OpenTK
 		private DateTime prevUpdateTime;
 		private DateTime prevRenderTime;
 
+		private NSEventModifierMask prevMask;
+
 		public Input.Mouse Mouse;
 		public Input.Keyboard Keyboard;
 
@@ -155,10 +157,53 @@ namespace OpenTK
 		public override void FlagsChanged(NSEvent theEvent)
 		{
 			if (Keyboard != null) {
-				if (theEvent.ModifierFlags.HasFlag(NSEventModifierMask.CommandKeyMask)) {
-					Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = Key.LWin, Modifiers = theEvent.ModifierFlags});
+				var parser = new ModifierMaskParser((ulong)theEvent.ModifierFlags);
+				var prevParser = new ModifierMaskParser((ulong)prevMask);
+				if (parser.IsLShiftPressed()) {
+					Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = Key.LShift});
+				} else if (prevParser.IsLShiftPressed()) {
+					Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = Key.LShift});
+				}
+				if (parser.IsRShiftPressed()) {
+					Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = Key.RShift});
+				} else if (prevParser.IsRShiftPressed()) {
+					Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = Key.RShift});
+				}
+
+				if (parser.IsLCtrlPressed()) {
+					Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = Key.LControl});
+				} else if (prevParser.IsLCtrlPressed()) {
+					Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = Key.LControl});
+				}
+				if (parser.IsRCtrlPressed()) {
+					Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = Key.RControl});
+				} else if (prevParser.IsRCtrlPressed()) {
+					Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = Key.RControl});
+				}
+
+				if (parser.IsLAltPressed()) {
+					Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = Key.LAlt});
+				} else if (prevParser.IsLAltPressed()) {
+					Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = Key.LAlt});
+				}
+				if (parser.IsRAltPressed()) {
+					Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = Key.RAlt});
+				} else if (prevParser.IsRAltPressed()) {
+					Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = Key.RAlt});
+				}
+
+				if (parser.IsLWinPressed()) {
+					Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = Key.LWin});
+				} else if (prevParser.IsLWinPressed()) {
+					Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = Key.LWin});
+				}
+				if (parser.IsRWinPressed()) {
+					Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = Key.RWin});
+				} else if (prevParser.IsRWinPressed()) {
+					Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = Key.RWin});
 				}
 			}
+			prevMask = theEvent.ModifierFlags;		
 		}
 
 		public override void KeyUp(NSEvent theEvent)

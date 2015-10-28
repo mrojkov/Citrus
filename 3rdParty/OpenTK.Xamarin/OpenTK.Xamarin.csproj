@@ -81,6 +81,7 @@
     <Compile Include="Platform\MacOS\NSGameView.cs" />
     <Compile Include="Input\MacOSKeyMap.cs" />
     <Compile Include="Input\MacOSKeys.cs" />
+    <Compile Include="Input\ModifierMaskParser.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
 </Project>

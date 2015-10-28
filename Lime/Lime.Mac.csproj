@@ -180,7 +180,6 @@
     <Compile Include="Source\Application\Clipboard\Clipboard.Win.cs" />
     <Compile Include="Source\Application\Clipboard\Clipboard.cs" />
     <Compile Include="Source\Application\Clipboard\Clipboard.iOS.cs" />
-    <Compile Include="Source\Input\ModifierMaskParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
@@ -279,6 +278,7 @@
     <Folder Include="Source\Widgets\Clipboard\" />
     <Folder Include="Source\Widgets\" />
     <Folder Include="Source\Application\Clipboard\" />
+    <Folder Include="Source\Input\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

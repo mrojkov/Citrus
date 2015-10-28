@@ -193,22 +193,6 @@ namespace Lime
 		{
 			currentKeysState.CopyTo(previousKeysState, 0);
 		}
-
-		internal static void SetModifierKeysState(ulong modifierMask)
-		{
-			var parser = new ModifierMaskParser(modifierMask);
-			SetKeyState(Key.LShift, parser.IsLShiftPressed());
-			SetKeyState(Key.RShift, parser.IsRShiftPressed());
-
-			SetKeyState(Key.LControl, parser.IsLCtrlPressed());
-			SetKeyState(Key.RControl, parser.IsRCtrlPressed());
-
-			SetKeyState(Key.LAlt, parser.IsLAltPressed());
-			SetKeyState(Key.RAlt, parser.IsRAltPressed());
-
-			SetKeyState(Key.LWin, parser.IsLWinPressed());
-			SetKeyState(Key.RWin, parser.IsRWinPressed());
-		}
 	}
 }
 
