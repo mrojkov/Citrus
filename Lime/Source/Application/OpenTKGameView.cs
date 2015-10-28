@@ -159,8 +159,8 @@ namespace Lime
 				Input.TextInput += '\b';
 			}
 			Input.SetKeyState((Key)e.Key, true);
-			Input.SetModifierKeysState((ulong)e.Modifiers);
 #if MAC
+			Input.SetModifierKeysState((ulong)e.Modifiers);
 			//There is no KeyUp event for regular key on Mac if Command key pressed, so we release it manualy in the same frame
 			if ((Input.IsKeyPressed(Key.LWin) || Input.IsKeyPressed(Key.RWin))) {
 				Input.SetKeyState((Key)e.Key, false);
