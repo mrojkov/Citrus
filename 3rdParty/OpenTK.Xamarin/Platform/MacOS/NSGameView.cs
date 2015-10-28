@@ -152,6 +152,15 @@ namespace OpenTK
 			}
 		}
 
+		public override void FlagsChanged(NSEvent theEvent)
+		{
+			if (Keyboard != null) {
+				if (theEvent.ModifierFlags.HasFlag(NSEventModifierMask.CommandKeyMask)) {
+					Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = Key.LWin, Modifiers = theEvent.ModifierFlags});
+				}
+			}
+		}
+
 		public override void KeyUp(NSEvent theEvent)
 		{
 			if (Keyboard != null) {

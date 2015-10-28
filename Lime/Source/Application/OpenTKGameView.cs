@@ -159,18 +159,13 @@ namespace Lime
 				Input.TextInput += '\b';
 			}
 			Input.SetKeyState((Key)e.Key, true);
-			Input.ResetModifiers();
-			var modifierKeys = Input.GetModifierKeysFromMask((ulong)e.Modifiers);
-			foreach (var key in modifierKeys)
-			{
-				Input.SetKeyState(key, true);
+			Input.SetModifierKeysState((ulong)e.Modifiers);
 #if MAC
-				//There is no KeyUp event on Mac if Command key pressed, so we release it manualy in the same frame
-				if (key == Key.LWin || key == Key.RWin) {
-					Input.SetKeyState((Key)e.Key, false);
-				}
-#endif
+			//There is no KeyUp event for regular key on Mac if Command key pressed, so we release it manualy in the same frame
+			if ((Input.IsKeyPressed(Key.LWin) || Input.IsKeyPressed(Key.RWin))) {
+				Input.SetKeyState((Key)e.Key, false);
 			}
+#endif
 		}
 
 		void HandleKeyUp(object sender, KeyboardKeyEventArgs e)

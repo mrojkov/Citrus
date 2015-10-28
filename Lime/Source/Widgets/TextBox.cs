@@ -128,17 +128,7 @@ namespace Lime
 		private void ProcessHotkeys()
 		{
 			if (Input.IsKeyPressed(Key.V)) {
-				string pasteText = Clipboard.GetText();
-				int freeSpace = MaxTextLength - Text.Length;
-				if (freeSpace > 0) {
-					if (pasteText.Length > freeSpace) {
-						pasteText = pasteText.Substring(0, freeSpace);
-					}
-					pasteText = pasteText
-						.Replace(System.Environment.NewLine, " ")
-						.Replace('\t', ' ');
-					Text += pasteText;
-				}
+				PasteFromClipboard();
 			} else if (Input.IsKeyPressed(Key.C)) {
 				Clipboard.PutText(Text);
 			} else if (Input.IsKeyPressed(Key.X)) {
@@ -146,6 +136,20 @@ namespace Lime
 				Text = String.Empty;
 			} else if (Input.IsKeyPressed(Key.Z)) {
 				//TODO: undo last action
+			}
+		}
+
+		private void PasteFromClipboard()
+		{
+			string pasteText = Clipboard.GetText()
+				.Replace(System.Environment.NewLine, " ")
+				.Replace('\t', ' ');
+			int freeSpace = MaxTextLength - Text.Length;
+			if (freeSpace > 0) {
+				if (pasteText.Length > freeSpace) {
+					pasteText = pasteText.Substring(0, freeSpace);
+				}
+				Text += pasteText;
 			}
 		}
 
