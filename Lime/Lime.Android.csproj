@@ -50,6 +50,11 @@
   <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup>
     <Compile Include="Source\Application\Application.cs" />
+    <Compile Include="Source\Application\Clipboard\Clipboard.Android.cs" />
+    <Compile Include="Source\Application\Clipboard\Clipboard.cs" />
+    <Compile Include="Source\Application\Clipboard\Clipboard.iOS.cs" />
+    <Compile Include="Source\Application\Clipboard\Clipboard.Mac.cs" />
+    <Compile Include="Source\Application\Clipboard\Clipboard.Win.cs" />
     <Compile Include="Source\Application\CommandLineArgs.cs" />
     <Compile Include="Source\Application\Debug.cs" />
     <Compile Include="Source\Application\ExternalStorageLagsSimulator.cs" />
