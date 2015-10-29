@@ -146,17 +146,25 @@ namespace OpenTK.Input
         Down = 125,
         Left = 123,
         Right = 124,
+	}
 
-
-    }
-    [Flags]
-    enum MacOSKeyModifiers
-    {
-        None     = 0,
-        Shift    = 0x0200,
-        CapsLock = 0x0400,
-        Control  = 0x1000,  // 
-        Command  = 0x0100,  // Open-Apple  - Windows key 
-        Option   = 0x0800,  // Option key is same position as the alt key on non-mac keyboards.
-    }
+	[Flags]
+	enum MacOSKeyModifiers
+	{
+		None     = 0,
+		Shift    = 0x0200,
+		CapsLock = 0x0400,
+		Control  = 0x1000,  // 
+		Command  = 0x0100,  // Open-Apple  - Windows key 
+		Option   = 0x0800,  // Option key is same position as the alt key on non-mac keyboards.
+		LShiftFlag = 0x20002,
+		RShiftFlag = 0x20004,
+		LCtrlFlag = 0x40001,
+		RCtrlFlag = 0x42000,
+		LAltFlag = 0x80020,
+		RAltFlag = 0x80040,
+		LWinFlag = 0x100008,
+		RWinFlag = 0x100010,
+	}
 }
+

@@ -157,53 +157,56 @@ namespace OpenTK
 		public override void FlagsChanged(NSEvent theEvent)
 		{
 			if (Keyboard != null) {
-				var parser = new ModifierMaskParser((ulong)theEvent.ModifierFlags);
-				var prevParser = new ModifierMaskParser((ulong)prevMask);
-				if (parser.IsLShiftPressed()) {
+				if (IsMaskHasFlag(theEvent.ModifierFlags, MacOSKeyModifiers.LShiftFlag)) {
 					Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = Key.LShift});
-				} else if (prevParser.IsLShiftPressed()) {
+				} else if (IsMaskHasFlag(prevMask, MacOSKeyModifiers.LShiftFlag)) {
 					Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = Key.LShift});
 				}
-				if (parser.IsRShiftPressed()) {
+				if (IsMaskHasFlag(theEvent.ModifierFlags, MacOSKeyModifiers.RShiftFlag)) {
 					Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = Key.RShift});
-				} else if (prevParser.IsRShiftPressed()) {
+				} else if (IsMaskHasFlag(prevMask, MacOSKeyModifiers.RShiftFlag)) {
 					Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = Key.RShift});
 				}
 
-				if (parser.IsLCtrlPressed()) {
+				if (IsMaskHasFlag(theEvent.ModifierFlags, MacOSKeyModifiers.LCtrlFlag)) {
 					Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = Key.LControl});
-				} else if (prevParser.IsLCtrlPressed()) {
+				} else if (IsMaskHasFlag(prevMask, MacOSKeyModifiers.LCtrlFlag)) {
 					Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = Key.LControl});
 				}
-				if (parser.IsRCtrlPressed()) {
+				if (IsMaskHasFlag(theEvent.ModifierFlags, MacOSKeyModifiers.RCtrlFlag)) {
 					Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = Key.RControl});
-				} else if (prevParser.IsRCtrlPressed()) {
+				} else if (IsMaskHasFlag(prevMask, MacOSKeyModifiers.RCtrlFlag)) {
 					Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = Key.RControl});
 				}
 
-				if (parser.IsLAltPressed()) {
+				if (IsMaskHasFlag(theEvent.ModifierFlags, MacOSKeyModifiers.LAltFlag)) {
 					Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = Key.LAlt});
-				} else if (prevParser.IsLAltPressed()) {
+				} else if (IsMaskHasFlag(prevMask, MacOSKeyModifiers.LAltFlag)) {
 					Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = Key.LAlt});
 				}
-				if (parser.IsRAltPressed()) {
+				if (IsMaskHasFlag(theEvent.ModifierFlags, MacOSKeyModifiers.RAltFlag)) {
 					Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = Key.RAlt});
-				} else if (prevParser.IsRAltPressed()) {
+				} else if (IsMaskHasFlag(prevMask, MacOSKeyModifiers.RAltFlag)) {
 					Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = Key.RAlt});
 				}
 
-				if (parser.IsLWinPressed()) {
+				if (IsMaskHasFlag(theEvent.ModifierFlags, MacOSKeyModifiers.LWinFlag)) {
 					Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = Key.LWin});
-				} else if (prevParser.IsLWinPressed()) {
+				} else if (IsMaskHasFlag(prevMask, MacOSKeyModifiers.LWinFlag)) {
 					Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = Key.LWin});
 				}
-				if (parser.IsRWinPressed()) {
+				if (IsMaskHasFlag(theEvent.ModifierFlags, MacOSKeyModifiers.RWinFlag)) {
 					Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = Key.RWin});
-				} else if (prevParser.IsRWinPressed()) {
+				} else if (IsMaskHasFlag(prevMask, MacOSKeyModifiers.RWinFlag)) {
 					Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = Key.RWin});
 				}
 			}
 			prevMask = theEvent.ModifierFlags;
+		}
+
+		private static bool IsMaskHasFlag(NSEventModifierMask mask, MacOSKeyModifiers flag)
+		{
+			return ((ulong)mask & (ulong)flag) == (ulong)flag;
 		}
 
 		public override void KeyUp(NSEvent theEvent)
