@@ -254,9 +254,6 @@
     <Compile Include="Source\Widgets\Layout\TableLayout.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Source\Widgets\Clipboard\" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">
       <Link>OpenAL32.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
