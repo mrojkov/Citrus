@@ -141,7 +141,11 @@ namespace Lime
 
 		private void PasteFromClipboard()
 		{
-			string pasteText = Clipboard.GetText()
+			string pasteText = Clipboard.GetText();
+			if (pasteText == null) {
+				return;
+			}
+			pasteText = pasteText
 				.Replace(System.Environment.NewLine, " ")
 				.Replace('\t', ' ');
 			int freeSpace = MaxTextLength - Text.Length;
