@@ -88,7 +88,7 @@ namespace OpenTK
 			trackingArea = new NSTrackingArea(viewBounds, options, this, null);
 			AddTrackingArea(trackingArea);
 		}
-			
+
 		public override void MouseDown(NSEvent theEvent)
 		{
 			if (Mouse != null) {
@@ -100,22 +100,22 @@ namespace OpenTK
 		{
 			if (Mouse != null) {
 				Mouse.OnButtonDown(new MouseButtonEventArgs() { Button = MouseButton.Right });
-			}			
+			}
 		}
 
 		public override void RightMouseUp(NSEvent theEvent)
 		{
 			if (Mouse != null) {
 				Mouse.OnButtonUp(new MouseButtonEventArgs() { Button = MouseButton.Right });
-			}			
-		}				
-												
+			}
+		}
+
 		public override void MouseUp(NSEvent theEvent)
 		{
 			if (Mouse != null) {
 				Mouse.OnButtonUp(new MouseButtonEventArgs() { Button = MouseButton.Left });
 			}
-		}	
+		}
 
 		public override void MouseDragged(NSEvent theEvent)
 		{
@@ -136,7 +136,7 @@ namespace OpenTK
 		public override void ScrollWheel(NSEvent theEvent)
 		{
 			if (Mouse != null) {
-				Mouse.OnWheelChanged(new MouseWheelEventArgs() { Delta = (int)theEvent.ScrollingDeltaY, Y = (int)theEvent.ScrollingDeltaY });
+				Mouse.OnWheelChanged(new MouseWheelEventArgs() { Delta = Math.Sign(theEvent.ScrollingDeltaY) });
 			}
 		}
 
@@ -203,7 +203,7 @@ namespace OpenTK
 					Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = Key.RWin});
 				}
 			}
-			prevMask = theEvent.ModifierFlags;		
+			prevMask = theEvent.ModifierFlags;
 		}
 
 		public override void KeyUp(NSEvent theEvent)

@@ -228,13 +228,8 @@ namespace Lime
 
 		void HandleMouseWheel(object sender, MouseWheelEventArgs e)
 		{
-#if WIN
-			// Unfortunately SDL gives us only scrolling direction (-1 or 1), but several times per frame.
-			// So, presume minimum scrolling step - 15 pixels
-			var wheelDelta = e.Delta * 15;
-#else
+			// On Mac and Win we assume this as number of "lines" to scroll, not pixels to scroll
 			var wheelDelta = e.Delta;
-#endif
 			if (e.Delta > 0) {
 				if (!Input.HasPendingKeyEvent(Key.MouseWheelUp)) {
 					Input.SetKeyState(Key.MouseWheelUp, true);

@@ -13,6 +13,9 @@ namespace Lime
 
 	public partial class ScrollView : IDisposable
 	{
+		private float mouseScrollStep;
+		private float scrollDestination;
+
 		public readonly Frame Frame;
 		public readonly ScrollViewContentWidget Content;
 
@@ -76,7 +79,7 @@ namespace Lime
 				Content.Tasks.Add(MainTask());
 			}
 #if MAC || WIN
-			Content.Tasks.Add(ScrollByMouseWheelTask());
+			Content.Tasks.Add(SmoothMouseScroll());
 #endif
 		}
 
@@ -160,26 +163,6 @@ namespace Lime
 			scrollingTask = null;
 		}
 
-#if MAC || WIN
-		private IEnumerator<object> ScrollByMouseWheelTask()
-		{
-			while (true) {
-				yield return null;
-				IsScrollingByMouseWheel = 
-					(Frame.Input.WasKeyPressed(Key.MouseWheelDown) || Frame.Input.WasKeyPressed(Key.MouseWheelUp)) &&
-					(CanScroll && Frame.HitTest(Input.MousePosition));
-				if (IsScrollingByMouseWheel) {
-					StopScrolling();
-					ScrollPosition = Mathf.Clamp(
-						value: ScrollPosition - Input.WheelScrollAmount,
-						min: MinScrollPosition,
-						max: MaxScrollPosition
-					);
-				}
-			}
-		}
-#endif
-
 		public bool IsScrolling()
 		{
 			return scrollingTask != null;
@@ -243,6 +226,30 @@ namespace Lime
 					}
 				} else {
 					yield return HandleDragTask(velocityMeter, ProjectToScrollAxis(mousePos));
+				}
+			}
+		}
+
+		private IEnumerator<object> SmoothMouseScroll()
+		{
+			if (Content.Nodes.Count > 0) {
+				mouseScrollStep = Content.Nodes
+					.Select(node => node.AsWidget.Height)
+					.Average();
+			}
+			float prevDirection = 0;
+			while (true) {
+				yield return null;
+				IsScrollingByMouseWheel = 
+					(Frame.Input.WasKeyPressed(Key.MouseWheelDown) || Frame.Input.WasKeyPressed(Key.MouseWheelUp)) &&
+					(CanScroll && Frame.HitTest(Input.MousePosition));
+				if (IsScrollingByMouseWheel) {
+					if (Math.Sign(Input.WheelScrollAmount) != prevDirection) {
+						scrollDestination = ScrollPosition;
+					}
+					scrollDestination -= Input.WheelScrollAmount * mouseScrollStep;
+					prevDirection = Math.Sign(Input.WheelScrollAmount);
+					ScrollTo(scrollDestination, instantly: false);
 				}
 			}
 		}
