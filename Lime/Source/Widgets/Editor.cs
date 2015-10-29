@@ -226,6 +226,7 @@ namespace Lime
 			if (CheckCursorKey(Key.Enter) && editorParams.IsAcceptableLines(Text.Text.Count(ch => ch == '\n') + 2))
 				InsertChar('\n');
 #if WIN
+			//TODO: remake with new Clipboard class and hot kay handling
 			if (Container.Input.IsKeyPressed(Key.ControlLeft) && CheckCursorKey(Key.V)) {
 				foreach (var ch in System.Windows.Forms.Clipboard.GetText())
 					InsertChar(ch);
@@ -267,13 +268,62 @@ namespace Lime
 				if (IsFocused()) {
 					World.Instance.IsActiveTextWidgetUpdated = true;
 					HandleCursorKeys();
-					HandleTextInput();
+					if (IsHotKeyPressed()) {
+						HandleHotKeys();
+					} else {
+						HandleTextInput();
+					}
 					if (wasClicked) {
 						var t = Container.LocalToWorldTransform.CalcInversed();
 						caretPos.WorldPos = t.TransformVector(Container.Input.MousePosition);
 					}
 				}
 				yield return null;
+			}
+		}
+
+		private bool IsHotKeyPressed()
+		{
+#if MAC
+			return (Input.IsKeyPressed(Key.LWin) || Input.IsKeyPressed(Key.RWin));
+#elif WIN
+			return (Input.IsKeyPressed(Key.LControl) || Input.IsKeyPressed(Key.RControl));
+#else
+			return false;
+#endif
+		}
+
+		private void HandleHotKeys()
+		{
+			if (Input.IsKeyPressed(Key.V)) {
+				PasteFromClipboard();
+			} else if (Input.IsKeyPressed(Key.C)) {
+				Clipboard.PutText(Text.Text);
+			} else if (Input.IsKeyPressed(Key.X)) {
+				Clipboard.PutText(Text.Text);
+				Text.Text = String.Empty;
+			} else if (Input.IsKeyPressed(Key.Z)) {
+				//TODO: undo last action
+			}
+		}
+
+		private void PasteFromClipboard()
+		{
+			string pasteText = Clipboard.GetText()
+				.Replace(System.Environment.NewLine, "\n")
+				.Replace('\t', ' ');
+			int freeSpace = editorParams.MaxLength - Text.Text.Length;
+			if (freeSpace > 0) {
+				if (pasteText.Length > freeSpace) {
+					pasteText = pasteText.Substring(0, freeSpace);
+				}
+				foreach (var ch in pasteText) {
+					if (ch != '\n' || editorParams.IsAcceptableLines(Text.Text.Count(c => c == '\n') + 2)) {
+						InsertChar(ch);
+					} else {
+						InsertChar(' ');
+					}
+				}
 			}
 		}
 
