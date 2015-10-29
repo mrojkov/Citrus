@@ -3,7 +3,8 @@ namespace Lime
 {
 	public static partial class Clipboard
 	{
-		public static string GetText()
+		private const string Tag = "Clipboard";
+        public static string GetText()
 		{
 			return GetTextImpl();
 		}

@@ -18,6 +18,12 @@ namespace Lime
 	[ProtoContract]
 	public class TextBox : Widget, IKeyboardInputProcessor
 	{
+		private const float KeyRepeatDelay = 0.5f;
+		private const float KeyRepeatInterval = 0.05f;
+		private float cursorKeyDownTime;
+		private Key prevKeyPressed = 0;
+		private Key keyPressed;
+
 		private string text;
 		private float caretBlinkPhase;
 		private float lastCharTimer;
@@ -100,12 +106,15 @@ namespace Lime
 		{
 			var world = World.Instance;
 			if (Enabled) {
-				if (world.ActiveTextWidget == this && Input.TextInput != null) {
+				if (world.ActiveTextWidget == this) {
+					cursorKeyDownTime -= delta;
+					keyPressed = 0;
 					if (IsHotKeyPressed()) {
-						ProcessHotkeys();
-					} else {
+						ProcessHotKeys();
+					} else if (Input.TextInput != null) {
 						ProcessInput();
 					}
+					prevKeyPressed = keyPressed;
 				}
 				if (world.ActiveTextWidget == this) {
 					world.IsActiveTextWidgetUpdated = true;
@@ -116,35 +125,62 @@ namespace Lime
 
 		private bool IsHotKeyPressed()
 		{
+			bool pressed;
 #if MAC
-			return (Input.IsKeyPressed(Key.LWin) || Input.IsKeyPressed(Key.RWin));
+			pressed = (Input.IsKeyPressed(Key.LWin) || Input.IsKeyPressed(Key.RWin));
 #elif WIN
-			return (Input.IsKeyPressed(Key.LControl) || Input.IsKeyPressed(Key.RControl));
-#else
-			return false;
+			pressed = (Input.IsKeyPressed(Key.LControl) || Input.IsKeyPressed(Key.RControl));
 #endif
+			return pressed;
+
 		}
 
-		private void ProcessHotkeys()
+		private void ProcessHotKeys()
 		{
+#if WIN
+			if (CheckKeyRepeated(Key.V)) {
+				PasteFromClipboard();
+			} else if (CheckKeyRepeated(Key.C)) {
+				Clipboard.PutText(Text);
+			} else if (CheckKeyRepeated(Key.X)) {
+				Clipboard.PutText(Text);
+				Text = string.Empty;
+			} else if (CheckKeyRepeated(Key.Z)) {
+				//TODO: undo last action
+			}
+#else
 			if (Input.IsKeyPressed(Key.V)) {
 				PasteFromClipboard();
 			} else if (Input.IsKeyPressed(Key.C)) {
 				Clipboard.PutText(Text);
 			} else if (Input.IsKeyPressed(Key.X)) {
 				Clipboard.PutText(Text);
-				Text = String.Empty;
+				Text = string.Empty;
 			} else if (Input.IsKeyPressed(Key.Z)) {
 				//TODO: undo last action
 			}
+#endif
+		}
+
+		private bool CheckKeyRepeated(Key key)
+		{
+			if (!Input.IsKeyPressed(key) || keyPressed != 0) {
+				return false;
+			}
+			keyPressed = key;
+			if (key != prevKeyPressed) {
+				cursorKeyDownTime = KeyRepeatDelay;
+			} else if (cursorKeyDownTime <= 0) {
+				cursorKeyDownTime = KeyRepeatInterval;
+			} else {
+				return false;
+			}
+			return true;
 		}
 
 		private void PasteFromClipboard()
 		{
 			string pasteText = Clipboard.GetText();
-			if (pasteText == null) {
-				return;
-			}
 			pasteText = pasteText
 				.Replace(System.Environment.NewLine, " ")
 				.Replace('\t', ' ');

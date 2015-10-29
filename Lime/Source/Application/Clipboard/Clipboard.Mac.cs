@@ -45,7 +45,7 @@ namespace Lime
 		private static void PutTextImpl(string text)
 		{
 			//Do not put empty strings into clipboard
-			if (text == String.Empty) { return; }
+			if (text == null || text == String.Empty) { return; }
 			var pasteBoard = NSPasteboard.GeneralPasteboard;
 			pasteBoard.ClearContents();
 			pasteBoard.WriteObjects(new NSString[] {(NSString)text});

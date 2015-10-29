@@ -6,7 +6,7 @@ namespace Lime
 	{
 		private static string GetTextImpl()
 		{
-			return null;
+			return string.Empty;
 		}
 
 		private static void PutTextImpl(string text)

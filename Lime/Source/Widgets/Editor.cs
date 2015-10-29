@@ -163,17 +163,18 @@ namespace Lime
 		private Key prevKeyPressed = 0;
 		private Key keyPressed;
 
-		private bool CheckCursorKey(Key key)
+		private bool CheckKeyRepeated(Key key)
 		{
 			if (!Container.Input.IsKeyPressed(key) || keyPressed != 0)
 				return false;
 			keyPressed = key;
-			if (key != prevKeyPressed)
+			if (key != prevKeyPressed) {
 				cursorKeyDownTime = editorParams.KeyRepeatDelay;
-			else if (cursorKeyDownTime <= 0)
+			} else if (cursorKeyDownTime <= 0) {
 				cursorKeyDownTime = editorParams.KeyRepeatInterval;
-			else
+			} else {
 				return false;
+			}
 			return true;
 		}
 
@@ -202,37 +203,27 @@ namespace Lime
 
 		private void HandleCursorKeys()
 		{
-			cursorKeyDownTime -= Container.Tasks.Delta;
-			keyPressed = 0;
-			if (CheckCursorKey(Key.Left))
+			if (CheckKeyRepeated(Key.Left))
 				caretPos.TextPos--;
-			if (CheckCursorKey(Key.Right))
+			if (CheckKeyRepeated(Key.Right))
 				caretPos.TextPos++;
-			if (CheckCursorKey(Key.Up))
+			if (CheckKeyRepeated(Key.Up))
 				caretPos.Line--;
-			if (CheckCursorKey(Key.Down))
+			if (CheckKeyRepeated(Key.Down))
 				caretPos.Line++;
-			if (CheckCursorKey(Key.Home))
+			if (CheckKeyRepeated(Key.Home))
 				caretPos.Pos = 0;
-			if (CheckCursorKey(Key.End))
+			if (CheckKeyRepeated(Key.End))
 				caretPos.Pos = int.MaxValue;
-			if (CheckCursorKey(Key.Delete)) {
+			if (CheckKeyRepeated(Key.Delete)) {
 				if (caretPos.TextPos >= 0 && caretPos.TextPos < Text.Text.Length) {
 					Text.Text = Text.Text.Remove(caretPos.TextPos, 1);
 					caretPos.TextPos--;
 					caretPos.TextPos++; // Enforce revalidation.
 				}
 			}
-			if (CheckCursorKey(Key.Enter) && editorParams.IsAcceptableLines(Text.Text.Count(ch => ch == '\n') + 2))
+			if (CheckKeyRepeated(Key.Enter) && editorParams.IsAcceptableLines(Text.Text.Count(ch => ch == '\n') + 2))
 				InsertChar('\n');
-#if WIN
-			//TODO: remake with new Clipboard class and hotkey handling
-			if (Container.Input.IsKeyPressed(Key.ControlLeft) && CheckCursorKey(Key.V)) {
-				foreach (var ch in System.Windows.Forms.Clipboard.GetText())
-					InsertChar(ch);
-			}
-#endif
-			prevKeyPressed = keyPressed;
 		}
 
 		private float lastCharShowTimeLeft = 0f;
@@ -266,6 +257,8 @@ namespace Lime
 				caretPos.IsVisible = IsFocused();
 
 				if (IsFocused()) {
+					cursorKeyDownTime -= Container.Tasks.Delta;
+					keyPressed = 0;
 					World.Instance.IsActiveTextWidgetUpdated = true;
 					HandleCursorKeys();
 					if (IsHotKeyPressed()) {
@@ -277,6 +270,7 @@ namespace Lime
 						var t = Container.LocalToWorldTransform.CalcInversed();
 						caretPos.WorldPos = t.TransformVector(Container.Input.MousePosition);
 					}
+					prevKeyPressed = keyPressed;
 				}
 				yield return null;
 			}
@@ -295,24 +289,34 @@ namespace Lime
 
 		private void HandleHotKeys()
 		{
+#if WIN
+			if (CheckKeyRepeated(Key.V)) {
+				PasteFromClipboard();
+			} else if (CheckKeyRepeated(Key.C)) {
+				Clipboard.PutText(Text.Text);
+			} else if (CheckKeyRepeated(Key.X)) {
+				Clipboard.PutText(Text.Text);
+				Text.Text = string.Empty;
+			} else if (CheckKeyRepeated(Key.Z)) {
+				//TODO: undo last action
+			}
+#else
 			if (Input.IsKeyPressed(Key.V)) {
 				PasteFromClipboard();
 			} else if (Input.IsKeyPressed(Key.C)) {
 				Clipboard.PutText(Text.Text);
 			} else if (Input.IsKeyPressed(Key.X)) {
 				Clipboard.PutText(Text.Text);
-				Text.Text = String.Empty;
+				Text.Text = string.Empty;
 			} else if (Input.IsKeyPressed(Key.Z)) {
 				//TODO: undo last action
 			}
+#endif
 		}
 
 		private void PasteFromClipboard()
 		{
 			string pasteText = Clipboard.GetText();
-			if (pasteText == null) {
-				return;
-			}
 			pasteText = pasteText
 				.Replace(System.Environment.NewLine, "\n")
 				.Replace('\t', ' ');

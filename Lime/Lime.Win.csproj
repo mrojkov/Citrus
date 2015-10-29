@@ -54,7 +54,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Source\Application\Clipboard\Clipboard.Android.cs" />
     <Compile Include="Source\Application\Clipboard\Clipboard.cs" />
+    <Compile Include="Source\Application\Clipboard\Clipboard.iOS.cs" />
+    <Compile Include="Source\Application\Clipboard\Clipboard.Mac.cs" />
     <Compile Include="Source\Application\Clipboard\Clipboard.Win.cs" />
     <Compile Include="Source\Application\Debug.cs" />
     <Compile Include="Source\Application\RenderingApi.cs" />
