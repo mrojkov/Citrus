@@ -125,7 +125,7 @@ namespace Lime
 
 		private bool IsHotKeyPressed()
 		{
-			bool pressed;
+			bool pressed = false;
 #if MAC
 			pressed = (Input.IsKeyPressed(Key.LWin) || Input.IsKeyPressed(Key.RWin));
 #elif WIN
