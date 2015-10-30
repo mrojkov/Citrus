@@ -81,7 +81,9 @@ namespace OpenTK
 				frame.Y = value.Y;
 				window.SetFrame(frame, true);
 			}
-		}		
+		}
+
+		private Size windowedClientSize;
 
 		public GameWindow(int width, int height, GraphicsMode graphicsMode, string title, GameWindowFlags flags = GameWindowFlags.Default)
 		{
@@ -101,13 +103,17 @@ namespace OpenTK
 				NSApplication.SharedApplication.Terminate(View);
 				OnClosed(e);	
 			};
+			// Set window minimum size to prevent render bugs in split-screen mode.
 			window.MinSize = new CGSize(480, 480);
 			window.DidResize += (s, e) => {
 				View.UpdateGLContext();
 				OnResize(e);
 			};
+			window.WillEnterFullScreen += (sender, e) => {
+				windowedClientSize = ClientSize;
+			};
 			window.DidExitFullScreen += (sender, e) => {
-				window.SetContentSize(new CGSize(1024, 768));
+				ClientSize = windowedClientSize;
 				window.Center();
 			};
 			window.DidMove += (s, e) => OnMove(e);
