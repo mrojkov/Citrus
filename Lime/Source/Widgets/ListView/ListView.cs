@@ -40,8 +40,9 @@ namespace Lime
 				}
 			}
 			ContentLength = p;
-			if (AutoMouseScrollStep) {				
+			if (AutoMouseScrollStep) {
 				MouseScrollStep = itemCount > 0 ? ContentLength / itemCount : 0;
+				IsListViewSetScrollStep = true;
 			}
 		}
 
