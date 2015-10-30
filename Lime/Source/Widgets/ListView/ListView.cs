@@ -7,6 +7,7 @@ namespace Lime
 {
 	public partial class ListView : ScrollViewWithSlider, IList<Widget>
 	{
+		private const float MaxScrollStep = 100;
 		public bool AutoMouseScrollStep = true;
 		public bool ManualItemsPositioning;
 
@@ -41,8 +42,7 @@ namespace Lime
 			}
 			ContentLength = p;
 			if (AutoMouseScrollStep) {
-				MouseScrollStep = itemCount > 0 ? ContentLength / itemCount : 0;
-				IsListViewSetScrollStep = true;
+				MouseScrollStep = itemCount > 0 ? Mathf.Clamp(ContentLength / itemCount, 0, MaxScrollStep) : 0;
 			}
 		}
 

@@ -13,8 +13,8 @@ namespace Lime
 
 	public partial class ScrollView : IDisposable
 	{
-		protected bool IsListViewSetScrollStep;
-		public float MouseScrollStep;
+		private const float DefaultMouseScrollStep = 50;
+		public float MouseScrollStep = DefaultMouseScrollStep;
 		private float scrollDestination;
 
 		public readonly Frame Frame;
@@ -234,11 +234,6 @@ namespace Lime
 		private IEnumerator<object> SmoothMouseScroll()
 		{
 			float prevDirection = 0;
-			if (!IsListViewSetScrollStep && Content.Nodes.Count > 0) {
-				MouseScrollStep = Content.Nodes
-					.Select(node => node.AsWidget.Height)
-					.Average();
-			}
 			while (true) {
 				yield return null;
 				IsScrollingByMouseWheel = 
