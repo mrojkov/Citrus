@@ -538,13 +538,14 @@ namespace Lime
 			{
 				lineWithoutLastWord = null;
 				lastWord = null;
-				var lastSpaceAt = text.LastIndexOf(' ');
+				// Use Line Separator character as a soft break
+				int lastSpaceAt = Math.Max(text.LastIndexOf(' '), text.LastIndexOf((char)8232));
 				if (lastSpaceAt < 0) {
 					return false;
 				}
 				if (lastSpaceAt == text.Length - 1) {
 					// Treat a space character as a word
-					lastWord = " ";
+					lastWord = text.Substring(lastSpaceAt);
 					lineWithoutLastWord = text.Substring(0, lastSpaceAt);
 				} else {
 					lineWithoutLastWord = text.Substring(0, lastSpaceAt + 1);
