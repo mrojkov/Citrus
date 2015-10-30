@@ -13,7 +13,7 @@ namespace Lime
 
 	public partial class ScrollView : IDisposable
 	{
-		private float mouseScrollStep;
+		public float MouseScrollStep;
 		private float scrollDestination;
 
 		public readonly Frame Frame;
@@ -232,23 +232,19 @@ namespace Lime
 
 		private IEnumerator<object> SmoothMouseScroll()
 		{
-			if (Content.Nodes.Count > 0) {
-				mouseScrollStep = Content.Nodes
-					.Select(node => node.AsWidget.Height)
-					.Average();
-			}
 			float prevDirection = 0;
 			while (true) {
 				yield return null;
 				IsScrollingByMouseWheel = 
+					!Frame.Input.IsMousePressed() &&
 					(Frame.Input.WasKeyPressed(Key.MouseWheelDown) || Frame.Input.WasKeyPressed(Key.MouseWheelUp)) &&
-					(CanScroll && Frame.HitTest(Input.MousePosition));
+					(CanScroll && Frame.HitTest(Frame.Input.MousePosition));
 				if (IsScrollingByMouseWheel) {
-					if (Math.Sign(Input.WheelScrollAmount) != prevDirection) {
+					if (Math.Sign(Frame.Input.WheelScrollAmount) != prevDirection) {
 						scrollDestination = ScrollPosition;
 					}
-					scrollDestination -= Input.WheelScrollAmount * mouseScrollStep;
-					prevDirection = Math.Sign(Input.WheelScrollAmount);
+					scrollDestination -= Frame.Input.WheelScrollAmount * MouseScrollStep;
+					prevDirection = Math.Sign(Frame.Input.WheelScrollAmount);
 					ScrollTo(scrollDestination, instantly: false);
 				}
 			}

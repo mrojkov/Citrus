@@ -155,6 +155,11 @@ namespace Lime
 			return IsAcceptingMouse() && Input.WasMouseReleased(button);
 		}
 
+		public float WheelScrollAmount
+		{
+			get { return IsAcceptingMouse() ? Input.WheelScrollAmount : 0; } 
+		}
+
 		public bool IsKeyPressed(Key key)
 		{
 			return IsAcceptingDeviceWithKey(key) && Input.IsKeyPressed(key);
