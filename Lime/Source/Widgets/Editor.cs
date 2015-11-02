@@ -224,6 +224,13 @@ namespace Lime
 			}
 			if (CheckKeyRepeated(Key.Enter) && editorParams.IsAcceptableLines(Text.Text.Count(ch => ch == '\n') + 2))
 				InsertChar('\n');
+#if WIN
+			if (Container.Input.IsKeyPressed(Key.ControlLeft) && CheckCursorKey(Key.V)) {
+				foreach (var ch in System.Windows.Forms.Clipboard.GetText())
+					InsertChar(ch);
+			}
+#endif
+			prevKeyPressed = keyPressed;
 		}
 
 		private float lastCharShowTimeLeft = 0f;
@@ -261,11 +268,7 @@ namespace Lime
 					keyPressed = 0;
 					World.Instance.IsActiveTextWidgetUpdated = true;
 					HandleCursorKeys();
-					if (IsHotKeyPressed()) {
-						HandleHotKeys();
-					} else {
-						HandleTextInput();
-					}
+					HandleTextInput();
 					if (wasClicked) {
 						var t = Container.LocalToWorldTransform.CalcInversed();
 						caretPos.WorldPos = t.TransformVector(Container.Input.MousePosition);
@@ -273,65 +276,6 @@ namespace Lime
 					prevKeyPressed = keyPressed;
 				}
 				yield return null;
-			}
-		}
-
-		private bool IsHotKeyPressed()
-		{
-#if MAC
-			return (Input.IsKeyPressed(Key.LWin) || Input.IsKeyPressed(Key.RWin));
-#elif WIN
-			return (Input.IsKeyPressed(Key.LControl) || Input.IsKeyPressed(Key.RControl));
-#else
-			return false;
-#endif
-		}
-
-		private void HandleHotKeys()
-		{
-#if WIN
-			if (CheckKeyRepeated(Key.V)) {
-				PasteFromClipboard();
-			} else if (CheckKeyRepeated(Key.C)) {
-				Clipboard.PutText(Text.Text);
-			} else if (CheckKeyRepeated(Key.X)) {
-				Clipboard.PutText(Text.Text);
-				Text.Text = string.Empty;
-			} else if (CheckKeyRepeated(Key.Z)) {
-				//TODO: undo last action
-			}
-#else
-			if (Input.IsKeyPressed(Key.V)) {
-				PasteFromClipboard();
-			} else if (Input.IsKeyPressed(Key.C)) {
-				Clipboard.PutText(Text.Text);
-			} else if (Input.IsKeyPressed(Key.X)) {
-				Clipboard.PutText(Text.Text);
-				Text.Text = string.Empty;
-			} else if (Input.IsKeyPressed(Key.Z)) {
-				//TODO: undo last action
-			}
-#endif
-		}
-
-		private void PasteFromClipboard()
-		{
-			string pasteText = Clipboard.GetText();
-			pasteText = pasteText
-				.Replace(System.Environment.NewLine, "\n")
-				.Replace('\t', ' ');
-			int freeSpace = editorParams.MaxLength - Text.Text.Length;
-			if (freeSpace > 0) {
-				if (pasteText.Length > freeSpace) {
-					pasteText = pasteText.Substring(0, freeSpace);
-				}
-				foreach (var ch in pasteText) {
-					if (ch != '\n' || editorParams.IsAcceptableLines(Text.Text.Count(c => c == '\n') + 2)) {
-						InsertChar(ch);
-					} else {
-						InsertChar(' ');
-					}
-				}
 			}
 		}
 
