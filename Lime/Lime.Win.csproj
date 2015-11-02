@@ -123,11 +123,9 @@
     <Compile Include="Source\Widgets\TextStyle.cs" />
     <Compile Include="Source\Widgets\Text\TextRenderer.cs" />
     <Compile Include="Source\Widgets\Text\TextParser.cs" />
-    <Compile Include="Source\Widgets\WebBrowser\IWebBrowserFactory.cs" />
     <Compile Include="Source\Widgets\WebBrowser\IWebBrowserImplementation.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WebBrowser.Win.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WinFormsWebBrowser.cs" />
-    <Compile Include="Source\Widgets\WebBrowser\WinFormsWebBrowserFactory.cs" />
     <Compile Include="Source\Widgets\WidgetInput.cs" />
     <Compile Include="Source\Input\Key.cs" />
     <Compile Include="Source\RewindableStream.cs" />

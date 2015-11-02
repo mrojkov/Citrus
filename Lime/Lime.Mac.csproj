@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -156,14 +156,12 @@
     <Compile Include="Source\Widgets\Layout\Layout.cs" />
     <Compile Include="Source\Widgets\Layout\Margin.cs" />
     <Compile Include="Source\Widgets\Layout\TableLayout.cs" />
-    <Compile Include="Source\Widgets\WebBrowser\IWebBrowserFactory.cs" />
     <Compile Include="Source\Widgets\WebBrowser\IWebBrowserImplementation.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WebBrowser.Android.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WebBrowser.Mac.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WebBrowser.Win.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WebBrowser.iOS.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WinFormsWebBrowser.cs" />
-    <Compile Include="Source\Widgets\WebBrowser\WinFormsWebBrowserFactory.cs" />
     <Compile Include="Source\Types\BoundingSphere.cs" />
     <Compile Include="Source\Types\ContainmentType.cs" />
     <Compile Include="Source\Types\Quaternion.cs" />

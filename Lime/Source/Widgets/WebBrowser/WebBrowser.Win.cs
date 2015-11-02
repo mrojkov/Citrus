@@ -5,7 +5,7 @@ namespace Lime
 {
 	public class WebBrowser : Widget
 	{
-		public static IWebBrowserFactory BrowserFactory = new WinFormsWebBrowserFactory();
+		public static Func<IWebBrowserImplementation> BrowserFactory = () => new WinFormsWebBrowser();
 		private IWebBrowserImplementation implementation;
 
 		public Uri Url
@@ -16,7 +16,7 @@ namespace Lime
 
 		public WebBrowser(): base()
 		{
-			implementation = BrowserFactory.CreateWebBrowserImplementation();
+			implementation = BrowserFactory();
 		}
 
 		public WebBrowser(Widget parentWidget)
