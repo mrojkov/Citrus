@@ -155,37 +155,25 @@ namespace OpenTK
 				}
 			}
 		}
-		
-		private MacOSKeyModifiers[] modifierFlags = new MacOSKeyModifiers() {
-			MacOSKeyModifiers.LShiftFlag,
-			MacOSKeyModifiers.RShiftFlag,
-			MacOSKeyModifiers.LCtrlFlag,
-			MacOSKeyModifiers.RCtrlFlag,
-			MacOSKeyModifiers.LAltFlag,
-			MacOSKeyModifiers.RAltFlag,
-			MacOSKeyModifiers.LWinFlag,
-			MacOSKeyModifiers.RWinFlag
-		}
-		
-		private Key[] modifierKeys = new Key() {
-			Key.LShift,
-			Key.RShift,
-			Key.LControl,
-			Key.RControl,
-			Key.LAlt,
-			Key.RAlt,
-			Key.LWin,
-			Key.RWin
-		}
+
+		private readonly Dictionary<Key, MacOSKeyModifiers> modifierKeyToFlagAssoc = new Dictionary<Key, MacOSKeyModifiers> {
+			{ Key.LShift, MacOSKeyModifiers.LShiftFlag },
+			{ Key.RShift, MacOSKeyModifiers.RShiftFlag },
+			{ Key.LControl, MacOSKeyModifiers.LCtrlFlag },
+			{ Key.RControl, MacOSKeyModifiers.RCtrlFlag },
+			{ Key.LAlt, MacOSKeyModifiers.LAltFlag },
+			{ Key.RAlt, MacOSKeyModifiers.RAltFlag },
+			{ Key.LWin, MacOSKeyModifiers.LWinFlag },
+			{ Key.RWin, MacOSKeyModifiers.RWinFlag } };
 
 		public override void FlagsChanged(NSEvent theEvent)
 		{
 			if (Keyboard != null) {
-				for (int i = 0, i < modifierFlags.Length, i++) {
-					if (IsMaskHasFlag(theEvent.ModifierFlags, modifierFlags[i])) {
-						Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = modifierKeys[i]})
-					} else if (IsMaskHasFlag(prevMask, modifierFlags[i])) {
-						Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = modifierKeys[i]})
+				foreach (var item in modifierKeyToFlagAssoc) {
+					if (IsMaskHasFlag(theEvent.ModifierFlags, item.Value)) {
+						Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = item.Key});
+					} else if (IsMaskHasFlag(prevMask,item.Value)) {
+						Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = item.Key});
 					}
 				}
 			}
