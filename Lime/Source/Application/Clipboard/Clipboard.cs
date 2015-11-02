@@ -1,18 +1,25 @@
 ﻿
 namespace Lime
 {
-	public static partial class Clipboard
+	interface IClipboardImplementation
 	{
-		private const string Tag = "Clipboard";
+		string Text { get; set; }
+	}
 
-		public static string GetText()
-		{
-			return GetTextImpl();
-		}
+	public static class Clipboard
+	{
+		private static IClipboardImplementation implementation = new ClipboardImplementation();
 
-		public static void PutText(string text)
+		public static string Text
 		{
-			PutTextImpl(text);
+			get
+			{
+				return implementation.Text;
+			}
+			set
+			{
+				implementation.Text = value;
+			}
 		}
 	}
 }

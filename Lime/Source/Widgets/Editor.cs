@@ -225,8 +225,8 @@ namespace Lime
 			if (CheckKeyRepeated(Key.Enter) && editorParams.IsAcceptableLines(Text.Text.Count(ch => ch == '\n') + 2))
 				InsertChar('\n');
 #if WIN
-			if (Container.Input.IsKeyPressed(Key.ControlLeft) && CheckCursorKey(Key.V)) {
-				foreach (var ch in System.Windows.Forms.Clipboard.GetText())
+			if (Container.Input.IsKeyPressed(Key.ControlLeft) && CheckKeyRepeated(Key.V)) {
+				foreach (var ch in Clipboard.Text)
 					InsertChar(ch);
 			}
 #endif

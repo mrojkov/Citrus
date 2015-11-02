@@ -1,16 +1,20 @@
 ﻿#if iOS
 namespace Lime
 {
-	//Mock iOS clipboard implementation
-	public static partial class Clipboard
+	public class ClipboardImplementation : IClipboardImplementation
 	{
-		private static string GetTextImpl()
-		{
-			return string.Empty;
-		}
+		private const string Tag = "Clipboard";
 
-		private static void PutTextImpl(string text)
+		public string Text
 		{
+			get
+			{
+				return string.Empty;
+			}
+
+			set
+			{
+			}
 		}
 	}
 }

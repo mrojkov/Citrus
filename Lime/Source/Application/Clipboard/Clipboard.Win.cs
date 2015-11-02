@@ -3,33 +3,38 @@ using WinForms = System.Windows.Forms;
 
 namespace Lime
 {
-	public static partial class Clipboard
+	public class ClipboardImplementation : IClipboardImplementation
 	{
-		private static string GetTextImpl()
-		{
-			string pasteText = string.Empty;
-			try {
-				if (WinForms.Clipboard.ContainsText()) {
-					pasteText = WinForms.Clipboard.GetText();
-				}
-			} catch (System.Exception ex) {
-				Logger.Write("[{0}]: {1}", Tag, ex.Message);
-			}
-			return pasteText;
-		}
+		private const string Tag = "Clipboard";
 
-		private static void PutTextImpl(string text)
+		public string Text
 		{
-			if (text == null || text == string.Empty) {
-				return;
+			get
+			{
+				string pasteText = string.Empty;
+				try {
+					if (WinForms.Clipboard.ContainsText()) {
+						pasteText = WinForms.Clipboard.GetText();
+					}
+				} catch (System.Exception ex) {
+					Logger.Write("[{0}]: {1}", Tag, ex.Message);
+				}
+				return pasteText;
 			}
-			try {
-				WinForms.Clipboard.SetText(text);
-			} catch (System.Exception ex) {
-				Logger.Write("[{0}]: {1}", Tag, ex.Message);
+
+			set
+			{
+				if (value == null || value == string.Empty) {
+					return;
+				}
+				try {
+					WinForms.Clipboard.SetText(value);
+				} catch (System.Exception ex) {
+					Logger.Write("[{0}]: {1}", Tag, ex.Message);
+				}
 			}
 		}
 	}
 }
-
 #endif
+
