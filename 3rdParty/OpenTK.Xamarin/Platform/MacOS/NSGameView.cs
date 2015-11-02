@@ -155,52 +155,38 @@ namespace OpenTK
 				}
 			}
 		}
+		
+		private MacOSKeyModifiers[] modifierFlags = new MacOSKeyModifiers() {
+			MacOSKeyModifiers.LShiftFlag,
+			MacOSKeyModifiers.RShiftFlag,
+			MacOSKeyModifiers.LCtrlFlag,
+			MacOSKeyModifiers.RCtrlFlag,
+			MacOSKeyModifiers.LAltFlag,
+			MacOSKeyModifiers.RAltFlag,
+			MacOSKeyModifiers.LWinFlag,
+			MacOSKeyModifiers.RWinFlag
+		}
+		
+		private Key[] modifierKeys = new Key() {
+			Key.LShift,
+			Key.RShift,
+			Key.LControl,
+			Key.RControl,
+			Key.LAlt,
+			Key.RAlt,
+			Key.LWin,
+			Key.RWin
+		}
 
 		public override void FlagsChanged(NSEvent theEvent)
 		{
 			if (Keyboard != null) {
-				if (IsMaskHasFlag(theEvent.ModifierFlags, MacOSKeyModifiers.LShiftFlag)) {
-					Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = Key.LShift});
-				} else if (IsMaskHasFlag(prevMask, MacOSKeyModifiers.LShiftFlag)) {
-					Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = Key.LShift});
-				}
-				if (IsMaskHasFlag(theEvent.ModifierFlags, MacOSKeyModifiers.RShiftFlag)) {
-					Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = Key.RShift});
-				} else if (IsMaskHasFlag(prevMask, MacOSKeyModifiers.RShiftFlag)) {
-					Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = Key.RShift});
-				}
-
-				if (IsMaskHasFlag(theEvent.ModifierFlags, MacOSKeyModifiers.LCtrlFlag)) {
-					Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = Key.LControl});
-				} else if (IsMaskHasFlag(prevMask, MacOSKeyModifiers.LCtrlFlag)) {
-					Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = Key.LControl});
-				}
-				if (IsMaskHasFlag(theEvent.ModifierFlags, MacOSKeyModifiers.RCtrlFlag)) {
-					Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = Key.RControl});
-				} else if (IsMaskHasFlag(prevMask, MacOSKeyModifiers.RCtrlFlag)) {
-					Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = Key.RControl});
-				}
-
-				if (IsMaskHasFlag(theEvent.ModifierFlags, MacOSKeyModifiers.LAltFlag)) {
-					Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = Key.LAlt});
-				} else if (IsMaskHasFlag(prevMask, MacOSKeyModifiers.LAltFlag)) {
-					Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = Key.LAlt});
-				}
-				if (IsMaskHasFlag(theEvent.ModifierFlags, MacOSKeyModifiers.RAltFlag)) {
-					Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = Key.RAlt});
-				} else if (IsMaskHasFlag(prevMask, MacOSKeyModifiers.RAltFlag)) {
-					Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = Key.RAlt});
-				}
-
-				if (IsMaskHasFlag(theEvent.ModifierFlags, MacOSKeyModifiers.LWinFlag)) {
-					Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = Key.LWin});
-				} else if (IsMaskHasFlag(prevMask, MacOSKeyModifiers.LWinFlag)) {
-					Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = Key.LWin});
-				}
-				if (IsMaskHasFlag(theEvent.ModifierFlags, MacOSKeyModifiers.RWinFlag)) {
-					Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = Key.RWin});
-				} else if (IsMaskHasFlag(prevMask, MacOSKeyModifiers.RWinFlag)) {
-					Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = Key.RWin});
+				for (int i = 0, i < modifierFlags.Length, i++) {
+					if (IsMaskHasFlag(theEvent.ModifierFlags, modifierFlags[i])) {
+						Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = modifierKeys[i]})
+					} else if (IsMaskHasFlag(prevMask, modifierFlags[i])) {
+						Keyboard.OnKeyUp(new KeyboardKeyEventArgs {Key = modifierKeys[i]})
+					}
 				}
 			}
 			prevMask = theEvent.ModifierFlags;
