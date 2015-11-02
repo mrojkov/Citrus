@@ -78,7 +78,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ChromiumWebBrowserFactory.cs" />
     <Compile Include="Chromium\CefButtonKeyMap.cs" />
     <Compile Include="Chromium\CefKey.cs" />
     <Compile Include="Chromium\CefMessage.cs" />
