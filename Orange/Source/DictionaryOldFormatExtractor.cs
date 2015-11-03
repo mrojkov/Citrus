@@ -173,7 +173,7 @@ namespace Orange
 
 		void ProcessGummyDropLevelFile(string file, LocalizationPass pass, Encoding saveEncoding)
 		{
-			if (pass != LocalizationPass.TagUntaggedStrings) {
+			if (pass == LocalizationPass.ExtractTaggedStrings) {
 				return;
 			}
 			currentSource = file;
