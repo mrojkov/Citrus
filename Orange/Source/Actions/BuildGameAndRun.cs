@@ -27,6 +27,9 @@ namespace Orange
 			var builder = new SolutionBuilder(platform);
 			if (!builder.Build()) {
 				Console.WriteLine("BUILD FAILED");
+				if (UserInterface.Instance is ConsoleUI) {
+					Environment.Exit(1);
+				}
 				return false;
 			}
 			return true;

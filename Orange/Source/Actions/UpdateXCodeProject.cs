@@ -31,6 +31,8 @@ namespace Kill3.OrangePlugin
 						CopyDSYM(appPath, Path.GetDirectoryName(dstPath));
 					}
 				}
+			} else if (UserInterface.Instance is ConsoleUI) {
+				Environment.Exit(1);
 			}
 			if (The.Workspace.ProjectJson.GetBool("XCodeProject/DoSvnCommit")) {
 				Subversion.Commit(GetXCodeProjectFolder(), "");
