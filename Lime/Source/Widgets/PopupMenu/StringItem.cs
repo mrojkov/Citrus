@@ -10,6 +10,7 @@ namespace Lime.PopupMenu
 	/// </summary>
 	public class StringItem : MenuItem
 	{
+		private const int MaxButtonIdFromTextLength = 16;
 		MenuButton button;
 
 		/// <summary>
@@ -74,6 +75,10 @@ namespace Lime.PopupMenu
 			Frame.AddNode(new ExpandSiblingsToParent());
 			Frame.AddNode(button);
 			button.Clicked += OnClick;
+			button.Id = text.Replace(' ', '_');
+			if (button.Id.Length > MaxButtonIdFromTextLength) {
+				button.Id = button.Id.Substring(0, MaxButtonIdFromTextLength);
+			}
 		}
 
 		void OnClick()
