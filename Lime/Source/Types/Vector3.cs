@@ -40,7 +40,14 @@ namespace Lime
 			Y = y;
 			Z = z;
 		}
-		
+
+		public Vector3(float value)
+		{
+			X = value;
+			Y = value;
+			Z = value;
+		}
+
 		public static explicit operator Vector2(Vector3 value)
 		{
 			return new Vector2(value.X, value.Y);
@@ -91,9 +98,10 @@ namespace Lime
 			return new Vector3(lhs.X / rhs, lhs.Y / rhs, lhs.Z / rhs);
 		}
 		
+		[Obsolete("Use * instead", true)]
 		public static Vector3 Scale(Vector3 lhs, Vector3 rhs)
 		{
-			return new Vector3(lhs.X * rhs.X, lhs.Y * rhs.Y, lhs.Z * rhs.Z);
+			return lhs * rhs;
 		}
 		public static bool operator ==(Vector3 lhs, Vector3 rhs)
 		{
