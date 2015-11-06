@@ -343,7 +343,7 @@ namespace Lime
 					rect = lineRect;
 					firstLine = false;
 				} else {
-					rect = Rectangle.Bounds(rect, lineRect);
+					rect += lineRect;
 				}
 			}
 			if (caret.Valid == CaretPosition.ValidState.WorldPos) {

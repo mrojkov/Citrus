@@ -124,10 +124,10 @@ namespace Lime
 			WidgetHull hull;
 			CalcHullInSpaceOf(out hull, container);
 			var aabb = new Rectangle(float.MaxValue, float.MaxValue, float.MinValue, float.MinValue);
-			aabb.IncludePoint(hull.V1);
-			aabb.IncludePoint(hull.V2);
-			aabb.IncludePoint(hull.V3);
-			aabb.IncludePoint(hull.V4);
+			aabb += hull.V1;
+			aabb += hull.V2;
+			aabb += hull.V3;
+			aabb += hull.V4;
 			return aabb;
 		}
 
