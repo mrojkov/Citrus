@@ -149,8 +149,8 @@ namespace Lime
 
 		public static void SetDefaultViewport()
 		{
-			if (Application.Instance != null) {
-				var windowSize = Application.Instance.WindowSize;
+			if (Application.MainWindow != null) {
+				var windowSize = Application.MainWindow.ClientSize;
 				Viewport = new WindowRect {
 					X = 0,
 					Y = 0,

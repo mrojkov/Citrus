@@ -19,6 +19,11 @@ namespace Lime
 #endif
 		}
 
+		private Input WindowInput
+		{
+			get { return widget.Context.Window.Input; }
+		}
+
 		private Widget widget;
 		private Vector2 lastMousePosition;
 		private Vector2[] lastTouchPositions;
@@ -54,7 +59,7 @@ namespace Lime
 		private Vector2 GetMousePosition()
 		{
 			if (IsAcceptingMouse()) {
-				lastMousePosition = Input.MousePosition;
+				lastMousePosition = WindowInput.MousePosition;
 			}
 			return lastMousePosition;
 		}
@@ -62,14 +67,14 @@ namespace Lime
 		public Vector2 GetTouchPosition(int index)
 		{
 			if (IsAcceptingTouchScreen()) {
-				lastTouchPositions[index] = Input.GetTouchPosition(index);
+				lastTouchPositions[index] = WindowInput.GetTouchPosition(index);
 			}
 			return lastTouchPositions[index];
 		}
 
 		public int GetNumTouches()
 		{
-			return IsAcceptingTouchScreen() ? Input.GetNumTouches() : 0;
+			return IsAcceptingTouchScreen() ? WindowInput.GetNumTouches() : 0;
 		}
 
 		public void CaptureMouse()
@@ -136,33 +141,33 @@ namespace Lime
 
 		public string TextInput { 
 			get {
-				return IsAcceptingKeyboard() ? Input.TextInput : string.Empty;
+				return IsAcceptingKeyboard() ? WindowInput.TextInput : string.Empty;
 			}
 		}
 
 		public bool IsMousePressed(int button = 0)
 		{
-			return IsAcceptingMouse() && Input.IsMousePressed(button);
+			return IsAcceptingMouse() && WindowInput.IsMousePressed(button);
 		}
 
 		public bool WasMousePressed(int button = 0)
 		{
-			return IsAcceptingMouse() && Input.WasMousePressed(button);
+			return IsAcceptingMouse() && WindowInput.WasMousePressed(button);
 		}
 
 		public bool WasMouseReleased(int button = 0)
 		{
-			return IsAcceptingMouse() && Input.WasMouseReleased(button);
+			return IsAcceptingMouse() && WindowInput.WasMouseReleased(button);
 		}
 
 		public float WheelScrollAmount
 		{
-			get { return IsAcceptingMouse() ? Input.WheelScrollAmount : 0; } 
+			get { return IsAcceptingMouse() ? WindowInput.WheelScrollAmount : 0; } 
 		}
 
 		public bool IsKeyPressed(Key key)
 		{
-			return IsAcceptingDeviceWithKey(key) && Input.IsKeyPressed(key);
+			return IsAcceptingDeviceWithKey(key) && WindowInput.IsKeyPressed(key);
 		}
 
 		/// <summary>
@@ -174,7 +179,7 @@ namespace Lime
 			if (!IsAcceptingDeviceWithKey(key))
 				return false;
 			for (var k = rangeMin; k <= rangeMax; ++k) {
-				if (Input.IsKeyPressed(k) != (k == key))
+				if (WindowInput.IsKeyPressed(k) != (k == key))
 					return false;
 			}
 			return true;
@@ -182,12 +187,12 @@ namespace Lime
 
 		public bool WasKeyPressed(Key key)
 		{
-			return IsAcceptingDeviceWithKey(key) && Input.WasKeyPressed(key);
+			return IsAcceptingDeviceWithKey(key) && WindowInput.WasKeyPressed(key);
 		}
 
 		public bool WasKeyReleased(Key key)
 		{
-			return IsAcceptingDeviceWithKey(key) && Input.WasKeyReleased(key);
+			return IsAcceptingDeviceWithKey(key) && WindowInput.WasKeyReleased(key);
 		}
 
 		private bool IsAcceptingDeviceWithKey(Key key)
@@ -255,7 +260,7 @@ namespace Lime
 
 		private static bool IsVisibleWidget(Widget widget)
 		{
-			return (widget.GetRoot() == World.Instance) && widget.GloballyVisible;
+			return widget.Context != null && widget.Context.Root == widget.GetRoot() && widget.GloballyVisible;
 		}
 	}
 }

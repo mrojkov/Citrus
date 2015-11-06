@@ -21,8 +21,6 @@ namespace Lime
 		DateTime lastMemoryWarningTime;
 		public static AppDelegate Instance;
 
-		public NSDictionary LaunchOptions;
-
 		// handlers
 		public delegate void AlertClickHandler(int buttonIdx);
 		public delegate bool OpenURLHandler(NSUrl url);
@@ -35,10 +33,8 @@ namespace Lime
 		public event RegisteredForRemoteNotificationsHandler RegisteredForRemoteNotificationsEvent;
         public event FailedToRegisterForRemoteNotificationsHandler FailedToRegisterForRemoteNotificationsEvent;
 		public event Action WillTerminateEvent;
-
-		// class-level declarations
-        public override UIWindow Window { get; set; }
-		public GameController GameController { get; private set; }
+		public event Action Activated;
+		public event Action Deactivated;
 
 		public AppDelegate()
 		{
@@ -104,9 +100,9 @@ namespace Lime
 
 		public override void OnActivated(UIApplication application)
 		{
-			Application.Instance.Active = true;
-			AudioSystem.Active = true;
-			Application.Instance.OnActivate();
+			if (Activated != null) {
+				Activated();
+			}
 		}
 	
 		public override void WillTerminate(UIApplication application)
@@ -118,13 +114,9 @@ namespace Lime
 
 		public override void OnResignActivation(UIApplication application)
 		{
-			// http://developer.apple.com/library/ios/#documentation/3DDrawing/Conceptual/OpenGLES_ProgrammingGuide/ImplementingaMultitasking-awareOpenGLESApplication/ImplementingaMultitasking-awareOpenGLESApplication.html#//apple_ref/doc/uid/TP40008793-CH5
-			AudioSystem.Active = false;
-			Application.Instance.OnDeactivate();
-			GameController.Instance.View.RenderFrame();
-			OpenTK.Graphics.ES11.GL.Finish();
-			TexturePool.Instance.DiscardTexturesUnderPressure();
-			Application.Instance.Active = false;
+			if (Deactivated != null) {
+				Deactivated();
+			}
 		}
 
         public override void ReceivedRemoteNotification(UIApplication application, NSDictionary userInfo)
@@ -147,44 +139,6 @@ namespace Lime
                 FailedToRegisterForRemoteNotificationsEvent(error);
             }
         }
-
-		// This method is invoked when the application has loaded its UI and is ready to run
-		public override bool FinishedLaunching(UIApplication app, NSDictionary options)
-		{
-			UIApplication.SharedApplication.StatusBarHidden = true;
-            UIApplication.SharedApplication.IdleTimerDisabled = !IsAllowedGoingToSleepMode();
-		
-			LaunchOptions = options;
-
-			AudioSystem.Initialize();
-
-			// create a new window instance based on the screen size
-			Window = new UIWindow(UIScreen.MainScreen.Bounds);
-
-			GameController = new GameController();
-
-			Application.Instance.PreCreate();
-			
-			Window.RootViewController = GameController;
-
-			// make the window visible
-			Window.MakeKeyAndVisible();
-
-			// Set the current directory.
-			Directory.SetCurrentDirectory(NSBundle.MainBundle.ResourcePath);
-
-			// Run() creates OpenGL context, so calls it before Application.OnCreate()
-			GameView.Instance.Run();
-
-			Application.Instance.OnCreate();
-			return true;
-		}
-
-		private bool IsAllowedGoingToSleepMode()
-		{
-			var obj = NSBundle.MainBundle.ObjectForInfoDictionary("AllowSleepMode");
-			return (obj != null && obj.ToString() == "1");
-		}
 	}
 }
 #endif

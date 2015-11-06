@@ -82,8 +82,11 @@ namespace Lime
 			SetBrowserFeatureControlKey("FEATURE_BROWSER_EMULATION", fileName, GetBrowserEmulationMode());
 		}
 
-		public WinFormsWebBrowser()
+		Widget widget;
+
+		public WinFormsWebBrowser(Widget widget)
 		{
+			this.widget = widget;
 			form = new HiddenForm {
 				StartPosition = FormStartPosition.Manual,
 				FormBorderStyle = FormBorderStyle.None,
@@ -97,9 +100,9 @@ namespace Lime
 
 		private IntRectangle CalculateAABBInWorldSpace(Widget widget)
 		{
-			var aabb = widget.CalcAABBInSpaceOf(World.Instance);
+			var aabb = widget.CalcAABBInSpaceOf(this.widget.Context.Root);
 			var viewport = Renderer.Viewport;
-			var scale = new Vector2(viewport.Width, viewport.Height) / World.Instance.Size;
+			var scale = new Vector2(viewport.Width, viewport.Height) / this.widget.Context.Root.Size;
 			return new IntRectangle(
 				(viewport.X + aabb.Left * scale.X).Round(),
 				(viewport.Y + aabb.Top * scale.Y).Round(),
@@ -108,20 +111,16 @@ namespace Lime
 			);
 		}
 
-		private IntRectangle SysToIntRect(System.Drawing.Rectangle r)
-		{
-			return new IntRectangle(r.Left, r.Top, r.Right, r.Bottom);
-		}
-
 		private void CalcGeometry(Widget widget)
 		{
 			if (form == null) {
 				return;
 			}
+			var window = widget.Context.Window;
 			var r = IntRectangle.Intersect(
 				CalculateAABBInWorldSpace(widget),
-				SysToIntRect(GameView.Instance.ClientRectangle)
-			).OffsetBy(new IntVector2(GameView.Instance.X, GameView.Instance.Y));
+				new IntRectangle(IntVector2.Zero, (IntVector2)window.ClientSize)
+			).OffsetBy(window.ClientPosition);
 			form.Left = r.Left;
 			form.Top = r.Top;
 			form.Width = r.Width;
@@ -129,7 +128,7 @@ namespace Lime
 			browser.SetBounds(0, 0, form.Width, form.Height);
 		}
 
-		public void Render(Widget widget)
+		public void Render()
 		{
 			if (form == null) {
 				return;
@@ -144,9 +143,9 @@ namespace Lime
 			}
 		}
 
-		public void Update(Widget widget, float delta) { }
+		public void Update(float delta) { }
 
-		public void OnSizeChanged(Widget widget, Vector2 sizeDelta)
+		public void OnSizeChanged(Vector2 sizeDelta)
 		{
 			CalcGeometry(widget);
 		}

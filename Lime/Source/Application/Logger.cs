@@ -24,6 +24,9 @@ namespace Lime
 			using (var nss = new NSString(msg)) {
 				NSLog(nss.Handle);
 			}
+			if (OnWrite != null) {
+				OnWrite(msg);
+			}
 		}
 
 		public static void Write(string msg, params object[] args)

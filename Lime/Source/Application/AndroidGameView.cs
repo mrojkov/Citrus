@@ -13,85 +13,98 @@ using Android.Widget;
 
 namespace Lime
 {
-	public class GameView : AndroidGameView
+	public sealed class GameView : AndroidGameView, ISoftKeyboard
 	{
 		// TODO: resolve keyboard flickering bug and remove this field;
 		public static bool AllowOnscreenKeyboard;
 
 		private class KeyboardHandler : Java.Lang.Object, IOnKeyListener
 		{
-			public string TextInput;
+			private string textInput;
+			private Input input;
+			
+			public KeyboardHandler(Input input)
+			{
+				this.input = input;
+			}
+			
+			public void ProcessTextInput()
+			{
+				input.TextInput = textInput;
+				textInput = null;
+			}
 
 			public bool OnKey(View v, Keycode keyCode, KeyEvent e)
 			{
 				if (e.KeyCode == Keycode.Del && e.Action != KeyEventActions.Up) {
-					TextInput += '\b';
+					textInput += '\b';
 				} else if (keyCode == Keycode.Unknown) {
-					TextInput += e.Characters;
+					textInput += e.Characters;
 				} else if (e.IsPrintingKey && e.Action != KeyEventActions.Up) {
-					TextInput += (char) e.UnicodeChar;
+					textInput += (char) e.UnicodeChar;
 				} else if (e.KeyCode == Keycode.Space && e.Action != KeyEventActions.Up) {
-					TextInput += ' ';
+					textInput += ' ';
 				} else if (e.Action != KeyEventActions.Multiple) {
 					var key = TranslateKeycode(keyCode);
 					if (key != Key.KeyCount) {
 						var state = e.Action != KeyEventActions.Up;
-						Input.SetKeyState(key, state);
+						input.SetKeyState(key, state);
 					}
 				}
 				return true;
 			}
-		}
-
-		private static Key TranslateKeycode(Keycode key)
-		{
-			switch (key) {
-				case Keycode.DpadLeft:
-					return Key.Left;
-				case Keycode.DpadRight:
-					return Key.Right;
-				case Keycode.DpadUp:
-					return Key.Up;
-				case Keycode.DpadDown:
-					return Key.Down;
-				case Keycode.ForwardDel:
-					return Key.Delete;
-				case Keycode.Escape:
-					return Key.Escape;
-				case Keycode.Tab:
-					return Key.Tab;
-				case Keycode.Enter:
-					return Key.Enter;
-				case Keycode.MoveHome:
-					return Key.Home;
-				case Keycode.MoveEnd:
-					return Key.End;
-				// TODO: add all alpha-numeric keys
-				default:
-					return Key.KeyCount;
+			
+			private static Key TranslateKeycode(Keycode key)
+			{
+				switch (key) {
+					case Keycode.DpadLeft:
+						return Key.Left;
+					case Keycode.DpadRight:
+						return Key.Right;
+					case Keycode.DpadUp:
+						return Key.Up;
+					case Keycode.DpadDown:
+						return Key.Down;
+					case Keycode.ForwardDel:
+						return Key.Delete;
+					case Keycode.Escape:
+						return Key.Escape;
+					case Keycode.Tab:
+						return Key.Tab;
+					case Keycode.Enter:
+						return Key.Enter;
+					case Keycode.MoveHome:
+						return Key.Home;
+					case Keycode.MoveEnd:
+						return Key.End;
+					// TODO: add all alpha-numeric keys
+					default:
+						return Key.KeyCount;
+				}
 			}
 		}
 
-		internal static event Action DidUpdated;
-		public static GameView Instance;
-
-		public readonly RenderingApi RenderingApi = RenderingApi.ES20;
-
 		private KeyboardHandler keyboardHandler;
 		private InputMethodManager imm;
+		private Input input;
 
-		public GameView(Context context) : base(context)
+		private bool softKeyboardVisible;
+		private float softKeyboardHeight;
+
+		bool ISoftKeyboard.Visible { get { return softKeyboardVisible; } }		
+		float ISoftKeyboard.Height { get { return softKeyboardHeight; } }
+		bool ISoftKeyboard.Supported { get { return true; } }
+		event Action ISoftKeyboard.Hidden { add {} remove {} }
+
+		public GameView(Context context, Input input) : base(context)
 		{
-			Instance = this;
+			this.input = input;
+			Application.SoftKeyboard = this;
 			for (int i = 0; i < Input.MaxTouches; i++) {
 				pointerIds[i] = -1;
 			}
 			imm = (InputMethodManager) context.GetSystemService(Android.Content.Context.InputMethodService);
-		}
-
-		public void OnCreate()
-		{
-			keyboardHandler = new KeyboardHandler();
+			keyboardHandler = new KeyboardHandler(input);
 			SetOnKeyListener(keyboardHandler);
 		}
 
@@ -108,32 +121,28 @@ namespace Lime
 				this.GetWindowVisibleDisplayFrame(r);
 				var totalHeight = bottom - top;
 				var visibleHeight = r.Bottom - r.Top;
-				var app = Application.Instance;
 				if (visibleHeight == totalHeight) {
-					app.SoftKeyboard.Visible = false;
-					app.SoftKeyboard.Height = 0;
+					softKeyboardVisible = false;
+					softKeyboardHeight = 0;
 				} else {
-					app.SoftKeyboard.Height = totalHeight - visibleHeight;
-					app.SoftKeyboard.Visible = true;
+					softKeyboardVisible = true;
+					softKeyboardHeight = totalHeight - visibleHeight;
 				}
 			}
 		}
 
 		protected override void OnResize(EventArgs e)
 		{
-			var app = Lime.Application.Instance;
-			app.WindowSize = new Lime.Size(Width, Height);
 			// Determine orientation using screen dimensions, because Amazon FireOS sometimes reports wrong device orientation.
 			var orientation = Width < Height ? DeviceOrientation.Portrait : DeviceOrientation.LandscapeLeft;
-			app.CurrentDeviceOrientation = orientation;
-			app.OnDeviceRotate();
+			Application.CurrentDeviceOrientation = orientation;
 			base.OnResize(e);
 			// RenderFrame once in case of Pause() has been called and
 			// there is another view overlaying this view. (e.g. Chartboost video)
-			RenderFrame();
+			OnRenderFrame(null);
 		}
 
-		public void ShowSoftKeyboard(bool show, string text)
+		void ISoftKeyboard.Show(bool show, string text)
 		{
 			if (AllowOnscreenKeyboard) {
 				if (show) {
@@ -146,11 +155,11 @@ namespace Lime
 					FocusableInTouchMode = false;
 					imm.HideSoftInputFromWindow(WindowToken, 0);
 				}
-				Application.Instance.SoftKeyboard.Visible = show;
+				softKeyboardVisible = show;
 			}
 		}
 
-		public void ChangeSoftKeyboardText(string text)
+		void ISoftKeyboard.ChangeText(string text)
 		{
 		}
 
@@ -172,7 +181,7 @@ namespace Lime
 			base.OnContextSet(e);
 			if (contextLost) {
 				contextLost = false;
-				Application.Instance.OnGraphicsContextReset();
+				GLObjectRegistry.Instance.DiscardObjects();
 			}
 		}
 
@@ -209,12 +218,10 @@ namespace Lime
 				MakeCurrent();
 			}
 			var allowedOrientaion = IsRotationEnabled()
-				? Application.Instance.SupportedDeviceOrientations
-				: Application.Instance.CurrentDeviceOrientation;
+				? Application.SupportedDeviceOrientations
+				: Application.CurrentDeviceOrientation;
 			RestrictSupportedOrientationsWith(allowedOrientaion);
 			base.OnRenderFrame(e);
-			FPSCalculator.Refresh();
-			Application.Instance.OnRenderFrame();
 			SwapBuffers();
 		}
 
@@ -250,12 +257,6 @@ namespace Lime
 			}
 		}
 
-		public float FrameRate {
-			get {
-				return FPSCalculator.FPS;
-			}
-		}
-
 		private int[] pointerIds = new int[Input.MaxTouches];
 
 		public override bool OnTouchEvent(Android.Views.MotionEvent e)
@@ -281,11 +282,11 @@ namespace Lime
 
 		void CancelGesture()
 		{
-			Input.SetKeyState(Key.Mouse0, false);
+			input.SetKeyState(Key.Mouse0, false);
 			for (int i = 0; i < Input.MaxTouches; i++) {
 				pointerIds[i] = -1;
 				Key key = (Key)((int)Key.Touch0 + i);
-				Input.SetKeyState(key, false);
+				input.SetKeyState(key, false);
 			}
 		}
 
@@ -299,10 +300,10 @@ namespace Lime
 					continue;
 				}
 				e.GetPointerCoords(i, pc);
-				Vector2 position = new Vector2(pc.X, pc.Y) * Input.ScreenToWorldTransform;
-				Input.SetTouchPosition(touchIndex, position);
+				var position = new Vector2(pc.X, pc.Y) * input.ScreenToWorldTransform;
+				input.SetTouchPosition(touchIndex, position);
 				if (touchIndex == 0) {
-					Input.MousePosition = position;
+					input.MousePosition = position;
 				}
 			}
 		}
@@ -316,10 +317,10 @@ namespace Lime
 			int i = e.ActionIndex;
 			pointerIds[touchIndex] = e.GetPointerId(i);
 			if (touchIndex == 0) {
-				Input.SetKeyState(Key.Mouse0, true);
+				input.SetKeyState(Key.Mouse0, true);
 			}
 			var key = (Key)((int)Key.Touch0 + touchIndex);
-			Input.SetKeyState(key, true);
+			input.SetKeyState(key, true);
 		}
 
 		void HandleUpAction(Android.Views.MotionEvent e)
@@ -331,30 +332,21 @@ namespace Lime
 			}
 			pointerIds[touchIndex] = -1;
 			if (touchIndex == 0) {
-				Input.SetKeyState(Key.Mouse0, false);
+				input.SetKeyState(Key.Mouse0, false);
 			}
 			var key = (Key)((int)Key.Touch0 + touchIndex);
-			Input.SetKeyState(key, false);
-		}
-
-		public new void UpdateFrame()
-		{
-			OnUpdateFrame(null);
+			input.SetKeyState(key, false);
 		}
 
 		protected override void OnUpdateFrame(FrameEventArgs e)
 		{
 			float delta;
 			RefreshFrameTimeStamp(out delta);
-			Input.ProcessPendingKeyEvents();
-			Application.Instance.OnUpdateFrame(delta);
+			input.ProcessPendingKeyEvents();
+			base.OnUpdateFrame(new FrameEventArgs(delta));
 			AudioSystem.Update();
-			Input.TextInput = keyboardHandler.TextInput;
-			keyboardHandler.TextInput = null;
-			Input.CopyKeysState();
-			if (DidUpdated != null) {
-				DidUpdated();
-			}
+			keyboardHandler.ProcessTextInput();
+			input.CopyKeysState();
 		}
 
 		private DateTime lastFrameTimeStamp = DateTime.UtcNow;
@@ -365,11 +357,6 @@ namespace Lime
 			delta = (float)(now - lastFrameTimeStamp).TotalSeconds;
 			delta = delta.Clamp(0, 1 / Application.LowFPSLimit);
 			lastFrameTimeStamp = now;
-		}
-
-		public new void RenderFrame()
-		{
-			OnRenderFrame(null);
 		}
 	}
 }

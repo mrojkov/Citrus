@@ -7,24 +7,31 @@ using System.Text;
 
 namespace Lime
 {
-	public static class Input
+	public class Input
 	{
-		public static class Simulator
+		public class InputSimulator
 		{
-			public static void SetMousePosition(Vector2 position)
+			Input input;
+
+			public InputSimulator(Input input)
 			{
-				Input.MousePosition = position;
+				this.input = input;
 			}
 
-			public static void SetKeyState(Key key, bool value)
+			public void SetMousePosition(Vector2 position)
 			{
-				Input.SetKeyState(key, value);
+				input.MousePosition = position;
 			}
 
-			public static void OnBetweenFrames()
+			public void SetKeyState(Key key, bool value)
 			{
-				Input.CopyKeysState();
-				Input.ProcessPendingKeyEvents();
+				input.SetKeyState(key, value);
+			}
+
+			public void OnBetweenFrames()
+			{
+				input.CopyKeysState();
+				input.ProcessPendingKeyEvents();
 			}
 		}
 
@@ -36,37 +43,44 @@ namespace Lime
 			public bool State;
 		}
 
-		private static Vector2[] touchPositions = new Vector2[MaxTouches];
+		public InputSimulator Simulator;
 
-		private static List<KeyEvent> keyEventQueue = new List<KeyEvent>();
+		private Vector2[] touchPositions = new Vector2[MaxTouches];
 
-		private static bool[] previousKeysState = new bool[(int)Key.KeyCount];
-		private static bool[] currentKeysState = new bool[(int)Key.KeyCount];
+		private List<KeyEvent> keyEventQueue = new List<KeyEvent>();
+
+		private bool[] previousKeysState = new bool[(int)Key.KeyCount];
+		private bool[] currentKeysState = new bool[(int)Key.KeyCount];
 
 		/// <summary>
 		/// The matrix describes transition from pixels to virtual coordinates.
 		/// </summary>
-		public static Matrix32 ScreenToWorldTransform = Matrix32.Identity;
+		public Matrix32 ScreenToWorldTransform = Matrix32.Identity;
 
 		/// <summary>
 		/// The current mouse position in virtual coordinates coordinates. (read only)
 		/// </summary>
-		public static Vector2 MousePosition { get; internal set; }
+		public Vector2 MousePosition { get; internal set; }
 
 		/// <summary>
 		/// Indicates how much the mouse wheel was moved
 		/// </summary>
-		public static float WheelScrollAmount { get; internal set; }
+		public float WheelScrollAmount { get; internal set; }
 
 		/// <summary>
 		/// The current accelerometer state (read only) in g-force units
 		/// </summary>
-		public static Vector3 Acceleration { get; internal set; }
+		public Vector3 Acceleration { get; internal set; }
+
+		public Input()
+		{
+			Simulator = new InputSimulator(this);
+		}
 
 		/// <summary>
 		/// Returns true while the user holds down the key identified by name. Think auto fire.
 		/// </summary>
-		public static bool IsKeyPressed(Key key)
+		public bool IsKeyPressed(Key key)
 		{
 			return currentKeysState[(int)key];
 		}
@@ -74,7 +88,7 @@ namespace Lime
 		/// <summary>
 		/// Returns true during the frame the user releases the key identified by name.
 		/// </summary>
-		public static bool WasKeyReleased(Key key)
+		public bool WasKeyReleased(Key key)
 		{
 			return !currentKeysState[(int)key] && previousKeysState[(int)key];
 		}
@@ -82,47 +96,47 @@ namespace Lime
 		/// <summary>
 		/// Returns true during the frame the user starts pressing down the key identified by name.
 		/// </summary>
-		public static bool WasKeyPressed(Key key)
+		public bool WasKeyPressed(Key key)
 		{
 			return currentKeysState[(int)key] && !previousKeysState[(int)key];
 		}
 
-		public static bool WasMousePressed()
+		public bool WasMousePressed()
 		{
 			return WasKeyPressed(GetMouseButtonByIndex(0));
 		}
 
-		public static bool WasMouseReleased()
+		public bool WasMouseReleased()
 		{
 			return WasKeyReleased(GetMouseButtonByIndex(0));
 		}
 
-		public static bool IsMousePressed()
+		public bool IsMousePressed()
 		{
 			return IsKeyPressed(GetMouseButtonByIndex(0));
 		}
 
-		public static bool WasMousePressed(int button)
+		public bool WasMousePressed(int button)
 		{
 			return WasKeyPressed(GetMouseButtonByIndex(button));
 		}
 
-		public static bool WasMouseReleased(int button)
+		public bool WasMouseReleased(int button)
 		{
 			return WasKeyReleased(GetMouseButtonByIndex(button));
 		}
 
-		public static bool IsMousePressed(int button)
+		public bool IsMousePressed(int button)
 		{
 			return IsKeyPressed(GetMouseButtonByIndex(button));
 		}
 
-		public static bool WasTouchBegan(int index)
+		public bool WasTouchBegan(int index)
 		{
 			return WasKeyPressed((Key)((int)Key.Touch0 + index));
 		}
 
-		private static Key GetMouseButtonByIndex(int button)
+		private Key GetMouseButtonByIndex(int button)
 		{
 			if (button < 0 || button > 2) {
 				throw new ArgumentException();
@@ -130,27 +144,27 @@ namespace Lime
 			return (Key)((int)Key.Mouse0 + button);
 		}
 
-		public static bool WasTouchEnded(int index)
+		public bool WasTouchEnded(int index)
 		{
 			return WasKeyReleased((Key)((int)Key.Touch0 + index));
 		}
 
-		public static bool IsTouching(int index)
+		public bool IsTouching(int index)
 		{
 			return IsKeyPressed((Key)((int)Key.Touch0 + index));
 		}
 
-		public static Vector2 GetTouchPosition(int index)
+		public Vector2 GetTouchPosition(int index)
 		{
 			return touchPositions[index];
 		}
 
-		internal static void SetTouchPosition(int index, Vector2 position)
+		internal void SetTouchPosition(int index, Vector2 position)
 		{
 			touchPositions[index] = position;
 		}
 
-		public static int GetNumTouches()
+		public int GetNumTouches()
 		{
 			int j = 0;
 			for (int i = 0; i < MaxTouches; i++) {
@@ -160,20 +174,20 @@ namespace Lime
 			return j;
 		}
 
-		public static string TextInput { get; internal set; }
+		public string TextInput { get; internal set; }
 
-		internal static void SetKeyState(Key key, bool value)
+		internal void SetKeyState(Key key, bool value)
 		{
 			keyEventQueue.Add(new KeyEvent { Key = key, State = value });
 		}
 
-		internal static bool HasPendingKeyEvent(Key key)
+		internal bool HasPendingKeyEvent(Key key)
 		{
 			return keyEventQueue.Contains(new KeyEvent { Key = key, State = true }) ||
 				keyEventQueue.Contains(new KeyEvent { Key = key, State = false });
 		}
 
-		internal static void ProcessPendingKeyEvents()
+		internal void ProcessPendingKeyEvents()
 		{
 			if (keyEventQueue.Count > 0) {
 				var processedKeys = new bool[(int)Key.KeyCount];
@@ -189,7 +203,7 @@ namespace Lime
 			}
 		}
 
-		internal static void CopyKeysState()
+		internal void CopyKeysState()
 		{
 			currentKeysState.CopyTo(previousKeysState, 0);
 		}

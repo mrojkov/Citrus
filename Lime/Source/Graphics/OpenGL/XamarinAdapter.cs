@@ -5,7 +5,15 @@ using System.Linq;
 using System.Text;
 using OpenTK.Graphics.ES20;
 
-#if ANDROID
+#if WIN
+namespace Lime
+{
+	static class FramebufferAttachment
+	{
+		public const FramebufferSlot ColorAttachment0 = FramebufferSlot.ColorAttachment0;
+	}
+}
+#elif ANDROID
 namespace Lime
 {
 	static class BufferUsageHint

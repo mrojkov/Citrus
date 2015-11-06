@@ -3,11 +3,13 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-#if iOS || ANDROID
+#if iOS || ANDROID || WIN
 using OpenTK.Graphics.ES20;
 #else
 using OpenTK.Graphics.OpenGL;
 #endif
+
+#pragma warning disable 0618
 
 namespace Lime
 {
@@ -216,15 +218,11 @@ namespace Lime
 
 		public void LoadImage(IntPtr pixels, int width, int height, bool generateMips, bool swapRedAndBlue)
 		{
-#if iOS || ANDROID
 			if (swapRedAndBlue) {
-				throw new NotImplementedException("Color swap doesnt work on mobile");
+				throw new NotImplementedException();
 			}
 			var format = PixelFormat.Rgba;
-#else
-			var format = swapRedAndBlue ? PixelFormat.Bgra : PixelFormat.Rgba;
-#endif
-			if (!Application.IsMainThread)
+			if (!Application.CurrentThread.IsMain())
 			{
 				throw new InvalidOperationException();
 			}
@@ -233,7 +231,7 @@ namespace Lime
 			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, format, PixelType.UnsignedByte, pixels);
 			MemoryUsed = 4 * width * height;
 			if (generateMips) {
-#if !MAC && !iOS
+#if !MAC && !iOS && !WIN
 				GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 				MemoryUsed += (int)(MemoryUsed * 0.33f);
 #endif

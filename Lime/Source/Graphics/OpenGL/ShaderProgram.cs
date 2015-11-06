@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using OpenTK.Graphics;
-#if iOS || ANDROID
+#if iOS || ANDROID || WIN
 using OpenTK.Graphics.ES20;
 #else
 using OpenTK.Graphics.OpenGL;
 #endif
+
+#pragma warning disable 0618
 
 namespace Lime
 {

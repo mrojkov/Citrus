@@ -7,9 +7,9 @@ namespace Lime
 	{
 		static readonly float[] groupVolumes = new float[3] {1, 1, 1};
 
-		public static void Initialize()
+		public static void Initialize(ApplicationOptions options)
 		{
-			PlatformAudioSystem.Initialize();
+			PlatformAudioSystem.Initialize(options);
 		}
 
 		public static void Terminate()

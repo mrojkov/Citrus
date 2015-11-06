@@ -5,64 +5,49 @@ namespace Lime
 	/// <summary>
 	/// Програмная клавиатура (для мобильных устройств)
 	/// </summary>
-	public class SoftKeyboard
+	public interface ISoftKeyboard
 	{
 		/// <summary>
 		/// Возвращает true, если в данный момент клавиатура видима
 		/// </summary>
-		public bool Visible { get; internal set; }
+		bool Visible { get; }
 
 		/// <summary>
 		/// Высота клавиатуры. Значение устанавливается, когда клавиатура показана первый раз (до этого 0). Значение может меняться
 		/// </summary>
-		public float Height { get; internal set; }
+		float Height { get; }
 
 		/// <summary>
 		/// Генерируется, когда клавиатура исчезла
 		/// </summary>
-		public event Action Hidden;
+		event Action Hidden;
 
 		/// <summary>
 		/// Показывает или прячет клавиатуру
 		/// </summary>
 		/// <param name="show">true, чтобы показать; false, чтобы спрятать</param>
 		/// <param name="text">Набранный текст в поле ввода</param>
-		public void Show(bool show, string text)
-		{
-#if iOS || ANDROID
-			GameView.Instance.ShowSoftKeyboard(show, text);
-#endif
-		}
+		void Show(bool show, string text);
 
 		/// <summary>
 		/// Изменяет текст в поле ввода
 		/// </summary>
-		public void ChangeText(string text)
-		{
-#if iOS || ANDROID
-			GameView.Instance.ChangeSoftKeyboardText(text);
-#endif
-		}
-
-		internal void RaiseHidden()
-		{
-			if (Hidden != null)
-				Hidden();
-		}
+		void ChangeText(string text);
 
 		/// <summary>
 		/// Возвращает true, если програмная клавиатура подерживается текущей платформой
 		/// </summary>
-		public bool Supported
-		{
-			get {
-#if iOS || ANDROID
-				return true;
-#else
-				return false;
-#endif
-			}
-		}
+		bool Supported { get; }
+	}
+
+	internal class DummySoftKeyboard : ISoftKeyboard
+	{
+		public bool Visible { get { return false; } }
+		public float Height { get { return 0; } }
+		public event Action Hidden;
+		public void Show(bool show, string text) { }
+		public void ChangeText(string text) { }
+		public bool Supported { get { return false; } }
 	}
 }
 

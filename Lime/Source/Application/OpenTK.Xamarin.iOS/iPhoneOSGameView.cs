@@ -33,8 +33,15 @@ using All  = OpenTK.Graphics.ES11.All;
 using ES11 = OpenTK.Graphics.ES11;
 using ES20 = OpenTK.Graphics.ES20;
 
+#pragma warning disable 0618
+
 namespace Lime.Xamarin
 {
+	public class FrameEventArgs
+	{
+		public double Time;
+	}
+
     sealed class GLCalls {
         public delegate void glBindFramebuffer(All target, int framebuffer);
         public delegate void glBindRenderbuffer(All target, int renderbuffer);
@@ -768,7 +775,7 @@ namespace Lime.Xamarin
             if (prevUpdateTime == TimeSpan.Zero)
                 prevUpdateTime = curUpdateTime;
             var t = (curUpdateTime - prevUpdateTime).TotalSeconds;
-            // updateEventArgs.Time = t;
+            updateEventArgs.Time = t;
             OnUpdateFrame(updateEventArgs);
             prevUpdateTime = curUpdateTime;
 
@@ -778,7 +785,7 @@ namespace Lime.Xamarin
             if (prevRenderTime == TimeSpan.Zero)
                 prevRenderTime = curRenderTime;
             t = (curRenderTime - prevRenderTime).TotalSeconds;
-            // renderEventArgs.Time = t;
+            renderEventArgs.Time = t;
             OnRenderFrame(renderEventArgs);
             prevRenderTime = curRenderTime;
         }

@@ -34,7 +34,7 @@ namespace ChromiumWebBrowser
 		static ChromiumWebBrowserLogic()
 		{
 			Cef.Initialize();
-			Application.Instance.Terminating += () => {
+			Application.MainWindow.Closed += () => {
 				if (Cef.IsInitialized) {
 					Cef.Shutdown();
 				}
@@ -330,15 +330,15 @@ namespace ChromiumWebBrowser
 		{
 			switch (type) {
 				case CefCursorType.Pointer: {
-					GameView.Instance.SetDefaultCursor();
+					Application.MainWindow.Cursor = MouseCursor.Default;
 					break;
 				}
 				case CefCursorType.IBeam: {
-					GameView.Instance.SetCursor("Cursors.IBeam.png", new IntVector2(6, 8), "ChromiumWebBrowser");
+					Application.MainWindow.Cursor = new MouseCursor("Cursors.IBeam.png", new IntVector2(6, 8), "ChromiumWebBrowser");
 					break;
 				}
 				case CefCursorType.Hand: {
-					GameView.Instance.SetCursor("Cursors.Hand.png", new IntVector2(7, 2), "ChromiumWebBrowser");
+					Application.MainWindow.Cursor = new MouseCursor("Cursors.Hand.png", new IntVector2(6, 8), "ChromiumWebBrowser");
 					break;
 				}
 			}

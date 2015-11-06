@@ -58,13 +58,11 @@
     <Compile Include="Source\Application\CommandLineArgs.cs" />
     <Compile Include="Source\Application\Debug.cs" />
     <Compile Include="Source\Application\ExternalStorageLagsSimulator.cs" />
-    <Compile Include="Source\Application\FPSCalculator.cs" />
     <Compile Include="Source\Application\iOSAppDelegate.cs" />
     <Compile Include="Source\Application\iOSGameController.cs" />
     <Compile Include="Source\Application\iOSGameView.cs" />
     <Compile Include="Source\Application\Logger.cs" />
     <Compile Include="Source\Application\OpenTKGameView.cs" />
-    <Compile Include="Source\Application\RenderingApi.cs" />
     <Compile Include="Source\Application\Sdl2.cs" />
     <Compile Include="Source\Application\WinApi.cs" />
     <Compile Include="Source\AssetsBundle\AssetsBundle.cs" />
@@ -168,7 +166,6 @@
     <Compile Include="Source\Widgets\WidgetCachedRenderer.cs" />
     <Compile Include="Source\Widgets\WidgetDebugView.cs" />
     <Compile Include="Source\Widgets\WidgetInput.cs" />
-    <Compile Include="Source\Widgets\World.cs" />
     <Compile Include="Source\Environment.cs" />
     <Compile Include="Source\Exception.cs" />
     <Compile Include="Source\Geometry.cs" />
@@ -247,6 +244,23 @@
     <Compile Include="Source\Widgets\Model\ModelMesh.cs" />
     <Compile Include="Source\Widgets\Model\ModelNode.cs" />
     <Compile Include="Source\Widgets\Model\ModelViewport.cs" />
+    <Compile Include="Source\Application\IWindow.cs" />
+    <Compile Include="Source\RichUI\BorderedPane.cs" />
+    <Compile Include="Source\RichUI\Button.cs" />
+    <Compile Include="Source\RichUI\ColorGradient.cs" />
+    <Compile Include="Source\RichUI\Extensions.cs" />
+    <Compile Include="Source\RichUI\Label.cs" />
+    <Compile Include="Source\RichUI\RendererExtensions.cs" />
+    <Compile Include="Source\RichUI\Theme.cs" />
+    <Compile Include="Source\Application\WindowOptions.cs" />
+    <Compile Include="Source\Application\FPSCounter.cs" />
+    <Compile Include="Source\Application\MouseCursor.cs" />
+    <Compile Include="Source\Application\RenderingBackend.cs" />
+    <Compile Include="Source\Application\Window.iOS.cs" />
+    <Compile Include="Source\Application\Window.Win.cs" />
+    <Compile Include="Source\Application\Window.Android.cs" />
+    <Compile Include="Source\Widgets\WindowWidget.cs" />
+    <Compile Include="Source\Application\AndroidAccelerometerListener.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">

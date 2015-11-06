@@ -1,4 +1,4 @@
-#if WIN || MONOMAC || MAC
+#if MONOMAC || MAC
 using System;
 using OpenTK;
 using OpenTK.Input;
@@ -8,61 +8,114 @@ using OpenTK.Graphics.ES20;
 #endif
 using System.Collections.Generic;
 using System.Drawing;
+using System.ComponentModel;
 
 namespace Lime
 {
-	public enum WindowBorder
+	public class GameWindow : IWindow
 	{
-		Resizeable,
-		Fixed,
-		Hidden
-	}
-
-	internal static class WindowBorderExtensions
-	{
-		public static OpenTK.WindowBorder ToOpenTK(this WindowBorder border)
-		{
-			switch (border) {
-				case WindowBorder.Hidden:
-					return OpenTK.WindowBorder.Hidden;
-				case WindowBorder.Fixed:
-					return OpenTK.WindowBorder.Fixed;
-				default:
-					return OpenTK.WindowBorder.Resizable;
-			}
-		}
-
-		public static WindowBorder FromOpenTK(this OpenTK.WindowBorder border)
-		{
-			switch (border) {
-				case OpenTK.WindowBorder.Hidden:
-					return WindowBorder.Hidden;
-				case OpenTK.WindowBorder.Fixed:
-					return WindowBorder.Fixed;
-				default:
-					return WindowBorder.Resizeable;
-			}
-		}
-	}
-
-	public class GameView : OpenTK.GameWindow
-	{
-		private Application app;
 		private Dictionary<string, MouseCursor> cursors = new Dictionary<string, MouseCursor>();
 		private MouseCursor currentCursor;
+		private OpenTK.GameWindow otkWindow;
 
-		public static GameView Instance;
-		// Indicates whether the game uses OpenGL or OpenGL ES 2.0
-		public RenderingApi RenderingApi { get; private set; }
-		internal static event Action DidUpdated;
+		public string Title
+		{
+			get { return otkWindow.Title; }
+			set { otkWindow.Title = value; }
+		}
+
+		public WindowBorder Border
+		{
+			get { return (WindowBorder)otkWindow.WindowBorder; }
+			set { otkWindow.WindowBorder = (OpenTK.WindowBorder)value; }
+		}
+
+		public IntVector2 ClientPosition
+		{
+			get { return new IntVector2(otkWindow.ClientRectangle.X, otkWindow.ClientRectangle.Y); }
+			set
+			{
+				var rc = otkWindow.ClientRectangle;
+				rc.X = value.X;
+				rc.Y = value.Y;
+				otkWindow.ClientRectangle = rc;
+			}
+		}
+
+		public bool Visible
+		{
+			get { return otkWindow.Visible; }
+			set { otkWindow.Visible = value; }
+		}
+
+		public Size ClientSize
+		{
+			get { return new Lime.Size(otkWindow.ClientSize.Width, otkWindow.ClientSize.Height); }
+			set { otkWindow.ClientSize = new System.Drawing.Size(value.Width, value.Height); }
+		}
+
+		public IntVector2 DecoratedPosition
+		{
+			get { return new IntVector2(otkWindow.Location.X, otkWindow.Location.Y); }
+			set { otkWindow.Location = new System.Drawing.Point(value.X, value.Y); }
+		}
+
+
+		public Size DecoratedSize
+		{
+			get { return new Lime.Size(otkWindow.Size.Width, otkWindow.Size.Height); }
+			set { otkWindow.Size = new System.Drawing.Size(value.Width, value.Height); }
+		}
+
+		public bool Active { get; private set; }
+
+		public WindowState State
+		{
+			get { return (WindowState)otkWindow.WindowState; }
+			set
+			{
+				if (otkWindow.WindowState == (OpenTK.WindowState)value) {
+					return;
+				}
+				otkWindow.WindowState = (OpenTK.WindowState)value;
+			}
+		}
+
+		public bool Fullscreen
+		{
+			get { return State == WindowState.Fullscreen; }
+			set
+			{
+				if (value && State == WindowState.Fullscreen || !value && State != WindowState.Fullscreen) {
+					return;
+				}
+				State = value ? WindowState.Fullscreen : WindowState.Normal;
+			}
+		}
+
+		public float FPS
+		{
+			get { return FPSCalculator.FPS; }
+		}
+
+		public Input Input { get; private set; }
+
+		public event Action Activated;
+		public event Action Deactivated;
+		public event Func<bool> Closing;
+		public event Action Closed;
+		public event Action Moved;
+		public event Action Resized;
+		public event Action<float> Updating;
+		public event Action Rendering;
 
 #if WIN
-		static GameView()
+		static GameWindow()
 		{
 			// This is workaround an OpenTK bug.
 			// On some video cards the SDL framework could not create a GLES2/Angle OpenGL context
 			// if context attributes weren't set before the main window creation.
-			if (GetRenderingApi() == RenderingApi.ES20) {
+			if (Application.RenderingBackend == RenderingBackend.ES20) {
 				Sdl2.Init(Sdl2.SystemFlags.VIDEO);
 				Sdl2.SetAttribute(Sdl2.ContextAttribute.CONTEXT_PROFILE_MASK, 4);
 				Sdl2.SetAttribute(Sdl2.ContextAttribute.CONTEXT_MAJOR_VERSION, 2);
@@ -71,60 +124,63 @@ namespace Lime
 		}
 #endif
 
-		public GameView(Application app)
-			: base(app.Options.WindowSize.Width, app.Options.WindowSize.Height, 
-				new GraphicsMode(new ColorFormat(32), depth: 24), app.Options.WindowTitle, GetWindowFlags(app.Options)
+		public GameWindow(WindowOptions options)
+		{
+			Input = new Input();
+			otkWindow = new OpenTK.GameWindow(options.Size.Width, options.Size.Height,
+				new GraphicsMode(new ColorFormat(32), depth: 24), options.Title, GetWindowFlags(options)
 #if WIN
 				, DisplayDevice.Default, 2, 0, GetGraphicContextFlags()
 #endif
-			)
-		{
-			Instance = this;
-			this.app = app;
-			app.Active = true;
-			AudioSystem.Initialize();
-			app.OnCreate();
-			this.Keyboard.KeyDown += HandleKeyDown;
-			this.Keyboard.KeyUp += HandleKeyUp;
-			this.KeyPress += HandleKeyPress;
-			this.Mouse.ButtonDown += HandleMouseButtonDown;
-			this.Mouse.ButtonUp += HandleMouseButtonUp;
-			this.Mouse.Move += HandleMouseMove;
-			this.Mouse.WheelChanged += HandleMouseWheel;
-			SetupWindowLocationAndSize();
+			);
+			if (Application.MainWindow != null) {
+				throw new Lime.Exception("Attempt to create GameWindow twice");
+			}
+			Application.MainWindow = this;
+			Active = true;
+			otkWindow.Keyboard.KeyDown += HandleKeyDown;
+			otkWindow.Keyboard.KeyUp += HandleKeyUp;
+			otkWindow.KeyPress += HandleKeyPress;
+			otkWindow.Mouse.ButtonDown += HandleMouseButtonDown;
+			otkWindow.Mouse.ButtonUp += HandleMouseButtonUp;
+			otkWindow.Mouse.Move += HandleMouseMove;
+			otkWindow.Mouse.WheelChanged += HandleMouseWheel;
+			otkWindow.FocusedChanged += HandleFocusedChanged;
+			otkWindow.Closing += HandleClosing;
+			otkWindow.Closed += HandleClosed;
+			otkWindow.Move += HandleMove;
+			otkWindow.Resize += HandleResize;
+			otkWindow.RenderFrame += HandleRenderFrame;
+			if (options.Icon != null) {
+				otkWindow.Icon = options.Icon as System.Drawing.Icon;
+			}
+			SetupWindowPositionAndSize();
 			// Setting fullscreen with GameWindowFlags.FullScreen in OpenTK.GameWindow constructor causes
 			// changing the display resolution. Desktop fullscreen is much more better.
-			this.FullScreen = app.Options.FullScreen;
-			RenderingApi = GetRenderingApi();
+			this.State = options.FullScreen ? WindowState.Fullscreen : WindowState.Normal;
 		}
 
-		private static GameWindowFlags GetWindowFlags(Application.StartupOptions options)
+		private static GameWindowFlags GetWindowFlags(WindowOptions options)
 		{
-			return options.FixedSizeWindow ? GameWindowFlags.FixedWindow : GameWindowFlags.Default;
-		}
-
-		public new WindowBorder WindowBorder
-		{
-			get { return base.WindowBorder.FromOpenTK(); }
-			set { base.WindowBorder = value.ToOpenTK(); }
+			return options.FixedSize ? GameWindowFlags.FixedWindow : GameWindowFlags.Default;
 		}
 
 #if !MAC
 		private static GraphicsContextFlags GetGraphicContextFlags()
 		{
-			return GetRenderingApi() == RenderingApi.OpenGL ? 
+			return Application.RenderingBackend == RenderingBackend.OpenGL ? 
 				 GraphicsContextFlags.Default : GraphicsContextFlags.Embedded;
 		}
 #endif
 
-		private void SetupWindowLocationAndSize()
+		private void SetupWindowPositionAndSize()
 		{
 			var displayBounds = OpenTK.DisplayDevice.Default.Bounds;
 			if (CommandLineArgs.FullscreenMode) {
-				this.WindowState = OpenTK.WindowState.Fullscreen;
+				otkWindow.WindowState = OpenTK.WindowState.Fullscreen;
 			} else if (CommandLineArgs.MaximizedWindow) {
-				this.Location = displayBounds.Location;
-				this.WindowState = OpenTK.WindowState.Maximized;
+				otkWindow.Location = displayBounds.Location;
+				otkWindow.WindowState = OpenTK.WindowState.Maximized;
 			} else {
 				Center();
 			}
@@ -133,23 +189,26 @@ namespace Lime
 		public void Center()
 		{
 			var displayBounds = OpenTK.DisplayDevice.Default.Bounds;
-			this.Location = new System.Drawing.Point {
-				X = Math.Max(0, (displayBounds.Width - this.Width) / 2 + displayBounds.X),
-				Y = Math.Max(0, (displayBounds.Height - this.Height) / 2 + displayBounds.Y)
+			DecoratedPosition = new IntVector2 {
+				X = Math.Max(0, (displayBounds.Width - DecoratedSize.Width) / 2 + displayBounds.X),
+				Y = Math.Max(0, (displayBounds.Height - DecoratedSize.Height) / 2 + displayBounds.Y)
 			};
 		}
 
-		private static RenderingApi GetRenderingApi()
+		public void Close()
 		{
-#if MAC
-			return RenderingApi.OpenGL;
-#else
-			if (CommandLineArgs.OpenGL) {
-				return RenderingApi.OpenGL;
-			} else {
-				return RenderingApi.ES20;
+			otkWindow.Close();
+		}
+
+		public RenderingBackend RenderingApi {
+			get
+			{
+				if (CommandLineArgs.OpenGL) {
+					return RenderingBackend.OpenGL;
+				} else {
+					return RenderingBackend.ES20;
+				}
 			}
-#endif
 		}
 
 		void HandleKeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
@@ -177,13 +236,19 @@ namespace Lime
 			Input.TextInput += e.KeyChar;
 		}
 
-		protected override void OnFocusedChanged(EventArgs e)
+		private void HandleFocusedChanged(object sender, EventArgs e)
 		{
-			app.Active = this.Focused;
-			if (this.Focused) {
-				app.OnActivate();
+			Active = otkWindow.Focused;
+			if (otkWindow.Focused) {
+				AudioSystem.Active = true;
+				if (Activated != null) {
+					Activated();
+				}
 			} else {
-				app.OnDeactivate();
+				AudioSystem.Active = false;
+				if (Deactivated != null) {
+					Deactivated();
+				}
 			}
 		}
 
@@ -249,37 +314,45 @@ namespace Lime
 			}
 		}
 
-		protected override void OnClosed(EventArgs e)
+		private void HandleClosing(object sender, CancelEventArgs e)
 		{
-			app.OnTerminate();
+			if (Closing != null) {
+				e.Cancel = !Closing();
+			}
+		}
+
+		private void HandleClosed(object sender, EventArgs e)
+		{
+			if (Closed != null) {
+				Closed();
+			}
 			TexturePool.Instance.DiscardAllTextures();
 			AudioSystem.Terminate();
 		}
 
-		protected override void OnRenderFrame(OpenTK.FrameEventArgs e)
+		private void HandleRenderFrame(object sender, FrameEventArgs e)
 		{
 			float delta;
 			RefreshFrameTimeStamp(out delta);
 			Update(delta);
-			if (DidUpdated != null) {
-				DidUpdated();
-			}
 			Render();
-			SwapBuffers();
 			if (CommandLineArgs.Limit25FPS) {
 				Limit25FPS();
 			}
 		}
 
-		protected override void OnMove(EventArgs e)
+		private void HandleResize(object sender, EventArgs e)
 		{
-			app.OnMove();
+			if (Resized != null) {
+				Resized();
+			}
 		}
 
-		protected override void OnResize(EventArgs e)
+		private void HandleMove(object sender, EventArgs e)
 		{
-			if (app != null)
-				app.OnResize();
+			if (Moved != null) {
+				Moved();
+			}
 		}
 
 		private void Limit25FPS()
@@ -304,44 +377,28 @@ namespace Lime
 		private void Render()
 		{
 			FPSCalculator.Refresh();
-			MakeCurrent();
-			app.OnRenderFrame();
+			otkWindow.MakeCurrent();
+			if (Rendering != null) {
+				Rendering();
+			}
+			otkWindow.SwapBuffers();
 		}
 
 		private void Update(float delta)
 		{
 			Input.ProcessPendingKeyEvents();
-			app.OnUpdateFrame(delta);
+			if (Updating != null) {
+				Updating(delta);
+			}
 			AudioSystem.Update();
 			Input.TextInput = null;
 			Input.CopyKeysState();
 		}
 		
-		public Size WindowSize { 
-			get { return new Size(ClientSize.Width, ClientSize.Height); } 
-			set { this.ClientSize = new System.Drawing.Size(value.Width, value.Height); } 
-		}
-		
-		public bool FullScreen { 
-			get { return this.WindowState == WindowState.Fullscreen; }
-			set
-			{
-				var newState = value ? WindowState.Fullscreen : WindowState.Normal;
-				if (WindowState == newState) {
-					return;
-				}
-				this.WindowState = newState;
-			}
-		}
-
-		public float FrameRate { 
-			get { return FPSCalculator.FPS; } 
-		}
-
 		public void SetDefaultCursor()
 		{
 			currentCursor = MouseCursor.Default;
-			base.Cursor = currentCursor;
+			otkWindow.Cursor = currentCursor;
 		}
 
 		public void SetCursor(string resourceName, IntVector2 hotSpot, string assemblyName = null)
@@ -349,8 +406,13 @@ namespace Lime
 			var cursor = GetCursor(resourceName, hotSpot, assemblyName);
 			if (cursor != currentCursor) {
 				currentCursor = cursor;
-				base.Cursor = cursor;
+				otkWindow.Cursor = cursor;
 			}
+		}
+
+		internal void Run(float fps)
+		{
+			otkWindow.Run(fps);
 		}
 
 		private MouseCursor GetCursor(string resourceName, IntVector2 hotSpot, string assemblyName = null)

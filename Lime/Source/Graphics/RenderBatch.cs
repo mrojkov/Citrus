@@ -1,11 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-#if iOS || ANDROID
-using OpenTK.Graphics.ES20;
-#elif !UNITY
-using OpenTK.Graphics.OpenGL;
-#endif
 
 namespace Lime
 {

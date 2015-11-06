@@ -81,32 +81,28 @@ namespace Lime
 		protected override void SelfUpdate(float delta)
 		{
 			lastCharTimer -= delta;
-			var world = World.Instance;
 			if (!Enabled) {
-				if (world.ActiveTextWidget == this) {
-					world.ActiveTextWidget = null;
+				if (Context.ActiveTextWidget == this) {
+					Context.ActiveTextWidget = null;
 				}
 			} else {
-				if (world.ActiveTextWidget == null && Autofocus) {
-					world.ActiveTextWidget = this;
+				if (Context.ActiveTextWidget == null && Autofocus) {
+					Context.ActiveTextWidget = this;
 				}
 				if (Input.WasMouseReleased() && IsMouseOver()) {
-					world.ActiveTextWidget = this;
+					Context.ActiveTextWidget = this;
 				}
 			}
 		}
 
 		protected override void SelfLateUpdate(float delta)
 		{
-			var world = World.Instance;
 			if (Enabled) {
-				if (world.ActiveTextWidget == this) {
-					if (Input.TextInput != null) {
-						ProcessInput();
-					}
+				if (Context.ActiveTextWidget == this && Input.TextInput != null) {
+					ProcessInput();
 				}
-				if (world.ActiveTextWidget == this) {
-					world.IsActiveTextWidgetUpdated = true;
+				if (Context.ActiveTextWidget == this) {
+					Context.IsActiveTextWidgetUpdated = true;
 				}
 				caretBlinkPhase += delta;
 			}
@@ -147,7 +143,7 @@ namespace Lime
 					text += '*';
 				}
 			}
-			if (World.Instance.ActiveTextWidget == this) {
+			if (Context.ActiveTextWidget == this) {
 				text += CaretChar;
 			}
 			int start = 0;
@@ -158,7 +154,7 @@ namespace Lime
 				length--;
 				extent = Renderer.MeasureTextLine(Font.Instance, text, FontHeight, start, length);
 			}
-			if (World.Instance.ActiveTextWidget == this) {
+			if (Context.ActiveTextWidget == this) {
 				if (caretBlinkPhase % CaretBlinkPeriod < CaretBlinkPeriod / 2 && length > 0) {
 					length--;
 				}

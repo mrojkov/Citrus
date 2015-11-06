@@ -17,6 +17,9 @@ namespace Lime
 		private const float DelayBeforeItemDrag = 0.3f;
 		private bool dragInProgress;
 
+		// TODO: Use WidgetInput instead
+		private Input Input { get { return Frame.Context.Window.Input; } }
+
 		private IEnumerator<object> DragItemMainTask()
 		{
 			while (true) {
@@ -50,7 +53,7 @@ namespace Lime
 			dragInProgress = true;
 			try {
 				while (item.Input.IsMousePressed() || Frame.Input.IsMousePressed()) {
-					var bounds = item.CalcAABBInSpaceOf(World.Instance);
+					var bounds = item.CalcAABBInSpaceOf(item.Context.Root);
 					var i = this.IndexOf(item);
 					if (Input.MousePosition.Y < bounds.Top && i > 0) {
 						if (CanDragItemTo(item, this[i - 1])) {

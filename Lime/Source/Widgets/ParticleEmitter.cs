@@ -481,7 +481,7 @@ namespace Lime
 			}
 			case ParticlesLinkage.Root:
 			default:
-				return (Parent != null) ? GetRoot().AsWidget : null;
+				return (Parent != null) ? Context.Root : null;
 			}
 		}
 

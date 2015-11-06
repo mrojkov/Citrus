@@ -40,7 +40,7 @@ namespace Lime
 
 		private void CreateWebView()
 		{
-			webView = new WebView(GameView.Instance.Context);
+			webView = new WebView(ActivityDelegate.Instance.GameView.Context);
 			webView.SetBackgroundColor(Android.Graphics.Color.Transparent);
 			webView.Settings.JavaScriptEnabled = true;
 			webView.SetWebViewClient(new WebViewClient());
@@ -64,12 +64,12 @@ namespace Lime
 					// If the device is locked, setting Visibility causes an exception
 				}
 				// Workaround for a crash in RelativeLayout.onLayout() while rotating the device
-				Action a = null;
-				a = () => {
-					((RelativeLayout)GameView.Instance.Parent).RemoveView(webView);
-					GameView.DidUpdated -= a;
+				EventHandler<OpenTK.FrameEventArgs> a = null;
+				a = (s, e) => {
+					((RelativeLayout)ActivityDelegate.Instance.GameView.Parent).RemoveView(webView);
+					ActivityDelegate.Instance.GameView.UpdateFrame -= a;
 				};
-				GameView.DidUpdated += a;
+				ActivityDelegate.Instance.GameView.UpdateFrame += a;
 				webView = null;
 			}
 		}
@@ -90,7 +90,7 @@ namespace Lime
 				((RelativeLayout)webView.Parent).RemoveView(webView);
 			}
 			if (webView.Parent == null) {
-				((RelativeLayout)GameView.Instance.Parent).AddView(webView);
+				((RelativeLayout)ActivityDelegate.Instance.GameView.Parent).AddView(webView);
 			}
 			var p = (RelativeLayout.MarginLayoutParams)webView.LayoutParameters;
 			p.LeftMargin = wr.X;
@@ -102,9 +102,9 @@ namespace Lime
 
 		private WindowRect CalculateAABBInWorldSpace(Widget widget)
 		{
-			var aabb = widget.CalcAABBInSpaceOf(World.Instance);
+			var aabb = widget.CalcAABBInSpaceOf(Context.Root);
 			var viewport = Renderer.Viewport;
-			var scale = new Vector2(viewport.Width, viewport.Height) / World.Instance.Size;
+			var scale = new Vector2(viewport.Width, viewport.Height) / Context.Root.Size;
 			return new WindowRect {
 				X = (viewport.X + aabb.Left * scale.X).Round(),
 				Y = (viewport.Y + aabb.Top * scale.Y).Round(),

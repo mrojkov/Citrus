@@ -1,12 +1,14 @@
 #if OPENGL
 using System;
 using System.Diagnostics;
-#if iOS || ANDROID
+#if iOS || ANDROID || WIN
 using OpenTK.Graphics.ES20;
 #else
 using OpenTK.Graphics.OpenGL;
 #endif
 using System.Collections.Generic;
+
+#pragma warning disable 0618
 
 namespace Lime
 {
@@ -37,7 +39,7 @@ namespace Lime
 
 		private void CreateTexture()
 		{
-			if (!Application.IsMainThread) {
+			if (!Application.CurrentThread.IsMain()) {
 				throw new Lime.Exception("Attempt to create a RenderTexture not from the main thread");
 			}
 			var t = new uint[1];

@@ -30,7 +30,10 @@ namespace Lime
 
 		protected bool IsScrollingByMouseWheel { get; private set; }
 		public virtual bool IsDragging { get; protected set; }
-		
+
+		// TODO: Use WidgetInput instead
+		private Input Input { get { return Frame.Context.Window.Input; } }
+
 		public float ContentLength
 		{ 
 			get { return ProjectToScrollAxis(Content.Size); }

@@ -13,28 +13,66 @@ namespace Lime
 {
 	public class GameController : UIViewController
 	{
-		public static GameController Instance;
+		class SoftKeyboard : ISoftKeyboard
+		{
+			GameView view;
+
+			public event Action Hidden;
+
+			public SoftKeyboard(GameView view)
+			{
+				this.view = view;
+			}
+
+			internal void RaiseHidden()
+			{
+				if (Hidden != null) {
+					Hidden();
+				}
+			}
+
+			public void Show(bool show, string text)
+			{
+				view.ShowSoftKeyboard(show, text);
+			}
+
+			public void ChangeText(string text)
+			{
+				view.ChangeSoftKeyboardText(text);
+			}
+
+			public bool Visible { get; internal set; }
+			public float Height { get; internal set; }
+			public bool Supported { get { return true; } }
+		}
+
 		private NSObject keyboardShowNotification;
 		private NSObject keyboardHideNotification;
 		private NSObject keyboardWillChangeFrameNotification;
 		private NSObject keyboardDidChangeFrameNotification;
+		private SoftKeyboard softKeyboard;
+		private Input input;
 
-		public bool IsKeyboardChanging { get; private set; }
+		public event Action ViewDidLayoutSubviewsEvent;
+		public bool SoftKeyboardBeingShownOrHid { get; private set; }
+		public bool LockDeviceOrientation { get; set; }
 
-		public GameController() : base()
+		public GameController(Input input) : base()
 		{
-			Instance = this;
-			base.View = new GameView();
+			this.input = input;
+			base.View = new GameView(input);
+			softKeyboard = new SoftKeyboard(View);
+			Application.SoftKeyboard = softKeyboard;
 			UIAccelerometer.SharedAccelerometer.UpdateInterval = 0.05;
 			UIAccelerometer.SharedAccelerometer.Acceleration += OnAcceleration;
-			Application.Instance.CurrentDeviceOrientation = ConvertInterfaceOrientation(InterfaceOrientation);
+			Application.CurrentDeviceOrientation = ConvertInterfaceOrientation(InterfaceOrientation);
 		}
 
 		public new GameView View { get { return (GameView)base.View; } }
 
 		private void OnAcceleration(object sender, UIAccelerometerEventArgs e)
 		{
-			Input.Acceleration = new Vector3((float)e.Acceleration.X,
+			input.Acceleration = new Vector3((float)e.Acceleration.X,
 				(float)e.Acceleration.Y, (float)e.Acceleration.Z);
 		}
 
@@ -67,27 +105,27 @@ namespace Lime
 
 		private void KeyboardWillChangeFrameCallback(object sender, UIKeyboardEventArgs args)
 		{
-			IsKeyboardChanging = true;
+			SoftKeyboardBeingShownOrHid = true;
 			var beginFrame = args.FrameBegin;
 			var screenRect = UIScreen.MainScreen.Bounds;
 			if (!beginFrame.IntersectsWith(screenRect)) {
-				IsKeyboardChanging = false;
+				SoftKeyboardBeingShownOrHid = false;
 			}
 		}
 
 		private void KeyboardDidChangeFrameCallback(object sender, UIKeyboardEventArgs args)
 		{
-			IsKeyboardChanging = false;
+			SoftKeyboardBeingShownOrHid = false;
 			var endFrame = args.FrameEnd;
 			var screenRect = UIScreen.MainScreen.Bounds;
 			if (!endFrame.IntersectsWith(screenRect)) {
-				Application.Instance.SoftKeyboard.RaiseHidden();
+				softKeyboard.RaiseHidden();
 			}		
 		}
 
 		private void KeyboardShowCallback(object sender, UIKeyboardEventArgs args)
 		{
-			Application.Instance.SoftKeyboard.Visible = true;
+			softKeyboard.Visible = true;
 			var scale = UIScreen.MainScreen.Scale;
 
 			// iPad 2 return keyboard height in Height, but iPad 3 return keyboard height in Width.
@@ -97,50 +135,49 @@ namespace Lime
 			rectBegin.X  = rectBegin.X < 0? 0 : rectBegin.X;
 			rectEnd.X = rectEnd.X < 0 ? 0 : rectEnd.X;
 			if (rectEnd.X == 0 && rectBegin.X == 0 && rectEnd.Height < rectEnd.Width) {
-				Application.Instance.SoftKeyboard.Height = (float)(rectEnd.Height * scale);
+				softKeyboard.Height = (float)(rectEnd.Height * scale);
 			} else {
-				Application.Instance.SoftKeyboard.Height = (float)(rectEnd.Width * scale);
+				softKeyboard.Height = (float)(rectEnd.Width * scale);
 			}
 		}
 
 		private void KeyboardHideCallback(object sender, UIKeyboardEventArgs args)
 		{
-			Application.Instance.SoftKeyboard.Height = 0;
-			Application.Instance.SoftKeyboard.Visible = false;
+			softKeyboard.Height = 0;
+			softKeyboard.Visible = false;
 		}
 		 
-		public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations ()
+		public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations()
 		{
-			UIInterfaceOrientationMask mask = 0;
-			if (!Application.Instance.Active && Application.Instance.CurrentDeviceOrientation != 0) {
-				return mask | ConvertDeviceOrientationToInterfaceOrientationMask(Application.Instance.CurrentDeviceOrientation);
+			if (LockDeviceOrientation && Application.CurrentDeviceOrientation != 0) {
+				return ConvertDeviceOrientationToInterfaceOrientationMask(Application.CurrentDeviceOrientation);
 			}
-			if ((Application.Instance.SupportedDeviceOrientations & DeviceOrientation.LandscapeLeft) != 0)
+			UIInterfaceOrientationMask mask = 0;
+			if ((Application.SupportedDeviceOrientations & DeviceOrientation.LandscapeLeft) != 0)
 				mask = mask | UIInterfaceOrientationMask.LandscapeLeft;
-			if ((Application.Instance.SupportedDeviceOrientations & DeviceOrientation.LandscapeRight) != 0)
+			if ((Application.SupportedDeviceOrientations & DeviceOrientation.LandscapeRight) != 0)
 				mask = mask | UIInterfaceOrientationMask.LandscapeRight;
-			if ((Application.Instance.SupportedDeviceOrientations & DeviceOrientation.Portrait) != 0)
+			if ((Application.SupportedDeviceOrientations & DeviceOrientation.Portrait) != 0)
 				mask = mask | UIInterfaceOrientationMask.Portrait;
-			if ((Application.Instance.SupportedDeviceOrientations & DeviceOrientation.PortraitUpsideDown) != 0)
+			if ((Application.SupportedDeviceOrientations & DeviceOrientation.PortraitUpsideDown) != 0)
 				mask = mask | UIInterfaceOrientationMask.PortraitUpsideDown;
 			return mask;
 		}
 
-		[Obsolete]
 		public override bool ShouldAutorotateToInterfaceOrientation(UIInterfaceOrientation toInterfaceOrientation)
 		{
-			if (!Application.Instance.Active) {
+			if (LockDeviceOrientation) {
 				return false;
 			}
 			switch (toInterfaceOrientation) {
 			case UIInterfaceOrientation.LandscapeLeft:
-				return (Application.Instance.SupportedDeviceOrientations & DeviceOrientation.LandscapeLeft) != 0;
+				return (Application.SupportedDeviceOrientations & DeviceOrientation.LandscapeLeft) != 0;
 			case UIInterfaceOrientation.LandscapeRight:
-				return (Application.Instance.SupportedDeviceOrientations & DeviceOrientation.LandscapeRight) != 0;
+				return (Application.SupportedDeviceOrientations & DeviceOrientation.LandscapeRight) != 0;
 			case UIInterfaceOrientation.Portrait:
-				return (Application.Instance.SupportedDeviceOrientations & DeviceOrientation.Portrait) != 0;
+				return (Application.SupportedDeviceOrientations & DeviceOrientation.Portrait) != 0;
 			case UIInterfaceOrientation.PortraitUpsideDown:
-				return (Application.Instance.SupportedDeviceOrientations & DeviceOrientation.PortraitUpsideDown) != 0;
+				return (Application.SupportedDeviceOrientations & DeviceOrientation.PortraitUpsideDown) != 0;
 			}
 			return false;
 		}
@@ -190,11 +227,13 @@ namespace Lime
 		public override void ViewDidLayoutSubviews()
 		{
 			var toOrientation = ConvertInterfaceOrientation(this.InterfaceOrientation);
-			if (toOrientation != Application.Instance.CurrentDeviceOrientation) {
-				Application.Instance.CurrentDeviceOrientation = toOrientation;
-				// OnDeviceRotate() called from here (not in WillRotate) because in WillRotate we don't know
+			if (toOrientation != Application.CurrentDeviceOrientation) {
+				Application.CurrentDeviceOrientation = toOrientation;
+				// Handle resize here (not in WillRotate) because in WillRotate we don't know
 				// the resulting screen resolution.
-				Application.Instance.OnDeviceRotate();
+				if (ViewDidLayoutSubviewsEvent != null) {
+					ViewDidLayoutSubviewsEvent();
+				}
 			}
 		}
 	}

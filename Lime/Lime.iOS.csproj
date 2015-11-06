@@ -105,7 +105,6 @@
     <Compile Include="Source\Geometry.cs" />
     <Compile Include="Source\Widgets\Polyline.cs" />
     <Compile Include="Source\StringExtensions.cs" />
-    <Compile Include="Source\Widgets\World.cs" />
     <Compile Include="Source\Application\Logger.cs" />
     <Compile Include="Source\Application\Application.cs" />
     <Compile Include="Source\Application\WinApi.cs" />
@@ -144,7 +143,6 @@
     <Compile Include="Source\Graphics\OpenGL\ShaderProgram.cs" />
     <Compile Include="Source\Graphics\OpenGL\Shaders.cs" />
     <Compile Include="Source\Graphics\OpenGL\XamarinAdapter.cs" />
-    <Compile Include="Source\Application\RenderingApi.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationUtils.cs" />
     <Compile Include="Source\Widgets\Animation\Animator.cs" />
     <Compile Include="Source\Widgets\Animation\AnimatorCollection.cs" />
@@ -161,7 +159,6 @@
     <Compile Include="Source\Application\Debug.cs" />
     <Compile Include="Source\Application\CommandLineArgs.cs" />
     <Compile Include="Source\Application\ExternalStorageLagsSimulator.cs" />
-    <Compile Include="Source\Application\FPSCalculator.cs" />
     <Compile Include="Source\Application\Sdl2.cs" />
     <Compile Include="Source\Graphics\Bitmap.Win.cs" />
     <Compile Include="Source\Graphics\Bitmap.cs" />
@@ -238,24 +235,29 @@
     <Compile Include="Source\Types\BoundingSphere.cs" />
     <Compile Include="Source\Types\ContainmentType.cs" />
     <Compile Include="Source\Types\Ray.cs" />
+    <Compile Include="Source\Widgets\WebBrowser\IWebBrowserFactory.cs" />
     <Compile Include="Source\Widgets\WebBrowser\IWebBrowserImplementation.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WebBrowser.Android.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WebBrowser.Mac.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WebBrowser.Win.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WebBrowser.iOS.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WinFormsWebBrowser.cs" />
-    <Compile Include="Source\Application\Clipboard\Clipboard.Android.cs" />
-    <Compile Include="Source\Application\Clipboard\Clipboard.Mac.cs" />
-    <Compile Include="Source\Application\Clipboard\Clipboard.Win.cs" />
-    <Compile Include="Source\Application\Clipboard\Clipboard.cs" />
-    <Compile Include="Source\Application\Clipboard\Clipboard.iOS.cs" />
+    <Compile Include="Source\Widgets\WebBrowser\WinFormsWebBrowserFactory.cs" />
+    <Compile Include="Source\Application\FPSCounter.cs" />
+    <Compile Include="Source\Application\AndroidGameWindow.cs" />
+    <Compile Include="Source\Application\IWindow.cs" />
+    <Compile Include="Source\Application\MouseCursor.cs" />
+    <Compile Include="Source\Application\RenderingBackend.cs" />
+    <Compile Include="Source\Application\Window.Win.cs" />
+    <Compile Include="Source\Application\WindowOptions.cs" />
+    <Compile Include="Source\Application\Window.iOS.cs" />
+    <Compile Include="Source\Widgets\WindowWidget.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
     <Folder Include="Source\Application\" />
     <Folder Include="Source\Audio\OpenAL\" />
     <Folder Include="Source\Audio\Unity\" />
-    <Folder Include="Source\Application\Clipboard\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.iOS.csproj">

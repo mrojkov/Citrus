@@ -173,8 +173,7 @@ namespace Lime
 		/// </summary>
 		public virtual IEnumerable<string> GetVisibilityIssues()
 		{
-			var world = World.Instance;
-			if (!ChildOf(world) && (this != world)) {
+			if (!ChildOf(Context.Root) && (this != Context.Root)) {
 				yield return "The widget is not included to the world hierarchy";
 			}
 			if (!Visible) {
@@ -188,13 +187,13 @@ namespace Lime
 			} else if (GlobalColor.A < 10) {
 				yield return "One of its parent has 'Opacity' close to zero";
 			}
-			var basis = CalcTransformInSpaceOf(world);
+			var basis = CalcTransformInSpaceOf(Context.Root);
 			if ((basis.Scale.X * Size.X).Abs() < 1 || (basis.Scale.Y * Size.Y).Abs() < 1) {
 				yield return string.Format("The widget is probably too small");
 			}
 			bool passedHitTest = false;
-			var hitTestLT = world.Position;
-			var hitTestRB = hitTestLT + world.Size;
+			var hitTestLT = Context.Root.Position;
+			var hitTestRB = hitTestLT + Context.Root.Size;
 			for (float y = hitTestLT.Y; y < hitTestRB.Y && !passedHitTest; y++) {
 				for (float x = hitTestLT.X; x < hitTestRB.X && !passedHitTest; x++) {
 					if (this.SelfHitTest(new Vector2(x, y))) {

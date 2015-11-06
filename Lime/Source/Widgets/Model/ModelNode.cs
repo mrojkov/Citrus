@@ -169,12 +169,12 @@ namespace Lime
 			if (!HitTestTarget) {
 				return;
 			}
-			var r = HitTest(Input.MousePosition);
-			if (r.Distance < World.Instance.DistanceToNodeUnderCursor) {
+			var r = HitTest(Context.Window.Input.MousePosition);
+			if (r.Distance < Context.DistanceToNodeUnderCursor) {
 				// TODO: Check Renderer.CurrentFrameBuffer == Renderer.DefaultFrameBuffer
 				// TODO: Check Renderer.ScissorTestEnabled and ScissorRectangle
-				World.Instance.DistanceToNodeUnderCursor = r.Distance;
-				World.Instance.NodeUnderCursor = this;
+				Context.DistanceToNodeUnderCursor = r.Distance;
+				Context.NodeUnderCursor = this;
 			}
 		}
 	}

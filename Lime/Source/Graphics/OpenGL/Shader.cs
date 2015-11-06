@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using OpenTK.Graphics;
-#if iOS || ANDROID
+#if iOS || ANDROID || WIN
 using OpenTK.Graphics.ES20;
 #else
 using OpenTK.Graphics.OpenGL;
@@ -82,7 +82,7 @@ namespace Lime
 
 		private static string ReplacePrecisionModifiers(string source)
 		{
-			if (GameView.Instance.RenderingApi == RenderingApi.OpenGL) {
+			if (Application.RenderingBackend == RenderingBackend.OpenGL) {
 				source = source.Replace("lowp ", "");
 				source = source.Replace("mediump ", "");
 				source = source.Replace("highp ", "");

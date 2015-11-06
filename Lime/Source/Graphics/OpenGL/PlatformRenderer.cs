@@ -1,7 +1,7 @@
 #if OPENGL
 using System;
 
-#if iOS || ANDROID
+#if iOS || ANDROID || WIN
 using OpenTK.Graphics.ES20;
 #else
 using OpenTK.Graphics.OpenGL;
@@ -25,7 +25,7 @@ namespace Lime
 		[System.Diagnostics.Conditional("DEBUG")]
 		public static void CheckErrors()
 		{
-#if ANDROID
+#if ANDROID || iOS
 			var errCode = GL.GetErrorCode();
 #else
 			var errCode = GL.GetError();
@@ -37,7 +37,7 @@ namespace Lime
 				if (errors != "")
 					errors += ", ";
 				errors += errCode.ToString();
-#if ANDROID
+#if ANDROID || iOS
 				errCode = GL.GetErrorCode();
 #else
 				errCode = GL.GetError();

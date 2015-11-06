@@ -5,6 +5,8 @@ using System.Linq;
 using System.IO;
 using OpenTK.Graphics.ES20;
 
+#pragma warning disable 0618
+
 namespace Lime
 {
 	public partial class Texture2D : CommonTexture, ITexture
@@ -148,15 +150,15 @@ namespace Lime
 			if (version != PVRMagic) {
 				throw new Exception("Invalid PVR header");
 			}
-			var flags = reader.ReadUInt32();
+			reader.ReadUInt32(); // flags
 			var pixelFormat = (PVRFormat)reader.ReadUInt64();
-			var colorSpace = reader.ReadUInt32();
-			var channelType = reader.ReadUInt32();
+			reader.ReadUInt32(); // color space
+			reader.ReadUInt32(); // channel type
 			var height = reader.ReadInt32();
 			var width = reader.ReadInt32();
-			var depth = reader.ReadUInt32();
-			var numSurfaces = reader.ReadUInt32();
-			var numFaces = reader.ReadUInt32();
+			reader.ReadUInt32(); // depth
+			reader.ReadUInt32(); // num surfaces
+			reader.ReadUInt32(); // num faces
 			var numMipmaps = reader.ReadInt32();
 			var metaDataSize = reader.ReadInt32();
 			if (metaDataSize > 0) {

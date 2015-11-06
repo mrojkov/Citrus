@@ -8,75 +8,27 @@ using Android.Views;
 using Android.Views.InputMethods;
 using Android.Widget;
 using Android.Content;
-using Android.Hardware;
 
 namespace Lime
 {
 	public class ActivityDelegate
 	{
-		#region AccelerometerListener
-
-		/// <summary>
-		/// The AccelerometerListener is used for capture accelerometer data
-		/// </summary>
-		class AccelerometerListener : Java.Lang.Object, ISensorEventListener
-		{
-			private static AccelerometerListener listener;
-
-			public void OnAccuracyChanged(Sensor sensor, SensorStatus accuracy) { }
-
-			public void OnSensorChanged(SensorEvent e)
-			{
-				if (e.Values == null) {
-					throw new Exception("Invalid accelerometer data");
-				}
-				var vector = new Vector3();
-				if (e.Values.Count > 0) {
-					vector.X = e.Values[0];
-				}
-				if (e.Values.Count > 1) {
-					vector.Y = e.Values[1];
-				}
-				if (e.Values.Count > 2) {
-					vector.Z = e.Values[2];
-				}
-				// Translate into iOS accelerometer units: g-forces instead of m/s^2
-				var a = -vector / 9.81f;
-				Input.Acceleration = a;
-			}
-
-			public static void StartListening()
-			{
-				if (listener == null) {
-					listener = new AccelerometerListener();
-					var activity = Lime.ActivityDelegate.Instance.Activity;
-					var sensorManager = (SensorManager)activity.GetSystemService(Context.SensorService);
-					sensorManager.RegisterListener(listener, sensorManager.GetDefaultSensor(SensorType.Accelerometer), SensorDelay.Ui);
-				}
-			}
-
-			public static void StopListening()
-			{
-				if (listener != null) {
-					var activity = Lime.ActivityDelegate.Instance.Activity;
-					var sensorManager = (SensorManager)activity.GetSystemService(Context.SensorService);
-					sensorManager.UnregisterListener(listener);
-					listener = null;
-				}
-			}
-		}
-
-		#endregion
-
 		public class BackButtonEventArgs
 		{
 			public bool Handled;
 		}
 
+		public static ActivityDelegate Instance { get; private set; }
+
+		private Action gameInitializer;
+		internal Input Input { get; private set; }
+		
+		public Activity Activity { get; private set; }
+		public GameView GameView { get; private set; }
+		public RelativeLayout ContentView { get; private set; }
+		
 		public delegate void BackButtonDelegate(BackButtonEventArgs args);
 		public delegate void ActivityResultDelegate(int requestCode, Result resultCode, Intent data);
-
-		public static ActivityDelegate Instance { get; private set; }
 
 		public event Action<Activity, Bundle> Created;
 		public event Action<Activity> Started;
@@ -93,47 +45,79 @@ namespace Lime
 		public event BackButtonDelegate BackPressed;
 		public event ActivityResultDelegate ActivityResult;
 
-		public Activity Activity { get; private set; }
-
-		public ActivityDelegate()
+		public ActivityDelegate(Action gameInitializer)
 		{
 			Instance = this;
+			this.gameInitializer = gameInitializer;
+			Input = new Input();
 		}
 
-		public virtual void OnCreate(Activity activity, Bundle bundle)
+		public void OnCreate(Activity activity, Bundle bundle)
 		{
+			Debug.Write("Activity.OnCreate");
 			Activity = activity;
+			if (GameView == null) {
+				GameView = new GameView(Activity, Input);
+				GameView.Resize += (s, e) => {
+					// Initialize the application on Resize (not Load) event,
+					// because we may need a valid screen resolution
+					if (gameInitializer != null) {
+						gameInitializer();
+						gameInitializer = null;
+					}
+				};
+			} else {
+				RemoveGameViewFromParent();
+			}
+			ContentView = new RelativeLayout(activity.ApplicationContext);
+			ContentView.AddView(GameView);
+			Activity.SetContentView(ContentView);
 			if (Created != null) {
 				Created(Activity, bundle);
+			}		
+		}
+
+		private void RemoveGameViewFromParent()
+		{
+			if (GameView.Parent != null) {
+				(GameView.Parent as RelativeLayout).RemoveView(GameView);
 			}
 		}
 
-		public virtual void OnStart()
+		public void OnStart()
 		{
 			if (Started != null) {
 				Started(Activity);
 			}
-
-			AccelerometerListener.StartListening();
+			AccelerometerListener.StartListening(Input);
 		}
 
-		public virtual void OnResume()
+		public void OnResume()
 		{
+			AudioSystem.Active = true;
+			GameView.Resume();
+			if (!GameView.IsFocused) {
+				GameView.RequestFocus();
+			}
+			GameView.Run();
+			AccelerometerListener.StartListening(Input);
 			if (Resumed != null) {
 				Resumed(Activity);
 			}
-			AccelerometerListener.StartListening();
 		}
 
-		public virtual void OnPause()
+		public void OnPause()
 		{
+			AudioSystem.Active = false;
+			GameView.Pause();
+			GameView.ClearFocus();
 			if (Paused != null) {
 				Paused(Activity);
 			}
 			AccelerometerListener.StopListening();
 		}
 
-		public virtual void OnStop()
+		public void OnStop()
 		{
 			if (Stopped != null) {
 				Stopped(Activity);
@@ -141,7 +125,7 @@ namespace Lime
 			AccelerometerListener.StopListening();
 		}
 
-		public virtual void OnDestroy()
+		public void OnDestroy()
 		{
 			if (Destroying != null) {
 				Destroying(Activity);
@@ -150,23 +134,28 @@ namespace Lime
 			Activity = null;
 		}
 
-		public virtual void OnLowMemory()
+		public void OnLowMemory()
 		{
+			Logger.Write("Memory warning, texture memory: {0}mb", CommonTexture.TotalMemoryUsedMb);
+			TexturePool.Instance.DiscardTexturesUnderPressure();
+			System.GC.Collect();
 			if (LowMemory != null) {
 				LowMemory();
 			}
 		}
 
 #if __ANDROID_14__
-		public virtual void OnTrimMemory(TrimMemory level)
+		public void OnTrimMemory(TrimMemory level)
 		{
+			Logger.Write("Memory warning, texture memory: {0}mb", CommonTexture.TotalMemoryUsedMb);
+			System.GC.Collect();
 			if (TrimmingMemory != null) {
 				TrimmingMemory(level);
 			}
 		}
 #endif
 
-		public virtual bool OnBackPressed()
+		public bool OnBackPressed()
 		{
 			var args = new BackButtonEventArgs();
 			if (BackPressed != null) {
@@ -175,20 +164,21 @@ namespace Lime
 			return args.Handled;
 		}
 
-		public virtual void OnConfigurationChanged(Android.Content.Res.Configuration newConfig)
+		public void OnConfigurationChanged(Android.Content.Res.Configuration newConfig)
 		{
 			if (ConfigurationChanged != null) {
 				ConfigurationChanged(newConfig);
 			}
 		}
 
-		public virtual void OnActivityResult(int requestCode, Result resultCode, Intent data)
+		public void OnActivityResult(int requestCode, Result resultCode, Intent data)
 		{
 			if (ActivityResult != null) {
 				ActivityResult(requestCode, resultCode, data);
 			}
 		}
 	}
+<<<<<<< .working
 
 	public class DefaultActivityDelegate : ActivityDelegate
 	{
@@ -274,5 +264,92 @@ namespace Lime
 #endif
 	}
 
+||||||| .merge-left.r226789
+
+	public class DefaultActivityDelegate : ActivityDelegate
+	{
+		public static GameView GameView { get; private set; }
+		public RelativeLayout ContentView { get; private set; }
+		private bool applicationCreated;
+		private Application application;
+
+		public DefaultActivityDelegate(Application app)
+		{
+			this.application = app;
+			AudioSystem.Initialize();
+		}
+
+		public override void OnCreate(Activity activity, Bundle bundle)
+		{
+			if (GameView == null) {
+				GameView = new GameView(activity);
+				GameView.OnCreate();
+			}
+			Debug.Write("Activity.OnCreate");
+			RemoveGameViewFromParent();
+			ContentView = new RelativeLayout(activity.ApplicationContext);
+			ContentView.AddView(GameView);
+			activity.SetContentView(ContentView);
+			GameView.Resize += (object sender, EventArgs e) => {
+				// Initialize the application on Resize (not Load) event,
+				// because we may need a valid screen resolution
+				if (!applicationCreated) {
+					applicationCreated = true;
+					application.OnCreate();
+				}
+			};
+			base.OnCreate(activity, bundle);
+		}
+
+		private void RemoveGameViewFromParent()
+		{
+			if (GameView.Instance.Parent != null) {
+				(GameView.Instance.Parent as RelativeLayout).RemoveView(GameView);
+			}
+		}
+
+		public override void OnPause()
+		{
+			application.Active = false;
+			application.OnDeactivate();
+			AudioSystem.Active = false;
+			GameView.Pause();
+			GameView.ClearFocus();
+			base.OnPause();
+		}
+
+		public override void OnResume()
+		{
+			AudioSystem.Active = true;
+			application.Active = true;
+			application.OnActivate();
+			GameView.Resume();
+			if (!GameView.IsFocused) {
+				GameView.RequestFocus();
+			}
+			GameView.Run();
+			base.OnResume();
+		}
+
+		public override void OnLowMemory()
+		{
+			Logger.Write("Memory warning, texture memory: {0}mb", CommonTexture.TotalMemoryUsedMb);
+			TexturePool.Instance.DiscardTexturesUnderPressure();
+			System.GC.Collect();
+			base.OnLowMemory();
+		}
+
+#if __ANDROID_14__
+		public override void OnTrimMemory(TrimMemory level)
+		{
+			Logger.Write("Memory warning, texture memory: {0}mb", CommonTexture.TotalMemoryUsedMb);
+			System.GC.Collect();
+			base.OnTrimMemory(level);
+		}
+#endif
+	}
+
+=======
+>>>>>>> .merge-right.r228510
 }
 #endif

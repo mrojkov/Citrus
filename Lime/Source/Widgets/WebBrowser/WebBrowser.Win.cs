@@ -5,7 +5,7 @@ namespace Lime
 {
 	public class WebBrowser : Widget
 	{
-		public static Func<IWebBrowserImplementation> BrowserFactory = () => new WinFormsWebBrowser();
+		public static Func<Widget, IWebBrowserImplementation> BrowserFactory = widget => new WinFormsWebBrowser(widget);
 		private IWebBrowserImplementation implementation;
 
 		public Uri Url
@@ -16,7 +16,7 @@ namespace Lime
 
 		public WebBrowser(): base()
 		{
-			implementation = BrowserFactory();
+			implementation = BrowserFactory(this);
 		}
 
 		public WebBrowser(Widget parentWidget)
@@ -34,7 +34,7 @@ namespace Lime
 
 		public override void Render()
 		{
-			implementation.Render(this);
+			implementation.Render();
 		}
 
 		protected override void OnSizeChanged(Vector2 sizeDelta)
@@ -42,13 +42,13 @@ namespace Lime
 			// OnSizeChanged() is called before WebBrowser constructor, where normal
 			// web browser implementation is constructed
 			if (implementation != null)
-				implementation.OnSizeChanged(this, sizeDelta);
+				implementation.OnSizeChanged(sizeDelta);
 		}
 
 		public override void Update(float delta)
 		{
 			base.Update(delta);
-			implementation.Update(this, delta);
+			implementation.Update(delta);
 		}
 
 		public override void Dispose()

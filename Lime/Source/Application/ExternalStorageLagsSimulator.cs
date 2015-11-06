@@ -17,7 +17,7 @@ namespace Lime
 				readTime += 200;
 				lastReadTime = DateTime.Now;
 			}
-			if (readTime > 10 && Application.IsMainThread) {
+			if (readTime > 10 && Application.CurrentThread.IsMain()) {
 				Logger.Write("Lag {0} ms while reading {1}", readTime, path);
 			}
 			System.Threading.Thread.Sleep(readTime);

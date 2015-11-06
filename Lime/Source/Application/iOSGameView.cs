@@ -16,34 +16,39 @@ namespace Lime
 {
 	public class GameView : Lime.Xamarin.iPhoneOSGameView
 	{
-		UITextField textField;
-		UITouch[] activeTouches = new UITouch[Input.MaxTouches];
-		float screenScale;
-
 		class TextFieldDelegate : UITextFieldDelegate
 		{
+			Input input;
+
+			public TextFieldDelegate(Input input)
+			{
+				this.input = input;
+			}
+
 			public override bool ShouldReturn(UITextField textField)
 			{
-				Input.SetKeyState(Key.Enter, true);
+				input.SetKeyState(Key.Enter, true);
 				return false;
 			}
 		}
 
-		public readonly RenderingApi RenderingApi = RenderingApi.ES20;
+		private UITextField textField;
+		private UITouch[] activeTouches = new UITouch[Input.MaxTouches];
+		private float screenScale;
+		private Input input;
 
-		internal static event Action DidUpdated;
+		public Size ClientSize { get; private set; }
+		public bool DisableUpdateAndRender;
 
-		public static GameView Instance;
-
-		public GameView() : base(UIScreen.MainScreen.Bounds)
+		public GameView(Input input) : base(UIScreen.MainScreen.Bounds)
 		{
-			Instance = this;
+			this.input = input;
 			AutoResize = true;
 			LayerRetainsBacking = false;
 			LayerColorFormat = EAGLColorFormat.RGB565;
 			MultipleTouchEnabled = true;
 			textField = new UIKit.UITextField();
-			textField.Delegate = new TextFieldDelegate();
+			textField.Delegate = new TextFieldDelegate(input);
 			textField.AutocorrectionType = UITextAutocorrectionType.No;
 			textField.AutocapitalizationType = UITextAutocapitalizationType.None;
 			screenScale = (float)UIScreen.MainScreen.Scale;
@@ -60,14 +65,13 @@ namespace Lime
 			base.LayoutSubviews();
 		}
 
-		void RefreshWindowSize()
+		private void RefreshWindowSize()
 		{
 			var scale = UIScreen.MainScreen.Scale;
-			var size = new Size {
+			ClientSize = new Size {
 				Width = (int)(Bounds.Width * scale),
 				Height = (int)(Bounds.Height * scale)
 			};
-			Application.Instance.WindowSize = size;
 		}
 
 		public override void TouchesBegan(NSSet touches, UIEvent evt)
@@ -76,15 +80,15 @@ namespace Lime
 				for (int i = 0; i < Input.MaxTouches; i++) {
 					if (activeTouches[i] == null) {
 						var pt = touch.LocationInView(this);
-						Vector2 position = new Vector2((float)pt.X, (float)pt.Y) * screenScale * Input.ScreenToWorldTransform;
+						var position = new Vector2((float)pt.X, (float)pt.Y) * screenScale * input.ScreenToWorldTransform;
 						if (i == 0) {
-							Input.MousePosition = position;
-							Input.SetKeyState(Key.Mouse0, true);
+							input.MousePosition = position;
+							input.SetKeyState(Key.Mouse0, true);
 						}
 						Key key = (Key)((int)Key.Touch0 + i);
-						Input.SetTouchPosition(i, position);
+						input.SetTouchPosition(i, position);
 						activeTouches[i] = touch;
-						Input.SetKeyState(key, true);
+						input.SetKeyState(key, true);
 						break;
 					}
 				}
@@ -97,11 +101,11 @@ namespace Lime
 				for (int i = 0; i < Input.MaxTouches; i++) {
 					if (activeTouches[i] == touch) {
 						var pt = touch.LocationInView(this);
-						Vector2 position = new Vector2((float)pt.X, (float)pt.Y) * screenScale * Input.ScreenToWorldTransform;
+						var position = new Vector2((float)pt.X, (float)pt.Y) * screenScale * input.ScreenToWorldTransform;
 						if (i == 0) {
-							Input.MousePosition = position;
+							input.MousePosition = position;
 						}
-						Input.SetTouchPosition(i, position);
+						input.SetTouchPosition(i, position);
 					}
 				}
 			}
@@ -113,11 +117,11 @@ namespace Lime
 				for (int i = 0; i < Input.MaxTouches; i++) {
 					if (activeTouches[i] == touch) {
 						if (i == 0) {
-							Input.SetKeyState(Key.Mouse0, false);
+							input.SetKeyState(Key.Mouse0, false);
 						}
 						activeTouches[i] = null;
 						Key key = (Key)((int)Key.Touch0 + i);
-						Input.SetKeyState(key, false);
+						input.SetKeyState(key, false);
 					}
 				}
 			}
@@ -154,6 +158,11 @@ namespace Lime
 			}
 		}
 
+		public void DoRenderFrame()
+		{
+			OnRenderFrame(null);
+		}
+
 		protected override void ConfigureLayer(CAEAGLLayer eaglLayer)
 		{
 			eaglLayer.Opaque = true;
@@ -184,7 +193,7 @@ namespace Lime
 			GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferSlot.DepthAttachment, RenderbufferTarget.Renderbuffer, depthRenderBuffer);
 			
 			GL.ClearDepth(1.0f); // Depth Buffer Setup
-			GL.DepthFunc(All.Lequal); // The Type Of Depth Test To Do				
+			GL.DepthFunc(DepthFunction.Lequal); // The Type Of Depth Test To Do				
 		}
 		
 		protected override void DeleteBuffers()
@@ -192,60 +201,6 @@ namespace Lime
 			base.DeleteBuffers();
 			GL.DeleteRenderbuffers(1, ref depthRenderBuffer);
 			depthRenderBuffer = 0;
-		}
-		
-		public new void UpdateFrame()
-		{
-			OnUpdateFrame(null);
-		}
-
-		protected override void OnUpdateFrame(FrameEventArgs e)
-		{
-			if (GameController.Instance.IsKeyboardChanging) {
-				return;
-			}
-			float delta;
-			RefreshFrameTimeStamp(out delta);
-			Input.ProcessPendingKeyEvents();
-			Application.Instance.OnUpdateFrame(delta);
-			AudioSystem.Update();
-			Input.TextInput = null;
-			Input.CopyKeysState();
-			Input.SetKeyState(Key.Enter, false);
-			ProcessTextInput();
-			if (DidUpdated != null) {
-				DidUpdated();
-			}
-		}
-		
-		private DateTime lastFrameTimeStamp = DateTime.UtcNow;
-
-
-		private void RefreshFrameTimeStamp(out float delta)
-		{
-			var now = DateTime.UtcNow;
-			delta = (float)(now - lastFrameTimeStamp).TotalSeconds;
-			delta = delta.Clamp(0, 1 / Application.LowFPSLimit);
-			lastFrameTimeStamp = now;
-		}
-
-		void ProcessTextInput()
-		{
-			var currText = textField.Text ?? "";
-			prevText = prevText ?? "";
-			if (currText.Length > prevText.Length) {
-				Input.TextInput = currText.Substring(prevText.Length);
-			} else {
-				for (int i = 0; i < prevText.Length - currText.Length; i++) {
-					Input.TextInput += '\b';
-				}
-			}
-			prevText = currText;
-		}
-
-		public new void RenderFrame()
-		{
-			OnRenderFrame(null);
 		}
 
 		public override void WillMoveToWindow(UIWindow window)
@@ -255,21 +210,27 @@ namespace Lime
 			// So disable it.
 		}
 
-		protected override void OnRenderFrame(FrameEventArgs e)
+		protected override void OnUpdateFrame(Xamarin.FrameEventArgs e)
 		{
-			if (!Application.Instance.Active || GameController.Instance.IsKeyboardChanging) {
-				return;
-			}
-			MakeCurrent();
-			Application.Instance.OnRenderFrame();
-			SwapBuffers();
-			FPSCalculator.Refresh();
+			base.OnUpdateFrame(e);
+			input.CopyKeysState();
+			input.SetKeyState(Key.Enter, false);
+			ProcessTextInput();
 		}
 
-		public float FrameRate {
-			get {
-				return FPSCalculator.FPS;
+		private void ProcessTextInput()
+		{
+			input.TextInput = null;
+			var currText = textField.Text ?? "";
+			prevText = prevText ?? "";
+			if (currText.Length > prevText.Length) {
+				input.TextInput = currText.Substring(prevText.Length);
+			} else {
+				for (int i = 0; i < prevText.Length - currText.Length; i++) {
+					input.TextInput += '\b';
+				}
 			}
+			prevText = currText;
 		}
 	}
 }

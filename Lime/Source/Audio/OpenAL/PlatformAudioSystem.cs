@@ -54,7 +54,7 @@ namespace Lime
 		static NSObject interruptionNotification;
 #endif
 		
-		public static void Initialize()
+		public static void Initialize(ApplicationOptions options)
 		{
 #if iOS
 			AVAudioSession.SharedInstance().Init();
@@ -87,7 +87,6 @@ namespace Lime
 				context = new AudioContext();
 			}
 #endif
-			var options = Application.Instance.Options;
 			if (AL.GetError() == ALError.NoError) {
 				// iOS dislike to mix stereo and mono buffers on one audio source, so separate them
 				for (int i = 0; i < options.NumStereoChannels; i++) {

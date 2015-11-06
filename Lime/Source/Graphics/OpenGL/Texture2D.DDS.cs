@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-#if WIN || MAC || MONOMAC
+#if MAC || MONOMAC
 using OpenTK.Graphics.OpenGL;
-#elif ANDROID
+#elif ANDROID || WIN
 using OpenTK.Graphics.ES20;
 #endif
+
+#pragma warning disable 0618
 
 namespace Lime
 {
@@ -116,6 +118,22 @@ namespace Lime
 #if ANDROID
 			throw new NotSupportedException();
 #else
+#if WIN
+			var pif = All.CompressedRgbaS3tcDxt1Ext;
+			switch ((DDSFourCC)pfFourCC) {
+				case DDSFourCC.DXT1:
+					pif = All.CompressedRgbaS3tcDxt1Ext;
+					break;
+				case DDSFourCC.DXT3:
+					pif = All.CompressedRgbaS3tcDxt3Ext;
+					break;
+				case DDSFourCC.DXT5:
+					pif = All.CompressedRgbaS3tcDxt5Angle;
+					break;
+				default:
+					throw new Lime.Exception("Unsupported texture format");
+			}
+#else
 			var pif = PixelInternalFormat.CompressedRgbS3tcDxt1Ext;
 			switch ((DDSFourCC)pfFourCC) {
 				case DDSFourCC.DXT1:
@@ -130,10 +148,15 @@ namespace Lime
 				default:
 					throw new Lime.Exception("Unsupported texture format");
 			}
+#endif
 			var buffer = ReadTextureData(reader, linearSize);
 			glCommands += () => {
 				PlatformRenderer.PushTexture(handle, 0);
+#if WIN
+				GL.CompressedTexImage2D(All.Texture2D, level, pif, width, height, 0, buffer.Length, buffer);
+#else
 				GL.CompressedTexImage2D(TextureTarget.Texture2D, level, pif, width, height, 0, buffer.Length, buffer);
+#endif
 				PlatformRenderer.PopTexture(0);
 				PlatformRenderer.CheckErrors();
 			};

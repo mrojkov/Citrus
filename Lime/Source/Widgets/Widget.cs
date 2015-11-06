@@ -825,7 +825,7 @@ namespace Lime
 				return false;
 			}
 			var targets = new List<Widget>();
-			World.Instance.AsWidget.EnumerateHitTestTargets(targets, HitTestMask);
+			Context.Root.EnumerateHitTestTargets(targets, HitTestMask);
 			var thisLayer = GetEffectiveLayer();
 			var passedThis = false;
 			foreach (var target in targets) {
@@ -920,10 +920,9 @@ namespace Lime
 			if (SelfHitTest(Input.MousePosition)) {
 				// TODO: Check Renderer.CurrentFrameBuffer == Renderer.DefaultFrameBuffer
 				// TODO: Check Renderer.ScissorTestEnabled and ScissorRectangle
-				World.Instance.NodeUnderCursor = this;
+				Context.NodeUnderCursor = this;
 			}
 		}
-
 		#endregion
 	}
 }

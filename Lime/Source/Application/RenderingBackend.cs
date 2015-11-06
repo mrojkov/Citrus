@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Lime
 {
-	public enum RenderingApi
+	public enum RenderingBackend
 	{
 		OpenGL,
 		ES20

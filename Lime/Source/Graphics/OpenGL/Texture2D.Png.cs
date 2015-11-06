@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 #if WIN
-using OpenTK.Graphics.OpenGL;
+using OpenTK.Graphics.ES20;
 using SDI = System.Drawing.Imaging;
 using SD = System.Drawing;
 #elif iOS
@@ -19,6 +19,8 @@ using AppKit;
 using CoreGraphics;
 using OpenTK.Graphics.OpenGL;
 #endif
+
+#pragma warning disable 0618
 
 namespace Lime
 {
@@ -80,7 +82,7 @@ namespace Lime
 #elif WIN
 		private void InitWithPngOrJpgBitmap(Stream stream, Stream alphaStream)
 		{
-			if (!Application.IsMainThread) {
+			if (!Application.CurrentThread.IsMain()) {
 				throw new NotSupportedException("Calling from non-main thread currently is not supported");
 			}
 			using (var bitmap = new SD.Bitmap(alphaStream ?? stream)) {
