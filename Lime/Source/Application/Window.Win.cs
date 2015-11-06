@@ -386,6 +386,8 @@ namespace Lime
 					return Key.Q;
 				case Keys.W:
 					return Key.W;
+				case Keys.E:
+					return Key.E;
 				case Keys.R:
 					return Key.R;
 				case Keys.T:
@@ -478,8 +480,10 @@ namespace Lime
 					return Key.PageDown;
 				case Keys.Menu:
 					return Key.AltLeft;
-				case Keys.Control:
+				case Keys.ControlKey:
 					return Key.ControlLeft;
+				case Keys.ShiftKey:
+					return Key.LShift;
 				case Keys.LShiftKey:
 					return Key.LShift;
 				case Keys.RShiftKey:
