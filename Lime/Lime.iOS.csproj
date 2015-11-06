@@ -235,16 +235,13 @@
     <Compile Include="Source\Types\BoundingSphere.cs" />
     <Compile Include="Source\Types\ContainmentType.cs" />
     <Compile Include="Source\Types\Ray.cs" />
-    <Compile Include="Source\Widgets\WebBrowser\IWebBrowserFactory.cs" />
     <Compile Include="Source\Widgets\WebBrowser\IWebBrowserImplementation.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WebBrowser.Android.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WebBrowser.Mac.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WebBrowser.Win.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WebBrowser.iOS.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WinFormsWebBrowser.cs" />
-    <Compile Include="Source\Widgets\WebBrowser\WinFormsWebBrowserFactory.cs" />
     <Compile Include="Source\Application\FPSCounter.cs" />
-    <Compile Include="Source\Application\AndroidGameWindow.cs" />
     <Compile Include="Source\Application\IWindow.cs" />
     <Compile Include="Source\Application\MouseCursor.cs" />
     <Compile Include="Source\Application\RenderingBackend.cs" />
@@ -252,6 +249,13 @@
     <Compile Include="Source\Application\WindowOptions.cs" />
     <Compile Include="Source\Application\Window.iOS.cs" />
     <Compile Include="Source\Widgets\WindowWidget.cs" />
+    <Compile Include="Source\Application\AndroidAccelerometerListener.cs" />
+    <Compile Include="Source\Application\Window.Android.cs" />
+    <Compile Include="Source\Application\Clipboard\Clipboard.Android.cs" />
+    <Compile Include="Source\Application\Clipboard\Clipboard.cs" />
+    <Compile Include="Source\Application\Clipboard\Clipboard.iOS.cs" />
+    <Compile Include="Source\Application\Clipboard\Clipboard.Mac.cs" />
+    <Compile Include="Source\Application\Clipboard\Clipboard.Win.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

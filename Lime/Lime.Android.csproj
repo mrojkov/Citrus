@@ -245,13 +245,6 @@
     <Compile Include="Source\Widgets\Model\ModelNode.cs" />
     <Compile Include="Source\Widgets\Model\ModelViewport.cs" />
     <Compile Include="Source\Application\IWindow.cs" />
-    <Compile Include="Source\RichUI\BorderedPane.cs" />
-    <Compile Include="Source\RichUI\Button.cs" />
-    <Compile Include="Source\RichUI\ColorGradient.cs" />
-    <Compile Include="Source\RichUI\Extensions.cs" />
-    <Compile Include="Source\RichUI\Label.cs" />
-    <Compile Include="Source\RichUI\RendererExtensions.cs" />
-    <Compile Include="Source\RichUI\Theme.cs" />
     <Compile Include="Source\Application\WindowOptions.cs" />
     <Compile Include="Source\Application\FPSCounter.cs" />
     <Compile Include="Source\Application\MouseCursor.cs" />

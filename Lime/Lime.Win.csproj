@@ -261,13 +261,6 @@
     <Compile Include="Source\Widgets\Layout\Layout.cs" />
     <Compile Include="Source\Widgets\Layout\Margin.cs" />
     <Compile Include="Source\Widgets\Layout\TableLayout.cs" />
-    <Compile Include="Source\RichUI\BorderedPane.cs" />
-    <Compile Include="Source\RichUI\Button.cs" />
-    <Compile Include="Source\RichUI\ColorGradient.cs" />
-    <Compile Include="Source\RichUI\Extensions.cs" />
-    <Compile Include="Source\RichUI\Label.cs" />
-    <Compile Include="Source\RichUI\RendererExtensions.cs" />
-    <Compile Include="Source\RichUI\Theme.cs" />
     <Compile Include="Source\Widgets\WindowWidget.cs" />
   </ItemGroup>
   <ItemGroup>
