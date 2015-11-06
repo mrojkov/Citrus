@@ -288,34 +288,10 @@ namespace Lime
 				(3.0f * p1 - p0 - 3.0f * p2 + p3) * t3);
 		}
 
+		[Obsolete("Use Vector2.HeadingRad(float) instead", true)]
 		public static Vector2 CosSin(float radians)
 		{
-			if (sinTable0 == null) {
-				BuildSinTable();
-			}
-			const float t = 65536 / (2 * Pi);
-			int index = (int)(radians * t) & 65535;
-			var a = sinTable0[index >> 8];
-			var b = sinTable1[index & 255];
-			Vector2 result;
-			result.X = a.X * b.X - a.Y * b.Y;
-			result.Y = a.Y * b.X + a.X * b.Y;
-			return result;
-		}
-
-		private static Vector2[] sinTable0;
-		private static Vector2[] sinTable1;
-
-		private static void BuildSinTable()
-		{
-			sinTable0 = new Vector2[256];
-			sinTable1 = new Vector2[256];
-			float t1 = 2 * Pi / 256;
-			float t2 = t1 / 256;
-			for (int i = 0; i < 256; i++) {
-				sinTable0[i] = new Vector2((float)Math.Cos(i * t1), (float)Math.Sin(i * t1));
-				sinTable1[i] = new Vector2((float)Math.Cos(i * t2), (float)Math.Sin(i * t2));
-			}
+			return Vector2.HeadingRad(radians);
 		}
 	}
 }

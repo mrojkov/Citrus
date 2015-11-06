@@ -59,7 +59,7 @@ namespace Lime
 		/// </summary>
 		public static Matrix32 Rotation(float radians)
 		{
-			var cs = Mathf.CosSin(radians);
+			var cs = Vector2.HeadingRad(radians);
 			Matrix32 m;
 			m.U.X = cs.X;
 			m.U.Y = cs.Y;
@@ -114,7 +114,7 @@ namespace Lime
 		/// <param name="rotation">Rotation (in radians).</param>
 		public static Matrix32 Transformation(Vector2 center, Vector2 scaling, float rotation, Vector2 translation)
 		{
-			var cs = Mathf.CosSin(rotation);
+			var cs = Vector2.HeadingRad(rotation);
 			Matrix32 m;
 			m.U.X = scaling.X * cs.X;
 			m.U.Y = scaling.X * cs.Y;

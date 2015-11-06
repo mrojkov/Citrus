@@ -245,16 +245,27 @@ namespace Lime
 		/// <param name="degrees">Azimuth of direction (in degrees).</param>
 		public static Vector2 HeadingDeg(float degrees)
 		{
-			return Mathf.CosSin(degrees * Mathf.DegreesToRadians);
+			return HeadingRad(degrees * Mathf.DegreesToRadians);
 		}
 
+		// TODO: After removing CosSin rename to HeadingRadFast and create HeadingRad based on Math.Cos, Math.Sin 
 		/// <summary>
 		/// Creates a new <see cref="Vector2"/> that represents specified direction.
 		/// </summary>
 		/// <param name="radians">Azimuth of direction (in radians).</param>
 		public static Vector2 HeadingRad(float radians)
 		{
-			return Mathf.CosSin(radians);
+			if (sinTable0 == null) {
+				BuildSinTable();
+			}
+			const float t = 65536 / (2 * Mathf.Pi);
+			int index = (int)(radians * t) & 65535;
+			var a = sinTable0[index >> 8];
+			var b = sinTable1[index & 255];
+			Vector2 result;
+			result.X = a.X * b.X - a.Y * b.Y;
+			result.Y = a.Y * b.X + a.X * b.Y;
+			return result;
 		}
 
 		/// <summary>
@@ -274,7 +285,7 @@ namespace Lime
 		/// <param name="radians">Azimuth of turning (in radians).</param>
 		public static Vector2 RotateRad(Vector2 value, float radians)
 		{
-			var cosSin = Mathf.CosSin(radians);
+			var cosSin = HeadingRad(radians);
 			return new Vector2
 			{
 				X = value.X * cosSin.X - value.Y * cosSin.Y,
@@ -374,6 +385,24 @@ namespace Lime
 				throw new FormatException();
 			}
 			return vector;
+		}
+
+		private static Vector2[] sinTable0;
+		private static Vector2[] sinTable1;
+
+		/// <summary>
+		/// Used for <see cref="HeadingRad(float)"/>.
+		/// </summary>
+		private static void BuildSinTable()
+		{
+			sinTable0 = new Vector2[256];
+			sinTable1 = new Vector2[256];
+			const float T1 = 2 * Mathf.Pi / 256;
+			const float T2 = T1 / 256;
+			for (int i = 0; i < 256; i++) {
+				sinTable0[i] = new Vector2(Mathf.Cos(i * T1), Mathf.Sin(i * T1));
+				sinTable1[i] = new Vector2(Mathf.Cos(i * T2), Mathf.Sin(i * T2));
+			}
 		}
 	}
 }

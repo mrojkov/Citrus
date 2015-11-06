@@ -118,8 +118,8 @@ namespace Lime
 				float len = (p2 - p1).Length;
 				float ta1 = v1.TangentAngle * Mathf.DegreesToRadians;
 				float ta2 = v2.TangentAngle * Mathf.DegreesToRadians;
-				Vector2 t1 = Mathf.CosSin(ta1);
-				Vector2 t2 = Mathf.CosSin(ta2);
+				Vector2 t1 = Vector2.HeadingRad(ta1);
+				Vector2 t2 = Vector2.HeadingRad(ta2);
 				t1 *= len * v1.TangentWeight;
 				t2 *= len * v2.TangentWeight;
 				return Mathf.HermiteSpline( t, p1, t1, p2, t2 );
