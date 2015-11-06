@@ -101,8 +101,8 @@ namespace Lime
 		{
 			return new Rectangle(
 				Mathf.Min(rhs.X, lhs.Left),
-				Mathf.Max(rhs.X, lhs.Right),
 				Mathf.Min(rhs.Y, lhs.Top),
+				Mathf.Max(rhs.X, lhs.Right),
 				Mathf.Max(rhs.Y, lhs.Bottom)
 				);
 		}
