@@ -100,9 +100,9 @@ namespace Lime
 
 		private IntRectangle CalculateAABBInWorldSpace(Widget widget)
 		{
-			var aabb = widget.CalcAABBInSpaceOf(this.widget.Context.Root);
+			var aabb = widget.CalcAABBInSpaceOf(WidgetContext.Current.Root);
 			var viewport = Renderer.Viewport;
-			var scale = new Vector2(viewport.Width, viewport.Height) / this.widget.Context.Root.Size;
+			var scale = new Vector2(viewport.Width, viewport.Height) / WidgetContext.Current.Root.Size;
 			return new IntRectangle(
 				(viewport.X + aabb.Left * scale.X).Round(),
 				(viewport.Y + aabb.Top * scale.Y).Round(),
@@ -116,7 +116,7 @@ namespace Lime
 			if (form == null) {
 				return;
 			}
-			var window = widget.Context.Window;
+			var window = WidgetContext.Current.Window;
 			var r = IntRectangle.Intersect(
 				CalculateAABBInWorldSpace(widget),
 				new IntRectangle(IntVector2.Zero, (IntVector2)window.ClientSize)

@@ -32,7 +32,7 @@ namespace Lime
 		public virtual bool IsDragging { get; protected set; }
 
 		// TODO: Use WidgetInput instead
-		private Input Input { get { return Frame.Context.Window.Input; } }
+		private Input Input { get { return WidgetContext.Current.Window.Input; } }
 
 		public float ContentLength
 		{ 

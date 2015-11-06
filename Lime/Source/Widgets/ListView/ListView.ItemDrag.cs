@@ -18,7 +18,7 @@ namespace Lime
 		private bool dragInProgress;
 
 		// TODO: Use WidgetInput instead
-		private Input Input { get { return Frame.Context.Window.Input; } }
+		private Input Input { get { return WidgetContext.Current.Window.Input; } }
 
 		private IEnumerator<object> DragItemMainTask()
 		{
@@ -53,7 +53,7 @@ namespace Lime
 			dragInProgress = true;
 			try {
 				while (item.Input.IsMousePressed() || Frame.Input.IsMousePressed()) {
-					var bounds = item.CalcAABBInSpaceOf(item.Context.Root);
+					var bounds = item.CalcAABBInSpaceOf(WidgetContext.Current.Root);
 					var i = this.IndexOf(item);
 					if (Input.MousePosition.Y < bounds.Top && i > 0) {
 						if (CanDragItemTo(item, this[i - 1])) {

@@ -11,16 +11,6 @@ namespace Lime
 {
 	public delegate void UpdateHandler(float delta);
 
-	public interface IWidgetContext
-	{
-		IKeyboardInputProcessor ActiveTextWidget { get; set; }
-		bool IsActiveTextWidgetUpdated { get; set; }
-		IWindow Window { get; }
-		Widget Root { get; }
-		float DistanceToNodeUnderCursor { get; set; }
-		Node NodeUnderCursor { get; set; }
-	}
-
 	/// <summary>
 	/// Scene tree element.
 	/// </summary>
@@ -91,9 +81,6 @@ namespace Lime
 			{
 				if (parent != value) {
 					parent = value;
-					if (parent != null) {
-						PropagateContext(parent.Context);
-					}
 					PropagateDirtyFlags();
 					OnParentChanged();
 				}
@@ -223,8 +210,6 @@ namespace Lime
 		/// </summary>
 		protected bool IsDirty(DirtyFlags mask) { return (DirtyMask & mask) != 0; }
 
-		public IWidgetContext Context { get; internal set; }
-
 		public bool HitTestTarget;
 
 		public static int CreatedCount = 0;
@@ -259,14 +244,6 @@ namespace Lime
 				if ((n.DirtyMask & mask) != mask) {
 					n.PropagateDirtyFlags(mask);
 				}
-			}
-		}
-
-		private void PropagateContext(IWidgetContext context)
-		{
-			Context = context;
-			for (var n = Nodes.FirstOrNull(); n != null; n = n.NextSibling) {
-				n.PropagateContext(context);
 			}
 		}
 

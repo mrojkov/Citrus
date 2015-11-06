@@ -5,46 +5,35 @@ namespace Lime
 	/// <summary>
 	/// Root of the widgets hierarchy.
 	/// </summary>
-	public class WindowWidget : Widget, IWidgetContext
+	public class WindowWidget : Widget
 	{
-		/// <summary>
-		/// Widget which holds text input focus. Before processing Input.TextInput string 
-		/// you should test whether ActiveTextWidget == this. For revoking text input focus from widget 
-		/// you should nullify ActiveTextWidget.
-		/// </summary>
-		public IKeyboardInputProcessor ActiveTextWidget { get; set; }
-
-		/// <summary>
-		/// On each update cycle active text widget must set this flag true.
-		/// </summary>
-		public bool IsActiveTextWidgetUpdated { get; set; }
-
-		float IWidgetContext.DistanceToNodeUnderCursor { get; set; }
-		Node IWidgetContext.NodeUnderCursor { get; set; }
-
-		private IWindow window;
-		IWindow IWidgetContext.Window { get { return window; } }
-		Widget IWidgetContext.Root { get { return this; } }
-
 #if iOS || ANDROID
 		private IKeyboardInputProcessor prevActiveTextWidget;
 #endif
+		private RenderChain renderChain = new RenderChain();
+		private IWidgetContext context;
 
 		public WindowWidget(IWindow window)
+			: this(new WidgetContext { Window = window })
 		{
-			Context = this;
-			this.window = window;
+			(context as WidgetContext).Root = this;
+		}
+
+		public WindowWidget(IWidgetContext context)
+		{
+			this.context = context;
 		}
 
 		public override void Update(float delta)
 		{
+			var savedContext = WidgetContext.MakeCurrent(context);
 			WidgetInput.RemoveInvalidatedCaptures();
 			ParticleEmitter.NumberOfUpdatedParticles = 0;
-			Context.IsActiveTextWidgetUpdated = false;
-			Context.DistanceToNodeUnderCursor = float.MaxValue;
+			context.IsActiveTextWidgetUpdated = false;
+			context.DistanceToNodeUnderCursor = float.MaxValue;
 			base.Update(delta);
-			if (!Context.IsActiveTextWidgetUpdated) {
-				Context.ActiveTextWidget = null;
+			if (!context.IsActiveTextWidgetUpdated) {
+				context.ActiveTextWidget = null;
 			}
 #if iOS || ANDROID
 			if (Application.IsMainThread) {
@@ -65,6 +54,17 @@ namespace Lime
 				prevActiveTextWidget = Context.ActiveTextWidget;
 			}
 #endif
+			WidgetContext.MakeCurrent(savedContext);
+		}
+
+		public override void Render()
+		{
+			var savedContext = WidgetContext.MakeCurrent(context);
+			foreach (var node in Nodes) {
+				node.AddToRenderChain(renderChain);
+			}
+			renderChain.RenderAndClear();
+			WidgetContext.MakeCurrent(savedContext);
 		}
 	}
 }

@@ -21,7 +21,7 @@ namespace Lime
 
 		private Input WindowInput
 		{
-			get { return widget.Context.Window.Input; }
+			get { return WidgetContext.Current.Window.Input; }
 		}
 
 		private Widget widget;
@@ -260,7 +260,7 @@ namespace Lime
 
 		private static bool IsVisibleWidget(Widget widget)
 		{
-			return widget.Context != null && widget.Context.Root == widget.GetRoot() && widget.GloballyVisible;
+			return WidgetContext.Current.Root == widget.GetRoot() && widget.GloballyVisible;
 		}
 	}
 }

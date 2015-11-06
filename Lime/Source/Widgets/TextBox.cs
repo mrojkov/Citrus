@@ -82,15 +82,15 @@ namespace Lime
 		{
 			lastCharTimer -= delta;
 			if (!Enabled) {
-				if (Context.ActiveTextWidget == this) {
-					Context.ActiveTextWidget = null;
+				if (WidgetContext.Current.ActiveTextWidget == this) {
+					WidgetContext.Current.ActiveTextWidget = null;
 				}
 			} else {
-				if (Context.ActiveTextWidget == null && Autofocus) {
-					Context.ActiveTextWidget = this;
+				if (WidgetContext.Current.ActiveTextWidget == null && Autofocus) {
+					WidgetContext.Current.ActiveTextWidget = this;
 				}
 				if (Input.WasMouseReleased() && IsMouseOver()) {
-					Context.ActiveTextWidget = this;
+					WidgetContext.Current.ActiveTextWidget = this;
 				}
 			}
 		}
@@ -98,11 +98,11 @@ namespace Lime
 		protected override void SelfLateUpdate(float delta)
 		{
 			if (Enabled) {
-				if (Context.ActiveTextWidget == this && Input.TextInput != null) {
+				if (WidgetContext.Current.ActiveTextWidget == this && Input.TextInput != null) {
 					ProcessInput();
 				}
-				if (Context.ActiveTextWidget == this) {
-					Context.IsActiveTextWidgetUpdated = true;
+				if (WidgetContext.Current.ActiveTextWidget == this) {
+					WidgetContext.Current.IsActiveTextWidgetUpdated = true;
 				}
 				caretBlinkPhase += delta;
 			}
@@ -143,7 +143,7 @@ namespace Lime
 					text += '*';
 				}
 			}
-			if (Context.ActiveTextWidget == this) {
+			if (WidgetContext.Current.ActiveTextWidget == this) {
 				text += CaretChar;
 			}
 			int start = 0;
@@ -154,7 +154,7 @@ namespace Lime
 				length--;
 				extent = Renderer.MeasureTextLine(Font.Instance, text, FontHeight, start, length);
 			}
-			if (Context.ActiveTextWidget == this) {
+			if (WidgetContext.Current.ActiveTextWidget == this) {
 				if (caretBlinkPhase % CaretBlinkPeriod < CaretBlinkPeriod / 2 && length > 0) {
 					length--;
 				}

@@ -145,7 +145,7 @@ namespace Lime
 		public void Unlink()
 		{
 			if (IsFocused()) {
-				Container.Context.ActiveTextWidget = null;
+				WidgetContext.Current.ActiveTextWidget = null;
 				caretPos.IsVisible = false;
 			}
 			Container.Tasks.StopByTag(this);
@@ -153,11 +153,11 @@ namespace Lime
 
 		public void Focus()
 		{
-			Container.Context.ActiveTextWidget = textInputProcessor;
-			Container.Context.IsActiveTextWidgetUpdated = true;
+			WidgetContext.Current.ActiveTextWidget = textInputProcessor;
+			WidgetContext.Current.IsActiveTextWidgetUpdated = true;
 		}
 
-		public bool IsFocused() { return Container.Context.ActiveTextWidget == textInputProcessor; }
+		public bool IsFocused() { return WidgetContext.Current.ActiveTextWidget == textInputProcessor; }
 
 		private float cursorKeyDownTime;
 		private Key prevKeyPressed = 0;
@@ -266,7 +266,7 @@ namespace Lime
 				if (IsFocused()) {
 					cursorKeyDownTime -= Container.Tasks.Delta;
 					keyPressed = 0;
-					Container.Context.IsActiveTextWidgetUpdated = true;
+					WidgetContext.Current.IsActiveTextWidgetUpdated = true;
 					HandleCursorKeys();
 					HandleTextInput();
 					if (wasClicked) {

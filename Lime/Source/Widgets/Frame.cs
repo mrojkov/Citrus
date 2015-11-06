@@ -166,7 +166,7 @@ namespace Lime
 
 		private WindowRect CalculateScissorRectangle(Widget widget)
 		{
-			var aabb = widget.CalcAABBInSpaceOf(Context.Root);
+			var aabb = widget.CalcAABBInSpaceOf(WidgetContext.Current.Root);
 			// Get the projected AABB coordinates in the normalized OpenGL space
 			Matrix44 proj = Renderer.Projection;
 			aabb.A = proj.TransformVector(aabb.A);

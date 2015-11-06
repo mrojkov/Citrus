@@ -139,6 +139,7 @@
     <Compile Include="Source\Widgets\WebBrowser\IWebBrowserImplementation.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WebBrowser.Win.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WinFormsWebBrowser.cs" />
+    <Compile Include="Source\Widgets\WidgetContext.cs" />
     <Compile Include="Source\Widgets\WidgetInput.cs" />
     <Compile Include="Source\Input\Key.cs" />
     <Compile Include="Source\RewindableStream.cs" />
