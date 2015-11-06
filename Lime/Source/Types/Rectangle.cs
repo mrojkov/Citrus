@@ -66,7 +66,47 @@ namespace Lime
 		{
 			return !lhs.Equals(rhs);
 		}
-		
+
+		/// <summary>
+		/// Creates a new <see cref="Rectangle"/> that contains 
+		/// overlapping region of two other rectangles.
+		/// </summary>
+		public static Rectangle operator *(Rectangle lhs, Rectangle rhs)
+		{
+			var x0 = Math.Max(lhs.A.X, rhs.A.X);
+			var x1 = Math.Min(lhs.B.X, rhs.B.X);
+			var y0 = Math.Max(lhs.A.Y, rhs.A.Y);
+			var y1 = Math.Min(lhs.B.Y, rhs.B.Y);
+			return x1 >= x0 && y1 >= y0 ? new Rectangle(x0, y0, x1, y1) : Empty;
+		}
+
+		/// <summary>
+		/// Creates a new <see cref="Rectangle"/> that covers both of two other rectangles.
+		/// </summary>
+		public static Rectangle operator +(Rectangle lhs, Rectangle rhs)
+		{
+			return new Rectangle(
+				Mathf.Min(lhs.Left, rhs.Left),
+				Mathf.Min(lhs.Top, rhs.Top),
+				Mathf.Max(lhs.Right, rhs.Right),
+				Mathf.Max(lhs.Bottom, rhs.Bottom)
+				);
+		}
+
+		/// <summary>
+		/// Creates a new <see cref="Rectangle"/> that includes
+		/// the specified <see cref="Vector2"/>.
+		/// </summary>
+		public static Rectangle operator +(Rectangle lhs, Vector2 rhs)
+		{
+			return new Rectangle(
+				Mathf.Min(rhs.X, lhs.Left),
+				Mathf.Max(rhs.X, lhs.Right),
+				Mathf.Min(rhs.Y, lhs.Top),
+				Mathf.Max(rhs.Y, lhs.Bottom)
+				);
+		}
+
 		public float Width
 		{
 			get { return B.X - A.X; }
@@ -136,10 +176,7 @@ namespace Lime
 			get { return B - A; }
 		}
 
-		/// <summary>
-		/// Creates a new <see cref="Rectangle"/> that contains 
-		/// overlapping region of two other rectangles.
-		/// </summary>
+		[Obsolete("Use * operation instead", true)]
 		public static Rectangle Intersect(Rectangle value1, Rectangle value2)
 		{
 			var x0 = Math.Max(value1.A.X, value2.A.X);
@@ -149,9 +186,7 @@ namespace Lime
 			return x1 >= x0 && y1 >= y0 ? new Rectangle(x0, y0, x1, y1) : Empty;
 		}
 
-		/// <summary>
-		/// Creates a new <see cref="Rectangle"/> that covers both of two other rectangles.
-		/// </summary>
+		[Obsolete("Use + operation instead", true)]
 		public static Rectangle Bounds(Rectangle value1, Rectangle value2)
 		{
 			return new Rectangle(
@@ -162,10 +197,7 @@ namespace Lime
 			);
 		}
 
-		/// <summary>
-		/// Changes bounds of this <see cref="Rectangle"/> so it includes
-		/// the specified <see cref="Vector2"/>.
-		/// </summary>
+		[Obsolete("Use + operation instead", true)]
 		public void IncludePoint(Vector2 value)
 		{
 			Left = Mathf.Min(value.X, Left);
