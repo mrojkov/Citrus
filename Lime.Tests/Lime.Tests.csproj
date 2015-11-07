@@ -47,6 +47,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constraints\AfterConstraint.cs" />
+    <Compile Include="Constraints\BeforeConstraint.cs" />
+    <Compile Include="Constraints\OrderConstraint.cs" />
+    <Compile Include="Constraints\OrderConstraintResult.cs" />
     <Compile Include="Is.cs" />
     <Compile Include="Source\ExceptionTests.cs" />
     <Compile Include="Constraints\Vector2EqualConstraint.cs" />
@@ -65,6 +69,7 @@
     <Compile Include="Source\Types\SizeTests.cs" />
     <Compile Include="Source\Types\Vector2Tests.cs" />
     <Compile Include="Source\Types\Vector3Tests.cs" />
+    <Compile Include="Source\Widgets\NodeTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Win.csproj">
