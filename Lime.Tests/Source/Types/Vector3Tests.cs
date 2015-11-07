@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Globalization;
+using NUnit.Framework;
 
 namespace Lime.Tests.Source.Types
 {
@@ -69,9 +70,9 @@ namespace Lime.Tests.Source.Types
 		[Test]
 		public void ToStringTest()
 		{
-			Assert.That(Vector3.Zero.ToString(), Is.EqualTo("0, 0, 0"));
-			Assert.That(Vector3.Half.ToString(), Is.EqualTo("0,5, 0,5, 0,5"));
-			Assert.That(Vector3.One.ToString(), Is.EqualTo("1, 1, 1"));
+			Assert.That(Vector3.Zero.ToString(CultureInfo.InvariantCulture), Is.EqualTo("0, 0, 0"));
+			Assert.That(Vector3.Half.ToString(CultureInfo.InvariantCulture), Is.EqualTo("0.5, 0.5, 0.5"));
+			Assert.That(Vector3.One.ToString(CultureInfo.InvariantCulture), Is.EqualTo("1, 1, 1"));
 		}
 	}
 }
