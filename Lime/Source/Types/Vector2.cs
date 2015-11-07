@@ -347,6 +347,15 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// Returns the <see cref="string"/> representation of this <see cref="Vector2"/> 
+		/// in the format: "X, Y".
+		/// </summary>
+		public string ToString(IFormatProvider format)
+		{
+			return string.Format(format, "{0}, {1}", X, Y);
+		}
+
+		/// <summary>
 		/// Converts the string representation of the vector to its <see cref="Vector2"/> equivalent.
 		/// The return value indicates whether the conversion succeeded.
 		/// </summary>
