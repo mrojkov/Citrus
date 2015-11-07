@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.Tests", "Lime.Tests.csproj", "{49498887-2E5D-4C89-A4C2-F989C53C61FA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.Win", "..\Lime\Lime.Win.csproj", "{FC2DE6C9-641A-4230-8D29-EA4035CD8708}"
