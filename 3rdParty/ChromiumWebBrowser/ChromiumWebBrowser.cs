@@ -14,6 +14,8 @@ namespace ChromiumWebBrowser
 		private CefEventFlags modifiers = CefEventFlags.None;
 		private Widget widget;
 
+		Input Input { get { return WidgetContext.Current.Window.Input; } }
+
 		public Uri Url
 		{
 			get { return new Uri(browserLogic.Address); }
@@ -22,10 +24,9 @@ namespace ChromiumWebBrowser
 
 		public void Update(float delta)
 		{
-			var input = widget.Context.Window.Input;
-			UpdateModifiers(input);
-			HandleMouse(input, widget);
-			HandleKeyboard(input);
+			UpdateModifiers();
+			HandleMouse(widget);
+			HandleKeyboard();
 		}
 
 		public ChromiumWebBrowser(Widget widget)
@@ -80,9 +81,9 @@ namespace ChromiumWebBrowser
 			}
 		}
 
-		private void HandleMouse(Input input, Widget widget)
+		private void HandleMouse(Widget widget)
 		{
-			var position = input.MousePosition - widget.GlobalPosition;
+			var position = Input.MousePosition - widget.GlobalPosition;
 			var x = (int)position.X;
 			var y = (int)position.Y;
 			if (widget.IsMouseOver()) {
@@ -91,50 +92,51 @@ namespace ChromiumWebBrowser
 			else {
 				browserLogic.SendMouseMove(-1, -1, true, modifiers);
 			}
-			HandleLeftMouseButton(input, x, y);
-			HandleRightMouseButton(input, x, y);
-			HandleMouseWheel(input, x, y);
+			HandleLeftMouseButton(x, y);
+			HandleRightMouseButton(x, y);
+			HandleMouseWheel(x, y);
 		}
 
-		private void HandleLeftMouseButton(Input input, int x, int y)
+		private void HandleLeftMouseButton(int x, int y)
 		{
-			HandleMouseButton(input, x, y, 0, 0);
+			HandleMouseButton(x, y, 0, 0);
 		}
 
-		private void HandleRightMouseButton(Input input, int x, int y)
+		private void HandleRightMouseButton(int x, int y)
 		{
-			HandleMouseButton(input, x, y, 1, 2);
+			HandleMouseButton(x, y, 1, 2);
 		}
 
-		private void HandleMouseWheel(Input input, int x, int y)
+		private void HandleMouseWheel(int x, int y)
 		{
-			HandleMouseButton(input, x, y, 2, 1);
-			if (input.WasKeyPressed(Key.MouseWheelUp)) {
+			HandleMouseButton(x, y, 2, 1);
+			if (Input.WasKeyPressed(Key.MouseWheelUp)) {
 				browserLogic.SendMouseWheelEvent(x, y, 0, mouseWheelSpeed);
 			}
-			if (input.WasKeyPressed(Key.MouseWheelDown)) {
+			if (Input.WasKeyPressed(Key.MouseWheelDown)) {
 				browserLogic.SendMouseWheelEvent(x, y, 0, -mouseWheelSpeed);
 			}
 		}
 
-		private void HandleMouseButton(Input input, int x, int y, int limeButton, int chromiumButon)
+		private void HandleMouseButton(int x, int y, int limeButton, int chromiumButon)
 		{
-			if (input.WasMousePressed(limeButton)) {
+			if (Input.WasMousePressed(limeButton)) {
 				browserLogic.SendMouseClick(x, y, chromiumButon, false, modifiers);
 			}
-			if (input.WasMouseReleased(limeButton)) {
+			if (Input.WasMouseReleased(limeButton)) {
 				browserLogic.SendMouseClick(x, y, chromiumButon, true, modifiers);
 			}
 		}
 
-		private void HandleKeyboard(Input input)
+		private void HandleKeyboard()
 		{
-			HandleKeys(input);
-			HandleTextInput(input);
+			HandleKeys();
+			HandleTextInput();
 		}
 
-		private void HandleKeys(Input input)
+		private void HandleKeys()
 		{
+			var input = WidgetContext.Current.Window.Input;
 			var keys = Enum.GetValues(typeof(Key))
 				.Cast<int>()
 				.Distinct()
@@ -157,59 +159,59 @@ namespace ChromiumWebBrowser
 			}
 		}
 
-		private void HandleTextInput(Input input)
+		private void HandleTextInput()
 		{
-			if (input.TextInput == null) {
+			if (Input.TextInput == null) {
 				return;
 			}
-			foreach (var character in input.TextInput) {
+			foreach (var character in Input.TextInput) {
 				browserLogic.SendKeyPress((int)CefMessage.Char, character, modifiers);
 			}
 		}
 
-		private void UpdateModifiers(Input input)
+		private void UpdateModifiers()
 		{
 			modifiers = 0;
 
-			if (input.IsMousePressed(0))
+			if (Input.IsMousePressed(0))
 			{
 				modifiers |= CefEventFlags.LeftMouseButton;
 			}
-			if (input.IsMousePressed(2))
+			if (Input.IsMousePressed(2))
 			{
 				modifiers |= CefEventFlags.MiddleMouseButton;
 			}
-			if (input.IsMousePressed(1))
+			if (Input.IsMousePressed(1))
 			{
 				modifiers |= CefEventFlags.RightMouseButton;
 			}
 
-			if (input.IsKeyPressed(Key.LControl))
+			if (Input.IsKeyPressed(Key.LControl))
 			{
 				modifiers |= CefEventFlags.ControlDown | CefEventFlags.IsLeft;
 			}
 
-			if (input.IsKeyPressed(Key.RControl))
+			if (Input.IsKeyPressed(Key.RControl))
 			{
 				modifiers |= CefEventFlags.ControlDown | CefEventFlags.IsRight;
 			}
 
-			if (input.IsKeyPressed(Key.LShift))
+			if (Input.IsKeyPressed(Key.LShift))
 			{
 				modifiers |= CefEventFlags.ShiftDown | CefEventFlags.IsLeft;
 			}
 
-			if (input.IsKeyPressed(Key.RShift))
+			if (Input.IsKeyPressed(Key.RShift))
 			{
 				modifiers |= CefEventFlags.ShiftDown | CefEventFlags.IsRight;
 			}
 
-			if (input.IsKeyPressed(Key.LAlt))
+			if (Input.IsKeyPressed(Key.LAlt))
 			{
 				modifiers |= CefEventFlags.AltDown | CefEventFlags.IsLeft;
 			}
 
-			if (input.IsKeyPressed(Key.RAlt))
+			if (Input.IsKeyPressed(Key.RAlt))
 			{
 				modifiers |= CefEventFlags.AltDown | CefEventFlags.IsRight;
 			}
