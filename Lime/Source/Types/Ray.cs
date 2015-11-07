@@ -64,7 +64,7 @@ namespace Lime
 		{
 			// Find the vector between where the ray starts the the sphere's centre
 			var difference = sphere.Center - Position;
-			float differenceLengthSquared = difference.SquaredLength;
+			float differenceLengthSquared = difference.SqrLength;
 			float sphereRadiusSquared = sphere.Radius * sphere.Radius;
 
 			// If the distance between the ray start and the sphere's centre is less than

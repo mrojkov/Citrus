@@ -196,7 +196,13 @@ namespace Lime
 			get { return (float)Math.Sqrt(X * X + Y * Y + Z * Z); }
 		}
 		
+		[Obsolete("Use SqrLength instead", true)]
 		public float SquaredLength
+		{
+			get { return SqrLength; }
+		}
+
+		public float SqrLength
 		{
 			get { return X * X + Y * Y + Z * Z; }
 		}

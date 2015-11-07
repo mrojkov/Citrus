@@ -61,9 +61,9 @@ namespace Lime.Tests.Source.Types
 			Assert.That(Vector3.Zero.Length, Is.EqualTo(0));
 			Assert.That(Vector3.Half.Length, Is.EqualTo(Mathf.Sqrt(0.75f)));
 			Assert.That(Vector3.One.Length, Is.EqualTo(Mathf.Sqrt(3)));
-			Assert.That(Vector3.Zero.SquaredLength, Is.EqualTo(0)); // TODO: Adjust names -> SqrLength
-			Assert.That(Vector3.Half.SquaredLength, Is.EqualTo(0.75f));
-			Assert.That(Vector3.One.SquaredLength, Is.EqualTo(3));
+			Assert.That(Vector3.Zero.SqrLength, Is.EqualTo(0));
+			Assert.That(Vector3.Half.SqrLength, Is.EqualTo(0.75f));
+			Assert.That(Vector3.One.SqrLength, Is.EqualTo(3));
 		}
 
 		// TODO: No Parse?
