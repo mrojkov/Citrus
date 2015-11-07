@@ -209,5 +209,14 @@ namespace Lime
 		{
 			return string.Format("{0}, {1}, {2}", X, Y, Z);
 		}
+
+		/// <summary>
+		/// Returns the <see cref="string"/> representation of this <see cref="Vector3"/> in the format:
+		/// "X, Y, Z".
+		/// </summary>
+		public string ToString(IFormatProvider format)
+		{
+			return string.Format(format, "{0}, {1}, {2}", X, Y, Z);
+		}
 	}
 }
