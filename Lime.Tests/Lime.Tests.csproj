@@ -34,7 +34,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+    <Reference Include="nunit.framework, Version=3.0.5783.22231, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>NUnit binaries\nunit.framework.dll</HintPath>
     </Reference>
@@ -48,11 +48,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Is.cs" />
     <Compile Include="Source\ExceptionTests.cs" />
-    <Compile Include="Constraints\Vector2\Is.cs" />
-    <Compile Include="Constraints\Vector2\EqualConstraint.cs" />
-    <Compile Include="Constraints\Vector2\Tolerance.cs" />
-    <Compile Include="Is.Delegate.cs" />
+    <Compile Include="Constraints\Vector2EqualConstraint.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Source\Types\BitSet32Tests.cs" />
     <Compile Include="Source\Types\BoundingSphereTests.cs" />

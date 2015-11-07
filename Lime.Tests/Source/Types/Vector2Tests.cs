@@ -86,38 +86,38 @@ namespace Lime.Tests.Source.Types
 			Assert.That(Vector2.CrossProduct(Vector2.Half, Vector2.Half), Is.EqualTo(0));
 		}
 
-		const float VeryLowPreciseTolerance = 0.0001f;
+		private const float VeryLowPreciseTolerance = 0.0001f;
 
 		[Test]
 		public void HeadingDegTest()
 		{
-			Assert.That(Vector2.HeadingDeg(0), Is.EqualTo(Vector2.Right).Within(new Vector2(VeryLowPreciseTolerance)));
-			Assert.That(Vector2.HeadingDeg(180), Is.EqualTo(Vector2.Left).Within(new Vector2(VeryLowPreciseTolerance)));
-			Assert.That(Vector2.HeadingDeg(90), Is.EqualTo(Vector2.Down).Within(new Vector2(VeryLowPreciseTolerance)));
+			Assert.That(Vector2.HeadingDeg(0), Is.EqualTo(Vector2.Right).Within(VeryLowPreciseTolerance));
+			Assert.That(Vector2.HeadingDeg(180), Is.EqualTo(Vector2.Left).Within(VeryLowPreciseTolerance));
+			Assert.That(Vector2.HeadingDeg(90), Is.EqualTo(Vector2.Down).Within(VeryLowPreciseTolerance));
 		}
 
 		[Test]
 		public void HeadingRadTest()
 		{
-			Assert.That(Vector2.HeadingRad(0), Is.EqualTo(Vector2.Right).Within(new Vector2(VeryLowPreciseTolerance)));
-			Assert.That(Vector2.HeadingRad(Mathf.Pi), Is.EqualTo(Vector2.Left).Within(new Vector2(VeryLowPreciseTolerance)));
-			Assert.That(Vector2.HeadingRad(Mathf.HalfPi), Is.EqualTo(Vector2.Down).Within(new Vector2(VeryLowPreciseTolerance)));
+			Assert.That(Vector2.HeadingRad(0), Is.EqualTo(Vector2.Right).Within(VeryLowPreciseTolerance));
+			Assert.That(Vector2.HeadingRad(Mathf.Pi), Is.EqualTo(Vector2.Left).Within(VeryLowPreciseTolerance));
+			Assert.That(Vector2.HeadingRad(Mathf.HalfPi), Is.EqualTo(Vector2.Down).Within(VeryLowPreciseTolerance));
 		}
 
 		[Test]
 		public void RotateDegTest()
 		{
-			Assert.That(Vector2.RotateDeg(Vector2.Right, 0), Is.EqualTo(Vector2.Right).Within(new Vector2(VeryLowPreciseTolerance)));
-			Assert.That(Vector2.RotateDeg(Vector2.Right, 180), Is.EqualTo(Vector2.Left).Within(new Vector2(VeryLowPreciseTolerance)));
-			Assert.That(Vector2.RotateDeg(Vector2.Right, 90), Is.EqualTo(Vector2.Down).Within(new Vector2(VeryLowPreciseTolerance)));
+			Assert.That(Vector2.RotateDeg(Vector2.Right, 0), Is.EqualTo(Vector2.Right).Within(VeryLowPreciseTolerance));
+			Assert.That(Vector2.RotateDeg(Vector2.Right, 180), Is.EqualTo(Vector2.Left).Within(VeryLowPreciseTolerance));
+			Assert.That(Vector2.RotateDeg(Vector2.Right, 90), Is.EqualTo(Vector2.Down).Within(VeryLowPreciseTolerance));
 		}
 
 		[Test]
 		public void RotateRadTest()
 		{
-			Assert.That(Vector2.RotateRad(Vector2.Right, 0), Is.EqualTo(Vector2.Right).Within(new Vector2(VeryLowPreciseTolerance)));
-			Assert.That(Vector2.RotateRad(Vector2.Right, Mathf.Pi), Is.EqualTo(Vector2.Left).Within(new Vector2(VeryLowPreciseTolerance)));
-			Assert.That(Vector2.RotateRad(Vector2.Right, Mathf.HalfPi), Is.EqualTo(Vector2.Down).Within(new Vector2(VeryLowPreciseTolerance)));
+			Assert.That(Vector2.RotateRad(Vector2.Right, 0), Is.EqualTo(Vector2.Right).Within(VeryLowPreciseTolerance));
+			Assert.That(Vector2.RotateRad(Vector2.Right, Mathf.Pi), Is.EqualTo(Vector2.Left).Within(VeryLowPreciseTolerance));
+			Assert.That(Vector2.RotateRad(Vector2.Right, Mathf.HalfPi), Is.EqualTo(Vector2.Down).Within(VeryLowPreciseTolerance));
 		}
 
 		[Test]
@@ -161,7 +161,7 @@ namespace Lime.Tests.Source.Types
 		public void ToStringTest()
 		{
 			Assert.That(Vector2.Zero.ToString(), Is.EqualTo("0, 0"));
-			Assert.That(Vector2.Half.ToString(), Is.EqualTo("0,5, 0,5"));
+			Assert.That(Vector2.Half.ToString(), Is.EqualTo("0.5, 0.5"));
 			Assert.That(Vector2.One.ToString(), Is.EqualTo("1, 1"));
 		}
 

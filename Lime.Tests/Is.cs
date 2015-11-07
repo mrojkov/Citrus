@@ -1,6 +1,6 @@
 namespace Lime.Tests
 {
-	internal static partial class Is
+	internal class Is: NUnit.Framework.Is
 	{
 		public static Vector2EqualConstraint EqualTo(Vector2 vector)
 		{
