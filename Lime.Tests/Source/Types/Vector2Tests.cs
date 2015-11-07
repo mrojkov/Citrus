@@ -87,38 +87,41 @@ namespace Lime.Tests.Source.Types
 			Assert.That(Vector2.CrossProduct(Vector2.Half, Vector2.Half), Is.EqualTo(0));
 		}
 
-		private const float VeryLowPreciseTolerance = 0.0001f;
+		private NUnit.Framework.Constraints.EqualConstraint IsApproximately(Vector2 expected)
+		{
+			return Is.EqualTo(expected).Within(0.0001f);
+		}
 
 		[Test]
 		public void HeadingDegTest()
 		{
-			Assert.That(Vector2.HeadingDeg(0), Is.EqualTo(Vector2.Right).Within(VeryLowPreciseTolerance));
-			Assert.That(Vector2.HeadingDeg(180), Is.EqualTo(Vector2.Left).Within(VeryLowPreciseTolerance));
-			Assert.That(Vector2.HeadingDeg(90), Is.EqualTo(Vector2.Down).Within(VeryLowPreciseTolerance));
+			Assert.That(Vector2.HeadingDeg(0), IsApproximately(Vector2.Right));
+			Assert.That(Vector2.HeadingDeg(180), IsApproximately(Vector2.Left));
+			Assert.That(Vector2.HeadingDeg(90), IsApproximately(Vector2.Down));
 		}
 
 		[Test]
 		public void HeadingRadTest()
 		{
-			Assert.That(Vector2.HeadingRad(0), Is.EqualTo(Vector2.Right).Within(VeryLowPreciseTolerance));
-			Assert.That(Vector2.HeadingRad(Mathf.Pi), Is.EqualTo(Vector2.Left).Within(VeryLowPreciseTolerance));
-			Assert.That(Vector2.HeadingRad(Mathf.HalfPi), Is.EqualTo(Vector2.Down).Within(VeryLowPreciseTolerance));
+			Assert.That(Vector2.HeadingRad(0), IsApproximately(Vector2.Right));
+			Assert.That(Vector2.HeadingRad(Mathf.Pi), IsApproximately(Vector2.Left));
+			Assert.That(Vector2.HeadingRad(Mathf.HalfPi), IsApproximately(Vector2.Down));
 		}
 
 		[Test]
 		public void RotateDegTest()
 		{
-			Assert.That(Vector2.RotateDeg(Vector2.Right, 0), Is.EqualTo(Vector2.Right).Within(VeryLowPreciseTolerance));
-			Assert.That(Vector2.RotateDeg(Vector2.Right, 180), Is.EqualTo(Vector2.Left).Within(VeryLowPreciseTolerance));
-			Assert.That(Vector2.RotateDeg(Vector2.Right, 90), Is.EqualTo(Vector2.Down).Within(VeryLowPreciseTolerance));
+			Assert.That(Vector2.RotateDeg(Vector2.Right, 0), IsApproximately(Vector2.Right));
+			Assert.That(Vector2.RotateDeg(Vector2.Right, 180), IsApproximately(Vector2.Left));
+			Assert.That(Vector2.RotateDeg(Vector2.Right, 90), IsApproximately(Vector2.Down));
 		}
 
 		[Test]
 		public void RotateRadTest()
 		{
-			Assert.That(Vector2.RotateRad(Vector2.Right, 0), Is.EqualTo(Vector2.Right).Within(VeryLowPreciseTolerance));
-			Assert.That(Vector2.RotateRad(Vector2.Right, Mathf.Pi), Is.EqualTo(Vector2.Left).Within(VeryLowPreciseTolerance));
-			Assert.That(Vector2.RotateRad(Vector2.Right, Mathf.HalfPi), Is.EqualTo(Vector2.Down).Within(VeryLowPreciseTolerance));
+			Assert.That(Vector2.RotateRad(Vector2.Right, 0), IsApproximately(Vector2.Right));
+			Assert.That(Vector2.RotateRad(Vector2.Right, Mathf.Pi), IsApproximately(Vector2.Left));
+			Assert.That(Vector2.RotateRad(Vector2.Right, Mathf.HalfPi), IsApproximately(Vector2.Down));
 		}
 
 		[Test]
