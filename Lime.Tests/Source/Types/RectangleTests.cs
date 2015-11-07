@@ -80,10 +80,10 @@ namespace Lime.Tests.Source.Types
 		[Test]
 		public void IntersectTest()
 		{
-			var intersection = new Rectangle(0, 0, 2, 2) * new Rectangle(1, 1, 3, 3);
+			var intersection = Rectangle.Intersect(new Rectangle(0, 0, 2, 2), new Rectangle(1, 1, 3, 3));
 			var expectedIntersection = new Rectangle(1, 1, 2, 2);
 			Assert.That(intersection, Is.EqualTo(expectedIntersection));
-			intersection = new Rectangle(0, 0, 3, 3) * new Rectangle(1, 1, 2, 2);
+			intersection = Rectangle.Intersect(new Rectangle(0, 0, 3, 3), new Rectangle(1, 1, 2, 2));
 			expectedIntersection = new Rectangle(1, 1, 2, 2);
 			Assert.That(intersection, Is.EqualTo(expectedIntersection));
 		}
@@ -91,10 +91,10 @@ namespace Lime.Tests.Source.Types
 		[Test]
 		public void BoundsTest()
 		{
-			var bounds = new Rectangle(0, 0, 2, 2) + new Rectangle(1, 1, 3, 3);
+			var bounds = Rectangle.Bounds(new Rectangle(0, 0, 2, 2), new Rectangle(1, 1, 3, 3));
 			var expectedBounds = new Rectangle(0, 0, 3, 3);
 			Assert.That(bounds, Is.EqualTo(expectedBounds));
-			bounds = new Rectangle(0, 0, 3, 3) + new Rectangle(1, 1, 2, 2);
+			bounds = Rectangle.Bounds(new Rectangle(0, 0, 3, 3), new Rectangle(1, 1, 2, 2));
 			expectedBounds = new Rectangle(0, 0, 3, 3);
 			Assert.That(bounds, Is.EqualTo(expectedBounds));
 		}
@@ -102,10 +102,10 @@ namespace Lime.Tests.Source.Types
 		[Test]
 		public void IncludePointTest()
 		{
-			var rectangle = new Rectangle(0, 0, 1, 1) + new Vector2(2, 2);
+			var rectangle = new Rectangle(0, 0, 1, 1).IncludingPoint(new Vector2(2, 2));
 			var expextedRectangle = new Rectangle(0, 0, 2, 2);
 			Assert.That(rectangle, Is.EqualTo(expextedRectangle));
-			rectangle = new Rectangle(0, 0, 2, 2) + new Vector2(1, 1);
+			rectangle = new Rectangle(0, 0, 2, 2).IncludingPoint(new Vector2(1, 1));
 			expextedRectangle = new Rectangle(0, 0, 2, 2);
 			Assert.That(rectangle, Is.EqualTo(expextedRectangle));
 		}
