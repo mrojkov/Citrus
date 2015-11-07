@@ -149,5 +149,9 @@ namespace Lime
 #if iOS
 		GameController UIViewController { get; }
 #endif
+		/// <summary>
+		/// Sets the context, which is used for each window callback.
+		/// </summary>
+		IContext Context { set; }
     }
 }

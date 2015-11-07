@@ -34,22 +34,13 @@ namespace Lime
 		}
 	}
 
-	public class Window : IWindow
+	public class Window : CommonWindow, IWindow
 	{
 		private OpenTK.GLControl glControl;
 		private Form form;
 		private Timer timer;
 		private Stopwatch stopwatch;
 		private bool active;
-
-		public event Action Activated;
-		public event Action Deactivated;
-		public event Func<bool> Closing;
-		public event Action Closed;
-		public event Action Moved;
-		public event Action Resized;
-		public event Action<float> Updating;
-		public event Action Rendering;
 
 		public Input Input { get; private set; }
 		public bool Active { get { return active; } }
@@ -227,9 +218,7 @@ namespace Lime
 
 		private void OnClosed(object sender, FormClosedEventArgs e)
 		{
-			if (Closed != null) {
-				Closed();
-			}
+			RaiseClosed();
 			if (this == Application.MainWindow) {
 				System.Windows.Forms.Application.Exit();
 			}
@@ -237,24 +226,18 @@ namespace Lime
 
 		private void OnClosing(object sender, FormClosingEventArgs e)
 		{
-			if (Closing != null) {
-				e.Cancel = !Closing();
-			}
+			e.Cancel = !RaiseClosing();
 		}
 
 		private void OnMove(object sender, EventArgs e)
 		{
-			if (Moved != null) {
-				Moved();
-			}
+			RaiseMoved();
 		}
 
 		private void OnActivated(object sender, EventArgs e)
 		{
 			active = true;
-			if (Activated != null) {
-				Activated();
-			}
+			RaiseActivated();
 			timer.Start();
 		}
 
@@ -262,16 +245,12 @@ namespace Lime
 		{
 			timer.Stop();
 			active = false;
-			if (Deactivated != null) {
-				Deactivated();
-			}
+			RaiseDeactivated();
 		}
 
 		private void OnResize(object sender, EventArgs e)
 		{
-			if (Resized != null) {
-				Resized();
-			}
+			RaiseResized();
 		}
 
 		private void OnMouseDown(object sender, MouseEventArgs e)
@@ -280,9 +259,9 @@ namespace Lime
 				Input.SetKeyState(Key.Mouse0, true);
 				Input.SetKeyState(Key.Touch0, true);
 			} else if (e.Button == MouseButtons.Right) {
-				Input.SetKeyState(Key.Mouse2, true);
-			} else if (e.Button == MouseButtons.Middle) {
 				Input.SetKeyState(Key.Mouse1, true);
+			} else if (e.Button == MouseButtons.Middle) {
+				Input.SetKeyState(Key.Mouse2, true);
 			}
 		}
 
@@ -292,9 +271,9 @@ namespace Lime
 				Input.SetKeyState(Key.Mouse0, false);
 				Input.SetKeyState(Key.Touch0, false);
 			} else if (e.Button == MouseButtons.Right) {
-				Input.SetKeyState(Key.Mouse2, false);
-			} else if (e.Button == MouseButtons.Middle) {
 				Input.SetKeyState(Key.Mouse1, false);
+			} else if (e.Button == MouseButtons.Middle) {
+				Input.SetKeyState(Key.Mouse2, false);
 			}
 		}
 
@@ -331,17 +310,13 @@ namespace Lime
 			stopwatch.Restart();
 			delta = Mathf.Clamp(delta, 0, 1 / Application.LowFPSLimit);
 			Input.ProcessPendingKeyEvents();
-			if (Updating != null) {
-				Updating(delta);
-			}
+			RaiseUpdating(delta);
 			AudioSystem.Update();
 			Input.TextInput = null;
 			Input.CopyKeysState();
 			fpsCounter.Refresh();
 			mainGLControl.Context.MakeCurrent(glControl.WindowInfo);
-			if (Rendering != null) {
-				Rendering();
-			}
+			RaiseRendering();
 			mainGLControl.SwapBuffers();
 		}
 

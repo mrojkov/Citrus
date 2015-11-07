@@ -11,29 +11,22 @@ namespace Lime
 		private IKeyboardInputProcessor prevActiveTextWidget;
 #endif
 		private RenderChain renderChain = new RenderChain();
-		private IWidgetContext context;
+		public IWidgetContext Context { get; private set; }
 
 		public WindowWidget(IWindow window)
-			: this(new WidgetContext { Window = window })
 		{
-			(context as WidgetContext).Root = this;
-		}
-
-		public WindowWidget(IWidgetContext context)
-		{
-			this.context = context;
+			Context = new WidgetContext(window, this);
 		}
 
 		public override void Update(float delta)
 		{
-			var savedContext = WidgetContext.MakeCurrent(context);
 			WidgetInput.RemoveInvalidatedCaptures();
 			ParticleEmitter.NumberOfUpdatedParticles = 0;
-			context.IsActiveTextWidgetUpdated = false;
-			context.DistanceToNodeUnderCursor = float.MaxValue;
+			Context.IsActiveTextWidgetUpdated = false;
+			Context.DistanceToNodeUnderCursor = float.MaxValue;
 			base.Update(delta);
-			if (!context.IsActiveTextWidgetUpdated) {
-				context.ActiveTextWidget = null;
+			if (!Context.IsActiveTextWidgetUpdated) {
+				Context.ActiveTextWidget = null;
 			}
 #if iOS || ANDROID
 			if (Application.IsMainThread) {
@@ -54,17 +47,14 @@ namespace Lime
 				prevActiveTextWidget = Context.ActiveTextWidget;
 			}
 #endif
-			WidgetContext.MakeCurrent(savedContext);
 		}
 
 		public override void Render()
 		{
-			var savedContext = WidgetContext.MakeCurrent(context);
 			foreach (var node in Nodes) {
 				node.AddToRenderChain(renderChain);
 			}
 			renderChain.RenderAndClear();
-			WidgetContext.MakeCurrent(savedContext);
 		}
 	}
 }

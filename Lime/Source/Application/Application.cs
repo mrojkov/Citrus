@@ -117,6 +117,7 @@ namespace Lime
 		public static event Action DeviceRotated;
 
 		// Specifies the lowest possible 1/(time delta) passed to Window.Updating.
+		// TODO: Move to IWindow
 		public static float LowFPSLimit = 20;
 
 		/// <summary>
