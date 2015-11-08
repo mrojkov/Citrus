@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Lime
 {
+	/// <summary>
+	/// Represents the global context for every widget within the current window.
+	/// </summary>
 	public interface IWidgetContext : IContext
 	{
 		/// <summary>
@@ -23,10 +26,20 @@ namespace Lime
 		Node NodeUnderCursor { get; set; }
 	}
 
+	/// <summary>
+	/// Represents the global context for every widget within the current window.
+	/// </summary>
 	public class WidgetContext : IWidgetContext
 	{
+		/// <summary>
+		/// Gets the default "Null" global context.
+		/// </summary>
 		public static IWidgetContext Null { get; private set; }
+		/// <summary>
+		/// Gets the current global context. The context is set on every window's callback.
+		/// </summary>
 		public static IWidgetContext Current { get; private set; }
+
 		public IKeyboardInputProcessor ActiveTextWidget { get; set; }
 		public bool IsActiveTextWidgetUpdated { get; set; }
 		public float DistanceToNodeUnderCursor { get; set; }
@@ -44,7 +57,6 @@ namespace Lime
 		public WidgetContext(IWindow window, Widget root)
 		{
 			Window = window;
-			Window.Context = this;
 			Root = root;
 		}
 
