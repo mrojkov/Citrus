@@ -5,7 +5,7 @@ using System;
 
 namespace Lime
 {
-	public class Window : IWindow
+	public class Window : CommonWindow, IWindow
 	{
 		private FPSCounter fpsCounter;
 		
@@ -22,15 +22,6 @@ namespace Lime
 		public Size DecoratedSize { get { return ClientSize; } set {} }
 		public ActivityDelegate ActivityDelegate { get { return ActivityDelegate; } }
 
-		public event Action Activated;
-		public event Action Deactivated;
-		public event Func<bool> Closing;
-		public event Action Closed;
-		public event Action Moved;
-		public event Action Resized;
-		public event Action<float> Updating;
-		public event Action Rendering;
-
 		public float CalcFPS() { return fpsCounter.FPS; }
 		public void Center() {}
 		public void Close() {}
@@ -45,31 +36,21 @@ namespace Lime
 			fpsCounter = new FPSCounter();
 			ActivityDelegate.Instance.Paused += activity => {
 				Active = false;
-				if (Deactivated != null) {
-					Deactivated();
-				}
+				RaiseDeactivated();
 			};
 			ActivityDelegate.Instance.Resumed += activity => {
 				Active = true;
-				if (Activated != null) {
-					Activated();
-				}
+				RaiseActivated();
 			};
 			ActivityDelegate.Instance.GameView.Resize += (sender, e) => {
-				if (Resized != null) {
-					Resized();
-				}
+				RaiseResized();
 			};
 			ActivityDelegate.Instance.GameView.RenderFrame += (sender, e) => {
-				if (Rendering != null) {
-					Rendering();
-				}
+				RaiseRendering();
 				fpsCounter.Refresh();
 			};
 			ActivityDelegate.Instance.GameView.UpdateFrame += (sender, e) => {
-				if (Updating != null) {
-					Updating((float)e.Time);
-				}
+				RaiseUpdating((float)e.Time);
 			};
 		}
 

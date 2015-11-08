@@ -102,9 +102,9 @@ namespace Lime
 
 		private WindowRect CalculateAABBInWorldSpace(Widget widget)
 		{
-			var aabb = widget.CalcAABBInSpaceOf(Context.Root);
+			var aabb = widget.CalcAABBInSpaceOf(WidgetContext.Current.Root);
 			var viewport = Renderer.Viewport;
-			var scale = new Vector2(viewport.Width, viewport.Height) / Context.Root.Size;
+			var scale = new Vector2(viewport.Width, viewport.Height) / WidgetContext.Current.Root.Size;
 			return new WindowRect {
 				X = (viewport.X + aabb.Left * scale.X).Round(),
 				Y = (viewport.Y + aabb.Top * scale.Y).Round(),

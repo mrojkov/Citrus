@@ -47,7 +47,6 @@
     </Reference>
     <Reference Include="OpenTK-1.0" />
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
   <ItemGroup>
     <Compile Include="Source\Application\Application.cs" />
     <Compile Include="Source\Application\Clipboard\Clipboard.Android.cs" />
@@ -254,6 +253,9 @@
     <Compile Include="Source\Application\Window.Android.cs" />
     <Compile Include="Source\Widgets\WindowWidget.cs" />
     <Compile Include="Source\Application\AndroidAccelerometerListener.cs" />
+    <Compile Include="Source\Application\CommonWindow.cs" />
+    <Compile Include="Source\Application\IContext.cs" />
+    <Compile Include="Source\Widgets\WidgetContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">
@@ -262,4 +264,5 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>
