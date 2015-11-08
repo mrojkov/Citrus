@@ -109,8 +109,11 @@ namespace Lime
 		/// <summary>
 		/// Gets the current device orientation. On desktop platforms it is always DeviceOrientation.LandscapeLeft.
 		/// </summary>
+#if WIN || MAC
+		public static DeviceOrientation CurrentDeviceOrientation { get { return DeviceOrientation.LandscapeLeft; } }
+#else
 		public static DeviceOrientation CurrentDeviceOrientation { get; internal set; }
-
+#endif
 		/// <summary>
 		/// Occurs when the device has rotated. Only mobile platforms.
 		/// </summary>
@@ -160,10 +163,11 @@ namespace Lime
 			System.Threading.Thread.CurrentThread.CurrentCulture = culture;
 			SetGlobalExceptionHandler();
 			AudioSystem.Initialize(options);
-			CurrentDeviceOrientation = DeviceOrientation.LandscapeLeft;
 #if WIN
 			SetProcessDPIAware();
 			Window.InitializeMainOpenGLContext();
+			SoftKeyboard = new DummySoftKeyboard();
+#elif MAC
 			SoftKeyboard = new DummySoftKeyboard();
 #elif iOS
 			System.IO.Directory.SetCurrentDirectory(Foundation.NSBundle.MainBundle.ResourcePath);
@@ -324,7 +328,7 @@ namespace Lime
 		public static void Run(float fps = 60)
 		{
 #if MAC
-			(MainWindow as GameWindow).Run(fps);
+			MainWindow.NSGameView.Run(fps);
 #elif WIN
 			System.Windows.Forms.Application.Run();
 #endif
