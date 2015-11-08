@@ -155,6 +155,9 @@ namespace Lime
 
 		public static void Initialize(ApplicationOptions options = null)
 		{
+#if MAC
+			NSApplication.Init();
+#endif
 			options = options ?? new ApplicationOptions();
 			RenderingBackend = options.RenderingBackend;
 			MainThread = Thread.CurrentThread;
@@ -325,10 +328,10 @@ namespace Lime
 		/// <summary>
 		/// Runs the main application loop on desktop platforms.
 		/// </summary>
-		public static void Run(float fps = 60)
+		public static void Run()
 		{
 #if MAC
-			MainWindow.NSGameView.Run(fps);
+			NSApplication.SharedApplication.Run();
 #elif WIN
 			System.Windows.Forms.Application.Run();
 #endif

@@ -53,7 +53,6 @@
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
     <Compile Include="Source\Serialization.cs" />
-    <Compile Include="Source\Application\OpenTKGameView.cs" />
     <Compile Include="Source\Application\iOSAppDelegate.cs" />
     <Compile Include="Source\Application\iOSGameController.cs" />
     <Compile Include="Source\Application\iOSGameView.cs" />
@@ -259,6 +258,7 @@
     <Compile Include="Source\Application\CommonWindow.cs" />
     <Compile Include="Source\Application\IContext.cs" />
     <Compile Include="Source\Widgets\WidgetContext.cs" />
+    <Compile Include="Source\Application\Window.Mac.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

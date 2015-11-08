@@ -34,7 +34,7 @@ namespace Lime
 #elif MAC
 		private void InitWithPngOrJpgBitmap(Stream stream, Stream alphaStream)
 		{
-			if (!Application.IsMainThread) {
+			if (!Application.CurrentThread.IsMain()) {
 				throw new NotSupportedException ("Calling from non-main thread currently is not supported");
 			}
 			using (var nsData = Foundation.NSData.FromStream(stream))

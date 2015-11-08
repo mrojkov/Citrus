@@ -148,7 +148,6 @@
     <Compile Include="Source\Graphics\Bitmap.Unity.cs" />
     <Compile Include="Source\Graphics\Unity\PlatformMesh.cs" />
     <Compile Include="Source\Graphics\Unity\PlatformRenderer.cs" />
-    <Compile Include="Source\Application\OpenTKGameView.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationEngine.cs" />
     <Compile Include="Source\Widgets\Layout\AnchorLayout.cs" />
     <Compile Include="Source\Widgets\Layout\Layout.cs" />
@@ -186,6 +185,10 @@
     <Compile Include="Source\Application\Window.Win.cs" />
     <Compile Include="Source\Application\WindowOptions.cs" />
     <Compile Include="Source\Widgets\WindowWidget.cs" />
+    <Compile Include="Source\Application\CommonWindow.cs" />
+    <Compile Include="Source\Application\IContext.cs" />
+    <Compile Include="Source\Widgets\WidgetContext.cs" />
+    <Compile Include="Source\Application\Window.Mac.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

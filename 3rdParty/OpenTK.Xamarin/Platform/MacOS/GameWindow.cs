@@ -12,11 +12,23 @@ namespace OpenTK
 		FullScreen = 1,	
 		FixedWindow = 2,
 	}
-
+	
+	public class CancelEventArgs : EventArgs
+	{
+		public bool Cancel;
+	}
+	
 	public class GameWindow : IDisposable
 	{
 		public readonly NSGameView View;
 		private readonly NSWindow window;
+
+		public event EventHandler<EventArgs> FocusedChanged;
+		public event EventHandler<CancelEventArgs> Closing;
+		public event EventHandler<EventArgs> Closed;
+		public event EventHandler<EventArgs> Move;
+		public event EventHandler<EventArgs> Resize;
+		public event EventHandler<FrameEventArgs> RenderFrame;
 		
 		public readonly Input.Mouse Mouse = new Input.Mouse();
 		public readonly Input.Keyboard Keyboard = new Input.Keyboard();
@@ -59,10 +71,27 @@ namespace OpenTK
 		public int Width { get { return ClientSize.Width; } }
 		public int Height { get { return ClientSize.Height; } }
 
+		public bool Visible
+		{
+			get { return View.Visible; }
+			set { View.Visible = value; }
+		}
+
 		public Size ClientSize
 		{
 			get { return new Size((int)View.Bounds.Width, (int)View.Bounds.Height); }
 			set { window.SetContentSize(new CGSize(value.Width, value.Height)); }
+		}
+
+		public Size Size
+		{
+			get { return new Size((int)window.Frame.Width, (int)window.Frame.Height); }
+			set 
+			{
+				var frame = window.Frame;
+				frame.Size = new CGSize(value.Width, value.Height); 
+				window.SetFrame(frame, true);
+			}
 		}
 
 		public string Title
@@ -70,15 +99,20 @@ namespace OpenTK
 			get { return window.Title; }
 			set { window.Title = value; }
 		}
-		
+
+		public Point ClientLocation
+		{
+			get { throw new NotImplementedException(); }
+			set { throw new NotImplementedException(); }
+		}
+
 		public Point Location
 		{
 			get { return new Point((int)window.Frame.X, (int)window.Frame.Y); }
 			set
 			{
 				var frame = window.Frame;
-				frame.X = value.X;
-				frame.Y = value.Y;
+				frame.Location = new CGPoint(value.X, value.Y);
 				window.SetFrame(frame, true);
 			}
 		}
@@ -163,22 +197,37 @@ namespace OpenTK
 
 		protected virtual void OnFocusedChanged(EventArgs e)
 		{
+			if (FocusedChanged != null) {
+				FocusedChanged(this, e);
+			}
 		}
 		
 		protected virtual void OnClosed(EventArgs e)
-		{			
+		{
+			if (Closed != null) {
+				Closed(this, e);
+			}
 		}
 
 		protected virtual void OnMove(EventArgs e)
 		{
+			if (Move != null) {
+				Move(this, e);
+			}
 		}
 		
 		protected virtual void OnResize(EventArgs e)
 		{
+			if (Resize != null) {
+				Resize(this, e);
+			}
 		}
 
 		public void Close()
 		{
+			if (Closed != null) {
+				Closed(this, new EventArgs());
+			}
 			View.Close();
 		}
 
@@ -186,11 +235,13 @@ namespace OpenTK
 		{
 			window.MakeKeyAndOrderFront(window);
 			View.Run(updatesPerSecond);
-			NSApplication.SharedApplication.Run();
 		}
 
 		protected virtual void OnRenderFrame(OpenTK.FrameEventArgs e)
 		{
+			if (RenderFrame != null) {
+				RenderFrame(this, e);
+			}
 		}
 	}
 }

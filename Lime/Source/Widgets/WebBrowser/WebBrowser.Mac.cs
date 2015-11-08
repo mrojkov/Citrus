@@ -33,7 +33,7 @@ namespace Lime
 			webView = new WebView();
 			webView.AutoresizingMask = NSViewResizingMask.HeightSizable | NSViewResizingMask.WidthSizable; 
 			webView.WantsLayer = true;
-			GameView.Instance.View.AddSubview(webView);
+			WidgetContext.Current.Window.NSGameView.AddSubview(webView);
 		}
 
 		public override void Dispose()
@@ -59,7 +59,7 @@ namespace Lime
 
 		private CGRect CalculateAABBInWorldSpace(Widget widget)
 		{
-			var aabb = widget.CalcAABBInSpaceOf(World.Instance);
+			var aabb = widget.CalcAABBInSpaceOf(WidgetContext.Current.Root);
 			// Get the projected AABB coordinates in the normalized OpenGL space
 			Matrix44 proj = Renderer.Projection;
 			aabb.A = proj.TransformVector(aabb.A);
