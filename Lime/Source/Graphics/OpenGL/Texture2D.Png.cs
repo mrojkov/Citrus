@@ -216,7 +216,7 @@ namespace Lime
 #elif iOS
 		private void InitWithPngOrJpgBitmap(Stream stream, Stream alphaStream)
 		{
-			if (!Application.IsMainThread) {
+			if (!Application.CurrentThread.IsMain()) {
 				throw new NotSupportedException ("Calling from non-main thread currently is not supported");
 			}
 			using (var nsData = Foundation.NSData.FromStream(alphaStream ?? stream))
@@ -310,7 +310,7 @@ namespace Lime
 #elif ANDROID
 		private void InitWithPngOrJpgBitmap(Stream stream, Stream alphaStream)
 		{
-			if (!Application.IsMainThread) {
+			if (!Application.CurrentThread.IsMain()) {
 				// why?
 				throw new NotSupportedException("Calling from non-main thread currently is not supported");
 			}

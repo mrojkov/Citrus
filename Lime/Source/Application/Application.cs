@@ -168,7 +168,7 @@ namespace Lime
 #elif iOS
 			System.IO.Directory.SetCurrentDirectory(Foundation.NSBundle.MainBundle.ResourcePath);
 			UIApplication.SharedApplication.StatusBarHidden = true;
-            UIApplication.SharedApplication.IdleTimerDisabled = !IsAllowedGoingToSleepMode();
+			UIApplication.SharedApplication.IdleTimerDisabled = !IsAllowedGoingToSleepMode();
 #endif
 		}
 
@@ -179,6 +179,13 @@ namespace Lime
 			return obj != null && obj.ToString() == "1";
 		}
 #endif
+
+		internal static void RaiseDeviceRotated()
+		{
+			if (DeviceRotated != null) {
+				DeviceRotated();
+			}
+		}
 
 #if !UNITY
 		private static void RunScheduledActions(float delta)

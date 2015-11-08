@@ -20,7 +20,7 @@
     <DebugType>full</DebugType>
     <Optimize>False</Optimize>
     <OutputPath>bin\iOS\Debug</OutputPath>
-    <DefineConstants>DEBUG;iOS;OPENGL;OPENAL</DefineConstants>
+    <DefineConstants>__UNIFIED__;__MOBILE__;__IOS__;DEBUG;iOS;OPENGL;OPENAL</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>False</ConsolePause>
@@ -36,7 +36,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>False</ConsolePause>
-    <DefineConstants>iOS;OPENGL;OPENAL</DefineConstants>
+    <DefineConstants>__UNIFIED__;__MOBILE__;__IOS__;iOS;OPENGL;OPENAL</DefineConstants>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
@@ -256,6 +256,9 @@
     <Compile Include="Source\Application\Clipboard\Clipboard.iOS.cs" />
     <Compile Include="Source\Application\Clipboard\Clipboard.Mac.cs" />
     <Compile Include="Source\Application\Clipboard\Clipboard.Win.cs" />
+    <Compile Include="Source\Application\CommonWindow.cs" />
+    <Compile Include="Source\Application\IContext.cs" />
+    <Compile Include="Source\Widgets\WidgetContext.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

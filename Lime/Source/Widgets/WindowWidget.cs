@@ -29,7 +29,7 @@ namespace Lime
 				Context.ActiveTextWidget = null;
 			}
 #if iOS || ANDROID
-			if (Application.IsMainThread) {
+			if (Application.CurrentThread.IsMain()) {
 				bool showKeyboard = Context.ActiveTextWidget != null && Context.ActiveTextWidget.Visible;
 				if (prevActiveTextWidget != Context.ActiveTextWidget) {
 					Application.SoftKeyboard.Show(showKeyboard, Context.ActiveTextWidget != null ? Context.ActiveTextWidget.Text : "");

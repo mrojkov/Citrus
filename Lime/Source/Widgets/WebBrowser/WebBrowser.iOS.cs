@@ -49,7 +49,7 @@ namespace Lime
 			webView.Opaque = false;
 			webView.BackgroundColor = new UIColor(0.0f, 0.0f, 0.0f, 1.0f);
 			webView.Hidden = true;
-			Context.Window.UIViewController.View.AddSubview(webView);
+			WidgetContext.Current.Window.UIViewController.View.AddSubview(webView);
 		}
 		
 		public override void Dispose()
@@ -79,7 +79,7 @@ namespace Lime
 			if (webView == null) {
 				return;
 			}
-			float screenHeight = Context.Window.ClientSize.Height;
+			float screenHeight = WidgetContext.Current.Window.ClientSize.Height;
 			WindowRect wr = CalculateAABBInWorldSpace(this);
 			float Height = (float)wr.Height / (float)UIScreen.MainScreen.Scale;
 			var position = new PointF((float)wr.X / (float)UIScreen.MainScreen.Scale, screenHeight - (float)(wr.Y / UIScreen.MainScreen.Scale) - Height);
@@ -92,10 +92,10 @@ namespace Lime
 			if (activityIndicator == null) {
 				activityIndicator = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.WhiteLarge);
 				activityIndicator.Center = activityIndicatorPosition;
-
+				var view = WidgetContext.Current.Window.UIViewController.View;
 				webView.LoadStarted += (object sender, EventArgs e) => {
 					activityIndicator.StartAnimating();
-					Context.Window.UIViewController.View.AddSubview(activityIndicator);
+					view.AddSubview(activityIndicator);
 					isActivityIndicatorVisible = true;
 				};
 				webView.LoadFinished += (object sender, EventArgs e) => {
@@ -109,7 +109,7 @@ namespace Lime
 	
 		private WindowRect CalculateAABBInWorldSpace(Widget widget)
 		{
-			var aabb = widget.CalcAABBInSpaceOf(Context.Root);
+			var aabb = widget.CalcAABBInSpaceOf(WidgetContext.Current.Root);
 			// Get the projected AABB coordinates in the normalized OpenGL space
 			Matrix44 proj = Renderer.Projection;
 			aabb.A = proj.TransformVector(aabb.A);

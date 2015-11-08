@@ -9,19 +9,10 @@ using UIKit;
 
 namespace Lime
 {
-	public class Window : IWindow
+	public class Window : CommonWindow, IWindow
 	{
 		private UIWindow uiWindow;
 		private FPSCounter fpsCounter = new FPSCounter();
-
-		public event Action Activated;
-		public event Action Deactivated;
-		public event Func<bool> Closing;
-		public event Action Closed;
-		public event Action Moved;
-		public event Action Resized;
-		public event Action<float> Updating;
-		public event Action Rendering;
 
 		public GameController UIViewController { get; private set; }
 		public GameView UIView { get { return UIViewController.View; } }
@@ -64,29 +55,23 @@ namespace Lime
 				UIViewController.LockDeviceOrientation = false;
 				Active = true;
 				AudioSystem.Active = true;
-				if (Activated != null) {
-					Activated();
-				}
+				RaiseActivated();
 			};
 			AppDelegate.Instance.Deactivated += () => {
 				UIViewController.LockDeviceOrientation = true;
 				AudioSystem.Active = false;
-				if (Deactivated != null) {
-					Deactivated();
-				}
+				RaiseDeactivated();
 				UIView.DoRenderFrame();
 				OpenTK.Graphics.ES11.GL.Finish();
 				TexturePool.Instance.DiscardTexturesUnderPressure();
 				Active = false;
 			};
 			AppDelegate.Instance.WillTerminateEvent += () => {
-				if (Closed != null) {
-					Closed();
-				}
+				RaiseClosed();
 			};
 			UIViewController.ViewDidLayoutSubviewsEvent += () => {
-				if (Resized != null) {
-					Resized();
+				using (Context.MakeCurrent()) {
+					Application.RaiseDeviceRotated();
 				}
 			};
 			UIView.RenderFrame += OnRenderFrame;
@@ -99,10 +84,8 @@ namespace Lime
 				return;
 			}
 			Input.ProcessPendingKeyEvents();
-			if (Updating != null) {
-				var delta = (float)Math.Min(e.Time, 1 / Application.LowFPSLimit);
-				Updating(delta);
-			}
+			var delta = (float)Math.Min(e.Time, 1 / Application.LowFPSLimit);
+			RaiseUpdating(delta);
 			AudioSystem.Update();
 		}
 
@@ -112,9 +95,7 @@ namespace Lime
 				return;
 			}
 			UIView.MakeCurrent();
-			if (Rendering != null) {
-				Rendering();
-			}
+			RaiseRendering();
 			UIView.SwapBuffers();
 			fpsCounter.Refresh();
 		}
