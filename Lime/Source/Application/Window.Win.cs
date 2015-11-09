@@ -243,6 +243,9 @@ namespace Lime
 
 		private void OnDeactivate(object sender, EventArgs e)
 		{
+			foreach (var key in (Key[]) Enum.GetValues(typeof (Key))) {
+				Input.SetKeyState(key, false);
+			}
 			timer.Stop();
 			active = false;
 			RaiseDeactivated();
