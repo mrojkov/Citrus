@@ -373,15 +373,20 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Add summary
+		/// Returns the <see cref="string"/> representation of this <see cref="Node"/> 
+		/// in the format: "TypeName, "Id", HierarchyPath".
+		/// Example: "Node, "Child", Root/Child".
 		/// </summary>
 		public override string ToString()
 		{
 			return string.Format("{0}, \"{1}\", {2}", GetType().Name, Id ?? "", GetHierarchyPath());
 		}
 
+		// TODO: Transform to HierarchyPath property?
 		/// <summary>
-		/// TODO: Add summary
+		/// Returns hierarchy path for this Node in the format: "Parent.GetHierarchyPath()/Id (Tag)".
+		/// If Id is null then it's replaced with Type name. Tag is ommited if it's null.
+		/// Example: "Root/[Node] (Cool tag)/Child".
 		/// </summary>
 		private string GetHierarchyPath()
 		{
@@ -508,72 +513,82 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Ищет дочерний объект (рекурсивно). Если такого объекта нет, генерирует исключение
-		/// </summary>
-		/// <typeparam name="T">Тип искомого объекта</typeparam>
-		/// <param name="id">Id искомого объекта</param>
-		/// <exception cref="Lime.Exception"/>
-		public T Find<T>(string id) where T : Node
+		/// Searches for node with provided path or id in this node's descendants.
+		/// Throws an exception if sought-for node doesn't exist.
+		/// <para>This function is thread safe.</para>
+		/// </summary> 
+		/// <typeparam name="T">Type of sought-for node.</typeparam>
+		/// <param name="path">Id or path of Node. Path can be incomplete 
+		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
+		public T Find<T>(string path) where T : Node
 		{
-			T result = TryFindNode(id) as T;
+			T result = TryFindNode(path) as T;
 			if (result == null) {
-				throw new Lime.Exception("'{0}' of {1} not found for '{2}'", id, typeof(T).Name, ToString());
+				throw new Lime.Exception("'{0}' of {1} not found for '{2}'", path, typeof(T).Name, ToString());
 			}
 			return result;
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Ищет дочерний объект (рекурсивно). Если такого объекта нет, генерирует исключение
+		/// Searches for node with provided path or id in this node's descendants.
+		/// Returns null if sought-for node doesn't exist.
+		/// <para>This function is thread safe.</para>
 		/// </summary>
-		/// <typeparam name="T">Тип искомого объекта</typeparam>
-		/// <exception cref="Lime.Exception"/>
+		/// <typeparam name="T">Type of sought-for node.</typeparam>
+		/// <param name="format">Id or path of Node. Path can be incomplete 
+		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
 		public T Find<T>(string format, params object[] args) where T : Node
 		{
 			return Find<T>(string.Format(format, args));
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Ищет дочерний объект (рекурсивно). Если такого объекта нет, возвращает false
+		/// Searches for node with provided path or id in this node's descendants.
+		/// Returns null if sought-for node doesn't exist.
+		/// <para>This function is thread safe.</para>
 		/// </summary>
-		/// <typeparam name="T">Тип искомого объекта</typeparam>
-		/// <param name="id">Id искомого объекта</param>
-		/// <param name="node">Переменная, в которую будет записан результат</param>
-		public bool TryFind<T>(string id, out T node) where T : Node
+		/// <typeparam name="T">Type of sought-for node.</typeparam>
+		/// <param name="path">Id or path of Node. Path can be incomplete 
+		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
+		public bool TryFind<T>(string path, out T node) where T : Node
 		{
-			node = TryFindNode(id) as T;
+			node = TryFindNode(path) as T;
 			return node != null;
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Ищет дочерний объект (рекурсивно). Если такого объекта нет, возвращает null
+		/// Searches for node with provided path or id in this node's descendants.
+		/// Returns null if sought-for node doesn't exist.
+		/// <para>This function is thread safe.</para>
 		/// </summary>
-		/// <typeparam name="T">Тип искомого объекта</typeparam>
-		/// <param name="id">Id искомого объекта</param>
-		public T TryFind<T>(string id) where T : Node
+		/// <typeparam name="T">Type of sought-for node.</typeparam>
+		/// <param name="path">Id or path of Node. Path can be incomplete 
+		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
+		public T TryFind<T>(string path) where T : Node
 		{
-			return TryFindNode(id) as T;
+			return TryFindNode(path) as T;
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Ищет дочерний объект (рекурсивно). Если такого объекта нет, возвращает null
+		/// Searches for node with provided path or id in this node's descendants.
+		/// Returns null if sought-for node doesn't exist.
+		/// <para>This function is thread safe.</para>
 		/// </summary>
-		/// <typeparam name="T">Тип искомого объекта</typeparam>
+		/// <typeparam name="T">Type of sought-for node.</typeparam>
+		/// <param name="format">Id or path of Node. Path can be incomplete 
+		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
 		public T TryFind<T>(string format, params object[] args) where T : Node
 		{
 			return TryFind<T>(string.Format(format, args));
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Ищет дочерний объект (рекурсивно). Если такого объекта нет, генерирует исключение
-		/// </summary>
-		/// <param name="path">Путь к виджету или Id, (пример пути: Root/Human/Head/Eye, где Eye - Id искомого виджета)</param>
-		/// <exception cref="Lime.Exception"/>
+		/// Searches for node with provided path or id in this node's descendants.
+		/// Throws an exception if sought-for node doesn't exist.
+		/// <para>This function is thread safe.</para>
+		/// </summary> 
+		/// <param name="path">Id or path of Node. Path can be incomplete 
+		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
 		public Node FindNode(string path)
 		{
 			var node = TryFindNode(path);
@@ -584,10 +599,12 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Ищет дочерний объект (рекурсивно). Если такого объекта нет, возвращает null
+		/// Searches for node with provided path or id in this node's descendants.
+		/// Returns null if sought-for node doesn't exist.
+		/// <para>This function is thread safe.</para>
 		/// </summary>
-		/// <param name="path">Путь к виджету или Id, (пример пути: Root/Human/Head/Eye, где Eye - Id искомого виджета)</param>
+		/// <param name="path">Id or path of Node. Path can be incomplete 
+		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
 		public Node TryFindNode(string path)
 		{
 			if (path.IndexOf('/') >= 0) {
@@ -598,10 +615,12 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Ищет дочерний объект по его пути. Если такого объекта нет, возвращает null
+		/// Searches for node with provided path in this node's descendants.
+		/// Returns null if sought-for node doesn't exist.
+		/// <para>This function is thread safe.</para>
 		/// </summary>
-		/// <param name="path">Путь к виджету, (пример пути: Root/Human/Head/Eye, где Eye - Id искомого виджета)</param>
+		/// <param name="path">Path of node. Can be incomplete 
+		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
 		private Node TryFindNodeByPath(string path)
 		{
 			Node child = this;
@@ -645,15 +664,14 @@ namespace Lime
 				node.StaticScale(ratio, roundCoordinates);
 			}
 		}
-
-		/// <summary>
-		/// TODO: Add summary
-		/// </summary>
+		
 		[ThreadStatic]
 		private static Queue<Node> nodeSearchQueue;
 
 		/// <summary>
-		/// TODO: Add summary
+		/// Searches for node with provided id in this node's descendants.
+		/// Returns null if sought-for node doesn't exist.
+		/// <para>This function is thread safe.</para>
 		/// </summary>
 		private Node TryFindNodeById(string id)
 		{
