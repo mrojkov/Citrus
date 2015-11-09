@@ -136,6 +136,7 @@ namespace Lime
 			// Determine orientation using screen dimensions, because Amazon FireOS sometimes reports wrong device orientation.
 			var orientation = Width < Height ? DeviceOrientation.Portrait : DeviceOrientation.LandscapeLeft;
 			Application.CurrentDeviceOrientation = orientation;
+			Application.RaiseDeviceRotated();
 			base.OnResize(e);
 			// RenderFrame once in case of Pause() has been called and
 			// there is another view overlaying this view. (e.g. Chartboost video)
