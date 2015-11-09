@@ -191,6 +191,11 @@ namespace Lime
 #endif
 		}
 
+		public static void DiscardOpenGLObjects()
+		{
+			GLObjectRegistry.Instance.DiscardObjects();
+		}
+
 #if iOS
 		private static bool IsAllowedGoingToSleepMode()
 		{
