@@ -46,6 +46,8 @@ namespace Lime
 			Active = true;
 			Input = new Input();
 			uiWindow = new UIWindow(UIScreen.MainScreen.Bounds);
+			// UIApplicationDelegate must has a Window reference. This is an Apple's requirement.
+			AppDelegate.Instance.Window = uiWindow;
 			UIViewController = new GameController(Input);
 			uiWindow.RootViewController = UIViewController;
 			uiWindow.MakeKeyAndVisible();

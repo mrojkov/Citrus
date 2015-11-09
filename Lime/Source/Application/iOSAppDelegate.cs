@@ -35,6 +35,8 @@ namespace Lime
 		public event Action WillTerminateEvent;
 		public event Action Activated;
 		public event Action Deactivated;
+		// This is a mandatory property. See https://developer.xamarin.com/api/type/MonoTouch.UIKit.UIApplicationDelegate/
+		public override UIWindow Window { get; set; }
 
 		public AppDelegate()
 		{
