@@ -167,8 +167,6 @@ namespace Lime
 
 		MouseWheelUp = 137,
 		MouseWheelDown = 138,
-
-		KeyCount,
 	}
 }
 

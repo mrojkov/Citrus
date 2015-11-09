@@ -49,8 +49,10 @@ namespace Lime
 
 		private List<KeyEvent> keyEventQueue = new List<KeyEvent>();
 
-		private bool[] previousKeysState = new bool[(int)Key.KeyCount];
-		private bool[] currentKeysState = new bool[(int)Key.KeyCount];
+		public static readonly int KeyCount = Enum.GetNames(typeof(Key)).Length;
+
+		private bool[] previousKeysState = new bool[KeyCount];
+		private bool[] currentKeysState = new bool[KeyCount];
 
 		/// <summary>
 		/// The matrix describes transition from pixels to virtual coordinates.
@@ -190,7 +192,7 @@ namespace Lime
 		internal void ProcessPendingKeyEvents()
 		{
 			if (keyEventQueue.Count > 0) {
-				var processedKeys = new bool[(int)Key.KeyCount];
+				var processedKeys = new bool[KeyCount];
 				for (int i = 0; i < keyEventQueue.Count(); i++) {
 					var evt = keyEventQueue[i];
 					if (!processedKeys[(int)evt.Key]) {
