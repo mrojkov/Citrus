@@ -151,8 +151,7 @@ namespace Lime.Tests.Source.Types
 			Assert.That(Vector2.One.Normalized, Is.EqualTo(unitVector));
 			Assert.That(Vector2.Half.Normalized, Is.EqualTo(unitVector));
 		}
-
-		// TODO: Check ToString and Parse compatibility
+		
 		[Test]
 		public void ToStringTest()
 		{
