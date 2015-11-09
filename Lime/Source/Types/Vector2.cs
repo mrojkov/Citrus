@@ -140,7 +140,7 @@ namespace Lime
 		/// </summary>
 		public static float AngleDeg(Vector2 value1, Vector2 value2)
 		{
-			return AngleRad(value1, value2) * Mathf.RadiansToDegrees;
+			return AngleRad(value1, value2) * Mathf.RadToDeg;
 		}
 
 		/// <summary>
@@ -245,7 +245,7 @@ namespace Lime
 		/// <param name="degrees">Azimuth of direction (in degrees).</param>
 		public static Vector2 HeadingDeg(float degrees)
 		{
-			return HeadingRad(degrees * Mathf.DegreesToRadians);
+			return HeadingRad(degrees * Mathf.DegToRad);
 		}
 
 		// TODO: After removing CosSin rename to HeadingRadFast and create HeadingRad based on Math.Cos, Math.Sin 
@@ -275,7 +275,7 @@ namespace Lime
 		/// <param name="degrees">Azimuth of turning (in degrees).</param>
 		public static Vector2 RotateDeg(Vector2 value, float degrees)
 		{
-			return RotateRad(value, degrees * Mathf.DegreesToRadians);
+			return RotateRad(value, degrees * Mathf.DegToRad);
 		}
 
 		/// <summary>
@@ -306,7 +306,7 @@ namespace Lime
 		/// </summary>
 		public float Atan2Deg
 		{
-			get { return (float)Math.Atan2(Y, X) * Mathf.RadiansToDegrees; }
+			get { return (float)Math.Atan2(Y, X) * Mathf.RadToDeg; }
 		}
 		
 		public float Length

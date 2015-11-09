@@ -137,8 +137,8 @@ namespace Lime
 					float relativeScaling = Length / ClipAboutZero(RefLength);
 					// Calculating the matrix of relative transformation.
 					Matrix32 m1, m2;
-					m1 = Matrix32.Transformation(Vector2.Zero, Vector2.One, RefRotation * Mathf.DegreesToRadians, RefPosition);
-					m2 = Matrix32.Transformation(Vector2.Zero, new Vector2(relativeScaling, 1), e.Rotation * Mathf.DegreesToRadians, e.Joint);
+					m1 = Matrix32.Transformation(Vector2.Zero, Vector2.One, RefRotation * Mathf.DegToRad, RefPosition);
+					m2 = Matrix32.Transformation(Vector2.Zero, new Vector2(relativeScaling, 1), e.Rotation * Mathf.DegToRad, e.Joint);
 					e.RelativeTransform = m1.CalcInversed() * m2;
 				} else
 					e.RelativeTransform = Matrix32.Identity;

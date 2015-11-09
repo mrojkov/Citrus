@@ -116,8 +116,8 @@ namespace Lime
 				Vector2 p1 = v1.Position * Size;
 				Vector2 p2 = v2.Position * Size;
 				float len = (p2 - p1).Length;
-				float ta1 = v1.TangentAngle * Mathf.DegreesToRadians;
-				float ta2 = v2.TangentAngle * Mathf.DegreesToRadians;
+				float ta1 = v1.TangentAngle * Mathf.DegToRad;
+				float ta2 = v2.TangentAngle * Mathf.DegToRad;
 				Vector2 t1 = Vector2.HeadingRad(ta1);
 				Vector2 t2 = Vector2.HeadingRad(ta2);
 				t1 *= len * v1.TangentWeight;
