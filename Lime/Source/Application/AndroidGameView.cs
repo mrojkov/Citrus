@@ -1,15 +1,15 @@
 #if ANDROID
 using System;
-using OpenTK.Platform;
-using OpenTK.Platform.Android;
-using OpenTK;
 using Android.Content;
-using OpenTK.Graphics;
-using System.Collections.Generic;
 using Android.Content.PM;
+using Android.Text;
 using Android.Views;
 using Android.Views.InputMethods;
-using Android.Widget;
+using Java.Lang;
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Platform.Android;
+
 
 namespace Lime
 {
@@ -36,6 +36,12 @@ namespace Lime
 
 			public bool OnKey(View v, Keycode keyCode, KeyEvent e)
 			{
+				// Nika: Here we skip our unprocessed char wich is placed into buffer to make Del key work where it isn't
+				// http://stackoverflow.com/questions/18581636/android-cannot-capture-backspace-delete-press-in-soft-keyboard
+				if (e.UnicodeChar == FixDelKeyEditable.OneUnprocessedCharacter.CharAt(0)) {
+					return true;
+				}
+
 				if (e.KeyCode == Keycode.Del && e.Action != KeyEventActions.Up) {
 					textInput += '\b';
 				} else if (keyCode == Keycode.Unknown) {
@@ -91,7 +97,7 @@ namespace Lime
 		private bool softKeyboardVisible;
 		private float softKeyboardHeight;
 
-		bool ISoftKeyboard.Visible { get { return softKeyboardVisible; } }		
+		bool ISoftKeyboard.Visible { get { return softKeyboardVisible; } }
 		float ISoftKeyboard.Height { get { return softKeyboardHeight; } }
 		bool ISoftKeyboard.Supported { get { return true; } }
 		event Action ISoftKeyboard.Hidden { add {} remove {} }
@@ -106,6 +112,15 @@ namespace Lime
 			imm = (InputMethodManager) context.GetSystemService(Android.Content.Context.InputMethodService);
 			keyboardHandler = new KeyboardHandler(input);
 			SetOnKeyListener(keyboardHandler);
+		}
+
+		public override IInputConnection OnCreateInputConnection(EditorInfo outAttrs)
+		{
+			FixDelKeyInputConnection baseInputConnection = new FixDelKeyInputConnection(this, false);
+			outAttrs.ActionLabel = null;
+			outAttrs.InputType = InputTypes.Null;
+			outAttrs.ImeOptions = (ImeFlags)ImeAction.Done;
+			return baseInputConnection;
 		}
 
 		protected override void OnLayout(bool changed, int left, int top, int right, int bottom)
@@ -358,6 +373,67 @@ namespace Lime
 			delta = (float)(now - lastFrameTimeStamp).TotalSeconds;
 			delta = delta.Clamp(0, 1 / Application.LowFPSLimit);
 			lastFrameTimeStamp = now;
+		}
+
+		// Classes to help fix problem with DEL key on some devices
+		public class FixDelKeyInputConnection : BaseInputConnection
+		{
+			private IEditable myEditable = null;
+
+			public FixDelKeyInputConnection(View targetView, bool fullEditor) : base(targetView, fullEditor) { }
+
+			public override IEditable Editable
+			{
+				get
+				{
+					if ((int)Android.OS.Build.VERSION.SdkInt >= 14) {
+						if (myEditable == null) {
+							myEditable = new FixDelKeyEditable(FixDelKeyEditable.OneUnprocessedCharacter);
+							Selection.SetSelection(myEditable, 1);
+						} else {
+							int myEditableLength = myEditable.Length();
+							if (myEditableLength == 0) {
+								myEditable.Append(FixDelKeyEditable.OneUnprocessedCharacter);
+								Selection.SetSelection(myEditable, 1);
+							}
+						}
+						return myEditable;
+					} else {
+						return base.Editable;
+					}
+				}
+			}
+
+			public override bool DeleteSurroundingText(int leftLength, int rightLength)
+			{
+				if ((int)Android.OS.Build.VERSION.SdkInt >= 14 && (leftLength == 1 && rightLength == 0)) {
+					return 
+						base.SendKeyEvent(new KeyEvent(KeyEventActions.Down, Keycode.Del)) &&
+						base.SendKeyEvent(new KeyEvent(KeyEventActions.Up, Keycode.Del));
+				} else {
+					return base.DeleteSurroundingText(leftLength, rightLength);
+				}
+			}
+		}
+
+		public class FixDelKeyEditable : SpannableStringBuilder
+		{
+			// Nika: there is no such symbol in android keyboard, so we can use it as unprocessed charcater.
+			public static ICharSequence OneUnprocessedCharacter = new Java.Lang.String("»");
+
+			public FixDelKeyEditable(ICharSequence source) : base(source) { }
+
+			public override IEditable Replace(int start, int end, ICharSequence tb, int tbstart, int tbend)
+			{
+				if (tbend > tbstart) {
+					base.Replace(0, Length(), (ICharSequence)new Java.Lang.String(""), 0, 0);
+					return base.Replace(0, 0, tb, tbstart, tbend);
+				} else if (end > start) {
+					base.Replace(0, Length(), (ICharSequence)new Java.Lang.String(""), 0, 0);
+					return base.Replace(0, 0, OneUnprocessedCharacter, 0, 1);
+				}
+				return base.Replace(start, end, tb, tbstart, tbend);
+			}
 		}
 	}
 }
