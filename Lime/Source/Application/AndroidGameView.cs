@@ -38,7 +38,7 @@ namespace Lime
 			{
 				// Nika: Here we skip our unprocessed char wich is placed into buffer to make Del key work where it isn't
 				// http://stackoverflow.com/questions/18581636/android-cannot-capture-backspace-delete-press-in-soft-keyboard
-				if (e.UnicodeChar == FixDelKeyEditable.OneUnprocessedCharacter.CharAt(0)) {
+				if (e.Characters == FixDelKeyEditable.OneUnprocessedCharacter.CharAt(0).ToString()) {
 					return true;
 				}
 
