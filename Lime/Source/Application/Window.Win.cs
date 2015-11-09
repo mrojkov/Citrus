@@ -177,6 +177,7 @@ namespace Lime
 			glControl.Paint += OnPaint;
 			glControl.KeyDown += OnKeyDown;
 			glControl.KeyUp += OnKeyUp;
+			glControl.KeyPress += OnKeyPress;
 			glControl.MouseMove += OnMouseMove;
 			glControl.MouseDown += OnMouseDown;
 			glControl.MouseUp += OnMouseUp;
@@ -305,6 +306,11 @@ namespace Lime
 			if (k != Key.Unknown) {
 				Input.SetKeyState(k, false);
 			}
+		}
+
+		private void OnKeyPress(object sender, KeyPressEventArgs e)
+		{
+			Input.TextInput += e.KeyChar;
 		}
 
 		private void OnPaint(object sender, PaintEventArgs e)
