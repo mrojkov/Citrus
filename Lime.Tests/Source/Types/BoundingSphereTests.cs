@@ -23,22 +23,22 @@ namespace Lime.Tests.Source.Types
 		public void ContainsBoundingSphereTest()
 		{
 			var disjoiningSphere = new BoundingSphere(new Vector3(3), 1);
-			Assert.That(unitSphere.Contains(ref disjoiningSphere) == ContainmentType.Disjoint);
+			Assert.That(unitSphere.Contains(ref disjoiningSphere), Is.EqualTo(ContainmentType.Disjoint));
 			var containingSphere = new BoundingSphere(Vector3.Zero, 0.5f);
-			Assert.That(unitSphere.Contains(ref containingSphere) == ContainmentType.Contains);
+			Assert.That(unitSphere.Contains(ref containingSphere), Is.EqualTo(ContainmentType.Contains));
 			var intersectingSphere = new BoundingSphere(Vector3.One, 1);
-			Assert.That(unitSphere.Contains(ref intersectingSphere) == ContainmentType.Intersects);
+			Assert.That(unitSphere.Contains(ref intersectingSphere), Is.EqualTo(ContainmentType.Intersects));
 		}
 
 		[Test]
 		public void ContainsVectorTest()
 		{
 			var disjoiningVector = new Vector3(3);
-			Assert.That(unitSphere.Contains(ref disjoiningVector) == ContainmentType.Disjoint);
+			Assert.That(unitSphere.Contains(ref disjoiningVector), Is.EqualTo(ContainmentType.Disjoint));
 			var containingVector = Vector3.Zero;
-			Assert.That(unitSphere.Contains(ref containingVector) == ContainmentType.Contains);
+			Assert.That(unitSphere.Contains(ref containingVector), Is.EqualTo(ContainmentType.Contains));
 			var intersectingVector = new Vector3(1, 0, 0);
-			Assert.That(unitSphere.Contains(ref intersectingVector) == ContainmentType.Intersects);
+			Assert.That(unitSphere.Contains(ref intersectingVector), Is.EqualTo(ContainmentType.Intersects));
 		}
 
 		[Test]
