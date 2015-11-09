@@ -38,29 +38,16 @@ namespace Lime
 			return Position.GetHashCode() ^ Direction.GetHashCode();
 		}
 
-		// SUGGESTION: Change name to Intersection()?
-		/// <summary>
-		/// Returns the distance between the center of this ray and border of sphere. 
-		/// </summary>
-		/// <seealso cref="Intersects(ref BoundingSphere, out float?)"/>
-		public float? Intersects(BoundingSphere sphere)
-		{
-			float? result;
-			Intersects(ref sphere, out result);
-			return result;
-		}
-
-		// SUGGESTION: Change return type to bool to match to this method name?
 		/// <summary>
 		/// Calculates the distance between the center of this ray and border of sphere. 
 		/// </summary>
 		/// <param name="sphere">Sphere to check intersection for.</param>
-		/// <param name="result">
+		/// <returns>
 		/// The distance between the center of this ray and border of sphere.
-		/// Becomes 0.0f if ray is inside of sphere. 
-		/// Becomes null if ray is pointed away from sphere.
-		/// </param>
-		public void Intersects(ref BoundingSphere sphere, out float? result)
+		/// Returns 0.0f if ray is inside of sphere. 
+		/// Returns null if ray is pointed away from sphere.
+		/// </returns>
+		public float? Intersects(ref BoundingSphere sphere)
 		{
 			// Find the vector between where the ray starts the the sphere's centre
 			var difference = sphere.Center - Position;
@@ -70,16 +57,14 @@ namespace Lime
 			// If the distance between the ray start and the sphere's centre is less than
 			// the radius of the sphere, it means we've intersected. N.B. checking the LengthSquared is faster.
 			if (differenceLengthSquared < sphereRadiusSquared) {
-				result = 0.0f;
-				return;
+				return 0.0f;
 			}
 
 			float distanceAlongRay = Vector3.DotProduct(Direction, difference);
 
 			// If the ray is pointing away from the sphere then we don't ever intersect
 			if (distanceAlongRay < 0) {
-				result = null;
-				return;
+				return null;
 			}
 
 			// Next we kinda use Pythagoras to check if we are within the bounds of the sphere
@@ -88,7 +73,13 @@ namespace Lime
 			// if z = the distance we've travelled along the ray
 			// if x^2 + z^2 - y^2 < 0, we do not intersect
 			float dist = sphereRadiusSquared + distanceAlongRay * distanceAlongRay - differenceLengthSquared;
-			result = (dist < 0) ? null : distanceAlongRay - (float?)Math.Sqrt(dist);
+			return dist < 0 ? null : distanceAlongRay - (float?)Math.Sqrt(dist);
+		}
+		
+		[Obsolete("Use Intersets(ref BoundingSphere) instead", true)]
+		public void Intersects(ref BoundingSphere sphere, out float? result)
+		{
+			result = Intersects(ref sphere);
 		}
 
 

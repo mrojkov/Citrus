@@ -25,52 +25,44 @@ namespace Lime
 		/// <summary>
 		/// Test if a sphere is fully inside, outside, or just intersecting the sphere. 
 		/// </summary>
-		public ContainmentType Contains(BoundingSphere sphere)
-		{
-			ContainmentType result;
-			Contains(ref sphere, out result);
-			return result;
-		}
-
-		/// <summary>
-		/// Test if a sphere is fully inside, outside, or just intersecting the sphere. 
-		/// </summary>
-		public void Contains(ref BoundingSphere sphere, out ContainmentType result)
+		public ContainmentType Contains(ref BoundingSphere sphere)
 		{
 			var sqDistance = (sphere.Center - Center).SqrLength;
 			if (sqDistance > (sphere.Radius + Radius) * (sphere.Radius + Radius)) {
-				result = ContainmentType.Disjoint;
-			} else if (sqDistance <= (Radius - sphere.Radius) * (Radius - sphere.Radius)) {
-				result = ContainmentType.Contains;
-			} else {
-				result = ContainmentType.Intersects;
+				return ContainmentType.Disjoint;
 			}
+			if (sqDistance <= (Radius - sphere.Radius) * (Radius - sphere.Radius)) {
+				return ContainmentType.Contains;
+			}
+			return ContainmentType.Intersects;
 		}
 
-		/// <summary>
-		/// Test if a vector is fully inside, outside, or just intersecting the sphere. 
-		/// </summary>
-		public ContainmentType Contains(Vector3 point)
+		[Obsolete("Use Contains(ref BoundingSphere) instead", true)]
+		public void Contains(ref BoundingSphere sphere, out ContainmentType result)
 		{
-			ContainmentType result;
-			Contains(ref point, out result);
-			return result;
+			result = Contains(ref sphere);
 		}
 
 		/// <summary>
 		/// Test if a vector is fully inside, outside, or just intersecting the sphere. 
 		/// </summary>
-		public void Contains(ref Vector3 point, out ContainmentType result)
+		public ContainmentType Contains(ref Vector3 point)
 		{
 			float sqRadius = Radius * Radius;
 			float sqDistance = (point - Center).SqrLength;
 			if (sqDistance > sqRadius) {
-				result = ContainmentType.Disjoint;
-			} else if (sqDistance < sqRadius) {
-				result = ContainmentType.Contains;
-			} else {
-				result = ContainmentType.Intersects;
+				return ContainmentType.Disjoint;
 			}
+			if (sqDistance < sqRadius) {
+				return ContainmentType.Contains;
+			}
+			return ContainmentType.Intersects;
+		}
+		
+		[Obsolete("Use Contains(ref Vector3) instead", true)]
+		public void Contains(ref Vector3 point, out ContainmentType result)
+		{
+			result = Contains(ref point);
 		}
 
 		/// <summary>

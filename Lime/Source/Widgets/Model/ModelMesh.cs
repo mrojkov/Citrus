@@ -70,7 +70,7 @@ namespace Lime
 			if (HitTestTarget) {
 				var sphereInWorldSpace = BoundingSphere.CreateFromPoints(Submeshes.SelectMany(sm => sm.Geometry.Vertices).Select(v => v * GlobalTransform));
 				//sphereInWorldSpace = sphereInWorldSpace.Transform(GlobalTransform);
-				d = ray.Intersects(sphereInWorldSpace);
+				d = ray.Intersects(ref sphereInWorldSpace);
 			}
 			if (d.HasValue && d.Value < result.Distance) {
 				result = new MeshHitTestResult() { Distance = d.Value, Mesh = this };
