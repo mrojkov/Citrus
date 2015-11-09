@@ -294,7 +294,7 @@ namespace Lime
 				(3.0f * p1 - p0 - 3.0f * p2 + p3) * t3);
 		}
 
-		[Obsolete("Use Vector2.HeadingRad(float) instead", true)]
+		[Obsolete("Use Vector2.CosSinRough(float) instead", true)]
 		public static Vector2 CosSin(float radians)
 		{
 			return Vector2.HeadingRad(radians);

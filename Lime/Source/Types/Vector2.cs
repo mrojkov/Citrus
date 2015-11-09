@@ -237,23 +237,18 @@ namespace Lime
 			}
 		}
 
-		// BUG: HeadingDeg(45) == (0.7071745, 0.707039), though it should be approx. (0.70711, 0.70711)
-		// (At least X and Y should be equal)
-		/// <summary>
-		/// Creates a new <see cref="Vector2"/> that represents specified direction.
-		/// </summary>
-		/// <param name="degrees">Azimuth of direction (in degrees).</param>
+		[Obsolete("Use CosSinRough(float * Mathf.DegToRad) instead", true)]
 		public static Vector2 HeadingDeg(float degrees)
 		{
-			return HeadingRad(degrees * Mathf.DegToRad);
+			return CosSinRough(degrees * Mathf.DegToRad);
 		}
-
-		// TODO: After removing CosSin rename to HeadingRadFast and create HeadingRad based on Math.Cos, Math.Sin 
+		
 		/// <summary>
-		/// Creates a new <see cref="Vector2"/> that represents specified direction.
+		/// Creates a new <see cref="Vector2"/> that represents 
+		/// cosine and sine of specified direction.
 		/// </summary>
 		/// <param name="radians">Azimuth of direction (in radians).</param>
-		public static Vector2 HeadingRad(float radians)
+		public static Vector2 CosSinRough(float radians)
 		{
 			if (sinTable0 == null) {
 				BuildSinTable();
@@ -266,6 +261,12 @@ namespace Lime
 			result.X = a.X * b.X - a.Y * b.Y;
 			result.Y = a.Y * b.X + a.X * b.Y;
 			return result;
+		}
+
+		[Obsolete("Use CosSinRough(float) instead", true)]
+		public static Vector2 HeadingRad(float radians)
+		{
+			return CosSinRough(radians);
 		}
 
 		/// <summary>
@@ -285,7 +286,7 @@ namespace Lime
 		/// <param name="radians">Azimuth of turning (in radians).</param>
 		public static Vector2 RotateRad(Vector2 value, float radians)
 		{
-			var cosSin = HeadingRad(radians);
+			var cosSin = CosSinRough(radians);
 			return new Vector2
 			{
 				X = value.X * cosSin.X - value.Y * cosSin.Y,
@@ -400,7 +401,7 @@ namespace Lime
 		private static Vector2[] sinTable1;
 
 		/// <summary>
-		/// Used for <see cref="HeadingRad(float)"/>.
+		/// Used for <see cref="CosSinRough(float)"/>.
 		/// </summary>
 		private static void BuildSinTable()
 		{

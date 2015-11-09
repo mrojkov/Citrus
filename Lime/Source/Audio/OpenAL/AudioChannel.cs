@@ -106,7 +106,7 @@ namespace Lime
 		private void SetPan(float value)
 		{
 			pan = value.Clamp(-1, 1);
-			var sourcePosition = Vector2.HeadingRad(pan * Mathf.HalfPi);
+			var sourcePosition = Vector2.CosSinRough(pan * Mathf.HalfPi);
 			using (new PlatformAudioSystem.ErrorChecker()) {
 				AL.Source(source, ALSource3f.Position, sourcePosition.Y, 0, sourcePosition.X);
 			}

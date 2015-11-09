@@ -317,7 +317,7 @@ namespace Lime
 				System.Diagnostics.Debug.Assert(IsNumber(value));
 				if (rotation != value) {
 					rotation = value;
-					direction = Vector2.HeadingRad(Mathf.DegToRad * value);
+					direction = Vector2.CosSinRough(Mathf.DegToRad * value);
 					PropagateDirtyFlags(DirtyFlags.Transform);
 				}
 			}

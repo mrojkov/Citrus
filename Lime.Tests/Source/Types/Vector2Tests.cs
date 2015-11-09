@@ -93,19 +93,11 @@ namespace Lime.Tests.Source.Types
 		}
 
 		[Test]
-		public void HeadingDegTest()
+		public void CosSinRoughTest()
 		{
-			Assert.That(Vector2.HeadingDeg(0), IsApproximately(Vector2.Right));
-			Assert.That(Vector2.HeadingDeg(180), IsApproximately(Vector2.Left));
-			Assert.That(Vector2.HeadingDeg(90), IsApproximately(Vector2.Down));
-		}
-
-		[Test]
-		public void HeadingRadTest()
-		{
-			Assert.That(Vector2.HeadingRad(0), IsApproximately(Vector2.Right));
-			Assert.That(Vector2.HeadingRad(Mathf.Pi), IsApproximately(Vector2.Left));
-			Assert.That(Vector2.HeadingRad(Mathf.HalfPi), IsApproximately(Vector2.Down));
+			Assert.That(Vector2.CosSinRough(0), IsApproximately(Vector2.Right));
+			Assert.That(Vector2.CosSinRough(Mathf.Pi), IsApproximately(Vector2.Left));
+			Assert.That(Vector2.CosSinRough(Mathf.HalfPi), IsApproximately(Vector2.Down));
 		}
 
 		[Test]

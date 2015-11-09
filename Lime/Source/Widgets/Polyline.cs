@@ -105,7 +105,7 @@ namespace Lime
 			float length = n2.Length;
 			for (int i = 0; i < v.Length - 1; i++) {
 				float t = (float)i / (v.Length - 2);
-				p = -Vector2.HeadingDeg(Mathf.Lerp(t, angle1, angle2)) * length + b;
+				p = -Vector2.CosSinRough(Mathf.Lerp(t, angle1, angle2) * Mathf.DegToRad) * length + b;
 				v[i + 1] = new Vertex { Pos = p, Color = GlobalColor };
 			}
 			Renderer.DrawTriangleFan(null, null, v, v.Length);
@@ -124,7 +124,7 @@ namespace Lime
 			v[0] = new Vertex { Pos = center, Color = GlobalColor };
 			for (int i = 0; i <= numPoints; i++) {
 				float t = (float)i / numPoints;
-				Vector2 p = Vector2.HeadingDeg(Mathf.Lerp(t, angle1, angle2));
+				Vector2 p = Vector2.CosSinRough(Mathf.Lerp(t, angle1, angle2) * Mathf.DegToRad);
 				v[i + 1] = new Vertex { Pos = center + p * Thickness / 2, Color = GlobalColor };
 			}
 			Renderer.DrawTriangleFan(null, null, v, v.Length);

@@ -567,7 +567,7 @@ namespace Lime
 		private Vector2 GenerateRandomMotionControlPoint(ref float rayDirection)
 		{
 			rayDirection += RandomMotionRotation.UniformRandomNumber(Rng);
-			Vector2 result = Vector2.HeadingDeg(rayDirection);
+			Vector2 result = Vector2.CosSinRough(rayDirection * Mathf.DegToRad);
 			NumericRange radius = RandomMotionRadius;
 			if (radius.Dispersion == 0)
 				radius.Dispersion = radius.Median;
@@ -640,7 +640,7 @@ namespace Lime
 
 			case EmitterShape.Ellipse:
 				float angle = Rng.RandomFloat(0, 360);
-				Vector2 sincos = Vector2.HeadingDeg(angle);
+				Vector2 sincos = Vector2.CosSinRough(angle * Mathf.DegToRad);
 				position = 0.5f * ((sincos + Vector2.One) * Size);
 				p.RegularDirection = Direction.UniformRandomNumber(Rng) + emitterAngle - 90 + angle;
 				break;
@@ -746,14 +746,14 @@ namespace Lime
 			// Updating other properties of a particle.
 			float windVelocity = p.WindAmount * modifier.WindAmount;
 			if (windVelocity != 0) {
-				var windDirection = Vector2.HeadingDeg(p.WindDirection);
+				var windDirection = Vector2.CosSinRough(p.WindDirection * Mathf.DegToRad);
 				p.RegularPosition += windVelocity * delta * windDirection;
 			}
 			if (p.GravityVelocity != 0) {
-				var gravityDirection = Vector2.HeadingDeg(p.GravityDirection);
+				var gravityDirection = Vector2.CosSinRough(p.GravityDirection * Mathf.DegToRad);
 				p.RegularPosition += p.GravityVelocity * delta * gravityDirection;
 			}
-			var direction = Vector2.HeadingDeg(p.RegularDirection);
+			var direction = Vector2.CosSinRough(p.RegularDirection * Mathf.DegToRad);
 			float velocity = p.Velocity * modifier.Velocity;
 
 			p.RegularDirection += p.AngularVelocity * modifier.AngularVelocity * delta;
@@ -812,7 +812,7 @@ namespace Lime
 			ITexture texture = p.Modifier.GetTexture((int)p.TextureIndex - 1);
 			var imageSize = (Vector2)texture.ImageSize;
 			var particleSize = p.ScaleCurrent * imageSize;
-			var orientation = Vector2.HeadingDeg(angle);
+			var orientation = Vector2.CosSinRough(angle * Mathf.DegToRad);
 			var perpendicularOrientation = new Vector2(-orientation.Y, orientation.X);
 			var globalMatrix = new Matrix32 {
 				U = particleSize.X * orientation,
