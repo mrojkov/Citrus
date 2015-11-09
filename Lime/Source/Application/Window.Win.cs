@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using OpenTK.Graphics;
 
 namespace Lime
 {
@@ -128,11 +129,25 @@ namespace Lime
 		public void Center() { }
 		public void Close() { }
 
+		private class GLControl : OpenTK.GLControl
+		{
+			public GLControl(GraphicsMode mode, int major, int minor, GraphicsContextFlags flags)
+				: base(mode, major, minor, flags)
+			{
+
+			}
+			// Without this at least Left, Right, Up, Down and Tab keys are not submitted OnKeyDown
+			protected override bool IsInputKey(Keys keyData)
+			{
+				return true;
+			}
+		}
+
 		private static OpenTK.GLControl mainGLControl;
 
 		private static OpenTK.GLControl CreateGLControl()
 		{
-			return new OpenTK.GLControl(OpenTK.Graphics.GraphicsMode.Default, 2, 0,
+			return new GLControl(OpenTK.Graphics.GraphicsMode.Default, 2, 0,
 				Application.RenderingBackend == RenderingBackend.OpenGL ?
 				OpenTK.Graphics.GraphicsContextFlags.Default :
 				OpenTK.Graphics.GraphicsContextFlags.Embedded
@@ -462,6 +477,10 @@ namespace Lime
 					return Key.PageUp;
 				case Keys.PageDown:
 					return Key.PageDown;
+				case Keys.Home:
+					return Key.Home;
+				case Keys.End:
+					return Key.End;
 				case Keys.Menu:
 					return Key.AltLeft;
 				case Keys.ControlKey:
