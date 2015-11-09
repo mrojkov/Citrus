@@ -99,7 +99,19 @@ namespace Lime
 
 	public static class Application
 	{
-		public static IWindow MainWindow { get; set; }
+		private static IWindow mainWindow;
+		public static IWindow MainWindow 
+		{ 
+			get { return mainWindow; }
+			set
+			{
+				if (mainWindow != null || value == null) {
+					throw new InvalidOperationException();
+				}
+				mainWindow = value;
+				mainWindow.Updating += RunScheduledActions;
+			}
+		}
 
 		/// <summary>
 		/// Supported device orientations (only for mobile platforms)
@@ -334,9 +346,6 @@ namespace Lime
 			NSApplication.SharedApplication.Run();
 #elif WIN
 			System.Windows.Forms.Application.Run();
-#endif
-#if !UNITY
-			MainWindow.Updating += RunScheduledActions;
 #endif
 		}
 
