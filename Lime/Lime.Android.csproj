@@ -61,7 +61,6 @@
     <Compile Include="Source\Application\iOSGameController.cs" />
     <Compile Include="Source\Application\iOSGameView.cs" />
     <Compile Include="Source\Application\Logger.cs" />
-    <Compile Include="Source\Application\OpenTKGameView.cs" />
     <Compile Include="Source\Application\Sdl2.cs" />
     <Compile Include="Source\Application\WinApi.cs" />
     <Compile Include="Source\AssetsBundle\AssetsBundle.cs" />

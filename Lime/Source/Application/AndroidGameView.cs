@@ -46,7 +46,7 @@ namespace Lime
 					textInput += ' ';
 				} else if (e.Action != KeyEventActions.Multiple) {
 					var key = TranslateKeycode(keyCode);
-					if (key != Key.KeyCount) {
+					if (key != Key.Unknown) {
 						var state = e.Action != KeyEventActions.Up;
 						input.SetKeyState(key, state);
 					}
@@ -79,7 +79,7 @@ namespace Lime
 						return Key.End;
 					// TODO: add all alpha-numeric keys
 					default:
-						return Key.KeyCount;
+						return Key.Unknown;
 				}
 			}
 		}
