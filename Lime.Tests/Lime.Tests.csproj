@@ -52,6 +52,7 @@
     <Compile Include="Constraints\OrderConstraint.cs" />
     <Compile Include="Constraints\OrderConstraintResult.cs" />
     <Compile Include="Is.cs" />
+    <Compile Include="Mocks\NodeWithSideEffects.cs" />
     <Compile Include="Source\ExceptionTests.cs" />
     <Compile Include="Constraints\Vector2EqualConstraint.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
