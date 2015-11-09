@@ -300,6 +300,7 @@ namespace Lime
 		{
 			var position = (Vector2)SDToLime.Convert(e.Location);
 			Input.MousePosition = position * Input.ScreenToWorldTransform;
+			Input.SetTouchPosition(0, Input.MousePosition);
 		}
 
 		private void OnTick(object sender, EventArgs e)
