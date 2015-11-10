@@ -297,21 +297,18 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Запускает анимацию и возвращает true. Если такой анимации нет, возвращает false
+		/// Runs animation with provided Id and provided marker.
+		/// Returns false if sought-for animation or marker doesn't exist.
 		/// </summary>
-		/// <param name="markerId">Название маркера анимации</param>
 		public bool TryRunAnimation(string markerId, string animationId = null)
 		{
 			return Animations.TryRun(animationId, markerId);
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Запускает анимацию. Если такой анимации нет, генерирует исключение
+		/// Runs animation with provided Id and provided marker.
+		/// Throws an exception if sought-for animation or marker doesn't exist.
 		/// </summary>
-		/// <param name="markerId">Название маркера анимации</param>
-		/// <exception cref="Lime.Exception"/>
 		public void RunAnimation(string markerId, string animationId = null)
 		{
 			Animations.Run(animationId, markerId);
@@ -382,7 +379,7 @@ namespace Lime
 			return string.Format("{0}, \"{1}\", {2}", GetType().Name, Id ?? "", GetHierarchyPath());
 		}
 
-		// TODO: Transform to HierarchyPath property?
+		// SUGGESTION: Transform to HierarchyPath property?
 		/// <summary>
 		/// Returns hierarchy path for this Node in the format: "Parent.GetHierarchyPath()/Id (Tag)".
 		/// If Id is null then it's replaced with Type name. Tag is ommited if it's null.
@@ -695,7 +692,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Advances animation by provided delta.
+		/// Advances all running animations by provided delta.
 		/// </summary>
 		/// <param name="delta">Time delta (in seconds).</param>
 		public void AdvanceAnimation(float delta)
