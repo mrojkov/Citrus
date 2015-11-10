@@ -52,8 +52,6 @@
     <Compile Include="Constraints\OrderConstraint.cs" />
     <Compile Include="Constraints\OrderConstraintResult.cs" />
     <Compile Include="Is.cs" />
-    <Compile Include="Mocks\NodeWithAssets.cs" />
-    <Compile Include="Mocks\NodeWithSideEffects.cs" />
     <Compile Include="Source\ExceptionTests.cs" />
     <Compile Include="Constraints\Vector2EqualConstraint.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -71,6 +69,7 @@
     <Compile Include="Source\Types\SizeTests.cs" />
     <Compile Include="Source\Types\Vector2Tests.cs" />
     <Compile Include="Source\Types\Vector3Tests.cs" />
+    <Compile Include="Source\Widgets\NodeListTests.cs" />
     <Compile Include="Source\Widgets\NodeTests.cs" />
     <Compile Include="Source\Widgets\WidgetTests.cs" />
   </ItemGroup>
