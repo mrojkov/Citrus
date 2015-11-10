@@ -146,10 +146,11 @@ namespace OpenTK
 				var key = MacOSKeyMap.GetKey((MacOSKeyCode)theEvent.KeyCode);
 				Keyboard.OnKeyDown(new KeyboardKeyEventArgs {Key = key, Modifiers = theEvent.ModifierFlags});
 				foreach(var c in theEvent.Characters) {
-					// Imitation of original OpenTK backspace bug and filter every control key,
-					// including arrow keys (mapped 63232-63235)
+					// Imitation of original OpenTK backspace bug
+					const int backspaceCode = 127;
 					int intVal = (int)c;
-					if (!Char.IsControl(c) && (intVal < 63232 || intVal > 63235) && intVal != 127) {
+					bool isControl = Enum.IsDefined(typeof(NSFunctionKey), (ulong)c);
+					if (!isControl && intVal != backspaceCode) {
 						Keyboard.OnKeyPress(new KeyPressEventArgs{KeyChar = c});
 					}
 				}
@@ -164,7 +165,8 @@ namespace OpenTK
 			{ Key.LAlt, MacOSKeyModifiers.LAltFlag },
 			{ Key.RAlt, MacOSKeyModifiers.RAltFlag },
 			{ Key.LWin, MacOSKeyModifiers.LWinFlag },
-			{ Key.RWin, MacOSKeyModifiers.RWinFlag } };
+			{ Key.RWin, MacOSKeyModifiers.RWinFlag } 
+		};
 
 		public override void FlagsChanged(NSEvent theEvent)
 		{
