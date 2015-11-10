@@ -30,6 +30,9 @@ namespace Lime
 			}
 		}
 
+		public delegate void TextureMissingDelegate(string path);
+		public static event TextureMissingDelegate TextureMissing;
+
 #if UNITY
 		private readonly Dictionary<string, WeakReference> textures = new Dictionary<string, WeakReference>();
 #else
@@ -115,6 +118,9 @@ namespace Lime
 #endif
 			if (texture == null) {
 				Console.WriteLine("Missing texture '{0}'", path);
+				if (TextureMissing != null) {
+					TextureMissing(path);
+				}
 				texture = new StubTexture();
 			}
 			return texture;
