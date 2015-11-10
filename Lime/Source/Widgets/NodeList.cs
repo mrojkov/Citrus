@@ -221,7 +221,7 @@ namespace Lime
 				node.NextSibling = null;
 				node.PropagateDirtyFlags();
 			}
-			list.Clear();
+			list = null;
 		}
 
 		public Node TryFind(string id)
