@@ -1,7 +1,6 @@
 #if OPENGL
 using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 #if iOS || ANDROID || WIN
 using OpenTK.Graphics.ES20;
@@ -213,22 +212,12 @@ namespace Lime
 
 		public void LoadImage(IntPtr pixels, int width, int height, bool generateMips)
 		{
-			LoadImage(pixels, width, height, generateMips, swapRedAndBlue: false);
-		}
-
-		public void LoadImage(IntPtr pixels, int width, int height, bool generateMips, bool swapRedAndBlue)
-		{
-			if (swapRedAndBlue) {
-				throw new NotImplementedException();
-			}
-			var format = PixelFormat.Rgba;
-			if (!Application.CurrentThread.IsMain())
-			{
+			if (!Application.CurrentThread.IsMain()) {
 				throw new InvalidOperationException();
 			}
 			PrepareOpenGLTexture();
 			PlatformRenderer.PushTexture(handle, 0);
-			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, format, PixelType.UnsignedByte, pixels);
+			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
 			MemoryUsed = 4 * width * height;
 			if (generateMips) {
 #if !MAC && !iOS && !WIN
