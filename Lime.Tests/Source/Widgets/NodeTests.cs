@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Lime.Tests.Mocks;
 using NUnit.Framework;
 
@@ -29,6 +30,7 @@ namespace Lime.Tests
 			var grandChild = new Node { Id = "Grandchild" };
 			root.AddNode(child);
 			child.AddNode(grandChild);
+			Assert.That(root.GetRoot(), Is.EqualTo(root));
 			Assert.That(child.GetRoot(), Is.EqualTo(root));
 			Assert.That(grandChild.GetRoot(), Is.EqualTo(root));
 		}
@@ -47,16 +49,73 @@ namespace Lime.Tests
 			Assert.That(root.ChildOf(grandChild), Is.False);
 		}
 
+		private const string AnimationName = "Animation";
+		private const string MarkerName = "Marker";
+
 		[Test]
-		public void TryRunAnimationTest()
+		public void TryRunAnimationWithoutAnimationTest()
 		{
-			Assert.Fail();
+			var node = new Node();
+			Assert.That(node.TryRunAnimation(MarkerName), Is.False);
+			Assert.That(node.TryRunAnimation(MarkerName, AnimationName), Is.False);
 		}
 
 		[Test]
-		public void RunAnimationTest()
+		public void TryRunAnimationWithMarkerTest()
 		{
-			Assert.Fail();
+			var node = new Node();
+			var animation = new Animation();
+			animation.Markers.AddPlayMarker(MarkerName, 0);
+			node.Animations = new AnimationList(node) { animation };
+			Assert.That(node.TryRunAnimation(MarkerName, AnimationName), Is.False);
+			Assert.That(node.TryRunAnimation(MarkerName), Is.True);
+			Assert.That(node.CurrentAnimation, Is.EqualTo(MarkerName));
+		}
+
+		[Test]
+		public void TryRunAnimationWithMarkerAndIdTest()
+		{
+			var node = new Node();
+			var animation = new Animation {
+				Id = AnimationName
+			};
+			animation.Markers.AddPlayMarker(MarkerName, 0);
+			node.Animations = new AnimationList(node) { animation };
+			Assert.That(node.TryRunAnimation(MarkerName, AnimationName), Is.True);
+			Assert.That(node.CurrentAnimation, Is.EqualTo(MarkerName));
+		}
+
+		[Test]
+		public void RunAnimationWithoutAnimationTest()
+		{
+			var node = new Node();
+			Assert.Throws<Exception>(() => node.RunAnimation(MarkerName));
+			Assert.Throws<Exception>(() => node.RunAnimation(MarkerName, AnimationName));
+		}
+
+		[Test]
+		public void RunAnimationWithMarkerTest()
+		{
+			var node = new Node();
+			var animation = new Animation();	
+			animation.Markers.AddPlayMarker(MarkerName, 0);
+			node.Animations = new AnimationList(node) { animation };
+			node.RunAnimation(MarkerName);
+			Assert.That(node.CurrentAnimation, Is.EqualTo(MarkerName));
+			Assert.Throws<Exception>(() => node.RunAnimation(MarkerName, AnimationName));
+		}
+
+		[Test]
+		public void RunAnimationWithMarkerAndIdTest()
+		{
+			var node = new Node();
+			var animation = new Animation {
+				Id = AnimationName
+			};
+			animation.Markers.AddPlayMarker(MarkerName, 0);
+			node.Animations = new AnimationList(node) { animation };
+			node.RunAnimation(MarkerName, AnimationName);
+			Assert.That(node.CurrentAnimation, Is.EqualTo(MarkerName));
 		}
 
 		[Test]
@@ -122,22 +181,53 @@ namespace Lime.Tests
 		[Test]
 		public void UpdateTest()
 		{
-			Assert.Fail();
+			var root = new Node { Id = "Root" };
+			var child = new Node { Id = "Child" };
+			var grandChild = new Node { Id = "Grandchild" };
+			root.AddNode(child);
+			child.AddNode(grandChild);
+			var nodes = new List<Node> {root, child, grandChild};
+			foreach (var node in nodes) {
+				var animation = new Animation();
+				animation.Markers.AddPlayMarker("Start", 0);
+				node.Animations = new AnimationList(node) { animation };
+				node.RunAnimation("Start");
+			}
+			const float FrameDelta = (float)AnimationUtils.MsecsPerFrame / 1000;
+			var animationFrames = nodes.Select(node => node.AnimationFrame);
+			for (var i = 0; i < 10; i++) {
+				root.Update(FrameDelta);
+				Assert.That(animationFrames, Is.All.EqualTo(i));
+			}
 		}
 
 		[Test]
-		public void AddToRenderChainTest()
+		public void AddToRenderChainSingleNodeTest()
 		{
 			var renderChain = new RenderChain();
 			var root = new Node { Id = "Root" };
 			root.AddToRenderChain(renderChain);
 			Assert.That(renderChain.Enumerate(), Is.Empty);
+		}
+
+		[Test]
+		public void AddToRenderChainMultipleNodesTest()
+		{
+			var renderChain = new RenderChain();
+			var root = new Node { Id = "Root" };
 			var child = new Node { Id = "Child" };
 			var grandChild = new Node { Id = "Grandchild" };
 			root.AddNode(child);
 			child.AddNode(grandChild);
 			root.AddToRenderChain(renderChain);
 			Assert.That(renderChain.Enumerate(), Is.Empty);
+		}
+
+		[Test]
+		public void AddToRenderChainNodeWithSideEffectsTest()
+		{
+			var renderChain = new RenderChain();
+			var root = new Node { Id = "Root" };
 			var childWithSideEffects = new NodeWithSideEffects();
 			root.AddNode(childWithSideEffects);
 			root.AddToRenderChain(renderChain);
@@ -274,6 +364,7 @@ namespace Lime.Tests
 			root.AddNode(child2);
 			child1.AddNode(grandChild);
 			Assert.That(root.Descendants.Contains(child1));
+			Assert.That(root.Descendants.Contains(child2));
 			Assert.That(root.Descendants.Contains(grandChild));
 			Assert.That(child1.Descendants.Contains(grandChild));
 			Assert.That(grandChild.Descendants, Is.Empty);
@@ -288,13 +379,23 @@ namespace Lime.Tests
 		[Test]
 		public void AdvanceAnimationTest()
 		{
-			Assert.Fail();
+			var animation = new Animation();
+			animation.Markers.AddPlayMarker("Start", 0);
+			var node = new Node ();
+			node.Animations = new AnimationList(node) {animation};
+			node.RunAnimation("Start");
+			const float FrameDelta = (float)(AnimationUtils.MsecsPerFrame) / 1000;
+			for (var i = 0; i < 10; i++) {
+				node.AdvanceAnimation(FrameDelta);
+				Assert.That(node.AnimationFrame, Is.EqualTo(i));
+			}
 		}
 
 		[Test]
 		public void PreloadAssetsTest()
 		{
-			Assert.Fail();
+			var node = new NodeWithAssets();
+			node.PreloadAssets();
 		}
 	}
 }

@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace Lime.Tests.Mocks
+﻿namespace Lime.Tests.Mocks
 {
-	class NodeWithSideEffects: Node
+	public class NodeWithSideEffects: Node
 	{
 		public override void AddToRenderChain(RenderChain chain)
 		{
