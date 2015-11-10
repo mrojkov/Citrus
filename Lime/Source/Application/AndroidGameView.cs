@@ -419,7 +419,7 @@ namespace Lime
 		public class FixDelKeyEditable : SpannableStringBuilder
 		{
 			// Nika: there is no such symbol in android keyboard, so we can use it as unprocessed charcater.
-			public static ICharSequence OneUnprocessedCharacter = new Java.Lang.String("»");
+			public static ICharSequence OneUnprocessedCharacter = new Java.Lang.String("\ud804\udc00");
 
 			public FixDelKeyEditable(ICharSequence source) : base(source) { }
 
