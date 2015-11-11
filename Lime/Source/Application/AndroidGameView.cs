@@ -2,6 +2,7 @@
 using System;
 using Android.Content;
 using Android.Content.PM;
+using Android.OS;
 using Android.Text;
 using Android.Views;
 using Android.Views.InputMethods;
@@ -375,66 +376,81 @@ namespace Lime
 			lastFrameTimeStamp = now;
 		}
 
-		// Classes to help fix problem with DEL key on some devices
-		public class FixDelKeyInputConnection : BaseInputConnection
+#region FixDelKey
+		// Classes to help fix problem with DEL key event not triggered on some devices
+		class FixDelKeyInputConnection : BaseInputConnection
 		{
 			private IEditable myEditable = null;
+			private const long KeyInterval = 200;
+			private long eventTime;
 
-			public FixDelKeyInputConnection(View targetView, bool fullEditor) : base(targetView, fullEditor) { }
+			public FixDelKeyInputConnection(View targetView, bool fullEditor) 
+				: base(targetView, fullEditor) { }
 
 			public override IEditable Editable
 			{
 				get
 				{
-					if ((int)Android.OS.Build.VERSION.SdkInt >= 14) {
-						if (myEditable == null) {
-							myEditable = new FixDelKeyEditable(FixDelKeyEditable.OneUnprocessedCharacter);
-							Selection.SetSelection(myEditable, 1);
-						} else {
-							int myEditableLength = myEditable.Length();
-							if (myEditableLength == 0) {
-								myEditable.Append(FixDelKeyEditable.OneUnprocessedCharacter);
-								Selection.SetSelection(myEditable, 1);
-							}
-						}
-						return myEditable;
-					} else {
+					if (IsSdkVersionBelow14()) {
 						return base.Editable;
 					}
+					if (myEditable == null) {
+						myEditable = new FixDelKeyEditable(FixDelKeyEditable.OneUnprocessedCharacter);
+						Selection.SetSelection(myEditable, 1);
+					} else {
+						int myEditableLength = myEditable.Length();
+						if (myEditableLength == 0) {
+							myEditable.Append(FixDelKeyEditable.OneUnprocessedCharacter);
+							Selection.SetSelection(myEditable, 1);
+						}
+					}
+					return myEditable;
 				}
+			}
+
+			static bool IsSdkVersionBelow14()
+			{
+				return (int)Build.VERSION.SdkInt < 14;
 			}
 
 			public override bool DeleteSurroundingText(int leftLength, int rightLength)
 			{
-				if ((int)Android.OS.Build.VERSION.SdkInt >= 14 && (leftLength == 1 && rightLength == 0)) {
-					return 
-						base.SendKeyEvent(new KeyEvent(KeyEventActions.Down, Keycode.Del)) &&
-						base.SendKeyEvent(new KeyEvent(KeyEventActions.Up, Keycode.Del));
+				if (!IsSdkVersionBelow14() && (leftLength == 1 && rightLength == 0)) {
+					long currentTime = SystemClock.UptimeMillis();
+					if (currentTime - eventTime >= KeyInterval) {
+						eventTime = currentTime;
+						base.SendKeyEvent(new KeyEvent(eventTime, eventTime, KeyEventActions.Down, Keycode.Del, 0));
+						base.SendKeyEvent(new KeyEvent(SystemClock.UptimeMillis(), eventTime, KeyEventActions.Up, Keycode.Del, 0));
+					}
+					return true;
 				} else {
 					return base.DeleteSurroundingText(leftLength, rightLength);
 				}
 			}
 		}
 
-		public class FixDelKeyEditable : SpannableStringBuilder
+		class FixDelKeyEditable : SpannableStringBuilder
 		{
 			// Nika: there is no such symbol in android keyboard, so we can use it as unprocessed charcater.
-			public static ICharSequence OneUnprocessedCharacter = new Java.Lang.String("\ud804\udc00");
+			public static readonly ICharSequence OneUnprocessedCharacter = new Java.Lang.String("\ud804\udc00");
 
 			public FixDelKeyEditable(ICharSequence source) : base(source) { }
 
 			public override IEditable Replace(int start, int end, ICharSequence tb, int tbstart, int tbend)
 			{
-				if (tbend > tbstart) {
+				if (tbend > tbstart || end > start) {
 					base.Replace(0, Length(), (ICharSequence)new Java.Lang.String(""), 0, 0);
-					return base.Replace(0, 0, tb, tbstart, tbend);
-				} else if (end > start) {
-					base.Replace(0, Length(), (ICharSequence)new Java.Lang.String(""), 0, 0);
-					return base.Replace(0, 0, OneUnprocessedCharacter, 0, 1);
+					if (tbend > tbstart) {
+						return base.Replace(0, 0, tb, tbstart, tbend);
+					} else if (end > start) {
+						return base.Replace(0, 0, OneUnprocessedCharacter, 0, 1);
+					}
 				}
 				return base.Replace(start, end, tb, tbstart, tbend);
 			}
 		}
+#endregion
 	}
 }
+
 #endif
