@@ -179,6 +179,9 @@ namespace Lime
 			SetGlobalExceptionHandler();
 			AudioSystem.Initialize(options);
 #if WIN
+			System.Windows.Forms.Application.SetUnhandledExceptionMode(
+				System.Windows.Forms.UnhandledExceptionMode.ThrowException
+			);
 			SetProcessDPIAware();
 			Window.InitializeMainOpenGLContext();
 			SoftKeyboard = new DummySoftKeyboard();
