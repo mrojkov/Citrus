@@ -15,6 +15,7 @@ namespace ChromiumWebBrowser
 		private CefEventFlags modifiers = CefEventFlags.None;
 		private Widget widget;
 		private Widget popupWidget;
+		private bool popupTextureLoaded = false;
 
 		public ChromiumWebBrowser(Widget widget)
 		{
@@ -61,6 +62,7 @@ namespace ChromiumWebBrowser
 		{
 			if (args.Show == false) {
 				HidePopupWidget();
+				popupTextureLoaded = false;
 			}
 		}
 
@@ -83,6 +85,9 @@ namespace ChromiumWebBrowser
 					var bitmapPointer = bitmapInfo.BackBufferHandle;
 					SwapRedAndBlue32(bitmapPointer, bitmapInfo.Width * bitmapInfo.Height);
 					var targetTexture = browserLogic.BitmapInfo.IsPopup ? popupTexture : texture;
+					if (browserLogic.BitmapInfo.IsPopup) {
+						popupTextureLoaded = true;
+					}
 					targetTexture.LoadImage(bitmapPointer, bitmapInfo.Width, bitmapInfo.Height, false);
 				}
 			});
@@ -101,7 +106,9 @@ namespace ChromiumWebBrowser
 		public void Render()
 		{
 			RenderTextureToWidget(widget, texture);
-			RenderTextureToWidget(popupWidget, popupTexture);
+			if (popupTextureLoaded) {
+				RenderTextureToWidget(popupWidget, popupTexture);
+			}
 		}
 
 		private static void RenderTextureToWidget(Widget widget, ITexture texture)
