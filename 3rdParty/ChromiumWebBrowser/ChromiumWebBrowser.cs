@@ -14,7 +14,22 @@ namespace ChromiumWebBrowser
 		private CefEventFlags modifiers = CefEventFlags.None;
 		private Widget widget;
 
-		Input Input { get { return WidgetContext.Current.Window.Input; } }
+		public ChromiumWebBrowser(Widget widget)
+		{
+			this.widget = widget;
+			var browserSettings = new BrowserSettings {
+				OffScreenTransparentBackground = false
+			};
+			browserLogic = new ChromiumWebBrowserLogic(browserSettings: browserSettings) {
+				LifeSpanHandler = new LifeSpanHandler(),
+			};
+			browserLogic.NewScreenshot += LoadTexture;
+		}
+
+		private Input Input
+		{
+			get { return WidgetContext.Current.Window.Input; }
+		}
 
 		public Uri Url
 		{
@@ -27,18 +42,6 @@ namespace ChromiumWebBrowser
 			UpdateModifiers();
 			HandleMouse(widget);
 			HandleKeyboard();
-		}
-
-		public ChromiumWebBrowser(Widget widget)
-		{
-			this.widget = widget;
-			var browserSettings = new BrowserSettings {
-				OffScreenTransparentBackground = false
-			};
-			browserLogic = new ChromiumWebBrowserLogic(browserSettings: browserSettings) {
-				LifeSpanHandler = new LifeSpanHandler()
-			};
-			browserLogic.NewScreenshot += LoadTexture;
 		}
 
 		private void LoadTexture(object sender, EventArgs eventArgs)
@@ -99,17 +102,17 @@ namespace ChromiumWebBrowser
 
 		private void HandleLeftMouseButton(int x, int y)
 		{
-			HandleMouseButton(x, y, 0, 0);
+			HandleMouseButton(x, y, 0, MouseButtonType.Left);
 		}
 
 		private void HandleRightMouseButton(int x, int y)
 		{
-			HandleMouseButton(x, y, 1, 2);
+			HandleMouseButton(x, y, 1, MouseButtonType.Right);
 		}
 
 		private void HandleMouseWheel(int x, int y)
 		{
-			HandleMouseButton(x, y, 2, 1);
+			HandleMouseButton(x, y, 2, MouseButtonType.Middle);
 			if (Input.WasKeyPressed(Key.MouseWheelUp)) {
 				browserLogic.SendMouseWheelEvent(x, y, 0, mouseWheelSpeed);
 			}
@@ -118,13 +121,13 @@ namespace ChromiumWebBrowser
 			}
 		}
 
-		private void HandleMouseButton(int x, int y, int limeButton, int chromiumButon)
+		private void HandleMouseButton(int x, int y, int limeButton, MouseButtonType buttonType)
 		{
 			if (Input.WasMousePressed(limeButton)) {
-				browserLogic.SendMouseClick(x, y, chromiumButon, false, modifiers);
+				browserLogic.SendMouseClick(x, y, buttonType, false, modifiers);
 			}
 			if (Input.WasMouseReleased(limeButton)) {
-				browserLogic.SendMouseClick(x, y, chromiumButon, true, modifiers);
+				browserLogic.SendMouseClick(x, y, buttonType, true, modifiers);
 			}
 		}
 
@@ -171,7 +174,7 @@ namespace ChromiumWebBrowser
 
 		private void UpdateModifiers()
 		{
-			modifiers = 0;
+			modifiers = CefEventFlags.None;
 
 			if (Input.IsMousePressed(0))
 			{

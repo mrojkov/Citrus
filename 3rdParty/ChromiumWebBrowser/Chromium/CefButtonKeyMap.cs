@@ -2,7 +2,7 @@
 
 namespace ChromiumWebBrowser
 {
-	static class CefButtonKeyMap
+	internal static class CefButtonKeyMap
 	{
 		public static CefKey? GetButton(Key key)
 		{
