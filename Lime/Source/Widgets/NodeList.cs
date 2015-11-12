@@ -6,15 +6,9 @@ using ProtoBuf;
 
 namespace Lime
 {
-	/// <summary>
-	/// Список объектов сцены. Поведение аналогично стандартному списку List
-	/// </summary>
 	[ProtoContract]
 	public class NodeList : IList<Node>
 	{
-		/// <summary>
-		/// Перечислитель объектов сцены
-		/// </summary>
 		public struct Enumerator : IEnumerator<Node>
 		{
 			private Node first;
@@ -52,23 +46,23 @@ namespace Lime
 		private List<Node> list;
 
 		/// <summary>
-		/// Конструктор только для ProtoBuf
+		/// This constructor is used by ProtoBuf.
 		/// </summary>
 		public NodeList() { /* ctor for ProtoBuf only */ }
-
-		/// <summary>
-		/// Конструктор
-		/// </summary>
-		/// <param name="owner">Объект, которому будет принадлежать этот список</param>
+		
 		public NodeList(Node owner)
 		{
 			this.list = null;
 			this.owner = owner;
 		}
 
-		internal NodeList DeepCloneFast(Node clone)
+		/// <summary>
+		/// Creates a copy of this list with new owner.
+		/// Containing nodes will alse have their Parent set as new owner.
+		/// </summary>
+		internal NodeList DeepCloneFast(Node newOwner)
 		{
-			var result = new NodeList(clone);
+			var result = new NodeList(newOwner);
 			if (Count > 0) {
 				result.list = new List<Node>(Count);
 				foreach (var node in this) {
@@ -96,6 +90,10 @@ namespace Lime
 
 		public int Count { get { return list != null ? list.Count : 0; } }
 
+		/// <summary>
+		/// Returns Enumerator for this list. This method is preferrable over IEnumerable.GetEnumerator()
+		/// because it doesn't allocate new memory via boxing.
+		/// </summary>
 		public Enumerator GetEnumerator()
 		{
 			return new Enumerator(FirstOrNull());
@@ -135,7 +133,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Добавляет объект в начало списка
+		/// Adds a Node to the start of this list.
 		/// </summary>
 		public void Push(Node node)
 		{
@@ -143,7 +141,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Добавляет объект в конец списка
+		/// Adds a Node to the end of this list.
 		/// </summary>
 		public void Add(Node node)
 		{
@@ -224,6 +222,10 @@ namespace Lime
 			list = null;
 		}
 
+		/// <summary>
+		/// Searchs for node with provided Id in this list.
+		/// Returns null if this list doesn't contain sought-for node. 
+		/// </summary>
 		public Node TryFind(string id)
 		{
 			for (var node = FirstOrNull(); node != null; node = node.NextSibling) {
