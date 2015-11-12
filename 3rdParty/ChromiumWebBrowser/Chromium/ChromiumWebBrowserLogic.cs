@@ -330,7 +330,8 @@ namespace ChromiumWebBrowser
 
 		public bool StartDragging(IDragData dragData, DragOperationsMask mask, int x, int y)
 		{
-			throw new NotImplementedException();
+			//TODO: Implement
+			return false;
 		}
 
 		public void SendMouseWheelEvent(int x, int y, int deltaX, int deltaY, 
