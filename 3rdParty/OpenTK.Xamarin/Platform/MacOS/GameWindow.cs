@@ -126,7 +126,7 @@ namespace OpenTK
 				Mouse = Mouse,
 				Keyboard = Keyboard
 			};
-			var style = NSWindowStyle.Titled | NSWindowStyle.Closable;
+			var style = NSWindowStyle.Titled | NSWindowStyle.Closable | NSWindowStyle.Miniaturizable;
 			if ((flags & GameWindowFlags.FixedWindow) == 0) {
 				style |= NSWindowStyle.Resizable;
 			}
