@@ -9,6 +9,12 @@ namespace Lime.Tests.Source.Widgets
 	public class NodeListTests
 	{
 		[Test]
+		public void IsReadOnlyTest()
+		{
+			Assert.That(new NodeList().IsReadOnly, Is.False);
+		}
+
+		[Test]
 		public void IndexOfTest()
 		{
 			var list = new NodeList();
@@ -72,6 +78,35 @@ namespace Lime.Tests.Source.Widgets
 			Assert.That(list.Contains(node), Is.False);
 			list.Add(node);
 			Assert.That(list.Contains(node), Is.True);
+		}
+
+		[Test]
+		public void EnumeratorEmptyTest()
+		{
+			var list = new NodeList();
+			var enumerator = list.GetEnumerator();
+			Assert.That(enumerator.Current, Is.Null);
+			Assert.That(enumerator.MoveNext(), Is.False);
+		}
+
+		[Test]
+		public void EnumeratorNotEmptyTest()
+		{
+			var node1 = new Node { Layer = 3 };
+			var node2 = new Node { Layer = 2 };
+			var node3 = new Node { Layer = 1 };
+			var list = new NodeList { node1, node2, node3 };
+			var enumerator = list.GetEnumerator();
+			for (int i = 0; i < 10; i++) {
+				Assert.That(enumerator.Current, Is.Null);
+				foreach (var node in new List<Node> {node1, node2, node3}) {
+					Assert.That(enumerator.MoveNext(), Is.True);
+					Assert.That(enumerator.Current, Is.EqualTo(node));
+				}
+				Assert.That(enumerator.MoveNext(), Is.False);
+				// BUG: This expression is not mandatory
+				enumerator.Reset();
+			}
 		}
 
 		[Test]
@@ -270,9 +305,50 @@ namespace Lime.Tests.Source.Widgets
 		}
 
 		[Test]
-		public void IndexerTest()
+		public void IndexerGetEmptyTest()
 		{
-			Assert.Fail();
+			var list = new NodeList();
+			Node node;
+			Assert.Throws<IndexOutOfRangeException>(() => node = list[0]);
+		}
+
+		[Test]
+		public void IndexerGetNotEmptyTest()
+		{
+			var node1 = new Node();
+			var node2 = new Node();
+			var node3 = new Node();
+			var list = new NodeList { node1, node2, node3 };
+			Node node;
+			Assert.Throws<ArgumentOutOfRangeException>(() => node = list[-1]);
+			Assert.Throws<ArgumentOutOfRangeException>(() => node = list[3]);
+			Assert.That(list[1], Is.EqualTo(node2));
+		}
+
+		[Test]
+		public void IndexerSetEmptyTest()
+		{
+			var list = new NodeList();
+			Assert.Throws<ArgumentOutOfRangeException>(() => list[0] = new Node());
+		}
+
+		[Test]
+		public void IndexerSetNotEmptyTest()
+		{
+			var owner = new Node();
+			var node1 = new Node();
+			var node2 = new Node();
+			var node3 = new Node();
+			var list = new NodeList(owner) { node1, node2, node3 };
+			var newNode = new Node();
+			list[1] = newNode;
+			Assert.That(list.IndexOf(newNode), Is.EqualTo(1));
+			Assert.That(list, Is.Not.Contains(node2));
+			Assert.That(node1.NextSibling, Is.SameAs(newNode));
+			Assert.That(newNode.NextSibling, Is.SameAs(node3));
+			Assert.That(newNode.Parent, Is.SameAs(owner));
+			Assert.That(node2.Parent, Is.Null);
+			Assert.That(node2.NextSibling, Is.Null);
 		}
 	}
 }
