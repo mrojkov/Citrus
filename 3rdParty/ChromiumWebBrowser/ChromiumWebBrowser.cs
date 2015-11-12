@@ -10,13 +10,18 @@ namespace ChromiumWebBrowser
 	{
 		private ChromiumWebBrowserLogic browserLogic;
 		private Texture2D texture = new Texture2D();
+		private Texture2D popupTexture = new Texture2D();
 		private int mouseWheelSpeed = 100;
 		private CefEventFlags modifiers = CefEventFlags.None;
 		private Widget widget;
+		private Widget popupWidget;
 
 		public ChromiumWebBrowser(Widget widget)
 		{
 			this.widget = widget;
+			popupWidget = new Widget();
+			HidePopupWidget();
+			widget.AddNode(popupWidget);
 			var browserSettings = new BrowserSettings {
 				OffScreenTransparentBackground = false
 			};
@@ -24,6 +29,8 @@ namespace ChromiumWebBrowser
 				LifeSpanHandler = new LifeSpanHandler(),
 			};
 			browserLogic.NewScreenshot += LoadTexture;
+			browserLogic.PopupOpen += OnPopupShow;
+			browserLogic.PopupTransformed += OnPopupTransform;
 		}
 
 		private Input Input
@@ -44,6 +51,25 @@ namespace ChromiumWebBrowser
 			HandleKeyboard();
 		}
 
+		private void HidePopupWidget()
+		{
+			popupWidget.Position = Vector2.Zero;
+			popupWidget.Size = Vector2.Zero;
+		}
+
+		private void OnPopupShow(object sender, PopupOpenArgs args)
+		{
+			if (args.Show == false) {
+				HidePopupWidget();
+			}
+		}
+
+		private void OnPopupTransform(object sender, PopupTransformArgs args)
+		{
+			popupWidget.Position = new Vector2(args.X, args.Y);
+			popupWidget.Size = new Vector2(args.Width, args.Height);
+		}
+
 		private void LoadTexture(object sender, EventArgs eventArgs)
 		{
 			Application.InvokeOnMainThread(() => {
@@ -56,7 +82,8 @@ namespace ChromiumWebBrowser
 				{
 					var bitmapPointer = bitmapInfo.BackBufferHandle;
 					SwapRedAndBlue32(bitmapPointer, bitmapInfo.Width * bitmapInfo.Height);
-					texture.LoadImage(bitmapPointer, bitmapInfo.Width, bitmapInfo.Height, false);
+					var targetTexture = browserLogic.BitmapInfo.IsPopup ? popupTexture : texture;
+					targetTexture.LoadImage(bitmapPointer, bitmapInfo.Width, bitmapInfo.Height, false);
 				}
 			});
 		}
@@ -67,9 +94,17 @@ namespace ChromiumWebBrowser
 			browserLogic = null;
 			texture.Dispose();
 			texture = null;
+			popupTexture.Dispose();
+			popupTexture = null;
 		}
 
 		public void Render()
+		{
+			RenderTextureToWidget(widget, texture);
+			RenderTextureToWidget(popupWidget, popupTexture);
+		}
+
+		private static void RenderTextureToWidget(Widget widget, ITexture texture)
 		{
 			Renderer.Blending = widget.GlobalBlending;
 			Renderer.Shader = widget.GlobalShader;

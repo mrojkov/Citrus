@@ -4,8 +4,9 @@ namespace ChromiumWebBrowser
 {
 	class LifeSpanHandler: ILifeSpanHandler
 	{
-		public bool OnBeforePopup(IWebBrowser browserControl, IBrowser browser, IFrame frame, string targetUrl, string targetFrameName,
-			WindowOpenDisposition targetDisposition, bool userGesture, IWindowInfo windowInfo, ref bool noJavascriptAccess,
+		public bool OnBeforePopup(IWebBrowser browserControl, IBrowser browser, IFrame frame, 
+			string targetUrl, string targetFrameName, WindowOpenDisposition targetDisposition, 
+			bool userGesture, IWindowInfo windowInfo, ref bool noJavascriptAccess,
 			out IWebBrowser newBrowser)
 		{
 			// Preserve new windows to be opened and load all popup urls in the same browser view

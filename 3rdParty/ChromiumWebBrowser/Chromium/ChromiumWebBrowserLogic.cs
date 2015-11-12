@@ -152,6 +152,8 @@ namespace ChromiumWebBrowser
 		public event EventHandler BrowserInitialized;
 		public event EventHandler<AddressChangedEventArgs> AddressChanged;
 		public event EventHandler<TitleChangedEventArgs> TitleChanged;
+		public event EventHandler<PopupOpenArgs> PopupOpen;
+		public event EventHandler<PopupTransformArgs> PopupTransformed;
 
 		/// <summary>
 		/// Fired by a separate thread when Chrome has re-rendered.
@@ -365,12 +367,18 @@ namespace ChromiumWebBrowser
 
 		public void SetPopupIsOpen(bool show)
 		{
-			throw new NotImplementedException();
+			var handler = PopupOpen;
+			if (handler != null) {
+				handler(this, new PopupOpenArgs(show));
+			}
 		}
 
 		public void SetPopupSizeAndPosition(int width, int height, int x, int y)
 		{
-			throw new NotImplementedException();
+			var handler = PopupTransformed;
+			if (handler != null) {
+				handler(this, new PopupTransformArgs(width, height, x, y));
+			}
 		}
 
 		private void Dispose(bool disposing)

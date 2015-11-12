@@ -84,6 +84,8 @@
     <Compile Include="Chromium\ChromiumWebBrowserLogic.cs" />
     <Compile Include="Chromium\GdiBitmapInfo.cs" />
     <Compile Include="Chromium\LifeSpanHandler.cs" />
+    <Compile Include="Chromium\PopupOpenArgs.cs" />
+    <Compile Include="Chromium\PopupTransformArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ChromiumWebBrowser.cs" />
   </ItemGroup>
