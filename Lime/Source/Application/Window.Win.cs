@@ -1,9 +1,6 @@
 ﻿#if WIN
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using OpenTK.Graphics;
 
@@ -267,7 +264,10 @@ namespace Lime
 
 		private void OnResize(object sender, EventArgs e)
 		{
-			RaiseResized();
+			// Nika: Minimized window has 0x0 size and better not to call RaiseResized() at this state.
+			if (State != WindowState.Minimized) {
+				RaiseResized();
+			}
 		}
 
 		private void OnMouseDown(object sender, MouseEventArgs e)
