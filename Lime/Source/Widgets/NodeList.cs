@@ -109,7 +109,7 @@ namespace Lime
 			return new Enumerator(FirstOrNull());
 		}
 
-		bool ICollection<Node>.IsReadOnly {
+		public bool IsReadOnly {
 			get { return false; }
 		}
 
