@@ -48,7 +48,7 @@ namespace ChromiumWebBrowser
 		public void Update(float delta)
 		{
 			UpdateModifiers();
-			HandleMouse(widget);
+			HandleMouse();
 			HandleKeyboard();
 		}
 
@@ -126,7 +126,7 @@ namespace ChromiumWebBrowser
 			}
 		}
 
-		private void HandleMouse(Widget widget)
+		private void HandleMouse()
 		{
 			var position = Input.MousePosition - widget.GlobalPosition;
 			var x = (int)position.X;
