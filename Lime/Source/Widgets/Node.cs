@@ -417,7 +417,7 @@ namespace Lime
 		/// Advances animations of this node and calls Update of all its children.
 		/// Usually called once a frame.
 		/// </summary>
-		/// <param name="delta">Time delta from last Update.</param>
+		/// <param name="delta">Time delta since last Update.</param>
 		public virtual void Update(float delta)
 		{
 			delta *= AnimationSpeed;
