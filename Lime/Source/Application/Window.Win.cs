@@ -121,7 +121,15 @@ namespace Lime
 			set { form.Visible = value; }
 		}
 
-		public MouseCursor Cursor { get; set; }
+		private MouseCursor cursor;
+		public MouseCursor Cursor
+		{
+			get { return cursor; }
+			set {
+				cursor = value;
+				form.Cursor = value.WinFormsCursor;
+			}
+		}
 
 		public void Center() { }
 		public void Close() { }
