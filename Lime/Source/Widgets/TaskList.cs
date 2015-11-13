@@ -131,8 +131,6 @@ namespace Lime
 			}
 		}
 
-		#region Utility methods
-
 		/// <summary>
 		/// TODO: Add summary
 		/// Задача (таск), изменяющая число в указанном диапазоне в течении указанного периода времени.
@@ -182,7 +180,5 @@ namespace Lime
 			}
 			yield return to;
 		}
-		
-		#endregion
 	}
 }
