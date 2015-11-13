@@ -553,22 +553,25 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Translate
-		/// Ищет виджет, находящийся в контейнере этого виджета (рекурсивно).
-		/// Если виджета с таким Id нет, генерирует исключение
-		/// </summary>
-		/// <param name="id">Id искомого виджета</param>
-		public Widget this[string id]
+		/// Searches for widget with provided path or id in this widget's descendants.
+		/// Throws an exception if sought-for widget doesn't exist.
+		/// <para>This function is thread safe.</para>
+		/// </summary> 
+		/// <param name="path">Id or path of widget. Path can be incomplete 
+		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
+		public Widget this[string path]
 		{
-			get { return Find<Widget>(id); }
+			get { return Find<Widget>(path); }
 		}
 
+
 		/// <summary>
-		/// TODO: Translate
-		/// Ищет виджет, находящийся в контейнере этого виджета (рекурсивно).
-		/// Если виджета с таким Id нет, генерирует исключение
-		/// </summary>
-		/// <param name="id">Id искомого виджета</param>
+		/// Searches for widget with provided path or id in this widget's descendants.
+		/// Throws an exception if sought-for widget doesn't exist.
+		/// <para>This function is thread safe.</para>
+		/// </summary> 
+		/// <param name="format">Id or path of widget. Path can be incomplete 
+		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
 		public Widget this[string format, params object[] arg]
 		{
 			get { return Find<Widget>(string.Format(format, arg)); }
