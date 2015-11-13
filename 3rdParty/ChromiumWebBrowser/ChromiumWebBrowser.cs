@@ -29,13 +29,13 @@ namespace ChromiumWebBrowser
 			browserController = new ChromiumWebBrowserController(browserSettings: browserSettings) {
 				LifeSpanHandler = new LifeSpanHandler(),
 			};
-			browserController.NewScreenshot += LoadTexture;
-			browserController.PopupOpen += OnPopupShow;
-			browserController.PopupTransformed += OnPopupTransform;
-			browserController.CursorChanged += BrowserControllerCursorChanged;
+			browserController.NewScreenshot += BrowserController_NewScreenshot;
+			browserController.PopupOpen += BrowserController_PopupOpen;
+			browserController.PopupTransformed += BrowserController_PopupTransformed;
+			browserController.CursorChanged += BrowserController_CursorChanged;
 		}
 
-		private void BrowserControllerCursorChanged(object sender, CursorChangedEventArgs args)
+		private void BrowserController_CursorChanged(object sender, CursorChangedEventArgs args)
 		{
 			var window = WidgetContext.Current.Window as Window;
 			if (window != null) {
@@ -69,7 +69,7 @@ namespace ChromiumWebBrowser
 			popupWidget.Size = Vector2.Zero;
 		}
 
-		private void OnPopupShow(object sender, PopupOpenEventArgs args)
+		private void BrowserController_PopupOpen(object sender, PopupOpenEventArgs args)
 		{
 			if (args.Show == false) {
 				HidePopupWidget();
@@ -77,13 +77,13 @@ namespace ChromiumWebBrowser
 			}
 		}
 
-		private void OnPopupTransform(object sender, PopupTransformEventArgs args)
+		private void BrowserController_PopupTransformed(object sender, PopupTransformEventArgs args)
 		{
 			popupWidget.Position = new Vector2(args.X, args.Y);
 			popupWidget.Size = new Vector2(args.Width, args.Height);
 		}
 
-		private void LoadTexture(object sender, EventArgs eventArgs)
+		private void BrowserController_NewScreenshot(object sender, EventArgs eventArgs)
 		{
 			Application.InvokeOnMainThread(() => {
 				if (browserController == null)
