@@ -114,6 +114,7 @@ namespace Lime
 				var style = node as TextStyle;
 				if (style != null) {
 					style.Size *= ratio;
+					style.ImageSize *= ratio;
 				}
 			}
 			base.StaticScale(ratio, roundCoordinates);
