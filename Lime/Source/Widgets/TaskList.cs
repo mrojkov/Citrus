@@ -15,24 +15,32 @@ namespace Lime
 		public T1 Value1;
 		public T2 Value2;
 	}
-
-	/// <summary>
-	/// Список задач (тасков) (Tasks). Аналогичен стандартному List
-	/// </summary>
+	
 	public class TaskList : List<Task>
 	{
 		[ThreadStatic]
 		private static TaskList current;
+
+		/// <summary>
+		/// Currently processing task.
+		/// </summary>
 		public static TaskList Current { 
 			get { return current; } 
 			private set { current = value; } 
 		}
 
+		/// <summary>
+		/// Total time accumulated via Update.
+		/// </summary>
 		public float Time;
+
+		/// <summary>
+		/// Time delta since last Update.
+		/// </summary>
 		public float Delta;
 
 		/// <summary>
-		/// Останавливает все таски
+		/// Stops all tasks.
 		/// </summary>
 		public void Stop()
 		{
@@ -43,7 +51,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Останавливает таски, удовлетворяющие заданному условию
+		/// Stops all tasks that match the conditions defined by the specified predicate.
 		/// </summary>
 		public void Stop(Predicate<Task> match)
 		{
@@ -56,7 +64,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Останавливает таск с указанным тегом (допустимо null, тогда будут останвлены задачи с тегом null)
+		/// Stops all tasks with specified tag (null is also a tag).
 		/// </summary>
 		public void StopByTag(object tag)
 		{
@@ -64,7 +72,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Добавляет таск в конец списка
+		/// Adds task to the end of this list.
 		/// </summary>
 		public Task Add(IEnumerator<object> e, object tag = null)
 		{
@@ -74,7 +82,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Добавляет таск в конец списка
+		/// Adds task to the end of this list.
 		/// </summary>
 		public Task Add(Func<IEnumerator<object>> e, object tag = null)
 		{
@@ -82,7 +90,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Останавливает таск с указанным тегом, создает новую с таким-же тегом и добавляет ее в конец списка
+		/// Stops all tasks with specified tag, creates new one with same tag 
+		/// and adds it to the end of this list.
 		/// </summary>
 		public Task Replace(IEnumerator<object> e, object tag)
 		{
@@ -93,9 +102,9 @@ namespace Lime
 		private bool isBeingUpdated;
 
 		/// <summary>
-		/// Обновляет свое состояние (удаляет завершенные задачи, запускает новые и т.д.)
+		/// Advances tasks by provided delta and removes completed ones.
 		/// </summary>
-		/// <param name="delta">Время, прошедшее с предыдущего вызова Update в секундах</param>
+		/// <param name="delta">Time delta since last Update.</param>
 		public void Update(float delta)
 		{
 			if (isBeingUpdated) {
@@ -125,6 +134,7 @@ namespace Lime
 		#region Utility methods
 
 		/// <summary>
+		/// TODO: Add summary
 		/// Задача (таск), изменяющая число в указанном диапазоне в течении указанного периода времени.
 		/// Значение изменяется по синусоиде от from к to
 		/// </summary>
@@ -141,6 +151,7 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// TODO: Add summary
 		/// Задача (таск), изменяющая число в указанном диапазоне в течении указанного периода времени.
 		/// Значение изменяется по функции квадратного корня от from к to
 		/// </summary>
@@ -157,6 +168,7 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// TODO: Add summary
 		/// Задача (таск), изменяющая число в указанном диапазоне в течении указанного периода времени.
 		/// Значение изменяется от from к to линейно
 		/// </summary>
