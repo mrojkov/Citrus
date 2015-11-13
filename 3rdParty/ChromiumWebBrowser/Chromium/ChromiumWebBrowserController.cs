@@ -10,7 +10,7 @@ namespace ChromiumWebBrowser
 	///	An offscreen instance of Chromium that you can use to render
 	///	webpages or evaluate JavaScript.
 	/// </summary>
-	public class ChromiumWebBrowserLogic : IRenderWebBrowser
+	public class ChromiumWebBrowserController : IRenderWebBrowser
 	{
 		/// <summary>
 		///	Object that contains info about last taken snapshot.
@@ -29,7 +29,7 @@ namespace ChromiumWebBrowser
 		/// </summary>
 		private Size size;
 
-		static ChromiumWebBrowserLogic()
+		static ChromiumWebBrowserController()
 		{
 			Cef.Initialize();
 			Application.MainWindow.Closed += () => {
@@ -47,7 +47,7 @@ namespace ChromiumWebBrowser
 		/// <param name="browserSettings">The browser settings to use. If null, the default settings are used.</param>
 		/// <param name="requestcontext">See <see cref="RequestContext"/> for more details. Defaults to null</param>
 		/// <param name="width">Width of browser</param>
-		public ChromiumWebBrowserLogic(int width = 1366, int height = 768, string address = "", 
+		public ChromiumWebBrowserController(int width = 1366, int height = 768, string address = "", 
 			RequestContext requestcontext = null, BrowserSettings browserSettings = null)
 		{
 			if (!Cef.IsInitialized && !Cef.Initialize()) {

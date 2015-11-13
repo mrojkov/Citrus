@@ -8,7 +8,7 @@ namespace ChromiumWebBrowser
 {
 	public sealed class ChromiumWebBrowser : IWebBrowserImplementation
 	{
-		private ChromiumWebBrowserLogic browserLogic;
+		private ChromiumWebBrowserController browserController;
 		private Texture2D texture = new Texture2D();
 		private Texture2D popupTexture = new Texture2D();
 		private int mouseWheelSpeed = 100;
@@ -26,16 +26,16 @@ namespace ChromiumWebBrowser
 			var browserSettings = new BrowserSettings {
 				OffScreenTransparentBackground = false
 			};
-			browserLogic = new ChromiumWebBrowserLogic(browserSettings: browserSettings) {
+			browserController = new ChromiumWebBrowserController(browserSettings: browserSettings) {
 				LifeSpanHandler = new LifeSpanHandler(),
 			};
-			browserLogic.NewScreenshot += LoadTexture;
-			browserLogic.PopupOpen += OnPopupShow;
-			browserLogic.PopupTransformed += OnPopupTransform;
-			browserLogic.CursorChanged += BrowserLogic_CursorChanged;
+			browserController.NewScreenshot += LoadTexture;
+			browserController.PopupOpen += OnPopupShow;
+			browserController.PopupTransformed += OnPopupTransform;
+			browserController.CursorChanged += BrowserControllerCursorChanged;
 		}
 
-		private void BrowserLogic_CursorChanged(object sender, CursorChangedArgs args)
+		private void BrowserControllerCursorChanged(object sender, CursorChangedArgs args)
 		{
 			var window = WidgetContext.Current.Window as Window;
 			if (window != null) {
@@ -52,8 +52,8 @@ namespace ChromiumWebBrowser
 
 		public Uri Url
 		{
-			get { return new Uri(browserLogic.Address); }
-			set { browserLogic.Load(value.AbsoluteUri); }
+			get { return new Uri(browserController.Address); }
+			set { browserController.Load(value.AbsoluteUri); }
 		}
 
 		public void Update(float delta)
@@ -86,17 +86,17 @@ namespace ChromiumWebBrowser
 		private void LoadTexture(object sender, EventArgs eventArgs)
 		{
 			Application.InvokeOnMainThread(() => {
-				if (browserLogic == null)
+				if (browserController == null)
 					return;
-				var bitmapInfo = browserLogic.BitmapInfo;
+				var bitmapInfo = browserController.BitmapInfo;
 				if (bitmapInfo == null)
 					return;
 				//lock (bitmapInfo.BitmapLock)
 				{
 					var bitmapPointer = bitmapInfo.BackBufferHandle;
 					SwapRedAndBlue32(bitmapPointer, bitmapInfo.Width * bitmapInfo.Height);
-					var targetTexture = browserLogic.BitmapInfo.IsPopup ? popupTexture : texture;
-					if (browserLogic.BitmapInfo.IsPopup) {
+					var targetTexture = browserController.BitmapInfo.IsPopup ? popupTexture : texture;
+					if (browserController.BitmapInfo.IsPopup) {
 						popupTextureLoaded = true;
 					}
 					targetTexture.LoadImage(bitmapPointer, bitmapInfo.Width, bitmapInfo.Height, false);
@@ -106,8 +106,8 @@ namespace ChromiumWebBrowser
 
 		public void Dispose()
 		{
-			browserLogic.Dispose();
-			browserLogic = null;
+			browserController.Dispose();
+			browserController = null;
 			texture.Dispose();
 			texture = null;
 			popupTexture.Dispose();
@@ -132,8 +132,8 @@ namespace ChromiumWebBrowser
 
 		public void OnSizeChanged(Vector2 sizeDelta)
 		{
-			if (browserLogic != null) {
-				browserLogic.Size = new Size((int)widget.Size.X, (int)widget.Size.Y);
+			if (browserController != null) {
+				browserController.Size = new Size((int)widget.Size.X, (int)widget.Size.Y);
 			}
 		}
 
@@ -143,10 +143,10 @@ namespace ChromiumWebBrowser
 			var x = (int)position.X;
 			var y = (int)position.Y;
 			if (widget.IsMouseOver()) {
-				browserLogic.SendMouseMove(x, y, false, modifiers);
+				browserController.SendMouseMove(x, y, false, modifiers);
 			}
 			else {
-				browserLogic.SendMouseMove(-1, -1, true, modifiers);
+				browserController.SendMouseMove(-1, -1, true, modifiers);
 			}
 			HandleLeftMouseButton(x, y);
 			HandleRightMouseButton(x, y);
@@ -167,20 +167,20 @@ namespace ChromiumWebBrowser
 		{
 			HandleMouseButton(x, y, 2, MouseButtonType.Middle);
 			if (Input.WasKeyPressed(Key.MouseWheelUp)) {
-				browserLogic.SendMouseWheelEvent(x, y, 0, mouseWheelSpeed);
+				browserController.SendMouseWheelEvent(x, y, 0, mouseWheelSpeed);
 			}
 			if (Input.WasKeyPressed(Key.MouseWheelDown)) {
-				browserLogic.SendMouseWheelEvent(x, y, 0, -mouseWheelSpeed);
+				browserController.SendMouseWheelEvent(x, y, 0, -mouseWheelSpeed);
 			}
 		}
 
 		private void HandleMouseButton(int x, int y, int limeButton, MouseButtonType buttonType)
 		{
 			if (Input.WasMousePressed(limeButton)) {
-				browserLogic.SendMouseClick(x, y, buttonType, false, modifiers);
+				browserController.SendMouseClick(x, y, buttonType, false, modifiers);
 			}
 			if (Input.WasMouseReleased(limeButton)) {
-				browserLogic.SendMouseClick(x, y, buttonType, true, modifiers);
+				browserController.SendMouseClick(x, y, buttonType, true, modifiers);
 			}
 		}
 
@@ -203,14 +203,14 @@ namespace ChromiumWebBrowser
 					continue;
 				}
 				if (input.WasKeyPressed(key)) {
-					browserLogic.SendKeyPress((int)CefMessage.KeyDown, (int)cefKey, modifiers);
+					browserController.SendKeyPress((int)CefMessage.KeyDown, (int)cefKey, modifiers);
 					// OpenTK doesn't get character for Enter
 					if (cefKey == CefKey.Return) {
-						browserLogic.SendKeyPress((int)CefMessage.Char, '\r', modifiers);
+						browserController.SendKeyPress((int)CefMessage.Char, '\r', modifiers);
 					}
 				}
 				if (input.WasKeyReleased(key)) {
-					browserLogic.SendKeyPress((int)CefMessage.KeyUp, (int)cefKey, modifiers);
+					browserController.SendKeyPress((int)CefMessage.KeyUp, (int)cefKey, modifiers);
 				}
 			}
 		}
@@ -221,7 +221,7 @@ namespace ChromiumWebBrowser
 				return;
 			}
 			foreach (var character in Input.TextInput) {
-				browserLogic.SendKeyPress((int)CefMessage.Char, character, modifiers);
+				browserController.SendKeyPress((int)CefMessage.Char, character, modifiers);
 			}
 		}
 
