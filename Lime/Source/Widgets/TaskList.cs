@@ -132,13 +132,9 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Add summary
-		/// Задача (таск), изменяющая число в указанном диапазоне в течении указанного периода времени.
-		/// Значение изменяется по синусоиде от from к to
+		/// Returns a sequence of numbers, interpolated as sine in specified time period.
+		/// Advances by using Current.Delta.
 		/// </summary>
-		/// <param name="timePeriod">Период времени в секундах</param>
-		/// <param name="from">Начальное значение</param>
-		/// <param name="to">Конечное значение</param>
 		public static IEnumerable<float> SinMotion(float timePeriod, float from, float to)
 		{
 			for (float t = 0; t < timePeriod; t += Current.Delta) {
@@ -149,13 +145,9 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Add summary
-		/// Задача (таск), изменяющая число в указанном диапазоне в течении указанного периода времени.
-		/// Значение изменяется по функции квадратного корня от from к to
+		/// Returns a sequence of numbers, interpolated as square root in specified time period.
+		/// Advances by using Current.Delta.
 		/// </summary>
-		/// <param name="timePeriod">Период времени в секундах</param>
-		/// <param name="from">Начальное значение</param>
-		/// <param name="to">Конечное значение</param>
 		public static IEnumerable<float> SqrtMotion(float timePeriod, float from, float to)
 		{
 			for (float t = 0; t < timePeriod; t += Current.Delta) {
@@ -166,13 +158,9 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// TODO: Add summary
-		/// Задача (таск), изменяющая число в указанном диапазоне в течении указанного периода времени.
-		/// Значение изменяется от from к to линейно
+		/// Returns a sequence of numbers, linear interpolated in specified time period.
+		/// Advances by using Current.Delta.
 		/// </summary>
-		/// <param name="timePeriod">Период времени в секундах</param>
-		/// <param name="from">Начальное значение</param>
-		/// <param name="to">Конечное значение</param>
 		public static IEnumerable<float> LinearMotion(float timePeriod, float from, float to)
 		{
 			for (float t = 0; t < timePeriod; t += Current.Delta) {
