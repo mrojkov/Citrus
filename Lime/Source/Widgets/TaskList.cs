@@ -58,9 +58,9 @@ namespace Lime
 			foreach (var i in ToArray()) {
 				if (match(i)) {
 					i.Dispose();
+					Remove(i);
 				}
 			}
-			RemoveAll(match);
 		}
 
 		/// <summary>
