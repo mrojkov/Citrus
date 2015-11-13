@@ -32,6 +32,17 @@ namespace ChromiumWebBrowser
 			browserLogic.NewScreenshot += LoadTexture;
 			browserLogic.PopupOpen += OnPopupShow;
 			browserLogic.PopupTransformed += OnPopupTransform;
+			browserLogic.CursorChanged += BrowserLogic_CursorChanged;
+		}
+
+		private void BrowserLogic_CursorChanged(object sender, CursorChangedArgs args)
+		{
+			var window = WidgetContext.Current.Window as Window;
+			if (window != null) {
+				Application.InvokeOnMainThread(() => {
+					window.Cursor = new MouseCursor(args.Handle);
+				});
+			}
 		}
 
 		private Input Input

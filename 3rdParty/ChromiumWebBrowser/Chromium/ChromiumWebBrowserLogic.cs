@@ -154,6 +154,7 @@ namespace ChromiumWebBrowser
 		public event EventHandler<TitleChangedEventArgs> TitleChanged;
 		public event EventHandler<PopupOpenArgs> PopupOpen;
 		public event EventHandler<PopupTransformArgs> PopupTransformed;
+		public event EventHandler<CursorChangedArgs> CursorChanged;
 
 		/// <summary>
 		/// Fired by a separate thread when Chrome has re-rendered.
@@ -179,21 +180,13 @@ namespace ChromiumWebBrowser
 		public void OnAfterBrowserCreated()
 		{
 			IsBrowserInitialized = true;
-
-			var handler = BrowserInitialized;
-			if (handler != null) {
-				handler(this, EventArgs.Empty);
-			}
+			BrowserInitialized.SafeInvoke(this);
 		}
 
 		public void SetAddress(AddressChangedEventArgs args)
 		{
 			Address = args.Address;
-
-			var handler = AddressChanged;
-			if (handler != null) {
-				handler(this, args);
-			}
+			AddressChanged.SafeInvoke(this, args);
 		}
 
 		public void SetLoadingStateChange(LoadingStateChangedEventArgs args)
@@ -201,19 +194,12 @@ namespace ChromiumWebBrowser
 			CanGoBack = args.CanGoBack;
 			CanGoForward = args.CanGoForward;
 			IsLoading = args.IsLoading;
-
-			var handler = LoadingStateChanged;
-			if (handler != null) {
-				handler(this, args);
-			}
+			LoadingStateChanged.SafeInvoke(this, args);
 		}
 
 		public void SetTitle(TitleChangedEventArgs args)
 		{
-			var handler = TitleChanged;
-			if (handler != null) {
-				handler(this, args);
-			}
+			TitleChanged.SafeInvoke(this, args);
 		}
 
 		public void SetTooltipText(string tooltipText)
@@ -223,42 +209,27 @@ namespace ChromiumWebBrowser
 
 		public void OnFrameLoadStart(FrameLoadStartEventArgs args)
 		{
-			var handler = FrameLoadStart;
-			if (handler != null) {
-				handler(this, args);
-			}
+			FrameLoadStart.SafeInvoke(this, args);
 		}
 
 		public void OnFrameLoadEnd(FrameLoadEndEventArgs args)
 		{
-			var handler = FrameLoadEnd;
-			if (handler != null) {
-				handler(this, args);
-			}
+			FrameLoadEnd.SafeInvoke(this, args);
 		}
 
 		public void OnConsoleMessage(ConsoleMessageEventArgs args)
 		{
-			var handler = ConsoleMessage;
-			if (handler != null) {
-				handler(this, args);
-			}
+			ConsoleMessage.SafeInvoke(this, args);
 		}
 
 		public void OnStatusMessage(StatusMessageEventArgs args)
 		{
-			var handler = StatusMessage;
-			if (handler != null) {
-				handler(this, args);
-			}
+			StatusMessage.SafeInvoke(this, args);
 		}
 
 		public void OnLoadError(LoadErrorEventArgs args)
 		{
-			var handler = LoadError;
-			if (handler != null) {
-				handler(this, args);
-			}
+			LoadError.SafeInvoke(this, args);
 		}
 
 		public IBrowserAdapter BrowserAdapter
@@ -301,31 +272,12 @@ namespace ChromiumWebBrowser
 		public void InvokeRenderAsync(BitmapInfo bitmapInfo)
 		{
 			BitmapInfo = bitmapInfo;
-
-			var handler = NewScreenshot;
-			if (handler != null) {
-				handler(this, EventArgs.Empty);
-			}
+			NewScreenshot.SafeInvoke(this);
 		}
 
-		// TODO: Deal with it
-		// There are two ways to deal with it:
-		// 1. Find a way to handle with the handle (haha, get it?)
-		// Tip: it has type of HCURSOR in WinAPI
-		// 2. Implement other cursor types (maybe a bad idea)
 		public void SetCursor(IntPtr cursor, CefCursorType type)
 		{
-			switch (type) {
-				case CefCursorType.Pointer:
-					Application.MainWindow.Cursor = MouseCursor.Default;
-					break;
-				case CefCursorType.IBeam:
-					Application.MainWindow.Cursor = new MouseCursor("Cursors.IBeam.png", new IntVector2(6, 8), "ChromiumWebBrowser");
-					break;
-				case CefCursorType.Hand:
-					Application.MainWindow.Cursor = new MouseCursor("Cursors.Hand.png", new IntVector2(6, 8), "ChromiumWebBrowser");
-					break;
-			}
+			CursorChanged.SafeInvoke(this, new CursorChangedArgs(cursor, type));
 		}
 
 		public bool StartDragging(IDragData dragData, DragOperationsMask mask, int x, int y)
@@ -368,18 +320,12 @@ namespace ChromiumWebBrowser
 
 		public void SetPopupIsOpen(bool show)
 		{
-			var handler = PopupOpen;
-			if (handler != null) {
-				handler(this, new PopupOpenArgs(show));
-			}
+			PopupOpen.SafeInvoke(this, new PopupOpenArgs(show));
 		}
 
 		public void SetPopupSizeAndPosition(int width, int height, int x, int y)
 		{
-			var handler = PopupTransformed;
-			if (handler != null) {
-				handler(this, new PopupTransformArgs(width, height, x, y));
-			}
+			PopupTransformed.SafeInvoke(this, new PopupTransformArgs(width, height, x, y));
 		}
 
 		private void Dispose(bool disposing)
@@ -430,6 +376,23 @@ namespace ChromiumWebBrowser
 			RequestHandler = null;
 			DragHandler = null;
 			GeolocationHandler = null;
+		}
+	}
+
+	internal static class EventExtensions
+	{
+		public static void SafeInvoke(this EventHandler e, object sender)
+		{
+			if (e != null) {
+				e(sender, EventArgs.Empty);
+			}
+		}
+
+		public static void SafeInvoke<T>(this EventHandler<T> e, object sender, T args) where T : EventArgs
+		{
+			if (e != null) {
+				e(sender, args);
+			}
 		}
 	}
 }
