@@ -35,7 +35,7 @@ namespace ChromiumWebBrowser
 			browserController.CursorChanged += BrowserControllerCursorChanged;
 		}
 
-		private void BrowserControllerCursorChanged(object sender, CursorChangedArgs args)
+		private void BrowserControllerCursorChanged(object sender, CursorChangedEventArgs args)
 		{
 			var window = WidgetContext.Current.Window as Window;
 			if (window != null) {
@@ -69,7 +69,7 @@ namespace ChromiumWebBrowser
 			popupWidget.Size = Vector2.Zero;
 		}
 
-		private void OnPopupShow(object sender, PopupOpenArgs args)
+		private void OnPopupShow(object sender, PopupOpenEventArgs args)
 		{
 			if (args.Show == false) {
 				HidePopupWidget();
@@ -77,7 +77,7 @@ namespace ChromiumWebBrowser
 			}
 		}
 
-		private void OnPopupTransform(object sender, PopupTransformArgs args)
+		private void OnPopupTransform(object sender, PopupTransformEventArgs args)
 		{
 			popupWidget.Position = new Vector2(args.X, args.Y);
 			popupWidget.Size = new Vector2(args.Width, args.Height);

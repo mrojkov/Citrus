@@ -2,11 +2,11 @@
 
 namespace ChromiumWebBrowser
 {
-	public class PopupOpenArgs : EventArgs
+	public class PopupOpenEventArgs : EventArgs
 	{
 		public bool Show;
 
-		public PopupOpenArgs(bool show)
+		public PopupOpenEventArgs(bool show)
 		{
 			Show = show;
 		}

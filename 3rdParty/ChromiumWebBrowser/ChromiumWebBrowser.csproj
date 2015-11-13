@@ -82,12 +82,12 @@
     <Compile Include="Chromium\CefButtonKeyMap.cs" />
     <Compile Include="Chromium\CefKey.cs" />
     <Compile Include="Chromium\CefMessage.cs" />
-    <Compile Include="Chromium\ChromiumWebBrowserLogic.cs" />
-    <Compile Include="Chromium\CursorChangedArgs.cs" />
+    <Compile Include="Chromium\ChromiumWebBrowserController.cs" />
+    <Compile Include="Chromium\CursorChangedEventArgs.cs" />
     <Compile Include="Chromium\GdiBitmapInfo.cs" />
     <Compile Include="Chromium\LifeSpanHandler.cs" />
-    <Compile Include="Chromium\PopupOpenArgs.cs" />
-    <Compile Include="Chromium\PopupTransformArgs.cs" />
+    <Compile Include="Chromium\PopupOpenEventArgs.cs" />
+    <Compile Include="Chromium\PopupTransformEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ChromiumWebBrowser.cs" />
   </ItemGroup>

@@ -152,9 +152,9 @@ namespace ChromiumWebBrowser
 		public event EventHandler BrowserInitialized;
 		public event EventHandler<AddressChangedEventArgs> AddressChanged;
 		public event EventHandler<TitleChangedEventArgs> TitleChanged;
-		public event EventHandler<PopupOpenArgs> PopupOpen;
-		public event EventHandler<PopupTransformArgs> PopupTransformed;
-		public event EventHandler<CursorChangedArgs> CursorChanged;
+		public event EventHandler<PopupOpenEventArgs> PopupOpen;
+		public event EventHandler<PopupTransformEventArgs> PopupTransformed;
+		public event EventHandler<CursorChangedEventArgs> CursorChanged;
 
 		/// <summary>
 		/// Fired by a separate thread when Chrome has re-rendered.
@@ -277,7 +277,7 @@ namespace ChromiumWebBrowser
 
 		public void SetCursor(IntPtr cursor, CefCursorType type)
 		{
-			CursorChanged.SafeInvoke(this, new CursorChangedArgs(cursor, type));
+			CursorChanged.SafeInvoke(this, new CursorChangedEventArgs(cursor, type));
 		}
 
 		public bool StartDragging(IDragData dragData, DragOperationsMask mask, int x, int y)
@@ -320,12 +320,12 @@ namespace ChromiumWebBrowser
 
 		public void SetPopupIsOpen(bool show)
 		{
-			PopupOpen.SafeInvoke(this, new PopupOpenArgs(show));
+			PopupOpen.SafeInvoke(this, new PopupOpenEventArgs(show));
 		}
 
 		public void SetPopupSizeAndPosition(int width, int height, int x, int y)
 		{
-			PopupTransformed.SafeInvoke(this, new PopupTransformArgs(width, height, x, y));
+			PopupTransformed.SafeInvoke(this, new PopupTransformEventArgs(width, height, x, y));
 		}
 
 		private void Dispose(bool disposing)
