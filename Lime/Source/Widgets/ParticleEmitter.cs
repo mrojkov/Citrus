@@ -692,7 +692,7 @@ namespace Lime
 			Widget basicWidget = GetBasicWidget();
 			if (basicWidget != null) {
 				for (Node node = Parent; node != basicWidget; node = node.Parent) {
-					if (node.AsWidget != null) {
+					if (node != null && node.AsWidget != null) {
 						transform *= node.AsWidget.CalcLocalToParentTransform();
 						color *= node.AsWidget.Color;
 					}
