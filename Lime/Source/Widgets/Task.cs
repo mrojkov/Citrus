@@ -62,6 +62,11 @@ namespace Lime
 			profile[type] = pe;
 		}
 
+		public override string ToString()
+		{
+			return stack.Count == 0 ? "Completed" : stack.Peek().GetType().ToString();
+		}
+
 		public void Advance(float delta)
 		{
 			if (ProfilingEnabled) {
