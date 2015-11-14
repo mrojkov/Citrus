@@ -11,17 +11,8 @@ namespace Lime
 	/// </summary>
 	public class Task : IDisposable
 	{
+		public static ITaskProfiler Profiler = new NullTaskProfiler();
 		public static bool SkipFrameOnTaskCompletion;
-		public static long TotalTasksUpdated = 0;
-		public static bool ProfilingEnabled;
-		private static Dictionary<Type, ProfileEntry> profile = new Dictionary<Type, ProfileEntry>();
-
-		struct ProfileEntry
-		{
-			public long MemoryAllocated;
-			public int CallCount;
-			public int TaskCount;
-		}
 
 		public object Tag { get; set; }
 
@@ -47,11 +38,7 @@ namespace Lime
 		{
 			Tag = tag;
 			stack.Push(e);
-			var type = e.GetType();
-			ProfileEntry pe;
-			profile.TryGetValue(type, out pe);
-			pe.TaskCount++;
-			profile[type] = pe;
+			Profiler.RegisterTask(e);
 		}
 
 		public override string ToString()
@@ -61,30 +48,13 @@ namespace Lime
 
 		public void Advance(float delta)
 		{
-			if (ProfilingEnabled) {
-				var type = stack.Peek().GetType();
-				var memoryAllocated = System.GC.GetTotalMemory(forceFullCollection: false);
-				try {
-					AdvanceHelper(delta);
-				} finally {
-					memoryAllocated = System.GC.GetTotalMemory(forceFullCollection: false) - memoryAllocated;
-					ProfileEntry pe;
-					profile.TryGetValue(type, out pe);
-					pe.CallCount++;
-					if (memoryAllocated > 0) {
-						pe.MemoryAllocated += memoryAllocated;
-					}
-					profile[type] = pe;
-				}
-			} else {
-				AdvanceHelper(delta);
+			if (Completed) {
+				return;
 			}
-		}
-
-		private void AdvanceHelper(float delta)
-		{
 			var savedCurrent = current;
 			current = this;
+			var e = stack.Peek();
+			Profiler.BeforeAdvance(e);
 			try {
 				if (Watcher != null) {
 					Watcher();
@@ -92,7 +62,6 @@ namespace Lime
 						return;
 					}
 				}
-				TotalTasksUpdated++;
 				if (waitTime > 0) {
 					waitTime -= delta;
 					return;
@@ -104,7 +73,6 @@ namespace Lime
 					}
 					waitPredicate = null;
 				}
-				var e = stack.Peek();
 				if (e.MoveNext()) {
 					HandleYieldedResult(e.Current);
 				} else if (!Completed) {
@@ -115,6 +83,7 @@ namespace Lime
 				}
 			} finally {
 				current = savedCurrent;
+				Profiler.AfterAdvance(e);
 			}
 		}
 
@@ -187,21 +156,6 @@ namespace Lime
 				yield return null;
 			}
 #endif
-		}
-
-		public static void DumpProfile(System.IO.TextWriter writer)
-		{
-			var items = profile.Select(p => new { 
-				Method = p.Key.ToString(), 
-				Memory = p.Value.MemoryAllocated, 
-				CallCount = p.Value.CallCount,
-				TaskCount = p.Value.TaskCount,
-			}).OrderByDescending(a => a.Memory);
-			writer.WriteLine("Memory allocated\tCall count\tMethod Name");
-			writer.WriteLine("===================================================================================================");
-			foreach (var i in items) {
-				writer.WriteLine("{0:N0}\t\t\t{1:N0}\t\t{2}\t\t{3}", i.Memory, i.CallCount, i.TaskCount, i.Method);
-			}
 		}
 
 		public static void KillMeIf(Func<bool> pred)
