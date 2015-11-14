@@ -82,7 +82,7 @@ namespace Lime
 			}
 			var a = item1.Position;
 			var b = item2.Position;
-			foreach (float t in TaskList.SinMotion(0.15f, 0, 1)) {
+			foreach (float t in Task.SinMotion(0.15f, 0, 1)) {
 				item1.Position = Vector2.Lerp(t, a, a + item2.Height * Vector2.Down);
 				item2.Position = Vector2.Lerp(t, b, a);
 				yield return null;

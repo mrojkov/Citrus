@@ -102,7 +102,7 @@ namespace Lime
 		{
 			subContainer.ClipChildren = ClipMethod.ScissorTest;
 			IsAnimating = true;
-			foreach (var t in TaskList.SinMotion(0.25f, from, to)) {
+			foreach (var t in Task.SinMotion(0.25f, from, to)) {
 				ListView.SetProjectedSize(subContainer, t);
 				StackWidgets(this);
 				onStep();

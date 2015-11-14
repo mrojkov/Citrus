@@ -160,7 +160,7 @@ namespace Lime
 		private IEnumerator<object> ScrollToTask(float position)
 		{
 			float time = (position - ScrollPosition).Abs() / ScrollToItemVelocity;
-			foreach (var t in TaskList.SinMotion(time, ScrollPosition, position)) {
+			foreach (var t in Task.SinMotion(time, ScrollPosition, position)) {
 				ScrollPosition = t;
 				yield return null;
 			}
