@@ -71,6 +71,7 @@
     <Compile Include="Source\Types\Vector3Tests.cs" />
     <Compile Include="Source\Widgets\NodeListTests.cs" />
     <Compile Include="Source\Widgets\NodeTests.cs" />
+    <Compile Include="Source\Widgets\TaskListTests.cs" />
     <Compile Include="Source\Widgets\WidgetTests.cs" />
   </ItemGroup>
   <ItemGroup>
