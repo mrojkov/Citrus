@@ -87,7 +87,7 @@ namespace Lime
 
 	public class ApplicationOptions
 	{
-		public bool DecodeAudioInSeparateThread = true;
+		public bool DecodeAudioInSeparateThread = false;
 		public int NumStereoChannels = 8;
 		public int NumMonoChannels = 16;
 #if MAC
@@ -300,6 +300,37 @@ namespace Lime
 #endif
 			}
 		}
+
+		/// <summary>
+		/// Terminates the application.
+		/// </summary>
+		public static void Exit()
+		{
+#if WIN
+			MainWindow.Close();
+#elif MAC || MONOMAC
+			NSApplication.SharedApplication.Terminate(new Foundation.NSObject());
+#elif ANDROID || iOS
+			// Android: There is no way to terminate an android application. 
+			// The only way is to finish each its activity one by one.
+#elif UNITY
+			UnityEngine.Application.Quit();
+#endif
+		}
+
+		/// <summary>
+		/// Runs the main application loop on desktop platforms.
+		/// Does nothing on iOS, Android.
+		/// </summary>
+		public static void Run()
+		{
+#if MAC
+			NSApplication.SharedApplication.Run();
+#elif WIN
+			System.Windows.Forms.Application.Run();
+#endif
+		}
+
 #if iOS
 		private static float pixelsPerPoints = 0f;
 
@@ -330,31 +361,11 @@ namespace Lime
 #elif WIN || MAC || MONOMAC
 
 		/// <summary>
-		/// Завершает работу приложения
-		/// </summary>
-		public static void Exit()
-		{
-			MainWindow.Close();
-		}
-
-		/// <summary>
 		/// Возвращает количество пикселей в дюйме по горизонтали и вертикали (всегда возвращает (240, 240))
 		/// </summary>
 		public static Vector2 ScreenDPI 
 		{
 			get { return 240 * Vector2.One; }
-		}
-
-		/// <summary>
-		/// Runs the main application loop on desktop platforms.
-		/// </summary>
-		public static void Run()
-		{
-#if MAC
-			NSApplication.SharedApplication.Run();
-#elif WIN
-			System.Windows.Forms.Application.Run();
-#endif
 		}
 
 #elif ANDROID
@@ -368,20 +379,6 @@ namespace Lime
 				var dm = Android.Content.Res.Resources.System.DisplayMetrics;
 				return new Vector2(dm.Xdpi, dm.Ydpi);
 			}
-		}
-
-		/// <summary>
-		/// Ничего не делает. На Андроиде завершить работу приложения таким образом невозможно. Приложения завершаются по усмотрению операционной системы
-		/// </summary>
-		public static void Exit()
-		{
-			// There is no way to terminate an android application. 
-			// The only way is to finish each its activity one by one.
-		}
-#elif UNITY
-		public void Exit()
-		{
-			UnityEngine.Application.Quit();
 		}
 #endif
 	}
