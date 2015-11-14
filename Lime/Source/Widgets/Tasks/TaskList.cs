@@ -29,14 +29,10 @@ namespace Lime
 			private set { current = value; } 
 		}
 
-		/// <summary>
-		/// Total time accumulated via Update.
-		/// </summary>
+		[Obsolete("Use Task.Current.Time", true)]
 		public float Time;
 
-		/// <summary>
-		/// Time delta since last Update.
-		/// </summary>
+		[Obsolete("Use Task.Delta", true)]
 		public float Delta;
 
 		/// <summary>
@@ -114,8 +110,6 @@ namespace Lime
 			TaskList savedCurrent = Current;
 			Current = this;
 			try {
-				Time += delta;
-				Delta = delta;
 				for (int i = 0; i < Count; ) {
 					var task = this[i];
 					if (task.Completed) {

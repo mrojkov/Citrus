@@ -55,7 +55,7 @@ namespace Lime
 			var time = 0f;
 			bool blinkOn = true;
 			while (true) {
-				time += container.Tasks.Delta;
+				time += Task.Delta;
 				if (time > caretParams.BlinkInterval && caretParams.BlinkInterval > 0f) {
 					blinkOn = !blinkOn;
 					time = 0f;
@@ -264,7 +264,7 @@ namespace Lime
 				caretPos.IsVisible = IsFocused();
 
 				if (IsFocused()) {
-					cursorKeyDownTime -= Container.Tasks.Delta;
+					cursorKeyDownTime -= Task.Delta;
 					keyPressed = 0;
 					WidgetContext.Current.IsActiveTextWidgetUpdated = true;
 					HandleCursorKeys();
@@ -283,7 +283,7 @@ namespace Lime
 		{
 			while (true) {
 				if (editorParams.PasswordChar != null && Text.Text != "") {
-					lastCharShowTimeLeft -= TaskList.Current.Delta;
+					lastCharShowTimeLeft -= Task.Delta;
 					Text.DisplayText = new string(editorParams.PasswordChar.Value, Text.Text.Length - 1);
 					Text.DisplayText += lastCharShowTimeLeft > 0 ? Text.Text.Last() : editorParams.PasswordChar;
 				}

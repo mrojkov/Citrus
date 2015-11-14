@@ -20,9 +20,20 @@ namespace Lime
 		private float waitTime;
 
 		/// <summary>
+		/// Time delta since last Update.
+		/// </summary>
+		[ThreadStatic]
+		public static float Delta;
+
+		/// <summary>
 		/// Invoked on every task update. Useful for disposing of the task on some condition.
 		/// </summary>
 		public Action Watcher;
+
+		/// <summary>
+		/// Total time accumulated via Update.
+		/// </summary>
+		public float Time;
 
 		public Task(IEnumerator<object> e, object tag = null)
 		{
@@ -49,6 +60,8 @@ namespace Lime
 			}
 			var savedCurrent = current;
 			current = this;
+			Delta = delta;
+			Time += delta;
 			var e = stack.Peek();
 			Profiler.BeforeAdvance(e);
 			try {
@@ -169,7 +182,7 @@ namespace Lime
 		/// </summary>
 		public static IEnumerable<float> SinMotion(float timePeriod, float from, float to)
 		{
-			for (float t = 0; t < timePeriod; t += TaskList.Current.Delta) {
+			for (float t = 0; t < timePeriod; t += Task.Delta) {
 				float v = Mathf.Sin(t / timePeriod * Mathf.HalfPi);
 				yield return Mathf.Lerp(v, from, to);
 			}
@@ -182,7 +195,7 @@ namespace Lime
 		/// </summary>
 		public static IEnumerable<float> SqrtMotion(float timePeriod, float from, float to)
 		{
-			for (float t = 0; t < timePeriod; t += TaskList.Current.Delta) {
+			for (float t = 0; t < timePeriod; t += Task.Delta) {
 				float v = Mathf.Sqrt(t / timePeriod);
 				yield return Mathf.Lerp(v, from, to);
 			}
@@ -195,7 +208,7 @@ namespace Lime
 		/// </summary>
 		public static IEnumerable<float> LinearMotion(float timePeriod, float from, float to)
 		{
-			for (float t = 0; t < timePeriod; t += TaskList.Current.Delta) {
+			for (float t = 0; t < timePeriod; t += Task.Delta) {
 				yield return Mathf.Lerp(t / timePeriod, from, to);
 			}
 			yield return to;

@@ -67,7 +67,7 @@ namespace Lime
 		private void ShowSliderIfNeeded()
 		{
 			if (sliderTimeToLive > 0) {
-				sliderTimeToLive -= TaskList.Current.Delta;
+				sliderTimeToLive -= Task.Delta;
 				ChangeAnimation(Slider, "Show");
 			} else if (Slider.CurrentAnimation != "Def") {
 				ChangeAnimation(Slider, "Hide");
