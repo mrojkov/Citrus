@@ -109,20 +109,20 @@ namespace Lime
 				waitTime = (float)result;
 			}
 			else if (result is IEnumerator<object>) {
-				stack.Push(result as IEnumerator<object>);
+				stack.Push((IEnumerator<object>) result);
 				Advance(0);
 			}
 			else if (result is WaitPredicate) {
-				waitPredicate = result as WaitPredicate;
+				waitPredicate = (WaitPredicate) result;
 			}
-			else if (result is Lime.Node) {
-				waitPredicate = WaitForAnimation(result as Lime.Node);
+			else if (result is Node) {
+				waitPredicate = WaitForAnimation((Node) result);
 			}
 			else if (result is IEnumerable<object>) {
-				throw new Lime.Exception("Use IEnumerator<object> instead of IEnumerable<object> for " + result);
+				throw new Exception("Use IEnumerator<object> instead of IEnumerable<object> for " + result);
 			}
 			else {
-				throw new Lime.Exception("Invalid object yielded " + result);
+				throw new Exception("Invalid object yielded " + result);
 			}
 		}
 
@@ -136,7 +136,7 @@ namespace Lime
 			return new TimeWaitPredicate() { Predicate = timePredicate };
 		}
 		
-		public static WaitPredicate WaitForAnimation(Lime.Node node)
+		public static WaitPredicate WaitForAnimation(Node node)
 		{
 			return new AnimationWaitPredicate() { Node = node };
 		}
