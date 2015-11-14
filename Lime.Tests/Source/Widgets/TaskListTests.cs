@@ -88,13 +88,13 @@ namespace Lime.Tests.Source.Widgets
 		}
 
 		[Test]
-		public void UpdateDuplicatingTest()
+		public void UpdateNestedTest()
 		{
 			var list = new TaskList();
-			 list.Add(UpdateDuplicateTestTask(list));
+			 list.Add(UpdateNestedTestTask(list));
 			list.Update(0);
 			list.Update(0);
-			Assert.Fail("Task haven't called Assert.Pass() on second Update(). Possible duplication of Update() call.");
+			Assert.Fail("Task haven't called Assert.Pass() on second Update(). Possible nested Update() call.");
 		}
 
 		[Test]
@@ -122,7 +122,7 @@ namespace Lime.Tests.Source.Widgets
 			Assert.That(list, Is.Not.Contains(task2));
 		}
 
-		private IEnumerator<object> UpdateDuplicateTestTask(TaskList list)
+		private IEnumerator<object> UpdateNestedTestTask(TaskList list)
 		{
 			list.Update(0);
 			yield return null;
