@@ -89,6 +89,7 @@ namespace Lime
 					throw new InvalidOperationException("Cannot call Stop() before Start() or twice in a row.");
 				}
 				MemoryAllocated = GC.GetTotalMemory(false) - startingMemoryAllocation;
+				Stopped = true;
 			}
 		}
 	}
