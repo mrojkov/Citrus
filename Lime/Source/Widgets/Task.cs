@@ -241,5 +241,43 @@ namespace Lime
 				}
 			};
 		}
+
+		/// <summary>
+		/// Returns a sequence of numbers, interpolated as sine in specified time period.
+		/// Advances by using TaskList.Current.Delta.
+		/// </summary>
+		public static IEnumerable<float> SinMotion(float timePeriod, float from, float to)
+		{
+			for (float t = 0; t < timePeriod; t += TaskList.Current.Delta) {
+				float v = Mathf.Sin(t / timePeriod * Mathf.HalfPi);
+				yield return Mathf.Lerp(v, from, to);
+			}
+			yield return to;
+		}
+
+		/// <summary>
+		/// Returns a sequence of numbers, interpolated as square root in specified time period.
+		/// Advances by using TaskList.Current.Delta.
+		/// </summary>
+		public static IEnumerable<float> SqrtMotion(float timePeriod, float from, float to)
+		{
+			for (float t = 0; t < timePeriod; t += TaskList.Current.Delta) {
+				float v = Mathf.Sqrt(t / timePeriod);
+				yield return Mathf.Lerp(v, from, to);
+			}
+			yield return to;
+		}
+
+		/// <summary>
+		/// Returns a sequence of numbers, linear interpolated in specified time period.
+		/// Advances by using TaskList.Current.Delta.
+		/// </summary>
+		public static IEnumerable<float> LinearMotion(float timePeriod, float from, float to)
+		{
+			for (float t = 0; t < timePeriod; t += TaskList.Current.Delta) {
+				yield return Mathf.Lerp(t / timePeriod, from, to);
+			}
+			yield return to;
+		}
 	}
 }

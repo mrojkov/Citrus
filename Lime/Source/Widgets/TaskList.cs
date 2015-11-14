@@ -131,42 +131,22 @@ namespace Lime
 			}
 		}
 
-		/// <summary>
-		/// Returns a sequence of numbers, interpolated as sine in specified time period.
-		/// Advances by using Current.Delta.
-		/// </summary>
+		[Obsolete("Use Task.SinMotion instead", true)]
 		public static IEnumerable<float> SinMotion(float timePeriod, float from, float to)
 		{
-			for (float t = 0; t < timePeriod; t += Current.Delta) {
-				float v = Mathf.Sin(t / timePeriod * Mathf.HalfPi);
-				yield return Mathf.Lerp(v, from, to);
-			}
-			yield return to;
+			return Task.SinMotion(timePeriod, from, to);
 		}
 
-		/// <summary>
-		/// Returns a sequence of numbers, interpolated as square root in specified time period.
-		/// Advances by using Current.Delta.
-		/// </summary>
+		[Obsolete("Use Task.SqrtMotion instead", true)]
 		public static IEnumerable<float> SqrtMotion(float timePeriod, float from, float to)
 		{
-			for (float t = 0; t < timePeriod; t += Current.Delta) {
-				float v = Mathf.Sqrt(t / timePeriod);
-				yield return Mathf.Lerp(v, from, to);
-			}
-			yield return to;
+			return Task.SqrtMotion(timePeriod, from, to);
 		}
 
-		/// <summary>
-		/// Returns a sequence of numbers, linear interpolated in specified time period.
-		/// Advances by using Current.Delta.
-		/// </summary>
+		[Obsolete("Use Task.LinearMotion instead", true)]
 		public static IEnumerable<float> LinearMotion(float timePeriod, float from, float to)
 		{
-			for (float t = 0; t < timePeriod; t += Current.Delta) {
-				yield return Mathf.Lerp(t / timePeriod, from, to);
-			}
-			yield return to;
+			return Task.LinearMotion(timePeriod, from, to);
 		}
 	}
 }
