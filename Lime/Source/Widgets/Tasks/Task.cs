@@ -20,13 +20,13 @@ namespace Lime
 		private float waitTime;
 
 		/// <summary>
-		/// Time delta since last Update.
+		/// Time delta since last Update of current Task.
 		/// </summary>
 		[ThreadStatic]
 		public static float Delta;
 
 		/// <summary>
-		/// Invoked on every task update. Useful for disposing of the task on some condition.
+		/// Invoked on every Task update. Useful for disposing of the Task on some condition.
 		/// </summary>
 		public Action Watcher;
 
@@ -178,11 +178,11 @@ namespace Lime
 
 		/// <summary>
 		/// Returns a sequence of numbers, interpolated as sine in specified time period.
-		/// Advances by using TaskList.Current.Delta.
+		/// Advances by using Delta.
 		/// </summary>
 		public static IEnumerable<float> SinMotion(float timePeriod, float from, float to)
 		{
-			for (float t = 0; t < timePeriod; t += Task.Delta) {
+			for (float t = 0; t < timePeriod; t += Delta) {
 				float v = Mathf.Sin(t / timePeriod * Mathf.HalfPi);
 				yield return Mathf.Lerp(v, from, to);
 			}
@@ -191,11 +191,11 @@ namespace Lime
 
 		/// <summary>
 		/// Returns a sequence of numbers, interpolated as square root in specified time period.
-		/// Advances by using TaskList.Current.Delta.
+		/// Advances by using Delta.
 		/// </summary>
 		public static IEnumerable<float> SqrtMotion(float timePeriod, float from, float to)
 		{
-			for (float t = 0; t < timePeriod; t += Task.Delta) {
+			for (float t = 0; t < timePeriod; t += Delta) {
 				float v = Mathf.Sqrt(t / timePeriod);
 				yield return Mathf.Lerp(v, from, to);
 			}
@@ -204,11 +204,11 @@ namespace Lime
 
 		/// <summary>
 		/// Returns a sequence of numbers, linear interpolated in specified time period.
-		/// Advances by using TaskList.Current.Delta.
+		/// Advances by using Delta.
 		/// </summary>
 		public static IEnumerable<float> LinearMotion(float timePeriod, float from, float to)
 		{
-			for (float t = 0; t < timePeriod; t += Task.Delta) {
+			for (float t = 0; t < timePeriod; t += Delta) {
 				yield return Mathf.Lerp(t / timePeriod, from, to);
 			}
 			yield return to;
