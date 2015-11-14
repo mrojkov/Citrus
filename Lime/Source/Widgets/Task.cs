@@ -5,8 +5,6 @@ using System.Text;
 
 namespace Lime
 {
-	using EnumType = IEnumerator<object>;
-
 	/// <summary>
 	/// Задача (таск). Бывает, что нужно задать какую-нибудь последовательность действий и ждать окончания ее выполнения.
 	/// Задачи основаны на перечислителях (IEnumerator<object>) и их операторе yield return
@@ -49,9 +47,9 @@ namespace Lime
 		
 		private float waitTime;
 		private WaitPredicate waitPredicate;
-		private Stack<EnumType> stack = new Stack<EnumType>();
+		private Stack<IEnumerator<object>> stack = new Stack<IEnumerator<object>>();
 
-		public Task(EnumType e, object tag = null)
+		public Task(IEnumerator<object> e, object tag = null)
 		{
 			Tag = tag;
 			stack.Push(e);
