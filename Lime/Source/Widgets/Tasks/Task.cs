@@ -23,12 +23,6 @@ namespace Lime
 			public int TaskCount;
 		}
 
-		public abstract class WaitPredicate
-		{
-			public float TotalTime;
-			public abstract bool Evaluate();
-		}
-
 		public object Tag { get; set; }
 
 		[ThreadStatic]
@@ -176,27 +170,6 @@ namespace Lime
 		public static WaitPredicate WaitForAnimation(Lime.Node node)
 		{
 			return new AnimationWaitPredicate() { Node = node };
-		}
-
-		private class AnimationWaitPredicate : WaitPredicate
-		{
-			public Node Node;
-
-			public override bool Evaluate() { return Node.IsRunning; }
-		}
-
-		private class BooleanWaitPredicate : WaitPredicate
-		{
-			public Func<bool> Predicate;
-
-			public override bool Evaluate() { return Predicate(); }
-		}
-
-		private class TimeWaitPredicate : WaitPredicate
-		{
-			public Func<float, bool> Predicate;
-
-			public override bool Evaluate() { return Predicate(TotalTime); }
 		}
 
 		/// <summary>

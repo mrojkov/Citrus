@@ -136,6 +136,7 @@
     <Compile Include="Source\Widgets\Model\ModelMesh.cs" />
     <Compile Include="Source\Widgets\Model\ModelNode.cs" />
     <Compile Include="Source\Widgets\Model\ModelViewport.cs" />
+    <Compile Include="Source\Widgets\Tasks\WaitPredicate.cs" />
     <Compile Include="Source\Widgets\TextStyle.cs" />
     <Compile Include="Source\Widgets\Text\TextRenderer.cs" />
     <Compile Include="Source\Widgets\Text\TextParser.cs" />
@@ -188,8 +189,8 @@
     <Compile Include="Source\Types\Vector2.cs" />
     <Compile Include="Source\Types\Vector3.cs" />
     <Compile Include="Source\AssetsBundle\UnpackedAssetsBundle.cs" />
-    <Compile Include="Source\Widgets\TaskList.cs" />
-    <Compile Include="Source\Widgets\Task.cs" />
+    <Compile Include="Source\Widgets\Tasks\TaskList.cs" />
+    <Compile Include="Source\Widgets\Tasks\Task.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationUtils.cs" />
     <Compile Include="Source\Widgets\Animation\Animator.cs" />
     <Compile Include="Source\Widgets\Animation\AnimatorCollection.cs" />

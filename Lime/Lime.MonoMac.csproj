@@ -86,8 +86,6 @@
     <Compile Include="Source\Application\Debug.cs" />
     <Compile Include="Source\Input\Key.cs" />
     <Compile Include="Source\Widgets\NodeList.cs" />
-    <Compile Include="Source\Widgets\Task.cs" />
-    <Compile Include="Source\Widgets\TaskList.cs" />
     <Compile Include="Source\Widgets\WidgetDebugView.cs" />
     <Compile Include="Source\Widgets\WidgetInput.cs" />
     <Compile Include="Source\Application\CommandLineArgs.cs" />
@@ -190,11 +188,17 @@
     <Compile Include="Source\Application\Window.Win.cs" />
     <Compile Include="Source\Application\WindowOptions.cs" />
     <Compile Include="Source\Widgets\WindowWidget.cs" />
+    <Compile Include="Source\Application\CommonWindow.cs" />
+    <Compile Include="Source\Application\IContext.cs" />
+    <Compile Include="Source\Application\Window.Mac.cs" />
+    <Compile Include="Source\Widgets\WidgetContext.cs" />
+    <Compile Include="Source\Widgets\Tasks\Task.cs" />
+    <Compile Include="Source\Widgets\Tasks\TaskList.cs" />
+    <Compile Include="Source\Widgets\Tasks\WaitPredicate.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
     <Compile Include="Source\Serialization.cs" />
-    <Compile Include="Source\Application\OpenTKGameView.cs" />
     <Compile Include="Source\Application\iOSAppDelegate.cs" />
     <Compile Include="Source\Application\iOSGameController.cs" />
     <Compile Include="Source\Application\iOSGameView.cs" />
