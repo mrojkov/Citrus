@@ -22,7 +22,7 @@ namespace Lime
 		private static TaskList current;
 
 		/// <summary>
-		/// Currently processing task.
+		/// Currently processing TaskList.
 		/// </summary>
 		public static TaskList Current { 
 			get { return current; } 
