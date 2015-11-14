@@ -11,28 +11,18 @@ namespace Lime
 	/// </summary>
 	public class Task : IDisposable
 	{
-		public static ITaskProfiler Profiler = new NullTaskProfiler();
-		public static bool SkipFrameOnTaskCompletion;
-
-		public object Tag { get; set; }
-
 		[ThreadStatic]
 		private static Task current;
-		public static Task Current { 
-			get { return current; } 
-			private set { current = value; } 
-		}
+		public static ITaskProfiler Profiler = new NullTaskProfiler();
+		public static bool SkipFrameOnTaskCompletion;
+		private Stack<IEnumerator<object>> stack = new Stack<IEnumerator<object>>();
+		private WaitPredicate waitPredicate;
+		private float waitTime;
 
 		/// <summary>
 		/// Invoked on every task update. Useful for disposing of the task on some condition.
 		/// </summary>
 		public Action Watcher;
-
-		public bool Completed { get { return stack.Count == 0; } }
-		
-		private float waitTime;
-		private WaitPredicate waitPredicate;
-		private Stack<IEnumerator<object>> stack = new Stack<IEnumerator<object>>();
 
 		public Task(IEnumerator<object> e, object tag = null)
 		{
@@ -40,6 +30,12 @@ namespace Lime
 			stack.Push(e);
 			Profiler.RegisterTask(e);
 		}
+
+		public static Task Current { get { return current; } }
+
+		public object Tag { get; set; }
+
+		public bool Completed { get { return stack.Count == 0; } }
 
 		public override string ToString()
 		{
