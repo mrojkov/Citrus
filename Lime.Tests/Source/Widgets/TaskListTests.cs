@@ -82,12 +82,6 @@ namespace Lime.Tests.Source.Widgets
 		}
 
 		[Test]
-		public void ReplaceTest()
-		{
-			Assert.Fail();
-		}
-
-		[Test]
 		public void UpdateNestedTest()
 		{
 			var list = new TaskList();
