@@ -58,7 +58,7 @@ namespace Lime
 
 		public override string ToString()
 		{
-			return stack.Count == 0 ? "Completed" : stack.Peek().GetType().ToString();
+			return Completed ? "Completed" : stack.Peek().GetType().ToString();
 		}
 
 		public void Advance(float delta)
