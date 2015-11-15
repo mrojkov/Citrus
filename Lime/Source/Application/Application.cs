@@ -348,16 +348,6 @@ namespace Lime
 			}
 		}
 
-		/// <summary>
-		/// Генерирует исключение NotImplementedException.
-		/// На iOS завершить работу приложения таким образом невозможно. Приложения завершаются по усмотрению операционной системы
-		/// </summary>
-		/// <exception cref="NotImplementedException"/>		
-		public static void Exit()
-		{
-			throw new NotImplementedException();
-		}
-
 #elif WIN || MAC || MONOMAC
 
 		/// <summary>
