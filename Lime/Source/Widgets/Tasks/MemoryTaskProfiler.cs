@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Lime
 {
-	public class CommonTaskProfiler: ITaskProfiler
+	public class MemoryTaskProfiler: ITaskProfiler
 	{
 		private Dictionary<Type, ProfileEntry> profile = new Dictionary<Type, ProfileEntry>();
 		private MemoryStopwatch memoryStopwatch = new MemoryStopwatch();
@@ -52,11 +52,6 @@ namespace Lime
 			foreach (var i in items) {
 				writer.WriteLine("{0:N0}\t\t\t{1:N0}\t\t{2}\t\t{3}", i.Memory, i.CallCount, i.TaskCount, i.Method);
 			}
-		}
-
-		public bool IsNull
-		{
-			get { return false; }
 		}
 
 		private struct ProfileEntry

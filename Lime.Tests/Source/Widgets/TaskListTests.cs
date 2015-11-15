@@ -27,10 +27,10 @@ namespace Lime.Tests.Source.Widgets
 			var list = new TaskList();
 			var task1 = list.Add(OneFrameTask);
 			var task2 = list.Add(OneFrameTask);
-			Action watcher = () => { };
-			task2.Watcher = watcher;
+			Action updating = () => { };
+			task2.Updating = updating;
 			var task3 = list.Add(OneFrameTask);
-			list.Stop(t => t.Watcher == watcher);
+			list.Stop(t => t.Updating == updating);
 			Assert.That(list.Contains(task1));
 			Assert.That(list, Is.Not.Contains(task2));
 			Assert.That(list.Contains(task3));

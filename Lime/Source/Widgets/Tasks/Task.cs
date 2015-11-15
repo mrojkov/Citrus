@@ -13,34 +13,42 @@ namespace Lime
 	{
 		[ThreadStatic]
 		private static Task current;
-		public static ITaskProfiler Profiler = new NullTaskProfiler();
+		public static ITaskProfiler Profiler = null;
 		public static bool SkipFrameOnTaskCompletion;
 		private Stack<IEnumerator<object>> stack = new Stack<IEnumerator<object>>();
 		private WaitPredicate waitPredicate;
 		private float waitTime;
 
 		/// <summary>
-		/// Time delta since last Update of current Task.
-		/// </summary>
-		[ThreadStatic]
-		public static float Delta;
-
-		/// <summary>
 		/// Invoked on every Task update. Useful for disposing of the Task on some condition.
 		/// </summary>
+		public Action Updating;
+
+		[Obsolete("Use Updating instead", true)]
 		public Action Watcher;
 
-		/// <summary>
-		/// Total time accumulated via Update.
-		/// </summary>
+
+		[Obsolete("Use LifeTime instead", true)]
 		public float Time;
 
 		public Task(IEnumerator<object> e, object tag = null)
 		{
 			Tag = tag;
 			stack.Push(e);
-			Profiler.RegisterTask(e);
+			if (Profiler != null) {
+				Profiler.RegisterTask(e);
+			}
 		}
+		
+		/// <summary>
+		/// Time delta since last Update of current Task.
+		/// </summary>
+		public float Delta { get; private set; }
+
+		/// <summary>
+		/// Total time accumulated via Update.
+		/// </summary>
+		public float LifeTime { get; private set; }
 
 		public static Task Current { get { return current; } }
 
@@ -61,12 +69,14 @@ namespace Lime
 			var savedCurrent = current;
 			current = this;
 			Delta = delta;
-			Time += delta;
+			LifeTime += delta;
 			var e = stack.Peek();
-			Profiler.BeforeAdvance(e);
+			if (Profiler != null) {
+				Profiler.BeforeAdvance(e);
+			}
 			try {
-				if (Watcher != null) {
-					Watcher();
+				if (Updating != null) {
+					Updating();
 					if (Completed) {
 						return;
 					}
@@ -92,7 +102,9 @@ namespace Lime
 				}
 			} finally {
 				current = savedCurrent;
-				Profiler.AfterAdvance(e);
+				if (Profiler != null) {
+					Profiler.AfterAdvance(e);
+				}
 			}
 		}
 
@@ -103,7 +115,7 @@ namespace Lime
 				e.Dispose();
 			}
 			waitPredicate = null;
-			Watcher = null;
+			Updating = null;
 		}
 
 		private void HandleYieldedResult(object result)
@@ -166,10 +178,16 @@ namespace Lime
 			}
 #endif
 		}
-
+		
+		[Obsolete("Use StopIf instead", true)]
 		public static void KillMeIf(Func<bool> pred)
 		{
-			Current.Watcher = () => {
+			StopIf(pred);
+		}
+		
+		public static void StopIf(Func<bool> pred)
+		{
+			Current.Updating = () => {
 				if (pred()) {
 					Current.Dispose();
 				}
@@ -182,7 +200,7 @@ namespace Lime
 		/// </summary>
 		public static IEnumerable<float> SinMotion(float timePeriod, float from, float to)
 		{
-			for (float t = 0; t < timePeriod; t += Delta) {
+			for (float t = 0; t < timePeriod; t += Current.Delta) {
 				float v = Mathf.Sin(t / timePeriod * Mathf.HalfPi);
 				yield return Mathf.Lerp(v, from, to);
 			}
@@ -195,7 +213,7 @@ namespace Lime
 		/// </summary>
 		public static IEnumerable<float> SqrtMotion(float timePeriod, float from, float to)
 		{
-			for (float t = 0; t < timePeriod; t += Delta) {
+			for (float t = 0; t < timePeriod; t += Current.Delta) {
 				float v = Mathf.Sqrt(t / timePeriod);
 				yield return Mathf.Lerp(v, from, to);
 			}
@@ -208,7 +226,7 @@ namespace Lime
 		/// </summary>
 		public static IEnumerable<float> LinearMotion(float timePeriod, float from, float to)
 		{
-			for (float t = 0; t < timePeriod; t += Delta) {
+			for (float t = 0; t < timePeriod; t += Current.Delta) {
 				yield return Mathf.Lerp(t / timePeriod, from, to);
 			}
 			yield return to;

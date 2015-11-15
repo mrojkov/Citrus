@@ -274,7 +274,7 @@ namespace Lime
 			Frame.HitTestMask = Widget.ControlsHitTestMask;
 			try {
 				while (true) {
-					var delta = Task.Delta;
+					var delta = Task.Current.Delta;
 					float damping = ScrollPosition.InRange(MinScrollPosition, MaxScrollPosition) ? 2.0f : 20.0f;
 					velocity -= velocity * damping * delta;
 					if (velocity.Abs() < 40.0f) {

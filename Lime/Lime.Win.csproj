@@ -136,9 +136,8 @@
     <Compile Include="Source\Widgets\Model\ModelMesh.cs" />
     <Compile Include="Source\Widgets\Model\ModelNode.cs" />
     <Compile Include="Source\Widgets\Model\ModelViewport.cs" />
-    <Compile Include="Source\Widgets\Tasks\CommonTaskProfiler.cs" />
+    <Compile Include="Source\Widgets\Tasks\MemoryTaskProfiler.cs" />
     <Compile Include="Source\Widgets\Tasks\ITaskProfiler.cs" />
-    <Compile Include="Source\Widgets\Tasks\NullTaskProfiler.cs" />
     <Compile Include="Source\Widgets\Tasks\WaitPredicate.cs" />
     <Compile Include="Source\Widgets\TextStyle.cs" />
     <Compile Include="Source\Widgets\Text\TextRenderer.cs" />

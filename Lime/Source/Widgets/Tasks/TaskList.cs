@@ -32,7 +32,7 @@ namespace Lime
 		[Obsolete("Use Task.Current.Time", true)]
 		public float Time;
 
-		[Obsolete("Use Task.Delta", true)]
+		[Obsolete("Use Task.Current.Delta", true)]
 		public float Delta;
 
 		/// <summary>
@@ -85,10 +85,7 @@ namespace Lime
 			return Add(e(), tag);
 		}
 
-		/// <summary>
-		/// Stops all tasks with specified tag, creates new one with same tag 
-		/// and adds it to the end of this list.
-		/// </summary>
+		[Obsolete("This method will be removed, inline it in your code", true)]
 		public Task Replace(IEnumerator<object> e, object tag)
 		{
 			StopByTag(tag);

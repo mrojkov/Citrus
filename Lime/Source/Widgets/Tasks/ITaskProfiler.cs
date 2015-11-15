@@ -9,6 +9,5 @@ namespace Lime
 		void BeforeAdvance(IEnumerator<object> enumerator);
 		void AfterAdvance(IEnumerator<object> enumerator);
 		void DumpProfile(TextWriter writer);
-		bool IsNull { get; }
 	}
 }
