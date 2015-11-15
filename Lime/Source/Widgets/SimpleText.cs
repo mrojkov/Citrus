@@ -14,6 +14,7 @@ namespace Lime
 		private SerializableFont font;
 		private string text;
 		private string displayText;
+		private Rectangle extent;
 		private float fontHeight;
 		private float spacing;
 		private HAlignment hAlignment;
@@ -242,29 +243,39 @@ namespace Lime
 		{
 			if (caret.Valid != CaretPosition.ValidState.All)
 				spriteList = null;
-			if (spriteList == null) {
-				if (OverflowMode == TextOverflowMode.Minify) {
-					FitTextInsideWidgetArea();
-				}
-				spriteList = new SpriteList();
-				Rectangle extent;
-				RenderHelper(spriteList, out extent);
-			}
-
+			PrepareSpriteListAndExtent();
 			Renderer.Transform1 = LocalToWorldTransform;
 			Renderer.Blending = GlobalBlending;
 			Renderer.Shader = GlobalShader;
 			spriteList.Render(GlobalColor * textColor);
 		}
 
+		private void PrepareSpriteListAndExtent()
+		{
+			if (spriteList != null) {
+				return;
+			}
+			if (OverflowMode == TextOverflowMode.Minify) {
+				var savedSpacing = spacing;
+				var savedHeight = fontHeight;
+				FitTextInsideWidgetArea();
+				spriteList = new SpriteList();
+				RenderHelper(spriteList, out extent);
+				spacing = savedSpacing;
+				fontHeight = savedHeight;
+			} else {
+				spriteList = new SpriteList();
+				RenderHelper(spriteList, out extent);
+			}
+		}
+
 		/// <summary>
-		/// Измеряет размер текста и возвращает прямоугольник, описывающий размер текста
+		/// Gets the text's bounding box.
 		/// </summary>
 		public Rectangle MeasureText()
 		{
-			Rectangle rect;
-			RenderHelper(null, out rect);
-			return rect;
+			PrepareSpriteListAndExtent();
+			return extent;
 		}
 
 		public override void StaticScale(float ratio, bool roundCoordinates)
@@ -274,9 +285,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Изменяет параметры текста таким образом, чтобы он помещался в область этого виджета
+		/// Changes FontHeight and Spacing to make the text inside widget's area.
 		/// </summary>
-		/// <param name="minFontHeight">Минимально возможный размер шрифта</param>
 		public void FitTextInsideWidgetArea(float minFontHeight = 10)
 		{
 			var minH = minFontHeight;
@@ -287,7 +297,8 @@ namespace Lime
 			var bestHeight = minH;
 			var spacingKoeff = Spacing / FontHeight;
 			while (maxH - minH > 1) {
-				var rect = MeasureText();
+				Rectangle rect;
+				RenderHelper(null, out rect);
 				var fit = (rect.Width <= Width && rect.Height <= Height);
 				if (fit) {
 					minH = FontHeight;
@@ -302,54 +313,64 @@ namespace Lime
 			Spacing = bestHeight * spacingKoeff;
 		}
 
+		private static CaretPosition dummyCaret = new CaretPosition();
+
 		private void RenderHelper(SpriteList spriteList, out Rectangle rect)
 		{
-			rect = Rectangle.Empty;
-			var t = DisplayText ?? (LocalizationHandler != null ? LocalizationHandler(Text) : Text.Localize());
-			var lines = SplitText(t);
-			if (TrimWhitespaces) {
-				TrimLinesWhitespaces(lines);
+			var savedCaret = caret;
+			if (spriteList == null) {
+				caret = dummyCaret;
 			}
-			var pos = Vector2.Down * CalcVerticalTextPosition(lines);
-			caret.RenderingLineNumber = 0;
-			caret.RenderingTextPos = 0;
-			caret.NearestCharPos = Vector2.Zero;
-			if (String.IsNullOrEmpty(t)) {
-				caret.WorldPos = pos;
-				caret.Line = caret.Pos = caret.TextPos = 0;
+			try {
+				rect = Rectangle.Empty;
+				var t = DisplayText ?? (LocalizationHandler != null ? LocalizationHandler(Text) : Text.Localize());
+				var lines = SplitText(t);
+				if (TrimWhitespaces) {
+					TrimLinesWhitespaces(lines);
+				}
+				var pos = Vector2.Down * CalcVerticalTextPosition(lines);
+				caret.RenderingLineNumber = 0;
+				caret.RenderingTextPos = 0;
+				caret.NearestCharPos = Vector2.Zero;
+				if (String.IsNullOrEmpty(t)) {
+					caret.WorldPos = pos;
+					caret.Line = caret.Pos = caret.TextPos = 0;
+					caret.Valid = CaretPosition.ValidState.All;
+					return;
+				}
+				bool firstLine = true;
+				if (caret.Valid == CaretPosition.ValidState.TextPos)
+					Caret.TextPos = Caret.TextPos.Clamp(0, Text.Length);
+				if (caret.Valid == CaretPosition.ValidState.LinePos)
+					Caret.Line = Caret.Line.Clamp(0, lines.Count - 1);
+				int i = 0;
+				foreach (var line in lines) {
+					bool lastLine = ++i == lines.Count;
+					if (caret.Valid == CaretPosition.ValidState.LinePos && caret.Line == caret.RenderingLineNumber) {
+						Caret.Pos = Caret.Pos.Clamp(0, line.Length - (lastLine ? 0 : 1));
+					}
+					Rectangle lineRect;
+					RenderSingleTextLine(spriteList, out lineRect, pos, line);
+					if (lastLine) {
+						// There is no end-of-text character, so simulate it.
+						caret.Sync(line.Length, new Vector2(lineRect.Right, lineRect.Top), Vector2.Down * fontHeight);
+					}
+					pos.Y += Spacing + FontHeight;
+					++caret.RenderingLineNumber;
+					if (firstLine) {
+						rect = lineRect;
+						firstLine = false;
+					} else {
+						rect = Rectangle.Bounds(rect, lineRect);
+					}
+				}
+				if (caret.Valid == CaretPosition.ValidState.WorldPos) {
+					caret.WorldPos = caret.NearestCharPos;
+				}
 				caret.Valid = CaretPosition.ValidState.All;
-				return;
+			} finally {
+				caret = savedCaret;
 			}
-			bool firstLine = true;
-			if (caret.Valid == CaretPosition.ValidState.TextPos)
-				Caret.TextPos = Caret.TextPos.Clamp(0, Text.Length);
-			if (caret.Valid == CaretPosition.ValidState.LinePos)
-				Caret.Line = Caret.Line.Clamp(0, lines.Count - 1);
-			int i = 0;
-			foreach (var line in lines) {
-				bool lastLine = ++i == lines.Count;
-				if (caret.Valid == CaretPosition.ValidState.LinePos && caret.Line == caret.RenderingLineNumber) {
-					Caret.Pos = Caret.Pos.Clamp(0, line.Length - (lastLine ? 0 : 1));
-				}
-				Rectangle lineRect;
-				RenderSingleTextLine(spriteList, out lineRect, pos, line);
-				if (lastLine) {
-					// There is no end-of-text character, so simulate it.
-					caret.Sync(line.Length, new Vector2(lineRect.Right, lineRect.Top), Vector2.Down * fontHeight);
-				}
-				pos.Y += Spacing + FontHeight;
-				++caret.RenderingLineNumber;
-				if (firstLine) {
-					rect = lineRect;
-					firstLine = false;
-				} else {
-					rect = Rectangle.Bounds(rect, lineRect);
-				}
-			}
-			if (caret.Valid == CaretPosition.ValidState.WorldPos) {
-				caret.WorldPos = caret.NearestCharPos;
-			}
-			caret.Valid = CaretPosition.ValidState.All;
 		}
 
 		private static void TrimLinesWhitespaces(List<string> lines)
