@@ -11,11 +11,11 @@ namespace Lime
 {
 	public class Window : CommonWindow, IWindow
 	{
-		public NSGameView View { get; private set; }
 		private NSWindow window;
-
 		private FPSCounter fpsCounter;
 		private Stopwatch stopwatch;
+
+		public NSGameView View { get; private set; }
 
 		public string Title
 		{
@@ -25,8 +25,12 @@ namespace Lime
 
 		public bool Visible
 		{
-			get { return View.Visible; }
-			set { View.Visible = value; }
+			get { return !View.Hidden; }
+			set
+			{
+				if (View.Hidden != !value)
+					View.Hidden = !value; 
+			}
 		}
 
 		public IntVector2 ClientPosition
@@ -143,7 +147,7 @@ namespace Lime
 			stopwatch = new Stopwatch();
 			stopwatch.Start();
 			window.MakeKeyAndOrderFront(window);
-			View.Run(updatesPerSecond: 60);
+			View.Run(60);
 		}
 
 		private Size windowedClientSize;
@@ -202,7 +206,7 @@ namespace Lime
 
 		public void Close()
 		{
-			View.Close();
+			window.Close();
 		}
 
 		private void HandleClosed(object sender, EventArgs e)
@@ -212,7 +216,7 @@ namespace Lime
 			AudioSystem.Terminate();
 		}
 
-		private void HandleRenderFrame(object sender, EventArgs e)
+		private void HandleRenderFrame()
 		{
 			var delta = (float)stopwatch.Elapsed.TotalSeconds;
 			stopwatch.Restart();

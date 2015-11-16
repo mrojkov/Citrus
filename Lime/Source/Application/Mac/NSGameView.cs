@@ -19,20 +19,14 @@ namespace Lime.Platform
 		private CVDisplayLink displayLink;
 		private NSTimer animationTimer;
 		private NSTrackingArea trackingArea;
-
+		private bool swapInterval;
 		private bool disposed;
 		private bool animating;
-		private bool displayLinkSupported = false;
-
-		private WindowState windowState = WindowState.Normal;
-		private OpenTK.WindowBorder windowBorder;
-
-		private DateTime prevUpdateTime;
-		private DateTime prevRenderTime;
-
+		private bool displayLinkSupported;
 		private NSEventModifierMask prevMask;
-
 		private Lime.Input input;
+
+		public event Action RenderFrame;
 
 		public NSGameView(Lime.Input input, CGRect frame, NSOpenGLContext shareContext, GraphicsMode mode)
 			: base(frame)
@@ -55,8 +49,8 @@ namespace Lime.Platform
 
 			openGLContext.MakeCurrentContext();
 
-			SwapInterval = true;
-			DisplaylinkSupported = true;
+			swapInterval = true;
+			displayLinkSupported = true;
 		}
 
 		public override void UpdateTrackingAreas()
@@ -103,7 +97,7 @@ namespace Lime.Platform
 			RefreshMousePosition(theEvent);
 		}
 
-		void RefreshMousePosition(NSEvent theEvent)
+		private void RefreshMousePosition(NSEvent theEvent)
 		{
 			var point = new Point((int)theEvent.LocationInWindow.X, (int)Frame.Height - (int)theEvent.LocationInWindow.Y);
 			var p = new Vector2(point.X, point.Y) * (float)Window.BackingScaleFactor;
@@ -153,7 +147,7 @@ namespace Lime.Platform
 			}
 		}
 
-		private readonly Dictionary<MacKeyModifiers, Key> modifiersToKeys = new Dictionary<MacKeyModifiers, Key> {
+		private readonly static Dictionary<MacKeyModifiers, Key> modifiersToKeys = new Dictionary<MacKeyModifiers, Key> {
 			{ MacKeyModifiers.LShiftFlag, Key.LShift },
 			{ MacKeyModifiers.RShiftFlag, Key.RShift },
 			{ MacKeyModifiers.LCtrlFlag, Key.LControl },
@@ -236,25 +230,13 @@ namespace Lime.Platform
 			return new NSOpenGLPixelFormat(attributes.ToArray());
 		}
 
-#region Public
-
 		public void UpdateGLContext()
 		{
 			openGLContext.CGLContext.Lock();
 			openGLContext.Update();
 			openGLContext.CGLContext.Unlock();					
 		}
-
-		public NSOpenGLContext OpenGLContext
-		{
-			get { return openGLContext; }
-		}
-
-		public NSOpenGLPixelFormat PixelFormat
-		{
-			get { return pixelFormat; }
-		}
-
+	
 		public void Stop()
 		{
 			if (animating) {
@@ -270,41 +252,16 @@ namespace Lime.Platform
 			animating = false;
 		}
 
-		public void Run()
-		{
-			AssertNonDisposed();
-			OnLoad(EventArgs.Empty);
-
-			openGLContext.SwapInterval = SwapInterval;
-
-			if (displayLinkSupported)
-				SetupDisplayLink();
-
-			StartAnimation(0.0);
-		}
-
 		public void Run(double updatesPerSecond)
 		{
 			AssertNonDisposed();
-			if (updatesPerSecond == 0.0) {
-				Run();
-				return;
-			}
-
-			OnLoad(EventArgs.Empty);
-
-			SwapInterval = false;
-			DisplaylinkSupported = false;
-
-			openGLContext.SwapInterval = SwapInterval;
-
+			swapInterval = false;
+			displayLinkSupported = false;
+			openGLContext.SwapInterval = swapInterval;
 			if (displayLinkSupported)
 				SetupDisplayLink();
-
 			StartAnimation(updatesPerSecond);
 		}
-
-#region Override
 
 		public override bool AcceptsFirstResponder()
 		{
@@ -331,12 +288,6 @@ namespace Lime.Platform
 				openGLContext.View = this;
 		}
 
-#endregion
-
-#endregion
-
-#region Protected
-
 		protected NSViewController GetViewController()
 		{
 			NSResponder r = this;
@@ -349,39 +300,6 @@ namespace Lime.Platform
 			return null;
 		}
 
-#endregion
-
-#region Private
-
-		private bool SwapInterval { get; set; }
-
-		private bool DisplaylinkSupported
-		{
-			get { return displayLinkSupported; }	
-			set { displayLinkSupported = value; }
-		}
-
-		private NSWindowStyle GetStyleMask(OpenTK.WindowBorder border)
-		{
-			switch (border) {
-				case WindowBorder.Resizable:
-				return NSWindowStyle.Closable | NSWindowStyle.Miniaturizable | NSWindowStyle.Titled | NSWindowStyle.Resizable;
-				case WindowBorder.Fixed:
-				return NSWindowStyle.Closable | NSWindowStyle.Miniaturizable | NSWindowStyle.Titled;
-				case WindowBorder.Hidden:
-				return NSWindowStyle.Borderless;
-			}
-			return (NSWindowStyle)0;
-		}
-
-		private void UpdateWindowBorder(OpenTK.WindowBorder border)
-		{
-			AssertNonDisposed();
-			var title = Title;
-			Window.StyleMask = GetStyleMask(border);
-			Title = title; // Title gets lost after going borderless
-		}
-
 		private void StartAnimation(double updatesPerSecond)
 		{
 			if (!animating) {
@@ -390,7 +308,7 @@ namespace Lime.Platform
 						displayLink.Start();
 				} else {
 					var timeout = new TimeSpan((long)(((1.0 * TimeSpan.TicksPerSecond) / updatesPerSecond) + 0.5));
-					if (SwapInterval) {
+					if (swapInterval) {
 						animationTimer = NSTimer.CreateRepeatingScheduledTimer(timeout, delegate {
 							NeedsDisplay = true;
 						});
@@ -407,13 +325,7 @@ namespace Lime.Platform
 			animating = true;
 		}
 
-		private void DeAllocate()
-		{
-			Stop();
-			displayLink = null;
-		}
-
-		void AssertNonDisposed()
+		private void AssertNonDisposed()
 		{
 			if (disposed) {
 				throw new ObjectDisposedException("");
@@ -430,30 +342,9 @@ namespace Lime.Platform
 		{
 			openGLContext.CGLContext.Lock();
 			openGLContext.MakeCurrentContext();
-
-			var curUpdateTime = DateTime.Now;
-			if (prevUpdateTime.Ticks == 0) {
-				prevUpdateTime = curUpdateTime;
+			if (RenderFrame != null) {
+				RenderFrame();
 			}
-			var t = (curUpdateTime - prevUpdateTime).TotalSeconds;
-
-			if (t <= 0)
-				t = Double.Epsilon;
-
-			OnUpdateFrame(EventArgs.Empty);
-			prevUpdateTime = curUpdateTime;
-
-			var curRenderTime = DateTime.Now;
-			if (prevRenderTime.Ticks == 0) {
-				prevRenderTime = curRenderTime;
-			}
-			t = (curRenderTime - prevRenderTime).TotalSeconds;
-
-			if (t <= 0)
-				t = Double.Epsilon;
-
-			OnRenderFrame(EventArgs.Empty);
-			prevRenderTime = curRenderTime;
 			openGLContext.CGLContext.Unlock();
 		}
 
@@ -466,7 +357,7 @@ namespace Lime.Platform
 			displayLink.SetOutputCallback(DisplayLinkCallback);
 
 			CGLContext cglContext = openGLContext.CGLContext;
-			CGLPixelFormat cglPixelFormat = PixelFormat.CGLPixelFormat;
+			CGLPixelFormat cglPixelFormat = pixelFormat.CGLPixelFormat;
 			displayLink.SetCurrentDisplay(cglContext, cglPixelFormat);
 		}
 
@@ -480,90 +371,6 @@ namespace Lime.Platform
 			}
 
 			return result;
-		}
-
-#endregion
-
-#region Virtual
-
-#region Public
-
-		public virtual string Title
-		{
-			get
-			{
-				AssertNonDisposed();
-				if (Window != null)
-					return Window.Title;
-				else
-					throw new NotSupportedException();
-			}
-			set
-			{
-				AssertNonDisposed();
-				if (Window != null)
-					Window.Title = value;
-				else
-					throw new NotSupportedException();
-			}
-		}
-
-		public virtual bool Visible
-		{
-			get
-			{
-				AssertNonDisposed();
-				return !base.Hidden;
-			}
-			set
-			{
-				AssertNonDisposed();
-				if (base.Hidden != !value) {
-					base.Hidden = !value;
-					OnVisibleChanged(EventArgs.Empty);
-				}
-			}
-		}
-
-		public virtual WindowState WindowState
-		{
-			get
-			{
-				AssertNonDisposed();
-				return windowState;
-			}
-			set
-			{
-				AssertNonDisposed();
-				if (windowState != value) {
-					windowState = value;
-					OnWindowStateChanged(EventArgs.Empty);
-				}
-			}
-		}
-
-		public virtual OpenTK.WindowBorder WindowBorder
-		{
-			get
-			{ 
-				AssertNonDisposed();
-				return windowBorder;
-			}
-			set
-			{
-				AssertNonDisposed();
-				// Do not allow border changes during fullscreen mode.
-				if (windowState == WindowState.Fullscreen || windowState == WindowState.Maximized || windowBorder == value)
-					return;
-				windowBorder = value;
-				UpdateWindowBorder(windowBorder);
-			}
-		}
-
-		public virtual void Close()
-		{
-			AssertNonDisposed();
-			OnClosed(EventArgs.Empty);
 		}
 
 		public virtual void MakeCurrent()
@@ -580,115 +387,18 @@ namespace Lime.Platform
 			openGLContext.FlushBuffer();
 		}
 
-#endregion
-
-#region Protected
-
-		protected virtual void OnLoad(EventArgs e)
-		{
-			var h = Load;
-			if (h != null)
-				h(this, e);
-		}
-
-		protected virtual void OnUnload(EventArgs e)
-		{
-			var h = Unload;
-			Stop();
-			if (h != null)
-				h(this, e);
-		}
-
-		protected virtual void OnUpdateFrame(EventArgs e)
-		{
-			var h = UpdateFrame;
-			if (h != null)
-				h(this,e);
-		}
-
-		protected virtual void OnRenderFrame(EventArgs e)
-		{
-			var h = RenderFrame;
-			if (h != null)
-				h(this,e);
-		}
-
-		protected virtual void OnKeyPressed(EventArgs e)
-		{
-			var h = KeyPress;
-			if (h != null)
-				h(this, e);
-		}
-
-		protected virtual void OnClosed(EventArgs e)
-		{
-			var h = Closed;
-			if (h != null)
-				h(this, e);
-		}
-
-		protected virtual void OnDisposed(EventArgs e)
-		{
-			var h = Disposed;
-			if (h != null)
-				h(this, e);
-		}
-
-		protected virtual void OnWindowStateChanged(EventArgs e)
-		{
-			var h = WindowStateChanged;
-			if (h != null)
-				h(this, EventArgs.Empty);
-		}
-
-		protected virtual void OnResize(object sender, EventArgs e)
-		{
-			var h = Resize;
-			if (h != null)
-				h(sender, e);
-		}
-
-		protected virtual void OnVisibleChanged(EventArgs e)
-		{
-			var h = VisibleChanged;
-			if (h != null)
-				h(this, EventArgs.Empty);
-		}
-
-#endregion
-
-#endregion
-
-#region Events
-
-		public event EventHandler<EventArgs> UpdateFrame;
-		public event EventHandler<EventArgs> RenderFrame;
-		public event EventHandler<EventArgs> Resize;
-		public event EventHandler<EventArgs> WindowStateChanged;
-		public event EventHandler<EventArgs> KeyPress;
-		public event EventHandler<EventArgs> Closed;
-		public event EventHandler<EventArgs> Disposed;
-		public event EventHandler<EventArgs> VisibleChanged;
-		public event EventHandler<EventArgs> Load;
-		public event EventHandler<EventArgs> Unload;
-
-#endregion
-
 		protected override void Dispose(bool disposing)
 		{
 			if (disposed)
 				return;
 			if (disposing) {
-				DeAllocate();
+				Stop();
+				displayLink = null;
 				// DestroyFrameBuffer();
 			}
 			base.Dispose(disposing);
 			disposed = true;
-			if (disposing)
-				OnDisposed(EventArgs.Empty);
 		}
-
 	}
 }
-
 #endif
