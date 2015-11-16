@@ -174,8 +174,11 @@ namespace Lime
 #elif ANDROID
 			var s = ActivityDelegate.Instance.GameView.Size;
 			return new Vector2(s.Width, s.Height);
-#else
+#elif MAC || MONOMAC
 			var device = Lime.Platform.DisplayDevice.Default;
+			return new Vector2(device.Width, device.Height);
+#elif WIN
+			var device = OpenTK.DisplayDevice.Default;
 			return new Vector2(device.Width, device.Height);
 #endif
 		}
