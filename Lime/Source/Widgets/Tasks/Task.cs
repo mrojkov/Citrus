@@ -27,7 +27,6 @@ namespace Lime
 		[Obsolete("Use Updating instead", true)]
 		public Action Watcher;
 
-
 		[Obsolete("Use LifeTime instead", true)]
 		public float Time;
 
