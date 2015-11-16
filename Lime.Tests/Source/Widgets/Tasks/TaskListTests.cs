@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace Lime.Tests.Source.Widgets
+namespace Lime.Tests.Source.Widgets.Tasks
 {
 	[TestFixture]
 	public class TaskListTests
@@ -11,9 +11,9 @@ namespace Lime.Tests.Source.Widgets
 		public void StopTest()
 		{
 			var list = new TaskList();
-			var task1 = list.Add(OneFrameTask);
-			var task2 = list.Add(OneFrameTask);
-			var task3 = list.Add(OneFrameTask);
+			var task1 = list.Add(TwoFramesTask);
+			var task2 = list.Add(TwoFramesTask);
+			var task3 = list.Add(TwoFramesTask);
 			list.Stop();
 			Assert.That(list, Is.Empty);
 			Assert.That(task1.Completed);
@@ -25,11 +25,11 @@ namespace Lime.Tests.Source.Widgets
 		public void StopByPredicateTest()
 		{
 			var list = new TaskList();
-			var task1 = list.Add(OneFrameTask);
-			var task2 = list.Add(OneFrameTask);
+			var task1 = list.Add(TwoFramesTask);
+			var task2 = list.Add(TwoFramesTask);
 			Action updating = () => { };
 			task2.Updating = updating;
-			var task3 = list.Add(OneFrameTask);
+			var task3 = list.Add(TwoFramesTask);
 			list.Stop(t => t.Updating == updating);
 			Assert.That(list.Contains(task1));
 			Assert.That(list, Is.Not.Contains(task2));
@@ -41,11 +41,11 @@ namespace Lime.Tests.Source.Widgets
 		public void StopByTagTest()
 		{
 			var list = new TaskList();
-			var task1 = list.Add(OneFrameTask);
-			var task2 = list.Add(OneFrameTask);
+			var task1 = list.Add(TwoFramesTask);
+			var task2 = list.Add(TwoFramesTask);
 			var tag = new object();
 			task2.Tag = tag;
-			var task3 = list.Add(OneFrameTask);
+			var task3 = list.Add(TwoFramesTask);
 			list.StopByTag(tag);
 			Assert.That(list.Contains(task1));
 			Assert.That(list, Is.Not.Contains(task2));
@@ -57,8 +57,8 @@ namespace Lime.Tests.Source.Widgets
 		public void AddWithoutTagTest()
 		{
 			var list = new TaskList();
-			var task1 = list.Add(OneFrameTask());
-			var task2 = list.Add(OneFrameTask);
+			var task1 = list.Add(TwoFramesTask());
+			var task2 = list.Add(TwoFramesTask);
 			Assert.That(list.Contains(task1));
 			Assert.That(task1.Tag, Is.Null);
 			Assert.That(list.Contains(task2));
@@ -72,8 +72,8 @@ namespace Lime.Tests.Source.Widgets
 			var list = new TaskList();
 			var tag1 = new object();
 			var tag2 = new object();
-			var task1 = list.Add(OneFrameTask(), tag1);
-			var task2 = list.Add(OneFrameTask, tag2);
+			var task1 = list.Add(TwoFramesTask(), tag1);
+			var task2 = list.Add(TwoFramesTask, tag2);
 			Assert.That(list.Contains(task1));
 			Assert.That(task1.Tag, Is.EqualTo(tag1));
 			Assert.That(list.Contains(task2));
@@ -96,8 +96,8 @@ namespace Lime.Tests.Source.Widgets
 		{
 			const float UpdateDelta = 0.1f;
 			var list = new TaskList();
-			var task1 = list.Add(OneFrameTask);
-			var task2 = list.Add(TwoFramesTask);
+			var task1 = list.Add(TwoFramesTask);
+			var task2 = list.Add(ThreeFramesTask);
 			list.Update(UpdateDelta);
 			Assert.That(!task1.Completed);
 			Assert.That(list.Contains(task1));
@@ -123,11 +123,11 @@ namespace Lime.Tests.Source.Widgets
 			Assert.Pass();
 		}
 
-		private IEnumerator<object> OneFrameTask()
+		private IEnumerator<object> TwoFramesTask()
 		{
 			yield return null;
 		}
-		private IEnumerator<object> TwoFramesTask()
+		private IEnumerator<object> ThreeFramesTask()
 		{
 			yield return null;
 			yield return null;
