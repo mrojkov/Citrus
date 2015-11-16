@@ -691,8 +691,8 @@ namespace Lime
 			transform = CalcLocalToParentTransform();
 			Widget basicWidget = GetBasicWidget();
 			if (basicWidget != null) {
-				for (Node node = Parent; node != basicWidget; node = node.Parent) {
-					if (node != null && node.AsWidget != null) {
+				for (Node node = Parent; node != null && node != basicWidget; node = node.Parent) {
+					if (node.AsWidget != null) {
 						transform *= node.AsWidget.CalcLocalToParentTransform();
 						color *= node.AsWidget.Color;
 					}
