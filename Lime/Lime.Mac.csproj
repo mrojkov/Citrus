@@ -187,6 +187,21 @@
     <Compile Include="Source\Application\IContext.cs" />
     <Compile Include="Source\Widgets\WidgetContext.cs" />
     <Compile Include="Source\Application\Window.Mac.cs" />
+    <Compile Include="Source\Widgets\Layout\StackLayout.cs" />
+    <Compile Include="Source\Application\Mac\ColorFormat.cs" />
+    <Compile Include="Source\Application\Mac\DisplayDevice.cs" />
+    <Compile Include="Source\Application\Mac\GraphicsMode.cs" />
+    <Compile Include="Source\Application\Mac\NSGameView.cs" />
+    <Compile Include="Source\Application\Mac\Audio\AudioCapture.cs" />
+    <Compile Include="Source\Application\Mac\Audio\AudioContext.cs" />
+    <Compile Include="Source\Application\Mac\Audio\AudioContextException.cs" />
+    <Compile Include="Source\Application\Mac\Audio\AudioDeviceEnumerator.cs" />
+    <Compile Include="Source\Application\Mac\Audio\AudioDeviceErrorChecker.cs" />
+    <Compile Include="Source\Application\Mac\Audio\AudioDeviceException.cs" />
+    <Compile Include="Source\Application\Mac\Audio\AudioException.cs" />
+    <Compile Include="Source\Application\Mac\Audio\AudioValueException.cs" />
+    <Compile Include="Source\Application\Mac\KeyMap.cs" />
+    <Compile Include="Source\Application\Mac\Keys.cs" />
     <Compile Include="Source\Widgets\Tasks\Task.cs" />
     <Compile Include="Source\Widgets\Tasks\TaskList.cs" />
     <Compile Include="Source\Widgets\Tasks\WaitPredicate.cs" />
@@ -290,16 +305,14 @@
     <Folder Include="Source\Widgets\" />
     <Folder Include="Source\Application\Clipboard\" />
     <Folder Include="Source\Input\" />
+    <Folder Include="Source\Application\Mac\" />
+    <Folder Include="Source\Application\Mac\Input\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Mac.csproj">
       <Project>{BB697671-700C-455D-B8EE-66A6B122B949}</Project>
       <Name>Lemon.Mac</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\3rdParty\OpenTK.Xamarin\OpenTK.Xamarin.csproj">
-      <Project>{670A98AF-7AAD-43A8-A80B-B202A7745EA5}</Project>
-      <Name>OpenTK.Xamarin</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

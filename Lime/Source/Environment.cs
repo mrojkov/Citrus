@@ -175,7 +175,7 @@ namespace Lime
 			var s = ActivityDelegate.Instance.GameView.Size;
 			return new Vector2(s.Width, s.Height);
 #else
-			var device = OpenTK.DisplayDevice.Default;
+			var device = Lime.Platform.DisplayDevice.Default;
 			return new Vector2(device.Width, device.Height);
 #endif
 		}

@@ -149,7 +149,7 @@ namespace Lime
 #if iOS
 		GameController UIViewController { get; }
 #elif MAC
-		OpenTK.NSGameView NSGameView { get; }
+		Platform.NSGameView NSGameView { get; }
 #endif
 		/// <summary>
 		/// Sets the context, which is used for each window callback.

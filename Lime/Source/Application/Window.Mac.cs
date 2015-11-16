@@ -1,72 +1,107 @@
 #if MONOMAC || MAC
 using System;
-using OpenTK;
-using OpenTK.Input;
 using OpenTK.Graphics;
 using System.Collections.Generic;
 using System.Diagnostics;
+using AppKit;
+using CoreGraphics;
+using Lime.Platform;
 
 namespace Lime
 {
 	public class Window : CommonWindow, IWindow
 	{
-		private OpenTK.GameWindow otkWindow;
+		public NSGameView View { get; private set; }
+		private NSWindow window;
+
 		private FPSCounter fpsCounter;
 		private Stopwatch stopwatch;
 
 		public string Title
 		{
-			get { return otkWindow.Title; }
-			set { otkWindow.Title = value; }
-		}
-
-		public WindowBorder Border
-		{
-			get { return (WindowBorder)otkWindow.WindowBorder; }
-			set { otkWindow.WindowBorder = (OpenTK.WindowBorder)value; }
+			get { return window.Title; }
+			set { window.Title = value; }
 		}
 
 		public bool Visible
 		{
-			get { return otkWindow.Visible; }
-			set { otkWindow.Visible = value; }
+			get { return View.Visible; }
+			set { View.Visible = value; }
 		}
 
 		public IntVector2 ClientPosition
 		{
-			get { return new Lime.IntVector2(otkWindow.ClientLocation.X, otkWindow.ClientLocation.Y); }
-			set { otkWindow.ClientLocation = new System.Drawing.Point(value.X, value.X); }
+			get { throw new NotImplementedException(); }
+			set { throw new NotImplementedException(); }
 		}
 
 		public Size ClientSize
 		{
-			get { return new Lime.Size(otkWindow.ClientSize.Width, otkWindow.ClientSize.Height); }
-			set { otkWindow.ClientSize = new System.Drawing.Size(value.Width, value.Height); }
+			get 
+			{
+				var b = View.ConvertRectToBacking(View.Bounds);
+				return new Size((int)b.Width, (int)b.Height); 
+			}
+			set 
+			{ 
+				var s = View.ConvertSizeFromBacking(new CGSize(value.Width, value.Height));
+				window.SetContentSize(new CGSize(s.Width, s.Height)); 
+			}
 		}
 
 		public IntVector2 DecoratedPosition
 		{
-			get { return new IntVector2(otkWindow.Location.X, otkWindow.Location.Y); }
-			set { otkWindow.Location = new System.Drawing.Point(value.X, value.Y); }
+			get { return new IntVector2((int)window.Frame.X, (int)window.Frame.Y); }
+			set
+			{
+				var frame = window.Frame;
+				frame.Location = new CGPoint(value.X, value.Y);
+				window.SetFrame(frame, true);
+			}
 		}
 
 		public Size DecoratedSize
 		{
-			get { return new Lime.Size(otkWindow.Size.Width, otkWindow.Size.Height); }
-			set { otkWindow.Size = new System.Drawing.Size(value.Width, value.Height); }
+			get { return new Size((int)window.Frame.Width, (int)window.Frame.Height); }
+			set 
+			{
+				var frame = window.Frame;
+				frame.Size = new CGSize(value.Width, value.Height); 
+				window.SetFrame(frame, true);
+			}
 		}
 
-		public bool Active { get; private set; }
-
-		public WindowState State
+		public bool Active
 		{
-			get { return (WindowState)otkWindow.WindowState; }
+			get { return window.IsKeyWindow; }
+		}
+
+		public WindowState State 
+		{
+			get 
+			{
+				if (window.IsMiniaturized) {
+					return WindowState.Minimized;
+				}
+				if ((window.StyleMask & NSWindowStyle.FullScreenWindow) != 0) {
+					return WindowState.Fullscreen;
+				}
+				return WindowState.Normal;
+			}
 			set
 			{
-				if (otkWindow.WindowState == (OpenTK.WindowState)value) {
+				if (State == value) {
 					return;
 				}
-				otkWindow.WindowState = (OpenTK.WindowState)value;
+				if (value == WindowState.Minimized) {
+					window.Miniaturize(null);
+					return;
+				}
+				if (value == WindowState.Fullscreen && State != WindowState.Fullscreen) {
+					window.ToggleFullScreen(null);
+				} else if (value != WindowState.Fullscreen && State == WindowState.Fullscreen) {
+					window.ToggleFullScreen(null);
+				}
 			}
 		}
 
@@ -82,7 +117,7 @@ namespace Lime
 			}
 		}
 
-		public NSGameView NSGameView { get { return otkWindow.View; } }
+		public NSGameView NSGameView { get { return View; } }
 
 		public MouseCursor Cursor { get; set; }
 
@@ -94,26 +129,12 @@ namespace Lime
 		{
 			Input = new Input();
 			fpsCounter = new FPSCounter();
-			otkWindow = new OpenTK.GameWindow(options.Size.Width, options.Size.Height,
-				new GraphicsMode(new ColorFormat(32), depth: 24), options.Title, GetWindowFlags(options));
+			CreateNativeWindow(options.Size.Width, options.Size.Height,
+				new GraphicsMode(new ColorFormat(32), depth: 24), options.Title, options.FixedSize);
 			if (Application.MainWindow != null) {
 				throw new Lime.Exception("Attempt to create GameWindow twice");
 			}
 			Application.MainWindow = this;
-			Active = true;
-			otkWindow.Keyboard.KeyDown += HandleKeyDown;
-			otkWindow.Keyboard.KeyUp += HandleKeyUp;
-			otkWindow.KeyPress += HandleKeyPress;
-			otkWindow.Mouse.ButtonDown += HandleMouseButtonDown;
-			otkWindow.Mouse.ButtonUp += HandleMouseButtonUp;
-			otkWindow.Mouse.Move += HandleMouseMove;
-			otkWindow.Mouse.WheelChanged += HandleMouseWheel;
-			otkWindow.FocusedChanged += HandleFocusedChanged;
-			otkWindow.Closing += HandleClosing;
-			otkWindow.Closed += HandleClosed;
-			otkWindow.Move += HandleMove;
-			otkWindow.Resize += HandleResize;
-			otkWindow.RenderFrame += HandleRenderFrame;
 			ClientSize = options.Size;
 			Title = options.Title;
 			Center();
@@ -122,128 +143,67 @@ namespace Lime
 			}
 			stopwatch = new Stopwatch();
 			stopwatch.Start();
-			otkWindow.Run(60);
+			window.MakeKeyAndOrderFront(window);
+			View.Run(updatesPerSecond: 60);
 		}
 
-		private static GameWindowFlags GetWindowFlags(WindowOptions options)
+		private Size windowedClientSize;
+
+		private void CreateNativeWindow(int width, int height, GraphicsMode graphicsMode, string title, bool fixedSize)
 		{
-			return options.FixedSize ? GameWindowFlags.FixedWindow : GameWindowFlags.Default;
+			var rect = new CGRect(0, 0, width, height);
+			View = new NSGameView(Input, rect, null, GraphicsMode.Default);
+			var style = NSWindowStyle.Titled | NSWindowStyle.Closable | NSWindowStyle.Miniaturizable;
+			if (!fixedSize) {
+				style |= NSWindowStyle.Resizable;
+			}
+			window = new NSWindow(rect, style, NSBackingStore.Buffered, false);
+			window.Title = title;
+			window.WillClose += (s, e) => {
+				View.Stop();
+				NSApplication.SharedApplication.Terminate(View);
+				HandleClosed(s, e);	
+			};
+			// Set window minimum size to prevent render bugs in split-screen mode.
+			window.MinSize = new CGSize(480, 480);
+			window.DidResize += (s, e) => {
+				View.UpdateGLContext();
+				HandleResize(s, e);
+			};
+			window.WillEnterFullScreen += (sender, e) => {
+				windowedClientSize = ClientSize;
+			};
+			window.DidExitFullScreen += (sender, e) => {
+				ClientSize = windowedClientSize;
+				window.Center();
+			};
+			window.DidBecomeKey += (sender, e) => {
+				AudioSystem.Active = true;
+				RaiseActivated();
+			};
+			window.DidResignKey += (sender, e) => {
+				AudioSystem.Active = false;
+				RaiseActivated();
+			};
+			window.DidMove += HandleMove;
+			window.CollectionBehavior = NSWindowCollectionBehavior.FullScreenPrimary;
+			window.ContentView = View;
+			window.ReleasedWhenClosed = true;
+			View.RenderFrame += HandleRenderFrame;
 		}
 
 		public void Center()
 		{
-			var displayBounds = OpenTK.DisplayDevice.Default.Bounds;
+			var displayBounds = DisplayDevice.Default.Bounds;
 			DecoratedPosition = new IntVector2 {
-				X = Math.Max(0, (displayBounds.Width - DecoratedSize.Width) / 2 + displayBounds.X),
-				Y = Math.Max(0, (displayBounds.Height - DecoratedSize.Height) / 2 + displayBounds.Y)
+				X = (int)Math.Max(0, (displayBounds.Width - DecoratedSize.Width) / 2 + displayBounds.Left),
+				Y = (int)Math.Max(0, (displayBounds.Height - DecoratedSize.Height) / 2 + displayBounds.Top)
 			};
 		}
 
 		public void Close()
 		{
-			otkWindow.Close();
-		}
-
-		private void HandleKeyDown(object sender, OpenTK.Input.KeyboardKeyEventArgs e)
-		{
-			// SDL backend bug: OpenTK doesn't send key press event for backspace
-			if (e.Key == OpenTK.Input.Key.BackSpace) {
-				Input.TextInput += '\b';
-			}
-			Input.SetKeyState((Key)e.Key, true);
-			//There is no KeyUp event for regular key on Mac if Command key pressed, so we release it manualy in the same frame
-			if ((Input.IsKeyPressed(Key.LWin) || Input.IsKeyPressed(Key.RWin))) {
-				Input.SetKeyState((Key)e.Key, false);
-			}
-		}
-
-		private void HandleKeyUp(object sender, KeyboardKeyEventArgs e)
-		{
-			Input.SetKeyState((Key)e.Key, false);
-		}
-
-		private void HandleKeyPress(object sender, KeyPressEventArgs e)
-		{
-			Input.TextInput += e.KeyChar;
-		}
-
-		private void HandleFocusedChanged(object sender, EventArgs e)
-		{
-			Active = otkWindow.Focused;
-			if (otkWindow.Focused) {
-				AudioSystem.Active = true;
-				RaiseActivated();
-			} else {
-				AudioSystem.Active = false;
-				RaiseDeactivated();
-			}
-		}
-
-		private void HandleMouseButtonUp(object sender, MouseButtonEventArgs e)
-		{
-			switch(e.Button) {
-			case OpenTK.Input.MouseButton.Left:
-				Input.SetKeyState(Key.Mouse0, false);
-				Input.SetKeyState(Key.Touch0, false);
-				break;
-			case OpenTK.Input.MouseButton.Right:
-				Input.SetKeyState(Key.Mouse1, false);
-				break;
-			case OpenTK.Input.MouseButton.Middle:
-				Input.SetKeyState(Key.Mouse2, false);
-				break;
-			}
-		}
-
-		private void HandleMouseButtonDown(object sender, MouseButtonEventArgs e)
-		{
-			switch(e.Button) {
-			case OpenTK.Input.MouseButton.Left:
-				Input.SetKeyState(Key.Mouse0, true);
-				Input.SetKeyState(Key.Touch0, true);
-				break;
-			case OpenTK.Input.MouseButton.Right:
-				Input.SetKeyState(Key.Mouse1, true);
-				break;
-			case OpenTK.Input.MouseButton.Middle:
-				Input.SetKeyState(Key.Mouse2, true);
-				break;
-			}
-		}
-
-		private void HandleMouseMove(object sender, MouseMoveEventArgs e)
-		{
-			var position = new Vector2(e.X, e.Y) * Input.ScreenToWorldTransform;
-			Input.MousePosition = position;
-			Input.SetTouchPosition(0, position);
-		}
-
-		void HandleMouseWheel(object sender, MouseWheelEventArgs e)
-		{
-			// On Mac and Win we assume this as number of "lines" to scroll, not pixels to scroll
-			var wheelDelta = e.Delta;
-			if (e.Delta > 0) {
-				if (!Input.HasPendingKeyEvent(Key.MouseWheelUp)) {
-					Input.SetKeyState(Key.MouseWheelUp, true);
-					Input.SetKeyState(Key.MouseWheelUp, false);
-					Input.WheelScrollAmount = wheelDelta;
-				} else {
-					Input.WheelScrollAmount += wheelDelta;
-				}
-			} else {
-				if (!Input.HasPendingKeyEvent(Key.MouseWheelDown)) {
-					Input.SetKeyState(Key.MouseWheelDown, true);
-					Input.SetKeyState(Key.MouseWheelDown, false);
-					Input.WheelScrollAmount = wheelDelta;
-				} else {
-					Input.WheelScrollAmount += wheelDelta;
-				}
-			}
-		}
-
-		private void HandleClosing(object sender, OpenTK.CancelEventArgs e)
-		{
-			e.Cancel = RaiseClosing();
+			View.Close();
 		}
 
 		private void HandleClosed(object sender, EventArgs e)
@@ -253,13 +213,16 @@ namespace Lime
 			AudioSystem.Terminate();
 		}
 
-		private void HandleRenderFrame(object sender, FrameEventArgs e)
+		private void HandleRenderFrame(object sender, EventArgs e)
 		{
 			var delta = (float)stopwatch.Elapsed.TotalSeconds;
 			stopwatch.Restart();
 			delta = Mathf.Clamp(delta, 0, 1 / Application.LowFPSLimit);
 			Update(delta);
-			Render();
+			fpsCounter.Refresh();
+			View.MakeCurrent();
+			RaiseRendering();
+			View.SwapBuffers();
 		}
 
 		private void HandleResize(object sender, EventArgs e)
@@ -270,14 +233,6 @@ namespace Lime
 		private void HandleMove(object sender, EventArgs e)
 		{
 			RaiseMoved();
-		}
-
-		private void Render()
-		{
-			fpsCounter.Refresh();
-			otkWindow.MakeCurrent();
-			RaiseRendering();
-			otkWindow.SwapBuffers();
 		}
 
 		private void Update(float delta)
