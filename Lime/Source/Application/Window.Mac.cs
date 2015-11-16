@@ -129,8 +129,7 @@ namespace Lime
 		{
 			Input = new Input();
 			fpsCounter = new FPSCounter();
-			CreateNativeWindow(options.Size.Width, options.Size.Height,
-				new GraphicsMode(new ColorFormat(32), depth: 24), options.Title, options.FixedSize);
+			CreateNativeWindow(options);
 			if (Application.MainWindow != null) {
 				throw new Lime.Exception("Attempt to create GameWindow twice");
 			}
@@ -149,16 +148,16 @@ namespace Lime
 
 		private Size windowedClientSize;
 
-		private void CreateNativeWindow(int width, int height, GraphicsMode graphicsMode, string title, bool fixedSize)
+		private void CreateNativeWindow(WindowOptions options)
 		{
-			var rect = new CGRect(0, 0, width, height);
-			View = new NSGameView(Input, rect, null, GraphicsMode.Default);
+			var rect = new CGRect(0, 0, options.Size.Width, options.Size.Height);
+			View = new NSGameView(Input, rect, null, Platform.GraphicsMode.Default);
 			var style = NSWindowStyle.Titled | NSWindowStyle.Closable | NSWindowStyle.Miniaturizable;
-			if (!fixedSize) {
+			if (!options.FixedSize) {
 				style |= NSWindowStyle.Resizable;
 			}
 			window = new NSWindow(rect, style, NSBackingStore.Buffered, false);
-			window.Title = title;
+			window.Title = options.Title;
 			window.WillClose += (s, e) => {
 				View.Stop();
 				NSApplication.SharedApplication.Terminate(View);

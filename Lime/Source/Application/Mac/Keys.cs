@@ -1,3 +1,4 @@
+#if MAC || MONOMAC
 #region License
 //
 // The Open Toolkit Library License
@@ -167,4 +168,4 @@ namespace Lime.Platform
 		RWinFlag = 0x100010,
 	}
 }
-
+#endif

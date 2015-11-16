@@ -6,7 +6,7 @@ using System.Reflection;
 
 #if iOS
 using UIKit;
-#elif MAC
+#elif MAC || MONOMAC
 using AppKit;
 #elif ANDROID
 using Android.App;

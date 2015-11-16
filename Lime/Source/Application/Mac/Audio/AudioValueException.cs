@@ -1,4 +1,5 @@
-﻿#region License
+﻿#if MAC || MONOMAC
+#region License
 //
 // The Open Toolkit Library License
 //
@@ -41,3 +42,4 @@ namespace OpenTK.Audio
         public AudioValueException(string message) : base(message) { }
     }
 }
+#endif

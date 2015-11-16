@@ -197,6 +197,20 @@
     <Compile Include="Source\Widgets\Tasks\WaitPredicate.cs" />
     <Compile Include="Source\Widgets\Tasks\ITaskProfiler.cs" />
     <Compile Include="Source\Widgets\Tasks\MemoryTaskProfiler.cs" />
+    <Compile Include="Source\Application\Mac\Audio\AudioCapture.cs" />
+    <Compile Include="Source\Application\Mac\Audio\AudioContext.cs" />
+    <Compile Include="Source\Application\Mac\Audio\AudioContextException.cs" />
+    <Compile Include="Source\Application\Mac\Audio\AudioDeviceEnumerator.cs" />
+    <Compile Include="Source\Application\Mac\Audio\AudioDeviceErrorChecker.cs" />
+    <Compile Include="Source\Application\Mac\Audio\AudioDeviceException.cs" />
+    <Compile Include="Source\Application\Mac\Audio\AudioException.cs" />
+    <Compile Include="Source\Application\Mac\Audio\AudioValueException.cs" />
+    <Compile Include="Source\Application\Mac\ColorFormat.cs" />
+    <Compile Include="Source\Application\Mac\DisplayDevice.cs" />
+    <Compile Include="Source\Application\Mac\GraphicsMode.cs" />
+    <Compile Include="Source\Application\Mac\KeyMap.cs" />
+    <Compile Include="Source\Application\Mac\Keys.cs" />
+    <Compile Include="Source\Application\Mac\NSGameView.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

@@ -1,3 +1,4 @@
+#if MAC || MONOMAC
 #region License
 //
 // The Open Toolkit Library License
@@ -413,3 +414,4 @@ namespace OpenTK.Audio
         #endregion Destructor
     }
 }
+#endif

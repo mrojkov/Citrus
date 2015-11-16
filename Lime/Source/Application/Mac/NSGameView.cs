@@ -1,4 +1,4 @@
-﻿#if MAC
+﻿#if MAC || MONOMAC
 using System;
 using AppKit;
 using CoreVideo;

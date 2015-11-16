@@ -1,3 +1,4 @@
+#if MAC || MONOMAC
 #region License
 //
 // The Open Toolkit Library License
@@ -259,3 +260,4 @@ namespace Lime.Platform
         }
     }
 }
+#endif
