@@ -29,10 +29,10 @@ namespace Lime
 			private set { current = value; } 
 		}
 
-		[Obsolete("Use Task.Current.Time", true)]
+		[Obsolete("Use Task.Current.Time", false)]
 		public float Time;
 
-		[Obsolete("Use Task.Current.Delta", true)]
+		[Obsolete("Use Task.Current.Delta", false)]
 		public float Delta;
 
 		/// <summary>
