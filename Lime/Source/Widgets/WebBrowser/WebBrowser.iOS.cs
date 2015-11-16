@@ -79,16 +79,12 @@ namespace Lime
 			if (webView == null) {
 				return;
 			}
-			float screenHeight = WidgetContext.Current.Window.ClientSize.Height;
-			WindowRect wr = CalculateAABBInWorldSpace(this);
-			float Height = (float)wr.Height / (float)UIScreen.MainScreen.Scale;
-			var position = new PointF((float)wr.X / (float)UIScreen.MainScreen.Scale, screenHeight - (float)(wr.Y / UIScreen.MainScreen.Scale) - Height);
-			var size = new SizeF((float)wr.Width / (float)UIScreen.MainScreen.Scale, Height);
+			var wr = CalculateAABBInDeviceSpace(this);
+			var position = new PointF(wr.Left, wr.Top);
+			var size = new SizeF(wr.Width, wr.Height);
 			webView.Frame = new RectangleF(position, size);
 			webView.Hidden = false;
-
 			var activityIndicatorPosition = new PointF((size.Width * 0.5f) + position.X, (size.Height * 0.5f) + position.Y);
-
 			if (activityIndicator == null) {
 				activityIndicator = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.WhiteLarge);
 				activityIndicator.Center = activityIndicatorPosition;
@@ -107,7 +103,7 @@ namespace Lime
 			activityIndicator.Center = activityIndicatorPosition;
 		}
 	
-		private WindowRect CalculateAABBInWorldSpace(Widget widget)
+		private Rectangle CalculateAABBInDeviceSpace(Widget widget)
 		{
 			var aabb = widget.CalcAABBInSpaceOf(WidgetContext.Current.Root);
 			// Get the projected AABB coordinates in the normalized OpenGL space
@@ -119,15 +115,17 @@ namespace Lime
 			aabb.Right = (1 + aabb.Right) / 2;
 			aabb.Top = (1 + aabb.Top) / 2;
 			aabb.Bottom = (1 + aabb.Bottom) / 2;
-			// Transform to window coordinates
+			// Transform to device coordinates
 			var viewport = Renderer.Viewport;
-			var result = new WindowRect();
-			var min = new Vector2(viewport.X, viewport.Y);
-			var max = new Vector2(viewport.X + viewport.Width, viewport.Y + viewport.Height);
-			result.X = Mathf.Lerp(aabb.Left, min.X, max.X).Round();
-			result.Width = Mathf.Lerp(aabb.Right, min.X, max.X).Round() - result.X;
-			result.Y = Mathf.Lerp(aabb.Bottom, min.Y, max.Y).Round();
-			result.Height = Mathf.Lerp(aabb.Top, min.Y, max.Y).Round() - result.Y;
+			var result = new Rectangle();
+			var screenScale = (float)UIScreen.MainScreen.Scale;
+			var min = new Vector2(viewport.X, viewport.Y) / screenScale;
+			var max = new Vector2(viewport.X + viewport.Width, viewport.Y + viewport.Height) / screenScale;
+			var displayHeight = WidgetContext.Current.Window.ClientSize.Height / screenScale;
+			result.Left = Mathf.Lerp(aabb.Left, min.X, max.X).Round();
+			result.Right = Mathf.Lerp(aabb.Right, min.X, max.X).Round();
+			result.Top = displayHeight - Mathf.Lerp(aabb.Bottom, min.Y, max.Y).Round();
+			result.Bottom = displayHeight - Mathf.Lerp(aabb.Top, min.Y, max.Y).Round();
 			return result;
 		}
 
@@ -140,8 +138,7 @@ namespace Lime
 		{
 			NSUrlRequest request = new NSUrlRequest(new NSUrl(value.AbsoluteUri));
 			webView.LoadRequest(request);
-		}
-		
+		}		
 	}
 }
 #endif
