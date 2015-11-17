@@ -182,7 +182,13 @@ namespace Lime
 			System.Windows.Forms.Application.SetUnhandledExceptionMode(
 				System.Windows.Forms.UnhandledExceptionMode.ThrowException
 			);
-			SetProcessDPIAware();
+			// Nika: This function doesn't work on XP, and we don't want to add dpiAware into manifest
+			// because this will require adding into every new project.
+			try {
+				SetProcessDPIAware();
+			} catch (EntryPointNotFoundException ex) {
+				Logger.Write(ex.Message);
+			}
 			Window.InitializeMainOpenGLContext();
 			SoftKeyboard = new DummySoftKeyboard();
 #elif MAC
