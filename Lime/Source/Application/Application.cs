@@ -250,6 +250,7 @@ namespace Lime
 				if (MainWindow != null) {
 					MainWindow.Fullscreen = false;
 					title = MainWindow.Title;
+					MainWindow.Visible = false;
 				}
 				WinApi.MessageBox((IntPtr)null, e.ExceptionObject.ToString(), 
 					string.Format("{0} has terminated with an error", title), 0);
