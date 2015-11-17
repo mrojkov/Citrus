@@ -6,8 +6,7 @@ using System.Text;
 namespace Lime
 {
 	/// <summary>
-	/// Задача (таск). Бывает, что нужно задать какую-нибудь последовательность действий и ждать окончания ее выполнения.
-	/// Задачи основаны на перечислителях (IEnumerator<object>) и их операторе yield return
+	/// Sequence of actions, based on IEnumerators.
 	/// </summary>
 	public class Task : IDisposable
 	{
@@ -40,7 +39,7 @@ namespace Lime
 		}
 		
 		/// <summary>
-		/// Time delta since last Update of current Task.
+		/// Time delta since last Update.
 		/// </summary>
 		public float Delta { get; private set; }
 
@@ -60,6 +59,9 @@ namespace Lime
 			return Completed ? "Completed" : stack.Peek().GetType().ToString();
 		}
 
+		/// <summary>
+		/// Advances task to the next step of enumerator.
+		/// </summary>
 		public void Advance(float delta)
 		{
 			if (Completed) {
@@ -107,6 +109,9 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Exits from all IEnumerators, sets Updating to null.
+		/// </summary>
 		public void Dispose()
 		{
 			while (stack.Count > 0) {
@@ -146,25 +151,34 @@ namespace Lime
 			}
 		}
 
+		/// <summary>
+		/// Proceeds while specified predicate returns true.
+		/// </summary>
 		public static WaitPredicate WaitWhile(Func<bool> predicate)
 		{
 			return new BooleanWaitPredicate() { Predicate = predicate };
 		}
 
+		/// <summary>
+		/// Proceeds while specified predicate returns true. Argument of the predicate is
+		/// time, that accumulates on Advance.
+		/// </summary>
 		public static WaitPredicate WaitWhile(Func<float, bool> timePredicate)
 		{
 			return new TimeWaitPredicate() { Predicate = timePredicate };
 		}
-		
+
+		/// <summary>
+		/// Proceeds while specified node is running animation.
+		/// </summary>
 		public static WaitPredicate WaitForAnimation(Node node)
 		{
 			return new AnimationWaitPredicate() { Node = node };
 		}
 
 		/// <summary>
-		/// Выполняет задачу асинхронно в другом потоке. Возвращает null до тех пор, пока задача не будет выполнена или отменена
+		/// Proceeds asynchronously in separate thread. Returns null while specified action is incomplete.
 		/// </summary>
-		/// <param name="action">Действия, которые должны быть выполнены</param>
 		public static IEnumerator<object> ExecuteAsync(Action action)
 		{
 #if UNITY
@@ -184,6 +198,9 @@ namespace Lime
 			StopIf(pred);
 		}
 		
+		/// <summary>
+		/// Sets stopping condition for current task.
+		/// </summary>
 		public static void StopIf(Func<bool> pred)
 		{
 			Current.Updating = () => {
@@ -195,7 +212,7 @@ namespace Lime
 
 		/// <summary>
 		/// Returns a sequence of numbers, interpolated as sine in specified time period.
-		/// Advances by using Delta.
+		/// Advances by using Current.Delta.
 		/// </summary>
 		public static IEnumerable<float> SinMotion(float timePeriod, float from, float to)
 		{
@@ -208,7 +225,7 @@ namespace Lime
 
 		/// <summary>
 		/// Returns a sequence of numbers, interpolated as square root in specified time period.
-		/// Advances by using Delta.
+		/// Advances by using Current.Delta.
 		/// </summary>
 		public static IEnumerable<float> SqrtMotion(float timePeriod, float from, float to)
 		{
@@ -221,7 +238,7 @@ namespace Lime
 
 		/// <summary>
 		/// Returns a sequence of numbers, linear interpolated in specified time period.
-		/// Advances by using Delta.
+		/// Advances by using Current.Delta.
 		/// </summary>
 		public static IEnumerable<float> LinearMotion(float timePeriod, float from, float to)
 		{
