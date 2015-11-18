@@ -112,6 +112,18 @@ namespace Lime
 			set { form.Size = LimeToSD.Convert(value); }
 		}
 
+		public Size MinimumDecoratedSize
+		{
+			get { return SDToLime.Convert(form.MinimumSize); }
+			set { form.MinimumSize = LimeToSD.Convert(value); }
+		}
+
+		public Size MaximumDecoratedSize
+		{
+			get { return SDToLime.Convert(form.MaximumSize); }
+			set { form.MaximumSize = LimeToSD.Convert(value); }
+		}
+
 		FPSCounter fpsCounter = new FPSCounter();
 		public float CalcFPS() { return fpsCounter.FPS; }
 
@@ -191,7 +203,7 @@ namespace Lime
 			} else {
 				glControl = CreateGLControl();
 			}
-			ClientSize = options.Size;
+			ClientSize = options.ClientSize;
 			Title = options.Title;
 			glControl.Dock = DockStyle.Fill;
 			glControl.Paint += OnPaint;
