@@ -41,7 +41,6 @@ namespace Lime
 		private void CreateWebView()
 		{
 			webView = new WebView(ActivityDelegate.Instance.GameView.Context);
-			webView.SetBackgroundColor(Android.Graphics.Color.Transparent);
 			webView.Settings.JavaScriptEnabled = true;
 			webView.SetWebViewClient(new WebViewClient());
 		}
