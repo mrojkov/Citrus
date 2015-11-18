@@ -104,7 +104,11 @@ namespace Lime
 		{
 			KeyRepeatDelay = 0.5f;
 			KeyRepeatInterval = 0.05f;
+#if WIN || MAC || MONOMAC
+			PasswordLastCharShowTime = 0.0f;
+#else
 			PasswordLastCharShowTime = 1.0f;
+#endif
 		}
 
 		public bool IsAcceptableLength(int length) { return MaxLength <= 0 || length <= MaxLength; }
