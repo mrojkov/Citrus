@@ -166,12 +166,12 @@ namespace Lime
 				var savedHeight = fontHeight;
 				FitTextInsideWidgetArea();
 				spriteList = new SpriteList();
-				RenderHelper(spriteList, out extent);
+				extent = RenderHelper(spriteList);
 				spacing = savedSpacing;
 				fontHeight = savedHeight;
 			} else {
 				spriteList = new SpriteList();
-				RenderHelper(spriteList, out extent);
+				extent = RenderHelper(spriteList);
 			}
 		}
 
@@ -203,8 +203,7 @@ namespace Lime
 			var bestHeight = minH;
 			var spacingKoeff = Spacing / FontHeight;
 			while (maxH - minH > 1) {
-				Rectangle rect;
-				RenderHelper(null, out rect);
+				Rectangle rect = RenderHelper(null);
 				var fit = (rect.Width <= Width && rect.Height <= Height);
 				if (fit) {
 					minH = FontHeight;
@@ -221,14 +220,14 @@ namespace Lime
 
 		private static CaretPosition dummyCaret = new CaretPosition();
 
-		private void RenderHelper(SpriteList spriteList, out Rectangle rect)
+		private Rectangle RenderHelper(SpriteList spriteList)
 		{
+			Rectangle rect = Rectangle.Empty;
 			var savedCaret = caret;
 			if (spriteList == null) {
 				caret = dummyCaret;
 			}
 			try {
-				rect = Rectangle.Empty;
 				var t = DisplayText ?? (LocalizationHandler != null ? LocalizationHandler(Text) : Text.Localize());
 				var lines = SplitText(t);
 				if (TrimWhitespaces) {
@@ -242,7 +241,7 @@ namespace Lime
 					caret.WorldPos = pos;
 					caret.Line = caret.Pos = caret.TextPos = 0;
 					caret.Valid = CaretPosition.ValidState.All;
-					return;
+					return rect;
 				}
 				bool firstLine = true;
 				if (caret.Valid == CaretPosition.ValidState.TextPos)
@@ -255,8 +254,7 @@ namespace Lime
 					if (caret.Valid == CaretPosition.ValidState.LinePos && caret.Line == caret.RenderingLineNumber) {
 						Caret.Pos = Caret.Pos.Clamp(0, line.Length - (lastLine ? 0 : 1));
 					}
-					Rectangle lineRect;
-					RenderSingleTextLine(spriteList, out lineRect, pos, line);
+					Rectangle lineRect = RenderSingleTextLine(spriteList, pos, line);
 					if (lastLine) {
 						// There is no end-of-text character, so simulate it.
 						caret.Sync(line.Length, new Vector2(lineRect.Right, lineRect.Top), Vector2.Down * fontHeight);
@@ -277,6 +275,7 @@ namespace Lime
 			} finally {
 				caret = savedCaret;
 			}
+			return rect;
 		}
 
 		private static void TrimLinesWhitespaces(List<string> lines)
@@ -302,8 +301,7 @@ namespace Lime
 			return Math.Max(FontHeight * numLines + Spacing * (numLines - 1), FontHeight);
 		}
 
-		private void RenderSingleTextLine(
-			SpriteList spriteList, out Rectangle extent, Vector2 pos, string line)
+		Rectangle RenderSingleTextLine(SpriteList spriteList, Vector2 pos, string line)
 		{
 			float lineWidth = MeasureTextLine(line).X;
 			switch (HAlignment) {
@@ -318,7 +316,7 @@ namespace Lime
 				Renderer.DrawTextLine(
 					Font.Instance, pos, line, Color4.White, FontHeight, 0, line.Length, spriteList, caret.Sync);
 			}
-			extent = new Rectangle(pos.X, pos.Y, pos.X + lineWidth, pos.Y + FontHeight);
+			return new Rectangle(pos.X, pos.Y, pos.X + lineWidth, pos.Y + FontHeight);
 		}
 
 		private List<string> SplitText(string text)
