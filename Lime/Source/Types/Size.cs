@@ -12,9 +12,14 @@ namespace Lime
 	{
 		[ProtoMember(1)]
 		public int Width;
-		
+
 		[ProtoMember(2)]
 		public int Height;
+
+		/// <summary>
+		/// Returns a size with zero width and height.
+		/// </summary>
+		public static readonly Size Zero = new Size(0, 0);
 
 		public Size(int width, int height)
 		{

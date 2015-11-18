@@ -75,6 +75,12 @@ namespace Lime
 		/// </summary>
 		Size DecoratedSize { get; set; }
 
+		// Gets or sets the minimum size to which the window (including title and border) can be sized.
+		Size MinimumDecoratedSize { get; set; }
+
+		// Gets or sets the maximum size to which the window (including title and border) can be sized.
+		Size MaximumDecoratedSize { get; set; }
+
 		/// <summary>
 		/// Gets or sets a value indicates whether the window is displayed
 		/// </summary>

@@ -25,6 +25,8 @@ namespace Lime
 		public Size ClientSize { get { return UIViewController.View.ClientSize; } set {} }
 		public IntVector2 DecoratedPosition { get { return IntVector2.Zero; } set {} }
 		public Size DecoratedSize { get { return ClientSize; } set {} }
+		public Size MinimumDecoratedSize { get { return Size.Zero; } set {} }
+		public Size MaximumDecoratedSize { get { return Size.Zero; } set {} }
 		public bool Visible { get { return true; } set {} }
 		public MouseCursor Cursor { get; set; }
 

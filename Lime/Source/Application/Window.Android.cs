@@ -20,6 +20,8 @@ namespace Lime
 		public IntVector2 DecoratedPosition { get { return IntVector2.Zero; } set {} }
 		public Size ClientSize { get { return ToLimeSize(ActivityDelegate.Instance.GameView.Size); } set {} }
 		public Size DecoratedSize { get { return ClientSize; } set {} }
+		public Size MinimumDecoratedSize { get { return Size.Zero; } set {} }
+		public Size MaximumDecoratedSize { get { return Size.Zero; } set {} }
 		public ActivityDelegate ActivityDelegate { get { return ActivityDelegate; } }
 
 		public float CalcFPS() { return fpsCounter.FPS; }

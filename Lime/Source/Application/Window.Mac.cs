@@ -75,6 +75,34 @@ namespace Lime
 			}
 		}
 
+		public Size MinimumDecoratedSize
+		{
+			get
+			{
+				var s = View.ConvertSizeToBacking(window.MinSize);
+				return new Size((int)s.Width, (int)s.Height); 
+			}
+			set
+			{
+				var s = new CGSize(value.Width, value.Height);
+				window.MinSize = View.ConvertSizeFromBacking(s);
+			}
+		}
+
+		public Size MaximumDecoratedSize
+		{
+			get
+			{
+				var s = View.ConvertSizeToBacking(window.MaxSize);
+				return new Size((int)s.Width, (int)s.Height); 
+			}
+			set
+			{
+				var s = new CGSize(value.Width, value.Height);
+				window.MaxSize = View.ConvertSizeFromBacking(s);
+			}
+		}
+
 		public bool Active
 		{
 			get { return window.IsKeyWindow; }
@@ -138,7 +166,7 @@ namespace Lime
 				throw new Lime.Exception("Attempt to create GameWindow twice");
 			}
 			Application.MainWindow = this;
-			ClientSize = options.Size;
+			ClientSize = options.ClientSize;
 			Title = options.Title;
 			Center();
 			if (options.Visible) {
@@ -154,21 +182,25 @@ namespace Lime
 
 		private void CreateNativeWindow(WindowOptions options)
 		{
-			var rect = new CGRect(0, 0, options.Size.Width, options.Size.Height);
+			var rect = new CGRect(0, 0, options.ClientSize.Width, options.ClientSize.Height);
 			View = new NSGameView(Input, rect, null, Platform.GraphicsMode.Default);
 			var style = NSWindowStyle.Titled | NSWindowStyle.Closable | NSWindowStyle.Miniaturizable;
 			if (!options.FixedSize) {
 				style |= NSWindowStyle.Resizable;
 			}
 			window = new NSWindow(rect, style, NSBackingStore.Buffered, false);
+			if (options.MinimumDecoratedSize != Size.Zero) {
+				MinimumDecoratedSize = options.MinimumDecoratedSize;
+			}
+			if (options.MaximumDecoratedSize != Size.Zero) {
+				MaximumDecoratedSize = options.MaximumDecoratedSize;
+			}
 			window.Title = options.Title;
 			window.WillClose += (s, e) => {
 				View.Stop();
 				NSApplication.SharedApplication.Terminate(View);
-				HandleClosed(s, e);	
+				HandleClosed(s, e);
 			};
-			// Set window minimum size to prevent render bugs in split-screen mode.
-			window.MinSize = new CGSize(480, 480);
 			window.DidResize += (s, e) => {
 				View.UpdateGLContext();
 				HandleResize(s, e);
