@@ -104,8 +104,6 @@
     <Compile Include="Source\Localization\LocalizationDictionary.cs" />
     <Compile Include="Source\Localization\LocalizationDictionaryTextSerializer.cs" />
     <Compile Include="Source\Localization\LocalizationDictionaryXmlSerializer.cs" />
-    <Compile Include="Source\Widgets\TextStyle.cs" />
-    <Compile Include="Source\Widgets\IText.cs" />
     <Compile Include="Source\Widgets\Text\TextParser.cs" />
     <Compile Include="Source\Widgets\Text\TextRenderer.cs" />
     <Compile Include="Source\Graphics\TextureAtlasElement.cs" />
@@ -211,6 +209,13 @@
     <Compile Include="Source\Application\Mac\KeyMap.cs" />
     <Compile Include="Source\Application\Mac\Keys.cs" />
     <Compile Include="Source\Application\Mac\NSGameView.cs" />
+    <Compile Include="Source\Widgets\Text\CaretPosition.cs" />
+    <Compile Include="Source\Widgets\Text\IText.cs" />
+    <Compile Include="Source\Widgets\Text\RichText.cs" />
+    <Compile Include="Source\Widgets\Text\SimpleText.cs" />
+    <Compile Include="Source\Widgets\Text\TextBox.cs" />
+    <Compile Include="Source\Widgets\Text\TextLineSplitter.cs" />
+    <Compile Include="Source\Widgets\Text\TextStyle.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
@@ -243,7 +248,6 @@
     <Compile Include="Source\Widgets\ParticleModifier.cs" />
     <Compile Include="Source\Widgets\ParticlesMagnet.cs" />
     <Compile Include="Source\Widgets\PointObject.cs" />
-    <Compile Include="Source\Widgets\SimpleText.cs" />
     <Compile Include="Source\Widgets\Spline.cs" />
     <Compile Include="Source\Widgets\SplineGear.cs" />
     <Compile Include="Source\Widgets\SplinePoint.cs" />
@@ -254,12 +258,10 @@
     <Compile Include="Source\Audio\SerializableSample.cs" />
     <Compile Include="Source\Audio\Sound.cs" />
     <Compile Include="Source\Widgets\NineGrid.cs" />
-    <Compile Include="Source\Widgets\RichText.cs" />
     <Compile Include="Source\Widgets\Slider.cs" />
     <Compile Include="Source\Widgets\RenderChain.cs" />
     <Compile Include="Source\Types\Vector3.cs" />
     <Compile Include="Source\Environment.cs" />
-    <Compile Include="Source\Widgets\TextBox.cs" />
     <Compile Include="Source\Application\Application.cs" />
     <Compile Include="Source\Mathf.cs" />
     <Compile Include="Source\Widgets\Widget.Toolbox.cs" />

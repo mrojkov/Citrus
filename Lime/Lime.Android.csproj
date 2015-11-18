@@ -134,7 +134,6 @@
     <Compile Include="Source\Widgets\Frame.cs" />
     <Compile Include="Source\Widgets\Image.cs" />
     <Compile Include="Source\Widgets\ImageCombiner.cs" />
-    <Compile Include="Source\Widgets\IText.cs" />
     <Compile Include="Source\Widgets\LinearLayout.cs" />
     <Compile Include="Source\Widgets\Marker.cs" />
     <Compile Include="Source\Widgets\MarkerCollection.cs" />
@@ -149,14 +148,10 @@
     <Compile Include="Source\Widgets\PointObject.cs" />
     <Compile Include="Source\Widgets\Polyline.cs" />
     <Compile Include="Source\Widgets\RenderChain.cs" />
-    <Compile Include="Source\Widgets\RichText.cs" />
-    <Compile Include="Source\Widgets\SimpleText.cs" />
     <Compile Include="Source\Widgets\Slider.cs" />
     <Compile Include="Source\Widgets\Spline.cs" />
     <Compile Include="Source\Widgets\SplineGear.cs" />
     <Compile Include="Source\Widgets\SplinePoint.cs" />
-    <Compile Include="Source\Widgets\TextBox.cs" />
-    <Compile Include="Source\Widgets\TextStyle.cs" />
     <Compile Include="Source\Widgets\Widget.cs" />
     <Compile Include="Source\Widgets\Widget.Toolbox.cs" />
     <Compile Include="Source\Widgets\WidgetCachedRenderer.cs" />
@@ -273,6 +268,13 @@
     <Compile Include="Source\Application\Mac\Audio\AudioDeviceException.cs" />
     <Compile Include="Source\Application\Mac\Audio\AudioException.cs" />
     <Compile Include="Source\Application\Mac\Audio\AudioValueException.cs" />
+    <Compile Include="Source\Widgets\Text\CaretPosition.cs" />
+    <Compile Include="Source\Widgets\Text\IText.cs" />
+    <Compile Include="Source\Widgets\Text\RichText.cs" />
+    <Compile Include="Source\Widgets\Text\SimpleText.cs" />
+    <Compile Include="Source\Widgets\Text\TextBox.cs" />
+    <Compile Include="Source\Widgets\Text\TextLineSplitter.cs" />
+    <Compile Include="Source\Widgets\Text\TextStyle.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">
