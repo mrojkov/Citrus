@@ -8,7 +8,7 @@ namespace Lime
 	public class MemoryTaskProfiler: ITaskProfiler
 	{
 		private Dictionary<Type, ProfileEntry> profile = new Dictionary<Type, ProfileEntry>();
-		private MemoryStopwatch memoryStopwatch = new MemoryStopwatch();
+		private Dictionary<IEnumerator<object>, MemoryStopwatch> memoryStopwatches = new Dictionary<IEnumerator<object>, MemoryStopwatch>();
 		public long TotalTasksUpdated;
 
 		public void RegisterTask(IEnumerator<object> enumerator)
@@ -23,20 +23,24 @@ namespace Lime
 		public void BeforeAdvance(IEnumerator<object> enumerator)
 		{
 			TotalTasksUpdated++;
-			memoryStopwatch.Start();
+			var stopWatch = new MemoryStopwatch();
+			memoryStopwatches.Add(enumerator, stopWatch);
+			stopWatch.Start();
 		}
 
 		public void AfterAdvance(IEnumerator<object> enumerator)
 		{
-			memoryStopwatch.Stop();
+			var stopWatch = memoryStopwatches[enumerator];
+			stopWatch.Stop();
 			var type = enumerator.GetType();
 			ProfileEntry pe;
 			profile.TryGetValue(type, out pe);
 			pe.CallCount++;
-			if (memoryStopwatch.MemoryAllocated > 0) {
-				pe.MemoryAllocated += memoryStopwatch.MemoryAllocated;
+			if (stopWatch.MemoryAllocated > 0) {
+				pe.MemoryAllocated += stopWatch.MemoryAllocated;
 			}
 			profile[type] = pe;
+			memoryStopwatches.Remove(enumerator);
 		}
 
 		public void DumpProfile(TextWriter writer)
