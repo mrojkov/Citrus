@@ -12,7 +12,6 @@ namespace Lime
 	{
 		[ThreadStatic]
 		private static Task current;
-		public static ITaskProfiler Profiler = null;
 		public static bool SkipFrameOnTaskCompletion;
 		private Stack<IEnumerator<object>> stack = new Stack<IEnumerator<object>>();
 		private WaitPredicate waitPredicate;
@@ -33,9 +32,6 @@ namespace Lime
 		{
 			Tag = tag;
 			stack.Push(e);
-			if (Profiler != null) {
-				Profiler.RegisterTask(e);
-			}
 		}
 		
 		/// <summary>
@@ -72,9 +68,6 @@ namespace Lime
 			Delta = delta;
 			LifeTime += delta;
 			var e = stack.Peek();
-			if (Profiler != null) {
-				Profiler.BeforeAdvance(e);
-			}
 			try {
 				if (Updating != null) {
 					Updating();
@@ -103,9 +96,6 @@ namespace Lime
 				}
 			} finally {
 				current = savedCurrent;
-				if (Profiler != null) {
-					Profiler.AfterAdvance(e);
-				}
 			}
 		}
 

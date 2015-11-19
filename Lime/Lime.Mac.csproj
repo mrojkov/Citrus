@@ -202,8 +202,6 @@
     <Compile Include="Source\Widgets\Tasks\Task.cs" />
     <Compile Include="Source\Widgets\Tasks\TaskList.cs" />
     <Compile Include="Source\Widgets\Tasks\WaitPredicate.cs" />
-    <Compile Include="Source\Widgets\Tasks\ITaskProfiler.cs" />
-    <Compile Include="Source\Widgets\Tasks\MemoryTaskProfiler.cs" />
     <Compile Include="Source\Widgets\Text\CaretPosition.cs" />
     <Compile Include="Source\Widgets\Text\IText.cs" />
     <Compile Include="Source\Widgets\Text\RichText.cs" />
