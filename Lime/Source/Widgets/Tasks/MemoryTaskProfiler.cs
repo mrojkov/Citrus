@@ -9,6 +9,7 @@ namespace Lime
 	{
 		private Dictionary<Type, ProfileEntry> profile = new Dictionary<Type, ProfileEntry>();
 		private Dictionary<IEnumerator<object>, MemoryStopwatch> memoryStopwatches = new Dictionary<IEnumerator<object>, MemoryStopwatch>();
+		private List<MemoryStopwatch> memoryStopwatchList = new List<MemoryStopwatch>();
 		public long TotalTasksUpdated;
 
 		public void RegisterTask(IEnumerator<object> enumerator)
@@ -23,7 +24,11 @@ namespace Lime
 		public void BeforeAdvance(IEnumerator<object> enumerator)
 		{
 			TotalTasksUpdated++;
-			var stopWatch = new MemoryStopwatch();
+			var stopWatch = memoryStopwatchList.FirstOrDefault(sw => sw.Stopped);
+			if (stopWatch == null) {
+				stopWatch = new MemoryStopwatch();
+				memoryStopwatchList.Add(stopWatch);
+			}
 			memoryStopwatches.Add(enumerator, stopWatch);
 			stopWatch.Start();
 		}
