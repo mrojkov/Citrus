@@ -249,7 +249,7 @@ namespace Lime
 					if (caretPos.TextPos > 0 && caretPos.TextPos <= Text.Text.Length) {
 						caretPos.TextPos--;
 						Text.Text = Text.Text.Remove(caretPos.TextPos, 1);
-						lastCharShowTimeLeft = editorParams.PasswordLastCharShowTime;
+						lastCharShowTimeLeft = 0f;
 					}
 				}
 				else if (ch >= ' ') {
