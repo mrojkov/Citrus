@@ -270,6 +270,7 @@ namespace Lime
 		private void OnActivated(object sender, EventArgs e)
 		{
 			active = true;
+			glControl.Invalidate();
 			RaiseActivated();
 		}
 
