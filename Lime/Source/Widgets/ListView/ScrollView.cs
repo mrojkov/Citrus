@@ -260,6 +260,8 @@ namespace Lime
 						// or to lower int if we move up.
 						ScrollPosition = stepPerFrame > 0 ? ScrollPosition.Ceiling() : ScrollPosition.Floor();
 					}
+				} else {
+					prevMouseScrollDirection = 0;
 				}
 			}
 		}
