@@ -13,9 +13,8 @@ namespace Lime
 
 	public partial class ScrollView : IDisposable
 	{
-		private const float DefaultMouseScrollStep = 50;
-		public float MouseScrollStep = DefaultMouseScrollStep;
-		private float scrollDestination;
+		private float mouseScrollDestination;
+		private int prevMouseScrollDirection;
 
 		public readonly Frame Frame;
 		public readonly ScrollViewContentWidget Content;
@@ -236,7 +235,7 @@ namespace Lime
 
 		private IEnumerator<object> SmoothMouseScroll()
 		{
-			float prevDirection = 0;
+			prevMouseScrollDirection = 0;
 			while (true) {
 				yield return null;
 				IsScrollingByMouseWheel = 
@@ -244,12 +243,12 @@ namespace Lime
 					(Frame.Input.WasKeyPressed(Key.MouseWheelDown) || Frame.Input.WasKeyPressed(Key.MouseWheelUp)) &&
 					(CanScroll && Frame.HitTest(Frame.Input.MousePosition));
 				if (IsScrollingByMouseWheel) {
-					if (Math.Sign(Frame.Input.WheelScrollAmount) != prevDirection) {
-						scrollDestination = ScrollPosition;
+					if (Math.Sign(Frame.Input.WheelScrollAmount) != prevMouseScrollDirection) {
+						mouseScrollDestination = ScrollPosition;
 					}
-					scrollDestination -= Frame.Input.WheelScrollAmount * MouseScrollStep;
-					prevDirection = Math.Sign(Frame.Input.WheelScrollAmount);
-					ScrollTo(scrollDestination, instantly: false);
+					mouseScrollDestination -= Frame.Input.WheelScrollAmount;
+					prevMouseScrollDirection = Math.Sign(Frame.Input.WheelScrollAmount);
+					ScrollTo(mouseScrollDestination, instantly: false);
 				}
 			}
 		}
@@ -302,6 +301,9 @@ namespace Lime
 			IsDragging = true;
 			Frame.Input.CaptureMouse();
 			float realScrollPosition = ScrollPosition;
+			// Stop mouse wheel scrolling
+			mouseScrollDestination = ScrollPosition;
+			prevMouseScrollDirection = 0;
 			do {
 				if (IsItemDragInProgress()) {
 					Frame.Input.ReleaseMouse();

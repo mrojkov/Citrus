@@ -239,7 +239,7 @@ namespace Lime
 
 		private void OnMouseWheel(object sender, MouseEventArgs e)
 		{
-			Input.WheelScrollAmount = e.Delta / SystemInformation.MouseWheelScrollDelta;
+			Input.WheelScrollAmount = e.Delta;
 			if (e.Delta > 0) {
 				Input.SetKeyState(Key.MouseWheelUp, true);
 				Input.SetKeyState(Key.MouseWheelUp, false);
