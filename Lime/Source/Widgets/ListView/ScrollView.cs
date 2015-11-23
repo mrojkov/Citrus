@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Lime
 {
@@ -81,7 +80,7 @@ namespace Lime
 			} else {
 				Content.Tasks.Add(MainTask());
 			}
-#if MAC || WIN
+#if MAC || MONOMAC || WIN
 			Content.Tasks.Add(SmoothMouseScroll());
 #endif
 		}
@@ -248,7 +247,19 @@ namespace Lime
 					}
 					mouseScrollDestination -= Frame.Input.WheelScrollAmount;
 					prevMouseScrollDirection = Math.Sign(Frame.Input.WheelScrollAmount);
-					ScrollTo(mouseScrollDestination, instantly: false);
+				}
+
+				if ((ScrollPosition - mouseScrollDestination).Abs() > 0 && prevMouseScrollDirection != 0) {
+					StopScrolling();
+					var stepPerFrame = (mouseScrollDestination - ScrollPosition) / 16;
+					ScrollPosition = Mathf.Clamp(ScrollPosition + stepPerFrame, MinScrollPosition, MaxScrollPosition);
+					if (ScrollPosition == MinScrollPosition || ScrollPosition == MaxScrollPosition) {
+						mouseScrollDestination = ScrollPosition;
+					} else {
+						// If scroll stopped in the middle, we need to round to upper int if we move down
+						// or to lower int if we move up.
+						ScrollPosition = stepPerFrame > 0 ? ScrollPosition.Ceiling() : ScrollPosition.Floor();
+					}
 				}
 			}
 		}
@@ -267,7 +278,7 @@ namespace Lime
 			}
 		}
 
-		private IEnumerator<object> IntertialScrollingTask(float velocity)
+		private IEnumerator<object> InertialScrollingTask(float velocity)
 		{
 			var oldMask = Frame.HitTestMask;
 			Frame.HitTestMask = Widget.ControlsHitTestMask;
@@ -290,6 +301,8 @@ namespace Lime
 				scrollingTask = null;
 			} finally {
 				Frame.HitTestMask = oldMask;
+				// Sync mouse scroll destination after drag scroll
+				mouseScrollDestination = ScrollPosition;
 			}
 		}
 
@@ -302,7 +315,6 @@ namespace Lime
 			Frame.Input.CaptureMouse();
 			float realScrollPosition = ScrollPosition;
 			// Stop mouse wheel scrolling
-			mouseScrollDestination = ScrollPosition;
 			prevMouseScrollDirection = 0;
 			do {
 				if (IsItemDragInProgress()) {
@@ -318,7 +330,7 @@ namespace Lime
 				yield return null;
 			} while (Input.IsMousePressed());
 			Frame.Input.ReleaseMouse();
-			StartScrolling(IntertialScrollingTask(velocityMeter.CalcVelocity()));
+			StartScrolling(InertialScrollingTask(velocityMeter.CalcVelocity()));
 			IsDragging = false;
 		}
 
