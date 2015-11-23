@@ -104,10 +104,11 @@ namespace Lime.Platform
 			input.MousePosition = p * input.ScreenToWorldTransform;
 		}
 
+		private const int SizeOfLineInPixels = 40;
 		public override void ScrollWheel(NSEvent theEvent)
 		{
-			// On Mac and Win we assume this as number of "lines" to scroll, not pixels to scroll
-			var wheelDelta = Math.Sign(theEvent.ScrollingDeltaY);
+			var wheelDelta = theEvent.HasPreciseScrollingDeltas ? (float)theEvent.ScrollingDeltaY
+				: (float)theEvent.ScrollingDeltaY * SizeOfLineInPixels;
 			if (wheelDelta > 0) {
 				if (!input.HasPendingKeyEvent(Key.MouseWheelUp)) {
 					input.SetKeyState(Key.MouseWheelUp, true);
