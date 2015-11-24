@@ -125,6 +125,14 @@ namespace YuzuTest
 		public List<SampleBase> E;
 	}
 
+	public class SampleDict
+	{
+		[YuzuRequired(1)]
+		public int Value;
+		[YuzuOptional(2)]
+		public Dictionary<string, SampleDict> Children;
+	}
+
 	public class SampleMatrix
 	{
 		[YuzuRequired(1)]
@@ -402,6 +410,29 @@ namespace YuzuTest
 			jd.FromString(w2, result2);
 			Assert.AreEqual(v2.Value, w2.Value);
 			Assert.AreEqual(v2.Children.Count, w2.Children.Count);
+		}
+
+		[TestMethod]
+		public void TestJsonDictionary()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			var jd = new JsonDeserializer();
+
+			var v0 = new SampleDict { Value = 3, Children = new Dictionary<string, SampleDict> {
+				{ "a", new SampleDict { Value = 5, Children = new Dictionary<string, SampleDict>() } }
+			} };
+			var result0 = js.ToString(v0);
+			Assert.AreEqual(
+				"{\n\"Value\":3,\n\"Children\":{\n" +
+				"\"a\":{\n\"Value\":5,\n\"Children\":{}\n}\n" +
+				"}\n}", result0);
+
+			var w0 = new SampleDict();
+			jd.FromString(w0, result0);
+			Assert.AreEqual(v0.Value, w0.Value);
+			Assert.AreEqual(v0.Children.Count, w0.Children.Count);
+			Assert.AreEqual(v0.Children["a"].Value, w0.Children["a"].Value);
 		}
 
 		[TestMethod]

@@ -71,6 +71,22 @@ namespace Yuzu
 			writer.Write(']');
 		}
 
+		private void WriteDictionary<T>(Dictionary<string, T> dict)
+		{
+			var wf = GetWriteFunc(typeof(T));
+			writer.Write('{');
+			if (dict.Count > 0) {
+				WriteStr(JsonOptions.FieldSeparator);
+				var isFirst = true;
+				foreach (var elem in dict) {
+					WriteName(elem.Key, ref isFirst);
+					wf(elem.Value);
+				}
+				WriteStr(JsonOptions.FieldSeparator);
+			}
+			writer.Write('}');
+		}
+
 		private void WriteArray<T>(T[] array)
 		{
 			var wf = GetWriteFunc(typeof(T));
@@ -109,9 +125,17 @@ namespace Yuzu
 				else
 					return WriteEnumAsInt;
 			}
-			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>)) {
-				var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteList", t);
-				return obj => m.Invoke(this, new object[] { obj });
+			if (t.IsGenericType)
+			{
+				var g = t.GetGenericTypeDefinition();
+				if (g == typeof(List<>)) {
+					var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteList", t);
+					return obj => m.Invoke(this, new object[] { obj });
+				}
+				if (g == typeof(Dictionary<,>) && t.GetGenericArguments()[0] == typeof(string)) {
+					var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteDictionary", t, argNumber: 1);
+					return obj => m.Invoke(this, new object[] { obj });
+				}
 			}
 			if (t.IsArray) {
 				var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteArray", t);
@@ -410,6 +434,24 @@ namespace Yuzu
 			return list;
 		}
 
+		private Dictionary<string, T> ReadDictionary<T>()
+		{
+			var dict = new Dictionary<string, T>();
+			Require('{');
+			// ReadValue might invoke a new serializer, so we must not rely on PutBack.
+			if (SkipSpacesCarefully() == '}')
+				Require('}');
+			else {
+				var rf = ReadValueFunc(typeof(T));
+				do {
+					var key = RequireString();
+					Require(':');
+					dict.Add(key, (T)rf());
+				} while (Require('}', ',') == ',');
+			}
+			return dict;
+		}
+
 		private T[] ReadArray<T>()
 		{
 			return ReadList<T>().ToArray();
@@ -461,9 +503,16 @@ namespace Yuzu
 				else
 					return () => Enum.ToObject(t, RequireInt());
 			}
-			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>)) {
-				var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadList", t);
-				return () => m.Invoke(this, new object[] {});
+			if (t.IsGenericType) {
+				var g = t.GetGenericTypeDefinition();
+				if (g == typeof(List<>)) {
+					var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadList", t);
+					return () => m.Invoke(this, new object[] { });
+				}
+				if (g == typeof(Dictionary<,>)) {
+					var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadDictionary", t, argNumber: 1);
+					return () => m.Invoke(this, new object[] { });
+				}
 			}
 			if (t.IsArray) {
 				var n = JsonOptions.ArrayLengthPrefix ? "ReadArrayWithLengthPrefix" : "ReadArray";
