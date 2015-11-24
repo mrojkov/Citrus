@@ -242,12 +242,12 @@ namespace Lime
 					(Frame.Input.WasKeyPressed(Key.MouseWheelDown) || Frame.Input.WasKeyPressed(Key.MouseWheelUp)) &&
 					(CanScroll && Frame.HitTest(Frame.Input.MousePosition));
 				if (IsScrollingByMouseWheel) {
-					if (Math.Sign(Frame.Input.WheelScrollAmount) != (int)wheelScrollState) {
-						// If direction changed then reverse immediately.
+					var newWheelScrollState = (WheelScrollState)Math.Sign(Frame.Input.WheelScrollAmount);
+					if (newWheelScrollState != wheelScrollState) {
 						totalScrollAmount = 0f;
+						wheelScrollState = newWheelScrollState;
 					}
 					totalScrollAmount -= Frame.Input.WheelScrollAmount;
-					wheelScrollState = (WheelScrollState)Math.Sign(Frame.Input.WheelScrollAmount);
 				}
 
 				if (totalScrollAmount.Abs() > 1 && wheelScrollState != 0) {
