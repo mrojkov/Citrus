@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="Code.cs" />
     <Compile Include="Json.cs" />
+    <Compile Include="JsonGenerators.cs" />
     <Compile Include="ProtoBuf.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Yuzu.cs" />
