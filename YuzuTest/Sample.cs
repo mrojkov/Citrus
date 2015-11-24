@@ -20,6 +20,7 @@ namespace YuzuTest
 			JsonOptions.ClassTag = "class";
 			JsonOptions.EnumAsString = false;
 			JsonOptions.ArrayLengthPrefix = false;
+			JsonOptions.IgnoreCompact = false;
 		}
 
 		public override object FromReaderInt()
@@ -60,6 +61,7 @@ namespace YuzuTest
 			JsonOptions.ClassTag = "class";
 			JsonOptions.EnumAsString = false;
 			JsonOptions.ArrayLengthPrefix = false;
+			JsonOptions.IgnoreCompact = false;
 		}
 
 		public override object FromReaderInt()
@@ -100,6 +102,7 @@ namespace YuzuTest
 			JsonOptions.ClassTag = "class";
 			JsonOptions.EnumAsString = false;
 			JsonOptions.ArrayLengthPrefix = false;
+			JsonOptions.IgnoreCompact = false;
 		}
 
 		public override object FromReaderInt()
@@ -144,6 +147,7 @@ namespace YuzuTest
 			JsonOptions.ClassTag = "class";
 			JsonOptions.EnumAsString = true;
 			JsonOptions.ArrayLengthPrefix = false;
+			JsonOptions.IgnoreCompact = false;
 		}
 
 		public override object FromReaderInt()
@@ -181,6 +185,7 @@ namespace YuzuTest
 			JsonOptions.ClassTag = "class";
 			JsonOptions.EnumAsString = true;
 			JsonOptions.ArrayLengthPrefix = false;
+			JsonOptions.IgnoreCompact = false;
 		}
 
 		public override object FromReaderInt()
@@ -217,6 +222,7 @@ namespace YuzuTest
 			JsonOptions.ClassTag = "class";
 			JsonOptions.EnumAsString = true;
 			JsonOptions.ArrayLengthPrefix = false;
+			JsonOptions.IgnoreCompact = false;
 		}
 
 		public override object FromReaderInt()
@@ -264,6 +270,7 @@ namespace YuzuTest
 			JsonOptions.ClassTag = "class";
 			JsonOptions.EnumAsString = true;
 			JsonOptions.ArrayLengthPrefix = false;
+			JsonOptions.IgnoreCompact = false;
 		}
 
 		public override object FromReaderInt()
@@ -317,6 +324,7 @@ namespace YuzuTest
 			JsonOptions.ClassTag = "class";
 			JsonOptions.EnumAsString = true;
 			JsonOptions.ArrayLengthPrefix = true;
+			JsonOptions.IgnoreCompact = false;
 		}
 
 		public override object FromReaderInt()
@@ -364,6 +372,7 @@ namespace YuzuTest
 			JsonOptions.ClassTag = "class";
 			JsonOptions.EnumAsString = true;
 			JsonOptions.ArrayLengthPrefix = true;
+			JsonOptions.IgnoreCompact = false;
 		}
 
 		public override object FromReaderInt()
@@ -400,6 +409,7 @@ namespace YuzuTest
 			JsonOptions.ClassTag = "class";
 			JsonOptions.EnumAsString = true;
 			JsonOptions.ArrayLengthPrefix = true;
+			JsonOptions.IgnoreCompact = false;
 		}
 
 		public override object FromReaderInt()
@@ -439,6 +449,7 @@ namespace YuzuTest
 			JsonOptions.ClassTag = "class";
 			JsonOptions.EnumAsString = true;
 			JsonOptions.ArrayLengthPrefix = true;
+			JsonOptions.IgnoreCompact = false;
 		}
 
 		public override object FromReaderInt()
@@ -478,6 +489,7 @@ namespace YuzuTest
 			JsonOptions.ClassTag = "class";
 			JsonOptions.EnumAsString = true;
 			JsonOptions.ArrayLengthPrefix = true;
+			JsonOptions.IgnoreCompact = false;
 		}
 
 		public override object FromReaderInt()
@@ -536,6 +548,7 @@ namespace YuzuTest
 			JsonOptions.ClassTag = "class";
 			JsonOptions.EnumAsString = true;
 			JsonOptions.ArrayLengthPrefix = true;
+			JsonOptions.IgnoreCompact = false;
 		}
 
 		public override object FromReaderInt()
@@ -575,6 +588,7 @@ namespace YuzuTest
 			JsonOptions.ClassTag = "class";
 			JsonOptions.EnumAsString = true;
 			JsonOptions.ArrayLengthPrefix = true;
+			JsonOptions.IgnoreCompact = false;
 		}
 
 		public override object FromReaderInt()
@@ -614,6 +628,7 @@ namespace YuzuTest
 			JsonOptions.ClassTag = "class";
 			JsonOptions.EnumAsString = true;
 			JsonOptions.ArrayLengthPrefix = true;
+			JsonOptions.IgnoreCompact = false;
 		}
 
 		public override object FromReaderInt()

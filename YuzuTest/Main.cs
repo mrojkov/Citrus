@@ -146,6 +146,7 @@ namespace YuzuTest
 		public List<List<int>> M;
 	}
 
+	[YuzuCompact]
 	public struct SamplePoint
 	{
 		[YuzuRequired(1)]
@@ -547,6 +548,7 @@ namespace YuzuTest
 			var js = new JsonSerializer();
 			js.JsonOptions.Indent = "";
 			js.JsonOptions.FieldSeparator = " ";
+			js.JsonOptions.IgnoreCompact = true;
 			var result = js.ToString(v);
 			Assert.AreEqual("{ \"A\":{ \"X\":33, \"Y\":44 }, \"B\":{ \"X\":55, \"Y\":66 } }", result);
 
@@ -562,6 +564,25 @@ namespace YuzuTest
 				FromString(new SamplePoint(), "{ \"X\":34, \"Y\":45 }");
 			Assert.AreEqual(34, p.X);
 			Assert.AreEqual(45, p.Y);
+		}
+
+		[TestMethod]
+		public void TestJsonCompact()
+		{
+			var v = new SampleRect {
+				A = new SamplePoint { X = 33, Y = 44 },
+				B = new SamplePoint { X = 55, Y = 66 },
+			};
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = " ";
+			var result = js.ToString(v);
+			Assert.AreEqual("{ \"A\":[ 33, 44 ], \"B\":[ 55, 66 ] }", result);
+
+			var jd = new JsonDeserializer();
+			var w = new SampleRect();
+			jd.FromString(w, result);
+			CheckSampleRect(v, w);
 		}
 
 		[TestMethod]

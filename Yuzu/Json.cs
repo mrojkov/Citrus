@@ -15,6 +15,7 @@ namespace Yuzu
 		public string ClassTag = "class";
 		public bool EnumAsString = false;
 		public bool ArrayLengthPrefix = false;
+		public bool IgnoreCompact = false;
 	};
 
 	public class JsonSerializer : AbstractWriterSerializer
@@ -149,10 +150,12 @@ namespace Yuzu
 				var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteArray", t);
 				return obj => m.Invoke(this, new object[] { obj });
 			}
-			if (Utils.IsStruct(t))
-				return ToWriter;
-			if (t.IsClass)
-				return ToWriter;
+			if (Utils.IsStruct(t) || t.IsClass) {
+				if (Utils.IsCompact(t, Options) && !JsonOptions.IgnoreCompact)
+					return ToWriterCompact;
+				else
+					return ToWriter;
+			}
 			throw new NotImplementedException(t.Name);
 		}
 
@@ -439,7 +442,14 @@ namespace Yuzu
 				return false;
 			Require("ull");
 			return true;
+		}
 
+		protected char RequireBracketOrNull()
+		{
+			var ch = Require('{', '[', 'n');
+			if (ch == 'n')
+				Require("ull");
+			return ch;
 		}
 
 		private List<T> ReadList<T>()
@@ -565,30 +575,64 @@ namespace Yuzu
 			return obj;
 		}
 
+		protected virtual object ReadFieldsCompact(object obj)
+		{
+			if (!Utils.IsCompact(obj.GetType(), Options))
+				throw new YuzuException();
+			bool isFirst = true;
+			foreach (var yi in Utils.GetYuzuItems(obj.GetType(), Options)) {
+				if (!isFirst)
+					Require(',');
+				isFirst = false;
+				yi.SetValue(obj, ReadValueFunc(yi.Type)());
+			}
+			Require(']');
+			return obj;
+		}
+
 		public override object FromReaderInt()
 		{
 			if (!Options.ClassNames)
 				throw new YuzuException();
 			buf = null;
-			if (RequireOrNull('{')) return null;
-			if (GetNextName(true) != JsonOptions.ClassTag)
-				throw new YuzuException();
-			return ReadFields(Make(RequireString()), GetNextName(false));
+			switch (RequireBracketOrNull()) {
+				case 'n': return null;
+				case '{':
+					if (GetNextName(true) != JsonOptions.ClassTag)
+						throw new YuzuException();
+					return ReadFields(Make(RequireString()), GetNextName(false));
+				case '[':
+					return ReadFieldsCompact(Make(RequireString()));
+				default:
+					throw new YuzuException();
+			}
 		}
 
 		public override object FromReaderInt(object obj)
 		{
 			buf = null;
-			if (RequireOrNull('{')) return null;
-			string name = GetNextName(true);
-			if (Options.ClassNames) {
-				if (name != JsonOptions.ClassTag)
+			switch (RequireBracketOrNull()) {
+				case 'n':
+					return null;
+				case '{':
+					string name = GetNextName(true);
+					if (Options.ClassNames) {
+						if (name != JsonOptions.ClassTag)
+							throw new YuzuException();
+						if (RequireString() != obj.GetType().FullName)
+							throw new YuzuException();
+						name = GetNextName(false);
+					}
+					return ReadFields(obj, name);
+				case '[':
+					if (Options.ClassNames) {
+						if (RequireString() != obj.GetType().FullName)
+							throw new YuzuException();
+					}
+					return ReadFieldsCompact(obj);
+				default:
 					throw new YuzuException();
-				if (RequireString() != obj.GetType().FullName)
-					throw new YuzuException();
-				name = GetNextName(false);
 			}
-			return ReadFields(obj, name);
 		}
 
 		private JsonDeserializerGenBase MakeDeserializer(string className)

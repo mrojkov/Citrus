@@ -54,6 +54,10 @@ namespace Yuzu
 			return callerType.GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic).MakeGenericMethod(t);
 		}
 
+		public static bool IsCompact(Type t, CommonOptions options) {
+			return t.IsDefined(options.CompactAttribute);
+		}
+
 		public static List<YuzuItem> GetYuzuItems(Type t, CommonOptions options)
 		{
 			List<YuzuItem> items;
