@@ -63,18 +63,58 @@ namespace Yuzu
 
 	public class YuzuCompact : Attribute { }
 
+	public enum TagMode
+	{
+		Names,
+		Aliases,
+		Ids,
+	}
+
+	public static class IdGenerator
+	{
+		static char[] lastId = new char[] { 'A', 'A', 'A', 'A' };
+
+		private static void NextId()
+		{
+			var i = lastId.Length - 1;
+			do {
+				switch (lastId[i]) {
+					case 'Z':
+						lastId[i] = 'a';
+						return;
+					case 'z':
+						lastId[i] = 'A';
+						break;
+					default:
+						lastId[i] = (char)((int)lastId[i] + 1);
+						return;
+				}
+				i--;
+			} while (lastId[i] != 'A');
+			lastId[i] = 'B';
+		}
+
+		public static string GetNextId()
+		{
+			NextId();
+			return new string(lastId);
+		}
+
+	}
+
 	public class CommonOptions
 	{
 		public Type RequiredAttribute = typeof(YuzuRequired);
 		public Type OptionalAttribute = typeof(YuzuOptional);
 		public Type CompactAttribute = typeof(YuzuCompact);
 		public Type SerializeIfAttribute = typeof(YuzuSerializeCondition);
+
 		public Func<Attribute, string> GetAlias = attr => (attr as YuzuField).Alias;
 		public Func<Attribute, Func<object, object, bool>> GetSerializeCondition =
 			attr => (attr as YuzuSerializeCondition).Check;
 		public bool ClassNames = false;
 		public Assembly Assembly = Assembly.GetCallingAssembly();
-		public bool UseAliases = false;
+		public TagMode TagMode = TagMode.Names;
 	}
 
 	public class YuzuPosition

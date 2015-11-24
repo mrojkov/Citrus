@@ -5,12 +5,20 @@ using System.Reflection;
 
 namespace Yuzu
 {
-	internal class YuzuItem: IComparable<YuzuItem> {
+	internal class YuzuItem: IComparable<YuzuItem>
+	{
+		private string id;
+
+		public string Name;
 		public string Alias;
+		public string Id { get {
+			if (id == null)
+				id = IdGenerator.GetNextId();
+			return id;
+		} }
 		public bool IsOptional;
 		public bool IsCompact;
 		public Func<object, object, bool> SerializeIf;
-		public string Name;
 		public Type Type;
 		public Func<object, object> GetValue;
 		public Action<object, object> SetValue;
@@ -19,7 +27,15 @@ namespace Yuzu
 
 		public int CompareTo(YuzuItem yi) { return Alias.CompareTo(yi.Alias); }
 
-		public string Tag(CommonOptions options) { return options.UseAliases ? Alias : Name; }
+		public string Tag(CommonOptions options)
+		{
+			switch (options.TagMode) {
+				case TagMode.Names: return Name;
+				case TagMode.Aliases: return Alias;
+				case TagMode.Ids: return Id;
+				default: throw new YuzuAssert();
+			}
+		}
 		public string NameTagged(CommonOptions options)
 		{
 			var tag = Tag(options);

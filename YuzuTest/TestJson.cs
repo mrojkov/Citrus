@@ -457,20 +457,30 @@ namespace YuzuTest
 			var js = new JsonSerializer();
 			js.JsonOptions.Indent = "";
 			js.JsonOptions.FieldSeparator = "";
-			js.Options.UseAliases = true;
+			js.Options.TagMode = TagMode.Aliases;
 
 			var v = new SampleTree { Value = 9 };
 			var result = js.ToString(v);
 			Assert.AreEqual("{\"a\":9,\"b\":null}", result);
 
-			var js1 = new JsonSerializer();
-			js1.JsonOptions.Indent = "";
-			js1.JsonOptions.FieldSeparator = "";
-			var result1 = js1.ToString(v);
+			js.Options.TagMode = TagMode.Names;
+			var result1 = js.ToString(v);
 			Assert.AreEqual("{\"Value\":9,\"Children\":null}", result1);
 
+			js.Options.TagMode = TagMode.Ids;
+			var result2 = js.ToString(v);
+			Assert.AreEqual("{\"AAAB\":9,\"AAAC\":null}", result2);
+
+			var prev = IdGenerator.GetNextId();
+			for (int i = 0; i < 2 * 52 - 5; ++i) {
+				var next = IdGenerator.GetNextId();
+				Assert.IsTrue(String.CompareOrdinal(prev, next) < 0);
+				prev = next;
+			}
+			Assert.AreEqual("AABz", IdGenerator.GetNextId());
+
 			var jd = new JsonDeserializer();
-			jd.Options.UseAliases = true;
+			jd.Options.TagMode = TagMode.Aliases;
 			var w = new SampleTree();
 			jd.FromString(w, result);
 			Assert.AreEqual(9, w.Value);
