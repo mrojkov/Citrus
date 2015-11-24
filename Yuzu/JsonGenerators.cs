@@ -122,6 +122,29 @@ namespace Yuzu
 				Put("} while (Require(']', ',') == ',');\n");
 				Put("}\n");
 			}
+			else if (
+				t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>) &&
+				t.GetGenericArguments()[0] == typeof(string)
+			) {
+				PutPart(String.Format("new {0}();\n", GetTypeSpec(t)));
+				Put("Require('{');\n");
+				Put("if (SkipSpacesCarefully() == '}') {\n");
+				Put("Require('}');\n");
+				Put("}\n");
+				Put("else {\n");
+				Put("do {\n");
+				tempCount += 1;
+				var tempKey = "tmp" + tempCount.ToString();
+				PutF("var {0} = RequireString();\n", tempKey);
+				Put("Require(':');\n");
+				tempCount += 1;
+				var tempValue = "tmp" + tempCount.ToString();
+				PutF("var {0} = ", tempValue);
+				GenerateValue(t.GetGenericArguments()[1], tempValue);
+				PutF("{0}.Add({1}, {2});\n", name, tempKey, tempValue);
+				Put("} while (Require('}', ',') == ',');\n");
+				Put("}\n");
+			}
 			else if (t.IsArray && !JsonOptions.ArrayLengthPrefix) {
 				PutPart(String.Format("new {0}[0];\n", GetTypeSpec(t.GetElementType())));
 				Put("Require('[');\n");

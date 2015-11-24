@@ -433,6 +433,11 @@ namespace YuzuTest
 			Assert.AreEqual(v0.Value, w0.Value);
 			Assert.AreEqual(v0.Children.Count, w0.Children.Count);
 			Assert.AreEqual(v0.Children["a"].Value, w0.Children["a"].Value);
+
+			var w1 = (SampleDict)SampleDict_JsonDeserializer.Instance.FromString(result0);
+			Assert.AreEqual(v0.Value, w1.Value);
+			Assert.AreEqual(v0.Children.Count, w1.Children.Count);
+			Assert.AreEqual(v0.Children["a"].Value, w1.Children["a"].Value);
 		}
 
 		[TestMethod]
@@ -629,6 +634,7 @@ namespace YuzuTest
 				jd.Generate<Sample4>();
 				jd.Generate<SampleBool>();
 				jd.Generate<SampleList>();
+				jd.Generate<SampleDict>();
 				jd.JsonOptions.ArrayLengthPrefix = true;
 				jd.Generate<SampleArray>();
 				jd.Generate<SampleBase>();
