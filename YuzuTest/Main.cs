@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ProtoBuf;
 
 using Yuzu;
 
@@ -31,11 +32,14 @@ namespace YuzuTest
 	{
 	}
 
+	[ProtoContract]
 	public class Sample1
 	{
 		[YuzuRequired(1)]
+		[ProtoMember(1)]
 		public int X;
 		[YuzuOptional(2)]
+		[ProtoMember(2)]
 		public string Y = "zzz";
 	}
 
@@ -87,9 +91,11 @@ namespace YuzuTest
 		public int Func() { return 0; }
 	}
 
+	[ProtoContract]
 	public class SampleList
 	{
 		[YuzuRequired(1)]
+		[ProtoMember(1)]
 		public List<string> E;
 	}
 
@@ -487,6 +493,15 @@ namespace YuzuTest
 			Assert.AreEqual(45, p.Y);
 		}
 
+		private byte[] ProtoBufNetToBytes(object obj)
+		{
+			var ms = new MemoryStream();
+			ProtoBuf.Serializer.Serialize(ms, obj);
+			var result = ms.GetBuffer();
+			Array.Resize(ref result, (int)ms.Length);
+			return result;
+		}
+
 		[TestMethod]
 		public void TestProtobufSimple()
 		{
@@ -495,6 +510,7 @@ namespace YuzuTest
 			var result = ps.ToBytes(v1);
 			CollectionAssert.AreEqual(new byte[] {
 				0x08, 0x96, 0x01, 0x12, 0x04, (byte)'t', (byte)'e', (byte)'s', (byte)'t' }, result);
+			CollectionAssert.AreEqual(result, ProtoBufNetToBytes(v1));
 			var v2 = new Sample1();
 			(new ProtobufDeserializer()).FromBytes(v2, result);
 			Assert.AreEqual(v1.X, v2.X);
@@ -591,6 +607,22 @@ namespace YuzuTest
 				var jdg = new SampleList_JsonDeserializer();
 				var list3 = (SampleList)jdg.FromString(result1);
 				Assert.AreEqual(list1.E.Count, list3.E.Count);
+			}
+
+			[TestMethod]
+			public void TestProtobufNetLongListStr()
+			{
+				var list1 = new SampleList { E = new List<string>() };
+				for (int i = 0; i < 100000; ++i)
+					list1.E.Add(i.ToString());
+
+				var ms = new MemoryStream();
+				ProtoBuf.Serializer.Serialize(ms, list1);
+				Assert.IsTrue(ms.Length > 0);
+
+				ms.Position = 0;
+				var list2 = ProtoBuf.Serializer.Deserialize<SampleList>(ms);
+				Assert.AreEqual(list1.E.Count, list2.E.Count);
 			}
 
 			[TestMethod]
