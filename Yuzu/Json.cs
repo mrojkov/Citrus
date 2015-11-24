@@ -232,7 +232,7 @@ namespace Yuzu
 			Options.Assembly = Assembly.GetCallingAssembly();
 		}
 
-		protected char? buf;
+		private char? buf;
 
 		private char Next()
 		{
@@ -241,6 +241,12 @@ namespace Yuzu
 			var result = buf.Value;
 			buf = null;
 			return result;
+		}
+
+		protected void KillBuf()
+		{
+			if (buf != null)
+				throw new YuzuException();
 		}
 
 		private void PutBack(char ch)
@@ -594,7 +600,7 @@ namespace Yuzu
 		{
 			if (!Options.ClassNames)
 				throw new YuzuException();
-			buf = null;
+			KillBuf();
 			switch (RequireBracketOrNull()) {
 				case 'n': return null;
 				case '{':
@@ -610,7 +616,7 @@ namespace Yuzu
 
 		public override object FromReaderInt(object obj)
 		{
-			buf = null;
+			KillBuf();
 			switch (RequireBracketOrNull()) {
 				case 'n':
 					return null;
@@ -646,7 +652,7 @@ namespace Yuzu
 		{
 			if (!Options.ClassNames)
 				throw new YuzuException();
-			buf = null;
+			KillBuf();
 			Require('{');
 			if (GetNextName(true) != JsonOptions.ClassTag)
 				throw new YuzuException();
@@ -657,7 +663,7 @@ namespace Yuzu
 
 		protected object FromReaderIntGenerated(object obj)
 		{
-			buf = null;
+			KillBuf();
 			Require('{');
 			string name = GetNextName(true);
 			if (Options.ClassNames) {

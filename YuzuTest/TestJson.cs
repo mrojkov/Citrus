@@ -459,7 +459,7 @@ namespace YuzuTest
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{}"));
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"X\" }"));
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"Y\": \"x\" }"));
-			XAssert.Throws<System.IO.EndOfStreamException>(() => jd.FromString(w, "{ \"X\": 1"));
+			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"X\": 1"));
 		}
 	}
 }
