@@ -168,6 +168,42 @@ namespace YuzuTest
 		}
 	}
 
+	class SampleBool_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new SampleBool_JsonDeserializer Instance = new SampleBool_JsonDeserializer();
+
+		public SampleBool_JsonDeserializer()
+		{
+			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+			Options.ClassNames = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.EnumAsString = true;
+			JsonOptions.ArrayLengthPrefix = false;
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderInt(new SampleBool());
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new SampleBool(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (SampleBool)obj;
+			if ("B" != name) throw new YuzuException();
+			result.B = RequireBool();
+			name = GetNextName(false);
+			Require('}');
+			return result;
+		}
+	}
+
 	class SampleList_JsonDeserializer : JsonDeserializerGenBase
 	{
 		public static new SampleList_JsonDeserializer Instance = new SampleList_JsonDeserializer();

@@ -48,6 +48,11 @@ namespace Yuzu
 			writer.Write('"');
 		}
 
+		private void WriteBool(object obj)
+		{
+			WriteStr((bool)obj ? "true" : "false");
+		}
+
 		private void WriteList<T>(List<T> list)
 		{
 			var wf = GetWriteFunc(typeof(T));
@@ -96,6 +101,8 @@ namespace Yuzu
 				return WriteSingle;
 			if (t == typeof(string))
 				return WriteString;
+			if (t == typeof(bool))
+				return WriteBool;
 			if (t.IsEnum) {
 				if (JsonOptions.EnumAsString)
 					return WriteString;
@@ -232,6 +239,13 @@ namespace Yuzu
 			return ch;
 		}
 
+		protected void Require(string s)
+		{
+			foreach (var ch in s)
+				if (Reader.ReadChar() != ch)
+					throw new YuzuException();
+		}
+
 		private char JsonUnquote(char ch)
 		{
 			switch (ch) {
@@ -264,6 +278,20 @@ namespace Yuzu
 				sb.Append(ch);
 			}
 			return sb.ToString();
+		}
+
+		protected bool RequireBool()
+		{
+			var ch = Reader.ReadChar();
+			if (ch == 't') {
+				Require("rue");
+				return true;
+			}
+			if (ch == 'f') {
+				Require("alse");
+				return false;
+			}
+			throw new YuzuException();
 		}
 
 		protected uint RequireUInt()
@@ -408,6 +436,7 @@ namespace Yuzu
 		// Optimization: Avoid creating trivial closures.
 		private object RequireIntObj() { return RequireInt(); }
 		private object RequireStringObj() { return RequireString(); }
+		private object RequireBoolObj() { return RequireBool(); }
 		private object RequireUIntObj() { return RequireUInt(); }
 		private object RequireSingleObj() { return RequireSingle(); }
 		private object RequireDoubleObj() { return RequireDouble(); }
@@ -420,6 +449,8 @@ namespace Yuzu
 				return RequireUIntObj;
 			if (t == typeof(string))
 				return RequireStringObj;
+			if (t == typeof(bool))
+				return RequireBoolObj;
 			if (t == typeof(float))
 				return RequireSingleObj;
 			if (t == typeof(double))
@@ -606,6 +637,9 @@ namespace Yuzu
 			}
 			else if (t == typeof(string)) {
 				PutPart("RequireString();\n");
+			}
+			else if (t == typeof(bool)) {
+				PutPart("RequireBool();\n");
 			}
 			else if (t == typeof(float)) {
 				PutPart("RequireSingle();\n");

@@ -69,6 +69,12 @@ namespace YuzuTest
 		public SampleEnum E;
 	}
 
+	public class SampleBool
+	{
+		[YuzuRequired(1)]
+		public bool B;
+	}
+
 	public class SampleFloat
 	{
 		[YuzuRequired(1)]
@@ -281,6 +287,26 @@ namespace YuzuTest
 
 			w = (Sample4)Sample4_JsonDeserializer.Instance.FromString(result2);
 			Assert.AreEqual(SampleEnum.E3, w.E);
+		}
+
+		[TestMethod]
+		public void TestJsonBool()
+		{
+			var js = new JsonSerializer();
+
+			var v = new SampleBool { B = true };
+			js.JsonOptions.Indent = "";
+
+			var result1 = js.ToString(v);
+			Assert.AreEqual("{\n\"B\":true\n}", result1);
+
+			var jd = new JsonDeserializer();
+			var w = new SampleBool();
+			jd.FromString(w, result1);
+			Assert.AreEqual(true, w.B);
+
+			w = (SampleBool)SampleBool_JsonDeserializer.Instance.FromString(result1);
+			Assert.AreEqual(true, w.B);
 		}
 
 		[TestMethod]
@@ -570,6 +596,7 @@ namespace YuzuTest
 				jd.Generate<Sample3>();
 				jd.JsonOptions.EnumAsString = true;
 				jd.Generate<Sample4>();
+				jd.Generate<SampleBool>();
 				jd.Generate<SampleList>();
 				jd.JsonOptions.ArrayLengthPrefix = true;
 				jd.Generate<SampleArray>();
