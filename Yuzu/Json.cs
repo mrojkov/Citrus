@@ -194,7 +194,7 @@ namespace Yuzu
 				var value = yi.GetValue(obj);
 				if (yi.SerializeIf != null && !yi.SerializeIf(obj, value))
 					continue;
-				WriteName(yi.Name, ref isFirst);
+				WriteName(yi.Tag(Options), ref isFirst);
 				GetWriteFunc(yi.Type)(value);
 			}
 			if (!isFirst)
@@ -579,9 +579,9 @@ namespace Yuzu
 		protected virtual object ReadFields(object obj, string name)
 		{
 			foreach (var yi in Utils.GetYuzuItems(obj.GetType(), Options)) {
-				if (yi.Name != name) {
+				if (yi.Tag(Options) != name) {
 					if (!yi.IsOptional)
-						throw Error("Expected field '{0}', but found '{1}'", yi.Name, name);
+						throw Error("Expected field '{0}', but found '{1}'", yi.NameTagged(Options), name);
 					continue;
 				}
 				yi.SetValue(obj, ReadValueFunc(yi.Type)());

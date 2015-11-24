@@ -452,6 +452,32 @@ namespace YuzuTest
 		}
 
 		[TestMethod]
+		public void TestAlias()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = "";
+			js.Options.UseAliases = true;
+
+			var v = new SampleTree { Value = 9 };
+			var result = js.ToString(v);
+			Assert.AreEqual("{\"a\":9,\"b\":null}", result);
+
+			var js1 = new JsonSerializer();
+			js1.JsonOptions.Indent = "";
+			js1.JsonOptions.FieldSeparator = "";
+			var result1 = js1.ToString(v);
+			Assert.AreEqual("{\"Value\":9,\"Children\":null}", result1);
+
+			var jd = new JsonDeserializer();
+			jd.Options.UseAliases = true;
+			var w = new SampleTree();
+			jd.FromString(w, result);
+			Assert.AreEqual(9, w.Value);
+			Assert.AreEqual(null, w.Children);
+		}
+
+		[TestMethod]
 		public void TestErrors()
 		{
 			var jd = new JsonDeserializer();

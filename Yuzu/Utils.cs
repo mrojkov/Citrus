@@ -6,7 +6,7 @@ using System.Reflection;
 namespace Yuzu
 {
 	internal class YuzuItem: IComparable<YuzuItem> {
-		public string Order;
+		public string Alias;
 		public bool IsOptional;
 		public bool IsCompact;
 		public Func<object, object, bool> SerializeIf;
@@ -17,7 +17,14 @@ namespace Yuzu
 		public FieldInfo FieldInfo;
 		public PropertyInfo PropInfo;
 
-		public int CompareTo(YuzuItem yi) { return Order.CompareTo(yi.Order); }
+		public int CompareTo(YuzuItem yi) { return Alias.CompareTo(yi.Alias); }
+
+		public string Tag(CommonOptions options) { return options.UseAliases ? Alias : Name; }
+		public string NameTagged(CommonOptions options)
+		{
+			var tag = Tag(options);
+			return Name + (tag == Name ? "" : " (" + tag + ")");
+		}
 	}
 
 	internal class Utils
@@ -75,7 +82,7 @@ namespace Yuzu
 				if (optional != null && required != null)
 					throw new YuzuAssert("Both optional and required attributes for field: " + m.Name);
 				var item = new YuzuItem {
-						Order = options.GetOrder(optional ?? required) ?? m.Name,
+						Alias = options.GetAlias(optional ?? required) ?? m.Name,
 						IsOptional = optional != null,
 						IsCompact =
 							m.IsDefined(options.CompactAttribute) ||

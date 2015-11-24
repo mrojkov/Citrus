@@ -8,20 +8,20 @@ using System.Text;
 
 namespace Yuzu
 {
-	public class YuzuOrder : Attribute
+	public class YuzuField : Attribute
 	{
-		public readonly string Order;
-		public YuzuOrder(string order) { Order = order; }
+		public readonly string Alias;
+		public YuzuField(string alias) { Alias = alias; }
 	}
 
-	public class YuzuRequired : YuzuOrder
+	public class YuzuRequired : YuzuField
 	{
-		public YuzuRequired(string order = null) : base(order) { }
+		public YuzuRequired(string alias = null) : base(alias) { }
 	}
 
-	public class YuzuOptional : YuzuOrder
+	public class YuzuOptional : YuzuField
 	{
-		public YuzuOptional(string order = null) : base(order) { }
+		public YuzuOptional(string alias = null) : base(alias) { }
 	}
 
 	public abstract class YuzuSerializeCondition : Attribute
@@ -69,11 +69,12 @@ namespace Yuzu
 		public Type OptionalAttribute = typeof(YuzuOptional);
 		public Type CompactAttribute = typeof(YuzuCompact);
 		public Type SerializeIfAttribute = typeof(YuzuSerializeCondition);
-		public Func<Attribute, string> GetOrder = attr => (attr as YuzuOrder).Order;
+		public Func<Attribute, string> GetAlias = attr => (attr as YuzuField).Alias;
 		public Func<Attribute, Func<object, object, bool>> GetSerializeCondition =
 			attr => (attr as YuzuSerializeCondition).Check;
 		public bool ClassNames = false;
 		public Assembly Assembly = Assembly.GetCallingAssembly();
+		public bool UseAliases = false;
 	}
 
 	public class YuzuPosition

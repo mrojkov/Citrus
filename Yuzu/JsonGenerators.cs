@@ -249,11 +249,11 @@ namespace Yuzu
 			tempCount = 0;
 			foreach (var yi in Utils.GetYuzuItems(typeof(T), Options)) {
 				if (yi.IsOptional) {
-					PutF("if (\"{0}\" == name) {{\n", yi.Name);
+					PutF("if (\"{0}\" == name) {{\n", yi.Tag(Options));
 					PutF("result.{0} = ", yi.Name);
 				}
 				else {
-					PutF("if (\"{0}\" != name) throw new YuzuException();\n", yi.Name);
+					PutF("if (\"{0}\" != name) throw new YuzuException(\"{0}!=\" + name);\n", yi.Tag(Options));
 					PutF("result.{0} = ", yi.Name);
 				}
 				GenerateValue(yi.Type, "result." + yi.Name);
