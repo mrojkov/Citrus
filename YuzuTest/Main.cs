@@ -678,7 +678,7 @@ namespace YuzuTest
 		{
 			//(new TestMain()).TestJsonMemberOrder();
 			var jd = JsonDeserializerGenerator.Instance;
-			using (jd.GenWriter = new StreamWriter(new FileStream(@"..\..\Sample.cs", FileMode.Create))) {
+			using (jd.GenWriter = new StreamWriter(new FileStream(@"..\..\Generated.cs", FileMode.Create))) {
 				jd.GenerateHeader("YuzuTest");
 				jd.Generate<Sample1>();
 				jd.Generate<Sample2>();
