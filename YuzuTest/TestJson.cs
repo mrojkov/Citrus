@@ -450,5 +450,16 @@ namespace YuzuTest
 			var result2 = js.ToString(v2);
 			Assert.AreEqual("{ \"X\":5 }", result2);
 		}
+
+		[TestMethod]
+		public void TestErrors()
+		{
+			var jd = new JsonDeserializer();
+			var w = new Sample1();
+			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{}"));
+			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"X\" }"));
+			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"Y\": \"x\" }"));
+			XAssert.Throws<System.IO.EndOfStreamException>(() => jd.FromString(w, "{ \"X\": 1"));
+		}
 	}
 }

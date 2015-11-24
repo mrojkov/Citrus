@@ -163,6 +163,29 @@ namespace YuzuTest
 		public SamplePoint B;
 	}
 
+	public static class XAssert
+	{
+		public static void Throws<TExpectedException>(Action exceptionThrower, string expectedExceptionMessage = "")
+			where TExpectedException : Exception
+		{
+			try
+			{
+				exceptionThrower();
+				Assert.Fail("Expected exception:<{0}>. Actual exception: none.", typeof(TExpectedException).Name);
+			}
+			catch (AssertFailedException)
+			{
+				throw;
+			}
+			catch (TExpectedException ex)
+			{
+				Assert.IsTrue(
+					ex.Message.Contains(expectedExceptionMessage),
+					"Exception message:<{0}>. Actual message:<{1}>.", expectedExceptionMessage, ex.Message);
+			}
+		}
+	}
+
 	[TestClass]
 	public class TestMain
 	{
