@@ -264,6 +264,25 @@ namespace Yuzu
 			Put("Require('}');\n");
 			Put("return result;\n");
 			Put("}\n");
+
+			if (Utils.IsCompact(typeof(T), Options)) {
+				Put("\n");
+				Put("protected override object ReadFieldsCompact(object obj)\n");
+				Put("{\n");
+				PutF("var result = ({0})obj;\n", typeof(T).Name);
+				bool isFirst = true;
+				tempCount = 0;
+				foreach (var yi in Utils.GetYuzuItems(typeof(T), Options)) {
+					if (!isFirst)
+						Put("Require(',');\n");
+					isFirst = false;
+					PutF("result.{0} = ", yi.Name);
+					GenerateValue(yi.Type, "result." + yi.Name);
+				}
+				Put("Require(']');\n");
+				Put("return result;\n");
+				Put("}\n");
+			}
 			Put("}\n");
 			Put("\n");
 		}

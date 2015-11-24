@@ -583,6 +583,9 @@ namespace YuzuTest
 			var w = new SampleRect();
 			jd.FromString(w, result);
 			CheckSampleRect(v, w);
+
+			w = (SampleRect)SampleRect_JsonDeserializer.Instance.FromString(result);
+			CheckSampleRect(v, w);
 		}
 
 		[TestMethod]

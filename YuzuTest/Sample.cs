@@ -573,6 +573,16 @@ namespace YuzuTest
 			Require('}');
 			return result;
 		}
+
+		protected override object ReadFieldsCompact(object obj)
+		{
+			var result = (SamplePoint)obj;
+			result.X = RequireInt();
+			Require(',');
+			result.Y = RequireInt();
+			Require(']');
+			return result;
+		}
 	}
 
 	class SampleRect_JsonDeserializer : JsonDeserializerGenBase
