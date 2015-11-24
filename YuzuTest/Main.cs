@@ -122,7 +122,7 @@ namespace YuzuTest
 	{
 		[YuzuRequired("a")]
 		public int Value;
-		[YuzuRequired("b")]
+		[YuzuOptional("b")]
 		public List<SampleTree> Children;
 	}
 

@@ -599,29 +599,53 @@ namespace Yuzu
 			throw new NotImplementedException(t.Name);
 		}
 
-		protected virtual object ReadFields(object obj, string name)
+		protected void IgnoreNewFieldsTail(string name)
 		{
-			foreach (var yi in Utils.GetYuzuItems(obj.GetType(), Options)) {
-				var cmp = String.CompareOrdinal(yi.Tag(Options), name);
-				if (Options.IgnoreNewFields && Options.TagMode != TagMode.Names)
-					while (cmp > 0 && name != "") {
-						ReadObject();
-						name = GetNextName(false);
-						cmp = String.CompareOrdinal(yi.Tag(Options), name);
-					}
-				if (cmp != 0) {
-					if (!yi.IsOptional)
-						throw Error("Expected field '{0}', but found '{1}'", yi.NameTagged(Options), name);
-					continue;
-				}
-				yi.SetValue(obj, ReadValueFunc(yi.Type)());
+			while (name != "") {
+				ReadObject();
 				name = GetNextName(false);
 			}
-			if (Options.IgnoreNewFields)
-				while (name != "") {
+		}
+
+		protected int IgnoreNewFields(string tag, ref string name)
+		{
+			var cmp = String.CompareOrdinal(tag, name);
+			if (Options.IgnoreNewFields && Options.TagMode != TagMode.Names)
+				while (cmp > 0 && name != "") {
 					ReadObject();
 					name = GetNextName(false);
+					cmp = String.CompareOrdinal(tag, name);
 				}
+			return cmp;
+		}
+
+		protected virtual object ReadFields(object obj, string name)
+		{
+			// Optimization: duplicate loop to extract options check.
+			if (Options.IgnoreNewFields && Options.TagMode != TagMode.Names) {
+				foreach (var yi in Utils.GetYuzuItems(obj.GetType(), Options)) {
+					if (IgnoreNewFields(yi.Tag(Options), ref name) != 0) {
+						if (!yi.IsOptional)
+							throw Error("Expected field '{0}', but found '{1}'", yi.NameTagged(Options), name);
+						continue;
+					}
+					yi.SetValue(obj, ReadValueFunc(yi.Type)());
+					name = GetNextName(false);
+				}
+			}
+			else {
+				foreach (var yi in Utils.GetYuzuItems(obj.GetType(), Options)) {
+					if (yi.Tag(Options) != name) {
+						if (!yi.IsOptional)
+							throw Error("Expected field '{0}', but found '{1}'", yi.NameTagged(Options), name);
+						continue;
+					}
+					yi.SetValue(obj, ReadValueFunc(yi.Type)());
+					name = GetNextName(false);
+				}
+			}
+			if (Options.IgnoreNewFields)
+				IgnoreNewFieldsTail(name);
 			Require('}');
 			return obj;
 		}

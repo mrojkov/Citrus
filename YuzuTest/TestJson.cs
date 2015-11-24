@@ -515,6 +515,9 @@ namespace YuzuTest
 
 			jd.FromString(w, "{\"a\":10, \"a1\":[], \"b\":null, \"x\":null}");
 			Assert.AreEqual(10, w.Value);
+
+			jd.FromString(w, "{\"a\":11, \"a1\":[], \"x\":null}");
+			Assert.AreEqual(11, w.Value);
 		}
 
 		[TestMethod]
