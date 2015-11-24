@@ -115,6 +115,7 @@ namespace Yuzu
 		public bool ClassNames = false;
 		public Assembly Assembly = Assembly.GetCallingAssembly();
 		public TagMode TagMode = TagMode.Names;
+		public bool IgnoreNewFields = false;
 	}
 
 	public class YuzuPosition

@@ -602,7 +602,14 @@ namespace Yuzu
 		protected virtual object ReadFields(object obj, string name)
 		{
 			foreach (var yi in Utils.GetYuzuItems(obj.GetType(), Options)) {
-				if (yi.Tag(Options) != name) {
+				var cmp = String.CompareOrdinal(yi.Tag(Options), name);
+				if (Options.IgnoreNewFields && Options.TagMode != TagMode.Names)
+					while (cmp > 0 && name != "") {
+						ReadObject();
+						name = GetNextName(false);
+						cmp = String.CompareOrdinal(yi.Tag(Options), name);
+					}
+				if (cmp != 0) {
 					if (!yi.IsOptional)
 						throw Error("Expected field '{0}', but found '{1}'", yi.NameTagged(Options), name);
 					continue;
@@ -610,6 +617,11 @@ namespace Yuzu
 				yi.SetValue(obj, ReadValueFunc(yi.Type)());
 				name = GetNextName(false);
 			}
+			if (Options.IgnoreNewFields)
+				while (name != "") {
+					ReadObject();
+					name = GetNextName(false);
+				}
 			Require('}');
 			return obj;
 		}

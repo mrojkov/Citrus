@@ -503,6 +503,21 @@ namespace YuzuTest
 		}
 
 		[TestMethod]
+		public void TestNewFields()
+		{
+			var jd = new JsonDeserializer();
+			jd.Options.TagMode = TagMode.Aliases;
+			jd.Options.IgnoreNewFields = true;
+
+			var w = new SampleTree();
+			jd.FromString(w, "{\"a\":9,\"a1\":[],\"b\":null}");
+			Assert.AreEqual(9, w.Value);
+
+			jd.FromString(w, "{\"a\":10, \"a1\":[], \"b\":null, \"x\":null}");
+			Assert.AreEqual(10, w.Value);
+		}
+
+		[TestMethod]
 		public void TestErrors()
 		{
 			var jd = new JsonDeserializer();
