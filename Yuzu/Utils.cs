@@ -6,7 +6,7 @@ using System.Reflection;
 namespace Yuzu
 {
 	internal class YuzuItem: IComparable<YuzuItem> {
-		public int Order;
+		public string Order;
 		public bool IsOptional;
 		public bool IsCompact;
 		public Func<object, object, bool> SerializeIf;
@@ -75,7 +75,7 @@ namespace Yuzu
 				if (optional != null && required != null)
 					throw new YuzuAssert("Both optional and required attributes for field: " + m.Name);
 				var item = new YuzuItem {
-						Order = options.GetOrder(optional ?? required),
+						Order = options.GetOrder(optional ?? required) ?? m.Name,
 						IsOptional = optional != null,
 						IsCompact =
 							m.IsDefined(options.CompactAttribute) ||

@@ -10,18 +10,18 @@ namespace Yuzu
 {
 	public class YuzuOrder : Attribute
 	{
-		public readonly int Order = 0;
-		public YuzuOrder(int order) { Order = order; }
+		public readonly string Order;
+		public YuzuOrder(string order) { Order = order; }
 	}
 
 	public class YuzuRequired : YuzuOrder
 	{
-		public YuzuRequired(int order): base(order) { }
+		public YuzuRequired(string order = null) : base(order) { }
 	}
 
 	public class YuzuOptional : YuzuOrder
 	{
-		public YuzuOptional(int order) : base(order) { }
+		public YuzuOptional(string order = null) : base(order) { }
 	}
 
 	public abstract class YuzuSerializeCondition : Attribute
@@ -69,7 +69,7 @@ namespace Yuzu
 		public Type OptionalAttribute = typeof(YuzuOptional);
 		public Type CompactAttribute = typeof(YuzuCompact);
 		public Type SerializeIfAttribute = typeof(YuzuSerializeCondition);
-		public Func<Attribute, int> GetOrder = attr => (attr as YuzuOrder).Order;
+		public Func<Attribute, string> GetOrder = attr => (attr as YuzuOrder).Order;
 		public Func<Attribute, Func<object, object, bool>> GetSerializeCondition =
 			attr => (attr as YuzuSerializeCondition).Check;
 		public bool ClassNames = false;

@@ -12,19 +12,19 @@ namespace YuzuTest
 
 	public class SampleBase
 	{
-		[YuzuRequired(1)]
+		[YuzuRequired("0_FBase")]
 		public int FBase;
 	}
 
 	public class SampleDerivedA : SampleBase
 	{
-		[YuzuRequired(2)]
+		[YuzuRequired]
 		public int FA;
 	}
 
 	public class SampleDerivedB : SampleBase
 	{
-		[YuzuRequired(2)]
+		[YuzuRequired]
 		public int FB;
 	}
 
@@ -35,21 +35,21 @@ namespace YuzuTest
 	[ProtoContract]
 	public class Sample1
 	{
-		[YuzuRequired(1)]
+		[YuzuRequired]
 		[ProtoMember(1)]
 		public int X;
 
-		[YuzuOptional(2)][YuzuDefault("ttt")]
+		[YuzuOptional][YuzuDefault("ttt")]
 		[ProtoMember(2)]
 		public string Y = "zzz";
 	}
 
 	public class Sample2
 	{
-		[YuzuRequired(1)]
+		[YuzuRequired]
 		public int X { get; set; }
 
-		[YuzuOptional(2)][YuzuSerializeIf("SaveYIf")]
+		[YuzuOptional][YuzuSerializeIf("SaveYIf")]
 		public string Y { get; set; }
 
 		public bool SaveYIf()
@@ -60,11 +60,11 @@ namespace YuzuTest
 
 	public class Sample3
 	{
-		[YuzuRequired(1)]
+		[YuzuRequired]
 		public Sample1 S1 { get; set; }
-		[YuzuOptional(2)]
+		[YuzuOptional("S11")]
 		public int F;
-		[YuzuOptional(3)]
+		[YuzuOptional]
 		public Sample2 S2;
 	}
 
@@ -72,34 +72,34 @@ namespace YuzuTest
 
 	public class Sample4
 	{
-		[YuzuOptional(1)]
+		[YuzuOptional]
 		public SampleEnum E;
 	}
 
 	public class SampleBool
 	{
-		[YuzuRequired(1)]
+		[YuzuRequired]
 		public bool B;
 	}
 
 	public class SampleFloat
 	{
-		[YuzuRequired(1)]
+		[YuzuRequired("1")]
 		public float F;
-		[YuzuRequired(2)]
+		[YuzuRequired("2")]
 		public double D;
 	}
 
 	public class SampleMethodOrder
 	{
-		[YuzuRequired(4)]
+		[YuzuRequired("4")]
 		public int P2 { get; set; }
-		[YuzuRequired(2)]
+		[YuzuRequired("2")]
 		public int P1 { get; set; }
 		public int F_no;
-		[YuzuRequired(1)]
+		[YuzuRequired("1")]
 		public int F1;
-		[YuzuRequired(3)]
+		[YuzuRequired("3")]
 		public int F2;
 		public int Func() { return 0; }
 	}
@@ -107,59 +107,59 @@ namespace YuzuTest
 	[ProtoContract]
 	public class SampleList
 	{
-		[YuzuRequired(1)]
+		[YuzuRequired]
 		[ProtoMember(1)]
 		public List<string> E;
 	}
 
 	public class SampleArray
 	{
-		[YuzuRequired(1)]
+		[YuzuRequired]
 		public string[] A;
 	}
 
 	public class SampleTree
 	{
-		[YuzuRequired(1)]
+		[YuzuRequired("a")]
 		public int Value;
-		[YuzuRequired(2)]
+		[YuzuRequired("b")]
 		public List<SampleTree> Children;
 	}
 
 	public class SampleClassList
 	{
-		[YuzuRequired(1)]
+		[YuzuRequired]
 		public List<SampleBase> E;
 	}
 
 	public class SampleDict
 	{
-		[YuzuRequired(1)]
+		[YuzuRequired("a")]
 		public int Value;
-		[YuzuOptional(2)]
+		[YuzuOptional("b")]
 		public Dictionary<string, SampleDict> Children;
 	}
 
 	public class SampleMatrix
 	{
-		[YuzuRequired(1)]
+		[YuzuRequired]
 		public List<List<int>> M;
 	}
 
 	[YuzuCompact]
 	public struct SamplePoint
 	{
-		[YuzuRequired(1)]
+		[YuzuRequired]
 		public int X;
-		[YuzuRequired(2)]
+		[YuzuRequired]
 		public int Y;
 	}
 
 	public class SampleRect
 	{
-		[YuzuRequired(1)]
+		[YuzuRequired]
 		public SamplePoint A;
-		[YuzuRequired(2)]
+		[YuzuRequired]
 		public SamplePoint B;
 	}
 
