@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
@@ -23,6 +24,43 @@ namespace Yuzu
 		public YuzuOptional(int order) : base(order) { }
 	}
 
+	public abstract class YuzuSerializeCondition : Attribute
+	{
+		public abstract bool Check(object obj, object field);
+	}
+
+	public class YuzuSerializeIf : YuzuSerializeCondition
+	{
+		public readonly string Method;
+		public YuzuSerializeIf(string method) { Method = method; }
+
+		private Func<bool> checker;
+
+		public override bool Check(object obj, object field) {
+			if (checker == null) {
+				var fn = obj.GetType().GetMethod(Method);
+				if (fn == null)
+					throw new YuzuException();
+				var e = Expression.Call(Expression.Constant(obj), fn);
+				checker = Expression.Lambda<Func<bool>>(e).Compile();
+			}
+			return checker();
+		}
+	}
+
+	public class YuzuDefault : YuzuSerializeCondition
+	{
+		public readonly object Value;
+		public YuzuDefault(object value)
+		{
+			Value = value;
+		}
+		public override bool Check(object obj, object field)
+		{
+			return !Value.Equals(field);
+		}
+	}
+
 	public class YuzuCompact : Attribute { }
 
 	public class CommonOptions
@@ -30,7 +68,10 @@ namespace Yuzu
 		public Type RequiredAttribute = typeof(YuzuRequired);
 		public Type OptionalAttribute = typeof(YuzuOptional);
 		public Type CompactAttribute = typeof(YuzuCompact);
+		public Type SerializeIfAttribute = typeof(YuzuSerializeCondition);
 		public Func<Attribute, int> GetOrder = attr => (attr as YuzuOrder).Order;
+		public Func<Attribute, Func<object, object, bool>> GetSerializeCondition =
+			attr => (attr as YuzuSerializeCondition).Check;
 		public bool ClassNames = false;
 		public Assembly Assembly = Assembly.GetCallingAssembly();
 	}

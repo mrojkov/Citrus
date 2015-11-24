@@ -9,6 +9,7 @@ namespace Yuzu
 		public int Order;
 		public bool IsOptional;
 		public bool IsCompact;
+		public Func<object, object, bool> SerializeIf;
 		public string Name;
 		public Type Type;
 		public Func<object, object> GetValue;
@@ -64,6 +65,7 @@ namespace Yuzu
 
 				var optional = m.GetCustomAttribute(options.OptionalAttribute, false);
 				var required = m.GetCustomAttribute(options.RequiredAttribute, false);
+				var serializeIf = m.GetCustomAttribute(options.SerializeIfAttribute, true);
 				if (optional == null && required == null)
 					continue;
 				if (optional != null && required != null)
@@ -74,6 +76,7 @@ namespace Yuzu
 						IsCompact =
 							m.IsDefined(options.CompactAttribute) ||
 							m.GetType().IsDefined(options.CompactAttribute),
+						SerializeIf = serializeIf != null ? options.GetSerializeCondition(serializeIf) : null,
 						Name = m.Name,
 				};
 

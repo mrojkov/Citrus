@@ -38,7 +38,8 @@ namespace YuzuTest
 		[YuzuRequired(1)]
 		[ProtoMember(1)]
 		public int X;
-		[YuzuOptional(2)]
+
+		[YuzuOptional(2)][YuzuDefault("ttt")]
 		[ProtoMember(2)]
 		public string Y = "zzz";
 	}
@@ -47,8 +48,14 @@ namespace YuzuTest
 	{
 		[YuzuRequired(1)]
 		public int X { get; set; }
-		[YuzuOptional(2)]
+
+		[YuzuOptional(2)][YuzuSerializeIf("SaveYIf")]
 		public string Y { get; set; }
+
+		public bool SaveYIf()
+		{
+			return X.ToString() != Y;
+		}
 	}
 
 	public class Sample3
@@ -556,6 +563,26 @@ namespace YuzuTest
 			Assert.AreEqual(34, p.X);
 			Assert.AreEqual(45, p.Y);
 		}
+
+		[TestMethod]
+		public void TestJsonDefault()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = " ";
+
+			var v1 = new Sample1 { X = 6, Y = "ttt" };
+			var result1 = js.ToString(v1);
+			Assert.AreEqual("{ \"X\":6 }", result1);
+			var w1 = (Sample1)Sample1_JsonDeserializer.Instance.FromString(result1);
+			Assert.AreEqual(6, w1.X);
+			Assert.AreEqual("zzz", w1.Y);
+
+			var v2 = new Sample2 { X = 5, Y = "5" };
+			var result2 = js.ToString(v2);
+			Assert.AreEqual("{ \"X\":5 }", result2);
+		}
+
 
 		private byte[] ProtoBufNetToBytes(object obj)
 		{

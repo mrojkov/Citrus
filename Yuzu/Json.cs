@@ -188,8 +188,11 @@ namespace Yuzu
 				WriteString(t.FullName);
 			}
 			foreach (var yi in Utils.GetYuzuItems(t, Options)) {
+				var value = yi.GetValue(obj);
+				if (yi.SerializeIf != null && !yi.SerializeIf(obj, value))
+					continue;
 				WriteName(yi.Name, ref isFirst);
-				GetWriteFunc(yi.Type)(yi.GetValue(obj));
+				GetWriteFunc(yi.Type)(value);
 			}
 			if (!isFirst)
 				WriteStr(JsonOptions.FieldSeparator);
