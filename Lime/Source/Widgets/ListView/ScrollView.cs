@@ -251,7 +251,7 @@ namespace Lime
 
 				if ((ScrollPosition - mouseScrollDestination).Abs() > 0 && prevMouseScrollDirection != 0) {
 					StopScrolling();
-					var stepPerFrame = (mouseScrollDestination - ScrollPosition) / 16;
+					var stepPerFrame = (mouseScrollDestination - ScrollPosition) * Task.Current.Delta * 4;
 					ScrollPosition = Mathf.Clamp(ScrollPosition + stepPerFrame, MinScrollPosition, MaxScrollPosition);
 					if (ScrollPosition == MinScrollPosition || ScrollPosition == MaxScrollPosition) {
 						mouseScrollDestination = ScrollPosition;
