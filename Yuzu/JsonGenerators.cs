@@ -79,6 +79,18 @@ namespace Yuzu
 				t.Name;
 		}
 
+		private void PutRequireOrNull(char ch, Type t, string name)
+		{
+			PutPart(String.Format("RequireOrNull('{0}') ? null : new {1}();\n", ch, GetTypeSpec(t)));
+			PutF("if ({0} != null) {{\n", name);
+		}
+
+		private void PutRequireOrNullArray(char ch, Type t, string name)
+		{
+			PutPart(String.Format("RequireOrNull('{0}') ? null : new {1}[0];\n", ch, GetTypeSpec(t.GetElementType())));
+			PutF("if ({0} != null) {{\n", name);
+		}
+
 		private void GenerateValue(Type t, string name)
 		{
 			if (t == typeof(int)) {
@@ -107,8 +119,7 @@ namespace Yuzu
 					t.Name));
 			}
 			else if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>)) {
-				PutPart(String.Format("new {0}();\n", GetTypeSpec(t)));
-				Put("Require('[');\n");
+				PutRequireOrNull('[', t, name);
 				Put("if (SkipSpacesCarefully() == ']') {\n");
 				Put("Require(']');\n");
 				Put("}\n");
@@ -121,13 +132,13 @@ namespace Yuzu
 				PutF("{0}.Add({1});\n", name, tempName);
 				Put("} while (Require(']', ',') == ',');\n");
 				Put("}\n");
+				Put("}\n");
 			}
 			else if (
 				t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>) &&
 				t.GetGenericArguments()[0] == typeof(string)
 			) {
-				PutPart(String.Format("new {0}();\n", GetTypeSpec(t)));
-				Put("Require('{');\n");
+				PutRequireOrNull('{', t, name);
 				Put("if (SkipSpacesCarefully() == '}') {\n");
 				Put("Require('}');\n");
 				Put("}\n");
@@ -144,10 +155,10 @@ namespace Yuzu
 				PutF("{0}.Add({1}, {2});\n", name, tempKey, tempValue);
 				Put("} while (Require('}', ',') == ',');\n");
 				Put("}\n");
+				Put("}\n");
 			}
 			else if (t.IsArray && !JsonOptions.ArrayLengthPrefix) {
-				PutPart(String.Format("new {0}[0];\n", GetTypeSpec(t.GetElementType())));
-				Put("Require('[');\n");
+				PutRequireOrNullArray('[', t, name);
 				Put("if (SkipSpacesCarefully() == ']') {\n");
 				Put("Require(']');\n");
 				Put("}\n");
@@ -164,10 +175,10 @@ namespace Yuzu
 				Put("} while (Require(']', ',') == ',');\n");
 				PutF("{0} = {1}.ToArray();\n", name, tempListName);
 				Put("}\n");
+				Put("}\n");
 			}
 			else if (t.IsArray && JsonOptions.ArrayLengthPrefix) {
-				PutPart(String.Format("new {0}[0];\n", GetTypeSpec(t.GetElementType())));
-				Put("Require('[');\n");
+				PutRequireOrNullArray('[', t, name);
 				Put("if (SkipSpacesCarefully() != ']') {\n");
 				tempCount += 1;
 				var tempArrayName = "tmp" + tempCount.ToString();
@@ -182,6 +193,7 @@ namespace Yuzu
 				PutF("{0} = {1};\n", name, tempArrayName);
 				Put("}\n");
 				Put("Require(']');\n");
+				Put("}\n");
 			}
 			else if (t.IsClass && Options.ClassNames) {
 				PutPart(String.Format("({0})base.FromReaderInt();\n", t.Name));

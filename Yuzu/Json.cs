@@ -55,6 +55,10 @@ namespace Yuzu
 
 		private void WriteList<T>(List<T> list)
 		{
+			if (list == null) {
+				WriteStr("null");
+				return;
+			}
 			var wf = GetWriteFunc(typeof(T));
 			writer.Write('[');
 			if (list.Count > 0) {
@@ -73,6 +77,10 @@ namespace Yuzu
 
 		private void WriteDictionary<T>(Dictionary<string, T> dict)
 		{
+			if (dict == null) {
+				WriteStr("null");
+				return;
+			}
 			var wf = GetWriteFunc(typeof(T));
 			writer.Write('{');
 			if (dict.Count > 0) {
@@ -167,6 +175,10 @@ namespace Yuzu
 
 		protected override void ToWriter(object obj)
 		{
+			if (obj == null) {
+				WriteStr("null");
+				return;
+			}
 			writer.Write('{');
 			WriteStr(JsonOptions.FieldSeparator);
 			var isFirst = true;
@@ -418,10 +430,19 @@ namespace Yuzu
 			return Activator.CreateInstance(t);
 		}
 
+		protected bool RequireOrNull(char ch)
+		{
+			if (Require(ch, 'n') == ch)
+				return false;
+			Require("ull");
+			return true;
+
+		}
+
 		private List<T> ReadList<T>()
 		{
+			if (RequireOrNull('[')) return null;
 			var list = new List<T>();
-			Require('[');
 			// ReadValue might invoke a new serializer, so we must not rely on PutBack.
 			if (SkipSpacesCarefully() == ']')
 				Require(']');
@@ -436,8 +457,8 @@ namespace Yuzu
 
 		private Dictionary<string, T> ReadDictionary<T>()
 		{
+			if (RequireOrNull('{')) return null;
 			var dict = new Dictionary<string, T>();
-			Require('{');
 			// ReadValue might invoke a new serializer, so we must not rely on PutBack.
 			if (SkipSpacesCarefully() == '}')
 				Require('}');
@@ -546,7 +567,7 @@ namespace Yuzu
 			if (!Options.ClassNames)
 				throw new YuzuException();
 			buf = null;
-			Require('{');
+			if (RequireOrNull('{')) return null;
 			if (GetNextName(true) != JsonOptions.ClassTag)
 				throw new YuzuException();
 			return ReadFields(Make(RequireString()), GetNextName(false));
@@ -555,7 +576,7 @@ namespace Yuzu
 		public override object FromReaderInt(object obj)
 		{
 			buf = null;
-			Require('{');
+			if (RequireOrNull('{')) return null;
 			string name = GetNextName(true);
 			if (Options.ClassNames) {
 				if (name != JsonOptions.ClassTag)

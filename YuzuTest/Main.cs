@@ -395,7 +395,6 @@ namespace YuzuTest
 					},
 					new SampleTree {
 						Value = 13,
-						Children = new List<SampleTree>(),
 					}
 				}
 			};
@@ -403,7 +402,7 @@ namespace YuzuTest
 			Assert.AreEqual(
 				"{\n\"Value\":11,\n\"Children\":[\n" +
 				"{\n\"Value\":12,\n\"Children\":[]\n},\n" +
-				"{\n\"Value\":13,\n\"Children\":[]\n}\n" +
+				"{\n\"Value\":13,\n\"Children\":null\n}\n" +
 				"]\n}",
 				result2);
 			SampleTree w2 = new SampleTree();
@@ -420,12 +419,15 @@ namespace YuzuTest
 			var jd = new JsonDeserializer();
 
 			var v0 = new SampleDict { Value = 3, Children = new Dictionary<string, SampleDict> {
-				{ "a", new SampleDict { Value = 5, Children = new Dictionary<string, SampleDict>() } }
-			} };
+				{ "a", new SampleDict { Value = 5, Children = new Dictionary<string, SampleDict>() } },
+				{ "b", new SampleDict { Value = 7 } },
+			}
+			};
 			var result0 = js.ToString(v0);
 			Assert.AreEqual(
 				"{\n\"Value\":3,\n\"Children\":{\n" +
-				"\"a\":{\n\"Value\":5,\n\"Children\":{}\n}\n" +
+				"\"a\":{\n\"Value\":5,\n\"Children\":{}\n},\n" +
+				"\"b\":{\n\"Value\":7,\n\"Children\":null\n}\n" +
 				"}\n}", result0);
 
 			var w0 = new SampleDict();

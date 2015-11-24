@@ -233,16 +233,17 @@ namespace YuzuTest
 		{
 			var result = (SampleList)obj;
 			if ("E" != name) throw new YuzuException();
-			result.E = new List<String>();
-			Require('[');
-			if (SkipSpacesCarefully() == ']') {
-				Require(']');
-			}
-			else {
-				do {
-					var tmp1 = RequireString();
-					result.E.Add(tmp1);
-				} while (Require(']', ',') == ',');
+			result.E = RequireOrNull('[') ? null : new List<String>();
+			if (result.E != null) {
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = RequireString();
+						result.E.Add(tmp1);
+					} while (Require(']', ',') == ',');
+				}
 			}
 			name = GetNextName(false);
 			Require('}');
@@ -282,18 +283,19 @@ namespace YuzuTest
 			result.Value = RequireInt();
 			name = GetNextName(false);
 			if ("Children" == name) {
-				result.Children = new Dictionary<String,SampleDict>();
-				Require('{');
-				if (SkipSpacesCarefully() == '}') {
-					Require('}');
-				}
-				else {
-					do {
-						var tmp1 = RequireString();
-						Require(':');
-						var tmp2 = (SampleDict)SampleDict_JsonDeserializer.Instance.FromReader(new SampleDict(), Reader);
-						result.Children.Add(tmp1, tmp2);
-					} while (Require('}', ',') == ',');
+				result.Children = RequireOrNull('{') ? null : new Dictionary<String,SampleDict>();
+				if (result.Children != null) {
+					if (SkipSpacesCarefully() == '}') {
+						Require('}');
+					}
+					else {
+						do {
+							var tmp1 = RequireString();
+							Require(':');
+							var tmp2 = (SampleDict)SampleDict_JsonDeserializer.Instance.FromReader(new SampleDict(), Reader);
+							result.Children.Add(tmp1, tmp2);
+						} while (Require('}', ',') == ',');
+					}
 				}
 				name = GetNextName(false);
 			}
@@ -331,17 +333,18 @@ namespace YuzuTest
 		{
 			var result = (SampleArray)obj;
 			if ("A" != name) throw new YuzuException();
-			result.A = new String[0];
-			Require('[');
-			if (SkipSpacesCarefully() != ']') {
-				var tmp1 = new String[RequireUInt()];
-				for(int tmp2 = 0; tmp2 < tmp1.Length; ++tmp2) {
-					Require(',');
-					tmp1[tmp2] = RequireString();
+			result.A = RequireOrNull('[') ? null : new String[0];
+			if (result.A != null) {
+				if (SkipSpacesCarefully() != ']') {
+					var tmp1 = new String[RequireUInt()];
+					for(int tmp2 = 0; tmp2 < tmp1.Length; ++tmp2) {
+						Require(',');
+						tmp1[tmp2] = RequireString();
+					}
+					result.A = tmp1;
 				}
-				result.A = tmp1;
+				Require(']');
 			}
-			Require(']');
 			name = GetNextName(false);
 			Require('}');
 			return result;
@@ -491,26 +494,28 @@ namespace YuzuTest
 		{
 			var result = (SampleMatrix)obj;
 			if ("M" != name) throw new YuzuException();
-			result.M = new List<List<Int32>>();
-			Require('[');
-			if (SkipSpacesCarefully() == ']') {
-				Require(']');
-			}
-			else {
-				do {
-					var tmp1 = new List<Int32>();
-					Require('[');
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp2 = RequireInt();
-							tmp1.Add(tmp2);
-						} while (Require(']', ',') == ',');
-					}
-					result.M.Add(tmp1);
-				} while (Require(']', ',') == ',');
+			result.M = RequireOrNull('[') ? null : new List<List<Int32>>();
+			if (result.M != null) {
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = RequireOrNull('[') ? null : new List<Int32>();
+						if (tmp1 != null) {
+							if (SkipSpacesCarefully() == ']') {
+								Require(']');
+							}
+							else {
+								do {
+									var tmp2 = RequireInt();
+									tmp1.Add(tmp2);
+								} while (Require(']', ',') == ',');
+							}
+						}
+						result.M.Add(tmp1);
+					} while (Require(']', ',') == ',');
+				}
 			}
 			name = GetNextName(false);
 			Require('}');
@@ -625,16 +630,17 @@ namespace YuzuTest
 		{
 			var result = (SampleClassList)obj;
 			if ("E" != name) throw new YuzuException();
-			result.E = new List<SampleBase>();
-			Require('[');
-			if (SkipSpacesCarefully() == ']') {
-				Require(']');
-			}
-			else {
-				do {
-					var tmp1 = (SampleBase)base.FromReaderInt();
-					result.E.Add(tmp1);
-				} while (Require(']', ',') == ',');
+			result.E = RequireOrNull('[') ? null : new List<SampleBase>();
+			if (result.E != null) {
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = (SampleBase)base.FromReaderInt();
+						result.E.Add(tmp1);
+					} while (Require(']', ',') == ',');
+				}
 			}
 			name = GetNextName(false);
 			Require('}');
