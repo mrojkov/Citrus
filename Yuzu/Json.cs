@@ -525,6 +525,27 @@ namespace Yuzu
 			return array;
 		}
 
+		private object ReadObject() {
+			var ch = SkipSpaces();
+			PutBack(ch);
+			switch (ch) {
+				case '\"':
+					return RequireString();
+				case 't': case 'f':
+					return RequireBool();
+				case 'n':
+					Next();
+					Require("ull");
+					return null;
+				case '{':
+					return ReadDictionary<object>();
+				case '[':
+					return ReadList<object>();
+				default:
+					return RequireDouble();
+			}
+		}
+
 		// Optimization: Avoid creating trivial closures.
 		private object RequireIntObj() { return RequireInt(); }
 		private object RequireStringObj() { return RequireString(); }
@@ -569,6 +590,8 @@ namespace Yuzu
 				var m = Utils.GetPrivateCovariantGeneric(GetType(), n, t);
 				return () => m.Invoke(this, new object[] { });
 			}
+			if (t == typeof(object))
+				return ReadObject;
 			if (t.IsClass && Options.ClassNames)
 				return FromReaderInt;
 			if (t.IsClass && !Options.ClassNames || Utils.IsStruct(t))

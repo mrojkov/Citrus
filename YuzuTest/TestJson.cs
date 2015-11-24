@@ -488,6 +488,21 @@ namespace YuzuTest
 		}
 
 		[TestMethod]
+		public void TestObject()
+		{
+			var jd = new JsonDeserializer();
+			var w = new SampleObj();
+			jd.FromString(w, "{ \"F\": 123.4 }");
+			Assert.AreEqual(123.4, w.F);
+			jd.FromString(w, "{ \"F\": [1,2,3] }");
+			CollectionAssert.AreEqual(new object[] { 1.0, 2.0, 3.0 }, (List<object>)w.F);
+			jd.FromString(w, "{ \"F\": {\"a\":\"1\", \"b\": \"2\"} }");
+			CollectionAssert.AreEqual(
+				new Dictionary<string, object>() { { "a", "1" }, { "b", "2" } },
+				(Dictionary<string, object>)w.F);
+		}
+
+		[TestMethod]
 		public void TestErrors()
 		{
 			var jd = new JsonDeserializer();

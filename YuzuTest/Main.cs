@@ -163,6 +163,12 @@ namespace YuzuTest
 		public SamplePoint B;
 	}
 
+	public class SampleObj
+	{
+		[YuzuRequired]
+		public object F;
+	}
+
 	public static class XAssert
 	{
 		public static void Throws<TExpectedException>(Action exceptionThrower, string expectedExceptionMessage = "")
