@@ -12,8 +12,6 @@ namespace Lime
 
 	public partial class ScrollView : IDisposable
 	{
-		private WheelScrollState wheelScrollState;
-
 		public readonly Frame Frame;
 		public readonly ScrollViewContentWidget Content;
 
@@ -23,9 +21,9 @@ namespace Lime
 		public float BounceZoneThickness = 100;
 		public float ScrollToItemVelocity = 800;
 		public ScrollDirection ScrollDirection { get; private set; }
+		private WheelScrollState wheelScrollState;
 		public bool ScrollWhenContentFits = true;
-
-		protected bool IsScrollingByMouseWheel { get; private set; }
+		
 		public virtual bool IsDragging { get; protected set; }
 
 		// TODO: Use WidgetInput instead
@@ -166,7 +164,7 @@ namespace Lime
 
 		public bool IsScrolling()
 		{
-			return scrollingTask != null;
+			return scrollingTask != null || wheelScrollState != WheelScrollState.Stop;
 		}
 
 		public void StopScrolling()
@@ -237,7 +235,7 @@ namespace Lime
 			float totalScrollAmount = 0f;
 			while (true) {
 				yield return null;
-				IsScrollingByMouseWheel = 
+				var IsScrollingByMouseWheel = 
 					!Frame.Input.IsMousePressed() &&
 					(Frame.Input.WasKeyPressed(Key.MouseWheelDown) || Frame.Input.WasKeyPressed(Key.MouseWheelUp)) &&
 					(CanScroll && Frame.HitTest(Frame.Input.MousePosition));

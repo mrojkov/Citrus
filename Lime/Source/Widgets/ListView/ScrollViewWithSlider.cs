@@ -34,7 +34,7 @@ namespace Lime
 		{
 			yield return Task.WaitWhile(() => Slider == null);
 			while (true) {
-				if (IsScrolling() || IsDragging || IsScrollingByMouseWheel) {
+				if (IsScrolling() || IsDragging) {
 					sliderTimeToLive = 1;
 				}
 				yield return null;
