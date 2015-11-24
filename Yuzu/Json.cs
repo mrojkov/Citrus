@@ -234,6 +234,8 @@ namespace Yuzu
 
 		private char? buf;
 
+		public override void Initialize() { buf = null; }
+
 		private char Next()
 		{
 			if (!buf.HasValue)
@@ -243,16 +245,22 @@ namespace Yuzu
 			return result;
 		}
 
+		protected YuzuException Error(string message, params object[] args)
+		{
+			return new YuzuException(
+				String.Format(message, args), new YuzuPosition(Reader.BaseStream.Position));
+		}
+
 		protected void KillBuf()
 		{
 			if (buf != null)
-				throw new YuzuException();
+				throw Error("Unconsumed character: {0}", buf);
 		}
 
 		private void PutBack(char ch)
 		{
 			if (buf.HasValue)
-				throw new YuzuException();
+				throw new YuzuAssert();
 			buf = ch;
 		}
 
@@ -267,7 +275,7 @@ namespace Yuzu
 		protected char SkipSpacesCarefully()
 		{
 			if (buf.HasValue)
-				throw new YuzuException();
+				throw new YuzuAssert();
 			while (true) {
 				var v = Reader.PeekChar();
 				if (v < 0)
@@ -282,19 +290,21 @@ namespace Yuzu
 		protected char Require(params char[] chars)
 		{
 			var ch = SkipSpaces();
-			if (Array.IndexOf(chars, ch) < 0)
-				throw new YuzuException();
+			if(Array.IndexOf(chars, ch) < 0)
+				throw Error("Expected '{0}' but found '{1}'", String.Join("','", chars), ch);
 			return ch;
 		}
 
 		protected void Require(string s)
 		{
-			foreach (var ch in s)
-				if (Reader.ReadChar() != ch)
-					throw new YuzuException();
+			foreach (var ch in s) {
+				var r = Reader.ReadChar();
+				if (r != ch)
+					throw Error("Expected '{0}', but found '{1}'", ch, r);
+			}
 		}
 
-		private char JsonUnquote(char ch)
+		private char JsonUnescape(char ch)
 		{
 			switch (ch) {
 				case '"':
@@ -306,7 +316,7 @@ namespace Yuzu
 				case 't':
 					return '\t';
 			}
-			throw new YuzuException();
+			throw Error("Unexpected escape chararcter: '{0}'", ch);
 		}
 
 		// Optimization: avoid re-creating StringBuilder.
@@ -322,7 +332,7 @@ namespace Yuzu
 				if (ch == '"')
 					break;
 				if (ch == '\\')
-					ch = JsonUnquote(Reader.ReadChar());
+					ch = JsonUnescape(Reader.ReadChar());
 				sb.Append(ch);
 			}
 			return sb.ToString();
@@ -330,7 +340,7 @@ namespace Yuzu
 
 		protected bool RequireBool()
 		{
-			var ch = Reader.ReadChar();
+			var ch = SkipSpaces();
 			if (ch == 't') {
 				Require("rue");
 				return true;
@@ -339,7 +349,7 @@ namespace Yuzu
 				Require("alse");
 				return false;
 			}
-			throw new YuzuException();
+			throw Error("Expected 'true' or 'false', but found: {0}", ch);
 		}
 
 		protected uint RequireUInt()
@@ -423,7 +433,7 @@ namespace Yuzu
 			var ch = SkipSpaces();
 			if (ch == ',') {
 				if (first)
-					throw new YuzuException();
+					throw Error("Expected name, but got ','");
 				ch = SkipSpaces();
 			}
 			PutBack(ch);
@@ -438,7 +448,7 @@ namespace Yuzu
 		{
 			var t = Options.Assembly.GetType(typeName);
 			if (t == null)
-				throw new YuzuException();
+				throw new YuzuAssert("Type not found: " + typeName);
 			return Activator.CreateInstance(t);
 		}
 
@@ -571,7 +581,7 @@ namespace Yuzu
 			foreach (var yi in Utils.GetYuzuItems(obj.GetType(), Options)) {
 				if (yi.Name != name) {
 					if (!yi.IsOptional)
-						throw new YuzuException();
+						throw Error("Expected field '{0}', but found '{1}'", yi.Name, name);
 					continue;
 				}
 				yi.SetValue(obj, ReadValueFunc(yi.Type)());
@@ -584,7 +594,7 @@ namespace Yuzu
 		protected virtual object ReadFieldsCompact(object obj)
 		{
 			if (!Utils.IsCompact(obj.GetType(), Options))
-				throw new YuzuException();
+				throw Error("Attempt to read non-compact type '{0}' from compact format", obj.GetType().Name);
 			bool isFirst = true;
 			foreach (var yi in Utils.GetYuzuItems(obj.GetType(), Options)) {
 				if (!isFirst)
@@ -596,21 +606,34 @@ namespace Yuzu
 			return obj;
 		}
 
+		private void CheckClassTag(string name)
+		{
+			if (name != JsonOptions.ClassTag)
+				throw Error("Expected class tag, but found '{0}'", name);
+		}
+
+		private void CheckSameTypeAsTag(object obj)
+		{
+			var typeName = obj.GetType().FullName;
+			var tag = RequireString();
+			if (typeName != tag)
+				throw Error("Reading object of type '{0}', but found class tag '{1}'", typeName, tag);
+		}
+
 		public override object FromReaderInt()
 		{
 			if (!Options.ClassNames)
-				throw new YuzuException();
+				throw new YuzuException("Attempt to read unspecified type without class name");
 			KillBuf();
 			switch (RequireBracketOrNull()) {
 				case 'n': return null;
 				case '{':
-					if (GetNextName(true) != JsonOptions.ClassTag)
-						throw new YuzuException();
+					CheckClassTag(GetNextName(true));
 					return ReadFields(Make(RequireString()), GetNextName(false));
 				case '[':
 					return ReadFieldsCompact(Make(RequireString()));
 				default:
-					throw new YuzuException();
+					throw new YuzuAssert();
 			}
 		}
 
@@ -623,21 +646,17 @@ namespace Yuzu
 				case '{':
 					string name = GetNextName(true);
 					if (Options.ClassNames) {
-						if (name != JsonOptions.ClassTag)
-							throw new YuzuException();
-						if (RequireString() != obj.GetType().FullName)
-							throw new YuzuException();
+						CheckClassTag(name);
+						CheckSameTypeAsTag(obj);
 						name = GetNextName(false);
 					}
 					return ReadFields(obj, name);
 				case '[':
-					if (Options.ClassNames) {
-						if (RequireString() != obj.GetType().FullName)
-							throw new YuzuException();
-					}
+					if (Options.ClassNames)
+						CheckSameTypeAsTag(obj);
 					return ReadFieldsCompact(obj);
 				default:
-					throw new YuzuException();
+					throw new YuzuAssert();
 			}
 		}
 
@@ -651,11 +670,10 @@ namespace Yuzu
 		protected object FromReaderIntGenerated()
 		{
 			if (!Options.ClassNames)
-				throw new YuzuException();
+				throw new YuzuException("Attempt to read unspecified type without class name");
 			KillBuf();
 			Require('{');
-			if (GetNextName(true) != JsonOptions.ClassTag)
-				throw new YuzuException();
+			CheckClassTag(GetNextName(true));
 			var d = MakeDeserializer(RequireString());
 			Require(',');
 			return d.FromReaderIntPartial(GetNextName(false));
@@ -667,10 +685,8 @@ namespace Yuzu
 			Require('{');
 			string name = GetNextName(true);
 			if (Options.ClassNames) {
-				if (name != JsonOptions.ClassTag)
-					throw new YuzuException();
-				if (RequireString() != obj.GetType().FullName)
-					throw new YuzuException();
+				CheckClassTag(name);
+				CheckSameTypeAsTag(obj);
 				name = GetNextName(false);
 			}
 			return MakeDeserializer(obj.GetType().FullName).ReadFields(obj, name);

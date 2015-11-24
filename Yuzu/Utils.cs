@@ -73,7 +73,7 @@ namespace Yuzu
 				if (optional == null && required == null)
 					continue;
 				if (optional != null && required != null)
-					throw new YuzuException();
+					throw new YuzuAssert("Both optional and required attributes for field: " + m.Name);
 				var item = new YuzuItem {
 						Order = options.GetOrder(optional ?? required),
 						IsOptional = optional != null,

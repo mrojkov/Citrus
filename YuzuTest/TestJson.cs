@@ -457,9 +457,20 @@ namespace YuzuTest
 			var jd = new JsonDeserializer();
 			var w = new Sample1();
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{}"));
-			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"X\" }"));
-			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"Y\": \"x\" }"));
-			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"X\": 1"));
+			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"X\" }"), ":");
+			XAssert.Throws<YuzuException>(() => jd.FromString(w, "nn"), "u");
+			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"X\":1, \"Y\": \"\\z\" }"), "z");
+			XAssert.Throws<YuzuException>(() => jd.FromString(new SampleBool(), "{ \"B\": 1 }"), "1");
+			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ ,}"), ",");
+			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"Y\": \"q\" }"), "'X'");
+			XAssert.Throws<YuzuException>(() => jd.FromString(w, "[]"), "'Sample1'");
+			jd.Options.ClassNames = true;
+			XAssert.Throws<YuzuException>(() => jd.FromString("{\"X\":0}"), "class");
+			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"class\": \"Q\" }"), "'Q'");
+			XAssert.Throws<YuzuException>(() => jd.FromString(new SamplePoint(), "[ \"QQ\" ]"), "'QQ'");
+			jd.Options.ClassNames = false;
+			XAssert.Throws<YuzuException>(() => jd.FromString(""), "unspecified");
+			XAssert.Throws<System.IO.EndOfStreamException>(() => jd.FromString(w, "{ \"X\": 1"));
 		}
 	}
 }

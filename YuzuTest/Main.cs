@@ -181,7 +181,7 @@ namespace YuzuTest
 			{
 				Assert.IsTrue(
 					ex.Message.Contains(expectedExceptionMessage),
-					"Exception message:<{0}>. Actual message:<{1}>.", expectedExceptionMessage, ex.Message);
+					"Expected message part:<{0}>. Actual message:<{1}>.", expectedExceptionMessage, ex.Message);
 			}
 		}
 	}

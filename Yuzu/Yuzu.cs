@@ -76,8 +76,32 @@ namespace Yuzu
 		public Assembly Assembly = Assembly.GetCallingAssembly();
 	}
 
+	public class YuzuPosition
+	{
+		public readonly long Offset = 0;
+		public YuzuPosition(long offset) { Offset = offset; }
+		public override string ToString()
+		{
+			return "byte " + Offset.ToString();
+		}
+	}
+
 	public class YuzuException: Exception
 	{
+		public readonly YuzuPosition Position = null;
+
+		public YuzuException() { }
+
+		public YuzuException(string message, YuzuPosition position = null): base(
+			position == null ? message : message + " at " + position.ToString())
+		{
+			Position = position;
+		}
+	}
+
+	public class YuzuAssert : YuzuException
+	{
+		public YuzuAssert(string message = "") : base(message) { }
 	}
 
 	public abstract class AbstractSerializer
@@ -177,12 +201,14 @@ namespace Yuzu
 	{
 		public BinaryReader Reader;
 
+		public virtual void Initialize() { }
 		public abstract object FromReaderInt();
 		public abstract object FromReaderInt(object obj);
 
 		public override object FromReader(object obj, BinaryReader reader)
 		{
 			Reader = reader;
+			Initialize();
 			return FromReaderInt(obj);
 		}
 
