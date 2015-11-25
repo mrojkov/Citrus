@@ -140,6 +140,24 @@ namespace YuzuTest
 		public Dictionary<string, SampleDict> Children;
 	}
 
+	public class SampleKey: IEquatable<SampleKey>
+	{
+		public int V;
+		public override string ToString() { return V.ToString() + "!"; }
+		public bool Equals(SampleKey other) { return V == other.V; }
+		public override int GetHashCode() { return V; }
+	}
+
+	public class SampleDictKeys
+	{
+		[YuzuRequired]
+		public Dictionary<int, int> I;
+		[YuzuRequired]
+		public Dictionary<SampleEnum, int> E;
+		[YuzuRequired]
+		public Dictionary<SampleKey, int> K;
+	}
+
 	public class SampleMatrix
 	{
 		[YuzuRequired]

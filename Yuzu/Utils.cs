@@ -98,13 +98,21 @@ namespace Yuzu
 			return t.IsValueType && !t.IsPrimitive && !t.IsEnum && !t.IsPointer;
 		}
 
-		public static MethodInfo GetPrivateCovariantGeneric(Type callerType, string name, Type container, int argNumber = 0)
+		public static MethodInfo GetPrivateCovariantGeneric(Type callerType, string name, Type container)
 		{
-			var t = container.HasElementType ? container.GetElementType() : container.GetGenericArguments()[argNumber];
+			var t = container.HasElementType ? container.GetElementType() : container.GetGenericArguments()[0];
 			return callerType.GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic).MakeGenericMethod(t);
 		}
 
-		public static bool IsCompact(Type t, CommonOptions options) {
+		public static MethodInfo GetPrivateCovariantGenericAll(Type callerType, string name, Type container)
+		{
+			return
+				callerType.GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic).
+					MakeGenericMethod(container.GetGenericArguments());
+		}
+
+		public static bool IsCompact(Type t, CommonOptions options)
+		{
 			return t.IsDefined(options.CompactAttribute);
 		}
 

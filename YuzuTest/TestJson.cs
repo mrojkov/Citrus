@@ -295,6 +295,41 @@ namespace YuzuTest
 		}
 
 		[TestMethod]
+		public void TestDictionaryKeys()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = "";
+
+			var v0 = new SampleDictKeys {
+				I =  new Dictionary<int, int> { { 5, 7 } },
+				E =  new Dictionary<SampleEnum, int> { { SampleEnum.E2, 8 } },
+				K =  new Dictionary<SampleKey, int> { { new SampleKey { V = 3 }, 9 } },
+			};
+			var result0 = js.ToString(v0);
+			Assert.AreEqual(
+				"{" +
+				"\"E\":{\"E2\":8}," +
+				"\"I\":{\"5\":7}," +
+				"\"K\":{\"3!\":9}" +
+				"}", result0);
+
+			JsonDeserializer.RegisterKeyParser(
+				typeof(SampleKey),
+				s => new SampleKey { V = int.Parse(s.Substring(0, s.Length - 1)) });
+
+			var jd = new JsonDeserializer();
+			var w = new SampleDictKeys();
+			jd.FromString(w, result0);
+			Assert.AreEqual(1, w.I.Count);
+			Assert.AreEqual(7, w.I[5]);
+			Assert.AreEqual(1, w.E.Count);
+			Assert.AreEqual(8, w.E[SampleEnum.E2]);
+			Assert.AreEqual(1, w.K.Count);
+			Assert.AreEqual(9, w.K[new SampleKey { V = 3 }]);
+		}
+
+		[TestMethod]
 		public void TestArray()
 		{
 			var js = new JsonSerializer();

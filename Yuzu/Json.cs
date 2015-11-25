@@ -76,19 +76,19 @@ namespace Yuzu
 			writer.Write(']');
 		}
 
-		private void WriteDictionary<T>(Dictionary<string, T> dict)
+		private void WriteDictionary<K, V>(Dictionary<K, V> dict)
 		{
 			if (dict == null) {
 				WriteStr("null");
 				return;
 			}
-			var wf = GetWriteFunc(typeof(T));
+			var wf = GetWriteFunc(typeof(V));
 			writer.Write('{');
 			if (dict.Count > 0) {
 				WriteStr(JsonOptions.FieldSeparator);
 				var isFirst = true;
 				foreach (var elem in dict) {
-					WriteName(elem.Key, ref isFirst);
+					WriteName(elem.Key.ToString(), ref isFirst);
 					wf(elem.Value);
 				}
 				WriteStr(JsonOptions.FieldSeparator);
@@ -141,8 +141,8 @@ namespace Yuzu
 					var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteList", t);
 					return obj => m.Invoke(this, new object[] { obj });
 				}
-				if (g == typeof(Dictionary<,>) && t.GetGenericArguments()[0] == typeof(string)) {
-					var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteDictionary", t, argNumber: 1);
+				if (g == typeof(Dictionary<,>)) {
+					var m = Utils.GetPrivateCovariantGenericAll(GetType(), "WriteDictionary", t);
 					return obj => m.Invoke(this, new object[] { obj });
 				}
 			}
@@ -484,19 +484,35 @@ namespace Yuzu
 			return list;
 		}
 
-		private Dictionary<string, T> ReadDictionary<T>()
+		protected static Dictionary<Type, Func<string, object>> keyParsers = new Dictionary<Type, Func<string, object>> {
+			{ typeof(int), s => int.Parse(s) },
+			{ typeof(string), s => s },
+		};
+
+		public static void RegisterKeyParser(Type t, Func<string, object> parser)
+		{
+			keyParsers.Add(t, parser);
+		}
+
+		private Dictionary<K, V> ReadDictionary<K, V>()
 		{
 			if (RequireOrNull('{')) return null;
-			var dict = new Dictionary<string, T>();
+			var dict = new Dictionary<K, V>();
 			// ReadValue might invoke a new serializer, so we must not rely on PutBack.
 			if (SkipSpacesCarefully() == '}')
 				Require('}');
 			else {
-				var rf = ReadValueFunc(typeof(T));
+				Func<string, object> rk;
+				if (typeof(K).IsEnum)
+					rk = s => Enum.Parse(typeof(K), s);
+				else if (!keyParsers.TryGetValue(typeof(K), out rk))
+					throw new YuzuAssert("Unable to find key parser for type: " + typeof(K).Name);
+
+				var rf = ReadValueFunc(typeof(V));
 				do {
 					var key = RequireString();
 					Require(':');
-					dict.Add(key, (T)rf());
+					dict.Add((K)rk(key), (V)rf());
 				} while (Require('}', ',') == ',');
 			}
 			return dict;
@@ -538,7 +554,7 @@ namespace Yuzu
 					Require("ull");
 					return null;
 				case '{':
-					return ReadDictionary<object>();
+					return ReadDictionary<string, object>();
 				case '[':
 					return ReadList<object>();
 				default:
@@ -581,7 +597,7 @@ namespace Yuzu
 					return () => m.Invoke(this, new object[] { });
 				}
 				if (g == typeof(Dictionary<,>)) {
-					var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadDictionary", t, argNumber: 1);
+					var m = Utils.GetPrivateCovariantGenericAll(GetType(), "ReadDictionary", t);
 					return () => m.Invoke(this, new object[] { });
 				}
 			}
