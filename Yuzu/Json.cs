@@ -130,7 +130,7 @@ namespace Yuzu
 
 		private Action<object> GetWriteFunc(Type t)
 		{
-			if (t == typeof(int) || t == typeof(uint))
+			if (t == typeof(int) || t == typeof(uint) || t == typeof(byte) || t == typeof(sbyte))
 				return WriteInt;
 			if (t == typeof(double))
 				return WriteDouble;
@@ -604,9 +604,9 @@ namespace Yuzu
 
 		private Func<object> ReadValueFunc(Type t)
 		{
-			if (t == typeof(int))
+			if (t == typeof(int) || t == typeof(sbyte))
 				return RequireIntObj;
-			if (t == typeof(uint))
+			if (t == typeof(uint) || t == typeof(byte))
 				return RequireUIntObj;
 			if (t == typeof(string))
 				return RequireStringObj;
