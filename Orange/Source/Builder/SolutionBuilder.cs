@@ -19,19 +19,27 @@ namespace Orange
 			this.platform = platform;
 			projectName = The.Workspace.Title;
 			projectDirectory = Path.Combine(The.Workspace.ProjectDirectory, projectName);
+			switch (platform) {
+				case TargetPlatform.Android:
+					projectDirectory += ".Android";
+					break;
+				case TargetPlatform.Desktop:
 #if WIN
-			if (platform == TargetPlatform.Android) {
-				projectDirectory += ".Android";
-			} else {
-				projectDirectory += ".Win";
-			}
-#elif MAC
-			if (platform == TargetPlatform.iOS) {
-				projectDirectory += ".iOS";
-			} else {
-				projectDirectory += ".Mac";
-			}
+					projectDirectory += ".Win";
+#elif MAC || MONOMAC
+					projectDirectory += ".Mac";
 #endif
+					break;
+				case TargetPlatform.iOS:
+#if WIN
+					throw new NotSupportedException();
+#elif MAC || MONOMAC
+					projectDirectory += ".iOS";
+					break;
+#endif
+				default:
+					throw new NotSupportedException();
+			}
 		}
 
 		public SolutionBuilder(TargetPlatform platform, string projectDirectory, string projectName)
