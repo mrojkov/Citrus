@@ -327,6 +327,14 @@ namespace YuzuTest
 			Assert.AreEqual(8, w.E[SampleEnum.E2]);
 			Assert.AreEqual(1, w.K.Count);
 			Assert.AreEqual(9, w.K[new SampleKey { V = 3 }]);
+
+			w = (SampleDictKeys)SampleDictKeys_JsonDeserializer.Instance.FromString(result0);
+			Assert.AreEqual(1, w.I.Count);
+			Assert.AreEqual(7, w.I[5]);
+			Assert.AreEqual(1, w.E.Count);
+			Assert.AreEqual(8, w.E[SampleEnum.E2]);
+			Assert.AreEqual(1, w.K.Count);
+			Assert.AreEqual(9, w.K[new SampleKey { V = 3 }]);
 		}
 
 		[TestMethod]

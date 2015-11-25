@@ -135,8 +135,7 @@ namespace Yuzu
 				Put("}\n");
 			}
 			else if (
-				t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>) &&
-				t.GetGenericArguments()[0] == typeof(string)
+				t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)
 			) {
 				PutRequireOrNull('{', t, name);
 				Put("if (SkipSpacesCarefully() == '}') {\n");
@@ -145,13 +144,21 @@ namespace Yuzu
 				Put("else {\n");
 				Put("do {\n");
 				tempCount += 1;
-				var tempKey = "tmp" + tempCount.ToString();
-				PutF("var {0} = RequireString();\n", tempKey);
+				var tempKeyStr = "tmp" + tempCount.ToString();
+				PutF("var {0} = RequireString();\n", tempKeyStr);
 				Put("Require(':');\n");
 				tempCount += 1;
 				var tempValue = "tmp" + tempCount.ToString();
 				PutF("var {0} = ", tempValue);
 				GenerateValue(t.GetGenericArguments()[1], tempValue);
+				var keyType = t.GetGenericArguments()[0];
+				var tempKey =
+					keyType == typeof(string) ? tempKeyStr :
+					keyType == typeof(int) ? String.Format("int.Parse({0})", tempKeyStr) :
+					keyType.IsEnum ?
+						String.Format("({0})Enum.Parse(typeof({0}), {1})", GetTypeSpec(keyType), tempKeyStr) :
+						// Slow.
+						String.Format("({0})keyParsers[typeof({0})]({1})", GetTypeSpec(keyType), tempKeyStr);
 				PutF("{0}.Add({1}, {2});\n", name, tempKey, tempValue);
 				Put("} while (Require('}', ',') == ',');\n");
 				Put("}\n");

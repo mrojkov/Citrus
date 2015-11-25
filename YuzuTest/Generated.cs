@@ -15,6 +15,7 @@ namespace YuzuTest
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
+			Options.IgnoreNewFields = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -36,7 +37,7 @@ namespace YuzuTest
 		protected override object ReadFields(object obj, string name)
 		{
 			var result = (Sample1)obj;
-			if ("X" != name) throw new YuzuException();
+			if ("X" != name) throw new YuzuException("X!=" + name);
 			result.X = RequireInt();
 			name = GetNextName(false);
 			if ("Y" == name) {
@@ -56,6 +57,7 @@ namespace YuzuTest
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
+			Options.IgnoreNewFields = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -77,7 +79,7 @@ namespace YuzuTest
 		protected override object ReadFields(object obj, string name)
 		{
 			var result = (Sample2)obj;
-			if ("X" != name) throw new YuzuException();
+			if ("X" != name) throw new YuzuException("X!=" + name);
 			result.X = RequireInt();
 			name = GetNextName(false);
 			if ("Y" == name) {
@@ -97,6 +99,7 @@ namespace YuzuTest
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
+			Options.IgnoreNewFields = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -118,7 +121,7 @@ namespace YuzuTest
 		protected override object ReadFields(object obj, string name)
 		{
 			var result = (Sample3)obj;
-			if ("S1" != name) throw new YuzuException();
+			if ("S1" != name) throw new YuzuException("S1!=" + name);
 			result.S1 = (Sample1)Sample1_JsonDeserializer.Instance.FromReader(new Sample1(), Reader);
 			name = GetNextName(false);
 			if ("F" == name) {
@@ -142,6 +145,7 @@ namespace YuzuTest
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
+			Options.IgnoreNewFields = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -180,6 +184,7 @@ namespace YuzuTest
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
+			Options.IgnoreNewFields = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -201,7 +206,7 @@ namespace YuzuTest
 		protected override object ReadFields(object obj, string name)
 		{
 			var result = (SampleBool)obj;
-			if ("B" != name) throw new YuzuException();
+			if ("B" != name) throw new YuzuException("B!=" + name);
 			result.B = RequireBool();
 			name = GetNextName(false);
 			Require('}');
@@ -217,6 +222,7 @@ namespace YuzuTest
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
+			Options.IgnoreNewFields = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -238,7 +244,7 @@ namespace YuzuTest
 		protected override object ReadFields(object obj, string name)
 		{
 			var result = (SampleList)obj;
-			if ("E" != name) throw new YuzuException();
+			if ("E" != name) throw new YuzuException("E!=" + name);
 			result.E = RequireOrNull('[') ? null : new List<String>();
 			if (result.E != null) {
 				if (SkipSpacesCarefully() == ']') {
@@ -265,6 +271,7 @@ namespace YuzuTest
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
+			Options.IgnoreNewFields = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -286,7 +293,7 @@ namespace YuzuTest
 		protected override object ReadFields(object obj, string name)
 		{
 			var result = (SampleDict)obj;
-			if ("Value" != name) throw new YuzuException();
+			if ("Value" != name) throw new YuzuException("Value!=" + name);
 			result.Value = RequireInt();
 			name = GetNextName(false);
 			if ("Children" == name) {
@@ -311,6 +318,89 @@ namespace YuzuTest
 		}
 	}
 
+	class SampleDictKeys_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new SampleDictKeys_JsonDeserializer Instance = new SampleDictKeys_JsonDeserializer();
+
+		public SampleDictKeys_JsonDeserializer()
+		{
+			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+			Options.ClassNames = false;
+			Options.IgnoreNewFields = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.EnumAsString = true;
+			JsonOptions.ArrayLengthPrefix = false;
+			JsonOptions.IgnoreCompact = false;
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderInt(new SampleDictKeys());
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new SampleDictKeys(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (SampleDictKeys)obj;
+			if ("E" != name) throw new YuzuException("E!=" + name);
+			result.E = RequireOrNull('{') ? null : new Dictionary<SampleEnum,Int32>();
+			if (result.E != null) {
+				if (SkipSpacesCarefully() == '}') {
+					Require('}');
+				}
+				else {
+					do {
+						var tmp1 = RequireString();
+						Require(':');
+						var tmp2 = RequireInt();
+						result.E.Add((SampleEnum)Enum.Parse(typeof(SampleEnum), tmp1), tmp2);
+					} while (Require('}', ',') == ',');
+				}
+			}
+			name = GetNextName(false);
+			if ("I" != name) throw new YuzuException("I!=" + name);
+			result.I = RequireOrNull('{') ? null : new Dictionary<Int32,Int32>();
+			if (result.I != null) {
+				if (SkipSpacesCarefully() == '}') {
+					Require('}');
+				}
+				else {
+					do {
+						var tmp3 = RequireString();
+						Require(':');
+						var tmp4 = RequireInt();
+						result.I.Add(int.Parse(tmp3), tmp4);
+					} while (Require('}', ',') == ',');
+				}
+			}
+			name = GetNextName(false);
+			if ("K" != name) throw new YuzuException("K!=" + name);
+			result.K = RequireOrNull('{') ? null : new Dictionary<SampleKey,Int32>();
+			if (result.K != null) {
+				if (SkipSpacesCarefully() == '}') {
+					Require('}');
+				}
+				else {
+					do {
+						var tmp5 = RequireString();
+						Require(':');
+						var tmp6 = RequireInt();
+						result.K.Add((SampleKey)keyParsers[typeof(SampleKey)](tmp5), tmp6);
+					} while (Require('}', ',') == ',');
+				}
+			}
+			name = GetNextName(false);
+			Require('}');
+			return result;
+		}
+	}
+
 	class SampleArray_JsonDeserializer : JsonDeserializerGenBase
 	{
 		public static new SampleArray_JsonDeserializer Instance = new SampleArray_JsonDeserializer();
@@ -319,6 +409,7 @@ namespace YuzuTest
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
+			Options.IgnoreNewFields = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -340,7 +431,7 @@ namespace YuzuTest
 		protected override object ReadFields(object obj, string name)
 		{
 			var result = (SampleArray)obj;
-			if ("A" != name) throw new YuzuException();
+			if ("A" != name) throw new YuzuException("A!=" + name);
 			result.A = RequireOrNull('[') ? null : new String[0];
 			if (result.A != null) {
 				if (SkipSpacesCarefully() != ']') {
@@ -367,6 +458,7 @@ namespace YuzuTest
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
+			Options.IgnoreNewFields = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -388,7 +480,7 @@ namespace YuzuTest
 		protected override object ReadFields(object obj, string name)
 		{
 			var result = (SampleBase)obj;
-			if ("FBase" != name) throw new YuzuException();
+			if ("FBase" != name) throw new YuzuException("FBase!=" + name);
 			result.FBase = RequireInt();
 			name = GetNextName(false);
 			Require('}');
@@ -404,6 +496,7 @@ namespace YuzuTest
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
+			Options.IgnoreNewFields = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -425,10 +518,10 @@ namespace YuzuTest
 		protected override object ReadFields(object obj, string name)
 		{
 			var result = (SampleDerivedA)obj;
-			if ("FBase" != name) throw new YuzuException();
+			if ("FBase" != name) throw new YuzuException("FBase!=" + name);
 			result.FBase = RequireInt();
 			name = GetNextName(false);
-			if ("FA" != name) throw new YuzuException();
+			if ("FA" != name) throw new YuzuException("FA!=" + name);
 			result.FA = RequireInt();
 			name = GetNextName(false);
 			Require('}');
@@ -444,6 +537,7 @@ namespace YuzuTest
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
+			Options.IgnoreNewFields = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -465,10 +559,10 @@ namespace YuzuTest
 		protected override object ReadFields(object obj, string name)
 		{
 			var result = (SampleDerivedB)obj;
-			if ("FBase" != name) throw new YuzuException();
+			if ("FBase" != name) throw new YuzuException("FBase!=" + name);
 			result.FBase = RequireInt();
 			name = GetNextName(false);
-			if ("FB" != name) throw new YuzuException();
+			if ("FB" != name) throw new YuzuException("FB!=" + name);
 			result.FB = RequireInt();
 			name = GetNextName(false);
 			Require('}');
@@ -484,6 +578,7 @@ namespace YuzuTest
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
+			Options.IgnoreNewFields = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -505,7 +600,7 @@ namespace YuzuTest
 		protected override object ReadFields(object obj, string name)
 		{
 			var result = (SampleMatrix)obj;
-			if ("M" != name) throw new YuzuException();
+			if ("M" != name) throw new YuzuException("M!=" + name);
 			result.M = RequireOrNull('[') ? null : new List<List<Int32>>();
 			if (result.M != null) {
 				if (SkipSpacesCarefully() == ']') {
@@ -543,6 +638,7 @@ namespace YuzuTest
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
+			Options.IgnoreNewFields = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -564,10 +660,10 @@ namespace YuzuTest
 		protected override object ReadFields(object obj, string name)
 		{
 			var result = (SamplePoint)obj;
-			if ("X" != name) throw new YuzuException();
+			if ("X" != name) throw new YuzuException("X!=" + name);
 			result.X = RequireInt();
 			name = GetNextName(false);
-			if ("Y" != name) throw new YuzuException();
+			if ("Y" != name) throw new YuzuException("Y!=" + name);
 			result.Y = RequireInt();
 			name = GetNextName(false);
 			Require('}');
@@ -593,6 +689,7 @@ namespace YuzuTest
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
+			Options.IgnoreNewFields = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -614,10 +711,10 @@ namespace YuzuTest
 		protected override object ReadFields(object obj, string name)
 		{
 			var result = (SampleRect)obj;
-			if ("A" != name) throw new YuzuException();
+			if ("A" != name) throw new YuzuException("A!=" + name);
 			result.A = (SamplePoint)SamplePoint_JsonDeserializer.Instance.FromReader(new SamplePoint(), Reader);
 			name = GetNextName(false);
-			if ("B" != name) throw new YuzuException();
+			if ("B" != name) throw new YuzuException("B!=" + name);
 			result.B = (SamplePoint)SamplePoint_JsonDeserializer.Instance.FromReader(new SamplePoint(), Reader);
 			name = GetNextName(false);
 			Require('}');
@@ -633,6 +730,7 @@ namespace YuzuTest
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = true;
+			Options.IgnoreNewFields = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -654,7 +752,7 @@ namespace YuzuTest
 		protected override object ReadFields(object obj, string name)
 		{
 			var result = (SampleClassList)obj;
-			if ("E" != name) throw new YuzuException();
+			if ("E" != name) throw new YuzuException("E!=" + name);
 			result.E = RequireOrNull('[') ? null : new List<SampleBase>();
 			if (result.E != null) {
 				if (SkipSpacesCarefully() == ']') {

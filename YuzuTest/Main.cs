@@ -295,6 +295,7 @@ namespace YuzuTest
 				jd.Generate<SampleBool>();
 				jd.Generate<SampleList>();
 				jd.Generate<SampleDict>();
+				jd.Generate<SampleDictKeys>();
 				jd.JsonOptions.ArrayLengthPrefix = true;
 				jd.Generate<SampleArray>();
 				jd.Generate<SampleBase>();
