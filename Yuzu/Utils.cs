@@ -5,6 +5,33 @@ using System.Reflection;
 
 namespace Yuzu
 {
+#if NET40
+	internal static class Net4
+	{
+		public static bool IsDefined(this MemberInfo m, Type t)
+		{
+			return m.IsDefined(t, false);
+		}
+
+		public static Attribute GetCustomAttribute(this MemberInfo m, Type t, bool inherit)
+		{
+			var attrs = m.GetCustomAttributes(t, inherit);
+			if (attrs.Count() > 1)
+				throw new AmbiguousMatchException();
+			return (Attribute)attrs.FirstOrDefault();
+		}
+
+		public static object GetValue(this PropertyInfo m, object obj)
+		{
+			return m.GetValue(obj, new object[] { });
+		}
+		public static void SetValue(this PropertyInfo m, object obj, object value)
+		{
+			m.SetValue(obj, value, new object[] { });
+		}
+	}
+#endif
+
 	internal class YuzuItem: IComparable<YuzuItem>
 	{
 		private string id;
