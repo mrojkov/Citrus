@@ -34,17 +34,11 @@ namespace Lime
 		/// </summary>
 		public const float DegToRad = Pi / 180;
 
-		[Obsolete("Use DegToRad instead", true)]
-		public const float DegreesToRadians = DegToRad;
-
 		/// <summary>
 		/// Для перевода радиан в градусы умножайте на это число
 		/// </summary>
 		public const float RadToDeg = 180 / Pi;
-
-		[Obsolete("Use RadToDeg instead", true)]
-		public const float RadiansToDegrees = RadToDeg;
-
+		
 		public static float Max(float x, float y)
 		{
 			return (x > y) ? x : y;
@@ -292,12 +286,6 @@ namespace Lime
 				(p2 - p0) * t +
 				(2.0f * p0 - 5.0f * p1 + 4.0f * p2 - p3) * t2 +
 				(3.0f * p1 - p0 - 3.0f * p2 + p3) * t3);
-		}
-
-		[Obsolete("Use Vector2.CosSinRough(float) instead", true)]
-		public static Vector2 CosSin(float radians)
-		{
-			return Vector2.HeadingRad(radians);
 		}
 	}
 }

@@ -115,17 +115,6 @@ namespace Lime
 				return rect;
 			}
 		}
-
-		[Obsolete("Use Normalized property instead", true)]
-		public void Normalize()
-		{
-			if (A.X > B.X) {
-				Toolbox.Swap(ref A.X, ref B.X);
-			}
-			if (A.Y > B.Y) {
-				Toolbox.Swap(ref A.Y, ref B.Y);
-			}
-		}
 		
 		public bool Contains(Vector2 value)
 		{
@@ -174,15 +163,6 @@ namespace Lime
 				Mathf.Max(value.X, Right),
 				Mathf.Max(value.Y, Bottom)
 			);
-		}
-
-		[Obsolete("Use IncludingPoint instead", true)]
-		public void IncludePoint(Vector2 value)
-		{
-			Left = Mathf.Min(value.X, Left);
-			Right = Mathf.Max(value.X, Right);
-			Top = Mathf.Min(value.Y, Top);
-			Bottom = Mathf.Max(value.Y, Bottom);
 		}
 
 		// SUGGESTION: Swap to return string.Format("{0}, {1}", A.ToString(), B.ToString());?

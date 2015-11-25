@@ -98,11 +98,6 @@ namespace Lime
 			return new Vector3(lhs.X / rhs, lhs.Y / rhs, lhs.Z / rhs);
 		}
 		
-		[Obsolete("Use * instead", true)]
-		public static Vector3 Scale(Vector3 lhs, Vector3 rhs)
-		{
-			return lhs * rhs;
-		}
 		public static bool operator ==(Vector3 lhs, Vector3 rhs)
 		{
 			return lhs.X == rhs.X 
@@ -154,18 +149,6 @@ namespace Lime
 			);
 		}
 
-		[Obsolete("Use Normalized property instead", true)]
-		public void Normalize()
-		{
-			var length = Length;
-			if (length > 0)
-			{
-				X /= length;
-				Y /= length;
-				Z /= length;
-			}
-		}
-
 		/// <summary>
 		/// Returns this <see cref="Vector3"/> as a unit vector with the same direction.
 		/// </summary>
@@ -184,22 +167,10 @@ namespace Lime
 				return v;
 			}
 		}
-
-		[Obsolete("Use Normalized property instead", true)]
-		public static Vector3 Normalize(Vector3 value)
-		{
-			return value.Normalized;
-		}
 		
 		public float Length
 		{
 			get { return (float)Math.Sqrt(X * X + Y * Y + Z * Z); }
-		}
-		
-		[Obsolete("Use SqrLength instead", true)]
-		public float SquaredLength
-		{
-			get { return SqrLength; }
 		}
 
 		public float SqrLength

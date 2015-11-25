@@ -226,22 +226,6 @@ namespace Lime
 		{
 			return value1.X * value2.Y - value1.Y * value2.X;
 		}
-
-		[Obsolete("Use Normalized property instead", true)]
-		public void Normalize()
-		{
-			var length = Length;
-			if (length > 0) {
-				X /= length;
-				Y /= length;
-			}
-		}
-
-		[Obsolete("Use CosSinRough(float * Mathf.DegToRad) instead", true)]
-		public static Vector2 HeadingDeg(float degrees)
-		{
-			return CosSinRough(degrees * Mathf.DegToRad);
-		}
 		
 		/// <summary>
 		/// Creates a new <see cref="Vector2"/> that represents 
@@ -261,12 +245,6 @@ namespace Lime
 			result.X = a.X * b.X - a.Y * b.Y;
 			result.Y = a.Y * b.X + a.X * b.Y;
 			return result;
-		}
-
-		[Obsolete("Use CosSinRough(float) instead", true)]
-		public static Vector2 HeadingRad(float radians)
-		{
-			return CosSinRough(radians);
 		}
 
 		/// <summary>

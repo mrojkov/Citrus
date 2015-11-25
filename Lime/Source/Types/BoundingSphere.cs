@@ -37,12 +37,6 @@ namespace Lime
 			return ContainmentType.Intersects;
 		}
 
-		[Obsolete("Use Contains(ref BoundingSphere) instead", true)]
-		public void Contains(ref BoundingSphere sphere, out ContainmentType result)
-		{
-			result = Contains(ref sphere);
-		}
-
 		/// <summary>
 		/// Test if a vector is fully inside, outside, or just intersecting the sphere. 
 		/// </summary>
@@ -57,12 +51,6 @@ namespace Lime
 				return ContainmentType.Contains;
 			}
 			return ContainmentType.Intersects;
-		}
-		
-		[Obsolete("Use Contains(ref Vector3) instead", true)]
-		public void Contains(ref Vector3 point, out ContainmentType result)
-		{
-			result = Contains(ref point);
 		}
 
 		/// <summary>

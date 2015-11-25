@@ -29,12 +29,6 @@ namespace Lime
 			private set { current = value; } 
 		}
 
-		[Obsolete("Use Task.Current.Time", true)]
-		public float Time;
-
-		[Obsolete("Use Task.Current.Delta", true)]
-		public float Delta;
-
 		/// <summary>
 		/// Stops all tasks.
 		/// </summary>
@@ -85,13 +79,6 @@ namespace Lime
 			return Add(e(), tag);
 		}
 
-		[Obsolete("This method will be removed, inline it in your code", true)]
-		public Task Replace(IEnumerator<object> e, object tag)
-		{
-			StopByTag(tag);
-			return Add(e, tag);
-		}
-
 		private bool isBeingUpdated;
 
 		/// <summary>
@@ -120,24 +107,6 @@ namespace Lime
 				isBeingUpdated = false;
 				Current = savedCurrent;
 			}
-		}
-
-		[Obsolete("Use Task.SinMotion instead", true)]
-		public static IEnumerable<float> SinMotion(float timePeriod, float from, float to)
-		{
-			return Task.SinMotion(timePeriod, from, to);
-		}
-
-		[Obsolete("Use Task.SqrtMotion instead", true)]
-		public static IEnumerable<float> SqrtMotion(float timePeriod, float from, float to)
-		{
-			return Task.SqrtMotion(timePeriod, from, to);
-		}
-
-		[Obsolete("Use Task.LinearMotion instead", true)]
-		public static IEnumerable<float> LinearMotion(float timePeriod, float from, float to)
-		{
-			return Task.LinearMotion(timePeriod, from, to);
 		}
 	}
 }

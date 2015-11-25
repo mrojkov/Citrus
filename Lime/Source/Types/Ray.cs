@@ -75,13 +75,6 @@ namespace Lime
 			float dist = sphereRadiusSquared + distanceAlongRay * distanceAlongRay - differenceLengthSquared;
 			return dist < 0 ? null : distanceAlongRay - (float?)Math.Sqrt(dist);
 		}
-		
-		[Obsolete("Use Intersets(ref BoundingSphere) instead", true)]
-		public void Intersects(ref BoundingSphere sphere, out float? result)
-		{
-			result = Intersects(ref sphere);
-		}
-
 
 		public static bool operator !=(Ray a, Ray b)
 		{

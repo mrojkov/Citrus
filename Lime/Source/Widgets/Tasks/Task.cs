@@ -21,13 +21,7 @@ namespace Lime
 		/// Invoked on every Task update. Useful for disposing of the Task on some condition.
 		/// </summary>
 		public Action Updating;
-
-		[Obsolete("Use Updating instead", true)]
-		public Action Watcher;
-
-		[Obsolete("Use LifeTime instead", true)]
-		public float Time;
-
+		
 		public Task(IEnumerator<object> e, object tag = null)
 		{
 			Tag = tag;
@@ -180,12 +174,6 @@ namespace Lime
 				yield return null;
 			}
 #endif
-		}
-		
-		[Obsolete("Use StopIf instead", true)]
-		public static void KillMeIf(Func<bool> pred)
-		{
-			StopIf(pred);
 		}
 		
 		/// <summary>
