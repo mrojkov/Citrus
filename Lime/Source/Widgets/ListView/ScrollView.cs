@@ -248,17 +248,18 @@ namespace Lime
 					totalScrollAmount -= Frame.Input.WheelScrollAmount;
 				}
 
-				if (totalScrollAmount.Abs() > 1 && wheelScrollState != 0) {
+				if (totalScrollAmount.Abs() > 0 && wheelScrollState != WheelScrollState.Stop) {
 					StopScrolling();
 					var stepPerFrame = totalScrollAmount * Task.Current.Delta * 4;
+					var prevScrollPosition = ScrollPosition;
 					ScrollPosition = Mathf.Clamp(ScrollPosition + stepPerFrame, MinScrollPosition, MaxScrollPosition);
-					totalScrollAmount -= stepPerFrame;
 					if (ScrollPosition == MinScrollPosition || ScrollPosition == MaxScrollPosition) {
 						totalScrollAmount = 0f;
 					} else {
 						// If scroll stopped in the middle, we need to round to upper int if we move down
 						// or to lower int if we move up.
 						ScrollPosition = stepPerFrame > 0 ? ScrollPosition.Ceiling() : ScrollPosition.Floor();
+						totalScrollAmount += (prevScrollPosition - ScrollPosition);
 					}
 				} else {
 					wheelScrollState = WheelScrollState.Stop;
