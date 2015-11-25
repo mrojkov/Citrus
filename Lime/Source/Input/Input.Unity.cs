@@ -169,7 +169,9 @@ namespace Lime
 		{
 			TextInput = null;
 			CopyKeysState();
+			ProcessPendingKeyEvents();
 			RefreshMousePosition();
+			RefreshMouseWheel();
 			currentKeysState[(int)Key.Mouse0] = UnityEngine.Input.GetMouseButton(0);
 			currentKeysState[(int)Key.Mouse1] = UnityEngine.Input.GetMouseButton(1);
 			currentKeysState[(int)Key.Mouse2] = UnityEngine.Input.GetMouseButton(2);
@@ -285,6 +287,20 @@ namespace Lime
 			var p = UnityEngine.Input.mousePosition;
 			MousePosition = new Vector2(p.x, UnityEngine.Screen.height - p.y);
 			MousePosition *= ScreenToWorldTransform;
+		}
+
+		private void RefreshMouseWheel()
+		{
+			var wheelDelta = UnityEngine.Input.mouseScrollDelta.y;
+			WheelScrollAmount = wheelDelta;
+			if (wheelDelta > 0) {
+				SetKeyState(Key.MouseWheelUp, true);
+				SetKeyState(Key.MouseWheelUp, false);
+			} 
+			if (wheelDelta < 0) {
+				SetKeyState(Key.MouseWheelDown, true);
+				SetKeyState(Key.MouseWheelDown, false);
+			}
 		}
 
 		internal void CopyKeysState()
