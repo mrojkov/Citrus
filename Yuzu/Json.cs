@@ -16,6 +16,8 @@ namespace Yuzu
 		public bool EnumAsString = false;
 		public bool ArrayLengthPrefix = false;
 		public bool IgnoreCompact = false;
+		public string DateFormat = "O";
+		public string TimeSpanFormat = "c";
 	};
 
 	public class JsonSerializer : AbstractWriterSerializer
@@ -52,6 +54,16 @@ namespace Yuzu
 		private void WriteBool(object obj)
 		{
 			WriteStr((bool)obj ? "true" : "false");
+		}
+
+		private void WriteDateTime(object obj)
+		{
+			WriteString(((DateTime)obj).ToString(JsonOptions.DateFormat, CultureInfo.InvariantCulture));
+		}
+
+		private void WriteTimeSpan(object obj)
+		{
+			WriteString(((TimeSpan)obj).ToString(JsonOptions.TimeSpanFormat, CultureInfo.InvariantCulture));
 		}
 
 		private void WriteList<T>(List<T> list)
@@ -128,6 +140,10 @@ namespace Yuzu
 				return WriteString;
 			if (t == typeof(bool))
 				return WriteBool;
+			if (t == typeof(DateTime))
+				return WriteDateTime;
+			if (t == typeof(TimeSpan))
+				return WriteTimeSpan;
 			if (t.IsEnum) {
 				if (JsonOptions.EnumAsString)
 					return WriteString;
@@ -428,6 +444,16 @@ namespace Yuzu
 			return Single.Parse(ParseFloat(), CultureInfo.InvariantCulture);
 		}
 
+		protected DateTime RequireDateTime()
+		{
+			return DateTime.ParseExact(RequireString(), JsonOptions.DateFormat, CultureInfo.InvariantCulture);
+		}
+
+		protected TimeSpan RequireTimeSpan()
+		{
+			return TimeSpan.ParseExact(RequireString(), JsonOptions.TimeSpanFormat, CultureInfo.InvariantCulture);
+		}
+
 		protected string GetNextName(bool first)
 		{
 			var ch = SkipSpaces();
@@ -569,6 +595,8 @@ namespace Yuzu
 		private object RequireUIntObj() { return RequireUInt(); }
 		private object RequireSingleObj() { return RequireSingle(); }
 		private object RequireDoubleObj() { return RequireDouble(); }
+		private object RequireDateTimeObj() { return RequireDateTime(); }
+		private object RequireTimeSpanObj() { return RequireTimeSpan(); }
 
 		private Func<object> ReadValueFunc(Type t)
 		{
@@ -584,6 +612,10 @@ namespace Yuzu
 				return RequireSingleObj;
 			if (t == typeof(double))
 				return RequireDoubleObj;
+			if (t == typeof(DateTime))
+				return RequireDateTimeObj;
+			if (t == typeof(TimeSpan))
+				return RequireTimeSpanObj;
 			if (t.IsEnum) {
 				if (JsonOptions.EnumAsString)
 					return () => Enum.Parse(t, RequireString());

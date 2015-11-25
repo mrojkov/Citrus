@@ -573,6 +573,25 @@ namespace YuzuTest
 		}
 
 		[TestMethod]
+		public void TestDate()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = " ";
+
+			var v1 = new SampleDate { D = new DateTime(2011, 3, 25), T = TimeSpan.FromMinutes(5) };
+			var result1 = js.ToString(v1);
+			Assert.AreEqual("{ \"D\":\"2011-03-25T00:00:00.0000000\", \"T\":\"00:05:00\" }", result1);
+			js.JsonOptions.DateFormat = @"yyyy";
+			Assert.AreEqual("{ \"D\":\"2011\", \"T\":\"00:05:00\" }", js.ToString(v1));
+
+			var w1 = new SampleDate();
+			(new JsonDeserializer()).FromString(w1, result1);
+			Assert.AreEqual(v1.D, w1.D);
+			Assert.AreEqual(v1.T, w1.T);
+		}
+
+		[TestMethod]
 		public void TestErrors()
 		{
 			var jd = new JsonDeserializer();

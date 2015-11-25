@@ -187,6 +187,14 @@ namespace YuzuTest
 		public object F;
 	}
 
+	public class SampleDate
+	{
+		[YuzuRequired]
+		public DateTime D;
+		[YuzuRequired]
+		public TimeSpan T;
+	}
+
 	public static class XAssert
 	{
 		public static void Throws<TExpectedException>(Action exceptionThrower, string expectedExceptionMessage = "")
