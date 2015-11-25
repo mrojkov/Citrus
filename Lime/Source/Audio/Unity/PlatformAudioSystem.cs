@@ -12,9 +12,8 @@ namespace Lime
 
 		public static bool Active;
 
-		public static void Initialize()
+		public static void Initialize(ApplicationOptions options)
 		{
-			var options = Application.Instance.Options;
 			if (options.DecodeAudioInSeparateThread) {
 				throw new Lime.Exception("Unity3D doesn't support setting audio volume in separate thread. Set DecodeAudioInSeparateThread = false and use AudioSystem.Update()");
 			}

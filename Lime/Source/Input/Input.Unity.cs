@@ -6,24 +6,30 @@ using System.Text;
 
 namespace Lime
 {
-	public static class Input
+	public class Input
 	{
-		public static class Simulator
+		public class Simulator
 		{
-			public static void SetMousePosition(Vector2 position)
+			Input input;
+			public Simulator(Input input)
 			{
-				Input.MousePosition = position;
+				this.input = input;
 			}
 
-			public static void SetKeyState(Key key, bool value)
+			public void SetMousePosition(Vector2 position)
 			{
-				Input.SetKeyState(key, value);
+				input.MousePosition = position;
 			}
 
-			public static void OnBetweenFrames()
+			public void SetKeyState(Key key, bool value)
 			{
-				Input.CopyKeysState();
-				Input.ProcessPendingKeyEvents();
+				input.SetKeyState(key, value);
+			}
+
+			public void OnBetweenFrames()
+			{
+				input.CopyKeysState();
+				input.ProcessPendingKeyEvents();
 			}
 		}
 
@@ -33,34 +39,39 @@ namespace Lime
 			public bool State;
 		}
 
-		private static Vector2[] touchPositions = new Vector2[MaxTouches];
+		private Vector2[] touchPositions = new Vector2[MaxTouches];
 
-		private static List<KeyEvent> keyEventQueue = new List<KeyEvent>();
+		private List<KeyEvent> keyEventQueue = new List<KeyEvent>();
 		
 		public const int MaxTouches = 4;
 
-		static bool[] previousKeysState = new bool[(int)Key.KeyCount];
-		static bool[] currentKeysState = new bool[(int)Key.KeyCount];
+		bool[] previousKeysState = new bool[Enum.GetNames(typeof(Key)).Length];
+		bool[] currentKeysState = new bool[Enum.GetNames(typeof(Key)).Length];
 
 		/// <summary>
 		/// The matrix describes transition from pixels to virtual coordinates.
 		/// </summary>
-		public static Matrix32 ScreenToWorldTransform = Matrix32.Identity;
+		public Matrix32 ScreenToWorldTransform = Matrix32.Identity;
 
 		/// <summary>
 		/// The current mouse position in virtual coordinates coordinates. (read only)
 		/// </summary>
-		public static Vector2 MousePosition { get; private set; }
+		public Vector2 MousePosition { get; private set; }
+
+		/// <summary>
+		/// Indicates how much the mouse wheel was moved
+		/// </summary>
+		public float WheelScrollAmount { get; internal set; }
 
 		/// <summary>
 		/// The current accelerometer state (read only).
 		/// </summary>
-		public static Vector3 Acceleration { get; internal set; }
+		public Vector3 Acceleration { get; internal set; }
 
 		/// <summary>
 		/// Returns true while the user holds down the key identified by name. Think auto fire.
 		/// </summary>
-		public static bool IsKeyPressed(Key key)
+		public bool IsKeyPressed(Key key)
 		{
 			return currentKeysState[(int)key];
 		}
@@ -68,7 +79,7 @@ namespace Lime
 		/// <summary>
 		/// Returns true during the frame the user releases the key identified by name.
 		/// </summary>
-		public static bool WasKeyReleased(Key key)
+		public bool WasKeyReleased(Key key)
 		{
 			return !currentKeysState[(int)key] && previousKeysState[(int)key];
 		}
@@ -76,52 +87,52 @@ namespace Lime
 		/// <summary>
 		/// Returns true during the frame the user starts pressing down the key identified by name.
 		/// </summary>
-		public static bool WasKeyPressed(Key key)
+		public bool WasKeyPressed(Key key)
 		{
 			return currentKeysState[(int)key] && !previousKeysState[(int)key];
 		}
 
-		public static bool WasMousePressed(int button = 0)
+		public bool WasMousePressed(int button = 0)
 		{
 			return WasKeyPressed((Key)((int)Key.Mouse0 + button));
 		}
 
-		public static bool WasMouseReleased(int button = 0)
+		public bool WasMouseReleased(int button = 0)
 		{
 			return WasKeyReleased((Key)((int)Key.Mouse0 + button));
 		}
 
-		public static bool IsMousePressed(int button = 0)
+		public bool IsMousePressed(int button = 0)
 		{
 			return IsKeyPressed((Key)((int)Key.Mouse0 + button));
 		}
 
-		public static bool WasTouchBegan(int index)
+		public bool WasTouchBegan(int index)
 		{
 			return WasKeyPressed((Key)((int)Key.Touch0 + index));
 		}
 
-		public static bool WasTouchEnded(int index)
+		public bool WasTouchEnded(int index)
 		{
 			return WasKeyReleased((Key)((int)Key.Touch0 + index));
 		}
 
-		public static bool IsTouching(int index)
+		public bool IsTouching(int index)
 		{
 			return IsKeyPressed((Key)((int)Key.Touch0 + index));
 		}
 
-		public static Vector2 GetTouchPosition(int index)
+		public Vector2 GetTouchPosition(int index)
 		{
 			return touchPositions[index];
 		}
 
-		internal static void SetTouchPosition(int index, Vector2 position)
+		internal void SetTouchPosition(int index, Vector2 position)
 		{
 			touchPositions[index] = position;
 		}
 		
-		public static int GetNumTouches()
+		public int GetNumTouches()
 		{
 			int j = 0;
 			for (int i = 0; i < MaxTouches; i++) {
@@ -131,17 +142,17 @@ namespace Lime
 			return j;
 		}
 		
-		public static string TextInput { get; internal set; }
+		public string TextInput { get; internal set; }
 
-		internal static void SetKeyState(Key key, bool value)
+		internal void SetKeyState(Key key, bool value)
 		{
 			keyEventQueue.Add(new KeyEvent{Key = key, State = value});
 		}
 		
-		internal static void ProcessPendingKeyEvents()
+		internal void ProcessPendingKeyEvents()
 		{
 			if (keyEventQueue.Count > 0) {
-				var processedKeys = new bool[(int)Key.KeyCount];
+				var processedKeys = new bool[Enum.GetNames(typeof(Key)).Length];
 				for (int i = 0; i < keyEventQueue.Count; i++) {
 					var evt = keyEventQueue[i];
 					if (!processedKeys[(int)evt.Key]) {
@@ -154,10 +165,10 @@ namespace Lime
 			}
 		}
 
-		public static void Refresh()
+		public void Refresh()
 		{
-			Input.TextInput = null;
-			Input.CopyKeysState();
+			TextInput = null;
+			CopyKeysState();
 			RefreshMousePosition();
 			currentKeysState[(int)Key.Mouse0] = UnityEngine.Input.GetMouseButton(0);
 			currentKeysState[(int)Key.Mouse1] = UnityEngine.Input.GetMouseButton(1);
@@ -264,19 +275,19 @@ namespace Lime
 			GrabKeyState(UnityEngine.KeyCode.Backslash, Key.BackSlash);
 		}
 
-		private static void GrabKeyState(UnityEngine.KeyCode unityKey, Key ourKey)
+		private void GrabKeyState(UnityEngine.KeyCode unityKey, Key ourKey)
 		{
 			currentKeysState[(int)ourKey] = UnityEngine.Input.GetKey(unityKey);
 		}
 
-		private static void RefreshMousePosition()
+		private void RefreshMousePosition()
 		{
 			var p = UnityEngine.Input.mousePosition;
 			MousePosition = new Vector2(p.x, UnityEngine.Screen.height - p.y);
 			MousePosition *= ScreenToWorldTransform;
 		}
 
-		internal static void CopyKeysState()
+		internal void CopyKeysState()
 		{
 			currentKeysState.CopyTo(previousKeysState, 0);
 		}

@@ -199,12 +199,12 @@ namespace Lime
 			UIApplication.SharedApplication.IdleTimerDisabled = !IsAllowedGoingToSleepMode();
 #endif
 		}
-
+#if !UNITY
 		public static void DiscardOpenGLObjects()
 		{
 			GLObjectRegistry.Instance.DiscardObjects();
 		}
-
+#endif		
 #if iOS
 		private static bool IsAllowedGoingToSleepMode()
 		{
@@ -220,7 +220,6 @@ namespace Lime
 			}
 		}
 
-#if !UNITY
 		private static void RunScheduledActions(float delta)
 		{
 			lock (scheduledActionsSync) {
@@ -243,7 +242,6 @@ namespace Lime
 				scheduledActions = null;
 			}
 		}
-#endif
 
 		private static void SetGlobalExceptionHandler()
 		{

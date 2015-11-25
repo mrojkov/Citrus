@@ -331,11 +331,8 @@ namespace Lime
 				Main != Key.Unknown && input.WasKeyPressed(Main) &&
 				input.IsSingleKeyPressed(Modifier, Key.Unknown + 1, Key.Menu);
 		}
-	}
 
-	public static class ShortcutExt
-	{
-		public static Shortcut Plus(this Key modifier, Key main) { return new Shortcut(modifier, main); }
+		public static Shortcut Plus(Key modifier, Key main) { return new Shortcut(modifier, main); }
 	}
 
 	/// <summary>
@@ -344,7 +341,7 @@ namespace Lime
 	public class KeyboardFocusController
 	{
 		public Shortcut NextField = Key.Tab;
-		public Shortcut PreviousField = Key.LShift.Plus(Key.Tab);
+		public Shortcut PreviousField = Shortcut.Plus(Key.LShift, Key.Tab);
 		public Shortcut NextFieldOrSubmit = Key.Enter;
 		public Shortcut Cancel = Key.Escape;
 

@@ -31,6 +31,12 @@ namespace Lime
 			}
 			return true;
 		}
+
+		public static void Restart(this System.Diagnostics.Stopwatch stopwatch)
+		{
+			stopwatch.Reset();
+			stopwatch.Start();
+		}
 #else
 		public static bool IsNullOrWhiteSpace(this string value)
 		{
