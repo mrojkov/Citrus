@@ -89,7 +89,7 @@ namespace Lime
 			if (vboHandle != 0) {
 				var capturedVboHandle = vboHandle;
 				Application.InvokeOnMainThread(() => {
-#if !MAC
+#if !MAC && !MONOMAC
 					if (OpenTK.Graphics.GraphicsContext.CurrentContext == null)
 						return;
 #endif

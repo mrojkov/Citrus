@@ -74,7 +74,7 @@ namespace Lime
 			if (handle != 0) {
 				var capturedHandle = handle;
 				Application.InvokeOnMainThread(() => {
-#if MAC
+#if MAC || MONOMAC
 					GL.DeleteProgram(1, new int[] { capturedHandle });
 #else
 					GL.DeleteProgram(capturedHandle);

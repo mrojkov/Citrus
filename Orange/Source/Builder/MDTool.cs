@@ -44,6 +44,10 @@ namespace Orange.Source
 					platformSpecification = "";
 					break;
 				}
+			case TargetPlatform.Android: {
+					platformSpecification = "";
+					break;
+				}
 				default: {
 					throw new NotSupportedException();
 				}

@@ -59,7 +59,6 @@
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral" />
-    <Reference Include="System.Drawing" />
     <Reference Include="Xamarin.Mac" />
   </ItemGroup>
   <ItemGroup>

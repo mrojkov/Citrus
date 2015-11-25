@@ -1,4 +1,4 @@
-#if OPENGL && !MAC
+#if OPENGL && !MAC && !MONOMAC
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -55,7 +55,7 @@ namespace Lime
 			UploadVertices();
 			UploadIndices();
 			int offset = startIndex * sizeof(short);
-#if MAC
+#if MAC || MONOMAC
 			GL.DrawElements(BeginMode.Triangles, count, DrawElementsType.UnsignedShort, (IntPtr)offset);
 #else
 			GL.DrawElements(PrimitiveType.Triangles, count, DrawElementsType.UnsignedShort, (IntPtr)offset);

@@ -64,7 +64,7 @@ namespace Lime
 			if (iboHandle != 0) {
 				var capturedIboHandle = iboHandle;
 				Application.InvokeOnMainThread(() => {
-#if !MAC
+#if !MAC && !MONOMAC
 					if (OpenTK.Graphics.GraphicsContext.CurrentContext == null)
 						return;
 #endif

@@ -50,7 +50,7 @@ namespace Lime
 		private void CreateShader()
 		{
 			handle = GL.CreateShader(fragmentOrVertex ? ShaderType.FragmentShader : ShaderType.VertexShader);
-#if MAC
+#if MAC || MONOMAC
 			var length = source.Length;
 			GL.ShaderSource(handle, 1, new string[] { source }, ref length);
 #else
