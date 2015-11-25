@@ -211,9 +211,7 @@ namespace YuzuTest
 			}
 			catch (TExpectedException ex)
 			{
-				Assert.IsTrue(
-					ex.Message.Contains(expectedExceptionMessage),
-					"Expected message part:<{0}>. Actual message:<{1}>.", expectedExceptionMessage, ex.Message);
+				StringAssert.Contains(ex.Message, expectedExceptionMessage, "Bad exception message");
 			}
 		}
 	}
