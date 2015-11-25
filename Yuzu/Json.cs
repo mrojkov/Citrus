@@ -281,7 +281,7 @@ namespace Yuzu
 				if (v < 0)
 					return '\0';
 				var ch = (char)v;
-				if (ch != ' ' && ch != '\t' || ch != '\n' || ch != '\r')
+				if (ch != ' ' && ch != '\t' && ch != '\n' && ch != '\r')
 					return ch;
 				Reader.ReadChar();
 			}

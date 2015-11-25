@@ -521,6 +521,15 @@ namespace YuzuTest
 		}
 
 		[TestMethod]
+		public void TestSpaces()
+		{
+			var jd = new JsonDeserializer();
+			var w = new SampleList();
+			jd.FromString(w, "{   \t\t\n\n\n\r \"E\":   \t\t\n\n[  \n\t\n\t]    }");
+			Assert.AreEqual(0, w.E.Count);
+		}
+
+		[TestMethod]
 		public void TestErrors()
 		{
 			var jd = new JsonDeserializer();
