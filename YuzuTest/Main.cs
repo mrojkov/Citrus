@@ -312,6 +312,7 @@ namespace YuzuTest
 				jd.Generate<SampleMatrix>();
 				jd.Generate<SamplePoint>();
 				jd.Generate<SampleRect>();
+				jd.Generate<SampleDate>();
 				jd.Options.ClassNames = true;
 				jd.Generate<SampleClassList>();
 				jd.GenerateFooter();

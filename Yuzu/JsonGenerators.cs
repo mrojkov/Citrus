@@ -111,6 +111,12 @@ namespace Yuzu
 			else if (t == typeof(double)) {
 				PutPart("RequireDouble();\n");
 			}
+			else if (t == typeof(DateTime)) {
+				PutPart("RequireDateTime();\n");
+			}
+			else if (t == typeof(TimeSpan)) {
+				PutPart("RequireTimeSpan();\n");
+			}
 			else if (t.IsEnum) {
 				PutPart(String.Format(
 					JsonOptions.EnumAsString ?

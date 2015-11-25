@@ -589,6 +589,10 @@ namespace YuzuTest
 			(new JsonDeserializer()).FromString(w1, result1);
 			Assert.AreEqual(v1.D, w1.D);
 			Assert.AreEqual(v1.T, w1.T);
+
+			w1 = (SampleDate)SampleDate_JsonDeserializer.Instance.FromString(result1);
+			Assert.AreEqual(v1.D, w1.D);
+			Assert.AreEqual(v1.T, w1.T);
 		}
 
 		[TestMethod]

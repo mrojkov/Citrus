@@ -22,6 +22,8 @@ namespace YuzuTest
 			JsonOptions.EnumAsString = false;
 			JsonOptions.ArrayLengthPrefix = false;
 			JsonOptions.IgnoreCompact = false;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
 		}
 
 		public override object FromReaderInt()
@@ -64,6 +66,8 @@ namespace YuzuTest
 			JsonOptions.EnumAsString = false;
 			JsonOptions.ArrayLengthPrefix = false;
 			JsonOptions.IgnoreCompact = false;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
 		}
 
 		public override object FromReaderInt()
@@ -106,6 +110,8 @@ namespace YuzuTest
 			JsonOptions.EnumAsString = false;
 			JsonOptions.ArrayLengthPrefix = false;
 			JsonOptions.IgnoreCompact = false;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
 		}
 
 		public override object FromReaderInt()
@@ -152,6 +158,8 @@ namespace YuzuTest
 			JsonOptions.EnumAsString = true;
 			JsonOptions.ArrayLengthPrefix = false;
 			JsonOptions.IgnoreCompact = false;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
 		}
 
 		public override object FromReaderInt()
@@ -191,6 +199,8 @@ namespace YuzuTest
 			JsonOptions.EnumAsString = true;
 			JsonOptions.ArrayLengthPrefix = false;
 			JsonOptions.IgnoreCompact = false;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
 		}
 
 		public override object FromReaderInt()
@@ -229,6 +239,8 @@ namespace YuzuTest
 			JsonOptions.EnumAsString = true;
 			JsonOptions.ArrayLengthPrefix = false;
 			JsonOptions.IgnoreCompact = false;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
 		}
 
 		public override object FromReaderInt()
@@ -278,6 +290,8 @@ namespace YuzuTest
 			JsonOptions.EnumAsString = true;
 			JsonOptions.ArrayLengthPrefix = false;
 			JsonOptions.IgnoreCompact = false;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
 		}
 
 		public override object FromReaderInt()
@@ -333,6 +347,8 @@ namespace YuzuTest
 			JsonOptions.EnumAsString = true;
 			JsonOptions.ArrayLengthPrefix = false;
 			JsonOptions.IgnoreCompact = false;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
 		}
 
 		public override object FromReaderInt()
@@ -416,6 +432,8 @@ namespace YuzuTest
 			JsonOptions.EnumAsString = true;
 			JsonOptions.ArrayLengthPrefix = true;
 			JsonOptions.IgnoreCompact = false;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
 		}
 
 		public override object FromReaderInt()
@@ -465,6 +483,8 @@ namespace YuzuTest
 			JsonOptions.EnumAsString = true;
 			JsonOptions.ArrayLengthPrefix = true;
 			JsonOptions.IgnoreCompact = false;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
 		}
 
 		public override object FromReaderInt()
@@ -503,6 +523,8 @@ namespace YuzuTest
 			JsonOptions.EnumAsString = true;
 			JsonOptions.ArrayLengthPrefix = true;
 			JsonOptions.IgnoreCompact = false;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
 		}
 
 		public override object FromReaderInt()
@@ -544,6 +566,8 @@ namespace YuzuTest
 			JsonOptions.EnumAsString = true;
 			JsonOptions.ArrayLengthPrefix = true;
 			JsonOptions.IgnoreCompact = false;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
 		}
 
 		public override object FromReaderInt()
@@ -585,6 +609,8 @@ namespace YuzuTest
 			JsonOptions.EnumAsString = true;
 			JsonOptions.ArrayLengthPrefix = true;
 			JsonOptions.IgnoreCompact = false;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
 		}
 
 		public override object FromReaderInt()
@@ -645,6 +671,8 @@ namespace YuzuTest
 			JsonOptions.EnumAsString = true;
 			JsonOptions.ArrayLengthPrefix = true;
 			JsonOptions.IgnoreCompact = false;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
 		}
 
 		public override object FromReaderInt()
@@ -696,6 +724,8 @@ namespace YuzuTest
 			JsonOptions.EnumAsString = true;
 			JsonOptions.ArrayLengthPrefix = true;
 			JsonOptions.IgnoreCompact = false;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
 		}
 
 		public override object FromReaderInt()
@@ -722,6 +752,49 @@ namespace YuzuTest
 		}
 	}
 
+	class SampleDate_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new SampleDate_JsonDeserializer Instance = new SampleDate_JsonDeserializer();
+
+		public SampleDate_JsonDeserializer()
+		{
+			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+			Options.ClassNames = false;
+			Options.IgnoreNewFields = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.EnumAsString = true;
+			JsonOptions.ArrayLengthPrefix = true;
+			JsonOptions.IgnoreCompact = false;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderInt(new SampleDate());
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new SampleDate(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (SampleDate)obj;
+			if ("D" != name) throw new YuzuException("D!=" + name);
+			result.D = RequireDateTime();
+			name = GetNextName(false);
+			if ("T" != name) throw new YuzuException("T!=" + name);
+			result.T = RequireTimeSpan();
+			name = GetNextName(false);
+			Require('}');
+			return result;
+		}
+	}
+
 	class SampleClassList_JsonDeserializer : JsonDeserializerGenBase
 	{
 		public static new SampleClassList_JsonDeserializer Instance = new SampleClassList_JsonDeserializer();
@@ -737,6 +810,8 @@ namespace YuzuTest
 			JsonOptions.EnumAsString = true;
 			JsonOptions.ArrayLengthPrefix = true;
 			JsonOptions.IgnoreCompact = false;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
 		}
 
 		public override object FromReaderInt()
