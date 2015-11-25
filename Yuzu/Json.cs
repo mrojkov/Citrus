@@ -220,6 +220,10 @@ namespace Yuzu
 
 		private void ToWriterCompact(object obj)
 		{
+			if (obj == null) {
+				WriteStr("null");
+				return;
+			}
 			writer.Write('[');
 			WriteStr(JsonOptions.FieldSeparator);
 			var isFirst = true;
