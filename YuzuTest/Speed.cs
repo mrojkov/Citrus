@@ -210,6 +210,18 @@ namespace YuzuTest
 		}
 
 		[TestMethod]
+		public void TestJsonReadObject()
+		{
+			var jd = new JsonDeserializer();
+			jd.Options.TagMode = TagMode.Aliases;
+			jd.Options.AllowEmptyTypes = true;
+			object p = new object();
+			jsonStream.Position = 0;
+			p = jd.FromStream(p, jsonStream);
+			Assert.AreEqual(person.Name, ((Dictionary<string, object>)p)["1"]);
+		}
+
+		[TestMethod]
 		public void TestJsonGenRead()
 		{
 			jsonStream.Position = 0;

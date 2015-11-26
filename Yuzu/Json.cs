@@ -878,6 +878,9 @@ namespace Yuzu
 		public override object FromReaderInt(object obj)
 		{
 			KillBuf();
+			// HACK: We can not modify the object we are given, so return a new one instead.
+			if (obj.GetType() == typeof(object))
+				return ReadObject();
 			switch (RequireBracketOrNull()) {
 				case 'n':
 					return null;
