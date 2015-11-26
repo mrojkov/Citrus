@@ -231,6 +231,7 @@ namespace Lime
 
 		private IEnumerator<object> WheelScrollingTask()
 		{
+			const int wheelScrollingSpeedFactor = 8;
 			wheelScrollState = WheelScrollState.Stop;
 			float totalScrollAmount = 0f;
 			while (true) {
@@ -245,12 +246,12 @@ namespace Lime
 						totalScrollAmount = 0f;
 						wheelScrollState = newWheelScrollState;
 					}
-					totalScrollAmount -= Frame.Input.WheelScrollAmount;
+					totalScrollAmount = Frame.Input.WheelScrollAmount == 0 ? totalScrollAmount = 0f : totalScrollAmount -= Frame.Input.WheelScrollAmount;
 				}
 
 				if (totalScrollAmount.Abs() > 0 && wheelScrollState != WheelScrollState.Stop) {
 					StopScrolling();
-					var stepPerFrame = totalScrollAmount * Task.Current.Delta * 4;
+					var stepPerFrame = totalScrollAmount * Task.Current.Delta * wheelScrollingSpeedFactor;
 					var prevScrollPosition = ScrollPosition;
 					ScrollPosition = Mathf.Clamp(ScrollPosition + stepPerFrame, MinScrollPosition, MaxScrollPosition);
 					if (ScrollPosition == MinScrollPosition || ScrollPosition == MaxScrollPosition) {
