@@ -427,6 +427,19 @@ namespace Yuzu
 			}
 		}
 
+		protected string RequireUnescapedString()
+		{
+			sb.Clear();
+			Require('"');
+			while (true) {
+				var ch = Reader.ReadChar();
+				if (ch == '"')
+					break;
+				sb.Append(ch);
+			}
+			return sb.ToString();
+		}
+
 		// Optimization: avoid re-creating StringBuilder.
 		private StringBuilder sb = new StringBuilder();
 
@@ -556,12 +569,14 @@ namespace Yuzu
 
 		protected DateTime RequireDateTime()
 		{
-			return DateTime.ParseExact(RequireString(), JsonOptions.DateFormat, CultureInfo.InvariantCulture);
+			var s = JsonOptions.DateFormat == "O" ? RequireUnescapedString() : RequireString();
+			return DateTime.ParseExact(s, JsonOptions.DateFormat, CultureInfo.InvariantCulture);
 		}
 
 		protected TimeSpan RequireTimeSpan()
 		{
-			return TimeSpan.ParseExact(RequireString(), JsonOptions.TimeSpanFormat, CultureInfo.InvariantCulture);
+			var s = JsonOptions.TimeSpanFormat == "c" ? RequireUnescapedString() : RequireString();
+			return TimeSpan.ParseExact(s, JsonOptions.TimeSpanFormat, CultureInfo.InvariantCulture);
 		}
 
 		protected string GetNextName(bool first)
@@ -575,7 +590,7 @@ namespace Yuzu
 			PutBack(ch);
 			if (ch == '}')
 				return "";
-			var result = RequireString();
+			var result = RequireUnescapedString();
 			Require(':');
 			return result;
 		}
