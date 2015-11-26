@@ -225,6 +225,26 @@ namespace Yuzu
 			}
 		}
 
+		private void GenAssigns(string name, object obj)
+		{
+			foreach (var m in obj.GetType().GetMembers()) {
+				if (m.MemberType == MemberTypes.Field) {
+					var f = (FieldInfo)m;
+					var v = Utils.CodeValueFormat(f.GetValue(obj));
+					if (v != "") // TODO
+						PutF("{0}.{1} = {2};\n", name, f.Name, v);
+				}
+				else if (m.MemberType == MemberTypes.Property) {
+					var p = (PropertyInfo)m;
+					if (p.CanWrite) {
+						var v = Utils.CodeValueFormat(p.GetValue(obj));
+						if (v != "") // TODO
+							PutF("{0}.{1} = {2};\n", name, p.Name, v);
+					}
+				}
+			}
+		}
+
 		public void Generate<T>()
 		{
 			PutF("class {0}_JsonDeserializer : JsonDeserializerGenBase\n", typeof(T).Name);
@@ -236,16 +256,8 @@ namespace Yuzu
 			PutF("public {0}_JsonDeserializer()\n", typeof(T).Name);
 			Put("{\n");
 			PutF("Options.Assembly = Assembly.Load(\"{0}\");\n", typeof(T).Assembly.FullName);
-			foreach (var f in Options.GetType().GetFields()) {
-				var v = Utils.CodeValueFormat(f.GetValue(Options));
-				if (v != "") // TODO
-					PutF("Options.{0} = {1};\n", f.Name, v);
-			}
-			foreach (var f in JsonOptions.GetType().GetFields()) {
-				var v = Utils.CodeValueFormat(f.GetValue(JsonOptions));
-				if (v != "") // TODO
-					PutF("JsonOptions.{0} = {1};\n", f.Name, v);
-			}
+			GenAssigns("Options", Options);
+			GenAssigns("JsonOptions", JsonOptions);
 			Put("}\n");
 			Put("\n");
 

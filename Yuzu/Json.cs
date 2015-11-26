@@ -10,7 +10,7 @@ namespace Yuzu
 {
 	public class JsonSerializeOptions
 	{
-		public int generation = 0;
+		private int generation = 0;
 		public int Generation { get { return generation; } }
 
 		public string FieldSeparator = "\n";
