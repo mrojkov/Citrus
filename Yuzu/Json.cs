@@ -20,6 +20,46 @@ namespace Yuzu
 		public string TimeSpanFormat = "c";
 	};
 
+	internal static class JsonEscapeData
+	{
+		public static char[] unescapeChars = new char['t' + 1];
+		public static char[] escapeChars = new char['\\' + 1];
+		public static int[] hexDigits = new int['f' + 1];
+		public static char[] digitHex = new char[16];
+
+		// Optimization: array access is slightly faster than two or more sequential comparisons.
+		static JsonEscapeData()
+		{
+			for (int i = 0; i < hexDigits.Length; ++i)
+				hexDigits[i] = -1;
+			for (int i = 0; i < 10; ++i) {
+				hexDigits[i + '0'] = i;
+				digitHex[i] = (char)(i + '0');
+			}
+			for (int i = 0; i < 6; ++i) {
+				hexDigits[i + 'a'] = hexDigits[i + 'A'] = i + 10;
+				digitHex[i + 10] = (char)(i + 'a');
+			}
+			unescapeChars['"'] = '"';
+			unescapeChars['\\'] = '\\';
+			unescapeChars['/'] = '/';
+			unescapeChars['b'] = '\b';
+			unescapeChars['f'] = '\f';
+			unescapeChars['n'] = '\n';
+			unescapeChars['r'] = '\r';
+			unescapeChars['t'] = '\t';
+
+			escapeChars['"'] = '"';
+			escapeChars['\\'] = '\\';
+			escapeChars['/'] = '/';
+			escapeChars['\b'] = 'b';
+			escapeChars['\f'] = 'f';
+			escapeChars['\n'] = 'n';
+			escapeChars['\r'] = 'r';
+			escapeChars['\t'] = 't';
+		}
+	}
+
 	public class JsonSerializer : AbstractWriterSerializer
 	{
 		public JsonSerializeOptions JsonOptions = new JsonSerializeOptions();
@@ -47,7 +87,22 @@ namespace Yuzu
 		private void WriteString(object obj)
 		{
 			writer.Write('"');
-			WriteStr(obj.ToString());
+			foreach (var ch in obj.ToString()) {
+				var escape = ch <= '\\' ? JsonEscapeData.escapeChars[ch] : '\0';
+				if (escape > 0) {
+					writer.Write('\\');
+					writer.Write(escape);
+				}
+				else if (ch < ' ') {
+					writer.Write('\\');
+					writer.Write('u');
+					for (int i = 3 * 4; i >= 0; i -= 4)
+						writer.Write(JsonEscapeData.digitHex[ch >> i & 0xf]);
+				}
+				else {
+					writer.Write(ch);
+				}
+			}
 			writer.Write('"');
 		}
 
@@ -324,21 +379,6 @@ namespace Yuzu
 			}
 		}
 
-		private char JsonUnescape(char ch)
-		{
-			switch (ch) {
-				case '"':
-					return '"';
-				case '\\':
-					return '\\';
-				case 'n':
-					return '\n';
-				case 't':
-					return '\t';
-			}
-			throw Error("Unexpected escape chararcter: '{0}'", ch);
-		}
-
 		// Optimization: avoid re-creating StringBuilder.
 		private StringBuilder sb = new StringBuilder();
 
@@ -351,8 +391,26 @@ namespace Yuzu
 				var ch = Reader.ReadChar();
 				if (ch == '"')
 					break;
-				if (ch == '\\')
-					ch = JsonUnescape(Reader.ReadChar());
+				if (ch == '\\') {
+					ch = Reader.ReadChar();
+					if (ch == 'u') {
+						int code = 0;
+						for (int i = 0; i < 4; ++i) {
+							ch = Reader.ReadChar();
+							int h = ch <= 'f' ? JsonEscapeData.hexDigits[ch] : -1;
+							if (h < 0)
+								throw Error("Bad hexadecimal digit in unicode escape: '{0}'", ch);
+							code = code * 16 + h;
+						}
+						ch = (char)code;
+					}
+					else {
+						var escaped = ch <= 't' ? JsonEscapeData.unescapeChars[ch] : '\0';
+						if (escaped == 0)
+							throw Error("Unexpected escape chararcter: '{0}'", ch);
+						ch = escaped;
+					}
+				}
 				sb.Append(ch);
 			}
 			return sb.ToString();

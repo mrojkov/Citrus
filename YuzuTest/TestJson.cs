@@ -574,6 +574,38 @@ namespace YuzuTest
 		}
 
 		[TestMethod]
+		public void TestEscape()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = "";
+
+			var s = "\"/{\u0001}\n\t\"\"";
+			var v = new Sample1 { Y = s };
+			var result = js.ToString(v);
+			Assert.AreEqual("{\"X\":0,\"Y\":\"\\\"\\/{\\u0001}\\n\\t\\\"\\\"\"}", result);
+
+			var w = new Sample1();
+			var jd = new JsonDeserializer();
+			jd.FromString(w, result);
+			Assert.AreEqual(s, w.Y);
+
+			v.Y = result;
+			var result1 = js.ToString(v);
+			jd.FromString(w, result1);
+			Assert.AreEqual(result, w.Y);
+
+			v.Y = "привет";
+			var result2 = js.ToString(v);
+			Assert.AreEqual("{\"X\":0,\"Y\":\"привет\"}", result2);
+
+			jd.FromString(w, result2);
+			Assert.AreEqual(v.Y, w.Y);
+			jd.FromString(w, "{\"X\":0,\"Y\":\"\u043F\u0440\u0438\u0432\u0435\u0442\"}");
+			Assert.AreEqual(v.Y, w.Y);
+		}
+
+		[TestMethod]
 		public void TestDate()
 		{
 			var js = new JsonSerializer();
@@ -608,6 +640,7 @@ namespace YuzuTest
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"X\" }"), ":");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "nn"), "u");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"X\":1, \"Y\": \"\\z\" }"), "z");
+			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"X\":1, \"Y\": \"\\uQ\" }"), "Q");
 			XAssert.Throws<YuzuException>(() => jd.FromString(new SampleBool(), "{ \"B\": 1 }"), "1");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ ,}"), ",");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"Y\": \"q\" }"), "'X'");
