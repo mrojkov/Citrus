@@ -10,12 +10,21 @@ namespace Yuzu
 {
 	public class JsonSerializeOptions
 	{
+		public int generation = 0;
+		public int Generation { get { return generation; } }
+
 		public string FieldSeparator = "\n";
 		public string Indent = "\t";
 		public string ClassTag = "class";
-		public bool EnumAsString = false;
+
+		private bool enumAsString = false;
+		public bool EnumAsString { get { return enumAsString; } set { enumAsString = value; generation++; } }
+
 		public bool ArrayLengthPrefix = false;
-		public bool IgnoreCompact = false;
+
+		private bool ignoreCompact = false;
+		public bool IgnoreCompact { get { return ignoreCompact; } set { ignoreCompact = value; generation++; } }
+
 		public string DateFormat = "O";
 		public string TimeSpanFormat = "c";
 	};
@@ -204,7 +213,25 @@ namespace Yuzu
 			writer.Write(']');
 		}
 
+		private Dictionary<Type, Action<object>> writerCache = new Dictionary<Type, Action<object>>();
+		private int jsonOptionsGeneration = 0;
+
 		private Action<object> GetWriteFunc(Type t)
+		{
+			if (jsonOptionsGeneration != JsonOptions.Generation) {
+				writerCache.Clear();
+				jsonOptionsGeneration = JsonOptions.Generation;
+			}
+
+			Action<object> result;
+			if (writerCache.TryGetValue(t, out result))
+				return result;
+			result = MakeWriteFunc(t);
+			writerCache[t] = result;
+			return result;
+		}
+
+		private Action<object> MakeWriteFunc(Type t)
 		{
 			if (t == typeof(int) || t == typeof(uint) || t == typeof(byte) || t == typeof(sbyte))
 				return WriteInt;
