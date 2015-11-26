@@ -811,6 +811,65 @@ namespace YuzuTest
 		}
 	}
 
+	class Color_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new Color_JsonDeserializer Instance = new Color_JsonDeserializer();
+
+		public Color_JsonDeserializer()
+		{
+			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+			Options.ClassNames = false;
+			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
+			JsonOptions.EnumAsString = true;
+			JsonOptions.IgnoreCompact = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.ArrayLengthPrefix = true;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderInt(new Color());
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new Color(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (Color)obj;
+			if ("B" != name) throw new YuzuException("B!=" + name);
+			result.B = (byte)RequireUInt();
+			name = GetNextName(false);
+			if ("G" != name) throw new YuzuException("G!=" + name);
+			result.G = (byte)RequireUInt();
+			name = GetNextName(false);
+			if ("R" != name) throw new YuzuException("R!=" + name);
+			result.R = (byte)RequireUInt();
+			name = GetNextName(false);
+			Require('}');
+			return result;
+		}
+
+		protected override object ReadFieldsCompact(object obj)
+		{
+			var result = (Color)obj;
+			result.B = (byte)RequireUInt();
+			Require(',');
+			result.G = (byte)RequireUInt();
+			Require(',');
+			result.R = (byte)RequireUInt();
+			Require(']');
+			return result;
+		}
+	}
+
 	class SampleClassList_JsonDeserializer : JsonDeserializerGenBase
 	{
 		public static new SampleClassList_JsonDeserializer Instance = new SampleClassList_JsonDeserializer();
@@ -857,6 +916,67 @@ namespace YuzuTest
 					} while (Require(']', ',') == ',');
 				}
 			}
+			name = GetNextName(false);
+			Require('}');
+			return result;
+		}
+	}
+
+	class SamplePerson_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new SamplePerson_JsonDeserializer Instance = new SamplePerson_JsonDeserializer();
+
+		public SamplePerson_JsonDeserializer()
+		{
+			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+			Options.ClassNames = false;
+			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
+			JsonOptions.EnumAsString = true;
+			JsonOptions.IgnoreCompact = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.ArrayLengthPrefix = true;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderInt(new SamplePerson());
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new SamplePerson(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (SamplePerson)obj;
+			if ("1" != name) throw new YuzuException("1!=" + name);
+			result.Name = RequireString();
+			name = GetNextName(false);
+			if ("2" != name) throw new YuzuException("2!=" + name);
+			result.Birth = RequireDateTime();
+			name = GetNextName(false);
+			if ("3" != name) throw new YuzuException("3!=" + name);
+			result.Children = RequireOrNull('[') ? null : new List<SamplePerson>();
+			if (result.Children != null) {
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = (SamplePerson)SamplePerson_JsonDeserializer.Instance.FromReader(new SamplePerson(), Reader);
+						result.Children.Add(tmp1);
+					} while (Require(']', ',') == ',');
+				}
+			}
+			name = GetNextName(false);
+			if ("4" != name) throw new YuzuException("4!=" + name);
+			result.EyeColor = (Color)Color_JsonDeserializer.Instance.FromReader(new Color(), Reader);
 			name = GetNextName(false);
 			Require('}');
 			return result;

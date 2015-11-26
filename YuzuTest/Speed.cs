@@ -28,18 +28,19 @@ namespace YuzuTest
 	{
 		public static int Counter = 0;
 
-		[YuzuRequired][ProtoMember(1)]
+		[YuzuRequired("1")][ProtoMember(1)]
 		public string Name;
 
-		[YuzuRequired][ProtoMember(2)]
+		[YuzuRequired("2")][ProtoMember(2)]
 		public DateTime Birth;
 
-		[YuzuRequired][ProtoMember(3)]
-
+		[YuzuRequired("3")][ProtoMember(3)]
 		public List<SamplePerson> Children;
 
-		[YuzuRequired][ProtoMember(4)]
+		[YuzuRequired("4")][ProtoMember(4)]
 		public Color EyeColor;
+
+		public SamplePerson() { }
 
 		public SamplePerson(Random rnd, int depth)
 		{
@@ -149,34 +150,71 @@ namespace YuzuTest
 	}
 
 	[TestClass]
-	public class TestSpeedPerson {
+	public class TestSpeedPerson
+	{
 		private static SamplePerson person;
+		private static MemoryStream jsonStream = new MemoryStream();
+		private static MemoryStream protobufStream = new MemoryStream();
 
 		[ClassInitialize]
 		public static void Init(TestContext context) {
 			SamplePerson.Counter = 0;
 			Random rnd = new Random(20151125);
 			person = new SamplePerson(rnd, 1);
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = "";
+			js.Options.TagMode = TagMode.Aliases;
+			js.ToStream(person, jsonStream);
+			ProtoBuf.Serializer.Serialize(protobufStream, person);
 		}
 
 		[TestMethod]
-		public void TestProtobuf()
+		public void TestProtobufWrite()
 		{
 			var ms = new MemoryStream();
 			ProtoBuf.Serializer.Serialize(ms, person);
-			Assert.IsTrue(ms.Length > 0);
+			Assert.AreEqual(protobufStream.Length, ms.Length);
 		}
 
 		[TestMethod]
-		public void TestJson()
+		public void TestProtobuRead()
+		{
+			protobufStream.Position = 0;
+			var p = ProtoBuf.Serializer.Deserialize<SamplePerson>(protobufStream);
+			Assert.AreEqual(person.Name, p.Name);
+		}
+
+		[TestMethod]
+		public void TestJsonWrite()
 		{
 			Assert.AreEqual(28076, SamplePerson.Counter);
 			var js = new JsonSerializer();
 			js.JsonOptions.Indent = "";
 			js.JsonOptions.FieldSeparator = "";
+			js.Options.TagMode = TagMode.Aliases;
 			var ms = new MemoryStream();
 			js.ToStream(person, ms);
-			Assert.IsTrue(ms.Length > 0);
+			Assert.AreEqual(jsonStream.Length, ms.Length);
+		}
+
+		[TestMethod]
+		public void TestJsonRead()
+		{
+			var jd = new JsonDeserializer();
+			jd.Options.TagMode = TagMode.Aliases;
+			SamplePerson p = new SamplePerson();
+			jsonStream.Position = 0;
+			jd.FromStream(p, jsonStream);
+			Assert.AreEqual(person.Name, p.Name);
+		}
+
+		[TestMethod]
+		public void TestJsonGenRead()
+		{
+			jsonStream.Position = 0;
+			SamplePerson p = (SamplePerson)SamplePerson_JsonDeserializer.Instance.FromStream(jsonStream);
+			Assert.AreEqual(person.Name, p.Name);
 		}
 	}
 
