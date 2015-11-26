@@ -700,9 +700,11 @@ namespace Yuzu
 
 		// Optimization: Avoid creating trivial closures.
 		private object RequireIntObj() { return RequireInt(); }
+		private object RequireUIntObj() { return RequireUInt(); }
+		private object RequireSByteObj() { return (sbyte)RequireInt(); }
+		private object RequireByteObj() { return (byte)RequireInt(); }
 		private object RequireStringObj() { return RequireString(); }
 		private object RequireBoolObj() { return RequireBool(); }
-		private object RequireUIntObj() { return RequireUInt(); }
 		private object RequireSingleObj() { return RequireSingle(); }
 		private object RequireDoubleObj() { return RequireDouble(); }
 		private object RequireDateTimeObj() { return RequireDateTime(); }
@@ -710,10 +712,14 @@ namespace Yuzu
 
 		private Func<object> ReadValueFunc(Type t)
 		{
-			if (t == typeof(int) || t == typeof(sbyte))
+			if (t == typeof(int))
 				return RequireIntObj;
-			if (t == typeof(uint) || t == typeof(byte))
+			if (t == typeof(uint))
 				return RequireUIntObj;
+			if (t == typeof(sbyte))
+				return RequireSByteObj;
+			if (t == typeof(byte))
+				return RequireByteObj;
 			if (t == typeof(string))
 				return RequireStringObj;
 			if (t == typeof(bool))

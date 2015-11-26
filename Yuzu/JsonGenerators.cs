@@ -93,11 +93,17 @@ namespace Yuzu
 
 		private void GenerateValue(Type t, string name)
 		{
-			if (t == typeof(int) || t == typeof(sbyte)) {
+			if (t == typeof(int)) {
 				PutPart("RequireInt();\n");
 			}
-			else if (t == typeof(uint) || t == typeof(byte)) {
+			else if (t == typeof(uint)) {
 				PutPart("RequireUInt();\n");
+			}
+			else if (t == typeof(sbyte)) {
+				PutPart("(sbyte)RequireInt();\n");
+			}
+			else if (t == typeof(byte)) {
+				PutPart("(byte)RequireUInt();\n");
 			}
 			else if (t == typeof(string)) {
 				PutPart("RequireString();\n");
