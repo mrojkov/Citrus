@@ -256,7 +256,6 @@ namespace Lime.Platform
 		public void Run(double updatesPerSecond)
 		{
 			AssertNonDisposed();
-			swapInterval = false;
 			displayLinkSupported = false;
 			openGLContext.SwapInterval = swapInterval;
 			if (displayLinkSupported)
