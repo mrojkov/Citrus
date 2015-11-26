@@ -653,5 +653,15 @@ namespace YuzuTest
 			XAssert.Throws<YuzuException>(() => jd.FromString(""), "unspecified");
 			XAssert.Throws<System.IO.EndOfStreamException>(() => jd.FromString(w, "{ \"X\": 1"));
 		}
+
+		[TestMethod]
+		public void TestDeclarationErrors()
+		{
+			var js = new JsonSerializer();
+			js.Options.TagMode = TagMode.Aliases;
+			XAssert.Throws<YuzuException>(() => js.ToString(new Bad1()), "F");
+			XAssert.Throws<YuzuException>(() => js.ToString(new Bad2()), "F");
+			XAssert.Throws<YuzuException>(() => js.ToString(new Bad3()), "G");
+		}
 	}
 }

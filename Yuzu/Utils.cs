@@ -116,6 +116,12 @@ namespace Yuzu
 			return t.IsDefined(options.CompactAttribute);
 		}
 
+		private static YuzuException Error(Type t, string format, params object[] args)
+		{
+			return new YuzuException("In type '" + t.FullName + "': " + String.Format(format, args));
+
+		}
+
 		public static List<YuzuItem> GetYuzuItems(Type t, CommonOptions options)
 		{
 			List<YuzuItem> items;
@@ -133,7 +139,7 @@ namespace Yuzu
 				if (optional == null && required == null)
 					continue;
 				if (optional != null && required != null)
-					throw new YuzuAssert("Both optional and required attributes for field: " + m.Name);
+					throw Error(t, "Both optional and required attributes for field '{0}'", m.Name);
 				var item = new YuzuItem {
 						Alias = options.GetAlias(optional ?? required) ?? m.Name,
 						IsOptional = optional != null,
@@ -162,8 +168,20 @@ namespace Yuzu
 				items.Add(item);
 			}
 			if (!options.AllowEmptyTypes && items.Count == 0)
-				throw new YuzuException("No serializable fields in type '" + t.Name + "'");
+				throw Error(t, "No serializable fields");
 			items.Sort();
+			var prevTag = "";
+			foreach (var i in items) {
+				var tag = i.Tag(options);
+				if (tag == "")
+					throw Error(t, "Empty tag for field '{0}'", i.Name);
+				foreach (var ch in tag)
+					if (ch <= ' ' || ch >= 127)
+						throw Error(t, "Bad character '{0}' in tag for field '{1}'", ch, i.Name);
+				if (tag == prevTag)
+					throw Error(t, "Duplicate tag '{0}' for field '{1}'", tag, i.Name);
+				prevTag = tag;
+			}
 			return items;
 		}
 	}

@@ -195,6 +195,27 @@ namespace YuzuTest
 		public TimeSpan T;
 	}
 
+	public class Bad1
+	{
+		[YuzuRequired]
+		[YuzuOptional]
+		public int F;
+	};
+
+	public class Bad2
+	{
+		[YuzuRequired("привет")]
+		public int F;
+	};
+
+	public class Bad3
+	{
+		[YuzuRequired("q")]
+		public int F;
+		[YuzuRequired("q")]
+		public int G;
+	};
+
 	public static class XAssert
 	{
 		public static void Throws<TExpectedException>(Action exceptionThrower, string expectedExceptionMessage = "")
