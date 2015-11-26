@@ -246,7 +246,7 @@ namespace Lime
 						totalScrollAmount = 0f;
 						wheelScrollState = newWheelScrollState;
 					}
-					totalScrollAmount = Frame.Input.WheelScrollAmount == 0 ? totalScrollAmount = 0f : totalScrollAmount -= Frame.Input.WheelScrollAmount;
+					totalScrollAmount -= Frame.Input.WheelScrollAmount;
 				}
 
 				if (totalScrollAmount.Abs() > 0 && wheelScrollState != WheelScrollState.Stop) {
