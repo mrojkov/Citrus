@@ -159,6 +159,8 @@ namespace Yuzu
 
 				items.Add(item);
 			}
+			if (!options.AllowEmptyTypes && items.Count == 0)
+				throw new YuzuException("No serializable fields in type '" + t.Name + "'");
 			items.Sort();
 			return items;
 		}

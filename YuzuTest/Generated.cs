@@ -16,6 +16,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
 			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -60,6 +61,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
 			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -104,6 +106,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
 			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -152,6 +155,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
 			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -193,6 +197,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
 			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -233,6 +238,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
 			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -284,6 +290,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
 			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -341,6 +348,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
 			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -426,6 +434,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
 			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -477,6 +486,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
 			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -517,6 +527,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
 			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -560,6 +571,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
 			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -603,6 +615,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
 			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -665,6 +678,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
 			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -718,6 +732,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
 			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -761,6 +776,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = false;
 			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";
@@ -804,6 +820,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.ClassNames = true;
 			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
 			JsonOptions.FieldSeparator = "\n";
 			JsonOptions.Indent = "\t";
 			JsonOptions.ClassTag = "class";

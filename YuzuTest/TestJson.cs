@@ -14,6 +14,7 @@ namespace YuzuTest
 		public void TestSimple()
 		{
 			var js = new JsonSerializer();
+			js.Options.AllowEmptyTypes = true;
 			Assert.AreEqual("{\n}", js.ToString(new Empty()));
 
 			var v1 = new Sample1 { X = 345, Y = "test" };
@@ -598,6 +599,9 @@ namespace YuzuTest
 		[TestMethod]
 		public void TestErrors()
 		{
+			var js = new JsonSerializer();
+			XAssert.Throws<YuzuException>(() => js.ToString(new Empty()), "Empty");
+
 			var jd = new JsonDeserializer();
 			var w = new Sample1();
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{}"));
