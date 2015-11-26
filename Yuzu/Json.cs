@@ -84,7 +84,14 @@ namespace Yuzu
 			WriteStr(((int)obj).ToString());
 		}
 
-		private void WriteString(object obj)
+		private void WriteUnescapedString(object obj)
+		{
+			writer.Write('"');
+			writer.Write(Encoding.UTF8.GetBytes(obj.ToString()));
+			writer.Write('"');
+		}
+
+		private void WriteEscapedString(object obj)
 		{
 			writer.Write('"');
 			foreach (var ch in obj.ToString()) {
@@ -113,12 +120,22 @@ namespace Yuzu
 
 		private void WriteDateTime(object obj)
 		{
-			WriteString(((DateTime)obj).ToString(JsonOptions.DateFormat, CultureInfo.InvariantCulture));
+			var s = ((DateTime)obj).ToString(JsonOptions.DateFormat, CultureInfo.InvariantCulture);
+			// 'Roundtrip' format is guaranteed to be ASCII-clean.
+			if (JsonOptions.DateFormat == "O")
+				WriteUnescapedString(s);
+			else
+				WriteEscapedString(s);
 		}
 
 		private void WriteTimeSpan(object obj)
 		{
-			WriteString(((TimeSpan)obj).ToString(JsonOptions.TimeSpanFormat, CultureInfo.InvariantCulture));
+			var s = ((TimeSpan)obj).ToString(JsonOptions.TimeSpanFormat, CultureInfo.InvariantCulture);
+			// 'Constant' format is guaranteed to be ASCII-clean.
+			if (JsonOptions.DateFormat == "c")
+				WriteUnescapedString(s);
+			else
+				WriteEscapedString(s);
 		}
 
 		private void WriteList<T>(List<T> list)
@@ -155,7 +172,11 @@ namespace Yuzu
 				WriteStr(JsonOptions.FieldSeparator);
 				var isFirst = true;
 				foreach (var elem in dict) {
-					WriteName(elem.Key.ToString(), ref isFirst);
+					WriteSep(ref isFirst);
+					WriteStr(JsonOptions.Indent);
+					// TODO: Option to not escape dictionary keys.
+					WriteEscapedString(elem.Key.ToString());
+					writer.Write(':');
 					wf(elem.Value);
 				}
 				WriteStr(JsonOptions.FieldSeparator);
@@ -192,7 +213,7 @@ namespace Yuzu
 			if (t == typeof(float))
 				return WriteSingle;
 			if (t == typeof(string))
-				return WriteString;
+				return WriteEscapedString;
 			if (t == typeof(bool))
 				return WriteBool;
 			if (t == typeof(DateTime))
@@ -201,7 +222,7 @@ namespace Yuzu
 				return WriteTimeSpan;
 			if (t.IsEnum) {
 				if (JsonOptions.EnumAsString)
-					return WriteString;
+					return WriteUnescapedString;
 				else
 					return WriteEnumAsInt;
 			}
@@ -243,7 +264,7 @@ namespace Yuzu
 		{
 			WriteSep(ref isFirst);
 			WriteStr(JsonOptions.Indent);
-			WriteString(name);
+			WriteUnescapedString(name);
 			writer.Write(':');
 		}
 
@@ -259,7 +280,7 @@ namespace Yuzu
 			var t = obj.GetType();
 			if (Options.ClassNames && !Utils.IsStruct(t)) {
 				WriteName(JsonOptions.ClassTag, ref isFirst);
-				WriteString(t.FullName);
+				WriteUnescapedString(t.FullName);
 			}
 			foreach (var yi in Utils.GetYuzuItems(t, Options)) {
 				var value = yi.GetValue(obj);
@@ -285,7 +306,7 @@ namespace Yuzu
 			var t = obj.GetType();
 			if (Options.ClassNames && !Utils.IsStruct(t)) {
 				WriteSep(ref isFirst);
-				WriteString(t.FullName);
+				WriteUnescapedString(t.FullName);
 			}
 			foreach (var yi in Utils.GetYuzuItems(t, Options)) {
 				WriteSep(ref isFirst);
