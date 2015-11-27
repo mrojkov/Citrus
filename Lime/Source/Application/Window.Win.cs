@@ -239,25 +239,7 @@ namespace Lime
 
 		private void OnMouseWheel(object sender, MouseEventArgs e)
 		{
-			if (e.Delta == 0) { return; }
-			int wheelDelta = e.Delta;
-			if (e.Delta > 0) {
-				if (!Input.HasPendingKeyEvent(Key.MouseWheelUp)) {
-					Input.SetKeyState(Key.MouseWheelUp, true);
-					Input.SetKeyState(Key.MouseWheelUp, false);
-					Input.WheelScrollAmount = wheelDelta;
-				} else {
-					Input.WheelScrollAmount += wheelDelta;
-				}
-			} else {
-				if (!Input.HasPendingKeyEvent(Key.MouseWheelDown)) {
-					Input.SetKeyState(Key.MouseWheelDown, true);
-					Input.SetKeyState(Key.MouseWheelDown, false);
-					Input.WheelScrollAmount = wheelDelta;
-				} else {
-					Input.WheelScrollAmount += wheelDelta;
-				}
-			}
+			Input.SetWheelScrollAmount(e.Delta);
 		}
 
 		private void OnClosed(object sender, FormClosedEventArgs e)

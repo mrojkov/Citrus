@@ -208,6 +208,22 @@ namespace Lime
 		{
 			currentKeysState.CopyTo(previousKeysState, 0);
 		}
+
+		internal void SetWheelScrollAmount(float delta)
+		{
+			if (delta == 0) {
+				return;
+			}
+			var key = delta > 0 ? Key.MouseWheelUp : Key.MouseWheelDown;
+			if (!HasPendingKeyEvent(Key.MouseWheelUp)) {
+				SetKeyState(key, true);
+				SetKeyState(key, false);
+				WheelScrollAmount = delta;
+			} else {
+				WheelScrollAmount += delta;
+			}
+		}
 	}
 }
+
 #endif
