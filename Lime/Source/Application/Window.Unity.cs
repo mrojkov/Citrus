@@ -36,14 +36,14 @@ namespace Lime
 			fpsCounter = new FPSCounter();
 			input = new Input();
 
-			Lime.UnityApp.Instance.Updating += (delta) => {
+			UnityApplicationDelegate.Instance.Updating += delta => {
 				Input.Refresh();
 				RaiseUpdating(delta);
 			};
-			Lime.UnityApp.Instance.Rendering += () => {
+			UnityApplicationDelegate.Instance.Rendering += () => {
 				RaiseRendering();
 			};
-			Lime.UnityApp.Instance.Destroying += () => {
+			UnityApplicationDelegate.Instance.Destroying += () => {
 				RaiseClosed();
 			};
 		}

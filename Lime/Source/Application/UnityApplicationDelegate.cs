@@ -2,16 +2,15 @@
 using System;
 namespace Lime
 {
-
-	public class UnityApp 
+	public class UnityApplicationDelegate 
 	{
-		public static UnityApp Instance {get; private set;}
+		public static UnityApplicationDelegate Instance {get; private set;}
 		public event Action<float> Updating;
 		public event Action Rendering;
 		public event Action Destroying; 
 		public event Action Activated;
 
-		public UnityApp ()
+		public UnityApplicationDelegate ()
 		{
 			Instance = this;
 		}
