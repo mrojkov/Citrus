@@ -210,7 +210,7 @@ namespace Lime
 			glControl.KeyDown += OnKeyDown;
 			glControl.KeyUp += OnKeyUp;
 			glControl.KeyPress += OnKeyPress;
-			glControl.MouseMove += OnMouseMove;
+			Updating += OnMouseMove;
 			glControl.MouseDown += OnMouseDown;
 			glControl.MouseUp += OnMouseUp;
 			glControl.Resize += OnResize;
@@ -308,9 +308,9 @@ namespace Lime
 			}
 		}
 
-		private void OnMouseMove(object sender, MouseEventArgs e)
+		private void OnMouseMove(float delta)
 		{
-			var position = (Vector2)SDToLime.Convert(e.Location);
+			var position = (Vector2)SDToLime.Convert(form.PointToClient(Control.MousePosition));
 			Input.MousePosition = position * Input.ScreenToWorldTransform;
 			Input.SetTouchPosition(0, Input.MousePosition);
 		}
