@@ -209,9 +209,9 @@
     <Compile Include="Source\Widgets\Text\TextBox.cs" />
     <Compile Include="Source\Widgets\Text\TextLineSplitter.cs" />
     <Compile Include="Source\Widgets\Text\TextStyle.cs" />
-    <Compile Include="Source\Application\UnityApp.cs" />
     <Compile Include="Source\Application\Window.Unity.cs" />
     <Compile Include="Source\Application\Clipboard\Clipboard.Unity.cs" />
+    <Compile Include="Source\Application\UnityApplicationDelegate.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

@@ -104,28 +104,12 @@ namespace Lime.Platform
 			input.MousePosition = p * input.ScreenToWorldTransform;
 		}
 
-		private const int SizeOfLineInPixels = 40;
 		public override void ScrollWheel(NSEvent theEvent)
 		{
+			const int SizeOfLineInPixels = 40;
 			var wheelDelta = theEvent.HasPreciseScrollingDeltas ? (float)theEvent.ScrollingDeltaY
 				: (float)theEvent.ScrollingDeltaY * SizeOfLineInPixels;
-			if (wheelDelta > 0) {
-				if (!input.HasPendingKeyEvent(Key.MouseWheelUp)) {
-					input.SetKeyState(Key.MouseWheelUp, true);
-					input.SetKeyState(Key.MouseWheelUp, false);
-					input.WheelScrollAmount = wheelDelta;
-				} else {
-					input.WheelScrollAmount += wheelDelta;
-				}
-			} else {
-				if (!input.HasPendingKeyEvent(Key.MouseWheelDown)) {
-					input.SetKeyState(Key.MouseWheelDown, true);
-					input.SetKeyState(Key.MouseWheelDown, false);
-					input.WheelScrollAmount = wheelDelta;
-				} else {
-					input.WheelScrollAmount += wheelDelta;
-				}
-			}
+			input.SetWheelScrollAmount(wheelDelta);
 		}
 
 		public override void KeyDown(NSEvent theEvent)
