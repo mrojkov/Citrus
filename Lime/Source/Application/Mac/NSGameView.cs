@@ -87,23 +87,6 @@ namespace Lime.Platform
 			input.SetKeyState(Key.Touch0, false);
 		}
 
-		public override void MouseDragged(NSEvent theEvent)
-		{
-			RefreshMousePosition(theEvent);
-		}
-
-		public override void MouseMoved(NSEvent theEvent)
-		{
-			RefreshMousePosition(theEvent);
-		}
-
-		private void RefreshMousePosition(NSEvent theEvent)
-		{
-			var point = new Point((int)theEvent.LocationInWindow.X, (int)Frame.Height - (int)theEvent.LocationInWindow.Y);
-			var p = new Vector2(point.X, point.Y) * (float)Window.BackingScaleFactor;
-			input.MousePosition = p * input.ScreenToWorldTransform;
-		}
-
 		public override void ScrollWheel(NSEvent theEvent)
 		{
 			const int SizeOfLineInPixels = 40;

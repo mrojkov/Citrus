@@ -272,12 +272,23 @@ namespace Lime
 
 		private void Update(float delta)
 		{
+			// Refresh mouse position on every frame to make HitTest work properly if mouse is outside of the window.
+			RefreshMousePosition();
 			Input.ProcessPendingKeyEvents();
 			RaiseUpdating(delta);
 			AudioSystem.Update();
 			Input.TextInput = null;
 			Input.CopyKeysState();
 		}
+
+		private void RefreshMousePosition()
+		{
+			var mousePos = window.MouseLocationOutsideOfEventStream;
+			var point = new Vector2((int)mousePos.X, (int)NSGameView.Frame.Height - (int)mousePos.Y) *
+				(float)window.BackingScaleFactor;
+			Input.MousePosition = point * Input.ScreenToWorldTransform;
+		}
 	}
 }
+
 #endif
