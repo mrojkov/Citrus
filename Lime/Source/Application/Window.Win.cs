@@ -277,10 +277,18 @@ namespace Lime
 			RaiseDeactivated();
 		}
 
+		private WindowState prevWindowState;
 		private void OnResize(object sender, EventArgs e)
 		{
-			// Nika: Minimized window has 0x0 size and better not to call RaiseResized() at this state.
-			if (State != WindowState.Minimized) {
+			// We should ingore this event after minimize or unminimize
+			// Calling to RaiseResized() after minimize can lead to various bugs because window size is 0x0
+			// Calling to RaiseResized() after unminimize leads to useless screen recreating and some screen state loss
+			// (like scroll position in scrollview)
+			bool HasBeenMinizedOrUnminimized = 
+				(prevWindowState != WindowState.Minimized && State == WindowState.Minimized) ||
+				(prevWindowState == WindowState.Minimized && State != WindowState.Minimized);
+			prevWindowState = State;
+			if (!HasBeenMinizedOrUnminimized) {
 				RaiseResized();
 			}
 		}
