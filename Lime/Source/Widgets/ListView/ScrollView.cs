@@ -249,7 +249,7 @@ namespace Lime
 					totalScrollAmount -= Frame.Input.WheelScrollAmount;
 				}
 
-				if (totalScrollAmount.Abs() > 0 && wheelScrollState != WheelScrollState.Stop) {
+				if (totalScrollAmount.Abs() >= 1f && wheelScrollState != WheelScrollState.Stop) {
 					StopScrolling();
 					var stepPerFrame = totalScrollAmount * Task.Current.Delta * wheelScrollingSpeedFactor;
 					var prevScrollPosition = ScrollPosition;

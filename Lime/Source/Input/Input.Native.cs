@@ -215,7 +215,7 @@ namespace Lime
 				return;
 			}
 			var key = delta > 0 ? Key.MouseWheelUp : Key.MouseWheelDown;
-			if (!HasPendingKeyEvent(Key.MouseWheelUp)) {
+			if (!HasPendingKeyEvent(key)) {
 				SetKeyState(key, true);
 				SetKeyState(key, false);
 				WheelScrollAmount = delta;
