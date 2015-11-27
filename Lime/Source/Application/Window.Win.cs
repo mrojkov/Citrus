@@ -210,7 +210,8 @@ namespace Lime
 			glControl.KeyDown += OnKeyDown;
 			glControl.KeyUp += OnKeyUp;
 			glControl.KeyPress += OnKeyPress;
-			Updating += OnMouseMove;
+			// Refresh mouse position of every frame to make HitTest work properly if mouse is outside of the screen.
+			Updating += RefreshMousePosition;
 			glControl.MouseDown += OnMouseDown;
 			glControl.MouseUp += OnMouseUp;
 			glControl.Resize += OnResize;
@@ -308,7 +309,7 @@ namespace Lime
 			}
 		}
 
-		private void OnMouseMove(float delta)
+		private void RefreshMousePosition(float delta)
 		{
 			var position = (Vector2)SDToLime.Convert(form.PointToClient(Control.MousePosition));
 			Input.MousePosition = position * Input.ScreenToWorldTransform;
