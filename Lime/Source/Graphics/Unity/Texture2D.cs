@@ -56,6 +56,15 @@ namespace Lime
 			SetTextureDefaultParameters();
 		}
 
+		public void LoadImage(Bitmap bitmap)
+		{
+			using (var stream = new MemoryStream()) {
+				bitmap.SaveToStream(stream);
+				stream.Position = 0;
+				LoadImage(stream);
+			}
+		}
+
 		void SetTextureDefaultParameters()
 		{
 			unityTexture.wrapMode = UnityEngine.TextureWrapMode.Clamp;
