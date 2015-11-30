@@ -8,10 +8,10 @@ namespace Lime
 {
 	public class Input
 	{
-		public class Simulator
+		public class InputSimulator
 		{
 			Input input;
-			public Simulator(Input input)
+			public InputSimulator(Input input)
 			{
 				this.input = input;
 			}
@@ -39,14 +39,18 @@ namespace Lime
 			public bool State;
 		}
 
+		public InputSimulator Simulator;
+
 		private Vector2[] touchPositions = new Vector2[MaxTouches];
 
 		private List<KeyEvent> keyEventQueue = new List<KeyEvent>();
 		
 		public const int MaxTouches = 4;
 
-		bool[] previousKeysState = new bool[Enum.GetNames(typeof(Key)).Length];
-		bool[] currentKeysState = new bool[Enum.GetNames(typeof(Key)).Length];
+		public static readonly int KeyCount = Enum.GetNames(typeof(Key)).Length;
+
+		bool[] previousKeysState = new bool[KeyCount];
+		bool[] currentKeysState = new bool[KeyCount];
 
 		/// <summary>
 		/// The matrix describes transition from pixels to virtual coordinates.
@@ -67,6 +71,11 @@ namespace Lime
 		/// The current accelerometer state (read only).
 		/// </summary>
 		public Vector3 Acceleration { get; internal set; }
+
+		public Input()
+		{
+			Simulator = new InputSimulator(this);
+		}
 
 		/// <summary>
 		/// Returns true while the user holds down the key identified by name. Think auto fire.
@@ -152,7 +161,7 @@ namespace Lime
 		internal void ProcessPendingKeyEvents()
 		{
 			if (keyEventQueue.Count > 0) {
-				var processedKeys = new bool[Enum.GetNames(typeof(Key)).Length];
+				var processedKeys = new bool[KeyCount];
 				for (int i = 0; i < keyEventQueue.Count; i++) {
 					var evt = keyEventQueue[i];
 					if (!processedKeys[(int)evt.Key]) {
@@ -172,10 +181,10 @@ namespace Lime
 			ProcessPendingKeyEvents();
 			RefreshMousePosition();
 			RefreshMouseWheel();
-			currentKeysState[(int)Key.Mouse0] = UnityEngine.Input.GetMouseButton(0);
-			currentKeysState[(int)Key.Mouse1] = UnityEngine.Input.GetMouseButton(1);
-			currentKeysState[(int)Key.Mouse2] = UnityEngine.Input.GetMouseButton(2);
-			currentKeysState[(int)Key.Touch0] = UnityEngine.Input.GetMouseButton(0);
+			GrabMouseKeyState(0, Key.Mouse0);
+			GrabMouseKeyState(1, Key.Mouse1);
+			GrabMouseKeyState(2, Key.Mouse2);
+			GrabMouseKeyState(0, Key.Touch0);
 			GrabKeyState(UnityEngine.KeyCode.LeftShift, Key.ShiftLeft);
 			GrabKeyState(UnityEngine.KeyCode.RightShift, Key.ShiftRight);
 			GrabKeyState(UnityEngine.KeyCode.LeftControl, Key.ControlLeft);
@@ -186,9 +195,9 @@ namespace Lime
 			GrabKeyState(UnityEngine.KeyCode.RightWindows, Key.WinRight);
 			GrabKeyState(UnityEngine.KeyCode.Menu, Key.Menu);
 			GrabKeyState(UnityEngine.KeyCode.F1, Key.F1);
-			GrabKeyState(UnityEngine.KeyCode.F2, Key.F1);
-			GrabKeyState(UnityEngine.KeyCode.F3, Key.F2);
-			GrabKeyState(UnityEngine.KeyCode.F4, Key.F3);
+			GrabKeyState(UnityEngine.KeyCode.F2, Key.F2);
+			GrabKeyState(UnityEngine.KeyCode.F3, Key.F3);
+			GrabKeyState(UnityEngine.KeyCode.F4, Key.F4);
 			GrabKeyState(UnityEngine.KeyCode.F5, Key.F5);
 			GrabKeyState(UnityEngine.KeyCode.F6, Key.F6);
 			GrabKeyState(UnityEngine.KeyCode.F7, Key.F7);
@@ -277,15 +286,34 @@ namespace Lime
 			GrabKeyState(UnityEngine.KeyCode.Backslash, Key.BackSlash);
 		}
 
-		private void GrabKeyState(UnityEngine.KeyCode unityKey, Key ourKey)
+		private void GrabMouseKeyState(int unityMouseButton, Key ourkey)
 		{
-			currentKeysState[(int)ourKey] = UnityEngine.Input.GetKey(unityKey);
+			if (UnityEngine.Input.GetMouseButtonDown(unityMouseButton)) {
+				SetKeyState(ourkey, true);
+			}
+			if (UnityEngine.Input.GetMouseButtonUp(unityMouseButton)) {
+				SetKeyState(ourkey, false);
+			}
 		}
 
+		private void GrabKeyState(UnityEngine.KeyCode unityKey, Key ourKey)
+		{
+			if (UnityEngine.Input.GetKeyDown(unityKey)) {
+				SetKeyState(ourKey, true);
+			}
+			if (UnityEngine.Input.GetKeyUp(unityKey)) {
+				SetKeyState(ourKey, false);
+			}
+		}
+
+		private UnityEngine.Vector3 prevMousePos;
 		private void RefreshMousePosition()
 		{
-			var p = UnityEngine.Input.mousePosition;
-			MousePosition = new Vector2(p.x, UnityEngine.Screen.height - p.y);
+			if (UnityEngine.Input.mousePosition == prevMousePos) {
+				return;
+			}
+			prevMousePos = UnityEngine.Input.mousePosition;
+			MousePosition = new Vector2(prevMousePos.x, UnityEngine.Screen.height - prevMousePos.y);
 			MousePosition *= ScreenToWorldTransform;
 		}
 
