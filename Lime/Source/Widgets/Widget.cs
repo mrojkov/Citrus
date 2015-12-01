@@ -102,7 +102,7 @@ namespace Lime
 
 		public Widget ParentWidget { get { return Parent != null ? Parent.AsWidget : null; } }
 
-		public Layout Layout = AnchorLayout.Instance;
+		public ILayout Layout = AnchorLayout.Instance;
 
 		/// <summary>
 		/// Keeps layout-specific data, used by parent widget's Layout. 
