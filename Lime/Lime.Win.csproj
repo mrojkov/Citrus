@@ -282,6 +282,10 @@
     <Compile Include="Source\Application\Mac\Audio\AudioDeviceException.cs" />
     <Compile Include="Source\Application\Mac\Audio\AudioException.cs" />
     <Compile Include="Source\Application\Mac\Audio\AudioValueException.cs" />
+    <Compile Include="Source\Application\UnityApplicationDelegate.cs" />
+    <Compile Include="Source\Application\Window.Unity.cs" />
+    <Compile Include="Source\Application\Clipboard\Clipboard.Unity.cs" />
+    <Compile Include="Source\Graphics\FontBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">

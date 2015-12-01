@@ -212,6 +212,7 @@
     <Compile Include="Source\Application\Window.Unity.cs" />
     <Compile Include="Source\Application\Clipboard\Clipboard.Unity.cs" />
     <Compile Include="Source\Application\UnityApplicationDelegate.cs" />
+    <Compile Include="Source\Graphics\FontBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
