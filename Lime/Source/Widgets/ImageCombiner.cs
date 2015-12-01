@@ -45,6 +45,8 @@ namespace Lime
 		[ProtoMember(3)]
 		public ShaderId Shader { get; set; }
 
+		public ShaderProgram CustomShaderProgram;
+
 		public ImageCombiner()
 		{
 			Enabled = true;
@@ -197,6 +199,9 @@ namespace Lime
 				Toolbox.Swap(ref arg1, ref arg2);
 			} else {
 				Renderer.Shader = shader;
+			}
+			if (Renderer.Shader == ShaderId.Custom) {
+				Renderer.CustomShaderProgram = CustomShaderProgram;
 			}
 			RenderHelper(arg1, arg2);
 		}
