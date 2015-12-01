@@ -19,7 +19,7 @@ namespace Orange
 
 		private string dataFolderName;
 
-		public string  GetPlatformSuffix()
+		public string GetPlatformSuffix()
 		{
 			switch (ActivePlatform) {
 				case TargetPlatform.Android:
