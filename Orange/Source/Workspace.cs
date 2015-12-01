@@ -19,13 +19,26 @@ namespace Orange
 
 		private string dataFolderName;
 
-		public string GetPlatformSuffix()
+		public string  GetPlatformSuffix()
 		{
+			switch (ActivePlatform) {
+				case TargetPlatform.Android:
+					return ".Android";
+				case TargetPlatform.Desktop:
 #if WIN
-			return ActivePlatform == TargetPlatform.Desktop ? ".Win" : ".Android";
-#else
-			return ActivePlatform == TargetPlatform.Desktop ? ".Mac" : ".iOS";
+					return ".Win";
+#elif MAC || MONOMAC
+					return ".Mac";
 #endif
+				case TargetPlatform.iOS:
+#if WIN
+					throw new NotSupportedException();
+#elif MAC || MONOMAC
+					return ".iOS";
+#endif
+				default:
+					throw new NotSupportedException();
+			}
 		}
 
 		/// <summary>
