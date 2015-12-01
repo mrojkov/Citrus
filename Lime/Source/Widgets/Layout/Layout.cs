@@ -5,8 +5,10 @@ using System.Text;
 
 namespace Lime
 {
-	public abstract class Layout
+	public interface ILayout
 	{
-		public abstract void OnSizeChanged(Widget widget, Vector2 sizeDelta);
+		List<Rectangle> ContentRectangles { get; }
+
+		void OnSizeChanged(Widget widget, Vector2 sizeDelta);
 	}
 }

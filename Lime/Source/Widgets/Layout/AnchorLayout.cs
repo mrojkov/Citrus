@@ -1,10 +1,14 @@
-﻿namespace Lime
-{
-	public class AnchorLayout : Layout
-	{
-		public static readonly Layout Instance = new AnchorLayout();
+﻿using System.Collections.Generic;
 
-		public override void OnSizeChanged(Widget widget, Vector2 sizeDelta)
+namespace Lime
+{
+	public class AnchorLayout : ILayout
+	{
+		public static readonly ILayout Instance = new AnchorLayout();
+
+		public List<Rectangle> ContentRectangles { get { return null; } }
+
+		public void OnSizeChanged(Widget widget, Vector2 sizeDelta)
 		{
 			for (var child = widget.Nodes.FirstOrNull(); child != null; child = child.NextSibling) {
 				if (child.AsWidget != null) {

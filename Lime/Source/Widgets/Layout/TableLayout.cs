@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Lime
 {
@@ -13,8 +14,10 @@ namespace Lime
 		public static readonly TableLayoutCell Default = new TableLayoutCell();
 	}
 
-	public class TableLayout : Layout
+	public class TableLayout : ILayout
 	{
+		private Widget widget;
+
 		public int RowCount { get; set; }
 		public int ColumnCount { get; set; }
 		public int RowToStretch { get; set; }
@@ -27,10 +30,14 @@ namespace Lime
 			get { return ColumnSpacing == RowSpacing ? ColumnSpacing : float.NaN; }
 			set { ColumnSpacing = RowSpacing = value; }
 		}
+		public List<Rectangle> ContentRectangles { get; private set; }
 
-		private Widget widget;
+		public TableLayout()
+		{
+			ContentRectangles = new List<Rectangle>();
+		}
 
-		public override void OnSizeChanged(Widget widget, Vector2 sizeDelta)
+		public void OnSizeChanged(Widget widget, Vector2 sizeDelta)
 		{
 			Refresh(widget);
 		}
@@ -93,10 +100,11 @@ namespace Lime
 				}
 			}
 			// Stretch given row/column
-            colWidths[ColumnToStretch] = Math.Max(widget.Width - colWidths.Sum(), colWidths[ColumnToStretch]);
-			rowHeights[RowToStretch] = Math.Max(widget.Height - rowHeights.Sum(), rowHeights[RowToStretch]);
+			colWidths[ColumnToStretch] = colWidths[ColumnToStretch] + Math.Max(widget.Width - colWidths.Sum(), 0);
+			rowHeights[RowToStretch] = rowHeights[RowToStretch] + Math.Max(widget.Height - rowHeights.Sum(), 0);
 			// Layout each cell
 			var p = Vector2.Zero;
+			ContentRectangles.Clear();
 			for (int i = 0; i < RowCount; i++) {
 				p.X = 0;
 				for (int j = 0; j < ColumnCount; j++) {
@@ -137,9 +145,12 @@ namespace Lime
 				for (int j = 0; j < ColumnCount; j++) {
 					if (occupied[i, j])
 						continue;
-					if (t >= widget.Nodes.Count)
-						return null;
-					var c = widget.Nodes[t].AsWidget;
+					Widget c = null;
+					while (c == null) {
+						if (t >= widget.Nodes.Count)
+							return cells;
+						c = widget.Nodes[t++].AsWidget;
+					}
 					cells[i, j] = c;
 					int rowSpan = GetRowSpan(c, i);
 					int colSpan = GetColSpan(c, j);
@@ -150,7 +161,6 @@ namespace Lime
 					}
 					maxRowSpan = Math.Max(maxRowSpan, rowSpan);
 					maxColSpan = Math.Max(maxColSpan, colSpan);
-					t++;
                 }
 			}
 			return cells;
@@ -168,6 +178,7 @@ namespace Lime
 
 		private void LayoutCell(Widget widget, HAlignment halign, VAlignment valign, Vector2 position, Vector2 size)
 		{
+			ContentRectangles.Add(new Rectangle { A = position, B = position + size });
 			if (halign == HAlignment.Left) {
 				size.X = widget.Width;
 			} else if (halign == HAlignment.Right) {
