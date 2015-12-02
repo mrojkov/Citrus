@@ -202,11 +202,7 @@ namespace Lime
 				}
 			}
 		}
-
-		/// <summary>
-		/// Size that is used for hit testing (not for rendering).
-		/// Use Scale to change visual size of this widget.
-		/// </summary>
+		
 		[ProtoMember(2)]
 		public Vector2 Size
 		{
@@ -247,11 +243,7 @@ namespace Lime
 		{
 			Layout.OnSizeChanged(this, sizeDelta);
 		}
-
-		/// <summary>
-		/// Width that is used for hit testing (not for rendering).
-		/// Use Scale to change visual size of this widget.
-		/// </summary>
+		
 		public float Width { 
 			get { return size.X; }
 			set {
@@ -259,11 +251,7 @@ namespace Lime
 					Size = new Vector2(value, Height);
 			} 
 		}
-
-		/// <summary>
-		/// Height that is used for hit testing (not for rendering).
-		/// Use Scale to change visual size of this widget.
-		/// </summary>
+		
 		public float Height {
 			get { return size.Y; } 
 			set {
