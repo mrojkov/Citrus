@@ -112,7 +112,7 @@ namespace Lime
 						InitWithPngOrJpgBitmap(stream, alphaStream); // Device-independent jpg(RGB) + png(A) compression
 					}
 				} else {
-					LoadImageHelper(stream, createReloader: false);
+					LoadImage(stream, createReloader: false);
 				}
 			}
 			reloader = new TextureBundleReloader(path);
@@ -136,24 +136,9 @@ namespace Lime
 			}
 		}
 
-		public void LoadImage(Stream stream)
-		{
-			LoadImageHelper(stream, createReloader: true);
-		}
-
-		public void LoadImage(Bitmap bitmap)
-		{
-			using (var stream = new MemoryStream()) {
-				bitmap.SaveToStream(stream);
-				stream.Position = 0;
-				LoadImageHelper(stream, createReloader: true);
-			}
-		}
-
-		private void LoadImageHelper(Stream stream, bool createReloader)
+		public void LoadImage(Stream stream, bool createReloader = true)
 		{
 			reloader = createReloader ? new TextureStreamReloader(stream) : null;
-			// Discard current texture
 			Discard();
 			if (stream is System.IO.Compression.DeflateStream) {
 				// DeflateStream doesn't support Seek
@@ -179,6 +164,15 @@ namespace Lime
 #endif
 			}
 			uvRect = new Rectangle(Vector2.Zero, (Vector2)ImageSize / (Vector2)SurfaceSize);
+		}
+
+		public void LoadImage(Bitmap bitmap)
+		{
+			using (var stream = new MemoryStream()) {
+				bitmap.SaveToStream(stream);
+				stream.Position = 0;
+				LoadImage(stream);
+			}
 		}
 
 		private void PrepareOpenGLTexture()
