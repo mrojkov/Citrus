@@ -761,20 +761,12 @@ namespace Lime
 		/// </summary>
 		protected void LoadContent()
 		{
-			if (!string.IsNullOrEmpty(ContentsPath)) {
-				LoadContentHelper();
-			} else {
+			if (string.IsNullOrEmpty(ContentsPath)) {
 				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
 					node.LoadContent();
 				}
+				return;
 			}
-		}
-
-		/// <summary>
-		/// TODO: Add summary
-		/// </summary>
-		private void LoadContentHelper()
-		{
 			Nodes.Clear();
 			Markers.Clear();
 			var contentsPath = ResolveScenePath(ContentsPath);
