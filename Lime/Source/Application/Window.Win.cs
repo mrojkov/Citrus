@@ -39,6 +39,7 @@ namespace Lime
 		private Timer timer;
 		private Stopwatch stopwatch;
 		private bool active;
+		private System.Drawing.Point lastMousePosition;
 
 		public Input Input { get; private set; }
 		public bool Active { get { return active; } }
@@ -319,6 +320,10 @@ namespace Lime
 
 		private void RefreshMousePosition(float delta)
 		{
+			if (lastMousePosition == Control.MousePosition) {
+				return;
+			}
+			lastMousePosition = Control.MousePosition;
 			var position = (Vector2)SDToLime.Convert(form.PointToClient(Control.MousePosition));
 			Input.MousePosition = position * Input.ScreenToWorldTransform;
 			Input.SetTouchPosition(0, Input.MousePosition);
