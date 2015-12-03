@@ -214,7 +214,7 @@ namespace Lime
 				FontHeight = (minH + maxH) / 2;
 				Spacing = FontHeight * spacingKoeff;
 			}
-			FontHeight = bestHeight;
+			FontHeight = bestHeight.Round();
 			Spacing = bestHeight * spacingKoeff;
 		}
 

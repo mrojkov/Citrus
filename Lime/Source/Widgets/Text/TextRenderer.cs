@@ -220,7 +220,7 @@ namespace Lime.Text
 				}
 				scaleFactor = (minScale + maxScale) / 2;
 			}
-			scaleFactor = bestScaleFactor;
+			scaleFactor = bestScaleFactor.Round();
 		}
 
 		public Vector2 MeasureText(float maxWidth, float maxHeight)
