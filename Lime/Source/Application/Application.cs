@@ -247,11 +247,7 @@ namespace Lime
 		{
 			// Почитать и применить:
 			// http://forums.xamarin.com/discussion/931/how-to-prevent-ios-crash-reporters-from-crashing-monotouch-apps
-#if WIN
-			System.Windows.Forms.Application.ThreadException += (sender, e) => {
-#else
-			AppDomain.CurrentDomain.UnhandledException += (sender, e) => {
-#endif
+			Action<object> handler = (e) => {
 #if WIN
 				var title = "The application";
 				if (MainWindow != null) {
@@ -259,11 +255,22 @@ namespace Lime
 					title = MainWindow.Title;
 					MainWindow.Visible = false;
 				}
-				WinApi.MessageBox((IntPtr)null, e.Exception.ToString(), 
+				WinApi.MessageBox((IntPtr)null, e.ToString(), 
 					string.Format("{0} has terminated with an error", title), 0);
 #else
-				Console.WriteLine(e.ExceptionObject.ToString());
+				Console.WriteLine(e.ToString());
 #endif
+			};
+#if WIN
+			// UI-thread exceptions on windows platform
+			System.Windows.Forms.Application.ThreadException += (sender, e) => {
+				handler(e.Exception);
+				System.Windows.Forms.Application.Exit();
+			};
+#endif
+			// Any other unhandled exceptions
+			AppDomain.CurrentDomain.UnhandledException += (sender, e) => {
+				handler(e.ExceptionObject);
 			};
 		}
 
