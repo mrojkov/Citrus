@@ -94,8 +94,10 @@
     <Compile Include="Source\Audio\OpenAL\PlatformAudioSystem.cs" />
     <Compile Include="Source\Audio\OpenAL\WaveIMA4Decoder.cs" />
     <Compile Include="Source\Audio\Unity\AudioChannel.cs" />
-    <Compile Include="Source\Graphics\DynamicFont.cs" />
-    <Compile Include="Source\Graphics\FontRenderer.cs" />
+    <Compile Include="Source\Graphics\Fonts\DynamicFont.cs" />
+    <Compile Include="Source\Graphics\Fonts\Font.cs" />
+    <Compile Include="Source\Graphics\Fonts\FontRenderer.cs" />
+    <Compile Include="Source\Graphics\Fonts\SerializableFont.cs" />
     <Compile Include="Source\Graphics\OpenGL\IGLObject.cs" />
     <Compile Include="Source\Graphics\Mesh.cs" />
     <Compile Include="Source\Graphics\OpenGL\PlatformMesh.cs" />
@@ -177,8 +179,6 @@
     <Compile Include="Source\AssetsBundle\PackedAssetsBundle.cs" />
     <Compile Include="Source\Audio\AudioSystem.cs" />
     <Compile Include="Source\Exception.cs" />
-    <Compile Include="Source\Graphics\Font.cs" />
-    <Compile Include="Source\Graphics\SerializableFont.cs" />
     <Compile Include="Source\Graphics\SerializableTexture.cs" />
     <Compile Include="Source\Graphics\ITexture.cs" />
     <Compile Include="Source\Graphics\TextureAtlasElement.cs" />
@@ -330,9 +330,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Source\Graphics\Fonts\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
