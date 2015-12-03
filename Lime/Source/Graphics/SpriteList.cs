@@ -55,7 +55,7 @@ namespace Lime
 		{
 			public int Tag;
 			public Color4 Color;
-			public Font Font;
+			public IFont Font;
 			public float FontHeight;
 			public CharDef[] CharDefs;
 			private static Sprite[] buffer = new Sprite[50];
@@ -114,7 +114,7 @@ namespace Lime
 			});
 		}
 
-		public void Add(Font font, Color4 color, float fontHeight, CharDef[] charDefs, int tag)
+		public void Add(IFont font, Color4 color, float fontHeight, CharDef[] charDefs, int tag)
 		{
 			items.Add(new TextSprite {
 				Font = font,

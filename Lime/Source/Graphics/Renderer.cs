@@ -220,17 +220,17 @@ namespace Lime
 			DrawTextLine(FontPool.Instance[null], position, text, fontHeight, new Color4(abgr));
 		}
 
-		public static void DrawTextLine(Font font, Vector2 position, string text, float fontHeight, Color4 color)
+		public static void DrawTextLine(IFont font, Vector2 position, string text, float fontHeight, Color4 color)
 		{
 			DrawTextLine(font, position, text, color, fontHeight, 0, text.Length);
 		}
 
-		public static Vector2 MeasureTextLine(Font font, string text, float fontHeight)
+		public static Vector2 MeasureTextLine(IFont font, string text, float fontHeight)
 		{
 			return MeasureTextLine(font, text, fontHeight, 0, text.Length);
 		}
 
-		public static Vector2 MeasureTextLine(Font font, string text, float fontHeight, int start, int length)
+		public static Vector2 MeasureTextLine(IFont font, string text, float fontHeight, int start, int length)
 		{
 			FontChar prevChar = null;
 			var size = new Vector2(0, fontHeight);
@@ -244,7 +244,7 @@ namespace Lime
 					prevChar = null;
 					continue;
 				}
-				var fontChar = font.Chars[ch];
+				var fontChar = font.Chars.Get(ch, fontHeight);
 				if (fontChar == FontChar.Null) {
 					continue;
 				}
@@ -258,14 +258,14 @@ namespace Lime
 		}
 
 		public static void DrawTextLine(
-			Font font, Vector2 position, string text, Color4 color, float fontHeight, int start, int length, SpriteList list = null,
+			IFont font, Vector2 position, string text, Color4 color, float fontHeight, int start, int length, SpriteList list = null,
 			Action<int, Vector2, Vector2> onDrawChar = null, int tag = -1)
 		{
 			int j = 0;
 			if (list != null) {
 				for (int i = 0; i < length; i++) {
 					char ch = text[i + start];
-					if (ch != '\n' && font.Chars[ch] != FontChar.Null)
+					if (ch != '\n' && font.Chars.Get(ch, fontHeight) != FontChar.Null)
 						++j;
 				}
 			}
@@ -288,7 +288,7 @@ namespace Lime
 				} else if (ch == '\r') {
 					continue;
 				}
-				FontChar fontChar = font.Chars[ch];
+				FontChar fontChar = font.Chars.Get(ch, fontHeight);
 				if (fontChar == FontChar.Null) {
 					if (onDrawChar != null) {
 						onDrawChar(i, position, Vector2.Down * fontHeight);
@@ -299,14 +299,15 @@ namespace Lime
 				position.X += scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar));
 				var texture = font.Textures[fontChar.TextureIndex];
 				var size = new Vector2(scale * fontChar.Width, fontHeight);
+				var roundPos = new Vector2(position.X.Ceiling(), position.Y.Ceiling());
 				if (onDrawChar != null) {
-					onDrawChar(i, position, size);
+					onDrawChar(i, roundPos, size);
 				}
 				if (list == null) {
-					DrawSprite(texture, color, position, size, fontChar.UV0, fontChar.UV1);
+					DrawSprite(texture, color, roundPos, size, fontChar.UV0, fontChar.UV1);
 				} else {
 					chars[j].FontChar = fontChar;
-					chars[j].Position = position;
+					chars[j].Position = roundPos;
 					++j;
 				}
 				position.X += scale * (fontChar.Width + fontChar.ACWidths.Y);

@@ -1,5 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\Main\Poker.Win\packages\SharpFont.3.0.1\build\SharpFont.props" Condition="Exists('..\..\Main\Poker.Win\packages\SharpFont.3.0.1\build\SharpFont.props')" />
+  <Import Project="..\..\Main\Poker.Win\packages\SharpFont.Dependencies.2.6\build\SharpFont.Dependencies.props" Condition="Exists('..\..\Main\Poker.Win\packages\SharpFont.Dependencies.2.6\build\SharpFont.Dependencies.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -11,6 +13,8 @@
     <RootNamespace>Lime</RootNamespace>
     <AssemblyName>Lime</AssemblyName>
     <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <PlatformTarget>x86</PlatformTarget>
@@ -40,6 +44,10 @@
     <Reference Include="Microsoft.VisualStudio.DebuggerVisualizers, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="OpenTK.GLControl">
       <HintPath>..\3rdParty\OpenTK\OpenTK.GLControl.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpFont, Version=3.0.1.200, Culture=neutral, PublicKeyToken=48add4c483071cdf, processorArchitecture=MSIL">
+      <HintPath>..\..\Main\Poker.Win\packages\SharpFont.3.0.1\lib\net20\SharpFont.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -86,6 +94,8 @@
     <Compile Include="Source\Audio\OpenAL\PlatformAudioSystem.cs" />
     <Compile Include="Source\Audio\OpenAL\WaveIMA4Decoder.cs" />
     <Compile Include="Source\Audio\Unity\AudioChannel.cs" />
+    <Compile Include="Source\Graphics\DynamicFont.cs" />
+    <Compile Include="Source\Graphics\FontRenderer.cs" />
     <Compile Include="Source\Graphics\OpenGL\IGLObject.cs" />
     <Compile Include="Source\Graphics\Mesh.cs" />
     <Compile Include="Source\Graphics\OpenGL\PlatformMesh.cs" />
@@ -285,7 +295,6 @@
     <Compile Include="Source\Application\UnityApplicationDelegate.cs" />
     <Compile Include="Source\Application\Window.Unity.cs" />
     <Compile Include="Source\Application\Clipboard\Clipboard.Unity.cs" />
-    <Compile Include="Source\Graphics\FontBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">
@@ -319,8 +328,19 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Source\Graphics\Fonts\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\Main\Poker.Win\packages\SharpFont.Dependencies.2.6\build\SharpFont.Dependencies.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\Main\Poker.Win\packages\SharpFont.Dependencies.2.6\build\SharpFont.Dependencies.props'))" />
+    <Error Condition="!Exists('..\..\Main\Poker.Win\packages\SharpFont.3.0.1\build\SharpFont.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\Main\Poker.Win\packages\SharpFont.3.0.1\build\SharpFont.props'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

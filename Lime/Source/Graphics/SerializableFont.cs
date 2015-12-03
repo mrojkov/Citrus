@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.IO;
+
 using ProtoBuf;
 
 namespace Lime
@@ -9,7 +8,7 @@ namespace Lime
 	[ProtoContract]
 	public class SerializableFont
 	{
-		public Font Instance { get; private set; }
+		public IFont Instance { get; private set; }
 
 		[ProtoMember(1)]
 		public string Name
@@ -38,8 +37,8 @@ namespace Lime
 
 	public class FontPool
 	{
-		public Font Null = new Font();
-		private Dictionary<string, Font> fonts = new Dictionary<string, Font>();
+		public IFont Null = new Font();
+		private Dictionary<string, IFont> fonts = new Dictionary<string, IFont>();
 
 		static readonly FontPool instance = new FontPool();
 		public static FontPool Instance { get { return instance; } }
@@ -48,21 +47,21 @@ namespace Lime
 
 		private FontPool() { }
 
-		public Font DefaultFont { get { return this[null]; } }
+		public IFont DefaultFont { get { return this[null]; } }
 
 		public void AddFont(string name, Font font)
 		{
 			fonts[name] = font;
 		}
 
-		public Font this[string name]
+		public IFont this[string name]
 		{
 			get	{
 				if (FontNameChanger != null)
 					name = FontNameChanger(name);
 				if (string.IsNullOrEmpty(name))
 					name = "Default";
-				Font font;
+				IFont font;
 				if (fonts.TryGetValue(name, out font))
 					return font;
 				string path = "Fonts/" + name + ".fnt";
@@ -76,6 +75,9 @@ namespace Lime
 
 		public void Clear()
 		{
+			foreach (var fontsItem in fonts) {
+				if (fontsItem.Value != null) { fontsItem.Value.Dispose(); }
+			}
 			fonts.Clear();
 		}
 	}

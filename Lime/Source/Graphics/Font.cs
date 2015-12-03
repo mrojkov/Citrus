@@ -1,54 +1,89 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+
 using ProtoBuf;
 
 namespace Lime
 {
 	[ProtoContract]
-	public class Font
+	public interface IFont : IDisposable
 	{
 		[ProtoMember(1)]
-		public string About;
+		string About { get; }
 		[ProtoMember(2)]
-		public List<ITexture> Textures = new List<ITexture>();
+		List<ITexture> Textures { get; }
 		[ProtoMember(3)]
-		public readonly FontCharCollection Chars = new FontCharCollection();
+		IFontCharSource Chars { get; }
+	}
+
+	public interface IFontCharSource : IDisposable
+	{
+		FontChar Get(char code, float heightHint);
 	}
 
 	[ProtoContract]
-	public class FontCharCollection : ICollection<FontChar>
+	public class Font : IFont
+	{
+		[ProtoMember(1)]
+		public string About { get; set; }
+		[ProtoMember(2)]
+		public List<ITexture> Textures { get; private set; }
+		[ProtoMember(3)]
+		public FontCharCollection CharCollection { get; private set; }
+		public IFontCharSource Chars { get { return CharCollection; } }
+
+		public Font()
+		{
+			Textures = new List<ITexture>();
+			CharCollection = new FontCharCollection();
+		}
+
+		public void Dispose() {
+			foreach (var texture in Textures) {
+				if (texture != null) { texture.Dispose(); }
+			}
+		}
+	}
+
+	[ProtoContract]
+	public class FontCharCollection : IFontCharSource, ICollection<FontChar>
 	{
 		public List<FontChar> CharList = new List<FontChar>();
 		public FontChar[][] CharMap = new FontChar[256][];
 
-		public FontChar this[char code] { 
-			get { 
-				byte hb = (byte)(code >> 8);
-				byte lb = (byte)(code & 255);
-				if (CharMap[hb] != null) {
-					var c = CharMap[hb][lb];
-					if (c != null)
-						return c;
-				}
-				// Can use normal space instead of unbreakable space
-				if (code == 160) {
-					return this[' '];
-				}
-				// Can use 'middle dot' instead of 'bullet operator'
-				if (code == 8729) {
-					return this[(char)183];
-				}
-				// Can use 'degree symbol' instead of 'masculine ordinal indicator'
-				if (code == 186) {
-					return this[(char)176];
-				}
-				// Use '#' instead of 'numero sign'
-				if (code == 8470) {
-					return this['#'];
-				}
-				return FontChar.Null;
+		public FontChar Get(char code, float heightHint)
+		{
+			byte hb = (byte)(code >> 8);
+			byte lb = (byte)(code & 255);
+			if (CharMap[hb] != null) {
+				var c = CharMap[hb][lb];
+				if (c != null)
+					return c;
 			}
+			return TranslateKnownMissingChars(ref code) ? Get(code, heightHint) : FontChar.Null;
+		}
+
+		internal static bool TranslateKnownMissingChars(ref char code)
+		{
+			var origCode = code;
+			// Can use normal space instead of unbreakable space
+			if (code == 160) {
+				code = ' ';
+			}
+			// Can use 'middle dot' instead of 'bullet operator'
+			if (code == 8729) {
+				code = (char)183;
+			}
+			// Can use 'degree symbol' instead of 'masculine ordinal indicator'
+			if (code == 186) {
+				code = (char)176;
+			}
+			// Use '#' instead of 'numero sign'
+			if (code == 8470) {
+				code = '#';
+			}
+			return code != origCode;
 		}
 
 		public void CopyTo(Array a, int index)
@@ -114,6 +149,8 @@ namespace Lime
 			CharMap[hb][lb] = c;
 			CharList.Add(c);
 		}
+
+		public void Dispose() { }
 	}
 
 	[ProtoContract]
@@ -159,7 +196,7 @@ namespace Lime
 		/// The C spacing is the distance to add to the current position to provide white space to the right of the character glyph.
 		/// </summary>
 		[ProtoMember(6)]
-        public Vector2 ACWidths;
+		public Vector2 ACWidths;
 		/// <summary>
 		/// List of kerning pairs, related to this character
 		/// </summary>
