@@ -110,8 +110,13 @@ namespace Lime.Text
 		{
 			var style = styles[word.Style];
 			Vector2 size = Renderer.MeasureTextLine(
-				style.Font.Instance, texts[word.TextIndex], style.Size * scaleFactor, word.Start, word.Length);
-			return size.X + (IsBullet(word) ? style.ImageSize.X * scaleFactor : 0);
+				style.Font.Instance, texts[word.TextIndex], ScaleSize(style.Size), word.Start, word.Length);
+			return size.X + (IsBullet(word) ? ScaleSize(style.ImageSize.X) : 0);
+		}
+
+		private float ScaleSize(float size)
+		{
+			return (size * scaleFactor).Floor();
 		}
 
 		public void Render(SpriteList spriteList, Vector2 area, HAlignment hAlign, VAlignment vAlign)
@@ -133,9 +138,9 @@ namespace Lime.Text
 				for (int j = 0; j < count; j++) {
 					var word = fittedWords[b + j];
 					var style = styles[word.Style];
-					maxHeight = Math.Max(maxHeight, (style.Size + style.SpaceAfter) * scaleFactor);
+					maxHeight = Math.Max(maxHeight, ScaleSize(style.Size + style.SpaceAfter));
 					if (word.IsTagBegin) {
-						maxHeight = Math.Max(maxHeight, (style.ImageSize.Y + style.SpaceAfter) * scaleFactor);
+						maxHeight = Math.Max(maxHeight, ScaleSize(style.ImageSize.Y + style.SpaceAfter));
 					}
 					totalWidth += word.Width;
 				}
@@ -163,18 +168,18 @@ namespace Lime.Text
 							sz, Vector2.Zero, Vector2.One, tag: word.Style);
 						position.X += sz.X;
 					}
-					var yOffset = new Vector2(0, (maxHeight - style.Size * scaleFactor) * 0.5f);
+					var yOffset = new Vector2(0, (maxHeight - ScaleSize(style.Size)) * 0.5f);
 					var font = style.Font.Instance;
 					if (style.CastShadow) {
 						for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
 							Renderer.DrawTextLine(
-								font, position + style.ShadowOffset + yOffset, t, style.ShadowColor, style.Size * scaleFactor,
+								font, position + style.ShadowOffset + yOffset, t, style.ShadowColor, ScaleSize(style.Size),
 								word.Start, word.Length, spriteList, tag: word.Style);
 						}
 					}
 					for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
 						Renderer.DrawTextLine(
-							font, position + yOffset, t, style.TextColor, style.Size * scaleFactor,
+							font, position + yOffset, t, style.TextColor, ScaleSize(style.Size),
 							word.Start, word.Length, spriteList, tag: word.Style);
 					}
 				}
@@ -191,7 +196,7 @@ namespace Lime.Text
 						k -= 1;
 						Vector2 lt = new Vector2(fittedWords[b + j].X, y) + offset;
 						Vector2 rb = new Vector2(fittedWords[b + k].X + fittedWords[b + k].Width, y) + offset;
-						float yOffset = (maxHeight - style.ImageSize.Y * scaleFactor) * 0.5f;
+						float yOffset = (maxHeight - ScaleSize(style.ImageSize.Y)) * 0.5f;
 						spriteList.Add(style.ImageTexture, Color4.White, lt + new Vector2(0, yOffset),
 							rb - lt + new Vector2(0, style.ImageSize.Y),
 							Vector2.Zero, Vector2.One, tag: word.Style);
@@ -220,7 +225,7 @@ namespace Lime.Text
 				}
 				scaleFactor = (minScale + maxScale) / 2;
 			}
-			scaleFactor = bestScaleFactor.Round();
+			scaleFactor = bestScaleFactor;
 		}
 
 		public Vector2 MeasureText(float maxWidth, float maxHeight)
@@ -257,9 +262,9 @@ namespace Lime.Text
 						c = 0;
 					}
 				}
-				lineHeight = Math.Max(lineHeight, (style.Size + style.SpaceAfter) * scaleFactor);
+				lineHeight = Math.Max(lineHeight, ScaleSize(style.Size + style.SpaceAfter));
 				if (word.IsTagBegin) {
-					lineHeight = Math.Max(lineHeight, (style.ImageSize.Y + style.SpaceAfter) * scaleFactor);
+					lineHeight = Math.Max(lineHeight, ScaleSize(style.ImageSize.Y + style.SpaceAfter));
 				}
 				c++;
 			}
@@ -285,12 +290,12 @@ namespace Lime.Text
 				var style = styles[word.Style];
 				var font = style.Font.Instance;
 				var t = texts[word.TextIndex];
-				float dotsWidth = Renderer.MeasureTextLine(font, "...", style.Size * scaleFactor).X;
+				float dotsWidth = Renderer.MeasureTextLine(font, "...", ScaleSize(style.Size)).X;
 				if (
 					lastWordInLastLine > firstWordInLastLineIndex 
 					&& (
 						word.X + Renderer.MeasureTextLine(
-							font, t.Substring(word.Start, 1), style.Size * scaleFactor).X + dotsWidth > maxWidth
+							font, t.Substring(word.Start, 1), ScaleSize(style.Size)).X + dotsWidth > maxWidth
 						|| (word.Length == 1 && t[word.Start] == ' ')
 					)
 				) {
@@ -375,7 +380,7 @@ namespace Lime.Text
 			var t = texts[word.TextIndex];
 			do {
 				mid = min + ((max - min) / 2);
-				var w = Renderer.MeasureTextLine(font, t, style.Size * scaleFactor, word.Start, mid).X;
+				var w = Renderer.MeasureTextLine(font, t, ScaleSize(style.Size), word.Start, mid).X;
 				isLineLonger = word.X + w > maxWidth;
 				if (isLineLonger) {
 					max = mid;
@@ -391,7 +396,7 @@ namespace Lime.Text
 		private void ClipWordWithEllipsis(Word word, float maxWidth)
 		{
 			var style = styles[word.Style];
-			float dotsWidth = Renderer.MeasureTextLine(style.Font.Instance, "...", style.Size * scaleFactor).X;
+			float dotsWidth = Renderer.MeasureTextLine(style.Font.Instance, "...", ScaleSize(style.Size)).X;
 			while (word.Length > 1 && word.X + word.Width + dotsWidth > maxWidth) {
 				word.Length--;
 				word.Width = CalcWordWidth(word);

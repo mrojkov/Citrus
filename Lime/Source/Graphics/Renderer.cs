@@ -299,7 +299,7 @@ namespace Lime
 				position.X += scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar));
 				var texture = font.Textures[fontChar.TextureIndex];
 				var size = new Vector2(scale * fontChar.Width, fontHeight);
-				var roundPos = new Vector2(position.X.Ceiling(), position.Y.Ceiling());
+				var roundPos = new Vector2(position.X.Round(), position.Y.Round());
 				if (onDrawChar != null) {
 					onDrawChar(i, roundPos, size);
 				}
