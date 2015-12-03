@@ -73,7 +73,7 @@ namespace Lime
 			}
 		}
 
-		public void ClearFonts()
+		public void Clear()
 		{
 			foreach (var font in fonts.Values) {
 				font.Dispose();
@@ -81,7 +81,7 @@ namespace Lime
 			fonts.Clear();
 		}
 
-		public void ClearFontsCache()
+		public void ClearCache()
 		{
 			foreach (var font in fonts.Values) {
 				font.ClearCache();
