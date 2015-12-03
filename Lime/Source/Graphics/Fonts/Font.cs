@@ -6,15 +6,13 @@ using ProtoBuf;
 
 namespace Lime
 {
-	[ProtoContract]
 	public interface IFont : IDisposable
 	{
-		[ProtoMember(1)]
 		string About { get; }
-		[ProtoMember(2)]
 		List<ITexture> Textures { get; }
-		[ProtoMember(3)]
 		IFontCharSource Chars { get; }
+
+		void ClearCache();
 	}
 
 	public interface IFontCharSource : IDisposable
@@ -39,11 +37,15 @@ namespace Lime
 			CharCollection = new FontCharCollection();
 		}
 
-		public void Dispose() {
+		public void Dispose()
+		{
 			foreach (var texture in Textures) {
-				if (texture != null) { texture.Dispose(); }
+				texture.Dispose();
 			}
+			Textures.Clear();
 		}
+
+		public void ClearCache() { }
 	}
 
 	[ProtoContract]
@@ -135,7 +137,8 @@ namespace Lime
 			return CharList.Remove(item);
 		}
 		
-		bool ICollection<FontChar>.IsReadOnly { 
+		bool ICollection<FontChar>.IsReadOnly
+		{
 			get { return false; }
 		}
 

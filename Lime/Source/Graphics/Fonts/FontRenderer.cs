@@ -104,7 +104,12 @@ namespace Lime
 
 		public void Dispose()
 		{
-			if (library != null) { library.Dispose(); }
+			if (library != null) {
+				library.Dispose();
+				library = null;
+				// Do not dispose the face, because library.Dispose() made it on its own.
+				face = null;
+			}
 		}
 	}
 }

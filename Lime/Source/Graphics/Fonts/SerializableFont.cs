@@ -73,12 +73,19 @@ namespace Lime
 			}
 		}
 
-		public void Clear()
+		public void ClearFonts()
 		{
-			foreach (var fontsItem in fonts) {
-				if (fontsItem.Value != null) { fontsItem.Value.Dispose(); }
+			foreach (var font in fonts.Values) {
+				font.Dispose();
 			}
 			fonts.Clear();
+		}
+
+		public void ClearFontsCache()
+		{
+			foreach (var font in fonts.Values) {
+				font.ClearCache();
+			}
 		}
 	}
 }

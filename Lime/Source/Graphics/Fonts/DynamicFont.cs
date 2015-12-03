@@ -25,6 +25,11 @@ namespace Lime
 				if (texture != null) { texture.Dispose(); }
 			}
 		}
+
+		public void ClearCache()
+		{
+			(Chars as DynamicFontCharSource).ClearCache();
+		}
 	}
 
 	internal class DynamicFontCharSource : IFontCharSource
@@ -37,6 +42,29 @@ namespace Lime
 		{
 			builder = new FontRenderer(fontData);
 			this.textures = textures;
+		}
+
+		public FontChar Get(char code, float heightHint)
+		{
+			var roundedHeight = heightHint.Round();
+			CharCache charChache;
+			if (!charCaches.TryGetValue(roundedHeight, out charChache)) {
+				charCaches[roundedHeight] = charChache = new CharCache(roundedHeight, builder, textures);
+			}
+			return charChache.Get(code);
+		}
+
+		public void ClearCache()
+		{
+			charCaches.Clear();
+		}
+
+		public void Dispose()
+		{
+			if (builder != null) {
+				builder.Dispose();
+				builder = null;
+			}
 		}
 
 		class CharCache
@@ -75,7 +103,7 @@ namespace Lime
 					CharMap[hb][lb] = c;
 					return c;
 				}
-				return FontCharCollection.TranslateKnownMissingChars(ref code) ? 
+				return FontCharCollection.TranslateKnownMissingChars(ref code) ?
 					Get(code) : (CharMap[hb][lb] = FontChar.Null);
 			}
 
@@ -106,7 +134,7 @@ namespace Lime
 					KerningPairs = glyph.KerningPairs,
 					TextureIndex = textureIndex
 				};
-				position.X += glyph.Width + 1;
+				position.X += glyph.Width + 2;
 				// TODO: avoid texture reload on each glyph
 				texture.LoadImage(textureData, textureSize, textureSize, generateMips: false);
 				return fontChar;
@@ -155,21 +183,6 @@ namespace Lime
 					}
 				}
 			}
-		}
-
-		public FontChar Get(char code, float heightHint)
-		{
-			var roundedHeight = heightHint.Round();
-			CharCache c;
-			if (!charCaches.TryGetValue(roundedHeight, out c)) {
-				charCaches[roundedHeight] = c = new CharCache(roundedHeight, builder, textures);
-			}
-			return c.Get(code);
-		}
-
-		public void Dispose()
-		{
-			if (builder != null) { builder.Dispose(); }
 		}
 	}
 }
