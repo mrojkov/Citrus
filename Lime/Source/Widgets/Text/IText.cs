@@ -38,13 +38,11 @@ namespace Lime
 	public enum TextOverflowMode
 	{
 		[ProtoEnum]
-		Default,
+		Ignore,
 		[ProtoEnum]
 		Minify,
 		[ProtoEnum]
-		Ellipsis,
-		[ProtoEnum]
-		Ignore
+		Ellipsis
 	}
 
 	public interface ICaretPosition
