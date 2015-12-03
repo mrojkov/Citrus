@@ -40,9 +40,8 @@ namespace Lime
 		public void Dispose()
 		{
 			foreach (var texture in Textures) {
-				texture.Dispose();
+				texture.Discard();
 			}
-			Textures.Clear();
 		}
 
 		public void ClearCache() { }
