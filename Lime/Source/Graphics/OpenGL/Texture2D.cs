@@ -264,7 +264,7 @@ namespace Lime
 		/// Returns native texture handle
 		/// </summary>
 		/// <returns></returns>
-		public uint GetHandle()
+		public virtual uint GetHandle()
 		{
 			if (handle == 0) {
 				Reload();

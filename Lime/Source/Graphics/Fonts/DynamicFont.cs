@@ -69,10 +69,30 @@ namespace Lime
 
 		class CharCache
 		{
+			// Use inheritance instead of composition in a sake of performance
+			class DynamicTexture : Texture2D
+			{
+				public readonly Color4[] Data;
+				public bool Invalidated;
+
+				public DynamicTexture(Size size)
+				{
+					ImageSize = SurfaceSize = size;
+					Data = new Color4[size.Width * size.Height];
+				}
+
+				public override uint GetHandle()
+				{
+					if (Invalidated) {
+						LoadImage(Data, ImageSize.Width, ImageSize.Height, generateMips: false);
+						Invalidated = false;
+					}
+					return base.GetHandle();
+				}
+			}
+
 			private FontRenderer fontRenderer;
-			private Texture2D texture;
-			private Color4[] textureData;
-			private int textureSize;
+			private DynamicTexture texture;
 			private IntVector2 position;
 			private List<ITexture> textures;
 			private int textureIndex;
@@ -112,51 +132,47 @@ namespace Lime
 				var glyph = fontRenderer.Render(code, fontHeight);
 				if (glyph == null)
 					return null;
-				if (position.X + glyph.Width + 1 >= textureSize) {
+				if (texture == null) {
+					CreateNewFontTexture();
+				}
+				if (position.X + glyph.Width + 1 >= texture.ImageSize.Width) {
 					position.X = 0;
 					position.Y += fontHeight + 1;
 				}
-				if (position.Y + fontHeight + 1 >= textureSize) {
-					texture = null;
+				if (position.Y + fontHeight + 1 >= texture.ImageSize.Height) {
+					CreateNewFontTexture();
 					position = IntVector2.Zero;
-				}
-				if (texture == null) {
-					AddFontTexture();
 				}
 				DrawGlyphToTexture(glyph);
 				var fontChar = new FontChar {
 					Char = code,
-					UV0 = (Vector2)position / textureSize,
-					UV1 = ((Vector2)position + new Vector2(glyph.Width + 1, fontHeight)) / textureSize,
+					UV0 = (Vector2)position / (Vector2)texture.ImageSize,
+					UV1 = ((Vector2)position + new Vector2(glyph.Width, fontHeight)) / (Vector2)texture.ImageSize,
 					ACWidths = glyph.ACWidths,
-					Width = glyph.Width + 1,
+					Width = glyph.Width,
 					Height = fontHeight,
 					KerningPairs = glyph.KerningPairs,
 					TextureIndex = textureIndex
 				};
-				position.X += glyph.Width + 2;
-				// TODO: avoid texture reload on each glyph
-				texture.LoadImage(textureData, textureSize, textureSize, generateMips: false);
+				position.X += glyph.Width + 1;
 				return fontChar;
 			}
 
-			private void AddFontTexture()
+			private void CreateNewFontTexture()
 			{
-				textureSize = CalcTextureSize();
-				textureData = new Color4[textureSize * textureSize];
-				texture = new Texture2D();
+				texture = new DynamicTexture(CalcTextureSize());
 				textureIndex = textures.Count;
 				textures.Add(texture);
 			}
 
-			private int CalcTextureSize()
+			private Size CalcTextureSize()
 			{
 				const int glyphsPerTexture = 50;
 				var glyphMaxArea = fontHeight * (fontHeight / 2);
-				var textureSize =
+				var size =
 					CalcUpperPowerOfTwo((int)Math.Sqrt(glyphMaxArea * glyphsPerTexture))
 					.Clamp(128, 1024);
-				return textureSize;
+				return new Size(size, size);
 			}
 
 			private int CalcUpperPowerOfTwo(int x)
@@ -175,11 +191,12 @@ namespace Lime
 				var data = glyph.Pixels;
 				if (data == null)
 					return; // Invisible glyph
+				texture.Invalidated = true;
 				var t = 0;
 				for (int i = 0; i < glyph.Height; i++) {
-					int w = (position.Y + glyph.VerticalOffset + i) * textureSize + position.X;
+					int w = (position.Y + glyph.VerticalOffset + i) * texture.ImageSize.Width + position.X;
 					for (int j = 0; j < glyph.Width; j++) {
-						textureData[w++] = new Color4(255, 255, 255, data[t++]);
+						texture.Data[w++] = new Color4(255, 255, 255, data[t++]);
 					}
 				}
 			}
