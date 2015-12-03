@@ -1,10 +1,9 @@
-using System.Collections.Generic;
 using ProtoBuf;
 
 namespace Lime
 {
 	/// <summary>
-	/// ¬арианты горизонтального выравнивани€ текста
+	/// Types of horizontal alignment.
 	/// </summary>
 	[ProtoContract]
 	public enum HAlignment
@@ -16,11 +15,11 @@ namespace Lime
 		[ProtoEnum]
 		Right,
 		[ProtoEnum]
-		Expand,
+		Expand
 	}
 
 	/// <summary>
-	/// ¬арианты вертикального выравнивани€ текста
+	/// Types of vertical alignment.
 	/// </summary>
 	[ProtoContract]
 	public enum VAlignment
@@ -32,7 +31,7 @@ namespace Lime
 		[ProtoEnum]
 		Bottom,
 		[ProtoEnum]
-		Expand,
+		Expand
 	}
 
 	[ProtoContract]
@@ -45,7 +44,7 @@ namespace Lime
 		[ProtoEnum]
 		Ellipsis,
 		[ProtoEnum]
-		Ignore,
+		Ignore
 	}
 
 	public interface ICaretPosition
