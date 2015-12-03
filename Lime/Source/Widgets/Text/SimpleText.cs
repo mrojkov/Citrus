@@ -409,8 +409,7 @@ namespace Lime
 
 		private void DisposeSpriteList()
 		{
-			caret.TextPos--;
-			caret.TextPos++; // Enforce revalidation.
+			caret.Valid = CaretPosition.ValidState.TextPos;
 			spriteList = null;
 		}
 	}
