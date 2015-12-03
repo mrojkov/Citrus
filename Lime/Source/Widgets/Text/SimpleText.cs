@@ -26,7 +26,12 @@ namespace Lime
 		[ProtoMember(1)]
 		public SerializableFont Font {
 			get { return font; }
-			set { SetFont(value); }
+			set {
+				if (value != font) {
+					font = value;
+					DisposeSpriteList();
+				}
+			}
 		}
 
 		/// <summary>
@@ -35,7 +40,12 @@ namespace Lime
 		[ProtoMember(2)]
 		public override string Text {
 			get { return text ?? ""; }
-			set { SetText(value); }
+			set {
+				if (value != text) {
+					text = value;
+					DisposeSpriteList();
+				}
+			}
 		}
 
 		/// <summary>
@@ -56,7 +66,12 @@ namespace Lime
 		[ProtoMember(3)]
 		public float FontHeight {
 			get { return fontHeight; }
-			set { SetFontHeight(value); }
+			set {
+				if (value != fontHeight) {
+					fontHeight = value;
+					DisposeSpriteList();
+				}
+			}
 		}
 
 		/// <summary>
@@ -65,7 +80,12 @@ namespace Lime
 		[ProtoMember(4)]
 		public float Spacing {
 			get { return spacing; }
-			set { SetSpacing(value); }
+			set {
+				if (value != spacing) {
+					spacing = value;
+					DisposeSpriteList();
+				}
+			}
 		}
 
 		/// <summary>
@@ -74,7 +94,12 @@ namespace Lime
 		[ProtoMember(5)]
 		public HAlignment HAlignment {
 			get { return hAlignment; }
-			set { SetHAlignment(value); }
+			set {
+				if (value != hAlignment) {
+					hAlignment = value;
+					DisposeSpriteList();
+				}
+			}
 		}
 
 		/// <summary>
@@ -83,7 +108,12 @@ namespace Lime
 		[ProtoMember(6)]
 		public VAlignment VAlignment {
 			get { return vAlignment; }
-			set { SetVAlignment(value); }
+			set {
+				if (value != vAlignment) {
+					vAlignment = value;
+					DisposeSpriteList();
+				}
+			}
 		}
 
 		/// <summary>
@@ -375,54 +405,6 @@ namespace Lime
 			}
 			line += "...";
 			return line;
-		}
-
-		private void SetFont(SerializableFont value)
-		{
-			if (value != font) {
-				font = value;
-				DisposeSpriteList();
-			}
-		}
-
-		private void SetText(string value)
-		{
-			if (value != text) {
-				text = value;
-				DisposeSpriteList();
-			}
-		}
-
-		private void SetFontHeight(float value)
-		{
-			if (value != fontHeight) {
-				fontHeight = value;
-				DisposeSpriteList();
-			}
-		}
-
-		private void SetHAlignment(Lime.HAlignment value)
-		{
-			if (value != hAlignment) {
-				hAlignment = value;
-				DisposeSpriteList();
-			}
-		}
-
-		private void SetVAlignment(Lime.VAlignment value)
-		{
-			if (value != vAlignment) {
-				vAlignment = value;
-				DisposeSpriteList();
-			}
-		}
-
-		private void SetSpacing(float value)
-		{
-			if (value != spacing) {
-				spacing = value;
-				DisposeSpriteList();
-			}
 		}
 
 		private void DisposeSpriteList()
