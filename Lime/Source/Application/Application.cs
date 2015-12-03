@@ -180,7 +180,7 @@ namespace Lime
 			AudioSystem.Initialize(options);
 #if WIN
 			System.Windows.Forms.Application.SetUnhandledExceptionMode(
-				System.Windows.Forms.UnhandledExceptionMode.ThrowException
+				System.Windows.Forms.UnhandledExceptionMode.CatchException
 			);
 			// Nika: This function doesn't work on XP, and we don't want to add dpiAware into manifest
 			// because this will require adding into every new project.
@@ -247,8 +247,11 @@ namespace Lime
 		{
 			// Почитать и применить:
 			// http://forums.xamarin.com/discussion/931/how-to-prevent-ios-crash-reporters-from-crashing-monotouch-apps
-
+#if WIN
+			System.Windows.Forms.Application.ThreadException += (sender, e) => {
+#else
 			AppDomain.CurrentDomain.UnhandledException += (sender, e) => {
+#endif
 #if WIN
 				var title = "The application";
 				if (MainWindow != null) {
@@ -256,7 +259,7 @@ namespace Lime
 					title = MainWindow.Title;
 					MainWindow.Visible = false;
 				}
-				WinApi.MessageBox((IntPtr)null, e.ExceptionObject.ToString(), 
+				WinApi.MessageBox((IntPtr)null, e.Exception.ToString(), 
 					string.Format("{0} has terminated with an error", title), 0);
 #else
 				Console.WriteLine(e.ExceptionObject.ToString());
