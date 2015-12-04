@@ -147,7 +147,7 @@ namespace Lime
 				const int spacing = 1;
 
 				position.X += padding;
-				if (position.X + glyph.Width + spacing >= texture.ImageSize.Width) {
+				if (position.X + glyph.Width + padding + spacing >= texture.ImageSize.Width) {
 					position.X = padding;
 					position.Y += fontHeight + spacing;
 				}
