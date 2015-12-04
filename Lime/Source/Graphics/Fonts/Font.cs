@@ -216,13 +216,15 @@ namespace Lime
 
 		public float Kerning(FontChar prevChar)
 		{
-			if (prevChar != null && prevChar.KerningPairs != null)
-				foreach (var pair in prevChar.KerningPairs) {
-					if (pair.Char == Char) {
-						return pair.Kerning;
+			float kerning = 0f;
+			if (prevChar != null && KerningPairs != null) {
+				foreach (var pair in KerningPairs) {
+					if (pair.Char == prevChar.Char) {
+						kerning = pair.Kerning;
 					}
 				}
-			return 0;
+			}
+			return kerning;
 		}
 	}
 }
