@@ -145,8 +145,8 @@ namespace Lime
 				const int padding = 1;
 				// Space between characters on the texture
 				const int spacing = 1;
-				var paddedGlyphWith = glyph.Width + padding * 2;
-				if (position.X + paddedGlyphWith + spacing >= texture.ImageSize.Width) {
+				var paddedGlyphWidth = glyph.Width + padding * 2;
+				if (position.X + paddedGlyphWidth + spacing >= texture.ImageSize.Width) {
 					position.X = 0;
 					position.Y += fontHeight + spacing;
 				}
@@ -154,18 +154,18 @@ namespace Lime
 					CreateNewFontTexture();
 					position = IntVector2.Zero;
 				}
-				DrawGlyphToTexture(glyph, texture, position + new IntVector2(padding, 0));
+				CopyGlyphToTexture(glyph, texture, position + new IntVector2(padding, 0));
 				var fontChar = new FontChar {
 					Char = code,
 					UV0 = (Vector2)position / (Vector2)texture.ImageSize,
-					UV1 = ((Vector2)position + new Vector2(paddedGlyphWith, fontHeight)) / (Vector2)texture.ImageSize,
+					UV1 = ((Vector2)position + new Vector2(paddedGlyphWidth, fontHeight)) / (Vector2)texture.ImageSize,
 					ACWidths = glyph.ACWidths - Vector2.One * padding,
-					Width = paddedGlyphWith,
+					Width = paddedGlyphWidth,
 					Height = fontHeight,
 					KerningPairs = glyph.KerningPairs,
 					TextureIndex = textureIndex
 				};
-				position.X += paddedGlyphWith + spacing;
+				position.X += paddedGlyphWidth + spacing;
 				return fontChar;
 			}
 
@@ -197,7 +197,7 @@ namespace Lime
 				return (x + 1);
 			}
 
-			private static void DrawGlyphToTexture(FontRenderer.Glyph glyph, DynamicTexture texture, IntVector2 position)
+			private static void CopyGlyphToTexture(FontRenderer.Glyph glyph, DynamicTexture texture, IntVector2 position)
 			{
 				var srcPixels = glyph.Pixels;
 				if (srcPixels == null)
