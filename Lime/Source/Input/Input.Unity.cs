@@ -176,8 +176,6 @@ namespace Lime
 
 		public void Refresh()
 		{
-			TextInput = null;
-			CopyKeysState();
 			ProcessPendingKeyEvents();
 			RefreshMousePosition();
 			RefreshMouseWheel();

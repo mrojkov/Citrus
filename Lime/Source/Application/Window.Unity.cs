@@ -39,9 +39,13 @@ namespace Lime
 			UnityApplicationDelegate.Instance.Updating += delta => {
 				Input.Refresh();
 				RaiseUpdating(delta);
+				AudioSystem.Update();
+				Input.TextInput = null;
+				Input.CopyKeysState();
 			};
 			UnityApplicationDelegate.Instance.Rendering += () => {
 				RaiseRendering();
+				fpsCounter.Refresh();
 			};
 			UnityApplicationDelegate.Instance.Destroying += () => {
 				RaiseClosed();
