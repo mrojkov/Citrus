@@ -20,9 +20,13 @@ namespace Lime
 
 		public void Dispose()
 		{
-			if (Chars != null) { Chars.Dispose(); }
+			if (Chars != null) {
+				Chars.Dispose();
+			}
 			foreach (var texture in Textures) {
-				if (texture != null) { texture.Dispose(); }
+				if (texture != null) {
+					texture.Discard();
+				}
 			}
 		}
 
@@ -135,7 +139,12 @@ namespace Lime
 				if (texture == null) {
 					CreateNewFontTexture();
 				}
-				if (position.X + glyph.Width + 1 >= texture.ImageSize.Width) {
+				// We add 1px left and right padding to each char on texture and also to the UV
+				// so that chars will be blurred correctly after stretching or drawing to float position.
+				// And we copensate this padding thourgh ACWidth, so that text will take the same space.
+				const int paddingSum = 2;
+
+				if (position.X + glyph.Width + paddingSum + 1>= texture.ImageSize.Width) {
 					position.X = 0;
 					position.Y += fontHeight + 1;
 				}
@@ -143,18 +152,18 @@ namespace Lime
 					CreateNewFontTexture();
 					position = IntVector2.Zero;
 				}
-				DrawGlyphToTexture(glyph);
+				DrawGlyphToTexture(glyph, paddingSum);
 				var fontChar = new FontChar {
 					Char = code,
 					UV0 = (Vector2)position / (Vector2)texture.ImageSize,
-					UV1 = ((Vector2)position + new Vector2(glyph.Width, fontHeight)) / (Vector2)texture.ImageSize,
-					ACWidths = glyph.ACWidths,
-					Width = glyph.Width,
+					UV1 = ((Vector2)position + new Vector2(glyph.Width + paddingSum, fontHeight)) / (Vector2)texture.ImageSize,
+					ACWidths = new Vector2(glyph.ACWidths.X - paddingSum / 2, glyph.ACWidths.Y - paddingSum / 2),
+					Width = glyph.Width + paddingSum,
 					Height = fontHeight,
 					KerningPairs = glyph.KerningPairs,
 					TextureIndex = textureIndex
 				};
-				position.X += glyph.Width + 1;
+				position.X += glyph.Width + paddingSum + 1;
 				return fontChar;
 			}
 
@@ -186,7 +195,7 @@ namespace Lime
 				return (x + 1);
 			}
 
-			private void DrawGlyphToTexture(FontRenderer.Glyph glyph)
+			private void DrawGlyphToTexture(FontRenderer.Glyph glyph, int padding)
 			{
 				var srcPixels = glyph.Pixels;
 				if (srcPixels == null)
@@ -196,10 +205,12 @@ namespace Lime
 				var dstPixels = texture.Data;
 				for (int i = 0; i < glyph.Height; i++) {
 					int di = (position.Y + glyph.VerticalOffset + i) * texture.ImageSize.Width + position.X;
+					di += padding / 2;
 					for (int j = glyph.Width; j > 0; j--) {
 						color.A = srcPixels[si++];
 						dstPixels[di++] = color;
 					}
+					di += padding / 2;
 				}
 				texture.Invalidated = true;
 			}
