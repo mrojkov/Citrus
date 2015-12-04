@@ -34,13 +34,13 @@ namespace Lime
 
 	internal class DynamicFontCharSource : IFontCharSource
 	{
-		private FontRenderer builder;
+		private FontRenderer fontRenderer;
 		private List<ITexture> textures;
 		private Dictionary<int, CharCache> charCaches = new Dictionary<int, CharCache>();
 		
 		public DynamicFontCharSource(byte[] fontData, List<ITexture> textures)
 		{
-			builder = new FontRenderer(fontData);
+			fontRenderer = new FontRenderer(fontData);
 			this.textures = textures;
 		}
 
@@ -49,7 +49,7 @@ namespace Lime
 			var roundedHeight = heightHint.Round();
 			CharCache charChache;
 			if (!charCaches.TryGetValue(roundedHeight, out charChache)) {
-				charCaches[roundedHeight] = charChache = new CharCache(roundedHeight, builder, textures);
+				charCaches[roundedHeight] = charChache = new CharCache(roundedHeight, fontRenderer, textures);
 			}
 			return charChache.Get(code);
 		}
@@ -61,9 +61,9 @@ namespace Lime
 
 		public void Dispose()
 		{
-			if (builder != null) {
-				builder.Dispose();
-				builder = null;
+			if (fontRenderer != null) {
+				fontRenderer.Dispose();
+				fontRenderer = null;
 			}
 		}
 
@@ -167,11 +167,11 @@ namespace Lime
 
 			private Size CalcTextureSize()
 			{
-				const int glyphsPerTexture = 50;
+				const int glyphsPerTexture = 30;
 				var glyphMaxArea = fontHeight * (fontHeight / 2);
 				var size =
 					CalcUpperPowerOfTwo((int)Math.Sqrt(glyphMaxArea * glyphsPerTexture))
-					.Clamp(128, 1024);
+					.Clamp(64, 1024);
 				return new Size(size, size);
 			}
 
