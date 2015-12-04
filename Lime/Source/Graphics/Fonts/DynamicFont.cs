@@ -1,4 +1,4 @@
-﻿#if WIN
+﻿#if WIN || MAC
 using System;
 using System.Collections.Generic;
 
@@ -188,17 +188,20 @@ namespace Lime
 
 			private void DrawGlyphToTexture(FontRenderer.Glyph glyph)
 			{
-				var data = glyph.Pixels;
-				if (data == null)
+				var srcPixels = glyph.Pixels;
+				if (srcPixels == null)
 					return; // Invisible glyph
-				texture.Invalidated = true;
-				var t = 0;
+				var si = 0;
+				var color = Color4.White;
+				var dstPixels = texture.Data;
 				for (int i = 0; i < glyph.Height; i++) {
-					int w = (position.Y + glyph.VerticalOffset + i) * texture.ImageSize.Width + position.X;
-					for (int j = 0; j < glyph.Width; j++) {
-						texture.Data[w++] = new Color4(255, 255, 255, data[t++]);
+					int di = (position.Y + glyph.VerticalOffset + i) * texture.ImageSize.Width + position.X;
+					for (int j = glyph.Width; j > 0; j--) {
+						color.A = srcPixels[si++];
+						dstPixels[di++] = color;
 					}
 				}
+				texture.Invalidated = true;
 			}
 		}
 	}
