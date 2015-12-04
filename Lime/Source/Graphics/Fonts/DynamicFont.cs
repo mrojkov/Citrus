@@ -143,15 +143,17 @@ namespace Lime
 				// so that chars will be blurred correctly after stretching or drawing to float position.
 				// And we copensate this padding thourgh ACWidth, so that text will take the same space.
 				const int padding = 1;
-				position.X += padding;
+				// Space between characters on the texture
+				const int spacing = 1;
 
-				if (position.X + glyph.Width + 1 >= texture.ImageSize.Width) {
+				position.X += padding;
+				if (position.X + glyph.Width + spacing >= texture.ImageSize.Width) {
 					position.X = padding;
-					position.Y += fontHeight + 1;
+					position.Y += fontHeight + spacing;
 				}
-				if (position.Y + fontHeight + 1 >= texture.ImageSize.Height) {
+				if (position.Y + fontHeight + spacing >= texture.ImageSize.Height) {
 					CreateNewFontTexture();
-					position = IntVector2.Zero;
+					position = new IntVector2(padding, 0);
 				}
 				DrawGlyphToTexture(glyph);
 				var fontChar = new FontChar {
@@ -164,7 +166,7 @@ namespace Lime
 					KerningPairs = glyph.KerningPairs,
 					TextureIndex = textureIndex
 				};
-				position.X += glyph.Width + padding + 1;
+				position.X += glyph.Width + padding + spacing;
 				return fontChar;
 			}
 
