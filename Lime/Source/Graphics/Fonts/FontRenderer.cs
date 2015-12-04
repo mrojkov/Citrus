@@ -89,14 +89,14 @@ namespace Lime
 				),
 			};
 			// Iterate through kerning pairs
-			foreach (var prevChar in KerningCharacters) {
-				uint prevGlyphIndex = face.GetCharIndex(prevChar);
-				var kerning = (float)face.GetKerning(prevGlyphIndex, glyphIndex, KerningMode.Default).X;
+			foreach (var nextChar in KerningCharacters) {
+				uint nextGlyphIndex = face.GetCharIndex(nextChar);
+				var kerning = (float)face.GetKerning(glyphIndex, nextGlyphIndex, KerningMode.Default).X;
 				if (kerning != 0) {
 					if (glyph.KerningPairs == null) {
 						glyph.KerningPairs = new List<KerningPair>();
 					}
-					glyph.KerningPairs.Add(new KerningPair { Char = prevChar, Kerning = kerning });
+					glyph.KerningPairs.Add(new KerningPair { Char = nextChar, Kerning = kerning });
 				}
 			}
 			return glyph;
