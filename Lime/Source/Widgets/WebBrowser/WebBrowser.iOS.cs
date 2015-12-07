@@ -11,10 +11,8 @@ namespace Lime
 	{
 		private UIWebView webView;
 		private UIActivityIndicatorView activityIndicator;
-
 		private bool isActivityIndicatorVisible = false;
-	
-		public Uri Url { get { return GetUrl(); } set { SetUrl(value); } }	
+		private Rectangle aabbInDeviceSpace;
 		
 		public WebBrowser(Widget parentWidget)
 			: this()
@@ -22,36 +20,103 @@ namespace Lime
 			AddToWidget(parentWidget);
 		}
 
+		public WebBrowser()
+		{
+			webView = new UIWebView {
+				AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight,
+				ScalesPageToFit = true,
+				Opaque = false,
+				BackgroundColor = new UIColor(0.0f, 0.0f, 0.0f, 1.0f),
+				Hidden = true,
+			};
+			webView.ScrollView.Scrolled += WebViewScrollView_Scrolled;
+			webView.LoadStarted += WebView_LoadStarted;
+			webView.LoadFinished += WebView_LoadFinished;
+			GameView.AddSubview(webView);
+		}	
+
 		public void AddToWidget(Widget parentWidget)
 		{
 			parentWidget.Nodes.Add(this);
 			Size = parentWidget.Size;
-			Anchors = Anchors.LeftRight | Anchors.TopBottom;
+			Anchors = Anchors.LeftRightTopBottom;
 		}
 
-		public WebBrowser()
-		{
-			webView = new UIWebView();
-			webView.AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;
-			webView.ScalesPageToFit = true;
-			webView.ScrollView.ShowsHorizontalScrollIndicator = false;
-			webView.ScrollView.Scrolled += (object sender, EventArgs e) => {
-				webView.ScrollView.ShowsVerticalScrollIndicator = true;
-				if (webView.ScrollView.ContentOffset.X != 0.0f) {
-					webView.ScrollView.SetContentOffset(new PointF(0.0f, (float)webView.ScrollView.ContentOffset.Y), false);
-					webView.ScrollView.ShowsVerticalScrollIndicator = false;
-				}
-				if (webView.ScrollView.ContentOffset.Y < 0.0f) {
-					webView.ScrollView.SetContentOffset(new PointF((float)webView.ScrollView.ContentOffset.X, 0.0f), false);
-					webView.ScrollView.ShowsVerticalScrollIndicator = false;
-				}
-			};
-			webView.Opaque = false;
-			webView.BackgroundColor = new UIColor(0.0f, 0.0f, 0.0f, 1.0f);
-			webView.Hidden = true;
-			WidgetContext.Current.Window.UIViewController.View.AddSubview(webView);
+		public Uri Url 
+		{ 
+			get { return new Uri(webView.Request.Url.AbsoluteString); } 
+			set 
+			{ 
+				var request = new NSUrlRequest(new NSUrl(value.AbsoluteUri));
+				webView.LoadRequest(request); 
+			} 
 		}
-		
+
+		private void WebView_LoadStarted(object sender, EventArgs e) {
+			if (activityIndicator == null) {
+				activityIndicator = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.WhiteLarge);
+				activityIndicator.Center = ActivityIndicatorPosition;
+			}
+			activityIndicator.StartAnimating();
+			GameView.AddSubview(activityIndicator);
+			isActivityIndicatorVisible = true;
+		}
+
+		private GameView GameView 
+		{
+			get { return WidgetContext.Current.Window.UIViewController.View; }
+		}
+
+		private void WebView_LoadFinished(object sender, EventArgs e) {
+			activityIndicator.StopAnimating();
+			activityIndicator.RemoveFromSuperview();
+			isActivityIndicatorVisible = false;
+		}
+
+		private void WebViewScrollView_Scrolled(object sender, EventArgs e) {
+			webView.ScrollView.ShowsVerticalScrollIndicator = true;
+			if (webView.ScrollView.ContentOffset.X != 0.0f) {
+				webView.ScrollView.SetContentOffset(new PointF(0.0f, (float)webView.ScrollView.ContentOffset.Y), false);
+				webView.ScrollView.ShowsVerticalScrollIndicator = false;
+			}
+			if (webView.ScrollView.ContentOffset.Y < 0.0f) {
+				webView.ScrollView.SetContentOffset(new PointF((float)webView.ScrollView.ContentOffset.X, 0.0f), false);
+				webView.ScrollView.ShowsVerticalScrollIndicator = false;
+			}
+		}
+
+		private PointF ActivityIndicatorPosition 
+		{
+			get 
+			{ 
+				return new PointF((WebViewSize.Width * 0.5f) + WebViewPosition.X, 
+					(WebViewSize.Height * 0.5f) + WebViewPosition.Y);
+			}
+		}
+
+		private PointF WebViewPosition 
+		{
+			get { return new PointF(aabbInDeviceSpace.Left, aabbInDeviceSpace.Top); }
+		}
+
+		private SizeF WebViewSize 
+		{
+			get { return new SizeF(aabbInDeviceSpace.Width, aabbInDeviceSpace.Height); }
+		}
+
+		protected override void SelfUpdate(float delta)
+		{
+			if (webView == null) {
+				return;
+			}
+			aabbInDeviceSpace = CalculateAABBInDeviceSpace(this);
+			webView.Frame = new RectangleF(WebViewPosition, WebViewSize);
+			webView.Hidden = false;
+			if (activityIndicator != null) {
+				activityIndicator.Center = ActivityIndicatorPosition;
+			}
+		}
+
 		public override void Dispose()
 		{
 			if (activityIndicator != null) {
@@ -73,37 +138,8 @@ namespace Lime
 				webView = null;
 			}
 		}
-
-		protected override void SelfUpdate(float delta)
-		{
-			if (webView == null) {
-				return;
-			}
-			var wr = CalculateAABBInDeviceSpace(this);
-			var position = new PointF(wr.Left, wr.Top);
-			var size = new SizeF(wr.Width, wr.Height);
-			webView.Frame = new RectangleF(position, size);
-			webView.Hidden = false;
-			var activityIndicatorPosition = new PointF((size.Width * 0.5f) + position.X, (size.Height * 0.5f) + position.Y);
-			if (activityIndicator == null) {
-				activityIndicator = new UIActivityIndicatorView(UIActivityIndicatorViewStyle.WhiteLarge);
-				activityIndicator.Center = activityIndicatorPosition;
-				var view = WidgetContext.Current.Window.UIViewController.View;
-				webView.LoadStarted += (object sender, EventArgs e) => {
-					activityIndicator.StartAnimating();
-					view.AddSubview(activityIndicator);
-					isActivityIndicatorVisible = true;
-				};
-				webView.LoadFinished += (object sender, EventArgs e) => {
-					activityIndicator.StopAnimating();
-					activityIndicator.RemoveFromSuperview();
-					isActivityIndicatorVisible = false;
-				};
-			}
-			activityIndicator.Center = activityIndicatorPosition;
-		}
 	
-		private Rectangle CalculateAABBInDeviceSpace(Widget widget)
+		private static Rectangle CalculateAABBInDeviceSpace(Widget widget)
 		{
 			var aabb = widget.CalcAABBInSpaceOf(WidgetContext.Current.Root);
 			// Get the projected AABB coordinates in the normalized OpenGL space
@@ -127,17 +163,6 @@ namespace Lime
 			result.Top = displayHeight - Mathf.Lerp(aabb.Bottom, min.Y, max.Y).Round();
 			result.Bottom = displayHeight - Mathf.Lerp(aabb.Top, min.Y, max.Y).Round();
 			return result;
-		}
-
-		private Uri GetUrl()
-		{
-			return new Uri(webView.Request.Url.AbsoluteString);
-		}
-
-		private void SetUrl(Uri value)
-		{
-			NSUrlRequest request = new NSUrlRequest(new NSUrl(value.AbsoluteUri));
-			webView.LoadRequest(request);
 		}		
 	}
 }
