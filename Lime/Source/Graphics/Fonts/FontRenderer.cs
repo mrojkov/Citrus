@@ -1,4 +1,4 @@
-﻿#if WIN
+﻿#if WIN || iOS
 using System;
 using System.Collections.Generic;
 

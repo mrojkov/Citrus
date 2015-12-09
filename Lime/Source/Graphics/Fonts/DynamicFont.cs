@@ -1,4 +1,4 @@
-﻿#if WIN || MAC
+﻿#if WIN || MAC || iOS
 using System;
 using System.Collections.Generic;
 
