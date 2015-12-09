@@ -46,6 +46,9 @@
       <HintPath>..\3rdParty\ProtoBuf-Net\Android\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK-1.0" />
+    <Reference Include="SharpFont">
+      <HintPath>..\3rdParty\SharpFont\SharpFont.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Application\Application.cs" />
@@ -287,4 +290,15 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
+  <ItemGroup>
+    <EmbeddedNativeLibrary Include="..\3rdParty\SharpFont\libfreetype\armeabi\libfreetype6.so">
+      <Link>libfreetype\armeabi\libfreetype6.so</Link>
+    </EmbeddedNativeLibrary>
+    <EmbeddedNativeLibrary Include="..\3rdParty\SharpFont\libfreetype\armeabi-v7a\libfreetype6.so">
+      <Link>libfreetype\armeabi-v7a\libfreetype6.so</Link>
+    </EmbeddedNativeLibrary>
+    <EmbeddedNativeLibrary Include="..\3rdParty\SharpFont\libfreetype\x86\libfreetype6.so">
+      <Link>libfreetype\x86\libfreetype6.so</Link>
+    </EmbeddedNativeLibrary>
+  </ItemGroup>
 </Project>

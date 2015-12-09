@@ -1,5 +1,4 @@
-﻿#if WIN || MAC || iOS
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Lime
@@ -217,4 +216,3 @@ namespace Lime
 		}
 	}
 }
-#endif
