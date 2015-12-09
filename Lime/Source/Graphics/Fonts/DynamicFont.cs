@@ -62,6 +62,9 @@ namespace Lime
 			charCaches.Clear();
 		}
 
+		/// <summary>
+		/// Checks if given char available for rendering
+		/// </summary>
 		public bool Contains(char code)
 		{
 			return fontRenderer.ContainsGlyph(code);
