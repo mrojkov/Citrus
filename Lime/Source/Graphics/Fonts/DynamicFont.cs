@@ -62,6 +62,11 @@ namespace Lime
 			charCaches.Clear();
 		}
 
+		public bool Contains(char code)
+		{
+			return fontRenderer.ContainsGlyph(code);
+		}
+
 		public void Dispose()
 		{
 			if (fontRenderer != null) {

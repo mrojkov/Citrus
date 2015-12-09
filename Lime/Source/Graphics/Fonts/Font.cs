@@ -18,6 +18,7 @@ namespace Lime
 	public interface IFontCharSource : IDisposable
 	{
 		FontChar Get(char code, float heightHint);
+		bool Contains(char code);
 	}
 
 	[ProtoContract]
@@ -115,17 +116,22 @@ namespace Lime
 				CharMap[i] = null;
 			}
 		}
-		
-		public bool Contains(FontChar item)
+
+		public bool Contains(char code)
 		{
-			byte hb = (byte)(item.Char >> 8);
-			byte lb = (byte)(item.Char & 255);
+			byte hb = (byte)(code >> 8);
+			byte lb = (byte)(code & 255);
 			if (CharMap[hb] != null) {
 				return CharMap[hb][lb] != null;
 			}
 			return false;
 		}
 		
+		public bool Contains(FontChar item)
+		{
+			return Contains(item.Char);
+		}
+
 		public bool Remove(FontChar item)
 		{
 			byte hb = (byte)(item.Char >> 8);

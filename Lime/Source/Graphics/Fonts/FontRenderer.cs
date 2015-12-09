@@ -102,6 +102,11 @@ namespace Lime
 			return glyph;
 		}
 
+		public bool ContainsGlyph(char code)
+		{
+			return face.GetCharIndex(code) != 0;
+		}
+
 		public void Dispose()
 		{
 			if (library != null) {
