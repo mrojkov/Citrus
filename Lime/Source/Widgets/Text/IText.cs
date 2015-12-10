@@ -1,3 +1,4 @@
+using System;
 using ProtoBuf;
 
 namespace Lime
@@ -76,14 +77,20 @@ namespace Lime
 
 	public interface IText
 	{
+		/// <summary>
+		/// Returns the text's bounding box.
+		/// </summary>
 		Rectangle MeasureText();
+
+		void Invalidate();
+
+		bool Localizable { get; set; }
 		string Text { get; set; }
-		string DisplayText { get; set; }
+		Action<ITextProcessorArg> TextProcessor { get; set; }
 		HAlignment HAlignment { get; set; }
 		VAlignment VAlignment { get; set; }
 		TextOverflowMode OverflowMode { get; set; }
 		bool WordSplitAllowed { get; set; }
 		bool TrimWhitespaces { get; set; }
 	}
-
 }

@@ -142,8 +142,19 @@ namespace Lime
 			Text.TrimWhitespaces = false;
 			this.caretPos = caretPos;
 			this.editorParams = editorParams;
+			Text.Localizable = false;
+			if (editorParams.PasswordChar != null) {
+				Text.TextProcessor = arg => ProcessTextAsPassword(arg, editorParams.PasswordChar.Value);
+				container.Tasks.Add(TrackLastCharInput, this);
+			}
 			container.Tasks.Add(HandleInputTask(), this);
-			container.Tasks.Add(EnforceDisplayTextTask(), this);
+		}
+
+		private void ProcessTextAsPassword(ITextProcessorArg arg, char passwordChar)
+		{
+			if (Text.Text == "") return;
+			arg.Text = new string(passwordChar, Text.Text.Length - 1);
+			arg.Text += isLastCharVisible ? Text.Text.Last() : editorParams.PasswordChar;
 		}
 
 		public void Unlink()
@@ -198,10 +209,10 @@ namespace Lime
 
 		private float CalcTextHeight(string s)
 		{
-			var displayText = Text.DisplayText;
-			Text.DisplayText = s;
+			var text = Text.Text;
+			Text.Text = s;
 			var height = Text.MeasureText().Height;
-			Text.DisplayText = displayText;
+			Text.Text = text;
 			return height;
 		}
 
@@ -236,8 +247,10 @@ namespace Lime
 #endif
 			prevKeyPressed = keyPressed;
 		}
+		
+		private float lastCharShowTimeLeft;
+		private bool isLastCharVisible;
 
-		private float lastCharShowTimeLeft = 0f;
 		private void HandleTextInput()
 		{
 			if (Container.Input.TextInput == null)
@@ -256,6 +269,21 @@ namespace Lime
 					InsertChar(ch);
 					lastCharShowTimeLeft = editorParams.PasswordLastCharShowTime;
 				}
+			}
+		}
+
+		private IEnumerator<object> TrackLastCharInput()
+		{
+			while (true) {
+				if (Text.Text != "") {
+					lastCharShowTimeLeft -= Task.Current.Delta;
+					var shouldShowLastChar = lastCharShowTimeLeft > 0;
+					if (shouldShowLastChar != isLastCharVisible) {
+						isLastCharVisible = shouldShowLastChar;
+						Text.Invalidate();
+					}
+				}
+				yield return null;
 			}
 		}
 
@@ -282,22 +310,6 @@ namespace Lime
 				yield return null;
 			}
 		}
-
-		private IEnumerator<object> EnforceDisplayTextTask()
-		{
-			while (true) {
-				if (editorParams.PasswordChar != null && Text.Text != "") {
-					lastCharShowTimeLeft -= Task.Current.Delta;
-					Text.DisplayText = new string(editorParams.PasswordChar.Value, Text.Text.Length - 1);
-					Text.DisplayText += lastCharShowTimeLeft > 0 ? Text.Text.Last() : editorParams.PasswordChar;
-				}
-				else {
-					Text.DisplayText = Text.Text; // Disable localization.
-				}
-				yield return null;
-			}
-		}
-
 	}
 
 	/// <summary>

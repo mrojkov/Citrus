@@ -8,12 +8,11 @@ namespace Lime
 	/// Виджет, выводящий текст с упрощенным форматированием
 	/// </summary>
 	[ProtoContract]
-	public class SimpleText : Widget, IText, IKeyboardInputProcessor
+	public class SimpleText : Widget, IText, IKeyboardInputProcessor, ITextProcessorArg
 	{
 		private SpriteList spriteList;
 		private SerializableFont font;
 		private string text;
-		private string displayText;
 		private Rectangle extent;
 		private float fontHeight;
 		private float spacing;
@@ -21,7 +20,12 @@ namespace Lime
 		private VAlignment vAlignment;
 		private Color4 textColor;
 
+		[Obsolete("Use TextProcessor instead", true)]
 		public Func<string, string> LocalizationHandler;
+
+		string ITextProcessorArg.Text { get; set; }
+
+		public Action<ITextProcessorArg> TextProcessor { get; set; }
 
 		[ProtoMember(1)]
 		public SerializableFont Font {
@@ -29,7 +33,7 @@ namespace Lime
 			set {
 				if (value != font) {
 					font = value;
-					DisposeSpriteList();
+					Invalidate();
 				}
 			}
 		}
@@ -43,23 +47,11 @@ namespace Lime
 			set {
 				if (value != text) {
 					text = value;
-					DisposeSpriteList();
+					Invalidate();
 				}
 			}
 		}
-
-		/// <summary>
-		/// Выводимый фактически текст. Свойство Text, прошедшее локализацию
-		/// </summary>
-		public string DisplayText {
-			get { return displayText; }
-			set { 
-				if (displayText == value) return;
-				displayText = value;
-				DisposeSpriteList();
-			}
-		}
-
+		
 		/// <summary>
 		/// Размер шрифта
 		/// </summary>
@@ -69,7 +61,7 @@ namespace Lime
 			set {
 				if (value != fontHeight) {
 					fontHeight = value;
-					DisposeSpriteList();
+					Invalidate();
 				}
 			}
 		}
@@ -83,7 +75,7 @@ namespace Lime
 			set {
 				if (value != spacing) {
 					spacing = value;
-					DisposeSpriteList();
+					Invalidate();
 				}
 			}
 		}
@@ -97,7 +89,7 @@ namespace Lime
 			set {
 				if (value != hAlignment) {
 					hAlignment = value;
-					DisposeSpriteList();
+					Invalidate();
 				}
 			}
 		}
@@ -111,7 +103,7 @@ namespace Lime
 			set {
 				if (value != vAlignment) {
 					vAlignment = value;
-					DisposeSpriteList();
+					Invalidate();
 				}
 			}
 		}
@@ -151,6 +143,8 @@ namespace Lime
 		/// </summary>
 		public ICaretPosition Caret { get { return caret; } }
 
+		public bool Localizable { get; set; }
+
 		public SimpleText()
 		{
 			TrimWhitespaces = true;
@@ -159,6 +153,24 @@ namespace Lime
 			FontHeight = 15;
 			Font = new SerializableFont();
 			TextColor = Color4.White;
+			TextProcessor = LocalizeProcessor;
+		}
+
+		private void LocalizeProcessor(ITextProcessorArg arg)
+		{
+			if (Localizable) {
+				arg.Text = arg.Text.Localize();
+			}
+		}
+
+		private string GetProcessedText()
+		{
+			var textProcessorArg = (ITextProcessorArg) this;
+			textProcessorArg.Text = Text;
+			if (TextProcessor != null) {
+				TextProcessor(textProcessorArg);
+			}
+			return textProcessorArg.Text;
 		}
 
 		/// <summary>
@@ -166,13 +178,13 @@ namespace Lime
 		/// </summary>
 		public override Vector2 CalcContentSize()
 		{
-			return Renderer.MeasureTextLine(Font.Instance, DisplayText ?? Text, FontHeight);
+			return Renderer.MeasureTextLine(Font.Instance, GetProcessedText(), FontHeight);
 		}
 
 		protected override void OnSizeChanged(Vector2 sizeDelta)
 		{
 			base.OnSizeChanged(sizeDelta);
-			DisposeSpriteList();
+			Invalidate();
 		}
 
 		public override void Render()
@@ -258,8 +270,8 @@ namespace Lime
 				caret = dummyCaret;
 			}
 			try {
-				var t = DisplayText ?? (LocalizationHandler != null ? LocalizationHandler(Text) : Text.Localize());
-				var lines = SplitText(t);
+				var processedText = GetProcessedText();
+				var lines = SplitText(processedText);
 				if (TrimWhitespaces) {
 					TrimLinesWhitespaces(lines);
 				}
@@ -267,7 +279,7 @@ namespace Lime
 				caret.RenderingLineNumber = 0;
 				caret.RenderingTextPos = 0;
 				caret.NearestCharPos = Vector2.Zero;
-				if (String.IsNullOrEmpty(t)) {
+				if (String.IsNullOrEmpty(processedText)) {
 					caret.WorldPos = pos;
 					caret.Line = caret.Pos = caret.TextPos = 0;
 					caret.Valid = CaretPosition.ValidState.All;
@@ -407,10 +419,15 @@ namespace Lime
 			return line;
 		}
 
-		private void DisposeSpriteList()
+		public void Invalidate()
 		{
 			caret.Valid = CaretPosition.ValidState.TextPos;
 			spriteList = null;
 		}
+	}
+
+	public interface ITextProcessorArg
+	{
+		string Text { get; set; }
 	}
 }

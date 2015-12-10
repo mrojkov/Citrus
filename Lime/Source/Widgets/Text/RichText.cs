@@ -27,12 +27,9 @@ namespace Lime
 			set { SetText(value); }
 		}
 
-		public string DisplayText // TODO
-		{
-			get { return text; }
-			set { SetText(value); }
-		}
-
+		// TODO
+		public Action<ITextProcessorArg> TextProcessor { get; set; }
+		
 		[ProtoMember(2)]
 		public HAlignment HAlignment 
 		{ 
@@ -107,6 +104,9 @@ namespace Lime
 			var extent = PrepareRenderer().MeasureText(Size.X, Size.Y);
 			return new Rectangle(Vector2.Zero, extent);
 		}
+
+		// TODO
+		public bool Localizable { get; set; }
 
 		public override void StaticScale(float ratio, bool roundCoordinates)
 		{
