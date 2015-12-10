@@ -51,6 +51,8 @@ namespace Orange
 				return () => (AudioAction)lexer.ParseInt();
 			case "Hot::TypedAnimator<Hot::Movie::Action>":
 				return () => (MovieAction)lexer.ParseInt();
+			case "Hot::TypedAnimator<Hot::EmissionType>":
+				return () => (EmissionType) lexer.ParseInt();
 			default:
 				throw new Lime.Exception("Unknown type of animator '{0}'", animatorType);
 			}

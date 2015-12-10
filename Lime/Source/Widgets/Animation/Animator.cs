@@ -23,6 +23,7 @@ namespace Lime
 	[ProtoInclude(117, typeof(Animator<ShaderId>))]
 	[ProtoInclude(118, typeof(Animator<Vector3>))]
 	[ProtoInclude(119, typeof(Animator<Quaternion>))]
+	[ProtoInclude(120, typeof(Animator<EmissionType>))]
 	public interface IAnimator
 	{
 		void Bind(Node owner);

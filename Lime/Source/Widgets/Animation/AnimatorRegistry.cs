@@ -48,6 +48,7 @@ namespace Lime
 			Add(typeof(HAlignment), typeof(Animator<HAlignment>));
 			Add(typeof(VAlignment), typeof(Animator<VAlignment>));
 			Add(typeof(Anchors), typeof(Animator<Anchors>));
+			Add(typeof(EmissionType), typeof(Animator<EmissionType>));
 		}
 		
 		Dictionary<Type, Type> map = new Dictionary<Type, Type>();
