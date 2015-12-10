@@ -1,4 +1,4 @@
-﻿#if !MAC && !MONOMAC
+﻿#if !MAC && !MONOMAC && !iOS
 using System;
 using System.Collections.Generic;
 

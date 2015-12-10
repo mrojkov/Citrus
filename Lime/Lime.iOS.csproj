@@ -49,9 +49,6 @@
     </Reference>
     <Reference Include="Xamarin.iOS" />
     <Reference Include="OpenTK-1.0" />
-    <Reference Include="SharpFont.iOS">
-      <HintPath>..\3rdParty\SharpFont\SharpFont.iOS.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
