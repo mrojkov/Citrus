@@ -56,6 +56,7 @@ namespace Lime
 		public RichText()
 		{
 			// CachedRendering = true;
+			Localizable = true;
 		}
 
 		public override void Dispose()

@@ -20,9 +20,6 @@ namespace Lime
 		private VAlignment vAlignment;
 		private Color4 textColor;
 
-		[Obsolete("Use TextProcessor instead", true)]
-		public Func<string, string> LocalizationHandler;
-
 		string ITextProcessorArg.Text { get; set; }
 
 		public Action<ITextProcessorArg> TextProcessor { get; set; }
@@ -154,6 +151,7 @@ namespace Lime
 			Font = new SerializableFont();
 			TextColor = Color4.White;
 			TextProcessor = LocalizeProcessor;
+			Localizable = true;
 		}
 
 		private void LocalizeProcessor(ITextProcessorArg arg)
