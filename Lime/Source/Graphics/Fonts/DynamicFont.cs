@@ -64,7 +64,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Checks if given char available for rendering
+		/// Checks if given a char is available for rendering
 		/// </summary>
 		public bool Contains(char code)
 		{
