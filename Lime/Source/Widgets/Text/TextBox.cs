@@ -16,6 +16,7 @@ namespace Lime
 	/// Поле ввода текста
 	/// </summary>
 	[ProtoContract]
+	[Obsolete("Use SimpleText and Editor instead.")]
 	public class TextBox : Widget, IKeyboardInputProcessor
 	{
 		private string text;
