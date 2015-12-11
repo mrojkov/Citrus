@@ -193,6 +193,23 @@ namespace Lime
 			}
 		}
 
+		public static void EnableZTest(bool value)
+		{
+			if (value) {
+				GL.Enable(EnableCap.DepthTest);
+				CheckErrors();
+			} else {
+				GL.Disable(EnableCap.DepthTest);
+				CheckErrors();
+			}
+		}
+
+		public static void EnableZWrite(bool value)
+		{
+			GL.DepthMask(value);
+			CheckErrors();
+		}
+
 		public static void SetBlending(Blending value)
 		{
 			if (value == blending && premultipliedAlphaMode == Renderer.PremultipliedAlphaMode) {

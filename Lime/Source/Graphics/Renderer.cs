@@ -80,6 +80,8 @@ namespace Lime
 		private static WindowRect viewport;
 		private static WindowRect scissorRectangle = new WindowRect();
 		private static bool scissorTestEnabled = false;
+		private static bool zTestEnabled = false;
+		private static bool zWriteEnabled = true;
 		private static bool Transform2Active;
 
 		public static Blending Blending;
@@ -144,6 +146,32 @@ namespace Lime
 			{
 				viewport = value;
 				PlatformRenderer.SetViewport(value);
+			}
+		}
+
+		public static bool ZTestEnabled
+		{
+			get { return zTestEnabled; }
+			set
+			{
+				if (zTestEnabled != value) {
+					Flush();
+					zTestEnabled = value;
+					PlatformRenderer.EnableZTest(value);
+				}
+			}
+		}
+
+		public static bool ZWriteEnabled
+		{
+			get { return zWriteEnabled; }
+			set
+			{
+				if (zWriteEnabled != value) {
+					Flush();
+					zWriteEnabled = value;
+					PlatformRenderer.EnableZWrite(value);
+				}
 			}
 		}
 

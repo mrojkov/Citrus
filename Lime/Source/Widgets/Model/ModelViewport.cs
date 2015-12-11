@@ -75,23 +75,25 @@ namespace Lime
 			foreach (var node in Nodes) {
 				node.AddToRenderChain(chain);
 			}
+			var oldZTestEnabled = Renderer.ZTestEnabled;
+			var oldZWriteEnabled = Renderer.ZWriteEnabled;
 			Renderer.Flush();
 			Renderer.PushProjectionMatrix();
 			Renderer.Projection = TransformProjection(Renderer.Projection);
 #if OPENGL
-			GL.Enable(EnableCap.DepthTest);
 			GL.Enable(EnableCap.CullFace);
 #elif UNITY
 			MaterialFactory.ThreeDimensionalRendering = true;
 #endif
 			chain.RenderAndClear();
 #if OPENGL
-			GL.Disable(EnableCap.DepthTest);
 			GL.Disable(EnableCap.CullFace);
 #elif UNITY
 			MaterialFactory.ThreeDimensionalRendering = false;
 #endif
 			Renderer.PopProjectionMatrix();
+			Renderer.ZTestEnabled = oldZTestEnabled;
+			Renderer.ZWriteEnabled = oldZWriteEnabled;
 		}
 
 		private Matrix44 TransformProjection(Matrix44 orthoProjection)

@@ -14,11 +14,15 @@ namespace Lime
 		[ProtoMember(2)]
 		public BoundingSphere BoundingSphere { get; set; }
 
-		public bool SkipRender;
+		public bool ZTestEnabled { get; set; }
+		public bool ZWriteEnabled { get; set; }
+		public bool SkipRender { get; set; }
 
 		public ModelMesh()
 		{
 			Submeshes = new List<ModelSubmesh>();
+			ZTestEnabled = true;
+			ZWriteEnabled = true;
 		}
 
 		public override void AddToRenderChain(RenderChain chain)
@@ -48,6 +52,8 @@ namespace Lime
 			}
 			foreach (var sm in Submeshes) {
 				var viewProjection = Renderer.Projection;
+				Renderer.ZTestEnabled = ZTestEnabled;
+				Renderer.ZWriteEnabled = ZWriteEnabled;
 				Renderer.Projection = GlobalTransform * viewProjection;
 				PlatformRenderer.SetTexture(sm.Material.DiffuseTexture, 0);
 				PlatformRenderer.SetTexture(null, 1);
