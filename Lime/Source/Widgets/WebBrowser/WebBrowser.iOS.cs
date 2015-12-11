@@ -23,13 +23,14 @@ namespace Lime
 		public WebBrowser()
 		{
 			webView = new UIWebView {
-				AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight,
+				AutoresizingMask = UIViewAutoresizing.FlexibleDimensions,
 				ScalesPageToFit = true,
 				Opaque = false,
-				BackgroundColor = new UIColor(0.0f, 0.0f, 0.0f, 1.0f),
+				BackgroundColor = UIColor.Black,
 				Hidden = true,
 			};
-			webView.ScrollView.Scrolled += WebViewScrollView_Scrolled;
+			webView.ScrollView.Bounces = false;
+			webView.ScrollView.BouncesZoom = false;
 			webView.LoadStarted += WebView_LoadStarted;
 			webView.LoadFinished += WebView_LoadFinished;
 			GameView.AddSubview(webView);
@@ -73,23 +74,10 @@ namespace Lime
 			isActivityIndicatorVisible = false;
 		}
 
-		private void WebViewScrollView_Scrolled(object sender, EventArgs e) {
-			webView.ScrollView.ShowsVerticalScrollIndicator = true;
-			if (webView.ScrollView.ContentOffset.X != 0.0f) {
-				webView.ScrollView.SetContentOffset(new PointF(0.0f, (float)webView.ScrollView.ContentOffset.Y), false);
-				webView.ScrollView.ShowsVerticalScrollIndicator = false;
-			}
-			if (webView.ScrollView.ContentOffset.Y < 0.0f) {
-				webView.ScrollView.SetContentOffset(new PointF((float)webView.ScrollView.ContentOffset.X, 0.0f), false);
-				webView.ScrollView.ShowsVerticalScrollIndicator = false;
-			}
-		}
-
 		private PointF ActivityIndicatorPosition 
 		{
-			get 
-			{ 
-				return new PointF((WebViewSize.Width * 0.5f) + WebViewPosition.X, 
+			get { 
+				return new PointF((WebViewSize.Width * 0.5f) + WebViewPosition.X,
 					(WebViewSize.Height * 0.5f) + WebViewPosition.Y);
 			}
 		}
