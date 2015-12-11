@@ -93,4 +93,10 @@ namespace Lime
 		bool WordSplitAllowed { get; set; }
 		bool TrimWhitespaces { get; set; }
 	}
+
+	public interface ITextProcessorArg
+	{
+		string Text
+		{ get; set; }
+	}
 }

@@ -423,9 +423,4 @@ namespace Lime
 			spriteList = null;
 		}
 	}
-
-	public interface ITextProcessorArg
-	{
-		string Text { get; set; }
-	}
 }
