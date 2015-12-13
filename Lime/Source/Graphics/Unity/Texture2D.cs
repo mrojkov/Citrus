@@ -14,11 +14,16 @@ namespace Lime
 		public Size ImageSize
 		{
 			get { return new Size(unityTexture.width, unityTexture.height); }
+			protected set {
+				unityTexture.width = value.Width;
+				unityTexture.height = value.Height;
+			}
 		}
 
 		public Size SurfaceSize
 		{
 			get { return ImageSize; }
+			set { ImageSize = value; }
 		}
 
 		public UnityEngine.Texture GetUnityTexture()
@@ -162,7 +167,7 @@ namespace Lime
 		/// Returns native texture handle
 		/// </summary>
 		/// <returns></returns>
-		public uint GetHandle()
+		public virtual uint GetHandle()
 		{
 			return (uint)unityTexture.GetNativeTextureID();
 		}
