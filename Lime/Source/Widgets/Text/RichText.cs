@@ -116,6 +116,7 @@ namespace Lime
 				if (style != null) {
 					style.Size *= ratio;
 					style.ImageSize *= ratio;
+					style.SpaceAfter *= ratio;
 				}
 			}
 			base.StaticScale(ratio, roundCoordinates);
