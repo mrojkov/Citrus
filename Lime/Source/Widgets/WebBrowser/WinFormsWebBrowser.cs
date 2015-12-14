@@ -10,17 +10,62 @@ namespace Lime
 {
 	class WinFormsWebBrowser: IWebBrowserImplementation
 	{
-		private class HiddenForm : Form
+		private System.Windows.Forms.WebBrowser browser;
+		private Widget widget;
+
+		public WinFormsWebBrowser(Widget widget)
 		{
-			protected override CreateParams CreateParams
-			{
-				get
-				{
-					var p = base.CreateParams;
-					p.ExStyle |= 0x80; // WS_EX_TOOLWINDOW
-					return p;
-				}
+			this.widget = widget;
+			browser = new System.Windows.Forms.WebBrowser {
+				Parent = Form.ActiveForm,
+				ScriptErrorsSuppressed = true
+			};
+			widget.Updating += Widget_Updating;
+		}
+
+		public void Render()
+		{
+			FitBrowserInWidget();
+		}
+
+		public void OnSizeChanged(Vector2 sizeDelta)
+		{
+			FitBrowserInWidget();
+		}
+
+		private void FitBrowserInWidget()
+		{
+			if (browser == null) {
+				return;
 			}
+			var rectangle = (IntRectangle)widget.CalcAABBInSpaceOf(WidgetContext.Current.Root);
+			browser.Left = rectangle.Left;
+			browser.Top = rectangle.Top;
+			browser.Width = rectangle.Width;
+			browser.Height = rectangle.Height;
+		}
+
+		public void Update(float delta) { }
+
+		private void Widget_Updating(float delta)
+		{
+			// This should be done in Updating/Updated, as Update() 
+			// doesn't get called if widget is not globally visible.
+			if (widget.GloballyVisible) {
+				browser.Show();
+				browser.BringToFront();
+			}
+			else {
+				browser.Hide();
+			}
+		}
+
+		public void Dispose()
+		{
+			if (browser == null)
+				return;
+			Application.InvokeOnMainThread(browser.Dispose);
+			browser = null;
 		}
 
 		public Uri Url {
@@ -28,8 +73,17 @@ namespace Lime
 			set { browser.Url = value; }
 		}
 
-		private System.Windows.Forms.WebBrowser browser;
-		private Form form;
+		static WinFormsWebBrowser()
+		{
+			// By default embedded IE emulates version 7.0. We need to add ourselves to registry to enable more recent versiion.
+			// http://msdn.microsoft.com/en-us/library/ee330720(v=vs.85).aspx
+
+			var fileName = Path.GetFileName(Process.GetCurrentProcess().MainModule.FileName);
+			var ideNames = new[] { "devenv.exe", "xdesproc.exe" };
+			if (ideNames.Any(s => string.Equals(fileName, s, StringComparison.InvariantCultureIgnoreCase)))
+				return;
+			SetBrowserFeatureControlKey("FEATURE_BROWSER_EMULATION", fileName, GetBrowserEmulationMode());
+		}
 
 		private static void SetBrowserFeatureControlKey(string feature, string appName, uint value)
 		{
@@ -67,98 +121,6 @@ namespace Lime
 					return 11001; // [sic]
 				default:
 					return 10000;
-			}
-		}
-
-		static WinFormsWebBrowser()
-		{
-			// By default embedded IE emulates version 7.0. We need to add ourselves to registry to enable more recent versiion.
-			// http://msdn.microsoft.com/en-us/library/ee330720(v=vs.85).aspx
-
-			var fileName = Path.GetFileName(Process.GetCurrentProcess().MainModule.FileName);
-			var ideNames = new[] { "devenv.exe", "xdesproc.exe" };
-			if (ideNames.Any(s => string.Equals(fileName, s, StringComparison.InvariantCultureIgnoreCase)))
-				return;
-			SetBrowserFeatureControlKey("FEATURE_BROWSER_EMULATION", fileName, GetBrowserEmulationMode());
-		}
-
-		Widget widget;
-
-		public WinFormsWebBrowser(Widget widget)
-		{
-			this.widget = widget;
-			form = new HiddenForm {
-				StartPosition = FormStartPosition.Manual,
-				FormBorderStyle = FormBorderStyle.None,
-				ShowInTaskbar = false
-			};
-			browser = new System.Windows.Forms.WebBrowser {
-				Parent = form,
-				ScriptErrorsSuppressed = true
-			};
-		}
-
-		private IntRectangle CalculateAABBInWorldSpace(Widget widget)
-		{
-			var aabb = widget.CalcAABBInSpaceOf(WidgetContext.Current.Root);
-			var viewport = Renderer.Viewport;
-			var scale = new Vector2(viewport.Width, viewport.Height) / WidgetContext.Current.Root.Size;
-			return new IntRectangle(
-				(viewport.X + aabb.Left * scale.X).Round(),
-				(viewport.Y + aabb.Top * scale.Y).Round(),
-				(viewport.X + aabb.Right * scale.X).Round(),
-				(viewport.Y + aabb.Bottom * scale.Y).Round()
-			);
-		}
-
-		private void CalcGeometry(Widget widget)
-		{
-			if (form == null) {
-				return;
-			}
-			var window = WidgetContext.Current.Window;
-			var r = IntRectangle.Intersect(
-				CalculateAABBInWorldSpace(widget),
-				new IntRectangle(IntVector2.Zero, (IntVector2)window.ClientSize)
-			).OffsetBy(window.ClientPosition);
-			form.Left = r.Left;
-			form.Top = r.Top;
-			form.Width = r.Width;
-			form.Height = r.Height;
-			browser.SetBounds(0, 0, form.Width, form.Height);
-		}
-
-		public void Render()
-		{
-			if (form == null) {
-				return;
-			}
-			if (widget.GloballyVisible) {
-				CalcGeometry(widget);
-				form.Show();
-				form.BringToFront();
-			}
-			else {
-				form.Hide();
-			}
-		}
-
-		public void Update(float delta) { }
-
-		public void OnSizeChanged(Vector2 sizeDelta)
-		{
-			CalcGeometry(widget);
-		}
-
-		public void Dispose()
-		{
-			if (browser != null) {
-				Application.InvokeOnMainThread(browser.Dispose);
-				browser = null;
-			}
-			if (form != null) {
-				Application.InvokeOnMainThread(form.Dispose);
-				form = null;
 			}
 		}
 	}
