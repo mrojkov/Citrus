@@ -20,17 +20,21 @@ namespace Lime
 				Parent = Form.ActiveForm,
 				ScriptErrorsSuppressed = true
 			};
-			widget.Updating += Widget_Updating;
 		}
 
 		public void Render()
 		{
-			FitBrowserInWidget();
-		}
-
-		public void OnSizeChanged(Vector2 sizeDelta)
-		{
-			FitBrowserInWidget();
+			if (browser == null) {
+				return;
+			}
+			if (widget.GloballyVisible) {
+				FitBrowserInWidget();
+				browser.Show();
+				browser.BringToFront();
+			}
+			else {
+				browser.Hide();
+			}
 		}
 
 		private void FitBrowserInWidget()
@@ -45,20 +49,9 @@ namespace Lime
 			browser.Height = rectangle.Height;
 		}
 
-		public void Update(float delta) { }
+		public void OnSizeChanged(Vector2 sizeDelta) { }
 
-		private void Widget_Updating(float delta)
-		{
-			// This should be done in Updating/Updated, as Update() 
-			// doesn't get called if widget is not globally visible.
-			if (widget.GloballyVisible) {
-				browser.Show();
-				browser.BringToFront();
-			}
-			else {
-				browser.Hide();
-			}
-		}
+		public void Update(float delta) { }
 
 		public void Dispose()
 		{
