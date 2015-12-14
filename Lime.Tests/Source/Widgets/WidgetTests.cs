@@ -26,6 +26,7 @@ namespace Lime.Tests.Source.Widgets
 		}
 
 		[Test]
+		[Ignore("Wait until development on this function stops.")]
 		public void WasClickedTest()
 		{
 			Assert.Fail();
@@ -47,6 +48,7 @@ namespace Lime.Tests.Source.Widgets
 		}
 
 		[Test]
+		[Ignore("Wait until development on this function stops.")]
 		public void RefreshLayoutTest()
 		{
 			Assert.Fail();
@@ -62,6 +64,7 @@ namespace Lime.Tests.Source.Widgets
 		}
 
 		[Test]
+		[Ignore("Need to implement reliable way to check cloned objects.")]
 		public void DeepCloneFastTest()
 		{
 			Assert.Fail();
@@ -104,12 +107,14 @@ namespace Lime.Tests.Source.Widgets
 		}
 
 		[Test]
+		[Ignore("Wait until development on this function stops.")]
 		public void CalcLocalToParentTransformTest()
 		{
 			Assert.Fail();
 		}
 
 		[Test]
+		[Ignore("Wait until development on this function stops.")]
 		public void StaticScaleTest()
 		{
 			Assert.Fail();
@@ -122,18 +127,21 @@ namespace Lime.Tests.Source.Widgets
 		}
 
 		[Test]
+		[Ignore("Wait until development on this function stops.")]
 		public void IsMouseOverTest()
 		{
 			Assert.Fail();
 		}
 
 		[Test]
+		[Ignore("Wait until development on this function stops.")]
 		public void HitTestTest()
 		{
 			Assert.Fail();
 		}
 
 		[Test]
+		[Ignore("Wait until development on this function stops.")]
 		public void GetEffectiveLayerTest()
 		{
 			Assert.Fail();

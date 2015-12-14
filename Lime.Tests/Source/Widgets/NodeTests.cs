@@ -111,24 +111,28 @@ namespace Lime.Tests.Source.Widgets
 		}
 
 		[Test]
+		[Ignore("Need to implement reliable way to check cloned objects.")]
 		public void DeepCloneSafeTest()
 		{
 			Assert.Fail();
 		}
 
 		[Test]
+		[Ignore("Need to implement reliable way to check cloned objects.")]
 		public void DeepCloneSafeTest1()
 		{
 			Assert.Fail();
 		}
 
 		[Test]
+		[Ignore("Need to implement reliable way to check cloned objects.")]
 		public void DeepCloneFastTest()
 		{
 			Assert.Fail();
 		}
 
 		[Test]
+		[Ignore("Need to implement reliable way to check cloned objects.")]
 		public void DeepCloneFastTest1()
 		{
 			Assert.Fail();
@@ -310,6 +314,7 @@ namespace Lime.Tests.Source.Widgets
 		}
 
 		[Test]
+		[Ignore("Wait until development on this function stops.")]
 		public void StaticScaleTest()
 		{
 			Assert.Fail();
