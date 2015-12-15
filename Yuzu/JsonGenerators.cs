@@ -278,7 +278,7 @@ namespace Yuzu
 			Put("{\n");
 			PutF("var result = ({0})obj;\n", typeof(T).Name);
 			tempCount = 0;
-			foreach (var yi in Utils.GetYuzuItems(typeof(T), Options)) {
+			foreach (var yi in Meta.Get(typeof(T), Options).Items) {
 				if (yi.IsOptional) {
 					PutF("if (\"{0}\" == name) {{\n", yi.Tag(Options));
 					PutF("result.{0} = ", yi.Name);
@@ -303,7 +303,7 @@ namespace Yuzu
 				PutF("var result = ({0})obj;\n", typeof(T).Name);
 				bool isFirst = true;
 				tempCount = 0;
-				foreach (var yi in Utils.GetYuzuItems(typeof(T), Options)) {
+				foreach (var yi in Meta.Get(typeof(T), Options).Items) {
 					if (!isFirst)
 						Put("Require(',');\n");
 					isFirst = false;

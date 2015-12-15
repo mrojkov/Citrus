@@ -309,7 +309,7 @@ namespace Yuzu
 				WriteName(JsonOptions.ClassTag, ref isFirst);
 				WriteUnescapedString(t.FullName);
 			}
-			foreach (var yi in Utils.GetYuzuItems(t, Options)) {
+			foreach (var yi in Meta.Get(t, Options).Items) {
 				var value = yi.GetValue(obj);
 				if (yi.SerializeIf != null && !yi.SerializeIf(obj, value))
 					continue;
@@ -335,7 +335,7 @@ namespace Yuzu
 				WriteSep(ref isFirst);
 				WriteUnescapedString(t.FullName);
 			}
-			foreach (var yi in Utils.GetYuzuItems(t, Options)) {
+			foreach (var yi in Meta.Get(t, Options).Items) {
 				WriteSep(ref isFirst);
 				GetWriteFunc(yi.Type)(yi.GetValue(obj));
 			}
@@ -802,7 +802,7 @@ namespace Yuzu
 		{
 			// Optimization: duplicate loop to extract options check.
 			if (Options.IgnoreNewFields && Options.TagMode != TagMode.Names) {
-				foreach (var yi in Utils.GetYuzuItems(obj.GetType(), Options)) {
+				foreach (var yi in Meta.Get(obj.GetType(), Options).Items) {
 					if (IgnoreNewFields(yi.Tag(Options), ref name) != 0) {
 						if (!yi.IsOptional)
 							throw Error("Expected field '{0}', but found '{1}'", yi.NameTagged(Options), name);
@@ -813,7 +813,7 @@ namespace Yuzu
 				}
 			}
 			else {
-				foreach (var yi in Utils.GetYuzuItems(obj.GetType(), Options)) {
+				foreach (var yi in Meta.Get(obj.GetType(), Options).Items) {
 					if (yi.Tag(Options) != name) {
 						if (!yi.IsOptional)
 							throw Error("Expected field '{0}', but found '{1}'", yi.NameTagged(Options), name);
@@ -834,7 +834,7 @@ namespace Yuzu
 			if (!Utils.IsCompact(obj.GetType(), Options))
 				throw Error("Attempt to read non-compact type '{0}' from compact format", obj.GetType().Name);
 			bool isFirst = true;
-			foreach (var yi in Utils.GetYuzuItems(obj.GetType(), Options)) {
+			foreach (var yi in Meta.Get(obj.GetType(), Options).Items) {
 				if (!isFirst)
 					Require(',');
 				isFirst = false;

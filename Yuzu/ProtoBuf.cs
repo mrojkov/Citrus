@@ -38,7 +38,7 @@ namespace Yuzu
 				throw new NotImplementedException();
 
 			int count = 1;
-			foreach (var yi in Utils.GetYuzuItems(obj.GetType(), Options)) {
+			foreach (var yi in Meta.Get(obj.GetType(), Options).Items) {
 				if (yi.Type == typeof(int) || yi.Type == typeof(uint)) {
 					WriteVarint((count << 3) + (int)WireType.Varint);
 					WriteVarint((int)yi.GetValue(obj));
@@ -97,7 +97,7 @@ namespace Yuzu
 				throw new NotImplementedException();
 
 			int count = 1;
-			foreach (var yi in Utils.GetYuzuItems(obj.GetType(), Options)) {
+			foreach (var yi in Meta.Get(obj.GetType(), Options).Items) {
 				if (yi.Type == typeof(int) || yi.Type == typeof(uint)) {
 					if (ReadVarint() != (count << 3) + (int)WireType.Varint)
 						throw new YuzuException();

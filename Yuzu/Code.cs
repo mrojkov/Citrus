@@ -16,7 +16,7 @@ namespace Yuzu
 		{
 			builder.AppendFormat("var {0} = new {1} {{\n", CodeConstructOptions.VarName, obj.GetType().Name);
 			var first = true;
-			foreach (var yi in Utils.GetYuzuItems(obj.GetType(), Options)) {
+			foreach (var yi in Meta.Get(obj.GetType(), Options).Items) {
 				if (!first) {
 					builder.Append(",\n");
 				}
@@ -46,7 +46,7 @@ namespace Yuzu
 		protected override void ToBuilder(object obj)
 		{
 			builder.AppendFormat("void {0}({1} obj) {{\n", CodeAssignOptions.FuncName, obj.GetType().Name);
-			foreach (var yi in Utils.GetYuzuItems(obj.GetType(), Options)) {
+			foreach (var yi in Meta.Get(obj.GetType(), Options).Items) {
 				string valueStr = Utils.CodeValueFormat(yi.GetValue(obj));
 				if (valueStr == "")
 					throw new NotImplementedException(yi.Type.Name);
