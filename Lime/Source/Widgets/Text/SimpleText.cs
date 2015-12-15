@@ -62,7 +62,7 @@ namespace Lime
 			get
 			{
 				if (displayText == null) {
-					displayText = text;
+					displayText = Text;
 					if (textProcessor != null)
 						textProcessor(ref displayText);
 				}
