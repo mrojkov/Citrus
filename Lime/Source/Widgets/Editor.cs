@@ -157,17 +157,18 @@ namespace Lime
 			this.editorParams = editorParams;
 			Text.Localizable = false;
 			if (editorParams.PasswordChar != null) {
-				Text.TextProcessor = arg => ProcessTextAsPassword(arg, editorParams.PasswordChar.Value);
+				Text.TextProcessor +=
+					(ref string arg) => ProcessTextAsPassword(ref arg, editorParams.PasswordChar.Value);
 				container.Tasks.Add(TrackLastCharInput, this);
 			}
 			container.Tasks.Add(HandleInputTask(), this);
 		}
 
-		private void ProcessTextAsPassword(ITextProcessorArg arg, char passwordChar)
+		private void ProcessTextAsPassword(ref string arg, char passwordChar)
 		{
 			if (Text.Text == "") return;
-			arg.Text = new string(passwordChar, Text.Text.Length - 1);
-			arg.Text += isLastCharVisible ? Text.Text.Last() : editorParams.PasswordChar;
+			arg = new string(passwordChar, Text.Text.Length - 1);
+			arg += isLastCharVisible ? Text.Text.Last() : editorParams.PasswordChar;
 		}
 
 		public void Unlink()
