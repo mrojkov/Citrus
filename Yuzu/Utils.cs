@@ -32,51 +32,59 @@ namespace Yuzu
 	}
 #endif
 
-	internal class YuzuItem: IComparable<YuzuItem>
-	{
-		private string id;
-
-		public string Name;
-		public string Alias;
-		public string Id { get {
-			if (id == null)
-				id = IdGenerator.GetNextId();
-			return id;
-		} }
-		public bool IsOptional;
-		public bool IsCompact;
-		public Func<object, object, bool> SerializeIf;
-		public Type Type;
-		public Func<object, object> GetValue;
-		public Action<object, object> SetValue;
-		public FieldInfo FieldInfo;
-		public PropertyInfo PropInfo;
-
-		public int CompareTo(YuzuItem yi) { return Alias.CompareTo(yi.Alias); }
-
-		public string Tag(CommonOptions options)
-		{
-			switch (options.TagMode) {
-				case TagMode.Names: return Name;
-				case TagMode.Aliases: return Alias;
-				case TagMode.Ids: return Id;
-				default: throw new YuzuAssert();
-			}
-		}
-		public string NameTagged(CommonOptions options)
-		{
-			var tag = Tag(options);
-			return Name + (tag == Name ? "" : " (" + tag + ")");
-		}
-	}
-
 	internal class Meta
 	{
 		private static Dictionary<Tuple<Type, CommonOptions>, Meta> cache =
 			new Dictionary<Tuple<Type, CommonOptions>, Meta>();
 
+		internal class Item : IComparable<Item>
+		{
+			private string id;
+
+			public string Name;
+			public string Alias;
+			public string Id
+			{
+				get
+				{
+					if (id == null)
+						id = IdGenerator.GetNextId();
+					return id;
+				}
+			}
+			public bool IsOptional;
+			public bool IsCompact;
+			public Func<object, object, bool> SerializeIf;
+			public Type Type;
+			public Func<object, object> GetValue;
+			public Action<object, object> SetValue;
+			public FieldInfo FieldInfo;
+			public PropertyInfo PropInfo;
+
+			public int CompareTo(Item yi) { return Alias.CompareTo(yi.Alias); }
+
+			public string Tag(CommonOptions options)
+			{
+				switch (options.TagMode) {
+					case TagMode.Names:
+						return Name;
+					case TagMode.Aliases:
+						return Alias;
+					case TagMode.Ids:
+						return Id;
+					default:
+						throw new YuzuAssert();
+				}
+			}
+			public string NameTagged(CommonOptions options)
+			{
+				var tag = Tag(options);
+				return Name + (tag == Name ? "" : " (" + tag + ")");
+			}
+		}
+
 		public Type Type;
-		public List<YuzuItem> Items = new List<YuzuItem>();
+		public List<Item> Items = new List<Item>();
 
 		private Meta(Type t, CommonOptions options)
 		{
@@ -92,7 +100,7 @@ namespace Yuzu
 					continue;
 				if (optional != null && required != null)
 					throw Utils.Error(t, "Both optional and required attributes for field '{0}'", m.Name);
-				var item = new YuzuItem {
+				var item = new Item {
 					Alias = options.GetAlias(optional ?? required) ?? m.Name,
 					IsOptional = optional != null,
 					IsCompact =
