@@ -169,7 +169,7 @@ namespace Lime
 			if (!HitTestTarget) {
 				return;
 			}
-			var r = HitTest(WidgetContext.Current.Window.Input.MousePosition);
+			var r = HitTest(Window.Current.Input.MousePosition);
 			if (r.Distance < WidgetContext.Current.DistanceToNodeUnderCursor) {
 				// TODO: Check Renderer.CurrentFrameBuffer == Renderer.DefaultFrameBuffer
 				// TODO: Check Renderer.ScissorTestEnabled and ScissorRectangle

@@ -183,7 +183,6 @@
     <Compile Include="Source\Application\WindowOptions.cs" />
     <Compile Include="Source\Widgets\WindowWidget.cs" />
     <Compile Include="Source\Application\CommonWindow.cs" />
-    <Compile Include="Source\Application\IContext.cs" />
     <Compile Include="Source\Widgets\WidgetContext.cs" />
     <Compile Include="Source\Application\Window.Mac.cs" />
     <Compile Include="Source\Application\Mac\ColorFormat.cs" />
@@ -217,6 +216,7 @@
     <Compile Include="Source\Widgets\Text\IKeyboardInputProcessor.cs" />
     <Compile Include="Source\Graphics\Fonts\CharMap.cs" />
     <Compile Include="Source\Graphics\Fonts\CompoundFont.cs" />
+    <Compile Include="Source\Application\Context.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

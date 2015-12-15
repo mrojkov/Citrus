@@ -7,14 +7,6 @@ namespace Lime
 {
 	public class CommonWindow
 	{
-		class DummyContext : IContext
-		{
-			public ContextScope MakeCurrent()
-			{
-				return new ContextScope { SavedContext = this };
-			}
-		}
-
 		public event Action Activated;
 		public event Action Deactivated;
 		public event Func<bool> Closing;
@@ -23,11 +15,12 @@ namespace Lime
 		public event Action Resized;
 		public event Action<float> Updating;
 		public event Action Rendering;
-		public IContext Context { get; set; }
+		public Context Context { get; private set; }
 
 		public CommonWindow()
 		{
-			Context = new DummyContext();
+			Context = new Context();
+			Context.MakeCurrent();
 		}
 
 		protected void RaiseActivated()

@@ -175,19 +175,6 @@ namespace Lime
 			}
 		}
 
-		public static void SetDefaultViewport()
-		{
-			if (Application.MainWindow != null) {
-				var windowSize = Application.MainWindow.ClientSize;
-				Viewport = new WindowRect {
-					X = 0,
-					Y = 0,
-					Width = windowSize.Width,
-					Height = windowSize.Height
-				};
-			}
-		}
-
 		public static void SetOrthogonalProjection(Vector2 leftTop, Vector2 rightBottom)
 		{
 			SetOrthogonalProjection(leftTop.X, leftTop.Y, rightBottom.X, rightBottom.Y);
@@ -224,7 +211,6 @@ namespace Lime
 			Transform1 = Matrix32.Identity;
 			Transform2 = Matrix32.Identity;
 			CurrentRenderList = MainRenderList;
-			SetDefaultViewport();
 			RenderCycle++;
 		}
 
