@@ -8,7 +8,7 @@ namespace Lime
 	/// Виджет, выводящий текст с упрощенным форматированием
 	/// </summary>
 	[ProtoContract]
-	public class SimpleText : Widget, IText, IKeyboardInputProcessor, ITextProcessorArg
+	public class SimpleText : Widget, IText, IKeyboardInputProcessor
 	{
 		private SpriteList spriteList;
 		private SerializableFont font;
@@ -20,11 +20,7 @@ namespace Lime
 		private VAlignment vAlignment;
 		private Color4 textColor;
 
-		string ITextProcessorArg.Text { get; set; }
-
-		public Action<ITextProcessorArg> TextProcessor { get; set; }
-		public delegate void TextProcessorDelegate(ref string text);
-		//public event TextProcessorDelegate TextProcessor;
+		public event TextProcessorDelegate TextProcessor;
 
 		[ProtoMember(1)]
 		public SerializableFont Font {
@@ -152,25 +148,24 @@ namespace Lime
 			FontHeight = 15;
 			Font = new SerializableFont();
 			TextColor = Color4.White;
-			TextProcessor = LocalizeProcessor;
+			TextProcessor += LocalizeProcessor;
 			Localizable = true;
 		}
 
-		private void LocalizeProcessor(ITextProcessorArg arg)
+		public void LocalizeProcessor(ref string text)
 		{
 			if (Localizable) {
-				arg.Text = arg.Text.Localize();
+				text = text.Localize();
 			}
 		}
 
 		private string GetProcessedText()
 		{
-			var textProcessorArg = (ITextProcessorArg) this;
-			textProcessorArg.Text = Text;
+			var displayText = Text;
 			if (TextProcessor != null) {
-				TextProcessor(textProcessorArg);
+				TextProcessor(ref displayText);
 			}
-			return textProcessorArg.Text;
+			return displayText;
 		}
 
 		/// <summary>

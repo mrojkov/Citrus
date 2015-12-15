@@ -28,7 +28,7 @@ namespace Lime
 		}
 
 		// TODO
-		public Action<ITextProcessorArg> TextProcessor { get; set; }
+		public event TextProcessorDelegate TextProcessor;
 		
 		[ProtoMember(2)]
 		public HAlignment HAlignment 

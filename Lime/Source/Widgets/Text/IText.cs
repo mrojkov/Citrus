@@ -75,6 +75,8 @@ namespace Lime
 		bool IsVisible { get; set; }
 	}
 
+	public delegate void TextProcessorDelegate(ref string text);
+
 	public interface IText
 	{
 		/// <summary>
@@ -86,17 +88,11 @@ namespace Lime
 
 		bool Localizable { get; set; }
 		string Text { get; set; }
-		Action<ITextProcessorArg> TextProcessor { get; set; }
+		event TextProcessorDelegate TextProcessor;
 		HAlignment HAlignment { get; set; }
 		VAlignment VAlignment { get; set; }
 		TextOverflowMode OverflowMode { get; set; }
 		bool WordSplitAllowed { get; set; }
 		bool TrimWhitespaces { get; set; }
-	}
-
-	public interface ITextProcessorArg
-	{
-		string Text
-		{ get; set; }
 	}
 }
