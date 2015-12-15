@@ -23,8 +23,14 @@ namespace Lime
 
 		private TextProcessorDelegate textProcessor;
 		public event TextProcessorDelegate TextProcessor {
-			add { textProcessor += value; Invalidate(); }
-			remove { textProcessor -= value; Invalidate(); }
+			add {
+				textProcessor += value;
+				Invalidate();
+			}
+			remove {
+				textProcessor -= value;
+				Invalidate();
+			}
 		}
 
 		[ProtoMember(1)]
