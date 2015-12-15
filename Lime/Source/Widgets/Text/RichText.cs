@@ -28,6 +28,7 @@ namespace Lime
 		}
 
 		// TODO
+		public string DisplayText { get { return text; } }
 		public event TextProcessorDelegate TextProcessor;
 		
 		[ProtoMember(2)]

@@ -88,6 +88,7 @@ namespace Lime
 
 		bool Localizable { get; set; }
 		string Text { get; set; }
+		string DisplayText { get; }
 		event TextProcessorDelegate TextProcessor;
 		HAlignment HAlignment { get; set; }
 		VAlignment VAlignment { get; set; }

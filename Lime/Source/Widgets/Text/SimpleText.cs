@@ -19,8 +19,13 @@ namespace Lime
 		private HAlignment hAlignment;
 		private VAlignment vAlignment;
 		private Color4 textColor;
+		private string displayText;
 
-		public event TextProcessorDelegate TextProcessor;
+		private TextProcessorDelegate textProcessor;
+		public event TextProcessorDelegate TextProcessor {
+			add { textProcessor += value; Invalidate(); }
+			remove { textProcessor -= value; Invalidate(); }
+		}
 
 		[ProtoMember(1)]
 		public SerializableFont Font {
@@ -46,7 +51,19 @@ namespace Lime
 				}
 			}
 		}
-		
+
+		public string DisplayText {
+			get
+			{
+				if (displayText == null) {
+					displayText = text;
+					if (textProcessor != null)
+						textProcessor(ref displayText);
+				}
+				return displayText;
+			}
+		}
+
 		/// <summary>
 		/// Размер шрифта
 		/// </summary>
@@ -159,21 +176,12 @@ namespace Lime
 			}
 		}
 
-		private string GetProcessedText()
-		{
-			var displayText = Text;
-			if (TextProcessor != null) {
-				TextProcessor(ref displayText);
-			}
-			return displayText;
-		}
-
 		/// <summary>
 		/// Возвращает размер текста
 		/// </summary>
 		public override Vector2 CalcContentSize()
 		{
-			return Renderer.MeasureTextLine(Font.Instance, GetProcessedText(), FontHeight);
+			return Renderer.MeasureTextLine(Font.Instance, DisplayText, FontHeight);
 		}
 
 		protected override void OnSizeChanged(Vector2 sizeDelta)
@@ -265,8 +273,7 @@ namespace Lime
 				caret = dummyCaret;
 			}
 			try {
-				var processedText = GetProcessedText();
-				var lines = SplitText(processedText);
+				var lines = SplitText(DisplayText);
 				if (TrimWhitespaces) {
 					TrimLinesWhitespaces(lines);
 				}
@@ -274,7 +281,7 @@ namespace Lime
 				caret.RenderingLineNumber = 0;
 				caret.RenderingTextPos = 0;
 				caret.NearestCharPos = Vector2.Zero;
-				if (String.IsNullOrEmpty(processedText)) {
+				if (String.IsNullOrEmpty(DisplayText)) {
 					caret.WorldPos = pos;
 					caret.Line = caret.Pos = caret.TextPos = 0;
 					caret.Valid = CaretPosition.ValidState.All;
@@ -416,6 +423,7 @@ namespace Lime
 
 		public void Invalidate()
 		{
+			displayText = null;
 			caret.Valid = CaretPosition.ValidState.TextPos;
 			spriteList = null;
 		}
