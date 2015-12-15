@@ -23,6 +23,8 @@ namespace Lime
 		string ITextProcessorArg.Text { get; set; }
 
 		public Action<ITextProcessorArg> TextProcessor { get; set; }
+		public delegate void TextProcessorDelegate(ref string text);
+		//public event TextProcessorDelegate TextProcessor;
 
 		[ProtoMember(1)]
 		public SerializableFont Font {
