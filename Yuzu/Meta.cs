@@ -55,49 +55,55 @@ namespace Yuzu
 			}
 		}
 
-		public Type Type;
-		public List<Item> Items = new List<Item>();
+		public readonly Type Type;
+		public readonly CommonOptions Options;
+		public readonly List<Item> Items = new List<Item>();
+
+		private void AddItem(MemberInfo m)
+		{
+			var optional = m.GetCustomAttribute(Options.OptionalAttribute, false);
+			var required = m.GetCustomAttribute(Options.RequiredAttribute, false);
+			if (optional == null && required == null)
+				return;
+			if (optional != null && required != null)
+				throw Error("Both optional and required attributes for field '{0}'", m.Name);
+			var serializeIf = m.GetCustomAttribute(Options.SerializeIfAttribute, true);
+			var item = new Item {
+				Alias = Options.GetAlias(optional ?? required) ?? m.Name,
+				IsOptional = optional != null,
+				IsCompact =
+					m.IsDefined(Options.CompactAttribute) ||
+					m.GetType().IsDefined(Options.CompactAttribute),
+				SerializeIf = serializeIf != null ? Options.GetSerializeCondition(serializeIf) : null,
+				Name = m.Name,
+			};
+
+			if (m.MemberType == MemberTypes.Field) {
+				var f = m as FieldInfo;
+				item.Type = f.FieldType;
+				item.GetValue = f.GetValue;
+				item.SetValue = f.SetValue;
+				item.FieldInfo = f;
+			}
+			else {
+				var p = m as PropertyInfo;
+				item.Type = p.PropertyType;
+				item.GetValue = p.GetValue;
+				item.SetValue = p.SetValue;
+				item.PropInfo = p;
+			}
+
+			Items.Add(item);
+		}
 
 		private Meta(Type t, CommonOptions options)
 		{
 			Type = t;
+			Options = options;
 			foreach (var m in t.GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy)) {
 				if (m.MemberType != MemberTypes.Field && m.MemberType != MemberTypes.Property)
 					continue;
-
-				var optional = m.GetCustomAttribute(options.OptionalAttribute, false);
-				var required = m.GetCustomAttribute(options.RequiredAttribute, false);
-				var serializeIf = m.GetCustomAttribute(options.SerializeIfAttribute, true);
-				if (optional == null && required == null)
-					continue;
-				if (optional != null && required != null)
-					throw Error("Both optional and required attributes for field '{0}'", m.Name);
-				var item = new Item {
-					Alias = options.GetAlias(optional ?? required) ?? m.Name,
-					IsOptional = optional != null,
-					IsCompact =
-						m.IsDefined(options.CompactAttribute) ||
-						m.GetType().IsDefined(options.CompactAttribute),
-					SerializeIf = serializeIf != null ? options.GetSerializeCondition(serializeIf) : null,
-					Name = m.Name,
-				};
-
-				if (m.MemberType == MemberTypes.Field) {
-					var f = m as FieldInfo;
-					item.Type = f.FieldType;
-					item.GetValue = f.GetValue;
-					item.SetValue = f.SetValue;
-					item.FieldInfo = f;
-				}
-				else {
-					var p = m as PropertyInfo;
-					item.Type = p.PropertyType;
-					item.GetValue = p.GetValue;
-					item.SetValue = p.SetValue;
-					item.PropInfo = p;
-				}
-
-				Items.Add(item);
+				AddItem(m);
 			}
 			if (!options.AllowEmptyTypes && Items.Count == 0)
 				throw Error("No serializable fields");
