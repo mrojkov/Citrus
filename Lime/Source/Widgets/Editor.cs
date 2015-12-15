@@ -142,10 +142,10 @@ namespace Lime
 	{
 		public readonly Widget Container;
 		public readonly IText Text;
+		public readonly IEditorParams EditorParams;
 
 		private IKeyboardInputProcessor textInputProcessor;
 		private ICaretPosition caretPos;
-		private IEditorParams editorParams;
 
 		public Editor(Widget container, ICaretPosition caretPos, IEditorParams editorParams)
 		{
@@ -153,8 +153,8 @@ namespace Lime
 			textInputProcessor = (IKeyboardInputProcessor)container;
 			Text = (IText)container;
 			Text.TrimWhitespaces = false;
+			EditorParams = editorParams;
 			this.caretPos = caretPos;
-			this.editorParams = editorParams;
 			Text.Localizable = false;
 			if (editorParams.PasswordChar != null) {
 				Text.TextProcessor += ProcessTextAsPassword;
@@ -163,7 +163,7 @@ namespace Lime
 			container.Tasks.Add(HandleInputTask(), this);
 		}
 
-		private string PasswordChars(int length) { return new string(editorParams.PasswordChar.Value, length); }
+		private string PasswordChars(int length) { return new string(EditorParams.PasswordChar.Value, length); }
 
 		private void ProcessTextAsPassword(ref string text)
 		{
@@ -198,9 +198,9 @@ namespace Lime
 				return false;
 			keyPressed = key;
 			if (key != prevKeyPressed) {
-				cursorKeyDownTime = editorParams.KeyRepeatDelay;
+				cursorKeyDownTime = EditorParams.KeyRepeatDelay;
 			} else if (cursorKeyDownTime <= 0) {
-				cursorKeyDownTime = editorParams.KeyRepeatInterval;
+				cursorKeyDownTime = EditorParams.KeyRepeatInterval;
 			} else {
 				return false;
 			}
@@ -210,10 +210,10 @@ namespace Lime
 		private void InsertChar(char ch)
 		{
 			if (caretPos.TextPos < 0 || caretPos.TextPos > Text.Text.Length) return;
-			if (!editorParams.IsAcceptableLength(Text.Text.Length + 1)) return;
+			if (!EditorParams.IsAcceptableLength(Text.Text.Length + 1)) return;
 			var newText = Text.Text.Insert(caretPos.TextPos, ch.ToString());
-			if (editorParams.AcceptText != null && !editorParams.AcceptText(newText)) return;
-			if (editorParams.MaxHeight > 0 && !editorParams.IsAcceptableHeight(CalcTextHeight(newText))) return;
+			if (EditorParams.AcceptText != null && !EditorParams.AcceptText(newText)) return;
+			if (EditorParams.MaxHeight > 0 && !EditorParams.IsAcceptableHeight(CalcTextHeight(newText))) return;
 			Text.Text = newText;
 			caretPos.TextPos++;
 		}
@@ -248,7 +248,7 @@ namespace Lime
 					caretPos.TextPos++; // Enforce revalidation.
 				}
 			}
-			if (CheckKeyRepeated(Key.Enter) && editorParams.IsAcceptableLines(Text.Text.Count(ch => ch == '\n') + 2))
+			if (CheckKeyRepeated(Key.Enter) && EditorParams.IsAcceptableLines(Text.Text.Count(ch => ch == '\n') + 2))
 				InsertChar('\n');
 #if WIN
 			if (Container.Input.IsKeyPressed(Key.ControlLeft) && CheckKeyRepeated(Key.V)) {
@@ -278,7 +278,7 @@ namespace Lime
 				}
 				else if (ch >= ' ') {
 					InsertChar(ch);
-					lastCharShowTimeLeft = editorParams.PasswordLastCharShowTime;
+					lastCharShowTimeLeft = EditorParams.PasswordLastCharShowTime;
 				}
 			}
 		}
