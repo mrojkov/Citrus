@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -84,6 +85,7 @@ namespace Lime
 		float MaxHeight { get; set; }
 		char? PasswordChar { get; set; }
 		float PasswordLastCharShowTime { get; set; }
+		Predicate<string> AcceptText { get; set; }
 
 		bool IsAcceptableLength(int length);
 		bool IsAcceptableLines(int lines);
@@ -99,6 +101,7 @@ namespace Lime
 		public float MaxHeight { get; set; }
 		public char? PasswordChar { get; set; }
 		public float PasswordLastCharShowTime { get; set; }
+		public Predicate<string> AcceptText { get; set; }
 
 		public EditorParams()
 		{
@@ -114,6 +117,16 @@ namespace Lime
 		public bool IsAcceptableLength(int length) { return MaxLength <= 0 || length <= MaxLength; }
 		public bool IsAcceptableLines(int lines) { return MaxLines <= 0 || lines <= MaxLines; }
 		public bool IsAcceptableHeight(float height) { return MaxHeight <= 0 || height <= MaxHeight; }
+
+		public const NumberStyles numberStyle =
+			NumberStyles.AllowDecimalPoint |
+			NumberStyles.AllowLeadingSign;
+
+		public static bool AcceptNumber(string s)
+		{
+			double temp;
+			return s == "-" || Double.TryParse(s, numberStyle, CultureInfo.InvariantCulture, out temp);
+		}
 	}
 
 	public interface IFocusable
@@ -195,16 +208,13 @@ namespace Lime
 
 		private void InsertChar(char ch)
 		{
-			if (
-				caretPos.TextPos >= 0 && caretPos.TextPos <= Text.Text.Length &&
-				editorParams.IsAcceptableLength(Text.Text.Length + 1)
-			) {
-				var newText = Text.Text.Insert(caretPos.TextPos, ch.ToString());
-				if (editorParams.MaxHeight <= 0 || editorParams.IsAcceptableHeight(CalcTextHeight(newText))) {
-					Text.Text = newText;
-					caretPos.TextPos++;
-				}
-			}
+			if (caretPos.TextPos < 0 || caretPos.TextPos > Text.Text.Length) return;
+			if (!editorParams.IsAcceptableLength(Text.Text.Length + 1)) return;
+			var newText = Text.Text.Insert(caretPos.TextPos, ch.ToString());
+			if (editorParams.AcceptText != null && !editorParams.AcceptText(newText)) return;
+			if (editorParams.MaxHeight > 0 && !editorParams.IsAcceptableHeight(CalcTextHeight(newText))) return;
+			Text.Text = newText;
+			caretPos.TextPos++;
 		}
 
 		private float CalcTextHeight(string s)
