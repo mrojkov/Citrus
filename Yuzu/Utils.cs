@@ -73,10 +73,5 @@ namespace Yuzu
 		{
 			return t.IsDefined(options.CompactAttribute);
 		}
-
-		public static YuzuException Error(Type t, string format, params object[] args)
-		{
-			return new YuzuException("In type '" + t.FullName + "': " + String.Format(format, args));
-		}
 	}
 }

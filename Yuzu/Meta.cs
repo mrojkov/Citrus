@@ -71,7 +71,7 @@ namespace Yuzu
 				if (optional == null && required == null)
 					continue;
 				if (optional != null && required != null)
-					throw Utils.Error(t, "Both optional and required attributes for field '{0}'", m.Name);
+					throw Error("Both optional and required attributes for field '{0}'", m.Name);
 				var item = new Item {
 					Alias = options.GetAlias(optional ?? required) ?? m.Name,
 					IsOptional = optional != null,
@@ -100,18 +100,18 @@ namespace Yuzu
 				Items.Add(item);
 			}
 			if (!options.AllowEmptyTypes && Items.Count == 0)
-				throw Utils.Error(t, "No serializable fields");
+				throw Error("No serializable fields");
 			Items.Sort();
 			var prevTag = "";
 			foreach (var i in Items) {
 				var tag = i.Tag(options);
 				if (tag == "")
-					throw Utils.Error(t, "Empty tag for field '{0}'", i.Name);
+					throw Error("Empty tag for field '{0}'", i.Name);
 				foreach (var ch in tag)
 					if (ch <= ' ' || ch >= 127)
-						throw Utils.Error(t, "Bad character '{0}' in tag for field '{1}'", ch, i.Name);
+						throw Error("Bad character '{0}' in tag for field '{1}'", ch, i.Name);
 				if (tag == prevTag)
-					throw Utils.Error(t, "Duplicate tag '{0}' for field '{1}'", tag, i.Name);
+					throw Error("Duplicate tag '{0}' for field '{1}'", tag, i.Name);
 				prevTag = tag;
 			}
 		}
@@ -124,6 +124,11 @@ namespace Yuzu
 			meta = new Meta(t, options);
 			cache.Add(Tuple.Create(t, options), meta);
 			return meta;
+		}
+
+		private YuzuException Error(string format, params object[] args)
+		{
+			return new YuzuException("In type '" + Type.FullName + "': " + String.Format(format, args));
 		}
 	}
 
