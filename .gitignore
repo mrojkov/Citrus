@@ -1,0 +1,7 @@
+Lemon/bin/
+Lemon/obj/
+Lime/bin/
+Lime/obj/
+Orange/bin/Win/Release/*.pdb
+Orange/bin/Win/Release/OpenTK.xml
+Orange/obj/
