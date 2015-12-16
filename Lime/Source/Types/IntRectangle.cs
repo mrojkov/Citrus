@@ -143,8 +143,7 @@ namespace Lime
 				&& value.X < B.X 
 				&& value.Y < B.Y;
 		}
-
-		// SUGGESTION: Swap to return string.Format("{0}, {1}", A.ToString(), B.ToString());?
+		
 		/// <summary>
 		/// Returns the string representation of this <see cref="IntRectangle"/> in the format:
 		/// "A.X, A.Y, B.X, B.Y".

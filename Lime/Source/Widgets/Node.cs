@@ -127,8 +127,7 @@ namespace Lime
 		/// Markers of default animation.
 		/// </summary>
 		public MarkerCollection Markers { get { return DefaultAnimation.Markers; } }
-
-		// SUGGESTION: This property should have private/protected setter.
+		
 		/// <summary>
 		/// Returns true if this node is running animation.
 		/// </summary>
@@ -137,8 +136,7 @@ namespace Lime
 			get { return DefaultAnimation.IsRunning; }
 			set { DefaultAnimation.IsRunning = value; }
 		}
-
-		// SUGGESTION: This property should have private/protected setter.
+		
 		/// <summary>
 		/// Returns true if this node isn't running animation.
 		/// </summary>
@@ -179,8 +177,7 @@ namespace Lime
 
 		[ProtoMember(13)]
 		public AnimationList Animations;
-
-		// SUGGESTION: This property should have private/protected setter
+		
 		/// <summary>
 		/// Name of last started marker of default animation. Is set to null by default.
 		/// </summary>
@@ -272,8 +269,7 @@ namespace Lime
 			++FinalizedCount;
 		}
 #endif
-
-		// SUGGESTION: Transform to Root property?
+		
 		public Node GetRoot()
 		{
 			Node node = this;
@@ -282,8 +278,7 @@ namespace Lime
 			}
 			return node;
 		}
-
-		// SUGGESTION: rename to DescendantOf?
+		
 		/// <summary>
 		/// Returns true if this node is a descendant of provided node.
 		/// </summary>
@@ -378,8 +373,7 @@ namespace Lime
 		{
 			return string.Format("{0}, \"{1}\", {2}", GetType().Name, Id ?? "", GetHierarchyPath());
 		}
-
-		// SUGGESTION: Transform to HierarchyPath property?
+		
 		/// <summary>
 		/// Returns hierarchy path for this Node in the format: "Parent.GetHierarchyPath()/Id (Tag)".
 		/// If Id is null then it's replaced with Type name. Tag is ommited if it's null.

@@ -35,14 +35,12 @@ namespace Lime
 		{
 			return U.Equals(rhs.U) && V.Equals(rhs.V) && T.Equals(rhs.T);
 		}
-
-		// SUGGESTION: Transform to Determinant property?
+		
 		public float CalcDeterminant()
 		{
 			return U.X * V.Y - U.Y * V.X;
 		}
-
-		// SUGGESTION: Transform to Inversed property?
+		
 		public Matrix32 CalcInversed()
 		{
 			Matrix32 m;
@@ -214,8 +212,7 @@ namespace Lime
 			result.V = Mathf.Lerp(amount, value1.V, value2.V);
 			return result;
 		}
-
-		// SUGGESTION: Transform to IsIdentity property?
+		
 		/// <summary>
 		/// Checks if this matrix is identity matrix.
 		/// </summary>

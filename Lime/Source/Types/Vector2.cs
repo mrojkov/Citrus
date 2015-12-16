@@ -352,8 +352,7 @@ namespace Lime
 			if (parts.Length != 2 || parts.Any(i => i.IsNullOrWhiteSpace())) {
 				return false;
 			}
-
-			// BUG: Sometimes TryParse() fails because ToString uses non-invariant culture (',' instead of '.', etc.)
+			
 			return float.TryParse(parts[0], NumberStyles.Float, CultureInfo.InvariantCulture, out vector.X)
 				&& float.TryParse(parts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out vector.Y);
 		}

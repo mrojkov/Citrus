@@ -88,8 +88,7 @@ namespace Lime
 		public float Bottom { get { return B.Y; } set { B.Y = value; } }
 		
 		public Vector2 Center { get { return (A + B) / 2; } }
-
-		// SUGGESTION: Current algorithm vs Toolbox.Swap vs new Rectangle()?
+		
 		/// <summary>
 		/// Returns this rectangle with swapped coordinates 
 		/// of borders if width or height is negative.
@@ -164,8 +163,7 @@ namespace Lime
 				Mathf.Max(value.Y, Bottom)
 			);
 		}
-
-		// SUGGESTION: Swap to return string.Format("{0}, {1}", A.ToString(), B.ToString());?
+		
 		/// <summary>
 		/// Returns the string representation of this <see cref="Rectangle"/> in the format:
 		/// "A.X, A.Y, B.X, B.Y".
