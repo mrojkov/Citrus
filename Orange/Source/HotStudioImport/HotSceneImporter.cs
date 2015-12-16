@@ -147,7 +147,7 @@ namespace Orange
 			Image img = (Image)node;
 			switch (name) {
 			case "TexturePath":
-                var path = lexer.ParsePath();
+				var path = lexer.ParsePath();
 				img.Texture = new SerializableTexture(path);
 				break;
 			case "TexCoordForMins":
@@ -591,10 +591,10 @@ namespace Orange
 			case "Text":
 				button.Text = lexer.ParseQuotedString();
 				break;
-            case "Enabled":
-                button.Enabled = lexer.ParseBool();
-                break;
-            default:
+			case "Enabled":
+				button.Enabled = lexer.ParseBool();
+				break;
+			default:
 				ParseGraphicProperty(button, name);
 				break;
 			}
@@ -763,38 +763,7 @@ namespace Orange
 				break;
 			}
 		}
-
-		protected void ParseEditProperty(Node node, string name)
-		{
-			TextBox textBox = (TextBox)node;
-			switch (name) {
-			case "FontName":
-				textBox.Font = new SerializableFont(lexer.ParseQuotedString());
-				break;
-			case "Text":
-				textBox.Text = lexer.ParseQuotedString();
-				break;
-			case "FontSize":
-				textBox.FontHeight = lexer.ParseFloat();
-				break;
-			case "MaxLength":
-				textBox.MaxTextLength = lexer.ParseInt();
-				break;
-			case "ExclusiveMode":
-				lexer.ParseBool();
-				break;
-			case "CaretChar":
-				string caret = lexer.ParseQuotedString();
-				if (caret != "") {
-					textBox.CaretChar = caret[0];
-				}
-				break;
-			default:
-				ParseGraphicProperty(node, name);
-				break;
-			}
-		}
-
+		
 		protected void ParseFolderBeginProperty(Node node, string name)
 		{
 			switch (name) {
@@ -933,7 +902,6 @@ namespace Orange
 				new KnownActorType {ActorClass = "Hot::Slider", NodeClass = "Lime.Slider, Lime", PropReader = ParseSliderProperty},
 				new KnownActorType {ActorClass = "Hot::RichText", NodeClass = "Lime.RichText, Lime", PropReader = ParseRichTextProperty},
 				new KnownActorType {ActorClass = "Hot::TextStyle", NodeClass = "Lime.TextStyle, Lime", PropReader = ParseTextStyleProperty},
-				new KnownActorType {ActorClass = "Hot::Edit", NodeClass = "Lime.TextBox, Lime", PropReader = ParseEditProperty},
 				new KnownActorType {ActorClass = "Hot::Movie", NodeClass = "Lime.Movie, Lime", PropReader = ParseVideoProperty},
 				new KnownActorType {ActorClass = "Hot::ModelView", NodeClass = "Lime.ModelViewport, Lime", PropReader = ParseModelViewProperty},
 				new KnownActorType {ActorClass = "LinearLayout", NodeClass = "Lime.LinearLayout, Lime", PropReader = ParseLinearLayoutProperty},
