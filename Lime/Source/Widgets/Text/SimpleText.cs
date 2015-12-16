@@ -61,11 +61,10 @@ namespace Lime
 		public string DisplayText {
 			get
 			{
-				if (displayText == null) {
-					displayText = Text;
-					if (textProcessor != null)
-						textProcessor(ref displayText);
-				}
+				if (displayText != null) return displayText;
+				displayText = Localizable ? Text.Localize() : Text;
+				if (textProcessor != null)
+					textProcessor(ref displayText);
 				return displayText;
 			}
 		}
@@ -171,15 +170,7 @@ namespace Lime
 			FontHeight = 15;
 			Font = new SerializableFont();
 			TextColor = Color4.White;
-			TextProcessor += LocalizeProcessor;
 			Localizable = true;
-		}
-
-		public void LocalizeProcessor(ref string text)
-		{
-			if (Localizable) {
-				text = text.Localize();
-			}
 		}
 
 		/// <summary>
