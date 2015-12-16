@@ -325,14 +325,13 @@ namespace Lime
 				}
 				float scale = fontHeight / fontChar.Height;
 				position.X += scale * (fontChar.ACWidths.X + fontChar.Kerning(prevChar));
-				var texture = font.Textures[fontChar.TextureIndex];
 				var size = new Vector2(scale * fontChar.Width, fontHeight);
 				var roundPos = new Vector2(position.X.Round(), position.Y.Round());
 				if (onDrawChar != null) {
 					onDrawChar(i, roundPos, size);
 				}
 				if (list == null) {
-					DrawSprite(texture, color, roundPos, size, fontChar.UV0, fontChar.UV1);
+					DrawSprite(fontChar.Texture, color, roundPos, size, fontChar.UV0, fontChar.UV1);
 				} else {
 					chars[j].FontChar = fontChar;
 					chars[j].Position = roundPos;

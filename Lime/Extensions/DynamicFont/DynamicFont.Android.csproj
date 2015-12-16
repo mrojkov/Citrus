@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectGuid>{B305434E-2233-4F9E-9815-577DF6F9A737}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>DynamicFont.Android</RootNamespace>
+    <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
+    <AndroidResgenClass>Resource</AndroidResgenClass>
+    <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
+    <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
+    <AndroidUseLatestPlatformSdk>True</AndroidUseLatestPlatformSdk>
+    <AssemblyName>DynamicFont.Android</AssemblyName>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Android\Debug</OutputPath>
+    <DefineConstants>DEBUG;ANDROID</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <AndroidLinkMode>None</AndroidLinkMode>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Android\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants>ANDROID</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="Mono.Android" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CharCache.cs" />
+    <Compile Include="CompoundFont.cs" />
+    <Compile Include="DynamicFont.cs" />
+    <Compile Include="FontRenderer.cs" />
+    <Compile Include="SharpFont\BBox.cs" />
+    <Compile Include="SharpFont\Error.cs" />
+    <Compile Include="SharpFont\Face.cs" />
+    <Compile Include="SharpFont\Fixed26Dot6.cs" />
+    <Compile Include="SharpFont\FreeTypeException.cs" />
+    <Compile Include="SharpFont\FT.Internal.cs" />
+    <Compile Include="SharpFont\FTBitmap.cs" />
+    <Compile Include="SharpFont\FTSize.cs" />
+    <Compile Include="SharpFont\FTVector26Dot6.cs" />
+    <Compile Include="SharpFont\GlyphFormat.cs" />
+    <Compile Include="SharpFont\GlyphMetrics.cs" />
+    <Compile Include="SharpFont\GlyphSlot.cs" />
+    <Compile Include="SharpFont\KerningMode.cs" />
+    <Compile Include="SharpFont\Library.cs" />
+    <Compile Include="SharpFont\LoadFlags.cs" />
+    <Compile Include="SharpFont\LoadTarget.cs" />
+    <Compile Include="SharpFont\OutlineFlags.cs" />
+    <Compile Include="SharpFont\PInvokeHelper.cs" />
+    <Compile Include="SharpFont\PixelMode.cs" />
+    <Compile Include="SharpFont\RenderMode.cs" />
+    <Compile Include="SharpFont\SizeMetrics.cs" />
+    <Compile Include="SharpFont\Internal\BitmapRec.cs" />
+    <Compile Include="SharpFont\Internal\FaceRec.cs" />
+    <Compile Include="SharpFont\Internal\GenericRec.cs" />
+    <Compile Include="SharpFont\Internal\GlyphMetricsRec.cs" />
+    <Compile Include="SharpFont\Internal\GlyphSlotRec.cs" />
+    <Compile Include="SharpFont\Internal\OutlineRec.cs" />
+    <Compile Include="SharpFont\Internal\SizeMetricsRec.cs" />
+    <Compile Include="SharpFont\Internal\SizeRec.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedNativeLibrary Include="..\..\..\3rdParty\SharpFont\libfreetype\armeabi\libfreetype6.so">
+      <Link>libfreetype\armeabi\libfreetype6.so</Link>
+    </EmbeddedNativeLibrary>
+    <EmbeddedNativeLibrary Include="..\..\..\3rdParty\SharpFont\libfreetype\armeabi-v7a\libfreetype6.so">
+      <Link>libfreetype\armeabi-v7a\libfreetype6.so</Link>
+    </EmbeddedNativeLibrary>
+    <EmbeddedNativeLibrary Include="..\..\..\3rdParty\SharpFont\libfreetype\x86\libfreetype6.so">
+      <Link>libfreetype\x86\libfreetype6.so</Link>
+    </EmbeddedNativeLibrary>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Lime.Android.csproj">
+      <Project>{72E2DDBB-C320-4356-89EC-BDED6036D29B}</Project>
+      <Name>Lime.Android</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

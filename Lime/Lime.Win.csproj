@@ -43,10 +43,6 @@
     <Reference Include="OpenTK.GLControl">
       <HintPath>..\3rdParty\OpenTK\OpenTK.GLControl.dll</HintPath>
     </Reference>
-    <Reference Include="SharpFont, Version=3.0.1.200, Culture=neutral, PublicKeyToken=48add4c483071cdf, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\3rdParty\SharpFont\SharpFont.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -92,9 +88,9 @@
     <Compile Include="Source\Audio\OpenAL\PlatformAudioSystem.cs" />
     <Compile Include="Source\Audio\OpenAL\WaveIMA4Decoder.cs" />
     <Compile Include="Source\Audio\Unity\AudioChannel.cs" />
-    <Compile Include="Source\Graphics\Fonts\DynamicFont.cs" />
+    <Compile Include="Source\Graphics\Fonts\CharMap.cs" />
+    <Compile Include="Source\Graphics\Fonts\CompoundFont.cs" />
     <Compile Include="Source\Graphics\Fonts\Font.cs" />
-    <Compile Include="Source\Graphics\Fonts\FontRenderer.cs" />
     <Compile Include="Source\Graphics\Fonts\SerializableFont.cs" />
     <Compile Include="Source\Graphics\OpenGL\IGLObject.cs" />
     <Compile Include="Source\Graphics\Mesh.cs" />

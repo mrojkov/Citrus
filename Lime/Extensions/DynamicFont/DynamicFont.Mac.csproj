@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectTypeGuids>{A3F8F2AB-B479-4A4A-A458-A89E7DC349F1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectGuid>{B5F74505-80BB-4373-B194-219D743C1FA0}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>DynamicFont</RootNamespace>
+    <MonoMacResourcePrefix>Resources</MonoMacResourcePrefix>
+    <AssemblyName>DynamicFont</AssemblyName>
+    <TargetFrameworkIdentifier>Xamarin.Mac</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Mac\Debug</OutputPath>
+    <DefineConstants>DEBUG; MAC</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <Profiling>false</Profiling>
+    <UseRefCounting>false</UseRefCounting>
+    <UseSGen>false</UseSGen>
+    <IncludeMonoRuntime>false</IncludeMonoRuntime>
+    <CreatePackage>false</CreatePackage>
+    <EnableCodeSigning>false</EnableCodeSigning>
+    <EnablePackageSigning>false</EnablePackageSigning>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Mac\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <Profiling>false</Profiling>
+    <UseRefCounting>false</UseRefCounting>
+    <UseSGen>false</UseSGen>
+    <IncludeMonoRuntime>false</IncludeMonoRuntime>
+    <CreatePackage>false</CreatePackage>
+    <EnableCodeSigning>false</EnableCodeSigning>
+    <EnablePackageSigning>false</EnablePackageSigning>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants>MAC</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="Xamarin.Mac" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
+  <ItemGroup>
+    <Compile Include="CharCache.cs" />
+    <Compile Include="CompoundFont.cs" />
+    <Compile Include="DynamicFont.cs" />
+    <Compile Include="FontRenderer.cs" />
+    <Compile Include="SharpFont\BBox.cs" />
+    <Compile Include="SharpFont\Error.cs" />
+    <Compile Include="SharpFont\FTBitmap.cs" />
+    <Compile Include="SharpFont\FTSize.cs" />
+    <Compile Include="SharpFont\FTVector26Dot6.cs" />
+    <Compile Include="SharpFont\Face.cs" />
+    <Compile Include="SharpFont\Fixed26Dot6.cs" />
+    <Compile Include="SharpFont\FreeTypeException.cs" />
+    <Compile Include="SharpFont\GlyphFormat.cs" />
+    <Compile Include="SharpFont\GlyphMetrics.cs" />
+    <Compile Include="SharpFont\GlyphSlot.cs" />
+    <Compile Include="SharpFont\KerningMode.cs" />
+    <Compile Include="SharpFont\Library.cs" />
+    <Compile Include="SharpFont\LoadFlags.cs" />
+    <Compile Include="SharpFont\LoadTarget.cs" />
+    <Compile Include="SharpFont\OutlineFlags.cs" />
+    <Compile Include="SharpFont\PInvokeHelper.cs" />
+    <Compile Include="SharpFont\PixelMode.cs" />
+    <Compile Include="SharpFont\RenderMode.cs" />
+    <Compile Include="SharpFont\SizeMetrics.cs" />
+    <Compile Include="SharpFont\Internal\BitmapRec.cs" />
+    <Compile Include="SharpFont\Internal\FaceRec.cs" />
+    <Compile Include="SharpFont\Internal\GenericRec.cs" />
+    <Compile Include="SharpFont\Internal\GlyphMetricsRec.cs" />
+    <Compile Include="SharpFont\Internal\GlyphSlotRec.cs" />
+    <Compile Include="SharpFont\Internal\OutlineRec.cs" />
+    <Compile Include="SharpFont\Internal\SizeMetricsRec.cs" />
+    <Compile Include="SharpFont\Internal\SizeRec.cs" />
+    <Compile Include="SharpFont\FT.Internal.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\PokerClient\Citrus\Lime\Lime.Mac.csproj">
+      <Project>{DC16EEBF-404D-4610-B87A-15B57464D707}</Project>
+      <Name>Lime.Mac</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\..\3rdParty\SharpFont\libfreetype6.dylib">
+      <Link>libfreetype6.dylib</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+</Project>

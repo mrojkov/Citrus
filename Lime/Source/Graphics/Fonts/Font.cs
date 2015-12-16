@@ -9,9 +9,7 @@ namespace Lime
 	public interface IFont : IDisposable
 	{
 		string About { get; }
-		List<ITexture> Textures { get; }
 		IFontCharSource Chars { get; }
-
 		void ClearCache();
 	}
 
@@ -27,14 +25,14 @@ namespace Lime
 		[ProtoMember(1)]
 		public string About { get; set; }
 		[ProtoMember(2)]
-		public List<ITexture> Textures { get; private set; }
+		// It is better to move it to FontCharCollection, but leave it here for compatibility reasons.
+		public List<ITexture> Textures { get { return CharCollection.Textures; } }
 		[ProtoMember(3)]
 		public FontCharCollection CharCollection { get; private set; }
 		public IFontCharSource Chars { get { return CharCollection; } }
 
 		public Font()
 		{
-			Textures = new List<ITexture>();
 			CharCollection = new FontCharCollection();
 		}
 
@@ -51,114 +49,85 @@ namespace Lime
 	[ProtoContract]
 	public class FontCharCollection : IFontCharSource, ICollection<FontChar>
 	{
-		public List<FontChar> CharList = new List<FontChar>();
-		public FontChar[][] CharMap = new FontChar[256][];
+		private readonly CharMap charMap = new CharMap();
+		private readonly List<FontChar> charList = new List<FontChar>();
 
-		public FontChar Get(char code, float heightHint)
+		public readonly List<ITexture> Textures = new List<ITexture>();
+
+		int ICollection<FontChar>.Count
 		{
-			byte hb = (byte)(code >> 8);
-			byte lb = (byte)(code & 255);
-			if (CharMap[hb] != null) {
-				var c = CharMap[hb][lb];
-				if (c != null)
-					return c;
+			get
+			{
+				return charList.Count;
 			}
-			return TranslateKnownMissingChars(ref code) ? Get(code, heightHint) : FontChar.Null;
 		}
 
-		internal static bool TranslateKnownMissingChars(ref char code)
+		bool ICollection<FontChar>.IsReadOnly
 		{
-			var origCode = code;
-			// Can use normal space instead of unbreakable space
-			if (code == 160) {
-				code = ' ';
-			}
-			// Can use 'middle dot' instead of 'bullet operator'
-			if (code == 8729) {
-				code = (char)183;
-			}
-			// Can use 'degree symbol' instead of 'masculine ordinal indicator'
-			if (code == 186) {
-				code = (char)176;
-			}
-			// Use '#' instead of 'numero sign'
-			if (code == 8470) {
-				code = '#';
-			}
-			return code != origCode;
-		}
-
-		public void CopyTo(Array a, int index)
-		{
-		}
-
-		public int Count { get { return CharList.Count; } }
-
-		IEnumerator<FontChar> IEnumerable<FontChar>.GetEnumerator()
-		{
-			return CharList.GetEnumerator();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return CharList.GetEnumerator();
-		}
-
-		void ICollection<FontChar>.CopyTo(FontChar[] a, int index)
-		{
-			CharList.CopyTo(a, index);
-		}
-		
-		public void Clear()
-		{
-			CharList.Clear();
-			for (int i = 0; i < 256; i++) {
-				CharMap[i] = null;
+			get
+			{
+				return false;
 			}
 		}
 
 		public bool Contains(char code)
 		{
-			byte hb = (byte)(code >> 8);
-			byte lb = (byte)(code & 255);
-			if (CharMap[hb] != null) {
-				return CharMap[hb][lb] != null;
-			}
-			return false;
+			return charMap.Contains(code);
 		}
-		
-		public bool Contains(FontChar item)
+
+		public FontChar Get(char code, float heightHint)
+		{
+			var c = charMap[code];
+			if (c != null) {
+				if (c.Texture == null) {
+					c.Texture = Textures[c.TextureIndex];
+				}
+				return c;
+			}
+			return CharMap.TranslateKnownMissingChars(ref code) ? Get(code, heightHint) : FontChar.Null;
+		}
+
+		public void Dispose()
+		{
+		}
+
+		void ICollection<FontChar>.Add(FontChar item)
+		{
+			charMap[item.Char] = item;
+			charList.Add(item);
+		}
+
+		void ICollection<FontChar>.Clear()
+		{
+			charList.Clear();
+			charMap.Clear();
+		}
+
+		bool ICollection<FontChar>.Contains(FontChar item)
 		{
 			return Contains(item.Char);
 		}
 
-		public bool Remove(FontChar item)
+		void ICollection<FontChar>.CopyTo(FontChar[] array, int arrayIndex)
 		{
-			byte hb = (byte)(item.Char >> 8);
-			byte lb = (byte)(item.Char & 255);
-			if (CharMap[hb] != null) {
-				CharMap[hb][lb] = null;
-			}
-			return CharList.Remove(item);
-		}
-		
-		bool ICollection<FontChar>.IsReadOnly
-		{
-			get { return false; }
+			charList.CopyTo(array, arrayIndex);
 		}
 
-		public void Add(FontChar c)
+		IEnumerator IEnumerable.GetEnumerator()
 		{
-			byte hb = (byte)(c.Char >> 8);
-			byte lb = (byte)(c.Char & 255);
-			if (CharMap[hb] == null) {
-				CharMap[hb] = new FontChar[256];
-			}
-			CharMap[hb][lb] = c;
-			CharList.Add(c);
+			return charList.GetEnumerator();
 		}
 
-		public void Dispose() { }
+		IEnumerator<FontChar> IEnumerable<FontChar>.GetEnumerator()
+		{
+			return charList.GetEnumerator();
+		}
+
+		bool ICollection<FontChar>.Remove(FontChar item)
+		{
+			charMap[item.Char] = null;
+			return charList.Remove(item);
+		}
 	}
 
 	[ProtoContract]
@@ -219,6 +188,11 @@ namespace Lime
 		/// The null-character which denotes any missing character in a font
 		/// </summary>
 		public static FontChar Null = new FontChar();
+
+		/// <summary>
+		/// Cached texture reference.
+		/// </summary>
+		public ITexture Texture;
 
 		public float Kerning(FontChar prevChar)
 		{

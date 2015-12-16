@@ -73,7 +73,7 @@ namespace Lime
 					var s = buffer[Index];
 					Index++;
 					s.Tag = Tag;
-					s.Texture = Font.Textures[ch.TextureIndex];
+					s.Texture = ch.Texture;
 					s.Color = Color;
 					s.Position = cd.Position;
 					s.Size = cd.Size(FontHeight);
