@@ -1,7 +1,6 @@
-using System.Collections;
-using System.IO;
-using System.Collections.Generic;
 using System;
+using System.IO;
+
 using ProtoBuf;
 
 namespace Lime
@@ -10,27 +9,53 @@ namespace Lime
 	{
 		int GetWidth();
 		int GetHeight();
-		void LoadFromStream(Stream stream);
 		void SaveToStream(Stream stream);
 		IBitmapImplementation Crop(IntRectangle cropArea);
 		IBitmapImplementation Rescale(int newWidth, int newHeight);
 		bool IsValid();
+		Color4[] GetPixels();
 	}
 
 	[ProtoContract]
 	public class Bitmap : IDisposable
 	{
-		IBitmapImplementation implementation;
+		private IBitmapImplementation implementation;
 
-		public Vector2 Size { get { return new Vector2(Width, Height); } }
-		public int Width { get { return implementation.GetWidth(); } }
-		public int Height { get { return implementation.GetHeight(); } }
+		public Bitmap()
+		{
+			implementation = new BitmapImplementation();
+		}
+
+		public Bitmap(Color4[] data, int width, int height)
+		{
+			implementation = new BitmapImplementation(data, width, height);
+		}
+
+		public Bitmap(Stream stream)
+		{
+			implementation = new BitmapImplementation(stream);
+		}
+
+		private Bitmap(IBitmapImplementation implementation)
+		{
+			this.implementation = implementation;
+		}
+
+		public int Height
+		{
+			get { return implementation.GetHeight(); }
+		}
 
 		[ProtoMember(1)]
 		public byte[] SerializationData
 		{
-			get { return IsValid() ? GetByteArray() : null; }
-			set {
+			get
+			{
+				return IsValid() ? GetByteArray() : null;
+			}
+
+			set
+			{
 				if (value != null) {
 					LoadFromByteArray(value);
 				} else {
@@ -39,40 +64,19 @@ namespace Lime
 			}
 		}
 
-		public Bitmap()
+		public Vector2 Size
 		{
-			implementation = new BitmapImplementation();
+			get { return new Vector2(Width, Height); }
 		}
 
-		public Bitmap(Stream stream) : this()
+		public int Width
 		{
-			LoadFromStream(stream);
-		}
-
-		private Bitmap(IBitmapImplementation implementation)
-		{
-			this.implementation = implementation;
-		}
-
-		public void LoadFromStream(Stream stream)
-		{
-			implementation.LoadFromStream(stream);
-		}
-
-		public void SaveToStream(Stream stream)
-		{
-			implementation.SaveToStream(stream);
+			get { return implementation.GetWidth(); }
 		}
 
 		public Bitmap Clone()
 		{
-			return Crop(new IntRectangle(0, 0, Width - 1, Height - 1));
-		}
-
-		public Bitmap Rescale(int newWidth, int newHeight)
-		{
-			var newImplementation = implementation.Rescale(newWidth, newHeight);
-			return new Bitmap(newImplementation);
+			return Crop(new IntRectangle(0, 0, Width, Height));
 		}
 
 		public Bitmap Crop(IntRectangle cropArea)
@@ -83,14 +87,30 @@ namespace Lime
 
 		public void Dispose()
 		{
-			implementation.Dispose();
+			if (implementation != null) {
+				implementation.Dispose();
+			}
 		}
 
-		private void LoadFromByteArray(byte[] data)
+		public Color4[] GetPixels()
 		{
-			using (var stream = new MemoryStream(data)) {
-				LoadFromStream(stream);
-			}
+			return implementation.GetPixels();
+		}
+
+		public bool IsValid()
+		{
+			return implementation != null && implementation.IsValid();
+		}
+
+		public Bitmap Rescale(int newWidth, int newHeight)
+		{
+			var newImplementation = implementation.Rescale(newWidth, newHeight);
+			return new Bitmap(newImplementation);
+		}
+
+		public void SaveToStream(Stream stream)
+		{
+			implementation.SaveToStream(stream);
 		}
 
 		private byte[] GetByteArray()
@@ -101,9 +121,11 @@ namespace Lime
 			}
 		}
 
-		public bool IsValid()
+		private void LoadFromByteArray(byte[] data)
 		{
-			return implementation != null && implementation.IsValid();
+			using (var stream = new MemoryStream(data)) {
+				implementation = new BitmapImplementation(stream);
+			}
 		}
 	}
 }
