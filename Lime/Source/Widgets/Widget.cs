@@ -139,9 +139,7 @@ namespace Lime
 			get { return clicked; }
 			set { clicked = value; }
 		}
-
-		// SUGGESTION: This one should use IsMouseOver instead of HitTest (as HandleClick does)
-		// SUGGESTION: Transform to property?
+		
 		public virtual bool WasClicked()
 		{
 			return Input.WasMouseReleased() && HitTest(Input.MousePosition);
@@ -533,8 +531,7 @@ namespace Lime
 		{
 			get { return input ?? (input = new WidgetInput(this)); }
 		}
-
-		// SUGGESTION: Transform to ContentSize property?
+		
 		public virtual Vector2 CalcContentSize()
 		{
 			return Size;
@@ -795,8 +792,7 @@ namespace Lime
 		#endregion
 
 		#region HitTest handling
-
-		// SUGGESTION: Transform to property?
+		
 		public bool IsMouseOver()
 		{
 			return Input.IsAcceptingMouse() && HitTest(Input.MousePosition);

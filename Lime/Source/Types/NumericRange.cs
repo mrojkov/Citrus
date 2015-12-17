@@ -21,8 +21,7 @@ namespace Lime
 			Median = median;
 			Dispersion = dispersion;
 		}
-
-		// BUG (in code or in documentation): Result can be greater than median.
+		
 		/// <summary>
 		/// Returns random number from this range. Result is always lesser than median.
 		/// </summary>
