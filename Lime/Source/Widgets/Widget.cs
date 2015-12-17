@@ -67,7 +67,6 @@ namespace Lime
 	[ProtoInclude(108, typeof(Button))]
 	[ProtoInclude(109, typeof(Slider))]
 	[ProtoInclude(110, typeof(RichText))]
-	[ProtoInclude(111, typeof(TextBox))]
 	[ProtoInclude(112, typeof(Movie))]
 	[ProtoInclude(113, typeof(ModelViewport))]
 	[DebuggerTypeProxy(typeof(WidgetDebugView))]
