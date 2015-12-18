@@ -508,6 +508,8 @@ namespace Lime
 					return Key.Home;
 				case Keys.End:
 					return Key.End;
+				case Keys.Pause:
+					return Key.Pause;
 				case Keys.Menu:
 					return Key.AltLeft;
 				case Keys.ControlKey:
