@@ -227,6 +227,21 @@ namespace Lime
 			return value1.X * value2.Y - value1.Y * value2.X;
 		}
 
+		public static Vector2 Min(Vector2 a, Vector2 b)
+		{
+			return new Vector2(Mathf.Min(a.X, b.X), Mathf.Min(a.Y, b.Y));
+		}
+
+		public static Vector2 Max(Vector2 a, Vector2 b)
+		{
+			return new Vector2(Mathf.Max(a.X, b.X), Mathf.Max(a.Y, b.Y));
+		}
+
+		public static Vector2 Clamp(Vector2 value, Vector2 a, Vector2 b)
+		{
+			return new Vector2(Mathf.Clamp(value.X, a.X, b.X), Mathf.Clamp(value.Y, a.Y, b.Y));
+		}
+				
 		/// <summary>
 		/// Creates a new <see cref="Vector2"/> that represents
 		/// cosine and sine of specified direction.

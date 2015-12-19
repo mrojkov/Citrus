@@ -81,14 +81,15 @@ namespace Lime
 			internal set
 			{
 				if (parent != value) {
+					var oldParent = parent;
 					parent = value;
 					PropagateDirtyFlags();
-					OnParentChanged();
+					OnParentChanged(oldParent);
 				}
 			}
 		}
 
-		protected virtual void OnParentChanged() { }
+		protected virtual void OnParentChanged(Node oldParent) { }
 
 		public Widget AsWidget { get; internal set; }
 

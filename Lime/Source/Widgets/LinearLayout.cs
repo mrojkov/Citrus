@@ -10,11 +10,9 @@ namespace Lime
 	// TODO: Get rid of the class, use Widget.Layout technology instead.
 	public class LinearLayout : Node
 	{
-		class LayoutHandler : ILayout
+		class LayoutHandler : CommonLayout, ILayout
 		{
 			private LinearLayout layoutData;
-
-			public List<Rectangle> ContentRectangles { get { return null; } }
 
 			public LayoutHandler(LinearLayout layoutNode)
 			{
@@ -87,6 +85,10 @@ namespace Lime
 					lastWidget.Height += parentSize.Y - y;
 				}
 			}
+
+			public void MeasureSizeConstraints(Widget widget)
+			{
+			}
 		}
 
 		[ProtoMember(1)]
@@ -95,7 +97,7 @@ namespace Lime
 		[ProtoMember(2)]
 		public bool ProcessHidden { get; set; }
 
-		protected override void OnParentChanged()
+		protected override void OnParentChanged(Node oldParent)
 		{
 			if (Parent != null) {
 				Parent.AsWidget.Layout = new LayoutHandler(this);

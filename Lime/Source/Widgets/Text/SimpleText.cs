@@ -19,6 +19,7 @@ namespace Lime
 		private HAlignment hAlignment;
 		private VAlignment vAlignment;
 		private Color4 textColor;
+		private bool minSizeValid;
 		private string displayText;
 
 		private TextProcessorDelegate textProcessor;
@@ -149,6 +150,40 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// Gets or sets a value indicating whether this <see cref="Lime.RichText"/> calculates MinSize and MaxSize automatically.
+		/// </summary>
+		public bool AutoSizeConstraints { get; set; }
+
+		public override Vector2 MinSize
+		{
+			get
+			{
+				if (AutoSizeConstraints && !minSizeValid) {
+					base.MinSize = CalcContentSize();
+					minSizeValid = true;
+				}
+				return base.MinSize;
+			}
+			set
+			{
+				if (!AutoSizeConstraints) {
+					base.MinSize = value;
+				}
+			}
+		}
+
+		public override Vector2 MaxSize
+		{
+			get { return AutoSizeConstraints ? MinSize : base.MaxSize; }
+			set
+			{
+				if (!AutoSizeConstraints) {
+					base.MaxSize = value;
+				}
+			}
+		}
+
+		/// <summary>
 		/// Удалять лишние пробелы между словами
 		/// </summary>
 		public bool TrimWhitespaces { get; set; }
@@ -164,6 +199,7 @@ namespace Lime
 
 		public SimpleText()
 		{
+			AutoSizeConstraints = true;
 			TrimWhitespaces = true;
 			// CachedRendering = true;
 			Text = "";
@@ -423,6 +459,7 @@ namespace Lime
 			displayText = null;
 			caret.Valid = CaretPosition.ValidState.TextPos;
 			spriteList = null;
+			minSizeValid = false;
 		}
 	}
 }
