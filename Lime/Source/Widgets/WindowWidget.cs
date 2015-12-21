@@ -20,6 +20,9 @@ namespace Lime
 			Window = window;
 			Context = new WidgetContext(window, this);
 			Window.Context = Context;
+#if ANDROID
+			Application.SoftKeyboard.Hidden += () => Context.ActiveTextWidget = null;
+#endif
 		}
 
 		public override void Update(float delta)
@@ -31,6 +34,9 @@ namespace Lime
 			base.Update(delta);
 			if (!Context.IsActiveTextWidgetUpdated) {
 				Context.ActiveTextWidget = null;
+				if (Application.SoftKeyboard.Visible) {
+					Application.SoftKeyboard.Show(false, string.Empty);
+				}
 			}
 #if iOS || ANDROID
 			if (Application.CurrentThread.IsMain()) {
@@ -38,11 +44,6 @@ namespace Lime
 				if (prevActiveTextWidget != Context.ActiveTextWidget) {
 					Application.SoftKeyboard.Show(showKeyboard, Context.ActiveTextWidget != null ? Context.ActiveTextWidget.Text : "");
 				}
-#if ANDROID
-				if (!Application.SoftKeyboard.Visible) {
-					Context.ActiveTextWidget = null;
-				}
-#endif
 				// Handle switching between various text widgets
 				if (prevActiveTextWidget != Context.ActiveTextWidget && Context.ActiveTextWidget != null && prevActiveTextWidget != null) {
 					Application.SoftKeyboard.ChangeText(Context.ActiveTextWidget.Text);

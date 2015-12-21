@@ -18,6 +18,16 @@ namespace Lime
 		float Height { get; }
 
 		/// <summary>
+		/// Возвращает true, если програмная клавиатура подерживается текущей платформой
+		/// </summary>
+		bool Supported { get; }
+
+		/// <summary>
+		/// Occurs when the keyboard shown on the screen.
+		/// </summary>
+		event Action Shown;
+
+		/// <summary>
 		/// Генерируется, когда клавиатура исчезла
 		/// </summary>
 		event Action Hidden;
@@ -33,17 +43,13 @@ namespace Lime
 		/// Изменяет текст в поле ввода
 		/// </summary>
 		void ChangeText(string text);
-
-		/// <summary>
-		/// Возвращает true, если програмная клавиатура подерживается текущей платформой
-		/// </summary>
-		bool Supported { get; }
 	}
 
 	internal class DummySoftKeyboard : ISoftKeyboard
 	{
 		public bool Visible { get { return false; } }
 		public float Height { get { return 0; } }
+		public event Action Shown;
 		public event Action Hidden;
 		public void Show(bool show, string text) { }
 		public void ChangeText(string text) { }
