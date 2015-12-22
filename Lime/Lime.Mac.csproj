@@ -108,7 +108,6 @@
     <Compile Include="Source\Widgets\Text\TextRenderer.cs" />
     <Compile Include="Source\Graphics\TextureAtlasElement.cs" />
     <Compile Include="Source\Graphics\OpenGL\IGLObject.cs" />
-    <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Source\Application\AndroidActivityDelegate.cs" />
     <Compile Include="Source\Application\AndroidGameView.cs" />
     <Compile Include="Source\Graphics\Bitmap.Android.cs" />

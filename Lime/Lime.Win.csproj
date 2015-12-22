@@ -250,7 +250,6 @@
     <Compile Include="Source\Widgets\WebBrowser\WebBrowser.Mac.cs" />
     <Compile Include="Source\Graphics\Bitmap.Android.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WebBrowser.Android.cs" />
-    <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Source\Graphics\Bitmap.Mac.cs" />
     <Compile Include="Source\Graphics\Bitmap.Unity.cs" />
     <Compile Include="Source\Graphics\Unity\PlatformMesh.cs" />
