@@ -85,10 +85,6 @@ namespace Lime
 					lastWidget.Height += parentSize.Y - y;
 				}
 			}
-
-			public void MeasureSizeConstraints(Widget widget)
-			{
-			}
 		}
 
 		[ProtoMember(1)]
