@@ -29,8 +29,8 @@ namespace Lime
 			if (cells == null) {
 				return;
 			}
-			List<LinearAllocator.Constraints> cols, rows;
-			CalcCellConstraints(cells, out cols, out rows);
+			var cols = CalcColConstraints(cells);
+			var rows = CalcRowConstraints(cells);
 			var minSize = Vector2.Zero;
 			var maxSize = Vector2.Zero;
 			foreach (var i in cols) {
@@ -50,11 +50,9 @@ namespace Lime
 			var cells = GetCellArray(widget.Nodes);
 			if (cells == null)
 				return;
-			List<LinearAllocator.Constraints> cols, rows;
-			CalcCellConstraints(cells, out cols, out rows);
 			var allocator = new LinearAllocator(roundSizes: true);
-			allocator.Allocate(widget.Width, cols);
-			allocator.Allocate(widget.Height, rows);
+			var cols = allocator.Allocate(widget.Width, CalcColConstraints(cells));
+			var rows = allocator.Allocate(widget.Height, CalcRowConstraints(cells));
 			// Layout each cell
 			var p = Vector2.Zero;
 			DebugRectangles.Clear();
@@ -63,7 +61,7 @@ namespace Lime
 				for (int j = 0; j < ColCount; j++) {
 					var c = cells[i, j];
 					if (c == null) {
-						p.X += cols[j].Size;
+						p.X += cols[j];
 						continue;
 					}
 					var margin = GetCellMargin(i, j);
@@ -72,27 +70,27 @@ namespace Lime
 					Vector2 size;
 					size.X = -margin.Left - GetCellMargin(i, j + colSpan - 1).Right;
 					for (int u = 0; u < colSpan; u++) {
-						size.X += cols[j + u].Size;
+						size.X += cols[j + u];
 					}
 					var rowSpan = GetRowSpan(c, i);
 					size.Y = -margin.Top - GetCellMargin(i + rowSpan - 1, j).Bottom;
 					for (int u = 0; u < rowSpan; u++) {
-						size.Y += rows[i + u].Size;
+						size.Y += rows[i + u];
 					}
 					var halign = GetCellData(c).Alignment.X;
 					var valign = GetCellData(c).Alignment.Y;
 					LayoutCell(c, halign, valign, offset, size);
-					p.X += cols[j].Size;
+					p.X += cols[j];
 				}
-				p.Y += rows[i].Size;
+				p.Y += rows[i];
 			}
 		}
 
-		private void CalcCellConstraints(Widget[,] cells, out List<LinearAllocator.Constraints> cols, out List<LinearAllocator.Constraints> rows)
+		private LinearAllocator.Constraints[] CalcColConstraints(Widget[,] cells)
 		{
-			cols = new List<LinearAllocator.Constraints>(ColCount);
+			var cols = new LinearAllocator.Constraints[ColCount];
 			for (int i = 0; i < ColCount; i++) {
-				cols.Add(new LinearAllocator.Constraints { MaxSize = float.PositiveInfinity });
+				cols[i] = new LinearAllocator.Constraints { MaxSize = float.PositiveInfinity };
 			}
 			for (int j = 0; j < ColCount; j++) {
 				for (int i = 0; i < RowCount; i++) {
@@ -115,10 +113,14 @@ namespace Lime
 					}
 				}
 			}
+			return cols;
+		}
 
-			rows = new List<LinearAllocator.Constraints>(RowCount);
+		private LinearAllocator.Constraints[] CalcRowConstraints(Widget[,] cells)
+		{
+			var rows = new LinearAllocator.Constraints[RowCount];
 			for (int i = 0; i < RowCount; i++) {
-				rows.Add(new LinearAllocator.Constraints { MaxSize = float.PositiveInfinity });
+				rows[i] = new LinearAllocator.Constraints { MaxSize = float.PositiveInfinity };
 			}
 			for (int i = 0; i < RowCount; i++) {
 				for (int j = 0; j < ColCount; j++) {
@@ -141,6 +143,7 @@ namespace Lime
 					}
 				}
 			}
+			return rows;
 		}
 
 		private Widget[,] GetCellArray(NodeList nodes)

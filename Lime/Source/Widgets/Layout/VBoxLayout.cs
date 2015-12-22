@@ -24,22 +24,23 @@ namespace Lime
 			if (widgets.Count == 0) {
 				return;
 			}
-			var items = new List<LinearAllocator.Constraints>(widgets.Count);
+			var constraints = new LinearAllocator.Constraints[widgets.Count];
+			int i = 0;
 			foreach (var w in widgets) {
 				var cell = w.LayoutCell ?? LayoutCell.Default;
-				items.Add(new LinearAllocator.Constraints {
+				constraints[i++] = new LinearAllocator.Constraints {
 					MinSize = w.MinSize.Y,
 					MaxSize = w.MaxSize.Y,
 					Stretch = cell.StretchY
-				});
+				};
 			}
 			var packer = new LinearAllocator(roundSizes: true);
-			packer.Allocate(widget.Height, items);
+			var sizes = packer.Allocate(widget.Height, constraints);
 			float y = 0;
-			int i = 0;
+			i = 0;
 			DebugRectangles.Clear();
 			foreach (var w in widgets) {
-				w.Size = new Vector2(widget.Width, items[i++].Size);
+				w.Size = new Vector2(widget.Width, sizes[i++]);
 				w.Position = new Vector2(0, y);
 				w.Pivot = Vector2.Zero;
 				y += w.Height;
