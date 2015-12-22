@@ -389,23 +389,23 @@ namespace Lime
 				case Keys.D0:
 					return Key.Number0;
 				case Keys.D1:
-					return Key.Number0;
+					return Key.Number1;
 				case Keys.D2:
-					return Key.Number0;
+					return Key.Number2;
 				case Keys.D3:
-					return Key.Number0;
+					return Key.Number3;
 				case Keys.D4:
-					return Key.Number0;
+					return Key.Number4;
 				case Keys.D5:
-					return Key.Number0;
+					return Key.Number5;
 				case Keys.D6:
-					return Key.Number0;
+					return Key.Number6;
 				case Keys.D7:
-					return Key.Number0;
+					return Key.Number7;
 				case Keys.D8:
-					return Key.Number0;
+					return Key.Number8;
 				case Keys.D9:
-					return Key.Number0;
+					return Key.Number9;
 				case Keys.Oem3:
 					return Key.Tilde;
 				case Keys.Q:
