@@ -17,6 +17,7 @@ namespace Lime
 		{
 			GameView view;
 
+			public event Action Shown;
 			public event Action Hidden;
 
 			public SoftKeyboard(GameView view)

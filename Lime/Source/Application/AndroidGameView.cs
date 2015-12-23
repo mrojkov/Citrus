@@ -14,7 +14,7 @@ using OpenTK.Platform.Android;
 
 namespace Lime
 {
-	public sealed class GameView : AndroidGameView, ISoftKeyboard
+	public sealed class GameView : AndroidGameView
 	{
 		// TODO: resolve keyboard flickering bug and remove this field;
 		public static bool AllowOnscreenKeyboard;
@@ -92,25 +92,17 @@ namespace Lime
 		}
 
 		private KeyboardHandler keyboardHandler;
-		private InputMethodManager imm;
 		private Input input;
-
-		private bool softKeyboardVisible;
-		private float softKeyboardHeight;
-
-		bool ISoftKeyboard.Visible { get { return softKeyboardVisible; } }
-		float ISoftKeyboard.Height { get { return softKeyboardHeight; } }
-		bool ISoftKeyboard.Supported { get { return true; } }
-		event Action ISoftKeyboard.Hidden { add {} remove {} }
+		private AndroidSoftKeyboard androidSoftKeyboard;
 
 		public GameView(Context context, Input input) : base(context)
 		{
 			this.input = input;
-			Application.SoftKeyboard = this;
+			androidSoftKeyboard = new AndroidSoftKeyboard(this);
+			Application.SoftKeyboard = androidSoftKeyboard;
 			for (int i = 0; i < Input.MaxTouches; i++) {
 				pointerIds[i] = -1;
 			}
-			imm = (InputMethodManager) context.GetSystemService(Android.Content.Context.InputMethodService);
 			keyboardHandler = new KeyboardHandler(input);
 			SetOnKeyListener(keyboardHandler);
 		}
@@ -122,6 +114,21 @@ namespace Lime
 			outAttrs.InputType = InputTypes.Null;
 			outAttrs.ImeOptions = (ImeFlags)ImeAction.Done;
 			return baseInputConnection;
+		}
+
+		public override bool OnKeyPreIme(Keycode keyCode, KeyEvent e)
+		{
+			if (keyCode == Keycode.Back && e.Action == KeyEventActions.Up) {
+				androidSoftKeyboard.Height = 0;
+				return false;
+			}
+			return base.DispatchKeyEvent(e);
+		}
+
+		public override void ClearFocus()
+		{
+			base.ClearFocus();
+			androidSoftKeyboard.Show(false, string.Empty);
 		}
 
 		protected override void OnLayout(bool changed, int left, int top, int right, int bottom)
@@ -138,11 +145,9 @@ namespace Lime
 				var totalHeight = bottom - top;
 				var visibleHeight = r.Bottom - r.Top;
 				if (visibleHeight == totalHeight) {
-					softKeyboardVisible = false;
-					softKeyboardHeight = 0;
+					androidSoftKeyboard.Height = 0;
 				} else {
-					softKeyboardVisible = true;
-					softKeyboardHeight = totalHeight - visibleHeight;
+					androidSoftKeyboard.Height = totalHeight - visibleHeight;
 				}
 			}
 		}
@@ -157,27 +162,6 @@ namespace Lime
 			// RenderFrame once in case of Pause() has been called and
 			// there is another view overlaying this view. (e.g. Chartboost video)
 			OnRenderFrame(null);
-		}
-
-		void ISoftKeyboard.Show(bool show, string text)
-		{
-			if (AllowOnscreenKeyboard) {
-				if (show) {
-					Focusable = true;
-					FocusableInTouchMode = true;
-					this.RequestFocus();
-					imm.ShowSoftInput(this, ShowFlags.Forced);
-				} else {
-					Focusable = false;
-					FocusableInTouchMode = false;
-					imm.HideSoftInputFromWindow(WindowToken, 0);
-				}
-				softKeyboardVisible = show;
-			}
-		}
-
-		void ISoftKeyboard.ChangeText(string text)
-		{
 		}
 
 		public override bool OnCheckIsTextEditor()
