@@ -288,6 +288,8 @@ namespace Orange
 				Serialization.WriteObjectToBundle(assetsBundle, dstPath, font);
 				return true;
 			});
+			SyncRawAssets(".ttf");
+			SyncRawAssets(".otf");
 		}
 
 		private static void SyncTextures()
