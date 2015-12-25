@@ -41,16 +41,13 @@ namespace Lime
 
 		public Size ClientSize
 		{
-			get 
-			{
-				var b = View.ConvertRectToBacking(View.Bounds);
-				return new Size((int)b.Width, (int)b.Height); 
-			}
-			set 
-			{ 
-				var s = View.ConvertSizeFromBacking(new CGSize(value.Width, value.Height));
-				window.SetContentSize(new CGSize(s.Width, s.Height)); 
-			}
+			get { return new Size((int)View.Bounds.Width, (int)View.Bounds.Height); }
+			set { window.SetContentSize(new CGSize(value.Width, value.Height)); }
+		}
+
+		public float PixelScale
+		{
+			get { return (float)window.BackingScaleFactor; }
 		}
 
 		public IntVector2 DecoratedPosition
@@ -77,30 +74,14 @@ namespace Lime
 
 		public Size MinimumDecoratedSize
 		{
-			get
-			{
-				var s = View.ConvertSizeToBacking(window.MinSize);
-				return new Size((int)s.Width, (int)s.Height); 
-			}
-			set
-			{
-				var s = new CGSize(value.Width, value.Height);
-				window.MinSize = View.ConvertSizeFromBacking(s);
-			}
+			get { return new Size((int)window.MinSize.Width, (int)window.MinSize.Height); }
+			set { window.MinSize = new CGSize(value.Width, value.Height); }
 		}
 
 		public Size MaximumDecoratedSize
 		{
-			get
-			{
-				var s = View.ConvertSizeToBacking(window.MaxSize);
-				return new Size((int)s.Width, (int)s.Height); 
-			}
-			set
-			{
-				var s = new CGSize(value.Width, value.Height);
-				window.MaxSize = View.ConvertSizeFromBacking(s);
-			}
+			get { return new Size((int)window.MaxSize.Width, (int)window.MaxSize.Height); }
+			set { window.MaxSize = new CGSize(value.Width, value.Height); }
 		}
 
 		public bool Active
@@ -283,10 +264,8 @@ namespace Lime
 
 		private void RefreshMousePosition()
 		{
-			var mousePos = window.MouseLocationOutsideOfEventStream;
-			var point = new Vector2((int)mousePos.X, (int)NSGameView.Frame.Height - (int)mousePos.Y) *
-				(float)window.BackingScaleFactor;
-			Input.MousePosition = point * Input.ScreenToWorldTransform;
+			var p = window.MouseLocationOutsideOfEventStream;
+			Input.MousePosition = new Vector2((int)p.X, (int)NSGameView.Frame.Height - (int)p.Y) * Input.ScreenToWorldTransform;
 		}
 	}
 }
