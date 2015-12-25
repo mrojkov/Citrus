@@ -161,5 +161,7 @@ namespace Lime
 		/// Gets the scale factor which translates virtual units to the physical pixels.
 		/// </summary>
 		float PixelScale { get; }
-    }
+
+		IContext Context { get; set; }
+	}
 }

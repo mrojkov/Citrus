@@ -15,8 +15,8 @@ namespace Lime
 		public WindowWidget(IWindow window)
 		{
 			Window = window;
-			Context = new WidgetContext(window, this);
-			Window.Context = Context;
+			new WidgetContext(this);
+			Window.Context = new CombinedContext(Window.Context, WidgetContext.Current);
 		}
 
 		public override void Update(float delta)
@@ -56,8 +56,7 @@ namespace Lime
 		public void SetViewport()
 		{
 			Renderer.Viewport = new WindowRect {
-				X = 0,
-				Y = 0,
+				X = 0, Y = 0,
 				Width = (int)(Window.ClientSize.Width * Window.PixelScale),
 				Height = (int)(Window.ClientSize.Height * Window.PixelScale)
 			};

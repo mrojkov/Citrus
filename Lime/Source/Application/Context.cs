@@ -1,51 +1,142 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
+using System.Linq;
 
 namespace Lime
 {
+	public interface IContext
+	{
+		IContext Activate();
+		void Deactivate();
+		ContextScope Scoped();
+	}
+
 	public struct ContextScope : IDisposable
 	{
-		public Context OldContext;
+		private IContext context;
+		public ContextScope(IContext context) { this.context = context; }
+		public void Dispose() { context.Deactivate(); }
+	}
 
-		public void Dispose()
+	public class Context : IContext
+	{
+		struct ActivationRecord
 		{
-			OldContext.MakeCurrent();
+			public Context Context;
+			public object OldValue;
+		}
+
+		private object value;
+		private Property property;
+
+		[ThreadStatic]
+		private static Stack<ActivationRecord> stack;
+
+		public Context(Property property, object value)
+		{
+			EnsureStack();
+			this.property = property;
+			this.value = value;
+		}
+
+		protected Context(string propertyName)
+		{
+			EnsureStack();
+			this.property = new Property(GetType(), propertyName);
+			this.value = this;
+		}
+
+		private void EnsureStack()
+		{
+			stack = stack ?? new Stack<ActivationRecord>();
+		}
+
+		public IContext Activate()
+		{
+			var r = new ActivationRecord { Context = this, OldValue = property.Getter() };
+			stack.Push(r);
+			property.Setter(value);
+			return this;
+		}
+
+		public void Deactivate()
+		{
+			var r = stack.Pop();
+			if (r.Context != this) {
+				throw new InvalidOperationException();
+			}
+			property.Setter(r.OldValue);
+		}
+
+		public ContextScope Scoped()
+		{
+			return new ContextScope(this);
 		}
 	}
 
-	public class Context
+	public class CombinedContext : IContext
 	{
-		private static Dictionary<Type, PropertyInfo> properties = new Dictionary<Type, PropertyInfo>();
+		private IContext[] contexts;
 
-		private Dictionary<PropertyInfo, object> snapshot = new Dictionary<PropertyInfo, object>();
-
-		public static Context Current { get; private set; }
-
-		static Context()
+		public CombinedContext(params IContext[] contexts)
 		{
-			Current = new Context();
+			this.contexts = contexts;
 		}
 
-		public ContextScope MakeCurrent()
+		public CombinedContext(IEnumerable<IContext> contexts)
 		{
-			Current = this;
-			var scope = new ContextScope { OldContext = Current };
-			foreach (var pair in snapshot) {
-				pair.Key.SetValue(null, pair.Value);
+			this.contexts = contexts.ToArray();
+		}
+
+		public IContext Activate()
+		{
+			foreach (var i in contexts) {
+				i.Activate();
 			}
-			return scope;
+			return this;
+		}
+
+		public void Deactivate()
+		{
+			for (int i = contexts.Length - 1; i >= 0; i--) {
+				contexts[i].Deactivate();
+			}
+		}
+
+		public ContextScope Scoped()
+		{
+			return new ContextScope(this);
+		}
+	}
+
+	public class Property
+	{
+		public Func<object> Getter { get; private set; }
+		public Action<object> Setter { get; private set; }
+
+		public Property(Func<object> getter, Action<object> setter)
+		{
+			Getter = getter;
+			Setter = setter;
 		}	
 
-		public static void RegisterSingleton(Type type, string property)
+		public static Property Create<T>(Func<T> getter, Action<T> setter)
 		{
-			properties[type] = type.GetProperty(property);
+			return new Property(() => getter(), x => setter((T)x));
+		}	
+
+		public Property(Type singleton, string propertyName = "Instance")
+		{
+			var pi = singleton.GetProperty(propertyName);
+			Getter = () => pi.GetValue(null);
+			Setter = val => pi.SetValue(null, val);
 		}
 
-		public void SetSingleton(Type type, object value)
+		public Property(object obj, string propertyName)
 		{
-			snapshot[properties[type]] = value;
+			var pi = obj.GetType().GetProperty(propertyName);
+			Getter = () => pi.GetValue(obj);
+			Setter = val => pi.SetValue(obj, val);
 		}
 	}
 }
-
