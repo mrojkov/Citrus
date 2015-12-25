@@ -52,11 +52,6 @@ namespace Lime
 		Skip
 	}
 
-	public interface ITheme
-	{
-		void Apply(Widget widget);
-	}
-
 	/// <summary>
 	/// Base class for any rendered object.
 	/// </summary>
@@ -131,6 +126,18 @@ namespace Lime
 			}
 		}
 
+		public virtual float MinWidth
+		{
+			get { return MinSize.X; }
+			set { MinSize = new Vector2(value, MinSize.Y); }
+		}
+
+		public virtual float MinHeight
+		{
+			get { return MinSize.Y; }
+			set { MinSize = new Vector2(MinSize.X, value); }
+		}
+
 		/// <summary>
 		/// The maximum widget size. For basic widgets could be provided by user or calculated automatically (e.g. for SimpleText).
 		/// If the widget has non-fixed layout, the layout is responsible to manage MaxSize property.
@@ -145,6 +152,18 @@ namespace Lime
 					InvalidateParentConstraintsAndArrangement();
 				}
 			}
+		}
+
+		public virtual float MaxWidth
+		{
+			get { return MaxSize.X; }
+			set { MaxSize = new Vector2(value, MaxSize.Y); }
+		}
+
+		public virtual float MaxHeight
+		{
+			get { return MaxSize.Y; }
+			set { MaxSize = new Vector2(MaxSize.X, value); }
 		}
 
 		public virtual Vector2 MinMaxSize
@@ -577,14 +596,6 @@ namespace Lime
 			if (ParentWidget != null) {
 				ParentWidget.Layout.InvalidateConstraintsAndArrangement(ParentWidget);
 			}
-		}
-
-		public void SetThemeRecursive(ITheme theme)
-		{
-			foreach (var w in Nodes.OfType<Widget>()) {
-				w.SetThemeRecursive(theme);
-			}
-			theme.Apply(this);
 		}
 
 		WidgetInput input;
