@@ -50,9 +50,8 @@ namespace Lime
 			var cells = GetCellArray(widget.Nodes);
 			if (cells == null)
 				return;
-			var allocator = new LinearAllocator(roundSizes: true);
-			var cols = allocator.Allocate(widget.Width, CalcColConstraints(cells));
-			var rows = allocator.Allocate(widget.Height, CalcRowConstraints(cells));
+			var cols = LinearAllocator.Allocate(widget.Width, CalcColConstraints(cells), roundSizes: true);
+			var rows = LinearAllocator.Allocate(widget.Height, CalcRowConstraints(cells), roundSizes: true);
 			// Layout each cell
 			var p = Vector2.Zero;
 			DebugRectangles.Clear();

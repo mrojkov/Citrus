@@ -34,8 +34,7 @@ namespace Lime
 					Stretch = cell.StretchY
 				};
 			}
-			var packer = new LinearAllocator(roundSizes: true);
-			var sizes = packer.Allocate(widget.Height, constraints);
+			var sizes = LinearAllocator.Allocate(widget.Height, constraints, roundSizes: true);
 			float y = 0;
 			i = 0;
 			DebugRectangles.Clear();
