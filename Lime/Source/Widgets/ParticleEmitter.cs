@@ -98,133 +98,95 @@ namespace Lime
 		/// <summary>
 		/// Частица, сгенерированная эмиттером
 		/// </summary>
-		[ProtoContract]
 		public class Particle
 		{
-			[ProtoMember(1)]
-			public int ModifierIndex;
-
 			public ParticleModifier Modifier;
 
 			// Position of particle with random motion.
-			[ProtoMember(2)]
 			public Vector2 FullPosition;
 
 			// Position if particle without random motion.
-			[ProtoMember(3)]
 			public Vector2 RegularPosition;
 
 			// Motion direction with random motion(in degrees).
-			[ProtoMember(4)]
 			public float FullDirection;
 
 			// Motion direction without random motion(in degrees).
-			[ProtoMember(5)]
 			public float RegularDirection;
 
 			// Veclocity of motion.
-			[ProtoMember(6)]
 			public float Velocity;
 
 			// Velocity of changing motion direction(degrees/sec).
-			[ProtoMember(7)]
 			public float AngularVelocity;
 
 			// Direction of particle windage(0 - right, 90 - down).
-			[ProtoMember(8)]
 			public float WindDirection;
 
 			// Velocity of particle windage.
-			[ProtoMember(9)]
 			public float WindAmount;
 
 			// Direction of gravity(0 - right, 90 - down)
-			[ProtoMember(10)]
 			public float GravityDirection;
 
 			// Strength of gravity.
-			[ProtoMember(11)]
 			public float GravityAmount;
 
 			// Acceleration of gravity(calculated thru gravityAmount).
-			[ProtoMember(12)]
 			public float GravityAcceleration;
 
 			// Velocity of the particle caused by gravity(calculated thru gravityAcceleration).
-			[ProtoMember(13)]
 			public float GravityVelocity;
 
 			// Strength of magnet's gravity at the moment of particle birth.
-			[ProtoMember(14)]
 			public float MagnetAmountInitial;
 
 			// Strength of magnet's gravity in the current moment.
-			[ProtoMember(15)]
 			public float MagnetAmountCurrent;
 
 			// Scale of particle at the moment of particle birth.
-			[ProtoMember(16)]
 			public Vector2 ScaleInitial;
 
 			// Scale of particle in the current moment.
-			[ProtoMember(17)]
 			public Vector2 ScaleCurrent;
 
 			// Rotation of particle relative to its center.
-			[ProtoMember(18)]
 			public float Angle;
 
 			// Velocity of particle rotation(degrees/sec).
-			[ProtoMember(19)]
 			public float Spin;
 
 			// Age of particle in seconds.
-			[ProtoMember(20)]
 			public float Age;
 
 			// Full life time of particle in seconds.
-			[ProtoMember(21)]
 			public float Lifetime;
 
 			// Color of the particle at the moment of birth.
-			[ProtoMember(22)]
 			public Color4 ColorInitial;
 
 			// Current color of the particle.
-			[ProtoMember(23)]
 			public Color4 ColorCurrent;
 
 			// Velocty of random motion.
-			[ProtoMember(24)]
 			public float RandomMotionSpeed;
 
 			// Splined path of random particle motion.
-			[ProtoMember(25)]
 			public Vector2 RandomSplineVertex0;
-
-			[ProtoMember(26)]
 			public Vector2 RandomSplineVertex1;
-
-			[ProtoMember(27)]
 			public Vector2 RandomSplineVertex2;
-
-			[ProtoMember(28)]
 			public Vector2 RandomSplineVertex3;
 
 			// Current angle of spline control point, relative to center of random motion.
-			[ProtoMember(29)]
 			public float RandomRayDirection;
 
 			// Current offset of spline beginning(0..1).
-			[ProtoMember(30)]
 			public float RandomSplineOffset;
 
 			// Current texture of the particle.
-			[ProtoMember(31)]
 			public float TextureIndex;
 
 			// modifier.Animators.OverallDuration / LifeTime
-			[ProtoMember(32)]
 			public float AgeToFrame;
 		};
 
@@ -388,27 +350,28 @@ namespace Lime
 		/// </summary>
 		[ProtoMember(26)]
 		public NumericRange RandomMotionRotation { get; set; }
+		// NOTE: last unprotobuffed field was `particles` under index `29`.
+		// Next protobuf index must be `30`
 
 		/// <summary>
 		/// Флаг, сбрасывающийся в false после первого обновления
 		/// </summary>
-		[ProtoMember(27)]
-		public bool firstUpdate = true;
+		private bool firstUpdate = true;
 
 		/// <summary>
 		/// Количество частиц, которое должен сгенерировать эмиттер в цикле обновления (Update)
 		/// Используется, чтобы количество сгенерированных частиц не зависело от FPS
 		/// </summary>
-		[ProtoMember(28)]
-		public float particlesToSpawn;
+		private float particlesToSpawn;
 
 		/// <summary>
 		/// Список сгенерированных частиц
 		/// </summary>
-		[ProtoMember(29)]
 		public LinkedList<Particle> particles = new LinkedList<Particle>();
 
 		private static LinkedList<Particle> particlePool = new LinkedList<Particle>();
+		private const int MaxModifierCount = 32;
+		private static readonly ParticleModifier[] modifiers = new ParticleModifier [MaxModifierCount];
 
 		public ParticleEmitter()
 		{
@@ -437,20 +400,6 @@ namespace Lime
 			AlongPathOrientation = false;
 			TimeShift = 0;
 			ImmortalParticles = false;
-		}
-
-		/// <summary>
-		/// Для ProtoBuf. Действия, выполняемые после десериализации
-		/// </summary>
-		[ProtoAfterDeserialization]
-		public void AfterDeserialization()
-		{
-			// If particle was deserialized, particle.Modifier would be null. In some cases
-			// particles are rendered before update, but particle.Modifier is required for
-			// the render. AdvanceParticle() sets particle.Modifier.
-			foreach (var particle in particles) {
-				AdvanceParticle(particle, 0);
-			}
 		}
 
 		public override Node DeepCloneFast()
@@ -655,19 +604,19 @@ namespace Lime
 				throw new Lime.Exception("Invalid particle emitter shape");
 			}
 
-			p.RegularPosition = transform.TransformVector(position);
-			p.ModifierIndex = -1;
-			p.Modifier = null;
-			for (int counter = 0; counter < 10; counter++) {
-				int i = Rng.RandomInt(Nodes.Count);
-				p.Modifier = Nodes[i] as ParticleModifier;
-				if (p.Modifier != null) {
-					p.ModifierIndex = i;
-					break;
+			int modifierCount = 0;
+			for (int i = 0; i < Nodes.Count && i < MaxModifierCount; i++) {
+				var node = Nodes[i];
+				if (node is ParticleModifier) {
+					modifiers[modifierCount] = node as ParticleModifier;
+					modifierCount++;
 				}
 			}
-			if (p.ModifierIndex < 0)
+			p.RegularPosition = transform.TransformVector(position);
+			p.Modifier = modifiers[Rng.RandomInt(modifierCount)];
+			if (p.Modifier == null) {
 				return false;
+			}
 
 			int duration = p.Modifier.Animators.GetOverallDuration();
 			p.AgeToFrame = duration / p.Lifetime;
@@ -704,14 +653,11 @@ namespace Lime
 		{
 			NumberOfUpdatedParticles++;
 			p.Age += delta;
-			// If particle was deserialized, p.Modifier would be null.
-			if (p.Modifier == null) {
-				p.Modifier = Nodes[p.ModifierIndex] as ParticleModifier;
-			}
+
 			var modifier = p.Modifier;
 
 			if (p.AgeToFrame > 0) {
-				p.Modifier.Animators.Apply(AnimationUtils.FramesToMsecs((int)(p.Age * p.AgeToFrame)));
+				modifier.Animators.Apply(AnimationUtils.FramesToMsecs((int)(p.Age * p.AgeToFrame)));
 			}
 			if (ImmortalParticles) {
 				if (p.Lifetime > 0.0f)
