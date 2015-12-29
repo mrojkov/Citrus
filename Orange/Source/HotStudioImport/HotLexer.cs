@@ -17,7 +17,7 @@ namespace Orange
 			this.sourcePath = sourcePath;
 			this.text = text;
 		}
-		
+
 		string GetSubstring(int position, int length)
 		{
 			int x = Math.Min(text.Length, length + position) - position;
@@ -41,7 +41,7 @@ namespace Orange
 			string number = GetSubstring(p, position - p);
 			return Single.Parse(number, numberFormat);
 		}
-		
+
 		public int ParseInt()
 		{
 			SkipWhitespace();
@@ -101,7 +101,7 @@ namespace Orange
 			}
 			return result;
 		}
-		
+
 		public Tuple<Blending, ShaderId> ParseBlendMode()
 		{
 			Blending blending = Blending.Inherited;
@@ -136,7 +136,7 @@ namespace Orange
 			}
 			return new Tuple<Blending, ShaderId>(blending, shader);
 		}
-		
+
 		public uint ParseHex()
 		{
 			SkipWhitespace();
@@ -149,7 +149,7 @@ namespace Orange
 					break;
 				ReadByte();
 			}
-			string number = GetSubstring(p, position - p);	
+			string number = GetSubstring(p, position - p);
 			uint result = 0;
 			for (int i = number.Length - 1, k = 0; i >= 0; --i, k += 4) {
 				int c = number[i];
@@ -307,8 +307,8 @@ namespace Orange
 			string path = ParseQuotedString();
 			if (string.IsNullOrEmpty(path))
 				return path;
-            else if (path[0] == '#')
-                return path;
+			else if (path[0] == '#')
+				return path;
 			else if (path[0] == '/' || path[0] == '\\')
 				path = path.Substring(1);
 			else {
