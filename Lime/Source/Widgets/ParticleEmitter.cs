@@ -35,6 +35,13 @@ namespace Lime
 		/// </summary>
 		[ProtoEnum]
 		Area,
+
+		/// <summary>
+		/// Генерация частиц внутри многоугольника, заданного точками EmitterShapePoint.
+		/// Точки располагаются по часовой стрелке.
+		/// </summary>
+		[ProtoEnum]
+		Custom,
 	};
 
 	/// <summary>
@@ -86,6 +93,26 @@ namespace Lime
 		/// </summary>
 		[ProtoEnum]
 		Other
+	}
+
+	[ProtoContract]
+	public class EmitterShapePoint : PointObject
+	{
+		public Vector2 TransformedPosition {
+			get {
+				Vector2 result = Vector2.Zero;
+				if (Parent != null && Parent.AsWidget != null) {
+					result = Parent.AsWidget.Size * Position;
+				}
+				if (SkinningWeights != null && Parent != null && Parent.Parent != null) {
+					BoneArray a = Parent.Parent.AsWidget.BoneArray;
+					Matrix32 m1 = Parent.AsWidget.CalcLocalToParentTransform();
+					Matrix32 m2 = m1.CalcInversed();
+					result = m2.TransformVector(a.ApplySkinningToVector(m1.TransformVector(result), SkinningWeights));
+				}
+				return result;
+			}
+		}
 	}
 
 	/// <summary>
@@ -373,6 +400,13 @@ namespace Lime
 		private static readonly List<Particle> particlePool = new List<Particle>();
 		private const int MaxModifierCount = 32;
 		private static readonly ParticleModifier[] modifiers = new ParticleModifier [MaxModifierCount];
+		private const int MaxEmitterShapePointCount = 32;
+		private static readonly EmitterShapePoint[] emitterShapePoints = new EmitterShapePoint[MaxEmitterShapePointCount];
+
+		private readonly List<Vector2> cachedShapePoints = new List<Vector2>();
+		// indexed triangle list (3 values per triangle)
+		private readonly List<int> cachedShapeTriangles = new List<int>();
+		private readonly List<float> cachedShapeTriangleSizes = new List<float>();
 
 		public static int NumberOfUpdatedParticles = 0;
 		public static bool GloballyEnabled = true;
@@ -466,6 +500,9 @@ namespace Lime
 
 		private void UpdateHelper(float delta)
 		{
+			if (Shape == EmitterShape.Custom) {
+				RefreshCustomShape();
+			}
 			delta *= Speed;
 			if (ImmortalParticles) {
 				if (TimeShift > 0)
@@ -502,6 +539,182 @@ namespace Lime
 				i--;
 			}
 			FreeLastParticles(particlesToFreeCount);
+		}
+
+		private bool CheckIntersection(Vector2[] v, int[] workPoints, int count, float sign, int startIndex = 0)
+		{
+			for(int i = 0; i < count; i++) {
+				Vector2 point = cachedShapePoints[workPoints[i + startIndex]];
+				if(
+					Mathf.Sign(Vector2.CrossProduct(v[1] - v[0], point - v[0])) == sign &&
+					Mathf.Sign(Vector2.CrossProduct(v[2] - v[1], point - v[1])) == sign &&
+					Mathf.Sign(Vector2.CrossProduct(v[0] - v[2], point - v[2])) == sign
+				) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		static void ShiftArray(int[] arr, int cnt, int startIndex = 0)
+		{
+			for (int i = 0; i < cnt; i++) {
+				arr[i + startIndex] = arr[i + startIndex + 1];
+			}
+		}
+
+		private bool GetTriangleHelper(int[] workPoints, ref int pointCount,
+			out int i1, out int i2, out int i3, float sign)
+		{
+			i1 = 0;
+			i2 = 0;
+			i3 = 0;
+			if (pointCount < 3) {
+				return false;
+			}
+
+			//
+			// special case #1 (first point)
+			//
+			Vector2[] v = new Vector2 [3];
+			v[0] = cachedShapePoints[workPoints[pointCount - 1]];
+			v[1] = cachedShapePoints[workPoints[0]];
+			v[2] = cachedShapePoints[workPoints[1]];
+
+			if(Mathf.Sign(Vector2.CrossProduct(v[2] - v[1], v[0] - v[1])) == sign &&
+				!CheckIntersection(v, workPoints, pointCount - 3, sign, 2)) {
+				i1 = workPoints[pointCount - 1];
+				i2 = workPoints[0];
+				i3 = workPoints[1];
+				ShiftArray(workPoints, pointCount - 1);
+				pointCount--;
+				return true;
+			}
+
+			//
+			// special case #2 (last point)
+			//
+			v[0] = cachedShapePoints[workPoints[pointCount - 2]];
+			v[1] = cachedShapePoints[workPoints[pointCount - 1]];
+			v[2] = cachedShapePoints[workPoints[0]];
+
+			if(Mathf.Sign(Vector2.CrossProduct(v[2] - v[1], v[0] - v[1])) == sign &&
+				!CheckIntersection(v, workPoints, pointCount - 3, sign, 1))
+			{
+				i1 = workPoints[pointCount - 2];
+				i2 = workPoints[pointCount - 1];
+				i3 = workPoints[0];
+				pointCount--;
+				return true;
+			}
+
+			//
+			// rest of points
+			//
+			for(int i = 1; i < pointCount - 1; i++) {
+				v[0] = cachedShapePoints[workPoints[i - 1]];
+				v[1] = cachedShapePoints[workPoints[i]];
+				v[2] = cachedShapePoints[workPoints[i + 1]];
+
+				if(Mathf.Sign(Vector2.CrossProduct(v[2] - v[1], v[0] - v[1])) == sign &&
+					!CheckIntersection(v, workPoints, i - 1, sign) &&
+					!CheckIntersection(v, workPoints, pointCount - 2 - i, sign, i + 2))
+				{
+					i1 = workPoints[i - 1];
+					i2 = workPoints[i];
+					i3 = workPoints[i + 1];
+					ShiftArray(workPoints, pointCount - 1 - i, i);
+					pointCount--;
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		private void RefreshCustomShape()
+		{
+			int pointCount = 0;
+			for(int i = 0; i < Nodes.Count && pointCount < MaxEmitterShapePointCount; i++) {
+				var node = Nodes[i];
+				if (node is EmitterShapePoint) {
+					emitterShapePoints[pointCount] = node as EmitterShapePoint;
+					pointCount++;
+				}
+			}
+
+			if(pointCount < 3) {
+				cachedShapePoints.Clear();
+				cachedShapeTriangles.Clear();
+				cachedShapeTriangleSizes.Clear();
+				return;
+			}
+
+			// Если количество или позиции точек изменились, то область надо перетриангулировать.
+			bool changed = false;
+			if (cachedShapePoints.Count == pointCount) {
+				for (int i = 0; i < pointCount; i++) {
+					if (emitterShapePoints[i].TransformedPosition != cachedShapePoints[i]) {
+						changed = true;
+						break;
+					}
+				}
+			} else {
+				changed = true;
+			}
+
+			if (!changed) {
+				return;
+			}
+
+			for (int i = 0; i < pointCount; i++) {
+				cachedShapePoints.Add(emitterShapePoints[i].TransformedPosition);
+			}
+
+			// определяем, по часовой стрелке или против часовой стрелки задан многоугольник
+			float angle = 0;
+			angle += Vector2.AngleRad(cachedShapePoints[0] - cachedShapePoints[pointCount - 1],
+				cachedShapePoints[1] - cachedShapePoints[0]);
+			angle += Vector2.AngleRad(cachedShapePoints[pointCount - 1] - cachedShapePoints[pointCount - 2],
+				cachedShapePoints[0] - cachedShapePoints[pointCount - 1]);
+			for (int i = 1; i < pointCount - 1; i++) {
+				angle += Vector2.AngleRad(cachedShapePoints[i] - cachedShapePoints[i - 1],
+					cachedShapePoints[i + 1] - cachedShapePoints[i]);
+			}
+			float sign = Mathf.Sign(angle);
+
+			cachedShapeTriangles.Clear();
+			cachedShapeTriangleSizes.Clear();
+
+			int[] workPoints = new int[MaxEmitterShapePointCount];
+			for (int i = 0; i < pointCount; i++) {
+				workPoints[i] = i;
+			}
+
+			int i1;
+			int i2;
+			int i3;
+			float totalSpace = 0;
+			while(GetTriangleHelper(workPoints, ref pointCount, out i1, out i2, out i3, sign)) {
+				cachedShapeTriangles.Add(i1);
+				cachedShapeTriangles.Add(i2);
+				cachedShapeTriangles.Add(i3);
+
+				// вычисляем площадь
+				float a = (cachedShapePoints[i2] - cachedShapePoints[i1]).Length;
+				float b = (cachedShapePoints[i3] - cachedShapePoints[i2]).Length;
+				float c = (cachedShapePoints[i1] - cachedShapePoints[i3]).Length;
+				float p = (a + b + c) * 0.5f;
+				float s = Mathf.Sqrt(p * (p - a) * (p - b) * (p - c));
+				cachedShapeTriangleSizes.Add(s);
+				totalSpace += s;
+			}
+
+			float accum = 0;
+			for(int i = 0; i < cachedShapeTriangleSizes.Count; i++) {
+				accum += cachedShapeTriangleSizes[i] / totalSpace;
+				cachedShapeTriangleSizes[i] = accum;
+			}
 		}
 
 		protected override void SelfLateUpdate(float delta)
@@ -607,6 +820,11 @@ namespace Lime
 				p.RegularDirection = Direction.UniformRandomNumber(Rng) + emitterAngle - 90.0f;
 				break;
 
+			case EmitterShape.Custom:
+				position = GetPointInCustomShape();
+				p.RegularDirection = Direction.UniformRandomNumber(Rng) + emitterAngle - 90.0f;
+				break;
+
 			default:
 				throw new Lime.Exception("Invalid particle emitter shape");
 			}
@@ -639,6 +857,37 @@ namespace Lime
 			p.FullDirection = p.RegularDirection;
 			p.FullPosition = p.RegularPosition;
 			return true;
+		}
+
+		private Vector2 GetPointInCustomShape()
+		{
+			if (cachedShapeTriangles.Count == 0) {
+				return Vector2.Zero;
+			}
+
+			float rand = Rng.RandomFloat();
+			int idx = 0;
+			for (int i = 0; i < cachedShapeTriangleSizes.Count; i++) {
+				if (rand < cachedShapeTriangleSizes[i])
+				{
+					idx = i;
+					break;
+				}
+			}
+
+			float k1 = Rng.RandomFloat();
+			float k2 = Rng.RandomFloat();
+			if(k1 + k2 > 1) {
+				k1 = 1 - k1;
+				k2 = 1 - k2;
+			}
+			float k3 = 1 - k1 - k2;
+
+			int i1 = cachedShapeTriangles[idx * 3 + 0];
+			int i2 = cachedShapeTriangles[idx * 3 + 1];
+			int i3 = cachedShapeTriangles[idx * 3 + 2];
+
+			return cachedShapePoints[i1] * k1 + cachedShapePoints[i2] * k2 + cachedShapePoints[i3] * k3;
 		}
 
 		private void CalcInitialColorAndTransform(out Color4 color, out Matrix32 transform)

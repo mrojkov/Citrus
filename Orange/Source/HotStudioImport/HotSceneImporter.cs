@@ -872,6 +872,25 @@ namespace Orange
 			}
 		}
 
+		private void ParseEmitterShapePointProperty(Node node, string name)
+		{
+			EmitterShapePoint point = (EmitterShapePoint)node;
+			switch (name) {
+			case "Position":
+				// Not used
+				break;
+			case "Anchor":
+				point.Position = lexer.ParseVector2();
+				break;
+			case "SkinningWeights":
+				point.SkinningWeights = lexer.ParseSkinningWeights();
+				break;
+			default:
+				ParseActorProperty(point, name);
+				break;
+			}
+		}
+
 		#endregion
 
 		protected virtual void RegisterKnownActorTypes()
@@ -905,7 +924,7 @@ namespace Orange
 				new KnownActorType {ActorClass = "Hot::Movie", NodeClass = "Lime.Movie, Lime", PropReader = ParseVideoProperty},
 				new KnownActorType {ActorClass = "Hot::ModelView", NodeClass = "Lime.ModelViewport, Lime", PropReader = ParseModelViewProperty},
 				new KnownActorType {ActorClass = "LinearLayout", NodeClass = "Lime.LinearLayout, Lime", PropReader = ParseLinearLayoutProperty},
-
+				new KnownActorType {ActorClass = "Hot::EmitterShapePoint", NodeClass = "Lime.EmitterShapePoint, Lime", PropReader = ParseEmitterShapePointProperty},
 			};
 		}
 	}
