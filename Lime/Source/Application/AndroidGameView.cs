@@ -1,16 +1,16 @@
 #if ANDROID
 using System;
+
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Text;
 using Android.Views;
 using Android.Views.InputMethods;
-using Java.Lang;
+
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Platform.Android;
-
 
 namespace Lime
 {
@@ -37,12 +37,6 @@ namespace Lime
 
 			public bool OnKey(View v, Keycode keyCode, KeyEvent e)
 			{
-				// Nika: Here we skip our unprocessed char wich is placed into buffer to make Del key work where it isn't
-				// http://stackoverflow.com/questions/18581636/android-cannot-capture-backspace-delete-press-in-soft-keyboard
-				if (e.Characters == FixDelKeyEditable.OneUnprocessedCharacter.CharAt(0).ToString()) {
-					return true;
-				}
-
 				if (e.KeyCode == Keycode.Del && e.Action != KeyEventActions.Up) {
 					textInput += '\b';
 				} else if (keyCode == Keycode.Unknown) {
@@ -109,6 +103,8 @@ namespace Lime
 
 		public override IInputConnection OnCreateInputConnection(EditorInfo outAttrs)
 		{
+			// Read FixDelKeyInputConnection class for details.
+			// http://stackoverflow.com/questions/14560344/android-backspace-in-webview-baseinputconnection
 			FixDelKeyInputConnection baseInputConnection = new FixDelKeyInputConnection(this, false);
 			outAttrs.ActionLabel = null;
 			outAttrs.InputType = InputTypes.Null;
@@ -360,81 +356,37 @@ namespace Lime
 			lastFrameTimeStamp = now;
 		}
 
-#region FixDelKey
-		// Classes to help fix problem with DEL key event not triggered on some devices
-		class FixDelKeyInputConnection : BaseInputConnection
+		/// <summary>
+		/// Classes to help fix problem with DEL key event not triggered on some devices
+		/// </summary>
+		private class FixDelKeyInputConnection : BaseInputConnection
 		{
-			private IEditable myEditable = null;
-			private const long KeyInterval = 200;
-			private long eventTime;
-
-			public FixDelKeyInputConnection(View targetView, bool fullEditor) 
-				: base(targetView, fullEditor) { }
-
-			public override IEditable Editable
+			public FixDelKeyInputConnection(View targetView, bool fullEditor)
+				: base(targetView, fullEditor)
 			{
-				get
-				{
-					if (IsSdkVersionBelow14()) {
-						return base.Editable;
-					}
-					if (myEditable == null) {
-						myEditable = new FixDelKeyEditable(FixDelKeyEditable.OneUnprocessedCharacter);
-						Selection.SetSelection(myEditable, 1);
-					} else {
-						int myEditableLength = myEditable.Length();
-						if (myEditableLength == 0) {
-							myEditable.Append(FixDelKeyEditable.OneUnprocessedCharacter);
-							Selection.SetSelection(myEditable, 1);
-						}
-					}
-					return myEditable;
-				}
 			}
 
-			static bool IsSdkVersionBelow14()
+			static bool IsBuggedSdk()
 			{
-				return (int)Build.VERSION.SdkInt < 14;
+				// Bugged SDKs are from 14 to 19, but with some third-party keyboards
+				// bug may present even in newer version. Also this code should not affect
+				// devices without this bug.
+				return (int)Build.VERSION.SdkInt >= 14;
 			}
 
 			public override bool DeleteSurroundingText(int leftLength, int rightLength)
 			{
-				if (!IsSdkVersionBelow14() && (leftLength == 1 && rightLength == 0)) {
-					long currentTime = SystemClock.UptimeMillis();
-					if (currentTime - eventTime >= KeyInterval) {
-						eventTime = currentTime;
-						base.SendKeyEvent(new KeyEvent(eventTime, eventTime, KeyEventActions.Down, Keycode.Del, 0));
-						base.SendKeyEvent(new KeyEvent(SystemClock.UptimeMillis(), eventTime, KeyEventActions.Up, Keycode.Del, 0));
-					}
+				// leftLength == 1 and rightLength == 0 means that the user presses Backspace
+				if (IsBuggedSdk() && (leftLength == 1 && rightLength == 0)) {
+					// Send Del key event to handle char deleting in the OnKey() method.
+					base.SendKeyEvent(new KeyEvent(KeyEventActions.Down, Keycode.Del));
+					base.SendKeyEvent(new KeyEvent(KeyEventActions.Up, Keycode.Del));
 					return true;
 				} else {
 					return base.DeleteSurroundingText(leftLength, rightLength);
 				}
 			}
 		}
-
-		class FixDelKeyEditable : SpannableStringBuilder
-		{
-			// Nika: there is no such symbol in android keyboard, so we can use it as unprocessed charcater.
-			public static readonly ICharSequence OneUnprocessedCharacter = new Java.Lang.String("\ud804\udc00");
-
-			public FixDelKeyEditable(ICharSequence source) : base(source) { }
-
-			public override IEditable Replace(int start, int end, ICharSequence tb, int tbstart, int tbend)
-			{
-				if (tbend > tbstart || end > start) {
-					base.Replace(0, Length(), (ICharSequence)new Java.Lang.String(""), 0, 0);
-					if (tbend > tbstart) {
-						return base.Replace(0, 0, tb, tbstart, tbend);
-					} else if (end > start) {
-						return base.Replace(0, 0, OneUnprocessedCharacter, 0, 1);
-					}
-				}
-				return base.Replace(start, end, tb, tbstart, tbend);
-			}
-		}
-#endregion
 	}
 }
-
 #endif
