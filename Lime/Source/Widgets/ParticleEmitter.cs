@@ -552,7 +552,7 @@ namespace Lime
 		{
 			if (firstUpdate) {
 				firstUpdate = false;
-				const float ModellingStep = 0.004f;
+				const float ModellingStep = 0.04f;
 				delta = Math.Max(delta, TimeShift);
 				while (delta >= ModellingStep) {
 					UpdateHelper(ModellingStep);
