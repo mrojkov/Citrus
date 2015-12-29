@@ -2,6 +2,7 @@ using Lime;
 using ProtoBuf;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Lime
 {
@@ -367,11 +368,14 @@ namespace Lime
 		/// <summary>
 		/// Список сгенерированных частиц
 		/// </summary>
-		public LinkedList<Particle> particles = new LinkedList<Particle>();
+		public List<Particle> particles = new List<Particle>();
 
-		private static LinkedList<Particle> particlePool = new LinkedList<Particle>();
+		private static readonly List<Particle> particlePool = new List<Particle>();
 		private const int MaxModifierCount = 32;
 		private static readonly ParticleModifier[] modifiers = new ParticleModifier [MaxModifierCount];
+
+		public static int NumberOfUpdatedParticles = 0;
+		public static bool GloballyEnabled = true;
 
 		public ParticleEmitter()
 		{
@@ -406,7 +410,7 @@ namespace Lime
 		{
 			// Do not clone particle instances
 			var savedParticles = particles;
-			particles = new LinkedList<Particle>();
+			particles = new List<Particle>();
 			var clone = base.DeepCloneFast() as ParticleEmitter;
 			particles = savedParticles;
 			return clone;
@@ -434,26 +438,30 @@ namespace Lime
 			}
 		}
 
-		public static int NumberOfUpdatedParticles = 0;
-		public static bool GloballyEnabled = true;
-
-		private LinkedListNode<Particle> AllocParticle()
+		private Particle AllocParticle()
 		{
-			LinkedListNode<Particle> result;
+			Particle result;
 			if (particlePool.Count == 0) {
-				result = new LinkedListNode<Particle>(new Particle());
+				result = new Particle();
 			} else {
-				result = particlePool.First;
-				particlePool.RemoveFirst();
+				result = particlePool.Last();
+				particlePool.RemoveAt(particlePool.Count - 1);
 			}
-			particles.AddLast(result);
+			particles.Add(result);
 			return result;
 		}
 
-		private void FreeParticle(LinkedListNode<Particle> particleNode)
+		/// <summary>
+		/// Remove particleCount particles from the end of particles list and put them into particlePool.
+		/// </summary>
+		/// <param name="particleCount"></param>
+		private void FreeLastParticles(int particleCount)
 		{
-			particles.Remove(particleNode);
-			particlePool.AddFirst(particleNode);
+			while (particleCount > 0) {
+				particlePool.Add(particles.Last());
+				particles.RemoveAt(particles.Count - 1);
+				particleCount--;
+			}
 		}
 
 		private void UpdateHelper(float delta)
@@ -465,36 +473,35 @@ namespace Lime
 				else
 					particlesToSpawn = Number;
 				particlesToSpawn = Math.Min(particlesToSpawn, Number - particles.Count);
-				while (particles.Count > Number) {
-					FreeParticle(particles.Last);
-				}
+				FreeLastParticles(particles.Count - (int) Number);
 			} else {
 				particlesToSpawn += Number * delta;
 			}
 			while (particlesToSpawn >= 1f) {
-				LinkedListNode<Particle> particleNode = AllocParticle();
-				if (GloballyEnabled && Nodes.Count > 0 && InitializeParticle(particleNode.Value)) {
-					AdvanceParticle(particleNode.Value, 0);
+				Particle particle = AllocParticle();
+				if (GloballyEnabled && Nodes.Count > 0 && InitializeParticle(particle)) {
+					AdvanceParticle(particle, 0);
 				} else {
-					FreeParticle(particleNode);
+					FreeLastParticles(1);
 				}
 				particlesToSpawn -= 1;
 			}
 			if (MagnetAmount.Median != 0 || MagnetAmount.Dispersion != 0) {
 				EnumerateMagnets();
 			}
-			LinkedListNode<Particle> p = particles.First;
-			for (; p != null; p = p.Next) {
-				Particle particle = p.Value;
+			int particlesToFreeCount = 0;
+			int i = particles.Count - 1;
+			while (i >= 0) {
+				Particle particle = particles[i];
 				AdvanceParticle(particle, delta);
 				if (!ImmortalParticles && particle.Age > particle.Lifetime) {
-					LinkedListNode<Particle> n = p.Next;
-					FreeParticle(p);
-					p = n;
-					if (p == null)
-						break;
+					particles[i] = particles[particles.Count - particlesToFreeCount - 1];
+					particles[particles.Count - particlesToFreeCount - 1] = particle;
+					particlesToFreeCount++;
 				}
+				i--;
 			}
+			FreeLastParticles(particlesToFreeCount);
 		}
 
 		protected override void SelfLateUpdate(float delta)
@@ -780,18 +787,14 @@ namespace Lime
 			}
 			Renderer.Blending = GlobalBlending;
 			Renderer.Shader = GlobalShader;
-			LinkedListNode<Particle> node = particles.First;
-			for (; node != null; node = node.Next) {
-				Particle particle = node.Value;
+			foreach (var particle in particles) {
 				RenderParticle(particle, matrix, color);
 			}
 		}
 
 		public void DeleteAllParticles()
 		{
-			while (particles.Count > 0) {
-				FreeParticle(particles.Last);
-			}
+			FreeLastParticles(particles.Count);
 		}
 	}
 }
