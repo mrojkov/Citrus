@@ -280,6 +280,7 @@
     <Compile Include="Source\Graphics\Fonts\FontRenderer.cs" />
     <Compile Include="Source\Graphics\Fonts\SerializableFont.cs" />
     <Compile Include="Source\Widgets\Text\IKeyboardInputProcessor.cs" />
+    <Compile Include="Source\Application\AndroidSoftKeyboard.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

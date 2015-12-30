@@ -115,7 +115,8 @@ namespace Lime
 		public override bool OnKeyPreIme(Keycode keyCode, KeyEvent e)
 		{
 			if (keyCode == Keycode.Back && e.Action == KeyEventActions.Up) {
-				androidSoftKeyboard.Height = 0;
+				input.SetKeyState(Key.DismissSoftKeyboard, true);
+				input.SetKeyState(Key.DismissSoftKeyboard, false);
 				return false;
 			}
 			return base.DispatchKeyEvent(e);
@@ -123,6 +124,7 @@ namespace Lime
 
 		public override void ClearFocus()
 		{
+			// we override this function to hide keyboard when app is stopped.
 			base.ClearFocus();
 			androidSoftKeyboard.Show(false, string.Empty);
 		}

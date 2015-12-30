@@ -20,9 +20,6 @@ namespace Lime
 			Window = window;
 			Context = new WidgetContext(window, this);
 			Window.Context = Context;
-#if ANDROID
-			Application.SoftKeyboard.Hidden += () => Context.ActiveTextWidget = null;
-#endif
 		}
 
 		public override void Update(float delta)
@@ -32,11 +29,8 @@ namespace Lime
 			Context.IsActiveTextWidgetUpdated = false;
 			Context.DistanceToNodeUnderCursor = float.MaxValue;
 			base.Update(delta);
-			if (!Context.IsActiveTextWidgetUpdated) {
+			if (!Context.IsActiveTextWidgetUpdated || Window.Input.WasKeyPressed(Key.DismissSoftKeyboard)) {
 				Context.ActiveTextWidget = null;
-				if (Application.SoftKeyboard.Visible) {
-					Application.SoftKeyboard.Show(false, string.Empty);
-				}
 			}
 #if iOS || ANDROID
 			if (Application.CurrentThread.IsMain()) {

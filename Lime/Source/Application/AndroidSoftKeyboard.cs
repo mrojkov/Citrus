@@ -1,5 +1,6 @@
 ﻿#if ANDROID
 using System;
+
 using Android.Content;
 using Android.Views.InputMethods;
 
@@ -12,12 +13,16 @@ namespace Lime
 		private float height;
 		private bool prevKeyboardVisible;
 
-		public bool Visible {
-			get {
-				return Height > 0;
-			}
+		public AndroidSoftKeyboard(GameView gameView)
+		{
+			this.gameView = gameView;
+			imm = (InputMethodManager)gameView.Context.GetSystemService(Context.InputMethodService);
 		}
 
+		public bool Visible
+		{
+			get { return Height > 0; }
+		}
 
 		public float Height 
 		{ 
@@ -29,20 +34,13 @@ namespace Lime
 			}
 		}
 
-		public bool Supported {
-			get {
-				return true;
-			}
+		public bool Supported
+		{
+			get { return true; }
 		}
 
 		public event Action Shown;
 		public event Action Hidden;
-
-		public AndroidSoftKeyboard(GameView gameView)
-		{
-			this.gameView = gameView;
-			imm = (InputMethodManager)gameView.Context.GetSystemService(Context.InputMethodService);
-		}
 
 		public void Show(bool show, string text)
 		{

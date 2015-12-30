@@ -1,16 +1,13 @@
 #if iOS
-using System;
-using OpenTK;
-using OpenTK.Platform.iPhoneOS;
-using System.Drawing;
-using Foundation;
 using CoreAnimation;
+using Foundation;
 using ObjCRuntime;
 using OpenGLES;
 using UIKit;
+
 using OpenTK.Graphics.ES20;
+using OpenTK.Platform.iPhoneOS;
 using GL = OpenTK.Graphics.ES20.GL;
-using All = OpenTK.Graphics.ES20.All;
 
 namespace Lime
 {
@@ -28,7 +25,14 @@ namespace Lime
 			public override bool ShouldReturn(UITextField textField)
 			{
 				input.SetKeyState(Key.Enter, true);
+				input.SetKeyState(Key.Enter, false);
 				return false;
+			}
+
+			public override void EditingEnded(UITextField textField)
+			{
+				input.SetKeyState(Key.DismissSoftKeyboard, true);
+				input.SetKeyState(Key.DismissSoftKeyboard, false);
 			}
 		}
 
@@ -214,7 +218,6 @@ namespace Lime
 		{
 			base.OnUpdateFrame(e);
 			input.CopyKeysState();
-			input.SetKeyState(Key.Enter, false);
 			ProcessTextInput();
 		}
 
