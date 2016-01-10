@@ -48,7 +48,7 @@ namespace Lime
 
 		private List<KeyEvent> keyEventQueue = new List<KeyEvent>();
 
-		public static readonly int KeyCount = Enum.GetNames(typeof(Key)).Length;
+		public static readonly int KeyCount = Enum.GetValues(typeof(Key)).Cast<int>().Max() + 1;
 
 		private bool[] previousKeysState = new bool[KeyCount];
 		private bool[] currentKeysState = new bool[KeyCount];
