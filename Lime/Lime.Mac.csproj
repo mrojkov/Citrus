@@ -217,6 +217,7 @@
     <Compile Include="Source\Graphics\Fonts\CharMap.cs" />
     <Compile Include="Source\Graphics\Fonts\CompoundFont.cs" />
     <Compile Include="Source\Application\Context.cs" />
+    <Compile Include="Source\Application\AndroidSoftKeyboard.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

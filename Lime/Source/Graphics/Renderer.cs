@@ -494,8 +494,8 @@ namespace Lime
 		}
 
 		private static Sprite[] batchedSprites = new Sprite[20];
+		private static Sprite sentinelSprite = new Sprite();
 
-		// Last sprite should be a sentinel.
 		public static void DrawSpriteList(List<Sprite> spriteList, Color4 color)
 		{
 			if (Blending == Blending.Glow) {
@@ -510,7 +510,18 @@ namespace Lime
 			}
 			var matrix = GetEffectiveTransform();
 			int batchLength = 0;
-			foreach (var s in spriteList) {
+			var clipRect = scissorTestEnabled ? CalcLocalScissorAABB(matrix) : new Rectangle();
+			for (int i = 0; i <= spriteList.Count; i++) {
+				var s = (i == spriteList.Count) ? sentinelSprite : spriteList[i];
+				if (scissorTestEnabled && s != sentinelSprite) {
+					if (s.Position.X + s.Size.X < clipRect.A.X ||
+						s.Position.X > clipRect.B.X || 
+						s.Position.Y + s.Size.Y < clipRect.A.Y ||
+						s.Position.Y > clipRect.B.Y)
+					{
+						continue;
+					}
+				}
 				if (batchLength == 0 || batchLength < batchedSprites.Length && s.Texture == batchedSprites[0].Texture) {
 					batchedSprites[batchLength++] = s;
 					continue;
@@ -557,17 +568,17 @@ namespace Lime
 					float x1uy = x1 * matrix.U.Y;
 					float y1vx = y1 * matrix.V.X;
 					float y1vy = y1 * matrix.V.Y;
-					v[bv + 0] = new Vector3() { X = x0ux + y0vx + matrix.T.X, Y = x0uy + y0vy + matrix.T.Y };
-					v[bv + 1] = new Vector3() { X = x1ux + y0vx + matrix.T.X, Y = x1uy + y0vy + matrix.T.Y };
-					v[bv + 2] = new Vector3() { X = x0ux + y1vx + matrix.T.X, Y = x0uy + y1vy + matrix.T.Y };
-					v[bv + 3] = new Vector3() { X = x1ux + y1vx + matrix.T.X, Y = x1uy + y1vy + matrix.T.Y };
+					v[bv + 0] = new Vector3 { X = x0ux + y0vx + matrix.T.X, Y = x0uy + y0vy + matrix.T.Y };
+					v[bv + 1] = new Vector3 { X = x1ux + y0vx + matrix.T.X, Y = x1uy + y0vy + matrix.T.Y };
+					v[bv + 2] = new Vector3 { X = x0ux + y1vx + matrix.T.X, Y = x0uy + y1vy + matrix.T.Y };
+					v[bv + 3] = new Vector3 { X = x1ux + y1vx + matrix.T.X, Y = x1uy + y1vy + matrix.T.Y };
 					c[bv + 0] = effectiveColor;
 					c[bv + 1] = effectiveColor;
 					c[bv + 2] = effectiveColor;
 					c[bv + 3] = effectiveColor;
 					uv[bv + 0] = uv0;
-					uv[bv + 1] = new Vector2() { X = uv1.X, Y = uv0.Y };
-					uv[bv + 2] = new Vector2() { X = uv0.X, Y = uv1.Y };
+					uv[bv + 1] = new Vector2 { X = uv1.X, Y = uv0.Y };
+					uv[bv + 2] = new Vector2 { X = uv0.X, Y = uv1.Y };
 					uv[bv + 3] = uv1;
 					bv += 4;
 				}
@@ -576,6 +587,40 @@ namespace Lime
 				batchLength = 1;
 				batchedSprites[0] = s;
 			}
+		}
+
+		private static Rectangle CalcLocalScissorAABB(Matrix32 transform)
+		{
+			// Get the scissor rectangle in 0,0 - 1,1 coordinate space
+			var vp = new Rectangle {
+				A = new Vector2(viewport.X, viewport.Y),
+				B = new Vector2(viewport.X + viewport.Width, viewport.Y + viewport.Height)
+			};
+			var r = (Rectangle)(IntRectangle)scissorRectangle;
+			var scissorRect = new Rectangle {
+				A = (r.A - vp.A) / vp.Size,
+				B = (r.B - vp.A) / vp.Size
+			};
+			// Transform it to the normalized OpenGL space
+			scissorRect.A = scissorRect.A * 2 - Vector2.One;
+			scissorRect.B = scissorRect.B * 2 - Vector2.One;
+			// Get the unprojected coordinates
+			var invProjection = Projection.CalcInverted();
+			var v0 = invProjection.ProjectVector(scissorRect.A);
+			var v1 = invProjection.ProjectVector(new Vector2(scissorRect.B.X, scissorRect.A.Y));
+			var v2 = invProjection.ProjectVector(scissorRect.B);
+			var v3 = invProjection.ProjectVector(new Vector2(scissorRect.A.X, scissorRect.B.Y));
+			// Get coordinates in the widget space
+			var invTransform = transform.CalcInversed();
+			v0 = invTransform.TransformVector(v0);
+			v1 = invTransform.TransformVector(v1);
+			v2 = invTransform.TransformVector(v2);
+			v3 = invTransform.TransformVector(v3);
+			var aabb = new Rectangle { A = v0, B = v0 }.
+				IncludingPoint(v1).
+				IncludingPoint(v2).
+				IncludingPoint(v3);
+			return aabb;
 		}
 	}
 }
