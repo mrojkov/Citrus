@@ -168,10 +168,7 @@ namespace Lime
 
 		public virtual Vector2 MinMaxSize
 		{
-			set
-			{
-				MinSize = MaxSize = value;
-			}
+			set { MinSize = MaxSize = value; }
 		}
 
 		/// <summary>
@@ -280,6 +277,32 @@ namespace Lime
 					PropagateDirtyFlags(DirtyFlags.Transform);
 				}
 			}
+		}
+
+		/// <summary>
+		/// Gets or sets the widget padding. Padding defines the white space between the widget content and the widget border.
+		/// The widget should respect the padding during its rendering.
+		/// </summary>
+		public Margin Padding;
+
+		public Vector2 ContentPosition
+		{
+			get { return new Vector2(Padding.Left, Padding.Top); }
+		}
+
+		public Vector2 ContentSize
+		{
+			get { return new Vector2(Size.X - Padding.Left - Padding.Right, Size.Y - Padding.Top - Padding.Bottom); }
+		}
+
+		public float ContentWidth
+		{
+			get { return Size.X - Padding.Left - Padding.Right; }
+		}
+
+		public float ContentHeight
+		{
+			get { return Size.Y - Padding.Top - Padding.Bottom; }
 		}
 
 		/// <summary>
