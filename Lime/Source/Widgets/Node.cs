@@ -101,6 +101,12 @@ namespace Lime
 		internal Node NextToRender;
 
 		/// <summary>
+		/// The presenter used for rendering this node.
+		/// A user can override a node rendering by replacing the presenter.
+		/// </summary>
+		public IPresenter Presenter;
+
+		/// <summary>
 		/// Shortcut to the next element of nodes of this parent.
 		/// </summary>
 		public Node NextSibling;
@@ -352,6 +358,9 @@ namespace Lime
 			clone.Animations = Animations.Clone(clone);
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Nodes = Nodes.DeepCloneFast(clone);
+			if (clone.Presenter != null) {
+				clone.Presenter = Presenter.Clone(clone);
+			}
 			return clone;
 		}
 
@@ -437,7 +446,12 @@ namespace Lime
 		/// </summary>
 		protected virtual void SelfLateUpdate(float delta) { }
 
-		public virtual void Render() {}
+		public virtual void Render()
+		{
+			if (Presenter != null) {
+				Presenter.Render();
+			}
+		}
 
 		/// <summary>
 		/// Adds this node and all its descendant nodes to render chain.
