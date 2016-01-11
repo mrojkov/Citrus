@@ -8,7 +8,7 @@ namespace Lime
 	public class Window : CommonWindow, IWindow
 	{
 		private FPSCounter fpsCounter;
-		
+
 		public bool Active { get; private set; }
 		public bool Fullscreen { get { return true; } set {} }
 		public string Title { get; set; }
@@ -34,7 +34,7 @@ namespace Lime
 		public void Center() {}
 		public void Close() {}
 
-		public Window(WindowOptions options) 
+		public Window(WindowOptions options)
 		{
 			if (Application.MainWindow != null) {
 				throw new Lime.Exception("Attempt to set Application.MainWindow twice");
@@ -51,7 +51,7 @@ namespace Lime
 				RaiseActivated();
 			};
 			ActivityDelegate.Instance.GameView.Resize += (sender, e) => {
-				RaiseResized();
+				RaiseResized(((ResizeEventArgs)e).DeviceRotated);
 			};
 			ActivityDelegate.Instance.GameView.RenderFrame += (sender, e) => {
 				RaiseRendering();

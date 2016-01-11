@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Lime
 {
@@ -12,7 +9,7 @@ namespace Lime
 		public event Func<bool> Closing;
 		public event Action Closed;
 		public event Action Moved;
-		public event Action Resized;
+		public event ResizeDelegate Resized;
 		public event Action<float> Updating;
 		public event Action Rendering;
 
@@ -89,11 +86,11 @@ namespace Lime
 			}
 		}
 
-		protected void RaiseResized()
+		protected void RaiseResized(bool deviceRotated)
 		{
 			using (Context.Activate().Scoped()) {
 				if (Resized != null) {
-					Resized();
+					Resized(deviceRotated);
 				}
 			}
 		}

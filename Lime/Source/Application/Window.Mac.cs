@@ -243,7 +243,7 @@ namespace Lime
 
 		private void HandleResize(object sender, EventArgs e)
 		{
-			RaiseResized();
+			RaiseResized(deviceRotated: false);
 		}
 
 		private void HandleMove(object sender, EventArgs e)
