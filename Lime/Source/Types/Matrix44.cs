@@ -1016,6 +1016,11 @@ namespace Lime
 			return result;
 		}
 
+		public Vector2 TransformVector(Vector2 position)
+		{
+			return (Vector2)TransformVector((Vector3)position);
+		}
+
 		public Vector3 ProjectVector(Vector3 position)
 		{
 			var x = position.X * M11 + position.Y * M21 + position.Z * M31 + M41;
@@ -1025,9 +1030,12 @@ namespace Lime
 			return new Vector3(x / w, y / w, z / w);
 		}
 
-		public Vector2 TransformVector(Vector2 position)
+		public Vector2 ProjectVector(Vector2 position)
 		{
-			return (Vector2)TransformVector((Vector3)position);
+			var x = position.X * M11 + position.Y * M21 + M41;
+			var y = position.X * M12 + position.Y * M22 + M42;
+			var w = position.X * M14 + position.Y * M24 + M44;
+			return new Vector2(x / w, y / w);
 		}
 
 		public static Vector3 operator *(Vector3 a, Matrix44 b)
