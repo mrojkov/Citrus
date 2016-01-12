@@ -1,5 +1,4 @@
-﻿
-namespace Lime
+﻿namespace Lime
 {
 	interface IClipboardImplementation
 	{
@@ -8,19 +7,12 @@ namespace Lime
 
 	public static class Clipboard
 	{
-		private static IClipboardImplementation implementation = new ClipboardImplementation();
+		private static readonly IClipboardImplementation implementation = new ClipboardImplementation();
 
 		public static string Text
 		{
-			get
-			{
-				return implementation.Text;
-			}
-			set
-			{
-				implementation.Text = value;
-			}
+			get { return implementation.Text; }
+			set { implementation.Text = value; }
 		}
 	}
 }
-

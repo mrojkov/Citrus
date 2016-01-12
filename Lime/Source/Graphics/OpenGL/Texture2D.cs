@@ -213,10 +213,12 @@ namespace Lime
 			PlatformRenderer.PushTexture(handle, 0);
 			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
 			MemoryUsed = 4 * width * height;
+#if !MAC && !MONOMAC
 			if (generateMips && Application.RenderingBackend == RenderingBackend.ES20) {
 				GL.GenerateMipmap(All.Texture2D);
 				MemoryUsed += (int)(MemoryUsed * 0.33f);
 			}
+#endif
 			PlatformRenderer.PopTexture(0);
 			PlatformRenderer.CheckErrors();
 
