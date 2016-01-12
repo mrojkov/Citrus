@@ -15,8 +15,8 @@ namespace Lime
 				Class[] classArray = { new Class("NSString") };
 				var hasText = pasteBoard.CanReadObjectForClasses(classArray, null);
 				if (hasText) {
-					NSObject[] objectsToPaste = pasteBoard.ReadObjectsForClasses(classArray, null);
-					retutn objectsToPaste[0].ToString();
+					var objectsToPaste = pasteBoard.ReadObjectsForClasses(classArray, null);
+					return objectsToPaste[0].ToString();
 				}
 				return string.Empty;
 			}
@@ -33,4 +33,3 @@ namespace Lime
 	}
 }
 #endif
-
