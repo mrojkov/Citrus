@@ -81,13 +81,13 @@
     <Compile Include="SharpFont\Internal\SizeRec.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedNativeLibrary Include="..\..\..\3rdParty\SharpFont\libfreetype\armeabi\libfreetype6.so">
+    <EmbeddedNativeLibrary Include="..\..\..\3rdParty\FreeType\libfreetype\armeabi\libfreetype6.so">
       <Link>libfreetype\armeabi\libfreetype6.so</Link>
     </EmbeddedNativeLibrary>
-    <EmbeddedNativeLibrary Include="..\..\..\3rdParty\SharpFont\libfreetype\armeabi-v7a\libfreetype6.so">
+    <EmbeddedNativeLibrary Include="..\..\..\3rdParty\FreeType\libfreetype\armeabi-v7a\libfreetype6.so">
       <Link>libfreetype\armeabi-v7a\libfreetype6.so</Link>
     </EmbeddedNativeLibrary>
-    <EmbeddedNativeLibrary Include="..\..\..\3rdParty\SharpFont\libfreetype\x86\libfreetype6.so">
+    <EmbeddedNativeLibrary Include="..\..\..\3rdParty\FreeType\libfreetype\x86\libfreetype6.so">
       <Link>libfreetype\x86\libfreetype6.so</Link>
     </EmbeddedNativeLibrary>
   </ItemGroup>

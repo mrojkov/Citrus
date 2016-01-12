@@ -94,7 +94,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\..\3rdParty\SharpFont\libfreetype6.dylib">
+    <Content Include="..\..\..\3rdParty\FreeType\libfreetype6.dylib">
       <Link>libfreetype6.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

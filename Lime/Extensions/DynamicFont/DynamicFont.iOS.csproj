@@ -78,7 +78,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.ObjCBinding.CSharp.targets" />
   <ItemGroup>
-    <ObjcBindingNativeLibrary Include="..\..\..\3rdParty\SharpFont\libfreetype.a">
+    <ObjcBindingNativeLibrary Include="..\..\..\3rdParty\FreeType\libfreetype.a">
       <Link>libfreetype.a</Link>
     </ObjcBindingNativeLibrary>
   </ItemGroup>

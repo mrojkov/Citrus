@@ -76,8 +76,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\..\3rdParty\SharpFont\freetype6.dll">
+    <Content Include="..\..\..\3rdParty\FreeType\freetype6.dll">
       <Link>freetype6.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
