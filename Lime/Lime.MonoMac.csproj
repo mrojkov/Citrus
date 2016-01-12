@@ -30,6 +30,7 @@
     <IncludeMonoRuntime>false</IncludeMonoRuntime>
     <UseSGen>false</UseSGen>
     <UseRefCounting>false</UseRefCounting>
+    <Profiling>false</Profiling>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -47,6 +48,7 @@
     <IncludeMonoRuntime>false</IncludeMonoRuntime>
     <UseSGen>false</UseSGen>
     <UseRefCounting>false</UseRefCounting>
+    <Profiling>false</Profiling>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -107,7 +109,6 @@
     <Compile Include="Source\Widgets\Text\TextRenderer.cs" />
     <Compile Include="Source\Graphics\TextureAtlasElement.cs" />
     <Compile Include="Source\Graphics\OpenGL\IGLObject.cs" />
-    <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Source\Application\AndroidActivityDelegate.cs" />
     <Compile Include="Source\Application\AndroidGameView.cs" />
     <Compile Include="Source\Graphics\Bitmap.Android.cs" />
@@ -215,11 +216,10 @@
     <Compile Include="Source\Application\UnityApplicationDelegate.cs" />
     <Compile Include="Source\Application\Window.Unity.cs" />
     <Compile Include="Source\Application\Clipboard\Clipboard.Unity.cs" />
-    <Compile Include="Source\Graphics\Fonts\DynamicFont.cs" />
     <Compile Include="Source\Graphics\Fonts\Font.cs" />
-    <Compile Include="Source\Graphics\Fonts\FontRenderer.cs" />
     <Compile Include="Source\Graphics\Fonts\SerializableFont.cs" />
     <Compile Include="Source\Widgets\Text\IKeyboardInputProcessor.cs" />
+    <Compile Include="Source\Graphics\Fonts\CharMap.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
