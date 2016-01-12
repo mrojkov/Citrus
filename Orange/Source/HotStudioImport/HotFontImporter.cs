@@ -101,14 +101,14 @@ namespace Orange
 			case "Characters":
 				lexer.ParseToken('[');
 				while (lexer.PeekChar() != ']')
-					(font.Chars as FontCharCollection).Add(ParseFontChar());
+					(font.Chars as ICollection<FontChar>).Add(ParseFontChar());
 				lexer.ParseToken(']');
 				break;
 			case "Pairs":
 				lexer.ParseToken('[');
 				while (lexer.PeekChar() != ']') {
 					var pair = ParseFontCharPair();
-					// conforming to FontCharCollection interface which doesn't really care	
+					// conforming to FontCharCollection interface which doesn't really care
 					// about height argument for this particular case of `Font`
 					FontChar c = (font.Chars as FontCharCollection).Get(pair.A, 666);
 					if (c.KerningPairs == null) {
