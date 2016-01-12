@@ -1,22 +1,15 @@
 ﻿#if UNITY
+using System;
+
 namespace Lime
 {
 	public class ClipboardImplementation : IClipboardImplementation
 	{
-		private const string Tag = "Clipboard";
-
 		public string Text
 		{
-			get
-			{
-				return string.Empty;
-			}
-
-			set
-			{
-			}
+			get { throw new NotImplementedException(); }
+			set { throw new NotImplementedException(); }
 		}
 	}
 }
 #endif
-

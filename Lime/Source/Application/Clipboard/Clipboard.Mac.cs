@@ -1,56 +1,33 @@
 ﻿#if MAC || MONOMAC
-using System;
 using AppKit;
 using ObjCRuntime;
 using Foundation;
-using System.Runtime.InteropServices;
-
 
 namespace Lime
 {
 	public class ClipboardImplementation : IClipboardImplementation
 	{
-		private const string Tag = "Clipboard";
-
-		[DllImport("/usr/lib/libobjc.dylib", EntryPoint = "objc_msgSend")]
-		private extern static global::System.IntPtr
-		SendMessageAndGetIntPtr(IntPtr receiver, IntPtr selector, IntPtr arg1, IntPtr arg2);
-
-		[DllImport("/usr/lib/libobjc.dylib", EntryPoint = "objc_msgSend")]
-		private extern static bool
-		SendMessageAndGetBool(IntPtr receiver, IntPtr selector, IntPtr arg1, IntPtr arg2);
-
 		public string Text
 		{
 			get
 			{
 				var pasteBoard = NSPasteboard.GeneralPasteboard;
-				var classArray = NSArray.FromObjects(new Class("NSString"));
-
-				bool hasText = SendMessageAndGetBool(
-					pasteBoard.Handle,
-					Selector.GetHandle("canReadObjectForClasses:options:"),
-					classArray.Handle,
-					IntPtr.Zero);
-
-				string text = String.Empty;
-
+				Class[] classArray = { new Class("NSString") };
+				var hasText = pasteBoard.CanReadObjectForClasses(classArray, null);
 				if (hasText) {
-					NSObject[] objectsToPaste = NSArray.ArrayFromHandle<NSObject>(SendMessageAndGetIntPtr(
-						pasteBoard.Handle,
-						Selector.GetHandle("readObjectsForClasses:options:"),
-						classArray.Handle,
-						IntPtr.Zero));
-					text = objectsToPaste[0].ToString();
+					NSObject[] objectsToPaste = pasteBoard.ReadObjectsForClasses(classArray, null);
+					retutn objectsToPaste[0].ToString();
 				}
-				return text;
+				return string.Empty;
 			}
+
 			set
 			{
-				if (value == null || value == String.Empty) { return; }
-				var pasteBoard = NSPasteboard.GeneralPasteboard;
-				pasteBoard.ClearContents();
-				pasteBoard.WriteObjects(new NSString[] { (NSString)value });
+				if (!string.IsNullOrEmpty(value)) {
+					var pasteBoard = NSPasteboard.GeneralPasteboard;
+					pasteBoard.ClearContents();
+					pasteBoard.WriteObjects(new NSString[] { (NSString)value });
+				}
 			}
 		}
 	}
