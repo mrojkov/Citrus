@@ -378,6 +378,7 @@ namespace Lime
 		{
 			Parent = parent;
 			Parent.Tasks.Add(FocusTask());
+			OnSubmit += () => WidgetContext.Current.ActiveTextWidget = null;
 		}
 
 		private int Next()

@@ -323,7 +323,7 @@ namespace Lime.Text
 				}
 				var isLongerThanWidth = x + word.Width > maxWidth;
 				var t = texts[word.TextIndex];
-				var isText = t[word.Start] > ' ';
+				var isText = t.Length > 0 && t[word.Start] > ' ';
 				if (isLongerThanWidth && isText && (wordSplitAllowed || t.HasJapaneseSymbols(word.Start, word.Length))) {
 					var fittedCharsCount = CalcFittedCharactersCount(word, maxWidth - x);
 					if (fittedCharsCount > 0) {
