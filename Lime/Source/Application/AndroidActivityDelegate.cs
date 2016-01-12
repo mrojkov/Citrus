@@ -1,13 +1,10 @@
 #if ANDROID
 using System;
-using System.Linq;
+
 using Android.App;
-using Android.OS;
-using Android.Content.PM;
-using Android.Views;
-using Android.Views.InputMethods;
-using Android.Widget;
 using Android.Content;
+using Android.OS;
+using Android.Widget;
 
 namespace Lime
 {
@@ -74,7 +71,7 @@ namespace Lime
 			Activity.SetContentView(ContentView);
 			if (Created != null) {
 				Created(Activity, bundle);
-			}		
+			}
 		}
 
 		private void RemoveGameViewFromParent()

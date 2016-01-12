@@ -1,52 +1,13 @@
 #if iOS
 using System;
-using OpenTK;
-using System.Drawing;
+
 using Foundation;
-using CoreAnimation;
-using ObjCRuntime;
-using OpenGLES;
 using UIKit;
-using System.Collections.Generic;
 
 namespace Lime
 {
 	public class GameController : UIViewController
 	{
-		class SoftKeyboard : ISoftKeyboard
-		{
-			GameView view;
-
-			public event Action Shown;
-			public event Action Hidden;
-
-			public SoftKeyboard(GameView view)
-			{
-				this.view = view;
-			}
-
-			internal void RaiseHidden()
-			{
-				if (Hidden != null) {
-					Hidden();
-				}
-			}
-
-			public void Show(bool show, string text)
-			{
-				view.ShowSoftKeyboard(show, text);
-			}
-
-			public void ChangeText(string text)
-			{
-				view.ChangeSoftKeyboardText(text);
-			}
-
-			public bool Visible { get; internal set; }
-			public float Height { get; internal set; }
-			public bool Supported { get { return true; } }
-		}
-
 		private NSObject keyboardShowNotification;
 		private NSObject keyboardHideNotification;
 		private NSObject keyboardWillChangeFrameNotification;
@@ -121,7 +82,7 @@ namespace Lime
 			var screenRect = UIScreen.MainScreen.Bounds;
 			if (!endFrame.IntersectsWith(screenRect)) {
 				softKeyboard.RaiseHidden();
-			}		
+			}
 		}
 
 		private void KeyboardShowCallback(object sender, UIKeyboardEventArgs args)
@@ -236,6 +197,40 @@ namespace Lime
 					ViewDidLayoutSubviewsEvent();
 				}
 			}
+		}
+
+		private class SoftKeyboard : ISoftKeyboard
+		{
+			GameView view;
+
+			public event Action Shown;
+			public event Action Hidden;
+
+			public SoftKeyboard(GameView view)
+			{
+				this.view = view;
+			}
+
+			internal void RaiseHidden()
+			{
+				if (Hidden != null) {
+					Hidden();
+				}
+			}
+
+			public void Show(bool show, string text)
+			{
+				view.ShowSoftKeyboard(show, text);
+			}
+
+			public void ChangeText(string text)
+			{
+				view.ChangeSoftKeyboardText(text);
+			}
+
+			public bool Visible { get; internal set; }
+			public float Height { get; internal set; }
+			public bool Supported { get { return true; } }
 		}
 	}
 }

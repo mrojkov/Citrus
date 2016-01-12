@@ -54,7 +54,6 @@ namespace Lime
 
 		public override void Dispose()
 		{
-			GC.SuppressFinalize(this);
 			if (webView != null) {
 				webView.StopLoading();
 				try {
@@ -71,6 +70,11 @@ namespace Lime
 				ActivityDelegate.Instance.GameView.UpdateFrame += a;
 				webView = null;
 			}
+			// Browser may request keyboard and we should hide it on our own when closing browser.
+			if (WidgetContext.Current.ActiveTextWidget == null && Application.SoftKeyboard.Visible) {
+				Application.SoftKeyboard.Show(false, string.Empty);
+			}
+			GC.SuppressFinalize(this);
 		}
 
 		public void SetBackgroundColor(Android.Graphics.Color color)
@@ -96,6 +100,12 @@ namespace Lime
 			p.TopMargin = wr.Y;
 			p.Width = wr.Width;
 			p.Height = wr.Height;
+			// Reduce web view height by keyboard overlap to keep focused widget visible
+			// and let scroll through the whole page if soft keyboard is shown.
+			if (p.TopMargin < CalcKeyboardTop()) {
+				var webViewBottom = p.TopMargin + p.Height;
+				p.Height -= Math.Max(0, webViewBottom - CalcKeyboardTop());
+			}
 			webView.RequestLayout();
 		}
 
@@ -110,6 +120,11 @@ namespace Lime
 				Width = (aabb.Width * scale.X).Round(),
 				Height = (aabb.Height * scale.Y).Round()
 			};
+		}
+
+		private int CalcKeyboardTop()
+		{
+			return WidgetContext.Current.Window.ClientSize.Height - (int)Application.SoftKeyboard.Height;
 		}
 
 		private Uri GetUrl()
