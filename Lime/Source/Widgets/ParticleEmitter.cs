@@ -1022,7 +1022,7 @@ namespace Lime
 				T = p.FullPosition
 			};
 			Renderer.Transform1 = globalMatrix * matrix;
-			Renderer.DrawSprite(texture, p.ColorCurrent, -Vector2.Half, Vector2.One, Vector2.Zero, Vector2.One);
+			Renderer.DrawSprite(texture, p.ColorCurrent * color, -Vector2.Half, Vector2.One, Vector2.Zero, Vector2.One);
 		}
 
 		public override void Render()
