@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{FE8512BC-7A55-425C-8BC1-AD4D9785CF12}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DynamicFont</RootNamespace>
+    <AssemblyName>DynamicFont</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Win\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;WIN</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Win\Release\</OutputPath>
+    <DefineConstants>TRACE;WIN</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="CharCache.cs" />
+    <Compile Include="CompoundFont.cs" />
+    <Compile Include="DynamicFont.cs" />
+    <Compile Include="FontRenderer.cs" />
+    <Compile Include="SharpFont\BBox.cs" />
+    <Compile Include="SharpFont\Error.cs" />
+    <Compile Include="SharpFont\Face.cs" />
+    <Compile Include="SharpFont\Fixed26Dot6.cs" />
+    <Compile Include="SharpFont\FreeTypeException.cs" />
+    <Compile Include="SharpFont\FT.Internal.cs" />
+    <Compile Include="SharpFont\FTBitmap.cs" />
+    <Compile Include="SharpFont\FTSize.cs" />
+    <Compile Include="SharpFont\FTVector26Dot6.cs" />
+    <Compile Include="SharpFont\GlyphFormat.cs" />
+    <Compile Include="SharpFont\GlyphMetrics.cs" />
+    <Compile Include="SharpFont\GlyphSlot.cs" />
+    <Compile Include="SharpFont\Internal\BitmapRec.cs" />
+    <Compile Include="SharpFont\Internal\FaceRec.cs" />
+    <Compile Include="SharpFont\Internal\GenericRec.cs" />
+    <Compile Include="SharpFont\Internal\GlyphMetricsRec.cs" />
+    <Compile Include="SharpFont\Internal\GlyphSlotRec.cs" />
+    <Compile Include="SharpFont\Internal\OutlineRec.cs" />
+    <Compile Include="SharpFont\Internal\SizeMetricsRec.cs" />
+    <Compile Include="SharpFont\Internal\SizeRec.cs" />
+    <Compile Include="SharpFont\KerningMode.cs" />
+    <Compile Include="SharpFont\Library.cs" />
+    <Compile Include="SharpFont\LoadFlags.cs" />
+    <Compile Include="SharpFont\LoadTarget.cs" />
+    <Compile Include="SharpFont\OutlineFlags.cs" />
+    <Compile Include="SharpFont\PInvokeHelper.cs" />
+    <Compile Include="SharpFont\PixelMode.cs" />
+    <Compile Include="SharpFont\RenderMode.cs" />
+    <Compile Include="SharpFont\SizeMetrics.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Lime.Win.csproj">
+      <Project>{fc2de6c9-641a-4230-8d29-ea4035cd8708}</Project>
+      <Name>Lime.Win</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\..\3rdParty\SharpFont\freetype6.dll">
+      <Link>freetype6.dll</Link>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

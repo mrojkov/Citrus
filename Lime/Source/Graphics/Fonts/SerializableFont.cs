@@ -45,18 +45,17 @@ namespace Lime
 
 		public Func<string, string> FontNameChanger;
 
-		private FontPool() { }
-
 		public IFont DefaultFont { get { return this[null]; } }
 
-		public void AddFont(string name, Font font)
+		public void AddFont(string name, IFont font)
 		{
 			fonts[name] = font;
 		}
 
 		public IFont this[string name]
 		{
-			get	{
+			get
+			{
 				if (FontNameChanger != null)
 					name = FontNameChanger(name);
 				if (string.IsNullOrEmpty(name))

@@ -708,8 +708,6 @@ namespace Lime
 			foreach (var prop in GetType().GetProperties()) {
 				if (prop.PropertyType == typeof(ITexture)) {
 					PreloadTexture(prop);
-				} else if (prop.PropertyType == typeof(SerializableFont)) {
-					PreloadFont(prop);
 				}
 			}
 			foreach (var animator in Animators) {
@@ -726,17 +724,6 @@ namespace Lime
 			if (textureAnimator != null) {
 				foreach (var key in textureAnimator.ReadonlyKeys) {
 					key.Value.GetHandle();
-				}
-			}
-		}
-
-		private void PreloadFont(PropertyInfo prop)
-		{
-			var getter = prop.GetGetMethod();
-			var font = getter.Invoke(this, new object[]{}) as SerializableFont;
-			if (font != null) {
-				foreach (var texture in font.Instance.Textures) {
-					texture.GetHandle();
 				}
 			}
 		}

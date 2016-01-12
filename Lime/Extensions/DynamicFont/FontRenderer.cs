@@ -1,5 +1,4 @@
-﻿#if !MAC && !MONOMAC && !iOS
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 using SharpFont;
@@ -58,7 +57,7 @@ namespace Lime
 			// Handle whitespace
 			if (@char == ' ') {
 				return new Glyph {
-					Width = ((float)height / 5).Round(),
+					ACWidths = Vector2.One * (height / 10.0f),
 					Height = height,
 				};
 			}
@@ -67,7 +66,7 @@ namespace Lime
 			if (face.Glyph.Metrics.Width == 0) {
 				return null;
 			}
-			 
+
 			face.Glyph.RenderGlyph(RenderMode.Normal);
 			var bitmap = face.Glyph.Bitmap;
 			if (bitmap.PixelMode != PixelMode.Gray) {
@@ -111,11 +110,9 @@ namespace Lime
 		{
 			if (library != null) {
 				library.Dispose();
-				library = null;
-				// Do not dispose the face, because library.Dispose() made it on its own.
-				face = null;
 			}
+			// Do not dispose the face, because library.Dispose() made it on its own.
+			GC.SuppressFinalize(this);
 		}
 	}
 }
-#endif

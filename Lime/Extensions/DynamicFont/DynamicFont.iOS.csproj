@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectTypeGuids>{8FFB629D-F513-41CE-95D2-7ECE97B6EEEC};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B956A746-3D0C-4378-926B-8A776846FFFA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>DynamicFont</RootNamespace>
+    <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
+    <AssemblyName>DynamicFont</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iOS\Debug</OutputPath>
+    <DefineConstants>DEBUG;iOS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\iOS\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants>iOS</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="Xamarin.iOS" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="libfreetype.linkwith.cs">
+      <DependentUpon>libfreetype.a</DependentUpon>
+    </Compile>
+    <Compile Include="CharCache.cs" />
+    <Compile Include="DynamicFont.cs" />
+    <Compile Include="FontRenderer.cs" />
+    <Compile Include="SharpFont\BBox.cs" />
+    <Compile Include="SharpFont\Error.cs" />
+    <Compile Include="SharpFont\Face.cs" />
+    <Compile Include="SharpFont\Fixed26Dot6.cs" />
+    <Compile Include="SharpFont\FreeTypeException.cs" />
+    <Compile Include="SharpFont\FTBitmap.cs" />
+    <Compile Include="SharpFont\FTSize.cs" />
+    <Compile Include="SharpFont\FTVector26Dot6.cs" />
+    <Compile Include="SharpFont\GlyphFormat.cs" />
+    <Compile Include="SharpFont\GlyphMetrics.cs" />
+    <Compile Include="SharpFont\GlyphSlot.cs" />
+    <Compile Include="SharpFont\KerningMode.cs" />
+    <Compile Include="SharpFont\Library.cs" />
+    <Compile Include="SharpFont\LoadFlags.cs" />
+    <Compile Include="SharpFont\LoadTarget.cs" />
+    <Compile Include="SharpFont\OutlineFlags.cs" />
+    <Compile Include="SharpFont\PInvokeHelper.cs" />
+    <Compile Include="SharpFont\PixelMode.cs" />
+    <Compile Include="SharpFont\RenderMode.cs" />
+    <Compile Include="SharpFont\SizeMetrics.cs" />
+    <Compile Include="SharpFont\Internal\BitmapRec.cs" />
+    <Compile Include="SharpFont\Internal\FaceRec.cs" />
+    <Compile Include="SharpFont\Internal\GenericRec.cs" />
+    <Compile Include="SharpFont\Internal\GlyphMetricsRec.cs" />
+    <Compile Include="SharpFont\Internal\GlyphSlotRec.cs" />
+    <Compile Include="SharpFont\Internal\OutlineRec.cs" />
+    <Compile Include="SharpFont\Internal\SizeMetricsRec.cs" />
+    <Compile Include="SharpFont\Internal\SizeRec.cs" />
+    <Compile Include="SharpFont\FT.Internal.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ObjcBindingApiDefinition Include="ApiDefinition.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.ObjCBinding.CSharp.targets" />
+  <ItemGroup>
+    <ObjcBindingNativeLibrary Include="..\..\..\3rdParty\SharpFont\libfreetype.a">
+      <Link>libfreetype.a</Link>
+    </ObjcBindingNativeLibrary>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\PokerClient\Citrus\Lime\Lime.iOS.csproj">
+      <Project>{9CFD3A2F-7DA5-420E-B475-44749DC61485}</Project>
+      <Name>Lime.iOS</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="SharpFont\" />
+    <Folder Include="SharpFont\Internal\" />
+    <Folder Include="Properties\" />
+  </ItemGroup>
+</Project>

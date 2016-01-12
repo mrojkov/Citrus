@@ -7,3 +7,5 @@ Orange/bin/Win/Release/OpenTK.xml
 Orange/obj/
 3rdParty/*/bin/*
 3rdParty/*/obj/*
+Lime/Extensions/*/bin/*
+Lime/Extensions/*/obj/*

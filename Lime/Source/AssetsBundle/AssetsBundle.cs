@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace Lime
 {
@@ -68,6 +66,16 @@ namespace Lime
 		public static string CurrentLanguage;
 
 		public abstract Stream OpenFile(string path);
+
+		public byte[] ReadFile(string path)
+		{
+			using (var stream = OpenFile(path)) {
+				using (var memoryStream = new MemoryStream()) {
+					stream.CopyTo(memoryStream);
+					return memoryStream.ToArray();
+				}
+			}
+		}
 
 		/// <summary>
 		/// Возвращает время записи файла (время, когда файл был изменен)
