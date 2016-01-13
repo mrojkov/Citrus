@@ -47,7 +47,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CharCache.cs" />
-    <Compile Include="CompoundFont.cs" />
     <Compile Include="DynamicFont.cs" />
     <Compile Include="FontRenderer.cs" />
     <Compile Include="SharpFont\BBox.cs" />
