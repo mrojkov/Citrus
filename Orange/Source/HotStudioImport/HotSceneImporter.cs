@@ -19,7 +19,7 @@ namespace Orange
 	{
 		protected HotLexer lexer;
 		protected List<KnownActorType> knownActorTypes;
-		
+
 		public HotSceneImporter(string path)
 		{
 			RegisterKnownActorTypes();
@@ -763,7 +763,7 @@ namespace Orange
 				break;
 			}
 		}
-		
+
 		protected void ParseFolderBeginProperty(Node node, string name)
 		{
 			switch (name) {
@@ -787,7 +787,7 @@ namespace Orange
 
 		public delegate void ActorPropReader(Node node, string name);
 
-		public struct KnownActorType 
+		public struct KnownActorType
 		{
 			public string ActorClass;
 			public string NodeClass;
@@ -805,7 +805,7 @@ namespace Orange
 				return result;
 			}
 		}
-		
+
 		public object CreateObject(string className)
 		{
 			var type = System.Type.GetType(className);
@@ -818,7 +818,7 @@ namespace Orange
 			var obj = ctor.Invoke(new object[] {});
 			return obj;
 		}
-		
+
 		public Node ParseNode()
 		{
 			string actorClass = lexer.ParseQuotedString();
@@ -872,6 +872,25 @@ namespace Orange
 			}
 		}
 
+		private void ParseEmitterShapePointProperty(Node node, string name)
+		{
+			EmitterShapePoint point = (EmitterShapePoint)node;
+			switch (name) {
+			case "Position":
+				// Not used
+				break;
+			case "Anchor":
+				point.Position = lexer.ParseVector2();
+				break;
+			case "SkinningWeights":
+				point.SkinningWeights = lexer.ParseSkinningWeights();
+				break;
+			default:
+				ParseActorProperty(point, name);
+				break;
+			}
+		}
+
 		#endregion
 
 		protected virtual void RegisterKnownActorTypes()
@@ -905,7 +924,7 @@ namespace Orange
 				new KnownActorType {ActorClass = "Hot::Movie", NodeClass = "Lime.Movie, Lime", PropReader = ParseVideoProperty},
 				new KnownActorType {ActorClass = "Hot::ModelView", NodeClass = "Lime.ModelViewport, Lime", PropReader = ParseModelViewProperty},
 				new KnownActorType {ActorClass = "LinearLayout", NodeClass = "Lime.LinearLayout, Lime", PropReader = ParseLinearLayoutProperty},
-
+				new KnownActorType {ActorClass = "Hot::EmitterShapePoint", NodeClass = "Lime.EmitterShapePoint, Lime", PropReader = ParseEmitterShapePointProperty},
 			};
 		}
 	}

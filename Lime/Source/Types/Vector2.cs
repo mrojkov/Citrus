@@ -14,7 +14,7 @@ namespace Lime
 	{
 		[ProtoMember(1)]
 		public float X;
-		
+
 		[ProtoMember(2)]
 		public float Y;
 
@@ -82,44 +82,44 @@ namespace Lime
 		/// Returns a vector with components 1, 0.
 		/// </summary>
 		public static readonly Vector2 Right = new Vector2(1, 0);
-		
+
 		public Vector2(float x, float y)
 		{
 			X = x;
 			Y = y;
 		}
-		
+
 		public Vector2(float value)
 		{
 			X = value;
 			Y = value;
 		}
-		
+
 		public static explicit operator IntVector2(Vector2 value)
 		{
 			return new IntVector2((int)value.X, (int)value.Y);
 		}
-		
+
 		public static explicit operator Vector3(Vector2 value)
 		{
 			return new Vector3(value.X, value.Y, 0);
 		}
-		
+
 		public static explicit operator Size(Vector2 value)
 		{
 			return new Size((int)value.X, (int)value.Y);
 		}
-		
+
 		public bool Equals(Vector2 other)
 		{
 			return X == other.X && Y == other.Y;
 		}
-		
+
 		public override bool Equals(object obj)
 		{
 			return obj is Vector2 && Equals((Vector2) obj);
 		}
-		
+
 		public override int GetHashCode()
 		{
 			return X.GetHashCode() ^ Y.GetHashCode();
@@ -129,7 +129,7 @@ namespace Lime
 		{
 			return lhs.X == rhs.X && lhs.Y == rhs.Y;
 		}
-		
+
 		public static bool operator != (Vector2 lhs, Vector2 rhs)
 		{
 			return lhs.X != rhs.X || lhs.Y != rhs.Y;
@@ -154,7 +154,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Creates a new <see cref="Vector2"/> that contains 
+		/// Creates a new <see cref="Vector2"/> that contains
 		/// linear interpolation of the specified vectors.
 		/// </summary>
 		/// <param name="amount">Weighting value(between 0.0 and 1.0).</param>
@@ -176,59 +176,59 @@ namespace Lime
 		{
 			return (value1 - value2).Length;
 		}
-		
+
 		public static Vector2 operator *(Vector2 lhs, Vector2 rhs)
 		{
 			return new Vector2(lhs.X * rhs.X, lhs.Y * rhs.Y);
 		}
-		
+
 		public static Vector2 operator /(Vector2 lhs, Vector2 rhs)
 		{
 			return new Vector2(lhs.X / rhs.X, lhs.Y / rhs.Y);
 		}
-		
+
 		public static Vector2 operator /(Vector2 lhs, float rhs)
 		{
 			return new Vector2(lhs.X / rhs, lhs.Y / rhs);
 		}
-		
+
 		public static Vector2 operator *(float lhs, Vector2 rhs)
 		{
 			return new Vector2(lhs * rhs.X, lhs * rhs.Y);
 		}
-		
+
 		public static Vector2 operator *(Vector2 lhs, float rhs)
 		{
 			return new Vector2(rhs * lhs.X, rhs * lhs.Y);
 		}
-		
+
 		public static Vector2 operator +(Vector2 lhs, Vector2 rhs)
 		{
 			return new Vector2(lhs.X + rhs.X, lhs.Y + rhs.Y);
 		}
-		
+
 		public static Vector2 operator -(Vector2 lhs, Vector2 rhs)
 		{
 			return new Vector2(lhs.X - rhs.X, lhs.Y - rhs.Y);
 		}
-		
+
 		public static Vector2 operator -(Vector2 value)
 		{
 			return new Vector2(-value.X, -value.Y);
 		}
-		
+
 		public static float DotProduct(Vector2 value1, Vector2 value2)
 		{
 			return value1.X * value2.X + value1.Y * value2.Y;
 		}
-		
+
 		public static float CrossProduct(Vector2 value1, Vector2 value2)
 		{
 			return value1.X * value2.Y - value1.Y * value2.X;
 		}
-		
+
 		/// <summary>
-		/// Creates a new <see cref="Vector2"/> that represents 
+		/// Creates a new <see cref="Vector2"/> that represents
 		/// cosine and sine of specified direction.
 		/// </summary>
 		/// <param name="radians">Azimuth of direction (in radians).</param>
@@ -287,7 +287,7 @@ namespace Lime
 		{
 			get { return (float)Math.Atan2(Y, X) * Mathf.RadToDeg; }
 		}
-		
+
 		public float Length
 		{
 			get { return (float)Math.Sqrt(X * X + Y * Y); }
@@ -298,7 +298,7 @@ namespace Lime
 		/// </summary>
 		public Vector2 Normalized
 		{
-			get 
+			get
 			{
 				var v = new Vector2(X, Y);
 				var length = Length;
@@ -310,14 +310,14 @@ namespace Lime
 				return v;
 			}
 		}
-		
+
 		public float SqrLength
 		{
 			get { return X * X + Y * Y; }
 		}
 
 		/// <summary>
-		/// Returns the <see cref="string"/> representation of this <see cref="Vector2"/> 
+		/// Returns the <see cref="string"/> representation of this <see cref="Vector2"/>
 		/// in the format: "X, Y".
 		/// </summary>
 		public override string ToString()
@@ -326,7 +326,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Returns the <see cref="string"/> representation of this <see cref="Vector2"/> 
+		/// Returns the <see cref="string"/> representation of this <see cref="Vector2"/>
 		/// in the format: "X, Y".
 		/// </summary>
 		public string ToString(IFormatProvider format)
@@ -352,7 +352,7 @@ namespace Lime
 			if (parts.Length != 2 || parts.Any(i => i.IsNullOrWhiteSpace())) {
 				return false;
 			}
-			
+
 			return float.TryParse(parts[0], NumberStyles.Float, CultureInfo.InvariantCulture, out vector.X)
 				&& float.TryParse(parts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out vector.Y);
 		}

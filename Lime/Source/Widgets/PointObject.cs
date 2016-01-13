@@ -12,6 +12,7 @@ namespace Lime
 	[ProtoContract]
 	[ProtoInclude(101, typeof(SplinePoint))]
 	[ProtoInclude(102, typeof(DistortionMeshPoint))]
+	[ProtoInclude(103, typeof(EmitterShapePoint))]
 	public class PointObject : Node
 	{
 		private Vector2 position;

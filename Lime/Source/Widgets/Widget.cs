@@ -104,7 +104,7 @@ namespace Lime
 		public ILayout Layout = AnchorLayout.Instance;
 
 		/// <summary>
-		/// Keeps layout-specific data, used by parent widget's Layout. 
+		/// Keeps layout-specific data, used by parent widget's Layout.
 		/// E.g: TableLayoutCell object, if parent widget has TableLayout.
 		/// </summary>
 		public object LayoutCell;
@@ -113,8 +113,8 @@ namespace Lime
 		/// TODO: Translate
 		/// Используется только для виджетов, умеющих отображать текст. Если виджет не умеет отображать текст, возвращает null
 		/// </summary>
-		public virtual string Text 
-		{ 
+		public virtual string Text
+		{
 			get { return null; }
 			set { }
 		}
@@ -128,17 +128,17 @@ namespace Lime
 			get { return null; }
 			set { }
 		}
-				
-		internal protected virtual bool IsRenderedToTexture() 
+
+		internal protected virtual bool IsRenderedToTexture()
 		{
-			return false; 
+			return false;
 		}
 
 		public virtual Action Clicked {
 			get { return clicked; }
 			set { clicked = value; }
 		}
-		
+
 		public virtual bool WasClicked()
 		{
 			return Input.WasMouseReleased() && HitTest(Input.MousePosition);
@@ -171,9 +171,9 @@ namespace Lime
 		/// <summary>
 		/// Parent-relative X position.
 		/// </summary>
-		public float X 
-		{ 
-			get { return position.X; } 
+		public float X
+		{
+			get { return position.X; }
 			set
 			{
 				System.Diagnostics.Debug.Assert(IsNumber(value));
@@ -181,7 +181,7 @@ namespace Lime
 					position.X = value;
 					PropagateDirtyFlags(DirtyFlags.Transform);
 				}
-			} 
+			}
 		}
 
 		/// <summary>
@@ -199,7 +199,7 @@ namespace Lime
 				}
 			}
 		}
-		
+
 		[ProtoMember(2)]
 		public Vector2 Size
 		{
@@ -240,21 +240,21 @@ namespace Lime
 		{
 			Layout.OnSizeChanged(this, sizeDelta);
 		}
-		
-		public float Width { 
+
+		public float Width {
 			get { return size.X; }
 			set {
 				if (size.X != value)
 					Size = new Vector2(value, Height);
-			} 
+			}
 		}
-		
+
 		public float Height {
-			get { return size.Y; } 
+			get { return size.Y; }
 			set {
 				if (size.Y != value)
 					Size = new Vector2(Width, value);
-			} 
+			}
 		}
 
 		/// <summary>
@@ -262,9 +262,9 @@ namespace Lime
 		/// (0, 0) is top-left corner, (1, 1) is bottom-right corner.
 		/// </summary>
 		[ProtoMember(3)]
-		public Vector2 Pivot 
-		{ 
-			get { return pivot; } 
+		public Vector2 Pivot
+		{
+			get { return pivot; }
 			set
 			{
 				System.Diagnostics.Debug.Assert(IsNumber(value.X));
@@ -273,13 +273,13 @@ namespace Lime
 					pivot = value;
 					PropagateDirtyFlags(DirtyFlags.Transform);
 				}
-			} 
+			}
 		}
 
 		[ProtoMember(4)]
-		public Vector2 Scale 
-		{ 
-			get { return scale; } 
+		public Vector2 Scale
+		{
+			get { return scale; }
 			set
 			{
 				System.Diagnostics.Debug.Assert(IsNumber(value.X));
@@ -288,14 +288,14 @@ namespace Lime
 					scale = value;
 					PropagateDirtyFlags(DirtyFlags.Transform);
 				}
-			} 
+			}
 		}
 
 		/// <summary>
 		/// Counter-clockwise rotation of this widget.
 		/// </summary>
 		[ProtoMember(5)]
-		public float Rotation { 
+		public float Rotation {
 			get { return rotation; }
 			set
 			{
@@ -312,15 +312,15 @@ namespace Lime
 		/// Hue of this widget. Contents color will be multiplied by it on render.
 		/// </summary>
 		[ProtoMember(6)]
-		public Color4 Color 
-		{ 
-			get { return color; } 
+		public Color4 Color
+		{
+			get { return color; }
 			set {
 				if (color.ABGR != value.ABGR) {
 					color = value;
 					PropagateDirtyFlags(DirtyFlags.Color);
 				}
-			} 
+			}
 		}
 
 		/// <summary>
@@ -329,7 +329,7 @@ namespace Lime
 		public float Opacity
 		{
 			get { return (float)color.A * (1 / 255f); }
-			set 
+			set
 			{
 				var a = (byte)(value * 255f);
 				if (color.A != a) {
@@ -343,16 +343,16 @@ namespace Lime
 		public Anchors Anchors { get; set; }
 
 		[ProtoMember(8)]
-		public Blending Blending 
-		{ 
-			get { return blending; } 
-			set 
+		public Blending Blending
+		{
+			get { return blending; }
+			set
 			{
 				if (blending != value) {
 					blending = value;
 					PropagateDirtyFlags(DirtyFlags.Color);
 				}
-			} 
+			}
 		}
 
 		[ProtoMember(9)]
@@ -369,10 +369,10 @@ namespace Lime
 		}
 
 		[ProtoMember(10)]
-		public bool Visible 
-		{ 
-			get { return visible; } 
-			set 
+		public bool Visible
+		{
+			get { return visible; }
+			set
 			{
 				if (visible != value) {
 					visible = value;
@@ -386,7 +386,7 @@ namespace Lime
 
 		[ProtoMember(12)]
 		public HitTestMethod HitTestMethod { get; set; }
-		
+
 		[ProtoMember(13)]
 		public uint HitTestMask { get; set; }
 
@@ -398,7 +398,7 @@ namespace Lime
 		private Blending globalBlending;
 		private ShaderId globalShader;
 		private bool globallyVisible;
-		
+
 		/// <summary>
 		/// TODO: Add summary
 		/// </summary>
@@ -410,7 +410,7 @@ namespace Lime
 		/// <summary>
 		/// TODO: Add summary
 		/// </summary>
-		public Color4 GlobalColor 
+		public Color4 GlobalColor
 		{
 			get { RecalcDirtyGlobals(); return globalColor; }
 		}
@@ -434,9 +434,9 @@ namespace Lime
 		/// <summary>
 		/// TODO: Add summary
 		/// </summary>
-		public bool GloballyVisible 
+		public bool GloballyVisible
 		{
-			get 
+			get
 			{
 				if ((DirtyMask & (DirtyFlags.Visible | DirtyFlags.Color)) == 0) {
 					return globallyVisible;
@@ -444,11 +444,11 @@ namespace Lime
 				if (!visible || color.A == 0) {
 					return false;
 				}
-				RecalcDirtyGlobals(); 
-				return globallyVisible; 
+				RecalcDirtyGlobals();
+				return globallyVisible;
 			}
 		}
-		
+
 		/// <summary>
 		/// Absolute position of this widget.
 		/// </summary>
@@ -482,7 +482,7 @@ namespace Lime
 		}
 
 		private TaskList lateTasks;
-		
+
 		/// <summary>
 		/// Tasks that are called after Update.
 		/// </summary>
@@ -530,7 +530,7 @@ namespace Lime
 		{
 			get { return input ?? (input = new WidgetInput(this)); }
 		}
-		
+
 		public virtual Vector2 CalcContentSize()
 		{
 			return Size;
@@ -540,8 +540,8 @@ namespace Lime
 		/// Searches for widget with provided path or id in this widget's descendants.
 		/// Throws an exception if sought-for widget doesn't exist.
 		/// <para>This function is thread safe.</para>
-		/// </summary> 
-		/// <param name="path">Id or path of widget. Path can be incomplete 
+		/// </summary>
+		/// <param name="path">Id or path of widget. Path can be incomplete
 		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
 		public Widget this[string path]
 		{
@@ -553,8 +553,8 @@ namespace Lime
 		/// Searches for widget with provided path or id in this widget's descendants.
 		/// Throws an exception if sought-for widget doesn't exist.
 		/// <para>This function is thread safe.</para>
-		/// </summary> 
-		/// <param name="format">Id or path of widget. Path can be incomplete 
+		/// </summary>
+		/// <param name="format">Id or path of widget. Path can be incomplete
 		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
 		public Widget this[string format, params object[] arg]
 		{
@@ -593,7 +593,7 @@ namespace Lime
 					var next = node.NextSibling;
 					node.Update(delta);
 					node = next;
-				} 
+				}
 				SelfLateUpdate(delta);
 				if (clicked != null) {
 					HandleClick();
@@ -625,7 +625,7 @@ namespace Lime
 				Updated(delta * AnimationSpeed);
 			}
 		}
-		
+
 		private void HandleClick()
 		{
 			if (Input.WasMouseReleased() && IsMouseOver()) {
@@ -635,7 +635,7 @@ namespace Lime
 				clicked();
 			}
 		}
-		
+
 		/// <summary>
 		/// TODO: Add summary
 		/// </summary>
@@ -668,7 +668,7 @@ namespace Lime
 			globalShader = Shader;
 			globallyVisible = Visible && color.A != 0;
 		}
-		
+
 		/// <summary>
 		/// TODO: Add summary
 		/// </summary>
@@ -703,7 +703,7 @@ namespace Lime
 			matrix.T.Y = -(center.X * u.Y) - center.Y * v.Y + translation.Y;
 			return matrix;
 		}
-		
+
 		/// <summary>
 		/// TODO: Add summary
 		/// </summary>
@@ -791,7 +791,7 @@ namespace Lime
 		#endregion
 
 		#region HitTest handling
-		
+
 		public bool IsMouseOver()
 		{
 			return Input.IsAcceptingMouse() && HitTest(Input.MousePosition);

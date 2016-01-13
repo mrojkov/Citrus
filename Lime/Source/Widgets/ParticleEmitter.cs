@@ -2,413 +2,270 @@ using Lime;
 using ProtoBuf;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Lime
 {
-	/// <summary>
-	/// Форма эмиттера частиц
-	/// </summary>
 	[ProtoContract]
 	public enum EmitterShape
 	{
-		/// <summary>
-		/// Точечный. Частицы генерируются в точке
-		/// </summary>
 		[ProtoEnum]
 		Point,
-
-		/// <summary>
-		/// Линейный. Частицы генерируются равномерно по линии, длина которой соответствует ширине эмиттера
-		/// </summary>
 		[ProtoEnum]
 		Line,
-
-		/// <summary>
-		/// Частицы генерируются равномерно по границам эллипса, описанного по границам эмиттера
-		/// </summary>
 		[ProtoEnum]
 		Ellipse,
-
-		/// <summary>
-		/// Частицы генерируются равномерно по области эмиттера
-		/// </summary>
 		[ProtoEnum]
 		Area,
+		/// <summary>
+		/// Particles are generated inside polygon defined by EmitterShapePoint points.
+		/// Polygon points are oriented clockwise.
+		/// </summary>
+		[ProtoEnum]
+		Custom,
 	};
 
-	/// <summary>
-	/// Тип генерации частиц
-	/// </summary>
 	[Flags]
 	[ProtoContract]
 	public enum EmissionType
 	{
-		/// <summary>
-		/// Частицы генерироваться не будут
-		/// </summary>
 		[ProtoEnum]
 		None,
-
-		/// <summary>
-		/// Частицы генерируются внутрь области эмиттера
-		/// </summary>
 		[ProtoEnum]
 		Inner = 1,
-
-		/// <summary>
-		/// Частицы генерируются наружу области эмиттера
-		/// </summary>
 		[ProtoEnum]
 		Outer = 2,
 	}
 
 	/// <summary>
-	/// Тип привязки частиц. Привязанные частицы двигаются вместе с объектом, к которому они привязаны
+	/// Particles move with widget they're linked to.
 	/// </summary>
 	[ProtoContract]
 	public enum ParticlesLinkage
 	{
 		/// <summary>
-		/// Частицы не привязаны ни к какому объекту (стандартное поведение)
+		/// No linkage (default)
 		/// </summary>
 		[ProtoEnum]
 		Root,
-
 		/// <summary>
-		/// Частицы привязаны к контейнеру, в котором находится эмиттер
+		/// Emitter parent.
 		/// </summary>
 		[ProtoEnum]
 		Parent,
-
 		/// <summary>
-		/// Частицы привязаны к объекту, указанному пользователем
+		/// User defined widget via LinkageWidgetName
 		/// </summary>
 		[ProtoEnum]
 		Other
 	}
 
-	/// <summary>
-	/// Эмиттер частиц (специальный невидимый объект, из которого вылетают частицы)
-	/// </summary>
+	[ProtoContract]
+	public class EmitterShapePoint : PointObject
+	{
+		public Vector2 TransformedPosition {
+			get {
+				Vector2 result = Vector2.Zero;
+				if (Parent != null && Parent.AsWidget != null) {
+					result = Parent.AsWidget.Size * Position;
+				}
+				if (SkinningWeights != null && Parent != null && Parent.Parent != null) {
+					BoneArray a = Parent.Parent.AsWidget.BoneArray;
+					Matrix32 m1 = Parent.AsWidget.CalcLocalToParentTransform();
+					Matrix32 m2 = m1.CalcInversed();
+					result = m2.TransformVector(a.ApplySkinningToVector(m1.TransformVector(result), SkinningWeights));
+				}
+				return result;
+			}
+		}
+	}
+
 	[ProtoContract]
 	public partial class ParticleEmitter : Widget
 	{
 		internal static System.Random Rng = new System.Random();
 
-		/// <summary>
-		/// Частица, сгенерированная эмиттером
-		/// </summary>
-		[ProtoContract]
 		public class Particle
 		{
-			[ProtoMember(1)]
-			public int ModifierIndex;
-
 			public ParticleModifier Modifier;
-
 			// Position of particle with random motion.
-			[ProtoMember(2)]
 			public Vector2 FullPosition;
-
 			// Position if particle without random motion.
-			[ProtoMember(3)]
 			public Vector2 RegularPosition;
-
 			// Motion direction with random motion(in degrees).
-			[ProtoMember(4)]
 			public float FullDirection;
-
 			// Motion direction without random motion(in degrees).
-			[ProtoMember(5)]
 			public float RegularDirection;
-
 			// Veclocity of motion.
-			[ProtoMember(6)]
 			public float Velocity;
-
 			// Velocity of changing motion direction(degrees/sec).
-			[ProtoMember(7)]
 			public float AngularVelocity;
-
 			// Direction of particle windage(0 - right, 90 - down).
-			[ProtoMember(8)]
 			public float WindDirection;
-
 			// Velocity of particle windage.
-			[ProtoMember(9)]
 			public float WindAmount;
-
 			// Direction of gravity(0 - right, 90 - down)
-			[ProtoMember(10)]
 			public float GravityDirection;
-
 			// Strength of gravity.
-			[ProtoMember(11)]
 			public float GravityAmount;
-
 			// Acceleration of gravity(calculated thru gravityAmount).
-			[ProtoMember(12)]
 			public float GravityAcceleration;
-
 			// Velocity of the particle caused by gravity(calculated thru gravityAcceleration).
-			[ProtoMember(13)]
 			public float GravityVelocity;
-
 			// Strength of magnet's gravity at the moment of particle birth.
-			[ProtoMember(14)]
 			public float MagnetAmountInitial;
-
 			// Strength of magnet's gravity in the current moment.
-			[ProtoMember(15)]
 			public float MagnetAmountCurrent;
-
 			// Scale of particle at the moment of particle birth.
-			[ProtoMember(16)]
 			public Vector2 ScaleInitial;
-
 			// Scale of particle in the current moment.
-			[ProtoMember(17)]
 			public Vector2 ScaleCurrent;
-
 			// Rotation of particle relative to its center.
-			[ProtoMember(18)]
 			public float Angle;
-
 			// Velocity of particle rotation(degrees/sec).
-			[ProtoMember(19)]
 			public float Spin;
-
 			// Age of particle in seconds.
-			[ProtoMember(20)]
 			public float Age;
-
 			// Full life time of particle in seconds.
-			[ProtoMember(21)]
 			public float Lifetime;
-
 			// Color of the particle at the moment of birth.
-			[ProtoMember(22)]
 			public Color4 ColorInitial;
-
 			// Current color of the particle.
-			[ProtoMember(23)]
 			public Color4 ColorCurrent;
-
 			// Velocty of random motion.
-			[ProtoMember(24)]
 			public float RandomMotionSpeed;
-
 			// Splined path of random particle motion.
-			[ProtoMember(25)]
 			public Vector2 RandomSplineVertex0;
-
-			[ProtoMember(26)]
 			public Vector2 RandomSplineVertex1;
-
-			[ProtoMember(27)]
 			public Vector2 RandomSplineVertex2;
-
-			[ProtoMember(28)]
 			public Vector2 RandomSplineVertex3;
-
 			// Current angle of spline control point, relative to center of random motion.
-			[ProtoMember(29)]
 			public float RandomRayDirection;
-
 			// Current offset of spline beginning(0..1).
-			[ProtoMember(30)]
 			public float RandomSplineOffset;
-
 			// Current texture of the particle.
-			[ProtoMember(31)]
 			public float TextureIndex;
-
 			// modifier.Animators.OverallDuration / LifeTime
-			[ProtoMember(32)]
 			public float AgeToFrame;
 		};
 
 		public static bool EnabledGlobally = true;
-
 		/// <summary>
-		/// Сгенерированные частицы будут жить вечно. Генерация происходит один раз
+		/// Particles are generated once and live forever.
 		/// </summary>
 		[ProtoMember(1)]
 		public bool ImmortalParticles;
-
-		/// <summary>
-		/// Форма эмиттера
-		/// </summary>
 		[ProtoMember(2)]
 		public EmitterShape Shape { get; set; }
-
-		/// <summary>
-		/// Тип генерации частиц
-		/// </summary>
 		[ProtoMember(3)]
 		public EmissionType EmissionType { get; set; }
-
-		/// <summary>
-		///  Тип привязки частиц. Привязанные частицы двигаются вместе с объектом, к которому они привязаны
-		/// </summary>
 		[ProtoMember(4)]
 		public ParticlesLinkage ParticlesLinkage;
-
 		/// <summary>
-		/// Имя виджета, к которому привязаны частицы (имеет смысл только при ParticlesLinkage = Other)
+		/// When ParticleLinkage is `Other` this makes sense as name of widget particle emitter is linked to.
 		/// </summary>
 		[ProtoMember(5)]
 		public string LinkageWidgetName;
-
 		/// <summary>
-		/// Количество сгенерированных частиц в секунду
+		/// Number of particles generated per second.
 		/// </summary>
 		[ProtoMember(6)]
 		public float Number { get; set; }
-
 		/// <summary>
-		/// На сколько кадров раньше эмиттер начнет генерацию.
-		/// Используется для того, чтобы в 0 кадре частицы была уже сгенерирована
-		/// (Например значение 3 означает, что эмиттер начнет генерацию на 3 кадра раньше)
+		/// Pre simulate TimeShift seconds.
 		/// </summary>
 		[ProtoMember(7)]
 		public float TimeShift;
-
 		/// <summary>
-		/// Скорость жизненного цикла частицы
+		/// Update: delta *= Speed
 		/// </summary>
 		[ProtoMember(8)]
 		public float Speed { get; set; }
-
 		/// <summary>
 		/// Whether particles are oriented along track.
 		/// </summary>
 		[ProtoMember(9)]
 		public bool AlongPathOrientation { get; set; }
-
 		/// <summary>
-		/// Направление ветра, градусы (0 - вправо, 90 - вниз)
+		/// degrees (0 - right, 90 - down)
 		/// </summary>
 		[ProtoMember(10)]
 		public NumericRange WindDirection { get; set; }
-
-		/// <summary>
-		/// Сила ветра
-		/// </summary>
 		[ProtoMember(11)]
 		public NumericRange WindAmount { get; set; }
-
 		/// <summary>
-		/// Направление гравитации, градусы (0 - вправо, 90 - вниз)
+		/// degrees (0 - right, 90 - down)
 		/// </summary>
 		[ProtoMember(12)]
 		public NumericRange GravityDirection { get; set; }
-
-		/// <summary>
-		/// Сила гравитации
-		/// </summary>
 		[ProtoMember(13)]
 		public NumericRange GravityAmount { get; set; }
-
-		/// <summary>
-		/// Задает силу притяжения магнита
-		/// </summary>
 		[ProtoMember(14)]
 		public NumericRange MagnetAmount { get; set; }
-
 		/// <summary>
-		/// Задает угол поворота сгенерированных частиц
+		/// Rotation angle of generated particles
 		/// </summary>
 		[ProtoMember(15)]
 		public NumericRange Orientation { get; set; }
-
 		/// <summary>
-		/// Угол поворота эмиттера, градусы (поворот по часовой стрелке)
+		/// Rotation angle of emitter (degrees, clockwise)
 		/// </summary>
 		[ProtoMember(16)]
 		public NumericRange Direction { get; set; }
-
 		/// <summary>
-		/// Время жизни частицы в секундах
+		/// Particle lifetime in seconds
 		/// </summary>
 		[ProtoMember(17)]
 		public NumericRange Lifetime { get; set; }
-
 		/// <summary>
-		/// Масштаб сгенерированных частиц
+		/// Scale of generated particles
 		/// </summary>
 		[ProtoMember(18)]
 		public NumericRange Zoom { get; set; }
-
 		/// <summary>
-		/// Задает соотношение ширины и длины частицы (для создания вытянутых частиц)
+		/// Designates width to height ratio.
 		/// </summary>
 		[ProtoMember(19)]
 		public NumericRange AspectRatio { get; set; }
-
-		/// <summary>
-		/// Скорость движения частицы
-		/// </summary>
 		[ProtoMember(20)]
 		public NumericRange Velocity { get; set; }
-
 		/// <summary>
-		/// Скорость вращения частиц
+		/// Angular velocity of particles.
 		/// </summary>
 		[ProtoMember(21)]
 		public NumericRange Spin { get; set; }
-
 		/// <summary>
-		/// Скорость изменения направления движения по кругу (градусы в секунду)
+		/// Angular velocity of emitter (degrees)
 		/// </summary>
 		[ProtoMember(22)]
 		public NumericRange AngularVelocity { get; set; }
-
-		/// <summary>
-		/// Радиус окружности, в котором частицы хаотично двигаются
-		/// </summary>
 		[ProtoMember(23)]
 		public NumericRange RandomMotionRadius { get; set; }
-
-		/// <summary>
-		/// Скорость хаотичного движения частиц
-		/// </summary>
 		[ProtoMember(24)]
 		public NumericRange RandomMotionSpeed { get; set; }
-
-		/// <summary>
-		/// Коэффицент 'плоской формы' для траектории заотичного движения
-		/// (задает распространение хаотичного движения по нескольким осям)
-		/// </summary>
 		[ProtoMember(25)]
 		public float RandomMotionAspectRatio { get; set; }
-
-		/// <summary>
-		/// Скорость вращения частиц при хаотичном движении
-		/// </summary>
 		[ProtoMember(26)]
 		public NumericRange RandomMotionRotation { get; set; }
-
+		// NOTE: last unprotobuffed field was `particles` under index `29`.
+		// Next protobuf index must be `30`
+		private bool firstUpdate = true;
 		/// <summary>
-		/// Флаг, сбрасывающийся в false после первого обновления
+		/// Number of particles to generate on Update. Used to make particle count FPS independent.
 		/// </summary>
-		[ProtoMember(27)]
-		public bool firstUpdate = true;
-
-		/// <summary>
-		/// Количество частиц, которое должен сгенерировать эмиттер в цикле обновления (Update)
-		/// Используется, чтобы количество сгенерированных частиц не зависело от FPS
-		/// </summary>
-		[ProtoMember(28)]
-		public float particlesToSpawn;
-
-		/// <summary>
-		/// Список сгенерированных частиц
-		/// </summary>
-		[ProtoMember(29)]
-		public LinkedList<Particle> particles = new LinkedList<Particle>();
-
-		private static LinkedList<Particle> particlePool = new LinkedList<Particle>();
+		private float particlesToSpawn;
+		public List<Particle> particles = new List<Particle>();
+		private static readonly List<Particle> particlePool = new List<Particle>();
+		private const int MaxModifierCount = 32;
+		private static readonly ParticleModifier[] modifiers = new ParticleModifier [MaxModifierCount];
+		private const int MaxEmitterShapePointCount = 32;
+		private static readonly EmitterShapePoint[] emitterShapePoints = new EmitterShapePoint[MaxEmitterShapePointCount];
+		private readonly List<Vector2> cachedShapePoints = new List<Vector2>();
+		// indexed triangle list (3 values per triangle)
+		private readonly List<int> cachedShapeTriangles = new List<int>();
+		private readonly List<float> cachedShapeTriangleSizes = new List<float>();
+		public static int NumberOfUpdatedParticles = 0;
+		public static bool GloballyEnabled = true;
 
 		public ParticleEmitter()
 		{
@@ -439,25 +296,11 @@ namespace Lime
 			ImmortalParticles = false;
 		}
 
-		/// <summary>
-		/// Для ProtoBuf. Действия, выполняемые после десериализации
-		/// </summary>
-		[ProtoAfterDeserialization]
-		public void AfterDeserialization()
-		{
-			// If particle was deserialized, particle.Modifier would be null. In some cases
-			// particles are rendered before update, but particle.Modifier is required for
-			// the render. AdvanceParticle() sets particle.Modifier.
-			foreach (var particle in particles) {
-				AdvanceParticle(particle, 0);
-			}
-		}
-
 		public override Node DeepCloneFast()
 		{
 			// Do not clone particle instances
 			var savedParticles = particles;
-			particles = new LinkedList<Particle>();
+			particles = new List<Particle>();
 			var clone = base.DeepCloneFast() as ParticleEmitter;
 			particles = savedParticles;
 			return clone;
@@ -469,7 +312,6 @@ namespace Lime
 			case ParticlesLinkage.Parent:
 				return (Parent != null && !ParentWidget.IsRenderedToTexture()) ?
 					ParentWidget : null;
-
 			case ParticlesLinkage.Other: {
 				var widget = ParentWidget;
 				while (widget != null) {
@@ -485,30 +327,37 @@ namespace Lime
 			}
 		}
 
-		public static int NumberOfUpdatedParticles = 0;
-		public static bool GloballyEnabled = true;
-
-		private LinkedListNode<Particle> AllocParticle()
+		private Particle AllocParticle()
 		{
-			LinkedListNode<Particle> result;
+			Particle result;
 			if (particlePool.Count == 0) {
-				result = new LinkedListNode<Particle>(new Particle());
+				result = new Particle();
 			} else {
-				result = particlePool.First;
-				particlePool.RemoveFirst();
+				result = particlePool.Last();
+				particlePool.RemoveAt(particlePool.Count - 1);
 			}
-			particles.AddLast(result);
+			particles.Add(result);
 			return result;
 		}
 
-		private void FreeParticle(LinkedListNode<Particle> particleNode)
+		/// <summary>
+		/// Remove particleCount particles from the end of particles list and put them into particlePool.
+		/// </summary>
+		/// <param name="particleCount"></param>
+		private void FreeLastParticles(int particleCount)
 		{
-			particles.Remove(particleNode);
-			particlePool.AddFirst(particleNode);
+			while (particleCount > 0) {
+				particlePool.Add(particles.Last());
+				particles.RemoveAt(particles.Count - 1);
+				particleCount--;
+			}
 		}
 
 		private void UpdateHelper(float delta)
 		{
+			if (Shape == EmitterShape.Custom) {
+				RefreshCustomShape();
+			}
 			delta *= Speed;
 			if (ImmortalParticles) {
 				if (TimeShift > 0)
@@ -516,35 +365,191 @@ namespace Lime
 				else
 					particlesToSpawn = Number;
 				particlesToSpawn = Math.Min(particlesToSpawn, Number - particles.Count);
-				while (particles.Count > Number) {
-					FreeParticle(particles.Last);
-				}
+				FreeLastParticles(particles.Count - (int) Number);
 			} else {
 				particlesToSpawn += Number * delta;
 			}
 			while (particlesToSpawn >= 1f) {
-				LinkedListNode<Particle> particleNode = AllocParticle();
-				if (GloballyEnabled && Nodes.Count > 0 && InitializeParticle(particleNode.Value)) {
-					AdvanceParticle(particleNode.Value, 0);
+				Particle particle = AllocParticle();
+				if (GloballyEnabled && Nodes.Count > 0 && InitializeParticle(particle)) {
+					AdvanceParticle(particle, 0);
 				} else {
-					FreeParticle(particleNode);
+					FreeLastParticles(1);
 				}
 				particlesToSpawn -= 1;
 			}
 			if (MagnetAmount.Median != 0 || MagnetAmount.Dispersion != 0) {
 				EnumerateMagnets();
 			}
-			LinkedListNode<Particle> p = particles.First;
-			for (; p != null; p = p.Next) {
-				Particle particle = p.Value;
+			int particlesToFreeCount = 0;
+			int i = particles.Count - 1;
+			while (i >= 0) {
+				Particle particle = particles[i];
 				AdvanceParticle(particle, delta);
 				if (!ImmortalParticles && particle.Age > particle.Lifetime) {
-					LinkedListNode<Particle> n = p.Next;
-					FreeParticle(p);
-					p = n;
-					if (p == null)
-						break;
+					particles[i] = particles[particles.Count - particlesToFreeCount - 1];
+					particles[particles.Count - particlesToFreeCount - 1] = particle;
+					particlesToFreeCount++;
 				}
+				i--;
+			}
+			FreeLastParticles(particlesToFreeCount);
+		}
+
+		private bool CheckIntersection(Vector2[] v, int[] workPoints, int count, float sign, int startIndex = 0)
+		{
+			for(int i = 0; i < count; i++) {
+				Vector2 point = cachedShapePoints[workPoints[i + startIndex]];
+				if(
+					Mathf.Sign(Vector2.CrossProduct(v[1] - v[0], point - v[0])) == sign &&
+					Mathf.Sign(Vector2.CrossProduct(v[2] - v[1], point - v[1])) == sign &&
+					Mathf.Sign(Vector2.CrossProduct(v[0] - v[2], point - v[2])) == sign
+				) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		static void ShiftArray(int[] arr, int cnt, int startIndex = 0)
+		{
+			for (int i = 0; i < cnt; i++) {
+				arr[i + startIndex] = arr[i + startIndex + 1];
+			}
+		}
+
+		private bool GetTriangleHelper(int[] workPoints, ref int pointCount,
+			out int i1, out int i2, out int i3, float sign)
+		{
+			i1 = 0;
+			i2 = 0;
+			i3 = 0;
+			if (pointCount < 3) {
+				return false;
+			}
+			// special case #1 (first point)
+			Vector2[] v = new Vector2 [3];
+			v[0] = cachedShapePoints[workPoints[pointCount - 1]];
+			v[1] = cachedShapePoints[workPoints[0]];
+			v[2] = cachedShapePoints[workPoints[1]];
+			if (
+				Mathf.Sign(Vector2.CrossProduct(v[2] - v[1], v[0] - v[1])) == sign &&
+				!CheckIntersection(v, workPoints, pointCount - 3, sign, 2)
+			) {
+				i1 = workPoints[pointCount - 1];
+				i2 = workPoints[0];
+				i3 = workPoints[1];
+				ShiftArray(workPoints, pointCount - 1);
+				pointCount--;
+				return true;
+			}
+			// special case #2 (last point)
+			v[0] = cachedShapePoints[workPoints[pointCount - 2]];
+			v[1] = cachedShapePoints[workPoints[pointCount - 1]];
+			v[2] = cachedShapePoints[workPoints[0]];
+			if (
+				Mathf.Sign(Vector2.CrossProduct(v[2] - v[1], v[0] - v[1])) == sign &&
+				!CheckIntersection(v, workPoints, pointCount - 3, sign, 1)
+			) {
+				i1 = workPoints[pointCount - 2];
+				i2 = workPoints[pointCount - 1];
+				i3 = workPoints[0];
+				pointCount--;
+				return true;
+			}
+			// rest of points
+			for(int i = 1; i < pointCount - 1; i++) {
+				v[0] = cachedShapePoints[workPoints[i - 1]];
+				v[1] = cachedShapePoints[workPoints[i]];
+				v[2] = cachedShapePoints[workPoints[i + 1]];
+				if (
+					Mathf.Sign(Vector2.CrossProduct(v[2] - v[1], v[0] - v[1])) == sign &&
+					!CheckIntersection(v, workPoints, i - 1, sign) &&
+					!CheckIntersection(v, workPoints, pointCount - 2 - i, sign, i + 2)
+				) {
+					i1 = workPoints[i - 1];
+					i2 = workPoints[i];
+					i3 = workPoints[i + 1];
+					ShiftArray(workPoints, pointCount - 1 - i, i);
+					pointCount--;
+					return true;
+				}
+			}
+			return false;
+		}
+
+		private void RefreshCustomShape()
+		{
+			int pointCount = 0;
+			for(int i = 0; i < Nodes.Count && pointCount < MaxEmitterShapePointCount; i++) {
+				var node = Nodes[i];
+				if (node is EmitterShapePoint) {
+					emitterShapePoints[pointCount] = node as EmitterShapePoint;
+					pointCount++;
+				}
+			}
+			if (pointCount < 3) {
+				cachedShapePoints.Clear();
+				cachedShapeTriangles.Clear();
+				cachedShapeTriangleSizes.Clear();
+				return;
+			}
+			// retriangulate area if number or position of points are changed
+			bool changed = false;
+			if (cachedShapePoints.Count == pointCount) {
+				for (int i = 0; i < pointCount; i++) {
+					if (emitterShapePoints[i].TransformedPosition != cachedShapePoints[i]) {
+						changed = true;
+						break;
+					}
+				}
+			} else {
+				changed = true;
+			}
+			if (!changed) {
+				return;
+			}
+			for (int i = 0; i < pointCount; i++) {
+				cachedShapePoints.Add(emitterShapePoints[i].TransformedPosition);
+			}
+			// find if polygon points ar cw or ccw oriented
+			float angle = 0;
+			angle += Vector2.AngleRad(cachedShapePoints[0] - cachedShapePoints[pointCount - 1],
+				cachedShapePoints[1] - cachedShapePoints[0]);
+			angle += Vector2.AngleRad(cachedShapePoints[pointCount - 1] - cachedShapePoints[pointCount - 2],
+				cachedShapePoints[0] - cachedShapePoints[pointCount - 1]);
+			for (int i = 1; i < pointCount - 1; i++) {
+				angle += Vector2.AngleRad(cachedShapePoints[i] - cachedShapePoints[i - 1],
+					cachedShapePoints[i + 1] - cachedShapePoints[i]);
+			}
+			float sign = Mathf.Sign(angle);
+			cachedShapeTriangles.Clear();
+			cachedShapeTriangleSizes.Clear();
+			int[] workPoints = new int[MaxEmitterShapePointCount];
+			for (int i = 0; i < pointCount; i++) {
+				workPoints[i] = i;
+			}
+			int i1;
+			int i2;
+			int i3;
+			float totalSpace = 0;
+			while(GetTriangleHelper(workPoints, ref pointCount, out i1, out i2, out i3, sign)) {
+				cachedShapeTriangles.Add(i1);
+				cachedShapeTriangles.Add(i2);
+				cachedShapeTriangles.Add(i3);
+				// calc area
+				float a = (cachedShapePoints[i2] - cachedShapePoints[i1]).Length;
+				float b = (cachedShapePoints[i3] - cachedShapePoints[i2]).Length;
+				float c = (cachedShapePoints[i1] - cachedShapePoints[i3]).Length;
+				float p = (a + b + c) * 0.5f;
+				float s = Mathf.Sqrt(p * (p - a) * (p - b) * (p - c));
+				cachedShapeTriangleSizes.Add(s);
+				totalSpace += s;
+			}
+			float accum = 0;
+			for(int i = 0; i < cachedShapeTriangleSizes.Count; i++) {
+				accum += cachedShapeTriangleSizes[i] / totalSpace;
+				cachedShapeTriangleSizes[i] = accum;
 			}
 		}
 
@@ -552,16 +557,18 @@ namespace Lime
 		{
 			if (firstUpdate) {
 				firstUpdate = false;
-				const float ModellingStep = 0.004f;
+				const float ModellingStep = 0.04f;
 				delta = Math.Max(delta, TimeShift);
 				while (delta >= ModellingStep) {
 					UpdateHelper(ModellingStep);
 					delta -= ModellingStep;
 				}
-				if (delta > 0)
+				if (delta > 0) {
 					UpdateHelper(delta);
-			} else
+				}
+			} else {
 				UpdateHelper(delta);
+			}
 		}
 
 		private Vector2 GenerateRandomMotionControlPoint(ref float rayDirection)
@@ -569,8 +576,9 @@ namespace Lime
 			rayDirection += RandomMotionRotation.UniformRandomNumber(Rng);
 			Vector2 result = Vector2.CosSinRough(rayDirection * Mathf.DegToRad);
 			NumericRange radius = RandomMotionRadius;
-			if (radius.Dispersion == 0)
+			if (radius.Dispersion == 0) {
 				radius.Dispersion = radius.Median;
+			}
 			result *= Math.Abs(radius.NormalRandomNumber(Rng));
 			if (RandomMotionAspectRatio != 1f && RandomMotionAspectRatio > 0f) {
 				result.X *= RandomMotionAspectRatio;
@@ -593,13 +601,11 @@ namespace Lime
 				emitterScale.Y = -emitterScale.Y;
 			emitterScaleAmount = (float)Math.Sqrt(Math.Abs(crossProduct));
 			float emitterAngle = transform.U.Atan2Deg;
-
 			NumericRange aspectRatioVariationPair = new NumericRange(0, Math.Max(0.0f, AspectRatio.Dispersion));
 			float zoom = Zoom.NormalRandomNumber(Rng);
 			float aspectRatio = Math.Max(0.00001f, AspectRatio.Median *
 				(1 + Math.Abs(aspectRatioVariationPair.NormalRandomNumber(Rng))) /
 				(1 + Math.Abs(aspectRatioVariationPair.NormalRandomNumber(Rng))));
-
 			p.TextureIndex = 0.0f;
 			p.Velocity = Velocity.NormalRandomNumber(Rng) * emitterScaleAmount;
 			p.ScaleInitial = emitterScale * new Vector2(zoom * aspectRatio, zoom / aspectRatio);
@@ -625,64 +631,87 @@ namespace Lime
 			p.RandomSplineVertex3 = GenerateRandomMotionControlPoint(ref p.RandomRayDirection);
 			p.RandomMotionSpeed = RandomMotionSpeed.NormalRandomNumber(Rng);
 			p.RandomSplineOffset = 0;
-
 			Vector2 position;
 			switch (Shape) {
 			case EmitterShape.Point:
 				position = 0.5f * Size;
 				p.RegularDirection = Direction.UniformRandomNumber(Rng) + emitterAngle - 90.0f;
 				break;
-
 			case EmitterShape.Line:
 				position = new Vector2(Rng.RandomFloat() * Size.X, Size.Y * 0.5f);
 				p.RegularDirection = Direction.UniformRandomNumber(Rng) + emitterAngle - 90.0f;
 				break;
-
 			case EmitterShape.Ellipse:
 				float angle = Rng.RandomFloat(0, 360);
 				Vector2 sincos = Vector2.CosSinRough(angle * Mathf.DegToRad);
 				position = 0.5f * ((sincos + Vector2.One) * Size);
 				p.RegularDirection = Direction.UniformRandomNumber(Rng) + emitterAngle - 90 + angle;
 				break;
-
 			case EmitterShape.Area:
 				position.X = Rng.RandomFloat() * Size.X;
 				position.Y = Rng.RandomFloat() * Size.Y;
 				p.RegularDirection = Direction.UniformRandomNumber(Rng) + emitterAngle - 90.0f;
 				break;
-
+			case EmitterShape.Custom:
+				position = GetPointInCustomShape();
+				p.RegularDirection = Direction.UniformRandomNumber(Rng) + emitterAngle - 90.0f;
+				break;
 			default:
 				throw new Lime.Exception("Invalid particle emitter shape");
 			}
-
-			p.RegularPosition = transform.TransformVector(position);
-			p.ModifierIndex = -1;
-			p.Modifier = null;
-			for (int counter = 0; counter < 10; counter++) {
-				int i = Rng.RandomInt(Nodes.Count);
-				p.Modifier = Nodes[i] as ParticleModifier;
-				if (p.Modifier != null) {
-					p.ModifierIndex = i;
-					break;
+			int modifierCount = 0;
+			for (int i = 0; i < Nodes.Count && i < MaxModifierCount; i++) {
+				var node = Nodes[i];
+				if (node is ParticleModifier) {
+					modifiers[modifierCount] = node as ParticleModifier;
+					modifierCount++;
 				}
 			}
-			if (p.ModifierIndex < 0)
+			p.RegularPosition = transform.TransformVector(position);
+			p.Modifier = modifiers[Rng.RandomInt(modifierCount)];
+			if (p.Modifier == null) {
 				return false;
-
+			}
 			int duration = p.Modifier.Animators.GetOverallDuration();
 			p.AgeToFrame = duration / p.Lifetime;
-
-			if (EmissionType == EmissionType.Inner)
+			if (EmissionType == EmissionType.Inner) {
 				p.RegularDirection += 180;
-			else if ((EmissionType & EmissionType.Inner) != 0) {
-				if (Rng.RandomInt(2) == 0)
+			} else if ((EmissionType & EmissionType.Inner) != 0) {
+				if (Rng.RandomInt(2) == 0) {
 					p.RegularDirection += 180;
-			} else if (EmissionType == 0)
+				}
+			} else if (EmissionType == 0) {
 				return false;
-
+			}
 			p.FullDirection = p.RegularDirection;
 			p.FullPosition = p.RegularPosition;
 			return true;
+		}
+
+		private Vector2 GetPointInCustomShape()
+		{
+			if (cachedShapeTriangles.Count == 0) {
+				return Vector2.Zero;
+			}
+			float rand = Rng.RandomFloat();
+			int idx = 0;
+			for (int i = 0; i < cachedShapeTriangleSizes.Count; i++) {
+				if (rand < cachedShapeTriangleSizes[i]) {
+					idx = i;
+					break;
+				}
+			}
+			float k1 = Rng.RandomFloat();
+			float k2 = Rng.RandomFloat();
+			if(k1 + k2 > 1) {
+				k1 = 1 - k1;
+				k2 = 1 - k2;
+			}
+			float k3 = 1 - k1 - k2;
+			int i1 = cachedShapeTriangles[idx * 3 + 0];
+			int i2 = cachedShapeTriangles[idx * 3 + 1];
+			int i3 = cachedShapeTriangles[idx * 3 + 2];
+			return cachedShapePoints[i1] * k1 + cachedShapePoints[i2] * k2 + cachedShapePoints[i3] * k3;
 		}
 
 		private void CalcInitialColorAndTransform(out Color4 color, out Matrix32 transform)
@@ -704,33 +733,30 @@ namespace Lime
 		{
 			NumberOfUpdatedParticles++;
 			p.Age += delta;
-			// If particle was deserialized, p.Modifier would be null.
-			if (p.Modifier == null) {
-				p.Modifier = Nodes[p.ModifierIndex] as ParticleModifier;
-			}
 			var modifier = p.Modifier;
-
 			if (p.AgeToFrame > 0) {
-				p.Modifier.Animators.Apply(AnimationUtils.FramesToMsecs((int)(p.Age * p.AgeToFrame)));
+				modifier.Animators.Apply(AnimationUtils.FramesToMsecs((int)(p.Age * p.AgeToFrame)));
 			}
 			if (ImmortalParticles) {
 				if (p.Lifetime > 0.0f)
 					p.Age = p.Age % p.Lifetime;
 			}
 			// Updating a particle texture index.
-			if (p.TextureIndex == 0.0f)
+			if (p.TextureIndex == 0.0f) {
 				p.TextureIndex = (float)modifier.FirstFrame;
-
+			}
 			if (modifier.FirstFrame == modifier.LastFrame) {
 				p.TextureIndex = (float)modifier.FirstFrame;
 			} else if (modifier.FirstFrame < modifier.LastFrame) {
 				p.TextureIndex += delta * Math.Max(0, modifier.AnimationFps);
 				if (modifier.LoopedAnimation) {
 					float upLimit = modifier.LastFrame + 1.0f;
-					while (p.TextureIndex > upLimit)
+					while (p.TextureIndex > upLimit) {
 						p.TextureIndex -= upLimit - modifier.FirstFrame;
-				} else
+					}
+				} else {
 					p.TextureIndex = Math.Min(p.TextureIndex, modifier.LastFrame);
+				}
 				p.TextureIndex = Math.Max(p.TextureIndex, modifier.FirstFrame);
 			} else {
 				p.TextureIndex -= delta * Math.Max(0, modifier.AnimationFps);
@@ -738,11 +764,11 @@ namespace Lime
 					float downLimit = modifier.LastFrame - 1f;
 					while (p.TextureIndex < downLimit)
 						p.TextureIndex += modifier.FirstFrame - downLimit;
-				} else
+				} else {
 					p.TextureIndex = Math.Max(p.TextureIndex, modifier.LastFrame);
+				}
 				p.TextureIndex = Math.Min(p.TextureIndex, modifier.FirstFrame);
 			}
-
 			// Updating other properties of a particle.
 			float windVelocity = p.WindAmount * modifier.WindAmount;
 			if (windVelocity != 0) {
@@ -755,25 +781,19 @@ namespace Lime
 			}
 			var direction = Vector2.CosSinRough(p.RegularDirection * Mathf.DegToRad);
 			float velocity = p.Velocity * modifier.Velocity;
-
 			p.RegularDirection += p.AngularVelocity * modifier.AngularVelocity * delta;
 			p.GravityAcceleration += p.GravityAmount * modifier.GravityAmount * delta;
 			p.GravityVelocity += p.GravityAcceleration * delta;
-
 			p.RegularPosition += velocity * delta * direction;
 			p.Angle += p.Spin * modifier.Spin * delta;
-
 			p.ScaleCurrent = p.ScaleInitial * modifier.Scale;
 			if (modifier.AspectRatio != 1f) {
 				p.ScaleCurrent.X *= modifier.AspectRatio;
 				p.ScaleCurrent.Y /= Math.Max(0.0001f, modifier.AspectRatio);
 			}
 			p.ColorCurrent = p.ColorInitial * modifier.Color;
-
 			p.MagnetAmountCurrent = p.MagnetAmountInitial * modifier.MagnetAmount;
-
 			ApplyMagnetsToParticle(p, delta);
-
 			Vector2 positionOnSpline = Vector2.Zero;
 			if (p.RandomMotionSpeed > 0.0f) {
 				p.RandomSplineOffset += delta * p.RandomMotionSpeed;
@@ -788,10 +808,8 @@ namespace Lime
 					p.RandomSplineVertex0, p.RandomSplineVertex1,
 					p.RandomSplineVertex2, p.RandomSplineVertex3);
 			}
-
 			Vector2 previousPosition = p.FullPosition;
 			p.FullPosition = p.RegularPosition + positionOnSpline;
-
 			if (AlongPathOrientation) {
 				Vector2 deltaPos = p.FullPosition - previousPosition;
 				if (deltaPos.SqrLength > 0.00001f)
@@ -820,7 +838,7 @@ namespace Lime
 				T = p.FullPosition
 			};
 			Renderer.Transform1 = globalMatrix * matrix;
-			Renderer.DrawSprite(texture, p.ColorCurrent, -Vector2.Half, Vector2.One, Vector2.Zero, Vector2.One);
+			Renderer.DrawSprite(texture, p.ColorCurrent * color, -Vector2.Half, Vector2.One, Vector2.Zero, Vector2.One);
 		}
 
 		public override void Render()
@@ -834,18 +852,14 @@ namespace Lime
 			}
 			Renderer.Blending = GlobalBlending;
 			Renderer.Shader = GlobalShader;
-			LinkedListNode<Particle> node = particles.First;
-			for (; node != null; node = node.Next) {
-				Particle particle = node.Value;
+			foreach (var particle in particles) {
 				RenderParticle(particle, matrix, color);
 			}
 		}
 
 		public void DeleteAllParticles()
 		{
-			while (particles.Count > 0) {
-				FreeParticle(particles.Last);
-			}
+			FreeLastParticles(particles.Count);
 		}
 	}
 }

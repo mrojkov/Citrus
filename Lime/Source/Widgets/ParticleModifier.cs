@@ -104,7 +104,7 @@ namespace Lime
 					if (!ChangeTextureFrameIndex(ref path, i))
 						break;
 					if (PackedAssetsBundle.Instance.FileExists(path + ".atlasPart") ||
-						PackedAssetsBundle.Instance.FileExists(path)) 
+						PackedAssetsBundle.Instance.FileExists(path))
 					{
 						var t = new SerializableTexture(path);
 						textures.Add(t);
