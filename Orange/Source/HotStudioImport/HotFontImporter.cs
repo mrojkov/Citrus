@@ -9,16 +9,6 @@ namespace Orange
 		HotLexer lexer;
 		Size textureSize;
 
-		public HotFontImporter(string path)
-		{
-			using(Stream stream = new FileStream(path, FileMode.Open)) {
-				using(TextReader reader = new StreamReader(stream)) {
-					string text = reader.ReadToEnd();
-					lexer = new HotLexer(path, text);
-				}
-			}
-		}
-
 		void ParseFontCharProperty(ref FontChar fontChar, string name)
 		{
 			switch(name) {
@@ -126,18 +116,54 @@ namespace Orange
 			}
 		}
 
-		public Font ParseFont(Size textureSize)
+		public Font ParseFont(string srcPath, string dstPath)
 		{
-			this.textureSize = textureSize;
-			string type = lexer.ParseQuotedString();
+			this.textureSize = GetTextureSize(srcPath);
+			this.lexer = CreateLexer(srcPath);
+			var type = lexer.ParseQuotedString();
 			if (type != "Hot::Font")
 				throw new Exception("Unknown type of object '{0}'", type);
 			var font = new Font();
+			AddFontTextures(font, srcPath, dstPath);
 			lexer.ParseToken('{');
 			while (lexer.PeekChar() != '}')
 				ParseFontProperty(font, lexer.ParseWord());
 			lexer.ParseToken('}');
 			return font;
+		}
+
+		private static void AddFontTextures(Font font, string srcPath, string dstPath)
+		{
+			for (var i = 0; ; i++) {
+				var texturePath = Path.ChangeExtension(dstPath, null);
+				var index = (i == 0) ? "" : i.ToString("00");
+				var texturePng = Path.ChangeExtension(srcPath, null) + index + ".png";
+				if (!File.Exists(texturePng)) {
+					break;
+				}
+				font.Textures.Add(new SerializableTexture(texturePath + index));
+			}
+		}
+
+		private static HotLexer CreateLexer(string path)
+		{
+			using (Stream stream = new FileStream(path, FileMode.Open)) {
+				using (TextReader reader = new StreamReader(stream)) {
+					var text = reader.ReadToEnd();
+					return new HotLexer(path, text);
+				}
+			}
+		}
+
+		private static Size GetTextureSize(string srcPath)
+		{
+			var fontPngFile = Path.ChangeExtension(srcPath, ".png");
+			Size size;
+			bool hasAlpha;
+			if (!TextureConverterUtils.GetPngFileInfo(fontPngFile, out size.Width, out size.Height, out hasAlpha)) {
+				throw new Lime.Exception("Font doesn't have an appropriate png texture file");
+			}
+			return size;
 		}
 	}
 }

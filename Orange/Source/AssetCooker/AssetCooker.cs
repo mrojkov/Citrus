@@ -268,23 +268,8 @@ namespace Orange
 		private static void SyncFonts()
 		{
 			SyncUpdated(".fnt", ".fnt", (srcPath, dstPath) => {
-				var fontPngFile = Path.ChangeExtension(srcPath, ".png");
-				Size size;
-				bool hasAlpha;
-				if (!TextureConverterUtils.GetPngFileInfo(fontPngFile, out size.Width, out size.Height, out hasAlpha)) {
-					throw new Lime.Exception("Font doesn't have an appropriate png texture file");
-				}
-				var importer = new HotFontImporter(srcPath);
-				var font = importer.ParseFont(size);
-				for (var i = 0; ; i++) {
-					var texturePath = Path.ChangeExtension(dstPath, null);
-					var index = (i == 0) ? "" : i.ToString("00");
-					var texturePng = Path.ChangeExtension(srcPath, null) + index + ".png";
-					if (!File.Exists(texturePng)) {
-						break;
-					}
-					font.Textures.Add(new SerializableTexture(texturePath + index));
-				}
+				var importer = new HotFontImporter();
+				var font = importer.ParseFont(srcPath, dstPath);
 				Serialization.WriteObjectToBundle(assetsBundle, dstPath, font);
 				return true;
 			});
@@ -434,9 +419,9 @@ namespace Orange
 				var a = Math.Max(x.Pixbuf.Width, x.Pixbuf.Height);
 				var b = Math.Max(y.Pixbuf.Width, y.Pixbuf.Height);
 				return b - a;
-			});	
+			});
 			// PVRTC2/4 textures must be square
-			var squareAtlas = (platform == TargetPlatform.iOS) && items.Any(i => 
+			var squareAtlas = (platform == TargetPlatform.iOS) && items.Any(i =>
 				i.PVRFormat == PVRFormat.PVRTC4 || i.PVRFormat == PVRFormat.PVRTC2);
 			for (var atlasId = 0; items.Count > 0; atlasId++) {
 				if (atlasId >= MaxAtlasChainLength) {
@@ -548,7 +533,7 @@ namespace Orange
 			}
 			Console.WriteLine("+ " + atlasPath);
 			var firstItem = items.First(i => i.Allocated);
-			var rules = new CookingRules() {
+			var rules = new CookingRules {
 				MipMaps = firstItem.MipMapped,
 				PVRFormat = firstItem.PVRFormat,
 				DDSFormat = firstItem.DDSFormat
