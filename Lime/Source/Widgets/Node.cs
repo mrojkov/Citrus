@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System;
-using System.Reflection;
-using System.Linq;
-using ProtoBuf;
-using System.ComponentModel;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+
+using ProtoBuf;
 
 namespace Lime
 {
@@ -624,19 +625,11 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Enumerates all nodes (except this one) of hierarchy inside this node.
+		/// Gets a DFS-enumeration of all descendant nodes.
 		/// </summary>
 		public IEnumerable<Node> Descendants
 		{
-			get
-			{
-				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
-					yield return node;
-					foreach (var i in node.Descendants) {
-						yield return i;
-					}
-				}
-			}
+			get { return new DescendantsEnumerable(this); }
 		}
 
 		/// <summary>
@@ -780,5 +773,85 @@ namespace Lime
 		}
 				
 		protected internal virtual void PerformHitTest() { }
+
+		private class DescendantsEnumerable : IEnumerable<Node>
+		{
+			private readonly Node root;
+
+			public DescendantsEnumerable(Node root)
+			{
+				this.root = root;
+			}
+
+			public IEnumerator<Node> GetEnumerator()
+			{
+				return new Enumerator(root);
+			}
+
+			IEnumerator IEnumerable.GetEnumerator()
+			{
+				return GetEnumerator();
+			}
+
+			private class Enumerator : IEnumerator<Node>
+			{
+				private readonly Node root;
+				private Node current;
+
+				public Enumerator(Node root)
+				{
+					this.root = root;
+				}
+
+				public Node Current
+				{
+					get
+					{
+						if (current == null) {
+							throw new InvalidOperationException();
+						}
+						return current;
+					}
+				}
+
+				object IEnumerator.Current
+				{
+					get { return Current; }
+				}
+
+				public void Dispose()
+				{
+					current = null;
+				}
+
+				public bool MoveNext()
+				{
+					if (current == null) {
+						current = root;
+					}
+					var node = current.Nodes.FirstOrNull();
+					if (node != null) {
+						current = node;
+						return true;
+					}
+					if (current == root) {
+						return false;
+					}
+					while (current.NextSibling == null) {
+						current = current.Parent;
+						if (current == root) {
+							return false;
+						}
+					}
+					current = current.NextSibling;
+					return true;
+				}
+
+				public void Reset()
+				{
+					current = null;
+				}
+			}
+		}
 	}
 }
