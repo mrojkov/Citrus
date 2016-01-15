@@ -95,6 +95,8 @@ namespace Lime
 		private ShaderId shader;
 		private Vector2 pivot;
 		private Vector2 scale;
+		private Vector2 minSize;
+		private Vector2 maxSize = Vector2.PositiveInfinity;
 		private bool visible;
 
 		#region Properties
@@ -104,10 +106,70 @@ namespace Lime
 		public ILayout Layout = AnchorLayout.Instance;
 
 		/// <summary>
-		/// Keeps layout-specific data, used by parent widget's Layout.
-		/// E.g: TableLayoutCell object, if parent widget has TableLayout.
+		/// Gets the layout-specific data. 
 		/// </summary>
-		public object LayoutCell;
+		public LayoutCell LayoutCell;
+
+		/// <summary>
+		/// The minimum widget size. For basic widgets could be provided by user or calculated automatically (e.g. for SimpleText).
+		/// If the widget has non-fixed layout, the layout is responsible to manage MinSize property.
+		/// </summary>
+		public virtual Vector2 MinSize
+		{
+			get { return minSize; }
+			set
+			{
+				if (minSize != value) {
+					minSize = value;
+					InvalidateParentConstraintsAndArrangement();
+				}
+			}
+		}
+
+		public virtual float MinWidth
+		{
+			get { return MinSize.X; }
+			set { MinSize = new Vector2(value, MinSize.Y); }
+		}
+
+		public virtual float MinHeight
+		{
+			get { return MinSize.Y; }
+			set { MinSize = new Vector2(MinSize.X, value); }
+		}
+
+		/// <summary>
+		/// The maximum widget size. For basic widgets could be provided by user or calculated automatically (e.g. for SimpleText).
+		/// If the widget has non-fixed layout, the layout is responsible to manage MaxSize property.
+		/// </summary>
+		public virtual Vector2 MaxSize
+		{
+			get { return maxSize; }
+			set
+			{
+				if (maxSize != value) {
+					maxSize = value;
+					InvalidateParentConstraintsAndArrangement();
+				}
+			}
+		}
+
+		public virtual float MaxWidth
+		{
+			get { return MaxSize.X; }
+			set { MaxSize = new Vector2(value, MaxSize.Y); }
+		}
+
+		public virtual float MaxHeight
+		{
+			get { return MaxSize.Y; }
+			set { MaxSize = new Vector2(MaxSize.X, value); }
+		}
+
+		public virtual Vector2 MinMaxSize
+		{
+			set { MinSize = MaxSize = value; }
+		}
 
 		/// <summary>
 		/// TODO: Translate
@@ -215,6 +277,32 @@ namespace Lime
 					PropagateDirtyFlags(DirtyFlags.Transform);
 				}
 			}
+		}
+
+		/// <summary>
+		/// Gets or sets the widget padding. Padding defines the white space between the widget content and the widget border.
+		/// The widget should respect the padding during its rendering.
+		/// </summary>
+		public Margin Padding;
+
+		public Vector2 ContentPosition
+		{
+			get { return new Vector2(Padding.Left, Padding.Top); }
+		}
+
+		public Vector2 ContentSize
+		{
+			get { return new Vector2(Size.X - Padding.Left - Padding.Right, Size.Y - Padding.Top - Padding.Bottom); }
+		}
+
+		public float ContentWidth
+		{
+			get { return Size.X - Padding.Left - Padding.Right; }
+		}
+
+		public float ContentHeight
+		{
+			get { return Size.Y - Padding.Top - Padding.Bottom; }
 		}
 
 		/// <summary>
@@ -377,6 +465,7 @@ namespace Lime
 				if (visible != value) {
 					visible = value;
 					PropagateDirtyFlags(DirtyFlags.Visible);
+					InvalidateParentConstraintsAndArrangement();
 				}
 			}
 		}
@@ -525,6 +614,13 @@ namespace Lime
 			direction = new Vector2(1, 0);
 		}
 
+		internal void InvalidateParentConstraintsAndArrangement()
+		{
+			if (ParentWidget != null) {
+				ParentWidget.Layout.InvalidateConstraintsAndArrangement(ParentWidget);
+			}
+		}
+
 		WidgetInput input;
 		public WidgetInput Input
 		{
@@ -547,7 +643,6 @@ namespace Lime
 		{
 			get { return Find<Widget>(path); }
 		}
-
 
 		/// <summary>
 		/// Searches for widget with provided path or id in this widget's descendants.
@@ -572,6 +667,15 @@ namespace Lime
 			clone.tasks = null;
 			clone.lateTasks = null;
 			return clone;
+		}
+
+		protected override void OnParentChanged(Node oldParent)
+		{
+			if (oldParent != null && oldParent.AsWidget != null) {
+				var w = oldParent.AsWidget;
+				w.Layout.InvalidateConstraintsAndArrangement(w);
+			}
+			InvalidateParentConstraintsAndArrangement();
 		}
 
 		/// <summary>
@@ -723,7 +827,6 @@ namespace Lime
 		{
 			Animator<Vector2> posAnimator, sizeAnimator;
 			if (Animators.TryFind("Position", out posAnimator)) {
-				var geometryProperties = new string[] { "Position", "Size", "Pivot", "Rotation", "Scale" };
 				var savedPivot = pivot;
 				var savedRotation = rotation;
 				var savedScale = scale;

@@ -8,7 +8,7 @@ namespace Lime
 	/// Виджет, выводящий текст с упрощенным форматированием
 	/// </summary>
 	[ProtoContract]
-	public class SimpleText : Widget, IText, IKeyboardInputProcessor
+	public class SimpleText : Widget, IText, IKeyboardInputProcessor, IPresenter
 	{
 		private SpriteList spriteList;
 		private SerializableFont font;
@@ -19,6 +19,7 @@ namespace Lime
 		private HAlignment hAlignment;
 		private VAlignment vAlignment;
 		private Color4 textColor;
+		private bool minSizeValid;
 		private string displayText;
 
 		private TextProcessorDelegate textProcessor;
@@ -149,6 +150,40 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// Gets or sets a value indicating whether this <see cref="Lime.RichText"/> calculates MinSize and MaxSize automatically.
+		/// </summary>
+		public bool AutoSizeConstraints { get; set; }
+
+		public override Vector2 MinSize
+		{
+			get
+			{
+				if (AutoSizeConstraints && !minSizeValid) {
+					base.MinSize = CalcContentSize();
+					minSizeValid = true;
+				}
+				return base.MinSize;
+			}
+			set
+			{
+				if (!AutoSizeConstraints) {
+					base.MinSize = value;
+				}
+			}
+		}
+
+		public override Vector2 MaxSize
+		{
+			get { return AutoSizeConstraints ? MinSize : base.MaxSize; }
+			set
+			{
+				if (!AutoSizeConstraints) {
+					base.MaxSize = value;
+				}
+			}
+		}
+
+		/// <summary>
 		/// Удалять лишние пробелы между словами
 		/// </summary>
 		public bool TrimWhitespaces { get; set; }
@@ -164,13 +199,8 @@ namespace Lime
 
 		public SimpleText()
 		{
-			TrimWhitespaces = true;
-			// CachedRendering = true;
-			Text = "";
-			FontHeight = 15;
-			Font = new SerializableFont();
-			TextColor = Color4.White;
-			Localizable = true;
+			Presenter = this;
+			Theme.Current.Apply(this);
 		}
 
 		/// <summary>
@@ -187,7 +217,7 @@ namespace Lime
 			Invalidate();
 		}
 
-		public override void Render()
+		void IPresenter.Render()
 		{
 			if (caret.Valid != CaretPosition.ValidState.All)
 				spriteList = null;
@@ -196,6 +226,11 @@ namespace Lime
 			Renderer.Blending = GlobalBlending;
 			Renderer.Shader = GlobalShader;
 			spriteList.Render(GlobalColor * textColor);
+		}
+
+		IPresenter IPresenter.Clone(Node newNode)
+		{
+			return (IPresenter)newNode;
 		}
 
 		private void PrepareSpriteListAndExtent()
@@ -246,7 +281,7 @@ namespace Lime
 			var spacingKoeff = Spacing / FontHeight;
 			while (maxH - minH > 1) {
 				Rectangle rect = RenderHelper(null);
-				var fit = (rect.Width <= Width && rect.Height <= Height);
+				var fit = (rect.Width <= ContentWidth && rect.Height <= ContentHeight);
 				if (fit) {
 					minH = FontHeight;
 					bestHeight = Mathf.Max(bestHeight, FontHeight);
@@ -274,7 +309,7 @@ namespace Lime
 				if (TrimWhitespaces) {
 					TrimLinesWhitespaces(lines);
 				}
-				var pos = Vector2.Down * CalcVerticalTextPosition(lines);
+				var pos = new Vector2(Padding.Left, Padding.Top + CalcVerticalTextPosition(lines));
 				caret.RenderingLineNumber = 0;
 				caret.RenderingTextPos = 0;
 				caret.NearestCharPos = Vector2.Zero;
@@ -330,9 +365,9 @@ namespace Lime
 		{
 			var totalHeight = CalcTotalHeight(lines.Count);
 			if (VAlignment == VAlignment.Bottom) {
-				return Size.Y - totalHeight;
+				return ContentSize.Y - totalHeight;
 			} else if (VAlignment == VAlignment.Center) {
-				return ((Size.Y - totalHeight) * 0.5f).Round();
+				return ((ContentSize.Y - totalHeight) * 0.5f).Round();
 			}
 			return 0;
 		}
@@ -347,10 +382,10 @@ namespace Lime
 			float lineWidth = MeasureTextLine(line).X;
 			switch (HAlignment) {
 				case HAlignment.Right:
-					pos.X = Size.X - lineWidth;
+					pos.X = ContentSize.X - lineWidth;
 					break;
 				case HAlignment.Center:
-					pos.X = ((Size.X - lineWidth) * 0.5f).Round();
+					pos.X = ((ContentSize.X - lineWidth) * 0.5f).Round();
 					break;
 			}
 			if (spriteList != null) {
@@ -373,7 +408,7 @@ namespace Lime
 			for (var i = 0; i < strings.Count; i++) {
 				if (OverflowMode == TextOverflowMode.Ellipsis) {
 					// Clipping the last line of the text.
-					if (CalcTotalHeight(i + 2) > Height) {
+					if (CalcTotalHeight(i + 2) > ContentHeight) {
 						strings[i] = ClipLineWithEllipsis(strings[i]);
 						while (strings.Count > i + 1) {
 							strings.RemoveAt(strings.Count - 1);
@@ -382,7 +417,7 @@ namespace Lime
 					}
 				}
 				// Trying to split long lines. If a line can't be split it gets clipped.
-				while (MeasureTextLine(strings[i]).X > Math.Abs(Width)) {
+				while (MeasureTextLine(strings[i]).X > Math.Abs(ContentWidth)) {
 					if (!TextLineSplitter.CarryLastWordToNextLine(strings, i, WordSplitAllowed, IsTextLinePartFitToWidth)) {
 						if (OverflowMode == TextOverflowMode.Ellipsis) {
 							strings[i] = ClipLineWithEllipsis(strings[i]);
@@ -396,7 +431,7 @@ namespace Lime
 
 		private bool IsTextLinePartFitToWidth(string line, int start, int count)
 		{
-			return Renderer.MeasureTextLine(Font.Instance, line, FontHeight, start, count).X <= Width;
+			return Renderer.MeasureTextLine(Font.Instance, line, FontHeight, start, count).X <= ContentWidth;
 		}
 
 		public Vector2 MeasureTextLine(string line)
@@ -407,10 +442,10 @@ namespace Lime
 		private string ClipLineWithEllipsis(string line)
 		{
 			var lineWidth = MeasureTextLine(line).X;
-			if (lineWidth <= Width) {
+			if (lineWidth <= ContentWidth) {
 				return line;
 			}
-			while (line.Length > 0 && lineWidth > Width) {
+			while (line.Length > 0 && lineWidth > ContentWidth) {
 				lineWidth = MeasureTextLine(line + "...").X;
 				line = line.Substring(0, line.Length - 1);
 			}
@@ -423,6 +458,7 @@ namespace Lime
 			displayText = null;
 			caret.Valid = CaretPosition.ValidState.TextPos;
 			spriteList = null;
+			minSizeValid = false;
 		}
 	}
 }

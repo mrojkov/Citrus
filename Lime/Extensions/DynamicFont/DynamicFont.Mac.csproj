@@ -87,7 +87,7 @@
     <Compile Include="SharpFont\FT.Internal.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\PokerClient\Citrus\Lime\Lime.Mac.csproj">
+    <ProjectReference Include="..\..\Lime.Mac.csproj">
       <Project>{DC16EEBF-404D-4610-B87A-15B57464D707}</Project>
       <Name>Lime.Mac</Name>
     </ProjectReference>

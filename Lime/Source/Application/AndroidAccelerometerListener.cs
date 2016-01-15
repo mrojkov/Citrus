@@ -37,7 +37,7 @@ namespace Lime
 			if (listener == null) {
 				listener = new AccelerometerListener() { input = input };
 				var activity = Lime.ActivityDelegate.Instance.Activity;
-				var sensorManager = (SensorManager)activity.GetSystemService(Context.SensorService);
+				var sensorManager = (SensorManager)activity.GetSystemService(Android.Content.Context.SensorService);
 				sensorManager.RegisterListener(listener, sensorManager.GetDefaultSensor(SensorType.Accelerometer), SensorDelay.Ui);
 			}
 		}
@@ -46,7 +46,7 @@ namespace Lime
 		{
 			if (listener != null) {
 				var activity = Lime.ActivityDelegate.Instance.Activity;
-				var sensorManager = (SensorManager)activity.GetSystemService(Context.SensorService);
+				var sensorManager = (SensorManager)activity.GetSystemService(Android.Content.Context.SensorService);
 				sensorManager.UnregisterListener(listener);
 				listener = null;
 			}

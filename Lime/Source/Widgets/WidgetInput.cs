@@ -21,7 +21,7 @@ namespace Lime
 
 		private Input WindowInput
 		{
-			get { return WidgetContext.Current.Window.Input; }
+			get { return Window.Current.Input; }
 		}
 
 		private Widget widget;

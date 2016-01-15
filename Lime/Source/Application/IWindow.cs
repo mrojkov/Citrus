@@ -158,8 +158,10 @@ namespace Lime
 		Platform.NSGameView NSGameView { get; }
 #endif
 		/// <summary>
-		/// Sets the context, which is used for each window callback.
+		/// Gets the scale factor which translates virtual units to the physical pixels.
 		/// </summary>
+		float PixelScale { get; }
+
 		IContext Context { get; set; }
-    }
+	}
 }

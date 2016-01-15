@@ -54,6 +54,18 @@ namespace Lime
 		public int Width;
 		public int Height;
 
+		public IntVector2 Origin
+		{
+			get { return new IntVector2(X, Y); }
+			set { X = value.X; Y = value.Y; }
+		}
+
+		public IntVector2 Size
+		{
+			get { return new IntVector2(Width, Height); }
+			set { Width = value.X; Height = value.Y; }
+		}
+
 		public static explicit operator IntRectangle(WindowRect r)
 		{
 			return new IntRectangle(r.X, r.Y, r.X + r.Width, r.Y + r.Height);
@@ -175,19 +187,6 @@ namespace Lime
 			}
 		}
 
-		public static void SetDefaultViewport()
-		{
-			if (Application.MainWindow != null) {
-				var windowSize = Application.MainWindow.ClientSize;
-				Viewport = new WindowRect {
-					X = 0,
-					Y = 0,
-					Width = windowSize.Width,
-					Height = windowSize.Height
-				};
-			}
-		}
-
 		public static void SetOrthogonalProjection(Vector2 leftTop, Vector2 rightBottom)
 		{
 			SetOrthogonalProjection(leftTop.X, leftTop.Y, rightBottom.X, rightBottom.Y);
@@ -224,7 +223,6 @@ namespace Lime
 			Transform1 = Matrix32.Identity;
 			Transform2 = Matrix32.Identity;
 			CurrentRenderList = MainRenderList;
-			SetDefaultViewport();
 			RenderCycle++;
 		}
 
@@ -508,8 +506,8 @@ namespace Lime
 		}
 
 		private static Sprite[] batchedSprites = new Sprite[20];
+		private static Sprite sentinelSprite = new Sprite();
 
-		// Last sprite should be a sentinel.
 		public static void DrawSpriteList(List<Sprite> spriteList, Color4 color)
 		{
 			if (Blending == Blending.Glow) {
@@ -524,7 +522,18 @@ namespace Lime
 			}
 			var matrix = GetEffectiveTransform();
 			int batchLength = 0;
-			foreach (var s in spriteList) {
+			var clipRect = scissorTestEnabled ? CalcLocalScissorAABB(matrix) : new Rectangle();
+			for (int i = 0; i <= spriteList.Count; i++) {
+				var s = (i == spriteList.Count) ? sentinelSprite : spriteList[i];
+				if (scissorTestEnabled && s != sentinelSprite) {
+					if (s.Position.X + s.Size.X < clipRect.A.X ||
+						s.Position.X > clipRect.B.X || 
+						s.Position.Y + s.Size.Y < clipRect.A.Y ||
+						s.Position.Y > clipRect.B.Y)
+					{
+						continue;
+					}
+				}
 				if (batchLength == 0 || batchLength < batchedSprites.Length && s.Texture == batchedSprites[0].Texture) {
 					batchedSprites[batchLength++] = s;
 					continue;
@@ -571,17 +580,17 @@ namespace Lime
 					float x1uy = x1 * matrix.U.Y;
 					float y1vx = y1 * matrix.V.X;
 					float y1vy = y1 * matrix.V.Y;
-					v[bv + 0] = new Vector3() { X = x0ux + y0vx + matrix.T.X, Y = x0uy + y0vy + matrix.T.Y };
-					v[bv + 1] = new Vector3() { X = x1ux + y0vx + matrix.T.X, Y = x1uy + y0vy + matrix.T.Y };
-					v[bv + 2] = new Vector3() { X = x0ux + y1vx + matrix.T.X, Y = x0uy + y1vy + matrix.T.Y };
-					v[bv + 3] = new Vector3() { X = x1ux + y1vx + matrix.T.X, Y = x1uy + y1vy + matrix.T.Y };
+					v[bv + 0] = new Vector3 { X = x0ux + y0vx + matrix.T.X, Y = x0uy + y0vy + matrix.T.Y };
+					v[bv + 1] = new Vector3 { X = x1ux + y0vx + matrix.T.X, Y = x1uy + y0vy + matrix.T.Y };
+					v[bv + 2] = new Vector3 { X = x0ux + y1vx + matrix.T.X, Y = x0uy + y1vy + matrix.T.Y };
+					v[bv + 3] = new Vector3 { X = x1ux + y1vx + matrix.T.X, Y = x1uy + y1vy + matrix.T.Y };
 					c[bv + 0] = effectiveColor;
 					c[bv + 1] = effectiveColor;
 					c[bv + 2] = effectiveColor;
 					c[bv + 3] = effectiveColor;
 					uv[bv + 0] = uv0;
-					uv[bv + 1] = new Vector2() { X = uv1.X, Y = uv0.Y };
-					uv[bv + 2] = new Vector2() { X = uv0.X, Y = uv1.Y };
+					uv[bv + 1] = new Vector2 { X = uv1.X, Y = uv0.Y };
+					uv[bv + 2] = new Vector2 { X = uv0.X, Y = uv1.Y };
 					uv[bv + 3] = uv1;
 					bv += 4;
 				}
@@ -590,6 +599,100 @@ namespace Lime
 				batchLength = 1;
 				batchedSprites[0] = s;
 			}
+		}
+
+		private static Rectangle CalcLocalScissorAABB(Matrix32 transform)
+		{
+			// Get the scissor rectangle in 0,0 - 1,1 coordinate space
+			var vp = new Rectangle {
+				A = new Vector2(viewport.X, viewport.Y),
+				B = new Vector2(viewport.X + viewport.Width, viewport.Y + viewport.Height)
+			};
+			var r = (Rectangle)(IntRectangle)scissorRectangle;
+			var scissorRect = new Rectangle {
+				A = (r.A - vp.A) / vp.Size,
+				B = (r.B - vp.A) / vp.Size
+			};
+			// Transform it to the normalized OpenGL space
+			scissorRect.A = scissorRect.A * 2 - Vector2.One;
+			scissorRect.B = scissorRect.B * 2 - Vector2.One;
+			// Get the unprojected coordinates
+			var invProjection = Projection.CalcInverted();
+			var v0 = invProjection.ProjectVector(scissorRect.A);
+			var v1 = invProjection.ProjectVector(new Vector2(scissorRect.B.X, scissorRect.A.Y));
+			var v2 = invProjection.ProjectVector(scissorRect.B);
+			var v3 = invProjection.ProjectVector(new Vector2(scissorRect.A.X, scissorRect.B.Y));
+			// Get coordinates in the widget space
+			var invTransform = transform.CalcInversed();
+			v0 = invTransform.TransformVector(v0);
+			v1 = invTransform.TransformVector(v1);
+			v2 = invTransform.TransformVector(v2);
+			v3 = invTransform.TransformVector(v3);
+			var aabb = new Rectangle { A = v0, B = v0 }.
+				IncludingPoint(v1).
+				IncludingPoint(v2).
+				IncludingPoint(v3);
+			return aabb;
+		}
+
+		public static void DrawLine(float x0, float y0, float x1, float y1, Color4 color, float thickness)
+		{
+			DrawLine(new Vector2(x0, y0), new Vector2(x1, y1), color, thickness);
+		}
+		
+		static Vertex[] v = new Vertex[4];
+
+		public static void DrawLine(Vector2 a, Vector2 b, Color4 color, float thickness)
+		{
+			var d = (b - a).Normalized * thickness * 0.5f;
+			Vector2 n = GetVectorNormal(d);
+			v[0] = new Vertex { Pos = a - d - n, Color = color };
+			v[1] = new Vertex { Pos = b + d - n, Color = color };
+			v[2] = new Vertex { Pos = b + d + n, Color = color };
+			v[3] = new Vertex { Pos = a - d + n, Color = color };
+			Renderer.DrawTriangleFan(null, null, v, v.Length);
+		}
+
+		static Vector2 GetVectorNormal(Vector2 v)
+		{
+			return new Vector2(-v.Y, v.X);
+		}
+
+		public static void DrawRect(Vector2 a, Vector2 b, Color4 color)
+		{
+			v[0] = new Vertex { Pos = a, Color = color };
+			v[1] = new Vertex { Pos = new Vector2(b.X, a.Y), Color = color };
+			v[2] = new Vertex { Pos = b, Color = color };
+			v[3] = new Vertex { Pos = new Vector2(a.X, b.Y), Color = color };
+			Renderer.DrawTriangleFan(null, null, v, v.Length);
+		}
+
+		public static void DrawRectOutline(Vector2 a, Vector2 b, Color4 color)
+		{
+			var thickness = 1 / Window.Current.PixelScale;
+			DrawRectOutline(a, b, color, thickness);
+		}
+
+		public static void DrawRectOutline(Vector2 a, Vector2 b, Color4 color, float thickness)
+		{
+			DrawLine(a.X, a.Y, b.X, a.Y, color, thickness);
+			DrawLine(b.X, a.Y, b.X, b.Y, color, thickness);
+			DrawLine(b.X, b.Y, a.X, b.Y, color, thickness);
+			DrawLine(a.X, b.Y, a.X, a.Y, color, thickness);
+		}
+
+		public static void DrawVerticalGradientRect(Vector2 a, Vector2 b, ColorGradient gradient)
+		{
+			v[0] = new Vertex { Pos = a, Color = gradient.A };
+			v[1] = new Vertex { Pos = new Vector2(b.X, a.Y), Color = gradient.A };
+			v[2] = new Vertex { Pos = b, Color = gradient.B };
+			v[3] = new Vertex { Pos = new Vector2(a.X, b.Y), Color = gradient.B };
+			Renderer.DrawTriangleFan(null, null, v, v.Length);
+		}
+
+		public static void DrawVerticalGradientRect(Vector2 a, Vector2 b, Color4 topColor, Color4 bottomColor)
+		{
+			DrawVerticalGradientRect(a, b, new ColorGradient(topColor, bottomColor));
 		}
 	}
 }

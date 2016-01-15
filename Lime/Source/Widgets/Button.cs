@@ -92,6 +92,7 @@ namespace Lime
 			// On the current frame the button contents may not be loaded, 
 			// so delay its initialization until the next frame.
 			State = InitialState;
+			Theme.Current.Apply(this);
 		}
 
 		private IEnumerator<int> InitialState()

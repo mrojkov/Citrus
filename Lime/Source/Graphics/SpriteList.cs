@@ -131,7 +131,6 @@ namespace Lime
 		}
 
 		private static List<Sprite> sprites = new List<Sprite>();
-		private static Sprite sentinel = new Sprite();
 
 		public void Render(Color4 color)
 		{
@@ -139,12 +138,7 @@ namespace Lime
 			foreach (var w in items) {
 				w.AddToList(sprites);
 			}
-			// Temporarily disable optimization
-			foreach (var i in sprites) {
-				Renderer.DrawSprite(i.Texture, i.Color * color, i.Position, i.Size, i.UV0, i.UV1);
-			}
-			//sprites.Add(sentinel);
-			//Renderer.DrawSpriteList(sprites, color);
+			Renderer.DrawSpriteList(sprites, color);
 			sprites.Clear();
 		}
 

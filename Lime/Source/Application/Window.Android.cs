@@ -25,6 +25,12 @@ namespace Lime
 		public ActivityDelegate ActivityDelegate { get { return ActivityDelegate; } }
 
 		public float CalcFPS() { return fpsCounter.FPS; }
+
+		public float PixelScale
+		{
+			get { return 1.0f; }
+		}
+
 		public void Center() {}
 		public void Close() {}
 

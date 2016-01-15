@@ -85,7 +85,7 @@ namespace Lime
 			/// <returns></returns>
 			public FontChar Get(char code, float heightHint)
 			{
-				var roundedHeight = heightHint.Round();
+				var roundedHeight = (heightHint * Window.Current.PixelScale).Round();
 				CharCache charChache;
 				if (!charCaches.TryGetValue(roundedHeight, out charChache)) {
 					charCaches[roundedHeight] = charChache = new CharCache(roundedHeight, fontRenderer, textures);

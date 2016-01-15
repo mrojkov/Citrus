@@ -18,7 +18,7 @@ namespace Lime
 		private bool dragInProgress;
 
 		// TODO: Use WidgetInput instead
-		private Input Input { get { return WidgetContext.Current.Window.Input; } }
+		private Input Input { get { return Window.Current.Input; } }
 
 		private IEnumerator<object> DragItemMainTask()
 		{

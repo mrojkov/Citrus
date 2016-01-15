@@ -5,16 +5,8 @@ using System.Text;
 
 namespace Lime
 {
-	public class CommonWindow
+	public abstract class CommonWindow
 	{
-		class DummyContext : IContext
-		{
-			public ContextScope MakeCurrent()
-			{
-				return new ContextScope { SavedContext = this };
-			}
-		}
-
 		public event Action Activated;
 		public event Action Deactivated;
 		public event Func<bool> Closing;
@@ -23,16 +15,19 @@ namespace Lime
 		public event Action Resized;
 		public event Action<float> Updating;
 		public event Action Rendering;
+
+		public static IWindow Current { get; private set; }
 		public IContext Context { get; set; }
 
 		public CommonWindow()
 		{
-			Context = new DummyContext();
+			Current = (IWindow)this;
+			Context = new Context(new Property(typeof(CommonWindow), "Current"), Current);
 		}
 
 		protected void RaiseActivated()
 		{
-			using (Context.MakeCurrent()) {
+			using (Context.Activate().Scoped()) {
 				if (Activated != null) {
 					Activated();
 				}
@@ -41,7 +36,7 @@ namespace Lime
 
 		protected void RaiseDeactivated()
 		{
-			using (Context.MakeCurrent()) {
+			using (Context.Activate().Scoped()) {
 				if (Deactivated != null) {
 					Deactivated();
 				}
@@ -50,7 +45,7 @@ namespace Lime
 
 		protected void RaiseClosed()
 		{
-			using (Context.MakeCurrent()) {
+			using (Context.Activate().Scoped()) {
 				if (Closed != null) {
 					Closed();
 				}
@@ -59,7 +54,7 @@ namespace Lime
 
 		protected void RaiseRendering()
 		{
-			using (Context.MakeCurrent()) {
+			using (Context.Activate().Scoped()) {
 				if (Rendering != null) {
 					Rendering();
 				}
@@ -68,7 +63,7 @@ namespace Lime
 
 		protected void RaiseUpdating(float delta)
 		{
-			using (Context.MakeCurrent()) {
+			using (Context.Activate().Scoped()) {
 				if (Updating != null) {
 					Updating(delta);
 				}
@@ -77,7 +72,7 @@ namespace Lime
 
 		protected bool RaiseClosing()
 		{
-			using (Context.MakeCurrent()) {
+			using (Context.Activate().Scoped()) {
 				if (Closing != null) {
 					return Closing();
 				}
@@ -87,7 +82,7 @@ namespace Lime
 
 		protected void RaiseMoved()
 		{
-			using (Context.MakeCurrent()) {
+			using (Context.Activate().Scoped()) {
 				if (Moved != null) {
 					Moved();
 				}
@@ -96,7 +91,7 @@ namespace Lime
 
 		protected void RaiseResized()
 		{
-			using (Context.MakeCurrent()) {
+			using (Context.Activate().Scoped()) {
 				if (Resized != null) {
 					Resized();
 				}

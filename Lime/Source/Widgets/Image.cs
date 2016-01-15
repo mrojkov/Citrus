@@ -8,7 +8,7 @@ namespace Lime
 	/// Виджет, содержащий в себе изображение
 	/// </summary>
 	[ProtoContract]
-	public class Image : Widget, IImageCombinerArg
+	public class Image : Widget, IImageCombinerArg, IPresenter
 	{
 		bool skipRender;
 		bool requestSkipRender;
@@ -33,27 +33,24 @@ namespace Lime
 
 		public Image()
 		{
-			UV0 = Vector2.Zero;
 			UV1 = Vector2.One;
 			HitTestMethod = HitTestMethod.Contents;
 			Texture = new SerializableTexture();
+			Presenter = this;
 		}
 
 		public Image(ITexture texture)
 		{
-			UV0 = Vector2.Zero;
 			UV1 = Vector2.One;
 			Texture = texture;
 			HitTestMethod = HitTestMethod.Contents;
 			Size = (Vector2)texture.ImageSize;
+			Presenter = this;
 		}
 
 		public Image(string texturePath)
+			: this(new SerializableTexture(texturePath))
 		{
-			UV0 = Vector2.Zero;
-			UV1 = Vector2.One;
-			Texture = new SerializableTexture(texturePath);
-			Size = (Vector2)Texture.ImageSize;
 		}
 
 		/// <summary>
@@ -62,14 +59,6 @@ namespace Lime
 		public override Vector2 CalcContentSize()
 		{
 			return (Vector2)Texture.ImageSize;
-		}
-
-		public override void Render()
-		{
-			Renderer.Blending = GlobalBlending;
-			Renderer.Shader = GlobalShader;
-			Renderer.Transform1 = LocalToWorldTransform;
-			Renderer.DrawSprite(Texture, GlobalColor, Vector2.Zero, Size, UV0, UV1);
 		}
 
 		/// <summary>
@@ -128,6 +117,17 @@ namespace Lime
 			} else {
 				return false;
 			}
+		}
+
+		void IPresenter.Render()
+		{
+			PrepareRendererState();
+			Renderer.DrawSprite(Texture, GlobalColor, ContentPosition, ContentSize, UV0, UV1);
+		}
+
+		IPresenter IPresenter.Clone(Node newNode)
+		{
+			return (IPresenter)newNode;
 		}
 	}
 }

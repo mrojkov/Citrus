@@ -2,11 +2,9 @@
 
 namespace Lime
 {
-	public class AnchorLayout : ILayout
+	public class AnchorLayout : CommonLayout, ILayout
 	{
 		public static readonly ILayout Instance = new AnchorLayout();
-
-		public List<Rectangle> ContentRectangles { get { return null; } }
 
 		public void OnSizeChanged(Widget widget, Vector2 sizeDelta)
 		{

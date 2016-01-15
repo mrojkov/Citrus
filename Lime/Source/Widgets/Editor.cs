@@ -27,7 +27,7 @@ namespace Lime
 
 	public class VerticalLineCaret : Polyline
 	{
-		public VerticalLineCaret(SimpleText text) : base(2.0f)
+		public VerticalLineCaret(SimpleText text, float thickness = 2.0f) : base(thickness)
 		{
 			Points.Add(Vector2.Zero);
 			Points.Add(Vector2.Down * text.FontHeight);

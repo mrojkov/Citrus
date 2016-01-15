@@ -144,6 +144,11 @@ namespace Lime
 			}
 		}
 
+		public float PixelScale
+		{
+			get { return 1.0f; }
+		}
+
 		public void Center() { }
 		public void Close() { }
 

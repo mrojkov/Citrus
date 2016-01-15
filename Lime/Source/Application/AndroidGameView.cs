@@ -89,7 +89,7 @@ namespace Lime
 		private Input input;
 		private AndroidSoftKeyboard androidSoftKeyboard;
 
-		public GameView(Context context, Input input) : base(context)
+		public GameView(Android.Content.Context context, Input input) : base(context)
 		{
 			this.input = input;
 			androidSoftKeyboard = new AndroidSoftKeyboard(this);

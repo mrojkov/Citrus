@@ -33,7 +33,7 @@ namespace Lime
 			webView = new WebView();
 			webView.AutoresizingMask = NSViewResizingMask.HeightSizable | NSViewResizingMask.WidthSizable; 
 			webView.WantsLayer = true;
-			WidgetContext.Current.Window.NSGameView.AddSubview(webView);
+			Window.Current.NSGameView.AddSubview(webView);
 		}
 
 		public override void Dispose()

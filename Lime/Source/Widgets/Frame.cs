@@ -51,7 +51,7 @@ namespace Lime
 	/// Сцена, загружаемая из бандла
 	/// </summary>
 	[ProtoContract]
-	public class Frame : Widget, IImageCombinerArg
+	public class Frame : Widget, IImageCombinerArg, IPresenter
 	{
 		public event Action Rendered;
 
@@ -71,9 +71,12 @@ namespace Lime
 			set { SetRenderTarget(value); }
 		}
 
-		public Frame() {}
+		public Frame()
+		{
+			this.Presenter = this;
+		}
 
-		public Frame(Vector2 position)
+		public Frame(Vector2 position) : this()
 		{
 			this.Position = position;
 		}
@@ -82,7 +85,7 @@ namespace Lime
 		/// Загружает фрейм из бандла
 		/// </summary>
 		/// <param name="path">Путь к файлу сцены в бандле без расширения, относительно папки Data (например Scenes/Maps/MyScene)</param>
-		public Frame(string path)
+		public Frame(string path) : this()
 		{
 			LoadFromBundle(path);
 		}
@@ -108,7 +111,7 @@ namespace Lime
 			return base.IsRenderedToTexture() || renderTarget != RenderTarget.None;
 		}
 
-		public override void Render()
+		void IPresenter.Render()
 		{
 			if (renderTexture != null) {
 				EnsureRenderChain();
@@ -120,6 +123,11 @@ namespace Lime
 				Renderer.Transform1 = LocalToWorldTransform;
 				Rendered();
 			}
+		}
+
+		IPresenter IPresenter.Clone(Node newNode)
+		{
+			return (IPresenter)newNode;
 		}
 
 		private RenderChain renderChain;
@@ -166,26 +174,8 @@ namespace Lime
 
 		private WindowRect CalculateScissorRectangle(Widget widget)
 		{
-			var aabb = widget.CalcAABBInSpaceOf(WidgetContext.Current.Root);
-			// Get the projected AABB coordinates in the normalized OpenGL space
-			Matrix44 proj = Renderer.Projection;
-			aabb.A = proj.TransformVector(aabb.A);
-			aabb.B = proj.TransformVector(aabb.B);
-			// Transform to 0,0 - 1,1 coordinate space
-			aabb.Left = (1 + aabb.Left) / 2;
-			aabb.Right = (1 + aabb.Right) / 2;
-			aabb.Top = (1 + aabb.Top) / 2;
-			aabb.Bottom = (1 + aabb.Bottom) / 2;
-			// Transform to window coordinates
-			var viewport = Renderer.Viewport;
-			var result = new WindowRect();
-			var min = new Vector2(viewport.X, viewport.Y);
-			var max = new Vector2(viewport.X + viewport.Width, viewport.Y + viewport.Height);
-			result.X = Mathf.Lerp(aabb.Left, min.X, max.X).Round();
-			result.Width = Mathf.Lerp(aabb.Right, min.X, max.X).Round() - result.X;
-			result.Y = Mathf.Lerp(aabb.Bottom, min.Y, max.Y).Round();
-			result.Height = Mathf.Lerp(aabb.Top, min.Y, max.Y).Round() - result.Y;
-			return result;
+			var aabb = widget.CalcAABBInViewportSpace();
+			return (WindowRect)(IntRectangle)aabb;
 		}
 
 		public override void AddToRenderChain(RenderChain chain)
