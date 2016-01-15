@@ -262,7 +262,6 @@ namespace Lime
 		// indexed triangle list (3 values per triangle)
 		private readonly List<int> cachedShapeTriangles = new List<int>();
 		private readonly List<float> cachedShapeTriangleSizes = new List<float>();
-		public static int NumberOfUpdatedParticles = 0;
 		public static bool GloballyEnabled = true;
 
 		public ParticleEmitter()
@@ -736,7 +735,6 @@ namespace Lime
 
 		private bool AdvanceParticle(Particle p, float delta)
 		{
-			NumberOfUpdatedParticles++;
 			p.Age += delta;
 			var modifier = modifiers[p.ModifierIndex];
 			if (p.AgeToFrame > 0) {
