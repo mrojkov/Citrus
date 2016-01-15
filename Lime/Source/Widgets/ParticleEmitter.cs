@@ -87,7 +87,7 @@ namespace Lime
 
 		public class Particle
 		{
-			public ParticleModifier Modifier;
+			public int ModifierIndex;
 			// Position of particle with random motion.
 			public Vector2 FullPosition;
 			// Position if particle without random motion.
@@ -256,10 +256,8 @@ namespace Lime
 		private float particlesToSpawn;
 		public List<Particle> particles = new List<Particle>();
 		private static readonly List<Particle> particlePool = new List<Particle>();
-		private const int MaxModifierCount = 32;
-		private static readonly ParticleModifier[] modifiers = new ParticleModifier [MaxModifierCount];
-		private const int MaxEmitterShapePointCount = 32;
-		private static readonly EmitterShapePoint[] emitterShapePoints = new EmitterShapePoint[MaxEmitterShapePointCount];
+		private readonly List<ParticleModifier> modifiers = new List<ParticleModifier>();
+		private readonly List<EmitterShapePoint> emitterShapePoints = new List<EmitterShapePoint>();
 		private readonly List<Vector2> cachedShapePoints = new List<Vector2>();
 		// indexed triangle list (3 values per triangle)
 		private readonly List<int> cachedShapeTriangles = new List<int>();
@@ -480,12 +478,14 @@ namespace Lime
 
 		private void RefreshCustomShape()
 		{
-			int pointCount = 0;
-			for(int i = 0; i < Nodes.Count && pointCount < MaxEmitterShapePointCount; i++) {
-				var node = Nodes[i];
-				if (node is EmitterShapePoint) {
-					emitterShapePoints[pointCount] = node as EmitterShapePoint;
-					pointCount++;
+			int pointCount = emitterShapePoints.Count();
+			if (pointCount == 0) {
+				for(int i = 0; i < Nodes.Count; i++) {
+					var node = Nodes[i];
+					if (node is EmitterShapePoint) {
+						emitterShapePoints.Add(node as EmitterShapePoint);
+						pointCount++;
+					}
 				}
 			}
 			if (pointCount < 3) {
@@ -525,7 +525,7 @@ namespace Lime
 			float sign = Mathf.Sign(angle);
 			cachedShapeTriangles.Clear();
 			cachedShapeTriangleSizes.Clear();
-			int[] workPoints = new int[MaxEmitterShapePointCount];
+			int[] workPoints = new int[emitterShapePoints.Count()];
 			for (int i = 0; i < pointCount; i++) {
 				workPoints[i] = i;
 			}
@@ -660,19 +660,24 @@ namespace Lime
 				throw new Lime.Exception("Invalid particle emitter shape");
 			}
 			int modifierCount = 0;
-			for (int i = 0; i < Nodes.Count && i < MaxModifierCount; i++) {
-				var node = Nodes[i];
-				if (node is ParticleModifier) {
-					modifiers[modifierCount] = node as ParticleModifier;
-					modifierCount++;
+			if (modifiers.Count() == 0) {
+				for (int i = 0; i < Nodes.Count; i++) {
+					var node = Nodes[i];
+					if (node is ParticleModifier) {
+						modifiers.Add(node as ParticleModifier);
+						modifierCount++;
+					}
 				}
+			} else {
+				modifierCount = modifiers.Count();
 			}
 			p.RegularPosition = transform.TransformVector(position);
-			p.Modifier = modifiers[Rng.RandomInt(modifierCount)];
-			if (p.Modifier == null) {
+			p.ModifierIndex = Rng.RandomInt(modifierCount);
+			var modifier = modifiers[p.ModifierIndex];
+			if (modifier == null) {
 				return false;
 			}
-			int duration = p.Modifier.Animators.GetOverallDuration();
+			int duration = modifier.Animators.GetOverallDuration();
 			p.AgeToFrame = duration / p.Lifetime;
 			if (EmissionType == EmissionType.Inner) {
 				p.RegularDirection += 180;
@@ -733,7 +738,7 @@ namespace Lime
 		{
 			NumberOfUpdatedParticles++;
 			p.Age += delta;
-			var modifier = p.Modifier;
+			var modifier = modifiers[p.ModifierIndex];
 			if (p.AgeToFrame > 0) {
 				modifier.Animators.Apply(AnimationUtils.FramesToMsecs((int)(p.Age * p.AgeToFrame)));
 			}
@@ -827,7 +832,7 @@ namespace Lime
 			if (AlongPathOrientation) {
 				angle += p.FullDirection;
 			}
-			ITexture texture = p.Modifier.GetTexture((int)p.TextureIndex - 1);
+			ITexture texture = modifiers[p.ModifierIndex].GetTexture((int)p.TextureIndex - 1);
 			var imageSize = (Vector2)texture.ImageSize;
 			var particleSize = p.ScaleCurrent * imageSize;
 			var orientation = Vector2.CosSinRough(angle * Mathf.DegToRad);
