@@ -15,7 +15,7 @@
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>BuildMachineOSBuild</key>
-	<string>15C50</string>
+	<string>14F1509</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>MonoBundleExecutable</key>
@@ -37,7 +37,7 @@
 	<key>DTPlatformVersion</key>
 	<string>GM</string>
 	<key>DTSDKBuild</key>
-	<string>15C50</string>
+	<string>14F1509</string>
 	<key>DTSDKName</key>
 	<string>macosx10.11</string>
 	<key>DTXcode</key>
