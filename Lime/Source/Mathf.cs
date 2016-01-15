@@ -38,7 +38,7 @@ namespace Lime
 		/// Для перевода радиан в градусы умножайте на это число
 		/// </summary>
 		public const float RadToDeg = 180 / Pi;
-		
+
 		public static float Max(float x, float y)
 		{
 			return (x > y) ? x : y;
@@ -116,6 +116,11 @@ namespace Lime
 		public static float Dist2(Vector2 a, Vector2 b)
 		{
 			return Sqr(a.X - b.X) + Sqr(a.Y - b.Y);
+		}
+
+		public static float Log(float x)
+		{
+			return (float)Math.Log(x);
 		}
 
 		public static float Pow(float x, float y)
@@ -210,11 +215,12 @@ namespace Lime
 
 		public static float NormalRandom(this System.Random rng, float median, float dispersion)
 		{
-			float x = 0;
-			for (int i = 0; i < 12; ++i)
-				x += rng.RandomFloat();
-			x -= 6;
-			return median + x * dispersion;
+			if (dispersion == 0.0f) {
+				return median;
+			}
+			return median + dispersion *
+				Sqrt(-2.0f * Log(rng.RandomFloat())) *
+				Sin(2.0f * Pi * rng.RandomFloat());
 		}
 
 		public static float NormalRandom(float median, float dispersion)
