@@ -39,7 +39,7 @@ namespace Lime
 				}
 				// Handle switching between various text widgets
 				if (prevActiveTextWidget != context.ActiveTextWidget && context.ActiveTextWidget != null && prevActiveTextWidget != null) {
-					Application.SoftKeyboard.ChangeText(Context.ActiveTextWidget.Text);
+					Application.SoftKeyboard.ChangeText(context.ActiveTextWidget.Text);
 				}
 				prevActiveTextWidget = context.ActiveTextWidget;
 			}
