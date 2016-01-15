@@ -78,10 +78,8 @@ namespace Lime
 			AppDelegate.Instance.WillTerminateEvent += () => {
 				RaiseClosed();
 			};
-			UIViewController.ViewDidLayoutSubviewsEvent += () => {
-				using (Context.Activate().Scoped()) {
-					Application.RaiseDeviceRotated();
-				}
+			UIViewController.OnResize += (sender, e) => {
+				RaiseResized(((ResizeEventArgs)e).DeviceRotated);
 			};
 			UIView.RenderFrame += OnRenderFrame;
 			UIView.UpdateFrame += OnUpdateFrame;

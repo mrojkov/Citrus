@@ -1,8 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Threading;
-using System.Reflection;
 
 #if iOS
 using UIKit;
@@ -100,8 +97,8 @@ namespace Lime
 	public static class Application
 	{
 		private static IWindow mainWindow;
-		public static IWindow MainWindow 
-		{ 
+		public static IWindow MainWindow
+		{
 			get { return mainWindow; }
 			set
 			{
@@ -126,10 +123,6 @@ namespace Lime
 #else
 		public static DeviceOrientation CurrentDeviceOrientation { get; internal set; }
 #endif
-		/// <summary>
-		/// Occurs when the device has rotated. Only mobile platforms.
-		/// </summary>
-		public static event Action DeviceRotated;
 
 		// Specifies the lowest possible 1/(time delta) passed to Window.Updating.
 		// TODO: Move to IWindow
@@ -180,9 +173,8 @@ namespace Lime
 			AudioSystem.Initialize(options);
 #if WIN
 			System.Windows.Forms.Application.SetUnhandledExceptionMode(
-				System.Windows.Forms.UnhandledExceptionMode.CatchException
-			);
-			// Nika: This function doesn't work on XP, and we don't want to add dpiAware into manifest
+				System.Windows.Forms.UnhandledExceptionMode.CatchException);
+			// This function doesn't work on XP, and we don't want to add dpiAware into manifest
 			// because this will require adding into every new project.
 			try {
 				SetProcessDPIAware();
@@ -204,7 +196,7 @@ namespace Lime
 		{
 			GLObjectRegistry.Instance.DiscardObjects();
 		}
-#endif		
+#endif
 #if iOS
 		private static bool IsAllowedGoingToSleepMode()
 		{
@@ -212,13 +204,6 @@ namespace Lime
 			return obj != null && obj.ToString() == "1";
 		}
 #endif
-
-		internal static void RaiseDeviceRotated()
-		{
-			if (DeviceRotated != null) {
-				DeviceRotated();
-			}
-		}
 
 		private static void RunScheduledActions(float delta)
 		{
@@ -255,7 +240,7 @@ namespace Lime
 					title = MainWindow.Title;
 					MainWindow.Visible = false;
 				}
-				WinApi.MessageBox((IntPtr)null, e.ToString(), 
+				WinApi.MessageBox((IntPtr)null, e.ToString(),
 					string.Format("{0} has terminated with an error", title), 0);
 #else
 				Console.WriteLine(e.ToString());
@@ -274,9 +259,8 @@ namespace Lime
 			};
 		}
 
-
 		/// <summary>
-		/// Executes an action on the main thread. 
+		/// Executes an action on the main thread.
 		/// </summary>
 		public static void InvokeOnMainThread(Action action)
 		{
@@ -326,7 +310,7 @@ namespace Lime
 #elif MAC || MONOMAC
 			NSApplication.SharedApplication.Terminate(new Foundation.NSObject());
 #elif ANDROID || iOS
-			// Android: There is no way to terminate an android application. 
+			// Android: There is no way to terminate an android application.
 			// The only way is to finish each its activity one by one.
 #elif UNITY
 			UnityEngine.Application.Quit();
@@ -352,7 +336,7 @@ namespace Lime
 		/// <summary>
 		/// Возвращает количество пикселей в дюйме по горизонтали и вертикали
 		/// </summary>
-		public static Vector2 ScreenDPI 
+		public static Vector2 ScreenDPI
 		{
 			get {
 				// Class-level initialization fails on iOS simulator in debug mode,
@@ -368,7 +352,7 @@ namespace Lime
 		/// <summary>
 		/// Возвращает количество пикселей в дюйме по горизонтали и вертикали (всегда возвращает (240, 240))
 		/// </summary>
-		public static Vector2 ScreenDPI 
+		public static Vector2 ScreenDPI
 		{
 			get { return 240 * Vector2.One; }
 		}
@@ -377,10 +361,10 @@ namespace Lime
 		/// <summary>
 		/// Возвращает количество пикселей в дюйме по горизонтали и вертикали
 		/// </summary>
-		public static Vector2 ScreenDPI 
+		public static Vector2 ScreenDPI
 		{
 			get
-			{ 
+			{
 				var dm = Android.Content.Res.Resources.System.DisplayMetrics;
 				return new Vector2(dm.Xdpi, dm.Ydpi);
 			}

@@ -15,7 +15,8 @@ namespace Lime
 		private SoftKeyboard softKeyboard;
 		private Input input;
 
-		public event Action ViewDidLayoutSubviewsEvent;
+		public event EventHandler OnResize;
+
 		public bool SoftKeyboardBeingShownOrHid { get; private set; }
 		public bool LockDeviceOrientation { get; set; }
 
@@ -188,14 +189,13 @@ namespace Lime
 
 		public override void ViewDidLayoutSubviews()
 		{
+			// Handle resize here (not in WillRotate) because in WillRotate we don't know
+			// the resulting screen resolution.
 			var toOrientation = ConvertInterfaceOrientation(this.InterfaceOrientation);
-			if (toOrientation != Application.CurrentDeviceOrientation) {
-				Application.CurrentDeviceOrientation = toOrientation;
-				// Handle resize here (not in WillRotate) because in WillRotate we don't know
-				// the resulting screen resolution.
-				if (ViewDidLayoutSubviewsEvent != null) {
-					ViewDidLayoutSubviewsEvent();
-				}
+			var deviceRotated = toOrientation != Application.CurrentDeviceOrientation;
+			Application.CurrentDeviceOrientation = toOrientation;
+			if (OnResize != null) {
+				OnResize(this, new ResizeEventArgs { DeviceRotated = deviceRotated });
 			}
 		}
 
@@ -232,6 +232,11 @@ namespace Lime
 			public float Height { get; internal set; }
 			public bool Supported { get { return true; } }
 		}
+	}
+
+	internal class ResizeEventArgs : EventArgs
+	{
+		public bool DeviceRotated;
 	}
 }
 #endif

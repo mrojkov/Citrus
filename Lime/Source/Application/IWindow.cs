@@ -1,10 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Lime
 {
+	/// <summary>
+	/// Delegate used by <see cref="IWindow.Resized"/> event.
+	/// </summary>
+	/// <param name="deviceRotated">Defines whether resize is triggered by device rotation or not.</param>
+	public delegate void ResizeDelegate(bool deviceRotated);
+
 	/// <summary>
 	/// Enumerates available window states.
 	/// </summary>
@@ -29,12 +32,12 @@ namespace Lime
 	}
 
 	/// <summary>
-	/// Defines the interface for a window. 
+	/// Defines the interface for a window.
 	/// </summary>
 	public interface IWindow
 	{
 		/// <summary>
-		/// Indicates whether the window is active. 
+		/// Indicates whether the window is active.
 		/// For PC, Mac it means that the window has the input focus.
 		/// On mobile platforms it indicates that the application is on screen and running.
 		/// </summary>
@@ -128,7 +131,7 @@ namespace Lime
 		event Func<bool> Closing;
 
 		/// <summary>
-		/// Occurs after the window has closed. 
+		/// Occurs after the window has closed.
 		/// </summary>
 		event Action Closed;
 
@@ -140,7 +143,7 @@ namespace Lime
 		/// <summary>
 		/// Occurs whenever the window is resized or a device orientation has changed.
 		/// </summary>
-		event Action Resized;
+		event ResizeDelegate Resized;
 
 		/// <summary>
 		/// Occurs when it is time to update a frame.
