@@ -124,7 +124,7 @@ namespace Lime
 
 		private int CalcKeyboardTop()
 		{
-			return WidgetContext.Current.Window.ClientSize.Height - (int)Application.SoftKeyboard.Height;
+			return Window.Current.ClientSize.Height - (int)Application.SoftKeyboard.Height;
 		}
 
 		private Uri GetUrl()

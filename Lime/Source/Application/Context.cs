@@ -128,15 +128,15 @@ namespace Lime
 		public Property(Type singleton, string propertyName = "Instance")
 		{
 			var pi = singleton.GetProperty(propertyName);
-			Getter = () => pi.GetValue(null);
-			Setter = val => pi.SetValue(null, val);
+			Getter = () => pi.GetValue(null, null);
+			Setter = val => pi.SetValue(null, val, null);
 		}
 
 		public Property(object obj, string propertyName)
 		{
 			var pi = obj.GetType().GetProperty(propertyName);
-			Getter = () => pi.GetValue(obj);
-			Setter = val => pi.SetValue(obj, val);
+			Getter = () => pi.GetValue(obj, null);
+			Setter = val => pi.SetValue(obj, val, null);
 		}
 	}
 }

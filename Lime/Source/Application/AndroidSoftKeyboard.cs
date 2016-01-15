@@ -16,7 +16,7 @@ namespace Lime
 		public AndroidSoftKeyboard(GameView gameView)
 		{
 			this.gameView = gameView;
-			imm = (InputMethodManager)gameView.Context.GetSystemService(Context.InputMethodService);
+			imm = (InputMethodManager)gameView.Context.GetSystemService(Android.Content.Context.InputMethodService);
 		}
 
 		public bool Visible

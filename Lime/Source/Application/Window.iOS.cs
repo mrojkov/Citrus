@@ -31,6 +31,11 @@ namespace Lime
 		public MouseCursor Cursor { get; set; }
 
 		public float CalcFPS() { return fpsCounter.FPS; }
+
+		public float PixelScale {
+			get { return 1.0f; }
+		}
+
 		public void Center() { }
 		public void Close() { }
 
@@ -74,7 +79,7 @@ namespace Lime
 				RaiseClosed();
 			};
 			UIViewController.ViewDidLayoutSubviewsEvent += () => {
-				using (Context.MakeCurrent()) {
+				using (Context.Activate().Scoped()) {
 					Application.RaiseDeviceRotated();
 				}
 			};

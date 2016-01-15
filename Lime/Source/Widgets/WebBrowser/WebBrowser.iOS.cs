@@ -65,7 +65,7 @@ namespace Lime
 
 		private GameView GameView 
 		{
-			get { return WidgetContext.Current.Window.UIViewController.View; }
+			get { return Window.Current.UIViewController.View; }
 		}
 
 		private void WebView_LoadFinished(object sender, EventArgs e) {
@@ -145,7 +145,7 @@ namespace Lime
 			var screenScale = (float)UIScreen.MainScreen.Scale;
 			var min = new Vector2(viewport.X, viewport.Y) / screenScale;
 			var max = new Vector2(viewport.X + viewport.Width, viewport.Y + viewport.Height) / screenScale;
-			var displayHeight = WidgetContext.Current.Window.ClientSize.Height / screenScale;
+			var displayHeight = Window.Current.ClientSize.Height / screenScale;
 			result.Left = Mathf.Lerp(aabb.Left, min.X, max.X).Round();
 			result.Right = Mathf.Lerp(aabb.Right, min.X, max.X).Round();
 			result.Top = displayHeight - Mathf.Lerp(aabb.Bottom, min.Y, max.Y).Round();

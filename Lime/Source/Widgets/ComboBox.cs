@@ -52,6 +52,7 @@ namespace Lime
 
 		private void ShowDropDownList()
 		{
+#if MAC
 			var menu = new Menu();
 			int j = 0;
 			IMenuItem selectedItem = null;
@@ -67,6 +68,9 @@ namespace Lime
 			}
 			var aabb = CalcAABBInWindowSpace();
 			menu.Popup(Window.Current, aabb.A, aabb.Width, selectedItem);
+#else
+			throw new NotImplementedException();
+#endif
 		}
 
 		private void Items_Changed()
