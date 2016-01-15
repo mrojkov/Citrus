@@ -5,7 +5,7 @@ namespace Lime
 	/// <summary>
 	/// Root of the widgets hierarchy.
 	/// </summary>
-	public class WindowWidget : Widget
+	public class WindowWidget : Widget, IPresenter
 	{
 		private IKeyboardInputProcessor prevActiveTextWidget;
 		private RenderChain renderChain = new RenderChain();
@@ -17,6 +17,8 @@ namespace Lime
 			Window = window;
 			new WidgetContext(this);
 			Window.Context = new CombinedContext(Window.Context, WidgetContext.Current);
+			Presenter = this;
+			Theme.Current.Apply(this);
 		}
 
 		public override void Update(float delta)
@@ -44,13 +46,18 @@ namespace Lime
 			LayoutManager.Instance.Layout();
 		}
 
-		public override void Render()
+		void IPresenter.Render()
 		{
 			SetViewport();
 			foreach (var node in Nodes) {
 				node.AddToRenderChain(renderChain);
 			}
 			renderChain.RenderAndClear();
+		}
+
+		IPresenter IPresenter.Clone(Node newNode)
+		{
+			return (IPresenter)newNode;
 		}
 
 		public void SetViewport()

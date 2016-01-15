@@ -131,6 +131,59 @@ namespace Lime
 			return aabb;
 		}
 
+		/// <summary>
+		/// Calculates AABB in the viewport space.
+		/// AABB.A specifies the lower left corner of the rectangle.
+		/// AABB.A specifies the upper right corner of the rectangle.
+		/// </summary>
+		public IntRectangle CalcAABBInViewportSpace()
+		{
+			var aabb = CalcAABBInSpaceOf(WidgetContext.Current.Root);
+			// Get the projected AABB coordinates in the normalized OpenGL space
+			Matrix44 proj = Renderer.Projection;
+			aabb.A = proj.TransformVector(aabb.A);
+			aabb.B = proj.TransformVector(aabb.B);
+			// Transform to 0,0 - 1,1 coordinate space
+			aabb.Left = (1 + aabb.Left) / 2;
+			aabb.Right = (1 + aabb.Right) / 2;
+			aabb.Top = (1 + aabb.Top) / 2;
+			aabb.Bottom = (1 + aabb.Bottom) / 2;
+			// Transform to vieport coordinates
+			var viewport = Renderer.Viewport;
+			var min = new Vector2(viewport.X, viewport.Y);
+			var max = new Vector2(viewport.X + viewport.Width, viewport.Y + viewport.Height);
+			return new IntRectangle {
+				A = new IntVector2(
+					Mathf.Lerp(aabb.Left, min.X, max.X).Round(),
+					Mathf.Lerp(aabb.Bottom, min.Y, max.Y).Round()
+				),
+				B = new IntVector2(
+					Mathf.Lerp(aabb.Right, min.X, max.X).Round(),
+					Mathf.Lerp(aabb.Top, min.Y, max.Y).Round()
+				)
+			};
+		}
+
+		/// <summary>
+		/// Calculates AABB in the window space.
+		/// AABB.A specifies the upper left corner of the rectangle.
+		/// AABB.A specifies the lower right corner of the rectangle.
+		/// </summary>
+		public Rectangle CalcAABBInWindowSpace()
+		{
+			var aabb = (Rectangle)CalcAABBInViewportSpace();
+			var vpOrigin = (Vector2)Renderer.Viewport.Origin;
+			aabb.A += vpOrigin;
+			aabb.B += vpOrigin;
+			var window = Window.Current;
+			aabb.A /= window.PixelScale;
+			aabb.B /= window.PixelScale;
+			return new Rectangle {
+				A = new Vector2(aabb.A.X, window.ClientSize.Height - aabb.B.Y),
+				B = new Vector2(aabb.B.X, window.ClientSize.Height - aabb.A.Y),
+			};
+		}
+
 		public Transform CalcTransformFromMatrix(Matrix32 matrix)
 		{
 			var v1 = new Vector2(1, 0);
@@ -207,6 +260,13 @@ namespace Lime
 			if (!(this is Image) && (this.Nodes.Count == 0)) {
 				yield return "The widget doesn't contain any drawable node";
 			}
+		}
+
+		internal void PrepareRendererState()
+		{
+			Renderer.Transform1 = LocalToWorldTransform;
+			Renderer.Blending = GlobalBlending;
+			Renderer.Shader = GlobalShader;
 		}
 	}
 }
