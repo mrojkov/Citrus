@@ -148,7 +148,6 @@
     <Compile Include="Source\Widgets\Animation\AnimationEngine.cs" />
     <Compile Include="Source\Widgets\Layout\AnchorLayout.cs" />
     <Compile Include="Source\Widgets\Layout\Layout.cs" />
-    <Compile Include="Source\Widgets\Layout\Margin.cs" />
     <Compile Include="Source\Widgets\Layout\TableLayout.cs" />
     <Compile Include="Source\Widgets\WebBrowser\IWebBrowserImplementation.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WebBrowser.Android.cs" />
@@ -218,6 +217,23 @@
     <Compile Include="Source\Graphics\Fonts\CompoundFont.cs" />
     <Compile Include="Source\Application\Context.cs" />
     <Compile Include="Source\Application\AndroidSoftKeyboard.cs" />
+    <Compile Include="Source\Widgets\Layout\LayoutCell.cs" />
+    <Compile Include="Source\Widgets\Layout\LayoutManager.cs" />
+    <Compile Include="Source\Widgets\Layout\LinearAllocator.cs" />
+    <Compile Include="Source\Widgets\Layout\VBoxLayout.cs" />
+    <Compile Include="Source\Widgets\Theme\DefaultTheme.cs" />
+    <Compile Include="Source\Widgets\Theme\DesktopTheme.cs" />
+    <Compile Include="Source\Widgets\Theme\ITheme.cs" />
+    <Compile Include="Source\Types\ColorGradient.cs" />
+    <Compile Include="Source\Widgets\EditBox.cs" />
+    <Compile Include="Source\Widgets\IPresenter.cs" />
+    <Compile Include="Source\Widgets\TextView.cs" />
+    <Compile Include="Source\Types\Margin.cs" />
+    <Compile Include="Source\Application\Menu\Menu.cs" />
+    <Compile Include="Source\Application\Menu\Menu.Mac.cs" />
+    <Compile Include="Source\Widgets\ComboBox.cs" />
+    <Compile Include="Source\Types\ObservableList.cs" />
+    <Compile Include="Source\Graphics\VectorShape.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
@@ -313,6 +329,9 @@
     <Folder Include="Source\Input\" />
     <Folder Include="Source\Application\Mac\" />
     <Folder Include="Source\Application\Mac\Input\" />
+    <Folder Include="Source\Widgets\Layout\" />
+    <Folder Include="Source\Application\Menu\" />
+    <Folder Include="Source\Widgets\Theme\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
