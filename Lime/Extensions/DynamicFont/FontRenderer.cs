@@ -57,9 +57,6 @@ namespace Lime
 
 			var glyphIndex = face.GetCharIndex(@char);
 			face.LoadGlyph(glyphIndex, LoadFlags.Default, LoadTarget.Normal);
-			if (face.Glyph.Metrics.Width == 0) {
-				return null;
-			}
 
 			face.Glyph.RenderGlyph(RenderMode.Normal);
 			var bitmap = face.Glyph.Bitmap;
