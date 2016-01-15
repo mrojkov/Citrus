@@ -43,19 +43,17 @@ namespace Lime
 			Color4[] pixels;
 			int width;
 			int height;
-			bool generateMips;
 
-			public TexturePixelArrayReloader(Color4[] pixels, int width, int height, bool generateMips)
+			public TexturePixelArrayReloader(Color4[] pixels, int width, int height)
 			{
 				this.pixels = pixels;
 				this.width = width;
 				this.height = height;
-				this.generateMips = generateMips;
 			}
 
 			public override void Reload(Texture2D texture)
 			{
-				texture.LoadImage(pixels, width, height, generateMips);
+				texture.LoadImage(pixels, width, height);
 			}
 		}
 
@@ -195,16 +193,16 @@ namespace Lime
 		/// <summary>
 		/// Create texture from pixel array
 		/// </summary>
-		public void LoadImage(Color4[] pixels, int width, int height, bool generateMips)
+		public void LoadImage(Color4[] pixels, int width, int height)
 		{
-			reloader = new TexturePixelArrayReloader(pixels, width, height, generateMips);
+			reloader = new TexturePixelArrayReloader(pixels, width, height);
 			var pinnedArray = GCHandle.Alloc(pixels, GCHandleType.Pinned);
 			var pointer = pinnedArray.AddrOfPinnedObject();
-			LoadImage(pointer, width, height, generateMips);
+			LoadImage(pointer, width, height);
 			pinnedArray.Free();
 		}
 
-		public void LoadImage(IntPtr pixels, int width, int height, bool generateMips)
+		public void LoadImage(IntPtr pixels, int width, int height)
 		{
 			if (!Application.CurrentThread.IsMain()) {
 				throw new InvalidOperationException();
@@ -213,12 +211,6 @@ namespace Lime
 			PlatformRenderer.PushTexture(handle, 0);
 			GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
 			MemoryUsed = 4 * width * height;
-#if !MAC
-			if (generateMips && Application.RenderingBackend == RenderingBackend.ES20) {
-				GL.GenerateMipmap(All.Texture2D);
-				MemoryUsed += (int)(MemoryUsed * 0.33f);
-			}
-#endif
 			PlatformRenderer.PopTexture(0);
 			PlatformRenderer.CheckErrors();
 

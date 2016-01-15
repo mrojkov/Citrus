@@ -134,7 +134,7 @@ namespace Lime
 			public override uint GetHandle()
 			{
 				if (Invalidated) {
-					LoadImage(Data, ImageSize.Width, ImageSize.Height, generateMips: false);
+					LoadImage(Data, ImageSize.Width, ImageSize.Height);
 					Invalidated = false;
 				}
 				return base.GetHandle();
