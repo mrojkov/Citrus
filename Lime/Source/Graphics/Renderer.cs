@@ -54,6 +54,18 @@ namespace Lime
 		public int Width;
 		public int Height;
 
+		public IntVector2 Origin
+		{
+			get { return new IntVector2(X, Y); }
+			set { X = value.X; Y = value.Y; }
+		}
+
+		public IntVector2 Size
+		{
+			get { return new IntVector2(Width, Height); }
+			set { Width = value.X; Height = value.Y; }
+		}
+
 		public static explicit operator IntRectangle(WindowRect r)
 		{
 			return new IntRectangle(r.X, r.Y, r.X + r.Width, r.Y + r.Height);
@@ -621,6 +633,66 @@ namespace Lime
 				IncludingPoint(v2).
 				IncludingPoint(v3);
 			return aabb;
+		}
+
+		public static void DrawLine(float x0, float y0, float x1, float y1, Color4 color, float thickness)
+		{
+			DrawLine(new Vector2(x0, y0), new Vector2(x1, y1), color, thickness);
+		}
+		
+		static Vertex[] v = new Vertex[4];
+
+		public static void DrawLine(Vector2 a, Vector2 b, Color4 color, float thickness)
+		{
+			var d = (b - a).Normalized * thickness * 0.5f;
+			Vector2 n = GetVectorNormal(d);
+			v[0] = new Vertex { Pos = a - d - n, Color = color };
+			v[1] = new Vertex { Pos = b + d - n, Color = color };
+			v[2] = new Vertex { Pos = b + d + n, Color = color };
+			v[3] = new Vertex { Pos = a - d + n, Color = color };
+			Renderer.DrawTriangleFan(null, null, v, v.Length);
+		}
+
+		static Vector2 GetVectorNormal(Vector2 v)
+		{
+			return new Vector2(-v.Y, v.X);
+		}
+
+		public static void DrawRect(Vector2 a, Vector2 b, Color4 color)
+		{
+			v[0] = new Vertex { Pos = a, Color = color };
+			v[1] = new Vertex { Pos = new Vector2(b.X, a.Y), Color = color };
+			v[2] = new Vertex { Pos = b, Color = color };
+			v[3] = new Vertex { Pos = new Vector2(a.X, b.Y), Color = color };
+			Renderer.DrawTriangleFan(null, null, v, v.Length);
+		}
+
+		public static void DrawRectOutline(Vector2 a, Vector2 b, Color4 color)
+		{
+			var thickness = 1 / Window.Current.PixelScale;
+			DrawRectOutline(a, b, color, thickness);
+		}
+
+		public static void DrawRectOutline(Vector2 a, Vector2 b, Color4 color, float thickness)
+		{
+			DrawLine(a.X, a.Y, b.X, a.Y, color, thickness);
+			DrawLine(b.X, a.Y, b.X, b.Y, color, thickness);
+			DrawLine(b.X, b.Y, a.X, b.Y, color, thickness);
+			DrawLine(a.X, b.Y, a.X, a.Y, color, thickness);
+		}
+
+		public static void DrawVerticalGradientRect(Vector2 a, Vector2 b, ColorGradient gradient)
+		{
+			v[0] = new Vertex { Pos = a, Color = gradient.A };
+			v[1] = new Vertex { Pos = new Vector2(b.X, a.Y), Color = gradient.A };
+			v[2] = new Vertex { Pos = b, Color = gradient.B };
+			v[3] = new Vertex { Pos = new Vector2(a.X, b.Y), Color = gradient.B };
+			Renderer.DrawTriangleFan(null, null, v, v.Length);
+		}
+
+		public static void DrawVerticalGradientRect(Vector2 a, Vector2 b, Color4 topColor, Color4 bottomColor)
+		{
+			DrawVerticalGradientRect(a, b, new ColorGradient(topColor, bottomColor));
 		}
 	}
 }
