@@ -18,9 +18,6 @@ namespace Lime
 				foreach (var i in indices) {
 					var c = constraints[i];
 					var s = availableSize * c.Stretch / totalStretch;
-					if (roundSizes) {
-						s = s.Round();
-					}
 					s = Mathf.Clamp(s, c.MinSize, c.MaxSize);
 					allocatedSize += (sizes[i] = s);
 				}
@@ -35,6 +32,11 @@ namespace Lime
 						availableSize = Math.Max(0, availableSize - sizes[i]);
 						indices.RemoveAt(i);
 					}
+				}
+			}
+			if (roundSizes) {
+				for (int i = 0; i < sizes.Length; i++) {
+					sizes[i] = sizes[i].Round();
 				}
 			}
 			return sizes;
