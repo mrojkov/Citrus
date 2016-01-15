@@ -54,14 +54,8 @@ namespace Lime
 				var pixelSize = (uint)CalcPixelSize(face, height).Round();
 				face.SetPixelSizes(pixelSize, pixelSize);
 			}
-			// Handle whitespace
-			if (@char == ' ') {
-				return new Glyph {
-					ACWidths = Vector2.One * (height / 10.0f),
-					Height = height,
-				};
-			}
-			uint glyphIndex = face.GetCharIndex(@char);
+
+			var glyphIndex = face.GetCharIndex(@char);
 			face.LoadGlyph(glyphIndex, LoadFlags.Default, LoadTarget.Normal);
 			if (face.Glyph.Metrics.Width == 0) {
 				return null;
@@ -89,7 +83,7 @@ namespace Lime
 			};
 			// Iterate through kerning pairs
 			foreach (var nextChar in KerningCharacters) {
-				uint nextGlyphIndex = face.GetCharIndex(nextChar);
+				var nextGlyphIndex = face.GetCharIndex(nextChar);
 				var kerning = (float)face.GetKerning(glyphIndex, nextGlyphIndex, KerningMode.Default).X;
 				if (kerning != 0) {
 					if (glyph.KerningPairs == null) {
