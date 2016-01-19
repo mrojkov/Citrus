@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System; 
+
 
 namespace Lime
 {
@@ -159,6 +160,8 @@ namespace Lime
 		GameController UIViewController { get; }
 #elif MAC
 		Platform.NSGameView NSGameView { get; }
+#elif WIN
+		System.Windows.Forms.Form Form { get; }
 #endif
 		/// <summary>
 		/// Gets the scale factor which translates virtual units to the physical pixels.

@@ -52,7 +52,7 @@ namespace Lime
 
 		private void ShowDropDownList()
 		{
-#if MAC
+#if MAC || WIN
 			var menu = new Menu();
 			int j = 0;
 			IMenuItem selectedItem = null;

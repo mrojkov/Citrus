@@ -43,6 +43,7 @@ namespace Lime
 
 		public Input Input { get; private set; }
 		public bool Active { get { return active; } }
+		public Form Form { get { return form; } }
 		public string Title { get { return form.Text; } set { form.Text = value; } }
 		public WindowState State
 		{
