@@ -235,5 +235,7 @@ namespace Lime
 			}
 			return false;
 		}
+
+		void IText.SyncCaretPosition() { }
 	}
 }

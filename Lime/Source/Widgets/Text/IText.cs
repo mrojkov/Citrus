@@ -79,8 +79,8 @@ namespace Lime
 		/// Returns the text's bounding box.
 		/// </summary>
 		Rectangle MeasureText();
-
 		void Invalidate();
+		void SyncCaretPosition();
 
 		bool Localizable { get; set; }
 		string Text { get; set; }
