@@ -38,11 +38,11 @@ namespace Lime
 		private FontChar CreateFontChar(char code)
 		{
 			var glyph = fontRenderer.Render(code, fontHeight);
-			if (glyph == null)
-				return null;
 			if (texture == null) {
 				CreateNewFontTexture();
 			}
+			if (glyph == null)
+				return null;
 			// We add 1px left and right padding to each char on the texture and also to the UV
 			// so that chars will be blurred correctly after stretching or drawing to float position.
 			// And we compensate this padding by ACWidth, so that the text will take the same space.
