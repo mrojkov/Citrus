@@ -31,6 +31,7 @@
     <IncludeMonoRuntime>False</IncludeMonoRuntime>
     <UseSGen>False</UseSGen>
     <UseRefCounting>false</UseRefCounting>
+    <Profiling>false</Profiling>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>full</DebugType>
@@ -49,6 +50,7 @@
     <IncludeMonoRuntime>False</IncludeMonoRuntime>
     <UseSGen>False</UseSGen>
     <UseRefCounting>false</UseRefCounting>
+    <Profiling>false</Profiling>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -200,6 +202,10 @@
     <ProjectReference Include="..\Lime\Lime.MonoMac.csproj">
       <Project>{DC16EEBF-404D-4610-B87A-15B57464D707}</Project>
       <Name>Lime.MonoMac</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lemon\Lemon.MonoMac.csproj">
+      <Project>{4604AA2E-129F-4814-AD0D-8BA35346ECC4}</Project>
+      <Name>Lemon.MonoMac</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>
