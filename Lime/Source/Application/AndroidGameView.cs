@@ -108,7 +108,7 @@ namespace Lime
 			FixDelKeyInputConnection baseInputConnection = new FixDelKeyInputConnection(this, false);
 			outAttrs.ActionLabel = null;
 			outAttrs.InputType = InputTypes.Null;
-			outAttrs.ImeOptions = (ImeFlags)ImeAction.Done;
+			outAttrs.ImeOptions = (ImeFlags)ImeAction.None;
 			return baseInputConnection;
 		}
 
