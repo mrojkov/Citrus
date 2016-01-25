@@ -9,3 +9,5 @@ Orange/obj/
 3rdParty/*/obj/*
 Lime/Extensions/*/bin/*
 Lime/Extensions/*/obj/*
+.DS_Store
+.vs/
