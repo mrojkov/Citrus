@@ -13,30 +13,32 @@ namespace Lime
 {
 	public class GameView : Lime.Xamarin.iPhoneOSGameView
 	{
-		class TextFieldDelegate : UITextFieldDelegate
+		class TextViewDelegate : UITextViewDelegate
 		{
 			Input input;
 
-			public TextFieldDelegate(Input input)
+			public TextViewDelegate(Input input)
 			{
 				this.input = input;
 			}
 
-			public override bool ShouldReturn(UITextField textField)
+			public override bool ShouldChangeText(UITextView textView, NSRange range, string text)
 			{
-				input.SetKeyState(Key.Enter, true);
-				input.SetKeyState(Key.Enter, false);
-				return false;
+				if (text.Equals("\n")) {
+					input.SetKeyState(Key.Enter, true);
+					input.SetKeyState(Key.Enter, false);
+				}
+				return true;
 			}
 
-			public override void EditingEnded(UITextField textField)
+			public override void EditingEnded(UITextView textView)
 			{
 				input.SetKeyState(Key.DismissSoftKeyboard, true);
 				input.SetKeyState(Key.DismissSoftKeyboard, false);
 			}
 		}
 
-		private UITextField textField;
+		private UITextView textView;
 		private UITouch[] activeTouches = new UITouch[Input.MaxTouches];
 		private float screenScale;
 		private Input input;
@@ -51,12 +53,12 @@ namespace Lime
 			LayerRetainsBacking = false;
 			LayerColorFormat = EAGLColorFormat.RGB565;
 			MultipleTouchEnabled = true;
-			textField = new UIKit.UITextField();
-			textField.Delegate = new TextFieldDelegate(input);
-			textField.AutocorrectionType = UITextAutocorrectionType.No;
-			textField.AutocapitalizationType = UITextAutocapitalizationType.None;
+			textView = new UIKit.UITextView();
+			textView.Delegate = new TextViewDelegate(input);
+			textView.AutocorrectionType = UITextAutocorrectionType.No;
+			textView.AutocapitalizationType = UITextAutocapitalizationType.None;
 			screenScale = (float)UIScreen.MainScreen.Scale;
-			this.Add(textField);
+			this.Add(textView);
 			RefreshWindowSize();
 		}
 
@@ -147,17 +149,17 @@ namespace Lime
 		public void ChangeSoftKeyboardText(string text)
 		{
 			prevText = text;
-			textField.Text = text;
+			textView.Text = text;
 		}
 
 		public void ShowSoftKeyboard(bool show, string text)
 		{
-			if (show != textField.IsFirstResponder) {
+			if (show != textView.IsFirstResponder) {
 				ChangeSoftKeyboardText(text);
 				if (show) {
-					textField.BecomeFirstResponder();
+					textView.BecomeFirstResponder();
 				} else {
-					textField.ResignFirstResponder();
+					textView.ResignFirstResponder();
 				}
 			}
 		}
@@ -224,7 +226,7 @@ namespace Lime
 		private void ProcessTextInput()
 		{
 			input.TextInput = null;
-			var currText = textField.Text ?? "";
+			var currText = textView.Text ?? "";
 			prevText = prevText ?? "";
 			if (currText.Length > prevText.Length) {
 				input.TextInput = currText.Substring(prevText.Length);
