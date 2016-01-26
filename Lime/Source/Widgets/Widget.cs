@@ -686,6 +686,10 @@ namespace Lime
 		/// <param name="delta">Количество секунд, прошедшее с момента предыдущего вызова Update</param>
 		public override void Update(float delta)
 		{
+			if (!Awoken) {
+				Awake();
+				Awoken = true;
+			}
 			delta *= AnimationSpeed;
 			if (Updating != null) {
 				Updating(delta);
