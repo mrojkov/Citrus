@@ -6,9 +6,8 @@ namespace Lime
 {
 	public class ComboBox : Widget
 	{
+		private Widget label;
 		private int index = -1;
-
-		public readonly Widget TextWidget;
 		public readonly ObservableList<Item> Items;
 
 		public int Index
@@ -17,11 +16,11 @@ namespace Lime
 			set
 			{
 				index = value;
-				Items_Changed();
+				RefreshLabel();
 			}
 		}
 
-		public string Text
+		public override string Text
 		{
 			get { return Index == -1 ? null : Items[Index].Text; }
 			set
@@ -34,20 +33,23 @@ namespace Lime
 		public ComboBox()
 		{
 			Items = new ObservableList<Item>();
-			(Items as INotifyListChanged).Changed += Items_Changed;
+			(Items as INotifyListChanged).Changed += RefreshLabel;
+			Theme.Current.Apply(this);
+		}
 
-			TextWidget = new SimpleText();
+		protected override void Awake()
+		{
+			label = this["Label"];
+			RefreshLabel();
 			// Show dropdown list on mouse press.
-			TextWidget.Updated += (delta) => {
-				if (Input.WasMousePressed() && TextWidget.HitTest(Input.MousePosition)) {
+			label.Updated += delta => {
+				if (Input.WasMousePressed() && label.HitTest(Input.MousePosition)) {
 #if MAC
 					Window.Current.Input.SetKeyState(Key.Mouse0, false);
 #endif
 					ShowDropDownList();
 				}
 			};
-			AddNode(TextWidget);
-			Theme.Current.Apply(this);
 		}
 
 		private void ShowDropDownList()
@@ -73,9 +75,11 @@ namespace Lime
 #endif
 		}
 
-		private void Items_Changed()
+		private void RefreshLabel()
 		{
-			TextWidget.Text = Text;
+			if (label != null) {
+				label.Text = Text;
+			}
 		}
 
 		public class Item

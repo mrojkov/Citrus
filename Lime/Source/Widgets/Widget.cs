@@ -166,9 +166,19 @@ namespace Lime
 			set { MaxSize = new Vector2(MaxSize.X, value); }
 		}
 
-		public virtual Vector2 MinMaxSize
+		public Vector2 MinMaxSize
 		{
 			set { MinSize = MaxSize = value; }
+		}
+
+		public float MinMaxWidth
+		{
+			set { MinWidth = MaxWidth = value; }
+		}
+
+		public float MinMaxHeight
+		{
+			set { MinHeight = MaxHeight = value; }
 		}
 
 		/// <summary>
