@@ -1,14 +1,14 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Lime
 {
-	public class VBoxLayout : CommonLayout, ILayout
+	public class HBoxLayout : CommonLayout, ILayout
 	{
 		public float Spacing { get; set; }
 
-		public VBoxLayout()
+		public HBoxLayout()
 		{
 			DebugRectangles = new List<Rectangle>();
 		}
@@ -30,21 +30,21 @@ namespace Lime
 			var margins = CalcCellMargins(widget.Padding, widgets.Count);
 			int i = 0;
 			foreach (var w in widgets) {
-				var extraSpace = margins[i].Top + margins[i].Bottom;
+				var extraSpace = margins[i].Left + margins[i].Right;
 				constraints[i++] = new LinearAllocator.Constraints {
-					MinSize = w.MinSize.Y + extraSpace,
-					MaxSize = w.MaxSize.Y + extraSpace,
-					Stretch = (w.LayoutCell ?? LayoutCell.Default).StretchY
+					MinSize = w.MinSize.X + extraSpace,
+					MaxSize = w.MaxSize.X + extraSpace,
+					Stretch = (w.LayoutCell ?? LayoutCell.Default).StretchX
 				};
 			}
-			var sizes = LinearAllocator.Allocate(widget.Height, constraints, roundSizes: true);
+			var sizes = LinearAllocator.Allocate(widget.Width, constraints, roundSizes: true);
 			i = 0;
 			DebugRectangles.Clear();
 			var position = Vector2.Zero;
 			foreach (var w in widgets) {
-				var size = new Vector2(Mathf.Clamp(widget.Width, w.MinWidth, w.MaxWidth), sizes[i]);
+				var size = new Vector2(sizes[i], Mathf.Clamp(widget.Height, w.MinHeight, w.MaxHeight));
 				TableLayout.LayoutCell(w, position, size, margins[i], DebugRectangles);
-				position.Y += size.Y;
+				position.X += size.X;
 				i++;
 			}
 		}
@@ -54,10 +54,10 @@ namespace Lime
 			var margins = new Thickness[numCells];
 			for (int i = 0; i < numCells; i++) {
 				margins[i] = new Thickness {
-					Left = padding.Left,
-					Right = padding.Right,
-					Top = (i == 0) ? padding.Top : (Spacing / 2).Round(),
-					Bottom = (i == numCells - 1) ? padding.Bottom : (Spacing / 2).Round(),
+					Left = (i == 0) ? padding.Left : (Spacing / 2).Round(),
+					Right = (i == numCells - 1) ? padding.Right : (Spacing / 2).Round(),
+					Top = padding.Top,
+					Bottom = padding.Bottom,
 				};
 			}
 			return margins;
@@ -68,14 +68,14 @@ namespace Lime
 			ConstraintsValid = true;
 			var widgets = widget.Nodes.OfType<Widget>().ToList();
 			var minSize = new Vector2(
-				widgets.Max(i => i.MinSize.X),
-				widgets.Sum(i => i.MinSize.Y)
+				widgets.Sum(i => i.MinSize.X),
+				widgets.Max(i => i.MinSize.Y)
 			);
 			var maxSize = new Vector2(
-				widgets.Max(i => i.MaxSize.X),
-				widgets.Sum(i => i.MaxSize.Y)
+				widgets.Sum(i => i.MaxSize.X),
+				widgets.Max(i => i.MaxSize.Y)
 			);
-			var extraSpace = new Vector2(0, (widgets.Count - 1) * Spacing) + widget.Padding;
+			var extraSpace = new Vector2((widgets.Count - 1) * Spacing, 0) + widget.Padding;
 			widget.MinSize = minSize + extraSpace;
 			widget.MaxSize = maxSize + extraSpace;
 		}

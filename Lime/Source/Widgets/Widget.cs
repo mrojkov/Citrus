@@ -281,9 +281,9 @@ namespace Lime
 
 		/// <summary>
 		/// Gets or sets the widget padding. Padding defines the white space between the widget content and the widget border.
-		/// The widget should respect the padding during its rendering.
+		/// The widget presenter and layout should respect the padding.
 		/// </summary>
-		public Margin Padding;
+		public Thickness Padding;
 
 		public Vector2 ContentPosition
 		{
