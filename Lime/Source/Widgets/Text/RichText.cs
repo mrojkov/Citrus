@@ -205,6 +205,7 @@ namespace Lime
 			spriteList = null;
 			parser = null;
 			renderer = null;
+			Window.Current.Invalidate();
 		}
 
 		/// Call on user-supplied parts of text.

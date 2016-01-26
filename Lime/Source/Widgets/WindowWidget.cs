@@ -9,11 +9,13 @@ namespace Lime
 	{
 		private IKeyboardInputProcessor prevActiveTextWidget;
 		private RenderChain renderChain = new RenderChain();
-		
+		private bool continuousRendering;
+
 		public IWindow Window { get; private set; }
 
-		public WindowWidget(IWindow window)
+		public WindowWidget(IWindow window, bool continuousRendering = true)
 		{
+			this.continuousRendering = continuousRendering;
 			Window = window;
 			new WidgetContext(this);
 			Window.Context = new CombinedContext(Window.Context, WidgetContext.Current);
@@ -23,6 +25,9 @@ namespace Lime
 
 		public override void Update(float delta)
 		{
+			if (!continuousRendering) {
+				Window.Invalidate();
+			}
 			var context = WidgetContext.Current;
 			WidgetInput.RemoveInvalidatedCaptures();
 			ParticleEmitter.NumberOfUpdatedParticles = 0;

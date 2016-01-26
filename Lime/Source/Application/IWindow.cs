@@ -152,6 +152,11 @@ namespace Lime
 		/// </summary>
 		event Action Rendering;
 
+		/// <summary>
+		/// Sets a flag indicating whether the current frame should be rendered.
+		/// </summary>
+		void Invalidate();
+
 #if iOS
 		GameController UIViewController { get; }
 #elif MAC

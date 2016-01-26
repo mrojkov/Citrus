@@ -14,6 +14,7 @@ namespace Lime
 		private NSWindow window;
 		private FPSCounter fpsCounter;
 		private Stopwatch stopwatch;
+		private bool invalidated;
 
 		public NSGameView View { get; private set; }
 
@@ -141,6 +142,7 @@ namespace Lime
 		public Window(WindowOptions options)
 		{
 			Input = new Input();
+			Input.Changed += HandleRenderFrame;
 			fpsCounter = new FPSCounter();
 			CreateNativeWindow(options);
 			if (Application.MainWindow != null) {
@@ -156,7 +158,7 @@ namespace Lime
 			stopwatch = new Stopwatch();
 			stopwatch.Start();
 			window.MakeKeyAndOrderFront(window);
-			View.Run(60);
+			View.Run(options.RefreshRate);
 		}
 
 		private Size windowedClientSize;
@@ -208,6 +210,11 @@ namespace Lime
 			View.RenderFrame += HandleRenderFrame;
 		}
 
+		public void Invalidate()
+		{
+			invalidated = true;
+		}
+
 		public void Center()
 		{
 			var displayBounds = DisplayDevice.Default.Bounds;
@@ -235,15 +242,19 @@ namespace Lime
 			stopwatch.Restart();
 			delta = Mathf.Clamp(delta, 0, 1 / Application.LowFPSLimit);
 			Update(delta);
-			fpsCounter.Refresh();
-			View.MakeCurrent();
-			RaiseRendering();
-			View.SwapBuffers();
+			if (invalidated) {
+				fpsCounter.Refresh();
+				View.MakeCurrent();
+				RaiseRendering();
+				View.SwapBuffers();
+				invalidated = false;
+			}
 		}
 
 		private void HandleResize(object sender, EventArgs e)
 		{
 			RaiseResized();
+			Invalidate();
 		}
 
 		private void HandleMove(object sender, EventArgs e)

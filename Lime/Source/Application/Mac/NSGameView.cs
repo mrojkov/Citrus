@@ -27,6 +27,7 @@ namespace Lime.Platform
 		private Lime.Input input;
 
 		public event Action RenderFrame;
+		public event Action InputChanged;
 
 		public NSGameView(Lime.Input input, CGRect frame, NSOpenGLContext shareContext, GraphicsMode mode)
 			: base(frame)
@@ -365,6 +366,13 @@ namespace Lime.Platform
 			}
 			base.Dispose(disposing);
 			disposed = true;
+		}
+
+		private void RaiseInputChanged()
+		{
+			if (InputChanged != null) {
+				InputChanged();
+			}
 		}
 	}
 }

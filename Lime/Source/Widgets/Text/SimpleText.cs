@@ -159,7 +159,7 @@ namespace Lime
 			get
 			{
 				if (AutoSizeConstraints && !minSizeValid) {
-					base.MinSize = CalcContentSize();
+					base.MinSize = CalcContentSize() + Padding;
 					minSizeValid = true;
 				}
 				return base.MinSize;
@@ -470,6 +470,7 @@ namespace Lime
 			caret.Valid = CaretPosition.ValidState.TextPos;
 			spriteList = null;
 			minSizeValid = false;
+			Window.Current.Invalidate();
 		}
 	}
 }
