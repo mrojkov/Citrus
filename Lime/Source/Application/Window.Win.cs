@@ -41,7 +41,6 @@ namespace Lime
 		private bool active;
 		private System.Drawing.Point lastMousePosition;
 
-		public bool ModalDialogShown { get; set; }
 		public Input Input { get; private set; }
 		public bool Active { get { return active; } }
 		public string Title { get { return form.Text; } set { form.Text = value; } }

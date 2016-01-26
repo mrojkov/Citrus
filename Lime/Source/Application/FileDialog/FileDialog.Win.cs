@@ -5,7 +5,7 @@ using WinForms = System.Windows.Forms;
 namespace Lime
 {
 	/// <summary>
-	/// Class that brings files and folders access through the dialog screen.
+	/// Brings access to files and folders through the dialog screen.
 	/// </summary>
 	public class FileDialog : IFileDialog
 	{
@@ -30,7 +30,7 @@ namespace Lime
 		public string FileName { get; private set; }
 
 		/// <summary>
-		/// Gets an array of strings containing paths of all selected files in the open file dialog.
+		/// Gets an array of strings containing paths of all selected files.
 		/// </summary>
 		public string[] FileNames { get; private set; }
 
