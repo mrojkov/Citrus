@@ -41,6 +41,7 @@ namespace Lime
 		private bool active;
 		private System.Drawing.Point lastMousePosition;
 
+		public bool ModalDialogShown { get; set; }
 		public Input Input { get; private set; }
 		public bool Active { get { return active; } }
 		public string Title { get { return form.Text; } set { form.Text = value; } }
@@ -362,18 +363,21 @@ namespace Lime
 
 		private void OnPaint(object sender, PaintEventArgs e)
 		{
-			var delta = (float)stopwatch.Elapsed.TotalSeconds;
-			stopwatch.Restart();
-			delta = Mathf.Clamp(delta, 0, 1 / Application.LowFPSLimit);
-			Input.ProcessPendingKeyEvents();
-			RaiseUpdating(delta);
-			AudioSystem.Update();
-			Input.TextInput = null;
-			Input.CopyKeysState();
-			fpsCounter.Refresh();
-			mainGLControl.Context.MakeCurrent(glControl.WindowInfo);
-			RaiseRendering();
-			mainGLControl.SwapBuffers();
+			// Do not allow updating if modal dialog is shown, otherwise it will lead to recursive OnPaint.
+			if (form.Visible && form.CanFocus) {
+				var delta = (float)stopwatch.Elapsed.TotalSeconds;
+				stopwatch.Restart();
+				delta = Mathf.Clamp(delta, 0, 1 / Application.LowFPSLimit);
+				Input.ProcessPendingKeyEvents();
+				RaiseUpdating(delta);
+				AudioSystem.Update();
+				Input.TextInput = null;
+				Input.CopyKeysState();
+				fpsCounter.Refresh();
+				mainGLControl.Context.MakeCurrent(glControl.WindowInfo);
+				RaiseRendering();
+				mainGLControl.SwapBuffers();
+			}
 		}
 
 		private static Key TranslateKey(Keys key)

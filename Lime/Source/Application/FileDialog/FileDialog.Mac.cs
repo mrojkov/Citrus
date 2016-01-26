@@ -8,11 +8,8 @@ namespace Lime
 	public class FileDialog : IFileDialog
 	{
 		public FileDialogMode Mode { get; set; }
-		public bool CanChooseFiles { get; set; }
-		public bool CanChooseDirectories { get; set; }
 		public bool AllowsMultipleSelection { get; set; }
 		public bool CanCreateDirectories { get; set; }
-		public bool ShowHiddenFiles { get; set; }
 		public string FileName { get; private set; }
 		public string[] FileNames { get; private set; }
 		public string[] AllowedFileTypes { get; set; }
@@ -28,10 +25,10 @@ namespace Lime
 					if (AllowedFileTypes != null) {
 						nsPanel.AllowedFileTypes = AllowedFileTypes;
 					}
-					nsPanel.ShowsHiddenFiles = ShowHiddenFiles;
 					nsPanel.CanCreateDirectories = CanCreateDirectories;
 					if (nsPanel.RunModal() == (int)NSPanelButtonType.Ok) {
 						FileName = nsPanel.Url.Path;
+						FileNames = new[] { FileName };
 						return true;
 					}
 				}
@@ -43,7 +40,6 @@ namespace Lime
 					nsPanel.AllowsMultipleSelection = AllowsMultipleSelection;
 					nsPanel.CanChooseFiles = Mode == FileDialogMode.Open;
 					nsPanel.CanChooseDirectories = !nsPanel.CanChooseFiles;
-					nsPanel.ShowsHiddenFiles = ShowHiddenFiles;
 					nsPanel.CanCreateDirectories = CanCreateDirectories;
 					if (nsPanel.RunModal() == (int)NSPanelButtonType.Ok) {
 						FileName = nsPanel.Url.Path;
