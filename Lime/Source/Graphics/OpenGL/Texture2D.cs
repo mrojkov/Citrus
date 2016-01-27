@@ -73,6 +73,21 @@ namespace Lime
 				texture.LoadImage(stream);
 			}
 		}
+
+		class TextureBitmapReloader : TextureReloader
+		{
+			Bitmap bitmap;
+
+			public TextureBitmapReloader(Bitmap bitmap)
+			{
+				this.bitmap = bitmap.Clone();
+			}
+
+			public override void Reload(Texture2D texture)
+			{
+				texture.LoadImage(bitmap);
+			}
+		}
 		#endregion
 
 		private uint handle;
@@ -134,6 +149,9 @@ namespace Lime
 
 		public void LoadImage(Bitmap bitmap)
 		{
+			if (reloader == null) {
+				reloader = new TextureBitmapReloader(bitmap);
+			}
 			InitWithLimeBitmap(bitmap);
 		}
 
