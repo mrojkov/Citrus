@@ -173,6 +173,15 @@ namespace Lime
 		{
 			SetTexture(textureStack.Pop(), stage);
 		}
+		
+		public static void InvalidateTexture(uint handle)
+		{
+			for (int i = 0; i < textures.Length; i++) {
+				if (textures[i] == handle) {
+					textures[i] = 0;
+				}
+			}
+		}
 
 		public static void SetViewport(WindowRect value)
 		{

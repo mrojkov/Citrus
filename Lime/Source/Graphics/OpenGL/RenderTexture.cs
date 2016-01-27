@@ -105,6 +105,7 @@ namespace Lime
 				Application.InvokeOnMainThread(() => {
 					GL.DeleteTextures(1, new uint[] { capturedHandle });
 					PlatformRenderer.CheckErrors();
+					PlatformRenderer.InvalidateTexture(capturedHandle);
 				});
 				handle = 0;
 			}

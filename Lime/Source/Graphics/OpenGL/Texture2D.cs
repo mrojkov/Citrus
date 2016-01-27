@@ -269,6 +269,7 @@ namespace Lime
 				var capturedHandle = handle;
 				Application.InvokeOnMainThread(() => {
 					GL.DeleteTextures(1, new uint[] { capturedHandle });
+					PlatformRenderer.InvalidateTexture(capturedHandle);
 				});
 				handle = 0;
 			}
