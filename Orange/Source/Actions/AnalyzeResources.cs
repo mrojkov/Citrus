@@ -89,11 +89,11 @@ namespace Orange
 				The.Workspace.GetBundlePath(CookingRules.MainBundleName));
 			foreach (var i in cookingRulesMap) {
 				if (i.Key.EndsWith(".png")) {
-					if (i.Value.TextureAtlas == null && i.Value.PVRFormat != PVRFormat.PVRTC4) {
+					if (i.Value.TextureAtlas == null && i.Value.PVRFormat != PVRFormat.PVRTC4 && i.Value.PVRFormat != PVRFormat.PVRTC4_Forced) {
 						suspiciousTexturesReport.Add(string.Format("{0}: {1}, atlas: none",
 							i.Key, i.Value.PVRFormat));
 					}
-					if (i.Value.PVRFormat != PVRFormat.PVRTC4 && i.Value.PVRFormat != PVRFormat.PVRTC2) {
+					if (i.Value.PVRFormat != PVRFormat.PVRTC4 && i.Value.PVRFormat != PVRFormat.PVRTC4_Forced && i.Value.PVRFormat != PVRFormat.PVRTC2) {
 						int w;
 						int h;
 						bool hasAlpha;

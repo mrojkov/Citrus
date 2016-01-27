@@ -422,7 +422,7 @@ namespace Orange
 			});
 			// PVRTC2/4 textures must be square
 			var squareAtlas = (platform == TargetPlatform.iOS) && items.Any(i =>
-				i.PVRFormat == PVRFormat.PVRTC4 || i.PVRFormat == PVRFormat.PVRTC2);
+				i.PVRFormat == PVRFormat.PVRTC4 || i.PVRFormat == PVRFormat.PVRTC4_Forced || i.PVRFormat == PVRFormat.PVRTC2);
 			for (var atlasId = 0; items.Count > 0; atlasId++) {
 				if (atlasId >= MaxAtlasChainLength) {
 					throw new Lime.Exception("Too many textures in the atlas chain {0}", atlasChain);

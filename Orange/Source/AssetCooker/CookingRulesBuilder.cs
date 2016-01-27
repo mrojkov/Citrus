@@ -9,6 +9,7 @@ namespace Orange
 	public enum PVRFormat
 	{
 		PVRTC4,
+		PVRTC4_Forced,
 		PVRTC2,
 		ETC1,
 		RGB565,
@@ -127,6 +128,8 @@ namespace Orange
 				case "":
 				case "PVRTC4":
 					return (platform == TargetPlatform.Android) ? PVRFormat.ETC1 : PVRFormat.PVRTC4;
+				case "PVRTC4_Forced":
+					return (platform == TargetPlatform.Android) ? PVRFormat.ETC1 : PVRFormat.PVRTC4_Forced;
 				case "PVRTC2":
 					return (platform == TargetPlatform.Android) ? PVRFormat.ETC1 : PVRFormat.PVRTC2;
 				case "RGBA4":
@@ -138,7 +141,7 @@ namespace Orange
 				case "RGBA8":
 					return PVRFormat.ARGB8;
 				default:
-					throw new Lime.Exception("Error parsing PVR format. Must be one of: PVRTC4, PVRTC2, RGBA4, RGB565, ARGB8");
+					throw new Lime.Exception("Error parsing PVR format. Must be one of: PVRTC4, PVRTC4_Forced, PVRTC2, RGBA4, RGB565, ARGB8");
 			}
 		}
 
