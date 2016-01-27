@@ -17,9 +17,6 @@ namespace Lime
 
 		public BitmapImplementation(Stream stream)
 		{
-			if (stream.Length == 0) {
-				throw new Exception("Can not create bitmap from empty stream");
-			}
 			LoadFromStream(stream);
 		}
 
