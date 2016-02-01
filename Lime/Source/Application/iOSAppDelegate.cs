@@ -11,8 +11,8 @@ using MessageUI;
 namespace Lime
 {
 	/// <summary>
-	/// The UIApplicationDelegate for the application. This class is responsible for launching the 
-	/// User Interface of the application, as well as listening(and optionally responding) to 
+	/// The UIApplicationDelegate for the application. This class is responsible for launching the
+	/// User Interface of the application, as well as listening(and optionally responding) to
 	/// application events from iOS.
 	/// </summary>
 	[Register("AppDelegate")]
@@ -43,7 +43,7 @@ namespace Lime
 			Instance = this;
 			AppDomain.CurrentDomain.UnhandledException += GlobalExceptionHandler;
 		}
-		
+
 		public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations(UIApplication application, UIWindow forWindow)
 		{
 			// Grisha: UIInterfaceOrientationMask.Portrait is required by GameCenter for iPhone in iOS 6.
@@ -83,6 +83,12 @@ namespace Lime
 			Logger.Write("========================= CRASH REPORT ============================\n" + e.ExceptionObject.ToString());
 		}
 
+		//iOS9 changed the function signature for OpenURL. This is the new signature. Fixes [WSAG-3193].
+		public override bool OpenUrl (UIApplication application, NSUrl url, NSDictionary options)
+		{
+			return InvokeUrlOpenedDelegate(url);
+		}
+
 		public override bool OpenUrl (UIApplication application, NSUrl url, string sourceApplication, NSObject annotation)
 		{
 			return InvokeUrlOpenedDelegate(url);
@@ -106,7 +112,7 @@ namespace Lime
 				Activated();
 			}
 		}
-	
+
 		public override void WillTerminate(UIApplication application)
 		{
 			if (WillTerminateEvent != null) {
