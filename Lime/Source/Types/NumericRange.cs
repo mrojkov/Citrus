@@ -21,9 +21,10 @@ namespace Lime
 			Median = median;
 			Dispersion = dispersion;
 		}
-		
+
 		/// <summary>
-		/// Returns random number from this range. Result is always lesser than median.
+		/// Returns random number from a normal distribution
+		/// with given median and variance (dispersion)
 		/// </summary>
 		public float NormalRandomNumber()
 		{
@@ -36,7 +37,9 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Returns random number from this range.
+		/// Returns random number from uniform distribution
+		/// with given median and range (note that Dispersion here is not the actual
+		/// variance of a distribution but half of the range).
 		/// </summary>
 		public float UniformRandomNumber()
 		{
