@@ -14,6 +14,12 @@ namespace Lime
 			var sizes = new float[constraints.Length];
 			while (indices.Count != 0) {
 				var totalStretch = CalcTotalStretch(constraints, indices);
+				if (totalStretch < 1e-5) {
+					foreach (var i in indices) {
+						sizes[i] = constraints[i].MinSize;
+					}
+					return sizes;
+				}
 				float allocatedSize = 0;
 				foreach (var i in indices) {
 					var c = constraints[i];
@@ -21,7 +27,7 @@ namespace Lime
 					s = Mathf.Clamp(s, c.MinSize, c.MaxSize);
 					allocatedSize += (sizes[i] = s);
 				}
-				if (Math.Abs(allocatedSize - availableSize) < 0.01f) {
+				if (Math.Abs(allocatedSize - availableSize) < 0.1f) {
 					// We perfectly fit the items into the designated space.
 					return sizes;
 				}
@@ -47,9 +53,6 @@ namespace Lime
 			float ts = 0;
 			foreach (var i in indices) {
 				ts += constraints[i].Stretch;
-			}
-			if (ts == 0) {
-				ts = 1;
 			}
 			return ts;
 		}

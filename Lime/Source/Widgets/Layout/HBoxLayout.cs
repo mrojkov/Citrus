@@ -27,40 +27,25 @@ namespace Lime
 				return;
 			}
 			var constraints = new LinearAllocator.Constraints[widgets.Count];
-			var margins = CalcCellMargins(widget.Padding, widgets.Count);
 			int i = 0;
 			foreach (var w in widgets) {
-				var extraSpace = margins[i].Left + margins[i].Right;
 				constraints[i++] = new LinearAllocator.Constraints {
-					MinSize = w.MinSize.X + extraSpace,
-					MaxSize = w.MaxSize.X + extraSpace,
+					MinSize = w.MinSize.X,
+					MaxSize = w.MaxSize.X,
 					Stretch = (w.LayoutCell ?? LayoutCell.Default).StretchX
 				};
 			}
-			var sizes = LinearAllocator.Allocate(widget.Width, constraints, roundSizes: true);
+			var availableWidth = Math.Max(0, widget.ContentWidth - (widgets.Count - 1) * Spacing);
+			var sizes = LinearAllocator.Allocate(availableWidth, constraints, roundSizes: true);
 			i = 0;
 			DebugRectangles.Clear();
-			var position = Vector2.Zero;
+			var position = new Vector2(widget.Padding.Left, widget.Padding.Top);
 			foreach (var w in widgets) {
 				var size = new Vector2(sizes[i], Mathf.Clamp(widget.Height, w.MinHeight, w.MaxHeight));
-				TableLayout.LayoutCell(w, position, size, margins[i], DebugRectangles);
-				position.X += size.X;
+				TableLayout.LayoutCell(w, position, size, DebugRectangles);
+				position.X += size.X + Spacing;
 				i++;
 			}
-		}
-
-		private Thickness[] CalcCellMargins(Thickness padding, int numCells)
-		{
-			var margins = new Thickness[numCells];
-			for (int i = 0; i < numCells; i++) {
-				margins[i] = new Thickness {
-					Left = (i == 0) ? padding.Left : (Spacing / 2).Round(),
-					Right = (i == numCells - 1) ? padding.Right : (Spacing / 2).Round(),
-					Top = padding.Top,
-					Bottom = padding.Bottom,
-				};
-			}
-			return margins;
 		}
 
 		public override void MeasureSizeConstraints(Widget widget)
