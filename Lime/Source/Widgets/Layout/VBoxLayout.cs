@@ -41,7 +41,7 @@ namespace Lime
 			DebugRectangles.Clear();
 			var position = new Vector2(widget.Padding.Left, widget.Padding.Top);
 			foreach (var w in widgets) {
-				var size = new Vector2(Mathf.Clamp(widget.Width, w.MinWidth, w.MaxWidth), sizes[i]);
+				var size = new Vector2(widget.Width, sizes[i]);
 				TableLayout.LayoutCell(w, position, size, DebugRectangles);
 				position.Y += size.Y + Spacing;
 				i++;
