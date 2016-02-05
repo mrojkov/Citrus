@@ -73,7 +73,7 @@ namespace Lime
 					for (int u = 0; u < rowSpan; u++) {
 						size.Y += rows[i + u] + (u > 0 ? RowSpacing : 0);
 					}
-					LayoutCell(c, p, size, DebugRectangles);
+					LayoutWidgetWithinCell(c, p, size, DebugRectangles);
 					p.X += cols[j] + ColSpacing;
 				}
 				p.Y += rows[i] + RowSpacing;
@@ -164,32 +164,6 @@ namespace Lime
 				}
 			}
 			return cells;
-		}
-
-		internal static void LayoutCell(Widget widget, Vector2 position, Vector2 size, List<Rectangle> debugRectangles)
-		{
-			debugRectangles.Add(new Rectangle { A = position, B = position + size });
-			var halign = GetCellData(widget).Alignment.X;
-			var valign = GetCellData(widget).Alignment.Y;
-			var innerSize = Vector2.Clamp(size, widget.MinSize, widget.MaxSize);
-			if (halign == HAlignment.Right) {
-				position.X += size.X - innerSize.X;
-			} else if (halign == HAlignment.Center) {
-				position.X += ((size.X - innerSize.X) / 2).Round();
-			}
-			if (valign == VAlignment.Bottom) {
-				position.Y += size.Y - innerSize.Y;
-			} else if (valign == VAlignment.Center) {
-				position.Y += ((size.Y - innerSize.Y) / 2).Round();
-			}
-			widget.Position = position;
-			widget.Size = innerSize;
-			widget.Pivot = Vector2.Zero;
-		}
-
-		private static LayoutCell GetCellData(Widget cell)
-		{
-			return cell.LayoutCell ?? Lime.LayoutCell.Default;
 		}
 
 		private int GetRowSpan(Widget cell, int row)

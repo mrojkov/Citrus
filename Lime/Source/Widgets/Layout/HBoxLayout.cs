@@ -42,7 +42,7 @@ namespace Lime
 			var position = new Vector2(widget.Padding.Left, widget.Padding.Top);
 			foreach (var w in widgets) {
 				var size = new Vector2(sizes[i], widget.ContentHeight);
-				TableLayout.LayoutCell(w, position, size, DebugRectangles);
+				LayoutWidgetWithinCell(w, position, size, DebugRectangles);
 				position.X += size.X + Spacing;
 				i++;
 			}
@@ -63,11 +63,6 @@ namespace Lime
 			var extraSpace = new Vector2((widgets.Count - 1) * Spacing, 0) + widget.Padding;
 			widget.MinSize = minSize + extraSpace;
 			widget.MaxSize = maxSize + extraSpace;
-		}
-
-		private List<Widget> GetChildren(Widget widget)
-		{
-			return widget.Nodes.OfType<Widget>().Where(i => i.Visible).ToList();
 		}
 	}
 }
