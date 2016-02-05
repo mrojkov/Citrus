@@ -22,7 +22,7 @@ namespace Lime
 		public override void ArrangeChildren(Widget widget)
 		{
 			ArrangementValid = true;
-			var widgets = widget.Nodes.OfType<Widget>().ToList();
+			var widgets = GetChildren(widget);
 			if (widgets.Count == 0) {
 				return;
 			}
@@ -51,7 +51,7 @@ namespace Lime
 		public override void MeasureSizeConstraints(Widget widget)
 		{
 			ConstraintsValid = true;
-			var widgets = widget.Nodes.OfType<Widget>().ToList();
+			var widgets = GetChildren(widget);
 			var minSize = new Vector2(
 				widgets.Max(i => i.MinSize.X),
 				widgets.Sum(i => i.MinSize.Y)
@@ -63,6 +63,11 @@ namespace Lime
 			var extraSpace = new Vector2(0, (widgets.Count - 1) * Spacing) + widget.Padding;
 			widget.MinSize = minSize + extraSpace;
 			widget.MaxSize = maxSize + extraSpace;
+		}
+
+		private List<Widget> GetChildren(Widget widget)
+		{
+			return widget.Nodes.OfType<Widget>().Where(i => i.Visible).ToList();
 		}
 	}
 }
