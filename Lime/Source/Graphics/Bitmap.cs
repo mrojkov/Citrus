@@ -1,8 +1,6 @@
 using System;
 using System.IO;
 
-using ProtoBuf;
-
 namespace Lime
 {
 	interface IBitmapImplementation : IDisposable
@@ -16,7 +14,6 @@ namespace Lime
 		Color4[] GetPixels();
 	}
 
-	[ProtoContract]
 	public class Bitmap : IDisposable
 	{
 		private IBitmapImplementation implementation;
@@ -41,37 +38,19 @@ namespace Lime
 			this.implementation = implementation;
 		}
 
+		public int Width
+		{
+			get { return implementation.GetWidth(); }
+		}
+
 		public int Height
 		{
 			get { return implementation.GetHeight(); }
 		}
 
-		[ProtoMember(1)]
-		public byte[] SerializationData
-		{
-			get
-			{
-				return IsValid() ? GetByteArray() : null;
-			}
-
-			set
-			{
-				if (value != null) {
-					LoadFromByteArray(value);
-				} else {
-					Dispose();
-				}
-			}
-		}
-
 		public Vector2 Size
 		{
 			get { return new Vector2(Width, Height); }
-		}
-
-		public int Width
-		{
-			get { return implementation.GetWidth(); }
 		}
 
 		public Bitmap Clone()
@@ -112,19 +91,38 @@ namespace Lime
 		{
 			implementation.SaveToStream(stream);
 		}
+	}
 
-		private byte[] GetByteArray()
+	/// <summary>
+	/// Serves for <see cref="Bitmap"/> serialization only. You don't need to create instance of this class.
+	/// </summary>
+	public class SurrogateBitmap
+	{
+		/// <summary>
+		/// Gets or sets a byte array with png-compressed image data.
+		/// </summary>
+		public byte[] SerializationData { get; set; }
+
+		public static implicit operator Bitmap(SurrogateBitmap surrogate)
 		{
-			using (var stream = new MemoryStream()) {
-				SaveToStream(stream);
-				return stream.ToArray();
+			if (surrogate == null) {
+				return null;
+			}
+
+			using (var memoryStream = new MemoryStream(surrogate.SerializationData)) {
+				return new Bitmap(memoryStream);
 			}
 		}
 
-		private void LoadFromByteArray(byte[] data)
+		public static implicit operator SurrogateBitmap(Bitmap bitmap)
 		{
-			using (var stream = new MemoryStream(data)) {
-				implementation = new BitmapImplementation(stream);
+			if (bitmap == null) {
+				return null;
+			}
+
+			using (var memoryStream = new MemoryStream()) {
+				bitmap.SaveToStream(memoryStream);
+				return new SurrogateBitmap { SerializationData = memoryStream.ToArray() };
 			}
 		}
 	}
