@@ -110,6 +110,12 @@ namespace Lime
 			var color = Color4.White;
 			var dstPixels = texture.Data;
 			for (int i = 0; i < glyph.Height; i++) {
+				if (glyph.VerticalOffset + i < 0) {
+					// Sometimes VerticalOffset could be negative for symbols with diacritics and this leads the symbols to overlap or
+					// go out of the bounds of texture. We just skip such pixels from glyph because it could be just
+					// error of SharpFont (normally they have zero offset but for some font heights it's -1).
+					continue;
+				}
 				var di = (position.Y + glyph.VerticalOffset + i) * texture.ImageSize.Width + position.X;
 				for (int j = glyph.Width; j > 0; j--) {
 					color.A = srcPixels[si++];
