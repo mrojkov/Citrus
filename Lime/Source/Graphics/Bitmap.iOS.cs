@@ -1,6 +1,5 @@
 #if iOS
 using System;
-using System.Drawing;
 using System.IO;
 using CoreGraphics;
 using UIKit;
@@ -82,7 +81,7 @@ namespace Lime
 			if (!IsValid()) {
 				throw new InvalidOperationException();
 			}
-			var scaledImage = bitmap.Scale(new SizeF(newWidth, newHeight));
+			var scaledImage = bitmap.Scale(new CGSize(newWidth, newHeight));
 			return new BitmapImplementation { bitmap = scaledImage };
 		}
 
@@ -91,7 +90,7 @@ namespace Lime
 			if (!IsValid()) {
 				throw new InvalidOperationException();
 			}
-			var rect = new RectangleF(cropArea.Left, cropArea.Top, cropArea.Width, cropArea.Height);
+			var rect = new CGRect(cropArea.Left, cropArea.Top, cropArea.Width, cropArea.Height);
 			var cgimage = bitmap.CGImage;
 			cgimage = cgimage.WithImageInRect(rect);
 			return new BitmapImplementation { bitmap = new UIImage(cgimage) };
@@ -102,23 +101,43 @@ namespace Lime
 			if (!IsValid()) {
 				throw new InvalidOperationException();
 			}
-			nint bitsPerPixel = bitmap.CGImage.BitsPerPixel;
-			bool isColorSpaceRGB = bitmap.CGImage.ColorSpace.Model == CGColorSpaceModel.RGB;
-			if (!isColorSpaceRGB && bitsPerPixel != 32) {
+			var isColorSpaceRGB = bitmap.CGImage.ColorSpace.Model == CGColorSpaceModel.RGB;
+			if (!isColorSpaceRGB && bitmap.CGImage.BitsPerPixel != 32) {
 				throw new Exception("Can not return array of pixels if bitmap is not in 32 bit format or if not in RGBA format.");
 			}
-			int arraySize = GetWidth() * GetHeight();
-			var pixels = new Color4[arraySize];
-			using (var data = bitmap.CGImage.DataProvider.CopyData()) {				
+
+			var doSwap = bitmap.CGImage.BitmapInfo.HasFlag(CGBitmapFlags.ByteOrder32Little);
+			var isPremultiplied = bitmap.CGImage.AlphaInfo == CGImageAlphaInfo.PremultipliedFirst ||
+				bitmap.CGImage.AlphaInfo == CGImageAlphaInfo.PremultipliedLast;
+			var rowLength = bitmap.CGImage.BytesPerRow / 4;
+			var width = GetWidth();
+			var height = GetHeight();
+			var pixels = new Color4[width * height];
+			using (var data = bitmap.CGImage.DataProvider.CopyData()) {
 				unsafe {
 					byte* pBytes = (byte*)data.Bytes;
 					byte r, g, b, a;
-					for (int i = 0; i < arraySize; i++) {
-						r = (byte)(*pBytes++);
-						g = (byte)(*pBytes++);
-						b = (byte)(*pBytes++);
-						a = (byte)(*pBytes++);
-						pixels[i] = new Color4(r, g, b, a);
+					int index = 0;
+					for (int i = 0; i < height; i++) {
+						for (int j = 0; j < width; j++) {
+							r = (byte)(*pBytes++);
+							g = (byte)(*pBytes++);
+							b = (byte)(*pBytes++);
+							a = (byte)(*pBytes++);
+							if (isPremultiplied && a != 255 && a != 0) {
+								var fa = a / 255f;
+								r = (byte)(((r / 255f) / fa) * 255f);
+								g = (byte)(((g / 255f) / fa) * 255f);
+								b = (byte)(((b / 255f) / fa) * 255f);
+							}
+							pixels[index++] = doSwap ? new Color4(b, g, r, a) : new Color4(r, g, b, a);
+						}
+
+						// Sometimes Width can be smaller then length of a row due to byte allignment.
+						// It's just an empty bytes at the end of each row, so we can skip them here.
+						for (int k = 0; k < rowLength - width; k++) {
+							pBytes += 4;
+						}
 					}
 				}
 			}
@@ -129,14 +148,7 @@ namespace Lime
 		{
 			if (bitmap != null) {
 				bitmap.Dispose();
-				bitmap = null;
 			}
-			GC.SuppressFinalize(this);
-		}
-
-		~BitmapImplementation() 
-		{
-			Dispose();
 		}
 		
 		public bool IsValid()
