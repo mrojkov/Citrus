@@ -150,7 +150,15 @@ namespace Lime
 			get { return 1.0f; }
 		}
 
-		public void Center() { }
+		public void Center()
+		{
+			var screen = Screen.FromControl(form).WorkingArea;
+			var position = new IntVector2(
+				screen.X + (screen.Width - form.ClientSize.Width) / 2,
+				screen.Y + (screen.Height - form.ClientSize.Height) / 2);
+			ClientPosition = position;
+		}
+
 		public void Close() { }
 
 		private class GLControl : OpenTK.GLControl
