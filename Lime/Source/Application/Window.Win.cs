@@ -127,6 +127,9 @@ namespace Lime
 		}
 
 		FPSCounter fpsCounter = new FPSCounter();
+		public float FPS { get { return fpsCounter.FPS; } }
+
+		[Obsolete("Use FPS property instead", true)]
 		public float CalcFPS() { return fpsCounter.FPS; }
 
 		public bool Visible

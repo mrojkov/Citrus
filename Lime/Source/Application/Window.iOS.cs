@@ -29,7 +29,9 @@ namespace Lime
 		public Size MaximumDecoratedSize { get { return Size.Zero; } set {} }
 		public bool Visible { get { return true; } set {} }
 		public MouseCursor Cursor { get; set; }
+		public float FPS { get { return fpsCounter.FPS; } }
 
+		[Obsolete("Use FPS property instead", true)]
 		public float CalcFPS() { return fpsCounter.FPS; }
 
 		public float PixelScale {

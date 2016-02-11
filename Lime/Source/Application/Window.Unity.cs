@@ -20,7 +20,9 @@ namespace Lime
 		public Size DecoratedSize { get { return ClientSize; } set {} }
 		public Size MinimumDecoratedSize { get { return Size.Zero; } set {} }
 		public Size MaximumDecoratedSize { get { return Size.Zero; } set {} }
-		
+		public float FPS { get { return fpsCounter.FPS; } }
+
+		[Obsolete("Use FPS property instead", true)]
 		public float CalcFPS() { return fpsCounter.FPS; }
 		public void Center() {}
 		public void Close() {}
