@@ -1,4 +1,4 @@
-﻿using System; 
+﻿using System;
 
 
 namespace Lime
@@ -101,7 +101,7 @@ namespace Lime
 		float CalcFPS();
 
 		/// <summary>
-		/// Centers the game window on the default display.
+		/// Centers the game window on the current display.
 		/// </summary>
 		void Center();
 
