@@ -98,6 +98,9 @@ namespace Lime
 		/// <summary>
 		/// Gets current FPS for the window.
 		/// </summary>
+		float FPS { get; }
+
+		[Obsolete("Use FPS property instead", true)]
 		float CalcFPS();
 
 		/// <summary>
