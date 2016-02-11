@@ -159,7 +159,10 @@ namespace Lime
 			ClientPosition = position;
 		}
 
-		public void Close() { }
+		public void Close()
+		{
+			form.Close();
+		}
 
 		private class GLControl : OpenTK.GLControl
 		{
