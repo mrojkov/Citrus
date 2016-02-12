@@ -74,4 +74,20 @@ namespace Lime
 			};
 		}
 	}
+
+	public class DefaultWindowWidget : WindowWidget
+	{
+		public DefaultWindowWidget(Window window, bool continuousRendering = true)
+			: base(window, continuousRendering)
+		{
+			window.Rendering += () => {
+				Renderer.BeginFrame();
+				Size = (Vector2)window.ClientSize;
+				Renderer.SetOrthogonalProjection(Vector2.Zero, Size);
+				Render();
+				Renderer.EndFrame();			
+			};
+			window.Updating += Update;
+		}
+	}
 }
