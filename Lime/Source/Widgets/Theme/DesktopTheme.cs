@@ -103,7 +103,8 @@ namespace Lime
 			var eb = (EditBox)widget;
 			eb.AutoSizeConstraints = false;
 			eb.Caret.IsVisible = true;
-			eb.MinMaxSize = Constants.DefaultButtonSize;
+			eb.MinSize = Constants.DefaultButtonSize;
+			eb.MaxHeight = eb.MinHeight;
 			eb.HAlignment = HAlignment.Left;
 			eb.Localizable = false;	
 			eb.TrimWhitespaces = false;
