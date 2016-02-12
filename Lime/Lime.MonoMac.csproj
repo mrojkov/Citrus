@@ -178,7 +178,6 @@
     <Compile Include="Source\Application\AndroidAccelerometerListener.cs" />
     <Compile Include="Source\Application\FPSCounter.cs" />
     <Compile Include="Source\Application\IWindow.cs" />
-    <Compile Include="Source\Application\MouseCursor.cs" />
     <Compile Include="Source\Application\RenderingBackend.cs" />
     <Compile Include="Source\Application\Window.Android.cs" />
     <Compile Include="Source\Application\Window.iOS.cs" />
@@ -235,6 +234,17 @@
     <Compile Include="Source\Types\ColorGradient.cs" />
     <Compile Include="Source\Types\ObservableList.cs" />
     <Compile Include="Source\Graphics\VectorShape.cs" />
+    <Compile Include="Source\Application\Menu\Menu.cs" />
+    <Compile Include="Source\Application\Menu\Menu.Mac.cs" />
+    <Compile Include="Source\Application\Menu\Menu.Win.cs" />
+    <Compile Include="Source\Application\MouseCursor\CursorCollection.Mac.cs" />
+    <Compile Include="Source\Application\MouseCursor\CursorCollection.Null.cs" />
+    <Compile Include="Source\Application\MouseCursor\CursorCollection.Win.cs" />
+    <Compile Include="Source\Application\MouseCursor\ICursorCollection.cs" />
+    <Compile Include="Source\Application\MouseCursor\MouseCursor.cs" />
+    <Compile Include="Source\Application\MouseCursor\MouseCursor.Mac.cs" />
+    <Compile Include="Source\Application\MouseCursor\MouseCursor.Win.cs" />
+    <Compile Include="Source\Graphics\Fonts\CompoundFont.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
