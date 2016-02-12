@@ -49,6 +49,12 @@ namespace Lime
 			}
 		}
 
+		public virtual void OnSizeChanged(Widget widget, Vector2 sizeDelta)
+		{
+			// Size changing could only affect children arrangement, not the widget's size constraints.
+			InvalidateArrangement(widget);
+		}
+
 		public virtual void MeasureSizeConstraints(Widget widget) { }
 
 		public virtual void ArrangeChildren(Widget widget) { }

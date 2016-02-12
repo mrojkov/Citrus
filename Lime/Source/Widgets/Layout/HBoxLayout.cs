@@ -13,12 +13,6 @@ namespace Lime
 			DebugRectangles = new List<Rectangle>();
 		}
 
-		public void OnSizeChanged(Widget widget, Vector2 sizeDelta)
-		{
-			// Size changing could only affect children arrangement, not the widget's size constraints.
-			InvalidateArrangement(widget);
-		}
-
 		public override void ArrangeChildren(Widget widget)
 		{
 			ArrangementValid = true;

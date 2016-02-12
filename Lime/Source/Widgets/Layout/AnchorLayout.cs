@@ -6,7 +6,7 @@ namespace Lime
 	{
 		public static readonly ILayout Instance = new AnchorLayout();
 
-		public void OnSizeChanged(Widget widget, Vector2 sizeDelta)
+		public override void OnSizeChanged(Widget widget, Vector2 sizeDelta)
 		{
 			for (var child = widget.Nodes.FirstOrNull(); child != null; child = child.NextSibling) {
 				if (child.AsWidget != null) {

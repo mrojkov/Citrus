@@ -17,11 +17,6 @@ namespace Lime
 			DebugRectangles = new List<Rectangle>();
 		}
 
-		public void OnSizeChanged(Widget widget, Vector2 sizeDelta)
-		{
-			ArrangeChildren(widget);
-		}
-
 		public override void MeasureSizeConstraints(Widget widget)
 		{
 			var cells = GetCellArray(widget.Nodes);

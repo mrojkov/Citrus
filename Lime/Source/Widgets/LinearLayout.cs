@@ -19,7 +19,7 @@ namespace Lime
 				this.layoutData = layoutNode;
 			}
 
-			public void OnSizeChanged(Widget widget, Vector2 sizeDelta)
+			public override void OnSizeChanged(Widget widget, Vector2 sizeDelta)
 			{
 				if (layoutData.Horizontal) {
 					UpdateForHorizontalOrientation(widget);
