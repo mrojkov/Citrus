@@ -160,7 +160,6 @@
     <Compile Include="Source\Widgets\Animation\AnimationList.cs" />
     <Compile Include="Source\Widgets\Layout\AnchorLayout.cs" />
     <Compile Include="Source\Widgets\Layout\Layout.cs" />
-    <Compile Include="Source\Widgets\Layout\Margin.cs" />
     <Compile Include="Source\Widgets\Layout\TableLayout.cs" />
     <Compile Include="Source\Types\BoundingSphere.cs" />
     <Compile Include="Source\Types\ContainmentType.cs" />
@@ -187,7 +186,6 @@
     <Compile Include="Source\Application\WindowOptions.cs" />
     <Compile Include="Source\Widgets\WindowWidget.cs" />
     <Compile Include="Source\Application\CommonWindow.cs" />
-    <Compile Include="Source\Application\IContext.cs" />
     <Compile Include="Source\Application\Window.Mac.cs" />
     <Compile Include="Source\Widgets\WidgetContext.cs" />
     <Compile Include="Source\Widgets\Tasks\Task.cs" />
@@ -220,6 +218,29 @@
     <Compile Include="Source\Graphics\Fonts\SerializableFont.cs" />
     <Compile Include="Source\Widgets\Text\IKeyboardInputProcessor.cs" />
     <Compile Include="Source\Graphics\Fonts\CharMap.cs" />
+    <Compile Include="Source\Widgets\Layout\LayoutCell.cs" />
+    <Compile Include="Source\Widgets\Layout\LayoutManager.cs" />
+    <Compile Include="Source\Widgets\Layout\LinearAllocator.cs" />
+    <Compile Include="Source\Widgets\Layout\VBoxLayout.cs" />
+    <Compile Include="Source\Widgets\Theme\DefaultTheme.cs" />
+    <Compile Include="Source\Widgets\Theme\DesktopTheme.cs" />
+    <Compile Include="Source\Widgets\Theme\ITheme.cs" />
+    <Compile Include="Source\Widgets\ComboBox.cs" />
+    <Compile Include="Source\Widgets\IPresenter.cs" />
+    <Compile Include="Source\Widgets\EditBox.cs" />
+    <Compile Include="Source\Widgets\TextView.cs" />
+    <Compile Include="Source\Application\Menu\Menu.cs" />
+    <Compile Include="Source\Application\Menu\Menu.Mac.cs" />
+    <Compile Include="Source\Application\AndroidSoftKeyboard.cs" />
+    <Compile Include="Source\Application\Context.cs" />
+    <Compile Include="Source\Types\ObservableList.cs" />
+    <Compile Include="Source\Types\ColorGradient.cs" />
+    <Compile Include="Source\Graphics\VectorShape.cs" />
+    <Compile Include="Source\Types\Thickness.cs" />
+    <Compile Include="Source\Widgets\FileChooserButton.cs" />
+    <Compile Include="Source\Application\FileDialog\FileDialog.cs" />
+    <Compile Include="Source\Application\FileDialog\FileDialog.Mac.cs" />
+    <Compile Include="Source\Widgets\Layout\HBoxLayout.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
