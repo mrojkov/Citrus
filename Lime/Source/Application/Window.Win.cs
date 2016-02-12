@@ -156,10 +156,13 @@ namespace Lime
 		public void Center()
 		{
 			var screen = Screen.FromControl(form).WorkingArea;
+			var x = (screen.Width - DecoratedSize.Width) / 2;
+			var y = (screen.Height - DecoratedSize.Height) / 2;
 			var position = new IntVector2(
-				screen.X + (screen.Width - form.ClientSize.Width) / 2,
-				screen.Y + (screen.Height - form.ClientSize.Height) / 2);
-			ClientPosition = position;
+				screen.X + (x > 0 ? x : 0),
+				screen.Y + (y > 0 ? y : 0)
+				);
+			DecoratedPosition = position;
 		}
 
 		public void Close()
