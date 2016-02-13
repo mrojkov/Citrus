@@ -102,6 +102,7 @@
     <Compile Include="Source\Types\ContainmentType.cs" />
     <Compile Include="Source\Types\Quaternion.cs" />
     <Compile Include="Source\Types\Ray.cs" />
+    <Compile Include="Source\Types\Thickness.cs" />
     <Compile Include="Source\Widgets\Animation\Animation.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationList.cs" />
     <Compile Include="Source\Widgets\Editor.cs" />
@@ -131,6 +132,10 @@
     <Compile Include="Source\Localization\LocalizationDictionaryXmlSerializer.cs" />
     <Compile Include="Source\Localization\LocalizationDictionaryTextSerializer.cs" />
     <Compile Include="Source\Version.cs" />
+    <Compile Include="Source\Widgets\FileChooserButton.cs" />
+    <Compile Include="Source\Widgets\HSplitter.cs" />
+    <Compile Include="Source\Widgets\Layout\HBoxLayout.cs" />
+    <Compile Include="Source\Widgets\Layout\LayoutDebugPresenter.cs" />
     <Compile Include="Source\Widgets\Text\IKeyboardInputProcessor.cs" />
     <Compile Include="Source\Widgets\Text\IText.cs" />
     <Compile Include="Source\Widgets\ListView\ExpandableListItem.cs" />
@@ -151,6 +156,7 @@
     <Compile Include="Source\Widgets\Text\TextLineSplitter.cs" />
     <Compile Include="Source\Widgets\Text\TextRenderer.cs" />
     <Compile Include="Source\Widgets\Text\TextParser.cs" />
+    <Compile Include="Source\Widgets\VSplitter.cs" />
     <Compile Include="Source\Widgets\WebBrowser\IWebBrowserImplementation.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WebBrowser.Win.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WinFormsWebBrowser.cs" />
@@ -295,7 +301,6 @@
     <Compile Include="Source\Application\Menu\Menu.Mac.cs" />
     <Compile Include="Source\Graphics\VectorShape.cs" />
     <Compile Include="Source\Types\ColorGradient.cs" />
-    <Compile Include="Source\Types\Margin.cs" />
     <Compile Include="Source\Types\ObservableList.cs" />
     <Compile Include="Source\Widgets\ComboBox.cs" />
     <Compile Include="Source\Widgets\EditBox.cs" />
