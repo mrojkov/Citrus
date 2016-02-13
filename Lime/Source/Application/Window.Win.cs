@@ -230,7 +230,7 @@ namespace Lime
 			stopwatch = new Stopwatch();
 			stopwatch.Start();
 			timer = new Timer();
-			timer.Interval = 1000 / 65;
+			timer.Interval = (int)(1000 / options.RefreshRate);
 			timer.Tick += OnTick;
 			timer.Start();
 			if (options.Icon != null) {
