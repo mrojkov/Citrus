@@ -39,6 +39,7 @@ namespace Lime
 		private Timer timer;
 		private Stopwatch stopwatch;
 		private bool active;
+		private bool invalidated;
 		private System.Drawing.Point lastMousePosition;
 
 		public Input Input { get; private set; }
@@ -216,8 +217,6 @@ namespace Lime
 			glControl.KeyDown += OnKeyDown;
 			glControl.KeyUp += OnKeyUp;
 			glControl.KeyPress += OnKeyPress;
-			// Refresh mouse position of every frame to make HitTest work properly if mouse is outside of the screen.
-			Updating += RefreshMousePosition;
 			glControl.MouseDown += OnMouseDown;
 			glControl.MouseUp += OnMouseUp;
 			glControl.Resize += OnResize;
@@ -297,6 +296,7 @@ namespace Lime
 			if (!HasBeenMinizedOrUnminimized) {
 				RaiseResized();
 			}
+			Invalidate();
 		}
 
 		private void OnMouseDown(object sender, MouseEventArgs e)
@@ -367,16 +367,26 @@ namespace Lime
 				var delta = (float)stopwatch.Elapsed.TotalSeconds;
 				stopwatch.Restart();
 				delta = Mathf.Clamp(delta, 0, 1 / Application.LowFPSLimit);
-				Input.ProcessPendingKeyEvents();
-				RaiseUpdating(delta);
-				AudioSystem.Update();
-				Input.TextInput = null;
-				Input.CopyKeysState();
-				fpsCounter.Refresh();
-				mainGLControl.Context.MakeCurrent(glControl.WindowInfo);
-				RaiseRendering();
-				mainGLControl.SwapBuffers();
+				Update(delta);
+				if (invalidated) {
+					fpsCounter.Refresh();
+					mainGLControl.Context.MakeCurrent(glControl.WindowInfo);
+					RaiseRendering();
+					mainGLControl.SwapBuffers();
+					invalidated = false;
+				}
 			}
+		}
+
+		private void Update(float delta)
+		{
+			// Refresh mouse position of every frame to make HitTest work properly if mouse is outside of the screen.
+			RefreshMousePosition(delta);
+			Input.ProcessPendingKeyEvents();
+			RaiseUpdating(delta);
+			AudioSystem.Update();
+			Input.TextInput = null;
+			Input.CopyKeysState();
 		}
 
 		private static Key TranslateKey(Keys key)
@@ -543,6 +553,11 @@ namespace Lime
 				default:
 					return Key.Unknown;
 			}
+		}
+
+		public void Invalidate()
+		{
+			invalidated = true;
 		}
 	}
 }
