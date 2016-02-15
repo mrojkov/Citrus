@@ -8,6 +8,7 @@ namespace Lime
 		private FontRenderer fontRenderer;
 		private DynamicTexture texture;
 		private IntVector2 position;
+		private int lineAdditionalHeight; // Used for lines containing glyphs with diacritics.
 		private List<ITexture> textures;
 		private int textureIndex;
 		private int fontHeight;
@@ -43,18 +44,24 @@ namespace Lime
 			}
 			if (glyph == null)
 				return null;
+
 			// We add 1px left and right padding to each char on the texture and also to the UV
 			// so that chars will be blurred correctly after stretching or drawing to float position.
 			// And we compensate this padding by ACWidth, so that the text will take the same space.
 			const int padding = 1;
+
 			// Space between characters on the texture
 			const int spacing = 1;
 			var paddedGlyphWidth = glyph.Width + padding * 2;
 			if (position.X + paddedGlyphWidth + spacing >= texture.ImageSize.Width) {
 				position.X = 0;
-				position.Y += fontHeight + spacing;
+				position.Y += fontHeight + spacing + lineAdditionalHeight;
+				lineAdditionalHeight = 0;
 			}
-			if (position.Y + fontHeight + spacing >= texture.ImageSize.Height) {
+			if (glyph.VerticalOffset < -lineAdditionalHeight) {
+				lineAdditionalHeight = -glyph.VerticalOffset;
+			}
+			if (position.Y + fontHeight + spacing + lineAdditionalHeight >= texture.ImageSize.Height) {
 				CreateNewFontTexture();
 				position = IntVector2.Zero;
 			}
@@ -67,7 +74,8 @@ namespace Lime
 				Width = paddedGlyphWidth,
 				Height = fontHeight,
 				KerningPairs = glyph.KerningPairs,
-				TextureIndex = textureIndex
+				TextureIndex = textureIndex,
+				VerticalOffset = Math.Min(0, glyph.VerticalOffset)
 			};
 			position.X += paddedGlyphWidth + spacing;
 			return fontChar;
@@ -109,11 +117,11 @@ namespace Lime
 			var si = 0;
 			var color = Color4.White;
 			var dstPixels = texture.Data;
-			for (int i = 0; i < glyph.Height; i++) {
+			// Sometimes glyph.VerticalOffset could be negative for symbols with diacritics and this results the symbols
+			// get overlapped or run out of the texture bounds. We shift the glyph down and increase the current line
+			// height to fix the issue. Also we store the shift amount in FontChar.VerticalOffset property.
+			for (int i = 0; i < glyph.Height - Math.Min(0, glyph.VerticalOffset); i++) {
 				if (glyph.VerticalOffset + i < 0) {
-					// Sometimes VerticalOffset could be negative for symbols with diacritics and this leads the symbols to overlap or
-					// go out of the bounds of texture. We just skip such pixels from glyph because it could be just
-					// error of SharpFont (normally they have zero offset but for some font heights it's -1).
 					continue;
 				}
 				var di = (position.Y + glyph.VerticalOffset + i) * texture.ImageSize.Width + position.X;

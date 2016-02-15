@@ -185,6 +185,11 @@ namespace Lime
 		[ProtoMember(8)]
 		public int TextureIndex;
 		/// <summary>
+		/// Mostly stores only negative offset which is useful for chars with diacritics.
+		/// </summary>
+		[ProtoMember(9)]
+		public int VerticalOffset;
+		/// <summary>
 		/// The null-character which denotes any missing character in a font
 		/// </summary>
 		public static FontChar Null = new FontChar();
