@@ -5,19 +5,24 @@ namespace Lime
 {
 	internal class CursorCollection: ICursorCollection
 	{
-
 		public CursorCollection()
 		{
-			Empty = new MouseCursor(new System.Drawing.Bitmap(1, 1), IntVector2.Zero);
-			Hand = new MouseCursor(Cursors.Hand);
-			IBeam = new MouseCursor(Cursors.IBeam);
-			Default = new MouseCursor(Cursors.Default);
-			Wait = new MouseCursor(Cursors.WaitCursor);
-			Move = new MouseCursor(Cursors.SizeAll);
-			SizeNS = new MouseCursor(Cursors.SizeNS);
-			SizeWE = new MouseCursor(Cursors.SizeWE);
-			SizeNESW = new MouseCursor(Cursors.SizeNESW);
-			SizeNWSE = new MouseCursor(Cursors.SizeNWSE);
+			Empty = new MouseCursor(new Bitmap(new Color4[1], 1, 1), IntVector2.Zero);
+			Hand = FromWinFormsCursor(Cursors.Hand);
+			IBeam = FromWinFormsCursor(Cursors.IBeam);
+			Default = FromWinFormsCursor(Cursors.Default);
+			Wait = FromWinFormsCursor(Cursors.WaitCursor);
+			Move = FromWinFormsCursor(Cursors.SizeAll);
+			SizeNS = FromWinFormsCursor(Cursors.SizeNS);
+			SizeWE = FromWinFormsCursor(Cursors.SizeWE);
+			SizeNESW = FromWinFormsCursor(Cursors.SizeNESW);
+			SizeNWSE = FromWinFormsCursor(Cursors.SizeNWSE);
+		}
+
+		private static MouseCursor FromWinFormsCursor(Cursor cursor)
+		{
+			var implementation = new MouseCursorImplementation(cursor);
+			return new MouseCursor(implementation);
 		}
 
 		public MouseCursor Default { get; private set; }

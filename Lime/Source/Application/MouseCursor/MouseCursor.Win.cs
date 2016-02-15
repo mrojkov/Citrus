@@ -5,31 +5,31 @@ using System.Runtime.InteropServices;
 
 namespace Lime
 {
-	public partial class MouseCursor
+	public class MouseCursorImplementation
 	{
 		/// <summary>
-		/// Create a cursor from the specified Win32 cursor pointer.
+		/// Create a cursor from the specified Win32 cursor handle.
 		/// </summary>
-		public MouseCursor(IntPtr handle) : this(new Cursor(handle)) { }
+		public MouseCursorImplementation(IntPtr handle) : this(new Cursor(handle)) { }
 
-		public MouseCursor(Cursor winFormsCursor)
+		public MouseCursorImplementation(Cursor nativeCursor)
 		{
-			WinFormsCursor = winFormsCursor;
+			NativeCursor = nativeCursor;
 		}
 
-		public MouseCursor(System.Drawing.Bitmap bitmap, IntVector2 hotSpot)
+		public MouseCursorImplementation(Bitmap bitmap, IntVector2 hotSpot)
 		{
-			var ptr = bitmap.GetHicon();
+			var handle = bitmap.NativeBitmap.GetHicon();
 			var info = new IconInfo();
-			GetIconInfo(ptr, ref info);
+			GetIconInfo(handle, ref info);
 			info.HotSpotX = hotSpot.X;
 			info.HotSpotY = hotSpot.Y;
 			info.IsIcon = false;
-			ptr = CreateIconIndirect(ref info);
-			WinFormsCursor = new Cursor(ptr);
+			handle = CreateIconIndirect(ref info);
+			NativeCursor = new Cursor(handle);
 		}
 
-		public Cursor WinFormsCursor { get; private set; }
+		public Cursor NativeCursor { get; private set; }
 
 		/// <summary>
 		/// http://www.pinvoke.net/default.aspx/user32.geticoninfo

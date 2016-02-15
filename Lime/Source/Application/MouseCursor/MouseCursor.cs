@@ -1,15 +1,35 @@
 ﻿using System;
+#if WIN
+using NativeCursor = System.Windows.Forms.Cursor;
+#elif MAC || MONOMAC
+using NativeCursor = System.Object;
+#elif ANDROID || iOS || UNITY
+using NativeCursor = System.Object;
+#endif
 
 namespace Lime
 {
-	public partial class MouseCursor
+	public class MouseCursor
 	{
 		private static readonly ICursorCollection cursorCollection = new CursorCollection();
+		private readonly MouseCursorImplementation implementation;
 
-		public MouseCursor() { }
+		public MouseCursor(MouseCursorImplementation implementation)
+		{
+			this.implementation = implementation;
+		}
+		public MouseCursor(Bitmap bitmap, IntVector2 hotSpot)
+		{
+			implementation = new MouseCursorImplementation(bitmap, hotSpot);
+		}
 
-		[Obsolete("Use something else for cursor constructing, this one doesn't do anything anyways.", true)]
+		[Obsolete("Use other constructors as this one doesn't do anything anyways.", true)]
 		public MouseCursor(string name, IntVector2 hotSpot, string assemblyName = null) { }
+
+		public NativeCursor NativeCursor
+		{
+			get { return implementation.NativeCursor; }
+		}
 
 		public static MouseCursor Default { get { return cursorCollection.Default; } }
 		public static MouseCursor Empty { get { return cursorCollection.Empty; } }

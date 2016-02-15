@@ -3,16 +3,16 @@ namespace Lime
 {
 	internal class CursorCollection: ICursorCollection
 	{
-		public MouseCursor Default { get { return new MouseCursor(); } }
-		public MouseCursor Empty { get { return new MouseCursor(); } }
-		public MouseCursor Hand { get { return new MouseCursor(); } }
-		public MouseCursor IBeam { get { return new MouseCursor(); } }
-		public MouseCursor Wait { get { return new MouseCursor(); } }
-		public MouseCursor Move { get { return new MouseCursor(); } }
-		public MouseCursor SizeNS { get { return new MouseCursor(); } }
-		public MouseCursor SizeWE { get { return new MouseCursor(); } }
-		public MouseCursor SizeNESW { get { return new MouseCursor(); } }
-		public MouseCursor SizeNWSE { get { return new MouseCursor(); } }
+		public MouseCursor Default { get { return null; } }
+		public MouseCursor Empty { get { return null; } }
+		public MouseCursor Hand { get { return null; } }
+		public MouseCursor IBeam { get { return null; } }
+		public MouseCursor Wait { get { return null; } }
+		public MouseCursor Move { get { return null; } }
+		public MouseCursor SizeNS { get { return null; } }
+		public MouseCursor SizeWE { get { return null; } }
+		public MouseCursor SizeNESW { get { return null; } }
+		public MouseCursor SizeNWSE { get { return null; } }
 	}
 }
 #endif

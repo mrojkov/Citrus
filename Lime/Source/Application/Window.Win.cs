@@ -132,7 +132,7 @@ namespace Lime
 			set
 			{
 				cursor = value;
-				form.Cursor = value.WinFormsCursor;
+				form.Cursor = value.NativeCursor;
 			}
 		}
 
