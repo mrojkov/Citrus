@@ -187,10 +187,20 @@ namespace Lime
 			base.DidRotate(fromInterfaceOrientation);
 		}
 
+		private Size prevSize;
+
+		public override void ViewWillLayoutSubviews()
+		{
+			prevSize = Window.Current.ClientSize;
+		}
+
 		public override void ViewDidLayoutSubviews()
 		{
 			// Handle resize here (not in WillRotate) because in WillRotate we don't know
 			// the resulting screen resolution.
+			if (prevSize == Window.Current.ClientSize) {
+				return;
+			}
 			var toOrientation = ConvertInterfaceOrientation(this.InterfaceOrientation);
 			var deviceRotated = toOrientation != Application.CurrentDeviceOrientation;
 			Application.CurrentDeviceOrientation = toOrientation;
