@@ -5,7 +5,7 @@ namespace Lime
 {
 	public class DummyWindow : CommonWindow, IWindow
 	{
-		public bool Active { get; }
+		public bool Active { get; set; }
 		public string Title { get; set; }
 		public WindowState State { get; set; }
 		public bool Fullscreen { get; set; }
@@ -16,8 +16,8 @@ namespace Lime
 		public Size MinimumDecoratedSize { get; set; }
 		public Size MaximumDecoratedSize { get; set; }
 		public bool Visible { get; set; }
-		public Input Input { get; }
-		public float FPS { get; }
+		public Input Input { get; set; }
+		public float FPS { get; set; }
 		public float CalcFPS()
 		{
 			throw new NotImplementedException();
@@ -33,11 +33,11 @@ namespace Lime
 		}
 		public void Invalidate(){}
 #if MAC
-		public Platform.NSGameView NSGameView { get; }
+		public Platform.NSGameView NSGameView { get; set; }
 #elif WIN
-		public System.Windows.Forms.Form Form { get; }
+		public System.Windows.Forms.Form Form { get; set; }
 #endif
-		public float PixelScale { get; }
+		public float PixelScale { get; set; }
 	}
 }
 #endif
