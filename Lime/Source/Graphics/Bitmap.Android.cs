@@ -1,96 +1,94 @@
 #if ANDROID
 using System;
-using Android.Graphics;
 using System.IO;
+
+using Android.Graphics;
 using Android.Graphics.Drawables;
+using Android.OS;
 using AndroidBitmap = Android.Graphics.Bitmap;
 
 namespace Lime
 {
 	class BitmapImplementation : IBitmapImplementation
 	{
-		AndroidBitmap bitmap;
-
-		public BitmapImplementation() { }
+		public AndroidBitmap bitmap;
 
 		public BitmapImplementation(Stream stream)
 		{
-			LoadFromStream(stream);
-		}
-
-		public BitmapImplementation(Color4[] data, int width, int height)
-		{
-			LoadFromArray(data, width, height);
-		}
-
-		public int GetWidth()
-		{
-			return bitmap == null ? 0 : bitmap.Width;
-		}
-
-		public int GetHeight()
-		{
-			return bitmap == null ? 0 : bitmap.Height;
-		}
-
-		private void LoadFromStream(Stream stream)
-		{
 			var options = new BitmapFactory.Options();
-			if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.Kitkat) {
+			if (Build.VERSION.SdkInt >= BuildVersionCodes.Kitkat) {
 				options.InPremultiplied = false;
 			}
 			bitmap = BitmapFactory.DecodeStream(stream, null, options);
 		}
 
-		private void LoadFromArray(Color4[] pixels, int width, int height)
+		public BitmapImplementation(Color4[] data, int width, int height)
 		{
-			if (width * height != pixels.Length) {
-				throw new Exception("Pixel data doesn't fit width and height.");
-			}
-			var colors = new int[pixels.Length];
-			for (int i = 0; i < pixels.Length; i++) {
-				var pixel = pixels[i];
+			var colors = new int[data.Length];
+			for (int i = 0; i < data.Length; i++) {
+				var pixel = data[i];
 				colors[i] = Color.Argb(pixel.A, pixel.R, pixel.G, pixel.B).ToArgb();
 			}
 			bitmap = AndroidBitmap.CreateBitmap(colors, width, height, AndroidBitmap.Config.Argb8888);
 		}
 
-		public void SaveToStream(Stream stream)
+		private BitmapImplementation(AndroidBitmap bitmap)
 		{
-			if (!IsValid()) {
-				throw new InvalidOperationException();
+			this.bitmap = bitmap;
+		}
+
+		public int Width
+		{
+			get { return bitmap == null ? 0 : bitmap.Width; }
+		}
+
+		public int Height
+		{
+			get { return bitmap == null ? 0 : bitmap.Height; }
+		}
+
+		public bool IsValid
+		{
+			get
+			{
+				return
+					bitmap != null &&
+					!bitmap.IsRecycled &&
+					bitmap.Height > 0 &&
+					bitmap.Width > 0;
 			}
-			bitmap.Compress(Android.Graphics.Bitmap.CompressFormat.Png, 100, stream);
+		}
+
+		public IBitmapImplementation Clone()
+		{
+			return new BitmapImplementation(bitmap.Copy(
+				AndroidBitmap.Config.Argb8888,
+				isMutable: false));
 		}
 
 		public IBitmapImplementation Rescale(int newWidth, int newHeight)
 		{
-			if (!IsValid()) {
-				throw new InvalidOperationException();
-			}
-			var scaledBitmap = Android.Graphics.Bitmap.CreateScaledBitmap(bitmap, newWidth, newHeight, true);
-			return new BitmapImplementation() { bitmap = scaledBitmap };
+			return new BitmapImplementation(
+				AndroidBitmap.CreateScaledBitmap(
+					bitmap,
+					newWidth,
+					newHeight,
+					filter: true));
 		}
 
 		public IBitmapImplementation Crop(IntRectangle cropArea)
 		{
-			if (!IsValid()) {
-				throw new InvalidOperationException();
-			}
-			if (cropArea.Width == GetWidth() && cropArea.Height == GetHeight()) {
-				return new BitmapImplementation {
-					bitmap = bitmap.Copy(AndroidBitmap.Config.Argb8888, isMutable: false)
-				};
-			}
-			var croppedBitmap = Android.Graphics.Bitmap.CreateBitmap(bitmap, cropArea.Left, cropArea.Top, cropArea.Width, cropArea.Height);
-			return new BitmapImplementation { bitmap = croppedBitmap };
+			return new BitmapImplementation(
+				AndroidBitmap.CreateBitmap(
+					bitmap,
+					cropArea.Left,
+					cropArea.Top,
+					cropArea.Width,
+					cropArea.Height));
 		}
 
 		public Color4[] GetPixels()
 		{
-			if (!IsValid()) {
-				throw new InvalidOperationException();
-			}
 			int length = bitmap.Width * bitmap.Height;
 			var colors = new int[length];
 			bitmap.GetPixels(colors, 0, bitmap.Width, 0, 0, bitmap.Width, bitmap.Height);
@@ -106,16 +104,16 @@ namespace Lime
 			return pixels;
 		}
 
+		public void SaveTo(Stream stream)
+		{
+			bitmap.Compress(Android.Graphics.Bitmap.CompressFormat.Png, 100, stream);
+		}
+
 		public void Dispose()
 		{
 			if (bitmap != null && !bitmap.IsRecycled) {
 				bitmap.Recycle();
 			}
-		}
-
-		public bool IsValid()
-		{
-			return (bitmap != null && !bitmap.IsRecycled && (bitmap.Height > 0 && bitmap.Width > 0));
 		}
 	}
 }

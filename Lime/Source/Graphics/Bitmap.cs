@@ -1,19 +1,18 @@
 using System;
 using System.IO;
 
+#if WIN
+using NativeBitmap = System.Drawing.Bitmap;
+#elif MAC
+using NativeBitmap = AppKit.NSImage;
+#elif iOS
+using NativeBitmap = UIKit.UIImage;
+#elif ANDROID
+using NativeBitmap = Android.Graphics.Bitmap;
+#endif
+
 namespace Lime
 {
-	interface IBitmapImplementation : IDisposable
-	{
-		int GetWidth();
-		int GetHeight();
-		void SaveToStream(Stream stream);
-		IBitmapImplementation Crop(IntRectangle cropArea);
-		IBitmapImplementation Rescale(int newWidth, int newHeight);
-		bool IsValid();
-		Color4[] GetPixels();
-	}
-
 	/// <summary>
 	/// Wraps native bitmap and exposes unified methods to work with images.
 	/// </summary>
@@ -29,6 +28,9 @@ namespace Lime
 		/// <param name="height">The height, in pixels, of the new bitmap.</param>
 		public Bitmap(Color4[] data, int width, int height)
 		{
+			if (width * height != data.Length) {
+				throw new ArgumentException("Pixel data doesn't fit width and height.");
+			}
 
 			implementation = new BitmapImplementation(data, width, height);
 		}
@@ -56,7 +58,7 @@ namespace Lime
 		/// </summary>
 		public int Width
 		{
-			get { return implementation.GetWidth(); }
+			get { return implementation.Width; }
 		}
 
 		/// <summary>
@@ -64,7 +66,7 @@ namespace Lime
 		/// </summary>
 		public int Height
 		{
-			get { return implementation.GetHeight(); }
+			get { return implementation.Height; }
 		}
 
 		/// <summary>
@@ -76,12 +78,30 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// Determines whether this bitmap is valid.
+		/// </summary>
+		/// <returns>true if this bitmap is not null or empty; otherwise, false.</returns>
+		public bool IsValid
+		{
+			get { return implementation != null && implementation.IsValid; }
+		}
+
+		/// <summary>
+		/// Gets a platform specific bitmap.
+		/// </summary>
+		public NativeBitmap NativeBitmap
+		{
+			get { return ((BitmapImplementation)implementation).bitmap; }
+		}
+
+		/// <summary>
 		/// Creates an exact copy of this bitmap.
 		/// </summary>
 		/// <returns>The new bitmap that this method creates.</returns>
 		public Bitmap Clone()
 		{
-			return Crop(new IntRectangle(0, 0, Width, Height));
+			CheckValidity();
+			return new Bitmap(implementation.Clone());
 		}
 
 		/// <summary>
@@ -95,42 +115,18 @@ namespace Lime
 			if (
 				cropArea.Width <= 0 || cropArea.Height <= 0 ||
 				cropArea.Left < 0 || cropArea.Top < 0 ||
-				cropArea.Right > this.Width || cropArea.Bottom > this.Height
+				cropArea.Right > Width || cropArea.Bottom > Height
 				) {
 				throw new InvalidOperationException("Bitmap: Crop rectangle should be inside the image," +
 					" and resulting bitmap should not be empty.");
 			}
 
-			var newImplementation = implementation.Crop(cropArea);
-			return new Bitmap(newImplementation);
-		}
-
-		/// <summary>
-		/// Releases all resources used by this bitmap.
-		/// </summary>
-		public void Dispose()
-		{
-			if (implementation != null) {
-				implementation.Dispose();
+			if (cropArea.Width == Width && cropArea.Height == Height) {
+				return Clone();
 			}
-		}
 
-		/// <summary>
-		/// Gets the array of pixels from this bitmap.
-		/// </summary>
-		/// <returns>An <see cref="Color4"/> array of pixels.</returns>
-		public Color4[] GetPixels()
-		{
-			return implementation.GetPixels();
-		}
-
-		/// <summary>
-		/// Determines whether this bitmap is valid.
-		/// </summary>
-		/// <returns>true if this bitmap is not null or empty; otherwise, false.</returns>
-		public bool IsValid()
-		{
-			return implementation != null && implementation.IsValid();
+			CheckValidity();
+			return new Bitmap(implementation.Crop(cropArea));
 		}
 
 		/// <summary>
@@ -149,17 +145,49 @@ namespace Lime
 				throw new ArgumentException("Bitmap: Width and height should be positive.");
 			}
 
-			var newImplementation = implementation.Rescale(newWidth, newHeight);
-			return new Bitmap(newImplementation);
+			if (newWidth == Width && newHeight == Height) {
+				return Clone();
+			}
+
+			CheckValidity();
+			return new Bitmap(implementation.Rescale(newWidth, newHeight));
+		}
+
+		/// <summary>
+		/// Gets the array of pixels from this bitmap.
+		/// </summary>
+		/// <returns>An <see cref="Color4"/> array of pixels.</returns>
+		public Color4[] GetPixels()
+		{
+			CheckValidity();
+			return implementation.GetPixels();
 		}
 
 		/// <summary>
 		/// Saves this image to the specified stream in PNG format.
 		/// </summary>
 		/// <param name="stream">The stream where the image will be saved.</param>
-		public void SaveToStream(Stream stream)
+		public void SaveTo(Stream stream)
 		{
-			implementation.SaveToStream(stream);
+			CheckValidity();
+			implementation.SaveTo(stream);
+		}
+
+		private void CheckValidity()
+		{
+			if (!IsValid) {
+				throw new InvalidOperationException("Bitmap is not valid.");
+			}
+		}
+
+		/// <summary>
+		/// Releases all resources used by this bitmap.
+		/// </summary>
+		public void Dispose()
+		{
+			if (implementation != null) {
+				implementation.Dispose();
+			}
 		}
 	}
 
@@ -191,9 +219,21 @@ namespace Lime
 			}
 
 			using (var memoryStream = new MemoryStream()) {
-				bitmap.SaveToStream(memoryStream);
+				bitmap.SaveTo(memoryStream);
 				return new SurrogateBitmap { SerializationData = memoryStream.ToArray() };
 			}
 		}
+	}
+
+	interface IBitmapImplementation : IDisposable
+	{
+		int Width { get; }
+		int Height { get; }
+		bool IsValid { get; }
+		IBitmapImplementation Clone();
+		IBitmapImplementation Crop(IntRectangle cropArea);
+		IBitmapImplementation Rescale(int newWidth, int newHeight);
+		Color4[] GetPixels();
+		void SaveTo(Stream stream);
 	}
 }

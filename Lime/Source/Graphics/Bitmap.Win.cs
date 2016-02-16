@@ -8,80 +8,88 @@ namespace Lime
 {
 	class BitmapImplementation : IBitmapImplementation
 	{
-		private SD.Bitmap bitmap;
 		private IntPtr data;
-
-		public BitmapImplementation()
-		{
-		}
+		public SD.Bitmap bitmap;
 
 		public BitmapImplementation(Stream stream)
 		{
-			LoadFromStream(stream);
+			// System.Drawing.Bitmap требует, чтобы stream оставался открытым всё время существования битмапа.
+			// http://stackoverflow.com/questions/336387/image-save-throws-a-gdi-exception-because-the-memory-stream-is-closed
+			// Так как мы не можем быть уверены, что снаружи стрим не уничтожат, копируем его.
+			var streamClone = new MemoryStream();
+			stream.CopyTo(streamClone);
+			bitmap = new SD.Bitmap(streamClone);
 		}
 
-		public BitmapImplementation(Color4[] data, int width, int height)
+		public BitmapImplementation(Color4[] colors, int width, int height)
 		{
-			LoadFromArray(data, width, height);
+			const SD.Imaging.PixelFormat Format = SD.Imaging.PixelFormat.Format32bppArgb;
+			var stride = 4 * width;
+			data = CreateMemoryCopy(colors);
+			bitmap = new SD.Bitmap(width, height, stride, Format, data);
+		}
+
+		private BitmapImplementation(SD.Bitmap bitmap)
+		{
+			this.bitmap = bitmap;
+		}
+
+		public int Width
+		{
+			get { return bitmap == null ? 0 : bitmap.Width; }
+		}
+
+		public int Height
+		{
+			get { return bitmap == null ? 0 : bitmap.Height; }
+		}
+
+		public bool IsValid
+		{
+			get
+			{
+				return
+					!disposed &&
+					bitmap != null &&
+					bitmap.Height > 0 &&
+					bitmap.Width > 0;
+			}
+		}
+
+		public IBitmapImplementation Clone()
+		{
+			return new BitmapImplementation((SD.Bitmap)bitmap.Clone());
 		}
 
 		public IBitmapImplementation Crop(IntRectangle cropArea)
 		{
-			if (!IsValid()) {
-				throw new InvalidOperationException();
-			}
 			var rect = new SD.Rectangle(cropArea.Left, cropArea.Top, cropArea.Width, cropArea.Height);
-			var croppedBitmap = bitmap.Clone(rect, bitmap.PixelFormat);
-			return new BitmapImplementation { bitmap = croppedBitmap };
+			return new BitmapImplementation(bitmap.Clone(rect, bitmap.PixelFormat));
 		}
 
-		public int GetHeight()
+		public IBitmapImplementation Rescale(int newWidth, int newHeight)
 		{
-			return bitmap == null ? 0 : bitmap.Height;
+			return new BitmapImplementation(new SD.Bitmap(bitmap, newWidth, newHeight));
 		}
 
 		public Color4[] GetPixels()
 		{
-			if (!IsValid()) {
-				throw new InvalidOperationException();
-			}
 			var bmpData = bitmap.LockBits(
 				new SD.Rectangle(0, 0, bitmap.Width, bitmap.Height),
 				SD.Imaging.ImageLockMode.ReadOnly,
 				SD.Imaging.PixelFormat.Format32bppArgb);
 			if (bmpData.Stride != bmpData.Width * 4) {
-				throw new Exception("Bitmap stride does not match its width");
+				throw new FormatException("Bitmap stride does not match its width");
 			}
+
 			var numBytes = bmpData.Width * bitmap.Height * 4;
 			var pixelsArray = ArrayFromPointer(bmpData.Scan0, numBytes / 4);
 			bitmap.UnlockBits(bmpData);
 			return pixelsArray;
 		}
 
-		public int GetWidth()
+		public void SaveTo(Stream stream)
 		{
-			return bitmap == null ? 0 : bitmap.Width;
-		}
-
-		public bool IsValid()
-		{
-			return !disposed && bitmap != null && (bitmap.Height > 0 && bitmap.Width > 0);
-		}
-
-		public IBitmapImplementation Rescale(int newWidth, int newHeight)
-		{
-			if (!IsValid()) {
-				throw new InvalidOperationException();
-			}
-			var rescaledBitmap = new SD.Bitmap(bitmap, newWidth, newHeight);
-			return new BitmapImplementation { bitmap = rescaledBitmap };
-		}
-
-		public void SaveToStream(Stream stream)
-		{
-			if (!IsValid()) {
-				throw new InvalidOperationException();
-			}
 			bitmap.Save(stream, SD.Imaging.ImageFormat.Png);
 		}
 
@@ -94,7 +102,7 @@ namespace Lime
 				for (int i = 0; i < array.Length; i++) {
 					var c = *ptr++;
 
-					// swap R and B again
+					// Swap R and B again
 					array[i] = new Color4(c.B, c.G, c.R, c.A);
 				}
 			}
@@ -117,31 +125,10 @@ namespace Lime
 			return data;
 		}
 
-		private void LoadFromArray(Color4[] pixels, int width, int height)
-		{
-			if (width * height != pixels.Length) {
-				throw new Exception("Pixel data doesn't fit width and height.");
-			}
-			const SD.Imaging.PixelFormat Format = SD.Imaging.PixelFormat.Format32bppArgb;
-			var stride = 4 * width;
-			data = CreateMemoryCopy(pixels);
-			bitmap = new SD.Bitmap(width, height, stride, Format, data);
-		}
-
-		private void LoadFromStream(Stream stream)
-		{
-			// System.Drawing.Bitmap требует, чтобы stream оставался открытым всё время существования битмапа.
-			// http://stackoverflow.com/questions/336387/image-save-throws-a-gdi-exception-because-the-memory-stream-is-closed
-			// Так как мы не можем быть уверены, что снаружи стрим не уничтожат, копируем его.
-			var streamClone = new MemoryStream();
-			stream.CopyTo(streamClone);
-			bitmap = new SD.Bitmap(streamClone);
-		}
-
 		#region IDisposable Support
 		private bool disposed;
 
-		protected virtual void Dispose(bool disposing)
+		private void Dispose(bool disposing)
 		{
 			if (!disposed) {
 				if (disposing) {

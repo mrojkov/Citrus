@@ -88,7 +88,6 @@
     <Compile Include="Source\Graphics\Unity\RenderTexture.cs" />
     <Compile Include="Source\Graphics\Unity\Texture2D.cs" />
     <Compile Include="Source\Graphics\Bitmap.cs" />
-    <Compile Include="Source\Graphics\Bitmap.iOS.cs" />
     <Compile Include="Source\Graphics\Bitmap.Win.cs" />
     <Compile Include="Source\Graphics\ITexture.cs" />
     <Compile Include="Source\Graphics\MovieTexture.cs" />
@@ -192,7 +191,6 @@
     <Compile Include="Source\Application\AndroidActivityDelegate.cs" />
     <Compile Include="Source\Graphics\TextureAtlasElement.cs" />
     <Compile Include="Source\Graphics\OpenGL\IGLObject.cs" />
-    <Compile Include="Source\Graphics\Bitmap.Mac.cs" />
     <Compile Include="Source\Graphics\Mesh.cs" />
     <Compile Include="Source\Graphics\RenderBatch.cs" />
     <Compile Include="Source\Graphics\RenderList.cs" />
@@ -311,6 +309,7 @@
     <Compile Include="Source\Widgets\Layout\FlowLayout.cs" />
     <Compile Include="Source\Widgets\Layout\HBoxLayout.cs" />
     <Compile Include="Source\Widgets\Layout\LayoutDebugPresenter.cs" />
+    <Compile Include="Source\Graphics\Bitmap.Cocoa.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">
