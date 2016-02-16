@@ -541,10 +541,17 @@ namespace Orange
 			ImportTexture(atlasPath, atlas, rules);
 		}
 
+		private static bool ShouldGenerateOpacityMasks()
+		{
+			return !((bool)The.Workspace.ProjectJson.GetValue("DontGenerateOpacityMasks", false));
+		}
+
 		private static void ImportTexture(string path, Gdk.Pixbuf texture, CookingRules rules)
 		{
-			var maskPath = Path.ChangeExtension(path, ".mask");
-			OpacityMaskCreator.CreateMask(assetsBundle, texture, maskPath);
+			if (ShouldGenerateOpacityMasks()) {
+				var maskPath = Path.ChangeExtension(path, ".mask");
+				OpacityMaskCreator.CreateMask(assetsBundle, texture, maskPath);
+			}
 			var attributes = AssetAttributes.Zipped;
 			if (!TextureConverterUtils.IsPowerOf2(texture.Width) || !TextureConverterUtils.IsPowerOf2(texture.Height)) {
 				attributes |= AssetAttributes.NonPowerOf2Texture;
