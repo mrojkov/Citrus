@@ -42,8 +42,9 @@ namespace Lime
 		public override void ArrangeChildren(Widget widget)
 		{
 			var cells = GetCellArray(widget.Nodes);
-			if (cells == null)
+			if (cells == null) {
 				return;
+			}
 			var availableWidth = widget.ContentWidth - (ColCount - 1) * ColSpacing;
 			var availableHeight = widget.ContentHeight - (RowCount - 1) * RowSpacing;
 			var cols = LinearAllocator.Allocate(availableWidth, CalcColConstraints(widget, cells), roundSizes: true);
