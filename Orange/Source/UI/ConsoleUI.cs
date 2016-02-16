@@ -19,6 +19,7 @@ namespace Orange
 	{
 		public override void Initialize()
 		{
+			base.Initialize();
 			Gtk.Application.Init();
 #if MAC
 			AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
@@ -67,7 +68,7 @@ namespace Orange
 			var commands = The.MenuController.GetVisibleAndSortedItems();
 			var commandObj = commands.Find(i => i.Label == command);
 			if (commandObj == null) {
-				Console.WriteLine("Unknown command: '{0}'", command); 
+				Console.WriteLine("Unknown command: '{0}'", command);
 				WriteHelpAndExit();
 			}
 			if (DoesNeedSvnUpdate()) {

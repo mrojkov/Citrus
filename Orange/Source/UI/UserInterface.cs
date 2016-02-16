@@ -21,7 +21,10 @@ namespace Orange
 			Instance.Initialize();
 		}
 
-		public virtual void Initialize() { }
+		public virtual void Initialize()
+		{
+			var w = new Lime.DummyWindow();
+		}
 
 		public virtual void ClearLog() { }
 

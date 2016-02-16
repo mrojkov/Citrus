@@ -16,6 +16,7 @@ namespace Orange
 
 		public override void Initialize()
 		{
+			base.Initialize();
 			Application.Init();
 
 			Create();
@@ -63,7 +64,7 @@ namespace Orange
 
 			var output = CreateOutputPane();
 			mainVBox.PackStart(output, expand: true, fill: true, padding: 0);
-			
+
 			var hbox = CreateFooterSection();
 			mainVBox.PackStart(hbox, expand: false, fill: true, padding: 0);
 
@@ -80,7 +81,7 @@ namespace Orange
 		private Widget CreateFooterSection()
 		{
 			var hbox = new HBox();
-			
+
 			// ActionPicker section
 			ActionPicker = ComboBox.NewText();
 			hbox.PackStart(ActionPicker);
@@ -106,11 +107,11 @@ namespace Orange
 
 		private void CreateHeaderSection(VBox mainVBox)
 		{
-			var table = new Table(2, 2, homogeneous: false) { 
-				RowSpacing = 6, 
+			var table = new Table(2, 2, homogeneous: false) {
+				RowSpacing = 6,
 				ColumnSpacing = 6
 			};
-			
+
 			// Platform section
 			var label1 = new Label() { Xalign = 1, LabelProp = "Target platform" };
 			table.Attach(label1, 0, 1, 0, 1, xoptions: AttachOptions.Fill, yoptions: 0,
@@ -133,7 +134,7 @@ namespace Orange
 			CitrusProjectChooser = new FileChooserButton("Select a File", FileChooserAction.Open);
 			table.Attach(CitrusProjectChooser, 1, 2, 1, 2);
 			CitrusProjectChooser.FileSet += CitrusProjectChooser_SelectionChanged;
-			
+
 			// Svn update section
 			UpdateBeforeBuildCheckbox = new CheckButton() { Xalign = 1, Label = "Update project before build" };
 

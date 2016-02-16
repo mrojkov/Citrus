@@ -68,6 +68,7 @@
     <Compile Include="Source\Application\Clipboard\Clipboard.Mac.cs" />
     <Compile Include="Source\Application\Clipboard\Clipboard.Win.cs" />
     <Compile Include="Source\Application\CommonWindow.cs" />
+    <Compile Include="Source\Application\DummyWindow.cs" />
     <Compile Include="Source\Application\Menu\Menu.Win.cs" />
     <Compile Include="Source\Application\MouseCursor\CursorCollection.Null.cs" />
     <Compile Include="Source\Application\MouseCursor\ICursorCollection.cs" />

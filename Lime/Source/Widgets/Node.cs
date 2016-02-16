@@ -61,14 +61,14 @@ namespace Lime
 		public string Id { get; set; }
 
 		/// <summary>
-		/// Denotes the path to the external scene. If this path isn't null during node loading, 
+		/// Denotes the path to the external scene. If this path isn't null during node loading,
 		/// the node children are replaced by the external scene nodes.
 		/// </summary>
 		[ProtoMember(2)]
 		public string ContentsPath { get; set; }
 
 		/// <summary>
-		/// May contain the marker id of the default animation.  When an animation hits a trigger keyframe, 
+		/// May contain the marker id of the default animation.  When an animation hits a trigger keyframe,
 		/// it automatically runs the child animation from the given marker id.
 		/// </summary>
 		[Trigger]
@@ -135,7 +135,7 @@ namespace Lime
 		/// Markers of default animation.
 		/// </summary>
 		public MarkerCollection Markers { get { return DefaultAnimation.Markers; } }
-		
+
 		/// <summary>
 		/// Returns true if this node is running animation.
 		/// </summary>
@@ -144,7 +144,7 @@ namespace Lime
 			get { return DefaultAnimation.IsRunning; }
 			set { DefaultAnimation.IsRunning = value; }
 		}
-		
+
 		/// <summary>
 		/// Returns true if this node isn't running animation.
 		/// </summary>
@@ -185,7 +185,7 @@ namespace Lime
 
 		[ProtoMember(13)]
 		public AnimationList Animations;
-		
+
 		/// <summary>
 		/// Name of last started marker of default animation. Is set to null by default.
 		/// </summary>
@@ -244,9 +244,7 @@ namespace Lime
 		/// </summary>
 		protected internal void PropagateDirtyFlags(DirtyFlags mask = DirtyFlags.All)
 		{
-			if (Window.Current != null) {
-				Window.Current.Invalidate();
-			}
+			Window.Current.Invalidate();
 			if ((DirtyMask & mask) == mask)
 				return;
 			DirtyMask |= mask;
@@ -282,7 +280,7 @@ namespace Lime
 			++FinalizedCount;
 		}
 #endif
-		
+
 		public Node GetRoot()
 		{
 			Node node = this;
@@ -291,7 +289,7 @@ namespace Lime
 			}
 			return node;
 		}
-		
+
 		/// <summary>
 		/// Returns true if this node is a descendant of provided node.
 		/// </summary>
@@ -382,7 +380,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Returns the <see cref="string"/> representation of this <see cref="Node"/> 
+		/// Returns the <see cref="string"/> representation of this <see cref="Node"/>
 		/// in the format: "TypeName, "Id", HierarchyPath".
 		/// Example: "Node, "Child", Root/Child".
 		/// </summary>
@@ -390,7 +388,7 @@ namespace Lime
 		{
 			return string.Format("{0}, \"{1}\", {2}", GetType().Name, Id ?? "", GetHierarchyPath());
 		}
-		
+
 		/// <summary>
 		/// Returns hierarchy path for this Node in the format: "Parent.GetHierarchyPath()/Id (Tag)".
 		/// If Id is null then it's replaced with Type name. Tag is ommited if it's null.
@@ -538,9 +536,9 @@ namespace Lime
 		/// Searches for node with provided path or id in this node's descendants.
 		/// Throws an exception if sought-for node doesn't exist.
 		/// <para>This function is thread safe.</para>
-		/// </summary> 
+		/// </summary>
 		/// <typeparam name="T">Type of sought-for node.</typeparam>
-		/// <param name="path">Id or path of Node. Path can be incomplete 
+		/// <param name="path">Id or path of Node. Path can be incomplete
 		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
 		public T Find<T>(string path) where T : Node
 		{
@@ -557,7 +555,7 @@ namespace Lime
 		/// <para>This function is thread safe.</para>
 		/// </summary>
 		/// <typeparam name="T">Type of sought-for node.</typeparam>
-		/// <param name="format">Id or path of Node. Path can be incomplete 
+		/// <param name="format">Id or path of Node. Path can be incomplete
 		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
 		public T Find<T>(string format, params object[] args) where T : Node
 		{
@@ -570,7 +568,7 @@ namespace Lime
 		/// <para>This function is thread safe.</para>
 		/// </summary>
 		/// <typeparam name="T">Type of sought-for node.</typeparam>
-		/// <param name="path">Id or path of Node. Path can be incomplete 
+		/// <param name="path">Id or path of Node. Path can be incomplete
 		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
 		public bool TryFind<T>(string path, out T node) where T : Node
 		{
@@ -584,7 +582,7 @@ namespace Lime
 		/// <para>This function is thread safe.</para>
 		/// </summary>
 		/// <typeparam name="T">Type of sought-for node.</typeparam>
-		/// <param name="path">Id or path of Node. Path can be incomplete 
+		/// <param name="path">Id or path of Node. Path can be incomplete
 		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
 		public T TryFind<T>(string path) where T : Node
 		{
@@ -597,7 +595,7 @@ namespace Lime
 		/// <para>This function is thread safe.</para>
 		/// </summary>
 		/// <typeparam name="T">Type of sought-for node.</typeparam>
-		/// <param name="format">Id or path of Node. Path can be incomplete 
+		/// <param name="format">Id or path of Node. Path can be incomplete
 		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
 		public T TryFind<T>(string format, params object[] args) where T : Node
 		{
@@ -608,8 +606,8 @@ namespace Lime
 		/// Searches for node with provided path or id in this node's descendants.
 		/// Throws an exception if sought-for node doesn't exist.
 		/// <para>This function is thread safe.</para>
-		/// </summary> 
-		/// <param name="path">Id or path of Node. Path can be incomplete 
+		/// </summary>
+		/// <param name="path">Id or path of Node. Path can be incomplete
 		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
 		public Node FindNode(string path)
 		{
@@ -625,7 +623,7 @@ namespace Lime
 		/// Returns null if sought-for node doesn't exist.
 		/// <para>This function is thread safe.</para>
 		/// </summary>
-		/// <param name="path">Id or path of Node. Path can be incomplete 
+		/// <param name="path">Id or path of Node. Path can be incomplete
 		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
 		public Node TryFindNode(string path)
 		{
@@ -641,7 +639,7 @@ namespace Lime
 		/// Returns null if sought-for node doesn't exist.
 		/// <para>This function is thread safe.</para>
 		/// </summary>
-		/// <param name="path">Path of node. Can be incomplete 
+		/// <param name="path">Path of node. Can be incomplete
 		/// (i.e. for path Root/Human/Head/Eye Human or Head can be ommited).</param>
 		private Node TryFindNodeByPath(string path)
 		{
@@ -678,7 +676,7 @@ namespace Lime
 				node.StaticScale(ratio, roundCoordinates);
 			}
 		}
-		
+
 		[ThreadStatic]
 		private static Queue<Node> nodeSearchQueue;
 
@@ -801,7 +799,7 @@ namespace Lime
 			}
 			return candidates.FirstOrDefault();
 		}
-				
+
 		protected internal virtual void PerformHitTest() { }
 
 		private class DescendantsEnumerable : IEnumerable<Node>
