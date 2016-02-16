@@ -244,7 +244,9 @@ namespace Lime
 		/// </summary>
 		protected internal void PropagateDirtyFlags(DirtyFlags mask = DirtyFlags.All)
 		{
-			Window.Current.Invalidate();
+			if (Window.Current != null) {
+				Window.Current.Invalidate();
+			}
 			if ((DirtyMask & mask) == mask)
 				return;
 			DirtyMask |= mask;
