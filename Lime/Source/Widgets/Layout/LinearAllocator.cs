@@ -33,9 +33,10 @@ namespace Lime
 				}
 				var containerOverfilled = allocatedSize > availableSize;
 				for (int i = indices.Count - 1; i >= 0; i--) {
-					var t = constraints[i];
-					if (sizes[i] == (containerOverfilled ? t.MinSize : t.MaxSize)) {
-						availableSize = Math.Max(0, availableSize - sizes[i]);
+					var index = indices[i];
+					var t = constraints[index];
+					if (sizes[index] == (containerOverfilled ? t.MinSize : t.MaxSize)) {
+						availableSize = Math.Max(0, availableSize - sizes[index]);
 						indices.RemoveAt(i);
 					}
 				}
@@ -47,7 +48,7 @@ namespace Lime
 			}
 			return sizes;
 		}
-		
+
 		private static float CalcTotalStretch(Constraints[] constraints, List<int> indices)
 		{
 			float ts = 0;
