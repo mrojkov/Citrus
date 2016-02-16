@@ -9,11 +9,13 @@ namespace Lime
 	{
 		private IKeyboardInputProcessor prevActiveTextWidget;
 		private RenderChain renderChain = new RenderChain();
+		private bool continuousRendering;
 
 		public IWindow Window { get; private set; }
 
-		public WindowWidget(IWindow window)
+		public WindowWidget(IWindow window, bool continuousRendering = true)
 		{
+			this.continuousRendering = continuousRendering;
 			Window = window;
 			new WidgetContext(this);
 			Window.Context = new CombinedContext(Window.Context, WidgetContext.Current);
@@ -23,6 +25,9 @@ namespace Lime
 
 		public override void Update(float delta)
 		{
+			if (!continuousRendering) {
+				Window.Invalidate();
+			}
 			var context = WidgetContext.Current;
 			WidgetInput.RemoveInvalidatedCaptures();
 			context.IsActiveTextWidgetUpdated = false;
@@ -70,6 +75,22 @@ namespace Lime
 				Width = (int)(Window.ClientSize.Width * Window.PixelScale),
 				Height = (int)(Window.ClientSize.Height * Window.PixelScale)
 			};
+		}
+	}
+
+	public class DefaultWindowWidget : WindowWidget
+	{
+		public DefaultWindowWidget(Window window, bool continuousRendering = true)
+			: base(window, continuousRendering)
+		{
+			window.Rendering += () => {
+				Renderer.BeginFrame();
+				Size = (Vector2)window.ClientSize;
+				Renderer.SetOrthogonalProjection(Vector2.Zero, Size);
+				Render();
+				Renderer.EndFrame();			
+			};
+			window.Updating += Update;
 		}
 	}
 }

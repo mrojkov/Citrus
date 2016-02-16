@@ -159,7 +159,7 @@ namespace Lime
 			get
 			{
 				if (AutoSizeConstraints && !minSizeValid) {
-					base.MinSize = CalcContentSize();
+					base.MinSize = CalcContentSize() + Padding;
 					minSizeValid = true;
 				}
 				return base.MinSize;
@@ -219,13 +219,24 @@ namespace Lime
 
 		void IPresenter.Render()
 		{
-			if (caret.Valid != CaretPosition.ValidState.All)
-				spriteList = null;
-			PrepareSpriteListAndExtent();
+			PrepareSpriteListAndSyncCaret();
 			Renderer.Transform1 = LocalToWorldTransform;
 			Renderer.Blending = GlobalBlending;
 			Renderer.Shader = GlobalShader;
 			spriteList.Render(GlobalColor * textColor);
+		}
+
+		void IText.SyncCaretPosition()
+		{
+			PrepareSpriteListAndSyncCaret();
+		}
+
+		private void PrepareSpriteListAndSyncCaret()
+		{
+			if (caret.Valid != CaretPosition.ValidState.All) {
+				spriteList = null;
+			}
+			PrepareSpriteListAndExtent();
 		}
 
 		IPresenter IPresenter.Clone(Node newNode)
@@ -459,6 +470,7 @@ namespace Lime
 			caret.Valid = CaretPosition.ValidState.TextPos;
 			spriteList = null;
 			minSizeValid = false;
+			Window.Current.Invalidate();
 		}
 	}
 }

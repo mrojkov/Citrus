@@ -220,6 +220,8 @@ namespace Lime
 		public static int CreatedCount = 0;
 		public static int FinalizedCount = 0;
 
+		protected bool Awoken;
+
 		public Node()
 		{
 			AnimationSpeed = 1;
@@ -242,6 +244,7 @@ namespace Lime
 		/// </summary>
 		protected internal void PropagateDirtyFlags(DirtyFlags mask = DirtyFlags.All)
 		{
+			Window.Current.Invalidate();
 			if ((DirtyMask & mask) == mask)
 				return;
 			DirtyMask |= mask;
@@ -358,6 +361,7 @@ namespace Lime
 			clone.Animations = Animations.Clone(clone);
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Nodes = Nodes.DeepCloneFast(clone);
+			clone.Awoken = false;
 			if (clone.Presenter != null) {
 				clone.Presenter = Presenter.Clone(clone);
 			}
@@ -426,6 +430,10 @@ namespace Lime
 		public virtual void Update(float delta)
 		{
 			delta *= AnimationSpeed;
+			if (!Awoken) {
+				Awake();
+				Awoken = true;
+			}
 			AdvanceAnimation(delta);
 			SelfUpdate(delta);
 			for (var node = Nodes.FirstOrNull(); node != null; ) {
@@ -435,6 +443,11 @@ namespace Lime
 			}
 			SelfLateUpdate(delta);
 		}
+
+		/// <summary>
+		/// Awake is called on the first node update, before changing node state.
+		/// </summary>
+		protected virtual void Awake() { }
 
 		/// <summary>
 		/// Called before updating child nodes.

@@ -39,6 +39,7 @@ namespace Lime
 		private Timer timer;
 		private Stopwatch stopwatch;
 		private bool active;
+		private bool invalidated;
 		private System.Drawing.Point lastMousePosition;
 
 		public Input Input { get; private set; }
@@ -234,8 +235,6 @@ namespace Lime
 			glControl.KeyDown += OnKeyDown;
 			glControl.KeyUp += OnKeyUp;
 			glControl.KeyPress += OnKeyPress;
-			// Refresh mouse position of every frame to make HitTest work properly if mouse is outside of the screen.
-			Updating += RefreshMousePosition;
 			glControl.MouseDown += OnMouseDown;
 			glControl.MouseUp += OnMouseUp;
 			glControl.Resize += OnResize;
@@ -249,7 +248,7 @@ namespace Lime
 			stopwatch = new Stopwatch();
 			stopwatch.Start();
 			timer = new Timer();
-			timer.Interval = 1000 / 65;
+			timer.Interval = (int)(1000 / options.RefreshRate);
 			timer.Tick += OnTick;
 			timer.Start();
 			if (options.Icon != null) {
@@ -316,6 +315,7 @@ namespace Lime
 			if (!hasBeenMinimizedOrRestored) {
 				RaiseResized(deviceRotated: false);
 			}
+			Invalidate();
 		}
 
 		private void OnMouseDown(object sender, MouseEventArgs e)
@@ -381,18 +381,31 @@ namespace Lime
 
 		private void OnPaint(object sender, PaintEventArgs e)
 		{
-			var delta = (float)stopwatch.Elapsed.TotalSeconds;
-			stopwatch.Restart();
-			delta = Mathf.Clamp(delta, 0, 1 / Application.LowFPSLimit);
+			// Do not allow updating if modal dialog is shown, otherwise it will lead to recursive OnPaint.
+			if (form.Visible && form.CanFocus) {
+				var delta = (float)stopwatch.Elapsed.TotalSeconds;
+				stopwatch.Restart();
+				delta = Mathf.Clamp(delta, 0, 1 / Application.LowFPSLimit);
+				Update(delta);
+				if (invalidated) {
+					fpsCounter.Refresh();
+					mainGLControl.Context.MakeCurrent(glControl.WindowInfo);
+					RaiseRendering();
+					mainGLControl.SwapBuffers();
+					invalidated = false;
+				}
+			}
+		}
+
+		private void Update(float delta)
+		{
+			// Refresh mouse position of every frame to make HitTest work properly if mouse is outside of the screen.
+			RefreshMousePosition(delta);
 			Input.ProcessPendingKeyEvents();
 			RaiseUpdating(delta);
 			AudioSystem.Update();
 			Input.TextInput = null;
 			Input.CopyKeysState();
-			fpsCounter.Refresh();
-			mainGLControl.Context.MakeCurrent(glControl.WindowInfo);
-			RaiseRendering();
-			mainGLControl.SwapBuffers();
 		}
 
 		private static Key TranslateKey(Keys key)
@@ -559,6 +572,11 @@ namespace Lime
 				default:
 					return Key.Unknown;
 			}
+		}
+
+		public void Invalidate()
+		{
+			invalidated = true;
 		}
 	}
 }

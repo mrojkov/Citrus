@@ -8,7 +8,6 @@ namespace Lime
 	{
 		public int RowCount { get; set; }
 		public int ColCount { get; set; }
-		public Margin Margin = new Margin();
 		public float ColSpacing;
 		public float RowSpacing;
 		public float Spacing { set { ColSpacing = RowSpacing = value; } }
@@ -18,19 +17,14 @@ namespace Lime
 			DebugRectangles = new List<Rectangle>();
 		}
 
-		public void OnSizeChanged(Widget widget, Vector2 sizeDelta)
-		{
-			ArrangeChildren(widget);
-		}
-
 		public override void MeasureSizeConstraints(Widget widget)
 		{
 			var cells = GetCellArray(widget.Nodes);
 			if (cells == null) {
 				return;
 			}
-			var cols = CalcColConstraints(cells);
-			var rows = CalcRowConstraints(cells);
+			var cols = CalcColConstraints(widget, cells);
+			var rows = CalcRowConstraints(widget, cells);
 			var minSize = Vector2.Zero;
 			var maxSize = Vector2.Zero;
 			foreach (var i in cols) {
@@ -48,44 +42,41 @@ namespace Lime
 		public override void ArrangeChildren(Widget widget)
 		{
 			var cells = GetCellArray(widget.Nodes);
-			if (cells == null)
+			if (cells == null) {
 				return;
-			var cols = LinearAllocator.Allocate(widget.Width, CalcColConstraints(cells), roundSizes: true);
-			var rows = LinearAllocator.Allocate(widget.Height, CalcRowConstraints(cells), roundSizes: true);
+			}
+			var availableWidth = widget.ContentWidth - (ColCount - 1) * ColSpacing;
+			var availableHeight = widget.ContentHeight - (RowCount - 1) * RowSpacing;
+			var cols = LinearAllocator.Allocate(availableWidth, CalcColConstraints(widget, cells), roundSizes: true);
+			var rows = LinearAllocator.Allocate(availableHeight, CalcRowConstraints(widget, cells), roundSizes: true);
 			// Layout each cell
-			var p = Vector2.Zero;
+			var p = new Vector2(0, widget.Padding.Top);
 			DebugRectangles.Clear();
 			for (int i = 0; i < RowCount; i++) {
-				p.X = 0;
+				p.X = widget.Padding.Left;
 				for (int j = 0; j < ColCount; j++) {
 					var c = cells[i, j];
 					if (c == null) {
 						p.X += cols[j];
 						continue;
 					}
-					var margin = GetCellMargin(i, j);
-					var offset = p + new Vector2(margin.Left, margin.Top);
 					var colSpan = GetColSpan(c, j);
-					Vector2 size;
-					size.X = -margin.Left - GetCellMargin(i, j + colSpan - 1).Right;
+					var size = Vector2.Zero;
 					for (int u = 0; u < colSpan; u++) {
-						size.X += cols[j + u];
+						size.X += cols[j + u] + (u > 0 ? ColSpacing : 0);
 					}
 					var rowSpan = GetRowSpan(c, i);
-					size.Y = -margin.Top - GetCellMargin(i + rowSpan - 1, j).Bottom;
 					for (int u = 0; u < rowSpan; u++) {
-						size.Y += rows[i + u];
+						size.Y += rows[i + u] + (u > 0 ? RowSpacing : 0);
 					}
-					var halign = GetCellData(c).Alignment.X;
-					var valign = GetCellData(c).Alignment.Y;
-					LayoutCell(c, halign, valign, offset, size);
-					p.X += cols[j];
+					LayoutWidgetWithinCell(c, p, size, DebugRectangles);
+					p.X += cols[j] + ColSpacing;
 				}
-				p.Y += rows[i];
+				p.Y += rows[i] + RowSpacing;
 			}
 		}
 
-		private LinearAllocator.Constraints[] CalcColConstraints(Widget[,] cells)
+		private LinearAllocator.Constraints[] CalcColConstraints(Widget widget, Widget[,] cells)
 		{
 			var cols = new LinearAllocator.Constraints[ColCount];
 			for (int i = 0; i < ColCount; i++) {
@@ -97,9 +88,8 @@ namespace Lime
 					if (c != null) {
 						cols[j].Stretch = Math.Max(cols[j].Stretch, GetCellData(c).StretchX);
 						int s = GetColSpan(c, j);
-						float margins = GetCellMargin(i, j).Left + GetCellMargin(i, j + s - 1).Right;
-						float mn = c.MinSize.X + margins;
-						float mx = c.MaxSize.X + margins;
+						float mn = c.MinSize.X;
+						float mx = c.MaxSize.X;
 						if (s > 1) {
 							mn /= s;
 							mx /= s;
@@ -115,7 +105,7 @@ namespace Lime
 			return cols;
 		}
 
-		private LinearAllocator.Constraints[] CalcRowConstraints(Widget[,] cells)
+		private LinearAllocator.Constraints[] CalcRowConstraints(Widget widget, Widget[,] cells)
 		{
 			var rows = new LinearAllocator.Constraints[RowCount];
 			for (int i = 0; i < RowCount; i++) {
@@ -127,9 +117,8 @@ namespace Lime
 					if (c != null) {
 						rows[i].Stretch = Math.Max(rows[i].Stretch, GetCellData(c).StretchY);
 						int s = GetRowSpan(c, i);
-						float margins = GetCellMargin(i, j).Top + GetCellMargin(i + s - 1, j).Bottom;
-						float mn = c.MinSize.Y + margins;
-						float mx = c.MaxSize.Y + margins;
+						float mn = c.MinSize.Y;
+						float mx = c.MaxSize.Y;
 						if (s > 1) {
 							mn /= s;
 							mx /= s;
@@ -171,39 +160,6 @@ namespace Lime
 				}
 			}
 			return cells;
-		}
-
-		private Margin GetCellMargin(int i, int j)
-		{
-			return new Margin() {
-				Left = (j == 0) ? Margin.Left : (ColSpacing / 2).Round(),
-				Right = (j == ColCount - 1) ? Margin.Right : (ColSpacing / 2).Round(),
-				Top = (i == 0) ? Margin.Top : (RowSpacing / 2).Round(),
-				Bottom = (i == RowCount - 1) ? Margin.Bottom : (RowSpacing / 2).Round()
-			};
-		}
-
-		private void LayoutCell(Widget widget, HAlignment halign, VAlignment valign, Vector2 position, Vector2 cellSize)
-		{
-			DebugRectangles.Add(new Rectangle { A = position, B = position + cellSize });
-			var size = Vector2.Clamp(cellSize, widget.MinSize, widget.MaxSize);
-			if (halign == HAlignment.Right) {
-				position.X += cellSize.X - size.X;
-			} else if (halign == HAlignment.Center) {
-				position.X += ((cellSize.X - size.X) / 2).Round();
-			}
-			if (valign == VAlignment.Bottom) {
-				position.Y += cellSize.Y - size.Y;
-			} else if (valign == VAlignment.Center) {
-				position.Y += ((cellSize.Y - size.Y) / 2).Round();
-			}
-			widget.Position = position;
-			widget.Size = size;
-		}
-
-		private static LayoutCell GetCellData(Widget cell)
-		{
-			return cell.LayoutCell ?? Lime.LayoutCell.Default;
 		}
 
 		private int GetRowSpan(Widget cell, int row)

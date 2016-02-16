@@ -18,7 +18,7 @@ namespace Lime
 			public readonly ColorGradient ButtonPress = new ColorGradient(new Color4(215, 234, 252), new Color4(199, 226, 252));
 			public readonly ColorGradient ButtonDisable = new ColorGradient(new Color4(244, 244, 244), new Color4(244, 244, 244));
 			public readonly Vector2 DefaultButtonSize = new Vector2(75, 23);
-			public readonly Margin Padding = new Margin(2);
+			public readonly Thickness ControlsPadding = new Thickness(2);
 		}
 
 		public static ThemeConstants Constants = new ThemeConstants();
@@ -31,16 +31,16 @@ namespace Lime
 			Decorators[typeof(WindowWidget)] = DecorateWindowWidget;
 			Decorators[typeof(TextView)] = DecorateTextView;
 			Decorators[typeof(ComboBox)] = DecorateComboBox;
+			Decorators[typeof(FileChooserButton)] = DecorateFileChooserButton;
 		}
 
 		private void DecorateButton(Widget widget)
 		{
 			var button = (Button)widget;
 			button.Nodes.Clear();
-			button.MinSize = Constants.DefaultButtonSize;
-			button.MaxSize = Constants.DefaultButtonSize;
+			button.MinMaxSize = Constants.DefaultButtonSize;
 			button.Size = button.MinSize;
-			button.Padding = Constants.Padding;
+			button.Padding = Constants.ControlsPadding;
 			button.Presenter = new ButtonPresenter(button);
 			button.DefaultAnimation.AnimationEngine = new ButtonAnimationEngine(button);
 			var caption = new SimpleText {
@@ -54,6 +54,27 @@ namespace Lime
 			button.AddNode(caption);
 			ExpandToContainer(caption);
 		}
+
+		private void DecorateFileChooserButton(Widget widget)
+		{
+			var fc = (FileChooserButton)widget;
+			fc.Layout = new HBoxLayout();
+			var label = new SimpleText {
+				Id = "Label",
+				AutoSizeConstraints = false,
+				MinMaxHeight = Constants.DefaultButtonSize.Y,
+				Padding = Constants.ControlsPadding,
+				LayoutCell = new LayoutCell { StretchX = float.MaxValue }
+			};
+			var button = new Button {
+				Id = "Button",
+				Text = "...",
+				MinMaxWidth = 20
+			};
+			fc.Presenter = new BorderedFramePresenter(fc, Constants.DialogBackground, Constants.ButtonInactiveBorder);
+			fc.AddNode(label);
+			fc.AddNode(button);
+		}
 		
 		private void DecorateSimpleText(Widget widget)
 		{
@@ -65,7 +86,7 @@ namespace Lime
 			text.Font = new SerializableFont();
 			text.FontHeight = Constants.TextHeight;
 			text.HAlignment = HAlignment.Left;
-			text.VAlignment = VAlignment.Top;
+			text.VAlignment = VAlignment.Center;
 			text.OverflowMode = TextOverflowMode.Ellipsis;
 			text.TrimWhitespaces = true;	
 			text.Size = text.MinSize;
@@ -83,52 +104,60 @@ namespace Lime
 			eb.AutoSizeConstraints = false;
 			eb.Caret.IsVisible = true;
 			eb.MinSize = Constants.DefaultButtonSize;
-			eb.MaxSize = Constants.DefaultButtonSize;
+			eb.MaxHeight = eb.MinHeight;
 			eb.HAlignment = HAlignment.Left;
 			eb.Localizable = false;	
 			eb.TrimWhitespaces = false;
 			eb.VAlignment = VAlignment.Center;
-			eb.Padding = Constants.Padding;
+			eb.Padding = Constants.ControlsPadding;
 			var editorParams = new EditorParams { MaxLength = 100, MaxLines = 1 };
 			new CaretDisplay(
 				eb, eb.Caret,
 				new CaretParams { CaretWidget = new VerticalLineCaret(eb, thickness: 1.0f) });
 			new Editor(eb, eb.Caret, editorParams);
-			eb.Presenter = new EditBoxFramePresenter(eb);
+			eb.Presenter = new BorderedFramePresenter(eb, Constants.TextViewBackground, Constants.ButtonInactiveBorder);
 		}
 
 		private void DecorateComboBox(Widget widget)
 		{
 			var comboBox = (ComboBox)widget;
 			comboBox.MinSize = Constants.DefaultButtonSize;
-			var text = (SimpleText)comboBox.TextWidget;
-			text.VAlignment = VAlignment.Center;
+			comboBox.MaxHeight = Constants.DefaultButtonSize.Y;
+			var text = new SimpleText {
+				Id = "Label",
+				VAlignment = VAlignment.Center,
+			};
 			text.Presenter = new ComboBoxPresenter(text);
+			comboBox.AddNode(text);
 			ExpandToContainer(text);
 		}
 
 		private void DecorateTextView(Widget widget)
 		{
 			var tv = (TextView)widget;
-			tv.Presenter = new EditBoxFramePresenter(tv);
+			tv.Presenter = new BorderedFramePresenter(tv, Constants.TextViewBackground, Constants.ButtonInactiveBorder);
 		}
 
-		class EditBoxFramePresenter : IPresenter
+		class BorderedFramePresenter : IPresenter
 		{
 			private IPresenter oldPresenter;
 			private Widget widget;
+			private Color4 innerColor;
+			private Color4 borderColor;
 
-			public EditBoxFramePresenter(Widget widget)
+			public BorderedFramePresenter(Widget widget, Color4 innerColor, Color4 borderColor)
 			{
 				this.widget = widget;
+				this.innerColor = innerColor;
+				this.borderColor = borderColor;
 				oldPresenter = widget.Presenter;
 			}
 
 			public void Render()
 			{
 				widget.PrepareRendererState();
-				Renderer.DrawRect(Vector2.Zero, widget.Size, Constants.TextViewBackground);
-				Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Constants.ButtonInactiveBorder);
+				Renderer.DrawRect(Vector2.Zero, widget.Size, innerColor);
+				Renderer.DrawRectOutline(Vector2.Zero, widget.Size, borderColor);
 				if (oldPresenter != null) {
 					oldPresenter.Render();
 				}
@@ -136,7 +165,7 @@ namespace Lime
 
 			public IPresenter Clone(Node newNode)
 			{
-				return new EditBoxFramePresenter((Widget)newNode);
+				return new BorderedFramePresenter((Widget)newNode, innerColor, borderColor);
 			}
 		}
 
@@ -157,7 +186,7 @@ namespace Lime
 			{
 				this.widget = widget;
 				oldPresenter = widget.Presenter;
-				widget.Padding = Constants.Padding;
+				widget.Padding = Constants.ControlsPadding;
 				widget.Padding.Right = IconWidth;
 			}
 
@@ -209,6 +238,7 @@ namespace Lime
 
 			public void SetState(string state)
 			{
+				Window.Current.Invalidate();
 				switch (state) {
 					case "Press":
 						innerGradient = Constants.ButtonPress;
@@ -237,7 +267,7 @@ namespace Lime
 
 			public IPresenter Clone(Node newNode)
 			{
-				return new EditBoxFramePresenter((Widget)newNode);
+				return new ButtonPresenter((Widget)newNode);
 			}
 		}
 

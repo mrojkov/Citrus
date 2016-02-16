@@ -11,6 +11,7 @@ namespace Lime
 		public Size MaximumDecoratedSize;
 		public string Title = "Citrus";
 		public bool Visible = true;
+		public float RefreshRate = 60;
 		// System.Drawing.Icon on Windows
 		public object Icon;
 	}

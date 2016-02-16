@@ -27,6 +27,7 @@ namespace Lime.Platform
 		private Lime.Input input;
 
 		public event Action RenderFrame;
+		public event Action InputChanged;
 
 		public NSGameView(Lime.Input input, CGRect frame, NSOpenGLContext shareContext, GraphicsMode mode)
 			: base(frame)
@@ -69,22 +70,34 @@ namespace Lime.Platform
 		{
 			input.SetKeyState(Key.Mouse0, true);
 			input.SetKeyState(Key.Touch0, true);
+			if (theEvent.ClickCount == 2) {
+				input.SetKeyState(Key.Mouse0DoubleClick, true);
+			}
 		}
 
 		public override void RightMouseDown(NSEvent theEvent)
 		{
 			input.SetKeyState(Key.Mouse1, true);
+			if (theEvent.ClickCount == 2) {
+				input.SetKeyState(Key.Mouse1DoubleClick, true);
+			}
 		}
 
 		public override void RightMouseUp(NSEvent theEvent)
 		{
 			input.SetKeyState(Key.Mouse1, false);
+			if (theEvent.ClickCount == 2) {
+				input.SetKeyState(Key.Mouse1DoubleClick, false);
+			}
 		}
 
 		public override void MouseUp(NSEvent theEvent)
 		{
 			input.SetKeyState(Key.Mouse0, false);
 			input.SetKeyState(Key.Touch0, false);
+			if (theEvent.ClickCount == 2) {
+				input.SetKeyState(Key.Mouse0DoubleClick, false);
+			}
 		}
 
 		public override void ScrollWheel(NSEvent theEvent)
@@ -365,6 +378,13 @@ namespace Lime.Platform
 			}
 			base.Dispose(disposing);
 			disposed = true;
+		}
+
+		private void RaiseInputChanged()
+		{
+			if (InputChanged != null) {
+				InputChanged();
+			}
 		}
 	}
 }

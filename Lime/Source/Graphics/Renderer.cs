@@ -47,6 +47,13 @@ namespace Lime
 		Custom,
 	}
 
+	public enum LineCap
+	{
+		Butt,
+		Round,
+		Square
+	}
+
 	public struct WindowRect : IEquatable<WindowRect>
 	{
 		public int X;
@@ -635,21 +642,30 @@ namespace Lime
 			return aabb;
 		}
 
-		public static void DrawLine(float x0, float y0, float x1, float y1, Color4 color, float thickness)
+		public static void DrawLine(float x0, float y0, float x1, float y1, Color4 color, float thickness = 1, LineCap cap  = LineCap.Butt)
 		{
-			DrawLine(new Vector2(x0, y0), new Vector2(x1, y1), color, thickness);
+			DrawLine(new Vector2(x0, y0), new Vector2(x1, y1), color, thickness, cap);
 		}
 		
 		static Vertex[] v = new Vertex[4];
 
-		public static void DrawLine(Vector2 a, Vector2 b, Color4 color, float thickness)
+		public static void DrawLine(Vector2 a, Vector2 b, Color4 color, float thickness = 1, LineCap cap = LineCap.Butt)
 		{
+			if (cap == LineCap.Round) {
+				throw new NotImplementedException();
+			}
 			var d = (b - a).Normalized * thickness * 0.5f;
 			Vector2 n = GetVectorNormal(d);
-			v[0] = new Vertex { Pos = a - d - n, Color = color };
-			v[1] = new Vertex { Pos = b + d - n, Color = color };
-			v[2] = new Vertex { Pos = b + d + n, Color = color };
-			v[3] = new Vertex { Pos = a - d + n, Color = color };
+			v[0] = new Vertex { Pos = a - n, Color = color };
+			v[1] = new Vertex { Pos = b - n, Color = color };
+			v[2] = new Vertex { Pos = b + n, Color = color };
+			v[3] = new Vertex { Pos = a + n, Color = color };
+			if (cap == LineCap.Square) {
+				v[0].Pos -= d;
+				v[1].Pos += d;
+				v[2].Pos += d;
+				v[3].Pos -= d;
+			}
 			Renderer.DrawTriangleFan(null, null, v, v.Length);
 		}
 
@@ -675,10 +691,10 @@ namespace Lime
 
 		public static void DrawRectOutline(Vector2 a, Vector2 b, Color4 color, float thickness)
 		{
-			DrawLine(a.X, a.Y, b.X, a.Y, color, thickness);
-			DrawLine(b.X, a.Y, b.X, b.Y, color, thickness);
-			DrawLine(b.X, b.Y, a.X, b.Y, color, thickness);
-			DrawLine(a.X, b.Y, a.X, a.Y, color, thickness);
+			DrawLine(a.X, a.Y, b.X, a.Y, color, thickness, LineCap.Square);
+			DrawLine(b.X, a.Y, b.X, b.Y, color, thickness, LineCap.Square);
+			DrawLine(b.X, b.Y, a.X, b.Y, color, thickness, LineCap.Square);
+			DrawLine(a.X, b.Y, a.X, a.Y, color, thickness, LineCap.Square);
 		}
 
 		public static void DrawVerticalGradientRect(Vector2 a, Vector2 b, ColorGradient gradient)

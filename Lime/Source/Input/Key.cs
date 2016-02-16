@@ -168,6 +168,16 @@ namespace Lime
 		MouseWheelUp = 137,
 		MouseWheelDown = 138,
 		DismissSoftKeyboard = 139,
+
+		/// <summary>
+		/// The double click with the left mouse button.
+		/// </summary>
+		Mouse0DoubleClick = 140,
+
+		/// <summary>
+		/// The double click with the right mouse button.
+		/// </summary>
+		Mouse1DoubleClick = 141,
 	}
 }
 

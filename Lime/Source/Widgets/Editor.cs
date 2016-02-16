@@ -105,8 +105,8 @@ namespace Lime
 
 		public EditorParams()
 		{
-			KeyRepeatDelay = 0.5f;
-			KeyRepeatInterval = 0.05f;
+			KeyRepeatDelay = 0.3f;
+			KeyRepeatInterval = 0.03f;
 #if WIN || MAC || MONOMAC
 			PasswordLastCharShowTime = 0.0f;
 #else
@@ -317,6 +317,7 @@ namespace Lime
 						caretPos.WorldPos = t.TransformVector(Container.Input.MousePosition);
 					}
 					prevKeyPressed = keyPressed;
+					Text.SyncCaretPosition();
 				}
 				yield return null;
 			}

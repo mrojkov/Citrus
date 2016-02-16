@@ -166,9 +166,19 @@ namespace Lime
 			set { MaxSize = new Vector2(MaxSize.X, value); }
 		}
 
-		public virtual Vector2 MinMaxSize
+		public Vector2 MinMaxSize
 		{
 			set { MinSize = MaxSize = value; }
+		}
+
+		public float MinMaxWidth
+		{
+			set { MinWidth = MaxWidth = value; }
+		}
+
+		public float MinMaxHeight
+		{
+			set { MinHeight = MaxHeight = value; }
 		}
 
 		/// <summary>
@@ -281,9 +291,9 @@ namespace Lime
 
 		/// <summary>
 		/// Gets or sets the widget padding. Padding defines the white space between the widget content and the widget border.
-		/// The widget should respect the padding during its rendering.
+		/// The widget presenter and layout should respect the padding.
 		/// </summary>
-		public Margin Padding;
+		public Thickness Padding;
 
 		public Vector2 ContentPosition
 		{
@@ -686,6 +696,10 @@ namespace Lime
 		/// <param name="delta">Количество секунд, прошедшее с момента предыдущего вызова Update</param>
 		public override void Update(float delta)
 		{
+			if (!Awoken) {
+				Awake();
+				Awoken = true;
+			}
 			delta *= AnimationSpeed;
 			if (Updating != null) {
 				Updating(delta);
