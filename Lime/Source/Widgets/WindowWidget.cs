@@ -25,7 +25,7 @@ namespace Lime
 
 		public override void Update(float delta)
 		{
-			if (!continuousRendering) {
+			if (continuousRendering) {
 				Window.Invalidate();
 			}
 			var context = WidgetContext.Current;

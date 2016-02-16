@@ -248,7 +248,8 @@ namespace Lime
 			stopwatch = new Stopwatch();
 			stopwatch.Start();
 			timer = new Timer();
-			timer.Interval = (int)(1000 / options.RefreshRate);
+			// kuzymov: Without adding 5 frames to refresh rate, game have been getting FPS drops (minus ~20 FPS)
+			timer.Interval = (int)(1000 / (options.RefreshRate + 5));
 			timer.Tick += OnTick;
 			timer.Start();
 			if (options.Icon != null) {
