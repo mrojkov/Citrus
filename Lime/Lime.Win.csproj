@@ -75,7 +75,6 @@
     <Compile Include="Source\Application\FileDialog\FileDialog.cs" />
     <Compile Include="Source\Application\FileDialog\FileDialog.Mac.cs" />
     <Compile Include="Source\Application\FileDialog\FileDialog.Win.cs" />
-    <Compile Include="Source\Application\MouseCursor.cs" />
     <Compile Include="Source\Application\Debug.cs" />
     <Compile Include="Source\Application\FPSCounter.cs" />
     <Compile Include="Source\Application\IWindow.cs" />
