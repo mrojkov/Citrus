@@ -1,4 +1,5 @@
-﻿using System;
+#if !ANDROID && !iOS
+using System;
 using System.Collections.Generic;
 
 namespace Lime
@@ -305,3 +306,4 @@ namespace Lime
 		}
 	}
 }
+#endif

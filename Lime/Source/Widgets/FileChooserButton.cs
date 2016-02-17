@@ -1,4 +1,5 @@
-﻿using System;
+#if !ANDROID && !iOS
+using System;
 
 namespace Lime
 {
@@ -40,4 +41,4 @@ namespace Lime
 		}
 	}
 }
-
+#endif
