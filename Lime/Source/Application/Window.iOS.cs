@@ -87,6 +87,10 @@ namespace Lime
 			UIView.UpdateFrame += OnUpdateFrame;
 		}
 
+		public void Invalidate()
+		{
+		}
+
 		private void OnUpdateFrame(object s, Xamarin.FrameEventArgs e)
 		{
 			if (!Active || UIViewController.SoftKeyboardBeingShownOrHid) {

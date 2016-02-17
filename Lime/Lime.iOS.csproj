@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -283,7 +283,6 @@
     <Compile Include="Source\Application\Menu\Menu.cs" />
     <Compile Include="Source\Graphics\VectorShape.cs" />
     <Compile Include="Source\Types\ColorGradient.cs" />
-    <Compile Include="Source\Types\Margin.cs" />
     <Compile Include="Source\Types\ObservableList.cs" />
     <Compile Include="Source\Widgets\ComboBox.cs" />
     <Compile Include="Source\Widgets\EditBox.cs" />
@@ -304,6 +303,17 @@
     <Compile Include="Source\Application\MouseCursor\MouseCursor.cs" />
     <Compile Include="Source\Application\MouseCursor\MouseCursor.Mac.cs" />
     <Compile Include="Source\Application\MouseCursor\MouseCursor.Win.cs" />
+    <Compile Include="Source\Application\DummyWindow.cs" />
+    <Compile Include="Source\Application\FileDialog\FileDialog.Mac.cs" />
+    <Compile Include="Source\Application\FileDialog\FileDialog.Win.cs" />
+    <Compile Include="Source\Application\FileDialog\FileDialog.cs" />
+    <Compile Include="Source\Types\Thickness.cs" />
+    <Compile Include="Source\Widgets\FileChooserButton.cs" />
+    <Compile Include="Source\Widgets\HSplitter.cs" />
+    <Compile Include="Source\Widgets\VSplitter.cs" />
+    <Compile Include="Source\Widgets\Layout\FlowLayout.cs" />
+    <Compile Include="Source\Widgets\Layout\HBoxLayout.cs" />
+    <Compile Include="Source\Widgets\Layout\LayoutDebugPresenter.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
