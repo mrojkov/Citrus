@@ -26,7 +26,7 @@ namespace Lime
 
 		public float Height 
 		{ 
-			get { return height; }
+			get { return height / Window.Current.PixelScale; }
 			internal set 
 			{
 				height = value;

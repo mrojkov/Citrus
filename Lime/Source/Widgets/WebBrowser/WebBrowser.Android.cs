@@ -1,10 +1,11 @@
 #if ANDROID
 using System;
-using Android.Webkit;
-using System.Drawing;
-using Android.Views;
-using Android.Widget;
 using System.Collections.Generic;
+using System.Drawing;
+
+using Android.Views;
+using Android.Webkit;
+using Android.Widget;
 
 namespace Lime
 {
@@ -42,6 +43,8 @@ namespace Lime
 		{
 			webView = new WebView(ActivityDelegate.Instance.GameView.Context);
 			webView.Settings.JavaScriptEnabled = true;
+			webView.Settings.LoadWithOverviewMode = true;
+			webView.Settings.UseWideViewPort = true;
 			webView.SetWebViewClient(new WebViewClient());
 		}
 
@@ -104,7 +107,7 @@ namespace Lime
 			// and let scroll through the whole page if soft keyboard is shown.
 			if (p.TopMargin < CalcKeyboardTop()) {
 				var webViewBottom = p.TopMargin + p.Height;
-				p.Height -= Math.Max(0, webViewBottom - CalcKeyboardTop());
+				p.Height -= (int)Math.Max(0, webViewBottom / Window.Current.PixelScale - CalcKeyboardTop());
 			}
 			webView.RequestLayout();
 		}
@@ -122,9 +125,9 @@ namespace Lime
 			};
 		}
 
-		private int CalcKeyboardTop()
+		private float CalcKeyboardTop()
 		{
-			return Window.Current.ClientSize.Height - (int)Application.SoftKeyboard.Height;
+			return Window.Current.ClientSize.Height - Application.SoftKeyboard.Height;
 		}
 
 		private Uri GetUrl()

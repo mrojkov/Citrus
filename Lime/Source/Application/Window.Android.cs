@@ -1,6 +1,8 @@
 ﻿#if ANDROID
 using System;
 
+using Android.Content.Res;
+
 #pragma warning disable 0067
 
 namespace Lime
@@ -18,7 +20,11 @@ namespace Lime
 		public WindowState State { get { return WindowState.Fullscreen; } set {} }
 		public IntVector2 ClientPosition { get { return IntVector2.Zero; } set {} }
 		public IntVector2 DecoratedPosition { get { return IntVector2.Zero; } set {} }
-		public Size ClientSize { get { return ToLimeSize(ActivityDelegate.Instance.GameView.Size); } set {} }
+		public Size ClientSize
+		{
+			get { return ToLimeSize(ActivityDelegate.Instance.GameView.Size) / PixelScale; } 
+			set { }
+		}
 		public Size DecoratedSize { get { return ClientSize; } set {} }
 		public Size MinimumDecoratedSize { get { return Size.Zero; } set {} }
 		public Size MaximumDecoratedSize { get { return Size.Zero; } set {} }
@@ -30,7 +36,7 @@ namespace Lime
 
 		public float PixelScale
 		{
-			get { return 1.0f; }
+			get { return Resources.System.DisplayMetrics.Density; }
 		}
 
 		public void Center() {}
