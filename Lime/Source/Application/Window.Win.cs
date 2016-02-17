@@ -45,7 +45,14 @@ namespace Lime
 		public Input Input { get; private set; }
 		public bool Active { get { return active; } }
 		public Form Form { get { return form; } }
-		public string Title { get { return form.Text; } set { form.Text = value; } }
+
+		public string Title
+		{
+			get { return form.Text; }
+
+			set { form.Text = value; }
+		}
+
 		public WindowState State
 		{
 			get
@@ -60,6 +67,7 @@ namespace Lime
 					return WindowState.Normal;
 				}
 			}
+
 			set
 			{
 				if (value == WindowState.Fullscreen) {
@@ -81,7 +89,11 @@ namespace Lime
 
 		public bool Fullscreen
 		{
-			get { return State == WindowState.Fullscreen; }
+			get
+			{
+				return State == WindowState.Fullscreen;
+			}
+
 			set
 			{
 				if (value && State == WindowState.Fullscreen || !value && State != WindowState.Fullscreen) {
@@ -93,37 +105,43 @@ namespace Lime
 
 		public IntVector2 ClientPosition
 		{
-			get { return SDToLime.Convert(form.PointToScreen(new System.Drawing.Point(0, 0))); }
-			set { DecoratedPosition = value + DecoratedPosition - ClientPosition; }
+			get { return SDToLime.Convert(form.PointToScreen(new System.Drawing.Point(0, 0))) / PixelScale; }
+
+			set { DecoratedPosition = value * PixelScale + DecoratedPosition - ClientPosition; }
 		}
 
 		public Size ClientSize
 		{
-			get { return SDToLime.Convert(form.ClientSize); }
-			set { form.ClientSize = LimeToSD.Convert(value); }
+			get { return SDToLime.Convert(form.ClientSize) / PixelScale; }
+
+			set { form.ClientSize = LimeToSD.Convert(value * PixelScale); }
 		}
 
 		public IntVector2 DecoratedPosition
 		{
-			get { return SDToLime.Convert(form.Location); }
-			set { form.Location = LimeToSD.Convert(value); }
+			get { return SDToLime.Convert(form.Location) / PixelScale; }
+
+			set { form.Location = LimeToSD.Convert(value * PixelScale); }
 		}
 
 		public Size DecoratedSize
 		{
-			get { return SDToLime.Convert(form.Size); }
-			set { form.Size = LimeToSD.Convert(value); }
+			get { return SDToLime.Convert(form.Size) / PixelScale; }
+
+			set { form.Size = LimeToSD.Convert(value * PixelScale); }
 		}
 
 		public Size MinimumDecoratedSize
 		{
-			get { return SDToLime.Convert(form.MinimumSize); }
-			set { form.MinimumSize = LimeToSD.Convert(value); }
+			get { return SDToLime.Convert(form.MinimumSize) / PixelScale; }
+
+			set { form.MinimumSize = LimeToSD.Convert(value * PixelScale); }
 		}
 
 		public Size MaximumDecoratedSize
 		{
-			get { return SDToLime.Convert(form.MaximumSize); }
+			get { return SDToLime.Convert(form.MaximumSize) / PixelScale; }
+
 			set { form.MaximumSize = LimeToSD.Convert(value); }
 		}
 
@@ -142,23 +160,25 @@ namespace Lime
 		private MouseCursor cursor;
 		public MouseCursor Cursor
 		{
-			get { return cursor; }
-			set {
+			get
+			{
+				return cursor;
+			}
+
+			set
+			{
 				cursor = value;
 				form.Cursor = value.WinFormsCursor;
 			}
 		}
 
-		public float PixelScale
-		{
-			get { return 1.0f; }
-		}
+		public float PixelScale { get; private set; }
 
 		public void Center()
 		{
 			var screen = Screen.FromControl(form).WorkingArea;
-			var x = (screen.Width - DecoratedSize.Width) / 2;
-			var y = (screen.Height - DecoratedSize.Height) / 2;
+			var x = (int)((screen.Width / PixelScale - DecoratedSize.Width) / 2);
+			var y = (int)((screen.Height / PixelScale - DecoratedSize.Height) / 2);
 			var position = new IntVector2(
 				screen.X + (x > 0 ? x : 0),
 				screen.Y + (y > 0 ? y : 0)
@@ -220,6 +240,9 @@ namespace Lime
 			}
 			Input = new Input();
 			form = new Form();
+			using (var graphics = form.CreateGraphics()) {
+				PixelScale = CalcPixelScale(graphics.DpiX);
+			}
 			borderStyle = options.FixedSize ? FormBorderStyle.FixedSingle : FormBorderStyle.Sizable;
 			form.FormBorderStyle = borderStyle;
 			form.MaximizeBox = !options.FixedSize;
@@ -260,6 +283,11 @@ namespace Lime
 			if (options.Visible) {
 				Visible = true;
 			}
+		}
+
+		private static float CalcPixelScale(float Dpi)
+		{
+			return Dpi * 1f / 96f;
 		}
 
 		private void OnMouseWheel(object sender, MouseEventArgs e)
@@ -343,14 +371,14 @@ namespace Lime
 			}
 		}
 
-		private void RefreshMousePosition(float delta)
+		private void RefreshMousePosition()
 		{
 			if (lastMousePosition == Control.MousePosition) {
 				return;
 			}
 			lastMousePosition = Control.MousePosition;
 			var position = (Vector2)SDToLime.Convert(form.PointToClient(Control.MousePosition));
-			Input.MousePosition = position * Input.ScreenToWorldTransform;
+			Input.MousePosition = position / PixelScale * Input.ScreenToWorldTransform;
 			Input.SetTouchPosition(0, Input.MousePosition);
 		}
 
@@ -387,6 +415,7 @@ namespace Lime
 				var delta = (float)stopwatch.Elapsed.TotalSeconds;
 				stopwatch.Restart();
 				delta = Mathf.Clamp(delta, 0, 1 / Application.LowFPSLimit);
+				PixelScale = CalcPixelScale(e.Graphics.DpiX);
 				Update(delta);
 				if (invalidated) {
 					fpsCounter.Refresh();
@@ -401,7 +430,7 @@ namespace Lime
 		private void Update(float delta)
 		{
 			// Refresh mouse position of every frame to make HitTest work properly if mouse is outside of the screen.
-			RefreshMousePosition(delta);
+			RefreshMousePosition();
 			Input.ProcessPendingKeyEvents();
 			RaiseUpdating(delta);
 			AudioSystem.Update();

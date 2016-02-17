@@ -47,6 +47,16 @@ namespace Lime
 			return lhs.Width != rhs.Width || lhs.Height != rhs.Height;
 		}
 
+		public static Size operator *(Size left, float right)
+		{
+			return new Size((int)(left.Width * right), (int)(left.Height * right));
+		}
+
+		public static Size operator /(Size left, float right)
+		{
+			return new Size((int)(left.Width / right), (int)(left.Height / right));
+		}
+
 		public bool Equals(Size rhs)
 		{
 			return Width == rhs.Width && Height == rhs.Height;
