@@ -17,13 +17,13 @@ namespace Lime
 
 		[FieldOffset(1)]
 		public byte G;
-		
+
 		[FieldOffset(2)]
 		public byte B;
-		
+
 		[FieldOffset(3)]
 		public byte A;
-		
+
 		[ProtoMember(1)]
 		[FieldOffset(0)]
 		public uint ABGR;
@@ -38,7 +38,7 @@ namespace Lime
 		public static readonly Color4 Yellow = new Color4(255, 255, 0, 255);
 		public static readonly Color4 Orange = new Color4(255, 128, 0, 255);
 		public static readonly Color4 Transparent = new Color4(255, 255, 255, 0);
-		
+
 		public Color4(uint abgr)
 		{
 			R = G = B = A = 0;
@@ -82,7 +82,7 @@ namespace Lime
 				A = (byte) ((rhs.A * ((lhs.A << 8) + lhs.A) + 255) >> 16)
 			};
 		}
-		
+
 		/// <summary>
 		/// Multiplies every component of color with its alpha.
 		/// </summary>
@@ -100,7 +100,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Creates a new <see cref="Color4"/> that contains 
+		/// Creates a new <see cref="Color4"/> that contains
 		/// linear interpolation of the specified colors.
 		/// </summary>
 		/// <param name="amount">Weighting value(between 0.0 and 1.0).</param>
@@ -132,7 +132,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Returns the <see cref="string"/> representation of this <see cref="Color4"/> 
+		/// Returns the <see cref="string"/> representation of this <see cref="Color4"/>
 		/// in the format: "#R.G.B.A", where R, G, B, A are represented by hexademical numbers.
 		/// </summary>
 		public override string ToString()

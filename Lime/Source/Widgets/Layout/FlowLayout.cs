@@ -33,7 +33,7 @@ namespace Lime
 				int i1 = splitIndices[j + 1];
 				var constraints = new LinearAllocator.Constraints[i1 - i0];
 				var line = widgets.GetRange(i0, i1 - i0);
-				var maxLineHeight = line.Max((w) => w.Height);
+				var maxLineHeight = line.Max((w) => w.MinHeight);
 				var availableLength = Math.Max(0, widget.ContentWidth - (line.Count - 1) * Spacing);
 				int i = 0;
 				foreach (var w in line) {
