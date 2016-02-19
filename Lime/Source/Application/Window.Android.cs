@@ -35,6 +35,7 @@ namespace Lime
 
 		public void Center() {}
 		public void Close() {}
+		public void Invalidate() {}
 
 		public Window(WindowOptions options)
 		{
