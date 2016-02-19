@@ -89,7 +89,6 @@ namespace Lime
 		private void KeyboardShowCallback(object sender, UIKeyboardEventArgs args)
 		{
 			softKeyboard.Visible = true;
-			var scale = UIScreen.MainScreen.Scale;
 
 			// iPad 2 return keyboard height in Height, but iPad 3 return keyboard height in Width.
 			// So, trying to determine where the real height is. 
@@ -98,9 +97,9 @@ namespace Lime
 			rectBegin.X  = rectBegin.X < 0? 0 : rectBegin.X;
 			rectEnd.X = rectEnd.X < 0 ? 0 : rectEnd.X;
 			if (rectEnd.X == 0 && rectBegin.X == 0 && rectEnd.Height < rectEnd.Width) {
-				softKeyboard.Height = (float)(rectEnd.Height * scale);
+				softKeyboard.Height = (float)(rectEnd.Height);
 			} else {
-				softKeyboard.Height = (float)(rectEnd.Width * scale);
+				softKeyboard.Height = (float)(rectEnd.Width);
 			}
 		}
 

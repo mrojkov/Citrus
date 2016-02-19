@@ -22,7 +22,11 @@ namespace Lime
 		public WindowState State { get { return WindowState.Fullscreen; } set {} }
 		public bool Fullscreen { get { return true; } set {} }
 		public IntVector2 ClientPosition { get { return IntVector2.Zero; } set {} }
-		public Size ClientSize { get { return UIViewController.View.ClientSize; } set {} }
+		public Size ClientSize
+		{
+			get { return UIView.ClientSize; }
+			set { }
+		}
 		public IntVector2 DecoratedPosition { get { return IntVector2.Zero; } set {} }
 		public Size DecoratedSize { get { return ClientSize; } set {} }
 		public Size MinimumDecoratedSize { get { return Size.Zero; } set {} }
@@ -34,8 +38,9 @@ namespace Lime
 		[Obsolete("Use FPS property instead", true)]
 		public float CalcFPS() { return fpsCounter.FPS; }
 
-		public float PixelScale {
-			get { return 1.0f; }
+		public float PixelScale
+		{
+			get { return (float)UIScreen.MainScreen.Scale; }
 		}
 
 		public void Center() { }

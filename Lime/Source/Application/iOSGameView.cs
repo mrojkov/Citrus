@@ -73,10 +73,9 @@ namespace Lime
 
 		private void RefreshWindowSize()
 		{
-			var scale = UIScreen.MainScreen.Scale;
 			ClientSize = new Size {
-				Width = (int)(Bounds.Width * scale),
-				Height = (int)(Bounds.Height * scale)
+				Width = (int)(Bounds.Width),
+				Height = (int)(Bounds.Height)
 			};
 		}
 
@@ -86,7 +85,7 @@ namespace Lime
 				for (int i = 0; i < Input.MaxTouches; i++) {
 					if (activeTouches[i] == null) {
 						var pt = touch.LocationInView(this);
-						var position = new Vector2((float)pt.X, (float)pt.Y) * screenScale * input.ScreenToWorldTransform;
+						var position = new Vector2((float)pt.X, (float)pt.Y) * input.ScreenToWorldTransform;
 						if (i == 0) {
 							input.MousePosition = position;
 							input.SetKeyState(Key.Mouse0, true);
@@ -107,7 +106,7 @@ namespace Lime
 				for (int i = 0; i < Input.MaxTouches; i++) {
 					if (activeTouches[i] == touch) {
 						var pt = touch.LocationInView(this);
-						var position = new Vector2((float)pt.X, (float)pt.Y) * screenScale * input.ScreenToWorldTransform;
+						var position = new Vector2((float)pt.X, (float)pt.Y) * input.ScreenToWorldTransform;
 						if (i == 0) {
 							input.MousePosition = position;
 						}
