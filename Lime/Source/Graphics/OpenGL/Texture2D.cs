@@ -73,21 +73,6 @@ namespace Lime
 				texture.LoadImage(stream);
 			}
 		}
-
-		class TextureBitmapReloader : TextureReloader
-		{
-			Bitmap bitmap;
-
-			public TextureBitmapReloader(Bitmap bitmap)
-			{
-				this.bitmap = bitmap.Clone();
-			}
-
-			public override void Reload(Texture2D texture)
-			{
-				texture.LoadImage(bitmap);
-			}
-		}
 		#endregion
 
 		private uint handle;
@@ -149,10 +134,7 @@ namespace Lime
 
 		public void LoadImage(Bitmap bitmap)
 		{
-			if (reloader == null) {
-				reloader = new TextureBitmapReloader(bitmap);
-			}
-			InitWithLimeBitmap(bitmap);
+			LoadImage(bitmap.GetPixels(), bitmap.Width, bitmap.Height);
 		}
 
 		private void LoadImageHelper(Stream stream, bool createReloader)
@@ -172,17 +154,24 @@ namespace Lime
 				} else if (sign == PVRMagic) {
 					InitWithPVRTexture(reader);
 				} else {
-					InitWithPngOrJpgBitmap(stream);
+					InitWithPngOrJpg(stream);
 				}
 #elif OPENGL
 				if (sign == DDSMagic) {
 					InitWithDDSBitmap(reader);
 				} else {
-					InitWithPngOrJpgBitmap(stream);
+					InitWithPngOrJpg(stream);
 				}
 #endif
 			}
 			uvRect = new Rectangle(Vector2.Zero, (Vector2)ImageSize / (Vector2)SurfaceSize);
+		}
+
+		private void InitWithPngOrJpg(Stream stream)
+		{
+			using (var bitmap = new Bitmap(stream)) {
+				LoadImage(bitmap);
+			}
 		}
 
 		private void PrepareOpenGLTexture()

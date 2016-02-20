@@ -126,7 +126,6 @@
     <Compile Include="Source\Graphics\OpenGL\ShaderProgram.cs" />
     <Compile Include="Source\Graphics\OpenGL\Texture2D.cs" />
     <Compile Include="Source\Graphics\OpenGL\Texture2D.DDS.cs" />
-    <Compile Include="Source\Graphics\OpenGL\Texture2D.Png.cs" />
     <Compile Include="Source\Graphics\OpenGL\Texture2D.Pvr.cs" />
     <Compile Include="Source\Graphics\Renderer.cs" />
     <Compile Include="Source\Graphics\SpriteList.cs" />
