@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Lime.PopupMenu
 {
@@ -14,7 +13,7 @@ namespace Lime.PopupMenu
 		RoundedRectangle rectangle = new RoundedRectangle();
 
 		public event Action Hidden;
-		public Frame Frame = new Frame() { Tag = "$PopupMenu.cs" };
+		public Frame Frame = new Frame { Tag = "$PopupMenu.cs" };
 		private List<MenuItem> items = new List<MenuItem>();
 		private int layer;
 		private int maxHeight;
@@ -55,7 +54,7 @@ namespace Lime.PopupMenu
 		/// </summary>
 		public void Hide()
 		{
-			Frame.Input.ReleaseMouse();	
+			Frame.Input.ReleaseMouse();
 			Frame.Unlink();
 			if (Hidden != null) {
 				Hidden();
@@ -70,21 +69,30 @@ namespace Lime.PopupMenu
 				float totalItemsHeigth = MenuItem.Height * visibleCount;
 				int columnsCount = Math.Max((totalItemsHeigth / maxHeight).Ceiling(), 1);
 				int itemsPerColumn = ((float)visibleCount / columnsCount).Ceiling();
+				if (Frame.Parent != null) {
+					Frame.CenterOnParent();
+				}
 				Frame.Height = MenuItem.Height * itemsPerColumn + MenuItem.Height;
 				Frame.Width = itemWidth * columnsCount;
+				if (Frame.Height * Frame.Scale.Y > Window.Current.ClientSize.Height - 60) {
+					Frame.Scale = (Window.Current.ClientSize.Height - 60) / Frame.Height * Vector2.One;
+				}
+				if (Frame.Width * Frame.Scale.X > Window.Current.ClientSize.Width - 60) {
+					Frame.Scale = (Window.Current.ClientSize.Width - 60) / Frame.Width * Vector2.One;
+				}
 				UpdateBackground();
 				UpdateItems(itemsPerColumn);
-				yield return null;	
+				yield return null;
 				if (Frame.Input.WasMousePressed() && !Frame.IsMouseOver()) {
 					Hide();
 					yield break;
-				}	
+				}
 			}
 		}
 
 		private void UpdateItems(int itemsPerColumn)
 		{
-			int i = 0;
+			var i = 0;
 			foreach (var item in items) {
 				item.Frame.Visible = item.Visible;
 				if (!item.Visible) {
