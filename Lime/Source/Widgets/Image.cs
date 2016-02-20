@@ -1,5 +1,3 @@
-using System;
-using Lime;
 using ProtoBuf;
 
 namespace Lime
@@ -69,6 +67,14 @@ namespace Lime
 			if (GloballyVisible && !skipRender) {
 				chain.Add(this, Layer);
 			}
+		}
+
+		public override void Dispose()
+		{
+			if (Texture != null) {
+				Texture.Dispose();
+			}
+			base.Dispose();
 		}
 
 		ITexture IImageCombinerArg.GetTexture()
