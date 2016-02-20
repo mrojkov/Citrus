@@ -11,7 +11,7 @@ namespace Lime
 {
 	class BitmapImplementation : IBitmapImplementation
 	{
-		public AndroidBitmap bitmap;
+		public AndroidBitmap Bitmap;
 
 		public BitmapImplementation(Stream stream)
 		{
@@ -19,7 +19,7 @@ namespace Lime
 			if (Build.VERSION.SdkInt >= BuildVersionCodes.Kitkat) {
 				options.InPremultiplied = false;
 			}
-			bitmap = BitmapFactory.DecodeStream(stream, null, options);
+			Bitmap = BitmapFactory.DecodeStream(stream, null, options);
 		}
 
 		public BitmapImplementation(Color4[] data, int width, int height)
@@ -29,22 +29,22 @@ namespace Lime
 				var pixel = data[i];
 				colors[i] = Color.Argb(pixel.A, pixel.R, pixel.G, pixel.B).ToArgb();
 			}
-			bitmap = AndroidBitmap.CreateBitmap(colors, width, height, AndroidBitmap.Config.Argb8888);
+			Bitmap = AndroidBitmap.CreateBitmap(colors, width, height, AndroidBitmap.Config.Argb8888);
 		}
 
 		private BitmapImplementation(AndroidBitmap bitmap)
 		{
-			this.bitmap = bitmap;
+			Bitmap = bitmap;
 		}
 
 		public int Width
 		{
-			get { return bitmap == null ? 0 : bitmap.Width; }
+			get { return Bitmap == null ? 0 : Bitmap.Width; }
 		}
 
 		public int Height
 		{
-			get { return bitmap == null ? 0 : bitmap.Height; }
+			get { return Bitmap == null ? 0 : Bitmap.Height; }
 		}
 
 		public bool IsValid
@@ -52,16 +52,16 @@ namespace Lime
 			get
 			{
 				return
-					bitmap != null &&
-					!bitmap.IsRecycled &&
-					bitmap.Height > 0 &&
-					bitmap.Width > 0;
+					Bitmap != null &&
+					!Bitmap.IsRecycled &&
+					Bitmap.Height > 0 &&
+					Bitmap.Width > 0;
 			}
 		}
 
 		public IBitmapImplementation Clone()
 		{
-			return new BitmapImplementation(bitmap.Copy(
+			return new BitmapImplementation(Bitmap.Copy(
 				AndroidBitmap.Config.Argb8888,
 				isMutable: false));
 		}
@@ -70,7 +70,7 @@ namespace Lime
 		{
 			return new BitmapImplementation(
 				AndroidBitmap.CreateScaledBitmap(
-					bitmap,
+					Bitmap,
 					newWidth,
 					newHeight,
 					filter: true));
@@ -80,7 +80,7 @@ namespace Lime
 		{
 			return new BitmapImplementation(
 				AndroidBitmap.CreateBitmap(
-					bitmap,
+					Bitmap,
 					cropArea.Left,
 					cropArea.Top,
 					cropArea.Width,
@@ -89,9 +89,9 @@ namespace Lime
 
 		public Color4[] GetPixels()
 		{
-			int length = bitmap.Width * bitmap.Height;
+			int length = Bitmap.Width * Bitmap.Height;
 			var colors = new int[length];
-			bitmap.GetPixels(colors, 0, bitmap.Width, 0, 0, bitmap.Width, bitmap.Height);
+			Bitmap.GetPixels(colors, 0, Bitmap.Width, 0, 0, Bitmap.Width, Bitmap.Height);
 			var pixels = new Color4[length];
 			int r, g, b, a;
 			for (int i = 0; i < length; i++) {
@@ -106,13 +106,13 @@ namespace Lime
 
 		public void SaveTo(Stream stream)
 		{
-			bitmap.Compress(Android.Graphics.Bitmap.CompressFormat.Png, 100, stream);
+			Bitmap.Compress(Android.Graphics.Bitmap.CompressFormat.Png, 100, stream);
 		}
 
 		public void Dispose()
 		{
-			if (bitmap != null && !bitmap.IsRecycled) {
-				bitmap.Recycle();
+			if (Bitmap != null && !Bitmap.IsRecycled) {
+				Bitmap.Recycle();
 			}
 		}
 	}

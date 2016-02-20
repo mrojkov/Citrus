@@ -9,7 +9,7 @@ namespace Lime
 	class BitmapImplementation : IBitmapImplementation
 	{
 		private IntPtr data;
-		public SD.Bitmap bitmap;
+		public SD.Bitmap Bitmap;
 
 		public BitmapImplementation(Stream stream)
 		{
@@ -18,7 +18,7 @@ namespace Lime
 			// Так как мы не можем быть уверены, что снаружи стрим не уничтожат, копируем его.
 			var streamClone = new MemoryStream();
 			stream.CopyTo(streamClone);
-			bitmap = new SD.Bitmap(streamClone);
+			Bitmap = new SD.Bitmap(streamClone);
 		}
 
 		public BitmapImplementation(Color4[] colors, int width, int height)
@@ -26,22 +26,22 @@ namespace Lime
 			const SD.Imaging.PixelFormat Format = SD.Imaging.PixelFormat.Format32bppArgb;
 			var stride = 4 * width;
 			data = CreateMemoryCopy(colors);
-			bitmap = new SD.Bitmap(width, height, stride, Format, data);
+			Bitmap = new SD.Bitmap(width, height, stride, Format, data);
 		}
 
 		private BitmapImplementation(SD.Bitmap bitmap)
 		{
-			this.bitmap = bitmap;
+			Bitmap = bitmap;
 		}
 
 		public int Width
 		{
-			get { return bitmap == null ? 0 : bitmap.Width; }
+			get { return Bitmap == null ? 0 : Bitmap.Width; }
 		}
 
 		public int Height
 		{
-			get { return bitmap == null ? 0 : bitmap.Height; }
+			get { return Bitmap == null ? 0 : Bitmap.Height; }
 		}
 
 		public bool IsValid
@@ -50,47 +50,47 @@ namespace Lime
 			{
 				return
 					!disposed &&
-					bitmap != null &&
-					bitmap.Height > 0 &&
-					bitmap.Width > 0;
+					Bitmap != null &&
+					Bitmap.Height > 0 &&
+					Bitmap.Width > 0;
 			}
 		}
 
 		public IBitmapImplementation Clone()
 		{
-			return new BitmapImplementation((SD.Bitmap)bitmap.Clone());
+			return new BitmapImplementation((SD.Bitmap)Bitmap.Clone());
 		}
 
 		public IBitmapImplementation Crop(IntRectangle cropArea)
 		{
 			var rect = new SD.Rectangle(cropArea.Left, cropArea.Top, cropArea.Width, cropArea.Height);
-			return new BitmapImplementation(bitmap.Clone(rect, bitmap.PixelFormat));
+			return new BitmapImplementation(Bitmap.Clone(rect, Bitmap.PixelFormat));
 		}
 
 		public IBitmapImplementation Rescale(int newWidth, int newHeight)
 		{
-			return new BitmapImplementation(new SD.Bitmap(bitmap, newWidth, newHeight));
+			return new BitmapImplementation(new SD.Bitmap(Bitmap, newWidth, newHeight));
 		}
 
 		public Color4[] GetPixels()
 		{
-			var bmpData = bitmap.LockBits(
-				new SD.Rectangle(0, 0, bitmap.Width, bitmap.Height),
+			var bmpData = Bitmap.LockBits(
+				new SD.Rectangle(0, 0, Bitmap.Width, Bitmap.Height),
 				SD.Imaging.ImageLockMode.ReadOnly,
 				SD.Imaging.PixelFormat.Format32bppArgb);
 			if (bmpData.Stride != bmpData.Width * 4) {
 				throw new FormatException("Bitmap stride does not match its width");
 			}
 
-			var numBytes = bmpData.Width * bitmap.Height * 4;
+			var numBytes = bmpData.Width * Bitmap.Height * 4;
 			var pixelsArray = ArrayFromPointer(bmpData.Scan0, numBytes / 4);
-			bitmap.UnlockBits(bmpData);
+			Bitmap.UnlockBits(bmpData);
 			return pixelsArray;
 		}
 
 		public void SaveTo(Stream stream)
 		{
-			bitmap.Save(stream, SD.Imaging.ImageFormat.Png);
+			Bitmap.Save(stream, SD.Imaging.ImageFormat.Png);
 		}
 
 		private static Color4[] ArrayFromPointer(IntPtr data, int arraySize)
@@ -132,8 +132,8 @@ namespace Lime
 		{
 			if (!disposed) {
 				if (disposing) {
-					if (bitmap != null) {
-						bitmap.Dispose();
+					if (Bitmap != null) {
+						Bitmap.Dispose();
 					}
 				}
 

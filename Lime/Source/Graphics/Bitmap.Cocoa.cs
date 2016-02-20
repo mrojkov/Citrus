@@ -14,16 +14,16 @@ namespace Lime
 {
 	class BitmapImplementation : IBitmapImplementation
 	{
-		public CocoaBitmap bitmap;
+		public CocoaBitmap Bitmap;
 
 		public BitmapImplementation(Stream stream)
 		{
 #if iOS
 			using (var nsData = NSData.FromStream(stream)) {
-				bitmap = CocoaBitmap.LoadFromData(nsData);
+				Bitmap = CocoaBitmap.LoadFromData(nsData);
 			}
 #elif MAC || MONOMAC
-			bitmap = CocoaBitmap.FromStream(stream);
+			Bitmap = CocoaBitmap.FromStream(stream);
 #endif
 		}
 
@@ -43,9 +43,9 @@ namespace Lime
 					using (var img = new CGImage(width, height, 8, 32, 4 * width, colorSpace, CGBitmapFlags.Last, dataProvider, null, false,
 						CGColorRenderingIntent.Default)) {
 #if iOS
-						bitmap = new CocoaBitmap(img);
+						Bitmap = new CocoaBitmap(img);
 #elif MAC || MONOMAC
-						bitmap = new CocoaBitmap(img, new CGSize(width, height));
+						Bitmap = new CocoaBitmap(img, new CGSize(width, height));
 #endif
 					}
 				}
@@ -54,22 +54,22 @@ namespace Lime
 
 		private BitmapImplementation(CocoaBitmap bitmap)
 		{
-			this.bitmap = bitmap;
+			Bitmap = bitmap;
 		}
 
 		public int Width
 		{
-			get { return bitmap != null ? (int)bitmap.CGImage.Width : 0; }
+			get { return Bitmap != null ? (int)Bitmap.CGImage.Width : 0; }
 		}
 
 		public int Height
 		{
-			get { return bitmap != null ? (int)bitmap.CGImage.Height : 0; }
+			get { return Bitmap != null ? (int)Bitmap.CGImage.Height : 0; }
 		}
 
 		public bool IsValid
 		{
-			get { return (bitmap != null && (Width > 0 && Height > 0)); }
+			get { return (Bitmap != null && (Width > 0 && Height > 0)); }
 		}
 
 		public IBitmapImplementation Clone()
@@ -77,22 +77,22 @@ namespace Lime
 #if iOS
 			return Crop(new IntRectangle(0, 0, Width, Height));
 #elif MAC || MONOMAC
-			return new BitmapImplementation((CocoaBitmap)bitmap.Copy());
+			return new BitmapImplementation((CocoaBitmap)Bitmap.Copy());
 #endif
 		}
 
 		public IBitmapImplementation Rescale(int newWidth, int newHeight)
 		{
 #if iOS
-			return new BitmapImplementation(bitmap.Scale(new CGSize(newWidth, newHeight)));
+			return new BitmapImplementation(Bitmap.Scale(new CGSize(newWidth, newHeight)));
 #elif MAC || MONOMAC
 			var newImage = new CocoaBitmap(new CGSize(newWidth, newHeight));
 			newImage.LockFocus();
 			var ctx = NSGraphicsContext.CurrentContext;
 			ctx.ImageInterpolation = NSImageInterpolation.High;
-			bitmap.DrawInRect(
+			Bitmap.DrawInRect(
 			new CGRect(0, 0, newWidth, newHeight), 
-			new CGRect(0, 0, bitmap.Size.Width, bitmap.Size.Height), 
+			new CGRect(0, 0, Bitmap.Size.Width, Bitmap.Size.Height), 
 			NSCompositingOperation.Copy, 1); 
 			newImage.UnlockFocus();
 			return new BitmapImplementation(newImage);
@@ -103,28 +103,28 @@ namespace Lime
 		{
 			var rect = new CGRect(cropArea.Left, cropArea.Top, cropArea.Width, cropArea.Height);
 #if iOS
-			return new BitmapImplementation(new CocoaBitmap(bitmap.CGImage.WithImageInRect(rect)));
+			return new BitmapImplementation(new CocoaBitmap(Bitmap.CGImage.WithImageInRect(rect)));
 #elif MAC || MONOMAC
 			var size = new CGSize(cropArea.Width, cropArea.Height);
-			return new BitmapImplementation(new CocoaBitmap(bitmap.CGImage.WithImageInRect(rect), size));
+			return new BitmapImplementation(new CocoaBitmap(Bitmap.CGImage.WithImageInRect(rect), size));
 #endif
 		}
 
 		public Color4[] GetPixels()
 		{
-			var isColorSpaceRGB = bitmap.CGImage.ColorSpace.Model == CGColorSpaceModel.RGB;
-			if (!isColorSpaceRGB && bitmap.CGImage.BitsPerPixel != 32) {
+			var isColorSpaceRGB = Bitmap.CGImage.ColorSpace.Model == CGColorSpaceModel.RGB;
+			if (!isColorSpaceRGB && Bitmap.CGImage.BitsPerPixel != 32) {
 				throw new FormatException("Can not return array of pixels if bitmap is not in 32 bit format or if not in RGBA format.");
 			}
 
-			var doSwap = bitmap.CGImage.BitmapInfo.HasFlag(CGBitmapFlags.ByteOrder32Little);
-			var isPremultiplied = bitmap.CGImage.AlphaInfo == CGImageAlphaInfo.PremultipliedFirst ||
-				bitmap.CGImage.AlphaInfo == CGImageAlphaInfo.PremultipliedLast;
-			var rowLength = bitmap.CGImage.BytesPerRow / 4;
+			var doSwap = Bitmap.CGImage.BitmapInfo.HasFlag(CGBitmapFlags.ByteOrder32Little);
+			var isPremultiplied = Bitmap.CGImage.AlphaInfo == CGImageAlphaInfo.PremultipliedFirst ||
+				Bitmap.CGImage.AlphaInfo == CGImageAlphaInfo.PremultipliedLast;
+			var rowLength = Bitmap.CGImage.BytesPerRow / 4;
 			var width = Width;
 			var height = Height;
 			var pixels = new Color4[width * height];
-			using (var data = bitmap.CGImage.DataProvider.CopyData()) {
+			using (var data = Bitmap.CGImage.DataProvider.CopyData()) {
 				unsafe {
 					byte* pBytes = (byte*)data.Bytes;
 					byte r, g, b, a;
@@ -157,7 +157,7 @@ namespace Lime
 		public void SaveTo(Stream stream)
 		{
 #if iOS
-			using (var png = bitmap.AsPNG()) {
+			using (var png = Bitmap.AsPNG()) {
 				if (png != null) {
 					using (var bitmapStream = png.AsStream()) {
 						bitmapStream.CopyTo(stream);
@@ -165,8 +165,8 @@ namespace Lime
 				}
 			}
 #elif MAC || MONOMAC
-			using (var rep = new NSBitmapImageRep(bitmap.CGImage)) {
-				rep.Size = bitmap.Size;
+			using (var rep = new NSBitmapImageRep(Bitmap.CGImage)) {
+				rep.Size = Bitmap.Size;
 				using (var pngData = rep.RepresentationUsingTypeProperties(NSBitmapImageFileType.Png, null))
 				using (var bitmapStream = pngData.AsStream()) {
 					bitmapStream.CopyTo(stream);
@@ -177,8 +177,8 @@ namespace Lime
 
 		public void Dispose()
 		{
-			if (bitmap != null) {
-				bitmap.Dispose();
+			if (Bitmap != null) {
+				Bitmap.Dispose();
 			}
 		}
 	}

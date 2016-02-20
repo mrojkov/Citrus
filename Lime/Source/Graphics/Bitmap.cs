@@ -91,7 +91,7 @@ namespace Lime
 		/// </summary>
 		public NativeBitmap NativeBitmap
 		{
-			get { return ((BitmapImplementation)implementation).bitmap; }
+			get { return ((BitmapImplementation)implementation).Bitmap; }
 		}
 
 		/// <summary>
