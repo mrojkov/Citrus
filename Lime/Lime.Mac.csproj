@@ -92,7 +92,6 @@
     <Compile Include="Source\Graphics\OpenGL\PlatformRenderer.cs" />
     <Compile Include="Source\Graphics\OpenGL\VertexBuffer.cs" />
     <Compile Include="Source\Graphics\Bitmap.cs" />
-    <Compile Include="Source\Graphics\Bitmap.iOS.cs" />
     <Compile Include="Source\Graphics\Bitmap.Win.cs" />
     <Compile Include="Source\Graphics\Renderer.cs" />
     <Compile Include="Source\Graphics\SpriteList.cs" />
@@ -125,7 +124,6 @@
     <Compile Include="Source\Widgets\PopupMenu\Separator.cs" />
     <Compile Include="Source\Widgets\PopupMenu\StringItem.cs" />
     <Compile Include="Source\Graphics\OgvDecoder.cs" />
-    <Compile Include="Source\Graphics\Bitmap.Mac.cs" />
     <Compile Include="Source\Graphics\RenderList.cs" />
     <Compile Include="Source\Graphics\RenderBatch.cs" />
     <Compile Include="Source\Audio\OpenAL\AudioCache.cs" />
@@ -249,6 +247,9 @@
     <Compile Include="Source\Widgets\HSplitter.cs" />
     <Compile Include="Source\Widgets\VSplitter.cs" />
     <Compile Include="Source\Widgets\Layout\LayoutDebugPresenter.cs" />
+    <Compile Include="Source\Application\DummyWindow.cs" />
+    <Compile Include="Source\Graphics\Bitmap.Cocoa.cs" />
+    <Compile Include="Source\Widgets\Layout\FlowLayout.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

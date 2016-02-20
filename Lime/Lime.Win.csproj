@@ -126,7 +126,6 @@
     <Compile Include="Source\Graphics\OpenGL\ShaderProgram.cs" />
     <Compile Include="Source\Graphics\OpenGL\Texture2D.cs" />
     <Compile Include="Source\Graphics\OpenGL\Texture2D.DDS.cs" />
-    <Compile Include="Source\Graphics\OpenGL\Texture2D.Png.cs" />
     <Compile Include="Source\Graphics\OpenGL\Texture2D.Pvr.cs" />
     <Compile Include="Source\Graphics\Renderer.cs" />
     <Compile Include="Source\Graphics\SpriteList.cs" />
@@ -258,12 +257,10 @@
     <Compile Include="Source\Application\CommandLineArgs.cs" />
     <Compile Include="Source\Application\ExternalStorageLagsSimulator.cs" />
     <Compile Include="Source\Graphics\Bitmap.cs" />
-    <Compile Include="Source\Graphics\Bitmap.iOS.cs" />
     <Compile Include="Source\Graphics\Bitmap.Win.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WebBrowser.Mac.cs" />
     <Compile Include="Source\Graphics\Bitmap.Android.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WebBrowser.Android.cs" />
-    <Compile Include="Source\Graphics\Bitmap.Mac.cs" />
     <Compile Include="Source\Graphics\Bitmap.Unity.cs" />
     <Compile Include="Source\Graphics\Unity\PlatformMesh.cs" />
     <Compile Include="Source\Graphics\Unity\PlatformRenderer.cs" />
@@ -322,6 +319,7 @@
     <Compile Include="Source\Widgets\Theme\DefaultTheme.cs" />
     <Compile Include="Source\Widgets\Theme\DesktopTheme.cs" />
     <Compile Include="Source\Widgets\Theme\ITheme.cs" />
+    <Compile Include="Source\Graphics\Bitmap.Cocoa.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">

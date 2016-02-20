@@ -1,69 +1,119 @@
 #if ANDROID
 using System;
-using Android.Graphics;
 using System.IO;
+
+using Android.Graphics;
 using Android.Graphics.Drawables;
+using Android.OS;
+using AndroidBitmap = Android.Graphics.Bitmap;
 
 namespace Lime
 {
 	class BitmapImplementation : IBitmapImplementation
 	{
-		Android.Graphics.Bitmap bitmap;
-
-		public int GetWidth()
+		public BitmapImplementation(Stream stream)
 		{
-			return bitmap == null ? 0 : bitmap.Width;
-		}
-
-		public int GetHeight()
-		{
-			return bitmap == null ? 0 : bitmap.Height;
-		}
-
-		public void LoadFromStream(Stream stream)
-		{
-			// For some reason bitmap.Dispose() causes NRE on Android L.
-			//if (bitmap != null) {
-			//	bitmap.Dispose();
-			//	bitmap = null;
-			//}
-			bitmap = BitmapFactory.DecodeStream(stream);
-		}
-
-		public void SaveToStream(Stream stream)
-		{
-			if (!IsValid()) {
-				throw new InvalidOperationException();
+			var options = new BitmapFactory.Options();
+			if (Build.VERSION.SdkInt >= BuildVersionCodes.Kitkat) {
+				options.InPremultiplied = false;
 			}
-			bitmap.Compress(Android.Graphics.Bitmap.CompressFormat.Png, 100, stream);
+			Bitmap = BitmapFactory.DecodeStream(stream, null, options);
+		}
+
+		public BitmapImplementation(Color4[] data, int width, int height)
+		{
+			var colors = new int[data.Length];
+			for (int i = 0; i < data.Length; i++) {
+				var pixel = data[i];
+				colors[i] = Color.Argb(pixel.A, pixel.R, pixel.G, pixel.B).ToArgb();
+			}
+			Bitmap = AndroidBitmap.CreateBitmap(colors, width, height, AndroidBitmap.Config.Argb8888);
+		}
+
+		private BitmapImplementation(AndroidBitmap bitmap)
+		{
+			Bitmap = bitmap;
+		}
+
+		public AndroidBitmap Bitmap { get; private set; }
+
+		public int Width
+		{
+			get { return Bitmap == null ? 0 : Bitmap.Width; }
+		}
+
+		public int Height
+		{
+			get { return Bitmap == null ? 0 : Bitmap.Height; }
+		}
+
+		public bool IsValid
+		{
+			get
+			{
+				return
+					Bitmap != null &&
+					!Bitmap.IsRecycled &&
+					Bitmap.Height > 0 &&
+					Bitmap.Width > 0;
+			}
+		}
+
+		public IBitmapImplementation Clone()
+		{
+			return new BitmapImplementation(Bitmap.Copy(
+				AndroidBitmap.Config.Argb8888,
+				isMutable: false));
 		}
 
 		public IBitmapImplementation Rescale(int newWidth, int newHeight)
 		{
-			if (!IsValid()) {
-				throw new InvalidOperationException();
-			}
-			var scaledBitmap = Android.Graphics.Bitmap.CreateScaledBitmap(bitmap, newWidth, newHeight, true);
-			return new BitmapImplementation() { bitmap = scaledBitmap };
+			return new BitmapImplementation(
+				AndroidBitmap.CreateScaledBitmap(
+					Bitmap,
+					newWidth,
+					newHeight,
+					filter: true));
 		}
 
 		public IBitmapImplementation Crop(IntRectangle cropArea)
 		{
-			if (!IsValid()) {
-				throw new InvalidOperationException();
+			return new BitmapImplementation(
+				AndroidBitmap.CreateBitmap(
+					Bitmap,
+					cropArea.Left,
+					cropArea.Top,
+					cropArea.Width,
+					cropArea.Height));
+		}
+
+		public Color4[] GetPixels()
+		{
+			int length = Bitmap.Width * Bitmap.Height;
+			var colors = new int[length];
+			Bitmap.GetPixels(colors, 0, Bitmap.Width, 0, 0, Bitmap.Width, Bitmap.Height);
+			var pixels = new Color4[length];
+			int r, g, b, a;
+			for (int i = 0; i < length; i++) {
+				r = Color.GetRedComponent(colors[i]);
+				g = Color.GetGreenComponent(colors[i]);
+				b = Color.GetBlueComponent(colors[i]);
+				a = Color.GetAlphaComponent(colors[i]);
+				pixels[i] = new Color4((byte)r, (byte)g, (byte)b, (byte)a);
 			}
-			var croppedBitmap = Android.Graphics.Bitmap.CreateBitmap(bitmap, cropArea.Left, cropArea.Top, cropArea.Width, cropArea.Height);
-			return new BitmapImplementation { bitmap = croppedBitmap };
+			return pixels;
+		}
+
+		public void SaveTo(Stream stream)
+		{
+			Bitmap.Compress(Android.Graphics.Bitmap.CompressFormat.Png, 100, stream);
 		}
 
 		public void Dispose()
 		{
-			// For some reason bitmap.Dispose() causes NRE on Android L.
-		}
-
-		public bool IsValid()
-		{
-			return (bitmap != null && (bitmap.Height > 0 && bitmap.Width > 0));
+			if (Bitmap != null && !Bitmap.IsRecycled) {
+				Bitmap.Recycle();
+			}
 		}
 	}
 }

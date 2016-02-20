@@ -32,6 +32,8 @@ namespace Lime
 			model.UseImplicitZeroDefaults = false;
 			// Add ITexture type here due a bug in ProtoBuf-Net
 			model.Add(typeof(ITexture), true);
+			model.Add(typeof(SurrogateBitmap), false).Add("SerializationData");
+			model.Add(typeof(Bitmap), false).SetSurrogate(typeof(SurrogateBitmap));
 			model.CompileInPlace();
 			return model;
 		}

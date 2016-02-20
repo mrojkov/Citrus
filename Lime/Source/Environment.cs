@@ -47,7 +47,8 @@ namespace Lime
 			model.Add(typeof(Node), true);
 			model.Add(typeof(TextureAtlasElement.Params), true);
 			model.Add(typeof(Font), true);
-			model.Add(typeof(Bitmap), true);
+			model.Add(typeof(SurrogateBitmap), false).Add("SerializationData");
+			model.Add(typeof(Bitmap), false).SetSurrogate(typeof(SurrogateBitmap));
 			foreach (var type in types) {
 				model.Add(type, true);
 			}

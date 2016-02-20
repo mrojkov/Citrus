@@ -154,7 +154,6 @@
     <Compile Include="Source\Application\Sdl2.cs" />
     <Compile Include="Source\Graphics\Bitmap.Win.cs" />
     <Compile Include="Source\Graphics\Bitmap.cs" />
-    <Compile Include="Source\Graphics\Bitmap.iOS.cs" />
     <Compile Include="Source\Graphics\Renderer.cs" />
     <Compile Include="Source\Graphics\SpriteList.cs" />
     <Compile Include="Source\Graphics\OpenGL\IndexBuffer.cs" />
@@ -188,7 +187,6 @@
     <Compile Include="Source\Graphics\TextureAtlasElement.cs" />
     <Compile Include="Source\Graphics\OpenGL\IGLObject.cs" />
     <Compile Include="Source\Application\AndroidActivityDelegate.cs" />
-    <Compile Include="Source\Graphics\Bitmap.Mac.cs" />
     <Compile Include="Source\Graphics\Bitmap.Unity.cs" />
     <Compile Include="Source\Graphics\Mesh.cs" />
     <Compile Include="Source\Graphics\RenderBatch.cs" />
@@ -314,6 +312,7 @@
     <Compile Include="Source\Widgets\Layout\FlowLayout.cs" />
     <Compile Include="Source\Widgets\Layout\HBoxLayout.cs" />
     <Compile Include="Source\Widgets\Layout\LayoutDebugPresenter.cs" />
+    <Compile Include="Source\Graphics\Bitmap.Cocoa.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
