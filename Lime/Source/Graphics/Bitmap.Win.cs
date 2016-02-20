@@ -9,7 +9,6 @@ namespace Lime
 	class BitmapImplementation : IBitmapImplementation
 	{
 		private IntPtr data;
-		public SD.Bitmap Bitmap;
 
 		public BitmapImplementation(Stream stream)
 		{
@@ -33,6 +32,8 @@ namespace Lime
 		{
 			Bitmap = bitmap;
 		}
+
+		public SD.Bitmap Bitmap { get; private set; }
 
 		public int Width
 		{

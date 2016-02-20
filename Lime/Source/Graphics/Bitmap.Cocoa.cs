@@ -14,8 +14,6 @@ namespace Lime
 {
 	class BitmapImplementation : IBitmapImplementation
 	{
-		public CocoaBitmap Bitmap;
-
 		public BitmapImplementation(Stream stream)
 		{
 #if iOS
@@ -56,6 +54,8 @@ namespace Lime
 		{
 			Bitmap = bitmap;
 		}
+
+		public CocoaBitmap Bitmap { get; private set; }
 
 		public int Width
 		{

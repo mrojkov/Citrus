@@ -21,7 +21,8 @@ namespace Lime
 		private IBitmapImplementation implementation;
 
 		/// <summary>
-		/// Initializes a new instance of <see cref="Bitmap"/> class with the specified array of pixels, width and height.
+		/// Initializes a new instance of <see cref="Bitmap"/> class with the specified
+		/// array of pixels, width and height.
 		/// </summary>
 		/// <param name="data">The array of pixels of <see cref="Color4"/> type.</param>
 		/// <param name="width">The width, in pixels, of the new bitmap.</param>
@@ -91,7 +92,7 @@ namespace Lime
 		/// </summary>
 		public NativeBitmap NativeBitmap
 		{
-			get { return ((BitmapImplementation)implementation).Bitmap; }
+			get { return implementation.Bitmap; }
 		}
 
 		/// <summary>
@@ -227,6 +228,7 @@ namespace Lime
 
 	interface IBitmapImplementation : IDisposable
 	{
+		NativeBitmap Bitmap { get; }
 		int Width { get; }
 		int Height { get; }
 		bool IsValid { get; }

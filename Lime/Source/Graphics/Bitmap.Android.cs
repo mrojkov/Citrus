@@ -11,8 +11,6 @@ namespace Lime
 {
 	class BitmapImplementation : IBitmapImplementation
 	{
-		public AndroidBitmap Bitmap;
-
 		public BitmapImplementation(Stream stream)
 		{
 			var options = new BitmapFactory.Options();
@@ -36,6 +34,8 @@ namespace Lime
 		{
 			Bitmap = bitmap;
 		}
+
+		public AndroidBitmap Bitmap { get; private set; }
 
 		public int Width
 		{
