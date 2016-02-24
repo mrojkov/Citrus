@@ -54,6 +54,13 @@ namespace Lime
 			};
 		}
 
+		public void Invalidate (){}
+
+		public float PixelScale
+		{
+			get { return 1.0f; }
+		}
+
 	}
 }
 #endif
