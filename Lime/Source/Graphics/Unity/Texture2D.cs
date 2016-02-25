@@ -64,7 +64,7 @@ namespace Lime
 		public void LoadImage(Bitmap bitmap)
 		{
 			using (var stream = new MemoryStream()) {
-				bitmap.SaveToStream(stream);
+				bitmap.SaveTo(stream);
 				stream.Position = 0;
 				LoadImage(stream);
 			}
@@ -132,7 +132,7 @@ namespace Lime
 		/// <summary>
 		/// Create texture from pixel array
 		/// </summary>
-		public void LoadImage(Color4[] pixels, int width, int height, bool generateMips)
+		public void LoadImage(Color4[] pixels, int width, int height, bool generateMips = false)
 		{
 			Dispose();
 			unityTexture = new UnityEngine.Texture2D(width, height);
