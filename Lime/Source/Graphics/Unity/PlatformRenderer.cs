@@ -88,6 +88,16 @@ namespace Lime
 			viewportOrProjectionChanged = true;
 		}
 
+		public static void EnableZTest(bool value)
+		{
+			
+		}
+
+		public static void EnableZWrite(bool value)
+		{
+			
+		}
+
 		public static void SetViewportAndProject()
 		{
 			if (!viewportOrProjectionChanged) {
