@@ -1,4 +1,4 @@
-#if !ANDROID && !iOS
+#if !ANDROID && !iOS && !UNITY
 using System;
 
 namespace Lime
