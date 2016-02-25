@@ -1,8 +1,9 @@
 #if UNITY
 using System;
+using UnityEngine;
 namespace Lime
 {
-	public class UnityApplicationDelegate 
+	public class UnityApplicationDelegate : MonoBehaviour
 	{
 		public static UnityApplicationDelegate Instance {get; private set;}
 		public event Action<float> Updating;
@@ -41,6 +42,21 @@ namespace Lime
 			if (Activated != null) {
 				Activated();
 			}
+		}
+
+		protected virtual void Update()
+		{
+			OnUpdate();
+		}
+
+		protected virtual void OnPostRender()
+		{
+			OnRendering();
+		}
+
+		protected virtual void OnApplicationQuit()
+		{
+			OnDestroy();
 		}
 	}
 }
