@@ -984,7 +984,12 @@ namespace Lime
 				case HitTestMethod.BoundingRect:
 					return HitTestBoundingRect(point);
 				case HitTestMethod.Contents:
-					return Nodes.Any(node => node.AsWidget != null && node.AsWidget.HitTest(point));
+					foreach (var node in Nodes) {
+						if (node.AsWidget != null && node.AsWidget.HitTest(point)) {
+							return true;
+						}
+					}
+					break;
 			}
 			return false;
 		}
