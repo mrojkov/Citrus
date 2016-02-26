@@ -630,7 +630,7 @@ namespace Orange
 			SplinePoint point = (SplinePoint)node;
 			switch (name) {
 			case "Position":
-				lexer.ParseVector2();
+				throw new Exception("`Position` property of spline point must not be used. Use `Anchor` instead.");
 				break;
 			case "Anchor":
 				point.Position = lexer.ParseVector2();
@@ -877,7 +877,7 @@ namespace Orange
 			EmitterShapePoint point = (EmitterShapePoint)node;
 			switch (name) {
 			case "Position":
-				// Not used
+				throw new Exception("`Position` property of emitter shape point must not be used. Use `Anchor` instead.");
 				break;
 			case "Anchor":
 				point.Position = lexer.ParseVector2();
