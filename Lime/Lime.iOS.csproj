@@ -114,7 +114,6 @@
     <Compile Include="Source\AssetsBundle\UnityAssetsBundle.cs" />
     <Compile Include="Source\Graphics\OpenGL\RenderTexture.cs" />
     <Compile Include="Source\Graphics\OpenGL\Texture2D.DDS.cs" />
-    <Compile Include="Source\Graphics\OpenGL\Texture2D.Png.cs" />
     <Compile Include="Source\Graphics\OpenGL\Texture2D.Pvr.cs" />
     <Compile Include="Source\Graphics\OpenGL\Texture2D.cs" />
     <Compile Include="Source\Graphics\Unity\MaterialFactory.cs" />
