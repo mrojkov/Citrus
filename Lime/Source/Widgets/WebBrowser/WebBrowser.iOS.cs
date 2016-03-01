@@ -142,16 +142,15 @@ namespace Lime
 			// Transform to device coordinates
 			var viewport = Renderer.Viewport;
 			var result = new Rectangle();
-			var screenScale = (float)UIScreen.MainScreen.Scale;
-			var min = new Vector2(viewport.X, viewport.Y) / screenScale;
-			var max = new Vector2(viewport.X + viewport.Width, viewport.Y + viewport.Height) / screenScale;
-			var displayHeight = Window.Current.ClientSize.Height / screenScale;
+			var min = new Vector2(viewport.X, viewport.Y) / Window.Current.PixelScale;
+			var max = new Vector2(viewport.X + viewport.Width, viewport.Y + viewport.Height) / Window.Current.PixelScale;
+			var displayHeight = Window.Current.ClientSize.Height;
 			result.Left = Mathf.Lerp(aabb.Left, min.X, max.X).Round();
 			result.Right = Mathf.Lerp(aabb.Right, min.X, max.X).Round();
 			result.Top = displayHeight - Mathf.Lerp(aabb.Bottom, min.Y, max.Y).Round();
 			result.Bottom = displayHeight - Mathf.Lerp(aabb.Top, min.Y, max.Y).Round();
 			return result;
-		}		
+		}
 	}
 }
 #endif

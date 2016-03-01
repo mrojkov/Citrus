@@ -350,11 +350,11 @@ namespace Lime
 #elif WIN || MAC || MONOMAC
 
 		/// <summary>
-		/// Возвращает количество пикселей в дюйме по горизонтали и вертикали (всегда возвращает (240, 240))
+		/// Возвращает количество пикселей в дюйме по горизонтали и вертикали.
 		/// </summary>
 		public static Vector2 ScreenDPI
 		{
-			get { return 240 * Vector2.One; }
+			get { return Window.Current.PixelScale * 96 * Vector2.One; }
 		}
 
 #elif ANDROID

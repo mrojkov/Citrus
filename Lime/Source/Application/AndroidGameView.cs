@@ -299,7 +299,7 @@ namespace Lime
 					continue;
 				}
 				e.GetPointerCoords(i, pc);
-				var position = new Vector2(pc.X, pc.Y) * input.ScreenToWorldTransform;
+				var position = new Vector2(pc.X, pc.Y) * input.ScreenToWorldTransform / Window.Current.PixelScale;
 				input.SetTouchPosition(touchIndex, position);
 				if (touchIndex == 0) {
 					input.MousePosition = position;
