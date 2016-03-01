@@ -18,7 +18,7 @@ namespace Lime
 					foreach (var i in indices) {
 						sizes[i] = constraints[i].MinSize;
 					}
-					return sizes;
+					break;
 				}
 				float allocatedSize = 0;
 				foreach (var i in indices) {
@@ -29,7 +29,7 @@ namespace Lime
 				}
 				if (Math.Abs(allocatedSize - availableSize) < 0.1f) {
 					// We perfectly fit the items into the designated space.
-					return sizes;
+					break;
 				}
 				var containerOverfilled = allocatedSize > availableSize;
 				for (int i = indices.Count - 1; i >= 0; i--) {

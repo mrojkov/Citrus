@@ -46,6 +46,11 @@ namespace Lime
 		{
 			ConstraintsValid = true;
 			var widgets = GetChildren(widget);
+			if (widgets.Count == 0) {
+				widget.MinSize = Vector2.Zero;
+				widget.MaxSize = Vector2.PositiveInfinity;
+				return;
+			}
 			var minSize = new Vector2(
 				widgets.Sum(i => i.MinSize.X),
 				widgets.Max(i => i.MinSize.Y)

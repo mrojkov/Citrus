@@ -21,6 +21,8 @@ namespace Lime
 		{
 			var cells = GetCellArray(widget.Nodes);
 			if (cells == null) {
+				widget.MinSize = Vector2.Zero;
+				widget.MaxSize = Vector2.PositiveInfinity;
 				return;
 			}
 			var cols = CalcColConstraints(widget, cells);
