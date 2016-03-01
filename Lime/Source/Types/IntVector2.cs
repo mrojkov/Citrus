@@ -117,16 +117,6 @@ namespace Lime
 			return new IntVector2(rhs * lhs.X, rhs * lhs.Y);
 		}
 
-		public static IntVector2 operator *(IntVector2 left, float right)
-		{
-			return new IntVector2((int)(left.X * right), (int)(left.Y * right));
-		}
-
-		public static IntVector2 operator /(IntVector2 left, float right)
-		{
-			return new IntVector2((int)(left.X / right), (int)(left.Y / right));
-		}
-
 		/// <summary>
 		/// Returns the string representation of this <see cref="IntVector2"/> in the format:
 		/// "X, Y".

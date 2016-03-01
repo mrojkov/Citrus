@@ -6,32 +6,6 @@ using OpenTK.Graphics;
 
 namespace Lime
 {
-	static class SDToLime
-	{
-		public static IntVector2 Convert(System.Drawing.Point p)
-		{
-			return new IntVector2(p.X, p.Y);
-		}
-
-		public static Size Convert(System.Drawing.Size p)
-		{
-			return new Size(p.Width, p.Height);
-		}
-	}
-
-	static class LimeToSD
-	{
-		public static System.Drawing.Point Convert(IntVector2 p)
-		{
-			return new System.Drawing.Point(p.X, p.Y);
-		}
-
-		public static System.Drawing.Size Convert(Size p)
-		{
-			return new System.Drawing.Size(p.Width, p.Height);
-		}
-	}
-
 	public class Window : CommonWindow, IWindow
 	{
 		private OpenTK.GLControl glControl;
@@ -105,44 +79,38 @@ namespace Lime
 
 		public IntVector2 ClientPosition
 		{
-			get { return SDToLime.Convert(form.PointToScreen(new System.Drawing.Point(0, 0))) / PixelScale; }
-
-			set { DecoratedPosition = value * PixelScale + DecoratedPosition - ClientPosition; }
+			get { return SDToLime.Convert(form.PointToScreen(new System.Drawing.Point(0, 0)), PixelScale); }
+			set { DecoratedPosition = value + DecoratedPosition - ClientPosition; }
 		}
 
 		public Size ClientSize
 		{
-			get { return SDToLime.Convert(form.ClientSize) / PixelScale; }
-
-			set { form.ClientSize = LimeToSD.Convert(value * PixelScale); }
+			get { return SDToLime.Convert(form.ClientSize, PixelScale); }
+			set { form.ClientSize = LimeToSD.Convert(value, PixelScale); }
 		}
 
 		public IntVector2 DecoratedPosition
 		{
-			get { return SDToLime.Convert(form.Location) / PixelScale; }
-
-			set { form.Location = LimeToSD.Convert(value * PixelScale); }
+			get { return SDToLime.Convert(form.Location, PixelScale); }
+			set { form.Location = LimeToSD.Convert(value, PixelScale); }
 		}
 
 		public Size DecoratedSize
 		{
-			get { return SDToLime.Convert(form.Size) / PixelScale; }
-
-			set { form.Size = LimeToSD.Convert(value * PixelScale); }
+			get { return SDToLime.Convert(form.Size, PixelScale); }
+			set { form.Size = LimeToSD.Convert(value, PixelScale); }
 		}
 
 		public Size MinimumDecoratedSize
 		{
-			get { return SDToLime.Convert(form.MinimumSize) / PixelScale; }
-
-			set { form.MinimumSize = LimeToSD.Convert(value * PixelScale); }
+			get { return SDToLime.Convert(form.MinimumSize, PixelScale); }
+			set { form.MinimumSize = LimeToSD.Convert(value, PixelScale); }
 		}
 
 		public Size MaximumDecoratedSize
 		{
-			get { return SDToLime.Convert(form.MaximumSize) / PixelScale; }
-
-			set { form.MaximumSize = LimeToSD.Convert(value); }
+			get { return SDToLime.Convert(form.MaximumSize, PixelScale); }
+			set { form.MaximumSize = LimeToSD.Convert(value, PixelScale); }
 		}
 
 		FPSCounter fpsCounter = new FPSCounter();
@@ -160,11 +128,7 @@ namespace Lime
 		private MouseCursor cursor;
 		public MouseCursor Cursor
 		{
-			get
-			{
-				return cursor;
-			}
-
+			get { return cursor; }
 			set
 			{
 				cursor = value;
@@ -380,8 +344,8 @@ namespace Lime
 				return;
 			}
 			lastMousePosition = Control.MousePosition;
-			var position = (Vector2)SDToLime.Convert(form.PointToClient(Control.MousePosition));
-			Input.MousePosition = position / PixelScale * Input.ScreenToWorldTransform;
+			var position = (Vector2)SDToLime.Convert(form.PointToClient(Control.MousePosition), PixelScale);
+			Input.MousePosition = position * Input.ScreenToWorldTransform;
 			Input.SetTouchPosition(0, Input.MousePosition);
 		}
 
@@ -610,6 +574,34 @@ namespace Lime
 		public void Invalidate()
 		{
 			invalidated = true;
+		}
+	}
+
+	static class SDToLime
+	{
+		public static IntVector2 Convert(System.Drawing.Point p, float pixelScale)
+		{
+			return (IntVector2)(new Vector2(p.X, p.Y) / pixelScale);
+		}
+
+		public static Size Convert(System.Drawing.Size p, float pixelScale)
+		{
+			return (Size)(new Vector2(p.Width, p.Height) / pixelScale);
+		}
+	}
+
+	static class LimeToSD
+	{
+		public static System.Drawing.Point Convert(IntVector2 p, float pixelScale)
+		{
+			p = (IntVector2)((Vector2)p * pixelScale);
+			return new System.Drawing.Point(p.X, p.Y);
+		}
+
+		public static System.Drawing.Size Convert(Size p, float pixelScale)
+		{
+			p = (Size)((Vector2)p * pixelScale);
+			return new System.Drawing.Size(p.Width, p.Height);
 		}
 	}
 }
