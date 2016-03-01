@@ -260,6 +260,9 @@ namespace Lime
 			if (options.Visible) {
 				Visible = true;
 			}
+			if (options.Centered) {
+				Center();
+			}
 		}
 
 		private void OnMouseWheel(object sender, MouseEventArgs e)

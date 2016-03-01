@@ -154,9 +154,11 @@ namespace Lime
 			Application.MainWindow = this;
 			ClientSize = options.ClientSize;
 			Title = options.Title;
-			Center();
 			if (options.Visible) {
 				Visible = true;
+			}
+			if (options.Centered) {
+				Center();
 			}
 			stopwatch = new Stopwatch();
 			stopwatch.Start();

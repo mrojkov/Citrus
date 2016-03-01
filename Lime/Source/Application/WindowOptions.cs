@@ -6,6 +6,7 @@ namespace Lime
 	{
 		public bool FullScreen = false;
 		public bool FixedSize = true;
+		public bool Centered = true;
 		public Size ClientSize = new Size(800, 600);
 		public Size MinimumDecoratedSize;
 		public Size MaximumDecoratedSize;
