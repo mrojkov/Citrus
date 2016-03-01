@@ -26,6 +26,7 @@ namespace Lime.Platform
 		private NSEventModifierMask prevMask;
 		private Lime.Input input;
 
+		public event Action Update;
 		public event Action RenderFrame;
 		public event Action InputChanged;
 
@@ -290,10 +291,12 @@ namespace Lime.Platform
 					var timeout = new TimeSpan((long)(((1.0 * TimeSpan.TicksPerSecond) / updatesPerSecond) + 0.5));
 					if (swapInterval) {
 						animationTimer = NSTimer.CreateRepeatingScheduledTimer(timeout, delegate {
+							OnUpdate();
 							NeedsDisplay = true;
 						});
 					} else {
 						animationTimer = NSTimer.CreateRepeatingScheduledTimer(timeout, delegate {
+							OnUpdate();
 							RenderScene();
 						});
 					}
@@ -316,6 +319,13 @@ namespace Lime.Platform
 		{
 			if (openGLContext == null)
 				throw new InvalidOperationException("Operation requires an OpenGLContext, which hasn't been created yet.");
+		}
+
+		private void OnUpdate()
+		{
+			if (Update != null) {
+				Update();
+			}
 		}
 
 		private void RenderScene()

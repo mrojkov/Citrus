@@ -212,6 +212,12 @@ namespace Lime
 			window.CollectionBehavior = NSWindowCollectionBehavior.FullScreenPrimary;
 			window.ContentView = View;
 			window.ReleasedWhenClosed = true;
+			View.Update += () => {
+				var delta = (float)stopwatch.Elapsed.TotalSeconds;
+				stopwatch.Restart();
+				delta = Mathf.Clamp(delta, 0, 1 / Application.LowFPSLimit);
+				Update(delta);
+			};
 			View.RenderFrame += HandleRenderFrame;
 		}
 
@@ -243,10 +249,6 @@ namespace Lime
 
 		private void HandleRenderFrame()
 		{
-			var delta = (float)stopwatch.Elapsed.TotalSeconds;
-			stopwatch.Restart();
-			delta = Mathf.Clamp(delta, 0, 1 / Application.LowFPSLimit);
-			Update(delta);
 			if (invalidated) {
 				fpsCounter.Refresh();
 				View.MakeCurrent();
