@@ -48,7 +48,7 @@ namespace Orange
 			case ".sound":
 				return ".ogg";
 			case ".model":
-				return ".dae";
+				return ".fbx";
 			default:
 				return Path.GetExtension(path);
 			}
@@ -682,7 +682,7 @@ namespace Orange
 
 		private static void SyncModels()
 		{
-			SyncUpdated(".dae", ".model", (srcPath, dstPath) => {
+			SyncUpdated(".fbx", ".model", (srcPath, dstPath) => {
 				var rootNode = new Lime.Frame();
 				rootNode.AddNode(new ModelImporter(srcPath, The.Workspace.ActivePlatform).RootNode);
 				Serialization.WriteObjectToBundle(assetsBundle, dstPath, rootNode);
