@@ -78,8 +78,6 @@ namespace Lime
 
 	public interface IEditorParams
 	{
-		float KeyRepeatDelay { get; set; }
-		float KeyRepeatInterval { get; set; }
 		int MaxLength { get; set; }
 		int MaxLines { get; set; }
 		float MaxHeight { get; set; }
@@ -94,8 +92,6 @@ namespace Lime
 
 	public class EditorParams : IEditorParams
 	{
-		public float KeyRepeatDelay { get; set; }
-		public float KeyRepeatInterval { get; set; }
 		public int MaxLength { get; set; }
 		public int MaxLines { get; set; }
 		public float MaxHeight { get; set; }
@@ -105,8 +101,6 @@ namespace Lime
 
 		public EditorParams()
 		{
-			KeyRepeatDelay = 0.3f;
-			KeyRepeatInterval = 0.03f;
 #if WIN || MAC || MONOMAC
 			PasswordLastCharShowTime = 0.0f;
 #else
@@ -188,23 +182,9 @@ namespace Lime
 
 		public bool IsFocused() { return WidgetContext.Current.ActiveTextWidget == textInputProcessor; }
 
-		private float cursorKeyDownTime;
-		private Key prevKeyPressed = 0;
-		private Key keyPressed;
-
 		private bool CheckKeyRepeated(Key key)
 		{
-			if (!Container.Input.IsKeyPressed(key) || keyPressed != 0)
-				return false;
-			keyPressed = key;
-			if (key != prevKeyPressed) {
-				cursorKeyDownTime = EditorParams.KeyRepeatDelay;
-			} else if (cursorKeyDownTime <= 0) {
-				cursorKeyDownTime = EditorParams.KeyRepeatInterval;
-			} else {
-				return false;
-			}
-			return true;
+			return Container.Input.WasKeyRepeated(key);
 		}
 
 		private void InsertChar(char ch)
@@ -256,7 +236,6 @@ namespace Lime
 					InsertChar(ch);
 			}
 #endif
-			prevKeyPressed = keyPressed;
 		}
 		
 		private float lastCharShowTimeLeft;
@@ -307,8 +286,6 @@ namespace Lime
 				caretPos.IsVisible = IsFocused();
 
 				if (IsFocused()) {
-					cursorKeyDownTime -= Task.Current.Delta;
-					keyPressed = 0;
 					WidgetContext.Current.IsActiveTextWidgetUpdated = true;
 					HandleCursorKeys();
 					HandleTextInput();
@@ -316,7 +293,6 @@ namespace Lime
 						var t = Container.LocalToWorldTransform.CalcInversed();
 						caretPos.WorldPos = t.TransformVector(Container.Input.MousePosition);
 					}
-					prevKeyPressed = keyPressed;
 					Text.SyncCaretPosition();
 				}
 				yield return null;

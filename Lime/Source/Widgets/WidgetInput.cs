@@ -195,6 +195,11 @@ namespace Lime
 			return IsAcceptingDeviceWithKey(key) && WindowInput.WasKeyReleased(key);
 		}
 
+		public bool WasKeyRepeated(Key key)
+		{
+			return IsAcceptingDeviceWithKey(key) && WindowInput.WasKeyRepeated(key);
+		}
+
 		private bool IsAcceptingDeviceWithKey(Key key)
 		{
 			switch (key) {

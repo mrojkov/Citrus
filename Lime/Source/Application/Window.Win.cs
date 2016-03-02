@@ -398,7 +398,7 @@ namespace Lime
 		{
 			// Refresh mouse position of every frame to make HitTest work properly if mouse is outside of the screen.
 			RefreshMousePosition();
-			Input.ProcessPendingKeyEvents();
+			Input.ProcessPendingKeyEvents(delta);
 			RaiseUpdating(delta);
 			AudioSystem.Update();
 			Input.TextInput = null;

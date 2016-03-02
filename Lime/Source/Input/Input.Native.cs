@@ -27,16 +27,18 @@ namespace Lime
 				input.SetKeyState(key, value);
 			}
 
-			public void OnBetweenFrames()
+			public void OnBetweenFrames(float delta)
 			{
 				input.CopyKeysState();
-				input.ProcessPendingKeyEvents();
+				input.ProcessPendingKeyEvents(delta);
 			}
 		}
 
 		internal event Action Changed;
 
 		public const int MaxTouches = 4;
+		public float KeyRepeatDelay = 0.3f;
+		public float KeyRepeatInterval = 0.03f;
 
 		private struct KeyEvent
 		{
@@ -53,8 +55,15 @@ namespace Lime
 
 		public static readonly int KeyCount = Enum.GetValues(typeof(Key)).Cast<int>().Max() + 1;
 
-		private bool[] previousKeysState = new bool[KeyCount];
-		private bool[] currentKeysState = new bool[KeyCount];
+		private struct KeyState
+		{
+			public bool PreviousState;
+			public bool CurrentState;
+			public float RepeatDelay;
+			public bool Repeated;
+		}
+
+		private KeyState[] keys = new KeyState[KeyCount];
 
 		/// <summary>
 		/// The matrix describes transition from pixels to virtual coordinates.
@@ -106,7 +115,7 @@ namespace Lime
 		/// </summary>
 		public bool IsKeyPressed(Key key)
 		{
-			return currentKeysState[(int)key];
+			return keys[(int)key].CurrentState;
 		}
 
 		/// <summary>
@@ -114,7 +123,7 @@ namespace Lime
 		/// </summary>
 		public bool WasKeyReleased(Key key)
 		{
-			return !currentKeysState[(int)key] && previousKeysState[(int)key];
+			return !keys[(int)key].CurrentState && keys[(int)key].PreviousState;
 		}
 
 		/// <summary>
@@ -122,7 +131,15 @@ namespace Lime
 		/// </summary>
 		public bool WasKeyPressed(Key key)
 		{
-			return currentKeysState[(int)key] && !previousKeysState[(int)key];
+			return keys[(int)key].CurrentState && !keys[(int)key].PreviousState;
+		}
+
+		/// <summary>
+		/// Returns true during the frame the user starts pressing down the key identified by name or key event was repeated.
+		/// </summary>
+		public bool WasKeyRepeated(Key key)
+		{
+			return keys[(int)key].Repeated;
 		}
 
 		public bool WasMousePressed()
@@ -212,15 +229,31 @@ namespace Lime
 				keyEventQueue.Contains(new KeyEvent { Key = key, State = false });
 		}
 
-		internal void ProcessPendingKeyEvents()
+		internal void ProcessPendingKeyEvents(float delta)
 		{
+			for (int i = 0; i < KeyCount; i++) {
+				var key = keys[i];
+				key.Repeated = false;
+				if (key.CurrentState) {
+					if ((key.RepeatDelay -= delta) < 0) {
+						key.RepeatDelay = KeyRepeatInterval;
+						key.Repeated = true;
+					}
+				}
+				keys[i] = key;
+			}
 			if (keyEventQueue.Count > 0) {
 				var processedKeys = new bool[KeyCount];
 				for (int i = 0; i < keyEventQueue.Count(); i++) {
 					var evt = keyEventQueue[i];
-					if (!processedKeys[(int)evt.Key]) {
-						processedKeys[(int)evt.Key] = true;
-						currentKeysState[(int)evt.Key] = evt.State;
+					var k = (int)evt.Key;
+					if (!processedKeys[k]) {
+						processedKeys[k] = true;
+						keys[k].CurrentState = evt.State;
+						keys[k].RepeatDelay = KeyRepeatDelay;
+						if (evt.State) {
+							keys[k].Repeated = true;
+						}
 						keyEventQueue.RemoveAt(i);
 						i--;
 					}
@@ -230,7 +263,9 @@ namespace Lime
 
 		internal void CopyKeysState()
 		{
-			currentKeysState.CopyTo(previousKeysState, 0);
+			for (int i = 0; i < KeyCount; i++) {
+				keys[i].PreviousState = keys[i].CurrentState;
+			}
 		}
 
 		internal void SetWheelScrollAmount(float delta)

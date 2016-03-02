@@ -101,8 +101,8 @@ namespace Lime
 			if (!Active || UIViewController.SoftKeyboardBeingShownOrHid) {
 				return;
 			}
-			Input.ProcessPendingKeyEvents();
 			var delta = (float)Math.Min(e.Time, 1 / Application.LowFPSLimit);
+			Input.ProcessPendingKeyEvents(delta);
 			RaiseUpdating(delta);
 			AudioSystem.Update();
 		}
