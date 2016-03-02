@@ -145,7 +145,7 @@ namespace Lime
 		public Window(WindowOptions options)
 		{
 			Input = new Input();
-			Input.Changed += HandleRenderFrame;
+			Input.Changed += Update;
 			fpsCounter = new FPSCounter();
 			CreateNativeWindow(options);
 			if (Application.MainWindow != null) {
@@ -212,12 +212,7 @@ namespace Lime
 			window.CollectionBehavior = NSWindowCollectionBehavior.FullScreenPrimary;
 			window.ContentView = View;
 			window.ReleasedWhenClosed = true;
-			View.Update += () => {
-				var delta = (float)stopwatch.Elapsed.TotalSeconds;
-				stopwatch.Restart();
-				delta = Mathf.Clamp(delta, 0, 1 / Application.LowFPSLimit);
-				Update(delta);
-			};
+			View.Update += Update;
 			View.RenderFrame += HandleRenderFrame;
 		}
 
@@ -269,8 +264,11 @@ namespace Lime
 			RaiseMoved();
 		}
 
-		private void Update(float delta)
+		private void Update()
 		{
+			var delta = (float)stopwatch.Elapsed.TotalSeconds;
+			stopwatch.Restart();
+			delta = Mathf.Clamp(delta, 0, 1 / Application.LowFPSLimit);
 			// Refresh mouse position on every frame to make HitTest work properly if mouse is outside of the window.
 			RefreshMousePosition();
 			Input.ProcessPendingKeyEvents(delta);
