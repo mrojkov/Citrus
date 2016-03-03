@@ -785,7 +785,7 @@ namespace Lime
 			Nodes.AddRange(nodes);
 		}
 
-		private static readonly string[] sceneExtensions = new[] { ".scene", ".model" };
+		private static readonly string[] sceneExtensions = new[] { ".scene", ".daeModel", ".fbxModel" };
 
 		/// <summary>
 		/// Returns path to scene if it exists in bundle. Returns null otherwise.

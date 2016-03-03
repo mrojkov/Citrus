@@ -47,7 +47,9 @@ namespace Orange
 				return ".png";
 			case ".sound":
 				return ".ogg";
-			case ".model":
+			case ".daeModel":
+				return ".dae";
+			case ".fbxModel":
 				return ".fbx";
 			default:
 				return Path.GetExtension(path);
@@ -682,12 +684,16 @@ namespace Orange
 
 		private static void SyncModels()
 		{
-			SyncUpdated(".fbx", ".model", (srcPath, dstPath) => {
-				var rootNode = new Lime.Frame();
-				rootNode.AddNode(new ModelImporter(srcPath, The.Workspace.ActivePlatform).RootNode);
-				Serialization.WriteObjectToBundle(assetsBundle, dstPath, rootNode);
-				return true;
-			});
+			SyncUpdated(".fbx", ".fbxModel", ConvertModel);
+			SyncUpdated(".dae", ".daeModel", ConvertModel);
+		}
+
+		private static bool ConvertModel(string srcPath, string dstPath)
+		{
+			var rootNode = new Lime.Frame();
+			rootNode.AddNode(new ModelImporter(srcPath, The.Workspace.ActivePlatform).RootNode);
+			Serialization.WriteObjectToBundle(assetsBundle, dstPath, rootNode);
+			return true;
 		}
 	}
 }
