@@ -16,27 +16,6 @@ namespace Lime
 			Instance = this;
 		}
 
-		public void OnUpdate()
-		{
-			if (Updating != null) {
-				Updating(UnityEngine.Time.deltaTime);
-			}
-		}
-
-		public void OnRendering()
-		{
-			if (Rendering != null) {
-				Rendering();
-			}
-		}
-
-		public void OnDestroy()
-		{
-			if (Destroying != null) {
-				Destroying();
-			}
-		}
-
 		public void OnActivate()
 		{
 			if (Activated != null) {
@@ -46,17 +25,23 @@ namespace Lime
 
 		protected virtual void Update()
 		{
-			OnUpdate();
+			if (Updating != null) {
+				Updating(UnityEngine.Time.deltaTime);
+			}
 		}
 
 		protected virtual void OnPostRender()
 		{
-			OnRendering();
+			if (Rendering != null) {
+				Rendering();
+			}
 		}
 
 		protected virtual void OnApplicationQuit()
 		{
-			OnDestroy();
+			if (Destroying != null) {
+				Destroying();
+			}
 		}
 	}
 }
