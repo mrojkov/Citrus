@@ -27,6 +27,7 @@ namespace Lime
 		public void Center() {}
 		public void Close() {}
 
+		private Size LastSize;
 		private Input input;
 		public Window(WindowOptions options) 
 		{
@@ -44,6 +45,11 @@ namespace Lime
 				AudioSystem.Update();
 				Input.TextInput = null;
 				Input.CopyKeysState();
+				if (LastSize != ClientSize) {
+					RaiseResized(false);
+					LastSize = ClientSize;
+				}
+
 			};
 			UnityApplicationDelegate.Instance.Rendering += () => {
 				RaiseRendering();
