@@ -118,7 +118,7 @@ namespace Lime
 		/// <summary>
 		/// Gets the current device orientation. On desktop platforms it is always DeviceOrientation.LandscapeLeft.
 		/// </summary>
-#if WIN || MAC
+#if WIN || MAC || UNITY
 		public static DeviceOrientation CurrentDeviceOrientation { get { return DeviceOrientation.LandscapeLeft; } }
 #else
 		public static DeviceOrientation CurrentDeviceOrientation { get; internal set; }
