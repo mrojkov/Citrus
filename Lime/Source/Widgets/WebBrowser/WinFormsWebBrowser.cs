@@ -43,10 +43,10 @@ namespace Lime
 				return;
 			}
 			var rectangle = (IntRectangle)widget.CalcAABBInSpaceOf(WidgetContext.Current.Root);
-			browser.Left = rectangle.Left;
-			browser.Top = rectangle.Top;
-			browser.Width = rectangle.Width;
-			browser.Height = rectangle.Height;
+			browser.Left = (rectangle.Left * Window.Current.PixelScale).Round();
+			browser.Top = (rectangle.Top * Window.Current.PixelScale).Round();
+			browser.Width = (rectangle.Width * Window.Current.PixelScale).Round();
+			browser.Height = (rectangle.Height * Window.Current.PixelScale).Round();
 		}
 
 		public void OnSizeChanged(Vector2 sizeDelta) { }
