@@ -14,6 +14,7 @@ namespace Lime
 		static UnityEngine.Material imageCombinerMat;
 		static UnityEngine.Material silhuetteMat;
 		static UnityEngine.Material silhuetteWith2TexturesMat;
+		static UnityEngine.Material silhuetteInversedMat;
 		public static bool ThreeDimensionalRendering;
 
 		static MaterialFactory()
@@ -24,6 +25,7 @@ namespace Lime
 			imageCombinerMat = new UnityEngine.Material(UnityEngine.Shader.Find("ImageCombiner"));
 			silhuetteMat = new UnityEngine.Material(UnityEngine.Shader.Find("Silhuette"));
 			silhuetteWith2TexturesMat = new UnityEngine.Material(UnityEngine.Shader.Find("SilhuetteWith2Textures"));
+			silhuetteInversedMat = new UnityEngine.Material(UnityEngine.Shader.Find("SilhuetteInversed"));
 		}
 
 		public static UnityEngine.Material GetMaterial(Blending blending, ShaderId shaderId, ITexture texture1, ITexture texture2)
@@ -35,6 +37,10 @@ namespace Lime
 				mat = texCount == 2 ? silhuetteWith2TexturesMat : silhuetteMat;
 				break;
 			default:
+				if (texCount == 1 && shaderId == ShaderId.InversedSilhuette) {
+					mat = silhuetteInversedMat;
+					break;
+				}
 				mat = texCount == 2 ? imageCombinerMat : (texCount == 1 ? 
 					(ThreeDimensionalRendering ? diffuseMat3d : diffuseMat) : flatMat);
 				break;
