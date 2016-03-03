@@ -1,7 +1,6 @@
 #if ANDROID
 using System;
 
-using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Text;
@@ -341,7 +340,7 @@ namespace Lime
 		{
 			float delta;
 			RefreshFrameTimeStamp(out delta);
-			input.ProcessPendingKeyEvents();
+			input.ProcessPendingKeyEvents(delta);
 			base.OnUpdateFrame(new FrameEventArgs(delta));
 			AudioSystem.Update();
 			keyboardHandler.ProcessTextInput();
