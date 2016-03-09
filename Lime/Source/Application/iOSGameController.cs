@@ -68,8 +68,27 @@ namespace Lime
 
 		private void OnAcceleration(object sender, UIAccelerometerEventArgs e)
 		{
-			input.Acceleration = new Vector3((float)e.Acceleration.X,
+			input.NativeAcceleration = new Vector3((float)e.Acceleration.X,
 				(float)e.Acceleration.Y, (float)e.Acceleration.Z);
+
+			switch (Application.CurrentDeviceOrientation) {
+				case DeviceOrientation.Portrait:
+					input.Acceleration =
+						new Vector3((float)e.Acceleration.X, (float)e.Acceleration.Y, (float)e.Acceleration.Z);
+					break;
+				case DeviceOrientation.PortraitUpsideDown:
+					input.Acceleration =
+						new Vector3((float)-e.Acceleration.X, (float)-e.Acceleration.Y, (float)e.Acceleration.Z);
+					break;
+				case DeviceOrientation.LandscapeLeft:
+					input.Acceleration =
+						new Vector3((float)e.Acceleration.Y, (float)-e.Acceleration.X, (float)e.Acceleration.Z);
+					break;
+				case DeviceOrientation.LandscapeRight:
+					input.Acceleration =
+						new Vector3((float)-e.Acceleration.Y, (float)e.Acceleration.X, (float)e.Acceleration.Z);
+					break;
+			}
 		}
 
 		public override void ViewWillAppear(bool animated)

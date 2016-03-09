@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Lime
 {
@@ -51,7 +50,16 @@ namespace Lime
 		public float WheelScrollAmount { get; private set; }
 
 		/// <summary>
-		/// The current accelerometer state (read only) in g-force units
+		/// Gets the current acceleration in g-force units. This vector is based on the device in a "natural"
+		/// orientation (portrait-up on iOS and device-specific on Android). The value is not changed when switching
+		/// between orientations.
+		/// </summary>
+		public Vector3 NativeAcceleration { get; internal set; }
+
+		/// <summary>
+		/// Gets the current acceleration in g-force units. This vector is specified in the current coordinate space,
+		/// which takes into account any interface rotations in effect for the device. Therefore,
+		/// the value of this property may change when the device rotates between portrait and landscape orientations.
 		/// </summary>
 		public Vector3 Acceleration { get; internal set; }
 
