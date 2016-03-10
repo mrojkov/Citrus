@@ -8,12 +8,23 @@ namespace Lime
 		private FPSCounter fpsCounter;
 		
 		public bool Active { get; private set; }
-		public bool Fullscreen { get { return true; } set {} }
+		public bool Fullscreen 
+		{
+			get { return UnityEngine.Screen.fullScreen; }
+			set {
+				UnityEngine.Screen.fullScreen = value;
+				RaiseResized(false);
+			}
+		}
 		public string Title { get; set; }
 		public bool Visible { get { return true; } set {} }
 		public Input Input { get { return input; } }
 		public MouseCursor Cursor { get; set; }
-		public WindowState State { get { return WindowState.Fullscreen; } set {} }
+		public WindowState State 
+		{ 
+			get { return Fullscreen ? WindowState.Fullscreen : WindowState.Normal; }
+			set {}
+		}
 		public IntVector2 ClientPosition { get { return IntVector2.Zero; } set {} }
 		public IntVector2 DecoratedPosition { get { return IntVector2.Zero; } set {} }
 		public Size ClientSize { get { return new Size(UnityEngine.Screen.width, UnityEngine.Screen.height); } set {} }
