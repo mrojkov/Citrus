@@ -386,9 +386,11 @@ namespace Lime
 				Update(delta);
 				if (invalidated) {
 					fpsCounter.Refresh();
-					mainGLControl.Context.MakeCurrent(glControl.WindowInfo);
-					RaiseRendering();
-					mainGLControl.SwapBuffers();
+					if (glControl.IsHandleCreated) {
+						mainGLControl.Context.MakeCurrent(glControl.WindowInfo);
+						RaiseRendering();
+						mainGLControl.SwapBuffers();
+					}
 					invalidated = false;
 				}
 			}
