@@ -37,7 +37,7 @@ namespace Lime
 		internal event Action Changed;
 
 		public const int MaxTouches = 4;
-		public float KeyRepeatDelay = 0.3f;
+		public float KeyRepeatDelay = 0.2f;
 		public float KeyRepeatInterval = 0.03f;
 
 		private struct KeyEvent
