@@ -28,7 +28,7 @@ namespace Lime
 			silhuetteInversedMat = new UnityEngine.Material(UnityEngine.Shader.Find("SilhuetteInversed"));
 		}
 
-		public static UnityEngine.Material GetMaterial(Blending blending, ShaderId shaderId, ITexture texture1, ITexture texture2)
+		public static UnityEngine.Material GetMaterial(Blending blending, bool zTestMode, bool zWriteMode, ShaderId shaderId, ITexture texture1, ITexture texture2)
 		{
 			UnityEngine.Material mat;
 			var texCount = texture1 != null ? (texture2 != null ? 2 : 1) : 0;
@@ -40,7 +40,7 @@ namespace Lime
 				if (texCount == 1 && shaderId == ShaderId.InversedSilhuette) {
 					mat = silhuetteInversedMat;
 					break;
-				}
+				} 
 				mat = texCount == 2 ? imageCombinerMat : (texCount == 1 ? 
 					(ThreeDimensionalRendering ? diffuseMat3d : diffuseMat) : flatMat);
 				break;
@@ -78,6 +78,8 @@ namespace Lime
 			}
 			mat.SetInt("BlendSrcMode", (int)srcMode);
 			mat.SetInt("BlendDstMode", (int)dstMode);
+			//mat.SetInt("ZWriteMode", zWriteMode ? 1 : 0);
+			mat.SetInt ("ZTestMode", zTestMode ? (int)UnityEngine.Rendering.CompareFunction.LessEqual : (int)UnityEngine.Rendering.CompareFunction.Always);
 			return mat;
 		}
 	}

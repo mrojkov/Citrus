@@ -28,6 +28,8 @@ namespace Lime
 		{
 			MaterialFactory.GetMaterial(
 				PlatformRenderer.Blending, 
+				PlatformRenderer.ZTest,
+				PlatformRenderer.ZWrite,
 				PlatformRenderer.Shader,
 				PlatformRenderer.Textures[0],
 				PlatformRenderer.Textures[1]
