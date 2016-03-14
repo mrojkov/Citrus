@@ -91,9 +91,8 @@ namespace Lime
 
 			public int Compare(ModelSubmesh a, ModelSubmesh b)
 			{
-				var cpos = Camera.Position * (Camera.Parent as ModelNode).GlobalTransform;
-				float da = (a.Center * a.ModelMesh.GlobalTransform).Z - cpos.Z;
-				float db = (b.Center * b.ModelMesh.GlobalTransform).Z - cpos.Z;
+				float da = (a.Center * a.ModelMesh.GlobalTransform * Camera.View).Z;
+				float db = (b.Center * b.ModelMesh.GlobalTransform * Camera.View).Z;
 				if (da == db) {
 					return 0;
 				} else if (da > db) {

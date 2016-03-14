@@ -44,7 +44,7 @@ namespace Lime
 		public float NearClipPlane
 		{
 			get { return nearClipPlane; }
-            set
+			set
 			{
 				if (nearClipPlane != value) {
 					nearClipPlane = value;
