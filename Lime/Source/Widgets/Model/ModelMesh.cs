@@ -166,7 +166,7 @@ namespace Lime
 			return list.Remove(item);
 		}
 
-		public int Count => list.Count;
+		public int Count { get { return list.Count; } }
 		public bool IsReadOnly { get { return false; } }
 		public int IndexOf(ModelSubmesh item)
 		{
