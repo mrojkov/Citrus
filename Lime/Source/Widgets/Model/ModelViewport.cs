@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,6 +20,19 @@ namespace Lime
 		private ModelCamera camera;
 		private RenderChain chain = new RenderChain();
 		private float frame;
+		private List<ModelSubmesh> submeshes;
+		public bool ZSortEnabled {
+			get { return submeshes != null; }
+			set
+			{
+				if (value) {
+					submeshes = new List<ModelSubmesh>(64);
+				} else {
+					submeshes = null;
+				}
+			}
+		}
+		private MeshCameraDistanceComparer meshCameraDistanceComparer = new MeshCameraDistanceComparer();
 
 		public ModelCamera Camera
 		{
@@ -26,6 +40,7 @@ namespace Lime
 			set
 			{
 				camera = value;
+				meshCameraDistanceComparer.Camera = camera;
 				AdjustCameraAspectRatio();
 			}
 		}
@@ -70,6 +85,25 @@ namespace Lime
 			}
 		}
 
+		internal class MeshCameraDistanceComparer : IComparer<ModelSubmesh>
+		{
+			public ModelCamera Camera;
+
+			public int Compare(ModelSubmesh a, ModelSubmesh b)
+			{
+				var cpos = Camera.Position * (Camera.Parent as ModelNode).GlobalTransform;
+				float da = (a.Center * a.ModelMesh.GlobalTransform).Z - cpos.Z;
+				float db = (b.Center * b.ModelMesh.GlobalTransform).Z - cpos.Z;
+				if (da == db) {
+					return 0;
+				} else if (da > db) {
+					return 1;
+				} else {
+					return -1;
+				}
+			}
+		}
+
 		public override void Render()
 		{
 			foreach (var node in Nodes) {
@@ -85,7 +119,27 @@ namespace Lime
 #elif UNITY
 			MaterialFactory.ThreeDimensionalRendering = true;
 #endif
-			chain.RenderAndClear();
+			if (ZSortEnabled) {
+				for (int i = 0; i <= chain.MaxUsedLayer; i++) {
+					Node node = chain.Layers[i];
+					submeshes.Clear();
+					while (node != null) {
+						node.PerformHitTest();
+						var mm = node as ModelMesh;
+						foreach (var sm in mm.Submeshes) {
+							submeshes.Add(sm);
+						}
+						node = node.NextToRender;
+					}
+					submeshes.Sort(meshCameraDistanceComparer);
+					foreach (var sm in submeshes) {
+						sm.ModelMesh.RenderSubmesh(sm);
+					}
+				}
+				chain.Clear();
+			} else {
+				chain.RenderAndClear();
+			}
 #if OPENGL
 			GL.Disable(EnableCap.CullFace);
 #elif UNITY

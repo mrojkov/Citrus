@@ -7,10 +7,10 @@ namespace Lime
 	/// </summary>
 	public class RenderChain
 	{
-		int currentLayer;
-		int maxUsedLayer;
+		private int currentLayer;
+		public int MaxUsedLayer { get; private set; }
 
-		readonly Node[] layers = new Node[Widget.MaxLayer + 1];
+		public readonly Node[] Layers = new Node[Widget.MaxLayer + 1];
 
 		/// <summary>
 		/// Добавляет объект и все его дочерние объекты в очередь отрисовки
@@ -24,15 +24,15 @@ namespace Lime
 				Add(node, 0);
 				SetCurrentLayer(oldLayer);
 			} else {
-				node.NextToRender = layers[currentLayer];
-				layers[currentLayer] = node;
+				node.NextToRender = Layers[currentLayer];
+				Layers[currentLayer] = node;
 			}
 		}
 
 		public int SetCurrentLayer(int layer)
 		{
-			if (layer > maxUsedLayer) {
-				maxUsedLayer = layer;
+			if (layer > MaxUsedLayer) {
+				MaxUsedLayer = layer;
 			}
 			int oldLayer = currentLayer;
 			currentLayer = layer;
@@ -41,27 +41,41 @@ namespace Lime
 
 		public void RenderAndClear()
 		{
-            for (int i = 0; i <= maxUsedLayer; i++) {
-                Node node = layers[i];
-                while (node != null) {
+			for (int i = 0; i <= MaxUsedLayer; i++) {
+				Node node = Layers[i];
+				while (node != null) {
 					node.PerformHitTest();
-                    node.Render();
-                    Node next = node.NextToRender;
-                    node.NextToRender = null;
-                    node = next;
-                }
-                layers[i] = null;
-            }
-            maxUsedLayer = 0;
+					node.Render();
+					Node next = node.NextToRender;
+					node.NextToRender = null;
+					node = next;
+				}
+				Layers[i] = null;
+			}
+			MaxUsedLayer = 0;
 		}
-        
+
+		public void Clear()
+		{
+			for (int i = 0; i <= MaxUsedLayer; i++) {
+				Node node = Layers[i];
+				while (node != null) {
+					Node next = node.NextToRender;
+					node.NextToRender = null;
+					node = next;
+				}
+				Layers[i] = null;
+			}
+			MaxUsedLayer = 0;
+		}
+
 		/// <summary>
 		/// Перечисляет все объекты в том порядке, в каком они должны отрисоваться
 		/// </summary>
 		public IEnumerable<Node> Enumerate()
 		{
-			for (int i = 0; i <= maxUsedLayer; i++) {
-				for (var node = layers[i]; node != null; node = node.NextToRender) {
+			for (int i = 0; i <= MaxUsedLayer; i++) {
+				for (var node = Layers[i]; node != null; node = node.NextToRender) {
 					yield return node;
 				}
 			}
