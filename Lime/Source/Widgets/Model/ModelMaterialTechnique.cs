@@ -7,7 +7,7 @@ namespace Lime
 		private static readonly ModelMaterialTechnique[] instances;
 
 		private const string VertexShader = @"
-			#ifdef GLES
+			#ifdef GL_ES
 			precision highp float;
 			#endif
 
@@ -44,7 +44,7 @@ namespace Lime
 		";
 
 		private const string FragmentShader = @"
-			#ifdef GLES
+			#ifdef GL_ES
 			precision highp float;
 			#endif
 
