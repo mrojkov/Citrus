@@ -190,7 +190,11 @@ namespace Lime
 
 		public void LoadColor(int uniformId, Color4 color)
 		{
+#if !MAC && !MONOMAC
 			GL.Uniform4(uniformId, new OpenTK.Graphics.Color4(color.R, color.G, color.B, color.A));
+#else
+			GL.Uniform4(uniformId, new OpenTK.Vector4(color.R, color.G, color.B, color.A));
+#endif
 		}
 
 		private void BindSampler(string name, int stage)
