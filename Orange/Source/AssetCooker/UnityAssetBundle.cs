@@ -18,7 +18,7 @@ namespace Orange
 		private string AdjustExtensionForBinaryAsset(string path)
 		{
 			var ext = Path.GetExtension(path);
-			if (ext != ".png" && ext != ".txt" && ext != ".ogg" && ext != ".shader") {
+			if (ext != ".png" && ext != ".txt" && ext != ".ogg" && ext != ".shader" && ext != ".ogv") {
 				path += ".bytes";
 			}
 			return path;

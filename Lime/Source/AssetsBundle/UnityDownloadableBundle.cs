@@ -48,7 +48,7 @@ namespace Lime
 		private string GetAssetPathWithRightExtension(string path)
 		{
 			var ext = Path.GetExtension(path);
-			if (ext != ".png" && ext != ".txt" && ext != ".ogg") {
+			if (ext != ".png" && ext != ".txt" && ext != ".ogg" && ext != ".ogv") {
 				path += ".bytes";
 			}
 			return path;
