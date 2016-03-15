@@ -284,6 +284,7 @@ namespace Lime
 		{
 			active = true;
 			glControl.Invalidate();
+			AudioSystem.Active = true;
 			RaiseActivated();
 		}
 
@@ -293,6 +294,7 @@ namespace Lime
 				Input.SetKeyState(key, false);
 			}
 			active = false;
+			AudioSystem.Active = false;
 			RaiseDeactivated();
 		}
 
