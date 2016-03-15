@@ -27,9 +27,11 @@ namespace Lime
 			get { return zSortEnabled; }
 			set
 			{
-				if (value && !zSortEnabled) {
-					submeshes = new List<ModelSubmesh>();
-					modelMeshes = new List<ModelMesh>();
+				if (value) {
+					if (!zSortEnabled) {
+						submeshes = new List<ModelSubmesh>();
+						modelMeshes = new List<ModelMesh>();
+					}
 				} else {
 					submeshes = null;
 					modelMeshes = null;
