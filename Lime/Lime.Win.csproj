@@ -98,6 +98,7 @@
     <Compile Include="Source\Audio\OpenAL\PlatformAudioSystem.cs" />
     <Compile Include="Source\Audio\OpenAL\WaveIMA4Decoder.cs" />
     <Compile Include="Source\Audio\Unity\AudioChannel.cs" />
+    <Compile Include="Source\EnumExtensions.cs" />
     <Compile Include="Source\Graphics\Fonts\CharMap.cs" />
     <Compile Include="Source\Graphics\Fonts\CompoundFont.cs" />
     <Compile Include="Source\Graphics\Fonts\Font.cs" />
@@ -144,6 +145,7 @@
     <Compile Include="Source\Widgets\Layout\HBoxLayout.cs" />
     <Compile Include="Source\Widgets\Layout\LayoutDebugPresenter.cs" />
     <Compile Include="Source\Widgets\Layout\FlowLayout.cs" />
+    <Compile Include="Source\Widgets\Model\ModelMaterialTechnique.cs" />
     <Compile Include="Source\Widgets\Text\IKeyboardInputProcessor.cs" />
     <Compile Include="Source\Widgets\Text\IText.cs" />
     <Compile Include="Source\Widgets\ListView\ExpandableListItem.cs" />

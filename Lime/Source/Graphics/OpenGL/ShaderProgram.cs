@@ -154,6 +154,20 @@ namespace Lime
 			}
 		}
 
+		public void LoadMatrixArray(int uniformId, Matrix44[] matrices)
+		{
+			LoadMatrixArray(uniformId, matrices, matrices.Length);
+		}
+
+		public void LoadMatrixArray(int uniformId, Matrix44[] matrices, int count)
+		{
+			unsafe {
+				fixed (Matrix44* p = matrices) {
+					GL.UniformMatrix4(uniformId, count, false, (float*)p);
+				}
+			}
+		}
+
 		public void LoadFloat(int uniformId, float value)
 		{
 			GL.Uniform1(uniformId, value);
@@ -172,6 +186,11 @@ namespace Lime
 		public void LoadVector2(int uniformId, Vector2 vector)
 		{
 			GL.Uniform2(uniformId, vector.X, vector.Y);
+		}
+
+		public void LoadColor(int uniformId, Color4 color)
+		{
+			GL.Uniform4(uniformId, new OpenTK.Graphics.Color4(color.R, color.G, color.B, color.A));
 		}
 
 		private void BindSampler(string name, int stage)

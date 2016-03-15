@@ -68,24 +68,27 @@ namespace Lime
 		public ModelNode()
 		{
 			AsModelNode = this;
-			Visible = true;
+			scale = Vector3.One;
+			rotation = Quaternion.Identity;
+			visible = true;
 		}
 
 		protected override void RecalcDirtyGlobalsUsingParents()
 		{
 			if (IsDirty(DirtyFlags.Transform)) {
-				if (Parent.AsModelNode != null) {
-					globalTransform = CalcLocalTransform() * Parent.AsModelNode.GlobalTransform;
-				} else {
-					globalTransform = CalcLocalTransform();
+				globalTransform = CalcLocalTransform();
+				if (Parent != null && Parent.AsModelNode != null) {
+					globalTransform *= Parent.AsModelNode.GlobalTransform;
 				}
 			}
 			if (IsDirty(DirtyFlags.Visible)) {
 				globallyVisible = Visible;
-				if (Parent.AsWidget != null) {
-					globallyVisible &= Parent.AsWidget.GloballyVisible;
-				} else if (Parent.AsModelNode != null) {
-					globallyVisible &= Parent.AsModelNode.GloballyVisible;
+				if (Parent != null) {
+					if (Parent.AsWidget != null) {
+						globallyVisible &= Parent.AsWidget.GloballyVisible;
+					} else if (Parent.AsModelNode != null) {
+						globallyVisible &= Parent.AsModelNode.GloballyVisible;
+					}
 				}
 			}
 		}
@@ -97,7 +100,11 @@ namespace Lime
 
 		public bool TrySetLocalTransform(Matrix44 transform)
 		{
-			return transform.Decompose(out scale, out rotation, out position);
+			if (transform.Decompose(out scale, out rotation, out position)) {
+				PropagateDirtyFlags(DirtyFlags.Transform);
+				return true;
+			}
+			return false;
 		}
 
 		public void SetLocalTransform(Matrix44 transform)
