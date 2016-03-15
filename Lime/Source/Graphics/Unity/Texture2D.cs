@@ -26,7 +26,7 @@ namespace Lime
 			set { ImageSize = value; }
 		}
 
-		public UnityEngine.Texture GetUnityTexture()
+		public virtual UnityEngine.Texture GetUnityTexture()
 		{
 			return unityTexture;
 		}
@@ -42,7 +42,7 @@ namespace Lime
 			get { return new Rectangle(0, 0, 1, 1); }
 		}
 
-		public ITexture AlphaTexture { get; private set; }
+		public ITexture AlphaTexture { get; protected set; }
 		
 		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv) { }
 
