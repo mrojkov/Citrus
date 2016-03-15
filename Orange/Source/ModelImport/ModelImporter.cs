@@ -494,9 +494,9 @@ namespace Orange
 					Quaternion finalRotation;
 					Vector3 finalTranslation;
 					transform.Decompose(out finalScale, out finalRotation, out finalTranslation);
-					scaleKeys.Add(new Keyframe<Vector3>(TimeToFrame(time), finalScale));
-					rotationKeys.Add(new Keyframe<Quaternion>(TimeToFrame(time), finalRotation));
-					translationKeys.Add(new Keyframe<Vector3>(TimeToFrame(time), finalTranslation));
+					scaleKeys.Add(new Keyframe<Vector3>(TimeToFrame(time, aiAnimation.TicksPerSecond), finalScale));
+					rotationKeys.Add(new Keyframe<Quaternion>(TimeToFrame(time, aiAnimation.TicksPerSecond), finalRotation));
+					translationKeys.Add(new Keyframe<Vector3>(TimeToFrame(time, aiAnimation.TicksPerSecond), finalTranslation));
 				}
 				AddDistinctKeys(n.Animators["Scale", animationId] as Animator<Vector3>, scaleKeys);
 				AddDistinctKeys(n.Animators["Rotation", animationId] as Animator<Quaternion>, rotationKeys);
@@ -520,9 +520,9 @@ namespace Orange
 			}
 		}
 
-		private static int TimeToFrame(double time)
+		private static int TimeToFrame(double ticks, double ticksPerSecond)
 		{
-			return AnimationUtils.MsecsToFrames((int)(time * 1000 + 0.5f));
+			return AnimationUtils.MsecsToFrames((int)(ticks * 1000 / ticksPerSecond + 0.5));
 		}
 
 		private static string GetNodeName(string name)
