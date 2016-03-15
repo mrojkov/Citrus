@@ -121,7 +121,7 @@ namespace Orange
 					DiffuseTexture = TryGetSerializableTexture("Diffuse"),
 					OpacityTexture = TryGetSerializableTexture("Opacity"),
 					SpecularTexture = TryGetSerializableTexture("Specular"),
-					BumpTexture = TryGetSerializableTexture("Bump")
+					HeightTexture = TryGetSerializableTexture("Bump")
 				};
 			}
 
@@ -165,10 +165,37 @@ namespace Orange
 				if (platform == TargetPlatform.Unity) {
 					postProcess |= Assimp.PostProcessSteps.FlipWindingOrder;
 				}
+				postProcess |= Assimp.PostProcessSteps.LimitBoneWeights;
 				aiScene = aiContext.ImportFile(path, postProcess);
 				FindCameras();
 				ImportNodes();
+				ImportSkeleton();
 				ImportAnimations();
+			}
+		}
+
+		private void ImportSkeleton()
+		{
+			ImportSkeleton(aiScene.RootNode);
+		}
+
+		private void ImportSkeleton(Assimp.Node aiNode)
+		{
+			if (aiNode.HasMeshes) {
+				var mesh = RootNode.Find<ModelMesh>(aiNode.Name);
+				for (var i = 0; i < aiNode.MeshCount; i++) {
+					var aiMesh = aiScene.Meshes[aiNode.MeshIndices[i]];
+					if (aiMesh.HasBones) {
+						foreach (var bone in aiMesh.Bones) {
+							mesh.Submeshes[i].BoneIndices.Add(mesh.Bones.Count);
+							mesh.Bones.Add(RootNode.Find<ModelNode>(bone.Name));
+							mesh.BoneBindPoseInverses.Add(bone.OffsetMatrix.ToLime());
+						}
+					}
+				}
+			}
+			foreach (var aiChild in aiNode.Children) {
+				ImportSkeleton(aiChild);
 			}
 		}
 
@@ -291,6 +318,47 @@ namespace Orange
 				res.Colors = mesh.VertexColorChannels[0].Select(AssimpExtensions.ToLime).ToArray();
 			} else {
 				res.Colors = Enumerable.Repeat(Color4.White, mesh.VertexCount).ToArray();
+			}
+			if (mesh.HasBones) {
+				var indices = new byte[4];
+				var weights = new float[4];
+				res.BlendIndices = new BlendIndices[res.Vertices.Length];
+				res.BlendWeights = new BlendWeights[res.Vertices.Length];
+				for (var i = 0; i < res.Vertices.Length; i++) {
+					var count = 0;
+					for (var j = 0; j < mesh.BoneCount; j++) {
+						var b = mesh.Bones[j];
+						for (var k = 0; k < b.VertexWeightCount; k++) {
+							var w = b.VertexWeights[k];
+							if (w.VertexID != i) {
+								continue;
+							}
+							indices[count] = (byte)j;
+							weights[count] = w.Weight;
+							count++;
+						}
+					}
+					if (count == 0) {
+						Console.WriteLine("Warning");
+					} else {
+						if (count > 0) {
+							res.BlendIndices[i].Index0 = indices[0];
+							res.BlendWeights[i].Weight0 = weights[0];
+						}
+						if (count > 1) {
+							res.BlendIndices[i].Index1 = indices[1];
+							res.BlendWeights[i].Weight1 = weights[1];
+						}
+						if (count > 2) {
+							res.BlendIndices[i].Index2 = indices[2];
+							res.BlendWeights[i].Weight2 = weights[2];
+						}
+						if (count > 3) {
+							res.BlendIndices[i].Index3 = indices[3];
+							res.BlendWeights[i].Weight3 = weights[3];
+						}
+					}
+				}
 			}
 			return res;
 		}
