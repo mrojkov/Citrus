@@ -9,11 +9,21 @@ namespace Lime
 	[ProtoContract]
 	public class ModelMesh : ModelNode
 	{
+		internal Matrix44 WorldViewProj;
+		internal Matrix44[] SharedBoneTransforms = new Matrix44[] { };
+		private bool invalidBones;
+
 		[ProtoMember(1)]
 		public ModelSubmeshCollection Submeshes { get; private set; }
 
 		[ProtoMember(2)]
 		public BoundingSphere BoundingSphere { get; set; }
+
+		[ProtoMember(3)]
+		public List<ModelNode> Bones { get; private set; }
+
+		[ProtoMember(4)]
+		public List<Matrix44> BoneBindPoseInverses { get; private set; }
 
 		public bool ZTestEnabled { get; set; }
 		public bool ZWriteEnabled { get; set; }
@@ -22,8 +32,16 @@ namespace Lime
 		public ModelMesh()
 		{
 			Submeshes = new ModelSubmeshCollection(this);
+			Bones = new List<ModelNode>();
+			BoneBindPoseInverses = new List<Matrix44>();
 			ZTestEnabled = true;
 			ZWriteEnabled = true;
+		}
+
+		[ProtoAfterDeserialization]
+		public void AfterDeserialization()
+		{
+			invalidBones = true;
 		}
 
 		public override void AddToRenderChain(RenderChain chain)
@@ -46,28 +64,57 @@ namespace Lime
 			}
 		}
 
+		internal void PrepareToRender()
+		{
+			ValidateBones();
+			var world = GlobalTransform;
+			var worldInverse = world.CalcInverted();
+			if (SharedBoneTransforms.Length < Bones.Count) {
+				SharedBoneTransforms = new Matrix44[Bones.Count];
+			}
+			for (var i = 0; i < Bones.Count; i++) {
+				SharedBoneTransforms[i] = BoneBindPoseInverses[i] * Bones[i].GlobalTransform * worldInverse;
+			}
+			WorldViewProj = world * Renderer.Projection;
+		}
+
 		public override void Render()
 		{
 			if (SkipRender) {
 				return;
 			}
+			PrepareToRender();
 			foreach (var sm in Submeshes) {
-				RenderSubmesh(sm);
+				sm.Render();
 			}
 		}
 
-		public void RenderSubmesh(ModelSubmesh sm)
+		private void ValidateBones()
 		{
-			var viewProjection = Renderer.Projection;
-			Renderer.ZTestEnabled = ZTestEnabled;
-			Renderer.ZWriteEnabled = ZWriteEnabled;
-			Renderer.Projection = GlobalTransform * viewProjection;
-			PlatformRenderer.SetTexture(sm.Material.DiffuseTexture, 0);
-			PlatformRenderer.SetTexture(null, 1);
-			PlatformRenderer.SetShader(ShaderId.Diffuse, null);
-			PlatformRenderer.SetBlending(Blending.Alpha);
-			sm.Geometry.Render(0, sm.Geometry.Vertices.Length);
-			Renderer.Projection = viewProjection;
+			if (invalidBones) {
+				var success = false;
+				Node skeletonRoot = this;
+				while (skeletonRoot != null && skeletonRoot.AsModelNode != null) {
+					var i = 0;
+					while (i < Bones.Count) {
+						var validBone = skeletonRoot.TryFind<ModelNode>(Bones[i].Id);
+						if (validBone == null) {
+							break;
+						}
+						Bones[i] = validBone;
+						i++;
+					}
+					success = i == Bones.Count;
+					if (success) {
+						break;
+					}
+					skeletonRoot = skeletonRoot.Parent;
+				}
+				if (!success) {
+					throw new Lime.Exception("Skeleton for `{0}` is not found", ToString());
+				}
+				invalidBones = false;
+			}
 		}
 
 		public override MeshHitTestResult HitTest(Ray ray)
@@ -94,17 +141,24 @@ namespace Lime
 	[ProtoContract]
 	public class ModelSubmesh
 	{
+		private static Matrix44[] sharedBoneTransforms = new Matrix44[] { };
+
 		[ProtoMember(1)]
 		public ModelMaterial Material { get; set; }
 
 		[ProtoMember(2)]
 		public Mesh Geometry { get; set; }
 
+		[ProtoMember(3)]
+		public List<int> BoneIndices { get; private set; }
+
 		public ModelMesh ModelMesh;
 
 		private Vector3? center;
-		public Vector3 Center {
-			get {
+		public Vector3 Center
+		{
+			get
+			{
 				if (center == null) {
 					center = Vector3.Zero;
 					int n = Geometry.Vertices.Length;
@@ -116,6 +170,33 @@ namespace Lime
 				return center.Value;
 			}
 			private set { center = value; }
+		}
+
+		public ModelSubmesh()
+		{
+			BoneIndices = new List<int>();
+		}
+
+		public void Render()
+		{
+			Renderer.ZTestEnabled = ModelMesh.ZTestEnabled;
+			Renderer.ZWriteEnabled = ModelMesh.ZWriteEnabled;
+			var materialExternals = new ModelMaterialExternals {
+				WorldViewProj = ModelMesh.WorldViewProj
+			};
+			if (BoneIndices.Count > 0) {
+				if (sharedBoneTransforms.Length < BoneIndices.Count) {
+					sharedBoneTransforms = new Matrix44[BoneIndices.Count];
+				}
+				for (var i = 0; i < BoneIndices.Count; i++) {
+					sharedBoneTransforms[i] = ModelMesh.SharedBoneTransforms[BoneIndices[i]];
+				}
+				materialExternals.Caps |= ModelMaterialCap.Skin;
+				materialExternals.Bones = sharedBoneTransforms;
+				materialExternals.BoneCount = BoneIndices.Count;
+			}
+			Material.Apply(ref materialExternals);
+			Geometry.Render(0, Geometry.Vertices.Length);
 		}
 	}
 

@@ -21,15 +21,20 @@ namespace Lime
 		private RenderChain chain = new RenderChain();
 		private float frame;
 		private List<ModelSubmesh> submeshes;
+		private List<ModelMesh> modelMeshes;
+		private bool zSortEnabled;
 		public bool ZSortEnabled {
-			get { return submeshes != null; }
+			get { return zSortEnabled; }
 			set
 			{
-				if (value) {
-					submeshes = new List<ModelSubmesh>(64);
+				if (value && !zSortEnabled) {
+					submeshes = new List<ModelSubmesh>();
+					modelMeshes = new List<ModelMesh>();
 				} else {
 					submeshes = null;
+					modelMeshes = null;
 				}
+				zSortEnabled = value;
 			}
 		}
 		private MeshCameraDistanceComparer meshCameraDistanceComparer = new MeshCameraDistanceComparer();
@@ -122,17 +127,24 @@ namespace Lime
 				for (int i = 0; i <= chain.MaxUsedLayer; i++) {
 					Node node = chain.Layers[i];
 					submeshes.Clear();
+					modelMeshes.Clear();
 					while (node != null) {
 						node.PerformHitTest();
 						var mm = node as ModelMesh;
-						foreach (var sm in mm.Submeshes) {
-							submeshes.Add(sm);
+						if (!mm.SkipRender) {
+							modelMeshes.Add(mm);
+							foreach (var sm in mm.Submeshes) {
+								submeshes.Add(sm);
+							}
 						}
 						node = node.NextToRender;
 					}
 					submeshes.Sort(meshCameraDistanceComparer);
+					foreach (var mm in modelMeshes) {
+						mm.PrepareToRender();
+					}
 					foreach (var sm in submeshes) {
-						sm.ModelMesh.RenderSubmesh(sm);
+						sm.Render();
 					}
 				}
 				chain.Clear();

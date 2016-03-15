@@ -21,15 +21,17 @@ namespace Lime
 		private uint vboHandle;
 		private int stride;
 		private int componentCount;
+		private bool normalized;
 		private bool disposed;
 	
-		public VertexBuffer(int attribute, VertexAttribPointerType attribType, int componentCount)
+		public VertexBuffer(int attribute, VertexAttribPointerType attribType, int componentCount, bool normalized = false)
 		{
 			Attribute = attribute;
 			AttribType = attribType;
 			ComponentCount = componentCount;
 			stride = GetAttributeSize(attribType) * componentCount;
 			this.componentCount = componentCount;
+			this.normalized = normalized;
 			TotalVertexBuffers++;
 			GLObjectRegistry.Instance.Add(this);
 		}
@@ -66,7 +68,6 @@ namespace Lime
 			}
 			GL.BindBuffer(BufferTarget.ArrayBuffer, vboHandle);
 			GL.EnableVertexAttribArray(Attribute);
-			var normalized = AttribType == VertexAttribPointerType.UnsignedByte;
 			GL.VertexAttribPointer(Attribute, componentCount, AttribType, normalized, 0, (IntPtr)0);
 			if (forceUpload) {
 				GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(stride * vertices.Length), vertices, BufferUsageHint.DynamicDraw);

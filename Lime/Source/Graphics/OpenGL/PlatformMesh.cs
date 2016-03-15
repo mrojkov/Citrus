@@ -21,6 +21,8 @@ namespace Lime
 			public const int UV2 = 3;
 			public const int UV3 = 4;
 			public const int UV4 = 5;
+			public const int BlendIndices = 6;
+			public const int BlendWeights = 7;
 
 			public static IEnumerable<ShaderProgram.AttribLocation> GetLocations()
 			{
@@ -31,6 +33,8 @@ namespace Lime
 					new ShaderProgram.AttribLocation { Index = UV2, Name = "inTexCoords2" },
 					new ShaderProgram.AttribLocation { Index = UV3, Name = "inTexCoords3" },
 					new ShaderProgram.AttribLocation { Index = UV4, Name = "inTexCoords4" },
+					new ShaderProgram.AttribLocation { Index = BlendIndices, Name = "inBlendIndices" },
+					new ShaderProgram.AttribLocation { Index = BlendWeights, Name = "inBlendWeights" }
 				};
 			}
 		}
@@ -42,6 +46,8 @@ namespace Lime
 		private VertexBuffer uv2VBO;
 		private VertexBuffer uv3VBO;
 		private VertexBuffer uv4VBO;
+		private VertexBuffer blendIndicesVBO;
+		private VertexBuffer blendWeightsVBO;
 		private IndexBuffer indexBuffer;
 
 		public PlatformMesh(Mesh mesh)
@@ -80,7 +86,7 @@ namespace Lime
 			}
 			if (mesh.Colors != null) {
 				if (colorsVBO == null) {
-					colorsVBO = new VertexBuffer(Attributes.Color, VertexAttribPointerType.UnsignedByte, 4);
+					colorsVBO = new VertexBuffer(Attributes.Color, VertexAttribPointerType.UnsignedByte, 4, normalized: true);
 				}
 				colorsVBO.Bind(mesh.Colors, (dm & Mesh.Attributes.Color) != 0);
 			}
@@ -108,6 +114,18 @@ namespace Lime
 				}
 				uv4VBO.Bind(mesh.UV3, (dm & Mesh.Attributes.UV4) != 0);
 			}
+			if (mesh.BlendIndices != null) {
+				if (blendIndicesVBO == null) {
+					blendIndicesVBO = new VertexBuffer(Attributes.BlendIndices, VertexAttribPointerType.UnsignedByte, 4);
+				}
+				blendIndicesVBO.Bind(mesh.BlendIndices, (dm & Mesh.Attributes.BlendIndices) != 0);
+			}
+			if (mesh.BlendWeights != null) {
+				if (blendWeightsVBO == null) {
+					blendWeightsVBO = new VertexBuffer(Attributes.BlendWeights, VertexAttribPointerType.Float, 4);
+				}
+				blendWeightsVBO.Bind(mesh.BlendWeights, (dm & Mesh.Attributes.BlendWeights) != 0);
+			}
 			mesh.DirtyAttributes = Mesh.Attributes.None;
 		}
 
@@ -119,6 +137,8 @@ namespace Lime
 			DisposeVertexBuffer(ref uv2VBO);
 			DisposeVertexBuffer(ref uv3VBO);
 			DisposeVertexBuffer(ref uv4VBO);
+			DisposeVertexBuffer(ref blendIndicesVBO);
+			DisposeVertexBuffer(ref blendWeightsVBO);
 			if (indexBuffer != null) {
 				indexBuffer.Dispose();
 				indexBuffer = null;
