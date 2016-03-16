@@ -24,7 +24,6 @@ SOFTWARE.*/
 
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
 namespace SharpFont
 {
@@ -43,7 +42,6 @@ namespace SharpFont
 
 		private IntPtr reference;
 
-		private bool customMemory;
 		private bool disposed;
 
 		private List<Face> childFaces;
@@ -194,7 +192,7 @@ namespace SharpFont
 
 				childFaces.Clear();
 
-				Error err = customMemory ? FT.FT_Done_Library(reference) : FT.FT_Done_FreeType(reference);
+				Error err = FT.FT_Done_FreeType(reference);
 
 				if (err != Error.Ok)
 					throw new FreeTypeException(err);

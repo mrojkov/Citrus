@@ -23,7 +23,6 @@ SOFTWARE.*/
 #endregion
 
 using System;
-//using System.Drawing;
 using System.Runtime.InteropServices;
 
 using SharpFont.Internal;
@@ -48,9 +47,6 @@ namespace SharpFont
 		private Library library;
 
 		private bool disposed;
-
-		//If the bitmap was generated with FT_Bitmap_New.
-		private bool user;
 
 		#endregion
 
@@ -242,16 +238,6 @@ namespace SharpFont
 			if (!disposed)
 			{
 				disposed = true;
-
-				if (user)
-				{
-					Error err = FT.FT_Bitmap_Done(library.Reference, reference);
-
-					if (err != Error.Ok)
-						throw new FreeTypeException(err);
-
-					Marshal.FreeHGlobal(reference);
-				}
 
 				reference = IntPtr.Zero;
 				library = null;
