@@ -8,7 +8,7 @@ namespace Lime
 {
 	interface IPlatformMesh : IDisposable
 	{
-		void Render(int startIndex, int count);
+		void Render(int startIndex, int indexCount);
 	}
 
 	[ProtoContract]
@@ -103,12 +103,12 @@ namespace Lime
 			DirtyAttributes = Attributes.All;
 		}
 
-		public void Render(int startIndex, int count)
+		public void Render(int startIndex, int indexCount)
 		{
 			if (platformMesh == null) {
 				platformMesh = new PlatformMesh(this);
 			}
-			platformMesh.Render(startIndex, count);
+			platformMesh.Render(startIndex, indexCount);
 		}
 
 		public void Allocate(int vertexCount, int indexCount, Attributes attrs)

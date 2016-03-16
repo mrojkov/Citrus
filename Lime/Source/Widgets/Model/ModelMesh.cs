@@ -196,7 +196,7 @@ namespace Lime
 				materialExternals.BoneCount = BoneIndices.Count;
 			}
 			Material.Apply(ref materialExternals);
-			Geometry.Render(0, Geometry.Vertices.Length);
+			Geometry.Render(0, Geometry.Indices.Length);
 		}
 	}
 
