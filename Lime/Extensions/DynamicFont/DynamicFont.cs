@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Lime
 {
@@ -41,6 +42,7 @@ namespace Lime
 		/// Collection of <see cref="FontChar"/> available in this font.
 		/// <see cref="DynamicFont"/> implements <see cref="DynamicFontCharSource"/>.
 		/// </summary>
+		[CLSCompliant(false)]
 		public IFontCharSource Chars
 		{
 			get; private set;
