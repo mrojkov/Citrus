@@ -204,7 +204,7 @@ namespace Lime
 				RaiseActivated();
 			};
 			window.DidResignKey += (sender, e) => {
-				RaiseActivated();
+				RaiseDeactivated();
 			};
 			window.DidMove += HandleMove;
 			window.CollectionBehavior = NSWindowCollectionBehavior.FullScreenPrimary;
