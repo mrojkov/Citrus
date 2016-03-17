@@ -201,11 +201,9 @@ namespace Lime
 				window.Center();
 			};
 			window.DidBecomeKey += (sender, e) => {
-				AudioSystem.Active = true;
 				RaiseActivated();
 			};
 			window.DidResignKey += (sender, e) => {
-				AudioSystem.Active = false;
 				RaiseActivated();
 			};
 			window.DidMove += HandleMove;

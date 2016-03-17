@@ -250,6 +250,8 @@
     <Compile Include="Source\Application\DummyWindow.cs" />
     <Compile Include="Source\Graphics\Bitmap.Cocoa.cs" />
     <Compile Include="Source\Widgets\Layout\FlowLayout.cs" />
+    <Compile Include="Source\EnumExtensions.cs" />
+    <Compile Include="Source\Widgets\Model\ModelMaterialTechnique.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
