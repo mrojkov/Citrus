@@ -63,29 +63,30 @@ namespace Lime
 		{
 			ConstraintsValid = true;
 			var widgets = GetChildren(widget);
-			float dx = widget.Padding.Left + widget.Padding.Right;
+			float paddingH = widget.Padding.Left + widget.Padding.Right;
+			float dx = paddingH;
 			float dy = widget.Padding.Top + widget.Padding.Bottom - Spacing;
-			float maxdx = dx;
 			float maxrowdy = 0;
 			int i = 0;
+			Action<int> split = (splitIndex) => {
+				splitIndices.Add(splitIndex);
+				dx = paddingH;
+				dy += maxrowdy + Spacing;
+				maxrowdy = 0.0f;
+			};
 			splitIndices.Clear();
 			splitIndices.Add(i);
 			while (i < widgets.Count) {
 				var w = widgets[i];
 				dx += w.MinWidth;
-				if (dx > widget.Width || i + 1 == widgets.Count) {
-					if (dx > widget.Width) {
-						splitIndices.Add(i);
-						i--;
-						dx -= w.MinWidth + Spacing;
-					} else {
-						splitIndices.Add(i + 1);
-						maxrowdy = Mathf.Max(maxrowdy, w.MinHeight);
-					}
-					maxdx = Mathf.Max(maxdx, dx);
-					dx = widget.Padding.Left + widget.Padding.Right;
-					dy += maxrowdy + Spacing;
-					maxrowdy = 0.0f;
+				if (w.MinWidth + paddingH > widget.Width && splitIndices.Last() == i) {
+					split(i + 1);
+				} else if (dx > widget.Width) {
+					split(i);
+					i--;
+				} else if (i + 1 == widgets.Count) {
+					maxrowdy = Mathf.Max(maxrowdy, w.MinHeight);
+					split(i + 1);
 				} else {
 					maxrowdy = Mathf.Max(maxrowdy, w.MinHeight);
 					dx += Spacing;
