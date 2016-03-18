@@ -196,7 +196,7 @@ namespace Lime
 			window.WillEnterFullScreen += (sender, e) => {
 				windowedClientSize = ClientSize;
 			};
-			window.DidExitFullScreen += (sender, e) => {
+			window.WillExitFullScreen += (sender, e) => {
 				ClientSize = windowedClientSize;
 				window.Center();
 			};
