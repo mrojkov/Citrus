@@ -54,6 +54,26 @@ namespace Lime
 			A = a;
 		}
 
+		public static byte GetAlphaComponent(int color)
+		{
+			return (byte)((uint)color >> 24);
+		}
+
+		public static byte GetRedComponent(int color)
+		{
+			return (byte)((color >> 16) & 0xFF);
+		}
+
+		public static byte GetGreenComponent(int color)
+		{
+			return (byte)((color >> 8) & 0xFF);
+		}
+
+		public static byte GetBlueComponent(int color)
+		{
+			return (byte)(color & 0xFF);
+		}
+
 		// Unity mono compiler doesn't allow another constructor because of ambiguity
 		public static Color4 FromFloats(float r, float g, float b, float a = 1)
 		{

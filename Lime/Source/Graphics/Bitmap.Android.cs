@@ -1,15 +1,13 @@
 #if ANDROID
-using System;
 using System.IO;
 
 using Android.Graphics;
-using Android.Graphics.Drawables;
 using Android.OS;
 using AndroidBitmap = Android.Graphics.Bitmap;
 
 namespace Lime
 {
-	class BitmapImplementation : IBitmapImplementation
+	internal class BitmapImplementation : IBitmapImplementation
 	{
 		public BitmapImplementation(Stream stream)
 		{
@@ -93,20 +91,19 @@ namespace Lime
 			var colors = new int[length];
 			Bitmap.GetPixels(colors, 0, Bitmap.Width, 0, 0, Bitmap.Width, Bitmap.Height);
 			var pixels = new Color4[length];
-			int r, g, b, a;
 			for (int i = 0; i < length; i++) {
-				r = Color.GetRedComponent(colors[i]);
-				g = Color.GetGreenComponent(colors[i]);
-				b = Color.GetBlueComponent(colors[i]);
-				a = Color.GetAlphaComponent(colors[i]);
-				pixels[i] = new Color4((byte)r, (byte)g, (byte)b, (byte)a);
+				pixels[i] = new Color4(
+					Color4.GetRedComponent(colors[i]),
+					Color4.GetGreenComponent(colors[i]),
+					Color4.GetBlueComponent(colors[i]),
+					Color4.GetAlphaComponent(colors[i]));
 			}
 			return pixels;
 		}
 
 		public void SaveTo(Stream stream)
 		{
-			Bitmap.Compress(Android.Graphics.Bitmap.CompressFormat.Png, 100, stream);
+			Bitmap.Compress(AndroidBitmap.CompressFormat.Png, 100, stream);
 		}
 
 		public void Dispose()
