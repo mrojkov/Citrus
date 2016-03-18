@@ -216,6 +216,12 @@ namespace Lime
 				glControl = CreateGLControl();
 			}
 			ClientSize = options.ClientSize;
+			if (options.MinimumDecoratedSize != Size.Zero) {
+				MinimumDecoratedSize = options.MinimumDecoratedSize;
+			}
+			if (options.MaximumDecoratedSize != Size.Zero) {
+				MaximumDecoratedSize = options.MaximumDecoratedSize;
+			}
 			Title = options.Title;
 			glControl.Dock = DockStyle.Fill;
 			glControl.Paint += OnPaint;
