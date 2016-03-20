@@ -85,6 +85,7 @@
     <Compile Include="SharpFont\Internal\SizeMetricsRec.cs" />
     <Compile Include="SharpFont\Internal\SizeRec.cs" />
     <Compile Include="SharpFont\FT.Internal.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime.Mac.csproj">
@@ -97,5 +98,8 @@
       <Link>libfreetype6.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
 </Project>

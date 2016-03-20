@@ -72,6 +72,7 @@
     <Compile Include="SharpFont\Internal\SizeMetricsRec.cs" />
     <Compile Include="SharpFont\Internal\SizeRec.cs" />
     <Compile Include="SharpFont\FT.Internal.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ObjcBindingApiDefinition Include="ApiDefinition.cs" />
@@ -83,7 +84,7 @@
     </ObjcBindingNativeLibrary>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\PokerClient\Citrus\Lime\Lime.iOS.csproj">
+    <ProjectReference Include="..\..\Lime.iOS.csproj">
       <Project>{9CFD3A2F-7DA5-420E-B475-44749DC61485}</Project>
       <Name>Lime.iOS</Name>
     </ProjectReference>
