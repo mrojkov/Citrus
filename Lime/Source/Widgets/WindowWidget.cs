@@ -65,9 +65,11 @@ namespace Lime
 			renderChain.RenderAndClear();
 		}
 
-		IPresenter IPresenter.Clone(Node newNode)
+		void IPresenter.OnAssign(Node node) { }
+
+		IPresenter IPresenter.Clone(Node node)
 		{
-			return (IPresenter)newNode;
+			return (IPresenter)node;
 		}
 
 		public void SetViewport()
@@ -82,6 +84,8 @@ namespace Lime
 
 	public class DefaultWindowWidget : WindowWidget
 	{
+		public bool CornerBlinkOnRendering;
+
 		public DefaultWindowWidget(Window window, bool continuousRendering = true)
 			: base(window, continuousRendering)
 		{
@@ -90,9 +94,24 @@ namespace Lime
 				Size = (Vector2)window.ClientSize;
 				Renderer.SetOrthogonalProjection(Vector2.Zero, Size);
 				Render();
-				Renderer.EndFrame();			
+				if (CornerBlinkOnRendering) {
+					RenderRedrawMark();
+				}				Renderer.EndFrame();
 			};
 			window.Updating += Update;
+		}
+
+		void RenderRedrawMark()
+		{
+			Renderer.Transform1 = Matrix32.Identity;
+			Renderer.Blending = Blending.Alpha;
+			Renderer.Shader = ShaderId.Diffuse;
+			Renderer.DrawRect(Vector2.Zero, Vector2.One * 4, RandomColor());
+		}
+
+		private Color4 RandomColor()
+		{
+			return new Color4((byte)Mathf.RandomInt(0, 255), (byte)Mathf.RandomInt(0, 255), (byte)Mathf.RandomInt(0, 255));
 		}
 	}
 }

@@ -100,11 +100,22 @@ namespace Lime
 		/// </summary>
 		internal Node NextToRender;
 
+		private IPresenter presenter;
 		/// <summary>
 		/// The presenter used for rendering this node.
 		/// A user can override a node rendering by replacing the presenter.
 		/// </summary>
-		public IPresenter Presenter;
+		public IPresenter Presenter
+		{
+			get { return presenter; }
+			set
+			{
+				if (value != null) {
+					value.OnAssign(this);
+				}
+				presenter = value;
+			}
+		}
 
 		/// <summary>
 		/// Shortcut to the next element of nodes of this parent.

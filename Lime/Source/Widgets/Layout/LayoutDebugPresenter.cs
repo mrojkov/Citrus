@@ -8,21 +8,24 @@ namespace Lime
 		private Node node;
 		public Color4 color;
 		
-		public LayoutDebugPresenter(Node node)
-			: this(node, Color4.Red)
+		public LayoutDebugPresenter() : this(Color4.Red)
 		{
 		}
 		
-		public LayoutDebugPresenter(Node node, Color4 color)
+		public LayoutDebugPresenter(Color4 color)
+		{
+			this.color = color;
+		}
+
+		void IPresenter.OnAssign(Node node)
 		{
 			this.node = node;
-			this.color = color;
 			oldPresenter = node.Presenter;
 		}
-		
-		public IPresenter Clone(Node newNode)
+
+		IPresenter IPresenter.Clone(Node node)
 		{
-			return new LayoutDebugPresenter(node, color);
+			return new LayoutDebugPresenter(color);
 		}
 		
 		public void Render()

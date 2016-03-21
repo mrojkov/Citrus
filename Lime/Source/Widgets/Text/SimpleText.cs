@@ -239,9 +239,11 @@ namespace Lime
 			PrepareSpriteListAndExtent();
 		}
 
-		IPresenter IPresenter.Clone(Node newNode)
+		void IPresenter.OnAssign(Node node) { }
+
+		IPresenter IPresenter.Clone(Node node)
 		{
-			return (IPresenter)newNode;
+			return (IPresenter)node;
 		}
 
 		private void PrepareSpriteListAndExtent()

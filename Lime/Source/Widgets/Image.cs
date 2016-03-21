@@ -131,9 +131,11 @@ namespace Lime
 			Renderer.DrawSprite(Texture, GlobalColor, ContentPosition, ContentSize, UV0, UV1);
 		}
 
-		IPresenter IPresenter.Clone(Node newNode)
+		void IPresenter.OnAssign(Node node) { }
+
+		IPresenter IPresenter.Clone(Node node)
 		{
-			return (IPresenter)newNode;
+			return (IPresenter)node;
 		}
 	}
 }

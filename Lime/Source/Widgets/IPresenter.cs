@@ -4,7 +4,8 @@ namespace Lime
 {
 	public interface IPresenter
 	{
+		void OnAssign(Node node);
 		void Render();
-		IPresenter Clone(Node newNode);
+		IPresenter Clone(Node node);
 	}
 }
