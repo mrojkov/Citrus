@@ -16,17 +16,13 @@ namespace Lime
 
 		[ProtoMember(2)]
 		public string Id;
-		
-		[ProtoMember(3)]
+
 		public int Time
 		{
 			get { return TimeInternal; }
 			set
 			{
 				TimeInternal = value;
-				if (Owner == null) {
-					return; // Protect us against protobuf
-				}
 				AnimationEngine.ApplyAnimators(this, false);
 			}
 		}
@@ -37,7 +33,6 @@ namespace Lime
 			set { Time = AnimationUtils.FramesToMsecs(value); }
 		}
 
-		[ProtoMember(4)]
 		public bool IsRunning;
 
 		public Node Owner;
