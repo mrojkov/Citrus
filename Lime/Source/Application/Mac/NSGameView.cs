@@ -259,30 +259,6 @@ namespace Lime.Platform
 			return true;
 		}
 
-		private void DrawRectangle(CGRect dirtyRect)
-		{
-			if (animating) {
-				if (displayLinkSupported) {
-					if (displayLink.IsRunning)
-						RenderScene();
-				} else {
-					RenderScene();
-				}
-			}
-		}
-
-#if MAC
-		public override void DrawRect(CGRect dirtyRect)
-		{
-			DrawRectangle(dirtyRect);
-		}
-#elif MONOMAC
-		public override void DrawRect(RectangleF dirtyRect)
-		{
-			DrawRectangle(new CGRect(dirtyRect));
-		}
-#endif
-
 		public override void LockFocus()
 		{
 			base.LockFocus();
@@ -310,17 +286,10 @@ namespace Lime.Platform
 						displayLink.Start();
 				} else {
 					var timeout = new TimeSpan((long)(((1.0 * TimeSpan.TicksPerSecond) / updatesPerSecond) + 0.5));
-					if (swapInterval) {
-						animationTimer = NSTimer.CreateRepeatingScheduledTimer(timeout, delegate {
-							OnUpdate();
-							NeedsDisplay = true;
-						});
-					} else {
-						animationTimer = NSTimer.CreateRepeatingScheduledTimer(timeout, delegate {
-							OnUpdate();
-							RenderScene();
-						});
-					}
+					animationTimer = NSTimer.CreateRepeatingScheduledTimer(timeout, delegate {
+						OnUpdate();
+						OnRender();
+					});
 					NSRunLoop.Current.AddTimer(animationTimer, NSRunLoopMode.Default);
 					NSRunLoop.Current.AddTimer(animationTimer, NSRunLoopMode.EventTracking);
 				}
@@ -349,7 +318,7 @@ namespace Lime.Platform
 			}
 		}
 
-		private void RenderScene()
+		private void OnRender()
 		{
 			openGLContext.CGLContext.Lock();
 			openGLContext.MakeCurrentContext();
@@ -377,7 +346,7 @@ namespace Lime.Platform
 			var result = CVReturn.Error;
 
 			using (var pool = new NSAutoreleasePool()) {
-				BeginInvokeOnMainThread(RenderScene);
+				BeginInvokeOnMainThread(OnRender);
 				result = CVReturn.Success;
 			}
 
