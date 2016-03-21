@@ -723,10 +723,20 @@ namespace Lime
 			Renderer.DrawTriangleFan(null, null, v, v.Length);
 		}
 
+		public static void DrawRect(float x0, float y0, float x1, float y1, Color4 color)
+		{
+			DrawRect(new Vector2(x0, y0), new Vector2(x1, y1), color);
+		}
+
 		public static void DrawRectOutline(Vector2 a, Vector2 b, Color4 color)
 		{
 			var thickness = 1 / Window.Current.PixelScale;
 			DrawRectOutline(a, b, color, thickness);
+		}
+
+		public static void DrawRectOutline(float x0, float y0, float x1, float y1, Color4 color)
+		{
+			DrawRectOutline(new Vector2(x0, y0), new Vector2(x1, y1), color);
 		}
 
 		public static void DrawRectOutline(Vector2 a, Vector2 b, Color4 color, float thickness)
@@ -735,6 +745,11 @@ namespace Lime
 			DrawLine(b.X, a.Y, b.X, b.Y, color, thickness, LineCap.Square);
 			DrawLine(b.X, b.Y, a.X, b.Y, color, thickness, LineCap.Square);
 			DrawLine(a.X, b.Y, a.X, a.Y, color, thickness, LineCap.Square);
+		}
+
+		public static void DrawRectOutline(float x0, float y0, float x1, float y1, Color4 color, float thickness)
+		{
+			DrawRectOutline(new Vector2(x0, y0), new Vector2(x1, y1), color, thickness);
 		}
 
 		public static void DrawVerticalGradientRect(Vector2 a, Vector2 b, ColorGradient gradient)
@@ -746,6 +761,11 @@ namespace Lime
 			Renderer.DrawTriangleFan(null, null, v, v.Length);
 		}
 
+		public static void DrawVerticalGradientRect(float x0, float y0, float x1, float y1, ColorGradient gradient)
+		{
+			DrawVerticalGradientRect(new Vector2(x0, y0), new Vector2(x1, y1), gradient);
+		}
+
 		public static void DrawVerticalGradientRect(Vector2 a, Vector2 b, Color4 topColor, Color4 bottomColor)
 		{
 			DrawVerticalGradientRect(a, b, new ColorGradient(topColor, bottomColor));
@@ -754,6 +774,11 @@ namespace Lime
 		public static Matrix44 FixupWVP(Matrix44 projection)
 		{
 			return PlatformRenderer.FixupWVP(projection);
+		}
+
+		public static void DrawVerticalGradientRect(float x0, float y0, float x1, float y1, Color4 topColor, Color4 bottomColor)
+		{
+			DrawVerticalGradientRect(new Vector2(x0, y0), new Vector2(x1, y1), topColor, bottomColor);
 		}
 	}
 }
