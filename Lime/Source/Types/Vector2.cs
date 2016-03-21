@@ -241,7 +241,27 @@ namespace Lime
 		{
 			return new Vector2(Mathf.Clamp(value.X, a.X, b.X), Mathf.Clamp(value.Y, a.Y, b.Y));
 		}
-				
+
+		public static Vector2 Round(Vector2 value)
+		{
+			return new Vector2(value.X.Round(), value.Y.Round());
+		}
+
+		public static Vector2 Ceiling(Vector2 value)
+		{
+			return new Vector2(value.X.Ceiling(), value.Y.Ceiling());
+		}
+
+		public static Vector2 Floor(Vector2 value)
+		{
+			return new Vector2(value.X.Floor(), value.Y.Floor());
+		}
+
+		public static Vector2 Truncate(Vector2 value)
+		{
+			return new Vector2(value.X.Truncate(), value.Y.Truncate());
+		}
+
 		/// <summary>
 		/// Creates a new <see cref="Vector2"/> that represents
 		/// cosine and sine of specified direction.

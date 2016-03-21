@@ -117,6 +117,21 @@ namespace Lime
 			return new IntVector2(rhs * lhs.X, rhs * lhs.Y);
 		}
 
+		public static IntVector2 Min(IntVector2 a, IntVector2 b)
+		{
+			return new IntVector2(Math.Min(a.X, b.X), Math.Min(a.Y, b.Y));
+		}
+
+		public static IntVector2 Max(IntVector2 a, IntVector2 b)
+		{
+			return new IntVector2(Math.Max(a.X, b.X), Math.Max(a.Y, b.Y));
+		}
+
+		public static IntVector2 Clamp(IntVector2 value, IntVector2 a, IntVector2 b)
+		{
+			return new IntVector2(Mathf.Clamp(value.X, a.X, b.X), Mathf.Clamp(value.Y, a.Y, b.Y));
+		}
+
 		/// <summary>
 		/// Returns the string representation of this <see cref="IntVector2"/> in the format:
 		/// "X, Y".
