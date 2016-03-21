@@ -23,7 +23,6 @@ SOFTWARE.*/
 #endregion
 
 using System;
-using System.Runtime.InteropServices;
 using SharpFont.Internal;
 
 namespace SharpFont
@@ -51,36 +50,36 @@ namespace SharpFont
 	/// <code>
 	/// FT_Pos  origin_x	   = 0;
 	///	FT_Pos  prev_rsb_delta = 0;
-	/// 
-	/// 
+	///
+	///
 	///	for all glyphs do
 	///	&lt;compute kern between current and previous glyph and add it to
 	///		`origin_x'&gt;
-	/// 
+	///
 	///	&lt;load glyph with `FT_Load_Glyph'&gt;
-	/// 
+	///
 	/// if ( prev_rsb_delta - face-&gt;glyph-&gt;lsb_delta &gt;= 32 )
 	/// 	origin_x -= 64;
 	/// else if ( prev_rsb_delta - face->glyph-&gt;lsb_delta &lt; -32 )
 	/// 	origin_x += 64;
-	/// 
+	///
 	/// prev_rsb_delta = face-&gt;glyph->rsb_delta;
-	/// 
+	///
 	/// &lt;save glyph image, or render glyph, or ...&gt;
-	/// 
+	///
 	/// origin_x += face-&gt;glyph-&gt;advance.x;
-	/// endfor  
+	/// endfor
 	/// </code>
 	/// </example>
 	public sealed class GlyphSlot
 	{
 		#region Fields
+		private readonly Face parentFace;
+		private readonly Library parentLibrary;
 
 		private IntPtr reference;
 		private GlyphSlotRec rec;
 
-		private Face parentFace;
-		private Library parentLibrary;
 
 		#endregion
 
@@ -184,7 +183,7 @@ namespace SharpFont
 		{
 			get
 			{
-				return new FTBitmap(PInvokeHelper.AbsoluteOffsetOf<GlyphSlotRec>(Reference, "bitmap"), rec.bitmap, parentLibrary);
+				return new FTBitmap(PInvokeHelper.AbsoluteOffsetOf<GlyphSlotRec>(Reference, "bitmap"), rec.bitmap);
 			}
 		}
 
@@ -314,8 +313,9 @@ namespace SharpFont
 		{
 			Error err = FT.FT_Render_Glyph(Reference, mode);
 
-			if (err != Error.Ok)
+			if (err != Error.Ok) {
 				throw new FreeTypeException(err);
+			}
 		}
 
 		#endregion

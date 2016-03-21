@@ -43,20 +43,16 @@ namespace SharpFont
 
 		private IntPtr reference;
 		private BitmapRec rec;
-
-		private Library library;
-
 		private bool disposed;
 
 		#endregion
 
 		#region Constructors
 
-		internal FTBitmap(IntPtr reference, BitmapRec bmpInt, Library library)
+		internal FTBitmap(IntPtr reference, BitmapRec bmpInt)
 		{
 			this.reference = reference;
 			this.rec = bmpInt;
-			this.library = library;
 		}
 
 		/// <summary>
@@ -70,7 +66,7 @@ namespace SharpFont
 		#endregion
 
 		#region Properties
-		
+
 		/// <summary>
 		/// Gets a value indicating whether the <see cref="FTBitmap"/> has been disposed.
 		/// </summary>
@@ -190,7 +186,7 @@ namespace SharpFont
 					throw new ObjectDisposedException("FTBitmap", "Cannot access a disposed object.");
 
 				//TODO deal with negative pitch
-				byte[] data = new byte[rec.rows * rec.pitch];
+				var data = new byte[rec.rows * rec.pitch];
 				if (data.Length != 0) {
 					Marshal.Copy(rec.buffer, data, 0, data.Length);
 				}
@@ -240,7 +236,6 @@ namespace SharpFont
 				disposed = true;
 
 				reference = IntPtr.Zero;
-				library = null;
 			}
 		}
 
