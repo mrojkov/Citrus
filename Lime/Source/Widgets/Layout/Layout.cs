@@ -11,6 +11,7 @@ namespace Lime
 
 		bool ConstraintsValid { get; }
 		bool ArrangementValid { get; }
+		bool FixedSizeConstraints { get; set; }
 
 		void OnSizeChanged(Widget widget, Vector2 sizeDelta);
 		void InvalidateArrangement(Widget widget);
@@ -25,6 +26,7 @@ namespace Lime
 
 		public bool ConstraintsValid { get; protected set; }
 		public bool ArrangementValid { get; protected set; }
+		public bool FixedSizeConstraints { get; set; }
 
 		public CommonLayout()
 		{
