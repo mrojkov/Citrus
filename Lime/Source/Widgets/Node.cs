@@ -10,6 +10,16 @@ using ProtoBuf;
 
 namespace Lime
 {
+	public class TangerineAttribute : Attribute
+	{
+		public int ColorIndex;
+
+		public TangerineAttribute(int colorIndex)
+		{
+			ColorIndex = colorIndex;
+		}
+	}
+
 	public delegate void UpdateHandler(float delta);
 
 	/// <summary>

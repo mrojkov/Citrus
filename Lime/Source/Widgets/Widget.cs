@@ -226,6 +226,7 @@ namespace Lime
 		/// Parent-relative position.
 		/// </summary>
 		[ProtoMember(1)]
+		[Tangerine(4)]
 		public Vector2 Position
 		{
 			get { return position; }
@@ -273,6 +274,7 @@ namespace Lime
 		}
 
 		[ProtoMember(2)]
+		[Tangerine(7)]
 		public Vector2 Size
 		{
 			get { return size; }
@@ -360,6 +362,7 @@ namespace Lime
 		/// (0, 0) is top-left corner, (1, 1) is bottom-right corner.
 		/// </summary>
 		[ProtoMember(3)]
+		[Tangerine(6)]
 		public Vector2 Pivot
 		{
 			get { return pivot; }
@@ -375,6 +378,7 @@ namespace Lime
 		}
 
 		[ProtoMember(4)]
+		[Tangerine(5)]
 		public Vector2 Scale
 		{
 			get { return scale; }
@@ -393,6 +397,7 @@ namespace Lime
 		/// Counter-clockwise rotation of this widget.
 		/// </summary>
 		[ProtoMember(5)]
+		[Tangerine(3)]
 		public float Rotation {
 			get { return rotation; }
 			set
@@ -410,6 +415,7 @@ namespace Lime
 		/// Hue of this widget. Contents color will be multiplied by it on render.
 		/// </summary>
 		[ProtoMember(6)]
+		[Tangerine(9)]
 		public Color4 Color
 		{
 			get { return color; }
@@ -441,6 +447,7 @@ namespace Lime
 		public Anchors Anchors { get; set; }
 
 		[ProtoMember(8)]
+		[Tangerine(10)]
 		public Blending Blending
 		{
 			get { return blending; }
@@ -467,6 +474,7 @@ namespace Lime
 		}
 
 		[ProtoMember(10)]
+		[Tangerine(2)]
 		public bool Visible
 		{
 			get { return visible; }
