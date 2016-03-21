@@ -26,7 +26,8 @@ namespace Lime
 				}
 				frame = marker.Frame;
 			}
-			animation.Frame = frame;
+			animation.TimeInternal = AnimationUtils.FramesToMsecs(frame);
+			ApplyAnimators(animation, true);
 			animation.RunningMarkerId = markerId;
 			animation.IsRunning = true;
 			return true;
