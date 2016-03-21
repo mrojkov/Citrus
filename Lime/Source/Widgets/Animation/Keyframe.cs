@@ -48,6 +48,8 @@ namespace Lime
 		/// Значение свойства
 		/// </summary>
 		object Value { get; set; }
+
+		IKeyframe Clone();
 	}
 
 	/// <summary>
@@ -119,6 +121,11 @@ namespace Lime
 				Function = Function,
 				Value = Value
 			};
+		}
+
+		IKeyframe IKeyframe.Clone()
+		{
+			return Clone();
 		}
 	}
 }

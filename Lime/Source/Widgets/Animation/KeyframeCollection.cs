@@ -1,15 +1,16 @@
 using ProtoBuf;
 using System.Collections.Generic;
+using System;
 
 namespace Lime
 {
-	public interface IKeyframeCollection : ICollection<IKeyframe>
+	public interface IKeyframeCollection : IList<IKeyframe>
 	{
-		IKeyframe this[int index] { get; set; }
-
 		IKeyframe CreateKeyframe();
 
 		void Add(int frame, object value, KeyFunction function = KeyFunction.Linear);
+		void AddOrdered(int frame, object value, KeyFunction function = KeyFunction.Linear);
+		void AddOrdered(IKeyframe keyframe);
 	}
 
 	public class KeyframeCollectionProxy<T> : IKeyframeCollection
@@ -29,6 +30,20 @@ namespace Lime
 		public void Add(int frame, object value, KeyFunction function = KeyFunction.Linear)
 		{
 			Add(new Keyframe<T> {
+				Frame = frame,
+				Value = (T)value,
+				Function = function
+			});
+		}
+
+		public void AddOrdered(IKeyframe item)
+		{
+			source.AddOrdered((Keyframe<T>)item);
+		}
+
+		public void AddOrdered(int frame, object value, KeyFunction function = KeyFunction.Linear)
+		{
+			AddOrdered(new Keyframe<T> {
 				Frame = frame,
 				Value = (T)value,
 				Function = function
@@ -89,6 +104,21 @@ namespace Lime
 		{
 			return source.GetEnumerator();
 		}
+
+		public int IndexOf(IKeyframe item)
+		{
+			return source.IndexOf((Keyframe<T>)item);
+		}
+
+		public void Insert(int index, IKeyframe item)
+		{
+			source.Insert(index, (Keyframe<T>)item);
+		}
+
+		public void RemoveAt(int index)
+		{
+			source.RemoveAt(index);
+		}
 	}
 
 	[ProtoContract]
@@ -108,6 +138,32 @@ namespace Lime
 		public void Add(int frame, T value, KeyFunction function = KeyFunction.Linear)
 		{
 			Add(new Keyframe<T>(frame, value, function));
+		}
+
+		public new void Add(Keyframe<T> keyframe)
+		{
+			if (Count == 0 || keyframe.Frame > this[Count - 1].Frame) {
+				base.Add(keyframe);
+			} else {
+				throw new InvalidOperationException();
+			}
+		}
+
+		public void AddOrdered(Keyframe<T> keyframe)
+		{
+			if (Count == 0 || keyframe.Frame > this[Count - 1].Frame) {
+				base.Add(keyframe);
+			} else {
+				int i = 0;
+				while (this[i].Frame < keyframe.Frame) {
+					i++;
+				}
+				if (this[i].Frame == keyframe.Frame) {
+					this[i] = keyframe;
+				} else {
+					Insert(i, keyframe);
+				}
+			}
 		}
 	}
 }
