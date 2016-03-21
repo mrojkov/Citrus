@@ -262,7 +262,7 @@ namespace Lime
 			}
 		}
 
-		internal void PrepareRendererState()
+		public void PrepareRendererState()
 		{
 			Renderer.Transform1 = LocalToWorldTransform;
 			Renderer.Blending = GlobalBlending;
