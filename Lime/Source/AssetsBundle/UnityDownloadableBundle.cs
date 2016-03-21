@@ -11,9 +11,11 @@ namespace Lime
 	{
 		private List<string> fileList;
 		private UnityEngine.AssetBundle bundle;
+		private string prefix;
 
 		public UnityDownloadableBundle(UnityEngine.AssetBundle bundle)
 		{
+			this.prefix = "Assets/Bundles/" + bundle.name + "/";
 			this.bundle = bundle;
 			ReadFileList();
 		}
@@ -30,7 +32,7 @@ namespace Lime
 
 		public override T LoadUnityAsset<T>(string path)
 		{
-			path = GetAssetPathWOExtension(path);
+			path = LimePathToUnityPath(path);
 			var result = bundle.LoadAsset(path) as T;
 			if (result == null) {
 				throw new Lime.Exception("Asset not found: {0}", path);
@@ -38,11 +40,16 @@ namespace Lime
 			return result;
 		}
 
-		private string GetAssetPathWOExtension(string path)
+		private string LimePathToUnityPath(string path)
+		{
+			return prefix + GetAssetPathWithRightExtension(path);
+		}
+
+		private string GetAssetPathWithRightExtension(string path)
 		{
 			var ext = Path.GetExtension(path);
-			if (ext == ".png" || ext == ".txt" || ext == ".ogg") {
-				path = System.IO.Path.ChangeExtension(path, null);
+			if (ext != ".png" && ext != ".txt" && ext != ".ogg" && ext != ".ogv") {
+				path += ".bytes";
 			}
 			return path;
 		}
@@ -72,7 +79,7 @@ namespace Lime
 		{
 			throw new NotImplementedException();
 		}
-		
+
 		public override IEnumerable<string> EnumerateFiles()
 		{
 			return fileList.ToArray();

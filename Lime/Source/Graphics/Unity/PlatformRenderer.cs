@@ -36,6 +36,19 @@ namespace Lime
 		internal static ShaderProgram CustomShader;
 		internal static ITexture[] Textures = new ITexture[2];
 
+		private static bool ztest = false;
+		private static bool zwrite = true;
+
+		internal static bool ZTest 
+		{ 
+			get { return ztest; }
+		}
+
+		internal static bool ZWrite
+		{ 
+			get { return zwrite; }
+		}
+
 		public static void SetTexture(ITexture texture, int stage)
 		{
 			Textures[stage] = texture;
@@ -86,6 +99,16 @@ namespace Lime
 		{
 			scissorTest = value;
 			viewportOrProjectionChanged = true;
+		}
+
+		public static void EnableZTest(bool value)
+		{
+			ztest = value;
+		}
+
+		public static void EnableZWrite(bool value)
+		{
+			zwrite = value;
 		}
 
 		public static void SetViewportAndProject()

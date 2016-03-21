@@ -8,6 +8,8 @@ namespace Orange
 {
 	public class UnityAssetBundle : Lime.UnpackedAssetsBundle
 	{
+		private bool needToUpdateFilesTXT = false;
+
 		public UnityAssetBundle(string baseDirectory)
 			: base(baseDirectory)
 		{
@@ -16,7 +18,7 @@ namespace Orange
 		private string AdjustExtensionForBinaryAsset(string path)
 		{
 			var ext = Path.GetExtension(path);
-			if (ext != ".png" && ext != ".txt" && ext != ".ogg" && ext != ".shader") {
+			if (ext != ".png" && ext != ".txt" && ext != ".ogg" && ext != ".shader" && ext != ".ogv") {
 				path += ".bytes";
 			}
 			return path;
@@ -35,6 +37,7 @@ namespace Orange
 		public override void DeleteFile(string path)
 		{
 			base.DeleteFile(AdjustExtensionForBinaryAsset(path));
+			needToUpdateFilesTXT = true;
 		}
 
 		public override bool FileExists(string path)
@@ -45,6 +48,7 @@ namespace Orange
 		public override void ImportFile(string path, Stream stream, int reserve, Lime.AssetAttributes attributes)
 		{
 			base.ImportFile(AdjustExtensionForBinaryAsset(path), stream, reserve, attributes);
+			needToUpdateFilesTXT = true;
 		}
 
 		public override IEnumerable<string> EnumerateFiles()
@@ -73,7 +77,9 @@ namespace Orange
 
 		private void SaveFileList()
 		{
-			File.WriteAllLines(BaseDirectory + "/Files.txt", EnumerateFiles());
+			if (needToUpdateFilesTXT) {
+				File.WriteAllLines(BaseDirectory + "/Files.txt", EnumerateFiles());
+			}
 		}
 	}
 }

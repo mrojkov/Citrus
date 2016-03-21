@@ -13,6 +13,9 @@ namespace Lime
 		static UnityEngine.Material diffuseMat3d;
 		static UnityEngine.Material imageCombinerMat;
 		static UnityEngine.Material silhuetteMat;
+		static UnityEngine.Material silhuetteWith2TexturesMat;
+		static UnityEngine.Material silhuetteInversedMat;
+		static UnityEngine.Material movieWithSeparateAlphaMat;
 		public static bool ThreeDimensionalRendering;
 
 		static MaterialFactory()
@@ -22,26 +25,41 @@ namespace Lime
 			diffuseMat3d = new UnityEngine.Material(UnityEngine.Shader.Find("Diffuse3d"));
 			imageCombinerMat = new UnityEngine.Material(UnityEngine.Shader.Find("ImageCombiner"));
 			silhuetteMat = new UnityEngine.Material(UnityEngine.Shader.Find("Silhuette"));
+			silhuetteWith2TexturesMat = new UnityEngine.Material(UnityEngine.Shader.Find("SilhuetteWith2Textures"));
+			silhuetteInversedMat = new UnityEngine.Material(UnityEngine.Shader.Find("SilhuetteInversed"));
+			movieWithSeparateAlphaMat = new UnityEngine.Material(UnityEngine.Shader.Find("MovieWithSeparateAlpha"));
 		}
 
-		public static UnityEngine.Material GetMaterial(Blending blending, ShaderId shaderId, ITexture texture1, ITexture texture2)
-		{
+		public static UnityEngine.Material GetMaterial(Blending blending, bool zTestMode, bool zWriteMode, ShaderId shaderId, ITexture texture1, ITexture texture2)
+		{ 
 			UnityEngine.Material mat;
 			var texCount = texture1 != null ? (texture2 != null ? 2 : 1) : 0;
 			switch (shaderId) {
 			case ShaderId.Silhuette:
-				mat = silhuetteMat;
+				mat = texCount == 2 ? silhuetteWith2TexturesMat : silhuetteMat;
 				break;
 			default:
+				if (texCount == 1 && shaderId == ShaderId.InversedSilhuette) {
+					mat = silhuetteInversedMat;
+					break;
+				} 
 				mat = texCount == 2 ? imageCombinerMat : (texCount == 1 ? 
 					(ThreeDimensionalRendering ? diffuseMat3d : diffuseMat) : flatMat);
+				if (texCount == 1 && texture1 is MovieTexture) {
+					mat = movieWithSeparateAlphaMat;
+				}
 				break;
 			}
-			if (texture1 != null) {
+			if (mat == movieWithSeparateAlphaMat) {
 				mat.mainTexture = texture1.GetUnityTexture();
-			}
-			if (texture2 != null) {
-				mat.SetTexture("SecondTex", texture2.GetUnityTexture());
+				mat.SetTexture("SecondTex", texture1.AlphaTexture.GetUnityTexture());
+			} else {
+				if (texture1 != null) {
+					mat.mainTexture = texture1.GetUnityTexture();
+				}
+				if (texture2 != null) {
+					mat.SetTexture("SecondTex", texture2.GetUnityTexture());
+				}
 			}
 			UnityEngine.Rendering.BlendMode srcMode, dstMode;
 			switch (blending) {
@@ -70,6 +88,8 @@ namespace Lime
 			}
 			mat.SetInt("BlendSrcMode", (int)srcMode);
 			mat.SetInt("BlendDstMode", (int)dstMode);
+			//mat.SetInt("ZWriteMode", zWriteMode ? 1 : 0);
+			mat.SetInt ("ZTestMode", zTestMode ? (int)UnityEngine.Rendering.CompareFunction.LessEqual : (int)UnityEngine.Rendering.CompareFunction.Always);
 			return mat;
 		}
 	}

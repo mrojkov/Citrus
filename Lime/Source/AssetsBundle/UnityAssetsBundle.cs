@@ -29,7 +29,7 @@ namespace Lime
 		private string GetAssetPathWOExtension(string path)
 		{
 			var ext = Path.GetExtension(path);
-			if (ext == ".png" || ext == ".txt" || ext == ".ogg") {
+			if (ext == ".png" || ext == ".txt" || ext == ".ogg" || ext == ".ogv") {
 				path = System.IO.Path.ChangeExtension(path, null);
 			}
 			return path;

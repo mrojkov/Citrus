@@ -26,7 +26,7 @@ namespace Lime
 			set { ImageSize = value; }
 		}
 
-		public UnityEngine.Texture GetUnityTexture()
+		public virtual UnityEngine.Texture GetUnityTexture()
 		{
 			return unityTexture;
 		}
@@ -42,7 +42,7 @@ namespace Lime
 			get { return new Rectangle(0, 0, 1, 1); }
 		}
 
-		public ITexture AlphaTexture { get; private set; }
+		public ITexture AlphaTexture { get; protected set; }
 		
 		public void TransformUVCoordinatesToAtlasSpace(ref Vector2 uv) { }
 
@@ -64,7 +64,7 @@ namespace Lime
 		public void LoadImage(Bitmap bitmap)
 		{
 			using (var stream = new MemoryStream()) {
-				bitmap.SaveToStream(stream);
+				bitmap.SaveTo(stream);
 				stream.Position = 0;
 				LoadImage(stream);
 			}
@@ -132,7 +132,7 @@ namespace Lime
 		/// <summary>
 		/// Create texture from pixel array
 		/// </summary>
-		public void LoadImage(Color4[] pixels, int width, int height, bool generateMips)
+		public void LoadImage(Color4[] pixels, int width, int height, bool generateMips = false)
 		{
 			Dispose();
 			unityTexture = new UnityEngine.Texture2D(width, height);

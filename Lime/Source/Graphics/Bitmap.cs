@@ -9,6 +9,8 @@ using NativeBitmap = AppKit.NSImage;
 using NativeBitmap = UIKit.UIImage;
 #elif ANDROID
 using NativeBitmap = Android.Graphics.Bitmap;
+#elif UNITY
+using NativeBitmap = UnityEngine.Texture2D;
 #endif
 
 namespace Lime
