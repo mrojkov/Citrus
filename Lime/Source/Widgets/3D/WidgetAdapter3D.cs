@@ -1,6 +1,6 @@
 ﻿namespace Lime
 {
-	public class WidgetAdapter : ModelNode, IModelRenderObject
+	public class WidgetAdapter3D : Node3D, IRenderObject3D
 	{
 		private Widget widget;
 		
@@ -27,7 +27,7 @@
 			get { return (Vector3)Widget.Center * GlobalTransform; }
 		}
 
-		public WidgetAdapter()
+		public WidgetAdapter3D()
 		{
 			DoubleSided = true;
 		}

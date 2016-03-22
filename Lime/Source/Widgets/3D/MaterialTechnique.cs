@@ -2,9 +2,9 @@
 
 namespace Lime
 {
-	internal class ModelMaterialTechnique : ShaderProgram
+	internal class MaterialTechnique : ShaderProgram
 	{
-		private static readonly ModelMaterialTechnique[] instances;
+		private static readonly MaterialTechnique[] instances;
 
 		private const string VertexShader = @"
 			#ifdef GL_ES
@@ -71,26 +71,26 @@ namespace Lime
 			}
 		";
 
-		private ModelMaterialCap caps;
+		private MaterialCap caps;
 		private UniformIds uniformIds;
 
-		static ModelMaterialTechnique()
+		static MaterialTechnique()
 		{
-			var allCaps = EnumExtensions.GetAtomicFlags<ModelMaterialCap>();
+			var allCaps = EnumExtensions.GetAtomicFlags<MaterialCap>();
 			var entryCount = 1 << allCaps.Length;
-			instances = new ModelMaterialTechnique[entryCount];
+			instances = new MaterialTechnique[entryCount];
 			for (var i = 0; i < entryCount; i++) {
-				var caps = ModelMaterialCap.None;
+				var caps = MaterialCap.None;
 				foreach (var cap in allCaps) {
 					if ((i & (int)cap) == (int)cap) {
 						caps |= cap;
 					}
 				}
-				instances[(int)caps] = new ModelMaterialTechnique(caps);
+				instances[(int)caps] = new MaterialTechnique(caps);
 			}
 		}
 
-		public ModelMaterialTechnique(ModelMaterialCap caps)
+		public MaterialTechnique(MaterialCap caps)
 			: base(GetShaders(caps), GetAttribLocations(), GetSamplers())
 		{
 			this.caps = caps;
@@ -104,19 +104,19 @@ namespace Lime
 			uniformIds.Bones = GetUniformId("u_Bones");
 		}
 
-		public void Apply(ModelMaterial material, ref ModelMaterialExternals externals)
+		public void Apply(Material material, ref MaterialExternals externals)
 		{
 			Use();
 			LoadMatrix(uniformIds.WorldViewProj, externals.WorldViewProj);
 			LoadColor(uniformIds.DiffuseColor, material.DiffuseColor);
 			LoadFloat(uniformIds.Opacity, material.Opacity);
-			if ((caps & ModelMaterialCap.Skin) != 0) {
+			if ((caps & MaterialCap.Skin) != 0) {
 				LoadMatrixArray(uniformIds.Bones, externals.Bones, externals.BoneCount);
 			}
-			if ((caps & ModelMaterialCap.DiffuseTexture) != 0) {
+			if ((caps & MaterialCap.DiffuseTexture) != 0) {
 				PlatformRenderer.SetTexture(material.DiffuseTexture.GetHandle(), TextureUnits.Diffuse);
 			}
-			if ((caps & ModelMaterialCap.OpacityTexture) != 0) {
+			if ((caps & MaterialCap.OpacityTexture) != 0) {
 #if ANDROID
 				PlatformRenderer.SetTexture(material.OpacityTexture.AlphaTexture.GetHandle(), TextureUnits.Opacity);
 #else
@@ -126,12 +126,12 @@ namespace Lime
 			PlatformRenderer.SetBlending(Blending.Alpha);
 		}
 
-		public static ModelMaterialTechnique Get(ModelMaterialCap caps)
+		public static MaterialTechnique Get(MaterialCap caps)
 		{
 			return instances[(int)caps];
 		}
 
-		private static IEnumerable<Shader> GetShaders(ModelMaterialCap caps)
+		private static IEnumerable<Shader> GetShaders(MaterialCap caps)
 		{
 			return new Shader[] {
 				new VertexShader(AddDefinitions(VertexShader, caps)),
@@ -142,14 +142,14 @@ namespace Lime
 		private static IEnumerable<AttribLocation> GetAttribLocations()
 		{
 			return new AttribLocation[] {
-				new AttribLocation { Name = "a_Position", Index = PlatformMesh.Attributes.Vertex },
-				new AttribLocation { Name = "a_Color", Index = PlatformMesh.Attributes.Color },
-				new AttribLocation { Name = "a_DiffuseUV", Index = PlatformMesh.Attributes.UV1 },
-				new AttribLocation { Name = "a_SpecularUV", Index = PlatformMesh.Attributes.UV2 },
-				new AttribLocation { Name = "a_HeightUV", Index = PlatformMesh.Attributes.UV3 },
-				new AttribLocation { Name = "a_OpacityUV", Index = PlatformMesh.Attributes.UV4 },
-				new AttribLocation { Name = "a_BlendIndices", Index = PlatformMesh.Attributes.BlendIndices },
-				new	AttribLocation { Name = "a_BlendWeights", Index = PlatformMesh.Attributes.BlendWeights }
+				new AttribLocation { Name = "a_Position", Index = PlatformGeometryBuffer.Attributes.Vertex },
+				new AttribLocation { Name = "a_Color", Index = PlatformGeometryBuffer.Attributes.Color },
+				new AttribLocation { Name = "a_DiffuseUV", Index = PlatformGeometryBuffer.Attributes.UV1 },
+				new AttribLocation { Name = "a_SpecularUV", Index = PlatformGeometryBuffer.Attributes.UV2 },
+				new AttribLocation { Name = "a_HeightUV", Index = PlatformGeometryBuffer.Attributes.UV3 },
+				new AttribLocation { Name = "a_OpacityUV", Index = PlatformGeometryBuffer.Attributes.UV4 },
+				new AttribLocation { Name = "a_BlendIndices", Index = PlatformGeometryBuffer.Attributes.BlendIndices },
+				new	AttribLocation { Name = "a_BlendWeights", Index = PlatformGeometryBuffer.Attributes.BlendWeights }
 			};
 		}
 
@@ -163,9 +163,9 @@ namespace Lime
 			};
 		}
 
-		private static string AddDefinitions(string shader, ModelMaterialCap caps)
+		private static string AddDefinitions(string shader, MaterialCap caps)
 		{
-			if ((caps & ModelMaterialCap.DiffuseTexture) != 0) {
+			if ((caps & MaterialCap.DiffuseTexture) != 0) {
 				shader = "#define DIFFUSE_TEXTURE_ENABLED\n" + shader;
 			}
 //			if ((caps & ModelMaterialCap.SpecularTexture) != 0) {
@@ -182,7 +182,7 @@ namespace Lime
 //				shader = "#define OPACITY_ALPHA_CHANNEL a\n" + shader;
 //#endif
 //			}
-			if ((caps & ModelMaterialCap.Skin) != 0) {
+			if ((caps & MaterialCap.Skin) != 0) {
 				shader = "#define SKIN_ENABLED\n" + shader;
 			}
 			return shader;

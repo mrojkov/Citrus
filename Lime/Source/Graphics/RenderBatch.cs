@@ -16,7 +16,7 @@ namespace Lime
 		public int LastVertex;
 		public int StartIndex;
 		public int LastIndex;
-		public Mesh Mesh;
+		public GeometryBuffer Geometry;
 		public bool OwnsMesh;
 
 		public RenderBatch()
@@ -31,11 +31,11 @@ namespace Lime
 			Shader = ShaderId.None;
 			CustomShaderProgram = null;
 			StartIndex = LastIndex = LastVertex = 0;
-			if (Mesh != null) {
+			if (Geometry != null) {
 				if (OwnsMesh) {
-					MeshesForBatchingPool.Release(Mesh);
+					GeometryBufferPool.Release(Geometry);
 				}
-				Mesh = null;
+				Geometry = null;
 			}
 			OwnsMesh = false;
 		}
@@ -46,7 +46,7 @@ namespace Lime
 			PlatformRenderer.SetTexture(Texture2, 1);
 			PlatformRenderer.SetBlending(Blending);
 			PlatformRenderer.SetShader(Shader, CustomShaderProgram);
-			Mesh.Render(StartIndex, LastIndex - StartIndex);
+			Geometry.Render(StartIndex, LastIndex - StartIndex);
 			Renderer.DrawCalls++;
 		}
 	}
@@ -70,21 +70,21 @@ namespace Lime
 		}
 	}
 
-	static class MeshesForBatchingPool
+	static class GeometryBufferPool
 	{
-		private static Stack<Mesh> items = new Stack<Mesh>();
+		private static Stack<GeometryBuffer> items = new Stack<GeometryBuffer>();
 
-		public static Mesh Acquire()
+		public static GeometryBuffer Acquire()
 		{
 			if (items.Count == 0) {
-				var mesh = new Mesh();
-				mesh.Allocate(RenderBatch.VertexBufferCapacity, RenderBatch.IndexBufferCapacity, Mesh.Attributes.VertexColorUV12);
+				var mesh = new GeometryBuffer();
+				mesh.Allocate(RenderBatch.VertexBufferCapacity, RenderBatch.IndexBufferCapacity, GeometryBuffer.Attributes.VertexColorUV12);
 				return mesh;
 			}
 			return items.Pop();
 		}
 
-		public static void Release(Mesh item)
+		public static void Release(GeometryBuffer item)
 		{
 			items.Push(item);
 		}

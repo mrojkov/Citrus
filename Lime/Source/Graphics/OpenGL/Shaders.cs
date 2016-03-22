@@ -240,7 +240,7 @@ namespace Lime
 			// #ifdef - breaks Unity3D compiler
 			fragmentShader = fragmentShader.Replace('$', '#');
 			return new MultiShaderProgram(
-				vertexShader, fragmentShader, PlatformMesh.Attributes.GetLocations(), 
+				vertexShader, fragmentShader, PlatformGeometryBuffer.Attributes.GetLocations(), 
 				GetSamplers(), mask);
 		}
 

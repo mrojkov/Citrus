@@ -12,8 +12,8 @@ namespace Lime
 		public RenderBatch GetBatch(ITexture texture1, ITexture texture2, Blending blending, ShaderId shader, ShaderProgram customShaderProgram, int vertexCount, int indexCount)
 		{
 			bool needMesh = lastBatch == null || 
-				lastBatch.LastVertex + vertexCount > lastBatch.Mesh.Vertices.Length ||
-				lastBatch.LastIndex + indexCount > lastBatch.Mesh.Indices.Length;
+				lastBatch.LastVertex + vertexCount > lastBatch.Geometry.Vertices.Length ||
+				lastBatch.LastIndex + indexCount > lastBatch.Geometry.Indices.Length;
 			if (!needMesh &&
 				(GetTextureHandle(lastBatch.Texture1) == GetTextureHandle(texture1)) &&
 				(GetTextureHandle(lastBatch.Texture2) == GetTextureHandle(texture2)) &&
@@ -24,14 +24,14 @@ namespace Lime
 			}
 			var batch = RenderBatchPool.Acquire();
 			if (needMesh) {
-				batch.Mesh = MeshesForBatchingPool.Acquire();
+				batch.Geometry = GeometryBufferPool.Acquire();
 				batch.OwnsMesh = true;
 				lastBatch = batch;
 			}
 			batch.StartIndex = lastBatch.LastIndex;
 			batch.LastVertex = lastBatch.LastVertex;
 			batch.LastIndex = lastBatch.LastIndex;
-			batch.Mesh = lastBatch.Mesh;
+			batch.Geometry = lastBatch.Geometry;
 			batch.Texture1 = texture1;
 			batch.Texture2 = texture2;
 			batch.Blending = blending;

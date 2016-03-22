@@ -74,7 +74,7 @@ namespace Lime
 				n2 = -n2;
 			}
 			Vector2 p = b;
-			Geometry.CalcLinesIntersection(a + n1, b + n1, b + n2, c + n2, ref p);
+			GeometryUtils.CalcLinesIntersection(a + n1, b + n1, b + n2, c + n2, ref p);
 			DrawQuad(a - n1, b - n1, p, a + n1);
 			DrawQuad(c - n2, b - n2, p, c + n2);
 			FillJointGap(p, b, n1, n2);

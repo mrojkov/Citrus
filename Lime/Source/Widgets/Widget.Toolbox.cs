@@ -83,7 +83,7 @@ namespace Lime
 					var isOutside = true;
 					for (int j = 0; j < 4; j++) {
 						var pt = matrices[1 - k] * (rect[j] * sizes[1 - k]);
-						isOutside = isOutside && Geometry.CalcPointHalfPlane(pt, ptA, ptB) * det[k] < 0;
+						isOutside = isOutside && GeometryUtils.CalcPointHalfPlane(pt, ptA, ptB) * det[k] < 0;
 					}
 					if (isOutside)
 						return false;

@@ -25,7 +25,7 @@ namespace Lime
 	[ProtoInclude(107, typeof(SplineGear))]
 	[ProtoInclude(108, typeof(TextStyle))]
 	[ProtoInclude(109, typeof(LinearLayout))]
-	[ProtoInclude(110, typeof(ModelNode))]
+	[ProtoInclude(110, typeof(Node3D))]
 	[DebuggerTypeProxy(typeof(NodeDebugView))]
 	public class Node : IDisposable
 	{
@@ -93,7 +93,7 @@ namespace Lime
 
 		public Widget AsWidget { get; internal set; }
 
-		public ModelNode AsModelNode { get; internal set; }
+		public Node3D AsModelNode { get; internal set; }
 
 		/// <summary>
 		/// TODO: Add summary

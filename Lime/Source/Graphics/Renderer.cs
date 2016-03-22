@@ -391,14 +391,14 @@ namespace Lime
 			var batch = DrawTrianglesHelper(texture1, texture2, vertices, numVertices);
 			var baseVertex = batch.LastVertex;
 			int j = batch.LastIndex;
-			var indices = batch.Mesh.Indices;
+			var indices = batch.Geometry.Indices;
 			for (int i = 1; i <= numVertices - 2; i++) {
 				indices[j++] = (ushort)(baseVertex);
 				indices[j++] = (ushort)(baseVertex + i);
 				indices[j++] = (ushort)(baseVertex + i + 1);
 				batch.LastIndex += 3;
 			}
-			batch.Mesh.IndicesDirty = true;
+			batch.Geometry.IndicesDirty = true;
 			batch.LastVertex += numVertices;
 		}
 
@@ -417,7 +417,7 @@ namespace Lime
 			var batch = DrawTrianglesHelper(texture1, texture2, vertices, numVertices);
 			var vertex = batch.LastVertex;
 			int j = batch.LastIndex;
-			var indices = batch.Mesh.Indices;
+			var indices = batch.Geometry.Indices;
 			for (int i = 0; i < numVertices - 2; i++) {
 				indices[j++] = (ushort)vertex;
 				indices[j++] = (ushort)(vertex + 1);
@@ -425,7 +425,7 @@ namespace Lime
 				vertex++;
 				batch.LastIndex += 3;
 			}
-			batch.Mesh.IndicesDirty = true;
+			batch.Geometry.IndicesDirty = true;
 			batch.LastVertex += numVertices;
 		}
 
@@ -433,8 +433,8 @@ namespace Lime
 		{
 			var batch = CurrentRenderList.GetBatch(texture1, texture2, Blending, Shader, CustomShaderProgram, numVertices, (numVertices - 2) * 3);
 			var transform = GetEffectiveTransform();
-			var mesh = batch.Mesh;
-			mesh.DirtyAttributes |= Mesh.Attributes.VertexColorUV12 | (texture2 != null ? Mesh.Attributes.UV2 : Mesh.Attributes.None);
+			var mesh = batch.Geometry;
+			mesh.DirtyAttributes |= GeometryBuffer.Attributes.VertexColorUV12 | (texture2 != null ? GeometryBuffer.Attributes.UV2 : GeometryBuffer.Attributes.None);
 			int j = batch.LastVertex;
 			for (int i = 0; i < numVertices; i++) {
 				var v = vertices[i];
@@ -476,8 +476,8 @@ namespace Lime
 				texture.TransformUVCoordinatesToAtlasSpace(ref uv0);
 				texture.TransformUVCoordinatesToAtlasSpace(ref uv1);
 			}
-			var mesh = batch.Mesh;
-			mesh.DirtyAttributes |= Mesh.Attributes.VertexColorUV12;
+			var mesh = batch.Geometry;
+			mesh.DirtyAttributes |= GeometryBuffer.Attributes.VertexColorUV12;
 			mesh.IndicesDirty = true;
 			int bv = batch.LastVertex;
 			int bi = batch.LastIndex;
@@ -571,8 +571,8 @@ namespace Lime
 					batchedSprites[0].Texture, null, Blending, Shader, CustomShaderProgram, 4 * batchLength, 6 * batchLength);
 				int bv = batch.LastVertex;
 				int bi = batch.LastIndex;
-				var mesh = batch.Mesh;
-				mesh.DirtyAttributes |= Mesh.Attributes.VertexColorUV12;
+				var mesh = batch.Geometry;
+				mesh.DirtyAttributes |= GeometryBuffer.Attributes.VertexColorUV12;
 				mesh.IndicesDirty = true;
 				var indices = mesh.Indices;
 				var v = mesh.Vertices;

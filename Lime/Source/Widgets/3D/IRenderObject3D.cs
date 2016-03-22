@@ -1,6 +1,6 @@
 ﻿namespace Lime
 {
-	public interface IModelRenderObject
+	public interface IRenderObject3D
 	{
 		Vector3 Center { get; }
 		void Render();

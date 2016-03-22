@@ -68,7 +68,7 @@ namespace Lime
 	[ProtoInclude(109, typeof(Slider))]
 	[ProtoInclude(110, typeof(RichText))]
 	[ProtoInclude(112, typeof(Movie))]
-	[ProtoInclude(113, typeof(ModelViewport))]
+	[ProtoInclude(113, typeof(Viewport3D))]
 	[DebuggerTypeProxy(typeof(WidgetDebugView))]
 	public partial class Widget : Node
 	{
