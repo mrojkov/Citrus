@@ -19,6 +19,8 @@ namespace Lime
 		private static Blending blending;
 		private static ShaderProgram shaderProgram;
 		private static bool premultipliedAlphaMode;
+		private static CullMode cullMode;
+
 		// First texture pair is used for creation mask effect, second pair - for representing ETC1 alpha channel
 		private static readonly uint[] textures = new uint[4];
 
@@ -72,7 +74,7 @@ namespace Lime
 				shaderProgram.Use();
 				var projection = Renderer.Projection;
 				// OpenGL has a nice peculiarity: for render targets we must flip Y axis.
-				if (CurrentFramebuffer != DefaultFramebuffer) {
+				if (IsOffscreen()) {
 					FlipProjectionYAxis(ref projection);
 				}
 				shaderProgram.LoadMatrix(program.ProjectionMatrixUniformId, projection);
@@ -253,6 +255,29 @@ namespace Lime
 		{
 			CurrentFramebuffer = framebuffer;
 			GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer);
+			SetCullMode(cullMode);
+		}
+
+		public static void SetCullMode(CullMode value)
+		{
+			if (value != CullMode.None) {
+				GL.Enable(EnableCap.CullFace);
+			} else {
+				GL.Disable(EnableCap.CullFace);
+				return;
+			}
+			GL.CullFace(CullFaceMode.Back);
+			if (value == CullMode.CullClockwise) {
+				GL.FrontFace(IsOffscreen() ? FrontFaceDirection.Cw : FrontFaceDirection.Ccw);
+			} else {
+				GL.FrontFace(IsOffscreen() ? FrontFaceDirection.Ccw : FrontFaceDirection.Cw);
+			}
+			cullMode = value;
+		}
+
+		private static bool IsOffscreen()
+		{
+			return CurrentFramebuffer != DefaultFramebuffer;
 		}
 	}
 }

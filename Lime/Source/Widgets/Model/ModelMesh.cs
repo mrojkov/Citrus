@@ -139,7 +139,7 @@ namespace Lime
 	}
 
 	[ProtoContract]
-	public class ModelSubmesh
+	public class ModelSubmesh : IModelRenderObject
 	{
 		private static Matrix44[] sharedBoneTransforms = new Matrix44[] { };
 
@@ -155,6 +155,7 @@ namespace Lime
 		public ModelMesh ModelMesh;
 
 		private Vector3? center;
+
 		public Vector3 Center
 		{
 			get
@@ -167,9 +168,8 @@ namespace Lime
 					}
 					center /= n;
 				}
-				return center.Value;
+				return center.Value * ModelMesh.GlobalTransform;
 			}
-			private set { center = value; }
 		}
 
 		public ModelSubmesh()

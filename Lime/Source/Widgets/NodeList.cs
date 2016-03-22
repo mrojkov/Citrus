@@ -194,9 +194,6 @@ namespace Lime
 			if (node.Parent != null) {
 				throw new Lime.Exception("Can't adopt a node twice. Call node.Unlink() first");
 			}
-			if (node.AsWidget != null && owner.AsWidget == null) {
-				throw new Lime.Exception("A widget can be adopted only by other widget");
-			}
 		}
 
 		public bool Remove(Node node)

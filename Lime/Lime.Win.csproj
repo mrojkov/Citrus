@@ -144,6 +144,8 @@
     <Compile Include="Source\Widgets\Layout\HBoxLayout.cs" />
     <Compile Include="Source\Widgets\Layout\LayoutDebugPresenter.cs" />
     <Compile Include="Source\Widgets\Layout\FlowLayout.cs" />
+    <Compile Include="Source\Widgets\Model\WidgetAdapter.cs" />
+    <Compile Include="Source\Widgets\Model\IModelRenderObject.cs" />
     <Compile Include="Source\Widgets\Model\ModelMaterialTechnique.cs" />
     <Compile Include="Source\Widgets\Text\IKeyboardInputProcessor.cs" />
     <Compile Include="Source\Widgets\Text\IText.cs" />

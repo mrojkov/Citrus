@@ -20,26 +20,28 @@ namespace Lime
 		private ModelCamera camera;
 		private RenderChain chain = new RenderChain();
 		private float frame;
-		private List<ModelSubmesh> submeshes;
+		private List<IModelRenderObject> renderQueue;
 		private List<ModelMesh> modelMeshes;
 		private bool zSortEnabled;
+
 		public bool ZSortEnabled {
 			get { return zSortEnabled; }
 			set
 			{
 				if (value) {
 					if (!zSortEnabled) {
-						submeshes = new List<ModelSubmesh>();
+						renderQueue = new List<IModelRenderObject>();
 						modelMeshes = new List<ModelMesh>();
 					}
 				} else {
-					submeshes = null;
+					renderQueue = null;
 					modelMeshes = null;
 				}
 				zSortEnabled = value;
 			}
 		}
-		private MeshCameraDistanceComparer meshCameraDistanceComparer = new MeshCameraDistanceComparer();
+
+		private DepthComparer depthComparer = new DepthComparer();
 
 		public ModelCamera Camera
 		{
@@ -47,7 +49,7 @@ namespace Lime
 			set
 			{
 				camera = value;
-				meshCameraDistanceComparer.Camera = camera;
+				depthComparer.Camera = camera;
 				AdjustCameraAspectRatio();
 			}
 		}
@@ -92,21 +94,15 @@ namespace Lime
 			}
 		}
 
-		internal class MeshCameraDistanceComparer : IComparer<ModelSubmesh>
+		private class DepthComparer : IComparer<IModelRenderObject>
 		{
 			public ModelCamera Camera;
 
-			public int Compare(ModelSubmesh a, ModelSubmesh b)
+			public int Compare(IModelRenderObject a, IModelRenderObject b)
 			{
-				float da = (a.Center * a.ModelMesh.GlobalTransform * Camera.View).Z;
-				float db = (b.Center * b.ModelMesh.GlobalTransform * Camera.View).Z;
-				if (da == db) {
-					return 0;
-				} else if (da > db) {
-					return 1;
-				} else {
-					return -1;
-				}
+				float da = (a.Center * Camera.View).Z;
+				float db = (b.Center * Camera.View).Z;
+				return da.CompareTo(db);
 			}
 		}
 
@@ -115,37 +111,41 @@ namespace Lime
 			foreach (var node in Nodes) {
 				node.AddToRenderChain(chain);
 			}
+			var oldCullMode = Renderer.CullMode;
 			var oldZTestEnabled = Renderer.ZTestEnabled;
 			var oldZWriteEnabled = Renderer.ZWriteEnabled;
 			Renderer.Flush();
 			Renderer.PushProjectionMatrix();
 			Renderer.Projection = TransformProjection(Renderer.Projection);
 #if OPENGL
-			GL.Enable(EnableCap.CullFace);
+			Renderer.CullMode = CullMode.CullClockwise;
 #elif UNITY
 			MaterialFactory.ThreeDimensionalRendering = true;
 #endif
 			if (ZSortEnabled) {
 				for (int i = 0; i <= chain.MaxUsedLayer; i++) {
 					Node node = chain.Layers[i];
-					submeshes.Clear();
+					renderQueue.Clear();
 					modelMeshes.Clear();
 					while (node != null) {
-						node.PerformHitTest();
 						var mm = node as ModelMesh;
-						if (!mm.SkipRender) {
+						if (mm != null && !mm.SkipRender) {
 							modelMeshes.Add(mm);
 							foreach (var sm in mm.Submeshes) {
-								submeshes.Add(sm);
+								renderQueue.Add(sm);
 							}
+						}
+						var wa = node as WidgetAdapter;
+						if (wa != null) {
+							renderQueue.Add(wa);
 						}
 						node = node.NextToRender;
 					}
-					submeshes.Sort(meshCameraDistanceComparer);
+					renderQueue.Sort(depthComparer);
 					foreach (var mm in modelMeshes) {
 						mm.PrepareToRender();
 					}
-					foreach (var sm in submeshes) {
+					foreach (var sm in renderQueue) {
 						sm.Render();
 					}
 				}
@@ -161,6 +161,7 @@ namespace Lime
 			Renderer.PopProjectionMatrix();
 			Renderer.ZTestEnabled = oldZTestEnabled;
 			Renderer.ZWriteEnabled = oldZWriteEnabled;
+			Renderer.CullMode = oldCullMode;
 		}
 
 		private Matrix44 TransformProjection(Matrix44 orthoProjection)

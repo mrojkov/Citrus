@@ -54,6 +54,13 @@ namespace Lime
 		Square
 	}
 
+	public enum CullMode
+	{
+		None,
+		CullClockwise,
+		CullCounterClockwise
+	}
+
 	public struct WindowRect : IEquatable<WindowRect>
 	{
 		public int X;
@@ -102,6 +109,7 @@ namespace Lime
 		private static bool zTestEnabled = false;
 		private static bool zWriteEnabled = true;
 		private static bool Transform2Active;
+		private static CullMode cullMode;
 
 		public static Blending Blending;
 		public static ShaderId Shader;
@@ -194,6 +202,19 @@ namespace Lime
 			}
 		}
 
+		public static CullMode CullMode
+		{
+			get { return cullMode; }
+			set
+			{
+				if (cullMode != value) {
+					cullMode = value;
+					Flush();
+					PlatformRenderer.SetCullMode(cullMode);
+				}
+			}
+		}
+
 		public static void SetOrthogonalProjection(Vector2 leftTop, Vector2 rightBottom)
 		{
 			SetOrthogonalProjection(leftTop.X, leftTop.Y, rightBottom.X, rightBottom.Y);
@@ -227,6 +248,7 @@ namespace Lime
 			DrawCalls = 0;
 			Blending = Blending.None;
 			Shader = ShaderId.None;
+			CullMode = CullMode.None;
 			Transform1 = Matrix32.Identity;
 			Transform2 = Matrix32.Identity;
 			CurrentRenderList = MainRenderList;
