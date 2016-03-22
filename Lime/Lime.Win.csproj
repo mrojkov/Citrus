@@ -321,6 +321,7 @@
     <Compile Include="Source\Widgets\Theme\DesktopTheme.cs" />
     <Compile Include="Source\Widgets\Theme\ITheme.cs" />
     <Compile Include="Source\Graphics\Bitmap.Cocoa.cs" />
+    <Compile Include="Source\Graphics\Unity\MovieTexture.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">
