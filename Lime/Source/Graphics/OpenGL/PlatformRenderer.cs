@@ -260,19 +260,20 @@ namespace Lime
 
 		public static void SetCullMode(CullMode value)
 		{
-			if (value != CullMode.None) {
+			cullMode = value;
+			if (cullMode != CullMode.None) {
 				GL.Enable(EnableCap.CullFace);
 			} else {
 				GL.Disable(EnableCap.CullFace);
 				return;
 			}
 			GL.CullFace(CullFaceMode.Back);
-			if (value == CullMode.CullClockwise) {
+			if (cullMode == CullMode.CullClockwise) {
 				GL.FrontFace(IsOffscreen() ? FrontFaceDirection.Cw : FrontFaceDirection.Ccw);
 			} else {
 				GL.FrontFace(IsOffscreen() ? FrontFaceDirection.Ccw : FrontFaceDirection.Cw);
 			}
-			cullMode = value;
+			PlatformRenderer.CheckErrors();
 		}
 
 		private static bool IsOffscreen()
