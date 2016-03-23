@@ -221,7 +221,7 @@ namespace Lime
 
 		public void Center()
 		{
-			var displayBounds = DisplayDevice.Default.Bounds;
+			var displayBounds = window.Screen.VisibleFrame;
 			DecoratedPosition = new IntVector2 {
 				X = (int)Math.Max(0, (displayBounds.Width - DecoratedSize.Width) / 2 + displayBounds.Left),
 				Y = (int)Math.Max(0, (displayBounds.Height - DecoratedSize.Height) / 2 + displayBounds.Top)
