@@ -137,22 +137,14 @@
     <Compile Include="Source\Audio\OpenAL\PlatformAudioSystem.cs" />
     <Compile Include="Source\Audio\OpenAL\WaveIMA4Decoder.cs" />
     <Compile Include="Source\Audio\IAudioChannel.cs" />
-    <Compile Include="Source\Graphics\Mesh.cs" />
-    <Compile Include="Source\Graphics\OpenGL\PlatformMesh.cs" />
     <Compile Include="Source\Types\BitSet32.cs" />
     <Compile Include="Source\Input\SoftKeyboard.cs" />
     <Compile Include="Source\AssetsBundle\UnityDownloadableBundle.cs" />
     <Compile Include="Source\Audio\Unity\AudioChannel.cs" />
     <Compile Include="Source\Audio\Unity\PlatformAudioSystem.cs" />
     <Compile Include="Source\Graphics\Bitmap.Unity.cs" />
-    <Compile Include="Source\Graphics\Unity\PlatformMesh.cs" />
     <Compile Include="Source\Graphics\Unity\PlatformRenderer.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationEngine.cs" />
-    <Compile Include="Source\Widgets\Model\ModelCamera.cs" />
-    <Compile Include="Source\Widgets\Model\ModelMaterial.cs" />
-    <Compile Include="Source\Widgets\Model\ModelMesh.cs" />
-    <Compile Include="Source\Widgets\Model\ModelNode.cs" />
-    <Compile Include="Source\Widgets\Model\ModelViewport.cs" />
     <Compile Include="Source\Types\Quaternion.cs" />
     <Compile Include="Source\Widgets\Animation\Animation.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationList.cs" />
@@ -249,8 +241,18 @@
     <Compile Include="Source\Widgets\Layout\HBoxLayout.cs" />
     <Compile Include="Source\Application\DummyWindow.cs" />
     <Compile Include="Source\Graphics\Bitmap.Cocoa.cs" />
-    <Compile Include="Source\Widgets\Model\ModelMaterialTechnique.cs" />
     <Compile Include="Source\EnumExtensions.cs" />
+    <Compile Include="Source\Graphics\GeometryBuffer.cs" />
+    <Compile Include="Source\Graphics\OpenGL\PlatformGeometryBuffer.cs" />
+    <Compile Include="Source\Widgets\3D\Camera3D.cs" />
+    <Compile Include="Source\Widgets\3D\IRenderObject3D.cs" />
+    <Compile Include="Source\Widgets\3D\Material.cs" />
+    <Compile Include="Source\Widgets\3D\MaterialTechnique.cs" />
+    <Compile Include="Source\Widgets\3D\Mesh3D.cs" />
+    <Compile Include="Source\Widgets\3D\Node3D.cs" />
+    <Compile Include="Source\Widgets\3D\Viewport3D.cs" />
+    <Compile Include="Source\Widgets\3D\WidgetAdapter3D.cs" />
+    <Compile Include="Source\GeometryUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
@@ -298,7 +300,6 @@
     <Compile Include="Source\Application\Application.cs" />
     <Compile Include="Source\Mathf.cs" />
     <Compile Include="Source\Widgets\Widget.Toolbox.cs" />
-    <Compile Include="Source\Geometry.cs" />
     <Compile Include="Source\Widgets\Polyline.cs" />
     <Compile Include="Source\StringExtensions.cs" />
     <Compile Include="Source\Application\Logger.cs" />
@@ -338,6 +339,8 @@
   <ItemGroup>
     <Folder Include="Source\Graphics\" />
     <Folder Include="Source\Audio\OpenAL\" />
+    <Folder Include="Source\Widgets\" />
+    <Folder Include="Source\Widgets\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
