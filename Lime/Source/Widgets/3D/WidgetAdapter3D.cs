@@ -43,14 +43,17 @@
 		public override void Render()
 		{
 			widget.AddToRenderChain(renderChain);
+			var oldZTestEnabled = Renderer.ZTestEnabled;
 			var oldCullMode = Renderer.CullMode;
 			var oldProj = Renderer.Projection;
+			Renderer.ZTestEnabled = false;
 			Renderer.CullMode = BackFaceCullingEnabled ? CullMode.None : CullMode.CullClockwise;
 			Renderer.Projection = GlobalTransform * oldProj;
 			renderChain.RenderAndClear();
 			Renderer.Flush();
 			Renderer.Projection = oldProj;
 			Renderer.CullMode = oldCullMode;
+			Renderer.ZTestEnabled = oldZTestEnabled;
 		}
 	}
 }
