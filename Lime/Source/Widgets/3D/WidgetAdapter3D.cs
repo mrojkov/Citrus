@@ -1,5 +1,8 @@
-﻿namespace Lime
+﻿using ProtoBuf;
+
+namespace Lime
 {
+	[ProtoContract]
 	public class WidgetAdapter3D : Node3D, IRenderObject3D
 	{
 		private Widget widget;
@@ -9,16 +12,13 @@
 
 		public Widget Widget
 		{
-			get { return widget; }
+			get { return Nodes.Count != 0 ? Nodes[0].AsWidget : null; }
 			set
 			{
-				if (widget != value) {
-					widget = value;
-					if (Nodes.Count != 0) {
-						Nodes[0] = widget;
-					} else {
-						Nodes.Add(widget);
-					}
+				if (Nodes.Count != 0) {
+					Nodes[0] = widget;
+				} else {
+					Nodes.Push(widget);
 				}
 			}
 		}
