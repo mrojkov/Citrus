@@ -2,6 +2,10 @@
 using System;
 
 using Android.Content.Res;
+using Android.Runtime;
+using Android.Views;
+using AndroidApp = Android.App.Application;
+using AndroidContext = Android.Content.Context;
 
 #pragma warning disable 0067
 
@@ -9,7 +13,11 @@ namespace Lime
 {
 	public class Window : CommonWindow, IWindow
 	{
-		private FPSCounter fpsCounter;
+		private static readonly IWindowManager WindowManager =
+			AndroidApp.Context.GetSystemService(AndroidContext.WindowService).JavaCast<IWindowManager>();
+
+		private readonly Display display = new Display(WindowManager.DefaultDisplay);
+		private readonly FPSCounter fpsCounter;
 
 		public bool Active { get; private set; }
 		public bool Fullscreen { get { return true; } set {} }
@@ -73,6 +81,14 @@ namespace Lime
 		public void Close() {}
 		public void Invalidate() {}
 		public void ShowModal() {}
+
+		/// <summary>
+		/// Gets the default display device.
+		/// </summary>
+		public Display Display
+		{
+			get { return display; }
+		}
 
 		private static Vector2 ToLimeSize(System.Drawing.Size size, float pixelScale)
 		{

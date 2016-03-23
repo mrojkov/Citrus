@@ -11,6 +11,8 @@ namespace Lime
 {
 	public class Window : CommonWindow, IWindow
 	{
+		private readonly Display display;
+
 		private UIWindow uiWindow;
 		private FPSCounter fpsCounter = new FPSCounter();
 
@@ -87,6 +89,15 @@ namespace Lime
 			};
 			UIView.RenderFrame += OnRenderFrame;
 			UIView.UpdateFrame += OnUpdateFrame;
+			display = new Display(UIScreen.MainScreen);
+		}
+
+		/// <summary>
+		/// Gets the default display device.
+		/// </summary>
+		public Display Display
+		{
+			get { return display; }
 		}
 
 		public void Center() { }

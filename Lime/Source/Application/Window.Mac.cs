@@ -4,15 +4,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using Lime.Platform;
-#if MAC
 using AppKit;
 using CoreGraphics;
 using OpenTK.Graphics;
-#else
-using MonoMac.AppKit;
-using MonoMac.CoreGraphics;
-using MonoMac.OpenGL;
-#endif
 
 namespace Lime
 {
@@ -24,6 +18,7 @@ namespace Lime
 		private bool invalidated;
 		private float refreshRate;
 		private bool dialogMode;
+		private Display display;
 
 		public NSGameView View { get; private set; }
 
@@ -183,6 +178,17 @@ namespace Lime
 		private Vector2 windowedClientSize;
 		private float titleBarHeight;
 		private bool shouldFixFullscreen;
+
+		public Display Display
+		{
+			get
+			{
+				if (display == null || window.Screen != display.NSScreen) {
+					display = new Display(window.Screen);
+				}
+				return display;
+			}
+		}
 
 		private void CreateNativeWindow(WindowOptions options)
 		{
@@ -355,5 +361,4 @@ namespace Lime
 		}
 	}
 }
-
 #endif

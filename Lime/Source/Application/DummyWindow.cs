@@ -18,6 +18,7 @@ namespace Lime
 		public bool Visible { get; set; }
 		public Input Input { get; set; }
 		public float FPS { get; set; }
+		public Display Display { get; set; }
 		public float CalcFPS()
 		{
 			throw new NotImplementedException();

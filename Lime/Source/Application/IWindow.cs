@@ -100,6 +100,12 @@ namespace Lime
 		/// </summary>
 		float FPS { get; }
 
+		/// <summary>
+		/// Gets the display device containing the largest portion of this window on desktops
+		/// or the default screen on devices.
+		/// </summary>
+		Display Display { get; }
+
 		[Obsolete("Use FPS property instead", true)]
 		float CalcFPS();
 

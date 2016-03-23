@@ -23,6 +23,7 @@ namespace Lime
 		private bool active;
 		private RenderingState renderingState = RenderingState.Rendered;
 		private System.Drawing.Point lastMousePosition;
+		private Display display;
 
 		public Input Input { get; private set; }
 		public bool Active { get { return active; } }
@@ -275,6 +276,21 @@ namespace Lime
 		{
 			RaiseVisibleChanging(true);
 			form.ShowDialog();
+		}
+
+		/// <summary>
+		/// Gets the display device containing the largest portion of this window.
+		/// </summary>
+		public Display Display
+		{
+			get
+			{
+				Screen screen = Screen.FromControl(form);
+				if (display == null || display.WinFormsScreen != screen) {
+					display = new Display(Screen.FromControl(form));
+				}
+				return display;
+			}
 		}
 
 		private static float CalcPixelScale(float Dpi)
