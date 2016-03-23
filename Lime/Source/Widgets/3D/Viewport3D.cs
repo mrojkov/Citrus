@@ -117,10 +117,10 @@ namespace Lime
 			Renderer.Flush();
 			Renderer.PushProjectionMatrix();
 			Renderer.Projection = TransformProjection(Renderer.Projection);
-#if OPENGL
-			Renderer.CullMode = CullMode.CullClockwise;
-#elif UNITY
+#if UNITY
 			MaterialFactory.ThreeDimensionalRendering = true;
+#else
+			Renderer.CullMode = CullMode.CullClockwise;
 #endif
 			if (ZSortEnabled) {
 				for (int i = 0; i <= chain.MaxUsedLayer; i++) {
@@ -153,15 +153,15 @@ namespace Lime
 			} else {
 				chain.RenderAndClear();
 			}
-#if OPENGL
-			GL.Disable(EnableCap.CullFace);
-#elif UNITY
+#if UNITY
 			MaterialFactory.ThreeDimensionalRendering = false;
+#else
+			Renderer.CullMode = oldCullMode;
 #endif
+			Renderer.Clear(ClearTarget.DepthBuffer);
 			Renderer.PopProjectionMatrix();
 			Renderer.ZTestEnabled = oldZTestEnabled;
 			Renderer.ZWriteEnabled = oldZWriteEnabled;
-			Renderer.CullMode = oldCullMode;
 		}
 
 		private Matrix44 TransformProjection(Matrix44 orthoProjection)

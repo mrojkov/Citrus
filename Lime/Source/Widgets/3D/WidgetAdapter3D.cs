@@ -1,24 +1,25 @@
-﻿namespace Lime
+﻿using ProtoBuf;
+
+namespace Lime
 {
+	[ProtoContract]
 	public class WidgetAdapter3D : Node3D, IRenderObject3D
 	{
-		private Widget widget;
 		private RenderChain renderChain = new RenderChain();
-
-		public bool BackFaceCullingEnabled { get; set; }
 
 		public Widget Widget
 		{
-			get { return widget; }
+			get { return Nodes.Count != 0 ? Nodes[0].AsWidget : null; }
 			set
 			{
-				if (widget != value) {
-					widget = value;
+				if (value != null) {
 					if (Nodes.Count != 0) {
-						Nodes[0] = widget;
+						Nodes[0] = value;
 					} else {
-						Nodes.Add(widget);
+						Nodes.Push(value);
 					}
+				} else {
+					Nodes.Clear();
 				}
 			}
 		}
@@ -28,27 +29,22 @@
 			get { return (Vector3)Widget.Center * GlobalTransform; }
 		}
 
-		public WidgetAdapter3D()
-		{
-			BackFaceCullingEnabled = true;
-		}
-
 		public override void AddToRenderChain(RenderChain chain)
 		{
-			if (GloballyVisible && widget != null) {
+			if (GloballyVisible && Widget != null) {
 				chain.Add(this, Layer);
 			}
 		}
 
 		public override void Render()
 		{
-			widget.AddToRenderChain(renderChain);
+			Widget.AddToRenderChain(renderChain);
 			var oldZTestEnabled = Renderer.ZTestEnabled;
 			var oldCullMode = Renderer.CullMode;
 			var oldProj = Renderer.Projection;
 			Renderer.ZTestEnabled = false;
-			Renderer.CullMode = BackFaceCullingEnabled ? CullMode.None : CullMode.CullClockwise;
-			Renderer.Projection = GlobalTransform * oldProj;
+			Renderer.CullMode = CullMode.None;
+			Renderer.Projection = Matrix44.CreateScale(new Vector3(1, -1, 1)) * GlobalTransform * oldProj;
 			renderChain.RenderAndClear();
 			Renderer.Flush();
 			Renderer.Projection = oldProj;

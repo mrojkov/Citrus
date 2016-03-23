@@ -61,6 +61,14 @@ namespace Lime
 		CullCounterClockwise
 	}
 
+	public enum ClearTarget
+	{
+		None = 0,
+		ColorBuffer = 1 << 0,
+		DepthBuffer = 1 << 1,
+		All = ColorBuffer | DepthBuffer
+	}
+
 	public struct WindowRect : IEquatable<WindowRect>
 	{
 		public int X;
@@ -529,9 +537,19 @@ namespace Lime
 			}
 		}
 
-		public static void ClearRenderTarget(float r, float g, float b, float a)
+		public static void Clear(float r, float g, float b, float a)
 		{
-			PlatformRenderer.ClearRenderTarget(r, g, b, a);
+			Clear(ClearTarget.All, r, g, b, a);
+		}
+
+		public static void Clear(ClearTarget targets)
+		{
+			Clear(targets, 0, 0, 0, 0);
+		}
+
+		public static void Clear(ClearTarget targets, float r, float g, float b, float a)
+		{
+			PlatformRenderer.Clear(targets, r, g, b, a);
 		}
 
 		private static Sprite[] batchedSprites = new Sprite[20];
@@ -731,6 +749,11 @@ namespace Lime
 		public static void DrawVerticalGradientRect(Vector2 a, Vector2 b, Color4 topColor, Color4 bottomColor)
 		{
 			DrawVerticalGradientRect(a, b, new ColorGradient(topColor, bottomColor));
+		}
+
+		public static Matrix44 FixupWVP(Matrix44 projection)
+		{
+			return PlatformRenderer.FixupWVP(projection);
 		}
 	}
 }

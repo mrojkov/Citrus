@@ -75,7 +75,7 @@ namespace Lime
 			for (var i = 0; i < Bones.Count; i++) {
 				SharedBoneTransforms[i] = BoneBindPoseInverses[i] * Bones[i].GlobalTransform * worldInverse;
 			}
-			WorldViewProj = world * Renderer.Projection;
+			WorldViewProj = Renderer.FixupWVP(world * Renderer.Projection);
 		}
 
 		public override void Render()

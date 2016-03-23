@@ -22,6 +22,8 @@ namespace Lime
 	{
 		private uint handle;
 		private uint framebuffer;
+		private uint depthBuffer;
+		
 		private readonly Size size = new Size(0, 0);
 		private readonly Rectangle uvRect;
 		private static readonly Stack<uint> framebufferStack = new Stack<uint>();
@@ -67,10 +69,22 @@ namespace Lime
 			GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, handle, 0);
 			if ((int)GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != (int)FramebufferErrorCode.FramebufferComplete)
 				throw new Exception("Failed to create render texture. Framebuffer is incomplete.");
-			Renderer.ClearRenderTarget(0, 0, 0, 0);
+			AttachRenderBuffer(FramebufferSlot.DepthAttachment, RenderbufferInternalFormat.DepthComponent16, out depthBuffer);
+			Renderer.Clear(0, 0, 0, 0);
 			PlatformRenderer.PopTexture(0);
 			PlatformRenderer.BindFramebuffer(oldFramebuffer);
 			PlatformRenderer.CheckErrors();
+		}
+
+		private void AttachRenderBuffer(FramebufferSlot attachement, RenderbufferInternalFormat format, out uint handle)
+		{
+			var t = new uint[1];
+			GL.GenRenderbuffers(1, t);
+			handle = t[0];
+			GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, handle);
+			GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, format, size.Width, size.Height);
+			GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, attachement, RenderbufferTarget.Renderbuffer, handle);
+			GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, 0);
 		}
 
 		public Size ImageSize {
@@ -93,22 +107,34 @@ namespace Lime
 		{
 			MemoryUsed = 0;
 			if (framebuffer != 0) {
-				var capturedFramebuffer = framebuffer;
+				var h = framebuffer;
 				Application.InvokeOnMainThread(() => {
-					GL.DeleteFramebuffers(1, new uint[] { capturedFramebuffer });
+					GL.DeleteFramebuffers(1, new uint[] { h });
 					PlatformRenderer.CheckErrors();
 				});
 				framebuffer = 0;
 			}
 			if (handle != 0) {
-				var capturedHandle = handle;
+				var h = handle;
 				Application.InvokeOnMainThread(() => {
-					GL.DeleteTextures(1, new uint[] { capturedHandle });
+					GL.DeleteTextures(1, new uint[] { h });
 					PlatformRenderer.CheckErrors();
-					PlatformRenderer.InvalidateTexture(capturedHandle);
+					PlatformRenderer.InvalidateTexture(h);
 				});
 				handle = 0;
 			}
+			DeleteRenderBuffer(ref depthBuffer);
+		}
+
+		private void DeleteRenderBuffer(ref uint renderBuffer)
+		{
+			var h = renderBuffer;
+			if (h != 0) {
+				Application.InvokeOnMainThread(() => {
+					GL.DeleteRenderbuffers(1, new uint[] { h });
+				});
+			}
+			renderBuffer = 0;
 		}
 		
 		public override void Dispose()

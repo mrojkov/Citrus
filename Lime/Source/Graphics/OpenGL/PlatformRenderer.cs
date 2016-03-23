@@ -72,20 +72,8 @@ namespace Lime
 			if (shaderProgram != program) {
 				shaderProgram = program;
 				shaderProgram.Use();
-				var projection = Renderer.Projection;
-				// OpenGL has a nice peculiarity: for render targets we must flip Y axis.
-				if (IsOffscreen()) {
-					FlipProjectionYAxis(ref projection);
-				}
-				shaderProgram.LoadMatrix(program.ProjectionMatrixUniformId, projection);
+				shaderProgram.LoadMatrix(program.ProjectionMatrixUniformId, FixupWVP(Renderer.Projection));
 			}
-		}
-
-		private static void FlipProjectionYAxis(ref Matrix44 matrix)
-		{
-			matrix.M22 = -matrix.M22;
-			matrix.M32 = -matrix.M32;
-			matrix.M42 = -matrix.M42;
 		}
 
 		static PlatformRenderer()
@@ -103,7 +91,7 @@ namespace Lime
 			shaderProgram = null;
 			SetBlending(Blending.Inherited);
 			SetShader(ShaderId.Diffuse, null);
-			ClearRenderTarget(0, 0, 0, 0);
+			Clear(ClearTarget.All, 0, 0, 0, 0);
 			CheckErrors();
 		}
 
@@ -116,10 +104,20 @@ namespace Lime
 			}
 		}
 		
-		public static void ClearRenderTarget(float r, float g, float b, float a)
+		public static void Clear(ClearTarget targets, float r, float g, float b, float a)
 		{
-			GL.ClearColor(r, g, b, a);
-			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+			if (targets == ClearTarget.None) {
+				return;
+			}
+			ClearBufferMask clearBufferMask = 0;
+			if ((targets & ClearTarget.ColorBuffer) != 0) {
+				GL.ClearColor(r, g, b, a);
+				clearBufferMask |= ClearBufferMask.ColorBufferBit;
+			}
+			if ((targets & ClearTarget.DepthBuffer) != 0) {
+				clearBufferMask |= ClearBufferMask.DepthBufferBit;
+			}
+			GL.Clear(clearBufferMask);
 		}
 
 		public static void SetTexture(ITexture texture, int stage)
@@ -256,6 +254,7 @@ namespace Lime
 			CurrentFramebuffer = framebuffer;
 			GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer);
 			SetCullMode(cullMode);
+			shaderProgram = null;
 		}
 
 		public static void SetCullMode(CullMode value)
@@ -279,6 +278,15 @@ namespace Lime
 		private static bool IsOffscreen()
 		{
 			return CurrentFramebuffer != DefaultFramebuffer;
+		}
+
+		public static Matrix44 FixupWVP(Matrix44 projection)
+		{
+			// OpenGL has a nice peculiarity: for render targets we must flip Y axis.
+			if (IsOffscreen()) {
+				projection *= Matrix44.CreateScale(new Vector3(1, -1, 1));
+			}
+			return projection;
 		}
 	}
 }
