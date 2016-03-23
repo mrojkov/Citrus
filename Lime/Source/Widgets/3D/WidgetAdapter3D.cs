@@ -51,7 +51,7 @@ namespace Lime
 			var oldProj = Renderer.Projection;
 			Renderer.ZTestEnabled = false;
 			Renderer.CullMode = BackFaceCullingEnabled ? CullMode.CullClockwise : CullMode.None;
-			Renderer.Projection = GlobalTransform * oldProj * Matrix44.CreateScale(new Vector3(1, -1, 1));
+			Renderer.Projection = Matrix44.CreateScale(new Vector3(1, -1, 1)) * GlobalTransform * oldProj;
 			renderChain.RenderAndClear();
 			Renderer.Flush();
 			Renderer.Projection = oldProj;
