@@ -231,8 +231,8 @@ namespace Lime
 			glControl.MouseDown += OnMouseDown;
 			glControl.MouseUp += OnMouseUp;
 			glControl.Resize += OnResize;
-			glControl.Move += OnMove;
 			glControl.MouseWheel += OnMouseWheel;
+			form.Move += OnMove;
 			form.Activated += OnActivated;
 			form.Deactivate += OnDeactivate;
 			form.FormClosing += OnClosing;
