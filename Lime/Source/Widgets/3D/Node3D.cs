@@ -6,6 +6,7 @@ namespace Lime
 	[ProtoContract]
 	[ProtoInclude(101, typeof(Mesh3D))]
 	[ProtoInclude(102, typeof(Camera3D))]
+	[ProtoInclude(103, typeof(WidgetAdapter3D))]
 	public class Node3D : Node
 	{
 		private Vector3 scale;

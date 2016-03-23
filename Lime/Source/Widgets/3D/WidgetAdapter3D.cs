@@ -47,8 +47,8 @@
 			var oldCullMode = Renderer.CullMode;
 			var oldProj = Renderer.Projection;
 			Renderer.ZTestEnabled = false;
-			Renderer.CullMode = BackFaceCullingEnabled ? CullMode.None : CullMode.CullClockwise;
-			Renderer.Projection = GlobalTransform * oldProj;
+			Renderer.CullMode = BackFaceCullingEnabled ? CullMode.CullClockwise : CullMode.None;
+			Renderer.Projection = GlobalTransform * oldProj * Matrix44.CreateScale(new Vector3(1, -1, 1));
 			renderChain.RenderAndClear();
 			Renderer.Flush();
 			Renderer.Projection = oldProj;
