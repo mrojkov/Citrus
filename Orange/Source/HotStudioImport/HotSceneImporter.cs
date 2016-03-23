@@ -855,7 +855,7 @@ namespace Orange
 
 		private void ParseModelViewProperty(Node node, string name)
 		{
-			var viewport = (ModelViewport)node;
+			var viewport = (Viewport3D)node;
 			switch (name) {
 				case "ModelPath":
 					viewport.ContentsPath = lexer.ParsePath();
@@ -922,7 +922,7 @@ namespace Orange
 				new KnownActorType {ActorClass = "Hot::RichText", NodeClass = "Lime.RichText, Lime", PropReader = ParseRichTextProperty},
 				new KnownActorType {ActorClass = "Hot::TextStyle", NodeClass = "Lime.TextStyle, Lime", PropReader = ParseTextStyleProperty},
 				new KnownActorType {ActorClass = "Hot::Movie", NodeClass = "Lime.Movie, Lime", PropReader = ParseVideoProperty},
-				new KnownActorType {ActorClass = "Hot::ModelView", NodeClass = "Lime.ModelViewport, Lime", PropReader = ParseModelViewProperty},
+				new KnownActorType {ActorClass = "Hot::ModelView", NodeClass = "Lime.Viewport3D, Lime", PropReader = ParseModelViewProperty},
 				new KnownActorType {ActorClass = "LinearLayout", NodeClass = "Lime.LinearLayout, Lime", PropReader = ParseLinearLayoutProperty},
 				new KnownActorType {ActorClass = "Hot::EmitterShapePoint", NodeClass = "Lime.EmitterShapePoint, Lime", PropReader = ParseEmitterShapePointProperty},
 			};

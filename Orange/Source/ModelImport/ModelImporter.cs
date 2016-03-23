@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Lime;
 
 namespace Orange
@@ -115,9 +114,9 @@ namespace Orange
 		{
 			public Dictionary<string, TextureReference> Textures { get; private set; }
 
-			public ModelMaterial CreateMaterial()
+			public Material CreateMaterial()
 			{
-				return new ModelMaterial {
+				return new Material {
 					DiffuseTexture = TryGetSerializableTexture("Diffuse"),
 					OpacityTexture = TryGetSerializableTexture("Opacity"),
 					SpecularTexture = TryGetSerializableTexture("Specular"),
@@ -128,10 +127,7 @@ namespace Orange
 			private SerializableTexture TryGetSerializableTexture(string name)
 			{
 				TextureReference reference;
-				if (Textures.TryGetValue(name, out reference)) {
-					return reference.ToSerializableTexture();
-				}
-				return null;
+				return Textures.TryGetValue(name, out reference) ? reference.ToSerializableTexture() : null;
 			}
 		}
 
@@ -152,7 +148,7 @@ namespace Orange
 		private Dictionary<string, Assimp.Camera> aiCameras = new Dictionary<string, Assimp.Camera>();
 		private Dictionary<string, Pivot> pivots = new Dictionary<string, Pivot>();
 
-		public ModelNode RootNode { get; private set; }
+		public Node3D RootNode { get; private set; }
 
 		public ModelImporter(string path, TargetPlatform platform)
 		{
@@ -182,13 +178,13 @@ namespace Orange
 		private void ImportSkeleton(Assimp.Node aiNode)
 		{
 			if (aiNode.HasMeshes) {
-				var mesh = RootNode.Find<ModelMesh>(aiNode.Name);
+				var mesh = RootNode.Find<Mesh3D>(aiNode.Name);
 				for (var i = 0; i < aiNode.MeshCount; i++) {
 					var aiMesh = aiScene.Meshes[aiNode.MeshIndices[i]];
 					if (aiMesh.HasBones) {
 						foreach (var bone in aiMesh.Bones) {
 							mesh.Submeshes[i].BoneIndices.Add(mesh.Bones.Count);
-							mesh.Bones.Add(RootNode.Find<ModelNode>(bone.Name));
+							mesh.Bones.Add(RootNode.Find<Node3D>(bone.Name));
 							mesh.BoneBindPoseInverses.Add(bone.OffsetMatrix.ToLime());
 						}
 					}
@@ -209,11 +205,11 @@ namespace Orange
 			RootNode = ImportNodes(aiScene.RootNode, null, null);
 		}
 
-		private ModelNode ImportNodes(Assimp.Node aiNode, Assimp.Node aiParent, Node parent)
+		private Node3D ImportNodes(Assimp.Node aiNode, Assimp.Node aiParent, Node parent)
 		{
-			ModelNode node = null;
+			Node3D node = null;
 			if (aiNode.HasMeshes) {
-				var mesh = new ModelMesh { Id = aiNode.Name };
+				var mesh = new Mesh3D { Id = aiNode.Name };
 				mesh.SetLocalTransform(CalcRelativeTransform(aiNode, aiParent));
 				foreach (var aiMeshIndex in aiNode.MeshIndices) {
 					var aiMesh = aiScene.Meshes[aiMeshIndex];
@@ -267,7 +263,7 @@ namespace Orange
 				if (aiCameras.TryGetValue(aiNode.Name, out camera)) {
 					node = ImportCamera(camera, aiNode, aiParent);
 				} else {
-					node = new ModelNode { Id = aiNode.Name };
+					node = new Node3D { Id = aiNode.Name };
 					node.SetLocalTransform(CalcRelativeTransform(aiNode, aiParent));
 				}
 			}
@@ -284,9 +280,9 @@ namespace Orange
 			return node;
 		}
 
-		private ModelNode ImportCamera(Assimp.Camera aiCamera, Assimp.Node aiNode, Assimp.Node aiParent)
+		private Node3D ImportCamera(Assimp.Camera aiCamera, Assimp.Node aiNode, Assimp.Node aiParent)
 		{
-			var camera = new ModelCamera {
+			var camera = new Camera3D {
 				Id = aiCamera.Name,
 				FieldOfView = aiCamera.FieldOfview,
 				AspectRatio = aiCamera.AspectRatio,
@@ -297,18 +293,18 @@ namespace Orange
 			return camera;
 		}
 
-		private ModelSubmesh ImportSubmesh(Assimp.Mesh mesh)
+		private Submesh3D ImportSubmesh(Assimp.Mesh mesh)
 		{
-			return new ModelSubmesh {
+			return new Submesh3D {
 				// TODO: Materials
 				Material = ImportMaterial(aiScene.Materials[mesh.MaterialIndex]),
 				Geometry = ImportGeometry(mesh)
 			};
 		}
 
-		private Mesh ImportGeometry(Assimp.Mesh mesh)
+		private GeometryBuffer ImportGeometry(Assimp.Mesh mesh)
 		{
-			var res = new Mesh();
+			var res = new GeometryBuffer();
 			res.Vertices = mesh.Vertices.Select(AssimpExtensions.ToLime).ToArray();
 			res.Indices = mesh.GetIndices().Select(index => checked((ushort)index)).ToArray();
 			if (mesh.HasTextureCoords(0)) {
@@ -363,9 +359,9 @@ namespace Orange
 			return res;
 		}
 
-		private ModelMaterial ImportMaterial(Assimp.Material material)
+		private Material ImportMaterial(Assimp.Material material)
 		{
-			var res = new ModelMaterial();
+			var res = new Material();
 			if (material.HasTextureDiffuse) {
 				res.DiffuseTexture = CreateSerializableTexture(material.TextureDiffuse);
 			}
@@ -402,7 +398,7 @@ namespace Orange
 				.NodeAnimationChannels
 				.GroupBy(channel => GetNodeName(channel.NodeName));
 			foreach (var channelGroup in channelGroups) {
-				var n = RootNode.TryFind<ModelNode>(channelGroup.Key);
+				var n = RootNode.TryFind<Node3D>(channelGroup.Key);
 				var aiScaleKeys = new List<Assimp.VectorKey>();
 				var aiRotationKeys = new List<Assimp.QuaternionKey>();
 				var aiTranslationKeys = new List<Assimp.VectorKey>();

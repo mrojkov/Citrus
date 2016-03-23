@@ -142,7 +142,7 @@ namespace Lime
 	public class Submesh3D : IRenderObject3D
 	{
 		private static Matrix44[] sharedBoneTransforms = new Matrix44[] { };
-
+		
 		[ProtoMember(1)]
 		public Material Material { get; set; }
 
