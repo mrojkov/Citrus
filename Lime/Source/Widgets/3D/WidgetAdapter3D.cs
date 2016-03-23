@@ -3,8 +3,9 @@
 	public class WidgetAdapter3D : Node3D, IRenderObject3D
 	{
 		private Widget widget;
-		
-		public bool DoubleSided { get; set; }
+		private RenderChain renderChain = new RenderChain();
+
+		public bool BackFaceCullingEnabled { get; set; }
 
 		public Widget Widget
 		{
@@ -29,7 +30,7 @@
 
 		public WidgetAdapter3D()
 		{
-			DoubleSided = true;
+			BackFaceCullingEnabled = true;
 		}
 
 		public override void AddToRenderChain(RenderChain chain)
@@ -41,12 +42,12 @@
 
 		public override void Render()
 		{
+			widget.AddToRenderChain(renderChain);
 			var oldCullMode = Renderer.CullMode;
 			var oldProj = Renderer.Projection;
-			Renderer.CullMode = DoubleSided ? CullMode.None : CullMode.CullClockwise;
+			Renderer.CullMode = BackFaceCullingEnabled ? CullMode.None : CullMode.CullClockwise;
 			Renderer.Projection = GlobalTransform * oldProj;
-			widget.PerformHitTest();
-			widget.Render();
+			renderChain.RenderAndClear();
 			Renderer.Flush();
 			Renderer.Projection = oldProj;
 			Renderer.CullMode = oldCullMode;
