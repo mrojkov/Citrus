@@ -7,8 +7,6 @@ namespace Lime
 	{
 		private RenderChain renderChain = new RenderChain();
 
-		public bool BackFaceCullingEnabled { get; set; }
-
 		public Widget Widget
 		{
 			get { return Nodes.Count != 0 ? Nodes[0].AsWidget : null; }
@@ -31,11 +29,6 @@ namespace Lime
 			get { return (Vector3)Widget.Center * GlobalTransform; }
 		}
 
-		public WidgetAdapter3D()
-		{
-			BackFaceCullingEnabled = true;
-		}
-
 		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (GloballyVisible && Widget != null) {
@@ -50,7 +43,7 @@ namespace Lime
 			var oldCullMode = Renderer.CullMode;
 			var oldProj = Renderer.Projection;
 			Renderer.ZTestEnabled = false;
-			Renderer.CullMode = BackFaceCullingEnabled ? CullMode.CullClockwise : CullMode.None;
+			Renderer.CullMode = CullMode.None;
 			Renderer.Projection = Matrix44.CreateScale(new Vector3(1, -1, 1)) * GlobalTransform * oldProj;
 			renderChain.RenderAndClear();
 			Renderer.Flush();
