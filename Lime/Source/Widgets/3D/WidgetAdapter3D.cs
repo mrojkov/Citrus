@@ -5,7 +5,6 @@ namespace Lime
 	[ProtoContract]
 	public class WidgetAdapter3D : Node3D, IRenderObject3D
 	{
-		private Widget widget;
 		private RenderChain renderChain = new RenderChain();
 
 		public bool BackFaceCullingEnabled { get; set; }
@@ -15,10 +14,14 @@ namespace Lime
 			get { return Nodes.Count != 0 ? Nodes[0].AsWidget : null; }
 			set
 			{
-				if (Nodes.Count != 0) {
-					Nodes[0] = widget;
+				if (value != null) {
+					if (Nodes.Count != 0) {
+						Nodes[0] = value;
+					} else {
+						Nodes.Push(value);
+					}
 				} else {
-					Nodes.Push(widget);
+					Nodes.Clear();
 				}
 			}
 		}
@@ -35,14 +38,14 @@ namespace Lime
 
 		public override void AddToRenderChain(RenderChain chain)
 		{
-			if (GloballyVisible && widget != null) {
+			if (GloballyVisible && Widget != null) {
 				chain.Add(this, Layer);
 			}
 		}
 
 		public override void Render()
 		{
-			widget.AddToRenderChain(renderChain);
+			Widget.AddToRenderChain(renderChain);
 			var oldZTestEnabled = Renderer.ZTestEnabled;
 			var oldCullMode = Renderer.CullMode;
 			var oldProj = Renderer.Projection;
