@@ -54,24 +54,57 @@ namespace Lime
 			A = a;
 		}
 
+		/// <summary>
+		/// Gets the alpha component from a specified ARGB color-int.
+		/// </summary>
+		/// <param name="color">The color as integer value in ARGB format.</param>
+		/// <returns>Alpha.</returns>
 		public static byte GetAlphaComponent(int color)
 		{
 			return (byte)((uint)color >> 24);
 		}
 
+		/// <summary>
+		/// Gets the red component from a specified ARGB color-int.
+		/// </summary>
+		/// <param name="color">The color as integer value in ARGB format.</param>
+		/// <returns>Red.</returns>
 		public static byte GetRedComponent(int color)
 		{
 			return (byte)((color >> 16) & 0xFF);
 		}
 
+		/// <summary>
+		/// Gets the green component from a specified ARGB color-int.
+		/// </summary>
+		/// <param name="color">The color as integer value in ARGB format.</param>
+		/// <returns>Green.</returns>
 		public static byte GetGreenComponent(int color)
 		{
 			return (byte)((color >> 8) & 0xFF);
 		}
 
+		/// <summary>
+		/// Gets the blue component from a specified ARGB color-int.
+		/// </summary>
+		/// <param name="color">The color as integer value in ARGB format.</param>
+		/// <returns>Blue.</returns>
 		public static byte GetBlueComponent(int color)
 		{
 			return (byte)(color & 0xFF);
+		}
+
+		/// <summary>
+		/// Creates an ARGB color-int from a specified alpha, red, green and blue components.
+		/// </summary>
+		/// <param name="alpha">Alpha component of the color.</param>
+		/// <param name="red">Red component of the color.</param>
+		/// <param name="green">Green component of the color.</param>
+		/// <param name="blue">Blue component of the color.</param>
+		/// <returns>ARGB color-int.</returns>
+		public static int CreateArgb(byte alpha, byte red, byte green, byte blue)
+		{
+			return (alpha << 24) | (red << 16) | (green << 8) | blue;
 		}
 
 		// Unity mono compiler doesn't allow another constructor because of ambiguity

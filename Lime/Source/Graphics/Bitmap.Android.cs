@@ -23,7 +23,7 @@ namespace Lime
 			var colors = new int[data.Length];
 			for (int i = 0; i < data.Length; i++) {
 				var pixel = data[i];
-				colors[i] = Color.Argb(pixel.A, pixel.R, pixel.G, pixel.B).ToArgb();
+				colors[i] = Color4.CreateArgb(pixel.A, pixel.R, pixel.G, pixel.B);
 			}
 			Bitmap = AndroidBitmap.CreateBitmap(colors, width, height, AndroidBitmap.Config.Argb8888);
 		}
