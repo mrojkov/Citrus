@@ -5,6 +5,8 @@ using System.Diagnostics;
 using OpenTK.Graphics.ES20;
 #else
 using OpenTK.Graphics.OpenGL;
+using FramebufferSlot = OpenTK.Graphics.OpenGL.FramebufferAttachment;
+using RenderbufferInternalFormat = OpenTK.Graphics.OpenGL.RenderbufferStorage;
 #endif
 using System.Collections.Generic;
 
@@ -66,7 +68,12 @@ namespace Lime
 			uint oldFramebuffer = PlatformRenderer.CurrentFramebuffer;
 			PlatformRenderer.BindFramebuffer(framebuffer);
 			PlatformRenderer.CheckErrors();
-			GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, handle, 0);
+			GL.FramebufferTexture2D(
+				FramebufferTarget.Framebuffer,
+				FramebufferSlot.ColorAttachment0,
+				TextureTarget.Texture2D,
+				handle,
+				level: 0);
 			if ((int)GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer) != (int)FramebufferErrorCode.FramebufferComplete)
 				throw new Exception("Failed to create render texture. Framebuffer is incomplete.");
 			AttachRenderBuffer(FramebufferSlot.DepthAttachment, RenderbufferInternalFormat.DepthComponent16, out depthBuffer);
