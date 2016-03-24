@@ -76,11 +76,26 @@ namespace Lime
 			return dist < 0 ? null : distanceAlongRay - (float?)Math.Sqrt(dist);
 		}
 
+		public float? Intersects(Plane plane)
+		{
+			var den = Vector3.DotProduct(Direction, plane.Normal);
+			if (Math.Abs(den) < 0.00001f) {
+				return null;
+			}
+			var result = (-plane.D - Vector3.DotProduct(plane.Normal, Position)) / den;
+			if (result < 0.0f) {
+				if (result < -0.00001f) {
+					return null;
+				}
+				result = 0.0f;
+			}
+			return result;
+		}
+
 		public static bool operator !=(Ray a, Ray b)
 		{
 			return !a.Equals(b);
 		}
-
 
 		public static bool operator ==(Ray a, Ray b)
 		{

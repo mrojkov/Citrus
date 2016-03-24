@@ -1010,7 +1010,8 @@ namespace Lime
 
 		public Vector3 TransformVector(Vector3 position)
 		{
-			var result = new Vector3((position.X * M11) + (position.Y * M21) + (position.Z * M31) + M41,
+			var result = new Vector3(
+				(position.X * M11) + (position.Y * M21) + (position.Z * M31) + M41,
 				(position.X * M12) + (position.Y * M22) + (position.Z * M32) + M42,
 				(position.X * M13) + (position.Y * M23) + (position.Z * M33) + M43);
 			return result;
@@ -1021,13 +1022,21 @@ namespace Lime
 			return (Vector2)TransformVector((Vector3)position);
 		}
 
+		public Vector4 TransformVector(Vector4 position)
+		{
+			return new Vector4(
+				(position.X * M11) + (position.Y * M21) + (position.Z * M31) + (position.W * M41),
+				(position.X * M12) + (position.Y * M22) + (position.Z * M32) + (position.W * M42),
+				(position.X * M13) + (position.Y * M23) + (position.Z * M33) + (position.W * M43),
+				(position.X * M14) + (position.Y * M24) + (position.Z * M34) + (position.W * M44)
+			);
+		}
+
 		public Vector3 ProjectVector(Vector3 position)
 		{
-			var x = position.X * M11 + position.Y * M21 + position.Z * M31 + M41;
-			var y = position.X * M12 + position.Y * M22 + position.Z * M32 + M42;
-			var z = position.X * M13 + position.Y * M23 + position.Z * M33 + M43;
-			var w = position.X * M14 + position.Y * M24 + position.Z * M34 + M44;
-			return new Vector3(x / w, y / w, z / w);
+			var result = TransformVector(new Vector4(position, 1));
+			result /= result.W;
+			return new Vector3(result.X, result.Y, result.Z);
 		}
 
 		public Vector2 ProjectVector(Vector2 position)
@@ -1054,6 +1063,11 @@ namespace Lime
 				+ " {" + String.Format("M21:{0} M22:{1} M23:{2} M24:{3}", M21, M22, M23, M24) + "}"
 				+ " {" + String.Format("M31:{0} M32:{1} M33:{2} M34:{3}", M31, M32, M33, M34) + "}"
 				+ " {" + String.Format("M41:{0} M42:{1} M43:{2} M44:{3}", M41, M42, M43, M44) + "}";
+		}
+
+		public Matrix44 Transpose()
+		{
+			return Transpose(this);
 		}
 
 		public static Matrix44 Transpose(Matrix44 matrix)
