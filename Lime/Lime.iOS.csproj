@@ -96,7 +96,6 @@
     <Compile Include="Source\Environment.cs" />
     <Compile Include="Source\Mathf.cs" />
     <Compile Include="Source\Widgets\Widget.Toolbox.cs" />
-    <Compile Include="Source\Geometry.cs" />
     <Compile Include="Source\Widgets\Polyline.cs" />
     <Compile Include="Source\StringExtensions.cs" />
     <Compile Include="Source\Application\Logger.cs" />
@@ -187,11 +186,8 @@
     <Compile Include="Source\Graphics\OpenGL\IGLObject.cs" />
     <Compile Include="Source\Application\AndroidActivityDelegate.cs" />
     <Compile Include="Source\Graphics\Bitmap.Unity.cs" />
-    <Compile Include="Source\Graphics\Mesh.cs" />
     <Compile Include="Source\Graphics\RenderBatch.cs" />
     <Compile Include="Source\Graphics\RenderList.cs" />
-    <Compile Include="Source\Graphics\OpenGL\PlatformMesh.cs" />
-    <Compile Include="Source\Graphics\Unity\PlatformMesh.cs" />
     <Compile Include="Source\Graphics\Unity\PlatformRenderer.cs" />
     <Compile Include="Source\Audio\IAudioChannel.cs" />
     <Compile Include="Source\Audio\OpenAL\AudioCache.cs" />
@@ -211,11 +207,6 @@
     <Compile Include="Source\Widgets\Layout\TableLayout.cs" />
     <Compile Include="Source\Widgets\Animation\Animation.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationList.cs" />
-    <Compile Include="Source\Widgets\Model\ModelCamera.cs" />
-    <Compile Include="Source\Widgets\Model\ModelMaterial.cs" />
-    <Compile Include="Source\Widgets\Model\ModelMesh.cs" />
-    <Compile Include="Source\Widgets\Model\ModelNode.cs" />
-    <Compile Include="Source\Widgets\Model\ModelViewport.cs" />
     <Compile Include="Source\Types\Quaternion.cs" />
     <Compile Include="Source\Types\BoundingSphere.cs" />
     <Compile Include="Source\Types\ContainmentType.cs" />
@@ -313,7 +304,21 @@
     <Compile Include="Source\Widgets\Layout\LayoutDebugPresenter.cs" />
     <Compile Include="Source\Graphics\Bitmap.Cocoa.cs" />
     <Compile Include="Source\EnumExtensions.cs" />
-    <Compile Include="Source\Widgets\Model\ModelMaterialTechnique.cs" />
+    <Compile Include="Source\GeometryUtils.cs" />
+    <Compile Include="Source\Graphics\GeometryBuffer.cs" />
+    <Compile Include="Source\Graphics\OpenGL\PlatformGeometryBuffer.cs" />
+    <Compile Include="Source\Graphics\Unity\MovieTexture.cs" />
+    <Compile Include="Source\Graphics\Unity\PlatformGeometryBuffer.cs" />
+    <Compile Include="Source\Types\Plane.cs" />
+    <Compile Include="Source\Types\Vector4.cs" />
+    <Compile Include="Source\Widgets\3D\Camera3D.cs" />
+    <Compile Include="Source\Widgets\3D\IRenderObject3D.cs" />
+    <Compile Include="Source\Widgets\3D\Material.cs" />
+    <Compile Include="Source\Widgets\3D\MaterialTechnique.cs" />
+    <Compile Include="Source\Widgets\3D\Mesh3D.cs" />
+    <Compile Include="Source\Widgets\3D\Node3D.cs" />
+    <Compile Include="Source\Widgets\3D\Viewport3D.cs" />
+    <Compile Include="Source\Widgets\3D\WidgetAdapter3D.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
