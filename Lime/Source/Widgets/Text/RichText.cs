@@ -118,6 +118,7 @@ namespace Lime
 					style.Size *= ratio;
 					style.ImageSize *= ratio;
 					style.SpaceAfter *= ratio;
+					style.ShadowOffset *= ratio;
 				}
 			}
 			base.StaticScale(ratio, roundCoordinates);

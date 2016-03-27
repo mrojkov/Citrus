@@ -275,6 +275,7 @@ namespace Lime
 		public override void StaticScale(float ratio, bool roundCoordinates)
 		{
 			fontHeight *= ratio;
+			spacing *= ratio;
 			base.StaticScale(ratio, roundCoordinates);
 		}
 
