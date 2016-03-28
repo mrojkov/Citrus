@@ -57,6 +57,9 @@ namespace Lime
 		void IPresenter.Render()
 		{
 			SetViewport();
+			var context = WidgetContext.Current;
+			context.NodeUnderCursor = null;
+			context.DistanceToNodeUnderCursor = float.MaxValue;
 			foreach (var node in Nodes) {
 				node.AddToRenderChain(renderChain);
 			}

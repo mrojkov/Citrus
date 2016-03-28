@@ -18,13 +18,13 @@ namespace Lime
 	public class Viewport3D : Widget
 	{
 		private Camera3D camera;
-		private RenderChain chain = new RenderChain();
 		private float frame;
 		private List<IRenderObject3D> renderQueue;
 		private List<Mesh3D> modelMeshes;
 		private bool zSortEnabled;
 
-		public bool ZSortEnabled {
+		public bool ZSortEnabled
+		{
 			get { return zSortEnabled; }
 			set
 			{
@@ -108,6 +108,9 @@ namespace Lime
 
 		public override void Render()
 		{
+			WidgetContext.Current.CursorRay = ScreenPointToRay(Window.Current.Input.MousePosition);
+			var hitProcessor = new HitProcessor();
+			var chain = new RenderChain(hitProcessor);
 			foreach (var node in Nodes) {
 				node.AddToRenderChain(chain);
 			}
@@ -129,14 +132,18 @@ namespace Lime
 					modelMeshes.Clear();
 					while (node != null) {
 						var mm = node as Mesh3D;
-						if (mm != null && !mm.SkipRender) {
-							modelMeshes.Add(mm);
-							foreach (var sm in mm.Submeshes) {
-								renderQueue.Add(sm);
+						if (mm != null) {
+							hitProcessor.PerformHitTest(mm);
+							if (!mm.SkipRender) {
+								modelMeshes.Add(mm);
+								foreach (var sm in mm.Submeshes) {
+									renderQueue.Add(sm);
+								}
 							}
 						}
 						var wa = node as WidgetAdapter3D;
 						if (wa != null) {
+							hitProcessor.PerformHitTest(wa);
 							renderQueue.Add(wa);
 						}
 						node = node.NextToRender;
@@ -174,6 +181,7 @@ namespace Lime
 				Matrix44.CreateTranslation(new Vector3(Width / 2, Height / 2, 0)) *
 				(Matrix44)LocalToWorldTransform * orthoProjection;
 		}
+
 		public Vector3 WorldToScreenPoint(Vector3 pt)
 		{
 			pt = WorldToViewportPoint(pt);
@@ -236,6 +244,19 @@ namespace Lime
 			var zFar = Camera.FarClipPlane;
 			var z = (pt.Z * (zFar + zNear) + 2f * zFar * zNear) / (pt.Z * (zFar - zNear));
 			return new Vector3(xy, z) * new Vector3(1, -1, 1);
+		}
+
+		private class HitProcessor : IHitProcessor
+		{
+			public void PerformHitTest(Node node)
+			{
+				float distance;
+				var context = WidgetContext.Current;
+				if (node.AsModelNode.PerformHitTest(context.CursorRay, context.DistanceToNodeUnderCursor, out distance)) {
+					context.NodeUnderCursor = node;
+					context.DistanceToNodeUnderCursor = distance;
+				}
+			}
 		}
 	}
 }

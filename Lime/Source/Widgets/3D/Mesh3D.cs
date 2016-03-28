@@ -129,12 +129,57 @@ namespace Lime
 			if (HitTestTarget) {
 				var sphereInWorldSpace = BoundingSphere.CreateFromPoints(Submeshes.SelectMany(sm => sm.Geometry.Vertices).Select(v => v * GlobalTransform));
 				//sphereInWorldSpace = sphereInWorldSpace.Transform(GlobalTransform);
-				d = ray.Intersects(ref sphereInWorldSpace);
+				d = ray.Intersects(sphereInWorldSpace);
 			}
 			if (d.HasValue && d.Value < result.Distance) {
 				result = new MeshHitTestResult() { Distance = d.Value, Mesh = this };
 			}
 			return result;
+		}
+
+		internal override bool PerformHitTest(Ray ray, float distanceToNearNode, out float distance)
+		{
+			distance = default(float);
+			if (!HitTestTarget) {
+				return false;
+			}
+			if (!HitTestBoundingSphere(ray, out distance) || distance > distanceToNearNode) {
+				return false;
+			}
+			if (!HitTestGeometry(ray, out distance) || distance > distanceToNearNode) {
+				return false;
+			}
+			return true;
+		}
+
+		private bool HitTestBoundingSphere(Ray ray, out float distance)
+		{
+			distance = default(float);
+			var boundingSphereInWorldSpace = BoundingSphere.Transform(GlobalTransform);
+			var d = ray.Intersects(boundingSphereInWorldSpace);
+			if (d != null) {
+				distance = d.Value;
+				return true;
+			}
+			return false;
+		}
+
+		private bool HitTestGeometry(Ray ray, out float distance)
+		{
+			var hit = false;
+			distance = float.MaxValue;
+			ray = ray.Transform(GlobalTransform.CalcInverted());
+			foreach (var submesh in Submeshes) {
+				var vertices = submesh.Geometry.Vertices;
+				for (int i = 0; i <= vertices.Length - 3; i += 3) {
+					var d = ray.IntersectsTriangle(vertices[i], vertices[i + 1], vertices[i + 2]);
+					if (d != null && d.Value < distance) {
+						distance = d.Value;
+						hit = true;
+					}
+				}
+			}
+			return hit;
 		}
 	}
 

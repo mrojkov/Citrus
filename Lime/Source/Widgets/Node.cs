@@ -800,7 +800,10 @@ namespace Lime
 			return candidates.FirstOrDefault();
 		}
 
-		protected internal virtual void PerformHitTest() { }
+		internal virtual bool PerformHitTest(Vector2 point)
+		{
+			return false;
+		}
 
 		private class DescendantsEnumerable : IEnumerable<Node>
 		{
@@ -880,6 +883,21 @@ namespace Lime
 					current = null;
 				}
 			}
+		}
+
+		public bool IsAncestorOf(Node node)
+		{
+			if (node == null) {
+				return false;
+			}
+			var parent = node.Parent;
+			while (parent != null) {
+				if (parent == this) {
+					return true;
+				}
+				parent = parent.Parent;
+			}
+			return false;
 		}
 	}
 }

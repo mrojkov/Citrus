@@ -8,10 +8,19 @@ namespace Lime
 	public class RenderChain
 	{
 		private int currentLayer;
+		private IHitProcessor hitProcessor;
+
 		public int MaxUsedLayer { get; private set; }
 
 		public readonly Node[] Layers = new Node[Widget.MaxLayer + 1];
 
+		public RenderChain(IHitProcessor hitProcessor = null)
+		{
+			if (hitProcessor == null) {
+				hitProcessor = DefaultHitProcessor.Instance;
+			}
+			this.hitProcessor = hitProcessor;
+		}
 		/// <summary>
 		/// Добавляет объект и все его дочерние объекты в очередь отрисовки
 		/// </summary>
@@ -44,7 +53,7 @@ namespace Lime
 			for (int i = 0; i <= MaxUsedLayer; i++) {
 				Node node = Layers[i];
 				while (node != null) {
-					node.PerformHitTest();
+					hitProcessor.PerformHitTest(node);
 					node.Render();
 					Node next = node.NextToRender;
 					node.NextToRender = null;

@@ -1017,20 +1017,17 @@ namespace Lime
 
 		protected virtual Widget GetEffectiveClipperWidget()
 		{
-			return Parent != null ? Parent.AsWidget.GetEffectiveClipperWidget() : null;
+			return Parent != null && Parent.AsWidget != null ? Parent.AsWidget.GetEffectiveClipperWidget() : null;
 		}
 
-		protected internal override void PerformHitTest()
+		internal override bool PerformHitTest(Vector2 point)
 		{
-			if (!HitTestTarget) {
-				return;
+			if (!HitTestTarget || !GloballyVisible || !InsideClipRect(Input.MousePosition)) {
+				return false;
 			}
-			if (SelfHitTest(Input.MousePosition)) {
-				// TODO: Check Renderer.CurrentFrameBuffer == Renderer.DefaultFrameBuffer
-				// TODO: Check Renderer.ScissorTestEnabled and ScissorRectangle
-				WidgetContext.Current.NodeUnderCursor = this;
-			}
+			return HitTestBoundingRect(point);
 		}
+
 		#endregion
 	}
 }

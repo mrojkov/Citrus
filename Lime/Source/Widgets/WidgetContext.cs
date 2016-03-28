@@ -26,6 +26,7 @@ namespace Lime
 		/// </summary>
 		public bool IsActiveTextWidgetUpdated { get; set; }
 		public float DistanceToNodeUnderCursor { get; set; }
+		public Ray CursorRay { get; set; }
 		public Node NodeUnderCursor { get; set; }
 		public Widget Root { get; private set; }
 
