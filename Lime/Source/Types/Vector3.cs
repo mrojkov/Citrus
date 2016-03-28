@@ -34,6 +34,11 @@ namespace Lime
 		/// </summary>
 		public static readonly Vector3 Half = new Vector3(0.5f, 0.5f, 0.5f);
 		
+		public Vector3(Vector2 xy, float z)
+			: this(xy.X, xy.Y, z)
+		{
+		}
+
 		public Vector3(float x, float y, float z)
 		{
 			X = x;
