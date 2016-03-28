@@ -57,13 +57,13 @@ namespace Lime
 			result = ((this.Normal.X * value.X) + (this.Normal.Y * value.Y)) + (this.Normal.Z * value.Z);
 		}
 
-		public static Plane Transform(Plane plane, Matrix44 matrix)
+		public Plane Transform(Matrix44 matrix)
 		{
 			var vector = matrix
 				.CalcInverted()
 				.Transpose()
-				.TransformVector(new Vector4(plane.Normal, plane.D));
-			return new Plane(vector.XYZ, vector.W);
+				.TransformVector(new Vector4(Normal, D));
+			return new Plane((Vector3)vector, vector.W);
 		}
 
 		public static bool operator !=(Plane plane1, Plane plane2)
