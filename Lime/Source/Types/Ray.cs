@@ -47,7 +47,7 @@ namespace Lime
 		/// Returns 0.0f if ray is inside of sphere. 
 		/// Returns null if ray is pointed away from sphere.
 		/// </returns>
-		public float? Intersects(ref BoundingSphere sphere)
+		public float? Intersects(BoundingSphere sphere)
 		{
 			// Find the vector between where the ray starts the the sphere's centre
 			var difference = sphere.Center - Position;
@@ -90,6 +90,41 @@ namespace Lime
 				result = 0.0f;
 			}
 			return result;
+		}
+
+		public float? IntersectsTriangle(Vector3 a, Vector3 b, Vector3 c)
+		{
+			var edge1 = b - a;
+			var edge2 = c - a;
+			var directionCrossEdge2 = Vector3.CrossProduct(Direction, edge2);
+			var det = Vector3.DotProduct(edge1, directionCrossEdge2);
+			if (det > -Mathf.ZeroTolerance && det < Mathf.ZeroTolerance) {
+				return null;
+			}
+			var invDet = 1.0f / det;
+			var distanceVector = Position - a;
+			var triangleU = Vector3.DotProduct(distanceVector, directionCrossEdge2) * invDet;
+			if (triangleU < 0f || triangleU > 1f) {
+				return null;
+			}
+			var distanceCrossEndge2 = Vector3.CrossProduct(distanceVector, edge1);
+			var triangleV = Vector3.DotProduct(Direction, distanceCrossEndge2) * invDet;
+			if (triangleV < 0f || triangleU + triangleV > 1f) {
+				return null;
+			}
+			var distance = Vector3.DotProduct(edge2, distanceCrossEndge2) * invDet;
+			if (distance < 0f) {
+				return null;
+			}
+			return distance;
+		}
+
+		public Ray Transform(Matrix44 matrix)
+		{
+			return new Ray(
+				matrix.TransformVector(Position),
+				matrix.TransformNormal(Direction)
+			);
 		}
 
 		public static bool operator !=(Ray a, Ray b)
