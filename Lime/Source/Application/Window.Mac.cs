@@ -167,6 +167,7 @@ namespace Lime
 		}
 
 		private Size windowedClientSize;
+		private bool shouldFixFullscreen;
 
 		private void CreateNativeWindow(WindowOptions options)
 		{
@@ -194,11 +195,19 @@ namespace Lime
 				HandleResize(s, e);
 			};
 			window.WillEnterFullScreen += (sender, e) => {
+				shouldFixFullscreen = !window.StyleMask.HasFlag(NSWindowStyle.Resizable);
+				if (shouldFixFullscreen) {
+					window.StyleMask |= NSWindowStyle.Resizable;
+				}
 				windowedClientSize = ClientSize;
 			};
 			window.WillExitFullScreen += (sender, e) => {
 				ClientSize = windowedClientSize;
-				window.Center();
+			};
+			window.DidExitFullScreen += (sender, e) => {
+				if (shouldFixFullscreen) {
+					window.StyleMask &= ~NSWindowStyle.Resizable;
+				}
 			};
 			window.DidBecomeKey += (sender, e) => {
 				RaiseActivated();
