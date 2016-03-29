@@ -31,7 +31,6 @@ namespace Lime
 			var context = WidgetContext.Current;
 			WidgetInput.RemoveInvalidatedCaptures();
 			context.IsActiveTextWidgetUpdated = false;
-			context.DistanceToNodeUnderCursor = float.MaxValue;
 			base.Update(delta);
 			if (Application.CurrentThread.IsMain()) {
 				if (!context.IsActiveTextWidgetUpdated || Window.Input.WasKeyPressed(Key.DismissSoftKeyboard)) {

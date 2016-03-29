@@ -1022,7 +1022,7 @@ namespace Lime
 
 		internal override bool PerformHitTest(Vector2 point)
 		{
-			if (!HitTestTarget || !GloballyVisible || !InsideClipRect(Input.MousePosition)) {
+			if (!HitTestTarget || !GloballyVisible || !InsideClipRect(point)) {
 				return false;
 			}
 			return HitTestBoundingRect(point);
