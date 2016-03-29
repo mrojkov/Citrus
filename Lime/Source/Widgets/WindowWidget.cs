@@ -89,6 +89,7 @@ namespace Lime
 		public DefaultWindowWidget(Window window, bool continuousRendering = true)
 			: base(window, continuousRendering)
 		{
+			Theme.Current.Apply(this, typeof(WindowWidget));
 			window.Rendering += () => {
 				Renderer.BeginFrame();
 				Size = (Vector2)window.ClientSize;
