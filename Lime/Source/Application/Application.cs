@@ -169,9 +169,11 @@ namespace Lime
 			// Use '.' as decimal separator.
 			var culture = System.Globalization.CultureInfo.InvariantCulture;
 			System.Threading.Thread.CurrentThread.CurrentCulture = culture;
+			SetGlobalExceptionHandler();
 			AudioSystem.Initialize(options);
 #if WIN
-			System.Windows.Forms.Application.SetUnhandledExceptionMode(System.Windows.Forms.UnhandledExceptionMode.ThrowException);
+			System.Windows.Forms.Application.SetUnhandledExceptionMode(
+				System.Windows.Forms.UnhandledExceptionMode.CatchException);
 			// This function doesn't work on XP, and we don't want to add dpiAware into manifest
 			// because this will require adding into every new project.
 			try {
