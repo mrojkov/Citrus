@@ -18,43 +18,31 @@ namespace Lime
 			D = d;
 		}
 
-		public Plane(Vector3 a, Vector3 b, Vector3 c)
+		public static Plane FromTriangle(Vector3 a, Vector3 b, Vector3 c)
 		{
 			var ab = b - a;
 			var ac = c - a;
 			var cross = Vector3.CrossProduct(ab, ac);
-			Normal = cross.Normalized;
-			D = -Vector3.DotProduct(Normal, a);
+			var normal = cross.Normalized;
+			return new Plane {
+				Normal = normal,
+				D = -Vector3.DotProduct(normal, a)
+			};
 		}
 
 		public float Dot(Vector4 value)
 		{
-			return ((((this.Normal.X * value.X) + (this.Normal.Y * value.Y)) + (this.Normal.Z * value.Z)) + (this.D * value.W));
-		}
-
-		public void Dot(ref Vector4 value, out float result)
-		{
-			result = (((this.Normal.X * value.X) + (this.Normal.Y * value.Y)) + (this.Normal.Z * value.Z)) + (this.D * value.W);
+			return Vector4.DotProduct(new Vector4(Normal, D), value);
 		}
 
 		public float DotCoordinate(Vector3 value)
 		{
-			return ((((this.Normal.X * value.X) + (this.Normal.Y * value.Y)) + (this.Normal.Z * value.Z)) + this.D);
-		}
-
-		public void DotCoordinate(ref Vector3 value, out float result)
-		{
-			result = (((this.Normal.X * value.X) + (this.Normal.Y * value.Y)) + (this.Normal.Z * value.Z)) + this.D;
+			return Dot(new Vector4(value, 1f));
 		}
 
 		public float DotNormal(Vector3 value)
 		{
-			return (((this.Normal.X * value.X) + (this.Normal.Y * value.Y)) + (this.Normal.Z * value.Z));
-		}
-
-		public void DotNormal(ref Vector3 value, out float result)
-		{
-			result = ((this.Normal.X * value.X) + (this.Normal.Y * value.Y)) + (this.Normal.Z * value.Z);
+			return Vector3.DotProduct(Normal, value);
 		}
 
 		public Plane Transform(Matrix44 matrix)
@@ -78,12 +66,12 @@ namespace Lime
 
 		public override bool Equals(object other)
 		{
-			return (other is Plane) ? this.Equals((Plane)other) : false;
+			return other is Plane ? this.Equals((Plane)other) : false;
 		}
 
 		public bool Equals(Plane other)
 		{
-			return ((Normal == other.Normal) && (D == other.D));
+			return Normal == other.Normal && D == other.D;
 		}
 
 		public override int GetHashCode()
