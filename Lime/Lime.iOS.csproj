@@ -319,6 +319,7 @@
     <Compile Include="Source\Widgets\3D\Node3D.cs" />
     <Compile Include="Source\Widgets\3D\Viewport3D.cs" />
     <Compile Include="Source\Widgets\3D\WidgetAdapter3D.cs" />
+    <Compile Include="Source\IHitProcessor.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
