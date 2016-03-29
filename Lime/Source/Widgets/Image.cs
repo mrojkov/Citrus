@@ -10,12 +10,25 @@ namespace Lime
 	{
 		bool skipRender;
 		bool requestSkipRender;
+		private ITexture texture;
 
 		/// <summary>
 		/// Изображение, отображаемое этим виджетом
 		/// </summary>
 		[ProtoMember(1)]
-		public override sealed ITexture Texture { get; set; }
+		public override sealed ITexture Texture
+		{
+			get { return texture; }
+			set
+			{
+				if (texture != value) {
+					texture = value;
+					if (Window.Current != null) {
+						Window.Current.Invalidate();
+					}
+				}
+			}
+		}
 
 		/// <summary>
 		/// Текстурная координата левого верхнего угла текстуры
