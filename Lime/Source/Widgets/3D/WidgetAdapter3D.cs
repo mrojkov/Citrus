@@ -81,11 +81,9 @@ namespace Lime
 
 			public void PerformHitTest(Node node)
 			{
-				node.HitTestTarget = true;
 				if (node.PerformHitTest(mousePosition)) {
 					WidgetContext.Current.NodeUnderCursor = node;
 					WidgetContext.Current.DistanceToNodeUnderCursor = distance;
-					System.Console.WriteLine(node.Id + "; " + distance);
 				}
 			}
 		}
