@@ -12,6 +12,17 @@ namespace Lime
 		[ProtoMember(2)]
 		public Vector3 Normal;
 
+		public Plane Normalized
+		{
+			get {
+				var magnitude = 1.0f / Normal.Length;
+				return new Plane {
+					Normal = Normal * magnitude,
+					D = D * magnitude
+				};
+            }
+		}
+
 		public Plane(Vector3 normal, float d)
 		{
 			Normal = normal;

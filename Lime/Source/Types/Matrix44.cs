@@ -591,6 +591,34 @@ namespace Lime
 			return result;
 		}
 
+		public static Matrix44 CreateReflection(Plane plane)
+		{
+			var x = plane.Normal.X;
+			var y = plane.Normal.Y;
+			var z = plane.Normal.Z;
+			var x2 = -2.0f * x;
+			var y2 = -2.0f * y;
+			var z2 = -2.0f * z;
+			Matrix44 result;
+			result.M11 = (x2 * x) + 1.0f;
+			result.M12 = y2 * x;
+			result.M13 = z2 * x;
+			result.M14 = 0.0f;
+			result.M21 = x2 * y;
+			result.M22 = (y2 * y) + 1.0f;
+			result.M23 = z2 * y;
+			result.M24 = 0.0f;
+			result.M31 = x2 * z;
+			result.M32 = y2 * z;
+			result.M33 = (z2 * z) + 1.0f;
+			result.M34 = 0.0f;
+			result.M41 = x2 * plane.D;
+			result.M42 = y2 * plane.D;
+			result.M43 = z2 * plane.D;
+			result.M44 = 1.0f;
+			return result;
+		}
+
 		public float CalcDeterminant()
 		{
 			float num22 = this.M11;
