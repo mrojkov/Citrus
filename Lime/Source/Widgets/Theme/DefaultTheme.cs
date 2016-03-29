@@ -4,6 +4,8 @@ namespace Lime
 {
 	public class DefaultTheme : Theme
 	{
+		public static readonly ITheme Instance = new DefaultTheme();
+
 		public DefaultTheme()
 		{
 			Decorators[typeof(SimpleText)] = DecorateSimpleText;
