@@ -18,13 +18,13 @@ namespace Lime
 	public class Viewport3D : Widget
 	{
 		private Camera3D camera;
-		private RenderChain chain = new RenderChain();
 		private float frame;
 		private List<IRenderObject3D> renderQueue;
 		private List<Mesh3D> modelMeshes;
 		private bool zSortEnabled;
 
-		public bool ZSortEnabled {
+		public bool ZSortEnabled
+		{
 			get { return zSortEnabled; }
 			set
 			{
@@ -108,6 +108,9 @@ namespace Lime
 
 		public override void Render()
 		{
+			WidgetContext.Current.CursorRay = ScreenPointToRay(Window.Current.Input.MousePosition);
+			var hitProcessor = new HitProcessor();
+			var chain = new RenderChain(hitProcessor);
 			foreach (var node in Nodes) {
 				node.AddToRenderChain(chain);
 			}
@@ -129,14 +132,18 @@ namespace Lime
 					modelMeshes.Clear();
 					while (node != null) {
 						var mm = node as Mesh3D;
-						if (mm != null && !mm.SkipRender) {
-							modelMeshes.Add(mm);
-							foreach (var sm in mm.Submeshes) {
-								renderQueue.Add(sm);
+						if (mm != null) {
+							hitProcessor.PerformHitTest(mm);
+							if (!mm.SkipRender) {
+								modelMeshes.Add(mm);
+								foreach (var sm in mm.Submeshes) {
+									renderQueue.Add(sm);
+								}
 							}
 						}
 						var wa = node as WidgetAdapter3D;
 						if (wa != null) {
+							hitProcessor.PerformHitTest(wa);
 							renderQueue.Add(wa);
 						}
 						node = node.NextToRender;
@@ -173,6 +180,83 @@ namespace Lime
 				Matrix44.CreateScale(new Vector3(Width / 2, -Height / 2, 1)) *
 				Matrix44.CreateTranslation(new Vector3(Width / 2, Height / 2, 0)) *
 				(Matrix44)LocalToWorldTransform * orthoProjection;
+		}
+
+		public Vector3 WorldToScreenPoint(Vector3 pt)
+		{
+			pt = WorldToViewportPoint(pt);
+			return new Vector3(LocalToWorldTransform.TransformVector((Vector2)pt), pt.Z);
+		}
+
+		public Vector3 WorldToViewportPoint(Vector3 pt)
+		{
+			pt = Camera.ViewProjection.ProjectVector(pt * new Vector3(1, -1, 1));
+			var xy = ((Vector2)pt + Vector2.One) * Size * Vector2.Half;
+			var zNear = Camera.NearClipPlane;
+			var zFar = Camera.FarClipPlane;
+			var z = 2f * (zNear * zFar) / ((zFar - zNear) * pt.Z - zNear - zFar);
+			return new Vector3(xy, z);
+		}
+
+		public Vector3 ScreenToWorldPoint(Vector3 pt)
+		{
+			var xy = LocalToWorldTransform.CalcInversed().TransformVector((Vector2)pt);
+			return ViewportToWorldPoint(new Vector3(xy, pt.Z));
+		}
+
+		public Vector3 ViewportToWorldPoint(Vector3 pt)
+		{
+			return Camera.ViewProjection.CalcInverted().ProjectVector(ViewportToNDCPoint(pt));
+		}
+
+		public Ray ScreenPointToRay(Vector2 pt)
+		{
+			return ScreenPointToRay(new Vector3(pt, Camera.NearClipPlane));
+		}
+
+		public Ray ScreenPointToRay(Vector3 pt)
+		{
+			var xy = LocalToWorldTransform.CalcInversed().TransformVector((Vector2)pt);
+			return ViewportPointToRay(new Vector3(xy, pt.Z));
+		}
+
+		public Ray ViewportPointToRay(Vector2 pt)
+		{
+			return ViewportPointToRay(new Vector3(pt, Camera.NearClipPlane));
+		}
+
+		public Ray ViewportPointToRay(Vector3 pt)
+		{
+			var xy = (Vector2)pt;
+			var invViewProj = Camera.ViewProjection.CalcInverted();
+			var a = invViewProj.ProjectVector(ViewportToNDCPoint(pt));
+			var b = invViewProj.ProjectVector(ViewportToNDCPoint(new Vector3(xy, Camera.FarClipPlane)));
+			return new Ray {
+				Position = a,
+				Direction = (a - b).Normalized
+			};
+		}
+
+		private Vector3 ViewportToNDCPoint(Vector3 pt)
+		{
+			var xy = (Vector2)pt / Size * 2f - Vector2.One;
+			var zNear = Camera.NearClipPlane;
+			var zFar = Camera.FarClipPlane;
+			var z = (pt.Z * (zFar + zNear) + 2f * zFar * zNear) / (pt.Z * (zFar - zNear));
+			return new Vector3(xy, z) * new Vector3(1, -1, 1);
+		}
+
+		private class HitProcessor : IHitProcessor
+		{
+			public void PerformHitTest(Node node)
+			{
+				float distance;
+				var context = WidgetContext.Current;
+				if (node.AsModelNode.PerformHitTest(context.CursorRay, context.DistanceToNodeUnderCursor, out distance)) {
+					context.NodeUnderCursor = node;
+					context.DistanceToNodeUnderCursor = distance;
+				}
+			}
 		}
 	}
 }

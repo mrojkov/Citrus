@@ -18,8 +18,6 @@ namespace Lime
 		[ProtoMember(4)]
 		public float W;
 
-		public Vector3 XYZ { get { return new Vector3(X, Y, Z); } }
-
 		public float Length
 		{
 			get { return Mathf.Sqrt(SqrLength); }
@@ -51,8 +49,8 @@ namespace Lime
 			W = w;
 		}
 
-		public Vector4(Vector3 value, float w)
-			: this(value.X, value.Y, value.Z, w)
+		public Vector4(Vector3 xyz, float w)
+			: this(xyz.X, xyz.Y, xyz.Z, w)
 		{
 		}
 
@@ -155,6 +153,16 @@ namespace Lime
 			value1.Y *= factor;
 			value1.Z *= factor;
 			return value1;
+		}
+
+		public static explicit operator Vector2(Vector4 value)
+		{
+			return new Vector2(value.X, value.Y);
+		}
+
+		public static explicit operator Vector3(Vector4 value)
+		{
+			return new Vector3(value.X, value.Y, value.Z);
 		}
 	}
 }

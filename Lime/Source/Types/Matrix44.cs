@@ -232,7 +232,7 @@ namespace Lime
 				return rotation;
 			}
 		}
-		
+
 		#endregion Public Properties
 
 		#region Public Methods
@@ -349,116 +349,80 @@ namespace Lime
 			result.M44 = 1f;
 		}
 
-		public static Matrix44 CreateOrthographic(float width, float height, float zNearPlane, float zFarPlane)
+		public static Matrix44 CreateOrthographic(float width, float height, float zNear, float zFar)
 		{
-			Matrix44 matrix;
-			matrix.M11 = 2f / width;
-			matrix.M12 = matrix.M13 = matrix.M14 = 0f;
-			matrix.M22 = 2f / height;
-			matrix.M21 = matrix.M23 = matrix.M24 = 0f;
-			matrix.M33 = 1f / (zNearPlane - zFarPlane);
-			matrix.M31 = matrix.M32 = matrix.M34 = 0f;
-			matrix.M41 = matrix.M42 = 0f;
-			matrix.M43 = zNearPlane / (zNearPlane - zFarPlane);
-			matrix.M44 = 1f;
-			return matrix;
+			var maxX = width * 0.5f;
+			var maxY = height * 0.5f;
+			var minX = -maxX;
+			var minY = -maxY;
+			return CreateOrthographicOffCenter(minX, maxX, minY, maxY, zNear, zFar);
 		}
 
-		public static void CreateOrthographic(float width, float height, float zNearPlane, float zFarPlane, out Matrix44 result)
-		{
-			result.M11 = 2f / width;
-			result.M12 = result.M13 = result.M14 = 0f;
-			result.M22 = 2f / height;
-			result.M21 = result.M23 = result.M24 = 0f;
-			result.M33 = 1f / (zNearPlane - zFarPlane);
-			result.M31 = result.M32 = result.M34 = 0f;
-			result.M41 = result.M42 = 0f;
-			result.M43 = zNearPlane / (zNearPlane - zFarPlane);
-			result.M44 = 1f;
-		}
-
-		public static Matrix44 CreateOrthographicOffCenter(float left, float right, float bottom, float top, float zNearPlane, float zFarPlane)
+		public static Matrix44 CreateOrthographicOffCenter(float left, float right, float bottom, float top, float zNear, float zFar)
 		{
 			Matrix44 matrix;
 			matrix.M11 = (float)(2.0 / ((double)right - (double)left));
 			matrix.M12 = 0.0f;
 			matrix.M13 = 0.0f;
 			matrix.M14 = 0.0f;
+
 			matrix.M21 = 0.0f;
 			matrix.M22 = (float)(2.0 / ((double)top - (double)bottom));
 			matrix.M23 = 0.0f;
 			matrix.M24 = 0.0f;
+
 			matrix.M31 = 0.0f;
 			matrix.M32 = 0.0f;
-			matrix.M33 = (float)(1.0 / ((double)zNearPlane - (double)zFarPlane));
+			matrix.M33 = (float)(1.0 / ((double)zNear - (double)zFar));
 			matrix.M34 = 0.0f;
+
 			matrix.M41 = (float)(((double)left + (double)right) / ((double)left - (double)right));
 			matrix.M42 = (float)(((double)top + (double)bottom) / ((double)bottom - (double)top));
-			matrix.M43 = (float)((double)zNearPlane / ((double)zNearPlane - (double)zFarPlane));
+			matrix.M43 = (float)(((double)zNear + (double)zFar) / ((double)zNear - (double)zFar));
 			matrix.M44 = 1.0f;
 			return matrix;
 		}
 
-		public static Matrix44 CreatePerspective(float width, float height, float nearPlaneDistance, float farPlaneDistance)
+		public static Matrix44 CreatePerspective(float width, float height, float zNear, float zFar)
 		{
-			Matrix44 matrix;
-			if (nearPlaneDistance <= 0f) {
-				throw new ArgumentException("nearPlaneDistance <= 0");
-			}
-			if (farPlaneDistance <= 0f) {
-				throw new ArgumentException("farPlaneDistance <= 0");
-			}
-			if (nearPlaneDistance >= farPlaneDistance) {
-				throw new ArgumentException("nearPlaneDistance >= farPlaneDistance");
-			}
-			matrix.M11 = (2f * nearPlaneDistance) / width;
-			matrix.M12 = matrix.M13 = matrix.M14 = 0f;
-			matrix.M22 = (2f * nearPlaneDistance) / height;
-			matrix.M21 = matrix.M23 = matrix.M24 = 0f;
-			matrix.M33 = farPlaneDistance / (nearPlaneDistance - farPlaneDistance);
-			matrix.M31 = matrix.M32 = 0f;
-			matrix.M34 = -1f;
-			matrix.M41 = matrix.M42 = matrix.M44 = 0f;
-			matrix.M43 = (nearPlaneDistance * farPlaneDistance) / (nearPlaneDistance - farPlaneDistance);
-			return matrix;
+			var maxX = width * 0.5f;
+			var maxY = height * 0.5f;
+			var minX = -maxX;
+			var minY = -maxY;
+			return CreatePerspectiveOffCenter(minX, maxX, minY, maxY, zNear, zFar);
 		}
 
-		public static Matrix44 CreatePerspectiveFieldOfView(float fieldOfView, float aspectRatio, float nearPlaneDistance, float farPlaneDistance)
+		public static Matrix44 CreatePerspectiveFieldOfView(float vFov, float aspectRatio, float zNear, float zFar)
 		{
-			var num1 = 1f / ((float)Math.Tan((double)(fieldOfView * 0.5f)));
-			var num2 = num1 / aspectRatio;
-			var zDistance = farPlaneDistance - nearPlaneDistance;
-			return new Matrix44 {
-				M11 = num2,
-				M22 = num1,
-				M33 = -(farPlaneDistance + nearPlaneDistance) / zDistance,
-				M34 = -1f,
-				M43 = -2f * farPlaneDistance * nearPlaneDistance / zDistance
-			};
+			var maxY = zNear * (float)(Math.Tan((double)(vFov * 0.5)));
+			var minY = -maxY;
+			var maxX = maxY * aspectRatio;
+			var minX = minY * aspectRatio;
+			return CreatePerspectiveOffCenter(minX, maxX, minY, maxY, zNear, zFar);
 		}
 
-		public static Matrix44 CreatePerspectiveOffCenter(float left, float right, float bottom, float top, float nearPlaneDistance, float farPlaneDistance)
+		public static Matrix44 CreatePerspectiveOffCenter(float left, float right, float bottom, float top, float zNear, float zFar)
 		{
 			Matrix44 matrix;
-			if (nearPlaneDistance <= 0f) {
-				throw new ArgumentException("nearPlaneDistance <= 0");
-			}
-			if (farPlaneDistance <= 0f) {
-				throw new ArgumentException("farPlaneDistance <= 0");
-			}
-			if (nearPlaneDistance >= farPlaneDistance) {
-				throw new ArgumentException("nearPlaneDistance >= farPlaneDistance");
-			}
-			matrix.M11 = (2f * nearPlaneDistance) / (right - left);
-			matrix.M12 = matrix.M13 = matrix.M14 = 0f;
-			matrix.M22 = (2f * nearPlaneDistance) / (top - bottom);
-			matrix.M21 = matrix.M23 = matrix.M24 = 0f;
+			matrix.M11 = (2f * zNear) / (right - left);
+			matrix.M12 = 0f;
+			matrix.M13 = 0f;
+			matrix.M14 = 0f;
+
+			matrix.M21 = 0f;
+			matrix.M22 = (2f * zNear) / (top - bottom);
+			matrix.M23 = 0f;
+			matrix.M24 = 0f;
+
 			matrix.M31 = (left + right) / (right - left);
 			matrix.M32 = (top + bottom) / (top - bottom);
-			matrix.M33 = farPlaneDistance / (nearPlaneDistance - farPlaneDistance);
+			matrix.M33 = -(zFar + zNear) / (zFar - zNear);
 			matrix.M34 = -1f;
-			matrix.M43 = (nearPlaneDistance * farPlaneDistance) / (nearPlaneDistance - farPlaneDistance);
-			matrix.M41 = matrix.M42 = matrix.M44 = 0f;
+
+			matrix.M41 = 0f;
+			matrix.M42 = 0f;
+			matrix.M43 = -2f * (zFar * zNear) / (zFar - zNear);
+			matrix.M44 = 0f;
 			return matrix;
 		}
 
@@ -1032,11 +996,27 @@ namespace Lime
 			);
 		}
 
+		public Vector2 TransformNormal(Vector2 normal)
+		{
+			return new Vector2 {
+				X = normal.X * M11 + normal.Y * M21,
+				Y = normal.X * M12 + normal.Y * M22
+			};
+		}
+
+		public Vector3 TransformNormal(Vector3 normal)
+		{
+			return new Vector3 {
+				X = normal.X * M11 + normal.Y * M21 + normal.Z * M31,
+				Y = normal.X * M12 + normal.Y * M22 + normal.Z * M32,
+				Z = normal.X * M13 + normal.Y * M23 + normal.Z * M33
+			};
+		}
+
 		public Vector3 ProjectVector(Vector3 position)
 		{
 			var result = TransformVector(new Vector4(position, 1));
-			result /= result.W;
-			return new Vector3(result.X, result.Y, result.Z);
+			return (Vector3)result / result.W;
 		}
 
 		public Vector2 ProjectVector(Vector2 position)

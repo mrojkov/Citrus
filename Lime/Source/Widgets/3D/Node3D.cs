@@ -66,6 +66,12 @@ namespace Lime
 		public Matrix44 GlobalTransform { get { RecalcDirtyGlobals(); return globalTransform; } }
 		public bool GloballyVisible { get { RecalcDirtyGlobals(); return globallyVisible; } }
 
+		public bool IsMouseOver()
+		{
+			return WidgetContext.Current.NodeUnderCursor == this ||
+				IsAncestorOf(WidgetContext.Current.NodeUnderCursor);
+		}
+
 		public Node3D()
 		{
 			AsModelNode = this;
@@ -118,25 +124,10 @@ namespace Lime
 		public MeshHitTestResult HitTest(Vector2 point)
 		{
 			var vp = GetViewport();
-			if (vp == null || vp.Camera == null) {
-				throw new Lime.Exception("Viewport or camera isn't set");
+			if (vp == null) {
+				throw new Lime.Exception("Viewport isn't set");
 			}
-			// Get the point coordinates in the normalized screen space <-1, 1>
-			var camera = vp.Camera;
-			point = vp.LocalToWorldTransform.CalcInversed().TransformVector(point);
-			point = (point / vp.Size - Vector2.Half) * 2;
-			// Calc the ray direction
-			var direction = new Vector3(point.X, -point.Y, -1);
-			direction = camera.Projection.CalcInverted().ProjectVector(direction);
-			// Rotate the direction according to the camera orientation
-			var cameraTransform = camera.GlobalTransform;
-			cameraTransform.Translation = Vector3.Zero; // Discard the camera position
-			direction = cameraTransform.TransformVector(direction);
-			var ray = new Ray() {
-				Direction = direction.Normalized,
-				Position = Vector3.Zero * camera.GlobalTransform
-			};
-			return HitTest(ray);
+			return HitTest(vp.ScreenPointToRay(point));
 		}
 
 		public Viewport3D GetViewport()
@@ -172,18 +163,10 @@ namespace Lime
 			return result;
 		}
 
-		protected internal override void PerformHitTest()
+		internal virtual bool PerformHitTest(Ray ray, float distanceToNearNode, out float distance)
 		{
-			if (!HitTestTarget) {
-				return;
-			}
-			var r = HitTest(Window.Current.Input.MousePosition);
-			if (r.Distance < WidgetContext.Current.DistanceToNodeUnderCursor) {
-				// TODO: Check Renderer.CurrentFrameBuffer == Renderer.DefaultFrameBuffer
-				// TODO: Check Renderer.ScissorTestEnabled and ScissorRectangle
-				WidgetContext.Current.DistanceToNodeUnderCursor = r.Distance;
-				WidgetContext.Current.NodeUnderCursor = this;
-			}
+			distance = default(float);
+			return false;
 		}
 	}
 }

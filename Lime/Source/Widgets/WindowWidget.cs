@@ -31,7 +31,6 @@ namespace Lime
 			var context = WidgetContext.Current;
 			WidgetInput.RemoveInvalidatedCaptures();
 			context.IsActiveTextWidgetUpdated = false;
-			context.DistanceToNodeUnderCursor = float.MaxValue;
 			base.Update(delta);
 			if (Application.CurrentThread.IsMain()) {
 				if (!context.IsActiveTextWidgetUpdated || Window.Input.WasKeyPressed(Key.DismissSoftKeyboard)) {
@@ -57,6 +56,9 @@ namespace Lime
 		void IPresenter.Render()
 		{
 			SetViewport();
+			var context = WidgetContext.Current;
+			context.NodeUnderCursor = null;
+			context.DistanceToNodeUnderCursor = float.MaxValue;
 			foreach (var node in Nodes) {
 				node.AddToRenderChain(renderChain);
 			}
