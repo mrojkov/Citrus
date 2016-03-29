@@ -26,6 +26,8 @@ namespace Lime
 	[ProtoInclude(120, typeof(Animator<EmissionType>))]
 	public interface IAnimator
 	{
+		Node Owner { get; }
+
 		void Bind(Node owner);
 
 		IAnimator Clone();
@@ -45,6 +47,8 @@ namespace Lime
 		IKeyframeCollection ReadonlyKeys { get; }
 
 		IKeyframeCollection Keys { get; }
+
+		object UserData { get; set; }
 	}
 
 	/// <summary>
@@ -60,7 +64,8 @@ namespace Lime
 	[ProtoInclude(156, typeof(Matrix44Animator))]
 	public class Animator<T> : IAnimator
 	{
-		private Node owner;
+		public Node Owner { get; private set; }
+
 		private int currentKey = 0;
 
 		public bool IsTriggerable { get; set; }
@@ -79,6 +84,8 @@ namespace Lime
 
 		[ProtoMember(3)]
 		public string AnimationId { get; set; }
+
+		public object UserData { get; set; }
 
 		/// <summary>
 		/// Возвращает коллекцию ключей анимации
@@ -114,7 +121,7 @@ namespace Lime
 				return proxyKeys;
 			}
 		}
-		
+
 		/// <summary>
 		/// Создает клон аниматора
 		/// </summary>
@@ -137,7 +144,7 @@ namespace Lime
 		/// <param name="owner">Объект, которому будет назначен аниматор</param>
 		public void Bind(Node owner)
 		{
-			this.owner = owner;
+			this.Owner = owner;
 			var p = AnimationUtils.GetProperty(owner.GetType(), TargetProperty);
 			IsTriggerable = p.Triggerable;
 			var mi = p.Info.GetSetMethod();
@@ -171,7 +178,7 @@ namespace Lime
 			if (ReadonlyKeys.Count > 0) {
 				// This function relies on currentKey value. Therefore Apply(time) must be called before.
 				if (ReadonlyKeys[currentKey].Frame == frame) {
-					owner.OnTrigger(TargetProperty);
+					Owner.OnTrigger(TargetProperty);
 				}
 			}
 		}
