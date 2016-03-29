@@ -126,13 +126,13 @@ namespace Lime
 			}
 		}
 
-		public virtual float MinWidth
+		public float MinWidth
 		{
 			get { return MinSize.X; }
 			set { MinSize = new Vector2(value, MinSize.Y); }
 		}
 
-		public virtual float MinHeight
+		public float MinHeight
 		{
 			get { return MinSize.Y; }
 			set { MinSize = new Vector2(MinSize.X, value); }
@@ -154,13 +154,13 @@ namespace Lime
 			}
 		}
 
-		public virtual float MaxWidth
+		public float MaxWidth
 		{
 			get { return MaxSize.X; }
 			set { MaxSize = new Vector2(value, MaxSize.Y); }
 		}
 
-		public virtual float MaxHeight
+		public float MaxHeight
 		{
 			get { return MaxSize.Y; }
 			set { MaxSize = new Vector2(MaxSize.X, value); }
