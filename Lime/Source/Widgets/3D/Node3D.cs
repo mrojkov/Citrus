@@ -168,5 +168,15 @@ namespace Lime
 			distance = default(float);
 			return false;
 		}
+
+		public Matrix44 CalcTransformInSpaceOf(Camera3D camera)
+		{
+			return GlobalTransform * camera.View;
+		}
+
+		public Matrix44 CalcTransformInSpaceOf(Node3D node)
+		{
+			return GlobalTransform * node.GlobalTransform.CalcInverted();
+		}
 	}
 }
