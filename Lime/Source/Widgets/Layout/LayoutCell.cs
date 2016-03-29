@@ -11,6 +11,9 @@ namespace Lime
 		public float StretchX { get { return Stretch.X; } set { Stretch.X = value; } }
 		public float StretchY { get { return Stretch.Y; } set { Stretch.Y = value; } }
 		public static readonly LayoutCell Default = new LayoutCell();
+
+		public LayoutCell() { }
+		public LayoutCell(Alignment alignment) { Alignment = alignment; }
 	}
 
 	public struct Alignment
