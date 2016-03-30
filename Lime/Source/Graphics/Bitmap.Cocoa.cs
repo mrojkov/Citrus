@@ -1,13 +1,18 @@
 #if iOS || MAC || MONOMAC
 using System;
 using System.IO;
-using CoreGraphics;
 #if iOS
 using Foundation;
+using CoreGraphics;
 using CocoaBitmap = UIKit.UIImage;
-#elif MAC || MONOMAC
+#elif MAC
 using AppKit;
+using CoreGraphics;
 using CocoaBitmap = AppKit.NSImage;
+#else
+using MonoMac.AppKit;
+using MonoMac.CoreGraphics;
+using CocoaBitmap = MonoMac.AppKit.NSImage;
 #endif
 
 namespace Lime

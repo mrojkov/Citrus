@@ -1,7 +1,11 @@
 ﻿#if MAC || MONOMAC
 using System;
 using System.Drawing;
+#if MAC
 using AppKit;
+#else
+using MonoMac.AppKit;
+#endif
 
 namespace Lime.Platform
 {

@@ -60,8 +60,10 @@
       <HintPath>..\3rdParty\OpenTK\OpenTK.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
-    <Reference Include="MonoMac, Version=0.0.0.0, Culture=neutral" />
-    <Reference Include="Xamarin.Mac" />
+    <Reference Include="MonoMac">
+      <HintPath>..\3rdParty\MonoMac.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Types\Matrix44.cs" />
@@ -253,6 +255,10 @@
     <Compile Include="Source\Widgets\3D\Viewport3D.cs" />
     <Compile Include="Source\Widgets\3D\WidgetAdapter3D.cs" />
     <Compile Include="Source\GeometryUtils.cs" />
+    <Compile Include="Source\IHitProcessor.cs" />
+    <Compile Include="Source\Types\Plane.cs" />
+    <Compile Include="Source\Types\Vector4.cs" />
+    <Compile Include="Source\Types\MonoMac\CG.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
@@ -340,7 +346,7 @@
     <Folder Include="Source\Graphics\" />
     <Folder Include="Source\Audio\OpenAL\" />
     <Folder Include="Source\Widgets\" />
-    <Folder Include="Source\Widgets\" />
+    <Folder Include="Source\Types\MonoMac\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

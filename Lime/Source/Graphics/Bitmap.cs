@@ -3,8 +3,10 @@ using System.IO;
 
 #if WIN
 using NativeBitmap = System.Drawing.Bitmap;
-#elif MAC || MONOMAC
+#elif MAC
 using NativeBitmap = AppKit.NSImage;
+#elif MONOMAC
+using NativeBitmap = MonoMac.AppKit.NSImage;
 #elif iOS
 using NativeBitmap = UIKit.UIImage;
 #elif ANDROID

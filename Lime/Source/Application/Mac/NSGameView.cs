@@ -1,14 +1,23 @@
 ﻿#if MAC || MONOMAC
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+#if MAC
 using AppKit;
+using CoreGraphics;
 using CoreVideo;
 using Foundation;
 using OpenGL;
-using System.ComponentModel;
-using CoreGraphics;
-using System.Collections.Generic;
+#else
+using MonoMac.AppKit;
+using MonoMac.CoreGraphics;
+using MonoMac.CoreVideo;
+using MonoMac.Foundation;
+using MonoMac.OpenGL;
+#endif
+
 using OpenTK;
-using System.Drawing;
 
 namespace Lime.Platform
 {
@@ -250,7 +259,7 @@ namespace Lime.Platform
 			return true;
 		}
 
-		public override void DrawRect(CGRect dirtyRect)
+		private void DrawRectangle(CGRect dirtyRect)
 		{
 			if (animating) {
 				if (displayLinkSupported) {
@@ -261,6 +270,18 @@ namespace Lime.Platform
 				}
 			}
 		}
+
+#if MAC
+		public override void DrawRect(CGRect dirtyRect)
+		{
+			DrawRectangle(dirtyRect);
+		}
+#elif MONOMAC
+		public override void DrawRect(RectangleF dirtyRect)
+		{
+			DrawRectangle(new CGRect(dirtyRect));
+		}
+#endif
 
 		public override void LockFocus()
 		{
