@@ -97,6 +97,8 @@ namespace Lime
 		private Vector2 scale;
 		private Vector2 minSize;
 		private Vector2 maxSize = Vector2.PositiveInfinity;
+		private Vector2 measuredMinSize;
+		private Vector2 measuredMaxSize = Vector2.PositiveInfinity;
 		private bool visible;
 
 		#region Properties
@@ -110,10 +112,31 @@ namespace Lime
 		/// </summary>
 		public LayoutCell LayoutCell;
 
-		/// <summary>
-		/// The minimum widget size. For basic widgets could be provided by user or calculated automatically (e.g. for SimpleText).
-		/// If the widget has non-fixed layout, the layout is responsible to manage MinSize property.
-		/// </summary>
+		public Vector2 EffectiveMinSize { get { return Vector2.Max(MinSize, MeasuredMinSize); } }
+		public Vector2 EffectiveMaxSize { get { return Vector2.Min(MaxSize, MeasuredMaxSize); } }
+
+		public Vector2 MeasuredMinSize
+		{
+			get { return measuredMinSize; }
+			set { 
+				if (measuredMinSize != value) {
+					measuredMinSize = value;
+					InvalidateParentConstraintsAndArrangement();
+				}
+			}
+		}
+
+		public Vector2 MeasuredMaxSize
+		{
+			get { return measuredMaxSize; }
+			set { 
+				if (measuredMaxSize != value) {
+					measuredMaxSize = value;
+					InvalidateParentConstraintsAndArrangement();
+				}
+			}
+		}
+
 		public virtual Vector2 MinSize
 		{
 			get { return minSize; }
@@ -138,10 +161,6 @@ namespace Lime
 			set { MinSize = new Vector2(MinSize.X, value); }
 		}
 
-		/// <summary>
-		/// The maximum widget size. For basic widgets could be provided by user or calculated automatically (e.g. for SimpleText).
-		/// If the widget has non-fixed layout, the layout is responsible to manage MaxSize property.
-		/// </summary>
 		public virtual Vector2 MaxSize
 		{
 			get { return maxSize; }

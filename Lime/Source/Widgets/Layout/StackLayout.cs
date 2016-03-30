@@ -13,22 +13,22 @@ namespace Lime
 
 		public override void MeasureSizeConstraints(Widget widget)
 		{
-			var widgets = GetChildren(widget);
+			var widgets = GetChildren(widget, IgnoreHidden);
 			if (widgets.Count == 0) {
-				widget.MinSize = Vector2.Zero;
-				widget.MaxSize = Vector2.PositiveInfinity;
+				widget.MeasuredMinSize = Vector2.Zero;
+				widget.MeasuredMaxSize = Vector2.PositiveInfinity;
 				return;
 			}
-			var minSize = new Vector2(widgets.Max(i => i.MinSize.X), widgets.Max(i => i.MinSize.Y));
-			var maxSize = new Vector2(widgets.Max(i => i.MaxSize.X), widgets.Max(i => i.MaxSize.Y));
-			widget.MinSize = minSize + widget.Padding;
-			widget.MaxSize = maxSize + widget.Padding;
+			var minSize = new Vector2(widgets.Max(i => i.EffectiveMinSize.X), widgets.Max(i => i.EffectiveMinSize.Y));
+			var maxSize = new Vector2(widgets.Max(i => i.EffectiveMaxSize.X), widgets.Max(i => i.EffectiveMaxSize.Y));
+			widget.MeasuredMinSize = minSize + widget.Padding;
+			widget.MeasuredMaxSize = maxSize + widget.Padding;
 		}
 
 		public override void ArrangeChildren(Widget widget)
 		{
 			ArrangementValid = true;
-			var widgets = GetChildren(widget);
+			var widgets = GetChildren(widget, IgnoreHidden);
 			if (widgets.Count == 0) {
 				return;
 			}

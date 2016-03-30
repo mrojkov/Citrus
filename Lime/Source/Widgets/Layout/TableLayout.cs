@@ -21,8 +21,8 @@ namespace Lime
 		{
 			var cells = GetCellArray(widget.Nodes);
 			if (cells == null) {
-				widget.MinSize = Vector2.Zero;
-				widget.MaxSize = Vector2.PositiveInfinity;
+				widget.MeasuredMinSize = Vector2.Zero;
+				widget.MeasuredMaxSize = Vector2.PositiveInfinity;
 				return;
 			}
 			var cols = CalcColConstraints(widget, cells);
@@ -37,8 +37,8 @@ namespace Lime
 				minSize.Y += i.MinSize;
 				maxSize.Y += i.MaxSize;
 			}
-			widget.MinSize = minSize;
-			widget.MaxSize = maxSize;
+			widget.MeasuredMinSize = minSize;
+			widget.MeasuredMaxSize = maxSize;
 		}
 
 		public override void ArrangeChildren(Widget widget)
@@ -90,8 +90,8 @@ namespace Lime
 					if (c != null) {
 						cols[j].Stretch = Math.Max(cols[j].Stretch, GetCellData(c).StretchX);
 						int s = GetColSpan(c, j);
-						float mn = c.MinSize.X;
-						float mx = c.MaxSize.X;
+						float mn = c.EffectiveMinSize.X;
+						float mx = c.EffectiveMaxSize.X;
 						if (s > 1) {
 							mn /= s;
 							mx /= s;
@@ -119,8 +119,8 @@ namespace Lime
 					if (c != null) {
 						rows[i].Stretch = Math.Max(rows[i].Stretch, GetCellData(c).StretchY);
 						int s = GetRowSpan(c, i);
-						float mn = c.MinSize.Y;
-						float mx = c.MaxSize.Y;
+						float mn = c.EffectiveMinSize.Y;
+						float mx = c.EffectiveMaxSize.Y;
 						if (s > 1) {
 							mn /= s;
 							mx /= s;

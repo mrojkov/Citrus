@@ -16,7 +16,7 @@ namespace Lime
 		public override void ArrangeChildren(Widget widget)
 		{
 			ArrangementValid = true;
-			var widgets = GetChildren(widget);
+			var widgets = GetChildren(widget, IgnoreHidden);
 			if (widgets.Count == 0) {
 				return;
 			}
@@ -24,8 +24,8 @@ namespace Lime
 			int i = 0;
 			foreach (var w in widgets) {
 				constraints[i++] = new LinearAllocator.Constraints {
-					MinSize = w.MinSize.X,
-					MaxSize = w.MaxSize.X,
+					MinSize = w.EffectiveMinSize.X,
+					MaxSize = w.EffectiveMaxSize.X,
 					Stretch = (w.LayoutCell ?? LayoutCell.Default).StretchX
 				};
 			}
@@ -45,23 +45,21 @@ namespace Lime
 		public override void MeasureSizeConstraints(Widget widget)
 		{
 			ConstraintsValid = true;
-			var widgets = GetChildren(widget);
+			var widgets = GetChildren(widget, IgnoreHidden);
 			if (widgets.Count == 0) {
-				widget.MinSize = Vector2.Zero;
-				widget.MaxSize = Vector2.PositiveInfinity;
+				widget.MeasuredMinSize = Vector2.Zero;
+				widget.MeasuredMaxSize = Vector2.PositiveInfinity;
 				return;
 			}
 			var minSize = new Vector2(
-				widgets.Sum(i => i.MinSize.X),
-				widgets.Max(i => i.MinSize.Y)
-			);
+				widgets.Sum(i => i.EffectiveMinSize.X),
+				widgets.Max(i => i.EffectiveMinSize.Y));
 			var maxSize = new Vector2(
-				widgets.Sum(i => i.MaxSize.X),
-				widgets.Max(i => i.MaxSize.Y)
-			);
+				widgets.Sum(i => i.EffectiveMaxSize.X),
+				widgets.Max(i => i.EffectiveMaxSize.Y));
 			var extraSpace = new Vector2((widgets.Count - 1) * Spacing, 0) + widget.Padding;
-			widget.MinSize = minSize + extraSpace;
-			widget.MaxSize = maxSize + extraSpace;
+			widget.MeasuredMinSize = minSize + extraSpace;
+			widget.MeasuredMaxSize = maxSize + extraSpace;
 		}
 	}
 }

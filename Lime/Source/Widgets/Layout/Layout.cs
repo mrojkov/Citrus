@@ -22,14 +22,17 @@ namespace Lime
 
 	public class CommonLayout
 	{
+		public object Tag;
 		public List<Rectangle> DebugRectangles { get; protected set; }
 
 		public bool ConstraintsValid { get; protected set; }
 		public bool ArrangementValid { get; protected set; }
 		public bool FixedSizeConstraints { get; set; }
+		public bool IgnoreHidden { get; set; }
 
 		public CommonLayout()
 		{
+			IgnoreHidden = true;
 			// Make it true by default, because we want the first Invalidate() to add it to the layout queue.
 			ConstraintsValid = ArrangementValid = true;
 		}
@@ -62,9 +65,9 @@ namespace Lime
 		public virtual void ArrangeChildren(Widget widget) { }
 
 #region protected methods
-		protected static List<Widget> GetChildren(Widget widget)
+		protected static List<Widget> GetChildren(Widget widget, bool onlyVisible)
 		{
-			return widget.Nodes.OfType<Widget>().Where(i => i.Visible).ToList();
+			return widget.Nodes.OfType<Widget>().Where(i => !onlyVisible || i.Visible).ToList();
 		}
 
 		protected static void LayoutWidgetWithinCell(Widget widget, Vector2 position, Vector2 size, List<Rectangle> debugRectangles)
@@ -72,7 +75,7 @@ namespace Lime
 			debugRectangles.Add(new Rectangle { A = position, B = position + size });
 			var halign = GetCellData(widget).Alignment.X;
 			var valign = GetCellData(widget).Alignment.Y;
-			var innerSize = Vector2.Clamp(size, widget.MinSize, widget.MaxSize);
+			var innerSize = Vector2.Clamp(size, widget.EffectiveMinSize, widget.EffectiveMaxSize);
 			if (halign == HAlignment.Right) {
 				position.X += size.X - innerSize.X;
 			} else if (halign == HAlignment.Center) {
