@@ -1,11 +1,16 @@
 #if MONOMAC || MAC
 using System;
-using OpenTK.Graphics;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Lime.Platform;
+#if MAC
 using AppKit;
 using CoreGraphics;
-using Lime.Platform;
+#else
+using MonoMac.AppKit;
+using MonoMac.CoreGraphics;
+#endif
+using OpenTK.Graphics;
 
 namespace Lime
 {
@@ -215,7 +220,11 @@ namespace Lime
 			window.DidResignKey += (sender, e) => {
 				RaiseDeactivated();
 			};
+#if MAC
 			window.DidMove += HandleMove;
+#else
+			window.DidMoved += HandleMove;
+#endif
 			window.CollectionBehavior = NSWindowCollectionBehavior.FullScreenPrimary;
 			window.ContentView = View;
 			window.ReleasedWhenClosed = true;

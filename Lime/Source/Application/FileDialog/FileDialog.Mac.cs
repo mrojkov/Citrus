@@ -1,7 +1,12 @@
 ﻿#if MAC || MONOMAC
 using System;
-using AppKit;
 using System.Linq;
+#if MAC
+using AppKit;
+#else
+using MonoMac.AppKit;
+#endif
+
 
 namespace Lime
 {

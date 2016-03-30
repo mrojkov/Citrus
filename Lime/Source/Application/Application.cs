@@ -3,8 +3,10 @@ using System.Threading;
 
 #if iOS
 using UIKit;
-#elif MAC || MONOMAC
+#elif MAC
 using AppKit;
+#elif MONOMAC
+using MonoMac.AppKit;
 #elif ANDROID
 using Android.App;
 #endif
@@ -307,8 +309,10 @@ namespace Lime
 		{
 #if WIN
 			MainWindow.Close();
-#elif MAC || MONOMAC
+#elif MAC
 			NSApplication.SharedApplication.Terminate(new Foundation.NSObject());
+#elif MONOMAC
+			NSApplication.SharedApplication.Terminate(new MonoMac.Foundation.NSObject());
 #elif ANDROID || iOS
 			// Android: There is no way to terminate an android application.
 			// The only way is to finish each its activity one by one.

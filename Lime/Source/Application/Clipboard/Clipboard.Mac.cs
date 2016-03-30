@@ -1,10 +1,10 @@
-﻿#if MAC || MONOMAC
+﻿#if MAC
+// TODO: Add MonoMac support.
 using System;
-using AppKit;
-using ObjCRuntime;
-using Foundation;
 using System.Runtime.InteropServices;
-
+using AppKit;
+using Foundation;
+using ObjCRuntime;
 
 namespace Lime
 {
@@ -56,4 +56,3 @@ namespace Lime
 	}
 }
 #endif
-

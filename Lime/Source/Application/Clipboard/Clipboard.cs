@@ -1,4 +1,5 @@
-﻿namespace Lime
+﻿#if !MONOMAC
+namespace Lime
 {
 	interface IClipboardImplementation
 	{
@@ -16,3 +17,4 @@
 		}
 	}
 }
+#endif
