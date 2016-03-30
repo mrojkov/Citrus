@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
+using System.Linq;
 using System.Xml;
 
 namespace Orange
@@ -106,7 +105,7 @@ namespace Orange
 			if (IsPathIgnored(filePath)) {
 				return false;
 			}
-			// Ignore .cs files related to sub-projects 
+			// Ignore .cs files related to sub-projects
 			var dir = Toolbox.ToUnixSlashes(filePath);
 			while (true) {
 				dir = Path.GetDirectoryName(dir);
@@ -122,7 +121,10 @@ namespace Orange
 
 		private static bool IsPathIgnored(string filePath)
 		{
-			return filePath.StartsWith("packages") || filePath.StartsWith("obj");
+			return
+				filePath.StartsWith("packages") ||
+				filePath.StartsWith("obj") ||
+				filePath.EndsWith("Resource.designer.cs");
 		}
 	}
 }
