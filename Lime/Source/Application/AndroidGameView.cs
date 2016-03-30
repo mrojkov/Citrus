@@ -340,11 +340,19 @@ namespace Lime
 		{
 			float delta;
 			RefreshFrameTimeStamp(out delta);
-			input.ProcessPendingKeyEvents(delta);
-			base.OnUpdateFrame(new FrameEventArgs(delta));
-			AudioSystem.Update();
-			keyboardHandler.ProcessTextInput();
-			input.CopyKeysState();
+			if (Application.UsingDeferredHitTest) {
+				base.OnUpdateFrame(new FrameEventArgs(delta));
+				AudioSystem.Update();
+				input.CopyKeysState();
+				input.ProcessPendingKeyEvents(delta);
+				keyboardHandler.ProcessTextInput();
+			} else {
+				input.ProcessPendingKeyEvents(delta);
+				base.OnUpdateFrame(new FrameEventArgs(delta));
+				AudioSystem.Update();
+				keyboardHandler.ProcessTextInput();
+				input.CopyKeysState();
+			}
 		}
 
 		private DateTime lastFrameTimeStamp = DateTime.UtcNow;

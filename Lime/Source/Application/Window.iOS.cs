@@ -102,8 +102,14 @@ namespace Lime
 				return;
 			}
 			var delta = (float)Math.Min(e.Time, 1 / Application.LowFPSLimit);
-			Input.ProcessPendingKeyEvents(delta);
-			RaiseUpdating(delta);
+			if (Application.UsingDeferredHitTest) {
+				RaiseUpdating(delta);
+				Input.CopyKeysState();
+				Input.ProcessPendingKeyEvents(delta);
+			} else {
+				Input.ProcessPendingKeyEvents(delta);
+				RaiseUpdating(delta);
+			}
 			AudioSystem.Update();
 		}
 

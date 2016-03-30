@@ -406,11 +406,19 @@ namespace Lime
 		{
 			// Refresh mouse position of every frame to make HitTest work properly if mouse is outside of the screen.
 			RefreshMousePosition();
-			Input.ProcessPendingKeyEvents(delta);
-			RaiseUpdating(delta);
-			AudioSystem.Update();
-			Input.TextInput = null;
-			Input.CopyKeysState();
+			if (Application.UsingDeferredHitTest) {
+				RaiseUpdating(delta);
+				AudioSystem.Update();
+				Input.CopyKeysState();
+				Input.ProcessPendingKeyEvents(delta);
+				Input.TextInput = null;
+			} else {
+				Input.ProcessPendingKeyEvents(delta);
+				RaiseUpdating(delta);
+				AudioSystem.Update();
+				Input.TextInput = null;
+				Input.CopyKeysState();
+			}
 		}
 
 		private static Key TranslateKey(Keys key)
