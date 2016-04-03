@@ -14,7 +14,7 @@ namespace Lime
 			DebugRectangles = new List<Rectangle>();
 		}
 
-		public void OnSizeChanged(Widget widget, Vector2 sizeDelta)
+		public override void OnSizeChanged(Widget widget, Vector2 sizeDelta)
 		{
 			InvalidateConstraintsAndArrangement(widget);
 		}
