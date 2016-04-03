@@ -26,6 +26,8 @@ namespace Lime
 		[ProtoMember(1)]
 		public uint Value;
 
+		public int Count { get { return 32; } }
+
 		public BitSet32(uint value)
 		{
 			Value = value;
