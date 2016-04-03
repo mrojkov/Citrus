@@ -29,12 +29,10 @@ namespace Lime
 				if (w == null) {
 					break;
 				}
-				if (!w.Layout.FixedSizeConstraints) {
-					// Keep in mind: MeasureConstraints could force a parent constraints
-					// invalidation when child constraints has changed.
-					// See MinSize/MaxSize setters.
-					w.Layout.MeasureSizeConstraints(w);
-				}
+				// Keep in mind: MeasureConstraints could force a parent constraints
+				// invalidation when child constraints has changed.
+				// See MinSize/MaxSize setters.
+				w.Layout.MeasureSizeConstraints(w);
 			}
 			while (true) {
 				var w = arrangeQueue.Dequeue();

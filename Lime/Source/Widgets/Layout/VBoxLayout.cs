@@ -16,7 +16,7 @@ namespace Lime
 		public override void ArrangeChildren(Widget widget)
 		{
 			ArrangementValid = true;
-			var widgets = GetChildren(widget, IgnoreHidden);
+			var widgets = GetChildren(widget);
 			if (widgets.Count == 0) {
 				return;
 			}
@@ -45,7 +45,7 @@ namespace Lime
 		public override void MeasureSizeConstraints(Widget widget)
 		{
 			ConstraintsValid = true;
-			var widgets = GetChildren(widget, !IgnoreHidden);
+			var widgets = GetChildren(widget);
 			if (widgets.Count == 0) {
 				widget.MeasuredMinSize = Vector2.Zero;
 				widget.MeasuredMaxSize = Vector2.PositiveInfinity;

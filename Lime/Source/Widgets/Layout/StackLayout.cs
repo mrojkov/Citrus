@@ -6,14 +6,10 @@ namespace Lime
 {
 	public class StackLayout : CommonLayout, ILayout
 	{
-		public StackLayout()
-		{
-			DebugRectangles = new List<Rectangle>();
-		}
-
 		public override void MeasureSizeConstraints(Widget widget)
 		{
-			var widgets = GetChildren(widget, IgnoreHidden);
+			ConstraintsValid = true;
+			var widgets = GetChildren(widget);
 			if (widgets.Count == 0) {
 				widget.MeasuredMinSize = Vector2.Zero;
 				widget.MeasuredMaxSize = Vector2.PositiveInfinity;
@@ -28,13 +24,8 @@ namespace Lime
 		public override void ArrangeChildren(Widget widget)
 		{
 			ArrangementValid = true;
-			var widgets = GetChildren(widget, IgnoreHidden);
-			if (widgets.Count == 0) {
-				return;
-			}
-			DebugRectangles.Clear();
-			foreach (var w in widgets) {
-				LayoutWidgetWithinCell(w, widget.ContentPosition, widget.ContentSize, DebugRectangles);
+			foreach (var w in GetChildren(widget)) {
+				LayoutWidgetWithinCell(w, widget.ContentPosition, widget.ContentSize);
 			}
 		}
 	}	

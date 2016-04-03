@@ -11,7 +11,6 @@ namespace Lime
 
 		bool ConstraintsValid { get; }
 		bool ArrangementValid { get; }
-		bool FixedSizeConstraints { get; set; }
 
 		void OnSizeChanged(Widget widget, Vector2 sizeDelta);
 		void InvalidateArrangement(Widget widget);
@@ -27,7 +26,6 @@ namespace Lime
 
 		public bool ConstraintsValid { get; protected set; }
 		public bool ArrangementValid { get; protected set; }
-		public bool FixedSizeConstraints { get; set; }
 		public bool IgnoreHidden { get; set; }
 
 		public CommonLayout()
@@ -65,14 +63,16 @@ namespace Lime
 		public virtual void ArrangeChildren(Widget widget) { }
 
 #region protected methods
-		protected static List<Widget> GetChildren(Widget widget, bool onlyVisible)
+		protected List<Widget> GetChildren(Widget widget)
 		{
-			return widget.Nodes.OfType<Widget>().Where(i => !onlyVisible || i.Visible).ToList();
+			return widget.Nodes.OfType<Widget>().Where(i => !IgnoreHidden || i.Visible).ToList();
 		}
 
-		protected static void LayoutWidgetWithinCell(Widget widget, Vector2 position, Vector2 size, List<Rectangle> debugRectangles)
+		protected static void LayoutWidgetWithinCell(Widget widget, Vector2 position, Vector2 size, List<Rectangle> debugRectangles = null)
 		{
-			debugRectangles.Add(new Rectangle { A = position, B = position + size });
+			if (debugRectangles != null) {
+				debugRectangles.Add(new Rectangle { A = position, B = position + size });
+			}
 			var halign = GetCellData(widget).Alignment.X;
 			var valign = GetCellData(widget).Alignment.Y;
 			var innerSize = Vector2.Clamp(size, widget.EffectiveMinSize, widget.EffectiveMaxSize);
