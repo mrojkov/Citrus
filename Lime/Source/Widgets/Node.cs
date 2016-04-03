@@ -99,6 +99,8 @@ namespace Lime
 			}
 		}
 
+		public BitSet32 TangerineFlags;
+
 		protected virtual void OnParentChanged(Node oldParent) { }
 
 		public Widget AsWidget { get; internal set; }
