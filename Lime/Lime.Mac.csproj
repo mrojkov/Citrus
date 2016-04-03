@@ -29,7 +29,8 @@
     <IncludeMonoRuntime>false</IncludeMonoRuntime>
     <UseSGen>false</UseSGen>
     <UseRefCounting>false</UseRefCounting>
-    <Profiling>false</Profiling>
+    <Profiling>true</Profiling>
+    <HttpClientHandler>HttpClientHandler</HttpClientHandler>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -48,6 +49,7 @@
     <UseSGen>false</UseSGen>
     <UseRefCounting>false</UseRefCounting>
     <Profiling>false</Profiling>
+    <HttpClientHandler>HttpClientHandler</HttpClientHandler>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -133,12 +135,15 @@
     <Compile Include="Source\Audio\OpenAL\PlatformAudioSystem.cs" />
     <Compile Include="Source\Audio\OpenAL\WaveIMA4Decoder.cs" />
     <Compile Include="Source\Audio\IAudioChannel.cs" />
+    <Compile Include="Source\Graphics\Mesh.cs" />
+    <Compile Include="Source\Graphics\OpenGL\PlatformMesh.cs" />
     <Compile Include="Source\Types\BitSet32.cs" />
     <Compile Include="Source\Input\SoftKeyboard.cs" />
     <Compile Include="Source\AssetsBundle\UnityDownloadableBundle.cs" />
     <Compile Include="Source\Audio\Unity\AudioChannel.cs" />
     <Compile Include="Source\Audio\Unity\PlatformAudioSystem.cs" />
     <Compile Include="Source\Graphics\Bitmap.Unity.cs" />
+    <Compile Include="Source\Graphics\Unity\PlatformMesh.cs" />
     <Compile Include="Source\Graphics\Unity\PlatformRenderer.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationEngine.cs" />
     <Compile Include="Source\Widgets\Layout\AnchorLayout.cs" />
@@ -156,6 +161,11 @@
     <Compile Include="Source\Types\Ray.cs" />
     <Compile Include="Source\Widgets\Animation\Animation.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationList.cs" />
+    <Compile Include="Source\Widgets\Model\ModelCamera.cs" />
+    <Compile Include="Source\Widgets\Model\ModelMaterial.cs" />
+    <Compile Include="Source\Widgets\Model\ModelMesh.cs" />
+    <Compile Include="Source\Widgets\Model\ModelNode.cs" />
+    <Compile Include="Source\Widgets\Model\ModelViewport.cs" />
     <Compile Include="Source\Application\Clipboard\Clipboard.Android.cs" />
     <Compile Include="Source\Application\Clipboard\Clipboard.Mac.cs" />
     <Compile Include="Source\Application\Clipboard\Clipboard.Win.cs" />
@@ -232,33 +242,16 @@
     <Compile Include="Source\Application\MouseCursor\MouseCursor.Win.cs" />
     <Compile Include="Source\Application\FileDialog\FileDialog.cs" />
     <Compile Include="Source\Application\FileDialog\FileDialog.Mac.cs" />
-    <Compile Include="Source\Widgets\Layout\HBoxLayout.cs" />
     <Compile Include="Source\Widgets\FileChooserButton.cs" />
     <Compile Include="Source\Types\Thickness.cs" />
     <Compile Include="Source\Application\FileDialog\FileDialog.Win.cs" />
     <Compile Include="Source\Widgets\HSplitter.cs" />
     <Compile Include="Source\Widgets\VSplitter.cs" />
     <Compile Include="Source\Widgets\Layout\LayoutDebugPresenter.cs" />
-    <Compile Include="Source\Application\DummyWindow.cs" />
     <Compile Include="Source\Graphics\Bitmap.Cocoa.cs" />
-    <Compile Include="Source\Widgets\Layout\FlowLayout.cs" />
-    <Compile Include="Source\EnumExtensions.cs" />
-    <Compile Include="Source\GeometryUtils.cs" />
-    <Compile Include="Source\Graphics\GeometryBuffer.cs" />
-    <Compile Include="Source\Graphics\OpenGL\PlatformGeometryBuffer.cs" />
-    <Compile Include="Source\Graphics\Unity\MovieTexture.cs" />
-    <Compile Include="Source\Graphics\Unity\PlatformGeometryBuffer.cs" />
-    <Compile Include="Source\Types\Plane.cs" />
-    <Compile Include="Source\Types\Vector4.cs" />
-    <Compile Include="Source\Widgets\3D\Camera3D.cs" />
-    <Compile Include="Source\Widgets\3D\IRenderObject3D.cs" />
-    <Compile Include="Source\Widgets\3D\Material.cs" />
-    <Compile Include="Source\Widgets\3D\MaterialTechnique.cs" />
-    <Compile Include="Source\Widgets\3D\Mesh3D.cs" />
-    <Compile Include="Source\Widgets\3D\Node3D.cs" />
-    <Compile Include="Source\Widgets\3D\Viewport3D.cs" />
-    <Compile Include="Source\Widgets\3D\WidgetAdapter3D.cs" />
-    <Compile Include="Source\IHitProcessor.cs" />
+    <Compile Include="Source\Widgets\Layout\StackLayout.cs" />
+    <Compile Include="Source\Widgets\Layout\HBoxLayout.cs" />
+    <Compile Include="Source\Widgets\ConstraintAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
@@ -306,6 +299,7 @@
     <Compile Include="Source\Application\Application.cs" />
     <Compile Include="Source\Mathf.cs" />
     <Compile Include="Source\Widgets\Widget.Toolbox.cs" />
+    <Compile Include="Source\Geometry.cs" />
     <Compile Include="Source\Widgets\Polyline.cs" />
     <Compile Include="Source\StringExtensions.cs" />
     <Compile Include="Source\Application\Logger.cs" />
@@ -337,7 +331,7 @@
       <Properties>
         <Policies>
           <TextStylePolicy TabsToSpaces="False" inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp" />
-          <CSharpFormattingPolicy IndentSwitchBody="True" AnonymousMethodBraceStyle="NextLine" PropertyBraceStyle="NextLine" PropertyGetBraceStyle="NextLine" PropertySetBraceStyle="NextLine" EventBraceStyle="NextLine" EventAddBraceStyle="NextLine" EventRemoveBraceStyle="NextLine" StatementBraceStyle="NextLine" ElseNewLinePlacement="NewLine" CatchNewLinePlacement="NewLine" FinallyNewLinePlacement="NewLine" WhileNewLinePlacement="DoNotCare" ArrayInitializerWrapping="DoNotChange" ArrayInitializerBraceStyle="NextLine" BeforeMethodDeclarationParentheses="False" BeforeMethodCallParentheses="False" BeforeConstructorDeclarationParentheses="False" BeforeDelegateDeclarationParentheses="False" NewParentheses="False" SpacesBeforeBrackets="False" inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
+          <CSharpFormattingPolicy inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
         </Policies>
       </Properties>
     </MonoDevelop>
