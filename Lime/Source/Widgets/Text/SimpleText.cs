@@ -473,6 +473,7 @@ namespace Lime
 			caret.Valid = CaretPosition.ValidState.TextPos;
 			spriteList = null;
 			minSizeValid = false;
+			InvalidateParentConstraintsAndArrangement();
 			Window.Current.Invalidate();
 		}
 	}

@@ -206,6 +206,7 @@ namespace Lime
 			spriteList = null;
 			parser = null;
 			renderer = null;
+			InvalidateParentConstraintsAndArrangement();
 			Window.Current.Invalidate();
 		}
 
