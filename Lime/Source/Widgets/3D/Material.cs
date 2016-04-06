@@ -97,6 +97,7 @@ namespace Lime
 
 	internal struct MaterialExternals
 	{
+		public Color4 ColorFactor;
 		public Matrix44 WorldViewProj;
 		public Matrix44[] Bones;
 		public int BoneCount;

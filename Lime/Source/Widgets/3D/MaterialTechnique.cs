@@ -108,7 +108,7 @@ namespace Lime
 		{
 			Use();
 			LoadMatrix(uniformIds.WorldViewProj, externals.WorldViewProj);
-			LoadColor(uniformIds.DiffuseColor, material.DiffuseColor);
+			LoadColor(uniformIds.DiffuseColor, material.DiffuseColor * externals.ColorFactor);
 			LoadFloat(uniformIds.Opacity, material.Opacity);
 			if ((caps & MaterialCap.Skin) != 0) {
 				LoadMatrixArray(uniformIds.Bones, externals.Bones, externals.BoneCount);

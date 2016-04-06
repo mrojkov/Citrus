@@ -13,9 +13,11 @@ namespace Lime
 		private Quaternion rotation;
 		private Vector3 position;
 		private bool visible;
+		private Color4 color;
 
 		protected Matrix44 globalTransform;
 		protected bool globallyVisible;
+		protected Color4 globalColor;
 
 		[ProtoMember(1)]
 		public bool Visible
@@ -63,8 +65,22 @@ namespace Lime
 			}
 		}
 
+		[ProtoMember(5)]
+		public Color4 Color
+		{
+			get { return color; }
+			set
+			{
+				color = value;
+				PropagateDirtyFlags(DirtyFlags.Color);
+			}
+		}
+
+
+
 		public Matrix44 GlobalTransform { get { RecalcDirtyGlobals(); return globalTransform; } }
 		public bool GloballyVisible { get { RecalcDirtyGlobals(); return globallyVisible; } }
+		public Color4 GlobalColor { get { RecalcDirtyGlobals(); return globalColor; } }
 
 		public bool IsMouseOver()
 		{
@@ -78,6 +94,7 @@ namespace Lime
 			scale = Vector3.One;
 			rotation = Quaternion.Identity;
 			visible = true;
+			color = Color4.White;
 		}
 
 		protected override void RecalcDirtyGlobalsUsingParents()
@@ -88,13 +105,16 @@ namespace Lime
 					globalTransform *= Parent.AsModelNode.GlobalTransform;
 				}
 			}
-			if (IsDirty(DirtyFlags.Visible)) {
+			if (IsDirty(DirtyFlags.Visible | DirtyFlags.Color)) {
 				globallyVisible = Visible;
+				globalColor = color;
 				if (Parent != null) {
 					if (Parent.AsWidget != null) {
 						globallyVisible &= Parent.AsWidget.GloballyVisible;
+						globalColor *= Parent.AsWidget.GlobalColor;
 					} else if (Parent.AsModelNode != null) {
 						globallyVisible &= Parent.AsModelNode.GloballyVisible;
+						globalColor *= Parent.AsModelNode.GlobalColor;
 					}
 				}
 			}

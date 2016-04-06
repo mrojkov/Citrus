@@ -227,7 +227,8 @@ namespace Lime
 			Renderer.ZTestEnabled = ModelMesh.ZTestEnabled;
 			Renderer.ZWriteEnabled = ModelMesh.ZWriteEnabled;
 			var materialExternals = new MaterialExternals {
-				WorldViewProj = ModelMesh.WorldViewProj
+				WorldViewProj = ModelMesh.WorldViewProj,
+				ColorFactor = ModelMesh.GlobalColor
 			};
 			if (BoneIndices.Count > 0) {
 				if (sharedBoneTransforms.Length < BoneIndices.Count) {
