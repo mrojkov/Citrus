@@ -132,6 +132,14 @@ namespace Lime
 			return false;
 		}
 
+		public void SetGlobalTransform(Matrix44 transform)
+		{
+			if (Parent != null && Parent.AsModelNode != null) {
+				transform *= Parent.AsModelNode.GlobalTransform.CalcInverted();
+			}
+			SetLocalTransform(transform);
+		}
+
 		public void SetLocalTransform(Matrix44 transform)
 		{
 			if (!TrySetLocalTransform(transform)) {
