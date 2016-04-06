@@ -76,8 +76,6 @@ namespace Lime
 			}
 		}
 
-
-
 		public Matrix44 GlobalTransform { get { RecalcDirtyGlobals(); return globalTransform; } }
 		public bool GloballyVisible { get { RecalcDirtyGlobals(); return globallyVisible; } }
 		public Color4 GlobalColor { get { RecalcDirtyGlobals(); return globalColor; } }

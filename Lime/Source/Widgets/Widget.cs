@@ -795,23 +795,25 @@ namespace Lime
 				globallyVisible = Visible && color.A != 0;
 				return;
 			}
-			if (Parent != null) {
-				var parentWidget = Parent.AsWidget;
-				if (parentWidget != null) {
-					var localToParent = CalcLocalToParentTransform();
-					Matrix32.Multiply(ref localToParent, ref parentWidget.localToWorldTransform, out localToWorldTransform);
-					globalColor = Color * parentWidget.globalColor;
-					globalBlending = Blending == Blending.Inherited ? parentWidget.globalBlending : Blending;
-					globalShader = Shader == ShaderId.Inherited ? parentWidget.globalShader : Shader;
-					globallyVisible = (Visible && color.A != 0) && parentWidget.globallyVisible;
-					return;
-				}
-			}
-			localToWorldTransform = CalcLocalToParentTransform();
-			globalColor = color;
+			globalColor = Color;
 			globalBlending = Blending;
 			globalShader = Shader;
 			globallyVisible = Visible && color.A != 0;
+			localToWorldTransform = CalcLocalToParentTransform();
+			if (Parent != null) {
+				var parentWidget = Parent.AsWidget;
+				var parentNode3D = Parent.AsModelNode;
+				if (parentWidget != null) {
+					localToWorldTransform *= parentWidget.localToWorldTransform;
+					globalColor *= parentWidget.globalColor;
+					globalBlending = Blending == Blending.Inherited ? parentWidget.globalBlending : Blending;
+					globalShader = Shader == ShaderId.Inherited ? parentWidget.globalShader : Shader;
+					globallyVisible &= parentWidget.globallyVisible;
+				} else if (parentNode3D != null) {
+					globalColor *= parentNode3D.GlobalColor;
+					globallyVisible &= parentNode3D.GloballyVisible;
+				}
+			}
 		}
 
 		/// <summary>
