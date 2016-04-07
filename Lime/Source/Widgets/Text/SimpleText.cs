@@ -476,5 +476,12 @@ namespace Lime
 			InvalidateParentConstraintsAndArrangement();
 			Window.Current.Invalidate();
 		}
+
+		public override Node DeepCloneFast()
+		{
+			var clone = base.DeepCloneFast() as SimpleText;
+			clone.caret = clone.caret.Clone();
+			return clone;
+		}
 	}
 }

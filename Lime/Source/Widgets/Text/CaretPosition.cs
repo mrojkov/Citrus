@@ -92,5 +92,10 @@ namespace Lime
 			}
 			++RenderingTextPos;
 		}
+
+		public CaretPosition Clone()
+		{
+			return (CaretPosition)MemberwiseClone();
+		}
 	}
 }
