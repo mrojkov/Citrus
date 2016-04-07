@@ -1,0 +1,47 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine", "Tangerine.csproj", "{836E69F0-39A3-47CA-94C5-FB9F605D49EB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.Mac", "..\Lime\Lime.Mac.csproj", "{DC16EEBF-404D-4610-B87A-15B57464D707}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lemon.Mac", "..\Lemon\Lemon.Mac.csproj", "{BB697671-700C-455D-B8EE-66A6B122B949}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicFont.Mac", "..\Lime\Extensions\DynamicFont\DynamicFont.Mac.csproj", "{B5F74505-80BB-4373-B194-219D743C1FA0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.Core", "Tangerine.Core\Tangerine.Core.csproj", "{05FB6476-C29B-49A7-918C-A52CAF73FCA7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.UI", "Tangerine.UI\Tangerine.UI.csproj", "{E62BA18F-4E1A-466A-8299-67AD567F17E5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{05FB6476-C29B-49A7-918C-A52CAF73FCA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05FB6476-C29B-49A7-918C-A52CAF73FCA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05FB6476-C29B-49A7-918C-A52CAF73FCA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05FB6476-C29B-49A7-918C-A52CAF73FCA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{836E69F0-39A3-47CA-94C5-FB9F605D49EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{836E69F0-39A3-47CA-94C5-FB9F605D49EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{836E69F0-39A3-47CA-94C5-FB9F605D49EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{836E69F0-39A3-47CA-94C5-FB9F605D49EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5F74505-80BB-4373-B194-219D743C1FA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5F74505-80BB-4373-B194-219D743C1FA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5F74505-80BB-4373-B194-219D743C1FA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5F74505-80BB-4373-B194-219D743C1FA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB697671-700C-455D-B8EE-66A6B122B949}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB697671-700C-455D-B8EE-66A6B122B949}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB697671-700C-455D-B8EE-66A6B122B949}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB697671-700C-455D-B8EE-66A6B122B949}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC16EEBF-404D-4610-B87A-15B57464D707}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC16EEBF-404D-4610-B87A-15B57464D707}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC16EEBF-404D-4610-B87A-15B57464D707}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC16EEBF-404D-4610-B87A-15B57464D707}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E62BA18F-4E1A-466A-8299-67AD567F17E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E62BA18F-4E1A-466A-8299-67AD567F17E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E62BA18F-4E1A-466A-8299-67AD567F17E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E62BA18F-4E1A-466A-8299-67AD567F17E5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

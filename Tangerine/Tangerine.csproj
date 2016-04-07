@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectTypeGuids>{A3F8F2AB-B479-4A4A-A458-A89E7DC349F1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectGuid>{836E69F0-39A3-47CA-94C5-FB9F605D49EB}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Tangerine</RootNamespace>
+    <MonoMacResourcePrefix>Resources</MonoMacResourcePrefix>
+    <AssemblyName>Tangerine</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkIdentifier>Xamarin.Mac</TargetFrameworkIdentifier>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <Profiling>false</Profiling>
+    <UseRefCounting>true</UseRefCounting>
+    <UseSGen>true</UseSGen>
+    <IncludeMonoRuntime>false</IncludeMonoRuntime>
+    <CreatePackage>false</CreatePackage>
+    <CodeSigningKey>Mac Developer</CodeSigningKey>
+    <EnableCodeSigning>false</EnableCodeSigning>
+    <EnablePackageSigning>false</EnablePackageSigning>
+    <XamMacArch>i386</XamMacArch>
+    <HttpClientHandler>HttpClientHandler</HttpClientHandler>
+    <LinkMode>SdkOnly</LinkMode>
+    <TlsProvider>AppleTLS</TlsProvider>
+    <PackageSigningKey>Developer ID Installer</PackageSigningKey>
+    <CodeSignEntitlements></CodeSignEntitlements>
+    <CodeSignResourceRules></CodeSignResourceRules>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType></DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <LinkMode>SdkOnly</LinkMode>
+    <Profiling>false</Profiling>
+    <UseRefCounting>true</UseRefCounting>
+    <UseSGen>true</UseSGen>
+    <IncludeMonoRuntime>true</IncludeMonoRuntime>
+    <CreatePackage>false</CreatePackage>
+    <CodeSigningKey>Developer ID Application</CodeSigningKey>
+    <EnableCodeSigning>true</EnableCodeSigning>
+    <EnablePackageSigning>false</EnablePackageSigning>
+    <HttpClientHandler>HttpClientHandler</HttpClientHandler>
+    <XamMacArch>i386</XamMacArch>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="Xamarin.Mac" />
+    <Reference Include="protobuf-net">
+      <HintPath>..\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ImageAsset Include="Resources\Images.xcassets\AppIcons.appiconset\Contents.json" />
+    <ImageAsset Include="Resources\Images.xcassets\AppIcons.appiconset\AppIcon-128.png" />
+    <ImageAsset Include="Resources\Images.xcassets\AppIcons.appiconset\AppIcon-128%402x.png" />
+    <ImageAsset Include="Resources\Images.xcassets\AppIcons.appiconset\AppIcon-16.png" />
+    <ImageAsset Include="Resources\Images.xcassets\AppIcons.appiconset\AppIcon-16%402x.png" />
+    <ImageAsset Include="Resources\Images.xcassets\AppIcons.appiconset\AppIcon-256.png" />
+    <ImageAsset Include="Resources\Images.xcassets\AppIcons.appiconset\AppIcon-256%402x.png" />
+    <ImageAsset Include="Resources\Images.xcassets\AppIcons.appiconset\AppIcon-32.png" />
+    <ImageAsset Include="Resources\Images.xcassets\AppIcons.appiconset\AppIcon-32%402x.png" />
+    <ImageAsset Include="Resources\Images.xcassets\AppIcons.appiconset\AppIcon-512.png" />
+    <ImageAsset Include="Resources\Images.xcassets\AppIcons.appiconset\AppIcon-512%402x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Info.plist" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Main.cs" />
+    <Compile Include="AppDelegate.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\Lime\Extensions\DynamicFont\DynamicFont.Mac.csproj">
+      <Project>{B5F74505-80BB-4373-B194-219D743C1FA0}</Project>
+      <Name>DynamicFont.Mac</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lemon\Lemon.Mac.csproj">
+      <Project>{BB697671-700C-455D-B8EE-66A6B122B949}</Project>
+      <Name>Lemon.Mac</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lime\Lime.Mac.csproj">
+      <Project>{DC16EEBF-404D-4610-B87A-15B57464D707}</Project>
+      <Name>Lime.Mac</Name>
+    </ProjectReference>
+    <ProjectReference Include="Tangerine.Core\Tangerine.Core.csproj">
+      <Project>{05FB6476-C29B-49A7-918C-A52CAF73FCA7}</Project>
+      <Name>Tangerine.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="Tangerine.UI\Tangerine.UI.csproj">
+      <Project>{E62BA18F-4E1A-466A-8299-67AD567F17E5}</Project>
+      <Name>Tangerine.UI</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\SegoeUIRegular.ttf" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Audio.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Bone.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Button.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Checkbox.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.DistortionMesh.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.EditBox.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.EmitterShapePoint.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Frame.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Gear.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Image.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.MaskedEffect.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.ModelView.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Movie.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.NineGrid.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.ParticleEmitter.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.ParticlesMagnet.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.ParticleTemplate.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.RadioButton.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.RichText.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.SimpleText.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Slider.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.Spline.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.SplinePoint.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.TextPresenter.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Lime.TextStyle.png" />
+    <EmbeddedResource Include="Resources\Icons\Nodes\Unknown.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\AlignBottom.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\AlignCentersHorizontally.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\AlignCentersVertically.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\AlignLeft.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\AlignRight.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\AlignTop.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\CenterH.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\CenterV.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\CreateAttributesFile.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\FitToContainer.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\FitToContent.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\FlipH.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\FlipV.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\NewFolder.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\OverdrawRatio.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\OverdrawVisualization.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\Refresh.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\RestoreOriginalSize.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\SetUnitScale.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\SetZeroRotation.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\SplitHorizontal.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\SplitVertical.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\ToolsCenterView.png" />
+    <EmbeddedResource Include="Resources\Icons\Tools\ToolsResetZoom.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\Collapsed.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\Cross.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\Dot.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\EnterContainer.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\ExitContainer.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\Expanded.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\Eye.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\Lock.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\Interpolation\ClosedSpline.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\Interpolation\ClosedSplineGrayed.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\Interpolation\Linear.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\Interpolation\LinearGrayed.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\Interpolation\None.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\Interpolation\NoneGrayed.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\Interpolation\Spline.png" />
+    <EmbeddedResource Include="Resources\Icons\Timeline\Interpolation\SplineGrayed.png" />
+  </ItemGroup>
+</Project>

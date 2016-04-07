@@ -1,0 +1,135 @@
+﻿<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectTypeGuids>{A3F8F2AB-B479-4A4A-A458-A89E7DC349F1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectGuid>{E62BA18F-4E1A-466A-8299-67AD567F17E5}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Tangerine.UI</RootNamespace>
+    <MonoMacResourcePrefix>Resources</MonoMacResourcePrefix>
+    <AssemblyName>Tangerine.UI</AssemblyName>
+    <TargetFrameworkIdentifier>Xamarin.Mac</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <Profiling>true</Profiling>
+    <UseRefCounting>false</UseRefCounting>
+    <UseSGen>false</UseSGen>
+    <IncludeMonoRuntime>false</IncludeMonoRuntime>
+    <CreatePackage>false</CreatePackage>
+    <EnableCodeSigning>false</EnableCodeSigning>
+    <EnablePackageSigning>false</EnablePackageSigning>
+    <HttpClientHandler>HttpClientHandler</HttpClientHandler>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <Profiling>false</Profiling>
+    <UseRefCounting>false</UseRefCounting>
+    <UseSGen>false</UseSGen>
+    <IncludeMonoRuntime>false</IncludeMonoRuntime>
+    <CreatePackage>false</CreatePackage>
+    <EnableCodeSigning>false</EnableCodeSigning>
+    <EnablePackageSigning>false</EnablePackageSigning>
+    <HttpClientHandler>HttpClientHandler</HttpClientHandler>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="Xamarin.Mac" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
+    <Folder Include="Utils\" />
+    <Folder Include="Timeline\Commands\" />
+    <Folder Include="Timeline\Tasks\" />
+    <Folder Include="Timeline\Components\" />
+    <Folder Include="Timeline\Tasks\GridPane\" />
+    <Folder Include="Timeline\Tasks\RollPane\" />
+    <Folder Include="Timeline\Tasks\OverviewPane\" />
+    <Folder Include="Timeline\Components\Model\" />
+    <Folder Include="Timeline\Components\Presentation\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Timeline\Timeline.cs" />
+    <Compile Include="Timeline\Toolbar.cs" />
+    <Compile Include="Timeline\Rulerbar.cs" />
+    <Compile Include="Timeline\Metrics.cs" />
+    <Compile Include="Timeline\RollPane.cs" />
+    <Compile Include="Timeline\GridPane.cs" />
+    <Compile Include="Timeline\OverviewPane.cs" />
+    <Compile Include="EmbeddedResource.cs" />
+    <Compile Include="Icon.cs" />
+    <Compile Include="Utils\PropertyRegistry.cs" />
+    <Compile Include="Utils\KeyframePalette.cs" />
+    <Compile Include="Utils\WidgetPresenter.cs" />
+    <Compile Include="Utils\HSpacer.cs" />
+    <Compile Include="Utils\Colors.cs" />
+    <Compile Include="Utils\CustomCheckbox.cs" />
+    <Compile Include="Timeline\Tasks\BuildRowViewsTask.cs" />
+    <Compile Include="Timeline\Tasks\BuildRowsTask.cs" />
+    <Compile Include="Timeline\Tasks\KeyboardShortcutsTask.cs" />
+    <Compile Include="Timeline\Commands\SetCurrentContainer.cs" />
+    <Compile Include="Timeline\Commands\SetCurrentColumn.cs" />
+    <Compile Include="Timeline\Commands\ClearRowSelection.cs" />
+    <Compile Include="Timeline\Commands\SelectRectangleOnGrid.cs" />
+    <Compile Include="Timeline\Commands\SelectRow.cs" />
+    <Compile Include="Timeline\Commands\ClearGridSelection.cs" />
+    <Compile Include="Timeline\Commands\ShiftSelection.cs" />
+    <Compile Include="Timeline\Components\DragKeyframesRequest.cs" />
+    <Compile Include="Timeline\Components\HasKeyframeRequest.cs" />
+    <Compile Include="Timeline\GridSelection.cs" />
+    <Compile Include="Timeline\Tasks\GridPane\GridMouseScrollTask.cs" />
+    <Compile Include="Timeline\Tasks\GridPane\DragKeyframesRespondentTask.cs" />
+    <Compile Include="Timeline\Tasks\GridPane\ClampScrollOriginTask.cs" />
+    <Compile Include="Timeline\Tasks\GridPane\ResizeGridCurveViewTask.cs" />
+    <Compile Include="Timeline\Tasks\GridPane\SelectAndDragKeyframesTask.cs" />
+    <Compile Include="Timeline\Tasks\GridPane\HasKeyframeRespondentTask.cs" />
+    <Compile Include="Timeline\Tasks\RollPane\SelectAndDragRowsTask.cs" />
+    <Compile Include="Timeline\Tasks\RollPane\RollMouseScrollTask.cs" />
+    <Compile Include="Timeline\Commands\DragRows.cs" />
+    <Compile Include="Timeline\Tasks\MouseWheelTask.cs" />
+    <Compile Include="Timeline\Row.cs" />
+    <Compile Include="Timeline\Tasks\GridPane\ProcessGridWidgetsTask.cs" />
+    <Compile Include="Timeline\Tasks\RollPane\ProcessRollWidgetsTask.cs" />
+    <Compile Include="Timeline\Tasks\OverviewPane\ProcessOverviewWidgetsTask.cs" />
+    <Compile Include="Timeline\Tasks\OverviewPane\OverviewScrollTask.cs" />
+    <Compile Include="Timeline\Tasks\GridPane\RefreshColumnCountTask.cs" />
+    <Compile Include="Timeline\Components\Presentation\GridCurveView.cs" />
+    <Compile Include="Timeline\Components\Presentation\GridNodeView.cs" />
+    <Compile Include="Timeline\Components\Presentation\GridPropertyView.cs" />
+    <Compile Include="Timeline\Components\Presentation\RollCurveView.cs" />
+    <Compile Include="Timeline\Components\Presentation\RollNodeView.cs" />
+    <Compile Include="Timeline\Components\Presentation\RollPropertyView.cs" />
+    <Compile Include="Timeline\Components\Presentation\Widgets.cs" />
+    <Compile Include="Timeline\Components\Model\CurveRow.cs" />
+    <Compile Include="Timeline\Components\Model\NodeRow.cs" />
+    <Compile Include="Timeline\Components\Model\PropertyRow.cs" />
+    <Compile Include="Timeline\Components\Presentation\IRollWidget.cs" />
+    <Compile Include="Timeline\Components\Presentation\IGridWidget.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.csproj">
+      <Project>{05FB6476-C29B-49A7-918C-A52CAF73FCA7}</Project>
+      <Name>Tangerine.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">
+      <Project>{DC16EEBF-404D-4610-B87A-15B57464D707}</Project>
+      <Name>Lime.Mac</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>
