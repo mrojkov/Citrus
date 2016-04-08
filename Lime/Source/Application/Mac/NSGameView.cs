@@ -26,13 +26,11 @@ namespace Lime.Platform
 		private static NSOpenGLContext primaryContext;
 		private NSOpenGLContext openGLContext;
 		private NSOpenGLPixelFormat pixelFormat;
-		private CVDisplayLink displayLink;
 		private NSTimer animationTimer;
 		private NSTrackingArea trackingArea;
 		private bool swapInterval;
 		private bool disposed;
 		private bool animating;
-		private bool displayLinkSupported;
 		private NSEventModifierMask prevMask;
 		private Lime.Input input;
 
@@ -65,7 +63,6 @@ namespace Lime.Platform
 			openGLContext.MakeCurrentContext();
 
 			swapInterval = true;
-			displayLinkSupported = true;
 		}
 
 		public override void UpdateTrackingAreas()
@@ -235,14 +232,8 @@ namespace Lime.Platform
 		public void Stop()
 		{
 			if (animating) {
-				if (displayLinkSupported) {
-					if (displayLink != null && displayLink.IsRunning)
-						displayLink.Stop();
-
-				} else {
-					animationTimer.Invalidate();
-					animationTimer = null;
-				}
+				animationTimer.Invalidate();
+				animationTimer = null;
 			}
 			animating = false;
 		}
@@ -250,10 +241,7 @@ namespace Lime.Platform
 		public void Run(double updatesPerSecond)
 		{
 			AssertNonDisposed();
-			displayLinkSupported = false;
 			openGLContext.SwapInterval = swapInterval;
-			if (displayLinkSupported)
-				SetupDisplayLink();
 			StartAnimation(updatesPerSecond);
 		}
 
@@ -285,20 +273,14 @@ namespace Lime.Platform
 		private void StartAnimation(double updatesPerSecond)
 		{
 			if (!animating) {
-				if (displayLinkSupported) {
-					if (displayLink != null && !displayLink.IsRunning)
-						displayLink.Start();
-				} else {
-					var timeout = new TimeSpan((long)(((1.0 * TimeSpan.TicksPerSecond) / updatesPerSecond) + 0.5));
-					animationTimer = NSTimer.CreateRepeatingScheduledTimer(timeout, delegate {
-						OnUpdate();
-						OnRender();
-					});
-					NSRunLoop.Current.AddTimer(animationTimer, NSRunLoopMode.Default);
-					NSRunLoop.Current.AddTimer(animationTimer, NSRunLoopMode.EventTracking);
-				}
+				var timeout = new TimeSpan((long)(((1.0 * TimeSpan.TicksPerSecond) / updatesPerSecond) + 0.5));
+				animationTimer = NSTimer.CreateRepeatingScheduledTimer(timeout, delegate {
+					OnUpdate();
+					OnRender();
+				});
+				NSRunLoop.Current.AddTimer(animationTimer, NSRunLoopMode.Default);
+				NSRunLoop.Current.AddTimer(animationTimer, NSRunLoopMode.EventTracking);
 			}
-
 			animating = true;
 		}
 
@@ -332,31 +314,6 @@ namespace Lime.Platform
 			openGLContext.CGLContext.Unlock();
 		}
 
-		private void SetupDisplayLink()
-		{
-			if (displayLink != null)
-				return;
-
-			displayLink = new CVDisplayLink();
-			displayLink.SetOutputCallback(DisplayLinkCallback);
-
-			CGLContext cglContext = openGLContext.CGLContext;
-			CGLPixelFormat cglPixelFormat = pixelFormat.CGLPixelFormat;
-			displayLink.SetCurrentDisplay(cglContext, cglPixelFormat);
-		}
-
-		private CVReturn DisplayLinkCallback(CVDisplayLink displayLink, ref CVTimeStamp inNow, ref CVTimeStamp inOutputTime, CVOptionFlags flagsIn, ref CVOptionFlags flagsOut)
-		{
-			var result = CVReturn.Error;
-
-			using (var pool = new NSAutoreleasePool()) {
-				BeginInvokeOnMainThread(OnRender);
-				result = CVReturn.Success;
-			}
-
-			return result;
-		}
-
 		public virtual void MakeCurrent()
 		{
 			AssertNonDisposed();
@@ -377,7 +334,6 @@ namespace Lime.Platform
 				return;
 			if (disposing) {
 				Stop();
-				displayLink = null;
 				// DestroyFrameBuffer();
 			}
 			base.Dispose(disposing);
