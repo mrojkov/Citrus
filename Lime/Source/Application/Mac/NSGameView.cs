@@ -23,6 +23,7 @@ namespace Lime.Platform
 {
 	public class NSGameView : NSView
 	{
+		private static NSOpenGLContext primaryContext;
 		private NSOpenGLContext openGLContext;
 		private NSOpenGLPixelFormat pixelFormat;
 		private CVDisplayLink displayLink;
@@ -39,7 +40,7 @@ namespace Lime.Platform
 		public event Action RenderFrame;
 		public event Action InputChanged;
 
-		public NSGameView(Lime.Input input, CGRect frame, NSOpenGLContext shareContext, GraphicsMode mode)
+		public NSGameView(Lime.Input input, CGRect frame, GraphicsMode mode)
 			: base(frame)
 		{
 			this.input = input;
@@ -50,9 +51,12 @@ namespace Lime.Platform
 
 			if (pixelFormat == null) {
 				throw new InvalidOperationException(string.Format("Failed to contruct NSOpenGLPixelFormat for GraphicsMode {0}", mode));
-			}				
+			}
 
-			openGLContext = new NSOpenGLContext(pixelFormat, shareContext);
+			openGLContext = new NSOpenGLContext(pixelFormat, primaryContext);
+			if (primaryContext == null) {
+				primaryContext = openGLContext;
+			}
 
 			if (openGLContext == null) {
 				throw new InvalidOperationException(string.Format("Failed to construct NSOpenGLContext {0}", mode));

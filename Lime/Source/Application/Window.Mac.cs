@@ -153,10 +153,9 @@ namespace Lime
 			Input.Changed += Update;
 			fpsCounter = new FPSCounter();
 			CreateNativeWindow(options);
-			if (Application.MainWindow != null) {
-				throw new Lime.Exception("Attempt to create GameWindow twice");
+			if (Application.MainWindow == null) {
+				Application.MainWindow = this;
 			}
-			Application.MainWindow = this;
 			ClientSize = options.ClientSize;
 			Title = options.Title;
 			if (options.Visible) {
@@ -177,7 +176,7 @@ namespace Lime
 		private void CreateNativeWindow(WindowOptions options)
 		{
 			var rect = new CGRect(0, 0, options.ClientSize.Width, options.ClientSize.Height);
-			View = new NSGameView(Input, rect, null, Platform.GraphicsMode.Default);
+			View = new NSGameView(Input, rect, Platform.GraphicsMode.Default);
 			var style = NSWindowStyle.Titled | NSWindowStyle.Closable | NSWindowStyle.Miniaturizable;
 			if (!options.FixedSize) {
 				style |= NSWindowStyle.Resizable;
