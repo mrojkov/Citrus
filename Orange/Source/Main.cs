@@ -7,6 +7,9 @@ namespace Orange
 		[STAThread]
 		public static void Main (string[] args)
 		{
+			var culture = System.Globalization.CultureInfo.InvariantCulture;
+			System.Threading.Thread.CurrentThread.CurrentCulture = culture;
+
 			if (Toolbox.GetCommandLineFlag("--console") || Toolbox.GetCommandLineFlag("--help")) {
 				ConsoleMode(args);
 			} else {
