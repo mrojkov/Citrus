@@ -236,6 +236,7 @@ namespace Lime
 		}
 
 		FormBorderStyle borderStyle;
+		private WindowState prevWindowState;
 
 		public Window(WindowOptions options)
 		{
@@ -416,21 +417,42 @@ namespace Lime
 
 		private void OnActivated(object sender, EventArgs e)
 		{
-			glControl.MakeCurrent();
-			active = true;
-			RaiseActivated();
+			if (!active) {
+				glControl.MakeCurrent();
+				active = true;
+				RaiseActivated();
+			}
 		}
 
 		private void OnDeactivate(object sender, EventArgs e)
 		{
-			Input.ClearKeyState();
-			active = false;
-			RaiseDeactivated();
+			if (active) {
+				Input.ClearKeyState();
+				active = false;
+				RaiseDeactivated();
+			}
 		}
 
 		private void OnResize(object sender, EventArgs e)
 		{
-			RaiseResized(deviceRotated: false);
+			bool hasBeenMinimized = prevWindowState != WindowState.Minimized && State == WindowState.Minimized;
+			bool hasBeenRestored = prevWindowState == WindowState.Minimized && State != WindowState.Minimized;
+			prevWindowState = State;
+
+			// This will produce extra invokes, but will keep "active" flag in consistant state when minimizing app by
+			// clicking on taskbar icon
+			if (hasBeenRestored) {
+				OnActivated(this, EventArgs.Empty);
+			}
+			if (hasBeenMinimized) {
+				OnDeactivate(this, EventArgs.Empty);
+			}
+
+			// We should ignore this event after minimize or restore.
+			// Calling to RaiseResized() after minimize can lead to various bugs because window size is 0x0
+			if (!hasBeenRestored && !hasBeenMinimized) {
+				RaiseResized(deviceRotated: false);
+			}
 		}
 
 		private void OnMouseDown(object sender, MouseEventArgs e)
