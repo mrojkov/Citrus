@@ -212,14 +212,7 @@ namespace Lime
 
 		public Vector3 Scale
 		{
-			get
-			{
-				return new Vector3(
-					(float)Math.Sqrt((M11 * M11) + (M12 * M12) + (M13 * M13)),
-					(float)Math.Sqrt((M21 * M21) + (M22 * M22) + (M23 * M23)),
-					(float)Math.Sqrt((M31 * M31) + (M32 * M32) + (M33 * M33))
-				);
-			}
+			get { return GetScale(false); }
 		}
 
 		public Quaternion Rotation
@@ -1106,6 +1099,29 @@ namespace Lime
 			result.M42 = matrix.M24;
 			result.M43 = matrix.M34;
 			result.M44 = matrix.M44;
+		}
+
+		private Vector3 GetScale(bool skipReflexionTest)
+		{
+			var scale = new Vector3(
+				(float)Math.Sqrt(M11 * M11 + M12 * M12 + M13 * M13),
+				(float)Math.Sqrt(M21 * M21 + M22 * M22 + M23 * M23),
+				(float)Math.Sqrt(M31 * M31 + M32 * M32 + M33 * M33)
+			);
+			if (skipReflexionTest ||
+				scale.X < Mathf.ZeroTolerance ||
+				scale.Y < Mathf.ZeroTolerance ||
+				scale.Z < Mathf.ZeroTolerance) {
+				return scale;
+			}
+			var at = Backward / scale.Z;
+			var up = Vector3.CrossProduct(at, Right / scale.X);
+			var right = Vector3.CrossProduct(up, at);
+			return new Vector3 {
+				X = Vector3.DotProduct(right, Right) > 0f ? scale.X : -scale.X,
+				Y = Vector3.DotProduct(up, Up) > 0f ? scale.Y : -scale.Y,
+				Z = Vector3.DotProduct(at, Backward) > 0f ? scale.Z : -scale.Z
+			};
 		}
 
 #if UNITY
