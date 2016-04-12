@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Net;
+using System.Runtime.InteropServices;
 using Gdk;
 
 namespace Orange
@@ -24,7 +22,7 @@ namespace Orange
 		/// <summary>
 		/// Fills RGB channels with alpha values.
 		/// </summary>
-		public static void ConvertBitmapToAlphaMask(Gdk.Pixbuf pixbuf)
+		public static void ConvertBitmapToAlphaMask(Pixbuf pixbuf)
 		{
 			int stride = pixbuf.Rowstride;
 			if ((stride & 0x3) != 0 || !pixbuf.HasAlpha) {
@@ -49,7 +47,7 @@ namespace Orange
 		/// <summary>
 		/// Fills RGB channels with Alpha value, Alpha remains untouched
 		/// </summary>
-		public static void ConvertBitmapToGrayscaleAlphaMask(Gdk.Pixbuf pixbuf)
+		public static void ConvertBitmapToGrayscaleAlphaMask(Pixbuf pixbuf)
 		{
 			int stride = pixbuf.Rowstride;
 			if ((stride & 0x3) != 0 || !pixbuf.HasAlpha) {
@@ -70,7 +68,7 @@ namespace Orange
 			}
 		}
 
-		public static bool IsWhiteImageWithAlpha(Gdk.Pixbuf pixbuf)
+		public static bool IsWhiteImageWithAlpha(Pixbuf pixbuf)
 		{
 			if (pixbuf.NChannels != 4 || !pixbuf.HasAlpha) {
 				return false;
@@ -97,120 +95,7 @@ namespace Orange
 			return true;
 		}
 
-		public static void ReduceTo4BitsPerChannelWithFloydSteinbergDithering(Gdk.Pixbuf pixbuf)
-		{
-			if (pixbuf.HasAlpha) {
-				ReduceRGBATo4BitsPerChannelWithFloydSteinbergDithering(pixbuf);
-			} else {
-				ReduceRGBTo4BitsPerChannelWithFloydSteinbergDithering(pixbuf);
-			}
-		}
-
-		private static void ReduceRGBATo4BitsPerChannelWithFloydSteinbergDithering(Gdk.Pixbuf pixbuf)
-		{
-			int stride = pixbuf.Rowstride;
-			if ((stride & 0x3) != 0) {
-				throw new Lime.Exception("Invalid pixbuf format");
-			}
-			unsafe {
-				int	width = pixbuf.Width;
-				int height = pixbuf.Height;
-				RGBA* pixels = (RGBA*)pixbuf.Pixels;
-				for (int i = 0; i < height; i++) {
-					for (int j = 0; j < width; j++) {
-						RGBA quantError = *pixels;
-						quantError.A &= 0x0F; 
-						quantError.R &= 0x0F; 
-						quantError.G &= 0x0F;
-						quantError.B &= 0x0F;
-						RGBA pixel = *pixels;
-						pixel.A &= 0xF0; 
-						pixel.R &= 0xF0; 
-						pixel.G &= 0xF0;
-						pixel.B &= 0xF0;
-						*pixels = pixel;
-						if (j < width - 1) {
-							RGBA* p = pixels + 1; // pixel[x + 1][y]
-							*p = AddQuantError(*p, 7, quantError); 
-						}
-						if (j > 0 && i < height - 1) {
-							RGBA* p = pixels - 1 + stride / 4; // pixel[x - 1][y + 1]
-							*p = AddQuantError(*p, 3, quantError); 
-						}
-						if (i < height - 1) {
-							RGBA* p = pixels + stride / 4; // pixel[x][y + 1]
-							*p = AddQuantError(*p, 5, quantError);
-						}
-						if (j < width - 1 && i < height - 1) {
-							RGBA* p = pixels + 1 + stride / 4; // pixel[x + 1][y + 1]
-							*p = AddQuantError(*p, 1, quantError);
-						}
-						pixels++;
-					}
-					pixels += stride / 4 - width;
-				}
-			}
-		}
-
-		private static void ReduceRGBTo4BitsPerChannelWithFloydSteinbergDithering(Pixbuf pixbuf)
-		{
-			int stride = pixbuf.Rowstride;
-			unsafe {
-				int width = pixbuf.Width;
-				int height = pixbuf.Height;
-				RGB* pixels = (RGB*)pixbuf.Pixels;
-				for (int i = 0; i < height; i++) {
-					for (int j = 0; j < width; j++) {
-						RGB quantError = *pixels;
-						quantError.R &= 0x0F;
-						quantError.G &= 0x0F;
-						quantError.B &= 0x0F;
-						RGB pixel = *pixels;
-						pixel.R &= 0xF0;
-						pixel.G &= 0xF0;
-						pixel.B &= 0xF0;
-						*pixels = pixel;
-						if (j < width - 1) {
-							RGB* p = pixels + 1; // pixel[x + 1][y]
-							*p = AddQuantError(*p, 7, quantError);
-						}
-						if (j > 0 && i < height - 1) {
-							RGB* p = pixels - 1 + stride / 4; // pixel[x - 1][y + 1]
-							*p = AddQuantError(*p, 3, quantError);
-						}
-						if (i < height - 1) {
-							RGB* p = pixels + stride / 4; // pixel[x][y + 1]
-							*p = AddQuantError(*p, 5, quantError);
-						}
-						if (j < width - 1 && i < height - 1) {
-							RGB* p = pixels + 1 + stride / 4; // pixel[x + 1][y + 1]
-							*p = AddQuantError(*p, 1, quantError);
-						}
-						pixels++;
-					}
-					pixels += stride / 4 - width;
-				}
-			}
-		}
-
-		private static RGBA AddQuantError(RGBA pixel, int koeff, RGBA error)
-		{
-			pixel.A = (byte)Math.Min((int)pixel.A + (error.A * koeff >> 4), 255);
-			pixel.R = (byte)Math.Min((int)pixel.R + (error.R * koeff >> 4), 255);
-			pixel.G = (byte)Math.Min((int)pixel.G + (error.G * koeff >> 4), 255);
-			pixel.B = (byte)Math.Min((int)pixel.B + (error.B * koeff >> 4), 255);
-			return pixel;
-		}
-
-		private static RGB AddQuantError(RGB pixel, int koeff, RGB error)
-		{
-			pixel.R = (byte)Math.Min((int)pixel.R + (error.R * koeff >> 4), 255);
-			pixel.G = (byte)Math.Min((int)pixel.G + (error.G * koeff >> 4), 255);
-			pixel.B = (byte)Math.Min((int)pixel.B + (error.B * koeff >> 4), 255);
-			return pixel;
-		}
-
-		public static void SwapRGBChannels(Gdk.Pixbuf pixbuf)
+		public static void SwapRGBChannels(Pixbuf pixbuf)
 		{
 			if (pixbuf.HasAlpha) {
 				unsafe {
@@ -245,7 +130,8 @@ namespace Orange
 				}
 			}
 		}
-		public static unsafe void BleedAlpha(Gdk.Pixbuf pixbuf)
+
+		public static unsafe void BleedAlpha(Pixbuf pixbuf)
 		{
 			if (!pixbuf.HasAlpha || (pixbuf.Width == 1 && pixbuf.Height == 1)) {
 				return;
@@ -326,8 +212,8 @@ namespace Orange
 				Lime.Toolbox.Swap(ref pending, ref pendingNext);
 			}
 		}
-		
-		public static void SaveToTGA(Gdk.Pixbuf pixbuf, string path)
+
+		public static void SaveToTGA(Pixbuf pixbuf, string path)
 		{
 			using (Stream stream = new FileStream(path, FileMode.Create)) {
 				using (BinaryWriter o = new BinaryWriter(stream)) {
