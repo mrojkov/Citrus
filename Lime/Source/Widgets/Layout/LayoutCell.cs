@@ -14,6 +14,13 @@ namespace Lime
 
 		public LayoutCell() { }
 		public LayoutCell(Alignment alignment) { Alignment = alignment; }
+		public LayoutCell(Alignment alignment, float stretch) : this(alignment, stretch, stretch) { }
+		public LayoutCell(Alignment alignment, float stretchX, float stretchY)
+		{
+			Alignment = alignment;
+			StretchX = stretchX;
+			StretchY = stretchY;
+		}
 	}
 
 	public struct Alignment
