@@ -311,24 +311,24 @@ namespace Lime
 				(3.0f * p1 - p0 - 3.0f * p2 + p3) * t3);
 		}
 
-		public static Vector3 CubicBezierSpline(float t, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3)
+		public static Vector3 BezierSpline(float t, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3)
 		{
 			return new Vector3 {
-				X = CubicBezierSpline(t, p0.X, p1.X, p2.X, p3.X),
-				Y = CubicBezierSpline(t, p0.Y, p1.Y, p2.Y, p3.Y),
-				Z = CubicBezierSpline(t, p0.Z, p1.Z, p2.Z, p3.Z),
+				X = BezierSpline(t, p0.X, p1.X, p2.X, p3.X),
+				Y = BezierSpline(t, p0.Y, p1.Y, p2.Y, p3.Y),
+				Z = BezierSpline(t, p0.Z, p1.Z, p2.Z, p3.Z),
 			};
 		}
 
-		public static Vector2 CubicBezierSpline(float t, Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3)
+		public static Vector2 BezierSpline(float t, Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3)
 		{
 			return new Vector2 {
-				X = CubicBezierSpline(t, p0.X, p1.X, p2.X, p3.X),
-				Y = CubicBezierSpline(t, p0.Y, p1.Y, p2.Y, p3.Y)
+				X = BezierSpline(t, p0.X, p1.X, p2.X, p3.X),
+				Y = BezierSpline(t, p0.Y, p1.Y, p2.Y, p3.Y)
 			};
 		}
 
-		public static float CubicBezierSpline(float t, float p0, float p1, float p2, float p3)
+		public static float BezierSpline(float t, float p0, float p1, float p2, float p3)
 		{
 			var oneMinusT = 1 - t;
 			var oneMinusT2 = oneMinusT * oneMinusT;
