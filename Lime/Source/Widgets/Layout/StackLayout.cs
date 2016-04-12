@@ -6,6 +6,11 @@ namespace Lime
 {
 	public class StackLayout : CommonLayout, ILayout
 	{
+		public StackLayout()
+		{
+			DebugRectangles = new List<Rectangle>();
+		}
+
 		public override void MeasureSizeConstraints(Widget widget)
 		{
 			ConstraintsValid = true;
@@ -23,9 +28,10 @@ namespace Lime
 
 		public override void ArrangeChildren(Widget widget)
 		{
+			DebugRectangles.Clear();
 			ArrangementValid = true;
 			foreach (var w in GetChildren(widget)) {
-				LayoutWidgetWithinCell(w, widget.ContentPosition, widget.ContentSize);
+				LayoutWidgetWithinCell(w, widget.ContentPosition, widget.ContentSize, DebugRectangles);
 			}
 		}
 	}	
