@@ -212,7 +212,7 @@ namespace Lime
 
 		public Vector3 Scale
 		{
-			get { return GetScale(false); }
+			get { return GetScale(true); }
 		}
 
 		public Quaternion Rotation
@@ -1101,14 +1101,14 @@ namespace Lime
 			result.M44 = matrix.M44;
 		}
 
-		private Vector3 GetScale(bool skipReflexionTest)
+		public Vector3 GetScale(bool checkReflexion)
 		{
 			var scale = new Vector3(
 				(float)Math.Sqrt(M11 * M11 + M12 * M12 + M13 * M13),
 				(float)Math.Sqrt(M21 * M21 + M22 * M22 + M23 * M23),
 				(float)Math.Sqrt(M31 * M31 + M32 * M32 + M33 * M33)
 			);
-			if (skipReflexionTest ||
+			if (!checkReflexion ||
 				scale.X < Mathf.ZeroTolerance ||
 				scale.Y < Mathf.ZeroTolerance ||
 				scale.Z < Mathf.ZeroTolerance) {
