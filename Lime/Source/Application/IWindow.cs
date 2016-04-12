@@ -177,5 +177,7 @@ namespace Lime
 		float PixelScale { get; }
 
 		IContext Context { get; set; }
+
+		object Tag { get; set; }
 	}
 }

@@ -12,6 +12,7 @@ namespace Lime
 		public event ResizeDelegate Resized;
 		public event Action<float> Updating;
 		public event Action Rendering;
+		public object Tag { get; set; }
 
 		public static IWindow Current { get; private set; }
 		public IContext Context { get; set; }
