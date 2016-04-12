@@ -141,6 +141,11 @@ namespace Lime
 			return value1 + (value2 - value1) * amount;
 		}
 
+		public static Vector3 Lerp(float amount, Vector3 value1, Vector3 value2)
+		{
+			return value1 + (value2 - value1) * amount;
+		}
+
 		public static float RandomFloat(this System.Random rng, float min, float max)
 		{
 			return rng.RandomFloat() * (max - min) + min;
@@ -258,8 +263,17 @@ namespace Lime
 
 		public static Vector2 HermiteSpline(float t, Vector2 p0, Vector2 m0, Vector2 p1, Vector2 m1)
 		{
-			return new Vector2(HermiteSpline(t, p0.X, m0.X, p1.X, m1.X),
+			return new Vector2(
+				HermiteSpline(t, p0.X, m0.X, p1.X, m1.X),
 				HermiteSpline(t, p0.Y, m0.Y, p1.Y, m1.Y));
+		}
+
+		public static Vector3 HermiteSpline(float t, Vector3 p0, Vector3 m0, Vector3 p1, Vector3 m1)
+		{
+			return new Vector3(
+				HermiteSpline(t, p0.X, m0.X, p1.X, m1.X),
+				HermiteSpline(t, p0.Y, m0.Y, p1.Y, m1.Y),
+				HermiteSpline(t, p0.Z, m0.Z, p1.Z, m1.Z));
 		}
 
 		public static float HermiteSpline(float t, float p0, float m0, float p1, float m1)
@@ -295,6 +309,33 @@ namespace Lime
 				(p2 - p0) * t +
 				(2.0f * p0 - 5.0f * p1 + 4.0f * p2 - p3) * t2 +
 				(3.0f * p1 - p0 - 3.0f * p2 + p3) * t3);
+		}
+
+		public static Vector3 BezierSpline(float t, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3)
+		{
+			return new Vector3 {
+				X = BezierSpline(t, p0.X, p1.X, p2.X, p3.X),
+				Y = BezierSpline(t, p0.Y, p1.Y, p2.Y, p3.Y),
+				Z = BezierSpline(t, p0.Z, p1.Z, p2.Z, p3.Z),
+			};
+		}
+
+		public static Vector2 BezierSpline(float t, Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3)
+		{
+			return new Vector2 {
+				X = BezierSpline(t, p0.X, p1.X, p2.X, p3.X),
+				Y = BezierSpline(t, p0.Y, p1.Y, p2.Y, p3.Y)
+			};
+		}
+
+		public static float BezierSpline(float t, float p0, float p1, float p2, float p3)
+		{
+			var oneMinusT = 1 - t;
+			var oneMinusT2 = oneMinusT * oneMinusT;
+			var oneMinusT3 = oneMinusT2 * oneMinusT;
+			var t2 = t * t;
+			var t3 = t2 * t;
+			return oneMinusT3 * p0 + 3 * t * oneMinusT2 * p1 + 3 * t2 * oneMinusT * p2 + t3 * p3;
 		}
 	}
 }
