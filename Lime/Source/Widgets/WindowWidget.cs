@@ -92,14 +92,16 @@ namespace Lime
 			Theme.Current.Apply(this, typeof(WindowWidget));
 			window.Rendering += () => {
 				Renderer.BeginFrame();
-				Size = (Vector2)window.ClientSize;
 				Renderer.SetOrthogonalProjection(Vector2.Zero, Size);
 				Render();
 				if (CornerBlinkOnRendering) {
 					RenderRedrawMark();
 				}				Renderer.EndFrame();
 			};
-			window.Updating += Update;
+			window.Updating += delta => {
+				Size = (Vector2)window.ClientSize;
+				Update(delta);
+			};
 		}
 
 		void RenderRedrawMark()
