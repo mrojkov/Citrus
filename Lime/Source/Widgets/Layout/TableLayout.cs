@@ -19,6 +19,7 @@ namespace Lime
 
 		public override void MeasureSizeConstraints(Widget widget)
 		{
+			ConstraintsValid = true;
 			var cells = GetCellArray(widget.Nodes);
 			if (cells == null) {
 				widget.MeasuredMinSize = Vector2.Zero;
@@ -43,6 +44,7 @@ namespace Lime
 
 		public override void ArrangeChildren(Widget widget)
 		{
+			ArrangementValid = true;
 			var cells = GetCellArray(widget.Nodes);
 			if (cells == null) {
 				return;
@@ -138,7 +140,7 @@ namespace Lime
 
 		private Widget[,] GetCellArray(NodeList nodes)
 		{
-			var cells = new Widget[RowCount, ColCount];
+			Widget[,] cells = null;
 			var occupied = new bool[RowCount, ColCount];
 			int t = 0;
 			for (int i = 0; i < RowCount; i++) {
@@ -150,6 +152,9 @@ namespace Lime
 						if (t >= nodes.Count)
 							return cells;
 						c = nodes[t++].AsWidget;
+					}
+					if (cells == null && c != null) {
+						cells = new Widget[RowCount, ColCount];
 					}
 					cells[i, j] = c;
 					int rowSpan = GetRowSpan(c, i);
