@@ -150,7 +150,6 @@ namespace Lime
 		public Window(WindowOptions options)
 		{
 			Input = new Input();
-			Input.Changed += Update;
 			fpsCounter = new FPSCounter();
 			CreateNativeWindow(options);
 			if (Application.MainWindow == null) {

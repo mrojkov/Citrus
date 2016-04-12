@@ -34,8 +34,6 @@ namespace Lime
 			}
 		}
 
-		internal event Action Changed;
-
 		public const int MaxTouches = 4;
 		public float KeyRepeatDelay = 0.2f;
 		public float KeyRepeatInterval = 0.03f;
@@ -49,8 +47,6 @@ namespace Lime
 		public InputSimulator Simulator;
 
 		private Vector2[] touchPositions = new Vector2[MaxTouches];
-		private Vector2 mousePosition;
-		private float wheelScrollAmount;
 		private List<KeyEvent> keyEventQueue = new List<KeyEvent>();
 
 		public static readonly int KeyCount = Enum.GetValues(typeof(Key)).Cast<int>().Max() + 1;
@@ -73,32 +69,12 @@ namespace Lime
 		/// <summary>
 		/// The current mouse position in virtual coordinates coordinates. (read only)
 		/// </summary>
-		public Vector2 MousePosition
-		{
-			get { return mousePosition; }
-			internal set
-			{
-				if (mousePosition != value) {
-					mousePosition = value;
-					RaiseChanged();
-				}
-			}
-		}
+		public Vector2 MousePosition { get; internal set; }
 
 		/// <summary>
 		/// Indicates how much the mouse wheel was moved
 		/// </summary>
-		public float WheelScrollAmount
-		{
-			get { return wheelScrollAmount; }
-			private set
-			{
-				if (wheelScrollAmount != value) {
-					wheelScrollAmount = value;
-					RaiseChanged();
-				}
-			}
-		}
+		public float WheelScrollAmount { get; private set; }
 
 		/// <summary>
 		/// The current accelerometer state (read only) in g-force units
@@ -220,7 +196,6 @@ namespace Lime
 		internal void SetKeyState(Key key, bool value)
 		{
 			keyEventQueue.Add(new KeyEvent { Key = key, State = value });
-			RaiseChanged();
 		}
 
 		internal bool HasPendingKeyEvent(Key key)
@@ -280,13 +255,6 @@ namespace Lime
 				WheelScrollAmount = delta;
 			} else {
 				WheelScrollAmount += delta;
-			}
-		}
-
-		private void RaiseChanged()
-		{
-			if (Changed != null) {
-				Changed();
 			}
 		}
 	}
