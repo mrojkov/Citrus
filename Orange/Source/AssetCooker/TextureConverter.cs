@@ -40,15 +40,13 @@ namespace Orange
 				case PVRFormat.RGB565:
 					if (hasAlpha) {
 						Console.WriteLine("WARNING: texture has alpha channel. Used 'RGBA4444' format instead of 'RGB565'.");
-						args += " -f r4g4b4a4";
-						TextureConverterUtils.ReduceTo4BitsPerChannelWithFloydSteinbergDithering(pixbuf);
+						args += " -f r4g4b4a4 -dither";
 					} else {
 						args += " -f r5g6b5";
 					}
 					break;
 				case PVRFormat.RGBA4:
-					args += " -f r4g4b4a4";
-					TextureConverterUtils.ReduceTo4BitsPerChannelWithFloydSteinbergDithering(pixbuf);
+					args += " -f r4g4b4a4 -dither";
 					break;
 				case PVRFormat.ARGB8:
 					args += " -f r8g8b8a8";
