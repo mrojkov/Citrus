@@ -165,6 +165,13 @@ namespace Lime
 			return p as Viewport3D;
 		}
 
+		public override Node DeepCloneFast()
+		{
+			var clone = base.DeepCloneFast() as Node3D;
+			clone.AsModelNode = clone;
+			return clone;
+		}
+
 		public struct MeshHitTestResult
 		{
 			public Mesh3D Mesh;

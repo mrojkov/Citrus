@@ -93,6 +93,11 @@ namespace Lime
 			var technique = MaterialTechnique.Get(caps | externals.Caps);
 			technique.Apply(this, ref externals);
 		}
+
+		public Material Clone()
+		{
+			return MemberwiseClone() as Material;
+		}
 	}
 
 	internal struct MaterialExternals
