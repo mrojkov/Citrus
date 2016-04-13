@@ -127,7 +127,7 @@ namespace Lime
 
 			float? d = null;
 			if (HitTestTarget) {
-				var sphereInWorldSpace = BoundingSphere.CreateFromPoints(Submeshes.SelectMany(sm => sm.Geometry.Vertices).Select(v => v * GlobalTransform));
+				var sphereInWorldSpace = BoundingSphere.CreateFromPoints(Submeshes.SelectMany(sm => sm.ReadOnlyGeometry.Vertices).Select(v => v * GlobalTransform));
 				//sphereInWorldSpace = sphereInWorldSpace.Transform(GlobalTransform);
 				d = ray.Intersects(sphereInWorldSpace);
 			}
@@ -170,7 +170,7 @@ namespace Lime
 			distance = float.MaxValue;
 			ray = ray.Transform(GlobalTransform.CalcInverted());
 			foreach (var submesh in Submeshes) {
-				var vertices = submesh.Geometry.Vertices;
+				var vertices = submesh.ReadOnlyGeometry.Vertices;
 				for (int i = 0; i <= vertices.Length - 3; i += 3) {
 					var d = ray.IntersectsTriangle(vertices[i], vertices[i + 1], vertices[i + 2]);
 					if (d != null && d.Value < distance) {
@@ -181,18 +181,42 @@ namespace Lime
 			}
 			return hit;
 		}
+
+		public override Node DeepCloneFast()
+		{
+			var clone = base.DeepCloneFast() as Mesh3D;
+			clone.Submeshes = Submeshes.Clone(clone);
+			clone.Bones = Toolbox.Clone(Bones);
+			clone.BoneBindPoseInverses = Toolbox.Clone(BoneBindPoseInverses);
+			clone.SharedBoneTransforms = new Matrix44[] { };
+			clone.invalidBones = true;
+			return clone;
+		}
 	}
 
 	[ProtoContract]
 	public class Submesh3D : IRenderObject3D
 	{
 		private static Matrix44[] sharedBoneTransforms = new Matrix44[] { };
-		
+
+		public GeometryBufferReference GeometryReference = new GeometryBufferReference(new GeometryBuffer());
+		public GeometryBuffer ReadOnlyGeometry { get { return GeometryReference.Target; } }
+
 		[ProtoMember(1)]
 		public Material Material { get; set; }
 
 		[ProtoMember(2)]
-		public GeometryBuffer Geometry { get; set; }
+		public GeometryBuffer Geometry
+		{
+			get
+			{
+				if (GeometryReference.Counter > 1) {
+					GeometryReference.Counter--;
+					GeometryReference = new GeometryBufferReference(GeometryReference.Target.Clone());
+				}
+				return GeometryReference.Target;
+			}
+		}
 
 		[ProtoMember(3)]
 		public List<int> BoneIndices { get; private set; }
@@ -207,9 +231,9 @@ namespace Lime
 			{
 				if (center == null) {
 					center = Vector3.Zero;
-					int n = Geometry.Vertices.Length;
+					int n = ReadOnlyGeometry.Vertices.Length;
 					for (int i = 0; i < n; i++) {
-						center += Geometry.Vertices[i];
+						center += ReadOnlyGeometry.Vertices[i];
 					}
 					center /= n;
 				}
@@ -220,6 +244,11 @@ namespace Lime
 		public Submesh3D()
 		{
 			BoneIndices = new List<int>();
+		}
+
+		~Submesh3D()
+		{
+			GeometryReference.Counter--;
 		}
 
 		public void Render()
@@ -242,7 +271,18 @@ namespace Lime
 				materialExternals.BoneCount = BoneIndices.Count;
 			}
 			Material.Apply(ref materialExternals);
-			Geometry.Render(0, Geometry.Indices.Length);
+			ReadOnlyGeometry.Render(0, ReadOnlyGeometry.Indices.Length);
+		}
+
+		public Submesh3D Clone()
+		{
+			GeometryReference.Counter++;
+			var clone = MemberwiseClone() as Submesh3D;
+			clone.GeometryReference = GeometryReference;
+			clone.BoneIndices = Toolbox.Clone(BoneIndices);
+			clone.Material = Material.Clone();
+			clone.ModelMesh = null;
+			return clone;
 		}
 	}
 
@@ -315,5 +355,29 @@ namespace Lime
 			get { return list[index]; }
 			set { list[index] = value; }
 		}
+
+		public Submesh3DCollection Clone(Mesh3D owner)
+		{
+			var clone = new Submesh3DCollection(owner);
+			for (int i = 0; i < Count; i++) {
+				clone.Add(this[i].Clone());
+			}
+			return clone;
+		}
 	}
+
+	public class GeometryBufferReference
+	{
+		public int Counter;
+		public GeometryBuffer Target;
+
+		public GeometryBufferReference(GeometryBuffer target)
+		{
+			Target = target;
+			Counter = 1;
+		}
+
+
+	}
+
 }

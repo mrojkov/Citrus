@@ -298,7 +298,7 @@ namespace Orange
 			return new Submesh3D {
 				// TODO: Materials
 				Material = ImportMaterial(aiScene.Materials[mesh.MaterialIndex]),
-				Geometry = ImportGeometry(mesh)
+				GeometryReference = new GeometryBufferReference(ImportGeometry(mesh))
 			};
 		}
 
