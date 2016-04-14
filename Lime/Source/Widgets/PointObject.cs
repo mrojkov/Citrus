@@ -17,6 +17,12 @@ namespace Lime
 	{
 		private Vector2 position;
 
+		public PointObject()
+		{
+			// Just in sake of optimization set Presenter to null because all of PointObjects have empty Render() methods.
+			Presenter = null;
+		}
+
 		/// <summary>
 		/// Позиция объекта. Может быть представлена как в пикселях, так и в нормализованном значении (как именно, зависит от класса-наследника)
 		/// </summary>

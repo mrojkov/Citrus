@@ -200,5 +200,10 @@ namespace Lime
 		{
 			return string.Format(format, "{0}, {1}, {2}", X, Y, Z);
 		}
+
+		public override int GetHashCode()
+		{
+			return X.GetHashCode() ^ Y.GetHashCode() ^ Z.GetHashCode();
+		}
 	}
 }

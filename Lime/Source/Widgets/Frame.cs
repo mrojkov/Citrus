@@ -51,7 +51,7 @@ namespace Lime
 	/// Сцена, загружаемая из бандла
 	/// </summary>
 	[ProtoContract]
-	public class Frame : Widget, IImageCombinerArg, IPresenter
+	public class Frame : Widget, IImageCombinerArg
 	{
 		public event Action Rendered;
 
@@ -71,12 +71,9 @@ namespace Lime
 			set { SetRenderTarget(value); }
 		}
 
-		public Frame()
-		{
-			this.Presenter = this;
-		}
+		public Frame() { }
 
-		public Frame(Vector2 position) : this()
+		public Frame(Vector2 position)
 		{
 			this.Position = position;
 		}
@@ -111,7 +108,7 @@ namespace Lime
 			return base.IsRenderedToTexture() || renderTarget != RenderTarget.None;
 		}
 
-		void IPresenter.Render()
+		public override void Render()
 		{
 			if (renderTexture != null) {
 				EnsureRenderChain();
@@ -123,13 +120,6 @@ namespace Lime
 				Renderer.Transform1 = LocalToWorldTransform;
 				Rendered();
 			}
-		}
-
-		void IPresenter.OnAssign(Node node) { }
-
-		IPresenter IPresenter.Clone(Node node)
-		{
-			return (IPresenter)node;
 		}
 
 		private RenderChain renderChain;
@@ -186,7 +176,7 @@ namespace Lime
 				return;
 			}
 			if (renderTexture != null || ClipChildren == ClipMethod.ScissorTest) {
-				chain.Add(this, Layer);
+				AddSelfToRenderChain(chain);
 			} else {
 				base.AddToRenderChain(chain);
 			}

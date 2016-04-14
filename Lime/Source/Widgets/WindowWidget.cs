@@ -5,7 +5,7 @@ namespace Lime
 	/// <summary>
 	/// Root of the widgets hierarchy.
 	/// </summary>
-	public class WindowWidget : Widget, IPresenter
+	public class WindowWidget : Widget
 	{
 		private IKeyboardInputProcessor prevActiveTextWidget;
 		private RenderChain renderChain = new RenderChain();
@@ -19,7 +19,6 @@ namespace Lime
 			Window = window;
 			new WidgetContext(this);
 			Window.Context = new CombinedContext(Window.Context, WidgetContext.Current);
-			Presenter = this;
 			Theme.Current.Apply(this);
 		}
 
@@ -53,23 +52,14 @@ namespace Lime
 			LayoutManager.Instance.Layout();
 		}
 
-		void IPresenter.Render()
+		public void RenderAll()
 		{
 			SetViewport();
 			var context = WidgetContext.Current;
 			context.NodeUnderCursor = null;
 			context.DistanceToNodeUnderCursor = float.MaxValue;
-			foreach (var node in Nodes) {
-				node.AddToRenderChain(renderChain);
-			}
+			AddContentsToRenderChain(renderChain);
 			renderChain.RenderAndClear();
-		}
-
-		void IPresenter.OnAssign(Node node) { }
-
-		IPresenter IPresenter.Clone(Node node)
-		{
-			return (IPresenter)node;
 		}
 
 		public void SetViewport()
@@ -93,7 +83,7 @@ namespace Lime
 			window.Rendering += () => {
 				Renderer.BeginFrame();
 				Renderer.SetOrthogonalProjection(Vector2.Zero, Size);
-				Render();
+				RenderAll();
 				if (CornerBlinkOnRendering) {
 					RenderRedrawMark();
 				}				Renderer.EndFrame();

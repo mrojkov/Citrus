@@ -108,26 +108,14 @@ namespace Lime
 		public Node3D AsModelNode { get; internal set; }
 
 		/// <summary>
-		/// TODO: Add summary
+		/// The presenter used for rendering and hit-testing the node.
 		/// </summary>
-		internal Node NextToRender;
+		public IPresenter Presenter { get; set; }
 
-		private IPresenter presenter;
 		/// <summary>
-		/// The presenter used for rendering this node.
-		/// A user can override a node rendering by replacing the presenter.
+		/// The presenter used for rendering the node after rendering its children.
 		/// </summary>
-		public IPresenter Presenter
-		{
-			get { return presenter; }
-			set
-			{
-				if (value != null) {
-					value.OnAssign(this);
-				}
-				presenter = value;
-			}
-		}
+		public IPresenter PostPresenter { get; set; }
 
 		/// <summary>
 		/// Shortcut to the next element of nodes of this parent.
@@ -251,6 +239,7 @@ namespace Lime
 			Animators = new AnimatorCollection(this);
 			Animations = new AnimationList(this);
 			Nodes = new NodeList(this);
+			Presenter = DefaultPresenter.Instance;
 			++CreatedCount;
 		}
 
@@ -387,8 +376,11 @@ namespace Lime
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Nodes = Nodes.DeepCloneFast(clone);
 			clone.Awoken = false;
-			if (clone.Presenter != null) {
-				clone.Presenter = Presenter.Clone(clone);
+			if (Presenter != null) {
+				clone.Presenter = Presenter.Clone();
+			}
+			if (PostPresenter != null) {
+				clone.PostPresenter = PostPresenter.Clone();
 			}
 			return clone;
 		}
@@ -484,21 +476,47 @@ namespace Lime
 		/// </summary>
 		protected virtual void SelfLateUpdate(float delta) { }
 
-		public virtual void Render()
-		{
-			if (Presenter != null) {
-				Presenter.Render();
-			}
-		}
+		public virtual void Render() { }
 
 		/// <summary>
 		/// Adds this node and all its descendant nodes to render chain.
 		/// </summary>
 		public virtual void AddToRenderChain(RenderChain chain)
 		{
-			for (Node node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
+			AddContentsToRenderChain(chain);
+		}
+
+		protected void AddContentsToRenderChain(RenderChain chain)
+		{
+			var savedLayer = chain.CurrentLayer;
+			if (Layer != 0) {
+				chain.CurrentLayer = Layer;
+			}
+			if (PostPresenter != null) {
+				chain.Add(this, PostPresenter);
+			}
+			for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
 				node.AddToRenderChain(chain);
 			}
+			if (Presenter != null) {
+				chain.Add(this, Presenter);
+			}
+			chain.CurrentLayer = savedLayer;
+		}
+
+		protected void AddSelfToRenderChain(RenderChain chain)
+		{
+			var savedLayer = chain.CurrentLayer;
+			if (Layer != 0) {
+				chain.CurrentLayer = Layer;
+			}
+			if (PostPresenter != null) {
+				chain.Add(this, PostPresenter);
+			}
+			if (Presenter != null) {
+				chain.Add(this, Presenter);
+			}
+			chain.CurrentLayer = savedLayer;
 		}
 
 		/// <summary>

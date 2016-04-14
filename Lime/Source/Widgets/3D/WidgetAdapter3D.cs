@@ -35,7 +35,7 @@ namespace Lime
 		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (GloballyVisible && Widget != null) {
-				chain.Add(this, Layer);
+				AddSelfToRenderChain(chain);
 			}
 		}
 
@@ -79,9 +79,9 @@ namespace Lime
 				this.distance = distance;
 			}
 
-			public void PerformHitTest(Node node)
+			public void PerformHitTest(Node node, IPresenter presenter)
 			{
-				if (node.PerformHitTest(mousePosition)) {
+				if (presenter.PerformHitTest(node, mousePosition)) {
 					WidgetContext.Current.NodeUnderCursor = node;
 					WidgetContext.Current.DistanceToNodeUnderCursor = distance;
 				}

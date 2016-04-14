@@ -44,7 +44,7 @@ namespace Lime
 			button.MinMaxSize = Metrics.DefaultButtonSize;
 			button.Size = button.MinSize;
 			button.Padding = Metrics.ControlsPadding;
-			button.Presenter = new ButtonPresenter();
+			button.Presenter = new ButtonPresenter(button.Presenter);
 			button.DefaultAnimation.AnimationEngine = new ButtonAnimationEngine(button);
 			var caption = new SimpleText {
 				Id = "TextPresenter",
@@ -74,7 +74,7 @@ namespace Lime
 				Text = "...",
 				MinMaxWidth = 20
 			};
-			fc.Presenter = new BorderedFramePresenter(Colors.GrayBackground, Colors.ControlBorder);
+			fc.Presenter = new BorderedFramePresenter(fc.Presenter, Colors.GrayBackground, Colors.ControlBorder);
 			fc.AddNode(label);
 			fc.AddNode(button);
 		}
@@ -97,7 +97,7 @@ namespace Lime
 				
 		private void DecorateWindowWidget(Widget widget)
 		{
-			widget.Presenter = new WindowWidgetPresenter();
+			widget.Presenter = new WindowWidgetPresenter(widget.Presenter);
 		}
 		
 		private void DecorateEditBox(Widget widget)
@@ -118,7 +118,7 @@ namespace Lime
 				eb, eb.Caret,
 				new CaretParams { CaretWidget = new VerticalLineCaret(eb, thickness: 1.0f) });
 			eb.Editor = new Editor(eb, eb.Caret, editorParams);
-			eb.Presenter = new BorderedFramePresenter(Colors.WhiteBackground, Colors.ControlBorder);
+			eb.Presenter = new BorderedFramePresenter(eb.Presenter, Colors.WhiteBackground, Colors.ControlBorder);
 		}
 
 		private void DecorateComboBox(Widget widget)
@@ -130,7 +130,9 @@ namespace Lime
 				Id = "Label",
 				VAlignment = VAlignment.Center,
 			};
-			text.Presenter = new ComboBoxPresenter(text);
+			text.Presenter = new ComboBoxPresenter(text.Presenter);
+			text.Padding = Metrics.ControlsPadding;
+			text.Padding.Right = ComboBoxPresenter.IconWidth;
 			comboBox.AddNode(text);
 			ExpandToContainer(text);
 		}
@@ -138,49 +140,42 @@ namespace Lime
 		private void DecorateTextView(Widget widget)
 		{
 			var tv = (TextView)widget;
-			tv.Presenter = new BorderedFramePresenter(Colors.WhiteBackground, Colors.ControlBorder);
+			tv.Presenter = new BorderedFramePresenter(tv.Presenter, Colors.WhiteBackground, Colors.ControlBorder);
 		}
 
-		class BorderedFramePresenter : IPresenter
+		private static void ExpandToContainer(Widget widget)
 		{
-			private IPresenter oldPresenter;
-			private Widget widget;
+			widget.Anchors = Anchors.None;
+			widget.Size = widget.ParentWidget.Size;
+			widget.Anchors = Anchors.LeftRightTopBottom;
+		}
+
+		class BorderedFramePresenter : CustomPresenter
+		{
 			private Color4 innerColor;
 			private Color4 borderColor;
 
-			public BorderedFramePresenter(Color4 innerColor, Color4 borderColor)
+			public BorderedFramePresenter(IPresenter previous, Color4 innerColor, Color4 borderColor)
+				: base(previous)
 			{
 				this.innerColor = innerColor;
 				this.borderColor = borderColor;
 			}
 
-			public void Render()
+			public override void Render(Node node)
 			{
+				base.Render(node);
+				var widget = node.AsWidget;
 				widget.PrepareRendererState();
 				Renderer.DrawRect(Vector2.Zero, widget.Size, innerColor);
 				Renderer.DrawRectOutline(Vector2.Zero, widget.Size, borderColor);
-				if (oldPresenter != null) {
-					oldPresenter.Render();
-				}
-			}
-
-			void IPresenter.OnAssign(Node node)
-			{
-				this.widget = (Widget)node;
-				oldPresenter = widget.Presenter;
-			}
-
-			public IPresenter Clone(Node node)
-			{
-				return new BorderedFramePresenter(innerColor, borderColor);
+				base.Render(node);
 			}
 		}
 
-		class ComboBoxPresenter : IPresenter
+		class ComboBoxPresenter : CustomPresenter
 		{
-			private const float IconWidth = 20;
-			private IPresenter oldPresenter;
-			private Widget widget;
+			public const float IconWidth = 20;
 			private VectorShape icon = new VectorShape {
 				new VectorShape.Line(0, 0.1f, 0, 0.9f, Colors.ControlBorder, 0.05f),
 				new VectorShape.Line(0.5f, 0.8f, 0.7f, 0.65f, Colors.BlackText, 0.07f),
@@ -189,37 +184,23 @@ namespace Lime
 				new VectorShape.Line(0.5f, 0.2f, 0.3f, 0.35f, Colors.BlackText, 0.07f),
 			};
 
-			public ComboBoxPresenter(Widget widget)
-			{
-				this.widget = widget;
-				oldPresenter = widget.Presenter;
-				widget.Padding = Metrics.ControlsPadding;
-				widget.Padding.Right = IconWidth;
-			}
+			public ComboBoxPresenter(IPresenter previous) : base(previous) { }
 
-			public void Render()
+			public override void Render(Node node)
 			{
+				var widget = node.AsWidget;
 				widget.PrepareRendererState();
 				Renderer.DrawVerticalGradientRect(Vector2.Zero, widget.Size, Colors.ButtonDefault);
 				Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.ControlBorder);
-				if (oldPresenter != null) {
-					oldPresenter.Render();
-				}
+				base.Render(node);
 				var transform = Matrix32.Scaling(IconWidth, widget.Height) * Matrix32.Translation(widget.Width - IconWidth, 0);
 				icon.Draw(transform);
-			}
-
-			void IPresenter.OnAssign(Node node) { }
-
-			public IPresenter Clone(Node node)
-			{
-				return new ComboBoxPresenter((Widget)node);
 			}
 		}
 
 		class ButtonAnimationEngine : Lime.AnimationEngine
 		{
-			private Button button;
+			private readonly Button button;
 
 			public ButtonAnimationEngine(Button button)
 			{
@@ -233,11 +214,11 @@ namespace Lime
 			}
 		}
 
-		class ButtonPresenter : IPresenter
+		class ButtonPresenter : CustomPresenter
 		{
-			private IPresenter oldPresenter;
-			private Widget widget;
 			private ColorGradient innerGradient;
+
+			public ButtonPresenter(IPresenter previous) : base(previous) { }
 
 			public void SetState(string state)
 			{
@@ -258,59 +239,27 @@ namespace Lime
 				}
 			}
 
-			public void Render()
+			public override void Render(Node node)
 			{
+				var widget = node.AsWidget;
 				widget.PrepareRendererState();
 				Renderer.DrawVerticalGradientRect(Vector2.Zero, widget.Size, innerGradient);
 				Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.ControlBorder);
-				if (oldPresenter != null) {
-					oldPresenter.Render();
-				}
-			}
-
-			void IPresenter.OnAssign(Node node)
-			{
-				this.widget = (Widget)node;
-				oldPresenter = widget.Presenter;
-			}
-
-			IPresenter IPresenter.Clone(Node node)
-			{
-				return new ButtonPresenter();
+				base.Render(node);
 			}
 		}
 
-		class WindowWidgetPresenter : IPresenter
+		class WindowWidgetPresenter : CustomPresenter
 		{
-			private IPresenter oldPresenter;
-			private Widget widget;
+			public WindowWidgetPresenter(IPresenter previous) : base(previous) { }
 
-			public void Render()
+			public override void Render(Node node)
 			{
+				var widget = node.AsWidget;
 				widget.PrepareRendererState();
 				Renderer.DrawRect(Vector2.Zero, widget.Size, Colors.GrayBackground);
-				if (oldPresenter != null) {
-					oldPresenter.Render();
-				}
+				base.Render(node);
 			}
-
-			void IPresenter.OnAssign(Node node)
-			{
-				this.widget = (Widget)node;
-				oldPresenter = widget.Presenter;
-			}
-
-			IPresenter IPresenter.Clone(Node node)
-			{
-				return new WindowWidgetPresenter();
-			}
-		}
-
-		private static void ExpandToContainer(Widget widget)
-		{
-			widget.Anchors = Anchors.None;
-			widget.Size = widget.ParentWidget.Size;
-			widget.Anchors = Anchors.LeftRightTopBottom;
 		}
 	}
 }

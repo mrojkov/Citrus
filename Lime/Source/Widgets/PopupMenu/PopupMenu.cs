@@ -28,7 +28,7 @@ namespace Lime.PopupMenu
 		/// <param name="layer">Слой (свойство виджета Layer), на котором будет рисоваться меню</param>
 		/// <param name="itemWidth">Ширина меню в пикселях</param>
 		/// <param name="maxHeight">Максимально возможная высота меню в пикселях</param>
-		public Menu(Widget container, int layer = Widget.MaxLayer, int itemWidth = 350, int maxHeight = 768)
+		public Menu(Widget container, int layer = RenderChain.LayerCount - 1, int itemWidth = 350, int maxHeight = 768)
 		{
 			this.container = container;
 			this.layer = layer;

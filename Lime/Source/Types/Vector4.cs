@@ -164,5 +164,10 @@ namespace Lime
 		{
 			return new Vector3(value.X, value.Y, value.Z);
 		}
+
+		public override int GetHashCode()
+		{
+			return X.GetHashCode() ^ Y.GetHashCode() ^ Z.GetHashCode() ^ W.GetHashCode();
+		}
 	}
 }

@@ -8,7 +8,7 @@ namespace Lime
 	/// Виджет, выводящий текст с упрощенным форматированием
 	/// </summary>
 	[ProtoContract]
-	public class SimpleText : Widget, IText, IKeyboardInputProcessor, IPresenter
+	public class SimpleText : Widget, IText, IKeyboardInputProcessor
 	{
 		private SpriteList spriteList;
 		private SerializableFont font;
@@ -199,7 +199,6 @@ namespace Lime
 
 		public SimpleText()
 		{
-			Presenter = this;
 			Theme.Current.Apply(this);
 		}
 
@@ -217,7 +216,7 @@ namespace Lime
 			Invalidate();
 		}
 
-		void IPresenter.Render()
+		public override void Render()
 		{
 			PrepareSpriteListAndSyncCaret();
 			Renderer.Transform1 = LocalToWorldTransform;
@@ -237,13 +236,6 @@ namespace Lime
 				spriteList = null;
 			}
 			PrepareSpriteListAndExtent();
-		}
-
-		void IPresenter.OnAssign(Node node) { }
-
-		IPresenter IPresenter.Clone(Node node)
-		{
-			return (IPresenter)node;
 		}
 
 		private void PrepareSpriteListAndExtent()

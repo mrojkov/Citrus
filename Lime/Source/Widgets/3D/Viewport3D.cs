@@ -83,7 +83,7 @@ namespace Lime
 			if (!GloballyVisible) {
 				return;
 			}
-			chain.Add(this, Layer);
+			AddSelfToRenderChain(chain);
 		}
 
 		private void RefreshChildren()
@@ -126,14 +126,17 @@ namespace Lime
 			Renderer.CullMode = CullMode.CullClockwise;
 #endif
 			if (ZSortEnabled) {
-				for (int i = 0; i <= chain.MaxUsedLayer; i++) {
-					Node node = chain.Layers[i];
+				for (int i = 0; i < RenderChain.LayerCount; i++) {
+					var layer = chain.Layers[i];
+					if (layer == null || layer.Count == 0) {
+						continue;
+					}
 					renderQueue.Clear();
 					modelMeshes.Clear();
-					while (node != null) {
-						var mm = node as Mesh3D;
+					foreach (var t in layer) {
+						var mm = t.Node as Mesh3D;
 						if (mm != null) {
-							hitProcessor.PerformHitTest(mm);
+							hitProcessor.PerformHitTest(t.Node, t.Presenter);
 							if (!mm.SkipRender) {
 								modelMeshes.Add(mm);
 								foreach (var sm in mm.Submeshes) {
@@ -141,12 +144,11 @@ namespace Lime
 								}
 							}
 						}
-						var wa = node as WidgetAdapter3D;
+						var wa = t.Node as WidgetAdapter3D;
 						if (wa != null) {
-							hitProcessor.PerformHitTest(wa);
+							hitProcessor.PerformHitTest(t.Node, t.Presenter);
 							renderQueue.Add(wa);
 						}
-						node = node.NextToRender;
 					}
 					renderQueue.Sort(depthComparer);
 					foreach (var mm in modelMeshes) {
@@ -248,7 +250,7 @@ namespace Lime
 
 		private class HitProcessor : IHitProcessor
 		{
-			public void PerformHitTest(Node node)
+			public void PerformHitTest(Node node, IPresenter presenter)
 			{
 				float distance;
 				var context = WidgetContext.Current;

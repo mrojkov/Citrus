@@ -49,19 +49,7 @@ namespace Lime
 			if (!GloballyVisible) {
 				return;
 			}
-			if (Layer != 0) {
-				var oldLayer = chain.SetCurrentLayer(Layer);
-				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
-					node.AddToRenderChain(chain);
-				}
-				chain.Add(this);
-				chain.SetCurrentLayer(oldLayer);
-			} else {
-				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
-					node.AddToRenderChain(chain);
-				}
-				chain.Add(this);
-			}
+			AddContentsToRenderChain(chain);
 		}
 
 		internal void PrepareToRender()

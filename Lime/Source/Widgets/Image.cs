@@ -6,7 +6,7 @@ namespace Lime
 	/// Виджет, содержащий в себе изображение
 	/// </summary>
 	[ProtoContract]
-	public class Image : Widget, IImageCombinerArg, IPresenter
+	public class Image : Widget, IImageCombinerArg
 	{
 		bool skipRender;
 		bool requestSkipRender;
@@ -47,7 +47,6 @@ namespace Lime
 			UV1 = Vector2.One;
 			HitTestMethod = HitTestMethod.Contents;
 			Texture = new SerializableTexture();
-			Presenter = this;
 		}
 
 		public Image(ITexture texture)
@@ -56,7 +55,6 @@ namespace Lime
 			Texture = texture;
 			HitTestMethod = HitTestMethod.Contents;
 			Size = (Vector2)texture.ImageSize;
-			Presenter = this;
 		}
 
 		public Image(string texturePath)
@@ -78,7 +76,7 @@ namespace Lime
 		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (GloballyVisible && !skipRender) {
-				chain.Add(this, Layer);
+				AddSelfToRenderChain(chain);
 			}
 		}
 
@@ -138,17 +136,10 @@ namespace Lime
 			}
 		}
 
-		void IPresenter.Render()
+		public override void Render()
 		{
 			PrepareRendererState();
 			Renderer.DrawSprite(Texture, GlobalColor, ContentPosition, ContentSize, UV0, UV1);
-		}
-
-		void IPresenter.OnAssign(Node node) { }
-
-		IPresenter IPresenter.Clone(Node node)
-		{
-			return (IPresenter)node;
 		}
 	}
 }

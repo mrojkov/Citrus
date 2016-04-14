@@ -75,16 +75,6 @@ namespace Lime
 		public const int EmptyHitTestMask = 0;
 		public const int ControlsHitTestMask = 1;
 
-		/// <summary>
-		/// Minimum possible layer.
-		/// </summary>
-		public const int MinLayer = 0;
-
-		/// <summary>
-		/// Maximum possible layer.
-		/// </summary>
-		public const int MaxLayer = 99;
-
 		private Vector2 position;
 		private Vector2 size;
 		private float rotation;
@@ -916,21 +906,8 @@ namespace Lime
 		/// </summary>
 		public override void AddToRenderChain(RenderChain chain)
 		{
-			if (!GloballyVisible) {
-				return;
-			}
-			if (Layer != 0) {
-				var oldLayer = chain.SetCurrentLayer(Layer);
-				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
-					node.AddToRenderChain(chain);
-				}
-				chain.Add(this);
-				chain.SetCurrentLayer(oldLayer);
-			} else {
-				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
-					node.AddToRenderChain(chain);
-				}
-				chain.Add(this);
+			if (GloballyVisible) {
+				AddContentsToRenderChain(chain);
 			}
 		}
 

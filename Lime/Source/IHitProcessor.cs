@@ -2,16 +2,16 @@
 {
 	public interface IHitProcessor
 	{
-		void PerformHitTest(Node node);
+		void PerformHitTest(Node node, IPresenter presenter);
 	}
 
 	public class DefaultHitProcessor : IHitProcessor
 	{
 		public static readonly DefaultHitProcessor Instance = new DefaultHitProcessor();
 
-		public void PerformHitTest(Node node)
+		public void PerformHitTest(Node node, IPresenter presenter)
 		{
-			if (node.PerformHitTest(Window.Current.Input.MousePosition)) {
+			if (presenter.PerformHitTest(node, Window.Current.Input.MousePosition)) {
 				WidgetContext.Current.NodeUnderCursor = node;
 			}
 		}
@@ -21,6 +21,6 @@
 	{
 		public static readonly NullHitProcessor Instance = new NullHitProcessor();
 
-		public void PerformHitTest(Node node) { }
+		public void PerformHitTest(Node node, IPresenter presenter) { }
 	}
 }
