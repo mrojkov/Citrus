@@ -24,7 +24,7 @@ namespace Lime
 			var length = 0f;
 			var segmentCount = GetSegmentCount();
 			for (int i = 0; i < segmentCount; i++) {
-				length += ((Points[(i + 1) % segmentCount].Position - Points[i].Position) * scale).Length;
+				length += ((Points[(i + 1) % Points.Count].Position - Points[i].Position) * scale).Length;
 			}
 			return length;
 		}
