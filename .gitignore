@@ -14,3 +14,4 @@ Lime/Extensions/*/obj/*
 Orange/packages
 /Orange/bin/Mac/*
 !/Orange/bin/Mac/Release/Orange.app
+*.userprefs
