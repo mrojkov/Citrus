@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-#if MAC || MONOMAC
+#if MAC
 using OpenTK.Graphics.OpenGL;
+#elif MONOMAC
+using MonoMac.OpenGL;
 #elif ANDROID || WIN
 using OpenTK.Graphics.ES20;
 #endif

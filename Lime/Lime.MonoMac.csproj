@@ -56,14 +56,11 @@
       <HintPath>..\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="System.Core" />
-    <Reference Include="OpenTK">
-      <HintPath>..\3rdParty\OpenTK\OpenTK.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="MonoMac">
       <HintPath>..\3rdParty\MonoMac.dll</HintPath>
     </Reference>
-    <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Types\Matrix44.cs" />

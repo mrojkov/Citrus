@@ -9,7 +9,12 @@ using System.Threading;
 
 using OpenTK;
 using OpenTK.Audio;
+
+#if !MONOMAC
 using OpenTK.Audio.OpenAL;
+#else
+using MonoMac.OpenAL;
+#endif
 
 #if iOS
 using Foundation;

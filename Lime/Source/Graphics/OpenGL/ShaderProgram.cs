@@ -3,11 +3,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+#if !MONOMAC
 using OpenTK.Graphics;
 #if iOS || ANDROID || WIN
 using OpenTK.Graphics.ES20;
 #else
 using OpenTK.Graphics.OpenGL;
+#endif
+#else
+using MonoMac.OpenGL;
 #endif
 
 #pragma warning disable 0618
@@ -74,7 +78,7 @@ namespace Lime
 			if (handle != 0) {
 				var capturedHandle = handle;
 				Application.InvokeOnMainThread(() => {
-#if MAC
+#if MAC || MONOMAC
 					GL.DeleteProgram(1, new int[] { capturedHandle });
 #else
 					GL.DeleteProgram(capturedHandle);
@@ -192,8 +196,10 @@ namespace Lime
 		{
 #if !MAC && !MONOMAC
 			GL.Uniform4(uniformId, new OpenTK.Graphics.Color4(color.R, color.G, color.B, color.A));
-#else
+#elif MAC
 			GL.Uniform4(uniformId, new OpenTK.Vector4(color.R, color.G, color.B, color.A));
+#elif MONOMAC
+			GL.Uniform4(uniformId, new MonoMac.OpenGL.Vector4(color.R, color.G, color.B, color.A));
 #endif
 		}
 

@@ -4,8 +4,10 @@ using System.IO;
 using System.Runtime.InteropServices;
 #if iOS || ANDROID || WIN
 using OpenTK.Graphics.ES20;
-#else
+#elif MAC
 using OpenTK.Graphics.OpenGL;
+#elif MONOMAC
+using MonoMac.OpenGL;
 #endif
 
 #pragma warning disable 0618

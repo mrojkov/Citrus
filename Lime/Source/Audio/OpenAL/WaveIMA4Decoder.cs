@@ -2,7 +2,12 @@
 using System;
 using System.IO;
 using System.Text;
+
+#if !MONOMAC
 using OpenTK.Audio.OpenAL;
+#else
+using MonoMac.OpenAL;
+#endif
 
 namespace Lime
 {

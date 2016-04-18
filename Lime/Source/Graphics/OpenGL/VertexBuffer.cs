@@ -5,8 +5,10 @@ using System.Linq;
 using System.Text;
 #if iOS || ANDROID || WIN
 using OpenTK.Graphics.ES20;
-#else
+#elif MAC
 using OpenTK.Graphics.OpenGL;
+#elif MONOMAC
+using MonoMac.OpenGL;
 #endif
 using System.Runtime.InteropServices;
 

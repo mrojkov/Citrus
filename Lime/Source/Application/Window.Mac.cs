@@ -6,11 +6,12 @@ using Lime.Platform;
 #if MAC
 using AppKit;
 using CoreGraphics;
+using OpenTK.Graphics;
 #else
 using MonoMac.AppKit;
 using MonoMac.CoreGraphics;
+using MonoMac.OpenGL;
 #endif
-using OpenTK.Graphics;
 
 namespace Lime
 {

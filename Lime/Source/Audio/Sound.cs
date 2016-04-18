@@ -1,5 +1,9 @@
 #if OPENAL
+#if !MONOMAC
 using OpenTK.Audio.OpenAL;
+#else
+using MonoMac.OpenAL;
+#endif
 #endif
 
 namespace Lime
