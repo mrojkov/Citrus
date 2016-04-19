@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 14 for Windows Desktop
-VisualStudioVersion = 14.0.23107.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyProject.Win", "EmptyProject.Win.csproj", "{586DFC69-5C3E-4365-B416-BD8AD512C6B8}"
 EndProject
@@ -10,8 +10,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyProject.Game.Win", "..\EmptyProject.Game\EmptyProject.Game.Win.csproj", "{5A3AE9DE-49BF-4234-8A69-9FF4295A5C08}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lemon.Win", "..\..\Citrus\Lemon\Lemon.Win.csproj", "{538E41E4-725C-4521-BCF3-A5591A1A3AFD}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.WinTests", "..\..\Citrus\Lime\Lime.WinTests\Lime.WinTests.csproj", "{3CB4D9B6-7B39-4435-985D-0CFA339EF558}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -131,38 +129,6 @@ Global
 		{538E41E4-725C-4521-BCF3-A5591A1A3AFD}.Release|Win32.ActiveCfg = Release|Any CPU
 		{538E41E4-725C-4521-BCF3-A5591A1A3AFD}.Release|x86.ActiveCfg = Release|x86
 		{538E41E4-725C-4521-BCF3-A5591A1A3AFD}.Release|x86.Build.0 = Release|x86
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Debug|Win32.Build.0 = Debug|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Debug|x86.Build.0 = Debug|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Documentation|Any CPU.ActiveCfg = Debug|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Documentation|Any CPU.Build.0 = Debug|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Documentation|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Documentation|Mixed Platforms.Build.0 = Debug|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Documentation|Win32.ActiveCfg = Debug|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Documentation|Win32.Build.0 = Debug|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Documentation|x86.ActiveCfg = Debug|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Documentation|x86.Build.0 = Debug|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Nsis|Any CPU.ActiveCfg = Release|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Nsis|Any CPU.Build.0 = Release|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Nsis|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Nsis|Mixed Platforms.Build.0 = Release|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Nsis|Win32.ActiveCfg = Release|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Nsis|Win32.Build.0 = Release|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Nsis|x86.ActiveCfg = Release|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Nsis|x86.Build.0 = Release|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Release|Win32.ActiveCfg = Release|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Release|Win32.Build.0 = Release|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Release|x86.ActiveCfg = Release|Any CPU
-		{3CB4D9B6-7B39-4435-985D-0CFA339EF558}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
