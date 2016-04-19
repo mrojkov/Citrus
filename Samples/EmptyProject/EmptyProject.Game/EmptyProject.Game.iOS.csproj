@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{8080C53C-FE69-4BC3-9CFB-B68FF9D0C77D}</ProjectGuid>
+    <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Match</RootNamespace>
+    <AssemblyName>EmptyProject.Game</AssemblyName>
+    <BaseDirectory>Source</BaseDirectory>
+    <TargetFrameworkIdentifier>Xamarin.iOS</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v1.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>False</Optimize>
+    <OutputPath>bin\iOS\Debug</OutputPath>
+    <DefineConstants>DEBUG;iOS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>False</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>True</Optimize>
+    <OutputPath>bin\iOS\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>False</ConsolePause>
+    <DefineConstants>iOS</DefineConstants>
+    <DebugSymbols>True</DebugSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="protobuf-net">
+      <HintPath>..\..\Citrus\3rdParty\ProtoBuf-Net\iOS\protobuf-net.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Json" />
+    <Reference Include="Xamarin.iOS" />
+    <Reference Include="OpenTK-1.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Source\Application.cs" />
+    <Compile Include="Source\ApplicationData.cs" />
+    <Compile Include="Source\Extensions.cs" />
+	<Compile Include="Source\GameProgress.cs" />
+	<Compile Include="Source\Layers.cs" />
+	<Compile Include="Source\ResolutionChanger.cs" />
+	<Compile Include="Source\SoundManager.cs" />
+	<Compile Include="Source\The.cs" />
+	<Compile Include="Source\Toolbox.cs" />
+    <Compile Include="Source\ScreensAndDialogs\AlertDialog.cs" />
+	<Compile Include="Source\ScreensAndDialogs\Confirmation.cs" />
+	<Compile Include="Source\ScreensAndDialogs\Dialog.cs" />
+	<Compile Include="Source\ScreensAndDialogs\GameScreen.cs" />
+	<Compile Include="Source\ScreensAndDialogs\MainMenu.cs" />
+	<Compile Include="Source\ScreensAndDialogs\Options.cs" />
+	<Compile Include="Source\ScreensAndDialogs\ScreenCrossfade.cs" />
+	<Compile Include="Source\ScreensAndDialogs\Splash.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Citrus\Lime\Lime.iOS.csproj">
+      <Project>{9CFD3A2F-7DA5-420E-B475-44749DC61485}</Project>
+      <Name>Lime.iOS</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
+</Project>

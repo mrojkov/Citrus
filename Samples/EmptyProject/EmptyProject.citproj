@@ -1,0 +1,6 @@
+{
+	Title: 'EmptyProject',
+	Version: '1.0',
+	BuildNotes: 'regular build',
+	LocalizeOnlyTaggedSceneTexts: true
+}

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectGuid>{F4B49D3B-5014-4603-A541-0D6233F5A2AD}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>EmptyProject</RootNamespace>
+    <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
+    <AndroidResgenClass>Resource</AndroidResgenClass>
+    <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
+    <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
+    <AndroidUseLatestPlatformSdk>False</AndroidUseLatestPlatformSdk>
+    <AssemblyName>EmptyProject.Game</AssemblyName>
+    <TargetFrameworkVersion>v4.0.3</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;ANDROID</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <AndroidLinkMode>None</AndroidLinkMode>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
+    <DefineConstants>ANDROID;</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="Mono.Android" />
+    <Reference Include="protobuf-net">
+      <HintPath>..\..\Citrus\3rdParty\ProtoBuf-Net\Android\protobuf-net.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Android.Export" />
+    <Reference Include="System.Runtime.Serialization" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Source\ScreensAndDialogs\AlertDialog.cs" />
+    <Compile Include="Source\ScreensAndDialogs\Confirmation.cs" />
+    <Compile Include="Source\ScreensAndDialogs\Dialog.cs" />
+    <Compile Include="Source\ScreensAndDialogs\GameScreen.cs" />
+    <Compile Include="Source\ScreensAndDialogs\MainMenu.cs" />
+    <Compile Include="Source\ScreensAndDialogs\Options.cs" />
+    <Compile Include="Source\ScreensAndDialogs\ScreenCrossfade.cs" />
+    <Compile Include="Source\ScreensAndDialogs\Splash.cs" />
+    <Compile Include="Source\Application.cs" />
+    <Compile Include="Source\ApplicationData.cs" />
+    <Compile Include="Source\Extensions.cs" />
+    <Compile Include="Source\GameProgress.cs" />
+    <Compile Include="Source\Layers.cs" />
+    <Compile Include="Source\ResolutionChanger.cs" />
+    <Compile Include="Source\SoundManager.cs" />
+    <Compile Include="Source\The.cs" />
+    <Compile Include="Source\Toolbox.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Novell\Novell.MonoDroid.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\..\Citrus\Lime\Lime.Android.csproj">
+      <Project>{72E2DDBB-C320-4356-89EC-BDED6036D29B}</Project>
+      <Name>Lime.Android</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+</Project>
