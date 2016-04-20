@@ -132,3 +132,4 @@ UpgradeLog*.htm
 # Project-specific
 !EmptyProject.Game/Debug
 !EmptyProject.Android
+!EmptyProject.iOS
