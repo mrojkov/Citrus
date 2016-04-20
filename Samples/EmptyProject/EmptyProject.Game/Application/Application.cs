@@ -24,7 +24,13 @@ namespace EmptyProject.Application
 
 		private AssetsBundle CreateAssetsBundle()
 		{
+#if ANDROID
+			return new PackedAssetsBundle("Assets.Android.Data.Android", "Assets.Android");
+#elif iOS
+			return new PackedAssetsBundle("Data.iOS");
+#else
 			return new PackedAssetsBundle("Data.Desktop");
+#endif
 		}
 
 		private void CreateWindow()
