@@ -119,15 +119,18 @@ UpgradeLog*.htm
 # Visual Studio 6 workspace options file
 *.opt
 
-# Citrus
+## Citrus
+
 # Bundles
 *.Desktop
 *.iOS
 *.Android
+
 # Scene backups
 *.scene_Autoback0
 *.scene_Autoback1
 *.scene_Autoback2
+HotStudioProject.ini
 
 # Project-specific
 !EmptyProject.Game/Debug
