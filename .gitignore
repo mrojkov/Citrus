@@ -129,4 +129,4 @@ UpgradeLog*.htm
 *.scene_Autoback2
 
 # Project-specific
-!EmptyProject.Game.New/Debug
+!EmptyProject.Game/Debug

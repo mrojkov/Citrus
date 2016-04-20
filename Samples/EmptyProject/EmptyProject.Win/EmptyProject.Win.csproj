@@ -56,9 +56,9 @@
       <Project>{fc2de6c9-641a-4230-8d29-ea4035cd8708}</Project>
       <Name>Lime.Win</Name>
     </ProjectReference>
-    <ProjectReference Include="..\EmptyProject.Game.New\EmptyProject.Game.Win.New.csproj">
+    <ProjectReference Include="..\EmptyProject.Game\EmptyProject.Game.Win.csproj">
       <Project>{8df7f0f3-8c68-4a0e-9573-cc4ca0882a3e}</Project>
-      <Name>EmptyProject.Game.Win.New</Name>
+      <Name>EmptyProject.Game.Win</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

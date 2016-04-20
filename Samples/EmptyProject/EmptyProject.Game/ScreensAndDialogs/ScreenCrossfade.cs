@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Lime;
 
-namespace EmptyProject
+namespace EmptyProject.ScreensAndDialogs
 {
-	class ScreenCrossfade
+	public class ScreenCrossfade
 	{
-		const float FadeTime = 0.3f;
-		Image image;
-		Frame frame;
-		TaskList workflow;
-		Action action;
+		private const float FadeTime = 0.3f;
+		private readonly Image image;
+		private readonly Frame frame;
+		private readonly Action action;
 
 		public ScreenCrossfade(Action action, bool doFadeIn = true, bool doFadeOut = true)
 		{
@@ -30,15 +27,14 @@ namespace EmptyProject
 			frame.PushToNode(The.World);
 			frame.Input.CaptureAll();
 			image.PushToNode(frame);
-			workflow = new TaskList();
-			workflow.Add(MainTask(doFadeIn, doFadeOut));
-			image.Updating += workflow.Update;
+			var tasks = new TaskList  {MainTask(doFadeIn, doFadeOut) };
+			image.Updating += tasks.Update;
 		}
 
 		private IEnumerator<object> MainTask(bool doFadeIn, bool doFadeOut)
 		{
 			if (doFadeIn) {
-				for (float t = 0; t < FadeTime; t += TaskList.Current.Delta) {
+				for (float t = 0; t < FadeTime; t += Task.Current.Delta) {
 					image.Opacity = t / FadeTime;
 					yield return 0;
 				}
@@ -46,7 +42,7 @@ namespace EmptyProject
 			frame.Input.ReleaseAll();
 			action.SafeInvoke();
 			if (doFadeOut) {
-				for (float t = 0; t < FadeTime; t += TaskList.Current.Delta) {
+				for (float t = 0; t < FadeTime; t += Task.Current.Delta) {
 					image.Opacity = 1 - t / FadeTime;
 					yield return 0;
 				}
@@ -56,7 +52,7 @@ namespace EmptyProject
 		}
 	}
 
-	class ScreenCrossfadeScene
+	internal class ScreenCrossfadeScene
 	{
 		public ScreenCrossfadeScene(string path, Action action)
 		{

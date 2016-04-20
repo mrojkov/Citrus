@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ProtoBuf;
-using Lime;
+﻿using ProtoBuf;
 
 namespace EmptyProject
 {
@@ -22,8 +17,10 @@ namespace EmptyProject
 	}
 
 	[ProtoContract]
-	public class GameProgress
+	public class Profile
 	{
+		public static Profile Instance;
+
 		[ProtoMember(1)]
 		public ExampleClass ExampleField = new ExampleClass();
 

@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Lime;
-using System.Reflection;
-using System.IO;
 
-namespace EmptyProject
+namespace EmptyProject.ScreensAndDialogs
 {
 	public class Options : Dialog
 	{
@@ -29,8 +24,8 @@ namespace EmptyProject
 			);
 
 			CreateCheckBox(Root["FullScreenCheckGroup"],
-				() => The.Application.FullScreen,
-				() => { The.Application.FullScreen = !The.Application.FullScreen; },
+				() => The.Window.Fullscreen,
+				() => { The.Window.Fullscreen = !The.Window.Fullscreen; },
 				autoUpdate: true
 			);
 
@@ -39,13 +34,13 @@ namespace EmptyProject
 
 		public override void Close()
 		{
-			The.ApplicationData.Save();
+			The.AppData.Save();
 			base.Close();
 		}
 
 		static void CreateCheckBox(Widget root, Func<bool> onGetValue, Action onToggleValue, bool autoUpdate = false)
 		{
-			Widget check = root["Check"];
+			var check = root["Check"];
 			check.RunAnimation(onGetValue() ? "Checked" : "Unchecked");
 			root["BtnCheck"].Clicked = () => {
 				onToggleValue.SafeInvoke();
@@ -59,21 +54,21 @@ namespace EmptyProject
 			}
 		}
 
-		static bool MusicEnabled {
-			get { return AudioSystem.GetGroupVolume(AudioChannelGroup.Music) > 0; }
-			set { AudioSystem.SetGroupVolume(AudioChannelGroup.Music, value ? 1.0f : 0); }
+		private static bool MusicEnabled {
+			get { return The.SoundManager.MusicVolume > 0; }
+			set { The.SoundManager.MusicVolume = value ? 1.0f : 0; }
 		}
 
-		static bool SoundEnabled
+		private static bool SoundEnabled
 		{
-			get { return AudioSystem.GetGroupVolume(AudioChannelGroup.Effects) > 0; }
-			set { AudioSystem.SetGroupVolume(AudioChannelGroup.Effects, value ? 1.0f : 0); }
+			get { return The.SoundManager.SfxVolume > 0; }
+			set { The.SoundManager.SfxVolume = value ? 1.0f : 0; }
 		}
 
-		static bool VoiceEnabled
+		private static bool VoiceEnabled
 		{
-			get { return AudioSystem.GetGroupVolume(AudioChannelGroup.Voice) > 0; }
-			set { AudioSystem.SetGroupVolume(AudioChannelGroup.Voice, value ? 1.0f : 0); }
+			get { return The.SoundManager.VoiceVolume > 0; }
+			set { The.SoundManager.VoiceVolume = value ? 1.0f : 0; }
 		}
 	}
 

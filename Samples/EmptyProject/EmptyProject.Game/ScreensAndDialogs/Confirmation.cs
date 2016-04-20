@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Lime;
 
-namespace EmptyProject
+namespace EmptyProject.ScreensAndDialogs
 {
 	public class Confirmation : Dialog
 	{
@@ -19,13 +16,8 @@ namespace EmptyProject
 				Close();
 				onOk.SafeInvoke();
 			};
-
 			Root["BtnCancel"].Visible = cancelButtonVisible;
-			Root["BtnCancel"].Clicked = () => {
-				Close();
-			};
+			Root["BtnCancel"].Clicked = Close;
 		}
-
 	}
-
 }

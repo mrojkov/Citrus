@@ -15,6 +15,7 @@ namespace EmptyProject.Application
 			CreateWindow();
 			AppData.Load();
 			AssetsBundle.Instance = CreateAssetsBundle();
+			Profile.Instance = new Profile();
 			SetWindowSize();
 			new MainMenu();
 		}

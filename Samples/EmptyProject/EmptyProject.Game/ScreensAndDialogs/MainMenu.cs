@@ -4,15 +4,15 @@ namespace EmptyProject.ScreensAndDialogs
 {
 	public class MainMenu : Dialog
 	{
-		bool closing;
+		private bool closing;
 
 		public MainMenu()
 			: base("Shell/MainMenu")
 		{
-			//The.SoundManager.PlayMusic("Theme");
+			The.SoundManager.PlayMusic("Theme");
 
 			Root["BtnPlay"].Clicked = BtnPlayClick;
-			//Root["BtnOptions"].Clicked = () => { new Options(); };
+			Root["BtnOptions"].Clicked = () => { new Options(); };
 
 			Root.Updating += Update;
 		}
@@ -38,10 +38,10 @@ namespace EmptyProject.ScreensAndDialogs
 		{
 			if (!closing) {
 				closing = true;
-				/*new ScreenCrossfade(() => {
+				new ScreenCrossfade(() => {
 					Close();
 					new GameScreen();
-				});*/
+				});
 			}
 		}
 
