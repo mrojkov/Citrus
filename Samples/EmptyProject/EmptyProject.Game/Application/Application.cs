@@ -36,7 +36,7 @@ namespace EmptyProject.Application
 			World.Window.Resized += OnResize;
 		}
 
-		private void SetWindowSize()
+		private static void SetWindowSize()
 		{
 #if WIN
 			The.Window.ClientSize = (Size)DisplayInfo.GetResolution();

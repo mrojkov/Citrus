@@ -76,6 +76,7 @@ artifacts/
 _ReSharper*/
 *.[Rr]e[Ss]harper
 *.DotSettings.user
+*.DotSettings
 
 # NuGet Packages
 *.nupkg
@@ -130,3 +131,4 @@ UpgradeLog*.htm
 
 # Project-specific
 !EmptyProject.Game/Debug
+!EmptyProject.Android

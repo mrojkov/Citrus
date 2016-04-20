@@ -1,11 +1,10 @@
 ﻿using Lime;
+using RainbowDash;
 
 namespace EmptyProject.ScreensAndDialogs
 {
 	public class MainMenu : Dialog
 	{
-		private bool closing;
-
 		public MainMenu()
 			: base("Shell/MainMenu")
 		{
@@ -22,12 +21,7 @@ namespace EmptyProject.ScreensAndDialogs
 			return false;
 		}
 
-		public override void Close()
-		{
-			base.Close();
-		}
-
-		void Update(float delta)
+		private void Update(float delta)
 		{
 			if (Root.Input.WasKeyPressed(Key.Escape)) {
 				Lime.Application.Exit();
@@ -36,14 +30,22 @@ namespace EmptyProject.ScreensAndDialogs
 
 		private void BtnPlayClick()
 		{
-			if (!closing) {
-				closing = true;
-				new ScreenCrossfade(() => {
-					Close();
-					new GameScreen();
-				});
-			}
+			if (State != DialogState.Shown) return;
+			State = DialogState.Closing;
+			new ScreenCrossfade(() => {
+				Close();
+				new GameScreen();
+			});
 		}
 
+		public override void FillDebugMenuItems(Menu menu)
+		{
+			var section = menu.Section("Cheats example");
+			section.Item("Red", () => Root.Color = Color4.Red);
+			section.Item("Green", () => Root.Color = Color4.Green);
+			section.Item("Blue", () => Root.Color = Color4.Blue);
+			var section2 = menu.Section("Cheats example 2");
+			section2.Item("Sample cheat", () => { });
+		}
 	}
 }

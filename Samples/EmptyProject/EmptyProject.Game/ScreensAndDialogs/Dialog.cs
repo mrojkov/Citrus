@@ -20,7 +20,7 @@ namespace EmptyProject.ScreensAndDialogs
 
 		public bool IsClosed { get { return Root.Parent == null; } }
 		public bool IsTopDialog { get { return Top == this; } }
-		public DialogState State { get; private set; }
+		public DialogState State { get; protected set; }
 
 		public Action BeforeHide;
 		public Action AfterHide;

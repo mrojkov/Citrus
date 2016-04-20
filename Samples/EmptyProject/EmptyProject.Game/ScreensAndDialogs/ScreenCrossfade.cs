@@ -56,10 +56,11 @@ namespace EmptyProject.ScreensAndDialogs
 	{
 		public ScreenCrossfadeScene(string path, Action action)
 		{
-			Frame frame = new Frame(path);
-			frame.Layer = Layers.AboveAllElse;
+			var frame = new Frame(path) {
+				Layer = Layers.AboveAllElse,
+				Size = The.World.Size
+			};
 			frame.PushToNode(The.World);
-			frame.Size = The.World.Size;
 			frame.Input.CaptureAll();
 			frame.RunAnimation("Show");
 			frame.AnimationStopped += () => {

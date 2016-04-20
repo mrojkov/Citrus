@@ -70,7 +70,7 @@ namespace EmptyProject.Application
 			MusicVolume = AudioSystem.GetGroupVolume(AudioChannelGroup.Music);
 			try
 			{
-				Lime.Serialization.WriteObjectToFile(GetDataFilePath(), this);
+				Serialization.WriteObjectToFile(GetDataFilePath(), this);
 			}
 			catch (System.Exception e)
 			{
