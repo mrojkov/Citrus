@@ -1,25 +1,29 @@
 using System;
+using EmptyProject.Application;
 
-public class Application
+namespace EmptyProject.Win
 {
-	[STAThread]
-	public static void Main(string[] args)
+	public class Application
 	{
-		if (Array.IndexOf(args, "--GenerateSerializationAssembly") >= 0) {
-			Lime.Environment.GenerateSerializationAssembly("Serializer", typeof(EmptyProject.ApplicationData));
-			return;
+		private static Type[] GetSerializationTypes()
+		{
+			var result = new [] {
+				typeof(AppData)
+			};
+			return result;
 		}
 
-		//Lime.Serialization.Serializer = new Serializer();
-
-		var options = new Lime.Application.StartupOptions();
-		options.DecodeAudioInSeparateThread = false;
-
-		var app = new EmptyProject.Application(args, options);
-		using (var gameView = new Lime.GameView(app)) {
-			bool _30FPS = Array.IndexOf(args, "--30FPS") >= 0;
-			double fps = _30FPS ? 30 : 60;
-			gameView.Run(fps, fps);
+		[STAThread]
+		public static void Main(string[] args)
+		{
+			if (Array.IndexOf(args, "--GenerateSerializationAssembly") >= 0)
+			{
+				Lime.Environment.GenerateSerializationAssembly("Serializer", GetSerializationTypes());
+				return;
+			}
+			Lime.Application.Initialize(new Lime.ApplicationOptions());
+			new EmptyProject.Application.Application();
+			Lime.Application.Run();
 		}
 	}
 }
