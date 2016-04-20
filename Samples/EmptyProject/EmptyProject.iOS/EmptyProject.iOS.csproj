@@ -110,4 +110,34 @@
       <Name>Lime.iOS</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\Icon-60%402x.png" />
+    <BundleResource Include="Resources\Icon-72.png" />
+    <BundleResource Include="Resources\Icon-72%402x.png" />
+    <BundleResource Include="Resources\Icon-76.png" />
+    <BundleResource Include="Resources\Icon-76%402x.png" />
+    <BundleResource Include="Resources\Icon-Small-40.png" />
+    <BundleResource Include="Resources\Icon-Small-40%402x.png" />
+    <BundleResource Include="Resources\Icon-Small-50.png" />
+    <BundleResource Include="Resources\Icon-Small-50%402x.png" />
+    <BundleResource Include="Resources\Icon-Small.png" />
+    <BundleResource Include="Resources\Icon-Small%402x.png" />
+    <BundleResource Include="Resources\Icon.png" />
+    <BundleResource Include="Resources\Icon%402x.png" />
+    <BundleResource Include="Resources\de.lproj\InfoPlist.strings" />
+    <BundleResource Include="Resources\en.lproj\InfoPlist.strings" />
+    <BundleResource Include="Resources\es.lproj\InfoPlist.strings" />
+    <BundleResource Include="Resources\fr.lproj\InfoPlist.strings" />
+    <BundleResource Include="Resources\it.lproj\InfoPlist.strings" />
+    <BundleResource Include="Resources\ja.lproj\InfoPlist.strings" />
+    <BundleResource Include="Resources\ko.lproj\InfoPlist.strings" />
+    <BundleResource Include="Resources\nl.lproj\InfoPlist.strings" />
+    <BundleResource Include="Resources\pt.lproj\InfoPlist.strings" />
+    <BundleResource Include="Resources\ru.lproj\InfoPlist.strings" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\Data.iOS">
+      <Link>Data.iOS</Link>
+    </Content>
+  </ItemGroup>
 </Project>

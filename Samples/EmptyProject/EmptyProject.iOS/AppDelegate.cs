@@ -5,7 +5,7 @@ using UIKit;
 namespace EmptyProject.iOS
 {
 	[Register ("EmptyProjectAppDelegate")]
-	public class EmptyProjectAppDelegate : UIApplicationDelegate
+	public class EmptyProjectAppDelegate : Lime.AppDelegate
 	{
 
 		public override bool FinishedLaunching (UIApplication application, NSDictionary launchOptions)
@@ -16,6 +16,7 @@ namespace EmptyProject.iOS
 				DecodeAudioInSeparateThread = false,
 				UsingDeferredHitTest = true
 			});
+			new EmptyProject.Application.Application ();
 			return true;
 		}
 
