@@ -130,8 +130,8 @@ namespace Orange
 			var jobject = JObject.Parse(File.ReadAllText(file));
 			ProjectJson = new Json(jobject, file);
 			Title = ProjectJson["Title"] as string;
-			Target = ProjectJson.GetValue("Target", "") as string;
-			dataFolderName = ProjectJson.GetValue("DataFolderName", "Data") as string;
+			Target = ProjectJson.GetValue("Target", "");
+			dataFolderName = ProjectJson.GetValue("DataFolderName", "Data");
 		}
 
 		public string GetActivePlatformString()

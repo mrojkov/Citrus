@@ -1,15 +1,13 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Orange
 {
 	public class Json
 	{
-		JObject obj;
-		string sourcePath;
+		private readonly JObject obj;
+		private readonly string sourcePath;
 
 		public Json(JObject obj, string sourcePath = null)
 		{
@@ -19,34 +17,52 @@ namespace Orange
 
 		public object this[string path]
 		{
-			get { return GetValue(path); }
+			get { return GetValue<object>(path); }
 		}
 
-		public object GetValue(string path, object @default = null)
+		public T[] GetArray<T>(string path, T[] @default = null)
 		{
-			JObject json = obj;
-			JValue result = null;
-			foreach (var element in path.Split('/')) {
-				JToken token = null;
-				if (json == null || !json.TryGetValue(element, out token)) {
-					if (@default != null) {
-						return @default;
-					}
-					throw new Lime.Exception("{0} is not defined in {1}", path, sourcePath);
+			JToken result = null;
+
+			foreach (var token in GetPathTokens(path)) {
+				if (token == null) {
+					return @default;
 				}
-				result = token as JValue;
-				json = token as JObject;
+
+				result = token;
 			}
-			return result.Value;
+
+			var array = result as JArray;
+			return array == null ? null : array.ToObject<T[]>();
 		}
 
-		public bool GetBool(string path)
+		public T GetValue<T>(string path, T @default = default(T))
 		{
-			var value = GetValue(path);
-			if (value is bool) {
-				return (bool)value;
-			} else {
-				throw new Lime.Exception("Invalid boolean value: {0} in {1}", value, sourcePath);
+			JToken result = null;
+
+			foreach (var token in GetPathTokens(path)) {
+				if (token == null)
+					return @default;
+
+				result = token;
+			}
+
+			var value = result as JValue;
+			return value == null ? default(T) : (T) value.Value;
+		}
+
+		private IEnumerable<JToken> GetPathTokens(string path)
+		{
+			var json = obj;
+			foreach (var element in path.Split('/')) {
+				if (json == null)
+					throw new Lime.Exception("{0} is not defined in {1}", path, sourcePath);
+
+				JToken token;
+				json.TryGetValue(element, out token);
+				yield return token;
+
+				json = token as JObject;
 			}
 		}
 	}

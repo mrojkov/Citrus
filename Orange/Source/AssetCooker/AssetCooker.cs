@@ -545,7 +545,7 @@ namespace Orange
 
 		private static bool ShouldGenerateOpacityMasks()
 		{
-			return !((bool)The.Workspace.ProjectJson.GetValue("DontGenerateOpacityMasks", false));
+			return !The.Workspace.ProjectJson.GetValue("DontGenerateOpacityMasks", false);
 		}
 
 		private static void ImportTexture(string path, Gdk.Pixbuf texture, CookingRules rules)
