@@ -128,6 +128,11 @@ namespace Lime
 			}
 		}
 
+		public Quaternion Normalized
+		{
+			get { return Quaternion.Normalize(this); }
+		}
+
 		#endregion
 
 		#region Internal Properties
@@ -1150,6 +1155,11 @@ namespace Lime
 		    return quaternion;
         }
 
+		public static Vector3 operator *(Vector3 a, Quaternion b)
+		{
+			return b.TransformVector(a);
+		}
+
         /// <summary>
         /// Subtracts a <see cref="Quaternion"/> from a <see cref="Quaternion"/>.
         /// </summary>
@@ -1181,6 +1191,18 @@ namespace Lime
 		    quaternion2.W = -quaternion.W;
 		    return quaternion2;
         }
+
+		public Vector3 TransformVector(Vector3 value)
+		{
+			var x = 2.0f * (Y * value.Z - Z * value.Y);
+			var y = 2.0f * (Z * value.X - X * value.Z);
+			var z = 2.0f * (X * value.Y - Y * value.X);
+			return new Vector3 {
+				X = value.X + x * W + (Y * z - Z * y),
+				Y = value.Y + y * W + (Z * x - X * z),
+				Z = value.Z + z * W + (X * y - Y * x)
+			};
+		}
 
         #endregion
     }
