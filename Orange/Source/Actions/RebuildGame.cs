@@ -26,7 +26,7 @@ namespace Orange
 				Console.WriteLine("Deleting {0}", fileInfo.Name);
 				File.Delete(fileInfo.FullName);
 			}
-			var builder = new SolutionBuilder(The.Workspace.ActivePlatform);
+			var builder = new SolutionBuilder(The.Workspace.ActivePlatform, The.Workspace.CustomSolution);
 			if (!builder.Clean()) {
 				Console.WriteLine("CLEANUP FAILED");
 				return false;

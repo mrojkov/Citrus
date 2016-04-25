@@ -24,10 +24,14 @@ namespace Orange.Source
 			{TargetPlatform.iOS, ".iOS.sln"}
 		};
 		
-		public BuildSystem(string projectDirectory, string projectName, TargetPlatform platform)
+		public BuildSystem(string projectDirectory, string projectName, TargetPlatform platform, string customSolution)
 		{
 			Platform = platform;
-			SlnPath = Path.Combine(projectDirectory, projectName + fileEndings[platform]);
+
+            if (customSolution != null)
+                SlnPath = Path.Combine(projectDirectory, customSolution);
+            else
+                SlnPath = Path.Combine(projectDirectory, projectName + fileEndings[platform]);
 		}
 
 		public abstract int Execute(StringBuilder output = null);

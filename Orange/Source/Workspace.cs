@@ -16,6 +16,7 @@ namespace Orange
 		public FileEnumerator AssetFiles { get; private set; }
 		public Json ProjectJson { get; private set; }
 		public string Target { get; private set; }
+		public List<SubTarget> SubTargets { get; private set; }
 
 		private string dataFolderName;
 
@@ -80,17 +81,23 @@ namespace Orange
 
 		public static readonly Workspace Instance = new Workspace();
 
-		public TargetPlatform ActivePlatform {
+		public TargetPlatform ActivePlatform
+		{
 			get { return The.UI.GetActivePlatform(); }
+		}
+
+		public string CustomSolution
+		{
+			get { return The.UI.GetActiveSubTarget() == null ? null : The.UI.GetActiveSubTarget().ProjectPath; }
 		}
 
 		public void Load()
 		{
 			var config = WorkspaceConfig.Load();
 			Open(config.CitrusProject);
-//#if MAC
+			//#if MAC
 			//The.UI.PlatformPicker.Active = TargetPlatform.iOS;
-//#endif
+			//#endif
 			// The.MainWindow.PlatformPicker.Active = config.TargetPlatform;
 			// The.MainWindow.UpdateBeforeBuildCheckbox.Active = config.UpdateBeforeBuild;
 			// ActionPicker.Active = config.Action;
@@ -120,7 +127,8 @@ namespace Orange
 				PluginLoader.ScanForPlugins(file);
 				AssetFiles = new FileEnumerator(AssetsDirectory);
 				The.UI.OnWorkspaceOpened();
-			} catch (System.Exception e) {
+			}
+			catch (System.Exception e) {
 				Console.WriteLine(string.Format("Can't open {0}:\n{1}", file, e.Message));
 			}
 		}
@@ -131,7 +139,11 @@ namespace Orange
 			ProjectJson = new Json(jobject, file);
 			Title = ProjectJson["Title"] as string;
 			Target = ProjectJson.GetValue("Target", "");
+			SubTargets = new List<SubTarget>();
 			dataFolderName = ProjectJson.GetValue("DataFolderName", "Data");
+
+			foreach (var target in ProjectJson.GetArray("SubTargets", new Dictionary<string, string>[0]))
+				SubTargets.Add(new SubTarget(target["Name"], target["Project"], true, GetPlaformByName(target["Platform"])));
 		}
 
 		public string GetActivePlatformString()
@@ -166,6 +178,16 @@ namespace Orange
 		public string GetUnityProjectDirectory()
 		{
 			return Path.Combine(ProjectDirectory, Title + ".Unity");
+		}
+
+		private TargetPlatform GetPlaformByName(string name)
+		{
+			try {
+				return (TargetPlatform)Enum.Parse(typeof(TargetPlatform), name, true);
+			}
+			catch (ArgumentException) {
+				throw new Lime.Exception("Uknown sub target platform name: {0}", name);
+			}
 		}
 	}
 }

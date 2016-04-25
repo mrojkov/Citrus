@@ -40,6 +40,8 @@ namespace Orange
 
 		public abstract TargetPlatform GetActivePlatform();
 
+        public abstract SubTarget GetActiveSubTarget();
+
 		public virtual void ProcessPendingEvents() { }
 
 		public virtual void OnWorkspaceOpened() { }

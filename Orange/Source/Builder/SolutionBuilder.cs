@@ -10,15 +10,17 @@ namespace Orange
 	{
 		string projectDirectory;
 		string projectName;
+        string customSolution;
 		TargetPlatform platform;
 
 		public static string ConfigurationName = "Release";
 
-		public SolutionBuilder(TargetPlatform platform)
+		public SolutionBuilder(TargetPlatform platform, string customSolution = null)
 		{
 			this.platform = platform;
 			projectName = The.Workspace.Title;
 			projectDirectory = Path.Combine(The.Workspace.ProjectDirectory, projectName);
+            this.customSolution = customSolution;
 			switch (platform) {
 				case TargetPlatform.Android:
 					projectDirectory += ".Android";
@@ -83,13 +85,13 @@ namespace Orange
 		private BuildSystem GetBuildSystem()
 		{
 #if WIN
-			var buildSystem = new MSBuild(projectDirectory, projectName, platform);
+			var buildSystem = new MSBuild(projectDirectory, projectName, platform, customSolution);
 #elif MAC
-			var buildSystem = new MDTool(projectDirectory, projectName, platform);
+			var buildSystem = new MDTool(projectDirectory, projectName, platform, customSolution);
 #else
 			throw new NotSupportedException();
 #endif
-			buildSystem.Configuration = ConfigurationName;
+            buildSystem.Configuration = ConfigurationName;
 			return buildSystem;
 		}
 

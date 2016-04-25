@@ -109,6 +109,7 @@
     <Compile Include="Source\PluginAttributes\PluginFinalizationAttribute.cs" />
     <Compile Include="Source\PluginAttributes\PluginInitializationAttribute.cs" />
     <Compile Include="Source\CsprojSynchronization\CsprojSynchronization.cs" />
+    <Compile Include="Source\SubTarget.cs" />
     <Compile Include="Source\Toolbox\Json.cs" />
     <Compile Include="Source\Toolbox\Process.cs" />
     <Compile Include="Source\Toolbox\Subversion.cs" />

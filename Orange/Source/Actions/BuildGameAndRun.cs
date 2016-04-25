@@ -19,12 +19,12 @@ namespace Orange
 
 		public static bool BuildGame()
 		{
-			return BuildGame(The.Workspace.ActivePlatform);
+			return BuildGame(The.Workspace.ActivePlatform, The.Workspace.CustomSolution);
 		}
 
-		public static bool BuildGame(TargetPlatform platform)
+		public static bool BuildGame(TargetPlatform platform, string customSolution = null)
 		{
-			var builder = new SolutionBuilder(platform);
+			var builder = new SolutionBuilder(platform, customSolution);
 			if (!builder.Build()) {
 				Console.WriteLine("BUILD FAILED");
 				if (UserInterface.Instance is ConsoleUI) {
@@ -37,12 +37,12 @@ namespace Orange
 
 		public static void RunGame()
 		{
-			RunGame(The.Workspace.ActivePlatform);
+			RunGame(The.Workspace.ActivePlatform, The.Workspace.CustomSolution);
 		}
 
-		public static bool RunGame(TargetPlatform platform)
+		public static bool RunGame(TargetPlatform platform, string customSolution = null)
 		{
-			var builder = new SolutionBuilder(platform);
+			var builder = new SolutionBuilder(platform, customSolution);
 			string arguments = PluginLoader.GetCommandLineArguments();
 			int exitCode = builder.Run(arguments);
 			if (exitCode != 0) {
