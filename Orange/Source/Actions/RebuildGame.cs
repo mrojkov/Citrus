@@ -18,7 +18,7 @@ namespace Orange
 			}
 		}
 
-		static bool CleanupGame()
+		public static bool CleanupGame()
 		{
 			string bundlePath = The.Workspace.GetMainBundlePath();
 			var dirInfo = new System.IO.DirectoryInfo(Path.GetDirectoryName(bundlePath));
