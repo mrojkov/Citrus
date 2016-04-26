@@ -91,6 +91,11 @@ namespace Orange
 			get { return The.UI.GetActiveSubTarget() == null ? null : The.UI.GetActiveSubTarget().ProjectPath; }
 		}
 
+		public bool CleanBeforeBuild
+		{
+			get { return The.UI.GetActiveSubTarget() != null && The.UI.GetActiveSubTarget().CleanBeforeBuild; }
+		}
+
 		public void Load()
 		{
 			var config = WorkspaceConfig.Load();
@@ -141,9 +146,16 @@ namespace Orange
 			Target = ProjectJson.GetValue("Target", "");
 			SubTargets = new List<SubTarget>();
 			dataFolderName = ProjectJson.GetValue("DataFolderName", "Data");
+			
+			foreach (var target in ProjectJson.GetArray("SubTargets", new Dictionary<string, object>[0])) {
+				var cleanBeforeBuild = false;
+				if (target.ContainsKey("CleanBeforeBuild")) {
+					cleanBeforeBuild = (bool)target["CleanBeforeBuild"];
+				}
 
-			foreach (var target in ProjectJson.GetArray("SubTargets", new Dictionary<string, string>[0]))
-				SubTargets.Add(new SubTarget(target["Name"], target["Project"], true, GetPlaformByName(target["Platform"])));
+				SubTargets.Add(new SubTarget(target["Name"] as string, target["Project"] as string, 
+											 cleanBeforeBuild, GetPlaformByName(target["Platform"] as string)));
+			}
 		}
 
 		public string GetActivePlatformString()

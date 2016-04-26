@@ -25,6 +25,10 @@ namespace Orange
 		public static bool BuildGame(TargetPlatform platform, string customSolution = null)
 		{
 			var builder = new SolutionBuilder(platform, customSolution);
+			if (The.Workspace.CleanBeforeBuild) {
+				builder.Clean();
+			}
+
 			if (!builder.Build()) {
 				Console.WriteLine("BUILD FAILED");
 				if (UserInterface.Instance is ConsoleUI) {

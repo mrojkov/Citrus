@@ -3,14 +3,18 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using Orange.Source;
+using System.Linq;
 
 namespace Orange
 {
 	public class SolutionBuilder
 	{
+		public readonly string ReleaseBinariesDirectory;
+		public readonly string DebugBinariesDirectory;
+
 		string projectDirectory;
 		string projectName;
-        string customSolution;
+		string customSolution;
 		TargetPlatform platform;
 
 		public static string ConfigurationName = "Release";
@@ -20,7 +24,7 @@ namespace Orange
 			this.platform = platform;
 			projectName = The.Workspace.Title;
 			projectDirectory = Path.Combine(The.Workspace.ProjectDirectory, projectName);
-            this.customSolution = customSolution;
+			this.customSolution = customSolution;
 			switch (platform) {
 				case TargetPlatform.Android:
 					projectDirectory += ".Android";
@@ -42,6 +46,10 @@ namespace Orange
 				default:
 					throw new NotSupportedException();
 			}
+
+			var builder = GetBuildSystem();
+			ReleaseBinariesDirectory = builder.ReleaseBinariesDirectory;
+			DebugBinariesDirectory = builder.DebugBinariesDirectory;
 		}
 
 		public SolutionBuilder(TargetPlatform platform, string projectDirectory, string projectName)
@@ -91,7 +99,7 @@ namespace Orange
 #else
 			throw new NotSupportedException();
 #endif
-            buildSystem.Configuration = ConfigurationName;
+			buildSystem.Configuration = ConfigurationName;
 			return buildSystem;
 		}
 
@@ -115,6 +123,17 @@ namespace Orange
 		public int Run(string arguments)
 		{
 			Console.WriteLine("------------- Starting Application -------------");
+
+			if (platform == TargetPlatform.Android) {
+				var signedApks = Directory.GetFiles(ReleaseBinariesDirectory).Where((f) => f.EndsWith("-Signed.apk")).ToArray();
+				if (signedApks.Length != 1) {
+					Console.WriteLine("There must be single signed apk file in binary's folder");
+					return 1;
+				}
+
+				AdbDeploy(signedApks[0]);
+				return 0;
+			}
 #if WIN
 			var app = GetApplicationPath();
 
@@ -153,6 +172,55 @@ namespace Orange
 				return path;
 			}
 			return null;
+		}
+
+		private static void AdbDeploy(string apkPath)
+		{
+			var adb = GetAdbPath();
+			var packageName = Path.GetFileNameWithoutExtension(apkPath);
+
+			var signedIndex = packageName.IndexOf("-Signed");
+			if (signedIndex != -1)
+				packageName = packageName.Substring(0, signedIndex);
+
+			Console.WriteLine("------------------ Deploying ------------------");
+			Console.WriteLine($"Uninstalling previous apk ({packageName})");
+
+			if (Process.Start(adb, $"shell pm uninstall {packageName}") == 0) {
+				Console.WriteLine("Uninstalled!");
+			} else {
+				Console.WriteLine("Error during uninstalling. Probably application wasn't installed.");
+			}
+
+			Console.WriteLine($"Installing apk {apkPath}");
+			if (Process.Start(adb, $"install {apkPath}") == 0) {
+				Console.WriteLine("App installed.");
+				Console.WriteLine("Starting application.");
+				Process.Start(adb, $"shell monkey -p {packageName} -c android.intent.category.LAUNCHER 1");
+			} else {
+				Console.WriteLine("Error during installing.");
+			}
+		}
+
+		private static string GetAdbPath()
+		{
+			string androidSdk = Toolbox.GetCommandLineArg("--android-sdk");
+			string executable = "adb";
+
+			if (androidSdk == null) {
+#if WIN
+				var appData = System.Environment.ExpandEnvironmentVariables("%LOCALAPPDATA%");
+				androidSdk = Path.Combine(appData, "Android", "android-sdk");
+				executable = Path.Combine(androidSdk, "platform-tools", "adb.exe");
+#elif MAC
+				androidSdk = ""; // TODO: Find defualt sdk path on OSX and assign executable
+#endif
+			}
+
+			if (!File.Exists(executable))
+				throw new Lime.Exception("ADB not found. You can specify sdk location with" +
+										 "--android-sdk argument. Used sdk path: {0}. ", androidSdk);
+			return executable;
 		}
 	}
 }
