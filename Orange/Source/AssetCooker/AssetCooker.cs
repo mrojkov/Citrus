@@ -103,7 +103,7 @@ namespace Orange
 			// Open the bundle again in order to make some plugin postprocessing (e.g. generate code from scene assets)
 			using (AssetsBundle.Instance = CreateBundle(bundleName)) {
 				using (new DirectoryChanger(The.Workspace.AssetsDirectory)) {
-					PluginLoader.AfterAssetsCooked();
+					PluginLoader.AfterAssetsCooked(bundleName);
 				}
 			}
 			if (platform != TargetPlatform.Unity) {

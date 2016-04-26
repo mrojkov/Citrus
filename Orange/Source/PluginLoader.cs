@@ -48,9 +48,9 @@ namespace Orange
 			}
 		}
 
-		public static void AfterAssetsCooked()
+		public static void AfterAssetsCooked(string bundleName)
 		{
-			RunCurrentPluginStaticMethodWithAttribute<PluginAssetsCookedAttribute>();
+			RunCurrentPluginStaticMethodWithAttribute<PluginAssetsCookedAttribute>(new object[] {bundleName});
 		}
 
 		private static void ResetCurrentPlugin()
@@ -123,14 +123,24 @@ namespace Orange
 			return result;
 		}
 
-		private static void RunCurrentPluginStaticMethodWithAttribute<T>() where T : Attribute
+		private static void RunCurrentPluginStaticMethodWithAttribute<T>(params object[] args) where T : Attribute
 		{
 			if (CurrentPlugin != null) {
 				foreach (var method in CurrentPlugin.GetAllMethodsWithAttribute(typeof(T))) {
 					if (!method.IsStatic) {
-						new Exception(string.Format("'{0}' must be a static method", method.Name));
+						throw new Exception(string.Format("'{0}' must be a static method", method.Name));
 					}
-					method.Invoke(null, null);
+					var parameters = method.GetParameters();
+					if (parameters.Length > args.Length) {
+						throw new Exception(string.Format("Wrong number of parameters in '{0}'", method.Name));
+					}
+
+					var args2 = args;
+					if (parameters.Length < args.Length) {
+						args2 = new object[parameters.Length];
+						Array.Copy(args, 0, args2, 0, parameters.Length);
+					};
+					method.Invoke(null, args2);
 				}
 			}
 		}
