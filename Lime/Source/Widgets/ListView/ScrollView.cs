@@ -23,14 +23,35 @@ namespace Lime
 		public ScrollDirection ScrollDirection { get; private set; }
 		private WheelScrollState wheelScrollState;
 		public bool ScrollWhenContentFits = true;
-		
+		private float? lastFrameRotation = null;
+		private Vector2? lastScrollAxis = null;
+		private Vector2 ScrollAxis
+		{
+			get
+			{
+				if (lastFrameRotation != Frame.Rotation) {
+					lastFrameRotation = Frame.Rotation;
+					lastScrollAxis = ScrollDirection == ScrollDirection.Horizontal
+						? new Vector2(1.0f, 0.0f)
+						: new Vector2(0.0f, 1.0f);
+					lastScrollAxis = Vector2.RotateDeg(lastScrollAxis.Value, Frame.Rotation);
+				}
+				return lastScrollAxis.Value;
+			}
+		}
+
+		private float ProjectToScrollAxisWithFrameRotation(Vector2 v)
+		{
+			return Vector2.DotProduct(ScrollAxis, v);
+		}
+
 		public virtual bool IsDragging { get; protected set; }
 
 		// TODO: Use WidgetInput instead
 		private Input Input { get { return Window.Current.Input; } }
 
 		public float ContentLength
-		{ 
+		{
 			get { return ProjectToScrollAxis(Content.Size); }
 			set { SetProjectedSize(Content, value); }
 		}
@@ -221,10 +242,10 @@ namespace Lime
 					var r = new TaskResult<bool>();
 					yield return DetectSwipeAlongScrollAxisTask(r);
 					if (r.Value) {
-						yield return HandleDragTask(velocityMeter, ProjectToScrollAxis(mousePos));
+						yield return HandleDragTask(velocityMeter, ProjectToScrollAxisWithFrameRotation(mousePos));
 					}
 				} else {
-					yield return HandleDragTask(velocityMeter, ProjectToScrollAxis(mousePos));
+					yield return HandleDragTask(velocityMeter, ProjectToScrollAxisWithFrameRotation(mousePos));
 				}
 			}
 		}
@@ -236,7 +257,7 @@ namespace Lime
 			float totalScrollAmount = 0f;
 			while (true) {
 				yield return null;
-				var IsScrollingByMouseWheel = 
+				var IsScrollingByMouseWheel =
 					!Frame.Input.IsMousePressed() &&
 					(Frame.Input.WasKeyPressed(Key.MouseWheelDown) || Frame.Input.WasKeyPressed(Key.MouseWheelUp)) &&
 					(CanScroll && Frame.HitTest(Frame.Input.MousePosition));
@@ -275,11 +296,9 @@ namespace Lime
 				yield return null;
 			}
 			Vector2 d = Input.MousePosition - mousePos;
-			if (ScrollDirection == ScrollDirection.Vertical) {
-				result.Value = d.Y.Abs() > d.X.Abs();
-			} else {
-				result.Value = d.X.Abs() > d.Y.Abs();
-			}
+			var dt = Vector2.DotProduct(ScrollAxis, d);
+			var dn = Vector2.DotProduct(new Vector2(ScrollAxis.Y, -ScrollAxis.X), d);
+			result.Value = dt.Abs() > dn.Abs();
 		}
 
 		private IEnumerator<object> InertialScrollingTask(float velocity)
@@ -323,10 +342,10 @@ namespace Lime
 					IsDragging = false;
 					yield break;
 				}
-				realScrollPosition += mouseProjectedPosition - ProjectToScrollAxis(Input.MousePosition);
+				realScrollPosition += mouseProjectedPosition - ProjectToScrollAxisWithFrameRotation(Input.MousePosition);
 				// Round scrolling position to prevent blurring
 				ScrollPosition = ClampScrollPositionWithinBounceZone(realScrollPosition).Round();
-				mouseProjectedPosition = ProjectToScrollAxis(Input.MousePosition);
+				mouseProjectedPosition = ProjectToScrollAxisWithFrameRotation(Input.MousePosition);
 				velocityMeter.AddSample(realScrollPosition);
 				yield return null;
 			} while (Input.IsMousePressed());
