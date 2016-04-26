@@ -337,5 +337,34 @@ namespace Lime
 			var t3 = t2 * t;
 			return oneMinusT3 * p0 + 3 * t * oneMinusT2 * p1 + 3 * t2 * oneMinusT * p2 + t3 * p3;
 		}
+
+		public static Vector3 BezierTangent(float t, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3)
+		{
+			return new Vector3(
+				BezierTangent(t, p0.X, p1.X, p2.X, p3.X),
+				BezierTangent(t, p0.Y, p1.Y, p2.Y, p3.Y),
+				BezierTangent(t, p0.Z, p1.Z, p2.Z, p3.Z));
+		}
+
+		public static Vector2 BezierTangent(float t, Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3)
+		{
+			return new Vector2(
+				BezierTangent(t, p0.X, p1.X, p2.X, p3.X),
+				BezierTangent(t, p0.Y, p1.Y, p2.Y, p3.Y));
+		}
+
+		public static float BezierTangent(float t, float p0, float p1, float p2, float p3)
+		{
+			var oneMinusT = 1 - t;
+			var oneMinusT2 = oneMinusT * oneMinusT;
+			var t2 = t * t;
+			return
+				-3 * oneMinusT2 * p0 +
+				3 * oneMinusT2 * p1 -
+				6 * t * oneMinusT * p1 -
+				3 * t2 * p2 +
+				6 * t * oneMinusT * p2 +
+				3 * t2 * p3;
+		}
 	}
 }

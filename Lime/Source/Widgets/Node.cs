@@ -231,7 +231,7 @@ namespace Lime
 		/// <summary>
 		/// TODO: Add summary
 		/// </summary>
-		protected DirtyFlags DirtyMask;
+		protected DirtyFlags DirtyMask = DirtyFlags.All;
 
 		/// <summary>
 		/// TODO: Add summary
@@ -387,6 +387,7 @@ namespace Lime
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
 			clone.Nodes = Nodes.DeepCloneFast(clone);
 			clone.Awoken = false;
+			clone.DirtyMask = DirtyFlags.All;
 			if (clone.Presenter != null) {
 				clone.Presenter = Presenter.Clone(clone);
 			}
