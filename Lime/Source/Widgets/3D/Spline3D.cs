@@ -71,6 +71,12 @@ namespace Lime
 				}
 				length += segmentLength;
 			}
+			if (Points.Count > 2) {
+				return Interpolate(1.0f, GetPoint(segmentCount - 1), GetPoint(segmentCount));
+			}
+			if (Points.Count == 1) {
+				return Matrix44.CreateTranslation(Points[0].Position);
+			}
 			return Matrix44.Identity;
 		}
 
@@ -85,23 +91,19 @@ namespace Lime
 				direction = position2 - position1;
 			} else {
 				var tangent1 = position1 + transform.TransformNormal(point1.TangentA);
-				var tangent2 = position2 + transform.TransformNormal(point1.TangentB);
+				var tangent2 = position2 + transform.TransformNormal(point2.TangentB);
 				position = Mathf.BezierSpline(amount, position1, tangent1, tangent2, position2);
 				direction = Mathf.BezierTangent(amount, position1, tangent1, tangent2, position2);
 			}
 			return CalcRotationMatrix(direction, Vector3.UnitY) * Matrix44.CreateTranslation(position);
 		}
 
-		private Matrix44 CalcPointTransform(Vector3 position, Vector3 direction)
-		{
-			return CalcRotationMatrix(direction, Vector3.UnitY) * Matrix44.CreateTranslation(position);
-		}
-
 		public int GetSegmentCount()
 		{
-			return Points.Count > 2 && Closed ?
-				Points.Count :
-				Points.Count - 1;
+			if (Points.Count > 2) {
+				return Closed ? Points.Count : Points.Count - 1;
+			}
+			return 0;
 		}
 
 		private Point GetPoint(int index)
