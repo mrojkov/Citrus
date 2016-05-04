@@ -122,6 +122,21 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// Determines is there any non-opaque pixel in the array of colors.
+		/// </summary>
+		/// <param name="colors">The array of colors.</param>
+		/// <returns>True if there is any non-opaque pixel, otherwise False.</returns>
+		public static bool AnyAlpha(Color4[] colors)
+		{
+			foreach (var color in colors) {
+				if (color.A != 255) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		/// <summary>
 		/// Creates an exact copy of this bitmap.
 		/// </summary>
 		/// <returns>The new bitmap that this method creates.</returns>

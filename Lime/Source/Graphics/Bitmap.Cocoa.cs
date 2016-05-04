@@ -1,7 +1,6 @@
 #if iOS || MAC || MONOMAC
 using System;
 using System.IO;
-using System.Linq;
 #if iOS
 using Foundation;
 using CoreGraphics;
@@ -42,7 +41,7 @@ namespace Lime
 				data[j++] = pixels[i].B;
 				data[j++] = pixels[i].A;
 			}
-			var alphaInfo = pixels.Any(color => color.A != 255) ? CGBitmapFlags.Last : CGBitmapFlags.NoneSkipLast;
+			var alphaInfo = Lime.Bitmap.AnyAlpha(pixels) ? CGBitmapFlags.Last : CGBitmapFlags.NoneSkipLast;
 			using (var colorSpace = CGColorSpace.CreateDeviceRGB()) {
 				using (var dataProvider = new CGDataProvider(data, 0, lengthInBytes)) {
 					using (var img = new CGImage(

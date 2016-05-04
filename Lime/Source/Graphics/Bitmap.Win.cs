@@ -1,7 +1,6 @@
 #if WIN
 using System;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using SD = System.Drawing;
 
@@ -28,7 +27,7 @@ namespace Lime
 			var stride = 4 * width;
 			data = CreateMemoryCopy(colors);
 			Bitmap = new SD.Bitmap(width, height, stride, Format, data);
-			HasAlpha = colors.Any(color => color.A != 255);
+			HasAlpha = Lime.Bitmap.AnyAlpha(colors);
 		}
 
 		private BitmapImplementation(SD.Bitmap bitmap)

@@ -1,6 +1,5 @@
 #if ANDROID
 using System.IO;
-using System.Linq;
 using Android.Graphics;
 using Android.OS;
 using AndroidBitmap = Android.Graphics.Bitmap;
@@ -26,7 +25,7 @@ namespace Lime
 				colors[i] = Color4.CreateArgb(pixel.A, pixel.R, pixel.G, pixel.B);
 			}
 			Bitmap = AndroidBitmap.CreateBitmap(colors, width, height, AndroidBitmap.Config.Argb8888);
-			Bitmap.HasAlpha = data.Any(color => color.A != 255);
+			Bitmap.HasAlpha = Lime.Bitmap.AnyAlpha(data);
 		}
 
 		private BitmapImplementation(AndroidBitmap bitmap)
