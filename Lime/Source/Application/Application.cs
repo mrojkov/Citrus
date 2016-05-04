@@ -176,8 +176,13 @@ namespace Lime
 			SetGlobalExceptionHandler();
 			AudioSystem.Initialize(options);
 #if WIN
+#if DEBUG
 			System.Windows.Forms.Application.SetUnhandledExceptionMode(
 				System.Windows.Forms.UnhandledExceptionMode.CatchException);
+#else
+			System.Windows.Forms.Application.SetUnhandledExceptionMode(
+				System.Windows.Forms.UnhandledExceptionMode.ThrowException);
+#endif
 			// This function doesn't work on XP, and we don't want to add dpiAware into manifest
 			// because this will require adding into every new project.
 			try {
