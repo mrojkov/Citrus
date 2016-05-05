@@ -63,9 +63,6 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>packages\Newtonsoft.Json.5.0.6\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="RestSharp">
-      <HintPath>packages\RestSharp.104.1\lib\net4\RestSharp.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="gtk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="gdk-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
@@ -94,7 +91,6 @@
     <Compile Include="Source\Actions\GenerateSerializerDll.cs" />
     <Compile Include="Source\Actions\RevealCookedAssets.cs" />
     <Compile Include="Source\Actions\BuildGameAndRun.cs" />
-    <Compile Include="Source\Actions\PublishTestFlight.cs" />
     <Compile Include="Source\Actions\UpdateDictionaryTxtOldFormat.cs" />
     <Compile Include="Source\Actions\UpdateDictionaryTxt.cs" />
     <Compile Include="Source\Actions\UpdateXCodeProject.cs" />
