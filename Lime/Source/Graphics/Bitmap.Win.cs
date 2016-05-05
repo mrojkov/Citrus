@@ -6,18 +6,20 @@ using SD = System.Drawing;
 
 namespace Lime
 {
-	class BitmapImplementation : IBitmapImplementation
+	internal class BitmapImplementation : IBitmapImplementation
 	{
 		private IntPtr data;
 
 		public BitmapImplementation(Stream stream)
 		{
-			// System.Drawing.Bitmap требует, чтобы stream оставался открытым всё время существования битмапа.
-			// http://stackoverflow.com/questions/336387/image-save-throws-a-gdi-exception-because-the-memory-stream-is-closed
-			// Так как мы не можем быть уверены, что снаружи стрим не уничтожат, копируем его.
+			// System.Drawing.Bitmap требует, чтобы поток оставался открытым всё время существования битмапа.
+			// http://goo.gl/oBBW6G
+			// Так как мы не можем быть уверены, что снаружи поток не уничтожат, копируем его.
 			var streamClone = new MemoryStream();
 			stream.CopyTo(streamClone);
 			Bitmap = new SD.Bitmap(streamClone);
+			HasAlpha = SD.Image.IsAlphaPixelFormat(Bitmap.PixelFormat) && IsReallyHasAlpha(Bitmap);
+
 		}
 
 		public BitmapImplementation(Color4[] colors, int width, int height)
@@ -26,6 +28,7 @@ namespace Lime
 			var stride = 4 * width;
 			data = CreateMemoryCopy(colors);
 			Bitmap = new SD.Bitmap(width, height, stride, Format, data);
+			HasAlpha = Lime.Bitmap.AnyAlpha(colors);
 		}
 
 		private BitmapImplementation(SD.Bitmap bitmap)
@@ -55,6 +58,11 @@ namespace Lime
 					Bitmap.Height > 0 &&
 					Bitmap.Width > 0;
 			}
+		}
+
+		public bool HasAlpha
+		{
+			get; private set;
 		}
 
 		public IBitmapImplementation Clone()
@@ -124,6 +132,27 @@ namespace Lime
 				}
 			}
 			return data;
+		}
+
+		private static unsafe bool IsReallyHasAlpha(SD.Bitmap bitmap)
+		{
+			var bmpData = bitmap.LockBits(
+				new SD.Rectangle(0, 0, bitmap.Width, bitmap.Height),
+				SD.Imaging.ImageLockMode.ReadOnly,
+				bitmap.PixelFormat);
+			try {
+				int lengthInBytes = bmpData.Height * Math.Abs(bmpData.Stride);
+				var pointer = (byte*)bmpData.Scan0 + 3;
+				for (int i = 3; i < lengthInBytes; i += 4) {
+					if (*pointer != 255) {
+						return true;
+					}
+					pointer += 4;
+				}
+				return false;
+			} finally {
+				bitmap.UnlockBits(bmpData);
+			}
 		}
 
 		#region IDisposable Support

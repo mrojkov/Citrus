@@ -17,6 +17,20 @@ using NativeBitmap = UnityEngine.Texture2D;
 
 namespace Lime
 {
+	interface IBitmapImplementation : IDisposable
+	{
+		NativeBitmap Bitmap { get; }
+		int Width { get; }
+		int Height { get; }
+		bool IsValid { get; }
+		bool HasAlpha { get; }
+		IBitmapImplementation Clone();
+		IBitmapImplementation Crop(IntRectangle cropArea);
+		IBitmapImplementation Rescale(int newWidth, int newHeight);
+		Color4[] GetPixels();
+		void SaveTo(Stream stream);
+	}
+
 	/// <summary>
 	/// Wraps native bitmap and exposes unified methods to work with images.
 	/// </summary>
@@ -83,7 +97,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Determines whether this bitmap is valid.
+		/// Gets a value indicating whether this bitmap is valid.
 		/// </summary>
 		/// <returns>true if this bitmap is not null or empty; otherwise, false.</returns>
 		public bool IsValid
@@ -92,11 +106,34 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// Gets a value indicating whether this bitmap has at least one non-opaque pixel.
+		/// </summary>
+		public bool HasAlpha
+		{
+			get { return implementation.HasAlpha; }
+		}
+
+		/// <summary>
 		/// Gets a platform specific bitmap.
 		/// </summary>
 		public NativeBitmap NativeBitmap
 		{
 			get { return implementation.Bitmap; }
+		}
+
+		/// <summary>
+		/// Determines is there any non-opaque pixel in the array of colors.
+		/// </summary>
+		/// <param name="colors">The array of colors.</param>
+		/// <returns>True if there is any non-opaque pixel, otherwise False.</returns>
+		public static bool AnyAlpha(Color4[] colors)
+		{
+			foreach (var color in colors) {
+				if (color.A != 255) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		/// <summary>
@@ -120,8 +157,7 @@ namespace Lime
 			if (
 				cropArea.Width <= 0 || cropArea.Height <= 0 ||
 				cropArea.Left < 0 || cropArea.Top < 0 ||
-				cropArea.Right > Width || cropArea.Bottom > Height
-				) {
+				cropArea.Right > Width || cropArea.Bottom > Height) {
 				throw new InvalidOperationException("Bitmap: Crop rectangle should be inside the image," +
 					" and resulting bitmap should not be empty.");
 			}
@@ -178,13 +214,6 @@ namespace Lime
 			implementation.SaveTo(stream);
 		}
 
-		private void CheckValidity()
-		{
-			if (!IsValid) {
-				throw new InvalidOperationException("Bitmap is not valid.");
-			}
-		}
-
 		/// <summary>
 		/// Releases all resources used by this bitmap.
 		/// </summary>
@@ -192,6 +221,13 @@ namespace Lime
 		{
 			if (implementation != null) {
 				implementation.Dispose();
+			}
+		}
+
+		private void CheckValidity()
+		{
+			if (!IsValid) {
+				throw new InvalidOperationException("Bitmap is not valid.");
 			}
 		}
 	}
@@ -228,18 +264,5 @@ namespace Lime
 				return new SurrogateBitmap { SerializationData = memoryStream.ToArray() };
 			}
 		}
-	}
-
-	interface IBitmapImplementation : IDisposable
-	{
-		NativeBitmap Bitmap { get; }
-		int Width { get; }
-		int Height { get; }
-		bool IsValid { get; }
-		IBitmapImplementation Clone();
-		IBitmapImplementation Crop(IntRectangle cropArea);
-		IBitmapImplementation Rescale(int newWidth, int newHeight);
-		Color4[] GetPixels();
-		void SaveTo(Stream stream);
 	}
 }
