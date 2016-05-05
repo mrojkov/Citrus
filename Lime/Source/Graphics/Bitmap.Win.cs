@@ -18,7 +18,8 @@ namespace Lime
 			var streamClone = new MemoryStream();
 			stream.CopyTo(streamClone);
 			Bitmap = new SD.Bitmap(streamClone);
-			HasAlpha = IsReallyHasAlpha(Bitmap);
+			HasAlpha = SD.Image.IsAlphaPixelFormat(Bitmap.PixelFormat) && IsReallyHasAlpha(Bitmap);
+
 		}
 
 		public BitmapImplementation(Color4[] colors, int width, int height)
@@ -133,22 +134,25 @@ namespace Lime
 			return data;
 		}
 
-		private static bool IsReallyHasAlpha(SD.Bitmap bitmap)
+		private static unsafe bool IsReallyHasAlpha(SD.Bitmap bitmap)
 		{
 			var bmpData = bitmap.LockBits(
 				new SD.Rectangle(0, 0, bitmap.Width, bitmap.Height),
 				SD.Imaging.ImageLockMode.ReadOnly,
 				bitmap.PixelFormat);
-			var bytes = new byte[bmpData.Height * Math.Abs(bmpData.Stride)];
-			Marshal.Copy(bmpData.Scan0, bytes, 0, bytes.Length);
-			for (int p = 3; p < bytes.Length; p += 4) {
-				if (bytes[p] != 255) {
-					bitmap.UnlockBits(bmpData);
-					return true;
+			try {
+				int lengthInBytes = bmpData.Height * Math.Abs(bmpData.Stride);
+				var pointer = (byte*)bmpData.Scan0 + 3;
+				for (int i = 3; i < lengthInBytes; i += 4) {
+					if (*pointer != 255) {
+						return true;
+					}
+					pointer += 4;
 				}
+				return false;
+			} finally {
+				bitmap.UnlockBits(bmpData);
 			}
-			bitmap.UnlockBits(bmpData);
-			return false;
 		}
 
 		#region IDisposable Support
