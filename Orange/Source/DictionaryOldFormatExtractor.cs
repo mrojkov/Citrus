@@ -121,7 +121,7 @@ namespace Orange
 
 		private bool ShouldLocalizeOnlyTaggedSceneTexts()
 		{
-			return (bool)The.Workspace.ProjectJson.GetValue("LocalizeOnlyTaggedSceneTexts", false);
+			return The.Workspace.ProjectJson.GetValue("LocalizeOnlyTaggedSceneTexts", false);
 		}
 
 		void ProcessSourceFile(string file, LocalizationPass pass, Encoding saveEncoding)

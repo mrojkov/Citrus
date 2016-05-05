@@ -72,10 +72,7 @@
     </Reference>
     <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f" />
     <Reference Include="Newtonsoft.Json">
-      <HintPath>packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="RestSharp">
-      <HintPath>packages\RestSharp.105.2.3\lib\net45\RestSharp.dll</HintPath>
+      <HintPath>..\3rdParty\Newtonsoft.Json\Newtonsoft.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -111,7 +108,6 @@
     <Compile Include="Source\Actions\UpdateDictionaryTxt.cs" />
     <Compile Include="Source\Actions\CookGameAssets.cs" />
     <Compile Include="Source\CsprojSynchronization\CsprojSynchronization.cs" />
-    <Compile Include="Source\Actions\PublishTestFlight.cs" />
     <Compile Include="Source\UI\ConsoleUI.cs" />
     <Compile Include="Source\UI\MainWindow.cs" />
     <Compile Include="Source\UI\MainWindow.UI.cs" />
@@ -161,26 +157,6 @@
       <Visible>False</Visible>
     </None>
     <None Include="Orange.ico" />
-    <None Include="packages.config" />
-    <None Include="packages\repositories.config" />
-    <None Include="packages\Newtonsoft.Json.5.0.6\Newtonsoft.Json.5.0.6.nupkg" />
-    <None Include="packages\Newtonsoft.Json.5.0.6\Newtonsoft.Json.5.0.6.nuspec" />
-    <None Include="packages\Newtonsoft.Json.5.0.6\lib\net20\Newtonsoft.Json.xml" />
-    <None Include="packages\Newtonsoft.Json.5.0.6\lib\net35\Newtonsoft.Json.xml" />
-    <None Include="packages\Newtonsoft.Json.5.0.6\lib\net40\Newtonsoft.Json.xml" />
-    <None Include="packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.xml" />
-    <None Include="packages\Newtonsoft.Json.5.0.6\lib\netcore45\Newtonsoft.Json.xml" />
-    <None Include="packages\Newtonsoft.Json.5.0.6\lib\portable-net40+sl4+wp7+win8\Newtonsoft.Json.xml" />
-    <None Include="packages\Newtonsoft.Json.5.0.6\lib\portable-net45+wp80+win8\Newtonsoft.Json.xml" />
-    <None Include="packages\RestSharp.104.1\RestSharp.104.1.nupkg" />
-    <None Include="packages\RestSharp.104.1\RestSharp.104.1.nuspec" />
-    <None Include="packages\RestSharp.104.1\readme.txt" />
-    <None Include="packages\RestSharp.104.1\lib\net35\RestSharp.xml" />
-    <None Include="packages\RestSharp.104.1\lib\net35-client\RestSharp.xml" />
-    <None Include="packages\RestSharp.104.1\lib\net4\RestSharp.xml" />
-    <None Include="packages\RestSharp.104.1\lib\net4-client\RestSharp.xml" />
-    <None Include="packages\RestSharp.104.1\lib\sl4\RestSharp.Silverlight.xml" />
-    <None Include="packages\RestSharp.104.1\lib\sl4-wp71\RestSharp.WindowsPhone.xml" />
     <None Include="Orange.Win.v11.suo">
       <Visible>False</Visible>
     </None>

@@ -72,7 +72,7 @@ namespace Orange
 				WriteHelpAndExit();
 			}
 			if (DoesNeedSvnUpdate()) {
-				var builder = new SolutionBuilder(The.Workspace.ActivePlatform);
+				var builder = new SolutionBuilder(The.Workspace.ActivePlatform, The.Workspace.CustomSolution);
 				builder.SvnUpdate();
 			}
 			The.Workspace.AssetFiles.Rescan();
@@ -135,6 +135,10 @@ namespace Orange
 
 		public override TargetPlatform GetActivePlatform()
 		{
+			var subTarget = GetActiveSubTarget();
+			if (subTarget != null)
+				return subTarget.Platform;
+
 			var platform = Toolbox.GetCommandLineArg("--platform");
 			if (platform == "ios") {
 				return TargetPlatform.iOS;
@@ -150,6 +154,17 @@ namespace Orange
 				Console.WriteLine("Target platform must be either ios, android or desktop");
 				throw new TerminateException(1);
 			}
+		}
+
+		public override SubTarget GetActiveSubTarget()
+		{
+			var platform = Toolbox.GetCommandLineArg("--platform");
+			foreach (var subTarget in The.Workspace.SubTargets) {
+				if (platform == subTarget.Name) {
+					return subTarget;
+				}
+			}
+			return null;
 		}
 
 		public override void ScrollLogToEnd()

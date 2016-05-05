@@ -18,7 +18,7 @@ namespace Orange
 			}
 		}
 
-		static bool CleanupGame()
+		public static bool CleanupGame()
 		{
 			string bundlePath = The.Workspace.GetMainBundlePath();
 			var dirInfo = new System.IO.DirectoryInfo(Path.GetDirectoryName(bundlePath));
@@ -26,7 +26,7 @@ namespace Orange
 				Console.WriteLine("Deleting {0}", fileInfo.Name);
 				File.Delete(fileInfo.FullName);
 			}
-			var builder = new SolutionBuilder(The.Workspace.ActivePlatform);
+			var builder = new SolutionBuilder(The.Workspace.ActivePlatform, The.Workspace.CustomSolution);
 			if (!builder.Clean()) {
 				Console.WriteLine("CLEANUP FAILED");
 				return false;
