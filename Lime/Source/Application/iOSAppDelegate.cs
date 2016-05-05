@@ -24,14 +24,14 @@ namespace Lime
 		// handlers
 		public delegate void AlertClickHandler(int buttonIdx);
 		public delegate bool OpenURLHandler(NSUrl url);
-        public delegate void ReceivedRemoteNotificationsHandler(NSDictionary userInfo);
-        public delegate void RegisteredForRemoteNotificationsHandler(NSData deviceToken);
-        public delegate void FailedToRegisterForRemoteNotificationsHandler(NSError error);
+		public delegate void ReceivedRemoteNotificationsHandler(NSDictionary userInfo);
+		public delegate void RegisteredForRemoteNotificationsHandler(NSData deviceToken);
+		public delegate void FailedToRegisterForRemoteNotificationsHandler(NSError error);
 
 		public event OpenURLHandler UrlOpened;
-        public event ReceivedRemoteNotificationsHandler ReceivedRemoteNotificationsHandlerEvent;
+		public event ReceivedRemoteNotificationsHandler ReceivedRemoteNotificationsHandlerEvent;
 		public event RegisteredForRemoteNotificationsHandler RegisteredForRemoteNotificationsEvent;
-        public event FailedToRegisterForRemoteNotificationsHandler FailedToRegisterForRemoteNotificationsEvent;
+		public event FailedToRegisterForRemoteNotificationsHandler FailedToRegisterForRemoteNotificationsEvent;
 		public event Action WillTerminateEvent;
 		public event Action Activated;
 		public event Action Deactivated;
@@ -127,12 +127,12 @@ namespace Lime
 			}
 		}
 
-        public override void ReceivedRemoteNotification(UIApplication application, NSDictionary userInfo)
-        {
-            if (ReceivedRemoteNotificationsHandlerEvent != null) {
-                ReceivedRemoteNotificationsHandlerEvent(userInfo);
-            }
-        }
+		public override void ReceivedRemoteNotification(UIApplication application, NSDictionary userInfo)
+		{
+			if (ReceivedRemoteNotificationsHandlerEvent != null) {
+				ReceivedRemoteNotificationsHandlerEvent(userInfo);
+			}
+		}
 
 		public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken)
 		{
@@ -141,12 +141,12 @@ namespace Lime
 			}
 		}
 
-        public override void FailedToRegisterForRemoteNotifications(UIApplication application, NSError error)
-        {
-            if (FailedToRegisterForRemoteNotificationsEvent != null) {
-                FailedToRegisterForRemoteNotificationsEvent(error);
-            }
-        }
+		public override void FailedToRegisterForRemoteNotifications(UIApplication application, NSError error)
+		{
+			if (FailedToRegisterForRemoteNotificationsEvent != null) {
+				FailedToRegisterForRemoteNotificationsEvent(error);
+			}
+		}
 	}
 }
 #endif

@@ -41,7 +41,7 @@ namespace Lime
 	{
 		public const TextureTarget Texture2D = TextureTarget.Texture2D;
 	}
-}		
+}
 #elif iOS
 namespace Lime
 {
@@ -59,7 +59,7 @@ namespace Lime
 	{
 		public const BeginMode Triangles = BeginMode.Triangles;
 	}
-		
+
 /*
 	static class VertexAttribPointerType
 	{
@@ -144,7 +144,7 @@ namespace Lime
 	static class PixelType
 	{
 		public const All UnsignedByte = All.UnsignedByte;
-        public const All UnsignedShort565 = All.UnsignedShort565;
+		public const All UnsignedShort565 = All.UnsignedShort565;
 	}
 
 	static class FramebufferTarget
@@ -180,7 +180,7 @@ namespace Lime
 		public const All ArrayBuffer = All.ArrayBuffer;
 		public const All ElementArrayBuffer = All.ElementArrayBuffer;
 	}
-		
+
 	static class ErrorCode
 	{
 		public const All NoError = All.NoError;
@@ -190,7 +190,7 @@ namespace Lime
 	{
 		public const All DynamicDraw = All.DynamicDraw;
 	}
-*/	
+*/
 }
 #endif
 #endif
