@@ -3,13 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyProject.Mac", "EmptyProject.Mac.csproj", "{6AC2E264-44BC-4508-B819-CA4B0CBA764B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyProject.Game.Mac", "..\..\EmptyProject.Game\EmptyProject.Game.Mac.csproj", "{42396B7B-C381-4A38-8AD4-46E042FB93AF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyProject.Game.Mac", "..\EmptyProject.Game\EmptyProject.Game.Mac.csproj", "{FB693455-C730-47B9-88A6-E16C3FD0B7D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.Mac", "..\..\..\Citrus\Lime\Lime.Mac.csproj", "{DC16EEBF-404D-4610-B87A-15B57464D707}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.Mac", "..\..\Citrus\Lime\Lime.Mac.csproj", "{DC16EEBF-404D-4610-B87A-15B57464D707}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lemon.Mac", "..\..\..\Citrus\Lemon\Lemon.Mac.csproj", "{BB697671-700C-455D-B8EE-66A6B122B949}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTK.Xamarin", "..\..\..\Citrus\3rdParty\OpenTK.Xamarin\OpenTK.Xamarin.csproj", "{670A98AF-7AAD-43A8-A80B-B202A7745EA5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lemon.Mac", "..\..\Citrus\Lemon\Lemon.Mac.csproj", "{BB697671-700C-455D-B8EE-66A6B122B949}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,14 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{42396B7B-C381-4A38-8AD4-46E042FB93AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{42396B7B-C381-4A38-8AD4-46E042FB93AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{42396B7B-C381-4A38-8AD4-46E042FB93AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{42396B7B-C381-4A38-8AD4-46E042FB93AF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{670A98AF-7AAD-43A8-A80B-B202A7745EA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{670A98AF-7AAD-43A8-A80B-B202A7745EA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{670A98AF-7AAD-43A8-A80B-B202A7745EA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{670A98AF-7AAD-43A8-A80B-B202A7745EA5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6AC2E264-44BC-4508-B819-CA4B0CBA764B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6AC2E264-44BC-4508-B819-CA4B0CBA764B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6AC2E264-44BC-4508-B819-CA4B0CBA764B}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -37,5 +27,9 @@ Global
 		{DC16EEBF-404D-4610-B87A-15B57464D707}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC16EEBF-404D-4610-B87A-15B57464D707}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC16EEBF-404D-4610-B87A-15B57464D707}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB693455-C730-47B9-88A6-E16C3FD0B7D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB693455-C730-47B9-88A6-E16C3FD0B7D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB693455-C730-47B9-88A6-E16C3FD0B7D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB693455-C730-47B9-88A6-E16C3FD0B7D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
