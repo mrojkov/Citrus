@@ -106,9 +106,16 @@ namespace Lime
 			return pixels;
 		}
 
-		public void SaveTo(Stream stream)
+		public void SaveTo(Stream stream, CompressionFormat compression)
 		{
-			Bitmap.Compress(AndroidBitmap.CompressFormat.Png, 100, stream);
+			switch (compression) {
+				case CompressionFormat.Jpeg:
+					Bitmap.Compress(AndroidBitmap.CompressFormat.Jpeg, 80, stream);
+					break;
+				case CompressionFormat.Png:
+					Bitmap.Compress(AndroidBitmap.CompressFormat.Png, 100, stream);
+					break;
+			}
 		}
 
 		public void Dispose()

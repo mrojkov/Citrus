@@ -8,10 +8,12 @@ using CocoaBitmap = UIKit.UIImage;
 #elif MAC
 using AppKit;
 using CoreGraphics;
+using Foundation;
 using CocoaBitmap = AppKit.NSImage;
 #else
 using MonoMac.AppKit;
 using MonoMac.CoreGraphics;
+using MonoMac.Foundation;
 using CocoaBitmap = MonoMac.AppKit.NSImage;
 #endif
 
@@ -183,23 +185,41 @@ namespace Lime
 			return pixels;
 		}
 
-		public void SaveTo(Stream stream)
+		public void SaveTo(Stream stream, CompressionFormat compression)
 		{
 #if iOS
-			using (var png = Bitmap.AsPNG()) {
-				if (png != null) {
-					using (var bitmapStream = png.AsStream()) {
-						bitmapStream.CopyTo(stream);
-					}
-				}
+			NSData data = null;
+			switch (compression) {
+				case CompressionFormat.Jpeg:
+					data = Bitmap.AsJPEG(0.8f);
+					break;
+				case CompressionFormat.Png:
+					data = Bitmap.AsPNG();
+					break;
 			}
-#elif MAC || MONOMAC
-			using (var rep = new NSBitmapImageRep(Bitmap.CGImage)) {
-				rep.Size = Bitmap.Size;
-				using (var pngData = rep.RepresentationUsingTypeProperties(NSBitmapImageFileType.Png, null))
-				using (var bitmapStream = pngData.AsStream()) {
+			if (data != null) {
+				using (var bitmapStream = data.AsStream()) {
 					bitmapStream.CopyTo(stream);
 				}
+				data.Dispose();
+			}
+#elif MAC || MONOMAC
+			using (var representation = new NSBitmapImageRep(Bitmap.CGImage)) {
+				NSData data = null;
+				switch (compression) {
+					case CompressionFormat.Jpeg:
+						var parameters = NSDictionary.FromObjectAndKey(
+							NSNumber.FromFloat(0.8f), NSBitmapImageRep.CompressionFactor);
+						data = representation.RepresentationUsingTypeProperties(NSBitmapImageFileType.Jpeg, parameters);
+						break;
+					case CompressionFormat.Png:
+						data = representation.RepresentationUsingTypeProperties(NSBitmapImageFileType.Png, null);
+						break;
+				}
+				using (var bitmapStream = data.AsStream()) {
+					bitmapStream.CopyTo(stream);
+				}
+				data.Dispose();
 			}
 #endif
 		}

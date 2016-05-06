@@ -17,7 +17,13 @@ using NativeBitmap = UnityEngine.Texture2D;
 
 namespace Lime
 {
-	interface IBitmapImplementation : IDisposable
+	public enum CompressionFormat
+	{
+		Jpeg,
+		Png
+	}
+
+	internal interface IBitmapImplementation : IDisposable
 	{
 		NativeBitmap Bitmap { get; }
 		int Width { get; }
@@ -28,7 +34,7 @@ namespace Lime
 		IBitmapImplementation Crop(IntRectangle cropArea);
 		IBitmapImplementation Rescale(int newWidth, int newHeight);
 		Color4[] GetPixels();
-		void SaveTo(Stream stream);
+		void SaveTo(Stream stream, CompressionFormat compression);
 	}
 
 	/// <summary>
@@ -36,7 +42,7 @@ namespace Lime
 	/// </summary>
 	public class Bitmap : IDisposable
 	{
-		private IBitmapImplementation implementation;
+		private readonly IBitmapImplementation implementation;
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="Bitmap"/> class with the specified
@@ -205,13 +211,14 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Saves this image to the specified stream in PNG format.
+		/// Saves this image to the specified stream in specified compression format (default compression is PNG).
 		/// </summary>
 		/// <param name="stream">The stream where the image will be saved.</param>
-		public void SaveTo(Stream stream)
+		/// <param name="compression">Jpeg or Png.</param>
+		public void SaveTo(Stream stream, CompressionFormat compression = CompressionFormat.Png)
 		{
 			CheckValidity();
-			implementation.SaveTo(stream);
+			implementation.SaveTo(stream, compression);
 		}
 
 		/// <summary>
