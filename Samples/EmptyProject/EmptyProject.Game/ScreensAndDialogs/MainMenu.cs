@@ -1,5 +1,4 @@
 ﻿using Lime;
-using RainbowDash;
 
 namespace EmptyProject.ScreensAndDialogs
 {
@@ -38,7 +37,7 @@ namespace EmptyProject.ScreensAndDialogs
 			});
 		}
 
-		public override void FillDebugMenuItems(Menu menu)
+		public override void FillDebugMenuItems(RainbowDash.Menu menu)
 		{
 			var section = menu.Section("Cheats example");
 			section.Item("Red", () => Root.Color = Color4.Red);
