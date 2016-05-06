@@ -5,7 +5,7 @@ using SD = System.Drawing;
 
 namespace Lime
 {
-	class Menu : ObservableList<IMenuItem>, IMenu
+	public class Menu : ObservableList<IMenuItem>, IMenu
 	{
 		private readonly ContextMenuStrip menu;
 		private bool validated = true;
@@ -55,7 +55,7 @@ namespace Lime
 		}
 	}
 
-	class MenuItem : IMenuItem
+	public class MenuItem : IMenuItem
 	{
 		public MenuItem()
 		{
