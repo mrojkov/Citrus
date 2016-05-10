@@ -127,6 +127,7 @@ namespace Orange
 				using (var writer = new BinaryWriter(stream)) {
 					int width = bitmap.Width;
 					int height = bitmap.Height;
+					bool hasAlpha = bitmap.HasAlpha;
 					writer.Write((byte)0); // size of ID field that follows 18 byte header(0 usually)
 					writer.Write((byte)0); // type of color map 0 = none, 1 = has palette
 					writer.Write((byte)2); // type of image 0 = none, 1 = indexed, 2 = rgb, 3 = grey, +8 = rle packed
@@ -137,27 +138,30 @@ namespace Orange
 					writer.Write((short)0); // image y origin
 					writer.Write((short)width); // image width in pixels
 					writer.Write((short)height); // image height in pixels
-					writer.Write((byte)(bitmap.HasAlpha ? 32 : 24)); // image bits per pixel 8,16,24,32
+					writer.Write((byte)(hasAlpha ? 32 : 24)); // image bits per pixel 8,16,24,32
 					writer.Write((byte)0); // descriptor
 					Color4[] pixels = bitmap.GetPixels();
+					var bytes = new byte[hasAlpha ? pixels.Length * 4 : pixels.Length * 3];
+					int bi = 0;
 					for (int y = height - 1; y >= 0; y--) {
 						int rowsOffset = y * width;
 						for (int x = 0; x < width; x++) {
 							Color4 pixel = pixels[x + rowsOffset];
 							if (swapRedAndBlue) {
-								writer.Write(pixel.B);
-								writer.Write(pixel.G);
-								writer.Write(pixel.R);
+								bytes[bi++] = pixel.B;
+								bytes[bi++] = pixel.G;
+								bytes[bi++] = pixel.R;
 							} else {
-								writer.Write(pixel.R);
-								writer.Write(pixel.G);
-								writer.Write(pixel.B);
+								bytes[bi++] = pixel.R;
+								bytes[bi++] = pixel.G;
+								bytes[bi++] = pixel.B;
 							}
-							if (bitmap.HasAlpha) {
-								writer.Write(pixel.A);
+							if (hasAlpha) {
+								bytes[bi++] = pixel.A;
 							}
 						}
 					}
+					writer.Write(bytes, 0, bytes.Length);
 				}
 			}
 		}
