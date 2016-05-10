@@ -389,7 +389,9 @@ namespace Orange
 					break;
 				}
 			}
-			var items = new List<AtlasItem>();
+			var items = new Dictionary<AtlasOptimization, List<AtlasItem>>();
+			items[AtlasOptimization.Memory] = new List<AtlasItem>();
+			items[AtlasOptimization.DrawCalls] = new List<AtlasItem>();
 			foreach (var fileInfo in The.Workspace.AssetFiles.Enumerate(".png")) {
 				var cookingRules = cookingRulesMap[fileInfo.Path];
 				if (cookingRules.TextureAtlas == atlasChain) {
@@ -413,9 +415,18 @@ namespace Orange
 						PVRFormat = cookingRules.PVRFormat,
 						DDSFormat = cookingRules.DDSFormat,
 					};
-					items.Add(item);
+					items[cookingRules.AtlasOptimization].Add(item);
 				}
 			}
+			var initialAtlasId = 0;
+			foreach (var kv in items) {
+				initialAtlasId = PackItemsToAtlasWithBestSize(atlasChain, kv.Value, kv.Key, initialAtlasId);
+			}
+		}
+
+		private static int PackItemsToAtlasWithBestSize(string atlasChain, List<AtlasItem> items,
+			AtlasOptimization atlasOptimization, int initialAtlasId)
+		{
 			// Sort images in descendend size order
 			items.Sort((x, y) => {
 				var a = Math.Max(x.Pixbuf.Width, x.Pixbuf.Height);
@@ -425,27 +436,43 @@ namespace Orange
 			// PVRTC2/4 textures must be square
 			var squareAtlas = (platform == TargetPlatform.iOS) && items.Any(i =>
 				i.PVRFormat == PVRFormat.PVRTC4 || i.PVRFormat == PVRFormat.PVRTC4_Forced || i.PVRFormat == PVRFormat.PVRTC2);
-			for (var atlasId = 0; items.Count > 0; atlasId++) {
+			var atlasId = initialAtlasId;
+			while (items.Count > 0) {
 				if (atlasId >= MaxAtlasChainLength) {
 					throw new Lime.Exception("Too many textures in the atlas chain {0}", atlasChain);
 				}
 				var bestSize = new Size(0, 0);
 				double bestPackRate = 0;
+				int minItemsLeft = Int32.MaxValue;
 				foreach (var size in EnumerateAtlasSizes(squareAtlas: squareAtlas)) {
 					double packRate;
 					PackItemsToAtlas(items, size, out packRate);
-					if (packRate * 0.95f > bestPackRate) {
-						bestPackRate = packRate;
-						bestSize = size;
+					switch (atlasOptimization) {
+						case AtlasOptimization.Memory:
+							if (packRate * 0.95f > bestPackRate) {
+								bestPackRate = packRate;
+								bestSize = size;
+							}
+							break;
+						case AtlasOptimization.DrawCalls: {
+							var notAllocatedCount = items.Count(item => !item.Allocated);
+							if (notAllocatedCount < minItemsLeft) {
+								minItemsLeft = notAllocatedCount;
+								bestSize = size;
+							}
+							break;
+						}
 					}
 				}
-				if (bestPackRate == 0) {
+				if (atlasOptimization == AtlasOptimization.Memory && bestPackRate == 0) {
 					throw new Lime.Exception("Failed to create atlas '{0}'", atlasChain);
 				}
 				PackItemsToAtlas(items, bestSize, out bestPackRate);
 				CopyAllocatedItemsToAtlas(items, atlasChain, atlasId, bestSize);
 				items.RemoveAll(x => x.Allocated);
+				atlasId++;
 			}
+			return atlasId;
 		}
 
 		private static string GetAlphaTexturePath(string path)

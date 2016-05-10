@@ -23,6 +23,12 @@ namespace Orange
 		Uncompressed
 	}
 
+	public enum AtlasOptimization
+	{
+		Memory,
+		DrawCalls
+	}
+
 	public struct CookingRules
 	{
 		public const string MainBundleName = "Main";
@@ -36,6 +42,7 @@ namespace Orange
 		public string[] Bundles;
 		public bool Ignore;
 		public int ADPCMLimit; // Kb
+		public AtlasOptimization AtlasOptimization;
 
 		public static CookingRules GetDefault(TargetPlatform platform)
 		{
@@ -48,11 +55,12 @@ namespace Orange
 				LastChangeTime = new DateTime(0),
 				Bundles = new[] { MainBundleName },
 				Ignore = false,
-				ADPCMLimit = 100
+				ADPCMLimit = 100,
+				AtlasOptimization = AtlasOptimization.Memory
 			};
 		}
 	}
-	
+
 	public class CookingRulesBuilder
 	{
 		public static Dictionary<string, CookingRules> Build(FileEnumerator fileEnumerator, TargetPlatform platform, string target)
@@ -145,8 +153,21 @@ namespace Orange
 			}
 		}
 
+		static AtlasOptimization ParseAtlasOptimization(string value)
+		{
+			switch (value) {
+				case "":
+				case "Memory":
+					return AtlasOptimization.Memory;
+				case "DrawCalls":
+					return AtlasOptimization.DrawCalls;
+				default:
+					throw new Lime.Exception("Error parsing AtlasOptimization. Must be one of: Memory, DrawCalls");
+			}
+		}
+
 		static CookingRules ParseCookingRules(CookingRules basicRules, string path, TargetPlatform platform, string target)
-		{ 
+		{
 			var rules = basicRules;
 			try {
 				rules.LastChangeTime = File.GetLastWriteTime(path);
@@ -221,6 +242,9 @@ namespace Orange
 								break;
 							case "TextureScaleFactor":
 								rules.TextureScaleFactor = float.Parse(words[1]);
+								break;
+							case "AtlasOptimization":
+								rules.AtlasOptimization = ParseAtlasOptimization(words[1]);
 								break;
 							default:
 								throw new Lime.Exception("Unknown attribute {0}", words[0]);
