@@ -12,3 +12,4 @@ Orange/packages
 !/Orange/bin/Mac/Release/Orange.app
 *.userprefs
 Lemon/Library/Android/libs/
+*.vshost.exe
