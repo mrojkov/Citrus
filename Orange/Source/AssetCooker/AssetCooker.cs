@@ -357,7 +357,7 @@ namespace Orange
 				}
 			}
 		}
-	
+
 		class AtlasItem
 		{
 			public string Path;
@@ -407,7 +407,7 @@ namespace Orange
 						Console.WriteLine("WARNING: '{0}' downscaled to {1}x{2}", srcTexturePath, w, h);
 					}
 					var item = new AtlasItem {
-						Path = Path.ChangeExtension(fileInfo.Path, ".atlasPart"), 
+						Path = Path.ChangeExtension(fileInfo.Path, ".atlasPart"),
 						Pixbuf = pixbuf,
 						MipMapped = cookingRules.MipMaps,
 						PVRFormat = cookingRules.PVRFormat,
@@ -471,7 +471,7 @@ namespace Orange
 
 		private static Size GetMaxAtlasSize()
 		{
-			return (platform == TargetPlatform.Desktop) ? new Size(2048, 2048) : new Size(1024, 1024);
+			return new Size(1024, 1024);
 		}
 
 		private static void PackItemsToAtlas(List<AtlasItem> items, Size size, out double packRate)
