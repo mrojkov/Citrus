@@ -365,7 +365,7 @@ namespace Orange
 		static string GetAtlasPath(string atlasChain, int index)
 		{
 			var path = AssetPath.Combine(
-				"Atlases" + atlasesPostfix, atlasChain + "." + index.ToString("000") + GetPlatformTextureExtension());
+				"Atlases" + atlasesPostfix, atlasChain + '.' + index.ToString("000") + GetPlatformTextureExtension());
 			return path;
 		}
 
@@ -423,6 +423,9 @@ namespace Orange
 			var initialAtlasId = 0;
 			foreach (var kv in items) {
 				initialAtlasId = PackItemsToAtlasWithBestSize(atlasChain, kv.Value, kv.Key, initialAtlasId);
+				foreach (var item in kv.Value) {
+					item.Bitmap.Dispose();
+				}
 			}
 		}
 
