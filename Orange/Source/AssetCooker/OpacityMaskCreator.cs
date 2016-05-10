@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Lime;
 using System.IO;
+using Lime;
 
 namespace Orange
 {
@@ -11,78 +8,74 @@ namespace Orange
 	{
 		const byte OpacityTheshold = 12;
 
-		struct RGBA
-		{
-#pragma warning disable 649
-			public byte R, G, B, A;
-		}
-
 		public static void CreateMask(AssetsBundle assetsBundle, string srcPath, string maskPath)
 		{
-			using (var pixbuf = new Gdk.Pixbuf(srcPath)) {
-				CreateMask(assetsBundle, pixbuf, maskPath);
+			using (var stream = File.OpenRead(srcPath)) {
+				using (var bitmap = new Bitmap(stream)) {
+					CreateMask(assetsBundle, bitmap, maskPath);
+				}
 			}
 		}
 
-		public static void CreateMask(AssetsBundle assetsBundle, Gdk.Pixbuf pixbuf, string maskPath)
+		public static void CreateMask(AssetsBundle assetsBundle, Bitmap bitmap, string maskPath)
 		{
-			if (!pixbuf.HasAlpha) {
+			if (!bitmap.HasAlpha) {
 				return;
 			}
-			int newWidth = Math.Max(pixbuf.Width / 2, 1);
-			int newHeight = Math.Max(pixbuf.Height / 2, 1);
-			using (var pixbufDownscaled = pixbuf.ScaleSimple(newWidth, newHeight, Gdk.InterpType.Bilinear)) {
+
+			int newWidth = Math.Max(bitmap.Width / 2, 1);
+			int newHeight = Math.Max(bitmap.Height / 2, 1);
+			using (var scaledBitmap = bitmap.Rescale(newWidth, newHeight)) {
 				bool bundled = assetsBundle.FileExists(maskPath);
 				Console.WriteLine((bundled ? "* " : "+ ") + maskPath);
-				WriteMask(assetsBundle, maskPath, pixbufDownscaled);
+				WriteMask(assetsBundle, maskPath, scaledBitmap);
 			}
 		}
 
-		private static void WriteMask(AssetsBundle assetsBundle, string maskPath, Gdk.Pixbuf pixbuf)
+		private static void WriteMask(AssetsBundle assetsBundle, string maskPath, Bitmap bitmap)
 		{
-			var mask = CreateMaskHelper(pixbuf);
-			using (var ms = new MemoryStream()) {
-				using (var bw = new BinaryWriter(ms)) {
-					bw.Write((UInt32)pixbuf.Width);
-					bw.Write((UInt32)pixbuf.Height);
-					bw.Write(mask, 0, mask.Length);
-					bw.Flush();
-					ms.Seek(0, SeekOrigin.Begin);
-					assetsBundle.ImportFile(maskPath, ms, 0, AssetAttributes.Zipped);
-				}
-			};
-		}
-
-		private static byte[] CreateMaskHelper(Gdk.Pixbuf pixbuf)
-		{
-			byte[] mask = new byte[pixbuf.Height * ((pixbuf.Width + 7) / 8)];
-			unsafe {
-				int t = 0;
-				RGBA* pixels = (RGBA*)pixbuf.Pixels;
-				int width = pixbuf.Width;
-				for (int i = 0; i < pixbuf.Height; i++) {
-					byte v = 0;
-					for (int j = 0; j < width; j++) {
-						RGBA c = *pixels;
-						if (c.A > OpacityTheshold) {
-							v |= 1;
-						}
-						if (((j + 1) & 7) == 0) {
-							mask[t++] = v;
-							v = 0;
-						}
-						v <<= 1;
-						pixels++;
-					}
-					if (width % 8 != 0) {
-						mask[t++] = v;
-					}
-					pixels += pixbuf.Rowstride / 4 - width;
-				}
-				if (t != mask.Length) {
-					throw new Lime.Exception();
+			byte[] mask = CreateMaskHelper(bitmap);
+			using (var stream = new MemoryStream()) {
+				using (var writer = new BinaryWriter(stream)) {
+					writer.Write((uint)bitmap.Width);
+					writer.Write((uint)bitmap.Height);
+					writer.Write(mask, 0, mask.Length);
+					writer.Flush();
+					stream.Seek(0, SeekOrigin.Begin);
+					assetsBundle.ImportFile(maskPath, stream, 0, AssetAttributes.Zipped);
 				}
 			}
+		}
+
+		private static byte[] CreateMaskHelper(Bitmap bitmap)
+		{
+			var mask = new byte[bitmap.Height * ((bitmap.Width + 7) / 8)];
+			var pi = 0;
+			var mi = 0;
+			int width = bitmap.Width;
+			int height = bitmap.Height;
+			Color4[] pixels = bitmap.GetPixels();
+			for (int y = 0; y < height; y++) {
+				byte value = 0;
+				for (int x = 0; x < width; x++) {
+					if (pixels[pi].A > OpacityTheshold) {
+						value |= 1;
+					}
+					if (((x + 1) & 7) == 0) {
+						mask[mi++] = value;
+						value = 0;
+					}
+					value <<= 1;
+					pi++;
+				}
+				if (width % 8 != 0) {
+					mask[mi++] = value;
+				}
+			}
+			if (mi != mask.Length) {
+				throw new Lime.Exception("Opacity mask is not full.");
+			}
+
 			return mask;
 		}
 	}
