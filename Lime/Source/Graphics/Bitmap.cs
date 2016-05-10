@@ -56,8 +56,9 @@ namespace Lime
 			if (width * height != data.Length) {
 				throw new ArgumentException("Pixel data doesn't fit width and height.");
 			}
-
 			implementation = new BitmapImplementation(data, width, height);
+			Width = width;
+			Height = height;
 		}
 
 		/// <summary>
@@ -67,6 +68,7 @@ namespace Lime
 		public Bitmap(Stream stream)
 		{
 			implementation = new BitmapImplementation(stream);
+			CacheDimensions();
 		}
 
 		/// <summary>
@@ -76,23 +78,18 @@ namespace Lime
 		private Bitmap(IBitmapImplementation implementation)
 		{
 			this.implementation = implementation;
+			CacheDimensions();
 		}
 
 		/// <summary>
 		/// Gets the width, in pixels, of this bitmap.
 		/// </summary>
-		public int Width
-		{
-			get { return implementation.Width; }
-		}
+		public int Width { get; private set; }
 
 		/// <summary>
 		/// Gets the height, in pixels, of this bitmap.
 		/// </summary>
-		public int Height
-		{
-			get { return implementation.Height; }
-		}
+		public int Height { get; private set; }
 
 		/// <summary>
 		/// Gets the size this bitmap.
@@ -167,11 +164,9 @@ namespace Lime
 				throw new InvalidOperationException("Bitmap: Crop rectangle should be inside the image," +
 					" and resulting bitmap should not be empty.");
 			}
-
 			if (cropArea.Width == Width && cropArea.Height == Height) {
 				return Clone();
 			}
-
 			CheckValidity();
 			return new Bitmap(implementation.Crop(cropArea));
 		}
@@ -191,11 +186,9 @@ namespace Lime
 			if (newWidth < 0 || newHeight < 0) {
 				throw new ArgumentException("Bitmap: Width and height should be positive.");
 			}
-
 			if (newWidth == Width && newHeight == Height) {
 				return Clone();
 			}
-
 			CheckValidity();
 			return new Bitmap(implementation.Rescale(newWidth, newHeight));
 		}
@@ -229,6 +222,12 @@ namespace Lime
 			if (implementation != null) {
 				implementation.Dispose();
 			}
+		}
+
+		private void CacheDimensions()
+		{
+			Width = implementation.Width;
+			Height = implementation.Height;
 		}
 
 		private void CheckValidity()
