@@ -148,7 +148,6 @@ namespace Orange
 			PlatformPicker.AppendText("iPhone/iPad");
 			PlatformPicker.AppendText("Android");
 			PlatformPicker.AppendText("Unity");
-			PlatformPicker.AppendText("Ultra compression");
 
 			if (The.Workspace.SubTargets != null) {
 				foreach (var target in The.Workspace.SubTargets)

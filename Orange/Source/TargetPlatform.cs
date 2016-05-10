@@ -1,4 +1,3 @@
-using System;
 
 namespace Orange
 {
@@ -8,6 +7,5 @@ namespace Orange
 		iOS,
 		Android,
 		Unity,
-		UltraCompression,
 	}
 }

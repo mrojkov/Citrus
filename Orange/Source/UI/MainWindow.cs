@@ -230,12 +230,6 @@ namespace Orange
 				ShowError("iOS target is not supported on Windows platform");
 				return false;
 			}
-#else
-			if (platform == Orange.TargetPlatform.UltraCompression) {
-				// TODO: find pngcrush tool for Mac
-				ShowError("Ultra compression cooking is currently supported only on Windows platform");
-				return false;
-			}
 #endif
 			return true;
 		}

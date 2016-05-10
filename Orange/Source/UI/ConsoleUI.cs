@@ -140,19 +140,17 @@ namespace Orange
 				return subTarget.Platform;
 
 			var platform = Toolbox.GetCommandLineArg("--platform");
-			if (platform == "ios") {
-				return TargetPlatform.iOS;
-			} else if (platform == "desktop") {
-				return TargetPlatform.Desktop;
-			} else if (platform == "android") {
-				return TargetPlatform.Android;
-			} else if (platform == "uc") {
-				return TargetPlatform.UltraCompression;
-			} else if (platform == null) {
-				return TargetPlatform.Desktop;
-			} else {
-				Console.WriteLine("Target platform must be either ios, android or desktop");
-				throw new TerminateException(1);
+			switch (platform) {
+				case "ios":
+					return TargetPlatform.iOS;
+				case "android":
+					return TargetPlatform.Android;
+				case "desktop":
+				case null:
+					return TargetPlatform.Desktop;
+				default:
+					Console.WriteLine("Target platform must be either ios, android or desktop");
+					throw new TerminateException(1);
 			}
 		}
 

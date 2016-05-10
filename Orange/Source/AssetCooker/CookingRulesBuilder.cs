@@ -204,19 +204,21 @@ namespace Orange
 						}
 						switch (words[0]) {
 							case "TextureAtlas":
-								if (platform == TargetPlatform.UltraCompression)
-									// Disable atlases for now, since they could make decompression more jerky and increase memory footprint.
-									rules.TextureAtlas = null;
-								else if (words[1] == "None")
-									rules.TextureAtlas = null;
-								else if (words[1] == "${DirectoryName}") {
-									string atlasName = Path.GetFileName(Lime.AssetPath.GetDirectoryName(path));
-									if (string.IsNullOrEmpty(atlasName)) {
-										throw new Lime.Exception("Atlas directory is empty. Choose another atlas name");
-									}
-									rules.TextureAtlas = atlasName;
-								} else {
-									rules.TextureAtlas = words[1];
+								switch (words[1]) {
+									case "None":
+										rules.TextureAtlas = null;
+										break;
+									case "${DirectoryName}":
+										string atlasName = Path.GetFileName(Lime.AssetPath.GetDirectoryName(path));
+										if (string.IsNullOrEmpty(atlasName)) {
+											throw new Lime.Exception(
+												"Atlas directory is empty. Choose another atlas name");
+										}
+										rules.TextureAtlas = atlasName;
+										break;
+									default:
+										rules.TextureAtlas = words[1];
+										break;
 								}
 								break;
 							case "MipMaps":

@@ -65,16 +65,9 @@ namespace Orange
 					return ".pvr";
 				case TargetPlatform.Unity:
 					return ".png";
-				case TargetPlatform.UltraCompression:
-					return ".jpg";
 				default:
 					return ".dds";
 			}
-		}
-
-		static string GetPlatformAlphaTextureExtension()
-		{
-			return platform == TargetPlatform.UltraCompression ? ".png" : GetPlatformTextureExtension();
 		}
 
 		public static void Cook(TargetPlatform platform)
@@ -179,9 +172,6 @@ namespace Orange
 
 		private static void WarnAboutNPOTTextures()
 		{
-			if (platform == TargetPlatform.UltraCompression) {
-				return;
-			}
 			foreach (var path in assetsBundle.EnumerateFiles()) {
 				if ((assetsBundle.GetAttributes(path) & AssetAttributes.NonPowerOf2Texture) != 0) {
 					Console.WriteLine("Warning: non-power of two texture: {0}", path);
@@ -191,7 +181,7 @@ namespace Orange
 
 		private static void DeleteOrphanedAlphaTextures()
 		{
-			var alphaExt = ".alpha" + GetPlatformAlphaTextureExtension();
+			var alphaExt = ".alpha" + GetPlatformTextureExtension();
 			foreach (var path in assetsBundle.EnumerateFiles()) {
 				if (path.EndsWith(alphaExt)) {
 					var origImageFile =
@@ -240,7 +230,7 @@ namespace Orange
 					// All sounds below 100kb size (can be changed with cooking rules) are converted
 					// from OGG to Wav/Adpcm
 					var rules = cookingRulesMap[srcPath];
-					if (stream.Length > rules.ADPCMLimit * 1024 || platform == TargetPlatform.UltraCompression) {
+					if (stream.Length > rules.ADPCMLimit * 1024) {
 						assetsBundle.ImportFile(dstPath, stream, 0);
 					} else {
 						Console.WriteLine("Converting sound to ADPCM/IMA4 format...");
@@ -293,7 +283,7 @@ namespace Orange
 					using (var stream = File.OpenRead(srcPath)) {
 						var bitmap = new Bitmap(stream);
 						if (ShouldDownscale(bitmap, rules)) {
-							var scaledBitmap = DownscaleTexture(bitmap, srcPath);
+							var scaledBitmap = DownscaleTexture(bitmap, srcPath, rules);
 							bitmap.Dispose();
 							bitmap = scaledBitmap;
 						}
@@ -405,7 +395,7 @@ namespace Orange
 						var bitmap = new Bitmap(stream);
 						if (ShouldDownscale(bitmap, cookingRules)) {
 							bitmap.Dispose();
-							bitmap = DownscaleTexture(bitmap, srcTexturePath);
+							bitmap = DownscaleTexture(bitmap, srcTexturePath, cookingRules);
 						}
 
 						// Ensure that no image exceeded maxAtlasSize limit
@@ -492,7 +482,7 @@ namespace Orange
 
 		private static string GetAlphaTexturePath(string path)
 		{
-			return Path.ChangeExtension(path, ".alpha" + GetPlatformAlphaTextureExtension());
+			return Path.ChangeExtension(path, ".alpha" + GetPlatformTextureExtension());
 		}
 
 		private static IEnumerable<Size> EnumerateAtlasSizes(bool squareAtlas)
@@ -654,24 +644,6 @@ namespace Orange
 						attributes,
 						file => TextureConverter.ToDDS(texture, file, rules.DDSFormat, rules.MipMaps));
 					break;
-				case TargetPlatform.UltraCompression:
-					attributes = AssetAttributes.None;
-					if (TextureConverterUtils.IsWhiteImageWithAlpha(texture)) {
-						// Optimization for fonts: they are usually completely RGB-white and premultiplied jpg is
-						// heavier then separate alpha.
-						using (var specialBitmap = texture.Crop(new IntRectangle(0, 0, 1, 1))) {
-							ConvertTexture(
-								path, attributes, file => TextureConverter.ToJPG(specialBitmap, file));
-						}
-					} else {
-						ConvertTexture(path, attributes, file => TextureConverter.ToJPG(texture, file));
-					}
-					if (texture.HasAlpha) {
-						using (var alphaTexture = TextureConverterUtils.ConvertBitmapToGrayscaleAlphaMask(texture)) {
-							ConvertTexture(alphaPath, attributes, file => TextureConverter.ToPNG(texture, file));
-						}
-					}
-					break;
 				default:
 					throw new Lime.Exception();
 			}
@@ -690,7 +662,7 @@ namespace Orange
 
 		private static bool ShouldDownscale(Bitmap texture, CookingRules rules)
 		{
-			if (platform == TargetPlatform.UltraCompression || rules.TextureScaleFactor != 1.0f) {
+			if (rules.TextureScaleFactor != 1.0f) {
 				int scaleThreshold = platform == TargetPlatform.Android ? 32 : 256;
 				if (texture.Width > scaleThreshold || texture.Height > scaleThreshold) {
 					return true;
@@ -699,13 +671,12 @@ namespace Orange
 			return false;
 		}
 
-		private static Bitmap DownscaleTexture(Bitmap texture, string path)
+		private static Bitmap DownscaleTexture(Bitmap texture, string path, CookingRules rules)
 		{
 			const int maxSize = 1024;
-			const float scaleRatio = 0.75f;
 
 			int scaleThreshold = platform == TargetPlatform.Android ? 32 : 256;
-			var ratio = scaleRatio;
+			var ratio = rules.TextureScaleFactor;
 			if (texture.Width > maxSize || texture.Height > maxSize) {
 				var max = (float)Math.Max(texture.Width, texture.Height);
 				ratio *= maxSize / max;
