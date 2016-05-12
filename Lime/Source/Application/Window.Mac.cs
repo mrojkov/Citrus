@@ -189,6 +189,9 @@ namespace Lime
 				MaximumDecoratedSize = options.MaximumDecoratedSize;
 			}
 			window.Title = options.Title;
+			window.WindowShouldClose += (sender) => {
+				return RaiseClosing();
+			};
 			window.WillClose += (s, e) => {
 				View.Stop();
 				NSApplication.SharedApplication.Terminate(View);
