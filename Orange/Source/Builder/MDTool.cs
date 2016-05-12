@@ -5,8 +5,8 @@ namespace Orange.Source
 {
 	class MDTool: BuildSystem
 	{
-		public MDTool(string projectDirectory, string projectName, TargetPlatform platform)
-			: base(projectDirectory, projectName, platform)
+		public MDTool(string projectDirectory, string projectName, TargetPlatform platform, string customSolution = null)
+			: base(projectDirectory, projectName, platform, customSolution)
 		{
 #if MAC
 			BuilderPath = "/Applications/Xamarin Studio.app/Contents/MacOS/mdtool";

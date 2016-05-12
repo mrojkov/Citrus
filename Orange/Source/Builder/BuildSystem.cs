@@ -23,18 +23,32 @@ namespace Orange.Source
 			{TargetPlatform.Android, ".Android.csproj"},
 			{TargetPlatform.iOS, ".iOS.sln"}
 		};
-		
-		public BuildSystem(string projectDirectory, string projectName, TargetPlatform platform)
+
+		public BuildSystem(string projectDirectory, string projectName, TargetPlatform platform, string customSolution)
 		{
 			Platform = platform;
-			SlnPath = Path.Combine(projectDirectory, projectName + fileEndings[platform]);
+
+			if (customSolution != null)
+				SlnPath = Path.Combine(projectDirectory, customSolution);
+			else
+				SlnPath = Path.Combine(projectDirectory, projectName + fileEndings[platform]);
+		}
+
+		public string ReleaseBinariesDirectory
+		{
+			get { return Path.Combine(Path.GetDirectoryName(SlnPath), "bin", "Release"); }
+		}
+
+		public string DebugBinariesDirectory
+		{
+			get { return Path.Combine(Path.GetDirectoryName(SlnPath), "bin", "Debug"); }
 		}
 
 		public abstract int Execute(StringBuilder output = null);
 		protected abstract void DecorateBuild();
 		protected abstract void DecorateClean();
 		protected abstract void DecorateConfiguration();
-		
+
 		public void PrepareForBuild()
 		{
 			DecorateBuild();

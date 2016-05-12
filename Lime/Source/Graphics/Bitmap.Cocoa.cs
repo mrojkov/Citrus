@@ -8,10 +8,12 @@ using CocoaBitmap = UIKit.UIImage;
 #elif MAC
 using AppKit;
 using CoreGraphics;
+using Foundation;
 using CocoaBitmap = AppKit.NSImage;
 #else
 using MonoMac.AppKit;
 using MonoMac.CoreGraphics;
+using MonoMac.Foundation;
 using CocoaBitmap = MonoMac.AppKit.NSImage;
 #endif
 
@@ -41,9 +43,20 @@ namespace Lime
 				data[j++] = pixels[i].B;
 				data[j++] = pixels[i].A;
 			}
+			var alphaInfo = Lime.Bitmap.AnyAlpha(pixels) ? CGBitmapFlags.Last : CGBitmapFlags.NoneSkipLast;
 			using (var colorSpace = CGColorSpace.CreateDeviceRGB()) {
 				using (var dataProvider = new CGDataProvider(data, 0, lengthInBytes)) {
-					using (var img = new CGImage(width, height, 8, 32, 4 * width, colorSpace, CGBitmapFlags.Last, dataProvider, null, false,
+					using (var img = new CGImage(
+						width,
+						height,
+						8,
+						32,
+						4 * width,
+						colorSpace,
+						alphaInfo,
+						dataProvider,
+						null,
+						false,
 						CGColorRenderingIntent.Default)) {
 #if iOS
 						Bitmap = new CocoaBitmap(img);
@@ -77,6 +90,17 @@ namespace Lime
 			get { return (Bitmap != null && (Width > 0 && Height > 0)); }
 		}
 
+		public bool HasAlpha
+		{
+			get
+			{
+				var alphaInfo = Bitmap.CGImage.AlphaInfo;
+				return alphaInfo != CGImageAlphaInfo.None &&
+					alphaInfo != CGImageAlphaInfo.NoneSkipFirst &&
+					alphaInfo != CGImageAlphaInfo.NoneSkipLast;
+			}
+		}
+
 		public IBitmapImplementation Clone()
 		{
 #if iOS
@@ -96,9 +120,10 @@ namespace Lime
 			var ctx = NSGraphicsContext.CurrentContext;
 			ctx.ImageInterpolation = NSImageInterpolation.High;
 			Bitmap.DrawInRect(
-			new CGRect(0, 0, newWidth, newHeight), 
-			new CGRect(0, 0, Bitmap.Size.Width, Bitmap.Size.Height), 
-			NSCompositingOperation.Copy, 1); 
+				new CGRect(0, 0, newWidth, newHeight),
+				new CGRect(0, 0, Bitmap.Size.Width, Bitmap.Size.Height),
+				NSCompositingOperation.Copy,
+				1);
 			newImage.UnlockFocus();
 			return new BitmapImplementation(newImage);
 #endif
@@ -119,7 +144,8 @@ namespace Lime
 		{
 			var isColorSpaceRGB = Bitmap.CGImage.ColorSpace.Model == CGColorSpaceModel.RGB;
 			if (!isColorSpaceRGB && Bitmap.CGImage.BitsPerPixel != 32) {
-				throw new FormatException("Can not return array of pixels if bitmap is not in 32 bit format or if not in RGBA format.");
+				throw new FormatException(
+					"Can not return array of pixels if bitmap is not in 32 bit format or if not in RGBA format.");
 			}
 
 			var doSwap = Bitmap.CGImage.BitmapInfo.HasFlag(CGBitmapFlags.ByteOrder32Little);
@@ -159,23 +185,41 @@ namespace Lime
 			return pixels;
 		}
 
-		public void SaveTo(Stream stream)
+		public void SaveTo(Stream stream, CompressionFormat compression)
 		{
 #if iOS
-			using (var png = Bitmap.AsPNG()) {
-				if (png != null) {
-					using (var bitmapStream = png.AsStream()) {
-						bitmapStream.CopyTo(stream);
-					}
-				}
+			NSData data = null;
+			switch (compression) {
+				case CompressionFormat.Jpeg:
+					data = Bitmap.AsJPEG(0.8f);
+					break;
+				case CompressionFormat.Png:
+					data = Bitmap.AsPNG();
+					break;
 			}
-#elif MAC || MONOMAC
-			using (var rep = new NSBitmapImageRep(Bitmap.CGImage)) {
-				rep.Size = Bitmap.Size;
-				using (var pngData = rep.RepresentationUsingTypeProperties(NSBitmapImageFileType.Png, null))
-				using (var bitmapStream = pngData.AsStream()) {
+			if (data != null) {
+				using (var bitmapStream = data.AsStream()) {
 					bitmapStream.CopyTo(stream);
 				}
+				data.Dispose();
+			}
+#elif MAC || MONOMAC
+			using (var representation = new NSBitmapImageRep(Bitmap.CGImage)) {
+				NSData data = null;
+				switch (compression) {
+					case CompressionFormat.Jpeg:
+						var parameters = NSDictionary.FromObjectAndKey(
+							NSNumber.FromFloat(0.8f), NSBitmapImageRep.CompressionFactor);
+						data = representation.RepresentationUsingTypeProperties(NSBitmapImageFileType.Jpeg, parameters);
+						break;
+					case CompressionFormat.Png:
+						data = representation.RepresentationUsingTypeProperties(NSBitmapImageFileType.Png, null);
+						break;
+				}
+				using (var bitmapStream = data.AsStream()) {
+					bitmapStream.CopyTo(stream);
+				}
+				data.Dispose();
 			}
 #endif
 		}

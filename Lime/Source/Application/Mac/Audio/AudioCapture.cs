@@ -31,7 +31,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
+#if !MONOMAC
 using OpenTK.Audio.OpenAL;
+#else
+using MonoMac.OpenAL;
+#endif
 
 namespace OpenTK.Audio
 {

@@ -1,11 +1,20 @@
 #if OPENAL
 using System;
-using OpenTK.Audio;
-using OpenTK.Audio.OpenAL;
-using System.Threading;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
+#if ANDROID
+using System.Runtime.InteropServices;
+#endif
+using System.Threading;
+
 using OpenTK;
+using OpenTK.Audio;
+
+#if !MONOMAC
+using OpenTK.Audio.OpenAL;
+#else
+using MonoMac.OpenAL;
+#endif
 
 #if iOS
 using Foundation;
@@ -16,6 +25,17 @@ namespace Lime
 {
 	public static class PlatformAudioSystem
 	{
+#if ANDROID
+		const string Lib = "openal32";
+		const CallingConvention Style = CallingConvention.Cdecl;
+
+		[DllImport(Lib, EntryPoint = "alcDevicePauseSOFT", ExactSpelling = true, CallingConvention = Style)]
+		unsafe static extern void AlcDevicePauseSoft(IntPtr device);
+
+		[DllImport(Lib, EntryPoint = "alcDeviceResumeSOFT", ExactSpelling = true, CallingConvention = Style)]
+		unsafe static extern void AlcDeviceResumeSoft(IntPtr device);
+#endif
+
 		public struct ErrorChecker : IDisposable
 		{
 			string comment;
@@ -53,7 +73,7 @@ namespace Lime
 #if iOS
 		static NSObject interruptionNotification;
 #endif
-		
+
 		public static void Initialize(ApplicationOptions options)
 		{
 #if iOS
@@ -65,9 +85,10 @@ namespace Lime
 					Active = false;
 					AVAudioSession.SharedInstance().SetActive(false);
 				} else if (args.InterruptionType == AVAudioSessionInterruptionType.Ended) {
-					
+
 					// Grisha: Workaround on "AUIOClient_StartIO failed" issue.
-					// On iOS sound not restores after incoming call. Making everything like in tutorial doesn't help much.
+					// On iOS sound not restores after incoming call.
+					// Making everything like in tutorial doesn't help much.
 					// So, we wait a bit before restoring - and it works.
 					Thread.Sleep(500);
 
@@ -75,11 +96,11 @@ namespace Lime
 					AVAudioSession.SharedInstance().SetActive(true);
 					Active = true;
 				}
-			});	
+			});
 			context = new AudioContext();
 #elif ANDROID
 			// LoadLibrary() ivokes JNI_OnLoad()
-			Java.Lang.JavaSystem.LoadLibrary("openal32");
+			Java.Lang.JavaSystem.LoadLibrary(Lib);
 			context = new AudioContext();
 #else
 			bool isDeviceAvailable = !String.IsNullOrEmpty(AudioContext.DefaultDevice);
@@ -111,33 +132,64 @@ namespace Lime
 				if (Active == value) {
 					return;
 				}
-
-				if (value) {
-					if (context != null) {
-						try {
-							context.MakeCurrent();
-#if iOS
-							context.Process();
-#endif
-						} catch (AudioContextException) {
-							Logger.Write("Error: failed to resume OpenAL after interruption ended");
-						}
-					}
-#if !iOS
-					ResumeAll();
-#endif
-				} else {
-#if iOS
-					if (context != null) {
-						context.Suspend();
-					}
-#else
-					PauseAll();
-#endif
-					Alc.MakeContextCurrent(ContextHandle.Zero);
-				}
+				SetActive(value);
 			}
 		}
+
+#if ANDROID
+		private static void SetActive(bool value)
+		{
+			if (value) {
+				if (context != null) {
+					try {
+						context.MakeCurrent();
+					} catch (AudioContextException) {
+						Logger.Write("Error: failed to resume OpenAL after interruption ended");
+					}
+				}
+				AlcDeviceResumeSoft(Alc.GetContextsDevice(Alc.GetCurrentContext()));
+			} else {
+				AlcDevicePauseSoft(Alc.GetContextsDevice(Alc.GetCurrentContext()));
+				Alc.MakeContextCurrent(ContextHandle.Zero);
+			}
+		}
+#elif iOS
+		private static void SetActive(bool value)
+		{
+			if (value) {
+				if (context != null) {
+					try {
+						context.MakeCurrent();
+						context.Process();
+					} catch (AudioContextException) {
+						Logger.Write("Error: failed to resume OpenAL after interruption ended");
+					}
+				}
+			} else {
+				if (context != null) {
+					context.Suspend();
+				}
+				Alc.MakeContextCurrent(ContextHandle.Zero);
+			}
+		}
+#else
+		private static void SetActive(bool value)
+		{
+			if (value) {
+				if (context != null) {
+					try {
+						context.MakeCurrent();
+					} catch (AudioContextException) {
+						Logger.Write("Error: failed to resume OpenAL after interruption ended");
+					}
+				}
+				ResumeAll();
+			} else {
+				PauseAll();
+				Alc.MakeContextCurrent(ContextHandle.Zero);
+			}
+		}
+#endif
 
 		public static void Terminate()
 		{
@@ -166,7 +218,7 @@ namespace Lime
 
 		private static long GetTimeDelta()
 		{
-			long delta = (System.DateTime.Now.Ticks / 10000L) - tickCount;
+			long delta = (DateTime.Now.Ticks / 10000L) - tickCount;
 			if (tickCount == 0) {
 				tickCount = delta;
 				delta = 0;
@@ -226,7 +278,6 @@ namespace Lime
 			}
 		}
 
-
 		public static void PauseAll()
 		{
 			foreach (var channel in channels) {
@@ -265,7 +316,8 @@ namespace Lime
 
 		static readonly AudioCache cache = new AudioCache();
 
-		private static Sound LoadSoundToChannel(ChannelSelector channelSelector, string path, bool looping, bool paused, float fadeinTime)
+		private static Sound LoadSoundToChannel(
+			ChannelSelector channelSelector, string path, bool looping, bool paused, float fadeinTime)
 		{
 			if (context == null) {
 				return new Sound();
@@ -320,7 +372,16 @@ namespace Lime
 			return null;
 		}
 
-		public static Sound Play(string path, AudioChannelGroup group, bool looping = false, float priority = 0.5f, float fadeinTime = 0f, bool paused = false, float volume = 1f, float pan = 0f, float pitch = 1f)
+		public static Sound Play(
+			string path,
+			AudioChannelGroup group,
+			bool looping = false,
+			float priority = 0.5f,
+			float fadeinTime = 0f,
+			bool paused = false,
+			float volume = 1f,
+			float pan = 0f,
+			float pitch = 1f)
 		{
 			ChannelSelector channelSelector = (format) => {
 				var channel = AllocateChannel(priority, format);

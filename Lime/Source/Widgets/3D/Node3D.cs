@@ -7,6 +7,7 @@ namespace Lime
 	[ProtoInclude(101, typeof(Mesh3D))]
 	[ProtoInclude(102, typeof(Camera3D))]
 	[ProtoInclude(103, typeof(WidgetAdapter3D))]
+	[ProtoInclude(104, typeof(Spline3D))]
 	public class Node3D : Node
 	{
 		private Vector3 scale;
@@ -165,6 +166,13 @@ namespace Lime
 			return p as Viewport3D;
 		}
 
+		public override Node DeepCloneFast()
+		{
+			var clone = base.DeepCloneFast() as Node3D;
+			clone.AsModelNode = clone;
+			return clone;
+		}
+
 		public struct MeshHitTestResult
 		{
 			public Mesh3D Mesh;
@@ -203,6 +211,24 @@ namespace Lime
 		public Matrix44 CalcTransformInSpaceOf(Node3D node)
 		{
 			return GlobalTransform * node.GlobalTransform.CalcInverted();
+		}
+
+		public override void AddToRenderChain(RenderChain chain)
+		{
+			if (!GloballyVisible) {
+				return;
+			}
+			if (Layer != 0) {
+				var oldLayer = chain.SetCurrentLayer(Layer);
+				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
+					node.AddToRenderChain(chain);
+				}
+				chain.SetCurrentLayer(oldLayer);
+			} else {
+				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
+					node.AddToRenderChain(chain);
+				}
+			}
 		}
 	}
 }

@@ -52,7 +52,7 @@ namespace Lime
 			SHARE_WITH_CURRENT_CONTEXT
 		}
 
-        const string lib = "SDL2.dll";
+		const string lib = "SDL2.dll";
 
 		[SuppressUnmanagedCodeSecurity]
 		[DllImport(lib, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SDL_Init", ExactSpelling = true)]

@@ -114,6 +114,7 @@
     <Compile Include="Source\Types\Ray.cs" />
     <Compile Include="Source\Types\Thickness.cs" />
     <Compile Include="Source\Types\Vector4.cs" />
+    <Compile Include="Source\Widgets\3D\Spline3D.cs" />
     <Compile Include="Source\Widgets\Animation\Animation.cs" />
     <Compile Include="Source\Widgets\Animation\AnimationList.cs" />
     <Compile Include="Source\Widgets\Editor.cs" />
@@ -328,6 +329,7 @@
     <Compile Include="Source\Graphics\Bitmap.Cocoa.cs" />
     <Compile Include="Source\Graphics\Unity\MovieTexture.cs" />
     <Compile Include="Source\Types\MonoMac\CG.cs" />
+    <Compile Include="Source\Widgets\Layout\StackLayout.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">

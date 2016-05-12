@@ -29,6 +29,8 @@ namespace Orange
 			CreateMenuItems();
 			The.Workspace.Load();
 			Application.Run();
+
+			UpdatePlatformPicker();
 		}
 
 		public override void ProcessPendingEvents()
@@ -118,12 +120,7 @@ namespace Orange
 				xpadding: 0, ypadding: 0);
 
 			PlatformPicker = ComboBox.NewText();
-			PlatformPicker.AppendText("Desktop (PC, Mac, Linux)");
-			PlatformPicker.AppendText("iPhone/iPad");
-			PlatformPicker.AppendText("Android");
-			PlatformPicker.AppendText("Unity");
-			PlatformPicker.AppendText("Ultra compression");
-			PlatformPicker.Active = 0;
+			UpdatePlatformPicker();
 			table.Attach(PlatformPicker, 1, 2, 0, 1);
 
 			// Citrus project section
@@ -141,6 +138,23 @@ namespace Orange
 			// Pack everything to vbox
 			mainVBox.PackStart(table, expand: false, fill: false, padding: 0);
 			mainVBox.PackStart(UpdateBeforeBuildCheckbox, expand: false, fill: false, padding: 0);
+		}
+
+		private void UpdatePlatformPicker()
+		{
+			(PlatformPicker.Model as ListStore).Clear();
+
+			PlatformPicker.AppendText("Desktop (PC, Mac, Linux)");
+			PlatformPicker.AppendText("iPhone/iPad");
+			PlatformPicker.AppendText("Android");
+			PlatformPicker.AppendText("Unity");
+
+			if (The.Workspace.SubTargets != null) {
+				foreach (var target in The.Workspace.SubTargets)
+					PlatformPicker.AppendText(target.Name);
+			}
+
+			PlatformPicker.Active = 0;
 		}
 	}
 }

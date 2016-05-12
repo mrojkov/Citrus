@@ -56,14 +56,11 @@
       <HintPath>..\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="System.Core" />
-    <Reference Include="OpenTK">
-      <HintPath>..\3rdParty\OpenTK\OpenTK.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="MonoMac">
       <HintPath>..\3rdParty\MonoMac.dll</HintPath>
     </Reference>
-    <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Types\Matrix44.cs" />
@@ -259,6 +256,7 @@
     <Compile Include="Source\Types\Plane.cs" />
     <Compile Include="Source\Types\Vector4.cs" />
     <Compile Include="Source\Types\MonoMac\CG.cs" />
+    <Compile Include="Source\Widgets\3D\Spline3D.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

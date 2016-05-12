@@ -110,7 +110,7 @@ namespace Lime
 				return Vector2.Zero;
 		}
 
-        private Vector2 Interpolate(SplinePoint v1, SplinePoint v2, float t)
+		private Vector2 Interpolate(SplinePoint v1, SplinePoint v2, float t)
 		{
 			if (!v1.Straight) {
 				Vector2 p1 = v1.Position * Size;
@@ -155,7 +155,7 @@ namespace Lime
 			}
 			return offset;
 		}
-	
+
 		private bool CalcSplineLengthToNearestPointHelper(SplinePoint v1, SplinePoint v2, Vector2 point, out float minDistance, out float offset)
 		{
 			const int SegmentCount = 10;

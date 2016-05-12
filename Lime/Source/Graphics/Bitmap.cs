@@ -17,12 +17,32 @@ using NativeBitmap = UnityEngine.Texture2D;
 
 namespace Lime
 {
+	public enum CompressionFormat
+	{
+		Jpeg,
+		Png
+	}
+
+	internal interface IBitmapImplementation : IDisposable
+	{
+		NativeBitmap Bitmap { get; }
+		int Width { get; }
+		int Height { get; }
+		bool IsValid { get; }
+		bool HasAlpha { get; }
+		IBitmapImplementation Clone();
+		IBitmapImplementation Crop(IntRectangle cropArea);
+		IBitmapImplementation Rescale(int newWidth, int newHeight);
+		Color4[] GetPixels();
+		void SaveTo(Stream stream, CompressionFormat compression);
+	}
+
 	/// <summary>
 	/// Wraps native bitmap and exposes unified methods to work with images.
 	/// </summary>
 	public class Bitmap : IDisposable
 	{
-		private IBitmapImplementation implementation;
+		private readonly IBitmapImplementation implementation;
 
 		/// <summary>
 		/// Initializes a new instance of <see cref="Bitmap"/> class with the specified
@@ -36,8 +56,9 @@ namespace Lime
 			if (width * height != data.Length) {
 				throw new ArgumentException("Pixel data doesn't fit width and height.");
 			}
-
 			implementation = new BitmapImplementation(data, width, height);
+			Width = width;
+			Height = height;
 		}
 
 		/// <summary>
@@ -47,6 +68,7 @@ namespace Lime
 		public Bitmap(Stream stream)
 		{
 			implementation = new BitmapImplementation(stream);
+			CacheDimensions();
 		}
 
 		/// <summary>
@@ -56,23 +78,18 @@ namespace Lime
 		private Bitmap(IBitmapImplementation implementation)
 		{
 			this.implementation = implementation;
+			CacheDimensions();
 		}
 
 		/// <summary>
 		/// Gets the width, in pixels, of this bitmap.
 		/// </summary>
-		public int Width
-		{
-			get { return implementation.Width; }
-		}
+		public int Width { get; private set; }
 
 		/// <summary>
 		/// Gets the height, in pixels, of this bitmap.
 		/// </summary>
-		public int Height
-		{
-			get { return implementation.Height; }
-		}
+		public int Height { get; private set; }
 
 		/// <summary>
 		/// Gets the size this bitmap.
@@ -83,7 +100,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Determines whether this bitmap is valid.
+		/// Gets a value indicating whether this bitmap is valid.
 		/// </summary>
 		/// <returns>true if this bitmap is not null or empty; otherwise, false.</returns>
 		public bool IsValid
@@ -92,11 +109,34 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// Gets a value indicating whether this bitmap has at least one non-opaque pixel.
+		/// </summary>
+		public bool HasAlpha
+		{
+			get { return implementation.HasAlpha; }
+		}
+
+		/// <summary>
 		/// Gets a platform specific bitmap.
 		/// </summary>
 		public NativeBitmap NativeBitmap
 		{
 			get { return implementation.Bitmap; }
+		}
+
+		/// <summary>
+		/// Determines is there any non-opaque pixel in the array of colors.
+		/// </summary>
+		/// <param name="colors">The array of colors.</param>
+		/// <returns>True if there is any non-opaque pixel, otherwise False.</returns>
+		public static bool AnyAlpha(Color4[] colors)
+		{
+			foreach (var color in colors) {
+				if (color.A != 255) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		/// <summary>
@@ -120,16 +160,13 @@ namespace Lime
 			if (
 				cropArea.Width <= 0 || cropArea.Height <= 0 ||
 				cropArea.Left < 0 || cropArea.Top < 0 ||
-				cropArea.Right > Width || cropArea.Bottom > Height
-				) {
+				cropArea.Right > Width || cropArea.Bottom > Height) {
 				throw new InvalidOperationException("Bitmap: Crop rectangle should be inside the image," +
 					" and resulting bitmap should not be empty.");
 			}
-
 			if (cropArea.Width == Width && cropArea.Height == Height) {
 				return Clone();
 			}
-
 			CheckValidity();
 			return new Bitmap(implementation.Crop(cropArea));
 		}
@@ -149,11 +186,9 @@ namespace Lime
 			if (newWidth < 0 || newHeight < 0) {
 				throw new ArgumentException("Bitmap: Width and height should be positive.");
 			}
-
 			if (newWidth == Width && newHeight == Height) {
 				return Clone();
 			}
-
 			CheckValidity();
 			return new Bitmap(implementation.Rescale(newWidth, newHeight));
 		}
@@ -169,20 +204,14 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Saves this image to the specified stream in PNG format.
+		/// Saves this image to the specified stream in specified compression format (default compression is PNG).
 		/// </summary>
 		/// <param name="stream">The stream where the image will be saved.</param>
-		public void SaveTo(Stream stream)
+		/// <param name="compression">Jpeg or Png.</param>
+		public void SaveTo(Stream stream, CompressionFormat compression = CompressionFormat.Png)
 		{
 			CheckValidity();
-			implementation.SaveTo(stream);
-		}
-
-		private void CheckValidity()
-		{
-			if (!IsValid) {
-				throw new InvalidOperationException("Bitmap is not valid.");
-			}
+			implementation.SaveTo(stream, compression);
 		}
 
 		/// <summary>
@@ -192,6 +221,19 @@ namespace Lime
 		{
 			if (implementation != null) {
 				implementation.Dispose();
+			}
+		}
+
+		private void CacheDimensions()
+		{
+			Width = implementation.Width;
+			Height = implementation.Height;
+		}
+
+		private void CheckValidity()
+		{
+			if (!IsValid) {
+				throw new InvalidOperationException("Bitmap is not valid.");
 			}
 		}
 	}
@@ -228,18 +270,5 @@ namespace Lime
 				return new SurrogateBitmap { SerializationData = memoryStream.ToArray() };
 			}
 		}
-	}
-
-	interface IBitmapImplementation : IDisposable
-	{
-		NativeBitmap Bitmap { get; }
-		int Width { get; }
-		int Height { get; }
-		bool IsValid { get; }
-		IBitmapImplementation Clone();
-		IBitmapImplementation Crop(IntRectangle cropArea);
-		IBitmapImplementation Rescale(int newWidth, int newHeight);
-		Color4[] GetPixels();
-		void SaveTo(Stream stream);
 	}
 }

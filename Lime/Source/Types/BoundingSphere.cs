@@ -23,7 +23,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Test if a sphere is fully inside, outside, or just intersecting the sphere. 
+		/// Test if a sphere is fully inside, outside, or just intersecting the sphere.
 		/// </summary>
 		public ContainmentType Contains(ref BoundingSphere sphere)
 		{
@@ -38,7 +38,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Test if a vector is fully inside, outside, or just intersecting the sphere. 
+		/// Test if a vector is fully inside, outside, or just intersecting the sphere.
 		/// </summary>
 		public ContainmentType Contains(ref Vector3 point)
 		{
@@ -54,7 +54,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Creates the smallest sphere that can contain a specified list of points. 
+		/// Creates the smallest sphere that can contain a specified list of points.
 		/// </summary>
 		public static BoundingSphere CreateFromPoints(IEnumerable<Vector3> points)
 		{
@@ -112,7 +112,7 @@ namespace Lime
 			var radius = (max - center).Length;
 
 			// Test every point and expand the sphere.
-			// The current bounding sphere is just a good approximation and may not enclose all points.            
+			// The current bounding sphere is just a good approximation and may not enclose all points.
 			// From: Mathematics for 3D Game Programming and Computer Graphics, Eric Lengyel, Third Edition.
 			// Page 218
 			float sqRadius = radius * radius;
@@ -148,7 +148,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Creates a new sphere that contains a transformation of translation and scale 
+		/// Creates a new sphere that contains a transformation of translation and scale
 		/// from this sphere by the specified Matrix.
 		/// </summary>
 		public BoundingSphere Transform(Matrix44 matrix)

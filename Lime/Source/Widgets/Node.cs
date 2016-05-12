@@ -219,7 +219,7 @@ namespace Lime
 		/// <summary>
 		/// TODO: Add summary
 		/// </summary>
-		protected DirtyFlags DirtyMask;
+		protected DirtyFlags DirtyMask = DirtyFlags.All;
 
 		/// <summary>
 		/// TODO: Add summary
@@ -382,6 +382,7 @@ namespace Lime
 			if (PostPresenter != null) {
 				clone.PostPresenter = PostPresenter.Clone();
 			}
+			clone.DirtyMask = DirtyFlags.All;
 			return clone;
 		}
 

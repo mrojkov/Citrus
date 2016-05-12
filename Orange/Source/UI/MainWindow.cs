@@ -11,31 +11,45 @@ namespace Orange
 			Instance = this;
 		}
 
-		public override TargetPlatform GetActivePlatform() 
+		public override TargetPlatform GetActivePlatform()
 		{
+			var subTarget = GetActiveSubTarget();
+			if (subTarget != null)
+				return subTarget.Platform;
+
 			return (TargetPlatform)PlatformPicker.Active;
 		}
-				
+
+		public override SubTarget GetActiveSubTarget()
+		{
+			var platformsCount = Enum.GetValues(typeof(TargetPlatform)).Length;
+
+			if (PlatformPicker.Active > (platformsCount - 1))
+				return The.Workspace.SubTargets[PlatformPicker.Active - platformsCount];
+
+			return null;
+		}
+
 		class LogWriter : TextWriter
 		{
 			TextView textView;
 #if !WIN
 			int bufferedLines;
 #endif
-			
+
 			public LogWriter(TextView textView)
 			{
 				this.textView = textView;
 			}
-			
+
 			public override void WriteLine(string value)
 			{
 				Write(value + '\n');
 			}
-			
+
 			public override void Write(string value)
 			{
-				#pragma warning disable 618
+#pragma warning disable 618
 				textView.Buffer.Insert(textView.Buffer.EndIter, value);
 				while (Application.EventsPending())
 					Application.RunIteration();
@@ -43,15 +57,17 @@ namespace Orange
 				if (bufferedLines > 4) {
 					bufferedLines = 0;
 #endif
-					textView.ScrollToIter(textView.Buffer.EndIter, 0, false, 0, 0);
+				textView.ScrollToIter(textView.Buffer.EndIter, 0, false, 0, 0);
 #if !WIN
 				}
 				bufferedLines++;
 #endif
 			}
 
-			public override System.Text.Encoding Encoding {
-				get {
+			public override System.Text.Encoding Encoding
+			{
+				get
+				{
 					throw new NotImplementedException();
 				}
 			}
@@ -137,12 +153,13 @@ namespace Orange
 				try {
 					ClearLog();
 					if (DoesNeedSvnUpdate()) {
-						var builder = new SolutionBuilder(The.Workspace.ActivePlatform);
+						var builder = new SolutionBuilder(The.Workspace.ActivePlatform, The.Workspace.CustomSolution);
 						builder.SvnUpdate();
 					}
 					The.Workspace.AssetFiles.Rescan();
 					action();
-				} catch (Exception exc) {
+				}
+				catch (Exception exc) {
 					var deepestException = exc;
 					while (deepestException.InnerException != null) {
 						deepestException = deepestException.InnerException;
@@ -151,7 +168,8 @@ namespace Orange
 					Console.WriteLine(deepestException.StackTrace);
 				}
 				ScrollLogToEnd();
-			} finally {
+			}
+			finally {
 				EnableControls(true);
 			}
 			ShowTimeStatistics(startTime);
@@ -187,8 +205,10 @@ namespace Orange
 				try {
 					if (CitrusProjectChooser.Filename != null) {
 						The.Workspace.Open(CitrusProjectChooser.Filename);
+						UpdatePlatformPicker();
 					}
-				} finally {
+				}
+				finally {
 					citrusProjectChooserRecursed = false;
 				}
 			}
@@ -208,12 +228,6 @@ namespace Orange
 #if WIN
 			if (platform == TargetPlatform.iOS) {
 				ShowError("iOS target is not supported on Windows platform");
-				return false;
-			}
-#else
-			if (platform == Orange.TargetPlatform.UltraCompression) {
-				// TODO: find pngcrush tool for Mac
-				ShowError("Ultra compression cooking is currently supported only on Windows platform");
 				return false;
 			}
 #endif

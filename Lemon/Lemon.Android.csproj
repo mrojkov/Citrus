@@ -45,8 +45,6 @@
     <Compile Include="Api.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedNativeLibrary Include="Library\bin\Android\armeabi\libLemon.so" />
-    <EmbeddedNativeLibrary Include="Library\bin\Android\armeabi\libopenal32.so" />
     <EmbeddedNativeLibrary Include="Library\bin\Android\x86\libLemon.so" />
     <EmbeddedNativeLibrary Include="Library\bin\Android\x86\libopenal32.so" />
     <EmbeddedNativeLibrary Include="Library\bin\Android\armeabi-v7a\libLemon.so" />

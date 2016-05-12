@@ -62,8 +62,6 @@ namespace Orange
 				return "iOS";
 			case TargetPlatform.Android:
 				return "Android";
-			case TargetPlatform.UltraCompression:
-				return "UC";
 			case TargetPlatform.Unity:
 				return "Unity";
 			default:

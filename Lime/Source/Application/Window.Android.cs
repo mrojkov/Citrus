@@ -36,7 +36,7 @@ namespace Lime
 
 		public float PixelScale
 		{
-			get { return Resources.System.DisplayMetrics.Density; }
+			get; private set;
 		}
 
 		public void Center() {}
@@ -69,6 +69,8 @@ namespace Lime
 			ActivityDelegate.Instance.GameView.UpdateFrame += (sender, e) => {
 				RaiseUpdating((float)e.Time);
 			};
+
+			PixelScale = Resources.System.DisplayMetrics.Density;
 		}
 
 		private static Size ToLimeSize(System.Drawing.Size size, float pixelScale)

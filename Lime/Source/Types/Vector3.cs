@@ -33,7 +33,11 @@ namespace Lime
 		/// Returns a vector with components 0.5, 0.5, 0.5.
 		/// </summary>
 		public static readonly Vector3 Half = new Vector3(0.5f, 0.5f, 0.5f);
-		
+
+		public static readonly Vector3 UnitX = new Vector3(1f, 0f, 0f);
+		public static readonly Vector3 UnitY = new Vector3(0f, 1f, 0f);
+		public static readonly Vector3 UnitZ = new Vector3(0f, 0f, 1f);
+
 		public Vector3(Vector2 xy, float z)
 			: this(xy.X, xy.Y, z)
 		{

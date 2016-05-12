@@ -5,8 +5,8 @@ namespace Orange.Source
 {
 	class MSBuild: BuildSystem
 	{
-		public MSBuild(string projectDirectory, string projectName, TargetPlatform platform) 
-			: base(projectDirectory, projectName, platform)
+		public MSBuild(string projectDirectory, string projectName, TargetPlatform platform, string customSolution = null) 
+			: base(projectDirectory, projectName, platform, customSolution)
 		{
 			BuilderPath = Path.Combine(System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(), "MSBuild.exe");
 		}

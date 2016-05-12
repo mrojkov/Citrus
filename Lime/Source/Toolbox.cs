@@ -69,6 +69,15 @@ namespace Lime
 			}
 		}
 
+		public static List<T> Clone<T>(List<T> list)
+		{
+			var clone = new List<T>();
+			for (int i = 0; i < list.Count; i++) {
+				clone.Add(list[i]);
+			}
+			return clone;
+		}
+
 		// In asian languages some characters are not allowed at the start or the end of the line.
 		const string NotAllowedAtTheStart =
 			"!%),.:;>?]}¢¨°·ˇˉ―‖’”„‟†‡›℃∶、。〃〆〈《「『〕〗〞︵︹︽︿﹃﹘﹚﹜！＂％＇），．：；？］｀｜｝～" +

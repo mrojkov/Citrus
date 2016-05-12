@@ -7,8 +7,10 @@ using ProtoBuf;
 #if OPENGL
 #if !MAC && !MONOMAC
 using OpenTK.Graphics.ES20;
-#else
+#elif MAC
 using OpenTK.Graphics.OpenGL;
+#elif MONOMAC
+using MonoMac.OpenGL;
 #endif
 #endif
 

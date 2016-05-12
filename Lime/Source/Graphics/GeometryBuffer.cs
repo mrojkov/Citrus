@@ -167,5 +167,30 @@ namespace Lime
 				platformBuffer = null;
 			}
 		}
+
+		public GeometryBuffer Clone()
+		{
+			var clone = new GeometryBuffer();
+			clone.Vertices = CloneElements(Vertices);
+			clone.Colors = CloneElements(Colors);
+			clone.UV1 = CloneElements(UV1);
+			clone.UV2 = CloneElements(UV2);
+			clone.UV3 = CloneElements(UV3);
+			clone.UV4 = CloneElements(UV4);
+			clone.BlendIndices = CloneElements(BlendIndices);
+			clone.BlendWeights = CloneElements(BlendWeights);
+			clone.Indices = CloneElements(Indices);
+			clone.DirtyAttributes = Attributes.All;
+			clone.IndicesDirty = true;
+			return clone;
+		}
+
+		private static T[] CloneElements<T>(T[] source)
+		{
+			if (source != null) {
+				return source.Clone() as T[];
+			}
+			return null;
+		}
 	}
 }

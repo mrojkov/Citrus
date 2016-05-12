@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -243,7 +243,6 @@
     <Compile Include="Source\Graphics\Bitmap.Cocoa.cs" />
     <Compile Include="Source\Widgets\Layout\StackLayout.cs" />
     <Compile Include="Source\Widgets\Layout\HBoxLayout.cs" />
-    <Compile Include="Source\Widgets\ConstraintAttribute.cs" />
     <Compile Include="Source\Widgets\3D\Camera3D.cs" />
     <Compile Include="Source\Widgets\3D\IRenderObject3D.cs" />
     <Compile Include="Source\Widgets\3D\Material.cs" />
@@ -264,7 +263,7 @@
     <Compile Include="Source\Types\Plane.cs" />
     <Compile Include="Source\Types\Vector4.cs" />
     <Compile Include="Source\Types\MonoMac\CG.cs" />
-    <Compile Include="Source\Widgets\Layout\ScrollableLayout.cs" />
+    <Compile Include="Source\Widgets\3D\Spline3D.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

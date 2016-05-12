@@ -63,7 +63,7 @@ namespace Orange
 
 		private static ILocalizationDictionarySerializer CreateSerializer()
 		{
-			var format = (string)The.Workspace.ProjectJson.GetValue("LocalizationDictionaryFormat", "Text");
+			var format = The.Workspace.ProjectJson.GetValue("LocalizationDictionaryFormat", "Text");
 			if (format == "Text") {
 				return new LocalizationDictionaryTextSerializer();
 #if !MAC
@@ -110,7 +110,7 @@ namespace Orange
 
 		private bool ShouldLocalizeOnlyTaggedSceneTexts()
 		{
-			return (bool)The.Workspace.ProjectJson.GetValue("LocalizeOnlyTaggedSceneTexts", false);
+			return The.Workspace.ProjectJson.GetValue("LocalizeOnlyTaggedSceneTexts", false);
 		}
 
 		private void ProcessSourceFile(string file)

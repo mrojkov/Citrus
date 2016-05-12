@@ -30,7 +30,11 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
+#if !MONOMAC
 using OpenTK.Audio.OpenAL;
+#else
+using MonoMac.OpenAL;
+#endif
 
 namespace OpenTK.Audio
 {

@@ -20,7 +20,7 @@ namespace Lime
 					Normal = Normal * magnitude,
 					D = D * magnitude
 				};
-            }
+			}
 		}
 
 		public Plane(Vector3 normal, float d)
@@ -77,7 +77,7 @@ namespace Lime
 
 		public override bool Equals(object other)
 		{
-			return other is Plane ? this.Equals((Plane)other) : false;
+			return other is Plane && this.Equals((Plane)other);
 		}
 
 		public bool Equals(Plane other)
