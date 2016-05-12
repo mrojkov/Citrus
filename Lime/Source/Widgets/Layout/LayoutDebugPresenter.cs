@@ -4,7 +4,8 @@ namespace Lime
 {
 	public class LayoutDebugPresenter : CustomPresenter
 	{
-		public Color4 color = Color4.Red;
+		public Color4 Color = Color4.Red;
+		public float Thickness;
 		
 		public LayoutDebugPresenter(IPresenter previous) : base(previous) { }
 
@@ -14,11 +15,10 @@ namespace Lime
 			var widget = node.AsWidget;
 			if (widget == null || widget.Layout == null)
 				return;
-			Renderer.Blending = Blending.Alpha;
-			Renderer.Shader = ShaderId.Diffuse;
-			Renderer.Transform1 = widget.LocalToWorldTransform;
+			widget.PrepareRendererState();
+			var t = Thickness > 0 ? Thickness : 1 / Window.Current.PixelScale;
 			foreach (var r in widget.Layout.DebugRectangles) {
-				Renderer.DrawRectOutline(r.A, r.B, color);
+				Renderer.DrawRectOutline(r.A, r.B, Color, t);
 			}
 		}
 	}
