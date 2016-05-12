@@ -17,6 +17,7 @@ namespace Lime
 #if DEBUG
 			public string StackTrace;
 #endif
+			public bool Exclusive;
 		}
 
 		private Input WindowInput
@@ -79,18 +80,26 @@ namespace Lime
 
 		public void CaptureMouse()
 		{
-			Capture(mouseCaptureStack);
+			Capture(mouseCaptureStack, false);
 		}
 
-		private void Capture(List<StackItem> stack)
+		/// <summary>
+		/// Captures the mouse only for the given widget.
+		/// </summary>
+		public void CaptureMouseExclusive()
+		{
+			Capture(mouseCaptureStack, true);
+		}
+
+		private void Capture(List<StackItem> stack, bool exclusive)
 		{
 			stack.RemoveAll(i => i.Widget == widget);
 			var thisLayer = widget.GetEffectiveLayer();
 			var t = stack.FindLastIndex(i => i.Widget.GetEffectiveLayer() <= thisLayer);
 #if DEBUG
-			stack.Insert(t + 1, new StackItem() { Widget = widget, StackTrace = System.Environment.StackTrace });
+			stack.Insert(t + 1, new StackItem() { Widget = widget, StackTrace = System.Environment.StackTrace, Exclusive = exclusive });
 #else
-			stack.Insert(t + 1, new StackItem() { Widget = widget });
+			stack.Insert(t + 1, new StackItem() { Widget = widget, Exclusive = exclusive  });
 #endif
 			// The widget may be invisible right after creation, 
 			// so omit the stack cleaning up on this frame.
@@ -108,16 +117,6 @@ namespace Lime
 			return (c > 0) && mouseCaptureStack[c - 1].Widget == widget;
 		}
 
-		public void CaptureTouchScreen()
-		{
-			CaptureMouse();
-		}
-
-		public void ReleaseTouchScreen()
-		{
-			ReleaseMouse();
-		}
-
 		public bool IsTouchScreenOwner()
 		{
 			return IsMouseOwner();
@@ -125,7 +124,15 @@ namespace Lime
 
 		public void CaptureKeyboard()
 		{
-			Capture(keyboardCaptureStack);
+			Capture(keyboardCaptureStack, false);
+		}
+
+		/// <summary>
+		/// Captures the keyboard only for the given widget.
+		/// </summary>
+		public void CaptureKeyboardExclusive()
+		{
+			Capture(keyboardCaptureStack, true);
 		}
 
 		public void ReleaseKeyboard()
@@ -224,7 +231,7 @@ namespace Lime
 				return true;
 			}
 			var context = mouseCaptureStack[c - 1];
-			return context.Widget == widget || widget.ChildOf(context.Widget);
+			return context.Widget == widget || (!context.Exclusive && widget.ChildOf(context.Widget));
 		}
 
 		public bool IsAcceptingTouchScreen()
@@ -239,13 +246,19 @@ namespace Lime
 				return true;
 			}
 			var context = keyboardCaptureStack[c - 1];
-			return context.Widget == widget || widget.ChildOf(context.Widget);
+			return context.Widget == widget || (!context.Exclusive && widget.ChildOf(context.Widget));
 		}
 
 		public void CaptureAll()
 		{
 			CaptureMouse();
 			CaptureKeyboard();
+		}
+
+		public void CaptureAllExclusive()
+		{
+			CaptureMouseExclusive();
+			CaptureKeyboardExclusive();
 		}
 
 		public void ReleaseAll()
