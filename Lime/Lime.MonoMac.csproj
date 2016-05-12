@@ -257,6 +257,8 @@
     <Compile Include="Source\Types\Vector4.cs" />
     <Compile Include="Source\Types\MonoMac\CG.cs" />
     <Compile Include="Source\Widgets\3D\Spline3D.cs" />
+    <Compile Include="Source\Widgets\HSplitter.cs" />
+    <Compile Include="Source\Widgets\VSplitter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
@@ -345,6 +347,7 @@
     <Folder Include="Source\Audio\OpenAL\" />
     <Folder Include="Source\Widgets\" />
     <Folder Include="Source\Types\MonoMac\" />
+    <Folder Include="Source\Widgets\Layout\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
