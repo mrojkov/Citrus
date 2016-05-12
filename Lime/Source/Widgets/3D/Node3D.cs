@@ -218,7 +218,7 @@ namespace Lime
 			if (!GloballyVisible) {
 				return;
 			}
-			AddSelfToRenderChain(chain);
+			AddContentsToRenderChain(chain);
 		}
 	}
 }
