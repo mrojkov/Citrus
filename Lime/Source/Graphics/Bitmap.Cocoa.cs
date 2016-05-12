@@ -44,28 +44,24 @@ namespace Lime
 				data[j++] = pixels[i].A;
 			}
 			var alphaInfo = Lime.Bitmap.AnyAlpha(pixels) ? CGBitmapFlags.Last : CGBitmapFlags.NoneSkipLast;
-			using (var colorSpace = CGColorSpace.CreateDeviceRGB()) {
-				using (var dataProvider = new CGDataProvider(data, 0, lengthInBytes)) {
-					using (var img = new CGImage(
-						width,
-						height,
-						8,
-						32,
-						4 * width,
-						colorSpace,
-						alphaInfo,
-						dataProvider,
-						null,
-						false,
-						CGColorRenderingIntent.Default)) {
+			var img = new CGImage(
+				width,
+				height,
+				8,
+				32,
+				4 * width,
+				CGColorSpace.CreateDeviceRGB(),
+				alphaInfo,
+				new CGDataProvider(data, 0, lengthInBytes),
+				null,
+				false,
+				CGColorRenderingIntent.Default);
 #if iOS
-						Bitmap = new CocoaBitmap(img);
+			Bitmap = new CocoaBitmap(img);
 #elif MAC || MONOMAC
-						Bitmap = new CocoaBitmap(img, new CGSize(width, height));
+			Bitmap = new CocoaBitmap(img, new CGSize(width, height));
 #endif
-					}
-				}
-			}
+
 		}
 
 		private BitmapImplementation(CocoaBitmap bitmap)
