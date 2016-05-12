@@ -206,14 +206,16 @@ namespace Lime
 #elif MAC || MONOMAC
 			using (var representation = new NSBitmapImageRep(Bitmap.CGImage)) {
 				NSData data = null;
+				NSDictionary parameters = null;
 				switch (compression) {
 					case CompressionFormat.Jpeg:
-						var parameters = NSDictionary.FromObjectAndKey(
+						parameters = NSDictionary.FromObjectAndKey(
 							NSNumber.FromFloat(0.8f), NSBitmapImageRep.CompressionFactor);
 						data = representation.RepresentationUsingTypeProperties(NSBitmapImageFileType.Jpeg, parameters);
 						break;
 					case CompressionFormat.Png:
-						data = representation.RepresentationUsingTypeProperties(NSBitmapImageFileType.Png, null);
+						parameters = new NSDictionary();
+						data = representation.RepresentationUsingTypeProperties(NSBitmapImageFileType.Png, parameters);
 						break;
 				}
 				using (var bitmapStream = data.AsStream()) {
