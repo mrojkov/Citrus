@@ -14,6 +14,9 @@ namespace Tangerine.UI
 		public static readonly Color4 GridSelection = Color4.FromFloats(0.5f, 0.5f, 0.5f, 0.5f);
 		public static readonly Color4 OverviewVeil = Color4.FromFloats(0.5f, 0.5f, 0.5f, 0.3f);
 		public static readonly ColorGradient Toolbar = new ColorGradient(new Color4(255, 255, 255), new Color4(230, 230, 230));
+		// Docking
+		public static readonly Color4 DockingRectagleOutline = Color4.FromFloats(0.2f, 0.2f, 1f);
+		public static readonly Color4 DockPanelBorder = Color4.FromFloats(0.75f, 0.75f, 0.75f);
 	}
 }
 

@@ -5,7 +5,7 @@ using Tangerine.Core;
 
 namespace Tangerine.UI
 {
-	class CustomCheckbox : Button
+	public class CustomCheckbox : Button
 	{
 		readonly Image image;
 		readonly ITexture checkedTexture;

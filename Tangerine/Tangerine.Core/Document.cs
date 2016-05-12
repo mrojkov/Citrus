@@ -7,6 +7,13 @@ using Lime;
 
 namespace Tangerine.Core
 {
+	public interface ISelectedNodesProvider
+	{
+		IEnumerable<Node> Get();
+
+		void Select(Node node, bool select);
+	}
+
 	public class Document
 	{
 		public enum CloseAction
@@ -28,8 +35,8 @@ namespace Tangerine.Core
 		public event Action Closed;
 		
 		public Node RootNode { get; private set; }
-
-		public readonly TaskList Tasks = new TaskList();
+		public IEnumerable<Node> SelectedNodes => SelectedNodesProvider.Get();
+		public ISelectedNodesProvider SelectedNodesProvider { get; set; }
 
 		static Document()
 		{
@@ -67,12 +74,6 @@ namespace Tangerine.Core
 				Closed();
 			}
 			return true;
-		}
-
-		public void Update(float delta)
-		{
-			Tasks.Update(delta);
-			History.Commit();
 		}
 
 		public void Save()

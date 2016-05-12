@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{FB325FE1-F328-4755-885F-E713BD7E7DAD}</ProjectGuid>
+    <ProjectTypeGuids>{A3F8F2AB-B479-4A4A-A458-A89E7DC349F1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Tangerine.UI.Timeline</RootNamespace>
+    <AssemblyName>Tangerine.UI.Timeline</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkIdentifier>Xamarin.Mac</TargetFrameworkIdentifier>
+    <MonoMacResourcePrefix>Resources</MonoMacResourcePrefix>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <EnableCodeSigning>false</EnableCodeSigning>
+    <CreatePackage>false</CreatePackage>
+    <EnablePackageSigning>false</EnablePackageSigning>
+    <IncludeMonoRuntime>false</IncludeMonoRuntime>
+    <UseSGen>false</UseSGen>
+    <CodeSignEntitlements></CodeSignEntitlements>
+    <CodeSignResourceRules></CodeSignResourceRules>
+    <XamMacArch></XamMacArch>
+    <Profiling>true</Profiling>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <DefineConstants></DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <EnableCodeSigning>false</EnableCodeSigning>
+    <CreatePackage>false</CreatePackage>
+    <EnablePackageSigning>false</EnablePackageSigning>
+    <IncludeMonoRuntime>false</IncludeMonoRuntime>
+    <UseSGen>false</UseSGen>
+    <CodeSignEntitlements></CodeSignEntitlements>
+    <CodeSignResourceRules></CodeSignResourceRules>
+    <XamMacArch></XamMacArch>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="Xamarin.Mac" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tasks\GridPane\ClampScrollOriginTask.cs" />
+    <Compile Include="Tasks\GridPane\DragKeyframesRespondentTask.cs" />
+    <Compile Include="Tasks\GridPane\GridMouseScrollTask.cs" />
+    <Compile Include="Tasks\GridPane\HasKeyframeRespondentTask.cs" />
+    <Compile Include="Tasks\GridPane\ProcessGridWidgetsTask.cs" />
+    <Compile Include="Tasks\GridPane\RefreshColumnCountTask.cs" />
+    <Compile Include="Tasks\GridPane\ResizeGridCurveViewTask.cs" />
+    <Compile Include="Tasks\GridPane\SelectAndDragKeyframesTask.cs" />
+    <Compile Include="Tasks\OverviewPane\OverviewScrollTask.cs" />
+    <Compile Include="Tasks\OverviewPane\ProcessOverviewWidgetsTask.cs" />
+    <Compile Include="Tasks\RollPane\ProcessRollWidgetsTask.cs" />
+    <Compile Include="Tasks\RollPane\RollMouseScrollTask.cs" />
+    <Compile Include="Tasks\RollPane\SelectAndDragRowsTask.cs" />
+    <Compile Include="Tasks\BuildRowsTask.cs" />
+    <Compile Include="Tasks\BuildRowViewsTask.cs" />
+    <Compile Include="Tasks\KeyboardShortcutsTask.cs" />
+    <Compile Include="Tasks\MouseWheelTask.cs" />
+    <Compile Include="GridPane.cs" />
+    <Compile Include="GridSelection.cs" />
+    <Compile Include="Metrics.cs" />
+    <Compile Include="OverviewPane.cs" />
+    <Compile Include="RollPane.cs" />
+    <Compile Include="Row.cs" />
+    <Compile Include="Rulerbar.cs" />
+    <Compile Include="Timeline.cs" />
+    <Compile Include="Toolbar.cs" />
+    <Compile Include="Commands\ClearGridSelection.cs" />
+    <Compile Include="Commands\ClearRowSelection.cs" />
+    <Compile Include="Commands\DragRows.cs" />
+    <Compile Include="Commands\SelectRectangleOnGrid.cs" />
+    <Compile Include="Commands\SelectRow.cs" />
+    <Compile Include="Commands\SetCurrentColumn.cs" />
+    <Compile Include="Commands\SetCurrentContainer.cs" />
+    <Compile Include="Commands\ShiftSelection.cs" />
+    <Compile Include="Components\Model\CurveRow.cs" />
+    <Compile Include="Components\Model\NodeRow.cs" />
+    <Compile Include="Components\Model\PropertyRow.cs" />
+    <Compile Include="Components\Presentation\GridCurveView.cs" />
+    <Compile Include="Components\Presentation\GridNodeView.cs" />
+    <Compile Include="Components\Presentation\GridPropertyView.cs" />
+    <Compile Include="Components\Presentation\IGridWidget.cs" />
+    <Compile Include="Components\Presentation\IOverviewWidget.cs" />
+    <Compile Include="Components\Presentation\IRollWidget.cs" />
+    <Compile Include="Components\Presentation\RollCurveView.cs" />
+    <Compile Include="Components\Presentation\RollNodeView.cs" />
+    <Compile Include="Components\Presentation\RollPropertyView.cs" />
+    <Compile Include="Components\DragKeyframesRequest.cs" />
+    <Compile Include="Components\HasKeyframeRequest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.csproj">
+      <Project>{05FB6476-C29B-49A7-918C-A52CAF73FCA7}</Project>
+      <Name>Tangerine.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">
+      <Project>{DC16EEBF-404D-4610-B87A-15B57464D707}</Project>
+      <Name>Lime.Mac</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tangerine.UI\Tangerine.UI.csproj">
+      <Project>{E62BA18F-4E1A-466A-8299-67AD567F17E5}</Project>
+      <Name>Tangerine.UI</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Tangerine.UI.Timeline.csproj" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
+</Project>
