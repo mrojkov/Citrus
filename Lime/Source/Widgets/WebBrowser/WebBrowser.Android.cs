@@ -68,10 +68,10 @@ namespace Lime
 				EventHandler<OpenTK.FrameEventArgs> a = null;
 				a = (s, e) => {
 					((RelativeLayout)ActivityDelegate.Instance.GameView.Parent).RemoveView(webView);
+					webView.Dispose();
 					ActivityDelegate.Instance.GameView.UpdateFrame -= a;
 				};
 				ActivityDelegate.Instance.GameView.UpdateFrame += a;
-				webView = null;
 			}
 			// Browser may request keyboard and we should hide it on our own when closing browser.
 			if (WidgetContext.Current.ActiveTextWidget == null && Application.SoftKeyboard.Visible) {
