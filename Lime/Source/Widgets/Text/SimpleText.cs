@@ -466,7 +466,9 @@ namespace Lime
 			spriteList = null;
 			minSizeValid = false;
 			InvalidateParentConstraintsAndArrangement();
-			Window.Current.Invalidate();
+			if (Window.Current != null) {
+				Window.Current.Invalidate();
+			}
 		}
 
 		public override Node DeepCloneFast()
