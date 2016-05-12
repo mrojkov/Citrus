@@ -589,9 +589,7 @@ namespace Orange
 			for (int y = 0; y < source.Height; y++) {
 				int sourceRowsOffset = y * source.Width;
 				int dstRowsOffset = (y + dstY) * dstWidth;
-				for (int x = 0; x < source.Width; x++) {
-					dstPixels[x + dstX + dstRowsOffset] = srcPixels[x + sourceRowsOffset];
-				}
+				Array.Copy(srcPixels, sourceRowsOffset, dstPixels, dstX + dstRowsOffset, source.Width);
 			}
 		}
 
