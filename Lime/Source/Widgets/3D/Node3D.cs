@@ -212,5 +212,23 @@ namespace Lime
 		{
 			return GlobalTransform * node.GlobalTransform.CalcInverted();
 		}
+
+		public override void AddToRenderChain(RenderChain chain)
+		{
+			if (!GloballyVisible) {
+				return;
+			}
+			if (Layer != 0) {
+				var oldLayer = chain.SetCurrentLayer(Layer);
+				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
+					node.AddToRenderChain(chain);
+				}
+				chain.SetCurrentLayer(oldLayer);
+			} else {
+				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
+					node.AddToRenderChain(chain);
+				}
+			}
+		}
 	}
 }
