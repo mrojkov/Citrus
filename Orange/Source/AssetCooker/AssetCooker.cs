@@ -391,33 +391,34 @@ namespace Orange
 				if (cookingRules.TextureAtlas == atlasChain) {
 					var maxAtlasSize = GetMaxAtlasSize();
 					var srcTexturePath = AssetPath.Combine(The.Workspace.AssetsDirectory, fileInfo.Path);
+					Bitmap bitmap = null;
 					using (var stream = File.OpenRead(srcTexturePath)) {
-						var bitmap = new Bitmap(stream);
-						if (ShouldDownscale(bitmap, cookingRules)) {
-							bitmap.Dispose();
-							bitmap = DownscaleTexture(bitmap, srcTexturePath, cookingRules);
-						}
-
-						// Ensure that no image exceeded maxAtlasSize limit
-						if (bitmap.Width > maxAtlasSize.Width || bitmap.Height > maxAtlasSize.Height) {
-							var newWidth = Math.Min(bitmap.Width, maxAtlasSize.Width);
-							var newHeight = Math.Min(bitmap.Height, maxAtlasSize.Height);
-							var scaledBitmap = bitmap.Rescale(newWidth, newHeight);
-							bitmap.Dispose();
-							bitmap = scaledBitmap;
-							Console.WriteLine(
-								"WARNING: '{0}' downscaled to {1}x{2}", srcTexturePath, newWidth, newHeight);
-						}
-
-						var item = new AtlasItem {
-							Path = Path.ChangeExtension(fileInfo.Path, ".atlasPart"),
-							Bitmap = bitmap,
-							MipMapped = cookingRules.MipMaps,
-							PVRFormat = cookingRules.PVRFormat,
-							DDSFormat = cookingRules.DDSFormat,
-						};
-						items[cookingRules.AtlasOptimization].Add(item);
+						bitmap = new Bitmap(stream);
 					}
+					if (ShouldDownscale(bitmap, cookingRules)) {
+						bitmap.Dispose();
+						bitmap = DownscaleTexture(bitmap, srcTexturePath, cookingRules);
+					}
+
+					// Ensure that no image exceeded maxAtlasSize limit
+					if (bitmap.Width > maxAtlasSize.Width || bitmap.Height > maxAtlasSize.Height) {
+						var newWidth = Math.Min(bitmap.Width, maxAtlasSize.Width);
+						var newHeight = Math.Min(bitmap.Height, maxAtlasSize.Height);
+						var scaledBitmap = bitmap.Rescale(newWidth, newHeight);
+						bitmap.Dispose();
+						bitmap = scaledBitmap;
+						Console.WriteLine(
+							"WARNING: '{0}' downscaled to {1}x{2}", srcTexturePath, newWidth, newHeight);
+					}
+
+					var item = new AtlasItem {
+						Path = Path.ChangeExtension(fileInfo.Path, ".atlasPart"),
+						Bitmap = bitmap,
+						MipMapped = cookingRules.MipMaps,
+						PVRFormat = cookingRules.PVRFormat,
+						DDSFormat = cookingRules.DDSFormat,
+					};
+					items[cookingRules.AtlasOptimization].Add(item);
 				}
 			}
 			var initialAtlasId = 0;
