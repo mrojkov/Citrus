@@ -4,50 +4,60 @@ using System.Linq;
 
 namespace Lime
 {
-	public class VSplitter : Widget
+	public class VSplitter : Splitter
 	{
-		private const float activeAreaHeight = 10;
-
 		public VSplitter()
 		{
-			Layout = new VBoxLayout { Spacing = 4 };
 			Tasks.Add(MainTask());
+			PostPresenter = new DelegatePresenter<Widget>(RenderSeparator);
+			Theme.Current.Apply(this);
+			Layout = new VBoxLayout { Spacing = SeparatorWidth };
+		}
+
+		void RenderSeparator(Widget widget)
+		{
+			widget.PrepareRendererState();
+			for (int i = 0; i < Nodes.Count - 1; i++) {
+				var w = Nodes[i + 1].AsWidget;
+				var y = w.Y - SeparatorWidth * 0.5f;
+				Renderer.DrawLine(w.X, y, w.Width + w.X, y, SeparatorColor, thickness: SeparatorWidth);
+			}
 		}
 
 		private IEnumerator<object> MainTask()
 		{
 			while (true) {
 				if (Input.WasMousePressed()) {
-					int splitterIndex;
-					if (FindSplitterUnderMouse(out splitterIndex)) {
-						yield return DragSplitterTask(splitterIndex);
+					int index;
+					if (FindSeparatorUnderMouse(out index)) {
+						yield return DragSeparatorTask(index);
 					}
 				}
 				yield return null;
 			}
 		}
 
-		private IEnumerator<object> DragSplitterTask(int index)
+		private IEnumerator<object> DragSeparatorTask(int index)
 		{
-			var widgets = GetWidgets();
+			RaiseDragStarted();
 			var initialMousePosition = Input.MousePosition;
-			var initialHeights = widgets.Select(i => i.Height).ToList();
-			Input.CaptureMouse();
+			var initialHeights = Nodes.Select(i => i.AsWidget.Height).ToList();
+			Input.CaptureMouseExclusive();
 			while (Input.IsMousePressed()) {
 				var dragDelta = Input.MousePosition.Y - initialMousePosition.Y;
-				AdjustStretchDelta(initialHeights[index], widgets[index], ref dragDelta);
+				AdjustStretchDelta(initialHeights[index], Nodes[index].AsWidget, ref dragDelta);
 				dragDelta = -dragDelta;
-				AdjustStretchDelta(initialHeights[index + 1], widgets[index + 1], ref dragDelta);
+				AdjustStretchDelta(initialHeights[index + 1], Nodes[index + 1].AsWidget, ref dragDelta);
 				dragDelta = -dragDelta;
-				for (int i = 0; i < widgets.Count; i++) {
-					GetLayoutCell(widgets[i]).StretchY = initialHeights[i];
+				for (int i = 0; i < Nodes.Count; i++) {
+					var d = (i == index) ? dragDelta : ((i == index + 1) ? -dragDelta : 0);
+					Nodes[i].AsWidget.LayoutCell = new LayoutCell { StretchY = initialHeights[i] + d };
 				}
-				GetLayoutCell(widgets[index]).StretchY += dragDelta;
-				GetLayoutCell(widgets[index + 1]).StretchY -= dragDelta;
 				Layout.InvalidateConstraintsAndArrangement(this);
 				yield return null;
 			}
 			Input.ReleaseMouse();
+			RaiseDragEnded();
 		}
 
 		private void AdjustStretchDelta(float initialHeight, Widget widget, ref float delta)
@@ -60,32 +70,20 @@ namespace Lime
 			}
 		}
 
-		private LayoutCell GetLayoutCell(Widget widget)
+		private bool FindSeparatorUnderMouse(out int index)
 		{
-			return widget.LayoutCell ?? (widget.LayoutCell = new LayoutCell());
-		}
-
-		private bool FindSplitterUnderMouse(out int splitterIndex)
-		{
-			var widgets = GetWidgets();
-			for (int i = 0; i < widgets.Count - 1; i++) {
-				var a = widgets[i].CalcAABBInWindowSpace();
-				var b = widgets[i + 1].CalcAABBInWindowSpace();
-				var y = (a.Bottom + b.Top) / 2;
-				if (Mathf.Abs(Input.MousePosition.Y - y) < activeAreaHeight / 2) {
-					if (Input.MousePosition.X >= a.Left && Input.MousePosition.X <= a.Right) {
-						splitterIndex = i;
+			for (int i = 0; i < Nodes.Count - 1; i++) {
+				var widget = Nodes[i + 1].AsWidget;
+				var p = widget.GlobalPosition;
+				if (Mathf.Abs(Input.MousePosition.Y - (p.Y - SeparatorWidth * 0.5f)) < SeparatorActiveAreaWidth * 0.5f) {
+					if (Input.MousePosition.X > p.X && Input.MousePosition.X < p.X + widget.Width) {
+						index = i;
 						return true;
 					}
 				}
 			}
-			splitterIndex = -1;
+			index = -1;
 			return false;
-		}
-
-		private List<Widget> GetWidgets()
-		{
-			return Nodes.OfType<Widget>().ToList();
 		}
 	}
 }

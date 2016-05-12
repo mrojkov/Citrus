@@ -24,6 +24,7 @@ namespace Lime
 			public static readonly ColorGradient ButtonHover = new ColorGradient(new Color4(235, 244, 252), new Color4(222, 238, 252));
 			public static readonly ColorGradient ButtonPress = new ColorGradient(new Color4(215, 234, 252), new Color4(199, 226, 252));
 			public static readonly ColorGradient ButtonDisable = new ColorGradient(new Color4(244, 244, 244), new Color4(244, 244, 244));
+			public static readonly Color4 SeparatorColor = new Color4(255, 255, 255);
 		}
 
 		public DesktopTheme()
@@ -35,6 +36,16 @@ namespace Lime
 			Decorators[typeof(TextView)] = DecorateTextView;
 			Decorators[typeof(ComboBox)] = DecorateComboBox;
 			Decorators[typeof(FileChooserButton)] = DecorateFileChooserButton;
+			Decorators[typeof(HSplitter)] = DecorateSplitter;
+			Decorators[typeof(VSplitter)] = DecorateSplitter;
+		}
+
+		private void DecorateSplitter(Widget widget)
+		{
+			var splitter = (Splitter)widget;
+			splitter.SeparatorColor = Colors.SeparatorColor;
+			splitter.SeparatorWidth = 2;
+			splitter.SeparatorActiveAreaWidth = 20;
 		}
 
 		private void DecorateButton(Widget widget)
