@@ -62,12 +62,12 @@ namespace Lime
 		}
 	}
 
-	public class DelegatePresenter : CustomPresenter
+	public class DelegatePresenter<T> : CustomPresenter where T: Node
 	{
-		readonly Action<Node> render;
+		readonly Action<T> render;
 		readonly bool reverseOrder;
 
-		public DelegatePresenter(Action<Node> render, IPresenter previous = null, bool reverseOrder = false)
+		public DelegatePresenter(Action<T> render, IPresenter previous = null, bool reverseOrder = false)
 			: base(previous)
 		{
 			this.render = render;
@@ -77,12 +77,49 @@ namespace Lime
 		public override void Render(Node node)
 		{
 			if (reverseOrder) {
-				render(node);
+				render(node as T);
 				base.Render(node);
 			} else {
 				base.Render(node);
-				render(node);
+				render(node as T);
 			}
+		}
+	}
+
+	public class WidgetBoundsPresenter : CustomPresenter
+	{
+		public readonly Color4 Color;
+		public readonly float Thickness;
+
+		public WidgetBoundsPresenter(Color4 color, float thickness = 0, IPresenter previous = null) : base(previous)
+		{
+			Color = color;
+			Thickness = thickness;
+		}
+
+		public override void Render(Node node)
+		{
+			base.Render(node);
+			node.AsWidget.PrepareRendererState();
+			var t = Thickness > 0 ? Thickness : 1 / Window.Current.PixelScale;
+			Renderer.DrawRectOutline(Vector2.Zero, node.AsWidget.Size, Color, t);
+		}
+	}
+
+	public class WidgetFlatFillPresenter : CustomPresenter
+	{
+		public readonly Color4 Color;
+
+		public WidgetFlatFillPresenter(Color4 color, IPresenter previous = null) : base(previous)
+		{
+			Color = color;
+		}
+
+		public override void Render(Node node)
+		{
+			base.Render(node);
+			node.AsWidget.PrepareRendererState();
+			Renderer.DrawRect(Vector2.Zero, node.AsWidget.Size, Color);
 		}
 	}
 }
