@@ -71,7 +71,7 @@ namespace Lime
 				}
 				length += segmentLength;
 			}
-			if (Points.Count > 2) {
+			if (Points.Count > 1) {
 				return Interpolate(1.0f, GetPoint(segmentCount - 1), GetPoint(segmentCount));
 			}
 			if (Points.Count == 1) {
@@ -100,7 +100,7 @@ namespace Lime
 
 		public int GetSegmentCount()
 		{
-			if (Points.Count > 2) {
+			if (Points.Count > 1) {
 				return Closed ? Points.Count : Points.Count - 1;
 			}
 			return 0;
