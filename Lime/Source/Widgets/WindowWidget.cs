@@ -30,9 +30,10 @@ namespace Lime
 			var context = WidgetContext.Current;
 			WidgetInput.RemoveInvalidatedCaptures();
 			context.IsActiveTextWidgetUpdated = false;
+			context.MouseCursor = MouseCursor.Default;
 			base.Update(delta);
 			if (Application.CurrentThread.IsMain()) {
-				if (!context.IsActiveTextWidgetUpdated || Window.Input.WasKeyPressed(Key.DismissSoftKeyboard)) {
+				if (!context.IsActiveTextWidgetUpdated || Window.Input.WasKeyPressed (Key.DismissSoftKeyboard)) {
 					context.ActiveTextWidget = null;
 				}
 				bool showKeyboard = context.ActiveTextWidget != null && context.ActiveTextWidget.Visible;
@@ -49,6 +50,7 @@ namespace Lime
 				}
 				prevActiveTextWidget = context.ActiveTextWidget;
 			}
+			Window.Cursor = context.MouseCursor;
 			LayoutManager.Instance.Layout();
 		}
 

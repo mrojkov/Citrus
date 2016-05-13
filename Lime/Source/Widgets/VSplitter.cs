@@ -27,9 +27,10 @@ namespace Lime
 		private IEnumerator<object> MainTask()
 		{
 			while (true) {
-				if (Input.WasMousePressed()) {
-					int index;
-					if (FindSeparatorUnderMouse(out index)) {
+				int index;
+				if (FindSeparatorUnderMouse(out index)) {
+					WidgetContext.Current.MouseCursor = MouseCursor.SizeNS;
+					if (Input.WasMousePressed()) {
 						yield return DragSeparatorTask(index);
 					}
 				}
@@ -44,6 +45,7 @@ namespace Lime
 			var initialHeights = Nodes.Select(i => i.AsWidget.Height).ToList();
 			Input.CaptureMouseExclusive();
 			while (Input.IsMousePressed()) {
+				WidgetContext.Current.MouseCursor = MouseCursor.SizeNS;
 				var dragDelta = Input.MousePosition.Y - initialMousePosition.Y;
 				AdjustStretchDelta(initialHeights[index], Nodes[index].AsWidget, ref dragDelta);
 				dragDelta = -dragDelta;

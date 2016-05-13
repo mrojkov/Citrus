@@ -30,6 +30,11 @@ namespace Lime
 		public Node NodeUnderCursor { get; set; }
 		public Widget Root { get; private set; }
 
+		/// <summary>
+		/// Gets or sets the mouse cursor. The WindowWidget resets mouse cursor to the default value in the beginning of every update cycle.
+		/// </summary>
+		public MouseCursor MouseCursor { get; set; }
+
 		public WidgetContext(Widget root) : base("Current")
 		{
 			Root = root;

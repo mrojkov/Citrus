@@ -51,9 +51,10 @@ namespace Lime
 		private IEnumerator<object> MainTask()
 		{
 			while (true) {
-				if (Input.WasMousePressed()) {
-					int index;
-					if (FindSeparatorUnderMouse(out index)) {
+				int index;
+				if (FindSeparatorUnderMouse(out index)) {
+					WidgetContext.Current.MouseCursor = MouseCursor.SizeWE;
+					if (Input.WasMousePressed()) {
 						yield return DragSeparatorTask(index);
 					}
 				}
@@ -66,8 +67,9 @@ namespace Lime
 			RaiseDragStarted();
 			var initialMousePosition = Input.MousePosition;
 			var initialWidths = Nodes.Select(i => i.AsWidget.Width).ToList();
-			Input.CaptureMouse();
+			Input.CaptureMouseExclusive();
 			while (Input.IsMousePressed()) {
+				WidgetContext.Current.MouseCursor = MouseCursor.SizeWE;
 				var dragDelta = Input.MousePosition.X - initialMousePosition.X;
 				AdjustStretchDelta(initialWidths[index], Nodes[index].AsWidget, ref dragDelta);
 				dragDelta = -dragDelta;
@@ -100,7 +102,7 @@ namespace Lime
 				var widget = Nodes[i + 1].AsWidget;
 				var p = widget.GlobalPosition;
 				if (Mathf.Abs(Input.MousePosition.X - (p.X - SeparatorWidth * 0.5f)) < SeparatorActiveAreaWidth * 0.5f) {
-					if (Input.MousePosition.X > p.Y && Input.MousePosition.Y < p.Y + widget.Height) {
+					if (Input.MousePosition.Y > p.Y && Input.MousePosition.Y < p.Y + widget.Height) {
 						index = i;
 						return true;
 					}
