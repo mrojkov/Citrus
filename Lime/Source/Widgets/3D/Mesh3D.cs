@@ -25,6 +25,7 @@ namespace Lime
 		[ProtoMember(4)]
 		public List<Matrix44> BoneBindPoseInverses { get; private set; }
 
+		public CullMode CullMode { get; set; }
 		public bool ZTestEnabled { get; set; }
 		public bool ZWriteEnabled { get; set; }
 		public bool SkipRender { get; set; }
@@ -36,6 +37,7 @@ namespace Lime
 			BoneBindPoseInverses = new List<Matrix44>();
 			ZTestEnabled = true;
 			ZWriteEnabled = true;
+			CullMode = CullMode.CullClockwise;
 		}
 
 		[ProtoAfterDeserialization]
@@ -243,6 +245,7 @@ namespace Lime
 		{
 			Renderer.ZTestEnabled = ModelMesh.ZTestEnabled;
 			Renderer.ZWriteEnabled = ModelMesh.ZWriteEnabled;
+			Renderer.CullMode = ModelMesh.CullMode;
 			var materialExternals = new MaterialExternals {
 				WorldViewProj = ModelMesh.WorldViewProj,
 				ColorFactor = ModelMesh.GlobalColor
