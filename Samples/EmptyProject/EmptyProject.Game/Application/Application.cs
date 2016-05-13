@@ -36,7 +36,7 @@ namespace EmptyProject.Application
 		private void CreateWindow()
 		{
 			var options = new WindowOptions {Title = ApplicationName};
-			World = new WindowWidget(new Window(options)) {Layer = Widget.MaxLayer};
+			World = new WindowWidget(new Window(options)) {Layer = RenderChain.LayerCount - 1};
 			World.Window.Updating += OnUpdateFrame;
 			World.Window.Rendering += OnRenderFrame;
 			World.Window.Resized += OnResize;
@@ -80,7 +80,7 @@ namespace EmptyProject.Application
 			lock (uiSync) {
 				Renderer.BeginFrame();
 				SetupViewportAndProjectionMatrix();
-				World.Render();
+				World.RenderAll();
 				Renderer.EndFrame();
 			}
 		}
