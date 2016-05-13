@@ -79,14 +79,11 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.iOS" />
-    <Reference Include="OpenTK">
-      <HintPath>..\..\Citrus\3rdParty\OpenTK\OpenTK.dll</HintPath>
+    <Reference Include="Serializer">
+      <HintPath>..\Serializer.dll</HintPath>
     </Reference>
     <Reference Include="protobuf-net">
       <HintPath>..\..\Citrus\3rdParty\ProtoBuf-Net\iOS\protobuf-net.dll</HintPath>
-    </Reference>
-    <Reference Include="Serializer">
-      <HintPath>..\Serializer.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
