@@ -225,10 +225,9 @@
     <Compile Include="Source\Types\ObservableList.cs" />
     <Compile Include="Source\Graphics\VectorShape.cs" />
     <Compile Include="Source\Application\Menu\Menu.Win.cs" />
-    <Compile Include="Source\Application\MouseCursor\CursorCollection.Mac.cs" />
-    <Compile Include="Source\Application\MouseCursor\CursorCollection.Null.cs" />
-    <Compile Include="Source\Application\MouseCursor\CursorCollection.Win.cs" />
-    <Compile Include="Source\Application\MouseCursor\ICursorCollection.cs" />
+    <Compile Include="Source\Application\MouseCursor\StockCursors.Mac.cs" />
+    <Compile Include="Source\Application\MouseCursor\StockCursors.Null.cs" />
+    <Compile Include="Source\Application\MouseCursor\IStockCursors.cs" />
     <Compile Include="Source\Application\MouseCursor\MouseCursor.cs" />
     <Compile Include="Source\Application\MouseCursor\MouseCursor.Mac.cs" />
     <Compile Include="Source\Application\MouseCursor\MouseCursor.Win.cs" />
@@ -265,6 +264,7 @@
     <Compile Include="Source\Types\MonoMac\CG.cs" />
     <Compile Include="Source\Widgets\3D\Spline3D.cs" />
     <Compile Include="Source\Widgets\Layout\ScrollableLayout.cs" />
+    <Compile Include="Source\Application\MouseCursor\MouseCursor.Null.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
