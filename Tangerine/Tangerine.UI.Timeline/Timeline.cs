@@ -28,7 +28,6 @@ namespace Tangerine.UI.Timeline
 		public readonly List<Row> Rows = new List<Row>();
 		public readonly List<Row> SelectedRows = new List<Row>();
 		public readonly Entity Globals = new Entity();
-		public readonly TaskList Tasks = new TaskList();
 
 		public static void Initialize(Widget rootWidget)
 		{
@@ -38,7 +37,7 @@ namespace Tangerine.UI.Timeline
 		private Timeline(Widget rootWidget)
 		{
 			RootWidget = rootWidget;
-			RootWidget.Updating += Update;
+			RootWidget.Updating += delta => Document.Current.History.Commit();
 			Focus = new KeyboardFocusController(RootWidget);
 			CreateTasks();
 			InitializeWidgets();
@@ -75,31 +74,29 @@ namespace Tangerine.UI.Timeline
 
 		void CreateTasks()
 		{
-			Tasks.Add(new BuildRowsTask().Main());
-			Tasks.Add(new RefreshColumnCountTask().Main());
-			Tasks.Add(new BuildRowViewsTask().Main());
-			Tasks.Add(new ProcessRollWidgetsTask().Main());
-			Tasks.Add(new ProcessGridWidgetsTask().Main());
-			Tasks.Add(new ProcessOverviewWidgetsTask().Main());
-			Tasks.Add(new KeyboardShortcutsTask().Main());
-			Tasks.Add(new OverviewScrollTask().Main());
-			Tasks.Add(new MouseWheelTask().Main());
-			// Grid specific tasks
-			Tasks.Add(new ResizeGridCurveViewTask().Main());
-			Tasks.Add(new GridMouseScrollTask().Main());
-			Tasks.Add(new RollMouseScrollTask().Main());
-			Tasks.Add(new SelectAndDragKeyframesTask().Main());
-			Tasks.Add(new HasKeyframeRespondentTask().Main());
-			Tasks.Add(new DragKeyframesRespondentTask().Main());
-			// Roll specific tasks
-			Tasks.Add(new SelectAndDragRowsTask().Main());
-			Tasks.Add(new ClampScrollOriginTask().Main());
-		}
-
-		void Update(float delta)
-		{
-			Tasks.Update(delta);
-			Document.Current.History.Commit();
+			// Rule of thumb: the code which is interacts with a widget, should be placed into the widget's TaskList.
+			// That help us to avoid bugs with HitTest and MouseCapture order.
+			var tasks = RootWidget.Tasks;
+			var gridTasks = Grid.RootWidget.Tasks;
+			var rollTasks = Roll.RootWidget.Tasks;
+			var overviewTasks = Overview.RootWidget.Tasks;
+			tasks.Add(new BuildRowsTask().Main());
+			tasks.Add(new RefreshColumnCountTask().Main());
+			tasks.Add(new BuildRowViewsTask().Main());
+			tasks.Add(new ProcessRollWidgetsTask().Main());
+			tasks.Add(new ProcessGridWidgetsTask().Main());
+			tasks.Add(new ProcessOverviewWidgetsTask().Main());
+			tasks.Add(new KeyboardShortcutsTask().Main());
+			overviewTasks.Add(new OverviewScrollTask().Main());
+			tasks.Add(new MouseWheelTask().Main());
+			gridTasks.Add(new ResizeGridCurveViewTask().Main());
+			gridTasks.Add(new GridMouseScrollTask().Main());
+			rollTasks.Add(new RollMouseScrollTask().Main());
+			gridTasks.Add(new SelectAndDragKeyframesTask().Main());
+			gridTasks.Add(new HasKeyframeRespondentTask().Main());
+			gridTasks.Add(new DragKeyframesRespondentTask().Main());
+			rollTasks.Add(new SelectAndDragRowsTask().Main());
+			rollTasks.Add(new ClampScrollOriginTask().Main());
 		}
 
 		IEnumerable<Node> ISelectedNodesProvider.Get()
