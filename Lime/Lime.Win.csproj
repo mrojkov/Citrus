@@ -69,8 +69,6 @@
     <Compile Include="Source\Application\CommonWindow.cs" />
     <Compile Include="Source\Application\DummyWindow.cs" />
     <Compile Include="Source\Application\Menu\Menu.Win.cs" />
-    <Compile Include="Source\Application\MouseCursor\CursorCollection.Null.cs" />
-    <Compile Include="Source\Application\MouseCursor\ICursorCollection.cs" />
     <Compile Include="Source\Application\MouseCursor\MouseCursor.cs" />
     <Compile Include="Source\Application\FileDialog\FileDialog.cs" />
     <Compile Include="Source\Application\FileDialog\FileDialog.Mac.cs" />
@@ -81,8 +79,6 @@
     <Compile Include="Source\Application\MouseCursor\MouseCursor.Mac.cs" />
     <Compile Include="Source\Application\MouseCursor\MouseCursor.Win.cs" />
     <Compile Include="Source\Application\MouseCursor\MouseCursor.Null.cs" />
-    <Compile Include="Source\Application\MouseCursor\CursorCollection.Mac.cs" />
-    <Compile Include="Source\Application\MouseCursor\CursorCollection.Win.cs" />
     <Compile Include="Source\Application\RenderingBackend.cs" />
     <Compile Include="Source\Application\Window.Android.cs" />
     <Compile Include="Source\Application\Window.iOS.cs" />
@@ -331,6 +327,11 @@
     <Compile Include="Source\Graphics\Unity\MovieTexture.cs" />
     <Compile Include="Source\Types\MonoMac\CG.cs" />
     <Compile Include="Source\Widgets\Layout\StackLayout.cs" />
+    <Compile Include="Source\Application\MouseCursor\IStockCursors.cs" />
+    <Compile Include="Source\Application\MouseCursor\StockCursors.Mac.cs" />
+    <Compile Include="Source\Application\MouseCursor\StockCursors.Null.cs" />
+    <Compile Include="Source\Application\MouseCursor\StockCursors.Win.cs" />
+    <Compile Include="Source\Widgets\Layout\ScrollableLayout.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">

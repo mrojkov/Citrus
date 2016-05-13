@@ -1,5 +1,4 @@
-﻿using System;
-#if WIN
+﻿#if WIN
 using NativeCursor = System.Windows.Forms.Cursor;
 #elif MAC || MONOMAC
 using NativeCursor = AppKit.NSCursor;
