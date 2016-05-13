@@ -3,14 +3,19 @@ using System;
 
 namespace Lime
 {
-	public class MouseCursorImplementation
+	internal class MouseCursorImplementation
 	{
 		public MouseCursorImplementation(Bitmap bitmap, IntVector2 hotSpot)
 		{
 			throw new NotImplementedException();
 		}
 
-		public object NativeCursor { get; private set; }
+		public MouseCursorImplementation(AppKit.NSCursor nativeCursor)
+		{
+			NativeCursor = nativeCursor;
+		}
+
+		public AppKit.NSCursor NativeCursor { get; private set; }
 	}
 }
 #endif

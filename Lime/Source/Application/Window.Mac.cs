@@ -139,8 +139,17 @@ namespace Lime
 
 		public NSGameView NSGameView { get { return View; } }
 
-		public MouseCursor Cursor { get; set; }
-
+		private MouseCursor cursor;
+		public MouseCursor Cursor
+		{
+			get { return cursor; }
+			set
+			{
+				cursor = value;
+				value.NativeCursor.Set();
+			}
+		}
+		
 		public float FPS { get { return fpsCounter.FPS; } }
 
 		[Obsolete("Use FPS property instead", true)]
