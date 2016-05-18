@@ -178,10 +178,9 @@ namespace Lime
 		{
 			WidgetContext.Current.ActiveTextWidget = textInputProcessor;
 			WidgetContext.Current.IsActiveTextWidgetUpdated = true;
-			Container.Input.CaptureKeyboard();
 		}
 
-		public bool IsFocused() { return WidgetContext.Current.ActiveTextWidget == textInputProcessor && Container.GloballyVisible; }
+		public bool IsFocused() { return WidgetContext.Current.ActiveTextWidget == textInputProcessor; }
 
 		private bool CheckKeyRepeated(Key key)
 		{
