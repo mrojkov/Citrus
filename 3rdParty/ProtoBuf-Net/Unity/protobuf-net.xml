@@ -177,14 +177,6 @@
             may be re-used (and thus re-assigned) unexpectedly.
             </summary>
         </member>
-        <member name="T:ProtoBuf.ProtoConverterAttribute">
-            <summary>
-            Indicates that a static member should be considered the same as though
-            were an implicit / explicit conversion operator; in particular, this
-            is useful for conversions that operator syntax does not allow, such as
-            to/from interface types.
-            </summary>
-        </member>
         <member name="T:ProtoBuf.DataFormat">
             <summary>
             Sub-format to use when serializing/deserializing data

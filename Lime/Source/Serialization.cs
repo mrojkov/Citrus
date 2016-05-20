@@ -20,12 +20,12 @@ namespace Lime
 			public string SerializationPath;
 		}
 		
-#if iOS
+#if iOS || ANDROID
 		public static ProtoBuf.Meta.TypeModel Serializer = null;
 #else
 		public static ProtoBuf.Meta.TypeModel Serializer = CreateSerializer();
 #endif
-#if !iOS
+#if !iOS && !ANDROID
 		public static ProtoBuf.Meta.RuntimeTypeModel CreateSerializer()
 		{
 			var model = ProtoBuf.Meta.RuntimeTypeModel.Create();
