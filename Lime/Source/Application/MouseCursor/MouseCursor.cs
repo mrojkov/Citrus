@@ -1,7 +1,9 @@
 ﻿#if WIN
 using NativeCursor = System.Windows.Forms.Cursor;
-#elif MAC || MONOMAC
+#elif MAC
 using NativeCursor = AppKit.NSCursor;
+#elif MONOMAC
+using NativeCursor = MonoMac.AppKit.NSCursor;
 #elif ANDROID || iOS || UNITY
 using NativeCursor = System.Object;
 #endif

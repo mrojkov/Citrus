@@ -1,6 +1,12 @@
 ﻿#if MAC || MONOMAC
 using System;
 
+#if MAC
+using AppKit;
+#else
+using MonoMac.AppKit;
+#endif
+
 namespace Lime
 {
 	internal class MouseCursorImplementation
@@ -10,12 +16,12 @@ namespace Lime
 			throw new NotImplementedException();
 		}
 
-		public MouseCursorImplementation(AppKit.NSCursor nativeCursor)
+		public MouseCursorImplementation(NSCursor nativeCursor)
 		{
 			NativeCursor = nativeCursor;
 		}
 
-		public AppKit.NSCursor NativeCursor { get; private set; }
+		public NSCursor NativeCursor { get; private set; }
 	}
 }
 #endif
