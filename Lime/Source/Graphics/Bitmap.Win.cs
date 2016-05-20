@@ -36,6 +36,7 @@ namespace Lime
 		private BitmapImplementation(SD.Bitmap bitmap)
 		{
 			Bitmap = bitmap;
+			HasAlpha = SD.Image.IsAlphaPixelFormat(Bitmap.PixelFormat) && IsReallyHasAlpha(Bitmap);
 		}
 
 		public SD.Bitmap Bitmap { get; private set; }
