@@ -30,6 +30,11 @@ namespace Lime
 #elif MAC || MONOMAC
 			Bitmap = CocoaBitmap.FromStream(stream);
 #endif
+			var alphaInfo = Bitmap.CGImage.AlphaInfo;
+			HasAlpha =
+				alphaInfo != CGImageAlphaInfo.None &&
+				alphaInfo != CGImageAlphaInfo.NoneSkipFirst &&
+				alphaInfo != CGImageAlphaInfo.NoneSkipLast;
 		}
 
 		public BitmapImplementation(Color4[] pixels, int width, int height)
@@ -61,12 +66,13 @@ namespace Lime
 #elif MAC || MONOMAC
 			Bitmap = new CocoaBitmap(img, new CGSize(width, height));
 #endif
-
+			HasAlpha = alphaInfo == CGBitmapFlags.Last;
 		}
 
 		private BitmapImplementation(CocoaBitmap bitmap)
 		{
 			Bitmap = bitmap;
+			HasAlpha = Lime.Bitmap.AnyAlpha(GetPixels());
 		}
 
 		public CocoaBitmap Bitmap { get; private set; }
@@ -88,13 +94,7 @@ namespace Lime
 
 		public bool HasAlpha
 		{
-			get
-			{
-				var alphaInfo = Bitmap.CGImage.AlphaInfo;
-				return alphaInfo != CGImageAlphaInfo.None &&
-					alphaInfo != CGImageAlphaInfo.NoneSkipFirst &&
-					alphaInfo != CGImageAlphaInfo.NoneSkipLast;
-			}
+			get; private set;
 		}
 
 		public IBitmapImplementation Clone()
