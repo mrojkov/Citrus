@@ -6,7 +6,6 @@ using MonoTouch;
 using UIKit;
 #elif ANDROID
 using Android.Content;
-using Android.App;
 #elif MAC
 using AppKit;
 #endif
@@ -18,7 +17,7 @@ namespace Lime
 	/// </summary>
 	public static class Environment
 	{
-#if !iOS && !UNITY
+#if !iOS && !ANDROID && !UNITY
 		/// <summary>
 		/// Создает Serializer.dll. Этот метод не должен вызываться в игровом цикле.
 		/// Он должен вызываться, только если приложение запущено с параметром --GenerateSerializationAssembly.
