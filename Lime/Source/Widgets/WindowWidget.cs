@@ -52,16 +52,17 @@ namespace Lime
 			}
 			Window.Cursor = context.MouseCursor;
 			LayoutManager.Instance.Layout();
+			renderChain.Clear();
+			AddContentsToRenderChain(renderChain);
+			var hitTestArgs = new HitTestArgs(Window.Input.MousePosition);
+			renderChain.HitTest(ref hitTestArgs);
+			context.NodeUnderMouse = hitTestArgs.Node;
 		}
 
 		public void RenderAll()
 		{
 			SetViewport();
-			var context = WidgetContext.Current;
-			context.NodeUnderCursor = null;
-			context.DistanceToNodeUnderCursor = float.MaxValue;
-			AddContentsToRenderChain(renderChain);
-			renderChain.RenderAndClear();
+			renderChain.Render();
 		}
 
 		public void SetViewport()

@@ -137,20 +137,14 @@ namespace Lime
 			}
 		}
 
-		protected override bool SelfHitTest(Vector2 point)
+		internal protected override bool PartialHitTestByContents (ref HitTestArgs args)
 		{
-			if (!GloballyVisible || !InsideClipRect(point)) {
-				return false;
+			BuildLayout(layout);
+			for (int i = 0; i < layout.Length; i++) {
+				if (PartHitTest(layout[i], args.Point))
+					return true;
 			}
-			if (HitTestMethod == HitTestMethod.Contents) {
-				BuildLayout(layout);
-				for (int i = 0; i < layout.Length; i++) {
-					if (PartHitTest(layout[i], point))
-						return true;
-				}
-				return false;
-			}
-			return base.SelfHitTest(point);
+			return false;
 		}
 
 		bool PartHitTest(Part part, Vector2 point)

@@ -154,17 +154,17 @@ namespace Lime
 
 		public bool IsMousePressed(int button = 0)
 		{
-			return IsAcceptingMouse() && WindowInput.IsMousePressed(button);
+			return WindowInput.IsMousePressed(button) && IsAcceptingMouse();
 		}
 
 		public bool WasMousePressed(int button = 0)
 		{
-			return IsAcceptingMouse() && WindowInput.WasMousePressed(button);
+			return WindowInput.WasMousePressed(button) && IsAcceptingMouse();
 		}
 
 		public bool WasMouseReleased(int button = 0)
 		{
-			return IsAcceptingMouse() && WindowInput.WasMouseReleased(button);
+			return WindowInput.WasMouseReleased(button) && IsAcceptingMouse();
 		}
 
 		public float WheelScrollAmount
@@ -174,7 +174,7 @@ namespace Lime
 
 		public bool IsKeyPressed(Key key)
 		{
-			return IsAcceptingDeviceWithKey(key) && WindowInput.IsKeyPressed(key);
+			return WindowInput.IsKeyPressed(key) && IsAcceptingDeviceWithKey(key);
 		}
 
 		/// <summary>
@@ -194,17 +194,17 @@ namespace Lime
 
 		public bool WasKeyPressed(Key key)
 		{
-			return IsAcceptingDeviceWithKey(key) && WindowInput.WasKeyPressed(key);
+			return WindowInput.WasKeyPressed(key) && IsAcceptingDeviceWithKey(key);
 		}
 
 		public bool WasKeyReleased(Key key)
 		{
-			return IsAcceptingDeviceWithKey(key) && WindowInput.WasKeyReleased(key);
+			return WindowInput.WasKeyReleased(key) && IsAcceptingDeviceWithKey(key);
 		}
 
 		public bool WasKeyRepeated(Key key)
 		{
-			return IsAcceptingDeviceWithKey(key) && WindowInput.WasKeyRepeated(key);
+			return WindowInput.WasKeyRepeated(key) && IsAcceptingDeviceWithKey(key);
 		}
 
 		private bool IsAcceptingDeviceWithKey(Key key)
@@ -213,6 +213,8 @@ namespace Lime
 				case Key.Mouse0:
 				case Key.Mouse1:
 				case Key.Mouse2:
+				case Key.Mouse0DoubleClick:
+				case Key.Mouse1DoubleClick:
 					return IsAcceptingMouse();
 				case Key.Touch0:
 				case Key.Touch1:

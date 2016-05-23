@@ -84,7 +84,7 @@ namespace Lime
 			if (invalidBones) {
 				var success = false;
 				Node skeletonRoot = this;
-				while (skeletonRoot != null && skeletonRoot.AsModelNode != null) {
+				while (skeletonRoot != null && skeletonRoot.AsNode3D != null) {
 					var i = 0;
 					while (i < Bones.Count) {
 						var validBone = skeletonRoot.TryFind<Node3D>(Bones[i].Id);
@@ -107,38 +107,20 @@ namespace Lime
 			}
 		}
 
-		public override MeshHitTestResult HitTest(Ray ray)
+		internal protected override bool PartialHitTest (ref HitTestArgs args)
 		{
-			var result = base.HitTest(ray);
-			//var sphereInWorldSpace = BoundingSphere;
-			//sphereInWorldSpace.Center *= GlobalTransform;
-			//Vector3 scale = GlobalTransform.Scale;
-			//sphereInWorldSpace.Radius *= Math.Max(Math.Abs(scale.X), Math.Max(Math.Abs(scale.Y), Math.Abs(scale.Z)));
-
-			float? d = null;
-			if (HitTestTarget) {
-				var sphereInWorldSpace = BoundingSphere.CreateFromPoints(Submeshes.SelectMany(sm => sm.ReadOnlyGeometry.Vertices).Select(v => v * GlobalTransform));
-				//sphereInWorldSpace = sphereInWorldSpace.Transform(GlobalTransform);
-				d = ray.Intersects(sphereInWorldSpace);
-			}
-			if (d.HasValue && d.Value < result.Distance) {
-				result = new MeshHitTestResult() { Distance = d.Value, Mesh = this };
-			}
-			return result;
-		}
-
-		internal override bool PerformHitTest(Ray ray, float distanceToNearNode, out float distance)
-		{
-			distance = default(float);
+			float distance;
 			if (!HitTestTarget) {
 				return false;
 			}
-			if (!HitTestBoundingSphere(ray, out distance) || distance > distanceToNearNode) {
+			if (!HitTestBoundingSphere(args.Ray, out distance) || distance > args.Distance) {
 				return false;
 			}
-			if (!HitTestGeometry(ray, out distance) || distance > distanceToNearNode) {
+			if (!HitTestGeometry(args.Ray, out distance) || distance > args.Distance) {
 				return false;
 			}
+			args.Node = this;
+			args.Distance = distance;
 			return true;
 		}
 

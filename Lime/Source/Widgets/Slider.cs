@@ -42,7 +42,7 @@ namespace Lime
 
 		public Slider()
 		{
-			HitTestMask = ControlsHitTestMask;
+			HitTestTarget = true;
 			RangeMin = 0;
 			RangeMax = 100;
 			Value = 0;
@@ -60,7 +60,7 @@ namespace Lime
 			if (thumb == null) {
 				thumb = Nodes.TryFind(name) as Widget;
 				if (thumb != null)
-					thumb.HitTestMask = ControlsHitTestMask;
+					thumb.HitTestTarget = true;
 			}
 			return thumb;
 		}

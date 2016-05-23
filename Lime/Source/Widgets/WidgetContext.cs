@@ -25,10 +25,9 @@ namespace Lime
 		/// On each update cycle active text widget must set this flag true.
 		/// </summary>
 		public bool IsActiveTextWidgetUpdated { get; set; }
-		public float DistanceToNodeUnderCursor { get; set; }
-		public Ray CursorRay { get; set; }
-		public Node NodeUnderCursor { get; set; }
 		public Widget Root { get; private set; }
+
+		public Node NodeUnderMouse { get; internal set; }
 
 		/// <summary>
 		/// Gets or sets the mouse cursor. The WindowWidget resets mouse cursor to the default value in the beginning of every update cycle.
