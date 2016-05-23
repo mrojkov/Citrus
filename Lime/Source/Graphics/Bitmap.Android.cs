@@ -31,6 +31,7 @@ namespace Lime
 		private BitmapImplementation(AndroidBitmap bitmap)
 		{
 			Bitmap = bitmap;
+			Bitmap.HasAlpha = Lime.Bitmap.AnyAlpha(GetPixels());
 		}
 
 		public AndroidBitmap Bitmap { get; private set; }
