@@ -336,11 +336,10 @@ namespace Lime
 				reader.Close();
 			if (stream != null)
 				stream.Close();
-			reader = null;
-			writer = null;
-			stream = null;
 			index.Clear();
-			streamPool.Clear();
+			while (streamPool.Count > 0) {
+				streamPool.Pop().Dispose();
+			}
 		}
 
 		/// <summary>
