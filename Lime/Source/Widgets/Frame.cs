@@ -53,8 +53,6 @@ namespace Lime
 	[ProtoContract]
 	public class Frame : Widget, IImageCombinerArg
 	{
-		public event Action Rendered;
-
 		public ClipMethod ClipChildren { get; set; }
 
 		public Widget ClipByWidget { get; set; }
@@ -87,15 +85,6 @@ namespace Lime
 			LoadFromBundle(path);
 		}
 
-		protected override Widget GetEffectiveClipperWidget()
-		{
-			if (ClipChildren != ClipMethod.None) {
-				return ClipByWidget ?? this;
-			} else {
-				return base.GetEffectiveClipperWidget();
-			}
-		}
-
 		private void SetRenderTarget(RenderTarget value)
 		{
 			renderTarget = value;
@@ -116,10 +105,6 @@ namespace Lime
 			} else if (ClipChildren == ClipMethod.ScissorTest) {
 				RenderWithScissorTest();
 			}
-			if (Rendered != null) {
-				Renderer.Transform1 = LocalToWorldTransform;
-				Rendered();
-			}
 		}
 
 		private RenderChain renderChain;
@@ -138,9 +123,6 @@ namespace Lime
 			Renderer.ScissorRectangle = rect;
 			try {
 				EnsureRenderChain();
-				if (renderChain == null) {
-					renderChain = new RenderChain();
-				}
 				foreach (var node in Nodes) {
 					node.AddToRenderChain(renderChain);
 				}
@@ -148,6 +130,29 @@ namespace Lime
 			} finally {
 				Renderer.ScissorTestEnabled = savedScissorTest;
 				Renderer.ScissorRectangle = savedScissorRect;
+			}
+		}
+
+		internal protected override bool PartialHitTest(ref HitTestArgs args)
+		{
+			if (ClipChildren == ClipMethod.ScissorTest) {
+				EnsureRenderChain();
+				var savedClipperWidget = args.ClipperWidget;
+				try {
+					args.ClipperWidget = ClipByWidget ?? this;
+					foreach (var node in Nodes) {
+						node.AddToRenderChain(renderChain);
+					}
+					if (renderChain.HitTest(ref args)) {
+						return true;
+					}
+					return base.PartialHitTest(ref args);
+				} finally {
+					renderChain.Clear();
+					args.ClipperWidget = savedClipperWidget;
+				}
+			} else {
+				return base.PartialHitTest(ref args);
 			}
 		}
 

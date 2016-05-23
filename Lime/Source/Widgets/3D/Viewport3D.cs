@@ -24,6 +24,7 @@ namespace Lime
 		private List<IRenderObject3D> renderQueue;
 		private List<Mesh3D> modelMeshes;
 		private bool zSortEnabled;
+		private RenderChain renderChain = new RenderChain();
 
 		public bool ZSortEnabled
 		{
@@ -108,13 +109,23 @@ namespace Lime
 			}
 		}
 
+		internal protected override bool PartialHitTest(ref HitTestArgs args)
+		{
+			try {
+				args.Ray = ViewportPointToRay(args.Point);
+				foreach (var node in Nodes) {
+					node.AddToRenderChain(renderChain);
+				}
+				return renderChain.HitTest(ref args);
+			} finally {
+				renderChain.Clear();
+			}
+		}
+
 		public override void Render()
 		{
-			WidgetContext.Current.CursorRay = ScreenPointToRay(Window.Current.Input.MousePosition);
-			var hitProcessor = new HitProcessor();
-			var chain = new RenderChain(hitProcessor);
 			foreach (var node in Nodes) {
-				node.AddToRenderChain(chain);
+				node.AddToRenderChain(renderChain);
 			}
 			var oldCullMode = Renderer.CullMode;
 			var oldZTestEnabled = Renderer.ZTestEnabled;
@@ -129,7 +140,7 @@ namespace Lime
 #endif
 			if (ZSortEnabled) {
 				for (int i = 0; i < RenderChain.LayerCount; i++) {
-					var layer = chain.Layers[i];
+					var layer = renderChain.Layers[i];
 					if (layer == null || layer.Count == 0) {
 						continue;
 					}
@@ -138,7 +149,6 @@ namespace Lime
 					foreach (var t in layer) {
 						var mm = t.Node as Mesh3D;
 						if (mm != null) {
-							hitProcessor.PerformHitTest(t.Node, t.Presenter);
 							if (!mm.SkipRender) {
 								modelMeshes.Add(mm);
 								foreach (var sm in mm.Submeshes) {
@@ -148,7 +158,6 @@ namespace Lime
 						}
 						var wa = t.Node as WidgetAdapter3D;
 						if (wa != null) {
-							hitProcessor.PerformHitTest(t.Node, t.Presenter);
 							renderQueue.Add(wa);
 						}
 					}
@@ -160,9 +169,9 @@ namespace Lime
 						sm.Render();
 					}
 				}
-				chain.Clear();
+				renderChain.Clear();
 			} else {
-				chain.RenderAndClear();
+				renderChain.RenderAndClear();
 			}
 #if UNITY
 			MaterialFactory.ThreeDimensionalRendering = false;
@@ -248,19 +257,6 @@ namespace Lime
 			var zFar = Camera.FarClipPlane;
 			var z = (pt.Z * (zFar + zNear) + 2f * zFar * zNear) / (pt.Z * (zFar - zNear));
 			return new Vector3(xy, z) * new Vector3(1, -1, 1);
-		}
-
-		private class HitProcessor : IHitProcessor
-		{
-			public void PerformHitTest(Node node, IPresenter presenter)
-			{
-				float distance;
-				var context = WidgetContext.Current;
-				if (node.AsModelNode.PerformHitTest(context.CursorRay, context.DistanceToNodeUnderCursor, out distance)) {
-					context.NodeUnderCursor = node;
-					context.DistanceToNodeUnderCursor = distance;
-				}
-			}
 		}
 	}
 }

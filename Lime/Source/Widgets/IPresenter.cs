@@ -5,7 +5,7 @@ namespace Lime
 	public interface IPresenter
 	{
 		void Render(Node node);
-		bool PerformHitTest(Node node, Vector2 point);
+		bool PartialHitTest(Node node, ref HitTestArgs args);
 		IPresenter Clone();
 	}
 
@@ -18,9 +18,9 @@ namespace Lime
 			node.Render();
 		}
 
-		public bool PerformHitTest(Node node, Vector2 point)
+		public bool PartialHitTest(Node node, ref HitTestArgs args)
 		{
-			return node.PerformHitTest(point);
+			return node.PartialHitTest(ref args);
 		}
 
 		public IPresenter Clone()
@@ -47,9 +47,9 @@ namespace Lime
 			}
 		}
 
-		public virtual bool PerformHitTest(Node node, Vector2 point)
+		public virtual bool PartialHitTest(Node node, ref HitTestArgs args)
 		{
-			return previous != null && previous.PerformHitTest(node, point);
+			return previous != null && previous.PartialHitTest(node, ref args);
 		}
 
 		public virtual IPresenter Clone()

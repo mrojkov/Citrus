@@ -81,6 +81,7 @@ namespace Lime
 			this.ScrollDirection = scrollDirection;
 			RejectOrtogonalSwipes = true;
 			Frame = frame;
+			Frame.HitTestTarget = true;
 			Frame.ClipChildren = ClipMethod.ScissorTest;
 			CanScroll = true;
 			Content = new ScrollViewContentWidget() { ScrollDirection = ScrollDirection };
@@ -260,7 +261,7 @@ namespace Lime
 				var IsScrollingByMouseWheel =
 					!Frame.Input.IsMousePressed() &&
 					(Frame.Input.WasKeyPressed(Key.MouseWheelDown) || Frame.Input.WasKeyPressed(Key.MouseWheelUp)) &&
-					(CanScroll && Frame.HitTest(Frame.Input.MousePosition));
+					(CanScroll && Frame.IsMouseOver());
 				if (IsScrollingByMouseWheel) {
 					var newWheelScrollState = (WheelScrollState)Math.Sign(Frame.Input.WheelScrollAmount);
 					if (newWheelScrollState != wheelScrollState) {
@@ -303,28 +304,22 @@ namespace Lime
 
 		private IEnumerator<object> InertialScrollingTask(float velocity)
 		{
-			var oldMask = Frame.HitTestMask;
-			Frame.HitTestMask = Widget.ControlsHitTestMask;
-			try {
-				while (true) {
-					var delta = Task.Current.Delta;
-					float damping = ScrollPosition.InRange(MinScrollPosition, MaxScrollPosition) ? 2.0f : 20.0f;
-					velocity -= velocity * damping * delta;
-					if (velocity.Abs() < 40.0f) {
-						break;
-					}
-					// Round scrolling position to prevent blurring
-					ScrollPosition = Mathf.Clamp(
-						value: (ScrollPosition + velocity * delta).Round(),
-						min: MinScrollPosition - MaxOverscroll,
-						max: MaxScrollPosition + MaxOverscroll
-					);
-					yield return null;
+			while (true) {
+				var delta = Task.Current.Delta;
+				float damping = ScrollPosition.InRange(MinScrollPosition, MaxScrollPosition) ? 2.0f : 20.0f;
+				velocity -= velocity * damping * delta;
+				if (velocity.Abs() < 40.0f) {
+					break;
 				}
-				scrollingTask = null;
-			} finally {
-				Frame.HitTestMask = oldMask;
+				// Round scrolling position to prevent blurring
+				ScrollPosition = Mathf.Clamp(
+					value: (ScrollPosition + velocity * delta).Round(),
+					min: MinScrollPosition - MaxOverscroll,
+					max: MaxScrollPosition + MaxOverscroll
+				);
+				yield return null;
 			}
+			scrollingTask = null;
 		}
 
 		private IEnumerator<object> HandleDragTask(VelocityMeter velocityMeter, float mouseProjectedPosition)

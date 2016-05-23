@@ -83,13 +83,12 @@ namespace Lime
 
 		public bool IsMouseOver()
 		{
-			return WidgetContext.Current.NodeUnderCursor == this ||
-				IsAncestorOf(WidgetContext.Current.NodeUnderCursor);
+			return WidgetContext.Current.NodeUnderMouse == this;
 		}
 
 		public Node3D()
 		{
-			AsModelNode = this;
+			AsNode3D = this;
 			scale = Vector3.One;
 			rotation = Quaternion.Identity;
 			visible = true;
@@ -100,8 +99,8 @@ namespace Lime
 		{
 			if (IsDirty(DirtyFlags.Transform)) {
 				globalTransform = CalcLocalTransform();
-				if (Parent != null && Parent.AsModelNode != null) {
-					globalTransform *= Parent.AsModelNode.GlobalTransform;
+				if (Parent != null && Parent.AsNode3D != null) {
+					globalTransform *= Parent.AsNode3D.GlobalTransform;
 				}
 			}
 			if (IsDirty(DirtyFlags.Visible | DirtyFlags.Color)) {
@@ -111,9 +110,9 @@ namespace Lime
 					if (Parent.AsWidget != null) {
 						globallyVisible &= Parent.AsWidget.GloballyVisible;
 						globalColor *= Parent.AsWidget.GlobalColor;
-					} else if (Parent.AsModelNode != null) {
-						globallyVisible &= Parent.AsModelNode.GloballyVisible;
-						globalColor *= Parent.AsModelNode.GlobalColor;
+					} else if (Parent.AsNode3D != null) {
+						globallyVisible &= Parent.AsNode3D.GloballyVisible;
+						globalColor *= Parent.AsNode3D.GlobalColor;
 					}
 				}
 			}
@@ -135,8 +134,8 @@ namespace Lime
 
 		public void SetGlobalTransform(Matrix44 transform)
 		{
-			if (Parent != null && Parent.AsModelNode != null) {
-				transform *= Parent.AsModelNode.GlobalTransform.CalcInverted();
+			if (Parent != null && Parent.AsNode3D != null) {
+				transform *= Parent.AsNode3D.GlobalTransform.CalcInverted();
 			}
 			SetLocalTransform(transform);
 		}
@@ -146,15 +145,6 @@ namespace Lime
 			if (!TrySetLocalTransform(transform)) {
 				throw new ArgumentException();
 			}
-		}
-
-		public MeshHitTestResult HitTest(Vector2 point)
-		{
-			var vp = GetViewport();
-			if (vp == null) {
-				throw new Lime.Exception("Viewport isn't set");
-			}
-			return HitTest(vp.ScreenPointToRay(point));
 		}
 
 		public Viewport3D GetViewport()
@@ -169,38 +159,8 @@ namespace Lime
 		public override Node DeepCloneFast()
 		{
 			var clone = base.DeepCloneFast() as Node3D;
-			clone.AsModelNode = clone;
+			clone.AsNode3D = clone;
 			return clone;
-		}
-
-		public struct MeshHitTestResult
-		{
-			public Mesh3D Mesh;
-			public float Distance;
-
-			public static readonly MeshHitTestResult Default = new MeshHitTestResult { Distance = float.MaxValue };
-		}
-
-		public virtual MeshHitTestResult HitTest(Ray ray)
-		{
-			var result = MeshHitTestResult.Default;
-			if (!GloballyVisible)
-				return result;
-			foreach (var node in Nodes) {
-				if (node.AsModelNode != null) {
-					var r = node.AsModelNode.HitTest(ray);
-					if (r.Distance < result.Distance) {
-						result = r;
-					}
-				}
-			}
-			return result;
-		}
-
-		internal virtual bool PerformHitTest(Ray ray, float distanceToNearNode, out float distance)
-		{
-			distance = default(float);
-			return false;
 		}
 
 		public Matrix44 CalcTransformInSpaceOf(Camera3D camera)

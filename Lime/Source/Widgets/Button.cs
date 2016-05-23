@@ -88,7 +88,6 @@ namespace Lime
 		public Button()
 		{
 			HitTestTarget = true;
-			HitTestMask = ControlsHitTestMask;
 			// On the current frame the button contents may not be loaded, 
 			// so delay its initialization until the next frame.
 			State = InitialState;

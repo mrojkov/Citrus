@@ -252,7 +252,6 @@
     <Compile Include="Source\Widgets\3D\WidgetAdapter3D.cs" />
     <Compile Include="Source\EnumExtensions.cs" />
     <Compile Include="Source\GeometryUtils.cs" />
-    <Compile Include="Source\IHitProcessor.cs" />
     <Compile Include="Source\Widgets\Layout\FlowLayout.cs" />
     <Compile Include="Source\Application\DummyWindow.cs" />
     <Compile Include="Source\Graphics\OpenGL\PlatformGeometryBuffer.cs" />

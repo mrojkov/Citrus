@@ -45,7 +45,7 @@ namespace Lime
 			var splitter = (Splitter)widget;
 			splitter.SeparatorColor = Colors.SeparatorColor;
 			splitter.SeparatorWidth = 2;
-			splitter.SeparatorActiveAreaWidth = 20;
+			splitter.SeparatorActiveAreaWidth = 10;
 		}
 
 		private void DecorateButton(Widget widget)

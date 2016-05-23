@@ -105,7 +105,7 @@ namespace Lime
 
 		public Widget AsWidget { get; internal set; }
 
-		public Node3D AsModelNode { get; internal set; }
+		public Node3D AsNode3D { get; internal set; }
 
 		/// <summary>
 		/// The presenter used for rendering and hit-testing the node.
@@ -843,8 +843,8 @@ namespace Lime
 			}
 			return candidates.FirstOrDefault();
 		}
-
-		internal virtual bool PerformHitTest(Vector2 point)
+			
+		internal protected virtual bool PartialHitTest(ref HitTestArgs args)
 		{
 			return false;
 		}
@@ -927,21 +927,6 @@ namespace Lime
 					current = null;
 				}
 			}
-		}
-
-		public bool IsAncestorOf(Node node)
-		{
-			if (node == null) {
-				return false;
-			}
-			var parent = node.Parent;
-			while (parent != null) {
-				if (parent == this) {
-					return true;
-				}
-				parent = parent.Parent;
-			}
-			return false;
 		}
 	}
 }
