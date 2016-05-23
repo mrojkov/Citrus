@@ -54,8 +54,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Citrus\3rdParty\OpenTK\OpenTK.dll</HintPath>
     </Reference>
-    <Reference Include="protobuf-net">
-      <HintPath>..\..\Citrus\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
+    <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Citrus\3rdParty\ProtoBuf-Net\win (full-net30)\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
