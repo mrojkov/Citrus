@@ -967,8 +967,8 @@ namespace Lime
 				}
 			} else if (HitTestMethod == HitTestMethod.Contents) {
 				for (Node p = this; p != null; p = p.Parent) {
-					var hm = p.AsWidget != null ? p.AsWidget.HitTestMethod : HitTestMethod.BoundingRect;
-					if (p != this && hm == HitTestMethod.BoundingRect || hm == HitTestMethod.Skip) {
+					var method = p.AsWidget != null ? p.AsWidget.HitTestMethod : HitTestMethod.BoundingRect;
+					if (p != this && method == HitTestMethod.BoundingRect || method == HitTestMethod.Skip) {
 						return false;
 					}
 					if (p.HitTestTarget && PartialHitTestByContents(ref args)) {
