@@ -130,11 +130,6 @@ namespace Lime
 			}
 		}
 
-		internal override bool PerformHitTest(Vector2 point)
-		{
-			return HitTestTarget && SelfHitTest(point);
-		}
-
 		public override void Render()
 		{
 			PrepareRendererState();
