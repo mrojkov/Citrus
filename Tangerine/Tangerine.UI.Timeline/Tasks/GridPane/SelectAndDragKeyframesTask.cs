@@ -18,7 +18,7 @@ namespace Tangerine.UI.Timeline
 		{
 			var input = grid.RootWidget.Input;
 			while (true) {
-				if (input.WasMousePressed() && grid.RootWidget.HitTest(input.MousePosition)) {
+				if (input.WasMousePressed() && grid.RootWidget.IsMouseOver()) {
 					var initialCell = MousePositionToCell(input.MousePosition);
 					input.CaptureMouse();
 					if (timeline.GridSelection.IsCellSelected(initialCell)) {
@@ -94,13 +94,13 @@ namespace Tangerine.UI.Timeline
 		IntVector2 MousePositionToCell(Vector2 position)
 		{
 			position -= grid.ContentWidget.GlobalPosition;
-			var r = new IntVector2((int)(position.X / Metrics.ColWidth), 0);
+			var r = new IntVector2((int)(position.X / Metrics.TimelineColWidth), 0);
 			if (position.Y >= grid.ContentSize.Y) {
 				r.Y = Math.Max(0, timeline.Rows.Count - 1);
 				return r;
 			}
 			foreach (var row in timeline.Rows) {
-				if (position.Y >= row.Top && position.Y < row.Bottom + Metrics.RowSpacing) {
+				if (position.Y >= row.Top && position.Y < row.Bottom + Metrics.TimelineRowSpacing) {
 					r.Y = row.Index;
 					break;
 				}

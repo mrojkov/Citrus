@@ -23,6 +23,7 @@ namespace Tangerine.UI.Timeline
 				LayoutCell = new LayoutCell { StretchY = 1 / 3f },
 				ClipChildren = ClipMethod.ScissorTest,
 				Layout = new ScrollableLayout(),
+				HitTestTarget = true,
 				Nodes = {
 					overlayWidget,
 					ContentWidget,

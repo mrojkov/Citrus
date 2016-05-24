@@ -28,15 +28,16 @@ namespace Tangerine.UI.Timeline.Components
 				Nodes = { expandButton }
 			};
 			widget = new Widget {				Padding = new Thickness { Left = 4, Right = 2 },
-				MinHeight = Metrics.DefaultRowHeight,				Layout = new HBoxLayout(),				Nodes = {
-					new HSpacer(indentation * Metrics.RollIndentation),
+				MinHeight = Metrics.TimelineDefaultRowHeight,				Layout = new HBoxLayout(),
+				HitTestTarget = true,				Nodes = {
+					new HSpacer(indentation * Metrics.TimelineRollIndentation),
 					expandButtonContainer,
 					new HSpacer(3),
 					nodeIcon,					new HSpacer(3),
 					label,
 					editBox,
 				},
-			};			widget.Presenter = new DelegatePresenter<Widget>(RenderBackground);			editBox.Visible = false;			widget.Tasks.Add(MonitorDoubleClickTask());
+			};			widget.Presenter = new DelegatePresenter<Widget>(RenderBackground, widget.Presenter);			editBox.Visible = false;			widget.Tasks.Add(MonitorDoubleClickTask());
 		}
 
 		CustomCheckbox CreateExpandButton()
@@ -68,7 +69,7 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			while (true) {
 				label.Text = nodeData.Node.Id;
-				if (widget.Input.WasKeyPressed(Key.Mouse0DoubleClick) && widget.HitTest(widget.Input.MousePosition)) {
+				if (widget.Input.WasKeyPressed(Key.Mouse0DoubleClick) && widget.IsMouseOver()) {
 					Document.Current.History.Execute(
 						new Commands.ClearRowSelection(), 
 						new Commands.SelectRow(row));
@@ -86,7 +87,7 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			editBox.Input.CaptureMouse();
 			while (true) {
-				var commitChanges = editBox.Input.WasKeyReleased(Key.Mouse0) && !editBox.HitTest(editBox.Input.MousePosition) ||
+				var commitChanges = editBox.Input.WasKeyReleased(Key.Mouse0) && !editBox.IsMouseOver() ||
 					editBox.Input.WasKeyPressed(Key.Enter);
 				var cancelChanges = editBox.Input.WasKeyPressed(Key.Escape);
 				if (commitChanges || cancelChanges) {

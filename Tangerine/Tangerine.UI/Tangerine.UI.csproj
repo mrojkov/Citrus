@@ -68,6 +68,8 @@
     <Compile Include="Utils\Colors.cs" />
     <Compile Include="Utils\CustomCheckbox.cs" />
     <Compile Include="Docking\DockManager.cs" />
+    <Compile Include="Metrics.cs" />
+    <Compile Include="Utils\BitmapButton.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

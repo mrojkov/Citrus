@@ -25,17 +25,18 @@ namespace Tangerine.UI.Timeline.Components
 			};
 			widget = new Widget {
 				Padding = new Thickness { Left = 4, Right = 2 },
-				MinHeight = Metrics.DefaultRowHeight,
+				MinHeight = Metrics.TimelineDefaultRowHeight,
+				HitTestTarget = true,
 				Layout = new HBoxLayout(),
 				Nodes = {
-					new HSpacer(identation * Metrics.RollIndentation),
+					new HSpacer(identation * Metrics.TimelineRollIndentation),
 					CreateExpandButton(),
 					propIcon,
 					new HSpacer(3),
 					label,
 				},
 			};
-			widget.Presenter = new DelegatePresenter<Widget>(RenderBackground);
+			widget.Presenter = new DelegatePresenter<Widget>(RenderBackground, widget.Presenter);
 		}
 
 		CustomCheckbox CreateExpandButton()

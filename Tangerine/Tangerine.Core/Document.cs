@@ -84,7 +84,7 @@ namespace Tangerine.Core
 		public void AddSomeNodes()
 		{
 			RootNode = new Widget();
-			for (int i = 0; i < 20; i++) {
+			for (int i = 0; i < 10; i++) {
 				var frame = new Lime.Frame();
 				frame.Id = string.Format("Frame {0:00}", i);
 				for (int j = 0; j < 12; j++) {

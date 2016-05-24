@@ -18,36 +18,41 @@ namespace Tangerine.UI.Timeline
 		{
 			var input = roll.RootWidget.Input;
 			while (true) {
-				if (input.WasMousePressed() && roll.RootWidget.HitTest(input.MousePosition)) {
-					var initialMousePosition = input.MousePosition;
-					var row = MousePositionToRow(initialMousePosition);
-					if (input.IsKeyPressed(Key.ShiftLeft)) {
-						if (timeline.SelectedRows.Count > 0) {
-							Document.Current.History.Execute(
-								new Commands.ClearRowSelection(), 
-								new Commands.SelectRowRange(timeline.SelectedRows[0], row));
-						} else {
-							Document.Current.History.Execute(
-								new Commands.ClearRowSelection(), 
-								new Commands.SelectRow(row));
-						}
-					} else {
-						input.CaptureMouse();
-						if (!timeline.SelectedRows.Contains(row)) {
-							Document.Current.History.Execute(
-								new Commands.ClearRowSelection(), 
-								new Commands.SelectRow(row));
-						}
-						while (input.IsMousePressed() && Math.Abs(initialMousePosition.Y - input.MousePosition.Y) < Metrics.DefaultRowHeight / 4) {
-							yield return null;
-						}
-						if (input.IsMousePressed()) {
-							yield return DragTask();
-						}
-						input.ReleaseMouse();
-					}
-				}
 				yield return null;
+				if (!input.WasMousePressed()) {
+					continue;
+				}
+				var hitNode = WidgetContext.Current.NodeUnderMouse;
+				if (hitNode == null || !hitNode.ChildOf(roll.RootWidget)) {
+					continue;
+				}
+				var initialMousePosition = input.MousePosition;
+				var row = MousePositionToRow(initialMousePosition);
+				if (input.IsKeyPressed(Key.ShiftLeft)) {
+					if (timeline.SelectedRows.Count > 0) {
+						Document.Current.History.Execute(
+							new Commands.ClearRowSelection(), 
+							new Commands.SelectRowRange(timeline.SelectedRows[0], row));
+					} else {
+						Document.Current.History.Execute(
+							new Commands.ClearRowSelection(), 
+							new Commands.SelectRow(row));
+					}
+				} else {
+					input.CaptureMouse();
+					if (!timeline.SelectedRows.Contains(row)) {
+						Document.Current.History.Execute(
+							new Commands.ClearRowSelection(), 
+							new Commands.SelectRow(row));
+					}
+					while (input.IsMousePressed() && Math.Abs(initialMousePosition.Y - input.MousePosition.Y) < Metrics.TimelineDefaultRowHeight / 4) {
+						yield return null;
+					}
+					if (input.IsMousePressed()) {
+						yield return DragTask();
+					}
+					input.ReleaseMouse();
+				}
 			}
 		}
 
@@ -79,7 +84,7 @@ namespace Tangerine.UI.Timeline
 				return timeline.Rows[0];
 			}
 			foreach (var row in timeline.Rows) {
-				if (position.Y >= row.Top && position.Y < row.Bottom + Metrics.RowSpacing) {
+				if (position.Y >= row.Top && position.Y < row.Bottom + Metrics.TimelineRowSpacing) {
 					return timeline.Rows[row.Index];
 				}
 			}
@@ -93,7 +98,7 @@ namespace Tangerine.UI.Timeline
 				return 0;
 			}
 			foreach (var row in timeline.Rows) {
-				if (position.Y >= row.Top && position.Y < row.Bottom + Metrics.RowSpacing) {
+				if (position.Y >= row.Top && position.Y < row.Bottom + Metrics.TimelineRowSpacing) {
 					return position.Y > (row.Top + row.Bottom) / 2 ? row.Index + 1 : row.Index;
 				}
 			}

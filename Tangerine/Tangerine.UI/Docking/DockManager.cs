@@ -21,6 +21,7 @@ namespace Tangerine.UI
 		public readonly Widget RootWidget;
 		public readonly Widget TitleWidget;
 		public readonly Widget ContentWidget;
+		public readonly Button CloseButton;
 		public readonly string Title;
 		public PanelPlacement Placement;
 
@@ -31,7 +32,9 @@ namespace Tangerine.UI
 				Layout = new HBoxLayout(),
 				Nodes = {
 					new SimpleText { Text = Title, Padding = new Thickness(4, 0), AutoSizeConstraints = false, MinMaxHeight = 20 },
+					(CloseButton = new BitmapButton(IconPool.GetTexture("PopupClose"), IconPool.GetTexture("PopupCloseHover")) { LayoutCell = new LayoutCell(Alignment.Center) })
 				},
+				HitTestTarget = true
 			};
 			ContentWidget = new Frame { ClipChildren = ClipMethod.ScissorTest };
 			RootWidget = new Widget {
@@ -64,6 +67,8 @@ namespace Tangerine.UI
 			public DockSite Site;
 			[ProtoMember(4)]
 			public Vector2 DockedSize;
+			[ProtoMember(5)]
+			public bool Hidden;
 		}
 
 		public class DragBehaviour
@@ -84,7 +89,7 @@ namespace Tangerine.UI
 			{
 				var input = panel.TitleWidget.Input;
 				while (true) {
-					if (input.WasMousePressed() && panel.TitleWidget.HitTest(input.MousePosition)) {
+					if (input.WasMousePressed() && (panel.TitleWidget.IsMouseOver() && !panel.CloseButton.IsMouseOver())) {
 						yield return DragTask();
 					}
 					yield return null;
@@ -167,6 +172,10 @@ namespace Tangerine.UI
 				panel.Placement.Site = newDockSite;
 				Refresh();
 			};
+			panel.CloseButton.Clicked += () => {
+				panel.Placement.Hidden = true;
+				Refresh();
+			};
 			Refresh();
 		}
 
@@ -178,6 +187,9 @@ namespace Tangerine.UI
 			int insertAt = 0;
 			var stretch = Vector2.Zero;
 			foreach (var p in panels) {
+				if (p.Placement.Hidden) {
+					continue;
+				}
 				p.RootWidget.Unlink();
 				p.RootWidget.LayoutCell.Stretch = p.Placement.DockedSize;
 				var splitter = (p.Placement.Site == DockSite.Left || p.Placement.Site == DockSite.Right) ? 
