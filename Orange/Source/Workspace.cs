@@ -69,6 +69,13 @@ namespace Orange
 				var file = fileInfo.FullName;
 				yield return file;
 			}
+
+			var subTarget = The.UI.GetActiveSubTarget();
+			if (subTarget != null) {
+				foreach (var subTargetCsprojFile in dirInfo.GetFiles(Path.GetFileName(subTarget.ProjectPath), SearchOption.AllDirectories)) {
+					yield return subTargetCsprojFile.FullName;
+				}
+			}
 		}
 
 		/// <summary>
