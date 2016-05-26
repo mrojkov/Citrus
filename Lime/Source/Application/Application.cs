@@ -127,6 +127,13 @@ namespace Lime
 		public static DeviceOrientation CurrentDeviceOrientation { get; internal set; }
 #endif
 
+#if MAC
+		public static IntVector2 DesktopMousePosition
+		{
+			get { return new IntVector2((int)AppKit.NSEvent.CurrentMouseLocation.X, (int)AppKit.NSEvent.CurrentMouseLocation.Y); }
+		}
+#endif
+
 		// Specifies the lowest possible 1/(time delta) passed to Window.Updating.
 		// TODO: Move to IWindow
 		public static float LowFPSLimit = 20;
