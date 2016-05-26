@@ -42,8 +42,8 @@ namespace Lime
 
 		public Vector2 ClientPosition
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return DecoratedPosition - new Vector2(0, titleBarHeight); }
+			set { DecoratedPosition = value + new Vector2(0, titleBarHeight); }
 		}
 
 		public Vector2 ClientSize
@@ -182,6 +182,7 @@ namespace Lime
 		}
 
 		private Vector2 windowedClientSize;
+		private float titleBarHeight;
 		private bool shouldFixFullscreen;
 
 		private void CreateNativeWindow(WindowOptions options)
@@ -198,6 +199,10 @@ namespace Lime
 				style |= NSWindowStyle.Resizable;
 			}
 			window = new NSWindow(rect, style, NSBackingStore.Buffered, false);
+
+			var contentRect = window.ContentRectFor(rect);
+			titleBarHeight = (float)rect.Height - (float)contentRect.Height;
+
 			if (options.MinimumDecoratedSize != Vector2.Zero) {
 				MinimumDecoratedSize = options.MinimumDecoratedSize;
 			}
