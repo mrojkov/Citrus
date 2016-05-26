@@ -67,7 +67,7 @@ namespace Lime
 		{
 			nsMenu.MinimumWidth = minimumWidth;
 			NSMenuItem i = item == null ? null : ((MenuItem)item).NSMenuItem;
-			nsMenu.PopUpMenu(i, new CoreGraphics.CGPoint(position.X, window.ClientSize.Height - position.Y), window.NSGameView);
+			nsMenu.PopUpMenu(i, new CoreGraphics.CGPoint(position.X, window.ClientSize.Y - position.Y), window.NSGameView);
 		}
 	}
 }

@@ -175,12 +175,12 @@ namespace Lime
 			var vpOrigin = (Vector2)Renderer.Viewport.Origin;
 			aabb.A += vpOrigin;
 			aabb.B += vpOrigin;
-			var window = Window.Current;
+			var window = CommonWindow.Current;
 			aabb.A /= window.PixelScale;
 			aabb.B /= window.PixelScale;
 			return new Rectangle {
-				A = new Vector2(aabb.A.X, window.ClientSize.Height - aabb.B.Y),
-				B = new Vector2(aabb.B.X, window.ClientSize.Height - aabb.A.Y),
+				A = new Vector2(aabb.A.X, window.ClientSize.Y - aabb.B.Y),
+				B = new Vector2(aabb.B.X, window.ClientSize.Y - aabb.A.Y),
 			};
 		}
 

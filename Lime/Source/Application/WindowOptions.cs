@@ -14,9 +14,9 @@ namespace Lime
 		public bool FixedSize = true;
 		public bool Centered = true;
 		public WindowStyle Style = WindowStyle.Regular;
-		public Size ClientSize = new Size(800, 600);
-		public Size MinimumDecoratedSize;
-		public Size MaximumDecoratedSize;
+		public Vector2 ClientSize = new Vector2(800, 600);
+		public Vector2 MinimumDecoratedSize;
+		public Vector2 MaximumDecoratedSize;
 		public string Title = "Citrus";
 		public bool Visible = true;
 		public float RefreshRate = 60;

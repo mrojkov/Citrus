@@ -40,16 +40,16 @@ namespace Lime
 			}
 		}
 
-		public IntVector2 ClientPosition
+		public Vector2 ClientPosition
 		{
 			get { throw new NotImplementedException(); }
 			set { throw new NotImplementedException(); }
 		}
 
-		public Size ClientSize
+		public Vector2 ClientSize
 		{
-			get { return new Size((int)View.Bounds.Width, (int)View.Bounds.Height); }
-			set { window.SetContentSize(new CGSize(value.Width, value.Height)); }
+			get { return new Vector2((float)View.Bounds.Width, (float)View.Bounds.Height); }
+			set { window.SetContentSize(new CGSize(value.X, value.Y)); }
 		}
 
 		public float PixelScale
@@ -57,9 +57,9 @@ namespace Lime
 			get { return (float)window.BackingScaleFactor; }
 		}
 
-		public IntVector2 DecoratedPosition
+		public Vector2 DecoratedPosition
 		{
-			get { return new IntVector2((int)window.Frame.X, (int)window.Frame.Y); }
+			get { return new Vector2((float)window.Frame.X, (float)window.Frame.Y); }
 			set
 			{
 				var frame = window.Frame;
@@ -68,27 +68,27 @@ namespace Lime
 			}
 		}
 
-		public Size DecoratedSize
+		public Vector2 DecoratedSize
 		{
-			get { return new Size((int)window.Frame.Width, (int)window.Frame.Height); }
+			get { return new Vector2((float)window.Frame.Width, (float)window.Frame.Height); }
 			set 
 			{
 				var frame = window.Frame;
-				frame.Size = new CGSize(value.Width, value.Height); 
+				frame.Size = new CGSize(value.X, value.Y); 
 				window.SetFrame(frame, true);
 			}
 		}
 
-		public Size MinimumDecoratedSize
+		public Vector2 MinimumDecoratedSize
 		{
-			get { return new Size((int)window.MinSize.Width, (int)window.MinSize.Height); }
-			set { window.MinSize = new CGSize(value.Width, value.Height); }
+			get { return new Vector2((float)window.MinSize.Width, (float)window.MinSize.Height); }
+			set { window.MinSize = new CGSize(value.X, value.Y); }
 		}
 
-		public Size MaximumDecoratedSize
+		public Vector2 MaximumDecoratedSize
 		{
-			get { return new Size((int)window.MaxSize.Width, (int)window.MaxSize.Height); }
-			set { window.MaxSize = new CGSize(value.Width, value.Height); }
+			get { return new Vector2((float)window.MaxSize.Width, (float)window.MaxSize.Height); }
+			set { window.MaxSize = new CGSize(value.X, value.Y); }
 		}
 
 		public bool Active
@@ -181,12 +181,12 @@ namespace Lime
 			View.Run(options.RefreshRate);
 		}
 
-		private Size windowedClientSize;
+		private Vector2 windowedClientSize;
 		private bool shouldFixFullscreen;
 
 		private void CreateNativeWindow(WindowOptions options)
 		{
-			var rect = new CGRect(0, 0, options.ClientSize.Width, options.ClientSize.Height);
+			var rect = new CGRect(0, 0, options.ClientSize.X, options.ClientSize.Y);
 			View = new NSGameView(Input, rect, Platform.GraphicsMode.Default);
 			NSWindowStyle style;
 			if (options.Style == WindowStyle.Borderless) {
@@ -198,10 +198,10 @@ namespace Lime
 				style |= NSWindowStyle.Resizable;
 			}
 			window = new NSWindow(rect, style, NSBackingStore.Buffered, false);
-			if (options.MinimumDecoratedSize != Size.Zero) {
+			if (options.MinimumDecoratedSize != Vector2.Zero) {
 				MinimumDecoratedSize = options.MinimumDecoratedSize;
 			}
-			if (options.MaximumDecoratedSize != Size.Zero) {
+			if (options.MaximumDecoratedSize != Vector2.Zero) {
 				MaximumDecoratedSize = options.MaximumDecoratedSize;
 			}
 			window.Title = options.Title;
@@ -262,9 +262,9 @@ namespace Lime
 		public void Center()
 		{
 			var displayBounds = window.Screen.VisibleFrame;
-			DecoratedPosition = new IntVector2 {
-				X = (int)Math.Max(0, (displayBounds.Width - DecoratedSize.Width) / 2 + displayBounds.Left),
-				Y = (int)Math.Max(0, (displayBounds.Height - DecoratedSize.Height) / 2 + displayBounds.Top)
+			DecoratedPosition = new Vector2 {
+				X = (int)Math.Max(0, (displayBounds.Width - DecoratedSize.X) / 2 + displayBounds.Left),
+				Y = (int)Math.Max(0, (displayBounds.Height - DecoratedSize.Y) / 2 + displayBounds.Top)
 			};
 		}
 

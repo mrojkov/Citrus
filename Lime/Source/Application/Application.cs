@@ -128,9 +128,9 @@ namespace Lime
 #endif
 
 #if MAC
-		public static IntVector2 DesktopMousePosition
+		public static Vector2 DesktopMousePosition
 		{
-			get { return new IntVector2((int)AppKit.NSEvent.CurrentMouseLocation.X, (int)AppKit.NSEvent.CurrentMouseLocation.Y); }
+			get { return new Vector2((float)AppKit.NSEvent.CurrentMouseLocation.X, (float)AppKit.NSEvent.CurrentMouseLocation.Y); }
 		}
 #endif
 
