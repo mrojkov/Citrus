@@ -23,6 +23,7 @@ namespace Tangerine.UI
 		public readonly Widget ContentWidget;
 		public readonly Button CloseButton;
 		public readonly string Title;
+		public WindowWidget WindowWidget;
 		public PanelPlacement Placement;
 
 		public DockPanel(string title)
@@ -69,18 +70,23 @@ namespace Tangerine.UI
 			public Vector2 DockedSize;
 			[ProtoMember(5)]
 			public bool Hidden;
+			[ProtoMember(6)]
+			public Vector2 UndockedPosition;
+			[ProtoMember(7)]
+			public Vector2 UndockedSize;
 		}
 
 		public class DragBehaviour
 		{
-			readonly Widget mainWindow;
+			readonly WindowWidget mainWidget;
 			readonly DockPanel panel;
 
-			public event Action<DockSite> OnDrag;
+			public event Action<DockSite> OnDock;
+			public event Action<Vector2> OnUndock;
 
-			public DragBehaviour(Widget mainWindow, DockPanel panel)
+			public DragBehaviour(WindowWidget mainWindow, DockPanel panel)
 			{
-				this.mainWindow = mainWindow;
+				this.mainWidget = mainWindow;
 				this.panel = panel;
 				panel.TitleWidget.Tasks.Add(MainTask());
 			}
@@ -89,8 +95,14 @@ namespace Tangerine.UI
 			{
 				var input = panel.TitleWidget.Input;
 				while (true) {
+					var mousePos = input.MousePosition;
 					if (input.WasMousePressed() && (panel.TitleWidget.IsMouseOver() && !panel.CloseButton.IsMouseOver())) {
-						yield return DragTask();
+						while ((mousePos - input.MousePosition).Length < 10 && input.IsMousePressed()) {
+							yield return null;
+						}
+						if (input.IsMousePressed()) {
+							yield return DragTask();
+						}
 					}
 					yield return null;
 				}
@@ -100,7 +112,7 @@ namespace Tangerine.UI
 			{
 				var dockSite = DockSite.None;
 				var dockSiteRect = new Rectangle();
-				mainWindow.PostPresenter = new DelegatePresenter<Widget>(widget => {
+				mainWidget.PostPresenter = new DelegatePresenter<Widget>(widget => {
 					if (dockSite != DockSite.None) {
 						widget.PrepareRendererState();
 						Renderer.DrawRectOutline(dockSiteRect.A + Vector2.One, dockSiteRect.B - Vector2.One, Colors.DockingRectagleOutline, 2);
@@ -115,27 +127,76 @@ namespace Tangerine.UI
 					new Rectangle(new Vector2(1 - dockSiteWidth, 0), Vector2.One),
 					new Rectangle(new Vector2(0, 1 - dockSiteWidth), Vector2.One)
 				};
+				ThumbnalWindow thumbWindow = null;
+				var initialMousePos = input.MousePosition;
+				var mainWindow = mainWidget.Window;
 				while (input.IsMousePressed()) {
-					var extent = (Vector2)CommonWindow.Current.ClientSize;
+					var extent = mainWindow.ClientSize;
 					dockSite = DockSite.None;
 					for (int i = 0; i < 4; i++) {
 						var r = dockSiteRects[i];
 						r.A *= extent;
 						r.B *= extent;
-						if (r.Contains(input.MousePosition)) {
+						var p = Application.DesktopMousePosition - mainWindow.ClientPosition;
+						if (Application.Platform == PlatformId.Mac) {
+							p.Y = mainWindow.ClientSize.Y - p.Y;
+						}
+						if (r.Contains(p)) {
 							dockSiteRect = r;
 							dockSite = (DockSite)(i + 1);
 						}
-						CommonWindow.Current.Invalidate();
+					}
+					if (dockSite == DockSite.None) {
+						if (thumbWindow == null) {
+							thumbWindow = new ThumbnalWindow(panel.Title);
+						}
+					} else {
+						mainWindow.Invalidate();
+						thumbWindow?.Dispose();
+						thumbWindow = null;
 					}
 					yield return null;
 				}
 				input.ReleaseMouse();
-				mainWindow.PostPresenter = null;
-				CommonWindow.Current.Invalidate();
+				mainWidget.PostPresenter = null;
+				mainWindow.Invalidate();
+				thumbWindow?.Dispose();
+				thumbWindow = null;
 				if (dockSite != DockSite.None) {
-					OnDrag?.Invoke(dockSite);	
+					OnDock?.Invoke(dockSite);	
+				} else {
+					OnUndock?.Invoke(Application.DesktopMousePosition - (initialMousePos - panel.TitleWidget.GlobalPosition));
 				}
+			}
+		}
+
+		class ThumbnalWindow : IDisposable
+		{
+			Window window;
+			WindowWidget rootWidget;
+
+			public ThumbnalWindow(string title)
+			{
+				window = new Window(new WindowOptions { FixedSize = true, ClientSize = new Vector2(100, 40), Style = WindowStyle.Borderless });
+				rootWidget = new DefaultWindowWidget(window, continuousRendering: false) {
+					PostPresenter = new WidgetBoundsPresenter(Color4.Black, 1),
+					Layout = new StackLayout(),
+					Nodes = {
+						new SimpleText { Text = title, LayoutCell = new LayoutCell(Alignment.Center) }
+					}
+				};
+				rootWidget.Updated += delta => StickToMouseCursor();
+				StickToMouseCursor();
+			}
+
+			void StickToMouseCursor()
+			{
+				window.DecoratedPosition = Application.DesktopMousePosition - window.ClientSize / 2;
+			}
+
+			public void Dispose()
+			{
+				window.Close();
 			}
 		}
 	}
@@ -143,17 +204,17 @@ namespace Tangerine.UI
 	public class DockManager
 	{
 		List<DockPanel> panels = new List<DockPanel>();
-		Widget rootWidget;
+		WindowWidget mainWidget;
 		Widget documentArea;
 
 		public event Action Closed;
 
-		public DockManager()
+		public DockManager(Vector2 windowSize)
 		{
-			var defaultWindowSize = new Size(1400, 800);
-			var window = new Window(new WindowOptions { ClientSize = defaultWindowSize, FixedSize = false, RefreshRate = 30 });
+			var window = new Window(new WindowOptions { ClientSize = windowSize, FixedSize = false, RefreshRate = 30 });
 			window.Closed += () => Closed?.Invoke();
-			rootWidget = new DefaultWindowWidget(window, continuousRendering: false) {
+			mainWidget = new DefaultWindowWidget(window, continuousRendering: false) {
+				Id = "MainWindow",
 				Layout = new HBoxLayout(),
 				Padding = new Thickness(4),
 				CornerBlinkOnRendering = true
@@ -161,15 +222,24 @@ namespace Tangerine.UI
 			documentArea = new Widget { PostPresenter = new WidgetFlatFillPresenter(Color4.Gray) };
 		}
 
-		public void AddPanel(DockPanel panel, DockSite site, Vector2 dockedSize)
+		public void AddPanel(DockPanel panel, DockSite site, Vector2 size)
 		{
-			panel.Placement = new DockPanel.PanelPlacement { Title = panel.Title, Site = site, DockedSize = dockedSize };
+			var dockedSize = mainWidget.Size / size;
+			panel.Placement = new DockPanel.PanelPlacement { Title = panel.Title, Site = site, DockedSize = dockedSize, Docked = true, UndockedSize = size };
 			panels.Add(panel);
-			var db = new DockPanel.DragBehaviour(rootWidget, panel);
-			db.OnDrag += newDockSite => {
+			var db = new DockPanel.DragBehaviour(mainWidget, panel);
+			db.OnDock += newDockSite => {
 				panels.Remove(panel);
 				panels.Insert(0, panel);
+				panel.Placement.Docked = true;
 				panel.Placement.Site = newDockSite;
+				Refresh();
+			};
+			db.OnUndock += position => {
+				var p = panel.Placement;
+				p.Docked = false;
+				p.UndockedSize = panel.ContentWidget.Size;
+				p.UndockedPosition = position - new Vector2(0, p.UndockedSize.Y);
 				Refresh();
 			};
 			panel.CloseButton.Clicked += () => {
@@ -181,18 +251,26 @@ namespace Tangerine.UI
 
 		void Refresh()
 		{
-			rootWidget.Nodes.Clear();
+			RefreshDockedPanels();
+			RefreshUndockedPanels();
+		}
+
+
+		void RefreshDockedPanels()
+		{
+			mainWidget.Nodes.Clear();
 			documentArea.Unlink();
-			var currentContainer = rootWidget;
+			var currentContainer = (Widget)mainWidget;
 			int insertAt = 0;
 			var stretch = Vector2.Zero;
-			foreach (var p in panels) {
-				if (p.Placement.Hidden) {
-					continue;
+			foreach (var p in panels.Where(p => !p.Placement.Hidden && p.Placement.Docked)) {
+				if (p.WindowWidget != null) {
+					p.WindowWidget.Window.Close();
+					p.WindowWidget = null;
 				}
 				p.RootWidget.Unlink();
 				p.RootWidget.LayoutCell.Stretch = p.Placement.DockedSize;
-				var splitter = (p.Placement.Site == DockSite.Left || p.Placement.Site == DockSite.Right) ? 
+				var splitter = (p.Placement.Site == DockSite.Left || p.Placement.Site == DockSite.Right) ?
 					(Splitter)new HSplitter() : (Splitter)new VSplitter();
 				splitter.DragEnded += p.RefreshDockedSize;
 				splitter.AddNode(p.RootWidget);
@@ -206,17 +284,45 @@ namespace Tangerine.UI
 			currentContainer.Nodes.Insert(insertAt, documentArea);
 		}
 
+		void RefreshUndockedPanels()
+		{
+			foreach (var p in panels.Where(p => !p.Placement.Hidden && !p.Placement.Docked)) {
+				p.RootWidget.Unlink();
+				if (p.WindowWidget == null) {
+					var window = new Window(new WindowOptions { RefreshRate = 30, Title = p.Title, FixedSize = false });
+					window.ClientSize = p.Placement.UndockedSize;
+					window.ClientPosition = p.Placement.UndockedPosition;
+					window.Moved += () => {
+						p.Placement.UndockedPosition = window.ClientPosition;
+					};
+					window.Resized += (deviceRotated) => {
+						p.Placement.UndockedSize = window.ClientSize;
+					};
+					p.WindowWidget = new DefaultWindowWidget(window, continuousRendering: false) {
+						Layout = new StackLayout(),
+					};
+				}
+				p.WindowWidget.AddNode(p.RootWidget);
+			}
+		}
+
 		public State ExportState()
 		{
 			var state = new State();
 			foreach (var p in panels) {
 				state.PanelPlacements.Add(p.Placement);
 			}
+			state.MainWindowPosition = mainWidget.Window.ClientPosition;
+			state.MainWindowSize = mainWidget.Window.ClientSize;
 			return state;
 		}
 
 		public void ImportState(State state)
 		{
+			if (state.MainWindowSize != Vector2.Zero) {
+				mainWidget.Window.ClientSize = state.MainWindowSize;
+				mainWidget.Window.ClientPosition = state.MainWindowPosition;
+			}
 			var allPanels = panels.ToList();
 			panels.Clear();
 			foreach (var s in state.PanelPlacements) {
@@ -234,6 +340,10 @@ namespace Tangerine.UI
 		{
 			[ProtoMember(2)]
 			public List<DockPanel.PanelPlacement> PanelPlacements = new List<DockPanel.PanelPlacement>();
+			[ProtoMember(3)]
+			public Vector2 MainWindowPosition;
+			[ProtoMember(4)]
+			public Vector2 MainWindowSize;
 		}
 	}
 }

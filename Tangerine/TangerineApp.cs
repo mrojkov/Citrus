@@ -52,16 +52,16 @@ namespace Tangerine
 			doc.AddSomeNodes();
 			Document.Current = doc;
 
-			var dockManager = new UI.DockManager();
+			var dockManager = new UI.DockManager(new Vector2(1024, 768));
 			Exiting += p => p.DockState = dockManager.ExportState();
 			dockManager.Closed += Exit;
 
 			var timelinePanel = new UI.DockPanel("Timeline");
 			var inspectorPanel = new UI.DockPanel("Inspector");
 			var browserPanel = new UI.DockPanel("Browser");
-			dockManager.AddPanel(timelinePanel, UI.DockSite.Top, new Vector2(0.3f));
-			dockManager.AddPanel(inspectorPanel, UI.DockSite.Left, new Vector2(0.2f));
-			dockManager.AddPanel(browserPanel, UI.DockSite.Right, new Vector2(0.1f));
+			dockManager.AddPanel(timelinePanel, UI.DockSite.Top, new Vector2(800, 300));
+			dockManager.AddPanel(inspectorPanel, UI.DockSite.Left, new Vector2(400, 700));
+			dockManager.AddPanel(browserPanel, UI.DockSite.Right, new Vector2(400, 700));
 
 			var prefs = new UserPreferences();
 			prefs.Load();
