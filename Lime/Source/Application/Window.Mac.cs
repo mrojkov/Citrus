@@ -139,14 +139,16 @@ namespace Lime
 
 		public NSGameView NSGameView { get { return View; } }
 
-		private MouseCursor cursor;
+		private MouseCursor cursor = MouseCursor.Default;
 		public MouseCursor Cursor
 		{
 			get { return cursor; }
 			set
 			{
-				cursor = value;
-				value.NativeCursor.Set();
+				if (cursor != value) {
+					cursor = value;
+					value.NativeCursor.Set();
+				}
 			}
 		}
 		
