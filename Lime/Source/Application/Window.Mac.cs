@@ -209,9 +209,13 @@ namespace Lime
 				return RaiseClosing();
 			};
 			window.WillClose += (s, e) => {
-				View.Stop();
-				NSApplication.SharedApplication.Terminate(View);
 				HandleClosed(s, e);
+				View.Stop();
+				if (Application.MainWindow == this) {
+					NSApplication.SharedApplication.Terminate(View);
+					TexturePool.Instance.DiscardAllTextures();
+					AudioSystem.Terminate();
+				}
 			};
 			window.DidResize += (s, e) => {
 				View.UpdateGLContext();
@@ -272,8 +276,6 @@ namespace Lime
 		private void HandleClosed(object sender, EventArgs e)
 		{
 			RaiseClosed();
-			TexturePool.Instance.DiscardAllTextures();
-			AudioSystem.Terminate();
 		}
 
 		private void HandleRenderFrame()
