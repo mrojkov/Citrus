@@ -188,7 +188,12 @@ namespace Lime
 		{
 			var rect = new CGRect(0, 0, options.ClientSize.Width, options.ClientSize.Height);
 			View = new NSGameView(Input, rect, Platform.GraphicsMode.Default);
-			var style = NSWindowStyle.Titled | NSWindowStyle.Closable | NSWindowStyle.Miniaturizable;
+			NSWindowStyle style;
+			if (options.Style == WindowStyle.Borderless) {
+				style = NSWindowStyle.Borderless;
+			} else {
+				style = NSWindowStyle.Titled | NSWindowStyle.Closable | NSWindowStyle.Miniaturizable;
+			}
 			if (!options.FixedSize) {
 				style |= NSWindowStyle.Resizable;
 			}

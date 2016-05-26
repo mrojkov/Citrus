@@ -2,11 +2,18 @@
 
 namespace Lime
 {
+	public enum WindowStyle
+	{
+		Regular,
+		Borderless
+	}
+
 	public class WindowOptions
 	{
 		public bool FullScreen = false;
 		public bool FixedSize = true;
 		public bool Centered = true;
+		public WindowStyle Style = WindowStyle.Regular;
 		public Size ClientSize = new Size(800, 600);
 		public Size MinimumDecoratedSize;
 		public Size MaximumDecoratedSize;
