@@ -19,8 +19,10 @@ namespace Lime
 
 		public CommonWindow()
 		{
-			Current = (IWindow)this;
-			Context = new Context(new Property(typeof(CommonWindow), "Current"), Current);
+			if (Current == null) {
+				Current = (IWindow)this;
+			}
+			Context = new Context(new Property(typeof(CommonWindow), "Current"), this);
 		}
 
 		protected void RaiseActivated()
