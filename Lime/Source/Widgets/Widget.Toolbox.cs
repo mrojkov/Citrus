@@ -34,7 +34,8 @@ namespace Lime
 		/// </summary>
 		/// <param name="texture">Texture to render to. Must be RenderTexture or SerializableTexture</param>
 		/// <param name="renderChain">Render queue (order relation of elements with tree structure and layers)</param>
-		public void RenderToTexture(ITexture texture, RenderChain renderChain)
+		/// <param name="clearRenderTarget">Whether to clear texture before rendering or not.</param>
+		public void RenderToTexture(ITexture texture, RenderChain renderChain, bool clearRenderTarget = true)
 		{
 			if (Width > 0 && Height > 0) {
 				var scissorTest = Renderer.ScissorTestEnabled;
@@ -44,7 +45,9 @@ namespace Lime
 				texture.SetAsRenderTarget();
 				var savedViewport = Renderer.Viewport;
 				Renderer.Viewport = new WindowRect { X = 0, Y = 0, Width = texture.ImageSize.Width, Height = texture.ImageSize.Height };
-				Renderer.Clear(0, 0, 0, 0);
+				if (clearRenderTarget) {
+					Renderer.Clear(0, 0, 0, 0);
+				}
 				Renderer.PushProjectionMatrix();
 				Renderer.SetOrthogonalProjection(0, 0, Width, Height);
 				for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
