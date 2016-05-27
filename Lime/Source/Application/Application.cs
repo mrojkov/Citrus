@@ -113,10 +113,26 @@ namespace Lime
 			}
 		}
 
+		private static DeviceOrientation supportedDeviceOrientations = DeviceOrientation.All;
 		/// <summary>
 		/// Supported device orientations (only for mobile platforms)
 		/// </summary>
-		public static DeviceOrientation SupportedDeviceOrientations = DeviceOrientation.All;
+		public static DeviceOrientation SupportedDeviceOrientations
+		{
+			get
+			{
+				return supportedDeviceOrientations;
+			}
+			set
+			{
+				if (supportedDeviceOrientations != value) {
+					supportedDeviceOrientations = value;
+#if iOS
+					GameController.ResetDeviceOrientation(value);
+#endif
+				}
+			}
+		}
 
 		/// <summary>
 		/// Gets the current device orientation. On desktop platforms it is always DeviceOrientation.LandscapeLeft.

@@ -33,6 +33,34 @@ namespace Lime
 
 		public new GameView View { get { return (GameView)base.View; } }
 
+		public static void ResetDeviceOrientation(DeviceOrientation supportedOrientation)
+		{
+			switch (supportedOrientation) {
+				case DeviceOrientation.AllLandscapes:
+				case DeviceOrientation.LandscapeLeft:
+					SetDeviceOrientation(UIInterfaceOrientation.LandscapeLeft);
+					break;
+				case DeviceOrientation.LandscapeRight:
+					SetDeviceOrientation(UIInterfaceOrientation.LandscapeRight);
+					break;
+				case DeviceOrientation.AllPortraits:
+				case DeviceOrientation.Portrait:
+					SetDeviceOrientation(UIInterfaceOrientation.Portrait);
+					break;
+				case DeviceOrientation.PortraitUpsideDown:
+					SetDeviceOrientation(UIInterfaceOrientation.PortraitUpsideDown);
+					break;
+			}
+			GameController.AttemptRotationToDeviceOrientation();
+		}
+
+		private static void SetDeviceOrientation(UIInterfaceOrientation orientation)
+		{
+			var value = new NSNumber((int)orientation);
+			var key = new NSString("orientation");
+			UIDevice.CurrentDevice.SetValueForKey(value, key);
+		}
+
 		private void OnAcceleration(object sender, UIAccelerometerEventArgs e)
 		{
 			input.Acceleration = new Vector3((float)e.Acceleration.X,
