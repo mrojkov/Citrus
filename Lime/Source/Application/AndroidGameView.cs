@@ -132,9 +132,8 @@ namespace Lime
 		{
 			base.OnLayout(changed, left, top, right, bottom);
 			if (AllowOnscreenKeyboard) {
-				if (changed) {
-					// Changed == true never seemed go along with showing and hiding keyboard, but 
-					// it results in softKeyboard.Visible = false right after device rotation.
+				if (Window.Current == null) {
+					// Do not calc keyboard height before window init, because we need to know pixel scale.
 					return;
 				}
 				var r = new Android.Graphics.Rect();
