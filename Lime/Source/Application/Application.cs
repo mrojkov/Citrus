@@ -99,6 +99,8 @@ namespace Lime
 
 	public static class Application
 	{
+		public static event Action<DeviceOrientation> SupportedDeviceOrientationsChanged;
+
 		private static IWindow mainWindow;
 		public static IWindow MainWindow
 		{
@@ -127,9 +129,9 @@ namespace Lime
 			{
 				if (supportedDeviceOrientations != value) {
 					supportedDeviceOrientations = value;
-#if iOS
-					GameController.ResetDeviceOrientation(value);
-#endif
+					if (SupportedDeviceOrientationsChanged != null) {
+						SupportedDeviceOrientationsChanged(value);
+					}
 				}
 			}
 		}

@@ -29,11 +29,12 @@ namespace Lime
 			UIAccelerometer.SharedAccelerometer.UpdateInterval = 0.05;
 			UIAccelerometer.SharedAccelerometer.Acceleration += OnAcceleration;
 			Application.CurrentDeviceOrientation = ConvertInterfaceOrientation(InterfaceOrientation);
+			Application.SupportedDeviceOrientationsChanged += ResetDeviceOrientation;
 		}
 
 		public new GameView View { get { return (GameView)base.View; } }
 
-		public static void ResetDeviceOrientation(DeviceOrientation supportedOrientation)
+		internal static void ResetDeviceOrientation(DeviceOrientation supportedOrientation)
 		{
 			switch (supportedOrientation) {
 				case DeviceOrientation.AllLandscapes:
@@ -51,7 +52,7 @@ namespace Lime
 					SetDeviceOrientation(UIInterfaceOrientation.PortraitUpsideDown);
 					break;
 			}
-			GameController.AttemptRotationToDeviceOrientation();
+			UIViewController.AttemptRotationToDeviceOrientation();
 		}
 
 		private static void SetDeviceOrientation(UIInterfaceOrientation orientation)
