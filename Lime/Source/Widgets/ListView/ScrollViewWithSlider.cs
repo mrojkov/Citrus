@@ -107,7 +107,7 @@ namespace Lime
 		private float CalcSliderLength()
 		{
 			float pagesCount = ContentLength / ProjectToScrollAxis(Frame.Size);
-			if (pagesCount < float.Epsilon) {
+			if (pagesCount < float.Epsilon || Single.IsNaN(pagesCount)) {
 				return 0;
 			}
 			float length = ProjectToScrollAxis(Frame.Size) / pagesCount;
