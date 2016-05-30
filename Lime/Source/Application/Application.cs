@@ -99,6 +99,8 @@ namespace Lime
 
 	public static class Application
 	{
+		public static event Action<DeviceOrientation> SupportedDeviceOrientationsChanged;
+
 		private static IWindow mainWindow;
 		public static IWindow MainWindow
 		{
@@ -113,10 +115,26 @@ namespace Lime
 			}
 		}
 
+		private static DeviceOrientation supportedDeviceOrientations = DeviceOrientation.All;
 		/// <summary>
 		/// Supported device orientations (only for mobile platforms)
 		/// </summary>
-		public static DeviceOrientation SupportedDeviceOrientations = DeviceOrientation.All;
+		public static DeviceOrientation SupportedDeviceOrientations
+		{
+			get
+			{
+				return supportedDeviceOrientations;
+			}
+			set
+			{
+				if (supportedDeviceOrientations != value) {
+					supportedDeviceOrientations = value;
+					if (SupportedDeviceOrientationsChanged != null) {
+						SupportedDeviceOrientationsChanged(value);
+					}
+				}
+			}
+		}
 
 		/// <summary>
 		/// Gets the current device orientation. On desktop platforms it is always DeviceOrientation.LandscapeLeft.
