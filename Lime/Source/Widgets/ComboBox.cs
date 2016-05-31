@@ -57,19 +57,19 @@ namespace Lime
 #if MAC || WIN
 			var menu = new Menu();
 			int j = 0;
-			IMenuItem selectedItem = null;
+			ICommand selectedCommand = null;
 			foreach (var i in Items) {
-				var menuItem = new MenuItem { Text = i.Text };
+				var command = new Command { Text = i.Text };
 				if (j == Index) {
-					selectedItem = menuItem;
+					selectedCommand = command;
 				}
 				var t = j;
-				menuItem.Clicked += () => Index = t;
-				menu.Add(menuItem);
+				command.Executing += () => Index = t;
+				menu.Add(command);
 				j++;
 			}
 			var aabb = CalcAABBInWindowSpace();
-			menu.Popup(Window.Current, aabb.A, aabb.Width, selectedItem);
+			menu.Popup(Window.Current, aabb.A, aabb.Width, selectedCommand);
 #else
 			throw new NotImplementedException();
 #endif
