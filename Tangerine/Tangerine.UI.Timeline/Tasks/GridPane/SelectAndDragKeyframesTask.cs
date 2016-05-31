@@ -59,15 +59,15 @@ namespace Tangerine.UI.Timeline
 		private IEnumerator<object> DragKeyframeTask(IntVector2 cell)
 		{
 			var rect = new IntRectangle { A = cell, B = cell + IntVector2.One };
-			Document.Current.History.Add(new Commands.ClearGridSelection());
-			Document.Current.History.Add(new Commands.SelectRectangleOnGrid(rect));
+			Document.Current.History.Add(new Operations.ClearGridSelection());
+			Document.Current.History.Add(new Operations.SelectRectangleOnGrid(rect));
 			Document.Current.History.Commit();
 			yield return DragSelectionTask(cell);
 		}
 
 		private IEnumerator<object> SelectTask(IntVector2 initialCell)
 		{
-			Document.Current.History.Execute(new Commands.ClearGridSelection());
+			Document.Current.History.Execute(new Operations.ClearGridSelection());
 			var input = grid.RootWidget.Input;
 			grid.OnPostRender += RenderSelectionRect;
 			while (input.IsMousePressed()) {
@@ -88,7 +88,7 @@ namespace Tangerine.UI.Timeline
 				yield return null;
 			}
 			grid.OnPostRender -= RenderSelectionRect;
-			Document.Current.History.Execute(new Commands.SelectRectangleOnGrid(rect));
+			Document.Current.History.Execute(new Operations.SelectRectangleOnGrid(rect));
 		}
 
 		IntVector2 MousePositionToCell(Vector2 position)

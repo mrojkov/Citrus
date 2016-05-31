@@ -4,9 +4,9 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 
-namespace Tangerine.UI.Timeline.Commands
+namespace Tangerine.UI.Timeline.Operations
 {
-	public class SelectRow : ICommand
+	public class SelectRow : IOperation
 	{
 		Timeline timeline => Timeline.Instance;
 
@@ -43,7 +43,7 @@ namespace Tangerine.UI.Timeline.Commands
 		}
 	}
 
-	public class SelectRowRange : CompoundCommand
+	public class SelectRowRange : CompoundOperation
 	{
 		public SelectRowRange(Row startRow, Row endRow)
 		{

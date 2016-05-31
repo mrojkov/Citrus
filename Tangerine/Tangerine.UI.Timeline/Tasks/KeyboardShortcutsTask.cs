@@ -45,11 +45,11 @@ namespace Tangerine.UI.Timeline
 			if (input.WasKeyPressed(Key.Enter)) {
 				var node = timeline.SelectedRows.Select(i => i.Components.Get<Components.NodeRow>()).FirstOrDefault(i => i != null).Node;
 				if (node != null) {
-					doc.History.Execute(new Commands.SetCurrentContainer(node));
+					doc.History.Execute(new Operations.SetCurrentContainer(node));
 				}
 			} else if (input.WasKeyPressed(Key.BackSpace)) {
 				if (timeline.Container.Parent != null) {
-					doc.History.Execute(new Commands.SetCurrentContainer(timeline.Container.Parent));
+					doc.History.Execute(new Operations.SetCurrentContainer(timeline.Container.Parent));
 				}
 			}
 		}
@@ -74,12 +74,12 @@ namespace Tangerine.UI.Timeline
 			var nextRow = timeline.Rows[Mathf.Clamp(lastSelectedRow.Index + advance, 0, timeline.Rows.Count - 1)];
 			if (nextRow != lastSelectedRow) {
 				if (!multiselection) {
-					doc.History.Add(new Commands.ClearRowSelection());
+					doc.History.Add(new Operations.ClearRowSelection());
 				}
 				if (timeline.SelectedRows.Contains(nextRow)) {
-					doc.History.Add(new Commands.SelectRow(lastSelectedRow, false));
+					doc.History.Add(new Operations.SelectRow(lastSelectedRow, false));
 				}
-				doc.History.Add(new Commands.SelectRow(nextRow));
+				doc.History.Add(new Operations.SelectRow(nextRow));
 				doc.History.Commit();
 				timeline.EnsureRowVisible(nextRow);
 			}
@@ -89,10 +89,10 @@ namespace Tangerine.UI.Timeline
 		{
 			var stride = input.IsKeyPressed(Key.AltLeft) ? 10 : 1;
 			if (input.WasKeyRepeated(Key.Right)) {
-				Document.Current.History.Execute(new Commands.SetCurrentColumn(timeline.CurrentColumn + stride));
+				Document.Current.History.Execute(new Operations.SetCurrentColumn(timeline.CurrentColumn + stride));
 				timeline.EnsureColumnVisible(timeline.CurrentColumn);
 			} else if (input.WasKeyRepeated(Key.Left)) {
-				Document.Current.History.Execute(new Commands.SetCurrentColumn(timeline.CurrentColumn - stride));
+				Document.Current.History.Execute(new Operations.SetCurrentColumn(timeline.CurrentColumn - stride));
 				timeline.EnsureColumnVisible(timeline.CurrentColumn);
 			}
 		}		

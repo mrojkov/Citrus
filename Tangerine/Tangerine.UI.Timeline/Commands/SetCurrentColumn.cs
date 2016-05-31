@@ -4,9 +4,9 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 
-namespace Tangerine.UI.Timeline.Commands
+namespace Tangerine.UI.Timeline.Operations
 {
-	public class SetCurrentColumn : ICommand
+	public class SetCurrentColumn : IOperation
 	{
 		readonly int previousColumn;
 		int currentColumn;

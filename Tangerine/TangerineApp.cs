@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Lime;
 using Tangerine.Core;
 using ProtoBuf;
@@ -44,15 +45,18 @@ namespace Tangerine
 			Instance = new TangerineApp();
 		}
 
+		public Menu ViewMenu { get; private set; }
+
 		private TangerineApp()
 		{
+			CreateMainMenu();
 			Theme.Current = new Lime.DesktopTheme();
 			LoadFont();
 			var doc = new Document();
 			doc.AddSomeNodes();
 			Document.Current = doc;
 
-			var dockManager = new UI.DockManager(new Vector2(1024, 768));
+			var dockManager = new UI.DockManager(new Vector2(1024, 768), ViewMenu);
 			Exiting += p => p.DockState = dockManager.ExportState();
 			dockManager.Closed += Exit;
 
@@ -70,9 +74,46 @@ namespace Tangerine
 			UI.Inspector.Inspector.Initialize(inspectorPanel.ContentWidget);
 			UI.Timeline.Timeline.Initialize(timelinePanel.ContentWidget);
 
-			doc.History.OnCommit += () => Window.Current.Invalidate();
+			doc.History.OnCommit += () => CommonWindow.Current.Invalidate();
 			UI.Timeline.Timeline.Instance.RegisterDocument(doc);
 		}
+
+		void CreateMainMenu()
+		{
+			Application.MainMenu = new Menu {
+				new Command {
+					Text = "Application",
+					Submenu = new Menu {
+						new Command { Text = "Quit", Shortcut = new Shortcut(Key.WinLeft, Key.Q) },
+					}
+				},
+				new Command {
+					Text = "File",
+					Submenu = new Menu {
+						new Command { Text = "Open", Shortcut = new Shortcut(Key.WinLeft, Key.O) },
+					}
+				},
+				new Command {
+					Text = "View",
+					Submenu = (ViewMenu = new Menu { })
+				}
+			};
+		}
+
+		//void CreateMenu(string appName) 
+		//{
+		//	var mainMenu = new AppKit.NSMenu();
+		//	var appMenu = new AppKit.NSMenu();
+		//	var appMenuItem = new AppKit.NSMenuItem {
+		//		Submenu = appMenu
+		//	};
+		//	mainMenu.AddItem(appMenuItem);
+		//	var quitMenuItem = new AppKit.NSMenuItem(string.Format("Quit {0}", appName), "q", delegate {
+		//		AppKit.NSApplication.SharedApplication.Terminate(mainMenu);
+		//	});
+		//	appMenu.AddItem(quitMenuItem);
+		//	AppKit.NSApplication.SharedApplication.MainMenu = mainMenu;
+		//}
 
 		public void Exit()
 		{

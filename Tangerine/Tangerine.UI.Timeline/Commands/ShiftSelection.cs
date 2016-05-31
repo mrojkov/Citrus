@@ -4,9 +4,9 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 
-namespace Tangerine.UI.Timeline.Commands
+namespace Tangerine.UI.Timeline.Operations
 {
-	public class ShiftSelection : ICommand
+	public class ShiftSelection : IOperation
 	{
 		IntVector2 offset;
 

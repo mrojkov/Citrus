@@ -57,6 +57,7 @@
     <Folder Include="Resources\" />
     <Folder Include="Utils\" />
     <Folder Include="Docking\" />
+    <Folder Include="Commands\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -70,6 +71,7 @@
     <Compile Include="Docking\DockManager.cs" />
     <Compile Include="Metrics.cs" />
     <Compile Include="Utils\BitmapButton.cs" />
+    <Compile Include="Docking\DockPanel.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

@@ -50,7 +50,7 @@ namespace Tangerine.UI.Timeline.Components
 				button.Visible = nodeData.Node.Animators.Count > 0;
 			};
 			button.Clicked += () => {
-				Document.Current.History.Execute(new Core.Commands.SetProperty<bool>(() => nodeData.Expanded, value => nodeData.Expanded = value, !nodeData.Expanded));
+				Document.Current.History.Execute(new Core.Operations.SetProperty<bool>(() => nodeData.Expanded, value => nodeData.Expanded = value, !nodeData.Expanded));
 			};
 			return button;
 		}
@@ -71,8 +71,8 @@ namespace Tangerine.UI.Timeline.Components
 				label.Text = nodeData.Node.Id;
 				if (widget.Input.WasKeyPressed(Key.Mouse0DoubleClick) && widget.IsMouseOver()) {
 					Document.Current.History.Execute(
-						new Commands.ClearRowSelection(), 
-						new Commands.SelectRow(row));
+						new Operations.ClearRowSelection(), 
+						new Operations.SelectRow(row));
 					label.Visible = false;
 					editBox.Visible = true;
 					editBox.Text = label.Text;
@@ -94,7 +94,7 @@ namespace Tangerine.UI.Timeline.Components
 					editBox.Visible = false;
 					label.Visible = true;
 					if (commitChanges) {
-						Document.Current.History.Execute(new Core.Commands.SetProperty(nodeData.Node, "Id", editBox.Text));
+						Document.Current.History.Execute(new Core.Operations.SetProperty(nodeData.Node, "Id", editBox.Text));
 					}
 					break;
 				}

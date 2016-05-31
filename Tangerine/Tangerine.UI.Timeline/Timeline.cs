@@ -134,7 +134,7 @@ namespace Tangerine.UI.Timeline
 		void SelectFirstRow()
 		{
 			var r = GetCachedRow(Container.Nodes[0].EditorState().Uid);
-			Document.Current.History.Execute(new Commands.SelectRow(r));
+			Document.Current.History.Execute(new Operations.SelectRow(r));
 		}
 
 		public Row GetCachedRow(Uid uid)

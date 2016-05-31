@@ -12,6 +12,6 @@ namespace Tangerine
 		public override void DidFinishLaunching(NSNotification notification)
 		{
 			TangerineApp.Initialize();
-		}		
+		}
 	}
 }

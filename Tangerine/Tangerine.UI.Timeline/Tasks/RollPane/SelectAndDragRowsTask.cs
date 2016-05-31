@@ -31,19 +31,19 @@ namespace Tangerine.UI.Timeline
 				if (input.IsKeyPressed(Key.ShiftLeft)) {
 					if (timeline.SelectedRows.Count > 0) {
 						Document.Current.History.Execute(
-							new Commands.ClearRowSelection(), 
-							new Commands.SelectRowRange(timeline.SelectedRows[0], row));
+							new Operations.ClearRowSelection(), 
+							new Operations.SelectRowRange(timeline.SelectedRows[0], row));
 					} else {
 						Document.Current.History.Execute(
-							new Commands.ClearRowSelection(), 
-							new Commands.SelectRow(row));
+							new Operations.ClearRowSelection(), 
+							new Operations.SelectRow(row));
 					}
 				} else {
 					input.CaptureMouse();
 					if (!timeline.SelectedRows.Contains(row)) {
 						Document.Current.History.Execute(
-							new Commands.ClearRowSelection(), 
-							new Commands.SelectRow(row));
+							new Operations.ClearRowSelection(), 
+							new Operations.SelectRow(row));
 					}
 					while (input.IsMousePressed() && Math.Abs(initialMousePosition.Y - input.MousePosition.Y) < Metrics.TimelineDefaultRowHeight / 4) {
 						yield return null;
@@ -67,7 +67,7 @@ namespace Tangerine.UI.Timeline
 			}
 			roll.OnRenderOverlay -= RenderDragCursor;
 			Window.Current.Invalidate();
-			Document.Current.History.Execute(new Commands.DragRows(dragPosition));
+			Document.Current.History.Execute(new Operations.DragRows(dragPosition));
 		}
 
 		private void RenderDragCursor(Widget widget)

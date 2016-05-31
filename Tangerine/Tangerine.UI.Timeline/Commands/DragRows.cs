@@ -5,9 +5,9 @@ using Lime;
 using Tangerine.Core;
 using Tangerine.UI.Timeline.Components;
 
-namespace Tangerine.UI.Timeline.Commands
+namespace Tangerine.UI.Timeline.Operations
 {
-	public class DragRows : InteractiveCommand
+	public class DragRows : InteractiveOperation
 	{
 		Timeline timeline => Timeline.Instance;
 		readonly int destination;
@@ -24,12 +24,12 @@ namespace Tangerine.UI.Timeline.Commands
 				row => !timeline.SelectedRows.Contains(row) && row.Index >= destination && row.Components.Has<NodeRow>());
 			var nodeInsertBefore = rowInsertBefore?.Components.Get<NodeRow>().Node;
 			foreach (var node in nodesToDrag) {
-				Execute(new Core.Commands.UnlinkNode(node));
+				Execute(new Core.Operations.UnlinkNode(node));
 			}
 			var container = timeline.Container;
 			var insertionIndex = nodeInsertBefore == null ? container.Nodes.Count : container.Nodes.IndexOf(nodeInsertBefore);
 			foreach (var node in nodesToDrag) {
-				Execute(new Core.Commands.InsertNode(container, insertionIndex++, node));
+				Execute(new Core.Operations.InsertNode(container, insertionIndex++, node));
 			}
 		}
 	}
