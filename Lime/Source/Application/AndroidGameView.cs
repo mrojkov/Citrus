@@ -22,12 +22,12 @@ namespace Lime
 		{
 			private string textInput;
 			private Input input;
-			
+
 			public KeyboardHandler(Input input)
 			{
 				this.input = input;
 			}
-			
+
 			public void ProcessTextInput()
 			{
 				input.TextInput = textInput;
@@ -53,7 +53,7 @@ namespace Lime
 				}
 				return true;
 			}
-			
+
 			private static Key TranslateKeycode(Keycode key)
 			{
 				switch (key) {
@@ -104,10 +104,10 @@ namespace Lime
 		{
 			// Read FixDelKeyInputConnection class for details.
 			// http://stackoverflow.com/questions/14560344/android-backspace-in-webview-baseinputconnection
-			FixDelKeyInputConnection baseInputConnection = new FixDelKeyInputConnection(this, false);
+			var baseInputConnection = new FixDelKeyInputConnection(this, false);
 			outAttrs.ActionLabel = null;
-			outAttrs.InputType = InputTypes.Null;
-			outAttrs.ImeOptions = (ImeFlags)ImeAction.None;
+			outAttrs.InputType = InputTypes.TextVariationVisiblePassword;
+			outAttrs.ImeOptions = ImeFlags.NoExtractUi | (ImeFlags)ImeAction.None;
 			return baseInputConnection;
 		}
 
