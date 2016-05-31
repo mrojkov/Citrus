@@ -160,6 +160,22 @@ namespace Lime
 
 		private static readonly object scheduledActionsSync = new object();
 		private static Action scheduledActions;
+		private static Menu mainMenu;
+
+		public static Menu MainMenu
+		{
+			get { return mainMenu; }	
+			set
+			{
+				if (mainMenu != value) {
+					mainMenu = value;
+#if MAC
+					value.Refresh();
+					NSApplication.SharedApplication.MainMenu = value.NativeMenu;
+#endif
+				}
+			}
+		}
 
 		public static RenderingBackend RenderingBackend { get; private set; }
 		public static bool UsingDeferredHitTest { get; private set; }
