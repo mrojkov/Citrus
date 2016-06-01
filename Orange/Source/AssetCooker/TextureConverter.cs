@@ -1,24 +1,25 @@
 using System;
 using System.IO;
 using System.Text;
-using Lime;
+
+using Gdk;
 
 namespace Orange
 {
 	public static class TextureConverter
 	{
-		public static void ToPVR(Bitmap bitmap, string dstPath, bool mipMaps, PVRFormat pvrFormat)
+		public static void ToPVR(Pixbuf pixbuf, string dstPath, bool mipMaps, PVRFormat pvrFormat)
 		{
-			int width = bitmap.Width;
-			int height = bitmap.Height;
-			bool hasAlpha = bitmap.HasAlpha;
+			int width = pixbuf.Width;
+			int height = pixbuf.Height;
+			bool hasAlpha = pixbuf.HasAlpha;
 
 			int potWidth = TextureConverterUtils.GetNearestPowerOf2(width, 8, 1024);
 			int potHeight = TextureConverterUtils.GetNearestPowerOf2(height, 8, 1024);
 			var args = new StringBuilder();
 			switch (pvrFormat) {
 				case PVRFormat.PVRTC4:
-					if (!hasAlpha) {
+					if (!pixbuf.HasAlpha) {
 						args.Append(" -f PVRTC1_2");
 					} else {
 						args.Append(" -f PVRTC1_4");
@@ -54,18 +55,18 @@ namespace Orange
 			}
 			string tga = Path.ChangeExtension(dstPath, ".tga");
 			try {
-				if (hasAlpha) {
+				if (pixbuf.HasAlpha) {
 					args.Append(" -l"); // Enable alpha bleed
 				}
-				TextureConverterUtils.SaveToTGA(bitmap, tga, swapRedAndBlue: true);
+				TextureConverterUtils.SwapRGBChannels(pixbuf);
+				TextureConverterUtils.SaveToTGA(pixbuf, tga);
 				if (mipMaps) {
 					args.Append(" -m");
 				}
 				args.AppendFormat(" -i \"{0}\" -o \"{1}\" -r {2},{3} -shh", tga, dstPath, width, height);
 #if MAC
 				var pvrTexTool = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Mac", "PVRTexTool");
-				Mono.Unix.Native.Syscall.chmod(
-					pvrTexTool, Mono.Unix.Native.FilePermissions.S_IXOTH | Mono.Unix.Native.FilePermissions.S_IXUSR);
+				Mono.Unix.Native.Syscall.chmod(pvrTexTool, Mono.Unix.Native.FilePermissions.S_IXOTH | Mono.Unix.Native.FilePermissions.S_IXUSR);
 #else
 				var pvrTexTool = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Win", "PVRTexToolCli");
 #endif
@@ -83,7 +84,7 @@ namespace Orange
 			while (true) {
 				try {
 					File.Delete(file);
-				} catch (System.Exception) {
+				} catch (Exception) {
 					System.Threading.Thread.Sleep(100);
 					continue;
 				}
@@ -91,20 +92,18 @@ namespace Orange
 			}
 		}
 
-		public static void ToDDS(Bitmap bitmap, string dstPath, DDSFormat format, bool mipMaps)
+		public static void ToDDS(Pixbuf pixbuf, string dstPath, DDSFormat format, bool mipMaps)
 		{
 			bool compressed = format == DDSFormat.DXTi;
-			Bitmap bledBitmap = null;
-			if (bitmap.HasAlpha) {
-				bledBitmap = TextureConverterUtils.BleedAlpha(bitmap);
+			if (pixbuf.HasAlpha) {
+				TextureConverterUtils.BleedAlpha(pixbuf);
+			}
+			if (compressed) {
+				TextureConverterUtils.SwapRGBChannels(pixbuf);
 			}
 			var tga = Path.ChangeExtension(dstPath, ".tga");
-			TextureConverterUtils.SaveToTGA(bledBitmap ?? bitmap, tga, swapRedAndBlue: compressed);
-			if (bledBitmap != null && bledBitmap != bitmap) {
-				bledBitmap.Dispose();
-			}
-			ToDDSTextureHelper(tga, dstPath, bitmap.HasAlpha, compressed, mipMaps);
-
+			TextureConverterUtils.SaveToTGA(pixbuf, tga);
+			ToDDSTextureHelper(tga, dstPath, pixbuf.HasAlpha, compressed, mipMaps);
 			// Do not delete the bitmap if an exception has occurred
 			File.Delete(tga);
 		}
@@ -127,8 +126,7 @@ namespace Orange
 			string nvcompress = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Win", "nvcompress.exe");
 #else
 			string nvcompress = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Mac", "nvcompress");
-			Mono.Unix.Native.Syscall.chmod(
-				nvcompress, Mono.Unix.Native.FilePermissions.S_IXOTH | Mono.Unix.Native.FilePermissions.S_IXUSR);
+			Mono.Unix.Native.Syscall.chmod(nvcompress, Mono.Unix.Native.FilePermissions.S_IXOTH | Mono.Unix.Native.FilePermissions.S_IXUSR);
 #endif
 			srcPath = Path.Combine(Directory.GetCurrentDirectory(), srcPath);
 			dstPath = Path.Combine(Directory.GetCurrentDirectory(), dstPath);
@@ -139,25 +137,18 @@ namespace Orange
 			}
 		}
 
-		public static void ToJPG(Bitmap bitmap, string dstPath)
+		public static void ToJPG(Pixbuf pixbuf, string dstPath, bool mipMaps)
 		{
-			Bitmap bledBitmap = null;
-			if (bitmap.HasAlpha) {
-				bledBitmap = TextureConverterUtils.BleedAlpha(bitmap);
+			if (pixbuf.HasAlpha) {
+				TextureConverterUtils.BleedAlpha(pixbuf);
 			}
-			using (var stream = File.OpenWrite(dstPath)) {
-				(bledBitmap ?? bitmap).SaveTo(stream, CompressionFormat.Jpeg);
-			}
-			if (bledBitmap != null && bledBitmap != bitmap) {
-				bledBitmap.Dispose();
-			}
+			pixbuf.Savev(dstPath, "jpeg", new string[] { "quality" }, new string[] { "80" });
 		}
 
-		public static void ToPNG(Bitmap bitmap, string dstPath)
+		public static void ToGrayscaleAlphaPNG(Pixbuf pixbuf, string dstPath, bool mipMaps)
 		{
-			using (var stream = File.OpenWrite(dstPath)) {
-				bitmap.SaveTo(stream, CompressionFormat.Png);
-			}
+			TextureConverterUtils.ConvertBitmapToGrayscaleAlphaMask(pixbuf);
+			pixbuf.Save(dstPath, "png");
 			var pngcrushTool = Path.Combine(Toolbox.GetApplicationDirectory(), "Toolchain.Win", "pngcrush_1_7_83_w32");
 			// -ow - overwrite
 			// -s - silent
