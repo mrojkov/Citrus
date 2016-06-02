@@ -16,7 +16,7 @@ namespace Tangerine
 		{
 			if (System.IO.File.Exists(GetPath())) {
 				try {
-					Lime.Serialization.ReadObjectFromFile<UserPreferences>(GetPath(), this);
+					Serialization.ReadObjectFromFile<UserPreferences>(GetPath(), this);
 				} catch (System.Exception e) {
 					Debug.Write($"Failed to load the user preferences: {e}");
 				}
@@ -25,7 +25,7 @@ namespace Tangerine
 
 		public void Save()
 		{
-			Lime.Serialization.WriteObjectToFile(GetPath(), this);
+			Serialization.WriteObjectToFile(GetPath(), this);
 		}
 
 		public static string GetPath()
@@ -50,7 +50,7 @@ namespace Tangerine
 		private TangerineApp()
 		{
 			CreateMainMenu();
-			Theme.Current = new Lime.DesktopTheme();
+			Theme.Current = new DesktopTheme();
 			LoadFont();
 			var doc = new Document();
 			doc.AddSomeNodes();
@@ -58,8 +58,11 @@ namespace Tangerine
 
 			var dockManager = new UI.DockManager(new Vector2(1024, 768), ViewMenu);
 			Exiting += p => p.DockState = dockManager.ExportState();
-			dockManager.Closed += Exit;
-
+			dockManager.Closed += () => {
+				var prefs = new UserPreferences();
+				Exiting?.Invoke(prefs);
+				prefs.Save();
+			};
 			var timelinePanel = new UI.DockPanel("Timeline");
 			var inspectorPanel = new UI.DockPanel("Inspector");
 			var browserPanel = new UI.DockPanel("Browser");
@@ -67,9 +70,9 @@ namespace Tangerine
 			dockManager.AddPanel(inspectorPanel, UI.DockSite.Left, new Vector2(400, 700));
 			dockManager.AddPanel(browserPanel, UI.DockSite.Right, new Vector2(400, 700));
 
-			var prefs = new UserPreferences();
-			prefs.Load();
-			dockManager.ImportState(prefs.DockState);
+			var preferences = new UserPreferences();
+			preferences.Load();
+			dockManager.ImportState(preferences.DockState);
 
 			UI.Inspector.Inspector.Initialize(inspectorPanel.ContentWidget);
 			UI.Timeline.Timeline.Initialize(timelinePanel.ContentWidget);
@@ -84,7 +87,7 @@ namespace Tangerine
 				new Command {
 					Text = "Application",
 					Submenu = new Menu {
-						new Command { Text = "Quit", Shortcut = new Shortcut(Key.WinLeft, Key.Q) },
+						new Command("Quit", Application.Exit) { Shortcut = new Shortcut(Key.WinLeft, Key.Q) },
 					}
 				},
 				new Command {
@@ -98,28 +101,6 @@ namespace Tangerine
 					Submenu = (ViewMenu = new Menu { })
 				}
 			};
-		}
-
-		//void CreateMenu(string appName) 
-		//{
-		//	var mainMenu = new AppKit.NSMenu();
-		//	var appMenu = new AppKit.NSMenu();
-		//	var appMenuItem = new AppKit.NSMenuItem {
-		//		Submenu = appMenu
-		//	};
-		//	mainMenu.AddItem(appMenuItem);
-		//	var quitMenuItem = new AppKit.NSMenuItem(string.Format("Quit {0}", appName), "q", delegate {
-		//		AppKit.NSApplication.SharedApplication.Terminate(mainMenu);
-		//	});
-		//	appMenu.AddItem(quitMenuItem);
-		//	AppKit.NSApplication.SharedApplication.MainMenu = mainMenu;
-		//}
-
-		public void Exit()
-		{
-			var prefs = new UserPreferences();
-			Exiting?.Invoke(prefs);
-			prefs.Save();
 		}
 
 		static void LoadFont()

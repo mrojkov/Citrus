@@ -42,7 +42,7 @@ namespace Tangerine.UI
 		public void AddPanel(DockPanel panel, DockSite site, Vector2 size)
 		{
 			padsMenu.Add(new Command(panel.Title, () => ShowPanel(panel)));
-			Application.MainMenu.Refresh();
+			padsMenu.Refresh();
 			var dockedSize = mainWidget.Size / size;
 			panel.Placement = new DockPanel.PanelPlacement { Title = panel.Title, Site = site, DockedSize = dockedSize, Docked = true, UndockedSize = size };
 			panels.Add(panel);

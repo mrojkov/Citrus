@@ -10,23 +10,30 @@ namespace Tangerine.UI
 	public class BitmapButton : Button
 	{
 		public readonly Image Image;
-		public readonly ITexture DefaultTexture;
-		public readonly ITexture HoverTexture;
+		public ITexture DefaultTexture { get; set; }
+		public ITexture HoverTexture { get; set; }
 
-		public BitmapButton(ITexture defaultTexture, ITexture hoverTexture)
-			: this(defaultTexture, hoverTexture, Metrics.IconSize)
-		{
-		}
+		public BitmapButton() : this(Metrics.IconSize) { }
 
-		public BitmapButton(ITexture defaultTexture, ITexture hoverTexture, Vector2 size)
+		public BitmapButton(Vector2 size)
 		{
-			DefaultTexture = defaultTexture;
-			HoverTexture = hoverTexture;
 			Nodes.Clear();
 			Size = MinMaxSize = size;
 			DefaultAnimation.AnimationEngine = new ButtonAnimationEngine(this);
 			Image = new Image { Size = size };
 			Nodes.Add(Image);
+		}
+
+		public BitmapButton(ITexture defaultTexture, ITexture hoverTexture, Vector2 size)
+			: this(size)
+		{
+			DefaultTexture = defaultTexture;
+			HoverTexture = hoverTexture;
+		}
+
+		public BitmapButton(ITexture defaultTexture, ITexture hoverTexture)
+			: this(defaultTexture, hoverTexture, Metrics.IconSize)
+		{
 		}
 
 		class ButtonAnimationEngine : AnimationEngine
