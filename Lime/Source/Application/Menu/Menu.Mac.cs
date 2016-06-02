@@ -32,6 +32,20 @@ namespace Lime
 			}
 		}
 
+		public IEnumerable<ICommand> AllCommands()
+		{
+			foreach (var i in this) {
+				yield return i;
+			}
+			foreach (var i in this) {
+				if (i.Submenu != null) {
+					foreach (var j in i.Submenu.AllCommands()) {
+						yield return j;
+					}
+				}
+			}
+		}
+
 		private void Rebuild()
 		{
 			items.Clear();
