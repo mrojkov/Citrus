@@ -2,21 +2,31 @@ using System.Collections.Generic;
 
 namespace Lime
 {
+	public struct HitTestArgs
+	{
+		public Ray Ray;
+		public Vector2 Point;
+		public Widget ClipperWidget;
+		public float Distance;
+		public Node Node;
+
+		public HitTestArgs(Ray ray) : this()
+		{
+			Ray = ray;
+			Distance = float.MaxValue;
+		}
+
+		public HitTestArgs(Vector2 point) : this()
+		{
+			Point = point;
+		}
+	}
+
 	public class RenderChain
 	{
-		private IHitProcessor hitProcessor;
-
 		public const int LayerCount = 100;
 		public int CurrentLayer;
 		public readonly List<Item>[] Layers = new List<Item>[LayerCount];
-
-		public RenderChain(IHitProcessor hitProcessor = null)
-		{
-			if (hitProcessor == null) {
-				hitProcessor = DefaultHitProcessor.Instance;
-			}
-			this.hitProcessor = hitProcessor;
-		}
 
 		public void Add(Node node, IPresenter presenter)
 		{
@@ -29,6 +39,12 @@ namespace Lime
 
 		public void RenderAndClear()
 		{
+			Render();
+			Clear();
+		}
+
+		public void Render()
+		{
 			for (int i = 0; i < Layers.Length; i++) {
 				var list = Layers[i];
 				if (list == null || list.Count == 0) {
@@ -36,11 +52,27 @@ namespace Lime
 				}
 				for (int j = list.Count - 1; j >= 0; j--) {
 					var t = list[j];
-					hitProcessor.PerformHitTest(t.Node, t.Presenter);
 					t.Presenter.Render(t.Node);
 				}
 				list.Clear();
 			}
+		}
+
+		public bool HitTest(ref HitTestArgs args)
+		{
+			for (int i = Layers.Length - 1; i >= 0; i--) {
+				var list = Layers[i];
+				if (list == null || list.Count == 0) {
+					continue;
+				}
+				for (int j = 0; j < list.Count; j++) {
+					var t = list[j];
+					if (t.Presenter.PartialHitTest(t.Node, ref args)) {
+						return true;
+					}
+				}
+			}
+			return false;
 		}
 
 		public void Clear()

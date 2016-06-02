@@ -144,6 +144,7 @@ namespace Lime
 		public Editor(Widget container, ICaretPosition caretPos, IEditorParams editorParams)
 		{
 			Container = container;
+			Container.HitTestTarget = true;
 			textInputProcessor = (IKeyboardInputProcessor)container;
 			Text = (IText)container;
 			Text.TrimWhitespaces = false;

@@ -72,9 +72,6 @@ namespace Lime
 	[DebuggerTypeProxy(typeof(WidgetDebugView))]
 	public partial class Widget : Node
 	{
-		public const int EmptyHitTestMask = 0;
-		public const int ControlsHitTestMask = 1;
-
 		private Vector2 position;
 		private Vector2 size;
 		private float rotation;
@@ -222,7 +219,7 @@ namespace Lime
 
 		public virtual bool WasClicked()
 		{
-			return Input.WasMouseReleased() && HitTest(Input.MousePosition);
+			return Input.WasMouseReleased() && IsMouseOver();
 		}
 
 		private bool IsNumber(float x)
@@ -502,9 +499,6 @@ namespace Lime
 
 		[ProtoMember(12)]
 		public HitTestMethod HitTestMethod { get; set; }
-
-		[ProtoMember(13)]
-		public uint HitTestMask { get; set; }
 
 		[ProtoMember(14)]
 		public BoneArray BoneArray;
@@ -792,7 +786,7 @@ namespace Lime
 			localToWorldTransform = CalcLocalToParentTransform();
 			if (Parent != null) {
 				var parentWidget = Parent.AsWidget;
-				var parentNode3D = Parent.AsModelNode;
+				var parentNode3D = Parent.AsNode3D;
 				if (parentWidget != null) {
 					localToWorldTransform *= parentWidget.localToWorldTransform;
 					globalColor *= parentWidget.globalColor;
@@ -917,43 +911,7 @@ namespace Lime
 
 		public bool IsMouseOver()
 		{
-			return Input.IsAcceptingMouse() && HitTest(Input.MousePosition);
-		}
-
-		/// <summary>
-		/// Returns true if this widget contains provided point.
-		/// </summary>
-		public bool HitTest(Vector2 point)
-		{
-			return SelfHitTest(point) && !ObscuredByOtherHitTestTargets(point);
-		}
-
-		private bool ObscuredByOtherHitTestTargets(Vector2 point)
-		{
-			if (HitTestMask == 0) {
-				return false;
-			}
-			var targets = new List<Widget>();
-			WidgetContext.Current.Root.EnumerateHitTestTargets(targets, HitTestMask);
-			var thisLayer = GetEffectiveLayer();
-			var passedThis = false;
-			foreach (var target in targets) {
-				if (target == this) {
-					passedThis = true;
-					continue;
-				}
-				var targetLayer = target.GetEffectiveLayer();
-				if (targetLayer < thisLayer) {
-					continue;
-				}
-				if (targetLayer == thisLayer && passedThis) {
-					continue;
-				}
-				if (target.SelfHitTest(point)) {
-					return true;
-				}
-			}
-			return false;
+			return WidgetContext.Current.NodeUnderMouse == this;
 		}
 
 		public int GetEffectiveLayer()
@@ -966,41 +924,71 @@ namespace Lime
 			return 0;
 		}
 
-		private void EnumerateHitTestTargets(List<Widget> targets, uint mask)
+		private static RenderChain renderChain = new RenderChain();
+
+		/// <summary>
+		/// Peforms hit test only for this widget and its descendants. Returns true if the widget or one of its decendants contains the given point.
+		/// This method doesn't take in account if one of the widget's ancestors overlaps the widget.
+		/// </summary>
+		public bool LocalHitTest(ref HitTestArgs args)
 		{
-			if (!GloballyVisible) {
-				return;
-			}
-			if ((HitTestMask & mask) != 0) {
-				targets.Add(this);
-			}
-			for (var node = Nodes.FirstOrNull(); node != null; node = node.NextSibling) {
-				if (node.AsWidget != null) {
-					node.AsWidget.EnumerateHitTestTargets(targets, mask);
+			lock (renderChain) {
+				var savedHitTestTarget = HitTestTarget;
+				try {
+					HitTestTarget = true;
+					AddToRenderChain(renderChain);
+					return renderChain.HitTest(ref args);
+				} finally {
+					renderChain.Clear();
+					HitTestTarget = savedHitTestTarget;
 				}
 			}
 		}
 
-		protected virtual bool SelfHitTest(Vector2 point)
+		/// <summary>
+		/// Checks whether this widget or one of its descendents contains the given point.
+		/// This method doesn't take in account if one of the widget's ancestors overlaps the widget.
+		/// </summary>
+		public bool LocalHitTest(Vector2 point)
 		{
-			if (!GloballyVisible || !InsideClipRect(point)) {
+			var args = new HitTestArgs(point);
+			return LocalHitTest(ref args);
+		}
+
+		/// <summary>
+		/// Checks whether this widgets contains the given point.
+		/// </summary>
+		internal protected override bool PartialHitTest(ref HitTestArgs args)
+		{
+			Node targetNode;
+			for (targetNode = this; targetNode != null; targetNode = targetNode.Parent) {
+				var method = targetNode.AsWidget != null ? targetNode.AsWidget.HitTestMethod : HitTestMethod.Contents;
+				if (method == HitTestMethod.Skip || (targetNode != this && method == HitTestMethod.BoundingRect)) {
+					return false;
+				}
+				if (targetNode.HitTestTarget) {
+					break;
+				}
+			}
+			if (targetNode == null || !IsPointInsideClipperWidget(ref args)) {
 				return false;
 			}
-			switch (HitTestMethod) {
-				case HitTestMethod.BoundingRect:
-					return HitTestBoundingRect(point);
-				case HitTestMethod.Contents:
-					foreach (var node in Nodes) {
-						if (node.AsWidget != null && node.AsWidget.HitTest(point)) {
-							return true;
-						}
-					}
-					break;
+			if (
+				HitTestMethod == HitTestMethod.BoundingRect && IsInsideBoundingRect(args.Point) ||
+			    HitTestMethod == HitTestMethod.Contents && PartialHitTestByContents(ref args)
+			) {
+				args.Node = targetNode;
+				return true;
 			}
 			return false;
 		}
 
-		private bool HitTestBoundingRect(Vector2 point)
+		internal protected virtual bool PartialHitTestByContents(ref HitTestArgs args)
+		{
+			return false;
+		}
+
+		private bool IsInsideBoundingRect(Vector2 point)
 		{
 			var position = LocalToWorldTransform.CalcInversed().TransformVector(point);
 			var size = Size;
@@ -1015,23 +1003,9 @@ namespace Lime
 			return position.X >= 0 && position.Y >= 0 && position.X < size.X && position.Y < size.Y;
 		}
 
-		protected bool InsideClipRect(Vector2 point)
+		private bool IsPointInsideClipperWidget(ref HitTestArgs args)
 		{
-			var clipper = GetEffectiveClipperWidget();
-			return clipper == null || clipper.HitTestBoundingRect(point);
-		}
-
-		protected virtual Widget GetEffectiveClipperWidget()
-		{
-			return Parent != null && Parent.AsWidget != null ? Parent.AsWidget.GetEffectiveClipperWidget() : null;
-		}
-
-		internal override bool PerformHitTest(Vector2 point)
-		{
-			if (!HitTestTarget || !GloballyVisible || !InsideClipRect(point)) {
-				return false;
-			}
-			return HitTestBoundingRect(point);
+			return args.ClipperWidget == null || args.ClipperWidget.IsInsideBoundingRect(args.Point);
 		}
 
 		#endregion

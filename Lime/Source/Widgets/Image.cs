@@ -109,15 +109,9 @@ namespace Lime
 			requestSkipRender = false;
 		}
 
-		protected override bool SelfHitTest(Vector2 point)
+		internal protected override bool PartialHitTestByContents(ref HitTestArgs args)
 		{
-			if (!GloballyVisible || skipRender || !InsideClipRect(point)) {
-				return false;
-			}
-			if (HitTestMethod != HitTestMethod.Contents) {
-				return base.SelfHitTest(point);
-			}
-			Vector2 localPoint = LocalToWorldTransform.CalcInversed().TransformVector(point);
+			Vector2 localPoint = LocalToWorldTransform.CalcInversed().TransformVector(args.Point);
 			Vector2 size = Size;
 			if (size.X < 0) {
 				localPoint.X = -localPoint.X;
@@ -134,11 +128,6 @@ namespace Lime
 			} else {
 				return false;
 			}
-		}
-
-		internal override bool PerformHitTest(Vector2 point)
-		{
-			return HitTestTarget && SelfHitTest(point);
 		}
 
 		public override void Render()

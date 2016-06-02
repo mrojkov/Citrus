@@ -97,14 +97,6 @@ namespace Lime
 			}
 		}
 
-		protected override bool SelfHitTest(Vector2 point)
-		{
-			if (!GloballyVisible || skipRender || !InsideClipRect(point)) {
-				return false;
-			}
-			return base.SelfHitTest(point);
-		}
-
 		protected internal override void OnTrigger(string property)
 		{
 			if (property == "Action") {

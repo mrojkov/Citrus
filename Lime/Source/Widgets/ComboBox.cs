@@ -43,7 +43,7 @@ namespace Lime
 			RefreshLabel();
 			// Show dropdown list on mouse press.
 			label.Updated += delta => {
-				if (Input.WasMousePressed() && label.HitTest(Input.MousePosition)) {
+				if (Input.WasMousePressed() && label.IsMouseOver()) {
 #if MAC
 					Window.Current.Input.SetKeyState(Key.Mouse0, false);
 #endif
