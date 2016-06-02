@@ -3,7 +3,9 @@ using System;
 
 using Android.App;
 using Android.Content;
+using Android.Content.PM;
 using Android.OS;
+using Android.Runtime;
 using Android.Widget;
 
 namespace Lime
@@ -19,11 +21,11 @@ namespace Lime
 
 		private Action gameInitializer;
 		internal Input Input { get; private set; }
-		
+
 		public Activity Activity { get; private set; }
 		public GameView GameView { get; private set; }
 		public RelativeLayout ContentView { get; private set; }
-		
+
 		public delegate void BackButtonDelegate(BackButtonEventArgs args);
 		public delegate void ActivityResultDelegate(int requestCode, Result resultCode, Intent data);
 
@@ -48,6 +50,11 @@ namespace Lime
 			this.gameInitializer = gameInitializer;
 			Input = new Input();
 		}
+
+		public delegate void RequestPermissionsResultHandler(
+			int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults);
+
+		public event RequestPermissionsResultHandler RequestPermissionsResult;
 
 		public void OnCreate(Activity activity, Bundle bundle)
 		{
@@ -172,6 +179,14 @@ namespace Lime
 		{
 			if (ActivityResult != null) {
 				ActivityResult(requestCode, resultCode, data);
+			}
+		}
+
+		public void OnRequestPermissionsResult(
+			int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
+		{
+			if (RequestPermissionsResult != null) {
+				RequestPermissionsResult(requestCode, permissions, grantResults);
 			}
 		}
 	}
