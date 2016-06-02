@@ -11,11 +11,15 @@ namespace Lime
 		void Add(int frame, object value, KeyFunction function = KeyFunction.Linear);
 		void AddOrdered(int frame, object value, KeyFunction function = KeyFunction.Linear);
 		void AddOrdered(IKeyframe keyframe);
+
+		int Version { get; }
 	}
 
 	public class KeyframeCollectionProxy<T> : IKeyframeCollection
 	{
 		KeyframeCollection<T> source;
+
+		public int Version { get; private set; }
 
 		public KeyframeCollectionProxy(KeyframeCollection<T> source)
 		{
@@ -24,6 +28,7 @@ namespace Lime
 
 		public void Add(IKeyframe item)
 		{
+			Version++;
 			source.Add((Keyframe<T>)item);
 		}
 
@@ -38,6 +43,7 @@ namespace Lime
 
 		public void AddOrdered(IKeyframe item)
 		{
+			Version++;
 			source.AddOrdered((Keyframe<T>)item);
 		}
 
@@ -58,12 +64,13 @@ namespace Lime
 		public IKeyframe this[int index]
 		{
 			get { return (IKeyframe)source[index]; }
-			set { source[index] = (Keyframe<T>)value; }
+			set { source[index] = (Keyframe<T>)value; Version++; }
 		}
 
 		public void Clear()
 		{
 			source.Clear();
+			Version++;
 		}
 
 		public bool Contains(IKeyframe item)
@@ -90,6 +97,7 @@ namespace Lime
 
 		public bool Remove(IKeyframe item)
 		{
+			Version++;
 			return source.Remove((Keyframe<T>)item);
 		}
 
@@ -112,11 +120,13 @@ namespace Lime
 
 		public void Insert(int index, IKeyframe item)
 		{
+			Version++;
 			source.Insert(index, (Keyframe<T>)item);
 		}
 
 		public void RemoveAt(int index)
 		{
+			Version++;
 			source.RemoveAt(index);
 		}
 	}

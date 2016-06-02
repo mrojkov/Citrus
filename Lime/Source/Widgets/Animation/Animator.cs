@@ -26,9 +26,9 @@ namespace Lime
 	[ProtoInclude(120, typeof(Animator<EmissionType>))]
 	public interface IAnimator
 	{
-		Node Owner { get; }
+		IAnimable Owner { get; }
 
-		void Bind(Node owner);
+		void Bind(IAnimable owner);
 
 		IAnimator Clone();
 
@@ -64,7 +64,7 @@ namespace Lime
 	[ProtoInclude(156, typeof(Matrix44Animator))]
 	public class Animator<T> : IAnimator
 	{
-		public Node Owner { get; private set; }
+		public IAnimable Owner { get; private set; }
 
 		private int currentKey = 0;
 
@@ -142,7 +142,7 @@ namespace Lime
 		/// Привязывает аниматор к свойству указанного объекта
 		/// </summary>
 		/// <param name="owner">Объект, которому будет назначен аниматор</param>
-		public void Bind(Node owner)
+		public void Bind(IAnimable owner)
 		{
 			this.Owner = owner;
 			var p = AnimationUtils.GetProperty(owner.GetType(), TargetProperty);

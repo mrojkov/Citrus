@@ -97,7 +97,7 @@ namespace Lime
 			}
 		}
 
-		protected internal override void OnTrigger(string property)
+		public override void OnTrigger(string property)
 		{
 			if (property == "Action") {
 				HandleAction();

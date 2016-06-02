@@ -10,6 +10,12 @@ using ProtoBuf;
 
 namespace Lime
 {
+	public interface IAnimable
+	{
+		AnimatorCollection Animators { get; }
+		void OnTrigger(string property);
+	}
+
 	public class TangerineAttribute : Attribute
 	{
 		public int ColorIndex;
@@ -37,7 +43,7 @@ namespace Lime
 	[ProtoInclude(109, typeof(LinearLayout))]
 	[ProtoInclude(110, typeof(Node3D))]
 	[DebuggerTypeProxy(typeof(NodeDebugView))]
-	public class Node : IDisposable
+	public class Node : IDisposable, IAnimable
 	{
 		[Flags]
 		protected internal enum DirtyFlags
@@ -133,7 +139,7 @@ namespace Lime
 		/// Аниматоры, изменяющие анимированные параметры объекта в время обновления
 		/// </summary>
 		[ProtoMember(5)]
-		public AnimatorCollection Animators;
+		public AnimatorCollection Animators { get; private set; }
 
 		/// <summary>
 		/// Child nodes.
@@ -523,7 +529,7 @@ namespace Lime
 		/// <summary>
 		/// TODO: Add summary
 		/// </summary>
-		protected internal virtual void OnTrigger(string property)
+		public virtual void OnTrigger(string property)
 		{
 			if (property != "Trigger") {
 				return;
