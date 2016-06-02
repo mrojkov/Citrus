@@ -53,6 +53,8 @@ namespace Lime
 	[ProtoContract]
 	public class Frame : Widget, IImageCombinerArg
 	{
+		public event Action Rendered;
+
 		public ClipMethod ClipChildren { get; set; }
 
 		public Widget ClipByWidget { get; set; }
@@ -104,6 +106,10 @@ namespace Lime
 				RenderToTexture(renderTexture, renderChain);
 			} else if (ClipChildren == ClipMethod.ScissorTest) {
 				RenderWithScissorTest();
+			}
+			if (Rendered != null) {
+				Renderer.Transform1 = LocalToWorldTransform;
+				Rendered();
 			}
 		}
 

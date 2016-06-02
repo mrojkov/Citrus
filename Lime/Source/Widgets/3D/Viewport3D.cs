@@ -113,6 +113,7 @@ namespace Lime
 		{
 			try {
 				args.Ray = ViewportPointToRay(args.Point);
+				args.Distance = float.MaxValue;
 				foreach (var node in Nodes) {
 					node.AddToRenderChain(renderChain);
 				}

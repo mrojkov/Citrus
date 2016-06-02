@@ -911,7 +911,7 @@ namespace Lime
 
 		public bool IsMouseOver()
 		{
-			return (WidgetContext.Current.NodeUnderMouse == this) && Input.IsAcceptingMouse();
+			return WidgetContext.Current.NodeUnderMouse == this;
 		}
 
 		public int GetEffectiveLayer()
@@ -960,22 +960,25 @@ namespace Lime
 		/// </summary>
 		internal protected override bool PartialHitTest(ref HitTestArgs args)
 		{
-			if (HitTestMethod == HitTestMethod.BoundingRect) {
-				if (HitTestTarget && IsPointInsideClipperWidget(ref args) && IsInsideBoundingRect(args.Point)) {
-					args.Node = this;
-					return true;
+			Node targetNode;
+			for (targetNode = this; targetNode != null; targetNode = targetNode.Parent) {
+				var method = targetNode.AsWidget != null ? targetNode.AsWidget.HitTestMethod : HitTestMethod.Contents;
+				if (method == HitTestMethod.Skip || (targetNode != this && method == HitTestMethod.BoundingRect)) {
+					return false;
 				}
-			} else if (HitTestMethod == HitTestMethod.Contents) {
-				for (Node p = this; p != null; p = p.Parent) {
-					var method = p.AsWidget != null ? p.AsWidget.HitTestMethod : HitTestMethod.BoundingRect;
-					if (p != this && method == HitTestMethod.BoundingRect || method == HitTestMethod.Skip) {
-						return false;
-					}
-					if (p.HitTestTarget && PartialHitTestByContents(ref args)) {
-						args.Node = p;
-						return true;
-					}
+				if (targetNode.HitTestTarget) {
+					break;
 				}
+			}
+			if (targetNode == null || !IsPointInsideClipperWidget(ref args)) {
+				return false;
+			}
+			if (
+				HitTestMethod == HitTestMethod.BoundingRect && IsInsideBoundingRect(args.Point) ||
+			    HitTestMethod == HitTestMethod.Contents && PartialHitTestByContents(ref args)
+			) {
+				args.Node = targetNode;
+				return true;
 			}
 			return false;
 		}

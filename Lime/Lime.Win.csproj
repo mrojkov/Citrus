@@ -103,7 +103,6 @@
     <Compile Include="Source\Graphics\OpenGL\IGLObject.cs" />
     <Compile Include="Source\Graphics\GeometryBuffer.cs" />
     <Compile Include="Source\Graphics\OpenGL\PlatformGeometryBuffer.cs" />
-    <Compile Include="Source\IHitProcessor.cs" />
     <Compile Include="Source\Input\SoftKeyboard.cs" />
     <Compile Include="Source\Types\BoundingSphere.cs" />
     <Compile Include="Source\Types\ContainmentType.cs" />

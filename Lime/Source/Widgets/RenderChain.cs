@@ -13,6 +13,7 @@ namespace Lime
 		public HitTestArgs(Ray ray) : this()
 		{
 			Ray = ray;
+			Distance = float.MaxValue;
 		}
 
 		public HitTestArgs(Vector2 point) : this()
