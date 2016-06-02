@@ -24,7 +24,7 @@ namespace Lime
 
 		public Vector3 Center
 		{
-			get { return (Vector3)Widget.Center * GlobalTransform; }
+			get { return GlobalTransform.TransformVector((Vector3)(Widget.GlobalCenter * new Vector2(1, -1))); }
 		}
 
 		public Plane GetPlane()
