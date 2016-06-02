@@ -106,7 +106,7 @@ namespace Lime
 			// http://stackoverflow.com/questions/14560344/android-backspace-in-webview-baseinputconnection
 			var baseInputConnection = new FixDelKeyInputConnection(this, false);
 			outAttrs.ActionLabel = null;
-			outAttrs.InputType = InputTypes.TextVariationVisiblePassword;
+			outAttrs.InputType = InputTypes.TextVariationVisiblePassword | InputTypes.TextFlagNoSuggestions;
 			outAttrs.ImeOptions = ImeFlags.NoExtractUi | (ImeFlags)ImeAction.None;
 			return baseInputConnection;
 		}
