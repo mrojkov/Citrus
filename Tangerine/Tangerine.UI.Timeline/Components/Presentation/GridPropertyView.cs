@@ -31,7 +31,7 @@ namespace Tangerine.UI.Timeline.Components
 			var maxCol = Timeline.Instance.ColumnCount;
 			widget.PrepareRendererState();
 			Renderer.DrawRect(Vector2.Zero, widget.ContentSize, Colors.GridPropertyRowBackground);
-			var colorIndex = PropertyRegistry.GetAttribute(node.GetType(), animator.TargetProperty)?.ColorIndex;
+			var colorIndex = PropertyRegistry.GetTangerineAttribute(node.GetType(), animator.TargetProperty)?.ColorIndex;
 			var color = KeyframePalette.Colors[colorIndex.Value];
 			var baseTransform = Renderer.Transform1;
 			for (int i = 0; i < animator.ReadonlyKeys.Count; i++) {

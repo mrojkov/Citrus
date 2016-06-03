@@ -46,7 +46,7 @@ namespace Tangerine.UI.Inspector
 
 		void InitializeWidgets()
 		{
-			ContentWidget.Layout = new TableLayout { Tag = "InspectorContent", Spacing = 4, ColCount = 4, RowCount = 6 };
+			ContentWidget.Layout = new VBoxLayout { Tag = "InspectorContent", Spacing = 4 };
 			ContentWidget.Padding = new Thickness(4);
 			RootWidget.Layout = new StackLayout();
 			RootWidget.AddNode(ContentWidget);
@@ -70,6 +70,8 @@ namespace Tangerine.UI.Inspector
 
 		public class PropertyEditorContext
 		{
+			TangerineAttribute tangerineAttribute;
+
 			public readonly Widget InspectorPane;
 			public readonly Node Node;
 			public readonly IAnimable Animable;
@@ -84,6 +86,9 @@ namespace Tangerine.UI.Inspector
 				Property = property;
 				AnimationId = animationId;
 			}
+
+			public TangerineAttribute TangerineAttribute => tangerineAttribute ?? 
+				(tangerineAttribute = PropertyRegistry.GetTangerineAttribute(Animable.GetType(), Property) ?? new TangerineAttribute(0));
 
 			public IAnimator FindAnimator()
 			{
@@ -100,26 +105,39 @@ namespace Tangerine.UI.Inspector
 
 		class CommonPropertyEditor : IPropertyEditor
 		{
+			readonly KeyframeButton keyframeButton;
+			readonly KeyFunctionButton keyFunctionButton;
+
 			protected readonly KeyframeChangeNotificator KeyframeChangeNotificator;
 			protected readonly PropertyEditorContext Context;
-			private readonly KeyframeButton keyframeButton;
-			private readonly KeyFunctionButton keyFunctionButton;
+			protected readonly Widget ContainerWidget;
 
 			public CommonPropertyEditor(PropertyEditorContext context)
 			{
 				Context = context;
+				ContainerWidget = new Widget {
+					Layout = new HBoxLayout { IgnoreHidden = false },
+					LayoutCell = new LayoutCell { StretchY = 0 }
+				};
+				context.InspectorPane.AddNode(ContainerWidget);
 				KeyframeChangeNotificator = new KeyframeChangeNotificator(context);
-				context.InspectorPane.AddNode(new SimpleText { Text = context.Property, Padding = new Thickness(8, 0), LayoutCell = new LayoutCell(Alignment.LeftCenter, 0.666f, 0) });
-				keyframeButton = new KeyframeButton {
-					LayoutCell = new LayoutCell(Alignment.LeftCenter, 0, 0),
-				};
+				ContainerWidget.AddNode(new SimpleText {
+					Text = context.Property,
+					Padding = new Thickness(8, 0),
+					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0.5f),
+					AutoSizeConstraints = false,
+				});
 				keyFunctionButton = new KeyFunctionButton {
-					LayoutCell = new LayoutCell(Alignment.LeftCenter, 0, 0),
+					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
 				};
-				keyframeButton.SetKeyColor(Color4.Red);
+				keyframeButton = new KeyframeButton {
+					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
+				};
+				var keyColor = KeyframePalette.Colors[Context.TangerineAttribute.ColorIndex];
+				keyframeButton.SetKeyColor(keyColor);
 				keyFunctionButton.Clicked += KeyFunctionButton_Clicked;
-				Context.InspectorPane.AddNode(keyframeButton);
-				Context.InspectorPane.AddNode(keyFunctionButton);
+				ContainerWidget.AddNode(keyFunctionButton);
+				ContainerWidget.AddNode(keyframeButton);
 			}
 
 			private void KeyFunctionButton_Clicked()
@@ -131,7 +149,7 @@ namespace Tangerine.UI.Inspector
 				KeyframeChangeNotificator.Update();
 				if (KeyframeChangeNotificator.Changed) {
 					var k = Context.FindKeyframe();
-					keyFunctionButton.Visible = k != null;
+					keyFunctionButton.Visible = (k != null);
 					if (k != null) {
 						keyFunctionButton.SetKeyFunction(k.Function);
 					}
@@ -140,7 +158,7 @@ namespace Tangerine.UI.Inspector
 
 			public class KeyframeButton : Button
 			{
-				private readonly Image image;
+				readonly Image image;
 
 				public KeyframeButton()
 				{
@@ -232,16 +250,13 @@ namespace Tangerine.UI.Inspector
 			{
 				var prop = Context.Animable.GetType().GetProperty(Context.Property);
 				getter = prop.GetGetMethod();
-				editorX = new EditBox();
-				editorY = new EditBox();
-				Context.InspectorPane.AddNode(new Widget {
-					LayoutCell = new LayoutCell(Alignment.Center) { StretchY = 0 },
+				ContainerWidget.AddNode(new Widget {
 					Layout = new HBoxLayout(),
 					Nodes = {
 						new SimpleText { Text = "X", Padding = new Thickness(4, 0), LayoutCell = new LayoutCell(Alignment.Center) },
-						editorX,
+						(editorX = new EditBox()),
 						new SimpleText { Text = "Y", Padding = new Thickness(4, 0), LayoutCell = new LayoutCell(Alignment.Center) },
-						editorY,
+						(editorY = new EditBox()),
 					}
 				});
 			}
