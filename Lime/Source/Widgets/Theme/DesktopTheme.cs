@@ -55,7 +55,7 @@ namespace Lime
 			button.MinMaxSize = Metrics.DefaultButtonSize;
 			button.Size = button.MinSize;
 			button.Padding = Metrics.ControlsPadding;
-			button.Presenter = new ButtonPresenter(button.Presenter);
+			button.CompoundPresenter.Push(new ButtonPresenter());
 			button.DefaultAnimation.AnimationEngine = new ButtonAnimationEngine(button);
 			var caption = new SimpleText {
 				Id = "TextPresenter",
@@ -85,7 +85,7 @@ namespace Lime
 				Text = "...",
 				MinMaxWidth = 20
 			};
-			fc.Presenter = new BorderedFramePresenter(fc.Presenter, Colors.GrayBackground, Colors.ControlBorder);
+			fc.CompoundPresenter.Push(new BorderedFramePresenter(Colors.GrayBackground, Colors.ControlBorder));
 			fc.AddNode(label);
 			fc.AddNode(button);
 		}
@@ -108,7 +108,7 @@ namespace Lime
 				
 		private void DecorateWindowWidget(Widget widget)
 		{
-			widget.Presenter = new WindowWidgetPresenter(widget.Presenter);
+			widget.CompoundPresenter.Push(new WindowWidgetPresenter());
 		}
 		
 		private void DecorateEditBox(Widget widget)
@@ -129,7 +129,7 @@ namespace Lime
 				eb, eb.Caret,
 				new CaretParams { CaretWidget = new VerticalLineCaret(eb, thickness: 1.0f) });
 			eb.Editor = new Editor(eb, eb.Caret, editorParams);
-			eb.Presenter = new BorderedFramePresenter(eb.Presenter, Colors.WhiteBackground, Colors.ControlBorder);
+			eb.CompoundPresenter.Push(new BorderedFramePresenter(Colors.WhiteBackground, Colors.ControlBorder));
 		}
 
 		private void DecorateComboBox(Widget widget)
@@ -141,7 +141,7 @@ namespace Lime
 				Id = "Label",
 				VAlignment = VAlignment.Center,
 			};
-			text.Presenter = new ComboBoxPresenter(text.Presenter);
+			text.CompoundPresenter.Add(new ComboBoxPresenter());
 			text.Padding = Metrics.ControlsPadding;
 			text.Padding.Right = ComboBoxPresenter.IconWidth;
 			comboBox.AddNode(text);
@@ -151,7 +151,7 @@ namespace Lime
 		private void DecorateTextView(Widget widget)
 		{
 			var tv = (TextView)widget;
-			tv.Presenter = new BorderedFramePresenter(tv.Presenter, Colors.WhiteBackground, Colors.ControlBorder);
+			tv.CompoundPresenter.Push(new BorderedFramePresenter(Colors.WhiteBackground, Colors.ControlBorder));
 		}
 
 		private static void ExpandToContainer(Widget widget)
@@ -163,11 +163,10 @@ namespace Lime
 
 		class BorderedFramePresenter : CustomPresenter
 		{
-			private Color4 innerColor;
-			private Color4 borderColor;
+			private readonly Color4 innerColor;
+			private readonly Color4 borderColor;
 
-			public BorderedFramePresenter(IPresenter previous, Color4 innerColor, Color4 borderColor)
-				: base(previous)
+			public BorderedFramePresenter(Color4 innerColor, Color4 borderColor)
 			{
 				this.innerColor = innerColor;
 				this.borderColor = borderColor;
@@ -175,12 +174,10 @@ namespace Lime
 
 			public override void Render(Node node)
 			{
-				base.Render(node);
 				var widget = node.AsWidget;
 				widget.PrepareRendererState();
 				Renderer.DrawRect(Vector2.Zero, widget.Size, innerColor);
 				Renderer.DrawRectOutline(Vector2.Zero, widget.Size, borderColor);
-				base.Render(node);
 			}
 		}
 
@@ -195,15 +192,12 @@ namespace Lime
 				new VectorShape.Line(0.5f, 0.2f, 0.3f, 0.35f, Colors.BlackText, 0.07f),
 			};
 
-			public ComboBoxPresenter(IPresenter previous) : base(previous) { }
-
 			public override void Render(Node node)
 			{
 				var widget = node.AsWidget;
 				widget.PrepareRendererState();
 				Renderer.DrawVerticalGradientRect(Vector2.Zero, widget.Size, Colors.ButtonDefault);
 				Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.ControlBorder);
-				base.Render(node);
 				var transform = Matrix32.Scaling(IconWidth, widget.Height) * Matrix32.Translation(widget.Width - IconWidth, 0);
 				icon.Draw(transform);
 			}
@@ -229,11 +223,9 @@ namespace Lime
 		{
 			private ColorGradient innerGradient;
 
-			public ButtonPresenter(IPresenter previous) : base(previous) { }
-
 			public void SetState(string state)
 			{
-				Window.Current.Invalidate();
+				CommonWindow.Current.Invalidate();
 				switch (state) {
 					case "Press":
 						innerGradient = Colors.ButtonPress;
@@ -256,20 +248,16 @@ namespace Lime
 				widget.PrepareRendererState();
 				Renderer.DrawVerticalGradientRect(Vector2.Zero, widget.Size, innerGradient);
 				Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.ControlBorder);
-				base.Render(node);
 			}
 		}
 
 		class WindowWidgetPresenter : CustomPresenter
 		{
-			public WindowWidgetPresenter(IPresenter previous) : base(previous) { }
-
 			public override void Render(Node node)
 			{
 				var widget = node.AsWidget;
 				widget.PrepareRendererState();
 				Renderer.DrawRect(Vector2.Zero, widget.Size, Colors.GrayBackground);
-				base.Render(node);
 			}
 		}
 	}

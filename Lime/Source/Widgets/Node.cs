@@ -74,6 +74,7 @@ namespace Lime
 		/// May be non-unique.
 		/// </summary>
 		[ProtoMember(1)]
+		[Tangerine(0)]
 		public string Id { get; set; }
 
 		/// <summary>
@@ -81,6 +82,7 @@ namespace Lime
 		/// the node children are replaced by the external scene nodes.
 		/// </summary>
 		[ProtoMember(2)]
+		[Tangerine(0)]
 		public string ContentsPath { get; set; }
 
 		/// <summary>
@@ -88,6 +90,7 @@ namespace Lime
 		/// it automatically runs the child animation from the given marker id.
 		/// </summary>
 		[Trigger]
+		[Tangerine(1)]
 		public string Trigger { get; set; }
 
 		private Node parent;
@@ -118,10 +121,20 @@ namespace Lime
 		/// </summary>
 		public IPresenter Presenter { get; set; }
 
+		public CompoundPresenter CompoundPresenter
+		{
+			get { return (Presenter as CompoundPresenter) ?? (CompoundPresenter)(Presenter = new CompoundPresenter(Presenter)); }
+		}
+
 		/// <summary>
 		/// The presenter used for rendering the node after rendering its children.
 		/// </summary>
 		public IPresenter PostPresenter { get; set; }
+
+		public CompoundPresenter CompoundPostPresenter
+		{
+			get { return (PostPresenter as CompoundPresenter) ?? (CompoundPresenter)(PostPresenter = new CompoundPresenter(PostPresenter)); }
+		}
 
 		/// <summary>
 		/// Shortcut to the next element of nodes of this parent.
