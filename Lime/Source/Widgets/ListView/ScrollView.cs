@@ -227,11 +227,17 @@ namespace Lime
 				ScrollTo(MaxScrollPosition);
 		}
 
+		private bool IsUnderMouse()
+		{
+			var hitTestArgs = new HitTestArgs(CommonWindow.Current.Input.MousePosition);
+			return Frame.Presenter.PartialHitTest(Frame, ref hitTestArgs);
+		}
+
 		private IEnumerator<object> MainTask()
 		{
 			while (true) {
 				// Wait until a user starts dragging the widget
-				while (!Frame.Input.WasMousePressed() || !Frame.IsMouseOver()) {
+				while (!Frame.Input.WasMousePressed() || !IsUnderMouse()) {
 					Bounce();
 					yield return null;
 				}
@@ -261,7 +267,7 @@ namespace Lime
 				var IsScrollingByMouseWheel =
 					!Frame.Input.IsMousePressed() &&
 					(Frame.Input.WasKeyPressed(Key.MouseWheelDown) || Frame.Input.WasKeyPressed(Key.MouseWheelUp)) &&
-					(CanScroll && Frame.IsMouseOver());
+					(CanScroll && IsUnderMouse());
 				if (IsScrollingByMouseWheel) {
 					var newWheelScrollState = (WheelScrollState)Math.Sign(Frame.Input.WheelScrollAmount);
 					if (newWheelScrollState != wheelScrollState) {
