@@ -1,12 +1,14 @@
 ﻿#if WIN
 using System;
 using System.Windows.Forms;
+using System.Collections.Generic;
 using SD = System.Drawing;
 
 namespace Lime
 {
-	public class Menu : ObservableList<IMenuItem>, IMenu
+	public class Menu : List<ICommand>, IMenu
 	{
+		List<MenuItem> items = new List<MenuItem>();
 		private readonly ContextMenuStrip menu;
 		private bool validated = true;
 
@@ -17,30 +19,51 @@ namespace Lime
 			};
 		}
 
+		private void Rebuild()
+		{
+			items.Clear();
+			menu.Items.Clear();
+			foreach (var i in this) {
+				var item = new MenuItem(i);
+				menu.Items.Add(item.Item);
+				items.Add(item);
+			}
+		}
+
+		public void Refresh()
+		{
+			if (items.Count != Count) {
+				Rebuild();
+				return;
+			}
+			int j = 0;
+			foreach (var i in items) {
+				if (i.Command != this[j++]) {
+					Rebuild();
+					break;
+				}
+				i.Refresh();
+			}
+		}
+
 		public void Popup()
 		{
 			Validate();
 			menu.Show(Window.Current.Form, new SD.Point());
 		}
 
-		public void Popup(IWindow window, Vector2 position, float minimumWidth, IMenuItem item)
+		public void Popup(IWindow window, Vector2 position, float minimumWidth, ICommand command)
 		{
 			Validate();
 			menu.MinimumSize = new SD.Size((int)minimumWidth, menu.MinimumSize.Height);
 			foreach (var menuItem in this) {
 				var mi = ((MenuItem)menuItem).Item;
 				mi.Width = menu.Width;
-				if (menuItem == item) {
+				if (menuItem == command) {
 					mi.Select();
 				}
 			}
 			menu.Show(window.Form, new SD.Point((int)position.X, (int)position.Y));
-		}
-
-		protected override void OnChanged()
-		{
-			validated = false;
-			base.OnChanged();
 		}
 
 		private void Validate()
@@ -55,14 +78,18 @@ namespace Lime
 		}
 	}
 
-	public class MenuItem : IMenuItem
+	class MenuItem
 	{
-		public MenuItem()
+		public readonly ICommand Command;
+
+		public MenuItem(ICommand command)
 		{
+			Command = command;
 			Item = new ToolStripMenuItem {
 				AutoSize = false
 			};
 			Item.Click += Item_Click;
+			Clicked += command.Execute;
 		}
 
 		public event Action Clicked;
@@ -92,6 +119,12 @@ namespace Lime
 		public void SetShortcutString(string shortcut)
 		{
 			((ToolStripMenuItem)Item).ShortcutKeyDisplayString = shortcut;
+		}
+
+		public void Refresh()
+		{
+			// TODO: implement.
+			throw new NotImplementedException();
 		}
 
 		private void Item_Click(object sender, EventArgs e)
