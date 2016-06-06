@@ -112,7 +112,7 @@ namespace Lime
 		internal protected override bool PartialHitTest(ref HitTestArgs args)
 		{
 			try {
-				args.Ray = ViewportPointToRay(args.Point);
+				args.Ray = ScreenPointToRay(args.Point);
 				args.Distance = float.MaxValue;
 				foreach (var node in Nodes) {
 					node.AddToRenderChain(renderChain);
