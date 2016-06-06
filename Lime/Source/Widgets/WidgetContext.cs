@@ -37,7 +37,9 @@ namespace Lime
 		public WidgetContext(Widget root) : base("Current")
 		{
 			Root = root;
-			Current = this;
+			if (Current == null) {
+				Current = this;
+			}
 		}
 	}
 }

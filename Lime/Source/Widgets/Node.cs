@@ -10,6 +10,12 @@ using ProtoBuf;
 
 namespace Lime
 {
+	public interface IAnimable
+	{
+		AnimatorCollection Animators { get; }
+		void OnTrigger(string property);
+	}
+
 	public class TangerineAttribute : Attribute
 	{
 		public int ColorIndex;
@@ -37,7 +43,7 @@ namespace Lime
 	[ProtoInclude(109, typeof(LinearLayout))]
 	[ProtoInclude(110, typeof(Node3D))]
 	[DebuggerTypeProxy(typeof(NodeDebugView))]
-	public class Node : IDisposable
+	public class Node : IDisposable, IAnimable
 	{
 		[Flags]
 		protected internal enum DirtyFlags
@@ -68,6 +74,7 @@ namespace Lime
 		/// May be non-unique.
 		/// </summary>
 		[ProtoMember(1)]
+		[Tangerine(0)]
 		public string Id { get; set; }
 
 		/// <summary>
@@ -75,6 +82,7 @@ namespace Lime
 		/// the node children are replaced by the external scene nodes.
 		/// </summary>
 		[ProtoMember(2)]
+		[Tangerine(0)]
 		public string ContentsPath { get; set; }
 
 		/// <summary>
@@ -82,6 +90,7 @@ namespace Lime
 		/// it automatically runs the child animation from the given marker id.
 		/// </summary>
 		[Trigger]
+		[Tangerine(1)]
 		public string Trigger { get; set; }
 
 		private Node parent;
@@ -112,10 +121,20 @@ namespace Lime
 		/// </summary>
 		public IPresenter Presenter { get; set; }
 
+		public CompoundPresenter CompoundPresenter
+		{
+			get { return (Presenter as CompoundPresenter) ?? (CompoundPresenter)(Presenter = new CompoundPresenter(Presenter)); }
+		}
+
 		/// <summary>
 		/// The presenter used for rendering the node after rendering its children.
 		/// </summary>
 		public IPresenter PostPresenter { get; set; }
+
+		public CompoundPresenter CompoundPostPresenter
+		{
+			get { return (PostPresenter as CompoundPresenter) ?? (CompoundPresenter)(PostPresenter = new CompoundPresenter(PostPresenter)); }
+		}
 
 		/// <summary>
 		/// Shortcut to the next element of nodes of this parent.
@@ -133,7 +152,7 @@ namespace Lime
 		/// Аниматоры, изменяющие анимированные параметры объекта в время обновления
 		/// </summary>
 		[ProtoMember(5)]
-		public AnimatorCollection Animators;
+		public AnimatorCollection Animators { get; private set; }
 
 		/// <summary>
 		/// Child nodes.
@@ -523,7 +542,7 @@ namespace Lime
 		/// <summary>
 		/// TODO: Add summary
 		/// </summary>
-		protected internal virtual void OnTrigger(string property)
+		public virtual void OnTrigger(string property)
 		{
 			if (property != "Trigger") {
 				return;

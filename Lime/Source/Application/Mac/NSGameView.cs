@@ -276,6 +276,10 @@ namespace Lime.Platform
 				var timeout = new TimeSpan((long)(((1.0 * TimeSpan.TicksPerSecond) / updatesPerSecond) + 0.5));
 				animationTimer = NSTimer.CreateRepeatingScheduledTimer(timeout, delegate {
 					OnUpdate();
+					if (!animating) {
+						// The window could be closed on update
+						return;
+					}
 					OnRender();
 				});
 				NSRunLoop.Current.AddTimer(animationTimer, NSRunLoopMode.Default);

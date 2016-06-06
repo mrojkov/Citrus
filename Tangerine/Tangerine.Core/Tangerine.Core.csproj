@@ -56,18 +56,18 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
-    <Folder Include="Commands\" />
+    <Folder Include="Operations\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DocumentHistory.cs" />
     <Compile Include="Document.cs" />
-    <Compile Include="Command.cs" />
     <Compile Include="Entity.cs" />
-    <Compile Include="Commands\Modification.cs" />
+    <Compile Include="Operations\Modification.cs" />
     <Compile Include="NodeEditorState.cs" />
     <Compile Include="AnimatorEditorState.cs" />
     <Compile Include="Uid.cs" />
+    <Compile Include="Operation.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

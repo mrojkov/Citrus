@@ -62,28 +62,28 @@ namespace Lime
 		/// <summary>
 		/// Gets or sets an upper-left corner of the client area on the desktop.
 		/// </summary>
-		IntVector2 ClientPosition { get; set; }
+		Vector2 ClientPosition { get; set; }
 
 		/// <summary>
 		/// Gets or sets a client size of this window.
 		/// </summary>
-		Size ClientSize { get; set; }
+		Vector2 ClientSize { get; set; }
 
 		/// <summary>
 		/// Gets or sets a position of this window on the desktop.
 		/// </summary>
-		IntVector2 DecoratedPosition { get; set; }
+		Vector2 DecoratedPosition { get; set; }
 
 		/// <summary>
 		/// Gets or sets an decorated size (including title and border) of this window.
 		/// </summary>
-		Size DecoratedSize { get; set; }
+		Vector2 DecoratedSize { get; set; }
 
 		// Gets or sets the minimum size to which the window (including title and border) can be sized.
-		Size MinimumDecoratedSize { get; set; }
+		Vector2 MinimumDecoratedSize { get; set; }
 
 		// Gets or sets the maximum size to which the window (including title and border) can be sized.
-		Size MaximumDecoratedSize { get; set; }
+		Vector2 MaximumDecoratedSize { get; set; }
 
 		/// <summary>
 		/// Gets or sets a value indicates whether the window is displayed

@@ -145,6 +145,13 @@ namespace Lime
 		public static DeviceOrientation CurrentDeviceOrientation { get; internal set; }
 #endif
 
+#if MAC
+		public static Vector2 DesktopMousePosition
+		{
+			get { return new Vector2((float)AppKit.NSEvent.CurrentMouseLocation.X, (float)AppKit.NSEvent.CurrentMouseLocation.Y); }
+		}
+#endif
+
 		// Specifies the lowest possible 1/(time delta) passed to Window.Updating.
 		// TODO: Move to IWindow
 		public static float LowFPSLimit = 20;
@@ -171,6 +178,22 @@ namespace Lime
 
 		private static readonly object scheduledActionsSync = new object();
 		private static Action scheduledActions;
+		private static Menu mainMenu;
+
+		public static Menu MainMenu
+		{
+			get { return mainMenu; }	
+			set
+			{
+				if (mainMenu != value) {
+					mainMenu = value;
+#if MAC
+					value.Refresh();
+					NSApplication.SharedApplication.MainMenu = value.NativeMenu;
+#endif
+				}
+			}
+		}
 
 		public static RenderingBackend RenderingBackend { get; private set; }
 		public static bool UsingDeferredHitTest { get; private set; }

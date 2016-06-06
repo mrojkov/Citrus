@@ -20,12 +20,13 @@ namespace Tangerine.UI.Timeline.Components
 				Padding = new Thickness { Left = 4, Right = 2 },
 				MinHeight = c.State.RowHeight - 1,
 				Layout = new HBoxLayout(),
+				HitTestTarget = true,
 				Nodes = {
-					new HSpacer(identation * Metrics.RollIndentation),
+					new HSpacer(identation * Metrics.TimelineRollIndentation),
 					label,
 				},
 			};
-			widget.Presenter = new DelegatePresenter<Widget>(RenderBackground);
+			widget.Presenter = new DelegatePresenter<Widget>(RenderBackground, widget.Presenter);
 			widget.Updated += delta => widget.MinHeight = c.State.RowHeight;
 		}
 

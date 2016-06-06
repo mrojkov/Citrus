@@ -15,9 +15,9 @@ namespace Tangerine.UI.Timeline
 				if (input.IsMouseOwner()) {
 					var rect = timeline.Roll.RootWidget.CalcAABBInSpaceOf(timeline.RootWidget);
 					if (input.MousePosition.Y > rect.B.Y) {
-						timeline.ScrollOrigin.Y += Metrics.DefaultRowHeight;
+						timeline.ScrollOrigin.Y += Metrics.TimelineDefaultRowHeight;
 					} else if (input.MousePosition.Y < rect.A.Y) {
-						timeline.ScrollOrigin.Y -= Metrics.DefaultRowHeight;
+						timeline.ScrollOrigin.Y -= Metrics.TimelineDefaultRowHeight;
 					}
 					Window.Current.Invalidate();
 				}

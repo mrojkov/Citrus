@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Lime
 {
@@ -29,61 +30,63 @@ namespace Lime
 		}
 	}
 
-	public class CustomPresenter : IPresenter
+	public class CompoundPresenter : List<IPresenter>, IPresenter
 	{
-		private IPresenter previous;
+		public CompoundPresenter() { }
 
-		public CustomPresenter() { }
-
-		public CustomPresenter(IPresenter previous)
+		public void Push(IPresenter presenter)
 		{
-			this.previous = previous;
+			Insert(0, presenter);
 		}
 
-		public virtual void Render(Node node)
+		public CompoundPresenter(IPresenter presenter)
 		{
-			if (previous != null) {
-				previous.Render(node);
+			if (presenter != null) {
+				Add(presenter);
 			}
 		}
 
-		public virtual bool PartialHitTest(Node node, ref HitTestArgs args)
+		public void Render(Node node)
 		{
-			return previous != null && previous.PartialHitTest(node, ref args);
+			for (int i = Count - 1; i >= 0; i--) {
+				this[i].Render(node);
+			}
 		}
 
-		public virtual IPresenter Clone()
+		public bool PartialHitTest(Node node, ref HitTestArgs args)
 		{
-			var r = (CustomPresenter)MemberwiseClone();
-			if (previous != null) {
-				r.previous = previous.Clone();
+			foreach (var i in this) {
+				if (i.PartialHitTest(node, ref args)) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		public IPresenter Clone()
+		{
+			var r = new CompoundPresenter();
+			foreach (var i in this) {
+				r.Add(i.Clone());
 			}
 			return r;
 		}
 	}
 
+	public class CustomPresenter : IPresenter
+	{
+		public virtual void Render(Node node) { }
+		public virtual bool PartialHitTest(Node node, ref HitTestArgs args) { return false; }
+		public virtual IPresenter Clone() { return (CustomPresenter)MemberwiseClone(); }
+	}
+
 	public class DelegatePresenter<T> : CustomPresenter where T: Node
 	{
 		readonly Action<T> render;
-		readonly bool reverseOrder;
 
-		public DelegatePresenter(Action<T> render, IPresenter previous = null, bool reverseOrder = false)
-			: base(previous)
-		{
-			this.render = render;
-			this.reverseOrder = reverseOrder;
-		}
+		public DelegatePresenter(Action<T> render) { this.render = render; }
 
-		public override void Render(Node node)
-		{
-			if (reverseOrder) {
-				render(node as T);
-				base.Render(node);
-			} else {
-				base.Render(node);
-				render(node as T);
-			}
-		}
+		public override void Render(Node node) { render(node as T); }
 	}
 
 	public class WidgetBoundsPresenter : CustomPresenter
@@ -91,7 +94,7 @@ namespace Lime
 		public readonly Color4 Color;
 		public readonly float Thickness;
 
-		public WidgetBoundsPresenter(Color4 color, float thickness = 0, IPresenter previous = null) : base(previous)
+		public WidgetBoundsPresenter(Color4 color, float thickness = 0)
 		{
 			Color = color;
 			Thickness = thickness;
@@ -99,9 +102,8 @@ namespace Lime
 
 		public override void Render(Node node)
 		{
-			base.Render(node);
 			node.AsWidget.PrepareRendererState();
-			var t = Thickness > 0 ? Thickness : 1 / Window.Current.PixelScale;
+			var t = Thickness > 0 ? Thickness : 1 / CommonWindow.Current.PixelScale;
 			Renderer.DrawRectOutline(Vector2.Zero, node.AsWidget.Size, Color, t);
 		}
 	}
@@ -110,16 +112,16 @@ namespace Lime
 	{
 		public readonly Color4 Color;
 
-		public WidgetFlatFillPresenter(Color4 color, IPresenter previous = null) : base(previous)
+		public WidgetFlatFillPresenter(Color4 color)
 		{
 			Color = color;
 		}
 
 		public override void Render(Node node)
 		{
-			base.Render(node);
-			node.AsWidget.PrepareRendererState();
-			Renderer.DrawRect(Vector2.Zero, node.AsWidget.Size, Color);
+			var widget = node.AsWidget;
+			widget.PrepareRendererState();
+			Renderer.DrawRect(widget.ContentPosition, widget.ContentSize, Color);
 		}
 	}
 }

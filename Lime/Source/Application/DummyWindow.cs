@@ -9,12 +9,12 @@ namespace Lime
 		public string Title { get; set; }
 		public WindowState State { get; set; }
 		public bool Fullscreen { get; set; }
-		public IntVector2 ClientPosition { get; set; }
-		public Size ClientSize { get; set; }
-		public IntVector2 DecoratedPosition { get; set; }
-		public Size DecoratedSize { get; set; }
-		public Size MinimumDecoratedSize { get; set; }
-		public Size MaximumDecoratedSize { get; set; }
+		public Vector2 ClientPosition { get; set; }
+		public Vector2 ClientSize { get; set; }
+		public Vector2 DecoratedPosition { get; set; }
+		public Vector2 DecoratedSize { get; set; }
+		public Vector2 MinimumDecoratedSize { get; set; }
+		public Vector2 MaximumDecoratedSize { get; set; }
 		public bool Visible { get; set; }
 		public Input Input { get; set; }
 		public float FPS { get; set; }

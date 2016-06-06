@@ -40,16 +40,16 @@ namespace Lime
 			}
 		}
 
-		public IntVector2 ClientPosition
+		public Vector2 ClientPosition
 		{
-			get { throw new NotImplementedException(); }
-			set { throw new NotImplementedException(); }
+			get { return DecoratedPosition - new Vector2(0, titleBarHeight); }
+			set { DecoratedPosition = value + new Vector2(0, titleBarHeight); }
 		}
 
-		public Size ClientSize
+		public Vector2 ClientSize
 		{
-			get { return new Size((int)View.Bounds.Width, (int)View.Bounds.Height); }
-			set { window.SetContentSize(new CGSize(value.Width, value.Height)); }
+			get { return new Vector2((float)View.Bounds.Width, (float)View.Bounds.Height); }
+			set { window.SetContentSize(new CGSize(value.X, value.Y)); }
 		}
 
 		public float PixelScale
@@ -57,9 +57,9 @@ namespace Lime
 			get { return (float)window.BackingScaleFactor; }
 		}
 
-		public IntVector2 DecoratedPosition
+		public Vector2 DecoratedPosition
 		{
-			get { return new IntVector2((int)window.Frame.X, (int)window.Frame.Y); }
+			get { return new Vector2((float)window.Frame.X, (float)window.Frame.Y); }
 			set
 			{
 				var frame = window.Frame;
@@ -68,27 +68,27 @@ namespace Lime
 			}
 		}
 
-		public Size DecoratedSize
+		public Vector2 DecoratedSize
 		{
-			get { return new Size((int)window.Frame.Width, (int)window.Frame.Height); }
+			get { return new Vector2((float)window.Frame.Width, (float)window.Frame.Height); }
 			set 
 			{
 				var frame = window.Frame;
-				frame.Size = new CGSize(value.Width, value.Height); 
+				frame.Size = new CGSize(value.X, value.Y); 
 				window.SetFrame(frame, true);
 			}
 		}
 
-		public Size MinimumDecoratedSize
+		public Vector2 MinimumDecoratedSize
 		{
-			get { return new Size((int)window.MinSize.Width, (int)window.MinSize.Height); }
-			set { window.MinSize = new CGSize(value.Width, value.Height); }
+			get { return new Vector2((float)window.MinSize.Width, (float)window.MinSize.Height); }
+			set { window.MinSize = new CGSize(value.X, value.Y); }
 		}
 
-		public Size MaximumDecoratedSize
+		public Vector2 MaximumDecoratedSize
 		{
-			get { return new Size((int)window.MaxSize.Width, (int)window.MaxSize.Height); }
-			set { window.MaxSize = new CGSize(value.Width, value.Height); }
+			get { return new Vector2((float)window.MaxSize.Width, (float)window.MaxSize.Height); }
+			set { window.MaxSize = new CGSize(value.X, value.Y); }
 		}
 
 		public bool Active
@@ -139,14 +139,16 @@ namespace Lime
 
 		public NSGameView NSGameView { get { return View; } }
 
-		private MouseCursor cursor;
+		private MouseCursor cursor = MouseCursor.Default;
 		public MouseCursor Cursor
 		{
 			get { return cursor; }
 			set
 			{
-				cursor = value;
-				value.NativeCursor.Set();
+				if (cursor != value) {
+					cursor = value;
+					value.NativeCursor.Set();
+				}
 			}
 		}
 		
@@ -179,22 +181,32 @@ namespace Lime
 			View.Run(options.RefreshRate);
 		}
 
-		private Size windowedClientSize;
+		private Vector2 windowedClientSize;
+		private float titleBarHeight;
 		private bool shouldFixFullscreen;
 
 		private void CreateNativeWindow(WindowOptions options)
 		{
-			var rect = new CGRect(0, 0, options.ClientSize.Width, options.ClientSize.Height);
+			var rect = new CGRect(0, 0, options.ClientSize.X, options.ClientSize.Y);
 			View = new NSGameView(Input, rect, Platform.GraphicsMode.Default);
-			var style = NSWindowStyle.Titled | NSWindowStyle.Closable | NSWindowStyle.Miniaturizable;
+			NSWindowStyle style;
+			if (options.Style == WindowStyle.Borderless) {
+				style = NSWindowStyle.Borderless;
+			} else {
+				style = NSWindowStyle.Titled | NSWindowStyle.Closable | NSWindowStyle.Miniaturizable;
+			}
 			if (!options.FixedSize) {
 				style |= NSWindowStyle.Resizable;
 			}
 			window = new NSWindow(rect, style, NSBackingStore.Buffered, false);
-			if (options.MinimumDecoratedSize != Size.Zero) {
+
+			var contentRect = window.ContentRectFor(rect);
+			titleBarHeight = (float)rect.Height - (float)contentRect.Height;
+
+			if (options.MinimumDecoratedSize != Vector2.Zero) {
 				MinimumDecoratedSize = options.MinimumDecoratedSize;
 			}
-			if (options.MaximumDecoratedSize != Size.Zero) {
+			if (options.MaximumDecoratedSize != Vector2.Zero) {
 				MaximumDecoratedSize = options.MaximumDecoratedSize;
 			}
 			window.Title = options.Title;
@@ -202,9 +214,13 @@ namespace Lime
 				return RaiseClosing();
 			};
 			window.WillClose += (s, e) => {
-				View.Stop();
-				NSApplication.SharedApplication.Terminate(View);
 				HandleClosed(s, e);
+				View.Stop();
+				if (Application.MainWindow == this) {
+					NSApplication.SharedApplication.Terminate(View);
+					TexturePool.Instance.DiscardAllTextures();
+					AudioSystem.Terminate();
+				}
 			};
 			window.DidResize += (s, e) => {
 				View.UpdateGLContext();
@@ -251,9 +267,9 @@ namespace Lime
 		public void Center()
 		{
 			var displayBounds = window.Screen.VisibleFrame;
-			DecoratedPosition = new IntVector2 {
-				X = (int)Math.Max(0, (displayBounds.Width - DecoratedSize.Width) / 2 + displayBounds.Left),
-				Y = (int)Math.Max(0, (displayBounds.Height - DecoratedSize.Height) / 2 + displayBounds.Top)
+			DecoratedPosition = new Vector2 {
+				X = (int)Math.Max(0, (displayBounds.Width - DecoratedSize.X) / 2 + displayBounds.Left),
+				Y = (int)Math.Max(0, (displayBounds.Height - DecoratedSize.Y) / 2 + displayBounds.Top)
 			};
 		}
 
@@ -265,8 +281,6 @@ namespace Lime
 		private void HandleClosed(object sender, EventArgs e)
 		{
 			RaiseClosed();
-			TexturePool.Instance.DiscardAllTextures();
-			AudioSystem.Terminate();
 		}
 
 		private void HandleRenderFrame()

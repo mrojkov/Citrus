@@ -73,7 +73,6 @@
     <Compile Include="Tasks\MouseWheelTask.cs" />
     <Compile Include="GridPane.cs" />
     <Compile Include="GridSelection.cs" />
-    <Compile Include="Metrics.cs" />
     <Compile Include="OverviewPane.cs" />
     <Compile Include="RollPane.cs" />
     <Compile Include="Row.cs" />

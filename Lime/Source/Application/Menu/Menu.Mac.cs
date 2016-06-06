@@ -1,73 +1,127 @@
 ﻿#if MAC
 using System;
+using System.Collections.Generic;
 using AppKit;
 
 namespace Lime
 {
-	public class MenuItem : IMenuItem
+	public class Menu : List<ICommand>, IMenu
 	{
-		public NSMenuItem NSMenuItem { get; private set; }
-		public event Action Clicked;
+		List<MenuItem> items = new List<MenuItem>();
 
-		public bool Visible
-		{
-			get { return !NSMenuItem.Hidden; }
-			set { NSMenuItem.Hidden = !value; }
-		}
-
-		public bool Enabled
-		{
-			get { return NSMenuItem.Enabled; }
-			set { NSMenuItem.Enabled = value; }
-		}
-
-		public string Text
-		{
-			get { return NSMenuItem.Title; }
-			set { NSMenuItem.Title = value; }
-		}
-
-		public IMenu SubMenu { get; set; }
-
-		public MenuItem()
-		{
-			NSMenuItem = new NSMenuItem();
-			NSMenuItem.Activated += (s, e) => {
-				if (Clicked != null) {
-					Clicked();
-				}
-			};
-		}
-	}
-
-	public class Menu : ObservableList<IMenuItem>, IMenu
-	{
-		private NSMenu nsMenu;
+		internal readonly NSMenu NativeMenu;
 
 		public Menu()
 		{
-			nsMenu = new NSMenu();
+			NativeMenu = new NSMenu();
 		}
 
-		protected override void OnChanged()
+		public void Refresh()
 		{
-			nsMenu.RemoveAllItems();
+			if (items.Count != Count) {
+				Rebuild();
+				return;
+			}
+			int j = 0;
+			foreach (var i in items) {
+				if (i.Command != this[j++]) {
+					Rebuild();
+					break;
+				}
+				i.Refresh();
+			}
+		}
+
+		public IEnumerable<ICommand> AllCommands()
+		{
 			foreach (var i in this) {
-				nsMenu.AddItem(((MenuItem)i).NSMenuItem);
+				yield return i;
+			}
+			foreach (var i in this) {
+				if (i.Submenu != null) {
+					foreach (var j in i.Submenu.AllCommands()) {
+						yield return j;
+					}
+				}
+			}
+		}
+
+		private void Rebuild()
+		{
+			items.Clear();
+			NativeMenu.RemoveAllItems();
+			foreach (var i in this) {
+				var item = new MenuItem(i);
+				NativeMenu.AddItem(item.NativeMenuItem);
+				items.Add(item);
 			}
 		}
 
 		public void Popup()
 		{
+			Refresh();
 			var evt = NSApplication.SharedApplication.CurrentEvent;
-			NSMenu.PopUpContextMenu(nsMenu, evt, Window.Current.NSGameView);
+			NSMenu.PopUpContextMenu(NativeMenu, evt, CommonWindow.Current.NSGameView);
 		}
 
-		public void Popup(IWindow window, Vector2 position, float minimumWidth, IMenuItem item)
+		public void Popup(IWindow window, Vector2 position, float minimumWidth, ICommand command)
 		{
-			nsMenu.MinimumWidth = minimumWidth;
-			NSMenuItem i = item == null ? null : ((MenuItem)item).NSMenuItem;
-			nsMenu.PopUpMenu(i, new CoreGraphics.CGPoint(position.X, window.ClientSize.Height - position.Y), window.NSGameView);
+			Refresh();
+			NativeMenu.MinimumWidth = minimumWidth;
+			NSMenuItem item = command == null ? null : items.Find(i => i.Command == command).NativeMenuItem;
+			NativeMenu.PopUpMenu(item, new CoreGraphics.CGPoint(position.X, window.ClientSize.Y - position.Y), window.NSGameView);
+		}
+
+		class MenuItem
+		{
+			public readonly ICommand Command;
+			public readonly NSMenuItem NativeMenuItem;
+
+			public MenuItem(ICommand command)
+			{
+				Command = command;
+				NativeMenuItem = new NSMenuItem();
+				NativeMenuItem.Activated += (s, e) => command.Execute();
+				Refresh();
+			}
+
+			public void Refresh()
+			{
+				NativeMenuItem.Hidden = !Command.Visible;
+				NativeMenuItem.Enabled = Command.Enabled;
+				NativeMenuItem.Title = Command.Text;
+				if (Command.Shortcut.Main != Key.Unknown) {
+					NativeMenuItem.KeyEquivalent = Command.Shortcut.Main.ToString().ToLower();
+					NativeMenuItem.KeyEquivalentModifierMask = GetShortcutModifierMask(Command.Shortcut);
+				}
+				if (Command.Submenu != null) {
+					var nativeSubmenu = Command.Submenu.NativeMenu;
+					nativeSubmenu.Title = Command.Text;
+					NativeMenuItem.Submenu = nativeSubmenu;
+					Command.Submenu.Refresh();
+				} else {
+					NativeMenuItem.Submenu = null;
+				}
+			}
+
+			static NSEventModifierMask GetShortcutModifierMask(Shortcut shortcut)
+			{
+				switch (shortcut.Modifier) {
+					case Key.ShiftLeft:
+					case Key.ShiftRight:
+						return NSEventModifierMask.ShiftKeyMask;
+					case Key.AltLeft:
+					case Key.AltRight:
+						return NSEventModifierMask.AlternateKeyMask;
+					case Key.WinLeft:
+					case Key.WinRight:
+						return NSEventModifierMask.CommandKeyMask;
+					case Key.ControlLeft:
+					case Key.ControlRight:
+						return NSEventModifierMask.ControlKeyMask;
+				}
+				return 0;
+			}
 		}
 	}
 }

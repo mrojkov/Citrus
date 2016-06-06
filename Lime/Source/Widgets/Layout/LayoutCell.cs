@@ -14,7 +14,7 @@ namespace Lime
 
 		public LayoutCell() { }
 		public LayoutCell(Alignment alignment) { Alignment = alignment; }
-		public LayoutCell(Alignment alignment, float stretch) : this(alignment, stretch, stretch) { }
+		public LayoutCell(Alignment alignment, float stretchX) : this(alignment, stretchX, 1) { }
 		public LayoutCell(Alignment alignment, float stretchX, float stretchY)
 		{
 			Alignment = alignment;

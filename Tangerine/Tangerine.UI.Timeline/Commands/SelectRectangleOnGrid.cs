@@ -4,9 +4,9 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 
-namespace Tangerine.UI.Timeline.Commands
+namespace Tangerine.UI.Timeline.Operations
 {
-	public class SelectRectangleOnGrid : ICommand
+	public class SelectRectangleOnGrid : IOperation
 	{
 		Timeline timeline => Timeline.Instance;
 		GridSelection savedSelection;

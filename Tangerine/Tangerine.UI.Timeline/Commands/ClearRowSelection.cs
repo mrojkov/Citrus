@@ -4,9 +4,9 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 
-namespace Tangerine.UI.Timeline.Commands
+namespace Tangerine.UI.Timeline.Operations
 {
-	public class ClearRowSelection : InteractiveCommand
+	public class ClearRowSelection : InteractiveOperation
 	{
 		public override void Do()
 		{

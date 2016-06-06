@@ -17,6 +17,8 @@ namespace Tangerine.UI
 		// Docking
 		public static readonly Color4 DockingRectagleOutline = Color4.FromFloats(0.2f, 0.2f, 1f);
 		public static readonly Color4 DockPanelBorder = Color4.FromFloats(0.75f, 0.75f, 0.75f);
+		// Inspector
+		public static readonly Color4 BorderAroundKeyframeColorbox = Color4.Black;
 	}
 }
 

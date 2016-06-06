@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using Lime;
 using System.Reflection;
 
-namespace Tangerine.Core.Commands
+namespace Tangerine.Core.Operations
 {
-	public class SetProperty : ICommand
+	public class SetProperty : IOperation
 	{
 		readonly object obj;
 		readonly object value;
@@ -33,7 +33,7 @@ namespace Tangerine.Core.Commands
 		}
 	}
 
-	public class SetProperty<T> : ICommand
+	public class SetProperty<T> : IOperation
 	{
 		Func<T> getter;
 		Action<T> setter;
@@ -59,7 +59,7 @@ namespace Tangerine.Core.Commands
 		}
 	}
 
-	public class RemoveKeyframe : ICommand
+	public class RemoveKeyframe : IOperation
 	{
 		readonly int frame;
 		readonly IAnimator animator;
@@ -84,7 +84,7 @@ namespace Tangerine.Core.Commands
 		}
 	}
 
-	public class SetKeyframe : ICommand
+	public class SetKeyframe : IOperation
 	{
 		readonly Node node;
 		readonly string property;
@@ -121,7 +121,7 @@ namespace Tangerine.Core.Commands
 		}
 	}
 
-	public class InsertNode : ICommand
+	public class InsertNode : IOperation
 	{
 		readonly Node container;
 		readonly int index;
@@ -145,7 +145,7 @@ namespace Tangerine.Core.Commands
 		}
 	}
 
-	public class UnlinkNode : ICommand
+	public class UnlinkNode : IOperation
 	{
 		readonly Node node;
 		int savedIndex;

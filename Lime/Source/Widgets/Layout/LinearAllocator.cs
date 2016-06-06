@@ -42,8 +42,19 @@ namespace Lime
 				}
 			}
 			if (roundSizes) {
+				float roundingError = 0;
 				for (int i = 0; i < sizes.Length; i++) {
-					sizes[i] = sizes[i].Round();
+					var rs = sizes[i].Round();
+					roundingError += rs - sizes[i];
+					while (roundingError >= 1.0f && rs >= constraints[i].MinSize + 1) {
+						roundingError -= 1.0f;
+						rs -= 1;
+					}
+					while (roundingError <= -1.0f && rs <= constraints[i].MaxSize - 1) {
+						roundingError += 1.0f;
+						rs += 1;
+					}
+					sizes[i] = rs;
 				}
 			}
 			return sizes;

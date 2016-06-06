@@ -18,7 +18,7 @@ namespace Tangerine.UI.Timeline
 		{
 			var input = grid.RootWidget.Input;
 			while (true) {
-				if (input.WasMousePressed() && grid.RootWidget.HitTest(input.MousePosition)) {
+				if (input.WasMousePressed() && grid.RootWidget.IsMouseOver()) {
 					var initialCell = MousePositionToCell(input.MousePosition);
 					input.CaptureMouse();
 					if (timeline.GridSelection.IsCellSelected(initialCell)) {
@@ -59,15 +59,15 @@ namespace Tangerine.UI.Timeline
 		private IEnumerator<object> DragKeyframeTask(IntVector2 cell)
 		{
 			var rect = new IntRectangle { A = cell, B = cell + IntVector2.One };
-			Document.Current.History.Add(new Commands.ClearGridSelection());
-			Document.Current.History.Add(new Commands.SelectRectangleOnGrid(rect));
+			Document.Current.History.Add(new Operations.ClearGridSelection());
+			Document.Current.History.Add(new Operations.SelectRectangleOnGrid(rect));
 			Document.Current.History.Commit();
 			yield return DragSelectionTask(cell);
 		}
 
 		private IEnumerator<object> SelectTask(IntVector2 initialCell)
 		{
-			Document.Current.History.Execute(new Commands.ClearGridSelection());
+			Document.Current.History.Execute(new Operations.ClearGridSelection());
 			var input = grid.RootWidget.Input;
 			grid.OnPostRender += RenderSelectionRect;
 			while (input.IsMousePressed()) {
@@ -88,19 +88,19 @@ namespace Tangerine.UI.Timeline
 				yield return null;
 			}
 			grid.OnPostRender -= RenderSelectionRect;
-			Document.Current.History.Execute(new Commands.SelectRectangleOnGrid(rect));
+			Document.Current.History.Execute(new Operations.SelectRectangleOnGrid(rect));
 		}
 
 		IntVector2 MousePositionToCell(Vector2 position)
 		{
 			position -= grid.ContentWidget.GlobalPosition;
-			var r = new IntVector2((int)(position.X / Metrics.ColWidth), 0);
+			var r = new IntVector2((int)(position.X / Metrics.TimelineColWidth), 0);
 			if (position.Y >= grid.ContentSize.Y) {
 				r.Y = Math.Max(0, timeline.Rows.Count - 1);
 				return r;
 			}
 			foreach (var row in timeline.Rows) {
-				if (position.Y >= row.Top && position.Y < row.Bottom + Metrics.RowSpacing) {
+				if (position.Y >= row.Top && position.Y < row.Bottom + Metrics.TimelineRowSpacing) {
 					r.Y = row.Index;
 					break;
 				}

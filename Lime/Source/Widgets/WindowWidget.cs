@@ -17,8 +17,7 @@ namespace Lime
 		{
 			this.continuousRendering = continuousRendering;
 			Window = window;
-			new WidgetContext(this);
-			Window.Context = new CombinedContext(Window.Context, WidgetContext.Current);
+			Window.Context = new CombinedContext(Window.Context, new WidgetContext(this));
 			Theme.Current.Apply(this);
 		}
 
@@ -69,8 +68,8 @@ namespace Lime
 		{
 			Renderer.Viewport = new WindowRect {
 				X = 0, Y = 0,
-				Width = (int)(Window.ClientSize.Width * Window.PixelScale),
-				Height = (int)(Window.ClientSize.Height * Window.PixelScale)
+				Width = (int)(Window.ClientSize.X * Window.PixelScale),
+				Height = (int)(Window.ClientSize.Y * Window.PixelScale)
 			};
 		}
 	}

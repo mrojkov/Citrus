@@ -14,7 +14,7 @@ namespace Tangerine.UI
 			map = new Dictionary<Type, Dictionary<string, TangerineAttribute>>();
 		}
 		
-		public static TangerineAttribute GetAttribute(Type type, string property)
+		public static TangerineAttribute GetTangerineAttribute(Type type, string property)
 		{
 			Dictionary<string, TangerineAttribute> propMap;
 			if (!map.TryGetValue(type, out propMap)) {

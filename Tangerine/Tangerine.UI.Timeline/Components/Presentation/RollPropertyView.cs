@@ -25,17 +25,18 @@ namespace Tangerine.UI.Timeline.Components
 			};
 			widget = new Widget {
 				Padding = new Thickness { Left = 4, Right = 2 },
-				MinHeight = Metrics.DefaultRowHeight,
+				MinHeight = Metrics.TimelineDefaultRowHeight,
+				HitTestTarget = true,
 				Layout = new HBoxLayout(),
 				Nodes = {
-					new HSpacer(identation * Metrics.RollIndentation),
+					new HSpacer(identation * Metrics.TimelineRollIndentation),
 					CreateExpandButton(),
 					propIcon,
 					new HSpacer(3),
 					label,
 				},
 			};
-			widget.Presenter = new DelegatePresenter<Widget>(RenderBackground);
+			widget.Presenter = new DelegatePresenter<Widget>(RenderBackground, widget.Presenter);
 		}
 
 		CustomCheckbox CreateExpandButton()
@@ -46,7 +47,7 @@ namespace Tangerine.UI.Timeline.Components
 			var s = propRow.Animator.EditorState();
 			button.Updated += delta => button.Checked = s.CurvesShown;
 			button.Clicked += () => {
-				Document.Current.History.Execute(new Core.Commands.SetProperty<bool>(() => s.CurvesShown, value => s.CurvesShown = value, !s.CurvesShown));
+				Document.Current.History.Execute(new Core.Operations.SetProperty<bool>(() => s.CurvesShown, value => s.CurvesShown = value, !s.CurvesShown));
 			};
 			return button;
 		}

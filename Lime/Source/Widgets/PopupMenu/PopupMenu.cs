@@ -74,11 +74,11 @@ namespace Lime.PopupMenu
 				}
 				Frame.Height = MenuItem.Height * itemsPerColumn + MenuItem.Height;
 				Frame.Width = itemWidth * columnsCount;
-				if (Frame.Height * Frame.Scale.Y > Window.Current.ClientSize.Height - 60) {
-					Frame.Scale = (Window.Current.ClientSize.Height - 60) / Frame.Height * Vector2.One;
+				if (Frame.Height * Frame.Scale.Y > Window.Current.ClientSize.Y - 60) {
+					Frame.Scale = (Window.Current.ClientSize.Y - 60) / Frame.Height * Vector2.One;
 				}
-				if (Frame.Width * Frame.Scale.X > Window.Current.ClientSize.Width - 60) {
-					Frame.Scale = (Window.Current.ClientSize.Width - 60) / Frame.Width * Vector2.One;
+				if (Frame.Width * Frame.Scale.X > Window.Current.ClientSize.X - 60) {
+					Frame.Scale = (Window.Current.ClientSize.X - 60) / Frame.Width * Vector2.One;
 				}
 				UpdateBackground();
 				UpdateItems(itemsPerColumn);

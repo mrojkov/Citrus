@@ -19,7 +19,7 @@ namespace Tangerine.UI.Timeline
 			Renderer.DrawVerticalGradientRect(Vector2.Zero, Widget.Size, Colors.Toolbar);
 			Renderer.Transform1 *= Matrix32.Translation(-Timeline.Instance.ScrollOrigin.X, 0);
 			for (int i = 0; i < Timeline.Instance.ColumnCount; i++) {
-				var x = i * Metrics.ColWidth + 0.5f;
+				var x = i * Metrics.TimelineColWidth + 0.5f;
 				if (i % 10 == 0) {
 					float textHeight = DesktopTheme.Metrics.TextHeight;
 					float y = Widget.Height - textHeight;

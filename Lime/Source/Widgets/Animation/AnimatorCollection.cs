@@ -17,6 +17,8 @@ namespace Lime
 		IAnimator[] animatorArray;
 		Node owner;
 
+		public int Version;
+
 		public AnimatorCollection() { /* ctor for ProtoBuf only */ }
 
 		public AnimatorCollection(Node owner)
@@ -90,6 +92,7 @@ namespace Lime
 				animator.TargetProperty = propertyName;
 				animator.AnimationId = animationId;
 				Add(animator);
+				Version++;
 				return animator;
 			}
 		}
@@ -119,10 +122,11 @@ namespace Lime
 				animatorList = emptyList;
 			}
 			animatorArray = null;
+			Version++;
 			return result;
 		}
 
-		public void Clear() { animatorList = emptyList; animatorArray = null;  }
+		public void Clear() { animatorList = emptyList; animatorArray = null; Version++; }
 		
 		public int Count { get { return AsArray.Length; } }
 	
@@ -144,6 +148,7 @@ namespace Lime
 			animatorArray = null;
 			animator.Bind(owner);
 			animatorList.Add(animator);
+			Version++;
 		}
 		
 		public int GetOverallDuration()

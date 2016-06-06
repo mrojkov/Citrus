@@ -22,10 +22,11 @@ namespace Tangerine.UI.Timeline
 			RootWidget = new Frame {
 				Layout = new ScrollableLayout(),
 				ClipChildren = ClipMethod.ScissorTest,
+				HitTestTarget = true,
 			};
 			ContentWidget = new Widget {
 				Padding = new Thickness { Top = 1, Bottom = 1 },
-				Layout = new VBoxLayout { Spacing = Metrics.RowSpacing },
+				Layout = new VBoxLayout { Spacing = Metrics.TimelineRowSpacing },
 				Presenter = new DelegatePresenter<Node>(RenderBackground),
 				PostPresenter = new DelegatePresenter<Widget>(w => OnPostRender(w))
 			};
@@ -50,9 +51,9 @@ namespace Tangerine.UI.Timeline
 				if (timeline.IsColumnVisible(i)) {
 					Renderer.DrawLine(x, 0, x, ContentWidget.Height, Colors.GridLines);
 				}
-				x += Metrics.ColWidth;
+				x += Metrics.TimelineColWidth;
 			}
-			x = Metrics.ColWidth * (timeline.CurrentColumn + 0.5f);
+			x = Metrics.TimelineColWidth * (timeline.CurrentColumn + 0.5f);
 			Renderer.DrawLine(x, 0, x, ContentWidget.Height, Color4.Red);
 		}
 
@@ -68,7 +69,7 @@ namespace Tangerine.UI.Timeline
 		{
 			var rows = timeline.Rows;
 			var y = cell.Y < rows.Count ? rows[Math.Max(cell.Y, 0)].Top : rows[rows.Count - 1].Bottom;
-			return new Vector2(cell.X * Metrics.ColWidth, y);
+			return new Vector2(cell.X * Metrics.TimelineColWidth, y);
 		}
 	}
 }

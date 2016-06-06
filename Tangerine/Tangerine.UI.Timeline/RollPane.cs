@@ -17,6 +17,7 @@ namespace Tangerine.UI.Timeline
 			RootWidget = new Frame {
 				MinWidth = Metrics.ToolbarMinWidth,
 				ClipChildren = ClipMethod.ScissorTest,
+				HitTestTarget = true,
 			};
 			ContentWidget = new Widget {
 				Padding = new Thickness { Top = 1, Bottom = 1 },

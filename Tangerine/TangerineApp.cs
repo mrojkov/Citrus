@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Lime;
 using Tangerine.Core;
 using ProtoBuf;
@@ -15,7 +16,7 @@ namespace Tangerine
 		{
 			if (System.IO.File.Exists(GetPath())) {
 				try {
-					Lime.Serialization.ReadObjectFromFile<UserPreferences>(GetPath(), this);
+					Serialization.ReadObjectFromFile<UserPreferences>(GetPath(), this);
 				} catch (System.Exception e) {
 					Debug.Write($"Failed to load the user preferences: {e}");
 				}
@@ -24,7 +25,7 @@ namespace Tangerine
 
 		public void Save()
 		{
-			Lime.Serialization.WriteObjectToFile(GetPath(), this);
+			Serialization.WriteObjectToFile(GetPath(), this);
 		}
 
 		public static string GetPath()
@@ -44,41 +45,62 @@ namespace Tangerine
 			Instance = new TangerineApp();
 		}
 
+		public Menu ViewMenu { get; private set; }
+
 		private TangerineApp()
 		{
-			Theme.Current = new Lime.DesktopTheme();
+			CreateMainMenu();
+			Theme.Current = new DesktopTheme();
 			LoadFont();
 			var doc = new Document();
 			doc.AddSomeNodes();
 			Document.Current = doc;
 
-			var dockManager = new UI.DockManager();
+			var dockManager = new UI.DockManager(new Vector2(1024, 768), ViewMenu);
 			Exiting += p => p.DockState = dockManager.ExportState();
-			dockManager.Closed += Exit;
-
+			dockManager.Closed += () => {
+				var prefs = new UserPreferences();
+				Exiting?.Invoke(prefs);
+				prefs.Save();
+			};
 			var timelinePanel = new UI.DockPanel("Timeline");
 			var inspectorPanel = new UI.DockPanel("Inspector");
 			var browserPanel = new UI.DockPanel("Browser");
-			dockManager.AddPanel(timelinePanel, UI.DockSite.Top, new Vector2(0.3f));
-			dockManager.AddPanel(inspectorPanel, UI.DockSite.Left, new Vector2(0.2f));
-			dockManager.AddPanel(browserPanel, UI.DockSite.Right, new Vector2(0.1f));
+			dockManager.AddPanel(timelinePanel, UI.DockSite.Top, new Vector2(800, 300));
+			dockManager.AddPanel(inspectorPanel, UI.DockSite.Left, new Vector2(400, 700));
+			dockManager.AddPanel(browserPanel, UI.DockSite.Right, new Vector2(400, 700));
 
-			var prefs = new UserPreferences();
-			prefs.Load();
-			dockManager.ImportState(prefs.DockState);
+			var preferences = new UserPreferences();
+			preferences.Load();
+			dockManager.ImportState(preferences.DockState);
 
 			UI.Inspector.Inspector.Initialize(inspectorPanel.ContentWidget);
 			UI.Timeline.Timeline.Initialize(timelinePanel.ContentWidget);
 
-			doc.History.OnCommit += () => Window.Current.Invalidate();
+			doc.History.OnCommit += () => CommonWindow.Current.Invalidate();
 			UI.Timeline.Timeline.Instance.RegisterDocument(doc);
 		}
 
-		public void Exit()
+		void CreateMainMenu()
 		{
-			var prefs = new UserPreferences();
-			Exiting?.Invoke(prefs);
-			prefs.Save();
+			Application.MainMenu = new Menu {
+				new Command {
+					Text = "Application",
+					Submenu = new Menu {
+						new Command("Quit", Application.Exit) { Shortcut = new Shortcut(Key.WinLeft, Key.Q) },
+					}
+				},
+				new Command {
+					Text = "File",
+					Submenu = new Menu {
+						new Command { Text = "Open", Shortcut = new Shortcut(Key.WinLeft, Key.O) },
+					}
+				},
+				new Command {
+					Text = "View",
+					Submenu = (ViewMenu = new Menu { })
+				}
+			};
 		}
 
 		static void LoadFont()
