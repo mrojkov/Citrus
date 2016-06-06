@@ -373,10 +373,16 @@ namespace Lime
 
 			public override void AddToRenderChain(RenderChain chain)
 			{
+				if (PostPresenter != null) {
+					chain.Add(this, PostPresenter);
+				}
 				if (ReverseOrderRendering) {
 					AddToRenderChainReversed(chain);
 				} else {
 					AddToRenderChainDirect(chain);
+				}
+				if (Presenter != null) {
+					chain.Add(this, Presenter);
 				}
 			}
 
