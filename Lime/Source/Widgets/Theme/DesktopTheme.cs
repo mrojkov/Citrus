@@ -129,7 +129,7 @@ namespace Lime
 				eb, eb.Caret,
 				new CaretParams { CaretWidget = new VerticalLineCaret(eb, thickness: 1.0f) });
 			eb.Editor = new Editor(eb, eb.Caret, editorParams);
-			eb.CompoundPresenter.Push(new BorderedFramePresenter(Colors.WhiteBackground, Colors.ControlBorder));
+			eb.CompoundPresenter.Add(new BorderedFramePresenter(Colors.WhiteBackground, Colors.ControlBorder));
 		}
 
 		private void DecorateComboBox(Widget widget)
