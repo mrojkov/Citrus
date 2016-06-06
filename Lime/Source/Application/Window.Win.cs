@@ -77,40 +77,40 @@ namespace Lime
 			}
 		}
 
-		public IntVector2 ClientPosition
+		public Vector2 ClientPosition
 		{
 			get { return SDToLime.Convert(form.PointToScreen(new System.Drawing.Point(0, 0)), PixelScale); }
 			set { DecoratedPosition = value + DecoratedPosition - ClientPosition; }
 		}
 
-		public Size ClientSize
+		public Vector2 ClientSize
 		{
 			get { return SDToLime.Convert(form.ClientSize, PixelScale); }
-			set { form.ClientSize = LimeToSD.Convert(value, PixelScale); }
+			set { form.ClientSize = LimeToSD.ConvertToSize(value, PixelScale); }
 		}
 
-		public IntVector2 DecoratedPosition
+		public Vector2 DecoratedPosition
 		{
 			get { return SDToLime.Convert(form.Location, PixelScale); }
-			set { form.Location = LimeToSD.Convert(value, PixelScale); }
+			set { form.Location = LimeToSD.ConvertToPoint(value, PixelScale); }
 		}
 
-		public Size DecoratedSize
+		public Vector2 DecoratedSize
 		{
 			get { return SDToLime.Convert(form.Size, PixelScale); }
-			set { form.Size = LimeToSD.Convert(value, PixelScale); }
+			set { form.Size = LimeToSD.ConvertToSize(value, PixelScale); }
 		}
 
-		public Size MinimumDecoratedSize
+		public Vector2 MinimumDecoratedSize
 		{
 			get { return SDToLime.Convert(form.MinimumSize, PixelScale); }
-			set { form.MinimumSize = LimeToSD.Convert(value, PixelScale); }
+			set { form.MinimumSize = LimeToSD.ConvertToSize(value, PixelScale); }
 		}
 
-		public Size MaximumDecoratedSize
+		public Vector2 MaximumDecoratedSize
 		{
 			get { return SDToLime.Convert(form.MaximumSize, PixelScale); }
-			set { form.MaximumSize = LimeToSD.Convert(value, PixelScale); }
+			set { form.MaximumSize = LimeToSD.ConvertToSize(value, PixelScale); }
 		}
 
 		FPSCounter fpsCounter = new FPSCounter();
@@ -141,9 +141,9 @@ namespace Lime
 		public void Center()
 		{
 			var screen = Screen.FromControl(form).WorkingArea;
-			var x = (int)((screen.Width / PixelScale - DecoratedSize.Width) / 2);
-			var y = (int)((screen.Height / PixelScale - DecoratedSize.Height) / 2);
-			var position = new IntVector2(
+			var x = (int)((screen.Width / PixelScale - DecoratedSize.X) / 2);
+			var y = (int)((screen.Height / PixelScale - DecoratedSize.Y) / 2);
+			var position = new Vector2(
 				screen.X + (x > 0 ? x : 0),
 				screen.Y + (y > 0 ? y : 0)
 				);
@@ -216,10 +216,10 @@ namespace Lime
 				glControl = CreateGLControl();
 			}
 			ClientSize = options.ClientSize;
-			if (options.MinimumDecoratedSize != Size.Zero) {
+			if (options.MinimumDecoratedSize != Vector2.Zero) {
 				MinimumDecoratedSize = options.MinimumDecoratedSize;
 			}
-			if (options.MaximumDecoratedSize != Size.Zero) {
+			if (options.MaximumDecoratedSize != Vector2.Zero) {
 				MaximumDecoratedSize = options.MaximumDecoratedSize;
 			}
 			Title = options.Title;
@@ -595,29 +595,26 @@ namespace Lime
 
 	static class SDToLime
 	{
-		public static IntVector2 Convert(System.Drawing.Point p, float pixelScale)
+		public static Vector2 Convert(System.Drawing.Point p, float pixelScale)
 		{
-			return (IntVector2)(new Vector2(p.X, p.Y) / pixelScale);
+			return new Vector2(p.X, p.Y) / pixelScale;
 		}
-
-		public static Size Convert(System.Drawing.Size p, float pixelScale)
+		public static Vector2 Convert(System.Drawing.Size p, float pixelScale)
 		{
-			return (Size)(new Vector2(p.Width, p.Height) / pixelScale);
+			return new Vector2(p.Width, p.Height) / pixelScale;
 		}
 	}
 
 	static class LimeToSD
 	{
-		public static System.Drawing.Point Convert(IntVector2 p, float pixelScale)
+		public static System.Drawing.Point ConvertToPoint(Vector2 p, float pixelScale)
 		{
-			p = (IntVector2)((Vector2)p * pixelScale);
-			return new System.Drawing.Point(p.X, p.Y);
+			return (System.Drawing.Point)ConvertToSize(p, pixelScale);
 		}
-
-		public static System.Drawing.Size Convert(Size p, float pixelScale)
+		public static System.Drawing.Size ConvertToSize(Vector2 p, float pixelScale)
 		{
-			p = (Size)((Vector2)p * pixelScale);
-			return new System.Drawing.Size(p.Width, p.Height);
+			p = (p * pixelScale);
+			return new System.Drawing.Size(p.X.Round(), p.Y.Round());
 		}
 	}
 }
