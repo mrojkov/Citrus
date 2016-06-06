@@ -248,7 +248,6 @@
     <Compile Include="Source\Widgets\RenderChain.cs" />
     <Compile Include="Source\Widgets\Text\RichText.cs" />
     <Compile Include="Source\Widgets\Movie.cs" />
-    <Compile Include="Source\Widgets\WidgetCachedRenderer.cs" />
     <Compile Include="Source\Widgets\Text\SimpleText.cs" />
     <Compile Include="Source\Widgets\Slider.cs" />
     <Compile Include="Source\Widgets\Spline.cs" />
