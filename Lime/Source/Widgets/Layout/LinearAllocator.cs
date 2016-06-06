@@ -46,12 +46,13 @@ namespace Lime
 				for (int i = 0; i < sizes.Length; i++) {
 					var rs = sizes[i].Round();
 					roundingError += rs - sizes[i];
-					if (roundingError >= 1.0f) {
+					while (roundingError >= 1.0f && rs >= constraints[i].MinSize + 1) {
 						roundingError -= 1.0f;
-						rs = Math.Max(rs - 1, 0);
-					} else if (roundingError <= -1.0f) {
+						rs -= 1;
+					}
+					while (roundingError <= -1.0f && rs <= constraints[i].MaxSize - 1) {
 						roundingError += 1.0f;
-						rs = rs + 1;
+						rs += 1;
 					}
 					sizes[i] = rs;
 				}
