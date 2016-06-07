@@ -112,7 +112,7 @@ namespace Lime
 			webView.RequestLayout();
 		}
 
-		private WindowRect CalculateAABBInWorldSpace(Widget widget)
+		private static WindowRect CalculateAABBInWorldSpace(Widget widget)
 		{
 			var aabb = widget.CalcAABBInSpaceOf(WidgetContext.Current.Root);
 			var viewport = Renderer.Viewport;
@@ -125,9 +125,9 @@ namespace Lime
 			};
 		}
 
-		private float CalcKeyboardTop()
+		private static float CalcKeyboardTop()
 		{
-			return Window.Current.ClientSize.Height - Application.SoftKeyboard.Height;
+			return Window.Current.ClientSize.Y - Application.SoftKeyboard.Height;
 		}
 
 		private Uri GetUrl()

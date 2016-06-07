@@ -150,7 +150,6 @@
     <Compile Include="Source\Widgets\SplinePoint.cs" />
     <Compile Include="Source\Widgets\Widget.cs" />
     <Compile Include="Source\Widgets\Widget.Toolbox.cs" />
-    <Compile Include="Source\Widgets\WidgetCachedRenderer.cs" />
     <Compile Include="Source\Widgets\WidgetDebugView.cs" />
     <Compile Include="Source\Widgets\WidgetInput.cs" />
     <Compile Include="Source\Environment.cs" />
@@ -313,7 +312,6 @@
     <Compile Include="Source\Widgets\3D\Node3D.cs" />
     <Compile Include="Source\Widgets\3D\Viewport3D.cs" />
     <Compile Include="Source\Widgets\3D\WidgetAdapter3D.cs" />
-    <Compile Include="Source\IHitProcessor.cs" />
     <Compile Include="Source\Types\MonoMac\CG.cs" />
     <Compile Include="Source\Widgets\3D\Spline3D.cs" />
     <Compile Include="Source\Widgets\Layout\StackLayout.cs" />

@@ -18,16 +18,16 @@ namespace Lime
 		public Input Input { get { return ActivityDelegate.Instance.Input; } }
 		public MouseCursor Cursor { get; set; }
 		public WindowState State { get { return WindowState.Fullscreen; } set {} }
-		public IntVector2 ClientPosition { get { return IntVector2.Zero; } set {} }
-		public IntVector2 DecoratedPosition { get { return IntVector2.Zero; } set {} }
-		public Size ClientSize
+		public Vector2 ClientPosition { get { return Vector2.Zero; } set {} }
+		public Vector2 DecoratedPosition { get { return Vector2.Zero; } set {} }
+		public Vector2 ClientSize
 		{
 			get { return ToLimeSize(ActivityDelegate.Instance.GameView.Size, PixelScale); } 
 			set { }
 		}
-		public Size DecoratedSize { get { return ClientSize; } set {} }
-		public Size MinimumDecoratedSize { get { return Size.Zero; } set {} }
-		public Size MaximumDecoratedSize { get { return Size.Zero; } set {} }
+		public Vector2 DecoratedSize { get { return ClientSize; } set {} }
+		public Vector2 MinimumDecoratedSize { get { return Vector2.Zero; } set {} }
+		public Vector2 MaximumDecoratedSize { get { return Vector2.Zero; } set {} }
 		public ActivityDelegate ActivityDelegate { get { return ActivityDelegate; } }
 		public float FPS { get { return fpsCounter.FPS; } }
 
@@ -73,9 +73,9 @@ namespace Lime
 			PixelScale = Resources.System.DisplayMetrics.Density;
 		}
 
-		private static Size ToLimeSize(System.Drawing.Size size, float pixelScale)
+		private static Vector2 ToLimeSize(System.Drawing.Size size, float pixelScale)
 		{
-			return (Size)(new Vector2(size.Width, size.Height) / pixelScale);
+			return new Vector2(size.Width, size.Height) / pixelScale;
 		}
 	}
 }
