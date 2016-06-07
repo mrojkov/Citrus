@@ -17,7 +17,7 @@ namespace Lime
 		public static IWindow Current { get; private set; }
 		public IContext Context { get; set; }
 
-		public CommonWindow()
+		protected CommonWindow()
 		{
 			if (Current == null) {
 				Current = (IWindow)this;
