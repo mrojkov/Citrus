@@ -3,14 +3,10 @@ using Lime;
 using System.Linq;
 using Tangerine.Core;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Tangerine.UI.Inspector
 {
-	public interface IPropertyEditor
-	{
-		void Update(float delta);
-	}
-
 	public class Inspector
 	{
 		public delegate IPropertyEditor PropertyEditorBuilder(PropertyEditorContext context);
@@ -19,6 +15,7 @@ namespace Tangerine.UI.Inspector
 
 		public readonly KeyboardFocusController Focus;
 		public readonly Widget RootWidget;
+		public readonly Frame ScrollViewWidget;
 		public readonly Widget ContentWidget;
 		public readonly List<Node> Nodes;
 		public readonly Dictionary<Type, PropertyEditorBuilder> EditorMap;
@@ -33,7 +30,8 @@ namespace Tangerine.UI.Inspector
 		private Inspector(Widget rootWidget)
 		{
 			RootWidget = rootWidget;
-			ContentWidget = new Widget();
+			// ScrollViewWidget = new Frame { Layout = new ScrollableLayout() };
+			ContentWidget = new ScrollView((Frame)RootWidget).Content;
 			Focus = new KeyboardFocusController(RootWidget);
 			Nodes = new List<Node>();
 			EditorMap = new Dictionary<Type, PropertyEditorBuilder>();
@@ -46,15 +44,17 @@ namespace Tangerine.UI.Inspector
 
 		void InitializeWidgets()
 		{
+			RootWidget.Layout = new ScrollableLayout { ScrollDirection = ScrollDirection.Vertical };
+			// RootWidget.AddNode(ScrollViewWidget);
 			ContentWidget.Layout = new VBoxLayout { Tag = "InspectorContent", Spacing = 4 };
 			ContentWidget.Padding = new Thickness(4);
-			RootWidget.Layout = new StackLayout();
-			RootWidget.AddNode(ContentWidget);
+			// RootWidget.Layout = new StackLayout();
 		}
 
 		private void RegisterEditors()
 		{
-			EditorMap.Add(typeof(Vector2), c => new Vector2Editor(c));
+			EditorMap.Add(typeof(Vector2), c => new Vector2PropertyEditor(c));
+			EditorMap.Add(typeof(string), c => new StringPropertyEditor(c));
 		}
 
 		void CreateTasks()
@@ -66,211 +66,6 @@ namespace Tangerine.UI.Inspector
 		{
 			Tasks.Update(delta);
 			Document.Current.History.Commit();
-		}
-
-		public class PropertyEditorContext
-		{
-			TangerineAttribute tangerineAttribute;
-
-			public readonly Widget InspectorPane;
-			public readonly Node Node;
-			public readonly IAnimable Animable;
-			public readonly string Property;
-			public readonly string AnimationId;
-
-			public PropertyEditorContext(Widget inspectorPane, Node node, IAnimable animable, string property, string animationId)
-			{
-				InspectorPane = inspectorPane;
-				Node = node;
-				Animable = animable;
-				Property = property;
-				AnimationId = animationId;
-			}
-
-			public TangerineAttribute TangerineAttribute => tangerineAttribute ?? 
-				(tangerineAttribute = PropertyRegistry.GetTangerineAttribute(Animable.GetType(), Property) ?? new TangerineAttribute(0));
-
-			public IAnimator FindAnimator()
-			{
-				IAnimator animator;
-				return Animable.Animators.TryFind(Property, out animator, AnimationId) ? animator : null;
-			}
-
-			public IKeyframe FindKeyframe()
-			{
-				var animation = AnimationId == null ? Node.DefaultAnimation : Node.Animations.Find(AnimationId);
-				return FindAnimator()?.ReadonlyKeys.FirstOrDefault(k => k.Frame == animation.Frame);
-			}
-		}
-
-		class CommonPropertyEditor : IPropertyEditor
-		{
-			readonly KeyframeButton keyframeButton;
-			readonly KeyFunctionButton keyFunctionButton;
-
-			protected readonly KeyframeChangeNotificator KeyframeChangeNotificator;
-			protected readonly PropertyEditorContext Context;
-			protected readonly Widget ContainerWidget;
-
-			public CommonPropertyEditor(PropertyEditorContext context)
-			{
-				Context = context;
-				ContainerWidget = new Widget {
-					Layout = new HBoxLayout { IgnoreHidden = false },
-					LayoutCell = new LayoutCell { StretchY = 0 }
-				};
-				context.InspectorPane.AddNode(ContainerWidget);
-				KeyframeChangeNotificator = new KeyframeChangeNotificator(context);
-				ContainerWidget.AddNode(new SimpleText {
-					Text = context.Property,
-					Padding = new Thickness(8, 0),
-					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0.5f),
-					AutoSizeConstraints = false,
-				});
-				keyFunctionButton = new KeyFunctionButton {
-					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
-				};
-				keyframeButton = new KeyframeButton {
-					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
-				};
-				var keyColor = KeyframePalette.Colors[Context.TangerineAttribute.ColorIndex];
-				keyframeButton.SetKeyColor(keyColor);
-				keyFunctionButton.Clicked += KeyFunctionButton_Clicked;
-				ContainerWidget.AddNode(keyFunctionButton);
-				ContainerWidget.AddNode(keyframeButton);
-			}
-
-			private void KeyFunctionButton_Clicked()
-			{
-			}
-
-			public virtual void Update(float delta)
-			{
-				KeyframeChangeNotificator.Update();
-				if (KeyframeChangeNotificator.Changed) {
-					var k = Context.FindKeyframe();
-					keyFunctionButton.Visible = (k != null);
-					if (k != null) {
-						keyFunctionButton.SetKeyFunction(k.Function);
-					}
-				}
-			}
-
-			public class KeyframeButton : Button
-			{
-				readonly Image image;
-
-				public KeyframeButton()
-				{
-					Nodes.Clear();
-					Size = MinMaxSize = Metrics.IconSize;
-					image = new Image { Size = Size, Shader = ShaderId.Silhuette, Texture = new SerializableTexture() };
-					Nodes.Add(image);
-					image.PostPresenter = new WidgetBoundsPresenter(Colors.BorderAroundKeyframeColorbox, 1);
-				}
-
-				public void SetKeyColor(Color4 color)
-				{
-					image.Color = color;
-				}
-			}	
-
-			class KeyFunctionButton : BitmapButton
-			{
-				public void SetKeyFunction(KeyFunction function)
-				{
-					var s = "Timeline.Interpolation." + FunctionToString(function);
-					HoverTexture = IconPool.GetTexture(s);
-					DefaultTexture = IconPool.GetTexture(s + "Grayed");
-				}
-
-				string FunctionToString(KeyFunction function)
-				{
-					switch (function) {
-						case KeyFunction.Linear:
-							return "Linear";
-						case KeyFunction.Steep:
-							return "None";
-						case KeyFunction.Spline:
-							return "Spline";
-						case KeyFunction.ClosedSpline:
-							return "ClosedSpline";
-						default:
-							throw new ArgumentException();
-					}
-				}
-			}
-		}
-
-		class KeyframeChangeNotificator
-		{
-			readonly PropertyEditorContext context;
-
-			int animatorCollectionVersion = -1;
-			int animatorKeysVersion = -1;
-			object keyValue;
-			KeyFunction keyFunction;
-			IAnimator animator;
-			IKeyframe keyframe;
-
-			public bool Changed { get; private set; }
-
-			public KeyframeChangeNotificator(PropertyEditorContext context)
-			{
-				this.context = context;
-			}
-
-			public void Update()
-			{
-				Changed = false;
-				if (animatorCollectionVersion != context.Animable.Animators.Version) {
-					Changed = true;
-					animator = context.FindAnimator();
-				}
-				Changed |= animator != null && animator.ReadonlyKeys.Version != animatorKeysVersion;
-				if (Changed) {
-					keyframe = context.FindKeyframe();
-				}
-				if (keyframe != null && (keyframe.Function != keyFunction || !keyframe.Value.Equals(keyValue))) {
-					Changed = true;
-					keyValue = keyframe.Value;
-					keyFunction = keyframe.Function;
-				}
-			}
-		}
-
-		class Vector2Editor : CommonPropertyEditor
-		{
-			Vector2? prevValue;
-			readonly System.Reflection.MethodInfo getter;
-			readonly EditBox editorX;
-			readonly EditBox editorY;
-
-			public Vector2Editor(PropertyEditorContext context) : base(context)
-			{
-				var prop = Context.Animable.GetType().GetProperty(Context.Property);
-				getter = prop.GetGetMethod();
-				ContainerWidget.AddNode(new Widget {
-					Layout = new HBoxLayout(),
-					Nodes = {
-						new SimpleText { Text = "X", Padding = new Thickness(4, 0), LayoutCell = new LayoutCell(Alignment.Center) },
-						(editorX = new EditBox()),
-						new SimpleText { Text = "Y", Padding = new Thickness(4, 0), LayoutCell = new LayoutCell(Alignment.Center) },
-						(editorY = new EditBox()),
-					}
-				});
-			}
-
-			public override void Update(float delta)
-			{
-				base.Update(delta);
-				var value = (Vector2)getter.Invoke(Context.Animable, null);
-				if (!prevValue.HasValue || value != prevValue) {
-					prevValue = value;
-					editorX.Text = value.X.ToString();
-					editorY.Text = value.Y.ToString();
-				}
-			}
 		}
 
 		class UpdatePropertyGridTask
@@ -305,10 +100,32 @@ namespace Tangerine.UI.Inspector
 			void PopulateContent(Node node, IAnimable animable, string animationId)
 			{
 				Inspector.Editors.Clear();
-				foreach (var prop in animable.GetType().GetProperties()) {
-					var a = prop.GetCustomAttributes(typeof(TangerineAttribute), false);
-					if (a.Length == 0) {
+				PopulateContentForType(animable.GetType(), node, animable, animationId);
+			}
+
+			void PopulateContentForType(Type type, Node node, IAnimable animable, string animationId)
+			{
+				if (type == typeof(object)) {
+					return;
+				}
+				var categoryLabelAdded = false;
+				PopulateContentForType(type.BaseType, node, animable, animationId);
+				foreach (var prop in type.GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public)) {
+					if (prop.Name == "Item") {
+						// WTF, Bug in Mono?
 						continue;
+					}
+					if (PropertyRegistry.GetTangerineAttribute(type, prop.Name) == null)
+						continue;
+					if (!categoryLabelAdded) {
+						categoryLabelAdded = true;
+						var label = new SimpleText {
+							Text = type.Name,
+							AutoSizeConstraints = false,
+							LayoutCell = new LayoutCell { StretchY = 0 }
+						};
+						label.CompoundPresenter.Add(new WidgetFlatFillPresenter(Colors.InspectorCategoryLabelBackground));
+						Inspector.ContentWidget.AddNode(label);
 					}
 					PropertyEditorBuilder editorBuilder;
 					if (!Inspector.EditorMap.TryGetValue(prop.PropertyType, out editorBuilder)) {

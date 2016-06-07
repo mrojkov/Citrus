@@ -26,7 +26,7 @@ namespace Tangerine.UI.Timeline.Components
 					label,
 				},
 			};
-			widget.Presenter = new DelegatePresenter<Widget>(RenderBackground, widget.Presenter);
+			widget.CompoundPresenter.Push(new DelegatePresenter<Widget>(RenderBackground));
 			widget.Updated += delta => widget.MinHeight = c.State.RowHeight;
 		}
 

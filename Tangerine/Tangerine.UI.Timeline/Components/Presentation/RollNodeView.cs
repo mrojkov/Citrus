@@ -37,7 +37,7 @@ namespace Tangerine.UI.Timeline.Components
 					label,
 					editBox,
 				},
-			};			widget.Presenter = new DelegatePresenter<Widget>(RenderBackground, widget.Presenter);			editBox.Visible = false;			widget.Tasks.Add(MonitorDoubleClickTask());
+			};			widget.CompoundPresenter.Push(new DelegatePresenter<Widget>(RenderBackground));			editBox.Visible = false;			widget.Tasks.Add(MonitorDoubleClickTask());
 		}
 
 		CustomCheckbox CreateExpandButton()
