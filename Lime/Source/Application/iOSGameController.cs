@@ -215,7 +215,7 @@ namespace Lime
 			base.DidRotate(fromInterfaceOrientation);
 		}
 
-		private Size prevSize;
+		private Vector2 prevSize;
 
 		public override void ViewWillLayoutSubviews()
 		{

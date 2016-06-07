@@ -21,16 +21,16 @@ namespace Lime
 		public string Title { get; set; }
 		public WindowState State { get { return WindowState.Fullscreen; } set {} }
 		public bool Fullscreen { get { return true; } set {} }
-		public IntVector2 ClientPosition { get { return IntVector2.Zero; } set {} }
-		public Size ClientSize
+		public Vector2 ClientPosition { get { return Vector2.Zero; } set {} }
+		public Vector2 ClientSize
 		{
 			get { return UIView.ClientSize; }
 			set { }
 		}
-		public IntVector2 DecoratedPosition { get { return IntVector2.Zero; } set {} }
-		public Size DecoratedSize { get { return ClientSize; } set {} }
-		public Size MinimumDecoratedSize { get { return Size.Zero; } set {} }
-		public Size MaximumDecoratedSize { get { return Size.Zero; } set {} }
+		public Vector2 DecoratedPosition { get { return Vector2.Zero; } set {} }
+		public Vector2 DecoratedSize { get { return ClientSize; } set {} }
+		public Vector2 MinimumDecoratedSize { get { return Vector2.Zero; } set {} }
+		public Vector2 MaximumDecoratedSize { get { return Vector2.Zero; } set {} }
 		public bool Visible { get { return true; } set {} }
 		public MouseCursor Cursor { get; set; }
 		public float FPS { get { return fpsCounter.FPS; } }

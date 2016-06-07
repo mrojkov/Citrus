@@ -155,7 +155,6 @@
     <Compile Include="Source\Graphics\OpenGL\IndexBuffer.cs" />
     <Compile Include="Source\Graphics\OpenGL\PlatformRenderer.cs" />
     <Compile Include="Source\Graphics\OpenGL\VertexBuffer.cs" />
-    <Compile Include="Source\Widgets\WidgetCachedRenderer.cs" />
     <Compile Include="Source\Localization\Localization.cs" />
     <Compile Include="Source\Localization\LocalizationDictionary.cs" />
     <Compile Include="Source\Localization\LocalizationDictionaryTextSerializer.cs" />
@@ -313,7 +312,6 @@
     <Compile Include="Source\Widgets\3D\Node3D.cs" />
     <Compile Include="Source\Widgets\3D\Viewport3D.cs" />
     <Compile Include="Source\Widgets\3D\WidgetAdapter3D.cs" />
-    <Compile Include="Source\IHitProcessor.cs" />
     <Compile Include="Source\Types\MonoMac\CG.cs" />
     <Compile Include="Source\Widgets\3D\Spline3D.cs" />
     <Compile Include="Source\Widgets\Layout\StackLayout.cs" />

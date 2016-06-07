@@ -178,6 +178,7 @@ namespace Lime
 
 		private static readonly object scheduledActionsSync = new object();
 		private static Action scheduledActions;
+#if WIN || MAC
 		private static Menu mainMenu;
 
 		public static Menu MainMenu
@@ -194,6 +195,7 @@ namespace Lime
 				}
 			}
 		}
+#endif
 
 		public static RenderingBackend RenderingBackend { get; private set; }
 		public static bool UsingDeferredHitTest { get; private set; }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Lime
 {
+#if WIN || MAC
 	public interface ICommand
 	{
 		string Text { get; set; }
@@ -61,4 +62,5 @@ namespace Lime
 		/// </summary>
 		void Refresh();
 	}
+#endif
 }

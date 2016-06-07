@@ -43,7 +43,7 @@ namespace Lime
 		private float screenScale;
 		private Input input;
 
-		public Size ClientSize { get; private set; }
+		public Vector2 ClientSize { get; private set; }
 		public bool DisableUpdateAndRender;
 
 		public GameView(Input input) : base(UIScreen.MainScreen.Bounds)
@@ -73,9 +73,9 @@ namespace Lime
 
 		private void RefreshWindowSize()
 		{
-			ClientSize = new Size {
-				Width = (int)(Bounds.Width),
-				Height = (int)(Bounds.Height)
+			ClientSize = new Vector2 {
+				X = (int)(Bounds.Width),
+				Y = (int)(Bounds.Height)
 			};
 		}
 

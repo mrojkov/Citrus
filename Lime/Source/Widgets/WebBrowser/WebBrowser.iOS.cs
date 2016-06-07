@@ -144,7 +144,7 @@ namespace Lime
 			var result = new Rectangle();
 			var min = new Vector2(viewport.X, viewport.Y) / Window.Current.PixelScale;
 			var max = new Vector2(viewport.X + viewport.Width, viewport.Y + viewport.Height) / Window.Current.PixelScale;
-			var displayHeight = Window.Current.ClientSize.Height;
+			var displayHeight = Window.Current.ClientSize.Y;
 			result.Left = Mathf.Lerp(aabb.Left, min.X, max.X).Round();
 			result.Right = Mathf.Lerp(aabb.Right, min.X, max.X).Round();
 			result.Top = displayHeight - Mathf.Lerp(aabb.Bottom, min.Y, max.Y).Round();
