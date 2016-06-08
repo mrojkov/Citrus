@@ -113,7 +113,7 @@ namespace EmptyProject.Application
 			BeforeOrientationOrResolutionChanged.SafeInvoke();
 			The.World.Size = CalcWorldSize();
 #if !iOS && !ANDROID
-			The.Window.ClientSize = (Size)GetResolution();
+			The.Window.ClientSize = GetResolution();
 #endif
 			OrientationOrResolutionChanged.SafeInvoke();
 

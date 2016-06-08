@@ -45,7 +45,7 @@ namespace EmptyProject.Application
 		private static void SetWindowSize()
 		{
 #if WIN
-			The.Window.ClientSize = (Size)DisplayInfo.GetResolution();
+			The.Window.ClientSize = DisplayInfo.GetResolution();
 #endif
 			DisplayInfo.HandleOrientationOrResolutionChange();
 		}
@@ -89,8 +89,8 @@ namespace EmptyProject.Application
 		{
 			Renderer.SetOrthogonalProjection(0, 0, The.World.Width, The.World.Height);
 			var windowSize = The.Window.ClientSize;
-			The.Window.Input.ScreenToWorldTransform = Matrix32.Scaling(The.World.Width/windowSize.Width,
-				The.World.Height/windowSize.Height);
+			The.Window.Input.ScreenToWorldTransform = Matrix32.Scaling(The.World.Width/windowSize.X,
+				The.World.Height/windowSize.Y);
 		}
 	}
 }

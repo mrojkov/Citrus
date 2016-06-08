@@ -12,7 +12,7 @@ namespace EmptyProject.Application
 		static Display InitializeDisplay()
 		{
 			var display = new Display("Unknown device",
-				The.Window.ClientSize.Width, The.Window.ClientSize.Height,
+				The.Window.ClientSize.X.Round(), The.Window.ClientSize.Y.Round(),
 				(int)Lime.Application.ScreenDPI.X);
 			return display;
 		}
