@@ -204,7 +204,7 @@ namespace Lime
 
 		public Vector3 WorldToViewportPoint(Vector3 pt)
 		{
-			pt = Camera.ViewProjection.ProjectVector(pt * new Vector3(1, -1, 1));
+			pt = Camera.ViewProjection.ProjectVector(pt) * new Vector3(1, -1, 1);
 			var xy = ((Vector2)pt + Vector2.One) * Size * Vector2.Half;
 			var zNear = Camera.NearClipPlane;
 			var zFar = Camera.FarClipPlane;
