@@ -71,6 +71,9 @@ namespace Lime
 		[ProtoMember(9)]
 		public float Opacity { get; set; }
 
+		[ProtoMember(10)]
+		public string Name { get; set; }
+
 		public Material()
 		{
 			DiffuseColor = Color4.White;
