@@ -362,6 +362,7 @@ namespace Orange
 		private Material ImportMaterial(Assimp.Material material)
 		{
 			var res = new Material();
+			res.Name = material.Name;
 			if (material.HasTextureDiffuse) {
 				res.DiffuseTexture = CreateSerializableTexture(material.TextureDiffuse);
 			}
