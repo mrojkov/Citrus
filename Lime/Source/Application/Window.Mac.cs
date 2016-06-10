@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using Lime.Platform;
 #if MAC
 using AppKit;
@@ -49,7 +50,7 @@ namespace Lime
 		public Vector2 ClientSize
 		{
 			get { return new Vector2((float)View.Bounds.Width, (float)View.Bounds.Height); }
-			set { window.SetContentSize(new CGSize(value.X, value.Y)); }
+			set { window.SetContentSize(new CGSize(value.X.Round(), value.Y.Round())); }
 		}
 
 		public float PixelScale
@@ -63,7 +64,7 @@ namespace Lime
 			set
 			{
 				var frame = window.Frame;
-				frame.Location = new CGPoint(value.X, value.Y);
+				frame.Location = new CGPoint(value.X.Round(), value.Y.Round());
 				window.SetFrame(frame, true);
 			}
 		}
@@ -74,7 +75,7 @@ namespace Lime
 			set 
 			{
 				var frame = window.Frame;
-				frame.Size = new CGSize(value.X, value.Y); 
+				frame.Size = new CGSize(value.X.Round(), value.Y.Round()); 
 				window.SetFrame(frame, true);
 			}
 		}
@@ -82,13 +83,13 @@ namespace Lime
 		public Vector2 MinimumDecoratedSize
 		{
 			get { return new Vector2((float)window.MinSize.Width, (float)window.MinSize.Height); }
-			set { window.MinSize = new CGSize(value.X, value.Y); }
+			set { window.MinSize = new CGSize(value.X.Round(), value.Y.Round()); }
 		}
 
 		public Vector2 MaximumDecoratedSize
 		{
 			get { return new Vector2((float)window.MaxSize.Width, (float)window.MaxSize.Height); }
-			set { window.MaxSize = new CGSize(value.X, value.Y); }
+			set { window.MaxSize = new CGSize(value.X.Round(), value.Y.Round()); }
 		}
 
 		public bool Active
@@ -201,7 +202,7 @@ namespace Lime
 			window = new NSWindow(rect, style, NSBackingStore.Buffered, false);
 
 			var contentRect = window.ContentRectFor(rect);
-			titleBarHeight = (float)rect.Height - (float)contentRect.Height;
+			titleBarHeight = ((RectangleF)rect).Height - (float)contentRect.Height;
 
 			if (options.MinimumDecoratedSize != Vector2.Zero) {
 				MinimumDecoratedSize = options.MinimumDecoratedSize;
