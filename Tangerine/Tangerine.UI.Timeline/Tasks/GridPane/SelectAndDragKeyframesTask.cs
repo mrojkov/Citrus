@@ -34,7 +34,7 @@ namespace Tangerine.UI.Timeline
 							yield return SelectTask(initialCell);
 						}
 					}
-					input.ReleaseMouse();
+					input.Release();
 				}
 				yield return null;
 			}

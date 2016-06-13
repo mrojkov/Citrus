@@ -267,6 +267,7 @@
     <Compile Include="Source\Widgets\Layout\ScrollableLayout.cs" />
     <Compile Include="Source\Application\MouseCursor\MouseCursor.Null.cs" />
     <Compile Include="Source\Application\MouseCursor\StockCursors.Win.cs" />
+    <Compile Include="Source\Types\BitSet256.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

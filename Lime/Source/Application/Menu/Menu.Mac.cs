@@ -106,19 +106,18 @@ namespace Lime
 
 			static NSEventModifierMask GetShortcutModifierMask(Shortcut shortcut)
 			{
-				switch (shortcut.Modifier) {
-					case Key.ShiftLeft:
-					case Key.ShiftRight:
-						return NSEventModifierMask.ShiftKeyMask;
-					case Key.AltLeft:
-					case Key.AltRight:
-						return NSEventModifierMask.AlternateKeyMask;
-					case Key.WinLeft:
-					case Key.WinRight:
-						return NSEventModifierMask.CommandKeyMask;
-					case Key.ControlLeft:
-					case Key.ControlRight:
-						return NSEventModifierMask.ControlKeyMask;
+				var m = shortcut.Modifier;
+				if (m == Key.ShiftLeft || m == Key.ShiftRight) {
+					return NSEventModifierMask.ShiftKeyMask;
+				}
+				if (m == Key.AltLeft || m == Key.AltRight) {
+					return NSEventModifierMask.AlternateKeyMask;
+				}
+				if (m == Key.WinLeft || m == Key.WinRight) {
+					return NSEventModifierMask.CommandKeyMask;
+				}
+				if (m == Key.ControlLeft || m == Key.ControlRight) {
+					return NSEventModifierMask.ControlKeyMask;
 				}
 				return 0;
 			}

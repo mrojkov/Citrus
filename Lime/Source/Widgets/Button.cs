@@ -125,7 +125,7 @@ namespace Lime
 		private IEnumerator<int> NormalState()
 		{
 			skipReleaseAnimation = false;
-			Input.ReleaseMouse();
+			Input.Release();
 			TryRunAnimation("Normal");
 			while (true) {
 				if (TabletControlScheme) {
@@ -247,7 +247,7 @@ namespace Lime
 
 		private IEnumerator<int> ReleaseState()
 		{
-			Input.ReleaseMouse();
+			Input.Release();
 			if (CurrentAnimation != "Release" && !skipReleaseAnimation) {
 				if (TryRunAnimation("Release")) {
 					while (IsRunning) {
@@ -269,7 +269,7 @@ namespace Lime
 
 		private IEnumerator<int> DisabledState()
 		{
-			Input.ReleaseMouse();
+			Input.Release();
 			if (CurrentAnimation == "Release") {
 				// The release animation should be played if we disable the button 
 				// right after click on it.

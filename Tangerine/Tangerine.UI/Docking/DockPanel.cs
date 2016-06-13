@@ -24,7 +24,12 @@ namespace Tangerine.UI
 				Layout = new HBoxLayout(),
 				Nodes = {
 					new SimpleText { Text = Title, Padding = new Thickness(4, 0), AutoSizeConstraints = false, MinMaxHeight = 20 },
-					(CloseButton = new BitmapButton(IconPool.GetTexture("PopupClose"), IconPool.GetTexture("PopupCloseHover")) { LayoutCell = new LayoutCell(Alignment.Center) })
+					(CloseButton = new BitmapButton(
+						IconPool.GetTexture("PopupClose"), 
+						IconPool.GetTexture("PopupCloseHover")) {
+							LayoutCell = new LayoutCell(Alignment.Center)
+						}
+					)
 				},
 				HitTestTarget = true
 			};
@@ -148,7 +153,7 @@ namespace Tangerine.UI
 					}
 					yield return null;
 				}
-				input.ReleaseMouse();
+				input.Release();
 				mainWidget.PostPresenter = null;
 				mainWindow.Invalidate();
 				thumbWindow?.Dispose();

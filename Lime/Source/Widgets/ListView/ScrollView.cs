@@ -341,7 +341,7 @@ namespace Lime
 			wheelScrollState = WheelScrollState.Stop;
 			do {
 				if (IsItemDragInProgress()) {
-					Frame.Input.ReleaseMouse();
+					Frame.Input.Release();
 					IsDragging = false;
 					yield break;
 				}
@@ -352,7 +352,7 @@ namespace Lime
 				velocityMeter.AddSample(realScrollPosition);
 				yield return null;
 			} while (Input.IsMousePressed());
-			Frame.Input.ReleaseMouse();
+			Frame.Input.Release();
 			StartScrolling(InertialScrollingTask(velocityMeter.CalcVelocity()));
 			IsDragging = false;
 		}

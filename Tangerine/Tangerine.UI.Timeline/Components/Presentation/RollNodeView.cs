@@ -100,7 +100,7 @@ namespace Tangerine.UI.Timeline.Components
 				}
 				yield return null;
 			}
-			editBox.Input.ReleaseMouse();
+			editBox.Input.Release();
 		}
 	}
 }

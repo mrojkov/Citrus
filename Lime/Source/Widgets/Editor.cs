@@ -330,7 +330,7 @@ namespace Lime
 		{
 			return
 				Main != Key.Unknown && input.WasKeyPressed(Main) &&
-				input.IsSingleKeyPressed(Modifier, Key.Unknown + 1, Key.Menu);
+				input.IsSingleKeyPressed(Modifier, (Key)(Key.Unknown.Value + 1), Key.Menu);
 		}
 
 		public static Shortcut Plus(Key modifier, Key main) { return new Shortcut(modifier, main); }

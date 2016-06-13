@@ -30,7 +30,6 @@ namespace Tangerine.UI.Inspector
 		private Inspector(Widget rootWidget)
 		{
 			RootWidget = rootWidget;
-			// ScrollViewWidget = new Frame { Layout = new ScrollableLayout() };
 			ContentWidget = new ScrollView((Frame)RootWidget).Content;
 			Focus = new KeyboardFocusController(RootWidget);
 			Nodes = new List<Node>();
@@ -45,10 +44,8 @@ namespace Tangerine.UI.Inspector
 		void InitializeWidgets()
 		{
 			RootWidget.Layout = new ScrollableLayout { ScrollDirection = ScrollDirection.Vertical };
-			// RootWidget.AddNode(ScrollViewWidget);
 			ContentWidget.Layout = new VBoxLayout { Tag = "InspectorContent", Spacing = 4 };
 			ContentWidget.Padding = new Thickness(4);
-			// RootWidget.Layout = new StackLayout();
 		}
 
 		private void RegisterEditors()

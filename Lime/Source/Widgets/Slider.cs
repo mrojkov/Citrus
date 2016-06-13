@@ -160,7 +160,7 @@ namespace Lime
 			RaiseDragEnded();
 			RunThumbAnimation("Normal");
 			if (Input.IsMouseOwner()) {
-				Input.ReleaseMouse();
+				Input.Release();
 			}
 		}
 

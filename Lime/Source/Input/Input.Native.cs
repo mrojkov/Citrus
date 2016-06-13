@@ -49,8 +49,6 @@ namespace Lime
 		private Vector2[] touchPositions = new Vector2[MaxTouches];
 		private List<KeyEvent> keyEventQueue = new List<KeyEvent>();
 
-		public static readonly int KeyCount = Enum.GetValues(typeof(Key)).Cast<int>().Max() + 1;
-
 		private struct KeyState
 		{
 			public bool PreviousState;
@@ -59,7 +57,7 @@ namespace Lime
 			public bool Repeated;
 		}
 
-		private KeyState[] keys = new KeyState[KeyCount];
+		private KeyState[] keys = new KeyState[Key.MaxCount];
 
 		/// <summary>
 		/// The matrix describes transition from pixels to virtual coordinates.
@@ -95,11 +93,24 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// Returns true if only a single given key from the given range is pressed.
+		/// Useful for recognizing keyboard modifiers.
+		/// </summary>
+		public bool IsSingleKeyPressed(Key key, Key rangeMin, Key rangeMax)
+		{
+			for (var k = rangeMin.Value; k <= rangeMax.Value; ++k) {
+				if (IsKeyPressed((Key)k) != (k == key.Value))
+					return false;
+			}
+			return true;
+		}
+
+		/// <summary>
 		/// Returns true during the frame the user releases the key identified by name.
 		/// </summary>
 		public bool WasKeyReleased(Key key)
 		{
-			return !keys[(int)key].CurrentState && keys[(int)key].PreviousState;
+			return !keys[key.Value].CurrentState && keys[key.Value].PreviousState;
 		}
 
 		/// <summary>
@@ -107,7 +118,7 @@ namespace Lime
 		/// </summary>
 		public bool WasKeyPressed(Key key)
 		{
-			return keys[(int)key].CurrentState && !keys[(int)key].PreviousState;
+			return keys[key.Value].CurrentState && !keys[key.Value].PreviousState;
 		}
 
 		/// <summary>
@@ -115,7 +126,7 @@ namespace Lime
 		/// </summary>
 		public bool WasKeyRepeated(Key key)
 		{
-			return keys[(int)key].Repeated;
+			return keys[key.Value].Repeated;
 		}
 
 		public bool WasMousePressed()
@@ -206,7 +217,7 @@ namespace Lime
 
 		internal void ProcessPendingKeyEvents(float delta)
 		{
-			for (int i = 0; i < KeyCount; i++) {
+			for (int i = 0; i < Key.Count; i++) {
 				var key = keys[i];
 				key.Repeated = false;
 				if (key.CurrentState) {
@@ -218,7 +229,7 @@ namespace Lime
 				keys[i] = key;
 			}
 			if (keyEventQueue.Count > 0) {
-				var processedKeys = new bool[KeyCount];
+				var processedKeys = new bool[Key.Count];
 				for (int i = 0; i < keyEventQueue.Count(); i++) {
 					var evt = keyEventQueue[i];
 					var k = (int)evt.Key;
@@ -238,7 +249,7 @@ namespace Lime
 
 		internal void CopyKeysState()
 		{
-			for (int i = 0; i < KeyCount; i++) {
+			for (int i = 0; i < Key.Count; i++) {
 				keys[i].PreviousState = keys[i].CurrentState;
 			}
 		}

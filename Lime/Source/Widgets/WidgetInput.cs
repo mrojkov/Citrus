@@ -1,45 +1,28 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Lime
 {
 	/// <summary>
-	/// The WidgetInput class allows a widget to capture an input device (mouse, keyboard, touchscreen).
+	/// The WidgetInput class allows a widget to capture an input device (mouse, keyboard).
 	/// After capturing the device, the widget and all its children receive an actual buttons and device axes state (e.g. mouse position). Other widgets receive released buttons state and frozen axes values.
 	/// </summary>
 	public class WidgetInput
 	{
-		public struct StackItem
-		{
-			public Widget Widget;
-#if DEBUG
-			public string StackTrace;
-#endif
-			public bool Exclusive;
-		}
-
-		private Input WindowInput
-		{
-			get { return Window.Current.Input; }
-		}
-
 		private Widget widget;
 		private Vector2 lastMousePosition;
 		private Vector2[] lastTouchPositions;
-		// NB: TouchScreen and mouse share the same capture stack
-		static List<StackItem> mouseCaptureStack;
-		static List<StackItem> keyboardCaptureStack;
-		static bool skipCapturesCleanup;
+		private static List<CaptureStackItem> captureStack;
+		private static bool skipCapturesCleanup;
+			
+		public static readonly BitSet256 KeyboardKeys = BitSet256.FromRange(Key.LShift.Value, Key.BackSlash.Value);
+		public static readonly BitSet256 MouseButtons = BitSet256.FromRange(Key.Mouse0.Value, Key.Mouse1DoubleClick.Value);
 
-		public static IEnumerable<StackItem> MouseCaptureStack { get { return mouseCaptureStack; } }
-		public static IEnumerable<StackItem> KeyboardCaptureStack { get { return keyboardCaptureStack; } }
-		
+		public static IEnumerable<CaptureStackItem> CaptureStack { get { return captureStack; } }
+
 		static WidgetInput()
 		{
-			mouseCaptureStack = new List<StackItem>();
-			keyboardCaptureStack = new List<StackItem>();
+			captureStack = new List<CaptureStackItem>();
 		}
 
 		public WidgetInput(Widget widget)
@@ -52,22 +35,25 @@ namespace Lime
 			}
 		}
 
-		public Vector2 MousePosition
+		public string TextInput 
 		{
-			get { return GetMousePosition(); }
+			get { return IsAcceptingKeyboard() ? WindowInput.TextInput : string.Empty; }
 		}
 
-		private Vector2 GetMousePosition()
+		public Vector2 MousePosition
 		{
-			if (IsAcceptingMouse()) {
-				lastMousePosition = WindowInput.MousePosition;
+			get
+			{
+				if (IsAcceptingKey(Key.Mouse0)) {
+					lastMousePosition = WindowInput.MousePosition;
+				}
+				return lastMousePosition;
 			}
-			return lastMousePosition;
 		}
 
 		public Vector2 GetTouchPosition(int index)
 		{
-			if (IsAcceptingTouchScreen()) {
+			if (IsAcceptingKey(Key.Touch0)) {
 				lastTouchPositions[index] = WindowInput.GetTouchPosition(index);
 			}
 			return lastTouchPositions[index];
@@ -75,12 +61,12 @@ namespace Lime
 
 		public int GetNumTouches()
 		{
-			return IsAcceptingTouchScreen() ? WindowInput.GetNumTouches() : 0;
+			return IsAcceptingKey(Key.Touch0) ? WindowInput.GetNumTouches() : 0;
 		}
 
 		public void CaptureMouse()
 		{
-			Capture(mouseCaptureStack, false);
+			Capture(MouseButtons, false);
 		}
 
 		/// <summary>
@@ -88,43 +74,12 @@ namespace Lime
 		/// </summary>
 		public void CaptureMouseExclusive()
 		{
-			Capture(mouseCaptureStack, true);
-		}
-
-		private void Capture(List<StackItem> stack, bool exclusive)
-		{
-			stack.RemoveAll(i => i.Widget == widget);
-			var thisLayer = widget.GetEffectiveLayer();
-			var t = stack.FindLastIndex(i => i.Widget.GetEffectiveLayer() <= thisLayer);
-#if DEBUG
-			stack.Insert(t + 1, new StackItem() { Widget = widget, StackTrace = System.Environment.StackTrace, Exclusive = exclusive });
-#else
-			stack.Insert(t + 1, new StackItem() { Widget = widget, Exclusive = exclusive  });
-#endif
-			// The widget may be invisible right after creation, 
-			// so omit the stack cleaning up on this frame.
-			skipCapturesCleanup = true;
-		}
-
-		public void ReleaseMouse()
-		{
-			mouseCaptureStack.RemoveAll(i => i.Widget == widget);
-		}
-
-		public bool IsMouseOwner()
-		{
-			int c = mouseCaptureStack.Count;
-			return (c > 0) && mouseCaptureStack[c - 1].Widget == widget;
-		}
-
-		public bool IsTouchScreenOwner()
-		{
-			return IsMouseOwner();
+			Capture(MouseButtons, true);
 		}
 
 		public void CaptureKeyboard()
 		{
-			Capture(keyboardCaptureStack, false);
+			Capture(KeyboardKeys, false);
 		}
 
 		/// <summary>
@@ -132,24 +87,71 @@ namespace Lime
 		/// </summary>
 		public void CaptureKeyboardExclusive()
 		{
-			Capture(keyboardCaptureStack, true);
+			Capture(KeyboardKeys, true);
 		}
 
-		public void ReleaseKeyboard()
+		public void Capture(BitSet256 keys, bool exclusive)
 		{
-			keyboardCaptureStack.RemoveAll(i => i.Widget == widget);
+			var thisLayer = widget.GetEffectiveLayer();
+			var t = captureStack.FindLastIndex(i => i.Widget.GetEffectiveLayer() <= thisLayer);
+#if DEBUG
+			captureStack.Insert(t + 1, new CaptureStackItem { Widget = widget, Keys = keys, StackTrace = System.Environment.StackTrace, Exclusive = exclusive });
+#else
+			stack.Insert(t + 1, new StackItem { Widget = widget, Keys = keys, Exclusive = exclusive  });
+#endif
+			// The widget may be invisible right after creation, 
+			// so omit the stack cleaning up on this frame.
+			skipCapturesCleanup = true;
+		}
+
+		public void Release()
+		{
+			var i = captureStack.Count;
+			if (i > 0 && captureStack[i - 1].Widget == widget) {
+				captureStack.RemoveAt(i - 1);
+			}
+		}
+
+		public bool IsMouseOwner()
+		{
+			return IsKeyOwner(Key.Mouse0);
 		}
 
 		public bool IsKeyboardOwner()
 		{
-			int c = keyboardCaptureStack.Count;
-			return (c > 0) && keyboardCaptureStack[c - 1].Widget == widget;
+			return IsKeyOwner(Key.A);
 		}
 
-		public string TextInput { 
-			get {
-				return IsAcceptingKeyboard() ? WindowInput.TextInput : string.Empty;
+		public bool IsKeyOwner(Key key)
+		{
+			for (int i = captureStack.Count - 1; i >= 0; i--) {
+				var t = captureStack[i];
+				if (t.Keys[key.Value]) {
+					return t.Widget == widget;
+				}
 			}
+			return false;
+		}
+
+		public bool IsAcceptingMouse()
+		{
+			return IsAcceptingKey(Key.Mouse0);
+		}
+
+		public bool IsAcceptingKeyboard()
+		{
+			return IsAcceptingKey(Key.A);
+		}
+
+		public bool IsAcceptingKey(Key key)
+		{
+			for (int i = captureStack.Count - 1; i >= 0; i--) {
+				var t = captureStack[i];
+				if (t.Keys[key.Value]) {
+					return t.Widget == widget || (!t.Exclusive && widget.ChildOf(t.Widget));
+				}
+			}
+			return true;				
 		}
 
 		public bool IsMousePressed(int button = 0)
@@ -174,7 +176,7 @@ namespace Lime
 
 		public bool IsKeyPressed(Key key)
 		{
-			return WindowInput.IsKeyPressed(key) && IsAcceptingDeviceWithKey(key);
+			return WindowInput.IsKeyPressed(key) && IsAcceptingKey(key);
 		}
 
 		/// <summary>
@@ -183,104 +185,60 @@ namespace Lime
 		/// </summary>
 		public bool IsSingleKeyPressed(Key key, Key rangeMin, Key rangeMax)
 		{
-			if (!IsAcceptingDeviceWithKey(key))
-				return false;
-			for (var k = rangeMin; k <= rangeMax; ++k) {
-				if (WindowInput.IsKeyPressed(k) != (k == key))
-					return false;
-			}
-			return true;
+			return IsAcceptingKey(key) && WindowInput.IsSingleKeyPressed(key, rangeMin, rangeMax);
 		}
 
 		public bool WasKeyPressed(Key key)
 		{
-			return WindowInput.WasKeyPressed(key) && IsAcceptingDeviceWithKey(key);
+			return WindowInput.WasKeyPressed(key) && IsAcceptingKey(key);
 		}
 
 		public bool WasKeyReleased(Key key)
 		{
-			return WindowInput.WasKeyReleased(key) && IsAcceptingDeviceWithKey(key);
+			return WindowInput.WasKeyReleased(key) && IsAcceptingKey(key);
 		}
 
 		public bool WasKeyRepeated(Key key)
 		{
-			return WindowInput.WasKeyRepeated(key) && IsAcceptingDeviceWithKey(key);
-		}
-
-		private bool IsAcceptingDeviceWithKey(Key key)
-		{
-			switch (key) {
-				case Key.Mouse0:
-				case Key.Mouse1:
-				case Key.Mouse2:
-				case Key.Mouse0DoubleClick:
-				case Key.Mouse1DoubleClick:
-					return IsAcceptingMouse();
-				case Key.Touch0:
-				case Key.Touch1:
-				case Key.Touch2:
-				case Key.Touch3:
-					return IsAcceptingTouchScreen();
-				default:
-					return IsAcceptingKeyboard();
-			}
-		}
-
-		public bool IsAcceptingMouse()
-		{
-			int c = mouseCaptureStack.Count;
-			if (c == 0) {
-				return true;
-			}
-			var context = mouseCaptureStack[c - 1];
-			return context.Widget == widget || (!context.Exclusive && widget.ChildOf(context.Widget));
-		}
-
-		public bool IsAcceptingTouchScreen()
-		{
-			return IsAcceptingMouse();
-		}
-
-		public bool IsAcceptingKeyboard()
-		{
-			int c = keyboardCaptureStack.Count;
-			if (c == 0) {
-				return true;
-			}
-			var context = keyboardCaptureStack[c - 1];
-			return context.Widget == widget || (!context.Exclusive && widget.ChildOf(context.Widget));
+			return WindowInput.WasKeyRepeated(key) && IsAcceptingKey(key);
 		}
 
 		public void CaptureAll()
 		{
-			CaptureMouse();
-			CaptureKeyboard();
+			Capture(BitSet256.Full, false);
 		}
 
 		public void CaptureAllExclusive()
 		{
-			CaptureMouseExclusive();
-			CaptureKeyboardExclusive();
-		}
-
-		public void ReleaseAll()
-		{
-			ReleaseMouse();
-			ReleaseKeyboard();
+			Capture(BitSet256.Full, true);
 		}
 
 		internal static void RemoveInvalidatedCaptures()
 		{
 			if (!skipCapturesCleanup) {
-				keyboardCaptureStack.RemoveAll(i => !IsVisibleWidget(i.Widget));
-				mouseCaptureStack.RemoveAll(i => !IsVisibleWidget(i.Widget));
+				captureStack.RemoveAll(i => !IsWidgetShown(i.Widget));
 			}
 			skipCapturesCleanup = false;
 		}
 
-		private static bool IsVisibleWidget(Widget widget)
+		private static bool IsWidgetShown(Widget widget)
 		{
 			return WidgetContext.Current.Root == widget.GetRoot() && widget.GloballyVisible;
+		}
+
+		private Input WindowInput
+		{
+			get { return CommonWindow.Current.Input; }
+		}
+
+		public class CaptureStackItem
+		{
+			public Widget Widget;
+			public BitSet256 Keys;
+#if DEBUG
+			public string StackTrace;
+#endif
+			public bool Exclusive;
 		}
 	}
 }

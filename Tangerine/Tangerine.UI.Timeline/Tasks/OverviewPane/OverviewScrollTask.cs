@@ -23,7 +23,7 @@ namespace Tangerine.UI.Timeline
 						timeline.ScrollOrigin = Vector2.Clamp(scrollOrigin + scrollDelta, Vector2.Zero, maxScrollOrigin);
 						yield return null;
 					}
-					input.ReleaseMouse();
+					input.Release();
 				}
 				yield return null;
 			}
