@@ -458,7 +458,7 @@ namespace Lime
 			throw new NotImplementedException();
 #else
 			MemoryStream memStream = new MemoryStream();
-			using (var compressionStream = new LzmaCompressionStream(stream, leaveOpen: true)) {
+			using (var compressionStream = new LzmaCompressionStream(memStream, leaveOpen: true)) {
 				stream.CopyTo(compressionStream);
 			}
 			memStream.Seek(0, SeekOrigin.Begin);
