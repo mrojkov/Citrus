@@ -252,7 +252,7 @@ namespace Orange
 			SyncUpdated(".scene", ".scene", (srcPath, dstPath) => {
 				var importer = HotSceneImporterFactory.CreateImporter(srcPath);
 				var node = importer.ParseNode();
-				Serialization.WriteObjectToBundle(assetsBundle, dstPath, node);
+				Serialization.WriteObjectToBundle(assetsBundle, dstPath, node, true);
 				return true;
 			});
 		}
@@ -699,7 +699,7 @@ namespace Orange
 		{
 			var rootNode = new Lime.Frame();
 			rootNode.AddNode(new ModelImporter(srcPath, The.Workspace.ActivePlatform).RootNode);
-			Serialization.WriteObjectToBundle(assetsBundle, dstPath, rootNode);
+			Serialization.WriteObjectToBundle(assetsBundle, dstPath, rootNode, true);
 			return true;
 		}
 	}
