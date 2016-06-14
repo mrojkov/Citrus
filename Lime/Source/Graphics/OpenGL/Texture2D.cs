@@ -143,8 +143,7 @@ namespace Lime
 		{
 			reloader = createReloader ? new TextureStreamReloader(stream) : null;
 			Discard();
-			if (stream is System.IO.Compression.DeflateStream) {
-				// DeflateStream doesn't support Seek
+			if (!stream.CanSeek) {
 				stream = new RewindableStream(stream);
 			}
 			using (var reader = new BinaryReader(stream)) {
