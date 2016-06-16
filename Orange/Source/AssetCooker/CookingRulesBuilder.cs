@@ -35,6 +35,7 @@ namespace Orange
 
 		public string TextureAtlas;
 		public bool MipMaps;
+		public bool HighQualityCompression;
 		public float TextureScaleFactor;
 		public PVRFormat PVRFormat;
 		public DDSFormat DDSFormat;
@@ -49,6 +50,7 @@ namespace Orange
 			return new CookingRules() {
 				TextureAtlas = null,
 				MipMaps = false,
+				HighQualityCompression = false,
 				TextureScaleFactor = 1.0f,
 				PVRFormat = platform == TargetPlatform.Android ? PVRFormat.ETC1 : PVRFormat.PVRTC4,
 				DDSFormat = DDSFormat.DXTi,
@@ -223,6 +225,9 @@ namespace Orange
 								break;
 							case "MipMaps":
 								rules.MipMaps = ParseBool(words[1]);
+								break;
+							case "HighQualityCompression":
+								rules.HighQualityCompression = ParseBool(words[1]);
 								break;
 							case "PVRFormat":
 								rules.PVRFormat = ParsePVRFormat(words[1], platform);

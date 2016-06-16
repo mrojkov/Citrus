@@ -586,17 +586,17 @@ namespace Orange
 					ConvertTexture(path, attributes, file => texture.Save(file, "png"));
 					break;
 				case TargetPlatform.Android:
-					ConvertTexture(path, attributes, file => TextureConverter.ToPVR(texture, file, rules.MipMaps, rules.PVRFormat));
+					ConvertTexture(path, attributes, file => TextureConverter.ToPVR(texture, file, rules.MipMaps, rules.HighQualityCompression, rules.PVRFormat));
 					// ETC1 textures on Android use separate alpha channel
 					if (texture.HasAlpha && rules.PVRFormat == PVRFormat.ETC1) {
 						using (var alphaTexture = new Gdk.Pixbuf(texture, 0, 0, texture.Width, texture.Height)) {
 							TextureConverterUtils.ConvertBitmapToAlphaMask(alphaTexture);
-							ConvertTexture(alphaPath, AssetAttributes.Zipped, file => TextureConverter.ToPVR(alphaTexture, file, rules.MipMaps, PVRFormat.ETC1));
+							ConvertTexture(alphaPath, AssetAttributes.Zipped, file => TextureConverter.ToPVR(alphaTexture, file, rules.MipMaps, rules.HighQualityCompression, PVRFormat.ETC1));
 						}
 					}
 					break;
 				case TargetPlatform.iOS:
-					ConvertTexture(path, attributes, file => TextureConverter.ToPVR(texture, file, rules.MipMaps, rules.PVRFormat));
+					ConvertTexture(path, attributes, file => TextureConverter.ToPVR(texture, file, rules.MipMaps, rules.HighQualityCompression, rules.PVRFormat));
 					break;
 				case TargetPlatform.Desktop:
 					ConvertTexture(path, attributes, file => TextureConverter.ToDDS(texture, file, rules.DDSFormat, rules.MipMaps));

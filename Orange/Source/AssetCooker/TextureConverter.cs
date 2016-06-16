@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 using Gdk;
@@ -8,7 +9,7 @@ namespace Orange
 {
 	public static class TextureConverter
 	{
-		public static void ToPVR(Pixbuf pixbuf, string dstPath, bool mipMaps, PVRFormat pvrFormat)
+		public static void ToPVR(Pixbuf pixbuf, string dstPath, bool mipMaps, bool highQualityCompression, PVRFormat pvrFormat)
 		{
 			int width = pixbuf.Width;
 			int height = pixbuf.Height;
@@ -52,6 +53,9 @@ namespace Orange
 				case PVRFormat.ARGB8:
 					args.Append(" -f r8g8b8a8");
 					break;
+			}
+			if (highQualityCompression && (new [] { PVRFormat.PVRTC2, PVRFormat.PVRTC4, PVRFormat.PVRTC4_Forced }.Contains (pvrFormat))) {
+				args.Append(" -q pvrtcbest");
 			}
 			string tga = Path.ChangeExtension(dstPath, ".tga");
 			try {
