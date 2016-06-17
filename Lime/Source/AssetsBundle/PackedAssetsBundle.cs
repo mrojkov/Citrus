@@ -355,18 +355,21 @@ namespace Lime
 				ExternalStorageLagsSimulator.SimulateReadDelay(path, desc.Length);
 			}
 			if ((desc.Attributes & AssetAttributes.Zipped) != 0) {
-				return DecompressStream(stream);
+				return DecompressAssetStream(stream, desc.Attributes);
 			}
 			return stream;
 		}
 
-		private static Stream DecompressStream(AssetStream stream)
+		private static Stream DecompressAssetStream(AssetStream stream, AssetAttributes attributes)
 		{
-#if UNITY
-			throw new NotImplementedException();
-#else
-			return new LzmaDecompressionStream(stream);
+#if !UNITY
+			if ((attributes & AssetAttributes.ZippedDeflate) != 0) {
+				return new DeflateStream(stream, CompressionMode.Decompress);
+			} else if ((attributes & AssetAttributes.ZippedLZMA) != 0){
+				return new LzmaDecompressionStream(stream);
+			}
 #endif
+			throw new NotImplementedException();
 		}
 
 		/// <summary>
@@ -416,7 +419,7 @@ namespace Lime
 		{
 			AssetDescriptor d;
 			if ((attributes & AssetAttributes.Zipped) != 0) {
-				stream = CompressStream(stream);
+				stream = CompressAssetStream(stream, attributes);
 			}
 			bool reuseExistingDescriptor = index.TryGetValue(AssetPath.CorrectSlashes(path), out d) && 
 				(d.AllocatedSize >= stream.Length) && 
@@ -452,19 +455,28 @@ namespace Lime
 			}
 		}
 
-		private static Stream CompressStream(Stream stream)
+		private static Stream CompressAssetStream(Stream stream, AssetAttributes attributes)
 		{
-#if UNITY
-			throw new NotImplementedException();
-#else
 			MemoryStream memStream = new MemoryStream();
-			using (var compressionStream = new LzmaCompressionStream(memStream, leaveOpen: true)) {
+			using (var compressionStream = CreateCompressionStream(memStream, attributes)) {
 				stream.CopyTo(compressionStream);
 			}
 			memStream.Seek(0, SeekOrigin.Begin);
 			stream = memStream;
 			return stream;
+		}
+
+		private static Stream CreateCompressionStream(Stream stream, AssetAttributes attributes)
+		{
+#if !UNITY
+			if ((attributes & AssetAttributes.ZippedDeflate) != 0) {
+				return new DeflateStream(stream, CompressionMode.Compress, leaveOpen: true);
+			}
+			if ((attributes & AssetAttributes.ZippedLZMA) != 0) {
+				return new LzmaCompressionStream(stream, leaveOpen: true);
+			}
 #endif
+			throw new NotImplementedException();
 		}
 
 		private void ReadIndexTable()

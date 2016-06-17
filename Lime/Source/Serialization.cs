@@ -93,12 +93,12 @@ namespace Lime
 				WriteObject(path, stream, instance);
 		}
 		
-		public static void WriteObjectToBundle<T>(AssetsBundle bundle, string path, T instance, bool compress = false)
+		public static void WriteObjectToBundle<T>(AssetsBundle bundle, string path, T instance, AssetAttributes attributes = AssetAttributes.None)
 		{
 			using (MemoryStream stream = new MemoryStream()) {
 				WriteObject(path, stream, instance);
 				stream.Seek(0, SeekOrigin.Begin);
-				bundle.ImportFile(path, stream, 0, compress ? AssetAttributes.Zipped : 0);
+				bundle.ImportFile(path, stream, 0, attributes);
 			}
 		}
 

@@ -12,12 +12,14 @@ namespace Lime
 		/// <summary>
 		/// Бандл заархивирован
 		/// </summary>
-		Zipped = 1 << 0,
+		ZippedDeflate = 1 << 0,
 
 		/// <summary>
 		/// Бандл содержит текстуры, не равные степени 2
 		/// </summary>
-		NonPowerOf2Texture = 1 << 1
+		NonPowerOf2Texture = 1 << 1,
+		ZippedLZMA = 1 << 1,
+		Zipped = ZippedDeflate | ZippedLZMA
 	}
 
 	/// <summary>

@@ -155,7 +155,7 @@ namespace Orange
 		{
 			AddStage(SyncAtlases);
 			AddStage(SyncDeleted);
-			AddStage(() => SyncRawAssets(".txt", true));
+			AddStage(() => SyncRawAssets(".txt", AssetAttributes.ZippedDeflate));
 			AddStage(SyncTextures);
 			AddStage(DeleteOrphanedMasks);
 			AddStage(DeleteOrphanedAlphaTextures);
@@ -211,10 +211,10 @@ namespace Orange
 			}
 		}
 
-		private static void SyncRawAssets(string extension, bool zipped = false)
+		private static void SyncRawAssets(string extension, AssetAttributes attributes = AssetAttributes.None)
 		{
 			SyncUpdated(extension, extension, (srcPath, dstPath) => {
-				assetsBundle.ImportFile(srcPath, dstPath, 0, zipped ? AssetAttributes.Zipped : AssetAttributes.None);
+				assetsBundle.ImportFile(srcPath, dstPath, 0, attributes);
 				return true;
 			});
 		}
@@ -252,7 +252,7 @@ namespace Orange
 			SyncUpdated(".scene", ".scene", (srcPath, dstPath) => {
 				var importer = HotSceneImporterFactory.CreateImporter(srcPath);
 				var node = importer.ParseNode();
-				Serialization.WriteObjectToBundle(assetsBundle, dstPath, node, true);
+				Serialization.WriteObjectToBundle(assetsBundle, dstPath, node);
 				return true;
 			});
 		}
@@ -576,7 +576,7 @@ namespace Orange
 				var maskPath = Path.ChangeExtension(path, ".mask");
 				OpacityMaskCreator.CreateMask(assetsBundle, texture, maskPath);
 			}
-			var attributes = AssetAttributes.Zipped;
+			var attributes = AssetAttributes.ZippedDeflate;
 			if (!TextureConverterUtils.IsPowerOf2(texture.Width) || !TextureConverterUtils.IsPowerOf2(texture.Height)) {
 				attributes |= AssetAttributes.NonPowerOf2Texture;
 			}
@@ -591,7 +591,7 @@ namespace Orange
 					if (texture.HasAlpha && rules.PVRFormat == PVRFormat.ETC1) {
 						using (var alphaTexture = new Gdk.Pixbuf(texture, 0, 0, texture.Width, texture.Height)) {
 							TextureConverterUtils.ConvertBitmapToAlphaMask(alphaTexture);
-							ConvertTexture(alphaPath, AssetAttributes.Zipped, file => TextureConverter.ToPVR(alphaTexture, file, rules.MipMaps, rules.HighQualityCompression, PVRFormat.ETC1));
+							ConvertTexture(alphaPath, AssetAttributes.ZippedDeflate, file => TextureConverter.ToPVR(alphaTexture, file, rules.MipMaps, rules.HighQualityCompression, PVRFormat.ETC1));
 						}
 					}
 					break;
@@ -699,7 +699,7 @@ namespace Orange
 		{
 			var rootNode = new Lime.Frame();
 			rootNode.AddNode(new ModelImporter(srcPath, The.Workspace.ActivePlatform).RootNode);
-			Serialization.WriteObjectToBundle(assetsBundle, dstPath, rootNode, true);
+			Serialization.WriteObjectToBundle(assetsBundle, dstPath, rootNode, AssetAttributes.ZippedLZMA);
 			return true;
 		}
 	}
