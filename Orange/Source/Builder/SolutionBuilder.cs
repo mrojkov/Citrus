@@ -184,19 +184,19 @@ namespace Orange
 				packageName = packageName.Substring(0, signedIndex);
 
 			Console.WriteLine("------------------ Deploying ------------------");
-			Console.WriteLine($"Uninstalling previous apk ({packageName})");
+			Console.WriteLine("Uninstalling previous apk ({0})", packageName);
 
-			if (Process.Start(adb, $"shell pm uninstall {packageName}") == 0) {
+			if (Process.Start(adb, string.Format("shell pm uninstall {0}", packageName)) == 0) {
 				Console.WriteLine("Uninstalled!");
 			} else {
 				Console.WriteLine("Error during uninstalling. Probably application wasn't installed.");
 			}
 
-			Console.WriteLine($"Installing apk {apkPath}");
-			if (Process.Start(adb, $"install {apkPath}") == 0) {
+			Console.WriteLine("Installing apk {0}", apkPath);
+			if (Process.Start(adb, string.Format("install {0}", apkPath)) == 0) {
 				Console.WriteLine("App installed.");
 				Console.WriteLine("Starting application.");
-				Process.Start(adb, $"shell monkey -p {packageName} -c android.intent.category.LAUNCHER 1");
+				Process.Start(adb, string.Format("shell monkey -p {0} -c android.intent.category.LAUNCHER 1", packageName));
 			} else {
 				Console.WriteLine("Error during installing.");
 			}
