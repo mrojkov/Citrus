@@ -18,7 +18,7 @@ namespace Lime
 		/// Бандл содержит текстуры, не равные степени 2
 		/// </summary>
 		NonPowerOf2Texture = 1 << 1,
-		ZippedLZMA = 1 << 1,
+		ZippedLZMA = 1 << 2,
 		Zipped = ZippedDeflate | ZippedLZMA
 	}
 
