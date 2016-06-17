@@ -60,6 +60,9 @@
     <Reference Include="protobuf-net">
       <HintPath>..\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
     </Reference>
+    <Reference Include="Lzma">
+      <HintPath>..\3rdParty\Lzma\bin\Release\Lzma.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Types\Matrix44.cs" />
@@ -368,11 +371,5 @@
       <IsCxx>False</IsCxx>
       <Kind>Dynamic</Kind>
     </NativeReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Lemon\Lemon.Mac.csproj">
-      <Project>{BB697671-700C-455D-B8EE-66A6B122B949}</Project>
-      <Name>Lemon.Mac</Name>
-    </ProjectReference>
   </ItemGroup>
 </Project>

@@ -47,6 +47,9 @@
     <Reference Include="protobuf-net">
       <HintPath>..\3rdParty\ProtoBuf-Net\iOS\protobuf-net.dll</HintPath>
     </Reference>
+    <Reference Include="Lzma">
+      <HintPath>..\3rdParty\Lzma\bin\Release\Lzma.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
@@ -328,12 +331,6 @@
     <Folder Include="Source\Audio\OpenAL\" />
     <Folder Include="Source\Audio\Unity\" />
     <Folder Include="Source\Graphics\Fonts\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Lemon\Lemon.iOS.csproj">
-      <Project>{C4795CBE-B192-4E53-8140-7310FBD206DD}</Project>
-      <Name>Lemon.iOS</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>
