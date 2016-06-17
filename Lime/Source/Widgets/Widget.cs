@@ -109,12 +109,14 @@ namespace Lime
 
 		public Widget ParentWidget { get { return Parent != null ? Parent.AsWidget : null; } }
 
+		public Focusable Focusable { get; set; }
+
 		public ILayout Layout = AnchorLayout.Instance;
 
 		/// <summary>
 		/// Gets the layout-specific data. 
 		/// </summary>
-		public LayoutCell LayoutCell;
+		public LayoutCell LayoutCell { get; set; }
 
 		public Vector2 EffectiveMinSize { get { return Vector2.Max(MinSize, MeasuredMinSize); } }
 		public Vector2 EffectiveMaxSize { get { return Vector2.Min(MaxSize, MeasuredMaxSize); } }
@@ -1231,7 +1233,7 @@ namespace Lime
 		/// </summary>
 		public virtual IEnumerable<string> GetVisibilityIssues()
 		{
-			if (!ChildOf(WidgetContext.Current.Root) && (this != WidgetContext.Current.Root)) {
+			if (!DescendantOrThis(WidgetContext.Current.Root)) {
 				yield return "The widget is not included to the world hierarchy";
 			}
 			if (!Visible) {

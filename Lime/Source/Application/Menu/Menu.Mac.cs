@@ -91,8 +91,8 @@ namespace Lime
 				NativeMenuItem.Enabled = Command.Enabled;
 				NativeMenuItem.Title = Command.Text;
 				if (Command.Shortcut.Main != Key.Unknown) {
-					NativeMenuItem.KeyEquivalent = Command.Shortcut.Main.ToString().ToLower();
-					NativeMenuItem.KeyEquivalentModifierMask = GetShortcutModifierMask(Command.Shortcut);
+					NativeMenuItem.KeyEquivalent = GetKeyEquivalent(Command.Shortcut.Main);
+					NativeMenuItem.KeyEquivalentModifierMask = GetModifierMask(Command.Shortcut.Modifiers);
 				}
 				if (Command.Submenu != null) {
 					var nativeSubmenu = Command.Submenu.NativeMenu;
@@ -104,22 +104,33 @@ namespace Lime
 				}
 			}
 
-			static NSEventModifierMask GetShortcutModifierMask(Shortcut shortcut)
+			static string GetKeyEquivalent(Key key)
 			{
-				var m = shortcut.Modifier;
-				if (m == Key.ShiftLeft || m == Key.ShiftRight) {
-					return NSEventModifierMask.ShiftKeyMask;
+				if (key >= Key.A && key <= Key.Z) {
+					return ((char)('a' + key - Key.A)).ToString();
 				}
-				if (m == Key.AltLeft || m == Key.AltRight) {
-					return NSEventModifierMask.AlternateKeyMask;
+				if (key >= Key.Number0 && key <= Key.Number9) {
+					return ((char)('0' + key - Key.A)).ToString();
 				}
-				if (m == Key.WinLeft || m == Key.WinRight) {
-					return NSEventModifierMask.CommandKeyMask;
+				throw new ArgumentException();
+			}
+
+			static NSEventModifierMask GetModifierMask(Modifiers modifiers)
+			{
+				NSEventModifierMask result = 0;
+				if ((modifiers & Modifiers.Shift) != 0) {
+					result |= NSEventModifierMask.ShiftKeyMask;
 				}
-				if (m == Key.ControlLeft || m == Key.ControlRight) {
-					return NSEventModifierMask.ControlKeyMask;
+				if ((modifiers & Modifiers.Alt) != 0) {
+					result |= NSEventModifierMask.AlternateKeyMask;
 				}
-				return 0;
+				if ((modifiers & Modifiers.Control) != 0) {
+					result |= NSEventModifierMask.ControlKeyMask;
+				}
+				if ((modifiers & Modifiers.Win) != 0) {
+					result |= NSEventModifierMask.CommandKeyMask;
+				}
+				return result;
 			}
 		}
 	}

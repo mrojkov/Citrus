@@ -15,9 +15,6 @@ namespace Lime
 		private static List<CaptureStackItem> captureStack;
 		private static bool skipCapturesCleanup;
 			
-		public static readonly BitSet256 KeyboardKeys = BitSet256.FromRange(Key.LShift.Value, Key.BackSlash.Value);
-		public static readonly BitSet256 MouseButtons = BitSet256.FromRange(Key.Mouse0.Value, Key.Mouse1DoubleClick.Value);
-
 		public static IEnumerable<CaptureStackItem> CaptureStack { get { return captureStack; } }
 
 		static WidgetInput()
@@ -66,7 +63,7 @@ namespace Lime
 
 		public void CaptureMouse()
 		{
-			Capture(MouseButtons, false);
+			Capture(KeySets.Mouse);
 		}
 
 		/// <summary>
@@ -74,12 +71,12 @@ namespace Lime
 		/// </summary>
 		public void CaptureMouseExclusive()
 		{
-			Capture(MouseButtons, true);
+			CaptureExclusive(KeySets.Mouse);
 		}
 
 		public void CaptureKeyboard()
 		{
-			Capture(KeyboardKeys, false);
+			Capture(KeySets.Keyboard);
 		}
 
 		/// <summary>
@@ -87,10 +84,20 @@ namespace Lime
 		/// </summary>
 		public void CaptureKeyboardExclusive()
 		{
-			Capture(KeyboardKeys, true);
+			CaptureExclusive(KeySets.Keyboard);
 		}
 
-		public void Capture(BitSet256 keys, bool exclusive)
+		public void Capture(BitSet256 keys)
+		{
+			CaptureHelper(keys, false);
+		}
+
+		public void CaptureExclusive(BitSet256 keys)
+		{
+			CaptureHelper(keys, true);
+		}
+
+		private void CaptureHelper(BitSet256 keys, bool exclusive)
 		{
 			var thisLayer = widget.GetEffectiveLayer();
 			var t = captureStack.FindLastIndex(i => i.Widget.GetEffectiveLayer() <= thisLayer);
@@ -106,9 +113,11 @@ namespace Lime
 
 		public void Release()
 		{
-			var i = captureStack.Count;
-			if (i > 0 && captureStack[i - 1].Widget == widget) {
-				captureStack.RemoveAt(i - 1);
+			for (int i = captureStack.Count - 1; i >= 0; i--) {
+				if (captureStack[i].Widget == widget) {
+					captureStack.RemoveAt(i);
+					break;
+				}
 			}
 		}
 
@@ -126,7 +135,7 @@ namespace Lime
 		{
 			for (int i = captureStack.Count - 1; i >= 0; i--) {
 				var t = captureStack[i];
-				if (t.Keys[key.Value]) {
+				if (t.Keys[key.Code]) {
 					return t.Widget == widget;
 				}
 			}
@@ -147,8 +156,8 @@ namespace Lime
 		{
 			for (int i = captureStack.Count - 1; i >= 0; i--) {
 				var t = captureStack[i];
-				if (t.Keys[key.Value]) {
-					return t.Widget == widget || (!t.Exclusive && widget.ChildOf(t.Widget));
+				if (t.Keys[key.Code]) {
+					return t.Widget == widget || (!t.Exclusive && widget.DescendantOf(t.Widget));
 				}
 			}
 			return true;				
@@ -179,15 +188,6 @@ namespace Lime
 			return WindowInput.IsKeyPressed(key) && IsAcceptingKey(key);
 		}
 
-		/// <summary>
-		/// Returns true if only a single given key from the given range is pressed.
-		/// Useful for recognizing keyboard modifiers.
-		/// </summary>
-		public bool IsSingleKeyPressed(Key key, Key rangeMin, Key rangeMax)
-		{
-			return IsAcceptingKey(key) && WindowInput.IsSingleKeyPressed(key, rangeMin, rangeMax);
-		}
-
 		public bool WasKeyPressed(Key key)
 		{
 			return WindowInput.WasKeyPressed(key) && IsAcceptingKey(key);
@@ -205,12 +205,12 @@ namespace Lime
 
 		public void CaptureAll()
 		{
-			Capture(BitSet256.Full, false);
+			Capture(BitSet256.Full);
 		}
 
 		public void CaptureAllExclusive()
 		{
-			Capture(BitSet256.Full, true);
+			CaptureExclusive(BitSet256.Full);
 		}
 
 		internal static void RemoveInvalidatedCaptures()

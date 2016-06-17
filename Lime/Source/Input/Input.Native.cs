@@ -6,6 +6,16 @@ using System.Text;
 
 namespace Lime
 {
+	[Flags]
+	public enum Modifiers
+	{
+		None = 0,
+		Shift = 1,
+		Control = 2,
+		Alt = 4,
+		Win = 8
+	}
+
 	public class Input
 	{
 		public class InputSimulator
@@ -79,6 +89,8 @@ namespace Lime
 		/// </summary>
 		public Vector3 Acceleration { get; internal set; }
 
+		public static readonly List<IKeyTranslator> KeyTranslators = new List<IKeyTranslator>();
+
 		public Input()
 		{
 			Simulator = new InputSimulator(this);
@@ -89,20 +101,25 @@ namespace Lime
 		/// </summary>
 		public bool IsKeyPressed(Key key)
 		{
-			return keys[(int)key].CurrentState;
+			return keys[key.Code].CurrentState;
 		}
 
-		/// <summary>
-		/// Returns true if only a single given key from the given range is pressed.
-		/// Useful for recognizing keyboard modifiers.
-		/// </summary>
-		public bool IsSingleKeyPressed(Key key, Key rangeMin, Key rangeMax)
+		public Modifiers GetModifiers()
 		{
-			for (var k = rangeMin.Value; k <= rangeMax.Value; ++k) {
-				if (IsKeyPressed((Key)k) != (k == key.Value))
-					return false;
+			var result = Modifiers.None;
+			if (IsKeyPressed(Key.LShift) || IsKeyPressed(Key.RShift)) {
+				result |= Modifiers.Shift;
 			}
-			return true;
+			if (IsKeyPressed(Key.LAlt) || IsKeyPressed(Key.RAlt)) {
+				result |= Modifiers.Alt;
+			}
+			if (IsKeyPressed(Key.LControl) || IsKeyPressed(Key.RControl)) {
+				result |= Modifiers.Control;
+			}
+			if (IsKeyPressed(Key.LWin) || IsKeyPressed(Key.RWin)) {
+				result |= Modifiers.Win;
+			}
+			return result;
 		}
 
 		/// <summary>
@@ -110,7 +127,7 @@ namespace Lime
 		/// </summary>
 		public bool WasKeyReleased(Key key)
 		{
-			return !keys[key.Value].CurrentState && keys[key.Value].PreviousState;
+			return !keys[key.Code].CurrentState && keys[key.Code].PreviousState;
 		}
 
 		/// <summary>
@@ -118,7 +135,7 @@ namespace Lime
 		/// </summary>
 		public bool WasKeyPressed(Key key)
 		{
-			return keys[key.Value].CurrentState && !keys[key.Value].PreviousState;
+			return keys[key.Code].CurrentState && !keys[key.Code].PreviousState;
 		}
 
 		/// <summary>
@@ -126,7 +143,7 @@ namespace Lime
 		/// </summary>
 		public bool WasKeyRepeated(Key key)
 		{
-			return keys[key.Value].Repeated;
+			return keys[key.Code].Repeated;
 		}
 
 		public bool WasMousePressed()
@@ -161,7 +178,7 @@ namespace Lime
 
 		public bool WasTouchBegan(int index)
 		{
-			return WasKeyPressed((Key)((int)Key.Touch0 + index));
+			return WasKeyPressed(Key.Touch0 + index);
 		}
 
 		private Key GetMouseButtonByIndex(int button)
@@ -169,17 +186,17 @@ namespace Lime
 			if (button < 0 || button > 2) {
 				throw new ArgumentException();
 			}
-			return (Key)((int)Key.Mouse0 + button);
+			return Key.Mouse0 + button;
 		}
 
 		public bool WasTouchEnded(int index)
 		{
-			return WasKeyReleased((Key)((int)Key.Touch0 + index));
+			return WasKeyReleased(Key.Touch0 + index);
 		}
 
 		public bool IsTouching(int index)
 		{
-			return IsKeyPressed((Key)((int)Key.Touch0 + index));
+			return IsKeyPressed(Key.Touch0 + index);
 		}
 
 		public Vector2 GetTouchPosition(int index)
@@ -206,7 +223,23 @@ namespace Lime
 
 		internal void SetKeyState(Key key, bool value)
 		{
+			if (KeySets.Modifiers[key]) {
+				ReleaseAffectedByModifierKeys();
+			}
+			var modifiers = GetModifiers();
+			foreach (var m in KeyTranslators) {
+				key = m.Translate(modifiers, key);
+			}
 			keyEventQueue.Add(new KeyEvent { Key = key, State = value });
+		}
+
+		private void ReleaseAffectedByModifierKeys()
+		{
+			for (var i = 0; i < KeySets.AffectedByModifiers.Count; i++) {
+				if (keys[i].CurrentState && KeySets.AffectedByModifiers[i]) {
+					SetKeyState(i, false);
+				}
+			}
 		}
 
 		internal bool HasPendingKeyEvent(Key key)

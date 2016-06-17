@@ -123,16 +123,10 @@ namespace Lime
 		}
 	}
 
-	public interface IFocusable
-	{
-		bool IsFocused();
-		void Focus();
-	}
-
 	/// <summary>
 	/// Editor behaviour implemented over the given text display widget.
 	/// </summary>
-	public class Editor : IFocusable
+	public class Editor
 	{
 		public readonly Widget Container;
 		public readonly IText Text;
@@ -177,11 +171,13 @@ namespace Lime
 
 		public void Focus()
 		{
-			WidgetContext.Current.ActiveTextWidget = textInputProcessor;
-			WidgetContext.Current.IsActiveTextWidgetUpdated = true;
+			KeyboardFocusController.SetFocus(Container);
 		}
 
-		public bool IsFocused() { return WidgetContext.Current.ActiveTextWidget == textInputProcessor; }
+		public bool IsFocused()
+		{
+			return KeyboardFocusController.Focused == Container;
+		}
 
 		private bool CheckKeyRepeated(Key key)
 		{
@@ -295,99 +291,6 @@ namespace Lime
 						caretPos.WorldPos = t.TransformVector(Container.Input.MousePosition);
 					}
 					Text.SyncCaretPosition();
-				}
-				yield return null;
-			}
-		}
-	}
-
-	/// <summary>
-	/// Represents combination of a key with a keyboard modifier used to trigger some action.
-	/// </summary>
-	public struct Shortcut
-	{
-		/// <summary>
-		/// Modifier is expected to be in range from Key.LShift to Key.Menu.<br/>
-		/// Set Modifier to Key.Unknown to get a key without any modifier.<br/>
-		/// </summary>
-		public readonly Key Modifier;
-		/// <summary>
-		/// Set Main to Key.Unknown to disable shortcut.
-		/// </summary>
-		public readonly Key Main;
-
-		public static Shortcut Disabled = Key.Unknown;
-
-		public Shortcut(Key modifier, Key main)
-		{
-			Modifier = modifier;
-			Main = main;
-		}
-
-		public static implicit operator Shortcut(Key main) { return new Shortcut(Key.Unknown, main); }
-
-		public bool WasTriggered(WidgetInput input)
-		{
-			return
-				Main != Key.Unknown && input.WasKeyPressed(Main) &&
-				input.IsSingleKeyPressed(Modifier, (Key)(Key.Unknown.Value + 1), Key.Menu);
-		}
-
-		public static Shortcut Plus(Key modifier, Key main) { return new Shortcut(modifier, main); }
-	}
-
-	/// <summary>
-	/// Controls switching of focus between <see cref="IFocusable"/> fields based on keyboard shortcuts.
-	/// </summary>
-	public class KeyboardFocusController
-	{
-		public Shortcut NextField = Key.Tab;
-		public Shortcut PreviousField = Shortcut.Plus(Key.LShift, Key.Tab);
-		public Shortcut NextFieldOrSubmit = Key.Enter;
-		public Shortcut Cancel = Key.Escape;
-
-		public event Action OnSubmit;
-		public event Action OnCancel;
-
-		public readonly Widget Parent;
-		public readonly List<IFocusable> Fields = new List<IFocusable>();
-
-		public KeyboardFocusController(Widget parent)
-		{
-			Parent = parent;
-			Parent.Tasks.Add(FocusTask());
-		}
-
-		private int Next()
-		{
-			var focused = Fields.FindIndex(i => i.IsFocused());
-			// Submit should work even without focusable entities.
-			if (NextFieldOrSubmit.WasTriggered(Parent.Input)) {
-				if (focused + 1 < Fields.Count)
-					return focused + 1;
-				if (OnSubmit != null)
-					OnSubmit();
-			}
-			if (focused < 0)
-				return -1;
-			if (NextField.WasTriggered(Parent.Input))
-				return (focused + 1) % Fields.Count;
-			if (PreviousField.WasTriggered(Parent.Input))
-				return (focused + Fields.Count - 1) % Fields.Count;
-			return -1;
-		}
-
-		private IEnumerator<object> FocusTask()
-		{
-			while (true) {
-				if (Cancel.WasTriggered(Parent.Input) && OnCancel != null) {
-					OnCancel();
-					yield break;
-				}
-				var next = Next();
-				if (next >= 0) {
-					yield return null;
-					Fields[next].Focus();
 				}
 				yield return null;
 			}

@@ -122,10 +122,12 @@ namespace Lime.Platform
 		public override void KeyDown(NSEvent theEvent)
 		{
 			var key = (Key)MacKeyMap.GetKey((MacKeyCode)theEvent.KeyCode);
-			input.SetKeyState(key, true);
-			// There is no KeyUp event for regular key on Mac if Command key pressed, so we release it manualy in the same frame
-			if ((theEvent.ModifierFlags & (NSEventModifierMask)(MacKeyModifiers.LWinFlag | MacKeyModifiers.RWinFlag)) != 0) {
-				input.SetKeyState(key, false);
+			if (!theEvent.IsARepeat) {
+				input.SetKeyState(key, true);
+				// There is no KeyUp event for regular key on Mac if Command key pressed, so we release it manualy in the same frame
+				if ((theEvent.ModifierFlags & (NSEventModifierMask)(MacKeyModifiers.LWinFlag | MacKeyModifiers.RWinFlag)) != 0) {
+					input.SetKeyState(key, false);
+				}
 			}
 			foreach(var c in theEvent.Characters) {
 				const char backspaceCode = (char)127;

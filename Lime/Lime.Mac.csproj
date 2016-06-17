@@ -268,6 +268,9 @@
     <Compile Include="Source\Application\MouseCursor\MouseCursor.Null.cs" />
     <Compile Include="Source\Application\MouseCursor\StockCursors.Win.cs" />
     <Compile Include="Source\Types\BitSet256.cs" />
+    <Compile Include="Source\Widgets\KeyboardFocus.cs" />
+    <Compile Include="Source\Input\Shortcut.cs" />
+    <Compile Include="Source\Input\IKeyTranslator.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

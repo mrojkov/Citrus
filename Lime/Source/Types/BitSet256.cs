@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Collections.Generic;
 using ProtoBuf;
 
 namespace Lime
@@ -48,17 +48,29 @@ namespace Lime
 			return result;
 		}
 
-		public bool this[int bit]
+		public bool this[int index]
 		{
-			get { return (GetNubble(bit / 32) & 1U << bit % 32) != 0; }
+			get { return (GetNubble(index / 32) & 1U << index % 32) != 0; }
 			set
 			{
 				if (value) {
-					SetNubble(bit / 32, GetNubble(bit / 32) | 1U << bit % 32);
+					SetNubble(index / 32, GetNubble(index / 32) | 1U << index % 32);
 				} else {
-					SetNubble(bit / 32, GetNubble(bit / 32) & ~(1U << bit % 32));
+					SetNubble(index / 32, GetNubble(index / 32) & ~(1U << index % 32));
 				}
 			}
+		}
+
+		public static BitSet256 operator - (BitSet256 bitset, int index)
+		{
+			bitset[index] = false;
+			return bitset;
+		}
+
+		public static BitSet256 operator + (BitSet256 bitset, int index)
+		{
+			bitset[index] = true;
+			return bitset;
 		}
 
 		private uint GetNubble(int index)
@@ -127,6 +139,19 @@ namespace Lime
 			lhs.Nubble6 ^= rhs.Nubble6;
 			lhs.Nubble7 ^= rhs.Nubble7;
 			return lhs;
+		}
+
+		public static BitSet256 operator ~ (BitSet256 value)
+		{
+			value.Nubble0 = ~value.Nubble0;
+			value.Nubble1 = ~value.Nubble1;
+			value.Nubble2 = ~value.Nubble2;
+			value.Nubble3 = ~value.Nubble3;
+			value.Nubble4 = ~value.Nubble4;
+			value.Nubble5 = ~value.Nubble5;
+			value.Nubble6 = ~value.Nubble6;
+			value.Nubble7 = ~value.Nubble7;
+			return value;
 		}
 	}
 }
