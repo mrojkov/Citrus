@@ -87,13 +87,13 @@ namespace Tangerine
 				new Command {
 					Text = "Application",
 					Submenu = new Menu {
-						new Command("Quit", Application.Exit) { Shortcut = new Shortcut(Key.WinLeft, Key.Q) },
+						new Command("Quit", Application.Exit) { Shortcut = new Shortcut(Modifiers.Win, Key.Q) },
 					}
 				},
 				new Command {
 					Text = "File",
 					Submenu = new Menu {
-						new Command { Text = "Open", Shortcut = new Shortcut(Key.WinLeft, Key.O) },
+						new Command { Text = "Open", Shortcut = new Shortcut(Modifiers.Win, Key.O) },
 					}
 				},
 				new Command {

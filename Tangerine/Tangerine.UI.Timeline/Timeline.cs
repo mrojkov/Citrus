@@ -17,7 +17,6 @@ namespace Tangerine.UI.Timeline
 		public readonly OverviewPane Overview = new OverviewPane();
 		public readonly GridPane Grid = new GridPane();
 		public readonly RollPane Roll = new RollPane();
-		public readonly KeyboardFocusController Focus;
 		public readonly Widget RootWidget;
 
 		public Vector2 ScrollOrigin;
@@ -38,7 +37,6 @@ namespace Tangerine.UI.Timeline
 		{
 			RootWidget = rootWidget;
 			RootWidget.Updating += delta => Document.Current.History.Commit();
-			Focus = new KeyboardFocusController(RootWidget);
 			CreateTasks();
 			InitializeWidgets();
 		}

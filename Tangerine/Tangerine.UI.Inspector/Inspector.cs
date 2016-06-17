@@ -13,7 +13,6 @@ namespace Tangerine.UI.Inspector
 
 		public static Inspector Instance { get; private set; }
 
-		public readonly KeyboardFocusController Focus;
 		public readonly Widget RootWidget;
 		public readonly Frame ScrollViewWidget;
 		public readonly Widget ContentWidget;
@@ -31,7 +30,6 @@ namespace Tangerine.UI.Inspector
 		{
 			RootWidget = rootWidget;
 			ContentWidget = new ScrollView((Frame)RootWidget).Content;
-			Focus = new KeyboardFocusController(RootWidget);
 			Nodes = new List<Node>();
 			EditorMap = new Dictionary<Type, PropertyEditorBuilder>();
 			Editors = new List<IPropertyEditor>();

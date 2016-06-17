@@ -42,6 +42,7 @@ namespace Tangerine.UI
 					ContentWidget
 				}
 			};
+			new KeyboardFocusController(RootWidget);
 		}
 
 		internal void RefreshDockedSize()

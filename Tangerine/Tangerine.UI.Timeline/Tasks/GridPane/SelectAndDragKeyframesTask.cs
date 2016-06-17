@@ -19,6 +19,7 @@ namespace Tangerine.UI.Timeline
 			var input = grid.RootWidget.Input;
 			while (true) {
 				if (input.WasMousePressed() && grid.RootWidget.IsMouseOver()) {
+					KeyboardFocusController.SetFocus(Timeline.Instance.RootWidget);
 					var initialCell = MousePositionToCell(input.MousePosition);
 					input.CaptureMouse();
 					if (timeline.GridSelection.IsCellSelected(initialCell)) {

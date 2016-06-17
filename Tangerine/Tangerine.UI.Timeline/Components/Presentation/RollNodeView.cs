@@ -21,7 +21,7 @@ namespace Tangerine.UI.Timeline.Components
 			this.row = row;			nodeData = row.Components.Get<NodeRow>();
 			expandButton = CreateExpandButton();
 			label = new SimpleText { AutoSizeConstraints = false, LayoutCell = new LayoutCell(Alignment.Center) };			editBox = new EditBox { AutoSizeConstraints = false, LayoutCell = new LayoutCell(Alignment.Center) };			nodeIcon = new Image {				LayoutCell = new LayoutCell { Alignment = Alignment.Center },				Texture = IconPool.GetTexture("Nodes." + nodeData.Node.GetType(), "Nodes.Unknown"),
-			};			Timeline.Instance.Focus.Fields.Add(editBox.Editor);			nodeIcon.MinMaxSize = (Vector2)nodeIcon.Texture.ImageSize;
+			};			nodeIcon.MinMaxSize = (Vector2)nodeIcon.Texture.ImageSize;
 			expandButtonContainer = new Widget { 
 				Layout = new StackLayout { IgnoreHidden = false },
 				LayoutCell = new LayoutCell(Alignment.Center),
@@ -61,8 +61,6 @@ namespace Tangerine.UI.Timeline.Components
 			Renderer.DrawRect(Vector2.Zero, widget.Size, Timeline.Instance.SelectedRows.Contains(row) ? Colors.SelectedBackground : Colors.WhiteBackground);
 		}
 
-		// XXX
-		// Timeline.Instance.Focus.Fields.Remove(editBox.Editor);
 		Widget IRollWidget.Widget => widget;
 
 		IEnumerator<object> MonitorDoubleClickTask()

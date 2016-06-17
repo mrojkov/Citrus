@@ -23,7 +23,7 @@ namespace Tangerine.UI.Timeline
 					continue;
 				}
 				var hitNode = WidgetContext.Current.NodeUnderMouse;
-				if (hitNode == null || !hitNode.ChildOf(roll.RootWidget)) {
+				if (hitNode == null || !hitNode.DescendantOf(roll.RootWidget)) {
 					continue;
 				}
 				var initialMousePosition = input.MousePosition;
