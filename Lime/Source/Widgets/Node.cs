@@ -326,13 +326,18 @@ namespace Lime
 		/// <summary>
 		/// Returns true if this node is a descendant of provided node.
 		/// </summary>
-		public bool ChildOf(Node node)
+		public bool DescendantOf(Node node)
 		{
 			for (Node n = Parent; n != null; n = n.Parent) {
 				if (n == node)
 					return true;
 			}
 			return false;
+		}
+
+		public bool DescendantOrThis(Node node)
+		{
+			return node == this || DescendantOf(node);
 		}
 
 		/// <summary>
