@@ -168,6 +168,7 @@ namespace Lime
 			if (Application.MainWindow == null) {
 				Application.MainWindow = this;
 			}
+			Application.Windows.Add(this);
 			ClientSize = options.ClientSize;
 			Title = options.Title;
 			if (options.Visible) {
@@ -215,8 +216,9 @@ namespace Lime
 				return RaiseClosing();
 			};
 			window.WillClose += (s, e) => {
-				HandleClosed(s, e);
+				RaiseClosed();
 				View.Stop();
+				Application.Windows.Remove(this);
 				if (Application.MainWindow == this) {
 					NSApplication.SharedApplication.Terminate(View);
 					TexturePool.Instance.DiscardAllTextures();
@@ -279,11 +281,6 @@ namespace Lime
 			window.Close();
 		}
 
-		private void HandleClosed(object sender, EventArgs e)
-		{
-			RaiseClosed();
-		}
-
 		private void HandleRenderFrame()
 		{
 			if (invalidated) {
@@ -308,6 +305,9 @@ namespace Lime
 
 		private void Update()
 		{
+			if (this == Application.MainWindow) {			
+				Application.MainMenu.Refresh();
+			}
 			var delta = (float)stopwatch.Elapsed.TotalSeconds;
 			stopwatch.Restart();
 			delta = Mathf.Clamp(delta, 0, 1 / Application.LowFPSLimit);

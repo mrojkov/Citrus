@@ -202,6 +202,7 @@ namespace Lime
 				// ES20 doesn't allow multiple contexts for now, because of a bug in OpenTK
 				throw new Lime.Exception("Attempt to create a second window for ES20 rendering backend. Use OpenGL backend instead.");
 			}
+			Application.Windows.Add(this);
 			Input = new Input();
 			form = new Form();
 			using (var graphics = form.CreateGraphics()) {
@@ -271,6 +272,7 @@ namespace Lime
 		private void OnClosed(object sender, FormClosedEventArgs e)
 		{
 			RaiseClosed();
+			Application.Windows.Remove(this);
 			if (this == Application.MainWindow) {
 				System.Windows.Forms.Application.Exit();
 			}
@@ -404,6 +406,9 @@ namespace Lime
 
 		private void Update(float delta)
 		{
+			if (this == Application.MainWindow) {			
+				Application.MainMenu.Refresh();
+			}
 			// Refresh mouse position of every frame to make HitTest work properly if mouse is outside of the screen.
 			RefreshMousePosition();
 			if (Application.UsingDeferredHitTest) {

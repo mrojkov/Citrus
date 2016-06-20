@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 
 #if iOS
@@ -100,6 +101,7 @@ namespace Lime
 	public static class Application
 	{
 		public static event Action<DeviceOrientation> SupportedDeviceOrientationsChanged;
+		public static readonly List<IWindow> Windows = new List<IWindow>();
 
 		private static IWindow mainWindow;
 		public static IWindow MainWindow
@@ -264,6 +266,13 @@ namespace Lime
 					scheduledActions();
 					scheduledActions = null;
 				}
+			}
+		}
+
+		public static void InvalidateAllWindows()
+		{
+			foreach (var i in Windows) {
+				i.Invalidate();
 			}
 		}
 
