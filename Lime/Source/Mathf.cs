@@ -93,9 +93,10 @@ namespace Lime
 
 		public static float Wrap(float x, float lowerBound, float upperBound)
 		{
-			float range = upperBound - lowerBound + 1;
-			x = ((x - lowerBound) % range);
-			return x < 0 ? upperBound + 1 + x : lowerBound + x;
+			if (x < lowerBound) {
+				return upperBound - (lowerBound - x) % (upperBound - lowerBound);
+			}
+			return lowerBound + (x - lowerBound) % (upperBound - lowerBound);
 		}
 
 		public static float Wrap360(float angle)
