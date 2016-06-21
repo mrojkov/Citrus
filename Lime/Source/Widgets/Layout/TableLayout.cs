@@ -11,6 +11,8 @@ namespace Lime
 		public float ColSpacing;
 		public float RowSpacing;
 		public float Spacing { set { ColSpacing = RowSpacing = value; } }
+		public List<LayoutCell> Cols = new List<LayoutCell>();
+		public List<LayoutCell> Rows = new List<LayoutCell>();
 
 		public TableLayout()
 		{
@@ -64,20 +66,26 @@ namespace Lime
 						p.X += cols[j];
 						continue;
 					}
-					var colSpan = GetColSpan(c, j);
+					var colSpan = GetColSpan(c, i, j);
 					var size = Vector2.Zero;
 					for (int u = 0; u < colSpan; u++) {
 						size.X += cols[j + u] + (u > 0 ? ColSpacing : 0);
 					}
-					var rowSpan = GetRowSpan(c, i);
+					var rowSpan = GetRowSpan(c, i, j);
 					for (int u = 0; u < rowSpan; u++) {
 						size.Y += rows[i + u] + (u > 0 ? RowSpacing : 0);
 					}
-					LayoutWidgetWithinCell(c, p, size, DebugRectangles);
+					var align = GetCellData(c, i, j).Alignment;
+					LayoutWidgetWithinCell(c, p, size, align, DebugRectangles);
 					p.X += cols[j] + ColSpacing;
 				}
 				p.Y += rows[i] + RowSpacing;
 			}
+		}
+
+		private LayoutCell GetCellData(Widget cell, int row, int col)
+		{
+			return cell.LayoutCell ?? (Cols.Count > col ? Cols[col] : (Rows.Count > row ? Rows[row] : LayoutCell.Default));
 		}
 
 		private LinearAllocator.Constraints[] CalcColConstraints(Widget widget, Widget[,] cells)
@@ -90,8 +98,8 @@ namespace Lime
 				for (int i = 0; i < RowCount; i++) {
 					var c = cells[i, j];
 					if (c != null) {
-						cols[j].Stretch = Math.Max(cols[j].Stretch, GetCellData(c).StretchX);
-						int s = GetColSpan(c, j);
+						cols[j].Stretch = Math.Max(cols[j].Stretch, GetCellData(c, i, j).StretchX);
+						int s = GetColSpan(c, i, j);
 						float mn = c.EffectiveMinSize.X;
 						float mx = c.EffectiveMaxSize.X;
 						if (s > 1) {
@@ -119,8 +127,8 @@ namespace Lime
 				for (int j = 0; j < ColCount; j++) {
 					var c = cells[i, j];
 					if (c != null) {
-						rows[i].Stretch = Math.Max(rows[i].Stretch, GetCellData(c).StretchY);
-						int s = GetRowSpan(c, i);
+						rows[i].Stretch = Math.Max(rows[i].Stretch, GetCellData(c, i, j).StretchY);
+						int s = GetRowSpan(c, i, j);
 						float mn = c.EffectiveMinSize.Y;
 						float mx = c.EffectiveMaxSize.Y;
 						if (s > 1) {
@@ -157,8 +165,8 @@ namespace Lime
 						cells = new Widget[RowCount, ColCount];
 					}
 					cells[i, j] = c;
-					int rowSpan = GetRowSpan(c, i);
-					int colSpan = GetColSpan(c, j);
+					int rowSpan = GetRowSpan(c, i, j);
+					int colSpan = GetColSpan(c, i, j);
 					for (int u = 0; u < rowSpan; u++) {
 						for (int v = 0; v < colSpan; v++) {
 							occupied[u + i, v + j] = true;
@@ -169,15 +177,15 @@ namespace Lime
 			return cells;
 		}
 
-		private int GetRowSpan(Widget cell, int row)
+		private int GetRowSpan(Widget cell, int row, int column)
 		{
-			var cd = GetCellData(cell);
+			var cd = GetCellData(cell, row, column);
 			return Mathf.Clamp(cd.RowSpan, 1, RowCount - row);
 		}
 
-		private int GetColSpan(Widget cell, int column)
+		private int GetColSpan(Widget cell, int row, int column)
 		{
-			var cd = GetCellData(cell);
+			var cd = GetCellData(cell, row, column);
 			return Mathf.Clamp(cd.ColSpan, 1, ColCount - column);
 		}
 	}

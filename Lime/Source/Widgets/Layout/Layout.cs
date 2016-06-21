@@ -70,30 +70,29 @@ namespace Lime
 
 		protected static void LayoutWidgetWithinCell(Widget widget, Vector2 position, Vector2 size, List<Rectangle> debugRectangles = null)
 		{
+			var align = (widget.LayoutCell ?? LayoutCell.Default).Alignment;
+			LayoutWidgetWithinCell(widget, position, size, align, debugRectangles);
+		}
+
+		protected static void LayoutWidgetWithinCell(Widget widget, Vector2 position, Vector2 size, Alignment alignment, List<Rectangle> debugRectangles = null)
+		{
 			if (debugRectangles != null) {
 				debugRectangles.Add(new Rectangle { A = position, B = position + size });
 			}
-			var halign = GetCellData(widget).Alignment.X;
-			var valign = GetCellData(widget).Alignment.Y;
 			var innerSize = Vector2.Clamp(size, widget.EffectiveMinSize, widget.EffectiveMaxSize);
-			if (halign == HAlignment.Right) {
+			if (alignment.X == HAlignment.Right) {
 				position.X += size.X - innerSize.X;
-			} else if (halign == HAlignment.Center) {
+			} else if (alignment.X == HAlignment.Center) {
 				position.X += ((size.X - innerSize.X) / 2).Round();
 			}
-			if (valign == VAlignment.Bottom) {
+			if (alignment.Y == VAlignment.Bottom) {
 				position.Y += size.Y - innerSize.Y;
-			} else if (valign == VAlignment.Center) {
+			} else if (alignment.Y == VAlignment.Center) {
 				position.Y += ((size.Y - innerSize.Y) / 2).Round();
 			}
 			widget.Position = position;
 			widget.Size = innerSize;
 			widget.Pivot = Vector2.Zero;
-		}
-
-		protected static LayoutCell GetCellData(Widget cell)
-		{
-			return cell.LayoutCell ?? Lime.LayoutCell.Default;
 		}
 #endregion
 	}
