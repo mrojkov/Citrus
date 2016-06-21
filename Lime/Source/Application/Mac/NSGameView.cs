@@ -23,8 +23,7 @@ namespace Lime.Platform
 {
 	public class NSGameView : NSView
 	{
-		private static NSOpenGLContext primaryContext;
-		private NSOpenGLContext openGLContext;
+		private static NSOpenGLContext openGLContext;
 		private NSOpenGLPixelFormat pixelFormat;
 		private NSTimer animationTimer;
 		private NSTrackingArea trackingArea;
@@ -44,24 +43,17 @@ namespace Lime.Platform
 			this.input = input;
 			// Avoid of double scaling on high DPI displays
 			this.WantsBestResolutionOpenGLSurface = true;
-			
 			pixelFormat = SelectPixelFormat(mode, 1, 0);
-
 			if (pixelFormat == null) {
 				throw new InvalidOperationException(string.Format("Failed to contruct NSOpenGLPixelFormat for GraphicsMode {0}", mode));
 			}
-
-			openGLContext = new NSOpenGLContext(pixelFormat, primaryContext);
-			if (primaryContext == null) {
-				primaryContext = openGLContext;
+			if (openGLContext == null) {
+				openGLContext = new NSOpenGLContext(pixelFormat, null);
 			}
-
 			if (openGLContext == null) {
 				throw new InvalidOperationException(string.Format("Failed to construct NSOpenGLContext {0}", mode));
 			}
-
 			openGLContext.MakeCurrentContext();
-
 			swapInterval = true;
 		}
 
@@ -226,9 +218,8 @@ namespace Lime.Platform
 
 		public void UpdateGLContext()
 		{
-			openGLContext.CGLContext.Lock();
+			openGLContext.View = this;
 			openGLContext.Update();
-			openGLContext.CGLContext.Unlock();					
 		}
 	
 		public void Stop()
@@ -310,21 +301,16 @@ namespace Lime.Platform
 			}
 		}
 
+		public void MakeCurrent()
+		{
+			openGLContext.View = this;
+		}
+
 		private void OnRender()
 		{
-			openGLContext.CGLContext.Lock();
-			openGLContext.MakeCurrentContext();
 			if (RenderFrame != null) {
 				RenderFrame();
 			}
-			openGLContext.CGLContext.Unlock();
-		}
-
-		public virtual void MakeCurrent()
-		{
-			AssertNonDisposed();
-			AssertContext();
-			openGLContext.MakeCurrentContext();
 		}
 
 		public virtual void SwapBuffers()
