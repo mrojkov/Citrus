@@ -741,23 +741,24 @@ namespace Lime
 
 		public static Matrix44 Lerp(Matrix44 value1, Matrix44 value2, float amount)
 		{
-			value1.M11 = value1.M11 + ((value2.M11 - value1.M11) * amount);
-			value1.M12 = value1.M12 + ((value2.M12 - value1.M12) * amount);
-			value1.M13 = value1.M13 + ((value2.M13 - value1.M13) * amount);
-			value1.M14 = value1.M14 + ((value2.M14 - value1.M14) * amount);
-			value1.M21 = value1.M21 + ((value2.M21 - value1.M21) * amount);
-			value1.M22 = value1.M22 + ((value2.M22 - value1.M22) * amount);
-			value1.M23 = value1.M23 + ((value2.M23 - value1.M23) * amount);
-			value1.M24 = value1.M24 + ((value2.M24 - value1.M24) * amount);
-			value1.M31 = value1.M31 + ((value2.M31 - value1.M31) * amount);
-			value1.M32 = value1.M32 + ((value2.M32 - value1.M32) * amount);
-			value1.M33 = value1.M33 + ((value2.M33 - value1.M33) * amount);
-			value1.M34 = value1.M34 + ((value2.M34 - value1.M34) * amount);
-			value1.M41 = value1.M41 + ((value2.M41 - value1.M41) * amount);
-			value1.M42 = value1.M42 + ((value2.M42 - value1.M42) * amount);
-			value1.M43 = value1.M43 + ((value2.M43 - value1.M43) * amount);
-			value1.M44 = value1.M44 + ((value2.M44 - value1.M44) * amount);
-			return value1;
+			var result = new Matrix44();
+			result.M11 = value1.M11 + ((value2.M11 - value1.M11) * amount);
+			result.M12 = value1.M12 + ((value2.M12 - value1.M12) * amount);
+			result.M13 = value1.M13 + ((value2.M13 - value1.M13) * amount);
+			result.M14 = value1.M14 + ((value2.M14 - value1.M14) * amount);
+			result.M21 = value1.M21 + ((value2.M21 - value1.M21) * amount);
+			result.M22 = value1.M22 + ((value2.M22 - value1.M22) * amount);
+			result.M23 = value1.M23 + ((value2.M23 - value1.M23) * amount);
+			result.M24 = value1.M24 + ((value2.M24 - value1.M24) * amount);
+			result.M31 = value1.M31 + ((value2.M31 - value1.M31) * amount);
+			result.M32 = value1.M32 + ((value2.M32 - value1.M32) * amount);
+			result.M33 = value1.M33 + ((value2.M33 - value1.M33) * amount);
+			result.M34 = value1.M34 + ((value2.M34 - value1.M34) * amount);
+			result.M41 = value1.M41 + ((value2.M41 - value1.M41) * amount);
+			result.M42 = value1.M42 + ((value2.M42 - value1.M42) * amount);
+			result.M43 = value1.M43 + ((value2.M43 - value1.M43) * amount);
+			result.M44 = value1.M44 + ((value2.M44 - value1.M44) * amount);
+			return result;
 		}
 
 		/// <summary>
@@ -890,6 +891,7 @@ namespace Lime
 			var m42 = (((matrix1.M41 * matrix2.M12) + (matrix1.M42 * matrix2.M22)) + (matrix1.M43 * matrix2.M32)) + (matrix1.M44 * matrix2.M42);
 			var m43 = (((matrix1.M41 * matrix2.M13) + (matrix1.M42 * matrix2.M23)) + (matrix1.M43 * matrix2.M33)) + (matrix1.M44 * matrix2.M43);
 			var m44 = (((matrix1.M41 * matrix2.M14) + (matrix1.M42 * matrix2.M24)) + (matrix1.M43 * matrix2.M34)) + (matrix1.M44 * matrix2.M44);
+			var result = new Matrix44();
 			matrix1.M11 = m11;
 			matrix1.M12 = m12;
 			matrix1.M13 = m13;
@@ -906,70 +908,73 @@ namespace Lime
 			matrix1.M42 = m42;
 			matrix1.M43 = m43;
 			matrix1.M44 = m44;
-			return matrix1;
+			return result;
 		}
 
 		public static Matrix44 operator *(Matrix44 matrix, float scaleFactor)
 		{
-			matrix.M11 = matrix.M11 * scaleFactor;
-			matrix.M12 = matrix.M12 * scaleFactor;
-			matrix.M13 = matrix.M13 * scaleFactor;
-			matrix.M14 = matrix.M14 * scaleFactor;
-			matrix.M21 = matrix.M21 * scaleFactor;
-			matrix.M22 = matrix.M22 * scaleFactor;
-			matrix.M23 = matrix.M23 * scaleFactor;
-			matrix.M24 = matrix.M24 * scaleFactor;
-			matrix.M31 = matrix.M31 * scaleFactor;
-			matrix.M32 = matrix.M32 * scaleFactor;
-			matrix.M33 = matrix.M33 * scaleFactor;
-			matrix.M34 = matrix.M34 * scaleFactor;
-			matrix.M41 = matrix.M41 * scaleFactor;
-			matrix.M42 = matrix.M42 * scaleFactor;
-			matrix.M43 = matrix.M43 * scaleFactor;
-			matrix.M44 = matrix.M44 * scaleFactor;
-			return matrix;
+			var result = new Matrix44();
+			result.M11 = matrix.M11 * scaleFactor;
+			result.M12 = matrix.M12 * scaleFactor;
+			result.M13 = matrix.M13 * scaleFactor;
+			result.M14 = matrix.M14 * scaleFactor;
+			result.M21 = matrix.M21 * scaleFactor;
+			result.M22 = matrix.M22 * scaleFactor;
+			result.M23 = matrix.M23 * scaleFactor;
+			result.M24 = matrix.M24 * scaleFactor;
+			result.M31 = matrix.M31 * scaleFactor;
+			result.M32 = matrix.M32 * scaleFactor;
+			result.M33 = matrix.M33 * scaleFactor;
+			result.M34 = matrix.M34 * scaleFactor;
+			result.M41 = matrix.M41 * scaleFactor;
+			result.M42 = matrix.M42 * scaleFactor;
+			result.M43 = matrix.M43 * scaleFactor;
+			result.M44 = matrix.M44 * scaleFactor;
+			return result;
 		}
 
 		public static Matrix44 operator +(Matrix44 matrix1, Matrix44 matrix2)
 		{
-			matrix1.M11 = matrix1.M11 + matrix2.M11;
-			matrix1.M12 = matrix1.M12 + matrix2.M12;
-			matrix1.M13 = matrix1.M13 + matrix2.M13;
-			matrix1.M14 = matrix1.M14 + matrix2.M14;
-			matrix1.M21 = matrix1.M21 + matrix2.M21;
-			matrix1.M22 = matrix1.M22 + matrix2.M22;
-			matrix1.M23 = matrix1.M23 + matrix2.M23;
-			matrix1.M24 = matrix1.M24 + matrix2.M24;
-			matrix1.M31 = matrix1.M31 + matrix2.M31;
-			matrix1.M32 = matrix1.M32 + matrix2.M32;
-			matrix1.M33 = matrix1.M33 + matrix2.M33;
-			matrix1.M34 = matrix1.M34 + matrix2.M34;
-			matrix1.M41 = matrix1.M41 + matrix2.M41;
-			matrix1.M42 = matrix1.M42 + matrix2.M42;
-			matrix1.M43 = matrix1.M43 + matrix2.M43;
-			matrix1.M44 = matrix1.M44 + matrix2.M44;
-			return matrix1;
+			var result = new Matrix44();
+			result.M11 = matrix1.M11 + matrix2.M11;
+			result.M12 = matrix1.M12 + matrix2.M12;
+			result.M13 = matrix1.M13 + matrix2.M13;
+			result.M14 = matrix1.M14 + matrix2.M14;
+			result.M21 = matrix1.M21 + matrix2.M21;
+			result.M22 = matrix1.M22 + matrix2.M22;
+			result.M23 = matrix1.M23 + matrix2.M23;
+			result.M24 = matrix1.M24 + matrix2.M24;
+			result.M31 = matrix1.M31 + matrix2.M31;
+			result.M32 = matrix1.M32 + matrix2.M32;
+			result.M33 = matrix1.M33 + matrix2.M33;
+			result.M34 = matrix1.M34 + matrix2.M34;
+			result.M41 = matrix1.M41 + matrix2.M41;
+			result.M42 = matrix1.M42 + matrix2.M42;
+			result.M43 = matrix1.M43 + matrix2.M43;
+			result.M44 = matrix1.M44 + matrix2.M44;
+			return result;
 		}
 
 		public static Matrix44 operator -(Matrix44 matrix1, Matrix44 matrix2)
 		{
-			matrix1.M11 = matrix1.M11 - matrix2.M11;
-			matrix1.M12 = matrix1.M12 - matrix2.M12;
-			matrix1.M13 = matrix1.M13 - matrix2.M13;
-			matrix1.M14 = matrix1.M14 - matrix2.M14;
-			matrix1.M21 = matrix1.M21 - matrix2.M21;
-			matrix1.M22 = matrix1.M22 - matrix2.M22;
-			matrix1.M23 = matrix1.M23 - matrix2.M23;
-			matrix1.M24 = matrix1.M24 - matrix2.M24;
-			matrix1.M31 = matrix1.M31 - matrix2.M31;
-			matrix1.M32 = matrix1.M32 - matrix2.M32;
-			matrix1.M33 = matrix1.M33 - matrix2.M33;
-			matrix1.M34 = matrix1.M34 - matrix2.M34;
-			matrix1.M41 = matrix1.M41 - matrix2.M41;
-			matrix1.M42 = matrix1.M42 - matrix2.M42;
-			matrix1.M43 = matrix1.M43 - matrix2.M43;
-			matrix1.M44 = matrix1.M44 - matrix2.M44;
-			return matrix1;
+			var result = new Matrix44();
+			result.M11 = matrix1.M11 - matrix2.M11;
+			result.M12 = matrix1.M12 - matrix2.M12;
+			result.M13 = matrix1.M13 - matrix2.M13;
+			result.M14 = matrix1.M14 - matrix2.M14;
+			result.M21 = matrix1.M21 - matrix2.M21;
+			result.M22 = matrix1.M22 - matrix2.M22;
+			result.M23 = matrix1.M23 - matrix2.M23;
+			result.M24 = matrix1.M24 - matrix2.M24;
+			result.M31 = matrix1.M31 - matrix2.M31;
+			result.M32 = matrix1.M32 - matrix2.M32;
+			result.M33 = matrix1.M33 - matrix2.M33;
+			result.M34 = matrix1.M34 - matrix2.M34;
+			result.M41 = matrix1.M41 - matrix2.M41;
+			result.M42 = matrix1.M42 - matrix2.M42;
+			result.M43 = matrix1.M43 - matrix2.M43;
+			result.M44 = matrix1.M44 - matrix2.M44;
+			return result;
 		}
 
 		public static Matrix44 operator -(Matrix44 matrix)
