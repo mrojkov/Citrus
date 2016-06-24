@@ -95,7 +95,7 @@ namespace Tangerine.UI.Timeline
 				}
 			};
 			new KeyboardFocusSwitcher(rootWidget);
-			new WidgetKeyHandler(rootWidget, Key.Escape).KeyPressed += window.Close;
+			new WidgetKeyHandler(rootWidget, KeyBindings.CloseDialog).KeyPressed += window.Close;
 			okButton.Clicked += () => { Apply(); window.Close(); };
 			cancelButton.Clicked += window.Close;
 			KeyboardFocus.Instance.SetFocus(okButton);

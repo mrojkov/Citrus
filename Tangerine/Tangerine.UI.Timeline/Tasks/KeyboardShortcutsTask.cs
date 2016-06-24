@@ -81,12 +81,18 @@ namespace Tangerine.UI.Timeline
 
 		void HorizontalScroll(WidgetInput input)
 		{
-			var stride = input.IsKeyPressed(Key.AltLeft) ? 10 : 1;
-			if (input.WasKeyRepeated(Key.Right)) {
+			int stride = 0;
+			if (input.WasKeyRepeated(KeyBindings.Timeline.FastScrollLeft)) {
+				stride = -10;
+			} else if (input.WasKeyRepeated(KeyBindings.Timeline.FastScrollRight)) {
+				stride = 10;
+			} else if (input.WasKeyRepeated(KeyBindings.Timeline.ScrollRight)) {
+				stride = 1;
+			} else if (input.WasKeyRepeated(KeyBindings.Timeline.ScrollLeft)) {
+				stride = -1;
+			}
+			if (stride != 0) {
 				Document.Current.History.Execute(new Operations.SetCurrentColumn(timeline.CurrentColumn + stride));
-				timeline.EnsureColumnVisible(timeline.CurrentColumn);
-			} else if (input.WasKeyRepeated(Key.Left)) {
-				Document.Current.History.Execute(new Operations.SetCurrentColumn(timeline.CurrentColumn - stride));
 				timeline.EnsureColumnVisible(timeline.CurrentColumn);
 			}
 		}		

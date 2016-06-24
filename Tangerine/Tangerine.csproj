@@ -63,6 +63,9 @@
     <Reference Include="protobuf-net">
       <HintPath>..\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
     </Reference>
+    <Reference Include="Lzma">
+      <HintPath>..\3rdParty\Lzma\bin\Release\Lzma.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Resources\Images.xcassets\AppIcons.appiconset\Contents.json" />

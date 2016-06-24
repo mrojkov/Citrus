@@ -72,6 +72,7 @@
     <Compile Include="Metrics.cs" />
     <Compile Include="Utils\BitmapButton.cs" />
     <Compile Include="Docking\DockPanel.cs" />
+    <Compile Include="KeyBindings.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
