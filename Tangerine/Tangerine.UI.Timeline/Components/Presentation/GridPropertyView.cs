@@ -30,7 +30,7 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			var maxCol = Timeline.Instance.ColumnCount;
 			widget.PrepareRendererState();
-			Renderer.DrawRect(Vector2.Zero, widget.ContentSize, Colors.GridPropertyRowBackground);
+			Renderer.DrawRect(Vector2.Zero, widget.ContentSize, Colors.Timeline.Grid.PropertyRowBackground);
 			var colorIndex = PropertyRegistry.GetTangerineAttribute(node.GetType(), animator.TargetProperty)?.ColorIndex;
 			var color = KeyframePalette.Colors[colorIndex.Value];
 			var baseTransform = Renderer.Transform1;
@@ -42,7 +42,7 @@ namespace Tangerine.UI.Timeline.Components
 					baseTransform;
 				var v = Metrics.TimelineColWidth / 3 * Vector2.One;
 				Renderer.DrawRect(-v, v, color);
-				Renderer.DrawRectOutline(-v, v, Colors.GridLines);
+				Renderer.DrawRectOutline(-v, v, Colors.Timeline.Grid.Lines);
 			}
 		}
 	}

@@ -53,9 +53,12 @@ namespace Tangerine.Core
 			}
 		}
 		
+		public bool UndoEnabled => undoPosition > 0;
+		public bool RedoEnabled => undoPosition < operations.Count;
+		
 		public void Undo()
 		{
-			if (undoPosition > 0) {
+			if (UndoEnabled) {
 				operations[--undoPosition].Undo();
 				OnCommit?.Invoke();
 			}
@@ -63,7 +66,7 @@ namespace Tangerine.Core
 		
 		public void Redo()
 		{
-			if (undoPosition < operations.Count) {
+			if (RedoEnabled) {
 				operations[undoPosition++].Do();
 				OnCommit?.Invoke();
 			}

@@ -98,7 +98,7 @@ namespace Tangerine.UI.Timeline.Components
 				}
 				yield return null;
 			}
-			editBox.Input.Release();
+			editBox.Input.ReleaseMouse();
 		}
 	}
 }

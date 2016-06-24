@@ -18,26 +18,20 @@ namespace Tangerine.UI.Timeline
 				HorizontalScroll(input);
 				VerticalScroll(input);
 				HandleEnterExit(input);
-				// HandleAppTermination(input);
 				yield return null;
 			}
 		}
 
 		void HandleGlobalShortcuts(WidgetInput input)
 		{
-			if (input.IsKeyPressed(Key.LShift) && input.IsKeyPressed(Key.LWin) && input.IsKeyPressed(Key.Z)) {
+			input.EnableKey(Key.Undo, Document.Current.History.UndoEnabled);
+			input.EnableKey(Key.Redo, Document.Current.History.RedoEnabled);
+			if (input.WasKeyRepeated(Key.Redo)) {
 				Document.Current.History.Redo();
-			} else if (input.IsKeyPressed(Key.LWin) && input.IsKeyPressed(Key.Z)) {
+			} else if (input.WasKeyRepeated(Key.Undo)) {
 				Document.Current.History.Undo();
 			}
 		}
-
-		//void HandleAppTermination(WidgetInput input)
-		//{
-		//	if (input.IsKeyPressed(Key.WinLeft) && input.WasKeyPressed(Key.W)) {
-		//		Application.Exit();
-		//	}
-		//}
 
 		void HandleEnterExit(WidgetInput input)
 		{
@@ -67,7 +61,7 @@ namespace Tangerine.UI.Timeline
 		void SelectRow(int advance, bool multiselection)
 		{
 			var doc = Document.Current;
-			if (timeline.Rows.Count() == 0) {
+			if (timeline.Rows.Count == 0) {
 				return;
 			}
 			var lastSelectedRow = timeline.SelectedRows.Count > 0 ? timeline.SelectedRows[0] : timeline.Rows[0];

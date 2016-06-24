@@ -42,7 +42,7 @@ namespace Tangerine.UI
 					ContentWidget
 				}
 			};
-			new KeyboardFocusController(RootWidget);
+			new KeyboardFocusSwitcher(RootWidget);
 		}
 
 		internal void RefreshDockedSize()
@@ -112,7 +112,7 @@ namespace Tangerine.UI
 				mainWidget.PostPresenter = new DelegatePresenter<Widget>(widget => {
 					if (dockSite != DockSite.None) {
 						widget.PrepareRendererState();
-						Renderer.DrawRectOutline(dockSiteRect.A + Vector2.One, dockSiteRect.B - Vector2.One, Colors.DockingRectagleOutline, 2);
+						Renderer.DrawRectOutline(dockSiteRect.A + Vector2.One, dockSiteRect.B - Vector2.One, Colors.Docking.DragRectagleOutline, 2);
 					}
 				});
 				var input = panel.TitleWidget.Input;
@@ -154,7 +154,7 @@ namespace Tangerine.UI
 					}
 					yield return null;
 				}
-				input.Release();
+				input.ReleaseMouse();
 				mainWidget.PostPresenter = null;
 				mainWindow.Invalidate();
 				thumbWindow?.Dispose();

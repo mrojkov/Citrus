@@ -119,7 +119,7 @@ namespace Tangerine.UI.Inspector
 							AutoSizeConstraints = false,
 							LayoutCell = new LayoutCell { StretchY = 0 }
 						};
-						label.CompoundPresenter.Add(new WidgetFlatFillPresenter(Colors.InspectorCategoryLabelBackground));
+						label.CompoundPresenter.Add(new WidgetFlatFillPresenter(Colors.Inspector.CategoryLabelBackground));
 						Inspector.ContentWidget.AddNode(label);
 					}
 					PropertyEditorBuilder editorBuilder;

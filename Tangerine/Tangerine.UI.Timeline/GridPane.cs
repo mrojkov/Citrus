@@ -39,7 +39,7 @@ namespace Tangerine.UI.Timeline
 		private void RenderBackground(Node node)
 		{
 			RootWidget.PrepareRendererState();
-			Renderer.DrawRect(Vector2.Zero, RootWidget.Size, Colors.GridLines);
+			Renderer.DrawRect(Vector2.Zero, RootWidget.Size, Colors.Timeline.Grid.Lines);
 		}
 		
 		private void RenderGrid(Widget widget)
@@ -49,19 +49,19 @@ namespace Tangerine.UI.Timeline
 			float x = 0.5f;
 			for (int i = 0; i <= numCols; i++) {
 				if (timeline.IsColumnVisible(i)) {
-					Renderer.DrawLine(x, 0, x, ContentWidget.Height, Colors.GridLines);
+					Renderer.DrawLine(x, 0, x, ContentWidget.Height, Colors.Timeline.Grid.Lines);
 				}
 				x += Metrics.TimelineColWidth;
 			}
 			x = Metrics.TimelineColWidth * (timeline.CurrentColumn + 0.5f);
-			Renderer.DrawLine(x, 0, x, ContentWidget.Height, Color4.Red);
+			Renderer.DrawLine(x, 0, x, ContentWidget.Height, Colors.Timeline.Grid.Cursor);
 		}
 
 		private void RenderSelection(Widget widget)
 		{
 			widget.PrepareRendererState();
 			foreach (var rect in timeline.GridSelection.GetNonOverlappedRects()) {
-				Renderer.DrawRect(CellToGridCoordinates(rect.A), CellToGridCoordinates(rect.B), Colors.GridSelection);
+				Renderer.DrawRect(CellToGridCoordinates(rect.A), CellToGridCoordinates(rect.B), Colors.Timeline.Grid.Selection);
 			}
 		}
 

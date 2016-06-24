@@ -110,7 +110,7 @@ namespace Tangerine.UI.Inspector
 				Size = MinMaxSize = Metrics.IconSize;
 				image = new Image { Size = Size, Shader = ShaderId.Silhuette, Texture = new SerializableTexture() };
 				Nodes.Add(image);
-				image.PostPresenter = new WidgetBoundsPresenter(Colors.BorderAroundKeyframeColorbox, 1);
+				image.PostPresenter = new WidgetBoundsPresenter(Colors.Inspector.BorderAroundKeyframeColorbox, 1);
 			}
 
 			public void SetKeyColor(Color4 color)

@@ -84,6 +84,8 @@ namespace Tangerine.Core
 		public void AddSomeNodes()
 		{
 			RootNode = new Widget();
+			RootNode.Markers.Add(new Marker { Id = "Start", Action = MarkerAction.Play, Frame = 10 });
+			RootNode.Markers.Add(new Marker { Id = "Loop", Action = MarkerAction.Jump, Frame = 20, JumpTo = "Start" });
 			for (int i = 0; i < 10; i++) {
 				var frame = new Lime.Frame();
 				frame.Id = string.Format("Frame {0:00}", i);

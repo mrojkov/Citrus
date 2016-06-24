@@ -48,7 +48,7 @@ namespace Tangerine.UI.Timeline
 				widget.MinHeight = cr.State.RowHeight = initialHeight + (input.MousePosition.Y - initialMousePosition.Y);
 				yield return null;
 			}
-			input.Release();
+			input.ReleaseMouse();
 		}
 	}
 }

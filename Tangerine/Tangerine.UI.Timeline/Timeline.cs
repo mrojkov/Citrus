@@ -78,6 +78,7 @@ namespace Tangerine.UI.Timeline
 			var gridTasks = Grid.RootWidget.Tasks;
 			var rollTasks = Roll.RootWidget.Tasks;
 			var overviewTasks = Overview.RootWidget.Tasks;
+			var rulerTasks = Ruler.Widget.Tasks;
 			tasks.Add(new BuildRowsTask().Main());
 			tasks.Add(new RefreshColumnCountTask().Main());
 			tasks.Add(new BuildRowViewsTask().Main());
@@ -95,6 +96,7 @@ namespace Tangerine.UI.Timeline
 			gridTasks.Add(new DragKeyframesRespondentTask().Main());
 			rollTasks.Add(new SelectAndDragRowsTask().Main());
 			rollTasks.Add(new ClampScrollOriginTask().Main());
+			rulerTasks.Add(new EditMarkerTask().Main());
 		}
 
 		IEnumerable<Node> ISelectedNodesProvider.Get()

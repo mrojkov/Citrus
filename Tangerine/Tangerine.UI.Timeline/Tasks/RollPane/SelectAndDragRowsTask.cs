@@ -51,7 +51,7 @@ namespace Tangerine.UI.Timeline
 					if (input.IsMousePressed()) {
 						yield return DragTask();
 					}
-					input.Release();
+					input.ReleaseMouse();
 				}
 			}
 		}

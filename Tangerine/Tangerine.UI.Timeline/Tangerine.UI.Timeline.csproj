@@ -101,6 +101,8 @@
     <Compile Include="Components\Presentation\RollPropertyView.cs" />
     <Compile Include="Components\DragKeyframesRequest.cs" />
     <Compile Include="Components\HasKeyframeRequest.cs" />
+    <Compile Include="MarkerPropertiesDialog.cs" />
+    <Compile Include="Tasks\Rulerbar\EditMarkerTask.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.csproj">
@@ -118,6 +120,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Tangerine.UI.Timeline.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Tasks\Rulerbar\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
 </Project>

@@ -97,9 +97,16 @@ namespace Tangerine
 					}
 				},
 				new Command {
+					Text = "Edit",
+					Submenu = new Menu {
+						new Command { Text = "Undo", Shortcut = new Shortcut(Modifiers.Win, Key.Z), Key = Key.Undo },
+						new Command { Text = "Redo", Shortcut = new Shortcut(Modifiers.Win | Modifiers.Shift, Key.Z), Key = Key.Redo },
+					}
+				},
+				new Command {
 					Text = "View",
 					Submenu = (ViewMenu = new Menu { })
-				}
+				},
 			};
 		}
 

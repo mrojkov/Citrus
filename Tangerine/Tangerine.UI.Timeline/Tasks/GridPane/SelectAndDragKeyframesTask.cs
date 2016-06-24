@@ -19,7 +19,7 @@ namespace Tangerine.UI.Timeline
 			var input = grid.RootWidget.Input;
 			while (true) {
 				if (input.WasMousePressed() && grid.RootWidget.IsMouseOver()) {
-					KeyboardFocusController.SetFocus(Timeline.Instance.RootWidget);
+					KeyboardFocus.Instance.SetFocus(Timeline.Instance.RootWidget);
 					var initialCell = MousePositionToCell(input.MousePosition);
 					input.CaptureMouse();
 					if (timeline.GridSelection.IsCellSelected(initialCell)) {
@@ -35,7 +35,7 @@ namespace Tangerine.UI.Timeline
 							yield return SelectTask(initialCell);
 						}
 					}
-					input.Release();
+					input.ReleaseMouse();
 				}
 				yield return null;
 			}
@@ -113,14 +113,14 @@ namespace Tangerine.UI.Timeline
 		{
 			widget.PrepareRendererState();
 			foreach (var r in selection.GetNonOverlappedRects()) {
-				Renderer.DrawRect(grid.CellToGridCoordinates(r.A + offset), grid.CellToGridCoordinates(r.B + offset), Colors.GridSelection);
+				Renderer.DrawRect(grid.CellToGridCoordinates(r.A + offset), grid.CellToGridCoordinates(r.B + offset), Colors.Timeline.Grid.Selection);
 			}
 		}
 
 		void RenderSelectionRect(Widget widget)
 		{
 			widget.PrepareRendererState();
-			Renderer.DrawRect(grid.CellToGridCoordinates(rect.A), grid.CellToGridCoordinates(rect.B), Colors.GridSelection);
+			Renderer.DrawRect(grid.CellToGridCoordinates(rect.A), grid.CellToGridCoordinates(rect.B), Colors.Timeline.Grid.Selection);
 		}
 	}
 }

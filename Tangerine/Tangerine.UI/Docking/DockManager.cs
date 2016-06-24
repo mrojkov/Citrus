@@ -28,7 +28,7 @@ namespace Tangerine.UI
 		public DockManager(Vector2 windowSize, Menu padsMenu)
 		{
 			this.padsMenu = padsMenu;
-			var window = new Window(new WindowOptions { ClientSize = windowSize, FixedSize = false, RefreshRate = 30 });
+			var window = new Window(new WindowOptions { ClientSize = windowSize, FixedSize = false, RefreshRate = 60 });
 			window.Closed += () => Closed?.Invoke();
 			mainWidget = new DefaultWindowWidget(window, continuousRendering: false) {
 				Id = "MainWindow",
