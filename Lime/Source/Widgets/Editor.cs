@@ -6,16 +6,24 @@ using System.Text;
 
 namespace Lime
 {
+	public interface ICaretPresenter : IPresenter
+	{
+		Vector2 Position { get; set; }
+		Color4 Color { get; set; }
+		bool Visible { get; set; }
+		float Thickness { get; set; }
+	}
+
 	public interface ICaretParams
 	{
-		Widget CaretWidget { get; set; }
+		ICaretPresenter CaretPresenter { get; set; }
 		float BlinkInterval { get; set; }
 		bool FollowTextColor { get; set; }
 	}
 
 	public class CaretParams : ICaretParams
 	{
-		public Widget CaretWidget { get; set; }
+		public ICaretPresenter CaretPresenter { get; set; }
 		public float BlinkInterval { get; set; }
 		public bool FollowTextColor { get; set; }
 
@@ -25,13 +33,26 @@ namespace Lime
 		}
 	}
 
-	public class VerticalLineCaret : Polyline
+	public class VerticalLineCaret : CustomPresenter, ICaretPresenter
 	{
-		public VerticalLineCaret(SimpleText text, float thickness = 2.0f) : base(thickness)
+		public Vector2 Position { get; set; }
+		public Color4 Color { get; set; }
+		public bool Visible { get; set; }
+		public float Thickness { get; set; }
+
+		public VerticalLineCaret()
 		{
-			Points.Add(Vector2.Zero);
-			Points.Add(Vector2.Down * text.FontHeight);
-			Color = text.Color;
+			Thickness = 1.0f;
+			Color = Color4.Black;
+		}
+
+		public override void Render(Node node)
+		{
+			if (Visible) {
+				var text = (SimpleText)node;
+				text.PrepareRendererState();
+				Renderer.DrawLine(Position, Position + Vector2.Down * text.FontHeight, Color, Thickness);
+			}
 		}
 	}
 
@@ -46,13 +67,13 @@ namespace Lime
 			this.container = container;
 			this.caretPos = caretPos;
 			this.caretParams = caretParams;
-			container.AddNode(caretParams.CaretWidget);
+			container.CompoundPostPresenter.Add(caretParams.CaretPresenter);
 			container.Tasks.Add(CaretDisplayTask());
 		}
 
 		private IEnumerator<object> CaretDisplayTask()
 		{
-			var w = caretParams.CaretWidget;
+			var p = caretParams.CaretPresenter;
 			var time = 0f;
 			bool blinkOn = true;
 			bool wasVisible = false;
@@ -60,18 +81,20 @@ namespace Lime
 				time += Task.Current.Delta;
 				if (time > caretParams.BlinkInterval && caretParams.BlinkInterval > 0f) {
 					blinkOn = !blinkOn;
+					Window.Current.Invalidate();
 					time = 0f;
 				}
 				var newPos = caretPos.WorldPos;
-				if (!w.Position.Equals(newPos) || !wasVisible && caretPos.IsVisible) {
-					w.Position = newPos;
+				if (!p.Position.Equals(newPos) || !wasVisible && caretPos.IsVisible) {
+					p.Position = newPos;
+					Window.Current.Invalidate();
 					blinkOn = true;
 					time = 0f;
 				}
 				wasVisible = caretPos.IsVisible;
-				w.Visible = caretPos.IsVisible && blinkOn;
+				p.Visible = caretPos.IsVisible && blinkOn;
 				if (caretParams.FollowTextColor) {
-					w.Color = container.Color;
+					p.Color = container.Color;
 				}
 				yield return null;
 			}
