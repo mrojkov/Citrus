@@ -666,7 +666,7 @@ namespace Lime
 		}
 
 		public bool IsFocused() { return KeyboardFocus.Instance.Focused == this; }
-		public void SetFocus(bool value) { KeyboardFocus.Instance.SetFocus(this); }
+		public void SetFocus() { KeyboardFocus.Instance.SetFocus(this); }
 
 		internal void InvalidateParentConstraintsAndArrangement()
 		{
