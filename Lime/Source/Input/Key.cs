@@ -1,41 +1,59 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Lime
 {
-	public class KeySets
-	{
-		public static readonly BitSet256 Keyboard = BitSet256.FromRange(Key.LShift, Key.BackSlash);
-		public static readonly BitSet256 Modifiers = BitSet256.FromRange(Key.LShift, Key.Menu);
-		public static readonly BitSet256 AffectedByModifiers = BitSet256.Full & ~Modifiers & ~Mouse;
-		public static readonly BitSet256 Mouse = BitSet256.FromRange(Key.Mouse0, Key.Mouse1DoubleClick);
-	}
-
-	[Flags]
-	public enum Modifiers
-	{
-		None = 0,
-		Shift = 1,
-		Control = 2,
-		Alt = 4,
-		Win = 8
-	}
-
 	public struct Key
 	{
-		public const int MaxCount = 256;
+		public static class Arrays
+		{
+			public static readonly BitArray AllKeys = FromRange(0, MaxCount - 1);
+			public static readonly BitArray KeyboardKeys = FromRange(LShift, BackSlash);
+			public static readonly BitArray ModifierKeys = FromRange(LShift, Menu);
+			public static readonly BitArray AffectedByModifiersKeys = FromRange(F1, BackSlash);
+			public static readonly BitArray MouseButtons = FromRange(Mouse0, Mouse1DoubleClick);
+
+			static BitArray FromRange(int min, int max)
+			{
+				var r = new BitArray(Key.MaxCount);
+				for (int i = min; i <= max; i++) {
+					r.Set(i, true);
+				}
+				return r;
+			}
+		}
+
+		public const int MaxCount = 512;
+
+		public static int Count = 150;
+		public static Key New() { return Count++; }
+
+		public static readonly Key Unknown = 0;
+		public static readonly Dictionary<Shortcut, Key> ShortcutMap = new Dictionary<Shortcut, Key>();
 
 		public readonly int Code;
 
-		public static int Count { get; private set; }
-		public static Key New() { return Count++; }
-
-		static Key() { Count = 150; }
 		public Key(int code) { Code = code; }
 
 		public static implicit operator Key (int code) { return new Key(code); }
 		public static implicit operator int (Key key) { return key.Code; }
 
-		public static readonly Key Unknown = 0;
+		public static Key MapShortcut(Shortcut shortcut)
+		{
+			if (!Arrays.AffectedByModifiersKeys[shortcut.Main]) {
+				throw new ArgumentException();
+			}
+			if (shortcut.Modifiers == Modifiers.None) {
+				return shortcut.Main;
+			}
+			Key key;
+			if (!ShortcutMap.TryGetValue(shortcut, out key)) {
+				key = New();
+				ShortcutMap.Add(shortcut, key);
+			}
+			return key;
+		}
 
 #region Keyboard
 		public static readonly Key LShift = 1;
@@ -217,8 +235,8 @@ namespace Lime
 #endregion
 
 #region Miscellaneous
-		public static readonly Key FocusPrevious = 142;
-		public static readonly Key FocusNext = 143;
+		public static readonly Key Undo = New();
+		public static readonly Key Redo = New();
 #endregion
 	}
 }

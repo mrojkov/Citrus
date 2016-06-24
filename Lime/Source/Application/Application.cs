@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading;
 
 #if iOS
@@ -101,7 +102,7 @@ namespace Lime
 	public static class Application
 	{
 		public static event Action<DeviceOrientation> SupportedDeviceOrientationsChanged;
-		public static readonly List<IWindow> Windows = new List<IWindow>();
+		public static readonly ObservableCollection<IWindow> Windows = new ObservableCollection<IWindow>();
 
 		private static IWindow mainWindow;
 		public static IWindow MainWindow
@@ -211,6 +212,7 @@ namespace Lime
 #if MAC
 			NSApplication.Init();
 #endif
+			KeyboardFocus.Initialize();
 			options = options ?? new ApplicationOptions();
 			RenderingBackend = options.RenderingBackend;
 			UsingDeferredHitTest = options.UsingDeferredHitTest;
@@ -266,13 +268,6 @@ namespace Lime
 					scheduledActions();
 					scheduledActions = null;
 				}
-			}
-		}
-
-		public static void InvalidateAllWindows()
-		{
-			foreach (var i in Windows) {
-				i.Invalidate();
 			}
 		}
 

@@ -12,12 +12,14 @@ namespace Lime
 		bool Enabled { get; set; }
 		bool Visible { get; set; }
 		void Execute();
+		void Refresh();
 	}
 
 	public class Command : ICommand
 	{
 		public string Text { get; set; }
 		public Shortcut Shortcut { get; set; }
+		public Key Key { get; set; }
 		public Menu Submenu { get; set; }
 		public bool Enabled { get; set; }
 		public bool Visible { get; set; }
@@ -40,6 +42,29 @@ namespace Lime
 			if (Executing != null) {
 				Executing();
 			}
+			if (Key != Key.Unknown) {
+				PropagateKeystrokeToWindows();
+			}
+		}
+
+		void PropagateKeystrokeToWindows()
+		{
+			foreach (var i in Application.Windows) {
+				i.Input.SetKeyState(Key, true);
+				i.Input.SetKeyState(Key, false);
+			}
+		}
+		
+		public void Refresh()
+		{
+			if (Shortcut.Main == Key.Unknown) {
+				return;
+			}
+			var enabled = false;
+			foreach (var i in Application.Windows) {
+				enabled |= i.Input.IsKeyEnabled(Key);
+			}
+			Enabled = enabled;
 		}
 	}
 

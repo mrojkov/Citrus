@@ -6,6 +6,16 @@ using System.Text;
 
 namespace Lime
 {
+	[Flags]
+	public enum Modifiers
+	{
+		None = 0,
+		Shift = 1,
+		Control = 2,
+		Alt = 4,
+		Win = 8
+	}
+
 	/// <summary>
 	/// Represents combination of a key with keyboard modifiers used to trigger some action.
 	/// </summary>
@@ -27,6 +37,11 @@ namespace Lime
 		}
 
 		public static implicit operator Shortcut(Key main) { return new Shortcut(main); }
+
+		public override int GetHashCode ()
+		{
+			return Main.Code.GetHashCode() ^ Modifiers.GetHashCode();
+		}
 	}	
 }
 

@@ -1,21 +1,12 @@
 #if !UNITY
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace Lime
 {
-	[Flags]
-	public enum Modifiers
-	{
-		None = 0,
-		Shift = 1,
-		Control = 2,
-		Alt = 4,
-		Win = 8
-	}
-
 	public class Input
 	{
 		public class InputSimulator
@@ -65,6 +56,7 @@ namespace Lime
 			public bool CurrentState;
 			public float RepeatDelay;
 			public bool Repeated;
+			public bool Disabled;
 		}
 
 		private KeyState[] keys = new KeyState[Key.MaxCount];
@@ -88,8 +80,6 @@ namespace Lime
 		/// The current accelerometer state (read only) in g-force units
 		/// </summary>
 		public Vector3 Acceleration { get; internal set; }
-
-		public static readonly List<IKeyTranslator> KeyTranslators = new List<IKeyTranslator>();
 
 		public Input()
 		{
@@ -221,22 +211,45 @@ namespace Lime
 
 		public string TextInput { get; internal set; }
 
+		public bool IsKeyEnabled(Key key)
+		{
+			return !keys[key].Disabled;
+		}
+		
+		public void EnableKey(Key key, bool enable)
+		{
+			keys[key].Disabled = !enable;
+		}
+
 		internal void SetKeyState(Key key, bool value)
 		{
-			if (KeySets.Modifiers[key]) {
+			if (Key.Arrays.ModifierKeys[key]) {
 				ReleaseAffectedByModifierKeys();
 			}
-			var modifiers = GetModifiers();
-			foreach (var m in KeyTranslators) {
-				key = m.Translate(modifiers, key);
+			key = TranslateShortcuts(key);
+			if (Key.Arrays.AffectedByModifiersKeys[key] && GetModifiers() != Modifiers.None) {
+				return;
 			}
 			keyEventQueue.Add(new KeyEvent { Key = key, State = value });
 		}
 
+		private Key TranslateShortcuts(Key key)
+		{
+			var modifiers = GetModifiers();
+			foreach (var kv in Key.ShortcutMap) {
+				var shortcut = kv.Key;
+				if (key == shortcut.Main && shortcut.Modifiers == modifiers) {
+					key = kv.Value;
+					break;
+				}
+			}
+			return key;
+		}
+
 		private void ReleaseAffectedByModifierKeys()
 		{
-			for (var i = 0; i < KeySets.AffectedByModifiers.Count; i++) {
-				if (keys[i].CurrentState && KeySets.AffectedByModifiers[i]) {
+			for (var i = 0; i < Key.Arrays.AffectedByModifiersKeys.Count; i++) {
+				if (keys[i].CurrentState && Key.Arrays.AffectedByModifiersKeys[i]) {
 					SetKeyState(i, false);
 				}
 			}
@@ -262,17 +275,15 @@ namespace Lime
 				keys[i] = key;
 			}
 			if (keyEventQueue.Count > 0) {
-				var processedKeys = new bool[Key.Count];
-				for (int i = 0; i < keyEventQueue.Count(); i++) {
+				var processedKeys = new BitArray(Key.MaxCount);
+				for (int i = 0; i < keyEventQueue.Count; i++) {
 					var evt = keyEventQueue[i];
-					var k = (int)evt.Key;
+					var k = evt.Key;
 					if (!processedKeys[k]) {
 						processedKeys[k] = true;
 						keys[k].CurrentState = evt.State;
 						keys[k].RepeatDelay = KeyRepeatDelay;
-						if (evt.State) {
-							keys[k].Repeated = true;
-						}
+						keys[k].Repeated |= evt.State;
 						keyEventQueue.RemoveAt(i);
 						i--;
 					}

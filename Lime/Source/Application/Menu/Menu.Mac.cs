@@ -87,6 +87,7 @@ namespace Lime
 
 			public void Refresh()
 			{
+				Command.Refresh();
 				NativeMenuItem.Hidden = !Command.Visible;
 				NativeMenuItem.Enabled = Command.Enabled;
 				NativeMenuItem.Title = Command.Text;
