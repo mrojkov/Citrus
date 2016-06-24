@@ -55,6 +55,36 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// Darken the color with the specified amount. 
+		/// Amount 1 turns the color into black, 
+		/// Amount 0 remains the color unchanged.
+		/// </summary>
+		public Color4 Darken(float amount)
+		{
+			return Lerp(amount, this, Black);
+		}
+
+		/// <summary>
+		/// Lighten the color with the specified amount. 
+		/// Amount 1 turns the color into white, 
+		/// Amount 0 remains the color unchanged.
+		/// </summary>
+		public Color4 Lighten(float amount)
+		{
+			return Lerp(amount, this, White);
+		}
+
+		/// <summary>
+		/// Change the color transparency with the specified amount. 
+		/// Amount 1 turns the color into fully transparent, 
+		/// Amount 0 remains the color unchanged.
+		/// </summary>
+		public Color4 Transparentify(float amount)
+		{
+			return Lerp(amount, this, Transparent);
+		}
+
+		/// <summary>
 		/// Gets the alpha component from a specified ARGB color-int.
 		/// </summary>
 		/// <param name="color">The color as integer value in ARGB format.</param>
