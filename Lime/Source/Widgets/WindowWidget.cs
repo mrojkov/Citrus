@@ -7,7 +7,6 @@ namespace Lime
 	/// </summary>
 	public class WindowWidget : Widget
 	{
-		private IKeyboardInputProcessor prevActiveTextWidget;
 		private RenderChain renderChain = new RenderChain();
 		private bool continuousRendering;
 
@@ -26,36 +25,18 @@ namespace Lime
 			if (continuousRendering) {
 				Window.Invalidate();
 			}
-			var context = WidgetContext.Current;
-			WidgetInput.RemoveInvalidatedCaptures();
-			context.IsActiveTextWidgetUpdated = false;
-			context.MouseCursor = MouseCursor.Default;
+			WidgetContext.Current.MouseCursor = MouseCursor.Default;
 			base.Update(delta);
-			if (Application.CurrentThread.IsMain()) {
-				if (!context.IsActiveTextWidgetUpdated || Window.Input.WasKeyPressed (Key.DismissSoftKeyboard)) {
-					context.ActiveTextWidget = null;
-				}
-				bool showKeyboard = context.ActiveTextWidget != null && context.ActiveTextWidget.Visible;
-				if (prevActiveTextWidget != context.ActiveTextWidget) {
-					Application.SoftKeyboard.Show(showKeyboard, context.ActiveTextWidget != null ? context.ActiveTextWidget.Text : "");
-				}
-				// Handle switching between various text widgets
-				if (
-					prevActiveTextWidget != context.ActiveTextWidget &&
-					context.ActiveTextWidget != null &&
-					prevActiveTextWidget != null
-				) {
-					Application.SoftKeyboard.ChangeText(context.ActiveTextWidget.Text);
-				}
-				prevActiveTextWidget = context.ActiveTextWidget;
+			if (Window.Input.WasKeyPressed(Key.DismissSoftKeyboard)) {
+				KeyboardFocus.Instance.SetFocus(null);
 			}
-			Window.Cursor = context.MouseCursor;
+			Window.Cursor = WidgetContext.Current.MouseCursor;
 			LayoutManager.Instance.Layout();
 			renderChain.Clear();
 			AddContentsToRenderChain(renderChain);
 			var hitTestArgs = new HitTestArgs(Window.Input.MousePosition);
 			renderChain.HitTest(ref hitTestArgs);
-			context.NodeUnderMouse = hitTestArgs.Node;
+			WidgetContext.Current.NodeUnderMouse = hitTestArgs.Node;
 		}
 
 		public void RenderAll()

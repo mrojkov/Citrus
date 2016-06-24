@@ -79,7 +79,7 @@ namespace Lime
 		/// 
 		/// Означает, что поведение всех кнопок подстроено под ввод с сенсорного экрана.
 		/// </summary>
-#if iOS
+#if iOS || ANDROID
 		public static bool TabletControlScheme = true;
 #else
 		public static bool TabletControlScheme = false;
@@ -125,7 +125,7 @@ namespace Lime
 		private IEnumerator<int> NormalState()
 		{
 			skipReleaseAnimation = false;
-			Input.Release();
+			Input.ReleaseMouse();
 			TryRunAnimation("Normal");
 			while (true) {
 				if (TabletControlScheme) {
@@ -247,7 +247,7 @@ namespace Lime
 
 		private IEnumerator<int> ReleaseState()
 		{
-			Input.Release();
+			Input.ReleaseMouse();
 			if (CurrentAnimation != "Release" && !skipReleaseAnimation) {
 				if (TryRunAnimation("Release")) {
 					while (IsRunning) {
@@ -269,7 +269,7 @@ namespace Lime
 
 		private IEnumerator<int> DisabledState()
 		{
-			Input.Release();
+			Input.ReleaseMouse();
 			if (CurrentAnimation == "Release") {
 				// The release animation should be played if we disable the button 
 				// right after click on it.
@@ -311,6 +311,11 @@ namespace Lime
 			}
 			if (!EnableMask.All() && State != DisabledState) {
 				State = DisabledState;
+			}
+			if (KeyboardFocus.Instance.Focused == this && Enabled) {
+				if (Input.WasKeyPressed(Key.Space) || Input.WasKeyPressed(Key.Enter)) {
+					HandleClick();
+				}
 			}
 		}
 

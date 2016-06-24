@@ -110,6 +110,7 @@ namespace Lime
 		public Widget ParentWidget { get { return Parent != null ? Parent.AsWidget : null; } }
 
 		public Focusable Focusable { get; set; }
+		public FocusOptions FocusOptions { get; set; }
 
 		public ILayout Layout = AnchorLayout.Instance;
 
@@ -352,6 +353,9 @@ namespace Lime
 			}
 			if (lateTasks != null) {
 				lateTasks.Stop();
+			}
+			if (input != null) {
+				input.Dispose();
 			}
 			base.Dispose();
 		}
@@ -627,6 +631,13 @@ namespace Lime
 			}
 		}
 
+		WidgetInput input;
+		public WidgetInput Input
+		{
+			get { return input ?? (input = new WidgetInput(this)); }
+		}
+
+
 		/// <summary>
 		/// Called before Update.
 		/// </summary>
@@ -654,17 +665,14 @@ namespace Lime
 			direction = new Vector2(1, 0);
 		}
 
+		public bool IsFocused() { return KeyboardFocus.Instance.Focused == this; }
+		public void SetFocus(bool value) { KeyboardFocus.Instance.SetFocus(this); }
+
 		internal void InvalidateParentConstraintsAndArrangement()
 		{
 			if (ParentWidget != null) {
 				ParentWidget.Layout.InvalidateConstraintsAndArrangement(ParentWidget);
 			}
-		}
-
-		WidgetInput input;
-		public WidgetInput Input
-		{
-			get { return input ?? (input = new WidgetInput(this)); }
 		}
 
 		public virtual Vector2 CalcContentSize()

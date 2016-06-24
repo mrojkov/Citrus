@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Lime
@@ -7,15 +8,15 @@ namespace Lime
 	/// The WidgetInput class allows a widget to capture an input device (mouse, keyboard).
 	/// After capturing the device, the widget and all its children receive an actual buttons and device axes state (e.g. mouse position). Other widgets receive released buttons state and frozen axes values.
 	/// </summary>
-	public class WidgetInput
+	public class WidgetInput : IDisposable
 	{
 		private Widget widget;
 		private Vector2 lastMousePosition;
 		private Vector2[] lastTouchPositions;
 		private static List<CaptureStackItem> captureStack;
-		private static bool skipCapturesCleanup;
 			
-		public static IEnumerable<CaptureStackItem> CaptureStack { get { return captureStack; } }
+		public Input WindowInput { get { return CommonWindow.Current.Input; } }
+		public static IEnumerable<CaptureStackItem> CaptureStack { get { return captureStack; } }		
 
 		static WidgetInput()
 		{
@@ -30,6 +31,11 @@ namespace Lime
 			for (int i = 0; i < Input.MaxTouches; i++) {
 				lastTouchPositions[i] = Vector2.PositiveInfinity;
 			}
+		}
+
+		public void Dispose()
+		{
+			captureStack.RemoveAll(i => i.Widget == widget);
 		}
 
 		public string TextInput 
@@ -63,7 +69,7 @@ namespace Lime
 
 		public void CaptureMouse()
 		{
-			Capture(KeySets.Mouse);
+			Capture(Key.Arrays.MouseButtons);
 		}
 
 		/// <summary>
@@ -71,12 +77,12 @@ namespace Lime
 		/// </summary>
 		public void CaptureMouseExclusive()
 		{
-			CaptureExclusive(KeySets.Mouse);
+			CaptureExclusive(Key.Arrays.MouseButtons);
 		}
 
 		public void CaptureKeyboard()
 		{
-			Capture(KeySets.Keyboard);
+			Capture(Key.Arrays.KeyboardKeys);
 		}
 
 		/// <summary>
@@ -84,20 +90,30 @@ namespace Lime
 		/// </summary>
 		public void CaptureKeyboardExclusive()
 		{
-			CaptureExclusive(KeySets.Keyboard);
+			CaptureExclusive(Key.Arrays.KeyboardKeys);
 		}
 
-		public void Capture(BitSet256 keys)
+		public void CaptureAll()
+		{
+			Capture(Key.Arrays.AllKeys);
+		}
+
+		public void CaptureAllExclusive()
+		{
+			CaptureExclusive(Key.Arrays.AllKeys);
+		}
+
+		public void Capture(BitArray keys)
 		{
 			CaptureHelper(keys, false);
 		}
 
-		public void CaptureExclusive(BitSet256 keys)
+		public void CaptureExclusive(BitArray keys)
 		{
 			CaptureHelper(keys, true);
 		}
 
-		private void CaptureHelper(BitSet256 keys, bool exclusive)
+		private void CaptureHelper(BitArray keys, bool exclusive)
 		{
 			var thisLayer = widget.GetEffectiveLayer();
 			var t = captureStack.FindLastIndex(i => i.Widget.GetEffectiveLayer() <= thisLayer);
@@ -106,19 +122,44 @@ namespace Lime
 #else
 			stack.Insert(t + 1, new StackItem { Widget = widget, Keys = keys, Exclusive = exclusive  });
 #endif
-			// The widget may be invisible right after creation, 
-			// so omit the stack cleaning up on this frame.
-			skipCapturesCleanup = true;
 		}
 
-		public void Release()
+		public void ReleaseMouse()
+		{
+			Release(Key.Arrays.MouseButtons);
+		}
+
+		public void ReleaseKeyboard()
+		{
+			Release(Key.Arrays.KeyboardKeys);
+		}
+
+		public void ReleaseAll()
+		{
+			Release(Key.Arrays.AllKeys);
+		}
+
+		public void Release(BitArray keys)
 		{
 			for (int i = captureStack.Count - 1; i >= 0; i--) {
-				if (captureStack[i].Widget == widget) {
+				if (captureStack[i].Widget == widget && BitArraysEqual(captureStack[i].Keys, keys)) {
 					captureStack.RemoveAt(i);
 					break;
 				}
 			}
+		}
+
+		private bool BitArraysEqual(BitArray lhs, BitArray rhs)
+		{
+			if (lhs.Count != rhs.Count) {
+				return false;
+			}
+			for (int i = 0; i < lhs.Count; i++) {
+				if (lhs.Get(i) != rhs.Get(i)) {
+					return false;
+				}
+			}
+			return true;
 		}
 
 		public bool IsMouseOwner()
@@ -151,7 +192,7 @@ namespace Lime
 		{
 			return IsAcceptingKey(Key.A);
 		}
-
+	
 		public bool IsAcceptingKey(Key key)
 		{
 			for (int i = captureStack.Count - 1; i >= 0; i--) {
@@ -203,38 +244,22 @@ namespace Lime
 			return WindowInput.WasKeyRepeated(key) && IsAcceptingKey(key);
 		}
 
-		public void CaptureAll()
+		public bool IsKeyEnabled(Key key)
 		{
-			Capture(BitSet256.Full);
+			return WindowInput.IsKeyEnabled(key);
 		}
-
-		public void CaptureAllExclusive()
+		
+		public void EnableKey(Key key, bool enable)
 		{
-			CaptureExclusive(BitSet256.Full);
-		}
-
-		internal static void RemoveInvalidatedCaptures()
-		{
-			if (!skipCapturesCleanup) {
-				captureStack.RemoveAll(i => !IsWidgetShown(i.Widget));
+			if (IsAcceptingKey(key)) {
+				WindowInput.EnableKey(key, enable);
 			}
-			skipCapturesCleanup = false;
-		}
-
-		private static bool IsWidgetShown(Widget widget)
-		{
-			return WidgetContext.Current.Root == widget.GetRoot() && widget.GloballyVisible;
-		}
-
-		private Input WindowInput
-		{
-			get { return CommonWindow.Current.Input; }
 		}
 
 		public class CaptureStackItem
 		{
 			public Widget Widget;
-			public BitSet256 Keys;
+			public BitArray Keys;
 #if DEBUG
 			public string StackTrace;
 #endif

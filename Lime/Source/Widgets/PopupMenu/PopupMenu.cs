@@ -54,7 +54,7 @@ namespace Lime.PopupMenu
 		/// </summary>
 		public void Hide()
 		{
-			Frame.Input.Release();
+			Frame.Input.ReleaseMouse();
 			Frame.Unlink();
 			if (Hidden != null) {
 				Hidden();

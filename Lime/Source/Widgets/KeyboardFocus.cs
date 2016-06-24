@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -8,50 +9,142 @@ namespace Lime
 {
 	public class Focusable
 	{
+		public bool TabStop { get; set; }
 		public int TabOrder { get; set; }
+
+		public Focusable()
+		{
+			TabStop = true;
+		}
+	}
+
+	public class FocusOptions
+	{
+		public readonly BitArray WantedKeys;
+
+		public FocusOptions()
+		{
+			WantedKeys = new BitArray(Key.MaxCount);
+		}
+	}
+
+	public class KeyboardFocus
+	{
+		private Dictionary<IWindow, Widget> focusPerWindow = new Dictionary<IWindow, Widget>();
+		private BitArray capturedKeys = new BitArray(Key.MaxCount);
+
+		public static KeyboardFocus Instance { get; private set; }
+		public Widget Focused { get; private set; }
+
+		public static void Initialize()
+		{
+			Instance = new KeyboardFocus();
+		}
+
+		private KeyboardFocus()
+		{
+			Application.Windows.CollectionChanged += (sender, e) => {
+				if (e.NewItems != null) {
+					foreach (var i in e.NewItems) {
+						var window = (IWindow)i; 
+						window.Deactivated += () => Window_Deactivated(window);
+						window.Activated += () => Window_Activated(window);
+					}
+				}
+				if (e.OldItems != null) {
+					foreach (var i in e.OldItems) {
+						focusPerWindow.Remove((IWindow)i);
+					}
+				}
+			};
+		}
+
+		private void Window_Deactivated(IWindow window)
+		{
+			if (Focused != null && Focused.GetRoot() == WidgetContext.Current.Root) {
+				focusPerWindow[window] = Focused;
+			} else if (Focused == null) {
+				focusPerWindow[window] = null;
+			}
+		}
+
+		private void Window_Activated(IWindow window)
+		{
+			Widget newFocused;
+			if (focusPerWindow.TryGetValue(window, out newFocused)) {
+				if (newFocused != null && newFocused.GetRoot() == WidgetContext.Current.Root) {
+					SetFocus(newFocused);
+					return;
+				}
+			}
+			SetFocus(null);
+		}
+
+		public void SetFocus(Widget value)
+		{
+			if (Focused == value) {
+				return;
+			}
+			if (Focused != null) {
+				Focused.Input.Release(capturedKeys);
+			}
+			if (value != null) {
+				capturedKeys = GetKeysToCapture(value);
+				value.Input.Capture(capturedKeys);
+				Application.SoftKeyboard.Show(true, value.Text);
+			} else {
+				Application.SoftKeyboard.Show(false, "");
+			}
+			Focused = value;
+			foreach (var i in Application.Windows) {
+				i.Invalidate();
+			}
+		}
+
+		private BitArray GetKeysToCapture(Widget widget)
+		{
+			var keys = new BitArray(Key.Arrays.KeyboardKeys);
+			for (var i = widget.ParentWidget; i != null; i = i.ParentWidget) {
+				if (i.FocusOptions != null) {
+					var t = i.FocusOptions.WantedKeys;
+					t.Not();
+					keys.And(t);
+					t.Not();
+				}
+			}
+			if (widget.FocusOptions != null) {
+				keys.Or(widget.FocusOptions.WantedKeys);
+			}
+			return keys;
+		}
 	}
 
 	/// <summary>
 	/// Controls switching of focus between widgets based on keyboard shortcuts.
 	/// </summary>
-	public class KeyboardFocusController
+	public class KeyboardFocusSwitcher
 	{
-		public readonly Widget Widget;
+		private readonly Widget widget;
 
-		public static Widget Focused { get; private set; }
+		public readonly Key FocusNext = Key.Tab;
+		public readonly Key FocusPrevious = Key.MapShortcut(new Shortcut(Modifiers.Shift, Key.Tab));
 
-		static KeyboardFocusController()
+		public KeyboardFocusSwitcher(Widget widget)
 		{
-			Input.KeyTranslators.Add(new ShortcutTranslator(Key.Tab, Key.FocusNext));
-			Input.KeyTranslators.Add(new ShortcutTranslator(new Shortcut(Modifiers.Shift, Key.Tab), Key.FocusPrevious));
-		}
-
-		public static void SetFocus(Widget widget)
-		{
-			if (Focused == widget) {
-				return;
-			}
-			if (Focused != null) {
-				Focused.Input.Release();
-			}
-			if (widget != null) {
-				widget.Input.Capture(KeySets.Keyboard);
-			}
-			Focused = widget;
-		}
-
-		public KeyboardFocusController(Widget widget)
-		{
-			Widget = widget;
+			this.widget = widget;
 			widget.Tasks.Add(FocusTask());
+			var keys = (widget.FocusOptions = widget.FocusOptions ?? new FocusOptions());
+			keys.WantedKeys[FocusNext] = true;
+			keys.WantedKeys[FocusPrevious] = true;
 		}
 
 		private IEnumerator<object> FocusTask()
 		{
 			while (true) {
-				if (Widget.Input.WasKeyRepeated(Key.FocusNext)) {
+				if (widget.Input.WasKeyRepeated(FocusNext)) {
 					AdvanceFocus(1);
-				} else if (Widget.Input.WasKeyRepeated(Key.FocusPrevious)) {
+				}
+				if (widget.Input.WasKeyRepeated(FocusPrevious)) {
 					AdvanceFocus(-1);
 				}
 				yield return null;
@@ -60,19 +153,24 @@ namespace Lime
 
 		private void AdvanceFocus(int direction)
 		{
-			if (Focused != null && Focused.DescendantOrThis(Widget)) {
-				var allFocusables = GetAllFocusables().ToList();
-				var i = allFocusables.IndexOf(Focused);
+			var focused = KeyboardFocus.Instance.Focused;
+			var focusables = GetFocusables().ToList();
+			if (focused == null) {
+				if (focusables.Count > 0) {
+					KeyboardFocus.Instance.SetFocus(focusables[0]);
+				}
+			} else if (focused.DescendantOrThis(widget)) {
+				var i = focusables.IndexOf(focused);
 				if (i >= 0) {
-					i = Mathf.Wrap(i + direction, 0, allFocusables.Count - 1);
-					SetFocus(allFocusables[i]);
+					i = Mathf.Wrap(i + direction, 0, focusables.Count - 1);
+					KeyboardFocus.Instance.SetFocus(focusables[i]);
 				}
 			}
 		}
 
-		private IEnumerable<Widget> GetAllFocusables()
+		private IEnumerable<Widget> GetFocusables()
 		{
-			return Widget.Descendants.OfType<Widget>().Where(i => i.Focusable != null).OrderBy(i => i.Focusable.TabOrder);
+			return widget.Descendants.OfType<Widget>().Where(i => i.Focusable != null && i.Focusable.TabStop).OrderBy(i => i.Focusable.TabOrder);
 		}
 	}
 }

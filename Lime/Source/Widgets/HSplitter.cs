@@ -82,7 +82,7 @@ namespace Lime
 				Layout.InvalidateConstraintsAndArrangement(this);
 				yield return null;
 			}
-			Input.Release();
+			Input.ReleaseMouse();
 			RaiseDragEnded();
 		}
 

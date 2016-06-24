@@ -55,6 +55,7 @@ namespace Lime
 			var w = caretParams.CaretWidget;
 			var time = 0f;
 			bool blinkOn = true;
+			bool wasVisible = false;
 			while (true) {
 				time += Task.Current.Delta;
 				if (time > caretParams.BlinkInterval && caretParams.BlinkInterval > 0f) {
@@ -62,11 +63,12 @@ namespace Lime
 					time = 0f;
 				}
 				var newPos = caretPos.WorldPos;
-				if (!w.Position.Equals(newPos)) {
+				if (!w.Position.Equals(newPos) || !wasVisible && caretPos.IsVisible) {
 					w.Position = newPos;
 					blinkOn = true;
 					time = 0f;
 				}
+				wasVisible = caretPos.IsVisible;
 				w.Visible = caretPos.IsVisible && blinkOn;
 				if (caretParams.FollowTextColor) {
 					w.Color = container.Color;
@@ -163,7 +165,7 @@ namespace Lime
 		public void Unlink()
 		{
 			if (IsFocused()) {
-				WidgetContext.Current.ActiveTextWidget = null;
+				KeyboardFocus.Instance.SetFocus(null);
 				caretPos.IsVisible = false;
 			}
 			Container.Tasks.StopByTag(this);
@@ -171,12 +173,12 @@ namespace Lime
 
 		public void Focus()
 		{
-			KeyboardFocusController.SetFocus(Container);
+			KeyboardFocus.Instance.SetFocus(Container);
 		}
 
 		public bool IsFocused()
 		{
-			return KeyboardFocusController.Focused == Container;
+			return KeyboardFocus.Instance.Focused == Container;
 		}
 
 		private bool CheckKeyRepeated(Key key)
@@ -283,7 +285,6 @@ namespace Lime
 				caretPos.IsVisible = IsFocused();
 
 				if (IsFocused()) {
-					WidgetContext.Current.IsActiveTextWidgetUpdated = true;
 					HandleCursorKeys();
 					HandleTextInput();
 					if (wasClicked) {
