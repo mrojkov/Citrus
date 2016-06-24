@@ -18,13 +18,14 @@ namespace Lime
 			public static readonly Color4 BlackText = new Color4(0, 0, 0);
 			public static readonly Color4 WhiteBackground = new Color4(255, 255, 255);
 			public static readonly Color4 GrayBackground = new Color4(240, 240, 240);
-			public static readonly Color4 SelectedBackground = new Color4(120, 160, 255);
+			public static readonly Color4 SelectedBackground = new Color4(140, 170, 255);
 			public static readonly Color4 ControlBorder = new Color4(172, 172, 172);
 			public static readonly ColorGradient ButtonDefault = new ColorGradient(new Color4(239, 239, 239), new Color4(229, 229, 229));
 			public static readonly ColorGradient ButtonHover = new ColorGradient(new Color4(235, 244, 252), new Color4(222, 238, 252));
 			public static readonly ColorGradient ButtonPress = new ColorGradient(new Color4(215, 234, 252), new Color4(199, 226, 252));
 			public static readonly ColorGradient ButtonDisable = new ColorGradient(new Color4(244, 244, 244), new Color4(244, 244, 244));
 			public static readonly Color4 SeparatorColor = new Color4(255, 255, 255);
+			public static readonly Color4 KeyboardFocusBorder = new Color4(150, 200, 255);
 		}
 
 		public DesktopTheme()
@@ -51,12 +52,14 @@ namespace Lime
 		private void DecorateButton(Widget widget)
 		{
 			var button = (Button)widget;
+			var presenter = new ButtonPresenter();
 			button.Nodes.Clear();
 			button.MinMaxSize = Metrics.DefaultButtonSize;
 			button.Size = button.MinSize;
 			button.Padding = Metrics.ControlsPadding;
-			button.CompoundPresenter.Push(new ButtonPresenter());
-			button.DefaultAnimation.AnimationEngine = new ButtonAnimationEngine(button);
+			button.Presenter = presenter;
+			button.PostPresenter = new KeyboardFocusBorderPresenter();
+			button.DefaultAnimation.AnimationEngine = new ButtonAnimationEngine(presenter);
 			var caption = new SimpleText {
 				Id = "TextPresenter",
 				TextColor = Colors.BlackText,
@@ -66,6 +69,7 @@ namespace Lime
 				OverflowMode = TextOverflowMode.Ellipsis
 			};
 			button.AddNode(caption);
+			button.Focusable = new Focusable();
 			ExpandToContainer(caption);
 		}
 
@@ -85,7 +89,7 @@ namespace Lime
 				Text = "...",
 				MinMaxWidth = 20
 			};
-			fc.CompoundPresenter.Push(new BorderedFramePresenter(Colors.GrayBackground, Colors.ControlBorder));
+			fc.PostPresenter = new BorderedFramePresenter(Colors.GrayBackground, Colors.ControlBorder);
 			fc.AddNode(label);
 			fc.AddNode(button);
 		}
@@ -131,6 +135,7 @@ namespace Lime
 			eb.Editor = new Editor(eb, eb.Caret, editorParams);
 			eb.Focusable = new Focusable();
 			eb.CompoundPresenter.Add(new BorderedFramePresenter(Colors.WhiteBackground, Colors.ControlBorder));
+			eb.PostPresenter = new KeyboardFocusBorderPresenter();
 		}
 
 		private void DecorateComboBox(Widget widget)
@@ -138,11 +143,13 @@ namespace Lime
 			var comboBox = (ComboBox)widget;
 			comboBox.MinSize = Metrics.DefaultButtonSize;
 			comboBox.MaxHeight = Metrics.DefaultButtonSize.Y;
+			comboBox.Focusable = new Focusable();
 			var text = new SimpleText {
 				Id = "Label",
 				VAlignment = VAlignment.Center,
 			};
 			text.CompoundPresenter.Add(new ComboBoxPresenter());
+			comboBox.PostPresenter = new KeyboardFocusBorderPresenter();
 			text.Padding = Metrics.ControlsPadding;
 			text.Padding.Right = ComboBoxPresenter.IconWidth;
 			comboBox.AddNode(text);
@@ -182,6 +189,18 @@ namespace Lime
 			}
 		}
 
+		class KeyboardFocusBorderPresenter : CustomPresenter
+		{
+			public override void Render(Node node)
+			{
+				if (node == KeyboardFocus.Instance.Focused) {
+					var widget = node.AsWidget;
+					widget.PrepareRendererState();
+					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.KeyboardFocusBorder, 2);
+				}
+			}
+		}
+
 		class ComboBoxPresenter : CustomPresenter
 		{
 			public const float IconWidth = 20;
@@ -206,16 +225,16 @@ namespace Lime
 
 		class ButtonAnimationEngine : Lime.AnimationEngine
 		{
-			private readonly Button button;
+			private readonly ButtonPresenter presenter;
 
-			public ButtonAnimationEngine(Button button)
+			public ButtonAnimationEngine(ButtonPresenter presenter)
 			{
-				this.button = button;
+				this.presenter = presenter;
 			}
 
 			public override bool TryRunAnimation(Animation animation, string markerId)
 			{
-				(button.Presenter as ButtonPresenter).SetState(markerId);
+				presenter.SetState(markerId);
 				return true;
 			}
 		}
@@ -249,6 +268,11 @@ namespace Lime
 				widget.PrepareRendererState();
 				Renderer.DrawVerticalGradientRect(Vector2.Zero, widget.Size, innerGradient);
 				Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.ControlBorder);
+			}
+
+			public override bool PartialHitTest(Node node, ref HitTestArgs args)
+			{
+				return node.PartialHitTest(ref args);
 			}
 		}
 
