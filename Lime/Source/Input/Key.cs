@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Lime
 {
@@ -22,6 +23,13 @@ namespace Lime
 				}
 				return r;
 			}
+		}
+
+		public static Key GetByName(string name)
+		{
+			var field = typeof(Key).GetFields().
+				FirstOrDefault(i => String.Equals(i.Name, name, StringComparison.OrdinalIgnoreCase) && i.FieldType == typeof(Key));
+			return field != null ? (Key)field.GetValue(null) : Key.Unknown;
 		}
 
 		public const int MaxCount = 512;

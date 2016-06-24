@@ -107,6 +107,7 @@
     <Compile Include="Source\Graphics\OpenGL\IGLObject.cs" />
     <Compile Include="Source\Graphics\GeometryBuffer.cs" />
     <Compile Include="Source\Graphics\OpenGL\PlatformGeometryBuffer.cs" />
+    <Compile Include="Source\Input\Shortcut.cs" />
     <Compile Include="Source\Input\SoftKeyboard.cs" />
     <Compile Include="Source\Types\BoundingSphere.cs" />
     <Compile Include="Source\Types\ContainmentType.cs" />
@@ -146,6 +147,7 @@
     <Compile Include="Source\Version.cs" />
     <Compile Include="Source\Widgets\FileChooserButton.cs" />
     <Compile Include="Source\Widgets\HSplitter.cs" />
+    <Compile Include="Source\Widgets\KeyboardFocus.cs" />
     <Compile Include="Source\Widgets\Layout\HBoxLayout.cs" />
     <Compile Include="Source\Widgets\Layout\LayoutDebugPresenter.cs" />
     <Compile Include="Source\Widgets\Layout\FlowLayout.cs" />
@@ -258,7 +260,6 @@
     <Compile Include="Source\Widgets\SplineGear.cs" />
     <Compile Include="Source\Widgets\SplinePoint.cs" />
     <Compile Include="Source\Widgets\Widget.cs" />
-    <Compile Include="Source\Widgets\Widget.Toolbox.cs" />
     <Compile Include="Source\Graphics\OpacityMask.cs" />
     <Compile Include="Source\Widgets\WebBrowser\WebBrowser.iOS.cs" />
     <Compile Include="Source\Application\CommandLineArgs.cs" />
@@ -314,7 +315,6 @@
     <Compile Include="Source\Application\Menu\Menu.Mac.cs" />
     <Compile Include="Source\Graphics\VectorShape.cs" />
     <Compile Include="Source\Types\ColorGradient.cs" />
-    <Compile Include="Source\Types\ObservableList.cs" />
     <Compile Include="Source\Widgets\ComboBox.cs" />
     <Compile Include="Source\Widgets\EditBox.cs" />
     <Compile Include="Source\Widgets\IPresenter.cs" />

@@ -297,8 +297,8 @@ namespace Lime
 
 		private void OnDeactivate(object sender, EventArgs e)
 		{
-			foreach (var key in (Key[])Enum.GetValues(typeof(Key))) {
-				Input.SetKeyState(key, false);
+			for (int i = 0; i < Key.Count; i++) {
+				Input.SetKeyState(i, false);
 			}
 			active = false;
 			RaiseDeactivated();
@@ -406,7 +406,7 @@ namespace Lime
 
 		private void Update(float delta)
 		{
-			if (this == Application.MainWindow) {			
+			if (this == Application.MainWindow && Application.MainMenu != null) {
 				Application.MainMenu.Refresh();
 			}
 			// Refresh mouse position of every frame to make HitTest work properly if mouse is outside of the screen.

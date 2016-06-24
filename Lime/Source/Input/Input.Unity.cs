@@ -44,10 +44,8 @@ namespace Lime
 		private Vector2[] touchPositions = new Vector2[MaxTouches];
 
 		private List<KeyEvent> keyEventQueue = new List<KeyEvent>();
-		
-		public const int MaxTouches = 4;
 
-		public static readonly int KeyCount = Enum.GetNames(typeof(Key)).Length;
+		public const int MaxTouches = 4;
 
 		bool[] previousKeysState = new bool[KeyCount];
 		bool[] currentKeysState = new bool[KeyCount];
@@ -140,7 +138,7 @@ namespace Lime
 		{
 			touchPositions[index] = position;
 		}
-		
+
 		public int GetNumTouches()
 		{
 			int j = 0;
@@ -150,14 +148,14 @@ namespace Lime
 			}
 			return j;
 		}
-		
+
 		public string TextInput { get; internal set; }
 
 		internal void SetKeyState(Key key, bool value)
 		{
 			keyEventQueue.Add(new KeyEvent{Key = key, State = value});
 		}
-		
+
 		internal void ProcessPendingKeyEvents()
 		{
 			if (keyEventQueue.Count > 0) {
@@ -322,7 +320,7 @@ namespace Lime
 			if (wheelDelta > 0) {
 				SetKeyState(Key.MouseWheelUp, true);
 				SetKeyState(Key.MouseWheelUp, false);
-			} 
+			}
 			if (wheelDelta < 0) {
 				SetKeyState(Key.MouseWheelDown, true);
 				SetKeyState(Key.MouseWheelDown, false);
