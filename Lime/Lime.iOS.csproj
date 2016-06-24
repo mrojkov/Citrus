@@ -96,7 +96,6 @@
     <Compile Include="Source\Types\Vector3.cs" />
     <Compile Include="Source\Environment.cs" />
     <Compile Include="Source\Mathf.cs" />
-    <Compile Include="Source\Widgets\Widget.Toolbox.cs" />
     <Compile Include="Source\Widgets\Polyline.cs" />
     <Compile Include="Source\StringExtensions.cs" />
     <Compile Include="Source\Application\Logger.cs" />
@@ -271,7 +270,6 @@
     <Compile Include="Source\Application\Menu\Menu.cs" />
     <Compile Include="Source\Graphics\VectorShape.cs" />
     <Compile Include="Source\Types\ColorGradient.cs" />
-    <Compile Include="Source\Types\ObservableList.cs" />
     <Compile Include="Source\Widgets\ComboBox.cs" />
     <Compile Include="Source\Widgets\EditBox.cs" />
     <Compile Include="Source\Widgets\IPresenter.cs" />
@@ -324,6 +322,8 @@
     <Compile Include="Source\Application\MouseCursor\StockCursors.Null.cs" />
     <Compile Include="Source\Application\MouseCursor\StockCursors.Win.cs" />
     <Compile Include="Source\Widgets\Layout\ScrollableLayout.cs" />
+    <Compile Include="Source\Widgets\KeyboardFocus.cs" />
+    <Compile Include="Source\Input\Shortcut.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
