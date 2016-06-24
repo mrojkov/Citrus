@@ -47,6 +47,11 @@ namespace Lime
 		public static implicit operator Key (int code) { return new Key(code); }
 		public static implicit operator int (Key key) { return key.Code; }
 
+		public static Key MapShortcut(Modifiers modifiers, Key main)
+		{
+			return MapShortcut(new Shortcut(modifiers, main));
+		}
+
 		public static Key MapShortcut(Shortcut shortcut)
 		{
 			if (!Arrays.AffectedByModifiersKeys[shortcut.Main]) {

@@ -372,4 +372,10 @@
       <Kind>Dynamic</Kind>
     </NativeReference>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Lemon\Lemon.Mac.csproj">
+      <Project>{BB697671-700C-455D-B8EE-66A6B122B949}</Project>
+      <Name>Lemon.Mac</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

@@ -248,8 +248,13 @@ namespace Lime
 
 		private void ReleaseAffectedByModifierKeys()
 		{
-			for (var i = 0; i < Key.Arrays.AffectedByModifiersKeys.Count; i++) {
+			for (var i = 0; i < Key.Count; i++) {
 				if (keys[i].CurrentState && Key.Arrays.AffectedByModifiersKeys[i]) {
+					SetKeyState(i, false);
+				}
+			}
+			foreach (var i in Key.ShortcutMap.Values) {
+				if (keys[i].CurrentState) {
 					SetKeyState(i, false);
 				}
 			}
