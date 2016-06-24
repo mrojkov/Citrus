@@ -134,14 +134,12 @@ namespace Lime
 		public readonly IText Text;
 		public readonly IEditorParams EditorParams;
 
-		private IKeyboardInputProcessor textInputProcessor;
 		private ICaretPosition caretPos;
 
 		public Editor(Widget container, ICaretPosition caretPos, IEditorParams editorParams)
 		{
 			Container = container;
 			Container.HitTestTarget = true;
-			textInputProcessor = (IKeyboardInputProcessor)container;
 			Text = (IText)container;
 			Text.TrimWhitespaces = false;
 			EditorParams = editorParams;

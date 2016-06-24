@@ -8,7 +8,7 @@ namespace Lime
 	/// Виджет, выводящий текст с упрощенным форматированием
 	/// </summary>
 	[ProtoContract]
-	public class SimpleText : Widget, IText, IKeyboardInputProcessor
+	public class SimpleText : Widget, IText
 	{
 		private SpriteList spriteList;
 		private SerializableFont font;

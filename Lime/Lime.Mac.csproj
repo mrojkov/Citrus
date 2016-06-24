@@ -205,7 +205,6 @@
     <Compile Include="Source\Application\UnityApplicationDelegate.cs" />
     <Compile Include="Source\Graphics\Fonts\Font.cs" />
     <Compile Include="Source\Graphics\Fonts\SerializableFont.cs" />
-    <Compile Include="Source\Widgets\Text\IKeyboardInputProcessor.cs" />
     <Compile Include="Source\Graphics\Fonts\CharMap.cs" />
     <Compile Include="Source\Graphics\Fonts\CompoundFont.cs" />
     <Compile Include="Source\Application\Context.cs" />
