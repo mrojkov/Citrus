@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Lime
 {
@@ -8,7 +8,8 @@ namespace Lime
 	{
 		private Widget label;
 		private int index = -1;
-		public readonly ObservableList<Item> Items;
+
+		public readonly ObservableCollection<Item> Items;
 
 		public int Index
 		{
@@ -25,29 +26,46 @@ namespace Lime
 			get { return Index == -1 ? null : Items[Index].Text; }
 			set
 			{
-				var item = Items.FirstOrDefault(i => i.Text == Text);
+				var item = Items.FirstOrDefault(i => i.Text == value);
+				Index = (item != null) ? Items.IndexOf(item) : -1;
+			}
+		}
+
+		public object Value
+		{
+			get { return Index == -1 ? null : Items[Index].Value; }
+			set
+			{
+				var item = Items.FirstOrDefault(i => i.Value.Equals(value));
 				Index = (item != null) ? Items.IndexOf(item) : -1;
 			}
 		}
 
 		public ComboBox()
 		{
-			Items = new ObservableList<Item>();
-			(Items as INotifyListChanged).Changed += RefreshLabel;
+			Items = new ObservableCollection<Item>();
+			Items.CollectionChanged += (sender, e) => RefreshLabel();
+			HitTestTarget = true;
 			Theme.Current.Apply(this);
 		}
 
 		protected override void Awake()
 		{
-			label = this["Label"];
 			RefreshLabel();
-			// Show dropdown list on mouse press.
-			label.Updated += delta => {
-				if (Input.WasMousePressed() && label.IsMouseOver()) {
+			Updated += delta => {
+				if (Input.WasMousePressed() && IsMouseOver()) {
+					KeyboardFocus.Instance.SetFocus(this);
 #if MAC
 					Window.Current.Input.SetKeyState(Key.Mouse0, false);
 #endif
 					ShowDropDownList();
+				}
+				if (Input.WasKeyPressed(Key.Space) || Input.WasKeyPressed(Key.Enter)) {
+					ShowDropDownList();
+				} else if (Input.WasKeyRepeated(Key.Up)) {
+					Index = Math.Max(0, Index - 1);
+				} else if (Input.WasKeyRepeated(Key.Down)) {
+					Index = Math.Min(Items.Count - 1, Index + 1);
 				}
 			};
 		}
@@ -77,6 +95,7 @@ namespace Lime
 
 		private void RefreshLabel()
 		{
+			label = TryFind<SimpleText>("Label");
 			if (label != null) {
 				label.Text = Text;
 			}
