@@ -120,7 +120,7 @@ namespace Lime
 #if DEBUG
 			captureStack.Insert(t + 1, new CaptureStackItem { Widget = widget, Keys = keys, StackTrace = System.Environment.StackTrace, Exclusive = exclusive });
 #else
-			stack.Insert(t + 1, new StackItem { Widget = widget, Keys = keys, Exclusive = exclusive  });
+			captureStack.Insert(t + 1, new CaptureStackItem { Widget = widget, Keys = keys, Exclusive = exclusive  });
 #endif
 		}
 

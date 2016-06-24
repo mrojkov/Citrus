@@ -74,7 +74,7 @@ namespace Lime
 				ActivityDelegate.Instance.GameView.UpdateFrame += a;
 			}
 			// Browser may request keyboard and we should hide it on our own when closing browser.
-			if (WidgetContext.Current.ActiveTextWidget == null && Application.SoftKeyboard.Visible) {
+			if (KeyboardFocus.Instance.Focused == null && Application.SoftKeyboard.Visible) {
 				Application.SoftKeyboard.Show(false, string.Empty);
 			}
 			GC.SuppressFinalize(this);
