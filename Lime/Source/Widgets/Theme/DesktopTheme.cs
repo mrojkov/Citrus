@@ -120,7 +120,6 @@ namespace Lime
 			DecorateSimpleText(widget);
 			var eb = (EditBox)widget;
 			eb.AutoSizeConstraints = false;
-			eb.Caret.IsVisible = true;
 			eb.MinSize = Metrics.DefaultButtonSize;
 			eb.MaxHeight = eb.MinHeight;
 			eb.HAlignment = HAlignment.Left;
@@ -131,11 +130,11 @@ namespace Lime
 			var editorParams = new EditorParams { MaxLength = 100, MaxLines = 1 };
 			new CaretDisplay(
 				eb, eb.Caret,
-				new CaretParams { CaretWidget = new VerticalLineCaret(eb, thickness: 1.0f) });
+				new CaretParams { CaretPresenter = new VerticalLineCaret() });
 			eb.Editor = new Editor(eb, eb.Caret, editorParams);
 			eb.Focusable = new Focusable();
 			eb.CompoundPresenter.Add(new BorderedFramePresenter(Colors.WhiteBackground, Colors.ControlBorder));
-			eb.PostPresenter = new KeyboardFocusBorderPresenter();
+			eb.CompoundPostPresenter.Add(new KeyboardFocusBorderPresenter());
 		}
 
 		private void DecorateComboBox(Widget widget)
