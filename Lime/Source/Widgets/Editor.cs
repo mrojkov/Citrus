@@ -78,24 +78,28 @@ namespace Lime
 			bool blinkOn = true;
 			bool wasVisible = false;
 			while (true) {
-				time += Task.Current.Delta;
-				if (time > caretParams.BlinkInterval && caretParams.BlinkInterval > 0f) {
-					blinkOn = !blinkOn;
-					Window.Current.Invalidate();
-					time = 0f;
-				}
-				var newPos = caretPos.WorldPos;
-				if (!p.Position.Equals(newPos) || !wasVisible && caretPos.IsVisible) {
-					p.Position = newPos;
-					Window.Current.Invalidate();
-					blinkOn = true;
-					time = 0f;
+				if (caretPos.IsVisible) {
+					time += Task.Current.Delta;
+					if (time > caretParams.BlinkInterval && caretParams.BlinkInterval > 0f) {
+						time = 0f;
+						blinkOn = !blinkOn;
+						Window.Current.Invalidate();
+					}
+					var newPos = caretPos.WorldPos;
+					if (!p.Position.Equals(newPos) || !wasVisible) {
+						p.Position = newPos;
+						time = 0f;
+						blinkOn = true;
+						Window.Current.Invalidate();
+					}
+					p.Visible = blinkOn;
+					if (caretParams.FollowTextColor) {
+						p.Color = container.Color;
+					}
+				} else {
+					p.Visible = false;
 				}
 				wasVisible = caretPos.IsVisible;
-				p.Visible = caretPos.IsVisible && blinkOn;
-				if (caretParams.FollowTextColor) {
-					p.Color = container.Color;
-				}
 				yield return null;
 			}
 		}
@@ -109,6 +113,7 @@ namespace Lime
 		char? PasswordChar { get; set; }
 		float PasswordLastCharShowTime { get; set; }
 		Predicate<string> AcceptText { get; set; }
+		bool RevokeFocusOnEnter { get; set; }
 
 		bool IsAcceptableLength(int length);
 		bool IsAcceptableLines(int lines);
@@ -123,6 +128,7 @@ namespace Lime
 		public char? PasswordChar { get; set; }
 		public float PasswordLastCharShowTime { get; set; }
 		public Predicate<string> AcceptText { get; set; }
+		public bool RevokeFocusOnEnter { get; set; }
 
 		public EditorParams()
 		{
@@ -248,8 +254,13 @@ namespace Lime
 					caretPos.TextPos++; // Enforce revalidation.
 				}
 			}
-			if (CheckKeyRepeated(Key.Enter) && EditorParams.IsAcceptableLines(Text.Text.Count(ch => ch == '\n') + 2))
-				InsertChar('\n');
+			if (CheckKeyRepeated(Key.Enter)) {
+				if (EditorParams.IsAcceptableLines(Text.Text.Count(ch => ch == '\n') + 2)) {
+					InsertChar('\n');
+				} else if (EditorParams.RevokeFocusOnEnter) {
+					KeyboardFocus.Instance.SetFocus(null);
+				}
+			}
 #if WIN
 			if (Container.Input.IsKeyPressed(Key.ControlLeft) && CheckKeyRepeated(Key.V)) {
 				foreach (var ch in Clipboard.Text)
