@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace Lime
 {
+	[Flags]
 	public enum ScrollDirection
 	{
 		None = 0,
