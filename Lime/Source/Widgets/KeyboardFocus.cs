@@ -11,10 +11,22 @@ namespace Lime
 	{
 		public bool TabStop { get; set; }
 		public int TabOrder { get; set; }
+		public event Action FocusLost;
+		public event Action FocusGained;
 
 		public Focusable()
 		{
 			TabStop = true;
+		}
+
+		internal void RaiseFocusLost()
+		{
+			FocusLost?.Invoke();
+		}
+
+		internal void RaiseFocusGained()
+		{
+			FocusGained?.Invoke();
 		}
 	}
 
@@ -87,11 +99,13 @@ namespace Lime
 			}
 			if (Focused != null) {
 				Focused.Input.Release(capturedKeys);
+				Focused?.Focusable?.RaiseFocusLost();
 			}
 			if (value != null) {
 				capturedKeys = GetKeysToCapture(value);
 				value.Input.Capture(capturedKeys);
 				Application.SoftKeyboard.Show(true, value.Text);
+				Focused?.Focusable?.RaiseFocusGained();
 			} else {
 				Application.SoftKeyboard.Show(false, "");
 			}
