@@ -305,9 +305,11 @@ namespace Lime
 
 		private void Update()
 		{
+#if MAC
 			if (this == Application.MainWindow) {			
 				Application.MainMenu.Refresh();
 			}
+#endif
 			var delta = (float)stopwatch.Elapsed.TotalSeconds;
 			stopwatch.Restart();
 			delta = Mathf.Clamp(delta, 0, 1 / Application.LowFPSLimit);

@@ -15,3 +15,4 @@ Orange/bin/Win/Debug/
 Orange/packages
 /Orange/bin/Mac/*
 !/Orange/bin/Mac/Release/Orange.app
+*.mdb

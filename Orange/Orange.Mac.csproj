@@ -143,6 +143,7 @@
     <Compile Include="Source\DictionaryExtractorWindow.cs" />
     <Compile Include="Source\ModelImport\ModelImporter.cs" />
     <Compile Include="Source\SubTarget.cs" />
+    <Compile Include="Source\ModelImport\KeyframeReducer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Info.plist" />
