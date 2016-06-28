@@ -127,11 +127,11 @@ namespace Lime
 			eb.TrimWhitespaces = false;
 			eb.VAlignment = VAlignment.Center;
 			eb.Padding = Metrics.ControlsPadding;
-			var editorParams = new EditorParams { MaxLength = 100, MaxLines = 1 };
+			var editorParams = new EditorParams { MaxLength = 100, MaxLines = 1, RevokeFocusOnEnter = true };
 			new CaretDisplay(
 				eb, eb.Caret,
 				new CaretParams { CaretPresenter = new VerticalLineCaret() });
-			eb.Editor = new Editor(eb, eb.Caret, editorParams);
+			new Editor(eb, eb.Caret, editorParams);
 			eb.Focusable = new Focusable();
 			eb.CompoundPresenter.Add(new BorderedFramePresenter(Colors.WhiteBackground, Colors.ControlBorder));
 			eb.CompoundPostPresenter.Add(new KeyboardFocusBorderPresenter());
