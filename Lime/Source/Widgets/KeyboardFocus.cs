@@ -21,12 +21,16 @@ namespace Lime
 
 		internal void RaiseFocusLost()
 		{
-			FocusLost?.Invoke();
+			if (FocusLost != null) {
+				FocusLost.Invoke();
+			}
 		}
 
 		internal void RaiseFocusGained()
 		{
-			FocusGained?.Invoke();
+			if (FocusGained != null) {
+				FocusGained.Invoke();
+			}
 		}
 	}
 
