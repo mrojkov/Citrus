@@ -4,11 +4,11 @@ using Lime;
 
 namespace Tangerine.UI.Timeline
 {
-	public class MouseWheelTask
+	public class MouseWheelProcessor : Core.IProcessor
 	{
 		Timeline timeline => Timeline.Instance;
 
-		public IEnumerator<object> Main()
+		public IEnumerator<object> MainLoop()
 		{
 			while (true) {
 				var widget = timeline.RootWidget;

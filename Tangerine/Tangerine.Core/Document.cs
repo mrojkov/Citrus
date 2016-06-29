@@ -7,14 +7,18 @@ using Lime;
 
 namespace Tangerine.Core
 {
-	public interface ISelectedNodesProvider
+	public interface ISelectedObjectsProvider
 	{
-		IEnumerable<Node> Get();
-
-		void Select(Node node, bool select);
+		IEnumerable<object> Get();
 	}
 
-	public class Document
+	public interface IAnimationContext
+	{
+		int AnimationFrame { get; set; }
+		string AnimationId { get; set; }
+	}
+
+	public class Document : IAnimationContext
 	{
 		public enum CloseAction
 		{
@@ -35,8 +39,17 @@ namespace Tangerine.Core
 		public event Action Closed;
 		
 		public Node RootNode { get; private set; }
-		public IEnumerable<Node> SelectedNodes => SelectedNodesProvider.Get();
-		public ISelectedNodesProvider SelectedNodesProvider { get; set; }
+		public Node Container { get; set; }
+		public IEnumerable<object> SelectedObjects => SelectedObjectsProvider.Get();
+
+		public int AnimationFrame
+		{
+			get { return Container.AnimationFrame; }
+			set { Container.AnimationFrame = value; }
+		}
+
+		public string AnimationId { get; set; }
+		public ISelectedObjectsProvider SelectedObjectsProvider { get; set; }
 
 		static Document()
 		{
@@ -98,7 +111,7 @@ namespace Tangerine.Core
 					var ani = frame.Animators["Position"];
 					ani.Keys.Add(0, new Lime.Vector2(0, 0));
 					ani.Keys.Add(5, new Lime.Vector2(100, 0));
-					ani.Keys.Add(12, new Lime.Vector2(100, 0));
+					ani.Keys.Add(12, new Lime.Vector2(200, 50));
 					ani.Keys.Add(16, new Lime.Vector2(100, 0));
 					ani.Keys.Add(19, new Lime.Vector2(100, 0));
 					ani.Keys.Add(30, new Lime.Vector2(200, 0));

@@ -4,11 +4,11 @@ using Lime;
 
 namespace Tangerine.UI.Timeline
 {
-	public class OverviewScrollTask
+	public class OverviewScrollProcessor : Core.IProcessor
 	{
 		private Timeline timeline => Timeline.Instance;
 
-		public IEnumerator<object> Main()
+		public IEnumerator<object> MainLoop()
 		{
 			var input = timeline.Overview.RootWidget.Input;
 			while (true) {

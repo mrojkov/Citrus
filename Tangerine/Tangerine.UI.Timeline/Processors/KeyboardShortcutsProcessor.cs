@@ -6,11 +6,11 @@ using System.Collections.Generic;
 
 namespace Tangerine.UI.Timeline
 {
-	public class KeyboardShortcutsTask
+	public class KeyboardShortcutsProcessor : Core.IProcessor
 	{
 		Timeline timeline => Timeline.Instance;
 
-		public IEnumerator<object> Main()
+		public IEnumerator<object> MainLoop()
 		{
 			while (true) {
 				var input = timeline.RootWidget.Input;
@@ -36,12 +36,12 @@ namespace Tangerine.UI.Timeline
 		void HandleEnterExit(WidgetInput input)
 		{
 			var doc = Document.Current;
-			if (input.WasKeyPressed(Key.Enter)) {
+			if (input.WasKeyPressed(KeyBindings.Timeline.EnterNode)) {
 				var node = timeline.SelectedRows.Select(i => i.Components.Get<Components.NodeRow>()).FirstOrDefault(i => i != null).Node;
 				if (node != null) {
 					doc.History.Execute(new Operations.SetCurrentContainer(node));
 				}
-			} else if (input.WasKeyPressed(Key.BackSpace)) {
+			} else if (input.WasKeyPressed(KeyBindings.Timeline.ExitNode)) {
 				if (timeline.Container.Parent != null) {
 					doc.History.Execute(new Operations.SetCurrentContainer(timeline.Container.Parent));
 				}
@@ -50,11 +50,14 @@ namespace Tangerine.UI.Timeline
 		
 		void VerticalScroll(WidgetInput input)
 		{
-			if (input.WasKeyRepeated(Key.Down)) {
-				SelectRow(1, input.IsKeyPressed(Key.ShiftLeft));
-			}
-			if (input.WasKeyRepeated(Key.Up)) {
-				SelectRow(-1, input.IsKeyPressed(Key.ShiftLeft));
+			if (input.WasKeyRepeated(KeyBindings.Timeline.ScrollUp)) {
+				SelectRow(-1, false);
+			} else if (input.WasKeyRepeated(KeyBindings.Timeline.ScrollDown)) {
+				SelectRow(1, false);
+			} else if (input.WasKeyRepeated(KeyBindings.Timeline.SelectUp)) {
+				SelectRow(-1, true);
+			} else if (input.WasKeyRepeated(KeyBindings.Timeline.SelectDown)) {
+				SelectRow(1, true);
 			}
 		}
 
@@ -92,8 +95,7 @@ namespace Tangerine.UI.Timeline
 				stride = -1;
 			}
 			if (stride != 0) {
-				Document.Current.History.Execute(new Operations.SetCurrentColumn(timeline.CurrentColumn + stride));
-				timeline.EnsureColumnVisible(timeline.CurrentColumn);
+				Document.Current.History.Execute(new Operations.SetCurrentColumn(Math.Max(0, timeline.CurrentColumn + stride)));
 			}
 		}		
 	}	

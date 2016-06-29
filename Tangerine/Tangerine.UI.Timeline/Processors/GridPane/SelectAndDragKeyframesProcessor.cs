@@ -7,19 +7,19 @@ using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline
 {
-	public class SelectAndDragKeyframesTask
+	public class SelectAndDragKeyframesProcessor : Core.IProcessor
 	{
 		IntRectangle rect;
 
 		Timeline timeline => Timeline.Instance;
 		GridPane grid => Timeline.Instance.Grid;
 
-		public IEnumerator<object> Main()
+		public IEnumerator<object> MainLoop()
 		{
 			var input = grid.RootWidget.Input;
 			while (true) {
 				if (input.WasMousePressed() && grid.RootWidget.IsMouseOver()) {
-					KeyboardFocus.Instance.SetFocus(Timeline.Instance.RootWidget);
+					Timeline.Instance.RootWidget.SetFocus();
 					var initialCell = MousePositionToCell(input.MousePosition);
 					input.CaptureMouse();
 					if (timeline.GridSelection.IsCellSelected(initialCell)) {

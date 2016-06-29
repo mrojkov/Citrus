@@ -2,16 +2,15 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Lime;
-using Tangerine.Core;
 using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline
 {
-	public class ResizeGridCurveViewTask
+	public class ResizeGridCurveViewProcessor : Core.IProcessor
 	{
 		const float separatorThickness = 10;
 
-		public IEnumerator<object> Main()
+		public IEnumerator<object> MainLoop()
 		{
 			while (true) {
 				foreach (var row in Timeline.Instance.Rows) {

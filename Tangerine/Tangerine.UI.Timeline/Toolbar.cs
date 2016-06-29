@@ -5,11 +5,11 @@ namespace Tangerine.UI.Timeline
 {
 	public class Toolbar
 	{
-		public Widget Widget { get; private set; }
+		public Widget RootWidget { get; private set; }
 		
 		public Toolbar()
 		{
-			Widget = new Widget {
+			RootWidget = new Widget {
 				MinMaxHeight = Metrics.ToolbarHeight,
 				MinWidth = Metrics.ToolbarMinWidth,
 				Presenter = new DelegatePresenter<Widget>(Render)

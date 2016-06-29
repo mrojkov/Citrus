@@ -16,35 +16,36 @@ namespace Tangerine.UI.Inspector
 		TangerineAttribute tangerineAttribute;
 
 		public readonly Widget InspectorPane;
-		public readonly Node Node;
-		public readonly IAnimable Animable;
+		public readonly object Object;
 		public readonly string PropertyName;
-		public readonly string AnimationId;
+		public readonly IAnimationContext AnimationContext;
 
-		public PropertyEditorContext(Widget inspectorPane, Node node, IAnimable animable, string propertyName, string animationId)
+		public PropertyEditorContext(Widget inspectorPane, object @object, string propertyName, IAnimationContext animationContext)
 		{
 			InspectorPane = inspectorPane;
-			Node = node;
-			Animable = animable;
+			Object = @object;
 			PropertyName = propertyName;
-			AnimationId = animationId;
+			AnimationContext = animationContext;
 		}
 
-		public System.Reflection.PropertyInfo PropertyInfo => Animable.GetType().GetProperty(PropertyName);
+		public System.Reflection.PropertyInfo PropertyInfo => Object.GetType().GetProperty(PropertyName);
 
 		public TangerineAttribute TangerineAttribute => tangerineAttribute ?? 
-		(tangerineAttribute = PropertyRegistry.GetTangerineAttribute(Animable.GetType(), PropertyName) ?? new TangerineAttribute(0));
+		(tangerineAttribute = PropertyRegistry.GetTangerineAttribute(Object.GetType(), PropertyName) ?? new TangerineAttribute(0));
 
 		public IAnimator FindAnimator()
 		{
+			var animable = Object as IAnimable;
+			if (animable == null) {
+				return null;
+			}
 			IAnimator animator;
-			return Animable.Animators.TryFind(PropertyName, out animator, AnimationId) ? animator : null;
+			return animable.Animators.TryFind(PropertyName, out animator, AnimationContext.AnimationId) ? animator : null;
 		}
 
 		public IKeyframe FindKeyframe()
 		{
-			var animation = AnimationId == null ? Node.DefaultAnimation : Node.Animations.Find(AnimationId);
-			return FindAnimator()?.ReadonlyKeys.FirstOrDefault(k => k.Frame == animation.Frame);
+			return FindAnimator()?.ReadonlyKeys.FirstOrDefault(k => k.Frame == AnimationContext.AnimationFrame);
 		}
 	}
 
@@ -53,35 +54,39 @@ namespace Tangerine.UI.Inspector
 		readonly KeyframeButton keyframeButton;
 		readonly KeyFunctionButton keyFunctionButton;
 
-		protected readonly KeyframeChangeNotificator KeyframeChangeNotificator;
-		protected readonly PropertyEditorContext Context;
-		protected readonly Widget ContainerWidget;
+		protected readonly KeyframeObserver keyframeObserver;
+		protected readonly PropertyObserver propertyObserver;
+		protected readonly PropertyEditorContext context;
+		protected readonly Widget containerWidget;
 
 		public CommonPropertyEditor(PropertyEditorContext context)
 		{
-			Context = context;
-			ContainerWidget = new Widget {
+			this.context = context;
+			containerWidget = new Widget {
 				Layout = new HBoxLayout { IgnoreHidden = false },
 				LayoutCell = new LayoutCell { StretchY = 0 },
 			};
-			context.InspectorPane.AddNode(ContainerWidget);
-			KeyframeChangeNotificator = new KeyframeChangeNotificator(context);
-			ContainerWidget.AddNode(new SimpleText {
+			context.InspectorPane.AddNode(containerWidget);
+			keyframeObserver = new KeyframeObserver(context);
+			propertyObserver = new PropertyObserver(context);
+			containerWidget.AddNode(new SimpleText {
 				Text = context.PropertyName,
 				LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0.5f),
 				AutoSizeConstraints = false,
 			});
-			keyFunctionButton = new KeyFunctionButton {
-				LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
-			};
-			keyframeButton = new KeyframeButton {
-				LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
-			};
-			var keyColor = KeyframePalette.Colors[Context.TangerineAttribute.ColorIndex];
-			keyframeButton.SetKeyColor(keyColor);
-			keyFunctionButton.Clicked += KeyFunctionButton_Clicked;
-			ContainerWidget.AddNode(keyFunctionButton);
-			ContainerWidget.AddNode(keyframeButton);
+			if (context.Object is IAnimable) {
+				keyFunctionButton = new KeyFunctionButton {
+					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
+				};
+				keyframeButton = new KeyframeButton {
+					LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
+				};
+				var keyColor = KeyframePalette.Colors[context.TangerineAttribute.ColorIndex];
+				keyframeButton.SetKeyColor(keyColor);
+				keyFunctionButton.Clicked += KeyFunctionButton_Clicked;
+				containerWidget.AddNode(keyFunctionButton);
+				containerWidget.AddNode(keyframeButton);
+			}
 		}
 
 		private void KeyFunctionButton_Clicked()
@@ -90,9 +95,10 @@ namespace Tangerine.UI.Inspector
 
 		public virtual void Update(float delta)
 		{
-			KeyframeChangeNotificator.Update();
-			if (KeyframeChangeNotificator.Changed) {
-				var k = Context.FindKeyframe();
+			keyframeObserver.Observe();
+			propertyObserver.Observe();
+			if (keyframeObserver.Changed) {
+				var k = context.FindKeyframe();
 				keyFunctionButton.Visible = (k != null);
 				if (k != null) {
 					keyFunctionButton.SetKeyFunction(k.Function);
@@ -146,7 +152,13 @@ namespace Tangerine.UI.Inspector
 		}
 	}
 
-	class KeyframeChangeNotificator
+	interface IDataObserver
+	{
+		void Observe();
+		bool Changed { get; }
+	}
+
+	class KeyframeObserver : IDataObserver
 	{
 		readonly PropertyEditorContext context;
 
@@ -159,21 +171,29 @@ namespace Tangerine.UI.Inspector
 
 		public bool Changed { get; private set; }
 
-		public KeyframeChangeNotificator(PropertyEditorContext context)
+		public KeyframeObserver(PropertyEditorContext context)
 		{
 			this.context = context;
 		}
 
-		public void Update()
+		public void Observe()
 		{
 			Changed = false;
-			if (animatorCollectionVersion != context.Animable.Animators.Version) {
+			var animable = context.Object as IAnimable;
+			if (animable != null && animatorCollectionVersion != animable.Animators.Version) {
+				animatorCollectionVersion = animable.Animators.Version;
 				Changed = true;
 				animator = context.FindAnimator();
 			}
 			Changed |= animator != null && animator.ReadonlyKeys.Version != animatorKeysVersion;
 			if (Changed) {
-				keyframe = context.FindKeyframe();
+				if (animator != null) {
+					animatorKeysVersion = animator.ReadonlyKeys.Version;
+					keyframe = context.FindKeyframe();
+				} else {
+					animatorKeysVersion = -1;
+					keyframe = null;
+				}
 			}
 			if (keyframe != null && (keyframe.Function != keyFunction || !keyframe.Value.Equals(keyValue))) {
 				Changed = true;
@@ -183,17 +203,35 @@ namespace Tangerine.UI.Inspector
 		}
 	}
 
+	class PropertyObserver : IDataObserver
+	{
+		readonly PropertyEditorContext context;
+		readonly System.Reflection.MethodInfo getter;
+		public object Value { get; private set; }
+		public bool Changed { get; private set; }
+
+		public PropertyObserver(PropertyEditorContext context)
+		{
+			this.context = context;
+			getter = context.PropertyInfo.GetGetMethod();
+		}
+
+		public void Observe()
+		{
+			var prevValue = Value;
+			Value = getter.Invoke(context.Object, null);
+			Changed = ((prevValue == null) ^ (Value == null)) || (Value != null && !Value.Equals(prevValue));
+		}
+	}
+
 	class Vector2PropertyEditor : CommonPropertyEditor
 	{
-		Vector2? prevValue;
-		readonly System.Reflection.MethodInfo getter;
 		readonly EditBox editorX;
 		readonly EditBox editorY;
 
 		public Vector2PropertyEditor(PropertyEditorContext context) : base(context)
 		{
-			getter = context.PropertyInfo.GetGetMethod();
-			ContainerWidget.AddNode(new Widget {
+			containerWidget.AddNode(new Widget {
 				Layout = new HBoxLayout(),
 				Nodes = {
 					new SimpleText { Text = "X", Padding = new Thickness(4, 0), LayoutCell = new LayoutCell(Alignment.Center) },
@@ -207,40 +245,39 @@ namespace Tangerine.UI.Inspector
 		public override void Update(float delta)
 		{
 			base.Update(delta);
-			var value = (Vector2)getter.Invoke(Context.Animable, null);
-			if (!prevValue.HasValue || value != prevValue) {
-				prevValue = value;
+			if (propertyObserver.Changed) {
+				var value = (Vector2)propertyObserver.Value;
 				editorX.Text = value.X.ToString();
-				editorY.Text = value.Y.ToString();
+					editorY.Text = value.Y.ToString();
 			}
 		}
 	}
 
 	class StringPropertyEditor : CommonPropertyEditor
 	{
-		string prevValue;
-		readonly System.Reflection.MethodInfo getter;
 		readonly EditBox editor;
 
 		public StringPropertyEditor(PropertyEditorContext context) : base(context)
 		{
-			getter = Context.PropertyInfo.GetGetMethod();
-			ContainerWidget.AddNode(new Widget {
+			containerWidget.AddNode(new Widget {
 				Layout = new HBoxLayout(),
 				Padding = new Thickness { Left = 4 },
 				Nodes = {
 					(editor = new EditBox()),
 				}
 			});
+			editor.Focusable.FocusLost += () => {
+				if (!editor.Text.Equals(propertyObserver.Value)) {
+					Document.Current.History.Execute(new Core.Operations.SetAnimableProperty(context.Object, context.PropertyName, editor.Text));
+				}
+			};
 		}
 
 		public override void Update(float delta)
 		{
 			base.Update(delta);
-			var value = (string)getter.Invoke(Context.Animable, null);
-			if (value != prevValue) {
-				prevValue = value;
-				editor.Text = value;
+			if (propertyObserver.Changed) {
+				editor.Text = (string)propertyObserver.Value;
 			}
 		}
 	}

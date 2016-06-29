@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Tangerine.UI.Timeline
 {
-	public class Timeline : ISelectedNodesProvider
+	public class Timeline : ISelectedObjectsProvider
 	{
 		public static Timeline Instance { get; private set; }
 			
@@ -20,8 +20,16 @@ namespace Tangerine.UI.Timeline
 		public readonly Widget RootWidget;
 
 		public Vector2 ScrollOrigin;
-		public Node Container { get; set; }
-		public int CurrentColumn { get; set; }
+		public Node Container
+		{
+			get { return Document.Current.Container; }
+			set { Document.Current.Container = value; }
+		}
+		public int CurrentColumn
+		{
+			get { return Document.Current.AnimationFrame; }
+			set { Document.Current.AnimationFrame = value; }
+		}
 		public int ColumnCount { get; set; }
 		public GridSelection GridSelection = new GridSelection();
 		public readonly List<Row> Rows = new List<Row>();
@@ -53,14 +61,14 @@ namespace Tangerine.UI.Timeline
 								Layout = new VBoxLayout(),
 								LayoutCell = new LayoutCell { StretchX = 0.33f },
 								Nodes = {
-									Toolbar.Widget,
+									Toolbar.RootWidget,
 									Roll.RootWidget,
 								}
 							},
 							new Widget {
 								Layout = new VBoxLayout(),
 								Nodes = {
-									Ruler.Widget,
+									Ruler.RootWidget,
 									Grid.RootWidget,
 								}
 							},
@@ -72,34 +80,31 @@ namespace Tangerine.UI.Timeline
 
 		void CreateTasks()
 		{
-			// Rule of thumb: the code which is interacts with a widget, should be placed into the widget's TaskList.
-			// That help us to avoid bugs with HitTest and MouseCapture order.
-			var tasks = RootWidget.Tasks;
-			var gridTasks = Grid.RootWidget.Tasks;
-			var rollTasks = Roll.RootWidget.Tasks;
-			var overviewTasks = Overview.RootWidget.Tasks;
-			var rulerTasks = Ruler.Widget.Tasks;
-			tasks.Add(new BuildRowsTask().Main());
-			tasks.Add(new RefreshColumnCountTask().Main());
-			tasks.Add(new BuildRowViewsTask().Main());
-			tasks.Add(new ProcessRollWidgetsTask().Main());
-			tasks.Add(new ProcessGridWidgetsTask().Main());
-			tasks.Add(new ProcessOverviewWidgetsTask().Main());
-			tasks.Add(new KeyboardShortcutsTask().Main());
-			overviewTasks.Add(new OverviewScrollTask().Main());
-			tasks.Add(new MouseWheelTask().Main());
-			gridTasks.Add(new ResizeGridCurveViewTask().Main());
-			gridTasks.Add(new GridMouseScrollTask().Main());
-			rollTasks.Add(new RollMouseScrollTask().Main());
-			gridTasks.Add(new SelectAndDragKeyframesTask().Main());
-			gridTasks.Add(new HasKeyframeRespondentTask().Main());
-			gridTasks.Add(new DragKeyframesRespondentTask().Main());
-			rollTasks.Add(new SelectAndDragRowsTask().Main());
-			rollTasks.Add(new ClampScrollOriginTask().Main());
-			rulerTasks.Add(new EditMarkerTask().Main());
+			var tasks = RootWidget.LateTasks; // Use LateTasks in order to process splitters first
+			tasks.AddRange(new IProcessor[] {
+				new BuildRowsProcessor(),
+				new ColumnCountProcessor(),
+				new BuildRowViewsProcessor(),
+				new RollWidgetsProcessor(),
+				new GridWidgetsProcessor(),
+				new OverviewWidgetsProcessor(),
+				new KeyboardShortcutsProcessor(),
+				new OverviewScrollProcessor(),
+				new MouseWheelProcessor(),
+				new ResizeGridCurveViewProcessor(),
+				new GridMouseScrollProcessor(),
+				new RollMouseScrollProcessor(),
+				new SelectAndDragKeyframesProcessor(),
+				new HasKeyframeRespondentProcessor(),
+				new DragKeyframesRespondentProcessor(),
+				new SelectAndDragRowsProcessor(),
+				new RulerMouseScrollProcessor(),
+				new ClampScrollOriginProcessor(),
+				new EditMarkerProcessor()
+			});
 		}
 
-		IEnumerable<Node> ISelectedNodesProvider.Get()
+		IEnumerable<object> ISelectedObjectsProvider.Get()
 		{
 			foreach (var i in SelectedRows) {
 				var n = i.Components.Get<Components.NodeRow>()?.Node;
@@ -109,24 +114,24 @@ namespace Tangerine.UI.Timeline
 			}
 		}
 
-		void ISelectedNodesProvider.Select(Node node, bool select)
-		{
-			var row = SelectedRows.FirstOrDefault(i => i.Components.Get<Components.NodeRow>()?.Node == node);
-			if (select) {
-				if (row == null) {
-					row = Rows.First(i => i.Components.Get<Components.NodeRow>()?.Node == node);
-					SelectedRows.Add(row);
-				}
-			} else {
-				if (row != null) {
-					SelectedRows.Remove(row);
-				}
-			}
-		}
+		//void ISelectedNodesProvider.Select(Node node, bool select)
+		//{
+		//	var row = SelectedRows.FirstOrDefault(i => i.Components.Get<Components.NodeRow>()?.Node == node);
+		//	if (select) {
+		//		if (row == null) {
+		//			row = Rows.First(i => i.Components.Get<Components.NodeRow>()?.Node == node);
+		//			SelectedRows.Add(row);
+		//		}
+		//	} else {
+		//		if (row != null) {
+		//			SelectedRows.Remove(row);
+		//		}
+		//	}
+		//}
 
 		public void RegisterDocument(Document document)
 		{
-			document.SelectedNodesProvider = this;
+			document.SelectedObjectsProvider = this;
 			Container = document.RootNode;
 			SelectFirstRow();
 		}

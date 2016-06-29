@@ -20,18 +20,22 @@ namespace Tangerine.UI.Timeline
 		public GridPane()
 		{
 			RootWidget = new Frame {
-				Layout = new ScrollableLayout(),
+				Id = nameof(GridPane),
+				Layout = new StackLayout { HorizontallySizeable = true, VerticallySizeable = true },
 				ClipChildren = ClipMethod.ScissorTest,
 				HitTestTarget = true,
 			};
 			ContentWidget = new Widget {
+				Id = nameof(GridPane) + "Content",
 				Padding = new Thickness { Top = 1, Bottom = 1 },
 				Layout = new VBoxLayout { Spacing = Metrics.TimelineRowSpacing },
 				Presenter = new DelegatePresenter<Node>(RenderBackground),
 				PostPresenter = new DelegatePresenter<Widget>(w => OnPostRender(w))
 			};
 			RootWidget.AddNode(ContentWidget);
-			RootWidget.Updating += delta => ContentWidget.Position = -timeline.ScrollOrigin;
+			RootWidget.Updating += delta => {
+				ContentWidget.Position = -timeline.ScrollOrigin;
+			};
 			OnPostRender += RenderGrid;
 			OnPostRender += RenderSelection;
 		}

@@ -6,9 +6,9 @@ using System.Collections.Generic;
 
 namespace Tangerine.UI.Timeline
 {
-	public class RefreshColumnCountTask
+	public class ColumnCountProcessor : IProcessor
 	{
-		public IEnumerator<object> Main()
+		public IEnumerator<object> MainLoop()
 		{
 			var timeline = Timeline.Instance;
 			while (true) {

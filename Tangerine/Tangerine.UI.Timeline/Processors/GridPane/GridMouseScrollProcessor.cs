@@ -2,15 +2,14 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Lime;
-using Tangerine.Core;
 
 namespace Tangerine.UI.Timeline
 {	
-	class GridMouseScrollTask
+	class GridMouseScrollProcessor : Core.IProcessor
 	{
 		Timeline timeline => Timeline.Instance;
 
-		public IEnumerator<object> Main()
+		public IEnumerator<object> MainLoop()
 		{
 			var input = timeline.Grid.RootWidget.Input;
 			while (true) {

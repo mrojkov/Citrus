@@ -2,14 +2,13 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Lime;
-using Tangerine.Core;
 using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline
 {
-	class HasKeyframeRespondentTask
+	class HasKeyframeRespondentProcessor : Core.IProcessor
 	{
-		public IEnumerator<object> Main()
+		public IEnumerator<object> MainLoop()
 		{
 			var g = Timeline.Instance.Globals;
 			while (true) {

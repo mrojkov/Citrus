@@ -6,11 +6,11 @@ using System.Collections.Generic;
 
 namespace Tangerine.UI.Timeline
 {
-	public class BuildRowsTask
+	public class BuildRowsProcessor : IProcessor
 	{
 		Timeline timeline => Timeline.Instance;
 
-		public IEnumerator<object> Main()
+		public IEnumerator<object> MainLoop()
 		{
 			while (true) {
 				if (!ValidateRows()) {

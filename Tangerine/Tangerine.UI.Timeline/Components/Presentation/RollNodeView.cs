@@ -50,7 +50,7 @@ namespace Tangerine.UI.Timeline.Components
 				button.Visible = nodeData.Node.Animators.Count > 0;
 			};
 			button.Clicked += () => {
-				Document.Current.History.Execute(new Core.Operations.SetProperty<bool>(() => nodeData.Expanded, value => nodeData.Expanded = value, !nodeData.Expanded));
+				Document.Current.History.Execute(new Core.Operations.SetGenericProperty<bool>(() => nodeData.Expanded, value => nodeData.Expanded = value, !nodeData.Expanded));
 			};
 			return button;
 		}

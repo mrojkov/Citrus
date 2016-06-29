@@ -20,9 +20,10 @@ namespace Tangerine.UI.Timeline
 			ContentWidget.Updated += delta => ContentWidget.Scale = CalculateZoom();
 			overlayWidget = new Widget { Presenter = new DelegatePresenter<Widget>(RenderOverlay) };
 			RootWidget = new Frame {
+				Id = nameof(OverviewPane),
 				LayoutCell = new LayoutCell { StretchY = 1 / 3f },
 				ClipChildren = ClipMethod.ScissorTest,
-				Layout = new ScrollableLayout(),
+				Layout = new StackLayout { HorizontallySizeable = true, VerticallySizeable = true },
 				HitTestTarget = true,
 				Nodes = {
 					overlayWidget,

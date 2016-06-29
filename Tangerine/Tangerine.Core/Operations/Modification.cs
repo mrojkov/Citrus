@@ -13,11 +13,11 @@ namespace Tangerine.Core.Operations
 		readonly PropertyInfo property;
 		object savedValue;
 
-		public SetProperty(object obj, string name, object value)
+		public SetProperty(object obj, string propertyName, object value)
 		{
 			this.obj = obj;
 			this.value = value;
-			property = obj.GetType().GetProperty(name);
+			property = obj.GetType().GetProperty(propertyName);
 		}
 
 		public void Do()
@@ -33,14 +33,14 @@ namespace Tangerine.Core.Operations
 		}
 	}
 
-	public class SetProperty<T> : IOperation
+	public class SetGenericProperty<T> : IOperation
 	{
 		Func<T> getter;
 		Action<T> setter;
 		T value;
 		T savedValue;
 
-		public SetProperty(Func<T> getter, Action<T> setter, T value)
+		public SetGenericProperty(Func<T> getter, Action<T> setter, T value)
 		{
 			this.value = value;
 			this.getter = getter;
@@ -56,6 +56,23 @@ namespace Tangerine.Core.Operations
 		public void Undo()
 		{
 			setter(savedValue);
+		}
+	}
+
+	public class SetAnimableProperty : CompoundOperation
+	{
+		public SetAnimableProperty(object @object, string propertyName, object value)
+		{
+			Add(new SetProperty(@object, propertyName, value));
+			IAnimator animator;
+			var animable = @object as IAnimable;
+			if (animable != null && animable.Animators.TryFind(propertyName, out animator, Document.Current.AnimationId)) {
+				var propertyType = animable.GetType().GetProperty(propertyName).PropertyType;
+				var keyframe = (IKeyframe)typeof(Keyframe<>).MakeGenericType(propertyType);
+				keyframe.Frame = Document.Current.AnimationFrame;
+				keyframe.Value = value;
+				Add(new SetKeyframe(animable, propertyName, keyframe));
+			}
 		}
 	}
 
@@ -86,36 +103,36 @@ namespace Tangerine.Core.Operations
 
 	public class SetKeyframe : IOperation
 	{
-		readonly Node node;
-		readonly string property;
+		readonly IAnimable animable;
+		readonly string propertyName;
 		readonly IKeyframe keyframe;
 		IKeyframe savedKeyframe;
 		bool animatorExists;
 
-		public SetKeyframe(Node node, string property, IKeyframe keyframe)
+		public SetKeyframe(IAnimable animable, string propertyName, IKeyframe keyframe)
 		{
-			this.node = node;
-			this.property = property;
+			this.animable = animable;
+			this.propertyName = propertyName;
 			this.keyframe = keyframe;
 		}
 
 		public void Do()
 		{
-			animatorExists = node.Animators.Any(a => a.TargetProperty == property);
-			var animator = node.Animators[property];
+			animatorExists = animable.Animators.Any(a => a.TargetProperty == propertyName);
+			var animator = animable.Animators[propertyName];
 			savedKeyframe = animator.Keys.FirstOrDefault(k => k.Frame == keyframe.Frame);
 			animator.Keys.AddOrdered(keyframe);
 		}
 
 		public void Undo()
 		{
-			var animator = node.Animators.FirstOrDefault(i => i.TargetProperty == property);
+			var animator = animable.Animators.FirstOrDefault(i => i.TargetProperty == propertyName);
 			animator.Keys.Remove(keyframe);
 			if (savedKeyframe != null) {
 				animator.Keys.AddOrdered(savedKeyframe);
 			}
 			if (!animatorExists) {
-				node.Animators.Remove(animator);
+				animable.Animators.Remove(animator);
 			}
 			savedKeyframe = null;
 		}

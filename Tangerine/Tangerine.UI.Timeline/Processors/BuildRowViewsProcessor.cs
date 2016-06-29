@@ -7,9 +7,9 @@ using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline
 {
-	public class BuildRowViewsTask
+	public class BuildRowViewsProcessor : IProcessor
 	{
-		public IEnumerator<object> Main()
+		public IEnumerator<object> MainLoop()
 		{
 			while (true) {
 				foreach (var row in Timeline.Instance.Rows) {

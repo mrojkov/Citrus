@@ -16,7 +16,7 @@ namespace Tangerine.UI.Inspector
 		public readonly Widget RootWidget;
 		public readonly Frame ScrollViewWidget;
 		public readonly Widget ContentWidget;
-		public readonly List<Node> Nodes;
+		public readonly List<object> Objects;
 		public readonly Dictionary<Type, PropertyEditorBuilder> EditorMap;
 		public readonly TaskList Tasks = new TaskList();
 		public readonly List<IPropertyEditor> Editors;
@@ -30,7 +30,7 @@ namespace Tangerine.UI.Inspector
 		{
 			RootWidget = rootWidget;
 			ContentWidget = new ScrollView((Frame)RootWidget).Content;
-			Nodes = new List<Node>();
+			Objects = new List<object>();
 			EditorMap = new Dictionary<Type, PropertyEditorBuilder>();
 			Editors = new List<IPropertyEditor>();
 			RegisterEditors();
@@ -41,7 +41,7 @@ namespace Tangerine.UI.Inspector
 
 		void InitializeWidgets()
 		{
-			RootWidget.Layout = new ScrollableLayout { ScrollDirection = ScrollDirection.Vertical };
+			RootWidget.Layout = new StackLayout { VerticallySizeable = true };
 			ContentWidget.Layout = new VBoxLayout { Tag = "InspectorContent", Spacing = 4 };
 			ContentWidget.Padding = new Thickness(4);
 		}
@@ -69,13 +69,13 @@ namespace Tangerine.UI.Inspector
 
 			public IEnumerator<object> Main()
 			{
-				var nodes = Inspector.Nodes;
+				var objects = Inspector.Objects;
 				while (true) {
-					var selectedNodes = Document.Current.SelectedNodes;
-					if (!nodes.SequenceEqual(selectedNodes)) {
-						nodes.Clear();
-						nodes.AddRange(selectedNodes);
-						RebuildContent();
+					var selectedObjects = Document.Current.SelectedObjects;
+					if (!objects.SequenceEqual(selectedObjects)) {
+						objects.Clear();
+						objects.AddRange(selectedObjects);
+						RebuildContent((IAnimationContext)Document.Current);
 					}
 					foreach (var i in Inspector.Editors) {
 						i.Update(Task.Current.Delta);
@@ -84,33 +84,33 @@ namespace Tangerine.UI.Inspector
 				}
 			}
 
-			void RebuildContent()
+			void RebuildContent(IAnimationContext animationContext)
 			{
 				Inspector.ContentWidget.Nodes.Clear();
-				if (Inspector.Nodes.Count > 0) {
-					PopulateContent(Inspector.Nodes[0], Inspector.Nodes[0], null);
+				foreach (var o in Inspector.Objects) {
+					PopulateContent(o, animationContext);
 				}
 			}
 
-			void PopulateContent(Node node, IAnimable animable, string animationId)
+			void PopulateContent(object @object, IAnimationContext animationContext)
 			{
 				Inspector.Editors.Clear();
-				PopulateContentForType(animable.GetType(), node, animable, animationId);
+				PopulateContentForType(@object.GetType(), @object, animationContext);
 			}
 
-			void PopulateContentForType(Type type, Node node, IAnimable animable, string animationId)
+			void PopulateContentForType(Type type, object @object, IAnimationContext animationContext)
 			{
 				if (type == typeof(object)) {
 					return;
 				}
 				var categoryLabelAdded = false;
-				PopulateContentForType(type.BaseType, node, animable, animationId);
-				foreach (var prop in type.GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public)) {
-					if (prop.Name == "Item") {
+				PopulateContentForType(type.BaseType, @object, animationContext);
+				foreach (var property in type.GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public)) {
+					if (property.Name == "Item") {
 						// WTF, Bug in Mono?
 						continue;
 					}
-					if (PropertyRegistry.GetTangerineAttribute(type, prop.Name) == null)
+					if (PropertyRegistry.GetTangerineAttribute(type, property.Name) == null)
 						continue;
 					if (!categoryLabelAdded) {
 						categoryLabelAdded = true;
@@ -123,10 +123,10 @@ namespace Tangerine.UI.Inspector
 						Inspector.ContentWidget.AddNode(label);
 					}
 					PropertyEditorBuilder editorBuilder;
-					if (!Inspector.EditorMap.TryGetValue(prop.PropertyType, out editorBuilder)) {
+					if (!Inspector.EditorMap.TryGetValue(property.PropertyType, out editorBuilder)) {
 						continue;
 					}
-					var context = new PropertyEditorContext(Inspector.ContentWidget, node, animable, prop.Name, animationId);
+					var context = new PropertyEditorContext(Inspector.ContentWidget, @object, property.Name, animationContext);
 					var propertyEditor = editorBuilder(context);
 					Inspector.Editors.Add(propertyEditor);
 				}

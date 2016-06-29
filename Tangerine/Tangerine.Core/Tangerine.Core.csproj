@@ -68,6 +68,7 @@
     <Compile Include="AnimatorEditorState.cs" />
     <Compile Include="Uid.cs" />
     <Compile Include="Operation.cs" />
+    <Compile Include="IProcessor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

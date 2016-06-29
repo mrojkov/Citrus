@@ -19,12 +19,14 @@ namespace Tangerine.UI.Timeline.Operations
 
 		public void Do()
 		{
-			Timeline.Instance.CurrentColumn = Math.Max(0, currentColumn);
+			Timeline.Instance.CurrentColumn = currentColumn;
+			Timeline.Instance.EnsureColumnVisible(currentColumn);
 		}
 
 		public void Undo()
 		{
 			Timeline.Instance.CurrentColumn = previousColumn;
+			Timeline.Instance.EnsureColumnVisible(previousColumn);
 		}
 	}
 }

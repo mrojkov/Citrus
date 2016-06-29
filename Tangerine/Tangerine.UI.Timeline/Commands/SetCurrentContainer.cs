@@ -19,8 +19,10 @@ namespace Tangerine.UI.Timeline.Operations
 		{
 			var prevContainer = Timeline.Instance.Container;
 			Timeline.Instance.Container = container;
+			Timeline.Instance.EnsureColumnVisible(Document.Current.AnimationFrame);
 			AddUndoAction(() => {
 				Timeline.Instance.Container = prevContainer;
+				Timeline.Instance.EnsureColumnVisible(Document.Current.AnimationFrame);
 				prevContainer = null;
 			});
 			Execute(new ClearRowSelection());

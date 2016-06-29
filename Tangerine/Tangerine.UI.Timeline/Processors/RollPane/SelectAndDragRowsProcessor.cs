@@ -7,14 +7,14 @@ using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline
 {
-	public class SelectAndDragRowsTask
+	public class SelectAndDragRowsProcessor : IProcessor
 	{
 		int dragPosition;
 
 		Timeline timeline => Timeline.Instance;
 		RollPane roll => Timeline.Instance.Roll;
 
-		public IEnumerator<object> Main()
+		public IEnumerator<object> MainLoop()
 		{
 			var input = roll.RootWidget.Input;
 			while (true) {
@@ -26,6 +26,7 @@ namespace Tangerine.UI.Timeline
 				if (hitNode == null || !hitNode.DescendantOf(roll.RootWidget)) {
 					continue;
 				}
+				Timeline.Instance.RootWidget.SetFocus();
 				var initialMousePosition = input.MousePosition;
 				var row = MousePositionToRow(initialMousePosition);
 				if (input.IsKeyPressed(Key.ShiftLeft)) {

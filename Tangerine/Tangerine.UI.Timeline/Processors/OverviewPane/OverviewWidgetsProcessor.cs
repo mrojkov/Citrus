@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace Tangerine.UI.Timeline
 {
-	public class ProcessOverviewWidgetsTask
+	public class OverviewWidgetsProcessor : Core.IProcessor
 	{
 		Timeline timeline => Timeline.Instance;
 
-		public IEnumerator<object> Main()
+		public IEnumerator<object> MainLoop()
 		{
 			while (true) {
 				if (!AreWidgetsValid()) {

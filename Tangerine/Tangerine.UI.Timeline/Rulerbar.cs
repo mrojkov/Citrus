@@ -6,30 +6,35 @@ namespace Tangerine.UI.Timeline
 {
 	public class Rulerbar
 	{
-		public Widget Widget { get; private set; }
+		public Widget RootWidget { get; private set; }
 		
 		public Rulerbar()
 		{
-			Widget = new Widget { MinMaxHeight = Metrics.ToolbarHeight, Presenter = new DelegatePresenter<Widget>(Render) };
+			RootWidget = new Widget {
+				Id = nameof(Rulerbar),
+				MinMaxHeight = Metrics.ToolbarHeight,
+				HitTestTarget = true
+			};
+			RootWidget.CompoundPresenter.Add(new DelegatePresenter<Widget>(Render));
 		}
 		
 		void Render(Widget widget)
 		{
 			widget.PrepareRendererState();
-			Renderer.DrawVerticalGradientRect(Vector2.Zero, Widget.Size, Colors.Toolbar);
+			Renderer.DrawVerticalGradientRect(Vector2.Zero, RootWidget.Size, Colors.Toolbar);
 			Renderer.Transform1 *= Matrix32.Translation(-Timeline.Instance.ScrollOrigin.X, 0);
 			RenderCursor();
 			for (int i = 0; i < Timeline.Instance.ColumnCount; i++) {
 				var x = i * Metrics.TimelineColWidth + 0.5f;
 				if (i % 10 == 0) {
 					float textHeight = DesktopTheme.Metrics.TextHeight;
-					float y = (Widget.Height - textHeight) / 2;
+					float y = (RootWidget.Height - textHeight) / 2;
 					Renderer.DrawTextLine(
 						new Vector2(x, y), i.ToString(),
 						DesktopTheme.Metrics.TextHeight, 
 						DesktopTheme.Colors.BlackText.ABGR);
 				}
-				Renderer.DrawLine(x, Widget.Height - 1, x, Widget.Height - 4, Colors.Timeline.Ruler.Notchings);
+				Renderer.DrawLine(x, RootWidget.Height - 1, x, RootWidget.Height - 4, Colors.Timeline.Ruler.Notchings);
 			}
 			foreach (var m in Timeline.Instance.Container.Markers) {
 				RenderMarker(m);
@@ -68,7 +73,7 @@ namespace Tangerine.UI.Timeline
 		{
 			return new Rectangle {
 				A = new Vector2(frame * Metrics.TimelineColWidth + 0.5f, 0),
-				B = new Vector2((frame + 1) * Metrics.TimelineColWidth + 0.5f, Widget.Height)
+				B = new Vector2((frame + 1) * Metrics.TimelineColWidth + 0.5f, RootWidget.Height)
 			};
 		}
 	}

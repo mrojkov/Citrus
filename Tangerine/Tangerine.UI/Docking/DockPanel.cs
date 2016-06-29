@@ -21,6 +21,7 @@ namespace Tangerine.UI
 		{
 			Title = title;
 			TitleWidget = new Widget {
+				Id = $"DockPanel<{title}>",
 				Layout = new HBoxLayout(),
 				Nodes = {
 					new SimpleText { Text = Title, Padding = new Thickness(4, 0), AutoSizeConstraints = false, MinMaxHeight = 20 },

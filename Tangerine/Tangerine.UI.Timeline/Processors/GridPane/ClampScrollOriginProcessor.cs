@@ -6,11 +6,11 @@ using System.Collections.Generic;
 
 namespace Tangerine.UI.Timeline
 {
-	class ClampScrollOriginTask
+	class ClampScrollOriginProcessor : IProcessor
 	{
 		Timeline timeline => Timeline.Instance;
 
-		public IEnumerator<object> Main()
+		public IEnumerator<object> MainLoop()
 		{
 			var doc = Document.Current;
 			while (true) {
