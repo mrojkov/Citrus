@@ -99,13 +99,17 @@ namespace Lime
 			}
 			if (Focused != null) {
 				Focused.Input.Release(capturedKeys);
-				Focused?.Focusable?.RaiseFocusLost();
+				if (Focused != null && Focused.Focusable != null) {
+					Focused.Focusable.RaiseFocusLost();
+				}
 			}
 			if (value != null) {
 				capturedKeys = GetKeysToCapture(value);
 				value.Input.Capture(capturedKeys);
 				Application.SoftKeyboard.Show(true, value.Text);
-				Focused?.Focusable?.RaiseFocusGained();
+				if (Focused != null && Focused.Focusable != null) {
+					Focused.Focusable.RaiseFocusGained();
+				}
 			} else {
 				Application.SoftKeyboard.Show(false, "");
 			}
