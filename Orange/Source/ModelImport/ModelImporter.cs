@@ -148,9 +148,6 @@ namespace Orange
 		private Dictionary<string, Assimp.Camera> aiCameras = new Dictionary<string, Assimp.Camera>();
 		private Dictionary<string, Pivot> pivots = new Dictionary<string, Pivot>();
 
-		private KeyframeReducer keyframeReducer =
-			new KeyframeReducer(new CommonInterpolationDetectorProvider(1e-8f));
-
 		public Node3D RootNode { get; private set; }
 
 		public ModelImporter(string path, TargetPlatform platform)
@@ -499,11 +496,13 @@ namespace Orange
 					translationKeys.Add(new Keyframe<Vector3>(TimeToFrame(time, aiAnimation.TicksPerSecond), finalTranslation));
 				}
 				(n.Animators["Scale", animationId] as Animator<Vector3>).Keys.AddRange(
-					keyframeReducer.Reduce(scaleKeys));
+					Vector3KeyReducer.Default.Reduce(scaleKeys));
+
 				(n.Animators["Rotation", animationId] as Animator<Quaternion>).Keys.AddRange(
-					keyframeReducer.Reduce(rotationKeys));
+					QuaternionKeyReducer.Default.Reduce(rotationKeys));
+
 				(n.Animators["Position", animationId] as Animator<Vector3>).Keys.AddRange(
-					keyframeReducer.Reduce(translationKeys));
+					Vector3KeyReducer.Default.Reduce(translationKeys));
 			}
 			RootNode.Animations.Add(new Animation {
 				Id = animationId

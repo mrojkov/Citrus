@@ -1,27 +1,26 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using Lime;
 
 namespace Orange
 {
-	internal class KeyframeReducer
+	public abstract class KeyReducer<T>
 	{
-		private IInterpolationDetectorProvider detectorProvider;
+		private float tolerance;
 
-		public KeyframeReducer(IInterpolationDetectorProvider detectorProvider)
+		protected KeyReducer(float tolerance)
 		{
-			this.detectorProvider = detectorProvider;
+			this.tolerance = tolerance;
 		}
 
-		public IList<Keyframe<T>> Reduce<T>(IList<Keyframe<T>> keys)
+		public IList<Keyframe<T>> Reduce(IList<Keyframe<T>> keys)
 		{
 			keys = RemoveOverlappedKeys(keys);
-			keys = CleanupInterpolations(keys);
+			keys = CleanLerps(keys);
 			return keys;
 		}
 
-		private IList<Keyframe<T>> RemoveOverlappedKeys<T>(IList<Keyframe<T>> keys)
+		private IList<Keyframe<T>> RemoveOverlappedKeys(IList<Keyframe<T>> keys)
 		{
 			var outputKeys = new List<Keyframe<T>>();
 			foreach (var k in keys) {
@@ -35,130 +34,65 @@ namespace Orange
 			return outputKeys;
 		}
 
-		private IList<Keyframe<T>> CleanupInterpolations<T>(IList<Keyframe<T>> keys)
+		private IList<Keyframe<T>> CleanLerps(IList<Keyframe<T>> keys)
 		{
 			if (keys.Count <= 2) {
 				return keys;
 			}
 			var outputKeys = new List<Keyframe<T>>();
-			var detector = detectorProvider.GetDetector<T>();
+			var totalError = 0f;
 			outputKeys.Add(keys[0]);
-			for (var i = 2; i < keys.Count; i++) {
-				var k1 = keys[i - 2];
-				var k2 = keys[i - 1];
-				var k3 = keys[i];
-				if (!detector.Detect(k1, k2, k3)) {
+			for (int i = 1; i < keys.Count - 1; i++) {
+				var k1 = keys[i - 1];
+				var k2 = keys[i];
+				var k3 = keys[i + 1];
+				var t = (float)(k2.Frame - k1.Frame) / (k3.Frame - k1.Frame);
+				var error = GetError(k2.Value, Lerp(t, k1.Value, k3.Value));
+				totalError += error;
+				if (totalError > tolerance) {
+					totalError = 0f;
 					outputKeys.Add(k2);
 				}
 			}
 			outputKeys.Add(keys[keys.Count - 1]);
 			return outputKeys;
 		}
+
+		protected abstract T Lerp(float t, T a, T b);
+		protected abstract float GetError(T a, T b);
 	}
 
-
-	internal interface IInterpolationDetectorProvider
+	public class Vector3KeyReducer : KeyReducer<Vector3>
 	{
-		InterpolationDetector<T> GetDetector<T>();
-	}
+		public static readonly Vector3KeyReducer Default = new Vector3KeyReducer(1e-3f);
 
-	internal class CommonInterpolationDetectorProvider : IInterpolationDetectorProvider
-	{
-		private Dictionary<Type, object> detectors = new Dictionary<Type, object>();
+		public Vector3KeyReducer(float tolerance) : base(tolerance) { }
 
-		public CommonInterpolationDetectorProvider(float tolerance)
-		{
-			detectors[typeof(Vector3)] = new Vector3InterpolationDetector(new Vector3Comparer(tolerance));
-			detectors[typeof(Quaternion)] = new QuaternionInterpolationDetector(new QuaternionComparer(tolerance));
-		}
-
-		public InterpolationDetector<T> GetDetector<T>()
-		{
-			object detector;
-			if (!detectors.TryGetValue(typeof(T), out detector)) {
-				throw new NotSupportedException();
-			}
-			return (InterpolationDetector<T>)detector;
-		}
-	}
-
-	internal abstract class InterpolationDetector<T>
-	{
-		public IEqualityComparer<T> Comparer { get; private set; }
-
-		public InterpolationDetector(IEqualityComparer<T> comparer)
-		{
-			Comparer = comparer;
-		}
-
-		public bool Detect(Keyframe<T> k1, Keyframe<T> k2, Keyframe<T> k3)
-		{
-			var t2 = (float)(k2.Frame - k1.Frame) / (k3.Frame - k1.Frame);
-			return Comparer.Equals(k2.Value, Interpolate(t2, k1.Value, k3.Value));
-		}
-
-		public abstract T Interpolate(float t, T a, T b);
-	}
-
-	internal class Vector3InterpolationDetector : InterpolationDetector<Vector3>
-	{
-		public Vector3InterpolationDetector(IEqualityComparer<Vector3> comparer) : base(comparer) { }
-
-		public override Vector3 Interpolate(float t, Vector3 a, Vector3 b)
+		protected override Vector3 Lerp(float t, Vector3 a, Vector3 b)
 		{
 			return Vector3.Lerp(t, a, b);
 		}
+
+		protected override float GetError(Vector3 a, Vector3 b)
+		{
+			return (a - b).Length;
+		}
 	}
 
-	internal class QuaternionInterpolationDetector : InterpolationDetector<Quaternion>
+	public class QuaternionKeyReducer : KeyReducer<Quaternion>
 	{
-		public QuaternionInterpolationDetector(IEqualityComparer<Quaternion> comparer) : base(comparer) { }
+		public static readonly QuaternionKeyReducer Default = new QuaternionKeyReducer(3.8077177e-9f);
 
-		public override Quaternion Interpolate(float t, Quaternion a, Quaternion b)
+		public QuaternionKeyReducer(float tolerance) : base(tolerance) { }
+
+		protected override Quaternion Lerp(float t, Quaternion a, Quaternion b)
 		{
 			return Quaternion.Slerp(a, b, t);
 		}
-	}
 
-	internal class Vector3Comparer : EqualityComparer<Vector3>
-	{
-		private float tolerance;
-
-		public Vector3Comparer(float tolerance)
+		protected override float GetError(Quaternion a, Quaternion b)
 		{
-			this.tolerance = tolerance;
-		}
-
-		public override bool Equals(Vector3 a, Vector3 b)
-		{
-			return (b - a).SqrLength < tolerance;
-		}
-
-		public override int GetHashCode(Vector3 obj)
-		{
-			throw new NotSupportedException();
-		}
-	}
-
-	internal class QuaternionComparer : EqualityComparer<Quaternion>
-	{
-		private float tolerance;
-
-		public QuaternionComparer(float tolerance)
-		{
-			this.tolerance = tolerance;
-		}
-
-		public override bool Equals(Quaternion a, Quaternion b)
-		{
-			a = Quaternion.Normalize(a);
-			b = Quaternion.Normalize(b);
-			return 1 - Mathf.Abs(Quaternion.Dot(a, b)) < tolerance;
-		}
-
-		public override int GetHashCode(Quaternion obj)
-		{
-			throw new NotSupportedException();
+			return Mathf.Abs(1f - Quaternion.Dot(a, b) / (a.Length() * b.Length()));
 		}
 	}
 }
