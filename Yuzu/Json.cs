@@ -122,6 +122,15 @@ namespace Yuzu
 			writer.Write('"');
 		}
 
+		private void WriteNullableEscapedString(object obj)
+		{
+			if (obj == null) {
+				WriteStr("null");
+				return;
+			}
+			WriteEscapedString(obj);
+		}
+
 		private void WriteBool(object obj)
 		{
 			WriteStr((bool)obj ? "true" : "false");
@@ -240,7 +249,7 @@ namespace Yuzu
 			if (t == typeof(float))
 				return WriteSingle;
 			if (t == typeof(string))
-				return WriteEscapedString;
+				return WriteNullableEscapedString;
 			if (t == typeof(bool))
 				return WriteBool;
 			if (t == typeof(DateTime))
@@ -446,7 +455,7 @@ namespace Yuzu
 		protected string RequireString()
 		{
 			sb.Clear();
-			Require('"');
+			if (RequireOrNull('"')) return null;
 			while (true) {
 				// Optimization: buf is guaranteed to be empty after Require, so no need to call Next.
 				var ch = Reader.ReadChar();

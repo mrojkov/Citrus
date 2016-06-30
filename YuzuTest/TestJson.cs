@@ -629,6 +629,19 @@ namespace YuzuTest
 		}
 
 		[TestMethod]
+		public void TestNullField()
+		{
+			var js = new JsonSerializer();
+			var sample = new SampleWithNullField();
+			var s = js.ToString(sample);
+			Assert.AreEqual("{\n\t\"About\":null\n}", s);
+			var jd = new JsonDeserializer();
+			var w = new SampleWithNullField { About = "zzz" };
+			jd.FromString(w, s);
+			Assert.AreEqual(sample.About, w.About);
+		}
+
+		[TestMethod]
 		public void TestErrors()
 		{
 			var js = new JsonSerializer();

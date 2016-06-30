@@ -195,6 +195,12 @@ namespace YuzuTest
 		public TimeSpan T;
 	}
 
+	public class SampleWithNullField
+	{
+		[YuzuRequired]
+		public string About = null;
+	}
+
 	public class Bad1
 	{
 		[YuzuRequired]
