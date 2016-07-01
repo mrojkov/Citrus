@@ -1,4 +1,4 @@
-﻿#if WIN
+﻿ #if WIN
 using System;
 using System.Diagnostics;
 using System.Windows.Forms;
@@ -132,7 +132,9 @@ namespace Lime
 			set
 			{
 				cursor = value;
-				form.Cursor = value.NativeCursor;
+				if (form.Cursor != value.NativeCursor) {
+					form.Cursor = value.NativeCursor;
+				}
 			}
 		}
 
@@ -208,7 +210,11 @@ namespace Lime
 			using (var graphics = form.CreateGraphics()) {
 				PixelScale = CalcPixelScale(graphics.DpiX);
 			}
-			borderStyle = options.FixedSize ? FormBorderStyle.FixedSingle : FormBorderStyle.Sizable;
+			if (options.Style == WindowStyle.Borderless) {
+				borderStyle = FormBorderStyle.None;
+			} else {
+				borderStyle = options.FixedSize ? FormBorderStyle.FixedSingle : FormBorderStyle.Sizable;
+			}
 			form.FormBorderStyle = borderStyle;
 			form.MaximizeBox = !options.FixedSize;
 			if (Application.RenderingBackend == RenderingBackend.ES20) {

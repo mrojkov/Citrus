@@ -58,7 +58,11 @@ namespace Tangerine.UI
 				var p = panel.Placement;
 				p.Docked = false;
 				p.UndockedSize = panel.ContentWidget.Size;
+#if MAC
 				p.UndockedPosition = position - new Vector2(0, p.UndockedSize.Y);
+#else
+				p.UndockedPosition = position;
+#endif
 				Refresh();
 			};
 			panel.CloseButton.Clicked += () => {
@@ -67,7 +71,7 @@ namespace Tangerine.UI
 			};
 			Refresh();
 		}
-		
+
 		void ShowPanel(DockPanel panel)
 		{
 			panel.Placement.Hidden = false;
@@ -116,9 +120,11 @@ namespace Tangerine.UI
 					if (p.WindowWidget == null) {
 						var window = new Window(new WindowOptions { RefreshRate = 30, Title = p.Title, FixedSize = false });
 						window.Closing += () => {
-							p.Placement.Hidden = true;
+							if (!p.Placement.Docked) {
+								p.Placement.Hidden = true;
+							}
 							Refresh();
-							return false;
+							return true;
 						};
 						window.ClientSize = p.Placement.UndockedSize;
 						window.ClientPosition = p.Placement.UndockedPosition;
@@ -144,8 +150,14 @@ namespace Tangerine.UI
 		{
 			if (panel.WindowWidget != null) {
 				panel.RootWidget.Unlink();
-				panel.WindowWidget.Window.Close();
+				var window = panel.WindowWidget.Window;
 				panel.WindowWidget = null;
+				Lime.UpdateHandler closeWindowOnNextFrame = null;
+				closeWindowOnNextFrame = delta => {
+					window.Close();
+					mainWidget.Updating -= closeWindowOnNextFrame;
+				};
+				mainWidget.Updating += closeWindowOnNextFrame;
 			}
 		}
 

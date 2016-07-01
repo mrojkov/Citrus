@@ -22,13 +22,13 @@ namespace Tangerine.Core.Operations
 
 		public void Do()
 		{
-			savedValue = property.GetValue(obj);
-			property.SetValue(obj, value);
+			savedValue = property.GetValue(obj, null);
+			property.SetValue(obj, value, null);
 		}
 
 		public void Undo()
 		{
-			property.SetValue(obj, savedValue);
+			property.SetValue(obj, savedValue, null);
 			savedValue = null;
 		}
 	}

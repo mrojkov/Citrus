@@ -153,6 +153,15 @@ namespace Lime
 		{
 			get { return new Vector2((float)AppKit.NSEvent.CurrentMouseLocation.X, (float)AppKit.NSEvent.CurrentMouseLocation.Y); }
 		}
+#elif WIN
+		public static Vector2 DesktopMousePosition
+		{
+			get
+			{
+				var p = Cursor.Position;
+				return new Vector2(p.X, p.Y);
+			}
+		}
 #endif
 
 		// Specifies the lowest possible 1/(time delta) passed to Window.Updating.
@@ -186,7 +195,7 @@ namespace Lime
 
 		public static Menu MainMenu
 		{
-			get { return mainMenu; }	
+			get { return mainMenu; }
 			set
 			{
 				if (mainMenu != value) {

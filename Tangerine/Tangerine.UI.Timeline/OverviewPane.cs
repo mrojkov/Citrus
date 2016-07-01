@@ -50,7 +50,7 @@ namespace Tangerine.UI.Timeline
 
 		public Vector2 CalculateZoom()
 		{
-			Vector2 scale = RootWidget.Size / ContentWidget.Size;
+			Vector2 scale = RootWidget.Size / Vector2.Max(Vector2.One, ContentWidget.Size);
 			return scale;
 		}
 	}
