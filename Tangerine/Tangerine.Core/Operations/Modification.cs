@@ -68,7 +68,7 @@ namespace Tangerine.Core.Operations
 			var animable = @object as IAnimable;
 			if (animable != null && animable.Animators.TryFind(propertyName, out animator, Document.Current.AnimationId)) {
 				var propertyType = animable.GetType().GetProperty(propertyName).PropertyType;
-				var keyframe = (IKeyframe)typeof(Keyframe<>).MakeGenericType(propertyType);
+				var keyframe = (IKeyframe)typeof(Keyframe<>).MakeGenericType(propertyType).GetConstructor(new Type[0]).Invoke(new object[0]);
 				keyframe.Frame = Document.Current.AnimationFrame;
 				keyframe.Value = value;
 				Add(new SetKeyframe(animable, propertyName, keyframe));

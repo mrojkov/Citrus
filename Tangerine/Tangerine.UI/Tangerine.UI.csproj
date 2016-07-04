@@ -57,7 +57,7 @@
     <Folder Include="Resources\" />
     <Folder Include="Utils\" />
     <Folder Include="Docking\" />
-    <Folder Include="Commands\" />
+    <Folder Include="Binding\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -73,6 +73,8 @@
     <Compile Include="Utils\BitmapButton.cs" />
     <Compile Include="Docking\DockPanel.cs" />
     <Compile Include="KeyBindings.cs" />
+    <Compile Include="Binding\EditBoxBinding.cs" />
+    <Compile Include="Binding\AnimablePropertyBinding.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

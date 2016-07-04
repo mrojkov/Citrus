@@ -54,7 +54,7 @@ namespace Tangerine.UI.Inspector
 
 		void CreateTasks()
 		{
-			Tasks.Add(new UpdatePropertyGridTask().Main());
+			Tasks.Add(new UpdatePropertyGridProcessor());
 		}
 
 		void Update(float delta)
@@ -63,11 +63,11 @@ namespace Tangerine.UI.Inspector
 			Document.Current.History.Commit();
 		}
 
-		class UpdatePropertyGridTask
+		class UpdatePropertyGridProcessor : IProcessor
 		{
 			Inspector Inspector => Instance;
 
-			public IEnumerator<object> Main()
+			public IEnumerator<object> MainLoop()
 			{
 				var objects = Inspector.Objects;
 				while (true) {
