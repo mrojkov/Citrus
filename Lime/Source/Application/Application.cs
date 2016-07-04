@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
-using System.Windows.Forms;
 
 #if iOS
 using UIKit;
@@ -12,6 +11,8 @@ using AppKit;
 using MonoMac.AppKit;
 #elif ANDROID
 using Android.App;
+#elif WIN
+using System.Windows.Forms;
 #endif
 
 namespace Lime
