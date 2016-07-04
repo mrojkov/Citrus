@@ -250,6 +250,7 @@ namespace Lime
 #region Miscellaneous
 		public static readonly Key Undo = New();
 		public static readonly Key Redo = New();
+		public static readonly Key SelectAll = New();
 #endregion
 	}
 }
