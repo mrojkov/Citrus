@@ -96,8 +96,9 @@ namespace Lime
 					if (caretParams.FollowTextColor) {
 						p.Color = container.Color;
 					}
-				} else {
+				} else if (p.Visible) {
 					p.Visible = false;
+					Window.Current.Invalidate();
 				}
 				wasVisible = caretPos.IsVisible;
 				yield return null;
