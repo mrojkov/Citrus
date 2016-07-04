@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ProtoBuf;
@@ -209,6 +210,63 @@ namespace YuzuTest
 		public string About = null;
 	}
 
+	[YuzuCompact]
+	[ProtoContract]
+	public class Color
+	{
+		[YuzuRequired]
+		[ProtoMember(1)]
+		public byte R;
+
+		[YuzuRequired]
+		[ProtoMember(2)]
+		public byte G;
+
+		[YuzuRequired]
+		[ProtoMember(3)]
+		public byte B;
+	}
+
+	[ProtoContract]
+	public class SamplePerson
+	{
+		public static int Counter = 0;
+
+		[YuzuRequired("1")]
+		[ProtoMember(1)]
+		public string Name;
+
+		[YuzuRequired("2")]
+		[ProtoMember(2)]
+		public DateTime Birth;
+
+		[YuzuRequired("3")]
+		[ProtoMember(3)]
+		public List<SamplePerson> Children;
+
+		[YuzuRequired("4")]
+		[ProtoMember(4)]
+		public Color EyeColor;
+
+		public SamplePerson() { }
+
+		public SamplePerson(Random rnd, int depth)
+		{
+			Counter++;
+			StringBuilder sb = new StringBuilder();
+			var len = rnd.Next(1, 40);
+			for (int i = 0; i < len; ++i)
+				sb.Append((char)rnd.Next((int)'a', (int)'z' + 1));
+			Name = sb.ToString();
+			Birth = new DateTime(1999, rnd.Next(10) + 1, 13);
+			var childCount = rnd.Next(28 / depth);
+			Children = new List<SamplePerson>();
+			for (int i = 0; i < childCount; ++i)
+				Children.Add(new SamplePerson(rnd, depth + 1));
+			EyeColor = new Color { R = (byte)rnd.Next(256), G = (byte)rnd.Next(256), B = (byte)rnd.Next(256) };
+		}
+	}
+
 	public class Bad1
 	{
 		[YuzuRequired]
@@ -229,6 +287,19 @@ namespace YuzuTest
 		[YuzuRequired("q")]
 		public int G;
 	};
+
+	public class SampleSelfDelegate
+	{
+		[YuzuRequired]
+		public int x;
+		[YuzuRequired]
+		public event Action<int> OnSomething;
+
+		[YuzuDelegate]
+		public void Handler1(int v) { x += v; }
+		[YuzuDelegate]
+		public void Handler2(int v) { x *= v; }
+	}
 
 	public static class XAssert
 	{
