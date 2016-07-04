@@ -140,7 +140,7 @@ namespace Lime
 		/// </summary>
 		public static WaitPredicate WaitWhile(Func<bool> predicate)
 		{
-			return new BooleanWaitPredicate() { Predicate = predicate };
+			return new BooleanWaitPredicate { Predicate = predicate };
 		}
 
 		/// <summary>
@@ -149,7 +149,7 @@ namespace Lime
 		/// </summary>
 		public static WaitPredicate WaitWhile(Func<float, bool> timePredicate)
 		{
-			return new TimeWaitPredicate() { Predicate = timePredicate };
+			return new TimeWaitPredicate { Predicate = timePredicate };
 		}
 
 		/// <summary>
@@ -157,7 +157,15 @@ namespace Lime
 		/// </summary>
 		public static WaitPredicate WaitForAnimation(Node node)
 		{
-			return new AnimationWaitPredicate() { Node = node };
+			return new AnimationWaitPredicate { Node = node };
+		}
+
+		/// <summary>
+		/// Proceeds while there is no keystroke on the current window.
+		/// </summary>
+		public static WaitPredicate WaitForInput()
+		{
+			return new InputWaitPredicate();
 		}
 
 		/// <summary>

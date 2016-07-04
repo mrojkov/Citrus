@@ -38,6 +38,7 @@ namespace Lime
 		public const int MaxTouches = 4;
 		public float KeyRepeatDelay = 0.2f;
 		public float KeyRepeatInterval = 0.03f;
+		public bool Changed { get; private set; }
 
 		private struct KeyEvent
 		{
@@ -210,7 +211,16 @@ namespace Lime
 			return j;
 		}
 
-		public string TextInput { get; internal set; }
+		private string textInput;
+		public string TextInput
+		{ 
+			get { return textInput; }
+			internal set
+			{
+				Changed |= value != null;
+				textInput = value;
+			}
+		}
 
 		public bool IsKeyEnabled(Key key)
 		{
@@ -269,6 +279,7 @@ namespace Lime
 
 		internal void ProcessPendingKeyEvents(float delta)
 		{
+			Changed = false;
 			for (int i = 0; i < Key.Count; i++) {
 				var key = keys[i];
 				key.Repeated = false;
@@ -276,6 +287,7 @@ namespace Lime
 					if ((key.RepeatDelay -= delta) < 0) {
 						key.RepeatDelay = KeyRepeatInterval;
 						key.Repeated = true;
+						Changed = true;
 					}
 				}
 				keys[i] = key;
@@ -294,6 +306,7 @@ namespace Lime
 						keys[k].RepeatDelay = KeyRepeatDelay;
 						keys[k].Repeated |= evt.State;
 						keyEventQueue.RemoveAt(i);
+						Changed = true;
 						i--;
 					}
 				}

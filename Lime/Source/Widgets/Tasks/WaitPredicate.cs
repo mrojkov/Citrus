@@ -12,23 +12,25 @@ namespace Lime
 	{
 		public Node Node;
 
-		public override bool Evaluate()
-		{ return Node.IsRunning; }
+		public override bool Evaluate() { return Node.IsRunning; }
+	}
+
+	public class InputWaitPredicate : WaitPredicate
+	{
+		public override bool Evaluate() { return !Window.Current.Input.Changed; }
 	}
 
 	public class BooleanWaitPredicate : WaitPredicate
 	{
 		public Func<bool> Predicate;
 
-		public override bool Evaluate()
-		{ return Predicate(); }
+		public override bool Evaluate() { return Predicate(); }
 	}
 
 	public class TimeWaitPredicate : WaitPredicate
 	{
 		public Func<float, bool> Predicate;
 
-		public override bool Evaluate()
-		{ return Predicate(TotalTime); }
+		public override bool Evaluate() { return Predicate(TotalTime); }
 	}
 }
