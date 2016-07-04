@@ -99,6 +99,12 @@ namespace Yuzu
 			else if (t == typeof(uint)) {
 				PutPart("RequireUInt();\n");
 			}
+			else if (t == typeof(long)) {
+				PutPart("RequireLong();\n");
+			}
+			else if (t == typeof(ulong)) {
+				PutPart("RequireULong();\n");
+			}
 			else if (t == typeof(sbyte)) {
 				PutPart("(sbyte)RequireInt();\n");
 			}

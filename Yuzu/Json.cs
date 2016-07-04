@@ -27,6 +27,9 @@ namespace Yuzu
 
 		public string DateFormat = "O";
 		public string TimeSpanFormat = "c";
+
+		private bool int64AsString = false;
+		public bool Int64AsString { get { return int64AsString; } set { int64AsString = value; generation++; } }
 	};
 
 	internal static class JsonEscapeData
@@ -244,6 +247,12 @@ namespace Yuzu
 		{
 			if (t == typeof(int) || t == typeof(uint) || t == typeof(byte) || t == typeof(sbyte))
 				return WriteInt;
+			if (t == typeof(long) || t == typeof(ulong)) {
+				if (JsonOptions.Int64AsString)
+					return WriteUnescapedString;
+				else
+					return WriteInt;
+			}
 			if (t == typeof(double))
 				return WriteDouble;
 			if (t == typeof(float))
@@ -500,6 +509,8 @@ namespace Yuzu
 			throw Error("Expected 'true' or 'false', but found: {0}", ch);
 		}
 
+		// Some code duplication within integer parsers to speed up hot path.
+
 		protected uint RequireUInt()
 		{
 			var ch = SkipSpaces();
@@ -526,6 +537,55 @@ namespace Yuzu
 				ch = Reader.ReadChar();
 			}
 			PutBack(ch);
+			return sign * result;
+		}
+
+		protected ulong RequireULong()
+		{
+			var ch = SkipSpaces();
+			if (JsonOptions.Int64AsString) {
+				if (ch != '"')
+					throw Error("Expected '\"' but found '{0}'", ch);
+				ch = Reader.ReadChar();
+			}
+			ulong result = 0;
+			while ('0' <= ch && ch <= '9') {
+				checked { result = result * 10 + (ulong)ch - (ulong)'0'; }
+				ch = Reader.ReadChar();
+			}
+			if (JsonOptions.Int64AsString) {
+				if (ch != '"')
+					throw Error("Expected '\"' but found '{0}'", ch);
+			}
+			else
+				PutBack(ch);
+			return result;
+		}
+
+		protected long RequireLong()
+		{
+			var ch = SkipSpaces();
+			if (JsonOptions.Int64AsString) {
+				if (ch != '"')
+					throw Error("Expected '\"' but found '{0}'", ch);
+				ch = Reader.ReadChar();
+			}
+			int sign = 1;
+			if (ch == '-') {
+				sign = -1;
+				ch = Reader.ReadChar();
+			}
+			long result = 0;
+			while ('0' <= ch && ch <= '9') {
+				checked { result = result * 10 + (long)ch - (long)'0'; }
+				ch = Reader.ReadChar();
+			}
+			if (JsonOptions.Int64AsString) {
+				if (ch != '"')
+					throw Error("Expected '\"' but found '{0}'", ch);
+			}
+			else
+				PutBack(ch);
 			return sign * result;
 		}
 
@@ -725,6 +785,8 @@ namespace Yuzu
 		// Optimization: Avoid creating trivial closures.
 		private object RequireIntObj() { return RequireInt(); }
 		private object RequireUIntObj() { return RequireUInt(); }
+		private object RequireLongObj() { return RequireLong(); }
+		private object RequireULongObj() { return RequireULong(); }
 		private object RequireSByteObj() { return (sbyte)RequireInt(); }
 		private object RequireByteObj() { return (byte)RequireInt(); }
 		private object RequireStringObj() { return RequireString(); }
@@ -740,6 +802,10 @@ namespace Yuzu
 				return RequireIntObj;
 			if (t == typeof(uint))
 				return RequireUIntObj;
+			if (t == typeof(long))
+				return RequireLongObj;
+			if (t == typeof(ulong))
+				return RequireULongObj;
 			if (t == typeof(sbyte))
 				return RequireSByteObj;
 			if (t == typeof(byte))

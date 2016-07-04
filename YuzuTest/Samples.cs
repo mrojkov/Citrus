@@ -76,6 +76,14 @@ namespace YuzuTest
 		public SampleEnum E;
 	}
 
+	public class SampleLong
+	{
+		[YuzuRequired]
+		public long S;
+		[YuzuRequired]
+		public ulong U;
+	}
+
 	public class SampleBool
 	{
 		[YuzuRequired]

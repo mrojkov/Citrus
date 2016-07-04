@@ -57,6 +57,32 @@ namespace YuzuTest
 		}
 
 		[TestMethod]
+		public void TestLong()
+		{
+			var js = new JsonSerializer();
+			var v1 = new SampleLong { S = -1L << 33, U = 1UL << 33 };
+
+			js.JsonOptions.Indent = "";
+			var result = js.ToString(v1);
+			Assert.AreEqual("{\n\"S\":-8589934592,\n\"U\":8589934592\n}", result);
+
+			var v2 = new SampleLong();
+			var jd = new JsonDeserializer();
+			jd.FromString(v2, result);
+			Assert.AreEqual(v1.S, v2.S);
+			Assert.AreEqual(v1.U, v2.U);
+
+			js.JsonOptions.Int64AsString = true;
+			var result1 = js.ToString(v1);
+			Assert.AreEqual("{\n\"S\":\"-8589934592\",\n\"U\":\"8589934592\"\n}", result1);
+			var jd1 = new JsonDeserializer();
+			jd1.JsonOptions.Int64AsString = true;
+			jd1.FromString(v2, result1);
+			Assert.AreEqual(v1.S, v2.S);
+			Assert.AreEqual(v1.U, v2.U);
+		}
+
+		[TestMethod]
 		public void TestNested()
 		{
 			var js = new JsonSerializer();
