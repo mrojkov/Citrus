@@ -81,7 +81,7 @@ namespace Tangerine.UI.Timeline
 		void CreateTasks()
 		{
 			var tasks = RootWidget.LateTasks; // Use LateTasks in order to process splitters first
-			tasks.AddRange(new IProcessor[] {
+			tasks.Add(new IProcessor[] {
 				new BuildRowsProcessor(),
 				new ColumnCountProcessor(),
 				new BuildRowViewsProcessor(),

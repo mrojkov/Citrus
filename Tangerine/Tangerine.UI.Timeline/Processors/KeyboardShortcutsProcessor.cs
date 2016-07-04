@@ -14,22 +14,28 @@ namespace Tangerine.UI.Timeline
 		{
 			while (true) {
 				var input = timeline.RootWidget.Input;
-				HandleGlobalShortcuts(input);
+				HandleShortcuts(input);
 				HorizontalScroll(input);
 				VerticalScroll(input);
 				HandleEnterExit(input);
-				yield return null;
+				yield return Task.WaitForInput();
 			}
 		}
 
-		void HandleGlobalShortcuts(WidgetInput input)
+		void HandleShortcuts(WidgetInput input)
 		{
 			input.EnableKey(Key.Undo, Document.Current.History.UndoEnabled);
 			input.EnableKey(Key.Redo, Document.Current.History.RedoEnabled);
+			input.EnableKey(Key.SelectAll, Document.Current.SelectedObjects.Count() > 0);
 			if (input.WasKeyRepeated(Key.Redo)) {
 				Document.Current.History.Redo();
 			} else if (input.WasKeyRepeated(Key.Undo)) {
 				Document.Current.History.Undo();
+			} else if (input.WasKeyRepeated(Key.SelectAll)) {
+				foreach (var row in timeline.Rows) {
+					Document.Current.History.Add(new Operations.SelectRow(row, true));
+					Document.Current.History.Commit();
+				}
 			}
 		}
 

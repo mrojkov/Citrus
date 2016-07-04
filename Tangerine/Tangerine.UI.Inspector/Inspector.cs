@@ -75,7 +75,7 @@ namespace Tangerine.UI.Inspector
 					if (!objects.SequenceEqual(selectedObjects)) {
 						objects.Clear();
 						objects.AddRange(selectedObjects);
-						RebuildContent((IAnimationContext)Document.Current);
+						RebuildContent((IAnimationContext)Document.Current, selectedObjects);
 					}
 					foreach (var i in Inspector.Editors) {
 						i.Update(Task.Current.Delta);
@@ -84,27 +84,37 @@ namespace Tangerine.UI.Inspector
 				}
 			}
 
-			void RebuildContent(IAnimationContext animationContext)
+			IEnumerable<Type> GetTypes(IEnumerable<object> objects)
+			{
+				var types = new List<Type>();
+				foreach (var o in objects) {
+					var inheritanceList = new List<Type>();
+					for (var t = o.GetType(); t != typeof(object); t = t.BaseType) {
+						inheritanceList.Add(t);
+					}
+					inheritanceList.Reverse();
+					foreach (var t in inheritanceList) {
+						if (!types.Contains(t)) {
+							types.Add(t);
+						}
+					}
+				}
+				return types;
+			}
+
+			void RebuildContent(IAnimationContext animationContext, IEnumerable<object> objects)
 			{
 				Inspector.ContentWidget.Nodes.Clear();
-				foreach (var o in Inspector.Objects) {
-					PopulateContent(o, animationContext);
-				}
-			}
-
-			void PopulateContent(object @object, IAnimationContext animationContext)
-			{
 				Inspector.Editors.Clear();
-				PopulateContentForType(@object.GetType(), @object, animationContext);
+				foreach (var t in GetTypes(objects)) {
+					var o = objects.Where(i => t.IsInstanceOfType(i)).ToList();
+					PopulateContentForType(animationContext, t, o);
+				}
 			}
 
-			void PopulateContentForType(Type type, object @object, IAnimationContext animationContext)
+			void PopulateContentForType(IAnimationContext animationContext, Type type, List<object> objects)
 			{
-				if (type == typeof(object)) {
-					return;
-				}
 				var categoryLabelAdded = false;
-				PopulateContentForType(type.BaseType, @object, animationContext);
 				foreach (var property in type.GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public)) {
 					if (property.Name == "Item") {
 						// WTF, Bug in Mono?
@@ -126,7 +136,7 @@ namespace Tangerine.UI.Inspector
 					if (!Inspector.EditorMap.TryGetValue(property.PropertyType, out editorBuilder)) {
 						continue;
 					}
-					var context = new PropertyEditorContext(Inspector.ContentWidget, @object, property.Name, animationContext);
+					var context = new PropertyEditorContext(Inspector.ContentWidget, objects, type, property.Name, animationContext);
 					var propertyEditor = editorBuilder(context);
 					Inspector.Editors.Add(propertyEditor);
 				}

@@ -11,7 +11,7 @@ namespace Tangerine.Core
 
 	public static class TaskListExtension
 	{
-		public static void AddRange(this TaskList taskList, IEnumerable<IProcessor> collection)
+		public static void Add(this TaskList taskList, params IProcessor[] collection)
 		{
 			foreach (var i in collection) {
 				taskList.Add(i.MainLoop());

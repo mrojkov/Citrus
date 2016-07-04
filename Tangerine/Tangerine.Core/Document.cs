@@ -135,6 +135,7 @@ namespace Tangerine.Core
 				}
 				RootNode.AddNode(frame);
 			}
+			RootNode.AnimationFrame = 0;
 			// Container = RootNode;
 		}		
 	}

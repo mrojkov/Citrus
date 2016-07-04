@@ -62,7 +62,6 @@ namespace Tangerine.Core
 		IDataflow<T> IDataflowProvider<T>.GetDataflow() => new PropertyDataflow<T>(Getter);
 	}
 
-
 	class PropertyDataflow<T> : IDataflow<T> where T: IEquatable<T>
 	{
 		readonly Func<T> getter;
@@ -82,16 +81,16 @@ namespace Tangerine.Core
 		}
 	}
 
-	public static class DataSourceMixins
+	public static class DataflowProviderMixins
 	{
 		public static IDataflowProvider<R> Select<T, R>(this IDataflowProvider<T> arg, Func<T, R> selector)
 		{
 			return new DataflowProvider<R>(() => new SelectProvider<T, R>(arg.GetDataflow(), selector));
 		}
 
-		public static IDataflowProvider<Tuple<T1, T2>> With<T1, T2>(this IDataflowProvider<T1> arg1, IDataflowProvider<T2> arg2)
+		public static IDataflowProvider<Tuple<T1, T2>> Coalesce<T1, T2>(this IDataflowProvider<T1> arg1, IDataflowProvider<T2> arg2)
 		{
-			return new DataflowProvider<Tuple<T1, T2>>(() => new WithProvider<T1, T2>(arg1.GetDataflow(), arg2.GetDataflow()));
+			return new DataflowProvider<Tuple<T1, T2>>(() => new CoalesceProvider<T1, T2>(arg1.GetDataflow(), arg2.GetDataflow()));
 		}
 
 		public static IDataflowProvider<T> Where<T>(this IDataflowProvider<T> arg, Predicate<T> predicate)
@@ -102,6 +101,16 @@ namespace Tangerine.Core
 		public static IDataflowProvider<T> Distinct<T>(this IDataflowProvider<T> arg)
 		{
 			return new DataflowProvider<T>(() => new DistinctProvider<T>(arg.GetDataflow()));
+		}
+
+		public static IDataflowProvider<T> SameOrDefault<T>(this IDataflowProvider<T> arg1, IDataflowProvider<T> arg2, T defaultValue = default(T))
+		{
+			return new DataflowProvider<T>(() => new SameOrDefault<T>(arg1.GetDataflow(), arg2.GetDataflow(), defaultValue));
+		}
+
+		private static bool Equals<T>(T a, T b)
+		{
+			return (a == null) && (b == null) || (a != null && b != null && a.Equals(b));
 		}
 
 		class SelectProvider<T, R> : IDataflow<R>
@@ -127,7 +136,7 @@ namespace Tangerine.Core
 			}
 		}
 
-		class WithProvider<T1, T2> : IDataflow<Tuple<T1, T2>>
+		class CoalesceProvider<T1, T2> : IDataflow<Tuple<T1, T2>>
 		{
 			readonly IDataflow<T1> arg1;
 			readonly IDataflow<T2> arg2;
@@ -135,7 +144,7 @@ namespace Tangerine.Core
 			public bool GotValue { get; private set; }
 			public Tuple<T1, T2> Value { get; private set; }
 
-			public WithProvider(IDataflow<T1> arg1, IDataflow<T2> arg2)
+			public CoalesceProvider(IDataflow<T1> arg1, IDataflow<T2> arg2)
 			{
 				this.arg1 = arg1;
 				this.arg2 = arg2;
@@ -193,11 +202,37 @@ namespace Tangerine.Core
 				arg.Poll();
 				if ((GotValue = arg.GotValue)) {
 					var current = arg.Value;
-					if ((GotValue = !hasValue || (current != null) != (previous != null) || (current != null && !current.Equals(previous)))) {
+					if ((GotValue = !hasValue || !Equals(current, previous))) {
 						Value = current;
 					}
 					hasValue = true;
 					previous = current;
+				}
+			}
+		}
+
+		class SameOrDefault<T> : IDataflow<T>
+		{
+			readonly IDataflow<T> arg1;
+			readonly IDataflow<T> arg2;
+			readonly T defaultValue;
+
+			public bool GotValue { get; private set; }
+			public T Value { get; private set; }
+
+			public SameOrDefault(IDataflow<T> arg1, IDataflow<T> arg2, T defaultValue)
+			{
+				this.arg1 = arg1;
+				this.arg2 = arg2;
+				this.defaultValue = defaultValue;
+			}
+
+			public void Poll()
+			{
+				arg1.Poll();
+				arg2.Poll();
+				if ((GotValue = arg1.GotValue || arg2.GotValue)) {
+					Value = Equals(arg1.Value, arg2.Value) ? arg1.Value : defaultValue;
 				}
 			}
 		}

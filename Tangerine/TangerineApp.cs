@@ -101,6 +101,7 @@ namespace Tangerine
 					Submenu = new Menu {
 						new Command { Text = "Undo", Shortcut = new Shortcut(Modifiers.Win, Key.Z), Key = Key.Undo },
 						new Command { Text = "Redo", Shortcut = new Shortcut(Modifiers.Win | Modifiers.Shift, Key.Z), Key = Key.Redo },
+						new Command { Text = "Select All", Shortcut = new Shortcut(Modifiers.Win, Key.A), Key = Key.SelectAll },
 					}
 				},
 				new Command {
