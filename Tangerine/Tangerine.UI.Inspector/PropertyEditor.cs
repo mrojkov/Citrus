@@ -6,18 +6,16 @@ using System.Collections.Generic;
 
 namespace Tangerine.UI.Inspector
 {
-	public interface IPropertyEditor
-	{
-	}
+	public interface IPropertyEditor { }
 
 	public class PropertyEditorContext
 	{
-		TangerineAttribute tangerineAttribute;
-
 		public readonly Widget InspectorPane;
 		public readonly List<object> Objects;
 		public readonly Type Type;
 		public readonly string PropertyName;
+		public readonly TangerineAttribute TangerineAttribute;
+		public readonly System.Reflection.PropertyInfo PropertyInfo;
 
 		public PropertyEditorContext(Widget inspectorPane, List<object> objects, Type type, string propertyName)
 		{
@@ -25,12 +23,9 @@ namespace Tangerine.UI.Inspector
 			Objects = objects;
 			Type = type;
 			PropertyName = propertyName;
+			TangerineAttribute = PropertyRegistry.GetTangerineAttribute(Type, PropertyName) ?? new TangerineAttribute(0);
+			PropertyInfo = Type.GetProperty(PropertyName);
 		}
-
-		public System.Reflection.PropertyInfo PropertyInfo => Type.GetProperty(PropertyName);
-
-		public TangerineAttribute TangerineAttribute => tangerineAttribute ?? 
-		(tangerineAttribute = PropertyRegistry.GetTangerineAttribute(Type, PropertyName) ?? new TangerineAttribute(0));
 	}
 
 	class CommonPropertyEditor : IPropertyEditor
@@ -63,7 +58,8 @@ namespace Tangerine.UI.Inspector
 			};
 			containerWidget.AddNode(keyFunctionButton);
 			containerWidget.AddNode(keyframeButton);
-			containerWidget.Tasks.Add(new KeyframeControlsBinding(keyframeButton, keyFunctionButton, context));
+			containerWidget.Tasks.Add(new KeyframeButtonBinding(context, keyframeButton));
+			containerWidget.Tasks.Add(new KeyFunctionButtonBinding(context, keyFunctionButton));
 		}
 
 		protected static IDataflowProvider<string> EditBoxCommittedText(EditBox editor)

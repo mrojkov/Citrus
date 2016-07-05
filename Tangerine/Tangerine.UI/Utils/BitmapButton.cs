@@ -10,8 +10,32 @@ namespace Tangerine.UI
 	public class BitmapButton : Button
 	{
 		public readonly Image Image;
-		public ITexture DefaultTexture { get; set; }
-		public ITexture HoverTexture { get; set; }
+		ITexture defaultTexture;
+		ITexture hoverTexture;
+
+		public ITexture DefaultTexture
+		{
+			get { return defaultTexture; }
+			set
+			{
+				if (defaultTexture != value) {
+					defaultTexture = value;
+					Refresh();
+				}
+			}
+		}
+
+		public ITexture HoverTexture
+		{
+			get { return hoverTexture; }
+			set
+			{
+				if (hoverTexture != value) {
+					hoverTexture = value;
+					Refresh();
+				}
+			}
+		}
 
 		public BitmapButton() : this(Metrics.IconSize) { }
 
@@ -36,8 +60,11 @@ namespace Tangerine.UI
 		{
 		}
 
+		void Refresh() => (DefaultAnimation.AnimationEngine as ButtonAnimationEngine).Refresh();
+
 		class ButtonAnimationEngine : AnimationEngine
 		{
+			string activeAnimation;
 			private readonly BitmapButton button;
 
 			public ButtonAnimationEngine(BitmapButton button)
@@ -47,8 +74,14 @@ namespace Tangerine.UI
 
 			public override bool TryRunAnimation(Animation animation, string markerId)
 			{
-				button.Image.Texture = markerId == "Focus" ? button.HoverTexture : button.DefaultTexture;
+				activeAnimation = markerId;
+				Refresh();
 				return true;
+			}
+
+			public void Refresh()
+			{
+				button.Image.Texture = activeAnimation == "Focus" ? button.HoverTexture : button.DefaultTexture;
 			}
 		}
 	}	

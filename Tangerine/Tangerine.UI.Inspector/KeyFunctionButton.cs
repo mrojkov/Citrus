@@ -1,0 +1,83 @@
+﻿using System;
+using System.Linq;
+using System.Collections.Generic;
+using Lime;
+using Tangerine.Core;
+
+namespace Tangerine.UI.Inspector
+{
+	class KeyFunctionButton : BitmapButton
+	{
+		public void SetKeyFunction(KeyFunction function)
+		{
+			var s = "Timeline.Interpolation." + FunctionToString(function);
+			HoverTexture = IconPool.GetTexture(s);
+			DefaultTexture = IconPool.GetTexture(s + "Grayed");
+		}
+
+		string FunctionToString(KeyFunction function)
+		{
+			switch (function) {
+				case KeyFunction.Linear:
+					return "Linear";
+				case KeyFunction.Steep:
+					return "None";
+				case KeyFunction.Spline:
+					return "Spline";
+				case KeyFunction.ClosedSpline:
+					return "ClosedSpline";
+				default:
+					throw new ArgumentException();
+			}
+		}
+	}
+
+	class KeyFunctionButtonBinding : IProcessor
+	{
+		readonly PropertyEditorContext context;
+		readonly KeyFunctionButton button;
+
+		public KeyFunctionButtonBinding(PropertyEditorContext context, KeyFunctionButton button)
+		{
+			this.context = context;
+			this.button = button;
+		}
+
+		public IEnumerator<object> Loop()
+		{
+			var provider = KeyframeDataflow.GetProvider(context, i => i?.Function).DistinctUntilChanged();
+			var keyFunction = provider.GetDataflow();
+			while (true) {
+				keyFunction.Poll();
+				if (keyFunction.GotValue) {
+					if ((button.Visible = keyFunction.Value.HasValue)) {
+						button.SetKeyFunction(keyFunction.Value.Value);
+					}
+				}
+				if (button.WasClicked()) {
+					SetKeyFunction(NextKeyFunction(keyFunction.Value.GetValueOrDefault()));
+				}
+				yield return null;
+			}
+		}
+
+		static KeyFunction NextKeyFunction(KeyFunction value)
+		{
+			var count = Enum.GetValues(typeof(KeyFunction)).Length;
+			return (KeyFunction)(((int)value + 1) % count);
+		}
+
+		void SetKeyFunction(KeyFunction value)
+		{
+			foreach (var animable in context.Objects.OfType<IAnimable>()) {
+				IAnimator animator;
+				if (animable.Animators.TryFind(context.PropertyName, out animator, Document.Current.AnimationId)) {
+					var keyframe = animator.ReadonlyKeys.FirstOrDefault(i => i.Frame == Document.Current.AnimationFrame).Clone();
+					keyframe.Function = value;
+					Document.Current.History.Add(new Core.Operations.SetKeyframe(animable, context.PropertyName, Document.Current.AnimationId, keyframe)); 
+				}
+			}
+			Document.Current.History.Commit();
+		}
+	}
+}

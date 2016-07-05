@@ -68,8 +68,12 @@ namespace Tangerine.Core.Operations
 			var animable = @object as IAnimable;
 			if (animable != null && animable.Animators.TryFind(propertyName, out animator, Document.Current.AnimationId)) {
 				var type = animable.GetType().GetProperty(propertyName).PropertyType;
-				var keyframe = Keyframe.CreateForType(type, Document.Current.AnimationFrame, value);
-				Add(new SetKeyframe(animable, propertyName, Document.Current.AnimationId, keyframe));
+				var key = 
+					animator.ReadonlyKeys.FirstOrDefault(i => i.Frame == Document.Current.AnimationFrame)?.Clone() ??
+					Keyframe.CreateForType(type);
+				key.Frame = Document.Current.AnimationFrame;
+				key.Value = value;
+				Add(new SetKeyframe(animable, propertyName, Document.Current.AnimationId, key));
 			}
 		}
 	}
