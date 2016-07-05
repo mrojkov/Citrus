@@ -25,7 +25,10 @@ namespace Tangerine.UI
 			while (true) {
 				dataflow.Poll();
 				if (dataflow.GotValue) {
-					Document.Current.History.Execute(new Core.Operations.SetAnimableProperty(@object, propertyName, dataflow.Value));
+					var currentValue = new Property(@object, propertyName).Value;
+					if (!Equals(currentValue, dataflow.Value)) {
+						Document.Current.History.Execute(new Core.Operations.SetAnimableProperty(@object, propertyName, dataflow.Value));
+					}
 				}
 				yield return null;
 			}
