@@ -1,3 +1,4 @@
+using System;
 using ProtoBuf;
 
 namespace Lime
@@ -16,6 +17,23 @@ namespace Lime
 		KeyFunction Function { get; set; }
 		object Value { get; set; }
 		IKeyframe Clone();
+	}
+
+	public static class Keyframe
+	{
+		public static IKeyframe CreateForType(Type type)
+		{
+			return (IKeyframe)typeof(Keyframe<>).MakeGenericType(type).GetConstructor(Array.Empty<Type>()).Invoke(Array.Empty<object>());
+		}
+
+		public static IKeyframe CreateForType(Type type, int frame, object value, KeyFunction function = KeyFunction.Linear)
+		{
+			var k = CreateForType(type);
+			k.Frame = frame;
+			k.Value = value;
+			k.Function = function;
+			return k;
+		}
 	}
 
 	[ProtoContract]
@@ -63,6 +81,18 @@ namespace Lime
 		IKeyframe IKeyframe.Clone()
 		{
 			return Clone();
+		}
+
+		public override bool Equals(object obj)
+		{
+			var other = (IKeyframe)obj;
+			return Frame == other.Frame && Function == other.Function && 
+				(Value == null && other.Value == null || Value != null && other.Value != null && Value.Equals(other.Value));
+		}
+
+		public override int GetHashCode()
+		{
+			return Frame.GetHashCode() ^ Function.GetHashCode() ^ Value.GetHashCode();
 		}
 	}
 }
