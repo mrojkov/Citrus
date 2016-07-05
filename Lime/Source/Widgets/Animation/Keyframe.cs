@@ -8,7 +8,7 @@ namespace Lime
 		Linear,
 		Steep,
 		Spline,
-		ClosedSpline
+		ClosedSpline,
 	}
 
 	public interface IKeyframe
@@ -23,7 +23,7 @@ namespace Lime
 	{
 		public static IKeyframe CreateForType(Type type)
 		{
-			return (IKeyframe)typeof(Keyframe<>).MakeGenericType(type).GetConstructor(Array.Empty<Type>()).Invoke(Array.Empty<object>());
+			return (IKeyframe)typeof(Keyframe<>).MakeGenericType(type).GetConstructor(new Type[0]).Invoke(new object[0]);
 		}
 
 		public static IKeyframe CreateForType(Type type, int frame, object value, KeyFunction function = KeyFunction.Linear)
