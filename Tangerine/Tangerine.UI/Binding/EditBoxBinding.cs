@@ -17,7 +17,7 @@ namespace Tangerine.UI
 			this.editBox = editBox;
 		}
 
-		public IEnumerator<object> MainLoop()
+		public IEnumerator<object> Loop()
 		{
 			var dataflow = source.GetDataflow();
 			var wasFocused = false;

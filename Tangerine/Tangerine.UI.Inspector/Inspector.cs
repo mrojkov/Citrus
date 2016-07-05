@@ -67,7 +67,7 @@ namespace Tangerine.UI.Inspector
 		{
 			Inspector Inspector => Instance;
 
-			public IEnumerator<object> MainLoop()
+			public IEnumerator<object> Loop()
 			{
 				var objects = Inspector.Objects;
 				while (true) {

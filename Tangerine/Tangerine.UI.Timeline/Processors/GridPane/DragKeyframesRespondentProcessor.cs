@@ -9,7 +9,7 @@ namespace Tangerine.UI.Timeline
 {
 	public class DragKeyframesRespondentProcessor : IProcessor
 	{
-		public IEnumerator<object> MainLoop()
+		public IEnumerator<object> Loop()
 		{
 			var g = Timeline.Instance.Globals;
 			while (true) {

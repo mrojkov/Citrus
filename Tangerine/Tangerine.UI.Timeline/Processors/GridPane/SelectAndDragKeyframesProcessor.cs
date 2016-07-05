@@ -14,7 +14,7 @@ namespace Tangerine.UI.Timeline
 		Timeline timeline => Timeline.Instance;
 		GridPane grid => Timeline.Instance.Grid;
 
-		public IEnumerator<object> MainLoop()
+		public IEnumerator<object> Loop()
 		{
 			var input = grid.RootWidget.Input;
 			while (true) {

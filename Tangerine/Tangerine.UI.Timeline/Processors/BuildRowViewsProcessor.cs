@@ -9,7 +9,7 @@ namespace Tangerine.UI.Timeline
 {
 	public class BuildRowViewsProcessor : IProcessor
 	{
-		public IEnumerator<object> MainLoop()
+		public IEnumerator<object> Loop()
 		{
 			while (true) {
 				foreach (var row in Timeline.Instance.Rows) {

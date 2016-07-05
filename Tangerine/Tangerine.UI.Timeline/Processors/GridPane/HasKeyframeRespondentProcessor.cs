@@ -8,7 +8,7 @@ namespace Tangerine.UI.Timeline
 {
 	class HasKeyframeRespondentProcessor : Core.IProcessor
 	{
-		public IEnumerator<object> MainLoop()
+		public IEnumerator<object> Loop()
 		{
 			var g = Timeline.Instance.Globals;
 			while (true) {

@@ -14,7 +14,7 @@ namespace Tangerine.UI.Timeline
 		Timeline timeline => Timeline.Instance;
 		RollPane roll => Timeline.Instance.Roll;
 
-		public IEnumerator<object> MainLoop()
+		public IEnumerator<object> Loop()
 		{
 			var input = roll.RootWidget.Input;
 			while (true) {

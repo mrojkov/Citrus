@@ -9,7 +9,7 @@ namespace Tangerine.UI.Timeline
 	{
 		Timeline timeline => Timeline.Instance;
 
-		public IEnumerator<object> MainLoop()
+		public IEnumerator<object> Loop()
 		{
 			var input = timeline.Grid.RootWidget.Input;
 			while (true) {

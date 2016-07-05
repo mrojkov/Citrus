@@ -19,7 +19,7 @@ namespace Tangerine.UI
 			this.source = source;
 		}
 
-		public IEnumerator<object> MainLoop()
+		public IEnumerator<object> Loop()
 		{
 			var dataflow = source.GetDataflow();
 			while (true) {

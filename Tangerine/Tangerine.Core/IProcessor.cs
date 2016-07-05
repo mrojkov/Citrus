@@ -6,7 +6,7 @@ namespace Tangerine.Core
 {
 	public interface IProcessor
 	{
-		IEnumerator<object> MainLoop();
+		IEnumerator<object> Loop();
 	}
 
 	public static class TaskListExtension
@@ -14,13 +14,13 @@ namespace Tangerine.Core
 		public static void Add(this TaskList taskList, params IProcessor[] collection)
 		{
 			foreach (var i in collection) {
-				taskList.Add(i.MainLoop());
+				taskList.Add(i.Loop());
 			}
 		}
 
 		public static void Add(this TaskList taskList, IProcessor processor)
 		{
-			taskList.Add(processor.MainLoop());
+			taskList.Add(processor.Loop());
 		}
 	}
 }

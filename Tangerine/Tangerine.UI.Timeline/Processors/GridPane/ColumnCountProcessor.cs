@@ -8,7 +8,7 @@ namespace Tangerine.UI.Timeline
 {
 	public class ColumnCountProcessor : IProcessor
 	{
-		public IEnumerator<object> MainLoop()
+		public IEnumerator<object> Loop()
 		{
 			var timeline = Timeline.Instance;
 			while (true) {
