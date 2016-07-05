@@ -245,7 +245,11 @@ namespace Yuzu
 
 		private Action<object> MakeWriteFunc(Type t)
 		{
-			if (t == typeof(int) || t == typeof(uint) || t == typeof(byte) || t == typeof(sbyte))
+			if (
+				t == typeof(int) || t == typeof(uint) ||
+				t == typeof(byte) || t == typeof(sbyte) ||
+				t == typeof(short) || t == typeof(ushort)
+			)
 				return WriteInt;
 			if (t == typeof(long) || t == typeof(ulong)) {
 				if (JsonOptions.Int64AsString)
@@ -257,6 +261,8 @@ namespace Yuzu
 				return WriteDouble;
 			if (t == typeof(float))
 				return WriteSingle;
+			if (t == typeof(char))
+				return WriteEscapedString;
 			if (t == typeof(string))
 				return WriteNullableEscapedString;
 			if (t == typeof(bool))
@@ -493,6 +499,14 @@ namespace Yuzu
 				sb.Append(ch);
 			}
 			return sb.ToString();
+		}
+
+		private object RequireChar()
+		{
+			var s = RequireString();
+			if (s.Length != 1)
+				throw Error("Expected single char but found: '{0}'", s);
+			return s[0];
 		}
 
 		protected bool RequireBool()
@@ -787,8 +801,11 @@ namespace Yuzu
 		private object RequireUIntObj() { return RequireUInt(); }
 		private object RequireLongObj() { return RequireLong(); }
 		private object RequireULongObj() { return RequireULong(); }
+		private object RequireShortObj() { return (short)RequireInt(); }
+		private object RequireUShortObj() { return (ushort)RequireUInt(); }
 		private object RequireSByteObj() { return (sbyte)RequireInt(); }
 		private object RequireByteObj() { return (byte)RequireInt(); }
+		private object RequireCharObj() { return RequireChar(); }
 		private object RequireStringObj() { return RequireString(); }
 		private object RequireBoolObj() { return RequireBool(); }
 		private object RequireSingleObj() { return RequireSingle(); }
@@ -806,10 +823,16 @@ namespace Yuzu
 				return RequireLongObj;
 			if (t == typeof(ulong))
 				return RequireULongObj;
+			if (t == typeof(short))
+				return RequireShortObj;
+			if (t == typeof(ushort))
+				return RequireUShortObj;
 			if (t == typeof(sbyte))
 				return RequireSByteObj;
 			if (t == typeof(byte))
 				return RequireByteObj;
+			if (t == typeof(char))
+				return RequireCharObj;
 			if (t == typeof(string))
 				return RequireStringObj;
 			if (t == typeof(bool))

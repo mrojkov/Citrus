@@ -83,6 +83,25 @@ namespace YuzuTest
 		}
 
 		[TestMethod]
+		public void TestSmallTypes()
+		{
+			var js = new JsonSerializer();
+			var v1 = new SampleSmallTypes { Ch = 'A', Sh = -2000, USh = 2001, B = 198, Sb = -109 };
+
+			js.JsonOptions.Indent = "";
+			var result = js.ToString(v1);
+			Assert.AreEqual("{\n\"B\":198,\n\"Ch\":\"A\",\n\"Sb\":-109,\n\"Sh\":-2000,\n\"USh\":2001\n}", result);
+
+			var v2 = new SampleSmallTypes();
+			var jd = new JsonDeserializer();
+			jd.FromString(v2, result);
+			Assert.AreEqual(v1.Ch, v2.Ch);
+			Assert.AreEqual(v1.Sh, v2.Sh);
+			Assert.AreEqual(v1.B, v2.B);
+			Assert.AreEqual(v1.Sb, v2.Sb);
+		}
+
+		[TestMethod]
 		public void TestNested()
 		{
 			var js = new JsonSerializer();

@@ -91,6 +91,20 @@ namespace YuzuTest
 		public bool B;
 	}
 
+	public class SampleSmallTypes
+	{
+		[YuzuRequired]
+		public char Ch;
+		[YuzuRequired]
+		public short Sh;
+		[YuzuRequired]
+		public short USh;
+		[YuzuRequired]
+		public byte B;
+		[YuzuRequired]
+		public sbyte Sb;
+	}
+
 	public class SampleFloat
 	{
 		[YuzuRequired("1")]

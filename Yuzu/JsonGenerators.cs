@@ -105,11 +105,20 @@ namespace Yuzu
 			else if (t == typeof(ulong)) {
 				PutPart("RequireULong();\n");
 			}
+			else if (t == typeof(short)) {
+				PutPart("(short)RequireInt();\n");
+			}
+			else if (t == typeof(ushort)) {
+				PutPart("(ushort)RequireUInt();\n");
+			}
 			else if (t == typeof(sbyte)) {
 				PutPart("(sbyte)RequireInt();\n");
 			}
 			else if (t == typeof(byte)) {
 				PutPart("(byte)RequireUInt();\n");
+			}
+			else if (t == typeof(char)) {
+				PutPart("RequireChar();\n");
 			}
 			else if (t == typeof(string)) {
 				PutPart("RequireString();\n");
