@@ -138,5 +138,11 @@ namespace Lime
 			Getter = () => pi.GetValue(obj, null);
 			Setter = val => pi.SetValue(obj, val, null);
 		}
+
+		public object Value
+		{
+			get { return Getter(); }
+			set { Setter(value); }
+		}
 	}
 }
