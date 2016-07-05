@@ -75,7 +75,7 @@ namespace Tangerine.UI.Inspector
 					if (!objects.SequenceEqual(selectedObjects)) {
 						objects.Clear();
 						objects.AddRange(selectedObjects);
-						RebuildContent((IAnimationContext)Document.Current, selectedObjects);
+						RebuildContent(selectedObjects);
 					}
 					yield return null;
 				}
@@ -99,17 +99,17 @@ namespace Tangerine.UI.Inspector
 				return types;
 			}
 
-			void RebuildContent(IAnimationContext animationContext, IEnumerable<object> objects)
+			void RebuildContent(IEnumerable<object> objects)
 			{
 				Inspector.ContentWidget.Nodes.Clear();
 				Inspector.Editors.Clear();
 				foreach (var t in GetTypes(objects)) {
 					var o = objects.Where(i => t.IsInstanceOfType(i)).ToList();
-					PopulateContentForType(animationContext, t, o);
+					PopulateContentForType(t, o);
 				}
 			}
 
-			void PopulateContentForType(IAnimationContext animationContext, Type type, List<object> objects)
+			void PopulateContentForType(Type type, List<object> objects)
 			{
 				var categoryLabelAdded = false;
 				foreach (var property in type.GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public)) {

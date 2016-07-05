@@ -12,13 +12,7 @@ namespace Tangerine.Core
 		IEnumerable<object> Get();
 	}
 
-	public interface IAnimationContext
-	{
-		int AnimationFrame { get; set; }
-		string AnimationId { get; set; }
-	}
-
-	public class Document : IAnimationContext
+	public class Document
 	{
 		public enum CloseAction
 		{
