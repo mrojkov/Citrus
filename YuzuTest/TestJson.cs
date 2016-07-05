@@ -99,6 +99,11 @@ namespace YuzuTest
 			Assert.AreEqual(v1.Sh, v2.Sh);
 			Assert.AreEqual(v1.B, v2.B);
 			Assert.AreEqual(v1.Sb, v2.Sb);
+			XAssert.Throws<YuzuException>(() => jd.FromString(v2, result.Replace("A", "ABC")), "ABC");
+			XAssert.Throws<OverflowException>(() => jd.FromString(v2, result.Replace("198", "298")));
+			XAssert.Throws<OverflowException>(() => jd.FromString(v2, result.Replace("109", "209")));
+			XAssert.Throws<OverflowException>(() => jd.FromString(v2, result.Replace("2000", "40000")));
+			XAssert.Throws<OverflowException>(() => jd.FromString(v2, result.Replace("2001", "200000")));
 		}
 
 		[TestMethod]

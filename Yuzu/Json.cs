@@ -801,10 +801,10 @@ namespace Yuzu
 		private object RequireUIntObj() { return RequireUInt(); }
 		private object RequireLongObj() { return RequireLong(); }
 		private object RequireULongObj() { return RequireULong(); }
-		private object RequireShortObj() { return (short)RequireInt(); }
-		private object RequireUShortObj() { return (ushort)RequireUInt(); }
-		private object RequireSByteObj() { return (sbyte)RequireInt(); }
-		private object RequireByteObj() { return (byte)RequireInt(); }
+		private object RequireShortObj() { return checked((short)RequireInt()); }
+		private object RequireUShortObj() { return checked((ushort)RequireUInt()); }
+		private object RequireSByteObj() { return checked((sbyte)RequireInt()); }
+		private object RequireByteObj() { return checked((byte)RequireInt()); }
 		private object RequireCharObj() { return RequireChar(); }
 		private object RequireStringObj() { return RequireString(); }
 		private object RequireBoolObj() { return RequireBool(); }

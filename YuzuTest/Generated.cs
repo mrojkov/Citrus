@@ -862,13 +862,13 @@ namespace YuzuTest
 		{
 			var result = (Color)obj;
 			if ("B" != name) throw new YuzuException("B!=" + name);
-			result.B = (byte)RequireUInt();
+			result.B = checked((byte)RequireUInt());
 			name = GetNextName(false);
 			if ("G" != name) throw new YuzuException("G!=" + name);
-			result.G = (byte)RequireUInt();
+			result.G = checked((byte)RequireUInt());
 			name = GetNextName(false);
 			if ("R" != name) throw new YuzuException("R!=" + name);
-			result.R = (byte)RequireUInt();
+			result.R = checked((byte)RequireUInt());
 			name = GetNextName(false);
 			Require('}');
 			return result;
@@ -877,11 +877,11 @@ namespace YuzuTest
 		protected override object ReadFieldsCompact(object obj)
 		{
 			var result = (Color)obj;
-			result.B = (byte)RequireUInt();
+			result.B = checked((byte)RequireUInt());
 			Require(',');
-			result.G = (byte)RequireUInt();
+			result.G = checked((byte)RequireUInt());
 			Require(',');
-			result.R = (byte)RequireUInt();
+			result.R = checked((byte)RequireUInt());
 			Require(']');
 			return result;
 		}

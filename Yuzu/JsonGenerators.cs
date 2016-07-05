@@ -106,16 +106,16 @@ namespace Yuzu
 				PutPart("RequireULong();\n");
 			}
 			else if (t == typeof(short)) {
-				PutPart("(short)RequireInt();\n");
+				PutPart("checked((short)RequireInt());\n");
 			}
 			else if (t == typeof(ushort)) {
-				PutPart("(ushort)RequireUInt();\n");
+				PutPart("checked((ushort)RequireUInt());\n");
 			}
 			else if (t == typeof(sbyte)) {
-				PutPart("(sbyte)RequireInt();\n");
+				PutPart("checked((sbyte)RequireInt());\n");
 			}
 			else if (t == typeof(byte)) {
-				PutPart("(byte)RequireUInt();\n");
+				PutPart("checked((byte)RequireUInt());\n");
 			}
 			else if (t == typeof(char)) {
 				PutPart("RequireChar();\n");
