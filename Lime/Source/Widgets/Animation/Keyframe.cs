@@ -86,8 +86,7 @@ namespace Lime
 		public override bool Equals(object obj)
 		{
 			var other = (IKeyframe)obj;
-			return Frame == other.Frame && Function == other.Function && 
-				(Value == null && other.Value == null || Value != null && other.Value != null && Value.Equals(other.Value));
+			return Frame == other.Frame && Function == other.Function && Equals(Value, other.Value);
 		}
 
 		public override int GetHashCode()
