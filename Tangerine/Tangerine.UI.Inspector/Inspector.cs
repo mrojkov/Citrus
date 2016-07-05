@@ -77,9 +77,6 @@ namespace Tangerine.UI.Inspector
 						objects.AddRange(selectedObjects);
 						RebuildContent((IAnimationContext)Document.Current, selectedObjects);
 					}
-					foreach (var i in Inspector.Editors) {
-						i.Update(Task.Current.Delta);
-					}
 					yield return null;
 				}
 			}
@@ -136,7 +133,7 @@ namespace Tangerine.UI.Inspector
 					if (!Inspector.EditorMap.TryGetValue(property.PropertyType, out editorBuilder)) {
 						continue;
 					}
-					var context = new PropertyEditorContext(Inspector.ContentWidget, objects, type, property.Name, animationContext);
+					var context = new PropertyEditorContext(Inspector.ContentWidget, objects, type, property.Name);
 					var propertyEditor = editorBuilder(context);
 					Inspector.Editors.Add(propertyEditor);
 				}

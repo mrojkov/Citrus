@@ -32,6 +32,18 @@ namespace Tangerine.Core
 		T Value { get; }
 	}
 
+	public class DataflowProvider<T> : IDataflowProvider<T>
+	{
+		readonly Func<IDataflow<T>> func;
+
+		public DataflowProvider(Func<IDataflow<T>> func)
+		{
+			this.func = func;
+		}
+
+		public IDataflow<T> GetDataflow() => func();
+	}
+
 	public class Property<T> : IDataflowProvider<T> where T: IEquatable<T>
 	{
 		public Func<T> Getter { get; private set; }
@@ -98,14 +110,19 @@ namespace Tangerine.Core
 			return new DataflowProvider<T>(() => new WhereProvider<T>(arg.GetDataflow(), predicate));
 		}
 
-		public static IDataflowProvider<T> Distinct<T>(this IDataflowProvider<T> arg)
+		public static IDataflowProvider<T> DistinctUntilChanged<T>(this IDataflowProvider<T> arg)
 		{
-			return new DataflowProvider<T>(() => new DistinctProvider<T>(arg.GetDataflow()));
+			return new DataflowProvider<T>(() => new DistinctUntilChangedProvider<T>(arg.GetDataflow()));
 		}
 
 		public static IDataflowProvider<T> SameOrDefault<T>(this IDataflowProvider<T> arg1, IDataflowProvider<T> arg2, T defaultValue = default(T))
 		{
 			return new DataflowProvider<T>(() => new SameOrDefault<T>(arg1.GetDataflow(), arg2.GetDataflow(), defaultValue));
+		}
+
+		public static IDataflowProvider<T> Skip<T>(this IDataflowProvider<T> arg, int count)
+		{
+			return new DataflowProvider<T>(() => new SkipProvider<T>(arg.GetDataflow(), count));
 		}
 
 		private static bool Equals<T>(T a, T b)
@@ -183,7 +200,7 @@ namespace Tangerine.Core
 			}
 		}
 
-		class DistinctProvider<T> : IDataflow<T>
+		class DistinctUntilChangedProvider<T> : IDataflow<T>
 		{
 			readonly IDataflow<T> arg;
 			T previous;
@@ -192,7 +209,7 @@ namespace Tangerine.Core
 			public bool GotValue { get; private set; }
 			public T Value { get; private set; }
 
-			public DistinctProvider(IDataflow<T> arg)
+			public DistinctUntilChangedProvider(IDataflow<T> arg)
 			{
 				this.arg = arg;
 			}
@@ -207,6 +224,31 @@ namespace Tangerine.Core
 					}
 					hasValue = true;
 					previous = current;
+				}
+			}
+		}
+
+		class SkipProvider<T> : IDataflow<T>
+		{
+			readonly IDataflow<T> arg;
+			int countdown;
+			bool done;
+
+			public bool GotValue { get; private set; }
+			public T Value { get; private set; }
+
+			public SkipProvider(IDataflow<T> arg, int count)
+			{
+				this.arg = arg;
+				countdown = count;
+			}
+
+			public void Poll()
+			{
+				arg.Poll();
+				if ((GotValue = arg.GotValue && (done || countdown-- <= 0))) {
+					done = true;
+					Value = arg.Value;
 				}
 			}
 		}
@@ -235,18 +277,6 @@ namespace Tangerine.Core
 					Value = Equals(arg1.Value, arg2.Value) ? arg1.Value : defaultValue;
 				}
 			}
-		}
-
-		class DataflowProvider<T> : IDataflowProvider<T>
-		{
-			readonly Func<IDataflow<T>> func;
-
-			public DataflowProvider(Func<IDataflow<T>> func)
-			{
-				this.func = func;
-			}
-
-			public IDataflow<T> GetDataflow() => func();
 		}
 	}
 }

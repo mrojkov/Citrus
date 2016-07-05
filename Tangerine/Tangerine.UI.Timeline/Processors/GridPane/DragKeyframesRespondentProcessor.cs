@@ -65,7 +65,7 @@ namespace Tangerine.UI.Timeline
 							if (k.Frame + offset.X >= 0) {
 								var k1 = k.Clone();
 								k1.Frame += offset.X;
-								commands.Add(new Core.Operations.SetKeyframe(destNode, a.TargetProperty, k1));
+								commands.Add(new Core.Operations.SetKeyframe(destNode, a.TargetProperty, Document.Current.AnimationId, k1));
 							}
 						}
 					}

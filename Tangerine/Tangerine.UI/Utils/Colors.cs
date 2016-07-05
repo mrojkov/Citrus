@@ -45,7 +45,7 @@ namespace Tangerine.UI
 		}
 		public static class Inspector
 		{
-			public static readonly Color4 BorderAroundKeyframeColorbox = Color4.Black;
+			public static readonly Color4 BorderAroundKeyframeColorbox = DesktopTheme.Colors.ControlBorder;
 			public static readonly Color4 CategoryLabelBackground = Color4.White.Darken(0.2f);
 		}
 	}

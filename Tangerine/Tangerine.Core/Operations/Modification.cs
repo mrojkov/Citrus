@@ -67,11 +67,9 @@ namespace Tangerine.Core.Operations
 			IAnimator animator;
 			var animable = @object as IAnimable;
 			if (animable != null && animable.Animators.TryFind(propertyName, out animator, Document.Current.AnimationId)) {
-				var propertyType = animable.GetType().GetProperty(propertyName).PropertyType;
-				var keyframe = (IKeyframe)typeof(Keyframe<>).MakeGenericType(propertyType).GetConstructor(new Type[0]).Invoke(new object[0]);
-				keyframe.Frame = Document.Current.AnimationFrame;
-				keyframe.Value = value;
-				Add(new SetKeyframe(animable, propertyName, keyframe));
+				var type = animable.GetType().GetProperty(propertyName).PropertyType;
+				var keyframe = Keyframe.CreateForType(type, Document.Current.AnimationFrame, value);
+				Add(new SetKeyframe(animable, propertyName, Document.Current.AnimationId, keyframe));
 			}
 		}
 	}
@@ -105,28 +103,30 @@ namespace Tangerine.Core.Operations
 	{
 		readonly IAnimable animable;
 		readonly string propertyName;
+		readonly string animationId;
 		readonly IKeyframe keyframe;
 		IKeyframe savedKeyframe;
 		bool animatorExists;
+		IAnimator animator;
 
-		public SetKeyframe(IAnimable animable, string propertyName, IKeyframe keyframe)
+		public SetKeyframe(IAnimable animable, string propertyName, string animationId, IKeyframe keyframe)
 		{
 			this.animable = animable;
 			this.propertyName = propertyName;
 			this.keyframe = keyframe;
+			this.animationId = animationId;
 		}
 
 		public void Do()
 		{
-			animatorExists = animable.Animators.Any(a => a.TargetProperty == propertyName);
-			var animator = animable.Animators[propertyName];
+			animatorExists = animable.Animators.Any(a => a.TargetProperty == propertyName && a.AnimationId == animationId);
+			animator = animable.Animators[propertyName, animationId];
 			savedKeyframe = animator.Keys.FirstOrDefault(k => k.Frame == keyframe.Frame);
 			animator.Keys.AddOrdered(keyframe);
 		}
 
 		public void Undo()
 		{
-			var animator = animable.Animators.FirstOrDefault(i => i.TargetProperty == propertyName);
 			animator.Keys.Remove(keyframe);
 			if (savedKeyframe != null) {
 				animator.Keys.AddOrdered(savedKeyframe);
@@ -135,6 +135,7 @@ namespace Tangerine.Core.Operations
 				animable.Animators.Remove(animator);
 			}
 			savedKeyframe = null;
+			animator = null;
 		}
 	}
 
