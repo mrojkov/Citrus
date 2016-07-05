@@ -205,6 +205,15 @@ namespace Lime
 #if MAC
 					value.Refresh();
 					NSApplication.SharedApplication.MainMenu = value.NativeMenu;
+#elif WIN
+					scheduledActions += () => {
+						var mmenu = new System.Windows.Forms.MenuStrip();
+						foreach (var i in mainMenu) {
+							mmenu.Items.Add(i.Text);
+							(mmenu.Items[0] as ToolStripMenuItem).DropDown = i.Submenu.menu;
+						}
+						MainWindow.Form.Controls.Add(mmenu);
+					};
 #endif
 				}
 			}

@@ -86,7 +86,8 @@ namespace Lime
 		{
 			Command = command;
 			Item = new ToolStripMenuItem {
-				AutoSize = false
+				AutoSize = false,
+				Text = command.Text
 			};
 			Item.Click += Item_Click;
 			Clicked += command.Execute;

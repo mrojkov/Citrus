@@ -58,7 +58,7 @@ namespace Tangerine.Core
 		{
 			Getter = getter;
 			Setter = setter;
-		}	
+		}
 
 		public Property(object obj, string propertyName)
 		{

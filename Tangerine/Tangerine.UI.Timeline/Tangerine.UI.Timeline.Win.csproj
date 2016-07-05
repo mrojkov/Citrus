@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Tangerine.UI.Timeline</RootNamespace>
+    <AssemblyName>Tangerine.UI.Timeline</AssemblyName>
+    <MonoMacResourcePrefix>Resources</MonoMacResourcePrefix>
+    <ProjectGuid>{DB168347-08CC-40FC-B612-5A33A6877863}</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <EnableCodeSigning>false</EnableCodeSigning>
+    <CreatePackage>false</CreatePackage>
+    <EnablePackageSigning>false</EnablePackageSigning>
+    <IncludeMonoRuntime>false</IncludeMonoRuntime>
+    <UseSGen>false</UseSGen>
+    <Profiling>true</Profiling>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <DefineConstants>
+    </DefineConstants>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <EnableCodeSigning>false</EnableCodeSigning>
+    <CreatePackage>false</CreatePackage>
+    <EnablePackageSigning>false</EnablePackageSigning>
+    <IncludeMonoRuntime>false</IncludeMonoRuntime>
+    <UseSGen>false</UseSGen>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Processors\GridPane\ClampScrollOriginProcessor.cs" />
+    <Compile Include="Processors\GridPane\DragKeyframesRespondentProcessor.cs" />
+    <Compile Include="Processors\GridPane\GridMouseScrollProcessor.cs" />
+    <Compile Include="Processors\GridPane\HasKeyframeRespondentProcessor.cs" />
+    <Compile Include="Processors\GridPane\GridWidgetsProcessor.cs" />
+    <Compile Include="Processors\GridPane\ColumnCountProcessor.cs" />
+    <Compile Include="Processors\GridPane\ResizeGridCurveViewProcessor.cs" />
+    <Compile Include="Processors\GridPane\SelectAndDragKeyframesProcessor.cs" />
+    <Compile Include="Processors\OverviewPane\OverviewScrollProcessor.cs" />
+    <Compile Include="Processors\OverviewPane\OverviewWidgetsProcessor.cs" />
+    <Compile Include="Processors\RollPane\RollWidgetsProcessor.cs" />
+    <Compile Include="Processors\RollPane\RollMouseScrollProcessor.cs" />
+    <Compile Include="Processors\RollPane\SelectAndDragRowsProcessor.cs" />
+    <Compile Include="Processors\BuildRowsProcessor.cs" />
+    <Compile Include="Processors\BuildRowViewsProcessor.cs" />
+    <Compile Include="Processors\KeyboardShortcutsProcessor.cs" />
+    <Compile Include="Processors\MouseWheelProcessor.cs" />
+    <Compile Include="GridPane.cs" />
+    <Compile Include="GridSelection.cs" />
+    <Compile Include="OverviewPane.cs" />
+    <Compile Include="RollPane.cs" />
+    <Compile Include="Row.cs" />
+    <Compile Include="Rulerbar.cs" />
+    <Compile Include="Timeline.cs" />
+    <Compile Include="Toolbar.cs" />
+    <Compile Include="Commands\ClearGridSelection.cs" />
+    <Compile Include="Commands\ClearRowSelection.cs" />
+    <Compile Include="Commands\DragRows.cs" />
+    <Compile Include="Commands\SelectRectangleOnGrid.cs" />
+    <Compile Include="Commands\SelectRow.cs" />
+    <Compile Include="Commands\SetCurrentColumn.cs" />
+    <Compile Include="Commands\SetCurrentContainer.cs" />
+    <Compile Include="Commands\ShiftSelection.cs" />
+    <Compile Include="Components\Model\CurveRow.cs" />
+    <Compile Include="Components\Model\NodeRow.cs" />
+    <Compile Include="Components\Model\PropertyRow.cs" />
+    <Compile Include="Components\Presentation\GridCurveView.cs" />
+    <Compile Include="Components\Presentation\GridNodeView.cs" />
+    <Compile Include="Components\Presentation\GridPropertyView.cs" />
+    <Compile Include="Components\Presentation\IGridWidget.cs" />
+    <Compile Include="Components\Presentation\IOverviewWidget.cs" />
+    <Compile Include="Components\Presentation\IRollWidget.cs" />
+    <Compile Include="Components\Presentation\RollCurveView.cs" />
+    <Compile Include="Components\Presentation\RollNodeView.cs" />
+    <Compile Include="Components\Presentation\RollPropertyView.cs" />
+    <Compile Include="Components\DragKeyframesRequest.cs" />
+    <Compile Include="Components\HasKeyframeRequest.cs" />
+    <Compile Include="MarkerPropertiesDialog.cs" />
+    <Compile Include="Processors\Rulerbar\EditMarkerProcessor.cs" />
+    <Compile Include="Processors\Rulerbar\RulerMouseScrollProcessor.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Tasks\Rulerbar\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Lime\Lime.Win.csproj">
+      <Project>{fc2de6c9-641a-4230-8d29-ea4035cd8708}</Project>
+      <Name>Lime.Win</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.Win.csproj">
+      <Project>{05fb6476-c29b-49a7-918c-a52caf73fca7}</Project>
+      <Name>Tangerine.Core.Win</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Tangerine.UI\Tangerine.UI.Win.csproj">
+      <Project>{e62ba18f-4e1a-466a-8299-67ad567f17e5}</Project>
+      <Name>Tangerine.UI.Win</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
