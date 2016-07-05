@@ -86,7 +86,10 @@ namespace YuzuTest
 		public static void Main()
 		{
 			var jd = JsonDeserializerGenerator.Instance;
-			using (jd.GenWriter = new StreamWriter(new FileStream(@"..\..\Generated.cs", FileMode.Create))) {
+			using (var ms = new MemoryStream())
+			using (var sw = new StreamWriter(ms))
+			{
+				jd.GenWriter = sw;
 				jd.GenerateHeader("YuzuTest");
 				jd.Generate<Sample1>();
 				jd.Generate<Sample2>();
@@ -113,6 +116,8 @@ namespace YuzuTest
 				jd.Options.TagMode = TagMode.Aliases;
 				jd.Generate<SamplePerson>();
 				jd.GenerateFooter();
+				sw.Flush();
+				ms.WriteTo(new FileStream(@"..\..\Generated.cs", FileMode.Create));
 			}
 		}
 
