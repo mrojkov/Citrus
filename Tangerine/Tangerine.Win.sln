@@ -1,10 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.Win", "..\Lime\Lime.Win.csproj", "{FC2DE6C9-641A-4230-8D29-EA4035CD8708}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.Core.Win", "Tangerine.Core\Tangerine.Core.Win.csproj", "{05FB6476-C29B-49A7-918C-A52CAF73FCA7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.UI.Win", "Tangerine.UI\Tangerine.UI.Win.csproj", "{E62BA18F-4E1A-466A-8299-67AD567F17E5}"
@@ -19,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.Win", "Tangerine.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.UI.Timeline.Win", "Tangerine.UI.Timeline\Tangerine.UI.Timeline.Win.csproj", "{DB168347-08CC-40FC-B612-5A33A6877863}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.Win", "..\Lime\Lime.Win.csproj", "{FC2DE6C9-641A-4230-8D29-EA4035CD8708}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,12 +27,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{FC2DE6C9-641A-4230-8D29-EA4035CD8708}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{FC2DE6C9-641A-4230-8D29-EA4035CD8708}.Debug|x86.ActiveCfg = Debug|x86
-		{FC2DE6C9-641A-4230-8D29-EA4035CD8708}.Debug|x86.Build.0 = Debug|x86
-		{FC2DE6C9-641A-4230-8D29-EA4035CD8708}.Release|Any CPU.ActiveCfg = Release|x86
-		{FC2DE6C9-641A-4230-8D29-EA4035CD8708}.Release|x86.ActiveCfg = Release|x86
-		{FC2DE6C9-641A-4230-8D29-EA4035CD8708}.Release|x86.Build.0 = Release|x86
 		{05FB6476-C29B-49A7-918C-A52CAF73FCA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{05FB6476-C29B-49A7-918C-A52CAF73FCA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05FB6476-C29B-49A7-918C-A52CAF73FCA7}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -67,8 +61,8 @@ Global
 		{D6B543CB-0223-4210-BB0F-7D8250760895}.Release|x86.Build.0 = Release|Any CPU
 		{FE8512BC-7A55-425C-8BC1-AD4D9785CF12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FE8512BC-7A55-425C-8BC1-AD4D9785CF12}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FE8512BC-7A55-425C-8BC1-AD4D9785CF12}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{FE8512BC-7A55-425C-8BC1-AD4D9785CF12}.Debug|x86.Build.0 = Debug|Any CPU
+		{FE8512BC-7A55-425C-8BC1-AD4D9785CF12}.Debug|x86.ActiveCfg = Debug|x86
+		{FE8512BC-7A55-425C-8BC1-AD4D9785CF12}.Debug|x86.Build.0 = Debug|x86
 		{FE8512BC-7A55-425C-8BC1-AD4D9785CF12}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FE8512BC-7A55-425C-8BC1-AD4D9785CF12}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FE8512BC-7A55-425C-8BC1-AD4D9785CF12}.Release|x86.ActiveCfg = Release|Any CPU
@@ -89,6 +83,14 @@ Global
 		{DB168347-08CC-40FC-B612-5A33A6877863}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DB168347-08CC-40FC-B612-5A33A6877863}.Release|x86.ActiveCfg = Release|Any CPU
 		{DB168347-08CC-40FC-B612-5A33A6877863}.Release|x86.Build.0 = Release|Any CPU
+		{FC2DE6C9-641A-4230-8D29-EA4035CD8708}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC2DE6C9-641A-4230-8D29-EA4035CD8708}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC2DE6C9-641A-4230-8D29-EA4035CD8708}.Debug|x86.ActiveCfg = Debug|x86
+		{FC2DE6C9-641A-4230-8D29-EA4035CD8708}.Debug|x86.Build.0 = Debug|x86
+		{FC2DE6C9-641A-4230-8D29-EA4035CD8708}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC2DE6C9-641A-4230-8D29-EA4035CD8708}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC2DE6C9-641A-4230-8D29-EA4035CD8708}.Release|x86.ActiveCfg = Release|x86
+		{FC2DE6C9-641A-4230-8D29-EA4035CD8708}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
