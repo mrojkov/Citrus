@@ -32,6 +32,14 @@ namespace YuzuTest
 			jd.FromString(v2, "{\"X\":999}");
 			Assert.AreEqual(999, v2.X);
 			Assert.AreEqual(v1.Y, v2.Y);
+
+			v1.X = int.MaxValue;
+			jd.FromString(v2, js.ToString(v1));
+			Assert.AreEqual(v1.X, v2.X);
+
+			v1.X = int.MinValue;
+			jd.FromString(v2, js.ToString(v1));
+			Assert.AreEqual(v1.X, v2.X);
 		}
 
 		[TestMethod]
@@ -80,6 +88,13 @@ namespace YuzuTest
 			jd1.FromString(v2, result1);
 			Assert.AreEqual(v1.S, v2.S);
 			Assert.AreEqual(v1.U, v2.U);
+
+			js.JsonOptions.Int64AsString = false;
+			v1.S = long.MinValue;
+			v1.U = ulong.MaxValue;
+			jd.FromString(v2, js.ToString(v1));
+			Assert.AreEqual(v1.S, v2.S);
+			Assert.AreEqual(v1.U, v2.U);
 		}
 
 		[TestMethod]
@@ -96,14 +111,23 @@ namespace YuzuTest
 			var jd = new JsonDeserializer();
 			jd.FromString(v2, result);
 			Assert.AreEqual(v1.Ch, v2.Ch);
+			Assert.AreEqual(v1.USh, v2.USh);
 			Assert.AreEqual(v1.Sh, v2.Sh);
 			Assert.AreEqual(v1.B, v2.B);
 			Assert.AreEqual(v1.Sb, v2.Sb);
+
 			XAssert.Throws<YuzuException>(() => jd.FromString(v2, result.Replace("A", "ABC")), "ABC");
 			XAssert.Throws<OverflowException>(() => jd.FromString(v2, result.Replace("198", "298")));
 			XAssert.Throws<OverflowException>(() => jd.FromString(v2, result.Replace("109", "209")));
 			XAssert.Throws<OverflowException>(() => jd.FromString(v2, result.Replace("2000", "40000")));
 			XAssert.Throws<OverflowException>(() => jd.FromString(v2, result.Replace("2001", "200000")));
+
+			jd.FromString(v2, "{\n\"B\":255,\n\"Ch\":\"Z\",\n\"Sb\":-128,\n\"Sh\":-32768,\n\"USh\":32767\n}");
+			Assert.AreEqual('Z', v2.Ch);
+			Assert.AreEqual(32767, v2.USh);
+			Assert.AreEqual(-32768, v2.Sh);
+			Assert.AreEqual(255, v2.B);
+			Assert.AreEqual(-128, v2.Sb);
 		}
 
 		[TestMethod]
@@ -676,6 +700,15 @@ namespace YuzuTest
 			w1 = (SampleDate)SampleDate_JsonDeserializer.Instance.FromString(result1);
 			Assert.AreEqual(v1.D, w1.D);
 			Assert.AreEqual(v1.T, w1.T);
+		}
+
+		[TestMethod]
+		public void TestDelegate()
+		{
+			var js = new JsonSerializer();
+			var v1 = new SampleSelfDelegate { x = 77 };
+			js.ToString(v1);
+			Assert.AreEqual(1, 1);
 		}
 
 		[TestMethod]

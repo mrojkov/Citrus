@@ -530,7 +530,8 @@ namespace Yuzu
 			var ch = SkipSpaces();
 			uint result = 0;
 			while ('0' <= ch && ch <= '9') {
-				checked { result = result * 10 + (uint)ch - (uint)'0'; }
+				var d = (uint)ch - (uint)'0';
+				checked { result = result * 10 + d; }
 				ch = Reader.ReadChar();
 			}
 			PutBack(ch);
@@ -540,18 +541,24 @@ namespace Yuzu
 		protected int RequireInt()
 		{
 			var ch = SkipSpaces();
-			int sign = 1;
-			if (ch == '-') {
-				sign = -1;
-				ch = Reader.ReadChar();
-			}
 			int result = 0;
-			while ('0' <= ch && ch <= '9') {
-				checked { result = result * 10 + (int)ch - (int)'0'; }
+			if (ch == '-') {
 				ch = Reader.ReadChar();
+				while ('0' <= ch && ch <= '9') {
+					var d = (int)'0' - (int)ch;
+					checked { result = result * 10 + d; }
+					ch = Reader.ReadChar();
+				}
+			}
+			else {
+				while ('0' <= ch && ch <= '9') {
+					var d = (int)ch - (int)'0';
+					checked { result = result * 10 + d; }
+					ch = Reader.ReadChar();
+				}
 			}
 			PutBack(ch);
-			return sign * result;
+			return result;
 		}
 
 		protected ulong RequireULong()
@@ -564,7 +571,8 @@ namespace Yuzu
 			}
 			ulong result = 0;
 			while ('0' <= ch && ch <= '9') {
-				checked { result = result * 10 + (ulong)ch - (ulong)'0'; }
+				var d = (ulong)ch - (ulong)'0';
+				checked { result = result * 10 + d; }
 				ch = Reader.ReadChar();
 			}
 			if (JsonOptions.Int64AsString) {
@@ -591,7 +599,8 @@ namespace Yuzu
 			}
 			long result = 0;
 			while ('0' <= ch && ch <= '9') {
-				checked { result = result * 10 + (long)ch - (long)'0'; }
+				var d = sign * ((long)ch - (long)'0');
+				checked { result = result * 10 + d; }
 				ch = Reader.ReadChar();
 			}
 			if (JsonOptions.Int64AsString) {
@@ -600,7 +609,7 @@ namespace Yuzu
 			}
 			else
 				PutBack(ch);
-			return sign * result;
+			return result;
 		}
 
 		private string ParseFloat()
