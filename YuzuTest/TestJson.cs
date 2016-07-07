@@ -338,6 +338,47 @@ namespace YuzuTest
 		}
 
 		[TestMethod]
+		public void TestTopLevelList()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			var jd = new JsonDeserializer();
+
+			var v0 = new List<string> { "a", "b", "c" };
+			var result0 = js.ToString(v0);
+			Assert.AreEqual("[\n\"a\",\n\"b\",\n\"c\"\n]", result0);
+
+			var w0 = new List<string>();
+			jd.FromString(w0, result0);
+			CollectionAssert.AreEqual(v0, w0);
+			jd.FromString(w0, "[]");
+			CollectionAssert.AreEqual(v0, w0);
+			jd.FromString(w0, result0);
+			CollectionAssert.AreEqual(new List<string> { "a", "b", "c", "a", "b", "c" }, w0);
+		}
+
+		[TestMethod]
+		public void TestTopLevelDict()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			var jd = new JsonDeserializer();
+
+			var v0 = new Dictionary<string, int> { { "a", 1 }, { "b", 2 } };
+			var result0 = js.ToString(v0);
+			Assert.AreEqual("{\n\"a\":1,\n\"b\":2\n}", result0);
+
+			var w0 = new Dictionary<string, int>();
+			jd.FromString(w0, result0);
+			CollectionAssert.AreEqual(v0, w0);
+			jd.FromString(w0, "{}");
+			CollectionAssert.AreEqual(v0, w0);
+			jd.FromString(w0, "{\"c\":3}");
+			CollectionAssert.AreEqual(
+				new Dictionary<string, int> { { "a", 1 }, { "b", 2 }, { "c", 3 } }, w0);
+		}
+
+		[TestMethod]
 		public void TestDictionary()
 		{
 			var js = new JsonSerializer();

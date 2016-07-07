@@ -295,9 +295,9 @@ namespace Yuzu
 			}
 			if (Utils.IsStruct(t) || t.IsClass) {
 				if (Utils.IsCompact(t, Options) && !JsonOptions.IgnoreCompact)
-					return ToWriterCompact;
+					return WriteObjectCompact;
 				else
-					return ToWriter;
+					return WriteObject;
 			}
 			throw new NotImplementedException(t.Name);
 		}
@@ -319,7 +319,7 @@ namespace Yuzu
 			writer.Write(':');
 		}
 
-		protected override void ToWriter(object obj)
+		private void WriteObject(object obj)
 		{
 			if (obj == null) {
 				WriteStr("null");
@@ -345,7 +345,7 @@ namespace Yuzu
 			writer.Write('}');
 		}
 
-		private void ToWriterCompact(object obj)
+		private void WriteObjectCompact(object obj)
 		{
 			if (obj == null) {
 				WriteStr("null");
@@ -367,6 +367,8 @@ namespace Yuzu
 				WriteStr(JsonOptions.FieldSeparator);
 			writer.Write(']');
 		}
+
+		protected override void ToWriter(object obj) { GetWriteFunc(obj.GetType())(obj); }
 	}
 
 	public class JsonDeserializer : AbstractReaderDeserializer
@@ -711,19 +713,25 @@ namespace Yuzu
 			return ch;
 		}
 
+		private void ReadIntoList<T>(List<T> list)
+		{
+			// ReadValue might invoke a new serializer, so we must not rely on PutBack.
+			if (SkipSpacesCarefully() == ']') {
+				Require(']');
+				return;
+			}
+			var rf = ReadValueFunc(typeof(T));
+			do {
+				list.Add((T)rf());
+			} while (Require(']', ',') == ',');
+		}
+
 		private List<T> ReadList<T>()
 		{
-			if (RequireOrNull('[')) return null;
+			if (RequireOrNull('['))
+				return null;
 			var list = new List<T>();
-			// ReadValue might invoke a new serializer, so we must not rely on PutBack.
-			if (SkipSpacesCarefully() == ']')
-				Require(']');
-			else {
-				var rf = ReadValueFunc(typeof(T));
-				do {
-					list.Add((T)rf());
-				} while (Require(']', ',') == ',');
-			}
+			ReadIntoList(list);
 			return list;
 		}
 
@@ -737,27 +745,33 @@ namespace Yuzu
 			keyParsers.Add(t, parser);
 		}
 
+		private void ReadIntoDictionary<K, V>(Dictionary<K, V> dict)
+		{
+			// ReadValue might invoke a new serializer, so we must not rely on PutBack.
+			if (SkipSpacesCarefully() == '}') {
+				Require('}');
+				return;
+			}
+			Func<string, object> rk;
+			if (typeof(K).IsEnum)
+				rk = s => Enum.Parse(typeof(K), s);
+			else if (!keyParsers.TryGetValue(typeof(K), out rk))
+				throw new YuzuAssert("Unable to find key parser for type: " + typeof(K).Name);
+
+			var rf = ReadValueFunc(typeof(V));
+			do {
+				var key = RequireString();
+				Require(':');
+				dict.Add((K)rk(key), (V)rf());
+			} while (Require('}', ',') == ',');
+		}
+
 		private Dictionary<K, V> ReadDictionary<K, V>()
 		{
-			if (RequireOrNull('{')) return null;
+			if (RequireOrNull('{'))
+				return null;
 			var dict = new Dictionary<K, V>();
-			// ReadValue might invoke a new serializer, so we must not rely on PutBack.
-			if (SkipSpacesCarefully() == '}')
-				Require('}');
-			else {
-				Func<string, object> rk;
-				if (typeof(K).IsEnum)
-					rk = s => Enum.Parse(typeof(K), s);
-				else if (!keyParsers.TryGetValue(typeof(K), out rk))
-					throw new YuzuAssert("Unable to find key parser for type: " + typeof(K).Name);
-
-				var rf = ReadValueFunc(typeof(V));
-				do {
-					var key = RequireString();
-					Require(':');
-					dict.Add((K)rk(key), (V)rf());
-				} while (Require('}', ',') == ',');
-			}
+			ReadIntoDictionary(dict);
 			return dict;
 		}
 
@@ -991,7 +1005,13 @@ namespace Yuzu
 			switch (RequireBracketOrNull()) {
 				case 'n':
 					return null;
-				case '{':
+				case '{': {
+					var t = obj.GetType();
+					if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
+						var m = Utils.GetPrivateCovariantGenericAll(GetType(), "ReadIntoDictionary", t);
+						m.Invoke(this, new object[] { obj });
+						return obj;
+					}
 					string name = GetNextName(true);
 					if (Options.ClassNames) {
 						CheckClassTag(name);
@@ -999,10 +1019,18 @@ namespace Yuzu
 						name = GetNextName(false);
 					}
 					return ReadFields(obj, name);
-				case '[':
+				}
+				case '[': {
+					var t = obj.GetType();
+					if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>)) {
+						var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadIntoList", t);
+						m.Invoke(this, new object[] { obj });
+						return obj;
+					}
 					if (Options.ClassNames)
 						CheckSameTypeAsTag(obj);
 					return ReadFieldsCompact(obj);
+				}
 				default:
 					throw new YuzuAssert();
 			}
