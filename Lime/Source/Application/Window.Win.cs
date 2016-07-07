@@ -171,8 +171,6 @@ namespace Lime
 			}
 		}
 
-		private static OpenTK.GLControl mainGLControl;
-
 		private static OpenTK.GLControl CreateGLControl()
 		{
 			return new GLControl(OpenTK.Graphics.GraphicsMode.Default, 2, 0,
@@ -182,11 +180,9 @@ namespace Lime
 			);
 		}
 
-		internal static void InitializeMainOpenGLContext()
+		static Window()
 		{
-			OpenTK.Graphics.GraphicsContext.ShareContexts = false;
-			mainGLControl = CreateGLControl();
-			mainGLControl.MakeCurrent();
+			GraphicsContext.ShareContexts = true;
 		}
 
 		public Window()
@@ -217,11 +213,6 @@ namespace Lime
 			}
 			form.FormBorderStyle = borderStyle;
 			form.MaximizeBox = !options.FixedSize;
-			if (Application.RenderingBackend == RenderingBackend.ES20) {
-				glControl = mainGLControl;
-			} else {
-				glControl = CreateGLControl();
-			}
 			ClientSize = options.ClientSize;
 			if (options.MinimumDecoratedSize != Vector2.Zero) {
 				MinimumDecoratedSize = options.MinimumDecoratedSize;
@@ -230,6 +221,7 @@ namespace Lime
 				MaximumDecoratedSize = options.MaximumDecoratedSize;
 			}
 			Title = options.Title;
+			glControl = CreateGLControl();
 			glControl.Dock = DockStyle.Fill;
 			glControl.Paint += OnPaint;
 			glControl.KeyDown += OnKeyDown;
@@ -255,7 +247,6 @@ namespace Lime
 			if (options.Icon != null) {
 				form.Icon = (System.Drawing.Icon)options.Icon;
 			}
-			mainGLControl.MakeCurrent();
 			Cursor = MouseCursor.Default;
 			if (options.Visible) {
 				Visible = true;
@@ -392,7 +383,8 @@ namespace Lime
 		private void OnPaint(object sender, PaintEventArgs e)
 		{
 			// Do not allow updating if modal dialog is shown, otherwise it will lead to recursive OnPaint.
-			if (form.Visible && form.CanFocus) {
+			if (glControl.IsHandleCreated && form.Visible && form.CanFocus) {
+				glControl.MakeCurrent();
 				var delta = (float)stopwatch.Elapsed.TotalSeconds;
 				stopwatch.Restart();
 				delta = Mathf.Clamp(delta, 0, 1 / Application.LowFPSLimit);
@@ -400,11 +392,9 @@ namespace Lime
 				Update(delta);
 				if (invalidated) {
 					fpsCounter.Refresh();
-					if (glControl.IsHandleCreated) {
-						mainGLControl.Context.MakeCurrent(glControl.WindowInfo);
-						RaiseRendering();
-						mainGLControl.SwapBuffers();
-					}
+					glControl.MakeCurrent();
+					RaiseRendering();
+					glControl.SwapBuffers();
 					invalidated = false;
 				}
 			}

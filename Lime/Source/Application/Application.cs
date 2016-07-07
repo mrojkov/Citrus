@@ -257,7 +257,6 @@ namespace Lime
 			} catch (EntryPointNotFoundException ex) {
 				Logger.Write(ex.Message);
 			}
-			Window.InitializeMainOpenGLContext();
 			SoftKeyboard = new DummySoftKeyboard();
 #elif MAC
 			SoftKeyboard = new DummySoftKeyboard();
