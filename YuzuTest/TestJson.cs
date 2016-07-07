@@ -747,9 +747,24 @@ namespace YuzuTest
 		public void TestDelegate()
 		{
 			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = "";
+
 			var v1 = new SampleSelfDelegate { x = 77 };
-			js.ToString(v1);
-			Assert.AreEqual(1, 1);
+			v1.OnSomething = v1.Handler1;
+			var result = js.ToString(v1);
+			Assert.AreEqual("{\"OnSomething\":\"Handler1\",\"x\":77}", result);
+
+			var w1 = new SampleSelfDelegate();
+			var jd = new JsonDeserializer();
+			jd.FromString(w1, result);
+			Assert.AreEqual(v1.x, w1.x);
+			w1.OnSomething(10);
+			Assert.AreEqual(87, w1.x);
+
+			jd.FromString(w1, result.Replace("Handler1", "Handler2"));
+			w1.OnSomething(10);
+			Assert.AreEqual(770, w1.x);
 		}
 
 		[TestMethod]

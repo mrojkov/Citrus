@@ -225,6 +225,20 @@ namespace Yuzu
 			writer.Write(']');
 		}
 
+		private Stack<object> objStack = new Stack<object>();
+
+		private void WriteAction(object obj)
+		{
+			if (obj == null) {
+				WriteStr("null");
+				return;
+			}
+			var a = obj as MulticastDelegate;
+			if (a.Target != objStack.Peek())
+				throw new NotImplementedException();
+			WriteUnescapedString(a.Method.Name);
+		}
+
 		private Dictionary<Type, Action<object>> writerCache = new Dictionary<Type, Action<object>>();
 		private int jsonOptionsGeneration = 0;
 
@@ -288,6 +302,9 @@ namespace Yuzu
 					var m = Utils.GetPrivateCovariantGenericAll(GetType(), "WriteDictionary", t);
 					return obj => m.Invoke(this, new object[] { obj });
 				}
+				if (g == typeof(Action<>)) {
+					return WriteAction;
+				}
 			}
 			if (t.IsArray) {
 				var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteArray", t);
@@ -333,12 +350,18 @@ namespace Yuzu
 				WriteName(JsonOptions.ClassTag, ref isFirst);
 				WriteUnescapedString(t.FullName);
 			}
-			foreach (var yi in Meta.Get(t, Options).Items) {
-				var value = yi.GetValue(obj);
-				if (yi.SerializeIf != null && !yi.SerializeIf(obj, value))
-					continue;
-				WriteName(yi.Tag(Options), ref isFirst);
-				GetWriteFunc(yi.Type)(value);
+			objStack.Push(obj);
+			try {
+				foreach (var yi in Meta.Get(t, Options).Items) {
+					var value = yi.GetValue(obj);
+					if (yi.SerializeIf != null && !yi.SerializeIf(obj, value))
+						continue;
+					WriteName(yi.Tag(Options), ref isFirst);
+					GetWriteFunc(yi.Type)(value);
+				}
+			}
+			finally {
+				objStack.Pop();
 			}
 			if (!isFirst)
 				WriteStr(JsonOptions.FieldSeparator);
@@ -359,10 +382,16 @@ namespace Yuzu
 				WriteSep(ref isFirst);
 				WriteUnescapedString(t.FullName);
 			}
-			foreach (var yi in Meta.Get(t, Options).Items) {
-				WriteSep(ref isFirst);
-				GetWriteFunc(yi.Type)(yi.GetValue(obj));
+			objStack.Push(obj);
+			try {
+				foreach (var yi in Meta.Get(t, Options).Items) {
+					WriteSep(ref isFirst);
+					GetWriteFunc(yi.Type)(yi.GetValue(obj));
+				}
 			}
+			finally {
+				objStack.Pop();
+			};
 			if (!isFirst)
 				WriteStr(JsonOptions.FieldSeparator);
 			writer.Write(']');
@@ -456,7 +485,7 @@ namespace Yuzu
 		protected string RequireUnescapedString()
 		{
 			sb.Clear();
-			Require('"');
+			if (RequireOrNull('"')) return null;
 			while (true) {
 				var ch = Reader.ReadChar();
 				if (ch == '"')
@@ -798,6 +827,19 @@ namespace Yuzu
 			return array;
 		}
 
+		Stack<object> objStack = new Stack<object>();
+
+		private Action<T> ReadAction<T>()
+		{
+			var name = RequireUnescapedString();
+			if (name == null) return null;
+			var obj = objStack.Peek();
+			var m = obj.GetType().GetMethod(name, BindingFlags.Instance | BindingFlags.Public);
+			if (m == null)
+				throw Error("Unknown action '{0}'", name);
+			return (Action<T>)Delegate.CreateDelegate(typeof(Action<T>), obj, m);
+		}
+
 		private object ReadObject() {
 			var ch = SkipSpaces();
 			PutBack(ch);
@@ -884,6 +926,11 @@ namespace Yuzu
 					var m = Utils.GetPrivateCovariantGenericAll(GetType(), "ReadDictionary", t);
 					return () => m.Invoke(this, new object[] { });
 				}
+				if (g == typeof(Action<>)) {
+					var p = t.GetGenericArguments();
+					var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadAction", t);
+					return () => m.Invoke(this, new object[] { });
+				}
 			}
 			if (t.IsArray) {
 				var n = JsonOptions.ArrayLengthPrefix ? "ReadArrayWithLengthPrefix" : "ReadArray";
@@ -921,28 +968,34 @@ namespace Yuzu
 
 		protected virtual object ReadFields(object obj, string name)
 		{
-			// Optimization: duplicate loop to extract options check.
-			if (Options.IgnoreNewFields && Options.TagMode != TagMode.Names) {
-				foreach (var yi in Meta.Get(obj.GetType(), Options).Items) {
-					if (IgnoreNewFields(yi.Tag(Options), ref name) != 0) {
-						if (!yi.IsOptional)
-							throw Error("Expected field '{0}', but found '{1}'", yi.NameTagged(Options), name);
-						continue;
+			objStack.Push(obj);
+			try {
+				// Optimization: duplicate loop to extract options check.
+				if (Options.IgnoreNewFields && Options.TagMode != TagMode.Names) {
+					foreach (var yi in Meta.Get(obj.GetType(), Options).Items) {
+						if (IgnoreNewFields(yi.Tag(Options), ref name) != 0) {
+							if (!yi.IsOptional)
+								throw Error("Expected field '{0}', but found '{1}'", yi.NameTagged(Options), name);
+							continue;
+						}
+						yi.SetValue(obj, ReadValueFunc(yi.Type)());
+						name = GetNextName(false);
 					}
-					yi.SetValue(obj, ReadValueFunc(yi.Type)());
-					name = GetNextName(false);
+				}
+				else {
+					foreach (var yi in Meta.Get(obj.GetType(), Options).Items) {
+						if (yi.Tag(Options) != name) {
+							if (!yi.IsOptional)
+								throw Error("Expected field '{0}', but found '{1}'", yi.NameTagged(Options), name);
+							continue;
+						}
+						yi.SetValue(obj, ReadValueFunc(yi.Type)());
+						name = GetNextName(false);
+					}
 				}
 			}
-			else {
-				foreach (var yi in Meta.Get(obj.GetType(), Options).Items) {
-					if (yi.Tag(Options) != name) {
-						if (!yi.IsOptional)
-							throw Error("Expected field '{0}', but found '{1}'", yi.NameTagged(Options), name);
-						continue;
-					}
-					yi.SetValue(obj, ReadValueFunc(yi.Type)());
-					name = GetNextName(false);
-				}
+			finally {
+				objStack.Pop();
 			}
 			if (Options.IgnoreNewFields)
 				IgnoreNewFieldsTail(name);
@@ -955,11 +1008,17 @@ namespace Yuzu
 			if (!Utils.IsCompact(obj.GetType(), Options))
 				throw Error("Attempt to read non-compact type '{0}' from compact format", obj.GetType().Name);
 			bool isFirst = true;
-			foreach (var yi in Meta.Get(obj.GetType(), Options).Items) {
-				if (!isFirst)
-					Require(',');
-				isFirst = false;
-				yi.SetValue(obj, ReadValueFunc(yi.Type)());
+			objStack.Push(obj);
+			try {
+				foreach (var yi in Meta.Get(obj.GetType(), Options).Items) {
+					if (!isFirst)
+						Require(',');
+					isFirst = false;
+					yi.SetValue(obj, ReadValueFunc(yi.Type)());
+				}
+			}
+			finally {
+				objStack.Pop();
 			}
 			Require(']');
 			return obj;

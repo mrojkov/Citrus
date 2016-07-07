@@ -281,6 +281,17 @@ namespace YuzuTest
 		}
 	}
 
+	public class SampleSelfDelegate
+	{
+		[YuzuRequired]
+		public int x;
+		[YuzuRequired]
+		public Action<int> OnSomething;
+
+		public void Handler1(int v) { x += v; }
+		public void Handler2(int v) { x *= v; }
+	}
+
 	public class Bad1
 	{
 		[YuzuRequired]
@@ -301,19 +312,6 @@ namespace YuzuTest
 		[YuzuRequired("q")]
 		public int G;
 	};
-
-	public class SampleSelfDelegate
-	{
-		[YuzuRequired]
-		public int x;
-		[YuzuRequired]
-		public event Action<int> OnSomething;
-
-		[YuzuDelegate]
-		public void Handler1(int v) { x += v; }
-		[YuzuDelegate]
-		public void Handler2(int v) { x *= v; }
-	}
 
 	public static class XAssert
 	{
