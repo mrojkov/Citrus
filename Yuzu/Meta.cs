@@ -78,19 +78,23 @@ namespace Yuzu
 				Name = m.Name,
 			};
 
-			if (m.MemberType == MemberTypes.Field) {
-				var f = m as FieldInfo;
-				item.Type = f.FieldType;
-				item.GetValue = f.GetValue;
-				item.SetValue = f.SetValue;
-				item.FieldInfo = f;
-			}
-			else {
-				var p = m as PropertyInfo;
-				item.Type = p.PropertyType;
-				item.GetValue = p.GetValue;
-				item.SetValue = p.SetValue;
-				item.PropInfo = p;
+			switch (m.MemberType) {
+				case MemberTypes.Field:
+					var f = m as FieldInfo;
+					item.Type = f.FieldType;
+					item.GetValue = f.GetValue;
+					item.SetValue = f.SetValue;
+					item.FieldInfo = f;
+					break;
+				case MemberTypes.Property:
+					var p = m as PropertyInfo;
+					item.Type = p.PropertyType;
+					item.GetValue = p.GetValue;
+					item.SetValue = p.SetValue;
+					item.PropInfo = p;
+					break;
+				default:
+					throw Error("Member type {0} not supported", m.MemberType);
 			}
 
 			Items.Add(item);
@@ -101,9 +105,8 @@ namespace Yuzu
 			Type = t;
 			Options = options;
 			foreach (var m in t.GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy)) {
-				if (m.MemberType != MemberTypes.Field && m.MemberType != MemberTypes.Property)
-					continue;
-				AddItem(m);
+				if (m.MemberType == MemberTypes.Field || m.MemberType == MemberTypes.Property)
+					AddItem(m);
 			}
 			if (!options.AllowEmptyTypes && Items.Count == 0)
 				throw Error("No serializable fields");
