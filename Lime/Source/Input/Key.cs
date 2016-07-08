@@ -34,7 +34,7 @@ namespace Lime
 
 		public const int MaxCount = 512;
 
-		public static int Count = 0;
+		public static int Count = 1;
 		public static Key New() { return Count++; }
 
 		public static readonly Key Unknown = 0;

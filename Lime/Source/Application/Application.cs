@@ -118,7 +118,7 @@ namespace Lime
 				mainWindow = value;
 				mainWindow.Updating += RunScheduledActions;
 #if WIN
-				InstallMainMenu();
+				(mainWindow as Window).SetMenu(mainMenu);
 #endif
 			}
 		}
@@ -205,34 +205,20 @@ namespace Lime
 			{
 				if (mainMenu != value) {
 					mainMenu = value;
-					InstallMainMenu();
+#if MAC
+					if (mainMenu != null) {
+						mainMenu.Refresh();
+						NSApplication.SharedApplication.MainMenu = mainMenu.NativeMenu;
+					} else {
+						NSApplication.SharedApplication.MainMenu = null;
+					}
+#elif WIN
+					if (mainWindow is Window) {
+						(mainWindow as Window).SetMenu(mainMenu);
+					}
+#endif
 				}
 			}
-		}
-
-		public static void InstallMainMenu()
-		{
-#if MAC
-			if (mainMenu != null) {
-				mainMenu.Refresh();
-				NSApplication.SharedApplication.MainMenu = mainMenu.NativeMenu;
-			} else {
-				NSApplication.SharedApplication.MainMenu = null;
-			}
-#elif WIN
-			if (mainWindow == null)
-				return;
-			var mainForm = mainWindow.Form;
-			if (mainForm.MainMenuStrip != null) {
-				mainForm.MainMenuStrip = null;
-				mainForm.Controls.Remove(mainForm.MainMenuStrip);
-			}
-			if (mainMenu != null) {
-				mainMenu.Refresh();
-				mainForm.Controls.Add(mainMenu.NativeMainMenu);
-				mainForm.MainMenuStrip = mainMenu.NativeMainMenu;
-			}
-#endif
 		}
 #endif
 

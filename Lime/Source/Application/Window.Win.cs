@@ -593,6 +593,19 @@ namespace Lime
 		{
 			invalidated = true;
 		}
+
+		internal void SetMenu(Menu menu)
+		{
+			if (form.MainMenuStrip != null) {
+				form.MainMenuStrip = null;
+				form.Controls.Remove(form.MainMenuStrip);
+			}
+			if (menu != null) {
+				menu.Refresh();
+				form.Controls.Add(menu.NativeMainMenu);
+				form.MainMenuStrip = menu.NativeMainMenu;
+			}
+		}
 	}
 
 	static class SDToLime
