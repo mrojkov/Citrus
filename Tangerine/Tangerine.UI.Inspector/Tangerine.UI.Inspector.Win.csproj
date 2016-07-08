@@ -38,6 +38,10 @@
     <UseSGen>false</UseSGen>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="protobuf-net, Version=2.0.0.614, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\3rdParty\ProtoBuf-Net\win (full-net30)\protobuf-net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
@@ -45,6 +49,7 @@
     <Compile Include="KeyframeButton.cs" />
     <Compile Include="KeyframeDataflow.cs" />
     <Compile Include="KeyFunctionButton.cs" />
+    <Compile Include="Processors\UpdatePropertyGridProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Inspector.cs" />
     <Compile Include="PropertyEditor.cs" />

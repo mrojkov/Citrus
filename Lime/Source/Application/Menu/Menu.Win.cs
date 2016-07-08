@@ -88,11 +88,11 @@ namespace Lime
 			Refresh();
 			NativeContextMenu.MinimumSize = new SD.Size(
 				(int)minimumWidth, NativeContextMenu.MinimumSize.Height);
-			foreach (var menuItem in this) {
-				var mi = ((MenuItem)menuItem).NativeItem;
-				mi.Width = NativeContextMenu.Width;
+			foreach (var menuItem in items) {
+				var ni = menuItem.NativeItem;
+				ni.Width = NativeContextMenu.Width;
 				if (menuItem == command) {
-					mi.Select();
+					ni.Select();
 				}
 			}
 			NativeContextMenu.Show(window.Form, new SD.Point((int)position.X, (int)position.Y));
