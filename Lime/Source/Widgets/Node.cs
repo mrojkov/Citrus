@@ -406,28 +406,19 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Returns the <see cref="string"/> representation of this <see cref="Node"/>
-		/// in the format: "TypeName, "Id", HierarchyPath".
-		/// Example: "Node, "Child", Root/Child".
+		/// Returns the <see cref="string"/> representation of this <see cref="Node"/>.
 		/// </summary>
 		public override string ToString()
 		{
-			return string.Format("{0}, \"{1}\", {2}", GetType().Name, Id ?? "", GetHierarchyPath());
-		}
-
-		/// <summary>
-		/// Returns hierarchy path for this Node in the format: "Parent.GetHierarchyPath()/Id (Tag)".
-		/// If Id is null then it's replaced with Type name. Tag is ommited if it's null.
-		/// Example: "Root/[Node] (Cool tag)/Child".
-		/// </summary>
-		private string GetHierarchyPath()
-		{
-			string r = string.IsNullOrEmpty(Id) ? String.Format("[{0}]", GetType().Name) : Id;
-			if (!string.IsNullOrEmpty(Tag)) {
-				r += string.Format(" ({0})", Tag);
-			}
-			if (Parent != null) {
-				r = Parent.GetHierarchyPath() + "/" + r;
+			string r = "";
+			for (var p = this; p != null; p = p.Parent) {
+				if (p != this) {
+					r += " in ";
+				}
+				r += string.IsNullOrEmpty(p.Id) ? p.GetType().Name : string.Format("'{0}'", p.Id);
+				if (!string.IsNullOrEmpty(p.Tag)) {
+					r += string.Format(" ({0})", p.Tag);
+				}
 			}
 			return r;
 		}
