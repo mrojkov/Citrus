@@ -41,6 +41,7 @@ namespace Lime
 			Add(typeof(Blending), typeof(Animator<Blending>));
 			Add(typeof(ShaderId), typeof(Animator<ShaderId>));
 			Add(typeof(ITexture), typeof(Animator<ITexture>));
+			Add(typeof(RenderTarget), typeof(Animator<RenderTarget>));
 			Add(typeof(SerializableSample), typeof(Animator<SerializableSample>));
 			Add(typeof(EmitterShape), typeof(Animator<EmitterShape>));
 			Add(typeof(AudioAction), typeof(Animator<AudioAction>));
