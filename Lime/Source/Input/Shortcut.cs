@@ -13,7 +13,7 @@ namespace Lime
 		Shift = 1,
 		Control = 2,
 		Alt = 4,
-		Win = 8
+		Command = 8
 	}
 
 	/// <summary>

@@ -128,7 +128,7 @@ namespace Lime
 				if ((modifiers & Modifiers.Control) != 0) {
 					result |= NSEventModifierMask.ControlKeyMask;
 				}
-				if ((modifiers & Modifiers.Win) != 0) {
+				if ((modifiers & Modifiers.Command) != 0) {
 					result |= NSEventModifierMask.CommandKeyMask;
 				}
 				return result;
