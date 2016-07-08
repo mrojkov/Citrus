@@ -118,12 +118,53 @@ namespace Lime
 			NativeItem.Visible = Command.Visible;
 			NativeItem.Enabled = Command.Enabled;
 			NativeItem.Text = Command.Text;
+			NativeItem.ShortcutKeys = ToNativeKeys(Command.Shortcut);
 			if (Command.Submenu != null) {
 				Command.Submenu.Refresh();
 				NativeItem.DropDown = Command.Submenu.NativeContextMenu;
 			} else {
 				NativeItem.DropDown = null;
 			}
+		}
+
+		private static Keys ToNativeKeys(Shortcut shortcut)
+		{
+			return ToNativeKeys(shortcut.Modifiers) | ToNativeKeys(shortcut.Main);
+		}
+
+		private static Keys ToNativeKeys(Key key)
+		{
+			if (key == Key.Unknown) {
+				return Keys.None;
+			}
+			if (key >= Key.A && key <= Key.Z) {
+				return Keys.A + key - Key.A;
+			}
+			if (key >= Key.Number0 && key <= Key.Number9) {
+				return Keys.D0 + key - Key.Number0;
+			}
+			if (key >= Key.F1 && key <= Key.F24) {
+				return Keys.F1 + key - Key.F1;
+			}
+			throw new ArgumentException();
+		}
+
+		private static Keys ToNativeKeys(Modifiers modifiers)
+		{
+			var keys = Keys.None;
+			if ((modifiers & Modifiers.Control) != 0) {
+				keys |= Keys.Control;
+			}
+			if ((modifiers & Modifiers.Shift) != 0) {
+				keys |= Keys.Shift;
+			}
+			if ((modifiers & Modifiers.Alt) != 0) {
+				keys |= Keys.Alt;
+			}
+			if ((modifiers & Modifiers.Command) != 0) {
+				keys |= Keys.Control;
+			}
+			return keys;
 		}
 	}
 }
