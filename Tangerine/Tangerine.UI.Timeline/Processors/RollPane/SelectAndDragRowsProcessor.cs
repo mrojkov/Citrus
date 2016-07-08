@@ -29,7 +29,7 @@ namespace Tangerine.UI.Timeline
 				Timeline.Instance.RootWidget.SetFocus();
 				var initialMousePosition = input.MousePosition;
 				var row = MousePositionToRow(initialMousePosition);
-				if (input.IsKeyPressed(Key.ShiftLeft)) {
+				if (input.IsKeyPressed(Key.LShift)) {
 					if (timeline.SelectedRows.Count > 0) {
 						Document.Current.History.Execute(
 							new Operations.ClearRowSelection(), 

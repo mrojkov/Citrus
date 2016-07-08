@@ -89,20 +89,20 @@ namespace Tangerine
 				new Command {
 					Text = "Application",
 					Submenu = new Menu {
-						new Command("Quit", Application.Exit) { Shortcut = new Shortcut(Modifiers.Win, Key.Q) },
+						new Command("Quit", Application.Exit) { Shortcut = new Shortcut(Modifiers.Command, Key.Q) },
 					}
 				},
 				new Command {
 					Text = "File",
 					Submenu = new Menu {
-						new Command { Text = "Open", Shortcut = new Shortcut(Modifiers.Win, Key.O) },
+						new Command { Text = "Open", Shortcut = new Shortcut(Modifiers.Command, Key.O) },
 					}
 				},
 				new Command {
 					Text = "Edit",
 					Submenu = new Menu {
-						new Command { Text = "Undo", Shortcut = new Shortcut(Modifiers.Win, Key.Z), Key = Key.Undo },
-						new Command { Text = "Redo", Shortcut = new Shortcut(Modifiers.Win | Modifiers.Shift, Key.Z), Key = Key.Redo },
+						new Command { Text = "Undo", Shortcut = new Shortcut(Modifiers.Command, Key.Z), Key = Key.Undo },
+						new Command { Text = "Redo", Shortcut = new Shortcut(Modifiers.Command | Modifiers.Shift, Key.Z), Key = Key.Redo },
 					}
 				},
 				new Command {
