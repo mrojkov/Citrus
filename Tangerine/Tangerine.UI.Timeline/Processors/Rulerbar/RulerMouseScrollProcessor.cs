@@ -16,6 +16,7 @@ namespace Tangerine.UI.Timeline
 			while (true) {
 				if (input.WasMousePressed() && rulerWidget.IsMouseOver()) {
 					input.CaptureMouse();
+					timeline.RootWidget.SetFocus();
 					var initialColumn = timeline.CurrentColumn;
 					try {
 						while (input.IsMousePressed()) {

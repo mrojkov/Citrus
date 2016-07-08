@@ -170,7 +170,7 @@ namespace Lime
 
 		private IEnumerable<Widget> GetFocusables()
 		{
-			return widget.Descendants.OfType<Widget>().Where(i => i.Focusable != null && i.Focusable.TabStop).OrderBy(i => i.Focusable.TabOrder);
+			return widget.Descendants.OfType<Widget>().Where(i => i.Focusable != null && i.Focusable.TabStop && i.GloballyVisible).OrderBy(i => i.Focusable.TabOrder);
 		}
 	}
 }

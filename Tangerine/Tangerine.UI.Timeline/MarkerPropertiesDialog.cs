@@ -46,7 +46,7 @@ namespace Tangerine.UI.Timeline
 		readonly WindowWidget rootWidget;
 		readonly Button okButton;
 		readonly Button cancelButton;
-		readonly ComboBox actionSelector;
+		readonly DropDownList actionSelector;
 		readonly EditBox markerIdEditor;
 		readonly EditBox jumpToEditor;
 
@@ -71,12 +71,12 @@ namespace Tangerine.UI.Timeline
 							new SimpleText { Text = "Marker Id" },
 							(markerIdEditor = new EditBox { Text = marker.Id }),
 							new SimpleText { Text = "Action" },
-							(actionSelector = new ComboBox {
+							(actionSelector = new DropDownList {
 								Items = {
-									new ComboBox.Item("Play", MarkerAction.Play),
-									new ComboBox.Item("Jump", MarkerAction.Jump),
-									new ComboBox.Item("Stop", MarkerAction.Stop),
-									new ComboBox.Item("Destroy", MarkerAction.Destroy),
+									new DropDownList.Item("Play", MarkerAction.Play),
+									new DropDownList.Item("Jump", MarkerAction.Jump),
+									new DropDownList.Item("Stop", MarkerAction.Stop),
+									new DropDownList.Item("Destroy", MarkerAction.Destroy),
 								},
 								Value = marker.Action
 							}),

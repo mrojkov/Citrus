@@ -6,15 +6,15 @@ using Tangerine.Core;
 
 namespace Tangerine.UI
 {
-	public class EditBoxBinding : IProcessor
+	public class DropDownListBinding<T> : IProcessor
 	{
-		readonly EditBox editBox;
-		readonly IDataflowProvider<string> source;
+		readonly DropDownList dropDownList;
+		readonly IDataflowProvider<T> source;
 
-		public EditBoxBinding(EditBox editBox, IDataflowProvider<string> source)
+		public DropDownListBinding(DropDownList dropDownList, IDataflowProvider<T> source)
 		{
 			this.source = source;
-			this.editBox = editBox;
+			this.dropDownList = dropDownList;
 		}
 
 		public IEnumerator<object> Loop()
@@ -22,8 +22,8 @@ namespace Tangerine.UI
 			var dataflow = source.GetDataflow();
 			while (true) {
 				dataflow.Poll();
-				if (!editBox.IsFocused()) {
-					editBox.Text = dataflow.Value;
+				if (dataflow.GotValue) {
+					dropDownList.Value = dataflow.Value;
 				}
 				yield return null;
 			}

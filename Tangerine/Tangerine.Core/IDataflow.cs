@@ -44,7 +44,7 @@ namespace Tangerine.Core
 		public IDataflow<T> GetDataflow() => func();
 	}
 
-	public class Property<T> : IDataflowProvider<T> where T: IEquatable<T>
+	public class Property<T> : IDataflowProvider<T>
 	{
 		public Func<T> Getter { get; private set; }
 		public Action<T> Setter { get; private set; }
@@ -72,9 +72,63 @@ namespace Tangerine.Core
 		}
 
 		IDataflow<T> IDataflowProvider<T>.GetDataflow() => new PropertyDataflow<T>(Getter);
+
+		public T Value
+		{
+			get { return Getter(); }
+			set { Setter(value); }
+		}
 	}
 
-	class PropertyDataflow<T> : IDataflow<T> where T: IEquatable<T>
+	public class EventflowProvider<T> : IDataflowProvider<T>
+	{
+		readonly object obj;
+		readonly string eventName;
+
+		public EventflowProvider(object obj, string eventName)
+		{
+			this.obj = obj;
+			this.eventName = eventName;
+		}
+
+		public IDataflow<T> GetDataflow()
+		{
+			return new Eventflow<T>(obj, eventName);
+		}
+	}
+
+	class Eventflow<T> : IDataflow<T>
+	{
+		readonly List<T> queue = new List<T>();
+
+		public T Value { get; private set; }
+		public bool GotValue { get; private set; }
+
+		public Eventflow(object obj, string eventName)
+		{
+			var evt = obj.GetType().GetEvent(eventName);
+			evt.AddEventHandler(obj, (Action<T>)EventHandler);
+		}
+
+		void EventHandler(T value)
+		{
+			lock (queue) {
+				queue.Add(value);
+			}
+		}
+
+		public void Poll()
+		{
+			lock (queue) {
+				if ((GotValue = queue.Count > 0)) {
+					Value = queue[0];
+					queue.RemoveAt(0);
+				}
+			}
+		}
+	}
+
+	class PropertyDataflow<T> : IDataflow<T>
 	{
 		readonly Func<T> getter;
 
@@ -117,17 +171,12 @@ namespace Tangerine.Core
 
 		public static IDataflowProvider<T> SameOrDefault<T>(this IDataflowProvider<T> arg1, IDataflowProvider<T> arg2, T defaultValue = default(T))
 		{
-			return new DataflowProvider<T>(() => new SameOrDefault<T>(arg1.GetDataflow(), arg2.GetDataflow(), defaultValue));
+			return new DataflowProvider<T>(() => new SameOrDefaultProvider<T>(arg1.GetDataflow(), arg2.GetDataflow(), defaultValue));
 		}
 
 		public static IDataflowProvider<T> Skip<T>(this IDataflowProvider<T> arg, int count)
 		{
 			return new DataflowProvider<T>(() => new SkipProvider<T>(arg.GetDataflow(), count));
-		}
-
-		private static bool Equals<T>(T a, T b)
-		{
-			return (a == null) && (b == null) || (a != null && b != null && a.Equals(b));
 		}
 
 		class SelectProvider<T, R> : IDataflow<R>
@@ -219,7 +268,7 @@ namespace Tangerine.Core
 				arg.Poll();
 				if ((GotValue = arg.GotValue)) {
 					var current = arg.Value;
-					if ((GotValue = !hasValue || !Equals(current, previous))) {
+					if ((GotValue = !hasValue || !EqualityComparer<T>.Default.Equals(current, previous))) {
 						Value = current;
 					}
 					hasValue = true;
@@ -253,7 +302,7 @@ namespace Tangerine.Core
 			}
 		}
 
-		class SameOrDefault<T> : IDataflow<T>
+		class SameOrDefaultProvider<T> : IDataflow<T>
 		{
 			readonly IDataflow<T> arg1;
 			readonly IDataflow<T> arg2;
@@ -262,7 +311,7 @@ namespace Tangerine.Core
 			public bool GotValue { get; private set; }
 			public T Value { get; private set; }
 
-			public SameOrDefault(IDataflow<T> arg1, IDataflow<T> arg2, T defaultValue)
+			public SameOrDefaultProvider(IDataflow<T> arg1, IDataflow<T> arg2, T defaultValue)
 			{
 				this.arg1 = arg1;
 				this.arg2 = arg2;
@@ -274,7 +323,7 @@ namespace Tangerine.Core
 				arg1.Poll();
 				arg2.Poll();
 				if ((GotValue = arg1.GotValue || arg2.GotValue)) {
-					Value = Equals(arg1.Value, arg2.Value) ? arg1.Value : defaultValue;
+					Value = EqualityComparer<T>.Default.Equals(arg1.Value, arg2.Value) ? arg1.Value : defaultValue;
 				}
 			}
 		}

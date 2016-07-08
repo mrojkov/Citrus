@@ -8,27 +8,24 @@ namespace Tangerine.UI
 {
 	public class AnimablePropertyBinding<T> : IProcessor
 	{
-		readonly object @object;
+		readonly object obj;
 		readonly string propertyName;
-		readonly IDataflowProvider<T> source;
+		readonly IDataflowProvider<T> values;
 
-		public AnimablePropertyBinding(object @object, string propertyName, IDataflowProvider<T> source)
+		public AnimablePropertyBinding(object obj, string propertyName, IDataflowProvider<T> values)
 		{
-			this.@object = @object;
+			this.obj = obj;
 			this.propertyName = propertyName;
-			this.source = source;
+			this.values = values;
 		}
 
 		public IEnumerator<object> Loop()
 		{
-			var dataflow = source.GetDataflow();
+			var i = values.GetDataflow();
 			while (true) {
-				dataflow.Poll();
-				if (dataflow.GotValue) {
-					var currentValue = new Property(@object, propertyName).Value;
-					if (!Equals(currentValue, dataflow.Value)) {
-						Document.Current.History.Execute(new Core.Operations.SetAnimableProperty(@object, propertyName, dataflow.Value));
-					}
+				i.Poll();
+				if (i.GotValue) {
+					Document.Current.History.Execute(new Core.Operations.SetAnimableProperty(obj, propertyName, i.Value));
 				}
 				yield return null;
 			}
