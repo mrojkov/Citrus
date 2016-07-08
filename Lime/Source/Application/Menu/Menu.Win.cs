@@ -9,24 +9,55 @@ namespace Lime
 	public class Menu : List<ICommand>, IMenu
 	{
 		List<MenuItem> items = new List<MenuItem>();
-		private readonly ContextMenuStrip menu;
-		private bool validated = true;
 
-		public Menu()
+		private MenuStrip nativeMainMenu;
+		private ContextMenuStrip nativeContextMenu;
+
+		internal MenuStrip NativeMainMenu
 		{
-			menu = new ContextMenuStrip {
-				ShowImageMargin = false
-			};
+			get
+			{
+				if (nativeMainMenu == null) {
+					nativeMainMenu = new MenuStrip();
+					UpdateNativeMenu(nativeMainMenu);
+				}
+				return nativeMainMenu;
+			}
+		}
+
+		internal ContextMenuStrip NativeContextMenu
+		{
+			get
+			{
+				if (nativeContextMenu == null) {
+					nativeContextMenu = new ContextMenuStrip {
+						ShowImageMargin = false
+					};
+					UpdateNativeMenu(nativeContextMenu);
+				}
+				return nativeContextMenu;
+			}
 		}
 
 		private void Rebuild()
 		{
 			items.Clear();
-			menu.Items.Clear();
 			foreach (var i in this) {
-				var item = new MenuItem(i);
-				menu.Items.Add(item.Item);
-				items.Add(item);
+				items.Add(new MenuItem(i));
+			}
+			if (nativeMainMenu != null) {
+				UpdateNativeMenu(nativeMainMenu);
+			}
+			if (nativeContextMenu != null) {
+				UpdateNativeMenu(nativeContextMenu);
+			}
+		}
+
+		private void UpdateNativeMenu(ToolStrip menu)
+		{
+			menu.Items.Clear();
+			foreach (var i in items) {
+				menu.Items.Add(i.NativeItems);
 			}
 		}
 
@@ -48,90 +79,50 @@ namespace Lime
 
 		public void Popup()
 		{
-			Validate();
-			menu.Show(Window.Current.Form, new SD.Point());
+			Refresh();
+			NativeContextMenu.Show(Window.Current.Form, new SD.Point());
 		}
 
 		public void Popup(IWindow window, Vector2 position, float minimumWidth, ICommand command)
 		{
-			Validate();
-			menu.MinimumSize = new SD.Size((int)minimumWidth, menu.MinimumSize.Height);
+			Refresh();
+			NativeContextMenu.MinimumSize = new SD.Size(
+				(int)minimumWidth, NativeContextMenu.MinimumSize.Height);
 			foreach (var menuItem in this) {
-				var mi = ((MenuItem)menuItem).Item;
-				mi.Width = menu.Width;
+				var mi = ((MenuItem)menuItem).NativeItems;
+				mi.Width = NativeContextMenu.Width;
 				if (menuItem == command) {
 					mi.Select();
 				}
 			}
-			menu.Show(window.Form, new SD.Point((int)position.X, (int)position.Y));
-		}
-
-		private void Validate()
-		{
-			if (!validated) {
-				menu.Items.Clear();
-				foreach (var item in this) {
-					menu.Items.Add(((MenuItem)item).Item);
-				}
-				validated = true;
-			}
+			NativeContextMenu.Show(window.Form, new SD.Point((int)position.X, (int)position.Y));
 		}
 	}
 
 	class MenuItem
 	{
 		public readonly ICommand Command;
+		public readonly ToolStripMenuItem NativeItems;
 
 		public MenuItem(ICommand command)
 		{
 			Command = command;
-			Item = new ToolStripMenuItem {
-				AutoSize = false,
-				Text = command.Text
-			};
-			Item.Click += Item_Click;
-			Clicked += command.Execute;
-		}
-
-		public event Action Clicked;
-
-		public bool Enabled
-		{
-			get { return Item.Enabled; }
-			set { Item.Enabled = value; }
-		}
-
-		public IMenu SubMenu { get; set; }
-
-		public string Text
-		{
-			get { return Item.Text; }
-			set { Item.Text = value; }
-		}
-
-		public ToolStripItem Item { get; private set; }
-
-		public bool Visible
-		{
-			get { return Item.Visible; }
-			set { Item.Visible = value; }
-		}
-
-		public void SetShortcutString(string shortcut)
-		{
-			((ToolStripMenuItem)Item).ShortcutKeyDisplayString = shortcut;
+			NativeItems = new ToolStripMenuItem();
+			NativeItems.Click += (s, e) => command.Execute();
+			Refresh();
 		}
 
 		public void Refresh()
 		{
-			// TODO: implement.
-			throw new NotImplementedException();
-		}
-
-		private void Item_Click(object sender, EventArgs e)
-		{
-			if (Clicked != null) {
-				Clicked();
+			Command.Refresh();
+			NativeItems.Visible = Command.Visible;
+			NativeItems.Enabled = Command.Enabled;
+			NativeItems.Text = Command.Text;
+			if (Command.Submenu != null) {
+				Command.Submenu.Refresh();
+				NativeItems.DropDown = Command.Submenu.NativeContextMenu;
+			} else {
+				NativeItems.DropDown = null;
 			}
 		}
 	}

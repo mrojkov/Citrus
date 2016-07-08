@@ -79,14 +79,14 @@ namespace Lime
 
 		public Vector2 ClientPosition
 		{
-			get { return SDToLime.Convert(form.PointToScreen(new System.Drawing.Point(0, 0)), PixelScale); }
+			get { return SDToLime.Convert(glControl.PointToScreen(new System.Drawing.Point(0, 0)), PixelScale); }
 			set { DecoratedPosition = value + DecoratedPosition - ClientPosition; }
 		}
 
 		public Vector2 ClientSize
 		{
-			get { return SDToLime.Convert(form.ClientSize, PixelScale); }
-			set { form.ClientSize = LimeToSD.ConvertToSize(value, PixelScale); }
+			get { return SDToLime.Convert(glControl.ClientSize, PixelScale); }
+			set { DecoratedSize = value + DecoratedSize - ClientSize; }
 		}
 
 		public Vector2 DecoratedPosition
@@ -194,13 +194,10 @@ namespace Lime
 
 		public Window(WindowOptions options)
 		{
-			if (Application.MainWindow == null) {
-				Application.MainWindow = this;
-			} else if (Application.RenderingBackend == RenderingBackend.ES20) {
+			if (Application.MainWindow != null && Application.RenderingBackend == RenderingBackend.ES20) {
 				// ES20 doesn't allow multiple contexts for now, because of a bug in OpenTK
 				throw new Lime.Exception("Attempt to create a second window for ES20 rendering backend. Use OpenGL backend instead.");
 			}
-			Application.Windows.Add(this);
 			Input = new Input();
 			form = new Form();
 			using (var graphics = form.CreateGraphics()) {
@@ -213,14 +210,12 @@ namespace Lime
 			}
 			form.FormBorderStyle = borderStyle;
 			form.MaximizeBox = !options.FixedSize;
-			ClientSize = options.ClientSize;
 			if (options.MinimumDecoratedSize != Vector2.Zero) {
 				MinimumDecoratedSize = options.MinimumDecoratedSize;
 			}
 			if (options.MaximumDecoratedSize != Vector2.Zero) {
 				MaximumDecoratedSize = options.MaximumDecoratedSize;
 			}
-			Title = options.Title;
 			glControl = CreateGLControl();
 			glControl.Dock = DockStyle.Fill;
 			glControl.Paint += OnPaint;
@@ -248,12 +243,18 @@ namespace Lime
 				form.Icon = (System.Drawing.Icon)options.Icon;
 			}
 			Cursor = MouseCursor.Default;
+			Title = options.Title;
+			ClientSize = options.ClientSize;
 			if (options.Visible) {
 				Visible = true;
 			}
 			if (options.Centered) {
 				Center();
 			}
+			if (Application.MainWindow == null) {
+				Application.MainWindow = this;
+			}
+			Application.Windows.Add(this);
 		}
 
 		private static float CalcPixelScale(float Dpi)
@@ -349,7 +350,7 @@ namespace Lime
 				return;
 			}
 			lastMousePosition = Control.MousePosition;
-			var position = (Vector2)SDToLime.Convert(form.PointToClient(Control.MousePosition), PixelScale);
+			var position = SDToLime.Convert(glControl.PointToClient(Control.MousePosition), PixelScale);
 			Input.MousePosition = position * Input.ScreenToWorldTransform;
 			Input.SetTouchPosition(0, Input.MousePosition);
 		}
