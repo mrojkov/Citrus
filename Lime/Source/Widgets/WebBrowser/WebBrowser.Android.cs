@@ -48,9 +48,9 @@ namespace Lime
 			webView.SetWebViewClient(new WebViewClient());
 		}
 
-		public override Node DeepCloneFast()
+		public override Node Clone()
 		{
-			var result = (WebBrowser)base.DeepCloneFast();
+			var result = (WebBrowser)base.Clone();
 			result.CreateWebView();
 			return result;
 		}

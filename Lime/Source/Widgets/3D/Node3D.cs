@@ -156,9 +156,9 @@ namespace Lime
 			return p as Viewport3D;
 		}
 
-		public override Node DeepCloneFast()
+		public override Node Clone()
 		{
-			var clone = base.DeepCloneFast() as Node3D;
+			var clone = base.Clone() as Node3D;
 			clone.AsNode3D = clone;
 			return clone;
 		}

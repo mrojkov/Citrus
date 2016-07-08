@@ -22,7 +22,7 @@ namespace Lime
 			{
 				this.refreshTask = refreshTask;
 				this.listView = listView;
-				this.animation = animationTemplate.DeepCloneFast<Widget>();
+				this.animation = animationTemplate.Clone<Widget>();
 				listView.Content.Tasks.Add(MainTask());
 				listView.Content.Tasks.Add(RefreshAnimationPositionTask());
 			}

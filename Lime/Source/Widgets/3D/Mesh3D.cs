@@ -154,9 +154,9 @@ namespace Lime
 			return hit;
 		}
 
-		public override Node DeepCloneFast()
+		public override Node Clone()
 		{
-			var clone = base.DeepCloneFast() as Mesh3D;
+			var clone = base.Clone() as Mesh3D;
 			clone.Submeshes = Submeshes.Clone(clone);
 			clone.Bones = Toolbox.Clone(Bones);
 			clone.BoneBindPoseInverses = Toolbox.Clone(BoneBindPoseInverses);

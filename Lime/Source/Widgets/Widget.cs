@@ -706,11 +706,11 @@ namespace Lime
 
 		/// <summary>
 		/// TODO: Translate
-		/// Возвращает клон этого виджета. Используйте DeepCloneFast() as Widget, т.к. он возвращает Node (базовый объект виджета)
+		/// Возвращает клон этого виджета. Используйте Clone() as Widget, т.к. он возвращает Node (базовый объект виджета)
 		/// </summary>
-		public override Node DeepCloneFast()
+		public override Node Clone()
 		{
-			var clone = base.DeepCloneFast().AsWidget;
+			var clone = base.Clone().AsWidget;
 			clone.input = null;
 			clone.tasks = null;
 			clone.lateTasks = null;

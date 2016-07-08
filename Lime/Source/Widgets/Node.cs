@@ -368,28 +368,12 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Slow, but safe way to clone node. This function is based on ProtoBuf.
-		/// </summary>
-		public Node DeepCloneSafe()
-		{
-			return Serialization.DeepClone<Node>(this);
-		}
-
-		/// <summary>
-		/// Slow, but safe way to clone node. This function is based on ProtoBuf.
-		/// </summary>
-		public T DeepCloneSafe<T>() where T : Node
-		{
-			return DeepCloneSafe() as T;
-		}
-
-		/// <summary>
 		/// TODO: Translate
 		/// Используйте для быстрого клонирования с сохранением иерархии для неанимированных объектов.
 		/// Функция основана на MemberwiseClone().
 		/// Свойства Animators, Markers, SkinningWeights будут общими у клона и оригинала
 		/// </summary>
-		public virtual Node DeepCloneFast()
+		public virtual Node Clone()
 		{
 			var clone = (Node)MemberwiseClone();
 			++CreatedCount;
@@ -398,7 +382,7 @@ namespace Lime
 			clone.AsWidget = clone as Widget;
 			clone.Animations = Animations.Clone(clone);
 			clone.Animators = AnimatorCollection.SharedClone(clone, Animators);
-			clone.Nodes = Nodes.DeepCloneFast(clone);
+			clone.Nodes = Nodes.Clone(clone);
 			clone.Awoken = false;
 			if (Presenter != null) {
 				clone.Presenter = Presenter.Clone();
@@ -416,9 +400,9 @@ namespace Lime
 		/// Функция основана на MemberwiseClone().
 		/// Свойства Animators, Markers, SkinningWeights будут общими у клона и оригинала
 		/// </summary>
-		public T DeepCloneFast<T>() where T : Node
+		public T Clone<T>() where T : Node
 		{
-			return (T)DeepCloneFast();
+			return (T)Clone();
 		}
 
 		/// <summary>
@@ -867,7 +851,7 @@ namespace Lime
 			}
 			return candidates.FirstOrDefault();
 		}
-			
+
 		internal protected virtual bool PartialHitTest(ref HitTestArgs args)
 		{
 			return false;

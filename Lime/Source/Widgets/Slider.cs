@@ -65,9 +65,9 @@ namespace Lime
 			return thumb;
 		}
 
-		public override Node DeepCloneFast()
+		public override Node Clone()
 		{
-			var result = base.DeepCloneFast() as Slider;
+			var result = base.Clone() as Slider;
 			result.thumb = null;
 			return result;
 		}

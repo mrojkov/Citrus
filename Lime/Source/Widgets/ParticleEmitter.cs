@@ -293,12 +293,12 @@ namespace Lime
 			ImmortalParticles = false;
 		}
 
-		public override Node DeepCloneFast()
+		public override Node Clone()
 		{
 			// Do not clone particle instances
 			var savedParticles = particles;
 			particles = new List<Particle>();
-			var clone = base.DeepCloneFast() as ParticleEmitter;
+			var clone = base.Clone() as ParticleEmitter;
 			particles = savedParticles;
 			return clone;
 		}

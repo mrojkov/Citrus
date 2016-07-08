@@ -60,13 +60,13 @@ namespace Lime
 		/// Creates a copy of this list with new owner.
 		/// Containing nodes will alse have their Parent set as new owner.
 		/// </summary>
-		internal NodeList DeepCloneFast(Node newOwner)
+		internal NodeList Clone(Node newOwner)
 		{
 			var result = new NodeList(newOwner);
 			if (Count > 0) {
 				result.list = new List<Node>(Count);
 				foreach (var node in this) {
-					result.Add(node.DeepCloneFast());
+					result.Add(node.Clone());
 				}
 			}
 			return result;

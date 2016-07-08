@@ -110,11 +110,11 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Возвращает клон этого виджета. Используйте DeepCloneFast() as Widget, т.к. он возвращает Node (базовый объект виджета)
+		/// Возвращает клон этого виджета. Используйте Clone() as Widget, т.к. он возвращает Node (базовый объект виджета)
 		/// </summary>
-		public override Node DeepCloneFast()
+		public override Node Clone()
 		{
-			var clone = (Button)base.DeepCloneFast();
+			var clone = (Button)base.Clone();
 			clone.stateMachine = new StateMachine();
 			clone.State = clone.InitialState;
 			// Should reference children copies, not originals. [PK-45446]

@@ -471,9 +471,9 @@ namespace Lime
 			}
 		}
 
-		public override Node DeepCloneFast()
+		public override Node Clone()
 		{
-			var clone = base.DeepCloneFast() as SimpleText;
+			var clone = base.Clone() as SimpleText;
 			clone.caret = clone.caret.Clone();
 			return clone;
 		}
