@@ -63,14 +63,10 @@ namespace Lime
 					yield return ShowDropDownListTask();
 				}
 				if (IsFocused()) {
-					if (Input.WasKeyPressed(Key.Space) || Input.WasKeyPressed(Key.Enter)) {
+					if (Input.WasKeyPressed(Key.Space) || Input.WasKeyPressed(Key.Up) || Input.WasKeyPressed(Key.Down)) {
 						ShowDropDownList();
-					} else if (Input.WasKeyPressed(Key.Escape)) {
+					} else if (Input.WasKeyPressed(Key.Escape) || Input.WasKeyPressed(Key.Enter)) {
 						RevokeFocus();
-					} else if (Input.WasKeyRepeated(Key.Up)) {
-						Index = Math.Max(0, Index - 1);
-					} else if (Input.WasKeyRepeated(Key.Down)) {
-						Index = Math.Min(Items.Count - 1, Index + 1);
 					}
 				}
 				yield return null;
