@@ -57,7 +57,7 @@ namespace Lime
 		{
 			menu.Items.Clear();
 			foreach (var i in items) {
-				menu.Items.Add(i.NativeItems);
+				menu.Items.Add(i.NativeItem);
 			}
 		}
 
@@ -89,7 +89,7 @@ namespace Lime
 			NativeContextMenu.MinimumSize = new SD.Size(
 				(int)minimumWidth, NativeContextMenu.MinimumSize.Height);
 			foreach (var menuItem in this) {
-				var mi = ((MenuItem)menuItem).NativeItems;
+				var mi = ((MenuItem)menuItem).NativeItem;
 				mi.Width = NativeContextMenu.Width;
 				if (menuItem == command) {
 					mi.Select();
@@ -102,27 +102,27 @@ namespace Lime
 	class MenuItem
 	{
 		public readonly ICommand Command;
-		public readonly ToolStripMenuItem NativeItems;
+		public readonly ToolStripMenuItem NativeItem;
 
 		public MenuItem(ICommand command)
 		{
 			Command = command;
-			NativeItems = new ToolStripMenuItem();
-			NativeItems.Click += (s, e) => command.Execute();
+			NativeItem = new ToolStripMenuItem();
+			NativeItem.Click += (s, e) => command.Execute();
 			Refresh();
 		}
 
 		public void Refresh()
 		{
 			Command.Refresh();
-			NativeItems.Visible = Command.Visible;
-			NativeItems.Enabled = Command.Enabled;
-			NativeItems.Text = Command.Text;
+			NativeItem.Visible = Command.Visible;
+			NativeItem.Enabled = Command.Enabled;
+			NativeItem.Text = Command.Text;
 			if (Command.Submenu != null) {
 				Command.Submenu.Refresh();
-				NativeItems.DropDown = Command.Submenu.NativeContextMenu;
+				NativeItem.DropDown = Command.Submenu.NativeContextMenu;
 			} else {
-				NativeItems.DropDown = null;
+				NativeItem.DropDown = null;
 			}
 		}
 	}
