@@ -114,7 +114,6 @@ namespace Lime
 		char? PasswordChar { get; set; }
 		float PasswordLastCharShowTime { get; set; }
 		Predicate<string> AcceptText { get; set; }
-		bool RevokeFocusOnEnter { get; set; }
 
 		bool IsAcceptableLength(int length);
 		bool IsAcceptableLines(int lines);
@@ -129,7 +128,6 @@ namespace Lime
 		public char? PasswordChar { get; set; }
 		public float PasswordLastCharShowTime { get; set; }
 		public Predicate<string> AcceptText { get; set; }
-		public bool RevokeFocusOnEnter { get; set; }
 
 		public EditorParams()
 		{
@@ -192,21 +190,11 @@ namespace Lime
 
 		public void Unlink()
 		{
-			if (IsFocused()) {
-				KeyboardFocus.Instance.SetFocus(null);
+			if (Container.IsFocused()) {
+				Container.RevokeFocus();
 				caretPos.IsVisible = false;
 			}
 			Container.Tasks.StopByTag(this);
-		}
-
-		public void Focus()
-		{
-			KeyboardFocus.Instance.SetFocus(Container);
-		}
-
-		public bool IsFocused()
-		{
-			return KeyboardFocus.Instance.Focused == Container;
 		}
 
 		private bool CheckKeyRepeated(Key key)
@@ -234,7 +222,7 @@ namespace Lime
 			return height;
 		}
 
-		private void HandleCursorKeys()
+		private void HandleKeys(string originalText)
 		{
 			if (CheckKeyRepeated(Key.Left))
 				caretPos.TextPos--;
@@ -258,9 +246,13 @@ namespace Lime
 			if (CheckKeyRepeated(Key.Enter)) {
 				if (EditorParams.IsAcceptableLines(Text.Text.Count(ch => ch == '\n') + 2)) {
 					InsertChar('\n');
-				} else if (EditorParams.RevokeFocusOnEnter) {
-					KeyboardFocus.Instance.SetFocus(null);
+				} else {
+					Container.RevokeFocus();
 				}
+			}
+			if (CheckKeyRepeated(Key.Escape)) {
+				Text.Text = originalText;
+				Container.RevokeFocus();
 			}
 #if WIN
 			if (Container.Input.IsKeyPressed(Key.ControlLeft) && CheckKeyRepeated(Key.V)) {
@@ -269,7 +261,7 @@ namespace Lime
 			}
 #endif
 		}
-		
+
 		private float lastCharShowTimeLeft;
 		private bool isLastCharVisible;
 
@@ -311,14 +303,14 @@ namespace Lime
 
 		private IEnumerator<object> HandleInputTask()
 		{
+			bool wasFocused = false;
+			string originalText = null;
 			while (true) {
 				var wasClicked = Container.WasClicked();
 				if (wasClicked)
-					Focus();
-				caretPos.IsVisible = IsFocused();
-
-				if (IsFocused()) {
-					HandleCursorKeys();
+					Container.SetFocus();
+				if (Container.IsFocused()) {
+					HandleKeys(originalText);
 					HandleTextInput();
 					if (wasClicked) {
 						var t = Container.LocalToWorldTransform.CalcInversed();
@@ -326,6 +318,17 @@ namespace Lime
 					}
 					Text.SyncCaretPosition();
 				}
+				var isFocused = Container.IsFocused();
+				caretPos.IsVisible = isFocused;
+				if (!wasFocused && isFocused) {
+					originalText = Text.Text;
+				}
+				if (wasFocused && !isFocused) {
+					if (originalText != Text.Text) {
+						Text.Submit();
+					}
+				}
+				wasFocused = isFocused;
 				yield return null;
 			}
 		}

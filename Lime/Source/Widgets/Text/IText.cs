@@ -75,12 +75,14 @@ namespace Lime
 
 	public interface IText
 	{
+		event Action<string> OnSubmit;
 		/// <summary>
 		/// Returns the text's bounding box.
 		/// </summary>
 		Rectangle MeasureText();
 		void Invalidate();
 		void SyncCaretPosition();
+		void Submit();
 
 		bool Localizable { get; set; }
 		string Text { get; set; }

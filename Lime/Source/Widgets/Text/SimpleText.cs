@@ -4,9 +4,6 @@ using ProtoBuf;
 
 namespace Lime
 {
-	/// <summary>
-	/// Виджет, выводящий текст с упрощенным форматированием
-	/// </summary>
 	[ProtoContract]
 	public class SimpleText : Widget, IText
 	{
@@ -45,9 +42,6 @@ namespace Lime
 			}
 		}
 
-		/// <summary>
-		/// Текст, заданный в HotStudio. Этот текст не выводится на экран (см DisplayText)
-		/// </summary>
 		[ProtoMember(2)]
 		public override string Text {
 			get { return text ?? ""; }
@@ -70,9 +64,6 @@ namespace Lime
 			}
 		}
 
-		/// <summary>
-		/// Размер шрифта
-		/// </summary>
 		[ProtoMember(3)]
 		public float FontHeight {
 			get { return fontHeight; }
@@ -84,9 +75,6 @@ namespace Lime
 			}
 		}
 
-		/// <summary>
-		/// Расстояние между строками
-		/// </summary>
 		[ProtoMember(4)]
 		public float Spacing {
 			get { return spacing; }
@@ -98,9 +86,6 @@ namespace Lime
 			}
 		}
 
-		/// <summary>
-		/// Горизонтальное выравнивание текста
-		/// </summary>
 		[ProtoMember(5)]
 		public HAlignment HAlignment {
 			get { return hAlignment; }
@@ -112,9 +97,6 @@ namespace Lime
 			}
 		}
 
-		/// <summary>
-		/// Вертикальное выравнивание текста
-		/// </summary>
 		[ProtoMember(6)]
 		public VAlignment VAlignment {
 			get { return vAlignment; }
@@ -126,22 +108,12 @@ namespace Lime
 			}
 		}
 
-		/// <summary>
-		/// Способ обрезания текста, выходящего за пределы контейнера виджета
-		/// </summary>
 		[ProtoMember(8)]
 		public TextOverflowMode OverflowMode { get; set; }
 
-		/// <summary>
-		/// Если текст не помещается в одну строку, то он может разбиваться в любом месте
-		/// (если false, то текст может разбиваться только на месте пробелов)
-		/// </summary>
 		[ProtoMember(9)]
 		public bool WordSplitAllowed { get; set; }
 
-		/// <summary>
-		/// Цвет текста
-		/// </summary>
 		[ProtoMember(10)]
 		public Color4 TextColor
 		{
@@ -183,17 +155,13 @@ namespace Lime
 			}
 		}
 
-		/// <summary>
-		/// Удалять лишние пробелы между словами
-		/// </summary>
 		public bool TrimWhitespaces { get; set; }
 
 		private CaretPosition caret = new CaretPosition();
 		
-		/// <summary>
-		/// Если текст находится в состоянии редактирования, возвращает интерфейс каретки
-		/// </summary>
 		public ICaretPosition Caret { get { return caret; } }
+
+		public event Action<string> OnSubmit;
 
 		public bool Localizable { get; set; }
 
@@ -202,9 +170,13 @@ namespace Lime
 			Theme.Current.Apply(this);
 		}
 
-		/// <summary>
-		/// Возвращает размер текста
-		/// </summary>
+		void IText.Submit()
+		{
+			if (OnSubmit != null) {
+				OnSubmit(Text);
+			}
+		}
+
 		public override Vector2 CalcContentSize()
 		{
 			return Renderer.MeasureTextLine(Font.Instance, DisplayText, FontHeight);

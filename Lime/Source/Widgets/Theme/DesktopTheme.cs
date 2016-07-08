@@ -127,7 +127,7 @@ namespace Lime
 			eb.TrimWhitespaces = false;
 			eb.VAlignment = VAlignment.Center;
 			eb.Padding = Metrics.ControlsPadding;
-			var editorParams = new EditorParams { MaxLength = 100, MaxLines = 1, RevokeFocusOnEnter = true };
+			var editorParams = new EditorParams { MaxLength = 100, MaxLines = 1 };
 			new CaretDisplay(
 				eb, eb.Caret,
 				new CaretParams { CaretPresenter = new VerticalLineCaret() });

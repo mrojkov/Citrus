@@ -54,10 +54,19 @@ namespace Lime
 		// TODO
 		public bool TrimWhitespaces { get; set; }
 
+		public event Action<string> OnSubmit;
+
 		public RichText()
 		{
 			// CachedRendering = true;
 			Localizable = true;
+		}
+
+		void IText.Submit()
+		{
+			if (OnSubmit != null) {
+				OnSubmit(Text);
+			}
 		}
 
 		public override void Dispose()
