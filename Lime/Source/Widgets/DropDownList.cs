@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace Lime
 {
-	public class ComboBox : Widget
+	public class DropDownList : Widget
 	{
 		private Widget label;
 		private int index = -1;
@@ -41,33 +42,45 @@ namespace Lime
 			}
 		}
 
-		public ComboBox()
+		public DropDownList()
 		{
 			Items = new ObservableCollection<Item>();
 			Items.CollectionChanged += (sender, e) => RefreshLabel();
 			HitTestTarget = true;
 			Theme.Current.Apply(this);
+			Tasks.Add(MainTask());
 		}
 
-		protected override void Awake()
+		IEnumerator<object> MainTask()
 		{
 			RefreshLabel();
-			Updated += delta => {
+			while (true) {
 				if (Input.WasMousePressed() && IsMouseOver()) {
 					KeyboardFocus.Instance.SetFocus(this);
 #if MAC
 					Window.Current.Input.SetKeyState(Key.Mouse0, false);
 #endif
-					ShowDropDownList();
+					yield return ShowDropDownListTask();
 				}
-				if (Input.WasKeyPressed(Key.Space) || Input.WasKeyPressed(Key.Enter)) {
-					ShowDropDownList();
-				} else if (Input.WasKeyRepeated(Key.Up)) {
-					Index = Math.Max(0, Index - 1);
-				} else if (Input.WasKeyRepeated(Key.Down)) {
-					Index = Math.Min(Items.Count - 1, Index + 1);
+				if (IsFocused()) {
+					if (Input.WasKeyPressed(Key.Space) || Input.WasKeyPressed(Key.Enter)) {
+						ShowDropDownList();
+					} else if (Input.WasKeyPressed(Key.Escape)) {
+						RevokeFocus();
+					} else if (Input.WasKeyRepeated(Key.Up)) {
+						Index = Math.Max(0, Index - 1);
+					} else if (Input.WasKeyRepeated(Key.Down)) {
+						Index = Math.Min(Items.Count - 1, Index + 1);
+					}
 				}
-			};
+				yield return null;
+			}
+		}
+
+		IEnumerator<object> ShowDropDownListTask()
+		{
+			yield return null;
+			ShowDropDownList();
 		}
 
 		private void ShowDropDownList()

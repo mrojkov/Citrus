@@ -35,7 +35,7 @@ namespace Lime
 			Decorators[typeof(EditBox)] = DecorateEditBox;
 			Decorators[typeof(WindowWidget)] = DecorateWindowWidget;
 			Decorators[typeof(TextView)] = DecorateTextView;
-			Decorators[typeof(ComboBox)] = DecorateComboBox;
+			Decorators[typeof(DropDownList)] = DecorateDropDownList;
 			Decorators[typeof(FileChooserButton)] = DecorateFileChooserButton;
 			Decorators[typeof(HSplitter)] = DecorateSplitter;
 			Decorators[typeof(VSplitter)] = DecorateSplitter;
@@ -137,21 +137,21 @@ namespace Lime
 			eb.CompoundPostPresenter.Add(new KeyboardFocusBorderPresenter());
 		}
 
-		private void DecorateComboBox(Widget widget)
+		private void DecorateDropDownList(Widget widget)
 		{
-			var comboBox = (ComboBox)widget;
-			comboBox.MinSize = Metrics.DefaultButtonSize;
-			comboBox.MaxHeight = Metrics.DefaultButtonSize.Y;
-			comboBox.Focusable = new Focusable();
+			var dropDownList = (DropDownList)widget;
+			dropDownList.MinSize = Metrics.DefaultButtonSize;
+			dropDownList.MaxHeight = Metrics.DefaultButtonSize.Y;
+			dropDownList.Focusable = new Focusable();
 			var text = new SimpleText {
 				Id = "Label",
 				VAlignment = VAlignment.Center,
 			};
-			text.CompoundPresenter.Add(new ComboBoxPresenter());
-			comboBox.PostPresenter = new KeyboardFocusBorderPresenter();
+			text.CompoundPresenter.Add(new DropDownListPresenter());
+			dropDownList.PostPresenter = new KeyboardFocusBorderPresenter();
 			text.Padding = Metrics.ControlsPadding;
-			text.Padding.Right = ComboBoxPresenter.IconWidth;
-			comboBox.AddNode(text);
+			text.Padding.Right = DropDownListPresenter.IconWidth;
+			dropDownList.AddNode(text);
 			ExpandToContainer(text);
 		}
 
@@ -200,7 +200,7 @@ namespace Lime
 			}
 		}
 
-		class ComboBoxPresenter : CustomPresenter
+		class DropDownListPresenter : CustomPresenter
 		{
 			public const float IconWidth = 20;
 			private VectorShape icon = new VectorShape {

@@ -222,7 +222,7 @@
     <Compile Include="Source\Widgets\TextView.cs" />
     <Compile Include="Source\Application\Menu\Menu.cs" />
     <Compile Include="Source\Application\Menu\Menu.Mac.cs" />
-    <Compile Include="Source\Widgets\ComboBox.cs" />
+    <Compile Include="Source\Widgets\DropDownList.cs" />
     <Compile Include="Source\Graphics\VectorShape.cs" />
     <Compile Include="Source\Application\Menu\Menu.Win.cs" />
     <Compile Include="Source\Application\MouseCursor\StockCursors.Mac.cs" />
