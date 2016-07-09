@@ -91,6 +91,22 @@ namespace Yuzu
 			PutF("if ({0} != null) {{\n", name);
 		}
 
+		private void GenerateList(Type t, string name)
+		{
+			Put("if (SkipSpacesCarefully() == ']') {\n");
+			Put("Require(']');\n");
+			Put("}\n");
+			Put("else {\n");
+			Put("do {\n");
+			tempCount += 1;
+			var tempName = "tmp" + tempCount.ToString();
+			PutF("var {0} = ", tempName);
+			GenerateValue(t.GetGenericArguments()[0], tempName);
+			PutF("{0}.Add({1});\n", name, tempName);
+			Put("} while (Require(']', ',') == ',');\n");
+			Put("}\n");
+		}
+
 		private void GenerateValue(Type t, string name)
 		{
 			if (t == typeof(int)) {
@@ -147,18 +163,7 @@ namespace Yuzu
 			}
 			else if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>)) {
 				PutRequireOrNull('[', t, name);
-				Put("if (SkipSpacesCarefully() == ']') {\n");
-				Put("Require(']');\n");
-				Put("}\n");
-				Put("else {\n");
-				Put("do {\n");
-				tempCount += 1;
-				var tempName = "tmp" + tempCount.ToString();
-				PutF("var {0} = ", tempName);
-				GenerateValue(t.GetGenericArguments()[0], tempName);
-				PutF("{0}.Add({1});\n", name, tempName);
-				Put("} while (Require(']', ',') == ',');\n");
-				Put("}\n");
+				GenerateList(t, name);
 				Put("}\n");
 			}
 			else if (
@@ -285,6 +290,18 @@ namespace Yuzu
 			Put("}\n");
 			Put("\n");
 
+			var isList = typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(List<>);
+			if (isList) {
+				Put("public override object FromReaderInt(object obj)\n");
+				Put("{\n");
+				PutF("var result = ({0})obj;\n", typeSpec);
+				Put("Require('[');\n");
+				GenerateList(typeof(T), "result");
+				Put("return result;\n");
+				Put("}\n");
+				Put("\n");
+			}
+
 			Put("public override object FromReaderIntPartial(string name)\n");
 			Put("{\n");
 			PutF("return ReadFields(new {0}(), name);\n", typeSpec);
@@ -294,22 +311,24 @@ namespace Yuzu
 			Put("protected override object ReadFields(object obj, string name)\n");
 			Put("{\n");
 			PutF("var result = ({0})obj;\n", typeSpec);
-			tempCount = 0;
-			foreach (var yi in Meta.Get(typeof(T), Options).Items) {
-				if (yi.IsOptional) {
-					PutF("if (\"{0}\" == name) {{\n", yi.Tag(Options));
-					PutF("result.{0} = ", yi.Name);
+			if (!isList) {
+				tempCount = 0;
+				foreach (var yi in Meta.Get(typeof(T), Options).Items) {
+					if (yi.IsOptional) {
+						PutF("if (\"{0}\" == name) {{\n", yi.Tag(Options));
+						PutF("result.{0} = ", yi.Name);
+					}
+					else {
+						PutF("if (\"{0}\" != name) throw new YuzuException(\"{0}!=\" + name);\n", yi.Tag(Options));
+						PutF("result.{0} = ", yi.Name);
+					}
+					GenerateValue(yi.Type, "result." + yi.Name);
+					Put("name = GetNextName(false);\n");
+					if (yi.IsOptional)
+						Put("}\n");
 				}
-				else {
-					PutF("if (\"{0}\" != name) throw new YuzuException(\"{0}!=\" + name);\n", yi.Tag(Options));
-					PutF("result.{0} = ", yi.Name);
-				}
-				GenerateValue(yi.Type, "result." + yi.Name);
-				Put("name = GetNextName(false);\n");
-				if (yi.IsOptional)
-					Put("}\n");
+				Put("Require('}');\n");
 			}
-			Put("Require('}');\n");
 			Put("return result;\n");
 			Put("}\n");
 

@@ -355,6 +355,15 @@ namespace YuzuTest
 			CollectionAssert.AreEqual(v0, w0);
 			jd.FromString(w0, result0);
 			CollectionAssert.AreEqual(new List<string> { "a", "b", "c", "a", "b", "c" }, w0);
+
+			var v1 = new List<List<int>> { new List<int> { 1, 2 }, new List<int> { 3 } };
+			var result1 = js.ToString(v1);
+			Assert.AreEqual("[\n[\n1,\n2\n],\n[\n3\n]\n]", result1);
+			List<List<int>> w1 = new List<List<int>>();
+			List_List_Int32_JsonDeserializer.Instance.FromString(w1, result1);
+			Assert.AreEqual(v1.Count, w1.Count);
+			CollectionAssert.AreEqual(v1[0], w1[0]);
+			CollectionAssert.AreEqual(v1[1], w1[1]);
 		}
 
 		[TestMethod]

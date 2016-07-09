@@ -887,6 +887,71 @@ namespace YuzuTest
 		}
 	}
 
+	class List_List_Int32_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new List_List_Int32_JsonDeserializer Instance = new List_List_Int32_JsonDeserializer();
+
+		public List_List_Int32_JsonDeserializer()
+		{
+			Options.Assembly = Assembly.Load("mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
+			Options.ClassNames = false;
+			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
+			JsonOptions.EnumAsString = true;
+			JsonOptions.IgnoreCompact = false;
+			JsonOptions.Int64AsString = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.ArrayLengthPrefix = true;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderInt(new List<List<Int32>>());
+		}
+
+		public override object FromReaderInt(object obj)
+		{
+			var result = (List<List<Int32>>)obj;
+			Require('[');
+			if (SkipSpacesCarefully() == ']') {
+				Require(']');
+			}
+			else {
+				do {
+					var tmp1 = RequireOrNull('[') ? null : new List<Int32>();
+					if (tmp1 != null) {
+						if (SkipSpacesCarefully() == ']') {
+							Require(']');
+						}
+						else {
+							do {
+								var tmp2 = RequireInt();
+								tmp1.Add(tmp2);
+							} while (Require(']', ',') == ',');
+						}
+					}
+					result.Add(tmp1);
+				} while (Require(']', ',') == ',');
+			}
+			return result;
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new List<List<Int32>>(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (List<List<Int32>>)obj;
+			return result;
+		}
+	}
+
 	class SampleClassList_JsonDeserializer : JsonDeserializerGenBase
 	{
 		public static new SampleClassList_JsonDeserializer Instance = new SampleClassList_JsonDeserializer();

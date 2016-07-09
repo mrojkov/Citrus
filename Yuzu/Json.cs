@@ -742,7 +742,7 @@ namespace Yuzu
 			return ch;
 		}
 
-		private void ReadIntoList<T>(List<T> list)
+		protected void ReadIntoList<T>(List<T> list)
 		{
 			// ReadValue might invoke a new serializer, so we must not rely on PutBack.
 			if (SkipSpacesCarefully() == ']') {
@@ -755,7 +755,7 @@ namespace Yuzu
 			} while (Require(']', ',') == ',');
 		}
 
-		private List<T> ReadList<T>()
+		protected List<T> ReadList<T>()
 		{
 			if (RequireOrNull('['))
 				return null;
@@ -774,7 +774,7 @@ namespace Yuzu
 			keyParsers.Add(t, parser);
 		}
 
-		private void ReadIntoDictionary<K, V>(Dictionary<K, V> dict)
+		protected void ReadIntoDictionary<K, V>(Dictionary<K, V> dict)
 		{
 			// ReadValue might invoke a new serializer, so we must not rely on PutBack.
 			if (SkipSpacesCarefully() == '}') {
@@ -795,7 +795,7 @@ namespace Yuzu
 			} while (Require('}', ',') == ',');
 		}
 
-		private Dictionary<K, V> ReadDictionary<K, V>()
+		protected Dictionary<K, V> ReadDictionary<K, V>()
 		{
 			if (RequireOrNull('{'))
 				return null;

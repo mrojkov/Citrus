@@ -110,6 +110,7 @@ namespace YuzuTest
 				jd.Generate<SampleRect>();
 				jd.Generate<SampleDate>();
 				jd.Generate<Color>();
+				jd.Generate<List<List<int>>>();
 				jd.Options.ClassNames = true;
 				jd.Generate<SampleClassList>();
 				jd.Options.ClassNames = false;
