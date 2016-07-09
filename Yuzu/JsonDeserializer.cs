@@ -558,13 +558,11 @@ namespace Yuzu.Json
 			if (t == typeof(object))
 				return ReadAnyObject;
 			if (t.IsClass) {
-				var m = GetType().GetMethod("ReadObject", BindingFlags.Instance | BindingFlags.NonPublic).
-					MakeGenericMethod(t);
+				var m = Utils.GetPrivateGeneric(GetType(), "ReadObject", t);
 				return (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);
 			}
 			if (t.IsInterface) {
-				var m = GetType().GetMethod("ReadInterface", BindingFlags.Instance | BindingFlags.NonPublic).
-					MakeGenericMethod(t);
+				var m = Utils.GetPrivateGeneric(GetType(), "ReadInterface", t);
 				return (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);
 			}
 			if (Utils.IsStruct(t))

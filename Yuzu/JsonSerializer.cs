@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Reflection;
 using System.Text;
 
 using Yuzu.Metadata;
@@ -320,8 +319,7 @@ namespace Yuzu.Json
 			if (Utils.IsStruct(t) || t.IsClass || t.IsInterface) {
 				var name = Utils.IsCompact(t, Options) && !JsonOptions.IgnoreCompact ?
 					"WriteObjectCompact" : "WriteObject";
-				var m = GetType().GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic).
-					MakeGenericMethod(t);
+				var m = Utils.GetPrivateGeneric(GetType(), name, t);
 				return (Action<object>)Delegate.CreateDelegate(typeof(Action<object>), this, m);
 			}
 			throw new NotImplementedException(t.Name);
