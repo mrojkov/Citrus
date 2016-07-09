@@ -148,6 +148,12 @@ namespace Yuzu.Metadata
 			else if (!options.AllowEmptyTypes && Items.Count == 0 && !t.IsInterface)
 				throw Error("No serializable fields");
 			Items.Sort();
+			Item prev = null;
+			foreach (var i in Items) {
+				if (prev != null && prev.CompareTo(i) == 0)
+					throw Error("Duplicate item {0} / {1}", i.Name, i.Alias);
+				prev = i;
+			}
 			var prevTag = "";
 			foreach (var i in Items) {
 				var tag = i.Tag(options);

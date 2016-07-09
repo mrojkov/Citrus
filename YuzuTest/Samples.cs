@@ -321,6 +321,12 @@ namespace YuzuTest
 		public int X { get; set; }
 	}
 
+	public class SampleInterfacedFieldDup : ISampleField
+	{
+		[YuzuOptional]
+		public int X { get; set; }
+	}
+
 	public class SampleCollection<T> : ICollection<T>
 	{
 		private List<T> impl = new List<T>();
