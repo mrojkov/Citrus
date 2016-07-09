@@ -118,7 +118,7 @@ namespace Yuzu.Json
 			PutF("if ({0} != null) {{\n", name);
 		}
 
-		private void GenerateCollection(Type t, string name)
+		private void GenerateCollection(Type t, Type icoll, string name)
 		{
 			Put("if (SkipSpacesCarefully() == ']') {\n");
 			Put("Require(']');\n");
@@ -128,8 +128,14 @@ namespace Yuzu.Json
 			tempCount += 1;
 			var tempName = "tmp" + tempCount.ToString();
 			PutF("var {0} = ", tempName);
-			GenerateValue(t.GetGenericArguments()[0], tempName);
-			PutF("{0}.Add({1});\n", name, tempName);
+			GenerateValue(icoll.GetGenericArguments()[0], tempName);
+			// Check for explicit vs implicit interface implementation.
+			var imap = t.GetInterfaceMap(icoll);
+			var addIndex = Array.FindIndex(imap.InterfaceMethods, m => m.Name == "Add");
+			if (imap.TargetMethods[addIndex].Name == "Add")
+				PutF("{0}.Add({1});\n", name, tempName);
+			else
+				PutF("(({2}){0}).Add({1});\n", name, tempName, GetTypeSpec(icoll));
 			Put("} while (Require(']', ',') == ',');\n");
 			Put("}\n");
 		}
@@ -143,7 +149,7 @@ namespace Yuzu.Json
 			}
 			else if (icoll != null) {
 				Put("Require('[');\n");
-				GenerateCollection(icoll, name);
+				GenerateCollection(t, icoll, name);
 			}
 			else if ((t.IsClass || t.IsInterface) && t != typeof(object))
 				PutF(String.Format(
@@ -282,7 +288,7 @@ namespace Yuzu.Json
 			}
 			else if (icoll != null) {
 				PutRequireOrNull('[', t, name);
-				GenerateCollection(icoll, name);
+				GenerateCollection(t, icoll, name);
 				Put("}\n");
 			}
 			else if (t.IsClass || Utils.IsStruct(t))
@@ -360,7 +366,7 @@ namespace Yuzu.Json
 				Put("{\n");
 				PutF("var result = ({0})obj;\n", typeSpec);
 				Put("Require('[');\n");
-				GenerateCollection(icoll, "result");
+				GenerateCollection(typeof(T), icoll, "result");
 				Put("return result;\n");
 				Put("}\n");
 				Put("\n");

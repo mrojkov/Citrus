@@ -382,6 +382,9 @@ namespace YuzuTest.Json
 			Assert.AreEqual("[\n2,\n5,\n4\n]", result1);
 			var w2 = (SampleCollection<int>)SampleCollection_Int32_JsonDeserializer.Instance.FromString(result1);
 			CollectionAssert.AreEqual(v2.ToList(), w2.ToList());
+			var w2g = (SampleExplicitCollection<int>)
+				SampleExplicitCollection_Int32_JsonDeserializer.Instance.FromString(result1);
+			CollectionAssert.AreEqual(v2.ToList(), w2g.ToList());
 
 			var v3 = new SampleConcreteCollection { 8, 3, 1 };
 			var result3 = js.ToString(v3);
@@ -389,9 +392,9 @@ namespace YuzuTest.Json
 			var w3 = new SampleConcreteCollection();
 			jd.FromString(w3, result3);
 			CollectionAssert.AreEqual(v3.ToList(), w3.ToList());
-			var w2g = (SampleConcreteCollection)
+			var w3g = (SampleConcreteCollection)
 				SampleConcreteCollection_JsonDeserializer.Instance.FromString(result3);
-			CollectionAssert.AreEqual(v3.ToList(), w2g.ToList());
+			CollectionAssert.AreEqual(v3.ToList(), w3g.ToList());
 		}
 
 		[TestMethod]
