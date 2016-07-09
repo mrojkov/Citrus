@@ -18,6 +18,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -64,6 +65,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -110,6 +112,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -160,6 +163,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -203,6 +207,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -245,6 +250,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -298,6 +304,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -357,6 +364,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -444,6 +452,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -497,6 +506,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -539,6 +549,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -584,6 +595,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -629,6 +641,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -693,6 +706,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -748,6 +762,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -793,6 +808,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -838,6 +854,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -898,6 +915,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -963,6 +981,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1016,6 +1035,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1078,6 +1098,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1117,6 +1138,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1159,6 +1181,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1201,6 +1224,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1255,6 +1279,7 @@ namespace YuzuTest
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
