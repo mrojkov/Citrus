@@ -886,6 +886,7 @@ namespace YuzuTest
 		{
 			var js = new JsonSerializer();
 			XAssert.Throws<YuzuException>(() => js.ToString(new Empty()), "Empty");
+			XAssert.Throws<YuzuException>(() => js.ToString(new SampleCollectionWithField<int>()), "collection");
 
 			var jd = new JsonDeserializer();
 			var w = new Sample1();

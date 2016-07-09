@@ -110,7 +110,11 @@ namespace Yuzu.Metadata
 				if (m.MemberType == MemberTypes.Field || m.MemberType == MemberTypes.Property)
 					AddItem(m);
 			}
-			if (!options.AllowEmptyTypes && Items.Count == 0 && !t.IsInterface)
+			if (Utils.IsICollection(t)) {
+				if (Items.Count > 0)
+					throw Error("Serializable fields in collection are not supported");
+			}
+			else if (!options.AllowEmptyTypes && Items.Count == 0 && !t.IsInterface)
 				throw Error("No serializable fields");
 			Items.Sort();
 			var prevTag = "";

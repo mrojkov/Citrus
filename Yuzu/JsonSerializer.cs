@@ -305,6 +305,7 @@ namespace Yuzu.Json
 					return obj => m.Invoke(this, new object[] { obj });
 				}
 				if (g.GetInterface((typeof(ICollection<>).Name)) != null) {
+					Meta.Get(t, Options); // Check for serializable fields.
 					var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteCollection", t);
 					return obj => m.Invoke(this, new object[] { obj });
 				}

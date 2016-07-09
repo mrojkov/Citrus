@@ -324,6 +324,12 @@ namespace YuzuTest
 		IEnumerator IEnumerable.GetEnumerator() { return impl.GetEnumerator(); }
 	}
 
+	public class SampleCollectionWithField<T> : SampleCollection<T>
+	{
+		[YuzuRequired]
+		public int X;
+	}
+
 	public class SampleWithCollection
 	{
 		[YuzuRequired]
