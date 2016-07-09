@@ -488,7 +488,22 @@ namespace Yuzu.Json
 		private object RequireDateTimeObj() { return RequireDateTime(); }
 		private object RequireTimeSpanObj() { return RequireTimeSpan(); }
 
+		private Dictionary<Type, Func<object>> readerCache = new Dictionary<Type, Func<object>>();
+		private int jsonOptionsGeneration = 0;
+
 		private Func<object> ReadValueFunc(Type t)
+		{
+			if (jsonOptionsGeneration != JsonOptions.Generation) {
+				readerCache.Clear();
+				jsonOptionsGeneration = JsonOptions.Generation;
+			}
+			Func<object> f;
+			if (readerCache.TryGetValue(t, out f))
+				return f;
+			return readerCache[t] = MakeValueFunc(t);
+		}
+
+		private Func<object> MakeValueFunc(Type t)
 		{
 			if (t == typeof(int))
 				return RequireIntObj;
