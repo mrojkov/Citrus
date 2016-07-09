@@ -757,7 +757,7 @@ namespace Yuzu.Json
 		{
 			var t = Options.Assembly.GetType(className + "_JsonDeserializer");
 			if (t == null)
-				throw Error("Generated deserializer not fount for type '{0}'", className);
+				throw Error("Generated deserializer not found for type '{0}'", className);
 			var result = (JsonDeserializerGenBase)Activator.CreateInstance(t);
 			result.Reader = Reader;
 			return result;
