@@ -116,6 +116,7 @@ namespace Yuzu
 		public TagMode TagMode = TagMode.Names;
 		public bool IgnoreNewFields = false;
 		public bool AllowEmptyTypes = false;
+		public bool ReportErrorPosition = true;
 	}
 
 	public class YuzuPosition

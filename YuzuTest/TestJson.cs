@@ -909,6 +909,15 @@ namespace YuzuTest
 			XAssert.Throws<YuzuException>(() => jd.FromString(
 				"{\"class\":\"YuzuTest.SampleInterfaceField\",\"I\":{\"class\":\"YuzuTest.Sample1\"}}"),
 				"ISample");
+
+			XAssert.Throws<YuzuException>(() => jd.FromString(w, "      z"), "7");
+			jd.Options.ReportErrorPosition = false;
+			try {
+				jd.FromString(w, "      z");
+			}
+			catch (YuzuException e) {
+				Assert.IsFalse(e.Message.Contains("7"));
+			}
 		}
 
 		[TestMethod]

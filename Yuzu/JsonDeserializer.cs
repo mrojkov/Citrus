@@ -36,7 +36,8 @@ namespace Yuzu.Json
 		protected YuzuException Error(string message, params object[] args)
 		{
 			return new YuzuException(
-				String.Format(message, args), new YuzuPosition(Reader.BaseStream.Position));
+				String.Format(message, args),
+				Options.ReportErrorPosition ? new YuzuPosition(Reader.BaseStream.Position) : null);
 		}
 
 		protected void KillBuf()
