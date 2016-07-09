@@ -60,6 +60,7 @@ namespace Yuzu.Metadata
 		public readonly Type Type;
 		public readonly CommonOptions Options;
 		public readonly List<Item> Items = new List<Item>();
+		public readonly List<Action<object>> AfterDeserialization = new List<Action<object>>();
 
 		private void AddItem(MemberInfo m)
 		{
@@ -102,6 +103,18 @@ namespace Yuzu.Metadata
 			Items.Add(item);
 		}
 
+		private void AddMethod(MethodInfo m)
+		{
+			if (m.IsDefined(Options.AfterDeserializationAttribute))
+				AfterDeserialization.Add(obj => m.Invoke(obj, null));
+		}
+
+		public void RunAfterDeserialization(object obj)
+		{
+			foreach (var a in AfterDeserialization)
+				a(obj);
+		}
+
 		private Meta(Type t, CommonOptions options)
 		{
 			Type = t;
@@ -109,6 +122,8 @@ namespace Yuzu.Metadata
 			foreach (var m in t.GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy)) {
 				if (m.MemberType == MemberTypes.Field || m.MemberType == MemberTypes.Property)
 					AddItem(m);
+				else if (m.MemberType == MemberTypes.Method)
+					AddMethod(m as MethodInfo);
 			}
 			if (Utils.IsICollection(t)) {
 				if (Items.Count > 0)

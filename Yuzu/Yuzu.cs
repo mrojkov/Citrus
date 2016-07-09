@@ -63,6 +63,8 @@ namespace Yuzu
 
 	public class YuzuCompact : Attribute { }
 
+	public class YuzuAfterDeserialization : Attribute { }
+
 	public enum TagMode
 	{
 		Names,
@@ -108,6 +110,7 @@ namespace Yuzu
 		public Type OptionalAttribute = typeof(YuzuOptional);
 		public Type CompactAttribute = typeof(YuzuCompact);
 		public Type SerializeIfAttribute = typeof(YuzuSerializeCondition);
+		public Type AfterDeserializationAttribute = typeof(YuzuAfterDeserialization);
 
 		public Func<Attribute, string> GetAlias = attr => (attr as YuzuField).Alias;
 		public Func<Attribute, Func<object, object, bool>> GetSerializeCondition =

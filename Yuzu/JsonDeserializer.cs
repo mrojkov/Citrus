@@ -619,11 +619,12 @@ namespace Yuzu.Json
 
 		protected virtual object ReadFields(object obj, string name)
 		{
+			var meta = Meta.Get(obj.GetType(), Options);
 			objStack.Push(obj);
 			try {
 				// Optimization: duplicate loop to extract options check.
 				if (Options.IgnoreNewFields && Options.TagMode != TagMode.Names) {
-					foreach (var yi in Meta.Get(obj.GetType(), Options).Items) {
+					foreach (var yi in meta.Items) {
 						if (IgnoreNewFields(yi.Tag(Options), ref name) != 0) {
 							if (!yi.IsOptional)
 								throw Error("Expected field '{0}', but found '{1}'", yi.NameTagged(Options), name);
@@ -634,7 +635,7 @@ namespace Yuzu.Json
 					}
 				}
 				else {
-					foreach (var yi in Meta.Get(obj.GetType(), Options).Items) {
+					foreach (var yi in meta.Items) {
 						if (yi.Tag(Options) != name) {
 							if (!yi.IsOptional)
 								throw Error("Expected field '{0}', but found '{1}'", yi.NameTagged(Options), name);
@@ -651,6 +652,7 @@ namespace Yuzu.Json
 			if (Options.IgnoreNewFields)
 				IgnoreNewFieldsTail(name);
 			Require('}');
+			meta.RunAfterDeserialization(obj);
 			return obj;
 		}
 
@@ -659,9 +661,10 @@ namespace Yuzu.Json
 			if (!Utils.IsCompact(obj.GetType(), Options))
 				throw Error("Attempt to read non-compact type '{0}' from compact format", obj.GetType().Name);
 			bool isFirst = true;
+			var meta = Meta.Get(obj.GetType(), Options);
 			objStack.Push(obj);
 			try {
-				foreach (var yi in Meta.Get(obj.GetType(), Options).Items) {
+				foreach (var yi in meta.Items) {
 					if (!isFirst)
 						Require(',');
 					isFirst = false;
@@ -672,6 +675,7 @@ namespace Yuzu.Json
 				objStack.Pop();
 			}
 			Require(']');
+			meta.RunAfterDeserialization(obj);
 			return obj;
 		}
 

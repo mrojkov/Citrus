@@ -882,6 +882,24 @@ namespace YuzuTest
 		}
 
 		[TestMethod]
+		public void TestAfterDeserialization()
+		{
+			var js = new JsonSerializer();
+			var v0 = new SampleAfter { X = "m" };
+			var result0 = js.ToString(v0);
+			Assert.AreEqual("{\n\t\"X\":\"m\"\n}", result0);
+
+			var jd = new JsonDeserializer();
+			var w0 = new SampleAfter();
+			jd.FromString(w0, result0);
+			Assert.AreEqual("m1", w0.X);
+
+			var w1 = new SampleAfter2();
+			jd.FromString(w1, result0);
+			Assert.AreEqual("m231", w1.X);
+		}
+
+		[TestMethod]
 		public void TestErrors()
 		{
 			var js = new JsonSerializer();
