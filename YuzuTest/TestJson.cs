@@ -480,6 +480,14 @@ namespace YuzuTest
 			var w1 = (SampleArray)SampleArray_JsonDeserializer.Instance.FromString(
 				"{\n\"A\":[\n3,\n\"a\",\n\"b\",\n\"c\"\n]\n}");
 			CollectionAssert.AreEqual(v0.A, w1.A);
+
+			var v2 = new SampleArray();
+			var result2 = js.ToString(v2);
+			Assert.AreEqual("{\n\"A\":null\n}", result2);
+			var w2 = (SampleArray)SampleArray_JsonDeserializer.Instance.FromString(result2);
+			CollectionAssert.AreEqual(v2.A, w2.A);
+			jd.FromString(w2, result2);
+			CollectionAssert.AreEqual(v2.A, w2.A);
 		}
 
 		[TestMethod]

@@ -408,12 +408,13 @@ namespace Yuzu.Json
 
 		private T[] ReadArray<T>()
 		{
-			return ReadList<T>().ToArray();
+			var lst = ReadList<T>();
+			return lst == null ? null : lst.ToArray();
 		}
 
 		private T[] ReadArrayWithLengthPrefix<T>()
 		{
-			Require('[');
+			if (RequireOrNull('[')) return null;
 			// ReadValue might invoke a new serializer, so we must not rely on PutBack.
 			if (SkipSpacesCarefully() == ']') {
 				Require(']');

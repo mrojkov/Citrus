@@ -211,6 +211,10 @@ namespace Yuzu.Json
 
 		private void WriteArray<T>(T[] array)
 		{
+			if (array == null) {
+				WriteStr("null");
+				return;
+			}
 			var wf = GetWriteFunc(typeof(T));
 			writer.Write('[');
 			if (array.Length > 0) {
