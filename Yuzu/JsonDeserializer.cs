@@ -456,7 +456,23 @@ namespace Yuzu.Json
 					Require("ull");
 					return null;
 				case '{':
-					return ReadDictionary<string, object>();
+					Next();
+					var name = GetNextName(first: true);
+					if (name != JsonOptions.ClassTag) {
+						var any = new Dictionary<string, object>();
+						if (name != "") {
+							var val = ReadAnyObject();
+							any.Add(name, val);
+							if (Require(',', '}') == ',')
+								ReadIntoDictionary<string, object>(any);
+						}
+						return any;
+					}
+					var typeName = RequireUnescapedString();
+					var t = Options.Assembly.GetType(typeName);
+					if (t == null)
+						throw Error("Unknown type '{0}'", typeName);
+					return ReadFields(Activator.CreateInstance(t), GetNextName(first: false));
 				case '[':
 					return ReadList<object>();
 				default:
@@ -654,31 +670,16 @@ namespace Yuzu.Json
 				throw Error("Expected class tag, but found '{0}'", name);
 		}
 
+		// T is neither a collection nor a bare object.
 		private T ReadObject<T>() where T: class, new() {
 			KillBuf();
 			switch (RequireBracketOrNull()) {
 				case 'n':
 					return null;
 				case '{':
-					if (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
-						var m = Utils.GetPrivateCovariantGenericAll(GetType(), "ReadIntoDictionary", typeof(T));
-						var result = new T();
-						m.Invoke(this, new object[] { result });
-						return (T)result;
-					}
 					var name = GetNextName(first: true);
-					if (name != JsonOptions.ClassTag) {
-						if (typeof(T) != typeof(object))
-							return (T)ReadFields(new T(), name);
-						var any = new Dictionary<string, object>();
-						if (name != "") {
-							var val = ReadAnyObject();
-							any.Add(name, val);
-							if (Require(',', '}') == ',')
-								ReadIntoDictionary<string, object>(any);
-						}
-						return (T)(object)any;
-					}
+					if (name != JsonOptions.ClassTag)
+						return (T)ReadFields(new T(), name);
 					var typeName = RequireUnescapedString();
 					var t = Options.Assembly.GetType(typeName);
 					if (t == null)
@@ -687,12 +688,6 @@ namespace Yuzu.Json
 						throw Error("Expected type '{0}', but got {1}", typeof(T).Name, typeName);
 					return (T)ReadFields(Activator.CreateInstance(t), GetNextName(first: false));
 				case '[':
-					if (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(List<>)) {
-						var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadIntoList", typeof(T));
-						var result = new T();
-						m.Invoke(this, new object[] { result });
-						return result;
-					}
 					return (T)ReadFieldsCompact(new T());
 				default:
 					throw new YuzuAssert();
@@ -713,7 +708,7 @@ namespace Yuzu.Json
 			return (T)ReadFields(Activator.CreateInstance(t), GetNextName(first: false));
 		}
 
-		public override object FromReaderInt() { return ReadObject<object>(); }
+		public override object FromReaderInt() { return ReadAnyObject(); }
 
 		public override object FromReaderInt(object obj)
 		{

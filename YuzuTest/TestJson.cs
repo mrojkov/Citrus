@@ -708,11 +708,18 @@ namespace YuzuTest
 				new Dictionary<string, object>() { { "a", "1" }, { "b", "2" } },
 				(Dictionary<string, object>)w.F);
 			Assert.AreEqual(typeof(Dictionary<string, object>), jd.FromString("{}").GetType());
+
 			var d = jd.FromString("{ \"F\": [1,2,3] }");
 			Assert.AreEqual(typeof(Dictionary<string, object>), d.GetType());
 			CollectionAssert.AreEqual(
 				new object[] { 1.0, 2.0, 3.0 },
 				(List<object>)((Dictionary<string,object>)d)["F"]);
+
+			d = jd.FromString("{ \"F\": {\"class\": \"YuzuTest.SampleObj\", \"F\": null } }");
+			Assert.AreEqual(typeof(Dictionary<string, object>), d.GetType());
+			var f = ((Dictionary<string, object>)d)["F"];
+			Assert.IsInstanceOfType(f, typeof(SampleObj));
+			Assert.AreEqual(null, ((SampleObj)f).F);
 		}
 
 		[TestMethod]
