@@ -317,7 +317,7 @@ namespace Yuzu.Json
 				var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteArray", t);
 				return obj => m.Invoke(this, new object[] { obj });
 			}
-			if (Utils.IsStruct(t) || t.IsClass) {
+			if (Utils.IsStruct(t) || t.IsClass || t.IsInterface) {
 				var name = Utils.IsCompact(t, Options) && !JsonOptions.IgnoreCompact ?
 					"WriteObjectCompact" : "WriteObject";
 				var m = GetType().GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic).

@@ -292,6 +292,23 @@ namespace YuzuTest
 		public void Handler2(int v) { x *= v; }
 	}
 
+	public interface ISample
+	{
+		int X { get; set; }
+	}
+
+	public class SampleInterfaced : ISample
+	{
+		[YuzuRequired]
+		public int X { get; set; }
+	}
+
+	public class SampleInterfaceField
+	{
+		[YuzuRequired]
+		public ISample I { get; set; }
+	}
+
 	public class Bad1
 	{
 		[YuzuRequired]

@@ -562,6 +562,11 @@ namespace Yuzu.Json
 					MakeGenericMethod(t);
 				return (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);
 			}
+			if (t.IsInterface) {
+				var m = GetType().GetMethod("ReadInterface", BindingFlags.Instance | BindingFlags.NonPublic).
+					MakeGenericMethod(t);
+				return (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);
+			}
 			if (Utils.IsStruct(t))
 				return () => FromReaderInt(Activator.CreateInstance(t));
 			throw new NotImplementedException(t.Name);
@@ -704,10 +709,19 @@ namespace Yuzu.Json
 			}
 		}
 
-		/*private T ReadObject<T>() where T : struct
+		private T ReadInterface<T>() where T: class
 		{
-			return (T)ReadFieldsCompact(Activator.CreateInstance(typeof(T)));
-		}*/
+			KillBuf();
+			if (RequireOrNull('{')) return null;
+			CheckClassTag(GetNextName(first: true));
+			var typeName = RequireUnescapedString();
+			var t = Options.Assembly.GetType(typeName);
+			if (t == null)
+				throw Error("Unknown type '{0}'", typeName);
+			if (!typeof(T).IsAssignableFrom(t))
+				throw Error("Expected interface '{0}', but got {1}", typeof(T).Name, typeName);
+			return (T)ReadFields(Activator.CreateInstance(t), GetNextName(first: false));
+		}
 
 		public override object FromReaderInt() { return ReadObject<object>(); }
 

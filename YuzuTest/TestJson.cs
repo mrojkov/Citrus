@@ -586,6 +586,34 @@ namespace YuzuTest
 		}
 
 		[TestMethod]
+		public void TestInterface()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = "";
+			js.JsonOptions.IgnoreCompact = true;
+			var v1 = new SampleInterfaceField { I = new SampleInterfaced { X = 34 } };
+			var result1 = js.ToString(v1);
+			Assert.AreEqual("{\"I\":{\"class\":\"YuzuTest.SampleInterfaced\",\"X\":34}}", result1);
+
+			var w1 = new SampleInterfaceField();
+			var jd = new JsonDeserializer();
+			jd.FromString(w1, result1);
+			Assert.IsInstanceOfType(w1.I, typeof(SampleInterfaced));
+			Assert.AreEqual(34, w1.I.X);
+
+			var v2 = new List<ISample> { null, new SampleInterfaced { X = 37 } };
+			var result2 = js.ToString(v2);
+			Assert.AreEqual("[null,{\"class\":\"YuzuTest.SampleInterfaced\",\"X\":37}]", result2);
+
+			var w2 = new List<ISample>();
+			jd.FromString(w2, result2);
+			Assert.AreEqual(2, w2.Count);
+			Assert.IsNull(w2[0]);
+			Assert.AreEqual(37, w2[1].X);
+		}
+
+		[TestMethod]
 		public void TestCompact()
 		{
 			var v = new SampleRect {
