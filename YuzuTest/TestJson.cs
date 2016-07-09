@@ -860,6 +860,7 @@ namespace YuzuTest
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "[]"), "'Sample1'");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"class\": \"Q\" }"), "'Q'");
 			XAssert.Throws<YuzuException>(() => jd.FromString(new SamplePoint(), "[ \"QQ\" ]"), "");
+			XAssert.Throws<YuzuException>(() => jd.FromString(new object(), "{}"), "object");
 			XAssert.Throws<EndOfStreamException>(() => jd.FromString(""), "");
 			XAssert.Throws<EndOfStreamException>(() => jd.FromString(w, "{ \"X\": 1"));
 			XAssert.Throws<YuzuException>(() => jd.FromString(

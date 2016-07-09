@@ -168,7 +168,7 @@ namespace YuzuTest
 			jd.Options.AllowEmptyTypes = true;
 			object p = new object();
 			jsonStream.Position = 0;
-			p = jd.FromStream(p, jsonStream);
+			p = jd.FromStream(jsonStream);
 			Assert.AreEqual(person.Name, ((Dictionary<string, object>)p)["1"]);
 		}
 

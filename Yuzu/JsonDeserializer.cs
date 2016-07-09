@@ -714,9 +714,8 @@ namespace Yuzu.Json
 		{
 			KillBuf();
 			var expectedType = obj.GetType();
-			// HACK: We can not modify the object we are given, so return a new one instead.
 			if (expectedType == typeof(object))
-				return ReadAnyObject();
+				throw Error("Unable to read into bare object");
 			switch (RequireBracketOrNull()) {
 				case 'n':
 					return null;
