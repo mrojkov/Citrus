@@ -295,6 +295,12 @@ namespace Yuzu.Json
 			}
 		}
 
+		private void GenerateAfterDeserialization(Meta meta)
+		{
+			foreach (var a in meta.AfterDeserialization)
+				PutF("result.{0}();\n", a.Info.Name);
+		}
+
 		public void Generate<T>()
 		{
 			var deserializerName = GetTypeSpec(typeof(T), "{0}_{1}") + "_JsonDeserializer";
@@ -350,7 +356,8 @@ namespace Yuzu.Json
 			PutF("var result = ({0})obj;\n", typeSpec);
 			if (!isCollection) {
 				tempCount = 0;
-				foreach (var yi in Meta.Get(typeof(T), Options).Items) {
+				var meta = Meta.Get(typeof(T), Options);
+				foreach (var yi in meta.Items) {
 					if (yi.IsOptional) {
 						PutF("if (\"{0}\" == name) {{\n", yi.Tag(Options));
 						PutF("result.{0} = ", yi.Name);
@@ -365,6 +372,7 @@ namespace Yuzu.Json
 						Put("}\n");
 				}
 				Put("Require('}');\n");
+				GenerateAfterDeserialization(meta);
 			}
 			Put("return result;\n");
 			Put("}\n");
@@ -376,7 +384,8 @@ namespace Yuzu.Json
 				PutF("var result = ({0})obj;\n", typeSpec);
 				bool isFirst = true;
 				tempCount = 0;
-				foreach (var yi in Meta.Get(typeof(T), Options).Items) {
+				var meta = Meta.Get(typeof(T), Options);
+				foreach (var yi in meta.Items) {
 					if (!isFirst)
 						Put("Require(',');\n");
 					isFirst = false;
@@ -384,6 +393,7 @@ namespace Yuzu.Json
 					GenerateValue(yi.Type, "result." + yi.Name);
 				}
 				Put("Require(']');\n");
+				GenerateAfterDeserialization(meta);
 				Put("return result;\n");
 				Put("}\n");
 			}

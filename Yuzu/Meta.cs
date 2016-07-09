@@ -60,7 +60,14 @@ namespace Yuzu.Metadata
 		public readonly Type Type;
 		public readonly CommonOptions Options;
 		public readonly List<Item> Items = new List<Item>();
-		public readonly List<Action<object>> AfterDeserialization = new List<Action<object>>();
+
+		public struct MethodAction
+		{
+			public MethodInfo Info;
+			public Action<object> Run;
+		}
+
+		public List<MethodAction> AfterDeserialization = new List<MethodAction>();
 
 		private void AddItem(MemberInfo m)
 		{
@@ -106,13 +113,13 @@ namespace Yuzu.Metadata
 		private void AddMethod(MethodInfo m)
 		{
 			if (m.IsDefined(Options.AfterDeserializationAttribute))
-				AfterDeserialization.Add(obj => m.Invoke(obj, null));
+				AfterDeserialization.Add(new MethodAction { Info = m, Run = obj => m.Invoke(obj, null) });
 		}
 
 		public void RunAfterDeserialization(object obj)
 		{
 			foreach (var a in AfterDeserialization)
-				a(obj);
+				a.Run(obj);
 		}
 
 		private Meta(Type t, CommonOptions options)

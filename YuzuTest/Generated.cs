@@ -1313,4 +1313,50 @@ namespace YuzuTest
 		}
 	}
 
+	class SampleAfter2_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new SampleAfter2_JsonDeserializer Instance = new SampleAfter2_JsonDeserializer();
+
+		public SampleAfter2_JsonDeserializer()
+		{
+			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
+			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
+			JsonOptions.IgnoreCompact = false;
+			JsonOptions.Int64AsString = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.ArrayLengthPrefix = true;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderTyped<SampleAfter2>(Reader);
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new SampleAfter2(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (SampleAfter2)obj;
+			if ("X" != name) throw new YuzuException("X!=" + name);
+			result.X = RequireString();
+			name = GetNextName(false);
+			Require('}');
+			result.After2();
+			result.After3();
+			result.After();
+			return result;
+		}
+	}
+
 }

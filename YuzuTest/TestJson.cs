@@ -897,6 +897,9 @@ namespace YuzuTest
 			var w1 = new SampleAfter2();
 			jd.FromString(w1, result0);
 			Assert.AreEqual("m231", w1.X);
+
+			var w2 = (SampleAfter2)SampleAfter2_JsonDeserializer.Instance.FromString(result0);
+			Assert.AreEqual("m231", w2.X);
 		}
 
 		[TestMethod]
