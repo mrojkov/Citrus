@@ -87,26 +87,33 @@ namespace Yuzu.Metadata
 				SerializeIf = serializeIf != null ? Options.GetSerializeCondition(serializeIf) : null,
 				Name = m.Name,
 			};
+			var merge = m.IsDefined(Options.MergeAttribute);
 
 			switch (m.MemberType) {
 				case MemberTypes.Field:
 					var f = m as FieldInfo;
 					item.Type = f.FieldType;
 					item.GetValue = f.GetValue;
-					item.SetValue = f.SetValue;
+					if (!merge)
+						item.SetValue = f.SetValue;
 					item.FieldInfo = f;
 					break;
 				case MemberTypes.Property:
 					var p = m as PropertyInfo;
 					item.Type = p.PropertyType;
 					item.GetValue = p.GetValue;
-					item.SetValue = p.SetValue;
+					if (!merge && p.GetSetMethod() != null)
+						item.SetValue = p.SetValue;
 					item.PropInfo = p;
 					break;
 				default:
 					throw Error("Member type {0} not supported", m.MemberType);
 			}
 
+			if (item.SetValue == null) {
+				if (!item.Type.IsClass && !item.Type.IsInterface || item.Type == typeof(object))
+					throw Error("Unable to either set or merge item {0}", item.Name);
+			}
 			Items.Add(item);
 		}
 

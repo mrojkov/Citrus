@@ -917,12 +917,38 @@ namespace YuzuTest.Json
 		}
 
 		[TestMethod]
+		public void TestMerge()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = "";
+
+			var v1 = new SampleMerge();
+			v1.LI.Add(33);
+			v1.M = new Sample1 { X = 768, Y = "ttt" };
+
+			var result1 = js.ToString(v1);
+			Assert.AreEqual("{\"LI\":[33],\"M\":{\"X\":768}}", result1);
+
+			var jd = new JsonDeserializer();
+			var w1 = new SampleMerge();
+			w1.LI.Add(44);
+			w1.M = new Sample1 { X = 999, Y = "qqq" };
+			jd.FromString(w1, result1);
+			CollectionAssert.AreEqual(new [] { 44, 33 }, w1.LI);
+			Assert.AreEqual(768, w1.M.X);
+			Assert.AreEqual("qqq", w1.M.Y);
+		}
+
+		[TestMethod]
 		public void TestErrors()
 		{
 			var js = new JsonSerializer();
 			XAssert.Throws<YuzuException>(() => js.ToString(new Empty()), "Empty");
 			XAssert.Throws<YuzuException>(() => js.ToString(new SampleCollectionWithField<int>()), "collection");
 			XAssert.Throws<YuzuException>(() => js.ToString(new SampleInterfacedFieldDup()), "X");
+			XAssert.Throws<YuzuException>(() => js.ToString(new BadMerge1()), "merge");
+			XAssert.Throws<YuzuException>(() => js.ToString(new BadMerge2()), "merge");
 
 			var jd = new JsonDeserializer();
 			var w = new Sample1();

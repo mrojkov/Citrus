@@ -373,18 +373,27 @@ namespace YuzuTest
 		public void After3() { X += "3"; }
 	}
 
+	public class SampleMerge
+	{
+		private List<int> li = new List<int>();
+		[YuzuRequired]
+		public List<int> LI { get { return li; } }
+		[YuzuOptional, YuzuMerge]
+		public Sample1 M;
+	}
+
 	public class Bad1
 	{
 		[YuzuRequired]
 		[YuzuOptional]
 		public int F;
-	};
+	}
 
 	public class Bad2
 	{
 		[YuzuRequired("привет")]
 		public int F;
-	};
+	}
 
 	public class Bad3
 	{
@@ -392,7 +401,19 @@ namespace YuzuTest
 		public int F;
 		[YuzuRequired("q")]
 		public int G;
-	};
+	}
+
+	public class BadMerge1
+	{
+		[YuzuRequired]
+		public int F { get { return 1; } }
+	}
+
+	public class BadMerge2
+	{
+		[YuzuRequired, YuzuMerge]
+		public int F;
+	}
 
 	public static class XAssert
 	{
@@ -401,14 +422,12 @@ namespace YuzuTest
 		{
 			try {
 				exceptionThrower();
-				Assert.Fail("Expected exception:<{0}>. Actual exception: none.", typeof(TExpectedException).Name);
-			}
-			catch (AssertFailedException) {
-				throw;
 			}
 			catch (TExpectedException ex) {
 				StringAssert.Contains(ex.Message, expectedExceptionMessage, "Bad exception message");
+				return;
 			}
+			Assert.Fail("Expected exception:<{0}>. Actual exception: none.", typeof(TExpectedException).Name);
 		}
 	}
 

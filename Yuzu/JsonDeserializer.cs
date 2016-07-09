@@ -499,6 +499,7 @@ namespace Yuzu.Json
 		private object RequireTimeSpanObj() { return RequireTimeSpan(); }
 
 		private Dictionary<Type, Func<object>> readerCache = new Dictionary<Type, Func<object>>();
+		private Dictionary<Type, Action<object>> mergerCache = new Dictionary<Type, Action<object>>();
 		private int jsonOptionsGeneration = 0;
 
 		private Func<object> ReadValueFunc(Type t)
@@ -510,10 +511,22 @@ namespace Yuzu.Json
 			Func<object> f;
 			if (readerCache.TryGetValue(t, out f))
 				return f;
-			return readerCache[t] = MakeValueFunc(t);
+			return readerCache[t] = MakeReaderFunc(t);
 		}
 
-		private Func<object> MakeValueFunc(Type t)
+		private Action<object> MergeValueFunc(Type t)
+		{
+			if (jsonOptionsGeneration != JsonOptions.Generation) {
+				mergerCache.Clear();
+				jsonOptionsGeneration = JsonOptions.Generation;
+			}
+			Action<object> f;
+			if (mergerCache.TryGetValue(t, out f))
+				return f;
+			return mergerCache[t] = MakeMergerFunc(t);
+		}
+
+		private Func<object> MakeReaderFunc(Type t)
 		{
 			if (t == typeof(int))
 				return RequireIntObj;
@@ -598,6 +611,27 @@ namespace Yuzu.Json
 			throw new NotImplementedException(t.Name);
 		}
 
+		private Action<object> MakeMergerFunc(Type t)
+		{
+			if (t.IsGenericType) {
+				var g = t.GetGenericTypeDefinition();
+				if (g == typeof(Dictionary<,>)) {
+					var m = Utils.GetPrivateCovariantGenericAll(GetType(), "ReadDictionary", t);
+					return obj => { Require('{'); m.Invoke(this, new object[] { obj }); };
+				}
+			}
+			var icoll = t.GetInterface(typeof(ICollection<>).Name);
+			if (icoll != null) {
+				var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadIntoCollection", icoll);
+				return obj => { Require('['); m.Invoke(this, new object[] { obj }); };
+			}
+			if ((t.IsClass || t.IsInterface) && t != typeof(object)) {
+				var m = Utils.GetPrivateGeneric(GetType(), "ReadIntoObject", t);
+				return (Action<object>)Delegate.CreateDelegate(typeof(Action<object>), this, m);
+			}
+			throw Error("Unable to merge field of type {0}", t.Name);
+		}
+
 		protected void IgnoreNewFieldsTail(string name)
 		{
 			while (name != "") {
@@ -631,7 +665,10 @@ namespace Yuzu.Json
 								throw Error("Expected field '{0}', but found '{1}'", yi.NameTagged(Options), name);
 							continue;
 						}
-						yi.SetValue(obj, ReadValueFunc(yi.Type)());
+						if (yi.SetValue != null)
+							yi.SetValue(obj, ReadValueFunc(yi.Type)());
+						else
+							MergeValueFunc(yi.Type)(yi.GetValue(obj));
 						name = GetNextName(false);
 					}
 				}
@@ -642,7 +679,10 @@ namespace Yuzu.Json
 								throw Error("Expected field '{0}', but found '{1}'", yi.NameTagged(Options), name);
 							continue;
 						}
-						yi.SetValue(obj, ReadValueFunc(yi.Type)());
+						if (yi.SetValue != null)
+							yi.SetValue(obj, ReadValueFunc(yi.Type)());
+						else
+							MergeValueFunc(yi.Type)(yi.GetValue(obj));
 						name = GetNextName(false);
 					}
 				}
@@ -686,6 +726,16 @@ namespace Yuzu.Json
 				throw Error("Expected class tag, but found '{0}'", name);
 		}
 
+		private void CheckSameClassTag(Type expectedType)
+		{
+			var typeName = RequireUnescapedString();
+			var actualType = Options.Assembly.GetType(typeName);
+			if (actualType == null)
+				throw Error("Unknown type '{0}'", typeName);
+			if (actualType != expectedType)
+				throw Error("Expected type '{0}', but got {1}", expectedType.Name, typeName);
+		}
+
 		// T is neither a collection nor a bare object.
 		private T ReadObject<T>() where T: class, new() {
 			KillBuf();
@@ -710,7 +760,30 @@ namespace Yuzu.Json
 			}
 		}
 
-		private T ReadInterface<T>() where T: class
+		// T is neither a collection nor a bare object.
+		private void ReadIntoObject<T>(object obj) where T : class, new()
+		{
+			KillBuf();
+			switch (Require('{', '[')) {
+				case '{':
+					var name = GetNextName(first: true);
+					if (name != JsonOptions.ClassTag) {
+						ReadFields(obj, name);
+					}
+					else {
+						CheckSameClassTag(typeof(T));
+						ReadFields(obj, GetNextName(first: false));
+					}
+					return;
+				case '[':
+					ReadFieldsCompact(obj);
+					return;
+				default:
+					throw new YuzuAssert();
+			}
+		}
+
+		private T ReadInterface<T>() where T : class
 		{
 			KillBuf();
 			if (RequireOrNull('{')) return null;
@@ -744,12 +817,7 @@ namespace Yuzu.Json
 					var name = GetNextName(first: true);
 					if (name != JsonOptions.ClassTag)
 						return ReadFields(obj, name);
-					var typeName = RequireUnescapedString();
-					var actualType = Options.Assembly.GetType(typeName);
-					if (actualType == null)
-						throw Error("Unknown type '{0}'", typeName);
-					if (actualType != expectedType)
-						throw Error("Expected type '{0}', but got {1}", expectedType.Name, typeName);
+					CheckSameClassTag(expectedType);
 					return ReadFields(obj, GetNextName(first: false));
 				case '[':
 					var icoll = expectedType.GetInterface(typeof(ICollection<>).Name);
