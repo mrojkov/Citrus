@@ -80,10 +80,5 @@ namespace Yuzu.Util
 		{
 			return t.IsDefined(options.CompactAttribute);
 		}
-
-		public static bool IsICollection(Type t)
-		{
-			return t.GetInterface((typeof(ICollection<>).Name)) != null;
-		}
 	}
 }

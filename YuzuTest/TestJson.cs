@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Yuzu;
 using Yuzu.Json;
 
-namespace YuzuTest
+namespace YuzuTest.Json
 {
 	[TestClass]
 	public class TestJson
@@ -375,6 +375,13 @@ namespace YuzuTest
 			Assert.AreEqual("[\n2,\n5,\n4\n]", result1);
 			var w2 = (SampleCollection<int>)SampleCollection_Int32_JsonDeserializer.Instance.FromString(result1);
 			CollectionAssert.AreEqual(v2.ToList(), w2.ToList());
+
+			var v3 = new SampleConcreteCollection { 8, 3, 1 };
+			var result3 = js.ToString(v3);
+			Assert.AreEqual("[\n8,\n3,\n1\n]", result3);
+			var w3 = new SampleConcreteCollection();
+			jd.FromString(w3, result3);
+			CollectionAssert.AreEqual(v3.ToList(), w3.ToList());
 		}
 
 		[TestMethod]

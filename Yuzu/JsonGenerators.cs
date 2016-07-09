@@ -256,7 +256,7 @@ namespace Yuzu.Json
 				Put("Require(']');\n");
 				Put("}\n");
 			}
-			else if (Utils.IsICollection(t)) {
+			else if (t.GetInterface(typeof(ICollection<>).Name) != null) {
 				PutRequireOrNull('[', t, name);
 				GenerateCollection(t, name);
 				Put("}\n");
@@ -318,7 +318,7 @@ namespace Yuzu.Json
 			Put("}\n");
 			Put("\n");
 
-			var isCollection = Utils.IsICollection(typeof(T));
+			var isCollection = typeof(T).GetInterface(typeof(ICollection<>).Name) != null;
 			var typeSpec = GetTypeSpec(typeof(T));
 			Put("public override object FromReaderInt()\n");
 			Put("{\n");

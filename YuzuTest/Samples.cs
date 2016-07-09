@@ -347,6 +347,8 @@ namespace YuzuTest
 		public int X;
 	}
 
+	public class SampleConcreteCollection : SampleCollection<int> { }
+
 	public class SampleWithCollection
 	{
 		[YuzuRequired]

@@ -304,17 +304,18 @@ namespace Yuzu.Json
 					var m = Utils.GetPrivateCovariantGenericAll(GetType(), "WriteDictionary", t);
 					return obj => m.Invoke(this, new object[] { obj });
 				}
-				if (g.GetInterface((typeof(ICollection<>).Name)) != null) {
-					Meta.Get(t, Options); // Check for serializable fields.
-					var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteCollection", t);
-					return obj => m.Invoke(this, new object[] { obj });
-				}
 				if (g == typeof(Action<>)) {
 					return WriteAction;
 				}
 			}
 			if (t.IsArray) {
 				var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteArray", t);
+				return obj => m.Invoke(this, new object[] { obj });
+			}
+			var icoll = t.GetInterface(typeof(ICollection<>).Name);
+			if (icoll != null) {
+				Meta.Get(t, Options); // Check for serializable fields.
+				var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteCollection", icoll);
 				return obj => m.Invoke(this, new object[] { obj });
 			}
 			if (Utils.IsStruct(t) || t.IsClass || t.IsInterface) {
