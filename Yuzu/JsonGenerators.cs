@@ -134,6 +134,54 @@ namespace Yuzu.Json
 			Put("}\n");
 		}
 
+		private void GenerateMerge(Type t, string name)
+		{
+			if(t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
+				Put("Require('{');\n");
+				GenerateDictionary(t, name);
+			}
+			else if (t.GetInterface(typeof(ICollection<>).Name) != null) {
+				Put("Require('[');\n");
+				GenerateCollection(t, name);
+			}
+			else if ((t.IsClass || t.IsInterface) && t != typeof(object))
+				PutF(String.Format(
+					"{0}_JsonDeserializer.Instance.FromReader({1}, Reader);\n",
+					GetTypeSpec(t, "{0}_{1}"), name)
+				);
+			else
+				throw Error("Unable to merge field {1} of type {0}", name, t.Name);
+		}
+
+		private void GenerateDictionary(Type t, string name)
+		{
+			Put("if (SkipSpacesCarefully() == '}') {\n");
+			Put("Require('}');\n");
+			Put("}\n");
+			Put("else {\n");
+			Put("do {\n");
+			tempCount += 1;
+			var tempKeyStr = "tmp" + tempCount.ToString();
+			PutF("var {0} = RequireString();\n", tempKeyStr);
+			Put("Require(':');\n");
+			tempCount += 1;
+			var tempValue = "tmp" + tempCount.ToString();
+			PutF("var {0} = ", tempValue);
+			GenerateValue(t.GetGenericArguments()[1], tempValue);
+			var keyType = t.GetGenericArguments()[0];
+			var tempKey =
+				keyType == typeof(string) ? tempKeyStr :
+				keyType == typeof(int) ? String.Format("int.Parse({0})", tempKeyStr) :
+				keyType.IsEnum ?
+					String.Format("({0})Enum.Parse(typeof({0}), {1})", GetTypeSpec(keyType), tempKeyStr) :
+				// Slow.
+					String.Format("({0})keyParsers[typeof({0})]({1})", GetTypeSpec(keyType), tempKeyStr);
+			PutF("{0}.Add({1}, {2});\n", name, tempKey, tempValue);
+			Put("} while (Require('}', ',') == ',');\n");
+			Put("}\n");
+			Put("}\n");
+		}
+
 		private void GenerateValue(Type t, string name)
 		{
 			if (t == typeof(int)) {
@@ -188,35 +236,9 @@ namespace Yuzu.Json
 						"({0})RequireInt();\n",
 					t.Name));
 			}
-			else if (
-				t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)
-			) {
+			else if(t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
 				PutRequireOrNull('{', t, name);
-				Put("if (SkipSpacesCarefully() == '}') {\n");
-				Put("Require('}');\n");
-				Put("}\n");
-				Put("else {\n");
-				Put("do {\n");
-				tempCount += 1;
-				var tempKeyStr = "tmp" + tempCount.ToString();
-				PutF("var {0} = RequireString();\n", tempKeyStr);
-				Put("Require(':');\n");
-				tempCount += 1;
-				var tempValue = "tmp" + tempCount.ToString();
-				PutF("var {0} = ", tempValue);
-				GenerateValue(t.GetGenericArguments()[1], tempValue);
-				var keyType = t.GetGenericArguments()[0];
-				var tempKey =
-					keyType == typeof(string) ? tempKeyStr :
-					keyType == typeof(int) ? String.Format("int.Parse({0})", tempKeyStr) :
-					keyType.IsEnum ?
-						String.Format("({0})Enum.Parse(typeof({0}), {1})", GetTypeSpec(keyType), tempKeyStr) :
-						// Slow.
-						String.Format("({0})keyParsers[typeof({0})]({1})", GetTypeSpec(keyType), tempKeyStr);
-				PutF("{0}.Add({1}, {2});\n", name, tempKey, tempValue);
-				Put("} while (Require('}', ',') == ',');\n");
-				Put("}\n");
-				Put("}\n");
+				GenerateDictionary(t, name);
 			}
 			else if (t.IsArray && !JsonOptions.ArrayLengthPrefix) {
 				PutRequireOrNullArray('[', t, name);
@@ -360,13 +382,18 @@ namespace Yuzu.Json
 				foreach (var yi in meta.Items) {
 					if (yi.IsOptional) {
 						PutF("if (\"{0}\" == name) {{\n", yi.Tag(Options));
-						PutF("result.{0} = ", yi.Name);
+						if (yi.SetValue != null)
+							PutF("result.{0} = ", yi.Name);
 					}
 					else {
 						PutF("if (\"{0}\" != name) throw new YuzuException(\"{0}!=\" + name);\n", yi.Tag(Options));
-						PutF("result.{0} = ", yi.Name);
+						if (yi.SetValue != null)
+							PutF("result.{0} = ", yi.Name);
 					}
-					GenerateValue(yi.Type, "result." + yi.Name);
+					if (yi.SetValue != null)
+						GenerateValue(yi.Type, "result." + yi.Name);
+					else
+						GenerateMerge(yi.Type, "result." + yi.Name);
 					Put("name = GetNextName(false);\n");
 					if (yi.IsOptional)
 						Put("}\n");
@@ -389,8 +416,12 @@ namespace Yuzu.Json
 					if (!isFirst)
 						Put("Require(',');\n");
 					isFirst = false;
-					PutF("result.{0} = ", yi.Name);
-					GenerateValue(yi.Type, "result." + yi.Name);
+					if (yi.SetValue != null) {
+						PutF("result.{0} = ", yi.Name);
+						GenerateValue(yi.Type, "result." + yi.Name);
+					}
+					else
+						GenerateMerge(yi.Type, "result." + yi.Name);
 				}
 				Put("Require(']');\n");
 				GenerateAfterDeserialization(meta);

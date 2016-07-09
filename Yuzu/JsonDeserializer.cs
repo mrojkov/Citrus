@@ -613,12 +613,9 @@ namespace Yuzu.Json
 
 		private Action<object> MakeMergerFunc(Type t)
 		{
-			if (t.IsGenericType) {
-				var g = t.GetGenericTypeDefinition();
-				if (g == typeof(Dictionary<,>)) {
-					var m = Utils.GetPrivateCovariantGenericAll(GetType(), "ReadDictionary", t);
-					return obj => { Require('{'); m.Invoke(this, new object[] { obj }); };
-				}
+			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
+				var m = Utils.GetPrivateCovariantGenericAll(GetType(), "ReadDictionary", t);
+				return obj => { Require('{'); m.Invoke(this, new object[] { obj }); };
 			}
 			var icoll = t.GetInterface(typeof(ICollection<>).Name);
 			if (icoll != null) {

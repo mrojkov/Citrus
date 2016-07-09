@@ -1384,4 +1384,60 @@ namespace YuzuTest
 		}
 	}
 
+	class SampleMerge_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new SampleMerge_JsonDeserializer Instance = new SampleMerge_JsonDeserializer();
+
+		public SampleMerge_JsonDeserializer()
+		{
+			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
+			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
+			JsonOptions.IgnoreCompact = false;
+			JsonOptions.Int64AsString = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.ArrayLengthPrefix = true;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderTyped<SampleMerge>(Reader);
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new SampleMerge(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (SampleMerge)obj;
+			if ("LI" != name) throw new YuzuException("LI!=" + name);
+			Require('[');
+			if (SkipSpacesCarefully() == ']') {
+				Require(']');
+			}
+			else {
+				do {
+					var tmp1 = RequireInt();
+					result.LI.Add(tmp1);
+				} while (Require(']', ',') == ',');
+			}
+			name = GetNextName(false);
+			if ("M" == name) {
+				Sample1_JsonDeserializer.Instance.FromReader(result.M, Reader);
+				name = GetNextName(false);
+			}
+			Require('}');
+			return result;
+		}
+	}
+
 }

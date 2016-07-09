@@ -938,6 +938,14 @@ namespace YuzuTest.Json
 			CollectionAssert.AreEqual(new [] { 44, 33 }, w1.LI);
 			Assert.AreEqual(768, w1.M.X);
 			Assert.AreEqual("qqq", w1.M.Y);
+
+			var w2 = new SampleMerge();
+			w2.LI.Add(55);
+			w2.M = new Sample1 { X = 999, Y = "www" };
+			SampleMerge_JsonDeserializer.Instance.FromString(w2, result1);
+			CollectionAssert.AreEqual(new[] { 55, 33 }, w2.LI);
+			Assert.AreEqual(768, w2.M.X);
+			Assert.AreEqual("www", w2.M.Y);
 		}
 
 		[TestMethod]
