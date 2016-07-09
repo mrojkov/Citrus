@@ -667,17 +667,17 @@ namespace Yuzu.Json
 						return (T)result;
 					}
 					var name = GetNextName(first: true);
-					if (name == "") return new T();
 					if (name != JsonOptions.ClassTag) {
-						if (typeof(T) == typeof(object)) {
-							var any = new Dictionary<string, object>();
+						if (typeof(T) != typeof(object))
+							return (T)ReadFields(new T(), name);
+						var any = new Dictionary<string, object>();
+						if (name != "") {
 							var val = ReadAnyObject();
 							any.Add(name, val);
 							if (Require(',', '}') == ',')
 								ReadIntoDictionary<string, object>(any);
-							return (T)(object)any;
 						}
-						return (T)ReadFields(new T(), name);
+						return (T)(object)any;
 					}
 					var typeName = RequireUnescapedString();
 					var t = Options.Assembly.GetType(typeName);

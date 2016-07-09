@@ -707,6 +707,12 @@ namespace YuzuTest
 			CollectionAssert.AreEqual(
 				new Dictionary<string, object>() { { "a", "1" }, { "b", "2" } },
 				(Dictionary<string, object>)w.F);
+			Assert.AreEqual(typeof(Dictionary<string, object>), jd.FromString("{}").GetType());
+			var d = jd.FromString("{ \"F\": [1,2,3] }");
+			Assert.AreEqual(typeof(Dictionary<string, object>), d.GetType());
+			CollectionAssert.AreEqual(
+				new object[] { 1.0, 2.0, 3.0 },
+				(List<object>)((Dictionary<string,object>)d)["F"]);
 		}
 
 		[TestMethod]
