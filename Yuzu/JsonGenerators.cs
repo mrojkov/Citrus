@@ -118,7 +118,7 @@ namespace Yuzu.Json
 			PutF("if ({0} != null) {{\n", name);
 		}
 
-		private void GenerateList(Type t, string name)
+		private void GenerateCollection(Type t, string name)
 		{
 			Put("if (SkipSpacesCarefully() == ']') {\n");
 			Put("Require(']');\n");
@@ -188,11 +188,6 @@ namespace Yuzu.Json
 						"({0})RequireInt();\n",
 					t.Name));
 			}
-			else if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>)) {
-				PutRequireOrNull('[', t, name);
-				GenerateList(t, name);
-				Put("}\n");
-			}
 			else if (
 				t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)
 			) {
@@ -261,12 +256,21 @@ namespace Yuzu.Json
 				Put("Require(']');\n");
 				Put("}\n");
 			}
+			else if (Utils.IsICollection(t)) {
+				PutRequireOrNull('[', t, name);
+				GenerateCollection(t, name);
+				Put("}\n");
+			}
 			else if (t.IsClass || Utils.IsStruct(t))
 				PutPart(String.Format(
-					"{0}_JsonDeserializer.Instance.FromReaderTyped<{0}>(Reader);\n", GetTypeSpec(t, "{0}_{1}")));
+					"{0}_JsonDeserializer.Instance.FromReaderTyped<{1}>(Reader);\n",
+					GetTypeSpec(t, "{0}_{1}"), GetTypeSpec(t))
+				);
 			else if (t.IsInterface)
 				PutPart(String.Format(
-					"{0}_JsonDeserializer.Instance.FromReaderInterface<{0}>(Reader);\n", GetTypeSpec(t, "{0}_{1}")));
+					"{0}_JsonDeserializer.Instance.FromReaderInterface<{1}>(Reader);\n",
+					GetTypeSpec(t, "{0}_{1}"), GetTypeSpec(t))
+				);
 			else
 				throw new NotImplementedException(t.Name);
 		}
@@ -308,11 +312,11 @@ namespace Yuzu.Json
 			Put("}\n");
 			Put("\n");
 
-			var isList = typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(List<>);
+			var isCollection = Utils.IsICollection(typeof(T));
 			var typeSpec = GetTypeSpec(typeof(T));
 			Put("public override object FromReaderInt()\n");
 			Put("{\n");
-			if (isList)
+			if (isCollection)
 				PutF("return FromReaderInt(new {0}());\n", typeSpec);
 			else if (typeof(T).IsInterface)
 				PutF("return FromReaderInterface<{0}>(Reader);\n", typeSpec);
@@ -321,12 +325,12 @@ namespace Yuzu.Json
 			Put("}\n");
 			Put("\n");
 
-			if (isList) {
+			if (isCollection) {
 				Put("public override object FromReaderInt(object obj)\n");
 				Put("{\n");
 				PutF("var result = ({0})obj;\n", typeSpec);
 				Put("Require('[');\n");
-				GenerateList(typeof(T), "result");
+				GenerateCollection(typeof(T), "result");
 				Put("return result;\n");
 				Put("}\n");
 				Put("\n");
@@ -344,7 +348,7 @@ namespace Yuzu.Json
 			Put("protected override object ReadFields(object obj, string name)\n");
 			Put("{\n");
 			PutF("var result = ({0})obj;\n", typeSpec);
-			if (!isList) {
+			if (!isCollection) {
 				tempCount = 0;
 				foreach (var yi in Meta.Get(typeof(T), Options).Items) {
 					if (yi.IsOptional) {

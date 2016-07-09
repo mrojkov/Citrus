@@ -560,7 +560,7 @@ namespace Yuzu.Json
 					var m = Utils.GetPrivateCovariantGenericAll(GetType(), "ReadDictionary", t);
 					return () => m.Invoke(this, new object[] { });
 				}
-				if (g.GetInterface((typeof(ICollection<>).Name)) != null) {
+				if (Utils.IsICollection(g)) {
 					var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadIntoCollection", t);
 					return () => {
 						if (RequireOrNull('['))
@@ -746,7 +746,7 @@ namespace Yuzu.Json
 						throw Error("Expected type '{0}', but got {1}", expectedType.Name, typeName);
 					return ReadFields(obj, GetNextName(first: false));
 				case '[':
-					if (expectedType.GetInterface((typeof(ICollection<>).Name)) != null) {
+					if (Utils.IsICollection(expectedType)) {
 						var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadIntoCollection", expectedType);
 						m.Invoke(this, new object[] { obj });
 						return obj;

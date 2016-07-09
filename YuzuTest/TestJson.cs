@@ -363,6 +363,18 @@ namespace YuzuTest
 			Assert.IsInstanceOfType(w0.A.First(), typeof(SampleInterfaced));
 			Assert.AreEqual(9, w0.A.First().X);
 			CollectionAssert.AreEqual(new int[] { 7, 6 }, w0.B.ToList());
+
+			var w1 = (SampleWithCollection)SampleWithCollection_JsonDeserializer.Instance.FromString(result0);
+			Assert.AreEqual(1, w1.A.Count);
+			Assert.IsInstanceOfType(w1.A.First(), typeof(SampleInterfaced));
+			Assert.AreEqual(9, w1.A.First().X);
+			CollectionAssert.AreEqual(new int[] { 7, 6 }, w1.B.ToList());
+
+			var v2 = new SampleCollection<int> { 2, 5, 4 };
+			var result1 = js.ToString(v2);
+			Assert.AreEqual("[\n2,\n5,\n4\n]", result1);
+			var w2 = (SampleCollection<int>)SampleCollection_Int32_JsonDeserializer.Instance.FromString(result1);
+			CollectionAssert.AreEqual(v2.ToList(), w2.ToList());
 		}
 
 		[TestMethod]

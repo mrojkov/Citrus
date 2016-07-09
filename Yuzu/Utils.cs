@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -78,6 +79,11 @@ namespace Yuzu.Util
 		public static bool IsCompact(Type t, CommonOptions options)
 		{
 			return t.IsDefined(options.CompactAttribute);
+		}
+
+		public static bool IsICollection(Type t)
+		{
+			return t.GetInterface((typeof(ICollection<>).Name)) != null;
 		}
 	}
 }
