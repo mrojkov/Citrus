@@ -272,6 +272,7 @@ namespace Yuzu
 		public override object FromReader(BinaryReader reader)
 		{
 			Reader = reader;
+			Initialize();
 			return FromReaderInt();
 		}
 
