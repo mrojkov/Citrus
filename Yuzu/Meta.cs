@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Yuzu
+using Yuzu.Util;
+
+namespace Yuzu.Metadata
 {
 	internal class Meta
 	{

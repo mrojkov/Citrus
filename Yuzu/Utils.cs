@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Reflection;
 
-namespace Yuzu
+namespace Yuzu.Util
 {
 #if NET40
 	internal static class Net4

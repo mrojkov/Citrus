@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 
 using Yuzu;
+using Yuzu.Json;
 
 namespace YuzuTest
 {

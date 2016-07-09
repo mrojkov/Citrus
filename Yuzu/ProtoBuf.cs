@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Text;
 
-namespace Yuzu
+using Yuzu.Metadata;
+
+namespace Yuzu.Protobuf
 {
 	internal enum WireType {
 		Varint = 0,

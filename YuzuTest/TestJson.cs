@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Yuzu;
+using Yuzu.Json;
 
 namespace YuzuTest
 {

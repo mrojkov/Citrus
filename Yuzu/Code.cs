@@ -1,6 +1,9 @@
 ﻿using System;
 
-namespace Yuzu
+using Yuzu.Metadata;
+using Yuzu.Util;
+
+namespace Yuzu.Code
 {
 	public class CodeConstructSerializeOptions
 	{

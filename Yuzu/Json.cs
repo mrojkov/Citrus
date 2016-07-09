@@ -6,7 +6,10 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace Yuzu
+using Yuzu.Metadata;
+using Yuzu.Util;
+
+namespace Yuzu.Json
 {
 	public class JsonSerializeOptions
 	{

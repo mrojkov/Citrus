@@ -4,7 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Yuzu
+using Yuzu.Metadata;
+using Yuzu.Util;
+
+namespace Yuzu.Json
 {
 	public abstract class JsonDeserializerGenBase : JsonDeserializer
 	{
@@ -57,6 +60,7 @@ namespace Yuzu
 			Put("using System.Reflection;\n");
 			Put("\n");
 			Put("using Yuzu;\n");
+			Put("using Yuzu.Json;\n");
 			Put("\n");
 			PutF("namespace {0}\n", namespaceName);
 			Put("{\n");

@@ -6,6 +6,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ProtoBuf;
 
 using Yuzu;
+using Yuzu.Code;
+using Yuzu.Json;
+using Yuzu.Protobuf;
 
 namespace YuzuTest
 {
