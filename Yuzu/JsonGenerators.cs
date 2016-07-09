@@ -70,12 +70,12 @@ namespace Yuzu
 
 		private int tempCount = 0;
 
-		private string GetTypeSpec(Type t)
+		private string GetTypeSpec(Type t, string format = "{0}<{1}>")
 		{
 			return t.IsGenericType ?
-				String.Format("{0}<{1}>",
+				String.Format(format,
 					t.Name.Remove(t.Name.IndexOf('`')),
-					String.Join(",", t.GetGenericArguments().Select(GetTypeSpec))) :
+					String.Join(",", t.GetGenericArguments().Select(a => GetTypeSpec(a, format)))) :
 				t.Name;
 		}
 
@@ -262,13 +262,14 @@ namespace Yuzu
 
 		public void Generate<T>()
 		{
-			PutF("class {0}_JsonDeserializer : JsonDeserializerGenBase\n", typeof(T).Name);
+			var deserializerName = GetTypeSpec(typeof(T), "{0}_{1}") + "_JsonDeserializer";
+			PutF("class {0} : JsonDeserializerGenBase\n", deserializerName);
 			Put("{\n");
 
-			PutF("public static new {0}_JsonDeserializer Instance = new {0}_JsonDeserializer();\n", typeof(T).Name);
+			PutF("public static new {0} Instance = new {0}();\n", deserializerName);
 			Put("\n");
 
-			PutF("public {0}_JsonDeserializer()\n", typeof(T).Name);
+			PutF("public {0}()\n", deserializerName);
 			Put("{\n");
 			PutF("Options.Assembly = Assembly.Load(\"{0}\");\n", typeof(T).Assembly.FullName);
 			GenAssigns("Options", Options);
@@ -276,22 +277,23 @@ namespace Yuzu
 			Put("}\n");
 			Put("\n");
 
+			var typeSpec = GetTypeSpec(typeof(T));
 			Put("public override object FromReaderInt()\n");
 			Put("{\n");
 			// Since deserializer is dynamically constructed anyway, it is too late to determine object type here.
-			PutF("return FromReaderInt(new {0}());\n", typeof(T).Name);
+			PutF("return FromReaderInt(new {0}());\n", typeSpec);
 			Put("}\n");
 			Put("\n");
 
 			Put("public override object FromReaderIntPartial(string name)\n");
 			Put("{\n");
-			PutF("return ReadFields(new {0}(), name);\n", typeof(T).Name);
+			PutF("return ReadFields(new {0}(), name);\n", typeSpec);
 			Put("}\n");
 			Put("\n");
 
 			Put("protected override object ReadFields(object obj, string name)\n");
 			Put("{\n");
-			PutF("var result = ({0})obj;\n", typeof(T).Name);
+			PutF("var result = ({0})obj;\n", typeSpec);
 			tempCount = 0;
 			foreach (var yi in Meta.Get(typeof(T), Options).Items) {
 				if (yi.IsOptional) {
@@ -315,7 +317,7 @@ namespace Yuzu
 				Put("\n");
 				Put("protected override object ReadFieldsCompact(object obj)\n");
 				Put("{\n");
-				PutF("var result = ({0})obj;\n", typeof(T).Name);
+				PutF("var result = ({0})obj;\n", typeSpec);
 				bool isFirst = true;
 				tempCount = 0;
 				foreach (var yi in Meta.Get(typeof(T), Options).Items) {
