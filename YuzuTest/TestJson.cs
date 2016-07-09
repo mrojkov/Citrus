@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -335,6 +336,33 @@ namespace YuzuTest
 			jd.FromString(w2, result2);
 			Assert.AreEqual(v2.Value, w2.Value);
 			Assert.AreEqual(v2.Children.Count, w2.Children.Count);
+		}
+
+		[TestMethod]
+		public void TestCollection()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			var jd = new JsonDeserializer();
+
+			var v0 = new SampleWithCollection();
+			v0.A.Add(new SampleInterfaced { X = 9 });
+			v0.B.Add(7);
+			v0.B.Add(6);
+			var result0 = js.ToString(v0);
+			Assert.AreEqual(
+				"{\n" +
+					"\"A\":[\n{\n\"class\":\"YuzuTest.SampleInterfaced\",\n\"X\":9\n}\n],\n" +
+					"\"B\":[\n7,\n6\n]\n" +
+				"}",
+				result0);
+
+			var w0 = new SampleWithCollection();
+			jd.FromString(w0, result0);
+			Assert.AreEqual(1, w0.A.Count);
+			Assert.IsInstanceOfType(w0.A.First(), typeof(SampleInterfaced));
+			Assert.AreEqual(9, w0.A.First().X);
+			CollectionAssert.AreEqual(new int[] { 7, 6 }, w0.B.ToList());
 		}
 
 		[TestMethod]

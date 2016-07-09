@@ -162,7 +162,7 @@ namespace Yuzu.Json
 				WriteEscapedString(s);
 		}
 
-		private void WriteList<T>(List<T> list)
+		private void WriteCollection<T>(ICollection<T> list)
 		{
 			if (list == null) {
 				WriteStr("null");
@@ -300,12 +300,12 @@ namespace Yuzu.Json
 			}
 			if (t.IsGenericType) {
 				var g = t.GetGenericTypeDefinition();
-				if (g == typeof(List<>)) {
-					var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteList", t);
-					return obj => m.Invoke(this, new object[] { obj });
-				}
 				if (g == typeof(Dictionary<,>)) {
 					var m = Utils.GetPrivateCovariantGenericAll(GetType(), "WriteDictionary", t);
+					return obj => m.Invoke(this, new object[] { obj });
+				}
+				if (g.GetInterface((typeof(ICollection<>).Name)) != null) {
+					var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteCollection", t);
 					return obj => m.Invoke(this, new object[] { obj });
 				}
 				if (g == typeof(Action<>)) {

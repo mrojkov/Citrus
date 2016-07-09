@@ -344,7 +344,7 @@ namespace Yuzu.Json
 			return ch;
 		}
 
-		protected void ReadIntoList<T>(List<T> list)
+		protected void ReadIntoCollection<T>(ICollection<T> list)
 		{
 			// ReadValue might invoke a new serializer, so we must not rely on PutBack.
 			if (SkipSpacesCarefully() == ']') {
@@ -362,7 +362,7 @@ namespace Yuzu.Json
 			if (RequireOrNull('['))
 				return null;
 			var list = new List<T>();
-			ReadIntoList(list);
+			ReadIntoCollection(list);
 			return list;
 		}
 
@@ -560,6 +560,16 @@ namespace Yuzu.Json
 					var m = Utils.GetPrivateCovariantGenericAll(GetType(), "ReadDictionary", t);
 					return () => m.Invoke(this, new object[] { });
 				}
+				if (g.GetInterface((typeof(ICollection<>).Name)) != null) {
+					var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadIntoCollection", t);
+					return () => {
+						if (RequireOrNull('['))
+							return null;
+						var list = Activator.CreateInstance(t);
+						m.Invoke(this, new object[] { list });
+						return list;
+					};
+				}
 				if (g == typeof(Action<>)) {
 					var p = t.GetGenericArguments();
 					var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadAction", t);
@@ -736,8 +746,8 @@ namespace Yuzu.Json
 						throw Error("Expected type '{0}', but got {1}", expectedType.Name, typeName);
 					return ReadFields(obj, GetNextName(first: false));
 				case '[':
-					if (expectedType.IsGenericType && expectedType.GetGenericTypeDefinition() == typeof(List<>)) {
-						var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadIntoList", expectedType);
+					if (expectedType.GetInterface((typeof(ICollection<>).Name)) != null) {
+						var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadIntoCollection", expectedType);
 						m.Invoke(this, new object[] { obj });
 						return obj;
 					}

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
@@ -307,6 +308,28 @@ namespace YuzuTest
 	{
 		[YuzuRequired]
 		public ISample I { get; set; }
+	}
+
+	public class SampleCollection<T> : ICollection<T>
+	{
+		private List<T> impl = new List<T>();
+		public int Count { get { return impl.Count; } }
+		public bool IsReadOnly { get { return false; } }
+		public void Add(T item) { impl.Add(item); }
+		public void Clear() { impl.Clear(); }
+		public bool Contains(T item) { return impl.Contains(item); }
+		public void CopyTo(T[] array, int arrayIndex) { impl.CopyTo(array, arrayIndex); }
+		public bool Remove(T item) { return impl.Remove(item); }
+		IEnumerator<T> IEnumerable<T>.GetEnumerator() { return impl.GetEnumerator(); }
+		IEnumerator IEnumerable.GetEnumerator() { return impl.GetEnumerator(); }
+	}
+
+	public class SampleWithCollection
+	{
+		[YuzuRequired]
+		public SampleCollection<ISample> A = new SampleCollection<ISample>();
+		[YuzuRequired]
+		public SampleCollection<int> B = new SampleCollection<int>();
 	}
 
 	public class Bad1
