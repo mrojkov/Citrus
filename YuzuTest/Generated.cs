@@ -1338,6 +1338,61 @@ namespace YuzuTest
 		}
 	}
 
+	class SampleConcreteCollection_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new SampleConcreteCollection_JsonDeserializer Instance = new SampleConcreteCollection_JsonDeserializer();
+
+		public SampleConcreteCollection_JsonDeserializer()
+		{
+			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
+			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
+			JsonOptions.IgnoreCompact = false;
+			JsonOptions.Int64AsString = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.ArrayLengthPrefix = true;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderInt(new SampleConcreteCollection());
+		}
+
+		public override object FromReaderInt(object obj)
+		{
+			var result = (SampleConcreteCollection)obj;
+			Require('[');
+			if (SkipSpacesCarefully() == ']') {
+				Require(']');
+			}
+			else {
+				do {
+					var tmp3 = RequireInt();
+					result.Add(tmp3);
+				} while (Require(']', ',') == ',');
+			}
+			return result;
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new SampleConcreteCollection(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (SampleConcreteCollection)obj;
+			return result;
+		}
+	}
+
 	class SampleAfter2_JsonDeserializer : JsonDeserializerGenBase
 	{
 		public static new SampleAfter2_JsonDeserializer Instance = new SampleAfter2_JsonDeserializer();

@@ -136,13 +136,14 @@ namespace Yuzu.Json
 
 		private void GenerateMerge(Type t, string name)
 		{
-			if(t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
+			var icoll = t.GetInterface(typeof(ICollection<>).Name);
+			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
 				Put("Require('{');\n");
 				GenerateDictionary(t, name);
 			}
-			else if (t.GetInterface(typeof(ICollection<>).Name) != null) {
+			else if (icoll != null) {
 				Put("Require('[');\n");
-				GenerateCollection(t, name);
+				GenerateCollection(icoll, name);
 			}
 			else if ((t.IsClass || t.IsInterface) && t != typeof(object))
 				PutF(String.Format(
@@ -184,6 +185,7 @@ namespace Yuzu.Json
 
 		private void GenerateValue(Type t, string name)
 		{
+			var icoll = t.GetInterface(typeof(ICollection<>).Name);
 			if (t == typeof(int)) {
 				PutPart("RequireInt();\n");
 			}
@@ -278,9 +280,9 @@ namespace Yuzu.Json
 				Put("Require(']');\n");
 				Put("}\n");
 			}
-			else if (t.GetInterface(typeof(ICollection<>).Name) != null) {
+			else if (icoll != null) {
 				PutRequireOrNull('[', t, name);
-				GenerateCollection(t, name);
+				GenerateCollection(icoll, name);
 				Put("}\n");
 			}
 			else if (t.IsClass || Utils.IsStruct(t))
@@ -340,11 +342,11 @@ namespace Yuzu.Json
 			Put("}\n");
 			Put("\n");
 
-			var isCollection = typeof(T).GetInterface(typeof(ICollection<>).Name) != null;
+			var icoll = typeof(T).GetInterface(typeof(ICollection<>).Name);
 			var typeSpec = GetTypeSpec(typeof(T));
 			Put("public override object FromReaderInt()\n");
 			Put("{\n");
-			if (isCollection)
+			if (icoll != null)
 				PutF("return FromReaderInt(new {0}());\n", typeSpec);
 			else if (typeof(T).IsInterface)
 				PutF("return FromReaderInterface<{0}>(Reader);\n", typeSpec);
@@ -353,12 +355,12 @@ namespace Yuzu.Json
 			Put("}\n");
 			Put("\n");
 
-			if (isCollection) {
+			if (icoll != null) {
 				Put("public override object FromReaderInt(object obj)\n");
 				Put("{\n");
 				PutF("var result = ({0})obj;\n", typeSpec);
 				Put("Require('[');\n");
-				GenerateCollection(typeof(T), "result");
+				GenerateCollection(icoll, "result");
 				Put("return result;\n");
 				Put("}\n");
 				Put("\n");
@@ -376,7 +378,7 @@ namespace Yuzu.Json
 			Put("protected override object ReadFields(object obj, string name)\n");
 			Put("{\n");
 			PutF("var result = ({0})obj;\n", typeSpec);
-			if (!isCollection) {
+			if (icoll == null) {
 				tempCount = 0;
 				var meta = Meta.Get(typeof(T), Options);
 				foreach (var yi in meta.Items) {

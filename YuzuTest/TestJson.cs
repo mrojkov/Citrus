@@ -382,6 +382,9 @@ namespace YuzuTest.Json
 			var w3 = new SampleConcreteCollection();
 			jd.FromString(w3, result3);
 			CollectionAssert.AreEqual(v3.ToList(), w3.ToList());
+			var w2g = (SampleConcreteCollection)
+				SampleConcreteCollection_JsonDeserializer.Instance.FromString(result3);
+			CollectionAssert.AreEqual(v3.ToList(), w2g.ToList());
 		}
 
 		[TestMethod]
