@@ -15,7 +15,7 @@ namespace YuzuTest
 		public Sample1_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-			Options.ClassNames = false;
+
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = false;
@@ -61,7 +61,7 @@ namespace YuzuTest
 		public Sample2_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-			Options.ClassNames = false;
+
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = false;
@@ -107,7 +107,7 @@ namespace YuzuTest
 		public Sample3_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-			Options.ClassNames = false;
+
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = false;
@@ -157,7 +157,7 @@ namespace YuzuTest
 		public Sample4_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-			Options.ClassNames = false;
+
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
@@ -200,7 +200,7 @@ namespace YuzuTest
 		public SampleBool_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-			Options.ClassNames = false;
+
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
@@ -242,7 +242,7 @@ namespace YuzuTest
 		public SampleList_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-			Options.ClassNames = false;
+
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
@@ -295,7 +295,7 @@ namespace YuzuTest
 		public SampleDict_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-			Options.ClassNames = false;
+
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
@@ -354,7 +354,7 @@ namespace YuzuTest
 		public SampleDictKeys_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-			Options.ClassNames = false;
+
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
@@ -441,7 +441,7 @@ namespace YuzuTest
 		public SampleArray_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-			Options.ClassNames = false;
+
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
@@ -494,7 +494,7 @@ namespace YuzuTest
 		public SampleBase_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-			Options.ClassNames = false;
+
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
@@ -536,7 +536,7 @@ namespace YuzuTest
 		public SampleDerivedA_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-			Options.ClassNames = false;
+
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
@@ -581,7 +581,7 @@ namespace YuzuTest
 		public SampleDerivedB_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-			Options.ClassNames = false;
+
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
@@ -626,7 +626,7 @@ namespace YuzuTest
 		public SampleMatrix_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-			Options.ClassNames = false;
+
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
@@ -690,7 +690,7 @@ namespace YuzuTest
 		public SamplePoint_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-			Options.ClassNames = false;
+
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
@@ -745,7 +745,7 @@ namespace YuzuTest
 		public SampleRect_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-			Options.ClassNames = false;
+
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
@@ -790,7 +790,7 @@ namespace YuzuTest
 		public SampleDate_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-			Options.ClassNames = false;
+
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
@@ -835,7 +835,7 @@ namespace YuzuTest
 		public Color_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-			Options.ClassNames = false;
+
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
@@ -895,7 +895,7 @@ namespace YuzuTest
 		public List_List_Int32_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
-			Options.ClassNames = false;
+
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
@@ -960,7 +960,6 @@ namespace YuzuTest
 		public SampleClassList_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-			Options.ClassNames = true;
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
@@ -1013,7 +1012,7 @@ namespace YuzuTest
 		public SamplePerson_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-			Options.ClassNames = false;
+
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
