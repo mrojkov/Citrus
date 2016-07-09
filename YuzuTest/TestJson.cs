@@ -655,6 +655,13 @@ namespace YuzuTest
 			Assert.AreEqual(2, w2.Count);
 			Assert.IsNull(w2[0]);
 			Assert.AreEqual(37, w2[1].X);
+
+			ISampleField v3 = new SampleInterfacedField { X = 41 };
+			js.JsonOptions.SaveRootClass = true;
+			var result3 = js.ToString(v3);
+			Assert.AreEqual("{\"class\":\"YuzuTest.SampleInterfacedField\",\"X\":41}", result3);
+			var w3 = (ISampleField)jd.FromString(result3);
+			Assert.AreEqual(41, w3.X);
 		}
 
 		[TestMethod]

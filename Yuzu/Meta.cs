@@ -122,16 +122,25 @@ namespace Yuzu.Metadata
 				a.Run(obj);
 		}
 
-		private Meta(Type t, CommonOptions options)
+		private void ExploreType(Type t)
 		{
-			Type = t;
-			Options = options;
-			foreach (var m in t.GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy)) {
+			const BindingFlags bindingFlags =
+				BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
+			foreach (var m in t.GetMembers(bindingFlags)) {
 				if (m.MemberType == MemberTypes.Field || m.MemberType == MemberTypes.Property)
 					AddItem(m);
 				else if (m.MemberType == MemberTypes.Method)
 					AddMethod(m as MethodInfo);
 			}
+		}
+
+		private Meta(Type t, CommonOptions options)
+		{
+			Type = t;
+			Options = options;
+			foreach (var i in t.GetInterfaces())
+				ExploreType(i);
+			ExploreType(t);
 			if (Utils.IsICollection(t)) {
 				if (Items.Count > 0)
 					throw Error("Serializable fields in collection are not supported");
