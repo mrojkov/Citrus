@@ -117,6 +117,9 @@ namespace YuzuTest
 				jd.Generate<SampleClassList>();
 				jd.Options.TagMode = TagMode.Aliases;
 				jd.Generate<SamplePerson>();
+				jd.Generate<ISample>();
+				jd.Generate<SampleInterfaced>();
+				jd.Generate<SampleInterfaceField>();
 				jd.GenerateFooter();
 				sw.Flush();
 				ms.WriteTo(new FileStream(@"..\..\Generated.cs", FileMode.Create));

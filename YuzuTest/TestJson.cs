@@ -602,6 +602,10 @@ namespace YuzuTest
 			Assert.IsInstanceOfType(w1.I, typeof(SampleInterfaced));
 			Assert.AreEqual(34, w1.I.X);
 
+			var w1g = (SampleInterfaceField)SampleInterfaceField_JsonDeserializer.Instance.FromString(result1);
+			Assert.IsInstanceOfType(w1g.I, typeof(SampleInterfaced));
+			Assert.AreEqual(34, w1g.I.X);
+
 			var v2 = new List<ISample> { null, new SampleInterfaced { X = 37 } };
 			var result2 = js.ToString(v2);
 			Assert.AreEqual("[null,{\"class\":\"YuzuTest.SampleInterfaced\",\"X\":37}]", result2);

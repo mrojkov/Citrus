@@ -29,6 +29,16 @@ namespace Yuzu.Json
 			var typeName = RequireUnescapedString();
 			return (T)MakeDeserializer(typeName).FromReaderIntPartial(GetNextName(false));
 		}
+
+		public T FromReaderInterface<T>(BinaryReader reader) where T : class
+		{
+			Reader = reader;
+			KillBuf();
+			var ch = Require('{');
+			CheckClassTag(GetNextName(first: true));
+			var typeName = RequireUnescapedString();
+			return (T)MakeDeserializer(typeName).FromReaderIntPartial(GetNextName(first: false));
+		}
 	}
 
 	public class JsonDeserializerGenerator : JsonDeserializer
@@ -251,13 +261,14 @@ namespace Yuzu.Json
 				Put("Require(']');\n");
 				Put("}\n");
 			}
-			else if (t.IsClass || Utils.IsStruct(t)) {
+			else if (t.IsClass || Utils.IsStruct(t))
 				PutPart(String.Format(
 					"{0}_JsonDeserializer.Instance.FromReaderTyped<{0}>(Reader);\n", GetTypeSpec(t, "{0}_{1}")));
-			}
-			else {
+			else if (t.IsInterface)
+				PutPart(String.Format(
+					"{0}_JsonDeserializer.Instance.FromReaderInterface<{0}>(Reader);\n", GetTypeSpec(t, "{0}_{1}")));
+			else
 				throw new NotImplementedException(t.Name);
-			}
 		}
 
 		private void GenAssigns(string name, object obj)
@@ -303,6 +314,8 @@ namespace Yuzu.Json
 			Put("{\n");
 			if (isList)
 				PutF("return FromReaderInt(new {0}());\n", typeSpec);
+			else if (typeof(T).IsInterface)
+				PutF("return FromReaderInterface<{0}>(Reader);\n", typeSpec);
 			else
 				PutF("return FromReaderTyped<{0}>(Reader);\n", typeSpec);
 			Put("}\n");
@@ -321,7 +334,10 @@ namespace Yuzu.Json
 
 			Put("public override object FromReaderIntPartial(string name)\n");
 			Put("{\n");
-			PutF("return ReadFields(new {0}(), name);\n", typeSpec);
+			if (typeof(T).IsInterface)
+				Put("return null;\n");
+			else
+				PutF("return ReadFields(new {0}(), name);\n", typeSpec);
 			Put("}\n");
 			Put("\n");
 

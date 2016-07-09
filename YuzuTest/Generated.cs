@@ -1069,4 +1069,127 @@ namespace YuzuTest
 		}
 	}
 
+	class ISample_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new ISample_JsonDeserializer Instance = new ISample_JsonDeserializer();
+
+		public ISample_JsonDeserializer()
+		{
+			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
+			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
+			JsonOptions.IgnoreCompact = false;
+			JsonOptions.Int64AsString = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.ArrayLengthPrefix = true;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderInterface<ISample>(Reader);
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return null;
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (ISample)obj;
+			Require('}');
+			return result;
+		}
+	}
+
+	class SampleInterfaced_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new SampleInterfaced_JsonDeserializer Instance = new SampleInterfaced_JsonDeserializer();
+
+		public SampleInterfaced_JsonDeserializer()
+		{
+			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
+			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
+			JsonOptions.IgnoreCompact = false;
+			JsonOptions.Int64AsString = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.ArrayLengthPrefix = true;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderTyped<SampleInterfaced>(Reader);
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new SampleInterfaced(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (SampleInterfaced)obj;
+			if ("X" != name) throw new YuzuException("X!=" + name);
+			result.X = RequireInt();
+			name = GetNextName(false);
+			Require('}');
+			return result;
+		}
+	}
+
+	class SampleInterfaceField_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new SampleInterfaceField_JsonDeserializer Instance = new SampleInterfaceField_JsonDeserializer();
+
+		public SampleInterfaceField_JsonDeserializer()
+		{
+			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
+			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
+			JsonOptions.IgnoreCompact = false;
+			JsonOptions.Int64AsString = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.ArrayLengthPrefix = true;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderTyped<SampleInterfaceField>(Reader);
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new SampleInterfaceField(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (SampleInterfaceField)obj;
+			if ("I" != name) throw new YuzuException("I!=" + name);
+			result.I = ISample_JsonDeserializer.Instance.FromReaderInterface<ISample>(Reader);
+			name = GetNextName(false);
+			Require('}');
+			return result;
+		}
+	}
+
 }

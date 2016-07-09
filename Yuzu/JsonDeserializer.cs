@@ -650,18 +650,10 @@ namespace Yuzu.Json
 			return obj;
 		}
 
-		private void CheckClassTag(string name)
+		protected void CheckClassTag(string name)
 		{
 			if (name != JsonOptions.ClassTag)
 				throw Error("Expected class tag, but found '{0}'", name);
-		}
-
-		private void CheckSameTypeAsTag(object obj)
-		{
-			var typeName = obj.GetType().FullName;
-			var tag = RequireString();
-			if (typeName != tag)
-				throw Error("Reading object of type '{0}', but found class tag '{1}'", typeName, tag);
 		}
 
 		private T ReadObject<T>() where T: class, new() {
