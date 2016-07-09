@@ -849,6 +849,11 @@ namespace YuzuTest
 			XAssert.Throws<YuzuException>(() => jd.FromString(new SamplePoint(), "[ \"QQ\" ]"), "");
 			XAssert.Throws<EndOfStreamException>(() => jd.FromString(""), "");
 			XAssert.Throws<EndOfStreamException>(() => jd.FromString(w, "{ \"X\": 1"));
+			XAssert.Throws<YuzuException>(() => jd.FromString(
+				"{\"class\":\"YuzuTest.SampleInterfaceField\",\"I\":{}}"), "class");
+			XAssert.Throws<YuzuException>(() => jd.FromString(
+				"{\"class\":\"YuzuTest.SampleInterfaceField\",\"I\":{\"class\":\"YuzuTest.Sample1\"}}"),
+				"ISample");
 		}
 
 		[TestMethod]
