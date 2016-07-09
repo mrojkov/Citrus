@@ -1026,6 +1026,61 @@ namespace YuzuTest
 		}
 	}
 
+	class SampleSmallTypes_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new SampleSmallTypes_JsonDeserializer Instance = new SampleSmallTypes_JsonDeserializer();
+
+		public SampleSmallTypes_JsonDeserializer()
+		{
+			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
+			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
+			JsonOptions.IgnoreCompact = false;
+			JsonOptions.Int64AsString = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.ArrayLengthPrefix = true;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderTyped<SampleSmallTypes>(Reader);
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new SampleSmallTypes(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (SampleSmallTypes)obj;
+			if ("B" != name) throw new YuzuException("B!=" + name);
+			result.B = checked((byte)RequireUInt());
+			name = GetNextName(false);
+			if ("Ch" != name) throw new YuzuException("Ch!=" + name);
+			result.Ch = RequireChar();
+			name = GetNextName(false);
+			if ("Sb" != name) throw new YuzuException("Sb!=" + name);
+			result.Sb = checked((sbyte)RequireInt());
+			name = GetNextName(false);
+			if ("Sh" != name) throw new YuzuException("Sh!=" + name);
+			result.Sh = checked((short)RequireInt());
+			name = GetNextName(false);
+			if ("USh" != name) throw new YuzuException("USh!=" + name);
+			result.USh = checked((short)RequireInt());
+			name = GetNextName(false);
+			Require('}');
+			return result;
+		}
+	}
+
 	class SamplePerson_JsonDeserializer : JsonDeserializerGenBase
 	{
 		public static new SamplePerson_JsonDeserializer Instance = new SamplePerson_JsonDeserializer();

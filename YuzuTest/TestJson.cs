@@ -119,6 +119,13 @@ namespace YuzuTest.Json
 			Assert.AreEqual(v1.B, v2.B);
 			Assert.AreEqual(v1.Sb, v2.Sb);
 
+			v2 = (SampleSmallTypes)SampleSmallTypes_JsonDeserializer.Instance.FromString(result);
+			Assert.AreEqual(v1.Ch, v2.Ch);
+			Assert.AreEqual(v1.USh, v2.USh);
+			Assert.AreEqual(v1.Sh, v2.Sh);
+			Assert.AreEqual(v1.B, v2.B);
+			Assert.AreEqual(v1.Sb, v2.Sb);
+
 			XAssert.Throws<YuzuException>(() => jd.FromString(v2, result.Replace("A", "ABC")), "ABC");
 			XAssert.Throws<OverflowException>(() => jd.FromString(v2, result.Replace("198", "298")));
 			XAssert.Throws<OverflowException>(() => jd.FromString(v2, result.Replace("109", "209")));

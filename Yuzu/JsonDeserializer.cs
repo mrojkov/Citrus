@@ -143,7 +143,7 @@ namespace Yuzu.Json
 			return sb.ToString();
 		}
 
-		private object RequireChar()
+		protected char RequireChar()
 		{
 			var s = RequireString();
 			if (s.Length != 1)
