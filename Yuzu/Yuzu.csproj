@@ -43,8 +43,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Code.cs" />
-    <Compile Include="Json.cs" />
+    <Compile Include="JsonDeserializer.cs" />
     <Compile Include="JsonGenerators.cs" />
+    <Compile Include="JsonSerializer.cs" />
     <Compile Include="Meta.cs" />
     <Compile Include="ProtoBuf.cs" />
     <Compile Include="Utils.cs" />
