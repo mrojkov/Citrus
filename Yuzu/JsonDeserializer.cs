@@ -328,14 +328,6 @@ namespace Yuzu.Json
 			return result;
 		}
 
-		protected object Make(string typeName)
-		{
-			var t = Options.Assembly.GetType(typeName);
-			if (t == null)
-				throw new YuzuAssert("Type not found: " + typeName);
-			return Activator.CreateInstance(t);
-		}
-
 		protected bool RequireOrNull(char ch)
 		{
 			if (Require(ch, 'n') == ch)
@@ -564,9 +556,12 @@ namespace Yuzu.Json
 			}
 			if (t == typeof(object))
 				return ReadAnyObject;
-			if (t.IsClass && Options.ClassNames)
-				return FromReaderInt;
-			if (t.IsClass && !Options.ClassNames || Utils.IsStruct(t))
+			if (t.IsClass) {
+				var m = GetType().GetMethod("ReadObject", BindingFlags.Instance | BindingFlags.NonPublic).
+					MakeGenericMethod(t);
+				return (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);
+			}
+			if (Utils.IsStruct(t))
 				return () => FromReaderInt(Activator.CreateInstance(t));
 			throw new NotImplementedException(t.Name);
 		}
@@ -663,91 +658,130 @@ namespace Yuzu.Json
 				throw Error("Reading object of type '{0}', but found class tag '{1}'", typeName, tag);
 		}
 
-		public override object FromReaderInt()
-		{
-			if (!Options.ClassNames)
-				throw new YuzuException("Attempt to read unspecified type without class name");
+		private T ReadObject<T>() where T: class, new() {
 			KillBuf();
 			switch (RequireBracketOrNull()) {
-				case 'n': return null;
+				case 'n':
+					return null;
 				case '{':
-					CheckClassTag(GetNextName(true));
-					return ReadFields(Make(RequireString()), GetNextName(false));
+					if (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
+						var m = Utils.GetPrivateCovariantGenericAll(GetType(), "ReadIntoDictionary", typeof(T));
+						var result = new T();
+						m.Invoke(this, new object[] { result });
+						return (T)result;
+					}
+					var name = GetNextName(first: true);
+					if (name == "") return new T();
+					if (name != JsonOptions.ClassTag) {
+						if (typeof(T) == typeof(object)) {
+							var any = new Dictionary<string, object>();
+							var val = ReadAnyObject();
+							any.Add(name, val);
+							if (Require(',', '}') == ',')
+								ReadIntoDictionary<string, object>(any);
+							return (T)(object)any;
+						}
+						return (T)ReadFields(new T(), name);
+					}
+					var typeName = RequireUnescapedString();
+					var t = Options.Assembly.GetType(typeName);
+					if (t == null)
+						throw Error("Unknown type '{0}'", typeName);
+					if (!typeof(T).IsAssignableFrom(t))
+						throw Error("Expected type '{0}', but got {1}", typeof(T).Name, typeName);
+					return (T)ReadFields(Activator.CreateInstance(t), GetNextName(first: false));
 				case '[':
-					return ReadFieldsCompact(Make(RequireString()));
+					if (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(List<>)) {
+						var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadIntoList", typeof(T));
+						var result = new T();
+						m.Invoke(this, new object[] { result });
+						return result;
+					}
+					return (T)ReadFieldsCompact(new T());
 				default:
 					throw new YuzuAssert();
 			}
 		}
+
+		/*private T ReadObject<T>() where T : struct
+		{
+			return (T)ReadFieldsCompact(Activator.CreateInstance(typeof(T)));
+		}*/
+
+		public override object FromReaderInt() { return ReadObject<object>(); }
 
 		public override object FromReaderInt(object obj)
 		{
 			KillBuf();
+			var expectedType = obj.GetType();
 			// HACK: We can not modify the object we are given, so return a new one instead.
-			if (obj.GetType() == typeof(object))
+			if (expectedType == typeof(object))
 				return ReadAnyObject();
 			switch (RequireBracketOrNull()) {
 				case 'n':
 					return null;
-				case '{': {
-					var t = obj.GetType();
-					if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
-						var m = Utils.GetPrivateCovariantGenericAll(GetType(), "ReadIntoDictionary", t);
+				case '{':
+					if (expectedType.IsGenericType && expectedType.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
+						var m = Utils.GetPrivateCovariantGenericAll(GetType(), "ReadIntoDictionary", expectedType);
 						m.Invoke(this, new object[] { obj });
 						return obj;
 					}
-					string name = GetNextName(true);
-					if (Options.ClassNames) {
-						CheckClassTag(name);
-						CheckSameTypeAsTag(obj);
-						name = GetNextName(false);
-					}
-					return ReadFields(obj, name);
-				}
-				case '[': {
-					var t = obj.GetType();
-					if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(List<>)) {
-						var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadIntoList", t);
+					var name = GetNextName(first: true);
+					if (name != JsonOptions.ClassTag)
+						return ReadFields(obj, name);
+					var typeName = RequireUnescapedString();
+					var actualType = Options.Assembly.GetType(typeName);
+					if (actualType == null)
+						throw Error("Unknown type '{0}'", typeName);
+					if (actualType != expectedType)
+						throw Error("Expected type '{0}', but got {1}", expectedType.Name, typeName);
+					return ReadFields(obj, GetNextName(first: false));
+				case '[':
+					if (expectedType.IsGenericType && expectedType.GetGenericTypeDefinition() == typeof(List<>)) {
+						var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadIntoList", expectedType);
 						m.Invoke(this, new object[] { obj });
 						return obj;
 					}
-					if (Options.ClassNames)
-						CheckSameTypeAsTag(obj);
 					return ReadFieldsCompact(obj);
-				}
 				default:
 					throw new YuzuAssert();
 			}
 		}
 
-		private JsonDeserializerGenBase MakeDeserializer(string className)
+		protected JsonDeserializerGenBase MakeDeserializer(string className)
 		{
-			var result = (JsonDeserializerGenBase)(Make(className + "_JsonDeserializer"));
+			var t = Options.Assembly.GetType(className + "_JsonDeserializer");
+			if (t == null)
+				throw Error("Generated deserializer not fount for type '{0}'", className);
+			var result = (JsonDeserializerGenBase)Activator.CreateInstance(t);
 			result.Reader = Reader;
 			return result;
 		}
 
 		protected object FromReaderIntGenerated()
 		{
-			if (!Options.ClassNames)
-				throw new YuzuException("Attempt to read unspecified type without class name");
 			KillBuf();
 			Require('{');
-			CheckClassTag(GetNextName(true));
-			var d = MakeDeserializer(RequireString());
+			CheckClassTag(GetNextName(first: true));
+			var d = MakeDeserializer(RequireUnescapedString());
 			Require(',');
-			return d.FromReaderIntPartial(GetNextName(false));
+			return d.FromReaderIntPartial(GetNextName(first: false));
 		}
 
 		protected object FromReaderIntGenerated(object obj)
 		{
 			KillBuf();
 			Require('{');
-			string name = GetNextName(true);
-			if (Options.ClassNames) {
-				CheckClassTag(name);
-				CheckSameTypeAsTag(obj);
-				name = GetNextName(false);
+			var expectedType = obj.GetType();
+			string name = GetNextName(first: true);
+			if (name == JsonOptions.ClassTag) {
+				var typeName = RequireUnescapedString();
+				var actualType = Options.Assembly.GetType(typeName);
+				if (actualType == null)
+					throw Error("Unknown type '{0}'", typeName);
+				if (actualType != expectedType)
+					throw Error("Expected type '{0}', but got {1}", expectedType.Name, typeName);
+				name = GetNextName(first: false);
 			}
 			return MakeDeserializer(obj.GetType().FullName).ReadFields(obj, name);
 		}

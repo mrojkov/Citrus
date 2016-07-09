@@ -17,6 +17,18 @@ namespace Yuzu.Json
 		{
 			return FromReaderIntGenerated();
 		}
+
+		public T FromReaderTyped<T>(BinaryReader reader) where T: new()
+		{
+			Reader = reader;
+			KillBuf();
+			var ch = Require('[', '{');
+			if (ch == '[') return (T)ReadFieldsCompact(new T());
+			var name = GetNextName(true);
+			if (name != JsonOptions.ClassTag) return (T)ReadFields(new T(), name);
+			var typeName = RequireUnescapedString();
+			return (T)MakeDeserializer(typeName).FromReaderIntPartial(GetNextName(false));
+		}
 	}
 
 	public class JsonDeserializerGenerator : JsonDeserializer
@@ -57,6 +69,7 @@ namespace Yuzu.Json
 		{
 			Put("using System;\n");
 			Put("using System.Collections.Generic;\n");
+			Put("using System.IO;\n");
 			Put("using System.Reflection;\n");
 			Put("\n");
 			Put("using Yuzu;\n");
@@ -238,11 +251,9 @@ namespace Yuzu.Json
 				Put("Require(']');\n");
 				Put("}\n");
 			}
-			else if (t.IsClass && Options.ClassNames) {
-				PutPart(String.Format("({0})base.FromReaderInt();\n", t.Name));
-			}
-			else if (t.IsClass && !Options.ClassNames || Utils.IsStruct(t)) {
-				PutPart(String.Format("({0}){0}_JsonDeserializer.Instance.FromReader(new {0}(), Reader);\n", t.Name));
+			else if (t.IsClass || Utils.IsStruct(t)) {
+				PutPart(String.Format(
+					"{0}_JsonDeserializer.Instance.FromReaderTyped<{0}>(Reader);\n", GetTypeSpec(t, "{0}_{1}")));
 			}
 			else {
 				throw new NotImplementedException(t.Name);
@@ -286,15 +297,17 @@ namespace Yuzu.Json
 			Put("}\n");
 			Put("\n");
 
+			var isList = typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(List<>);
 			var typeSpec = GetTypeSpec(typeof(T));
 			Put("public override object FromReaderInt()\n");
 			Put("{\n");
-			// Since deserializer is dynamically constructed anyway, it is too late to determine object type here.
-			PutF("return FromReaderInt(new {0}());\n", typeSpec);
+			if (isList)
+				PutF("return FromReaderInt(new {0}());\n", typeSpec);
+			else
+				PutF("return FromReaderTyped<{0}>(Reader);\n", typeSpec);
 			Put("}\n");
 			Put("\n");
 
-			var isList = typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(List<>);
 			if (isList) {
 				Put("public override object FromReaderInt(object obj)\n");
 				Put("{\n");

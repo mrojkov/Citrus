@@ -114,9 +114,7 @@ namespace YuzuTest
 				jd.Generate<SampleDate>();
 				jd.Generate<Color>();
 				jd.Generate<List<List<int>>>();
-				jd.Options.ClassNames = true;
 				jd.Generate<SampleClassList>();
-				jd.Options.ClassNames = false;
 				jd.Options.TagMode = TagMode.Aliases;
 				jd.Generate<SamplePerson>();
 				jd.GenerateFooter();

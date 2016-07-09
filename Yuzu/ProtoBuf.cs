@@ -36,9 +36,6 @@ namespace Yuzu.Protobuf
 
 		protected override void ToWriter(object obj)
 		{
-			if (Options.ClassNames)
-				throw new NotImplementedException();
-
 			int count = 1;
 			foreach (var yi in Meta.Get(obj.GetType(), Options).Items) {
 				if (yi.Type == typeof(int) || yi.Type == typeof(uint)) {
@@ -95,9 +92,6 @@ namespace Yuzu.Protobuf
 
 		public override object FromReaderInt(object obj)
 		{
-			if (Options.ClassNames)
-				throw new NotImplementedException();
-
 			int count = 1;
 			foreach (var yi in Meta.Get(obj.GetType(), Options).Items) {
 				if (yi.Type == typeof(int) || yi.Type == typeof(uint)) {

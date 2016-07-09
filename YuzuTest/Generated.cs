@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 
 using Yuzu;
@@ -15,10 +16,10 @@ namespace YuzuTest
 		public Sample1_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = false;
+			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -31,7 +32,7 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderInt(new Sample1());
+			return FromReaderTyped<Sample1>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
@@ -61,10 +62,10 @@ namespace YuzuTest
 		public Sample2_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = false;
+			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -77,7 +78,7 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderInt(new Sample2());
+			return FromReaderTyped<Sample2>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
@@ -107,10 +108,10 @@ namespace YuzuTest
 		public Sample3_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = false;
+			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -123,7 +124,7 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderInt(new Sample3());
+			return FromReaderTyped<Sample3>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
@@ -135,14 +136,14 @@ namespace YuzuTest
 		{
 			var result = (Sample3)obj;
 			if ("S1" != name) throw new YuzuException("S1!=" + name);
-			result.S1 = (Sample1)Sample1_JsonDeserializer.Instance.FromReader(new Sample1(), Reader);
+			result.S1 = Sample1_JsonDeserializer.Instance.FromReaderTyped<Sample1>(Reader);
 			name = GetNextName(false);
 			if ("F" == name) {
 				result.F = RequireInt();
 				name = GetNextName(false);
 			}
 			if ("S2" == name) {
-				result.S2 = (Sample2)Sample2_JsonDeserializer.Instance.FromReader(new Sample2(), Reader);
+				result.S2 = Sample2_JsonDeserializer.Instance.FromReaderTyped<Sample2>(Reader);
 				name = GetNextName(false);
 			}
 			Require('}');
@@ -157,10 +158,10 @@ namespace YuzuTest
 		public Sample4_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -173,7 +174,7 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderInt(new Sample4());
+			return FromReaderTyped<Sample4>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
@@ -200,10 +201,10 @@ namespace YuzuTest
 		public SampleBool_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -216,7 +217,7 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderInt(new SampleBool());
+			return FromReaderTyped<SampleBool>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
@@ -242,10 +243,10 @@ namespace YuzuTest
 		public SampleList_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -258,7 +259,7 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderInt(new SampleList());
+			return FromReaderTyped<SampleList>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
@@ -295,10 +296,10 @@ namespace YuzuTest
 		public SampleDict_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -311,7 +312,7 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderInt(new SampleDict());
+			return FromReaderTyped<SampleDict>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
@@ -335,7 +336,7 @@ namespace YuzuTest
 						do {
 							var tmp1 = RequireString();
 							Require(':');
-							var tmp2 = (SampleDict)SampleDict_JsonDeserializer.Instance.FromReader(new SampleDict(), Reader);
+							var tmp2 = SampleDict_JsonDeserializer.Instance.FromReaderTyped<SampleDict>(Reader);
 							result.Children.Add(tmp1, tmp2);
 						} while (Require('}', ',') == ',');
 					}
@@ -354,10 +355,10 @@ namespace YuzuTest
 		public SampleDictKeys_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -370,7 +371,7 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderInt(new SampleDictKeys());
+			return FromReaderTyped<SampleDictKeys>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
@@ -441,10 +442,10 @@ namespace YuzuTest
 		public SampleArray_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -457,7 +458,7 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderInt(new SampleArray());
+			return FromReaderTyped<SampleArray>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
@@ -494,10 +495,10 @@ namespace YuzuTest
 		public SampleBase_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -510,7 +511,7 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderInt(new SampleBase());
+			return FromReaderTyped<SampleBase>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
@@ -536,10 +537,10 @@ namespace YuzuTest
 		public SampleDerivedA_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -552,7 +553,7 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderInt(new SampleDerivedA());
+			return FromReaderTyped<SampleDerivedA>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
@@ -581,10 +582,10 @@ namespace YuzuTest
 		public SampleDerivedB_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -597,7 +598,7 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderInt(new SampleDerivedB());
+			return FromReaderTyped<SampleDerivedB>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
@@ -626,10 +627,10 @@ namespace YuzuTest
 		public SampleMatrix_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -642,7 +643,7 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderInt(new SampleMatrix());
+			return FromReaderTyped<SampleMatrix>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
@@ -690,10 +691,10 @@ namespace YuzuTest
 		public SamplePoint_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -706,7 +707,7 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderInt(new SamplePoint());
+			return FromReaderTyped<SamplePoint>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
@@ -745,10 +746,10 @@ namespace YuzuTest
 		public SampleRect_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -761,7 +762,7 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderInt(new SampleRect());
+			return FromReaderTyped<SampleRect>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
@@ -773,10 +774,10 @@ namespace YuzuTest
 		{
 			var result = (SampleRect)obj;
 			if ("A" != name) throw new YuzuException("A!=" + name);
-			result.A = (SamplePoint)SamplePoint_JsonDeserializer.Instance.FromReader(new SamplePoint(), Reader);
+			result.A = SamplePoint_JsonDeserializer.Instance.FromReaderTyped<SamplePoint>(Reader);
 			name = GetNextName(false);
 			if ("B" != name) throw new YuzuException("B!=" + name);
-			result.B = (SamplePoint)SamplePoint_JsonDeserializer.Instance.FromReader(new SamplePoint(), Reader);
+			result.B = SamplePoint_JsonDeserializer.Instance.FromReaderTyped<SamplePoint>(Reader);
 			name = GetNextName(false);
 			Require('}');
 			return result;
@@ -790,10 +791,10 @@ namespace YuzuTest
 		public SampleDate_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -806,7 +807,7 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderInt(new SampleDate());
+			return FromReaderTyped<SampleDate>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
@@ -835,10 +836,10 @@ namespace YuzuTest
 		public Color_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -851,7 +852,7 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderInt(new Color());
+			return FromReaderTyped<Color>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
@@ -895,10 +896,10 @@ namespace YuzuTest
 		public List_List_Int32_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
-
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -963,6 +964,7 @@ namespace YuzuTest
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -975,7 +977,7 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderInt(new SampleClassList());
+			return FromReaderTyped<SampleClassList>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
@@ -994,7 +996,7 @@ namespace YuzuTest
 				}
 				else {
 					do {
-						var tmp1 = (SampleBase)base.FromReaderInt();
+						var tmp1 = SampleBase_JsonDeserializer.Instance.FromReaderTyped<SampleBase>(Reader);
 						result.E.Add(tmp1);
 					} while (Require(']', ',') == ',');
 				}
@@ -1012,10 +1014,10 @@ namespace YuzuTest
 		public SamplePerson_JsonDeserializer()
 		{
 			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
-
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -1028,7 +1030,7 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderInt(new SamplePerson());
+			return FromReaderTyped<SamplePerson>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
@@ -1053,14 +1055,14 @@ namespace YuzuTest
 				}
 				else {
 					do {
-						var tmp1 = (SamplePerson)SamplePerson_JsonDeserializer.Instance.FromReader(new SamplePerson(), Reader);
+						var tmp1 = SamplePerson_JsonDeserializer.Instance.FromReaderTyped<SamplePerson>(Reader);
 						result.Children.Add(tmp1);
 					} while (Require(']', ',') == ',');
 				}
 			}
 			name = GetNextName(false);
 			if ("4" != name) throw new YuzuException("4!=" + name);
-			result.EyeColor = (Color)Color_JsonDeserializer.Instance.FromReader(new Color(), Reader);
+			result.EyeColor = Color_JsonDeserializer.Instance.FromReaderTyped<Color>(Reader);
 			name = GetNextName(false);
 			Require('}');
 			return result;

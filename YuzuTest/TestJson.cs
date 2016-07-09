@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -189,7 +190,6 @@ namespace YuzuTest
 			Assert.IsInstanceOfType(w1, typeof(Sample1));
 			Assert.AreEqual(88, w1.X);
 
-			jdg.Options.ClassNames = true;
 			var w2 = jdg.FromString("{\"class\":\"YuzuTest.Sample1\",\"X\":99}");
 			Assert.IsInstanceOfType(w2, typeof(Sample1));
 			Assert.AreEqual(99, ((Sample1)w2).X);
@@ -276,7 +276,7 @@ namespace YuzuTest
 		{
 			var js = new JsonSerializer();
 			js.JsonOptions.Indent = "";
-			js.Options.ClassNames = true;
+			js.JsonOptions.SaveRootClass = true;
 			Assert.AreEqual(
 				"{\n\"class\":\"YuzuTest.SampleBase\",\n\"FBase\":0\n}", js.ToString(new SampleBase()));
 			Assert.AreEqual(
@@ -284,7 +284,6 @@ namespace YuzuTest
 				js.ToString(new SampleDerivedA()));
 
 			var jd = new JsonDeserializer();
-			jd.Options.ClassNames = true;
 			var v = jd.FromString(
 				"{\n\"class\":\"YuzuTest.SampleDerivedB\",\n\"FBase\":3,\n\"FB\":7\n}");
 			Assert.IsInstanceOfType(v, typeof(SampleDerivedB));
@@ -487,9 +486,8 @@ namespace YuzuTest
 		public void TestClassList()
 		{
 			var js = new JsonSerializer();
-			js.Options.ClassNames = true;
+			js.JsonOptions.SaveRootClass = true;
 			var jd = new JsonDeserializer();
-			jd.Options.ClassNames = true;
 
 			var v = new SampleClassList {
 				E = new List<SampleBase> {
@@ -807,13 +805,10 @@ namespace YuzuTest
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ ,}"), ",");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"Y\": \"q\" }"), "'X'");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "[]"), "'Sample1'");
-			jd.Options.ClassNames = true;
-			XAssert.Throws<YuzuException>(() => jd.FromString("{\"X\":0}"), "class");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"class\": \"Q\" }"), "'Q'");
-			XAssert.Throws<YuzuException>(() => jd.FromString(new SamplePoint(), "[ \"QQ\" ]"), "'QQ'");
-			jd.Options.ClassNames = false;
-			XAssert.Throws<YuzuException>(() => jd.FromString(""), "unspecified");
-			XAssert.Throws<System.IO.EndOfStreamException>(() => jd.FromString(w, "{ \"X\": 1"));
+			XAssert.Throws<YuzuException>(() => jd.FromString(new SamplePoint(), "[ \"QQ\" ]"), "");
+			XAssert.Throws<EndOfStreamException>(() => jd.FromString(""), "");
+			XAssert.Throws<EndOfStreamException>(() => jd.FromString(w, "{ \"X\": 1"));
 		}
 
 		[TestMethod]

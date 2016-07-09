@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Reflection;
 using System.Text;
 
 using Yuzu.Metadata;
@@ -21,6 +22,9 @@ namespace Yuzu.Json
 		public bool EnumAsString { get { return enumAsString; } set { enumAsString = value; generation++; } }
 
 		public bool ArrayLengthPrefix = false;
+
+		private bool saveRootClass = false;
+		public bool SaveRootClass { get { return saveRootClass; } set { saveRootClass = value; generation++; } }
 
 		private bool ignoreCompact = false;
 		public bool IgnoreCompact { get { return ignoreCompact; } set { ignoreCompact = value; generation++; } }
@@ -310,10 +314,11 @@ namespace Yuzu.Json
 				return obj => m.Invoke(this, new object[] { obj });
 			}
 			if (Utils.IsStruct(t) || t.IsClass) {
-				if (Utils.IsCompact(t, Options) && !JsonOptions.IgnoreCompact)
-					return WriteObjectCompact;
-				else
-					return WriteObject;
+				var name = Utils.IsCompact(t, Options) && !JsonOptions.IgnoreCompact ?
+					"WriteObjectCompact" : "WriteObject";
+				var m = GetType().GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic).
+					MakeGenericMethod(t);
+				return (Action<object>)Delegate.CreateDelegate(typeof(Action<object>), this, m);
 			}
 			throw new NotImplementedException(t.Name);
 		}
@@ -335,7 +340,7 @@ namespace Yuzu.Json
 			writer.Write(':');
 		}
 
-		private void WriteObject(object obj)
+		private void WriteObject<T>(object obj)
 		{
 			if (obj == null) {
 				WriteStr("null");
@@ -344,14 +349,14 @@ namespace Yuzu.Json
 			writer.Write('{');
 			WriteStr(JsonOptions.FieldSeparator);
 			var isFirst = true;
-			var t = obj.GetType();
-			if (Options.ClassNames && !Utils.IsStruct(t)) {
+			var actualType = obj.GetType();
+			if (typeof(T) != actualType || objStack.Count == 0 && JsonOptions.SaveRootClass) {
 				WriteName(JsonOptions.ClassTag, ref isFirst);
-				WriteUnescapedString(t.FullName);
+				WriteUnescapedString(actualType.FullName);
 			}
 			objStack.Push(obj);
 			try {
-				foreach (var yi in Meta.Get(t, Options).Items) {
+				foreach (var yi in Meta.Get(actualType, Options).Items) {
 					var value = yi.GetValue(obj);
 					if (yi.SerializeIf != null && !yi.SerializeIf(obj, value))
 						continue;
@@ -367,7 +372,7 @@ namespace Yuzu.Json
 			writer.Write('}');
 		}
 
-		private void WriteObjectCompact(object obj)
+		private void WriteObjectCompact<T>(object obj)
 		{
 			if (obj == null) {
 				WriteStr("null");
@@ -376,14 +381,13 @@ namespace Yuzu.Json
 			writer.Write('[');
 			WriteStr(JsonOptions.FieldSeparator);
 			var isFirst = true;
-			var t = obj.GetType();
-			if (Options.ClassNames && !Utils.IsStruct(t)) {
-				WriteSep(ref isFirst);
-				WriteUnescapedString(t.FullName);
-			}
+			var actualType = obj.GetType();
+			if (typeof(T) != actualType)
+				throw new YuzuException(String.Format(
+					"Attempt to write compact type {0} instead of {1}", actualType.Name, typeof(T).Name));
 			objStack.Push(obj);
 			try {
-				foreach (var yi in Meta.Get(t, Options).Items) {
+				foreach (var yi in Meta.Get(actualType, Options).Items) {
 					WriteSep(ref isFirst);
 					GetWriteFunc(yi.Type)(yi.GetValue(obj));
 				}
