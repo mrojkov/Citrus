@@ -450,7 +450,7 @@ namespace Yuzu.Json
 			return (Action<T>)Delegate.CreateDelegate(typeof(Action<T>), obj, m);
 		}
 
-		private object ReadObject() {
+		private object ReadAnyObject() {
 			var ch = SkipSpaces();
 			PutBack(ch);
 			switch (ch) {
@@ -548,7 +548,7 @@ namespace Yuzu.Json
 				return () => m.Invoke(this, new object[] { });
 			}
 			if (t == typeof(object))
-				return ReadObject;
+				return ReadAnyObject;
 			if (t.IsClass && Options.ClassNames)
 				return FromReaderInt;
 			if (t.IsClass && !Options.ClassNames || Utils.IsStruct(t))
@@ -559,7 +559,7 @@ namespace Yuzu.Json
 		protected void IgnoreNewFieldsTail(string name)
 		{
 			while (name != "") {
-				ReadObject();
+				ReadAnyObject();
 				name = GetNextName(false);
 			}
 		}
@@ -569,7 +569,7 @@ namespace Yuzu.Json
 			var cmp = String.CompareOrdinal(tag, name);
 			if (Options.IgnoreNewFields && Options.TagMode != TagMode.Names)
 				while (cmp > 0 && name != "") {
-					ReadObject();
+					ReadAnyObject();
 					name = GetNextName(false);
 					cmp = String.CompareOrdinal(tag, name);
 				}
@@ -670,7 +670,7 @@ namespace Yuzu.Json
 			KillBuf();
 			// HACK: We can not modify the object we are given, so return a new one instead.
 			if (obj.GetType() == typeof(object))
-				return ReadObject();
+				return ReadAnyObject();
 			switch (RequireBracketOrNull()) {
 				case 'n':
 					return null;
