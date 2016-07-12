@@ -391,9 +391,8 @@ namespace Lime
 				delta = Mathf.Clamp(delta, 0, 1 / Application.LowFPSLimit);
 				PixelScale = CalcPixelScale(e.Graphics.DpiX);
 				Update(delta);
-				if (invalidated) {
+				if (invalidated && !glControl.IsDisposed) {
 					fpsCounter.Refresh();
-					glControl.MakeCurrent();
 					RaiseRendering();
 					glControl.SwapBuffers();
 					invalidated = false;
