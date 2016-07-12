@@ -7,9 +7,8 @@ namespace Lime
 {
 	public class DropDownList : Widget
 	{
-		private Widget label;
 		private int index = -1;
-
+		public event Action<int> Changed;
 		public readonly ObservableCollection<Item> Items;
 
 		public int Index
@@ -48,15 +47,19 @@ namespace Lime
 			Items.CollectionChanged += (sender, e) => RefreshLabel();
 			HitTestTarget = true;
 			Theme.Current.Apply(this);
-			Tasks.Add(MainTask());
 		}
 
-		IEnumerator<object> MainTask()
+		protected override void Awake()
+		{
+			Tasks.Add(Loop());
+		}
+
+		IEnumerator<object> Loop()
 		{
 			RefreshLabel();
 			while (true) {
 				if (Input.WasMousePressed() && IsMouseOver()) {
-					KeyboardFocus.Instance.SetFocus(this);
+					SetFocus();
 #if MAC
 					Window.Current.Input.SetKeyState(Key.Mouse0, false);
 #endif
@@ -69,7 +72,7 @@ namespace Lime
 						RevokeFocus();
 					}
 				}
-				yield return null;
+				yield return Task.WaitForInput();
 			}
 		}
 
@@ -91,7 +94,12 @@ namespace Lime
 					selectedCommand = command;
 				}
 				var t = j;
-				command.Executing += () => Index = t;
+				command.Executing += () => {
+					Index = t; 
+					if (Changed != null) {
+						Changed(Index);
+					}
+				};
 				menu.Add(command);
 				j++;
 			}
@@ -104,7 +112,7 @@ namespace Lime
 
 		private void RefreshLabel()
 		{
-			label = TryFind<SimpleText>("Label");
+			var label = TryFind<SimpleText>("Label");
 			if (label != null) {
 				label.Text = Text;
 			}
