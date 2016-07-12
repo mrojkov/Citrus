@@ -75,7 +75,7 @@ namespace Lime
 
 	public interface IText
 	{
-		event Action<string> OnSubmit;
+		event Action<string> Submitted;
 		/// <summary>
 		/// Returns the text's bounding box.
 		/// </summary>

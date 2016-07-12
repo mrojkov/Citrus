@@ -161,7 +161,7 @@ namespace Lime
 		
 		public ICaretPosition Caret { get { return caret; } }
 
-		public event Action<string> OnSubmit;
+		public event Action<string> Submitted;
 
 		public bool Localizable { get; set; }
 
@@ -172,8 +172,8 @@ namespace Lime
 
 		void IText.Submit()
 		{
-			if (OnSubmit != null) {
-				OnSubmit(Text);
+			if (Submitted != null) {
+				Submitted(Text);
 			}
 		}
 
