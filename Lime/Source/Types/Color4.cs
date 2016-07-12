@@ -214,13 +214,56 @@ namespace Lime
 			return ABGR == other.ABGR;
 		}
 
+		public enum StringPresentation
+		{
+			Hex,
+			Dec
+		}
+
+		public string ToString(StringPresentation presentation)
+		{
+			if (presentation == StringPresentation.Hex) {
+				return string.Format("#{0:X2}.{1:X2}.{2:X2}.{3:X2}", R, G, B, A);
+			} else {
+				return string.Format("{0}. {1}. {2}. {3}", R, G, B, A);
+			}
+		}
+
 		/// <summary>
 		/// Returns the <see cref="string"/> representation of this <see cref="Color4"/>
 		/// in the format: "#R.G.B.A", where R, G, B, A are represented by hexademical numbers.
 		/// </summary>
 		public override string ToString()
 		{
-			return string.Format("#{0:X2}.{1:X2}.{2:X2}.{3:X2}", R, G, B, A);
+			return ToString(StringPresentation.Hex);
+		}
+
+		public static bool TryParse(string s, out Color4 result)
+		{
+			result = new Color4();
+			var style = System.Globalization.NumberStyles.Integer;
+			if (s.Length > 0 && s[0] == '#') {
+				s = s.Substring(1);
+				style = System.Globalization.NumberStyles.HexNumber;
+			}
+			var t = s.Split('.');
+			if (t.Length != 4) {
+				return false;
+			}
+			return
+				byte.TryParse(t[0], style, null, out result.R) &&
+				byte.TryParse(t[1], style, null, out result.G) &&
+				byte.TryParse(t[2], style, null, out result.B) &&
+				byte.TryParse(t[3], style, null, out result.A);
+		}
+
+		public static Color4 Parse(string s)
+		{
+			Color4 result;
+			if (!TryParse(s, out result)) {
+				throw new ArgumentException();
+			}
+			return result;
 		}
 	}
 }
