@@ -111,8 +111,8 @@ namespace Tangerine.UI.Inspector
 
 		protected static bool IsNumericString(string value)
 		{
-			float temp;
-			return float.TryParse(value, out temp);
+			float unused;
+			return float.TryParse(value, out unused);
 		}
 	}
 
@@ -133,9 +133,9 @@ namespace Tangerine.UI.Inspector
 			OnKeyframeToggle += editorX.SetFocus;
 			foreach (var obj in context.Objects) {
 				var originalXY = new Property<Vector2>(obj, context.PropertyName);
-				var editedXWithY = EditBoxSubmittedText(editorX).Where(IsNumericString).Select(i => float.Parse(i)).
+				var editedXWithY = EditBoxSubmittedText(editorX).Where(IsNumericString).Select(float.Parse).
 					Coalesce(originalXY).Select(i => new Vector2(i.Item1, i.Item2.Y));
-				var xWithEditedY = EditBoxSubmittedText(editorY).Where(IsNumericString).Select(i => float.Parse(i)).
+				var xWithEditedY = EditBoxSubmittedText(editorY).Where(IsNumericString).Select(float.Parse).
 					Coalesce(originalXY).Select(i => new Vector2(i.Item2.X, i.Item1));
 				editorX.Tasks.Add(new AnimablePropertyBinding<Vector2>(obj, context.PropertyName, editedXWithY));
 				editorY.Tasks.Add(new AnimablePropertyBinding<Vector2>(obj, context.PropertyName, xWithEditedY));
@@ -191,6 +191,73 @@ namespace Tangerine.UI.Inspector
 				checkBox.Tasks.Add(new AnimablePropertyBinding<bool>(obj, context.PropertyName, CheckBoxChecked(checkBox)));
 			}
 			checkBox.Tasks.Add(new CheckBoxBinding(checkBox, CoalescedPropertyValue<bool>(context).DistinctUntilChanged()));
+		}
+	}
+
+	class FloatPropertyEditor : CommonPropertyEditor
+	{
+		public FloatPropertyEditor(PropertyEditorContext context) : base(context)
+		{
+			var editor = new EditBox { LayoutCell = new LayoutCell(Alignment.Center) };
+			containerWidget.AddNode(editor);
+			OnKeyframeToggle += editor.SetFocus;
+			foreach (var obj in context.Objects) {
+				var editorValue = EditBoxSubmittedText(editor).Where(IsNumericString).Select(float.Parse);
+				editor.Tasks.Add(new AnimablePropertyBinding<float>(obj, context.PropertyName, editorValue));
+			}
+			editor.Tasks.Add(new EditBoxBinding(editor, CoalescedPropertyValue<float>(context).DistinctUntilChanged().Select(i => i.ToString())));
+		}
+	}
+
+	class Color4PropertyEditor : CommonPropertyEditor
+	{
+		public Color4PropertyEditor(PropertyEditorContext context) : base(context)
+		{
+			EditBox editor;
+			ColorBoxButton button;
+			var color = CoalescedPropertyValue<Color4>(context).DistinctUntilChanged();
+			containerWidget.AddNode(new Widget {
+				Layout = new HBoxLayout(),
+				Nodes = {
+					(editor = new EditBox { LayoutCell = new LayoutCell(Alignment.Center) }),
+					new HSpacer(4),
+					(button = new ColorBoxButton(color) { LayoutCell = new LayoutCell(Alignment.Center) }),
+				}
+			});
+			OnKeyframeToggle += editor.SetFocus;
+			foreach (var obj in context.Objects) {
+				var editorValue = EditBoxSubmittedText(editor).Where(IsColorString).Select(Color4.Parse);
+				editor.Tasks.Add(new AnimablePropertyBinding<Color4>(obj, context.PropertyName, editorValue));
+			}
+			editor.Tasks.Add(new EditBoxBinding(editor, color.Select(i => i.ToString(Color4.StringPresentation.Hex))));
+		}
+
+		private bool IsColorString(string value)
+		{
+			Color4 unused;
+			return Color4.TryParse(value, out unused);
+		}
+
+		class ColorBoxButton : Button
+		{
+			public ColorBoxButton(IDataflowProvider<Color4> colorProvider)
+			{
+				Nodes.Clear();
+				Size = MinMaxSize = new Vector2(25, DesktopTheme.Metrics.DefaultButtonSize.Y);
+				var color = colorProvider.GetDataflow();
+				PostPresenter = new DelegatePresenter<Widget>(widget => {
+					widget.PrepareRendererState();
+					Renderer.DrawRect(Vector2.Zero, widget.Size, Color4.White);
+					color.Poll();
+					var checkSize = new Vector2(widget.Width / 4, widget.Height / 3);
+					for (int i = 0; i < 3; i++) {
+						var checkPos = new Vector2(widget.Width / 2 + ((i == 1) ? widget.Width / 4 : 0), i * checkSize.Y);
+						Renderer.DrawRect(checkPos, checkPos + checkSize, Color4.Black);
+					}
+					Renderer.DrawRect(Vector2.Zero, widget.Size, color.Value);
+					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.Inspector.BorderAroundKeyframeColorbox);
+				});
+			}
 		}
 	}
 }
