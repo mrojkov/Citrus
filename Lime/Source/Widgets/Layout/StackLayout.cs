@@ -44,7 +44,7 @@ namespace Lime
 			foreach (var child in GetChildren(widget)) {
 				var position = widget.ContentPosition;
 				var size = widget.ContentSize;
-				var align = (widget.LayoutCell ?? LayoutCell.Default).Alignment;
+				var align = (child.LayoutCell ?? LayoutCell.Default).Alignment;
 				if (HorizontallySizeable) {
 					position.X = child.X;
 					size.X = child.EffectiveMinSize.X;
