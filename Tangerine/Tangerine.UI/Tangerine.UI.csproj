@@ -70,12 +70,15 @@
     <Compile Include="Utils\CustomCheckbox.cs" />
     <Compile Include="Docking\DockManager.cs" />
     <Compile Include="Metrics.cs" />
-    <Compile Include="Utils\BitmapButton.cs" />
     <Compile Include="Docking\DockPanel.cs" />
     <Compile Include="KeyBindings.cs" />
     <Compile Include="Binding\EditBoxBinding.cs" />
     <Compile Include="Binding\AnimablePropertyBinding.cs" />
     <Compile Include="Binding\DropDownListBinding.cs" />
+    <Compile Include="Console.cs" />
+    <Compile Include="Binding\CheckBoxBinding.cs" />
+    <Compile Include="BitmapButton.cs" />
+    <Compile Include="Utils\WidgetKeyHandler.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

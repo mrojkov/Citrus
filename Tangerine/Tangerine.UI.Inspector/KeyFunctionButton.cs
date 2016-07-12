@@ -8,6 +8,8 @@ namespace Tangerine.UI.Inspector
 {
 	class KeyFunctionButton : BitmapButton
 	{
+		public KeyFunctionButton() : base(Metrics.IconSize) {}
+
 		public void SetKeyFunction(KeyFunction function)
 		{
 			var s = "Timeline.Interpolation." + FunctionToString(function);

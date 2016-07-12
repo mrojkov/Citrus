@@ -65,17 +65,18 @@ namespace Tangerine
 			};
 			var timelinePanel = new UI.DockPanel("Timeline");
 			var inspectorPanel = new UI.DockPanel("Inspector");
-			var browserPanel = new UI.DockPanel("Browser");
+			var consolePanel = new UI.DockPanel("Console");
 			dockManager.AddPanel(timelinePanel, UI.DockSite.Top, new Vector2(800, 300));
 			dockManager.AddPanel(inspectorPanel, UI.DockSite.Left, new Vector2(400, 700));
-			dockManager.AddPanel(browserPanel, UI.DockSite.Right, new Vector2(400, 700));
+			dockManager.AddPanel(consolePanel, UI.DockSite.Right, new Vector2(400, 700));
 
 			var preferences = new UserPreferences();
-			preferences.Load();
-			dockManager.ImportState(preferences.DockState);
+			// preferences.Load();
+			//dockManager.ImportState(preferences.DockState);
 
 			UI.Inspector.Inspector.Initialize(inspectorPanel.ContentWidget);
 			UI.Timeline.Timeline.Initialize(timelinePanel.ContentWidget);
+			UI.Console.Initialize(consolePanel.ContentWidget);
 
 			doc.History.OnCommit += () => CommonWindow.Current.Invalidate();
 			UI.Timeline.Timeline.Instance.RegisterDocument(doc);

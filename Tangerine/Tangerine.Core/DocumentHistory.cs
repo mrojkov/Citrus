@@ -15,6 +15,7 @@ namespace Tangerine.Core
 		
 		public void Add(IOperation operation)
 		{
+			Lime.Logger.Write(operation.ToString());
 			if (transaction == null) {
 				transaction = operation;
 			} else if (transaction is CompoundOperation) {

@@ -37,8 +37,6 @@ namespace Tangerine.UI
 			}
 		}
 
-		public BitmapButton() : this(Metrics.IconSize) { }
-
 		public BitmapButton(Vector2 size)
 		{
 			Nodes.Clear();
@@ -53,11 +51,6 @@ namespace Tangerine.UI
 		{
 			DefaultTexture = defaultTexture;
 			HoverTexture = hoverTexture;
-		}
-
-		public BitmapButton(ITexture defaultTexture, ITexture hoverTexture)
-			: this(defaultTexture, hoverTexture, Metrics.IconSize)
-		{
 		}
 
 		void Refresh() => (DefaultAnimation.AnimationEngine as ButtonAnimationEngine).Refresh();

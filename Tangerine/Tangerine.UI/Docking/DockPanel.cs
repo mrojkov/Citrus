@@ -27,7 +27,8 @@ namespace Tangerine.UI
 					new SimpleText { Text = Title, Padding = new Thickness(4, 0), AutoSizeConstraints = false, MinMaxHeight = 20 },
 					(CloseButton = new BitmapButton(
 						IconPool.GetTexture("PopupClose"), 
-						IconPool.GetTexture("PopupCloseHover")) {
+						IconPool.GetTexture("PopupCloseHover"),
+						Metrics.IconSize) {
 							LayoutCell = new LayoutCell(Alignment.Center)
 						}
 					)
@@ -43,7 +44,7 @@ namespace Tangerine.UI
 					ContentWidget
 				}
 			};
-			new KeyboardFocusSwitcher(RootWidget);
+			RootWidget.TabTraverseScope = new TabTraverseScope();
 		}
 
 		internal void RefreshDockedSize()

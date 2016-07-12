@@ -36,6 +36,7 @@ namespace Tangerine.UI
 				Padding = new Thickness(4),
 				CornerBlinkOnRendering = true
 			};
+			new TabTraverseController(mainWidget);
 			documentArea = new Widget { PostPresenter = new WidgetFlatFillPresenter(Color4.Gray) };
 		}
 
@@ -139,6 +140,7 @@ namespace Tangerine.UI
 						};
 						p.RootWidget.Unlink();
 						p.WindowWidget.AddNode(p.RootWidget);
+						new TabTraverseController(p.WindowWidget);
 					}
 				} else {
 					ClosePanelWindow(p);

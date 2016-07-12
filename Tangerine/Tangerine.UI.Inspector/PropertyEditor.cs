@@ -42,7 +42,7 @@ namespace Tangerine.UI.Inspector
 		{
 			this.context = context;
 			containerWidget = new Widget {
-				Layout = new HBoxLayout { IgnoreHidden = false },
+				Layout = new HBoxLayout { IgnoreHidden = false},
 				LayoutCell = new LayoutCell { StretchY = 0 },
 			};
 			context.InspectorPane.AddNode(containerWidget);
@@ -56,12 +56,15 @@ namespace Tangerine.UI.Inspector
 			};
 			keyframeButton = new KeyframeButton {
 				LayoutCell = new LayoutCell(Alignment.LeftCenter, stretchX: 0),
-				KeyColor = KeyframePalette.Colors[context.TangerineAttribute.ColorIndex]
+				KeyColor = KeyframePalette.Colors[context.TangerineAttribute.ColorIndex],
 			};
 			keyFunctionButton.Clicked += RaiseOnKeyframeToggle;
 			keyframeButton.Clicked += RaiseOnKeyframeToggle;
-			containerWidget.AddNode(keyFunctionButton);
-			containerWidget.AddNode(keyframeButton);
+			containerWidget.Nodes.AddRange(
+				keyFunctionButton,
+				keyframeButton,
+				new HSpacer(4)
+			);
 			containerWidget.Tasks.Add(new KeyframeButtonBinding(context, keyframeButton));
 			containerWidget.Tasks.Add(new KeyFunctionButtonBinding(context, keyFunctionButton));
 		}
@@ -71,14 +74,19 @@ namespace Tangerine.UI.Inspector
 			OnKeyframeToggle?.Invoke();
 		}
 
-		protected static IDataflowProvider<string> EditBoxSubmittedText(EditBox editor)
+		protected static IDataflowProvider<string> EditBoxSubmittedText(EditBox editBox)
 		{
-			return new EventflowProvider<string>(editor, "OnSubmit");
+			return new EventflowProvider<string>(editBox, "Submitted");
 		}
 
-		protected static IDataflowProvider<T> DropDownListSelectedItem<T>(DropDownList selector)
+		protected static IDataflowProvider<T> DropDownListSelectedItem<T>(DropDownList dropDownList)
 		{
-			return new Property<T>(() => selector.Value != null ? (T)selector.Value : default(T)).DistinctUntilChanged().Skip(1);
+			return new EventflowProvider<int>(dropDownList, "Changed").Select(i => (T)dropDownList.Items[i].Value);
+		}
+
+		protected static IDataflowProvider<bool> CheckBoxChecked(CheckBox checkBox)
+		{
+			return new EventflowProvider<bool>(checkBox, "Changed");
 		}
 
 		protected static IDataflowProvider<T> CoalescedPropertyValue<T>(PropertyEditorContext context)
@@ -141,14 +149,8 @@ namespace Tangerine.UI.Inspector
 	{
 		public StringPropertyEditor(PropertyEditorContext context) : base(context)
 		{
-			EditBox editor;
-			containerWidget.AddNode(new Widget {
-				Layout = new HBoxLayout(),
-				Padding = new Thickness { Left = 4 },
-				Nodes = {
-					(editor = new EditBox())
-				}
-			});
+			var editor = new EditBox { LayoutCell = new LayoutCell(Alignment.Center) };
+			containerWidget.AddNode(editor);
 			OnKeyframeToggle += editor.SetFocus;
 			foreach (var obj in context.Objects) {
 				var editorValue = EditBoxSubmittedText(editor);
@@ -162,14 +164,8 @@ namespace Tangerine.UI.Inspector
 	{
 		public EnumPropertyEditor(PropertyEditorContext context) : base(context)
 		{
-			DropDownList selector;
-			containerWidget.AddNode(new Widget {
-				Layout = new HBoxLayout(),
-				Padding = new Thickness { Left = 4 },
-				Nodes = {
-					(selector = new DropDownList())
-				}
-			});
+			var selector = new DropDownList { LayoutCell = new LayoutCell(Alignment.Center) };
+			containerWidget.AddNode(selector);
 			OnKeyframeToggle += selector.SetFocus;
 			var propType = context.PropertyInfo.PropertyType;
 			foreach (var i in Enum.GetNames(propType).Zip(Enum.GetValues(propType).Cast<object>(), (a, b) => new DropDownList.Item(a, b))) {
@@ -180,6 +176,21 @@ namespace Tangerine.UI.Inspector
 				selector.Tasks.Add(new AnimablePropertyBinding<T>(obj, context.PropertyName, pickedValue));
 			}
 			selector.Tasks.Add(new DropDownListBinding<T>(selector, CoalescedPropertyValue<T>(context).DistinctUntilChanged()));
+		}
+	}
+
+	class BooleanPropertyEditor : CommonPropertyEditor
+	{
+		public BooleanPropertyEditor(PropertyEditorContext context) : base(context)
+		{
+			var checkBox = new CheckBox { LayoutCell = new LayoutCell(Alignment.Center) };
+			containerWidget.AddNode(checkBox);
+			OnKeyframeToggle += checkBox.SetFocus;
+			var propType = context.PropertyInfo.PropertyType;
+			foreach (var obj in context.Objects) {
+				checkBox.Tasks.Add(new AnimablePropertyBinding<bool>(obj, context.PropertyName, CheckBoxChecked(checkBox)));
+			}
+			checkBox.Tasks.Add(new CheckBoxBinding(checkBox, CoalescedPropertyValue<bool>(context).DistinctUntilChanged()));
 		}
 	}
 }

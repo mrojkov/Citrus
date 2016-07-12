@@ -51,6 +51,7 @@ namespace Tangerine.UI.Inspector
 		{
 			EditorMap.Add(typeof(Vector2), c => new Vector2PropertyEditor(c));
 			EditorMap.Add(typeof(string), c => new StringPropertyEditor(c));
+			EditorMap.Add(typeof(bool), c => new BooleanPropertyEditor(c));
 			EditorMap.Add(typeof(Blending), c => new EnumPropertyEditor<Blending>(c));
 			EditorMap.Add(typeof(Anchors), c => new EnumPropertyEditor<Anchors>(c));
 			EditorMap.Add(typeof(RenderTarget), c => new EnumPropertyEditor<RenderTarget>(c));

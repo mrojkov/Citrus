@@ -107,6 +107,9 @@ namespace Tangerine.Core
 		public Eventflow(object obj, string eventName)
 		{
 			var evt = obj.GetType().GetEvent(eventName);
+			if (evt == null) {
+				throw new ArgumentException($"Unknown event {eventName} for type {obj.GetType()}");
+			}
 			evt.AddEventHandler(obj, (Action<T>)EventHandler);
 		}
 
