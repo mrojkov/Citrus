@@ -134,6 +134,7 @@ namespace Lime
 			Renderer.Flush();
 			Renderer.PushProjectionMatrix();
 			Renderer.Projection = TransformProjection(Renderer.Projection);
+			WidgetContext.Current.CurrentCamera = Camera;
 #if UNITY
 			MaterialFactory.ThreeDimensionalRendering = true;
 #else
@@ -183,6 +184,7 @@ namespace Lime
 			Renderer.PopProjectionMatrix();
 			Renderer.ZTestEnabled = oldZTestEnabled;
 			Renderer.ZWriteEnabled = oldZWriteEnabled;
+			WidgetContext.Current.CurrentCamera = Camera;
 		}
 
 		private Matrix44 TransformProjection(Matrix44 orthoProjection)

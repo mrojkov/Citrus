@@ -13,18 +13,24 @@ namespace Lime
 
 			attribute vec4 a_Position;
 			attribute vec4 a_Color;
-			attribute vec2 a_DiffuseUV;
-			attribute vec2 a_OpacityUV;
+			attribute vec2 a_UV;
 			attribute vec4 a_BlendIndices;
 			attribute vec4 a_BlendWeights;
 
 			varying vec4 v_Color;
-			varying vec2 v_DiffuseUV;
-			varying vec2 v_OpacityUV;
+			varying vec2 v_UV;
 
+			#ifdef FOG_ENABLED
+			varying float v_FogFactor;
+			uniform float u_FogStart;
+			uniform float u_FogEnd;
+			uniform float u_FogDensity;
+			#endif
+
+			uniform mat4 u_WorldView;
 			uniform mat4 u_WorldViewProj;
 			uniform mat4 u_Bones[50];
-			
+
 			void main()
 			{
 				vec4 position = a_Position;
@@ -37,8 +43,19 @@ namespace Lime
 				position = skinTransform * position;
 			#endif
 				v_Color = a_Color;
-				v_DiffuseUV = a_DiffuseUV;
-				v_OpacityUV = a_OpacityUV;
+				v_UV = a_UV;
+			#ifdef FOG_ENABLED
+				vec4 viewPos = u_WorldView * position;
+				float d = abs(viewPos.z);
+			#if defined(FOG_LINEAR)
+				v_FogFactor = (d - u_FogStart) / (u_FogEnd - u_FogStart);
+			#elif defined(FOG_EXP)
+				v_FogFactor = 1.0 - 1.0 / exp(d * u_FogDensity);
+			#elif defined(FOG_EXP2)
+				v_FogFactor = 1.0 - 1.0 / exp((d * u_FogDensity) * (d * u_FogDensity));
+			#endif
+				v_FogFactor = clamp(v_FogFactor, 0.0, 1.0);
+			#endif
 				gl_Position = u_WorldViewProj * position;
 			}
 		";
@@ -49,9 +66,13 @@ namespace Lime
 			#endif
 
 			varying vec4 v_Color;
-			varying vec2 v_DiffuseUV;
-			varying vec2 v_OpacityUV;
-			
+			varying vec2 v_UV;
+
+			#ifdef FOG_ENABLED
+			varying float v_FogFactor;
+			uniform vec4 u_FogColor;
+			#endif
+
 			uniform vec4 u_DiffuseColor;
 			uniform float u_Opacity;
 			uniform sampler2D u_DiffuseTexture;
@@ -61,10 +82,13 @@ namespace Lime
 			{
 				vec4 color = v_Color * u_DiffuseColor;
 			#ifdef DIFFUSE_TEXTURE_ENABLED
-				color.rgba *= texture2D(u_DiffuseTexture, v_DiffuseUV).rgba;
+				color.rgba *= texture2D(u_DiffuseTexture, v_UV).rgba;
 			#endif
 			#ifdef OPACITY_TEXTURE_ENABLED
-				color.a *= texture2D(u_OpacityTexture, v_OpacityUV).OPACITY_ALPHA_CHANNEL;
+				color.a *= texture2D(u_OpacityTexture, v_UV).OPACITY_ALPHA_CHANNEL;
+			#endif
+			#ifdef FOG_ENABLED
+				color.rgb = mix(color.rgb, u_FogColor.rgb, v_FogFactor);
 			#endif
 				color.a *= u_Opacity;
 				gl_FragColor = color;
@@ -98,10 +122,15 @@ namespace Lime
 
 		protected override void InitializeUniformIds()
 		{
+			uniformIds.WorldView = GetUniformId("u_WorldView");
 			uniformIds.WorldViewProj = GetUniformId("u_WorldViewProj");
 			uniformIds.DiffuseColor = GetUniformId("u_DiffuseColor");
 			uniformIds.Opacity = GetUniformId("u_Opacity");
 			uniformIds.Bones = GetUniformId("u_Bones");
+			uniformIds.FogColor = GetUniformId("u_FogColor");
+			uniformIds.FogStart = GetUniformId("u_FogStart");
+			uniformIds.FogEnd = GetUniformId("u_FogEnd");
+			uniformIds.FogDensity = GetUniformId("u_FogDensity");
 		}
 
 		public void Apply(Material material, ref MaterialExternals externals)
@@ -110,6 +139,21 @@ namespace Lime
 			LoadMatrix(uniformIds.WorldViewProj, externals.WorldViewProj);
 			LoadColor(uniformIds.DiffuseColor, material.DiffuseColor * externals.ColorFactor);
 			LoadFloat(uniformIds.Opacity, material.Opacity);
+			if ((caps & MaterialCap.Fog) != 0) {
+				LoadMatrix(uniformIds.WorldView, externals.WorldView);
+				LoadColor(uniformIds.FogColor, material.FogColor);
+				if ((caps & MaterialCap.FogLinear) != 0) {
+					LoadFloat(uniformIds.FogStart, material.FogStart);
+					LoadFloat(uniformIds.FogEnd, material.FogEnd);
+				} else {
+					LoadFloat(uniformIds.FogDensity, material.FogDensity);
+				}
+				var c = WidgetContext.Current.CurrentCamera;
+				var cp = c.Position;
+				var v = c.View;
+				var wv = externals.WorldView;
+				var v2 = Matrix44.CreateLookAt(new Vector3(0, 0, 45), Vector3.Zero, Vector3.UnitY);
+			}
 			if ((caps & MaterialCap.Skin) != 0) {
 				LoadMatrixArray(uniformIds.Bones, externals.Bones, externals.BoneCount);
 			}
@@ -144,10 +188,7 @@ namespace Lime
 			return new AttribLocation[] {
 				new AttribLocation { Name = "a_Position", Index = PlatformGeometryBuffer.Attributes.Vertex },
 				new AttribLocation { Name = "a_Color", Index = PlatformGeometryBuffer.Attributes.Color },
-				new AttribLocation { Name = "a_DiffuseUV", Index = PlatformGeometryBuffer.Attributes.UV1 },
-				new AttribLocation { Name = "a_SpecularUV", Index = PlatformGeometryBuffer.Attributes.UV2 },
-				new AttribLocation { Name = "a_HeightUV", Index = PlatformGeometryBuffer.Attributes.UV3 },
-				new AttribLocation { Name = "a_OpacityUV", Index = PlatformGeometryBuffer.Attributes.UV4 },
+				new AttribLocation { Name = "a_UV", Index = PlatformGeometryBuffer.Attributes.UV1 },
 				new AttribLocation { Name = "a_BlendIndices", Index = PlatformGeometryBuffer.Attributes.BlendIndices },
 				new	AttribLocation { Name = "a_BlendWeights", Index = PlatformGeometryBuffer.Attributes.BlendWeights }
 			};
@@ -157,8 +198,6 @@ namespace Lime
 		{
 			return new Sampler[] {
 				new Sampler { Name = "u_DiffuseTexture", Stage = TextureUnits.Diffuse },
-				new Sampler { Name = "u_SpecularTexture", Stage = TextureUnits.Specular },
-				new Sampler { Name = "u_HeightTexture", Stage = TextureUnits.Height },
 				new Sampler { Name = "u_OpacityTexture", Stage = TextureUnits.Opacity }
 			};
 		}
@@ -168,40 +207,39 @@ namespace Lime
 			if ((caps & MaterialCap.DiffuseTexture) != 0) {
 				shader = "#define DIFFUSE_TEXTURE_ENABLED\n" + shader;
 			}
-//			if ((caps & ModelMaterialCap.SpecularTexture) != 0) {
-//				shader = "#define SPECULAR_TEXTURE_ENABLED\n" + shader;
-//			}
-//			if ((caps & ModelMaterialCap.HeightTexture) != 0) {
-//				shader = "#define HEIGHT_TEXTURE_ENABLED\n" + shader;
-//			}
-//			if ((caps & ModelMaterialCap.OpacityTexture) != 0) {
-//				shader = "#define OPACITY_TEXTURE_ENABLED\n" + shader;
-//#if ANDROID
-//				shader = "#define OPACITY_ALPHA_CHANNEL r\n" + shader;
-//#else
-//				shader = "#define OPACITY_ALPHA_CHANNEL a\n" + shader;
-//#endif
-//			}
 			if ((caps & MaterialCap.Skin) != 0) {
 				shader = "#define SKIN_ENABLED\n" + shader;
+			}
+			if ((caps & MaterialCap.Fog) != 0) {
+				shader = "#define FOG_ENABLED\n" + shader;
+				if ((caps & MaterialCap.FogLinear) != 0) {
+					shader = "#define FOG_LINEAR\n" + shader;
+				} else if ((caps & MaterialCap.FogExp) != 0) {
+					shader = "#define FOG_EXP\n" + shader;
+				} else if ((caps & MaterialCap.FogExp2) != 0) {
+					shader = "#define FOG_EXP2\n" + shader;
+				}
 			}
 			return shader;
 		}
 
 		private struct UniformIds
 		{
+			public int WorldView;
 			public int WorldViewProj;
 			public int DiffuseColor;
 			public int Opacity;
 			public int Bones;
+			public int FogColor;
+			public int FogStart;
+			public int FogEnd;
+			public int FogDensity;
 		}
 
 		private static class TextureUnits
 		{
 			public const int Diffuse = 0;
-			public const int Specular = 1;
-			public const int Height = 2;
-			public const int Opacity = 3;
+			public const int Opacity = 1;
 		}
 	}
 }

@@ -9,6 +9,7 @@ namespace Lime
 	[ProtoContract]
 	public class Mesh3D : Node3D
 	{
+		internal Matrix44 WorldView;
 		internal Matrix44 WorldViewProj;
 		internal Matrix44[] SharedBoneTransforms = new Matrix44[] { };
 		private bool invalidBones;
@@ -65,6 +66,7 @@ namespace Lime
 			for (var i = 0; i < Bones.Count; i++) {
 				SharedBoneTransforms[i] = BoneBindPoseInverses[i] * Bones[i].GlobalTransform * worldInverse;
 			}
+			WorldView = world * WidgetContext.Current.CurrentCamera.View;
 			WorldViewProj = Renderer.FixupWVP(world * Renderer.Projection);
 		}
 
@@ -229,6 +231,7 @@ namespace Lime
 			Renderer.ZWriteEnabled = ModelMesh.ZWriteEnabled;
 			Renderer.CullMode = ModelMesh.CullMode;
 			var materialExternals = new MaterialExternals {
+				WorldView = ModelMesh.WorldView,
 				WorldViewProj = ModelMesh.WorldViewProj,
 				ColorFactor = ModelMesh.GlobalColor
 			};

@@ -192,6 +192,11 @@ namespace Lime
 			GL.Uniform2(uniformId, vector.X, vector.Y);
 		}
 
+		public void LoadVector4(int uniformId, Vector4 vector)
+		{
+			GL.Uniform4(uniformId, vector.X, vector.Y, vector.Z, vector.W);
+		}
+
 		public void LoadColor(int uniformId, Color4 color)
 		{
 #if !MAC && !MONOMAC

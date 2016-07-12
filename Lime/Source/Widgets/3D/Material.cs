@@ -11,6 +11,7 @@ namespace Lime
 		private ITexture heightTexture;
 		private ITexture opacityTexture;
 		private MaterialCap caps;
+		private FogMode fogMode;
 
 		[ProtoMember(1)]
 		public ITexture DiffuseTexture
@@ -20,28 +21,6 @@ namespace Lime
 			{
 				diffuseTexture = value;
 				SetCapState(MaterialCap.DiffuseTexture, diffuseTexture != null);
-			}
-		}
-
-		[ProtoMember(2)]
-		public ITexture SpecularTexture
-		{
-			get { return specularTexture; }
-			set
-			{
-				specularTexture = value;
-				SetCapState(MaterialCap.SpecularTexture, specularTexture != null);
-			}
-		}
-
-		[ProtoMember(3)]
-		public ITexture HeightTexture
-		{
-			get { return heightTexture; }
-			set
-			{
-				heightTexture = value;
-				SetCapState(MaterialCap.HeightTexture, heightTexture != null);
 			}
 		}
 
@@ -74,12 +53,43 @@ namespace Lime
 		[ProtoMember(10)]
 		public string Name { get; set; }
 
+		[ProtoMember(11)]
+		public FogMode FogMode
+		{
+			get { return fogMode; }
+			set
+			{
+				fogMode = value;
+				caps &= ~MaterialCap.Fog;
+				if (fogMode == FogMode.Linear) {
+					caps |= MaterialCap.FogLinear;
+				} else if (fogMode == FogMode.Exp) {
+					caps |= MaterialCap.FogExp;
+				} else if (fogMode == FogMode.Exp2) {
+					caps |= MaterialCap.FogExp2;
+				}
+			}
+		}
+
+		[ProtoMember(12)]
+		public Color4 FogColor;
+
+		[ProtoMember(13)]
+		public float FogStart;
+
+		[ProtoMember(14)]
+		public float FogEnd;
+
+		[ProtoMember(15)]
+		public float FogDensity;
+
 		public Material()
 		{
 			DiffuseColor = Color4.White;
 			EmissiveColor = Color4.White;
 			SpecularColor = Color4.White;
 			Opacity = 1f;
+			FogMode = FogMode.None;
 		}
 
 		private void SetCapState(MaterialCap mask, bool enabled)
@@ -106,6 +116,7 @@ namespace Lime
 	internal struct MaterialExternals
 	{
 		public Color4 ColorFactor;
+		public Matrix44 WorldView;
 		public Matrix44 WorldViewProj;
 		public Matrix44[] Bones;
 		public int BoneCount;
@@ -121,15 +132,28 @@ namespace Lime
 		DiffuseTexture = 1 << 0,
 
 		[AtomicFlag]
-		SpecularTexture = 1 << 1,
+		OpacityTexture = 1 << 1,
 
 		[AtomicFlag]
-		HeightTexture = 1 << 2,
+		Skin = 1 << 2,
 
 		[AtomicFlag]
-		OpacityTexture = 1 << 3,
+		FogLinear = 1 << 3,
 
 		[AtomicFlag]
-		Skin = 1 << 4
+		FogExp = 1 << 4,
+
+		[AtomicFlag]
+		FogExp2 = 1 << 5,
+
+		Fog = FogLinear | FogExp | FogExp2
+	}
+
+	public enum FogMode
+	{
+		None,
+		Linear,
+		Exp,
+		Exp2
 	}
 }
