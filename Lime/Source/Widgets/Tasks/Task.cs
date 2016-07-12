@@ -165,7 +165,7 @@ namespace Lime
 		/// </summary>
 		public static WaitPredicate WaitForInput()
 		{
-			return new InputWaitPredicate();
+			return InputWaitPredicate.Instance;
 		}
 
 		/// <summary>

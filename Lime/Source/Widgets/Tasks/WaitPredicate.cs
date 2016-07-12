@@ -17,6 +17,9 @@ namespace Lime
 
 	public class InputWaitPredicate : WaitPredicate
 	{
+		public static readonly InputWaitPredicate Instance = new InputWaitPredicate();
+
+		private InputWaitPredicate() { }
 		public override bool Evaluate() { return !Window.Current.Input.Changed; }
 	}
 
