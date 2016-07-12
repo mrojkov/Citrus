@@ -109,7 +109,8 @@ namespace Lime
 
 		public Widget ParentWidget { get { return Parent != null ? Parent.AsWidget : null; } }
 
-		public Focusable Focusable { get; set; }
+		public TabTraversable TabTravesable { get; set; }
+		public TabTraverseScope TabTraverseScope { get; set; }
 		public FocusOptions FocusOptions { get; set; }
 
 		public ILayout Layout = AnchorLayout.Instance;

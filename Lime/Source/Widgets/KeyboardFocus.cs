@@ -7,17 +7,25 @@ using System.Text;
 
 namespace Lime
 {
-	public class Focusable
+	/// <summary>
+	/// Controls whether a widget could be traversed with Tab or Shift+Tab.
+	/// </summary>
+	public class TabTraversable
 	{
-		public bool TabStop { get; set; }
-		public int TabOrder { get; set; }
-
-		public Focusable()
-		{
-			TabStop = true;
-		}
+		public int Order { get; set; }
 	}
 
+	/// <summary>
+	/// Indicates whether all of widget's descendants should be within the one tab-traverse scope. 
+	/// The only way to change the current scope, is to activate a widget inside any other tab-traverse scope with the mouse.
+	/// </summary>
+	public class TabTraverseScope
+	{
+	}
+
+	/// <summary>
+	/// Defines a set of keys which would be captured by a widget. By default the focused widget accepts all keyboard keys, except keys wanted one of it ancestors.
+	/// </summary>
 	public class FocusOptions
 	{
 		public readonly BitArray WantedKeys;
@@ -61,7 +69,7 @@ namespace Lime
 
 		private void Window_Deactivated(IWindow window)
 		{
-			if (Focused != null && Focused.GetRoot() == WidgetContext.Current.Root) {
+			if (Focused != null && Focused.DescendantOrThis(WidgetContext.Current.Root)) {
 				focusPerWindow[window] = Focused;
 			} else if (Focused == null) {
 				focusPerWindow[window] = null;
@@ -72,7 +80,7 @@ namespace Lime
 		{
 			Widget newFocused;
 			if (focusPerWindow.TryGetValue(window, out newFocused)) {
-				if (newFocused != null && newFocused.GetRoot() == WidgetContext.Current.Root) {
+				if (newFocused != null && newFocused.DescendantOrThis(WidgetContext.Current.Root)) {
 					SetFocus(newFocused);
 					return;
 				}
@@ -120,16 +128,17 @@ namespace Lime
 	}
 
 	/// <summary>
-	/// Controls switching of focus between widgets based on keyboard shortcuts.
+	/// Controls switching of focus between widgets with Tab or Shift+Tab.
 	/// </summary>
-	public class KeyboardFocusSwitcher
+	public class TabTraverseController
 	{
 		private readonly Widget widget;
+		private Widget lastFocused;
 
 		public readonly Key FocusNext = Key.Tab;
 		public readonly Key FocusPrevious = Key.MapShortcut(new Shortcut(Modifiers.Shift, Key.Tab));
 
-		public KeyboardFocusSwitcher(Widget widget)
+		public TabTraverseController(Widget widget)
 		{
 			this.widget = widget;
 			widget.Tasks.Add(FocusTask());
@@ -141,6 +150,10 @@ namespace Lime
 		private IEnumerator<object> FocusTask()
 		{
 			while (true) {
+				var focused = KeyboardFocus.Instance.Focused;
+				if (focused != null && focused.DescendantOrThis(widget)) {
+					lastFocused = focused;
+				}
 				if (widget.Input.WasKeyRepeated(FocusNext)) {
 					AdvanceFocus(1);
 				}
@@ -153,24 +166,39 @@ namespace Lime
 
 		private void AdvanceFocus(int direction)
 		{
-			var focused = KeyboardFocus.Instance.Focused;
-			var focusables = GetFocusables().ToList();
-			if (focused == null) {
-				if (focusables.Count > 0) {
-					KeyboardFocus.Instance.SetFocus(focusables[0]);
-				}
-			} else if (focused.DescendantOrThis(widget)) {
-				var i = focusables.IndexOf(focused);
+			if (!CanRegainFocus()) {
+				KeyboardFocus.Instance.SetFocus(GetTabTraversables(widget).FirstOrDefault());
+			} else if (KeyboardFocus.Instance.Focused == null) {
+				lastFocused.SetFocus();
+			} else {
+				var scope = GetTabTraverseScope(lastFocused);
+				var traversables = GetTabTraversables(scope).ToList();
+				var i = traversables.IndexOf(lastFocused);
 				if (i >= 0) {
-					i = Mathf.Wrap(i + direction, 0, focusables.Count - 1);
-					KeyboardFocus.Instance.SetFocus(focusables[i]);
+					i = Mathf.Wrap(i + direction, 0, traversables.Count - 1);
+					traversables[i].SetFocus();
 				}
 			}
 		}
 
-		private IEnumerable<Widget> GetFocusables()
+		private bool CanRegainFocus()
 		{
-			return widget.Descendants.OfType<Widget>().Where(i => i.Focusable != null && i.Focusable.TabStop && i.GloballyVisible).OrderBy(i => i.Focusable.TabOrder);
+			return lastFocused != null && lastFocused.GloballyVisible && lastFocused.DescendantOrThis(WidgetContext.Current.Root);
+		}
+
+		private Widget GetTabTraverseScope(Widget widget)
+		{
+			for (; widget.Parent != null; widget = widget.ParentWidget) {
+				if (widget.TabTraverseScope != null) {
+					break;
+				}
+			}
+			return widget;
+		}
+
+		private IEnumerable<Widget> GetTabTraversables(Widget root)
+		{
+			return root.Descendants.OfType<Widget>().Where(i => i.TabTravesable != null && i.GloballyVisible).OrderBy(i => i.TabTravesable.Order);
 		}
 	}
 }
