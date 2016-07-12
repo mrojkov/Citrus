@@ -169,6 +169,13 @@ namespace Lime
 			}
 		}
 
+		public void AddRange(params Node[] collection)
+		{
+			foreach (var node in collection) {
+				Add(node);
+			}
+		}
+
 		public Node FirstOrNull()
 		{
 			return list == null || list.Count == 0 ? null : list[0];
