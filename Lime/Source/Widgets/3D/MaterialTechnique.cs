@@ -148,11 +148,6 @@ namespace Lime
 				} else {
 					LoadFloat(uniformIds.FogDensity, material.FogDensity);
 				}
-				var c = WidgetContext.Current.CurrentCamera;
-				var cp = c.Position;
-				var v = c.View;
-				var wv = externals.WorldView;
-				var v2 = Matrix44.CreateLookAt(new Vector3(0, 0, 45), Vector3.Zero, Vector3.UnitY);
 			}
 			if ((caps & MaterialCap.Skin) != 0) {
 				LoadMatrixArray(uniformIds.Bones, externals.Bones, externals.BoneCount);
