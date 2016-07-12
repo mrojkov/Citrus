@@ -9,6 +9,7 @@ namespace Lime
 		public static class Metrics
 		{
 			public static readonly int TextHeight = 18;
+			public static readonly Vector2 CheckBoxSize = new Vector2(16, 16);
 			public static readonly Vector2 DefaultButtonSize = new Vector2(75, 23);
 			public static readonly Thickness ControlsPadding = new Thickness(2);
 		}
@@ -33,6 +34,7 @@ namespace Lime
 			Decorators[typeof(SimpleText)] = DecorateSimpleText;
 			Decorators[typeof(Button)] = DecorateButton;
 			Decorators[typeof(EditBox)] = DecorateEditBox;
+			Decorators[typeof(CheckBox)] = DecorateCheckBox;
 			Decorators[typeof(WindowWidget)] = DecorateWindowWidget;
 			Decorators[typeof(TextView)] = DecorateTextView;
 			Decorators[typeof(DropDownList)] = DecorateDropDownList;
@@ -69,7 +71,7 @@ namespace Lime
 				OverflowMode = TextOverflowMode.Ellipsis
 			};
 			button.AddNode(caption);
-			button.Focusable = new Focusable();
+			button.TabTravesable = new TabTraversable();
 			ExpandToContainer(caption);
 		}
 
@@ -132,9 +134,24 @@ namespace Lime
 				eb, eb.Caret,
 				new CaretParams { CaretPresenter = new VerticalLineCaret() });
 			new Editor(eb, eb.Caret, editorParams);
-			eb.Focusable = new Focusable();
+			eb.TabTravesable = new TabTraversable();
 			eb.CompoundPresenter.Add(new BorderedFramePresenter(Colors.WhiteBackground, Colors.ControlBorder));
 			eb.CompoundPostPresenter.Add(new KeyboardFocusBorderPresenter());
+		}
+
+		private void DecorateCheckBox(Widget widget)
+		{
+			var cb = (CheckBox)widget;
+			cb.Layout = new StackLayout();
+			cb.AddNode(new Button {
+				Id = "Button",
+				Presenter = new CheckBoxPresenter(cb),
+				LayoutCell = new LayoutCell(Alignment.Center),
+				MinMaxSize = Metrics.CheckBoxSize,
+				TabTravesable = null
+			});
+			cb.TabTravesable = new TabTraversable();
+			cb.CompoundPostPresenter.Add(new KeyboardFocusBorderPresenter());
 		}
 
 		private void DecorateDropDownList(Widget widget)
@@ -142,7 +159,7 @@ namespace Lime
 			var dropDownList = (DropDownList)widget;
 			dropDownList.MinSize = Metrics.DefaultButtonSize;
 			dropDownList.MaxHeight = Metrics.DefaultButtonSize.Y;
-			dropDownList.Focusable = new Focusable();
+			dropDownList.TabTravesable = new TabTraversable();
 			var text = new SimpleText {
 				Id = "Label",
 				VAlignment = VAlignment.Center,
@@ -267,6 +284,38 @@ namespace Lime
 				widget.PrepareRendererState();
 				Renderer.DrawVerticalGradientRect(Vector2.Zero, widget.Size, innerGradient);
 				Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.ControlBorder);
+			}
+
+			public override bool PartialHitTest(Node node, ref HitTestArgs args)
+			{
+				return node.PartialHitTest(ref args);
+			}
+		}
+
+		class CheckBoxPresenter : CustomPresenter
+		{
+			readonly CheckBox checkBox;
+
+			private VectorShape icon = new VectorShape {
+				new VectorShape.Line(0.2f, 0.5f, 0.4f, 0.8f, Colors.BlackText, 0.1f),
+				new VectorShape.Line(0.4f, 0.8f, 0.75f, 0.25f, Colors.BlackText, 0.1f),
+			};
+
+			public CheckBoxPresenter(CheckBox checkBox)
+			{
+				this.checkBox = checkBox;
+			}
+
+			public override void Render(Node node)
+			{
+				var widget = node.AsWidget;
+				widget.PrepareRendererState();
+				Renderer.DrawRect(Vector2.Zero, widget.Size, Colors.WhiteBackground);
+				Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.ControlBorder);
+				if (checkBox.Checked) {
+					var transform = Matrix32.Scaling(Metrics.CheckBoxSize);
+					icon.Draw(transform);
+				}
 			}
 
 			public override bool PartialHitTest(Node node, ref HitTestArgs args)
