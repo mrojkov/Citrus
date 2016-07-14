@@ -950,7 +950,7 @@ namespace Lime
 
 		public bool IsMouseOverDescendant()
 		{
-			return WidgetContext.Current.NodeUnderMouse != null ? DescendantOrThis(this) : false;
+			return WidgetContext.Current.NodeUnderMouse != null ? WidgetContext.Current.NodeUnderMouse.DescendantOrThis(this) : false;
 		}
 
 		public int GetEffectiveLayer()
