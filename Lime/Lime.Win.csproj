@@ -354,6 +354,7 @@
     <Compile Include="Source\Application\MouseCursor\StockCursors.Mac.cs" />
     <Compile Include="Source\Application\MouseCursor\StockCursors.Null.cs" />
     <Compile Include="Source\Application\MouseCursor\StockCursors.Win.cs" />
+    <Compile Include="Source\Widgets\CheckBox.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\3rdParty\OpenAL\OpenAL32.dll">
