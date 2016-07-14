@@ -232,8 +232,7 @@ namespace Lime
 
 		private bool IsUnderMouse()
 		{
-			var hitTestArgs = new HitTestArgs(CommonWindow.Current.Input.MousePosition);
-			return Frame.Presenter.PartialHitTest(Frame, ref hitTestArgs);
+			return Frame.IsMouseOverDescendant();
 		}
 
 		private IEnumerator<object> MainTask()

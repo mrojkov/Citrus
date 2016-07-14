@@ -948,6 +948,11 @@ namespace Lime
 			return WidgetContext.Current.NodeUnderMouse == this;
 		}
 
+		public bool IsMouseOverDescendant()
+		{
+			return WidgetContext.Current.NodeUnderMouse.DescendantOrThis(this);
+		}
+
 		public int GetEffectiveLayer()
 		{
 			for (Node node = this; node != null; node = node.Parent) {
