@@ -323,8 +323,8 @@ namespace Lime.Text
 				}
 				var isLongerThanWidth = x + word.Width > maxWidth;
 				var t = texts[word.TextIndex];
-				var isText = t.Length > 0 && t[word.Start] > ' ';
-				if (isLongerThanWidth && isText && (wordSplitAllowed || t.HasJapaneseSymbols(word.Start, word.Length))) {
+				var isTextOrBullet = (t.Length > 0 && t[word.Start] > ' ') || IsBullet(word);
+				if (isLongerThanWidth && isTextOrBullet && (wordSplitAllowed || t.HasJapaneseSymbols(word.Start, word.Length))) {
 					var fittedCharsCount = CalcFittedCharactersCount(word, maxWidth - x);
 					if (fittedCharsCount > 0) {
 						var wordEnd = word.Start + fittedCharsCount;
@@ -346,7 +346,7 @@ namespace Lime.Text
 					}
 				}
 
-				if (isLongerThanWidth && isText && x > 0) {
+				if (isLongerThanWidth && isTextOrBullet && x > 0) {
 					x = word.Width;
 					word.X = 0;
 					word.LineBreak = true;
@@ -362,7 +362,7 @@ namespace Lime.Text
 						ClipWordWithEllipsis(word, maxWidth);
 					}
 				}
-				if (isText) { // buz: при автопереносе на концах строк остаются пробелы, они не должны влиять на значение длины строки
+				if (isTextOrBullet) { // buz: при автопереносе на концах строк остаются пробелы, они не должны влиять на значение длины строки
 					longestLineWidth = Math.Max(longestLineWidth, word.X + word.Width);
 				}
 				fittedWords[i] = word;
