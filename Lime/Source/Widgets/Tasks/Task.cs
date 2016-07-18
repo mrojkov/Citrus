@@ -110,28 +110,21 @@ namespace Lime
 		{
 			if (result == null) {
 				waitTime = 0;
-			}
-			else if (result is int) {
+			} else if (result is int) {
 				waitTime = (int)result;
-			}
-			else if (result is float) {
+			} else if (result is float) {
 				waitTime = (float)result;
-			}
-			else if (result is IEnumerator<object>) {
+			} else if (result is IEnumerator<object>) {
 				stack.Push((IEnumerator<object>) result);
 				Advance(0);
-			}
-			else if (result is WaitPredicate) {
+			} else if (result is WaitPredicate) {
 				waitPredicate = (WaitPredicate) result;
-			}
-			else if (result is Node) {
+			} else if (result is Node) {
 				waitPredicate = WaitForAnimation((Node) result);
-			}
-			else if (result is IEnumerable<object>) {
-				throw new Exception("Use IEnumerator<object> instead of IEnumerable<object> for " + result);
-			}
-			else {
-				throw new Exception("Invalid object yielded " + result);
+			} else if (result is IEnumerable<object>) {
+				throw new InvalidOperationException("Use IEnumerator<object> instead of IEnumerable<object> for " + result);
+			} else {
+				throw new InvalidOperationException("Invalid object yielded " + result);
 			}
 		}
 
@@ -140,7 +133,7 @@ namespace Lime
 		/// </summary>
 		public static WaitPredicate WaitWhile(Func<bool> predicate)
 		{
-			return new BooleanWaitPredicate { Predicate = predicate };
+			return new BooleanWaitPredicate(predicate);
 		}
 
 		/// <summary>
@@ -149,7 +142,7 @@ namespace Lime
 		/// </summary>
 		public static WaitPredicate WaitWhile(Func<float, bool> timePredicate)
 		{
-			return new TimeWaitPredicate { Predicate = timePredicate };
+			return new TimeWaitPredicate(timePredicate);
 		}
 
 		/// <summary>
@@ -157,7 +150,7 @@ namespace Lime
 		/// </summary>
 		public static WaitPredicate WaitForAnimation(Node node)
 		{
-			return new AnimationWaitPredicate { Node = node };
+			return new AnimationWaitPredicate(node);
 		}
 
 		/// <summary>

@@ -8,14 +8,15 @@ namespace Lime
 		public abstract bool Evaluate();
 	}
 
-	public class AnimationWaitPredicate : WaitPredicate
+	class AnimationWaitPredicate : WaitPredicate
 	{
-		public Node Node;
+		private Node node;
 
-		public override bool Evaluate() { return Node.IsRunning; }
+		public AnimationWaitPredicate(Node node) { this.node = node; }
+		public override bool Evaluate() { return node.IsRunning; }
 	}
 
-	public class InputWaitPredicate : WaitPredicate
+	class InputWaitPredicate : WaitPredicate
 	{
 		public static readonly InputWaitPredicate Instance = new InputWaitPredicate();
 
@@ -23,17 +24,19 @@ namespace Lime
 		public override bool Evaluate() { return !Window.Current.Input.Changed; }
 	}
 
-	public class BooleanWaitPredicate : WaitPredicate
+	class BooleanWaitPredicate : WaitPredicate
 	{
-		public Func<bool> Predicate;
+		private Func<bool> predicate;
 
-		public override bool Evaluate() { return Predicate(); }
+		public BooleanWaitPredicate(Func<bool> predicate) { this.predicate = predicate; }
+		public override bool Evaluate() { return predicate(); }
 	}
 
-	public class TimeWaitPredicate : WaitPredicate
+	class TimeWaitPredicate : WaitPredicate
 	{
-		public Func<float, bool> Predicate;
+		private Func<float, bool> predicate;
 
-		public override bool Evaluate() { return Predicate(TotalTime); }
+		public TimeWaitPredicate(Func<float, bool> predicate) { this.predicate = predicate; }
+		public override bool Evaluate() { return predicate(TotalTime); }
 	}
 }
