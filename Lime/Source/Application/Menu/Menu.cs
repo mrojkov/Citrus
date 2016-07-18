@@ -3,71 +3,6 @@ using System.Collections.Generic;
 
 namespace Lime
 {
-#if WIN || MAC
-	public interface ICommand
-	{
-		string Text { get; set; }
-		Shortcut Shortcut { get; set; }
-		Menu Submenu { get; set; }
-		bool Enabled { get; set; }
-		bool Visible { get; set; }
-		void Execute();
-		void Refresh();
-	}
-
-	public class Command : ICommand
-	{
-		public string Text { get; set; }
-		public Shortcut Shortcut { get; set; }
-		public Key Key { get; set; }
-		public Menu Submenu { get; set; }
-		public bool Enabled { get; set; }
-		public bool Visible { get; set; }
-		public event Action Executing;
-
-		public Command()
-		{
-			Enabled = true;
-			Visible = true;
-		}
-
-		public Command(string text, Action executing) : this()
-		{
-			Text = text;
-			Executing += executing;
-		}
-
-		public void Execute()
-		{
-			if (Executing != null) {
-				Executing();
-			}
-			if (Key != Key.Unknown) {
-				PropagateKeystrokeToWindows();
-			}
-		}
-
-		void PropagateKeystrokeToWindows()
-		{
-			foreach (var i in Application.Windows) {
-				i.Input.SetKeyState(Key, true);
-				i.Input.SetKeyState(Key, false);
-			}
-		}
-		
-		public void Refresh()
-		{
-			if (Shortcut.Main == Key.Unknown) {
-				return;
-			}
-			var enabled = false;
-			foreach (var i in Application.Windows) {
-				enabled |= i.Input.IsKeyEnabled(Key);
-			}
-			Enabled = enabled;
-		}
-	}
-
 	public interface IMenu : IList<ICommand>
 	{
 		/// <summary>
@@ -87,5 +22,4 @@ namespace Lime
 		/// </summary>
 		void Refresh();
 	}
-#endif
 }
