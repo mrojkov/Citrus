@@ -7,9 +7,6 @@ using System.Collections.Generic;
 
 namespace Lime
 {
-	/// <summary>
-	/// Перечень текстур для рендеринга графики в них
-	/// </summary>
 	[ProtoContract]
 	public enum RenderTarget
 	{
@@ -31,9 +28,6 @@ namespace Lime
 		G
 	}
 	
-	/// <summary>
-	/// Способы отсечения поверхности, которая не должна отрисовываться
-	/// </summary>
 	[ProtoContract]
 	public enum ClipMethod
 	{
@@ -47,9 +41,6 @@ namespace Lime
 		NoRender,
 	}
 
-	/// <summary>
-	/// Сцена, загружаемая из бандла
-	/// </summary>
 	[ProtoContract]
 	public class Frame : Widget, IImageCombinerArg
 	{
@@ -60,9 +51,6 @@ namespace Lime
 		RenderTarget renderTarget;
 		ITexture renderTexture;
 
-		/// <summary>
-		/// Текстура, в которую будет отрисовываться фрейм
-		/// </summary>
 		[ProtoMember(1)]
 		public RenderTarget RenderTarget {
 			get { return renderTarget; }
@@ -76,10 +64,6 @@ namespace Lime
 			this.Position = position;
 		}
 
-		/// <summary>
-		/// Загружает фрейм из бандла
-		/// </summary>
-		/// <param name="path">Путь к файлу сцены в бандле без расширения, относительно папки Data (например Scenes/Maps/MyScene)</param>
 		public Frame(string path) : this()
 		{
 			LoadFromBundle(path);
