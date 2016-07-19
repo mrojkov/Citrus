@@ -307,7 +307,7 @@ namespace RainbowDash
 				Anchors = Anchors.LeftRightTopBottom,
 				Size = container.Size - Vector2.One * 80
 			};
-			var listContainer = (Frame)topContainer.DeepCloneFast();
+			var listContainer = (Frame)topContainer.Clone();
 			var back = new RoundedRectangle
 			{
 				Anchors = Anchors.LeftRightTopBottom,

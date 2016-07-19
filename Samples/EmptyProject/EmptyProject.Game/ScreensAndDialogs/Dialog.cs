@@ -29,7 +29,7 @@ namespace EmptyProject.ScreensAndDialogs
 
 		public Dialog(Widget windowProto, string animation = "Show", int layer = Layers.Interface)
 		{
-			Root = windowProto.DeepCloneFast<Widget>();
+			Root = windowProto.Clone<Widget>();
 			Initialize(animation, layer);
 		}
 
