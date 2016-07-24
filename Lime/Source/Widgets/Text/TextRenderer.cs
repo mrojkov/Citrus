@@ -161,7 +161,7 @@ namespace Lime.Text
 					var t = texts[word.TextIndex];
 					TextStyle style = styles[word.Style];
 					Vector2 position = new Vector2(word.X, y) + offset;
-					if (IsBullet(word) && !String.IsNullOrEmpty(style.ImageTexture.SerializationPath)) {
+					if (IsBullet(word) && style.ImageTexture != null) {
 						var sz = style.ImageSize * scaleFactor;
 						spriteList.Add(
 							style.ImageTexture, Color4.White, position + new Vector2(0, (maxHeight - sz.Y) * 0.5f),

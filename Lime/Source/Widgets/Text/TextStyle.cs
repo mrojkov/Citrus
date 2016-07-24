@@ -21,7 +21,7 @@ namespace Lime
 		}
 
 		[ProtoMember(1)]
-		public SerializableTexture ImageTexture { get; set; }
+		public ITexture ImageTexture { get; set; }
 		
 		[ProtoMember(2)]
 		public Vector2 ImageSize { get; set; }
@@ -60,8 +60,6 @@ namespace Lime
 			ShadowColor = Color4.Black;
 			ShadowOffset = Vector2.One;
 			Font = new SerializableFont();
-			ImageTexture = new SerializableTexture();
 		}
 	}
-
 }
