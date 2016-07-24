@@ -170,6 +170,11 @@ namespace Lime
 			Theme.Current.Apply(this);
 		}
 
+		public SimpleText(string text) : this()
+		{
+			Text = text;
+		}
+
 		void IText.Submit()
 		{
 			if (Submitted != null) {
