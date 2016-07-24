@@ -107,6 +107,8 @@ namespace Lime
 
 		#region Properties
 
+		public static Vector2 DefaultWidgetSize = new Vector2(100, 100);
+
 		public Widget ParentWidget { get { return Parent != null ? Parent.AsWidget : null; } }
 
 		public TabTraversable TabTravesable { get; set; }
@@ -657,7 +659,7 @@ namespace Lime
 		{
 			Layout = AnchorLayout.Instance;
 			AsWidget = this;
-			Size = new Vector2(100, 100);
+			Size = DefaultWidgetSize;
 			Color = Color4.White;
 			Scale = Vector2.One;
 			Visible = true;
