@@ -43,10 +43,10 @@ namespace Lime
 		/// </summary>
 		public override Action Clicked { get; set; }
 
-		private List<Widget> textPresenters;
 		private bool wasClicked;
 		private bool skipReleaseAnimation;
-		private StateMachine stateMachine = new StateMachine();
+		private TextPresentersFeeder textPresentersFeeder;
+		private StateMachine stateMachine;
 		private StateFunc State
 		{
 			get { return stateMachine.State; }
@@ -88,9 +88,6 @@ namespace Lime
 		public Button()
 		{
 			HitTestTarget = true;
-			// On the current frame the button contents may not be loaded, 
-			// so delay its initialization until the next frame.
-			State = InitialState;
 			Theme.Current.Apply(this);
 		}
 
@@ -109,17 +106,13 @@ namespace Lime
 			return wasClicked && GloballyVisible;
 		}
 
-		/// <summary>
-		/// Возвращает клон этого виджета. Используйте Clone() as Widget, т.к. он возвращает Node (базовый объект виджета)
-		/// </summary>
-		public override Node Clone()
+		protected override void Awake()
 		{
-			var clone = (Button)base.Clone();
-			clone.stateMachine = new StateMachine();
-			clone.State = clone.InitialState;
-			// Should reference children copies, not originals. [PK-45446]
-			clone.textPresenters = null;
-			return clone;
+			stateMachine = new StateMachine();
+			// On the current frame the button contents may not be loaded, 
+			// so delay its initialization until the next frame.
+			State = InitialState;
+			textPresentersFeeder = new TextPresentersFeeder(this);
 		}
 
 		private IEnumerator<int> NormalState()
@@ -291,23 +284,12 @@ namespace Lime
 			State = NormalState;
 		}
 
-		private void UpdateLabel()
-		{
-			if (textPresenters == null) {
-				textPresenters = new List<Widget>();
-				textPresenters.AddRange(Descendants.OfType<Widget>().Where(i => i.Id == "TextPresenter"));
-			}
-			foreach (var i in textPresenters) {
-				i.Text = Text;
-			}
-		}
-
 		protected override void SelfUpdate(float delta)
 		{
 			wasClicked = false;
 			if (GloballyVisible) {
 				stateMachine.Advance();
-				UpdateLabel();
+				textPresentersFeeder.Update();
 			}
 			if (!EnableMask.All() && State != DisabledState) {
 				State = DisabledState;
@@ -343,5 +325,27 @@ namespace Lime
 			}
 		}
 #endregion
+	}
+
+	internal class TextPresentersFeeder
+	{
+		private Widget widget;
+		private List<Widget> textPresenters;
+
+		public TextPresentersFeeder(Widget widget)
+		{
+			this.widget = widget;
+		}
+
+		public void Update()
+		{
+			if (textPresenters == null) {
+				textPresenters = new List<Widget>();
+				textPresenters.AddRange(widget.Descendants.OfType<Widget>().Where(i => i.Id == "TextPresenter"));
+			}
+			foreach (var i in textPresenters) {
+				i.Text = widget.Text;
+			}
+		}
 	}
 }
