@@ -11,6 +11,9 @@ namespace Lime
 			public static readonly int TextHeight = 18;
 			public static readonly Vector2 CheckBoxSize = new Vector2(16, 16);
 			public static readonly Vector2 DefaultButtonSize = new Vector2(75, 23);
+			public static readonly Vector2 MaxTabSize = new Vector2(250, 23);
+			public static readonly Vector2 MinTabSize = new Vector2(25, 23);
+			public static readonly Vector2 CloseButtonSize = new Vector2(16, 16);
 			public static readonly Thickness ControlsPadding = new Thickness(2);
 		}
 
@@ -25,14 +28,20 @@ namespace Lime
 			public static readonly ColorGradient ButtonHover = new ColorGradient(new Color4(235, 244, 252), new Color4(222, 238, 252));
 			public static readonly ColorGradient ButtonPress = new ColorGradient(new Color4(215, 234, 252), new Color4(199, 226, 252));
 			public static readonly ColorGradient ButtonDisable = new ColorGradient(new Color4(244, 244, 244), new Color4(244, 244, 244));
+			public static readonly Color4 TabNormal = GrayBackground.Darken(0.1f);
+			public static readonly Color4 TabActive = GrayBackground;
 			public static readonly Color4 SeparatorColor = new Color4(255, 255, 255);
 			public static readonly Color4 KeyboardFocusBorder = new Color4(150, 200, 255);
+			public static readonly Color4 CloseButtonNormal = GrayBackground.Darken(0.3f);
+			public static readonly Color4 CloseButtonHovered = GrayBackground.Darken(0.7f);
+			public static readonly Color4 CloseButtonPressed = GrayBackground.Darken(1);
 		}
 
 		public DesktopTheme()
 		{
 			Decorators[typeof(SimpleText)] = DecorateSimpleText;
 			Decorators[typeof(Button)] = DecorateButton;
+			Decorators[typeof(TabCloseButton)] = DecorateTabCloseButton;
 			Decorators[typeof(EditBox)] = DecorateEditBox;
 			Decorators[typeof(CheckBox)] = DecorateCheckBox;
 			Decorators[typeof(WindowWidget)] = DecorateWindowWidget;
@@ -41,6 +50,9 @@ namespace Lime
 			Decorators[typeof(FileChooserButton)] = DecorateFileChooserButton;
 			Decorators[typeof(HSplitter)] = DecorateSplitter;
 			Decorators[typeof(VSplitter)] = DecorateSplitter;
+			Decorators[typeof(Tab)] = DecorateTab;
+			Decorators[typeof(TabBar)] = DecorateTabBar;
+			Decorators[typeof(BorderedFrame)] = DecorateBorderedFrame;
 		}
 
 		private void DecorateSplitter(Widget widget)
@@ -172,10 +184,56 @@ namespace Lime
 			ExpandToContainer(text);
 		}
 
+		private void DecorateTabBar(Widget widget)
+		{
+			var tabBar = (TabBar)widget;
+			tabBar.Layout = new HBoxLayout();
+		}
+
+		private void DecorateTab(Widget widget)
+		{
+			var tab = (Tab)widget;
+			tab.Padding = Metrics.ControlsPadding;
+			tab.Presenter = new TabPresenter();
+			tab.MinSize = Metrics.MinTabSize;
+			tab.MaxSize = Metrics.MaxTabSize;
+			tab.Size = tab.MinSize;
+			tab.DefaultAnimation.AnimationEngine = new TabAnimationEngine((TabPresenter)tab.Presenter);
+			tab.Layout = new HBoxLayout();
+			var caption = new SimpleText {
+				Id = "TextPresenter",
+				AutoSizeConstraints = false,
+				TextColor = Colors.BlackText,
+				FontHeight = Metrics.TextHeight,
+				HAlignment = HAlignment.Center,
+				VAlignment = VAlignment.Center,
+				OverflowMode = TextOverflowMode.Ellipsis,
+				LayoutCell = new LayoutCell(Alignment.Center)
+			};
+			var closeButton = new TabCloseButton { Id = "CloseButton" };
+			tab.AddNode(caption);
+			tab.AddNode(closeButton);
+		}
+
+		private void DecorateTabCloseButton(Widget widget)
+		{
+			var button = (Button)widget;
+			button.LayoutCell = new LayoutCell(Alignment.Center, stretchX: 0);
+			button.Presenter = new TabCloseButtonPresenter();
+			button.MinMaxSize = Metrics.CloseButtonSize;
+			button.DefaultAnimation.AnimationEngine = new ButtonAnimationEngine((IButtonPresenter)button.Presenter);
+		}
+
 		private void DecorateTextView(Widget widget)
 		{
 			var tv = (TextView)widget;
 			tv.CompoundPresenter.Push(new BorderedFramePresenter(Colors.WhiteBackground, Colors.ControlBorder));
+		}
+
+		private void DecorateBorderedFrame(Widget widget)
+		{
+			var bf = (BorderedFrame)widget;
+			bf.CompoundPresenter.Add(new BorderedFramePresenter(Colors.GrayBackground, Colors.ControlBorder));
 		}
 
 		private static void ExpandToContainer(Widget widget)
@@ -239,11 +297,16 @@ namespace Lime
 			}
 		}
 
+		interface IButtonPresenter
+		{
+			void SetState(string state);
+		}
+
 		class ButtonAnimationEngine : Lime.AnimationEngine
 		{
-			private readonly ButtonPresenter presenter;
+			private readonly IButtonPresenter presenter;
 
-			public ButtonAnimationEngine(ButtonPresenter presenter)
+			public ButtonAnimationEngine(IButtonPresenter presenter)
 			{
 				this.presenter = presenter;
 			}
@@ -255,7 +318,7 @@ namespace Lime
 			}
 		}
 
-		class ButtonPresenter : CustomPresenter
+		class ButtonPresenter : CustomPresenter, IButtonPresenter
 		{
 			private ColorGradient innerGradient;
 
@@ -284,6 +347,52 @@ namespace Lime
 				widget.PrepareRendererState();
 				Renderer.DrawVerticalGradientRect(Vector2.Zero, widget.Size, innerGradient);
 				Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.ControlBorder);
+			}
+
+			public override bool PartialHitTest(Node node, ref HitTestArgs args)
+			{
+				return node.PartialHitTest(ref args);
+			}
+		}
+
+		class TabAnimationEngine : Lime.AnimationEngine
+		{
+			private readonly TabPresenter presenter;
+
+			public TabAnimationEngine(TabPresenter presenter)
+			{
+				this.presenter = presenter;
+			}
+
+			public override bool TryRunAnimation(Animation animation, string markerId)
+			{
+				presenter.SetState(markerId);
+				return true;
+			}
+		}
+
+		class TabPresenter : CustomPresenter
+		{
+			private bool active;
+
+			public void SetState(string state)
+			{
+				CommonWindow.Current.Invalidate();
+				active = state == "Active";
+			}
+
+			public override void Render(Node node)
+			{
+				var widget = node.AsWidget;
+				widget.PrepareRendererState();
+				Renderer.DrawRect(Vector2.Zero, widget.Size, active ? Colors.TabActive : Colors.TabNormal);
+				Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.ControlBorder);
+				Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.ControlBorder);
+				if (active) {
+					var pixel = 1 / Window.Current.PixelScale;
+					// Erase the bottom border
+					Renderer.DrawLine(new Vector2(pixel, widget.Height), new Vector2(widget.Width - pixel, widget.Height), Colors.TabActive);
+				}
 			}
 
 			public override bool PartialHitTest(Node node, ref HitTestArgs args)
@@ -331,6 +440,45 @@ namespace Lime
 				var widget = node.AsWidget;
 				widget.PrepareRendererState();
 				Renderer.DrawRect(Vector2.Zero, widget.Size, Colors.GrayBackground);
+			}
+		}
+
+		class TabCloseButton : Button
+		{
+		}
+
+		class TabCloseButtonPresenter : CustomPresenter, IButtonPresenter
+		{
+			private VectorShape icon = new VectorShape {
+				new VectorShape.Line(0.3f, 0.3f, 0.7f, 0.7f, Color4.White, 0.075f),
+				new VectorShape.Line(0.3f, 0.7f, 0.7f, 0.3f, Color4.White, 0.0751f),
+			};
+
+			Color4 color;
+
+			public override void Render(Node node)
+			{
+				var widget = node.AsWidget;
+				widget.PrepareRendererState();
+				var transform = Matrix32.Scaling(Metrics.CloseButtonSize);
+				icon.Draw(transform, color);
+			}
+
+			public override bool PartialHitTest(Node node, ref HitTestArgs args)
+			{
+				return node.PartialHitTest(ref args);
+			}
+
+			public void SetState(string state)
+			{
+				CommonWindow.Current.Invalidate();
+				if (state == "Normal") {
+					color = Colors.CloseButtonNormal;
+				} else if (state == "Focus") {
+					color = Colors.CloseButtonHovered;
+				} else {
+					color = Colors.CloseButtonPressed;
+				}
 			}
 		}
 	}
