@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Tangerine.UI.Timeline
 {
-	public class Timeline : ISelectedObjectsProvider
+	public class Timeline : ISelectedObjectsProvider, IDocumentView
 	{
 		public static Timeline Instance { get; private set; }
 			
@@ -17,7 +17,8 @@ namespace Tangerine.UI.Timeline
 		public readonly OverviewPane Overview = new OverviewPane();
 		public readonly GridPane Grid = new GridPane();
 		public readonly RollPane Roll = new RollPane();
-		public readonly Widget RootWidget;
+		public readonly Widget PanelWidget;
+		public readonly Widget RootWidget = new Widget();
 
 		public Vector2 ScrollOrigin;
 		public Node Container
@@ -36,21 +37,30 @@ namespace Tangerine.UI.Timeline
 		public readonly List<Row> SelectedRows = new List<Row>();
 		public readonly Entity Globals = new Entity();
 
-		public static void Initialize(Widget rootWidget)
+		public Timeline(Widget panelWidget)
 		{
-			Instance = new Timeline(rootWidget);
+			PanelWidget = panelWidget;
+			CreateProcessors();
+			InitializeWidgets();
+			Document.Current.SelectedObjectsProvider = this;
+			// SelectFirstRow();
 		}
 
-		private Timeline(Widget rootWidget)
+		public void Attach()
 		{
-			RootWidget = rootWidget;
-			RootWidget.Updating += delta => Document.Current.History.Commit();
-			CreateTasks();
-			InitializeWidgets();
+			Instance = this;
+			PanelWidget.PushNode(RootWidget);
+		}
+
+		public void Detach()
+		{
+			Instance = null;
+			RootWidget.Unlink();
 		}
 
 		void InitializeWidgets()
 		{
+			RootWidget.Updating += delta => Document.Current.History.Commit();
 			RootWidget.Layout = new StackLayout();
 			RootWidget.AddNode(new VSplitter {
 				Nodes = {
@@ -78,7 +88,7 @@ namespace Tangerine.UI.Timeline
 			});
 		}
 
-		void CreateTasks()
+		void CreateProcessors()
 		{
 			var tasks = RootWidget.LateTasks; // Use LateTasks in order to process splitters first
 			tasks.Add(new IProcessor[] {
@@ -128,13 +138,6 @@ namespace Tangerine.UI.Timeline
 		//		}
 		//	}
 		//}
-
-		public void RegisterDocument(Document document)
-		{
-			document.SelectedObjectsProvider = this;
-			Container = document.RootNode;
-			SelectFirstRow();
-		}
 
 		void SelectFirstRow()
 		{

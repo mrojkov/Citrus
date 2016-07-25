@@ -26,7 +26,7 @@ namespace Tangerine.UI.Timeline
 				if (hitNode == null || !hitNode.DescendantOf(roll.RootWidget)) {
 					continue;
 				}
-				Timeline.Instance.RootWidget.SetFocus();
+				Timeline.Instance.PanelWidget.SetFocus();
 				var initialMousePosition = input.MousePosition;
 				var row = MousePositionToRow(initialMousePosition);
 				if (input.IsKeyPressed(Key.LShift)) {

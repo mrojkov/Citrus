@@ -19,12 +19,9 @@ namespace Tangerine.UI
 
 		public IEnumerator<object> Loop()
 		{
-			var dataflow = source.GetDataflow();
+			var c = source.Consume(v => checkBox.Checked = v);
 			while (true) {
-				dataflow.Poll();
-				if (dataflow.GotValue) {
-					checkBox.Checked = dataflow.Value;
-				}
+				c.Execute();
 				yield return null;
 			}
 		}

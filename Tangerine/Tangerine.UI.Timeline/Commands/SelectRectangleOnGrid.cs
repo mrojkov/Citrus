@@ -12,6 +12,8 @@ namespace Tangerine.UI.Timeline.Operations
 		GridSelection savedSelection;
 		IntRectangle rect;
 
+		public bool HasModifications => false;
+
 		public SelectRectangleOnGrid(IntRectangle rect)
 		{
 			this.rect = rect;

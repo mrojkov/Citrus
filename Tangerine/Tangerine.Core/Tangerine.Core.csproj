@@ -69,6 +69,11 @@
     <Compile Include="Uid.cs" />
     <Compile Include="Operation.cs" />
     <Compile Include="IProcessor.cs" />
+    <Compile Include="HotStudioImport\HotAnimators.cs" />
+    <Compile Include="HotStudioImport\HotFontImporter.cs" />
+    <Compile Include="HotStudioImport\HotLexer.cs" />
+    <Compile Include="HotStudioImport\HotSceneImporter.cs" />
+    <Compile Include="Project.cs" />
     <Compile Include="IDataflow.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />

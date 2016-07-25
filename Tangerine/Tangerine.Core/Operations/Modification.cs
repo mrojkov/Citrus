@@ -13,6 +13,8 @@ namespace Tangerine.Core.Operations
 		readonly PropertyInfo property;
 		object savedValue;
 
+		public bool HasModifications => true;
+
 		public SetProperty(object obj, string propertyName, object value)
 		{
 			this.obj = obj;
@@ -39,6 +41,8 @@ namespace Tangerine.Core.Operations
 		Action<T> setter;
 		T value;
 		T savedValue;
+
+		public bool HasModifications => true;
 
 		public SetGenericProperty(Func<T> getter, Action<T> setter, T value)
 		{
@@ -84,6 +88,8 @@ namespace Tangerine.Core.Operations
 		readonly IAnimator animator;
 		IKeyframe savedKeyframe;
 
+		public bool HasModifications => true;
+
 		public RemoveKeyframe(IAnimator animator, int frame)
 		{
 			this.frame = frame;
@@ -112,6 +118,8 @@ namespace Tangerine.Core.Operations
 		IKeyframe savedKeyframe;
 		bool animatorExists;
 		IAnimator animator;
+
+		public bool HasModifications => true;
 
 		public SetKeyframe(IAnimable animable, string propertyName, string animationId, IKeyframe keyframe)
 		{
@@ -149,6 +157,8 @@ namespace Tangerine.Core.Operations
 		readonly int index;
 		readonly Node node;
 
+		public bool HasModifications => true;
+
 		public InsertNode(Node container, int index, Node node)
 		{
 			this.container = container;
@@ -172,6 +182,8 @@ namespace Tangerine.Core.Operations
 		readonly Node node;
 		int savedIndex;
 		Node container;
+
+		public bool HasModifications => true;
 
 		public UnlinkNode(Node node)
 		{

@@ -10,6 +10,8 @@ namespace Tangerine.UI.Timeline.Operations
 	{
 		GridSelection savedSelection;
 
+		public bool HasModifications => false;
+
 		public void Do()
 		{
 			savedSelection = Timeline.Instance.GridSelection;

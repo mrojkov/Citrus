@@ -1,7 +1,6 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using Lime;
+using System.Reflection;
 
 namespace Tangerine.Core
 {
@@ -97,7 +96,7 @@ namespace Tangerine.Core
 		}
 	}
 
-	class Eventflow<T> : IDataflow<T>
+	public class Eventflow<T> : IDataflow<T>
 	{
 		readonly List<T> queue = new List<T>();
 
@@ -110,10 +109,29 @@ namespace Tangerine.Core
 			if (evt == null) {
 				throw new ArgumentException($"Unknown event {eventName} for type {obj.GetType()}");
 			}
-			evt.AddEventHandler(obj, (Action<T>)EventHandler);
+			evt.AddEventHandler(obj, CreateDelegate(evt, obj, eventName));
 		}
 
-		void EventHandler(T value)
+		Delegate CreateDelegate(EventInfo evt, object obj, string eventName)
+		{
+			var p = evt.EventHandlerType.GetMethod("Invoke").GetParameters();
+			if (p.Length == 1 && p[0].ParameterType == typeof(T)) {
+				return Delegate.CreateDelegate(evt.EventHandlerType, this, "EventHandler1");
+			}
+			if (p.Length == 2 && p[0].ParameterType == typeof(object) && p[1].ParameterType == typeof(T)) {
+				return Delegate.CreateDelegate(evt.EventHandlerType, this, "EventHandler2");
+			}
+			throw new ArgumentException();
+		}
+
+		void EventHandler1(T value)
+		{
+			lock (queue) {
+				queue.Add(value);
+			}
+		}
+
+		void EventHandler2(object sender, T value)
 		{
 			lock (queue) {
 				queue.Add(value);
@@ -150,6 +168,16 @@ namespace Tangerine.Core
 		}
 	}
 
+	public static class DataflowMixins
+	{
+		public static bool Poll<T>(this IDataflow<T> dataflow, out T value)
+		{
+			dataflow.Poll();
+			value = dataflow.Value;
+			return dataflow.GotValue;
+		}
+	}
+
 	public static class DataflowProviderMixins
 	{
 		public static IDataflowProvider<R> Select<T, R>(this IDataflowProvider<T> arg, Func<T, R> selector)
@@ -180,6 +208,11 @@ namespace Tangerine.Core
 		public static IDataflowProvider<T> Skip<T>(this IDataflowProvider<T> arg, int count)
 		{
 			return new DataflowProvider<T>(() => new SkipProvider<T>(arg.GetDataflow(), count));
+		}
+
+		public static Consumer<T> Consume<T>(this IDataflowProvider<T> arg, Action<T> action)
+		{
+			return new Consumer<T>(arg.GetDataflow(), action);
 		}
 
 		class SelectProvider<T, R> : IDataflow<R>
@@ -327,6 +360,31 @@ namespace Tangerine.Core
 				arg2.Poll();
 				if ((GotValue = arg1.GotValue || arg2.GotValue)) {
 					Value = EqualityComparer<T>.Default.Equals(arg1.Value, arg2.Value) ? arg1.Value : defaultValue;
+				}
+			}
+		}
+
+		public class Consumer<T>
+		{
+			readonly IDataflow<T> dataflow;
+			readonly Action<T> action;
+
+			public Consumer(IDataflow<T> dataflow, Action<T> action)
+			{
+				this.dataflow = dataflow;
+				this.action = action;
+			}
+
+			public void Execute(float delta)
+			{
+				Execute();
+			}
+
+			public void Execute()
+			{
+				dataflow.Poll();
+				if (dataflow.GotValue) {
+					action(dataflow.Value);
 				}
 			}
 		}

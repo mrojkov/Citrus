@@ -48,9 +48,9 @@ namespace Tangerine.UI.Inspector
 			var provider = KeyframeDataflow.GetProvider(context, i => i != null).DistinctUntilChanged();
 			var hasKeyframe = provider.GetDataflow();
 			while (true) {
-				hasKeyframe.Poll();
-				if (hasKeyframe.GotValue) {
-					button.Checked = hasKeyframe.Value;
+				bool @checked;
+				if (hasKeyframe.Poll(out @checked)) {
+					button.Checked = @checked;
 				}
 				if (button.WasClicked()) {
 					SetKeyframe(!hasKeyframe.Value);

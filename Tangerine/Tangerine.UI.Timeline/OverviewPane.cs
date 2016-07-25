@@ -16,10 +16,12 @@ namespace Tangerine.UI.Timeline
 
 		public OverviewPane()
 		{
-			ContentWidget = new Widget { Layout = new VBoxLayout() };
-			ContentWidget.Updated += delta => ContentWidget.Scale = CalculateZoom();
+			ContentWidget = new CustomFrame {
+				Layout = new VBoxLayout(),
+				SizeChanged = RefreshContentScale
+			};
 			overlayWidget = new Widget { Presenter = new DelegatePresenter<Widget>(RenderOverlay) };
-			RootWidget = new Frame {
+			RootWidget = new CustomFrame {
 				Id = nameof(OverviewPane),
 				LayoutCell = new LayoutCell { StretchY = 1 / 3f },
 				ClipChildren = ClipMethod.ScissorTest,
@@ -28,8 +30,14 @@ namespace Tangerine.UI.Timeline
 				Nodes = {
 					overlayWidget,
 					ContentWidget,
-				}
+				},
+				SizeChanged = RefreshContentScale
 			};
+		}
+			
+		void RefreshContentScale()
+		{
+			ContentWidget.Scale = RootWidget.Size / Vector2.Max(Vector2.One, ContentWidget.Size);
 		}
 
 		void RenderOverlay(Widget widget)
@@ -37,7 +45,7 @@ namespace Tangerine.UI.Timeline
 			var size = RootWidget.Size;
 			widget.PrepareRendererState();
 			var veilColor = Colors.Timeline.Overview.Veil;
-			var zoom = CalculateZoom();
+			var zoom = ContentWidget.Scale;
 			var a = Vector2.Floor(timeline.ScrollOrigin * zoom) + Vector2.Half;
 			var b = a + Vector2.Floor(timeline.Grid.Size * zoom) - Vector2.Half;
 			b = Vector2.Min(size - Vector2.Half, b);
@@ -48,10 +56,15 @@ namespace Tangerine.UI.Timeline
 			Renderer.DrawRectOutline(a, b, Colors.Timeline.Overview.Border, 1);
 		}
 
-		public Vector2 CalculateZoom()
+		class CustomFrame : Frame
 		{
-			Vector2 scale = RootWidget.Size / Vector2.Max(Vector2.One, ContentWidget.Size);
-			return scale;
+			public Action SizeChanged;
+
+			protected override void OnSizeChanged(Vector2 sizeDelta)
+			{
+				SizeChanged?.Invoke();
+				base.OnSizeChanged(sizeDelta);
+			}
 		}
 	}
 }

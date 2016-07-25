@@ -10,41 +10,49 @@ namespace Tangerine.UI.Inspector
 {
 	public delegate IPropertyEditor PropertyEditorBuilder(PropertyEditorContext context);
 
-	public class Inspector
+	public class Inspector : IDocumentView
 	{
 		public static Inspector Instance { get; private set; }
 
-		public readonly Widget RootWidget;
-		public readonly Frame ScrollViewWidget;
-		public readonly Widget ContentWidget;
+		public readonly Widget PanelWidget;
+		public readonly Frame RootWidget;
+		public readonly Widget ScrollableWidget;
 		public readonly List<object> Objects;
 		public readonly Dictionary<Type, PropertyEditorBuilder> EditorMap;
 		public readonly TaskList Tasks = new TaskList();
 		public readonly List<IPropertyEditor> Editors;
 
-		public static void Initialize(Widget rootWidget)
+		public void Attach()
 		{
-			Instance = new Inspector(rootWidget);
+			Instance = this;
+			PanelWidget.PushNode(RootWidget);
 		}
 
-		private Inspector(Widget rootWidget)
+		public void Detach()
 		{
-			RootWidget = rootWidget;
-			ContentWidget = new ScrollView((Frame)RootWidget).Content;
+			Instance = null;
+			RootWidget.Unlink();
+		}
+
+		public Inspector(Widget panelWidget)
+		{
+			PanelWidget = panelWidget;
+			RootWidget = new Frame();
+			RootWidget.Updating += Update;
+			ScrollableWidget = new ScrollView((Frame)RootWidget).Content;
 			Objects = new List<object>();
 			EditorMap = new Dictionary<Type, PropertyEditorBuilder>();
 			Editors = new List<IPropertyEditor>();
 			RegisterEditors();
 			InitializeWidgets();
 			CreateTasks();
-			RootWidget.Updating += Update;
 		}
 
 		void InitializeWidgets()
 		{
 			RootWidget.Layout = new StackLayout { VerticallySizeable = true };
-			ContentWidget.Layout = new VBoxLayout { Tag = "InspectorContent", Spacing = 4 };
-			ContentWidget.Padding = new Thickness(4);
+			ScrollableWidget.Layout = new VBoxLayout { Tag = "InspectorContent", Spacing = 4 };
+			ScrollableWidget.Padding = new Thickness(4);
 		}
 
 		private void RegisterEditors()

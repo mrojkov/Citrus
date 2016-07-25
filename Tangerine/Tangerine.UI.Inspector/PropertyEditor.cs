@@ -214,14 +214,13 @@ namespace Tangerine.UI.Inspector
 		public Color4PropertyEditor(PropertyEditorContext context) : base(context)
 		{
 			EditBox editor;
-			ColorBoxButton button;
 			var color = CoalescedPropertyValue<Color4>(context).DistinctUntilChanged();
 			containerWidget.AddNode(new Widget {
 				Layout = new HBoxLayout(),
 				Nodes = {
 					(editor = new EditBox { LayoutCell = new LayoutCell(Alignment.Center) }),
 					new HSpacer(4),
-					(button = new ColorBoxButton(color) { LayoutCell = new LayoutCell(Alignment.Center) }),
+					new ColorBoxButton(color) { LayoutCell = new LayoutCell(Alignment.Center) },
 				}
 			});
 			OnKeyframeToggle += editor.SetFocus;

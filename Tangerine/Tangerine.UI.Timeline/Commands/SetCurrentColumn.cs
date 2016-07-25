@@ -11,6 +11,8 @@ namespace Tangerine.UI.Timeline.Operations
 		readonly int previousColumn;
 		int currentColumn;
 
+		public bool HasModifications => false;
+
 		public SetCurrentColumn(int currentColumn)
 		{
 			previousColumn = Timeline.Instance.CurrentColumn;

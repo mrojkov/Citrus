@@ -21,12 +21,10 @@ namespace Tangerine.UI
 
 		public IEnumerator<object> Loop()
 		{
-			var i = values.GetDataflow();
-			while (true) {
-				i.Poll();
-				if (i.GotValue) {
-					Document.Current.History.Execute(new Core.Operations.SetAnimableProperty(obj, propertyName, i.Value));
-				}
+			var c = values.Consume(v =>
+				Document.Current.History.Execute(new Core.Operations.SetAnimableProperty(obj, propertyName, v)));
+			while (true) { 
+				c.Execute();
 				yield return null;
 			}
 		}

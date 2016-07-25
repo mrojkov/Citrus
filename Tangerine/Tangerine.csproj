@@ -87,6 +87,7 @@
   <ItemGroup>
     <Compile Include="TangerineApp.cs" />
     <Compile Include="Main.Mac.cs" />
+    <Compile Include="PreferencesDialog\PreferencesDialog.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
@@ -117,6 +118,10 @@
     <ProjectReference Include="Tangerine.UI.Inspector\Tangerine.UI.Inspector.csproj">
       <Project>{D6B543CB-0223-4210-BB0F-7D8250760895}</Project>
       <Name>Tangerine.UI.Inspector</Name>
+    </ProjectReference>
+    <ProjectReference Include="Tangerine.UI.SceneView\Tangerine.UI.SceneView.csproj">
+      <Project>{80486551-A659-42B0-AADA-165C54E9B0AF}</Project>
+      <Name>Tangerine.UI.SceneView</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -189,5 +194,8 @@
     <EmbeddedResource Include="Resources\Icons\Timeline\Interpolation\SplineGrayed.png" />
     <EmbeddedResource Include="Resources\Icons\PopupClose.png" />
     <EmbeddedResource Include="Resources\Icons\PopupCloseHover.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="PreferencesDialog\" />
   </ItemGroup>
 </Project>

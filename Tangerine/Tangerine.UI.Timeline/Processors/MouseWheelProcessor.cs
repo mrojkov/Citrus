@@ -11,7 +11,7 @@ namespace Tangerine.UI.Timeline
 		public IEnumerator<object> Loop()
 		{
 			while (true) {
-				var widget = timeline.RootWidget;
+				var widget = timeline.PanelWidget;
 				var wheelDown = widget.Input.WasKeyPressed(Key.MouseWheelDown);
 				var wheelUp = widget.Input.WasKeyPressed(Key.MouseWheelUp);
 				if (wheelDown) {

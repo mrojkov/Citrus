@@ -10,6 +10,8 @@ namespace Tangerine.UI.Timeline.Operations
 	{
 		IntVector2 offset;
 
+		public bool HasModifications => false;
+
 		public ShiftSelection(IntVector2 offset)
 		{
 			this.offset = offset;

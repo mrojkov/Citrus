@@ -14,7 +14,7 @@ namespace Tangerine.UI.Timeline
 			var input = timeline.Grid.RootWidget.Input;
 			while (true) {
 				if (input.IsMouseOwner()) {
-					var rect = timeline.Grid.RootWidget.CalcAABBInSpaceOf(timeline.RootWidget);
+					var rect = timeline.Grid.RootWidget.CalcAABBInSpaceOf(timeline.PanelWidget);
 					if (input.MousePosition.X > rect.B.X) {
 						timeline.ScrollOrigin.X += Metrics.TimelineColWidth;
 					} else if (input.MousePosition.X < rect.A.X) {

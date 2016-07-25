@@ -1,25 +1,23 @@
 ﻿using System;
 using Lime;
+using Tangerine.Core;
 
 namespace Tangerine.UI
 {
-	public class Console
+	public class Console : IDocumentView
 	{
 		public static Console Instance { get; private set; }
 
-		public readonly Widget RootWidget;
+		public readonly Widget PanelWidget;
+		public readonly Frame RootWidget;
 		public readonly Frame ScrollViewWidget;
 		public readonly Widget ContentWidget;
 
-		public static void Initialize(Widget rootWidget)
+		public Console(Widget rootWidget)
 		{
-			Instance = new Console(rootWidget);
-		}
-
-		private Console(Widget rootWidget)
-		{
-			RootWidget = rootWidget;
-			ContentWidget = new ScrollView((Frame)RootWidget).Content;
+			PanelWidget = rootWidget;
+			RootWidget = new Frame { Layout = new StackLayout { VerticallySizeable = true } };
+			ContentWidget = new ScrollView(RootWidget).Content;
 			InitializeWidgets();
 			Logger.OnWrite += text => {
 				var widget = new SimpleText {
@@ -35,12 +33,22 @@ namespace Tangerine.UI
 			};
 		}
 
+		public void Attach()
+		{
+			Instance = this;
+			PanelWidget.PushNode(RootWidget);
+		}
+
+		public void Detach()
+		{
+			Instance = null;
+			RootWidget.Unlink();
+		}
+
 		void InitializeWidgets()
 		{
-			RootWidget.Layout = new StackLayout { VerticallySizeable = true };
 			ContentWidget.Layout = new VBoxLayout { Tag = "ConsoleContent", Spacing = 4 };
 			ContentWidget.Padding = new Thickness(4);
 		}
 	}
 }
-

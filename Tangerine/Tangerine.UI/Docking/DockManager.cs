@@ -18,18 +18,21 @@ namespace Tangerine.UI
 
 	public class DockManager
 	{
-		List<DockPanel> panels = new List<DockPanel>();
-		WindowWidget mainWidget;
-		Widget documentArea;
-		Menu padsMenu;
+		readonly List<DockPanel> panels = new List<DockPanel>();
+		readonly WindowWidget mainWidget;
+		readonly Menu padsMenu;
 
+		public readonly Widget DocumentArea;
+
+		public event Func<bool> Closing;
 		public event Action Closed;
 
 		public DockManager(Vector2 windowSize, Menu padsMenu)
 		{
 			this.padsMenu = padsMenu;
-			var window = new Window(new WindowOptions { ClientSize = windowSize, FixedSize = false, RefreshRate = 60 });
-			window.Closed += () => Closed?.Invoke();
+			var window = new Window(new WindowOptions { ClientSize = windowSize, FixedSize = false, RefreshRate = 30, Title = "Tangerine" });
+			window.Closing += () => Closing();
+			window.Closed += () => Closed();
 			mainWidget = new DefaultWindowWidget(window, continuousRendering: false) {
 				Id = "MainWindow",
 				Layout = new HBoxLayout(),
@@ -37,12 +40,16 @@ namespace Tangerine.UI
 				CornerBlinkOnRendering = true
 			};
 			new TabTraverseController(mainWidget);
-			documentArea = new Widget { PostPresenter = new WidgetFlatFillPresenter(Color4.Gray) };
+			DocumentArea = new Frame {
+				ClipChildren = ClipMethod.ScissorTest,
+				TabTraverseScope = new TabTraverseScope()
+			};
+			DocumentArea.CompoundPresenter.Add(new WidgetFlatFillPresenter(Color4.Gray));
 		}
 
 		public void AddPanel(DockPanel panel, DockSite site, Vector2 size)
 		{
-			padsMenu.Add(new Command(panel.Title, () => ShowPanel(panel)));
+			padsMenu.Add(new DelegateCommand(panel.Title, () => ShowPanel(panel)));
 			padsMenu.Refresh();
 			var dockedSize = mainWidget.Size / size;
 			panel.Placement = new DockPanel.PanelPlacement { Title = panel.Title, Site = site, DockedSize = dockedSize, Docked = true, UndockedSize = size };
@@ -88,7 +95,7 @@ namespace Tangerine.UI
 		void RefreshDockedPanels()
 		{
 			mainWidget.Nodes.Clear();
-			documentArea.Unlink();
+			DocumentArea.Unlink();
 			var currentContainer = (Widget)mainWidget;
 			int insertAt = 0;
 			var stretch = Vector2.Zero;
@@ -110,8 +117,8 @@ namespace Tangerine.UI
 					p.RootWidget.Unlink();
 				}
 			}
-			documentArea.LayoutCell = new LayoutCell { Stretch = Vector2.One - stretch };
-			currentContainer.Nodes.Insert(insertAt, documentArea);
+			DocumentArea.LayoutCell = new LayoutCell { Stretch = Vector2.One - stretch };
+			currentContainer.Nodes.Insert(insertAt, DocumentArea);
 		}
 
 		void RefreshUndockedPanels()

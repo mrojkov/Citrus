@@ -59,7 +59,7 @@ namespace Tangerine.UI.Timeline
 							}
 							var destRowComponents = Timeline.Instance.Rows[destRow].Components;
 							var destNode = destRowComponents.Get<NodeRow>()?.Node ?? destRowComponents.Get<PropertyRow>()?.Node;
-							if (destNode == null || !PropertiesAreCompatible(node, destNode, a.TargetProperty)) {
+							if (destNode == null || !ArePropertiesCompatible(node, destNode, a.TargetProperty)) {
 								continue;
 							}
 							if (k.Frame + offset.X >= 0) {
@@ -79,7 +79,7 @@ namespace Tangerine.UI.Timeline
 			return row >= 0 && row < Timeline.Instance.Rows.Count;
 		}
 
-		static bool PropertiesAreCompatible(object object1, object object2, string property)
+		static bool ArePropertiesCompatible(object object1, object object2, string property)
 		{
 			var m1 = object1.GetType().GetProperty(property)?.GetSetMethod();
 			var m2 = object2.GetType().GetProperty(property)?.GetSetMethod();

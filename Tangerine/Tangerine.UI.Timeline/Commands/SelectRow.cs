@@ -14,6 +14,8 @@ namespace Tangerine.UI.Timeline.Operations
 		readonly Row row;
 		readonly bool select;
 
+		public bool HasModifications => false;
+
 		public SelectRow(Row row, bool select = true)
 		{
 			this.select = select;

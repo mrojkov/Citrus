@@ -13,7 +13,7 @@ namespace Tangerine.UI.Timeline
 		public IEnumerator<object> Loop()
 		{
 			while (true) {
-				var input = timeline.RootWidget.Input;
+				var input = timeline.PanelWidget.Input;
 				HandleShortcuts(input);
 				HorizontalScroll(input);
 				VerticalScroll(input);

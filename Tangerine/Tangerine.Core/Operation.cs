@@ -9,6 +9,7 @@ namespace Tangerine.Core
 	{
 		void Do();
 		void Undo();
+		bool HasModifications { get; }
 	}
 
 	public class DelegateOperation : IOperation
@@ -16,10 +17,13 @@ namespace Tangerine.Core
 		readonly Action @do;
 		readonly Action undo;
 
-		public DelegateOperation(Action @do, Action undo)
+		public bool HasModifications { get; private set; }
+
+		public DelegateOperation(Action @do, Action undo, bool hasModifications = false)
 		{
 			this.@do = @do;
 			this.undo = undo;
+			this.HasModifications = hasModifications;
 		}
 
 		public void Do() => @do?.Invoke();
@@ -28,11 +32,14 @@ namespace Tangerine.Core
 
 	public class CompoundOperation : IOperation
 	{
-		List<IOperation> operations = new List<IOperation>();
+		readonly List<IOperation> operations = new List<IOperation>();
+
+		public bool HasModifications { get; private set; }
 
 		public void Add(IOperation operation)
 		{
 			operations.Add(operation);
+			HasModifications |= operation.HasModifications;
 		}
 
 		public void Insert(int index, IOperation operation)
@@ -59,6 +66,7 @@ namespace Tangerine.Core
 	{
 		readonly List<IOperation> history = new List<IOperation>();
 
+		public bool HasModifications { get; set; }
 		public abstract void Do();
 
 		public void Undo()
@@ -73,6 +81,7 @@ namespace Tangerine.Core
 		{
 			history.Add(operation);
 			operation.Do();
+			HasModifications |= operation.HasModifications;
 		}
 
 		protected void AddUndoAction(Action undo)

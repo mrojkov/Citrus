@@ -13,7 +13,7 @@ namespace Tangerine.UI.Timeline
 			var input = timeline.Roll.RootWidget.Input;
 			while (true) {
 				if (input.IsMouseOwner()) {
-					var rect = timeline.Roll.RootWidget.CalcAABBInSpaceOf(timeline.RootWidget);
+					var rect = timeline.Roll.RootWidget.CalcAABBInSpaceOf(timeline.PanelWidget);
 					if (input.MousePosition.Y > rect.B.Y) {
 						timeline.ScrollOrigin.Y += Metrics.TimelineDefaultRowHeight;
 					} else if (input.MousePosition.Y < rect.A.Y) {

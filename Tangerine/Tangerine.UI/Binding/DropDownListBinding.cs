@@ -19,12 +19,9 @@ namespace Tangerine.UI
 
 		public IEnumerator<object> Loop()
 		{
-			var dataflow = source.GetDataflow();
+			var c = source.Consume(v => dropDownList.Value = v);
 			while (true) {
-				dataflow.Poll();
-				if (dataflow.GotValue) {
-					dropDownList.Value = dataflow.Value;
-				}
+				c.Execute();
 				yield return null;
 			}
 		}

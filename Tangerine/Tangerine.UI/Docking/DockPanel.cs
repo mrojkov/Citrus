@@ -35,7 +35,7 @@ namespace Tangerine.UI
 				},
 				HitTestTarget = true
 			};
-			ContentWidget = new Frame { ClipChildren = ClipMethod.ScissorTest };
+			ContentWidget = new Frame { ClipChildren = ClipMethod.ScissorTest, Layout = new StackLayout() };
 			RootWidget = new Widget {
 				LayoutCell = new LayoutCell(),
 				Layout = new VBoxLayout(),

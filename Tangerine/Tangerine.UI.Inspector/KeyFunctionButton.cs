@@ -50,14 +50,14 @@ namespace Tangerine.UI.Inspector
 			var provider = KeyframeDataflow.GetProvider(context, i => i?.Function).DistinctUntilChanged();
 			var keyFunction = provider.GetDataflow();
 			while (true) {
-				keyFunction.Poll();
-				if (keyFunction.GotValue) {
-					if ((button.Visible = keyFunction.Value.HasValue)) {
-						button.SetKeyFunction(keyFunction.Value.Value);
+				KeyFunction? v; 
+				if (keyFunction.Poll(out v)) {
+					if ((button.Visible = v.HasValue)) {
+						button.SetKeyFunction(v.Value);
 					}
 				}
 				if (button.WasClicked()) {
-					SetKeyFunction(NextKeyFunction(keyFunction.Value.GetValueOrDefault()));
+					SetKeyFunction(NextKeyFunction(v.GetValueOrDefault()));
 				}
 				yield return null;
 			}
