@@ -79,11 +79,11 @@
     <Compile Include="Rulerbar.cs" />
     <Compile Include="Timeline.cs" />
     <Compile Include="Toolbar.cs" />
-    <Compile Include="Commands\ClearGridSelection.cs" />
-    <Compile Include="Commands\SelectRectangleOnGrid.cs" />
-    <Compile Include="Commands\SelectRow.cs" />
-    <Compile Include="Commands\SetCurrentColumn.cs" />
-    <Compile Include="Commands\ShiftSelection.cs" />
+    <Compile Include="Operations\ClearGridSelection.cs" />
+    <Compile Include="Operations\SelectRectangleOnGrid.cs" />
+    <Compile Include="Operations\SelectRow.cs" />
+    <Compile Include="Operations\SetCurrentColumn.cs" />
+    <Compile Include="Operations\ShiftSelection.cs" />
     <Compile Include="Components\Model\CurveRow.cs" />
     <Compile Include="Components\Model\NodeRow.cs" />
     <Compile Include="Components\Model\PropertyRow.cs" />
@@ -101,10 +101,10 @@
     <Compile Include="MarkerPropertiesDialog.cs" />
     <Compile Include="Processors\Rulerbar\EditMarkerProcessor.cs" />
     <Compile Include="Processors\Rulerbar\RulerMouseScrollProcessor.cs" />
-    <Compile Include="Commands\ClearRowSelection.cs" />
-    <Compile Include="Commands\DragRows.cs" />
-    <Compile Include="Commands\SelectRowRange.cs" />
-    <Compile Include="Commands\SetCurrentContainer.cs" />
+    <Compile Include="Operations\ClearRowSelection.cs" />
+    <Compile Include="Operations\DragRows.cs" />
+    <Compile Include="Operations\SelectRowRange.cs" />
+    <Compile Include="Operations\SetCurrentContainer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.csproj">
