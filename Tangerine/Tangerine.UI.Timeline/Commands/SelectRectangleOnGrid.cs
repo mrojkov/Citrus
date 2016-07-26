@@ -12,9 +12,15 @@ namespace Tangerine.UI.Timeline.Operations
 		GridSelection savedSelection;
 		IntRectangle rect;
 
-		public bool HasModifications => false;
+		public bool IsChangingDocument => false;
+		public DateTime Timestamp { get; set; }
 
-		public SelectRectangleOnGrid(IntRectangle rect)
+		public static void Perform(IntRectangle rect)
+		{
+			Document.Current.History.Perform(new SelectRectangleOnGrid(rect));
+		}
+
+		private SelectRectangleOnGrid(IntRectangle rect)
 		{
 			this.rect = rect;
 		}

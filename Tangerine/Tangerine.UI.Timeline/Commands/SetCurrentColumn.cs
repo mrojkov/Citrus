@@ -11,9 +11,15 @@ namespace Tangerine.UI.Timeline.Operations
 		readonly int previousColumn;
 		int currentColumn;
 
-		public bool HasModifications => false;
+		public bool IsChangingDocument => false;
+		public DateTime Timestamp { get; set; }
 
-		public SetCurrentColumn(int currentColumn)
+		public static void Perform(int currentColumn)
+		{
+			Document.Current.History.Perform(new SetCurrentColumn(currentColumn));
+		}
+
+		private SetCurrentColumn(int currentColumn)
 		{
 			previousColumn = Timeline.Instance.CurrentColumn;
 			this.currentColumn = currentColumn;

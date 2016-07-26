@@ -33,8 +33,7 @@ namespace Tangerine.UI.Timeline
 				Document.Current.History.Undo();
 			} else if (input.WasKeyRepeated(Key.SelectAll)) {
 				foreach (var row in timeline.Rows) {
-					Document.Current.History.Add(new Operations.SelectRow(row, true));
-					Document.Current.History.Commit();
+					Operations.SelectRow.Perform(row, true);
 				}
 			}
 		}
@@ -45,11 +44,11 @@ namespace Tangerine.UI.Timeline
 			if (input.WasKeyPressed(KeyBindings.Timeline.EnterNode)) {
 				var node = timeline.SelectedRows.Select(i => i.Components.Get<Components.NodeRow>()).FirstOrDefault(i => i != null).Node;
 				if (node != null) {
-					doc.History.Execute(new Operations.SetCurrentContainer(node));
+					Operations.SetCurrentContainer.Perform(node);
 				}
 			} else if (input.WasKeyPressed(KeyBindings.Timeline.ExitNode)) {
 				if (timeline.Container.Parent != null) {
-					doc.History.Execute(new Operations.SetCurrentContainer(timeline.Container.Parent));
+					Operations.SetCurrentContainer.Perform(timeline.Container.Parent);
 				}
 			}
 		}
@@ -77,13 +76,12 @@ namespace Tangerine.UI.Timeline
 			var nextRow = timeline.Rows[Mathf.Clamp(lastSelectedRow.Index + advance, 0, timeline.Rows.Count - 1)];
 			if (nextRow != lastSelectedRow) {
 				if (!multiselection) {
-					doc.History.Add(new Operations.ClearRowSelection());
+					Operations.ClearRowSelection.Perform();
 				}
 				if (timeline.SelectedRows.Contains(nextRow)) {
-					doc.History.Add(new Operations.SelectRow(lastSelectedRow, false));
+					Operations.SelectRow.Perform(lastSelectedRow, false);
 				}
-				doc.History.Add(new Operations.SelectRow(nextRow));
-				doc.History.Commit();
+				Operations.SelectRow.Perform(nextRow);
 				timeline.EnsureRowVisible(nextRow);
 			}
 		}
@@ -101,7 +99,7 @@ namespace Tangerine.UI.Timeline
 				stride = -1;
 			}
 			if (stride != 0) {
-				Document.Current.History.Execute(new Operations.SetCurrentColumn(Math.Max(0, timeline.CurrentColumn + stride)));
+				Operations.SetCurrentColumn.Perform(Math.Max(0, timeline.CurrentColumn + stride));
 			}
 		}		
 	}	

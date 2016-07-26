@@ -31,20 +31,17 @@ namespace Tangerine.UI.Timeline
 				var row = MousePositionToRow(initialMousePosition);
 				if (input.IsKeyPressed(Key.LShift)) {
 					if (timeline.SelectedRows.Count > 0) {
-						Document.Current.History.Execute(
-							new Operations.ClearRowSelection(), 
-							new Operations.SelectRowRange(timeline.SelectedRows[0], row));
+						Operations.ClearRowSelection.Perform();
+						Operations.SelectRowRange.Perform(timeline.SelectedRows[0], row);
 					} else {
-						Document.Current.History.Execute(
-							new Operations.ClearRowSelection(), 
-							new Operations.SelectRow(row));
+						Operations.ClearRowSelection.Perform();
+						Operations.SelectRow.Perform(row);
 					}
 				} else {
 					input.CaptureMouse();
 					if (!timeline.SelectedRows.Contains(row)) {
-						Document.Current.History.Execute(
-							new Operations.ClearRowSelection(), 
-							new Operations.SelectRow(row));
+						Operations.ClearRowSelection.Perform();
+						Operations.SelectRow.Perform(row);
 					}
 					while (input.IsMousePressed() && Math.Abs(initialMousePosition.Y - input.MousePosition.Y) < Metrics.TimelineDefaultRowHeight / 4) {
 						yield return null;
@@ -68,7 +65,7 @@ namespace Tangerine.UI.Timeline
 			}
 			roll.OnRenderOverlay -= RenderDragCursor;
 			Window.Current.Invalidate();
-			Document.Current.History.Execute(new Operations.DragRows(dragPosition));
+			Operations.DragRows.Perform(dragPosition);
 		}
 
 		private void RenderDragCursor(Widget widget)

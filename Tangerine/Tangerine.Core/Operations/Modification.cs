@@ -13,9 +13,15 @@ namespace Tangerine.Core.Operations
 		readonly PropertyInfo property;
 		object savedValue;
 
-		public bool HasModifications => true;
+		public bool IsChangingDocument => true;
+		public DateTime Timestamp { get; set; }
 
-		public SetProperty(object obj, string propertyName, object value)
+		public static void Perform(object obj, string propertyName, object value)
+		{
+			Document.Current.History.Perform(new SetProperty(obj, propertyName, value));
+		}
+
+		private SetProperty(object obj, string propertyName, object value)
 		{
 			this.obj = obj;
 			this.value = value;
@@ -42,9 +48,15 @@ namespace Tangerine.Core.Operations
 		T value;
 		T savedValue;
 
-		public bool HasModifications => true;
+		public bool IsChangingDocument => true;
+		public DateTime Timestamp { get; set; }
 
-		public SetGenericProperty(Func<T> getter, Action<T> setter, T value)
+		public static void Perform(Func<T> getter, Action<T> setter, T value)
+		{
+			Document.Current.History.Perform(new SetGenericProperty<T>(getter, setter, value));
+		}
+
+		private SetGenericProperty(Func<T> getter, Action<T> setter, T value)
 		{
 			this.value = value;
 			this.getter = getter;
@@ -63,11 +75,11 @@ namespace Tangerine.Core.Operations
 		}
 	}
 
-	public class SetAnimableProperty : CompoundOperation
+	public class SetAnimableProperty
 	{
-		public SetAnimableProperty(object @object, string propertyName, object value)
+		public static void Perform(object @object, string propertyName, object value)
 		{
-			Add(new SetProperty(@object, propertyName, value));
+			SetProperty.Perform(@object, propertyName, value);
 			IAnimator animator;
 			var animable = @object as IAnimable;
 			if (animable != null && animable.Animators.TryFind(propertyName, out animator, Document.Current.AnimationId)) {
@@ -77,7 +89,7 @@ namespace Tangerine.Core.Operations
 					Keyframe.CreateForType(type);
 				key.Frame = Document.Current.AnimationFrame;
 				key.Value = value;
-				Add(new SetKeyframe(animable, propertyName, Document.Current.AnimationId, key));
+				SetKeyframe.Perform(animable, propertyName, Document.Current.AnimationId, key);
 			}
 		}
 	}
@@ -88,9 +100,15 @@ namespace Tangerine.Core.Operations
 		readonly IAnimator animator;
 		IKeyframe savedKeyframe;
 
-		public bool HasModifications => true;
+		public bool IsChangingDocument => true;
+		public DateTime Timestamp { get; set; }
 
-		public RemoveKeyframe(IAnimator animator, int frame)
+		public static void Perform(IAnimator animator, int frame)
+		{
+			Document.Current.History.Perform(new RemoveKeyframe(animator, frame));
+		}
+
+		private RemoveKeyframe(IAnimator animator, int frame)
 		{
 			this.frame = frame;
 			this.animator = animator;
@@ -119,9 +137,15 @@ namespace Tangerine.Core.Operations
 		bool animatorExists;
 		IAnimator animator;
 
-		public bool HasModifications => true;
+		public bool IsChangingDocument => true;
+		public DateTime Timestamp { get; set; }
 
-		public SetKeyframe(IAnimable animable, string propertyName, string animationId, IKeyframe keyframe)
+		public static void Perform(IAnimable animable, string propertyName, string animationId, IKeyframe keyframe)
+		{
+			Document.Current.History.Perform(new SetKeyframe(animable, propertyName, animationId, keyframe));
+		}
+
+		private SetKeyframe(IAnimable animable, string propertyName, string animationId, IKeyframe keyframe)
 		{
 			this.animable = animable;
 			this.propertyName = propertyName;
@@ -157,9 +181,15 @@ namespace Tangerine.Core.Operations
 		readonly int index;
 		readonly Node node;
 
-		public bool HasModifications => true;
+		public bool IsChangingDocument => true;
+		public DateTime Timestamp { get; set; }
 
-		public InsertNode(Node container, int index, Node node)
+		public static void Perform(Node container, int index, Node node)
+		{
+			Document.Current.History.Perform(new InsertNode(container, index, node));
+		}
+
+		private InsertNode(Node container, int index, Node node)
 		{
 			this.container = container;
 			this.index = index;
@@ -183,9 +213,15 @@ namespace Tangerine.Core.Operations
 		int savedIndex;
 		Node container;
 
-		public bool HasModifications => true;
+		public bool IsChangingDocument => true;
+		public DateTime Timestamp { get; set; }
 
-		public UnlinkNode(Node node)
+		public static void Perform(Node node)
+		{
+			Document.Current.History.Perform(new UnlinkNode(node));
+		}
+
+		private UnlinkNode(Node node)
 		{
 			this.node = node;
 		}

@@ -10,9 +10,15 @@ namespace Tangerine.UI.Timeline.Operations
 	{
 		IntVector2 offset;
 
-		public bool HasModifications => false;
+		public bool IsChangingDocument => false;
+		public DateTime Timestamp { get; set; }
 
-		public ShiftSelection(IntVector2 offset)
+		public static void Perform(IntVector2 offset)
+		{
+			Document.Current.History.Perform(new ShiftSelection(offset));
+		}
+
+		private ShiftSelection(IntVector2 offset)
 		{
 			this.offset = offset;
 		}

@@ -6,29 +6,26 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.Timeline.Operations
 {
-	public class SetCurrentContainer : InteractiveOperation
+	public static class SetCurrentContainer
 	{
-		readonly Node container;
-
-		public SetCurrentContainer(Node node)
+		public static void Perform(Node container)
 		{
-			this.container = node;
-		}
-
-		public override void Do()
-		{
+			var timeline = Timeline.Instance;
 			var prevContainer = Timeline.Instance.Container;
-			Timeline.Instance.Container = container;
-			Timeline.Instance.EnsureColumnVisible(Document.Current.AnimationFrame);
-			AddUndoAction(() => {
-				Timeline.Instance.Container = prevContainer;
-				Timeline.Instance.EnsureColumnVisible(Document.Current.AnimationFrame);
-				prevContainer = null;
-			});
-			Execute(new ClearRowSelection());
+			DelegateOperation.Perform(
+				() => {
+					timeline.Container = container;
+					timeline.EnsureColumnVisible(Document.Current.AnimationFrame);
+				},
+				() => {
+					timeline.Container = prevContainer;
+					timeline.EnsureColumnVisible(Document.Current.AnimationFrame);
+				}
+			);
+			ClearRowSelection.Perform();
 			if (container.Nodes.Count > 0) {
-				var r = Timeline.Instance.GetCachedRow(container.Nodes[0].EditorState().Uid);
-				Execute(new SelectRow(r));
+				var r = timeline.GetCachedRow(container.Nodes[0].EditorState().Uid);
+				SelectRow.Perform(r);
 			}
 		}
 	}

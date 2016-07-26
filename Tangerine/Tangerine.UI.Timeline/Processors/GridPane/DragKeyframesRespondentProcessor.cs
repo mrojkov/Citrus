@@ -25,13 +25,13 @@ namespace Tangerine.UI.Timeline
 
 		static void ShiftSelection(IntVector2 offset)
 		{
-			Document.Current.History.Add(new Operations.ShiftSelection(offset));
+			Operations.ShiftSelection.Perform(offset);
 		}
 
 		static void DragKeys(IntVector2 offset, GridSelection selection)
 		{
 			var processedKeys = new HashSet<IKeyframe>();
-			var commands = new CompoundOperation();
+			var operations = new List<Action>();
 			foreach (var rect in Timeline.Instance.GridSelection.GetNonOverlappedRects()) {
 				for (int row = rect.A.Y; row < rect.B.Y; row++) {
 					if (!CheckRowRange(row)) {
@@ -52,7 +52,7 @@ namespace Tangerine.UI.Timeline
 								continue;
 							}
 							processedKeys.Add(k);
-							commands.Insert(0, new Core.Operations.RemoveKeyframe(a, k.Frame));
+							operations.Insert(0, () => Core.Operations.RemoveKeyframe.Perform(a, k.Frame));
 							var destRow = row + offset.Y;
 							if (!CheckRowRange(destRow)) {
 								continue;
@@ -65,13 +65,15 @@ namespace Tangerine.UI.Timeline
 							if (k.Frame + offset.X >= 0) {
 								var k1 = k.Clone();
 								k1.Frame += offset.X;
-								commands.Add(new Core.Operations.SetKeyframe(destNode, a.TargetProperty, Document.Current.AnimationId, k1));
+								operations.Add(() => Core.Operations.SetKeyframe.Perform(destNode, a.TargetProperty, Document.Current.AnimationId, k1));
 							}
 						}
 					}
 				}
 			}
-			Document.Current.History.Add(commands);
+			foreach (var o in operations) {
+				o();
+			}
 		}
 
 		static bool CheckRowRange(int row)

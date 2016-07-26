@@ -144,7 +144,7 @@ namespace Tangerine
 				doc.Views.Add(new UI.Timeline.Timeline(timelinePanel.ContentWidget));
 				doc.Views.Add(new UI.SceneView.SceneView(documentViewContainer));
 				doc.Views.Add(new UI.Console(consolePanel.ContentWidget));
-				doc.History.OnCommit += () => CommonWindow.Current.Invalidate();
+				doc.History.Changed += () => CommonWindow.Current.Invalidate();
 			};
 			if (Preferences.RecentProjects.Count > 0) {
 				Project.SetCurrent(new Project(Preferences.RecentProjects[0]));

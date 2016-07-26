@@ -10,7 +10,15 @@ namespace Tangerine.UI.Timeline.Operations
 	{
 		GridSelection savedSelection;
 
-		public bool HasModifications => false;
+		public bool IsChangingDocument => false;
+		public DateTime Timestamp { get; set; }
+
+		public static void Perform()
+		{
+			Document.Current.History.Perform(new ClearGridSelection());
+		}
+
+		private ClearGridSelection() {}
 
 		public void Do()
 		{

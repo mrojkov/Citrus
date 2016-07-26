@@ -6,12 +6,12 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.Timeline.Operations
 {
-	public class ClearRowSelection : InteractiveOperation
+	public static class ClearRowSelection
 	{
-		public override void Do()
+		public static void Perform()
 		{
 			foreach (var i in Timeline.Instance.SelectedRows.ToList()) {
-				Execute(new SelectRow(i, false));
+				SelectRow.Perform(i, false);
 			}
 		}
 	}

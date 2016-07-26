@@ -32,7 +32,7 @@ namespace Tangerine.UI.Timeline
 					}
 					var currentColumn = timeline.CurrentColumn;
 					timeline.CurrentColumn = initialColumn;
-					Document.Current.History.Execute(new Operations.SetCurrentColumn(currentColumn));
+					Operations.SetCurrentColumn.Perform(currentColumn);
 				}
 				yield return null;
 			}

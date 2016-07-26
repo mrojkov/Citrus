@@ -35,7 +35,7 @@ namespace Tangerine.Core
 		public string Path { get; private set; }
 		public readonly DocumentHistory History;
 		public bool ReadOnly { get; private set; }
-		public bool IsModified => History.UndoEnabled;
+		public bool IsModified => History.IsDocumentModified;
 
 		public event Func<CloseAction> Closing;
 		public event Action<Document> Closed;

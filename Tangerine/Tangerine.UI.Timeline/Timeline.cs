@@ -60,7 +60,6 @@ namespace Tangerine.UI.Timeline
 
 		void InitializeWidgets()
 		{
-			RootWidget.Updating += delta => Document.Current.History.Commit();
 			RootWidget.Layout = new StackLayout();
 			RootWidget.AddNode(new VSplitter {
 				Nodes = {
@@ -142,7 +141,7 @@ namespace Tangerine.UI.Timeline
 		void SelectFirstRow()
 		{
 			var r = GetCachedRow(Container.Nodes[0].EditorState().Uid);
-			Document.Current.History.Execute(new Operations.SelectRow(r));
+			Operations.SelectRow.Perform(r);
 		}
 
 		public Row GetCachedRow(Uid uid)

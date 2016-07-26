@@ -75,7 +75,6 @@ namespace Tangerine.UI.Inspector
 		void Update(float delta)
 		{
 			Tasks.Update(delta);
-			Document.Current.History.Commit();
 		}
 	}
 }

@@ -47,7 +47,7 @@ namespace Tangerine.UI.Timeline.Components
 			var s = propRow.Animator.EditorState();
 			button.Updated += delta => button.Checked = s.CurvesShown;
 			button.Clicked += () => {
-				Document.Current.History.Execute(new Core.Operations.SetGenericProperty<bool>(() => s.CurvesShown, value => s.CurvesShown = value, !s.CurvesShown));
+				Core.Operations.SetGenericProperty<bool>.Perform(() => s.CurvesShown, value => s.CurvesShown = value, !s.CurvesShown);
 			};
 			return button;
 		}

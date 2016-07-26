@@ -80,12 +80,9 @@
     <Compile Include="Timeline.cs" />
     <Compile Include="Toolbar.cs" />
     <Compile Include="Commands\ClearGridSelection.cs" />
-    <Compile Include="Commands\ClearRowSelection.cs" />
-    <Compile Include="Commands\DragRows.cs" />
     <Compile Include="Commands\SelectRectangleOnGrid.cs" />
     <Compile Include="Commands\SelectRow.cs" />
     <Compile Include="Commands\SetCurrentColumn.cs" />
-    <Compile Include="Commands\SetCurrentContainer.cs" />
     <Compile Include="Commands\ShiftSelection.cs" />
     <Compile Include="Components\Model\CurveRow.cs" />
     <Compile Include="Components\Model\NodeRow.cs" />
@@ -104,6 +101,10 @@
     <Compile Include="MarkerPropertiesDialog.cs" />
     <Compile Include="Processors\Rulerbar\EditMarkerProcessor.cs" />
     <Compile Include="Processors\Rulerbar\RulerMouseScrollProcessor.cs" />
+    <Compile Include="Commands\ClearRowSelection.cs" />
+    <Compile Include="Commands\DragRows.cs" />
+    <Compile Include="Commands\SelectRowRange.cs" />
+    <Compile Include="Commands\SetCurrentContainer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.csproj">

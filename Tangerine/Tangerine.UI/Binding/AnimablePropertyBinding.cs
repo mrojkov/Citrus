@@ -21,8 +21,7 @@ namespace Tangerine.UI
 
 		public IEnumerator<object> Loop()
 		{
-			var c = values.Consume(v =>
-				Document.Current.History.Execute(new Core.Operations.SetAnimableProperty(obj, propertyName, v)));
+			var c = values.Consume(v => Core.Operations.SetAnimableProperty.Perform(obj, propertyName, v));
 			while (true) { 
 				c.Execute();
 				yield return null;

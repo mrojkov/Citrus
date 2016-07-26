@@ -14,9 +14,15 @@ namespace Tangerine.UI.Timeline.Operations
 		readonly Row row;
 		readonly bool select;
 
-		public bool HasModifications => false;
+		public bool IsChangingDocument => false;
+		public DateTime Timestamp { get; set; }
 
-		public SelectRow(Row row, bool select = true)
+		public static void Perform(Row row, bool select = true)
+		{
+			Document.Current.History.Perform(new SelectRow(row, select));
+		}
+
+		private SelectRow(Row row, bool select)
 		{
 			this.select = select;
 			this.row = row;
@@ -41,22 +47,6 @@ namespace Tangerine.UI.Timeline.Operations
 				sr.RemoveAt(0);
 			} else if (lastIndex >= 0) {
 				sr.Insert(lastIndex, row);
-			}
-		}
-	}
-
-	public class SelectRowRange : CompoundOperation
-	{
-		public SelectRowRange(Row startRow, Row endRow)
-		{
-			if (endRow.Index >= startRow.Index) {
-				for (int i = startRow.Index; i <= endRow.Index; i++) {
-					Add(new SelectRow(Timeline.Instance.Rows[i]));
-				}
-			} else {
-				for (int i = startRow.Index; i >= endRow.Index; i--) {
-					Add(new SelectRow(Timeline.Instance.Rows[i]));
-				}
 			}
 		}
 	}

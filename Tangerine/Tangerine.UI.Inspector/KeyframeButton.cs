@@ -68,16 +68,15 @@ namespace Tangerine.UI.Inspector
 				if (animable.Animators.TryFind(context.PropertyName, out animator, Document.Current.AnimationId)) {
 					hasKey = animator.ReadonlyKeys.Any(i => i.Frame == Document.Current.AnimationFrame);
 					if (hasKey && !value) {
-						Document.Current.History.Add(new Core.Operations.RemoveKeyframe(animator, Document.Current.AnimationFrame)); 
+						Core.Operations.RemoveKeyframe.Perform(animator, Document.Current.AnimationFrame); 
 					}
 				}
 				if (!hasKey && value) {
 					var propValue = new Property(animable, context.PropertyName).Getter();
 					keyframe = Keyframe.CreateForType(context.PropertyInfo.PropertyType, Document.Current.AnimationFrame, propValue);
-					Document.Current.History.Add(new Core.Operations.SetKeyframe(animable, context.PropertyName, Document.Current.AnimationId, keyframe)); 
+					Core.Operations.SetKeyframe.Perform(animable, context.PropertyName, Document.Current.AnimationId, keyframe);
 				}
 			}
-			Document.Current.History.Commit();
 		}
 	}
 }
