@@ -968,7 +968,7 @@ namespace Lime
 		private static RenderChain renderChain = new RenderChain();
 
 		/// <summary>
-		/// Peforms hit test only for this widget and its descendants. Returns true if the widget or one of its decendants contains the given point.
+		/// Performs hit test only for this widget and its descendants. Returns true if the widget or one of its decendants contains the given point.
 		/// This method doesn't take in account if one of the widget's ancestors overlaps the widget.
 		/// </summary>
 		public bool LocalHitTest(ref HitTestArgs args)
