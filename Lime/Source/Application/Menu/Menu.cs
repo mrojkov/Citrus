@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if WIN || MAC
+using System;
 using System.Collections.Generic;
 
 namespace Lime
@@ -23,3 +24,4 @@ namespace Lime
 		void Refresh();
 	}
 }
+#endif
