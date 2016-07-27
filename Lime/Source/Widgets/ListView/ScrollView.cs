@@ -21,6 +21,7 @@ namespace Lime
 		protected bool IsBeingRefreshed { get; set; }
 		public bool CanScroll { get; set; }
 		public bool RejectOrtogonalSwipes { get; set; }
+		public Vector2? SwipeSensitivity { get; set; }
 		public float BounceZoneThickness = 100;
 		public float ScrollToItemVelocity = 800;
 		public ScrollDirection ScrollDirection { get; private set; }
@@ -249,7 +250,7 @@ namespace Lime
 				velocityMeter.AddSample(ScrollPosition);
 				if (RejectOrtogonalSwipes) {
 					var r = new TaskResult<bool>();
-					yield return DetectSwipeAlongScrollAxisTask(r);
+					yield return !SwipeSensitivity.HasValue ? DetectSwipeAlongScrollAxisTask(r) : DetectSwipeUsingSensitivityTask(r);
 					if (r.Value) {
 						yield return HandleDragTask(velocityMeter, ProjectToScrollAxisWithFrameRotation(mousePos));
 					}
@@ -308,6 +309,23 @@ namespace Lime
 			var dt = Vector2.DotProduct(ScrollAxis, d);
 			var dn = Vector2.DotProduct(new Vector2(ScrollAxis.Y, -ScrollAxis.X), d);
 			result.Value = dt.Abs() > dn.Abs();
+		}
+
+		private IEnumerator<object> DetectSwipeUsingSensitivityTask(TaskResult<bool> result) {
+			var mousePos = Input.MousePosition;
+			while (Input.IsMousePressed()) {
+				var deltaPosition = Input.MousePosition - mousePos;
+				if (Mathf.Abs(deltaPosition.X) >= SwipeSensitivity.Value.X) {
+					result.Value = false;
+					yield break;
+				}
+				if (Mathf.Abs(deltaPosition.Y) >= SwipeSensitivity.Value.Y) {
+					result.Value = true;
+					yield break;
+				}
+				yield return null;
+			}
+			result.Value = false;
 		}
 
 		private IEnumerator<object> InertialScrollingTask(float velocity)
