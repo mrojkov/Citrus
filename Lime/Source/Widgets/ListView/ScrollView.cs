@@ -312,20 +312,30 @@ namespace Lime
 		}
 
 		private IEnumerator<object> DetectSwipeUsingSensitivityTask(TaskResult<bool> result) {
+			if (ScrollDirection == ScrollDirection.None) {
+				yield break;
+			}
+
 			var mousePos = Input.MousePosition;
 			while (Input.IsMousePressed()) {
 				var deltaPosition = Input.MousePosition - mousePos;
-				if (Mathf.Abs(deltaPosition.X) >= SwipeSensitivity.Value.X) {
-					result.Value = false;
-					yield break;
-				}
-				if (Mathf.Abs(deltaPosition.Y) >= SwipeSensitivity.Value.Y) {
-					result.Value = true;
-					yield break;
+				var isHSwipe = Mathf.Abs(deltaPosition.X) >= SwipeSensitivity.Value.X;
+				var isVSwipe = Mathf.Abs(deltaPosition.Y) >= SwipeSensitivity.Value.Y;
+				if (isHSwipe || isVSwipe) {
+					switch (ScrollDirection) {
+						case ScrollDirection.Horizontal:
+							result.Value = isHSwipe;
+							yield break;
+						case ScrollDirection.Vertical:
+							result.Value = isVSwipe;
+							yield break;
+						case ScrollDirection.Both:
+							result.Value = true;
+							yield break;
+					}
 				}
 				yield return null;
 			}
-			result.Value = false;
 		}
 
 		private IEnumerator<object> InertialScrollingTask(float velocity)
@@ -338,11 +348,7 @@ namespace Lime
 					break;
 				}
 				// Round scrolling position to prevent blurring
-				ScrollPosition = Mathf.Clamp(
-					value: (ScrollPosition + velocity * delta).Round(),
-					min: MinScrollPosition - MaxOverscroll,
-					max: MaxScrollPosition + MaxOverscroll
-				);
+				ScrollPosition = Mathf.Clamp(value: (ScrollPosition + velocity * delta).Round(), min: MinScrollPosition - MaxOverscroll, max: MaxScrollPosition + MaxOverscroll);
 				yield return null;
 			}
 			scrollingTask = null;
@@ -365,7 +371,8 @@ namespace Lime
 				}
 				realScrollPosition += mouseProjectedPosition - ProjectToScrollAxisWithFrameRotation(Input.MousePosition);
 				// Round scrolling position to prevent blurring
-				ScrollPosition = ClampScrollPositionWithinBounceZone(realScrollPosition).Round();
+				ScrollPosition = ClampScrollPositionWithinBounceZone(realScrollPosition)
+					.Round();
 				mouseProjectedPosition = ProjectToScrollAxisWithFrameRotation(Input.MousePosition);
 				velocityMeter.AddSample(realScrollPosition);
 				yield return null;
