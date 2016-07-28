@@ -13,6 +13,15 @@ namespace Yuzu.Json
 	{
 		public abstract object FromReaderIntPartial(string name);
 
+		protected string GetTypeSpec(Type t, string format = "{0}<{1}>")
+		{
+			return t.IsGenericType ?
+				String.Format(format,
+					t.Name.Remove(t.Name.IndexOf('`')),
+					String.Join(",", t.GetGenericArguments().Select(a => GetTypeSpec(a, format)))) :
+				t.Name;
+		}
+
 		protected JsonDeserializerGenBase MakeDeserializer(string className)
 		{
 			var t = Options.Assembly.GetType(className + "_JsonDeserializer");
@@ -134,15 +143,6 @@ namespace Yuzu.Json
 		}
 
 		private int tempCount = 0;
-
-		private string GetTypeSpec(Type t, string format = "{0}<{1}>")
-		{
-			return t.IsGenericType ?
-				String.Format(format,
-					t.Name.Remove(t.Name.IndexOf('`')),
-					String.Join(",", t.GetGenericArguments().Select(a => GetTypeSpec(a, format)))) :
-				t.Name;
-		}
 
 		private void PutRequireOrNull(char ch, Type t, string name)
 		{
