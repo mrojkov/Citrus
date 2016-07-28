@@ -8,10 +8,12 @@ namespace Lime.Text
 {
 	class TextParser
 	{
+		private const char Nbsp = ' ';
 		public struct Fragment
 		{
 			public int Style;
 			public string Text;
+			public bool IsNbsp;
 		}
 
 		readonly string text;
@@ -28,6 +30,9 @@ namespace Lime.Text
 			text = text ?? "";
 			this.text = text;
 			while (pos < text.Length) {
+				if (text[pos] == Nbsp || text.Substring(pos, 6) == "&nbsp;") {
+					ParseNbsp();
+				}
 				if (text[pos] == '<') {
 					ParseTag();
 				} else {
@@ -43,7 +48,7 @@ namespace Lime.Text
 		{
 			int p = pos;
 			while (pos < text.Length) {
-				if (text[pos] == '<') {
+				if (text[pos] == '<' || text[pos] == Nbsp || text.Substring(pos, 6) == "&nbsp;") {
 					break;
 				} else if (text[pos] == '>') {
 					ErrorMessage = "Unexpected '&gt;'";
@@ -104,6 +109,19 @@ namespace Lime.Text
 			}
 			ErrorMessage = "Unclosed tag";
 			pos = text.Length;
+		}
+
+		/// <summary>
+		/// Creates "non-breaking space" fragment and skips 1 or 6 chars whether nbsp is unicode or html style.
+		/// </summary>
+		private void ParseNbsp()
+		{
+			Fragments.Add(new Fragment { Style = -1, Text = " ", IsNbsp = true });
+			if (text[pos] == '&') {
+				pos += 6;
+			} else {
+				pos++;
+			}
 		}
 
 		bool ProcessOpeningTag(string tag)

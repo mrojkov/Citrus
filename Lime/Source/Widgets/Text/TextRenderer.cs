@@ -30,6 +30,7 @@ namespace Lime.Text
 			public float X;
 			public float Width;
 			public bool LineBreak; // Effective line break after the text formatting.
+			public bool IsNbsp;
 			public Word Clone() { return (Word)MemberwiseClone(); }
 		};
 
@@ -48,7 +49,7 @@ namespace Lime.Text
 			return texts.Count - 1;
 		}
 
-		public void AddFragment(string text, int style)
+		public void AddFragment(string text, int style, bool isNbsp)
 		{
 			var word = new Word {
 				TextIndex = AddText(text),
@@ -58,7 +59,8 @@ namespace Lime.Text
 				X = 0,
 				Width = 0,
 				ForceLineBreak = false,
-				IsTagBegin = true,
+				IsTagBegin = !isNbsp,
+				IsNbsp = isNbsp,
 			};
 			int length = word.Length;
 			if (length == 0) {
@@ -346,7 +348,7 @@ namespace Lime.Text
 					}
 				}
 
-				if (isLongerThanWidth && isTextOrBullet && x > 0) {
+				if (isLongerThanWidth && isTextOrBullet && x > 0 && !fittedWords[i - 1].IsNbsp) {
 					x = word.Width;
 					word.X = 0;
 					word.LineBreak = true;

@@ -153,7 +153,7 @@ namespace Lime
 			// Add text fragments.
 			foreach (var frag in parser.Fragments) {
 				// Warning! Using style + 1, because -1 is a default style.
-				renderer.AddFragment(frag.Text, frag.Style + 1);
+				renderer.AddFragment(frag.Text, frag.Style + 1, frag.IsNbsp);
 			}
 			return renderer;
 		}
