@@ -829,42 +829,5 @@ namespace Yuzu.Json
 			}
 		}
 
-		protected JsonDeserializerGenBase MakeDeserializer(string className)
-		{
-			var t = Options.Assembly.GetType(className + "_JsonDeserializer");
-			if (t == null)
-				throw Error("Generated deserializer not found for type '{0}'", className);
-			var result = (JsonDeserializerGenBase)Activator.CreateInstance(t);
-			result.Reader = Reader;
-			return result;
-		}
-
-		protected object FromReaderIntGenerated()
-		{
-			KillBuf();
-			Require('{');
-			CheckClassTag(GetNextName(first: true));
-			var d = MakeDeserializer(RequireUnescapedString());
-			Require(',');
-			return d.FromReaderIntPartial(GetNextName(first: false));
-		}
-
-		protected object FromReaderIntGenerated(object obj)
-		{
-			KillBuf();
-			Require('{');
-			var expectedType = obj.GetType();
-			string name = GetNextName(first: true);
-			if (name == JsonOptions.ClassTag) {
-				var typeName = RequireUnescapedString();
-				var actualType = Options.Assembly.GetType(typeName);
-				if (actualType == null)
-					throw Error("Unknown type '{0}'", typeName);
-				if (actualType != expectedType)
-					throw Error("Expected type '{0}', but got {1}", expectedType.Name, typeName);
-				name = GetNextName(first: false);
-			}
-			return MakeDeserializer(obj.GetType().FullName).ReadFields(obj, name);
-		}
 	}
 }
