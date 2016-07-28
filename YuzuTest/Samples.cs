@@ -455,3 +455,12 @@ namespace YuzuTest
 	}
 
 }
+
+namespace YuzuTest2
+{
+	public class SampleNamespace
+	{
+		[YuzuRequired]
+		public YuzuTest.SampleBase B;
+	}
+}

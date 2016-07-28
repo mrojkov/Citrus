@@ -997,6 +997,22 @@ namespace YuzuTest.Json
 		}
 
 		[TestMethod]
+		public void TestNamespaces()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = "";
+
+			var v1 = new YuzuTest2.SampleNamespace { B = new SampleBase { FBase = 3 } };
+			var result1 = js.ToString(v1);
+			Assert.AreEqual("{\"B\":{\"FBase\":3}}", result1);
+
+			var w1 = (YuzuTest2.SampleNamespace)
+				YuzuGen.YuzuTest2.SampleNamespace_JsonDeserializer.Instance.FromString(result1);
+			Assert.AreEqual(3, w1.B.FBase);
+		}
+
+		[TestMethod]
 		public void TestErrors()
 		{
 			var js = new JsonSerializer();

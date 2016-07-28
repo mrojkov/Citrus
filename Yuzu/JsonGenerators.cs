@@ -28,6 +28,15 @@ namespace Yuzu.Json
 			return GetTypeSpec(t, "{0}<{1}>", true);
 		}
 
+		protected string GetMangledTypeName(Type t)
+		{
+			var n = t.Name;
+			if (!t.IsGenericType)
+				return n;
+			var args = String.Join("__", t.GetGenericArguments().Select(a => GetMangledTypeName(a)));
+			return n.Remove(n.IndexOf('`')) + "_" + args;
+		}
+
 		protected virtual string GetWrapperNamespace()
 		{
 			var ns = GetType().Namespace;
@@ -35,18 +44,20 @@ namespace Yuzu.Json
 			return i < 0 ? ns : ns.Remove(i);
 		}
 
+		protected string GetDeserializerName(Type t)
+		{
+			return GetWrapperNamespace() + "." + t.Namespace + "." + GetMangledTypeName(t) + "_JsonDeserializer";
+		}
+
 		protected JsonDeserializerGenBase MakeDeserializer(string className)
 		{
-			if (className.Contains("`")) {
-				var t1 = Options.Assembly.GetType(className);
-				if (t1 == null)
-					throw Error("Unknown type '{0}'", className);
-				className = t1.Namespace + "." + GetTypeSpec(t1, "{0}_{1}");
-			}
-			var t = Options.Assembly.GetType(GetWrapperNamespace() + "." + className + "_JsonDeserializer");
+			var t = Options.Assembly.GetType(className);
 			if (t == null)
+				throw Error("Unknown type '{0}'", className);
+			var dt = Options.Assembly.GetType(GetDeserializerName(t));
+			if (dt == null)
 				throw Error("Generated deserializer not found for type '{0}'", className);
-			var result = (JsonDeserializerGenBase)Activator.CreateInstance(t);
+			var result = (JsonDeserializerGenBase)Activator.CreateInstance(dt);
 			result.Reader = Reader;
 			return result;
 		}
@@ -211,10 +222,7 @@ namespace Yuzu.Json
 				GenerateCollection(t, icoll, name);
 			}
 			else if ((t.IsClass || t.IsInterface) && t != typeof(object))
-				PutF(String.Format(
-					"{0}_JsonDeserializer.Instance.FromReader({1}, Reader);\n",
-					GetTypeSpec(t, "{0}_{1}"), name)
-				);
+				PutF(String.Format("{0}.Instance.FromReader({1}, Reader);\n", GetDeserializerName(t), name));
 			else
 				throw Error("Unable to merge field {1} of type {0}", name, t.Name);
 		}
@@ -352,14 +360,10 @@ namespace Yuzu.Json
 			}
 			else if (t.IsClass || Utils.IsStruct(t))
 				PutPart(String.Format(
-					"{0}_JsonDeserializer.Instance.FromReaderTyped<{1}>(Reader);\n",
-					GetTypeSpec(t, "{0}_{1}"), GetTypeSpecNS(t))
-				);
+					"{0}.Instance.FromReaderTyped<{1}>(Reader);\n", GetDeserializerName(t), GetTypeSpecNS(t)));
 			else if (t.IsInterface)
 				PutPart(String.Format(
-					"{0}_JsonDeserializer.Instance.FromReaderInterface<{1}>(Reader);\n",
-					GetTypeSpec(t, "{0}_{1}"), GetTypeSpecNS(t))
-				);
+					"{0}.Instance.FromReaderInterface<{1}>(Reader);\n", GetDeserializerName(t), GetTypeSpecNS(t)));
 			else
 				throw new NotImplementedException(t.Name);
 		}
@@ -401,7 +405,7 @@ namespace Yuzu.Json
 				Put("{\n");
 			}
 
-			var deserializerName = GetTypeSpec(typeof(T), "{0}_{1}") + "_JsonDeserializer";
+			var deserializerName = GetMangledTypeName(typeof(T)) + "_JsonDeserializer";
 			PutF("class {0} : JsonDeserializerGenBase\n", deserializerName);
 			Put("{\n");
 

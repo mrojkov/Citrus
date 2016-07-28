@@ -128,6 +128,7 @@ namespace YuzuTest
 				jd.Generate<SampleConcreteCollection>();
 				jd.Generate<SampleAfter2>();
 				jd.Generate<SampleMerge>();
+				jd.Generate<YuzuTest2.SampleNamespace>();
 				jd.GenerateFooter();
 				sw.Flush();
 				ms.WriteTo(new FileStream(@"..\..\Generated.cs", FileMode.Create));
