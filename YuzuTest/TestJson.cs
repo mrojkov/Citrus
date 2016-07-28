@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Yuzu;
 using Yuzu.Json;
+using YuzuGen.YuzuTest;
 
 namespace YuzuTest.Json
 {
@@ -420,7 +421,7 @@ namespace YuzuTest.Json
 			var result1 = js.ToString(v1);
 			Assert.AreEqual("[\n[\n1,\n2\n],\n[\n3\n]\n]", result1);
 			List<List<int>> w1 = new List<List<int>>();
-			List_List_Int32_JsonDeserializer.Instance.FromString(w1, result1);
+			YuzuGen.System.Collections.Generic.List_List_Int32_JsonDeserializer.Instance.FromString(w1, result1);
 			Assert.AreEqual(v1.Count, w1.Count);
 			CollectionAssert.AreEqual(v1[0], w1[0]);
 			CollectionAssert.AreEqual(v1[1], w1[1]);

@@ -93,7 +93,7 @@ namespace YuzuTest
 			using (var sw = new StreamWriter(ms))
 			{
 				jd.GenWriter = sw;
-				jd.GenerateHeader("YuzuTest");
+				jd.GenerateHeader();
 				jd.Generate<Sample1>();
 				jd.Generate<Sample2>();
 				jd.Generate<Sample3>();

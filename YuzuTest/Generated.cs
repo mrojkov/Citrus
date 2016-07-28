@@ -6,9 +6,9 @@ using System.Reflection;
 using Yuzu;
 using Yuzu.Json;
 
-namespace YuzuTest
-{
 
+namespace YuzuGen.YuzuTest
+{
 	class Sample1_JsonDeserializer : JsonDeserializerGenBase
 	{
 		public static new Sample1_JsonDeserializer Instance = new Sample1_JsonDeserializer();
@@ -33,17 +33,17 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderTyped<Sample1>(Reader);
+			return FromReaderTyped<global::YuzuTest.Sample1>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new Sample1(), name);
+			return ReadFields(new global::YuzuTest.Sample1(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (Sample1)obj;
+			var result = (global::YuzuTest.Sample1)obj;
 			if ("X" != name) throw new YuzuException("X!=" + name);
 			result.X = RequireInt();
 			name = GetNextName(false);
@@ -80,17 +80,17 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderTyped<Sample2>(Reader);
+			return FromReaderTyped<global::YuzuTest.Sample2>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new Sample2(), name);
+			return ReadFields(new global::YuzuTest.Sample2(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (Sample2)obj;
+			var result = (global::YuzuTest.Sample2)obj;
 			if ("X" != name) throw new YuzuException("X!=" + name);
 			result.X = RequireInt();
 			name = GetNextName(false);
@@ -127,26 +127,26 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderTyped<Sample3>(Reader);
+			return FromReaderTyped<global::YuzuTest.Sample3>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new Sample3(), name);
+			return ReadFields(new global::YuzuTest.Sample3(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (Sample3)obj;
+			var result = (global::YuzuTest.Sample3)obj;
 			if ("S1" != name) throw new YuzuException("S1!=" + name);
-			result.S1 = Sample1_JsonDeserializer.Instance.FromReaderTyped<Sample1>(Reader);
+			result.S1 = Sample1_JsonDeserializer.Instance.FromReaderTyped<global::YuzuTest.Sample1>(Reader);
 			name = GetNextName(false);
 			if ("F" == name) {
 				result.F = RequireInt();
 				name = GetNextName(false);
 			}
 			if ("S2" == name) {
-				result.S2 = Sample2_JsonDeserializer.Instance.FromReaderTyped<Sample2>(Reader);
+				result.S2 = Sample2_JsonDeserializer.Instance.FromReaderTyped<global::YuzuTest.Sample2>(Reader);
 				name = GetNextName(false);
 			}
 			Require('}');
@@ -178,19 +178,19 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderTyped<Sample4>(Reader);
+			return FromReaderTyped<global::YuzuTest.Sample4>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new Sample4(), name);
+			return ReadFields(new global::YuzuTest.Sample4(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (Sample4)obj;
+			var result = (global::YuzuTest.Sample4)obj;
 			if ("E" == name) {
-				result.E = (SampleEnum)Enum.Parse(typeof(SampleEnum), RequireString());
+				result.E = (global::YuzuTest.SampleEnum)Enum.Parse(typeof(global::YuzuTest.SampleEnum), RequireString());
 				name = GetNextName(false);
 			}
 			Require('}');
@@ -222,17 +222,17 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderTyped<SampleBool>(Reader);
+			return FromReaderTyped<global::YuzuTest.SampleBool>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new SampleBool(), name);
+			return ReadFields(new global::YuzuTest.SampleBool(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (SampleBool)obj;
+			var result = (global::YuzuTest.SampleBool)obj;
 			if ("B" != name) throw new YuzuException("B!=" + name);
 			result.B = RequireBool();
 			name = GetNextName(false);
@@ -265,19 +265,19 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderTyped<SampleList>(Reader);
+			return FromReaderTyped<global::YuzuTest.SampleList>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new SampleList(), name);
+			return ReadFields(new global::YuzuTest.SampleList(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (SampleList)obj;
+			var result = (global::YuzuTest.SampleList)obj;
 			if ("E" != name) throw new YuzuException("E!=" + name);
-			result.E = RequireOrNull('[') ? null : new List<String>();
+			result.E = RequireOrNull('[') ? null : new global::System.Collections.Generic.List<global::System.String>();
 			if (result.E != null) {
 				if (SkipSpacesCarefully() == ']') {
 					Require(']');
@@ -319,22 +319,22 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderTyped<SampleDict>(Reader);
+			return FromReaderTyped<global::YuzuTest.SampleDict>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new SampleDict(), name);
+			return ReadFields(new global::YuzuTest.SampleDict(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (SampleDict)obj;
+			var result = (global::YuzuTest.SampleDict)obj;
 			if ("Value" != name) throw new YuzuException("Value!=" + name);
 			result.Value = RequireInt();
 			name = GetNextName(false);
 			if ("Children" == name) {
-				result.Children = RequireOrNull('{') ? null : new Dictionary<String,SampleDict>();
+				result.Children = RequireOrNull('{') ? null : new global::System.Collections.Generic.Dictionary<global::System.String,global::YuzuTest.SampleDict>();
 				if (result.Children != null) {
 					if (SkipSpacesCarefully() == '}') {
 						Require('}');
@@ -343,7 +343,7 @@ namespace YuzuTest
 						do {
 							var tmp1 = RequireString();
 							Require(':');
-							var tmp2 = SampleDict_JsonDeserializer.Instance.FromReaderTyped<SampleDict>(Reader);
+							var tmp2 = SampleDict_JsonDeserializer.Instance.FromReaderTyped<global::YuzuTest.SampleDict>(Reader);
 							result.Children.Add(tmp1, tmp2);
 						} while (Require('}', ',') == ',');
 					}
@@ -379,19 +379,19 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderTyped<SampleDictKeys>(Reader);
+			return FromReaderTyped<global::YuzuTest.SampleDictKeys>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new SampleDictKeys(), name);
+			return ReadFields(new global::YuzuTest.SampleDictKeys(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (SampleDictKeys)obj;
+			var result = (global::YuzuTest.SampleDictKeys)obj;
 			if ("E" != name) throw new YuzuException("E!=" + name);
-			result.E = RequireOrNull('{') ? null : new Dictionary<SampleEnum,Int32>();
+			result.E = RequireOrNull('{') ? null : new global::System.Collections.Generic.Dictionary<global::YuzuTest.SampleEnum,global::System.Int32>();
 			if (result.E != null) {
 				if (SkipSpacesCarefully() == '}') {
 					Require('}');
@@ -401,13 +401,13 @@ namespace YuzuTest
 						var tmp1 = RequireString();
 						Require(':');
 						var tmp2 = RequireInt();
-						result.E.Add((SampleEnum)Enum.Parse(typeof(SampleEnum), tmp1), tmp2);
+						result.E.Add((global::YuzuTest.SampleEnum)Enum.Parse(typeof(global::YuzuTest.SampleEnum), tmp1), tmp2);
 					} while (Require('}', ',') == ',');
 				}
 			}
 			name = GetNextName(false);
 			if ("I" != name) throw new YuzuException("I!=" + name);
-			result.I = RequireOrNull('{') ? null : new Dictionary<Int32,Int32>();
+			result.I = RequireOrNull('{') ? null : new global::System.Collections.Generic.Dictionary<global::System.Int32,global::System.Int32>();
 			if (result.I != null) {
 				if (SkipSpacesCarefully() == '}') {
 					Require('}');
@@ -423,7 +423,7 @@ namespace YuzuTest
 			}
 			name = GetNextName(false);
 			if ("K" != name) throw new YuzuException("K!=" + name);
-			result.K = RequireOrNull('{') ? null : new Dictionary<SampleKey,Int32>();
+			result.K = RequireOrNull('{') ? null : new global::System.Collections.Generic.Dictionary<global::YuzuTest.SampleKey,global::System.Int32>();
 			if (result.K != null) {
 				if (SkipSpacesCarefully() == '}') {
 					Require('}');
@@ -433,7 +433,7 @@ namespace YuzuTest
 						var tmp5 = RequireString();
 						Require(':');
 						var tmp6 = RequireInt();
-						result.K.Add((SampleKey)keyParsers[typeof(SampleKey)](tmp5), tmp6);
+						result.K.Add((global::YuzuTest.SampleKey)keyParsers[typeof(global::YuzuTest.SampleKey)](tmp5), tmp6);
 					} while (Require('}', ',') == ',');
 				}
 			}
@@ -467,22 +467,22 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderTyped<SampleArray>(Reader);
+			return FromReaderTyped<global::YuzuTest.SampleArray>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new SampleArray(), name);
+			return ReadFields(new global::YuzuTest.SampleArray(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (SampleArray)obj;
+			var result = (global::YuzuTest.SampleArray)obj;
 			if ("A" != name) throw new YuzuException("A!=" + name);
-			result.A = RequireOrNull('[') ? null : new String[0];
+			result.A = RequireOrNull('[') ? null : new global::System.String[0];
 			if (result.A != null) {
 				if (SkipSpacesCarefully() != ']') {
-					var tmp1 = new String[RequireUInt()];
+					var tmp1 = new global::System.String[RequireUInt()];
 					for(int tmp2 = 0; tmp2 < tmp1.Length; ++tmp2) {
 						Require(',');
 						tmp1[tmp2] = RequireString();
@@ -521,17 +521,17 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderTyped<SampleBase>(Reader);
+			return FromReaderTyped<global::YuzuTest.SampleBase>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new SampleBase(), name);
+			return ReadFields(new global::YuzuTest.SampleBase(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (SampleBase)obj;
+			var result = (global::YuzuTest.SampleBase)obj;
 			if ("FBase" != name) throw new YuzuException("FBase!=" + name);
 			result.FBase = RequireInt();
 			name = GetNextName(false);
@@ -564,17 +564,17 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderTyped<SampleDerivedA>(Reader);
+			return FromReaderTyped<global::YuzuTest.SampleDerivedA>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new SampleDerivedA(), name);
+			return ReadFields(new global::YuzuTest.SampleDerivedA(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (SampleDerivedA)obj;
+			var result = (global::YuzuTest.SampleDerivedA)obj;
 			if ("FBase" != name) throw new YuzuException("FBase!=" + name);
 			result.FBase = RequireInt();
 			name = GetNextName(false);
@@ -610,17 +610,17 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderTyped<SampleDerivedB>(Reader);
+			return FromReaderTyped<global::YuzuTest.SampleDerivedB>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new SampleDerivedB(), name);
+			return ReadFields(new global::YuzuTest.SampleDerivedB(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (SampleDerivedB)obj;
+			var result = (global::YuzuTest.SampleDerivedB)obj;
 			if ("FBase" != name) throw new YuzuException("FBase!=" + name);
 			result.FBase = RequireInt();
 			name = GetNextName(false);
@@ -656,26 +656,26 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderTyped<SampleMatrix>(Reader);
+			return FromReaderTyped<global::YuzuTest.SampleMatrix>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new SampleMatrix(), name);
+			return ReadFields(new global::YuzuTest.SampleMatrix(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (SampleMatrix)obj;
+			var result = (global::YuzuTest.SampleMatrix)obj;
 			if ("M" != name) throw new YuzuException("M!=" + name);
-			result.M = RequireOrNull('[') ? null : new List<List<Int32>>();
+			result.M = RequireOrNull('[') ? null : new global::System.Collections.Generic.List<global::System.Collections.Generic.List<global::System.Int32>>();
 			if (result.M != null) {
 				if (SkipSpacesCarefully() == ']') {
 					Require(']');
 				}
 				else {
 					do {
-						var tmp1 = RequireOrNull('[') ? null : new List<Int32>();
+						var tmp1 = RequireOrNull('[') ? null : new global::System.Collections.Generic.List<global::System.Int32>();
 						if (tmp1 != null) {
 							if (SkipSpacesCarefully() == ']') {
 								Require(']');
@@ -721,17 +721,17 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderTyped<SamplePoint>(Reader);
+			return FromReaderTyped<global::YuzuTest.SamplePoint>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new SamplePoint(), name);
+			return ReadFields(new global::YuzuTest.SamplePoint(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (SamplePoint)obj;
+			var result = (global::YuzuTest.SamplePoint)obj;
 			if ("X" != name) throw new YuzuException("X!=" + name);
 			result.X = RequireInt();
 			name = GetNextName(false);
@@ -744,7 +744,7 @@ namespace YuzuTest
 
 		protected override object ReadFieldsCompact(object obj)
 		{
-			var result = (SamplePoint)obj;
+			var result = (global::YuzuTest.SamplePoint)obj;
 			result.X = RequireInt();
 			Require(',');
 			result.Y = RequireInt();
@@ -777,22 +777,22 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderTyped<SampleRect>(Reader);
+			return FromReaderTyped<global::YuzuTest.SampleRect>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new SampleRect(), name);
+			return ReadFields(new global::YuzuTest.SampleRect(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (SampleRect)obj;
+			var result = (global::YuzuTest.SampleRect)obj;
 			if ("A" != name) throw new YuzuException("A!=" + name);
-			result.A = SamplePoint_JsonDeserializer.Instance.FromReaderTyped<SamplePoint>(Reader);
+			result.A = SamplePoint_JsonDeserializer.Instance.FromReaderTyped<global::YuzuTest.SamplePoint>(Reader);
 			name = GetNextName(false);
 			if ("B" != name) throw new YuzuException("B!=" + name);
-			result.B = SamplePoint_JsonDeserializer.Instance.FromReaderTyped<SamplePoint>(Reader);
+			result.B = SamplePoint_JsonDeserializer.Instance.FromReaderTyped<global::YuzuTest.SamplePoint>(Reader);
 			name = GetNextName(false);
 			Require('}');
 			return result;
@@ -823,17 +823,17 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderTyped<SampleDate>(Reader);
+			return FromReaderTyped<global::YuzuTest.SampleDate>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new SampleDate(), name);
+			return ReadFields(new global::YuzuTest.SampleDate(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (SampleDate)obj;
+			var result = (global::YuzuTest.SampleDate)obj;
 			if ("D" != name) throw new YuzuException("D!=" + name);
 			result.D = RequireDateTime();
 			name = GetNextName(false);
@@ -869,17 +869,17 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderTyped<Color>(Reader);
+			return FromReaderTyped<global::YuzuTest.Color>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new Color(), name);
+			return ReadFields(new global::YuzuTest.Color(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (Color)obj;
+			var result = (global::YuzuTest.Color)obj;
 			if ("B" != name) throw new YuzuException("B!=" + name);
 			result.B = checked((byte)RequireUInt());
 			name = GetNextName(false);
@@ -895,7 +895,7 @@ namespace YuzuTest
 
 		protected override object ReadFieldsCompact(object obj)
 		{
-			var result = (Color)obj;
+			var result = (global::YuzuTest.Color)obj;
 			result.B = checked((byte)RequireUInt());
 			Require(',');
 			result.G = checked((byte)RequireUInt());
@@ -906,6 +906,10 @@ namespace YuzuTest
 		}
 	}
 
+}
+
+namespace YuzuGen.System.Collections.Generic
+{
 	class List_List_Int32_JsonDeserializer : JsonDeserializerGenBase
 	{
 		public static new List_List_Int32_JsonDeserializer Instance = new List_List_Int32_JsonDeserializer();
@@ -930,19 +934,19 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderInt(new List<List<Int32>>());
+			return FromReaderInt(new global::System.Collections.Generic.List<global::System.Collections.Generic.List<global::System.Int32>>());
 		}
 
 		public override object FromReaderInt(object obj)
 		{
-			var result = (List<List<Int32>>)obj;
+			var result = (global::System.Collections.Generic.List<global::System.Collections.Generic.List<global::System.Int32>>)obj;
 			Require('[');
 			if (SkipSpacesCarefully() == ']') {
 				Require(']');
 			}
 			else {
 				do {
-					var tmp1 = RequireOrNull('[') ? null : new List<Int32>();
+					var tmp1 = RequireOrNull('[') ? null : new global::System.Collections.Generic.List<global::System.Int32>();
 					if (tmp1 != null) {
 						if (SkipSpacesCarefully() == ']') {
 							Require(']');
@@ -962,16 +966,20 @@ namespace YuzuTest
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new List<List<Int32>>(), name);
+			return ReadFields(new global::System.Collections.Generic.List<global::System.Collections.Generic.List<global::System.Int32>>(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (List<List<Int32>>)obj;
+			var result = (global::System.Collections.Generic.List<global::System.Collections.Generic.List<global::System.Int32>>)obj;
 			return result;
 		}
 	}
 
+}
+
+namespace YuzuGen.YuzuTest
+{
 	class SampleClassList_JsonDeserializer : JsonDeserializerGenBase
 	{
 		public static new SampleClassList_JsonDeserializer Instance = new SampleClassList_JsonDeserializer();
@@ -996,26 +1004,26 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderTyped<SampleClassList>(Reader);
+			return FromReaderTyped<global::YuzuTest.SampleClassList>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new SampleClassList(), name);
+			return ReadFields(new global::YuzuTest.SampleClassList(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (SampleClassList)obj;
+			var result = (global::YuzuTest.SampleClassList)obj;
 			if ("E" != name) throw new YuzuException("E!=" + name);
-			result.E = RequireOrNull('[') ? null : new List<SampleBase>();
+			result.E = RequireOrNull('[') ? null : new global::System.Collections.Generic.List<global::YuzuTest.SampleBase>();
 			if (result.E != null) {
 				if (SkipSpacesCarefully() == ']') {
 					Require(']');
 				}
 				else {
 					do {
-						var tmp1 = SampleBase_JsonDeserializer.Instance.FromReaderTyped<SampleBase>(Reader);
+						var tmp1 = SampleBase_JsonDeserializer.Instance.FromReaderTyped<global::YuzuTest.SampleBase>(Reader);
 						result.E.Add(tmp1);
 					} while (Require(']', ',') == ',');
 				}
@@ -1050,17 +1058,17 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderTyped<SampleSmallTypes>(Reader);
+			return FromReaderTyped<global::YuzuTest.SampleSmallTypes>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new SampleSmallTypes(), name);
+			return ReadFields(new global::YuzuTest.SampleSmallTypes(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (SampleSmallTypes)obj;
+			var result = (global::YuzuTest.SampleSmallTypes)obj;
 			if ("B" != name) throw new YuzuException("B!=" + name);
 			result.B = checked((byte)RequireUInt());
 			name = GetNextName(false);
@@ -1105,17 +1113,17 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderTyped<SamplePerson>(Reader);
+			return FromReaderTyped<global::YuzuTest.SamplePerson>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new SamplePerson(), name);
+			return ReadFields(new global::YuzuTest.SamplePerson(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (SamplePerson)obj;
+			var result = (global::YuzuTest.SamplePerson)obj;
 			if ("1" != name) throw new YuzuException("1!=" + name);
 			result.Name = RequireString();
 			name = GetNextName(false);
@@ -1123,21 +1131,21 @@ namespace YuzuTest
 			result.Birth = RequireDateTime();
 			name = GetNextName(false);
 			if ("3" != name) throw new YuzuException("3!=" + name);
-			result.Children = RequireOrNull('[') ? null : new List<SamplePerson>();
+			result.Children = RequireOrNull('[') ? null : new global::System.Collections.Generic.List<global::YuzuTest.SamplePerson>();
 			if (result.Children != null) {
 				if (SkipSpacesCarefully() == ']') {
 					Require(']');
 				}
 				else {
 					do {
-						var tmp1 = SamplePerson_JsonDeserializer.Instance.FromReaderTyped<SamplePerson>(Reader);
+						var tmp1 = SamplePerson_JsonDeserializer.Instance.FromReaderTyped<global::YuzuTest.SamplePerson>(Reader);
 						result.Children.Add(tmp1);
 					} while (Require(']', ',') == ',');
 				}
 			}
 			name = GetNextName(false);
 			if ("4" != name) throw new YuzuException("4!=" + name);
-			result.EyeColor = Color_JsonDeserializer.Instance.FromReaderTyped<Color>(Reader);
+			result.EyeColor = Color_JsonDeserializer.Instance.FromReaderTyped<global::YuzuTest.Color>(Reader);
 			name = GetNextName(false);
 			Require('}');
 			return result;
@@ -1168,7 +1176,7 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderInterface<ISample>(Reader);
+			return FromReaderInterface<global::YuzuTest.ISample>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
@@ -1178,7 +1186,7 @@ namespace YuzuTest
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (ISample)obj;
+			var result = (global::YuzuTest.ISample)obj;
 			Require('}');
 			return result;
 		}
@@ -1208,17 +1216,17 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderTyped<SampleInterfaced>(Reader);
+			return FromReaderTyped<global::YuzuTest.SampleInterfaced>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new SampleInterfaced(), name);
+			return ReadFields(new global::YuzuTest.SampleInterfaced(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (SampleInterfaced)obj;
+			var result = (global::YuzuTest.SampleInterfaced)obj;
 			if ("X" != name) throw new YuzuException("X!=" + name);
 			result.X = RequireInt();
 			name = GetNextName(false);
@@ -1251,19 +1259,19 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderTyped<SampleInterfaceField>(Reader);
+			return FromReaderTyped<global::YuzuTest.SampleInterfaceField>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new SampleInterfaceField(), name);
+			return ReadFields(new global::YuzuTest.SampleInterfaceField(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (SampleInterfaceField)obj;
+			var result = (global::YuzuTest.SampleInterfaceField)obj;
 			if ("I" != name) throw new YuzuException("I!=" + name);
-			result.I = ISample_JsonDeserializer.Instance.FromReaderInterface<ISample>(Reader);
+			result.I = ISample_JsonDeserializer.Instance.FromReaderInterface<global::YuzuTest.ISample>(Reader);
 			name = GetNextName(false);
 			Require('}');
 			return result;
@@ -1294,17 +1302,17 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderTyped<SampleInterfacedGeneric<String>>(Reader);
+			return FromReaderTyped<global::YuzuTest.SampleInterfacedGeneric<global::System.String>>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new SampleInterfacedGeneric<String>(), name);
+			return ReadFields(new global::YuzuTest.SampleInterfacedGeneric<global::System.String>(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (SampleInterfacedGeneric<String>)obj;
+			var result = (global::YuzuTest.SampleInterfacedGeneric<global::System.String>)obj;
 			if ("G" != name) throw new YuzuException("G!=" + name);
 			result.G = RequireString();
 			name = GetNextName(false);
@@ -1340,12 +1348,12 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderInt(new SampleCollection<Int32>());
+			return FromReaderInt(new global::YuzuTest.SampleCollection<global::System.Int32>());
 		}
 
 		public override object FromReaderInt(object obj)
 		{
-			var result = (SampleCollection<Int32>)obj;
+			var result = (global::YuzuTest.SampleCollection<global::System.Int32>)obj;
 			Require('[');
 			if (SkipSpacesCarefully() == ']') {
 				Require(']');
@@ -1361,12 +1369,12 @@ namespace YuzuTest
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new SampleCollection<Int32>(), name);
+			return ReadFields(new global::YuzuTest.SampleCollection<global::System.Int32>(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (SampleCollection<Int32>)obj;
+			var result = (global::YuzuTest.SampleCollection<global::System.Int32>)obj;
 			return result;
 		}
 	}
@@ -1395,12 +1403,12 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderInt(new SampleExplicitCollection<Int32>());
+			return FromReaderInt(new global::YuzuTest.SampleExplicitCollection<global::System.Int32>());
 		}
 
 		public override object FromReaderInt(object obj)
 		{
-			var result = (SampleExplicitCollection<Int32>)obj;
+			var result = (global::YuzuTest.SampleExplicitCollection<global::System.Int32>)obj;
 			Require('[');
 			if (SkipSpacesCarefully() == ']') {
 				Require(']');
@@ -1408,7 +1416,7 @@ namespace YuzuTest
 			else {
 				do {
 					var tmp2 = RequireInt();
-					((ICollection<Int32>)result).Add(tmp2);
+					((global::System.Collections.Generic.ICollection<global::System.Int32>)result).Add(tmp2);
 				} while (Require(']', ',') == ',');
 			}
 			return result;
@@ -1416,12 +1424,12 @@ namespace YuzuTest
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new SampleExplicitCollection<Int32>(), name);
+			return ReadFields(new global::YuzuTest.SampleExplicitCollection<global::System.Int32>(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (SampleExplicitCollection<Int32>)obj;
+			var result = (global::YuzuTest.SampleExplicitCollection<global::System.Int32>)obj;
 			return result;
 		}
 	}
@@ -1450,33 +1458,33 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderTyped<SampleWithCollection>(Reader);
+			return FromReaderTyped<global::YuzuTest.SampleWithCollection>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new SampleWithCollection(), name);
+			return ReadFields(new global::YuzuTest.SampleWithCollection(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (SampleWithCollection)obj;
+			var result = (global::YuzuTest.SampleWithCollection)obj;
 			if ("A" != name) throw new YuzuException("A!=" + name);
-			result.A = RequireOrNull('[') ? null : new SampleCollection<ISample>();
+			result.A = RequireOrNull('[') ? null : new global::YuzuTest.SampleCollection<global::YuzuTest.ISample>();
 			if (result.A != null) {
 				if (SkipSpacesCarefully() == ']') {
 					Require(']');
 				}
 				else {
 					do {
-						var tmp1 = ISample_JsonDeserializer.Instance.FromReaderInterface<ISample>(Reader);
+						var tmp1 = ISample_JsonDeserializer.Instance.FromReaderInterface<global::YuzuTest.ISample>(Reader);
 						result.A.Add(tmp1);
 					} while (Require(']', ',') == ',');
 				}
 			}
 			name = GetNextName(false);
 			if ("B" != name) throw new YuzuException("B!=" + name);
-			result.B = RequireOrNull('[') ? null : new SampleCollection<Int32>();
+			result.B = RequireOrNull('[') ? null : new global::YuzuTest.SampleCollection<global::System.Int32>();
 			if (result.B != null) {
 				if (SkipSpacesCarefully() == ']') {
 					Require(']');
@@ -1518,12 +1526,12 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderInt(new SampleConcreteCollection());
+			return FromReaderInt(new global::YuzuTest.SampleConcreteCollection());
 		}
 
 		public override object FromReaderInt(object obj)
 		{
-			var result = (SampleConcreteCollection)obj;
+			var result = (global::YuzuTest.SampleConcreteCollection)obj;
 			Require('[');
 			if (SkipSpacesCarefully() == ']') {
 				Require(']');
@@ -1539,12 +1547,12 @@ namespace YuzuTest
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new SampleConcreteCollection(), name);
+			return ReadFields(new global::YuzuTest.SampleConcreteCollection(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (SampleConcreteCollection)obj;
+			var result = (global::YuzuTest.SampleConcreteCollection)obj;
 			return result;
 		}
 	}
@@ -1573,17 +1581,17 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderTyped<SampleAfter2>(Reader);
+			return FromReaderTyped<global::YuzuTest.SampleAfter2>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new SampleAfter2(), name);
+			return ReadFields(new global::YuzuTest.SampleAfter2(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (SampleAfter2)obj;
+			var result = (global::YuzuTest.SampleAfter2)obj;
 			if ("X" != name) throw new YuzuException("X!=" + name);
 			result.X = RequireString();
 			name = GetNextName(false);
@@ -1619,17 +1627,17 @@ namespace YuzuTest
 
 		public override object FromReaderInt()
 		{
-			return FromReaderTyped<SampleMerge>(Reader);
+			return FromReaderTyped<global::YuzuTest.SampleMerge>(Reader);
 		}
 
 		public override object FromReaderIntPartial(string name)
 		{
-			return ReadFields(new SampleMerge(), name);
+			return ReadFields(new global::YuzuTest.SampleMerge(), name);
 		}
 
 		protected override object ReadFields(object obj, string name)
 		{
-			var result = (SampleMerge)obj;
+			var result = (global::YuzuTest.SampleMerge)obj;
 			if ("LI" != name) throw new YuzuException("LI!=" + name);
 			Require('[');
 			if (SkipSpacesCarefully() == ']') {

@@ -7,6 +7,7 @@ using ProtoBuf;
 
 using Yuzu;
 using Yuzu.Json;
+using YuzuGen.YuzuTest;
 
 namespace YuzuTest
 {
