@@ -213,7 +213,6 @@
     <Compile Include="Source\Widgets\Layout\LayoutManager.cs" />
     <Compile Include="Source\Widgets\Layout\LinearAllocator.cs" />
     <Compile Include="Source\Widgets\Layout\VBoxLayout.cs" />
-    <Compile Include="Source\Widgets\ComboBox.cs" />
     <Compile Include="Source\Widgets\EditBox.cs" />
     <Compile Include="Source\Widgets\IPresenter.cs" />
     <Compile Include="Source\Widgets\TextView.cs" />
@@ -267,6 +266,11 @@
     <Compile Include="Source\Graphics\Unity\PlatformGeometryBuffer.cs" />
     <Compile Include="Source\Application\FileDialog\FileDialog.Win.cs" />
     <Compile Include="Source\Widgets\KeyboardFocus.cs" />
+    <Compile Include="Source\Widgets\DropDownList.cs" />
+    <Compile Include="Source\Widgets\CheckBox.cs" />
+    <Compile Include="Source\Widgets\BorderedFrame.cs" />
+    <Compile Include="Source\Application\Menu\Command.cs" />
+    <Compile Include="Source\Widgets\TabBar.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

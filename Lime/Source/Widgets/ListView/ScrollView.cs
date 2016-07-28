@@ -21,6 +21,7 @@ namespace Lime
 		protected bool IsBeingRefreshed { get; set; }
 		public bool CanScroll { get; set; }
 		public bool RejectOrtogonalSwipes { get; set; }
+		public Vector2? SwipeSensitivity { get; set; }
 		public float BounceZoneThickness = 100;
 		public float ScrollToItemVelocity = 800;
 		public ScrollDirection ScrollDirection { get; private set; }
@@ -249,7 +250,7 @@ namespace Lime
 				velocityMeter.AddSample(ScrollPosition);
 				if (RejectOrtogonalSwipes) {
 					var r = new TaskResult<bool>();
-					yield return DetectSwipeAlongScrollAxisTask(r);
+					yield return !SwipeSensitivity.HasValue ? DetectSwipeAlongScrollAxisTask(r) : DetectSwipeUsingSensitivityTask(r);
 					if (r.Value) {
 						yield return HandleDragTask(velocityMeter, ProjectToScrollAxisWithFrameRotation(mousePos));
 					}
@@ -310,6 +311,33 @@ namespace Lime
 			result.Value = dt.Abs() > dn.Abs();
 		}
 
+		private IEnumerator<object> DetectSwipeUsingSensitivityTask(TaskResult<bool> result) {
+			if (ScrollDirection == ScrollDirection.None) {
+				yield break;
+			}
+
+			var mousePos = Input.MousePosition;
+			while (Input.IsMousePressed()) {
+				var deltaPosition = Input.MousePosition - mousePos;
+				var isHSwipe = Mathf.Abs(deltaPosition.X) >= SwipeSensitivity.Value.X;
+				var isVSwipe = Mathf.Abs(deltaPosition.Y) >= SwipeSensitivity.Value.Y;
+				if (isHSwipe || isVSwipe) {
+					switch (ScrollDirection) {
+						case ScrollDirection.Horizontal:
+							result.Value = isHSwipe;
+							yield break;
+						case ScrollDirection.Vertical:
+							result.Value = isVSwipe;
+							yield break;
+						case ScrollDirection.Both:
+							result.Value = true;
+							yield break;
+					}
+				}
+				yield return null;
+			}
+		}
+
 		private IEnumerator<object> InertialScrollingTask(float velocity)
 		{
 			while (true) {
@@ -320,11 +348,7 @@ namespace Lime
 					break;
 				}
 				// Round scrolling position to prevent blurring
-				ScrollPosition = Mathf.Clamp(
-					value: (ScrollPosition + velocity * delta).Round(),
-					min: MinScrollPosition - MaxOverscroll,
-					max: MaxScrollPosition + MaxOverscroll
-				);
+				ScrollPosition = Mathf.Clamp(value: (ScrollPosition + velocity * delta).Round(), min: MinScrollPosition - MaxOverscroll, max: MaxScrollPosition + MaxOverscroll);
 				yield return null;
 			}
 			scrollingTask = null;
@@ -347,7 +371,8 @@ namespace Lime
 				}
 				realScrollPosition += mouseProjectedPosition - ProjectToScrollAxisWithFrameRotation(Input.MousePosition);
 				// Round scrolling position to prevent blurring
-				ScrollPosition = ClampScrollPositionWithinBounceZone(realScrollPosition).Round();
+				ScrollPosition = ClampScrollPositionWithinBounceZone(realScrollPosition)
+					.Round();
 				mouseProjectedPosition = ProjectToScrollAxisWithFrameRotation(Input.MousePosition);
 				velocityMeter.AddSample(realScrollPosition);
 				yield return null;

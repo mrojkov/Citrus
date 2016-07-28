@@ -1,3 +1,4 @@
+#if WIN || MAC
 using System;
 
 namespace Lime
@@ -107,3 +108,4 @@ namespace Lime
 		}
 	}
 }
+#endif

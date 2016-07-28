@@ -269,7 +269,6 @@
     <Compile Include="Source\Application\Menu\Menu.cs" />
     <Compile Include="Source\Graphics\VectorShape.cs" />
     <Compile Include="Source\Types\ColorGradient.cs" />
-    <Compile Include="Source\Widgets\ComboBox.cs" />
     <Compile Include="Source\Widgets\EditBox.cs" />
     <Compile Include="Source\Widgets\IPresenter.cs" />
     <Compile Include="Source\Widgets\TextView.cs" />
@@ -320,9 +319,13 @@
     <Compile Include="Source\Application\MouseCursor\StockCursors.Mac.cs" />
     <Compile Include="Source\Application\MouseCursor\StockCursors.Null.cs" />
     <Compile Include="Source\Application\MouseCursor\StockCursors.Win.cs" />
-    <Compile Include="Source\Widgets\Layout\ScrollableLayout.cs" />
     <Compile Include="Source\Widgets\KeyboardFocus.cs" />
     <Compile Include="Source\Input\Shortcut.cs" />
+    <Compile Include="Source\Application\Menu\Command.cs" />
+    <Compile Include="Source\Widgets\BorderedFrame.cs" />
+    <Compile Include="Source\Widgets\CheckBox.cs" />
+    <Compile Include="Source\Widgets\DropDownList.cs" />
+    <Compile Include="Source\Widgets\TabBar.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
