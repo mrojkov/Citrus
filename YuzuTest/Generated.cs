@@ -1270,6 +1270,52 @@ namespace YuzuTest
 		}
 	}
 
+	class SampleInterfacedGeneric_String_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new SampleInterfacedGeneric_String_JsonDeserializer Instance = new SampleInterfacedGeneric_String_JsonDeserializer();
+
+		public SampleInterfacedGeneric_String_JsonDeserializer()
+		{
+			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
+			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
+			JsonOptions.IgnoreCompact = false;
+			JsonOptions.Int64AsString = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.ArrayLengthPrefix = true;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderTyped<SampleInterfacedGeneric<String>>(Reader);
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new SampleInterfacedGeneric<String>(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (SampleInterfacedGeneric<String>)obj;
+			if ("G" != name) throw new YuzuException("G!=" + name);
+			result.G = RequireString();
+			name = GetNextName(false);
+			if ("X" != name) throw new YuzuException("X!=" + name);
+			result.X = RequireInt();
+			name = GetNextName(false);
+			Require('}');
+			return result;
+		}
+	}
+
 	class SampleCollection_Int32_JsonDeserializer : JsonDeserializerGenBase
 	{
 		public static new SampleCollection_Int32_JsonDeserializer Instance = new SampleCollection_Int32_JsonDeserializer();

@@ -24,6 +24,12 @@ namespace Yuzu.Json
 
 		protected JsonDeserializerGenBase MakeDeserializer(string className)
 		{
+			if (className.Contains("`")) {
+				var t1 = Options.Assembly.GetType(className);
+				if (t1 == null)
+					throw Error("Unknown type '{0}'", className);
+				className = t1.Namespace + "." + GetTypeSpec(t1, "{0}_{1}");
+			}
 			var t = Options.Assembly.GetType(className + "_JsonDeserializer");
 			if (t == null)
 				throw Error("Generated deserializer not found for type '{0}'", className);

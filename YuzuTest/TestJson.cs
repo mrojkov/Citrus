@@ -651,7 +651,6 @@ namespace YuzuTest.Json
 			var js = new JsonSerializer();
 			js.JsonOptions.Indent = "";
 			js.JsonOptions.FieldSeparator = "";
-			js.JsonOptions.IgnoreCompact = true;
 			var v1 = new SampleInterfaceField { I = new SampleInterfaced { X = 34 } };
 			var result1 = js.ToString(v1);
 			Assert.AreEqual("{\"I\":{\"class\":\"YuzuTest.SampleInterfaced\",\"X\":34}}", result1);
@@ -682,6 +681,25 @@ namespace YuzuTest.Json
 			Assert.AreEqual("{\"class\":\"YuzuTest.SampleInterfacedField\",\"X\":41}", result3);
 			var w3 = (ISampleField)jd.FromString(result3);
 			Assert.AreEqual(41, w3.X);
+		}
+
+		[TestMethod]
+		public void TestGeneric()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = "";
+			var v1 = new SampleInterfaceField { I = new SampleInterfacedGeneric<string> { X = 35, G = "qq" } };
+			var n = typeof(SampleInterfacedGeneric<string>).FullName;
+			var result1 = js.ToString(v1);
+			Assert.AreEqual(
+				String.Format("{{\"I\":{{\"class\":\"{0}\",\"G\":\"qq\",\"X\":35}}}}", n), result1);
+			var w1 = (SampleInterfaceField)(new JsonDeserializer()).FromString(new SampleInterfaceField(), result1);
+			Assert.AreEqual(w1.I.X, 35);
+			Assert.AreEqual((w1.I as SampleInterfacedGeneric<string>).G, "qq");
+			var w1g = (SampleInterfaceField)SampleInterfaceField_JsonDeserializer.Instance.FromString(result1);
+			Assert.AreEqual(w1g.I.X, 35);
+			Assert.AreEqual((w1g.I as SampleInterfacedGeneric<string>).G, "qq");
 		}
 
 		[TestMethod]

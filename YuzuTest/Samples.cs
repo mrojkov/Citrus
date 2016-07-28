@@ -304,6 +304,15 @@ namespace YuzuTest
 		public int X { get; set; }
 	}
 
+	public class SampleInterfacedGeneric<T> : ISample
+	{
+		[YuzuRequired]
+		public int X { get; set; }
+
+		[YuzuRequired]
+		public T G;
+	}
+
 	public class SampleInterfaceField
 	{
 		[YuzuRequired]
