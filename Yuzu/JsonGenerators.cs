@@ -49,15 +49,22 @@ namespace Yuzu.Json
 			return GetWrapperNamespace() + "." + t.Namespace + "." + GetMangledTypeName(t) + "_JsonDeserializer";
 		}
 
+		private static Dictionary<string, JsonDeserializerGenBase> deserializerCache =
+			new Dictionary<string, JsonDeserializerGenBase>();
+
 		protected JsonDeserializerGenBase MakeDeserializer(string className)
 		{
-			var t = Options.Assembly.GetType(className);
-			if (t == null)
-				throw Error("Unknown type '{0}'", className);
-			var dt = Options.Assembly.GetType(GetDeserializerName(t));
-			if (dt == null)
-				throw Error("Generated deserializer not found for type '{0}'", className);
-			var result = (JsonDeserializerGenBase)Activator.CreateInstance(dt);
+			JsonDeserializerGenBase result;
+			if (!deserializerCache.TryGetValue(className, out result)) {
+				var t = Options.Assembly.GetType(className);
+				if (t == null)
+					throw Error("Unknown type '{0}'", className);
+				var dt = Options.Assembly.GetType(GetDeserializerName(t));
+				if (dt == null)
+					throw Error("Generated deserializer not found for type '{0}'", className);
+				result = (JsonDeserializerGenBase)Activator.CreateInstance(dt);
+				deserializerCache[className] = result;
+			}
 			result.Reader = Reader;
 			return result;
 		}
