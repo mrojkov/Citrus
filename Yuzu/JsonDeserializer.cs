@@ -304,7 +304,8 @@ namespace Yuzu.Json
 		protected DateTime RequireDateTime()
 		{
 			var s = JsonOptions.DateFormat == "O" ? RequireUnescapedString() : RequireString();
-			return DateTime.ParseExact(s, JsonOptions.DateFormat, CultureInfo.InvariantCulture);
+			return DateTime.ParseExact(
+				s, JsonOptions.DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
 		}
 
 		protected TimeSpan RequireTimeSpan()
@@ -827,6 +828,18 @@ namespace Yuzu.Json
 				default:
 					throw new YuzuAssert();
 			}
+		}
+
+		public T FromReader<T>(BinaryReader reader)
+		{
+			Reader = reader;
+			Initialize();
+			return (T)ReadValueFunc(typeof(T))();
+		}
+
+		public T FromString<T>(string source)
+		{
+			return FromReader<T>(new BinaryReader(new MemoryStream(Encoding.UTF8.GetBytes(source), false)));
 		}
 
 	}

@@ -872,10 +872,12 @@ namespace YuzuTest.Json
 			var js = new JsonSerializer();
 			js.JsonOptions.Indent = "";
 			js.JsonOptions.FieldSeparator = " ";
+			var jd = new JsonDeserializer();
 
 			var v1 = new SampleDate { D = new DateTime(2011, 3, 25), T = TimeSpan.FromMinutes(5) };
 			var result1 = js.ToString(v1);
 			Assert.AreEqual("{ \"D\":\"2011-03-25T00:00:00.0000000\", \"T\":\"00:05:00\" }", result1);
+
 			js.JsonOptions.DateFormat = @"yyyy";
 			Assert.AreEqual("{ \"D\":\"2011\", \"T\":\"00:05:00\" }", js.ToString(v1));
 
@@ -887,6 +889,20 @@ namespace YuzuTest.Json
 			w1 = (SampleDate)SampleDate_JsonDeserializer.Instance.FromString(result1);
 			Assert.AreEqual(v1.D, w1.D);
 			Assert.AreEqual(v1.T, w1.T);
+
+			js.JsonOptions.DateFormat = "O";
+			var v2 = new DateTime(2011, 3, 25, 1, 2, 3, DateTimeKind.Utc);
+			var result2 = js.ToString(v2);
+			Assert.AreEqual("\"2011-03-25T01:02:03.0000000Z\"", result2);
+			var w2 = jd.FromString<DateTime>(result2);
+			Assert.AreEqual(v2, w2);
+			Assert.AreEqual(v2.Kind, w2.Kind);
+
+			var v3 = new DateTime(2011, 3, 25, 1, 2, 3, DateTimeKind.Local);
+			var result3 = js.ToString(v3);
+			var w3 = jd.FromString<DateTime>(result3);
+			Assert.AreEqual(v3, w3);
+			Assert.AreEqual(v3.Kind, w3.Kind);
 		}
 
 		[TestMethod]
