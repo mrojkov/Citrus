@@ -30,7 +30,7 @@ namespace Lime.Text
 			text = text ?? "";
 			this.text = text;
 			while (pos < text.Length) {
-				if (text[pos] == Nbsp || text.Substring(pos, 6) == "&nbsp;") {
+				if (IsNbsp()) {
 					ParseNbsp();
 				}
 				if (text[pos] == '<') {
@@ -48,7 +48,7 @@ namespace Lime.Text
 		{
 			int p = pos;
 			while (pos < text.Length) {
-				if (text[pos] == '<' || text[pos] == Nbsp || text.Substring(pos, 6) == "&nbsp;") {
+				if (text[pos] == '<' || IsNbsp()) {
 					break;
 				} else if (text[pos] == '>') {
 					ErrorMessage = "Unexpected '&gt;'";
@@ -122,6 +122,13 @@ namespace Lime.Text
 			} else {
 				pos++;
 			}
+		}
+
+		private bool IsNbsp()
+		{
+			return
+				text[pos] == Nbsp ||
+				(text[pos] == '&' && text.Length - pos >= 6 && text.Substring(pos, 6) == "&nbsp;");
 		}
 
 		bool ProcessOpeningTag(string tag)
