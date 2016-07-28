@@ -119,8 +119,6 @@ namespace Orange
 				return new Material {
 					DiffuseTexture = TryGetSerializableTexture("Diffuse"),
 					OpacityTexture = TryGetSerializableTexture("Opacity"),
-					SpecularTexture = TryGetSerializableTexture("Specular"),
-					HeightTexture = TryGetSerializableTexture("Bump")
 				};
 			}
 

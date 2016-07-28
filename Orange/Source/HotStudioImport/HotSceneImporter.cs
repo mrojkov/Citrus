@@ -562,8 +562,21 @@ namespace Orange
 				lexer.ParseInt();
 				break;
 			case "Group":
-				audio.Group = lexer.ParseInt() == 1 ? AudioChannelGroup.Music : AudioChannelGroup.Effects;
+			{
+				var group = lexer.ParseInt();
+				switch (group) {
+					case 1:
+						audio.Group = AudioChannelGroup.Music;
+						break;
+					case 2:
+						audio.Group = AudioChannelGroup.Voice;
+						break;
+					default:
+						audio.Group = AudioChannelGroup.Effects;
+						break;
+				}
 				break;
+			}
 			case "Priority":
 				audio.Priority = (int)lexer.ParseFloat();
 				break;
