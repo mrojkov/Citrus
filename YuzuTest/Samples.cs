@@ -412,6 +412,20 @@ namespace YuzuTest
 		public Sample1 M;
 	}
 
+	public class SampleNested
+	{
+		public enum NestedEnum { One, Two };
+		public class NestedClass
+		{
+			[YuzuOptional]
+			public int Z;
+		}
+		[YuzuRequired]
+		public NestedEnum E;
+		[YuzuRequired]
+		public NestedClass C;
+	}
+
 	public class Bad1
 	{
 		[YuzuRequired]

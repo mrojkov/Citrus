@@ -1021,6 +1021,19 @@ namespace YuzuTest.Json
 		}
 
 		[TestMethod]
+		public void TestNestedTypes()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = "";
+
+			var v1 = new SampleNested { E = SampleNested.NestedEnum.One, C = new SampleNested.NestedClass() };
+			var result1 = js.ToString(v1);
+			Assert.AreEqual("{\"C\":{\"Z\":0},\"E\":0}", result1);
+
+		}
+
+		[TestMethod]
 		public void TestErrors()
 		{
 			var js = new JsonSerializer();

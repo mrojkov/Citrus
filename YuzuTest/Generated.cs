@@ -1140,6 +1140,96 @@ namespace YuzuGen.YuzuTest
 		}
 	}
 
+	class SampleNested__NestedClass_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new SampleNested__NestedClass_JsonDeserializer Instance = new SampleNested__NestedClass_JsonDeserializer();
+
+		public SampleNested__NestedClass_JsonDeserializer()
+		{
+			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
+			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
+			JsonOptions.IgnoreCompact = false;
+			JsonOptions.Int64AsString = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.ArrayLengthPrefix = true;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderTyped<global::YuzuTest.SampleNested.NestedClass>(Reader);
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new global::YuzuTest.SampleNested.NestedClass(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (global::YuzuTest.SampleNested.NestedClass)obj;
+			if ("Z" == name) {
+				result.Z = RequireInt();
+				name = GetNextName(false);
+			}
+			Require('}');
+			return result;
+		}
+	}
+
+	class SampleNested_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new SampleNested_JsonDeserializer Instance = new SampleNested_JsonDeserializer();
+
+		public SampleNested_JsonDeserializer()
+		{
+			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
+			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
+			JsonOptions.IgnoreCompact = false;
+			JsonOptions.Int64AsString = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.ArrayLengthPrefix = true;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderTyped<global::YuzuTest.SampleNested>(Reader);
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new global::YuzuTest.SampleNested(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (global::YuzuTest.SampleNested)obj;
+			if ("C" != name) throw new YuzuException("C!=" + name);
+			result.C = YuzuGen.YuzuTest.SampleNested__NestedClass_JsonDeserializer.Instance.FromReaderTyped<global::YuzuTest.SampleNested.NestedClass>(Reader);
+			name = GetNextName(false);
+			if ("E" != name) throw new YuzuException("E!=" + name);
+			result.E = (global::YuzuTest.SampleNested.NestedEnum)Enum.Parse(typeof(global::YuzuTest.SampleNested.NestedEnum), RequireString());
+			name = GetNextName(false);
+			Require('}');
+			return result;
+		}
+	}
+
 	class SamplePerson_JsonDeserializer : JsonDeserializerGenBase
 	{
 		public static new SamplePerson_JsonDeserializer Instance = new SamplePerson_JsonDeserializer();

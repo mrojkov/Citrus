@@ -13,10 +13,16 @@ namespace Yuzu.Json
 	{
 		public abstract object FromReaderIntPartial(string name);
 
+		private string DeclaringTypes(Type t, string separator)
+		{
+			return t.DeclaringType == null ? "" :
+				DeclaringTypes(t.DeclaringType, separator) + t.DeclaringType.Name + separator;
+		}
+
 		protected string GetTypeSpec(Type t, string format = "{0}<{1}>", bool ns = false)
 		{
 			var p = ns ? "global::" + t.Namespace + "." : "";
-			var n = t.Name;
+			var n = DeclaringTypes(t, ".") + t.Name;
 			if (!t.IsGenericType)
 				return p + n;
 			var args = String.Join(",", t.GetGenericArguments().Select(a => GetTypeSpec(a, format, ns)));
@@ -30,7 +36,7 @@ namespace Yuzu.Json
 
 		protected string GetMangledTypeName(Type t)
 		{
-			var n = t.Name;
+			var n = DeclaringTypes(t, "__") + t.Name;
 			if (!t.IsGenericType)
 				return n;
 			var args = String.Join("__", t.GetGenericArguments().Select(a => GetMangledTypeName(a)));
