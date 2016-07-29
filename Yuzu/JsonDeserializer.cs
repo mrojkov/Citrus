@@ -304,7 +304,8 @@ namespace Yuzu.Json
 		protected DateTime RequireDateTime()
 		{
 			var s = JsonOptions.DateFormat == "O" ? RequireUnescapedString() : RequireString();
-			return DateTime.ParseExact(s, JsonOptions.DateFormat, CultureInfo.InvariantCulture);
+			return DateTime.ParseExact(
+				s, JsonOptions.DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
 		}
 
 		protected TimeSpan RequireTimeSpan()
@@ -829,42 +830,17 @@ namespace Yuzu.Json
 			}
 		}
 
-		protected JsonDeserializerGenBase MakeDeserializer(string className)
+		public T FromReader<T>(BinaryReader reader)
 		{
-			var t = Options.Assembly.GetType(className + "_JsonDeserializer");
-			if (t == null)
-				throw Error("Generated deserializer not found for type '{0}'", className);
-			var result = (JsonDeserializerGenBase)Activator.CreateInstance(t);
-			result.Reader = Reader;
-			return result;
+			Reader = reader;
+			Initialize();
+			return (T)ReadValueFunc(typeof(T))();
 		}
 
-		protected object FromReaderIntGenerated()
+		public T FromString<T>(string source)
 		{
-			KillBuf();
-			Require('{');
-			CheckClassTag(GetNextName(first: true));
-			var d = MakeDeserializer(RequireUnescapedString());
-			Require(',');
-			return d.FromReaderIntPartial(GetNextName(first: false));
+			return FromReader<T>(new BinaryReader(new MemoryStream(Encoding.UTF8.GetBytes(source), false)));
 		}
 
-		protected object FromReaderIntGenerated(object obj)
-		{
-			KillBuf();
-			Require('{');
-			var expectedType = obj.GetType();
-			string name = GetNextName(first: true);
-			if (name == JsonOptions.ClassTag) {
-				var typeName = RequireUnescapedString();
-				var actualType = Options.Assembly.GetType(typeName);
-				if (actualType == null)
-					throw Error("Unknown type '{0}'", typeName);
-				if (actualType != expectedType)
-					throw Error("Expected type '{0}', but got {1}", expectedType.Name, typeName);
-				name = GetNextName(first: false);
-			}
-			return MakeDeserializer(obj.GetType().FullName).ReadFields(obj, name);
-		}
 	}
 }
