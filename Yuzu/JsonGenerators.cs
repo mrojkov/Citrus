@@ -19,19 +19,14 @@ namespace Yuzu.Json
 				DeclaringTypes(t.DeclaringType, separator) + t.DeclaringType.Name + separator;
 		}
 
-		protected string GetTypeSpec(Type t, string format = "{0}<{1}>", bool ns = false)
+		protected string GetTypeSpec(Type t)
 		{
-			var p = ns ? "global::" + t.Namespace + "." : "";
+			var p = "global::" + t.Namespace + ".";
 			var n = DeclaringTypes(t, ".") + t.Name;
 			if (!t.IsGenericType)
 				return p + n;
-			var args = String.Join(",", t.GetGenericArguments().Select(a => GetTypeSpec(a, format, ns)));
-			return p + String.Format(format, n.Remove(n.IndexOf('`')), args);
-		}
-
-		protected string GetTypeSpecNS(Type t)
-		{
-			return GetTypeSpec(t, "{0}<{1}>", true);
+			var args = String.Join(",", t.GetGenericArguments().Select(a => GetTypeSpec(a)));
+			return p + String.Format("{0}<{1}>", n.Remove(n.IndexOf('`')), args);
 		}
 
 		protected string GetMangledTypeName(Type t)
@@ -195,14 +190,14 @@ namespace Yuzu.Json
 
 		private void PutRequireOrNull(char ch, Type t, string name)
 		{
-			PutPart(String.Format("RequireOrNull('{0}') ? null : new {1}();\n", ch, GetTypeSpecNS(t)));
+			PutPart(String.Format("RequireOrNull('{0}') ? null : new {1}();\n", ch, GetTypeSpec(t)));
 			PutF("if ({0} != null) {{\n", name);
 		}
 
 		private void PutRequireOrNullArray(char ch, Type t, string name)
 		{
 			PutPart(String.Format(
-				"RequireOrNull('{0}') ? null : new {1}[0];\n", ch, GetTypeSpecNS(t.GetElementType())));
+				"RequireOrNull('{0}') ? null : new {1}[0];\n", ch, GetTypeSpec(t.GetElementType())));
 			PutF("if ({0} != null) {{\n", name);
 		}
 
@@ -223,7 +218,7 @@ namespace Yuzu.Json
 			if (imap.TargetMethods[addIndex].Name == "Add")
 				PutF("{0}.Add({1});\n", name, tempName);
 			else
-				PutF("(({2}){0}).Add({1});\n", name, tempName, GetTypeSpecNS(icoll));
+				PutF("(({2}){0}).Add({1});\n", name, tempName, GetTypeSpec(icoll));
 			Put("} while (Require(']', ',') == ',');\n");
 			Put("}\n");
 		}
@@ -265,9 +260,9 @@ namespace Yuzu.Json
 				keyType == typeof(string) ? tempKeyStr :
 				keyType == typeof(int) ? String.Format("int.Parse({0})", tempKeyStr) :
 				keyType.IsEnum ?
-					String.Format("({0})Enum.Parse(typeof({0}), {1})", GetTypeSpecNS(keyType), tempKeyStr) :
+					String.Format("({0})Enum.Parse(typeof({0}), {1})", GetTypeSpec(keyType), tempKeyStr) :
 				// Slow.
-					String.Format("({0})keyParsers[typeof({0})]({1})", GetTypeSpecNS(keyType), tempKeyStr);
+					String.Format("({0})keyParsers[typeof({0})]({1})", GetTypeSpec(keyType), tempKeyStr);
 			PutF("{0}.Add({1}, {2});\n", name, tempKey, tempValue);
 			Put("} while (Require('}', ',') == ',');\n");
 			Put("}\n");
@@ -327,7 +322,7 @@ namespace Yuzu.Json
 					JsonOptions.EnumAsString ?
 						"({0})Enum.Parse(typeof({0}), RequireString());\n" :
 						"({0})RequireInt();\n",
-					GetTypeSpecNS(t)));
+					GetTypeSpec(t)));
 			}
 			else if(t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
 				PutRequireOrNull('{', t, name);
@@ -341,7 +336,7 @@ namespace Yuzu.Json
 				Put("else {\n");
 				tempCount += 1;
 				var tempListName = "tmp" + tempCount.ToString();
-				PutF("var {0} = new List<{1}>();\n", tempListName, GetTypeSpecNS(t.GetElementType()));
+				PutF("var {0} = new List<{1}>();\n", tempListName, GetTypeSpec(t.GetElementType()));
 				Put("do {\n");
 				tempCount += 1;
 				var tempName = "tmp" + tempCount.ToString();
@@ -358,7 +353,7 @@ namespace Yuzu.Json
 				Put("if (SkipSpacesCarefully() != ']') {\n");
 				tempCount += 1;
 				var tempArrayName = "tmp" + tempCount.ToString();
-				PutF("var {0} = new {1}[RequireUInt()];\n", tempArrayName, GetTypeSpecNS(t.GetElementType()));
+				PutF("var {0} = new {1}[RequireUInt()];\n", tempArrayName, GetTypeSpec(t.GetElementType()));
 				tempCount += 1;
 				var tempIndexName = "tmp" + tempCount.ToString();
 				PutF("for(int {0} = 0; {0} < {1}.Length; ++{0}) {{\n", tempIndexName, tempArrayName);
@@ -378,10 +373,10 @@ namespace Yuzu.Json
 			}
 			else if (t.IsClass || Utils.IsStruct(t))
 				PutPart(String.Format(
-					"{0}.Instance.FromReaderTyped<{1}>(Reader);\n", GetDeserializerName(t), GetTypeSpecNS(t)));
+					"{0}.Instance.FromReaderTyped<{1}>(Reader);\n", GetDeserializerName(t), GetTypeSpec(t)));
 			else if (t.IsInterface)
 				PutPart(String.Format(
-					"{0}.Instance.FromReaderInterface<{1}>(Reader);\n", GetDeserializerName(t), GetTypeSpecNS(t)));
+					"{0}.Instance.FromReaderInterface<{1}>(Reader);\n", GetDeserializerName(t), GetTypeSpec(t)));
 			else
 				throw new NotImplementedException(t.Name);
 		}
@@ -439,7 +434,7 @@ namespace Yuzu.Json
 			Put("\n");
 
 			var icoll = typeof(T).GetInterface(typeof(ICollection<>).Name);
-			var typeSpec = GetTypeSpecNS(typeof(T));
+			var typeSpec = GetTypeSpec(typeof(T));
 			Put("public override object FromReaderInt()\n");
 			Put("{\n");
 			if (icoll != null)
