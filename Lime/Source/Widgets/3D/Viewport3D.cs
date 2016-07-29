@@ -117,7 +117,22 @@ namespace Lime
 				foreach (var node in Nodes) {
 					node.AddToRenderChain(renderChain);
 				}
-				return renderChain.HitTest(ref args);
+				var layers = renderChain.Layers;
+				for (var i = layers.Length - 1; i >= 0; i--) {
+					var list = layers[i];
+					if (list == null || list.Count == 0) {
+						continue;
+					}
+					var hit = false;
+					for (var j = 0; j < list.Count; j++) {
+						var t = list[j];
+						hit |= t.Presenter.PartialHitTest(t.Node, ref args);
+					}
+					if (hit) {
+						return true;
+					}
+				}
+				return false;
 			} finally {
 				renderChain.Clear();
 			}
