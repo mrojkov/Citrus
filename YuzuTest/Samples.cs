@@ -226,6 +226,13 @@ namespace YuzuTest
 	}
 
 	[YuzuCompact]
+	public class SampleWithNullFieldCompact
+	{
+		[YuzuRequired]
+		public Sample1 N;
+	}
+
+	[YuzuCompact]
 	[ProtoContract]
 	public class Color
 	{

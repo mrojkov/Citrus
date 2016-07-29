@@ -106,7 +106,8 @@ namespace Yuzu.Json
 		{
 			Reader = reader;
 			KillBuf();
-			var ch = Require('[', '{');
+			var ch = RequireBracketOrNull();
+			if (ch == 'n') return default(T);
 			if (ch == '[') return (T)ReadFieldsCompact(new T());
 			var name = GetNextName(true);
 			if (name != JsonOptions.ClassTag) return (T)ReadFields(new T(), name);
@@ -118,7 +119,11 @@ namespace Yuzu.Json
 		{
 			Reader = reader;
 			KillBuf();
-			var ch = Require('{');
+			var ch = Require('{', 'n');
+			if (ch == 'n') {
+				Require("ull");
+				return null;
+			}
 			CheckClassTag(GetNextName(first: true));
 			var typeName = RequireUnescapedString();
 			return (T)MakeDeserializer(typeName).FromReaderIntPartial(GetNextName(first: false));

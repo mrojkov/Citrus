@@ -1089,6 +1089,57 @@ namespace YuzuGen.YuzuTest
 		}
 	}
 
+	class SampleWithNullFieldCompact_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new SampleWithNullFieldCompact_JsonDeserializer Instance = new SampleWithNullFieldCompact_JsonDeserializer();
+
+		public SampleWithNullFieldCompact_JsonDeserializer()
+		{
+			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
+			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
+			JsonOptions.IgnoreCompact = false;
+			JsonOptions.Int64AsString = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.ArrayLengthPrefix = true;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderTyped<global::YuzuTest.SampleWithNullFieldCompact>(Reader);
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new global::YuzuTest.SampleWithNullFieldCompact(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (global::YuzuTest.SampleWithNullFieldCompact)obj;
+			if ("N" != name) throw new YuzuException("N!=" + name);
+			result.N = YuzuGen.YuzuTest.Sample1_JsonDeserializer.Instance.FromReaderTyped<global::YuzuTest.Sample1>(Reader);
+			name = GetNextName(false);
+			Require('}');
+			return result;
+		}
+
+		protected override object ReadFieldsCompact(object obj)
+		{
+			var result = (global::YuzuTest.SampleWithNullFieldCompact)obj;
+			result.N = YuzuGen.YuzuTest.Sample1_JsonDeserializer.Instance.FromReaderTyped<global::YuzuTest.Sample1>(Reader);
+			Require(']');
+			return result;
+		}
+	}
+
 	class SamplePerson_JsonDeserializer : JsonDeserializerGenBase
 	{
 		public static new SamplePerson_JsonDeserializer Instance = new SamplePerson_JsonDeserializer();

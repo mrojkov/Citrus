@@ -116,6 +116,7 @@ namespace YuzuTest
 				jd.Generate<List<List<int>>>();
 				jd.Generate<SampleClassList>();
 				jd.Generate<SampleSmallTypes>();
+				jd.Generate<SampleWithNullFieldCompact>();
 				jd.Options.TagMode = TagMode.Aliases;
 				jd.Generate<SamplePerson>();
 				jd.Generate<ISample>();

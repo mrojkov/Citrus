@@ -655,6 +655,7 @@ namespace YuzuTest.Json
 			var v1 = new SampleInterfaceField { I = new SampleInterfaced { X = 34 } };
 			var result1 = js.ToString(v1);
 			Assert.AreEqual("{\"I\":{\"class\":\"YuzuTest.SampleInterfaced\",\"X\":34}}", result1);
+			Assert.AreEqual("{\"I\":{\"class\":\"YuzuTest.SampleInterfaced\",\"X\":34}}", result1);
 
 			var w1 = new SampleInterfaceField();
 			var jd = new JsonDeserializer();
@@ -665,6 +666,9 @@ namespace YuzuTest.Json
 			var w1g = (SampleInterfaceField)SampleInterfaceField_JsonDeserializer.Instance.FromString(result1);
 			Assert.IsInstanceOfType(w1g.I, typeof(SampleInterfaced));
 			Assert.AreEqual(34, w1g.I.X);
+
+			var w1n = (SampleInterfaceField)SampleInterfaceField_JsonDeserializer.Instance.FromString("{\"I\":null}");
+			Assert.AreEqual(null, w1n.I);
 
 			var v2 = new List<ISample> { null, new SampleInterfaced { X = 37 } };
 			var result2 = js.ToString(v2);
@@ -941,6 +945,10 @@ namespace YuzuTest.Json
 			var w = new SampleWithNullField { About = "zzz" };
 			jd.FromString(w, s);
 			Assert.AreEqual(sample.About, w.About);
+
+			var wg = (SampleWithNullFieldCompact)
+				SampleWithNullFieldCompact_JsonDeserializer.Instance.FromString("[null]");
+			Assert.AreEqual(null, wg.N);
 		}
 
 		[TestMethod]
