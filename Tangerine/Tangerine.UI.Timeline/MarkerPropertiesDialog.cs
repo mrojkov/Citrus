@@ -18,7 +18,7 @@ namespace Tangerine.UI.Timeline
 		public MarkerPropertiesDialog(Marker marker)
 		{
 			window = new Window(new WindowOptions { ClientSize = new Vector2(300, 150), FixedSize = false, Title = "Marker properties" });
-			rootWidget = new DefaultWindowWidget(window, continuousRendering: false) {
+			rootWidget = new InvalidableWindowWidget(window) {
 				Padding = new Thickness(8),
 				Layout = new VBoxLayout { Spacing = 8 },
 				Nodes = {

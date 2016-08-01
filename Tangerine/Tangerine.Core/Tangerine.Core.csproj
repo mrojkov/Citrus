@@ -75,6 +75,7 @@
     <Compile Include="HotStudioImport\HotSceneImporter.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="IDataflow.cs" />
+    <Compile Include="VersionedCollection.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

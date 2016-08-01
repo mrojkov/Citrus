@@ -58,6 +58,7 @@
     <Folder Include="Utils\" />
     <Folder Include="Docking\" />
     <Folder Include="Binding\" />
+    <Folder Include="Dialogs\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Binding\CheckBoxBinding.cs" />
     <Compile Include="BitmapButton.cs" />
     <Compile Include="Utils\WidgetKeyHandler.cs" />
+    <Compile Include="Dialogs\AlertDialog.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

@@ -22,7 +22,7 @@ namespace Tangerine
 				Title = "Preferences",
 				MinimumDecoratedSize = new Vector2(400, 300)
 			});
-			rootWidget = new DefaultWindowWidget(window, continuousRendering: false) {
+			rootWidget = new InvalidableWindowWidget(window) {
 				Padding = new Thickness(8),
 				Layout = new VBoxLayout(),
 				Nodes = {

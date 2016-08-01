@@ -99,6 +99,50 @@ namespace Tangerine
 		}
 	}
 
+	public class NextDocumentCommand : Command
+	{
+		public NextDocumentCommand()
+		{
+			Text = "Next Document";
+			Shortcut = KeyBindings.Generic.NextDocument;
+		}
+
+		public override void Execute()
+		{
+			Project.Current.NextDocument();
+		}
+	}
+
+	public class PreviousDocumentCommand : Command
+	{
+		public PreviousDocumentCommand()
+		{
+			Text = "Previous Document";
+			Shortcut = KeyBindings.Generic.PreviousDocument;
+		}
+
+		public override void Execute()
+		{
+			Project.Current.PreviousDocument();
+		}
+	}
+
+	public class CloseDocumentCommand : Command
+	{
+		public CloseDocumentCommand()
+		{
+			Text = "Close Document";
+			Shortcut = KeyBindings.Generic.CloseDocument;
+		}
+
+		public override void Execute()
+		{
+			if (Document.Current != null) {
+				Project.Current.CloseDocument(Document.Current);
+			}
+		}
+	}
+
 	public class TangerineApp
 	{
 		public static TangerineApp Instance { get; private set; }
@@ -136,8 +180,14 @@ namespace Tangerine
 			Preferences = new UserPreferences();
 			Preferences.Load();
 			dockManager.ImportState(Preferences.DockState);
-			// new PreferencesDialog(Preferences);
-
+			Document.Closing += doc => {
+				var alert = new AlertDialog("Tangerine", $"Save the changes to document '{doc.Path}' before closing?", "Yes", "No", "Cancel");
+				switch (alert.Show()) {
+					case 0: return Document.CloseAction.SaveChanges;
+					case 1: return Document.CloseAction.DiscardChanges;
+					default: return Document.CloseAction.Cancel;
+				}
+			};
 			Document.ViewsBuilder = () => {
 				var doc = Document.Current;
 				doc.Views.Add(new UI.Inspector.Inspector(inspectorPanel.ContentWidget));
@@ -171,10 +221,12 @@ namespace Tangerine
 			public DocumentTabsProcessor(TabBar tabBar)
 			{
 				RebuildTabs(tabBar);
-				var documentsChanged = new EventflowProvider<NotifyCollectionChangedEventArgs>(Project.Current.Documents, "CollectionChanged");
-				tabBar.Updated += documentsChanged.Consume(_ => RebuildTabs(tabBar)).Execute;
+				var documentsCollectionChanged = new Property<int>(() => Project.Current.Documents.Version).DistinctUntilChanged();
 				var currentProjectChanged = new Property<Project>(() => Project.Current).DistinctUntilChanged();
-				tabBar.Updated += currentProjectChanged.Consume(_ => RebuildTabs(tabBar)).Execute;
+				tabBar.Tasks.Add(
+					documentsCollectionChanged.Consume(_ => RebuildTabs(tabBar)),
+					currentProjectChanged.Consume(_ => RebuildTabs(tabBar))
+				);
 			}
 
 			private void RebuildTabs(TabBar tabBar)
@@ -184,10 +236,12 @@ namespace Tangerine
 					var tab = new Tab { Closable = true };
 					var currentDocumentChanged = new Property<bool>(() => Document.Current == doc).DistinctUntilChanged().Where(i => i);
 					var documentModified = new Property<bool>(() => doc.IsModified).DistinctUntilChanged();
-					tab.Updated += currentDocumentChanged.Consume(_ => tabBar.ActivateTab(tab)).Execute;
-					tab.Updated += documentModified.Consume(_ => RefreshTabText(doc, tab)).Execute;
+					tab.Tasks.Add(
+						currentDocumentChanged.Consume(_ => tabBar.ActivateTab(tab)),
+						documentModified.Consume(_ => RefreshTabText(doc, tab))
+					);
 					tab.Clicked += doc.MakeCurrent;
-					tab.Closing += () => doc.Close();
+					tab.Closing += () => Project.Current.CloseDocument(doc);
 					tabBar.AddNode(tab);
 				}
 				tabBar.AddNode(new Widget { LayoutCell = new LayoutCell { StretchX = 0 }});
@@ -226,6 +280,13 @@ namespace Tangerine
 				},
 				new Command("View") {
 					Submenu = (ViewMenu = new Menu { })
+				},
+				new Command("Window") {
+					Submenu = new Menu {
+						new NextDocumentCommand(),
+						new PreviousDocumentCommand(),
+						new CloseDocumentCommand(),
+					}
 				},
 			};
 		}

@@ -33,11 +33,11 @@ namespace Tangerine.UI
 			var window = new Window(new WindowOptions { ClientSize = windowSize, FixedSize = false, RefreshRate = 30, Title = "Tangerine" });
 			window.Closing += () => Closing();
 			window.Closed += () => Closed();
-			mainWidget = new DefaultWindowWidget(window, continuousRendering: false) {
+			mainWidget = new InvalidableWindowWidget(window) {
 				Id = "MainWindow",
 				Layout = new HBoxLayout(),
 				Padding = new Thickness(4),
-				CornerBlinkOnRendering = true
+				RedrawMarkVisible = true
 			};
 			new TabTraverseController(mainWidget);
 			DocumentArea = new Frame {
@@ -142,7 +142,7 @@ namespace Tangerine.UI
 						window.Resized += (deviceRotated) => {
 							p.Placement.UndockedSize = window.ClientSize;
 						};
-						p.WindowWidget = new DefaultWindowWidget(window, continuousRendering: false) {
+						p.WindowWidget = new InvalidableWindowWidget(window) {
 							Layout = new StackLayout(),
 						};
 						p.RootWidget.Unlink();

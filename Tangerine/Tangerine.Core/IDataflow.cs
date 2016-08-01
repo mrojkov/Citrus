@@ -15,7 +15,7 @@ namespace Tangerine.Core
 	/// <summary>
 	/// Represents the poll-based stream of values.
 	/// </summary>
-	public interface IDataflow<T>
+	public interface IDataflow<T> : IDisposable
 	{
 		/// <summary>
 		/// Polls the dataflow.
@@ -96,20 +96,35 @@ namespace Tangerine.Core
 		}
 	}
 
-	public class Eventflow<T> : IDataflow<T>
+	public class Eventflow<T> : IDataflow<T>, IDisposable
 	{
 		readonly List<T> queue = new List<T>();
+		readonly EventInfo eventInfo;
+		readonly Delegate @delegate;
+		readonly object obj;
+		bool disposed;
 
 		public T Value { get; private set; }
 		public bool GotValue { get; private set; }
 
 		public Eventflow(object obj, string eventName)
 		{
-			var evt = obj.GetType().GetEvent(eventName);
-			if (evt == null) {
+			this.obj = obj;
+			var eventInfo = obj.GetType().GetEvent(eventName);
+			if (eventInfo == null) {
 				throw new ArgumentException($"Unknown event {eventName} for type {obj.GetType()}");
 			}
-			evt.AddEventHandler(obj, CreateDelegate(evt, obj, eventName));
+			@delegate = CreateDelegate(eventInfo, obj, eventName);
+			eventInfo.AddEventHandler(obj, @delegate);
+		}
+
+		public void Dispose()
+		{
+			if (disposed) {
+				throw new InvalidOperationException();
+			}
+			eventInfo.RemoveEventHandler(obj, @delegate);
+			disposed = true;
 		}
 
 		Delegate CreateDelegate(EventInfo evt, object obj, string eventName)
@@ -166,6 +181,8 @@ namespace Tangerine.Core
 			Value = getter();
 			GotValue = true;
 		}
+
+		public void Dispose() { }
 	}
 
 	public static class DataflowMixins
@@ -236,6 +253,11 @@ namespace Tangerine.Core
 					Value = selector(arg.Value);
 				}
 			}
+
+			public void Dispose()
+			{
+				arg.Dispose();
+			}
 		}
 
 		class CoalesceProvider<T1, T2> : IDataflow<Tuple<T1, T2>>
@@ -260,6 +282,12 @@ namespace Tangerine.Core
 					Value = new Tuple<T1, T2>(arg1.Value, arg2.Value);
 				}
 			}
+
+			public void Dispose()
+			{
+				arg1.Dispose();
+				arg2.Dispose();
+			}
 		}
 
 		class WhereProvider<T> : IDataflow<T>
@@ -282,6 +310,11 @@ namespace Tangerine.Core
 				if ((GotValue = arg.GotValue && predicate(arg.Value))) {
 					Value = arg.Value;
 				}
+			}
+
+			public void Dispose()
+			{
+				arg.Dispose();
 			}
 		}
 
@@ -311,6 +344,11 @@ namespace Tangerine.Core
 					previous = current;
 				}
 			}
+
+			public void Dispose()
+			{
+				arg.Dispose();
+			}
 		}
 
 		class SkipProvider<T> : IDataflow<T>
@@ -335,6 +373,11 @@ namespace Tangerine.Core
 					done = true;
 					Value = arg.Value;
 				}
+			}
+
+			public void Dispose()
+			{
+				arg.Dispose();
 			}
 		}
 
@@ -362,9 +405,15 @@ namespace Tangerine.Core
 					Value = EqualityComparer<T>.Default.Equals(arg1.Value, arg2.Value) ? arg1.Value : defaultValue;
 				}
 			}
+
+			public void Dispose()
+			{
+				arg1.Dispose();
+				arg2.Dispose();
+			}
 		}
 
-		public class Consumer<T>
+		public class Consumer<T> : IProcessor
 		{
 			readonly IDataflow<T> dataflow;
 			readonly Action<T> action;
@@ -375,16 +424,23 @@ namespace Tangerine.Core
 				this.action = action;
 			}
 
-			public void Execute(float delta)
-			{
-				Execute();
-			}
-
 			public void Execute()
 			{
 				dataflow.Poll();
 				if (dataflow.GotValue) {
 					action(dataflow.Value);
+				}
+			}
+
+			public IEnumerator<object> Loop()
+			{
+				try {
+					while (true) {
+						Execute();
+						yield return null;
+					}
+				} finally {
+					dataflow.Dispose();
 				}
 			}
 		}

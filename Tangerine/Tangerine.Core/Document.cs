@@ -37,9 +37,8 @@ namespace Tangerine.Core
 		public bool ReadOnly { get; private set; }
 		public bool IsModified => History.IsDocumentModified;
 
-		public event Func<CloseAction> Closing;
-		public event Action<Document> Closed;
-		
+		public static Func<Document, CloseAction> Closing;
+
 		public Node RootNode { get; private set; }
 		public Node Container { get; set; }
 		public IEnumerable<object> SelectedObjects => SelectedObjectsProvider.Get();
@@ -111,17 +110,19 @@ namespace Tangerine.Core
 
 		public bool Close()
 		{
+			if (!IsModified) {
+				return true;
+			}
 			if (Closing != null) {
-				var a = Closing();
-				if (a == CloseAction.Cancel) {
+				var r = Closing(this);
+				if (r == CloseAction.Cancel) {
 					return false;
 				}
-				if (a == CloseAction.SaveChanges) {
+				if (r == CloseAction.SaveChanges) {
 					Save();
 				}
-			}
-			if (Closed != null) {
-				Closed(this);
+			} else {
+				Save();
 			}
 			return true;
 		}

@@ -32,7 +32,7 @@ namespace Tangerine.UI.Timeline
 					Renderer.DrawTextLine(
 						new Vector2(x, y), i.ToString(),
 						DesktopTheme.Metrics.TextHeight, 
-						DesktopTheme.Colors.BlackText.ABGR);
+						DesktopTheme.Colors.BlackText);
 				}
 				Renderer.DrawLine(x, RootWidget.Height - 1, x, RootWidget.Height - 4, Colors.Timeline.Ruler.Notchings);
 			}
@@ -53,6 +53,14 @@ namespace Tangerine.UI.Timeline
 			r.A.Y = r.B.Y - 4;
 			Renderer.DrawRect(r.A, r.B, GetMarkerColor(marker));
 			Renderer.DrawRectOutline(r.A, r.B, Colors.Timeline.Ruler.Notchings);
+			if (!string.IsNullOrWhiteSpace(marker.Id)) {
+				var h = DesktopTheme.Metrics.TextHeight * 0.75f;
+				var extent = Renderer.MeasureTextLine(FontPool.Instance.DefaultFont, marker.Id, h) + Vector2.One;
+				var pos = new Vector2(r.A.X, r.A.Y - extent.Y);
+				Renderer.DrawRect(pos, pos + extent, DesktopTheme.Colors.WhiteBackground);
+				Renderer.DrawRectOutline(pos, pos + extent, DesktopTheme.Colors.ControlBorder);
+				Renderer.DrawTextLine(pos, marker.Id, h, DesktopTheme.Colors.BlackText);
+			}
 		}
 
 		Color4 GetMarkerColor(Marker marker)

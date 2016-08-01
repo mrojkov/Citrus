@@ -177,7 +177,7 @@ namespace Tangerine.UI
 			public ThumbnalWindow(string title)
 			{
 				window = new Window(new WindowOptions { FixedSize = true, ClientSize = new Vector2(100, 40), Style = WindowStyle.Borderless });
-				rootWidget = new DefaultWindowWidget(window, continuousRendering: false) {
+				rootWidget = new InvalidableWindowWidget(window) {
 					PostPresenter = new WidgetBoundsPresenter(Color4.Black, 1),
 					Layout = new StackLayout(),
 					Nodes = {

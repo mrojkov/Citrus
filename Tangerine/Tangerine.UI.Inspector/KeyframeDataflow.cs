@@ -26,6 +26,8 @@ namespace Tangerine.UI.Inspector
 			this.propertyName = propertyName;
 		}
 
+		public void Dispose() { }
+
 		public static IDataflowProvider<R> GetProvider<R>(PropertyEditorContext context, Func<IKeyframe, R> selector)
 		{
 			IDataflowProvider<R> provider = null;
