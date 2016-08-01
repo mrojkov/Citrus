@@ -57,19 +57,39 @@ namespace Lime
 
 	public class DefaultWindowWidget : WindowWidget
 	{
-		public bool CornerBlinkOnRendering;
-
-		public DefaultWindowWidget(Window window, bool continuousRendering = true)
-			: base(window, continuousRendering)
+		public DefaultWindowWidget(Window window)
+			: base(window)
 		{
 			Theme.Current.Apply(this, typeof(WindowWidget));
 			window.Rendering += () => {
 				Renderer.BeginFrame();
 				Renderer.SetOrthogonalProjection(Vector2.Zero, Size);
 				RenderAll();
-				if (CornerBlinkOnRendering) {
+				Renderer.EndFrame();
+			};
+			window.Updating += delta => {
+				Size = (Vector2)window.ClientSize;
+				Update(delta);
+			};
+		}
+	}
+
+	public class InvalidableWindowWidget : WindowWidget
+	{
+		public bool RedrawMarkVisible { get; set; }
+
+		public InvalidableWindowWidget(Window window)
+			: base(window, continuousRendering: false)
+		{
+			Theme.Current.Apply(this, typeof(WindowWidget));
+			window.Rendering += () => {
+				Renderer.BeginFrame();
+				Renderer.SetOrthogonalProjection(Vector2.Zero, Size);
+				RenderAll();
+				if (RedrawMarkVisible) {
 					RenderRedrawMark();
-				}				Renderer.EndFrame();
+				}
+				Renderer.EndFrame();
 			};
 			window.Updating += delta => {
 				Size = (Vector2)window.ClientSize;
@@ -87,7 +107,12 @@ namespace Lime
 
 		private Color4 RandomColor()
 		{
-			return new Color4((byte)Mathf.RandomInt(0, 255), (byte)Mathf.RandomInt(0, 255), (byte)Mathf.RandomInt(0, 255));
+			return new Color4(RandomByte(), RandomByte(), RandomByte());
+		}
+
+		private byte RandomByte()
+		{
+			return (byte)Mathf.RandomInt(0, 255);
 		}
 	}
 }
