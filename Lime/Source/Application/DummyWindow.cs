@@ -31,13 +31,15 @@ namespace Lime
 		{
 			throw new NotImplementedException();
 		}
-		public void Invalidate(){}
+		public void Invalidate() {}
 #if MAC
 		public Platform.NSGameView NSGameView { get; set; }
 #elif WIN
 		public System.Windows.Forms.Form Form { get; set; }
 #endif
 		public float PixelScale { get; set; }
+
+		public void ShowDialog() {}
 	}
 }
 #endif

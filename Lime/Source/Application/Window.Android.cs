@@ -39,10 +39,6 @@ namespace Lime
 			get; private set;
 		}
 
-		public void Center() {}
-		public void Close() {}
-		public void Invalidate() {}
-
 		public Window(WindowOptions options)
 		{
 			if (Application.MainWindow != null) {
@@ -72,6 +68,11 @@ namespace Lime
 
 			PixelScale = Resources.System.DisplayMetrics.Density;
 		}
+
+		public void Center() {}
+		public void Close() {}
+		public void Invalidate() {}
+		public void ShowDialog() {}
 
 		private static Vector2 ToLimeSize(System.Drawing.Size size, float pixelScale)
 		{

@@ -22,6 +22,8 @@ namespace Lime
 		private FPSCounter fpsCounter;
 		private Stopwatch stopwatch;
 		private bool invalidated;
+		private float refreshRate;
+		private bool dialogMode;
 
 		public NSGameView View { get; private set; }
 
@@ -34,11 +36,7 @@ namespace Lime
 		public bool Visible
 		{
 			get { return !View.Hidden; }
-			set
-			{
-				if (View.Hidden != !value)
-					View.Hidden = !value; 
-			}
+			set { ShowView(value, dialogMode: false); }
 		}
 
 		public Vector2 ClientPosition
@@ -162,6 +160,7 @@ namespace Lime
 
 		public Window(WindowOptions options)
 		{
+			this.refreshRate = options.RefreshRate;
 			Input = new Input();
 			fpsCounter = new FPSCounter();
 			CreateNativeWindow(options);
@@ -179,8 +178,6 @@ namespace Lime
 			}
 			stopwatch = new Stopwatch();
 			stopwatch.Start();
-			window.MakeKeyAndOrderFront(window);
-			View.Run(options.RefreshRate);
 		}
 
 		private Vector2 windowedClientSize;
@@ -194,6 +191,8 @@ namespace Lime
 			NSWindowStyle style;
 			if (options.Style == WindowStyle.Borderless) {
 				style = NSWindowStyle.Borderless;
+			} else if (options.Style == WindowStyle.Dialog) {
+				style = NSWindowStyle.Titled;
 			} else {
 				style = NSWindowStyle.Titled | NSWindowStyle.Closable | NSWindowStyle.Miniaturizable;
 			}
@@ -279,6 +278,17 @@ namespace Lime
 		public void Close()
 		{
 			window.Close();
+			if (dialogMode) {
+				NSApplication.SharedApplication.StopModal();
+			}
+		}
+
+		public void ShowDialog()
+		{
+			if (Visible) {
+				throw new InvalidOperationException();
+			}
+			ShowView(true, dialogMode: true);
 		}
 
 		private void HandleRenderFrame()
@@ -326,6 +336,20 @@ namespace Lime
 		{
 			var p = window.MouseLocationOutsideOfEventStream;
 			Input.MousePosition = new Vector2((int)p.X, (int)NSGameView.Frame.Height - (int)p.Y) * Input.ScreenToWorldTransform;
+		}
+
+		private void ShowView(bool show, bool dialogMode)
+		{
+			this.dialogMode = dialogMode;
+			View.Hidden = !show;
+			View.Stop();
+			if (show) {
+				View.Run(refreshRate, dialogMode);
+				window.MakeKeyAndOrderFront(window);
+			}
+			if (dialogMode) {
+				NSApplication.SharedApplication.RunModalForWindow(window);
+			}
 		}
 	}
 }

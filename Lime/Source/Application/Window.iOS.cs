@@ -43,9 +43,6 @@ namespace Lime
 			get { return (float)UIScreen.MainScreen.Scale; }
 		}
 
-		public void Center() { }
-		public void Close() { }
-
 		public Window()
 			: this(new WindowOptions())
 		{
@@ -92,9 +89,10 @@ namespace Lime
 			UIView.UpdateFrame += OnUpdateFrame;
 		}
 
-		public void Invalidate()
-		{
-		}
+		public void Center() { }
+		public void Close() { }
+		public void ShowDialog() { }
+		public void Invalidate() { }
 
 		private void OnUpdateFrame(object s, Xamarin.FrameEventArgs e)
 		{

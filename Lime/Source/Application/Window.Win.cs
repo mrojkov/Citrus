@@ -257,6 +257,11 @@ namespace Lime
 			Application.Windows.Add(this);
 		}
 
+		public void ShowDialog()
+		{
+			throw new NotImplementedException();
+		}
+
 		private static float CalcPixelScale(float Dpi)
 		{
 			return Dpi * 1f / 96f;

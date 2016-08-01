@@ -86,7 +86,7 @@ namespace Lime
 		Vector2 MaximumDecoratedSize { get; set; }
 
 		/// <summary>
-		/// Gets or sets a value indicates whether the window is displayed
+		/// Gets or sets a value indicates whether the window is displayed.
 		/// </summary>
 		bool Visible { get; set; }
 
@@ -179,5 +179,12 @@ namespace Lime
 		IContext Context { get; set; }
 
 		object Tag { get; set; }
+
+		/// <summary>
+		/// You can use this method to display a modal dialog box in your application. 
+		/// When this method is called, the code following it is not executed until after the dialog box is closed.
+		/// The window must be hidden before calling this method.
+		/// </summary>
+		void ShowDialog();
 	}
 }

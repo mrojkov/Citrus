@@ -29,9 +29,9 @@ namespace Lime.Platform
 		private NSTrackingArea trackingArea;
 		private bool swapInterval;
 		private bool disposed;
-		private bool animating;
 		private NSEventModifierMask prevMask;
 		private Lime.Input input;
+		private bool running;
 
 		public event Action Update;
 		public event Action RenderFrame;
@@ -41,6 +41,7 @@ namespace Lime.Platform
 			: base(frame)
 		{
 			this.input = input;
+			this.Hidden = true;
 			// Avoid of double scaling on high DPI displays
 			this.WantsBestResolutionOpenGLSurface = true;
 			pixelFormat = SelectPixelFormat(mode, 1, 0);
@@ -224,18 +225,18 @@ namespace Lime.Platform
 	
 		public void Stop()
 		{
-			if (animating) {
+			if (running) {
 				animationTimer.Invalidate();
 				animationTimer = null;
 			}
-			animating = false;
+			running = false;
 		}
 
-		public void Run(double updatesPerSecond)
+		public void Run(double updatesPerSecond, bool modal)
 		{
 			AssertNonDisposed();
 			openGLContext.SwapInterval = swapInterval;
-			StartAnimation(updatesPerSecond);
+			StartAnimation(updatesPerSecond, modal);
 		}
 
 		public override bool AcceptsFirstResponder()
@@ -263,22 +264,22 @@ namespace Lime.Platform
 			return null;
 		}
 
-		private void StartAnimation(double updatesPerSecond)
+		private void StartAnimation(double updatesPerSecond, bool modal)
 		{
-			if (!animating) {
+			if (!running) {
 				var timeout = new TimeSpan((long)(((1.0 * TimeSpan.TicksPerSecond) / updatesPerSecond) + 0.5));
 				animationTimer = NSTimer.CreateRepeatingScheduledTimer(timeout, delegate {
 					OnUpdate();
-					if (!animating) {
+					if (!running) {
 						// The window could be closed on update
 						return;
 					}
 					OnRender();
 				});
-				NSRunLoop.Current.AddTimer(animationTimer, NSRunLoopMode.Default);
+				NSRunLoop.Current.AddTimer(animationTimer, modal ? NSRunLoopMode.ModalPanel : NSRunLoopMode.Default);
 				NSRunLoop.Current.AddTimer(animationTimer, NSRunLoopMode.EventTracking);
 			}
-			animating = true;
+			running = true;
 		}
 
 		private void AssertNonDisposed()

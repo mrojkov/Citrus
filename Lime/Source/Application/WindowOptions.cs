@@ -5,6 +5,7 @@ namespace Lime
 	public enum WindowStyle
 	{
 		Regular,
+		Dialog,
 		Borderless
 	}
 
