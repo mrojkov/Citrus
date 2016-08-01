@@ -74,6 +74,7 @@ namespace Lime
 
 		class MenuItem
 		{
+			private Shortcut currentShortcut;
 			public readonly ICommand Command;
 			public readonly NSMenuItem NativeMenuItem;
 
@@ -91,7 +92,8 @@ namespace Lime
 				NativeMenuItem.Hidden = !Command.Visible;
 				NativeMenuItem.Enabled = Command.Enabled;
 				NativeMenuItem.Title = Command.Text;
-				if (Command.Shortcut.Main != Key.Unknown) {
+				if (Command.Shortcut.Main != Key.Unknown && currentShortcut != Command.Shortcut) {
+					currentShortcut = Command.Shortcut;
 					NativeMenuItem.KeyEquivalent = GetKeyEquivalent(Command.Shortcut.Main);
 					NativeMenuItem.KeyEquivalentModifierMask = GetModifierMask(Command.Shortcut.Modifiers);
 				}
@@ -112,6 +114,12 @@ namespace Lime
 				}
 				if (key >= Key.Number0 && key <= Key.Number9) {
 					return ((char)('0' + key - Key.A)).ToString();
+				}
+				if (key == Key.Tab) {
+					return "\t";
+				}
+				if (key == Key.Enter) {
+					return "\r";
 				}
 				throw new ArgumentException();
 			}
