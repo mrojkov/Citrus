@@ -38,9 +38,24 @@ namespace Lime
 
 		public static implicit operator Shortcut(Key main) { return new Shortcut(main); }
 
-		public override int GetHashCode ()
+		public override int GetHashCode()
 		{
 			return Main.Code.GetHashCode() ^ Modifiers.GetHashCode();
+		}
+
+		public static bool operator == (Shortcut lhs, Shortcut rhs)
+		{
+			return lhs.Main == rhs.Main && lhs.Modifiers == rhs.Modifiers;
+		}
+
+		public static bool operator != (Shortcut lhs, Shortcut rhs)
+		{
+			return lhs.Main != rhs.Main || lhs.Modifiers != rhs.Modifiers;
+		}
+
+		public override bool Equals(object obj)
+		{
+			return this == (Shortcut)obj;
 		}
 	}	
 }
