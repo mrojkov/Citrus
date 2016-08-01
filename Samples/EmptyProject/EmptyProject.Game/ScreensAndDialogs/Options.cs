@@ -54,7 +54,8 @@ namespace EmptyProject.ScreensAndDialogs
 			}
 		}
 
-		private static bool MusicEnabled {
+		private static bool MusicEnabled
+		{
 			get { return The.SoundManager.MusicVolume > 0; }
 			set { The.SoundManager.MusicVolume = value ? 1.0f : 0; }
 		}

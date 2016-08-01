@@ -40,8 +40,7 @@ namespace EmptyProject.Application
 				// Treat all devices with extra-large screens as tablets
 				// http://developer.android.com/guide/practices/screens_support.html
 				var ps = PhysicalSize;
-				if (ps.Y > ps.X)
-				{
+				if (ps.Y > ps.X) {
 					Toolbox.Swap(ref ps.Y, ref ps.X);
 				}
 				return ps.X >= 6 && ps.Y >= 4.5f;

@@ -62,8 +62,7 @@ namespace EmptyProject.ScreensAndDialogs
 			BeforeShow.SafeInvoke();
 			Orientate();
 			State = DialogState.Showing;
-			if (animation != null && Root.TryRunAnimation(animation))
-			{
+			if (animation != null && Root.TryRunAnimation(animation)) {
 				yield return Root;
 			}
 			State = DialogState.Shown;
@@ -74,8 +73,7 @@ namespace EmptyProject.ScreensAndDialogs
 		{
 			BeforeHide.SafeInvoke();
 			State = DialogState.Closing;
-			if (animation != null && Root.TryRunAnimation(animation))
-			{
+			if (animation != null && Root.TryRunAnimation(animation)) {
 				yield return Root;
 			}
 			State = DialogState.Closed;

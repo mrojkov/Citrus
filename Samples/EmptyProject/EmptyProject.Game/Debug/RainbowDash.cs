@@ -49,12 +49,10 @@ namespace RainbowDash
 		{
 			ArrangementValid = true;
 			var widgets = GetChildren(widget);
-			if (widgets.Count == 0)
-			{
+			if (widgets.Count == 0) {
 				return;
 			}
-			foreach (var w in widgets)
-			{
+			foreach (var w in widgets) {
 				w.Size = widget.Size;
 				LayoutWidgetWithinCell(w, Vector2.Zero, widget.Size, DebugRectangles);
 			}
@@ -83,10 +81,8 @@ namespace RainbowDash
 			var w = extent0.Width;
 			var h = extent0.Height;
 			var i = 2;
-			while (true)
-			{
-				if (w / i < h * i)
-				{
+			while (true) {
+				if (w / i < h * i) {
 					i--;
 					break;
 				}
@@ -192,8 +188,7 @@ namespace RainbowDash
 
 		public string CheatIdText()
 		{
-			if (Parent == null)
-			{
+			if (Parent == null) {
 				return "./" + button.Id;
 			}
 			return string.Join("/", Parent.CheatIdText(), button.Id);
@@ -238,8 +233,7 @@ namespace RainbowDash
 			var b = Menu.CreateItemButton();
 			Helper.DecorateButton(b, NiceColors.BasicColor(colorIndex));
 			b.Id = Helper.TrimTextForId(text);
-			var item = new Item(b)
-			{
+			var item = new Item(b) {
 				Text = text,
 				Action = action,
 				Enabled = enabled ?? (() => true),
@@ -288,13 +282,11 @@ namespace RainbowDash
 
 		public static void Cheat(string id)
 		{
-			if (instance == null)
-			{
+			if (instance == null) {
 				return;
 			}
 
-			foreach (var kv in instance.cheatButtons.Where(kv => kv.Key.StartsWith(id)))
-			{
+			foreach (var kv in instance.cheatButtons.Where(kv => kv.Key.StartsWith(id))) {
 				kv.Value.Clicked();
 			}
 		}
@@ -302,14 +294,12 @@ namespace RainbowDash
 		public Menu(Widget container, int layer)
 		{
 			worldContainer = container;
-			topContainer = new Frame
-			{
+			topContainer = new Frame {
 				Anchors = Anchors.LeftRightTopBottom,
 				Size = container.Size - Vector2.One * 80
 			};
 			var listContainer = (Frame)topContainer.Clone();
-			var back = new RoundedRectangle
-			{
+			var back = new RoundedRectangle {
 				Anchors = Anchors.LeftRightTopBottom,
 				Size = topContainer.Size + Vector2.One * 20,
 				Shader = ShaderId.Silhuette
@@ -327,8 +317,7 @@ namespace RainbowDash
 		public void Show()
 		{
 			instance = this;
-			for (var i = 0; i < parents.Count; i++)
-			{
+			for (var i = 0; i < parents.Count; i++) {
 				Fold(i, false);
 			}
 			worldContainer.AddNode(topContainer);
@@ -339,8 +328,7 @@ namespace RainbowDash
 
 		private void Fold(int id, bool visible)
 		{
-			if (foldButtons[id] == null)
-			{
+			if (foldButtons[id] == null) {
 				itemPanels[id].Visible = true;
 				return;
 			}
@@ -349,21 +337,17 @@ namespace RainbowDash
 			pQueue.Enqueue(id);
 			var depth = 1;
 			Action<int, bool> updateArrow = (j, v) => {
-				if (foldButtons[j] == null)
-				{
+				if (foldButtons[j] == null) {
 					return;
 				}
 				var arrow = foldButtons[j]["arrow"] as RichText;
 				arrow.Text = !v ? string.Concat(Enumerable.Repeat("&gt;  ", 1)) : string.Concat(Enumerable.Repeat("\\/  ", 1));
 			};
 			updateArrow(id, visible);
-			while (pQueue.Count != 0)
-			{
+			while (pQueue.Count != 0) {
 				id = pQueue.Dequeue();
-				for (var i = 0; i < parents.Count; i++)
-				{
-					if (parents[i] != id || foldButtons[i] == null)
-					{
+				for (var i = 0; i < parents.Count; i++) {
+					if (parents[i] != id || foldButtons[i] == null) {
 						continue;
 					}
 
@@ -379,8 +363,7 @@ namespace RainbowDash
 
 		private int AddNode(Button foldButton, Widget itemPanel, int parent = -1)
 		{
-			if (parents.Count != foldButtons.Count || foldButtons.Count != itemPanels.Count)
-			{
+			if (parents.Count != foldButtons.Count || foldButtons.Count != itemPanels.Count) {
 				throw new InvalidOperationException();
 			}
 
@@ -393,8 +376,7 @@ namespace RainbowDash
 		public Section Section(string text)
 		{
 			var itemPanel = CreateItemPanel();
-			var section = new Section(this, itemPanel, nextColorIndex)
-			{
+			var section = new Section(this, itemPanel, nextColorIndex) {
 				IdText = Helper.TrimTextForId(text)
 			};
 			var foldButton = CreateFoldButton(text);
@@ -417,8 +399,7 @@ namespace RainbowDash
 		{
 			var itemPanel = CreateItemPanel();
 			itemPanel.Id = ".";
-			var section = new Section(this, itemPanel, nextColorIndex)
-			{
+			var section = new Section(this, itemPanel, nextColorIndex) {
 				Id = foldButtons.Count
 			};
 			AddNode(null, itemPanel);
@@ -432,8 +413,7 @@ namespace RainbowDash
 			var s = Section(name);
 			s.ItemPanel.Id = s.IdText = Helper.TrimTextForId(name);
 			s.Depth = depth + 1;
-			var t = new Thickness
-			{
+			var t = new Thickness {
 				Left = 16 * (depth) + 8,
 				Right = 8,
 				Top = 8,
@@ -441,8 +421,7 @@ namespace RainbowDash
 			};
 			var id = parents.Count - 1;
 			itemPanels[id].Padding = t;
-			if (foldButtons[id] != null)
-			{
+			if (foldButtons[id] != null) {
 				foldButtons[id].Padding = t;
 				var p = (foldButtons[id]["padding"] as Image);
 				p.MinWidth = p.MaxWidth = t.Left;
@@ -456,16 +435,14 @@ namespace RainbowDash
 			instance = null;
 			topContainer.Unlink();
 			topContainer.Input.ReleaseAll();
-			if (Hidden != null)
-			{
+			if (Hidden != null) {
 				Hidden();
 			}
 		}
 
 		private static IEnumerator<object> RefreshTask()
 		{
-			while (true)
-			{
+			while (true) {
 				yield return null;
 			}
 		}
@@ -481,13 +458,11 @@ namespace RainbowDash
 			const int SpaceAfter = -32;
 			const float Height = 75.0f;
 #endif
-			var b = new Button()
-			{
+			var b = new Button() {
 				Text = text,
 				Height = Height
 			};
-			var textPresenter = new RichText()
-			{
+			var textPresenter = new RichText() {
 				Id = "TextPresenter",
 				Nodes = {
 					new TextStyle() {
@@ -500,16 +475,14 @@ namespace RainbowDash
 				HAlignment = HAlignment.Left,
 				VAlignment = VAlignment.Center
 			};
-			var bg = new Image()
-			{
+			var bg = new Image() {
 				Id = "bg",
 				Shader = ShaderId.Silhuette,
 				Height = Height,
 				Anchors = Anchors.LeftRightTopBottom,
 				Color = Color4.White
 			};
-			var arrow = new RichText()
-			{
+			var arrow = new RichText() {
 				Id = "arrow",
 				Nodes = {
 					new TextStyle() {
@@ -523,16 +496,14 @@ namespace RainbowDash
 				MinWidth = Height,
 				MaxWidth = Height
 			};
-			var padding = new Image()
-			{
+			var padding = new Image() {
 				Id = "padding",
 				MinWidth = 0,
 				MaxWidth = 0,
 				Shader = ShaderId.Silhuette,
 				Color = Color4.DarkGray
 			};
-			var w = new Widget
-			{
+			var w = new Widget {
 				Height = Height,
 				Anchors = Anchors.LeftRightTopBottom,
 				Layout = new HBoxLayout()
@@ -554,16 +525,13 @@ namespace RainbowDash
 			const int FontSize = 72;
 			const int SpaceAfter = -32;
 #endif
-			var b = new Button
-			{
-				LayoutCell = new LayoutCell()
-				{
+			var b = new Button {
+				LayoutCell = new LayoutCell() {
 					Stretch = new Vector2(1.0f, 1.0f)
 				},
 				Layout = new FillLayout()
 			};
-			var textPresenter = new RichText()
-			{
+			var textPresenter = new RichText() {
 				Id = "TextPresenter",
 				WordSplitAllowed = false,
 				Nodes = {
@@ -576,8 +544,7 @@ namespace RainbowDash
 				HAlignment = HAlignment.Center,
 				VAlignment = VAlignment.Center
 			};
-			var bg = new RoundedRectangle()
-			{
+			var bg = new RoundedRectangle() {
 				CornerRadius = 10,
 				OuterColor = Color4.Gray,
 				Id = "bg",
@@ -591,8 +558,7 @@ namespace RainbowDash
 
 		public static Widget CreateItemPanel()
 		{
-			var w = new Widget
-			{
+			var w = new Widget {
 				Padding = new Thickness(8.0f),
 				Layout = new FlowLayout { Spacing = 4.0f }
 			};
@@ -602,8 +568,7 @@ namespace RainbowDash
 		private Widget CreateToolPanel()
 		{
 			const float Height = 50.0f;
-			var w = new Widget
-			{
+			var w = new Widget {
 				Height = Height,
 				MinHeight = Height,
 				MaxHeight = Height,
@@ -630,16 +595,13 @@ namespace RainbowDash
 			btnClose.Draggable = true;
 			btnClose.Clicked = Hide;
 			Action<bool> fold = (foldOrUnfold) => {
-				for (var i = 0; i < foldButtons.Count; i++)
-				{
+				for (var i = 0; i < foldButtons.Count; i++) {
 					var fb = foldButtons[i];
-					if (fb == null)
-					{
+					if (fb == null) {
 						continue;
 					}
 					var panel = itemPanels[i];
-					if (panel.Visible ^ foldOrUnfold)
-					{
+					if (panel.Visible ^ foldOrUnfold) {
 						fb.Clicked();
 					}
 				}

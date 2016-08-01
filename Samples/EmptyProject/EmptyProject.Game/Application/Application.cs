@@ -35,8 +35,8 @@ namespace EmptyProject.Application
 
 		private void CreateWindow()
 		{
-			var options = new WindowOptions {Title = ApplicationName};
-			World = new WindowWidget(new Window(options)) {Layer = RenderChain.LayerCount - 1};
+			var options = new WindowOptions { Title = ApplicationName };
+			World = new WindowWidget(new Window(options)) { Layer = RenderChain.LayerCount - 1 };
 			World.Window.Updating += OnUpdateFrame;
 			World.Window.Rendering += OnRenderFrame;
 			World.Window.Resized += OnResize;
@@ -89,8 +89,8 @@ namespace EmptyProject.Application
 		{
 			Renderer.SetOrthogonalProjection(0, 0, The.World.Width, The.World.Height);
 			var windowSize = The.Window.ClientSize;
-			The.Window.Input.ScreenToWorldTransform = Matrix32.Scaling(The.World.Width/windowSize.X,
-				The.World.Height/windowSize.Y);
+			The.Window.Input.ScreenToWorldTransform = Matrix32.Scaling(The.World.Width / windowSize.X,
+				The.World.Height / windowSize.Y);
 		}
 	}
 }

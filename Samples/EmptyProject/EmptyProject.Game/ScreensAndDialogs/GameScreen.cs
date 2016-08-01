@@ -4,7 +4,7 @@ namespace EmptyProject.ScreensAndDialogs
 {
 	public class GameScreen : Dialog
 	{
-		public GameScreen(): base("Shell/GameScreen")
+		public GameScreen() : base("Shell/GameScreen")
 		{
 			The.SoundManager.PlayMusic("Ingame");
 			Root["BtnExit"].Clicked = BackToMenu;
@@ -20,7 +20,9 @@ namespace EmptyProject.ScreensAndDialogs
 
 		private void BackToMenu()
 		{
-			if (State != DialogState.Shown) return;
+			if (State != DialogState.Shown)
+				return;
+
 			State = DialogState.Closing;
 			new ScreenCrossfade(() => {
 				Close();

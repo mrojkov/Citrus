@@ -32,8 +32,7 @@ namespace EmptyProject
 
 		public static void ExpandToContainer(this Widget widget)
 		{
-			if (widget.ParentWidget != null)
-			{
+			if (widget.ParentWidget != null) {
 				widget.Size = widget.ParentWidget.Size;
 			}
 			widget.Anchors = Anchors.LeftRightTopBottom;

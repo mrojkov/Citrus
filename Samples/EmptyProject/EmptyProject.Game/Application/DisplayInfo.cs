@@ -33,8 +33,7 @@ namespace EmptyProject.Application
 		{
 			var d = Display.DPI / ReferenceDPI;
 			d = (d * 4.0f).Round() * 0.25f;
-			if (IsTabletDisplay())
-			{
+			if (IsTabletDisplay()) {
 				d *= 2;
 			}
 			return d;
@@ -98,8 +97,7 @@ namespace EmptyProject.Application
 			//   Portrait Keyboard (English)	 height: 264
 			//   Landscape Keyboard (English)	 height: 352
 
-			if (IsIPad())
-			{
+			if (IsIPad()) {
 				return IsLandscapeOrientation() ? 352 : 264;
 			}
 			else {
@@ -126,10 +124,8 @@ namespace EmptyProject.Application
 		{
 			var result = GetResolution();
 			var windowSize = (Size)GetResolution();
-			if (windowSize.Width > 0 && windowSize.Height > 0)
-			{
-				if (IsPortraitOrientation())
-				{
+			if (windowSize.Width > 0 && windowSize.Height > 0) {
+				if (IsPortraitOrientation()) {
 					result.X = Application.DefaultWorldSize.Y;
 					result.Y = Application.DefaultWorldSize.Y * ((float)windowSize.Height / (float)windowSize.Width);
 				}

@@ -29,7 +29,9 @@ namespace EmptyProject.ScreensAndDialogs
 
 		private void BtnPlayClick()
 		{
-			if (State != DialogState.Shown) return;
+			if (State != DialogState.Shown)
+				return;
+
 			State = DialogState.Closing;
 			new ScreenCrossfade(() => {
 				Close();

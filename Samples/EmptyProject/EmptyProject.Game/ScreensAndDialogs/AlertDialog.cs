@@ -4,7 +4,7 @@ namespace EmptyProject.ScreensAndDialogs
 {
 	public class AlertDialog : Dialog
 	{
-		public AlertDialog(string text): base("Shell/Alert")
+		public AlertDialog(string text) : base("Shell/Alert")
 		{
 			var label = Root.Find<RichText>("Title");
 			label.OverflowMode = TextOverflowMode.Minify;

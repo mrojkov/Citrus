@@ -27,7 +27,7 @@ namespace EmptyProject.ScreensAndDialogs
 			frame.PushToNode(The.World);
 			frame.Input.CaptureAll();
 			image.PushToNode(frame);
-			var tasks = new TaskList  {MainTask(doFadeIn, doFadeOut) };
+			var tasks = new TaskList { MainTask(doFadeIn, doFadeOut) };
 			image.Updating += tasks.Update;
 		}
 
