@@ -17,7 +17,7 @@ namespace Lime
 		IAnimator[] animatorArray;
 		Node owner;
 
-		public int Version;
+		public int Version { get; private set; }
 
 		public AnimatorCollection() { /* ctor for ProtoBuf only */ }
 
