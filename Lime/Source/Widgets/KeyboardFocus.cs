@@ -78,6 +78,9 @@ namespace Lime
 
 		private void Window_Activated(IWindow window)
 		{
+			if (Focused != null && Focused.DescendantOrThis(WidgetContext.Current.Root)) {
+				return;
+			}
 			Widget newFocused;
 			if (focusPerWindow.TryGetValue(window, out newFocused)) {
 				if (newFocused != null && newFocused.DescendantOrThis(WidgetContext.Current.Root)) {
