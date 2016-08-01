@@ -4,7 +4,7 @@ using System.Linq;
 using EmptyProject.Application;
 using Lime;
 
-namespace EmptyProject.ScreensAndDialogs
+namespace EmptyProject.Dialogs
 {
 	public class Dialog : IDisposable
 	{

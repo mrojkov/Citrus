@@ -1,7 +1,7 @@
 ﻿using System;
 using Lime;
 
-namespace EmptyProject.ScreensAndDialogs
+namespace EmptyProject.Dialogs
 {
 	public class Options : Dialog
 	{

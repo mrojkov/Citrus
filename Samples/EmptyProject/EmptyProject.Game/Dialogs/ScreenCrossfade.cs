@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Lime;
 
-namespace EmptyProject.ScreensAndDialogs
+namespace EmptyProject.Dialogs
 {
 	public class ScreenCrossfade
 	{

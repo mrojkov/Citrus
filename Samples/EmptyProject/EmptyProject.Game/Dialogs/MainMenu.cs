@@ -1,6 +1,6 @@
 ﻿using Lime;
 
-namespace EmptyProject.ScreensAndDialogs
+namespace EmptyProject.Dialogs
 {
 	public class MainMenu : Dialog
 	{

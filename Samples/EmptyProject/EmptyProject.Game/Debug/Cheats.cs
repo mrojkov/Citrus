@@ -1,5 +1,5 @@
 ﻿using EmptyProject.Application;
-using EmptyProject.ScreensAndDialogs;
+using EmptyProject.Dialogs;
 using Lime;
 
 namespace EmptyProject.Debug
