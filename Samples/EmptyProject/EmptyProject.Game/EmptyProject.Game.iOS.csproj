@@ -60,12 +60,5 @@
     <Compile Include="Application\SoundManager.cs" />
     <Compile Include="Debug\Cheats.cs" />
     <Compile Include="Debug\RainbowDash.cs" />
-    <Compile Include="ScreensAndDialogs\AlertDialog.cs" />
-    <Compile Include="ScreensAndDialogs\Confirmation.cs" />
-    <Compile Include="ScreensAndDialogs\Dialog.cs" />
-    <Compile Include="ScreensAndDialogs\GameScreen.cs" />
-    <Compile Include="ScreensAndDialogs\MainMenu.cs" />
-    <Compile Include="ScreensAndDialogs\Options.cs" />
-    <Compile Include="ScreensAndDialogs\ScreenCrossfade.cs" />
   </ItemGroup>
 </Project>
