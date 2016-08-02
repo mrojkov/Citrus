@@ -26,7 +26,6 @@ namespace EmptyProject
 
 		[ProtoAfterDeserialization]
 		public void AfterDeserialization()
-		{
-		}
+		{ }
 	}
 }
