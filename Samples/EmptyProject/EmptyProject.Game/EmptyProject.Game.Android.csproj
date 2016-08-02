@@ -56,14 +56,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Mono.Android" />
-    <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Citrus\3rdParty\ProtoBuf-Net\android (core-portable)\protobuf-net.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
+    <Reference Include="protobuf-net">
+      <HintPath>..\..\Citrus\3rdParty\ProtoBuf-Net\android %28core-portable%29\protobuf-net.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions.cs" />
@@ -79,13 +78,13 @@
     <Compile Include="Application\SoundManager.cs" />
     <Compile Include="Debug\Cheats.cs" />
     <Compile Include="Debug\RainbowDash.cs" />
-    <Compile Include="ScreensAndDialogs\AlertDialog.cs" />
-    <Compile Include="ScreensAndDialogs\Confirmation.cs" />
-    <Compile Include="ScreensAndDialogs\Dialog.cs" />
-    <Compile Include="ScreensAndDialogs\GameScreen.cs" />
-    <Compile Include="ScreensAndDialogs\MainMenu.cs" />
-    <Compile Include="ScreensAndDialogs\Options.cs" />
-    <Compile Include="ScreensAndDialogs\ScreenCrossfade.cs" />
+    <Compile Include="Dialogs\AlertDialog.cs" />
+    <Compile Include="Dialogs\Confirmation.cs" />
+    <Compile Include="Dialogs\Dialog.cs" />
+    <Compile Include="Dialogs\GameScreen.cs" />
+    <Compile Include="Dialogs\MainMenu.cs" />
+    <Compile Include="Dialogs\Options.cs" />
+    <Compile Include="Dialogs\ScreenCrossfade.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Citrus\Lemon\Lemon.Android.csproj">
