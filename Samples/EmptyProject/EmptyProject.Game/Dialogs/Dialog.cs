@@ -11,15 +11,15 @@ namespace EmptyProject.Dialogs
 		private const string DialogTag = "Dialog";
 
 		public static List<Dialog> ActiveDialogs = new List<Dialog>();
-		public static Dialog Top => ActiveDialogs.FirstOrDefault();
+		public static Dialog Top { get { return ActiveDialogs.FirstOrDefault(); } }
 
 		protected readonly TaskList Tasks = new TaskList();
-		protected virtual string HideAnimationName => "Hide";
-		protected virtual string CustomRotationAnimation => null;
+		protected virtual string HideAnimationName { get { return "Hide"; } }
+		protected virtual string CustomRotationAnimation { get { return null; } }
 		protected Widget Root;
 
-		public bool IsClosed => Root.Parent == null;
-		public bool IsTopDialog => Top == this;
+		public bool IsClosed { get { return Root.Parent == null; } }
+		public bool IsTopDialog { get { return Top == this; } }
 		public DialogState State { get; protected set; }
 
 		public Action BeforeHide;
@@ -59,26 +59,26 @@ namespace EmptyProject.Dialogs
 
 		private IEnumerator<object> ShowTask(string animation)
 		{
-			BeforeShow?.Invoke();
+			BeforeShow.SafeInvoke();
 			Orientate();
 			State = DialogState.Showing;
 			if (animation != null && Root.TryRunAnimation(animation)) {
 				yield return Root;
 			}
 			State = DialogState.Shown;
-			AfterShow?.Invoke();
+			AfterShow.SafeInvoke();
 		}
 
 		private IEnumerator<object> HideTask(string animation)
 		{
-			BeforeHide?.Invoke();
+			BeforeHide.SafeInvoke();
 			State = DialogState.Closing;
 			if (animation != null && Root.TryRunAnimation(animation)) {
 				yield return Root;
 			}
 			State = DialogState.Closed;
 			UnlinkAndDispose();
-			AfterHide?.Invoke();
+			AfterHide.SafeInvoke();
 		}
 
 		protected virtual void OnBeforeOrientationOrResolutionChanged()
@@ -146,7 +146,6 @@ namespace EmptyProject.Dialogs
 		{
 			if (!IsTopDialog)
 				return false;
-
 			Close();
 			return true;
 		}

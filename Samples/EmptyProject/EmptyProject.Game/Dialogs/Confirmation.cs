@@ -14,7 +14,7 @@ namespace EmptyProject.Dialogs
 
 			Root["BtnOk"].Clicked = () => {
 				Close();
-				onOk?.Invoke();
+				onOk.SafeInvoke();
 			};
 			Root["BtnCancel"].Visible = cancelButtonVisible;
 			Root["BtnCancel"].Clicked = Close;

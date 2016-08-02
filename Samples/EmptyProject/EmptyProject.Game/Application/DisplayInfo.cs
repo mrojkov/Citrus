@@ -108,12 +108,12 @@ namespace EmptyProject.Application
 
 		public static void HandleOrientationOrResolutionChange()
 		{
-			BeforeOrientationOrResolutionChanged?.Invoke();
+			BeforeOrientationOrResolutionChanged.SafeInvoke();
 			The.World.Size = CalcWorldSize();
 #if !iOS && !ANDROID
 			The.Window.ClientSize = GetResolution();
 #endif
-			OrientationOrResolutionChanged?.Invoke();
+			OrientationOrResolutionChanged.SafeInvoke();
 
 #if WIN
 			The.Window.Center();

@@ -16,7 +16,7 @@ namespace EmptyProject.Dialogs
 			this.action = action;
 			image = new Image() {
 				Size = The.World.Size,
-				Layer = Layers.AboveAll,
+				Layer = Layers.AboveAllElse,
 				Shader = ShaderId.Silhuette,
 				Color = Color4.Black
 			};
@@ -40,7 +40,7 @@ namespace EmptyProject.Dialogs
 				}
 			}
 			frame.Input.ReleaseAll();
-			action?.Invoke();
+			action.SafeInvoke();
 			if (doFadeOut) {
 				for (float t = 0; t < FadeTime; t += Task.Current.Delta) {
 					image.Opacity = 1 - t / FadeTime;
@@ -57,7 +57,7 @@ namespace EmptyProject.Dialogs
 		public ScreenCrossfadeScene(string path, Action action)
 		{
 			var frame = new Frame(path) {
-				Layer = Layers.AboveAll,
+				Layer = Layers.AboveAllElse,
 				Size = The.World.Size
 			};
 			frame.PushToNode(The.World);
@@ -65,7 +65,7 @@ namespace EmptyProject.Dialogs
 			frame.RunAnimation("Show");
 			frame.AnimationStopped += () => {
 				frame.Input.ReleaseAll();
-				action?.Invoke();
+				action.SafeInvoke();
 				frame.RunAnimation("Hide");
 				frame.AnimationStopped += () => {
 					frame.Unlink();

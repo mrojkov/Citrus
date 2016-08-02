@@ -43,7 +43,7 @@ namespace EmptyProject.Dialogs
 			var check = root["Check"];
 			check.RunAnimation(onGetValue() ? "Checked" : "Unchecked");
 			root["BtnCheck"].Clicked = () => {
-				onToggleValue?.Invoke();
+				onToggleValue.SafeInvoke();
 				check.RunAnimation(onGetValue() ? "Check" : "Uncheck");
 			};
 			if (autoUpdate) {

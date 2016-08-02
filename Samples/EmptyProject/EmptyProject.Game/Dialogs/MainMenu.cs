@@ -41,11 +41,12 @@ namespace EmptyProject.Dialogs
 
 		public override void FillDebugMenuItems(RainbowDash.Menu menu)
 		{
-			var section = menu.Section("Example Section");
-
+			var section = menu.Section("Cheats example");
 			section.Item("Red", () => Root.Color = Color4.Red);
 			section.Item("Green", () => Root.Color = Color4.Green);
 			section.Item("Blue", () => Root.Color = Color4.Blue);
+			var section2 = menu.Section("Cheats example 2");
+			section2.Item("Sample cheat", () => { });
 		}
 	}
 }

@@ -16,7 +16,14 @@ namespace EmptyProject.Debug
 			get { return true; }
 		}
 
+		public static bool IsDebugInfoVisible;
+
 		private static RainbowDash.Menu currentMenu;
+
+		public static void Initialize()
+		{
+			//IsDebugInfoVisible = ExecutionFlag.DebugInfo.IsSet();
+		}
 
 		public static void ProcessCheatKeys()
 		{
@@ -64,7 +71,6 @@ namespace EmptyProject.Debug
 			if (currentMenu != null) {
 				return;
 			}
-
 			var menu = new RainbowDash.Menu(The.World, Layers.CheatsMenu);
 			var section = menu.Section();
 			Dialog.Top.FillDebugMenuItems(menu);
