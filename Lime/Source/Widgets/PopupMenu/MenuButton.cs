@@ -86,22 +86,22 @@ namespace Lime.PopupMenu
 			var lbColor = captionLabel.Animators["Color"];
 			var arColor = arrowLabel.Animators["Color"];
 
-			Markers.AddStopMarker("Normal", 0);
+			Markers.Add(new Marker("Normal", 0, MarkerAction.Stop));
 			bgColor.Keys.Add(0, Color4.White);
 			lbColor.Keys.Add(0, Color4.Black);
 			arColor.Keys.Add(0, Color4.Gray);
 
-			Markers.AddStopMarker("Focus", 10);
+			Markers.Add(new Marker("Focus", 10, MarkerAction.Stop));
 			bgColor.Keys.Add(10, Color4.Gray);
 			lbColor.Keys.Add(10, Color4.Black);
 			arColor.Keys.Add(10, Color4.Black);
 
-			Markers.AddStopMarker("Press", 20);
+			Markers.Add(new Marker("Press", 20, MarkerAction.Stop));
 			bgColor.Keys.Add(20, Color4.Black);
 			lbColor.Keys.Add(20, Color4.White);
 			arColor.Keys.Add(20, Color4.White);
 
-			Markers.AddStopMarker("Disable", 30);
+			Markers.Add(new Marker("Disable", 30, MarkerAction.Stop));
 			bgColor.Keys.Add(30, Color4.White);
 			lbColor.Keys.Add(30, Color4.Gray);
 			arColor.Keys.Add(30, Color4.Gray);
