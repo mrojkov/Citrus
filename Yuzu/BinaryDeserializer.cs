@@ -27,12 +27,12 @@ namespace Yuzu.Binary
 				Options.ReportErrorPosition ? new YuzuPosition(Reader.BaseStream.Position) : null);
 		}
 
-		protected object ReadInt() { return Reader.ReadInt32(); }
-		protected object ReadUInt() { return Reader.ReadUInt32(); }
 		protected object ReadSByte() { return Reader.ReadSByte(); }
 		protected object ReadByte() { return Reader.ReadByte(); }
 		protected object ReadShort() { return Reader.ReadInt16(); }
 		protected object ReadUShort() { return Reader.ReadUInt16(); }
+		protected object ReadInt() { return Reader.ReadInt32(); }
+		protected object ReadUInt() { return Reader.ReadUInt32(); }
 		protected object ReadLong() { return Reader.ReadInt64(); }
 		protected object ReadULong() { return Reader.ReadUInt64(); }
 		protected object ReadBool() { return Reader.ReadBoolean(); }
@@ -48,16 +48,65 @@ namespace Yuzu.Binary
 			return s != "" ? s : Reader.ReadBoolean() ? null : "";
 		}
 
+		private Type ReadType()
+		{
+			var rt = (RoughType)Reader.ReadByte();
+			if (RoughType.FirstAtom <= rt && rt <= RoughType.LastAtom)
+				return RT.roughTypeToType[(int)rt];
+			if (rt == RoughType.Sequence)
+				return typeof(List<>).MakeGenericType(ReadType() ?? typeof(object));
+			if (rt == RoughType.Mapping) {
+				var k = ReadType() ?? typeof(object);
+				var v = ReadType() ?? typeof(object);
+				return typeof(Dictionary<,>).MakeGenericType(k, v);
+			}
+			if (rt == RoughType.Record)
+				return null;
+			throw Error("Unknown rough type {0}", rt);
+		}
+
+		private bool ReadCompatibleType(Type expectedType)
+		{
+			var rt = (RoughType)Reader.ReadByte();
+			if (RoughType.FirstAtom <= rt && rt <= RoughType.LastAtom)
+				return RT.roughTypeToType[(int)rt] == expectedType;
+			if (rt == RoughType.Sequence) {
+				if (expectedType.IsArray)
+					return ReadCompatibleType(expectedType.GetElementType());
+				var icoll = expectedType.GetInterface(typeof(ICollection<>).Name);
+				return icoll != null && ReadCompatibleType(icoll.GetGenericArguments()[0]);
+			}
+			if (rt == RoughType.Mapping) {
+				if (!expectedType.IsGenericType || expectedType.GetGenericTypeDefinition() != typeof(Dictionary<,>))
+					return false;
+				var g = expectedType.GetGenericArguments();
+				return ReadCompatibleType(g[0]) && ReadCompatibleType(g[1]);
+			}
+			if (rt == RoughType.Record)
+				return expectedType.IsRecord();
+			throw Error("Unknown rough type {0}", rt);
+		}
+
+		protected object ReadAny()
+		{
+			var t = ReadType();
+			if (t == typeof(object))
+				throw Error("Unable to read pure object");
+			if (t == null)
+				return ReadObject<object>();
+			return ReadValueFunc(t);
+		}
+
 		private void InitReaders()
 		{
-			readerCache[typeof(int)] = ReadInt;
-			readerCache[typeof(uint)] = ReadUInt;
 			readerCache[typeof(sbyte)] = ReadSByte;
 			readerCache[typeof(byte)] = ReadByte;
 			readerCache[typeof(short)] = ReadShort;
 			readerCache[typeof(ushort)] = ReadUShort;
 			readerCache[typeof(long)] = ReadLong;
 			readerCache[typeof(ulong)] = ReadULong;
+			readerCache[typeof(int)] = ReadInt;
+			readerCache[typeof(uint)] = ReadUInt;
 			readerCache[typeof(bool)] = ReadBool;
 			readerCache[typeof(char)] = ReadChar;
 			readerCache[typeof(float)] = ReadFloat;
@@ -65,6 +114,7 @@ namespace Yuzu.Binary
 			readerCache[typeof(DateTime)] = ReadDateTimeObj;
 			readerCache[typeof(TimeSpan)] = ReadTimeSpanObj;
 			readerCache[typeof(string)] = ReadString;
+			readerCache[typeof(object)] = ReadAny;
 		}
 
 		private object ReadDateTimeObj() { return ReadDateTime(); }
@@ -166,14 +216,15 @@ namespace Yuzu.Binary
 				Error("Bad classId: {0}", classId);
 			var result = new ClassDef();
 			var typeName = Reader.ReadString();
-			var t = Options.Assembly.GetType(typeName, throwOnError: true);
-			var meta = result.Meta = Meta.Get(t, Options);
+			var classType = Options.Assembly.GetType(typeName, throwOnError: true);
+			result.Meta = Meta.Get(classType, Options);
 			var fieldCount = Reader.ReadInt16();
-			if (fieldCount != meta.Items.Count)
+			if (fieldCount != result.Meta.Items.Count)
 				throw new NotImplementedException();
 			for (int i = 0; i < fieldCount; ++i) {
-				var yi = meta.Items[i];
+				var yi = result.Meta.Items[i];
 				var n = Reader.ReadString();
+				var t = ReadType();
 				if (n != yi.Name)
 					throw new NotImplementedException();
 				if (yi.SetValue != null) {
@@ -244,6 +295,19 @@ namespace Yuzu.Binary
 			return result;
 		}
 
+		private object ReadStruct<T>() where T: struct
+		{
+			var classId = Reader.ReadInt16();
+			if (classId == 0)
+				return null;
+			var def = GetClassDef(classId);
+			if (!typeof(T).IsAssignableFrom(def.Meta.Type))
+				throw Error("Unable to assign type {0} to {1}", def.Meta.Type, typeof(T));
+			var result = Activator.CreateInstance(def.Meta.Type);
+			ReadFields(def, result);
+			return result;
+		}
+
 		private Dictionary<Type, Func<object>> readerCache = new Dictionary<Type, Func<object>>();
 		private Dictionary<Type, Action<object>> mergerCache = new Dictionary<Type, Action<object>>();
 
@@ -300,8 +364,10 @@ namespace Yuzu.Binary
 				var m = Utils.GetPrivateGeneric(GetType(), "ReadObject", t);
 				return (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);
 			}
-			if (Utils.IsStruct(t))
-				return () => FromReaderInt(Activator.CreateInstance(t));
+			if (Utils.IsStruct(t)) {
+				var m = Utils.GetPrivateGeneric(GetType(), "ReadStruct", t);
+				return (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);
+			}
 			throw new NotImplementedException(t.Name);
 		}
 
@@ -323,11 +389,16 @@ namespace Yuzu.Binary
 			throw Error("Unable to merge field of type {0}", t.Name);
 		}
 
-		public override object FromReaderInt() { return ReadObject<object>(); }
+		public override object FromReaderInt() { return ReadAny(); }
 
 		public override object FromReaderInt(object obj)
 		{
-			MergeValueFunc(obj.GetType())(obj);
+			var expectedType = obj.GetType();
+			if (expectedType == typeof(object))
+				throw Error("Unable to read into untyped object");
+			if (!ReadCompatibleType(expectedType))
+				throw Error("Incompatible type to read into {0}", expectedType.Name);
+			MergeValueFunc(expectedType)(obj);
 			return obj;
 		}
 
@@ -335,6 +406,8 @@ namespace Yuzu.Binary
 		{
 			Reader = reader;
 			Initialize();
+			if (!ReadCompatibleType(typeof(T)))
+				throw Error("Incompatible type to read into {0}", typeof(T).Name);
 			return (T)ReadValueFunc(typeof(T))();
 		}
 

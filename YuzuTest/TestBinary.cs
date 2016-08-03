@@ -43,9 +43,29 @@ namespace YuzuTest.Binary
 			return VarintXS(s.Length) + XS(s.ToCharArray().Select(ch => (byte)ch));
 		}
 
+		private string XS(RoughType rt)
+		{
+			return ((byte)rt).ToString("X2");
+		}
+
 		private string XS(params string[] s)
 		{
 			return String.Join(" ", s.Select(XS));
+		}
+
+		private string XS(string s, RoughType rt)
+		{
+			return XS(s) + " " + XS(rt);
+		}
+
+		private string XS(string s1, RoughType rt1, string s2, RoughType rt2)
+		{
+			return XS(s1, rt1) + " " + XS(s2, rt2);
+		}
+
+		private string XS(string s1, RoughType rt1, string s2, RoughType rt2, string s3, RoughType rt3)
+		{
+			return XS(s1, rt1) + " " + XS(s2, rt2) + " " + XS(s3, rt3);
 		}
 
 		[TestMethod]
@@ -53,6 +73,7 @@ namespace YuzuTest.Binary
 		{
 			Assert.AreEqual("01 FF", XS(new byte[] { 1, 255 }));
 			Assert.AreEqual("02 41 42", XS("AB"));
+			Assert.AreEqual("20", XS(RoughType.Record));
 		}
 
 		[TestMethod]
@@ -60,13 +81,17 @@ namespace YuzuTest.Binary
 		{
 			var bs = new BinarySerializer();
 			bs.Options.AllowEmptyTypes = true;
-			Assert.AreEqual("01 00 " + XS("YuzuTest.Empty") + " 00 00 00 00", XS(bs.ToBytes(new Empty())));
+			Assert.AreEqual(
+				XS(RoughType.Record) + " 01 00 " + XS("YuzuTest.Empty") + " 00 00 00 00",
+				XS(bs.ToBytes(new Empty())));
 
 			var v1 = new Sample1 { X = 345, Y = "test" };
 
 			bs.ClearClassIds();
 			var result = bs.ToBytes(v1);
-			Assert.AreEqual("01 00 " + XS("YuzuTest.Sample1") + " 02 00 " + XS("X", "Y") +
+			Assert.AreEqual(
+				XS(RoughType.Record) + " 01 00 " + XS("YuzuTest.Sample1") + " 02 00 " +
+				XS("X", RoughType.Int, "Y", RoughType.String) +
 				" 01 00 59 01 00 00 02 00 " + XS("test") + " 00 00", XS(result));
 			Sample1 v2 = new Sample1();
 
@@ -75,7 +100,7 @@ namespace YuzuTest.Binary
 			Assert.AreEqual(v1.X, v2.X);
 			Assert.AreEqual(v1.Y, v2.Y);
 
-			bd.FromBytes(v2, new byte[] { 01, 00, 01, 00, 0xE7, 03, 00, 00, 00, 00 });
+			bd.FromBytes(v2, new byte[] { 0x20, 01, 00, 01, 00, 0xE7, 03, 00, 00, 00, 00 });
 			Assert.AreEqual(999, v2.X);
 			Assert.AreEqual(v1.Y, v2.Y);
 
@@ -96,7 +121,8 @@ namespace YuzuTest.Binary
 
 			var result = bs.ToBytes(v1);
 			Assert.AreEqual(
-				"01 00 " + XS("YuzuTest.SampleLong") + " 02 00 " + XS("S", "U") +
+				XS(RoughType.Record) + " 01 00 " + XS("YuzuTest.SampleLong") + " 02 00 " +
+				XS("S", RoughType.Long, "U", RoughType.ULong) +
 				" 01 00 00 00 00 00 FE FF FF FF 02 00 00 00 00 00 02 00 00 00 00 00", XS(result));
 
 			var v2 = new SampleLong();
@@ -120,7 +146,9 @@ namespace YuzuTest.Binary
 
 			var result = bs.ToBytes(v1);
 			Assert.AreEqual(
-				"01 00 " + XS("YuzuTest.SampleSmallTypes") + " 05 00 " + XS("B", "Ch", "Sb", "Sh", "USh") +
+				XS(RoughType.Record) + " 01 00 " + XS("YuzuTest.SampleSmallTypes") +
+				" 05 00 " + XS("B", RoughType.Byte, "Ch", RoughType.Char) + " " +
+				XS("Sb", RoughType.SByte, "Sh", RoughType.Short, "USh", RoughType.UShort) +
 				" 01 00 C6 02 00 41 03 00 93 04 00 30 F8 05 00 D1 07 00 00", XS(result));
 
 			var v2 = new SampleSmallTypes();
@@ -133,7 +161,8 @@ namespace YuzuTest.Binary
 			Assert.AreEqual(v1.Sb, v2.Sb);
 
 			bd.FromBytes(v2, new byte[] {
-				01, 00, 01, 00, 255, 02, 00, 65 + 25, 03, 00, 256 - 128, 04, 00, 00, 128, 05, 00, 255, 127, 00, 00 });
+				0x20, 01, 00, 01, 00, 255, 02, 00, 65 + 25, 03, 00, 256 - 128,
+				04, 00, 00, 128, 05, 00, 255, 127, 00, 00 });
 			Assert.AreEqual('Z', v2.Ch);
 			Assert.AreEqual(32767, v2.USh);
 			Assert.AreEqual(-32768, v2.Sh);
@@ -154,11 +183,14 @@ namespace YuzuTest.Binary
 
 			var result = bs.ToBytes(v);
 			Assert.AreEqual(
-				"01 00 " + XS("YuzuTest.Sample3") + " 03 00 " + XS("S1", "F", "S2") +
-				" 01 00 02 00 " + XS("YuzuTest.Sample1") + " 02 00 " + XS("X", "Y") +
+				"20 01 00 " + XS("YuzuTest.Sample3") + " 03 00 " +
+				XS("S1", RoughType.Record, "F", RoughType.Int, "S2", RoughType.Record) +
+				" 01 00 02 00 " + XS("YuzuTest.Sample1") +
+				" 02 00 " + XS("X", RoughType.Int, "Y", RoughType.String) +
 				" 01 00 59 01 00 00 02 00 " + XS("test") + " 00 00 " +
 				"02 00 DE 00 00 00 " +
-				"03 00 03 00 " + XS("YuzuTest.Sample2") + " 02 00 " + XS("X", "Y") +
+				"03 00 03 00 " + XS("YuzuTest.Sample2") +
+				" 02 00 " + XS("X", RoughType.Int, "Y", RoughType.String) +
 				" 01 00 A6 FE FF FF 02 00 " + XS("test1") + " 00 00 00 00",
 				XS(result));
 
@@ -181,7 +213,8 @@ namespace YuzuTest.Binary
 
 			var result1 = bs.ToBytes(v);
 			Assert.AreEqual(
-				"01 00 " + XS("YuzuTest.Sample4") + " 01 00 " + XS("E") + " 01 00 02 00 00 00 00 00",
+				"20 01 00 " + XS("YuzuTest.Sample4") + " 01 00 " + XS("E", RoughType.Int) +
+				" 01 00 02 00 00 00 00 00",
 				XS(result1));
 
 
@@ -200,7 +233,8 @@ namespace YuzuTest.Binary
 
 			var result1 = bs.ToBytes(v);
 			Assert.AreEqual(
-				"01 00 " + XS("YuzuTest.SampleBool") + " 01 00 " + XS("B") + " 01 00 01 00 00",
+				"20 01 00 " + XS("YuzuTest.SampleBool") +
+				" 01 00 " + XS("B", RoughType.Bool) + " 01 00 01 00 00",
 				XS(result1));
 
 			var bd = new BinaryDeserializer();
@@ -218,7 +252,8 @@ namespace YuzuTest.Binary
 
 			var result1 = bs.ToBytes(v);
 			Assert.AreEqual(
-				"01 00 " + XS("YuzuTest.SampleFloat") + " 02 00 " + XS("F", "D") +
+				"20 01 00 " + XS("YuzuTest.SampleFloat") + " 02 00 " +
+				XS("F", RoughType.Float, "D", RoughType.Double) +
 				" 01 00 08 E5 3C 1E 02 00 CA DC 09 3E BE B9 CC D4 00 00",
 				XS(result1));
 
@@ -235,7 +270,9 @@ namespace YuzuTest.Binary
 			var bs = new BinarySerializer();
 			var result = bs.ToBytes(new SampleMethodOrder());
 			Assert.AreEqual(
-				"01 00 " + XS("YuzuTest.SampleMethodOrder") + " 04 00 " + XS("F1", "P1", "F2", "P2") +
+				"20 01 00 " + XS("YuzuTest.SampleMethodOrder") + " 04 00 " +
+				XS("F1", RoughType.Int, "P1", RoughType.Int) + " " +
+				XS("F2", RoughType.Int, "P2", RoughType.Int) +
 				" 01 00 00 00 00 00 02 00 00 00 00 00 03 00 00 00 00 00 04 00 00 00 00 00 00 00",
 				XS(result));
 		}
@@ -245,17 +282,19 @@ namespace YuzuTest.Binary
 		{
 			var bs = new BinarySerializer();
 			Assert.AreEqual(
-				"01 00 " + XS("YuzuTest.SampleBase") + " 01 00 " + XS("FBase") +
+				"20 01 00 " + XS("YuzuTest.SampleBase") + " 01 00 " + XS("FBase", RoughType.Int) +
 				" 01 00 00 00 00 00 00 00",
 				XS(bs.ToBytes(new SampleBase())));
 			Assert.AreEqual(
-				"02 00 " + XS("YuzuTest.SampleDerivedA") + " 02 00 " + XS("FBase", "FA") +
+				"20 02 00 " + XS("YuzuTest.SampleDerivedA") + " 02 00 " +
+				XS("FBase", RoughType.Int, "FA", RoughType.Int) +
 				" 01 00 00 00 00 00 02 00 00 00 00 00 00 00",
 				XS(bs.ToBytes(new SampleDerivedA())));
 
 			var bd = new BinaryDeserializer();
 			var v = bd.FromBytes(SX(
-				"02 00 " + XS("YuzuTest.SampleDerivedB") + " 02 00 " + XS("FBase", "FB") +
+				"20 02 00 " + XS("YuzuTest.SampleDerivedB") + " 02 00 " +
+				XS("FBase", RoughType.Int, "FB", RoughType.Int) +
 				" 01 00 03 00 00 00 02 00 07 00 00 00 00 00").ToArray());
 			Assert.IsInstanceOfType(v, typeof(SampleDerivedB));
 			var b = (SampleDerivedB)v;
@@ -272,7 +311,8 @@ namespace YuzuTest.Binary
 			var v0 = new SampleList { E = new List<string> { "a", "b", "c" } };
 			var result0 = bs.ToBytes(v0);
 			Assert.AreEqual(
-				"01 00 " + XS("YuzuTest.SampleList") + " 01 00 " + XS("E") +
+				"20 01 00 " + XS("YuzuTest.SampleList") + " 01 00 " +
+				XS("E", RoughType.Sequence) + " " + XS(RoughType.String) +
 				" 01 00 03 00 00 00 " + XS("a", "b", "c") + " 00 00",
 				XS(result0));
 			var w0 = new SampleList();
@@ -282,10 +322,11 @@ namespace YuzuTest.Binary
 			var v1 = new SampleTree { Value = 11, Children = new List<SampleTree>() };
 			var result1 = bs.ToBytes(v1);
 			Assert.AreEqual(
-				"02 00 " + XS("YuzuTest.SampleTree") + " 02 00 " + XS("Value", "Children") +
+				"20 02 00 " + XS("YuzuTest.SampleTree") + " 02 00 " +
+				XS("Value", RoughType.Int, "Children", RoughType.Sequence) + " " + XS(RoughType.Record) +
 				" 01 00 0B 00 00 00 02 00 00 00 00 00 00 00",
 				XS(result1));
-			Assert.AreEqual("02 00 01 00 0B 00 00 00 02 00 00 00 00 00 00 00", XS(bs.ToBytes(v1)));
+			Assert.AreEqual("20 02 00 01 00 0B 00 00 00 02 00 00 00 00 00 00 00", XS(bs.ToBytes(v1)));
 			var w1 = new SampleTree();
 			bd.FromBytes(w1, result1);
 			Assert.AreEqual(0, w1.Children.Count);
@@ -304,7 +345,7 @@ namespace YuzuTest.Binary
 			};
 			var result2 = bs.ToBytes(v2);
 			Assert.AreEqual(
-				"02 00 01 00 0B 00 00 00 02 00 02 00 00 00 " +
+				"20 02 00 01 00 0B 00 00 00 02 00 02 00 00 00 " +
 				"02 00 01 00 0C 00 00 00 02 00 00 00 00 00 00 00 " +
 				"02 00 01 00 0D 00 00 00 02 00 FF FF FF FF 00 00 00 00",
 				XS(result2));
@@ -328,8 +369,11 @@ namespace YuzuTest.Binary
 			v0.B.Add(6);
 			var result0 = bs.ToBytes(v0);
 			Assert.AreEqual(
-				"01 00 " + XS("YuzuTest.SampleWithCollection") + " 02 00 " + XS("A", "B") +
-				" 01 00 01 00 00 00 02 00 " + XS("YuzuTest.SampleInterfaced") + " 01 00 " + XS("X") +
+				"20 01 00 " + XS("YuzuTest.SampleWithCollection") + " 02 00 " +
+				XS("A", RoughType.Sequence) + " " + XS(RoughType.Record) + " " +
+				XS("B", RoughType.Sequence) + " " + XS(RoughType.Int) +
+				" 01 00 01 00 00 00 02 00 " + XS("YuzuTest.SampleInterfaced") +
+				" 01 00 " + XS("X", RoughType.Int) +
 				" 01 00 09 00 00 00 00 00" +
 				" 02 00 02 00 00 00 07 00 00 00 06 00 00 00 00 00",
 				XS(result0));
@@ -343,7 +387,7 @@ namespace YuzuTest.Binary
 
 			var v2 = new SampleConcreteCollection { 2, 5, 4 };
 			var result1 = bs.ToBytes(v2);
-			Assert.AreEqual("03 00 00 00 02 00 00 00 05 00 00 00 04 00 00 00", XS(result1));
+			Assert.AreEqual("21 05 03 00 00 00 02 00 00 00 05 00 00 00 04 00 00 00", XS(result1));
 			SampleConcreteCollection w2 = new SampleConcreteCollection();
 			bd.FromBytes(w2, result1);
 			CollectionAssert.AreEqual(v2.ToList(), w2.ToList());
@@ -357,12 +401,12 @@ namespace YuzuTest.Binary
 
 			var v0 = new List<string> { "a", "b", "c" };
 			var result0 = bs.ToBytes(v0);
-			Assert.AreEqual("03 00 00 00 " + XS("a", "b", "c"), XS(result0));
+			Assert.AreEqual("21 0F 03 00 00 00 " + XS("a", "b", "c"), XS(result0));
 
 			var w0 = new List<string>();
 			bd.FromBytes(w0, result0);
 			CollectionAssert.AreEqual(v0, w0);
-			bd.FromBytes(w0, new byte[] { 0, 0, 0, 0 });
+			bd.FromBytes(w0, new byte[] { 0x21, 0x0F, 0, 0, 0, 0 });
 			CollectionAssert.AreEqual(v0, w0);
 			bd.FromBytes(w0, result0);
 			CollectionAssert.AreEqual(new List<string> { "a", "b", "c", "a", "b", "c" }, w0);
@@ -376,14 +420,16 @@ namespace YuzuTest.Binary
 
 			var v0 = new Dictionary<string, int> { { "a", 1 }, { "b", 2 } };
 			var result0 = bs.ToBytes(v0);
-			Assert.AreEqual("02 00 00 00 " + XS("a") + " 01 00 00 00 " + XS("b") + " 02 00 00 00", XS(result0));
+			Assert.AreEqual(
+				"22 0F 05 02 00 00 00 " + XS("a") + " 01 00 00 00 " + XS("b") + " 02 00 00 00",
+				XS(result0));
 
 			var w0 = new Dictionary<string, int>();
 			bd.FromBytes(w0, result0);
 			CollectionAssert.AreEqual(v0, w0);
-			bd.FromBytes(w0, new byte[] { 0, 0, 0, 0 });
+			bd.FromBytes(w0, new byte[] { 0x22, 0x0F, 05, 0, 0, 0, 0 });
 			CollectionAssert.AreEqual(v0, w0);
-			bd.FromBytes(w0, SX("01 00 00 00 " + XS("c") + " 03 00 00 00").ToArray());
+			bd.FromBytes(w0, SX("22 0F 05 01 00 00 00 " + XS("c") + " 03 00 00 00").ToArray());
 			CollectionAssert.AreEqual(
 				new Dictionary<string, int> { { "a", 1 }, { "b", 2 }, { "c", 3 } }, w0);
 		}
@@ -402,10 +448,11 @@ namespace YuzuTest.Binary
 			};
 			var result0 = bs.ToBytes(v0);
 			Assert.AreEqual(
-				("01 00 " + XS("YuzuTest.SampleDict") + " 02 00 " + XS("Value", "Children") +
+				"20 01 00 " + XS("YuzuTest.SampleDict") + " 02 00 " +
+				XS("Value", RoughType.Int, "Children", RoughType.Mapping) + " 0F 20" +
 				" 01 00 03 00 00 00 02 00 02 00 00 00 " + XS("a") +
 				" 01 00 01 00 05 00 00 00 02 00 00 00 00 00 00 00 " +
-				XS("b") + " 01 00 01 00 07 00 00 00 02 00 FF FF FF FF 00 00 00 00"),
+				XS("b") + " 01 00 01 00 07 00 00 00 02 00 FF FF FF FF 00 00 00 00",
 				XS(result0));
 
 			var w0 = new SampleDict();
@@ -427,10 +474,14 @@ namespace YuzuTest.Binary
 			};
 			var result0 = bs.ToBytes(v0);
 			Assert.AreEqual(
-				"01 00 " + XS("YuzuTest.SampleDictKeys") + " 03 00 " + XS("E", "I", "K") +
+				"20 01 00 " + XS("YuzuTest.SampleDictKeys") + " 03 00 " +
+				XS("E", RoughType.Mapping) + " 05 05 " +
+				XS("I", RoughType.Mapping) + " 05 05 " +
+				XS("K", RoughType.Mapping) + " 20 05" +
 				" 01 00 01 00 00 00 01 00 00 00 08 00 00 00 " +
 				"02 00 01 00 00 00 05 00 00 00 07 00 00 00 " +
-				"03 00 01 00 00 00 02 00 " + XS("YuzuTest.SampleKey") + " 01 00 " + XS("V") +
+				"03 00 01 00 00 00 02 00 " + XS("YuzuTest.SampleKey") +
+				" 01 00 " + XS("V", RoughType.Int) +
 				" 01 00 03 00 00 00 00 00 09 00 00 00 00 00", XS(result0));
 
 			var bd = new BinaryDeserializer();
@@ -453,8 +504,8 @@ namespace YuzuTest.Binary
 			var v0 = new SampleArray { A = new string[] { "a", "b", "c" } };
 			var result0 = bs.ToBytes(v0);
 			Assert.AreEqual(
-				"01 00 " + XS("YuzuTest.SampleArray") + " 01 00 " + XS("A") +
-				" 01 00 03 00 00 00 " + XS("a", "b", "c") + " 00 00",
+				"20 01 00 " + XS("YuzuTest.SampleArray") + " 01 00 " + XS("A", RoughType.Sequence) +
+				" 0F 01 00 03 00 00 00 " + XS("a", "b", "c") + " 00 00",
 				XS(result0));
 			var w0 = new SampleArray();
 			bd.FromBytes(w0, result0);
@@ -462,7 +513,7 @@ namespace YuzuTest.Binary
 
 			var v2 = new SampleArray();
 			var result2 = bs.ToBytes(v2);
-			Assert.AreEqual("01 00 01 00 FF FF FF FF 00 00", XS(result2));
+			Assert.AreEqual("20 01 00 01 00 FF FF FF FF 00 00", XS(result2));
 			var w2 = new SampleArray();
 			bd.FromBytes(w2, result2);
 			CollectionAssert.AreEqual(v2.A, w2.A);
@@ -497,7 +548,7 @@ namespace YuzuTest.Binary
 		public void TestMatrix()
 		{
 			var src =
-				"01 00 " + XS("YuzuTest.SampleMatrix") + " 01 00 " + XS("M") + " 01 00 " +
+				"20 01 00 " + XS("YuzuTest.SampleMatrix") + " 01 00 " + XS("M") + " 21 21 05 01 00 " +
 				"04 00 00 00 03 00 00 00 01 00 00 00 02 00 00 00 03 00 00 00 " +
 				"02 00 00 00 04 00 00 00 05 00 00 00 " +
 				"01 00 00 00 06 00 00 00 00 00 00 00 00 00";
@@ -531,8 +582,10 @@ namespace YuzuTest.Binary
 			var bs = new BinarySerializer();
 			var result = bs.ToBytes(v);
 			Assert.AreEqual(
-				"01 00 " + XS("YuzuTest.SampleRect") + " 02 00 " + XS("A", "B") + 
-			" 01 00 02 00 " + XS("YuzuTest.SamplePoint") + " 02 00 " + XS("X", "Y") +
+				"20 01 00 " + XS("YuzuTest.SampleRect") + " 02 00 " +
+				XS("A", RoughType.Record, "B", RoughType.Record) + 
+			" 01 00 02 00 " + XS("YuzuTest.SamplePoint") + " 02 00 " +
+			XS("X", RoughType.Int, "Y", RoughType.Int) +
 			" 21 00 00 00 2C 00 00 00 " +
 			"02 00 02 00 37 00 00 00 42 00 00 00 00 00",
 			XS(result));
@@ -550,8 +603,8 @@ namespace YuzuTest.Binary
 			var v1 = new SampleInterfaceField { I = new SampleInterfaced { X = 34 } };
 			var result1 = bs.ToBytes(v1);
 			Assert.AreEqual(
-				"01 00 " + XS("YuzuTest.SampleInterfaceField") + " 01 00 " + XS("I") +
-				" 01 00 02 00 " + XS("YuzuTest.SampleInterfaced") + " 01 00 " + XS("X") +
+				"20 01 00 " + XS("YuzuTest.SampleInterfaceField") + " 01 00 " + XS("I", RoughType.Record) +
+				" 01 00 02 00 " + XS("YuzuTest.SampleInterfaced") + " 01 00 " + XS("X", RoughType.Int) +
 				" 01 00 22 00 00 00 00 00 00 00",
 				XS(result1));
 
@@ -561,12 +614,12 @@ namespace YuzuTest.Binary
 			Assert.IsInstanceOfType(w1.I, typeof(SampleInterfaced));
 			Assert.AreEqual(34, w1.I.X);
 
-			var w1n = (SampleInterfaceField)bd.FromBytes(new byte[] { 01, 00, 01, 00, 00, 00, 00, 00 });
+			var w1n = (SampleInterfaceField)bd.FromBytes(new byte[] { 0x20, 01, 00, 01, 00, 00, 00, 00, 00 });
 			Assert.AreEqual(null, w1n.I);
 
 			var v2 = new List<ISample> { null, new SampleInterfaced { X = 37 } };
 			var result2 = bs.ToBytes(v2);
-			Assert.AreEqual("02 00 00 00 00 00 02 00 01 00 25 00 00 00 00 00", XS(result2));
+			Assert.AreEqual("21 20 02 00 00 00 00 00 02 00 01 00 25 00 00 00 00 00", XS(result2));
 
 			var w2 = new List<ISample>();
 			bd.FromBytes(w2, result2);
@@ -577,7 +630,7 @@ namespace YuzuTest.Binary
 			ISampleField v3 = new SampleInterfacedField { X = 41 };
 			var result3 = bs.ToBytes(v3);
 			Assert.AreEqual(
-				"03 00 " + XS("YuzuTest.SampleInterfacedField") + " 01 00 " + XS("X") +
+				"20 03 00 " + XS("YuzuTest.SampleInterfacedField") + " 01 00 " + XS("X", RoughType.Int) +
 				" 01 00 29 00 00 00 00 00", XS(result3));
 			var w3 = (ISampleField)bd.FromBytes(result3);
 			Assert.AreEqual(41, w3.X);
@@ -592,7 +645,7 @@ namespace YuzuTest.Binary
 			SampleAbstract v1 = new SampleConcrete { XX = 81 };
 			var result1 = bs.ToBytes(v1);
 			Assert.AreEqual(
-				"01 00 " + XS("YuzuTest.SampleConcrete") + " 01 00 " + XS("XX") +
+				"20 01 00 " + XS("YuzuTest.SampleConcrete") + " 01 00 " + XS("XX", RoughType.Int) +
 				" 01 00 51 00 00 00 00 00", XS(result1));
 
 			var w1 = bd.FromBytes<SampleAbstract>(result1);
@@ -614,8 +667,8 @@ namespace YuzuTest.Binary
 			var n = typeof(SampleInterfacedGeneric<string>).FullName;
 			var result1 = bs.ToBytes(v1);
 			Assert.AreEqual(
-				"01 00 " + XS("YuzuTest.SampleInterfaceField") + " 01 00 " + XS("I") +
-				" 01 00 02 00 " + XS(n) + " 02 00 " + XS("G", "X") +
+				"20 01 00 " + XS("YuzuTest.SampleInterfaceField") + " 01 00 " + XS("I", RoughType.Record) +
+				" 01 00 02 00 " + XS(n) + " 02 00 " + XS("G", RoughType.String, "X", RoughType.Int) +
 				" 01 00 " + XS("qq") + " 02 00 23 00 00 00 00 00 00 00",
 				XS(result1));
 			var w1 = (SampleInterfaceField)(new BinaryDeserializer()).FromBytes(new SampleInterfaceField(), result1);
@@ -631,7 +684,8 @@ namespace YuzuTest.Binary
 			var v1 = new Sample1 { X = 6, Y = "ttt" };
 			var result1 = bs.ToBytes(v1);
 			Assert.AreEqual(
-				"01 00 " + XS("YuzuTest.Sample1") + " 02 00 " + XS("X", "Y") +
+				"20 01 00 " + XS("YuzuTest.Sample1") + " 02 00 " +
+				XS("X", RoughType.Int, "Y", RoughType.String) +
 				" 01 00 06 00 00 00 00 00", XS(result1));
 			var w1 = (Sample1)(new BinaryDeserializer()).FromBytes(result1);
 			Assert.AreEqual(6, w1.X);
@@ -640,7 +694,8 @@ namespace YuzuTest.Binary
 			var v2 = new Sample2 { X = 5, Y = "5" };
 			var result2 = bs.ToBytes(v2);
 			Assert.AreEqual(
-				"02 00 " + XS("YuzuTest.Sample2") + " 02 00 " + XS("X", "Y") +
+				"20 02 00 " + XS("YuzuTest.Sample2") + " 02 00 " +
+				XS("X", RoughType.Int, "Y", RoughType.String) +
 				" 01 00 05 00 00 00 00 00", XS(result2));
 		}
 
@@ -653,7 +708,8 @@ namespace YuzuTest.Binary
 			var v = new Sample1 { Y = s };
 			var result = bs.ToBytes(v);
 			Assert.AreEqual(
-				"01 00 " + XS("YuzuTest.Sample1") + " 02 00 " + XS("X", "Y") +
+				"20 01 00 " + XS("YuzuTest.Sample1") + " 02 00 " +
+				XS("X", RoughType.Int, "Y", RoughType.String) +
 				" 01 00 00 00 00 00 02 00 " + XS(s) + " 00 00",
 				XS(result));
 
@@ -665,7 +721,7 @@ namespace YuzuTest.Binary
 			v.Y = "привет";
 			var result2 = bs.ToBytes(v);
 			Assert.AreEqual(
-				"01 00 01 00 00 00 00 00 02 00 0C " +
+				"20 01 00 01 00 00 00 00 00 02 00 0C " +
 				XS(Encoding.UTF8.GetBytes("привет")) + " 00 00",
 				XS(result2));
 			bd.FromBytes(w, result2);
@@ -681,7 +737,8 @@ namespace YuzuTest.Binary
 			var v1 = new SampleDate { D = new DateTime(2011, 3, 25), T = TimeSpan.FromMinutes(5) };
 			var result1 = bs.ToBytes(v1);
 			Assert.AreEqual(
-				"01 00 " + XS("YuzuTest.SampleDate") + " 02 00 " + XS("D", "T") +
+				"20 01 00 " + XS("YuzuTest.SampleDate") + " 02 00 " +
+				XS("D", RoughType.DateTime, "T", RoughType.TimeSpan) +
 				" 01 00 00 00 F5 B7 96 B8 CD 08 02 00 00 5E D0 B2 00 00 00 00 00 00",
 				XS(result1));
 
@@ -712,7 +769,8 @@ namespace YuzuTest.Binary
 			v1.OnSomething = v1.Handler1;
 			var result = bs.ToBytes(v1);
 			Assert.AreEqual(
-				"01 00 " + XS("YuzuTest.SampleSelfDelegate") + " 02 00 " + XS("OnSomething", "x") +
+				"20 01 00 " + XS("YuzuTest.SampleSelfDelegate") + " 02 00 " +
+				XS("OnSomething", RoughType.Record, "x", RoughType.Int) +
 				" 01 00 " + XS("Handler1") + " 02 00 4D 00 00 00 00 00",
 				XS(result));
 
@@ -723,7 +781,7 @@ namespace YuzuTest.Binary
 			w1.OnSomething(10);
 			Assert.AreEqual(87, w1.x);
 
-			result[56]++; // Replace("Handler1", "Handler2")
+			result[59]++; // Replace("Handler1", "Handler2")
 			(new BinaryDeserializer()).FromBytes(w1, result);
 			w1.OnSomething(10);
 			Assert.AreEqual(770, w1.x);
@@ -736,7 +794,7 @@ namespace YuzuTest.Binary
 			var sample = new SampleWithNullField();
 			var result = bs.ToBytes(sample);
 			Assert.AreEqual(
-				"01 00 " + XS("YuzuTest.SampleWithNullField") + " 01 00 " + XS("About") +
+				"20 01 00 " + XS("YuzuTest.SampleWithNullField") + " 01 00 " + XS("About", RoughType.String) +
 				" 01 00 00 01 00 00",
 				XS(result));
 			var bd = new BinaryDeserializer();
@@ -744,7 +802,7 @@ namespace YuzuTest.Binary
 			bd.FromBytes(w, result);
 			Assert.AreEqual(sample.About, w.About);
 
-			bd.FromBytes(w, new byte[] { 01, 00, 01, 00, 00, 00, 00, 00 });
+			bd.FromBytes(w, new byte[] { 0x20, 01, 00, 01, 00, 00, 00, 00, 00 });
 			Assert.AreEqual("", w.About);
 		}
 
@@ -755,7 +813,7 @@ namespace YuzuTest.Binary
 			var v0 = new SampleAfter { X = "m" };
 			var result0 = bs.ToBytes(v0);
 			Assert.AreEqual(
-				"01 00 " + XS("YuzuTest.SampleAfter") + " 01 00 " + XS("X") +
+				"20 01 00 " + XS("YuzuTest.SampleAfter") + " 01 00 " + XS("X", RoughType.String) +
 				" 01 00 " + XS("m") + " 00 00",
 				XS(result0));
 
@@ -781,9 +839,11 @@ namespace YuzuTest.Binary
 
 			var result1 = bs.ToBytes(v1);
 			Assert.AreEqual(
-				"01 00 " + XS("YuzuTest.SampleMerge") + " 03 00 " + XS("DI", "LI", "M") +
+				"20 01 00 " + XS("YuzuTest.SampleMerge") + " 03 00 " +
+				XS("DI") + " 22 05 05 " +
+				XS("LI") + " 21 05 " + XS("M", RoughType.Record) +
 				" 01 00 01 00 00 00 03 00 00 00 04 00 00 00 02 00 01 00 00 00 21 00 00 00 03 00 02 00 " +
-				XS("YuzuTest.Sample1") + " 02 00 " + XS("X", "Y") +
+				XS("YuzuTest.Sample1") + " 02 00 " + XS("X", RoughType.Int, "Y", RoughType.String) +
 				" 01 00 00 03 00 00 00 00 00 00",
 				XS(result1));
 
@@ -807,9 +867,9 @@ namespace YuzuTest.Binary
 			var v1 = new YuzuTest2.SampleNamespace { B = new SampleBase { FBase = 3 } };
 			var result1 = bs.ToBytes(v1);
 			Assert.AreEqual(
-				"01 00 " + XS("YuzuTest2.SampleNamespace") + " 01 00 " + XS("B") +
-				" 01 00 02 00 " + XS("YuzuTest.SampleBase") + " 01 00 " + XS("FBase") +
-				" 01 00 03 00 00 00 00 00 00 00",
+				"20 01 00 " + XS("YuzuTest2.SampleNamespace") + " 01 00 " + XS("B") +
+				" 20 01 00 02 00 " + XS("YuzuTest.SampleBase") + " 01 00 " + XS("FBase") +
+				" 05 01 00 03 00 00 00 00 00 00 00",
 				XS(result1));
 
 			var w1 = (new BinaryDeserializer()).FromBytes(result1);
@@ -824,8 +884,10 @@ namespace YuzuTest.Binary
 			var v1 = new SampleNested { E = SampleNested.NestedEnum.One, C = new SampleNested.NestedClass() };
 			var result1 = bs.ToBytes(v1);
 			Assert.AreEqual(
-				"01 00 " + XS("YuzuTest.SampleNested") + " 02 00 " + XS("C", "E") +
-				" 01 00 02 00 " + XS("YuzuTest.SampleNested+NestedClass") + " 01 00 " + XS("Z") +
+				"20 01 00 " + XS("YuzuTest.SampleNested") + " 02 00 " +
+				XS("C", RoughType.Record, "E", RoughType.Int) +
+				" 01 00 02 00 " + XS("YuzuTest.SampleNested+NestedClass") +
+				" 01 00 " + XS("Z", RoughType.Int) +
 				" 01 00 00 00 00 00 00 00 " +
 				"02 00 00 00 00 00 00 00",
 				XS(result1));
