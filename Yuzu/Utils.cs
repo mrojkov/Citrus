@@ -5,15 +5,10 @@ using System.Reflection;
 
 namespace Yuzu.Util
 {
-#if NET40
+	// Compatilility with .NET 4
 	internal static class Net4
 	{
-		public static bool IsDefined(this MemberInfo m, Type t)
-		{
-			return m.IsDefined(t, false);
-		}
-
-		public static Attribute GetCustomAttribute(this MemberInfo m, Type t, bool inherit)
+		public static Attribute GetCustomAttribute_Compat(this MemberInfo m, Type t, bool inherit)
 		{
 			var attrs = m.GetCustomAttributes(t, inherit);
 			if (attrs.Count() > 1)
@@ -21,7 +16,6 @@ namespace Yuzu.Util
 			return (Attribute)attrs.FirstOrDefault();
 		}
 	}
-#endif
 
 	internal class Utils
 	{

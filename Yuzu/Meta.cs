@@ -102,23 +102,23 @@ namespace Yuzu.Metadata
 
 		private void AddItem(MemberInfo m)
 		{
-			var optional = m.GetCustomAttribute(Options.OptionalAttribute, false);
-			var required = m.GetCustomAttribute(Options.RequiredAttribute, false);
+			var optional = m.GetCustomAttribute_Compat(Options.OptionalAttribute, false);
+			var required = m.GetCustomAttribute_Compat(Options.RequiredAttribute, false);
 			if (optional == null && required == null)
 				return;
 			if (optional != null && required != null)
 				throw Error("Both optional and required attributes for field '{0}'", m.Name);
-			var serializeIf = m.GetCustomAttribute(Options.SerializeIfAttribute, true);
+			var serializeIf = m.GetCustomAttribute_Compat(Options.SerializeIfAttribute, true);
 			var item = new Item {
 				Alias = Options.GetAlias(optional ?? required) ?? m.Name,
 				IsOptional = optional != null,
 				IsCompact =
-					m.IsDefined(Options.CompactAttribute) ||
-					m.GetType().IsDefined(Options.CompactAttribute),
+					m.IsDefined(Options.CompactAttribute, false) ||
+					m.GetType().IsDefined(Options.CompactAttribute, false),
 				SerializeIf = serializeIf != null ? Options.GetSerializeCondition(serializeIf) : null,
 				Name = m.Name,
 			};
-			var merge = m.IsDefined(Options.MergeAttribute);
+			var merge = m.IsDefined(Options.MergeAttribute, false);
 
 			switch (m.MemberType) {
 				case MemberTypes.Field:
@@ -151,7 +151,7 @@ namespace Yuzu.Metadata
 
 		private void AddMethod(MethodInfo m)
 		{
-			if (m.IsDefined(Options.AfterDeserializationAttribute))
+			if (m.IsDefined(Options.AfterDeserializationAttribute, false))
 				AfterDeserialization.Add(new MethodAction { Info = m, Run = obj => m.Invoke(obj, null) });
 		}
 
@@ -177,7 +177,7 @@ namespace Yuzu.Metadata
 		{
 			Type = t;
 			Options = options;
-			IsCompact = t.IsDefined(Options.CompactAttribute);
+			IsCompact = t.IsDefined(Options.CompactAttribute, false);
 
 			foreach (var i in t.GetInterfaces())
 				ExploreType(i);
