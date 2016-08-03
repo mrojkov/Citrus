@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ProtoBuf;
 
 using Yuzu;
+using Yuzu.Binary;
 using Yuzu.Json;
 using YuzuGen.YuzuTest;
 
@@ -106,6 +107,7 @@ namespace YuzuTest
 	{
 		private static SamplePerson person;
 		private static MemoryStream jsonStream = new MemoryStream();
+		private static MemoryStream binaryStream = new MemoryStream();
 		private static MemoryStream protobufStream = new MemoryStream();
 
 		[ClassInitialize]
@@ -118,6 +120,8 @@ namespace YuzuTest
 			js.JsonOptions.FieldSeparator = "";
 			js.Options.TagMode = TagMode.Aliases;
 			js.ToStream(person, jsonStream);
+			var bs = new BinarySerializer();
+			bs.ToStream(person, binaryStream);
 			ProtoBuf.Serializer.Serialize(protobufStream, person);
 		}
 
@@ -151,6 +155,16 @@ namespace YuzuTest
 		}
 
 		[TestMethod]
+		public void TestBinaryWrite()
+		{
+			Assert.AreEqual(28076, SamplePerson.Counter);
+			var bs = new BinarySerializer();
+			var ms = new MemoryStream();
+			bs.ToStream(person, ms);
+			Assert.AreEqual(binaryStream.Length, ms.Length);
+		}
+
+		[TestMethod]
 		public void TestJsonRead()
 		{
 			var jd = new JsonDeserializer();
@@ -158,6 +172,16 @@ namespace YuzuTest
 			SamplePerson p = new SamplePerson();
 			jsonStream.Position = 0;
 			jd.FromStream(p, jsonStream);
+			Assert.AreEqual(person.Name, p.Name);
+		}
+
+		[TestMethod]
+		public void TestBinaryRead()
+		{
+			var bd = new BinaryDeserializer();
+			SamplePerson p = new SamplePerson();
+			binaryStream.Position = 0;
+			bd.FromStream(p, binaryStream);
 			Assert.AreEqual(person.Name, p.Name);
 		}
 
