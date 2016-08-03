@@ -68,6 +68,8 @@ namespace Yuzu.Binary
 		private bool ReadCompatibleType(Type expectedType)
 		{
 			var rt = (RoughType)Reader.ReadByte();
+			if (expectedType.IsEnum)
+				return rt == RoughType.Int;
 			if (RoughType.FirstAtom <= rt && rt <= RoughType.LastAtom)
 				return RT.roughTypeToType[(int)rt] == expectedType;
 			if (rt == RoughType.Sequence) {
