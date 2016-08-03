@@ -40,8 +40,10 @@ namespace Lime
 				minSize.Y += i.MinSize;
 				maxSize.Y += i.MaxSize;
 			}
-			widget.MeasuredMinSize = minSize;
-			widget.MeasuredMaxSize = maxSize;
+			// TODO: totalSpacing should take in account col/row spans.
+			var totalSpacing = ColSpacing * new Vector2(ColCount - 1, RowCount - 1);
+			widget.MeasuredMinSize = minSize + totalSpacing;
+			widget.MeasuredMaxSize = maxSize + totalSpacing;
 		}
 
 		public override void ArrangeChildren(Widget widget)
