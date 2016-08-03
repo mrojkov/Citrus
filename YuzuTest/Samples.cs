@@ -344,6 +344,14 @@ namespace YuzuTest
 		public int X { get; set; }
 	}
 
+	public abstract class SampleAbstract { }
+
+	public class SampleConcrete: SampleAbstract
+	{
+		[YuzuRequired]
+		public int XX;
+	}
+
 	public class SampleCollection<T> : ICollection<T>
 	{
 		private List<T> impl = new List<T>();

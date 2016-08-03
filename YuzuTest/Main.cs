@@ -125,6 +125,8 @@ namespace YuzuTest
 				jd.Generate<SampleInterfaced>();
 				jd.Generate<SampleInterfaceField>();
 				jd.Generate<SampleInterfacedGeneric<string>>();
+				jd.Generate<SampleAbstract>();
+				jd.Generate<SampleConcrete>();
 				jd.Generate<SampleCollection<int>>();
 				jd.Generate<SampleExplicitCollection<int>>();
 				jd.Generate<SampleWithCollection>();

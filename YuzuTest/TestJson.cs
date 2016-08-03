@@ -690,6 +690,32 @@ namespace YuzuTest.Json
 		}
 
 		[TestMethod]
+		public void TestAbstract()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = "";
+			js.JsonOptions.SaveRootClass = true;
+			var jd = new JsonDeserializer();
+
+			SampleAbstract v1 = new SampleConcrete { XX = 81 };
+			var result1 = js.ToString(v1);
+			Assert.AreEqual("{\"class\":\"YuzuTest.SampleConcrete\",\"XX\":81}", result1);
+
+			var w1 = jd.FromString<SampleAbstract>(result1);
+			Assert.AreEqual((v1 as SampleConcrete).XX, (w1 as SampleConcrete).XX);
+			var w1g = (SampleConcrete)SampleAbstract_JsonDeserializer.Instance.FromString(result1);
+			Assert.AreEqual((v1 as SampleConcrete).XX, w1g.XX);
+
+			var v2 = new List<SampleAbstract>();
+			v2.Add(new SampleConcrete { XX = 51 });
+
+			var w2 = jd.FromString<List<SampleAbstract>>(js.ToString(v2));
+			Assert.AreEqual(v2.Count, w2.Count);
+			Assert.AreEqual((v2[0] as SampleConcrete).XX, (w2[0] as SampleConcrete).XX);
+		}
+
+		[TestMethod]
 		public void TestGeneric()
 		{
 			var js = new JsonSerializer();

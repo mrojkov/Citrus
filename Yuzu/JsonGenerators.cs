@@ -371,10 +371,10 @@ namespace Yuzu.Json
 				GenerateCollection(t, icoll, name);
 				Put("}\n");
 			}
-			else if (t.IsClass || Utils.IsStruct(t))
+			else if (t.IsClass && !t.IsAbstract || Utils.IsStruct(t))
 				PutPart(String.Format(
 					"{0}.Instance.FromReaderTyped<{1}>(Reader);\n", GetDeserializerName(t), GetTypeSpec(t)));
-			else if (t.IsInterface)
+			else if (t.IsInterface || t.IsAbstract)
 				PutPart(String.Format(
 					"{0}.Instance.FromReaderInterface<{1}>(Reader);\n", GetDeserializerName(t), GetTypeSpec(t)));
 			else
@@ -441,7 +441,7 @@ namespace Yuzu.Json
 			Put("{\n");
 			if (icoll != null)
 				PutF("return FromReaderInt(new {0}());\n", typeSpec);
-			else if (typeof(T).IsInterface)
+			else if (typeof(T).IsInterface || typeof(T).IsAbstract)
 				PutF("return FromReaderInterface<{0}>(Reader);\n", typeSpec);
 			else
 				PutF("return FromReaderTyped<{0}>(Reader);\n", typeSpec);
@@ -461,7 +461,7 @@ namespace Yuzu.Json
 
 			Put("public override object FromReaderIntPartial(string name)\n");
 			Put("{\n");
-			if (typeof(T).IsInterface)
+			if (typeof(T).IsInterface || typeof(T).IsAbstract)
 				Put("return null;\n");
 			else
 				PutF("return ReadFields(new {0}(), name);\n", typeSpec);

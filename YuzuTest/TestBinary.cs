@@ -584,6 +584,29 @@ namespace YuzuTest.Binary
 		}
 
 		[TestMethod]
+		public void TestAbstract()
+		{
+			var bs = new BinarySerializer();
+			var bd = new BinaryDeserializer();
+
+			SampleAbstract v1 = new SampleConcrete { XX = 81 };
+			var result1 = bs.ToBytes(v1);
+			Assert.AreEqual(
+				"01 00 " + XS("YuzuTest.SampleConcrete") + " 01 00 " + XS("XX") +
+				" 01 00 51 00 00 00 00 00", XS(result1));
+
+			var w1 = bd.FromBytes<SampleAbstract>(result1);
+			Assert.AreEqual((v1 as SampleConcrete).XX, (w1 as SampleConcrete).XX);
+
+			var v2 = new List<SampleAbstract>();
+			v2.Add(new SampleConcrete { XX = 51 });
+
+			var w2 = bd.FromBytes<List<SampleAbstract>>(bs.ToBytes(v2));
+			Assert.AreEqual(v2.Count, w2.Count);
+			Assert.AreEqual((v2[0] as SampleConcrete).XX, (w2[0] as SampleConcrete).XX);
+		}
+
+		[TestMethod]
 		public void TestGeneric()
 		{
 			var bs = new BinarySerializer();

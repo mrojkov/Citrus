@@ -599,11 +599,11 @@ namespace Yuzu.Json
 			}
 			if (t == typeof(object))
 				return ReadAnyObject;
-			if (t.IsClass) {
+			if (t.IsClass && !t.IsAbstract) {
 				var m = Utils.GetPrivateGeneric(GetType(), "ReadObject", t);
 				return (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);
 			}
-			if (t.IsInterface) {
+			if (t.IsInterface || t.IsAbstract) {
 				var m = Utils.GetPrivateGeneric(GetType(), "ReadInterface", t);
 				return (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);
 			}

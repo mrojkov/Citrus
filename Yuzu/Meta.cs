@@ -155,7 +155,7 @@ namespace Yuzu.Metadata
 				if (Items.Count > 0)
 					throw Error("Serializable fields in collection are not supported");
 			}
-			else if (!options.AllowEmptyTypes && Items.Count == 0 && !t.IsInterface)
+			else if (!options.AllowEmptyTypes && Items.Count == 0 && !(t.IsInterface || t.IsAbstract))
 				throw Error("No serializable fields");
 			Items.Sort();
 			Item prev = null;
