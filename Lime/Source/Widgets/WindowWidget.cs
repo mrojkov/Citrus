@@ -8,21 +8,43 @@ namespace Lime
 	public class WindowWidget : Widget
 	{
 		private RenderChain renderChain = new RenderChain();
-		private bool continuousRendering;
 
 		public IWindow Window { get; private set; }
+		public bool LayoutBasedWindowSize { get; set; }
 
-		public WindowWidget(IWindow window, bool continuousRendering = true)
+		public WindowWidget(IWindow window)
 		{
-			this.continuousRendering = continuousRendering;
 			Window = window;
 			Window.Context = new CombinedContext(Window.Context, new WidgetContext(this));
 			Theme.Current.Apply(this);
+			window.Rendering += () => {
+				Renderer.BeginFrame();
+				Renderer.SetOrthogonalProjection(Vector2.Zero, Size);
+				RenderAll();
+				Renderer.EndFrame();
+			};
+			window.Updating += delta => {
+				if (LayoutBasedWindowSize) {
+					Size = window.ClientSize = EffectiveMinSize;
+				} else {
+					Size = (Vector2)window.ClientSize;
+				}
+				Update(delta);
+			};
+			window.VisibleChanging += showing => {
+				if (showing && LayoutBasedWindowSize) {
+					Update(0); // Update widgets in order to deduce EffectiveMinSize.
+					Size = window.ClientSize = EffectiveMinSize;
+					window.Center();
+				}
+			};
 		}
+
+		protected virtual bool ContinuousRendering() { return true; }
 
 		public override void Update(float delta)
 		{
-			if (continuousRendering) {
+			if (ContinuousRendering()) {
 				Window.Invalidate();
 			}
 			WidgetContext.Current.MouseCursor = MouseCursor.Default;
@@ -39,7 +61,7 @@ namespace Lime
 			WidgetContext.Current.NodeUnderMouse = hitTestArgs.Node;
 		}
 
-		public void RenderAll()
+		public virtual void RenderAll()
 		{
 			SetViewport();
 			renderChain.Render();
@@ -55,22 +77,13 @@ namespace Lime
 		}
 	}
 
+	[Obsolete("Use WindowWidget instead")]
 	public class DefaultWindowWidget : WindowWidget
 	{
 		public DefaultWindowWidget(Window window)
 			: base(window)
 		{
 			Theme.Current.Apply(this, typeof(WindowWidget));
-			window.Rendering += () => {
-				Renderer.BeginFrame();
-				Renderer.SetOrthogonalProjection(Vector2.Zero, Size);
-				RenderAll();
-				Renderer.EndFrame();
-			};
-			window.Updating += delta => {
-				Size = (Vector2)window.ClientSize;
-				Update(delta);
-			};
 		}
 	}
 
@@ -79,22 +92,19 @@ namespace Lime
 		public bool RedrawMarkVisible { get; set; }
 
 		public InvalidableWindowWidget(Window window)
-			: base(window, continuousRendering: false)
+			: base(window)
 		{
 			Theme.Current.Apply(this, typeof(WindowWidget));
-			window.Rendering += () => {
-				Renderer.BeginFrame();
-				Renderer.SetOrthogonalProjection(Vector2.Zero, Size);
-				RenderAll();
-				if (RedrawMarkVisible) {
-					RenderRedrawMark();
-				}
-				Renderer.EndFrame();
-			};
-			window.Updating += delta => {
-				Size = (Vector2)window.ClientSize;
-				Update(delta);
-			};
+		}
+
+		protected override bool ContinuousRendering() { return false; }
+
+		public override void RenderAll ()
+		{
+			base.RenderAll ();
+			if (RedrawMarkVisible) {
+				RenderRedrawMark();
+			}
 		}
 
 		void RenderRedrawMark()
