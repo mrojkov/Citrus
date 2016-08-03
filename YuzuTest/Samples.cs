@@ -257,7 +257,7 @@ namespace YuzuTest
 
 		[YuzuRequired("1")]
 		[ProtoMember(1)]
-		public string Name;
+		public string Name { get; set; }
 
 		[YuzuRequired("2")]
 		[ProtoMember(2)]

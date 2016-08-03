@@ -393,7 +393,7 @@ namespace Yuzu.Json
 				else if (m.MemberType == MemberTypes.Property) {
 					var p = (PropertyInfo)m;
 					if (p.CanWrite) {
-						var v = Utils.CodeValueFormat(p.GetValue(obj));
+						var v = Utils.CodeValueFormat(p.GetValue(obj, new object[] { }));
 						if (v != "") // TODO
 							PutF("{0}.{1} = {2};\n", name, p.Name, v);
 					}

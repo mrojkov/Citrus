@@ -20,15 +20,6 @@ namespace Yuzu.Util
 				throw new AmbiguousMatchException();
 			return (Attribute)attrs.FirstOrDefault();
 		}
-
-		public static object GetValue(this PropertyInfo m, object obj)
-		{
-			return m.GetValue(obj, new object[] { });
-		}
-		public static void SetValue(this PropertyInfo m, object obj, object value)
-		{
-			m.SetValue(obj, value, new object[] { });
-		}
 	}
 #endif
 

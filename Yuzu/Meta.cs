@@ -70,6 +70,36 @@ namespace Yuzu.Metadata
 
 		public List<MethodAction> AfterDeserialization = new List<MethodAction>();
 
+		private static Action<object, object> SetterGenericHelper<TTarget, TParam>(MethodInfo m)
+		{
+			var action =
+				(Action<TTarget, TParam>)Delegate.CreateDelegate(typeof(Action<TTarget, TParam>), m);
+			return (object target, object param) => action((TTarget)target, (TParam)param);
+		}
+
+		private static Func<object, object> GetterGenericHelper<TTarget, TReturn>(MethodInfo m)
+		{
+			var func =
+				(Func<TTarget, TReturn>)Delegate.CreateDelegate(typeof(Func<TTarget, TReturn>), m);
+			return (object target) => (object)func((TTarget)target);
+		}
+
+		private static Action<object, object> BuildSetter(MethodInfo m)
+		{
+			var helper = typeof(Meta).GetMethod(
+				"SetterGenericHelper", BindingFlags.Static | BindingFlags.NonPublic).MakeGenericMethod(
+				m.DeclaringType, m.GetParameters()[0].ParameterType);
+			return (Action<object, object>)helper.Invoke(null, new object[] { m });
+		}
+
+		private static Func<object, object> BuildGetter(MethodInfo m)
+		{
+			var helper = typeof(Meta).GetMethod(
+				"GetterGenericHelper", BindingFlags.Static | BindingFlags.NonPublic).MakeGenericMethod(
+				m.DeclaringType, m.ReturnType);
+			return (Func<object, object>)helper.Invoke(null, new object[] { m });
+		}
+
 		private void AddItem(MemberInfo m)
 		{
 			var optional = m.GetCustomAttribute(Options.OptionalAttribute, false);
@@ -102,9 +132,10 @@ namespace Yuzu.Metadata
 				case MemberTypes.Property:
 					var p = m as PropertyInfo;
 					item.Type = p.PropertyType;
-					item.GetValue = p.GetValue;
-					if (!merge && p.GetSetMethod() != null)
-						item.SetValue = p.SetValue;
+					item.GetValue = BuildGetter(p.GetGetMethod());
+					var setter = p.GetSetMethod();
+					if (!merge && setter != null)
+						item.SetValue = BuildSetter(setter);
 					item.PropInfo = p;
 					break;
 				default:
