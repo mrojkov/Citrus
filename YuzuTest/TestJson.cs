@@ -51,12 +51,12 @@ namespace YuzuTest.Json
 		{
 			var js = new JsonSerializer();
 
-			var v1 = new Sample1 { X = 345, Y = "test" };
+			var v1 = new Sample2 { X = 345, Y = "test" };
 			js.JsonOptions.Indent = "";
 
 			var result = js.ToString(v1);
 			Assert.AreEqual("{\n\"X\":345,\n\"Y\":\"test\"\n}", result);
-			Sample1 v2 = new Sample1();
+			var v2 = new Sample2();
 
 			var jd = new JsonDeserializer();
 			jd.FromString(v2, result);
@@ -344,6 +344,8 @@ namespace YuzuTest.Json
 			jd.FromString(w2, result2);
 			Assert.AreEqual(v2.Value, w2.Value);
 			Assert.AreEqual(v2.Children.Count, w2.Children.Count);
+			Assert.AreEqual(v2.Children[0].Value, w2.Children[0].Value);
+			Assert.AreEqual(v2.Children[1].Children, w2.Children[1].Children);
 		}
 
 		[TestMethod]
@@ -654,7 +656,6 @@ namespace YuzuTest.Json
 			js.JsonOptions.FieldSeparator = "";
 			var v1 = new SampleInterfaceField { I = new SampleInterfaced { X = 34 } };
 			var result1 = js.ToString(v1);
-			Assert.AreEqual("{\"I\":{\"class\":\"YuzuTest.SampleInterfaced\",\"X\":34}}", result1);
 			Assert.AreEqual("{\"I\":{\"class\":\"YuzuTest.SampleInterfaced\",\"X\":34}}", result1);
 
 			var w1 = new SampleInterfaceField();
