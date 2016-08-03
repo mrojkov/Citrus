@@ -91,6 +91,11 @@ namespace Lime
 			Theme.Current.Apply(this);
 		}
 
+		public Button(string text) : this()
+		{
+			Text = text;
+		}
+
 		private IEnumerator<int> InitialState()
 		{
 			yield return 0;
