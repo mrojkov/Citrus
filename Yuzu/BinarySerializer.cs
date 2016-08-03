@@ -216,7 +216,7 @@ namespace Yuzu.Binary
 				return obj => m.Invoke(this, new object[] { obj });
 			}
 			if (Utils.IsStruct(t) || t.IsClass || t.IsInterface) {
-				var name = Utils.IsCompact(t, Options) ? "WriteObjectCompact" : "WriteObject";
+				var name = Meta.Get(t, Options).IsCompact ? "WriteObjectCompact" : "WriteObject";
 				var m = Utils.GetPrivateGeneric(GetType(), name, t);
 				return (Action<object>)Delegate.CreateDelegate(typeof(Action<object>), this, m);
 			}

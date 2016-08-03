@@ -193,7 +193,7 @@ namespace Yuzu.Binary
 		{
 			objStack.Push(obj);
 			try {
-				if (Utils.IsCompact(def.Meta.Type, Options)) {
+				if (def.Meta.IsCompact) {
 					for (int i = 0; i < def.Meta.Items.Count; ++i)
 						def.ReadFunc[i](obj);
 				}

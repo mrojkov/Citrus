@@ -697,10 +697,10 @@ namespace Yuzu.Json
 
 		protected virtual object ReadFieldsCompact(object obj)
 		{
-			if (!Utils.IsCompact(obj.GetType(), Options))
+			var meta = Meta.Get(obj.GetType(), Options);
+			if (!meta.IsCompact)
 				throw Error("Attempt to read non-compact type '{0}' from compact format", obj.GetType().Name);
 			bool isFirst = true;
-			var meta = Meta.Get(obj.GetType(), Options);
 			objStack.Push(obj);
 			try {
 				foreach (var yi in meta.Items) {

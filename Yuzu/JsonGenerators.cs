@@ -409,6 +409,8 @@ namespace Yuzu.Json
 
 		public void Generate<T>()
 		{
+			var meta = Meta.Get(typeof(T), Options);
+
 			if (lastNameSpace != typeof(T).Namespace) {
 				if (lastNameSpace != "")
 					Put("}\n");
@@ -471,7 +473,6 @@ namespace Yuzu.Json
 			PutF("var result = ({0})obj;\n", typeSpec);
 			if (icoll == null) {
 				tempCount = 0;
-				var meta = Meta.Get(typeof(T), Options);
 				foreach (var yi in meta.Items) {
 					if (yi.IsOptional) {
 						PutF("if (\"{0}\" == name) {{\n", yi.Tag(Options));
@@ -497,14 +498,13 @@ namespace Yuzu.Json
 			Put("return result;\n");
 			Put("}\n");
 
-			if (Utils.IsCompact(typeof(T), Options)) {
+			if (meta.IsCompact) {
 				Put("\n");
 				Put("protected override object ReadFieldsCompact(object obj)\n");
 				Put("{\n");
 				PutF("var result = ({0})obj;\n", typeSpec);
 				bool isFirst = true;
 				tempCount = 0;
-				var meta = Meta.Get(typeof(T), Options);
 				foreach (var yi in meta.Items) {
 					if (!isFirst)
 						Put("Require(',');\n");

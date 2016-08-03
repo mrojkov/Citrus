@@ -60,6 +60,7 @@ namespace Yuzu.Metadata
 		public readonly Type Type;
 		public readonly CommonOptions Options;
 		public readonly List<Item> Items = new List<Item>();
+		public readonly bool IsCompact;
 
 		public struct MethodAction
 		{
@@ -145,6 +146,8 @@ namespace Yuzu.Metadata
 		{
 			Type = t;
 			Options = options;
+			IsCompact = t.IsDefined(Options.CompactAttribute);
+
 			foreach (var i in t.GetInterfaces())
 				ExploreType(i);
 			ExploreType(t);

@@ -75,10 +75,5 @@ namespace Yuzu.Util
 				callerType.GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic).
 					MakeGenericMethod(container.GetGenericArguments());
 		}
-
-		public static bool IsCompact(Type t, CommonOptions options)
-		{
-			return t.IsDefined(options.CompactAttribute);
-		}
 	}
 }
