@@ -66,6 +66,7 @@
     <Compile Include="Generated.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="TestBinary.cs" />
     <Compile Include="TestJson.cs" />
   </ItemGroup>
   <ItemGroup>

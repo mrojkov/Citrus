@@ -166,6 +166,7 @@ namespace YuzuTest
 
 	public class SampleKey : IEquatable<SampleKey>
 	{
+		[YuzuRequired]
 		public int V;
 		public override string ToString() { return V.ToString() + "!"; }
 		public bool Equals(SampleKey other) { return V == other.V; }
