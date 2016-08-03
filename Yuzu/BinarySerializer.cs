@@ -78,7 +78,7 @@ namespace Yuzu.Binary
 				return;
 			}
 			writer.Write((string)obj);
-			if (obj == "") {
+			if ((string)obj == "") {
 				writer.Write(false);
 			}
 		}
