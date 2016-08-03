@@ -5,16 +5,16 @@ using ProtoBuf;
 
 namespace Lime
 {
-	/// <summary>
-	/// Коллекция маркеров анимации
-	/// </summary>
 	[ProtoContract]
 	public class MarkerCollection : List<Marker>
 	{
 		public MarkerCollection() { }
-		public MarkerCollection(int capacity) 
-			: base(capacity)
-		{ }
+		public MarkerCollection(int capacity) : base(capacity) { }
+
+		public Marker this[string id]
+		{
+			get { return Find(id); }
+		}
 
 		internal static MarkerCollection DeepClone(MarkerCollection source)
 		{
@@ -25,9 +25,6 @@ namespace Lime
 			return result;
 		}
 		
-		/// <summary>
-		/// Ищет маркер с указанным Id. Если такого маркера нет, возвращает null
-		/// </summary>
 		public Marker TryFind(string id)
 		{
 			foreach (var marker in this) {
@@ -38,42 +35,21 @@ namespace Lime
 			return null;
 		}
 
-		/// <summary>
-		/// Ищет маркер с указанным Id. Если такого маркера нет, возвращает false
-		/// </summary>
-		/// <param name="id">Id маркера</param>
-		/// <param name="marker">Переменная, в которую будет записан результат</param>
 		public bool TryFind(string id, out Marker marker)
 		{
 			marker = TryFind(id);
 			return marker != null;
 		}
 
-		/// <summary>
-		/// Ищет маркер с указанным Id. Если такого маркера нет, генерирует исключение
-		/// </summary>
-		/// <exception cref="Lime.Exception"/>
-		public Marker this[string id]
-		{
-			get { return Find(id); }
-		}
-
-		/// <summary>
-		/// Ищет маркер с указанным Id. Если такого маркера нет, генерирует исключение
-		/// </summary>
-		/// <exception cref="Lime.Exception"/>
 		public Marker Find(string id)
 		{
 			var marker = TryFind(id);
 			if (marker == null) {
-				throw new Lime.Exception("Unknown marker '{0}'", id);
+				throw new ArgumentException("Unknown marker '{0}'", id);
 			}	
 			return marker;
 		}
 
-		/// <summary>
-		/// Возвращает маркер, находящийся на указанном кадре. Если маркера нет, возвращает null
-		/// </summary>
 		public Marker GetByFrame(int frame)
 		{
 			foreach (var marker in this) {
@@ -84,24 +60,30 @@ namespace Lime
 			return null;
 		}
 
-		/// <summary>
-		/// Добавляет Stop-маркер (маркер конца анимации)
-		/// </summary>
-		/// <param name="id">Название маркера</param>
-		/// <param name="frame">Номер кадра, на котором будет установлен маркер</param>
-		public void AddStopMarker(string id, int frame)
+		public new void Add(Marker marker)
 		{
-			Add(new Marker() { Id = id, Action = MarkerAction.Stop, Frame = frame });
+			if (Count == 0 || marker.Frame > this[Count - 1].Frame) {
+				base.Add(marker);
+			} else {
+				throw new InvalidOperationException();
+			}
 		}
 
-		/// <summary>
-		/// Добавляет Play-маркер (маркер начала анимации)
-		/// </summary>
-		/// <param name="id">Название маркера</param>
-		/// <param name="frame">Номер кадра, на котором будет установлен маркер</param>
-		public void AddPlayMarker(string id, int frame)
+		public void AddOrdered(Marker marker)
 		{
-			Add(new Marker() { Id = id, Action = MarkerAction.Play, Frame = frame });
+			if (Count == 0 || marker.Frame > this[Count - 1].Frame) {
+				base.Add(marker);
+			} else {
+				int i = 0;
+				while (this[i].Frame < marker.Frame) {
+					i++;
+				}
+				if (this[i].Frame == marker.Frame) {
+					this[i] = marker;
+				} else {
+					Insert(i, marker);
+				}
+			}
 		}
 	}
 }
