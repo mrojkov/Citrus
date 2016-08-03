@@ -72,18 +72,17 @@ namespace Yuzu.Binary
 				return rt == RoughType.Int;
 			if (RoughType.FirstAtom <= rt && rt <= RoughType.LastAtom)
 				return RT.roughTypeToType[(int)rt] == expectedType;
-			if (rt == RoughType.Sequence) {
-				if (expectedType.IsArray)
-					return ReadCompatibleType(expectedType.GetElementType());
-				var icoll = expectedType.GetInterface(typeof(ICollection<>).Name);
-				return icoll != null && ReadCompatibleType(icoll.GetGenericArguments()[0]);
-			}
-			if (rt == RoughType.Mapping) {
-				if (!expectedType.IsGenericType || expectedType.GetGenericTypeDefinition() != typeof(Dictionary<,>))
+			if (expectedType.IsArray)
+				return rt == RoughType.Sequence && ReadCompatibleType(expectedType.GetElementType());
+			if (expectedType.IsGenericType && expectedType.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
+				if (rt != RoughType.Mapping)
 					return false;
 				var g = expectedType.GetGenericArguments();
 				return ReadCompatibleType(g[0]) && ReadCompatibleType(g[1]);
 			}
+			var icoll = expectedType.GetInterface(typeof(ICollection<>).Name);
+			if (icoll != null)
+				return rt == RoughType.Sequence && ReadCompatibleType(icoll.GetGenericArguments()[0]);
 			if (rt == RoughType.Record)
 				return expectedType.IsRecord();
 			throw Error("Unknown rough type {0}", rt);
