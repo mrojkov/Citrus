@@ -700,6 +700,32 @@ namespace YuzuTest.Binary
 		}
 
 		[TestMethod]
+		public void TestObject()
+		{
+			var bd = new BinaryDeserializer();
+			var w = new SampleObj();
+			bd.FromBytes(w, SX(
+				"20 01 00 " + XS("YuzuTest.SampleObj") + " 01 00 " + XS("F", RoughType.Any) +
+				" 01 00 " + XS(RoughType.Float) + " CD CC F6 42 00 00").ToArray());
+			Assert.AreEqual(123.4f, w.F);
+			bd.FromBytes(w, SX("20 01 00 01 00 21 02 03 00 00 00 01 02 03 00 00").ToArray());
+			CollectionAssert.AreEqual(new byte[] { 1, 2, 3 }, (List<byte>)w.F);
+			bd.FromBytes(w, SX(
+				"20 01 00 01 00 22 0F 03 02 00 00 00 " +
+				XS("a") + " 01 00 " + XS("b") + " 02 00 00 00").ToArray());
+			CollectionAssert.AreEqual(
+				new Dictionary<string, short>() { { "a", 1 }, { "b", 2 } },
+				(Dictionary<string, short>)w.F);
+
+			Assert.AreEqual(
+				typeof(Dictionary<string, object>),
+				bd.FromBytes(new byte[] { 0x22, 0x0F, (byte)RoughType.Any, 00, 00, 00, 00 }).GetType());
+			CollectionAssert.AreEqual(
+				(List<object>)bd.FromBytes(SX("21 10 02 00 00 00 01 05 0F " + XS("abc")).ToArray()),
+				new object[] { (sbyte)5, "abc" });
+		}
+
+		[TestMethod]
 		public void TestEscape()
 		{
 			var bs = new BinarySerializer();

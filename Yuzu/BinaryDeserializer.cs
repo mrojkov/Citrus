@@ -94,7 +94,7 @@ namespace Yuzu.Binary
 				throw Error("Unable to read pure object");
 			if (t == null)
 				return ReadObject<object>();
-			return ReadValueFunc(t);
+			return ReadValueFunc(t)();
 		}
 
 		private void InitReaders()
