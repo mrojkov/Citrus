@@ -99,7 +99,7 @@ namespace YuzuTest
 		[YuzuRequired]
 		public short Sh;
 		[YuzuRequired]
-		public short USh;
+		public ushort USh;
 		[YuzuRequired]
 		public byte B;
 		[YuzuRequired]

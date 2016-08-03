@@ -1082,7 +1082,7 @@ namespace YuzuGen.YuzuTest
 			result.Sh = checked((short)RequireInt());
 			name = GetNextName(false);
 			if ("USh" != name) throw new YuzuException("USh!=" + name);
-			result.USh = checked((short)RequireInt());
+			result.USh = checked((ushort)RequireUInt());
 			name = GetNextName(false);
 			Require('}');
 			return result;
