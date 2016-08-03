@@ -12,6 +12,7 @@ namespace Lime
 		public event ResizeDelegate Resized;
 		public event Action<float> Updating;
 		public event Action Rendering;
+		public event Action<bool> VisibleChanging;
 		public object Tag { get; set; }
 
 		public static IWindow Current { get; private set; }
@@ -94,6 +95,15 @@ namespace Lime
 			using (Context.Activate().Scoped()) {
 				if (Resized != null) {
 					Resized(deviceRotated);
+				}
+			}
+		}
+
+		protected void RaiseVisibleChanging(bool value)
+		{
+			using (Context.Activate().Scoped()) {
+				if (VisibleChanging != null) {
+					VisibleChanging(value);
 				}
 			}
 		}

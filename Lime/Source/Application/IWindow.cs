@@ -135,6 +135,11 @@ namespace Lime
 		event Func<bool> Closing;
 
 		/// <summary>
+		/// Occurs when the window is about to show or hide.
+		/// </summary>
+		event Action<bool> VisibleChanging;
+
+		/// <summary>
 		/// Occurs after the window has closed.
 		/// </summary>
 		event Action Closed;

@@ -36,7 +36,7 @@ namespace Lime
 		public bool Visible
 		{
 			get { return !View.Hidden; }
-			set { ShowView(value, dialogMode: false); }
+			set { SetVisible(value, dialogMode: false); }
 		}
 
 		public Vector2 ClientPosition
@@ -288,7 +288,7 @@ namespace Lime
 			if (Visible) {
 				throw new InvalidOperationException();
 			}
-			ShowView(true, dialogMode: true);
+			SetVisible(true, dialogMode: true);
 		}
 
 		private void HandleRenderFrame()
@@ -338,12 +338,13 @@ namespace Lime
 			Input.MousePosition = new Vector2((int)p.X, (int)NSGameView.Frame.Height - (int)p.Y) * Input.ScreenToWorldTransform;
 		}
 
-		private void ShowView(bool show, bool dialogMode)
+		private void SetVisible(bool value, bool dialogMode)
 		{
+			RaiseVisibleChanging(value);
 			this.dialogMode = dialogMode;
-			View.Hidden = !show;
+			View.Hidden = !value;
 			View.Stop();
-			if (show) {
+			if (value) {
 				View.Run(refreshRate, dialogMode);
 				window.MakeKeyAndOrderFront(window);
 			}
