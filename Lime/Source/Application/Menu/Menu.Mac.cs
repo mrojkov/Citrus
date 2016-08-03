@@ -67,14 +67,21 @@ namespace Lime
 		public void Popup(IWindow window, Vector2 position, float minimumWidth, ICommand command)
 		{
 			Refresh();
-			NativeMenu.MinimumWidth = minimumWidth;
-			NSMenuItem item = command == null ? null : items.Find(i => i.Command == command).NativeMenuItem;
-			NativeMenu.PopUpMenu(item, new CoreGraphics.CGPoint(position.X, window.ClientSize.Y - position.Y), window.NSGameView);
+			if (NSApplication.SharedApplication.ModalWindow != null) {
+				// Fixme: When a container dialog is running in the modal mode, showing the menu with PopUpMenu() causes all menu items are disabled.
+				// So, use PopUpContextMenu() instead as a workaround.
+				var evt = NSApplication.SharedApplication.CurrentEvent;
+				NSMenu.PopUpContextMenu(NativeMenu, evt, CommonWindow.Current.NSGameView);
+			} else {
+				NativeMenu.MinimumWidth = minimumWidth;
+				NSMenuItem item = command == null ? null : items.Find(i => i.Command == command).NativeMenuItem;
+				NativeMenu.PopUpMenu(item, new CoreGraphics.CGPoint(position.X, window.ClientSize.Y - position.Y), window.NSGameView);
+			}
 		}
 
 		class MenuItem
 		{
-			private Shortcut currentShortcut;
+			private CommandState state;
 			public readonly ICommand Command;
 			public readonly NSMenuItem NativeMenuItem;
 
@@ -82,20 +89,28 @@ namespace Lime
 			{
 				Command = command;
 				NativeMenuItem = new NSMenuItem();
-				NativeMenuItem.Activated += (s, e) => command.Execute();
+				NativeMenuItem.Activated += (s, e) => {
+					Command.Execute();
+				};
 				Refresh();
 			}
 
 			public void Refresh()
 			{
 				Command.Refresh();
+				if (state != null && state.Equals(Command)) {
+					return;
+				}
+				state = new CommandState(Command);
 				NativeMenuItem.Hidden = !Command.Visible;
 				NativeMenuItem.Enabled = Command.Enabled;
 				NativeMenuItem.Title = Command.Text;
-				if (Command.Shortcut.Main != Key.Unknown && currentShortcut != Command.Shortcut) {
-					currentShortcut = Command.Shortcut;
+				if (Command.Shortcut.Main != Key.Unknown) {
 					NativeMenuItem.KeyEquivalent = GetKeyEquivalent(Command.Shortcut.Main);
 					NativeMenuItem.KeyEquivalentModifierMask = GetModifierMask(Command.Shortcut.Modifiers);
+				} else {
+					NativeMenuItem.KeyEquivalent = "";
+					NativeMenuItem.KeyEquivalentModifierMask = 0;
 				}
 				if (Command.Submenu != null) {
 					var nativeSubmenu = Command.Submenu.NativeMenu;
@@ -140,6 +155,34 @@ namespace Lime
 					result |= NSEventModifierMask.CommandKeyMask;
 				}
 				return result;
+			}
+
+			class CommandState
+			{
+				readonly string Text;
+				readonly Shortcut Shortcut;
+				readonly Menu Submenu;
+				readonly bool Enabled;
+				readonly bool Visible;
+
+				public CommandState(ICommand command)
+				{
+					Text = command.Text;
+					Shortcut = command.Shortcut;
+					Submenu = command.Submenu;
+					Enabled = command.Enabled;
+					Visible = command.Visible;
+				}
+
+				public bool Equals(ICommand command)
+				{
+					return
+						Text == command.Text &&
+						Shortcut == command.Shortcut &&
+						Submenu == command.Submenu &&
+						Enabled == command.Enabled &&
+						Visible == command.Visible;
+				}
 			}
 		}
 	}
