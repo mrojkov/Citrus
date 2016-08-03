@@ -1027,11 +1027,15 @@ namespace YuzuTest.Json
 			var js = new JsonSerializer();
 			js.JsonOptions.Indent = "";
 			js.JsonOptions.FieldSeparator = "";
+			js.JsonOptions.EnumAsString = true;
 
 			var v1 = new SampleNested { E = SampleNested.NestedEnum.One, C = new SampleNested.NestedClass() };
 			var result1 = js.ToString(v1);
-			Assert.AreEqual("{\"C\":{\"Z\":0},\"E\":0}", result1);
+			Assert.AreEqual("{\"C\":{\"Z\":0},\"E\":\"One\"}", result1);
 
+			var w1 = (SampleNested)SampleNested_JsonDeserializer.Instance.FromString(result1);
+			Assert.AreEqual(v1.E, w1.E);
+			Assert.AreEqual(v1.C.Z, w1.C.Z);
 		}
 
 		[TestMethod]
