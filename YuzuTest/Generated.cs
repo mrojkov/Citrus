@@ -1779,6 +1779,20 @@ namespace YuzuGen.YuzuTest
 		protected override object ReadFields(object obj, string name)
 		{
 			var result = (global::YuzuTest.SampleMerge)obj;
+			if ("DI" != name) throw new YuzuException("DI!=" + name);
+			Require('{');
+			if (SkipSpacesCarefully() == '}') {
+				Require('}');
+			}
+			else {
+				do {
+					var tmp1 = RequireString();
+					Require(':');
+					var tmp2 = RequireInt();
+					result.DI.Add(int.Parse(tmp1), tmp2);
+				} while (Require('}', ',') == ',');
+			}
+			name = GetNextName(false);
 			if ("LI" != name) throw new YuzuException("LI!=" + name);
 			Require('[');
 			if (SkipSpacesCarefully() == ']') {
@@ -1786,8 +1800,8 @@ namespace YuzuGen.YuzuTest
 			}
 			else {
 				do {
-					var tmp1 = RequireInt();
-					result.LI.Add(tmp1);
+					var tmp3 = RequireInt();
+					result.LI.Add(tmp3);
 				} while (Require(']', ',') == ',');
 			}
 			name = GetNextName(false);

@@ -266,7 +266,6 @@ namespace Yuzu.Json
 			PutF("{0}.Add({1}, {2});\n", name, tempKey, tempValue);
 			Put("} while (Require('}', ',') == ',');\n");
 			Put("}\n");
-			Put("}\n");
 		}
 
 		private void GenerateValue(Type t, string name)
@@ -327,6 +326,7 @@ namespace Yuzu.Json
 			else if(t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
 				PutRequireOrNull('{', t, name);
 				GenerateDictionary(t, name);
+				Put("}\n");
 			}
 			else if (t.IsArray && !JsonOptions.ArrayLengthPrefix) {
 				PutRequireOrNullArray('[', t, name);

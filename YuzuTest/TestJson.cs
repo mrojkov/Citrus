@@ -981,25 +981,30 @@ namespace YuzuTest.Json
 			js.JsonOptions.FieldSeparator = "";
 
 			var v1 = new SampleMerge();
+			v1.DI.Add(3, 4);
 			v1.LI.Add(33);
 			v1.M = new Sample1 { X = 768, Y = "ttt" };
 
 			var result1 = js.ToString(v1);
-			Assert.AreEqual("{\"LI\":[33],\"M\":{\"X\":768}}", result1);
+			Assert.AreEqual("{\"DI\":{\"3\":4},\"LI\":[33],\"M\":{\"X\":768}}", result1);
 
 			var jd = new JsonDeserializer();
 			var w1 = new SampleMerge();
+			w1.DI.Add(5, 6);
 			w1.LI.Add(44);
 			w1.M = new Sample1 { X = 999, Y = "qqq" };
 			jd.FromString(w1, result1);
-			CollectionAssert.AreEqual(new [] { 44, 33 }, w1.LI);
+			CollectionAssert.AreEqual(new Dictionary<int, int> { { 5, 6 }, { 3, 4 } }, w1.DI);
+			CollectionAssert.AreEqual(new[] { 44, 33 }, w1.LI);
 			Assert.AreEqual(768, w1.M.X);
 			Assert.AreEqual("qqq", w1.M.Y);
 
 			var w2 = new SampleMerge();
+			w2.DI.Add(51, 61);
 			w2.LI.Add(55);
 			w2.M = new Sample1 { X = 999, Y = "www" };
 			SampleMerge_JsonDeserializer.Instance.FromString(w2, result1);
+			CollectionAssert.AreEqual(new Dictionary<int, int> { { 51, 61 }, { 3, 4 } }, w2.DI);
 			CollectionAssert.AreEqual(new[] { 55, 33 }, w2.LI);
 			Assert.AreEqual(768, w2.M.X);
 			Assert.AreEqual("www", w2.M.Y);

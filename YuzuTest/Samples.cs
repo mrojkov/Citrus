@@ -406,7 +406,10 @@ namespace YuzuTest
 
 	public class SampleMerge
 	{
+		private Dictionary<int, int> di = new Dictionary<int,int>();
 		private List<int> li = new List<int>();
+		[YuzuRequired]
+		public Dictionary<int, int> DI { get { return di; } }
 		[YuzuRequired]
 		public List<int> LI { get { return li; } }
 		[YuzuOptional, YuzuMerge]

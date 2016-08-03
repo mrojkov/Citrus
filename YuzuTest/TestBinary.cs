@@ -752,22 +752,25 @@ namespace YuzuTest.Binary
 			var bs = new BinarySerializer();
 
 			var v1 = new SampleMerge();
+			v1.DI.Add(3, 4);
 			v1.LI.Add(33);
 			v1.M = new Sample1 { X = 768, Y = "ttt" };
 
 			var result1 = bs.ToBytes(v1);
 			Assert.AreEqual(
-				"01 00 " + XS("YuzuTest.SampleMerge") + " 02 00 " + XS("LI", "M") +
-				" 01 00 01 00 00 00 21 00 00 00 02 00 02 00 " +
+				"01 00 " + XS("YuzuTest.SampleMerge") + " 03 00 " + XS("DI", "LI", "M") +
+				" 01 00 01 00 00 00 03 00 00 00 04 00 00 00 02 00 01 00 00 00 21 00 00 00 03 00 02 00 " +
 				XS("YuzuTest.Sample1") + " 02 00 " + XS("X", "Y") +
 				" 01 00 00 03 00 00 00 00 00 00",
 				XS(result1));
 
 			var bd = new BinaryDeserializer();
 			var w1 = new SampleMerge();
+			w1.DI.Add(5, 6);
 			w1.LI.Add(44);
 			w1.M = new Sample1 { X = 999, Y = "qqq" };
 			bd.FromBytes(w1, result1);
+			CollectionAssert.AreEqual(new Dictionary<int, int> { { 5, 6 }, { 3, 4 } }, w1.DI);
 			CollectionAssert.AreEqual(new[] { 44, 33 }, w1.LI);
 			Assert.AreEqual(768, w1.M.X);
 			Assert.AreEqual("qqq", w1.M.Y);
