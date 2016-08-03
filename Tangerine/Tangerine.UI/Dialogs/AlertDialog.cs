@@ -13,31 +13,19 @@ namespace Tangerine.UI
 
 		public AlertDialog(string title, string text, params string[] buttons)
 		{
-			var textHeight = DesktopTheme.Metrics.TextHeight;
-			var textExtent = Renderer.MeasureTextLine(FontPool.Instance.DefaultFont, text, textHeight);
-			var windowSize = new Vector2((textExtent.X + 20).Clamp(200, 800), 100);
 			window = new Window(new WindowOptions {
-				ClientSize = windowSize,
 				FixedSize = true,
 				Title = title,
 				Visible = false,
 				Style = WindowStyle.Dialog
 			});
 			rootWidget = new InvalidableWindowWidget(window) {
+				LayoutBasedWindowSize = true,
 				Padding = new Thickness(8),
-				Layout = new VBoxLayout { Spacing = 8 },
+				Layout = new VBoxLayout { Spacing = 16 },
 				Nodes = {
-					new Widget {
-						Layout = new StackLayout(),
-						Nodes = {
-							new SimpleText {
-								Text = text,
-								FontHeight = textHeight,
-								AutoSizeConstraints = false,
-								HAlignment = HAlignment.Center,
-								VAlignment = VAlignment.Top
-							},
-						}
+					new SimpleText(text) {
+						Padding = new Thickness(4)
 					},
 					(buttonsPanel = new Widget {
 						Layout = new HBoxLayout { Spacing = 8 },
@@ -71,6 +59,9 @@ namespace Tangerine.UI
 
 		public int Show()
 		{
+			//rootWidget.Update(0); // Refresh its size layout
+			//window.ClientSize = rootWidget.EffectiveMinSize;
+			// window.Center();
 			window.ShowDialog();
 			return result;
 		}

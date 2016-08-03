@@ -239,4 +239,39 @@ namespace Tangerine.Core.Operations
 			container = null;
 		}
 	}
+
+	public class SetMarker : IOperation
+	{
+		readonly MarkerCollection collection;
+		readonly Marker marker;
+		Marker savedMarker;
+
+		public bool IsChangingDocument => true;
+		public DateTime Timestamp { get; set; }
+
+		public static void Perform(MarkerCollection collection, Marker marker)
+		{
+			Document.Current.History.Perform(new SetMarker(collection, marker));
+		}
+
+		private SetMarker(MarkerCollection collection, Marker marker)
+		{
+			this.collection = collection;
+			this.marker = marker;
+		}
+
+		public void Do()
+		{
+			savedMarker = collection.FirstOrDefault(i => i.Frame == marker.Frame);
+			collection.AddOrdered(marker);
+		}
+
+		public void Undo()
+		{
+			collection.Remove(marker);
+			if (savedMarker != null) {
+				collection.AddOrdered(savedMarker);
+			}
+		}
+	}
 }

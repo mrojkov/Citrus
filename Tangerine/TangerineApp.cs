@@ -199,6 +199,8 @@ namespace Tangerine
 			if (Preferences.RecentProjects.Count > 0) {
 				Project.SetCurrent(new Project(Preferences.RecentProjects[0]));
 			}
+			//var c = new ColorPickerDialog(Color4.White);
+			//c.Show();
 		}
 
 		static Frame InitializeDocumentArea(UI.DockManager dockManager)

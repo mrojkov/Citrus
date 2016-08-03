@@ -81,6 +81,7 @@
     <Compile Include="BitmapButton.cs" />
     <Compile Include="Utils\WidgetKeyHandler.cs" />
     <Compile Include="Dialogs\AlertDialog.cs" />
+    <Compile Include="Dialogs\ColorPickerDialog.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

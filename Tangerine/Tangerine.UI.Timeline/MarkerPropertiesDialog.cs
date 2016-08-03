@@ -7,6 +7,8 @@ namespace Tangerine.UI.Timeline
 {
 	public class MarkerPropertiesDialog
 	{
+		bool result;
+		readonly Marker marker;
 		readonly Window window;
 		readonly WindowWidget rootWidget;
 		readonly Button okButton;
@@ -17,15 +19,17 @@ namespace Tangerine.UI.Timeline
 
 		public MarkerPropertiesDialog(Marker marker)
 		{
-			window = new Window(new WindowOptions { ClientSize = new Vector2(300, 150), FixedSize = false, Title = "Marker properties" });
+			this.marker = marker.Clone();
+			window = new Window(new WindowOptions { FixedSize = true, Title = "Marker properties", Visible = false });
 			rootWidget = new InvalidableWindowWidget(window) {
+				LayoutBasedWindowSize = true,
 				Padding = new Thickness(8),
-				Layout = new VBoxLayout { Spacing = 8 },
+				Layout = new VBoxLayout { Spacing = 16 },
 				Nodes = {
 					new Widget {
 						Layout = new TableLayout {
 							ColCount = 2,
-							RowCount = 6,
+							RowCount = 3,
 							Spacing = 8,
 							Cols = { 
 								new LayoutCell(Alignment.RightCenter, 0.5f, 0), 
@@ -33,9 +37,9 @@ namespace Tangerine.UI.Timeline
 							}
 						},
 						Nodes = {
-							new SimpleText { Text = "Marker Id" },
-							(markerIdEditor = new EditBox { Text = marker.Id }),
-							new SimpleText { Text = "Action" },
+							new SimpleText("Marker Id"),
+							(markerIdEditor = new EditBox { Text = marker.Id, MinSize = DesktopTheme.Metrics.DefaultEditBoxSize * new Vector2(2, 1) }),
+							new SimpleText("Action"),
 							(actionSelector = new DropDownList {
 								Items = {
 									new DropDownList.Item("Play", MarkerAction.Play),
@@ -45,7 +49,7 @@ namespace Tangerine.UI.Timeline
 								},
 								Value = marker.Action
 							}),
-							new SimpleText { Text = "Jump to" },
+							new SimpleText("Jump to"),
 							(jumpToEditor = new EditBox { Text = marker.JumpTo }),
 						}
 					},
@@ -53,21 +57,30 @@ namespace Tangerine.UI.Timeline
 						Layout = new HBoxLayout { Spacing = 8 },
 						LayoutCell = new LayoutCell(Alignment.RightCenter),
 						Nodes = {
-							(okButton = new Button { Text = "Ok" }),
-							(cancelButton = new Button { Text = "Cancel" }),
+							(okButton = new Button("Ok")),
+							(cancelButton = new Button("Cancel")),
 						}
 					}
 				}
 			};
 			new TabTraverseController(rootWidget);
 			new WidgetKeyHandler(rootWidget, KeyBindings.CloseDialog).KeyPressed += window.Close;
-			okButton.Clicked += () => { Apply(); window.Close(); };
+			okButton.Clicked += () => {
+				result = true;
+				this.marker.Id = markerIdEditor.Text;
+				this.marker.Action = (MarkerAction)actionSelector.Value;
+				this.marker.JumpTo = jumpToEditor.Text;
+				window.Close();
+			};
 			cancelButton.Clicked += window.Close;
 			KeyboardFocus.Instance.SetFocus(okButton);
 		}
 
-		private void Apply()
+		public Marker Show()
 		{
+			result = false;
+			window.ShowDialog();
+			return result ? marker : null;
 		}
 	}
 }
