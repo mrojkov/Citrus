@@ -726,6 +726,36 @@ namespace YuzuTest.Binary
 		}
 
 		[TestMethod]
+		public void TestNewFields()
+		{
+			var bd = new BinaryDeserializer();
+			bd.Options.TagMode = TagMode.Aliases;
+			bd.Options.IgnoreNewFields = true;
+
+			var w = new SampleTree();
+			bd.FromBytes(w, SX(
+				"20 01 00 " + XS("YuzuTest.SampleTree") + " 03 00 " +
+				XS("a", RoughType.Int, "a1", RoughType.Sequence) + " 0F " +
+				XS("b", RoughType.Sequence) +
+				" 20 01 00 09 00 00 00 02 00 00 00 00 00 03 00 FF FF FF FF 00 00").ToArray());
+			Assert.AreEqual(9, w.Value);
+			Assert.AreEqual(null, w.Children);
+
+			bd.ClearClassIds();
+
+			bd.FromBytes(w, SX(
+				"20 01 00 " + XS("YuzuTest.SampleTree") + " 04 00 " +
+				XS("a", RoughType.Int, "a1", RoughType.Byte) + " " +
+				XS("b", RoughType.Sequence) + " 20 " + XS("x", RoughType.Record) +
+				" 01 00 0A 00 00 00 02 00 00 04 00 00 00 00 00").ToArray());
+			Assert.AreEqual(10, w.Value);
+
+			bd.FromBytes(w, SX(
+				"20 01 00 01 00 0B 00 00 00 00 00").ToArray());
+			Assert.AreEqual(11, w.Value);
+		}
+
+		[TestMethod]
 		public void TestEscape()
 		{
 			var bs = new BinarySerializer();

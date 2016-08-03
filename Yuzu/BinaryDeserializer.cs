@@ -93,8 +93,6 @@ namespace Yuzu.Binary
 			var t = ReadType();
 			if (t == typeof(object))
 				throw Error("Unable to read pure object");
-			if (t == null)
-				return ReadObject<object>();
 			return ReadValueFunc(t)();
 		}
 
@@ -202,12 +200,20 @@ namespace Yuzu.Binary
 
 		protected class ClassDef
 		{
+			internal class FieldDef
+			{
+				public string Name;
+				public int OurIndex;
+				public Action<object> ReadFunc;
+			}
+
 			internal Meta Meta;
-			internal List<Action<object>> ReadFunc = new List<Action<object>>();
-			internal List<Tuple<string, int>> Fields = new List<Tuple<string, int>> { Tuple.Create("", 0) };
+			internal List<FieldDef> Fields = new List<FieldDef>();
 		}
 		// Zeroth element corresponds to 'null'.
 		private List<ClassDef> classDefs = new List<ClassDef> { new ClassDef() };
+
+		public void ClearClassIds() { classDefs = new List<ClassDef> { new ClassDef() }; }
 
 		protected ClassDef GetClassDef(short classId)
 		{
@@ -219,23 +225,62 @@ namespace Yuzu.Binary
 			var typeName = Reader.ReadString();
 			var classType = Options.Assembly.GetType(typeName, throwOnError: true);
 			result.Meta = Meta.Get(classType, Options);
-			var fieldCount = Reader.ReadInt16();
-			if (fieldCount != result.Meta.Items.Count)
-				throw new NotImplementedException();
-			for (int i = 0; i < fieldCount; ++i) {
-				var yi = result.Meta.Items[i];
-				var n = Reader.ReadString();
-				var t = ReadType();
-				if (n != yi.Name)
-					throw new NotImplementedException();
-				if (yi.SetValue != null) {
-					var rf = ReadValueFunc(yi.Type);
-					result.ReadFunc.Add(obj => yi.SetValue(obj, rf()));
+			var ourCount = result.Meta.Items.Count;
+			var theirCount = Reader.ReadInt16();
+			int ourIndex = 0, theirIndex = 0;
+			while (ourIndex < ourCount && theirIndex < theirCount) {
+				var yi = result.Meta.Items[ourIndex];
+				var ourName = yi.Tag(Options);
+				var theirName = Reader.ReadString();
+				switch (String.CompareOrdinal(ourName, theirName)) {
+					case -1:
+						if (!yi.IsOptional)
+							throw Error("Missing required field {0} for class {1}", ourName, typeName);
+						ourIndex += 1;
+						break;
+					case +1: {
+						if (!Options.IgnoreNewFields)
+							throw Error("New field {0} for class {1}", theirName, typeName);
+						var rf = ReadValueFunc(ReadType());
+						result.Fields.Add(new ClassDef.FieldDef {
+							Name = theirName, OurIndex = -1, ReadFunc = obj => rf() });
+						theirIndex += 1;
+						break;
+					}
+					default:
+						if (!ReadCompatibleType(yi.Type))
+							throw Error(
+								"Incompatible type for field {0}, expected {1}", ourName, yi.Type.Name);
+						var fieldDef = new ClassDef.FieldDef { Name = theirName, OurIndex = ourIndex };
+						if (yi.SetValue != null) {
+							var rf = ReadValueFunc(yi.Type);
+							fieldDef.ReadFunc = obj => yi.SetValue(obj, rf());
+						}
+						else {
+							var mf = MergeValueFunc(yi.Type);
+							fieldDef.ReadFunc = obj => mf(yi.GetValue(obj));
+						}
+						result.Fields.Add(fieldDef);
+						ourIndex += 1;
+						theirIndex += 1;
+						break;
 				}
-				else {
-					var mf = MergeValueFunc(yi.Type);
-					result.ReadFunc.Add(obj => mf(yi.GetValue(obj)));
-				}
+			}
+			while (ourIndex < ourCount) {
+				var yi = result.Meta.Items[ourIndex];
+				var ourName = yi.Tag(Options);
+				if (!yi.IsOptional)
+					throw Error("Missing required field {0} for class {1}", ourName, typeName);
+				ourIndex += 1;
+			}
+			while (theirIndex < theirCount) {
+				var theirName = Reader.ReadString();
+				if (!Options.IgnoreNewFields)
+					throw Error("New field {0} for class {1}", theirName, typeName);
+				var rf = ReadValueFunc(ReadType());
+				result.Fields.Add(new ClassDef.FieldDef {
+					Name = theirName, OurIndex = -1, ReadFunc = obj => rf() });
+				theirIndex += 1;
 			}
 			classDefs.Add(result);
 			return result;
@@ -246,24 +291,24 @@ namespace Yuzu.Binary
 			objStack.Push(obj);
 			try {
 				if (def.Meta.IsCompact) {
-					for (int i = 0; i < def.Meta.Items.Count; ++i)
-						def.ReadFunc[i](obj);
+					foreach (var f in def.Fields)
+						f.ReadFunc(obj);
 				}
 				else {
-					var fi = Reader.ReadInt16();
-					for (int i = 0; i < def.Meta.Items.Count; ++i) {
-						var yi = def.Meta.Items[i];
-						if (fi != i + 1) {
-							if (!yi.IsOptional)
-								throw Error("Expected field '{0}({1})', but found '{2}'",
-									i + 1, yi.NameTagged(Options), fi);
-							continue;
+					var actualIndex = Reader.ReadInt16();
+					for (int i = 0; i < def.Fields.Count; ++i) {
+						var fd = def.Fields[i];
+						if (i + 1 < actualIndex || actualIndex == 0) {
+							if (fd.OurIndex < 0 || def.Meta.Items[fd.OurIndex].IsOptional)
+								continue;
+							throw Error("Expected field '{0}({1})', but found '{2}'",
+								i + 1, fd.Name, actualIndex);
 						}
-						def.ReadFunc[i](obj);
-						fi = Reader.ReadInt16();
+						fd.ReadFunc(obj);
+						actualIndex = Reader.ReadInt16();
 					}
-					if (fi != 0)
-						throw Error("Unfinished object, expected zero, but got {0}", fi);
+					if (actualIndex != 0)
+						throw Error("Unfinished object, expected zero, but got {0}", actualIndex);
 				}
 			}
 			finally {
@@ -314,6 +359,8 @@ namespace Yuzu.Binary
 
 		private Func<object> ReadValueFunc(Type t)
 		{
+			if (t == null)
+				return ReadObject<object>;
 			Func<object> f;
 			if (readerCache.TryGetValue(t, out f))
 				return f;

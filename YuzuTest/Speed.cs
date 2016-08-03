@@ -165,6 +165,15 @@ namespace YuzuTest
 		}
 
 		[TestMethod]
+		public void TestBinaryReadObject()
+		{
+			var bd = new BinaryDeserializer();
+			binaryStream.Position = 0;
+			var p = bd.FromStream(binaryStream);
+			Assert.AreEqual(person.Name, ((SamplePerson)p).Name);
+		}
+
+		[TestMethod]
 		public void TestJsonRead()
 		{
 			var jd = new JsonDeserializer();
