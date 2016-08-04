@@ -599,11 +599,11 @@ namespace Yuzu.Json
 			}
 			if (t == typeof(object))
 				return ReadAnyObject;
-			if (t.IsClass) {
+			if (t.IsClass && !t.IsAbstract) {
 				var m = Utils.GetPrivateGeneric(GetType(), "ReadObject", t);
 				return (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);
 			}
-			if (t.IsInterface) {
+			if (t.IsInterface || t.IsAbstract) {
 				var m = Utils.GetPrivateGeneric(GetType(), "ReadInterface", t);
 				return (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);
 			}
@@ -615,7 +615,7 @@ namespace Yuzu.Json
 		private Action<object> MakeMergerFunc(Type t)
 		{
 			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
-				var m = Utils.GetPrivateCovariantGenericAll(GetType(), "ReadDictionary", t);
+				var m = Utils.GetPrivateCovariantGenericAll(GetType(), "ReadIntoDictionary", t);
 				return obj => { Require('{'); m.Invoke(this, new object[] { obj }); };
 			}
 			var icoll = t.GetInterface(typeof(ICollection<>).Name);
@@ -697,10 +697,10 @@ namespace Yuzu.Json
 
 		protected virtual object ReadFieldsCompact(object obj)
 		{
-			if (!Utils.IsCompact(obj.GetType(), Options))
+			var meta = Meta.Get(obj.GetType(), Options);
+			if (!meta.IsCompact)
 				throw Error("Attempt to read non-compact type '{0}' from compact format", obj.GetType().Name);
 			bool isFirst = true;
-			var meta = Meta.Get(obj.GetType(), Options);
 			objStack.Push(obj);
 			try {
 				foreach (var yi in meta.Items) {

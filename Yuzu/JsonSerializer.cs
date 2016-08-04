@@ -319,7 +319,7 @@ namespace Yuzu.Json
 				return obj => m.Invoke(this, new object[] { obj });
 			}
 			if (Utils.IsStruct(t) || t.IsClass || t.IsInterface) {
-				var name = Utils.IsCompact(t, Options) && !JsonOptions.IgnoreCompact ?
+				var name = Meta.Get(t, Options).IsCompact && !JsonOptions.IgnoreCompact ?
 					"WriteObjectCompact" : "WriteObject";
 				var m = Utils.GetPrivateGeneric(GetType(), name, t);
 				return (Action<object>)Delegate.CreateDelegate(typeof(Action<object>), this, m);
