@@ -10,34 +10,12 @@ namespace Lime
 		private RenderChain renderChain = new RenderChain();
 
 		public IWindow Window { get; private set; }
-		public bool LayoutBasedWindowSize { get; set; }
 
 		public WindowWidget(IWindow window)
 		{
 			Window = window;
 			Window.Context = new CombinedContext(Window.Context, new WidgetContext(this));
 			Theme.Current.Apply(this);
-			window.Rendering += () => {
-				Renderer.BeginFrame();
-				Renderer.SetOrthogonalProjection(Vector2.Zero, Size);
-				RenderAll();
-				Renderer.EndFrame();
-			};
-			window.Updating += delta => {
-				if (LayoutBasedWindowSize) {
-					Size = window.ClientSize = EffectiveMinSize;
-				} else {
-					Size = (Vector2)window.ClientSize;
-				}
-				Update(delta);
-			};
-			window.VisibleChanging += showing => {
-				if (showing && LayoutBasedWindowSize) {
-					Update(0); // Update widgets in order to deduce EffectiveMinSize.
-					Size = window.ClientSize = EffectiveMinSize;
-					window.Center();
-				}
-			};
 		}
 
 		protected virtual bool ContinuousRendering() { return true; }
@@ -77,17 +55,39 @@ namespace Lime
 		}
 	}
 
-	[Obsolete("Use WindowWidget instead")]
 	public class DefaultWindowWidget : WindowWidget
 	{
+		public bool LayoutBasedWindowSize { get; set; }
+
 		public DefaultWindowWidget(Window window)
 			: base(window)
 		{
 			Theme.Current.Apply(this, typeof(WindowWidget));
+			window.Rendering += () => {
+				Renderer.BeginFrame();
+				Renderer.SetOrthogonalProjection(Vector2.Zero, Size);
+				RenderAll();
+				Renderer.EndFrame();
+			};
+			window.Updating += delta => {
+				if (LayoutBasedWindowSize) {
+					Size = window.ClientSize = EffectiveMinSize;
+				} else {
+					Size = (Vector2)window.ClientSize;
+				}
+				Update(delta);
+			};
+			window.VisibleChanging += showing => {
+				if (showing && LayoutBasedWindowSize) {
+					Update(0); // Update widgets in order to deduce EffectiveMinSize.
+					Size = window.ClientSize = EffectiveMinSize;
+					window.Center();
+				}
+			};
 		}
 	}
 
-	public class InvalidableWindowWidget : WindowWidget
+	public class InvalidableWindowWidget : DefaultWindowWidget
 	{
 		public bool RedrawMarkVisible { get; set; }
 
