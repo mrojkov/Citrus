@@ -54,6 +54,7 @@ namespace Lime
 			Decorators[typeof(Tab)] = DecorateTab;
 			Decorators[typeof(TabBar)] = DecorateTabBar;
 			Decorators[typeof(BorderedFrame)] = DecorateBorderedFrame;
+			Decorators[typeof(Slider)] = DecorateSlider;
 		}
 
 		private void DecorateSplitter(Widget widget)
@@ -237,6 +238,26 @@ namespace Lime
 			bf.CompoundPresenter.Add(new BorderedFramePresenter(Colors.GrayBackground, Colors.ControlBorder));
 		}
 
+		private void DecorateSlider(Widget widget)
+		{
+			var slider = (Slider)widget;
+			slider.Options = Slider.SliderOptions.ClickOnRail;
+			var rail = new Spline { Id = "Rail" };
+			rail.AddNode(new SplinePoint { Position = new Vector2(0, 0.5f) });
+			rail.AddNode(new SplinePoint { Position = new Vector2(1, 0.5f) });
+			slider.AddNode(rail);
+			ExpandToContainer(rail);
+			var thumb = new Widget {
+				Id = "Thumb",
+				Size = new Vector2(8, 16),
+				Pivot = Vector2.Half,
+			};
+			slider.AddNode(thumb);
+			slider.MinSize = new Vector2(30, 16);
+			thumb.CompoundPresenter.Add(new SliderThumbPresenter());
+			slider.CompoundPresenter.Add(new SliderPresenter());
+		}
+
 		private static void ExpandToContainer(Widget widget)
 		{
 			widget.Anchors = Anchors.None;
@@ -369,6 +390,29 @@ namespace Lime
 			{
 				presenter.SetState(markerId);
 				return true;
+			}
+		}
+
+		class SliderThumbPresenter : CustomPresenter
+		{
+			public override void Render(Node node)
+			{
+				var widget = node.AsWidget;
+				widget.PrepareRendererState();
+				var p = new Vector2(0, 2);
+				Renderer.DrawVerticalGradientRect(-p, p + widget.Size, Colors.ButtonDefault);
+				Renderer.DrawRectOutline(-p, p + widget.Size, Colors.ControlBorder);
+			}
+		}
+
+		class SliderPresenter : CustomPresenter
+		{
+			public override void Render(Node node)
+			{
+				var widget = node.AsWidget;
+				widget.PrepareRendererState();
+				Renderer.DrawRect(Vector2.Zero, widget.Size, Colors.WhiteBackground);
+				Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.ControlBorder);
 			}
 		}
 
