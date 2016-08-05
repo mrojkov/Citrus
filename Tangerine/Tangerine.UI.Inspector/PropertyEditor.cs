@@ -89,22 +89,22 @@ namespace Tangerine.UI.Inspector
 			return new EventflowProvider<bool>(checkBox, "Changed");
 		}
 
-		protected static IDataflowProvider<T> CoalescedPropertyValue<T>(PropertyEditorContext context)
+		protected static IDataflowProvider<T> CoalescedPropertyValue<T>(PropertyEditorContext context, T defaultValue = default(T))
 		{
 			IDataflowProvider<T> provider = null;
 			foreach (var o in context.Objects) {
 				var p = new Property<T>(o, context.PropertyName);
-				provider = (provider == null) ? p : provider.SameOrDefault(p);
+				provider = (provider == null) ? p : provider.SameOrDefault(p, defaultValue);
 			}
 			return provider;
 		}
 
-		protected static IDataflowProvider<T2> CoalescedPropertyValue<T1, T2>(PropertyEditorContext context, Func<T1, T2> selector)
+		protected static IDataflowProvider<T2> CoalescedPropertyValue<T1, T2>(PropertyEditorContext context, Func<T1, T2> selector, T2 defaultValue = default(T2))
 		{
 			IDataflowProvider<T2> provider = null;
 			foreach (var o in context.Objects) {
 				var p = new Property<T1>(o, context.PropertyName).Select(selector);
-				provider = (provider == null) ? p : provider.SameOrDefault(p);
+				provider = (provider == null) ? p : provider.SameOrDefault(p, defaultValue);
 			}
 			return provider;
 		}
@@ -214,21 +214,32 @@ namespace Tangerine.UI.Inspector
 		public Color4PropertyEditor(PropertyEditorContext context) : base(context)
 		{
 			EditBox editor;
-			var color = CoalescedPropertyValue<Color4>(context).DistinctUntilChanged();
+			ColorBoxButton colorBox;
+			var color = CoalescedPropertyValue<Color4>(context, Color4.White).DistinctUntilChanged();
 			containerWidget.AddNode(new Widget {
 				Layout = new HBoxLayout(),
 				Nodes = {
 					(editor = new EditBox { LayoutCell = new LayoutCell(Alignment.Center) }),
 					new HSpacer(4),
-					new ColorBoxButton(color) { LayoutCell = new LayoutCell(Alignment.Center) },
+					(colorBox = new ColorBoxButton(color) { LayoutCell = new LayoutCell(Alignment.Center) }),
 				}
 			});
+			colorBox.Clicked += () => {
+				var c = color.GetDataflow();
+				c.Poll();
+				var dlg = new ColorPickerDialog(c.Value);
+				if (dlg.Show()) {
+					foreach (var obj in context.Objects) {
+						Core.Operations.SetAnimableProperty.Perform(obj, context.PropertyName, dlg.Color);
+					}
+				}
+			};
 			OnKeyframeToggle += editor.SetFocus;
 			foreach (var obj in context.Objects) {
 				var editorValue = EditBoxSubmittedText(editor).Where(IsColorString).Select(Color4.Parse);
 				editor.Tasks.Add(new AnimablePropertyBinding<Color4>(obj, context.PropertyName, editorValue));
 			}
-			editor.Tasks.Add(new EditBoxBinding(editor, color.Select(i => i.ToString(Color4.StringPresentation.Hex))));
+			editor.Tasks.Add(new EditBoxBinding(editor, color.Select(i => i.ToString(Color4.StringPresentation.Dec))));
 		}
 
 		private bool IsColorString(string value)
