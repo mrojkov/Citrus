@@ -38,7 +38,7 @@ namespace Lime
 					lastScrollAxis = ScrollDirection == ScrollDirection.Horizontal
 						? new Vector2(1.0f, 0.0f)
 						: new Vector2(0.0f, 1.0f);
-					lastScrollAxis = Vector2.RotateDeg(lastScrollAxis.Value, Frame.Rotation);
+					lastScrollAxis = Vector2.RotateDegRough(lastScrollAxis.Value, Frame.Rotation);
 				}
 				return lastScrollAxis.Value;
 			}
