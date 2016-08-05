@@ -771,6 +771,25 @@ namespace Lime
 			DrawVerticalGradientRect(a, b, new ColorGradient(topColor, bottomColor));
 		}
 
+		public static void DrawHorizontalGradientRect(Vector2 a, Vector2 b, ColorGradient gradient)
+		{
+			v[0] = new Vertex { Pos = a, Color = gradient.A };
+			v[1] = new Vertex { Pos = new Vector2(b.X, a.Y), Color = gradient.B };
+			v[2] = new Vertex { Pos = b, Color = gradient.B };
+			v[3] = new Vertex { Pos = new Vector2(a.X, b.Y), Color = gradient.A };
+			Renderer.DrawTriangleFan(null, null, v, v.Length);
+		}
+
+		public static void DrawHorizontalGradientRect(float x0, float y0, float x1, float y1, ColorGradient gradient)
+		{
+			DrawVerticalGradientRect(new Vector2(x0, y0), new Vector2(x1, y1), gradient);
+		}
+
+		public static void DrawHorizontalGradientRect(Vector2 a, Vector2 b, Color4 topColor, Color4 bottomColor)
+		{
+			DrawVerticalGradientRect(a, b, new ColorGradient(topColor, bottomColor));
+		}
+
 		public static Matrix44 FixupWVP(Matrix44 projection)
 		{
 			return PlatformRenderer.FixupWVP(projection);
