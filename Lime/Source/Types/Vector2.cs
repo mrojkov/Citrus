@@ -267,6 +267,16 @@ namespace Lime
 		/// cosine and sine of specified direction.
 		/// </summary>
 		/// <param name="radians">Azimuth of direction (in radians).</param>
+		public static Vector2 CosSin(float radians)
+		{
+			return new Vector2(Mathf.Cos(radians), Mathf.Sin(radians));
+		}
+
+		/// <summary>
+		/// Creates a new <see cref="Vector2"/> that represents
+		/// cosine and sine of specified direction.
+		/// </summary>
+		/// <param name="radians">Azimuth of direction (in radians).</param>
 		public static Vector2 CosSinRough(float radians)
 		{
 			if (sinTable0 == null) {
@@ -296,8 +306,33 @@ namespace Lime
 		/// Creates new <see cref="Vector2"/> that is turned around point (0, 0).
 		/// </summary>
 		/// <param name="value">Source vector.</param>
+		/// <param name="degrees">Azimuth of turning (in degrees).</param>
+		public static Vector2 RotateDegRough(Vector2 value, float degrees)
+		{
+			return RotateRadRough(value, degrees * Mathf.DegToRad);
+		}
+
+		/// <summary>
+		/// Creates new <see cref="Vector2"/> that is turned around point (0, 0).
+		/// </summary>
+		/// <param name="value">Source vector.</param>
 		/// <param name="radians">Azimuth of turning (in radians).</param>
 		public static Vector2 RotateRad(Vector2 value, float radians)
+		{
+			var cosSin = CosSin(radians);
+			return new Vector2
+			{
+				X = value.X * cosSin.X - value.Y * cosSin.Y,
+				Y = value.X * cosSin.Y + value.Y * cosSin.X
+			};
+		}
+
+		/// <summary>
+		/// Creates new <see cref="Vector2"/> that is turned around point (0, 0).
+		/// </summary>
+		/// <param name="value">Source vector.</param>
+		/// <param name="radians">Azimuth of turning (in radians).</param>
+		public static Vector2 RotateRadRough(Vector2 value, float radians)
 		{
 			var cosSin = CosSinRough(radians);
 			return new Vector2
