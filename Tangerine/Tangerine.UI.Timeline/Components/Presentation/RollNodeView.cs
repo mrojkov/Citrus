@@ -74,6 +74,7 @@ namespace Tangerine.UI.Timeline.Components
 					editBox.Visible = true;
 					editBox.Text = label.Text;
 					yield return null;
+					editBox.SetFocus();
 					editBox.Tasks.Add(EditNodeIdTask());
 				}
 				yield return null;
@@ -83,21 +84,16 @@ namespace Tangerine.UI.Timeline.Components
 		IEnumerator<object> EditNodeIdTask()
 		{
 			editBox.Input.CaptureMouse();
-			while (true) {
-				var commitChanges = editBox.Input.WasKeyReleased(Key.Mouse0) && !editBox.IsMouseOver() ||
-					editBox.Input.WasKeyPressed(Key.Enter);
-				var cancelChanges = editBox.Input.WasKeyPressed(Key.Escape);
-				if (commitChanges || cancelChanges) {
-					editBox.Visible = false;
-					label.Visible = true;
-					if (commitChanges) {
-						Core.Operations.SetProperty.Perform(nodeData.Node, "Id", editBox.Text);
-					}
-					break;
-				}
+			var initialText = editBox.Text;
+			while (editBox.IsFocused()) {
 				yield return null;
 			}
 			editBox.Input.ReleaseMouse();
+			editBox.Visible = false;
+			label.Visible = true;
+			if (editBox.Text != initialText) {
+				Core.Operations.SetProperty.Perform(nodeData.Node, "Id", editBox.Text);
+			}
 		}
 	}
 }
