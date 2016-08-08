@@ -773,6 +773,17 @@ namespace YuzuTest.Json
 			var v2 = new Sample2 { X = 5, Y = "5" };
 			var result2 = js.ToString(v2);
 			Assert.AreEqual("{ \"X\":5 }", result2);
+
+			var v3 = new SampleDefault();
+			Assert.AreEqual("{ }", js.ToString(new SampleDefault()));
+			v3.B = "z";
+			var result3 = js.ToString(v3);
+			Assert.AreEqual("{ \"B\":\"z\" }", result3);
+			var w3 = new SampleDefault();
+			(new JsonDeserializer()).FromString(w3, result3);
+			Assert.AreEqual(3, w3.A);
+			Assert.AreEqual("z", w3.B);
+			Assert.AreEqual(new SamplePoint { X = 7, Y = 2 }, w3.P);
 		}
 
 		[TestMethod]

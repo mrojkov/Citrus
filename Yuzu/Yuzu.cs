@@ -24,6 +24,11 @@ namespace Yuzu
 		public YuzuOptional(string alias = null) : base(alias) { }
 	}
 
+	public class YuzuMember : YuzuField
+	{
+		public YuzuMember(string alias = null) : base(alias) { }
+	}
+
 	public abstract class YuzuSerializeCondition : Attribute
 	{
 		public abstract bool Check(object obj, object field);
@@ -110,6 +115,7 @@ namespace Yuzu
 	{
 		public Type RequiredAttribute = typeof(YuzuRequired);
 		public Type OptionalAttribute = typeof(YuzuOptional);
+		public Type MemberAttribute = typeof(YuzuMember);
 		public Type CompactAttribute = typeof(YuzuCompact);
 		public Type SerializeIfAttribute = typeof(YuzuSerializeCondition);
 		public Type AfterDeserializationAttribute = typeof(YuzuAfterDeserialization);

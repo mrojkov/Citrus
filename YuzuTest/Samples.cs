@@ -196,6 +196,11 @@ namespace YuzuTest
 		public int X;
 		[YuzuRequired]
 		public int Y;
+
+		public override bool Equals(object obj)
+		{
+			return ((SamplePoint)obj).X == X && ((SamplePoint)obj).Y == Y;
+		}
 	}
 
 	public class SampleRect
@@ -204,6 +209,23 @@ namespace YuzuTest
 		public SamplePoint A;
 		[YuzuRequired]
 		public SamplePoint B;
+	}
+
+	public class SampleDefault
+	{
+		[YuzuMember]
+		public int A = 3;
+
+		[YuzuMember]
+		public string B = "default";
+
+		[YuzuMember]
+		public SamplePoint P;
+
+		public SampleDefault()
+		{
+			P = new SamplePoint { X = 7, Y = 2 };
+		}
 	}
 
 	public class SampleObj

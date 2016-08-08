@@ -680,6 +680,7 @@ namespace YuzuTest.Binary
 		public void TestDefault()
 		{
 			var bs = new BinarySerializer();
+			var bd = new BinaryDeserializer();
 
 			var v1 = new Sample1 { X = 6, Y = "ttt" };
 			var result1 = bs.ToBytes(v1);
@@ -687,7 +688,7 @@ namespace YuzuTest.Binary
 				"20 01 00 " + XS("YuzuTest.Sample1") + " 02 00 " +
 				XS("X", RoughType.Int, "Y", RoughType.String) +
 				" 01 00 06 00 00 00 00 00", XS(result1));
-			var w1 = (Sample1)(new BinaryDeserializer()).FromBytes(result1);
+			var w1 = (Sample1)bd.FromBytes(result1);
 			Assert.AreEqual(6, w1.X);
 			Assert.AreEqual("zzz", w1.Y);
 
@@ -697,6 +698,23 @@ namespace YuzuTest.Binary
 				"20 02 00 " + XS("YuzuTest.Sample2") + " 02 00 " +
 				XS("X", RoughType.Int, "Y", RoughType.String) +
 				" 01 00 05 00 00 00 00 00", XS(result2));
+			Assert.IsInstanceOfType(bd.FromBytes(result2), typeof(Sample2));
+
+			var v3 = new SampleDefault();
+			var result3 = bs.ToBytes(new SampleDefault());
+			Assert.AreEqual(
+				"20 03 00 " + XS("YuzuTest.SampleDefault") + " 03 00 " +
+				XS("A", RoughType.Int, "B", RoughType.String, "P", RoughType.Record) + " 00 00",
+				XS(result3));
+			Assert.IsInstanceOfType(bd.FromBytes(result3), typeof(SampleDefault));
+			v3.B = "z";
+			var result3m = bs.ToBytes(v3);
+			Assert.AreEqual("20 03 00 02 00 " + XS("z") + " 00 00", XS(result3m));
+			var w3 = new SampleDefault();
+			bd.FromBytes(w3, result3m);
+			Assert.AreEqual(3, w3.A);
+			Assert.AreEqual("z", w3.B);
+			Assert.AreEqual(new SamplePoint { X = 7, Y = 2 }, w3.P);
 		}
 
 		[TestMethod]
