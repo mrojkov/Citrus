@@ -220,7 +220,7 @@ namespace Yuzu.Binary
 			if (classId < classDefs.Count)
 				return classDefs[classId];
 			if (classId > classDefs.Count)
-				Error("Bad classId: {0}", classId);
+				throw Error("Bad classId: {0}", classId);
 			var result = new ClassDef();
 			var typeName = Reader.ReadString();
 			var classType = Options.Assembly.GetType(typeName, throwOnError: true);

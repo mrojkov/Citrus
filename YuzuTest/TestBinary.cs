@@ -293,7 +293,7 @@ namespace YuzuTest.Binary
 
 			var bd = new BinaryDeserializer();
 			var v = bd.FromBytes(SX(
-				"20 02 00 " + XS("YuzuTest.SampleDerivedB") + " 02 00 " +
+				"20 01 00 " + XS("YuzuTest.SampleDerivedB") + " 02 00 " +
 				XS("FBase", RoughType.Int, "FB", RoughType.Int) +
 				" 01 00 03 00 00 00 02 00 07 00 00 00 00 00").ToArray());
 			Assert.IsInstanceOfType(v, typeof(SampleDerivedB));
@@ -953,5 +953,37 @@ namespace YuzuTest.Binary
 			Assert.AreEqual(v1.C.Z, w1.C.Z);
 		}
 
+		[TestMethod]
+		public void TestErrors()
+		{
+			var bd = new BinaryDeserializer();
+			bd.Options.AllowEmptyTypes = true;
+
+			XAssert.Throws<YuzuException>(() => bd.FromBytes(new byte[] { 0xFF }), "255");
+			XAssert.Throws<YuzuException>(() => bd.FromBytes<int>(new byte[] { 0xFF }), "255");
+			XAssert.Throws<YuzuException>(() => bd.FromBytes<int>(new byte[] { 07 }), "Int32");
+
+			XAssert.Throws<YuzuException>(() => bd.FromBytes(new byte[] { (byte)RoughType.Any }), "pure");
+
+			var w = new Sample1();
+			XAssert.Throws<YuzuException>(() => bd.FromBytes(w, SX(
+				"20 01 00 " + XS("YuzuTest.Empty") + " 00 00 00 00"
+			).ToArray()), "Sample1");
+
+			XAssert.Throws<YuzuException>(() => bd.FromBytes(w, SX(
+				"20 05 00").ToArray()), "5");
+
+			XAssert.Throws<YuzuException>(() => bd.FromBytes(w, SX(
+				"20 02 00 " + XS("YuzuTest.Sample1") + " 00 00 00 00"
+			).ToArray()), " X ");
+
+			XAssert.Throws<YuzuException>(() => bd.FromBytes(w, SX(
+				"20 02 00 " + XS("YuzuTest.Empty") + " 00 01 " + XS("New", RoughType.Int) + " 00 00"
+			).ToArray()), "New");
+
+			XAssert.Throws<YuzuException>(() => bd.FromBytes(w, SX(
+				"20 02 00 " + XS("YuzuTest.Sample1") + " 00 01 " + XS("X", RoughType.String) + " 00 00"
+			).ToArray()), "Int32");
+		}
 	}
 }
