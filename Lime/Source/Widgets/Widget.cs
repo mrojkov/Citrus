@@ -1,9 +1,8 @@
 ﻿using System;
-using Lime;
 using ProtoBuf;
 using System.Collections.Generic;
-using System.Linq;
 using System.Diagnostics;
+using Yuzu;
 
 namespace Lime
 {
@@ -105,8 +104,6 @@ namespace Lime
 		private Vector2 measuredMaxSize = Vector2.PositiveInfinity;
 		private bool visible;
 
-		#region Properties
-
 		public static Vector2 DefaultWidgetSize = new Vector2(100, 100);
 
 		public Widget ParentWidget { get { return Parent != null ? Parent.AsWidget : null; } }
@@ -118,7 +115,7 @@ namespace Lime
 		public ILayout Layout = AnchorLayout.Instance;
 
 		/// <summary>
-		/// Gets the layout-specific data. 
+		/// Gets the layout-specific data.
 		/// </summary>
 		public LayoutCell LayoutCell { get; set; }
 
@@ -128,7 +125,7 @@ namespace Lime
 		public Vector2 MeasuredMinSize
 		{
 			get { return measuredMinSize; }
-			set { 
+			set {
 				if (measuredMinSize != value) {
 					measuredMinSize = value;
 					InvalidateParentConstraintsAndArrangement();
@@ -139,7 +136,7 @@ namespace Lime
 		public Vector2 MeasuredMaxSize
 		{
 			get { return measuredMaxSize; }
-			set { 
+			set {
 				if (measuredMaxSize != value) {
 					measuredMaxSize = value;
 					InvalidateParentConstraintsAndArrangement();
@@ -255,6 +252,7 @@ namespace Lime
 		/// Parent-relative position.
 		/// </summary>
 		[ProtoMember(1)]
+		[YuzuMember]
 		[Tangerine(4)]
 		public Vector2 Position
 		{
@@ -303,6 +301,7 @@ namespace Lime
 		}
 
 		[ProtoMember(2)]
+		[YuzuMember]
 		[Tangerine(7)]
 		public Vector2 Size
 		{
@@ -394,6 +393,7 @@ namespace Lime
 		/// (0, 0) is top-left corner, (1, 1) is bottom-right corner.
 		/// </summary>
 		[ProtoMember(3)]
+		[YuzuMember]
 		[Tangerine(6)]
 		public Vector2 Pivot
 		{
@@ -410,6 +410,7 @@ namespace Lime
 		}
 
 		[ProtoMember(4)]
+		[YuzuMember]
 		[Tangerine(5)]
 		public Vector2 Scale
 		{
@@ -429,6 +430,7 @@ namespace Lime
 		/// Counter-clockwise rotation of this widget.
 		/// </summary>
 		[ProtoMember(5)]
+		[YuzuMember]
 		[Tangerine(3)]
 		public float Rotation {
 			get { return rotation; }
@@ -447,6 +449,7 @@ namespace Lime
 		/// Hue of this widget. Contents color will be multiplied by it on render.
 		/// </summary>
 		[ProtoMember(6)]
+		[YuzuMember]
 		[Tangerine(9)]
 		public Color4 Color
 		{
@@ -476,9 +479,11 @@ namespace Lime
 		}
 
 		[ProtoMember(7)]
+		[YuzuMember]
 		public Anchors Anchors { get; set; }
 
 		[ProtoMember(8)]
+		[YuzuMember]
 		[Tangerine(10)]
 		public Blending Blending
 		{
@@ -493,6 +498,7 @@ namespace Lime
 		}
 
 		[ProtoMember(9)]
+		[YuzuMember]
 		public ShaderId Shader
 		{
 			get { return shader; }
@@ -506,6 +512,7 @@ namespace Lime
 		}
 
 		[ProtoMember(10)]
+		[YuzuMember]
 		[Tangerine(2)]
 		public bool Visible
 		{
@@ -521,12 +528,15 @@ namespace Lime
 		}
 
 		[ProtoMember(11)]
+		[YuzuMember]
 		public SkinningWeights SkinningWeights { get; set; }
 
 		[ProtoMember(12)]
+		[YuzuMember]
 		public HitTestMethod HitTestMethod { get; set; }
 
 		[ProtoMember(14)]
+		[YuzuMember]
 		public BoneArray BoneArray;
 
 		private Matrix32 localToWorldTransform;
@@ -637,7 +647,6 @@ namespace Lime
 			get { return input ?? (input = new WidgetInput(this)); }
 		}
 
-
 		/// <summary>
 		/// Called before Update.
 		/// </summary>
@@ -647,10 +656,6 @@ namespace Lime
 		/// Called after Update.
 		/// </summary>
 		public event UpdateHandler Updated;
-
-		#endregion
-
-		#region Methods
 
 		public Widget()
 		{
@@ -942,10 +947,6 @@ namespace Lime
 			}
 		}
 
-		#endregion
-
-		#region HitTest handling
-
 		public bool IsMouseOver()
 		{
 			return WidgetContext.Current.NodeUnderMouse == this;
@@ -1049,10 +1050,6 @@ namespace Lime
 		{
 			return args.ClipperWidget == null || args.ClipperWidget.IsInsideBoundingRect(args.Point);
 		}
-
-		#endregion
-
-		#region Miscellaneous methods
 
 		/// <summary>
 		/// Renders widget's descendants to texture. If you want to render widget itself
@@ -1300,6 +1297,5 @@ namespace Lime
 			Renderer.Shader = GlobalShader;
 		}
 
-		#endregion
 	}
 }

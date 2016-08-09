@@ -1,6 +1,5 @@
-using System;
-using Lime;
 using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
@@ -14,18 +13,21 @@ namespace Lime
 		/// Id виджета. Виджет ищется по всей сцене
 		/// </summary>
 		[ProtoMember(1)]
+		[YuzuMember]
 		public string WidgetId { get; set; }
 
 		/// <summary>
 		/// Id сплайна. Сплайн ищется по всей сцене
 		/// </summary>
 		[ProtoMember(2)]
+		[YuzuMember]
 		public string SplineId { get; set; }
 
 		/// <summary>
 		/// Положение виджета на сплайне. 0 - начало сплайна, 1 - конец
 		/// </summary>
 		[ProtoMember(3)]
+		[YuzuMember]
 		public float SplineOffset { get; set; }
 
 		protected override void SelfLateUpdate(float delta)

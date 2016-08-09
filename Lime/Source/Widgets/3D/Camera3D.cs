@@ -1,5 +1,5 @@
-﻿using System;
-using ProtoBuf;
+﻿using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
@@ -15,6 +15,7 @@ namespace Lime
 		private bool projectionDirty;
 
 		[ProtoMember(1)]
+		[YuzuMember]
 		public float FieldOfView
 		{
 			get { return fieldOfView; }
@@ -28,6 +29,7 @@ namespace Lime
 		}
 
 		[ProtoMember(2)]
+		[YuzuMember]
 		public float AspectRatio
 		{
 			get { return aspectRatio; }
@@ -41,6 +43,7 @@ namespace Lime
 		}
 
 		[ProtoMember(3)]
+		[YuzuMember]
 		public float NearClipPlane
 		{
 			get { return nearClipPlane; }
@@ -54,6 +57,7 @@ namespace Lime
 		}
 
 		[ProtoMember(4)]
+		[YuzuMember]
 		public float FarClipPlane
 		{
 			get { return farClipPlane; }

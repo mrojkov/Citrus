@@ -85,7 +85,7 @@ namespace Lime
 		private TextureReloader reloader;
 		private int usedOnRenderCycle;
 
-		public virtual string SerializationPath 
+		public virtual string SerializationPath
 		{
 			get { throw new NotSupportedException(); }
 			set { throw new NotSupportedException(); }

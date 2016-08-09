@@ -1,5 +1,6 @@
 ﻿using System;
 using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
@@ -11,12 +12,15 @@ namespace Lime
 	public struct Matrix32 : IEquatable<Matrix32>
 	{
 		[ProtoMember(1)]
+		[YuzuMember]
 		public Vector2 U;
 
 		[ProtoMember(2)]
+		[YuzuMember]
 		public Vector2 V;
 
 		[ProtoMember(3)]
+		[YuzuMember]
 		public Vector2 T;
 
 		/// <summary>
@@ -35,12 +39,12 @@ namespace Lime
 		{
 			return U.Equals(rhs.U) && V.Equals(rhs.V) && T.Equals(rhs.T);
 		}
-		
+
 		public float CalcDeterminant()
 		{
 			return U.X * V.Y - U.Y * V.X;
 		}
-		
+
 		public Matrix32 CalcInversed()
 		{
 			Matrix32 m;
@@ -124,7 +128,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Multiplication of matrixes. 
+		/// Multiplication of matrixes.
 		/// Combines transformations in result (this operation is non-communicative).
 		/// </summary>
 		public static Matrix32 operator *(Matrix32 a, Matrix32 b)
@@ -140,7 +144,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Multiplication of matrixes. 
+		/// Multiplication of matrixes.
 		/// Combines transformations in result (this operation is non-communicative).
 		/// </summary>
 		public static void Multiply(ref Matrix32 a, ref Matrix32 b, out Matrix32 result)
@@ -171,7 +175,7 @@ namespace Lime
 			v.Y = a.X * U.Y + a.Y * V.Y + T.Y;
 			return v;
 		}
-		
+
 		public Vector2 TransformVector(float x, float y)
 		{
 			Vector2 v;
@@ -179,7 +183,7 @@ namespace Lime
 			v.Y = x * U.Y + y * V.Y + T.Y;
 			return v;
 		}
-		
+
 		public static Vector2 operator *(Vector2 a, Matrix32 b)
 		{
 			return b.TransformVector(a);
@@ -198,7 +202,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Creates a new <see cref="Matrix32"/> that contains 
+		/// Creates a new <see cref="Matrix32"/> that contains
 		/// linear interpolation of the specified matrixes.
 		/// </summary>
 		/// <param name="amount">Weighting value(between 0.0 and 1.0).</param>
@@ -212,7 +216,7 @@ namespace Lime
 			result.V = Mathf.Lerp(amount, value1.V, value2.V);
 			return result;
 		}
-		
+
 		/// <summary>
 		/// Checks if this matrix is identity matrix.
 		/// </summary>

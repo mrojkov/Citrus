@@ -1,6 +1,7 @@
 ﻿using System;
 
 using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
@@ -24,6 +25,7 @@ namespace Lime
 		/// Uint that is used for array representation.
 		/// </summary>
 		[ProtoMember(1)]
+		[YuzuMember]
 		public uint Value;
 
 		public int Count { get { return 32; } }

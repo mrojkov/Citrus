@@ -1,5 +1,5 @@
 using ProtoBuf;
-using System.Collections.Generic;
+using Yuzu;
 
 namespace Lime
 {
@@ -19,6 +19,7 @@ namespace Lime
 		}
 
 		[ProtoMember(1)]
+		[YuzuMember]
 		public string SerializationPath
 		{
 			get { return Serialization.ShrinkPath(Path); }

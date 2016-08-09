@@ -1,9 +1,8 @@
 using System;
-using System.Linq;
-using Lime;
 using ProtoBuf;
 using System.IO;
 using System.Collections.Generic;
+using Yuzu;
 
 namespace Lime
 {
@@ -27,7 +26,7 @@ namespace Lime
 		[ProtoEnum]
 		G
 	}
-	
+
 	[ProtoContract]
 	public enum ClipMethod
 	{
@@ -52,6 +51,7 @@ namespace Lime
 		ITexture renderTexture;
 
 		[ProtoMember(1)]
+		[YuzuMember]
 		public RenderTarget RenderTarget {
 			get { return renderTarget; }
 			set { SetRenderTarget(value); }
@@ -229,7 +229,7 @@ namespace Lime
 		}
 
 		#region IImageCombinerArg
-		
+
 		void IImageCombinerArg.SkipRender() { }
 
 		ITexture IImageCombinerArg.GetTexture()

@@ -167,7 +167,7 @@ namespace Lime
 		{
 #if iOS
 			UIScreen screen = UIScreen.MainScreen;
-			return new Vector2((float)screen.Bounds.Width, (float)screen.Bounds.Height); 
+			return new Vector2((float)screen.Bounds.Width, (float)screen.Bounds.Height);
 #elif UNITY
 			var r = UnityEngine.Screen.currentResolution;
 			return new Vector2(r.width, r.height);

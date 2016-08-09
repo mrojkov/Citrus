@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using ProtoBuf;
 using Lime.Text;
+using Yuzu;
 
 namespace Lime
 {
@@ -21,6 +19,7 @@ namespace Lime
 		private TextRenderer renderer;
 
 		[ProtoMember(1)]
+		[YuzuMember]
 		public override string Text
 		{
 			get { return text; }
@@ -30,25 +29,29 @@ namespace Lime
 		// TODO
 		public string DisplayText { get { return text; } }
 		public event TextProcessorDelegate TextProcessor;
-		
+
 		[ProtoMember(2)]
-		public HAlignment HAlignment 
-		{ 
-			get { return hAlignment; } 
-			set { SetHAlignment(value); } 
+		[YuzuMember]
+		public HAlignment HAlignment
+		{
+			get { return hAlignment; }
+			set { SetHAlignment(value); }
 		}
-		
+
 		[ProtoMember(3)]
-		public VAlignment VAlignment 
-		{ 
-			get { return vAlignment; } 
-			set { SetVAlignment(value); } 
+		[YuzuMember]
+		public VAlignment VAlignment
+		{
+			get { return vAlignment; }
+			set { SetVAlignment(value); }
 		}
 
 		[ProtoMember(4)]
+		[YuzuMember]
 		public TextOverflowMode OverflowMode { get; set; }
 
 		[ProtoMember(5)]
+		[YuzuMember]
 		public bool WordSplitAllowed { get; set; }
 
 		// TODO
@@ -78,8 +81,8 @@ namespace Lime
 		private string errorMessage;
 
 		public string ErrorMessage
-		{ 
-			get 
+		{
+			get
 			{
 				ParseText();
 				return errorMessage;

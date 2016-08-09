@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using ProtoBuf;
+using Yuzu;
 #if OPENGL
 #if !MAC && !MONOMAC
 using OpenTK.Graphics.ES20;
@@ -58,6 +55,7 @@ namespace Lime
 		}
 
 		[ProtoMember(1)]
+		[YuzuMember]
 		public float Frame
 		{
 			get { return frame; }

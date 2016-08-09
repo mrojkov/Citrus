@@ -1,4 +1,5 @@
 using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
@@ -10,30 +11,35 @@ namespace Lime
 	public class NineGrid : Widget
 	{
 		[ProtoMember(1)]
+		[YuzuMember]
 		public override ITexture Texture { get; set; }
 
 		/// <summary>
 		/// Текстурная координата левого столбца (0 - 1)
 		/// </summary>
 		[ProtoMember(2)]
+		[YuzuMember]
 		public float LeftOffset { get; set; }
-		
+
 		/// <summary>
 		/// Текстурная координата правого столбца (0 - 1)
 		/// </summary>
 		[ProtoMember(3)]
+		[YuzuMember]
 		public float RightOffset { get; set; }
-		
+
 		/// <summary>
 		/// Текстурная координата верхнего столбца (0 - 1)
 		/// </summary>
 		[ProtoMember(4)]
+		[YuzuMember]
 		public float TopOffset { get; set; }
-		
+
 		/// <summary>
 		/// Текстурная координата нижнего столбца (0 - 1)
 		/// </summary>
 		[ProtoMember(5)]
+		[YuzuMember]
 		public float BottomOffset { get; set; }
 
 		struct Part

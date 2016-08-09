@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using ProtoBuf;
 
@@ -24,7 +23,7 @@ namespace Lime
 			}
 			return result;
 		}
-		
+
 		public Marker TryFind(string id)
 		{
 			foreach (var marker in this) {
@@ -46,7 +45,7 @@ namespace Lime
 			var marker = TryFind(id);
 			if (marker == null) {
 				throw new ArgumentException("Unknown marker '{0}'", id);
-			}	
+			}
 			return marker;
 		}
 

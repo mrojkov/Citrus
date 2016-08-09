@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Linq;
 using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
@@ -13,9 +14,11 @@ namespace Lime
 	public struct Vector2 : IEquatable<Vector2>
 	{
 		[ProtoMember(1)]
+		[YuzuMember]
 		public float X;
 
 		[ProtoMember(2)]
+		[YuzuMember]
 		public float Y;
 
 		/// <summary>

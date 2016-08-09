@@ -1,5 +1,6 @@
 ﻿using System;
 using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
@@ -10,9 +11,11 @@ namespace Lime
 	public struct Ray : IEquatable<Ray>
 	{
 		[ProtoMember(1)]
+		[YuzuMember]
 		public Vector3 Direction;
 
 		[ProtoMember(2)]
+		[YuzuMember]
 		public Vector3 Position;
 
 		public Ray(Vector3 position, Vector3 direction)
@@ -39,12 +42,12 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Calculates the distance between the center of this ray and border of sphere. 
+		/// Calculates the distance between the center of this ray and border of sphere.
 		/// </summary>
 		/// <param name="sphere">Sphere to check intersection for.</param>
 		/// <returns>
 		/// The distance between the center of this ray and border of sphere.
-		/// Returns 0.0f if ray is inside of sphere. 
+		/// Returns 0.0f if ray is inside of sphere.
 		/// Returns null if ray is pointed away from sphere.
 		/// </returns>
 		public float? Intersects(BoundingSphere sphere)

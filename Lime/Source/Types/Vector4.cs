@@ -1,5 +1,6 @@
 ﻿using System;
 using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
@@ -7,15 +8,19 @@ namespace Lime
 	public struct Vector4 : IEquatable<Vector4>
 	{
 		[ProtoMember(1)]
+		[YuzuMember]
 		public float X;
 
 		[ProtoMember(2)]
+		[YuzuMember]
 		public float Y;
 
 		[ProtoMember(3)]
+		[YuzuMember]
 		public float Z;
 
 		[ProtoMember(4)]
+		[YuzuMember]
 		public float W;
 
 		public float Length

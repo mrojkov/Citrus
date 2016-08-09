@@ -1,5 +1,6 @@
 using System;
 using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
@@ -7,12 +8,15 @@ namespace Lime
 	public class Slider : Widget
 	{
 		[ProtoMember(1)]
+		[YuzuMember]
 		public float RangeMin { get; set; }
 
 		[ProtoMember(2)]
+		[YuzuMember]
 		public float RangeMax { get; set; }
 
 		[ProtoMember(3)]
+		[YuzuMember]
 		public float Value
 		{
 			get { return value.Clamp(RangeMin, RangeMax); }
@@ -20,6 +24,7 @@ namespace Lime
 		}
 
 		[ProtoMember(4)]
+		[YuzuMember]
 		public float Step { get; set; }
 
 		[Flags]

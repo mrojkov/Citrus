@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 
 using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
@@ -11,6 +12,7 @@ namespace Lime
 		public IFont Instance { get; private set; }
 
 		[ProtoMember(1)]
+		[YuzuMember]
 		public string Name
 		{
 			get	{

@@ -1,6 +1,6 @@
 using System;
-using Lime;
 using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
@@ -23,7 +23,7 @@ namespace Lime
 		Color4 Color { get; }
 
 		Matrix32 CalcLocalToParentTransform();
-	
+
 		bool GloballyVisible { get; }
 
 		Blending Blending { get; }
@@ -37,12 +37,15 @@ namespace Lime
 	public class ImageCombiner : Node
 	{
 		[ProtoMember(1)]
+		[YuzuMember]
 		public bool Enabled { get; set; }
 
 		[ProtoMember(2)]
+		[YuzuMember]
 		public Blending Blending { get; set; }
 
 		[ProtoMember(3)]
+		[YuzuMember]
 		public ShaderId Shader { get; set; }
 
 		public ShaderProgram CustomShaderProgram;
@@ -132,11 +135,11 @@ namespace Lime
 		static readonly Vector2[] coords = new Vector2[8];
 		static readonly Vector2[] stencil = new Vector2[4];
 		static readonly Vertex[] vertices = new Vertex[8];
-		static readonly Vector2[] rect = new Vector2[4] { 
-			new Vector2(0, 0), 
-			new Vector2(1, 0), 
-			new Vector2(1, 1), 
-			new Vector2(0, 1) 
+		static readonly Vector2[] rect = new Vector2[4] {
+			new Vector2(0, 0),
+			new Vector2(1, 0),
+			new Vector2(1, 1),
+			new Vector2(0, 1)
 		};
 
 		private void RenderHelper(IImageCombinerArg arg1, IImageCombinerArg arg2)

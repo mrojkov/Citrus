@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
@@ -12,9 +10,11 @@ namespace Lime
 		internal int TimeInternal;
 
 		[ProtoMember(1)]
+		[YuzuMember]
 		public MarkerCollection Markers { get; private set; }
 
 		[ProtoMember(2)]
+		[YuzuMember]
 		public string Id;
 
 		public int Time

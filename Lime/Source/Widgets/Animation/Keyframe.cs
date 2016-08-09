@@ -1,5 +1,6 @@
 using System;
 using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
@@ -40,12 +41,15 @@ namespace Lime
 	public class Keyframe<T> : IKeyframe
 	{
 		[ProtoMember(1)]
+		[YuzuMember]
 		public int Frame { get; set; }
 
 		[ProtoMember(2)]
+		[YuzuMember]
 		public KeyFunction Function { get; set; }
 
 		[ProtoMember(3)]
+		[YuzuMember]
 		public T Value;
 
 		object IKeyframe.Value
@@ -57,7 +61,7 @@ namespace Lime
 		public Keyframe() { }
 
 		public Keyframe(int frame, T value, KeyFunction function)
-		{			
+		{
 			this.Frame = frame;
 			this.Value = value;
 			this.Function = function;

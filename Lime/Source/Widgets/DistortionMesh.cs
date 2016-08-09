@@ -1,5 +1,5 @@
-using Lime;
 using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
@@ -13,18 +13,21 @@ namespace Lime
 		/// Количество колонок
 		/// </summary>
 		[ProtoMember(1)]
+		[YuzuMember]
 		public int NumCols { get; set; }
 
 		/// <summary>
 		/// Количество горизонтальных рядов
 		/// </summary>
 		[ProtoMember(2)]
+		[YuzuMember]
 		public int NumRows { get; set; }
 
 		/// <summary>
 		/// Текстура
 		/// </summary>
 		[ProtoMember(3)]
+		[YuzuMember]
 		public override ITexture Texture { get; set; }
 
 		/// <summary>
@@ -36,7 +39,7 @@ namespace Lime
 			NumRows = 2;
 			Texture = new SerializableTexture();
 		}
-		
+
 		/// <summary>
 		/// Возвращает точку в указанном ряде и колонке. Точку можно анимировать, вызывая искажения поверхности
 		/// </summary>
@@ -71,7 +74,7 @@ namespace Lime
 
 		protected static Vertex[] polygon = new Vertex[6];
 		protected static DistortionMeshPoint[] points = new DistortionMeshPoint[4];
-		
+
 		protected Vertex CalculateCenterVertex()
 		{
 			var v = new Vertex();
@@ -95,7 +98,7 @@ namespace Lime
 			v.Pos *= k;
 			return v;
 		}
-		
+
 		protected virtual void RenderTile()
 		{
 			polygon[0] = CalculateCenterVertex();

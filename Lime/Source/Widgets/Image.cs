@@ -1,4 +1,5 @@
 using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
@@ -16,6 +17,7 @@ namespace Lime
 		/// »зображение, отображаемое этим виджетом
 		/// </summary>
 		[ProtoMember(1)]
+		[YuzuMember]
 		public override sealed ITexture Texture
 		{
 			get { return texture; }
@@ -34,12 +36,14 @@ namespace Lime
 		/// “екстурна€ координата левого верхнего угла текстуры
 		/// </summary>
 		[ProtoMember(2)]
+		[YuzuMember]
 		public Vector2 UV0 { get; set; }
 
 		/// <summary>
 		/// “екстурна€ координата правого нижнего угла текстуры
 		/// </summary>
 		[ProtoMember(3)]
+		[YuzuMember]
 		public Vector2 UV1 { get; set; }
 
 		public Image()

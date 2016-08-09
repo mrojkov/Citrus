@@ -34,7 +34,7 @@ namespace Lime
 			}
 		}
 
-		public IAnimator[] AsArray 
+		public IAnimator[] AsArray
 		{
 			get {
 				if (animatorArray == null) {
@@ -77,7 +77,7 @@ namespace Lime
 			return animator != null;
 		}
 
-		public IAnimator this[string propertyName, string animationId = null] 
+		public IAnimator this[string propertyName, string animationId = null]
 		{
 			get {
 				IAnimator animator;
@@ -101,20 +101,20 @@ namespace Lime
 		{
 			return animatorList.Contains(item);
 		}
-		
+
 		void ICollection<IAnimator>.CopyTo(IAnimator[] a, int index)
 		{
 			animatorList.CopyTo(a, index);
 		}
-		
-		bool ICollection<IAnimator>.IsReadOnly { 
+
+		bool ICollection<IAnimator>.IsReadOnly {
 			get { return false; }
 		}
-		
-		public IAnimator this[int index] { 
+
+		public IAnimator this[int index] {
 			get { return animatorList[index]; }
 		}
-		
+
 		public bool Remove(IAnimator item)
 		{
 			bool result = animatorList.Remove(item);
@@ -127,19 +127,19 @@ namespace Lime
 		}
 
 		public void Clear() { animatorList = emptyList; animatorArray = null; Version++; }
-		
+
 		public int Count { get { return AsArray.Length; } }
-	
+
 		IEnumerator<IAnimator> IEnumerable<IAnimator>.GetEnumerator()
 		{
 			return animatorList.GetEnumerator();
 		}
-		
+
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return animatorList.GetEnumerator();
 		}
-		 
+
 		public void Add(IAnimator animator)
 		{
 			if (animatorList == emptyList) {
@@ -150,7 +150,7 @@ namespace Lime
 			animatorList.Add(animator);
 			Version++;
 		}
-		
+
 		public int GetOverallDuration()
 		{
 			int val = 0;

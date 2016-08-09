@@ -1,13 +1,12 @@
 ﻿using System;
 using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
 	[ProtoContract]
 	public struct Matrix44 : IEquatable<Matrix44>
 	{
-		#region Public Constructors
-
 		public Matrix44(float m11, float m12, float m13, float m14, float m21, float m22, float m23, float m24, float m31,
 					  float m32, float m33, float m34, float m41, float m42, float m43, float m44)
 		{
@@ -29,70 +28,76 @@ namespace Lime
 			this.M44 = m44;
 		}
 
-		#endregion Public Constructors
-
-		#region Public Fields
-
 		[ProtoMember(1)]
+		[YuzuMember]
 		public float M11;
 
 		[ProtoMember(2)]
+		[YuzuMember]
 		public float M12;
 
 		[ProtoMember(3)]
+		[YuzuMember]
 		public float M13;
 
 		[ProtoMember(4)]
+		[YuzuMember]
 		public float M14;
 
 		[ProtoMember(5)]
+		[YuzuMember]
 		public float M21;
 
 		[ProtoMember(6)]
+		[YuzuMember]
 		public float M22;
 
 		[ProtoMember(7)]
+		[YuzuMember]
 		public float M23;
 
 		[ProtoMember(8)]
+		[YuzuMember]
 		public float M24;
 
 		[ProtoMember(9)]
+		[YuzuMember]
 		public float M31;
 
 		[ProtoMember(10)]
+		[YuzuMember]
 		public float M32;
 
 		[ProtoMember(11)]
+		[YuzuMember]
 		public float M33;
 
 		[ProtoMember(12)]
+		[YuzuMember]
 		public float M34;
 
 		[ProtoMember(13)]
+		[YuzuMember]
 		public float M41;
 
 		[ProtoMember(14)]
+		[YuzuMember]
 		public float M42;
 
 		[ProtoMember(15)]
+		[YuzuMember]
 		public float M43;
 
 		[ProtoMember(16)]
+		[YuzuMember]
 		public float M44;
 
-		#endregion Public Fields
-
-
-		#region Private Members
-		private static readonly Matrix44 identity = new Matrix44(1f, 0f, 0f, 0f,
-													0f, 1f, 0f, 0f,
-													0f, 0f, 1f, 0f,
-													0f, 0f, 0f, 1f);
-		#endregion Private Members
-
-
-		#region Public Properties
+		private static readonly Matrix44 identity = new Matrix44(
+			1f, 0f, 0f, 0f,
+			0f, 1f, 0f, 0f,
+			0f, 0f, 1f, 0f,
+			0f, 0f, 0f, 1f
+		);
 
 		public Vector3 Backward
 		{
@@ -108,7 +113,6 @@ namespace Lime
 			}
 		}
 
-
 		public Vector3 Down
 		{
 			get
@@ -122,7 +126,6 @@ namespace Lime
 				this.M23 = -value.Z;
 			}
 		}
-
 
 		public Vector3 Forward
 		{
@@ -225,10 +228,6 @@ namespace Lime
 				return rotation;
 			}
 		}
-
-		#endregion Public Properties
-
-		#region Public Methods
 
 		public static Matrix44 CreateFromAxisAngle(Vector3 axis, float angle)
 		{
@@ -475,7 +474,6 @@ namespace Lime
 			result.M33 = val1;
 		}
 
-
 		public static Matrix44 CreateRotationZ(float radians)
 		{
 			Matrix44 returnMatrix = Matrix44.Identity;
@@ -636,9 +634,13 @@ namespace Lime
 			float num15 = (num8 * num) - (num5 * num4);
 			float num14 = (num8 * num2) - (num6 * num4);
 			float num13 = (num8 * num3) - (num7 * num4);
-			return ((((num22 * (((num11 * num18) - (num10 * num17)) + (num9 * num16))) - (num21 * (((num12 * num18) - (num10 * num15)) + (num9 * num14)))) + (num20 * (((num12 * num17) - (num11 * num15)) + (num9 * num13)))) - (num19 * (((num12 * num16) - (num11 * num14)) + (num10 * num13))));
+			return (((
+				(num22 * (((num11 * num18) - (num10 * num17)) + (num9 * num16))) -
+				(num21 * (((num12 * num18) - (num10 * num15)) + (num9 * num14)))) +
+				(num20 * (((num12 * num17) - (num11 * num15)) + (num9 * num13)))) -
+				(num19 * (((num12 * num16) - (num11 * num14)) + (num10 * num13)
+			)));
 		}
-
 
 		public bool Equals(Matrix44 other)
 		{
@@ -1152,6 +1154,5 @@ namespace Lime
 			return r;
 		}
 #endif
-		#endregion Public Methods
 	}
 }

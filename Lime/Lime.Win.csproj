@@ -389,6 +389,10 @@
       <Project>{538E41E4-725C-4521-BCF3-A5591A1A3AFD}</Project>
       <Name>Lemon.Win</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Yuzu\Yuzu.csproj">
+      <Project>{ddd2dfe9-ced2-4cea-adf0-5a6865865a46}</Project>
+      <Name>Yuzu</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

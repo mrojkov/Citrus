@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
@@ -15,15 +14,19 @@ namespace Lime
 		private bool invalidBones;
 
 		[ProtoMember(1)]
+		[YuzuMember]
 		public Submesh3DCollection Submeshes { get; private set; }
 
 		[ProtoMember(2)]
+		[YuzuMember]
 		public BoundingSphere BoundingSphere { get; set; }
 
 		[ProtoMember(3)]
+		[YuzuMember]
 		public List<Node3D> Bones { get; private set; }
 
 		[ProtoMember(4)]
+		[YuzuMember]
 		public List<Matrix44> BoneBindPoseInverses { get; private set; }
 
 		public CullMode CullMode { get; set; }
@@ -42,6 +45,7 @@ namespace Lime
 		}
 
 		[ProtoAfterDeserialization]
+		[YuzuAfterDeserialization]
 		public void AfterDeserialization()
 		{
 			invalidBones = true;
@@ -177,9 +181,11 @@ namespace Lime
 		public GeometryBuffer ReadOnlyGeometry { get { return GeometryReference.Target; } }
 
 		[ProtoMember(1)]
+		[YuzuMember]
 		public Material Material { get; set; }
 
 		[ProtoMember(2)]
+		[YuzuMember]
 		public GeometryBuffer Geometry
 		{
 			get
@@ -193,6 +199,7 @@ namespace Lime
 		}
 
 		[ProtoMember(3)]
+		[YuzuMember]
 		public List<int> BoneIndices { get; private set; }
 
 		public Mesh3D ModelMesh;

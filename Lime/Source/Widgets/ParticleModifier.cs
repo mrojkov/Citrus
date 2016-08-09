@@ -1,9 +1,7 @@
-using Lime;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using ProtoBuf;
-using System.ComponentModel;
+using Yuzu;
 
 namespace Lime
 {
@@ -11,46 +9,60 @@ namespace Lime
 	public class ParticleModifier : Node
 	{
 		[ProtoMember(1)]
+		[YuzuMember]
 		public float Scale { get; set; }
 
 		[ProtoMember(2)]
+		[YuzuMember]
 		public float AspectRatio { get; set; }
 
 		[ProtoMember(3)]
+		[YuzuMember]
 		public float Velocity { get; set; }
 
 		[ProtoMember(4)]
+		[YuzuMember]
 		public float Spin { get; set; }
 
 		[ProtoMember(5)]
+		[YuzuMember]
 		public float AngularVelocity { get; set; }
 
 		[ProtoMember(6)]
+		[YuzuMember]
 		public float GravityAmount { get; set; }
 
 		[ProtoMember(7)]
+		[YuzuMember]
 		public float WindAmount { get; set; }
 
 		[ProtoMember(8)]
+		[YuzuMember]
 		public float MagnetAmount { get; set; }
 
 		[ProtoMember(9)]
+		[YuzuMember]
 		public Color4 Color { get; set; }
 
 		[ProtoMember(10)]
+		[YuzuMember]
 		public int FirstFrame { get; set; }
 
 		[ProtoMember(11)]
+		[YuzuMember]
 		public int LastFrame { get; set; }
 
 		[ProtoMember(12)]
+		[YuzuMember]
 		public float AnimationFps { get; set; }
 
 		[ProtoMember(13)]
+		[YuzuMember]
 		public bool LoopedAnimation { get; set; }
 
 		ITexture texture = new SerializableTexture();
 		[ProtoMember(14)]
+		[YuzuMember]
 		public ITexture Texture { get { return texture; } set { texture = value; textures = null; } }
 
 		public ParticleModifier()

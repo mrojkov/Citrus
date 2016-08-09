@@ -1,5 +1,6 @@
 using System;
 using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
@@ -9,9 +10,11 @@ namespace Lime
 		public struct Params
 		{
 			[ProtoMember(1)]
+			[YuzuMember]
 			public string AtlasPath;
 
 			[ProtoMember(2)]
+			[YuzuMember]
 			public IntRectangle AtlasRect;
 
 			public static Params ReadFromBundle(string path)
@@ -33,7 +36,7 @@ namespace Lime
 		private ITexture atlasTexture;
 		public Rectangle AtlasUVRect { get; private set; }
 		public Size ImageSize { get; private set; }
-		
+
 		public TextureAtlasElement(Params @params)
 		{
 			atlasTexture = TexturePool.Instance.GetTexture(@params.AtlasPath);

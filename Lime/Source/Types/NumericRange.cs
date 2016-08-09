@@ -1,5 +1,6 @@
 ﻿using ProtoBuf;
 using System;
+using Yuzu;
 
 namespace Lime
 {
@@ -11,9 +12,11 @@ namespace Lime
 	public struct NumericRange : IEquatable<NumericRange>
 	{
 		[ProtoMember(1)]
+		[YuzuMember]
 		public float Median;
 
 		[ProtoMember(2)]
+		[YuzuMember]
 		public float Dispersion;
 
 		public NumericRange(float median, float dispersion)

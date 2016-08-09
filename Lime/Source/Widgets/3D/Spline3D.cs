@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
@@ -8,9 +8,11 @@ namespace Lime
 	public class Spline3D : Node3D
 	{
 		[ProtoMember(1)]
+		[YuzuMember]
 		public List<Point> Points { get; set; }
 
 		[ProtoMember(2)]
+		[YuzuMember]
 		public bool Closed { get; set; }
 
 		public Spline3D()
@@ -137,15 +139,19 @@ namespace Lime
 		public class Point
 		{
 			[ProtoMember(1)]
+			[YuzuMember]
 			public InterpolationMode InterpolationMode { get; set; }
 
 			[ProtoMember(2)]
+			[YuzuMember]
 			public Vector3 Position { get; set; }
 
 			[ProtoMember(3)]
+			[YuzuMember]
 			public Vector3 TangentA { get; set; }
 
 			[ProtoMember(4)]
+			[YuzuMember]
 			public Vector3 TangentB { get; set; }
 
 			public Point()

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
@@ -32,6 +33,7 @@ namespace Lime
 		}
 
 		[ProtoMember(1)]
+		[YuzuMember]
 		public SerializableFont Font {
 			get { return font; }
 			set {
@@ -43,6 +45,7 @@ namespace Lime
 		}
 
 		[ProtoMember(2)]
+		[YuzuMember]
 		public override string Text {
 			get { return text ?? ""; }
 			set {
@@ -65,6 +68,7 @@ namespace Lime
 		}
 
 		[ProtoMember(3)]
+		[YuzuMember]
 		public float FontHeight {
 			get { return fontHeight; }
 			set {
@@ -76,6 +80,7 @@ namespace Lime
 		}
 
 		[ProtoMember(4)]
+		[YuzuMember]
 		public float Spacing {
 			get { return spacing; }
 			set {
@@ -87,6 +92,7 @@ namespace Lime
 		}
 
 		[ProtoMember(5)]
+		[YuzuMember]
 		public HAlignment HAlignment {
 			get { return hAlignment; }
 			set {
@@ -98,6 +104,7 @@ namespace Lime
 		}
 
 		[ProtoMember(6)]
+		[YuzuMember]
 		public VAlignment VAlignment {
 			get { return vAlignment; }
 			set {
@@ -109,12 +116,15 @@ namespace Lime
 		}
 
 		[ProtoMember(8)]
+		[YuzuMember]
 		public TextOverflowMode OverflowMode { get; set; }
 
 		[ProtoMember(9)]
+		[YuzuMember]
 		public bool WordSplitAllowed { get; set; }
 
 		[ProtoMember(10)]
+		[YuzuMember]
 		public Color4 TextColor
 		{
 			get { return textColor; }
@@ -158,7 +168,7 @@ namespace Lime
 		public bool TrimWhitespaces { get; set; }
 
 		private CaretPosition caret = new CaretPosition();
-		
+
 		public ICaretPosition Caret { get { return caret; } }
 
 		public event Action<string> Submitted;

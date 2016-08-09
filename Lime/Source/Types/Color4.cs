@@ -1,6 +1,7 @@
 ﻿using System;
 using ProtoBuf;
 using System.Runtime.InteropServices;
+using Yuzu;
 
 namespace Lime
 {
@@ -25,6 +26,7 @@ namespace Lime
 		public byte A;
 
 		[ProtoMember(1)]
+		[YuzuMember]
 		[FieldOffset(0)]
 		public uint ABGR;
 
@@ -55,8 +57,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Darken the color with the specified amount. 
-		/// Amount 1 turns the color into black, 
+		/// Darken the color with the specified amount.
+		/// Amount 1 turns the color into black,
 		/// Amount 0 remains the color unchanged.
 		/// </summary>
 		public Color4 Darken(float amount)
@@ -65,8 +67,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Lighten the color with the specified amount. 
-		/// Amount 1 turns the color into white, 
+		/// Lighten the color with the specified amount.
+		/// Amount 1 turns the color into white,
 		/// Amount 0 remains the color unchanged.
 		/// </summary>
 		public Color4 Lighten(float amount)
@@ -75,8 +77,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Change the color transparency with the specified amount. 
-		/// Amount 1 turns the color into fully transparent, 
+		/// Change the color transparency with the specified amount.
+		/// Amount 1 turns the color into fully transparent,
 		/// Amount 0 remains the color unchanged.
 		/// </summary>
 		public Color4 Transparentify(float amount)

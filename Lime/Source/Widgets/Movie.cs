@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
@@ -26,6 +23,7 @@ namespace Lime
 		MovieTexture movieTexture;
 
 		[ProtoMember(1)]
+		[YuzuMember]
 		public string Path
 		{
 			get { return Serialization.ShrinkPath(movieTexture.Path); }
@@ -33,6 +31,7 @@ namespace Lime
 		}
 
 		[ProtoMember(2)]
+		[YuzuMember]
 		public bool Looped { get; set; }
 
 		[Trigger]

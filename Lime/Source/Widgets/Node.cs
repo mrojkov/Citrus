@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 
 using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
@@ -85,6 +86,7 @@ namespace Lime
 		/// May be non-unique.
 		/// </summary>
 		[ProtoMember(1)]
+		[YuzuMember]
 		[Tangerine(0)]
 		public string Id { get; set; }
 
@@ -94,6 +96,7 @@ namespace Lime
 		/// the node children are replaced by the external scene nodes.
 		/// </summary>
 		[ProtoMember(2)]
+		[YuzuMember]
 		[Tangerine(0)]
 		public string ContentsPath
 		{
@@ -195,6 +198,7 @@ namespace Lime
 		/// Аниматоры, изменяющие анимированные параметры объекта в время обновления
 		/// </summary>
 		[ProtoMember(5)]
+		[YuzuMember]
 		public AnimatorCollection Animators { get; private set; }
 
 		/// <summary>
@@ -202,6 +206,7 @@ namespace Lime
 		/// For enumerating all descendants use Descendants.
 		/// </summary>
 		[ProtoMember(6)]
+		[YuzuMember]
 		public NodeList Nodes;
 
 		/// <summary>
@@ -254,9 +259,11 @@ namespace Lime
 		/// Custom data. Can be set via HotStudio (this way it will contain path to external scene).
 		/// </summary>
 		[ProtoMember(11)]
+		[YuzuMember]
 		public string Tag { get; set; }
 
 		[ProtoMember(13)]
+		[YuzuMember]
 		public AnimationList Animations;
 
 		/// <summary>

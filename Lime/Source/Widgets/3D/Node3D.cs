@@ -1,5 +1,6 @@
 ﻿using System;
 using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
@@ -21,6 +22,7 @@ namespace Lime
 		protected Color4 globalColor;
 
 		[ProtoMember(1)]
+		[YuzuMember]
 		public bool Visible
 		{
 			get { return visible; }
@@ -34,6 +36,7 @@ namespace Lime
 		}
 
 		[ProtoMember(2)]
+		[YuzuMember]
 		public Vector3 Scale
 		{
 			get { return scale; }
@@ -45,6 +48,7 @@ namespace Lime
 		}
 
 		[ProtoMember(3)]
+		[YuzuMember]
 		public Quaternion Rotation
 		{
 			get { return rotation; }
@@ -56,6 +60,7 @@ namespace Lime
 		}
 
 		[ProtoMember(4)]
+		[YuzuMember]
 		public Vector3 Position
 		{
 			get { return position; }
@@ -67,6 +72,7 @@ namespace Lime
 		}
 
 		[ProtoMember(5)]
+		[YuzuMember]
 		public Color4 Color
 		{
 			get { return color; }

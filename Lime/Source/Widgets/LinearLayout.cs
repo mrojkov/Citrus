@@ -1,8 +1,5 @@
 using ProtoBuf;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Yuzu;
 
 namespace Lime
 {
@@ -88,9 +85,11 @@ namespace Lime
 		}
 
 		[ProtoMember(1)]
+		[YuzuMember]
 		public bool Horizontal { get; set; }
 
 		[ProtoMember(2)]
+		[YuzuMember]
 		public bool ProcessHidden { get; set; }
 
 		protected override void OnParentChanged(Node oldParent)

@@ -1,5 +1,6 @@
 ﻿using System;
 using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
@@ -11,12 +12,15 @@ namespace Lime
 	public struct Vector3 : IEquatable<Vector3>
 	{
 		[ProtoMember(1)]
+		[YuzuMember]
 		public float X;
-		
+
 		[ProtoMember(2)]
+		[YuzuMember]
 		public float Y;
-		
+
 		[ProtoMember(3)]
+		[YuzuMember]
 		public float Z;
 
 		/// <summary>
@@ -61,21 +65,21 @@ namespace Lime
 		{
 			return new Vector2(value.X, value.Y);
 		}
-		
+
 		public bool Equals(Vector3 other)
 		{
-			return X == other.X 
-				&& Y == other.Y 
+			return X == other.X
+				&& Y == other.Y
 				&& Z == other.Z;
 		}
-		
+
 		public override bool Equals(object obj)
 		{
 			return obj is Vector3 && Equals((Vector3)obj);
 		}
 
 		/// <summary>
-		/// Creates a new <see cref="Vector3"/> that contains 
+		/// Creates a new <see cref="Vector3"/> that contains
 		/// linear interpolation of the specified vectors.
 		/// </summary>
 		/// <param name="amount">Weighting value(between 0.0 and 1.0).</param>
@@ -122,64 +126,64 @@ namespace Lime
 				}
 			}
 		}
-		
+
 		public static Vector3 operator *(Vector3 lhs, Vector3 rhs)
 		{
 			return new Vector3(lhs.X * rhs.X, lhs.Y * rhs.Y, lhs.Z * rhs.Z);
 		}
-		
+
 		public static Vector3 operator /(Vector3 lhs, Vector3 rhs)
 		{
 			return new Vector3(lhs.X / rhs.X, lhs.Y / rhs.Y, lhs.Z / rhs.Z);
 		}
-		
+
 		public static Vector3 operator /(Vector3 lhs, float rhs)
 		{
 			return new Vector3(lhs.X / rhs, lhs.Y / rhs, lhs.Z / rhs);
 		}
-		
+
 		public static bool operator ==(Vector3 lhs, Vector3 rhs)
 		{
-			return lhs.X == rhs.X 
-				&& lhs.Y == rhs.Y 
+			return lhs.X == rhs.X
+				&& lhs.Y == rhs.Y
 				&& lhs.Z == rhs.Z;
 		}
-		
+
 		public static bool operator !=(Vector3 lhs, Vector3 rhs)
 		{
 			return !(lhs == rhs);
 		}
-		
+
 		public static Vector3 operator *(float lhs, Vector3 rhs)
 		{
 			return new Vector3(lhs * rhs.X, lhs * rhs.Y, lhs * rhs.Z);
 		}
-		
+
 		public static Vector3 operator *(Vector3 lhs, float rhs)
 		{
 			return new Vector3(rhs * lhs.X, rhs * lhs.Y, rhs * lhs.Z);
 		}
-		
+
 		public static Vector3 operator +(Vector3 lhs, Vector3 rhs)
 		{
 			return new Vector3(lhs.X + rhs.X, lhs.Y + rhs.Y, lhs.Z + rhs.Z);
 		}
-		
+
 		public static Vector3 operator -(Vector3 lhs, Vector3 rhs)
 		{
 			return new Vector3(lhs.X - rhs.X, lhs.Y - rhs.Y, lhs.Z - rhs.Z);
 		}
-		
+
 		public static Vector3 operator -(Vector3 value)
 		{
 			return new Vector3(-value.X, -value.Y, -value.Z);
 		}
-		
+
 		public static float DotProduct(Vector3 value1, Vector3 value2)
 		{
 			return value1.X * value2.X + value1.Y * value2.Y + value1.Z * value2.Z;
 		}
-		
+
 		public static Vector3 CrossProduct(Vector3 value1, Vector3 value2)
 		{
 			return new Vector3(
@@ -207,7 +211,7 @@ namespace Lime
 				return v;
 			}
 		}
-		
+
 		public float Length
 		{
 			get { return (float)Math.Sqrt(X * X + Y * Y + Z * Z); }

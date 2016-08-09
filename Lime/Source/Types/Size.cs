@@ -1,5 +1,6 @@
 ﻿using System;
 using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
@@ -11,9 +12,11 @@ namespace Lime
 	public struct Size : IEquatable<Size>
 	{
 		[ProtoMember(1)]
+		[YuzuMember]
 		public int Width;
 
 		[ProtoMember(2)]
+		[YuzuMember]
 		public int Height;
 
 		/// <summary>
@@ -63,7 +66,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Returns string representation of this <see cref="Size"/> 
+		/// Returns string representation of this <see cref="Size"/>
 		/// in the format: "Width, Height".
 		/// </summary>
 		public override string ToString()

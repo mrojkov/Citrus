@@ -2,6 +2,7 @@ using System;
 using ProtoBuf;
 using System.Linq;
 using System.Collections.Generic;
+using Yuzu;
 
 namespace Lime
 {
@@ -20,12 +21,14 @@ namespace Lime
 		/// Текст кнопки
 		/// </summary>
 		[ProtoMember(1)]
+		[YuzuMember]
 		public override string Text { get; set; }
 
 		/// <summary>
 		/// Кнопка включена и принимает ввод от пользователя
 		/// </summary>
 		[ProtoMember(2)]
+		[YuzuMember]
 		public bool Enabled {
 			get { return EnableMask[0]; }
 			set { EnableMask[0] = value; }
@@ -36,6 +39,7 @@ namespace Lime
 		/// Если пользователь нажмет кнопку, и не отпуская палец быстро передвинет его, кнопка не нажмется
 		/// </summary>
 		[ProtoMember(3)]
+		[YuzuMember]
 		public bool Draggable { get; set; }
 
 		/// <summary>
@@ -55,13 +59,13 @@ namespace Lime
 
 		/// <summary>
 		/// The minimum distance which finger should pass through the button,
-		/// in order to avoid button click. 
+		/// in order to avoid button click.
 		/// For Draggable buttons only.
 		/// </summary>
 		private const float DragDistanceThreshold = 15;
 
 		/// <summary>
-		/// The period of time while drag detection is working, 
+		/// The period of time while drag detection is working,
 		/// since a finger touched the button.
 		/// For Draggable buttons only.
 		/// </summary>
@@ -76,7 +80,7 @@ namespace Lime
 		/// <summary>
 		/// Indicates whether all buttons should use tablet control scheme that doesn't includes
 		/// 'focused' state support, but behaves better when multiple buttons overlap each other.
-		/// 
+		///
 		/// Означает, что поведение всех кнопок подстроено под ввод с сенсорного экрана.
 		/// </summary>
 #if iOS || ANDROID
@@ -114,7 +118,7 @@ namespace Lime
 		protected override void Awake()
 		{
 			stateMachine = new StateMachine();
-			// On the current frame the button contents may not be loaded, 
+			// On the current frame the button contents may not be loaded,
 			// so delay its initialization until the next frame.
 			State = InitialState;
 			textPresentersFeeder = new TextPresentersFeeder(this);
@@ -269,7 +273,7 @@ namespace Lime
 		{
 			Input.ReleaseMouse();
 			if (CurrentAnimation == "Release") {
-				// The release animation should be played if we disable the button 
+				// The release animation should be played if we disable the button
 				// right after click on it.
 				while (IsRunning) {
 					yield return 0;

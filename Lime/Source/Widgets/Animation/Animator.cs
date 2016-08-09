@@ -1,5 +1,6 @@
 using System;
 using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
@@ -74,15 +75,18 @@ namespace Lime
 		/// Название анимируемого свойства
 		/// </summary>
 		[ProtoMember(1)]
+		[YuzuMember]
 		public string TargetProperty { get; set; }
 
 		/// <summary>
 		/// Коллекция ключей анимации
 		/// </summary>
 		[ProtoMember(2)]
+		[YuzuMember]
 		public KeyframeCollection<T> ReadonlyKeys = new KeyframeCollection<T>();
 
 		[ProtoMember(3)]
+		[YuzuMember]
 		public string AnimationId { get; set; }
 
 		public object UserData { get; set; }
@@ -99,7 +103,7 @@ namespace Lime
 				return ReadonlyKeys;
 			}
 		}
-			
+
 		IKeyframeCollection proxyKeys;
 		IKeyframeCollection IAnimator.Keys {
 			get {
@@ -153,7 +157,7 @@ namespace Lime
 			}
 			Setter = (SetterDelegate)Delegate.CreateDelegate(typeof(SetterDelegate), owner, mi);
 		}
-		
+
 		protected virtual void InterpolateAndSet(float t, Keyframe<T> a, Keyframe<T> b)
 		{
 			Setter(a.Value);
@@ -234,7 +238,7 @@ namespace Lime
 				InterpolateAndSet(t, key0, key1, key2, key3);
 			}
 		}
-		
+
 		/// <summary>
 		/// Возвращает номер кадра самого последнего ключа или 0, если ключей нет
 		/// </summary>

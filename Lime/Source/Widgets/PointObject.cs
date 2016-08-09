@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Lime;
 using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
@@ -21,6 +18,7 @@ namespace Lime
 		}
 
 		[ProtoMember(1)]
+		[YuzuMember]
 		public Vector2 Position { get { return position; } set { position = value; } }
 
 		public float X { get { return position.X; } set { position.X = value; } }
@@ -28,6 +26,7 @@ namespace Lime
 		public float Y { get { return position.Y; } set { position.Y = value; } }
 
 		[ProtoMember(2)]
+		[YuzuMember]
 		public SkinningWeights SkinningWeights { get; set; }
 	}
 }

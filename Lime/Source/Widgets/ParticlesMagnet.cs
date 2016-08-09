@@ -1,6 +1,6 @@
-using Lime;
 using System;
 using ProtoBuf;
+using Yuzu;
 
 namespace Lime
 {
@@ -21,18 +21,21 @@ namespace Lime
 		/// ‘орма магнита
 		/// </summary>
 		[ProtoMember(1)]
+		[YuzuMember]
 		public EmitterShape Shape { get; set; }
 
 		/// <summary>
 		/// «адает на сколько будет уменьшатьс€ сила (Strength) в зависимости от рассто€ни€ до центра магнита
 		/// </summary>
 		[ProtoMember(2)]
+		[YuzuMember]
 		public float Attenuation { get; set; }
 
 		/// <summary>
 		/// —ила воздействи€
 		/// </summary>
 		[ProtoMember(3)]
+		[YuzuMember]
 		public float Strength { get; set; }
 	}
 
