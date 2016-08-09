@@ -7,14 +7,60 @@ using Yuzu.Util;
 
 namespace Yuzu.Binary
 {
+	// These values are part of format.
+	public enum RoughType: byte
+	{
+		None      =  0,
+		SByte     =  1,
+		Byte      =  2,
+		Short     =  3,
+		UShort    =  4,
+		Int       =  5,
+		UInt      =  6,
+		Long      =  7,
+		ULong     =  8,
+		Bool      =  9,
+		Char      = 10,
+		Float     = 11,
+		Double    = 12,
+		DateTime  = 13,
+		TimeSpan  = 14,
+		String    = 15,
+		Any       = 16,
+
+		Record    = 32,
+		Sequence  = 33,
+		Mapping   = 34,
+
+		FirstAtom = SByte,
+		LastAtom  = Any,
+	}
+
+	internal static class RT
+	{
+		public static Type[] roughTypeToType = new Type[] {
+			null,
+			typeof(sbyte), typeof(byte), typeof(short), typeof(ushort),
+			typeof(int), typeof(uint), typeof(long), typeof(ulong),
+			typeof(bool), typeof(char), typeof(float), typeof(double),
+			typeof(DateTime), typeof(TimeSpan), typeof(string),
+			typeof(object),
+		};
+
+		public static bool IsRecord(this Type t)
+		{
+			return t.IsClass || t.IsInterface || Utils.IsStruct(t);
+		}
+	}
+
 	public class BinarySerializer : AbstractWriterSerializer
 	{
-		protected void WriteInt(object obj) { writer.Write((int)obj); }
-		protected void WriteUInt(object obj) { writer.Write((uint)obj); }
-		protected void WriteByte(object obj) { writer.Write((byte)obj); }
 		protected void WriteSByte(object obj) { writer.Write((sbyte)obj); }
+		protected void WriteByte(object obj) { writer.Write((byte)obj); }
 		protected void WriteShort(object obj) { writer.Write((short)obj); }
 		protected void WriteUShort(object obj) { writer.Write((ushort)obj); }
+		protected void WriteInt(object obj) { writer.Write((int)obj); }
+		protected void WriteUInt(object obj) { writer.Write((uint)obj); }
 		protected void WriteLong(object obj) { writer.Write((long)obj); }
 		protected void WriteULong(object obj) { writer.Write((ulong)obj); }
 		protected void WriteBool(object obj) { writer.Write((bool)obj); }
@@ -32,9 +78,16 @@ namespace Yuzu.Binary
 				return;
 			}
 			writer.Write((string)obj);
-			if (obj == "") {
+			if ((string)obj == "") {
 				writer.Write(false);
 			}
+		}
+
+		protected void WriteAny(object obj)
+		{
+			var t = obj.GetType();
+			WriteRoughType(t);
+			GetWriteFunc(t)(obj);
 		}
 
 		private Dictionary<Type, Action<object>> writerCache = new Dictionary<Type, Action<object>>();
@@ -56,12 +109,12 @@ namespace Yuzu.Binary
 
 		private void InitWriters()
 		{
-			writerCache[typeof(int)] = WriteInt;
-			writerCache[typeof(uint)] = WriteUInt;
-			writerCache[typeof(byte)] = WriteByte;
 			writerCache[typeof(sbyte)] = WriteSByte;
+			writerCache[typeof(byte)] = WriteByte;
 			writerCache[typeof(short)] = WriteShort;
 			writerCache[typeof(ushort)] = WriteUShort;
+			writerCache[typeof(int)] = WriteInt;
+			writerCache[typeof(uint)] = WriteUInt;
 			writerCache[typeof(long)] = WriteLong;
 			writerCache[typeof(ulong)] = WriteULong;
 			writerCache[typeof(bool)] = WriteBool;
@@ -71,6 +124,43 @@ namespace Yuzu.Binary
 			writerCache[typeof(DateTime)] = WriteDateTime;
 			writerCache[typeof(TimeSpan)] = WriteTimeSpan;
 			writerCache[typeof(string)] = WriteString;
+			writerCache[typeof(object)] = WriteAny;
+		}
+
+		private void WriteRoughType(Type t)
+		{
+			for (var result = RoughType.FirstAtom; result <= RoughType.LastAtom; ++result)
+				if (t == RT.roughTypeToType[(int)result]) {
+					writer.Write((byte)result);
+					return;
+				}
+			if (t.IsEnum) {
+				writer.Write((byte)RoughType.Int);
+				return;
+			}
+			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
+				writer.Write((byte)RoughType.Mapping);
+				var g = t.GetGenericArguments();
+				WriteRoughType(g[0]);
+				WriteRoughType(g[1]);
+				return;
+			}
+			if (t.IsArray) {
+				writer.Write((byte)RoughType.Sequence);
+				WriteRoughType(t.GetElementType());
+				return;
+			}
+			var icoll = t.GetInterface(typeof(ICollection<>).Name);
+			if (icoll != null) {
+				writer.Write((byte)RoughType.Sequence);
+				WriteRoughType(icoll.GetGenericArguments()[0]);
+				return;
+			}
+			if (t.IsRecord()) {
+				writer.Write((byte)RoughType.Record);
+				return;
+			}
+			throw new NotImplementedException();
 		}
 
 		private void WriteDictionary<K, V>(Dictionary<K, V> dict)
@@ -143,8 +233,10 @@ namespace Yuzu.Binary
 			writer.Write(result);
 			writer.Write(meta.Type.FullName);
 			writer.Write((short)meta.Items.Count);
-			foreach (var yi in meta.Items)
+			foreach (var yi in meta.Items) {
 				writer.Write(yi.Tag(Options));
+				WriteRoughType(yi.Type);
+			}
 		}
 
 		private void WriteObject<T>(object obj)
@@ -223,6 +315,6 @@ namespace Yuzu.Binary
 			throw new NotImplementedException(t.Name);
 		}
 
-		protected override void ToWriter(object obj){ GetWriteFunc(obj.GetType())(obj); }
+		protected override void ToWriter(object obj) { WriteAny(obj); }
 	}
 }

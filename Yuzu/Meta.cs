@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Reflection;
 
 using Yuzu.Util;
@@ -61,6 +62,7 @@ namespace Yuzu.Metadata
 		public readonly CommonOptions Options;
 		public readonly List<Item> Items = new List<Item>();
 		public readonly bool IsCompact;
+		public object Default { get; private set; }
 
 		public struct MethodAction
 		{
@@ -104,14 +106,16 @@ namespace Yuzu.Metadata
 		{
 			var optional = m.GetCustomAttribute_Compat(Options.OptionalAttribute, false);
 			var required = m.GetCustomAttribute_Compat(Options.RequiredAttribute, false);
-			if (optional == null && required == null)
+			var member = m.GetCustomAttribute_Compat(Options.MemberAttribute, false);
+			var count = (optional != null ? 1 : 0) + (required != null ? 1 : 0) + (member != null ? 1 : 0);
+			if (count == 0)
 				return;
-			if (optional != null && required != null)
-				throw Error("Both optional and required attributes for field '{0}'", m.Name);
+			if (count != 1)
+				throw Error("More than one of optional, required and member attributes for field '{0}'", m.Name);
 			var serializeIf = m.GetCustomAttribute_Compat(Options.SerializeIfAttribute, true);
 			var item = new Item {
-				Alias = Options.GetAlias(optional ?? required) ?? m.Name,
-				IsOptional = optional != null,
+				Alias = Options.GetAlias(optional ?? required ?? member) ?? m.Name,
+				IsOptional = required == null,
 				IsCompact =
 					m.IsDefined(Options.CompactAttribute, false) ||
 					m.GetType().IsDefined(Options.CompactAttribute, false),
@@ -145,6 +149,12 @@ namespace Yuzu.Metadata
 			if (item.SetValue == null) {
 				if (!item.Type.IsClass && !item.Type.IsInterface || item.Type == typeof(object))
 					throw Error("Unable to either set or merge item {0}", item.Name);
+			}
+			if (member != null && item.SerializeIf == null) {
+				if (Default == null)
+					Default = Activator.CreateInstance(Type);
+				var d = item.GetValue(Default);
+				item.SerializeIf = (object obj, object value) => !Object.Equals(item.GetValue(obj), d);
 			}
 			Items.Add(item);
 		}
