@@ -301,7 +301,6 @@ namespace Lime
 		}
 
 		[ProtoMember(2)]
-		[YuzuMember]
 		[Tangerine(7)]
 		public Vector2 Size
 		{
@@ -318,6 +317,13 @@ namespace Lime
 				}
 			}
 		}
+
+		/// <summary>
+		/// SilenSize is needed to prevent unwanted propagation of `OnSizeChanged`
+		/// while deserializing with Yuzu
+		/// </summary>
+		[YuzuMember("Size")]
+		public Vector2 SilentSize { get { return size; } set { size = value; } }
 
 		/// <summary>
 		/// Gets or sets the widget padding. Padding defines the white space between the widget content and the widget border.
