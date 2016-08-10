@@ -111,7 +111,7 @@ namespace Lime
 		/// <param name="attributes">Атрибуты импортируемого файла</param>
 		public void ImportFile(string srcPath, string dstPath, int reserve, AssetAttributes attributes = AssetAttributes.None)
 		{
-			using (var stream = new FileStream(srcPath, FileMode.Open)) {
+			using (var stream = new FileStream(srcPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
 				ImportFile(dstPath, stream, reserve, attributes);
 			}
 		}
