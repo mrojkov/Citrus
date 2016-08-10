@@ -229,10 +229,21 @@ namespace Lime
 		private static extern bool SetProcessDPIAware();
 #endif
 
+		public static event Func<bool> Exiting;
+		public static event Action Exited;
+
 		public static void Initialize(ApplicationOptions options = null)
 		{
 #if MAC
 			NSApplication.Init();
+			NSApplication.SharedApplication.ApplicationShouldTerminate += (sender) => {
+				return (Exiting == null) || Exiting() ? NSApplicationTerminateReply.Now : NSApplicationTerminateReply.Cancel;
+			};
+			NSApplication.SharedApplication.WillTerminate += (sender, e) => {
+				if (Exited != null) {
+					Exited();
+				}
+			};
 #endif
 			KeyboardFocus.Initialize();
 			options = options ?? new ApplicationOptions();
