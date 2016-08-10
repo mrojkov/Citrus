@@ -9,6 +9,7 @@ namespace Lime
 	/// </summary>
 	[System.Diagnostics.DebuggerStepThrough]
 	[ProtoContract]
+	[YuzuCompact]
 	public struct Rectangle : IEquatable<Rectangle>
 	{
 		/// <summary>

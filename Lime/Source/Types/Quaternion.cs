@@ -5,6 +5,7 @@ using Yuzu;
 namespace Lime
 {
 	[ProtoContract]
+	[YuzuCompact]
 	public struct Quaternion : IEquatable<Quaternion>
 	{
 		private static readonly Quaternion _identity = new Quaternion(0, 0, 0, 1);

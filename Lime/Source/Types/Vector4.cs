@@ -5,6 +5,7 @@ using Yuzu;
 namespace Lime
 {
 	[ProtoContract]
+	[YuzuCompact]
 	public struct Vector4 : IEquatable<Vector4>
 	{
 		[ProtoMember(1)]

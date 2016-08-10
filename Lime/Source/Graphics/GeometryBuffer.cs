@@ -11,6 +11,7 @@ namespace Lime
 	}
 
 	[ProtoContract]
+	[YuzuCompact]
 	[StructLayout(LayoutKind.Sequential, Pack = 1, Size=4)]
 	public struct BlendIndices
 	{
@@ -32,6 +33,7 @@ namespace Lime
 	}
 
 	[ProtoContract]
+	[YuzuCompact]
 	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 16)]
 	public struct BlendWeights
 	{

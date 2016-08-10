@@ -8,6 +8,7 @@ namespace Lime
 	/// Representation of 3x2 transformation matrix.
 	/// </summary>
 	[ProtoContract]
+	[YuzuCompact]
 	[System.Diagnostics.DebuggerStepThrough]
 	public struct Matrix32 : IEquatable<Matrix32>
 	{

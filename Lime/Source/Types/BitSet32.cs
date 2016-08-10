@@ -9,6 +9,7 @@ namespace Lime
 	/// Representation of 32-bit array of bit flags.
 	/// </summary>
 	[ProtoContract]
+	[YuzuCompact]
 	public struct BitSet32 : IEquatable<BitSet32>
 	{
 		/// <summary>

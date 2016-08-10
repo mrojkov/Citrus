@@ -5,6 +5,7 @@ using Yuzu;
 namespace Lime
 {
 	[ProtoContract]
+	[YuzuCompact]
 	public struct Matrix44 : IEquatable<Matrix44>
 	{
 		public Matrix44(float m11, float m12, float m13, float m14, float m21, float m22, float m23, float m24, float m31,

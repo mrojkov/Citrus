@@ -7,6 +7,7 @@ namespace Lime
 	/// Хранит номер кости и силу влияния
 	/// </summary>
 	[ProtoContract]
+	[YuzuCompact]
 	public struct BoneWeight
 	{
 		/// <summary>
@@ -29,6 +30,7 @@ namespace Lime
 	/// Поддерживается влияние 4 костей одновременно
 	/// </summary>
 	[ProtoContract]
+	[YuzuCompact]
 	public class SkinningWeights
 	{
 		[ProtoMember(1)]

@@ -8,6 +8,7 @@ namespace Lime
 	/// Representation of integer 2D vectors and points.
 	/// </summary>
 	[ProtoContract]
+	[YuzuCompact]
 	[System.Diagnostics.DebuggerStepThrough]
 	public struct IntVector2 : IEquatable<IntVector2>
 	{

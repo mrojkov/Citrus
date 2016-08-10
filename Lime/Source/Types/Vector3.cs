@@ -9,6 +9,7 @@ namespace Lime
 	/// </summary>
 	[System.Diagnostics.DebuggerStepThrough]
 	[ProtoContract]
+	[YuzuCompact]
 	public struct Vector3 : IEquatable<Vector3>
 	{
 		[ProtoMember(1)]
