@@ -14,6 +14,7 @@ namespace Lime
 		public Menu()
 		{
 			NativeMenu = new NSMenu();
+			NativeMenu.AutoEnablesItems = false;
 		}
 
 		public void Refresh()
@@ -81,6 +82,7 @@ namespace Lime
 
 		class MenuItem
 		{
+			private bool separator;
 			private CommandState state;
 			public readonly ICommand Command;
 			public readonly NSMenuItem NativeMenuItem;
@@ -88,16 +90,27 @@ namespace Lime
 			public MenuItem(ICommand command)
 			{
 				Command = command;
-				NativeMenuItem = new NSMenuItem();
-				NativeMenuItem.Activated += (s, e) => {
-					Command.Execute();
-				};
-				Refresh();
+				if (command == Lime.Command.MenuSeparator) {
+					NativeMenuItem = NSMenuItem.SeparatorItem;
+					separator = true;
+				} else {
+					NativeMenuItem = new NSMenuItem();
+					NativeMenuItem.Activated += (s, e) => {
+						Command.Execute();
+					};
+					Refresh();
+				}
 			}
 
 			public void Refresh()
 			{
+				if (separator) {
+					return;
+				}
 				Command.Refresh();
+				if (Command.Submenu != null) {
+					Command.Submenu.Refresh();
+				}
 				if (state != null && state.Equals(Command)) {
 					return;
 				}
@@ -116,7 +129,6 @@ namespace Lime
 					var nativeSubmenu = Command.Submenu.NativeMenu;
 					nativeSubmenu.Title = Command.Text;
 					NativeMenuItem.Submenu = nativeSubmenu;
-					Command.Submenu.Refresh();
 				} else {
 					NativeMenuItem.Submenu = null;
 				}
@@ -135,6 +147,9 @@ namespace Lime
 				}
 				if (key == Key.Enter) {
 					return "\r";
+				}
+				if (key == Key.Delete) {
+					return ((char)127).ToString();
 				}
 				throw new ArgumentException();
 			}

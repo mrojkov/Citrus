@@ -22,6 +22,8 @@ namespace Lime
 		public bool Enabled { get; set; }
 		public bool Visible { get; set; }
 
+		public static readonly ICommand MenuSeparator = new Command();
+
 		public Command()
 		{
 			Enabled = true;
