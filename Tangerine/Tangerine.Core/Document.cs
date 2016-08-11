@@ -122,21 +122,5 @@ namespace Tangerine.Core
 		public void Save()
 		{
 		}
-
-		struct DirectoryChanger : IDisposable
-		{
-			readonly string savedDirectory;
-
-			public DirectoryChanger(string directory)
-			{
-				savedDirectory = Directory.GetCurrentDirectory();
-				Directory.SetCurrentDirectory(directory);
-			}
-
-			public void Dispose()
-			{
-				Directory.SetCurrentDirectory(savedDirectory);
-			}
-		}
 	}
 }

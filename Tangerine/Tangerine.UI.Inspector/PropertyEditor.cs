@@ -275,8 +275,6 @@ namespace Tangerine.UI.Inspector
 	{
 		public TexturePropertyEditor(PropertyEditorContext context) : base(context)
 		{
-			//var editor = new EditBox { LayoutCell = new LayoutCell(Alignment.Center) };
-			// containerWidget.AddNode(editor);
 			EditBox editor;
 			Button button;
 			containerWidget.AddNode(new Widget {
