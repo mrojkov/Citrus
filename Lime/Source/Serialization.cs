@@ -8,25 +8,46 @@ namespace Lime
 	{
 		const float iPadDeserializationSpeed = 1024 * 1024;
 
-		enum OperationType
+		public enum OperationType
 		{
 			Clone,
 			Serialization
 		}
 		
-		struct Operation
+		public struct Operation
 		{
 			public OperationType Type;
 			public string SerializationPath;
+		}
+
+		public interface IDeserializer
+		{
+			object Deserialize(Stream stream, object value, Type type);
+		}
+
+		public class ProtoBufDeserializer : IDeserializer
+		{
+			readonly ProtoBuf.Meta.TypeModel typeModel;
+
+			public ProtoBufDeserializer(ProtoBuf.Meta.TypeModel typeModel)
+			{
+				this.typeModel = typeModel;
+			}
+
+			public object Deserialize(Stream stream, object value, Type type)
+			{
+				return typeModel.Deserialize(stream, value, type);
+			}
 		}
 		
 #if iOS || ANDROID
 		public static ProtoBuf.Meta.TypeModel Serializer = null;
 #else
-		public static ProtoBuf.Meta.TypeModel Serializer = CreateSerializer();
+		public static ProtoBuf.Meta.TypeModel ProtoBufTypeModel = CreateProtoBufTypeModel();
 #endif
+		public static IDeserializer Deserializer = new ProtoBufDeserializer(ProtoBufTypeModel);
 #if !iOS && !ANDROID
-		public static ProtoBuf.Meta.RuntimeTypeModel CreateSerializer()
+		public static ProtoBuf.Meta.RuntimeTypeModel CreateProtoBufTypeModel()
 		{
 			var model = ProtoBuf.Meta.RuntimeTypeModel.Create();
 			model.UseImplicitZeroDefaults = false;
@@ -81,7 +102,7 @@ namespace Lime
 		{
 			OperationStack.Push(new Operation { SerializationPath = path, Type = OperationType.Serialization });
 			try {
-				Serializer.Serialize(stream, instance);
+				ProtoBufTypeModel.Serialize(stream, instance);
 			} finally {
 				OperationStack.Pop();
 			}
@@ -106,7 +127,7 @@ namespace Lime
 		{
 			OperationStack.Push(new Operation { Type = OperationType.Clone });
 			try {
-				return (T)Serializer.DeepClone(obj);
+				return (T)ProtoBufTypeModel.DeepClone(obj);
 			} finally {
 				OperationStack.Pop();
 			}
@@ -116,7 +137,7 @@ namespace Lime
 		{
 			OperationStack.Push(new Operation { SerializationPath = path, Type = OperationType.Serialization });
 			try {
-				return (T)Serializer.Deserialize(stream, obj, typeof(T));
+				return (T)Deserializer.Deserialize(stream, obj, typeof(T));
 			} finally {
 				OperationStack.Pop();
 			}
@@ -124,7 +145,7 @@ namespace Lime
 
 		public static T ReadObject<T>(string path, object obj = null)
 		{
-			using (Stream stream = PackedAssetsBundle.Instance.OpenFileLocalized(path))
+			using (Stream stream = AssetsBundle.Instance.OpenFileLocalized(path))
 				return ReadObject<T>(path, stream, obj);
 		}
 		
@@ -142,6 +163,11 @@ namespace Lime
 				int checkSum = Toolbox.ComputeHash(memStream.GetBuffer(), (int)memStream.Length);
 				return checkSum;
 			}
+		}
+
+		public static Operation GetCurrentOperation()
+		{
+			return OperationStack.Peek();
 		}
 	}
 }
