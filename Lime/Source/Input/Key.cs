@@ -244,11 +244,16 @@ namespace Lime
 		public static readonly Key Mouse1DoubleClick = New();
 #endregion
 
-#region Miscellaneous
-		public static readonly Key Undo = New();
-		public static readonly Key Redo = New();
-		public static readonly Key SelectAll = New();
-#endregion
+		public static class Commands
+		{
+			public static readonly Key Undo = New();
+			public static readonly Key Redo = New();
+			public static readonly Key SelectAll = New();
+			public static readonly Key Cut = New();
+			public static readonly Key Copy = New();
+			public static readonly Key Paste = New();
+			public static readonly Key Delete = New();
+		}
 	}
 }
 
