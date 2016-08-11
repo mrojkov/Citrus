@@ -39,13 +39,13 @@ namespace Tangerine.UI.Timeline.Components
 			widget.CompoundPresenter.Push(new DelegatePresenter<Widget>(RenderBackground));
 		}
 
-		CustomCheckbox CreateExpandButton()
+		BitmapButton CreateExpandButton()
 		{
-			var button = new CustomCheckbox(IconPool.GetTexture("Timeline.Expanded"), IconPool.GetTexture("Timeline.Collapsed")) {
-				LayoutCell = new LayoutCell(Alignment.Center),
-			};
+			var button = new BitmapButton(Metrics.IconSize) { LayoutCell = new LayoutCell(Alignment.Center) };
 			var s = propRow.Animator.EditorState();
-			button.Updated += delta => button.Checked = s.CurvesShown;
+			button.Tasks.Add(new Property<bool>(() => s.CurvesShown).DistinctUntilChanged().Consume(i => {
+				button.DefaultTexture = IconPool.GetTexture(i ? "Timeline.Expanded" : "Timeline.Collapsed");
+			}));
 			button.Clicked += () => {
 				Core.Operations.SetGenericProperty<bool>.Perform(() => s.CurvesShown, value => s.CurvesShown = value, !s.CurvesShown);
 			};

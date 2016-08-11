@@ -16,7 +16,7 @@ namespace Tangerine.UI.Inspector
 		{
 			var objects = Inspector.Objects;
 			while (true) {
-				var selectedObjects = Document.Current.SelectedObjects;
+				var selectedObjects = Document.Current.SelectedNodes;
 				if (!objects.SequenceEqual(selectedObjects)) {
 					objects.Clear();
 					objects.AddRange(selectedObjects);

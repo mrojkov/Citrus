@@ -59,9 +59,6 @@ namespace Tangerine.UI
 
 		public int Show()
 		{
-			//rootWidget.Update(0); // Refresh its size layout
-			//window.ClientSize = rootWidget.EffectiveMinSize;
-			// window.Center();
 			window.ShowDialog();
 			return result;
 		}

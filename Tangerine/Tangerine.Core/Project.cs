@@ -13,25 +13,39 @@ namespace Tangerine.Core
 		public IReadOnlyVersionedCollection<Document> Documents => documents;
 
 		public static readonly Project Null = new Project();
+		public static Project Current { get; private set; } = Null;
+
 		public readonly string CitprojPath;
 		public readonly string UserprefsPath;
-
-		public static Project Current { get; private set; } = Null;
+		public readonly string AssetsDirectory;
 
 		private Project() { }
 
 		public Project(string citprojPath)
 		{
+			CitprojPath = citprojPath;
+			UserprefsPath = Path.ChangeExtension(citprojPath, ".userprefs");
+			AssetsDirectory = Path.Combine(Path.GetDirectoryName(CitprojPath), "Data");
+		}
+
+		public void Open()
+		{
 			if (Current != Null) {
 				throw new InvalidOperationException();
 			}
-			CitprojPath = citprojPath;
-			UserprefsPath = Path.ChangeExtension(citprojPath, ".userprefs");
+			Current = this;
+			AssetsBundle.Instance = new UnpackedAssetsBundle(AssetsDirectory);
 			if (File.Exists(UserprefsPath)) {
 				try {
 					var userprefs = Serialization.ReadObjectFromFile<Userprefs>(UserprefsPath);
 					foreach (var path in userprefs.Documents) {
-						OpenDocument(path);
+						if (AssetsBundle.Instance.FileExists(path)) {
+							try {
+								OpenDocument(path);
+							} catch (System.Exception e) {
+								Debug.Write($"Failed to open document '{path}': {e.Message}");
+							}
+						}
 					}
 					var currentDoc = documents.FirstOrDefault(d => d.Path == userprefs.CurrentDocument) ?? documents.FirstOrDefault();
 					Document.SetCurrent(currentDoc);
@@ -43,6 +57,12 @@ namespace Tangerine.Core
 
 		public bool Close()
 		{
+			if (Current != this) {
+				throw new InvalidOperationException();
+			}
+			if (Current == Null) {
+				return true;
+			}
 			var userprefs = new Userprefs();
 			if (Document.Current != null) {
 				userprefs.CurrentDocument = Document.Current.Path;
@@ -55,22 +75,8 @@ namespace Tangerine.Core
 			}
 			Serialization.WriteObjectToFile(UserprefsPath, userprefs);
 			AssetsBundle.Instance = null;
+			Current = Null;
 			return true;
-		}
-
-		public AssetsBundle GetAssetsBundle()
-		{
-			if (this == Null) {
-				return null;
-			}
-			var assetsPath = Path.Combine(Path.GetDirectoryName(CitprojPath), "Data");
-			return new UnpackedAssetsBundle(assetsPath);
-		}
-
-		public static void SetCurrent(Project proj)
-		{
-			Current = proj;
-			AssetsBundle.Instance = proj.GetAssetsBundle();
 		}
 
 		public Document OpenDocument(string path)

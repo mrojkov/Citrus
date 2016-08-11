@@ -24,17 +24,30 @@ namespace Tangerine.UI.Timeline
 
 		void HandleShortcuts(WidgetInput input)
 		{
-			input.EnableKey(Key.Undo, Document.Current.History.UndoEnabled);
-			input.EnableKey(Key.Redo, Document.Current.History.RedoEnabled);
-			input.EnableKey(Key.SelectAll, Document.Current.SelectedObjects.Count() > 0);
-			if (input.WasKeyRepeated(Key.Redo)) {
+			var hasSelection = Document.Current.SelectedNodes.Count() > 0;
+			input.EnableKey(Key.Commands.Undo, Document.Current.History.UndoEnabled);
+			input.EnableKey(Key.Commands.Redo, Document.Current.History.RedoEnabled);
+			input.EnableKey(Key.Commands.SelectAll, hasSelection);
+			input.EnableKey(Key.Commands.Cut, hasSelection);
+			input.EnableKey(Key.Commands.Copy, hasSelection);
+			input.EnableKey(Key.Commands.Paste, Timeline.Clipboard.Nodes.Count > 0);
+			input.EnableKey(Key.Commands.Delete, hasSelection);
+			if (input.WasKeyRepeated(Key.Commands.Redo)) {
 				Document.Current.History.Redo();
-			} else if (input.WasKeyRepeated(Key.Undo)) {
+			} else if (input.WasKeyRepeated(Key.Commands.Undo)) {
 				Document.Current.History.Undo();
-			} else if (input.WasKeyRepeated(Key.SelectAll)) {
+			} else if (input.WasKeyRepeated(Key.Commands.SelectAll)) {
 				foreach (var row in timeline.Rows) {
 					Operations.SelectRow.Perform(row, true);
 				}
+			} else if (input.WasKeyRepeated(Key.Commands.Cut)) {
+				Operations.Cut.Perform();
+			} else if (input.WasKeyRepeated(Key.Commands.Copy)) {
+				Operations.Copy.Perform();
+			} else if (input.WasKeyRepeated(Key.Commands.Paste)) {
+				Operations.Paste.Perform();
+			} else if (input.WasKeyRepeated(Key.Commands.Delete)) {
+				Operations.Delete.Perform();
 			}
 		}
 
@@ -42,7 +55,7 @@ namespace Tangerine.UI.Timeline
 		{
 			var doc = Document.Current;
 			if (input.WasKeyPressed(KeyBindings.Timeline.EnterNode)) {
-				var node = timeline.SelectedRows.Select(i => i.Components.Get<Components.NodeRow>()).FirstOrDefault(i => i != null).Node;
+				var node = timeline.SelectedRows.Select(i => i.Components.Get<Components.NodeRow>()).FirstOrDefault(i => i != null)?.Node;
 				if (node != null) {
 					Operations.SetCurrentContainer.Perform(node);
 				}

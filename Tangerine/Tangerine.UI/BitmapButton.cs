@@ -46,6 +46,12 @@ namespace Tangerine.UI
 			Nodes.Add(Image);
 		}
 
+		public BitmapButton(ITexture defaultTexture, Vector2 size)
+			: this(size)
+		{
+			HoverTexture = DefaultTexture = defaultTexture;
+		}
+
 		public BitmapButton(ITexture defaultTexture, ITexture hoverTexture, Vector2 size)
 			: this(size)
 		{
@@ -74,7 +80,7 @@ namespace Tangerine.UI
 
 			public void Refresh()
 			{
-				button.Image.Texture = activeAnimation == "Focus" ? button.HoverTexture : button.DefaultTexture;
+				button.Image.Texture = activeAnimation == "Focus" && button.HoverTexture != null ? button.HoverTexture : button.DefaultTexture;
 			}
 		}
 	}	

@@ -13,45 +13,89 @@ namespace Tangerine.UI.Timeline.Components
 		readonly EditBox editBox;
 		readonly Image nodeIcon;
 		readonly Widget widget;
-		readonly CustomCheckbox expandButton;
-		readonly Widget expandButtonContainer;
 
 		public RollNodeView(Row row, int indentation)
 		{
-			this.row = row;			nodeData = row.Components.Get<NodeRow>();
-			expandButton = CreateExpandButton();
-			label = new SimpleText { AutoSizeConstraints = false, LayoutCell = new LayoutCell(Alignment.Center) };			editBox = new EditBox { AutoSizeConstraints = false, LayoutCell = new LayoutCell(Alignment.Center) };			nodeIcon = new Image {				LayoutCell = new LayoutCell { Alignment = Alignment.Center },				Texture = IconPool.GetTexture("Nodes." + nodeData.Node.GetType(), "Nodes.Unknown"),
-			};			nodeIcon.MinMaxSize = (Vector2)nodeIcon.Texture.ImageSize;
-			expandButtonContainer = new Widget { 
+			this.row = row;
+			nodeData = row.Components.Get<NodeRow>();
+			label = new SimpleText { HitTestTarget = true, LayoutCell = new LayoutCell(Alignment.Center) };
+			editBox = new EditBox { AutoSizeConstraints = false, LayoutCell = new LayoutCell(Alignment.Center, stretchX: 1000) };
+			nodeIcon = new Image {
+				LayoutCell = new LayoutCell { Alignment = Alignment.Center },
+				Texture = IconPool.GetTexture("Nodes." + nodeData.Node.GetType(), "Nodes.Unknown"),
+			};
+			nodeIcon.MinMaxSize = (Vector2)nodeIcon.Texture.ImageSize;
+			var expandButtonContainer = new Widget {
 				Layout = new StackLayout { IgnoreHidden = false },
 				LayoutCell = new LayoutCell(Alignment.Center),
-				Nodes = { expandButton }
+				Nodes = { CreateExpandButton() }
 			};
-			widget = new Widget {				Padding = new Thickness { Left = 4, Right = 2 },
-				MinHeight = Metrics.TimelineDefaultRowHeight,				Layout = new HBoxLayout(),
-				HitTestTarget = true,				Nodes = {
+			widget = new Widget {
+				Padding = new Thickness { Left = 4, Right = 2 },
+				MinHeight = Metrics.TimelineDefaultRowHeight,
+				Layout = new HBoxLayout(),
+				HitTestTarget = true,
+				Nodes = {
 					new HSpacer(indentation * Metrics.TimelineRollIndentation),
 					expandButtonContainer,
 					new HSpacer(3),
-					nodeIcon,					new HSpacer(3),
+					nodeIcon,
+					new HSpacer(3),
 					label,
 					editBox,
+					new Widget(),
+					CreateEyeButton(),
+					CreateLockButton(),
 				},
-			};			widget.CompoundPresenter.Push(new DelegatePresenter<Widget>(RenderBackground));			editBox.Visible = false;			widget.Tasks.Add(MonitorDoubleClickTask());
+			};
+			widget.CompoundPresenter.Push(new DelegatePresenter<Widget>(RenderBackground));
+			editBox.Visible = false;
+			widget.Tasks.Add(MonitorDoubleClickTask());
 		}
 
-		CustomCheckbox CreateExpandButton()
+		BitmapButton CreateEyeButton()
 		{
-			var button = new CustomCheckbox(IconPool.GetTexture("Timeline.Expanded"), IconPool.GetTexture("Timeline.Collapsed")) {
-				LayoutCell = new LayoutCell(Alignment.Center),
+			var button = new BitmapButton(Metrics.IconSize) { LayoutCell = new LayoutCell(Alignment.Center) };
+			button.Tasks.Add(new Property<NodeVisibility>(() => nodeData.Visibility).DistinctUntilChanged().Consume(i => {
+				var texture = "Timeline.Dot";
+				if (i == NodeVisibility.Show) {
+					texture = "Timeline.Eye";
+				} else if (i == NodeVisibility.Hide) {
+					texture = "Timeline.Cross";
+				}
+				button.DefaultTexture = IconPool.GetTexture(texture);
+			}));
+			button.Clicked += () => {
+				Core.Operations.SetGenericProperty<NodeVisibility>.Perform(
+					() => nodeData.Visibility, value => nodeData.Visibility = value,
+					(NodeVisibility)(((int)nodeData.Visibility + 1) % 3)
+				);
 			};
-			button.Updated += delta => {
-				button.Checked = nodeData.Expanded;
-				button.Visible = nodeData.Node.Animators.Count > 0;
+			return button;
+		}
+
+		BitmapButton CreateLockButton()
+		{
+			var button = new BitmapButton(Metrics.IconSize) { LayoutCell = new LayoutCell(Alignment.Center) };
+			button.Tasks.Add(new Property<bool>(() => nodeData.Locked).DistinctUntilChanged().Consume(i => {
+				button.DefaultTexture = IconPool.GetTexture(i ? "Timeline.Lock" : "Timeline.Dot");
+			}));
+			button.Clicked += () => {
+				Core.Operations.SetGenericProperty<bool>.Perform(() => nodeData.Locked, value => nodeData.Locked = value, !nodeData.Locked);
 			};
+			return button;
+		}
+
+		BitmapButton CreateExpandButton()
+		{
+			var button = new BitmapButton(Metrics.IconSize) { LayoutCell = new LayoutCell(Alignment.Center) };
+			button.Tasks.Add(new Property<bool>(() => nodeData.Expanded).DistinctUntilChanged().Consume(i => {
+				button.DefaultTexture = IconPool.GetTexture(i ? "Timeline.Expanded" : "Timeline.Collapsed");
+			}));
 			button.Clicked += () => {
 				Core.Operations.SetGenericProperty<bool>.Perform(() => nodeData.Expanded, value => nodeData.Expanded = value, !nodeData.Expanded);
 			};
+			button.Updated += delta => button.Visible = nodeData.Node.Animators.Count > 0;
 			return button;
 		}
 
@@ -67,15 +111,19 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			while (true) {
 				label.Text = nodeData.Node.Id;
-				if (widget.Input.WasKeyPressed(Key.Mouse0DoubleClick) && widget.IsMouseOver()) {
-					Operations.ClearRowSelection.Perform();
-					Operations.SelectRow.Perform(row);
-					label.Visible = false;
-					editBox.Visible = true;
-					editBox.Text = label.Text;
-					yield return null;
-					editBox.SetFocus();
-					editBox.Tasks.Add(EditNodeIdTask());
+				if (widget.Input.WasKeyPressed(Key.Mouse0DoubleClick)) {
+					if (label.IsMouseOver()) {
+						Operations.ClearRowSelection.Perform();
+						Operations.SelectRow.Perform(row);
+						label.Visible = false;
+						editBox.Visible = true;
+						editBox.Text = label.Text;
+						yield return null;
+						editBox.SetFocus();
+						editBox.Tasks.Add(EditNodeIdTask());
+					} else if (widget.IsMouseOver()) {
+						Operations.SetCurrentContainer.Perform(row.Components.Get<NodeRow>().Node);
+					}
 				}
 				yield return null;
 			}

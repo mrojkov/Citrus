@@ -270,4 +270,46 @@ namespace Tangerine.UI.Inspector
 			}
 		}
 	}
+
+	class TexturePropertyEditor<T> : CommonPropertyEditor
+	{
+		public TexturePropertyEditor(PropertyEditorContext context) : base(context)
+		{
+			//var editor = new EditBox { LayoutCell = new LayoutCell(Alignment.Center) };
+			// containerWidget.AddNode(editor);
+			EditBox editor;
+			Button button;
+			containerWidget.AddNode(new Widget {
+				Layout = new HBoxLayout(),
+				Nodes = {
+					(editor = new EditBox { LayoutCell = new LayoutCell(Alignment.Center) }),
+					new HSpacer(4),
+					(button = new Button {
+						Text = "...",
+						MinMaxWidth = 20
+					})
+				}
+			});
+			button.Clicked += () => {
+				var dlg = new FileDialog { AllowedFileTypes = new string[] { "png" }, Mode = FileDialogMode.Open };
+				if (dlg.RunModal()) {
+					if (!dlg.FileName.StartsWith(Project.Current.AssetsDirectory)) {
+						var alert = new AlertDialog("Tangerine", "Can't open an assset outside the project assets directory", "Ok");
+						alert.Show();
+					} else {
+						var path = System.IO.Path.ChangeExtension(dlg.FileName.Substring(Project.Current.AssetsDirectory.Length + 1), null);
+						foreach (var obj in context.Objects) {
+							Core.Operations.SetAnimableProperty.Perform(obj, context.PropertyName, new SerializableTexture(path));
+						}
+					}
+				}
+			};
+			OnKeyframeToggle += editor.SetFocus;
+			foreach (var obj in context.Objects) {
+				var editorValue = EditBoxSubmittedText(editor).Select(i => (ITexture)new SerializableTexture(i));
+				editor.Tasks.Add(new AnimablePropertyBinding<ITexture>(obj, context.PropertyName, editorValue));
+			}
+			editor.Tasks.Add(new EditBoxBinding(editor, CoalescedPropertyValue<ITexture>(context).DistinctUntilChanged().Select(i => i != null ? i.SerializationPath : "")));
+		}
+	}
 }

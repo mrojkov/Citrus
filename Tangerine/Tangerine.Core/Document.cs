@@ -7,9 +7,9 @@ using Lime;
 
 namespace Tangerine.Core
 {
-	public interface ISelectedObjectsProvider
+	public interface ISelectedNodesProvider
 	{
-		IEnumerable<object> Get();
+		IEnumerable<Node> Get();
 	}
 
 	public interface IDocumentView
@@ -29,19 +29,17 @@ namespace Tangerine.Core
 
 		public static Action ViewsBuilder;
 		
-		public static readonly Document Null = new Document { ReadOnly = true };
 		public static Document Current { get; private set; }
 
 		public string Path { get; private set; }
 		public readonly DocumentHistory History;
-		public bool ReadOnly { get; private set; }
 		public bool IsModified => History.IsDocumentModified;
 
 		public static Func<Document, CloseAction> Closing;
 
 		public Node RootNode { get; private set; }
 		public Node Container { get; set; }
-		public IEnumerable<object> SelectedObjects => SelectedObjectsProvider.Get();
+		public IEnumerable<Node> SelectedNodes => SelectedNodesProvider.Get();
 
 		private bool viewsCreated;
 		public readonly List<IDocumentView> Views = new List<IDocumentView>();
@@ -53,7 +51,7 @@ namespace Tangerine.Core
 		}
 
 		public string AnimationId { get; set; }
-		public ISelectedObjectsProvider SelectedObjectsProvider { get; set; }
+		public ISelectedNodesProvider SelectedNodesProvider { get; set; }
 
 		public Document()
 		{
@@ -63,14 +61,8 @@ namespace Tangerine.Core
 		public Document(string path) : this()
 		{
 			Path = path;
-			ReadOnly = IsFileReadonly(path);
-			RootNode = new Orange.HotSceneImporter(path).ParseNode();
+			RootNode = Serialization.ReadObject<Node>(path);
 			Container = RootNode;
-		}
-
-		private static bool IsFileReadonly(string path)
-		{
-			return (File.GetAttributes(path) & FileAttributes.ReadOnly) != 0;
 		}
 
 		public void MakeCurrent()
@@ -129,6 +121,22 @@ namespace Tangerine.Core
 
 		public void Save()
 		{
+		}
+
+		struct DirectoryChanger : IDisposable
+		{
+			readonly string savedDirectory;
+
+			public DirectoryChanger(string directory)
+			{
+				savedDirectory = Directory.GetCurrentDirectory();
+				Directory.SetCurrentDirectory(directory);
+			}
+
+			public void Dispose()
+			{
+				Directory.SetCurrentDirectory(savedDirectory);
+			}
 		}
 	}
 }

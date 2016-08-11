@@ -59,6 +59,7 @@
     <Folder Include="Docking\" />
     <Folder Include="Binding\" />
     <Folder Include="Dialogs\" />
+    <Folder Include="SearchPanel\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -68,7 +69,6 @@
     <Compile Include="Utils\KeyframePalette.cs" />
     <Compile Include="Utils\HSpacer.cs" />
     <Compile Include="Utils\Colors.cs" />
-    <Compile Include="Utils\CustomCheckbox.cs" />
     <Compile Include="Docking\DockManager.cs" />
     <Compile Include="Metrics.cs" />
     <Compile Include="Docking\DockPanel.cs" />
@@ -82,6 +82,7 @@
     <Compile Include="Utils\WidgetKeyHandler.cs" />
     <Compile Include="Dialogs\AlertDialog.cs" />
     <Compile Include="Dialogs\ColorPickerDialog.cs" />
+    <Compile Include="SearchPanel\SearchPanel.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

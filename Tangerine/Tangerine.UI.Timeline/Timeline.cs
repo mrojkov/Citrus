@@ -6,8 +6,13 @@ using System.Collections.Generic;
 
 namespace Tangerine.UI.Timeline
 {
-	public class Timeline : ISelectedObjectsProvider, IDocumentView
+	public class Timeline : ISelectedNodesProvider, IDocumentView
 	{
+		public static class Clipboard
+		{
+			public static List<Node> Nodes = new List<Node>();
+		}
+
 		public static Timeline Instance { get; private set; }
 			
 		private readonly Dictionary<Uid, Row> RowCache = new Dictionary<Uid, Row>();
@@ -42,7 +47,7 @@ namespace Tangerine.UI.Timeline
 			PanelWidget = panelWidget;
 			CreateProcessors();
 			InitializeWidgets();
-			Document.Current.SelectedObjectsProvider = this;
+			Document.Current.SelectedNodesProvider = this;
 			// SelectFirstRow();
 		}
 
@@ -92,6 +97,7 @@ namespace Tangerine.UI.Timeline
 			var tasks = RootWidget.LateTasks; // Use LateTasks in order to process splitters first
 			tasks.Add(new IProcessor[] {
 				new BuildRowsProcessor(),
+				new UnselectUnlinkedNodesProcessor(),
 				new ColumnCountProcessor(),
 				new BuildRowViewsProcessor(),
 				new RollWidgetsProcessor(),
@@ -113,7 +119,7 @@ namespace Tangerine.UI.Timeline
 			});
 		}
 
-		IEnumerable<object> ISelectedObjectsProvider.Get()
+		IEnumerable<Node> ISelectedNodesProvider.Get()
 		{
 			foreach (var i in SelectedRows) {
 				var n = i.Components.Get<Components.NodeRow>()?.Node;

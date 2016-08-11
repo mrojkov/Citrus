@@ -5,20 +5,12 @@ using Tangerine.Core;
 
 namespace Tangerine
 {
-	public class AppDelegate : NSApplicationDelegate
-	{
-		public override void DidFinishLaunching(NSNotification notification)
-		{
-			TangerineApp.Initialize();
-		}
-	}
-	
 	static class MainClass
 	{
 		static void Main(string[] args)
 		{
 			Lime.Application.Initialize();
-			NSApplication.SharedApplication.Delegate = new AppDelegate();
+			NSApplication.SharedApplication.DidFinishLaunching += (sender, e) => TangerineApp.Initialize();
 			Lime.Application.Run();
 		}
 	}

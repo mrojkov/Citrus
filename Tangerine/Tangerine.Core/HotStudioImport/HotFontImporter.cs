@@ -117,15 +117,19 @@ namespace Orange
 			}
 		}
 
-		public Font ParseFont(string srcPath, string dstPath)
+		public Font ParseFont(Stream stream)
 		{
-			this.textureSize = GetTextureSize(srcPath);
-			this.lexer = CreateLexer(srcPath);
+			var path = Serialization.GetCurrentOperation().SerializationPath;
+			this.textureSize = GetTextureSize(path);
+			using(var reader = new StreamReader(stream)) {
+				string text = reader.ReadToEnd();
+				lexer = new HotLexer(text);
+			}
 			var type = lexer.ParseQuotedString();
 			if (type != "Hot::Font")
 				throw new Exception("Unknown type of object '{0}'", type);
 			var font = new Font();
-			AddFontTextures(font, srcPath, dstPath);
+			AddFontTextures(font, path);
 			lexer.ParseToken('{');
 			while (lexer.PeekChar() != '}')
 				ParseFontProperty(font, lexer.ParseWord());
@@ -133,26 +137,16 @@ namespace Orange
 			return font;
 		}
 
-		private static void AddFontTextures(Font font, string srcPath, string dstPath)
+		private static void AddFontTextures(Font font, string path)
 		{
 			for (var i = 0; ; i++) {
-				var texturePath = Path.ChangeExtension(dstPath, null);
+				var texturePath = Path.ChangeExtension(path, null);
 				var index = (i == 0) ? "" : i.ToString("00");
-				var texturePng = Path.ChangeExtension(srcPath, null) + index + ".png";
-				if (!File.Exists(texturePng)) {
+				var texturePng = Path.ChangeExtension(path, null) + index + ".png";
+				if (!AssetsBundle.Instance.FileExists(texturePng)) {
 					break;
 				}
 				font.Textures.Add(new SerializableTexture(texturePath + index));
-			}
-		}
-
-		private static HotLexer CreateLexer(string path)
-		{
-			using (Stream stream = new FileStream(path, FileMode.Open)) {
-				using (TextReader reader = new StreamReader(stream)) {
-					var text = reader.ReadToEnd();
-					return new HotLexer(path, text);
-				}
 			}
 		}
 
@@ -171,7 +165,7 @@ namespace Orange
 		{
 			width = height = 0;
 			hasAlpha = false;
-			using(var stream = new FileStream(path, FileMode.Open)) {
+			using(var stream = AssetsBundle.Instance.OpenFile(path)) {
 				using(var reader = new BinaryReader(stream)) {
 					byte[] sign = reader.ReadBytes(8); // PNG signature
 					if (sign[1] != 'P' || sign[2] != 'N' || sign[3] != 'G')

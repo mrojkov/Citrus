@@ -40,51 +40,6 @@ namespace Tangerine
 		}
 	}
 
-	public class OpenProjectCommand : Command
-	{
-		public OpenProjectCommand()
-		{
-			Text = "Open Project...";
-			Shortcut = KeyBindings.Generic.OpenProject;
-		}
-
-		public override void Execute()
-		{
-			var dlg = new FileDialog { AllowedFileTypes = new string[] { "citproj" }, Mode = FileDialogMode.Open };
-			if (dlg.RunModal()) {
-				if (Project.Current == null || Project.Current.Close()) {
-					Project.SetCurrent(new Project(dlg.FileName));
-					var prefs = TangerineApp.Instance.Preferences;
-					prefs.RecentProjects.Remove(dlg.FileName);
-					prefs.RecentProjects.Insert(0, dlg.FileName);
-					prefs.Save();
-				}
-			}
-		}
-	}
-
-	public class OpenFileCommand : Command
-	{
-		public OpenFileCommand()
-		{
-			Text = "Open File...";
-			Shortcut = KeyBindings.Generic.OpenFile;
-		}
-
-		public override void Execute()
-		{
-			var dlg = new FileDialog { AllowedFileTypes = new string[] { "scene" }, Mode = FileDialogMode.Open };
-			if (dlg.RunModal()) {
-				Project.Current.OpenDocument(dlg.FileName);
-			}
-		}
-
-		public override void Refresh()
-		{
-			Enabled = Project.Current != null;
-		}
-	}
-
 	public class PreferencesCommand : Command
 	{
 		public PreferencesCommand()
@@ -99,54 +54,12 @@ namespace Tangerine
 		}
 	}
 
-	public class NextDocumentCommand : Command
-	{
-		public NextDocumentCommand()
-		{
-			Text = "Next Document";
-			Shortcut = KeyBindings.Generic.NextDocument;
-		}
-
-		public override void Execute()
-		{
-			Project.Current.NextDocument();
-		}
-	}
-
-	public class PreviousDocumentCommand : Command
-	{
-		public PreviousDocumentCommand()
-		{
-			Text = "Previous Document";
-			Shortcut = KeyBindings.Generic.PreviousDocument;
-		}
-
-		public override void Execute()
-		{
-			Project.Current.PreviousDocument();
-		}
-	}
-
-	public class CloseDocumentCommand : Command
-	{
-		public CloseDocumentCommand()
-		{
-			Text = "Close Document";
-			Shortcut = KeyBindings.Generic.CloseDocument;
-		}
-
-		public override void Execute()
-		{
-			if (Document.Current != null) {
-				Project.Current.CloseDocument(Document.Current);
-			}
-		}
-	}
-
 	public class TangerineApp
 	{
 		public static TangerineApp Instance { get; private set; }
 
+		public readonly DockManager DockManager;
+		public readonly DockManager.State DockManagerInitialState;
 		public UserPreferences Preferences = new UserPreferences();
 
 		public static void Initialize()
@@ -154,32 +67,51 @@ namespace Tangerine
 			Instance = new TangerineApp();
 		}
 
-		public Menu ViewMenu { get; private set; }
+		public Menu PadsMenu { get; private set; }
+
+		class Deserializer : Serialization.IDeserializer
+		{
+			public object Deserialize(System.IO.Stream stream, object value, Type type)
+			{
+				if (type == typeof(Node)) {
+					return new Orange.HotSceneImporter(stream).ParseNode();
+				} else if (type == typeof(Font)) {
+					return new Orange.HotFontImporter().ParseFont(stream);
+				} else {
+					return new Serialization.ProtoBufDeserializer(Serialization.ProtoBufTypeModel).Deserialize(stream, value, type);
+				}
+			}
+		}
 
 		private TangerineApp()
 		{
+			Lime.Serialization.Deserializer = new Deserializer();
+
 			Widget.DefaultWidgetSize = Vector2.Zero;
 			CreateMainMenu();
 			Theme.Current = new DesktopTheme();
 			LoadFont();
 
-			var dockManager = new UI.DockManager(new Vector2(1024, 768), ViewMenu);
-			dockManager.Closing += () => Project.Current == null || Project.Current.Close();
-			dockManager.Closed += () => {
-				Preferences.DockState = dockManager.ExportState();
+			DockManager = new UI.DockManager(new Vector2(1024, 768), PadsMenu);
+			Application.Exiting += () => Project.Current.Close();
+			Application.Exited += () => {
+				Preferences.DockState = DockManager.ExportState();
 				Preferences.Save();
 			};
 			var timelinePanel = new UI.DockPanel("Timeline");
 			var inspectorPanel = new UI.DockPanel("Inspector");
 			var consolePanel = new UI.DockPanel("Console");
-			dockManager.AddPanel(timelinePanel, UI.DockSite.Top, new Vector2(800, 300));
-			dockManager.AddPanel(inspectorPanel, UI.DockSite.Left, new Vector2(400, 700));
-			dockManager.AddPanel(consolePanel, UI.DockSite.Right, new Vector2(400, 700));
-			var documentViewContainer = InitializeDocumentArea(dockManager);
+			var searchPanel = new UI.DockPanel("SearchPanel");
+			DockManager.AddPanel(timelinePanel, UI.DockSite.Top, new Vector2(800, 300));
+			DockManager.AddPanel(inspectorPanel, UI.DockSite.Left, new Vector2(300, 700));
+			DockManager.AddPanel(searchPanel, UI.DockSite.Right, new Vector2(300, 700));
+			DockManager.AddPanel(consolePanel, UI.DockSite.Right, new Vector2(300, 700));
+			DockManagerInitialState = DockManager.ExportState();
+			var documentViewContainer = InitializeDocumentArea(DockManager);
 
 			Preferences = new UserPreferences();
 			Preferences.Load();
-			dockManager.ImportState(Preferences.DockState);
+			DockManager.ImportState(Preferences.DockState);
 			Document.Closing += doc => {
 				var alert = new AlertDialog("Tangerine", $"Save the changes to document '{doc.Path}' before closing?", "Yes", "No", "Cancel");
 				switch (alert.Show()) {
@@ -194,10 +126,11 @@ namespace Tangerine
 				doc.Views.Add(new UI.Timeline.Timeline(timelinePanel.ContentWidget));
 				doc.Views.Add(new UI.SceneView.SceneView(documentViewContainer));
 				doc.Views.Add(new UI.Console(consolePanel.ContentWidget));
+				doc.Views.Add(new UI.SearchPanel(searchPanel.ContentWidget));
 				doc.History.Changed += () => CommonWindow.Current.Invalidate();
 			};
 			if (Preferences.RecentProjects.Count > 0) {
-				Project.SetCurrent(new Project(Preferences.RecentProjects[0]));
+				new Project(Preferences.RecentProjects[0]).Open();
 			}
 		}
 
@@ -262,30 +195,43 @@ namespace Tangerine
 				new Command("Application", new Shortcut(Modifiers.Command, Key.Q)) {
 					Submenu = new Menu {
 						new PreferencesCommand(),
+						Command.MenuSeparator, 
 						new DelegateCommand("Quit", new Shortcut(Modifiers.Command, Key.Q), Application.Exit),
 					}
 				},
 				new Command("File") {
 					Submenu = new Menu {
 						new OpenFileCommand(),
-						new OpenProjectCommand()
+						new OpenProjectCommand(),
+						Command.MenuSeparator,
+						new CloseDocumentCommand(),
 					}
 				},
 				new Command("Edit") {
 					Submenu = new Menu {
-						new KeySendingCommand("Undo", new Shortcut(Modifiers.Command, Key.Z), Key.Undo),
-						new KeySendingCommand("Redo", new Shortcut(Modifiers.Command | Modifiers.Shift, Key.Z), Key.Redo),
-						new KeySendingCommand("Select All", new Shortcut(Modifiers.Command, Key.A), Key.SelectAll),
+						new KeySendingCommand("Undo", new Shortcut(Modifiers.Command, Key.Z), Key.Commands.Undo),
+						new KeySendingCommand("Redo", new Shortcut(Modifiers.Command | Modifiers.Shift, Key.Z), Key.Commands.Redo),
+						Command.MenuSeparator,
+						new KeySendingCommand("Cut", new Shortcut(Modifiers.Command, Key.X), Key.Commands.Cut),
+						new KeySendingCommand("Copy", new Shortcut(Modifiers.Command, Key.C), Key.Commands.Copy),
+						new KeySendingCommand("Paste", new Shortcut(Modifiers.Command, Key.V), Key.Commands.Paste),
+						new KeySendingCommand("Delete", Key.Delete, Key.Commands.Delete),
+						Command.MenuSeparator,
+						new KeySendingCommand("Select All", new Shortcut(Modifiers.Command, Key.A), Key.Commands.SelectAll),
 					}
 				},
 				new Command("View") {
-					Submenu = (ViewMenu = new Menu { })
+					Submenu = new Menu {
+						new DefaultLayoutCommand(),
+						new Command("Pads") {
+							Submenu = (PadsMenu = new Menu())
+						}
+					}
 				},
 				new Command("Window") {
 					Submenu = new Menu {
 						new NextDocumentCommand(),
 						new PreviousDocumentCommand(),
-						new CloseDocumentCommand(),
 					}
 				},
 			};

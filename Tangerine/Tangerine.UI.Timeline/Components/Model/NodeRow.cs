@@ -11,8 +11,8 @@ namespace Tangerine.UI.Timeline.Components
 	public class NodeRow : IComponent
 	{
 		public Node Node { get; private set; }
-		public bool Visible { get { return Node.EditorState().Visible; } set { Node.EditorState().Visible = value; } }
-		public bool Hidden { get { return Node.EditorState().Hidden; } set { Node.EditorState().Hidden = value; } }
+		public NodeVisibility Visibility { get { return Node.EditorState().Visibility; } set { Node.EditorState().Visibility = value; } }
+		public bool Locked { get { return Node.EditorState().Locked; } set { Node.EditorState().Locked = value; } }
 		public bool Expanded { get { return Node.EditorState().Expanded; } set { Node.EditorState().Expanded = value; } }
 
 		public NodeRow(Node node)

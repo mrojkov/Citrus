@@ -22,14 +22,12 @@ namespace Orange
 		protected HotLexer lexer;
 		protected List<KnownActorType> knownActorTypes;
 
-		public HotSceneImporter(string path)
+		public HotSceneImporter(Stream stream)
 		{
 			RegisterKnownActorTypes();
-			using(Stream stream = new FileStream(path, FileMode.Open)) {
-				using(TextReader reader = new StreamReader(stream)) {
-					string text = reader.ReadToEnd();
-					lexer = new HotLexer(path, text);
-				}
+			using (TextReader reader = new StreamReader(stream)) {
+				string text = reader.ReadToEnd();
+				lexer = new HotLexer(text);
 			}
 		}
 
@@ -691,7 +689,6 @@ namespace Orange
 			switch (name) {
 			case "Position":
 				throw new Exception("`Position` property of spline point must not be used. Use `Anchor` instead.");
-				break;
 			case "Anchor":
 				point.Position = lexer.ParseVector2();
 				break;
@@ -938,7 +935,6 @@ namespace Orange
 			switch (name) {
 			case "Position":
 				throw new Exception("`Position` property of emitter shape point must not be used. Use `Anchor` instead.");
-				break;
 			case "Anchor":
 				point.Position = lexer.ParseVector2();
 				break;

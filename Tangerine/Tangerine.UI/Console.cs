@@ -18,7 +18,8 @@ namespace Tangerine.UI
 			PanelWidget = rootWidget;
 			RootWidget = new Frame { Layout = new StackLayout { VerticallySizeable = true } };
 			ContentWidget = new ScrollView(RootWidget).Content;
-			InitializeWidgets();
+			ContentWidget.Layout = new VBoxLayout { Tag = "ConsoleContent", Spacing = 4 };
+			ContentWidget.Padding = new Thickness(4);
 			Logger.OnWrite += text => {
 				var widget = new SimpleText {
 					Text = $"{DateTime.Now.ToString("hh:mm:ss")} {text}",
@@ -43,12 +44,6 @@ namespace Tangerine.UI
 		{
 			Instance = null;
 			RootWidget.Unlink();
-		}
-
-		void InitializeWidgets()
-		{
-			ContentWidget.Layout = new VBoxLayout { Tag = "ConsoleContent", Spacing = 4 };
-			ContentWidget.Padding = new Thickness(4);
 		}
 	}
 }

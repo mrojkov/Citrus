@@ -7,14 +7,12 @@ namespace Orange
 {
 	public class HotLexer
 	{
-		string sourcePath;
 		string text;
 		int position = 0;
 		NumberFormatInfo numberFormat = new CultureInfo("en-US", false).NumberFormat;
 
-		public HotLexer(string sourcePath, string text)
+		public HotLexer(string text)
 		{
-			this.sourcePath = sourcePath;
 			this.text = text;
 		}
 
@@ -311,10 +309,10 @@ namespace Orange
 				return path;
 			else if (path[0] == '/' || path[0] == '\\')
 				path = path.Substring(1);
-			else {
-				string d = Path.GetDirectoryName(sourcePath);
-				path = Path.Combine(d, path);
-			}
+			//else {
+			//	string d = Path.GetDirectoryName(sourcePath);
+			//	path = Path.Combine(d, path);
+			//}
 			path = Path.ChangeExtension(path, null);
 			path = path.Replace('\\', '/');
 			return path;

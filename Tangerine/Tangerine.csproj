@@ -88,6 +88,9 @@
     <Compile Include="TangerineApp.cs" />
     <Compile Include="Main.Mac.cs" />
     <Compile Include="PreferencesDialog\PreferencesDialog.cs" />
+    <Compile Include="MainMenu\WindowMenu.cs" />
+    <Compile Include="MainMenu\FileMenu.cs" />
+    <Compile Include="MainMenu\ViewMenu.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
@@ -197,5 +200,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="PreferencesDialog\" />
+    <Folder Include="MainMenu\" />
   </ItemGroup>
 </Project>

@@ -24,19 +24,15 @@ namespace Tangerine.UI
 
 		public readonly Widget DocumentArea;
 
-		public event Func<bool> Closing;
-		public event Action Closed;
-
 		public DockManager(Vector2 windowSize, Menu padsMenu)
 		{
 			this.padsMenu = padsMenu;
 			var window = new Window(new WindowOptions { ClientSize = windowSize, FixedSize = false, RefreshRate = 30, Title = "Tangerine" });
-			window.Closing += () => Closing();
-			window.Closed += () => Closed();
 			mainWidget = new InvalidableWindowWidget(window) {
 				Id = "MainWindow",
 				Layout = new HBoxLayout(),
 				Padding = new Thickness(4),
+				Size = windowSize,
 				RedrawMarkVisible = true
 			};
 			new TabTraverseController(mainWidget);
@@ -51,7 +47,7 @@ namespace Tangerine.UI
 		{
 			padsMenu.Add(new DelegateCommand(panel.Title, () => ShowPanel(panel)));
 			padsMenu.Refresh();
-			var dockedSize = mainWidget.Size / size;
+			var dockedSize = CalcDockedSize(site, size);
 			panel.Placement = new DockPanel.PanelPlacement { Title = panel.Title, Site = site, DockedSize = dockedSize, Docked = true, UndockedSize = size };
 			panels.Add(panel);
 			var db = new DockPanel.DragBehaviour(mainWidget, panel);
@@ -78,6 +74,11 @@ namespace Tangerine.UI
 				Refresh();
 			};
 			Refresh();
+		}
+
+		private Vector2 CalcDockedSize(DockSite site, Vector2 size)
+		{
+			return size / mainWidget.Size;
 		}
 
 		void ShowPanel(DockPanel panel)
@@ -181,19 +182,16 @@ namespace Tangerine.UI
 			return state;
 		}
 
-		public void ImportState(State state)
+		public void ImportState(State state, bool resizeMainWindow = true)
 		{
-			if (state.MainWindowSize != Vector2.Zero) {
+			if (resizeMainWindow && state.MainWindowSize != Vector2.Zero) {
 				mainWidget.Window.ClientSize = state.MainWindowSize;
 				mainWidget.Window.ClientPosition = state.MainWindowPosition;
 			}
-			var allPanels = panels.ToList();
-			panels.Clear();
-			foreach (var s in state.PanelPlacements) {
-				var p = allPanels.FirstOrDefault(i => i.Title == s.Title);
-				if (p != null) {
-					p.Placement = s;
-					panels.Add(p);
+			foreach (var p in panels) {
+				var pp = state.PanelPlacements.FirstOrDefault(i => i.Title == p.Title);
+				if (pp != null) {
+					p.Placement = pp;
 				}
 			}
 			Refresh();

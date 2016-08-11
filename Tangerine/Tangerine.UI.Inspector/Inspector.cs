@@ -19,8 +19,9 @@ namespace Tangerine.UI.Inspector
 		public readonly Widget ScrollableWidget;
 		public readonly List<object> Objects;
 		public readonly Dictionary<Type, PropertyEditorBuilder> EditorMap;
-		public readonly TaskList Tasks = new TaskList();
 		public readonly List<IPropertyEditor> Editors;
+
+		public TaskList Tasks => RootWidget.Tasks;
 
 		public void Attach()
 		{
@@ -38,7 +39,6 @@ namespace Tangerine.UI.Inspector
 		{
 			PanelWidget = panelWidget;
 			RootWidget = new Frame();
-			RootWidget.Updating += Update;
 			ScrollableWidget = new ScrollView((Frame)RootWidget).Content;
 			Objects = new List<object>();
 			EditorMap = new Dictionary<Type, PropertyEditorBuilder>();
@@ -65,16 +65,12 @@ namespace Tangerine.UI.Inspector
 			EditorMap.Add(typeof(Blending), c => new EnumPropertyEditor<Blending>(c));
 			EditorMap.Add(typeof(Anchors), c => new EnumPropertyEditor<Anchors>(c));
 			EditorMap.Add(typeof(RenderTarget), c => new EnumPropertyEditor<RenderTarget>(c));
+			EditorMap.Add(typeof(ITexture), c => new TexturePropertyEditor<ITexture>(c));
 		}
 
 		void CreateTasks()
 		{
 			Tasks.Add(new UpdatePropertyGridProcessor());
-		}
-
-		void Update(float delta)
-		{
-			Tasks.Update(delta);
 		}
 	}
 }
