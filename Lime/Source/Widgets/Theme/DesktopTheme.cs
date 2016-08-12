@@ -488,7 +488,7 @@ namespace Lime
 			}
 		}
 
-		class TabCloseButton : Button
+		public class TabCloseButton : Button
 		{
 		}
 
