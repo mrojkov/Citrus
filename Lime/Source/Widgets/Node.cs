@@ -26,6 +26,16 @@ namespace Lime
 		}
 	}
 
+	[Flags]
+	public enum TangerineFlags
+	{
+		None = 0,
+		Shown = 1,
+		Hidden = 2,
+		Locked = 4,
+		Expanded = 8
+	}
+
 	public delegate void UpdateHandler(float delta);
 
 	/// <summary>
@@ -52,6 +62,7 @@ namespace Lime
 			Visible   = 1 << 0,
 			Color     = 1 << 1,
 			Transform = 1 << 2,
+			TangerineFlags = 1 << 3,
 			All       = ~None
 		}
 
@@ -91,6 +102,7 @@ namespace Lime
 		/// </summary>
 		[Trigger]
 		[Tangerine(1)]
+		[ProtoMember(3)]
 		public string Trigger { get; set; }
 
 		private Node parent;
@@ -108,7 +120,33 @@ namespace Lime
 			}
 		}
 
-		public BitSet32 TangerineFlags;
+		private TangerineFlags tangerineFlags;
+
+		public TangerineFlags TangerineFlags
+		{
+			get { return tangerineFlags; }
+			set
+			{
+				if (tangerineFlags != value) {
+					tangerineFlags = value;
+					PropagateDirtyFlags(DirtyFlags.TangerineFlags);
+				}
+			}
+		}
+
+		public bool GetTangerineFlag(TangerineFlags flag)
+		{
+			return (tangerineFlags & flag) != 0;
+		}
+
+		public void SetTangerineFlag(TangerineFlags flag, bool value)
+		{
+			if (value) {
+				TangerineFlags |= flag;
+			} else {
+				TangerineFlags &= ~flag;
+			}
+		}
 
 		protected virtual void OnParentChanged(Node oldParent) { }
 

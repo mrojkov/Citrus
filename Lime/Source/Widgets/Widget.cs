@@ -574,11 +574,8 @@ namespace Lime
 		{
 			get
 			{
-				if ((DirtyMask & (DirtyFlags.Visible | DirtyFlags.Color)) == 0) {
+				if ((DirtyMask & (DirtyFlags.Visible | DirtyFlags.Color | DirtyFlags.TangerineFlags)) == 0) {
 					return globallyVisible;
-				}
-				if (!visible || color.A == 0) {
-					return false;
 				}
 				RecalcDirtyGlobals();
 				return globallyVisible;
@@ -819,6 +816,10 @@ namespace Lime
 			globalBlending = Blending;
 			globalShader = Shader;
 			globallyVisible = Visible && color.A != 0;
+			if (Application.IsTangerine) {
+				globallyVisible |= GetTangerineFlag(TangerineFlags.Shown);
+				globallyVisible &= !GetTangerineFlag(TangerineFlags.Hidden);
+			}
 			localToWorldTransform = CalcLocalToParentTransform();
 			if (Parent != null) {
 				var parentWidget = Parent.AsWidget;
