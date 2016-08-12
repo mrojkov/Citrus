@@ -232,6 +232,21 @@ namespace Tangerine.Core
 			return new Consumer<T>(arg.GetDataflow(), action);
 		}
 
+		public static T GetValue<T>(this IDataflowProvider<T> arg)
+		{
+			var dataflow = arg.GetDataflow();
+			dataflow.Poll();
+			return dataflow.Value;
+		}
+
+		public static bool TryGetValue<T>(this IDataflowProvider<T> arg, out T result)
+		{
+			var dataflow = arg.GetDataflow();
+			dataflow.Poll();
+			result = dataflow.GotValue ? dataflow.Value : default(T);
+			return dataflow.GotValue;
+		}
+
 		class SelectProvider<T, R> : IDataflow<R>
 		{
 			readonly IDataflow<T> arg;
@@ -424,14 +439,6 @@ namespace Tangerine.Core
 				this.action = action;
 			}
 
-			public void Execute()
-			{
-				dataflow.Poll();
-				if (dataflow.GotValue) {
-					action(dataflow.Value);
-				}
-			}
-
 			public IEnumerator<object> Loop()
 			{
 				try {
@@ -441,6 +448,14 @@ namespace Tangerine.Core
 					}
 				} finally {
 					dataflow.Dispose();
+				}
+			}
+
+			void Execute()
+			{
+				dataflow.Poll();
+				if (dataflow.GotValue) {
+					action(dataflow.Value);
 				}
 			}
 		}
