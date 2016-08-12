@@ -88,7 +88,8 @@ namespace Lime
 			Frame.HitTestTarget = true;
 			Frame.ClipChildren = ClipMethod.ScissorTest;
 			CanScroll = true;
-			Content = new ScrollViewContentWidget() { ScrollDirection = ScrollDirection };
+			Content = CreateContentWidget();
+			Content.ScrollDirection = ScrollDirection;
 			if (ScrollDirection == ScrollDirection.Vertical) {
 				Content.Width = Frame.Width;
 				Content.Height = 0;
@@ -165,6 +166,11 @@ namespace Lime
 			if (!IsBeingRefreshed) {
 				SetProjectedPosition(Content, -value);
 			}
+		}
+
+		protected virtual ScrollViewContentWidget CreateContentWidget()
+		{
+			return new ScrollViewContentWidget();
 		}
 
 		public void ScrollTo(float position, bool instantly = false)
@@ -438,7 +444,7 @@ namespace Lime
 				}
 			}
 
-			public bool IsItemOnscreen(Widget item)
+			public virtual bool IsItemOnscreen(Widget item)
 			{
 				var frame = Parent.AsWidget;
 				if (ScrollDirection == ScrollDirection.Vertical) {
@@ -452,7 +458,7 @@ namespace Lime
 				}
 			}
 
-			public bool IsItemFullyOnscreen(Widget item)
+			public virtual bool IsItemFullyOnscreen(Widget item)
 			{
 				var frame = Parent.AsWidget;
 				if (ScrollDirection == ScrollDirection.Vertical) {
