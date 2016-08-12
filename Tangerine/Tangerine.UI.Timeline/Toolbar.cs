@@ -13,11 +13,14 @@ namespace Tangerine.UI.Timeline
 		public Toolbar()
 		{
 			RootWidget = new Widget {
+				Padding = new Thickness { Left = 4, Right = 2 },
 				MinMaxHeight = Metrics.ToolbarHeight,
 				MinWidth = Metrics.ToolbarMinWidth,
 				Presenter = new DelegatePresenter<Widget>(Render),
 				Layout = new HBoxLayout(),
 				Nodes = {
+					CreateAnimationModeButton(),
+					CreateAutoKeyframesButton(),
 					new Widget(),
 					CreateEyeButton(),
 					CreateLockButton()
@@ -31,16 +34,40 @@ namespace Tangerine.UI.Timeline
 			Renderer.DrawVerticalGradientRect(Vector2.Zero, widget.Size, Colors.Toolbar); 
 		}
 
-		BitmapButton CreateEyeButton()
+		ToolbarButton CreateAnimationModeButton()
 		{
-			var button = new BitmapButton(IconPool.GetTexture("Timeline.Eye"), Metrics.IconSize) {
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.AnimationMode")) {
+				LayoutCell = new LayoutCell(Alignment.Center)
+			};
+			button.Tasks.Add(new Property<bool>(() => UserPreferences.Instance.AnimationMode).DistinctUntilChanged().Consume(i => button.Checked = i));
+			button.Clicked += () => {
+				UserPreferences.Instance.AnimationMode = !UserPreferences.Instance.AnimationMode;
+			};
+			return button;
+		}
+
+		ToolbarButton CreateAutoKeyframesButton()
+		{
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.Key")) {
+				LayoutCell = new LayoutCell(Alignment.Center)
+			};
+			button.Tasks.Add(new Property<bool>(() => UserPreferences.Instance.AutoKeyframes).DistinctUntilChanged().Consume(i => button.Checked = i));
+			button.Clicked += () => {
+				UserPreferences.Instance.AutoKeyframes = !UserPreferences.Instance.AutoKeyframes;
+			};
+			return button;
+		}
+
+		ToolbarButton CreateEyeButton()
+		{
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.Eye")) {
 				LayoutCell = new LayoutCell(Alignment.Center)
 			};
 			button.Clicked += () => {
-				var visibility = NodeVisibility.Hide;
-				if (Document.Current.Container.Nodes.All(i => i.EditorState().Visibility == NodeVisibility.Hide)) {
-					visibility = NodeVisibility.Show;
-				} else if (Document.Current.Container.Nodes.All(i => i.EditorState().Visibility == NodeVisibility.Show)) {
+				var visibility = NodeVisibility.Hidden;
+				if (Document.Current.Container.Nodes.All(i => i.EditorState().Visibility == NodeVisibility.Hidden)) {
+					visibility = NodeVisibility.Shown;
+				} else if (Document.Current.Container.Nodes.All(i => i.EditorState().Visibility == NodeVisibility.Shown)) {
 					visibility = NodeVisibility.Default;
 				}
 				foreach (var node in Document.Current.Container.Nodes) {
@@ -53,9 +80,9 @@ namespace Tangerine.UI.Timeline
 			return button;
 		}
 
-		BitmapButton CreateLockButton()
+		ToolbarButton CreateLockButton()
 		{
-			var button = new BitmapButton(IconPool.GetTexture("Timeline.Lock"), Metrics.IconSize) {
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.Lock")) {
 				LayoutCell = new LayoutCell(Alignment.Center)
 			};
 			button.Clicked += () => {

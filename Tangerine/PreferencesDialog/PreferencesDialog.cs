@@ -7,15 +7,13 @@ namespace Tangerine
 {
 	public class PreferencesDialog
 	{
-		readonly UserPreferences preferences;
 		readonly Window window;
 		readonly WindowWidget rootWidget;
 		readonly Button okButton;
 		readonly Button cancelButton;
 
-		public PreferencesDialog(UserPreferences preferences)
+		public PreferencesDialog()
 		{
-			this.preferences = preferences;
 			window = new Window(new WindowOptions {
 				ClientSize = new Vector2(600, 400),
 				FixedSize = false,

@@ -53,17 +53,17 @@ namespace Tangerine.UI.Timeline.Components
 			widget.Tasks.Add(MonitorDoubleClickTask());
 		}
 
-		BitmapButton CreateEyeButton()
+		ToolbarButton CreateEyeButton()
 		{
-			var button = new BitmapButton(Metrics.IconSize) { LayoutCell = new LayoutCell(Alignment.Center) };
+			var button = new ToolbarButton { LayoutCell = new LayoutCell(Alignment.Center) };
 			button.Tasks.Add(new Property<NodeVisibility>(() => nodeData.Visibility).DistinctUntilChanged().Consume(i => {
 				var texture = "Timeline.Dot";
-				if (i == NodeVisibility.Show) {
+				if (i == NodeVisibility.Shown) {
 					texture = "Timeline.Eye";
-				} else if (i == NodeVisibility.Hide) {
+				} else if (i == NodeVisibility.Hidden) {
 					texture = "Timeline.Cross";
 				}
-				button.DefaultTexture = IconPool.GetTexture(texture);
+				button.Texture = IconPool.GetTexture(texture);
 			}));
 			button.Clicked += () => {
 				Core.Operations.SetGenericProperty<NodeVisibility>.Perform(
@@ -74,11 +74,11 @@ namespace Tangerine.UI.Timeline.Components
 			return button;
 		}
 
-		BitmapButton CreateLockButton()
+		ToolbarButton CreateLockButton()
 		{
-			var button = new BitmapButton(Metrics.IconSize) { LayoutCell = new LayoutCell(Alignment.Center) };
+			var button = new ToolbarButton { LayoutCell = new LayoutCell(Alignment.Center) };
 			button.Tasks.Add(new Property<bool>(() => nodeData.Locked).DistinctUntilChanged().Consume(i => {
-				button.DefaultTexture = IconPool.GetTexture(i ? "Timeline.Lock" : "Timeline.Dot");
+				button.Texture = IconPool.GetTexture(i ? "Timeline.Lock" : "Timeline.Dot");
 			}));
 			button.Clicked += () => {
 				Core.Operations.SetGenericProperty<bool>.Perform(() => nodeData.Locked, value => nodeData.Locked = value, !nodeData.Locked);
@@ -86,11 +86,11 @@ namespace Tangerine.UI.Timeline.Components
 			return button;
 		}
 
-		BitmapButton CreateExpandButton()
+		ToolbarButton CreateExpandButton()
 		{
-			var button = new BitmapButton(Metrics.IconSize) { LayoutCell = new LayoutCell(Alignment.Center) };
+			var button = new ToolbarButton { LayoutCell = new LayoutCell(Alignment.Center) };
 			button.Tasks.Add(new Property<bool>(() => nodeData.Expanded).DistinctUntilChanged().Consume(i => {
-				button.DefaultTexture = IconPool.GetTexture(i ? "Timeline.Expanded" : "Timeline.Collapsed");
+				button.Texture = IconPool.GetTexture(i ? "Timeline.Expanded" : "Timeline.Collapsed");
 			}));
 			button.Clicked += () => {
 				Core.Operations.SetGenericProperty<bool>.Perform(() => nodeData.Expanded, value => nodeData.Expanded = value, !nodeData.Expanded);

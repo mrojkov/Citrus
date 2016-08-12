@@ -34,7 +34,14 @@ namespace Tangerine.UI.Timeline
 		public int CurrentColumn
 		{
 			get { return Document.Current.AnimationFrame; }
-			set { Document.Current.AnimationFrame = value; }
+			set
+			{
+				if (UserPreferences.Instance.AnimationMode && Document.Current.AnimationFrame != value) {
+					SetCurrentFrameRecursive(Document.Current.Container, value);
+				} else {
+					Document.Current.AnimationFrame = value; 
+				}
+			}
 		}
 		public int ColumnCount { get; set; }
 		public GridSelection GridSelection = new GridSelection();
@@ -129,20 +136,13 @@ namespace Tangerine.UI.Timeline
 			}
 		}
 
-		//void ISelectedNodesProvider.Select(Node node, bool select)
-		//{
-		//	var row = SelectedRows.FirstOrDefault(i => i.Components.Get<Components.NodeRow>()?.Node == node);
-		//	if (select) {
-		//		if (row == null) {
-		//			row = Rows.First(i => i.Components.Get<Components.NodeRow>()?.Node == node);
-		//			SelectedRows.Add(row);
-		//		}
-		//	} else {
-		//		if (row != null) {
-		//			SelectedRows.Remove(row);
-		//		}
-		//	}
-		//}
+		void SetCurrentFrameRecursive(Node node, int frame)
+		{
+			node.AnimationFrame = frame;
+			foreach (var child in node.Nodes) {
+				SetCurrentFrameRecursive(child, frame);
+			}
+		}
 
 		void SelectFirstRow()
 		{

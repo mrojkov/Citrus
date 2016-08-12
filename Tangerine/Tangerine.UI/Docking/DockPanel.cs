@@ -25,13 +25,7 @@ namespace Tangerine.UI
 				Layout = new HBoxLayout(),
 				Nodes = {
 					new SimpleText { Text = Title, Padding = new Thickness(4, 0), AutoSizeConstraints = false, MinMaxHeight = 20 },
-					(CloseButton = new BitmapButton(
-						IconPool.GetTexture("PopupClose"), 
-						IconPool.GetTexture("PopupCloseHover"),
-						Metrics.IconSize) {
-							LayoutCell = new LayoutCell(Alignment.Center)
-						}
-					)
+					(CloseButton = new DesktopTheme.TabCloseButton { LayoutCell = new LayoutCell(Alignment.Center) })
 				},
 				HitTestTarget = true
 			};

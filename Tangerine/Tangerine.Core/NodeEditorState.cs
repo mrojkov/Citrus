@@ -10,8 +10,8 @@ namespace Tangerine
 	public enum NodeVisibility
 	{
 		Default = 0,
-		Hide = 1,
-		Show = 2,
+		Hidden = 1,
+		Shown = 2,
 	}
 
 	public class NodeEditorState
@@ -22,22 +22,22 @@ namespace Tangerine
 		{
 			get
 			{
-				if (node.TangerineFlags[0]) {
-					return NodeVisibility.Show;
-				} else if (node.TangerineFlags[1]) {
-					return NodeVisibility.Hide;
+				if (node.GetTangerineFlag(TangerineFlags.Shown)) {
+					return NodeVisibility.Shown;
+				} else if (node.GetTangerineFlag(TangerineFlags.Hidden)) {
+					return NodeVisibility.Hidden;
 				} else {
 					return NodeVisibility.Default;
 				}
 			}
 			set
 			{
-				node.TangerineFlags[0] = value == NodeVisibility.Show;
-				node.TangerineFlags[1] = value == NodeVisibility.Hide;
+				node.SetTangerineFlag(TangerineFlags.Shown, value == NodeVisibility.Shown);
+				node.SetTangerineFlag(TangerineFlags.Hidden, value == NodeVisibility.Hidden);
 			}
 		}
-		public bool Locked { get { return node.TangerineFlags[2]; } set { node.TangerineFlags[2] = value; } }
-		public bool Expanded { get { return node.TangerineFlags[3]; } set { node.TangerineFlags[3] = value; } }
+		public bool Locked { get { return node.GetTangerineFlag(TangerineFlags.Locked); } set { node.SetTangerineFlag(TangerineFlags.Locked, value); } }
+		public bool Expanded { get { return node.GetTangerineFlag(TangerineFlags.Expanded); } set { node.SetTangerineFlag(TangerineFlags.Expanded, value); } }
 
 		public NodeEditorState(Node node)
 		{

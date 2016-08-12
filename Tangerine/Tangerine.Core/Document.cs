@@ -61,7 +61,9 @@ namespace Tangerine.Core
 		public Document(string path) : this()
 		{
 			Path = path;
-			RootNode = Serialization.ReadObject<Node>(path);
+			using (Theme.Push(DefaultTheme.Instance)) {
+				RootNode = Serialization.ReadObject<Node>(path);
+			}
 			Container = RootNode;
 		}
 

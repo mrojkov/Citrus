@@ -9,6 +9,8 @@ namespace Tangerine.UI
 		public static readonly Color4 GrayBackground = DesktopTheme.Colors.GrayBackground;
 		public static readonly Color4 SelectedBackground = DesktopTheme.Colors.SelectedBackground;
 		public static readonly Color4 DragCursor = Color4.Black;
+		public static readonly Color4 ToolbarButtonCheckedBackground = DesktopTheme.Colors.KeyboardFocusBorder.Lighten(0.5f);
+		public static readonly Color4 ToolbarButtonCheckedBorder = DesktopTheme.Colors.KeyboardFocusBorder.Darken(0.3f);
 		public static readonly ColorGradient Toolbar = new ColorGradient(Color4.White, Color4.White.Darken(0.2f));
 		public static class Timeline
 		{

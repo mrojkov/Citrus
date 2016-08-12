@@ -21,7 +21,7 @@ namespace Tangerine.UI.Timeline.Components
 			propIcon = new Image {
 				LayoutCell = new LayoutCell(Alignment.Center),
 				Texture = IconPool.GetTexture("Nodes.Unknown"),
-				MinMaxSize = Metrics.IconSize
+				MinMaxSize = new Vector2(16, 16)
 			};
 			widget = new Widget {
 				Padding = new Thickness { Left = 4, Right = 2 },
@@ -39,12 +39,12 @@ namespace Tangerine.UI.Timeline.Components
 			widget.CompoundPresenter.Push(new DelegatePresenter<Widget>(RenderBackground));
 		}
 
-		BitmapButton CreateExpandButton()
+		ToolbarButton CreateExpandButton()
 		{
-			var button = new BitmapButton(Metrics.IconSize) { LayoutCell = new LayoutCell(Alignment.Center) };
+			var button = new ToolbarButton { LayoutCell = new LayoutCell(Alignment.Center) };
 			var s = propRow.Animator.EditorState();
 			button.Tasks.Add(new Property<bool>(() => s.CurvesShown).DistinctUntilChanged().Consume(i => {
-				button.DefaultTexture = IconPool.GetTexture(i ? "Timeline.Expanded" : "Timeline.Collapsed");
+				button.Texture = IconPool.GetTexture(i ? "Timeline.Expanded" : "Timeline.Collapsed");
 			}));
 			button.Clicked += () => {
 				Core.Operations.SetGenericProperty<bool>.Perform(() => s.CurvesShown, value => s.CurvesShown = value, !s.CurvesShown);

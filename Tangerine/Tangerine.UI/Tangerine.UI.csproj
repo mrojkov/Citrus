@@ -78,11 +78,12 @@
     <Compile Include="Binding\DropDownListBinding.cs" />
     <Compile Include="Console.cs" />
     <Compile Include="Binding\CheckBoxBinding.cs" />
-    <Compile Include="BitmapButton.cs" />
+    <Compile Include="ToolbarButton.cs" />
     <Compile Include="Utils\WidgetKeyHandler.cs" />
     <Compile Include="Dialogs\AlertDialog.cs" />
     <Compile Include="Dialogs\ColorPickerDialog.cs" />
     <Compile Include="SearchPanel\SearchPanel.cs" />
+    <Compile Include="UserPreferences.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

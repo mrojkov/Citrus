@@ -6,15 +6,12 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.Inspector
 {
-	class KeyFunctionButton : BitmapButton
+	class KeyFunctionButton : ToolbarButton
 	{
-		public KeyFunctionButton() : base(Metrics.IconSize) {}
-
 		public void SetKeyFunction(KeyFunction function)
 		{
 			var s = "Timeline.Interpolation." + FunctionToString(function);
-			HoverTexture = IconPool.GetTexture(s);
-			DefaultTexture = IconPool.GetTexture(s + "Grayed");
+			Texture = IconPool.GetTexture(s);
 		}
 
 		string FunctionToString(KeyFunction function)

@@ -9,37 +9,6 @@ using Tangerine.UI;
 
 namespace Tangerine
 {
-	[ProtoContract]
-	public class UserPreferences
-	{
-		[ProtoMember(1)]
-		public UI.DockManager.State DockState = new UI.DockManager.State();
-
-		[ProtoMember(2)]
-		public readonly List<string> RecentProjects = new List<string>();
-
-		public void Load()
-		{
-			if (System.IO.File.Exists(GetPath())) {
-				try {
-					Serialization.ReadObjectFromFile<UserPreferences>(GetPath(), this);
-				} catch (System.Exception e) {
-					Debug.Write($"Failed to load the user preferences: {e}");
-				}
-			}
-		}
-
-		public void Save()
-		{
-			Serialization.WriteObjectToFile(GetPath(), this);
-		}
-
-		public static string GetPath()
-		{
-			return System.IO.Path.Combine(Lime.Environment.GetDataDirectory("Tangerine"), "UserPreferences");
-		}
-	}
-
 	public class PreferencesCommand : Command
 	{
 		public PreferencesCommand()
@@ -50,7 +19,7 @@ namespace Tangerine
 
 		public override void Execute()
 		{
-			new PreferencesDialog(TangerineApp.Instance.Preferences);
+			new PreferencesDialog();
 		}
 	}
 
@@ -60,7 +29,6 @@ namespace Tangerine
 
 		public readonly DockManager DockManager;
 		public readonly DockManager.State DockManagerInitialState;
-		public UserPreferences Preferences = new UserPreferences();
 
 		public static void Initialize()
 		{
@@ -85,6 +53,7 @@ namespace Tangerine
 
 		private TangerineApp()
 		{
+			Application.IsTangerine = true;
 			Lime.Serialization.Deserializer = new Deserializer();
 
 			Widget.DefaultWidgetSize = Vector2.Zero;
@@ -95,8 +64,8 @@ namespace Tangerine
 			DockManager = new UI.DockManager(new Vector2(1024, 768), PadsMenu);
 			Application.Exiting += () => Project.Current.Close();
 			Application.Exited += () => {
-				Preferences.DockState = DockManager.ExportState();
-				Preferences.Save();
+				UserPreferences.Instance.DockState = DockManager.ExportState();
+				UserPreferences.Instance.Save();
 			};
 			var timelinePanel = new UI.DockPanel("Timeline");
 			var inspectorPanel = new UI.DockPanel("Inspector");
@@ -109,9 +78,8 @@ namespace Tangerine
 			DockManagerInitialState = DockManager.ExportState();
 			var documentViewContainer = InitializeDocumentArea(DockManager);
 
-			Preferences = new UserPreferences();
-			Preferences.Load();
-			DockManager.ImportState(Preferences.DockState);
+			UserPreferences.Initialize();
+			DockManager.ImportState(UserPreferences.Instance.DockState);
 			Document.Closing += doc => {
 				var alert = new AlertDialog("Tangerine", $"Save the changes to document '{doc.Path}' before closing?", "Yes", "No", "Cancel");
 				switch (alert.Show()) {
@@ -129,8 +97,8 @@ namespace Tangerine
 				doc.Views.Add(new UI.SearchPanel(searchPanel.ContentWidget));
 				doc.History.Changed += () => CommonWindow.Current.Invalidate();
 			};
-			if (Preferences.RecentProjects.Count > 0) {
-				new Project(Preferences.RecentProjects[0]).Open();
+			if (UserPreferences.Instance.RecentProjects.Count > 0) {
+				new Project(UserPreferences.Instance.RecentProjects[0]).Open();
 			}
 		}
 

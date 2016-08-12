@@ -25,7 +25,7 @@ namespace Tangerine.UI.Inspector
 		public KeyframeButton()
 		{
 			Nodes.Clear();
-			Size = MinMaxSize = Metrics.IconSize;
+			Size = MinMaxSize = new Vector2(16, 16);
 			image = new Image { Size = Size, Shader = ShaderId.Silhuette, Texture = new SerializableTexture() };
 			Nodes.Add(image);
 			image.PostPresenter = new WidgetBoundsPresenter(Colors.Inspector.BorderAroundKeyframeColorbox);

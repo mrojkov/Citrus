@@ -19,7 +19,7 @@ namespace Tangerine
 			if (dlg.RunModal()) {
 				if (Project.Current.Close()) {
 					new Project(dlg.FileName).Open();
-					var prefs = TangerineApp.Instance.Preferences;
+					var prefs = UserPreferences.Instance;
 					prefs.RecentProjects.Remove(dlg.FileName);
 					prefs.RecentProjects.Insert(0, dlg.FileName);
 					prefs.Save();
