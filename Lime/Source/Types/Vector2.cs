@@ -170,6 +170,33 @@ namespace Lime
 		}
 
 		/// <summary>
+		/// Gets or sets the vector component by its index.
+		/// </summary>
+		public float this [int component]
+		{
+			get
+			{
+				if (component == 0) {
+					return X;
+				} else if (component == 1) {
+					return Y;
+				} else {
+					throw new IndexOutOfRangeException();
+				}
+			}
+			set
+			{
+				if (component == 0) {
+					X = value;
+				} else if (component == 1) {
+					Y = value;
+				} else {
+					throw new IndexOutOfRangeException();
+				}
+			}
+		}
+
+		/// <summary>
 		/// Returns the distance between two vectors.
 		/// </summary>
 		public static float Distance(Vector2 value1, Vector2 value2)

@@ -73,6 +73,41 @@ namespace Lime
 				value1.W * value2.W;
 		}
 
+		/// <summary>
+		/// Gets or sets the vector component by its index.
+		/// </summary>
+		public float this [int component]
+		{
+			get
+			{
+				if (component == 0) {
+					return X;
+				} else if (component == 1) {
+					return Y;
+				} else if (component == 2) {
+					return Z;
+				} else if (component == 3) {
+					return W;
+				} else {
+					throw new IndexOutOfRangeException();
+				}
+			}
+			set
+			{
+				if (component == 0) {
+					X = value;
+				} else if (component == 1) {
+					Y = value;
+				} else if (component == 2) {
+					Z = value;
+				} else if (component == 3) {
+					W = value;
+				} else {
+					throw new IndexOutOfRangeException();
+				}
+			}
+		}
+
 		public static Vector4 operator -(Vector4 value)
 		{
 			return new Vector4(-value.X, -value.Y, -value.Z, -value.W);

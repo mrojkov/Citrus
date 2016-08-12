@@ -91,6 +91,37 @@ namespace Lime
 				Z = Mathf.Lerp(amount, value1.Z, value2.Z)
 			};
 		}
+
+		/// <summary>
+		/// Gets or sets the vector component by its index.
+		/// </summary>
+		public float this [int component]
+		{
+			get
+			{
+				if (component == 0) {
+					return X;
+				} else if (component == 1) {
+					return Y;
+				} else if (component == 2) {
+					return Z;
+				} else {
+					throw new IndexOutOfRangeException();
+				}
+			}
+			set
+			{
+				if (component == 0) {
+					X = value;
+				} else if (component == 1) {
+					Y = value;
+				} else if (component == 2) {
+					Z = value;
+				} else {
+					throw new IndexOutOfRangeException();
+				}
+			}
+		}
 		
 		public static Vector3 operator *(Vector3 lhs, Vector3 rhs)
 		{
