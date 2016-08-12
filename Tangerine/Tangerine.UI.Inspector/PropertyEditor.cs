@@ -74,21 +74,6 @@ namespace Tangerine.UI.Inspector
 			OnKeyframeToggle?.Invoke();
 		}
 
-		protected static IDataflowProvider<string> EditBoxSubmittedText(EditBox editBox)
-		{
-			return new EventflowProvider<string>(editBox, "Submitted");
-		}
-
-		protected static IDataflowProvider<T> DropDownListSelectedItem<T>(DropDownList dropDownList)
-		{
-			return new EventflowProvider<int>(dropDownList, "Changed").Select(i => (T)dropDownList.Items[i].Value);
-		}
-
-		protected static IDataflowProvider<bool> CheckBoxChecked(CheckBox checkBox)
-		{
-			return new EventflowProvider<bool>(checkBox, "Changed");
-		}
-
 		protected static IDataflowProvider<T> CoalescedPropertyValue<T>(PropertyEditorContext context, T defaultValue = default(T))
 		{
 			IDataflowProvider<T> provider = null;
@@ -108,12 +93,6 @@ namespace Tangerine.UI.Inspector
 			}
 			return provider;
 		}
-
-		protected static bool IsNumericString(string value)
-		{
-			float unused;
-			return float.TryParse(value, out unused);
-		}
 	}
 
 	class Vector2PropertyEditor : CommonPropertyEditor
@@ -131,17 +110,26 @@ namespace Tangerine.UI.Inspector
 				}
 			});
 			OnKeyframeToggle += editorX.SetFocus;
-			foreach (var obj in context.Objects) {
-				var originalXY = new Property<Vector2>(obj, context.PropertyName);
-				var editedXWithY = EditBoxSubmittedText(editorX).Where(IsNumericString).Select(float.Parse).
-					Coalesce(originalXY).Select(i => new Vector2(i.Item1, i.Item2.Y));
-				var xWithEditedY = EditBoxSubmittedText(editorY).Where(IsNumericString).Select(float.Parse).
-					Coalesce(originalXY).Select(i => new Vector2(i.Item2.X, i.Item1));
-				editorX.Tasks.Add(new AnimablePropertyBinding<Vector2>(obj, context.PropertyName, editedXWithY));
-				editorY.Tasks.Add(new AnimablePropertyBinding<Vector2>(obj, context.PropertyName, xWithEditedY));
+			var currentX = CoalescedPropertyValue<Vector2, float>(context, v => v.X);
+			var currentY = CoalescedPropertyValue<Vector2, float>(context, v => v.Y);
+			editorX.Submitted += text => SetComponent(context, 0, editorX, currentX.GetValue());
+			editorY.Submitted += text => SetComponent(context, 1, editorY, currentY.GetValue());
+			editorX.Tasks.Add(currentX.DistinctUntilChanged().Select(i => i.ToString()).Consume(v => editorX.Text = v));
+			editorY.Tasks.Add(currentY.DistinctUntilChanged().Select(i => i.ToString()).Consume(v => editorY.Text = v));
+		}
+
+		void SetComponent(PropertyEditorContext context, int component, EditBox editor, float currentValue)
+		{
+			float newValue;
+			if (float.TryParse(editor.Text, out newValue)) {
+				foreach (var obj in context.Objects) {
+					var current = new Property<Vector2>(obj, context.PropertyName).Value;
+					current[component] = newValue;
+					Core.Operations.SetAnimableProperty.Perform(obj, context.PropertyName, current);
+				}
+			} else {
+				editor.Text = currentValue.ToString();
 			}
-			editorX.Tasks.Add(new EditBoxBinding(editorX, CoalescedPropertyValue<Vector2, float>(context, v => v.X).DistinctUntilChanged().Select(i => i.ToString())));
-			editorY.Tasks.Add(new EditBoxBinding(editorY, CoalescedPropertyValue<Vector2, float>(context, v => v.Y).DistinctUntilChanged().Select(i => i.ToString())));
 		}
 	}
 
@@ -152,11 +140,10 @@ namespace Tangerine.UI.Inspector
 			var editor = new EditBox { LayoutCell = new LayoutCell(Alignment.Center) };
 			containerWidget.AddNode(editor);
 			OnKeyframeToggle += editor.SetFocus;
-			foreach (var obj in context.Objects) {
-				var editorValue = EditBoxSubmittedText(editor);
-				editor.Tasks.Add(new AnimablePropertyBinding<string>(obj, context.PropertyName, editorValue));
-			}
-			editor.Tasks.Add(new EditBoxBinding(editor, CoalescedPropertyValue<string>(context).DistinctUntilChanged()));
+			editor.Submitted += text => {
+				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, text);
+			};
+			editor.Tasks.Add(CoalescedPropertyValue<string>(context).DistinctUntilChanged().Consume(v => editor.Text = v));
 		}
 	}
 
@@ -171,11 +158,10 @@ namespace Tangerine.UI.Inspector
 			foreach (var i in Enum.GetNames(propType).Zip(Enum.GetValues(propType).Cast<object>(), (a, b) => new DropDownList.Item(a, b))) {
 				selector.Items.Add(i);
 			}
-			foreach (var obj in context.Objects) {
-				var pickedValue = DropDownListSelectedItem<T>(selector);
-				selector.Tasks.Add(new AnimablePropertyBinding<T>(obj, context.PropertyName, pickedValue));
-			}
-			selector.Tasks.Add(new DropDownListBinding<T>(selector, CoalescedPropertyValue<T>(context).DistinctUntilChanged()));
+			selector.Changed += index => {
+				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, (T)selector.Items[index].Value);
+			};
+			selector.Tasks.Add(CoalescedPropertyValue<T>(context).DistinctUntilChanged().Consume(v => selector.Value = v));
 		}
 	}
 
@@ -186,11 +172,10 @@ namespace Tangerine.UI.Inspector
 			var checkBox = new CheckBox { LayoutCell = new LayoutCell(Alignment.Center) };
 			containerWidget.AddNode(checkBox);
 			OnKeyframeToggle += checkBox.SetFocus;
-			var propType = context.PropertyInfo.PropertyType;
-			foreach (var obj in context.Objects) {
-				checkBox.Tasks.Add(new AnimablePropertyBinding<bool>(obj, context.PropertyName, CheckBoxChecked(checkBox)));
-			}
-			checkBox.Tasks.Add(new CheckBoxBinding(checkBox, CoalescedPropertyValue<bool>(context).DistinctUntilChanged()));
+			checkBox.Changed += value => {
+				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, value);
+			};
+			checkBox.Tasks.Add(CoalescedPropertyValue<bool>(context).DistinctUntilChanged().Consume(v => checkBox.Checked = v));
 		}
 	}
 
@@ -201,11 +186,16 @@ namespace Tangerine.UI.Inspector
 			var editor = new EditBox { LayoutCell = new LayoutCell(Alignment.Center) };
 			containerWidget.AddNode(editor);
 			OnKeyframeToggle += editor.SetFocus;
-			foreach (var obj in context.Objects) {
-				var editorValue = EditBoxSubmittedText(editor).Where(IsNumericString).Select(float.Parse);
-				editor.Tasks.Add(new AnimablePropertyBinding<float>(obj, context.PropertyName, editorValue));
-			}
-			editor.Tasks.Add(new EditBoxBinding(editor, CoalescedPropertyValue<float>(context).DistinctUntilChanged().Select(i => i.ToString())));
+			var current = CoalescedPropertyValue<float>(context);
+			editor.Submitted += text => {
+				float newValue;
+				if (float.TryParse(text, out newValue)) {
+					Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, newValue);
+				} else {
+					editor.Text = current.GetValue().ToString();
+				}
+			};
+			editor.Tasks.Add(current.DistinctUntilChanged().Select(i => i.ToString()).Consume(v => editor.Text = v));
 		}
 	}
 
@@ -215,37 +205,32 @@ namespace Tangerine.UI.Inspector
 		{
 			EditBox editor;
 			ColorBoxButton colorBox;
-			var color = CoalescedPropertyValue<Color4>(context, Color4.White).DistinctUntilChanged();
+			var currentColor = CoalescedPropertyValue(context, Color4.White).DistinctUntilChanged();
 			containerWidget.AddNode(new Widget {
 				Layout = new HBoxLayout(),
 				Nodes = {
 					(editor = new EditBox { LayoutCell = new LayoutCell(Alignment.Center) }),
 					new HSpacer(4),
-					(colorBox = new ColorBoxButton(color) { LayoutCell = new LayoutCell(Alignment.Center) }),
+					(colorBox = new ColorBoxButton(currentColor) { LayoutCell = new LayoutCell(Alignment.Center) }),
 				}
 			});
 			colorBox.Clicked += () => {
-				var c = color.GetDataflow();
-				c.Poll();
-				var dlg = new ColorPickerDialog(c.Value);
+				var dlg = new ColorPickerDialog(currentColor.GetValue());
 				if (dlg.Show()) {
-					foreach (var obj in context.Objects) {
-						Core.Operations.SetAnimableProperty.Perform(obj, context.PropertyName, dlg.Color);
-					}
+					Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, dlg.Color);
 				}
 			};
+			var currentColorString = currentColor.Select(i => i.ToString(Color4.StringPresentation.Dec));
 			OnKeyframeToggle += editor.SetFocus;
-			foreach (var obj in context.Objects) {
-				var editorValue = EditBoxSubmittedText(editor).Where(IsColorString).Select(Color4.Parse);
-				editor.Tasks.Add(new AnimablePropertyBinding<Color4>(obj, context.PropertyName, editorValue));
-			}
-			editor.Tasks.Add(new EditBoxBinding(editor, color.Select(i => i.ToString(Color4.StringPresentation.Dec))));
-		}
-
-		private bool IsColorString(string value)
-		{
-			Color4 unused;
-			return Color4.TryParse(value, out unused);
+			editor.Submitted += text => {
+				Color4 newColor;
+				if (Color4.TryParse(text, out newColor)) {
+					Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, newColor);
+				} else {
+					editor.Text = currentColorString.GetValue();
+				}
+			};
+			editor.Tasks.Add(currentColorString.Consume(v => editor.Text = v));
 		}
 
 		class ColorBoxButton : Button
@@ -303,11 +288,10 @@ namespace Tangerine.UI.Inspector
 				}
 			};
 			OnKeyframeToggle += editor.SetFocus;
-			foreach (var obj in context.Objects) {
-				var editorValue = EditBoxSubmittedText(editor).Select(i => (ITexture)new SerializableTexture(i));
-				editor.Tasks.Add(new AnimablePropertyBinding<ITexture>(obj, context.PropertyName, editorValue));
-			}
-			editor.Tasks.Add(new EditBoxBinding(editor, CoalescedPropertyValue<ITexture>(context).DistinctUntilChanged().Select(i => i != null ? i.SerializationPath : "")));
+			editor.Submitted += text => {
+				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, new SerializableTexture(text));
+			};
+			editor.Tasks.Add(CoalescedPropertyValue<ITexture>(context).DistinctUntilChanged().Select(i => i != null ? i.SerializationPath : "").Consume(v => editor.Text = v));
 		}
 	}
 }
