@@ -45,8 +45,8 @@ namespace Lime
 #else
 		public static ProtoBuf.Meta.TypeModel ProtoBufTypeModel = CreateProtoBufTypeModel();
 #endif
-		public static IDeserializer Deserializer = new ProtoBufDeserializer(ProtoBufTypeModel);
 #if !iOS && !ANDROID
+		public static IDeserializer Deserializer = new ProtoBufDeserializer(ProtoBufTypeModel);
 		public static ProtoBuf.Meta.RuntimeTypeModel CreateProtoBufTypeModel()
 		{
 			var model = ProtoBuf.Meta.RuntimeTypeModel.Create();
@@ -102,7 +102,11 @@ namespace Lime
 		{
 			OperationStack.Push(new Operation { SerializationPath = path, Type = OperationType.Serialization });
 			try {
+#if iOS || ANDROID
+				Serializer.Serialize(stream, instance);
+#else
 				ProtoBufTypeModel.Serialize(stream, instance);
+#endif
 			} finally {
 				OperationStack.Pop();
 			}
@@ -127,7 +131,11 @@ namespace Lime
 		{
 			OperationStack.Push(new Operation { Type = OperationType.Clone });
 			try {
+#if iOS || ANDROID
+				return (T)Serializer.DeepClone(obj);
+#else
 				return (T)ProtoBufTypeModel.DeepClone(obj);
+#endif
 			} finally {
 				OperationStack.Pop();
 			}
@@ -137,7 +145,11 @@ namespace Lime
 		{
 			OperationStack.Push(new Operation { SerializationPath = path, Type = OperationType.Serialization });
 			try {
+#if iOS || ANDROID
+				return (T)Serializer.Deserialize(stream, obj, typeof(T));
+#else
 				return (T)Deserializer.Deserialize(stream, obj, typeof(T));
+#endif
 			} finally {
 				OperationStack.Pop();
 			}
