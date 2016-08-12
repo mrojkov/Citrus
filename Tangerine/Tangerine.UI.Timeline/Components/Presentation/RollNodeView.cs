@@ -48,9 +48,21 @@ namespace Tangerine.UI.Timeline.Components
 					CreateLockButton(),
 				},
 			};
+			label.Tasks.Add(new Property<string>(() => nodeData.Node.Id).DistinctUntilChanged().Consume(s => RefreshLabel()));
+			label.Tasks.Add(new Property<string>(() => nodeData.Node.ContentsPath).DistinctUntilChanged().Consume(s => RefreshLabel()));
 			widget.CompoundPresenter.Push(new DelegatePresenter<Widget>(RenderBackground));
 			editBox.Visible = false;
-			widget.Tasks.Add(MonitorDoubleClickTask());
+			widget.Tasks.Add(RenameOnDoubleClickTask());
+		}
+
+		void RefreshLabel()
+		{
+			var node = nodeData.Node;
+			if (!string.IsNullOrEmpty(node.ContentsPath)) {
+				label.Text = $"{node.Id} [{node.ContentsPath}]";
+			} else {
+				label.Text = node.Id;
+			}
 		}
 
 		ToolbarButton CreateEyeButton()
@@ -107,17 +119,16 @@ namespace Tangerine.UI.Timeline.Components
 
 		Widget IRollWidget.Widget => widget;
 
-		IEnumerator<object> MonitorDoubleClickTask()
+		IEnumerator<object> RenameOnDoubleClickTask()
 		{
 			while (true) {
-				label.Text = nodeData.Node.Id;
 				if (widget.Input.WasKeyPressed(Key.Mouse0DoubleClick)) {
 					if (label.IsMouseOver()) {
 						Operations.ClearRowSelection.Perform();
 						Operations.SelectRow.Perform(row);
 						label.Visible = false;
 						editBox.Visible = true;
-						editBox.Text = label.Text;
+						editBox.Text = nodeData.Node.Id;
 						yield return null;
 						editBox.SetFocus();
 						editBox.Tasks.Add(EditNodeIdTask());
