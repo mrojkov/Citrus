@@ -339,9 +339,9 @@ namespace Tangerine.Core
 					var current = arg.Value;
 					if ((GotValue = !hasValue || !EqualityComparer<T>.Default.Equals(current, previous))) {
 						Value = current;
+						hasValue = true;
+						previous = current;
 					}
-					hasValue = true;
-					previous = current;
 				}
 			}
 
