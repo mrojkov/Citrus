@@ -105,6 +105,7 @@ namespace Lime
 	{
 		public static event Action<DeviceOrientation> SupportedDeviceOrientationsChanged;
 		public static readonly ObservableCollection<IWindow> Windows = new ObservableCollection<IWindow>();
+		public static bool IsTangerine;
 
 		private static IWindow mainWindow;
 		public static IWindow MainWindow
