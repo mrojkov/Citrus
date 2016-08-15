@@ -88,13 +88,18 @@ namespace Lime
 		[Tangerine(0)]
 		public string Id { get; set; }
 
+		private string contentsPath;
 		/// <summary>
 		/// Denotes the path to the external scene. If this path isn't null during node loading,
 		/// the node children are replaced by the external scene nodes.
 		/// </summary>
 		[ProtoMember(2)]
 		[Tangerine(0)]
-		public string ContentsPath { get; set; }
+		public string ContentsPath
+		{
+			get { return Serialization.ShrinkPath(contentsPath); }
+			set { contentsPath = Serialization.ExpandPath(value); }
+		}
 
 		/// <summary>
 		/// May contain the marker id of the default animation.  When an animation hits a trigger keyframe,
