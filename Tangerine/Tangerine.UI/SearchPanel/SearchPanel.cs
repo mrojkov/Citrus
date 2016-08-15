@@ -43,7 +43,7 @@ namespace Tangerine.UI
 				ColCount = 3,
 				ColSpacing = 8,
 				RowCount = results.Count,
-				Cols = new List<LayoutCell>{
+				ColDefaults = new List<LayoutCell>{
 					new LayoutCell { Stretch = Vector2.Zero },
 					new LayoutCell { Stretch = Vector2.Zero },
 					new LayoutCell { StretchY = 0 }

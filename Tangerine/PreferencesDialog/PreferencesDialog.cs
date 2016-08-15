@@ -66,7 +66,7 @@ namespace Tangerine
 					RowCount = 2,
 					RowSpacing = 8,
 					ColSpacing = 16,
-					Cols = new List<LayoutCell> {
+					ColDefaults = new List<LayoutCell> {
 						new LayoutCell(Alignment.RightCenter),
 						new LayoutCell(Alignment.LeftCenter)
 					}

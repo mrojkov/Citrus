@@ -18,10 +18,9 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			this.row = row;
 			nodeData = row.Components.Get<NodeRow>();
-			label = new SimpleText { HitTestTarget = true, LayoutCell = new LayoutCell(Alignment.Center) };
+			label = new SimpleText { HitTestTarget = true };
 			editBox = new EditBox { AutoSizeConstraints = false, LayoutCell = new LayoutCell(Alignment.Center, stretchX: 1000) };
 			nodeIcon = new Image {
-				LayoutCell = new LayoutCell { Alignment = Alignment.Center },
 				Texture = IconPool.GetTexture("Nodes." + nodeData.Node.GetType(), "Nodes.Unknown"),
 			};
 			nodeIcon.MinMaxSize = (Vector2)nodeIcon.Texture.ImageSize;
@@ -33,7 +32,7 @@ namespace Tangerine.UI.Timeline.Components
 			widget = new Widget {
 				Padding = new Thickness { Left = 4, Right = 2 },
 				MinHeight = Metrics.TimelineDefaultRowHeight,
-				Layout = new HBoxLayout(),
+				Layout = new HBoxLayout { CellDefaults = new LayoutCell { Alignment = Alignment.Center } },
 				HitTestTarget = true,
 				Nodes = {
 					new HSpacer(indentation * Metrics.TimelineRollIndentation),
@@ -67,7 +66,7 @@ namespace Tangerine.UI.Timeline.Components
 
 		ToolbarButton CreateEyeButton()
 		{
-			var button = new ToolbarButton { LayoutCell = new LayoutCell(Alignment.Center) };
+			var button = new ToolbarButton { Highlightable = false };
 			button.Tasks.Add(new Property<NodeVisibility>(() => nodeData.Visibility).DistinctUntilChanged().Consume(i => {
 				var texture = "Timeline.Dot";
 				if (i == NodeVisibility.Shown) {
@@ -88,7 +87,7 @@ namespace Tangerine.UI.Timeline.Components
 
 		ToolbarButton CreateLockButton()
 		{
-			var button = new ToolbarButton { LayoutCell = new LayoutCell(Alignment.Center) };
+			var button = new ToolbarButton { Highlightable = false };
 			button.Tasks.Add(new Property<bool>(() => nodeData.Locked).DistinctUntilChanged().Consume(i => {
 				button.Texture = IconPool.GetTexture(i ? "Timeline.Lock" : "Timeline.Dot");
 			}));
@@ -100,7 +99,7 @@ namespace Tangerine.UI.Timeline.Components
 
 		ToolbarButton CreateExpandButton()
 		{
-			var button = new ToolbarButton { LayoutCell = new LayoutCell(Alignment.Center) };
+			var button = new ToolbarButton { Highlightable = false };
 			button.Tasks.Add(new Property<bool>(() => nodeData.Expanded).DistinctUntilChanged().Consume(i => {
 				button.Texture = IconPool.GetTexture(i ? "Timeline.Expanded" : "Timeline.Collapsed");
 			}));

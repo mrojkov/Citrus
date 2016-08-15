@@ -21,7 +21,7 @@ namespace Tangerine.UI.Timeline
 		void Render(Widget widget)
 		{
 			widget.PrepareRendererState();
-			Renderer.DrawVerticalGradientRect(Vector2.Zero, RootWidget.Size, Colors.Toolbar);
+			Renderer.DrawVerticalGradientRect(Vector2.Zero, RootWidget.Size, Colors.Toolbar.Background);
 			Renderer.Transform1 *= Matrix32.Translation(-Timeline.Instance.ScrollOrigin.X, 0);
 			RenderCursor();
 			for (int i = 0; i < Timeline.Instance.ColumnCount; i++) {

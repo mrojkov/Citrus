@@ -101,11 +101,11 @@ namespace Tangerine.UI.Inspector
 		{
 			EditBox editorX, editorY;
 			containerWidget.AddNode(new Widget {
-				Layout = new HBoxLayout(),
+				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center) },
 				Nodes = {
-					new SimpleText { Text = "X", Padding = new Thickness(4, 0), LayoutCell = new LayoutCell(Alignment.Center) },
+					new SimpleText { Text = "X", Padding = new Thickness(4, 0) },
 					(editorX = new EditBox()),
-					new SimpleText { Text = "Y", Padding = new Thickness(4, 0), LayoutCell = new LayoutCell(Alignment.Center) },
+					new SimpleText { Text = "Y", Padding = new Thickness(4, 0) },
 					(editorY = new EditBox()),
 				}
 			});
@@ -207,11 +207,11 @@ namespace Tangerine.UI.Inspector
 			ColorBoxButton colorBox;
 			var currentColor = CoalescedPropertyValue(context, Color4.White).DistinctUntilChanged();
 			containerWidget.AddNode(new Widget {
-				Layout = new HBoxLayout(),
+				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center) },
 				Nodes = {
-					(editor = new EditBox { LayoutCell = new LayoutCell(Alignment.Center) }),
+					(editor = new EditBox()),
 					new HSpacer(4),
-					(colorBox = new ColorBoxButton(currentColor) { LayoutCell = new LayoutCell(Alignment.Center) }),
+					(colorBox = new ColorBoxButton(currentColor)),
 				}
 			});
 			colorBox.Clicked += () => {

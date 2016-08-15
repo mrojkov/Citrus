@@ -9,8 +9,17 @@ namespace Tangerine.UI
 {
 	public class ToolbarButton : Button
 	{
-		private bool @checked;
+		enum State
+		{
+			Default,
+			Highlight,
+			Press
+		}
+
+		private State state;
 		private ITexture texture;
+		private bool @checked;
+		private bool @highlightable;
 
 		public bool Checked
 		{
@@ -19,6 +28,18 @@ namespace Tangerine.UI
 			{
 				if (@checked != value) {
 					@checked = value;
+					Window.Current.Invalidate();
+				}
+			}
+		}
+
+		public bool Highlightable
+		{
+			get { return @highlightable; }
+			set
+			{
+				if (@highlightable != value) {
+					@highlightable = value;
 					Window.Current.Invalidate();
 				}
 			}
@@ -38,19 +59,52 @@ namespace Tangerine.UI
 
 		public ToolbarButton()
 		{
+			highlightable = true;
 			Nodes.Clear();
 			Padding = new Thickness(3);
 			Size = MinMaxSize = new Vector2(22, 22);
+			DefaultAnimation.AnimationEngine = new AnimationEngineDelegate {
+				OnRunAnimation = (animation, markerId) => {
+					if (markerId == "Focus") {
+						state = State.Highlight;
+					} else if (markerId == "Press") {
+						state = State.Press;
+					} else {
+						state = State.Default;
+					}
+					Window.Current.Invalidate();
+					return true;
+				}
+			};
 			CompoundPresenter.Add(new DelegatePresenter<Widget>(w => {
 				w.PrepareRendererState();
-				if (Checked) {
-					Renderer.DrawRect(Vector2.One, Size - 2 * Vector2.One, Colors.ToolbarButtonCheckedBackground);
+				Color4 bgColor, borderColor;
+				GetColors(out bgColor, out borderColor);
+				if (bgColor != Color4.Transparent) {
+					Renderer.DrawRect(Vector2.One, Size - 2 * Vector2.One, bgColor);
 				}
 				Renderer.DrawSprite(Texture, GlobalColor, ContentPosition, ContentSize, Vector2.Zero, Vector2.One);
-				if (Checked) {
-					Renderer.DrawRectOutline(Vector2.One, Size - 2 * Vector2.One, Colors.ToolbarButtonCheckedBorder, 1);
+				if (borderColor != Color4.Transparent) {
+					Renderer.DrawRectOutline(Vector2.One, Size - 2 * Vector2.One, borderColor, 1);
 				}
 			}));
+		}
+
+		private void GetColors(out Color4 bgColor, out Color4 borderColor)
+		{
+			if (Highlightable && state == State.Highlight) {
+				bgColor = Colors.Toolbar.ButtonHighlightBackground;
+				borderColor = Colors.Toolbar.ButtonHighlightBorder;
+			} else if (Highlightable && state == State.Press) {
+				bgColor = Colors.Toolbar.ButtonPressBackground;
+				borderColor = Colors.Toolbar.ButtonPressBorder;
+			} else if (Checked) {
+				bgColor = Colors.Toolbar.ButtonCheckedBackground;
+				borderColor = Colors.Toolbar.ButtonCheckedBorder;
+			} else {
+				bgColor = Color4.Transparent;
+				borderColor = Color4.Transparent;
+			}
 		}
 
 		public ToolbarButton(ITexture texture) : this()
