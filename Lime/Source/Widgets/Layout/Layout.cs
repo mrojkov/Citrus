@@ -68,12 +68,6 @@ namespace Lime
 			return widget.Nodes.OfType<Widget>().Where(i => !IgnoreHidden || i.Visible).ToList();
 		}
 
-		protected static void LayoutWidgetWithinCell(Widget widget, Vector2 position, Vector2 size, List<Rectangle> debugRectangles = null)
-		{
-			var align = (widget.LayoutCell ?? LayoutCell.Default).Alignment;
-			LayoutWidgetWithinCell(widget, position, size, align, debugRectangles);
-		}
-
 		protected static void LayoutWidgetWithinCell(Widget widget, Vector2 position, Vector2 size, Alignment alignment, List<Rectangle> debugRectangles = null)
 		{
 			if (debugRectangles != null) {

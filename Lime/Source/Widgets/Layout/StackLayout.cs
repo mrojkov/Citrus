@@ -8,9 +8,11 @@ namespace Lime
 	{
 		public bool HorizontallySizeable { get; set; }
 		public bool VerticallySizeable { get; set; }
+		public LayoutCell CellDefaults { get; set; }
 
 		public StackLayout()
 		{
+			CellDefaults = new LayoutCell();
 			DebugRectangles = new List<Rectangle>();
 		}
 
@@ -44,7 +46,7 @@ namespace Lime
 			foreach (var child in GetChildren(widget)) {
 				var position = widget.ContentPosition;
 				var size = widget.ContentSize;
-				var align = (child.LayoutCell ?? LayoutCell.Default).Alignment;
+				var align = (child.LayoutCell ?? CellDefaults).Alignment;
 				if (HorizontallySizeable) {
 					position.X = child.X;
 					size.X = child.EffectiveMinSize.X;

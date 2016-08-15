@@ -7,9 +7,11 @@ namespace Lime
 	public class HBoxLayout : CommonLayout, ILayout
 	{
 		public float Spacing { get; set; }
+		public LayoutCell CellDefaults { get; set; }
 
 		public HBoxLayout()
 		{
+			CellDefaults = new LayoutCell();
 			DebugRectangles = new List<Rectangle>();
 		}
 
@@ -22,11 +24,11 @@ namespace Lime
 			}
 			var constraints = new LinearAllocator.Constraints[widgets.Count];
 			int i = 0;
-			foreach (var w in widgets) {
+			foreach (var child in widgets) {
 				constraints[i++] = new LinearAllocator.Constraints {
-					MinSize = w.EffectiveMinSize.X,
-					MaxSize = w.EffectiveMaxSize.X,
-					Stretch = (w.LayoutCell ?? LayoutCell.Default).StretchX
+					MinSize = child.EffectiveMinSize.X,
+					MaxSize = child.EffectiveMaxSize.X,
+					Stretch = (child.LayoutCell ?? CellDefaults).StretchX
 				};
 			}
 			var availableWidth = Math.Max(0, widget.ContentWidth - (widgets.Count - 1) * Spacing);
@@ -34,9 +36,10 @@ namespace Lime
 			i = 0;
 			DebugRectangles.Clear();
 			var position = new Vector2(widget.Padding.Left, widget.Padding.Top);
-			foreach (var w in widgets) {
+			foreach (var child in widgets) {
 				var size = new Vector2(sizes[i], widget.ContentHeight);
-				LayoutWidgetWithinCell(w, position, size, DebugRectangles);
+				var align = (child.LayoutCell ?? CellDefaults).Alignment;
+				LayoutWidgetWithinCell(child, position, size, align, DebugRectangles);
 				position.X += size.X + Spacing;
 				i++;
 			}

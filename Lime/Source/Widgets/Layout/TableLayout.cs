@@ -11,8 +11,8 @@ namespace Lime
 		public float ColSpacing;
 		public float RowSpacing;
 		public float Spacing { set { ColSpacing = RowSpacing = value; } }
-		public List<LayoutCell> Cols = new List<LayoutCell>();
-		public List<LayoutCell> Rows = new List<LayoutCell>();
+		public List<LayoutCell> ColDefaults = new List<LayoutCell>();
+		public List<LayoutCell> RowDefaults = new List<LayoutCell>();
 
 		public TableLayout()
 		{
@@ -87,7 +87,7 @@ namespace Lime
 
 		private LayoutCell GetCellData(Widget cell, int row, int col)
 		{
-			return cell.LayoutCell ?? (Cols.Count > col ? Cols[col] : (Rows.Count > row ? Rows[row] : LayoutCell.Default));
+			return cell.LayoutCell ?? (ColDefaults.Count > col ? ColDefaults[col] : (RowDefaults.Count > row ? RowDefaults[row] : LayoutCell.Default));
 		}
 
 		private LinearAllocator.Constraints[] CalcColConstraints(Widget widget, Widget[,] cells)

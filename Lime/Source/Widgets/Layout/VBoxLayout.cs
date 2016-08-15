@@ -7,9 +7,11 @@ namespace Lime
 	public class VBoxLayout : CommonLayout, ILayout
 	{
 		public float Spacing { get; set; }
+		public LayoutCell DefaultCell { get; set; }
 
 		public VBoxLayout()
 		{
+			DefaultCell = new LayoutCell();
 			DebugRectangles = new List<Rectangle>();
 		}
 
@@ -26,7 +28,7 @@ namespace Lime
 				constraints[i++] = new LinearAllocator.Constraints {
 					MinSize = w.EffectiveMinSize.Y,
 					MaxSize = w.EffectiveMaxSize.Y,
-					Stretch = (w.LayoutCell ?? LayoutCell.Default).StretchY
+					Stretch = (w.LayoutCell ?? DefaultCell).StretchY
 				};
 			}
 			var availableHeight = Math.Max(0, widget.ContentHeight - (widgets.Count - 1) * Spacing);
@@ -34,9 +36,10 @@ namespace Lime
 			i = 0;
 			DebugRectangles.Clear();
 			var position = new Vector2(widget.Padding.Left, widget.Padding.Top);
-			foreach (var w in widgets) {
+			foreach (var child in widgets) {
 				var size = new Vector2(widget.ContentWidth, sizes[i]);
-				LayoutWidgetWithinCell(w, position, size, DebugRectangles);
+				var align = (child.LayoutCell ?? DefaultCell).Alignment;
+				LayoutWidgetWithinCell(child, position, size, align, DebugRectangles);
 				position.Y += size.Y + Spacing;
 				i++;
 			}

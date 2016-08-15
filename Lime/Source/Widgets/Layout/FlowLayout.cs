@@ -8,9 +8,11 @@ namespace Lime
 	{
 		private List<int> splitIndices = new List<int>();
 		public float Spacing { get; set; }
+		public LayoutCell CellDefaults { get; set; }
 
 		public FlowLayout()
 		{
+			CellDefaults = new LayoutCell();
 			DebugRectangles = new List<Rectangle>();
 		}
 
@@ -40,18 +42,19 @@ namespace Lime
 					constraints[i++] = new LinearAllocator.Constraints {
 						MinSize = w.MinSize.X,
 						MaxSize = w.MaxSize.X,
-						Stretch = (w.LayoutCell ?? LayoutCell.Default).StretchX
+						Stretch = (w.LayoutCell ?? CellDefaults).StretchX
 					};
 				}
 				var sizes = LinearAllocator.Allocate(availableLength, constraints, roundSizes: true);
 				i = 0;
 				var position = new Vector2(widget.Padding.Left, widget.Padding.Top + dy);
 				foreach (var w in line) {
-					var height = (w.LayoutCell ?? LayoutCell.Default).Stretch.Y == 0.0f
+					var height = (w.LayoutCell ?? CellDefaults).Stretch.Y == 0.0f
 						? w.MinHeight
 						: maxLineHeight;
 					var size = new Vector2(sizes[i], height);
-					LayoutWidgetWithinCell(w, position, size, DebugRectangles);
+					var align = (widget.LayoutCell ?? CellDefaults).Alignment;
+					LayoutWidgetWithinCell(w, position, size, align, DebugRectangles);
 					position.X += size.X + Spacing;
 					i++;
 				}
