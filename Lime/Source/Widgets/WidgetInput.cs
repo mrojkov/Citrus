@@ -143,13 +143,6 @@ namespace Lime
 		{
 			for (int i = captureStack.Count - 1; i >= 0; i--) {
 				if (captureStack[i].Widget == widget && BitArraysEqual(captureStack[i].Keys, keys)) {
-					// Suppress key states changes to prevent keys from being processed twice.
-					var s = captureStack[i];
-					for (int k = 0; k < keys.Count; k++) {
-						if (s.Keys.Get(k)) {
-							WindowInput.SuppressKeyStateChange(k);
-						}
-					}
 					captureStack.RemoveAt(i);
 					break;
 				}

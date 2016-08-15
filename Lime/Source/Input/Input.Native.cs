@@ -96,11 +96,6 @@ namespace Lime
 			return keys[key.Code].CurrentState;
 		}
 
-		public void SuppressKeyStateChange(Key key)
-		{
-			keys[key.Code].PreviousState = keys[key.Code].CurrentState;
-		}
-
 		public Modifiers GetModifiers()
 		{
 			var result = Modifiers.None;
