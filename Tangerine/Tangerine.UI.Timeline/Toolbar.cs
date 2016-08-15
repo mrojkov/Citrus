@@ -22,6 +22,7 @@ namespace Tangerine.UI.Timeline
 					CreateAnimationModeButton(),
 					CreateAutoKeyframesButton(),
 					new Widget(),
+					CreateExitButton(),
 					CreateEyeButton(),
 					CreateLockButton()
 				}
@@ -55,6 +56,15 @@ namespace Tangerine.UI.Timeline
 			button.Clicked += () => {
 				UserPreferences.Instance.AutoKeyframes = !UserPreferences.Instance.AutoKeyframes;
 			};
+			return button;
+		}
+
+		ToolbarButton CreateExitButton()
+		{
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.ExitContainer")) {
+				LayoutCell = new LayoutCell(Alignment.Center)
+			};
+			button.Clicked += Operations.LeaveNode.Perform;
 			return button;
 		}
 

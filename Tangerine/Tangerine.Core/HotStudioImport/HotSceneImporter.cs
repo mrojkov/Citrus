@@ -61,7 +61,7 @@ namespace Orange
 			case "Actors":
 				lexer.ParseToken('[');
 				while (lexer.PeekChar() != ']') {
-					var child = ParseNode();
+					var child = ParseNode(null);
 					if (child != null)
 						node.Nodes.Add(child);
 				}
@@ -876,19 +876,21 @@ namespace Orange
 			return obj;
 		}
 
-		public Node ParseNode()
+		public Node ParseNode(Node node)
 		{
 			string actorClass = lexer.ParseQuotedString();
 			foreach (KnownActorType t in knownActorTypes) {
 				if (t.ActorClass == actorClass) {
-					Node n = (Node)CreateObject(t.NodeClass);
+					if (node == null) {
+						node = (Node)CreateObject(t.NodeClass);
+					}
 					lexer.ParseToken('{');
 					while (lexer.PeekChar() != '}')
-						t.PropReader(n, lexer.ParseWord());
+						t.PropReader(node, lexer.ParseWord());
 					lexer.ParseToken('}');
 					if (t.ActorClass == "Hot::FolderBegin" || t.ActorClass == "Hot::FolderEnd")
 						return null;
-					return n;
+					return node;
 				}
 			}
 			throw new Exception("Unknown type of actor '{0}'", actorClass);

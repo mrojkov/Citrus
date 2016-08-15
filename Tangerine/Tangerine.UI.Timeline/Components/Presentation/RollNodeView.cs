@@ -133,7 +133,7 @@ namespace Tangerine.UI.Timeline.Components
 						editBox.SetFocus();
 						editBox.Tasks.Add(EditNodeIdTask());
 					} else if (widget.IsMouseOver()) {
-						Operations.SetCurrentContainer.Perform(row.Components.Get<NodeRow>().Node);
+						Operations.EnterNode.Perform(row.Components.Get<NodeRow>().Node);
 					}
 				}
 				yield return null;

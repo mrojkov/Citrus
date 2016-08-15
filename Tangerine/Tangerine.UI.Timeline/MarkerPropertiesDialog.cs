@@ -20,7 +20,7 @@ namespace Tangerine.UI.Timeline
 		public MarkerPropertiesDialog(Marker marker)
 		{
 			this.marker = marker.Clone();
-			window = new Window(new WindowOptions { FixedSize = true, Title = "Marker properties", Visible = false });
+			window = new Window(new WindowOptions { FixedSize = true, Title = "Marker properties", Visible = false, Style = WindowStyle.Dialog });
 			rootWidget = new InvalidableWindowWidget(window) {
 				LayoutBasedWindowSize = true,
 				Padding = new Thickness(8),

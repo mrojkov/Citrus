@@ -20,6 +20,8 @@ namespace Tangerine.Core
 
 	public sealed class Document
 	{
+		public const string SceneFileExtension = "scene";
+
 		public enum CloseAction
 		{
 			Cancel,
@@ -40,6 +42,7 @@ namespace Tangerine.Core
 		public Node RootNode { get; private set; }
 		public Node Container { get; set; }
 		public IEnumerable<Node> SelectedNodes => SelectedNodesProvider.Get();
+		public string SceneNavigatedFrom;
 
 		private bool viewsCreated;
 		public readonly List<IDocumentView> Views = new List<IDocumentView>();
@@ -62,7 +65,7 @@ namespace Tangerine.Core
 		{
 			Path = path;
 			using (Theme.Push(DefaultTheme.Instance)) {
-				RootNode = Serialization.ReadObject<Node>(path);
+				RootNode = new Frame(path);
 			}
 			Container = RootNode;
 		}

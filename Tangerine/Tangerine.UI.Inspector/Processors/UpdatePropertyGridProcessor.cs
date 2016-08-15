@@ -74,14 +74,14 @@ namespace Tangerine.UI.Inspector
 					label.CompoundPresenter.Add(new WidgetFlatFillPresenter(Colors.Inspector.CategoryLabelBackground));
 					Inspector.ScrollableWidget.AddNode(label);
 				}
-				PropertyEditorBuilder editorBuilder;
-				var propType = property.PropertyType;
-				if (!Inspector.EditorMap.TryGetValue(propType, out editorBuilder)) {
-					continue;
-				}
 				var context = new PropertyEditorContext(Inspector.ScrollableWidget, objects, type, property.Name);
-				var propertyEditor = editorBuilder(context);
-				Inspector.Editors.Add(propertyEditor);
+				foreach (var i in Inspector.PropertyEditorRegistry) {
+					if (i.Condition(context)) {
+						var propertyEditor = i.Builder(context);
+						Inspector.Editors.Add(propertyEditor);
+						break;
+					}
+				}
 			}
 		}
 	}

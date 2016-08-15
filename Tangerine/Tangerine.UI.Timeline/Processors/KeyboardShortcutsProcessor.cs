@@ -57,12 +57,10 @@ namespace Tangerine.UI.Timeline
 			if (input.WasKeyPressed(KeyBindings.Timeline.EnterNode)) {
 				var node = timeline.SelectedRows.Select(i => i.Components.Get<Components.NodeRow>()).FirstOrDefault(i => i != null)?.Node;
 				if (node != null) {
-					Operations.SetCurrentContainer.Perform(node);
+					Operations.EnterNode.Perform(node);
 				}
 			} else if (input.WasKeyPressed(KeyBindings.Timeline.ExitNode)) {
-				if (timeline.Container.Parent != null) {
-					Operations.SetCurrentContainer.Perform(timeline.Container.Parent);
-				}
+				Operations.LeaveNode.Perform();
 			}
 		}
 		

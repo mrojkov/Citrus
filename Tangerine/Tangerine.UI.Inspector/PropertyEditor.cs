@@ -256,12 +256,13 @@ namespace Tangerine.UI.Inspector
 		}
 	}
 
-	class TexturePropertyEditor<T> : CommonPropertyEditor
+	abstract class FilePropertyEditor : CommonPropertyEditor
 	{
-		public TexturePropertyEditor(PropertyEditorContext context) : base(context)
+		protected readonly EditBox editor;
+		protected readonly Button button;
+
+		protected FilePropertyEditor(PropertyEditorContext context, string[] allowedFileTypes) : base(context)
 		{
-			EditBox editor;
-			Button button;
 			containerWidget.AddNode(new Widget {
 				Layout = new HBoxLayout(),
 				Nodes = {
@@ -273,25 +274,57 @@ namespace Tangerine.UI.Inspector
 					})
 				}
 			});
+			OnKeyframeToggle += editor.SetFocus;
 			button.Clicked += () => {
-				var dlg = new FileDialog { AllowedFileTypes = new string[] { "png" }, Mode = FileDialogMode.Open };
+				var dlg = new FileDialog { AllowedFileTypes = allowedFileTypes, Mode = FileDialogMode.Open };
 				if (dlg.RunModal()) {
 					if (!dlg.FileName.StartsWith(Project.Current.AssetsDirectory)) {
 						var alert = new AlertDialog("Tangerine", "Can't open an assset outside the project assets directory", "Ok");
 						alert.Show();
 					} else {
 						var path = System.IO.Path.ChangeExtension(dlg.FileName.Substring(Project.Current.AssetsDirectory.Length + 1), null);
-						foreach (var obj in context.Objects) {
-							Core.Operations.SetAnimableProperty.Perform(obj, context.PropertyName, new SerializableTexture(path));
-						}
+						SetFilePath(path);
 					}
 				}
 			};
-			OnKeyframeToggle += editor.SetFocus;
+		}
+
+		protected abstract void SetFilePath(string path);
+	}
+
+	class TexturePropertyEditor<T> : FilePropertyEditor
+	{
+		public TexturePropertyEditor(PropertyEditorContext context) : base(context, new string[] { "png" })
+		{
 			editor.Submitted += text => {
 				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, new SerializableTexture(text));
 			};
 			editor.Tasks.Add(CoalescedPropertyValue<ITexture>(context).DistinctUntilChanged().Select(i => i != null ? i.SerializationPath : "").Consume(v => editor.Text = v));
+		}
+
+		protected override void SetFilePath(string path)
+		{
+			foreach (var obj in context.Objects) {
+				Core.Operations.SetAnimableProperty.Perform(obj, context.PropertyName, new SerializableTexture(path));
+			}
+		}
+	}
+
+	class ContentsPathPropertyEditor : FilePropertyEditor
+	{
+		public ContentsPathPropertyEditor(PropertyEditorContext context) : base(context, new string[] { Document.SceneFileExtension })
+		{
+			editor.Submitted += text => {
+				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, text);
+			};
+			editor.Tasks.Add(CoalescedPropertyValue<string>(context).DistinctUntilChanged().Consume(v => editor.Text = v));
+		}
+
+		protected override void SetFilePath(string path)
+		{
+			foreach (var obj in context.Objects) {
+				Core.Operations.SetAnimableProperty.Perform(obj, context.PropertyName, path);
+			}
 		}
 	}
 }

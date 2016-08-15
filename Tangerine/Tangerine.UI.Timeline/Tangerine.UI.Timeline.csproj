@@ -104,7 +104,7 @@
     <Compile Include="Operations\ClearRowSelection.cs" />
     <Compile Include="Operations\DragRows.cs" />
     <Compile Include="Operations\SelectRowRange.cs" />
-    <Compile Include="Operations\SetCurrentContainer.cs" />
+    <Compile Include="Operations\EnterLeaveNode.cs" />
     <Compile Include="Operations\CopyPaste.cs" />
     <Compile Include="Processors\UnselectUnlinkedNodesProcessor.cs" />
   </ItemGroup>

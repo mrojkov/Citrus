@@ -38,7 +38,7 @@ namespace Tangerine
 
 		public override void Execute()
 		{
-			var dlg = new FileDialog { AllowedFileTypes = new string[] { "scene" }, Mode = FileDialogMode.Open };
+			var dlg = new FileDialog { AllowedFileTypes = new string[] { Document.SceneFileExtension }, Mode = FileDialogMode.Open };
 			if (dlg.RunModal()) {
 				if (!dlg.FileName.StartsWith(Project.Current.AssetsDirectory)) {
 					var alert = new AlertDialog("Tangerine", "Can't open document outside the project assets directory", "Ok");

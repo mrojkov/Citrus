@@ -12,13 +12,25 @@ namespace Tangerine.UI.Inspector
 
 	public class Inspector : IDocumentView
 	{
+		public class PropertyEditorRegistryItem
+		{
+			public readonly Func<PropertyEditorContext, bool> Condition;
+			public readonly PropertyEditorBuilder Builder;
+
+			public PropertyEditorRegistryItem(Func<PropertyEditorContext, bool> condition, PropertyEditorBuilder builder)
+			{
+				Condition = condition;
+				Builder = builder;
+			}
+		}
+
 		public static Inspector Instance { get; private set; }
 
 		public readonly Widget PanelWidget;
 		public readonly Frame RootWidget;
 		public readonly Widget ScrollableWidget;
 		public readonly List<object> Objects;
-		public readonly Dictionary<Type, PropertyEditorBuilder> EditorMap;
+		public readonly List<PropertyEditorRegistryItem> PropertyEditorRegistry;
 		public readonly List<IPropertyEditor> Editors;
 
 		public TaskList Tasks => RootWidget.Tasks;
@@ -41,7 +53,7 @@ namespace Tangerine.UI.Inspector
 			RootWidget = new Frame();
 			ScrollableWidget = new ScrollView((Frame)RootWidget).Content;
 			Objects = new List<object>();
-			EditorMap = new Dictionary<Type, PropertyEditorBuilder>();
+			PropertyEditorRegistry = new List<PropertyEditorRegistryItem>();
 			Editors = new List<IPropertyEditor>();
 			RegisterEditors();
 			InitializeWidgets();
@@ -57,15 +69,26 @@ namespace Tangerine.UI.Inspector
 
 		private void RegisterEditors()
 		{
-			EditorMap.Add(typeof(Vector2), c => new Vector2PropertyEditor(c));
-			EditorMap.Add(typeof(string), c => new StringPropertyEditor(c));
-			EditorMap.Add(typeof(float), c => new FloatPropertyEditor(c));
-			EditorMap.Add(typeof(bool), c => new BooleanPropertyEditor(c));
-			EditorMap.Add(typeof(Color4), c => new Color4PropertyEditor(c));
-			EditorMap.Add(typeof(Blending), c => new EnumPropertyEditor<Blending>(c));
-			EditorMap.Add(typeof(Anchors), c => new EnumPropertyEditor<Anchors>(c));
-			EditorMap.Add(typeof(RenderTarget), c => new EnumPropertyEditor<RenderTarget>(c));
-			EditorMap.Add(typeof(ITexture), c => new TexturePropertyEditor<ITexture>(c));
+			AddEditor(c => c.PropertyName == "ContentsPath", c => new ContentsPathPropertyEditor(c));
+			AddEditor(typeof(Vector2), c => new Vector2PropertyEditor(c));
+			AddEditor(typeof(string), c => new StringPropertyEditor(c));
+			AddEditor(typeof(float), c => new FloatPropertyEditor(c));
+			AddEditor(typeof(bool), c => new BooleanPropertyEditor(c));
+			AddEditor(typeof(Color4), c => new Color4PropertyEditor(c));
+			AddEditor(typeof(Blending), c => new EnumPropertyEditor<Blending>(c));
+			AddEditor(typeof(Anchors), c => new EnumPropertyEditor<Anchors>(c));
+			AddEditor(typeof(RenderTarget), c => new EnumPropertyEditor<RenderTarget>(c));
+			AddEditor(typeof(ITexture), c => new TexturePropertyEditor<ITexture>(c));
+		}
+
+		private void AddEditor(Type type, PropertyEditorBuilder builder)
+		{
+			PropertyEditorRegistry.Add(new PropertyEditorRegistryItem(c => c.PropertyInfo.PropertyType == type, builder));
+		}
+
+		private void AddEditor(Func<PropertyEditorContext, bool> condition, PropertyEditorBuilder builder)
+		{
+			PropertyEditorRegistry.Add(new PropertyEditorRegistryItem(condition, builder));
 		}
 
 		void CreateTasks()

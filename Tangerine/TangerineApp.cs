@@ -41,8 +41,8 @@ namespace Tangerine
 		{
 			public object Deserialize(System.IO.Stream stream, object value, Type type)
 			{
-				if (type == typeof(Node)) {
-					return new Orange.HotSceneImporter(stream).ParseNode();
+				if (type == typeof(Frame)) {
+					return new Orange.HotSceneImporter(stream).ParseNode(value as Node);
 				} else if (type == typeof(Font)) {
 					return new Orange.HotFontImporter().ParseFont(stream);
 				} else {
