@@ -55,7 +55,7 @@ namespace Tangerine.UI.Timeline
 			CreateProcessors();
 			InitializeWidgets();
 			Document.Current.SelectedNodesProvider = this;
-			// SelectFirstRow();
+			SelectFirstNode();
 		}
 
 		public void Attach()
@@ -144,10 +144,13 @@ namespace Tangerine.UI.Timeline
 			}
 		}
 
-		void SelectFirstRow()
+		void SelectFirstNode()
 		{
-			var r = GetCachedRow(Container.Nodes[0].EditorState().Uid);
-			Operations.SelectRow.Perform(r);
+			if (Container.Nodes.Count > 0) {
+				var r = GetCachedRow(Container.Nodes[0].EditorState().Uid);
+				SelectedRows.Clear();
+				SelectedRows.Add(r);
+			}
 		}
 
 		public Row GetCachedRow(Uid uid)
