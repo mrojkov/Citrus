@@ -214,6 +214,16 @@ namespace Lime
 			return ABGR == other.ABGR;
 		}
 
+		public static bool operator == (Color4 lhs, Color4 rhs)
+		{
+			return lhs.ABGR == rhs.ABGR;
+		}
+
+		public static bool operator != (Color4 lhs, Color4 rhs)
+		{
+			return lhs.ABGR != rhs.ABGR;
+		}
+
 		public enum StringPresentation
 		{
 			Hex,
