@@ -14,7 +14,7 @@ namespace Lime
 
 		public SerializableTexture(string path)
 		{
-			this.path = path;
+			SetSerializationPath(path);
 		}
 
 		public SerializableTexture()
