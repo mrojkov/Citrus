@@ -8,21 +8,17 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.Inspector
 {
-	class UpdatePropertyGridProcessor : IProcessor
+	class InspectorBuilder
 	{
 		Inspector Inspector => Inspector.Instance;
 
-		public IEnumerator<object> Loop()
+		public void Build(IEnumerable<object> objects)
 		{
-			var objects = Inspector.Objects;
-			while (true) {
-				var selectedObjects = Document.Current.SelectedNodes;
-				if (!objects.SequenceEqual(selectedObjects)) {
-					objects.Clear();
-					objects.AddRange(selectedObjects);
-					RebuildContent(selectedObjects);
-				}
-				yield return null;
+			Inspector.ScrollableWidget.Nodes.Clear();
+			Inspector.Editors.Clear();
+			foreach (var t in GetTypes(objects)) {
+				var o = objects.Where(i => t.IsInstanceOfType(i)).ToList();
+				PopulateContentForType(t, o);
 			}
 		}
 
@@ -42,16 +38,6 @@ namespace Tangerine.UI.Inspector
 				}
 			}
 			return types;
-		}
-
-		void RebuildContent(IEnumerable<object> objects)
-		{
-			Inspector.ScrollableWidget.Nodes.Clear();
-			Inspector.Editors.Clear();
-			foreach (var t in GetTypes(objects)) {
-				var o = objects.Where(i => t.IsInstanceOfType(i)).ToList();
-				PopulateContentForType(t, o);
-			}
 		}
 
 		void PopulateContentForType(Type type, List<object> objects)

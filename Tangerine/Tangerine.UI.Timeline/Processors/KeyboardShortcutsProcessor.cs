@@ -24,7 +24,7 @@ namespace Tangerine.UI.Timeline
 
 		void HandleShortcuts(WidgetInput input)
 		{
-			var hasSelection = Document.Current.SelectedNodes.Count() > 0;
+			var hasSelection = Document.Current.SelectedNodes.Count > 0;
 			input.EnableKey(Key.Commands.Undo, Document.Current.History.UndoEnabled);
 			input.EnableKey(Key.Commands.Redo, Document.Current.History.RedoEnabled);
 			input.EnableKey(Key.Commands.SelectAll, hasSelection);

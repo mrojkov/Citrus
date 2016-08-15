@@ -62,7 +62,7 @@
     <Compile Include="KeyFunctionButton.cs" />
     <Compile Include="KeyframeDataflow.cs" />
     <Compile Include="KeyframeButton.cs" />
-    <Compile Include="Processors\UpdatePropertyGridProcessor.cs" />
+    <Compile Include="InspectorBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tangerine.UI\Tangerine.UI.csproj">
@@ -77,9 +77,6 @@
       <Project>{DC16EEBF-404D-4610-B87A-15B57464D707}</Project>
       <Name>Lime.Mac</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Processors\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
 </Project>

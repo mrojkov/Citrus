@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Tangerine.UI.Timeline
 {
-	public class Timeline : ISelectedNodesProvider, IDocumentView
+	public class Timeline : IDocumentView
 	{
 		public static class Clipboard
 		{
@@ -46,7 +46,7 @@ namespace Tangerine.UI.Timeline
 		public int ColumnCount { get; set; }
 		public GridSelection GridSelection = new GridSelection();
 		public readonly List<Row> Rows = new List<Row>();
-		public readonly List<Row> SelectedRows = new List<Row>();
+		public readonly VersionedCollection<Row> SelectedRows = new VersionedCollection<Row>();
 		public readonly Entity Globals = new Entity();
 
 		public Timeline(Widget panelWidget)
@@ -54,7 +54,6 @@ namespace Tangerine.UI.Timeline
 			PanelWidget = panelWidget;
 			CreateProcessors();
 			InitializeWidgets();
-			Document.Current.SelectedNodesProvider = this;
 			SelectFirstNode();
 		}
 
@@ -122,18 +121,17 @@ namespace Tangerine.UI.Timeline
 				new SelectAndDragRowsProcessor(),
 				new RulerMouseScrollProcessor(),
 				new ClampScrollOriginProcessor(),
-				new EditMarkerProcessor()
+				new EditMarkerProcessor(),
+				CreateDocumentSelectedNodesProcessor()
 			});
 		}
 
-		IEnumerable<Node> ISelectedNodesProvider.Get()
+		static IProcessor CreateDocumentSelectedNodesProcessor()
 		{
-			foreach (var i in SelectedRows) {
-				var n = i.Components.Get<Components.NodeRow>()?.Node;
-				if (n != null) {
-					yield return n;
-				}
-			}
+			return new Property<int>(() => Timeline.Instance.SelectedRows.Version).DistinctUntilChanged().Consume(_ => {
+				Document.Current.SelectedNodes.Clear();
+				Document.Current.SelectedNodes.AddRange(Timeline.Instance.SelectedRows.Select(i => i.Components.Get<Components.NodeRow>()?.Node).Where(n => n != null));
+			});
 		}
 
 		void SetCurrentFrameRecursive(Node node, int frame)

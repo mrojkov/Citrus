@@ -12,18 +12,6 @@ namespace Tangerine.UI.Inspector
 
 	public class Inspector : IDocumentView
 	{
-		public class PropertyEditorRegistryItem
-		{
-			public readonly Func<PropertyEditorContext, bool> Condition;
-			public readonly PropertyEditorBuilder Builder;
-
-			public PropertyEditorRegistryItem(Func<PropertyEditorContext, bool> condition, PropertyEditorBuilder builder)
-			{
-				Condition = condition;
-				Builder = builder;
-			}
-		}
-
 		public static Inspector Instance { get; private set; }
 
 		public readonly Widget PanelWidget;
@@ -32,8 +20,6 @@ namespace Tangerine.UI.Inspector
 		public readonly List<object> Objects;
 		public readonly List<PropertyEditorRegistryItem> PropertyEditorRegistry;
 		public readonly List<IPropertyEditor> Editors;
-
-		public TaskList Tasks => RootWidget.Tasks;
 
 		public void Attach()
 		{
@@ -57,7 +43,7 @@ namespace Tangerine.UI.Inspector
 			Editors = new List<IPropertyEditor>();
 			RegisterEditors();
 			InitializeWidgets();
-			CreateTasks();
+			RootWidget.Tasks.Add(RebuildInspectorWhenSelectedNodesChanged());
 		}
 
 		void InitializeWidgets()
@@ -91,9 +77,24 @@ namespace Tangerine.UI.Inspector
 			PropertyEditorRegistry.Add(new PropertyEditorRegistryItem(condition, builder));
 		}
 
-		void CreateTasks()
+		IProcessor RebuildInspectorWhenSelectedNodesChanged()
 		{
-			Tasks.Add(new UpdatePropertyGridProcessor());
+			var builder = new InspectorBuilder();
+			return new Property<int>(() => Document.Current.SelectedNodes.Version).DistinctUntilChanged().Consume(_ => {
+				builder.Build(Document.Current.SelectedNodes);
+			});
+		}
+
+		public class PropertyEditorRegistryItem
+		{
+			public readonly Func<PropertyEditorContext, bool> Condition;
+			public readonly PropertyEditorBuilder Builder;
+
+			public PropertyEditorRegistryItem(Func<PropertyEditorContext, bool> condition, PropertyEditorBuilder builder)
+			{
+				Condition = condition;
+				Builder = builder;
+			}
 		}
 	}
 }

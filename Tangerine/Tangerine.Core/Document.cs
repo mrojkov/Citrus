@@ -7,11 +7,6 @@ using Lime;
 
 namespace Tangerine.Core
 {
-	public interface ISelectedNodesProvider
-	{
-		IEnumerable<Node> Get();
-	}
-
 	public interface IDocumentView
 	{
 		void Detach();
@@ -41,7 +36,7 @@ namespace Tangerine.Core
 
 		public Node RootNode { get; private set; }
 		public Node Container { get; set; }
-		public IEnumerable<Node> SelectedNodes => SelectedNodesProvider.Get();
+		public VersionedCollection<Node> SelectedNodes = new VersionedCollection<Node>();
 		public string SceneNavigatedFrom;
 
 		private bool viewsCreated;
@@ -54,7 +49,6 @@ namespace Tangerine.Core
 		}
 
 		public string AnimationId { get; set; }
-		public ISelectedNodesProvider SelectedNodesProvider { get; set; }
 
 		public Document()
 		{

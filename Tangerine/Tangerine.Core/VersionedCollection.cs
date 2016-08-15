@@ -35,5 +35,12 @@ namespace Tangerine.Core
 			base.SetItem(index, item);
 			Version++;
 		}
-	}	
+
+		public void AddRange(IEnumerable<T> values)
+		{
+			foreach (var v in values) {
+				Add(v);
+			}
+		}
+	}
 }
