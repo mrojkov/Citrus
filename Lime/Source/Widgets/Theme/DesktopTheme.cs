@@ -75,7 +75,12 @@ namespace Lime
 			button.Padding = Metrics.ControlsPadding;
 			button.Presenter = presenter;
 			button.PostPresenter = new KeyboardFocusBorderPresenter();
-			button.DefaultAnimation.AnimationEngine = new ButtonAnimationEngine(presenter);
+			button.DefaultAnimation.AnimationEngine = new AnimationEngineDelegate {
+				OnRunAnimation = (animation, markerId) => {
+					presenter.SetState(markerId);
+					return true;
+				}
+			};
 			var caption = new SimpleText {
 				Id = "TextPresenter",
 				TextColor = Colors.BlackText,
@@ -195,12 +200,18 @@ namespace Lime
 		private void DecorateTab(Widget widget)
 		{
 			var tab = (Tab)widget;
+			var presenter = new TabPresenter();
 			tab.Padding = Metrics.ControlsPadding;
-			tab.Presenter = new TabPresenter();
+			tab.Presenter = presenter;
 			tab.MinSize = Metrics.MinTabSize;
 			tab.MaxSize = Metrics.MaxTabSize;
 			tab.Size = tab.MinSize;
-			tab.DefaultAnimation.AnimationEngine = new TabAnimationEngine((TabPresenter)tab.Presenter);
+			tab.DefaultAnimation.AnimationEngine = new AnimationEngineDelegate {
+				OnRunAnimation = (animation, markerId) => {
+					presenter.SetState(markerId);
+					return true;
+				}
+			};
 			tab.Layout = new HBoxLayout();
 			var caption = new SimpleText {
 				Id = "TextPresenter",
@@ -220,10 +231,16 @@ namespace Lime
 		private void DecorateTabCloseButton(Widget widget)
 		{
 			var button = (Button)widget;
+			var presenter = new TabCloseButtonPresenter();
 			button.LayoutCell = new LayoutCell(Alignment.Center, stretchX: 0);
-			button.Presenter = new TabCloseButtonPresenter();
+			button.Presenter = presenter;
 			button.MinMaxSize = Metrics.CloseButtonSize;
-			button.DefaultAnimation.AnimationEngine = new ButtonAnimationEngine((IButtonPresenter)button.Presenter);
+			button.DefaultAnimation.AnimationEngine = new AnimationEngineDelegate {
+				OnRunAnimation = (animation, markerId) => {
+					presenter.SetState(markerId);
+					return true;
+				}
+			};
 		}
 
 		private void DecorateTextView(Widget widget)
@@ -324,22 +341,6 @@ namespace Lime
 			void SetState(string state);
 		}
 
-		class ButtonAnimationEngine : Lime.AnimationEngine
-		{
-			private readonly IButtonPresenter presenter;
-
-			public ButtonAnimationEngine(IButtonPresenter presenter)
-			{
-				this.presenter = presenter;
-			}
-
-			public override bool TryRunAnimation(Animation animation, string markerId)
-			{
-				presenter.SetState(markerId);
-				return true;
-			}
-		}
-
 		class ButtonPresenter : CustomPresenter, IButtonPresenter
 		{
 			private ColorGradient innerGradient;
@@ -374,22 +375,6 @@ namespace Lime
 			public override bool PartialHitTest(Node node, ref HitTestArgs args)
 			{
 				return node.PartialHitTest(ref args);
-			}
-		}
-
-		class TabAnimationEngine : Lime.AnimationEngine
-		{
-			private readonly TabPresenter presenter;
-
-			public TabAnimationEngine(TabPresenter presenter)
-			{
-				this.presenter = presenter;
-			}
-
-			public override bool TryRunAnimation(Animation animation, string markerId)
-			{
-				presenter.SetState(markerId);
-				return true;
 			}
 		}
 

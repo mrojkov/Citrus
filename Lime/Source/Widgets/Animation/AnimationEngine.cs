@@ -12,6 +12,32 @@ namespace Lime
 		public virtual void ApplyAnimators(Animation animation, bool invokeTriggers) { }
 	}
 
+	public class AnimationEngineDelegate : AnimationEngine
+	{
+		public Func<Animation, string, bool> OnRunAnimation;
+		public Action<Animation, float> OnAdvanceAnimation;
+		public Action<Animation, bool> OnApplyAnimators;
+
+		public override bool TryRunAnimation(Animation animation, string markerId)
+		{
+			return (OnRunAnimation != null) && OnRunAnimation(animation, markerId);
+		}
+
+		public override void AdvanceAnimation(Animation animation, float delta)
+		{
+			if (OnAdvanceAnimation != null) {
+				OnAdvanceAnimation(animation, delta);
+			}
+		}
+
+		public override void ApplyAnimators(Animation animation, bool invokeTriggers)
+		{
+			if (OnApplyAnimators != null) {
+				OnApplyAnimators(animation, invokeTriggers);
+			}
+		}
+	}
+
 	public class DefaultAnimationEngine : AnimationEngine
 	{
 		public static readonly DefaultAnimationEngine Instance = new DefaultAnimationEngine();
