@@ -15,8 +15,6 @@ namespace Tangerine.Core
 
 	public sealed class Document
 	{
-		public const string SceneFileExtension = "scene";
-
 		public enum CloseAction
 		{
 			Cancel,
@@ -24,22 +22,21 @@ namespace Tangerine.Core
 			DiscardChanges
 		}
 
-		public static Action ViewsBuilder;
-		
+		public static event Action<Document> AttachingViews;
+		public static event Func<Document, CloseAction> Closing;
+
+		public const string SceneFileExtension = "scene";
+
 		public static Document Current { get; private set; }
 
 		public string Path { get; private set; }
 		public readonly DocumentHistory History;
 		public bool IsModified => History.IsDocumentModified;
 
-		public static Func<Document, CloseAction> Closing;
-
 		public Node RootNode { get; private set; }
 		public Node Container { get; set; }
 		public VersionedCollection<Node> SelectedNodes = new VersionedCollection<Node>();
 		public string SceneNavigatedFrom;
-
-		private bool viewsCreated;
 		public readonly List<IDocumentView> Views = new List<IDocumentView>();
 
 		public int AnimationFrame
@@ -83,10 +80,7 @@ namespace Tangerine.Core
 
 		void AttachViews()
 		{
-			if (!viewsCreated) {
-				ViewsBuilder();
-				viewsCreated = true;
-			}
+			AttachingViews?.Invoke(this);
 			foreach (var i in Current.Views) {
 				i.Attach();
 			}
@@ -120,6 +114,7 @@ namespace Tangerine.Core
 
 		public void Save()
 		{
+			throw new NotImplementedException();
 		}
 	}
 }

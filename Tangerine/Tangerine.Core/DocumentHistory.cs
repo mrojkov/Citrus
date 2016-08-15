@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 
 namespace Tangerine.Core
 {
-	public interface ISaveOperation : IOperation
-	{
-	}
+	public interface ISaveOperation : IOperation { }
 
 	public class DocumentHistory
 	{

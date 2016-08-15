@@ -88,14 +88,17 @@ namespace Tangerine
 					default: return Document.CloseAction.Cancel;
 				}
 			};
-			Document.ViewsBuilder = () => {
-				var doc = Document.Current;
-				doc.Views.Add(new UI.Inspector.Inspector(inspectorPanel.ContentWidget));
-				doc.Views.Add(new UI.Timeline.Timeline(timelinePanel.ContentWidget));
-				doc.Views.Add(new UI.SceneView.SceneView(documentViewContainer));
-				doc.Views.Add(new UI.Console(consolePanel.ContentWidget));
-				doc.Views.Add(new UI.SearchPanel(searchPanel.ContentWidget));
-				doc.History.Changed += () => CommonWindow.Current.Invalidate();
+			Document.AttachingViews += doc => {
+				if (doc.Views.Count == 0) {
+					doc.Views.AddRange(new IDocumentView [] {
+						new UI.Inspector.Inspector(inspectorPanel.ContentWidget),
+						new UI.Timeline.Timeline(timelinePanel.ContentWidget),
+						new UI.SceneView.SceneView(documentViewContainer),
+						new UI.Console(consolePanel.ContentWidget),
+						new UI.SearchPanel(searchPanel.ContentWidget),
+					});
+					doc.History.Changed += () => CommonWindow.Current.Invalidate();
+				}
 			};
 			if (UserPreferences.Instance.RecentProjects.Count > 0) {
 				new Project(UserPreferences.Instance.RecentProjects[0]).Open();
