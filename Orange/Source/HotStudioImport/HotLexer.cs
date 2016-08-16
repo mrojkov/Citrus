@@ -305,8 +305,16 @@ namespace Orange
 		public string ParsePath()
 		{
 			string path = ParseQuotedString();
-			if (string.IsNullOrEmpty(path) || path[0] == '#')
+			if (string.IsNullOrEmpty(path))
 				return path;
+			else if (path[0] == '#')
+				return path;
+			else if (path[0] == '/' || path[0] == '\\')
+				path = path.Substring(1);
+			else {
+				string d = Path.GetDirectoryName(sourcePath);
+				path = Path.Combine(d, path);
+			}
 			path = Path.ChangeExtension(path, null);
 			path = path.Replace('\\', '/');
 			return path;
