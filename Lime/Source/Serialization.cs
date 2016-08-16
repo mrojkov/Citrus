@@ -76,7 +76,7 @@ namespace Lime
 			}
 			if (OperationStack.Peek().Type == OperationType.Clone)
 				return path;
-			return '/' + path;
+			return string.IsNullOrEmpty(path) ? path : '/' + path;
 		}
 
 		public static string ExpandPath(string path)
@@ -93,7 +93,7 @@ namespace Lime
 				result = path.Substring(1);
 			else {
 				string p = OperationStack.Peek().SerializationPath;
-				result = Path.Combine(Path.GetDirectoryName(p), path);
+				result = Path.GetDirectoryName(p) + '/' + path;
 			}
 			return result;
 		}
