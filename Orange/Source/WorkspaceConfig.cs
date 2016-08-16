@@ -1,22 +1,19 @@
 using System;
 using System.IO;
-using ProtoBuf;
+using Yuzu;
 
 namespace Orange
 {
-	[ProtoContract]
 	public class WorkspaceConfig
 	{
-		[ProtoMember(1)]
+		[YuzuMember]
 		public string CitrusProject = "";
 
-		[ProtoMember(2)]
+		[YuzuMember]
 		public int TargetPlatform;
 
-		[ProtoMember(6)]
+		[YuzuMember]
 		public bool UpdateBeforeBuild;
-
-		public WorkspaceConfig() {}
 
 		private static string GetConfigPath()
 		{
@@ -29,7 +26,8 @@ namespace Orange
 		{
 			try {
 				using(FileStream stream = new FileStream(GetConfigPath(), FileMode.Open, FileAccess.Read, FileShare.None)) {
-					return ProtoBuf.Serializer.Deserialize<WorkspaceConfig>(stream);
+					var jd = new Yuzu.Json.JsonDeserializer();
+					return (WorkspaceConfig)jd.FromStream(new WorkspaceConfig(), stream);
 				}
 			}
 			catch {
@@ -40,7 +38,8 @@ namespace Orange
 		public static void Save(WorkspaceConfig config)
 		{
 			using(FileStream stream = new FileStream(GetConfigPath(), FileMode.Create, FileAccess.Write, FileShare.None)) {
-				ProtoBuf.Serializer.Serialize(stream, config);
+				var js = new Yuzu.Json.JsonSerializer();
+				js.ToStream(config, stream);
 			}
 		}
 	}
