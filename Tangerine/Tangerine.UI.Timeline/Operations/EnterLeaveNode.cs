@@ -32,23 +32,19 @@ namespace Tangerine.UI.Timeline.Operations
 
 		public static void ChangeContainer(Node container)
 		{
-			var timeline = Timeline.Instance;
 			var prevContainer = Timeline.Instance.Container;
-			DelegateOperation.Perform(
-				() => {
-					timeline.Container = container;
-					timeline.EnsureColumnVisible(Document.Current.AnimationFrame);
-				},
-				() => {
-					timeline.Container = prevContainer;
-					timeline.EnsureColumnVisible(Document.Current.AnimationFrame);
-				}
-			);
+			DelegateOperation.Perform(() => SetContainer(container), () => SetContainer(prevContainer));
 			ClearRowSelection.Perform();
 			if (container.Nodes.Count > 0) {
-				var r = timeline.GetCachedRow(container.Nodes[0].EditorState().Uid);
+				var r = Timeline.Instance.GetCachedRow(container.Nodes[0].EditorState().Uid);
 				SelectRow.Perform(r);
 			}
+		}
+
+		static void SetContainer(Node container)
+		{
+			Timeline.Instance.Container = container;
+			Timeline.Instance.EnsureColumnVisible(Document.Current.AnimationFrame);
 		}
 	}
 

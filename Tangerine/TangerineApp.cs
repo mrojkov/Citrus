@@ -99,9 +99,35 @@ namespace Tangerine
 					});
 					doc.History.Changed += () => CommonWindow.Current.Invalidate();
 				}
+				RefreshExternalContent(doc.RootNode);
 			};
 			if (UserPreferences.Instance.RecentProjects.Count > 0) {
 				new Project(UserPreferences.Instance.RecentProjects[0]).Open();
+			}
+		}
+
+		private static void RefreshExternalContent(Node node)
+		{
+			if (node.ContentsPath != null) {
+				var path = System.IO.Path.ChangeExtension(node.ContentsPath, Document.SceneFileExtension);
+				var doc = Project.Current.Documents.FirstOrDefault(i => i.Path == path);
+				if (doc != null && doc.IsModified) {
+					node.Nodes.Clear();
+					node.Markers.Clear();
+					var content = doc.RootNode.Clone();
+					RefreshExternalContent(content);
+					if (content.AsWidget != null && node.AsWidget != null) {
+						content.AsWidget.Size = node.AsWidget.Size;
+					}
+					node.Markers.AddRange(content.Markers);
+					var nodes = content.Nodes.ToList();
+					content.Nodes.Clear();
+					node.Nodes.AddRange(nodes);
+				}
+			} else {
+				foreach (var child in node.Nodes) {
+					RefreshExternalContent(child);
+				}
 			}
 		}
 

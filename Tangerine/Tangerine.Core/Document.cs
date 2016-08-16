@@ -35,8 +35,9 @@ namespace Tangerine.Core
 
 		public Node RootNode { get; private set; }
 		public Node Container { get; set; }
-		public VersionedCollection<Node> SelectedNodes = new VersionedCollection<Node>();
-		public string SceneNavigatedFrom;
+		public string SceneNavigatedFrom { get; set; }
+
+		public readonly VersionedCollection<Node> SelectedNodes = new VersionedCollection<Node>();
 		public readonly List<IDocumentView> Views = new List<IDocumentView>();
 
 		public int AnimationFrame
