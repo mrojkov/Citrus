@@ -15,7 +15,7 @@ namespace Lime
 
 		public SerializableSample(string path)
 		{
-			Path = path;
+			SerializationPath = path;
 		}
 
 		[ProtoMember(1)]
