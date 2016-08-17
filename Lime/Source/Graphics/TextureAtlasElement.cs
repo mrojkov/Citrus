@@ -29,7 +29,7 @@ namespace Lime
 
 			public static void WriteToFile(Params texParams, string path)
 			{
-				Serialization.WriteObjectToFile<Params>(path, texParams);
+				Serialization.WriteObjectToFile<Params>(path, texParams, Serialization.Format.Binary);
 			}
 		}
 

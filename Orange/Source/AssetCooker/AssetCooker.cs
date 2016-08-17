@@ -254,7 +254,7 @@ namespace Orange
 			SyncUpdated(".scene", ".scene", (srcPath, dstPath) => {
 				var importer = HotSceneImporterFactory.CreateImporter(srcPath);
 				var node = importer.ParseNode();
-				Serialization.WriteObjectToBundle(assetsBundle, dstPath, node);
+				Serialization.WriteObjectToBundle(assetsBundle, dstPath, node, Serialization.Format.Binary);
 				return true;
 			});
 		}
@@ -264,7 +264,7 @@ namespace Orange
 			SyncUpdated(".fnt", ".fnt", (srcPath, dstPath) => {
 				var importer = new HotFontImporter();
 				var font = importer.ParseFont(srcPath, dstPath);
-				Serialization.WriteObjectToBundle(assetsBundle, dstPath, font);
+				Serialization.WriteObjectToBundle(assetsBundle, dstPath, font, Serialization.Format.Binary);
 				return true;
 			});
 			SyncRawAssets(".ttf");
@@ -542,7 +542,7 @@ namespace Orange
 				atlasPart.AtlasRect = item.AtlasRect;
 				atlasPart.AtlasRect.B -= new IntVector2(2, 2);
 				atlasPart.AtlasPath = Path.ChangeExtension(atlasPath, null);
-				Serialization.WriteObjectToBundle(assetsBundle, item.Path, atlasPart);
+				Serialization.WriteObjectToBundle(assetsBundle, item.Path, atlasPart, Serialization.Format.Binary);
 				// Delete non-atlased texture since now its useless
 				var texturePath = Path.ChangeExtension(item.Path, GetPlatformTextureExtension());
 				if (assetsBundle.FileExists(texturePath)) {
@@ -706,7 +706,7 @@ namespace Orange
 		{
 			var rootNode = new Lime.Frame();
 			rootNode.AddNode(new ModelImporter(srcPath, The.Workspace.ActivePlatform).RootNode);
-			Serialization.WriteObjectToBundle(assetsBundle, dstPath, rootNode, AssetAttributes.ZippedLZMA);
+			Serialization.WriteObjectToBundle(assetsBundle, dstPath, rootNode, Serialization.Format.Binary, AssetAttributes.ZippedLZMA);
 			return true;
 		}
 	}
