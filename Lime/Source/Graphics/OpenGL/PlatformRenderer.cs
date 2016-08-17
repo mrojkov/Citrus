@@ -8,7 +8,6 @@ using OpenTK.Graphics.OpenGL;
 #elif MONOMAC
 using MonoMac.OpenGL;
 #endif
-using ProtoBuf;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 

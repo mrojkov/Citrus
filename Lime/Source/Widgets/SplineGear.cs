@@ -1,4 +1,3 @@
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
@@ -6,27 +5,23 @@ namespace Lime
 	/// <summary>
 	/// Хранит имя виджета и имя сплайна. Используется для задания траектории движения виджета по сплайну
 	/// </summary>
-	[ProtoContract]
 	public class SplineGear : Node
 	{
 		/// <summary>
 		/// Id виджета. Виджет ищется по всей сцене
 		/// </summary>
-		[ProtoMember(1)]
 		[YuzuMember]
 		public string WidgetId { get; set; }
 
 		/// <summary>
 		/// Id сплайна. Сплайн ищется по всей сцене
 		/// </summary>
-		[ProtoMember(2)]
 		[YuzuMember]
 		public string SplineId { get; set; }
 
 		/// <summary>
 		/// Положение виджета на сплайне. 0 - начало сплайна, 1 - конец
 		/// </summary>
-		[ProtoMember(3)]
 		[YuzuMember]
 		public float SplineOffset { get; set; }
 

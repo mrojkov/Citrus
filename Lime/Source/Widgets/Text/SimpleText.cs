@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
 {
-	[ProtoContract]
 	public class SimpleText : Widget, IText
 	{
 		private SpriteList spriteList;
@@ -32,7 +30,6 @@ namespace Lime
 			}
 		}
 
-		[ProtoMember(1)]
 		[YuzuMember]
 		public SerializableFont Font {
 			get { return font; }
@@ -44,7 +41,6 @@ namespace Lime
 			}
 		}
 
-		[ProtoMember(2)]
 		[YuzuMember]
 		public override string Text {
 			get { return text ?? ""; }
@@ -67,7 +63,6 @@ namespace Lime
 			}
 		}
 
-		[ProtoMember(3)]
 		[YuzuMember]
 		public float FontHeight {
 			get { return fontHeight; }
@@ -79,7 +74,6 @@ namespace Lime
 			}
 		}
 
-		[ProtoMember(4)]
 		[YuzuMember]
 		public float Spacing {
 			get { return spacing; }
@@ -91,7 +85,6 @@ namespace Lime
 			}
 		}
 
-		[ProtoMember(5)]
 		[YuzuMember]
 		public HAlignment HAlignment {
 			get { return hAlignment; }
@@ -103,7 +96,6 @@ namespace Lime
 			}
 		}
 
-		[ProtoMember(6)]
 		[YuzuMember]
 		public VAlignment VAlignment {
 			get { return vAlignment; }
@@ -115,15 +107,12 @@ namespace Lime
 			}
 		}
 
-		[ProtoMember(8)]
 		[YuzuMember]
 		public TextOverflowMode OverflowMode { get; set; }
 
-		[ProtoMember(9)]
 		[YuzuMember]
 		public bool WordSplitAllowed { get; set; }
 
-		[ProtoMember(10)]
 		[YuzuMember]
 		public Color4 TextColor
 		{

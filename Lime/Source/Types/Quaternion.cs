@@ -1,10 +1,8 @@
 ﻿using System;
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
 {
-	[ProtoContract]
 	[YuzuCompact]
 	public struct Quaternion : IEquatable<Quaternion>
 	{
@@ -13,28 +11,24 @@ namespace Lime
 		/// <summary>
 		/// The x coordinate of this <see cref="Quaternion"/>.
 		/// </summary>
-		[ProtoMember(1)]
 		[YuzuMember]
 		public float X;
 
 		/// <summary>
 		/// The y coordinate of this <see cref="Quaternion"/>.
 		/// </summary>
-		[ProtoMember(2)]
 		[YuzuMember]
 		public float Y;
 
 		/// <summary>
 		/// The z coordinate of this <see cref="Quaternion"/>.
 		/// </summary>
-		[ProtoMember(3)]
 		[YuzuMember]
 		public float Z;
 
 		/// <summary>
 		/// The rotation component of this <see cref="Quaternion"/>.
 		/// </summary>
-		[ProtoMember(4)]
 		[YuzuMember]
 		public float W;
 

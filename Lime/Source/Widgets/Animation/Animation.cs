@@ -1,19 +1,15 @@
 ﻿using System;
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
 {
-	[ProtoContract]
 	public class Animation : ICloneable
 	{
 		internal int TimeInternal;
 
-		[ProtoMember(1)]
 		[YuzuMember]
 		public MarkerCollection Markers { get; private set; }
 
-		[ProtoMember(2)]
 		[YuzuMember]
 		public string Id;
 

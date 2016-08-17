@@ -121,14 +121,13 @@ namespace Tangerine.Core
 				documents[(currentIndex + direction).Wrap(0, Documents.Count - 1)].MakeCurrent();
 			}
 		}
-			
-		[ProtoContract]
+
 		public class Userprefs
 		{
-			[ProtoMember(1)]
+			[YuzuMember]
 			public readonly List<string> Documents = new List<string>();
 
-			[ProtoMember(2)]
+			[YuzuMember]
 			public string CurrentDocument;
 		}
 	}

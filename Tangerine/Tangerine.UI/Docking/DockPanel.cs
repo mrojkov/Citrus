@@ -50,22 +50,21 @@ namespace Tangerine.UI
 			Placement.DockedSize = RootWidget.LayoutCell.Stretch / s;
 		}
 
-		[ProtoContract]
 		public class PanelPlacement
 		{
-			[ProtoMember(1)]
+			[YuzuMember]
 			public string Title;
-			[ProtoMember(2)]
+			[YuzuMember]
 			public bool Docked;
-			[ProtoMember(3)]
+			[YuzuMember]
 			public DockSite Site;
-			[ProtoMember(4)]
+			[YuzuMember]
 			public Vector2 DockedSize;
-			[ProtoMember(5)]
+			[YuzuMember]
 			public bool Hidden;
-			[ProtoMember(6)]
+			[YuzuMember]
 			public Vector2 UndockedPosition;
-			[ProtoMember(7)]
+			[YuzuMember]
 			public Vector2 UndockedSize;
 		}
 
@@ -156,7 +155,7 @@ namespace Tangerine.UI
 				thumbWindow?.Dispose();
 				thumbWindow = null;
 				if (dockSite != DockSite.None) {
-					OnDock?.Invoke(dockSite);	
+					OnDock?.Invoke(dockSite);
 				} else {
 					OnUndock?.Invoke(Application.DesktopMousePosition - (initialMousePos - panel.TitleWidget.GlobalPosition));
 				}
@@ -192,5 +191,5 @@ namespace Tangerine.UI
 				window.Close();
 			}
 		}
-	}	
+	}
 }

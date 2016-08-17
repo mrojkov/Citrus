@@ -2,11 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Lime;
-using ProtoBuf;
 
 namespace Lime
 {
-	[ProtoContract]
 	public class NodeList : IList<Node>
 	{
 		public struct Enumerator : IEnumerator<Node>

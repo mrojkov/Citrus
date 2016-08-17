@@ -1,5 +1,4 @@
 ﻿using System;
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
@@ -8,14 +7,12 @@ namespace Lime
 	/// Representation of 2D rectangles.
 	/// </summary>
 	[System.Diagnostics.DebuggerStepThrough]
-	[ProtoContract]
 	[YuzuCompact]
 	public struct Rectangle : IEquatable<Rectangle>
 	{
 		/// <summary>
 		/// Left-top corner of this rectangle.
 		/// </summary>
-		[ProtoMember(1)]
 		[YuzuMember]
 		public Vector2 A;
 
@@ -23,7 +20,6 @@ namespace Lime
 		/// Right-bottom corner of this rectangle.
 		/// </summary>
 		/// <remarks>Rectangle doesn't contain this point.</remarks>
-		[ProtoMember(2)]
 		[YuzuMember]
 		public Vector2 B;
 

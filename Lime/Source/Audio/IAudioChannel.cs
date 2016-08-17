@@ -1,5 +1,4 @@
-﻿using ProtoBuf;
-
+﻿
 namespace Lime
 {
 	/// <summary>
@@ -16,14 +15,10 @@ namespace Lime
 	/// <summary>
 	/// Группы звуковых каналов
 	/// </summary>
-	[ProtoContract]
 	public enum AudioChannelGroup
 	{
-		[ProtoEnum]
 		Effects,
-		[ProtoEnum]
 		Music,
-		[ProtoEnum]
 		Voice
 	}
 

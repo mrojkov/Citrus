@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using ProtoBuf;
 using Yuzu;
 #if OPENGL
 #if !MAC && !MONOMAC
@@ -13,7 +12,6 @@ using MonoMac.OpenGL;
 
 namespace Lime
 {
-	[ProtoContract]
 	public class Viewport3D : Widget
 	{
 		private Camera3D camera;
@@ -54,7 +52,6 @@ namespace Lime
 			}
 		}
 
-		[ProtoMember(1)]
 		[YuzuMember]
 		public float Frame
 		{

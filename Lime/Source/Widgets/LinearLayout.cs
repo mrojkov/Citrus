@@ -1,9 +1,7 @@
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
 {
-	[ProtoContract]
 	// TODO: Get rid of the class, use Widget.Layout technology instead.
 	public class LinearLayout : Node
 	{
@@ -84,11 +82,9 @@ namespace Lime
 			}
 		}
 
-		[ProtoMember(1)]
 		[YuzuMember]
 		public bool Horizontal { get; set; }
 
-		[ProtoMember(2)]
 		[YuzuMember]
 		public bool ProcessHidden { get; set; }
 

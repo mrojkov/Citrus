@@ -1,5 +1,4 @@
 ﻿using System;
-using ProtoBuf;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Yuzu;
@@ -71,20 +70,6 @@ namespace Lime
 	/// <summary>
 	/// Base class for any rendered object.
 	/// </summary>
-	[ProtoContract]
-	[ProtoInclude(100, typeof(Frame))]
-	[ProtoInclude(101, typeof(Image))]
-	[ProtoInclude(102, typeof(SimpleText))]
-	[ProtoInclude(103, typeof(ParticleEmitter))]
-	[ProtoInclude(104, typeof(DistortionMesh))]
-	[ProtoInclude(105, typeof(Spline))]
-	[ProtoInclude(106, typeof(ParticlesMagnet))]
-	[ProtoInclude(107, typeof(NineGrid))]
-	[ProtoInclude(108, typeof(Button))]
-	[ProtoInclude(109, typeof(Slider))]
-	[ProtoInclude(110, typeof(RichText))]
-	[ProtoInclude(112, typeof(Movie))]
-	[ProtoInclude(113, typeof(Viewport3D))]
 	[DebuggerTypeProxy(typeof(WidgetDebugView))]
 	public class Widget : Node
 	{
@@ -251,7 +236,6 @@ namespace Lime
 		/// <summary>
 		/// Parent-relative position.
 		/// </summary>
-		[ProtoMember(1)]
 		[YuzuMember]
 		[Tangerine(4)]
 		public Vector2 Position
@@ -300,7 +284,6 @@ namespace Lime
 			}
 		}
 
-		[ProtoMember(2)]
 		[Tangerine(7)]
 		public Vector2 Size
 		{
@@ -398,7 +381,6 @@ namespace Lime
 		/// Center point of rotation and scaling.
 		/// (0, 0) is top-left corner, (1, 1) is bottom-right corner.
 		/// </summary>
-		[ProtoMember(3)]
 		[YuzuMember]
 		[Tangerine(6)]
 		public Vector2 Pivot
@@ -415,7 +397,6 @@ namespace Lime
 			}
 		}
 
-		[ProtoMember(4)]
 		[YuzuMember]
 		[Tangerine(5)]
 		public Vector2 Scale
@@ -435,7 +416,6 @@ namespace Lime
 		/// <summary>
 		/// Counter-clockwise rotation of this widget.
 		/// </summary>
-		[ProtoMember(5)]
 		[YuzuMember]
 		[Tangerine(3)]
 		public float Rotation {
@@ -454,7 +434,6 @@ namespace Lime
 		/// <summary>
 		/// Hue of this widget. Contents color will be multiplied by it on render.
 		/// </summary>
-		[ProtoMember(6)]
 		[YuzuMember]
 		[Tangerine(9)]
 		public Color4 Color
@@ -484,11 +463,9 @@ namespace Lime
 			}
 		}
 
-		[ProtoMember(7)]
 		[YuzuMember]
 		public Anchors Anchors { get; set; }
 
-		[ProtoMember(8)]
 		[YuzuMember]
 		[Tangerine(10)]
 		public Blending Blending
@@ -503,7 +480,6 @@ namespace Lime
 			}
 		}
 
-		[ProtoMember(9)]
 		[YuzuMember]
 		public ShaderId Shader
 		{
@@ -517,7 +493,6 @@ namespace Lime
 			}
 		}
 
-		[ProtoMember(10)]
 		[YuzuMember]
 		[Tangerine(2)]
 		public bool Visible
@@ -533,15 +508,12 @@ namespace Lime
 			}
 		}
 
-		[ProtoMember(11)]
 		[YuzuMember]
 		public SkinningWeights SkinningWeights { get; set; }
 
-		[ProtoMember(12)]
 		[YuzuMember]
 		public HitTestMethod HitTestMethod { get; set; }
 
-		[ProtoMember(14)]
 		[YuzuMember]
 		public BoneArray BoneArray;
 

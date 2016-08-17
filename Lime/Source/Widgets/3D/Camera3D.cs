@@ -1,9 +1,7 @@
-﻿using ProtoBuf;
-using Yuzu;
+﻿using Yuzu;
 
 namespace Lime
 {
-	[ProtoContract]
 	public class Camera3D : Node3D
 	{
 		private float fieldOfView;
@@ -14,7 +12,6 @@ namespace Lime
 		private Matrix44 projection;
 		private bool projectionDirty;
 
-		[ProtoMember(1)]
 		[YuzuMember]
 		public float FieldOfView
 		{
@@ -28,7 +25,6 @@ namespace Lime
 			}
 		}
 
-		[ProtoMember(2)]
 		[YuzuMember]
 		public float AspectRatio
 		{
@@ -42,7 +38,6 @@ namespace Lime
 			}
 		}
 
-		[ProtoMember(3)]
 		[YuzuMember]
 		public float NearClipPlane
 		{
@@ -56,7 +51,6 @@ namespace Lime
 			}
 		}
 
-		[ProtoMember(4)]
 		[YuzuMember]
 		public float FarClipPlane
 		{

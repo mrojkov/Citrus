@@ -6,19 +6,18 @@ using System.Collections.Generic;
 
 namespace Tangerine.UI
 {
-	[ProtoContract]
 	public class UserPreferences
 	{
-		[ProtoMember(1)]
+		[YuzuMember]
 		public UI.DockManager.State DockState = new UI.DockManager.State();
 
-		[ProtoMember(2)]
+		[YuzuMember]
 		public readonly List<string> RecentProjects = new List<string>();
 
-		[ProtoMember(3)]
+		[YuzuMember]
 		public bool AutoKeyframes;
 
-		[ProtoMember(4)]
+		[YuzuMember]
 		public bool AnimationMode;
 
 		public static UserPreferences Instance { get; private set; }
@@ -51,5 +50,5 @@ namespace Tangerine.UI
 		{
 			return System.IO.Path.Combine(Lime.Environment.GetDataDirectory("Tangerine"), "UserPreferences");
 		}
-	}	
+	}
 }

@@ -1,5 +1,4 @@
 using System;
-using ProtoBuf;
 using Lime.Text;
 using Yuzu;
 
@@ -8,7 +7,6 @@ namespace Lime
 	/// <summary>
 	/// Виджет, отображающий текст и использующий продвинутое форматирование
 	/// </summary>
-	[ProtoContract]
 	public class RichText : Widget, IText
 	{
 		private TextParser parser = new TextParser();
@@ -18,7 +16,6 @@ namespace Lime
 		private SpriteList spriteList;
 		private TextRenderer renderer;
 
-		[ProtoMember(1)]
 		[YuzuMember]
 		public override string Text
 		{
@@ -30,7 +27,6 @@ namespace Lime
 		public string DisplayText { get { return text; } }
 		public event TextProcessorDelegate TextProcessor;
 
-		[ProtoMember(2)]
 		[YuzuMember]
 		public HAlignment HAlignment
 		{
@@ -38,7 +34,6 @@ namespace Lime
 			set { SetHAlignment(value); }
 		}
 
-		[ProtoMember(3)]
 		[YuzuMember]
 		public VAlignment VAlignment
 		{
@@ -46,11 +41,9 @@ namespace Lime
 			set { SetVAlignment(value); }
 		}
 
-		[ProtoMember(4)]
 		[YuzuMember]
 		public TextOverflowMode OverflowMode { get; set; }
 
-		[ProtoMember(5)]
 		[YuzuMember]
 		public bool WordSplitAllowed { get; set; }
 

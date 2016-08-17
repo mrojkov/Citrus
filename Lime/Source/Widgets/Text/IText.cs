@@ -1,64 +1,50 @@
 using System;
-using ProtoBuf;
 
 namespace Lime
 {
 	/// <summary>
 	/// Types of horizontal alignment.
 	/// </summary>
-	[ProtoContract]
 	public enum HAlignment
 	{
-		[ProtoEnum]
 		Left,
-		[ProtoEnum]
 		Center,
-		[ProtoEnum]
 		Right,
 	}
 
 	/// <summary>
 	/// Types of vertical alignment.
 	/// </summary>
-	[ProtoContract]
 	public enum VAlignment
 	{
-		[ProtoEnum]
 		Top,
-		[ProtoEnum]
 		Center,
-		[ProtoEnum]
 		Bottom,
 	}
 
 	/// <summary>
 	/// Types of text overflow handling.
 	/// </summary>
-	[ProtoContract]
 	public enum TextOverflowMode
 	{
 		/// <summary>
 		/// Carry overflowed text on the next line.
 		/// </summary>
-		[ProtoEnum]
 		Default,
 
 		/// <summary>
 		/// Reduce font size until text is not overflowing.
 		/// </summary>
-		[ProtoEnum]
 		Minify,
 
 		/// <summary>
 		/// Add ellipsis ("...") in place of overflowed part of text.
 		/// </summary>
-		[ProtoEnum]
 		Ellipsis,
 
 		/// <summary>
 		/// Ignore text overflowing.
 		/// </summary>
-		[ProtoEnum]
 		Ignore
 	}
 

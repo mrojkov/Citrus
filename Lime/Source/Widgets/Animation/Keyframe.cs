@@ -1,5 +1,4 @@
 using System;
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
@@ -37,18 +36,14 @@ namespace Lime
 		}
 	}
 
-	[ProtoContract]
 	public class Keyframe<T> : IKeyframe
 	{
-		[ProtoMember(1)]
 		[YuzuMember]
 		public int Frame { get; set; }
 
-		[ProtoMember(2)]
 		[YuzuMember]
 		public KeyFunction Function { get; set; }
 
-		[ProtoMember(3)]
 		[YuzuMember]
 		public T Value;
 

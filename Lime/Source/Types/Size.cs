@@ -1,5 +1,4 @@
 ﻿using System;
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
@@ -8,15 +7,12 @@ namespace Lime
 	/// Representation of width and height.
 	/// </summary>
 	[System.Diagnostics.DebuggerStepThrough]
-	[ProtoContract]
 	[YuzuCompact]
 	public struct Size : IEquatable<Size>
 	{
-		[ProtoMember(1)]
 		[YuzuMember]
 		public int Width;
 
-		[ProtoMember(2)]
 		[YuzuMember]
 		public int Height;
 

@@ -1,4 +1,3 @@
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
@@ -6,7 +5,6 @@ namespace Lime
 	/// <summary>
 	/// Вспомогательный класс, использующийся для сериализации звуков через ProtoBuf
 	/// </summary>
-	[ProtoContract]
 	public class SerializableSample
 	{
 		public string Path;
@@ -18,7 +16,6 @@ namespace Lime
 			SerializationPath = path;
 		}
 
-		[ProtoMember(1)]
 		[YuzuMember]
 		public string SerializationPath
 		{

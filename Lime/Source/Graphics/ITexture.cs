@@ -1,11 +1,8 @@
 using System;
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
 {
-	[ProtoContract]
-	[ProtoInclude(100, typeof(SerializableTexture))]
 	public interface ITexture : IDisposable
 	{
 		Size ImageSize { get; }
@@ -21,7 +18,6 @@ namespace Lime
 		void RestoreRenderTarget();
 		bool IsTransparentPixel(int x, int y);
 		bool IsStubTexture { get; }
-		[ProtoMember(1)]
 		// Using YuzuOptional+YuzuDefault and not YuzuMember because there's
 		// no telling which implementation will set default value to what
 		// (some of implementations are throwing "Not Implemented" exceptions).

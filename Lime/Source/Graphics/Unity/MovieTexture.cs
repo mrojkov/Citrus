@@ -4,11 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using ProtoBuf;
 
 namespace Lime
 {
-	[ProtoContract]
 	public class MovieTexture : Texture2D
 	{
 		//FIXME: movie and alpha runs not simultaneously so we can see some artifacts

@@ -1,19 +1,15 @@
 using System;
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
 {
 	public class TextureAtlasElement : CommonTexture, ITexture
 	{
-		[ProtoContract]
 		public struct Params
 		{
-			[ProtoMember(1)]
 			[YuzuMember]
 			public string AtlasPath;
 
-			[ProtoMember(2)]
 			[YuzuMember]
 			public IntRectangle AtlasRect;
 

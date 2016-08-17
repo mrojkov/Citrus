@@ -1,17 +1,13 @@
 ﻿using System;
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
 {
-	[ProtoContract]
 	public struct Plane : IEquatable<Plane>
 	{
-		[ProtoMember(1)]
 		[YuzuMember]
 		public float D;
 
-		[ProtoMember(2)]
 		[YuzuMember]
 		public Vector3 Normal;
 

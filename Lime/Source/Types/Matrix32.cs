@@ -1,5 +1,4 @@
 ﻿using System;
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
@@ -7,20 +6,16 @@ namespace Lime
 	/// <summary>
 	/// Representation of 3x2 transformation matrix.
 	/// </summary>
-	[ProtoContract]
 	[YuzuCompact]
 	[System.Diagnostics.DebuggerStepThrough]
 	public struct Matrix32 : IEquatable<Matrix32>
 	{
-		[ProtoMember(1)]
 		[YuzuMember]
 		public Vector2 U;
 
-		[ProtoMember(2)]
 		[YuzuMember]
 		public Vector2 V;
 
-		[ProtoMember(3)]
 		[YuzuMember]
 		public Vector2 T;
 

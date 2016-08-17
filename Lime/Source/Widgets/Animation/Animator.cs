@@ -1,30 +1,8 @@
 using System;
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
 {
-	[ProtoContract]
-	[ProtoInclude(101, typeof(Animator<string>))]
-	[ProtoInclude(102, typeof(Animator<int>))]
-	[ProtoInclude(103, typeof(Animator<bool>))]
-	[ProtoInclude(104, typeof(Animator<Blending>))]
-	[ProtoInclude(105, typeof(Animator<ITexture>))]
-	[ProtoInclude(106, typeof(Animator<NumericRange>))]
-	[ProtoInclude(107, typeof(Animator<Vector2>))]
-	[ProtoInclude(108, typeof(Animator<Color4>))]
-	[ProtoInclude(109, typeof(Animator<float>))]
-	[ProtoInclude(110, typeof(Animator<EmitterShape>))]
-	[ProtoInclude(111, typeof(Animator<AudioAction>))]
-	[ProtoInclude(112, typeof(Animator<SerializableSample>))]
-	[ProtoInclude(113, typeof(Animator<HAlignment>))]
-	[ProtoInclude(114, typeof(Animator<VAlignment>))]
-	[ProtoInclude(115, typeof(Animator<SerializableSample>))]
-	[ProtoInclude(116, typeof(Animator<MovieAction>))]
-	[ProtoInclude(117, typeof(Animator<ShaderId>))]
-	[ProtoInclude(118, typeof(Animator<Vector3>))]
-	[ProtoInclude(119, typeof(Animator<Quaternion>))]
-	[ProtoInclude(120, typeof(Animator<EmissionType>))]
 	public interface IAnimator
 	{
 		IAnimable Owner { get; }
@@ -56,13 +34,6 @@ namespace Lime
 	/// Аниматор. Анимирует значение свойства, основываясь на ключевых кадрах
 	/// </summary>
 	/// <typeparam name="T">Тип анимируемого свойства</typeparam>
-	[ProtoContract]
-	[ProtoInclude(151, typeof(NumericAnimator))]
-	[ProtoInclude(152, typeof(Vector2Animator))]
-	[ProtoInclude(153, typeof(Color4Animator))]
-	[ProtoInclude(154, typeof(QuaternionAnimator))]
-	[ProtoInclude(155, typeof(Vector3Animator))]
-	[ProtoInclude(156, typeof(Matrix44Animator))]
 	public class Animator<T> : IAnimator
 	{
 		public IAnimable Owner { get; private set; }
@@ -74,18 +45,15 @@ namespace Lime
 		/// <summary>
 		/// Название анимируемого свойства
 		/// </summary>
-		[ProtoMember(1)]
 		[YuzuMember]
 		public string TargetProperty { get; set; }
 
 		/// <summary>
 		/// Коллекция ключей анимации
 		/// </summary>
-		[ProtoMember(2)]
 		[YuzuMember]
 		public KeyframeCollection<T> ReadonlyKeys = new KeyframeCollection<T>();
 
-		[ProtoMember(3)]
 		[YuzuMember]
 		public string AnimationId { get; set; }
 
@@ -256,7 +224,6 @@ namespace Lime
 		}
 	}
 
-	[ProtoContract]
 	public class Vector2Animator : Animator<Vector2>
 	{
 		protected override bool IsInterpolable()
@@ -275,7 +242,6 @@ namespace Lime
 		}
 	}
 
-	[ProtoContract]
 	public class Vector3Animator : Animator<Vector3>
 	{
 		protected override bool IsInterpolable()
@@ -294,7 +260,6 @@ namespace Lime
 		}
 	}
 
-	[ProtoContract]
 	public class NumericAnimator : Animator<float>
 	{
 		protected override bool IsInterpolable()
@@ -313,7 +278,6 @@ namespace Lime
 		}
 	}
 
-	[ProtoContract]
 	public class Color4Animator : Animator<Color4>
 	{
 		protected override bool IsInterpolable()
@@ -327,7 +291,6 @@ namespace Lime
 		}
 	}
 
-	[ProtoContract]
 	public class QuaternionAnimator : Animator<Quaternion>
 	{
 		protected override bool IsInterpolable()
@@ -341,7 +304,6 @@ namespace Lime
 		}
 	}
 
-	[ProtoContract]
 	public class Matrix44Animator : Animator<Matrix44>
 	{
 		protected override bool IsInterpolable()

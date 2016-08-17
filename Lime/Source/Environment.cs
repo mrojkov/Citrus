@@ -14,36 +14,6 @@ namespace Lime
 {
 	public static class Environment
 	{
-#if !iOS && !ANDROID && !UNITY
-		public static void GenerateSerializationAssembly(string assemblyName, params Type[] types)
-		{
-			GenerateSerializationAssembly(assemblyName, types, null);
-		}
-
-		public static void GenerateSerializationAssembly(string assemblyName, Type[] types, Dictionary<Type, List<KeyValuePair<int, Type>>> subTypes)
-		{
-			var model = ProtoBuf.Meta.TypeModel.Create();
-			model.UseImplicitZeroDefaults = false;
-			model.Add(typeof(ITexture), true);
-			model.Add(typeof(Node), true);
-			model.Add(typeof(TextureAtlasElement.Params), true);
-			model.Add(typeof(Font), true);
-			model.Add(typeof(SurrogateBitmap), false).Add("SerializationData");
-			model.Add(typeof(Bitmap), false).SetSurrogate(typeof(SurrogateBitmap));
-			foreach (var type in types) {
-				model.Add(type, true);
-			}
-			if (subTypes != null) {
-				foreach (var type in subTypes.Keys) {
-					foreach(var subTypePair in subTypes[type]) {
-						model[type].AddSubType(subTypePair.Key, subTypePair.Value);
-					}
-				}
-			}
-			model.Compile(assemblyName, assemblyName + ".dll");
-		}
-
-#endif
 		public static void OpenBrowser(string url)
 		{
 #if iOS

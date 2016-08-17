@@ -197,14 +197,13 @@ namespace Tangerine.UI
 			Refresh();
 		}
 
-		[ProtoContract]
 		public class State
 		{
-			[ProtoMember(2)]
+			[YuzuMember]
 			public List<DockPanel.PanelPlacement> PanelPlacements = new List<DockPanel.PanelPlacement>();
-			[ProtoMember(3)]
+			[YuzuMember]
 			public Vector2 MainWindowPosition;
-			[ProtoMember(4)]
+			[YuzuMember]
 			public Vector2 MainWindowSize;
 		}
 	}

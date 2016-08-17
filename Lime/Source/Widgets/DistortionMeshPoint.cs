@@ -1,4 +1,3 @@
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
@@ -7,27 +6,23 @@ namespace Lime
 	/// Точка DistortionMesh
 	/// Position точки представлен как [0,0]-[1,1] (левый верхний и правый нижний угол DistortionMesh)
 	/// </summary>
-	[ProtoContract]
 	public class DistortionMeshPoint : PointObject
 	{
 		/// <summary>
 		/// Оттенок (при отрисовке цвет текстуры умножается на цвет точки)
 		/// </summary>
-		[ProtoMember(1)]
 		[YuzuMember]
 		public Color4 Color { get; set; }
 
 		/// <summary>
 		/// Текстурные координаты
 		/// </summary>
-		[ProtoMember(2)]
 		[YuzuMember]
 		public Vector2 UV { get; set; }
 
 		/// <summary>
 		/// Смещение точки относительно ее начальной позиции (в пикселях)
 		/// </summary>
-		[ProtoMember(3)]
 		[YuzuMember]
 		public Vector2 Offset { get; set; }
 

@@ -1,46 +1,30 @@
 using System;
-using ProtoBuf;
 using System.IO;
 using System.Collections.Generic;
 using Yuzu;
 
 namespace Lime
 {
-	[ProtoContract]
 	public enum RenderTarget
 	{
-		[ProtoEnum]
 		None,
-		[ProtoEnum]
 		A,
-		[ProtoEnum]
 		B,
-		[ProtoEnum]
 		C,
-		[ProtoEnum]
 		D,
-		[ProtoEnum]
 		E,
-		[ProtoEnum]
 		F,
-		[ProtoEnum]
 		G
 	}
 
-	[ProtoContract]
 	public enum ClipMethod
 	{
-		[ProtoEnum]
 		None,
-		[ProtoEnum]
 		ScissorTest,
-		[ProtoEnum]
 		StencilBuffer,
-		[ProtoEnum]
 		NoRender,
 	}
 
-	[ProtoContract]
 	public class Frame : Widget, IImageCombinerArg
 	{
 		public ClipMethod ClipChildren { get; set; }
@@ -50,7 +34,6 @@ namespace Lime
 		RenderTarget renderTarget;
 		ITexture renderTexture;
 
-		[ProtoMember(1)]
 		[YuzuMember]
 		public RenderTarget RenderTarget {
 			get { return renderTarget; }

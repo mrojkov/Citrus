@@ -1,5 +1,4 @@
 using Lime;
-using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,61 +6,46 @@ using Yuzu;
 
 namespace Lime
 {
-	[ProtoContract]
 	public enum EmitterShape
 	{
-		[ProtoEnum]
 		Point,
-		[ProtoEnum]
 		Line,
-		[ProtoEnum]
 		Ellipse,
-		[ProtoEnum]
 		Area,
 		/// <summary>
 		/// Particles are generated inside polygon defined by EmitterShapePoint points.
 		/// Polygon points are oriented clockwise.
 		/// </summary>
-		[ProtoEnum]
 		Custom,
 	};
 
 	[Flags]
-	[ProtoContract]
 	public enum EmissionType
 	{
-		[ProtoEnum]
 		None,
-		[ProtoEnum]
 		Inner = 1,
-		[ProtoEnum]
 		Outer = 2,
 	}
 
 	/// <summary>
 	/// Particles move with widget they're linked to.
 	/// </summary>
-	[ProtoContract]
 	public enum ParticlesLinkage
 	{
 		/// <summary>
 		/// No linkage (default)
 		/// </summary>
-		[ProtoEnum]
 		Root,
 		/// <summary>
 		/// Emitter parent.
 		/// </summary>
-		[ProtoEnum]
 		Parent,
 		/// <summary>
 		/// User defined widget via LinkageWidgetName
 		/// </summary>
-		[ProtoEnum]
 		Other
 	}
 
-	[ProtoContract]
 	public class EmitterShapePoint : PointObject
 	{
 		public Vector2 TransformedPosition {
@@ -81,7 +65,6 @@ namespace Lime
 		}
 	}
 
-	[ProtoContract]
 	public partial class ParticleEmitter : Widget
 	{
 		internal static System.Random Rng = new System.Random();
@@ -154,124 +137,98 @@ namespace Lime
 		/// <summary>
 		/// Particles are generated once and live forever.
 		/// </summary>
-		[ProtoMember(1)]
 		[YuzuMember]
 		public bool ImmortalParticles;
-		[ProtoMember(2)]
 		[YuzuMember]
 		public EmitterShape Shape { get; set; }
-		[ProtoMember(3)]
 		[YuzuMember]
 		public EmissionType EmissionType { get; set; }
-		[ProtoMember(4)]
 		[YuzuMember]
 		public ParticlesLinkage ParticlesLinkage;
 		/// <summary>
 		/// When ParticleLinkage is `Other` this makes sense as name of widget particle emitter is linked to.
 		/// </summary>
-		[ProtoMember(5)]
 		[YuzuMember]
 		public string LinkageWidgetName;
 		/// <summary>
 		/// Number of particles generated per second.
 		/// </summary>
-		[ProtoMember(6)]
 		[YuzuMember]
 		public float Number { get; set; }
 		/// <summary>
 		/// Pre simulate TimeShift seconds.
 		/// </summary>
-		[ProtoMember(7)]
 		[YuzuMember]
 		public float TimeShift;
 		/// <summary>
 		/// Update: delta *= Speed
 		/// </summary>
-		[ProtoMember(8)]
 		[YuzuMember]
 		public float Speed { get; set; }
 		/// <summary>
 		/// Whether particles are oriented along track.
 		/// </summary>
-		[ProtoMember(9)]
 		[YuzuMember]
 		public bool AlongPathOrientation { get; set; }
 		/// <summary>
 		/// degrees (0 - right, 90 - down)
 		/// </summary>
-		[ProtoMember(10)]
 		[YuzuMember]
 		public NumericRange WindDirection { get; set; }
-		[ProtoMember(11)]
 		[YuzuMember]
 		public NumericRange WindAmount { get; set; }
 		/// <summary>
 		/// degrees (0 - right, 90 - down)
 		/// </summary>
-		[ProtoMember(12)]
 		[YuzuMember]
 		public NumericRange GravityDirection { get; set; }
-		[ProtoMember(13)]
 		[YuzuMember]
 		public NumericRange GravityAmount { get; set; }
-		[ProtoMember(14)]
 		[YuzuMember]
 		public NumericRange MagnetAmount { get; set; }
 		/// <summary>
 		/// Rotation angle of generated particles
 		/// </summary>
-		[ProtoMember(15)]
 		[YuzuMember]
 		public NumericRange Orientation { get; set; }
 		/// <summary>
 		/// Rotation angle of emitter (degrees, clockwise)
 		/// </summary>
-		[ProtoMember(16)]
 		[YuzuMember]
 		public NumericRange Direction { get; set; }
 		/// <summary>
 		/// Particle lifetime in seconds
 		/// </summary>
-		[ProtoMember(17)]
 		[YuzuMember]
 		public NumericRange Lifetime { get; set; }
 		/// <summary>
 		/// Scale of generated particles
 		/// </summary>
-		[ProtoMember(18)]
 		[YuzuMember]
 		public NumericRange Zoom { get; set; }
 		/// <summary>
 		/// Designates width to height ratio.
 		/// </summary>
-		[ProtoMember(19)]
 		[YuzuMember]
 		public NumericRange AspectRatio { get; set; }
-		[ProtoMember(20)]
 		[YuzuMember]
 		public NumericRange Velocity { get; set; }
 		/// <summary>
 		/// Angular velocity of particles.
 		/// </summary>
-		[ProtoMember(21)]
 		[YuzuMember]
 		public NumericRange Spin { get; set; }
 		/// <summary>
 		/// Angular velocity of emitter (degrees)
 		/// </summary>
-		[ProtoMember(22)]
 		[YuzuMember]
 		public NumericRange AngularVelocity { get; set; }
-		[ProtoMember(23)]
 		[YuzuMember]
 		public NumericRange RandomMotionRadius { get; set; }
-		[ProtoMember(24)]
 		[YuzuMember]
 		public NumericRange RandomMotionSpeed { get; set; }
-		[ProtoMember(25)]
 		[YuzuMember]
 		public float RandomMotionAspectRatio { get; set; }
-		[ProtoMember(26)]
 		[YuzuMember]
 		public NumericRange RandomMotionRotation { get; set; }
 		// NOTE: last unprotobuffed field was `particles` under index `29`.

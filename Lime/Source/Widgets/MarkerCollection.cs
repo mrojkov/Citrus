@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
-using ProtoBuf;
 
 namespace Lime
 {
-	[ProtoContract]
 	public class MarkerCollection : List<Marker>
 	{
 		public MarkerCollection() { }

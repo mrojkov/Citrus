@@ -1,4 +1,3 @@
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
@@ -6,7 +5,6 @@ namespace Lime
 	/// <summary>
 	/// Виджет, содержащий в себе изображение
 	/// </summary>
-	[ProtoContract]
 	public class Image : Widget, IImageCombinerArg
 	{
 		bool skipRender;
@@ -16,7 +14,6 @@ namespace Lime
 		/// <summary>
 		/// Изображение, отображаемое этим виджетом
 		/// </summary>
-		[ProtoMember(1)]
 		[YuzuMember]
 		public override sealed ITexture Texture
 		{
@@ -35,14 +32,12 @@ namespace Lime
 		/// <summary>
 		/// Текстурная координата левого верхнего угла текстуры
 		/// </summary>
-		[ProtoMember(2)]
 		[YuzuMember]
 		public Vector2 UV0 { get; set; }
 
 		/// <summary>
 		/// Текстурная координата правого нижнего угла текстуры
 		/// </summary>
-		[ProtoMember(3)]
 		[YuzuMember]
 		public Vector2 UV1 { get; set; }
 

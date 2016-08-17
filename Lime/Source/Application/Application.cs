@@ -21,7 +21,6 @@ namespace Lime
 	/// Варианты ориентации телефона или планшета
 	/// </summary>
 	[Flags]
-	[ProtoBuf.ProtoContract]
 	public enum DeviceOrientation
 	{
 		/// <summary>

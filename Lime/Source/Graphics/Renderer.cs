@@ -2,48 +2,30 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ProtoBuf;
 using System.Runtime.InteropServices;
 
 namespace Lime
 {
-	[ProtoContract]
 	public enum Blending
 	{
-		[ProtoEnum]
 		None,
-		[ProtoEnum]
 		Inherited,
-		[ProtoEnum]
 		Alpha,
-		[ProtoEnum]
 		Add,
-		[ProtoEnum]
 		Glow,
-		[ProtoEnum]
 		Modulate,
-		[ProtoEnum]
 		Burn,
-		[ProtoEnum]
 		Darken,
-		[ProtoEnum]
 		Opaque
 	}
 
-	[ProtoContract]
 	public enum ShaderId
 	{
-		[ProtoEnum]
 		None,
-		[ProtoEnum]
 		Inherited,
-		[ProtoEnum]
 		Diffuse,
-		[ProtoEnum]
 		Silhuette,
-		[ProtoEnum]
 		InversedSilhuette,
-		[ProtoEnum]
 		Custom,
 	}
 

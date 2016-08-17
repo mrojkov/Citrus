@@ -1,10 +1,8 @@
 ﻿using System;
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
 {
-	[ProtoContract]
 	public class Material
 	{
 		private ITexture diffuseTexture;
@@ -14,7 +12,6 @@ namespace Lime
 		private MaterialCap caps;
 		private FogMode fogMode;
 
-		[ProtoMember(1)]
 		[YuzuMember]
 		public ITexture DiffuseTexture
 		{
@@ -26,7 +23,6 @@ namespace Lime
 			}
 		}
 
-		[ProtoMember(4)]
 		[YuzuMember]
 		public ITexture OpacityTexture
 		{
@@ -38,31 +34,24 @@ namespace Lime
 			}
 		}
 
-		[ProtoMember(5)]
 		[YuzuMember]
 		public Color4 DiffuseColor { get; set; }
 
-		[ProtoMember(6)]
 		[YuzuMember]
 		public Color4 EmissiveColor { get; set; }
 
-		[ProtoMember(7)]
 		[YuzuMember]
 		public Color4 SpecularColor { get; set; }
 
-		[ProtoMember(8)]
 		[YuzuMember]
 		public float SpecularPower { get; set; }
 
-		[ProtoMember(9)]
 		[YuzuMember]
 		public float Opacity { get; set; }
 
-		[ProtoMember(10)]
 		[YuzuMember]
 		public string Name { get; set; }
 
-		[ProtoMember(11)]
 		[YuzuMember]
 		public FogMode FogMode
 		{
@@ -81,19 +70,15 @@ namespace Lime
 			}
 		}
 
-		[ProtoMember(12)]
 		[YuzuMember]
 		public Color4 FogColor;
 
-		[ProtoMember(13)]
 		[YuzuMember]
 		public float FogStart;
 
-		[ProtoMember(14)]
 		[YuzuMember]
 		public float FogEnd;
 
-		[ProtoMember(15)]
 		[YuzuMember]
 		public float FogDensity;
 

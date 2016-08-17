@@ -1,5 +1,4 @@
-﻿using ProtoBuf;
-using System;
+﻿using System;
 using Yuzu;
 
 namespace Lime
@@ -8,14 +7,11 @@ namespace Lime
 	/// Representation of numeric range of numbers around median.
 	/// </summary>
 	[System.Diagnostics.DebuggerStepThrough]
-	[ProtoContract]
 	public struct NumericRange : IEquatable<NumericRange>
 	{
-		[ProtoMember(1)]
 		[YuzuMember]
 		public float Median;
 
-		[ProtoMember(2)]
 		[YuzuMember]
 		public float Dispersion;
 

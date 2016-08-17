@@ -1,5 +1,4 @@
 using System;
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
@@ -33,18 +32,14 @@ namespace Lime
 		Matrix32 UVTransform { get; }
 	}
 
-	[ProtoContract]
 	public class ImageCombiner : Node
 	{
-		[ProtoMember(1)]
 		[YuzuMember]
 		public bool Enabled { get; set; }
 
-		[ProtoMember(2)]
 		[YuzuMember]
 		public Blending Blending { get; set; }
 
-		[ProtoMember(3)]
 		[YuzuMember]
 		public ShaderId Shader { get; set; }
 

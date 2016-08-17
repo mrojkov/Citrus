@@ -1,4 +1,3 @@
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
@@ -6,27 +5,23 @@ namespace Lime
 	/// <summary>
 	/// Плоскость с точками, которые можно анимировать, вызывая эффект искажения поверхности
 	/// </summary>
-	[ProtoContract]
 	public class DistortionMesh : Widget
 	{
 		/// <summary>
 		/// Количество колонок
 		/// </summary>
-		[ProtoMember(1)]
 		[YuzuMember]
 		public int NumCols { get; set; }
 
 		/// <summary>
 		/// Количество горизонтальных рядов
 		/// </summary>
-		[ProtoMember(2)]
 		[YuzuMember]
 		public int NumRows { get; set; }
 
 		/// <summary>
 		/// Текстура
 		/// </summary>
-		[ProtoMember(3)]
 		[YuzuMember]
 		public override ITexture Texture { get; set; }
 

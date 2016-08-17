@@ -1,10 +1,8 @@
 ﻿using System;
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
 {
-	[ProtoContract]
 	[YuzuCompact]
 	public struct Matrix44 : IEquatable<Matrix44>
 	{
@@ -29,67 +27,51 @@ namespace Lime
 			this.M44 = m44;
 		}
 
-		[ProtoMember(1)]
 		[YuzuMember]
 		public float M11;
 
-		[ProtoMember(2)]
 		[YuzuMember]
 		public float M12;
 
-		[ProtoMember(3)]
 		[YuzuMember]
 		public float M13;
 
-		[ProtoMember(4)]
 		[YuzuMember]
 		public float M14;
 
-		[ProtoMember(5)]
 		[YuzuMember]
 		public float M21;
 
-		[ProtoMember(6)]
 		[YuzuMember]
 		public float M22;
 
-		[ProtoMember(7)]
 		[YuzuMember]
 		public float M23;
 
-		[ProtoMember(8)]
 		[YuzuMember]
 		public float M24;
 
-		[ProtoMember(9)]
 		[YuzuMember]
 		public float M31;
 
-		[ProtoMember(10)]
 		[YuzuMember]
 		public float M32;
 
-		[ProtoMember(11)]
 		[YuzuMember]
 		public float M33;
 
-		[ProtoMember(12)]
 		[YuzuMember]
 		public float M34;
 
-		[ProtoMember(13)]
 		[YuzuMember]
 		public float M41;
 
-		[ProtoMember(14)]
 		[YuzuMember]
 		public float M42;
 
-		[ProtoMember(15)]
 		[YuzuMember]
 		public float M43;
 
-		[ProtoMember(16)]
 		[YuzuMember]
 		public float M44;
 

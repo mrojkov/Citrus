@@ -4,11 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using ProtoBuf;
 
 namespace Lime
 {
-	[ProtoContract]
 	public class MovieTexture : Texture2D
 	{
 		Stream rgbStream;

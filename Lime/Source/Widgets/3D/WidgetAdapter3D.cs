@@ -1,8 +1,6 @@
-﻿using ProtoBuf;
-
+﻿
 namespace Lime
 {
-	[ProtoContract]
 	public class WidgetAdapter3D : Node3D, IRenderObject3D
 	{
 		private RenderChain renderChain = new RenderChain();

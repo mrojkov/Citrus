@@ -1,14 +1,8 @@
 ﻿using System;
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
 {
-	[ProtoContract]
-	[ProtoInclude(101, typeof(Mesh3D))]
-	[ProtoInclude(102, typeof(Camera3D))]
-	[ProtoInclude(103, typeof(WidgetAdapter3D))]
-	[ProtoInclude(104, typeof(Spline3D))]
 	public class Node3D : Node
 	{
 		private Vector3 scale;
@@ -21,7 +15,6 @@ namespace Lime
 		protected bool globallyVisible;
 		protected Color4 globalColor;
 
-		[ProtoMember(1)]
 		[YuzuMember]
 		public bool Visible
 		{
@@ -35,7 +28,6 @@ namespace Lime
 			}
 		}
 
-		[ProtoMember(2)]
 		[YuzuMember]
 		public Vector3 Scale
 		{
@@ -47,7 +39,6 @@ namespace Lime
 			}
 		}
 
-		[ProtoMember(3)]
 		[YuzuMember]
 		public Quaternion Rotation
 		{
@@ -59,7 +50,6 @@ namespace Lime
 			}
 		}
 
-		[ProtoMember(4)]
 		[YuzuMember]
 		public Vector3 Position
 		{
@@ -71,7 +61,6 @@ namespace Lime
 			}
 		}
 
-		[ProtoMember(5)]
 		[YuzuMember]
 		public Color4 Color
 		{

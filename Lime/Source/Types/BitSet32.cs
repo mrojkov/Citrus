@@ -1,6 +1,5 @@
 ﻿using System;
 
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
@@ -8,7 +7,6 @@ namespace Lime
 	/// <summary>
 	/// Representation of 32-bit array of bit flags.
 	/// </summary>
-	[ProtoContract]
 	[YuzuCompact]
 	public struct BitSet32 : IEquatable<BitSet32>
 	{
@@ -25,7 +23,6 @@ namespace Lime
 		/// <summary>
 		/// Uint that is used for array representation.
 		/// </summary>
-		[ProtoMember(1)]
 		[YuzuMember]
 		public uint Value;
 

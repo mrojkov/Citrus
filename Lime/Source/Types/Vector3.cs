@@ -1,5 +1,4 @@
 ﻿using System;
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
@@ -8,19 +7,15 @@ namespace Lime
 	/// Representation of 3D vectors and points.
 	/// </summary>
 	[System.Diagnostics.DebuggerStepThrough]
-	[ProtoContract]
 	[YuzuCompact]
 	public struct Vector3 : IEquatable<Vector3>
 	{
-		[ProtoMember(1)]
 		[YuzuMember]
 		public float X;
 
-		[ProtoMember(2)]
 		[YuzuMember]
 		public float Y;
 
-		[ProtoMember(3)]
 		[YuzuMember]
 		public float Z;
 

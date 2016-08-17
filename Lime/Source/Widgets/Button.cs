@@ -1,5 +1,4 @@
 using System;
-using ProtoBuf;
 using System.Linq;
 using System.Collections.Generic;
 using Yuzu;
@@ -12,7 +11,6 @@ namespace Lime
 	/// <summary>
 	/// Виджет с поведением кнопки
 	/// </summary>
-	[ProtoContract]
 	public class Button : Widget
 	{
 		public BitSet32 EnableMask = BitSet32.Full;
@@ -20,14 +18,12 @@ namespace Lime
 		/// <summary>
 		/// Текст кнопки
 		/// </summary>
-		[ProtoMember(1)]
 		[YuzuMember]
 		public override string Text { get; set; }
 
 		/// <summary>
 		/// Кнопка включена и принимает ввод от пользователя
 		/// </summary>
-		[ProtoMember(2)]
 		[YuzuMember]
 		public bool Enabled {
 			get { return EnableMask[0]; }
@@ -38,7 +34,6 @@ namespace Lime
 		/// Для реализации кнопки, которая находится в элементе, допускающим скроллинг (например в скроллящемся списке)
 		/// Если пользователь нажмет кнопку, и не отпуская палец быстро передвинет его, кнопка не нажмется
 		/// </summary>
-		[ProtoMember(3)]
 		[YuzuMember]
 		public bool Draggable { get; set; }
 

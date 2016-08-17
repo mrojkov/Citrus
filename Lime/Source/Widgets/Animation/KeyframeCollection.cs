@@ -1,4 +1,3 @@
-using ProtoBuf;
 using System.Collections.Generic;
 using System;
 
@@ -131,7 +130,6 @@ namespace Lime
 		}
 	}
 
-	[ProtoContract]
 	public class KeyframeCollection<T> : List<Keyframe<T>>
 	{
 		internal bool Shared;

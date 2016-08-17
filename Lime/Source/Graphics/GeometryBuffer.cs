@@ -1,5 +1,4 @@
 ﻿using System;
-using ProtoBuf;
 using Yuzu;
 using System.Runtime.InteropServices;
 
@@ -10,51 +9,40 @@ namespace Lime
 		void Render(int startIndex, int indexCount);
 	}
 
-	[ProtoContract]
 	[YuzuCompact]
 	[StructLayout(LayoutKind.Sequential, Pack = 1, Size=4)]
 	public struct BlendIndices
 	{
-		[ProtoMember(1)]
 		[YuzuMember]
 		public byte Index0;
 
-		[ProtoMember(2)]
 		[YuzuMember]
 		public byte Index1;
 
-		[ProtoMember(3)]
 		[YuzuMember]
 		public byte Index2;
 
-		[ProtoMember(4)]
 		[YuzuMember]
 		public byte Index3;
 	}
 
-	[ProtoContract]
 	[YuzuCompact]
 	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 16)]
 	public struct BlendWeights
 	{
-		[ProtoMember(1)]
 		[YuzuMember]
 		public float Weight0;
 
-		[ProtoMember(2)]
 		[YuzuMember]
 		public float Weight1;
 
-		[ProtoMember(3)]
 		[YuzuMember]
 		public float Weight2;
 
-		[ProtoMember(4)]
 		[YuzuMember]
 		public float Weight3;
 	}
 
-	[ProtoContract]
 	public class GeometryBuffer : IDisposable
 	{
 		[Flags]
@@ -74,39 +62,30 @@ namespace Lime
 			All = Vertex | Color | UV1 | UV2 | UV3 | UV4 | Blend
 		}
 
-		[ProtoMember(1)]
 		[YuzuMember]
 		public Vector3[] Vertices;
 
-		[ProtoMember(2)]
 		[YuzuMember]
 		public Color4[] Colors;
 
-		[ProtoMember(3)]
 		[YuzuMember]
 		public Vector2[] UV1;
 
-		[ProtoMember(4)]
 		[YuzuMember]
 		public Vector2[] UV2;
 
-		[ProtoMember(5)]
 		[YuzuMember]
 		public Vector2[] UV3;
 
-		[ProtoMember(6)]
 		[YuzuMember]
 		public Vector2[] UV4;
 
-		[ProtoMember(7)]
 		[YuzuMember]
 		public ushort[] Indices;
 
-		[ProtoMember(8)]
 		[YuzuMember]
 		public BlendIndices[] BlendIndices;
 
-		[ProtoMember(9)]
 		[YuzuMember]
 		public BlendWeights[] BlendWeights;
 
@@ -115,7 +94,6 @@ namespace Lime
 
 		private IPlatformGeometryBuffer platformBuffer;
 
-		[ProtoAfterDeserialization]
 		[YuzuAfterDeserialization]
 		public void AfterDeserialization()
 		{

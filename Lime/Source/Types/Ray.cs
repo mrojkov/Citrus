@@ -1,5 +1,4 @@
 ﻿using System;
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
@@ -7,14 +6,11 @@ namespace Lime
 	/// <summary>
 	/// Representation of endless ray.
 	/// </summary>
-	[ProtoContract]
 	public struct Ray : IEquatable<Ray>
 	{
-		[ProtoMember(1)]
 		[YuzuMember]
 		public Vector3 Direction;
 
-		[ProtoMember(2)]
 		[YuzuMember]
 		public Vector3 Position;
 

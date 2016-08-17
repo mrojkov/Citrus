@@ -1,4 +1,3 @@
-using ProtoBuf;
 using System.Collections.Generic;
 
 namespace Lime
@@ -6,7 +5,6 @@ namespace Lime
 	/// <summary>
 	/// Сплайн. Вспомогательная кривая линия, построенная по алгоритму Catmull-Rom, задающая траекторию для чего-либо
 	/// </summary>
-	[ProtoContract]
 	public class Spline : Widget
 	{
 		/// <summary>

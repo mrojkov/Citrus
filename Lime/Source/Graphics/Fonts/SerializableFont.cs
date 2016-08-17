@@ -1,17 +1,14 @@
 using System;
 using System.Collections.Generic;
 
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
 {
-	[ProtoContract]
 	public class SerializableFont
 	{
 		public IFont Instance { get; private set; }
 
-		[ProtoMember(1)]
 		[YuzuMember]
 		public string Name
 		{

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
@@ -8,14 +7,11 @@ namespace Lime
 	/// <summary>
 	/// Representation of solid sphere.
 	/// </summary>
-	[ProtoContract]
 	public struct BoundingSphere : IEquatable<BoundingSphere>
 	{
-		[ProtoMember(1)]
 		[YuzuMember]
 		public Vector3 Center;
 
-		[ProtoMember(2)]
 		[YuzuMember]
 		public float Radius;
 

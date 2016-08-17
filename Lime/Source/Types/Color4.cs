@@ -1,5 +1,4 @@
 ﻿using System;
-using ProtoBuf;
 using System.Runtime.InteropServices;
 using Yuzu;
 
@@ -8,7 +7,6 @@ namespace Lime
 	/// <summary>
 	/// Representation of 4-byte color (RGBA).
 	/// </summary>
-	[ProtoContract]
 	[YuzuCompact]
 	[System.Diagnostics.DebuggerStepThrough]
 	[StructLayout(LayoutKind.Explicit)]
@@ -26,7 +24,6 @@ namespace Lime
 		[FieldOffset(3)]
 		public byte A;
 
-		[ProtoMember(1)]
 		[YuzuMember]
 		[FieldOffset(0)]
 		public uint ABGR;

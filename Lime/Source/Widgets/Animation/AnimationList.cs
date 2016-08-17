@@ -2,11 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using ProtoBuf;
 
 namespace Lime
 {
-	[ProtoContract]
 	public sealed class AnimationList : IList<Animation>
 	{
 		private Node owner;

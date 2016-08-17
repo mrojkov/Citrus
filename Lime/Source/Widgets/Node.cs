@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
@@ -42,17 +41,6 @@ namespace Lime
 	/// <summary>
 	/// Scene tree element.
 	/// </summary>
-	[ProtoContract]
-	[ProtoInclude(101, typeof(Widget))]
-	[ProtoInclude(102, typeof(ParticleModifier))]
-	[ProtoInclude(103, typeof(ImageCombiner))]
-	[ProtoInclude(104, typeof(PointObject))]
-	[ProtoInclude(105, typeof(Bone))]
-	[ProtoInclude(106, typeof(Audio))]
-	[ProtoInclude(107, typeof(SplineGear))]
-	[ProtoInclude(108, typeof(TextStyle))]
-	[ProtoInclude(109, typeof(LinearLayout))]
-	[ProtoInclude(110, typeof(Node3D))]
 	[DebuggerTypeProxy(typeof(NodeDebugView))]
 	public class Node : IDisposable, IAnimable
 	{
@@ -85,7 +73,6 @@ namespace Lime
 		/// Name field in HotStudio.
 		/// May be non-unique.
 		/// </summary>
-		[ProtoMember(1)]
 		[YuzuMember]
 		[Tangerine(0)]
 		public string Id { get; set; }
@@ -95,7 +82,6 @@ namespace Lime
 		/// Denotes the path to the external scene. If this path isn't null during node loading,
 		/// the node children are replaced by the external scene nodes.
 		/// </summary>
-		[ProtoMember(2)]
 		[YuzuMember]
 		[Tangerine(0)]
 		public string ContentsPath
@@ -110,7 +96,6 @@ namespace Lime
 		/// </summary>
 		[Trigger]
 		[Tangerine(1)]
-		[ProtoMember(3)]
 		public string Trigger { get; set; }
 
 		private Node parent;
@@ -197,7 +182,6 @@ namespace Lime
 		/// TODO: Translate
 		/// Аниматоры, изменяющие анимированные параметры объекта в время обновления
 		/// </summary>
-		[ProtoMember(5)]
 		[YuzuMember]
 		public AnimatorCollection Animators { get; private set; }
 
@@ -205,7 +189,6 @@ namespace Lime
 		/// Child nodes.
 		/// For enumerating all descendants use Descendants.
 		/// </summary>
-		[ProtoMember(6)]
 		[YuzuMember]
 		public NodeList Nodes { get; private set; }
 
@@ -258,11 +241,9 @@ namespace Lime
 		/// <summary>
 		/// Custom data. Can be set via HotStudio (this way it will contain path to external scene).
 		/// </summary>
-		[ProtoMember(11)]
 		[YuzuMember]
 		public string Tag { get; set; }
 
-		[ProtoMember(13)]
 		[YuzuMember]
 		public AnimationList Animations { get; private set; }
 

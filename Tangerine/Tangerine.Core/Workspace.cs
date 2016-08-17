@@ -108,14 +108,13 @@ namespace Tangerine.Core
 			}
 			userPreferences.Save(GetUserPrefsFile());
 		}
-		
-		[ProtoContract]
+
 		class UserPreferences
 		{
-			[ProtoMember(1)]
+			[YuzuMember]
 			public readonly List<string> OpenedDocuments = new List<string>();
 
-			[ProtoMember(2)]
+			[YuzuMember]
 			public string CurrentDirectory;
 
 			public void Load(string file)
@@ -129,6 +128,6 @@ namespace Tangerine.Core
 			{
 				Lime.Serialization.WriteObjectToFile<UserPreferences>(file, this);
 			}
-		}	
+		}
 	}
 }

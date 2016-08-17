@@ -1,21 +1,16 @@
 using System;
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
 {
-	[ProtoContract]
 	public class Slider : Widget
 	{
-		[ProtoMember(1)]
 		[YuzuMember]
 		public float RangeMin { get; set; }
 
-		[ProtoMember(2)]
 		[YuzuMember]
 		public float RangeMax { get; set; }
 
-		[ProtoMember(3)]
 		[YuzuMember]
 		public float Value
 		{
@@ -23,7 +18,6 @@ namespace Lime
 			set { this.value = value; }
 		}
 
-		[ProtoMember(4)]
 		[YuzuMember]
 		public float Step { get; set; }
 

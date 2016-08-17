@@ -1,47 +1,39 @@
 using System;
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
 {
-	[ProtoContract]
 	public struct BoneArray
 	{
-		[ProtoContract]
 		public struct Entry
 		{
 			/// <summary>
 			/// Текущий абсолютный поворот кости
 			/// </summary>
-			[ProtoMember(1)]
 			[YuzuMember]
 			public float Rotation;
 
 			/// <summary>
 			/// Текущая длина кости
 			/// </summary>
-			[ProtoMember(2)]
 			[YuzuMember]
 			public float Length;
 
 			/// <summary>
 			/// Текущая абсолютная позиция начала кости
 			/// </summary>
-			[ProtoMember(3)]
 			[YuzuMember]
 			public Vector2 Joint;
 
 			/// <summary>
 			/// Текущая абсолютная позиция конца кости
 			/// </summary>
-			[ProtoMember(4)]
 			[YuzuMember]
 			public Vector2 Tip;
 
 			/// <summary>
 			/// Bone's transformation relative its reference position.
 			/// </summary>
-			[ProtoMember(5)]
 			[YuzuMember]
 			public Matrix32 RelativeTransform;
 		}
@@ -95,7 +87,6 @@ namespace Lime
 			return result;
 		}
 
-		[ProtoMember(1)]
 		[YuzuMember]
 		public Entry[] items;
 	}

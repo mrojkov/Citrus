@@ -1,4 +1,3 @@
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
@@ -6,21 +5,18 @@ namespace Lime
 	/// <summary>
 	/// Хранит номер кости и силу влияния
 	/// </summary>
-	[ProtoContract]
 	[YuzuCompact]
 	public struct BoneWeight
 	{
 		/// <summary>
 		/// Номер кости
 		/// </summary>
-		[ProtoMember(1)]
 		[YuzuMember]
 		public int Index;
 
 		/// <summary>
 		/// Сила влияния кости
 		/// </summary>
-		[ProtoMember(2)]
 		[YuzuMember]
 		public float Weight;
 	}
@@ -29,23 +25,18 @@ namespace Lime
 	/// Содержит информацию о степени влияния костей на точку DistortionMesh
 	/// Поддерживается влияние 4 костей одновременно
 	/// </summary>
-	[ProtoContract]
 	[YuzuCompact]
 	public class SkinningWeights
 	{
-		[ProtoMember(1)]
 		[YuzuMember]
 		public BoneWeight Bone0;
 
-		[ProtoMember(2)]
 		[YuzuMember]
 		public BoneWeight Bone1;
 
-		[ProtoMember(3)]
 		[YuzuMember]
 		public BoneWeight Bone2;
 
-		[ProtoMember(4)]
 		[YuzuMember]
 		public BoneWeight Bone3;
 	}
@@ -53,27 +44,23 @@ namespace Lime
 	/// <summary>
 	/// Кость. Управляет движением точек DistortionMesh
 	/// </summary>
-	[ProtoContract]
 	public class Bone : Node
 	{
 		/// <summary>
 		/// Позиция в сцене
 		/// </summary>
-		[ProtoMember(1)]
 		[YuzuMember]
 		public Vector2 Position { get; set; }
 
 		/// <summary>
 		/// Угол поворота кости в градусах по часовой стрелке
 		/// </summary>
-		[ProtoMember(2)]
 		[YuzuMember]
 		public float Rotation { get; set; }
 
 		/// <summary>
 		/// Длина кости
 		/// </summary>
-		[ProtoMember(3)]
 		[YuzuMember]
 		public float Length { get; set; }
 
@@ -81,47 +68,39 @@ namespace Lime
 		/// Ограничитель обратной кинематики.
 		/// Обратная кинематика не будет распространяться на кость-родитель и далее
 		/// </summary>
-		[ProtoMember(4)]
 		[YuzuMember]
 		public bool IKStopper { get; set; }
 
 		/// <summary>
 		/// Порядковый номер кости в сцене
 		/// </summary>
-		[ProtoMember(5)]
 		[YuzuMember]
 		public int Index { get; set; }
 
 		/// <summary>
 		/// Номер родительской кости
 		/// </summary>
-		[ProtoMember(6)]
 		[YuzuMember]
 		public int BaseIndex { get; set; }
 
 		/// <summary>
 		/// Область влияния, в которой кость оказывает максимальный эффект
 		/// </summary>
-		[ProtoMember(7)]
 		[YuzuMember]
 		public float EffectiveRadius { get; set; }
 
 		/// <summary>
 		/// Область влияния, в которой кость оказывает минимальный эффект
 		/// </summary>
-		[ProtoMember(8)]
 		[YuzuMember]
 		public float FadeoutZone { get; set; }
 
-		[ProtoMember(9)]
 		[YuzuMember]
 		public Vector2 RefPosition { get; set; }
 
-		[ProtoMember(10)]
 		[YuzuMember]
 		public float RefRotation { get; set; }
 
-		[ProtoMember(11)]
 		[YuzuMember]
 		public float RefLength { get; set; }
 

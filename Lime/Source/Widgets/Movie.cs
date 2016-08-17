@@ -1,20 +1,14 @@
-using ProtoBuf;
 using Yuzu;
 
 namespace Lime
 {
-	[ProtoContract]
 	public enum MovieAction
 	{
-		[ProtoEnum]
 		Play,
-		[ProtoEnum]
 		Pause,
-		[ProtoEnum]
 		Stop
 	}
 
-	[ProtoContract]
 	public sealed class Movie : Widget, IImageCombinerArg
 	{
 		bool skipRender;
@@ -22,7 +16,6 @@ namespace Lime
 		bool textureInitialized;
 		MovieTexture movieTexture;
 
-		[ProtoMember(1)]
 		[YuzuMember]
 		public string Path
 		{
@@ -30,7 +23,6 @@ namespace Lime
 			set { movieTexture.Path = Serialization.ExpandPath(value); }
 		}
 
-		[ProtoMember(2)]
 		[YuzuMember]
 		public bool Looped { get; set; }
 
