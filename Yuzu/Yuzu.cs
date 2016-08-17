@@ -111,24 +111,40 @@ namespace Yuzu
 
 	}
 
-	public class CommonOptions
+	public struct CommonOptions
 	{
-		public Type RequiredAttribute = typeof(YuzuRequired);
-		public Type OptionalAttribute = typeof(YuzuOptional);
-		public Type MemberAttribute = typeof(YuzuMember);
-		public Type CompactAttribute = typeof(YuzuCompact);
-		public Type SerializeIfAttribute = typeof(YuzuSerializeCondition);
-		public Type AfterDeserializationAttribute = typeof(YuzuAfterDeserialization);
-		public Type MergeAttribute = typeof(YuzuMerge);
+		public Type RequiredAttribute;
+		public Type OptionalAttribute;
+		public Type MemberAttribute;
+		public Type CompactAttribute;
+		public Type SerializeIfAttribute;
+		public Type AfterDeserializationAttribute;
+		public Type MergeAttribute;
 
-		public Func<Attribute, string> GetAlias = attr => (attr as YuzuField).Alias;
-		public Func<Attribute, Func<object, object, bool>> GetSerializeCondition =
-			attr => (attr as YuzuSerializeCondition).Check;
-		public Assembly Assembly = Assembly.GetCallingAssembly();
-		public TagMode TagMode = TagMode.Names;
-		public bool IgnoreNewFields = false;
-		public bool AllowEmptyTypes = false;
-		public bool ReportErrorPosition = true;
+		public Func<Attribute, string> GetAlias;
+		public Func<Attribute, Func<object, object, bool>> GetSerializeCondition;
+		public Assembly Assembly;
+		public TagMode TagMode;
+		public bool IgnoreNewFields;
+		public bool AllowEmptyTypes;
+		public bool ReportErrorPosition;
+
+		public static readonly CommonOptions Default = new CommonOptions {
+			RequiredAttribute = typeof(YuzuRequired),
+			OptionalAttribute = typeof(YuzuOptional),
+			MemberAttribute = typeof(YuzuMember),
+			CompactAttribute = typeof(YuzuCompact),
+			SerializeIfAttribute = typeof(YuzuSerializeCondition),
+			AfterDeserializationAttribute = typeof(YuzuAfterDeserialization),
+			MergeAttribute = typeof(YuzuMerge),
+			GetAlias = attr => (attr as YuzuField).Alias,
+			GetSerializeCondition = attr => (attr as YuzuSerializeCondition).Check,
+			Assembly = Assembly.GetCallingAssembly(),
+			TagMode = TagMode.Names,
+			IgnoreNewFields = false,
+			AllowEmptyTypes = false,
+			ReportErrorPosition = true,
+		};
 	}
 
 	public class YuzuPosition
@@ -161,7 +177,7 @@ namespace Yuzu
 
 	public abstract class AbstractSerializer
 	{
-		public CommonOptions Options = new CommonOptions();
+		public CommonOptions Options = CommonOptions.Default;
 		public abstract void ToWriter(object obj, BinaryWriter writer);
 		public abstract string ToString(object obj);
 		public abstract byte[] ToBytes(object obj);
@@ -239,7 +255,7 @@ namespace Yuzu
 
 	public abstract class AbstractDeserializer
 	{
-		public CommonOptions Options = new CommonOptions();
+		public CommonOptions Options = CommonOptions.Default;
 
 		public abstract object FromReader(object obj, BinaryReader reader);
 		public abstract object FromString(object obj, string source);
