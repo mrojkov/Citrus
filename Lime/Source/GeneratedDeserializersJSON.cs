@@ -1742,17 +1742,15 @@ namespace GeneratedDeserializersJSON.Lime
 		{
 			var result = (global::Lime.Camera3D)obj;
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -1798,17 +1796,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -1965,17 +1961,15 @@ namespace GeneratedDeserializersJSON.Lime
 		{
 			var result = (global::Lime.Mesh3D)obj;
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -2035,17 +2029,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp5 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp5);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp5 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp5);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -2185,17 +2177,15 @@ namespace GeneratedDeserializersJSON.Lime
 		{
 			var result = (global::Lime.Node3D)obj;
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -2225,17 +2215,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -2300,17 +2288,15 @@ namespace GeneratedDeserializersJSON.Lime
 		{
 			var result = (global::Lime.Spline3D)obj;
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -2344,17 +2330,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -2494,17 +2478,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -2550,17 +2532,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -2702,17 +2682,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -2754,17 +2732,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -2845,17 +2821,15 @@ namespace GeneratedDeserializersJSON.Lime
 		{
 			var result = (global::Lime.LinearLayout)obj;
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -2885,17 +2859,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -5563,17 +5535,15 @@ namespace GeneratedDeserializersJSON.Lime
 		{
 			var result = (global::Lime.Audio)obj;
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -5615,17 +5585,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -5822,17 +5790,15 @@ namespace GeneratedDeserializersJSON.Lime
 		{
 			var result = (global::Lime.Bone)obj;
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -5882,17 +5848,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -6080,17 +6044,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -6140,17 +6102,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -6239,17 +6199,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -6291,17 +6249,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -6394,17 +6350,15 @@ namespace GeneratedDeserializersJSON.Lime
 		{
 			var result = (global::Lime.DistortionMeshPoint)obj;
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -6434,17 +6388,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -6513,17 +6465,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -6565,17 +6515,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -6664,17 +6612,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -6716,17 +6662,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -6819,17 +6763,15 @@ namespace GeneratedDeserializersJSON.Lime
 		{
 			var result = (global::Lime.ImageCombiner)obj;
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -6863,17 +6805,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -6986,17 +6926,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -7042,17 +6980,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -7141,17 +7077,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -7201,17 +7135,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -7304,17 +7236,15 @@ namespace GeneratedDeserializersJSON.Lime
 		{
 			var result = (global::Lime.Node)obj;
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -7340,17 +7270,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -7411,17 +7339,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -7499,17 +7425,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -7658,17 +7582,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -7722,17 +7644,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -7805,17 +7725,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -7861,17 +7779,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -7960,17 +7876,15 @@ namespace GeneratedDeserializersJSON.Lime
 		{
 			var result = (global::Lime.PointObject)obj;
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -7996,17 +7910,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -8067,17 +7979,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -8119,17 +8029,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -8226,17 +8134,15 @@ namespace GeneratedDeserializersJSON.Lime
 		{
 			var result = (global::Lime.SplineGear)obj;
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -8262,17 +8168,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -8333,17 +8237,15 @@ namespace GeneratedDeserializersJSON.Lime
 		{
 			var result = (global::Lime.SplinePoint)obj;
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -8369,17 +8271,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -8452,17 +8352,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -8508,17 +8406,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -8619,17 +8515,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -8683,17 +8577,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -8798,17 +8690,15 @@ namespace GeneratedDeserializersJSON.Lime
 		{
 			var result = (global::Lime.TextStyle)obj;
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -8858,17 +8748,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -8941,17 +8829,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Animations" == name) {
-				result.Animations = RequireOrNull('[') ? null : new global::Lime.AnimationList();
-				if (result.Animations != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
-							result.Animations.Add(tmp1);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp1 = GeneratedDeserializersJSON.Lime.Animation_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Animation>(Reader);
+						result.Animations.Add(tmp1);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}
@@ -8993,17 +8879,15 @@ namespace GeneratedDeserializersJSON.Lime
 				name = GetNextName(false);
 			}
 			if ("Nodes" == name) {
-				result.Nodes = RequireOrNull('[') ? null : new global::Lime.NodeList();
-				if (result.Nodes != null) {
-					if (SkipSpacesCarefully() == ']') {
-						Require(']');
-					}
-					else {
-						do {
-							var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
-							result.Nodes.Add(tmp3);
-						} while (Require(']', ',') == ',');
-					}
+				Require('[');
+				if (SkipSpacesCarefully() == ']') {
+					Require(']');
+				}
+				else {
+					do {
+						var tmp3 = GeneratedDeserializersJSON.Lime.Node_JsonDeserializer.Instance.FromReaderTyped<global::Lime.Node>(Reader);
+						result.Nodes.Add(tmp3);
+					} while (Require(']', ',') == ',');
 				}
 				name = GetNextName(false);
 			}

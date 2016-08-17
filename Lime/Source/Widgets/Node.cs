@@ -207,7 +207,7 @@ namespace Lime
 		/// </summary>
 		[ProtoMember(6)]
 		[YuzuMember]
-		public NodeList Nodes;
+		public NodeList Nodes { get; private set; }
 
 		/// <summary>
 		/// Markers of default animation.
@@ -264,7 +264,7 @@ namespace Lime
 
 		[ProtoMember(13)]
 		[YuzuMember]
-		public AnimationList Animations;
+		public AnimationList Animations { get; private set; }
 
 		/// <summary>
 		/// Name of last started marker of default animation. Is set to null by default.
