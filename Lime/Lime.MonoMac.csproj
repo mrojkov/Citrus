@@ -58,9 +58,6 @@
     <Reference Include="MonoMac">
       <HintPath>..\3rdParty\MonoMac.dll</HintPath>
     </Reference>
-    <Reference Include="protobuf-net">
-      <HintPath>..\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
-    </Reference>
     <Reference Include="Lzma">
       <HintPath>..\3rdParty\Lzma\bin\Release\Lzma.dll</HintPath>
     </Reference>
@@ -271,6 +268,7 @@
     <Compile Include="Source\Widgets\BorderedFrame.cs" />
     <Compile Include="Source\Application\Menu\Command.cs" />
     <Compile Include="Source\Widgets\TabBar.cs" />
+    <Compile Include="Source\GeneratedDeserializersJSON.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
@@ -365,6 +363,10 @@
     <ProjectReference Include="..\Lemon\Lemon.MonoMac.csproj">
       <Project>{4604AA2E-129F-4814-AD0D-8BA35346ECC4}</Project>
       <Name>Lemon.MonoMac</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Yuzu\Yuzu.csproj">
+      <Project>{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}</Project>
+      <Name>Yuzu</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

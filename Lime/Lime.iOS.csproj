@@ -44,9 +44,6 @@
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.iOS" />
     <Reference Include="OpenTK-1.0" />
-    <Reference Include="protobuf-net">
-      <HintPath>..\3rdParty\ProtoBuf-Net\iOS\protobuf-net.dll</HintPath>
-    </Reference>
     <Reference Include="Lzma">
       <HintPath>..\3rdParty\Lzma\bin\Release\Lzma.dll</HintPath>
     </Reference>
@@ -326,6 +323,7 @@
     <Compile Include="Source\Widgets\CheckBox.cs" />
     <Compile Include="Source\Widgets\DropDownList.cs" />
     <Compile Include="Source\Widgets\TabBar.cs" />
+    <Compile Include="Source\GeneratedDeserializersJSON.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -338,6 +336,10 @@
     <ProjectReference Include="..\Lemon\Lemon.iOS.csproj">
       <Project>{C4795CBE-B192-4E53-8140-7310FBD206DD}</Project>
       <Name>Lemon.iOS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Yuzu\Yuzu.iOS.csproj">
+      <Project>{DF52C768-5E17-4A26-AD77-4BDD31A2224C}</Project>
+      <Name>Yuzu.iOS</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />

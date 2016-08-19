@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lemon.MonoMac", "..\Lemon\L
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.MonoMac", "..\Lime\Lime.MonoMac.csproj", "{DC16EEBF-404D-4610-B87A-15B57464D707}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yuzu", "..\Yuzu\Yuzu.csproj", "{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -25,6 +27,10 @@ Global
 		{DC16EEBF-404D-4610-B87A-15B57464D707}.Debug|x86.Build.0 = Debug|Any CPU
 		{DC16EEBF-404D-4610-B87A-15B57464D707}.Release|x86.ActiveCfg = Release|Any CPU
 		{DC16EEBF-404D-4610-B87A-15B57464D707}.Release|x86.Build.0 = Release|Any CPU
+		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}.Debug|x86.Build.0 = Debug|Any CPU
+		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}.Release|x86.ActiveCfg = Release|Any CPU
+		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
