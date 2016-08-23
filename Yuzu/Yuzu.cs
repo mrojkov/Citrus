@@ -111,40 +111,25 @@ namespace Yuzu
 
 	}
 
-	public struct CommonOptions
+	public class CommonOptions
 	{
-		public Type RequiredAttribute;
-		public Type OptionalAttribute;
-		public Type MemberAttribute;
-		public Type CompactAttribute;
-		public Type SerializeIfAttribute;
-		public Type AfterDeserializationAttribute;
-		public Type MergeAttribute;
+		public Type RequiredAttribute = typeof(YuzuRequired);
+		public Type OptionalAttribute = typeof(YuzuOptional);
+		public Type MemberAttribute = typeof(YuzuMember);
+		public Type CompactAttribute = typeof(YuzuCompact);
+		public Type SerializeIfAttribute = typeof(YuzuSerializeCondition);
+		public Type AfterDeserializationAttribute = typeof(YuzuAfterDeserialization);
+		public Type MergeAttribute = typeof(YuzuMerge);
 
-		public Func<Attribute, string> GetAlias;
-		public Func<Attribute, Func<object, object, bool>> GetSerializeCondition;
-		public Assembly Assembly;
-		public TagMode TagMode;
-		public bool IgnoreNewFields;
-		public bool AllowEmptyTypes;
-		public bool ReportErrorPosition;
+		public Func<Attribute, string> GetAlias = attr => (attr as YuzuField).Alias;
+		public Func<Attribute, Func<object, object, bool>> GetSerializeCondition = attr => (attr as YuzuSerializeCondition).Check;
+		public Assembly Assembly = Assembly.GetCallingAssembly();
+		public TagMode TagMode = TagMode.Names;
+		public bool IgnoreNewFields = false;
+		public bool AllowEmptyTypes = false;
+		public bool ReportErrorPosition = true;
 
-		public static readonly CommonOptions Default = new CommonOptions {
-			RequiredAttribute = typeof(YuzuRequired),
-			OptionalAttribute = typeof(YuzuOptional),
-			MemberAttribute = typeof(YuzuMember),
-			CompactAttribute = typeof(YuzuCompact),
-			SerializeIfAttribute = typeof(YuzuSerializeCondition),
-			AfterDeserializationAttribute = typeof(YuzuAfterDeserialization),
-			MergeAttribute = typeof(YuzuMerge),
-			GetAlias = attr => (attr as YuzuField).Alias,
-			GetSerializeCondition = attr => (attr as YuzuSerializeCondition).Check,
-			Assembly = Assembly.GetCallingAssembly(),
-			TagMode = TagMode.Names,
-			IgnoreNewFields = false,
-			AllowEmptyTypes = false,
-			ReportErrorPosition = true,
-		};
+		public static readonly CommonOptions Default = new CommonOptions();
 	}
 
 	public class YuzuPosition
