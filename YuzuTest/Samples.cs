@@ -328,6 +328,24 @@ namespace YuzuTest
 		int X { get; set; }
 	}
 
+	public interface ISampleMember
+	{
+		[YuzuMember]
+		int X { get; set; }
+	}
+
+	public abstract class SampleMemberAbstract
+	{
+		[YuzuMember]
+		int X = 72;
+	}
+
+	public class SampleMemberI : ISampleMember
+	{
+		public int X { get; set; }
+		public SampleMemberI() { X = 71; }
+	}
+
 	public class SampleInterfaced : ISample
 	{
 		[YuzuRequired]

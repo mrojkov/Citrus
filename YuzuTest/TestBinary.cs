@@ -972,6 +972,32 @@ namespace YuzuTest.Binary
 		}
 
 		[TestMethod]
+		public void TestMemberOfInterface()
+		{
+			var bs = new BinarySerializer();
+
+			var v1 = new List<ISampleMember>();
+			var result1 = bs.ToBytes(v1);
+			Assert.AreEqual("21 20 00 00 00 00", XS(result1));
+
+			var bd = new BinaryDeserializer();
+			var w1 = new List<ISampleMember>();
+			bd.FromBytes(w1, result1);
+			Assert.AreEqual(0, w1.Count);
+
+			v1.Add(new SampleMemberI());
+			var result2 = bs.ToBytes(v1);
+			Assert.AreEqual(
+				"21 20 01 00 00 00 01 00 " +
+				XS("YuzuTest.SampleMemberI") + " 01 00 " + XS("X", RoughType.Int) + " 00 00",
+				XS(result2));
+			bd.FromBytes(w1, result2);
+			Assert.AreEqual(71, w1[0].X);
+
+			Assert.AreEqual("21 20 00 00 00 00", XS(bs.ToBytes(new List<SampleMemberAbstract>())));
+		}
+
+		[TestMethod]
 		public void TestErrors()
 		{
 			var bd = new BinaryDeserializer();

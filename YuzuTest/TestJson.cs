@@ -1081,6 +1081,31 @@ namespace YuzuTest.Json
 		}
 
 		[TestMethod]
+		public void TestMemberOfInterface()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = "";
+
+			var v1 = new List<ISampleMember>();
+			var result1 = js.ToString(v1);
+			Assert.AreEqual("[]", result1);
+
+			var jd = new JsonDeserializer();
+			var w1 = new List<ISampleMember>();
+			jd.FromString(w1, result1);
+			Assert.AreEqual(0, w1.Count);
+
+			v1.Add(new SampleMemberI());
+			var result2 = js.ToString(v1);
+			Assert.AreEqual("[{\"class\":\"YuzuTest.SampleMemberI\"}]", result2);
+			jd.FromString(w1, result2);
+			Assert.AreEqual(71, w1[0].X);
+
+			Assert.AreEqual("[]", js.ToString(new List<SampleMemberAbstract>()));
+		}
+
+		[TestMethod]
 		public void TestErrors()
 		{
 			var js = new JsonSerializer();
