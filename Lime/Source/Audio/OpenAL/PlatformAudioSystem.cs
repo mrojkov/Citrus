@@ -74,6 +74,9 @@ namespace Lime
 		static NSObject interruptionNotification;
 #endif
 
+		public delegate void AudioMissingDelegate(string path);
+		public static event AudioMissingDelegate AudioMissing;
+
 		public static void Initialize(ApplicationOptions options)
 		{
 #if iOS
@@ -326,6 +329,9 @@ namespace Lime
 			var sound = new Sound();
 			var stream = cache.OpenStream(path);
 			if (stream == null) {
+				if (AudioMissing != null) {
+					AudioMissing(path);
+				}
 				return sound;
 			}
 			var decoder = AudioDecoderFactory.CreateDecoder(stream);
