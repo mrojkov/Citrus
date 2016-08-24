@@ -202,6 +202,10 @@ namespace YuzuTest.Json
 			var w2 = jdg.FromString("{\"class\":\"YuzuTest.Sample1\",\"X\":99}");
 			Assert.IsInstanceOfType(w2, typeof(Sample1));
 			Assert.AreEqual(99, ((Sample1)w2).X);
+
+			var w3 = new SampleMemberI();
+			jdg.FromString(w3, "{\"class\":\"YuzuTest.SampleMemberI\"}");
+			Assert.AreEqual(71, ((SampleMemberI)w3).X);
 		}
 
 		[TestMethod]
@@ -1097,12 +1101,20 @@ namespace YuzuTest.Json
 			Assert.AreEqual(0, w1.Count);
 
 			v1.Add(new SampleMemberI());
-			var result2 = js.ToString(v1);
-			Assert.AreEqual("[{\"class\":\"YuzuTest.SampleMemberI\"}]", result2);
-			jd.FromString(w1, result2);
+			var result1p = js.ToString(v1);
+			Assert.AreEqual("[{\"class\":\"YuzuTest.SampleMemberI\"}]", result1p);
+			jd.FromString(w1, result1p);
 			Assert.AreEqual(71, w1[0].X);
 
 			Assert.AreEqual("[]", js.ToString(new List<SampleMemberAbstract>()));
+
+			var v2 = new List<ISampleMember> { new SampleMemberI(), new SampleMemberI { X = 99 } };
+			var result2 = js.ToString(v2);
+			var w2 = new List<ISampleMember>();
+			jd.FromString(w2, result2);
+			YuzuGen.System.Collections.Generic.List_ISampleMember_JsonDeserializer.Instance.FromString(w2, result2);
+			Assert.AreEqual(v2[0].X, w2[0].X);
+			Assert.AreEqual(v2[1].X, w2[1].X);
 		}
 
 		[TestMethod]

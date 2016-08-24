@@ -443,6 +443,157 @@ namespace YuzuGen.YuzuTest
 		}
 	}
 
+	class ISampleMember_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new ISampleMember_JsonDeserializer Instance = new ISampleMember_JsonDeserializer();
+
+		public ISampleMember_JsonDeserializer()
+		{
+			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
+			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
+			JsonOptions.IgnoreCompact = false;
+			JsonOptions.Int64AsString = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.ArrayLengthPrefix = false;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderInterface<global::YuzuTest.ISampleMember>(Reader);
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return null;
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (global::YuzuTest.ISampleMember)obj;
+			if ("X" == name) {
+				result.X = RequireInt();
+				name = GetNextName(false);
+			}
+			Require('}');
+			return result;
+		}
+	}
+
+	class SampleMemberI_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new SampleMemberI_JsonDeserializer Instance = new SampleMemberI_JsonDeserializer();
+
+		public SampleMemberI_JsonDeserializer()
+		{
+			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
+			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
+			JsonOptions.IgnoreCompact = false;
+			JsonOptions.Int64AsString = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.ArrayLengthPrefix = false;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderTyped<global::YuzuTest.SampleMemberI>(Reader);
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new global::YuzuTest.SampleMemberI(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (global::YuzuTest.SampleMemberI)obj;
+			if ("X" == name) {
+				result.X = RequireInt();
+				name = GetNextName(false);
+			}
+			Require('}');
+			return result;
+		}
+	}
+
+}
+
+namespace YuzuGen.System.Collections.Generic
+{
+	class List_ISampleMember_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new List_ISampleMember_JsonDeserializer Instance = new List_ISampleMember_JsonDeserializer();
+
+		public List_ISampleMember_JsonDeserializer()
+		{
+			Options.Assembly = Assembly.Load("mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
+			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
+			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
+			JsonOptions.IgnoreCompact = false;
+			JsonOptions.Int64AsString = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.ArrayLengthPrefix = false;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderInt(new global::System.Collections.Generic.List<global::YuzuTest.ISampleMember>());
+		}
+
+		public override object FromReaderInt(object obj)
+		{
+			var result = (global::System.Collections.Generic.List<global::YuzuTest.ISampleMember>)obj;
+			Require('[');
+			if (SkipSpacesCarefully() == ']') {
+				Require(']');
+			}
+			else {
+				do {
+					var tmp1 = YuzuGen.YuzuTest.ISampleMember_JsonDeserializer.Instance.FromReaderInterface<global::YuzuTest.ISampleMember>(Reader);
+					result.Add(tmp1);
+				} while (Require(']', ',') == ',');
+			}
+			return result;
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new global::System.Collections.Generic.List<global::YuzuTest.ISampleMember>(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (global::System.Collections.Generic.List<global::YuzuTest.ISampleMember>)obj;
+			return result;
+		}
+	}
+
+}
+
+namespace YuzuGen.YuzuTest
+{
 	class SampleArray_JsonDeserializer : JsonDeserializerGenBase
 	{
 		public static new SampleArray_JsonDeserializer Instance = new SampleArray_JsonDeserializer();
