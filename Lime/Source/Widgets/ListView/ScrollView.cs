@@ -44,7 +44,7 @@ namespace Lime
 			}
 		}
 
-		private float ProjectToScrollAxisWithFrameRotation(Vector2 v)
+		protected float ProjectToScrollAxisWithFrameRotation(Vector2 v)
 		{
 			return Vector2.DotProduct(ScrollAxis, v);
 		}
@@ -52,7 +52,7 @@ namespace Lime
 		public virtual bool IsDragging { get; protected set; }
 
 		// TODO: Use WidgetInput instead
-		private Input Input { get { return Window.Current.Input; } }
+		protected Input Input { get { return Window.Current.Input; } }
 
 		public float ContentLength
 		{
@@ -221,7 +221,7 @@ namespace Lime
 			}
 		}
 
-		private void StartScrolling(IEnumerator<object> newScrollingTask)
+		protected void StartScrolling(IEnumerator<object> newScrollingTask)
 		{
 			StopScrolling();
 			scrollingTask = Content.Tasks.Add(newScrollingTask);
@@ -344,7 +344,7 @@ namespace Lime
 			}
 		}
 
-		private IEnumerator<object> InertialScrollingTask(float velocity)
+		protected virtual IEnumerator<object> InertialScrollingTask(float velocity)
 		{
 			while (true) {
 				var delta = Task.Current.Delta;
@@ -354,13 +354,17 @@ namespace Lime
 					break;
 				}
 				// Round scrolling position to prevent blurring
-				ScrollPosition = Mathf.Clamp(value: (ScrollPosition + velocity * delta).Round(), min: MinScrollPosition - MaxOverscroll, max: MaxScrollPosition + MaxOverscroll);
+				ScrollPosition = Mathf.Clamp(
+					value: (ScrollPosition + velocity * delta).Round(),
+					min: MinScrollPosition - MaxOverscroll,
+					max: MaxScrollPosition + MaxOverscroll
+				);
 				yield return null;
 			}
 			scrollingTask = null;
 		}
 
-		private IEnumerator<object> HandleDragTask(VelocityMeter velocityMeter, float mouseProjectedPosition)
+		protected virtual IEnumerator<object> HandleDragTask(VelocityMeter velocityMeter, float mouseProjectedPosition)
 		{
 			if (!CanScroll || !ScrollWhenContentFits && MaxScrollPosition == 0)
 				yield break;
@@ -377,8 +381,7 @@ namespace Lime
 				}
 				realScrollPosition += mouseProjectedPosition - ProjectToScrollAxisWithFrameRotation(Input.MousePosition);
 				// Round scrolling position to prevent blurring
-				ScrollPosition = ClampScrollPositionWithinBounceZone(realScrollPosition)
-					.Round();
+				ScrollPosition = ClampScrollPositionWithinBounceZone(realScrollPosition).Round();
 				mouseProjectedPosition = ProjectToScrollAxisWithFrameRotation(Input.MousePosition);
 				velocityMeter.AddSample(realScrollPosition);
 				yield return null;
