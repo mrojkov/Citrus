@@ -139,7 +139,7 @@ namespace YuzuTest
 				jd.Generate<YuzuTest2.SampleNamespace>();
 				jd.GenerateFooter();
 				sw.Flush();
-				ms.WriteTo(new FileStream(@"..\..\Generated.cs", FileMode.Create));
+				ms.WriteTo(new FileStream(@"..\..\GeneratedJson.cs", FileMode.Create));
 			}
 		}
 
