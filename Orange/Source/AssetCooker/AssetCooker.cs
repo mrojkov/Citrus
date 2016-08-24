@@ -155,6 +155,7 @@ namespace Orange
 		{
 			AddStage(SyncAtlases);
 			AddStage(SyncDeleted);
+			AddStage(() => SyncRawAssets(".json", AssetAttributes.ZippedDeflate));
 			AddStage(() => SyncRawAssets(".txt", AssetAttributes.ZippedDeflate));
 			AddStage(() => SyncRawAssets(".csv", AssetAttributes.ZippedDeflate));
 			AddStage(SyncTextures);
