@@ -176,6 +176,7 @@ namespace YuzuTest
 				bd.Generate<SampleConcrete>();
 				bd.Generate<SampleWithCollection>();
 				bd.Generate<SampleAfter2>();
+				bd.Generate<SampleMerge>();
 				bd.Generate<YuzuTest2.SampleNamespace>();
 				bd.GenerateFooter();
 				sw.Flush();

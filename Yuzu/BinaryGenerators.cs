@@ -93,13 +93,18 @@ namespace Yuzu.Binary
 			return "tmp" + tempCount.ToString();
 		}
 
-		private string PutNullOrCount(Type t)
+		private string PutCount()
 		{
-			cw.PutPart("({0})null;\n", Utils.GetTypeSpec(t));
 			var tempCountName = GetTempName();
 			cw.Put("var {0} = Reader.ReadInt32();\n", tempCountName);
 			cw.Put("if ({0} >= 0) {{\n", tempCountName);
 			return tempCountName;
+		}
+
+		private string PutNullOrCount(Type t)
+		{
+			cw.PutPart("({0})null;\n", Utils.GetTypeSpec(t));
+			return PutCount();
 		}
 
 		private void GenerateCollection(Type t, Type icoll, string name, string tempIndexName)
@@ -181,7 +186,22 @@ namespace Yuzu.Binary
 
 		private void GenerateMerge(Type t, string name)
 		{
-
+			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
+				GenerateDictionary(t, name, PutCount());
+				cw.Put("}\n");
+				return;
+			}
+			var icoll = t.GetInterface(typeof(ICollection<>).Name);
+			if (icoll != null) {
+				GenerateCollection(t, icoll, name, PutCount());
+				cw.Put("}\n");
+				return;
+			}
+			if ((t.IsClass || t.IsInterface) && t != typeof(object)) {
+				cw.Put("ReadIntoObject<{0}>({1});\n", Utils.GetTypeSpec(t), name);
+				return;
+			}
+			throw new YuzuException(String.Format("Unable to merge field {1} of type {0}", name, t.Name));
 		}
 
 		private void GenerateReaderBody(Meta meta)

@@ -658,6 +658,44 @@ namespace YuzuGenBin
 			return result;
 		}
 
+		private void Read_YuzuTest__SampleMerge(ClassDef def, object obj)
+		{
+			var result = (global::YuzuTest.SampleMerge)obj;
+			ClassDef.FieldDef fd;
+			fd = def.Fields[Reader.ReadInt16()];
+			if (1 != fd.OurIndex) throw Error("1!=" + fd.OurIndex);
+			var tmp1 = Reader.ReadInt32();
+			if (tmp1 >= 0) {
+				while (--tmp1 >= 0) {
+					var tmp2 = Reader.ReadInt32();
+					var tmp3 = Reader.ReadInt32();
+					result.DI.Add(tmp2, tmp3);
+				}
+			}
+			fd = def.Fields[Reader.ReadInt16()];
+			if (2 != fd.OurIndex) throw Error("2!=" + fd.OurIndex);
+			var tmp4 = Reader.ReadInt32();
+			if (tmp4 >= 0) {
+				while (--tmp4 >= 0) {
+					var tmp5 = Reader.ReadInt32();
+					result.LI.Add(tmp5);
+				}
+			}
+			fd = def.Fields[Reader.ReadInt16()];
+			if (3 == fd.OurIndex) {
+				ReadIntoObject<global::YuzuTest.Sample1>(result.M);
+				fd = def.Fields[Reader.ReadInt16()];
+			}
+			if (fd.OurIndex != ClassDef.EOF) throw Error("Unfinished object");
+		}
+
+		private object Make_YuzuTest__SampleMerge(ClassDef def)
+		{
+			var result = new global::YuzuTest.SampleMerge();
+			Read_YuzuTest__SampleMerge(def, result);
+			return result;
+		}
+
 		private void Read_YuzuTest2__SampleNamespace(ClassDef def, object obj)
 		{
 			var result = (global::YuzuTest2.SampleNamespace)obj;
@@ -704,6 +742,7 @@ namespace YuzuGenBin
 			readFieldsCache[typeof(global::YuzuTest.SampleConcrete)] = Read_YuzuTest__SampleConcrete;
 			readFieldsCache[typeof(global::YuzuTest.SampleWithCollection)] = Read_YuzuTest__SampleWithCollection;
 			readFieldsCache[typeof(global::YuzuTest.SampleAfter2)] = Read_YuzuTest__SampleAfter2;
+			readFieldsCache[typeof(global::YuzuTest.SampleMerge)] = Read_YuzuTest__SampleMerge;
 			readFieldsCache[typeof(global::YuzuTest2.SampleNamespace)] = Read_YuzuTest2__SampleNamespace;
 			makeCache[typeof(global::YuzuTest.Sample1)] = Make_YuzuTest__Sample1;
 			makeCache[typeof(global::YuzuTest.Sample2)] = Make_YuzuTest__Sample2;
@@ -732,6 +771,7 @@ namespace YuzuGenBin
 			makeCache[typeof(global::YuzuTest.SampleConcrete)] = Make_YuzuTest__SampleConcrete;
 			makeCache[typeof(global::YuzuTest.SampleWithCollection)] = Make_YuzuTest__SampleWithCollection;
 			makeCache[typeof(global::YuzuTest.SampleAfter2)] = Make_YuzuTest__SampleAfter2;
+			makeCache[typeof(global::YuzuTest.SampleMerge)] = Make_YuzuTest__SampleMerge;
 			makeCache[typeof(global::YuzuTest2.SampleNamespace)] = Make_YuzuTest2__SampleNamespace;
 		}
 	}

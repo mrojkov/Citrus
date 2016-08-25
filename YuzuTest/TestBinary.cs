@@ -1061,6 +1061,17 @@ namespace YuzuTest.Binary
 			CollectionAssert.AreEqual(new[] { 44, 33 }, w1.LI);
 			Assert.AreEqual(768, w1.M.X);
 			Assert.AreEqual("qqq", w1.M.Y);
+
+			var bdg = new BinaryDeserializerGen();
+			var w2 = new SampleMerge();
+			w2.DI.Add(51, 61);
+			w2.LI.Add(55);
+			w2.M = new Sample1 { X = 999, Y = "www" };
+			bdg.FromBytes(w2, result1);
+			CollectionAssert.AreEqual(new Dictionary<int, int> { { 51, 61 }, { 3, 4 } }, w2.DI);
+			CollectionAssert.AreEqual(new[] { 55, 33 }, w2.LI);
+			Assert.AreEqual(768, w2.M.X);
+			Assert.AreEqual("www", w2.M.Y);
 		}
 
 		[TestMethod]
