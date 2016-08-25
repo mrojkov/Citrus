@@ -48,20 +48,22 @@ namespace Yuzu.Binary
 			return s != "" ? s : Reader.ReadBoolean() ? null : "";
 		}
 
+		private class Record { }
+
 		private Type ReadType()
 		{
 			var rt = (RoughType)Reader.ReadByte();
 			if (RoughType.FirstAtom <= rt && rt <= RoughType.LastAtom)
 				return RT.roughTypeToType[(int)rt];
 			if (rt == RoughType.Sequence)
-				return typeof(List<>).MakeGenericType(ReadType() ?? typeof(object));
+				return typeof(List<>).MakeGenericType(ReadType());
 			if (rt == RoughType.Mapping) {
-				var k = ReadType() ?? typeof(object);
-				var v = ReadType() ?? typeof(object);
+				var k = ReadType();
+				var v = ReadType();
 				return typeof(Dictionary<,>).MakeGenericType(k, v);
 			}
 			if (rt == RoughType.Record)
-				return null;
+				return typeof(Record);
 			throw Error("Unknown rough type {0}", rt);
 		}
 
@@ -114,6 +116,7 @@ namespace Yuzu.Binary
 			readerCache[typeof(TimeSpan)] = ReadTimeSpanObj;
 			readerCache[typeof(string)] = ReadString;
 			readerCache[typeof(object)] = ReadAny;
+			readerCache[typeof(Record)] = ReadObject<object>;
 		}
 
 		private object ReadDateTimeObj() { return ReadDateTime(); }
@@ -147,6 +150,17 @@ namespace Yuzu.Binary
 			var rf = ReadValueFunc(typeof(T));
 			for (int i = 0; i < count; ++i)
 				list.Add((T)rf());
+			return list;
+		}
+
+		protected List<object> ReadListRecord()
+		{
+			var count = Reader.ReadInt32();
+			if (count == -1)
+				return null;
+			var list = new List<object>();
+			for (int i = 0; i < count; ++i)
+				list.Add(ReadObject<object>());
 			return list;
 		}
 
@@ -382,6 +396,8 @@ namespace Yuzu.Binary
 			if (t.IsGenericType) {
 				var g = t.GetGenericTypeDefinition();
 				if (g == typeof(List<>)) {
+					if (t.GetGenericArguments()[0] == typeof(Record))
+						return ReadListRecord;
 					var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadList", t);
 					return () => m.Invoke(this, new object[] { });
 				}
@@ -406,8 +422,6 @@ namespace Yuzu.Binary
 					MakeGenericMethod(t, elemType);
 				return () => m.Invoke(this, new object[] { });
 			}
-			if (t == typeof(object))
-				throw new NotImplementedException();
 			if (t.IsClass || t.IsInterface) {
 				var m = Utils.GetPrivateGeneric(GetType(), "ReadObject", t);
 				return (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);

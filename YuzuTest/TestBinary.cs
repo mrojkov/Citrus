@@ -998,6 +998,28 @@ namespace YuzuTest.Binary
 		}
 
 		[TestMethod]
+		public void TestTopLevelListOfNonPrimitiveTypes()
+		{
+			var bs = new BinarySerializer();
+			var bd = new BinaryDeserializer();
+
+			var v1 = new List<SampleDerivedB> { new SampleDerivedB { FB = 10 }, new SampleDerivedB { FB = 20 } };
+
+			var result1 = bs.ToBytes(v1);
+			Assert.AreEqual(
+				("21 20 02 00 00 00 01 00 " + XS("YuzuTest.SampleDerivedB") + " 02 00 " +
+				XS("FBase", RoughType.Int, "FB", RoughType.Int) +
+				" 01 00 00 00 00 00 02 00 0A 00 00 00 00 00 " +
+				"01 00" +
+				" 01 00 00 00 00 00 02 00 14 00 00 00 00 00"),
+				XS(result1));
+			var w1 = (List<object>)bd.FromBytes(result1);
+			for (int i = 0; i < v1.Count; i++) {
+				Assert.AreEqual(v1[i].FB, (w1[i] as SampleDerivedB).FB);
+			}
+		}
+
+		[TestMethod]
 		public void TestErrors()
 		{
 			var bd = new BinaryDeserializer();
