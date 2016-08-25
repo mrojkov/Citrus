@@ -9,6 +9,32 @@ using Yuzu.Util;
 
 namespace Yuzu.Binary
 {
+
+	public class BinaryDeserializerGenBase: BinaryDeserializer
+	{
+		protected static Dictionary<Type, Action<BinaryDeserializer, ClassDef, object>> readCache =
+			new Dictionary<Type, Action<BinaryDeserializer, ClassDef, object>>();
+		protected static Dictionary<Type, Func<BinaryDeserializer, ClassDef, object>> makeCache =
+			new Dictionary<Type, Func<BinaryDeserializer, ClassDef, object>>();
+
+		protected override void PrepareReaders(ClassDef def)
+		{
+			base.PrepareReaders(def);
+			Action<BinaryDeserializer, ClassDef, object> r;
+			if (readCache.TryGetValue(def.Meta.Type, out r))
+				def.ReadFields = r;
+			Func<BinaryDeserializer, ClassDef, object> m;
+			if (makeCache.TryGetValue(def.Meta.Type, out m))
+				def.Make = m;
+		}
+
+		public BinaryDeserializerGenBase(): base()
+		{
+			Options.Assembly = Assembly.GetCallingAssembly();
+		}
+
+	}
+
 	public class BinaryDeserializerGenerator
 	{
 		private CodeWriter cw = new CodeWriter();
@@ -42,16 +68,16 @@ namespace Yuzu.Binary
 			cw.Put("\n");
 			cw.Put("namespace {0}\n", wrapperNameSpace);
 			cw.Put("{\n");
-			cw.Put("public class BinaryDeserializerGen: BinaryDeserializer\n");
+			cw.Put("public class BinaryDeserializerGen: BinaryDeserializerGenBase\n");
 			cw.Put("{\n");
 		}
 
 		public void GenerateFooter()
 		{
-			cw.Put("public BinaryDeserializerGen()\n");
+			cw.Put("static BinaryDeserializerGen()\n");
 			cw.Put("{\n");
 			foreach (var r in generatedReaders)
-				cw.Put("readFieldsCache[typeof({0})] = {1};\n", Utils.GetTypeSpec(r.Key), r.Value);
+				cw.Put("readCache[typeof({0})] = {1};\n", Utils.GetTypeSpec(r.Key), r.Value);
 			foreach (var r in generatedMakers)
 				cw.Put("makeCache[typeof({0})] = {1};\n", Utils.GetTypeSpec(r.Key), r.Value);
 			cw.Put("}\n");
@@ -69,27 +95,27 @@ namespace Yuzu.Binary
 
 		private void InitSimpleValueReader()
 		{
-			simpleValueReader[typeof(sbyte)] = "Reader.ReadSByte()";
-			simpleValueReader[typeof(byte)] = "Reader.ReadByte()";
-			simpleValueReader[typeof(short)] = "Reader.ReadInt16()";
-			simpleValueReader[typeof(ushort)] = "Reader.ReadUInt16()";
-			simpleValueReader[typeof(int)] = "Reader.ReadInt32()";
-			simpleValueReader[typeof(uint)] = "Reader.ReadUInt32()";
-			simpleValueReader[typeof(long)] = "Reader.ReadInt64()";
-			simpleValueReader[typeof(ulong)] = "Reader.ReadUInt64()";
-			simpleValueReader[typeof(bool)] = "Reader.ReadBoolean()";
-			simpleValueReader[typeof(char)] = "Reader.ReadChar()";
-			simpleValueReader[typeof(float)] = "Reader.ReadSingle()";
-			simpleValueReader[typeof(double)] = "Reader.ReadDouble()";
-			simpleValueReader[typeof(DateTime)] = "DateTime.FromBinary(Reader.ReadInt64())";
-			simpleValueReader[typeof(TimeSpan)] = "new TimeSpan(Reader.ReadInt64())";
-			simpleValueReader[typeof(object)] = "ReadAny()";
+			simpleValueReader[typeof(sbyte)] = "d.Reader.ReadSByte()";
+			simpleValueReader[typeof(byte)] = "d.Reader.ReadByte()";
+			simpleValueReader[typeof(short)] = "d.Reader.ReadInt16()";
+			simpleValueReader[typeof(ushort)] = "d.Reader.ReadUInt16()";
+			simpleValueReader[typeof(int)] = "d.Reader.ReadInt32()";
+			simpleValueReader[typeof(uint)] = "d.Reader.ReadUInt32()";
+			simpleValueReader[typeof(long)] = "d.Reader.ReadInt64()";
+			simpleValueReader[typeof(ulong)] = "d.Reader.ReadUInt64()";
+			simpleValueReader[typeof(bool)] = "d.Reader.ReadBoolean()";
+			simpleValueReader[typeof(char)] = "d.Reader.ReadChar()";
+			simpleValueReader[typeof(float)] = "d.Reader.ReadSingle()";
+			simpleValueReader[typeof(double)] = "d.Reader.ReadDouble()";
+			simpleValueReader[typeof(DateTime)] = "DateTime.FromBinary(d.Reader.ReadInt64())";
+			simpleValueReader[typeof(TimeSpan)] = "new TimeSpan(d.Reader.ReadInt64())";
+			simpleValueReader[typeof(object)] = "dg.ReadAny()";
 		}
 
 		private string PutCount()
 		{
 			var tempCountName = cw.GetTempName();
-			cw.Put("var {0} = Reader.ReadInt32();\n", tempCountName);
+			cw.Put("var {0} = d.Reader.ReadInt32();\n", tempCountName);
 			cw.Put("if ({0} >= 0) {{\n", tempCountName);
 			return tempCountName;
 		}
@@ -131,12 +157,12 @@ namespace Yuzu.Binary
 				return;
 			}
 			if (t == typeof(string)) {
-				cw.PutPart("Reader.ReadString();\n");
-				cw.Put("if ({0} == \"\" && Reader.ReadBoolean()) {0} = null;\n", name);
+				cw.PutPart("d.Reader.ReadString();\n");
+				cw.Put("if ({0} == \"\" && d.Reader.ReadBoolean()) {0} = null;\n", name);
 				return;
 			}
 			if (t.IsEnum) {
-				cw.PutPart("({0})Reader.ReadInt32();\n", Utils.GetTypeSpec(t));
+				cw.PutPart("({0})d.Reader.ReadInt32();\n", Utils.GetTypeSpec(t));
 				return;
 			}
 			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
@@ -167,11 +193,11 @@ namespace Yuzu.Binary
 				return;
 			}
 			if (t.IsClass || t.IsInterface) {
-				cw.PutPart("({0})ReadObject<{0}>();\n", Utils.GetTypeSpec(t));
+				cw.PutPart("({0})dg.ReadObject<{0}>();\n", Utils.GetTypeSpec(t));
 				return;
 			}
 			if (Utils.IsStruct(t)) {
-				cw.PutPart("({0})ReadStruct<{0}>();\n", Utils.GetTypeSpec(t));
+				cw.PutPart("({0})dg.ReadStruct<{0}>();\n", Utils.GetTypeSpec(t));
 				return;
 			}
 			throw new NotImplementedException();
@@ -191,7 +217,7 @@ namespace Yuzu.Binary
 				return;
 			}
 			if ((t.IsClass || t.IsInterface) && t != typeof(object)) {
-				cw.Put("ReadIntoObject<{0}>({1});\n", Utils.GetTypeSpec(t), name);
+				cw.Put("dg.ReadIntoObject<{0}>({1});\n", Utils.GetTypeSpec(t), name);
 				return;
 			}
 			throw new YuzuException(String.Format("Unable to merge field {1} of type {0}", name, t.Name));
@@ -200,6 +226,7 @@ namespace Yuzu.Binary
 		private void GenerateReaderBody(Meta meta)
 		{
 			cw.ResetTempNames();
+			cw.Put("var dg = (BinaryDeserializerGen)d;\n", Utils.GetTypeSpec(meta.Type));
 			if (meta.IsCompact) {
 				foreach (var yi in meta.Items) {
 					cw.Put("result.{0} = ", yi.Name);
@@ -209,7 +236,7 @@ namespace Yuzu.Binary
 			else {
 				cw.Put("ClassDef.FieldDef fd;\n");
 				var ourIndex = 0;
-				cw.Put("fd = def.Fields[Reader.ReadInt16()];\n");
+				cw.Put("fd = def.Fields[d.Reader.ReadInt16()];\n");
 				foreach (var yi in meta.Items) {
 					ourIndex += 1;
 					if (yi.IsOptional) {
@@ -219,7 +246,7 @@ namespace Yuzu.Binary
 					}
 					else {
 						if (SafetyChecks)
-							cw.Put("if ({0} != fd.OurIndex) throw Error(\"{0}!=\" + fd.OurIndex);\n", ourIndex);
+							cw.Put("if ({0} != fd.OurIndex) throw dg.Error(\"{0}!=\" + fd.OurIndex);\n", ourIndex);
 						if (yi.SetValue != null)
 							cw.Put("result.{0} = ", yi.Name);
 					}
@@ -227,12 +254,12 @@ namespace Yuzu.Binary
 						GenerateValue(yi.Type, "result." + yi.Name);
 					else
 						GenerateMerge(yi.Type, "result." + yi.Name);
-					cw.Put("fd = def.Fields[Reader.ReadInt16()];\n");
+					cw.Put("fd = def.Fields[d.Reader.ReadInt16()];\n");
 					if (yi.IsOptional)
 						cw.Put("}\n");
 				}
 				if (SafetyChecks)
-					cw.Put("if (fd.OurIndex != ClassDef.EOF) throw Error(\"Unfinished object\");\n");
+					cw.Put("if (fd.OurIndex != ClassDef.EOF) throw dg.Error(\"Unfinished object\");\n");
 			}
 			GenerateAfterDeserialization(meta);
 		}
@@ -253,7 +280,7 @@ namespace Yuzu.Binary
 
 			var readerName = "Read_" + GetMangledTypeNameNS(typeof(T));
 			if (!Utils.IsStruct(typeof(T))) {
-				cw.Put("private void {0}(ClassDef def, object obj)\n", readerName);
+				cw.Put("private static void {0}(BinaryDeserializer d, ClassDef def, object obj)\n", readerName);
 				cw.Put("{\n");
 				cw.Put("var result = ({0})obj;\n", Utils.GetTypeSpec(typeof(T)));
 				GenerateReaderBody(meta);
@@ -263,13 +290,13 @@ namespace Yuzu.Binary
 			}
 
 			var makerName = "Make_" + GetMangledTypeNameNS(typeof(T));
-			cw.Put("private object {0}(ClassDef def)\n", makerName);
+			cw.Put("private static object {0}(BinaryDeserializer d, ClassDef def)\n", makerName);
 			cw.Put("{\n");
 			cw.Put("var result = new {0}();\n", Utils.GetTypeSpec(typeof(T)));
 			if (Utils.IsStruct(typeof(T)))
 				GenerateReaderBody(meta);
 			else
-				cw.Put("{0}(def, result);\n", readerName);
+				cw.Put("{0}(d, def, result);\n", readerName);
 			cw.Put("return result;\n");
 			cw.Put("}\n");
 			cw.Put("\n");

@@ -224,16 +224,18 @@ namespace Yuzu.Binary
 
 			internal Meta Meta;
 			public const int EOF = short.MaxValue;
-			public Action<ClassDef, object> ReadFields;
-			public Func<ClassDef, object> Make;
+			public Action<BinaryDeserializer, ClassDef, object> ReadFields;
+			public Func<BinaryDeserializer, ClassDef, object> Make;
 			public List<FieldDef> Fields = new List<FieldDef> { new FieldDef { OurIndex = EOF } };
 		}
 
 		// Zeroth element corresponds to 'null'.
 		private List<ClassDef> classDefs = new List<ClassDef> { new ClassDef() };
 
-		protected Dictionary<Type, Action<ClassDef, object>> readFieldsCache = new Dictionary<Type, Action<ClassDef, object>>();
-		protected Dictionary<Type, Func<ClassDef, object>> makeCache = new Dictionary<Type, Func<ClassDef, object>>();
+		protected virtual void PrepareReaders(ClassDef def)
+		{
+			def.ReadFields = ReadFields;
+		}
 
 		public void ClearClassIds() { classDefs = new List<ClassDef> { new ClassDef() }; }
 
@@ -247,9 +249,7 @@ namespace Yuzu.Binary
 			var typeName = Reader.ReadString();
 			var classType = Options.Assembly.GetType(typeName, throwOnError: true);
 			result.Meta = Meta.Get(classType, Options);
-			if (!readFieldsCache.TryGetValue(classType, out result.ReadFields))
-				result.ReadFields = ReadFields;
-			makeCache.TryGetValue(classType, out result.Make);
+			PrepareReaders(result);
 			var ourCount = result.Meta.Items.Count;
 			var theirCount = Reader.ReadInt16();
 			int ourIndex = 0, theirIndex = 0;
@@ -311,33 +311,33 @@ namespace Yuzu.Binary
 			return result;
 		}
 
-		private void ReadFields(ClassDef def, object obj)
+		private static void ReadFields(BinaryDeserializer d, ClassDef def, object obj)
 		{
-			objStack.Push(obj);
+			d.objStack.Push(obj);
 			try {
 				if (def.Meta.IsCompact) {
 					for (int i = 1; i < def.Fields.Count; ++i)
 						def.Fields[i].ReadFunc(obj);
 				}
 				else {
-					var actualIndex = Reader.ReadInt16();
+					var actualIndex = d.Reader.ReadInt16();
 					for (int i = 1; i < def.Fields.Count; ++i) {
 						var fd = def.Fields[i];
 						if (i < actualIndex || actualIndex == 0) {
 							if (fd.OurIndex < 0 || def.Meta.Items[fd.OurIndex - 1].IsOptional)
 								continue;
-							throw Error("Expected field '{0}({1})', but found '{2}'",
+							throw d.Error("Expected field '{0}({1})', but found '{2}'",
 								i, fd.Name, actualIndex);
 						}
 						fd.ReadFunc(obj);
-						actualIndex = Reader.ReadInt16();
+						actualIndex = d.Reader.ReadInt16();
 					}
 					if (actualIndex != 0)
-						throw Error("Unfinished object, expected zero, but got {0}", actualIndex);
+						throw d.Error("Unfinished object, expected zero, but got {0}", actualIndex);
 				}
 			}
 			finally {
-				objStack.Pop();
+				d.objStack.Pop();
 			}
 			def.Meta.RunAfterDeserialization(obj);
 		}
@@ -350,7 +350,7 @@ namespace Yuzu.Binary
 			var def = GetClassDef(classId);
 			if (obj.GetType() != def.Meta.Type)
 				throw Error("Unable to read type {0} into {1}", def.Meta.Type, obj.GetType());
-			def.ReadFields(def, obj);
+			def.ReadFields(this, def, obj);
 		}
 
 		protected object ReadObject<T>() where T: class
@@ -362,9 +362,9 @@ namespace Yuzu.Binary
 			if (!typeof(T).IsAssignableFrom(def.Meta.Type))
 				throw Error("Unable to assign type {0} to {1}", def.Meta.Type, typeof(T));
 			if (def.Make != null)
-				return def.Make(def);
+				return def.Make(this, def);
 			var result = Activator.CreateInstance(def.Meta.Type);
-			def.ReadFields(def, result);
+			def.ReadFields(this, def, result);
 			return result;
 		}
 
@@ -377,9 +377,9 @@ namespace Yuzu.Binary
 			if (!typeof(T).IsAssignableFrom(def.Meta.Type))
 				throw Error("Unable to assign type {0} to {1}", def.Meta.Type, typeof(T));
 			if (def.Make != null)
-				return def.Make(def);
+				return def.Make(this, def);
 			var result = Activator.CreateInstance(def.Meta.Type);
-			def.ReadFields(def, result);
+			def.ReadFields(this, def, result);
 			return result;
 		}
 
