@@ -23,6 +23,8 @@ namespace Yuzu.Binary
 			set { cw.Output = value; }
 		}
 
+		public bool SafetyChecks = true;
+
 		public BinaryDeserializerGenerator(string wrapperNameSpace = "YuzuGenBin", CommonOptions options = null)
 		{
 			this.wrapperNameSpace = wrapperNameSpace;
@@ -203,7 +205,8 @@ namespace Yuzu.Binary
 							cw.Put("result.{0} = ", yi.Name);
 					}
 					else {
-						cw.Put("if ({0} != fd.OurIndex) throw Error(\"{0}!=\" + fd.OurIndex);\n", ourIndex);
+						if (SafetyChecks)
+							cw.Put("if ({0} != fd.OurIndex) throw Error(\"{0}!=\" + fd.OurIndex);\n", ourIndex);
 						if (yi.SetValue != null)
 							cw.Put("result.{0} = ", yi.Name);
 					}
@@ -215,7 +218,8 @@ namespace Yuzu.Binary
 					if (yi.IsOptional)
 						cw.Put("}\n");
 				}
-				cw.Put("if (fd.OurIndex != ClassDef.EOF) throw Error(\"Unfinished object\");\n");
+				if (SafetyChecks)
+					cw.Put("if (fd.OurIndex != ClassDef.EOF) throw Error(\"Unfinished object\");\n");
 			}
 			GenerateAfterDeserialization(meta);
 		}

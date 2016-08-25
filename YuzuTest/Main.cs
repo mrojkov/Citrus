@@ -144,6 +144,7 @@ namespace YuzuTest
 			}
 
 			var bd = new BinaryDeserializerGenerator();
+			bd.SafetyChecks = true;
 			using (var ms = new MemoryStream())
 			using (var sw = new StreamWriter(ms)) {
 				bd.GenWriter = sw;
