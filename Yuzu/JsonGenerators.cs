@@ -134,8 +134,9 @@ namespace Yuzu.Json
 			this.wrapperNameSpace = wrapperNameSpace;
 		}
 
-		private void PutPart(string s)
+		private void PutPart(string format, params object[] p)
 		{
+			var s = p.Length > 0 ? String.Format(format, p) : format;
 			GenWriter.Write(s.Replace("\n", "\r\n"));
 		}
 
@@ -179,14 +180,14 @@ namespace Yuzu.Json
 
 		private void PutRequireOrNull(char ch, Type t, string name)
 		{
-			PutPart(String.Format("RequireOrNull('{0}') ? null : new {1}();\n", ch, Utils.GetTypeSpec(t)));
+			PutPart("RequireOrNull('{0}') ? null : new {1}();\n", ch, Utils.GetTypeSpec(t));
 			PutF("if ({0} != null) {{\n", name);
 		}
 
 		private void PutRequireOrNullArray(char ch, Type t, string name)
 		{
-			PutPart(String.Format(
-				"RequireOrNull('{0}') ? null : new {1}[0];\n", ch, Utils.GetTypeSpec(t.GetElementType())));
+			PutPart(
+				"RequireOrNull('{0}') ? null : new {1}[0];\n", ch, Utils.GetTypeSpec(t.GetElementType()));
 			PutF("if ({0} != null) {{\n", name);
 		}
 
@@ -303,11 +304,11 @@ namespace Yuzu.Json
 				PutPart("RequireTimeSpan();\n");
 			}
 			else if (t.IsEnum) {
-				PutPart(String.Format(
+				PutPart(
 					JsonOptions.EnumAsString ?
 						"({0})Enum.Parse(typeof({0}), RequireString());\n" :
 						"({0})RequireInt();\n",
-					Utils.GetTypeSpec(t)));
+					Utils.GetTypeSpec(t));
 			}
 			else if(t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
 				PutRequireOrNull('{', t, name);
@@ -354,11 +355,9 @@ namespace Yuzu.Json
 				Put("}\n");
 			}
 			else if (t.IsClass && !t.IsAbstract || Utils.IsStruct(t))
-				PutPart(String.Format(
-					"{0}.Instance.FromReaderTyped<{1}>(Reader);\n", GetDeserializerName(t), Utils.GetTypeSpec(t)));
+				PutPart("{0}.Instance.FromReaderTyped<{1}>(Reader);\n", GetDeserializerName(t), Utils.GetTypeSpec(t));
 			else if (t.IsInterface || t.IsAbstract)
-				PutPart(String.Format(
-					"{0}.Instance.FromReaderInterface<{1}>(Reader);\n", GetDeserializerName(t), Utils.GetTypeSpec(t)));
+				PutPart("{0}.Instance.FromReaderInterface<{1}>(Reader);\n", GetDeserializerName(t), Utils.GetTypeSpec(t));
 			else
 				throw new NotImplementedException(t.Name);
 		}

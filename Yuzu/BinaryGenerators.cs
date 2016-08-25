@@ -27,8 +27,9 @@ namespace Yuzu.Binary
 			InitSimpleValueReader();
 		}
 
-		private void PutPart(string s)
+		private void PutPart(string format, params object []p)
 		{
+			var s = p.Length > 0 ? String.Format(format, p) : format;
 			GenWriter.Write(s.Replace("\n", "\r\n"));
 		}
 
@@ -112,7 +113,7 @@ namespace Yuzu.Binary
 
 		private string PutNullOrCount(Type t)
 		{
-			PutPart(String.Format("({0})null;\n", Utils.GetTypeSpec(t)));
+			PutPart("({0})null;\n", Utils.GetTypeSpec(t));
 			var tempCountName = GetTempName();
 			PutF("var {0} = Reader.ReadInt32();\n", tempCountName);
 			PutF("if ({0} >= 0) {{\n", tempCountName);
@@ -161,7 +162,7 @@ namespace Yuzu.Binary
 				return;
 			}
 			if (t.IsEnum) {
-				PutPart(String.Format("({0})Reader.ReadInt32();\n", Utils.GetTypeSpec(t)));
+				PutPart("({0})Reader.ReadInt32();\n", Utils.GetTypeSpec(t));
 				return;
 			}
 			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
@@ -192,11 +193,11 @@ namespace Yuzu.Binary
 				return;
 			}
 			if (t.IsClass || t.IsInterface) {
-				PutPart(String.Format("({0})ReadObject<{0}>();\n", Utils.GetTypeSpec(t)));
+				PutPart("({0})ReadObject<{0}>();\n", Utils.GetTypeSpec(t));
 				return;
 			}
 			if (Utils.IsStruct(t)) {
-				PutPart(String.Format("({0})ReadStruct<{0}>();\n", Utils.GetTypeSpec(t)));
+				PutPart("({0})ReadStruct<{0}>();\n", Utils.GetTypeSpec(t));
 				return;
 			}
 			throw new NotImplementedException();
