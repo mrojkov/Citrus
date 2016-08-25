@@ -171,6 +171,11 @@ namespace Yuzu.Json
 		}
 
 		private int tempCount = 0;
+		private string GetTempName()
+		{
+			tempCount += 1;
+			return "tmp" + tempCount.ToString();
+		}
 
 		private void PutRequireOrNull(char ch, Type t, string name)
 		{
@@ -192,8 +197,7 @@ namespace Yuzu.Json
 			Put("}\n");
 			Put("else {\n");
 			Put("do {\n");
-			tempCount += 1;
-			var tempName = "tmp" + tempCount.ToString();
+			var tempName = GetTempName();
 			PutF("var {0} = ", tempName);
 			GenerateValue(icoll.GetGenericArguments()[0], tempName);
 			// Check for explicit vs implicit interface implementation.
@@ -231,12 +235,10 @@ namespace Yuzu.Json
 			Put("}\n");
 			Put("else {\n");
 			Put("do {\n");
-			tempCount += 1;
-			var tempKeyStr = "tmp" + tempCount.ToString();
+			var tempKeyStr = GetTempName();
 			PutF("var {0} = RequireString();\n", tempKeyStr);
 			Put("Require(':');\n");
-			tempCount += 1;
-			var tempValue = "tmp" + tempCount.ToString();
+			var tempValue = GetTempName();
 			PutF("var {0} = ", tempValue);
 			GenerateValue(t.GetGenericArguments()[1], tempValue);
 			var keyType = t.GetGenericArguments()[0];
@@ -318,12 +320,10 @@ namespace Yuzu.Json
 				Put("Require(']');\n");
 				Put("}\n");
 				Put("else {\n");
-				tempCount += 1;
-				var tempListName = "tmp" + tempCount.ToString();
+				var tempListName = GetTempName();
 				PutF("var {0} = new List<{1}>();\n", tempListName, Utils.GetTypeSpec(t.GetElementType()));
 				Put("do {\n");
-				tempCount += 1;
-				var tempName = "tmp" + tempCount.ToString();
+				var tempName = GetTempName();
 				PutF("var {0} = ", tempName);
 				GenerateValue(t.GetElementType(), tempName);
 				PutF("{0}.Add({1});\n", tempListName, tempName);
@@ -335,11 +335,9 @@ namespace Yuzu.Json
 			else if (t.IsArray && JsonOptions.ArrayLengthPrefix) {
 				PutRequireOrNullArray('[', t, name);
 				Put("if (SkipSpacesCarefully() != ']') {\n");
-				tempCount += 1;
-				var tempArrayName = "tmp" + tempCount.ToString();
+				var tempArrayName = GetTempName();
 				PutF("var {0} = new {1}[RequireUInt()];\n", tempArrayName, Utils.GetTypeSpec(t.GetElementType()));
-				tempCount += 1;
-				var tempIndexName = "tmp" + tempCount.ToString();
+				var tempIndexName = GetTempName();
 				PutF("for(int {0} = 0; {0} < {1}.Length; ++{0}) {{\n", tempIndexName, tempArrayName);
 				Put("Require(',');\n");
 				PutF("{0}[{1}] = ", tempArrayName, tempIndexName);

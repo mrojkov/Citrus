@@ -13,7 +13,6 @@ namespace Yuzu.Binary
 	{
 		public StreamWriter GenWriter;
 
-		private int tempCount = 0;
 		private int indent = 0;
 		private string indentStr = "\t";
 		private string wrapperNameSpace;
@@ -103,6 +102,7 @@ namespace Yuzu.Binary
 			simpleValueReader[typeof(TimeSpan)] = "new TimeSpan(Reader.ReadInt64())";
 		}
 
+		private int tempCount = 0;
 		private string GetTempName()
 		{
 			tempCount += 1;
