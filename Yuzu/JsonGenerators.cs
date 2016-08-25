@@ -152,7 +152,7 @@ namespace Yuzu.Json
 				indent += 1;
 		}
 
-		private void PutF(string format, params object[] p)
+		private void Put(string format, params object[] p)
 		{
 			Put(String.Format(format, p));
 		}
@@ -181,14 +181,14 @@ namespace Yuzu.Json
 		private void PutRequireOrNull(char ch, Type t, string name)
 		{
 			PutPart("RequireOrNull('{0}') ? null : new {1}();\n", ch, Utils.GetTypeSpec(t));
-			PutF("if ({0} != null) {{\n", name);
+			Put("if ({0} != null) {{\n", name);
 		}
 
 		private void PutRequireOrNullArray(char ch, Type t, string name)
 		{
 			PutPart(
 				"RequireOrNull('{0}') ? null : new {1}[0];\n", ch, Utils.GetTypeSpec(t.GetElementType()));
-			PutF("if ({0} != null) {{\n", name);
+			Put("if ({0} != null) {{\n", name);
 		}
 
 		private void GenerateCollection(Type t, Type icoll, string name)
@@ -199,15 +199,15 @@ namespace Yuzu.Json
 			Put("else {\n");
 			Put("do {\n");
 			var tempName = GetTempName();
-			PutF("var {0} = ", tempName);
+			Put("var {0} = ", tempName);
 			GenerateValue(icoll.GetGenericArguments()[0], tempName);
 			// Check for explicit vs implicit interface implementation.
 			var imap = t.GetInterfaceMap(icoll);
 			var addIndex = Array.FindIndex(imap.InterfaceMethods, m => m.Name == "Add");
 			if (imap.TargetMethods[addIndex].Name == "Add")
-				PutF("{0}.Add({1});\n", name, tempName);
+				Put("{0}.Add({1});\n", name, tempName);
 			else
-				PutF("(({2}){0}).Add({1});\n", name, tempName, Utils.GetTypeSpec(icoll));
+				Put("(({2}){0}).Add({1});\n", name, tempName, Utils.GetTypeSpec(icoll));
 			Put("} while (Require(']', ',') == ',');\n");
 			Put("}\n");
 		}
@@ -224,7 +224,7 @@ namespace Yuzu.Json
 				GenerateCollection(t, icoll, name);
 			}
 			else if ((t.IsClass || t.IsInterface) && t != typeof(object))
-				PutF(String.Format("{0}.Instance.FromReader({1}, Reader);\n", GetDeserializerName(t), name));
+				Put(String.Format("{0}.Instance.FromReader({1}, Reader);\n", GetDeserializerName(t), name));
 			else
 				throw Error("Unable to merge field {1} of type {0}", name, t.Name);
 		}
@@ -237,10 +237,10 @@ namespace Yuzu.Json
 			Put("else {\n");
 			Put("do {\n");
 			var tempKeyStr = GetTempName();
-			PutF("var {0} = RequireString();\n", tempKeyStr);
+			Put("var {0} = RequireString();\n", tempKeyStr);
 			Put("Require(':');\n");
 			var tempValue = GetTempName();
-			PutF("var {0} = ", tempValue);
+			Put("var {0} = ", tempValue);
 			GenerateValue(t.GetGenericArguments()[1], tempValue);
 			var keyType = t.GetGenericArguments()[0];
 			var tempKey =
@@ -250,7 +250,7 @@ namespace Yuzu.Json
 					String.Format("({0})Enum.Parse(typeof({0}), {1})", Utils.GetTypeSpec(keyType), tempKeyStr) :
 				// Slow.
 					String.Format("({0})keyParsers[typeof({0})]({1})", Utils.GetTypeSpec(keyType), tempKeyStr);
-			PutF("{0}.Add({1}, {2});\n", name, tempKey, tempValue);
+			Put("{0}.Add({1}, {2});\n", name, tempKey, tempValue);
 			Put("} while (Require('}', ',') == ',');\n");
 			Put("}\n");
 		}
@@ -322,14 +322,14 @@ namespace Yuzu.Json
 				Put("}\n");
 				Put("else {\n");
 				var tempListName = GetTempName();
-				PutF("var {0} = new List<{1}>();\n", tempListName, Utils.GetTypeSpec(t.GetElementType()));
+				Put("var {0} = new List<{1}>();\n", tempListName, Utils.GetTypeSpec(t.GetElementType()));
 				Put("do {\n");
 				var tempName = GetTempName();
-				PutF("var {0} = ", tempName);
+				Put("var {0} = ", tempName);
 				GenerateValue(t.GetElementType(), tempName);
-				PutF("{0}.Add({1});\n", tempListName, tempName);
+				Put("{0}.Add({1});\n", tempListName, tempName);
 				Put("} while (Require(']', ',') == ',');\n");
-				PutF("{0} = {1}.ToArray();\n", name, tempListName);
+				Put("{0} = {1}.ToArray();\n", name, tempListName);
 				Put("}\n");
 				Put("}\n");
 			}
@@ -337,14 +337,14 @@ namespace Yuzu.Json
 				PutRequireOrNullArray('[', t, name);
 				Put("if (SkipSpacesCarefully() != ']') {\n");
 				var tempArrayName = GetTempName();
-				PutF("var {0} = new {1}[RequireUInt()];\n", tempArrayName, Utils.GetTypeSpec(t.GetElementType()));
+				Put("var {0} = new {1}[RequireUInt()];\n", tempArrayName, Utils.GetTypeSpec(t.GetElementType()));
 				var tempIndexName = GetTempName();
-				PutF("for(int {0} = 0; {0} < {1}.Length; ++{0}) {{\n", tempIndexName, tempArrayName);
+				Put("for(int {0} = 0; {0} < {1}.Length; ++{0}) {{\n", tempIndexName, tempArrayName);
 				Put("Require(',');\n");
-				PutF("{0}[{1}] = ", tempArrayName, tempIndexName);
+				Put("{0}[{1}] = ", tempArrayName, tempIndexName);
 				GenerateValue(t.GetElementType(), String.Format("{0}[{1}]", tempArrayName, tempIndexName));
 				Put("}\n");
-				PutF("{0} = {1};\n", name, tempArrayName);
+				Put("{0} = {1};\n", name, tempArrayName);
 				Put("}\n");
 				Put("Require(']');\n");
 				Put("}\n");
@@ -369,14 +369,14 @@ namespace Yuzu.Json
 					var f = (FieldInfo)m;
 					var v = Utils.CodeValueFormat(f.GetValue(obj));
 					if (v != "") // TODO
-						PutF("{0}.{1} = {2};\n", name, f.Name, v);
+						Put("{0}.{1} = {2};\n", name, f.Name, v);
 				}
 				else if (m.MemberType == MemberTypes.Property) {
 					var p = (PropertyInfo)m;
 					if (p.CanWrite) {
 						var v = Utils.CodeValueFormat(p.GetValue(obj, new object[] { }));
 						if (v != "") // TODO
-							PutF("{0}.{1} = {2};\n", name, p.Name, v);
+							Put("{0}.{1} = {2};\n", name, p.Name, v);
 					}
 				}
 			}
@@ -385,7 +385,7 @@ namespace Yuzu.Json
 		private void GenerateAfterDeserialization(Meta meta)
 		{
 			foreach (var a in meta.AfterDeserialization)
-				PutF("result.{0}();\n", a.Info.Name);
+				Put("result.{0}();\n", a.Info.Name);
 		}
 
 		public void Generate<T>()
@@ -397,20 +397,20 @@ namespace Yuzu.Json
 					Put("}\n");
 				Put("\n");
 				lastNameSpace = typeof(T).Namespace;
-				PutF("namespace {0}.{1}\n", wrapperNameSpace, lastNameSpace);
+				Put("namespace {0}.{1}\n", wrapperNameSpace, lastNameSpace);
 				Put("{\n");
 			}
 
 			var deserializerName = Utils.GetMangledTypeName(typeof(T)) + "_JsonDeserializer";
-			PutF("class {0} : JsonDeserializerGenBase\n", deserializerName);
+			Put("class {0} : JsonDeserializerGenBase\n", deserializerName);
 			Put("{\n");
 
-			PutF("public static new {0} Instance = new {0}();\n", deserializerName);
+			Put("public static new {0} Instance = new {0}();\n", deserializerName);
 			Put("\n");
 
-			PutF("public {0}()\n", deserializerName);
+			Put("public {0}()\n", deserializerName);
 			Put("{\n");
-			PutF("Options.Assembly = Assembly.Load(\"{0}\");\n", typeof(T).Assembly.FullName);
+			Put("Options.Assembly = Assembly.Load(\"{0}\");\n", typeof(T).Assembly.FullName);
 			GenAssigns("Options", Options);
 			GenAssigns("JsonOptions", JsonOptions);
 			Put("}\n");
@@ -421,18 +421,18 @@ namespace Yuzu.Json
 			Put("public override object FromReaderInt()\n");
 			Put("{\n");
 			if (icoll != null)
-				PutF("return FromReaderInt(new {0}());\n", typeSpec);
+				Put("return FromReaderInt(new {0}());\n", typeSpec);
 			else if (typeof(T).IsInterface || typeof(T).IsAbstract)
-				PutF("return FromReaderInterface<{0}>(Reader);\n", typeSpec);
+				Put("return FromReaderInterface<{0}>(Reader);\n", typeSpec);
 			else
-				PutF("return FromReaderTyped<{0}>(Reader);\n", typeSpec);
+				Put("return FromReaderTyped<{0}>(Reader);\n", typeSpec);
 			Put("}\n");
 			Put("\n");
 
 			if (icoll != null) {
 				Put("public override object FromReaderInt(object obj)\n");
 				Put("{\n");
-				PutF("var result = ({0})obj;\n", typeSpec);
+				Put("var result = ({0})obj;\n", typeSpec);
 				Put("Require('[');\n");
 				GenerateCollection(typeof(T), icoll, "result");
 				Put("return result;\n");
@@ -445,25 +445,25 @@ namespace Yuzu.Json
 			if (typeof(T).IsInterface || typeof(T).IsAbstract)
 				Put("return null;\n");
 			else
-				PutF("return ReadFields(new {0}(), name);\n", typeSpec);
+				Put("return ReadFields(new {0}(), name);\n", typeSpec);
 			Put("}\n");
 			Put("\n");
 
 			Put("protected override object ReadFields(object obj, string name)\n");
 			Put("{\n");
-			PutF("var result = ({0})obj;\n", typeSpec);
+			Put("var result = ({0})obj;\n", typeSpec);
 			if (icoll == null) {
 				tempCount = 0;
 				foreach (var yi in meta.Items) {
 					if (yi.IsOptional) {
-						PutF("if (\"{0}\" == name) {{\n", yi.Tag(Options));
+						Put("if (\"{0}\" == name) {{\n", yi.Tag(Options));
 						if (yi.SetValue != null)
-							PutF("result.{0} = ", yi.Name);
+							Put("result.{0} = ", yi.Name);
 					}
 					else {
-						PutF("if (\"{0}\" != name) throw new YuzuException(\"{0}!=\" + name);\n", yi.Tag(Options));
+						Put("if (\"{0}\" != name) throw new YuzuException(\"{0}!=\" + name);\n", yi.Tag(Options));
 						if (yi.SetValue != null)
-							PutF("result.{0} = ", yi.Name);
+							Put("result.{0} = ", yi.Name);
 					}
 					if (yi.SetValue != null)
 						GenerateValue(yi.Type, "result." + yi.Name);
@@ -483,7 +483,7 @@ namespace Yuzu.Json
 				Put("\n");
 				Put("protected override object ReadFieldsCompact(object obj)\n");
 				Put("{\n");
-				PutF("var result = ({0})obj;\n", typeSpec);
+				Put("var result = ({0})obj;\n", typeSpec);
 				bool isFirst = true;
 				tempCount = 0;
 				foreach (var yi in meta.Items) {
@@ -491,7 +491,7 @@ namespace Yuzu.Json
 						Put("Require(',');\n");
 					isFirst = false;
 					if (yi.SetValue != null) {
-						PutF("result.{0} = ", yi.Name);
+						Put("result.{0} = ", yi.Name);
 						GenerateValue(yi.Type, "result." + yi.Name);
 					}
 					else

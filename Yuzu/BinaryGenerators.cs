@@ -45,7 +45,7 @@ namespace Yuzu.Binary
 				indent += 1;
 		}
 
-		private void PutF(string format, params object[] p)
+		private void Put(string format, params object[] p)
 		{
 			Put(String.Format(format, p));
 		}
@@ -58,7 +58,7 @@ namespace Yuzu.Binary
 			Put("using Yuzu;\n");
 			Put("using Yuzu.Binary;\n");
 			Put("\n");
-			PutF("namespace {0}\n", wrapperNameSpace);
+			Put("namespace {0}\n", wrapperNameSpace);
 			Put("{\n");
 			Put("public class BinaryDeserializerGen: BinaryDeserializer\n");
 			Put("{\n");
@@ -69,9 +69,9 @@ namespace Yuzu.Binary
 			Put("public BinaryDeserializerGen()\n");
 			Put("{\n");
 			foreach (var r in generatedReaders)
-				PutF("readFieldsCache[typeof({0})] = {1};\n", Utils.GetTypeSpec(r.Key), r.Value);
+				Put("readFieldsCache[typeof({0})] = {1};\n", Utils.GetTypeSpec(r.Key), r.Value);
 			foreach (var r in generatedMakers)
-				PutF("makeCache[typeof({0})] = {1};\n", Utils.GetTypeSpec(r.Key), r.Value);
+				Put("makeCache[typeof({0})] = {1};\n", Utils.GetTypeSpec(r.Key), r.Value);
 			Put("}\n");
 			Put("}\n"); // Close class.
 			Put("}\n"); // Close namespace.
@@ -80,7 +80,7 @@ namespace Yuzu.Binary
 		private void GenerateAfterDeserialization(Meta meta)
 		{
 			foreach (var a in meta.AfterDeserialization)
-				PutF("result.{0}();\n", a.Info.Name);
+				Put("result.{0}();\n", a.Info.Name);
 		}
 
 		private Dictionary<Type, string> simpleValueReader = new Dictionary<Type, string>();
@@ -115,37 +115,37 @@ namespace Yuzu.Binary
 		{
 			PutPart("({0})null;\n", Utils.GetTypeSpec(t));
 			var tempCountName = GetTempName();
-			PutF("var {0} = Reader.ReadInt32();\n", tempCountName);
-			PutF("if ({0} >= 0) {{\n", tempCountName);
+			Put("var {0} = Reader.ReadInt32();\n", tempCountName);
+			Put("if ({0} >= 0) {{\n", tempCountName);
 			return tempCountName;
 		}
 
 		private void GenerateCollection(Type t, Type icoll, string name, string tempIndexName)
 		{
-			PutF("while (--{0} >= 0) {{\n", tempIndexName);
+			Put("while (--{0} >= 0) {{\n", tempIndexName);
 			var tempElementName = GetTempName();
-			PutF("var {0} = ", tempElementName);
+			Put("var {0} = ", tempElementName);
 			GenerateValue(icoll.GetGenericArguments()[0], tempElementName);
 			// Check for explicit vs implicit interface implementation.
 			var imap = t.GetInterfaceMap(icoll);
 			var addIndex = Array.FindIndex(imap.InterfaceMethods, m => m.Name == "Add");
 			if (imap.TargetMethods[addIndex].Name == "Add")
-				PutF("{0}.Add({1});\n", name, tempElementName);
+				Put("{0}.Add({1});\n", name, tempElementName);
 			else
-				PutF("(({2}){0}).Add({1});\n", name, tempElementName, Utils.GetTypeSpec(icoll));
+				Put("(({2}){0}).Add({1});\n", name, tempElementName, Utils.GetTypeSpec(icoll));
 			Put("}\n"); // while
 		}
 
 		private void GenerateDictionary(Type t, string name, string tempIndexName)
 		{
-			PutF("while (--{0} >= 0) {{\n", tempIndexName);
+			Put("while (--{0} >= 0) {{\n", tempIndexName);
 			var tempKeyName = GetTempName();
-			PutF("var {0} = ", tempKeyName);
+			Put("var {0} = ", tempKeyName);
 			GenerateValue(t.GetGenericArguments()[0], tempKeyName);
 			var tempValueName = GetTempName();
-			PutF("var {0} = ", tempValueName);
+			Put("var {0} = ", tempValueName);
 			GenerateValue(t.GetGenericArguments()[1], tempValueName);
-			PutF("{0}.Add({1}, {2});\n", name, tempKeyName, tempValueName);
+			Put("{0}.Add({1}, {2});\n", name, tempKeyName, tempValueName);
 			Put("}\n"); // while
 		}
 
@@ -158,7 +158,7 @@ namespace Yuzu.Binary
 			}
 			if (t == typeof(string)) {
 				PutPart("Reader.ReadString();\n");
-				PutF("if ({0} == \"\" && Reader.ReadBoolean()) {0} = null;\n", name);
+				Put("if ({0} == \"\" && Reader.ReadBoolean()) {0} = null;\n", name);
 				return;
 			}
 			if (t.IsEnum) {
@@ -167,7 +167,7 @@ namespace Yuzu.Binary
 			}
 			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
 				var tempIndexName = PutNullOrCount(t);
-				PutF("{0} = new {1}();\n", name, Utils.GetTypeSpec(t));
+				Put("{0} = new {1}();\n", name, Utils.GetTypeSpec(t));
 				GenerateDictionary(t, name, tempIndexName);
 				Put("}\n");
 				return;
@@ -175,19 +175,19 @@ namespace Yuzu.Binary
 			if (t.IsArray) {
 				var tempIndexName = PutNullOrCount(t);
 				var tempArrayName = GetTempName();
-				PutF("var {0} = new {1}[{2}];\n", tempArrayName, Utils.GetTypeSpec(t.GetElementType()), tempIndexName);
-				PutF("for({0} = 0; {0} < {1}.Length; ++{0}) {{\n", tempIndexName, tempArrayName);
-				PutF("{0}[{1}] = ", tempArrayName, tempIndexName);
+				Put("var {0} = new {1}[{2}];\n", tempArrayName, Utils.GetTypeSpec(t.GetElementType()), tempIndexName);
+				Put("for({0} = 0; {0} < {1}.Length; ++{0}) {{\n", tempIndexName, tempArrayName);
+				Put("{0}[{1}] = ", tempArrayName, tempIndexName);
 				GenerateValue(t.GetElementType(), String.Format("{0}[{1}]", tempArrayName, tempIndexName));
 				Put("}\n");
-				PutF("{0} = {1};\n", name, tempArrayName);
+				Put("{0} = {1};\n", name, tempArrayName);
 				Put("}\n"); // if >= 0
 				return;
 			}
 			var icoll = t.GetInterface(typeof(ICollection<>).Name);
 			if (icoll != null) {
 				var tempIndexName = PutNullOrCount(t);
-				PutF("{0} = new {1}();\n", name, Utils.GetTypeSpec(t));
+				Put("{0} = new {1}();\n", name, Utils.GetTypeSpec(t));
 				GenerateCollection(t, icoll, name, tempIndexName);
 				Put("}\n");
 				return;
@@ -213,35 +213,35 @@ namespace Yuzu.Binary
 			tempCount = 0;
 			if (meta.IsCompact) {
 				foreach (var yi in meta.Items) {
-					PutF("result.{0} = ", yi.Name);
+					Put("result.{0} = ", yi.Name);
 					GenerateValue(yi.Type, "result." + yi.Name);
 				}
 			}
 			else {
-				PutF("ClassDef.FieldDef fd;\n");
+				Put("ClassDef.FieldDef fd;\n");
 				var ourIndex = 0;
-				PutF("fd = def.Fields[Reader.ReadInt16()];\n");
+				Put("fd = def.Fields[Reader.ReadInt16()];\n");
 				foreach (var yi in meta.Items) {
 					ourIndex += 1;
 					if (yi.IsOptional) {
-						PutF("if ({0} == fd.OurIndex) {{\n", ourIndex);
+						Put("if ({0} == fd.OurIndex) {{\n", ourIndex);
 						if (yi.SetValue != null)
-							PutF("result.{0} = ", yi.Name);
+							Put("result.{0} = ", yi.Name);
 					}
 					else {
-						PutF("if ({0} != fd.OurIndex) throw Error(\"{0}!=\" + fd.OurIndex);\n", ourIndex);
+						Put("if ({0} != fd.OurIndex) throw Error(\"{0}!=\" + fd.OurIndex);\n", ourIndex);
 						if (yi.SetValue != null)
-							PutF("result.{0} = ", yi.Name);
+							Put("result.{0} = ", yi.Name);
 					}
 					if (yi.SetValue != null)
 						GenerateValue(yi.Type, "result." + yi.Name);
 					else
 						GenerateMerge(yi.Type, "result." + yi.Name);
-					PutF("fd = def.Fields[Reader.ReadInt16()];\n");
+					Put("fd = def.Fields[Reader.ReadInt16()];\n");
 					if (yi.IsOptional)
 						Put("}\n");
 				}
-				PutF("if (fd.OurIndex != ClassDef.EOF) throw Error(\"Unfinished object\");\n");
+				Put("if (fd.OurIndex != ClassDef.EOF) throw Error(\"Unfinished object\");\n");
 			}
 			GenerateAfterDeserialization(meta);
 		}
@@ -252,9 +252,9 @@ namespace Yuzu.Binary
 
 			var readerName = "Read_" + Utils.GetMangledTypeName(typeof(T));
 			if (!Utils.IsStruct(typeof(T))) {
-				PutF("private void {0}(ClassDef def, object obj)\n", readerName);
+				Put("private void {0}(ClassDef def, object obj)\n", readerName);
 				Put("{\n");
-				PutF("var result = ({0})obj;\n", Utils.GetTypeSpec(typeof(T)));
+				Put("var result = ({0})obj;\n", Utils.GetTypeSpec(typeof(T)));
 				GenerateReaderBody(meta);
 				Put("}\n");
 				Put("\n");
@@ -262,13 +262,13 @@ namespace Yuzu.Binary
 			}
 
 			var makerName = "Make_" + Utils.GetMangledTypeName(typeof(T));
-			PutF("private object {0}(ClassDef def)\n", makerName);
+			Put("private object {0}(ClassDef def)\n", makerName);
 			Put("{\n");
-			PutF("var result = new {0}();\n", Utils.GetTypeSpec(typeof(T)));
+			Put("var result = new {0}();\n", Utils.GetTypeSpec(typeof(T)));
 			if (Utils.IsStruct(typeof(T)))
 				GenerateReaderBody(meta);
 			else
-				PutF("{0}(def, result);\n", readerName);
+				Put("{0}(def, result);\n", readerName);
 			Put("return result;\n");
 			Put("}\n");
 			Put("\n");
