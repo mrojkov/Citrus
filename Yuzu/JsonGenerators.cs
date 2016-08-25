@@ -136,6 +136,7 @@ namespace Yuzu.Json
 		{
 			Options.Assembly = Assembly.GetCallingAssembly();
 			this.wrapperNameSpace = wrapperNameSpace;
+			InitSimpleValueReader();
 		}
 
 		public void GenerateHeader()
@@ -235,55 +236,36 @@ namespace Yuzu.Json
 			cw.Put("}\n");
 		}
 
+		private Dictionary<Type, string> simpleValueReader = new Dictionary<Type, string>();
+
+		private void InitSimpleValueReader()
+		{
+			simpleValueReader[typeof(sbyte)] = "checked((sbyte)RequireInt())";
+			simpleValueReader[typeof(byte)] = "checked((byte)RequireUInt())";
+			simpleValueReader[typeof(short)] = "checked((short)RequireInt())";
+			simpleValueReader[typeof(ushort)] = "checked((ushort)RequireUInt())";
+			simpleValueReader[typeof(int)] = "RequireInt()";
+			simpleValueReader[typeof(uint)] = "RequireUInt()";
+			simpleValueReader[typeof(long)] = "RequireLong()";
+			simpleValueReader[typeof(ulong)] = "RequireULong()";
+			simpleValueReader[typeof(bool)] = "RequireBool()";
+			simpleValueReader[typeof(char)] = "RequireChar()";
+			simpleValueReader[typeof(float)] = "RequireSingle()";
+			simpleValueReader[typeof(double)] = "RequireDouble()";
+			simpleValueReader[typeof(DateTime)] = "RequireDateTime()";
+			simpleValueReader[typeof(TimeSpan)] = "RequireTimeSpan()";
+			simpleValueReader[typeof(string)] = "RequireString()";
+		}
+
 		private void GenerateValue(Type t, string name)
 		{
+			string sr;
+			if (simpleValueReader.TryGetValue(t, out sr)) {
+				cw.PutPart(sr + ";\n");
+				return;
+			}
 			var icoll = t.GetInterface(typeof(ICollection<>).Name);
-			if (t == typeof(int)) {
-				cw.PutPart("RequireInt();\n");
-			}
-			else if (t == typeof(uint)) {
-				cw.PutPart("RequireUInt();\n");
-			}
-			else if (t == typeof(long)) {
-				cw.PutPart("RequireLong();\n");
-			}
-			else if (t == typeof(ulong)) {
-				cw.PutPart("RequireULong();\n");
-			}
-			else if (t == typeof(short)) {
-				cw.PutPart("checked((short)RequireInt());\n");
-			}
-			else if (t == typeof(ushort)) {
-				cw.PutPart("checked((ushort)RequireUInt());\n");
-			}
-			else if (t == typeof(sbyte)) {
-				cw.PutPart("checked((sbyte)RequireInt());\n");
-			}
-			else if (t == typeof(byte)) {
-				cw.PutPart("checked((byte)RequireUInt());\n");
-			}
-			else if (t == typeof(char)) {
-				cw.PutPart("RequireChar();\n");
-			}
-			else if (t == typeof(string)) {
-				cw.PutPart("RequireString();\n");
-			}
-			else if (t == typeof(bool)) {
-				cw.PutPart("RequireBool();\n");
-			}
-			else if (t == typeof(float)) {
-				cw.PutPart("RequireSingle();\n");
-			}
-			else if (t == typeof(double)) {
-				cw.PutPart("RequireDouble();\n");
-			}
-			else if (t == typeof(DateTime)) {
-				cw.PutPart("RequireDateTime();\n");
-			}
-			else if (t == typeof(TimeSpan)) {
-				cw.PutPart("RequireTimeSpan();\n");
-			}
-			else if (t.IsEnum) {
+			if (t.IsEnum) {
 				cw.PutPart(
 					JsonOptions.EnumAsString ?
 						"({0})Enum.Parse(typeof({0}), RequireString());\n" :
