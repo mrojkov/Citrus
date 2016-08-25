@@ -568,6 +568,7 @@ namespace YuzuTest.Binary
 		{
 			var bs = new BinarySerializer();
 			var bd = new BinaryDeserializer();
+			var bdg = new BinaryDeserializerGen();
 
 			var v0 = new SampleArray { A = new string[] { "a", "b", "c" } };
 			var result0 = bs.ToBytes(v0);
@@ -578,6 +579,8 @@ namespace YuzuTest.Binary
 			var w0 = new SampleArray();
 			bd.FromBytes(w0, result0);
 			CollectionAssert.AreEqual(v0.A, w0.A);
+			var w0g = (SampleArray)bdg.FromBytes(result0);
+			CollectionAssert.AreEqual(v0.A, w0g.A);
 
 			var v2 = new SampleArray();
 			var result2 = bs.ToBytes(v2);
@@ -585,6 +588,8 @@ namespace YuzuTest.Binary
 			var w2 = new SampleArray();
 			bd.FromBytes(w2, result2);
 			CollectionAssert.AreEqual(v2.A, w2.A);
+			var w2g = (SampleArray)bdg.FromBytes(result2);
+			CollectionAssert.AreEqual(v2.A, w2g.A);
 		}
 
 		[TestMethod]
@@ -705,8 +710,16 @@ namespace YuzuTest.Binary
 			Assert.IsInstanceOfType(w1.I, typeof(SampleInterfaced));
 			Assert.AreEqual(34, w1.I.X);
 
+			var w1g = new SampleInterfaceField();
+			var bdg = new BinaryDeserializerGen();
+			bdg.FromBytes(w1g, result1);
+			Assert.IsInstanceOfType(w1g.I, typeof(SampleInterfaced));
+			Assert.AreEqual(34, w1g.I.X);
+
 			var w1n = (SampleInterfaceField)bd.FromBytes(new byte[] { 0x20, 01, 00, 01, 00, 00, 00, 00, 00 });
 			Assert.AreEqual(null, w1n.I);
+			var w1ng = (SampleInterfaceField)bdg.FromBytes(new byte[] { 0x20, 01, 00, 01, 00, 00, 00, 00, 00 });
+			Assert.AreEqual(null, w1ng.I);
 
 			var v2 = new List<ISample> { null, new SampleInterfaced { X = 37 } };
 			var result2 = bs.ToBytes(v2);
