@@ -677,6 +677,14 @@ namespace YuzuTest.Binary
 			var w = new SampleRect();
 			bd.FromBytes(w, result);
 			CheckSampleRect(v, w);
+
+			var bdg = new BinaryDeserializerGen();
+			w = (SampleRect)bdg.FromBytes(result);
+			CheckSampleRect(v, w);
+
+			var p = (SamplePoint)bdg.FromBytes(new SamplePoint(), SX("20 02 00 22 00 00 00 2D 00 00 00").ToArray());
+			Assert.AreEqual(34, p.X);
+			Assert.AreEqual(45, p.Y);
 		}
 
 		[TestMethod]

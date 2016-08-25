@@ -225,6 +225,7 @@ namespace Yuzu.Binary
 			internal Meta Meta;
 			public const int EOF = short.MaxValue;
 			public Action<ClassDef, object> ReadFields;
+			public Func<ClassDef, object> Make;
 			public List<FieldDef> Fields = new List<FieldDef> { new FieldDef { OurIndex = EOF } };
 		}
 
@@ -232,6 +233,7 @@ namespace Yuzu.Binary
 		private List<ClassDef> classDefs = new List<ClassDef> { new ClassDef() };
 
 		protected Dictionary<Type, Action<ClassDef, object>> readFieldsCache = new Dictionary<Type, Action<ClassDef, object>>();
+		protected Dictionary<Type, Func<ClassDef, object>> makeCache = new Dictionary<Type, Func<ClassDef, object>>();
 
 		public void ClearClassIds() { classDefs = new List<ClassDef> { new ClassDef() }; }
 
@@ -247,6 +249,7 @@ namespace Yuzu.Binary
 			result.Meta = Meta.Get(classType, Options);
 			if (!readFieldsCache.TryGetValue(classType, out result.ReadFields))
 				result.ReadFields = ReadFields;
+			makeCache.TryGetValue(classType, out result.Make);
 			var ourCount = result.Meta.Items.Count;
 			var theirCount = Reader.ReadInt16();
 			int ourIndex = 0, theirIndex = 0;
@@ -358,6 +361,8 @@ namespace Yuzu.Binary
 			var def = GetClassDef(classId);
 			if (!typeof(T).IsAssignableFrom(def.Meta.Type))
 				throw Error("Unable to assign type {0} to {1}", def.Meta.Type, typeof(T));
+			if (def.Make != null)
+				return def.Make(def);
 			var result = Activator.CreateInstance(def.Meta.Type);
 			def.ReadFields(def, result);
 			return result;
@@ -371,6 +376,8 @@ namespace Yuzu.Binary
 			var def = GetClassDef(classId);
 			if (!typeof(T).IsAssignableFrom(def.Meta.Type))
 				throw Error("Unable to assign type {0} to {1}", def.Meta.Type, typeof(T));
+			if (def.Make != null)
+				return def.Make(def);
 			var result = Activator.CreateInstance(def.Meta.Type);
 			def.ReadFields(def, result);
 			return result;

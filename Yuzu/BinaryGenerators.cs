@@ -19,6 +19,7 @@ namespace Yuzu.Binary
 		private string wrapperNameSpace;
 		private CommonOptions options;
 		private Dictionary<Type, string> generatedReaders = new Dictionary<Type, string>();
+		private Dictionary<Type, string> generatedMakers = new Dictionary<Type, string>();
 
 		public BinaryDeserializerGenerator(string wrapperNameSpace = "YuzuGenBin", CommonOptions options = null)
 		{
@@ -92,9 +93,10 @@ namespace Yuzu.Binary
 		{
 			Put("public BinaryDeserializerGen()\n");
 			Put("{\n");
-			foreach (var r in generatedReaders) {
+			foreach (var r in generatedReaders)
 				PutF("readFieldsCache[typeof({0})] = {1};\n", GetTypeSpec(r.Key), r.Value);
-			}
+			foreach (var r in generatedMakers)
+				PutF("makeCache[typeof({0})] = {1};\n", GetTypeSpec(r.Key), r.Value);
 			Put("}\n");
 			Put("}\n"); // Close class.
 			Put("}\n"); // Close namespace.
@@ -229,14 +231,8 @@ namespace Yuzu.Binary
 
 		}
 
-		public void Generate<T>()
+		private void GenerateReaderBody(Meta meta)
 		{
-			var meta = Meta.Get(typeof(T), options);
-
-			var readerName = "Read_" + GetMangledTypeName(typeof(T));
-			PutF("private void {0}(ClassDef def, object obj)\n", readerName);
-			Put("{\n");
-			PutF("var result = ({0})obj;\n", GetTypeSpec(typeof(T)));
 			tempCount = 0;
 			if (meta.IsCompact) {
 				foreach (var yi in meta.Items) {
@@ -271,9 +267,35 @@ namespace Yuzu.Binary
 				PutF("if (fd.OurIndex != ClassDef.EOF) throw Error(\"Unfinished object\");\n");
 			}
 			GenerateAfterDeserialization(meta);
+		}
+
+		public void Generate<T>()
+		{
+			var meta = Meta.Get(typeof(T), options);
+
+			var readerName = "Read_" + GetMangledTypeName(typeof(T));
+			if (!Utils.IsStruct(typeof(T))) {
+				PutF("private void {0}(ClassDef def, object obj)\n", readerName);
+				Put("{\n");
+				PutF("var result = ({0})obj;\n", GetTypeSpec(typeof(T)));
+				GenerateReaderBody(meta);
+				Put("}\n");
+				Put("\n");
+				generatedReaders[typeof(T)] = readerName;
+			}
+
+			var makerName = "Make_" + GetMangledTypeName(typeof(T));
+			PutF("private object {0}(ClassDef def)\n", makerName);
+			Put("{\n");
+			PutF("var result = new {0}();\n", GetTypeSpec(typeof(T)));
+			if (Utils.IsStruct(typeof(T)))
+				GenerateReaderBody(meta);
+			else
+				PutF("{0}(def, result);\n", readerName);
+			Put("return result;\n");
 			Put("}\n");
 			Put("\n");
-			generatedReaders[typeof(T)] = readerName;
+			generatedMakers[typeof(T)] = makerName;
 		}
 
 	}
