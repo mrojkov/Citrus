@@ -60,5 +60,31 @@ namespace Yuzu.Util
 				callerType.GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic).
 					MakeGenericMethod(container.GetGenericArguments());
 		}
+
+		private static string DeclaringTypes(Type t, string separator)
+		{
+			return t.DeclaringType == null ? "" :
+				DeclaringTypes(t.DeclaringType, separator) + t.DeclaringType.Name + separator;
+		}
+
+		public static string GetTypeSpec(Type t)
+		{
+			var p = "global::" + t.Namespace + ".";
+			var n = DeclaringTypes(t, ".") + t.Name;
+			if (!t.IsGenericType)
+				return p + n;
+			var args = String.Join(",", t.GetGenericArguments().Select(a => GetTypeSpec(a)));
+			return p + String.Format("{0}<{1}>", n.Remove(n.IndexOf('`')), args);
+		}
+
+		public static string GetMangledTypeName(Type t)
+		{
+			var n = DeclaringTypes(t, "__") + t.Name;
+			if (!t.IsGenericType)
+				return n;
+			var args = String.Join("__", t.GetGenericArguments().Select(a => GetMangledTypeName(a)));
+			return n.Remove(n.IndexOf('`')) + "_" + args;
+		}
+
 	}
 }

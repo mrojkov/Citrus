@@ -50,31 +50,6 @@ namespace Yuzu.Binary
 			Put(String.Format(format, p));
 		}
 
-		private string DeclaringTypes(Type t, string separator)
-		{
-			return t.DeclaringType == null ? "" :
-				DeclaringTypes(t.DeclaringType, separator) + t.DeclaringType.Name + separator;
-		}
-
-		protected string GetTypeSpec(Type t)
-		{
-			var p = "global::" + t.Namespace + ".";
-			var n = DeclaringTypes(t, ".") + t.Name;
-			if (!t.IsGenericType)
-				return p + n;
-			var args = String.Join(",", t.GetGenericArguments().Select(a => GetTypeSpec(a)));
-			return p + String.Format("{0}<{1}>", n.Remove(n.IndexOf('`')), args);
-		}
-
-		protected string GetMangledTypeName(Type t)
-		{
-			var n = DeclaringTypes(t, "__") + t.Name;
-			if (!t.IsGenericType)
-				return n;
-			var args = String.Join("__", t.GetGenericArguments().Select(a => GetMangledTypeName(a)));
-			return n.Remove(n.IndexOf('`')) + "_" + args;
-		}
-
 		public void GenerateHeader()
 		{
 			Put("using System;\n");
@@ -94,9 +69,9 @@ namespace Yuzu.Binary
 			Put("public BinaryDeserializerGen()\n");
 			Put("{\n");
 			foreach (var r in generatedReaders)
-				PutF("readFieldsCache[typeof({0})] = {1};\n", GetTypeSpec(r.Key), r.Value);
+				PutF("readFieldsCache[typeof({0})] = {1};\n", Utils.GetTypeSpec(r.Key), r.Value);
 			foreach (var r in generatedMakers)
-				PutF("makeCache[typeof({0})] = {1};\n", GetTypeSpec(r.Key), r.Value);
+				PutF("makeCache[typeof({0})] = {1};\n", Utils.GetTypeSpec(r.Key), r.Value);
 			Put("}\n");
 			Put("}\n"); // Close class.
 			Put("}\n"); // Close namespace.
@@ -136,7 +111,7 @@ namespace Yuzu.Binary
 
 		private string PutNullOrCount(Type t)
 		{
-			PutPart(String.Format("({0})null;\n", GetTypeSpec(t)));
+			PutPart(String.Format("({0})null;\n", Utils.GetTypeSpec(t)));
 			var tempCountName = GetTempName();
 			PutF("var {0} = Reader.ReadInt32();\n", tempCountName);
 			PutF("if ({0} >= 0) {{\n", tempCountName);
@@ -155,7 +130,7 @@ namespace Yuzu.Binary
 			if (imap.TargetMethods[addIndex].Name == "Add")
 				PutF("{0}.Add({1});\n", name, tempElementName);
 			else
-				PutF("(({2}){0}).Add({1});\n", name, tempElementName, GetTypeSpec(icoll));
+				PutF("(({2}){0}).Add({1});\n", name, tempElementName, Utils.GetTypeSpec(icoll));
 			Put("}\n"); // while
 		}
 
@@ -185,12 +160,12 @@ namespace Yuzu.Binary
 				return;
 			}
 			if (t.IsEnum) {
-				PutPart(String.Format("({0})Reader.ReadInt32();\n", GetTypeSpec(t)));
+				PutPart(String.Format("({0})Reader.ReadInt32();\n", Utils.GetTypeSpec(t)));
 				return;
 			}
 			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
 				var tempIndexName = PutNullOrCount(t);
-				PutF("{0} = new {1}();\n", name, GetTypeSpec(t));
+				PutF("{0} = new {1}();\n", name, Utils.GetTypeSpec(t));
 				GenerateDictionary(t, name, tempIndexName);
 				Put("}\n");
 				return;
@@ -198,7 +173,7 @@ namespace Yuzu.Binary
 			if (t.IsArray) {
 				var tempIndexName = PutNullOrCount(t);
 				var tempArrayName = GetTempName();
-				PutF("var {0} = new {1}[{2}];\n", tempArrayName, GetTypeSpec(t.GetElementType()), tempIndexName);
+				PutF("var {0} = new {1}[{2}];\n", tempArrayName, Utils.GetTypeSpec(t.GetElementType()), tempIndexName);
 				PutF("for({0} = 0; {0} < {1}.Length; ++{0}) {{\n", tempIndexName, tempArrayName);
 				PutF("{0}[{1}] = ", tempArrayName, tempIndexName);
 				GenerateValue(t.GetElementType(), String.Format("{0}[{1}]", tempArrayName, tempIndexName));
@@ -210,17 +185,17 @@ namespace Yuzu.Binary
 			var icoll = t.GetInterface(typeof(ICollection<>).Name);
 			if (icoll != null) {
 				var tempIndexName = PutNullOrCount(t);
-				PutF("{0} = new {1}();\n", name, GetTypeSpec(t));
+				PutF("{0} = new {1}();\n", name, Utils.GetTypeSpec(t));
 				GenerateCollection(t, icoll, name, tempIndexName);
 				Put("}\n");
 				return;
 			}
 			if (t.IsClass || t.IsInterface) {
-				PutPart(String.Format("({0})ReadObject<{0}>();\n", GetTypeSpec(t)));
+				PutPart(String.Format("({0})ReadObject<{0}>();\n", Utils.GetTypeSpec(t)));
 				return;
 			}
 			if (Utils.IsStruct(t)) {
-				PutPart(String.Format("({0})ReadStruct<{0}>();\n", GetTypeSpec(t)));
+				PutPart(String.Format("({0})ReadStruct<{0}>();\n", Utils.GetTypeSpec(t)));
 				return;
 			}
 			throw new NotImplementedException();
@@ -273,21 +248,21 @@ namespace Yuzu.Binary
 		{
 			var meta = Meta.Get(typeof(T), options);
 
-			var readerName = "Read_" + GetMangledTypeName(typeof(T));
+			var readerName = "Read_" + Utils.GetMangledTypeName(typeof(T));
 			if (!Utils.IsStruct(typeof(T))) {
 				PutF("private void {0}(ClassDef def, object obj)\n", readerName);
 				Put("{\n");
-				PutF("var result = ({0})obj;\n", GetTypeSpec(typeof(T)));
+				PutF("var result = ({0})obj;\n", Utils.GetTypeSpec(typeof(T)));
 				GenerateReaderBody(meta);
 				Put("}\n");
 				Put("\n");
 				generatedReaders[typeof(T)] = readerName;
 			}
 
-			var makerName = "Make_" + GetMangledTypeName(typeof(T));
+			var makerName = "Make_" + Utils.GetMangledTypeName(typeof(T));
 			PutF("private object {0}(ClassDef def)\n", makerName);
 			Put("{\n");
-			PutF("var result = new {0}();\n", GetTypeSpec(typeof(T)));
+			PutF("var result = new {0}();\n", Utils.GetTypeSpec(typeof(T)));
 			if (Utils.IsStruct(typeof(T)))
 				GenerateReaderBody(meta);
 			else
