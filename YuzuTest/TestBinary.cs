@@ -515,6 +515,11 @@ namespace YuzuTest.Binary
 			Assert.AreEqual(v0.Value, w0.Value);
 			Assert.AreEqual(v0.Children.Count, w0.Children.Count);
 			Assert.AreEqual(v0.Children["a"].Value, w0.Children["a"].Value);
+
+			var w1 = (SampleDict)((new BinaryDeserializerGen()).FromBytes(result0));
+			Assert.AreEqual(v0.Value, w1.Value);
+			Assert.AreEqual(v0.Children.Count, w1.Children.Count);
+			Assert.AreEqual(v0.Children["a"].Value, w1.Children["a"].Value);
 		}
 
 		[TestMethod]
@@ -542,6 +547,14 @@ namespace YuzuTest.Binary
 			var bd = new BinaryDeserializer();
 			var w = new SampleDictKeys();
 			bd.FromBytes(w, result0);
+			Assert.AreEqual(1, w.I.Count);
+			Assert.AreEqual(7, w.I[5]);
+			Assert.AreEqual(1, w.E.Count);
+			Assert.AreEqual(8, w.E[SampleEnum.E2]);
+			Assert.AreEqual(1, w.K.Count);
+			Assert.AreEqual(9, w.K[new SampleKey { V = 3 }]);
+
+			w = (SampleDictKeys)((new BinaryDeserializerGen()).FromBytes(result0));
 			Assert.AreEqual(1, w.I.Count);
 			Assert.AreEqual(7, w.I[5]);
 			Assert.AreEqual(1, w.E.Count);
@@ -597,6 +610,14 @@ namespace YuzuTest.Binary
 			Assert.AreEqual(9, ((SampleDerivedB)w.E[1]).FB);
 			Assert.IsInstanceOfType(w.E[2], typeof(SampleDerivedB));
 			Assert.AreEqual(8, ((SampleDerivedB)w.E[2]).FB);
+
+			w = (SampleClassList)((new BinaryDeserializerGen()).FromBytes(result));
+			Assert.AreEqual(3, w.E.Count);
+			Assert.IsInstanceOfType(w.E[0], typeof(SampleDerivedA));
+			Assert.IsInstanceOfType(w.E[1], typeof(SampleDerivedB));
+			Assert.AreEqual(9, ((SampleDerivedB)w.E[1]).FB);
+			Assert.IsInstanceOfType(w.E[2], typeof(SampleDerivedB));
+			Assert.AreEqual(8, ((SampleDerivedB)w.E[2]).FB);
 		}
 
 		[TestMethod]
@@ -609,6 +630,13 @@ namespace YuzuTest.Binary
 				"01 00 00 00 06 00 00 00 00 00 00 00 00 00";
 			var v = new SampleMatrix();
 			(new BinaryDeserializer()).FromBytes(v, SX(src).ToArray());
+			Assert.AreEqual(4, v.M.Count);
+			CollectionAssert.AreEqual(new int[] { 1, 2, 3 }, v.M[0]);
+			CollectionAssert.AreEqual(new int[] { 4, 5 }, v.M[1]);
+			CollectionAssert.AreEqual(new int[] { 6 }, v.M[2]);
+			Assert.AreEqual(0, v.M[3].Count);
+
+			v = (SampleMatrix)((new BinaryDeserializerGen()).FromBytes(SX(src).ToArray()));
 			Assert.AreEqual(4, v.M.Count);
 			CollectionAssert.AreEqual(new int[] { 1, 2, 3 }, v.M[0]);
 			CollectionAssert.AreEqual(new int[] { 4, 5 }, v.M[1]);

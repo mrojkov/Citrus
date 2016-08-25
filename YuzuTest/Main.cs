@@ -151,9 +151,18 @@ namespace YuzuTest
 				bd.Generate<Sample2>();
 				bd.Generate<Sample3>();
 				bd.Generate<Sample4>();
+				bd.Generate<SampleDict>();
+				bd.Generate<SampleDictKeys>();
 				bd.Generate<SampleMemberI>();
 				bd.Generate<SampleArray>();
+				bd.Generate<SampleBase>();
+				bd.Generate<SampleDerivedA>();
+				bd.Generate<SampleDerivedB>();
+				bd.Generate<SampleMatrix>();
+				bd.Generate<SamplePoint>();
+				bd.Generate<SampleRect>();
 				bd.Generate<Color>();
+				bd.Generate<SampleClassList>();
 				bd.Generate<SampleSmallTypes>();
 				bd.Generate<SamplePerson>();
 				bd.Generate<SampleWithCollection>();

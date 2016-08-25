@@ -132,9 +132,9 @@ namespace Yuzu.Binary
 			return "tmp" + tempCount.ToString();
 		}
 
-		private string PutNullOrCount()
+		private string PutNullOrCount(Type t)
 		{
-			PutPart("null;\n");
+			PutPart(String.Format("({0})null;\n", GetTypeSpec(t)));
 			var tempCountName = GetTempName();
 			PutF("var {0} = Reader.ReadInt32();\n", tempCountName);
 			PutF("if ({0} >= 0) {{\n", tempCountName);
@@ -157,6 +157,19 @@ namespace Yuzu.Binary
 			Put("}\n"); // while
 		}
 
+		private void GenerateDictionary(Type t, string name, string tempIndexName)
+		{
+			PutF("while (--{0} >= 0) {{\n", tempIndexName);
+			var tempKeyName = GetTempName();
+			PutF("var {0} = ", tempKeyName);
+			GenerateValue(t.GetGenericArguments()[0], tempKeyName);
+			var tempValueName = GetTempName();
+			PutF("var {0} = ", tempValueName);
+			GenerateValue(t.GetGenericArguments()[1], tempValueName);
+			PutF("{0}.Add({1}, {2});\n", name, tempKeyName, tempValueName);
+			Put("}\n"); // while
+		}
+
 		private void GenerateValue(Type t, string name)
 		{
 			string sr;
@@ -174,13 +187,14 @@ namespace Yuzu.Binary
 				return;
 			}
 			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
-				//PutRequireOrNull('{', t, name);
-				//GenerateDictionary(t, name);
-				//Put("}\n");
+				var tempIndexName = PutNullOrCount(t);
+				PutF("{0} = new {1}();\n", name, GetTypeSpec(t));
+				GenerateDictionary(t, name, tempIndexName);
+				Put("}\n");
 				return;
 			}
 			if (t.IsArray) {
-				var tempIndexName = PutNullOrCount();
+				var tempIndexName = PutNullOrCount(t);
 				var tempArrayName = GetTempName();
 				PutF("var {0} = new {1}[{2}];\n", tempArrayName, GetTypeSpec(t.GetElementType()), tempIndexName);
 				PutF("for({0} = 0; {0} < {1}.Length; ++{0}) {{\n", tempIndexName, tempArrayName);
@@ -193,7 +207,7 @@ namespace Yuzu.Binary
 			}
 			var icoll = t.GetInterface(typeof(ICollection<>).Name);
 			if (icoll != null) {
-				var tempIndexName = PutNullOrCount();
+				var tempIndexName = PutNullOrCount(t);
 				PutF("{0} = new {1}();\n", name, GetTypeSpec(t));
 				GenerateCollection(t, icoll, name, tempIndexName);
 				Put("}\n");
