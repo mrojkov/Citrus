@@ -166,10 +166,16 @@ namespace YuzuTest
 				bd.Generate<Color>();
 				bd.Generate<SampleClassList>();
 				bd.Generate<SampleSmallTypes>();
+				bd.Generate<SampleWithNullFieldCompact>();
+				bd.Generate<SampleNested.NestedClass>();
+				bd.Generate<SampleNested>();
 				bd.Generate<SamplePerson>();
 				bd.Generate<SampleInterfaceField>();
+				bd.Generate<SampleInterfacedGeneric<string>>();
 				bd.Generate<SampleConcrete>();
 				bd.Generate<SampleWithCollection>();
+				bd.Generate<SampleAfter2>();
+				bd.Generate<YuzuTest2.SampleNamespace>();
 				bd.GenerateFooter();
 				sw.Flush();
 				ms.WriteTo(new FileStream(@"..\..\GeneratedBinary.cs", FileMode.Create));
