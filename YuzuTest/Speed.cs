@@ -8,6 +8,7 @@ using ProtoBuf;
 using Yuzu;
 using Yuzu.Binary;
 using Yuzu.Json;
+using YuzuGenBin;
 using YuzuGen.YuzuTest;
 
 namespace YuzuTest
@@ -191,6 +192,17 @@ namespace YuzuTest
 			SamplePerson p = new SamplePerson();
 			binaryStream.Position = 0;
 			bd.FromStream(p, binaryStream);
+			Assert.AreEqual(person.Name, p.Name);
+		}
+
+		[TestMethod]
+		public void TestBinaryGenRead()
+		{
+			var bd = new BinaryDeserializerGen();
+			binaryStream.Position = 0;
+			var p = (SamplePerson)bd.FromStream(binaryStream);
+			//var p = new SamplePerson();
+			//bd.FromStream(p, binaryStream);
 			Assert.AreEqual(person.Name, p.Name);
 		}
 

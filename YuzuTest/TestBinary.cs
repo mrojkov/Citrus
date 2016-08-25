@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Yuzu;
 using Yuzu.Binary;
+using YuzuGenBin;
 
 namespace YuzuTest.Binary
 {
@@ -160,6 +161,14 @@ namespace YuzuTest.Binary
 			Assert.AreEqual(v1.B, v2.B);
 			Assert.AreEqual(v1.Sb, v2.Sb);
 
+			v2 = (SampleSmallTypes)((new BinaryDeserializerGen()).FromBytes(result));
+			Assert.AreEqual(v1.Ch, v2.Ch);
+			Assert.AreEqual(v1.USh, v2.USh);
+			Assert.AreEqual(v1.Sh, v2.Sh);
+			Assert.AreEqual(v1.B, v2.B);
+			Assert.AreEqual(v1.Sb, v2.Sb);
+
+
 			bd.FromBytes(v2, new byte[] {
 				0x20, 01, 00, 01, 00, 255, 02, 00, 65 + 25, 03, 00, 256 - 128,
 				04, 00, 00, 128, 05, 00, 255, 127, 00, 00 });
@@ -205,6 +214,43 @@ namespace YuzuTest.Binary
 		}
 
 		[TestMethod]
+		public void TestGenerated()
+		{
+			var str =
+				"20 01 00 " + XS("YuzuTest.Sample3") + " 03 00 " +
+				XS("S1", RoughType.Record, "F", RoughType.Int, "S2", RoughType.Record) +
+				" 01 00 02 00 " + XS("YuzuTest.Sample1") +
+				" 02 00 " + XS("X", RoughType.Int, "Y", RoughType.String) +
+				" 01 00 59 01 00 00 02 00 " + XS("test") + " 00 00 " +
+				"02 00 DE 00 00 00 " +
+				"03 00 03 00 " + XS("YuzuTest.Sample2") +
+				" 02 00 " + XS("X", RoughType.Int, "Y", RoughType.String) +
+				" 01 00 A6 FE FF FF 02 00 " + XS("test1") + " 00 00 00 00";
+
+			var bd = new BinaryDeserializerGen();
+			var w = (Sample3)bd.FromBytes(SX(str).ToArray());
+			Assert.AreEqual(345, w.S1.X);
+			Assert.AreEqual("test", w.S1.Y);
+			Assert.AreEqual(222, w.F);
+			Assert.AreEqual(-346, w.S2.X);
+			Assert.AreEqual("test1", w.S2.Y);
+
+			var w1 = new Sample1();
+			bd.FromBytes(w1, SX("20 02 00 01 00 58 00 00 00 00 00").ToArray());
+			Assert.IsInstanceOfType(w1, typeof(Sample1));
+			Assert.AreEqual(88, w1.X);
+
+			var w2 = bd.FromBytes(SX("20 02 00 01 00 63 00 00 00 00 00").ToArray());
+			Assert.IsInstanceOfType(w2, typeof(Sample1));
+			Assert.AreEqual(99, ((Sample1)w2).X);
+
+			var w3 = new SampleMemberI();
+			bd.FromBytes(w3, SX(
+				"20 04 00 " + XS("YuzuTest.SampleMemberI") + " 01 00 " + XS("X", RoughType.Int) + " 00 00").ToArray());
+			Assert.AreEqual(71, ((SampleMemberI)w3).X);
+		}
+
+		[TestMethod]
 		public void TestEnum()
 		{
 			var bs = new BinarySerializer();
@@ -221,6 +267,9 @@ namespace YuzuTest.Binary
 			var bd = new BinaryDeserializer();
 			var w = new Sample4();
 			bd.FromBytes(w, result1);
+			Assert.AreEqual(SampleEnum.E3, w.E);
+
+			w = (Sample4)((new BinaryDeserializerGen()).FromBytes(result1));
 			Assert.AreEqual(SampleEnum.E3, w.E);
 		}
 
@@ -384,6 +433,12 @@ namespace YuzuTest.Binary
 			Assert.IsInstanceOfType(w0.A.First(), typeof(SampleInterfaced));
 			Assert.AreEqual(9, w0.A.First().X);
 			CollectionAssert.AreEqual(new int[] { 7, 6 }, w0.B.ToList());
+
+			var w1 = (SampleWithCollection)((new BinaryDeserializerGen()).FromBytes(result0));
+			Assert.AreEqual(1, w1.A.Count);
+			Assert.IsInstanceOfType(w1.A.First(), typeof(SampleInterfaced));
+			Assert.AreEqual(9, w1.A.First().X);
+			CollectionAssert.AreEqual(new int[] { 7, 6 }, w1.B.ToList());
 
 			var v2 = new SampleConcreteCollection { 2, 5, 4 };
 			var result1 = bs.ToBytes(v2);

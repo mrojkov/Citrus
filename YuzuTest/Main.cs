@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ProtoBuf;
 
 using Yuzu;
+using Yuzu.Binary;
 using Yuzu.Code;
 using Yuzu.Json;
 using Yuzu.Protobuf;
@@ -90,8 +91,7 @@ namespace YuzuTest
 		{
 			var jd = JsonDeserializerGenerator.Instance;
 			using (var ms = new MemoryStream())
-			using (var sw = new StreamWriter(ms))
-			{
+			using (var sw = new StreamWriter(ms)) {
 				jd.GenWriter = sw;
 				jd.GenerateHeader();
 				jd.Generate<Sample1>();
@@ -140,6 +140,26 @@ namespace YuzuTest
 				jd.GenerateFooter();
 				sw.Flush();
 				ms.WriteTo(new FileStream(@"..\..\GeneratedJson.cs", FileMode.Create));
+			}
+
+			var bd = new BinaryDeserializerGenerator();
+			using (var ms = new MemoryStream())
+			using (var sw = new StreamWriter(ms)) {
+				bd.GenWriter = sw;
+				bd.GenerateHeader();
+				bd.Generate<Sample1>();
+				bd.Generate<Sample2>();
+				bd.Generate<Sample3>();
+				bd.Generate<Sample4>();
+				bd.Generate<SampleMemberI>();
+				bd.Generate<SampleArray>();
+				bd.Generate<Color>();
+				bd.Generate<SampleSmallTypes>();
+				bd.Generate<SamplePerson>();
+				bd.Generate<SampleWithCollection>();
+				bd.GenerateFooter();
+				sw.Flush();
+				ms.WriteTo(new FileStream(@"..\..\GeneratedBinary.cs", FileMode.Create));
 			}
 		}
 

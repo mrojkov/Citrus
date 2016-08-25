@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BinaryDeserializer.cs" />
+    <Compile Include="BinaryGenerators.cs" />
     <Compile Include="BinarySerializer.cs" />
     <Compile Include="Code.cs" />
     <Compile Include="JsonDeserializer.cs" />

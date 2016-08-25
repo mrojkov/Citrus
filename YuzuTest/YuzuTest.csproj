@@ -59,6 +59,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GeneratedBinary.cs" />
     <Compile Include="Samples.cs" />
     <Compile Include="Speed.cs" />
     <Compile Include="Main.cs" />
