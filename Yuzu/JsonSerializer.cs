@@ -232,6 +232,18 @@ namespace Yuzu.Json
 			writer.Write(']');
 		}
 
+		// List<object>
+		private void WriteAny(object obj)
+		{
+			var t = obj.GetType();
+			if (t == typeof(object))
+				throw new YuzuException("WriteAny");
+			if (t.IsClass || Utils.IsStruct(t))
+				WriteObject<object>(obj);
+			else
+				GetWriteFunc(t)(obj);
+		}
+
 		private Stack<object> objStack = new Stack<object>();
 
 		private void WriteAction(object obj)
@@ -298,6 +310,8 @@ namespace Yuzu.Json
 				else
 					return WriteEnumAsInt;
 			}
+			if (t == typeof(object))
+				return WriteAny;
 			if (t.IsGenericType) {
 				var g = t.GetGenericTypeDefinition();
 				if (g == typeof(Dictionary<,>)) {

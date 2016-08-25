@@ -1118,6 +1118,27 @@ namespace YuzuTest.Json
 		}
 
 		[TestMethod]
+		public void TestTopLevelListOfNonPrimitiveTypes()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = "";
+			var jd = new JsonDeserializer();
+
+			var v1 = new List<object> { new SampleDerivedB { FB = 10 }, new SampleDerivedB { FB = 20 } };
+
+			var result1 = js.ToString(v1);
+			Assert.AreEqual(
+				"[{\"class\":\"YuzuTest.SampleDerivedB\",\"FBase\":0,\"FB\":10}," +
+				"{\"class\":\"YuzuTest.SampleDerivedB\",\"FBase\":0,\"FB\":20}]",
+				result1);
+			var w1 = (List<object>)jd.FromString(result1);
+			for (int i = 0; i < v1.Count; i++) {
+				Assert.AreEqual((v1[i] as SampleDerivedB).FB, (w1[i] as SampleDerivedB).FB);
+			}
+		}
+
+		[TestMethod]
 		public void TestErrors()
 		{
 			var js = new JsonSerializer();
