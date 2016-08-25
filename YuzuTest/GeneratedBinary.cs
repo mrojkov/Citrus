@@ -99,6 +99,24 @@ namespace YuzuGenBin
 			return result;
 		}
 
+		private void Read_SampleObj(ClassDef def, object obj)
+		{
+			var result = (global::YuzuTest.SampleObj)obj;
+			ClassDef.FieldDef fd;
+			fd = def.Fields[Reader.ReadInt16()];
+			if (1 != fd.OurIndex) throw Error("1!=" + fd.OurIndex);
+			result.F = ReadAny();
+			fd = def.Fields[Reader.ReadInt16()];
+			if (fd.OurIndex != ClassDef.EOF) throw Error("Unfinished object");
+		}
+
+		private object Make_SampleObj(ClassDef def)
+		{
+			var result = new global::YuzuTest.SampleObj();
+			Read_SampleObj(def, result);
+			return result;
+		}
+
 		private void Read_SampleDict(ClassDef def, object obj)
 		{
 			var result = (global::YuzuTest.SampleDict)obj;
@@ -501,6 +519,7 @@ namespace YuzuGenBin
 			readFieldsCache[typeof(global::YuzuTest.Sample2)] = Read_Sample2;
 			readFieldsCache[typeof(global::YuzuTest.Sample3)] = Read_Sample3;
 			readFieldsCache[typeof(global::YuzuTest.Sample4)] = Read_Sample4;
+			readFieldsCache[typeof(global::YuzuTest.SampleObj)] = Read_SampleObj;
 			readFieldsCache[typeof(global::YuzuTest.SampleDict)] = Read_SampleDict;
 			readFieldsCache[typeof(global::YuzuTest.SampleDictKeys)] = Read_SampleDictKeys;
 			readFieldsCache[typeof(global::YuzuTest.SampleMemberI)] = Read_SampleMemberI;
@@ -519,6 +538,7 @@ namespace YuzuGenBin
 			makeCache[typeof(global::YuzuTest.Sample2)] = Make_Sample2;
 			makeCache[typeof(global::YuzuTest.Sample3)] = Make_Sample3;
 			makeCache[typeof(global::YuzuTest.Sample4)] = Make_Sample4;
+			makeCache[typeof(global::YuzuTest.SampleObj)] = Make_SampleObj;
 			makeCache[typeof(global::YuzuTest.SampleDict)] = Make_SampleDict;
 			makeCache[typeof(global::YuzuTest.SampleDictKeys)] = Make_SampleDictKeys;
 			makeCache[typeof(global::YuzuTest.SampleMemberI)] = Make_SampleMemberI;

@@ -100,6 +100,7 @@ namespace Yuzu.Binary
 			simpleValueReader[typeof(double)] = "Reader.ReadDouble()";
 			simpleValueReader[typeof(DateTime)] = "DateTime.FromBinary(Reader.ReadInt64())";
 			simpleValueReader[typeof(TimeSpan)] = "new TimeSpan(Reader.ReadInt64())";
+			simpleValueReader[typeof(object)] = "ReadAny()";
 		}
 
 		private int tempCount = 0;

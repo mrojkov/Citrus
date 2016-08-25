@@ -813,10 +813,15 @@ namespace YuzuTest.Binary
 		{
 			var bd = new BinaryDeserializer();
 			var w = new SampleObj();
-			bd.FromBytes(w, SX(
+			var buf =  SX(
 				"20 01 00 " + XS("YuzuTest.SampleObj") + " 01 00 " + XS("F", RoughType.Any) +
-				" 01 00 " + XS(RoughType.Float) + " CD CC F6 42 00 00").ToArray());
+				" 01 00 " + XS(RoughType.Float) + " CD CC F6 42 00 00").ToArray();
+			bd.FromBytes(w, buf);
 			Assert.AreEqual(123.4f, w.F);
+			var wg = new SampleObj();
+			(new BinaryDeserializerGen()).FromBytes(wg, buf);
+			Assert.AreEqual(123.4f, wg.F);
+
 			bd.FromBytes(w, SX("20 01 00 01 00 21 02 03 00 00 00 01 02 03 00 00").ToArray());
 			CollectionAssert.AreEqual(new byte[] { 1, 2, 3 }, (List<byte>)w.F);
 			bd.FromBytes(w, SX(
