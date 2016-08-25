@@ -150,7 +150,7 @@ namespace Yuzu.Metadata
 				if (!item.Type.IsClass && !item.Type.IsInterface || item.Type == typeof(object))
 					throw Error("Unable to either set or merge item {0}", item.Name);
 			}
-			if (member != null && item.SerializeIf == null) {
+			if (member != null && item.SerializeIf == null && !Type.IsAbstract && !Type.IsInterface) {
 				if (Default == null)
 					Default = Activator.CreateInstance(Type);
 				var d = item.GetValue(Default);

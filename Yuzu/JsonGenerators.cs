@@ -53,7 +53,7 @@ namespace Yuzu.Json
 		private static Dictionary<string, JsonDeserializerGenBase> deserializerCache =
 			new Dictionary<string, JsonDeserializerGenBase>();
 
-		protected JsonDeserializerGenBase MakeDeserializer(string className)
+		private JsonDeserializerGenBase MakeDeserializer(string className)
 		{
 			JsonDeserializerGenBase result;
 			if (!deserializerCache.TryGetValue(className, out result)) {
@@ -70,14 +70,22 @@ namespace Yuzu.Json
 			return result;
 		}
 
-		protected object FromReaderIntGenerated()
+		private object MaybeReadObject(string className, string name)
+		{
+			if (name == "") {
+				Require('}');
+				return Activator.CreateInstance(Options.Assembly.GetType(className, throwOnError: true));
+			}
+			return MakeDeserializer(className).FromReaderIntPartial(name);
+		}
+
+		private object FromReaderIntGenerated()
 		{
 			KillBuf();
 			Require('{');
 			CheckClassTag(GetNextName(first: true));
-			var d = MakeDeserializer(RequireUnescapedString());
-			Require(',');
-			return d.FromReaderIntPartial(GetNextName(first: false));
+			var typeName = RequireUnescapedString();
+			return MaybeReadObject(typeName, GetNextName(first: false));
 		}
 
 		protected object FromReaderIntGenerated(object obj)
@@ -94,6 +102,10 @@ namespace Yuzu.Json
 				if (actualType != expectedType)
 					throw Error("Expected type '{0}', but got {1}", expectedType.Name, typeName);
 				name = GetNextName(first: false);
+			}
+			if (name == "") {
+				Require('}');
+				return obj;
 			}
 			return MakeDeserializer(obj.GetType().FullName).ReadFields(obj, name);
 		}
@@ -113,7 +125,7 @@ namespace Yuzu.Json
 			var name = GetNextName(true);
 			if (name != JsonOptions.ClassTag) return (T)ReadFields(new T(), name);
 			var typeName = RequireUnescapedString();
-			return (T)MakeDeserializer(typeName).FromReaderIntPartial(GetNextName(false));
+			return (T)MaybeReadObject(typeName, GetNextName(first: false));
 		}
 
 		public T FromReaderInterface<T>(BinaryReader reader) where T : class
@@ -127,7 +139,7 @@ namespace Yuzu.Json
 			}
 			CheckClassTag(GetNextName(first: true));
 			var typeName = RequireUnescapedString();
-			return (T)MakeDeserializer(typeName).FromReaderIntPartial(GetNextName(first: false));
+			return (T)MaybeReadObject(typeName, GetNextName(first: false));
 		}
 	}
 
@@ -523,11 +535,6 @@ namespace Yuzu.Json
 			}
 			Put("}\n");
 			Put("\n");
-		}
-
-		public override object FromReaderInt()
-		{
-			return FromReaderIntGenerated();
 		}
 
 		public override object FromReaderInt(object obj)
