@@ -95,6 +95,7 @@ namespace Yuzu.Util
 		public StreamWriter Output;
 		private int indentLevel = 0;
 		public string IndentString = "\t";
+		private int tempCount = 0;
 
 		public void PutPart(string format, params object[] p)
 		{
@@ -124,6 +125,14 @@ namespace Yuzu.Util
 				Put("{0}.Add({1});\n", collName, elementName);
 			else
 				Put("(({2}){0}).Add({1});\n", collName, elementName, Utils.GetTypeSpec(icoll));
+		}
+
+		public void ResetTempNames() { tempCount = 0; }
+
+		public string GetTempName()
+		{
+			tempCount += 1;
+			return "tmp" + tempCount.ToString();
 		}
 	}
 }

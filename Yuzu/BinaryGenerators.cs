@@ -86,16 +86,9 @@ namespace Yuzu.Binary
 			simpleValueReader[typeof(object)] = "ReadAny()";
 		}
 
-		private int tempCount = 0;
-		private string GetTempName()
-		{
-			tempCount += 1;
-			return "tmp" + tempCount.ToString();
-		}
-
 		private string PutCount()
 		{
-			var tempCountName = GetTempName();
+			var tempCountName = cw.GetTempName();
 			cw.Put("var {0} = Reader.ReadInt32();\n", tempCountName);
 			cw.Put("if ({0} >= 0) {{\n", tempCountName);
 			return tempCountName;
@@ -110,7 +103,7 @@ namespace Yuzu.Binary
 		private void GenerateCollection(Type t, Type icoll, string name, string tempIndexName)
 		{
 			cw.Put("while (--{0} >= 0) {{\n", tempIndexName);
-			var tempElementName = GetTempName();
+			var tempElementName = cw.GetTempName();
 			cw.Put("var {0} = ", tempElementName);
 			GenerateValue(icoll.GetGenericArguments()[0], tempElementName);
 			cw.PutAddToColllection(t, icoll, name, tempElementName);
@@ -120,10 +113,10 @@ namespace Yuzu.Binary
 		private void GenerateDictionary(Type t, string name, string tempIndexName)
 		{
 			cw.Put("while (--{0} >= 0) {{\n", tempIndexName);
-			var tempKeyName = GetTempName();
+			var tempKeyName = cw.GetTempName();
 			cw.Put("var {0} = ", tempKeyName);
 			GenerateValue(t.GetGenericArguments()[0], tempKeyName);
-			var tempValueName = GetTempName();
+			var tempValueName = cw.GetTempName();
 			cw.Put("var {0} = ", tempValueName);
 			GenerateValue(t.GetGenericArguments()[1], tempValueName);
 			cw.Put("{0}.Add({1}, {2});\n", name, tempKeyName, tempValueName);
@@ -155,7 +148,7 @@ namespace Yuzu.Binary
 			}
 			if (t.IsArray) {
 				var tempIndexName = PutNullOrCount(t);
-				var tempArrayName = GetTempName();
+				var tempArrayName = cw.GetTempName();
 				cw.Put("var {0} = new {1}[{2}];\n", tempArrayName, Utils.GetTypeSpec(t.GetElementType()), tempIndexName);
 				cw.Put("for({0} = 0; {0} < {1}.Length; ++{0}) {{\n", tempIndexName, tempArrayName);
 				cw.Put("{0}[{1}] = ", tempArrayName, tempIndexName);
@@ -206,7 +199,7 @@ namespace Yuzu.Binary
 
 		private void GenerateReaderBody(Meta meta)
 		{
-			tempCount = 0;
+			cw.ResetTempNames();
 			if (meta.IsCompact) {
 				foreach (var yi in meta.Items) {
 					cw.Put("result.{0} = ", yi.Name);
