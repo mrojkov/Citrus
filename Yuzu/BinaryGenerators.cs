@@ -106,13 +106,7 @@ namespace Yuzu.Binary
 			var tempElementName = GetTempName();
 			cw.Put("var {0} = ", tempElementName);
 			GenerateValue(icoll.GetGenericArguments()[0], tempElementName);
-			// Check for explicit vs implicit interface implementation.
-			var imap = t.GetInterfaceMap(icoll);
-			var addIndex = Array.FindIndex(imap.InterfaceMethods, m => m.Name == "Add");
-			if (imap.TargetMethods[addIndex].Name == "Add")
-				cw.Put("{0}.Add({1});\n", name, tempElementName);
-			else
-				cw.Put("(({2}){0}).Add({1});\n", name, tempElementName, Utils.GetTypeSpec(icoll));
+			cw.PutAddToColllection(t, icoll, name, tempElementName);
 			cw.Put("}\n"); // while
 		}
 

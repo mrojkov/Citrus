@@ -112,5 +112,16 @@ namespace Yuzu.Util
 			if (s.EndsWith("{\n"))
 				indentLevel += 1;
 		}
+
+		// Check for explicit vs implicit interface implementation.
+		public void PutAddToColllection(Type t, Type icoll, string collName, string elementName)
+		{
+			var imap = t.GetInterfaceMap(icoll);
+			var addIndex = Array.FindIndex(imap.InterfaceMethods, m => m.Name == "Add");
+			if (imap.TargetMethods[addIndex].Name == "Add")
+				Put("{0}.Add({1});\n", collName, elementName);
+			else
+				Put("(({2}){0}).Add({1});\n", collName, elementName, Utils.GetTypeSpec(icoll));
+		}
 	}
 }
