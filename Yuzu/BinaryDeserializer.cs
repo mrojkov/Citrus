@@ -27,23 +27,24 @@ namespace Yuzu.Binary
 				Options.ReportErrorPosition ? new YuzuPosition(Reader.BaseStream.Position) : null);
 		}
 
-		protected object ReadSByte() { return Reader.ReadSByte(); }
-		protected object ReadByte() { return Reader.ReadByte(); }
-		protected object ReadShort() { return Reader.ReadInt16(); }
-		protected object ReadUShort() { return Reader.ReadUInt16(); }
-		protected object ReadInt() { return Reader.ReadInt32(); }
-		protected object ReadUInt() { return Reader.ReadUInt32(); }
-		protected object ReadLong() { return Reader.ReadInt64(); }
-		protected object ReadULong() { return Reader.ReadUInt64(); }
-		protected object ReadBool() { return Reader.ReadBoolean(); }
-		protected object ReadChar() { return Reader.ReadChar(); }
-		protected object ReadFloat() { return Reader.ReadSingle(); }
-		protected object ReadDouble() { return Reader.ReadDouble(); }
+		private object ReadSByte() { return Reader.ReadSByte(); }
+		private object ReadByte() { return Reader.ReadByte(); }
+		private object ReadShort() { return Reader.ReadInt16(); }
+		private object ReadUShort() { return Reader.ReadUInt16(); }
+		private object ReadInt() { return Reader.ReadInt32(); }
+		private object ReadUInt() { return Reader.ReadUInt32(); }
+		private object ReadLong() { return Reader.ReadInt64(); }
+		private object ReadULong() { return Reader.ReadUInt64(); }
+		private object ReadBool() { return Reader.ReadBoolean(); }
+		private object ReadChar() { return Reader.ReadChar(); }
+		private object ReadFloat() { return Reader.ReadSingle(); }
+		private object ReadDouble() { return Reader.ReadDouble(); }
 
-		protected DateTime ReadDateTime() { return DateTime.FromBinary(Reader.ReadInt64()); }
-		protected TimeSpan ReadTimeSpan() { return new TimeSpan(Reader.ReadInt64()); }
+		private DateTime ReadDateTime() { return DateTime.FromBinary(Reader.ReadInt64()); }
+		private TimeSpan ReadTimeSpan() { return new TimeSpan(Reader.ReadInt64()); }
 
-		protected object ReadString() {
+		private object ReadString()
+		{
 			var s = Reader.ReadString();
 			return s != "" ? s : Reader.ReadBoolean() ? null : "";
 		}
@@ -234,7 +235,7 @@ namespace Yuzu.Binary
 
 		public void ClearClassIds() { classDefs = new List<ClassDef> { new ClassDef() }; }
 
-		protected ClassDef GetClassDef(short classId)
+		private ClassDef GetClassDef(short classId)
 		{
 			if (classId < classDefs.Count)
 				return classDefs[classId];
