@@ -831,8 +831,13 @@ namespace YuzuTest.Json
 		{
 			var jd = new JsonDeserializer();
 			var w = new SampleObj();
-			jd.FromString(w, "{ \"F\": 123.4 }");
+			const string str = "{ \"F\": 123.4 }";
+			jd.FromString(w, str);
 			Assert.AreEqual(123.4, w.F);
+			var wg = new SampleObj();
+			SampleObj_JsonDeserializer.Instance.FromString(wg, str);
+			Assert.AreEqual(123.4, wg.F);
+
 			jd.FromString(w, "{ \"F\": [1,2,3] }");
 			CollectionAssert.AreEqual(new object[] { 1.0, 2.0, 3.0 }, (List<object>)w.F);
 			jd.FromString(w, "{ \"F\": {\"a\":\"1\", \"b\": \"2\"} }");

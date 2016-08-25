@@ -445,7 +445,7 @@ namespace Yuzu.Json
 			return (Action<T>)Delegate.CreateDelegate(typeof(Action<T>), obj, m);
 		}
 
-		private object ReadAnyObject() {
+		protected object ReadAnyObject() {
 			var ch = SkipSpaces();
 			PutBack(ch);
 			switch (ch) {

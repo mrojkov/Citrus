@@ -255,6 +255,7 @@ namespace Yuzu.Json
 			simpleValueReader[typeof(DateTime)] = "RequireDateTime()";
 			simpleValueReader[typeof(TimeSpan)] = "RequireTimeSpan()";
 			simpleValueReader[typeof(string)] = "RequireString()";
+			simpleValueReader[typeof(object)] = "ReadAnyObject()";
 		}
 
 		private void GenerateValue(Type t, string name)

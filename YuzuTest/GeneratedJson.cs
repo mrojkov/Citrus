@@ -292,6 +292,49 @@ namespace YuzuGen.YuzuTest
 		}
 	}
 
+	class SampleObj_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new SampleObj_JsonDeserializer Instance = new SampleObj_JsonDeserializer();
+
+		public SampleObj_JsonDeserializer()
+		{
+			Options.Assembly = Assembly.Load("YuzuTest, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null");
+			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
+			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
+			JsonOptions.IgnoreCompact = false;
+			JsonOptions.Int64AsString = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.ArrayLengthPrefix = false;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderTyped<global::YuzuTest.SampleObj>(Reader);
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new global::YuzuTest.SampleObj(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (global::YuzuTest.SampleObj)obj;
+			if ("F" != name) throw new YuzuException("F!=" + name);
+			result.F = ReadAnyObject();
+			name = GetNextName(false);
+			Require('}');
+			return result;
+		}
+	}
+
 	class SampleDict_JsonDeserializer : JsonDeserializerGenBase
 	{
 		public static new SampleDict_JsonDeserializer Instance = new SampleDict_JsonDeserializer();
