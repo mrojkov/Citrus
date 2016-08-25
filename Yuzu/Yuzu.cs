@@ -250,6 +250,11 @@ namespace Yuzu
 		public abstract object FromString(string source);
 		public abstract object FromStream(Stream source);
 		public abstract object FromBytes(byte[] bytes);
+
+		public abstract T FromReader<T>(BinaryReader reader);
+		public abstract T FromString<T>(string source);
+		public abstract T FromStream<T>(Stream source);
+		public abstract T FromBytes<T>(byte[] bytes);
 	}
 
 	public abstract class AbstractReaderDeserializer: AbstractDeserializer
@@ -259,6 +264,7 @@ namespace Yuzu
 		public virtual void Initialize() { }
 		public abstract object FromReaderInt();
 		public abstract object FromReaderInt(object obj);
+		public abstract T FromReaderInt<T>();
 
 		public override object FromReader(object obj, BinaryReader reader)
 		{
@@ -303,6 +309,29 @@ namespace Yuzu
 		{
 			return FromStream(new MemoryStream(bytes, false));
 		}
+
+		public override T FromReader<T>(BinaryReader reader)
+		{
+			Reader = reader;
+			Initialize();
+			return FromReaderInt<T>();
+		}
+
+		public override T FromString<T>(string source)
+		{
+			return FromReader<T>(new BinaryReader(new MemoryStream(Encoding.UTF8.GetBytes(source), false)));
+		}
+
+		public override T FromStream<T>(Stream source)
+		{
+			return FromReader<T>(new BinaryReader(source));
+		}
+
+		public override T FromBytes<T>(byte[] bytes)
+		{
+			return FromStream<T>(new MemoryStream(bytes, false));
+		}
+
 	}
 
 }

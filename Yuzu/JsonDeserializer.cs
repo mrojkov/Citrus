@@ -830,17 +830,6 @@ namespace Yuzu.Json
 			}
 		}
 
-		public T FromReader<T>(BinaryReader reader)
-		{
-			Reader = reader;
-			Initialize();
-			return (T)ReadValueFunc(typeof(T))();
-		}
-
-		public T FromString<T>(string source)
-		{
-			return FromReader<T>(new BinaryReader(new MemoryStream(Encoding.UTF8.GetBytes(source), false)));
-		}
-
+		public override T FromReaderInt<T>() { return (T)ReadValueFunc(typeof(T))(); }
 	}
 }

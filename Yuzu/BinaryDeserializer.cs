@@ -480,18 +480,11 @@ namespace Yuzu.Binary
 			return obj;
 		}
 
-		public T FromReader<T>(BinaryReader reader)
+		public override T FromReaderInt<T>()
 		{
-			Reader = reader;
-			Initialize();
 			if (!ReadCompatibleType(typeof(T)))
 				throw Error("Incompatible type to read into {0}", typeof(T).Name);
 			return (T)ReadValueFunc(typeof(T))();
-		}
-
-		public T FromBytes<T>(byte[] bytes)
-		{
-			return FromReader<T>(new BinaryReader(new MemoryStream(bytes, false)));
 		}
 	}
 }

@@ -200,7 +200,7 @@ namespace YuzuTest
 		{
 			var bd = new BinaryDeserializerGen();
 			binaryStream.Position = 0;
-			var p = (SamplePerson)bd.FromStream(binaryStream);
+			var p = bd.FromStream<SamplePerson>(binaryStream);
 			//var p = new SamplePerson();
 			//bd.FromStream(p, binaryStream);
 			Assert.AreEqual(person.Name, p.Name);

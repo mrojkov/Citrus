@@ -90,6 +90,11 @@ namespace Yuzu.Protobuf
 			throw new NotImplementedException();
 		}
 
+		public override T FromReaderInt<T>()
+		{
+			throw new NotImplementedException();
+		}
+
 		public override object FromReaderInt(object obj)
 		{
 			int count = 1;
