@@ -389,19 +389,11 @@ namespace Orange
 			foreach (var fileInfo in The.Workspace.AssetFiles.Enumerate(".png")) {
 				var cookingRules = cookingRulesMap[fileInfo.Path];
 				if (cookingRules.TextureAtlas == atlasChain) {
-					var maxAtlasSize = GetMaxAtlasSize();
 					var srcTexturePath = AssetPath.Combine(The.Workspace.AssetsDirectory, fileInfo.Path);
 					var pixbuf = new Gdk.Pixbuf(srcTexturePath);
 					DownscaleTextureIfNeeded(ref pixbuf, srcTexturePath, cookingRules);
 					// Ensure that no image exceeded maxAtlasSize limit
-					if (pixbuf.Width > maxAtlasSize.Width || pixbuf.Height > maxAtlasSize.Height) {
-						var w = Math.Min(pixbuf.Width, maxAtlasSize.Width);
-						var h = Math.Min(pixbuf.Height, maxAtlasSize.Height);
-						var pixbufScaled = pixbuf.ScaleSimple(w, h, Gdk.InterpType.Bilinear);
-						pixbuf.Dispose();
-						pixbuf = pixbufScaled;
-						Console.WriteLine("WARNING: '{0}' downscaled to {1}x{2}", srcTexturePath, w, h);
-					}
+					DownscaleTextureToFitAtlas(ref pixbuf, srcTexturePath);
 					var item = new AtlasItem {
 						Path = Path.ChangeExtension(fileInfo.Path, ".atlasPart"),
 						Pixbuf = pixbuf,
@@ -616,6 +608,19 @@ namespace Orange
 				assetsBundle.ImportFile(tmpFile, path, 0, attributes);
 			} finally {
 				File.Delete(tmpFile);
+			}
+		}
+
+		private static void DownscaleTextureToFitAtlas (ref Gdk.Pixbuf texture, string path)
+		{
+			var maxWidth = GetMaxAtlasSize ().Width;
+			var maxHeight = GetMaxAtlasSize ().Height;
+			if (texture.Width > maxWidth || texture.Height > maxHeight) {
+				float ratio = Mathf.Min (maxWidth / (float)texture.Width, maxHeight / (float)texture.Height);
+				int w = Math.Min ((texture.Width * ratio).Round (), maxWidth);
+				int h = Math.Min ((texture.Height * ratio).Round (), maxHeight);
+				Console.WriteLine ("{0} downscaled to {1}x{2}", path, w, h);
+				texture = texture.ScaleSimple (w, h, Gdk.InterpType.Bilinear);
 			}
 		}
 
