@@ -220,6 +220,11 @@ namespace Yuzu.Binary
 			GenerateAfterDeserialization(meta);
 		}
 
+		private string GetMangledTypeNameNS(Type t)
+		{
+			return t.Namespace.Replace('.', '_') + "__" + Utils.GetMangledTypeName(t);
+		}
+
 		public void Generate<T>()
 		{
 			if (typeof(T).IsInterface)
@@ -229,7 +234,7 @@ namespace Yuzu.Binary
 
 			var meta = Meta.Get(typeof(T), options);
 
-			var readerName = "Read_" + Utils.GetMangledTypeName(typeof(T));
+			var readerName = "Read_" + GetMangledTypeNameNS(typeof(T));
 			if (!Utils.IsStruct(typeof(T))) {
 				cw.Put("private void {0}(ClassDef def, object obj)\n", readerName);
 				cw.Put("{\n");
@@ -240,7 +245,7 @@ namespace Yuzu.Binary
 				generatedReaders[typeof(T)] = readerName;
 			}
 
-			var makerName = "Make_" + Utils.GetMangledTypeName(typeof(T));
+			var makerName = "Make_" + GetMangledTypeNameNS(typeof(T));
 			cw.Put("private object {0}(ClassDef def)\n", makerName);
 			cw.Put("{\n");
 			cw.Put("var result = new {0}();\n", Utils.GetTypeSpec(typeof(T)));
