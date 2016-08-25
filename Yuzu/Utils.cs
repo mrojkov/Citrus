@@ -70,6 +70,8 @@ namespace Yuzu.Util
 
 		public static string GetTypeSpec(Type t)
 		{
+			if (t.IsArray)
+				return GetTypeSpec(t.GetElementType()) + "[]";
 			var p = "global::" + t.Namespace + ".";
 			var n = DeclaringTypes(t, ".") + t.Name;
 			if (!t.IsGenericType)

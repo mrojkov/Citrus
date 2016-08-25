@@ -483,6 +483,18 @@ namespace YuzuGenBin
 			if (2 != fd.OurIndex) throw Error("2!=" + fd.OurIndex);
 			result.E = (global::YuzuTest.SampleNested.NestedEnum)Reader.ReadInt32();
 			fd = def.Fields[Reader.ReadInt16()];
+			if (3 == fd.OurIndex) {
+				result.Z = (global::YuzuTest.SampleNested.NestedEnum[])null;
+				var tmp1 = Reader.ReadInt32();
+				if (tmp1 >= 0) {
+					var tmp2 = new global::YuzuTest.SampleNested.NestedEnum[tmp1];
+					for(tmp1 = 0; tmp1 < tmp2.Length; ++tmp1) {
+						tmp2[tmp1] = (global::YuzuTest.SampleNested.NestedEnum)Reader.ReadInt32();
+					}
+					result.Z = tmp2;
+				}
+				fd = def.Fields[Reader.ReadInt16()];
+			}
 			if (fd.OurIndex != ClassDef.EOF) throw Error("Unfinished object");
 		}
 

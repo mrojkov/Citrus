@@ -1091,8 +1091,8 @@ namespace YuzuTest.Binary
 			var v1 = new SampleNested { E = SampleNested.NestedEnum.One, C = new SampleNested.NestedClass() };
 			var result1 = bs.ToBytes(v1);
 			Assert.AreEqual(
-				"20 01 00 " + XS("YuzuTest.SampleNested") + " 02 00 " +
-				XS("C", RoughType.Record, "E", RoughType.Int) +
+				"20 01 00 " + XS("YuzuTest.SampleNested") + " 03 00 " +
+				XS("C", RoughType.Record, "E", RoughType.Int, "Z", RoughType.Sequence) + " 05" +
 				" 01 00 02 00 " + XS("YuzuTest.SampleNested+NestedClass") +
 				" 01 00 " + XS("Z", RoughType.Int) +
 				" 01 00 00 00 00 00 00 00 " +

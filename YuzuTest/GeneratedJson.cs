@@ -1416,6 +1416,21 @@ namespace YuzuGen.YuzuTest
 			if ("E" != name) throw new YuzuException("E!=" + name);
 			result.E = (global::YuzuTest.SampleNested.NestedEnum)Enum.Parse(typeof(global::YuzuTest.SampleNested.NestedEnum), RequireString());
 			name = GetNextName(false);
+			if ("Z" == name) {
+				result.Z = RequireOrNull('[') ? null : new global::YuzuTest.SampleNested.NestedEnum[0];
+				if (result.Z != null) {
+					if (SkipSpacesCarefully() != ']') {
+						var tmp1 = new global::YuzuTest.SampleNested.NestedEnum[RequireUInt()];
+						for(int tmp2 = 0; tmp2 < tmp1.Length; ++tmp2) {
+							Require(',');
+							tmp1[tmp2] = (global::YuzuTest.SampleNested.NestedEnum)Enum.Parse(typeof(global::YuzuTest.SampleNested.NestedEnum), RequireString());
+						}
+						result.Z = tmp1;
+					}
+					Require(']');
+				}
+				name = GetNextName(false);
+			}
 			Require('}');
 			return result;
 		}

@@ -476,6 +476,8 @@ namespace YuzuTest
 		public NestedEnum E;
 		[YuzuRequired]
 		public NestedClass C;
+		[YuzuMember]
+		public NestedEnum[] Z = null;
 	}
 
 	public class Bad1
