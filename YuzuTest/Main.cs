@@ -168,6 +168,7 @@ namespace YuzuTest
 				bd.Generate<SampleSmallTypes>();
 				bd.Generate<SamplePerson>();
 				bd.Generate<SampleInterfaceField>();
+				bd.Generate<SampleConcrete>();
 				bd.Generate<SampleWithCollection>();
 				bd.GenerateFooter();
 				sw.Flush();

@@ -494,6 +494,24 @@ namespace YuzuGenBin
 			return result;
 		}
 
+		private void Read_SampleConcrete(ClassDef def, object obj)
+		{
+			var result = (global::YuzuTest.SampleConcrete)obj;
+			ClassDef.FieldDef fd;
+			fd = def.Fields[Reader.ReadInt16()];
+			if (1 != fd.OurIndex) throw Error("1!=" + fd.OurIndex);
+			result.XX = Reader.ReadInt32();
+			fd = def.Fields[Reader.ReadInt16()];
+			if (fd.OurIndex != ClassDef.EOF) throw Error("Unfinished object");
+		}
+
+		private object Make_SampleConcrete(ClassDef def)
+		{
+			var result = new global::YuzuTest.SampleConcrete();
+			Read_SampleConcrete(def, result);
+			return result;
+		}
+
 		private void Read_SampleWithCollection(ClassDef def, object obj)
 		{
 			var result = (global::YuzuTest.SampleWithCollection)obj;
@@ -552,6 +570,7 @@ namespace YuzuGenBin
 			readFieldsCache[typeof(global::YuzuTest.SampleSmallTypes)] = Read_SampleSmallTypes;
 			readFieldsCache[typeof(global::YuzuTest.SamplePerson)] = Read_SamplePerson;
 			readFieldsCache[typeof(global::YuzuTest.SampleInterfaceField)] = Read_SampleInterfaceField;
+			readFieldsCache[typeof(global::YuzuTest.SampleConcrete)] = Read_SampleConcrete;
 			readFieldsCache[typeof(global::YuzuTest.SampleWithCollection)] = Read_SampleWithCollection;
 			makeCache[typeof(global::YuzuTest.Sample1)] = Make_Sample1;
 			makeCache[typeof(global::YuzuTest.Sample2)] = Make_Sample2;
@@ -573,6 +592,7 @@ namespace YuzuGenBin
 			makeCache[typeof(global::YuzuTest.SampleSmallTypes)] = Make_SampleSmallTypes;
 			makeCache[typeof(global::YuzuTest.SamplePerson)] = Make_SamplePerson;
 			makeCache[typeof(global::YuzuTest.SampleInterfaceField)] = Make_SampleInterfaceField;
+			makeCache[typeof(global::YuzuTest.SampleConcrete)] = Make_SampleConcrete;
 			makeCache[typeof(global::YuzuTest.SampleWithCollection)] = Make_SampleWithCollection;
 		}
 	}

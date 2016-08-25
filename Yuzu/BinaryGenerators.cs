@@ -228,6 +228,11 @@ namespace Yuzu.Binary
 
 		public void Generate<T>()
 		{
+			if (typeof(T).IsInterface)
+				throw new YuzuException("Useless BinaryGenerator for interface " + typeof(T).Name);
+			if (typeof(T).IsAbstract)
+				throw new YuzuException("Useless BinaryGenerator for abstract class " + typeof(T).Name);
+
 			var meta = Meta.Get(typeof(T), options);
 
 			var readerName = "Read_" + Utils.GetMangledTypeName(typeof(T));

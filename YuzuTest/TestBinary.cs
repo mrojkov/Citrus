@@ -754,6 +754,8 @@ namespace YuzuTest.Binary
 
 			var w1 = bd.FromBytes<SampleAbstract>(result1);
 			Assert.AreEqual((v1 as SampleConcrete).XX, (w1 as SampleConcrete).XX);
+			var w1g = (SampleConcrete)(new BinaryDeserializerGen().FromBytes(result1));
+			Assert.AreEqual((v1 as SampleConcrete).XX, w1g.XX);
 
 			var v2 = new List<SampleAbstract>();
 			v2.Add(new SampleConcrete { XX = 51 });
@@ -1133,6 +1135,11 @@ namespace YuzuTest.Binary
 		{
 			var bd = new BinaryDeserializer();
 			bd.Options.AllowEmptyTypes = true;
+			var bdg = new BinaryDeserializerGenerator();
+
+			XAssert.Throws<YuzuException>(() => bdg.Generate<ISample>(), "ISample");
+			XAssert.Throws<YuzuException>(() => bdg.Generate<SampleAbstract>(), "SampleAbstract");
+			XAssert.Throws<YuzuException>(() => bd.FromBytes<int>(new byte[] { 0xFF }), "255");
 
 			XAssert.Throws<YuzuException>(() => bd.FromBytes(new byte[] { 0xFF }), "255");
 			XAssert.Throws<YuzuException>(() => bd.FromBytes<int>(new byte[] { 0xFF }), "255");
