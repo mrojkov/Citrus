@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -85,6 +86,31 @@ namespace Yuzu.Util
 			var args = String.Join("__", t.GetGenericArguments().Select(a => GetMangledTypeName(a)));
 			return n.Remove(n.IndexOf('`')) + "_" + args;
 		}
+	}
 
+	internal class CodeWriter
+	{
+		public StreamWriter Output;
+		private int indentLevel = 0;
+		public string IndentString = "\t";
+
+		public void PutPart(string format, params object[] p)
+		{
+			var s = p.Length > 0 ? String.Format(format, p) : format;
+			Output.Write(s.Replace("\n", "\r\n"));
+		}
+
+		public void Put(string format, params object[] p)
+		{
+			var s = p.Length > 0 ? String.Format(format, p) : format;
+			if (s.StartsWith("}")) // "}\n" or "} while"
+				indentLevel -= 1;
+			if (s != "\n")
+				for (int i = 0; i < indentLevel; ++i)
+					PutPart(IndentString);
+			PutPart(s);
+			if (s.EndsWith("{\n"))
+				indentLevel += 1;
+		}
 	}
 }

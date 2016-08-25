@@ -122,11 +122,15 @@ namespace Yuzu.Json
 	{
 		public static new JsonDeserializerGenerator Instance = new JsonDeserializerGenerator();
 
-		private int indent = 0;
-		public StreamWriter GenWriter;
-
+		private CodeWriter cw = new CodeWriter();
 		private string wrapperNameSpace = "";
 		private string lastNameSpace = "";
+
+		public StreamWriter GenWriter
+		{
+			get { return cw.Output; }
+			set { cw.Output = value; }
+		}
 
 		public JsonDeserializerGenerator(string wrapperNameSpace = "YuzuGen")
 		{
@@ -134,41 +138,18 @@ namespace Yuzu.Json
 			this.wrapperNameSpace = wrapperNameSpace;
 		}
 
-		private void PutPart(string format, params object[] p)
-		{
-			var s = p.Length > 0 ? String.Format(format, p) : format;
-			GenWriter.Write(s.Replace("\n", "\r\n"));
-		}
-
-		private void Put(string s)
-		{
-			if (s.StartsWith("}")) // "}\n" or "} while"
-				indent -= 1;
-			if (s != "\n")
-				for (int i = 0; i < indent; ++i)
-					PutPart(JsonOptions.Indent);
-			PutPart(s);
-			if (s.EndsWith("{\n"))
-				indent += 1;
-		}
-
-		private void Put(string format, params object[] p)
-		{
-			Put(String.Format(format, p));
-		}
-
 		public void GenerateHeader()
 		{
-			Put("using System;\n");
-			Put("using System.Reflection;\n");
-			Put("\n");
-			Put("using Yuzu;\n");
-			Put("using Yuzu.Json;\n");
+			cw.Put("using System;\n");
+			cw.Put("using System.Reflection;\n");
+			cw.Put("\n");
+			cw.Put("using Yuzu;\n");
+			cw.Put("using Yuzu.Json;\n");
 		}
 
 		public void GenerateFooter()
 		{
-			Put("}\n"); // Close namespace.
+			cw.Put("}\n"); // Close namespace.
 		}
 
 		private int tempCount = 0;
@@ -180,67 +161,66 @@ namespace Yuzu.Json
 
 		private void PutRequireOrNull(char ch, Type t, string name)
 		{
-			PutPart("RequireOrNull('{0}') ? null : new {1}();\n", ch, Utils.GetTypeSpec(t));
-			Put("if ({0} != null) {{\n", name);
+			cw.PutPart("RequireOrNull('{0}') ? null : new {1}();\n", ch, Utils.GetTypeSpec(t));
+			cw.Put("if ({0} != null) {{\n", name);
 		}
 
 		private void PutRequireOrNullArray(char ch, Type t, string name)
 		{
-			PutPart(
-				"RequireOrNull('{0}') ? null : new {1}[0];\n", ch, Utils.GetTypeSpec(t.GetElementType()));
-			Put("if ({0} != null) {{\n", name);
+			cw.PutPart("RequireOrNull('{0}') ? null : new {1}[0];\n", ch, Utils.GetTypeSpec(t.GetElementType()));
+			cw.Put("if ({0} != null) {{\n", name);
 		}
 
 		private void GenerateCollection(Type t, Type icoll, string name)
 		{
-			Put("if (SkipSpacesCarefully() == ']') {\n");
-			Put("Require(']');\n");
-			Put("}\n");
-			Put("else {\n");
-			Put("do {\n");
+			cw.Put("if (SkipSpacesCarefully() == ']') {\n");
+			cw.Put("Require(']');\n");
+			cw.Put("}\n");
+			cw.Put("else {\n");
+			cw.Put("do {\n");
 			var tempName = GetTempName();
-			Put("var {0} = ", tempName);
+			cw.Put("var {0} = ", tempName);
 			GenerateValue(icoll.GetGenericArguments()[0], tempName);
 			// Check for explicit vs implicit interface implementation.
 			var imap = t.GetInterfaceMap(icoll);
 			var addIndex = Array.FindIndex(imap.InterfaceMethods, m => m.Name == "Add");
 			if (imap.TargetMethods[addIndex].Name == "Add")
-				Put("{0}.Add({1});\n", name, tempName);
+				cw.Put("{0}.Add({1});\n", name, tempName);
 			else
-				Put("(({2}){0}).Add({1});\n", name, tempName, Utils.GetTypeSpec(icoll));
-			Put("} while (Require(']', ',') == ',');\n");
-			Put("}\n");
+				cw.Put("(({2}){0}).Add({1});\n", name, tempName, Utils.GetTypeSpec(icoll));
+			cw.Put("} while (Require(']', ',') == ',');\n");
+			cw.Put("}\n");
 		}
 
 		private void GenerateMerge(Type t, string name)
 		{
 			var icoll = t.GetInterface(typeof(ICollection<>).Name);
 			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
-				Put("Require('{');\n");
+				cw.Put("Require('{');\n");
 				GenerateDictionary(t, name);
 			}
 			else if (icoll != null) {
-				Put("Require('[');\n");
+				cw.Put("Require('[');\n");
 				GenerateCollection(t, icoll, name);
 			}
 			else if ((t.IsClass || t.IsInterface) && t != typeof(object))
-				Put(String.Format("{0}.Instance.FromReader({1}, Reader);\n", GetDeserializerName(t), name));
+				cw.Put("{0}.Instance.FromReader({1}, Reader);\n", GetDeserializerName(t), name);
 			else
 				throw Error("Unable to merge field {1} of type {0}", name, t.Name);
 		}
 
 		private void GenerateDictionary(Type t, string name)
 		{
-			Put("if (SkipSpacesCarefully() == '}') {\n");
-			Put("Require('}');\n");
-			Put("}\n");
-			Put("else {\n");
-			Put("do {\n");
+			cw.Put("if (SkipSpacesCarefully() == '}') {\n");
+			cw.Put("Require('}');\n");
+			cw.Put("}\n");
+			cw.Put("else {\n");
+			cw.Put("do {\n");
 			var tempKeyStr = GetTempName();
-			Put("var {0} = RequireString();\n", tempKeyStr);
-			Put("Require(':');\n");
+			cw.Put("var {0} = RequireString();\n", tempKeyStr);
+			cw.Put("Require(':');\n");
 			var tempValue = GetTempName();
-			Put("var {0} = ", tempValue);
+			cw.Put("var {0} = ", tempValue);
 			GenerateValue(t.GetGenericArguments()[1], tempValue);
 			var keyType = t.GetGenericArguments()[0];
 			var tempKey =
@@ -250,61 +230,61 @@ namespace Yuzu.Json
 					String.Format("({0})Enum.Parse(typeof({0}), {1})", Utils.GetTypeSpec(keyType), tempKeyStr) :
 				// Slow.
 					String.Format("({0})keyParsers[typeof({0})]({1})", Utils.GetTypeSpec(keyType), tempKeyStr);
-			Put("{0}.Add({1}, {2});\n", name, tempKey, tempValue);
-			Put("} while (Require('}', ',') == ',');\n");
-			Put("}\n");
+			cw.Put("{0}.Add({1}, {2});\n", name, tempKey, tempValue);
+			cw.Put("} while (Require('}', ',') == ',');\n");
+			cw.Put("}\n");
 		}
 
 		private void GenerateValue(Type t, string name)
 		{
 			var icoll = t.GetInterface(typeof(ICollection<>).Name);
 			if (t == typeof(int)) {
-				PutPart("RequireInt();\n");
+				cw.PutPart("RequireInt();\n");
 			}
 			else if (t == typeof(uint)) {
-				PutPart("RequireUInt();\n");
+				cw.PutPart("RequireUInt();\n");
 			}
 			else if (t == typeof(long)) {
-				PutPart("RequireLong();\n");
+				cw.PutPart("RequireLong();\n");
 			}
 			else if (t == typeof(ulong)) {
-				PutPart("RequireULong();\n");
+				cw.PutPart("RequireULong();\n");
 			}
 			else if (t == typeof(short)) {
-				PutPart("checked((short)RequireInt());\n");
+				cw.PutPart("checked((short)RequireInt());\n");
 			}
 			else if (t == typeof(ushort)) {
-				PutPart("checked((ushort)RequireUInt());\n");
+				cw.PutPart("checked((ushort)RequireUInt());\n");
 			}
 			else if (t == typeof(sbyte)) {
-				PutPart("checked((sbyte)RequireInt());\n");
+				cw.PutPart("checked((sbyte)RequireInt());\n");
 			}
 			else if (t == typeof(byte)) {
-				PutPart("checked((byte)RequireUInt());\n");
+				cw.PutPart("checked((byte)RequireUInt());\n");
 			}
 			else if (t == typeof(char)) {
-				PutPart("RequireChar();\n");
+				cw.PutPart("RequireChar();\n");
 			}
 			else if (t == typeof(string)) {
-				PutPart("RequireString();\n");
+				cw.PutPart("RequireString();\n");
 			}
 			else if (t == typeof(bool)) {
-				PutPart("RequireBool();\n");
+				cw.PutPart("RequireBool();\n");
 			}
 			else if (t == typeof(float)) {
-				PutPart("RequireSingle();\n");
+				cw.PutPart("RequireSingle();\n");
 			}
 			else if (t == typeof(double)) {
-				PutPart("RequireDouble();\n");
+				cw.PutPart("RequireDouble();\n");
 			}
 			else if (t == typeof(DateTime)) {
-				PutPart("RequireDateTime();\n");
+				cw.PutPart("RequireDateTime();\n");
 			}
 			else if (t == typeof(TimeSpan)) {
-				PutPart("RequireTimeSpan();\n");
+				cw.PutPart("RequireTimeSpan();\n");
 			}
 			else if (t.IsEnum) {
-				PutPart(
+				cw.PutPart(
 					JsonOptions.EnumAsString ?
 						"({0})Enum.Parse(typeof({0}), RequireString());\n" :
 						"({0})RequireInt();\n",
@@ -313,51 +293,51 @@ namespace Yuzu.Json
 			else if(t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
 				PutRequireOrNull('{', t, name);
 				GenerateDictionary(t, name);
-				Put("}\n");
+				cw.Put("}\n");
 			}
 			else if (t.IsArray && !JsonOptions.ArrayLengthPrefix) {
 				PutRequireOrNullArray('[', t, name);
-				Put("if (SkipSpacesCarefully() == ']') {\n");
-				Put("Require(']');\n");
-				Put("}\n");
-				Put("else {\n");
+				cw.Put("if (SkipSpacesCarefully() == ']') {\n");
+				cw.Put("Require(']');\n");
+				cw.Put("}\n");
+				cw.Put("else {\n");
 				var tempListName = GetTempName();
-				Put("var {0} = new List<{1}>();\n", tempListName, Utils.GetTypeSpec(t.GetElementType()));
-				Put("do {\n");
+				cw.Put("var {0} = new List<{1}>();\n", tempListName, Utils.GetTypeSpec(t.GetElementType()));
+				cw.Put("do {\n");
 				var tempName = GetTempName();
-				Put("var {0} = ", tempName);
+				cw.Put("var {0} = ", tempName);
 				GenerateValue(t.GetElementType(), tempName);
-				Put("{0}.Add({1});\n", tempListName, tempName);
-				Put("} while (Require(']', ',') == ',');\n");
-				Put("{0} = {1}.ToArray();\n", name, tempListName);
-				Put("}\n");
-				Put("}\n");
+				cw.Put("{0}.Add({1});\n", tempListName, tempName);
+				cw.Put("} while (Require(']', ',') == ',');\n");
+				cw.Put("{0} = {1}.ToArray();\n", name, tempListName);
+				cw.Put("}\n");
+				cw.Put("}\n");
 			}
 			else if (t.IsArray && JsonOptions.ArrayLengthPrefix) {
 				PutRequireOrNullArray('[', t, name);
-				Put("if (SkipSpacesCarefully() != ']') {\n");
+				cw.Put("if (SkipSpacesCarefully() != ']') {\n");
 				var tempArrayName = GetTempName();
-				Put("var {0} = new {1}[RequireUInt()];\n", tempArrayName, Utils.GetTypeSpec(t.GetElementType()));
+				cw.Put("var {0} = new {1}[RequireUInt()];\n", tempArrayName, Utils.GetTypeSpec(t.GetElementType()));
 				var tempIndexName = GetTempName();
-				Put("for(int {0} = 0; {0} < {1}.Length; ++{0}) {{\n", tempIndexName, tempArrayName);
-				Put("Require(',');\n");
-				Put("{0}[{1}] = ", tempArrayName, tempIndexName);
+				cw.Put("for(int {0} = 0; {0} < {1}.Length; ++{0}) {{\n", tempIndexName, tempArrayName);
+				cw.Put("Require(',');\n");
+				cw.Put("{0}[{1}] = ", tempArrayName, tempIndexName);
 				GenerateValue(t.GetElementType(), String.Format("{0}[{1}]", tempArrayName, tempIndexName));
-				Put("}\n");
-				Put("{0} = {1};\n", name, tempArrayName);
-				Put("}\n");
-				Put("Require(']');\n");
-				Put("}\n");
+				cw.Put("}\n");
+				cw.Put("{0} = {1};\n", name, tempArrayName);
+				cw.Put("}\n");
+				cw.Put("Require(']');\n");
+				cw.Put("}\n");
 			}
 			else if (icoll != null) {
 				PutRequireOrNull('[', t, name);
 				GenerateCollection(t, icoll, name);
-				Put("}\n");
+				cw.Put("}\n");
 			}
 			else if (t.IsClass && !t.IsAbstract || Utils.IsStruct(t))
-				PutPart("{0}.Instance.FromReaderTyped<{1}>(Reader);\n", GetDeserializerName(t), Utils.GetTypeSpec(t));
+				cw.PutPart("{0}.Instance.FromReaderTyped<{1}>(Reader);\n", GetDeserializerName(t), Utils.GetTypeSpec(t));
 			else if (t.IsInterface || t.IsAbstract)
-				PutPart("{0}.Instance.FromReaderInterface<{1}>(Reader);\n", GetDeserializerName(t), Utils.GetTypeSpec(t));
+				cw.PutPart("{0}.Instance.FromReaderInterface<{1}>(Reader);\n", GetDeserializerName(t), Utils.GetTypeSpec(t));
 			else
 				throw new NotImplementedException(t.Name);
 		}
@@ -369,14 +349,14 @@ namespace Yuzu.Json
 					var f = (FieldInfo)m;
 					var v = Utils.CodeValueFormat(f.GetValue(obj));
 					if (v != "") // TODO
-						Put("{0}.{1} = {2};\n", name, f.Name, v);
+						cw.Put("{0}.{1} = {2};\n", name, f.Name, v);
 				}
 				else if (m.MemberType == MemberTypes.Property) {
 					var p = (PropertyInfo)m;
 					if (p.CanWrite) {
 						var v = Utils.CodeValueFormat(p.GetValue(obj, new object[] { }));
 						if (v != "") // TODO
-							Put("{0}.{1} = {2};\n", name, p.Name, v);
+							cw.Put("{0}.{1} = {2};\n", name, p.Name, v);
 					}
 				}
 			}
@@ -385,7 +365,7 @@ namespace Yuzu.Json
 		private void GenerateAfterDeserialization(Meta meta)
 		{
 			foreach (var a in meta.AfterDeserialization)
-				Put("result.{0}();\n", a.Info.Name);
+				cw.Put("result.{0}();\n", a.Info.Name);
 		}
 
 		public void Generate<T>()
@@ -394,116 +374,116 @@ namespace Yuzu.Json
 
 			if (lastNameSpace != typeof(T).Namespace) {
 				if (lastNameSpace != "")
-					Put("}\n");
-				Put("\n");
+					cw.Put("}\n");
+				cw.Put("\n");
 				lastNameSpace = typeof(T).Namespace;
-				Put("namespace {0}.{1}\n", wrapperNameSpace, lastNameSpace);
-				Put("{\n");
+				cw.Put("namespace {0}.{1}\n", wrapperNameSpace, lastNameSpace);
+				cw.Put("{\n");
 			}
 
 			var deserializerName = Utils.GetMangledTypeName(typeof(T)) + "_JsonDeserializer";
-			Put("class {0} : JsonDeserializerGenBase\n", deserializerName);
-			Put("{\n");
+			cw.Put("class {0} : JsonDeserializerGenBase\n", deserializerName);
+			cw.Put("{\n");
 
-			Put("public static new {0} Instance = new {0}();\n", deserializerName);
-			Put("\n");
+			cw.Put("public static new {0} Instance = new {0}();\n", deserializerName);
+			cw.Put("\n");
 
-			Put("public {0}()\n", deserializerName);
-			Put("{\n");
-			Put("Options.Assembly = Assembly.Load(\"{0}\");\n", typeof(T).Assembly.FullName);
+			cw.Put("public {0}()\n", deserializerName);
+			cw.Put("{\n");
+			cw.Put("Options.Assembly = Assembly.Load(\"{0}\");\n", typeof(T).Assembly.FullName);
 			GenAssigns("Options", Options);
 			GenAssigns("JsonOptions", JsonOptions);
-			Put("}\n");
-			Put("\n");
+			cw.Put("}\n");
+			cw.Put("\n");
 
 			var icoll = typeof(T).GetInterface(typeof(ICollection<>).Name);
 			var typeSpec = Utils.GetTypeSpec(typeof(T));
-			Put("public override object FromReaderInt()\n");
-			Put("{\n");
+			cw.Put("public override object FromReaderInt()\n");
+			cw.Put("{\n");
 			if (icoll != null)
-				Put("return FromReaderInt(new {0}());\n", typeSpec);
+				cw.Put("return FromReaderInt(new {0}());\n", typeSpec);
 			else if (typeof(T).IsInterface || typeof(T).IsAbstract)
-				Put("return FromReaderInterface<{0}>(Reader);\n", typeSpec);
+				cw.Put("return FromReaderInterface<{0}>(Reader);\n", typeSpec);
 			else
-				Put("return FromReaderTyped<{0}>(Reader);\n", typeSpec);
-			Put("}\n");
-			Put("\n");
+				cw.Put("return FromReaderTyped<{0}>(Reader);\n", typeSpec);
+			cw.Put("}\n");
+			cw.Put("\n");
 
 			if (icoll != null) {
-				Put("public override object FromReaderInt(object obj)\n");
-				Put("{\n");
-				Put("var result = ({0})obj;\n", typeSpec);
-				Put("Require('[');\n");
+				cw.Put("public override object FromReaderInt(object obj)\n");
+				cw.Put("{\n");
+				cw.Put("var result = ({0})obj;\n", typeSpec);
+				cw.Put("Require('[');\n");
 				GenerateCollection(typeof(T), icoll, "result");
-				Put("return result;\n");
-				Put("}\n");
-				Put("\n");
+				cw.Put("return result;\n");
+				cw.Put("}\n");
+				cw.Put("\n");
 			}
 
-			Put("public override object FromReaderIntPartial(string name)\n");
-			Put("{\n");
+			cw.Put("public override object FromReaderIntPartial(string name)\n");
+			cw.Put("{\n");
 			if (typeof(T).IsInterface || typeof(T).IsAbstract)
-				Put("return null;\n");
+				cw.Put("return null;\n");
 			else
-				Put("return ReadFields(new {0}(), name);\n", typeSpec);
-			Put("}\n");
-			Put("\n");
+				cw.Put("return ReadFields(new {0}(), name);\n", typeSpec);
+			cw.Put("}\n");
+			cw.Put("\n");
 
-			Put("protected override object ReadFields(object obj, string name)\n");
-			Put("{\n");
-			Put("var result = ({0})obj;\n", typeSpec);
+			cw.Put("protected override object ReadFields(object obj, string name)\n");
+			cw.Put("{\n");
+			cw.Put("var result = ({0})obj;\n", typeSpec);
 			if (icoll == null) {
 				tempCount = 0;
 				foreach (var yi in meta.Items) {
 					if (yi.IsOptional) {
-						Put("if (\"{0}\" == name) {{\n", yi.Tag(Options));
+						cw.Put("if (\"{0}\" == name) {{\n", yi.Tag(Options));
 						if (yi.SetValue != null)
-							Put("result.{0} = ", yi.Name);
+							cw.Put("result.{0} = ", yi.Name);
 					}
 					else {
-						Put("if (\"{0}\" != name) throw new YuzuException(\"{0}!=\" + name);\n", yi.Tag(Options));
+						cw.Put("if (\"{0}\" != name) throw new YuzuException(\"{0}!=\" + name);\n", yi.Tag(Options));
 						if (yi.SetValue != null)
-							Put("result.{0} = ", yi.Name);
+							cw.Put("result.{0} = ", yi.Name);
 					}
 					if (yi.SetValue != null)
 						GenerateValue(yi.Type, "result." + yi.Name);
 					else
 						GenerateMerge(yi.Type, "result." + yi.Name);
-					Put("name = GetNextName(false);\n");
+					cw.Put("name = GetNextName(false);\n");
 					if (yi.IsOptional)
-						Put("}\n");
+						cw.Put("}\n");
 				}
-				Put("Require('}');\n");
+				cw.Put("Require('}');\n");
 				GenerateAfterDeserialization(meta);
 			}
-			Put("return result;\n");
-			Put("}\n");
+			cw.Put("return result;\n");
+			cw.Put("}\n");
 
 			if (meta.IsCompact) {
-				Put("\n");
-				Put("protected override object ReadFieldsCompact(object obj)\n");
-				Put("{\n");
-				Put("var result = ({0})obj;\n", typeSpec);
+				cw.Put("\n");
+				cw.Put("protected override object ReadFieldsCompact(object obj)\n");
+				cw.Put("{\n");
+				cw.Put("var result = ({0})obj;\n", typeSpec);
 				bool isFirst = true;
 				tempCount = 0;
 				foreach (var yi in meta.Items) {
 					if (!isFirst)
-						Put("Require(',');\n");
+						cw.Put("Require(',');\n");
 					isFirst = false;
 					if (yi.SetValue != null) {
-						Put("result.{0} = ", yi.Name);
+						cw.Put("result.{0} = ", yi.Name);
 						GenerateValue(yi.Type, "result." + yi.Name);
 					}
 					else
 						GenerateMerge(yi.Type, "result." + yi.Name);
 				}
-				Put("Require(']');\n");
+				cw.Put("Require(']');\n");
 				GenerateAfterDeserialization(meta);
-				Put("return result;\n");
-				Put("}\n");
+				cw.Put("return result;\n");
+				cw.Put("}\n");
 			}
-			Put("}\n");
-			Put("\n");
+			cw.Put("}\n");
+			cw.Put("\n");
 		}
 
 		public override object FromReaderInt(object obj)
