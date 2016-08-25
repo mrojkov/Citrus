@@ -1,11 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 
 using Yuzu;
 using Yuzu.Json;
-
 
 namespace YuzuGen.YuzuTest
 {

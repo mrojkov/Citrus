@@ -184,13 +184,10 @@ namespace Yuzu.Json
 		public void GenerateHeader()
 		{
 			Put("using System;\n");
-			Put("using System.Collections.Generic;\n");
-			Put("using System.IO;\n");
 			Put("using System.Reflection;\n");
 			Put("\n");
 			Put("using Yuzu;\n");
 			Put("using Yuzu.Json;\n");
-			Put("\n");
 		}
 
 		public void GenerateFooter()
