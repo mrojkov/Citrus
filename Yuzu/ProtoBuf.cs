@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 
+using Yuzu.Deserializer;
 using Yuzu.Metadata;
 
 namespace Yuzu.Protobuf

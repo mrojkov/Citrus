@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 
+using Yuzu.Deserializer;
 using Yuzu.Metadata;
 using Yuzu.Util;
 

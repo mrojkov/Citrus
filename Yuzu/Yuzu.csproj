@@ -48,6 +48,7 @@
     <Compile Include="BinaryGenerators.cs" />
     <Compile Include="BinarySerializer.cs" />
     <Compile Include="Code.cs" />
+    <Compile Include="ReaderDeserializer.cs" />
     <Compile Include="UnsafeReader.cs" />
     <Compile Include="JsonDeserializer.cs" />
     <Compile Include="JsonGenerators.cs" />

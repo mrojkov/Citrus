@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
+using Yuzu.Deserializer;
 using Yuzu.Metadata;
 using Yuzu.Util;
 
