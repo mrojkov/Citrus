@@ -27,26 +27,29 @@ namespace Yuzu.Binary
 				Options.ReportErrorPosition ? new YuzuPosition(Reader.BaseStream.Position) : null);
 		}
 
-		protected object ReadSByte() { return Reader.ReadSByte(); }
-		protected object ReadByte() { return Reader.ReadByte(); }
-		protected object ReadShort() { return Reader.ReadInt16(); }
-		protected object ReadUShort() { return Reader.ReadUInt16(); }
-		protected object ReadInt() { return Reader.ReadInt32(); }
-		protected object ReadUInt() { return Reader.ReadUInt32(); }
-		protected object ReadLong() { return Reader.ReadInt64(); }
-		protected object ReadULong() { return Reader.ReadUInt64(); }
-		protected object ReadBool() { return Reader.ReadBoolean(); }
-		protected object ReadChar() { return Reader.ReadChar(); }
-		protected object ReadFloat() { return Reader.ReadSingle(); }
-		protected object ReadDouble() { return Reader.ReadDouble(); }
+		private object ReadSByte() { return Reader.ReadSByte(); }
+		private object ReadByte() { return Reader.ReadByte(); }
+		private object ReadShort() { return Reader.ReadInt16(); }
+		private object ReadUShort() { return Reader.ReadUInt16(); }
+		private object ReadInt() { return Reader.ReadInt32(); }
+		private object ReadUInt() { return Reader.ReadUInt32(); }
+		private object ReadLong() { return Reader.ReadInt64(); }
+		private object ReadULong() { return Reader.ReadUInt64(); }
+		private object ReadBool() { return Reader.ReadBoolean(); }
+		private object ReadChar() { return Reader.ReadChar(); }
+		private object ReadFloat() { return Reader.ReadSingle(); }
+		private object ReadDouble() { return Reader.ReadDouble(); }
 
-		protected DateTime ReadDateTime() { return DateTime.FromBinary(Reader.ReadInt64()); }
-		protected TimeSpan ReadTimeSpan() { return new TimeSpan(Reader.ReadInt64()); }
+		private DateTime ReadDateTime() { return DateTime.FromBinary(Reader.ReadInt64()); }
+		private TimeSpan ReadTimeSpan() { return new TimeSpan(Reader.ReadInt64()); }
 
-		protected object ReadString() {
+		private object ReadString()
+		{
 			var s = Reader.ReadString();
 			return s != "" ? s : Reader.ReadBoolean() ? null : "";
 		}
+
+		private class Record { }
 
 		private Type ReadType()
 		{
@@ -54,14 +57,14 @@ namespace Yuzu.Binary
 			if (RoughType.FirstAtom <= rt && rt <= RoughType.LastAtom)
 				return RT.roughTypeToType[(int)rt];
 			if (rt == RoughType.Sequence)
-				return typeof(List<>).MakeGenericType(ReadType() ?? typeof(object));
+				return typeof(List<>).MakeGenericType(ReadType());
 			if (rt == RoughType.Mapping) {
-				var k = ReadType() ?? typeof(object);
-				var v = ReadType() ?? typeof(object);
+				var k = ReadType();
+				var v = ReadType();
 				return typeof(Dictionary<,>).MakeGenericType(k, v);
 			}
 			if (rt == RoughType.Record)
-				return null;
+				return typeof(Record);
 			throw Error("Unknown rough type {0}", rt);
 		}
 
@@ -102,10 +105,10 @@ namespace Yuzu.Binary
 			readerCache[typeof(byte)] = ReadByte;
 			readerCache[typeof(short)] = ReadShort;
 			readerCache[typeof(ushort)] = ReadUShort;
-			readerCache[typeof(long)] = ReadLong;
-			readerCache[typeof(ulong)] = ReadULong;
 			readerCache[typeof(int)] = ReadInt;
 			readerCache[typeof(uint)] = ReadUInt;
+			readerCache[typeof(long)] = ReadLong;
+			readerCache[typeof(ulong)] = ReadULong;
 			readerCache[typeof(bool)] = ReadBool;
 			readerCache[typeof(char)] = ReadChar;
 			readerCache[typeof(float)] = ReadFloat;
@@ -114,6 +117,7 @@ namespace Yuzu.Binary
 			readerCache[typeof(TimeSpan)] = ReadTimeSpanObj;
 			readerCache[typeof(string)] = ReadString;
 			readerCache[typeof(object)] = ReadAny;
+			readerCache[typeof(Record)] = ReadObject<object>;
 		}
 
 		private object ReadDateTimeObj() { return ReadDateTime(); }
@@ -147,6 +151,17 @@ namespace Yuzu.Binary
 			var rf = ReadValueFunc(typeof(T));
 			for (int i = 0; i < count; ++i)
 				list.Add((T)rf());
+			return list;
+		}
+
+		protected List<object> ReadListRecord()
+		{
+			var count = Reader.ReadInt32();
+			if (count == -1)
+				return null;
+			var list = new List<object>();
+			for (int i = 0; i < count; ++i)
+				list.Add(ReadObject<object>());
 			return list;
 		}
 
@@ -200,22 +215,29 @@ namespace Yuzu.Binary
 
 		protected class ClassDef
 		{
-			internal class FieldDef
+			public class FieldDef
 			{
 				public string Name;
-				public int OurIndex;
+				public int OurIndex; // 1-based
 				public Action<object> ReadFunc;
 			}
 
 			internal Meta Meta;
-			internal List<FieldDef> Fields = new List<FieldDef>();
+			public const int EOF = short.MaxValue;
+			public Action<ClassDef, object> ReadFields;
+			public Func<ClassDef, object> Make;
+			public List<FieldDef> Fields = new List<FieldDef> { new FieldDef { OurIndex = EOF } };
 		}
+
 		// Zeroth element corresponds to 'null'.
 		private List<ClassDef> classDefs = new List<ClassDef> { new ClassDef() };
 
+		protected Dictionary<Type, Action<ClassDef, object>> readFieldsCache = new Dictionary<Type, Action<ClassDef, object>>();
+		protected Dictionary<Type, Func<ClassDef, object>> makeCache = new Dictionary<Type, Func<ClassDef, object>>();
+
 		public void ClearClassIds() { classDefs = new List<ClassDef> { new ClassDef() }; }
 
-		protected ClassDef GetClassDef(short classId)
+		private ClassDef GetClassDef(short classId)
 		{
 			if (classId < classDefs.Count)
 				return classDefs[classId];
@@ -225,6 +247,9 @@ namespace Yuzu.Binary
 			var typeName = Reader.ReadString();
 			var classType = Options.Assembly.GetType(typeName, throwOnError: true);
 			result.Meta = Meta.Get(classType, Options);
+			if (!readFieldsCache.TryGetValue(classType, out result.ReadFields))
+				result.ReadFields = ReadFields;
+			makeCache.TryGetValue(classType, out result.Make);
 			var ourCount = result.Meta.Items.Count;
 			var theirCount = Reader.ReadInt16();
 			int ourIndex = 0, theirIndex = 0;
@@ -251,7 +276,7 @@ namespace Yuzu.Binary
 						if (!ReadCompatibleType(yi.Type))
 							throw Error(
 								"Incompatible type for field {0}, expected {1}", ourName, yi.Type.Name);
-						var fieldDef = new ClassDef.FieldDef { Name = theirName, OurIndex = ourIndex };
+						var fieldDef = new ClassDef.FieldDef { Name = theirName, OurIndex = ourIndex + 1 };
 						if (yi.SetValue != null) {
 							var rf = ReadValueFunc(yi.Type);
 							fieldDef.ReadFunc = obj => yi.SetValue(obj, rf());
@@ -291,18 +316,18 @@ namespace Yuzu.Binary
 			objStack.Push(obj);
 			try {
 				if (def.Meta.IsCompact) {
-					foreach (var f in def.Fields)
-						f.ReadFunc(obj);
+					for (int i = 1; i < def.Fields.Count; ++i)
+						def.Fields[i].ReadFunc(obj);
 				}
 				else {
 					var actualIndex = Reader.ReadInt16();
-					for (int i = 0; i < def.Fields.Count; ++i) {
+					for (int i = 1; i < def.Fields.Count; ++i) {
 						var fd = def.Fields[i];
-						if (i + 1 < actualIndex || actualIndex == 0) {
-							if (fd.OurIndex < 0 || def.Meta.Items[fd.OurIndex].IsOptional)
+						if (i < actualIndex || actualIndex == 0) {
+							if (fd.OurIndex < 0 || def.Meta.Items[fd.OurIndex - 1].IsOptional)
 								continue;
 							throw Error("Expected field '{0}({1})', but found '{2}'",
-								i + 1, fd.Name, actualIndex);
+								i, fd.Name, actualIndex);
 						}
 						fd.ReadFunc(obj);
 						actualIndex = Reader.ReadInt16();
@@ -317,7 +342,7 @@ namespace Yuzu.Binary
 			def.Meta.RunAfterDeserialization(obj);
 		}
 
-		private void ReadIntoObject<T>(object obj)
+		protected void ReadIntoObject<T>(object obj)
 		{
 			var classId = Reader.ReadInt16();
 			if (classId == 0)
@@ -325,10 +350,10 @@ namespace Yuzu.Binary
 			var def = GetClassDef(classId);
 			if (obj.GetType() != def.Meta.Type)
 				throw Error("Unable to read type {0} into {1}", def.Meta.Type, obj.GetType());
-			ReadFields(def, obj);
+			def.ReadFields(def, obj);
 		}
 
-		private object ReadObject<T>() where T: class
+		protected object ReadObject<T>() where T: class
 		{
 			var classId = Reader.ReadInt16();
 			if (classId == 0)
@@ -336,12 +361,14 @@ namespace Yuzu.Binary
 			var def = GetClassDef(classId);
 			if (!typeof(T).IsAssignableFrom(def.Meta.Type))
 				throw Error("Unable to assign type {0} to {1}", def.Meta.Type, typeof(T));
+			if (def.Make != null)
+				return def.Make(def);
 			var result = Activator.CreateInstance(def.Meta.Type);
-			ReadFields(def, result);
+			def.ReadFields(def, result);
 			return result;
 		}
 
-		private object ReadStruct<T>() where T: struct
+		protected object ReadStruct<T>() where T : struct
 		{
 			var classId = Reader.ReadInt16();
 			if (classId == 0)
@@ -349,8 +376,10 @@ namespace Yuzu.Binary
 			var def = GetClassDef(classId);
 			if (!typeof(T).IsAssignableFrom(def.Meta.Type))
 				throw Error("Unable to assign type {0} to {1}", def.Meta.Type, typeof(T));
+			if (def.Make != null)
+				return def.Make(def);
 			var result = Activator.CreateInstance(def.Meta.Type);
-			ReadFields(def, result);
+			def.ReadFields(def, result);
 			return result;
 		}
 
@@ -382,10 +411,13 @@ namespace Yuzu.Binary
 			if (t.IsGenericType) {
 				var g = t.GetGenericTypeDefinition();
 				if (g == typeof(List<>)) {
+					if (t.GetGenericArguments()[0] == typeof(Record))
+						return ReadListRecord;
 					var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadList", t);
 					return () => m.Invoke(this, new object[] { });
 				}
 				if (g == typeof(Dictionary<,>)) {
+					// FIXME: Check for Record, similar to List case above.
 					var m = Utils.GetPrivateCovariantGenericAll(GetType(), "ReadDictionary", t);
 					return () => m.Invoke(this, new object[] { });
 				}
@@ -406,8 +438,6 @@ namespace Yuzu.Binary
 					MakeGenericMethod(t, elemType);
 				return () => m.Invoke(this, new object[] { });
 			}
-			if (t == typeof(object))
-				throw new NotImplementedException();
 			if (t.IsClass || t.IsInterface) {
 				var m = Utils.GetPrivateGeneric(GetType(), "ReadObject", t);
 				return (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);

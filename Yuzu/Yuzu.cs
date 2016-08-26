@@ -122,14 +122,15 @@ namespace Yuzu
 		public Type MergeAttribute = typeof(YuzuMerge);
 
 		public Func<Attribute, string> GetAlias = attr => (attr as YuzuField).Alias;
-		public Func<Attribute, Func<object, object, bool>> GetSerializeCondition = attr => (attr as YuzuSerializeCondition).Check;
+		public Func<Attribute, Func<object, object, bool>> GetSerializeCondition =
+			attr => (attr as YuzuSerializeCondition).Check;
 		public Assembly Assembly = Assembly.GetCallingAssembly();
 		public TagMode TagMode = TagMode.Names;
 		public bool IgnoreNewFields = false;
 		public bool AllowEmptyTypes = false;
 		public bool ReportErrorPosition = true;
 
-		public static readonly CommonOptions Default = new CommonOptions();
+		public static CommonOptions Default = new CommonOptions();
 	}
 
 	public class YuzuPosition
