@@ -1111,8 +1111,6 @@ namespace YuzuTest.Json
 			jd.FromString(w1, result1p);
 			Assert.AreEqual(71, w1[0].X);
 
-			Assert.AreEqual("[]", js.ToString(new List<SampleMemberAbstract>()));
-
 			var v2 = new List<ISampleMember> { new SampleMemberI(), new SampleMemberI { X = 99 } };
 			var result2 = js.ToString(v2);
 			var w2 = new List<ISampleMember>();
@@ -1120,6 +1118,14 @@ namespace YuzuTest.Json
 			YuzuGen.System.Collections.Generic.List_ISampleMember_JsonDeserializer.Instance.FromString(w2, result2);
 			Assert.AreEqual(v2[0].X, w2[0].X);
 			Assert.AreEqual(v2[1].X, w2[1].X);
+
+			Assert.AreEqual("[]", js.ToString(new List<SampleMemberAbstract>()));
+			var v3 = new List<SampleMemberAbstract> { new SampleMemberConcrete() };
+			var result3 = js.ToString(v3);
+			Assert.AreEqual("[{\"class\":\"YuzuTest.SampleMemberConcrete\"}]", result3);
+			var w3 = new List<SampleMemberAbstract>();
+			jd.FromString(w3, result3);
+			Assert.AreEqual(72, w3[0].X);
 		}
 
 		[TestMethod]

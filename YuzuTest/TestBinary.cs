@@ -1143,6 +1143,16 @@ namespace YuzuTest.Binary
 			Assert.AreEqual(71, w1[0].X);
 
 			Assert.AreEqual("21 20 00 00 00 00", XS(bs.ToBytes(new List<SampleMemberAbstract>())));
+
+			var v3 = new List<SampleMemberAbstract> { new SampleMemberConcrete() };
+			var result3 = bs.ToBytes(v3);
+			Assert.AreEqual(
+				"21 20 01 00 00 00 02 00 " +
+				XS("YuzuTest.SampleMemberConcrete") + " 01 00 " + XS("X", RoughType.Int) + " 00 00",
+				XS(result3));
+			var w3 = new List<SampleMemberAbstract>();
+			bd.FromBytes(w3, result3);
+			Assert.AreEqual(72, w3[0].X);
 		}
 
 		[TestMethod]

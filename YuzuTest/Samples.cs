@@ -339,8 +339,10 @@ namespace YuzuTest
 	public abstract class SampleMemberAbstract
 	{
 		[YuzuMember]
-		int X = 72;
+		public int X = 72;
 	}
+
+	public class SampleMemberConcrete : SampleMemberAbstract { }
 
 	public class SampleMemberI : ISampleMember
 	{
