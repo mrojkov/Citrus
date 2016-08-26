@@ -1,11 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 
 using Yuzu;
 using Yuzu.Json;
-
 
 namespace GeneratedDeserializersJSON.Lime
 {
@@ -20,7 +17,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -90,7 +87,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -134,7 +131,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -182,7 +179,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -269,7 +266,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -313,7 +310,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -357,7 +354,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -427,7 +424,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -497,7 +494,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -673,7 +670,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -721,7 +718,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -773,7 +770,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -821,7 +818,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -873,7 +870,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -931,7 +928,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -989,7 +986,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -1053,7 +1050,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -1195,7 +1192,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -1243,7 +1240,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -1291,7 +1288,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -1361,7 +1358,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -1409,7 +1406,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -1467,7 +1464,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -1525,7 +1522,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -1583,7 +1580,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -1647,7 +1644,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -1717,7 +1714,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -1844,7 +1841,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -1936,7 +1933,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -2091,7 +2088,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -2152,7 +2149,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -2263,7 +2260,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -2393,7 +2390,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -2449,7 +2446,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -2596,7 +2593,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -2653,7 +2650,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -2796,7 +2793,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -2895,7 +2892,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -2958,7 +2955,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -3021,7 +3018,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -3084,7 +3081,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -3147,7 +3144,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -3210,7 +3207,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -3273,7 +3270,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -3336,7 +3333,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -3399,7 +3396,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -3462,7 +3459,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -3525,7 +3522,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -3588,7 +3585,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -3651,7 +3648,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -3714,7 +3711,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -3777,7 +3774,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -3840,7 +3837,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -3903,7 +3900,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -3966,7 +3963,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -4029,7 +4026,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -4092,7 +4089,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -4155,7 +4152,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -4218,7 +4215,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -4281,7 +4278,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -4344,7 +4341,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -4407,7 +4404,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -4470,7 +4467,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -4522,7 +4519,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -4574,7 +4571,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -4626,7 +4623,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -4678,7 +4675,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -4730,7 +4727,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -4782,7 +4779,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -4834,7 +4831,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -4886,7 +4883,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -4938,7 +4935,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -4990,7 +4987,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -5042,7 +5039,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -5094,7 +5091,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -5146,7 +5143,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -5198,7 +5195,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -5250,7 +5247,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -5302,7 +5299,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -5354,7 +5351,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -5406,7 +5403,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -5458,7 +5455,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -5510,7 +5507,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -5637,7 +5634,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -5695,7 +5692,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -5765,7 +5762,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -5900,7 +5897,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -5955,7 +5952,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -6015,7 +6012,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -6170,7 +6167,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -6325,7 +6322,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -6436,7 +6433,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -6583,7 +6580,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -6738,7 +6735,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -6841,7 +6838,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -6897,7 +6894,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -7048,7 +7045,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -7211,7 +7208,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -7302,7 +7299,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -7549,7 +7546,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -7696,7 +7693,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -7851,7 +7848,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -7950,7 +7947,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -8109,7 +8106,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -8212,7 +8209,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -8323,7 +8320,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -8486,7 +8483,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -8665,7 +8662,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -8800,7 +8797,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -8943,7 +8940,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";
@@ -8983,7 +8980,7 @@ namespace GeneratedDeserializersJSON.Lime
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
 			JsonOptions.EnumAsString = false;
-			JsonOptions.SaveRootClass = false;
+			JsonOptions.SaveRootClass = true;
 			JsonOptions.IgnoreCompact = false;
 			JsonOptions.Int64AsString = false;
 			JsonOptions.FieldSeparator = "\n";

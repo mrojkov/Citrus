@@ -81,6 +81,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Source\Actions\ConvertAssetsToTangerine.cs" />
     <Compile Include="Source\Actions\ConvertDictionaryToNewFormat.cs" />
     <Compile Include="Source\Actions\CookGameAssets.cs" />
     <Compile Include="Source\Actions\ExtractTangerineScenes.cs" />

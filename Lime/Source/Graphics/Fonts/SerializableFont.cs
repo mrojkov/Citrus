@@ -62,12 +62,16 @@ namespace Lime
 				IFont font;
 				if (fonts.TryGetValue(name, out font))
 					return font;
-				string path = "Fonts/" + name + ".fnt";
-				if (!AssetsBundle.Initialized || !AssetsBundle.Instance.FileExists(path))
-					return Null;
-				font = Serialization.ReadObject<Font>(path);
-				fonts[name] = font;
-				return font;
+				string[] fontExtensions = { ".tft", ".fnt" };
+				foreach (var e in fontExtensions) {
+					string path = "Fonts/" + name + e;
+					if (!AssetsBundle.Initialized || !AssetsBundle.Instance.FileExists(path))
+						continue;
+					font = Serialization.ReadObject<Font>(path);
+					fonts[name] = font;
+					return font;
+				}
+				return Null;
 			}
 		}
 

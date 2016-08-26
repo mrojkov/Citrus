@@ -16,6 +16,7 @@ namespace Orange
 		public static bool GenerateLimeDeserializers()
 		{
 			Lime.Serialization.GenerateDeserializers();
+			Lime.Serialization.GenerateBinaryDeserializers();
 			Console.WriteLine("Done. Please rebuild Orange.");
 			return true;
 		}

@@ -162,9 +162,13 @@ namespace Orange
 			AddStage(DeleteOrphanedMasks);
 			AddStage(DeleteOrphanedAlphaTextures);
 			AddStage(SyncFonts);
+			AddStage(SyncHotFonts);
+			AddStage(() => SyncRawAssets(".ttf"));
+			AddStage(() => SyncRawAssets(".otf"));
 			AddStage(() => SyncRawAssets(".ogv"));
 			AddStage(SyncModels);
 			AddStage(SyncScenes);
+			AddStage(SyncHotScenes);
 			AddStage(SyncSounds);
 			AddStage(() => SyncRawAssets(".shader"));
 			AddStage(() => SyncRawAssets(".xml"));
@@ -251,6 +255,24 @@ namespace Orange
 
 		private static void SyncScenes()
 		{
+			SyncUpdated(".tan", ".tan", (srcPath, dstPath) => {
+				var node = Serialization.ReadObjectFromFile<Node>(srcPath);
+				Serialization.WriteObjectToBundle(assetsBundle, dstPath, node, Serialization.Format.Binary);
+				return true;
+			});
+		}
+
+		private static void SyncFonts()
+		{
+			SyncUpdated(".tft", ".tft", (srcPath, dstPath) => {
+				var font = Serialization.ReadObjectFromFile<Font>(srcPath);
+				Serialization.WriteObjectToBundle(assetsBundle, dstPath, font, Serialization.Format.Binary);
+				return true;
+			});
+		}
+
+		private static void SyncHotScenes()
+		{
 			SyncUpdated(".scene", ".scene", (srcPath, dstPath) => {
 				var importer = HotSceneImporterFactory.CreateImporter(srcPath);
 				var node = importer.ParseNode();
@@ -259,7 +281,7 @@ namespace Orange
 			});
 		}
 
-		private static void SyncFonts()
+		private static void SyncHotFonts()
 		{
 			SyncUpdated(".fnt", ".fnt", (srcPath, dstPath) => {
 				var importer = new HotFontImporter();
@@ -267,8 +289,6 @@ namespace Orange
 				Serialization.WriteObjectToBundle(assetsBundle, dstPath, font, Serialization.Format.Binary);
 				return true;
 			});
-			SyncRawAssets(".ttf");
-			SyncRawAssets(".otf");
 		}
 
 		private static void SyncTextures()
@@ -621,6 +641,19 @@ namespace Orange
 				int h = Math.Min ((texture.Height * ratio).Round (), maxHeight);
 				Console.WriteLine ("{0} downscaled to {1}x{2}", path, w, h);
 				texture = texture.ScaleSimple (w, h, Gdk.InterpType.Bilinear);
+			}
+		}
+
+		private static void DownscaleTextureToFitAtlas(ref Gdk.Pixbuf texture, string path, CookingRules rules)
+		{
+			var maxWidth = GetMaxAtlasSize().Width;
+			var maxHeight = GetMaxAtlasSize().Height;
+			if (texture.Width > maxWidth || texture.Height > maxHeight) {
+				float ratio = Mathf.Min(maxWidth / (float)texture.Width, maxHeight / (float)texture.Height);
+				int w = Math.Min((texture.Width * ratio).Round(), maxWidth);
+				int h = Math.Min((texture.Height * ratio).Round(), maxHeight);
+				Console.WriteLine("{0} downscaled to {1}x{2}", path, w, h);
+				texture = texture.ScaleSimple(w, h, Gdk.InterpType.Bilinear);
 			}
 		}
 
