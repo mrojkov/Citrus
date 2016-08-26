@@ -72,6 +72,7 @@ namespace Yuzu.Metadata
 
 		public List<MethodAction> AfterDeserialization = new List<MethodAction>();
 
+#if !iOS // Apple forbids code generation.
 		private static Action<object, object> SetterGenericHelper<TTarget, TParam>(MethodInfo m)
 		{
 			var action =
@@ -101,6 +102,7 @@ namespace Yuzu.Metadata
 				m.DeclaringType, m.ReturnType);
 			return (Func<object, object>)helper.Invoke(null, new object[] { m });
 		}
+#endif
 
 		private void AddItem(MemberInfo m)
 		{
@@ -136,10 +138,17 @@ namespace Yuzu.Metadata
 				case MemberTypes.Property:
 					var p = m as PropertyInfo;
 					item.Type = p.PropertyType;
+#if iOS // Apple forbids code generation.
+					item.GetValue = obj => p.GetValue(obj, new object[] { });
+					var setter = p.GetSetMethod();
+					if (!merge && setter != null)
+						item.SetValue = (obj, value) => p.SetValue(obj, value, new object[] { });
+#else
 					item.GetValue = BuildGetter(p.GetGetMethod());
 					var setter = p.GetSetMethod();
 					if (!merge && setter != null)
 						item.SetValue = BuildSetter(setter);
+#endif
 					item.PropInfo = p;
 					break;
 				default:
