@@ -353,7 +353,14 @@ namespace Yuzu.Binary
 			def.ReadFields(this, def, obj);
 		}
 
-		protected object ReadObject<T>() where T: class
+		protected void ReadIntoObjectUnchecked<T>(object obj)
+		{
+			var classId = Reader.ReadInt16();
+			var def = GetClassDef(classId);
+			def.ReadFields(this, def, obj);
+		}
+
+		protected object ReadObject<T>() where T : class
 		{
 			var classId = Reader.ReadInt16();
 			if (classId == 0)
@@ -361,6 +368,19 @@ namespace Yuzu.Binary
 			var def = GetClassDef(classId);
 			if (!typeof(T).IsAssignableFrom(def.Meta.Type))
 				throw Error("Unable to assign type {0} to {1}", def.Meta.Type, typeof(T));
+			if (def.Make != null)
+				return def.Make(this, def);
+			var result = Activator.CreateInstance(def.Meta.Type);
+			def.ReadFields(this, def, result);
+			return result;
+		}
+
+		protected object ReadObjectUnchecked<T>() where T : class
+		{
+			var classId = Reader.ReadInt16();
+			if (classId == 0)
+				return null;
+			var def = GetClassDef(classId);
 			if (def.Make != null)
 				return def.Make(this, def);
 			var result = Activator.CreateInstance(def.Meta.Type);
@@ -376,6 +396,19 @@ namespace Yuzu.Binary
 			var def = GetClassDef(classId);
 			if (!typeof(T).IsAssignableFrom(def.Meta.Type))
 				throw Error("Unable to assign type {0} to {1}", def.Meta.Type, typeof(T));
+			if (def.Make != null)
+				return def.Make(this, def);
+			var result = Activator.CreateInstance(def.Meta.Type);
+			def.ReadFields(this, def, result);
+			return result;
+		}
+
+		protected object ReadStructUnchecked<T>() where T : struct
+		{
+			var classId = Reader.ReadInt16();
+			if (classId == 0)
+				return null;
+			var def = GetClassDef(classId);
 			if (def.Make != null)
 				return def.Make(this, def);
 			var result = Activator.CreateInstance(def.Meta.Type);

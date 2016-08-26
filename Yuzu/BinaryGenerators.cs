@@ -49,6 +49,7 @@ namespace Yuzu.Binary
 			set { cw.Output = value; }
 		}
 
+		// Turn off for 5% speedup in exchange for potentially missing broken data.
 		public bool SafetyChecks = true;
 
 		public BinaryDeserializerGenerator(string wrapperNameSpace = "YuzuGenBin", CommonOptions options = null)
@@ -149,6 +150,8 @@ namespace Yuzu.Binary
 			cw.Put("}\n"); // while
 		}
 
+		private string MaybeUnchecked() { return SafetyChecks ? "" : "Unchecked"; }
+
 		private void GenerateValue(Type t, string name)
 		{
 			string sr;
@@ -193,11 +196,11 @@ namespace Yuzu.Binary
 				return;
 			}
 			if (t.IsClass || t.IsInterface) {
-				cw.PutPart("({0})dg.ReadObject<{0}>();\n", Utils.GetTypeSpec(t));
+				cw.PutPart("({0})dg.ReadObject{1}<{0}>();\n", Utils.GetTypeSpec(t), MaybeUnchecked());
 				return;
 			}
 			if (Utils.IsStruct(t)) {
-				cw.PutPart("({0})dg.ReadStruct<{0}>();\n", Utils.GetTypeSpec(t));
+				cw.PutPart("({0})dg.ReadStruct{1}<{0}>();\n", Utils.GetTypeSpec(t), MaybeUnchecked());
 				return;
 			}
 			throw new NotImplementedException();
@@ -217,7 +220,7 @@ namespace Yuzu.Binary
 				return;
 			}
 			if ((t.IsClass || t.IsInterface) && t != typeof(object)) {
-				cw.Put("dg.ReadIntoObject<{0}>({1});\n", Utils.GetTypeSpec(t), name);
+				cw.Put("dg.ReadIntoObject{0}<{1}>({2});\n", MaybeUnchecked(), Utils.GetTypeSpec(t), name);
 				return;
 			}
 			throw new YuzuException(String.Format("Unable to merge field {1} of type {0}", name, t.Name));
