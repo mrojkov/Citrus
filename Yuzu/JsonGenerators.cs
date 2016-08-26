@@ -128,8 +128,9 @@ namespace Yuzu.Json
 		public JsonDeserializerGenerator(string wrapperNameSpace = "YuzuGen")
 		{
 			this.wrapperNameSpace = wrapperNameSpace;
-			InitSimpleValueReader();
 		}
+
+		static JsonDeserializerGenerator() { InitSimpleValueReader(); }
 
 		public void GenerateHeader()
 		{
@@ -214,9 +215,9 @@ namespace Yuzu.Json
 			cw.Put("}\n");
 		}
 
-		private Dictionary<Type, string> simpleValueReader = new Dictionary<Type, string>();
+		private static Dictionary<Type, string> simpleValueReader = new Dictionary<Type, string>();
 
-		private void InitSimpleValueReader()
+		private static void InitSimpleValueReader()
 		{
 			simpleValueReader[typeof(sbyte)] = "checked((sbyte)RequireInt())";
 			simpleValueReader[typeof(byte)] = "checked((byte)RequireUInt())";

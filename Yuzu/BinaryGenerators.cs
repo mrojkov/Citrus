@@ -50,8 +50,9 @@ namespace Yuzu.Binary
 		{
 			this.wrapperNameSpace = wrapperNameSpace;
 			this.options = options ?? new CommonOptions();
-			InitSimpleValueReader();
 		}
+
+		static BinaryDeserializerGenerator() { InitSimpleValueReader(); }
 
 		public void GenerateHeader()
 		{
@@ -86,9 +87,9 @@ namespace Yuzu.Binary
 				cw.Put("result.{0}();\n", a.Info.Name);
 		}
 
-		private Dictionary<Type, string> simpleValueReader = new Dictionary<Type, string>();
+		private static Dictionary<Type, string> simpleValueReader = new Dictionary<Type, string>();
 
-		private void InitSimpleValueReader()
+		private static void InitSimpleValueReader()
 		{
 			simpleValueReader[typeof(sbyte)] = "d.Reader.ReadSByte()";
 			simpleValueReader[typeof(byte)] = "d.Reader.ReadByte()";
