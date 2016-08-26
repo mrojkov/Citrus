@@ -41,7 +41,7 @@ namespace Yuzu.Unsafe
 			return count;
 		}
 
-		public virtual int Read(char[] buffer, int index, int count)
+		public override int Read(char[] buffer, int index, int count)
 		{
 			throw new NotImplementedException();
 		}
