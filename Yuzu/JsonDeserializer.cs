@@ -28,13 +28,6 @@ namespace Yuzu.Json
 			return result;
 		}
 
-		protected YuzuException Error(string message, params object[] args)
-		{
-			return new YuzuException(
-				String.Format(message, args),
-				Options.ReportErrorPosition ? new YuzuPosition(Reader.BaseStream.Position) : null);
-		}
-
 		protected void KillBuf()
 		{
 			if (buf != null)

@@ -256,6 +256,7 @@ namespace Yuzu
 		public abstract T FromString<T>(string source);
 		public abstract T FromStream<T>(Stream source);
 		public abstract T FromBytes<T>(byte[] bytes);
+
 	}
 
 	public abstract class AbstractReaderDeserializer: AbstractDeserializer
@@ -333,6 +334,12 @@ namespace Yuzu
 			return FromStream<T>(new MemoryStream(bytes, false));
 		}
 
+		protected YuzuException Error(string message, params object[] args)
+		{
+			return new YuzuException(
+				String.Format(message, args),
+				Options.ReportErrorPosition ? new YuzuPosition(Reader.BaseStream.Position) : null);
+		}
 	}
 
 }

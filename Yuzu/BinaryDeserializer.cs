@@ -19,13 +19,6 @@ namespace Yuzu.Binary
 
 		public override void Initialize() {}
 
-		protected YuzuException Error(string message, params object[] args)
-		{
-			return new YuzuException(
-				String.Format(message, args),
-				Options.ReportErrorPosition ? new YuzuPosition(Reader.BaseStream.Position) : null);
-		}
-
 		private object ReadSByte() { return Reader.ReadSByte(); }
 		private object ReadByte() { return Reader.ReadByte(); }
 		private object ReadShort() { return Reader.ReadInt16(); }
