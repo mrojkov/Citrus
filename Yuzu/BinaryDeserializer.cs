@@ -447,29 +447,29 @@ namespace Yuzu.Binary
 					if (t.GetGenericArguments()[0] == typeof(Record))
 						return ReadListRecord;
 					var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadList", t);
-					return () => m.Invoke(this, new object[] { });
+					return () => m.Invoke(this, Utils.ZeroObjects);
 				}
 				if (g == typeof(Dictionary<,>)) {
 					// FIXME: Check for Record, similar to List case above.
 					var m = Utils.GetPrivateCovariantGenericAll(GetType(), "ReadDictionary", t);
-					return () => m.Invoke(this, new object[] { });
+					return () => m.Invoke(this, Utils.ZeroObjects);
 				}
 				if (g == typeof(Action<>)) {
 					var p = t.GetGenericArguments();
 					var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadAction", t);
-					return () => m.Invoke(this, new object[] { });
+					return () => m.Invoke(this, Utils.ZeroObjects);
 				}
 			}
 			if (t.IsArray) {
 				var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadArray", t);
-				return () => m.Invoke(this, new object[] { });
+				return () => m.Invoke(this, Utils.ZeroObjects);
 			}
 			var icoll = t.GetInterface(typeof(ICollection<>).Name);
 			if (icoll != null) {
 				var elemType = icoll.GetGenericArguments()[0];
 				var m = GetType().GetMethod("ReadCollection", BindingFlags.Instance | BindingFlags.NonPublic).
 					MakeGenericMethod(t, elemType);
-				return () => m.Invoke(this, new object[] { });
+				return () => m.Invoke(this, Utils.ZeroObjects);
 			}
 			if (t.IsClass || t.IsInterface) {
 				var m = Utils.GetPrivateGeneric(GetType(), "ReadObject", t);

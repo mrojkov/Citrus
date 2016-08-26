@@ -139,10 +139,10 @@ namespace Yuzu.Metadata
 					var p = m as PropertyInfo;
 					item.Type = p.PropertyType;
 #if iOS // Apple forbids code generation.
-					item.GetValue = obj => p.GetValue(obj, new object[] { });
+					item.GetValue = obj => p.GetValue(obj, Utils.ZeroObjects);
 					var setter = p.GetSetMethod();
 					if (!merge && setter != null)
-						item.SetValue = (obj, value) => p.SetValue(obj, value, new object[] { });
+						item.SetValue = (obj, value) => p.SetValue(obj, value, Utils.ZeroObjects);
 #else
 					item.GetValue = BuildGetter(p.GetGetMethod());
 					var setter = p.GetSetMethod();

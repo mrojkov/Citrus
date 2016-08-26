@@ -18,8 +18,10 @@ namespace Yuzu.Util
 		}
 	}
 
-	internal class Utils
+	internal static class Utils
 	{
+		public static object[] ZeroObjects = new object[] { };
+
 		public static string QuoteCSharpStringLiteral(string s)
 		{
 			return s.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\t", "\\t");

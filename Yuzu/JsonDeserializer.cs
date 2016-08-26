@@ -569,16 +569,16 @@ namespace Yuzu.Json
 				var g = t.GetGenericTypeDefinition();
 				if (g == typeof(List<>)) {
 					var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadList", t);
-					return () => m.Invoke(this, new object[] { });
+					return () => m.Invoke(this, Utils.ZeroObjects);
 				}
 				if (g == typeof(Dictionary<,>)) {
 					var m = Utils.GetPrivateCovariantGenericAll(GetType(), "ReadDictionary", t);
-					return () => m.Invoke(this, new object[] { });
+					return () => m.Invoke(this, Utils.ZeroObjects);
 				}
 				if (g == typeof(Action<>)) {
 					var p = t.GetGenericArguments();
 					var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadAction", t);
-					return () => m.Invoke(this, new object[] { });
+					return () => m.Invoke(this, Utils.ZeroObjects);
 				}
 			}
 			if (t.IsArray) {
