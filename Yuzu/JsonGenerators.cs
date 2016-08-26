@@ -32,8 +32,10 @@ namespace Yuzu.Json
 		{
 			JsonDeserializerGenBase result;
 			if (!deserializerCache.TryGetValue(className, out result)) {
-				var t = Meta.FindType(className);
-				var dt = Meta.FindType(GetDeserializerName(t), "Generated deserializer not found for type '{0}'");
+				var t = FindType(className);
+				var dt = Meta.FindType(GetDeserializerName(t));
+				if (dt == null)
+					throw Error("Generated deserializer not found for type '{0}'", className);
 				result = (JsonDeserializerGenBase)Activator.CreateInstance(dt);
 				deserializerCache[className] = result;
 			}
@@ -45,7 +47,7 @@ namespace Yuzu.Json
 		{
 			if (name == "") {
 				Require('}');
-				return Activator.CreateInstance(Meta.FindType(className));
+				return Activator.CreateInstance(FindType(className));
 			}
 			return MakeDeserializer(className).FromReaderIntPartial(name);
 		}
@@ -67,7 +69,7 @@ namespace Yuzu.Json
 			string name = GetNextName(first: true);
 			if (name == JsonOptions.ClassTag) {
 				var typeName = RequireUnescapedString();
-				if (Meta.FindType(typeName) != expectedType)
+				if (FindType(typeName) != expectedType)
 					throw Error("Expected type '{0}', but got {1}", expectedType.Name, typeName);
 				name = GetNextName(first: false);
 			}

@@ -2,6 +2,8 @@
 using System.IO;
 using System.Text;
 
+using Yuzu.Metadata;
+
 namespace Yuzu.Deserializer
 {
 	public abstract class AbstractReaderDeserializer : AbstractDeserializer
@@ -84,6 +86,14 @@ namespace Yuzu.Deserializer
 			return new YuzuException(
 				String.Format(message, args),
 				Options.ReportErrorPosition ? new YuzuPosition(Reader.BaseStream.Position) : null);
+		}
+
+		protected Type FindType(string typeName)
+		{
+			var t = Meta.FindType(typeName);
+			if (t == null)
+				throw Error("Unknown type '{0}'", typeName);
+			return t;
 		}
 	}
 }

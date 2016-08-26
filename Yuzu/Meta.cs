@@ -245,7 +245,7 @@ namespace Yuzu.Metadata
 
 		private static Dictionary<string, Type> typeCache = new Dictionary<string, Type>();
 
-		public static Type FindType(string typeName, string errorFormat = "Unknown type '{0}'")
+		public static Type FindType(string typeName)
 		{
 			Type t = null;
 			if (typeCache.TryGetValue(typeName, out t))
@@ -257,7 +257,7 @@ namespace Yuzu.Metadata
 					return t;
 				}
 			}
-			throw new YuzuException(String.Format(errorFormat, typeName));
+			return null;
 		}
 	}
 

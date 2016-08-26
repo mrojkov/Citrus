@@ -1194,6 +1194,10 @@ namespace YuzuTest.Binary
 
 			XAssert.Throws<YuzuException>(() => bd.FromBytes(new byte[] { (byte)RoughType.Any }), "pure");
 
+			XAssert.Throws<YuzuException>(() => bd.FromBytes<Sample1>(SX(
+				"20 01 00 " + XS("notype") + " 00 00 00 00"
+			).ToArray()), "notype");
+
 			var w = new Sample1();
 			XAssert.Throws<YuzuException>(() => bd.FromBytes(w, SX(
 				"20 01 00 " + XS("YuzuTest.Empty") + " 00 00 00 00"

@@ -240,7 +240,7 @@ namespace Yuzu.Binary
 				throw Error("Bad classId: {0}", classId);
 			var result = new ClassDef();
 			var typeName = Reader.ReadString();
-			var classType = Meta.FindType(typeName);
+			var classType = FindType(typeName);
 			result.Meta = Meta.Get(classType, Options);
 			PrepareReaders(result);
 			var ourCount = result.Meta.Items.Count;

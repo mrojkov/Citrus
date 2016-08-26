@@ -460,7 +460,7 @@ namespace Yuzu.Json
 						return any;
 					}
 					var typeName = RequireUnescapedString();
-					return ReadFields(Activator.CreateInstance(Meta.FindType(typeName)), GetNextName(first: false));
+					return ReadFields(Activator.CreateInstance(FindType(typeName)), GetNextName(first: false));
 				case '[':
 					return ReadList<object>();
 				default:
@@ -713,7 +713,7 @@ namespace Yuzu.Json
 		private void CheckSameClassTag(Type expectedType)
 		{
 			var typeName = RequireUnescapedString();
-			if (Meta.FindType(typeName) != expectedType)
+			if (FindType(typeName) != expectedType)
 				throw Error("Expected type '{0}', but got {1}", expectedType.Name, typeName);
 		}
 
@@ -728,7 +728,7 @@ namespace Yuzu.Json
 					if (name != JsonOptions.ClassTag)
 						return (T)ReadFields(new T(), name);
 					var typeName = RequireUnescapedString();
-					var t = Meta.FindType(typeName);
+					var t = FindType(typeName);
 					if (!typeof(T).IsAssignableFrom(t))
 						throw Error("Expected type '{0}', but got {1}", typeof(T).Name, typeName);
 					return (T)ReadFields(Activator.CreateInstance(t), GetNextName(first: false));
@@ -768,7 +768,7 @@ namespace Yuzu.Json
 			if (RequireOrNull('{')) return null;
 			CheckClassTag(GetNextName(first: true));
 			var typeName = RequireUnescapedString();
-			var t = Meta.FindType(typeName);
+			var t = FindType(typeName);
 			if (!typeof(T).IsAssignableFrom(t))
 				throw Error("Expected interface '{0}', but got {1}", typeof(T).Name, typeName);
 			return (T)ReadFields(Activator.CreateInstance(t), GetNextName(first: false));
