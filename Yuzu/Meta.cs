@@ -242,6 +242,23 @@ namespace Yuzu.Metadata
 		{
 			return new YuzuException("In type '" + Type.FullName + "': " + String.Format(format, args));
 		}
+
+		private static Dictionary<string, Type> typeCache = new Dictionary<string, Type>();
+
+		public static Type FindType(string typeName, string errorFormat = "Unknown type '{0}'")
+		{
+			Type t = null;
+			if (typeCache.TryGetValue(typeName, out t))
+				return t;
+			foreach (var a in Utils.GetAllReferencedAssemblies()) {
+				t = a.GetType(typeName);
+				if (t != null) {
+					typeCache[typeName] = t;
+					return t;
+				}
+			}
+			throw new YuzuException(String.Format(errorFormat, typeName));
+		}
 	}
 
 }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 using Yuzu.Metadata;
 using Yuzu.Util;
@@ -26,11 +25,6 @@ namespace Yuzu.Binary
 			Func<BinaryDeserializer, ClassDef, object> m;
 			if (makeCache.TryGetValue(def.Meta.Type, out m))
 				def.Make = m;
-		}
-
-		public BinaryDeserializerGenBase(): base()
-		{
-			Options.Assembly = Assembly.GetCallingAssembly();
 		}
 
 	}

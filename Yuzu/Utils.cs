@@ -90,6 +90,36 @@ namespace Yuzu.Util
 			var args = String.Join("__", t.GetGenericArguments().Select(a => GetMangledTypeName(a)));
 			return n.Remove(n.IndexOf('`')) + "_" + args;
 		}
+
+		private static List<Assembly> allReferencedAssemblies = null;
+		public static List<Assembly> GetAllReferencedAssemblies()
+		{
+			if (allReferencedAssemblies != null)
+				return allReferencedAssemblies;
+
+			var visited = new HashSet<Assembly>();
+			var queue = new Queue<Assembly>();
+
+			var ignoredPrefixes = new string[] { "System", "Microsoft", "mscorlib" };
+			Action<Assembly> visit = a => {
+				if (ignoredPrefixes.Any(p => a.FullName.StartsWith(p)))
+					return;
+				queue.Enqueue(a);
+				visited.Add(a);
+			};
+
+			foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
+				visit(a);
+			while (queue.Count() != 0) {
+				foreach (var aName in queue.Dequeue().GetReferencedAssemblies()) {
+					var a = Assembly.Load(aName);
+					if (!visited.Contains(a))
+						visit(a);
+				}
+			}
+			allReferencedAssemblies = visited.ToList();
+			return allReferencedAssemblies;
+		}
 	}
 
 	internal class CodeWriter

@@ -32,12 +32,8 @@ namespace Yuzu.Json
 		{
 			JsonDeserializerGenBase result;
 			if (!deserializerCache.TryGetValue(className, out result)) {
-				var t = Options.Assembly.GetType(className);
-				if (t == null)
-					throw Error("Unknown type '{0}'", className);
-				var dt = Options.Assembly.GetType(GetDeserializerName(t));
-				if (dt == null)
-					throw Error("Generated deserializer not found for type '{0}'", className);
+				var t = Meta.FindType(className);
+				var dt = Meta.FindType(GetDeserializerName(t), "Generated deserializer not found for type '{0}'");
 				result = (JsonDeserializerGenBase)Activator.CreateInstance(dt);
 				deserializerCache[className] = result;
 			}
@@ -49,7 +45,7 @@ namespace Yuzu.Json
 		{
 			if (name == "") {
 				Require('}');
-				return Activator.CreateInstance(Options.Assembly.GetType(className, throwOnError: true));
+				return Activator.CreateInstance(Meta.FindType(className));
 			}
 			return MakeDeserializer(className).FromReaderIntPartial(name);
 		}
@@ -71,10 +67,7 @@ namespace Yuzu.Json
 			string name = GetNextName(first: true);
 			if (name == JsonOptions.ClassTag) {
 				var typeName = RequireUnescapedString();
-				var actualType = Options.Assembly.GetType(typeName);
-				if (actualType == null)
-					throw Error("Unknown type '{0}'", typeName);
-				if (actualType != expectedType)
+				if (Meta.FindType(typeName) != expectedType)
 					throw Error("Expected type '{0}', but got {1}", expectedType.Name, typeName);
 				name = GetNextName(first: false);
 			}
@@ -134,7 +127,6 @@ namespace Yuzu.Json
 
 		public JsonDeserializerGenerator(string wrapperNameSpace = "YuzuGen")
 		{
-			Options.Assembly = Assembly.GetCallingAssembly();
 			this.wrapperNameSpace = wrapperNameSpace;
 			InitSimpleValueReader();
 		}
@@ -142,7 +134,6 @@ namespace Yuzu.Json
 		public void GenerateHeader()
 		{
 			cw.Put("using System;\n");
-			cw.Put("using System.Reflection;\n");
 			cw.Put("\n");
 			cw.Put("using Yuzu;\n");
 			cw.Put("using Yuzu.Json;\n");
@@ -360,7 +351,6 @@ namespace Yuzu.Json
 
 			cw.Put("public {0}()\n", deserializerName);
 			cw.Put("{\n");
-			cw.Put("Options.Assembly = Assembly.Load(\"{0}\");\n", typeof(T).Assembly.FullName);
 			GenAssigns("Options", Options);
 			GenAssigns("JsonOptions", JsonOptions);
 			cw.Put("}\n");

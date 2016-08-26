@@ -15,11 +15,6 @@ namespace Yuzu.Json
 		public static JsonDeserializer Instance = new JsonDeserializer();
 		public JsonSerializeOptions JsonOptions = new JsonSerializeOptions();
 
-		public JsonDeserializer()
-		{
-			Options.Assembly = Assembly.GetCallingAssembly();
-		}
-
 		private char? buf;
 
 		public override void Initialize() { buf = null; }
@@ -471,10 +466,7 @@ namespace Yuzu.Json
 						return any;
 					}
 					var typeName = RequireUnescapedString();
-					var t = Options.Assembly.GetType(typeName);
-					if (t == null)
-						throw Error("Unknown type '{0}'", typeName);
-					return ReadFields(Activator.CreateInstance(t), GetNextName(first: false));
+					return ReadFields(Activator.CreateInstance(Meta.FindType(typeName)), GetNextName(first: false));
 				case '[':
 					return ReadList<object>();
 				default:
@@ -727,10 +719,7 @@ namespace Yuzu.Json
 		private void CheckSameClassTag(Type expectedType)
 		{
 			var typeName = RequireUnescapedString();
-			var actualType = Options.Assembly.GetType(typeName);
-			if (actualType == null)
-				throw Error("Unknown type '{0}'", typeName);
-			if (actualType != expectedType)
+			if (Meta.FindType(typeName) != expectedType)
 				throw Error("Expected type '{0}', but got {1}", expectedType.Name, typeName);
 		}
 
@@ -745,9 +734,7 @@ namespace Yuzu.Json
 					if (name != JsonOptions.ClassTag)
 						return (T)ReadFields(new T(), name);
 					var typeName = RequireUnescapedString();
-					var t = Options.Assembly.GetType(typeName);
-					if (t == null)
-						throw Error("Unknown type '{0}'", typeName);
+					var t = Meta.FindType(typeName);
 					if (!typeof(T).IsAssignableFrom(t))
 						throw Error("Expected type '{0}', but got {1}", typeof(T).Name, typeName);
 					return (T)ReadFields(Activator.CreateInstance(t), GetNextName(first: false));
@@ -787,9 +774,7 @@ namespace Yuzu.Json
 			if (RequireOrNull('{')) return null;
 			CheckClassTag(GetNextName(first: true));
 			var typeName = RequireUnescapedString();
-			var t = Options.Assembly.GetType(typeName);
-			if (t == null)
-				throw Error("Unknown type '{0}'", typeName);
+			var t = Meta.FindType(typeName);
 			if (!typeof(T).IsAssignableFrom(t))
 				throw Error("Expected interface '{0}', but got {1}", typeof(T).Name, typeName);
 			return (T)ReadFields(Activator.CreateInstance(t), GetNextName(first: false));

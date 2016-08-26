@@ -14,7 +14,6 @@ namespace Yuzu.Binary
 
 		public BinaryDeserializer()
 		{
-			Options.Assembly = Assembly.GetCallingAssembly();
 			InitReaders();
 		}
 
@@ -247,7 +246,7 @@ namespace Yuzu.Binary
 				throw Error("Bad classId: {0}", classId);
 			var result = new ClassDef();
 			var typeName = Reader.ReadString();
-			var classType = Options.Assembly.GetType(typeName, throwOnError: true);
+			var classType = Meta.FindType(typeName);
 			result.Meta = Meta.Get(classType, Options);
 			PrepareReaders(result);
 			var ourCount = result.Meta.Items.Count;

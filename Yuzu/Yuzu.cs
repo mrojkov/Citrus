@@ -126,7 +126,6 @@ namespace Yuzu
 		public Func<Attribute, string> GetAlias = attr => (attr as YuzuField).Alias;
 		public Func<Attribute, Func<object, object, bool>> GetSerializeCondition =
 			attr => (attr as YuzuSerializeCondition).Check;
-		public Assembly Assembly = Assembly.GetCallingAssembly();
 		public TagMode TagMode = TagMode.Names;
 		public bool IgnoreNewFields = false;
 		public bool AllowEmptyTypes = false;
