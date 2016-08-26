@@ -201,6 +201,8 @@ namespace YuzuTest
 		{
 			return ((SamplePoint)obj).X == X && ((SamplePoint)obj).Y == Y;
 		}
+
+		public override int GetHashCode() { return X ^ Y; }
 	}
 
 	public class SampleRect
