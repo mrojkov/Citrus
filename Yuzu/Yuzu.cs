@@ -113,6 +113,8 @@ namespace Yuzu
 
 	public class CommonOptions
 	{
+		public static CommonOptions Default = new CommonOptions();
+
 		public Type RequiredAttribute = typeof(YuzuRequired);
 		public Type OptionalAttribute = typeof(YuzuOptional);
 		public Type MemberAttribute = typeof(YuzuMember);
