@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ProtoBuf;
 
 using Yuzu;
+using YuzuTestAssembly;
 
 namespace YuzuTest
 {
@@ -484,6 +485,12 @@ namespace YuzuTest
 		public NestedEnum[] Z = null;
 	}
 
+	public class SampleAssemblyDerivedR : SampleAssemblyBase
+	{
+		[YuzuMember]
+		public string R = "R";
+	}
+
 	public class Bad1
 	{
 		[YuzuRequired]
@@ -532,7 +539,6 @@ namespace YuzuTest
 			Assert.Fail("Expected exception:<{0}>. Actual exception: none.", typeof(TExpectedException).Name);
 		}
 	}
-
 }
 
 namespace YuzuTest2

@@ -75,6 +75,10 @@
       <Project>{ddd2dfe9-ced2-4cea-adf0-5a6865865a46}</Project>
       <Name>Yuzu</Name>
     </ProjectReference>
+    <ProjectReference Include="AssemblyTest\AssemblyTest.csproj">
+      <Project>{3dfbe19b-53f5-414b-ac2a-717a0b872e3f}</Project>
+      <Name>AssemblyTest</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

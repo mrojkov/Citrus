@@ -137,6 +137,10 @@ namespace YuzuTest
 				jd.Generate<SampleConcreteCollection>();
 				jd.Generate<SampleAfter2>();
 				jd.Generate<SampleMerge>();
+				jd.Generate<SampleAssemblyDerivedR>();
+				jd.Generate<List<YuzuTestAssembly.SampleAssemblyBase>>();
+				jd.Generate<YuzuTestAssembly.SampleAssemblyBase>();
+				jd.Generate<YuzuTestAssembly.SampleAssemblyDerivedQ>();
 				jd.Generate<YuzuTest2.SampleNamespace>();
 				jd.GenerateFooter();
 				sw.Flush();
@@ -177,6 +181,9 @@ namespace YuzuTest
 				bd.Generate<SampleWithCollection>();
 				bd.Generate<SampleAfter2>();
 				bd.Generate<SampleMerge>();
+				bd.Generate<SampleAssemblyDerivedR>();
+				bd.Generate<YuzuTestAssembly.SampleAssemblyBase>();
+				bd.Generate<YuzuTestAssembly.SampleAssemblyDerivedQ>();
 				bd.Generate<YuzuTest2.SampleNamespace>();
 				bd.GenerateFooter();
 				sw.Flush();

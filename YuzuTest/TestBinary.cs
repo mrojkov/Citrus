@@ -9,6 +9,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Yuzu;
 using Yuzu.Binary;
 using YuzuGenBin;
+using YuzuTestAssembly;
 
 namespace YuzuTest.Binary
 {
@@ -1165,16 +1166,46 @@ namespace YuzuTest.Binary
 
 			var result1 = bs.ToBytes(v1);
 			Assert.AreEqual(
-				("21 20 02 00 00 00 01 00 " + XS("YuzuTest.SampleDerivedB") + " 02 00 " +
+				"21 20 02 00 00 00 01 00 " + XS("YuzuTest.SampleDerivedB") + " 02 00 " +
 				XS("FBase", RoughType.Int, "FB", RoughType.Int) +
 				" 01 00 00 00 00 00 02 00 0A 00 00 00 00 00 " +
 				"01 00" +
-				" 01 00 00 00 00 00 02 00 14 00 00 00 00 00"),
+				" 01 00 00 00 00 00 02 00 14 00 00 00 00 00",
 				XS(result1));
 			var w1 = (List<object>)bd.FromBytes(result1);
 			for (int i = 0; i < v1.Count; i++) {
 				Assert.AreEqual(v1[i].FB, (w1[i] as SampleDerivedB).FB);
 			}
+		}
+
+		[TestMethod]
+		public void TestAssemblies()
+		{
+			var bs = new BinarySerializer();
+
+			var v1 = new List<SampleAssemblyBase> {
+				new SampleAssemblyDerivedQ { Q = 10 },
+				new SampleAssemblyDerivedR { R = "R1" } };
+			var result1 = bs.ToBytes(v1);
+			Assert.AreEqual(
+				"21 20 02 00 00 00 01 00 " + XS("YuzuTestAssembly.SampleAssemblyDerivedQ") + " 02 00 " +
+				XS("P", RoughType.Short, "Q", RoughType.Short) +
+				" 02 00 0A 00 00 00" +
+				" 02 00 " + XS("YuzuTest.SampleAssemblyDerivedR") + " 02 00 " +
+				XS("P", RoughType.Short, "R", RoughType.String) +
+				" 02 00 " + XS("R1") + " 00 00",
+				XS(result1));
+
+			var bd = new BinaryDeserializer();
+			var w1 = new List<SampleAssemblyBase>();
+			bd.FromBytes(w1, result1);
+			Assert.AreEqual((v1[0] as SampleAssemblyDerivedQ).Q, (w1[0] as SampleAssemblyDerivedQ).Q);
+			Assert.AreEqual((v1[1] as SampleAssemblyDerivedR).R, (w1[1] as SampleAssemblyDerivedR).R);
+
+			var bdg = new BinaryDeserializerGen();
+			var w1g = bdg.FromBytes<List<SampleAssemblyBase>>(result1);
+			Assert.AreEqual((v1[0] as SampleAssemblyDerivedQ).Q, (w1g[0] as SampleAssemblyDerivedQ).Q);
+			Assert.AreEqual((v1[1] as SampleAssemblyDerivedR).R, (w1g[1] as SampleAssemblyDerivedR).R);
 		}
 
 		[TestMethod]

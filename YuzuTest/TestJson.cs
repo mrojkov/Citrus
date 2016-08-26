@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Yuzu;
 using Yuzu.Json;
+using YuzuTestAssembly;
 using YuzuGen.YuzuTest;
 
 namespace YuzuTest.Json
@@ -1147,6 +1148,34 @@ namespace YuzuTest.Json
 			for (int i = 0; i < v1.Count; i++) {
 				Assert.AreEqual((v1[i] as SampleDerivedB).FB, (w1[i] as SampleDerivedB).FB);
 			}
+		}
+
+		[TestMethod]
+		public void TestAssemblies()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = "";
+			var jd = new JsonDeserializer();
+
+			var v1 = new List<SampleAssemblyBase> {
+				new SampleAssemblyDerivedQ { Q = 10 },
+				new SampleAssemblyDerivedR { R = "R1" } };
+			var result1 = js.ToString(v1);
+			Assert.AreEqual(
+				"[{\"class\":\"YuzuTestAssembly.SampleAssemblyDerivedQ\",\"Q\":10}," +
+				"{\"class\":\"YuzuTest.SampleAssemblyDerivedR\",\"R\":\"R1\"}]",
+				result1);
+
+			var w1 = new List<SampleAssemblyBase>();
+			jd.FromString(w1, result1);
+			Assert.AreEqual((v1[0] as SampleAssemblyDerivedQ).Q, (w1[0] as SampleAssemblyDerivedQ).Q);
+			Assert.AreEqual((v1[1] as SampleAssemblyDerivedR).R, (w1[1] as SampleAssemblyDerivedR).R);
+
+			var w1g = (List<SampleAssemblyBase>)
+				YuzuGen.System.Collections.Generic.List_SampleAssemblyBase_JsonDeserializer.Instance.FromString(result1);
+			Assert.AreEqual((v1[0] as SampleAssemblyDerivedQ).Q, (w1g[0] as SampleAssemblyDerivedQ).Q);
+			Assert.AreEqual((v1[1] as SampleAssemblyDerivedR).R, (w1g[1] as SampleAssemblyDerivedR).R);
 		}
 
 		[TestMethod]

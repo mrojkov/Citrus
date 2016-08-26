@@ -2062,6 +2062,205 @@ namespace YuzuGen.YuzuTest
 		}
 	}
 
+	class SampleAssemblyDerivedR_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new SampleAssemblyDerivedR_JsonDeserializer Instance = new SampleAssemblyDerivedR_JsonDeserializer();
+
+		public SampleAssemblyDerivedR_JsonDeserializer()
+		{
+			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
+			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
+			JsonOptions.IgnoreCompact = false;
+			JsonOptions.Int64AsString = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.ArrayLengthPrefix = true;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderTyped<global::YuzuTest.SampleAssemblyDerivedR>(Reader);
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new global::YuzuTest.SampleAssemblyDerivedR(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (global::YuzuTest.SampleAssemblyDerivedR)obj;
+			if ("P" == name) {
+				result.P = checked((short)RequireInt());
+				name = GetNextName(false);
+			}
+			if ("R" == name) {
+				result.R = RequireString();
+				name = GetNextName(false);
+			}
+			Require('}');
+			return result;
+		}
+	}
+
+}
+
+namespace YuzuGen.System.Collections.Generic
+{
+	class List_SampleAssemblyBase_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new List_SampleAssemblyBase_JsonDeserializer Instance = new List_SampleAssemblyBase_JsonDeserializer();
+
+		public List_SampleAssemblyBase_JsonDeserializer()
+		{
+			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
+			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
+			JsonOptions.IgnoreCompact = false;
+			JsonOptions.Int64AsString = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.ArrayLengthPrefix = true;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderInt(new global::System.Collections.Generic.List<global::YuzuTestAssembly.SampleAssemblyBase>());
+		}
+
+		public override object FromReaderInt(object obj)
+		{
+			var result = (global::System.Collections.Generic.List<global::YuzuTestAssembly.SampleAssemblyBase>)obj;
+			Require('[');
+			if (SkipSpacesCarefully() == ']') {
+				Require(']');
+			}
+			else {
+				do {
+					var tmp1 = YuzuGen.YuzuTestAssembly.SampleAssemblyBase_JsonDeserializer.Instance.FromReaderTyped<global::YuzuTestAssembly.SampleAssemblyBase>(Reader);
+					result.Add(tmp1);
+				} while (Require(']', ',') == ',');
+			}
+			return result;
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new global::System.Collections.Generic.List<global::YuzuTestAssembly.SampleAssemblyBase>(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (global::System.Collections.Generic.List<global::YuzuTestAssembly.SampleAssemblyBase>)obj;
+			return result;
+		}
+	}
+
+}
+
+namespace YuzuGen.YuzuTestAssembly
+{
+	class SampleAssemblyBase_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new SampleAssemblyBase_JsonDeserializer Instance = new SampleAssemblyBase_JsonDeserializer();
+
+		public SampleAssemblyBase_JsonDeserializer()
+		{
+			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
+			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
+			JsonOptions.IgnoreCompact = false;
+			JsonOptions.Int64AsString = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.ArrayLengthPrefix = true;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderTyped<global::YuzuTestAssembly.SampleAssemblyBase>(Reader);
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new global::YuzuTestAssembly.SampleAssemblyBase(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (global::YuzuTestAssembly.SampleAssemblyBase)obj;
+			if ("P" == name) {
+				result.P = checked((short)RequireInt());
+				name = GetNextName(false);
+			}
+			Require('}');
+			return result;
+		}
+	}
+
+	class SampleAssemblyDerivedQ_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new SampleAssemblyDerivedQ_JsonDeserializer Instance = new SampleAssemblyDerivedQ_JsonDeserializer();
+
+		public SampleAssemblyDerivedQ_JsonDeserializer()
+		{
+			Options.IgnoreNewFields = false;
+			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = true;
+			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
+			JsonOptions.IgnoreCompact = false;
+			JsonOptions.Int64AsString = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.ArrayLengthPrefix = true;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderTyped<global::YuzuTestAssembly.SampleAssemblyDerivedQ>(Reader);
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new global::YuzuTestAssembly.SampleAssemblyDerivedQ(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (global::YuzuTestAssembly.SampleAssemblyDerivedQ)obj;
+			if ("P" == name) {
+				result.P = checked((short)RequireInt());
+				name = GetNextName(false);
+			}
+			if ("Q" == name) {
+				result.Q = checked((short)RequireInt());
+				name = GetNextName(false);
+			}
+			Require('}');
+			return result;
+		}
+	}
+
 }
 
 namespace YuzuGen.YuzuTest2
