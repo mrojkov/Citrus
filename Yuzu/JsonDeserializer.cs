@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
 using System.Text;
 
 using Yuzu.Deserializer;
@@ -421,18 +420,7 @@ namespace Yuzu.Json
 			return array;
 		}
 
-		Stack<object> objStack = new Stack<object>();
-
-		private Action<T> ReadAction<T>()
-		{
-			var name = RequireUnescapedString();
-			if (name == null) return null;
-			var obj = objStack.Peek();
-			var m = obj.GetType().GetMethod(name, BindingFlags.Instance | BindingFlags.Public);
-			if (m == null)
-				throw Error("Unknown action '{0}'", name);
-			return (Action<T>)Delegate.CreateDelegate(typeof(Action<T>), obj, m);
-		}
+		private Action<T> ReadAction<T>() { return GetAction<T>(RequireUnescapedString()); }
 
 		protected object ReadAnyObject() {
 			var ch = SkipSpaces();

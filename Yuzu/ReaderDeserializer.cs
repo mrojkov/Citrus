@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text;
 
 using Yuzu.Metadata;
@@ -100,6 +102,19 @@ namespace Yuzu.Deserializer
 		{
 			if (FindType(typeName) != expectedType)
 				throw Error("Expected type '{0}', but got '{1}'", expectedType.Name, typeName);
+		}
+
+		protected Stack<object> objStack = new Stack<object>();
+
+		protected Action<T> GetAction<T>(string name)
+		{
+			if (String.IsNullOrEmpty(name))
+				return null;
+			var obj = objStack.Peek();
+			var m = obj.GetType().GetMethod(name, BindingFlags.Instance | BindingFlags.Public);
+			if (m == null)
+				throw Error("Unknown action '{0}'", name);
+			return (Action<T>)Delegate.CreateDelegate(typeof(Action<T>), obj, m);
 		}
 	}
 }

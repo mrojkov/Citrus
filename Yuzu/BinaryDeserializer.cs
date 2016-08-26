@@ -192,19 +192,7 @@ namespace Yuzu.Binary
 			return array;
 		}
 
-		private Stack<object> objStack = new Stack<object>();
-
-		protected Action<T> ReadAction<T>()
-		{
-			var name = Reader.ReadString();
-			if (name == "")
-				return null;
-			var obj = objStack.Peek();
-			var m = obj.GetType().GetMethod(name, BindingFlags.Instance | BindingFlags.Public);
-			if (m == null)
-				throw Error("Unknown action '{0}'", name);
-			return (Action<T>)Delegate.CreateDelegate(typeof(Action<T>), obj, m);
-		}
+		protected Action<T> ReadAction<T>() { return GetAction<T>(Reader.ReadString()); }
 
 		protected class ClassDef
 		{
