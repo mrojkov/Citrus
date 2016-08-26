@@ -68,9 +68,7 @@ namespace Yuzu.Json
 			var expectedType = obj.GetType();
 			string name = GetNextName(first: true);
 			if (name == JsonOptions.ClassTag) {
-				var typeName = RequireUnescapedString();
-				if (FindType(typeName) != expectedType)
-					throw Error("Expected type '{0}', but got {1}", expectedType.Name, typeName);
+				CheckExpectedType(RequireUnescapedString(), expectedType);
 				name = GetNextName(first: false);
 			}
 			if (name == "") {

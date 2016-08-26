@@ -710,13 +710,6 @@ namespace Yuzu.Json
 				throw Error("Expected class tag, but found '{0}'", name);
 		}
 
-		private void CheckSameClassTag(Type expectedType)
-		{
-			var typeName = RequireUnescapedString();
-			if (FindType(typeName) != expectedType)
-				throw Error("Expected type '{0}', but got {1}", expectedType.Name, typeName);
-		}
-
 		// T is neither a collection nor a bare object.
 		private T ReadObject<T>() where T: class, new() {
 			KillBuf();
@@ -730,7 +723,7 @@ namespace Yuzu.Json
 					var typeName = RequireUnescapedString();
 					var t = FindType(typeName);
 					if (!typeof(T).IsAssignableFrom(t))
-						throw Error("Expected type '{0}', but got {1}", typeof(T).Name, typeName);
+						throw Error("Expected type '{0}', but got '{1}'", typeof(T).Name, typeName);
 					return (T)ReadFields(Activator.CreateInstance(t), GetNextName(first: false));
 				case '[':
 					return (T)ReadFieldsCompact(new T());
@@ -750,7 +743,7 @@ namespace Yuzu.Json
 						ReadFields(obj, name);
 					}
 					else {
-						CheckSameClassTag(typeof(T));
+						CheckExpectedType(RequireUnescapedString(), typeof(T));
 						ReadFields(obj, GetNextName(first: false));
 					}
 					return;
@@ -770,7 +763,7 @@ namespace Yuzu.Json
 			var typeName = RequireUnescapedString();
 			var t = FindType(typeName);
 			if (!typeof(T).IsAssignableFrom(t))
-				throw Error("Expected interface '{0}', but got {1}", typeof(T).Name, typeName);
+				throw Error("Expected interface '{0}', but got '{1}'", typeof(T).Name, typeName);
 			return (T)ReadFields(Activator.CreateInstance(t), GetNextName(first: false));
 		}
 
@@ -794,7 +787,7 @@ namespace Yuzu.Json
 					var name = GetNextName(first: true);
 					if (name != JsonOptions.ClassTag)
 						return ReadFields(obj, name);
-					CheckSameClassTag(expectedType);
+					CheckExpectedType(RequireUnescapedString(), expectedType);
 					return ReadFields(obj, GetNextName(first: false));
 				case '[':
 					var icoll = expectedType.GetInterface(typeof(ICollection<>).Name);

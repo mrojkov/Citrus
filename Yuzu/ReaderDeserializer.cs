@@ -95,5 +95,11 @@ namespace Yuzu.Deserializer
 				throw Error("Unknown type '{0}'", typeName);
 			return t;
 		}
+
+		protected void CheckExpectedType(string typeName, Type expectedType)
+		{
+			if (FindType(typeName) != expectedType)
+				throw Error("Expected type '{0}', but got '{1}'", expectedType.Name, typeName);
+		}
 	}
 }
