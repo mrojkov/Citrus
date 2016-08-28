@@ -1,5 +1,4 @@
 using System;
-using System.Reflection;
 
 using Yuzu;
 using Yuzu.Json;
@@ -12,7 +11,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Font_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -82,7 +80,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public SerializableSample_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -126,7 +123,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public KerningPair_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -174,7 +170,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public FontChar_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -261,7 +256,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public ITexture_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -305,7 +299,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public SerializableFont_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -349,7 +342,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public BlendIndices_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -419,7 +411,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public BlendWeights_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -489,7 +480,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public GeometryBuffer_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -665,7 +655,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public TextureAtlasElement__Params_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -713,7 +702,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public BitSet32_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -765,7 +753,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public BoundingSphere_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -813,7 +800,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Color4_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -865,7 +851,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public IntRectangle_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -923,7 +908,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public IntVector2_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -981,7 +965,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Matrix32_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -1045,7 +1028,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Matrix44_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -1187,7 +1169,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public NumericRange_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -1235,7 +1216,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Plane_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -1283,7 +1263,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Quaternion_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -1353,7 +1332,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Ray_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -1401,7 +1379,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Rectangle_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -1459,7 +1436,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Size_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -1517,7 +1493,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Vector2_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -1575,7 +1550,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Vector3_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -1639,7 +1613,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Vector4_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -1709,7 +1682,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Camera3D_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -1836,7 +1808,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Material_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -1928,7 +1899,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Mesh3D_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -2083,7 +2053,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Submesh3D_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -2144,7 +2113,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Node3D_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -2255,7 +2223,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Spline3D_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -2385,7 +2352,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Spline3D__Point_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -2441,7 +2407,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Viewport3D_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -2588,7 +2553,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Animation_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -2645,7 +2609,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Spline_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -2788,7 +2751,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public LinearLayout_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -2887,7 +2849,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Animator_String_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -2950,7 +2911,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Animator_Int32_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -3013,7 +2973,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Animator_Boolean_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -3076,7 +3035,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Animator_Blending_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -3139,7 +3097,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Animator_ITexture_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -3202,7 +3159,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Animator_NumericRange_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -3265,7 +3221,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Animator_Vector2_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -3328,7 +3283,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Animator_Color4_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -3391,7 +3345,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Animator_Single_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -3454,7 +3407,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Animator_EmitterShape_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -3517,7 +3469,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Animator_AudioAction_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -3580,7 +3531,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Animator_SerializableSample_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -3643,7 +3593,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Animator_HAlignment_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -3706,7 +3655,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Animator_VAlignment_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -3769,7 +3717,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Animator_MovieAction_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -3832,7 +3779,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Animator_ShaderId_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -3895,7 +3841,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Animator_Vector3_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -3958,7 +3903,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Animator_Quaternion_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -4021,7 +3965,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Animator_EmissionType_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -4084,7 +4027,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public NumericAnimator_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -4147,7 +4089,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Vector2Animator_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -4210,7 +4151,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Color4Animator_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -4273,7 +4213,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public QuaternionAnimator_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -4336,7 +4275,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Vector3Animator_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -4399,7 +4337,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Matrix44Animator_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -4462,7 +4399,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Keyframe_String_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -4514,7 +4450,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Keyframe_Int32_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -4566,7 +4501,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Keyframe_Boolean_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -4618,7 +4552,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Keyframe_Blending_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -4670,7 +4603,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Keyframe_ITexture_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -4722,7 +4654,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Keyframe_NumericRange_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -4774,7 +4705,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Keyframe_Vector2_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -4826,7 +4756,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Keyframe_Color4_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -4878,7 +4807,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Keyframe_Single_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -4930,7 +4858,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Keyframe_EmitterShape_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -4982,7 +4909,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Keyframe_AudioAction_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -5034,7 +4960,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Keyframe_SerializableSample_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -5086,7 +5011,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Keyframe_HAlignment_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -5138,7 +5062,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Keyframe_VAlignment_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -5190,7 +5113,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Keyframe_MovieAction_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -5242,7 +5164,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Keyframe_ShaderId_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -5294,7 +5215,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Keyframe_Vector3_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -5346,7 +5266,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Keyframe_Quaternion_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -5398,7 +5317,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Keyframe_EmissionType_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -5450,7 +5368,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Keyframe_Matrix44_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -5502,7 +5419,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Audio_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -5629,7 +5545,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public BoneWeight_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -5687,7 +5602,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public SkinningWeights_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -5757,7 +5671,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Bone_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -5892,7 +5805,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public BoneArray_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -5947,7 +5859,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public BoneArray__Entry_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -6007,7 +5918,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Button_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -6162,7 +6072,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public DistortionMesh_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -6317,7 +6226,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public DistortionMeshPoint_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -6428,7 +6336,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Frame_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -6575,7 +6482,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Image_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -6730,7 +6636,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public ImageCombiner_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -6833,7 +6738,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Marker_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -6889,7 +6793,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Movie_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -7040,7 +6943,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public NineGrid_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -7203,7 +7105,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Node_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -7294,7 +7195,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public ParticleEmitter_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -7541,7 +7441,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public ParticleModifier_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -7688,7 +7587,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public ParticlesMagnet_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -7843,7 +7741,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public PointObject_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -7942,7 +7839,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Slider_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -8101,7 +7997,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public SplineGear_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -8204,7 +8099,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public SplinePoint_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -8315,7 +8209,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public RichText_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -8478,7 +8371,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public SimpleText_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -8657,7 +8549,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public TextStyle_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -8792,7 +8683,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public Widget_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -8935,7 +8825,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public IAnimator_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;
@@ -8975,7 +8864,6 @@ namespace GeneratedDeserializersJSON.Lime
 
 		public SerializableTexture_JsonDeserializer()
 		{
-			Options.Assembly = Assembly.Load("Lime, Version=1.0.0.2, Culture=neutral, PublicKeyToken=null");
 			Options.IgnoreNewFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = true;

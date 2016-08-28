@@ -109,7 +109,7 @@ namespace Lime
 			stream = ms;
 			SerializationPathStack.Push(path);
 			try {
-				AbstractReaderDeserializer yd = null;
+				Yuzu.Deserializer.AbstractReaderDeserializer yd = null;
 				if (CheckYuzuBinarySignature(stream)) {
 					//yd = new Yuzu.Binary.BinaryDeserializer(); // yuzuBinaryDeserializer;
 					//yd = bindesgen;

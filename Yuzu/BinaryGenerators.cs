@@ -49,7 +49,7 @@ namespace Yuzu.Binary
 		public BinaryDeserializerGenerator(string wrapperNameSpace = "YuzuGenBin", CommonOptions options = null)
 		{
 			this.wrapperNameSpace = wrapperNameSpace;
-			this.options = options ?? new CommonOptions();
+			this.options = options ?? CommonOptions.Default;
 		}
 
 		static BinaryDeserializerGenerator() { InitSimpleValueReader(); }
