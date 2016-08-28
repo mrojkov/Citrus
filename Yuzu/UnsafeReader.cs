@@ -10,6 +10,7 @@ namespace Yuzu.Unsafe
 
 		private byte[] buf;
 		private int pos;
+		private Decoder decoder = Encoding.UTF8.GetDecoder();
 
 		public UnsafeBinaryReader(Stream input): base(input) {
 			if (!(input is MemoryStream))
@@ -73,12 +74,29 @@ namespace Yuzu.Unsafe
 			return result;
 		}
 
-		public override char ReadChar() { unchecked { return Encoding.UTF8.GetChars(buf, pos++, 1)[0]; } }
+		public override char ReadChar() {
+			char result;
+			fixed (byte* b = buf) {
+				int bytesUsed, charsUsed;
+				bool completed;
+				decoder.Convert(
+					b + pos, buf.Length - pos, &result, 1, true, out bytesUsed, out charsUsed, out completed);
+				pos += bytesUsed;
+			}
+			return result;
+		}
 
 		public override char[] ReadChars(int count)
 		{
-			var result = Encoding.UTF8.GetChars(buf, pos, count);
-			pos += count;
+			var result = new char[count];
+			fixed (byte* b = buf)
+			fixed (char* r = result) {
+				int bytesUsed, charsUsed;
+				bool completed;
+				decoder.Convert(
+					b + pos, buf.Length - pos, r, count, true, out bytesUsed, out charsUsed, out completed);
+				pos += bytesUsed;
+			}
 			return result;
 		}
 
@@ -137,13 +155,9 @@ namespace Yuzu.Unsafe
 
 		public override string ReadString()
 		{
-			string result;
 			var length = ReadVarint();
-			fixed (byte *b = buf) {
-				var bytesCount = Encoding.UTF8.GetCharCount(b, length);
-				result = Encoding.UTF8.GetString(buf, pos, bytesCount);
-				pos += bytesCount;
-			}
+			var result = Encoding.UTF8.GetString(buf, pos, length);
+			pos += length;
 			return result;
 		}
 

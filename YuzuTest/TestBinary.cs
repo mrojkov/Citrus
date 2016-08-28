@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -8,6 +9,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Yuzu;
 using Yuzu.Binary;
+using Yuzu.Unsafe;
 using YuzuGenBin;
 using YuzuTestAssembly;
 
@@ -919,6 +921,12 @@ namespace YuzuTest.Binary
 				XS(Encoding.UTF8.GetBytes("привет")) + " 00 00",
 				XS(result2));
 			bd.FromBytes(w, result2);
+			Assert.AreEqual(v.Y, w.Y);
+
+			var ms = new MemoryStream(result2.Length);
+			ms.Write(result2, 0, result2.Length);
+			ms.Position = 0;
+			bd.FromReader(w, new UnsafeBinaryReader(ms));
 			Assert.AreEqual(v.Y, w.Y);
 		}
 
