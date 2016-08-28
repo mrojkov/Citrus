@@ -44,19 +44,12 @@ namespace Lime
 			return result;
 		}
 
-		private static readonly Yuzu.Json.JsonSerializer yuzuJsonSerializer = new Yuzu.Json.JsonSerializer();
-		private static readonly Yuzu.Binary.BinarySerializer yuzuBinarySerializer = new Yuzu.Binary.BinarySerializer();
-		private static readonly Yuzu.Json.JsonDeserializer yuzuJsonDeserializer = new Yuzu.Json.JsonDeserializer();
-		private static readonly Yuzu.Binary.BinaryDeserializer yuzuBinaryDeserializer = new Yuzu.Binary.BinaryDeserializer();
-
-		//private static readonly Yuzu.CommonOptions YuzuCommonOptions = new Yuzu.CommonOptions();
 		private static JsonSerializeOptions defaultYuzuJSONOptions = new JsonSerializeOptions {
 			ArrayLengthPrefix = true,
 			Indent = "\t",
 			FieldSeparator = "\n",
 			SaveRootClass = true
 		};
-
 
 		public enum Format
 		{
@@ -71,10 +64,12 @@ namespace Lime
 			try {
 				if (format == Format.Binary) {
 					WriteYuzuBinarySignature(stream);
-					ys = new Yuzu.Binary.BinarySerializer(); //yuzuBinarySerializer;
+					ys = typeof(T) == typeof(TextureAtlasElement.Params)
+						? atlasParamsBinarySerializer
+						: new Yuzu.Binary.BinarySerializer();
 				} else if (format == Format.JSON) {
 					ys = new Yuzu.Json.JsonSerializer {
-						JsonOptions = defaultYuzuJSONOptions, //yuzuJsonSerializer;
+						JsonOptions = defaultYuzuJSONOptions,
 					};
 				}
 				ys.ToStream(instance, stream);
@@ -98,7 +93,8 @@ namespace Lime
 			}
 		}
 
-		static private GeneratedDeserializersBIN.BinaryDeserializerGen bindesgen = new GeneratedDeserializersBIN.BinaryDeserializerGen();
+		static private readonly GeneratedDeserializersBIN.BinaryDeserializerGen atlasParamsBinaryGeneratedDeserializer = new GeneratedDeserializersBIN.BinaryDeserializerGen();
+		static private readonly BinarySerializer atlasParamsBinarySerializer = new BinarySerializer();
 
 		public static T ReadObject<T>(string path, Stream stream, object obj = null)
 		{
@@ -111,27 +107,29 @@ namespace Lime
 			try {
 				Yuzu.Deserializer.AbstractReaderDeserializer yd = null;
 				if (CheckYuzuBinarySignature(stream)) {
-					//yd = new Yuzu.Binary.BinaryDeserializer(); // yuzuBinaryDeserializer;
-					//yd = bindesgen;
-					yd = new GeneratedDeserializersBIN.BinaryDeserializerGen();
+					yd = typeof(T) == typeof(TextureAtlasElement.Params)
+						? atlasParamsBinaryGeneratedDeserializer
+						: new GeneratedDeserializersBIN.BinaryDeserializerGen();
 				} else {
-					// TODO: Node is basest base
-					//yd = new Yuzu.Json.JsonDeserializer();
 					yd = typeof(T) == typeof(Frame)
 						? new GeneratedDeserializersJSON.Lime.Frame_JsonDeserializer()
 						: typeof(T) == typeof(Node)
 							? new GeneratedDeserializersJSON.Lime.Node_JsonDeserializer()
-							: new Yuzu.Json.JsonDeserializer();// yuzuJsonDeserializer;
+							: new Yuzu.Json.JsonDeserializer();
 				}
-				yd.Options.ReportErrorPosition = false;
+				var bd = yd as BinaryDeserializer;
 				if (obj == null) {
-					if (yd is Yuzu.Binary.BinaryDeserializer) {
-						return (yd as Yuzu.Binary.BinaryDeserializer).FromReader<T>(new BinaryReader(ms));
+					if (bd != null) {
+						return bd.FromReader<T>(new BinaryReader(ms));
 					} else {
 						return (T)yd.FromStream(stream);
 					}
 				} else {
-					return (T)yd.FromStream(obj, stream);
+					if (bd != null) {
+						return (T)bd.FromReader(obj, new BinaryReader(ms));
+					} else {
+						return (T)yd.FromStream(stream);
+					}
 				}
 			} finally {
 				SerializationPathStack.Pop();
