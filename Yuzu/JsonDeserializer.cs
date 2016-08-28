@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
 using System.Text;
 
+using Yuzu.Deserializer;
 using Yuzu.Metadata;
 using Yuzu.Util;
 
@@ -14,11 +14,6 @@ namespace Yuzu.Json
 	{
 		public static JsonDeserializer Instance = new JsonDeserializer();
 		public JsonSerializeOptions JsonOptions = new JsonSerializeOptions();
-
-		public JsonDeserializer()
-		{
-			Options.Assembly = Assembly.GetCallingAssembly();
-		}
 
 		private char? buf;
 
@@ -31,13 +26,6 @@ namespace Yuzu.Json
 			var result = buf.Value;
 			buf = null;
 			return result;
-		}
-
-		protected YuzuException Error(string message, params object[] args)
-		{
-			return new YuzuException(
-				String.Format(message, args),
-				Options.ReportErrorPosition ? new YuzuPosition(Reader.BaseStream.Position) : null);
 		}
 
 		protected void KillBuf()
@@ -432,18 +420,7 @@ namespace Yuzu.Json
 			return array;
 		}
 
-		Stack<object> objStack = new Stack<object>();
-
-		private Action<T> ReadAction<T>()
-		{
-			var name = RequireUnescapedString();
-			if (name == null) return null;
-			var obj = objStack.Peek();
-			var m = obj.GetType().GetMethod(name, BindingFlags.Instance | BindingFlags.Public);
-			if (m == null)
-				throw Error("Unknown action '{0}'", name);
-			return (Action<T>)Delegate.CreateDelegate(typeof(Action<T>), obj, m);
-		}
+		private Action<T> ReadAction<T>() { return GetAction<T>(RequireUnescapedString()); }
 
 		protected object ReadAnyObject() {
 			var ch = SkipSpaces();
@@ -471,10 +448,7 @@ namespace Yuzu.Json
 						return any;
 					}
 					var typeName = RequireUnescapedString();
-					var t = Options.Assembly.GetType(typeName);
-					if (t == null)
-						throw Error("Unknown type '{0}'", typeName);
-					return ReadFields(Activator.CreateInstance(t), GetNextName(first: false));
+					return ReadFields(Activator.CreateInstance(FindType(typeName)), GetNextName(first: false));
 				case '[':
 					return ReadList<object>();
 				default:
@@ -569,16 +543,16 @@ namespace Yuzu.Json
 				var g = t.GetGenericTypeDefinition();
 				if (g == typeof(List<>)) {
 					var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadList", t);
-					return () => m.Invoke(this, new object[] { });
+					return () => m.Invoke(this, Utils.ZeroObjects);
 				}
 				if (g == typeof(Dictionary<,>)) {
 					var m = Utils.GetPrivateCovariantGenericAll(GetType(), "ReadDictionary", t);
-					return () => m.Invoke(this, new object[] { });
+					return () => m.Invoke(this, Utils.ZeroObjects);
 				}
 				if (g == typeof(Action<>)) {
 					var p = t.GetGenericArguments();
 					var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadAction", t);
-					return () => m.Invoke(this, new object[] { });
+					return () => m.Invoke(this, Utils.ZeroObjects);
 				}
 			}
 			if (t.IsArray) {
@@ -724,16 +698,6 @@ namespace Yuzu.Json
 				throw Error("Expected class tag, but found '{0}'", name);
 		}
 
-		private void CheckSameClassTag(Type expectedType)
-		{
-			var typeName = RequireUnescapedString();
-			var actualType = Options.Assembly.GetType(typeName);
-			if (actualType == null)
-				throw Error("Unknown type '{0}'", typeName);
-			if (actualType != expectedType)
-				throw Error("Expected type '{0}', but got {1}", expectedType.Name, typeName);
-		}
-
 		// T is neither a collection nor a bare object.
 		private T ReadObject<T>() where T: class, new() {
 			KillBuf();
@@ -745,11 +709,9 @@ namespace Yuzu.Json
 					if (name != JsonOptions.ClassTag)
 						return (T)ReadFields(new T(), name);
 					var typeName = RequireUnescapedString();
-					var t = Options.Assembly.GetType(typeName);
-					if (t == null)
-						throw Error("Unknown type '{0}'", typeName);
+					var t = FindType(typeName);
 					if (!typeof(T).IsAssignableFrom(t))
-						throw Error("Expected type '{0}', but got {1}", typeof(T).Name, typeName);
+						throw Error("Expected type '{0}', but got '{1}'", typeof(T).Name, typeName);
 					return (T)ReadFields(Activator.CreateInstance(t), GetNextName(first: false));
 				case '[':
 					return (T)ReadFieldsCompact(new T());
@@ -769,7 +731,7 @@ namespace Yuzu.Json
 						ReadFields(obj, name);
 					}
 					else {
-						CheckSameClassTag(typeof(T));
+						CheckExpectedType(RequireUnescapedString(), typeof(T));
 						ReadFields(obj, GetNextName(first: false));
 					}
 					return;
@@ -787,11 +749,9 @@ namespace Yuzu.Json
 			if (RequireOrNull('{')) return null;
 			CheckClassTag(GetNextName(first: true));
 			var typeName = RequireUnescapedString();
-			var t = Options.Assembly.GetType(typeName);
-			if (t == null)
-				throw Error("Unknown type '{0}'", typeName);
+			var t = FindType(typeName);
 			if (!typeof(T).IsAssignableFrom(t))
-				throw Error("Expected interface '{0}', but got {1}", typeof(T).Name, typeName);
+				throw Error("Expected interface '{0}', but got '{1}'", typeof(T).Name, typeName);
 			return (T)ReadFields(Activator.CreateInstance(t), GetNextName(first: false));
 		}
 
@@ -815,7 +775,7 @@ namespace Yuzu.Json
 					var name = GetNextName(first: true);
 					if (name != JsonOptions.ClassTag)
 						return ReadFields(obj, name);
-					CheckSameClassTag(expectedType);
+					CheckExpectedType(RequireUnescapedString(), expectedType);
 					return ReadFields(obj, GetNextName(first: false));
 				case '[':
 					var icoll = expectedType.GetInterface(typeof(ICollection<>).Name);
@@ -830,17 +790,6 @@ namespace Yuzu.Json
 			}
 		}
 
-		public T FromReader<T>(BinaryReader reader)
-		{
-			Reader = reader;
-			Initialize();
-			return (T)ReadValueFunc(typeof(T))();
-		}
-
-		public T FromString<T>(string source)
-		{
-			return FromReader<T>(new BinaryReader(new MemoryStream(Encoding.UTF8.GetBytes(source), false)));
-		}
-
+		public override T FromReaderInt<T>() { return (T)ReadValueFunc(typeof(T))(); }
 	}
 }

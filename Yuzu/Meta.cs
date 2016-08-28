@@ -72,6 +72,7 @@ namespace Yuzu.Metadata
 
 		public List<MethodAction> AfterDeserialization = new List<MethodAction>();
 
+#if !iOS // Apple forbids code generation.
 		private static Action<object, object> SetterGenericHelper<TTarget, TParam>(MethodInfo m)
 		{
 			var action =
@@ -101,6 +102,7 @@ namespace Yuzu.Metadata
 				m.DeclaringType, m.ReturnType);
 			return (Func<object, object>)helper.Invoke(null, new object[] { m });
 		}
+#endif
 
 		private void AddItem(MemberInfo m)
 		{
@@ -136,10 +138,17 @@ namespace Yuzu.Metadata
 				case MemberTypes.Property:
 					var p = m as PropertyInfo;
 					item.Type = p.PropertyType;
+#if iOS // Apple forbids code generation.
+					item.GetValue = obj => p.GetValue(obj, Utils.ZeroObjects);
+					var setter = p.GetSetMethod();
+					if (!merge && setter != null)
+						item.SetValue = (obj, value) => p.SetValue(obj, value, Utils.ZeroObjects);
+#else
 					item.GetValue = BuildGetter(p.GetGetMethod());
 					var setter = p.GetSetMethod();
 					if (!merge && setter != null)
 						item.SetValue = BuildSetter(setter);
+#endif
 					item.PropInfo = p;
 					break;
 				default:
@@ -232,6 +241,23 @@ namespace Yuzu.Metadata
 		private YuzuException Error(string format, params object[] args)
 		{
 			return new YuzuException("In type '" + Type.FullName + "': " + String.Format(format, args));
+		}
+
+		private static Dictionary<string, Type> typeCache = new Dictionary<string, Type>();
+
+		public static Type FindType(string typeName)
+		{
+			Type t = null;
+			if (typeCache.TryGetValue(typeName, out t))
+				return t;
+			foreach (var a in Utils.GetAllReferencedAssemblies()) {
+				t = a.GetType(typeName);
+				if (t != null) {
+					typeCache[typeName] = t;
+					return t;
+				}
+			}
+			return null;
 		}
 	}
 

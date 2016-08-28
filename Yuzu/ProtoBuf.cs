@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 
+using Yuzu.Deserializer;
 using Yuzu.Metadata;
 
 namespace Yuzu.Protobuf
@@ -86,6 +87,11 @@ namespace Yuzu.Protobuf
 		}
 
 		public override object FromReaderInt()
+		{
+			throw new NotImplementedException();
+		}
+
+		public override T FromReaderInt<T>()
 		{
 			throw new NotImplementedException();
 		}

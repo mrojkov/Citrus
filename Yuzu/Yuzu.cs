@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Text;
 
 namespace Yuzu
@@ -113,6 +112,8 @@ namespace Yuzu
 
 	public class CommonOptions
 	{
+		public static CommonOptions Default = new CommonOptions();
+
 		public Type RequiredAttribute = typeof(YuzuRequired);
 		public Type OptionalAttribute = typeof(YuzuOptional);
 		public Type MemberAttribute = typeof(YuzuMember);
@@ -124,13 +125,10 @@ namespace Yuzu
 		public Func<Attribute, string> GetAlias = attr => (attr as YuzuField).Alias;
 		public Func<Attribute, Func<object, object, bool>> GetSerializeCondition =
 			attr => (attr as YuzuSerializeCondition).Check;
-		public Assembly Assembly = Assembly.GetCallingAssembly();
 		public TagMode TagMode = TagMode.Names;
 		public bool IgnoreNewFields = false;
 		public bool AllowEmptyTypes = false;
 		public bool ReportErrorPosition = true;
-
-		public static CommonOptions Default = new CommonOptions();
 	}
 
 	public class YuzuPosition
@@ -163,7 +161,7 @@ namespace Yuzu
 
 	public abstract class AbstractSerializer
 	{
-		public CommonOptions Options = CommonOptions.Default;
+		public CommonOptions Options = new CommonOptions();
 		public abstract void ToWriter(object obj, BinaryWriter writer);
 		public abstract string ToString(object obj);
 		public abstract byte[] ToBytes(object obj);
@@ -241,7 +239,7 @@ namespace Yuzu
 
 	public abstract class AbstractDeserializer
 	{
-		public CommonOptions Options = CommonOptions.Default;
+		public CommonOptions Options = new CommonOptions();
 
 		public abstract object FromReader(object obj, BinaryReader reader);
 		public abstract object FromString(object obj, string source);
@@ -252,59 +250,11 @@ namespace Yuzu
 		public abstract object FromString(string source);
 		public abstract object FromStream(Stream source);
 		public abstract object FromBytes(byte[] bytes);
+
+		public abstract T FromReader<T>(BinaryReader reader);
+		public abstract T FromString<T>(string source);
+		public abstract T FromStream<T>(Stream source);
+		public abstract T FromBytes<T>(byte[] bytes);
+
 	}
-
-	public abstract class AbstractReaderDeserializer: AbstractDeserializer
-	{
-		public BinaryReader Reader;
-
-		public virtual void Initialize() { }
-		public abstract object FromReaderInt();
-		public abstract object FromReaderInt(object obj);
-
-		public override object FromReader(object obj, BinaryReader reader)
-		{
-			Reader = reader;
-			Initialize();
-			return FromReaderInt(obj);
-		}
-
-		public override object FromString(object obj, string source)
-		{
-			return FromReader(obj, new BinaryReader(new MemoryStream(Encoding.UTF8.GetBytes(source), false)));
-		}
-
-		public override object FromStream(object obj, Stream source)
-		{
-			return FromReader(obj, new BinaryReader(source));
-		}
-
-		public override object FromBytes(object obj, byte[] bytes)
-		{
-			return FromStream(obj, new MemoryStream(bytes, false));
-		}
-
-		public override object FromReader(BinaryReader reader)
-		{
-			Reader = reader;
-			Initialize();
-			return FromReaderInt();
-		}
-
-		public override object FromString(string source)
-		{
-			return FromReader(new BinaryReader(new MemoryStream(Encoding.UTF8.GetBytes(source), false)));
-		}
-
-		public override object FromStream(Stream source)
-		{
-			return FromReader(new BinaryReader(source));
-		}
-
-		public override object FromBytes(byte[] bytes)
-		{
-			return FromStream(new MemoryStream(bytes, false));
-		}
-	}
-
 }

@@ -18,8 +18,10 @@ namespace Yuzu.Util
 		}
 	}
 
-	internal class Utils
+	internal static class Utils
 	{
+		public static object[] ZeroObjects = new object[] { };
+
 		public static string QuoteCSharpStringLiteral(string s)
 		{
 			return s.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\t", "\\t");
@@ -88,6 +90,36 @@ namespace Yuzu.Util
 			var args = String.Join("__", t.GetGenericArguments().Select(a => GetMangledTypeName(a)));
 			return n.Remove(n.IndexOf('`')) + "_" + args;
 		}
+
+		private static List<Assembly> allReferencedAssemblies = null;
+		public static List<Assembly> GetAllReferencedAssemblies()
+		{
+			if (allReferencedAssemblies != null)
+				return allReferencedAssemblies;
+
+			var visited = new HashSet<Assembly>();
+			var queue = new Queue<Assembly>();
+
+			var ignoredPrefixes = new string[] { "System", "Microsoft", "mscorlib" };
+			Action<Assembly> visit = a => {
+				if (ignoredPrefixes.Any(p => a.FullName.StartsWith(p)))
+					return;
+				queue.Enqueue(a);
+				visited.Add(a);
+			};
+
+			foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
+				visit(a);
+			while (queue.Count() != 0) {
+				foreach (var aName in queue.Dequeue().GetReferencedAssemblies()) {
+					var a = Assembly.Load(aName);
+					if (!visited.Contains(a))
+						visit(a);
+				}
+			}
+			allReferencedAssemblies = visited.ToList();
+			return allReferencedAssemblies;
+		}
 	}
 
 	internal class CodeWriter
@@ -95,6 +127,7 @@ namespace Yuzu.Util
 		public StreamWriter Output;
 		private int indentLevel = 0;
 		public string IndentString = "\t";
+		private int tempCount = 0;
 
 		public void PutPart(string format, params object[] p)
 		{
@@ -124,6 +157,14 @@ namespace Yuzu.Util
 				Put("{0}.Add({1});\n", collName, elementName);
 			else
 				Put("(({2}){0}).Add({1});\n", collName, elementName, Utils.GetTypeSpec(icoll));
+		}
+
+		public void ResetTempNames() { tempCount = 0; }
+
+		public string GetTempName()
+		{
+			tempCount += 1;
+			return "tmp" + tempCount.ToString();
 		}
 	}
 }
