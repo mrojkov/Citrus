@@ -324,6 +324,7 @@
     <Compile Include="Source\Widgets\DropDownList.cs" />
     <Compile Include="Source\Widgets\TabBar.cs" />
     <Compile Include="Source\GeneratedDeserializersJSON.cs" />
+    <Compile Include="Source\GeneratedDeserializersBIN.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
