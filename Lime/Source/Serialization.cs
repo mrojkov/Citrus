@@ -64,9 +64,10 @@ namespace Lime
 			try {
 				if (format == Format.Binary) {
 					WriteYuzuBinarySignature(stream);
-					ys = typeof(T) == typeof(TextureAtlasElement.Params)
-						? atlasParamsBinarySerializer
-						: new Yuzu.Binary.BinarySerializer();
+					//ys = typeof(T) == typeof(TextureAtlasElement.Params)
+					//	? atlasParamsBinarySerializer
+					//	: new Yuzu.Binary.BinarySerializer();
+					ys = new Yuzu.Binary.BinarySerializer();
 				} else if (format == Format.JSON) {
 					ys = new Yuzu.Json.JsonSerializer {
 						JsonOptions = defaultYuzuJSONOptions,
@@ -107,9 +108,10 @@ namespace Lime
 			try {
 				Yuzu.Deserializer.AbstractReaderDeserializer yd = null;
 				if (CheckYuzuBinarySignature(stream)) {
-					yd = typeof(T) == typeof(TextureAtlasElement.Params)
-						? atlasParamsBinaryGeneratedDeserializer
-						: new GeneratedDeserializersBIN.BinaryDeserializerGen();
+					//yd = typeof(T) == typeof(TextureAtlasElement.Params)
+					//	? atlasParamsBinaryGeneratedDeserializer
+					//	: new GeneratedDeserializersBIN.BinaryDeserializerGen();
+					yd = new GeneratedDeserializersBIN.BinaryDeserializerGen();
 				} else {
 					yd = typeof(T) == typeof(Frame)
 						? new GeneratedDeserializersJSON.Lime.Frame_JsonDeserializer()
