@@ -38,17 +38,18 @@ namespace Yuzu
 		public readonly string Method;
 		public YuzuSerializeIf(string method) { Method = method; }
 
-		private Func<bool> checker;
+		private Func<object, bool> checker;
 
 		public override bool Check(object obj, object field) {
 			if (checker == null) {
 				var fn = obj.GetType().GetMethod(Method);
 				if (fn == null)
 					throw new YuzuException();
-				var e = Expression.Call(Expression.Constant(obj), fn);
-				checker = Expression.Lambda<Func<bool>>(e).Compile();
+				var p = Expression.Parameter(typeof(object));
+				var e = Expression.Call(Expression.Convert(p, obj.GetType()), fn);
+				checker = Expression.Lambda<Func<object, bool>>(e, p).Compile();
 			}
-			return checker();
+			return checker(obj);
 		}
 	}
 
