@@ -121,6 +121,12 @@ namespace YuzuTest
 		public decimal N;
 	}
 
+	public class SampleNullable
+	{
+		[YuzuRequired]
+		public int? N;
+	}
+
 	public class SampleMethodOrder
 	{
 		[YuzuRequired("4")]

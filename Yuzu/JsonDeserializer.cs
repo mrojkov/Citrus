@@ -432,7 +432,19 @@ namespace Yuzu.Json
 
 		private Action<T> ReadAction<T>() { return GetAction<T>(RequireUnescapedString()); }
 
-		protected object ReadAnyObject() {
+		private object ReadNullable(Func<object> normalRead)
+		{
+			var ch = SkipSpaces();
+			if (ch == 'n') {
+				Require("ull");
+				return null;
+			}
+			PutBack(ch);
+			return normalRead();
+		}
+
+		protected object ReadAnyObject()
+		{
 			var ch = SkipSpaces();
 			PutBack(ch);
 			switch (ch) {
@@ -571,6 +583,10 @@ namespace Yuzu.Json
 					var p = t.GetGenericArguments();
 					var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadAction", t);
 					return () => m.Invoke(this, Utils.ZeroObjects);
+				}
+				if (g == typeof(Nullable<>)) {
+					var r = ReadValueFunc(t.GetGenericArguments()[0]);
+					return () => ReadNullable(r);
 				}
 			}
 			if (t.IsArray) {

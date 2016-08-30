@@ -273,6 +273,14 @@ namespace Yuzu.Json
 			WriteUnescapedString(a.Method.Name);
 		}
 
+		private void WriteNullable(object obj, Action<object> normalWrite)
+		{
+			if (obj == null)
+				WriteStr("null");
+			else
+				normalWrite(obj);
+		}
+
 		private Dictionary<Type, Action<object>> writerCache = new Dictionary<Type, Action<object>>();
 		private int jsonOptionsGeneration = 0;
 
@@ -340,6 +348,10 @@ namespace Yuzu.Json
 				}
 				if (g == typeof(Action<>)) {
 					return WriteAction;
+				}
+				if (g == typeof(Nullable<>)) {
+					var w = GetWriteFunc(t.GetGenericArguments()[0]);
+					return obj => WriteNullable(obj, w);
 				}
 			}
 			if (t.IsArray) {

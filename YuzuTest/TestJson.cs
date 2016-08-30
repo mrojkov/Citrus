@@ -319,6 +319,27 @@ namespace YuzuTest.Json
 		}
 
 		[TestMethod]
+		public void TestNullable()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = "";
+			var jd = new JsonDeserializer();
+
+			var v1 = new SampleNullable { N = null };
+			var result1 = js.ToString(v1);
+			Assert.AreEqual("{\"N\":null}", result1);
+			var w1 = jd.FromString<SampleNullable>(result1);
+			Assert.AreEqual(v1.N, w1.N);
+
+			var v2 = new SampleNullable { N = 997 };
+			var result2 = js.ToString(v2);
+			Assert.AreEqual("{\"N\":997}", result2);
+			var w2 = jd.FromString<SampleNullable>(result2);
+			Assert.AreEqual(v2.N, w2.N);
+		}
+
+		[TestMethod]
 		public void TestMemberOrder()
 		{
 			var js = new JsonSerializer();
