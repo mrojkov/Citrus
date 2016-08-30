@@ -7,7 +7,7 @@ namespace Lime
 {
 	public partial class ScrollView
 	{
-		protected class VelocityMeter
+		class VelocityMeter
 		{
 			struct Sample
 			{
