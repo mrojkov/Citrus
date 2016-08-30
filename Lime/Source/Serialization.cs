@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using Yuzu;
 using Yuzu.Binary;
 using Yuzu.Json;
@@ -64,9 +66,6 @@ namespace Lime
 			try {
 				if (format == Format.Binary) {
 					WriteYuzuBinarySignature(stream);
-					//ys = typeof(T) == typeof(TextureAtlasElement.Params)
-					//	? atlasParamsBinarySerializer
-					//	: new Yuzu.Binary.BinarySerializer();
 					ys = new Yuzu.Binary.BinarySerializer();
 				} else if (format == Format.JSON) {
 					ys = new Yuzu.Json.JsonSerializer {
@@ -94,12 +93,8 @@ namespace Lime
 			}
 		}
 
-		static private readonly GeneratedDeserializersBIN.BinaryDeserializerGen atlasParamsBinaryGeneratedDeserializer = new GeneratedDeserializersBIN.BinaryDeserializerGen();
-		static private readonly BinarySerializer atlasParamsBinarySerializer = new BinarySerializer();
-
 		public static T ReadObject<T>(string path, Stream stream, object obj = null)
 		{
-			// TODO: should we copy only if (!stream.CanSeek) ?
 			var ms = new MemoryStream();
 			stream.CopyTo(ms);
 			ms.Seek(0, SeekOrigin.Begin);
@@ -108,9 +103,6 @@ namespace Lime
 			try {
 				Yuzu.Deserializer.AbstractReaderDeserializer yd = null;
 				if (CheckYuzuBinarySignature(stream)) {
-					//yd = typeof(T) == typeof(TextureAtlasElement.Params)
-					//	? atlasParamsBinaryGeneratedDeserializer
-					//	: new GeneratedDeserializersBIN.BinaryDeserializerGen();
 					yd = new GeneratedDeserializersBIN.BinaryDeserializerGen();
 				} else {
 					yd = typeof(T) == typeof(Frame)
@@ -122,15 +114,15 @@ namespace Lime
 				var bd = yd as BinaryDeserializer;
 				if (obj == null) {
 					if (bd != null) {
-						return bd.FromReader<T>(new BinaryReader(ms));
+						return bd.FromReader<T>(new BinaryReader(stream));
 					} else {
 						return (T)yd.FromStream(stream);
 					}
 				} else {
 					if (bd != null) {
-						return (T)bd.FromReader(obj, new BinaryReader(ms));
+						return (T)bd.FromReader(obj, new BinaryReader(stream));
 					} else {
-						return (T)yd.FromStream(stream);
+						return (T)yd.FromStream(obj, stream);
 					}
 				}
 			} finally {
@@ -187,6 +179,49 @@ namespace Lime
 				s.Seek(0, SeekOrigin.Begin);
 			}
 			return r;
+		}
+
+		public static void GenerateDeserializers(string filename, List<Type> types, Format format)
+		{
+			switch (format) {
+				case Format.Binary: {
+					var yjdg = new BinaryDeserializerGenerator("GeneratedDeserializersBIN");
+						using (var ms = new MemoryStream())
+						using (var sw = new StreamWriter(ms)) {
+							yjdg.GenWriter = sw;
+							yjdg.GenerateHeader();
+							foreach (var generate in types
+								.Select(t => yjdg.GetType()
+								.GetMethod("Generate")
+								.MakeGenericMethod(t))) {
+								generate.Invoke(yjdg, new object[] { });
+							}
+							yjdg.GenerateFooter();
+							sw.Flush();
+							ms.WriteTo(new FileStream(filename, FileMode.Create));
+						}
+					} break;
+				case Format.JSON: {
+					var ybdg = new JsonDeserializerGenerator("GeneratedDeserializersJSON");
+					ybdg.JsonOptions = defaultYuzuJSONOptions;
+						using (var ms = new MemoryStream())
+						using (var sw = new StreamWriter(ms)) {
+							ybdg.GenWriter = sw;
+							ybdg.GenerateHeader();
+							foreach (var generate in types
+								.Select(t => ybdg.GetType()
+								.GetMethod("Generate")
+								.MakeGenericMethod(t))) {
+								generate.Invoke(ybdg, new object[] { });
+							}
+							ybdg.GenerateFooter();
+							sw.Flush();
+							ms.WriteTo(new FileStream(filename, FileMode.Create));
+						}
+				} break;
+				default:
+					throw new NotImplementedException();
+			}
 		}
 
 		public static void GenerateDeserializers()

@@ -17,8 +17,6 @@ namespace Lime
 
 		public int Version { get; private set; }
 
-		public AnimatorCollection() { /* ctor for ProtoBuf only */ }
-
 		public AnimatorCollection(Node owner)
 		{
 			this.owner = owner;

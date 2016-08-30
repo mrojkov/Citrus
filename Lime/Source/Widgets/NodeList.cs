@@ -20,7 +20,7 @@ namespace Lime
 
 			object IEnumerator.Current { get { return current; } }
 
-			public bool MoveNext() 
+			public bool MoveNext()
 			{
 				if (current == null) {
 					current = first;
@@ -43,11 +43,6 @@ namespace Lime
 		private readonly Node owner;
 		private List<Node> list;
 
-		/// <summary>
-		/// This constructor is used by ProtoBuf.
-		/// </summary>
-		public NodeList() { /* ctor for ProtoBuf only */ }
-		
 		public NodeList(Node owner)
 		{
 			this.list = null;
@@ -143,7 +138,7 @@ namespace Lime
 		/// </summary>
 		public void Add(Node node)
 		{
-			RuntimeChecksBeforeInsertion(node); 
+			RuntimeChecksBeforeInsertion(node);
 			CreateListIfNeeded();
 			node.Parent = owner;
 			if (Count > 0) {
@@ -226,7 +221,7 @@ namespace Lime
 
 		/// <summary>
 		/// Searchs for node with provided Id in this list.
-		/// Returns null if this list doesn't contain sought-for node. 
+		/// Returns null if this list doesn't contain sought-for node.
 		/// </summary>
 		public Node TryFind(string id)
 		{
@@ -250,17 +245,17 @@ namespace Lime
 			list.RemoveAt(index);
 			if (index > 0) {
 				list[index - 1].NextSibling = index < Count ? list[index] : null;
-			} 
+			}
 		}
 
 		public Node this[int index]
 		{
-			get 
+			get
 			{
 				if (list == null) {
-					throw new IndexOutOfRangeException();				
+					throw new IndexOutOfRangeException();
 				}
-				return list[index]; 
+				return list[index];
 			}
 			set
 			{

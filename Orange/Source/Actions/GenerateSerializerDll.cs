@@ -7,23 +7,18 @@ namespace Orange
 {
 	static partial class Actions
 	{
-		[MenuItem("Generate Serializer.dll")]
-		public static void GenerateSerializerDllAction()
-		{
-			GenerateSerializerDll();
-		}
-
-		public static bool GenerateSerializerDll()
+		[MenuItem("Generate Yuzu Deserializers For Application Types")]
+		public static void GenerateYuzuDeserializersForApp()
 		{
 			AssetCooker.CookForActivePlatform();
 			if (!BuildGame(Orange.TargetPlatform.Desktop)) {
-				return false;
+				return;
 			}
 			var builder = new SolutionBuilder(TargetPlatform.Desktop);
-			int exitCode = builder.Run("--GenerateSerializationAssembly");
+			int exitCode = builder.Run("--GenerateYuzuDeserializers");
 			if (exitCode != 0) {
 				Console.WriteLine("Application terminated with exit code {0}", exitCode);
-				return false;
+				return;
 			}
 			string app = builder.GetApplicationPath();
 			string dir = System.IO.Path.GetDirectoryName(app);
@@ -33,11 +28,11 @@ namespace Orange
 				Console.WriteLine(@"Ensure your Application.cs contains following code:
 	public static void Main(string[] args)
 	{
-		if (Array.IndexOf(args, ""--GenerateSerializationAssembly"") >= 0) {
+		if (Array.IndexOf(args, ""--GenerateYuzuDeserializers"") >= 0) {
 			Lime.Environment.GenerateSerializationAssembly(""Serializer"");
 			return;
-		}");
-				return false;
+	}");
+				return;
 			}
 			var destination = System.IO.Path.Combine(The.Workspace.ProjectDirectory, "Serializer.dll");
 			if (System.IO.File.Exists(destination)) {
@@ -45,7 +40,6 @@ namespace Orange
 			}
 			System.IO.File.Move(assembly, destination);
 			Console.Write("Serialization assembly saved to '{0}'\n", destination);
-			return true;
 		}
 	}
 }

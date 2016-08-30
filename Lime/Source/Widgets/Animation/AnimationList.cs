@@ -39,11 +39,6 @@ namespace Lime
 			get { return Find(id); }
 		}
 
-		public AnimationList()
-		{
-			list = new List<Animation>();
-		}
-
 		public AnimationList(Node owner)
 		{
 			this.owner = owner;
@@ -55,7 +50,7 @@ namespace Lime
 			this.owner = owner;
 			list = new List<Animation>(count);
 		}
-		
+
 		public AnimationList Clone(Node owner)
 		{
 			var result = new AnimationList(owner, Count);
