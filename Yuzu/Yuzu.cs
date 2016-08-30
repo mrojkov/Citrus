@@ -111,21 +111,31 @@ namespace Yuzu
 
 	}
 
+	public class MetaOptions
+	{
+		public static MetaOptions Default = new MetaOptions();
+
+		public readonly Type RequiredAttribute = typeof(YuzuRequired);
+		public readonly Type OptionalAttribute = typeof(YuzuOptional);
+		public readonly Type MemberAttribute = typeof(YuzuMember);
+		public readonly Type CompactAttribute = typeof(YuzuCompact);
+		public readonly Type SerializeIfAttribute = typeof(YuzuSerializeCondition);
+		public readonly Type AfterDeserializationAttribute = typeof(YuzuAfterDeserialization);
+		public readonly Type MergeAttribute = typeof(YuzuMerge);
+
+		public readonly Func<Attribute, string> GetAlias = attr => (attr as YuzuField).Alias;
+		public readonly Func<Attribute, Func<object, object, bool>> GetSerializeCondition =
+			attr => (attr as YuzuSerializeCondition).Check;
+
+		public MetaOptions()
+		{
+
+		}
+	}
+
 	public class CommonOptions
 	{
-		public static CommonOptions Default = new CommonOptions();
-
-		public Type RequiredAttribute = typeof(YuzuRequired);
-		public Type OptionalAttribute = typeof(YuzuOptional);
-		public Type MemberAttribute = typeof(YuzuMember);
-		public Type CompactAttribute = typeof(YuzuCompact);
-		public Type SerializeIfAttribute = typeof(YuzuSerializeCondition);
-		public Type AfterDeserializationAttribute = typeof(YuzuAfterDeserialization);
-		public Type MergeAttribute = typeof(YuzuMerge);
-
-		public Func<Attribute, string> GetAlias = attr => (attr as YuzuField).Alias;
-		public Func<Attribute, Func<object, object, bool>> GetSerializeCondition =
-			attr => (attr as YuzuSerializeCondition).Check;
+		public MetaOptions Meta = MetaOptions.Default;
 		public TagMode TagMode = TagMode.Names;
 		public bool IgnoreNewFields = false;
 		public bool AllowEmptyTypes = false;

@@ -59,7 +59,7 @@ namespace Yuzu.Metadata
 		}
 
 		public readonly Type Type;
-		public readonly CommonOptions Options;
+		private MetaOptions Options;
 		public readonly List<Item> Items = new List<Item>();
 		public readonly bool IsCompact;
 		public object Default { get; private set; }
@@ -195,7 +195,7 @@ namespace Yuzu.Metadata
 		private Meta(Type t, CommonOptions options)
 		{
 			Type = t;
-			Options = options;
+			Options = options.Meta;
 			IsCompact = t.IsDefined(Options.CompactAttribute, false);
 
 			foreach (var i in t.GetInterfaces())
