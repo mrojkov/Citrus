@@ -459,12 +459,12 @@ namespace YuzuTest.Binary
 
 			var v0 = new List<string> { "a", "b", "c" };
 			var result0 = bs.ToBytes(v0);
-			Assert.AreEqual("21 0F 03 00 00 00 " + XS("a", "b", "c"), XS(result0));
+			Assert.AreEqual("21 10 03 00 00 00 " + XS("a", "b", "c"), XS(result0));
 
 			var w0 = new List<string>();
 			bd.FromBytes(w0, result0);
 			CollectionAssert.AreEqual(v0, w0);
-			bd.FromBytes(w0, new byte[] { 0x21, 0x0F, 0, 0, 0, 0 });
+			bd.FromBytes(w0, new byte[] { 0x21, 0x10, 0, 0, 0, 0 });
 			CollectionAssert.AreEqual(v0, w0);
 			bd.FromBytes(w0, result0);
 			CollectionAssert.AreEqual(new List<string> { "a", "b", "c", "a", "b", "c" }, w0);
@@ -479,15 +479,15 @@ namespace YuzuTest.Binary
 			var v0 = new Dictionary<string, int> { { "a", 1 }, { "b", 2 } };
 			var result0 = bs.ToBytes(v0);
 			Assert.AreEqual(
-				"22 0F 05 02 00 00 00 " + XS("a") + " 01 00 00 00 " + XS("b") + " 02 00 00 00",
+				"22 10 05 02 00 00 00 " + XS("a") + " 01 00 00 00 " + XS("b") + " 02 00 00 00",
 				XS(result0));
 
 			var w0 = new Dictionary<string, int>();
 			bd.FromBytes(w0, result0);
 			CollectionAssert.AreEqual(v0, w0);
-			bd.FromBytes(w0, new byte[] { 0x22, 0x0F, 05, 0, 0, 0, 0 });
+			bd.FromBytes(w0, new byte[] { 0x22, 0x10, 05, 0, 0, 0, 0 });
 			CollectionAssert.AreEqual(v0, w0);
-			bd.FromBytes(w0, SX("22 0F 05 01 00 00 00 " + XS("c") + " 03 00 00 00").ToArray());
+			bd.FromBytes(w0, SX("22 10 05 01 00 00 00 " + XS("c") + " 03 00 00 00").ToArray());
 			CollectionAssert.AreEqual(
 				new Dictionary<string, int> { { "a", 1 }, { "b", 2 }, { "c", 3 } }, w0);
 		}
@@ -507,7 +507,7 @@ namespace YuzuTest.Binary
 			var result0 = bs.ToBytes(v0);
 			Assert.AreEqual(
 				"20 01 00 " + XS("YuzuTest.SampleDict") + " 02 00 " +
-				XS("Value", RoughType.Int, "Children", RoughType.Mapping) + " 0F 20" +
+				XS("Value", RoughType.Int, "Children", RoughType.Mapping) + " 10 20" +
 				" 01 00 03 00 00 00 02 00 02 00 00 00 " + XS("a") +
 				" 01 00 01 00 05 00 00 00 02 00 00 00 00 00 00 00 " +
 				XS("b") + " 01 00 01 00 07 00 00 00 02 00 FF FF FF FF 00 00 00 00",
@@ -577,7 +577,7 @@ namespace YuzuTest.Binary
 			var result0 = bs.ToBytes(v0);
 			Assert.AreEqual(
 				"20 01 00 " + XS("YuzuTest.SampleArray") + " 01 00 " + XS("A", RoughType.Sequence) +
-				" 0F 01 00 03 00 00 00 " + XS("a", "b", "c") + " 00 00",
+				" 10 01 00 03 00 00 00 " + XS("a", "b", "c") + " 00 00",
 				XS(result0));
 			var w0 = new SampleArray();
 			bd.FromBytes(w0, result0);
@@ -851,7 +851,7 @@ namespace YuzuTest.Binary
 			bd.FromBytes(w, SX("20 01 00 01 00 21 02 03 00 00 00 01 02 03 00 00").ToArray());
 			CollectionAssert.AreEqual(new byte[] { 1, 2, 3 }, (List<byte>)w.F);
 			bd.FromBytes(w, SX(
-				"20 01 00 01 00 22 0F 03 02 00 00 00 " +
+				"20 01 00 01 00 22 10 03 02 00 00 00 " +
 				XS("a") + " 01 00 " + XS("b") + " 02 00 00 00").ToArray());
 			CollectionAssert.AreEqual(
 				new Dictionary<string, short>() { { "a", 1 }, { "b", 2 } },
@@ -859,9 +859,9 @@ namespace YuzuTest.Binary
 
 			Assert.AreEqual(
 				typeof(Dictionary<string, object>),
-				bd.FromBytes(new byte[] { 0x22, 0x0F, (byte)RoughType.Any, 00, 00, 00, 00 }).GetType());
+				bd.FromBytes(new byte[] { 0x22, 0x10, (byte)RoughType.Any, 00, 00, 00, 00 }).GetType());
 			CollectionAssert.AreEqual(
-				(List<object>)bd.FromBytes(SX("21 10 02 00 00 00 01 05 0F " + XS("abc")).ToArray()),
+				(List<object>)bd.FromBytes(SX("21 11 02 00 00 00 01 05 10 " + XS("abc")).ToArray()),
 				new object[] { (sbyte)5, "abc" });
 		}
 
@@ -875,7 +875,7 @@ namespace YuzuTest.Binary
 			var w = new SampleTree();
 			bd.FromBytes(w, SX(
 				"20 01 00 " + XS("YuzuTest.SampleTree") + " 03 00 " +
-				XS("a", RoughType.Int, "a1", RoughType.Sequence) + " 0F " +
+				XS("a", RoughType.Int, "a1", RoughType.Sequence) + " 10 " +
 				XS("b", RoughType.Sequence) +
 				" 20 01 00 09 00 00 00 02 00 00 00 00 00 03 00 FF FF FF FF 00 00").ToArray());
 			Assert.AreEqual(9, w.Value);
