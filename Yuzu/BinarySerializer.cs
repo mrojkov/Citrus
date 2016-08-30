@@ -234,7 +234,7 @@ namespace Yuzu.Binary
 			result = (short)(classIdCache.Count + 1);
 			classIdCache[meta.Type] = result;
 			writer.Write(result);
-			writer.Write(meta.Type.FullName);
+			writer.Write(TypeSerializer.Serialize(meta.Type));
 			writer.Write((short)meta.Items.Count);
 			foreach (var yi in meta.Items) {
 				writer.Write(yi.Tag(Options));
