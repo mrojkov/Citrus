@@ -580,7 +580,6 @@ namespace Yuzu.Json
 					return () => m.Invoke(this, Utils.ZeroObjects);
 				}
 				if (g == typeof(Action<>)) {
-					var p = t.GetGenericArguments();
 					var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadAction", t);
 					return () => m.Invoke(this, Utils.ZeroObjects);
 				}

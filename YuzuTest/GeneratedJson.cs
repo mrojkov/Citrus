@@ -242,6 +242,56 @@ namespace YuzuGen.YuzuTest
 		}
 	}
 
+	class SampleNullable_JsonDeserializer : JsonDeserializerGenBase
+	{
+		public static new SampleNullable_JsonDeserializer Instance = new SampleNullable_JsonDeserializer();
+
+		public SampleNullable_JsonDeserializer()
+		{
+			Options.IgnoreUnknownFields = false;
+			Options.AllowEmptyTypes = false;
+			Options.ReportErrorPosition = false;
+			JsonOptions.EnumAsString = true;
+			JsonOptions.SaveRootClass = false;
+			JsonOptions.IgnoreCompact = false;
+			JsonOptions.Int64AsString = false;
+			JsonOptions.DecimalAsString = false;
+			JsonOptions.FieldSeparator = "\n";
+			JsonOptions.Indent = "\t";
+			JsonOptions.ClassTag = "class";
+			JsonOptions.ArrayLengthPrefix = false;
+			JsonOptions.DateFormat = "O";
+			JsonOptions.TimeSpanFormat = "c";
+			JsonOptions.Unordered = false;
+		}
+
+		public override object FromReaderInt()
+		{
+			return FromReaderTyped<global::YuzuTest.SampleNullable>(Reader);
+		}
+
+		public override object FromReaderIntPartial(string name)
+		{
+			return ReadFields(new global::YuzuTest.SampleNullable(), name);
+		}
+
+		protected override object ReadFields(object obj, string name)
+		{
+			var result = (global::YuzuTest.SampleNullable)obj;
+			if ("N" != name) throw new YuzuException("N!=" + name);
+			result.N = null;
+			if (SkipSpacesCarefully() == 'n') {
+				Require("null");
+			}
+			else {
+				result.N = RequireInt();
+			}
+			name = GetNextName(false);
+			Require('}');
+			return result;
+		}
+	}
+
 	class SampleBool_JsonDeserializer : JsonDeserializerGenBase
 	{
 		public static new SampleBool_JsonDeserializer Instance = new SampleBool_JsonDeserializer();

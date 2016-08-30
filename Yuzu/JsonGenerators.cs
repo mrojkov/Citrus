@@ -266,6 +266,17 @@ namespace Yuzu.Json
 				cw.Put("}\n");
 				return;
 			}
+			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>)) {
+				cw.PutPart("null;\n");
+				cw.Put("if (SkipSpacesCarefully() == 'n') {\n");
+				cw.Put("Require(\"null\");\n");
+				cw.Put("}\n");
+				cw.Put("else {\n");
+				cw.Put("{0} = ", name);
+				GenerateValue(t.GetGenericArguments()[0], name);
+				cw.Put("}\n");
+				return;
+			}
 			if (t.IsArray && !JsonOptions.ArrayLengthPrefix) {
 				PutRequireOrNullArray('[', t, name);
 				cw.Put("if (SkipSpacesCarefully() == ']') {\n");

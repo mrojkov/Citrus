@@ -331,12 +331,16 @@ namespace YuzuTest.Json
 			Assert.AreEqual("{\"N\":null}", result1);
 			var w1 = jd.FromString<SampleNullable>(result1);
 			Assert.AreEqual(v1.N, w1.N);
+			var w1g = (SampleNullable)SampleNullable_JsonDeserializer.Instance.FromString(result1);
+			Assert.AreEqual(v1.N, w1g.N);
 
 			var v2 = new SampleNullable { N = 997 };
 			var result2 = js.ToString(v2);
 			Assert.AreEqual("{\"N\":997}", result2);
 			var w2 = jd.FromString<SampleNullable>(result2);
 			Assert.AreEqual(v2.N, w2.N);
+			var w2g = (SampleNullable)SampleNullable_JsonDeserializer.Instance.FromString(result2);
+			Assert.AreEqual(v2.N, w2g.N);
 		}
 
 		[TestMethod]
