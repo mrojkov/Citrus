@@ -128,6 +128,8 @@ namespace Yuzu.Util
 		private static Regex extendedAssemblyInfo = new Regex(
 			@", Version=\d+.\d+.\d+.\d+, Culture=neutral, PublicKeyToken=[a-z0-9]+", RegexOptions.Compiled);
 
+		public static bool Compatibility = false;
+
 		public static string Serialize(Type t)
 		{
 			return extendedAssemblyInfo.Replace(t.AssemblyQualifiedName, "").Replace(", mscorlib", "");
@@ -143,6 +145,9 @@ namespace Yuzu.Util
 				cache[typeName] = t;
 				return t;
 			}
+			// TODO: Remove when/if compatibility not needed.
+			if (!Compatibility)
+				return null;
 			for (var i = assembliesLru.First; i != null; i = i.Next) {
 				t = i.Value.GetType(typeName);
 				if (t != null) {
