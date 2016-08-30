@@ -351,6 +351,30 @@ namespace YuzuTest.Binary
 		}
 
 		[TestMethod]
+		public void TestNullable()
+		{
+			var bs = new BinarySerializer();
+			var bd = new BinaryDeserializer();
+
+			var v1 = new SampleNullable { N = null };
+			var result1 = bs.ToBytes(v1);
+			Assert.AreEqual(
+				"20 01 00 " + XS(typeof(SampleNullable)) + " 01 00 " + XS("N", RoughType.Nullable) + " 05 " +
+				"01 00 01 00 00",
+				XS(result1));
+			var w1 = bd.FromBytes<SampleNullable>(result1);
+			Assert.AreEqual(v1.N, w1.N);
+
+			var v2 = new SampleNullable { N = 997 };
+			var result2 = bs.ToBytes(v2);
+			Assert.AreEqual(
+				"20 01 00 01 00 00 E5 03 00 00 00 00",
+				XS(result2));
+			var w2 = bd.FromBytes<SampleNullable>(result2);
+			Assert.AreEqual(v2.N, w2.N);
+		}
+
+		[TestMethod]
 		public void TestMemberOrder()
 		{
 			var bs = new BinarySerializer();

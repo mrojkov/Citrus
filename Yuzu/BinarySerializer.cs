@@ -28,6 +28,7 @@ namespace Yuzu.Binary
 		TimeSpan  = 15,
 		String    = 16,
 		Any       = 17,
+		Nullable  = 18,
 
 		Record    = 32,
 		Sequence  = 33,
@@ -146,6 +147,11 @@ namespace Yuzu.Binary
 				var g = t.GetGenericArguments();
 				WriteRoughType(g[0]);
 				WriteRoughType(g[1]);
+				return;
+			}
+			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>)) {
+				writer.Write((byte)RoughType.Nullable);
+				WriteRoughType(t.GetGenericArguments()[0]);
 				return;
 			}
 			if (t.IsArray) {
@@ -298,6 +304,14 @@ namespace Yuzu.Binary
 				}
 				if (g == typeof(Action<>)) {
 					return WriteAction;
+				}
+				if (g == typeof(Nullable<>)) {
+					var w = GetWriteFunc(t.GetGenericArguments()[0]);
+					return obj => {
+						writer.Write(obj == null);
+						if (obj != null)
+							w(obj);
+					};
 				}
 			}
 			if (t.IsArray) {

@@ -59,6 +59,8 @@ namespace Yuzu.Binary
 			}
 			if (rt == RoughType.Record)
 				return typeof(Record);
+			if (rt == RoughType.Nullable)
+				return typeof(Nullable<>).MakeGenericType(ReadType());
 			throw Error("Unknown rough type {0}", rt);
 		}
 
@@ -77,6 +79,8 @@ namespace Yuzu.Binary
 				var g = expectedType.GetGenericArguments();
 				return ReadCompatibleType(g[0]) && ReadCompatibleType(g[1]);
 			}
+			if (expectedType.IsGenericType && expectedType.GetGenericTypeDefinition() == typeof(Nullable<>))
+				return rt == RoughType.Nullable && ReadCompatibleType(expectedType.GetGenericArguments()[0]);
 			var icoll = expectedType.GetInterface(typeof(ICollection<>).Name);
 			if (icoll != null)
 				return rt == RoughType.Sequence && ReadCompatibleType(icoll.GetGenericArguments()[0]);
@@ -436,9 +440,12 @@ namespace Yuzu.Binary
 					return () => m.Invoke(this, Utils.ZeroObjects);
 				}
 				if (g == typeof(Action<>)) {
-					var p = t.GetGenericArguments();
 					var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadAction", t);
 					return () => m.Invoke(this, Utils.ZeroObjects);
+				}
+				if (g == typeof(Nullable<>)) {
+					var r = ReadValueFunc(t.GetGenericArguments()[0]);
+					return () => Reader.ReadBoolean() ? null : r();
 				}
 			}
 			if (t.IsArray) {
