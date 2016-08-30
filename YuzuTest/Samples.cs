@@ -437,6 +437,20 @@ namespace YuzuTest
 		IEnumerator IEnumerable.GetEnumerator() { return impl.GetEnumerator(); }
 	}
 
+	public class SampleMultiCollection : List<string>, ICollection<int>
+	{
+		private List<int> impl = new List<int>();
+		int ICollection<int>.Count { get { return impl.Count; } }
+		bool ICollection<int>.IsReadOnly { get { return false; } }
+		void ICollection<int>.Add(int item) { impl.Add(item); }
+		void ICollection<int>.Clear() { impl.Clear(); }
+		bool ICollection<int>.Contains(int item) { return impl.Contains(item); }
+		void ICollection<int>.CopyTo(int[] array, int arrayIndex) { impl.CopyTo(array, arrayIndex); }
+		bool ICollection<int>.Remove(int item) { return impl.Remove(item); }
+		IEnumerator<int> IEnumerable<int>.GetEnumerator() { return impl.GetEnumerator(); }
+		IEnumerator IEnumerable.GetEnumerator() { return impl.GetEnumerator(); }
+	}
+
 	public class SampleCollectionWithField<T> : SampleCollection<T>
 	{
 		[YuzuRequired]

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -172,7 +173,6 @@ namespace Yuzu.Metadata
 				default:
 					throw Error("Member type {0} not supported", m.MemberType);
 			}
-
 			if (item.SetValue == null) {
 				if (!item.Type.IsClass && !item.Type.IsInterface || item.Type == typeof(object))
 					throw Error("Unable to either set or merge item {0}", item.Name);
@@ -219,7 +219,7 @@ namespace Yuzu.Metadata
 			foreach (var i in t.GetInterfaces())
 				ExploreType(i);
 			ExploreType(t);
-			if (t.GetInterface(typeof(ICollection<>).Name) != null) {
+			if (Utils.GetICollection(t) != null) {
 				if (Items.Count > 0)
 					throw Error("Serializable fields in collection are not supported");
 			}

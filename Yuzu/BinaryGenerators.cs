@@ -189,7 +189,7 @@ namespace Yuzu.Binary
 				cw.Put("}\n"); // if >= 0
 				return;
 			}
-			var icoll = t.GetInterface(typeof(ICollection<>).Name);
+			var icoll = Utils.GetICollection(t);
 			if (icoll != null) {
 				var tempIndexName = PutNullOrCount(t);
 				cw.Put("{0} = new {1}();\n", name, Utils.GetTypeSpec(t));
@@ -215,7 +215,7 @@ namespace Yuzu.Binary
 				cw.Put("}\n");
 				return;
 			}
-			var icoll = t.GetInterface(typeof(ICollection<>).Name);
+			var icoll = Utils.GetICollection(t);
 			if (icoll != null) {
 				GenerateCollection(t, icoll, name, PutCount());
 				cw.Put("}\n");

@@ -81,7 +81,7 @@ namespace Yuzu.Binary
 			}
 			if (expectedType.IsGenericType && expectedType.GetGenericTypeDefinition() == typeof(Nullable<>))
 				return rt == RoughType.Nullable && ReadCompatibleType(expectedType.GetGenericArguments()[0]);
-			var icoll = expectedType.GetInterface(typeof(ICollection<>).Name);
+			var icoll = Utils.GetICollection(expectedType);
 			if (icoll != null)
 				return rt == RoughType.Sequence && ReadCompatibleType(icoll.GetGenericArguments()[0]);
 			if (rt == RoughType.Record)
@@ -452,7 +452,7 @@ namespace Yuzu.Binary
 				var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadArray", t);
 				return () => m.Invoke(this, Utils.ZeroObjects);
 			}
-			var icoll = t.GetInterface(typeof(ICollection<>).Name);
+			var icoll = Utils.GetICollection(t);
 			if (icoll != null) {
 				var elemType = icoll.GetGenericArguments()[0];
 				var m = GetType().GetMethod("ReadCollection", BindingFlags.Instance | BindingFlags.NonPublic).
@@ -476,7 +476,7 @@ namespace Yuzu.Binary
 				var m = Utils.GetPrivateCovariantGenericAll(GetType(), "ReadIntoDictionary", t);
 				return obj => { m.Invoke(this, new object[] { obj }); };
 			}
-			var icoll = t.GetInterface(typeof(ICollection<>).Name);
+			var icoll = Utils.GetICollection(t);
 			if (icoll != null) {
 				var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadIntoCollection", icoll);
 				return obj => { m.Invoke(this, new object[] { obj }); };

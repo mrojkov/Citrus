@@ -159,7 +159,7 @@ namespace Yuzu.Binary
 				WriteRoughType(t.GetElementType());
 				return;
 			}
-			var icoll = t.GetInterface(typeof(ICollection<>).Name);
+			var icoll = Utils.GetICollection(t);
 			if (icoll != null) {
 				writer.Write((byte)RoughType.Sequence);
 				WriteRoughType(icoll.GetGenericArguments()[0]);
@@ -318,7 +318,7 @@ namespace Yuzu.Binary
 				var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteArray", t);
 				return obj => m.Invoke(this, new object[] { obj });
 			}
-			var icoll = t.GetInterface(typeof(ICollection<>).Name);
+			var icoll = Utils.GetICollection(t);
 			if (icoll != null) {
 				Meta.Get(t, Options); // Check for serializable fields.
 				var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteCollection", icoll);

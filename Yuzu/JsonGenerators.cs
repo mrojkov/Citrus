@@ -178,7 +178,7 @@ namespace Yuzu.Json
 
 		private void GenerateMerge(Type t, string name)
 		{
-			var icoll = t.GetInterface(typeof(ICollection<>).Name);
+			var icoll = Utils.GetICollection(t);
 			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
 				cw.Put("Require('{');\n");
 				GenerateDictionary(t, name);
@@ -313,7 +313,7 @@ namespace Yuzu.Json
 				cw.Put("}\n");
 				return;
 			}
-			var icoll = t.GetInterface(typeof(ICollection<>).Name);
+			var icoll = Utils.GetICollection(t);
 			if (icoll != null) {
 				PutRequireOrNull('[', t, name);
 				GenerateCollection(t, icoll, name);
@@ -385,7 +385,7 @@ namespace Yuzu.Json
 			cw.Put("}\n");
 			cw.Put("\n");
 
-			var icoll = t.GetInterface(typeof(ICollection<>).Name);
+			var icoll = Utils.GetICollection(t);
 			var typeSpec = Utils.GetTypeSpec(t);
 			cw.Put("public override object FromReaderInt()\n");
 			cw.Put("{\n");
