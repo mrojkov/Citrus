@@ -252,20 +252,21 @@ namespace Yuzu.Json
 				cw.PutPart(JsonOptions.DecimalAsString ? "RequireDecimalAsString();\n" : "RequireDecimal();\n");
 				return;
 			}
-			var icoll = t.GetInterface(typeof(ICollection<>).Name);
 			if (t.IsEnum) {
 				cw.PutPart(
 					JsonOptions.EnumAsString ?
 						"({0})Enum.Parse(typeof({0}), RequireString());\n" :
 						"({0})RequireInt();\n",
 					Utils.GetTypeSpec(t));
+				return;
 			}
-			else if(t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
+			if(t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
 				PutRequireOrNull('{', t, name);
 				GenerateDictionary(t, name);
 				cw.Put("}\n");
+				return;
 			}
-			else if (t.IsArray && !JsonOptions.ArrayLengthPrefix) {
+			if (t.IsArray && !JsonOptions.ArrayLengthPrefix) {
 				PutRequireOrNullArray('[', t, name);
 				cw.Put("if (SkipSpacesCarefully() == ']') {\n");
 				cw.Put("Require(']');\n");
@@ -282,8 +283,9 @@ namespace Yuzu.Json
 				cw.Put("{0} = {1}.ToArray();\n", name, tempListName);
 				cw.Put("}\n");
 				cw.Put("}\n");
+				return;
 			}
-			else if (t.IsArray && JsonOptions.ArrayLengthPrefix) {
+			if (t.IsArray && JsonOptions.ArrayLengthPrefix) {
 				PutRequireOrNullArray('[', t, name);
 				cw.Put("if (SkipSpacesCarefully() != ']') {\n");
 				var tempArrayName = cw.GetTempName();
@@ -298,18 +300,23 @@ namespace Yuzu.Json
 				cw.Put("}\n");
 				cw.Put("Require(']');\n");
 				cw.Put("}\n");
+				return;
 			}
-			else if (icoll != null) {
+			var icoll = t.GetInterface(typeof(ICollection<>).Name);
+			if (icoll != null) {
 				PutRequireOrNull('[', t, name);
 				GenerateCollection(t, icoll, name);
 				cw.Put("}\n");
+				return;
 			}
-			else if (t.IsClass && !t.IsAbstract || Utils.IsStruct(t))
-				cw.PutPart("{0}.Instance.FromReaderTyped<{1}>(Reader);\n", GetDeserializerName(t), Utils.GetTypeSpec(t));
-			else if (t.IsInterface || t.IsAbstract)
-				cw.PutPart("{0}.Instance.FromReaderInterface<{1}>(Reader);\n", GetDeserializerName(t), Utils.GetTypeSpec(t));
-			else
-				throw new NotImplementedException(t.Name);
+			if (t.IsClass || t.IsInterface || Utils.IsStruct(t)) {
+				var fmt = t.IsInterface || t.IsAbstract ?
+					"{0}.Instance.FromReaderInterface<{1}>(Reader);\n" :
+					"{0}.Instance.FromReaderTyped<{1}>(Reader);\n";
+				cw.PutPart(fmt, GetDeserializerName(t), Utils.GetTypeSpec(t));
+				return;
+			}
+			throw new NotImplementedException(t.Name);
 		}
 
 		private void GenAssigns(string name, object obj)
