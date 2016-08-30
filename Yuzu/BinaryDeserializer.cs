@@ -247,7 +247,7 @@ namespace Yuzu.Binary
 					ourIndex += 1;
 				}
 				else if (cmp > 0) {
-					if (!Options.IgnoreNewFields)
+					if (!Options.IgnoreUnknownFields)
 						throw Error("New field {0} for class {1}", theirName, typeName);
 					var rf = ReadValueFunc(ReadType());
 					result.Fields.Add(new ClassDef.FieldDef {
@@ -281,7 +281,7 @@ namespace Yuzu.Binary
 			}
 			while (theirIndex < theirCount) {
 				var theirName = Reader.ReadString();
-				if (!Options.IgnoreNewFields)
+				if (!Options.IgnoreUnknownFields)
 					throw Error("New field {0} for class {1}", theirName, typeName);
 				var rf = ReadValueFunc(ReadType());
 				result.Fields.Add(new ClassDef.FieldDef {

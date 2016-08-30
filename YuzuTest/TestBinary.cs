@@ -908,7 +908,7 @@ namespace YuzuTest.Binary
 		{
 			var bd = new BinaryDeserializer();
 			bd.Options.TagMode = TagMode.Aliases;
-			bd.Options.IgnoreNewFields = true;
+			bd.Options.IgnoreUnknownFields = true;
 
 			var w = new SampleTree();
 			bd.FromBytes(w, SX(

@@ -915,7 +915,7 @@ namespace YuzuTest.Json
 		{
 			var jd = new JsonDeserializer();
 			jd.Options.TagMode = TagMode.Aliases;
-			jd.Options.IgnoreNewFields = true;
+			jd.Options.IgnoreUnknownFields = true;
 
 			var w = new SampleTree();
 			jd.FromString(w, "{\"a\":9,\"a1\":[],\"b\":null}");
