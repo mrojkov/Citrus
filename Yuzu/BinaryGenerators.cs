@@ -171,6 +171,12 @@ namespace Yuzu.Binary
 				cw.Put("}\n");
 				return;
 			}
+			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>)) {
+				var arg = t.GetGenericArguments()[0];
+				cw.PutPart("d.Reader.ReadBoolean() ? ({0}?)null : ", Utils.GetTypeSpec(arg));
+				GenerateValue(arg, name);
+				return;
+			}
 			if (t.IsArray) {
 				var tempIndexName = PutNullOrCount(t);
 				var tempArrayName = cw.GetTempName();

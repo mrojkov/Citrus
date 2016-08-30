@@ -355,6 +355,7 @@ namespace YuzuTest.Binary
 		{
 			var bs = new BinarySerializer();
 			var bd = new BinaryDeserializer();
+			var bdg = new BinaryDeserializerGen();
 
 			var v1 = new SampleNullable { N = null };
 			var result1 = bs.ToBytes(v1);
@@ -364,6 +365,8 @@ namespace YuzuTest.Binary
 				XS(result1));
 			var w1 = bd.FromBytes<SampleNullable>(result1);
 			Assert.AreEqual(v1.N, w1.N);
+			var w1g = bdg.FromBytes<SampleNullable>(result1);
+			Assert.AreEqual(v1.N, w1g.N);
 
 			var v2 = new SampleNullable { N = 997 };
 			var result2 = bs.ToBytes(v2);
@@ -372,6 +375,8 @@ namespace YuzuTest.Binary
 				XS(result2));
 			var w2 = bd.FromBytes<SampleNullable>(result2);
 			Assert.AreEqual(v2.N, w2.N);
+			var w2g = bdg.FromBytes<SampleNullable>(result2);
+			Assert.AreEqual(v2.N, w2g.N);
 		}
 
 		[TestMethod]

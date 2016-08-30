@@ -122,6 +122,25 @@ namespace YuzuGenBin
 			return result;
 		}
 
+		private static void Read_YuzuTest__SampleNullable(BinaryDeserializer d, ClassDef def, object obj)
+		{
+			var result = (global::YuzuTest.SampleNullable)obj;
+			var dg = (BinaryDeserializerGen)d;
+			ClassDef.FieldDef fd;
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (1 != fd.OurIndex) throw dg.Error("1!=" + fd.OurIndex);
+			result.N = d.Reader.ReadBoolean() ? (global::System.Int32?)null : d.Reader.ReadInt32();
+			fd = def.Fields[d.Reader.ReadInt16()];
+			if (fd.OurIndex != ClassDef.EOF) throw dg.Error("Unfinished object");
+		}
+
+		private static object Make_YuzuTest__SampleNullable(BinaryDeserializer d, ClassDef def)
+		{
+			var result = new global::YuzuTest.SampleNullable();
+			Read_YuzuTest__SampleNullable(d, def, result);
+			return result;
+		}
+
 		private static void Read_YuzuTest__SampleObj(BinaryDeserializer d, ClassDef def, object obj)
 		{
 			var result = (global::YuzuTest.SampleObj)obj;
@@ -838,6 +857,7 @@ namespace YuzuGenBin
 			readCache[typeof(global::YuzuTest.Sample3)] = Read_YuzuTest__Sample3;
 			readCache[typeof(global::YuzuTest.Sample4)] = Read_YuzuTest__Sample4;
 			readCache[typeof(global::YuzuTest.SampleDecimal)] = Read_YuzuTest__SampleDecimal;
+			readCache[typeof(global::YuzuTest.SampleNullable)] = Read_YuzuTest__SampleNullable;
 			readCache[typeof(global::YuzuTest.SampleObj)] = Read_YuzuTest__SampleObj;
 			readCache[typeof(global::YuzuTest.SampleDict)] = Read_YuzuTest__SampleDict;
 			readCache[typeof(global::YuzuTest.SampleDictKeys)] = Read_YuzuTest__SampleDictKeys;
@@ -870,6 +890,7 @@ namespace YuzuGenBin
 			makeCache[typeof(global::YuzuTest.Sample3)] = Make_YuzuTest__Sample3;
 			makeCache[typeof(global::YuzuTest.Sample4)] = Make_YuzuTest__Sample4;
 			makeCache[typeof(global::YuzuTest.SampleDecimal)] = Make_YuzuTest__SampleDecimal;
+			makeCache[typeof(global::YuzuTest.SampleNullable)] = Make_YuzuTest__SampleNullable;
 			makeCache[typeof(global::YuzuTest.SampleObj)] = Make_YuzuTest__SampleObj;
 			makeCache[typeof(global::YuzuTest.SampleDict)] = Make_YuzuTest__SampleDict;
 			makeCache[typeof(global::YuzuTest.SampleDictKeys)] = Make_YuzuTest__SampleDictKeys;

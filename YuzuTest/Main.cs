@@ -145,6 +145,7 @@ namespace YuzuTest
 				bd.Generate<Sample3>();
 				bd.Generate<Sample4>();
 				bd.Generate<SampleDecimal>();
+				bd.Generate<SampleNullable>();
 				bd.Generate<SampleObj>();
 				bd.Generate<SampleDict>();
 				bd.Generate<SampleDictKeys>();
