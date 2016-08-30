@@ -90,6 +90,7 @@ namespace YuzuTest
 		public static void Main()
 		{
 			var jd = JsonDeserializerGenerator.Instance;
+			jd.Options.TagMode = TagMode.Names;
 			using (var ms = new MemoryStream())
 			using (var sw = new StreamWriter(ms)) {
 				jd.GenWriter = sw;

@@ -156,6 +156,7 @@ namespace YuzuTest.Json
 		public void TestNested()
 		{
 			var js = new JsonSerializer();
+			js.Options.TagMode = TagMode.Names;
 
 			var v = new Sample3 {
 				S1 = new Sample1 { X = 345, Y = "test" },
@@ -175,6 +176,7 @@ namespace YuzuTest.Json
 				result);
 
 			var jd = new JsonDeserializer();
+			jd.Options.TagMode = TagMode.Names;
 			var w = new Sample3();
 			jd.FromString(w, result);
 			Assert.AreEqual(v.S1.X, w.S1.X);
@@ -272,6 +274,7 @@ namespace YuzuTest.Json
 		public void TestFloat()
 		{
 			var js = new JsonSerializer();
+			js.Options.TagMode = TagMode.Names;
 
 			var v = new SampleFloat { F = 1e-20f, D = -3.1415e100d };
 			js.JsonOptions.Indent = "";
@@ -281,6 +284,7 @@ namespace YuzuTest.Json
 
 			var w = new SampleFloat();
 			var jd = new JsonDeserializer();
+			jd.Options.TagMode = TagMode.Names;
 			jd.FromString(w, result1);
 			Assert.AreEqual(v.F, w.F);
 			Assert.AreEqual(v.D, w.D);
@@ -317,6 +321,7 @@ namespace YuzuTest.Json
 		public void TestMemberOrder()
 		{
 			var js = new JsonSerializer();
+			js.Options.TagMode = TagMode.Names;
 			js.JsonOptions.Indent = "";
 			var result = js.ToString(new SampleMethodOrder());
 			Assert.AreEqual("{\n\"F1\":0,\n\"P1\":0,\n\"F2\":0,\n\"P2\":0\n}", result);
@@ -328,6 +333,7 @@ namespace YuzuTest.Json
 			var js = new JsonSerializer();
 			js.JsonOptions.Indent = "";
 			js.JsonOptions.SaveRootClass = true;
+			js.Options.TagMode = TagMode.Names;
 			Assert.AreEqual(
 				"{\n\"class\":\"YuzuTest.SampleBase\",\n\"FBase\":0\n}", js.ToString(new SampleBase()));
 			Assert.AreEqual(
@@ -335,6 +341,7 @@ namespace YuzuTest.Json
 				js.ToString(new SampleDerivedA()));
 
 			var jd = new JsonDeserializer();
+			jd.Options.TagMode = TagMode.Names;
 			var v = jd.FromString(
 				"{\n\"class\":\"YuzuTest.SampleDerivedB\",\n\"FBase\":3,\n\"FB\":7\n}");
 			Assert.IsInstanceOfType(v, typeof(SampleDerivedB));
@@ -348,7 +355,9 @@ namespace YuzuTest.Json
 		{
 			var js = new JsonSerializer();
 			js.JsonOptions.Indent = "";
+			js.Options.TagMode = TagMode.Names;
 			var jd = new JsonDeserializer();
+			jd.Options.TagMode = TagMode.Names;
 
 			var v0 = new SampleList { E = new List<string> { "a", "b", "c" } };
 			var result0 = js.ToString(v0);
@@ -497,7 +506,9 @@ namespace YuzuTest.Json
 		{
 			var js = new JsonSerializer();
 			js.JsonOptions.Indent = "";
+			js.Options.TagMode = TagMode.Names;
 			var jd = new JsonDeserializer();
+			jd.Options.TagMode = TagMode.Names;
 
 			var v0 = new SampleDict {
 				Value = 3, Children = new Dictionary<string, SampleDict> {
@@ -599,8 +610,10 @@ namespace YuzuTest.Json
 		public void TestClassList()
 		{
 			var js = new JsonSerializer();
+			js.Options.TagMode = TagMode.Names;
 			js.JsonOptions.SaveRootClass = true;
 			var jd = new JsonDeserializer();
+			jd.Options.TagMode = TagMode.Names;
 
 			var v = new SampleClassList {
 				E = new List<SampleBase> {
@@ -1100,6 +1113,7 @@ namespace YuzuTest.Json
 			var js = new JsonSerializer();
 			js.JsonOptions.Indent = "";
 			js.JsonOptions.FieldSeparator = "";
+			js.Options.TagMode = TagMode.Names;
 
 			var v1 = new YuzuTest2.SampleNamespace { B = new SampleBase { FBase = 3 } };
 			var result1 = js.ToString(v1);
@@ -1172,7 +1186,9 @@ namespace YuzuTest.Json
 			var js = new JsonSerializer();
 			js.JsonOptions.Indent = "";
 			js.JsonOptions.FieldSeparator = "";
+			js.Options.TagMode = TagMode.Names;
 			var jd = new JsonDeserializer();
+			jd.Options.TagMode = TagMode.Names;
 
 			var v1 = new List<object> { new SampleDerivedB { FB = 10 }, new SampleDerivedB { FB = 20 } };
 

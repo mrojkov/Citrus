@@ -74,8 +74,8 @@ namespace Yuzu
 
 	public enum TagMode
 	{
-		Names = 0,
-		Aliases,
+		Aliases = 0,
+		Names,
 		Ids,
 	}
 

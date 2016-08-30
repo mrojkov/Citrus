@@ -186,6 +186,7 @@ namespace YuzuTest.Binary
 		public void TestNested()
 		{
 			var bs = new BinarySerializer();
+			bs.Options.TagMode = TagMode.Names;
 
 			var v = new Sample3 {
 				S1 = new Sample1 { X = 345, Y = "test" },
@@ -207,6 +208,7 @@ namespace YuzuTest.Binary
 				XS(result));
 
 			var bd = new BinaryDeserializer();
+			bd.Options.TagMode = TagMode.Names;
 			var w = new Sample3();
 			bd.FromBytes(w, result);
 			Assert.AreEqual(v.S1.X, w.S1.X);
@@ -231,6 +233,7 @@ namespace YuzuTest.Binary
 				" 01 00 A6 FE FF FF 02 00 " + XS("test1") + " 00 00 00 00";
 
 			var bd = new BinaryDeserializerGen();
+			bd.Options.TagMode = TagMode.Names;
 			var w = (Sample3)bd.FromBytes(SX(str).ToArray());
 			Assert.AreEqual(345, w.S1.X);
 			Assert.AreEqual("test", w.S1.Y);
@@ -299,6 +302,7 @@ namespace YuzuTest.Binary
 		public void TestFloat()
 		{
 			var bs = new BinarySerializer();
+			bs.Options.TagMode = TagMode.Names;
 
 			var v = new SampleFloat { F = 1e-20f, D = -3.1415e100d };
 
@@ -311,6 +315,7 @@ namespace YuzuTest.Binary
 
 			var w = new SampleFloat();
 			var bd = new BinaryDeserializer();
+			bd.Options.TagMode = TagMode.Names;
 			bd.FromBytes(w, result1);
 			Assert.AreEqual(v.F, w.F);
 			Assert.AreEqual(v.D, w.D);
@@ -344,6 +349,7 @@ namespace YuzuTest.Binary
 		public void TestMemberOrder()
 		{
 			var bs = new BinarySerializer();
+			bs.Options.TagMode = TagMode.Names;
 			var result = bs.ToBytes(new SampleMethodOrder());
 			Assert.AreEqual(
 				"20 01 00 " + XS("YuzuTest.SampleMethodOrder") + " 04 00 " +
@@ -357,6 +363,7 @@ namespace YuzuTest.Binary
 		public void TestClassNames()
 		{
 			var bs = new BinarySerializer();
+			bs.Options.TagMode = TagMode.Names;
 			Assert.AreEqual(
 				"20 01 00 " + XS("YuzuTest.SampleBase") + " 01 00 " + XS("FBase", RoughType.Int) +
 				" 01 00 00 00 00 00 00 00",
@@ -368,6 +375,7 @@ namespace YuzuTest.Binary
 				XS(bs.ToBytes(new SampleDerivedA())));
 
 			var bd = new BinaryDeserializer();
+			bd.Options.TagMode = TagMode.Names;
 			var v = bd.FromBytes(SX(
 				"20 01 00 " + XS("YuzuTest.SampleDerivedB") + " 02 00 " +
 				XS("FBase", RoughType.Int, "FB", RoughType.Int) +
@@ -382,7 +390,9 @@ namespace YuzuTest.Binary
 		public void TestList()
 		{
 			var bs = new BinarySerializer();
+			bs.Options.TagMode = TagMode.Names;
 			var bd = new BinaryDeserializer();
+			bd.Options.TagMode = TagMode.Names;
 
 			var v0 = new SampleList { E = new List<string> { "a", "b", "c" } };
 			var result0 = bs.ToBytes(v0);
@@ -520,7 +530,11 @@ namespace YuzuTest.Binary
 		public void TestDictionary()
 		{
 			var bs = new BinarySerializer();
+			bs.Options.TagMode = TagMode.Names;
 			var bd = new BinaryDeserializer();
+			bd.Options.TagMode = TagMode.Names;
+			var bdg = new BinaryDeserializer();
+			bdg.Options.TagMode = TagMode.Names;
 
 			var v0 = new SampleDict {
 				Value = 3, Children = new Dictionary<string, SampleDict> {
@@ -543,7 +557,7 @@ namespace YuzuTest.Binary
 			Assert.AreEqual(v0.Children.Count, w0.Children.Count);
 			Assert.AreEqual(v0.Children["a"].Value, w0.Children["a"].Value);
 
-			var w1 = (SampleDict)((new BinaryDeserializerGen()).FromBytes(result0));
+			var w1 = (SampleDict)bdg.FromBytes(result0);
 			Assert.AreEqual(v0.Value, w1.Value);
 			Assert.AreEqual(v0.Children.Count, w1.Children.Count);
 			Assert.AreEqual(v0.Children["a"].Value, w1.Children["a"].Value);
@@ -1116,7 +1130,7 @@ namespace YuzuTest.Binary
 			var result1 = bs.ToBytes(v1);
 			Assert.AreEqual(
 				"20 01 00 " + XS("YuzuTest2.SampleNamespace") + " 01 00 " + XS("B") +
-				" 20 01 00 02 00 " + XS("YuzuTest.SampleBase") + " 01 00 " + XS("FBase") +
+				" 20 01 00 02 00 " + XS("YuzuTest.SampleBase") + " 01 00 " + XS("0_FBase") +
 				" 05 01 00 03 00 00 00 00 00 00 00",
 				XS(result1));
 
@@ -1192,7 +1206,9 @@ namespace YuzuTest.Binary
 		public void TestTopLevelListOfNonPrimitiveTypes()
 		{
 			var bs = new BinarySerializer();
+			bs.Options.TagMode = TagMode.Names;
 			var bd = new BinaryDeserializer();
+			bd.Options.TagMode = TagMode.Names;
 
 			var v1 = new List<SampleDerivedB> { new SampleDerivedB { FB = 10 }, new SampleDerivedB { FB = 20 } };
 
