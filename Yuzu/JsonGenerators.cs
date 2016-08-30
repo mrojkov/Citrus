@@ -134,6 +134,8 @@ namespace Yuzu.Json
 
 		public void GenerateHeader()
 		{
+			if (Options.IgnoreNewFields || JsonOptions.Unordered)
+				throw new NotImplementedException();
 			cw.Put("using System;\n");
 			cw.Put("\n");
 			cw.Put("using Yuzu;\n");
@@ -242,6 +244,10 @@ namespace Yuzu.Json
 			string sr;
 			if (simpleValueReader.TryGetValue(t, out sr)) {
 				cw.PutPart(sr + ";\n");
+				return;
+			}
+			if (t == typeof(decimal)) {
+				cw.PutPart(JsonOptions.DecimalAsString ? "RequireDecimalAsString();\n" : "RequireDecimal();\n");
 				return;
 			}
 			var icoll = t.GetInterface(typeof(ICollection<>).Name);

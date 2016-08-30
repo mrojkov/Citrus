@@ -38,17 +38,18 @@ namespace Yuzu
 		public readonly string Method;
 		public YuzuSerializeIf(string method) { Method = method; }
 
-		private Func<bool> checker;
+		private Func<object, bool> checker;
 
 		public override bool Check(object obj, object field) {
 			if (checker == null) {
 				var fn = obj.GetType().GetMethod(Method);
 				if (fn == null)
 					throw new YuzuException();
-				var e = Expression.Call(Expression.Constant(obj), fn);
-				checker = Expression.Lambda<Func<bool>>(e).Compile();
+				var p = Expression.Parameter(typeof(object));
+				var e = Expression.Call(Expression.Convert(p, obj.GetType()), fn);
+				checker = Expression.Lambda<Func<object, bool>>(e, p).Compile();
 			}
-			return checker();
+			return checker(obj);
 		}
 	}
 
@@ -73,8 +74,8 @@ namespace Yuzu
 
 	public enum TagMode
 	{
+		Aliases = 0,
 		Names,
-		Aliases,
 		Ids,
 	}
 
@@ -110,25 +111,30 @@ namespace Yuzu
 
 	}
 
-	public class CommonOptions
+	public class MetaOptions
 	{
-		public static CommonOptions Default = new CommonOptions();
+		public static MetaOptions Default = new MetaOptions();
 
-		public Type RequiredAttribute = typeof(YuzuRequired);
-		public Type OptionalAttribute = typeof(YuzuOptional);
-		public Type MemberAttribute = typeof(YuzuMember);
-		public Type CompactAttribute = typeof(YuzuCompact);
-		public Type SerializeIfAttribute = typeof(YuzuSerializeCondition);
-		public Type AfterDeserializationAttribute = typeof(YuzuAfterDeserialization);
-		public Type MergeAttribute = typeof(YuzuMerge);
+		public readonly Type RequiredAttribute = typeof(YuzuRequired);
+		public readonly Type OptionalAttribute = typeof(YuzuOptional);
+		public readonly Type MemberAttribute = typeof(YuzuMember);
+		public readonly Type CompactAttribute = typeof(YuzuCompact);
+		public readonly Type SerializeIfAttribute = typeof(YuzuSerializeCondition);
+		public readonly Type AfterDeserializationAttribute = typeof(YuzuAfterDeserialization);
+		public readonly Type MergeAttribute = typeof(YuzuMerge);
 
-		public Func<Attribute, string> GetAlias = attr => (attr as YuzuField).Alias;
-		public Func<Attribute, Func<object, object, bool>> GetSerializeCondition =
+		public readonly Func<Attribute, string> GetAlias = attr => (attr as YuzuField).Alias;
+		public readonly Func<Attribute, Func<object, object, bool>> GetSerializeCondition =
 			attr => (attr as YuzuSerializeCondition).Check;
-		public TagMode TagMode = TagMode.Names;
-		public bool IgnoreNewFields = false;
-		public bool AllowEmptyTypes = false;
-		public bool ReportErrorPosition = true;
+	}
+
+	public struct CommonOptions
+	{
+		public MetaOptions Meta;
+		public TagMode TagMode;
+		public bool IgnoreNewFields;
+		public bool AllowEmptyTypes;
+		public bool ReportErrorPosition;
 	}
 
 	public class YuzuPosition
@@ -161,7 +167,7 @@ namespace Yuzu
 
 	public abstract class AbstractSerializer
 	{
-		public CommonOptions Options = CommonOptions.Default;
+		public CommonOptions Options = new CommonOptions();
 		public abstract void ToWriter(object obj, BinaryWriter writer);
 		public abstract string ToString(object obj);
 		public abstract byte[] ToBytes(object obj);
@@ -239,7 +245,7 @@ namespace Yuzu
 
 	public abstract class AbstractDeserializer
 	{
-		public CommonOptions Options = CommonOptions.Default;
+		public CommonOptions Options = new CommonOptions();
 
 		public abstract object FromReader(object obj, BinaryReader reader);
 		public abstract object FromString(object obj, string source);

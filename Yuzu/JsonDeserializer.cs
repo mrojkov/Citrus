@@ -289,6 +289,16 @@ namespace Yuzu.Json
 			return Single.Parse(ParseFloat(), CultureInfo.InvariantCulture);
 		}
 
+		protected decimal RequireDecimal()
+		{
+			return Decimal.Parse(ParseFloat(), CultureInfo.InvariantCulture);
+		}
+
+		protected decimal RequireDecimalAsString()
+		{
+			return Decimal.Parse(RequireUnescapedString(), CultureInfo.InvariantCulture);
+		}
+
 		protected DateTime RequireDateTime()
 		{
 			var s = JsonOptions.DateFormat == "O" ? RequireUnescapedString() : RequireString();
@@ -470,6 +480,8 @@ namespace Yuzu.Json
 		private object RequireBoolObj() { return RequireBool(); }
 		private object RequireSingleObj() { return RequireSingle(); }
 		private object RequireDoubleObj() { return RequireDouble(); }
+		private object RequireDecimalObj() { return RequireDecimal(); }
+		private object RequireDecimalAsStringObj() { return RequireDecimalAsString(); }
 		private object RequireDateTimeObj() { return RequireDateTime(); }
 		private object RequireTimeSpanObj() { return RequireTimeSpan(); }
 
@@ -529,6 +541,12 @@ namespace Yuzu.Json
 				return RequireSingleObj;
 			if (t == typeof(double))
 				return RequireDoubleObj;
+			if (t == typeof(decimal)) {
+				if (JsonOptions.DecimalAsString)
+					return RequireDecimalAsStringObj;
+				else
+					return RequireDecimalObj;
+			}
 			if (t == typeof(DateTime))
 				return RequireDateTimeObj;
 			if (t == typeof(TimeSpan))
@@ -630,7 +648,24 @@ namespace Yuzu.Json
 			objStack.Push(obj);
 			try {
 				// Optimization: duplicate loop to extract options check.
-				if (Options.IgnoreNewFields && Options.TagMode != TagMode.Names) {
+				if (JsonOptions.Unordered) {
+					while (name != "") {
+						Meta.Item yi;
+						if (!meta.TagToItem.TryGetValue(name, out yi)) {
+							if (!Options.IgnoreNewFields)
+								throw Error("Unknown field '{0}'", name);
+							ReadAnyObject();
+							name = GetNextName(false);
+							continue;
+						}
+						if (yi.SetValue != null)
+							yi.SetValue(obj, ReadValueFunc(yi.Type)());
+						else
+							MergeValueFunc(yi.Type)(yi.GetValue(obj));
+						name = GetNextName(false);
+					}
+				}
+				else if (Options.IgnoreNewFields && Options.TagMode != TagMode.Names) {
 					foreach (var yi in meta.Items) {
 						if (IgnoreNewFields(yi.Tag(Options), ref name) != 0) {
 							if (!yi.IsOptional)
