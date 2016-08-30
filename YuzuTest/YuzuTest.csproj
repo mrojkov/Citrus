@@ -69,6 +69,7 @@
     </Compile>
     <Compile Include="TestBinary.cs" />
     <Compile Include="TestJson.cs" />
+    <Compile Include="TestProtobuf.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Yuzu\Yuzu.csproj">
