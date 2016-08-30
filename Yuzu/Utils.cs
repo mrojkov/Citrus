@@ -29,6 +29,8 @@ namespace Yuzu.Util
 
 		public static string CodeValueFormat(object value)
 		{
+			if (value == null)
+				return "";
 			var t = value.GetType();
 			if (t == typeof(int) || t == typeof(uint) || t == typeof(float) || t == typeof(double))
 				return value.ToString();

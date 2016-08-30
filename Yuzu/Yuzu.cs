@@ -74,7 +74,7 @@ namespace Yuzu
 
 	public enum TagMode
 	{
-		Names,
+		Names = 0,
 		Aliases,
 		Ids,
 	}
@@ -126,20 +126,15 @@ namespace Yuzu
 		public readonly Func<Attribute, string> GetAlias = attr => (attr as YuzuField).Alias;
 		public readonly Func<Attribute, Func<object, object, bool>> GetSerializeCondition =
 			attr => (attr as YuzuSerializeCondition).Check;
-
-		public MetaOptions()
-		{
-
-		}
 	}
 
-	public class CommonOptions
+	public struct CommonOptions
 	{
-		public MetaOptions Meta = MetaOptions.Default;
-		public TagMode TagMode = TagMode.Names;
-		public bool IgnoreNewFields = false;
-		public bool AllowEmptyTypes = false;
-		public bool ReportErrorPosition = true;
+		public MetaOptions Meta;
+		public TagMode TagMode;
+		public bool IgnoreNewFields;
+		public bool AllowEmptyTypes;
+		public bool ReportErrorPosition;
 	}
 
 	public class YuzuPosition

@@ -1238,6 +1238,7 @@ namespace YuzuTest.Json
 				"{\"class\":\"YuzuTest.SampleInterfaceField\",\"I\":{\"class\":\"YuzuTest.Sample1\"}}"),
 				"ISample");
 
+			jd.Options.ReportErrorPosition = true;
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "      z"), "7");
 			jd.Options.ReportErrorPosition = false;
 			try {

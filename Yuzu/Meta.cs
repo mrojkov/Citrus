@@ -195,7 +195,7 @@ namespace Yuzu.Metadata
 		private Meta(Type t, CommonOptions options)
 		{
 			Type = t;
-			Options = options.Meta;
+			Options = options.Meta ?? MetaOptions.Default;
 			IsCompact = t.IsDefined(Options.CompactAttribute, false);
 
 			foreach (var i in t.GetInterfaces())

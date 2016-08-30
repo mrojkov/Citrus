@@ -46,10 +46,10 @@ namespace Yuzu.Binary
 		// Turn off for 5% speedup in exchange for potentially missing broken data.
 		public bool SafetyChecks = true;
 
-		public BinaryDeserializerGenerator(string wrapperNameSpace = "YuzuGenBin", CommonOptions options = null)
+		public BinaryDeserializerGenerator(string wrapperNameSpace = "YuzuGenBin", CommonOptions? options = null)
 		{
 			this.wrapperNameSpace = wrapperNameSpace;
-			this.options = options ?? new CommonOptions();
+			this.options = options.HasValue ? options.Value : new CommonOptions();
 		}
 
 		static BinaryDeserializerGenerator() { InitSimpleValueReader(); }
