@@ -187,6 +187,18 @@ namespace YuzuTest
 		}
 
 		[TestMethod]
+		public void TestJsonUnorderedRead()
+		{
+			var jd = new JsonDeserializer();
+			jd.Options.TagMode = TagMode.Aliases;
+			jd.JsonOptions.Unordered = true;
+			SamplePerson p = new SamplePerson();
+			jsonStream.Position = 0;
+			jd.FromStream(p, jsonStream);
+			Assert.AreEqual(person.Name, p.Name);
+		}
+
+		[TestMethod]
 		public void TestBinaryRead()
 		{
 			var bd = new BinaryDeserializer();

@@ -36,6 +36,8 @@ namespace Yuzu.Json
 
 		private bool decimalAsString = false;
 		public bool DecimalAsString { get { return decimalAsString; } set { decimalAsString = value; generation++; } }
+
+		public bool Unordered = false;
 	};
 
 	internal static class JsonEscapeData

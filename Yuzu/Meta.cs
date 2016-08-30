@@ -63,6 +63,7 @@ namespace Yuzu.Metadata
 		public readonly List<Item> Items = new List<Item>();
 		public readonly bool IsCompact;
 		public object Default { get; private set; }
+		public Dictionary<string, Item> TagToItem = new Dictionary<string, Item>();
 
 		public struct MethodAction
 		{
@@ -225,6 +226,7 @@ namespace Yuzu.Metadata
 				if (tag == prevTag)
 					throw Error("Duplicate tag '{0}' for field '{1}'", tag, i.Name);
 				prevTag = tag;
+				TagToItem.Add(tag, i);
 			}
 		}
 

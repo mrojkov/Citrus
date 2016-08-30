@@ -48,6 +48,16 @@ namespace YuzuTest.Json
 		}
 
 		[TestMethod]
+		public void TestUnordered()
+		{
+			var jd = new JsonDeserializer();
+			jd.JsonOptions.Unordered = true;
+			var v = jd.FromString<Sample1>("{\n\"Y\":\"test\",\n\"X\":345\n}");
+			Assert.AreEqual(345, v.X);
+			Assert.AreEqual("test", v.Y);
+		}
+
+		[TestMethod]
 		public void TestSimpleProps()
 		{
 			var js = new JsonSerializer();

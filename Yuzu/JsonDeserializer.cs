@@ -648,7 +648,24 @@ namespace Yuzu.Json
 			objStack.Push(obj);
 			try {
 				// Optimization: duplicate loop to extract options check.
-				if (Options.IgnoreNewFields && Options.TagMode != TagMode.Names) {
+				if (JsonOptions.Unordered) {
+					while (name != "") {
+						Meta.Item yi;
+						if (!meta.TagToItem.TryGetValue(name, out yi)) {
+							if (!Options.IgnoreNewFields)
+								throw Error("Unknown field '{0}'", name);
+							ReadAnyObject();
+							name = GetNextName(false);
+							continue;
+						}
+						if (yi.SetValue != null)
+							yi.SetValue(obj, ReadValueFunc(yi.Type)());
+						else
+							MergeValueFunc(yi.Type)(yi.GetValue(obj));
+						name = GetNextName(false);
+					}
+				}
+				else if (Options.IgnoreNewFields && Options.TagMode != TagMode.Names) {
 					foreach (var yi in meta.Items) {
 						if (IgnoreNewFields(yi.Tag(Options), ref name) != 0) {
 							if (!yi.IsOptional)
