@@ -307,7 +307,7 @@ namespace Yuzu.Binary
 						if (i < actualIndex || actualIndex == 0) {
 							if (fd.OurIndex < 0 || def.Meta.Items[fd.OurIndex - 1].IsOptional)
 								continue;
-							throw d.Error("Expected field '{0}({1})', but found '{2}'",
+							throw d.Error("Expected field '{0}' ({1}), but found '{2}'",
 								i, fd.Name, actualIndex);
 						}
 						fd.ReadFunc(obj);
