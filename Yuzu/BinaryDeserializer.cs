@@ -240,38 +240,36 @@ namespace Yuzu.Binary
 				var yi = result.Meta.Items[ourIndex];
 				var ourName = yi.Tag(Options);
 				var theirName = Reader.ReadString();
-				switch (String.CompareOrdinal(ourName, theirName)) {
-					case -1:
-						if (!yi.IsOptional)
-							throw Error("Missing required field {0} for class {1}", ourName, typeName);
-						ourIndex += 1;
-						break;
-					case +1: {
-						if (!Options.IgnoreNewFields)
-							throw Error("New field {0} for class {1}", theirName, typeName);
-						var rf = ReadValueFunc(ReadType());
-						result.Fields.Add(new ClassDef.FieldDef {
-							Name = theirName, OurIndex = -1, ReadFunc = obj => rf() });
-						theirIndex += 1;
-						break;
+				var cmp = String.CompareOrdinal(ourName, theirName);
+				if (cmp < 0) {
+					if (!yi.IsOptional)
+						throw Error("Missing required field {0} for class {1}", ourName, typeName);
+					ourIndex += 1;
+				}
+				else if (cmp > 0) {
+					if (!Options.IgnoreNewFields)
+						throw Error("New field {0} for class {1}", theirName, typeName);
+					var rf = ReadValueFunc(ReadType());
+					result.Fields.Add(new ClassDef.FieldDef {
+						Name = theirName, OurIndex = -1, ReadFunc = obj => rf() });
+					theirIndex += 1;
+				}
+				else {
+					if (!ReadCompatibleType(yi.Type))
+						throw Error(
+							"Incompatible type for field {0}, expected {1}", ourName, yi.Type.Name);
+					var fieldDef = new ClassDef.FieldDef { Name = theirName, OurIndex = ourIndex + 1 };
+					if (yi.SetValue != null) {
+						var rf = ReadValueFunc(yi.Type);
+						fieldDef.ReadFunc = obj => yi.SetValue(obj, rf());
 					}
-					default:
-						if (!ReadCompatibleType(yi.Type))
-							throw Error(
-								"Incompatible type for field {0}, expected {1}", ourName, yi.Type.Name);
-						var fieldDef = new ClassDef.FieldDef { Name = theirName, OurIndex = ourIndex + 1 };
-						if (yi.SetValue != null) {
-							var rf = ReadValueFunc(yi.Type);
-							fieldDef.ReadFunc = obj => yi.SetValue(obj, rf());
-						}
-						else {
-							var mf = MergeValueFunc(yi.Type);
-							fieldDef.ReadFunc = obj => mf(yi.GetValue(obj));
-						}
-						result.Fields.Add(fieldDef);
-						ourIndex += 1;
-						theirIndex += 1;
-						break;
+					else {
+						var mf = MergeValueFunc(yi.Type);
+						fieldDef.ReadFunc = obj => mf(yi.GetValue(obj));
+					}
+					result.Fields.Add(fieldDef);
+					ourIndex += 1;
+					theirIndex += 1;
 				}
 			}
 			while (ourIndex < ourCount) {
