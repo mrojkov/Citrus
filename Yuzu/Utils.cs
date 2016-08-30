@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Reflection;
 
 namespace Yuzu.Util
@@ -92,35 +93,66 @@ namespace Yuzu.Util
 			var args = String.Join("__", t.GetGenericArguments().Select(a => GetMangledTypeName(a)));
 			return n.Remove(n.IndexOf('`')) + "_" + args;
 		}
+	}
 
-		private static List<Assembly> allReferencedAssemblies = null;
-		public static List<Assembly> GetAllReferencedAssemblies()
+	public static class TypeSerializer
+	{
+		private static LinkedList<Assembly> assembliesLru = new LinkedList<Assembly>();
+		private static Dictionary<string, Type> cache = new Dictionary<string, Type>();
+
+		static TypeSerializer()
 		{
-			if (allReferencedAssemblies != null)
-				return allReferencedAssemblies;
-
 			var visited = new HashSet<Assembly>();
 			var queue = new Queue<Assembly>();
 
-			var ignoredPrefixes = new string[] { "System", "Microsoft", "mscorlib" };
-			Action<Assembly> visit = a => {
-				if (ignoredPrefixes.Any(p => a.FullName.StartsWith(p)))
-					return;
+			foreach (var a in AppDomain.CurrentDomain.GetAssemblies()) {
 				queue.Enqueue(a);
 				visited.Add(a);
-			};
+			}
 
-			foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
-				visit(a);
 			while (queue.Count() != 0) {
 				foreach (var aName in queue.Dequeue().GetReferencedAssemblies()) {
 					var a = Assembly.Load(aName);
-					if (!visited.Contains(a))
-						visit(a);
+					if (!visited.Contains(a)) {
+						queue.Enqueue(a);
+						visited.Add(a);
+					}
 				}
 			}
-			allReferencedAssemblies = visited.ToList();
-			return allReferencedAssemblies;
+
+			foreach (var a in visited)
+				assembliesLru.AddLast(a);
+		}
+
+
+		private static Regex extendedAssemblyInfo = new Regex(
+			@", Version=\d+.\d+.\d+.\d+, Culture=neutral, PublicKeyToken=[a-z0-9]+", RegexOptions.Compiled);
+
+		public static string Serialize(Type t)
+		{
+			return extendedAssemblyInfo.Replace(t.AssemblyQualifiedName, "").Replace(", mscorlib", "");
+		}
+
+		public static Type Deserialize(string typeName)
+		{
+			Type t = null;
+			if (cache.TryGetValue(typeName, out t))
+				return t;
+			t = Type.GetType(typeName);
+			if (t != null) {
+				cache[typeName] = t;
+				return t;
+			}
+			for (var i = assembliesLru.First; i != null; i = i.Next) {
+				t = i.Value.GetType(typeName);
+				if (t != null) {
+					cache[typeName] = t;
+					assembliesLru.Remove(i);
+					assembliesLru.AddFirst(i);
+					return t;
+				}
+			}
+			return null;
 		}
 	}
 

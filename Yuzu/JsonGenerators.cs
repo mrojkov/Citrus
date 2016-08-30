@@ -33,7 +33,7 @@ namespace Yuzu.Json
 			JsonDeserializerGenBase result;
 			if (!deserializerCache.TryGetValue(className, out result)) {
 				var t = FindType(className);
-				var dt = Meta.FindType(GetDeserializerName(t));
+				var dt = TypeSerializer.Deserialize(GetDeserializerName(t));
 				if (dt == null)
 					throw Error("Generated deserializer not found for type '{0}'", className);
 				result = (JsonDeserializerGenBase)Activator.CreateInstance(dt);

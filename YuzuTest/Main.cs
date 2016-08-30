@@ -10,6 +10,7 @@ using Yuzu.Binary;
 using Yuzu.Code;
 using Yuzu.Json;
 using Yuzu.Protobuf;
+using Yuzu.Util;
 
 namespace YuzuTest
 {
@@ -82,6 +83,31 @@ namespace YuzuTest
 			var v2 = new Sample2 { X = 150, Y = "test" };
 			var result2 = cs.ToString(v2);
 			Assert.AreEqual("void Init(Sample2 obj) {\n\tobj.X = 150;\n\tobj.Y = \"test\";\n}\n", result2);
+		}
+
+		private void TestTypeSerializerHelper(Type t, string s) {
+			Assert.AreEqual(s, TypeSerializer.Serialize(t));
+			Assert.AreEqual(t, TypeSerializer.Deserialize(s));
+		}
+
+		[TestMethod]
+		public void TestTypeSerializer()
+		{
+			TestTypeSerializerHelper(typeof(int), "System.Int32");
+			TestTypeSerializerHelper(typeof(Sample1), "YuzuTest.Sample1, YuzuTest");
+			TestTypeSerializerHelper(
+				typeof(List<string>),
+				"System.Collections.Generic.List`1[[System.String]]");
+			TestTypeSerializerHelper(
+				typeof(SampleInterfacedGeneric<YuzuTestAssembly.SampleAssemblyBase>),
+				"YuzuTest.SampleInterfacedGeneric`1[[YuzuTestAssembly.SampleAssemblyBase, AssemblyTest]], YuzuTest");
+			TestTypeSerializerHelper(
+				typeof(Dictionary<Sample1, string>),
+				"System.Collections.Generic.Dictionary`2[[YuzuTest.Sample1, YuzuTest],[System.String]]");
+			TestTypeSerializerHelper(
+				typeof(Dictionary<Sample1, List<Sample2>>),
+				"System.Collections.Generic.Dictionary`2[[YuzuTest.Sample1, YuzuTest]," +
+				"[System.Collections.Generic.List`1[[YuzuTest.Sample2, YuzuTest]]]]");
 		}
 	}
 
