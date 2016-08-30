@@ -113,7 +113,7 @@ namespace Yuzu.Json
 		}
 	}
 
-	public class JsonDeserializerGenerator : JsonDeserializerGenBase
+	public class JsonDeserializerGenerator : JsonDeserializerGenBase, IDeserializerGenerator
 	{
 		public static new JsonDeserializerGenerator Instance = new JsonDeserializerGenerator();
 
@@ -338,20 +338,22 @@ namespace Yuzu.Json
 				cw.Put("result.{0}();\n", a.Info.Name);
 		}
 
-		public void Generate<T>()
-		{
-			var meta = Meta.Get(typeof(T), Options);
+		public void Generate<T>() { Generate(typeof(T)); }
 
-			if (lastNameSpace != typeof(T).Namespace) {
+		public void Generate(Type t)
+		{
+			var meta = Meta.Get(t, Options);
+
+			if (lastNameSpace != t.Namespace) {
 				if (lastNameSpace != "")
 					cw.Put("}\n");
 				cw.Put("\n");
-				lastNameSpace = typeof(T).Namespace;
+				lastNameSpace = t.Namespace;
 				cw.Put("namespace {0}.{1}\n", wrapperNameSpace, lastNameSpace);
 				cw.Put("{\n");
 			}
 
-			var deserializerName = Utils.GetMangledTypeName(typeof(T)) + "_JsonDeserializer";
+			var deserializerName = Utils.GetMangledTypeName(t) + "_JsonDeserializer";
 			cw.Put("class {0} : JsonDeserializerGenBase\n", deserializerName);
 			cw.Put("{\n");
 
@@ -365,13 +367,13 @@ namespace Yuzu.Json
 			cw.Put("}\n");
 			cw.Put("\n");
 
-			var icoll = typeof(T).GetInterface(typeof(ICollection<>).Name);
-			var typeSpec = Utils.GetTypeSpec(typeof(T));
+			var icoll = t.GetInterface(typeof(ICollection<>).Name);
+			var typeSpec = Utils.GetTypeSpec(t);
 			cw.Put("public override object FromReaderInt()\n");
 			cw.Put("{\n");
 			if (icoll != null)
 				cw.Put("return FromReaderInt(new {0}());\n", typeSpec);
-			else if (typeof(T).IsInterface || typeof(T).IsAbstract)
+			else if (t.IsInterface || t.IsAbstract)
 				cw.Put("return FromReaderInterface<{0}>(Reader);\n", typeSpec);
 			else
 				cw.Put("return FromReaderTyped<{0}>(Reader);\n", typeSpec);
@@ -383,7 +385,7 @@ namespace Yuzu.Json
 				cw.Put("{\n");
 				cw.Put("var result = ({0})obj;\n", typeSpec);
 				cw.Put("Require('[');\n");
-				GenerateCollection(typeof(T), icoll, "result");
+				GenerateCollection(t, icoll, "result");
 				cw.Put("return result;\n");
 				cw.Put("}\n");
 				cw.Put("\n");
@@ -391,7 +393,7 @@ namespace Yuzu.Json
 
 			cw.Put("public override object FromReaderIntPartial(string name)\n");
 			cw.Put("{\n");
-			if (typeof(T).IsInterface || typeof(T).IsAbstract)
+			if (t.IsInterface || t.IsAbstract)
 				cw.Put("return null;\n");
 			else
 				cw.Put("return ReadFields(new {0}(), name);\n", typeSpec);

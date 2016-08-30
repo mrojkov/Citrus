@@ -66,14 +66,25 @@ namespace YuzuTest
 
 	public class Program
 	{
+		private static void Gen(string fileName, IDeserializerGenerator g, Action<IDeserializerGenerator> fill)
+		{
+			using (var ms = new MemoryStream())
+			using (var sw = new StreamWriter(ms)) {
+				g.GenWriter = sw;
+				g.GenerateHeader();
+				fill(g);
+				g.GenerateFooter();
+				sw.Flush();
+				ms.WriteTo(new FileStream(fileName, FileMode.Create));
+			}
+		}
+
 		public static void Main()
 		{
 			var jd = JsonDeserializerGenerator.Instance;
 			jd.Options.TagMode = TagMode.Names;
-			using (var ms = new MemoryStream())
-			using (var sw = new StreamWriter(ms)) {
-				jd.GenWriter = sw;
-				jd.GenerateHeader();
+			Gen(@"..\..\GeneratedJson.cs", jd, g => {
+				var js = g as JsonDeserializerGenerator;
 				jd.Generate<Sample1>();
 				jd.Generate<Sample2>();
 				jd.Generate<Sample3>();
@@ -123,17 +134,11 @@ namespace YuzuTest
 				jd.Generate<YuzuTestAssembly.SampleAssemblyBase>();
 				jd.Generate<YuzuTestAssembly.SampleAssemblyDerivedQ>();
 				jd.Generate<YuzuTest2.SampleNamespace>();
-				jd.GenerateFooter();
-				sw.Flush();
-				ms.WriteTo(new FileStream(@"..\..\GeneratedJson.cs", FileMode.Create));
-			}
+			});
 
-			var bd = new BinaryDeserializerGenerator();
-			bd.SafetyChecks = true;
-			using (var ms = new MemoryStream())
-			using (var sw = new StreamWriter(ms)) {
-				bd.GenWriter = sw;
-				bd.GenerateHeader();
+			var bdg = new BinaryDeserializerGenerator();
+			bdg.SafetyChecks = true;
+			Gen(@"..\..\GeneratedBinary.cs", bdg, bd => {
 				bd.Generate<Sample1>();
 				bd.Generate<Sample2>();
 				bd.Generate<Sample3>();
@@ -167,10 +172,7 @@ namespace YuzuTest
 				bd.Generate<YuzuTestAssembly.SampleAssemblyBase>();
 				bd.Generate<YuzuTestAssembly.SampleAssemblyDerivedQ>();
 				bd.Generate<YuzuTest2.SampleNamespace>();
-				bd.GenerateFooter();
-				sw.Flush();
-				ms.WriteTo(new FileStream(@"..\..\GeneratedBinary.cs", FileMode.Create));
-			}
+			});
 		}
 
 	}
