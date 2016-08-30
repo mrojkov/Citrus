@@ -475,6 +475,14 @@ namespace YuzuTest.Binary
 			Assert.AreEqual(v2.Children.Count, w2.Children.Count);
 			Assert.AreEqual(v2.Children[0].Value, w2.Children[0].Value);
 			Assert.AreEqual(v2.Children[1].Children, w2.Children[1].Children);
+
+			Assert.AreEqual(
+				"20 03 00 " + XS(typeof(SampleEmptyList)) + " 01 00 " +
+				XS("E", RoughType.Sequence) + " " + XS(RoughType.String) + " 00 00",
+				XS(bs.ToBytes(new SampleEmptyList())));
+			Assert.AreEqual(
+				"20 03 00 01 00 FF FF FF FF 00 00",
+				XS(bs.ToBytes(new SampleEmptyList { E = null })));
 		}
 
 		[TestMethod]

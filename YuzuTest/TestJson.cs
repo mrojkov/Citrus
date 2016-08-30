@@ -423,6 +423,9 @@ namespace YuzuTest.Json
 			Assert.AreEqual(v2.Children.Count, w2.Children.Count);
 			Assert.AreEqual(v2.Children[0].Value, w2.Children[0].Value);
 			Assert.AreEqual(v2.Children[1].Children, w2.Children[1].Children);
+
+			Assert.AreEqual("{\n}", js.ToString(new SampleEmptyList()));
+			Assert.AreEqual("{\n\"E\":null\n}", js.ToString(new SampleEmptyList { E = null }));
 		}
 
 		[TestMethod]

@@ -122,6 +122,11 @@ namespace Yuzu.Metadata
 			}
 		}
 
+		private bool IsNonEmptyCollection<T>(object obj, object value)
+		{
+			return value == null || ((ICollection<T>)value).Count > 0;
+		}
+
 		private void AddItem(MemberInfo m)
 		{
 			var ia = new ItemAttrs(m, Options);
@@ -181,7 +186,16 @@ namespace Yuzu.Metadata
 				if (Default == null)
 					Default = Activator.CreateInstance(Type);
 				var d = item.GetValue(Default);
-				item.SerializeIf = (object obj, object value) => !Object.Equals(item.GetValue(obj), d);
+				var icoll = Utils.GetICollection(item.Type);
+				if (d != null && icoll != null) {
+					var mi = Utils.GetPrivateGeneric(
+						GetType(), "IsNonEmptyCollection", icoll.GetGenericArguments()[0]);
+					item.SerializeIf =
+						(Func<object, object, bool>)
+						Delegate.CreateDelegate(typeof(Func<object, object, bool>), this, mi);
+				}
+				else
+					item.SerializeIf = (object obj, object value) => !Object.Equals(item.GetValue(obj), d);
 			}
 			Items.Add(item);
 		}

@@ -149,6 +149,12 @@ namespace YuzuTest
 		public List<string> E;
 	}
 
+	public class SampleEmptyList
+	{
+		[YuzuMember]
+		public List<string> E = new List<string>();
+	}
+
 	public class SampleArray
 	{
 		[YuzuRequired]
