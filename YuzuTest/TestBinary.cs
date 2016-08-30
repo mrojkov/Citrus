@@ -317,6 +317,30 @@ namespace YuzuTest.Binary
 		}
 
 		[TestMethod]
+		public void TestDecimal()
+		{
+			var bs = new BinarySerializer();
+
+			var v = new SampleDecimal { N = -12.34m };
+
+			var result1 = bs.ToBytes(v);
+			Assert.AreEqual(
+				"20 01 00 " + XS("YuzuTest.SampleDecimal") + " 01 00 " +
+				XS("N", RoughType.Decimal) +
+				" 01 00" + " D2 04 00 00 00 00 00 00 00 00 00 00" + " 00 00 02 80" + " 00 00",
+				XS(result1));
+
+			var w = new SampleDecimal();
+			var bd = new BinaryDeserializer();
+			bd.FromBytes(w, result1);
+			Assert.AreEqual(v.N, w.N);
+
+			var bdg = new BinaryDeserializerGen();
+			w = bdg.FromBytes<SampleDecimal>(result1);
+			Assert.AreEqual(v.N, w.N);
+		}
+
+		[TestMethod]
 		public void TestMemberOrder()
 		{
 			var bs = new BinarySerializer();

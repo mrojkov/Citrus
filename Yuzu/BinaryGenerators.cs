@@ -103,6 +103,7 @@ namespace Yuzu.Binary
 			simpleValueReader[typeof(char)] = "d.Reader.ReadChar()";
 			simpleValueReader[typeof(float)] = "d.Reader.ReadSingle()";
 			simpleValueReader[typeof(double)] = "d.Reader.ReadDouble()";
+			simpleValueReader[typeof(decimal)] = "d.Reader.ReadDecimal()";
 			simpleValueReader[typeof(DateTime)] = "DateTime.FromBinary(d.Reader.ReadInt64())";
 			simpleValueReader[typeof(TimeSpan)] = "new TimeSpan(d.Reader.ReadInt64())";
 			simpleValueReader[typeof(object)] = "dg.ReadAny()";

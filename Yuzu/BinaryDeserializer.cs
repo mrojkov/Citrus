@@ -32,6 +32,7 @@ namespace Yuzu.Binary
 		private object ReadChar() { return Reader.ReadChar(); }
 		private object ReadFloat() { return Reader.ReadSingle(); }
 		private object ReadDouble() { return Reader.ReadDouble(); }
+		private object ReadDecimal() { return Reader.ReadDecimal(); }
 
 		private DateTime ReadDateTime() { return DateTime.FromBinary(Reader.ReadInt64()); }
 		private TimeSpan ReadTimeSpan() { return new TimeSpan(Reader.ReadInt64()); }
@@ -106,6 +107,7 @@ namespace Yuzu.Binary
 			readerCache[typeof(char)] = ReadChar;
 			readerCache[typeof(float)] = ReadFloat;
 			readerCache[typeof(double)] = ReadDouble;
+			readerCache[typeof(decimal)] = ReadDecimal;
 			readerCache[typeof(DateTime)] = ReadDateTimeObj;
 			readerCache[typeof(TimeSpan)] = ReadTimeSpanObj;
 			readerCache[typeof(string)] = ReadString;

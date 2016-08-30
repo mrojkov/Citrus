@@ -115,6 +115,12 @@ namespace YuzuTest
 		public double D;
 	}
 
+	public class SampleDecimal
+	{
+		[YuzuRequired]
+		public decimal N;
+	}
+
 	public class SampleMethodOrder
 	{
 		[YuzuRequired("4")]
