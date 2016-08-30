@@ -13,6 +13,8 @@ namespace Yuzu.Json
 	{
 		public abstract object FromReaderIntPartial(string name);
 
+		public Assembly Assembly;
+
 		protected virtual string GetWrapperNamespace()
 		{
 			var ns = GetType().Namespace;
@@ -33,7 +35,7 @@ namespace Yuzu.Json
 			JsonDeserializerGenBase result;
 			if (!deserializerCache.TryGetValue(className, out result)) {
 				var t = FindType(className);
-				var dt = TypeSerializer.Deserialize(GetDeserializerName(t));
+				var dt = TypeSerializer.Deserialize(GetDeserializerName(t) + ", " + (Assembly ?? GetType().Assembly).FullName);
 				if (dt == null)
 					throw Error("Generated deserializer not found for type '{0}'", className);
 				result = (JsonDeserializerGenBase)Activator.CreateInstance(dt);
@@ -75,7 +77,7 @@ namespace Yuzu.Json
 				Require('}');
 				return obj;
 			}
-			return MakeDeserializer(obj.GetType().FullName).ReadFields(obj, name);
+			return MakeDeserializer(TypeSerializer.Serialize(obj.GetType())).ReadFields(obj, name);
 		}
 
 		public override object FromReaderInt()

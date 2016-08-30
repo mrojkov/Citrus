@@ -206,18 +206,19 @@ namespace YuzuTest.Json
 			Assert.AreEqual("test1", w.S2.Y);
 
 			var jdg = new JsonDeserializerGenerator();
+			jdg.Assembly = GetType().Assembly;
 
 			var w1 = new Sample1();
 			jdg.FromString(w1, "{\"X\":88}");
 			Assert.IsInstanceOfType(w1, typeof(Sample1));
 			Assert.AreEqual(88, w1.X);
 
-			var w2 = jdg.FromString("{\"class\":\"YuzuTest.Sample1\",\"X\":99}");
+			var w2 = jdg.FromString("{\"class\":\"YuzuTest.Sample1, YuzuTest\",\"X\":99}");
 			Assert.IsInstanceOfType(w2, typeof(Sample1));
 			Assert.AreEqual(99, ((Sample1)w2).X);
 
 			var w3 = new SampleMemberI();
-			jdg.FromString(w3, "{\"class\":\"YuzuTest.SampleMemberI\"}");
+			jdg.FromString(w3, "{\"class\":\"YuzuTest.SampleMemberI, YuzuTest\"}");
 			Assert.AreEqual(71, ((SampleMemberI)w3).X);
 		}
 
@@ -335,15 +336,15 @@ namespace YuzuTest.Json
 			js.JsonOptions.SaveRootClass = true;
 			js.Options.TagMode = TagMode.Names;
 			Assert.AreEqual(
-				"{\n\"class\":\"YuzuTest.SampleBase\",\n\"FBase\":0\n}", js.ToString(new SampleBase()));
+				"{\n\"class\":\"YuzuTest.SampleBase, YuzuTest\",\n\"FBase\":0\n}", js.ToString(new SampleBase()));
 			Assert.AreEqual(
-				"{\n\"class\":\"YuzuTest.SampleDerivedA\",\n\"FBase\":0,\n\"FA\":0\n}",
+				"{\n\"class\":\"YuzuTest.SampleDerivedA, YuzuTest\",\n\"FBase\":0,\n\"FA\":0\n}",
 				js.ToString(new SampleDerivedA()));
 
 			var jd = new JsonDeserializer();
 			jd.Options.TagMode = TagMode.Names;
 			var v = jd.FromString(
-				"{\n\"class\":\"YuzuTest.SampleDerivedB\",\n\"FBase\":3,\n\"FB\":7\n}");
+				"{\n\"class\":\"YuzuTest.SampleDerivedB, YuzuTest\",\n\"FBase\":3,\n\"FB\":7\n}");
 			Assert.IsInstanceOfType(v, typeof(SampleDerivedB));
 			var b = (SampleDerivedB)v;
 			Assert.AreEqual(3, b.FBase);
@@ -413,7 +414,7 @@ namespace YuzuTest.Json
 			var result0 = js.ToString(v0);
 			Assert.AreEqual(
 				"{\n" +
-					"\"A\":[\n{\n\"class\":\"YuzuTest.SampleInterfaced\",\n\"X\":9\n}\n],\n" +
+					"\"A\":[\n{\n\"class\":\"YuzuTest.SampleInterfaced, YuzuTest\",\n\"X\":9\n}\n],\n" +
 					"\"B\":[\n7,\n6\n]\n" +
 				"}",
 				result0);
@@ -697,8 +698,9 @@ namespace YuzuTest.Json
 			w = (SampleRect)SampleRect_JsonDeserializer.Instance.FromString(result);
 			CheckSampleRect(v, w);
 
-			var p = (SamplePoint)(new JsonDeserializerGenerator()).
-				FromString(new SamplePoint(), "{ \"X\":34, \"Y\":45 }");
+			var jdg = new JsonDeserializerGenerator();
+			jdg.Assembly = GetType().Assembly;
+			var p = (SamplePoint)jdg.FromString(new SamplePoint(), "{ \"X\":34, \"Y\":45 }");
 			Assert.AreEqual(34, p.X);
 			Assert.AreEqual(45, p.Y);
 		}
@@ -711,7 +713,7 @@ namespace YuzuTest.Json
 			js.JsonOptions.FieldSeparator = "";
 			var v1 = new SampleInterfaceField { I = new SampleInterfaced { X = 34 } };
 			var result1 = js.ToString(v1);
-			Assert.AreEqual("{\"I\":{\"class\":\"YuzuTest.SampleInterfaced\",\"X\":34}}", result1);
+			Assert.AreEqual("{\"I\":{\"class\":\"YuzuTest.SampleInterfaced, YuzuTest\",\"X\":34}}", result1);
 
 			var w1 = new SampleInterfaceField();
 			var jd = new JsonDeserializer();
@@ -728,7 +730,7 @@ namespace YuzuTest.Json
 
 			var v2 = new List<ISample> { null, new SampleInterfaced { X = 37 } };
 			var result2 = js.ToString(v2);
-			Assert.AreEqual("[null,{\"class\":\"YuzuTest.SampleInterfaced\",\"X\":37}]", result2);
+			Assert.AreEqual("[null,{\"class\":\"YuzuTest.SampleInterfaced, YuzuTest\",\"X\":37}]", result2);
 
 			var w2 = new List<ISample>();
 			jd.FromString(w2, result2);
@@ -739,7 +741,7 @@ namespace YuzuTest.Json
 			ISampleField v3 = new SampleInterfacedField { X = 41 };
 			js.JsonOptions.SaveRootClass = true;
 			var result3 = js.ToString(v3);
-			Assert.AreEqual("{\"class\":\"YuzuTest.SampleInterfacedField\",\"X\":41}", result3);
+			Assert.AreEqual("{\"class\":\"YuzuTest.SampleInterfacedField, YuzuTest\",\"X\":41}", result3);
 			var w3 = (ISampleField)jd.FromString(result3);
 			Assert.AreEqual(41, w3.X);
 		}
@@ -755,7 +757,7 @@ namespace YuzuTest.Json
 
 			SampleAbstract v1 = new SampleConcrete { XX = 81 };
 			var result1 = js.ToString(v1);
-			Assert.AreEqual("{\"class\":\"YuzuTest.SampleConcrete\",\"XX\":81}", result1);
+			Assert.AreEqual("{\"class\":\"YuzuTest.SampleConcrete, YuzuTest\",\"XX\":81}", result1);
 
 			var w1 = jd.FromString<SampleAbstract>(result1);
 			Assert.AreEqual((v1 as SampleConcrete).XX, (w1 as SampleConcrete).XX);
@@ -777,7 +779,7 @@ namespace YuzuTest.Json
 			js.JsonOptions.Indent = "";
 			js.JsonOptions.FieldSeparator = "";
 			var v1 = new SampleInterfaceField { I = new SampleInterfacedGeneric<string> { X = 35, G = "qq" } };
-			var n = typeof(SampleInterfacedGeneric<string>).FullName;
+			var n = "YuzuTest.SampleInterfacedGeneric`1[[System.String]], YuzuTest";
 			var result1 = js.ToString(v1);
 			Assert.AreEqual(
 				String.Format("{{\"I\":{{\"class\":\"{0}\",\"G\":\"qq\",\"X\":35}}}}", n), result1);
@@ -903,7 +905,7 @@ namespace YuzuTest.Json
 				new object[] { 1.0, 2.0, 3.0 },
 				(List<object>)((Dictionary<string,object>)d)["F"]);
 
-			d = jd.FromString("{ \"F\": {\"class\": \"YuzuTest.SampleObj\", \"F\": null } }");
+			d = jd.FromString("{ \"F\": {\"class\": \"YuzuTest.SampleObj, YuzuTest\", \"F\": null } }");
 			Assert.AreEqual(typeof(Dictionary<string, object>), d.GetType());
 			var f = ((Dictionary<string, object>)d)["F"];
 			Assert.IsInstanceOfType(f, typeof(SampleObj));
@@ -1159,7 +1161,7 @@ namespace YuzuTest.Json
 
 			v1.Add(new SampleMemberI());
 			var result1p = js.ToString(v1);
-			Assert.AreEqual("[{\"class\":\"YuzuTest.SampleMemberI\"}]", result1p);
+			Assert.AreEqual("[{\"class\":\"YuzuTest.SampleMemberI, YuzuTest\"}]", result1p);
 			jd.FromString(w1, result1p);
 			Assert.AreEqual(71, w1[0].X);
 
@@ -1174,7 +1176,7 @@ namespace YuzuTest.Json
 			Assert.AreEqual("[]", js.ToString(new List<SampleMemberAbstract>()));
 			var v3 = new List<SampleMemberAbstract> { new SampleMemberConcrete() };
 			var result3 = js.ToString(v3);
-			Assert.AreEqual("[{\"class\":\"YuzuTest.SampleMemberConcrete\"}]", result3);
+			Assert.AreEqual("[{\"class\":\"YuzuTest.SampleMemberConcrete, YuzuTest\"}]", result3);
 			var w3 = new List<SampleMemberAbstract>();
 			jd.FromString(w3, result3);
 			Assert.AreEqual(72, w3[0].X);
@@ -1194,8 +1196,8 @@ namespace YuzuTest.Json
 
 			var result1 = js.ToString(v1);
 			Assert.AreEqual(
-				"[{\"class\":\"YuzuTest.SampleDerivedB\",\"FBase\":0,\"FB\":10}," +
-				"{\"class\":\"YuzuTest.SampleDerivedB\",\"FBase\":0,\"FB\":20}]",
+				"[{\"class\":\"YuzuTest.SampleDerivedB, YuzuTest\",\"FBase\":0,\"FB\":10}," +
+				"{\"class\":\"YuzuTest.SampleDerivedB, YuzuTest\",\"FBase\":0,\"FB\":20}]",
 				result1);
 			var w1 = (List<object>)jd.FromString(result1);
 			for (int i = 0; i < v1.Count; i++) {
@@ -1216,8 +1218,8 @@ namespace YuzuTest.Json
 				new SampleAssemblyDerivedR { R = "R1" } };
 			var result1 = js.ToString(v1);
 			Assert.AreEqual(
-				"[{\"class\":\"YuzuTestAssembly.SampleAssemblyDerivedQ\",\"Q\":10}," +
-				"{\"class\":\"YuzuTest.SampleAssemblyDerivedR\",\"R\":\"R1\"}]",
+				"[{\"class\":\"YuzuTestAssembly.SampleAssemblyDerivedQ, AssemblyTest\",\"Q\":10}," +
+				"{\"class\":\"YuzuTest.SampleAssemblyDerivedR, YuzuTest\",\"R\":\"R1\"}]",
 				result1);
 
 			var w1 = new List<SampleAssemblyBase>();
@@ -1253,15 +1255,15 @@ namespace YuzuTest.Json
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"Y\": \"q\" }"), "'X'");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "[]"), "'Sample1'");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"class\": \"Q\" }"), "'Q'");
-			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"class\": \"YuzuTest.Sample2\" }"), "Sample2'");
+			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"class\": \"YuzuTest.Sample2, YuzuTest\" }"), ".Sample2");
 			XAssert.Throws<YuzuException>(() => jd.FromString(new SamplePoint(), "[ \"QQ\" ]"), "");
 			XAssert.Throws<YuzuException>(() => jd.FromString(new object(), "{}"), "object");
 			XAssert.Throws<EndOfStreamException>(() => jd.FromString(""), "");
 			XAssert.Throws<EndOfStreamException>(() => jd.FromString(w, "{ \"X\": 1"));
 			XAssert.Throws<YuzuException>(() => jd.FromString(
-				"{\"class\":\"YuzuTest.SampleInterfaceField\",\"I\":{}}"), "class");
+				"{\"class\":\"YuzuTest.SampleInterfaceField, YuzuTest\",\"I\":{}}"), "class");
 			XAssert.Throws<YuzuException>(() => jd.FromString(
-				"{\"class\":\"YuzuTest.SampleInterfaceField\",\"I\":{\"class\":\"YuzuTest.Sample1\"}}"),
+				"{\"class\":\"YuzuTest.SampleInterfaceField, YuzuTest\",\"I\":{\"class\":\"YuzuTest.Sample1, YuzuTest\"}}"),
 				"ISample");
 
 			jd.Options.ReportErrorPosition = true;
