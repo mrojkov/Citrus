@@ -277,6 +277,33 @@ namespace YuzuTest.Json
 		}
 
 		[TestMethod]
+		public void TestDecimal()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+
+			var v = new SampleDecimal { N = -12.34m };
+
+			var jd = new JsonDeserializer();
+
+			var result1 = js.ToString(v);
+			Assert.AreEqual("{\n\"N\":-12.34\n}", result1);
+			var w1 = new SampleDecimal();
+			jd.FromString(w1, result1);
+			Assert.AreEqual(v.N, w1.N);
+
+			jd.JsonOptions.DecimalAsString = js.JsonOptions.DecimalAsString = true;
+			var result2 = js.ToString(v);
+			Assert.AreEqual("{\n\"N\":\"-12.34\"\n}", result2);
+			var w2 = new SampleDecimal();
+			jd.FromString(w2, result2);
+			Assert.AreEqual(v.N, w2.N);
+
+			var w3 = (SampleDecimal)SampleDecimal_JsonDeserializer.Instance.FromString(result1);
+			Assert.AreEqual(v.N, w3.N);
+		}
+
+		[TestMethod]
 		public void TestMemberOrder()
 		{
 			var js = new JsonSerializer();

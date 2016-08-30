@@ -33,6 +33,9 @@ namespace Yuzu.Json
 
 		private bool int64AsString = false;
 		public bool Int64AsString { get { return int64AsString; } set { int64AsString = value; generation++; } }
+
+		private bool decimalAsString = false;
+		public bool DecimalAsString { get { return decimalAsString; } set { decimalAsString = value; generation++; } }
 	};
 
 	internal static class JsonEscapeData
@@ -92,6 +95,16 @@ namespace Yuzu.Json
 		private void WriteSingle(object obj)
 		{
 			WriteStr(((float)obj).ToString(CultureInfo.InvariantCulture));
+		}
+
+		private void WriteDecimal(object obj)
+		{
+			WriteStr(((decimal)obj).ToString(CultureInfo.InvariantCulture));
+		}
+
+		private void WriteDecimalAsString(object obj)
+		{
+			WriteUnescapedString(((decimal)obj).ToString(CultureInfo.InvariantCulture));
 		}
 
 		private void WriteEnumAsInt(object obj)
@@ -292,6 +305,11 @@ namespace Yuzu.Json
 			}
 			if (t == typeof(double))
 				return WriteDouble;
+			if (t == typeof(decimal))
+				if (JsonOptions.DecimalAsString)
+					return WriteDecimalAsString;
+				else
+					return WriteDecimal;
 			if (t == typeof(float))
 				return WriteSingle;
 			if (t == typeof(char))

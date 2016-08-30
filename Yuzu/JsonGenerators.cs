@@ -244,6 +244,10 @@ namespace Yuzu.Json
 				cw.PutPart(sr + ";\n");
 				return;
 			}
+			if (t == typeof(decimal)) {
+				cw.PutPart(JsonOptions.DecimalAsString ? "RequireDecimalAsString();\n" : "RequireDecimal();\n");
+				return;
+			}
 			var icoll = t.GetInterface(typeof(ICollection<>).Name);
 			if (t.IsEnum) {
 				cw.PutPart(
