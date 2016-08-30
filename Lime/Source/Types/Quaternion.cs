@@ -11,25 +11,25 @@ namespace Lime
 		/// <summary>
 		/// The x coordinate of this <see cref="Quaternion"/>.
 		/// </summary>
-		[YuzuMember]
+		[YuzuMember("0")]
 		public float X;
 
 		/// <summary>
 		/// The y coordinate of this <see cref="Quaternion"/>.
 		/// </summary>
-		[YuzuMember]
+		[YuzuMember("1")]
 		public float Y;
 
 		/// <summary>
 		/// The z coordinate of this <see cref="Quaternion"/>.
 		/// </summary>
-		[YuzuMember]
+		[YuzuMember("2")]
 		public float Z;
 
 		/// <summary>
 		/// The rotation component of this <see cref="Quaternion"/>.
 		/// </summary>
-		[YuzuMember]
+		[YuzuMember("3")]
 		public float W;
 
 		/// <summary>

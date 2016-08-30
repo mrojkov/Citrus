@@ -24,7 +24,7 @@ namespace Lime
 		[FieldOffset(3)]
 		public byte A;
 
-		[YuzuMember]
+		[YuzuMember("0")]
 		[FieldOffset(0)]
 		public uint ABGR;
 

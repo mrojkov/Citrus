@@ -27,52 +27,52 @@ namespace Lime
 			this.M44 = m44;
 		}
 
-		[YuzuMember]
+		[YuzuMember("0")]
 		public float M11;
 
-		[YuzuMember]
+		[YuzuMember("1")]
 		public float M12;
 
-		[YuzuMember]
+		[YuzuMember("2")]
 		public float M13;
 
-		[YuzuMember]
+		[YuzuMember("3")]
 		public float M14;
 
-		[YuzuMember]
+		[YuzuMember("4")]
 		public float M21;
 
-		[YuzuMember]
+		[YuzuMember("5")]
 		public float M22;
 
-		[YuzuMember]
+		[YuzuMember("6")]
 		public float M23;
 
-		[YuzuMember]
+		[YuzuMember("7")]
 		public float M24;
 
-		[YuzuMember]
+		[YuzuMember("8")]
 		public float M31;
 
-		[YuzuMember]
+		[YuzuMember("9")]
 		public float M32;
 
-		[YuzuMember]
+		[YuzuMember("A")]
 		public float M33;
 
-		[YuzuMember]
+		[YuzuMember("B")]
 		public float M34;
 
-		[YuzuMember]
+		[YuzuMember("C")]
 		public float M41;
 
-		[YuzuMember]
+		[YuzuMember("D")]
 		public float M42;
 
-		[YuzuMember]
+		[YuzuMember("E")]
 		public float M43;
 
-		[YuzuMember]
+		[YuzuMember("F")]
 		public float M44;
 
 		private static readonly Matrix44 identity = new Matrix44(

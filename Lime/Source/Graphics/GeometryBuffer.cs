@@ -13,16 +13,16 @@ namespace Lime
 	[StructLayout(LayoutKind.Sequential, Pack = 1, Size=4)]
 	public struct BlendIndices
 	{
-		[YuzuMember]
+		[YuzuMember("0")]
 		public byte Index0;
 
-		[YuzuMember]
+		[YuzuMember("1")]
 		public byte Index1;
 
-		[YuzuMember]
+		[YuzuMember("2")]
 		public byte Index2;
 
-		[YuzuMember]
+		[YuzuMember("3")]
 		public byte Index3;
 	}
 
@@ -30,16 +30,16 @@ namespace Lime
 	[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 16)]
 	public struct BlendWeights
 	{
-		[YuzuMember]
+		[YuzuMember("0")]
 		public float Weight0;
 
-		[YuzuMember]
+		[YuzuMember("1")]
 		public float Weight1;
 
-		[YuzuMember]
+		[YuzuMember("2")]
 		public float Weight2;
 
-		[YuzuMember]
+		[YuzuMember("3")]
 		public float Weight3;
 	}
 

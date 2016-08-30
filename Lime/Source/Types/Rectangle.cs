@@ -13,14 +13,14 @@ namespace Lime
 		/// <summary>
 		/// Left-top corner of this rectangle.
 		/// </summary>
-		[YuzuMember]
+		[YuzuMember("0")]
 		public Vector2 A;
 
 		/// <summary>
 		/// Right-bottom corner of this rectangle.
 		/// </summary>
 		/// <remarks>Rectangle doesn't contain this point.</remarks>
-		[YuzuMember]
+		[YuzuMember("1")]
 		public Vector2 B;
 
 		/// <summary>

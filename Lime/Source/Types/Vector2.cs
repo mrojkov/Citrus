@@ -12,10 +12,10 @@ namespace Lime
 	[YuzuCompact]
 	public struct Vector2 : IEquatable<Vector2>
 	{
-		[YuzuMember]
+		[YuzuMember("0")]
 		public float X;
 
-		[YuzuMember]
+		[YuzuMember("1")]
 		public float Y;
 
 		/// <summary>

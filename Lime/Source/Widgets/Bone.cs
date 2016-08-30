@@ -11,13 +11,13 @@ namespace Lime
 		/// <summary>
 		/// Номер кости
 		/// </summary>
-		[YuzuMember]
+		[YuzuMember("0")]
 		public int Index;
 
 		/// <summary>
 		/// Сила влияния кости
 		/// </summary>
-		[YuzuMember]
+		[YuzuMember("1")]
 		public float Weight;
 	}
 
@@ -28,16 +28,16 @@ namespace Lime
 	[YuzuCompact]
 	public class SkinningWeights
 	{
-		[YuzuMember]
+		[YuzuMember("0")]
 		public BoneWeight Bone0;
 
-		[YuzuMember]
+		[YuzuMember("1")]
 		public BoneWeight Bone1;
 
-		[YuzuMember]
+		[YuzuMember("2")]
 		public BoneWeight Bone2;
 
-		[YuzuMember]
+		[YuzuMember("3")]
 		public BoneWeight Bone3;
 	}
 

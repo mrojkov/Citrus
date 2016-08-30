@@ -6,16 +6,16 @@ namespace Lime
 	[YuzuCompact]
 	public struct Vector4 : IEquatable<Vector4>
 	{
-		[YuzuMember]
+		[YuzuMember("0")]
 		public float X;
 
-		[YuzuMember]
+		[YuzuMember("1")]
 		public float Y;
 
-		[YuzuMember]
+		[YuzuMember("2")]
 		public float Z;
 
-		[YuzuMember]
+		[YuzuMember("3")]
 		public float W;
 
 		public float Length

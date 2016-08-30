@@ -10,10 +10,10 @@ namespace Lime
 	[System.Diagnostics.DebuggerStepThrough]
 	public struct IntVector2 : IEquatable<IntVector2>
 	{
-		[YuzuMember]
+		[YuzuMember("0")]
 		public int X;
 
-		[YuzuMember]
+		[YuzuMember("1")]
 		public int Y;
 
 		/// <summary>

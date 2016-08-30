@@ -10,10 +10,10 @@ namespace Lime
 	[YuzuCompact]
 	public struct Size : IEquatable<Size>
 	{
-		[YuzuMember]
+		[YuzuMember("0")]
 		public int Width;
 
-		[YuzuMember]
+		[YuzuMember("1")]
 		public int Height;
 
 		/// <summary>

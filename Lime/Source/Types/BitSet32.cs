@@ -23,7 +23,7 @@ namespace Lime
 		/// <summary>
 		/// Uint that is used for array representation.
 		/// </summary>
-		[YuzuMember]
+		[YuzuMember("0")]
 		public uint Value;
 
 		public int Count { get { return 32; } }

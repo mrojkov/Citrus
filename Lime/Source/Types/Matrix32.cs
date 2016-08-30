@@ -10,13 +10,13 @@ namespace Lime
 	[System.Diagnostics.DebuggerStepThrough]
 	public struct Matrix32 : IEquatable<Matrix32>
 	{
-		[YuzuMember]
+		[YuzuMember("0")]
 		public Vector2 U;
 
-		[YuzuMember]
+		[YuzuMember("1")]
 		public Vector2 V;
 
-		[YuzuMember]
+		[YuzuMember("2")]
 		public Vector2 T;
 
 		/// <summary>
