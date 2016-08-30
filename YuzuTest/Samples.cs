@@ -518,6 +518,18 @@ namespace YuzuTest
 		public int G;
 	}
 
+	public class BadPrivate
+	{
+		[YuzuRequired]
+		private int F;
+	}
+
+	public class BadPrivateGetter
+	{
+		[YuzuRequired]
+		public int F { private get; set; }
+	}
+
 	public class BadMerge1
 	{
 		[YuzuRequired]

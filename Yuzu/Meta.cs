@@ -143,6 +143,8 @@ namespace Yuzu.Metadata
 			switch (m.MemberType) {
 				case MemberTypes.Field:
 					var f = m as FieldInfo;
+					if (!f.IsPublic)
+						throw Error("Non-public item '{0}'", f.Name);
 					item.Type = f.FieldType;
 					item.GetValue = f.GetValue;
 					if (!merge)
@@ -151,15 +153,17 @@ namespace Yuzu.Metadata
 					break;
 				case MemberTypes.Property:
 					var p = m as PropertyInfo;
+					var getter = p.GetGetMethod();
+					if (getter == null)
+						throw Error("No getter for item '{0}'", p.Name);
 					item.Type = p.PropertyType;
+					var setter = p.GetSetMethod();
 #if iOS // Apple forbids code generation.
 					item.GetValue = obj => p.GetValue(obj, Utils.ZeroObjects);
-					var setter = p.GetSetMethod();
 					if (!merge && setter != null)
 						item.SetValue = (obj, value) => p.SetValue(obj, value, Utils.ZeroObjects);
 #else
-					item.GetValue = BuildGetter(p.GetGetMethod());
-					var setter = p.GetSetMethod();
+					item.GetValue = BuildGetter(getter);
 					if (!merge && setter != null)
 						item.SetValue = BuildSetter(setter);
 #endif
@@ -197,7 +201,7 @@ namespace Yuzu.Metadata
 		private void ExploreType(Type t)
 		{
 			const BindingFlags bindingFlags =
-				BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
+				BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy;
 			foreach (var m in t.GetMembers(bindingFlags)) {
 				if (m.MemberType == MemberTypes.Field || m.MemberType == MemberTypes.Property)
 					AddItem(m);

@@ -1285,6 +1285,8 @@ namespace YuzuTest.Json
 			XAssert.Throws<YuzuException>(() => js.ToString(new Bad1()), "F");
 			XAssert.Throws<YuzuException>(() => js.ToString(new Bad2()), "F");
 			XAssert.Throws<YuzuException>(() => js.ToString(new Bad3()), "G");
+			XAssert.Throws<YuzuException>(() => js.ToString(new BadPrivate()), "'F'");
+			XAssert.Throws<YuzuException>(() => js.ToString(new BadPrivateGetter()), "'F'");
 		}
 	}
 }
