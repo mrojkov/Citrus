@@ -7,12 +7,12 @@ using Yuzu.Util;
 
 namespace Yuzu.Metadata
 {
-	internal class Meta
+	public class Meta
 	{
 		private static Dictionary<Tuple<Type, CommonOptions>, Meta> cache =
 			new Dictionary<Tuple<Type, CommonOptions>, Meta>();
 
-		internal class Item : IComparable<Item>
+		public class Item : IComparable<Item>
 		{
 			private string id;
 
@@ -105,20 +105,33 @@ namespace Yuzu.Metadata
 		}
 #endif
 
+		private struct ItemAttrs
+		{
+			public Attribute Optional;
+			public Attribute Required;
+			public Attribute Member;
+			public int Count;
+			public Attribute Any() { return Optional ?? Required ?? Member; }
+			public ItemAttrs(MemberInfo m, MetaOptions options)
+			{
+				Optional = m.GetCustomAttribute_Compat(options.OptionalAttribute, false);
+				Required = m.GetCustomAttribute_Compat(options.RequiredAttribute, false);
+				Member = m.GetCustomAttribute_Compat(options.MemberAttribute, false);
+				Count = (Optional != null ? 1 : 0) + (Required != null ? 1 : 0) + (Member != null ? 1 : 0);
+			}
+		}
+
 		private void AddItem(MemberInfo m)
 		{
-			var optional = m.GetCustomAttribute_Compat(Options.OptionalAttribute, false);
-			var required = m.GetCustomAttribute_Compat(Options.RequiredAttribute, false);
-			var member = m.GetCustomAttribute_Compat(Options.MemberAttribute, false);
-			var count = (optional != null ? 1 : 0) + (required != null ? 1 : 0) + (member != null ? 1 : 0);
-			if (count == 0)
+			var ia = new ItemAttrs(m, Options);
+			if (ia.Count == 0)
 				return;
-			if (count != 1)
+			if (ia.Count != 1)
 				throw Error("More than one of optional, required and member attributes for field '{0}'", m.Name);
 			var serializeIf = m.GetCustomAttribute_Compat(Options.SerializeIfAttribute, true);
 			var item = new Item {
-				Alias = Options.GetAlias(optional ?? required ?? member) ?? m.Name,
-				IsOptional = required == null,
+				Alias = Options.GetAlias(ia.Any()) ?? m.Name,
+				IsOptional = ia.Required == null,
 				IsCompact =
 					m.IsDefined(Options.CompactAttribute, false) ||
 					m.GetType().IsDefined(Options.CompactAttribute, false),
@@ -160,7 +173,7 @@ namespace Yuzu.Metadata
 				if (!item.Type.IsClass && !item.Type.IsInterface || item.Type == typeof(object))
 					throw Error("Unable to either set or merge item {0}", item.Name);
 			}
-			if (member != null && item.SerializeIf == null && !Type.IsAbstract && !Type.IsInterface) {
+			if (ia.Member != null && item.SerializeIf == null && !Type.IsAbstract && !Type.IsInterface) {
 				if (Default == null)
 					Default = Activator.CreateInstance(Type);
 				var d = item.GetValue(Default);
@@ -245,6 +258,32 @@ namespace Yuzu.Metadata
 			return new YuzuException("In type '" + Type.FullName + "': " + String.Format(format, args));
 		}
 
+		private static bool HasItems(Type t, MetaOptions options)
+		{
+			const BindingFlags bindingFlags =
+				BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy;
+			foreach (var m in t.GetMembers(bindingFlags)) {
+				if (m.MemberType != MemberTypes.Field && m.MemberType != MemberTypes.Property)
+					continue;
+				if (new ItemAttrs(m, options).Any() != null)
+					return true;
+			}
+			return false;
+		}
+
+		public static List<Type> Collect(Assembly assembly, MetaOptions options = null)
+		{
+			var result = new List<Type>();
+			var q = new Queue<Type>(assembly.GetTypes());
+			while (q.Count > 0) {
+				var t = q.Dequeue();
+				if (HasItems(t, options ?? MetaOptions.Default) && !t.IsGenericTypeDefinition)
+					result.Add(t);
+				foreach (var nt in t.GetNestedTypes())
+					q.Enqueue(nt);
+			}
+			return result;
+		}
 	}
 
 }

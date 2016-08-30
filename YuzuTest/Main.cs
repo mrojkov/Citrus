@@ -9,6 +9,7 @@ using Yuzu;
 using Yuzu.Binary;
 using Yuzu.Code;
 using Yuzu.Json;
+using Yuzu.Metadata;
 using Yuzu.Protobuf;
 using Yuzu.Util;
 
@@ -108,6 +109,14 @@ namespace YuzuTest
 				typeof(Dictionary<Sample1, List<Sample2>>),
 				"System.Collections.Generic.Dictionary`2[[YuzuTest.Sample1, YuzuTest]," +
 				"[System.Collections.Generic.List`1[[YuzuTest.Sample2, YuzuTest]]]]");
+		}
+
+		[TestMethod]
+		public void TestMetaCollect()
+		{
+			var t = Meta.Collect(GetType().Assembly, MetaOptions.Default);
+			Assert.IsTrue(t.Contains(typeof(Sample1)));
+			Assert.IsFalse(t.Contains(typeof(SampleInterfacedGeneric<>)));
 		}
 	}
 
