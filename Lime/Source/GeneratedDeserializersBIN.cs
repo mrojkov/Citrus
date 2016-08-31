@@ -391,9 +391,9 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = new global::Lime.Matrix32();
 			var dg = (BinaryDeserializerGen)d;
-			result.T = (global::Lime.Vector2)dg.ReadStruct<global::Lime.Vector2>();
 			result.U = (global::Lime.Vector2)dg.ReadStruct<global::Lime.Vector2>();
 			result.V = (global::Lime.Vector2)dg.ReadStruct<global::Lime.Vector2>();
+			result.T = (global::Lime.Vector2)dg.ReadStruct<global::Lime.Vector2>();
 			return result;
 		}
 
@@ -460,10 +460,10 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = new global::Lime.Quaternion();
 			var dg = (BinaryDeserializerGen)d;
-			result.W = d.Reader.ReadSingle();
 			result.X = d.Reader.ReadSingle();
 			result.Y = d.Reader.ReadSingle();
 			result.Z = d.Reader.ReadSingle();
+			result.W = d.Reader.ReadSingle();
 			return result;
 		}
 
@@ -498,8 +498,8 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = new global::Lime.Size();
 			var dg = (BinaryDeserializerGen)d;
-			result.Height = d.Reader.ReadInt32();
 			result.Width = d.Reader.ReadInt32();
+			result.Height = d.Reader.ReadInt32();
 			return result;
 		}
 
@@ -526,10 +526,10 @@ namespace GeneratedDeserializersBIN
 		{
 			var result = new global::Lime.Vector4();
 			var dg = (BinaryDeserializerGen)d;
-			result.W = d.Reader.ReadSingle();
 			result.X = d.Reader.ReadSingle();
 			result.Y = d.Reader.ReadSingle();
 			result.Z = d.Reader.ReadSingle();
+			result.W = d.Reader.ReadSingle();
 			return result;
 		}
 

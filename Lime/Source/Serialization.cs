@@ -51,7 +51,7 @@ namespace Lime
 		};
 
 		private static readonly JsonSerializeOptions defaultYuzuJSONOptions = new JsonSerializeOptions {
-			ArrayLengthPrefix = true,
+			ArrayLengthPrefix = false,
 			Indent = "\t",
 			FieldSeparator = "\n",
 			SaveRootClass = true,
