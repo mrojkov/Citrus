@@ -355,11 +355,11 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Returns true if this node is a descendant of provided node.
+		/// Returns true if this node is a descendant of the provided node.
 		/// </summary>
 		public bool DescendantOf(Node node)
 		{
-			for (Node n = Parent; n != null; n = n.Parent) {
+			for (var n = Parent; n != null; n = n.Parent) {
 				if (n == node)
 					return true;
 			}
@@ -732,6 +732,19 @@ namespace Lime
 		public IEnumerable<Node> Descendants
 		{
 			get { return new DescendantsEnumerable(this); }
+		}
+
+		/// <summary>
+		/// Enumerate all node's ancestors.
+		/// </summary>
+		public IEnumerable<Node> Ancestors
+		{
+			get
+			{
+				for (var p = Parent; p != null; p = p.Parent) {
+					yield return p;
+				}		
+			}
 		}
 
 		/// <summary>
