@@ -7,24 +7,6 @@ namespace Lime
 {
 	public struct Key
 	{
-		public static class Arrays
-		{
-			public static readonly BitArray AllKeys = FromRange(0, MaxCount - 1);
-			public static readonly BitArray KeyboardKeys = FromRange(LShift, BackSlash);
-			public static readonly BitArray ModifierKeys = FromRange(LShift, Menu);
-			public static readonly BitArray AffectedByModifiersKeys = FromRange(F1, BackSlash);
-			public static readonly BitArray MouseButtons = FromRange(Mouse0, Mouse1DoubleClick);
-
-			static BitArray FromRange(int min, int max)
-			{
-				var r = new BitArray(Key.MaxCount);
-				for (int i = min; i <= max; i++) {
-					r.Set(i, true);
-				}
-				return r;
-			}
-		}
-
 		public static Key GetByName(string name)
 		{
 			var field = typeof(Key).GetFields().
@@ -44,6 +26,28 @@ namespace Lime
 
 		public Key(int code) { Code = code; }
 
+		public bool IsMouseButton()
+		{
+			return Code >= Mouse0.Code && Code <= Mouse1DoubleClick.Code;
+		}
+
+		public bool IsAffectedByModifiers()
+		{
+			return Code >= F1.Code && Code <= BackSlash.Code;
+		}
+
+		public bool IsModifier()
+		{
+			return Code >= LShift.Code && Code <= Menu.Code;
+		}
+
+		public static IEnumerable<Key> Enumerate()
+		{
+			for (int i = 0; i < Count; i++) {
+				yield return (Key)i;
+			}
+		}
+
 		public static implicit operator Key (int code) { return new Key(code); }
 		public static implicit operator int (Key key) { return key.Code; }
 
@@ -54,7 +58,7 @@ namespace Lime
 
 		public static Key MapShortcut(Shortcut shortcut)
 		{
-			if (!Arrays.AffectedByModifiersKeys[shortcut.Main]) {
+			if (!shortcut.Main.IsAffectedByModifiers()) {
 				throw new ArgumentException();
 			}
 			if (shortcut.Modifiers == Modifiers.None) {
