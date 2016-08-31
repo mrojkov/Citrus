@@ -10,15 +10,8 @@ namespace Orange
 		[MenuItem("Generate Lime deserializers")]
 		public static void GenerateLimeDeserializersAction()
 		{
-			GenerateLimeDeserializers();
-		}
-
-		public static bool GenerateLimeDeserializers()
-		{
-			Lime.Serialization.GenerateDeserializers();
 			Lime.Serialization.GenerateBinaryDeserializers();
 			Console.WriteLine("Done. Please rebuild Orange.");
-			return true;
 		}
 	}
 }

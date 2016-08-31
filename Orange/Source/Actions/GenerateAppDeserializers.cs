@@ -26,20 +26,13 @@ namespace Orange
 			if (!System.IO.File.Exists(assembly)) {
 				Console.WriteLine("{0} doesn't exist", assembly);
 				Console.WriteLine(@"Ensure your Application.cs contains following code:
-	public static void Main(string[] args)
-	{
-		if (Array.IndexOf(args, ""--GenerateYuzuDeserializers"") >= 0) {
-			Lime.Environment.GenerateSerializationAssembly(""Serializer"");
-			return;
+	if (Array.IndexOf(args, ""--GenerateYuzuDeserializers"") >= 0) {
+		Lime.Serialization.GenerateDeserializers(""OceanDeserializers.cs"", ""OceanDeserializers"", GetSerializationTypes());
+		return;
 	}");
 				return;
 			}
-			var destination = System.IO.Path.Combine(The.Workspace.ProjectDirectory, "Serializer.dll");
-			if (System.IO.File.Exists(destination)) {
-				System.IO.File.Delete(destination);
-			}
-			System.IO.File.Move(assembly, destination);
-			Console.Write("Serialization assembly saved to '{0}'\n", destination);
+			// TODO: write location of generated file
 		}
 	}
 }

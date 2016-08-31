@@ -118,7 +118,6 @@
     <Compile Include="Source\Audio\Unity\AudioChannel.cs" />
     <Compile Include="Source\EnumExtensions.cs" />
     <Compile Include="Source\GeneratedDeserializersBIN.cs" />
-    <Compile Include="Source\GeneratedDeserializersJSON.cs" />
     <Compile Include="Source\Graphics\Fonts\CharMap.cs" />
     <Compile Include="Source\Graphics\Fonts\CompoundFont.cs" />
     <Compile Include="Source\Graphics\Fonts\Font.cs" />
