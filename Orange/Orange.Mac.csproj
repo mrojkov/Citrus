@@ -106,7 +106,6 @@
     <Compile Include="Source\WorkspaceConfig.cs" />
     <Compile Include="Source\Actions\BuildGameAndRun.cs" />
     <Compile Include="Source\Actions\ExtractTangerineScenes.cs" />
-    <Compile Include="Source\Actions\GenerateSerializerDll.cs" />
     <Compile Include="Source\Actions\RebuildGame.cs" />
     <Compile Include="Source\Actions\RevealCookedAssets.cs" />
     <Compile Include="Source\Actions\UpdateDictionaryTxt.cs" />
@@ -141,6 +140,10 @@
     <Compile Include="Source\ModelImport\ModelImporter.cs" />
     <Compile Include="Source\SubTarget.cs" />
     <Compile Include="Source\ModelImport\KeyframeReducer.cs" />
+    <Compile Include="Source\Actions\ConvertAssetsToTangerine.cs" />
+    <Compile Include="Source\Actions\GenerateAppDeserializers.cs" />
+    <Compile Include="Source\Actions\GenerateLimeDeserializers.cs" />
+    <Compile Include="Source\Actions\AnalyzeResources.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Info.plist" />

@@ -268,7 +268,6 @@
     <Compile Include="Source\Widgets\BorderedFrame.cs" />
     <Compile Include="Source\Application\Menu\Command.cs" />
     <Compile Include="Source\Widgets\TabBar.cs" />
-    <Compile Include="Source\GeneratedDeserializersJSON.cs" />
     <Compile Include="Source\GeneratedDeserializersBIN.cs" />
   </ItemGroup>
   <ItemGroup>
