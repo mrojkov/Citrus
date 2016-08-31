@@ -633,7 +633,7 @@ namespace Yuzu.Json
 		protected int IgnoreNewFields(string tag, ref string name)
 		{
 			var cmp = String.CompareOrdinal(tag, name);
-			if (Options.IgnoreNewFields && Options.TagMode != TagMode.Names)
+			if (Options.IgnoreUnknownFields && Options.TagMode != TagMode.Names)
 				while (cmp > 0 && name != "") {
 					ReadAnyObject();
 					name = GetNextName(false);
@@ -652,7 +652,7 @@ namespace Yuzu.Json
 					while (name != "") {
 						Meta.Item yi;
 						if (!meta.TagToItem.TryGetValue(name, out yi)) {
-							if (!Options.IgnoreNewFields)
+							if (!Options.IgnoreUnknownFields)
 								throw Error("Unknown field '{0}'", name);
 							ReadAnyObject();
 							name = GetNextName(false);
@@ -665,7 +665,7 @@ namespace Yuzu.Json
 						name = GetNextName(false);
 					}
 				}
-				else if (Options.IgnoreNewFields && Options.TagMode != TagMode.Names) {
+				else if (Options.IgnoreUnknownFields && Options.TagMode != TagMode.Names) {
 					foreach (var yi in meta.Items) {
 						if (IgnoreNewFields(yi.Tag(Options), ref name) != 0) {
 							if (!yi.IsOptional)
@@ -697,7 +697,7 @@ namespace Yuzu.Json
 			finally {
 				objStack.Pop();
 			}
-			if (Options.IgnoreNewFields)
+			if (Options.IgnoreUnknownFields)
 				IgnoreNewFieldsTail(name);
 			Require('}');
 			meta.RunAfterDeserialization(obj);

@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 
 using Yuzu.Metadata;
+using Yuzu.Util;
 
 namespace Yuzu.Deserializer
 {
@@ -92,7 +93,7 @@ namespace Yuzu.Deserializer
 
 		protected Type FindType(string typeName)
 		{
-			var t = Meta.FindType(typeName);
+			var t = TypeSerializer.Deserialize(typeName);
 			if (t == null)
 				throw Error("Unknown type '{0}'", typeName);
 			return t;

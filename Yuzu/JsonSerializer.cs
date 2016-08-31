@@ -390,7 +390,7 @@ namespace Yuzu.Json
 			var actualType = obj.GetType();
 			if (typeof(T) != actualType || objStack.Count == 0 && JsonOptions.SaveRootClass) {
 				WriteName(JsonOptions.ClassTag, ref isFirst);
-				WriteUnescapedString(actualType.FullName);
+				WriteUnescapedString(TypeSerializer.Serialize(actualType));
 			}
 			objStack.Push(obj);
 			try {
