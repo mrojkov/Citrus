@@ -11,6 +11,8 @@ namespace Lime
 
 	public class WindowOptions
 	{
+		public static float DefaultRefreshRate = 60;
+
 		public bool FullScreen = false;
 		public bool FixedSize = true;
 		public bool Centered = true;
@@ -20,7 +22,7 @@ namespace Lime
 		public Vector2 MaximumDecoratedSize;
 		public string Title = "Citrus";
 		public bool Visible = true;
-		public float RefreshRate = 60;
+		public float RefreshRate = DefaultRefreshRate;
 		// System.Drawing.Icon on Windows
 		public object Icon;
 	}
