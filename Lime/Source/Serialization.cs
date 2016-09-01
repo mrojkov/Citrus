@@ -323,10 +323,15 @@ namespace Lime
 				jd.GenerateFooter();
 				sw.Flush();
 				var executablePath = System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly ().Location);
+				string goUp =
+
 #if WIN
-				var goUp = "/../../../..";
+				"/../../../..";
 #elif MAC || MONOMAC
-				var goUp = "/../../../../../../..";
+				"/../../../../../../..";
+#else	
+				"";
+				throw new NotSupportedException();	
 #endif
 				ms.WriteTo(new FileStream(executablePath + goUp + @"/Lime/Source/GeneratedDeserializersBIN.cs", FileMode.Create));
 			}
