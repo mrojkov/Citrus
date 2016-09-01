@@ -322,7 +322,13 @@ namespace Lime
 				jd.Generate<SerializableTexture>();
 				jd.GenerateFooter();
 				sw.Flush();
-				ms.WriteTo(new FileStream(@"..\..\..\..\Lime\Source\GeneratedDeserializersBIN.cs", FileMode.Create));
+				var executablePath = System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly ().Location);
+#if WIN
+				var goUp = "/../../../..";
+#elif MAC || MONOMAC
+				var goUp = "/../../../../../../..";
+#endif
+				ms.WriteTo(new FileStream(executablePath + goUp + @"/Lime/Source/GeneratedDeserializersBIN.cs", FileMode.Create));
 			}
 		}
 	}

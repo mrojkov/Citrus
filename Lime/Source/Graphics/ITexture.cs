@@ -18,14 +18,8 @@ namespace Lime
 		void RestoreRenderTarget();
 		bool IsTransparentPixel(int x, int y);
 		bool IsStubTexture { get; }
-		// Using YuzuOptional+YuzuDefault and not YuzuMember because there's
-		// no telling which implementation will set default value to what
-		// (some of implementations are throwing "Not Implemented" exceptions).
-		// And Yuzu deserializer generator will try to instantiate interface
-		// for this case when using YuzuMember.
 		// TODO: consider moving SerializationPath from ITexture to SerializableTexture which sounds only logical
-		[YuzuOptional]
-		[YuzuDefault("")]
+		[YuzuMember]
 		string SerializationPath { get; set; }
 		int MemoryUsed { get; }
 #if UNITY
