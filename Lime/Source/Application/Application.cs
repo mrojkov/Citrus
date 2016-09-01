@@ -245,7 +245,6 @@ namespace Lime
 				}
 			};
 #endif
-			KeyboardFocus.Initialize();
 			options = options ?? new ApplicationOptions();
 			RenderingBackend = options.RenderingBackend;
 			UsingDeferredHitTest = options.UsingDeferredHitTest;

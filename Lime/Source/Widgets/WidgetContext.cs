@@ -17,12 +17,16 @@ namespace Lime
 
 		public Widget Root { get; private set; }
 
+		/// <summary>
+		/// Gets the topmost node which the mouse cursor is up on.
+		/// </summary>
 		public Node NodeUnderMouse { get; internal set; }
 
 		/// <summary>
 		/// Gets or sets the mouse cursor. The WindowWidget resets mouse cursor to the default value in the beginning of every update cycle.
 		/// </summary>
 		public MouseCursor MouseCursor { get; set; }
+
 		public Camera3D CurrentCamera { get; set; }
 
 		public WidgetContext(Widget root) : base("Current")

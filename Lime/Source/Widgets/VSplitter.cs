@@ -26,12 +26,13 @@ namespace Lime
 
 		private IEnumerator<object> MainTask()
 		{
+			var p = new SeparatorsHitTestPresenter();
+			CompoundPostPresenter.Add(p);
 			while (true) {
-				int index;
-				if (FindSeparatorUnderMouse(out index)) {
+				if (IsMouseOver() && p.SeparatorUnderMouse >= 0) {
 					WidgetContext.Current.MouseCursor = MouseCursor.SizeNS;
 					if (Input.WasMousePressed()) {
-						yield return DragSeparatorTask(index);
+						yield return DragSeparatorTask(p.SeparatorUnderMouse);
 					}
 				}
 				yield return null;
@@ -43,7 +44,7 @@ namespace Lime
 			RaiseDragStarted();
 			var initialMousePosition = Input.MousePosition;
 			var initialHeights = Nodes.Select(i => i.AsWidget.Height).ToList();
-			Input.CaptureMouseExclusive();
+			Input.CaptureMouse();
 			while (Input.IsMousePressed()) {
 				WidgetContext.Current.MouseCursor = MouseCursor.SizeNS;
 				var dragDelta = Input.MousePosition.Y - initialMousePosition.Y;
@@ -72,20 +73,28 @@ namespace Lime
 			}
 		}
 
-		private bool FindSeparatorUnderMouse(out int index)
+		class SeparatorsHitTestPresenter : CustomPresenter
 		{
-			for (int i = 0; i < Nodes.Count - 1; i++) {
-				var widget = Nodes[i + 1].AsWidget;
-				var p = widget.GlobalPosition;
-				if (Mathf.Abs(Input.MousePosition.Y - (p.Y - SeparatorWidth * 0.5f)) < SeparatorActiveAreaWidth * 0.5f) {
-					if (Input.MousePosition.X > p.X && Input.MousePosition.X < p.X + widget.Width) {
-						index = i;
-						return true;
+			public int SeparatorUnderMouse { get; private set; }
+
+			public override bool PartialHitTest(Node node, ref HitTestArgs args)
+			{
+				var splitter = (Splitter)node;
+				for (int i = 0; i < splitter.Nodes.Count - 1; i++) {
+					var widget = splitter.Nodes[i + 1].AsWidget;
+					var widgetPos = widget.GlobalPosition;
+					var mousePos = Window.Current.Input.MousePosition;
+					if (Mathf.Abs(mousePos.Y - (widgetPos.Y - splitter.SeparatorWidth * 0.5f)) < splitter.SeparatorActiveAreaWidth * 0.5f) {
+						if (mousePos.X > widgetPos.X && mousePos.X < widgetPos.X + widget.Width) {
+							SeparatorUnderMouse = i;
+							args.Node = splitter;
+							return true;
+						}
 					}
 				}
+				SeparatorUnderMouse = -1;
+				return false;
 			}
-			index = -1;
-			return false;
 		}
 	}
 }

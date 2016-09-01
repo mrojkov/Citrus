@@ -88,14 +88,17 @@ namespace Lime
 		private Vector2 measuredMinSize;
 		private Vector2 measuredMaxSize = Vector2.PositiveInfinity;
 		private bool visible;
+		private WidgetInput input;
+
+		public static Widget Focused { get; private set; }
 
 		public static Vector2 DefaultWidgetSize = new Vector2(100, 100);
 
 		public Widget ParentWidget { get { return Parent != null ? Parent.AsWidget : null; } }
 
 		public TabTraversable TabTravesable { get; set; }
-		public TabTraverseScope TabTraverseScope { get; set; }
-		public FocusOptions FocusOptions { get; set; }
+
+		public KeyboardFocusScope FocusScope { get; set; }
 
 		public ILayout Layout = AnchorLayout.Instance;
 
@@ -344,9 +347,6 @@ namespace Lime
 			}
 			if (lateTasks != null) {
 				lateTasks.Stop();
-			}
-			if (input != null) {
-				input.Dispose();
 			}
 			base.Dispose();
 		}
@@ -619,11 +619,12 @@ namespace Lime
 			}
 		}
 
-		WidgetInput input;
 		public WidgetInput Input
 		{
 			get { return input ?? (input = new WidgetInput(this)); }
 		}
+
+		public bool HasInput() { return input != null; }
 
 		/// <summary>
 		/// Called before Update.
@@ -648,12 +649,29 @@ namespace Lime
 			direction = new Vector2(1, 0);
 		}
 
-		public bool IsFocused() { return KeyboardFocus.Instance.Focused == this; }
-		public void SetFocus() { KeyboardFocus.Instance.SetFocus(this); }
+		public bool IsFocused() { return Focused == this; }
+		public void SetFocus() { SetFocus(this); }
 		public void RevokeFocus()
 		{
 			if (IsFocused()) {
-				KeyboardFocus.Instance.SetFocus(null);
+				var scope = KeyboardFocusScope.GetEnclosingScope(this);
+				SetFocus(scope != null ? scope.Widget : null);
+			}
+		}
+
+		internal static void SetFocus(Widget value)
+		{
+			if (Focused == value) {
+				return;
+			}
+			if (value != null) {
+				Application.SoftKeyboard.Show(true, value.Text);
+			} else {
+				Application.SoftKeyboard.Show(false, "");
+			}
+			Focused = value;
+			foreach (var i in Application.Windows) {
+				i.Invalidate();
 			}
 		}
 
@@ -746,6 +764,9 @@ namespace Lime
 			}
 			if (Updated != null) {
 				Updated(delta);
+			}
+			if (input != null) {
+				input.DispatchEvents();
 			}
 		}
 
@@ -927,12 +948,8 @@ namespace Lime
 
 		public bool IsMouseOver()
 		{
-			return WidgetContext.Current.NodeUnderMouse == this;
-		}
-
-		public bool IsMouseOverDescendant()
-		{
-			return WidgetContext.Current.NodeUnderMouse != null ? WidgetContext.Current.NodeUnderMouse.DescendantOrThis(this) : false;
+			var mouseOwner = MouseCaptureStack.Instance.MouseOwner;
+			return (mouseOwner == null || mouseOwner == this) && WidgetContext.Current.NodeUnderMouse == this;
 		}
 
 		public int GetEffectiveLayer()
@@ -977,7 +994,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Checks whether this widgets contains the given point.
+		/// Checks whether this widget contains the given point.
 		/// </summary>
 		internal protected override bool PartialHitTest(ref HitTestArgs args)
 		{
@@ -1009,7 +1026,7 @@ namespace Lime
 			return false;
 		}
 
-		private bool IsInsideBoundingRect(Vector2 point)
+		internal bool IsInsideBoundingRect(Vector2 point)
 		{
 			var position = LocalToWorldTransform.CalcInversed().TransformVector(point);
 			var size = Size;

@@ -87,6 +87,7 @@ namespace Lime
 		public Button()
 		{
 			HitTestTarget = true;
+			Input.CompatibilityMode = false;
 			Theme.Current.Apply(this);
 		}
 
@@ -126,7 +127,7 @@ namespace Lime
 			TryRunAnimation("Normal");
 			while (true) {
 				if (TabletControlScheme) {
-					if (Input.WasMousePressed() && IsMouseOver()) {
+					if (Input.WasMousePressed()) {
 						if (Draggable) {
 							State = DetectDraggingState;
 						} else {
@@ -175,7 +176,7 @@ namespace Lime
 				yield return 0;
 				if ((mouse - Input.MousePosition).Length > DragDistanceThreshold) {
 					State = NormalState;
-				} else if (!Input.IsMousePressed() && IsMouseOver()) {
+				} else if (!Input.IsMousePressed()) {
 					State = QuickClickOnDraggableButtonState;
 					yield break;
 				}
@@ -231,6 +232,8 @@ namespace Lime
 
 		private void HandleClick()
 		{
+			// Release mouse for case we are showing a modal native dialog.
+			Input.ReleaseMouse();
 			if (Clicked != null) {
 #if !iOS
 				if (Debug.BreakOnButtonClick) {
@@ -298,8 +301,8 @@ namespace Lime
 			if (!EnableMask.All() && State != DisabledState) {
 				State = DisabledState;
 			}
-			if (KeyboardFocus.Instance.Focused == this && Enabled) {
-				if (Input.WasKeyPressed(Key.Space) || Input.WasKeyPressed(Key.Enter)) {
+			if (Enabled) {
+				if (Input.ConsumeKeyPress(Key.Space) || Input.ConsumeKeyPress(Key.Enter)) {
 					HandleClick();
 				}
 			}

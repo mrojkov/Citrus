@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace Lime
 {
@@ -7,7 +8,9 @@ namespace Lime
 	/// </summary>
 	public class WindowWidget : Widget
 	{
-		private RenderChain renderChain = new RenderChain();
+		private bool windowWasActive;
+		private Widget lastFocused;
+		private readonly RenderChain renderChain;
 
 		public IWindow Window { get; private set; }
 
@@ -15,6 +18,7 @@ namespace Lime
 		{
 			Window = window;
 			Window.Context = new CombinedContext(Window.Context, new WidgetContext(this));
+			renderChain = new RenderChain();
 			Theme.Current.Apply(this);
 		}
 
@@ -28,7 +32,7 @@ namespace Lime
 			WidgetContext.Current.MouseCursor = MouseCursor.Default;
 			base.Update(delta);
 			if (Window.Input.WasKeyPressed(Key.DismissSoftKeyboard)) {
-				KeyboardFocus.Instance.SetFocus(null);
+				Widget.SetFocus(null);
 			}
 			Window.Cursor = WidgetContext.Current.MouseCursor;
 			LayoutManager.Instance.Layout();
@@ -37,6 +41,24 @@ namespace Lime
 			var hitTestArgs = new HitTestArgs(Window.Input.MousePosition);
 			renderChain.HitTest(ref hitTestArgs);
 			WidgetContext.Current.NodeUnderMouse = hitTestArgs.Node;
+			ManageFocusOnWindowActivation();
+		}
+
+		private void ManageFocusOnWindowActivation()
+		{
+			if (Window.Active) {
+				if (Widget.Focused != null && Widget.Focused.DescendantOrThis(this)) {
+					lastFocused = Widget.Focused;
+				}
+				if (!windowWasActive) {
+					if (lastFocused == null || !lastFocused.GloballyVisible || !lastFocused.DescendantOrThis(this)) {
+						// Looking the first focus scope widget on the window and make it focused.
+						lastFocused = Descendants.OfType<Widget>().FirstOrDefault(i => i.FocusScope != null && i.GloballyVisible);
+					}
+					Widget.SetFocus(lastFocused);
+				}
+			}
+			windowWasActive = Window.Active;
 		}
 
 		public virtual void RenderAll()

@@ -197,9 +197,9 @@ namespace Lime
 			Container.Tasks.StopByTag(this);
 		}
 
-		private bool CheckKeyRepeated(Key key)
+		private bool ConsumeKeyRepeat(Key key)
 		{
-			return Container.Input.WasKeyRepeated(key);
+			return Container.Input.ConsumeKeyRepeat(key);
 		}
 
 		private void InsertChar(char ch)
@@ -224,33 +224,33 @@ namespace Lime
 
 		private void HandleKeys(string originalText)
 		{
-			if (CheckKeyRepeated(Key.Left))
+			if (ConsumeKeyRepeat(Key.Left))
 				caretPos.TextPos--;
-			if (CheckKeyRepeated(Key.Right))
+			if (ConsumeKeyRepeat(Key.Right))
 				caretPos.TextPos++;
-			if (CheckKeyRepeated(Key.Up))
+			if (ConsumeKeyRepeat(Key.Up))
 				caretPos.Line--;
-			if (CheckKeyRepeated(Key.Down))
+			if (ConsumeKeyRepeat(Key.Down))
 				caretPos.Line++;
-			if (CheckKeyRepeated(Key.Home))
+			if (ConsumeKeyRepeat(Key.Home))
 				caretPos.Pos = 0;
-			if (CheckKeyRepeated(Key.End))
+			if (ConsumeKeyRepeat(Key.End))
 				caretPos.Pos = int.MaxValue;
-			if (CheckKeyRepeated(Key.Delete)) {
+			if (ConsumeKeyRepeat(Key.Commands.Delete) || ConsumeKeyRepeat(Key.Delete)) {
 				if (caretPos.TextPos >= 0 && caretPos.TextPos < Text.Text.Length) {
 					Text.Text = Text.Text.Remove(caretPos.TextPos, 1);
 					caretPos.TextPos--;
 					caretPos.TextPos++; // Enforce revalidation.
 				}
 			}
-			if (CheckKeyRepeated(Key.Enter)) {
+			if (ConsumeKeyRepeat(Key.Enter)) {
 				if (EditorParams.IsAcceptableLines(Text.Text.Count(ch => ch == '\n') + 2)) {
 					InsertChar('\n');
 				} else {
 					Container.RevokeFocus();
 				}
 			}
-			if (CheckKeyRepeated(Key.Escape)) {
+			if (ConsumeKeyRepeat(Key.Escape)) {
 				Text.Text = originalText;
 				Container.RevokeFocus();
 			}
@@ -273,6 +273,7 @@ namespace Lime
 				// Some platforms, notably iOS, do not generate Key.BackSpace.
 				// OTOH, '\b' is emulated everywhere.
 				if (ch == '\b') {
+					ConsumeKeyRepeat(Key.BackSpace);
 					if (caretPos.TextPos > 0 && caretPos.TextPos <= Text.Text.Length) {
 						caretPos.TextPos--;
 						Text.Text = Text.Text.Remove(caretPos.TextPos, 1);

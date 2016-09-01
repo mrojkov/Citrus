@@ -85,6 +85,8 @@ namespace Lime
 			this.ScrollDirection = scrollDirection;
 			RejectOrtogonalSwipes = true;
 			Frame = frame;
+			Frame.Input.CompatibilityMode = false;
+			Frame.Input.AcceptMouseThroughDescendants = true;
 			Frame.HitTestTarget = true;
 			Frame.ClipChildren = ClipMethod.ScissorTest;
 			CanScroll = true;
@@ -237,16 +239,11 @@ namespace Lime
 				ScrollTo(MaxScrollPosition);
 		}
 
-		private bool IsUnderMouse()
-		{
-			return Frame.IsMouseOverDescendant();
-		}
-
 		private IEnumerator<object> MainTask()
 		{
 			while (true) {
 				// Wait until a user starts dragging the widget
-				while (!Frame.Input.WasMousePressed() || !IsUnderMouse()) {
+				while (!Frame.Input.IsMousePressed()) {
 					Bounce();
 					yield return null;
 				}
@@ -275,8 +272,7 @@ namespace Lime
 				yield return null;
 				var IsScrollingByMouseWheel =
 					!Frame.Input.IsMousePressed() &&
-					(Frame.Input.WasKeyPressed(Key.MouseWheelDown) || Frame.Input.WasKeyPressed(Key.MouseWheelUp)) &&
-					(CanScroll && IsUnderMouse());
+					(Frame.Input.WasKeyPressed(Key.MouseWheelDown) || Frame.Input.WasKeyPressed(Key.MouseWheelUp)) && CanScroll;
 				if (IsScrollingByMouseWheel) {
 					var newWheelScrollState = (WheelScrollState)Math.Sign(Frame.Input.WheelScrollAmount);
 					if (newWheelScrollState != wheelScrollState) {

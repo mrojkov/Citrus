@@ -21,6 +21,7 @@ namespace Lime
 
 		public CheckBox()
 		{
+			Input.CompatibilityMode = false;
 			Theme.Current.Apply(this);
 		}
 
@@ -37,13 +38,11 @@ namespace Lime
 					SetFocus();
 					Toggle();
 				}
-				if (IsFocused()) {
-					if (Input.WasKeyPressed(Key.Space)) {
-						Toggle();
-					}
-					if (Input.WasKeyPressed(Key.Enter) || Input.WasKeyPressed(Key.Escape)) {
-						RevokeFocus();
-					}
+				if (Input.ConsumeKeyPress(Key.Space)) {
+					Toggle();
+				}
+				if (Input.ConsumeKeyPress(Key.Enter) || Input.ConsumeKeyPress(Key.Escape)) {
+					RevokeFocus();
 				}
 				yield return Task.WaitForInput();
 			}

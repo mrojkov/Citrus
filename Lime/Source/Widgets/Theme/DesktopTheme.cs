@@ -306,7 +306,7 @@ namespace Lime
 		{
 			public override void Render(Node node)
 			{
-				if (node == KeyboardFocus.Instance.Focused) {
+				if (node == Widget.Focused) {
 					var widget = node.AsWidget;
 					widget.PrepareRendererState();
 					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.KeyboardFocusBorder, 2);

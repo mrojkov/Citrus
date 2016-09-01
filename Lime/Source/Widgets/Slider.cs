@@ -90,7 +90,7 @@ namespace Lime
 				return;
 			}
 			var draggingJustBegun = false;
-			if (Enabled && RangeMax > RangeMin && Input.WasMousePressed()) {
+			if (Enabled && RangeMax > RangeMin && (Thumb.Input.WasMousePressed() || Input.WasMousePressed())) {
 				if (Thumb.IsMouseOver()) {
 					StartDrag();
 					draggingJustBegun = true;

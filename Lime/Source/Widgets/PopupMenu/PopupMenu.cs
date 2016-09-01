@@ -46,7 +46,7 @@ namespace Lime.PopupMenu
 			container.PushNode(Frame);
 			Frame.CenterOnParent();
 			Frame.Layer = layer;
-			Frame.Input.CaptureAll();
+			Frame.Input.CaptureMouse();
 		}
 
 		/// <summary>

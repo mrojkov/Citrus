@@ -43,6 +43,7 @@ namespace Lime
 
 		public DropDownList()
 		{
+			Input.CompatibilityMode = false;
 			Items = new ObservableCollection<Item>();
 			Items.CollectionChanged += (sender, e) => RefreshLabel();
 			HitTestTarget = true;
@@ -65,12 +66,10 @@ namespace Lime
 #endif
 					yield return ShowDropDownListTask();
 				}
-				if (IsFocused()) {
-					if (Input.WasKeyPressed(Key.Space) || Input.WasKeyPressed(Key.Up) || Input.WasKeyPressed(Key.Down)) {
-						ShowDropDownList();
-					} else if (Input.WasKeyPressed(Key.Escape) || Input.WasKeyPressed(Key.Enter)) {
-						RevokeFocus();
-					}
+				if (Input.ConsumeKeyPress(Key.Space) || Input.ConsumeKeyPress(Key.Up) || Input.ConsumeKeyPress(Key.Down)) {
+					ShowDropDownList();
+				} else if (Input.ConsumeKeyPress(Key.Escape) || Input.ConsumeKeyPress(Key.Enter)) {
+					RevokeFocus();
 				}
 				yield return Task.WaitForInput();
 			}
