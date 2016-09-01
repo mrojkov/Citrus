@@ -14,6 +14,7 @@ namespace Lime
 		public Int32 Length;
 		public Int32 AllocatedSize;
 		public AssetAttributes Attributes;
+		public string SourceExtension;
 	}
 
 	public static class AssetPath
@@ -54,25 +55,25 @@ namespace Lime
 			stream = bundle.AllocStream();
 			Seek(0, SeekOrigin.Begin);
 		}
-		
+
 		public override bool CanRead {
 			get {
 				return true;
 			}
 		}
-		
+
 		public override bool CanWrite {
 			get {
 				return false;
 			}
 		}
-		
+
 		public override long Length {
 			get {
 				return descriptor.Length;
 			}
 		}
-		
+
 		public override long Position {
 			get {
 				return position;
@@ -81,7 +82,7 @@ namespace Lime
 				Seek(value, SeekOrigin.Begin);
 			}
 		}
-		
+
 		protected override void Dispose(bool disposing)
 		{
 			if (stream != null) {
@@ -89,13 +90,13 @@ namespace Lime
 				stream = null;
 			}
 		}
-		
+
 		public override bool CanSeek {
 			get {
 				return true;
 			}
 		}
-		
+
 		public override int Read(byte[] buffer, int offset, int count)
 		{
 			count = Math.Min(count, descriptor.Length - position);
@@ -109,7 +110,7 @@ namespace Lime
 			}
 			return count;
 		}
-		
+
 		public override long Seek(long offset, SeekOrigin origin)
 		{
 			if (origin == SeekOrigin.Begin) {
@@ -128,12 +129,12 @@ namespace Lime
 		{
 			throw new NotImplementedException();
 		}
-	
+
 		public override void SetLength(long value)
 		{
 			throw new NotImplementedException();
 		}
-		
+
 		public override void Write(byte[] buffer, int offset, int count)
 		{
 			throw new NotImplementedException();
@@ -277,7 +278,7 @@ namespace Lime
 				}
 			}
 		}
-		
+
 		private void MoveBlock(int offset, int size, int delta)
 		{
 			if (delta > 0) {
@@ -302,7 +303,7 @@ namespace Lime
 			trash.Sort((x, y) => {
 				return x.Offset - y.Offset; });
 			int moveDelta = 0;
-			var indexKeys = new string[index.Keys.Count]; 
+			var indexKeys = new string[index.Keys.Count];
 			index.Keys.CopyTo(indexKeys, 0);
 			for (int i = 0; i < trash.Count; i++) {
 				moveDelta += trash[i].AllocatedSize;
@@ -415,19 +416,20 @@ namespace Lime
 		/// <param name="stream">поток импортируемого файла</param>
 		/// <param name="reserve">Сколько байт зарезервировать (будет фактически записано 'Длина_Файла + reserve' байт)</param>
 		/// <param name="attributes">Атрибуты импортируемого файла</param>
-		public override void ImportFile(string path, Stream stream, int reserve, AssetAttributes attributes)
+		public override void ImportFile(string path, Stream stream, int reserve, string sourceExtension, AssetAttributes attributes)
 		{
 			AssetDescriptor d;
 			if ((attributes & AssetAttributes.Zipped) != 0) {
 				stream = CompressAssetStream(stream, attributes);
 			}
-			bool reuseExistingDescriptor = index.TryGetValue(AssetPath.CorrectSlashes(path), out d) && 
-				(d.AllocatedSize >= stream.Length) && 
+			bool reuseExistingDescriptor = index.TryGetValue(AssetPath.CorrectSlashes(path), out d) &&
+				(d.AllocatedSize >= stream.Length) &&
 				(d.AllocatedSize <= stream.Length + reserve);
 			if (reuseExistingDescriptor) {
 				d.Length = (int)stream.Length;
 				d.ModificationTime = DateTime.Now;
 				d.Attributes = attributes;
+				d.SourceExtension = sourceExtension;
 				index[AssetPath.CorrectSlashes(path)] = d;
 				this.stream.Seek(d.Offset, SeekOrigin.Begin);
 				stream.CopyTo(this.stream);
@@ -446,6 +448,7 @@ namespace Lime
 				d.Offset = indexOffset;
 				d.AllocatedSize = d.Length + reserve;
 				d.Attributes = attributes;
+				d.SourceExtension = sourceExtension;
 				index[AssetPath.CorrectSlashes(path)] = d;
 				indexOffset += d.AllocatedSize;
 				this.stream.Seek(d.Offset, SeekOrigin.Begin);
@@ -509,6 +512,7 @@ namespace Lime
 				desc.Length = reader.ReadInt32();
 				desc.AllocatedSize = reader.ReadInt32();
 				desc.Attributes = (AssetAttributes)reader.ReadInt32();
+				desc.SourceExtension = reader.ReadString();
 				index.Add(name, desc);
 			}
 		}
@@ -530,9 +534,10 @@ namespace Lime
 				writer.Write(p.Value.Length);
 				writer.Write(p.Value.AllocatedSize);
 				writer.Write((Int32)p.Value.Attributes);
+				writer.Write(p.Value.SourceExtension);
 			}
 		}
-		
+
 		/// <summary>
 		/// Перечисляет все файлы в бандле
 		/// </summary>
@@ -561,7 +566,7 @@ namespace Lime
 				return new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 			}
 		}
-		
+
 		internal void ReleaseStream(Stream stream)
 		{
 			lock (streamPool) {

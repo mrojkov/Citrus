@@ -41,7 +41,7 @@ namespace Lime
 				}
 				return instance;
 			}
-			set 
+			set
 			{
 				instance = value;
 				// The game could use some of textures from this bundle, and if they are missing
@@ -84,7 +84,7 @@ namespace Lime
 		/// </summary>
 		/// <param name="path">Путь к проверяемому файлу в бандле</param>
 		public abstract DateTime GetFileLastWriteTime(string path);
-		
+
 		public abstract void DeleteFile(string path);
 		public abstract bool FileExists(string path);
 
@@ -95,8 +95,8 @@ namespace Lime
 		/// <param name="stream">поток импортируемого файла</param>
 		/// <param name="reserve">Сколько байт зарезервировать (будет фактически записано 'Длина_Файла + reserve' байт)</param>
 		/// <param name="attributes">Атрибуты импортируемого файла</param>
-		public abstract void ImportFile(string path, Stream stream, int reserve, AssetAttributes attributes = AssetAttributes.None);
-		
+		public abstract void ImportFile(string path, Stream stream, int reserve, string sourceExtension, AssetAttributes attributes = AssetAttributes.None);
+
 		/// <summary>
 		/// Перечисляет все файлы, входящие в бандл
 		/// </summary>
@@ -109,10 +109,10 @@ namespace Lime
 		/// <param name="srcPath">Импортируемый файл</param>
 		/// <param name="reserve">Сколько байт зарезервировать (будет фактически записано 'Длина_Файла + reserve' байт)</param>
 		/// <param name="attributes">Атрибуты импортируемого файла</param>
-		public void ImportFile(string srcPath, string dstPath, int reserve, AssetAttributes attributes = AssetAttributes.None)
+		public void ImportFile(string srcPath, string dstPath, int reserve, string sourceExtension, AssetAttributes attributes = AssetAttributes.None)
 		{
 			using (var stream = new FileStream(srcPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) {
-				ImportFile(dstPath, stream, reserve, attributes);
+				ImportFile(dstPath, stream, reserve, sourceExtension, attributes);
 			}
 		}
 
@@ -126,7 +126,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Возвращает путь с учетом текущего языка (свойство CurrentLanguage). Например при path == "dictionary.txt" вернет dictionary.ru.txt 
+		/// Возвращает путь с учетом текущего языка (свойство CurrentLanguage). Например при path == "dictionary.txt" вернет dictionary.ru.txt
 		/// (при условии, что CurrentLanguage == "ru")
 		/// </summary>
 		public string GetLocalizedPath(string path)

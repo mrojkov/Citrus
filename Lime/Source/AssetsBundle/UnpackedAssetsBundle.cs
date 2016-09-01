@@ -60,7 +60,7 @@ namespace Lime
 		/// <param name="stream">Поток файла</param>
 		/// <param name="reserve">Не используется</param>
 		/// <param name="attributes">Не используется</param>
-		public override void ImportFile(string path, Stream stream, int reserve, AssetAttributes attributes)
+		public override void ImportFile(string path, Stream stream, int reserve, string sourceExtension, AssetAttributes attributes)
 		{
 #if UNITY
 			throw new NotImplementedException();

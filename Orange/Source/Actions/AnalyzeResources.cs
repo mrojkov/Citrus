@@ -59,7 +59,7 @@ namespace Orange
 				return mainBundle.FileExists(path) || secondaryBundle.FileExists(path);
 			}
 
-			public override void ImportFile(string path, Stream stream, int reserve, AssetAttributes attributes)
+			public override void ImportFile(string path, Stream stream, int reserve, string sourceExtension, AssetAttributes attributes)
 			{
 				throw new Lime.Exception("ImportFile is not supported for BundleSwitcher (file '{0}')", path);
 			}
