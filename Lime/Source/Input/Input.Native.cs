@@ -9,32 +9,6 @@ namespace Lime
 {
 	public class Input
 	{
-		public class InputSimulator
-		{
-			Input input;
-
-			public InputSimulator(Input input)
-			{
-				this.input = input;
-			}
-
-			public void SetMousePosition(Vector2 position)
-			{
-				input.MousePosition = position;
-			}
-
-			public void SetKeyState(Key key, bool value)
-			{
-				input.SetKeyState(key, value);
-			}
-
-			public void OnBetweenFrames(float delta)
-			{
-				input.CopyKeysState();
-				input.ProcessPendingKeyEvents(delta);
-			}
-		}
-
 		public const int MaxTouches = 4;
 		public float KeyRepeatDelay = 0.2f;
 		public float KeyRepeatInterval = 0.03f;
@@ -130,6 +104,12 @@ namespace Lime
 			return keys[key.Code].CurrentState && !keys[key.Code].PreviousState;
 		}
 
+		public void ConsumeKey(Key key)
+		{
+			keys[key].PreviousState = keys[key].CurrentState;
+			keys[key].Repeated = false;
+		}
+
 		/// <summary>
 		/// Returns true during the frame the user starts pressing down the key identified by name or key event was repeated.
 		/// </summary>
@@ -173,9 +153,9 @@ namespace Lime
 			return WasKeyPressed(Key.Touch0 + index);
 		}
 
-		private Key GetMouseButtonByIndex(int button)
+		public static Key GetMouseButtonByIndex(int button)
 		{
-			if (button < 0 || button > 2) {
+			if (((uint)button) > 2) {
 				throw new ArgumentException();
 			}
 			return Key.Mouse0 + button;
@@ -234,11 +214,11 @@ namespace Lime
 
 		internal void SetKeyState(Key key, bool value)
 		{
-			if (Key.Arrays.ModifierKeys[key]) {
+			if (key.IsModifier() ) {
 				ReleaseAffectedByModifierKeys();
 			}
 			key = TranslateShortcuts(key);
-			if (Key.Arrays.AffectedByModifiersKeys[key] && GetModifiers() != Modifiers.None) {
+			if (key.IsAffectedByModifiers() && GetModifiers() != Modifiers.None) {
 				return;
 			}
 			keyEventQueue.Add(new KeyEvent { Key = key, State = value });
@@ -260,7 +240,7 @@ namespace Lime
 		private void ReleaseAffectedByModifierKeys()
 		{
 			for (var i = 0; i < Key.Count; i++) {
-				if (keys[i].CurrentState && Key.Arrays.AffectedByModifiersKeys[i]) {
+				if (keys[i].CurrentState && ((Key)i).IsAffectedByModifiers()) {
 					SetKeyState(i, false);
 				}
 			}
@@ -332,6 +312,32 @@ namespace Lime
 				WheelScrollAmount = delta;
 			} else {
 				WheelScrollAmount += delta;
+			}
+		}
+
+		public class InputSimulator
+		{
+			Input input;
+
+			public InputSimulator(Input input)
+			{
+				this.input = input;
+			}
+
+			public void SetMousePosition(Vector2 position)
+			{
+				input.MousePosition = position;
+			}
+
+			public void SetKeyState(Key key, bool value)
+			{
+				input.SetKeyState(key, value);
+			}
+
+			public void OnBetweenFrames(float delta)
+			{
+				input.CopyKeysState();
+				input.ProcessPendingKeyEvents(delta);
 			}
 		}
 	}
