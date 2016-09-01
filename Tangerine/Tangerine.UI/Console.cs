@@ -20,18 +20,18 @@ namespace Tangerine.UI
 			ContentWidget = new ScrollView(RootWidget).Content;
 			ContentWidget.Layout = new VBoxLayout { Tag = "ConsoleContent", Spacing = 4 };
 			ContentWidget.Padding = new Thickness(4);
-			Logger.OnWrite += text => {
-				var widget = new SimpleText {
-					Text = $"{DateTime.Now.ToString("hh:mm:ss")} {text}",
-					AutoSizeConstraints = false,
-					FontHeight = DesktopTheme.Metrics.TextHeight * 0.8f
-				};
-				ContentWidget.PushNode(widget);
-				var i = ContentWidget.Nodes.Count;
-				if (i >= 100) {
-					ContentWidget.Nodes.RemoveAt(i - 1);
-				}
-			};
+			//Logger.OnWrite += text => {
+			//	var widget = new SimpleText {
+			//		Text = $"{DateTime.Now.ToString("hh:mm:ss")} {text}",
+			//		AutoSizeConstraints = false,
+			//		FontHeight = DesktopTheme.Metrics.TextHeight * 0.8f
+			//	};
+			//	ContentWidget.PushNode(widget);
+			//	var i = ContentWidget.Nodes.Count;
+			//	if (i >= 100) {
+			//		ContentWidget.Nodes.RemoveAt(i - 1);
+			//	}
+			//};
 		}
 
 		public void Attach()

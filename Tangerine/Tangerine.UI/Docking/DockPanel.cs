@@ -9,13 +9,14 @@ namespace Tangerine.UI
 {
 	public class DockPanel
 	{
+		public WindowWidget WindowWidget { get; set; }
+		public PanelPlacement Placement { get; set; }
+
 		public readonly Widget RootWidget;
 		public readonly Widget TitleWidget;
 		public readonly Widget ContentWidget;
 		public readonly Button CloseButton;
 		public readonly string Title;
-		public WindowWidget WindowWidget;
-		public PanelPlacement Placement;
 
 		public DockPanel(string title)
 		{
@@ -38,7 +39,7 @@ namespace Tangerine.UI
 					ContentWidget
 				}
 			};
-			RootWidget.TabTraverseScope = new TabTraverseScope();
+			RootWidget.FocusScope = new KeyboardFocusScope(RootWidget);
 		}
 
 		internal void RefreshDockedSize()
@@ -88,7 +89,7 @@ namespace Tangerine.UI
 				var input = panel.TitleWidget.Input;
 				while (true) {
 					var mousePos = input.MousePosition;
-					if (input.WasMousePressed() && (panel.TitleWidget.IsMouseOver() && !panel.CloseButton.IsMouseOver())) {
+					if (input.WasMousePressed()) {
 						while ((mousePos - input.MousePosition).Length < 10 && input.IsMousePressed()) {
 							yield return null;
 						}

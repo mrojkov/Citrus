@@ -42,7 +42,7 @@ namespace Tangerine.UI.Inspector
 		{
 			this.context = context;
 			containerWidget = new Widget {
-				Layout = new HBoxLayout { IgnoreHidden = false},
+				Layout = new HBoxLayout { IgnoreHidden = false },
 				LayoutCell = new LayoutCell { StretchY = 0 },
 			};
 			context.InspectorPane.AddNode(containerWidget);
@@ -114,8 +114,8 @@ namespace Tangerine.UI.Inspector
 			var currentY = CoalescedPropertyValue<Vector2, float>(context, v => v.Y);
 			editorX.Submitted += text => SetComponent(context, 0, editorX, currentX.GetValue());
 			editorY.Submitted += text => SetComponent(context, 1, editorY, currentY.GetValue());
-			editorX.Tasks.Add(currentX.DistinctUntilChanged().Select(i => i.ToString()).Consume(v => editorX.Text = v));
-			editorY.Tasks.Add(currentY.DistinctUntilChanged().Select(i => i.ToString()).Consume(v => editorY.Text = v));
+			editorX.Tasks.Add(currentX.DistinctUntilChanged().Consume(v => editorX.Text = v.ToString()));
+			editorY.Tasks.Add(currentY.DistinctUntilChanged().Consume(v => editorY.Text = v.ToString()));
 		}
 
 		void SetComponent(PropertyEditorContext context, int component, EditBox editor, float currentValue)
@@ -195,7 +195,7 @@ namespace Tangerine.UI.Inspector
 					editor.Text = current.GetValue().ToString();
 				}
 			};
-			editor.Tasks.Add(current.DistinctUntilChanged().Select(i => i.ToString()).Consume(v => editor.Text = v));
+			editor.Tasks.Add(current.DistinctUntilChanged().Consume(v => editor.Text = v.ToString()));
 		}
 	}
 
@@ -270,7 +270,8 @@ namespace Tangerine.UI.Inspector
 					new HSpacer(4),
 					(button = new Button {
 						Text = "...",
-						MinMaxWidth = 20
+						MinMaxWidth = 20,
+						Draggable = true
 					})
 				}
 			});

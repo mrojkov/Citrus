@@ -9,9 +9,9 @@ namespace Tangerine.UI.SceneView
 
 		public IEnumerator<object> Loop()
 		{
-			var input = sceneView.CanvasWidget.Input;
+			var input = sceneView.InputArea.Input;
 			while (true) {
-				if (input.WasMousePressed() && sceneView.InputScreen.IsMouseOver()) {
+				if (input.WasMousePressed()) {
 					var initialMouse = input.MousePosition;
 					var initialPosition = sceneView.CanvasWidget.Position;
 					input.CaptureMouse();

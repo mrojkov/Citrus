@@ -27,7 +27,6 @@ namespace Tangerine
 	{
 		public static TangerineApp Instance { get; private set; }
 
-		public readonly DockManager DockManager;
 		public readonly DockManager.State DockManagerInitialState;
 
 		public static void Initialize()
@@ -53,6 +52,8 @@ namespace Tangerine
 
 		private TangerineApp()
 		{
+			WindowOptions.DefaultRefreshRate = 30;
+			WidgetInput.CompatibilityModeByDefault = false;
 			Application.IsTangerine = true;
 			Lime.Serialization.Deserializer = new Deserializer();
 
@@ -61,25 +62,29 @@ namespace Tangerine
 			Theme.Current = new DesktopTheme();
 			LoadFont();
 
-			DockManager = new UI.DockManager(new Vector2(1024, 768), PadsMenu);
+			DockManager.Initialize(new Vector2(1024, 768), PadsMenu);
+			DockManager.Instance.DockPanelAdded += SetupKeyboardShortcutsForDockPanel;
+
 			Application.Exiting += () => Project.Current.Close();
 			Application.Exited += () => {
-				UserPreferences.Instance.DockState = DockManager.ExportState();
+				UserPreferences.Instance.DockState = DockManager.Instance.ExportState();
 				UserPreferences.Instance.Save();
 			};
-			var timelinePanel = new UI.DockPanel("Timeline");
-			var inspectorPanel = new UI.DockPanel("Inspector");
-			var consolePanel = new UI.DockPanel("Console");
-			var searchPanel = new UI.DockPanel("SearchPanel");
-			DockManager.AddPanel(timelinePanel, UI.DockSite.Top, new Vector2(800, 300));
-			DockManager.AddPanel(inspectorPanel, UI.DockSite.Left, new Vector2(300, 700));
-			DockManager.AddPanel(searchPanel, UI.DockSite.Right, new Vector2(300, 700));
-			DockManager.AddPanel(consolePanel, UI.DockSite.Right, new Vector2(300, 700));
-			DockManagerInitialState = DockManager.ExportState();
-			var documentViewContainer = InitializeDocumentArea(DockManager);
+			var timelinePanel = new DockPanel("Timeline");
+			var inspectorPanel = new DockPanel("Inspector");
+			var consolePanel = new DockPanel("Console");
+			var searchPanel = new DockPanel("SearchPanel");
+
+			var dockManager = DockManager.Instance;
+			dockManager.AddPanel(timelinePanel, DockSite.Top, new Vector2(800, 300));
+			dockManager.AddPanel(inspectorPanel, DockSite.Left, new Vector2(300, 700));
+			dockManager.AddPanel(searchPanel, DockSite.Right, new Vector2(300, 700));
+			dockManager.AddPanel(consolePanel, DockSite.Right, new Vector2(300, 700));
+			DockManagerInitialState = dockManager.ExportState();
+			var documentViewContainer = InitializeDocumentArea(dockManager);
 
 			UserPreferences.Initialize();
-			DockManager.ImportState(UserPreferences.Instance.DockState);
+			dockManager.ImportState(UserPreferences.Instance.DockState);
 			Document.Closing += doc => {
 				var alert = new AlertDialog("Tangerine", $"Save the changes to document '{doc.Path}' before closing?", "Yes", "No", "Cancel");
 				switch (alert.Show()) {
@@ -97,13 +102,24 @@ namespace Tangerine
 						new UI.Console(consolePanel.ContentWidget),
 						new UI.SearchPanel(searchPanel.ContentWidget),
 					});
-					doc.History.Changed += () => CommonWindow.Current.Invalidate();
+					doc.History.Changed += () => {
+						foreach (var window in Application.Windows) {
+							window.Invalidate();
+						}
+					};
 				}
 				RefreshExternalContent(doc.RootNode);
 			};
-			if (UserPreferences.Instance.RecentProjects.Count > 0) {
-				new Project(UserPreferences.Instance.RecentProjects[0]).Open();
+			var proj = UserPreferences.Instance.RecentProjects.FirstOrDefault();
+			if (proj != null) {
+				new Project(proj).Open();
 			}
+		}
+
+		private void SetupKeyboardShortcutsForDockPanel(DockPanel panel)
+		{
+			var widget = panel.RootWidget;
+			widget.LateTasks.Add(new UI.Timeline.GlobalKeyboardShortcutsProcessor(widget.Input));
 		}
 
 		private static void RefreshExternalContent(Node node)

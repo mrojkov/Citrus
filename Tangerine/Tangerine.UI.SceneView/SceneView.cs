@@ -7,25 +7,28 @@ namespace Tangerine.UI.SceneView
 {
 	public class SceneView : IDocumentView
 	{
-		private readonly Widget panelWidget; // Given panel.
-		private readonly Widget rootWidget; // Widget which is a direct child of the panel.
-		public readonly Widget InputScreen; // Widget having the same size as panel, used for catching mouse input above the canvas.
-		public readonly Widget CanvasWidget; // Canvas which is meant to be scrollable and zoomable widget.
+		// Given panel.
+		private readonly Widget panelWidget;
+		// Widget which is a direct child of the panel.
+		private readonly Widget rootWidget;
+		// Widget having the same size as panel, used for intercepting mouse events above the canvas.
+		public readonly Widget InputArea;
+		// Canvas which is meant to be scrollable and zoomable widget.
+		public readonly Widget CanvasWidget;
 
 		public static SceneView Instance { get; private set; }
 
 		public SceneView(Widget panelWidget)
 		{
 			this.panelWidget = panelWidget;
-			InputScreen = new Widget { HitTestTarget = true, Anchors = Anchors.LeftRightTopBottom };
+			InputArea = new Widget { HitTestTarget = true, Anchors = Anchors.LeftRightTopBottom };
 			CanvasWidget = new Widget {
 				Nodes = { Document.Current.RootNode }
 			};
 			rootWidget = new Widget {
 				Id = "SceneView",
-				Nodes = { InputScreen, CanvasWidget }
+				Nodes = { InputArea, CanvasWidget }
 			};
-			// Document.Current.RootNode.PostPresenter = new WidgetBoundsPresenter(Color4.Green);
 			CreateProcessors();
 		}
 
@@ -43,9 +46,9 @@ namespace Tangerine.UI.SceneView
 
 		void CreateProcessors()
 		{
-			rootWidget.Tasks.Add(new IProcessor[] {
+			rootWidget.Tasks.Add(
 				new MouseScrollProcessor()
-			});
+			);
 		}
 	}
 }

@@ -17,16 +17,12 @@ namespace Tangerine.UI.Timeline
 		public IEnumerator<object> Loop()
 		{
 			var input = roll.RootWidget.Input;
+			input.AcceptMouseThroughDescendants = true;
 			while (true) {
 				yield return null;
 				if (!input.WasMousePressed()) {
 					continue;
 				}
-				var hitNode = WidgetContext.Current.NodeUnderMouse;
-				if (hitNode == null || !hitNode.DescendantOf(roll.RootWidget)) {
-					continue;
-				}
-				Timeline.Instance.PanelWidget.SetFocus();
 				var initialMousePosition = input.MousePosition;
 				var row = MousePositionToRow(initialMousePosition);
 				if (input.IsKeyPressed(Key.LShift)) {

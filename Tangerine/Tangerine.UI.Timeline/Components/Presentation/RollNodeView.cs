@@ -19,7 +19,7 @@ namespace Tangerine.UI.Timeline.Components
 			this.row = row;
 			nodeData = row.Components.Get<NodeRow>();
 			label = new SimpleText { HitTestTarget = true };
-			editBox = new EditBox { AutoSizeConstraints = false, LayoutCell = new LayoutCell(Alignment.Center, stretchX: 1000) };
+			editBox = new EditBox { AutoSizeConstraints = false, LayoutCell = new LayoutCell(Alignment.Center, stretchX: float.MaxValue) };
 			nodeIcon = new Image {
 				Texture = IconPool.GetTexture("Nodes." + nodeData.Node.GetType(), "Nodes.Unknown"),
 			};
@@ -121,19 +121,17 @@ namespace Tangerine.UI.Timeline.Components
 		IEnumerator<object> RenameOnDoubleClickTask()
 		{
 			while (true) {
-				if (widget.Input.WasKeyPressed(Key.Mouse0DoubleClick)) {
-					if (label.IsMouseOver()) {
-						Operations.ClearRowSelection.Perform();
-						Operations.SelectRow.Perform(row);
-						label.Visible = false;
-						editBox.Visible = true;
-						editBox.Text = nodeData.Node.Id;
-						yield return null;
-						editBox.SetFocus();
-						editBox.Tasks.Add(EditNodeIdTask());
-					} else if (widget.IsMouseOver()) {
-						Operations.EnterNode.Perform(row.Components.Get<NodeRow>().Node);
-					}
+				if (label.Input.WasKeyPressed(Key.Mouse0DoubleClick)) {
+					Operations.ClearRowSelection.Perform();
+					Operations.SelectRow.Perform(row);
+					label.Visible = false;
+					editBox.Visible = true;
+					editBox.Text = nodeData.Node.Id;
+					yield return null;
+					editBox.SetFocus();
+					editBox.Tasks.Add(EditNodeIdTask());
+				} else if (widget.Input.WasKeyPressed(Key.Mouse0DoubleClick)) {
+					Operations.EnterNode.Perform(row.Components.Get<NodeRow>().Node);
 				}
 				yield return null;
 			}

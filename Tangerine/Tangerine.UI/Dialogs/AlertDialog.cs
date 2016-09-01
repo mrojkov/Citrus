@@ -33,12 +33,15 @@ namespace Tangerine.UI
 					})
 				}
 			};
-			new TabTraverseController(rootWidget);
+			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
 			var cancelIndex = buttons.ToList().IndexOf("Cancel");
 			if (cancelIndex >= 0) {
-				new WidgetKeyHandler(rootWidget, KeyBindings.CloseDialog).KeyPressed += () => Close(cancelIndex);
+				rootWidget.LateTasks.AddLoop(() => {
+					if (rootWidget.Input.ConsumeKeyPress(KeyBindings.CloseDialog)) {
+						Close(cancelIndex);
+					}
+				});
 			}
-			rootWidget.Input.CaptureAll();
 			for (int i = 0; i < buttons.Length; i++) {
 				var button = new Button { Text = buttons[i] };
 				int j = i;
@@ -53,7 +56,6 @@ namespace Tangerine.UI
 		void Close(int result)
 		{
 			this.result = result;
-			rootWidget.Input.ReleaseAll();
 			window.Close();
 		}
 

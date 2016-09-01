@@ -28,8 +28,8 @@ namespace Tangerine.UI
 				Visible = false,
 				Style = WindowStyle.Dialog
 			});
-			this.colorHSVA = ColorHSVA.FromRGBA(color);
-			var colorProperty = new Property<ColorHSVA>(() => this.colorHSVA, c => this.colorHSVA = c);
+			colorHSVA = ColorHSVA.FromRGBA(color);
+			var colorProperty = new Property<ColorHSVA>(() => colorHSVA, c => colorHSVA = c);
 			spectrum = new Spectrum(colorProperty);
 			valueSlider = new ValueSlider(colorProperty);
 			alphaSlider = new AlphaSlider(colorProperty);
@@ -59,15 +59,19 @@ namespace Tangerine.UI
 			};
 			okButton.Clicked += () => Close(true);
 			cancelButton.Clicked += () => Close(false);
-			new TabTraverseController(rootWidget);
-			new WidgetKeyHandler(rootWidget, KeyBindings.CloseDialog).KeyPressed += () => Close(false);
-			rootWidget.Input.CaptureAll();
+			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
+			okButton.SetFocus();
+			rootWidget.Input.KeyPressed += (input, key) => {
+				if (key == KeyBindings.CloseDialog) {
+					input.ConsumeKey(key);
+					Close(false);
+				}
+			};
 		}
 
 		void Close(bool result)
 		{
 			this.result = result;
-			rootWidget.Input.ReleaseAll();
 			window.Close();
 		}
 
@@ -89,6 +93,7 @@ namespace Tangerine.UI
 			{
 				this.color = color;
 				Widget = new Widget {
+					HitTestTarget = true,
 					MinMaxSize = Radius * 2 * Vector2.One,
 					PostPresenter = new DelegatePresenter<Widget>(Render)
 				};

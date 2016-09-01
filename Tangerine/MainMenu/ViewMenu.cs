@@ -14,7 +14,7 @@ namespace Tangerine
 
 		public override void Execute()
 		{
-			TangerineApp.Instance.DockManager.ImportState(TangerineApp.Instance.DockManagerInitialState, resizeMainWindow: false);
+			DockManager.Instance.ImportState(TangerineApp.Instance.DockManagerInitialState, resizeMainWindow: false);
 		}
 	}
 }

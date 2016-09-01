@@ -12,7 +12,7 @@ namespace Tangerine.UI.Timeline
 		{
 			var input = timeline.Overview.RootWidget.Input;
 			while (true) {
-				if (input.WasMousePressed() && timeline.Overview.RootWidget.IsMouseOver()) {
+				if (input.WasMousePressed()) {
 					input.CaptureMouse();
 					var originalMousePosition = input.MousePosition;
 					var scrollOrigin = timeline.ScrollOrigin;

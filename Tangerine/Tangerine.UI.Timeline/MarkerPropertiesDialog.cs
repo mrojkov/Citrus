@@ -63,8 +63,13 @@ namespace Tangerine.UI.Timeline
 					}
 				}
 			};
-			new TabTraverseController(rootWidget);
-			new WidgetKeyHandler(rootWidget, KeyBindings.CloseDialog).KeyPressed += window.Close;
+			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
+			rootWidget.Input.KeyPressed += (input, key) => {
+				if (key == KeyBindings.CloseDialog) {
+					input.ConsumeKey(key);
+					window.Close();
+				}
+			};
 			okButton.Clicked += () => {
 				result = true;
 				this.marker.Id = markerIdEditor.Text;
@@ -73,7 +78,7 @@ namespace Tangerine.UI.Timeline
 				window.Close();
 			};
 			cancelButton.Clicked += window.Close;
-			KeyboardFocus.Instance.SetFocus(okButton);
+			okButton.SetFocus();
 		}
 
 		public Marker Show()

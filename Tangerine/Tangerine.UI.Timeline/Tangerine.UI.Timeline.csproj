@@ -69,7 +69,7 @@
     <Compile Include="Processors\RollPane\SelectAndDragRowsProcessor.cs" />
     <Compile Include="Processors\BuildRowsProcessor.cs" />
     <Compile Include="Processors\BuildRowViewsProcessor.cs" />
-    <Compile Include="Processors\KeyboardShortcutsProcessor.cs" />
+    <Compile Include="Processors\GlobalKeyboardShortcutsProcessor.cs" />
     <Compile Include="Processors\MouseWheelProcessor.cs" />
     <Compile Include="GridPane.cs" />
     <Compile Include="GridSelection.cs" />

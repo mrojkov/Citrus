@@ -14,7 +14,7 @@ namespace Tangerine.UI.Timeline
 		{
 			var input = timeline.Ruler.RootWidget.Input;
 			while (true) {
-				if (input.WasKeyReleased(Key.Mouse0DoubleClick) && timeline.Ruler.RootWidget.IsMouseOver()) {
+				if (input.WasKeyReleased(Key.Mouse0DoubleClick)) {
 					var marker = timeline.Container.Markers.FirstOrDefault(i => i.Frame == timeline.CurrentColumn) ?? new Marker { Frame = timeline.CurrentColumn };
 					var dlg = new MarkerPropertiesDialog(marker);
 					var result = dlg.Show();

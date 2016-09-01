@@ -74,7 +74,6 @@
     <Compile Include="KeyBindings.cs" />
     <Compile Include="Console.cs" />
     <Compile Include="ToolbarButton.cs" />
-    <Compile Include="Utils\WidgetKeyHandler.cs" />
     <Compile Include="Dialogs\AlertDialog.cs" />
     <Compile Include="Dialogs\ColorPickerDialog.cs" />
     <Compile Include="SearchPanel\SearchPanel.cs" />

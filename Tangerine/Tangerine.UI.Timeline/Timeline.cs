@@ -100,7 +100,7 @@ namespace Tangerine.UI.Timeline
 
 		void CreateProcessors()
 		{
-			var tasks = RootWidget.LateTasks; // Use LateTasks in order to process splitters first
+			var tasks = RootWidget.LateTasks;
 			tasks.Add(new IProcessor[] {
 				new BuildRowsProcessor(),
 				new UnselectUnlinkedNodesProcessor(),
@@ -109,7 +109,6 @@ namespace Tangerine.UI.Timeline
 				new RollWidgetsProcessor(),
 				new GridWidgetsProcessor(),
 				new OverviewWidgetsProcessor(),
-				new KeyboardShortcutsProcessor(),
 				new OverviewScrollProcessor(),
 				new MouseWheelProcessor(),
 				new ResizeGridCurveViewProcessor(),

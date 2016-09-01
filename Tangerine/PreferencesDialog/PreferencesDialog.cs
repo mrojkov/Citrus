@@ -52,9 +52,13 @@ namespace Tangerine
 			};
 			okButton.Clicked += window.Close;
 			cancelButton.Clicked += window.Close;
-			new TabTraverseController(rootWidget);
-			new WidgetKeyHandler(rootWidget, KeyBindings.CloseDialog).KeyPressed += window.Close;
-			KeyboardFocus.Instance.SetFocus(okButton);
+			rootWidget.FocusScope = new KeyboardFocusScope(rootWidget);
+			rootWidget.LateTasks.AddLoop(() => {
+				if (rootWidget.Input.ConsumeKeyPress(KeyBindings.CloseDialog)) {
+					window.Close();
+				}
+			});
+			okButton.SetFocus();
 		}
 
 		Widget CreateGenericPane()

@@ -6,14 +6,20 @@ using System.Collections.Generic;
 
 namespace Tangerine.UI.Timeline
 {
-	public class KeyboardShortcutsProcessor : Core.IProcessor
+	public class GlobalKeyboardShortcutsProcessor : Core.IProcessor
 	{
+		readonly WidgetInput input;
+
 		Timeline timeline => Timeline.Instance;
+
+		public GlobalKeyboardShortcutsProcessor(WidgetInput input)
+		{
+			this.input = input;
+		}
 
 		public IEnumerator<object> Loop()
 		{
 			while (true) {
-				var input = timeline.PanelWidget.Input;
 				HandleShortcuts(input);
 				HorizontalScroll(input);
 				VerticalScroll(input);
@@ -32,21 +38,21 @@ namespace Tangerine.UI.Timeline
 			input.EnableKey(Key.Commands.Copy, hasSelection);
 			input.EnableKey(Key.Commands.Paste, Timeline.Clipboard.Nodes.Count > 0);
 			input.EnableKey(Key.Commands.Delete, hasSelection);
-			if (input.WasKeyRepeated(Key.Commands.Redo)) {
+			if (input.ConsumeKeyRepeat(Key.Commands.Redo)) {
 				Document.Current.History.Redo();
-			} else if (input.WasKeyRepeated(Key.Commands.Undo)) {
+			} else if (input.ConsumeKeyRepeat(Key.Commands.Undo)) {
 				Document.Current.History.Undo();
-			} else if (input.WasKeyRepeated(Key.Commands.SelectAll)) {
+			} else if (input.ConsumeKeyRepeat(Key.Commands.SelectAll)) {
 				foreach (var row in timeline.Rows) {
 					Operations.SelectRow.Perform(row, true);
 				}
-			} else if (input.WasKeyRepeated(Key.Commands.Cut)) {
+			} else if (input.ConsumeKeyRepeat(Key.Commands.Cut)) {
 				Operations.Cut.Perform();
-			} else if (input.WasKeyRepeated(Key.Commands.Copy)) {
+			} else if (input.ConsumeKeyRepeat(Key.Commands.Copy)) {
 				Operations.Copy.Perform();
-			} else if (input.WasKeyRepeated(Key.Commands.Paste)) {
+			} else if (input.ConsumeKeyRepeat(Key.Commands.Paste)) {
 				Operations.Paste.Perform();
-			} else if (input.WasKeyRepeated(Key.Commands.Delete)) {
+			} else if (input.ConsumeKeyRepeat(Key.Commands.Delete)) {
 				Operations.Delete.Perform();
 			}
 		}
@@ -54,25 +60,25 @@ namespace Tangerine.UI.Timeline
 		void HandleEnterExit(WidgetInput input)
 		{
 			var doc = Document.Current;
-			if (input.WasKeyPressed(KeyBindings.Timeline.EnterNode)) {
+			if (input.ConsumeKeyRepeat(KeyBindings.Timeline.EnterNode)) {
 				var node = timeline.SelectedRows.Select(i => i.Components.Get<Components.NodeRow>()).FirstOrDefault(i => i != null)?.Node;
 				if (node != null) {
 					Operations.EnterNode.Perform(node);
 				}
-			} else if (input.WasKeyPressed(KeyBindings.Timeline.ExitNode)) {
+			} else if (input.ConsumeKeyRepeat(KeyBindings.Timeline.ExitNode)) {
 				Operations.LeaveNode.Perform();
 			}
 		}
 		
 		void VerticalScroll(WidgetInput input)
 		{
-			if (input.WasKeyRepeated(KeyBindings.Timeline.ScrollUp)) {
+			if (input.ConsumeKeyRepeat(KeyBindings.Timeline.ScrollUp)) {
 				SelectRow(-1, false);
-			} else if (input.WasKeyRepeated(KeyBindings.Timeline.ScrollDown)) {
+			} else if (input.ConsumeKeyRepeat(KeyBindings.Timeline.ScrollDown)) {
 				SelectRow(1, false);
-			} else if (input.WasKeyRepeated(KeyBindings.Timeline.SelectUp)) {
+			} else if (input.ConsumeKeyRepeat(KeyBindings.Timeline.SelectUp)) {
 				SelectRow(-1, true);
-			} else if (input.WasKeyRepeated(KeyBindings.Timeline.SelectDown)) {
+			} else if (input.ConsumeKeyRepeat(KeyBindings.Timeline.SelectDown)) {
 				SelectRow(1, true);
 			}
 		}
@@ -100,13 +106,13 @@ namespace Tangerine.UI.Timeline
 		void HorizontalScroll(WidgetInput input)
 		{
 			int stride = 0;
-			if (input.WasKeyRepeated(KeyBindings.Timeline.FastScrollLeft)) {
+			if (input.ConsumeKeyRepeat(KeyBindings.Timeline.FastScrollLeft)) {
 				stride = -10;
-			} else if (input.WasKeyRepeated(KeyBindings.Timeline.FastScrollRight)) {
+			} else if (input.ConsumeKeyRepeat(KeyBindings.Timeline.FastScrollRight)) {
 				stride = 10;
-			} else if (input.WasKeyRepeated(KeyBindings.Timeline.ScrollRight)) {
+			} else if (input.ConsumeKeyRepeat(KeyBindings.Timeline.ScrollRight)) {
 				stride = 1;
-			} else if (input.WasKeyRepeated(KeyBindings.Timeline.ScrollLeft)) {
+			} else if (input.ConsumeKeyRepeat(KeyBindings.Timeline.ScrollLeft)) {
 				stride = -1;
 			}
 			if (stride != 0) {

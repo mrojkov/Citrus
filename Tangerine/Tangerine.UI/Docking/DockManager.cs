@@ -19,26 +19,33 @@ namespace Tangerine.UI
 	public class DockManager
 	{
 		readonly List<DockPanel> panels = new List<DockPanel>();
-		readonly WindowWidget mainWidget;
 		readonly Menu padsMenu;
-
 		public readonly Widget DocumentArea;
+		public readonly WindowWidget MainWindowWidget;
+		public event Action<DockPanel> DockPanelAdded;
+		public static DockManager Instance { get; private set; }
 
-		public DockManager(Vector2 windowSize, Menu padsMenu)
+		public static void Initialize(Vector2 windowSize, Menu padsMenu)
+		{
+			if (Instance != null) {
+				throw new InvalidOperationException();
+			}
+			Instance = new DockManager(windowSize, padsMenu);
+		}
+
+		private DockManager(Vector2 windowSize, Menu padsMenu)
 		{
 			this.padsMenu = padsMenu;
-			var window = new Window(new WindowOptions { ClientSize = windowSize, FixedSize = false, RefreshRate = 30, Title = "Tangerine" });
-			mainWidget = new InvalidableWindowWidget(window) {
+			var window = new Window(new WindowOptions { ClientSize = windowSize, FixedSize = false, Title = "Tangerine" });
+			MainWindowWidget = new InvalidableWindowWidget(window) {
 				Id = "MainWindow",
 				Layout = new HBoxLayout(),
 				Padding = new Thickness(4),
 				Size = windowSize,
 				RedrawMarkVisible = true
 			};
-			new TabTraverseController(mainWidget);
 			DocumentArea = new Frame {
 				ClipChildren = ClipMethod.ScissorTest,
-				TabTraverseScope = new TabTraverseScope()
 			};
 			DocumentArea.CompoundPresenter.Add(new WidgetFlatFillPresenter(Color4.Gray));
 		}
@@ -50,7 +57,7 @@ namespace Tangerine.UI
 			var dockedSize = CalcDockedSize(site, size);
 			panel.Placement = new DockPanel.PanelPlacement { Title = panel.Title, Site = site, DockedSize = dockedSize, Docked = true, UndockedSize = size };
 			panels.Add(panel);
-			var db = new DockPanel.DragBehaviour(mainWidget, panel);
+			var db = new DockPanel.DragBehaviour(MainWindowWidget, panel);
 			db.OnDock += newDockSite => {
 				panels.Remove(panel);
 				panels.Insert(0, panel);
@@ -74,11 +81,12 @@ namespace Tangerine.UI
 				Refresh();
 			};
 			Refresh();
+			DockPanelAdded?.Invoke(panel);
 		}
 
 		private Vector2 CalcDockedSize(DockSite site, Vector2 size)
 		{
-			return size / mainWidget.Size;
+			return size / MainWindowWidget.Size;
 		}
 
 		void ShowPanel(DockPanel panel)
@@ -95,9 +103,9 @@ namespace Tangerine.UI
 
 		void RefreshDockedPanels()
 		{
-			mainWidget.Nodes.Clear();
+			MainWindowWidget.Nodes.Clear();
 			DocumentArea.Unlink();
-			var currentContainer = (Widget)mainWidget;
+			var currentContainer = (Widget)MainWindowWidget;
 			int insertAt = 0;
 			var stretch = Vector2.Zero;
 			foreach (var p in panels.Where(p => p.Placement.Docked)) {
@@ -127,7 +135,7 @@ namespace Tangerine.UI
 			foreach (var p in panels.Where(p => !p.Placement.Docked)) {
 				if (!p.Placement.Hidden) {
 					if (p.WindowWidget == null) {
-						var window = new Window(new WindowOptions { RefreshRate = 30, Title = p.Title, FixedSize = false });
+						var window = new Window(new WindowOptions { Title = p.Title, FixedSize = false });
 						window.Closing += () => {
 							if (!p.Placement.Docked) {
 								p.Placement.Hidden = true;
@@ -148,7 +156,6 @@ namespace Tangerine.UI
 						};
 						p.RootWidget.Unlink();
 						p.WindowWidget.AddNode(p.RootWidget);
-						new TabTraverseController(p.WindowWidget);
 					}
 				} else {
 					ClosePanelWindow(p);
@@ -165,9 +172,9 @@ namespace Tangerine.UI
 				Lime.UpdateHandler closeWindowOnNextFrame = null;
 				closeWindowOnNextFrame = delta => {
 					window.Close();
-					mainWidget.Updating -= closeWindowOnNextFrame;
+					MainWindowWidget.Updating -= closeWindowOnNextFrame;
 				};
-				mainWidget.Updating += closeWindowOnNextFrame;
+				MainWindowWidget.Updating += closeWindowOnNextFrame;
 			}
 		}
 
@@ -177,16 +184,16 @@ namespace Tangerine.UI
 			foreach (var p in panels) {
 				state.PanelPlacements.Add(p.Placement);
 			}
-			state.MainWindowPosition = mainWidget.Window.ClientPosition;
-			state.MainWindowSize = mainWidget.Window.ClientSize;
+			state.MainWindowPosition = MainWindowWidget.Window.ClientPosition;
+			state.MainWindowSize = MainWindowWidget.Window.ClientSize;
 			return state;
 		}
 
 		public void ImportState(State state, bool resizeMainWindow = true)
 		{
 			if (resizeMainWindow && state.MainWindowSize != Vector2.Zero) {
-				mainWidget.Window.ClientSize = state.MainWindowSize;
-				mainWidget.Window.ClientPosition = state.MainWindowPosition;
+				MainWindowWidget.Window.ClientSize = state.MainWindowSize;
+				MainWindowWidget.Window.ClientPosition = state.MainWindowPosition;
 			}
 			foreach (var p in panels) {
 				var pp = state.PanelPlacements.FirstOrDefault(i => i.Title == p.Title);
