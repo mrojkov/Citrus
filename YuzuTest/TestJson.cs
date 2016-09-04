@@ -1320,6 +1320,20 @@ namespace YuzuTest.Json
 		}
 
 		[TestMethod]
+		public void TestOneline()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.MaxOnelineFields = 2;
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = " ";
+			Assert.AreEqual("[5,6]", js.ToString(new SamplePoint { X = 5, Y = 6 }));
+			var c = new Color { B = 1, G = 2, R = 3 };
+			Assert.AreEqual("[ 1, 2, 3 ]", js.ToString(c));
+			js.JsonOptions.MaxOnelineFields = 3;
+			Assert.AreEqual("[1,2,3]", js.ToString(c));
+		}
+
+		[TestMethod]
 		public void TestErrors()
 		{
 			var js = new JsonSerializer();

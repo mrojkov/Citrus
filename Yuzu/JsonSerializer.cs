@@ -17,6 +17,9 @@ namespace Yuzu.Json
 		public string Indent = "\t";
 		public string ClassTag = "class";
 
+		private int maxOnelineFields = 0;
+		public int MaxOnelineFields { get { return maxOnelineFields; } set { maxOnelineFields = value; generation++; } }
+
 		private bool enumAsString = false;
 		public bool EnumAsString { get { return enumAsString; } set { enumAsString = value; generation++; } }
 
@@ -344,6 +347,16 @@ namespace Yuzu.Json
 				normalWrite(obj);
 		}
 
+		private bool IsOneline(Meta meta)
+		{
+			if (meta.Items.Count > JsonOptions.MaxOnelineFields)
+				return false;
+			foreach (var yi in meta.Items)
+				if (!yi.Type.IsPrimitive && !yi.Type.IsEnum && yi.Type != typeof(string))
+					return false;
+			return true;
+		}
+
 		private Dictionary<Type, Action<object>> writerCache = new Dictionary<Type, Action<object>>();
 		private int jsonOptionsGeneration = 0;
 
@@ -428,8 +441,11 @@ namespace Yuzu.Json
 				return obj => m.Invoke(this, new object[] { obj });
 			}
 			if (Utils.IsStruct(t) || t.IsClass || t.IsInterface) {
-				var name = Meta.Get(t, Options).IsCompact && !JsonOptions.IgnoreCompact ?
-					"WriteObjectCompact" : "WriteObject";
+				var meta = Meta.Get(t, Options);
+				var name =
+					!meta.IsCompact || JsonOptions.IgnoreCompact ? "WriteObject" :
+					IsOneline(meta) ? "WriteObjectCompactOneline" :
+					"WriteObjectCompact";
 				var m = Utils.GetPrivateGeneric(GetType(), name, t);
 				return (Action<object>)Delegate.CreateDelegate(typeof(Action<object>), this, m);
 			}
@@ -517,6 +533,33 @@ namespace Yuzu.Json
 			if (!isFirst)
 				WriteFieldSeparator();
 			WriteIndent();
+			writer.Write(']');
+		}
+
+		private void WriteObjectCompactOneline<T>(object obj)
+		{
+			if (obj == null) {
+				WriteStrCached("null");
+				return;
+			}
+			writer.Write('[');
+			var isFirst = true;
+			var actualType = obj.GetType();
+			if (typeof(T) != actualType)
+				throw new YuzuException(String.Format(
+					"Attempt to write compact type {0} instead of {1}", actualType.Name, typeof(T).Name));
+			objStack.Push(obj);
+			try {
+				foreach (var yi in Meta.Get(actualType, Options).Items) {
+					if (!isFirst)
+						writer.Write(',');
+					isFirst = false;
+					GetWriteFunc(yi.Type)(yi.GetValue(obj));
+				}
+			}
+			finally {
+				objStack.Pop();
+			};
 			writer.Write(']');
 		}
 
