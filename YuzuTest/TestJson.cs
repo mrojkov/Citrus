@@ -1262,6 +1262,64 @@ namespace YuzuTest.Json
 		}
 
 		[TestMethod]
+		public void TestIndentation()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.SaveRootClass = true;
+
+			var v1 = new SampleTree {
+				Value = 1, Children = new List<SampleTree> {
+					new SampleTree {
+						Value = 11,
+						Children = null
+					},
+					new SampleTree {
+						Value = 12,
+						Children = new List<SampleTree> {
+							new SampleTree {
+								Value = 121,
+								Children = null
+							},
+						},
+					},
+				}
+			};
+			Assert.AreEqual(
+				"{\n" +
+				"\t\"class\":\"YuzuTest.SampleTree, YuzuTest\",\n" +
+				"\t\"a\":1,\n" +
+				"\t\"b\":[\n" +
+				"\t\t{\n" +
+				"\t\t\t\"a\":11,\n" +
+				"\t\t\t\"b\":null\n" +
+				"\t\t},\n" +
+				"\t\t{\n" +
+				"\t\t\t\"a\":12,\n" +
+				"\t\t\t\"b\":[\n" +
+				"\t\t\t\t{\n" +
+				"\t\t\t\t\t\"a\":121,\n" +
+				"\t\t\t\t\t\"b\":null\n" +
+				"\t\t\t\t}\n" +
+				"\t\t\t]\n" +
+				"\t\t}\n" +
+				"\t]\n" +
+				"}",
+				js.ToString(v1));
+
+			var v2 = new Dictionary<string, SamplePoint> {
+				{ "a", new SamplePoint { X = 4, Y = 3 } }
+			};
+			Assert.AreEqual(
+				"{\n" +
+				"\t\"a\":[\n" +
+				"\t\t4,\n" +
+				"\t\t3\n" +
+				"\t]\n" +
+				"}",
+				js.ToString(v2));
+		}
+
+		[TestMethod]
 		public void TestErrors()
 		{
 			var js = new JsonSerializer();
