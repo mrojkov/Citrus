@@ -86,12 +86,40 @@ namespace Yuzu.Json
 
 		private int depth = 0;
 
+		private Dictionary<string, byte[]> strCache = new Dictionary<string, byte[]>();
+		private byte[] StrToBytesCached(string s)
+		{
+			byte[] b;
+			if (!strCache.TryGetValue(s, out b)) {
+				b = Encoding.UTF8.GetBytes(s);
+				strCache[s] = b;
+			}
+			return b;
+		}
+
+		private void WriteStr(string s)
+		{
+			writer.Write(Encoding.UTF8.GetBytes(s));
+		}
+
+		private void WriteStrCached(string s)
+		{
+			writer.Write(StrToBytesCached(s));
+		}
+
+		private void WriteFieldSeparator()
+		{
+			if (JsonOptions.FieldSeparator != String.Empty)
+				WriteStrCached(JsonOptions.FieldSeparator);
+		}
+
 		private void WriteIndent()
 		{
 			if (JsonOptions.Indent == String.Empty)
 				return;
+			var b = StrToBytesCached(JsonOptions.Indent);
 			for (int i = 0; i < depth; ++i)
-				WriteStr(JsonOptions.Indent);
+				writer.Write(b);
 		}
 
 		private void WriteInt(object obj)
@@ -121,13 +149,13 @@ namespace Yuzu.Json
 
 		private void WriteEnumAsInt(object obj)
 		{
-			WriteStr(((int)obj).ToString());
+			WriteStrCached(((int)obj).ToString());
 		}
 
 		private void WriteUnescapedString(object obj)
 		{
 			writer.Write('"');
-			writer.Write(Encoding.UTF8.GetBytes(obj.ToString()));
+			WriteStrCached(obj.ToString());
 			writer.Write('"');
 		}
 
@@ -156,7 +184,7 @@ namespace Yuzu.Json
 		private void WriteNullableEscapedString(object obj)
 		{
 			if (obj == null) {
-				WriteStr("null");
+				WriteStrCached("null");
 				return;
 			}
 			WriteEscapedString(obj);
@@ -164,7 +192,7 @@ namespace Yuzu.Json
 
 		private void WriteBool(object obj)
 		{
-			WriteStr((bool)obj ? "true" : "false");
+			WriteStrCached((bool)obj ? "true" : "false");
 		}
 
 		private void WriteDateTime(object obj)
@@ -190,7 +218,7 @@ namespace Yuzu.Json
 		private void WriteCollection<T>(ICollection<T> list)
 		{
 			if (list == null) {
-				WriteStr("null");
+				WriteStrCached("null");
 				return;
 			}
 			var wf = GetWriteFunc(typeof(T));
@@ -203,11 +231,11 @@ namespace Yuzu.Json
 						if (!isFirst)
 							writer.Write(',');
 						isFirst = false;
-						WriteStr(JsonOptions.FieldSeparator);
+						WriteFieldSeparator();
 						WriteIndent();
 						wf(elem);
 					}
-					WriteStr(JsonOptions.FieldSeparator);
+					WriteFieldSeparator();
 				}
 				finally {
 					depth -= 1;
@@ -220,7 +248,7 @@ namespace Yuzu.Json
 		private void WriteDictionary<K, V>(Dictionary<K, V> dict)
 		{
 			if (dict == null) {
-				WriteStr("null");
+				WriteStrCached("null");
 				return;
 			}
 			var wf = GetWriteFunc(typeof(V));
@@ -228,7 +256,7 @@ namespace Yuzu.Json
 			if (dict.Count > 0) {
 				try {
 					depth += 1;
-					WriteStr(JsonOptions.FieldSeparator);
+					WriteFieldSeparator();
 					var isFirst = true;
 					foreach (var elem in dict) {
 						WriteSep(ref isFirst);
@@ -238,7 +266,7 @@ namespace Yuzu.Json
 						writer.Write(':');
 						wf(elem.Value);
 					}
-					WriteStr(JsonOptions.FieldSeparator);
+					WriteFieldSeparator();
 				}
 				finally {
 					depth -= 1;
@@ -251,7 +279,7 @@ namespace Yuzu.Json
 		private void WriteArray<T>(T[] array)
 		{
 			if (array == null) {
-				WriteStr("null");
+				WriteStrCached("null");
 				return;
 			}
 			var wf = GetWriteFunc(typeof(T));
@@ -268,11 +296,11 @@ namespace Yuzu.Json
 						if (!isFirst)
 							writer.Write(',');
 						isFirst = false;
-						WriteStr(JsonOptions.FieldSeparator);
+						WriteFieldSeparator();
 						WriteIndent();
 						wf(elem);
 					}
-					WriteStr(JsonOptions.FieldSeparator);
+					WriteFieldSeparator();
 				}
 				finally {
 					depth -= 1;
@@ -299,7 +327,7 @@ namespace Yuzu.Json
 		private void WriteAction(object obj)
 		{
 			if (obj == null) {
-				WriteStr("null");
+				WriteStrCached("null");
 				return;
 			}
 			var a = obj as MulticastDelegate;
@@ -311,7 +339,7 @@ namespace Yuzu.Json
 		private void WriteNullable(object obj, Action<object> normalWrite)
 		{
 			if (obj == null)
-				WriteStr("null");
+				WriteStrCached("null");
 			else
 				normalWrite(obj);
 		}
@@ -412,7 +440,7 @@ namespace Yuzu.Json
 		{
 			if (!isFirst) {
 				writer.Write(',');
-				WriteStr(JsonOptions.FieldSeparator);
+				WriteFieldSeparator();
 			}
 			isFirst = false;
 		}
@@ -428,11 +456,11 @@ namespace Yuzu.Json
 		private void WriteObject<T>(object obj)
 		{
 			if (obj == null) {
-				WriteStr("null");
+				WriteStrCached("null");
 				return;
 			}
 			writer.Write('{');
-			WriteStr(JsonOptions.FieldSeparator);
+			WriteFieldSeparator();
 			objStack.Push(obj);
 			try {
 				depth += 1;
@@ -450,7 +478,7 @@ namespace Yuzu.Json
 					GetWriteFunc(yi.Type)(value);
 				}
 				if (!isFirst)
-					WriteStr(JsonOptions.FieldSeparator);
+					WriteFieldSeparator();
 			}
 			finally {
 				depth -= 1;
@@ -463,11 +491,11 @@ namespace Yuzu.Json
 		private void WriteObjectCompact<T>(object obj)
 		{
 			if (obj == null) {
-				WriteStr("null");
+				WriteStrCached("null");
 				return;
 			}
 			writer.Write('[');
-			WriteStr(JsonOptions.FieldSeparator);
+			WriteFieldSeparator();
 			var isFirst = true;
 			var actualType = obj.GetType();
 			if (typeof(T) != actualType)
@@ -487,7 +515,7 @@ namespace Yuzu.Json
 				objStack.Pop();
 			};
 			if (!isFirst)
-				WriteStr(JsonOptions.FieldSeparator);
+				WriteFieldSeparator();
 			WriteIndent();
 			writer.Write(']');
 		}

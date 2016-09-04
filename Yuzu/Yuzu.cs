@@ -186,11 +186,6 @@ namespace Yuzu
 			ToWriter(obj);
 		}
 
-		protected void WriteStr(string s)
-		{
-			writer.Write(Encoding.UTF8.GetBytes(s));
-		}
-
 		public override string ToString(object obj)
 		{
 			var ms = new MemoryStream();
