@@ -161,7 +161,6 @@
     <Compile Include="Source\Input\Input.Native.cs" />
     <Compile Include="Source\Input\Input.Unity.cs" />
     <Compile Include="Source\Localization\LocalizationDictionary.cs" />
-    <Compile Include="Source\Localization\LocalizationDictionaryXmlSerializer.cs" />
     <Compile Include="Source\Localization\LocalizationDictionaryTextSerializer.cs" />
     <Compile Include="Source\Version.cs" />
     <Compile Include="Source\Widgets\FileChooserButton.cs" />
