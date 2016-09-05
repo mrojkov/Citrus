@@ -102,9 +102,10 @@ namespace Lime
 
 		public override void Render(Node node)
 		{
-			node.AsWidget.PrepareRendererState();
+			var widget = node.AsWidget;
+			widget.PrepareRendererState();
 			var t = Thickness > 0 ? Thickness : 1 / CommonWindow.Current.PixelScale;
-			Renderer.DrawRectOutline(Vector2.Zero, node.AsWidget.Size, Color, t);
+			Renderer.DrawRectOutline(Vector2.Zero, node.AsWidget.Size, Color * widget.GlobalColor, t);
 		}
 	}
 
@@ -121,7 +122,7 @@ namespace Lime
 		{
 			var widget = node.AsWidget;
 			widget.PrepareRendererState();
-			Renderer.DrawRect(widget.ContentPosition, widget.ContentSize, Color);
+			Renderer.DrawRect(widget.ContentPosition, widget.ContentSize, Color * widget.GlobalColor);
 		}
 	}
 }
