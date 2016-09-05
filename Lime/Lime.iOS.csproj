@@ -26,9 +26,11 @@
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <MtouchDebug>true</MtouchDebug>
     <MtouchProfiling>true</MtouchProfiling>
+    <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
+    <MtouchTlsProvider>Default</MtouchTlsProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>full</DebugType>
+    <DebugType></DebugType>
     <Optimize>True</Optimize>
     <OutputPath>bin\iOS\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
@@ -36,12 +38,12 @@
     <ConsolePause>False</ConsolePause>
     <DefineConstants>__UNIFIED__;__MOBILE__;__IOS__;iOS;OPENGL;OPENAL</DefineConstants>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <DebugSymbols>True</DebugSymbols>
+    <DebugSymbols>false</DebugSymbols>
+    <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
+    <MtouchTlsProvider>Default</MtouchTlsProvider>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Core" />
     <Reference Include="Xamarin.iOS" />
     <Reference Include="OpenTK-1.0" />
     <Reference Include="Lzma">
@@ -157,7 +159,6 @@
     <Compile Include="Source\Localization\Localization.cs" />
     <Compile Include="Source\Localization\LocalizationDictionary.cs" />
     <Compile Include="Source\Localization\LocalizationDictionaryTextSerializer.cs" />
-    <Compile Include="Source\Localization\LocalizationDictionaryXmlSerializer.cs" />
     <Compile Include="Source\Widgets\Text\TextParser.cs" />
     <Compile Include="Source\Widgets\Text\TextRenderer.cs" />
     <Compile Include="Source\Application\AndroidGameView.cs" />
