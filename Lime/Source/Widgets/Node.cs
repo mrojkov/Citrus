@@ -34,7 +34,7 @@ namespace Lime
 		Hidden = 2,
 		Locked = 4,
 		Expanded = 8,
-		HiddenWhileExposing = 16
+		HiddenOnExposition = 16
 	}
 
 	public delegate void UpdateHandler(float delta);

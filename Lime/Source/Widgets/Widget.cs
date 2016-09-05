@@ -833,7 +833,7 @@ namespace Lime
 			globallyVisible = Visible && color.A != 0;
 			if (Application.IsTangerine) {
 				globallyVisible |= GetTangerineFlag(TangerineFlags.Shown);
-				globallyVisible &= !GetTangerineFlag(TangerineFlags.Hidden | TangerineFlags.HiddenWhileExposing);
+				globallyVisible &= !GetTangerineFlag(TangerineFlags.Hidden | TangerineFlags.HiddenOnExposition);
 			}
 			localToWorldTransform = CalcLocalToParentTransform();
 			if (Parent != null) {
