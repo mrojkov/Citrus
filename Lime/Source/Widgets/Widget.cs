@@ -24,13 +24,24 @@ namespace Lime
 		Center = CenterH | CenterV,
 	}
 
-	public struct Transform
+	public struct Transform2
 	{
 		public Vector2 Position;
 		public Vector2 Scale;
 		public float Rotation;
 		public Vector2 U;
 		public Vector2 V;
+
+		public static Transform2 Lerp(float t, Transform2 a, Transform2 b)
+		{
+			return new Transform2 {
+				Position = Mathf.Lerp(t, a.Position, b.Position),
+				Scale = Mathf.Lerp(t, a.Scale, b.Scale),
+				Rotation = Mathf.Lerp(t, a.Rotation, b.Rotation),
+				U = Mathf.Lerp(t, a.U, b.U),
+				V = Mathf.Lerp(t, a.V, b.V)
+			};
+		}
 	}
 
 	public struct WidgetHull
@@ -822,7 +833,7 @@ namespace Lime
 			globallyVisible = Visible && color.A != 0;
 			if (Application.IsTangerine) {
 				globallyVisible |= GetTangerineFlag(TangerineFlags.Shown);
-				globallyVisible &= !GetTangerineFlag(TangerineFlags.Hidden);
+				globallyVisible &= !GetTangerineFlag(TangerineFlags.Hidden | TangerineFlags.HiddenWhileExposing);
 			}
 			localToWorldTransform = CalcLocalToParentTransform();
 			if (Parent != null) {
@@ -1206,7 +1217,7 @@ namespace Lime
 			};
 		}
 
-		public Transform CalcTransformFromMatrix(Matrix32 matrix)
+		public Transform2 CalcTransformFromMatrix(Matrix32 matrix)
 		{
 			var v1 = new Vector2(1, 0);
 			var v2 = new Vector2(0, 1);
@@ -1216,7 +1227,7 @@ namespace Lime
 			v3 = matrix.TransformVector(v3);
 			v1 = v1 - v3;
 			v2 = v2 - v3;
-			Transform transform;
+			Transform2 transform;
 			transform.Position = matrix.TransformVector(Pivot * Size);
 			transform.Scale = new Vector2(v1.Length, v2.Length);
 			transform.Rotation = v1.Atan2Deg;
@@ -1228,7 +1239,7 @@ namespace Lime
 		/// <summary>
 		/// Âîçâðàùàåò èíôîðìàöèþ î òðàíñôîðìàöèè ýòîãî âèäæåòà, åñëè áû îí íàõîäèëñÿ â ýòîé æå ýêðàííîé êîîðäèíàòå, íî â äðóãîì êîíòåéíåðå
 		/// </summary>
-		public Transform CalcTransformInSpaceOf(Widget container)
+		public Transform2 CalcTransformInSpaceOf(Widget container)
 		{
 			Matrix32 matrix = CalcTransitionToSpaceOf(container);
 			return CalcTransformFromMatrix(matrix);
