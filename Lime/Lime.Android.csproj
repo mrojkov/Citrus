@@ -38,10 +38,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\3rdParty\ProtoBuf-Net\android (core-portable)\protobuf-net.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -105,7 +101,6 @@
     <Compile Include="Source\Localization\Localization.cs" />
     <Compile Include="Source\Localization\LocalizationDictionary.cs" />
     <Compile Include="Source\Localization\LocalizationDictionaryTextSerializer.cs" />
-    <Compile Include="Source\Localization\LocalizationDictionaryXmlSerializer.cs" />
     <Compile Include="Source\Types\Color4.cs" />
     <Compile Include="Source\Types\IntRectangle.cs" />
     <Compile Include="Source\Types\IntVector2.cs" />
@@ -261,7 +256,6 @@
     <Compile Include="Source\Application\Clipboard\Clipboard.Unity.cs" />
     <Compile Include="Source\Graphics\Fonts\Font.cs" />
     <Compile Include="Source\Graphics\Fonts\SerializableFont.cs" />
-    <Compile Include="Source\Widgets\Text\IKeyboardInputProcessor.cs" />
     <Compile Include="Source\Graphics\Fonts\CharMap.cs" />
     <Compile Include="Source\Graphics\Fonts\CompoundFont.cs" />
     <Compile Include="Source\Application\AndroidSoftKeyboard.cs" />
@@ -270,7 +264,6 @@
     <Compile Include="Source\Application\Menu\Menu.Mac.cs" />
     <Compile Include="Source\Graphics\VectorShape.cs" />
     <Compile Include="Source\Types\ColorGradient.cs" />
-    <Compile Include="Source\Widgets\ComboBox.cs" />
     <Compile Include="Source\Widgets\EditBox.cs" />
     <Compile Include="Source\Widgets\IPresenter.cs" />
     <Compile Include="Source\Widgets\TextView.cs" />
@@ -321,14 +314,23 @@
     <Compile Include="Source\Application\MouseCursor\StockCursors.Mac.cs" />
     <Compile Include="Source\Application\MouseCursor\StockCursors.Null.cs" />
     <Compile Include="Source\Application\MouseCursor\StockCursors.Win.cs" />
-    <Compile Include="Source\Widgets\Layout\ScrollableLayout.cs" />
     <Compile Include="Source\Input\Shortcut.cs" />
     <Compile Include="Source\Widgets\KeyboardFocus.cs" />
+    <Compile Include="Source\GeneratedDeserializersBIN.cs" />
+    <Compile Include="Source\Application\Menu\Command.cs" />
+    <Compile Include="Source\Widgets\BorderedFrame.cs" />
+    <Compile Include="Source\Widgets\CheckBox.cs" />
+    <Compile Include="Source\Widgets\DropDownList.cs" />
+    <Compile Include="Source\Widgets\TabBar.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lemon\Lemon.Android.csproj">
       <Project>{B4435A5F-51DA-42BA-9315-61691A5F58AC}</Project>
       <Name>Lemon.Android</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Yuzu\Yuzu.Android.csproj">
+      <Project>{CF150772-5F4A-453C-91BD-D52901174B4E}</Project>
+      <Name>Yuzu.Android</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />
