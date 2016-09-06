@@ -66,10 +66,6 @@ namespace Orange
 			var format = The.Workspace.ProjectJson.GetValue("LocalizationDictionaryFormat", "Text");
 			if (format == "Text") {
 				return new LocalizationDictionaryTextSerializer();
-#if !MAC
-			} else if (format == "Xml") {
-				return new LocalizationDictionaryXmlSerializer();
-#endif
 			} else {
 				throw new Lime.Exception();
 			}
