@@ -17,3 +17,6 @@ Orange/packages
 !/Orange/bin/Mac/Release/Orange.app
 *.mdb
 Yuzu/bin
+bin
+obj
+*.suo

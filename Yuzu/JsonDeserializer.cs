@@ -432,7 +432,19 @@ namespace Yuzu.Json
 
 		private Action<T> ReadAction<T>() { return GetAction<T>(RequireUnescapedString()); }
 
-		protected object ReadAnyObject() {
+		private object ReadNullable(Func<object> normalRead)
+		{
+			var ch = SkipSpaces();
+			if (ch == 'n') {
+				Require("ull");
+				return null;
+			}
+			PutBack(ch);
+			return normalRead();
+		}
+
+		protected object ReadAnyObject()
+		{
 			var ch = SkipSpaces();
 			PutBack(ch);
 			switch (ch) {
@@ -568,9 +580,12 @@ namespace Yuzu.Json
 					return () => m.Invoke(this, Utils.ZeroObjects);
 				}
 				if (g == typeof(Action<>)) {
-					var p = t.GetGenericArguments();
 					var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadAction", t);
 					return () => m.Invoke(this, Utils.ZeroObjects);
+				}
+				if (g == typeof(Nullable<>)) {
+					var r = ReadValueFunc(t.GetGenericArguments()[0]);
+					return () => ReadNullable(r);
 				}
 			}
 			if (t.IsArray) {
@@ -578,7 +593,7 @@ namespace Yuzu.Json
 				var m = Utils.GetPrivateCovariantGeneric(GetType(), n, t);
 				return () => m.Invoke(this, new object[] { });
 			}
-			var icoll = t.GetInterface(typeof(ICollection<>).Name);
+			var icoll = Utils.GetICollection(t);
 			if (icoll != null) {
 				var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadIntoCollection", icoll);
 				return () => {
@@ -610,7 +625,7 @@ namespace Yuzu.Json
 				var m = Utils.GetPrivateCovariantGenericAll(GetType(), "ReadIntoDictionary", t);
 				return obj => { Require('{'); m.Invoke(this, new object[] { obj }); };
 			}
-			var icoll = t.GetInterface(typeof(ICollection<>).Name);
+			var icoll = Utils.GetICollection(t);
 			if (icoll != null) {
 				var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadIntoCollection", icoll);
 				return obj => { Require('['); m.Invoke(this, new object[] { obj }); };
@@ -813,7 +828,7 @@ namespace Yuzu.Json
 					CheckExpectedType(RequireUnescapedString(), expectedType);
 					return ReadFields(obj, GetNextName(first: false));
 				case '[':
-					var icoll = expectedType.GetInterface(typeof(ICollection<>).Name);
+					var icoll = Utils.GetICollection(expectedType);
 					if (icoll != null) {
 						var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadIntoCollection", icoll);
 						m.Invoke(this, new object[] { obj });

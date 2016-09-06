@@ -28,6 +28,7 @@ namespace Yuzu.Binary
 		TimeSpan  = 15,
 		String    = 16,
 		Any       = 17,
+		Nullable  = 18,
 
 		Record    = 32,
 		Sequence  = 33,
@@ -148,12 +149,17 @@ namespace Yuzu.Binary
 				WriteRoughType(g[1]);
 				return;
 			}
+			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>)) {
+				writer.Write((byte)RoughType.Nullable);
+				WriteRoughType(t.GetGenericArguments()[0]);
+				return;
+			}
 			if (t.IsArray) {
 				writer.Write((byte)RoughType.Sequence);
 				WriteRoughType(t.GetElementType());
 				return;
 			}
-			var icoll = t.GetInterface(typeof(ICollection<>).Name);
+			var icoll = Utils.GetICollection(t);
 			if (icoll != null) {
 				writer.Write((byte)RoughType.Sequence);
 				WriteRoughType(icoll.GetGenericArguments()[0]);
@@ -299,12 +305,20 @@ namespace Yuzu.Binary
 				if (g == typeof(Action<>)) {
 					return WriteAction;
 				}
+				if (g == typeof(Nullable<>)) {
+					var w = GetWriteFunc(t.GetGenericArguments()[0]);
+					return obj => {
+						writer.Write(obj == null);
+						if (obj != null)
+							w(obj);
+					};
+				}
 			}
 			if (t.IsArray) {
 				var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteArray", t);
 				return obj => m.Invoke(this, new object[] { obj });
 			}
-			var icoll = t.GetInterface(typeof(ICollection<>).Name);
+			var icoll = Utils.GetICollection(t);
 			if (icoll != null) {
 				Meta.Get(t, Options); // Check for serializable fields.
 				var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteCollection", icoll);

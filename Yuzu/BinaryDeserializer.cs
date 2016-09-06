@@ -59,6 +59,8 @@ namespace Yuzu.Binary
 			}
 			if (rt == RoughType.Record)
 				return typeof(Record);
+			if (rt == RoughType.Nullable)
+				return typeof(Nullable<>).MakeGenericType(ReadType());
 			throw Error("Unknown rough type {0}", rt);
 		}
 
@@ -77,7 +79,9 @@ namespace Yuzu.Binary
 				var g = expectedType.GetGenericArguments();
 				return ReadCompatibleType(g[0]) && ReadCompatibleType(g[1]);
 			}
-			var icoll = expectedType.GetInterface(typeof(ICollection<>).Name);
+			if (expectedType.IsGenericType && expectedType.GetGenericTypeDefinition() == typeof(Nullable<>))
+				return rt == RoughType.Nullable && ReadCompatibleType(expectedType.GetGenericArguments()[0]);
+			var icoll = Utils.GetICollection(expectedType);
 			if (icoll != null)
 				return rt == RoughType.Sequence && ReadCompatibleType(icoll.GetGenericArguments()[0]);
 			if (rt == RoughType.Record)
@@ -436,16 +440,19 @@ namespace Yuzu.Binary
 					return () => m.Invoke(this, Utils.ZeroObjects);
 				}
 				if (g == typeof(Action<>)) {
-					var p = t.GetGenericArguments();
 					var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadAction", t);
 					return () => m.Invoke(this, Utils.ZeroObjects);
+				}
+				if (g == typeof(Nullable<>)) {
+					var r = ReadValueFunc(t.GetGenericArguments()[0]);
+					return () => Reader.ReadBoolean() ? null : r();
 				}
 			}
 			if (t.IsArray) {
 				var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadArray", t);
 				return () => m.Invoke(this, Utils.ZeroObjects);
 			}
-			var icoll = t.GetInterface(typeof(ICollection<>).Name);
+			var icoll = Utils.GetICollection(t);
 			if (icoll != null) {
 				var elemType = icoll.GetGenericArguments()[0];
 				var m = GetType().GetMethod("ReadCollection", BindingFlags.Instance | BindingFlags.NonPublic).
@@ -469,7 +476,7 @@ namespace Yuzu.Binary
 				var m = Utils.GetPrivateCovariantGenericAll(GetType(), "ReadIntoDictionary", t);
 				return obj => { m.Invoke(this, new object[] { obj }); };
 			}
-			var icoll = t.GetInterface(typeof(ICollection<>).Name);
+			var icoll = Utils.GetICollection(t);
 			if (icoll != null) {
 				var m = Utils.GetPrivateCovariantGeneric(GetType(), "ReadIntoCollection", icoll);
 				return obj => { m.Invoke(this, new object[] { obj }); };

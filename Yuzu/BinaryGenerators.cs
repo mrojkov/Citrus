@@ -29,7 +29,7 @@ namespace Yuzu.Binary
 
 	}
 
-	public class BinaryDeserializerGenerator
+	public class BinaryDeserializerGenerator : IDeserializerGenerator
 	{
 		private CodeWriter cw = new CodeWriter();
 		private string wrapperNameSpace;
@@ -171,6 +171,12 @@ namespace Yuzu.Binary
 				cw.Put("}\n");
 				return;
 			}
+			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>)) {
+				var arg = t.GetGenericArguments()[0];
+				cw.PutPart("d.Reader.ReadBoolean() ? ({0}?)null : ", Utils.GetTypeSpec(arg));
+				GenerateValue(arg, name);
+				return;
+			}
 			if (t.IsArray) {
 				var tempIndexName = PutNullOrCount(t);
 				var tempArrayName = cw.GetTempName();
@@ -183,7 +189,7 @@ namespace Yuzu.Binary
 				cw.Put("}\n"); // if >= 0
 				return;
 			}
-			var icoll = t.GetInterface(typeof(ICollection<>).Name);
+			var icoll = Utils.GetICollection(t);
 			if (icoll != null) {
 				var tempIndexName = PutNullOrCount(t);
 				cw.Put("{0} = new {1}();\n", name, Utils.GetTypeSpec(t));
@@ -209,7 +215,7 @@ namespace Yuzu.Binary
 				cw.Put("}\n");
 				return;
 			}
-			var icoll = t.GetInterface(typeof(ICollection<>).Name);
+			var icoll = Utils.GetICollection(t);
 			if (icoll != null) {
 				GenerateCollection(t, icoll, name, PutCount());
 				cw.Put("}\n");
@@ -268,38 +274,40 @@ namespace Yuzu.Binary
 			return t.Namespace.Replace('.', '_') + "__" + Utils.GetMangledTypeName(t);
 		}
 
-		public void Generate<T>()
+		public void Generate<T>() { Generate(typeof(T)); }
+
+		public void Generate(Type t)
 		{
-			if (typeof(T).IsInterface)
-				throw new YuzuException("Useless BinaryGenerator for interface " + typeof(T).Name);
-			if (typeof(T).IsAbstract)
-				throw new YuzuException("Useless BinaryGenerator for abstract class " + typeof(T).Name);
+			if (t.IsInterface)
+				throw new YuzuException("Useless BinaryGenerator for interface " + t.Name);
+			if (t.IsAbstract)
+				throw new YuzuException("Useless BinaryGenerator for abstract class " + t.Name);
 
-			var meta = Meta.Get(typeof(T), options);
+			var meta = Meta.Get(t, options);
 
-			var readerName = "Read_" + GetMangledTypeNameNS(typeof(T));
-			if (!Utils.IsStruct(typeof(T))) {
+			var readerName = "Read_" + GetMangledTypeNameNS(t);
+			if (!Utils.IsStruct(t)) {
 				cw.Put("private static void {0}(BinaryDeserializer d, ClassDef def, object obj)\n", readerName);
 				cw.Put("{\n");
-				cw.Put("var result = ({0})obj;\n", Utils.GetTypeSpec(typeof(T)));
+				cw.Put("var result = ({0})obj;\n", Utils.GetTypeSpec(t));
 				GenerateReaderBody(meta);
 				cw.Put("}\n");
 				cw.Put("\n");
-				generatedReaders[typeof(T)] = readerName;
+				generatedReaders[t] = readerName;
 			}
 
-			var makerName = "Make_" + GetMangledTypeNameNS(typeof(T));
+			var makerName = "Make_" + GetMangledTypeNameNS(t);
 			cw.Put("private static object {0}(BinaryDeserializer d, ClassDef def)\n", makerName);
 			cw.Put("{\n");
-			cw.Put("var result = new {0}();\n", Utils.GetTypeSpec(typeof(T)));
-			if (Utils.IsStruct(typeof(T)))
+			cw.Put("var result = new {0}();\n", Utils.GetTypeSpec(t));
+			if (Utils.IsStruct(t))
 				GenerateReaderBody(meta);
 			else
 				cw.Put("{0}(d, def, result);\n", readerName);
 			cw.Put("return result;\n");
 			cw.Put("}\n");
 			cw.Put("\n");
-			generatedMakers[typeof(T)] = makerName;
+			generatedMakers[t] = makerName;
 		}
 
 	}

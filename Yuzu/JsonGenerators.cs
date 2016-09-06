@@ -113,7 +113,7 @@ namespace Yuzu.Json
 		}
 	}
 
-	public class JsonDeserializerGenerator : JsonDeserializerGenBase
+	public class JsonDeserializerGenerator : JsonDeserializerGenBase, IDeserializerGenerator
 	{
 		public static new JsonDeserializerGenerator Instance = new JsonDeserializerGenerator();
 
@@ -178,7 +178,7 @@ namespace Yuzu.Json
 
 		private void GenerateMerge(Type t, string name)
 		{
-			var icoll = t.GetInterface(typeof(ICollection<>).Name);
+			var icoll = Utils.GetICollection(t);
 			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
 				cw.Put("Require('{');\n");
 				GenerateDictionary(t, name);
@@ -252,20 +252,32 @@ namespace Yuzu.Json
 				cw.PutPart(JsonOptions.DecimalAsString ? "RequireDecimalAsString();\n" : "RequireDecimal();\n");
 				return;
 			}
-			var icoll = t.GetInterface(typeof(ICollection<>).Name);
 			if (t.IsEnum) {
 				cw.PutPart(
 					JsonOptions.EnumAsString ?
 						"({0})Enum.Parse(typeof({0}), RequireString());\n" :
 						"({0})RequireInt();\n",
 					Utils.GetTypeSpec(t));
+				return;
 			}
-			else if(t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
+			if(t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Dictionary<,>)) {
 				PutRequireOrNull('{', t, name);
 				GenerateDictionary(t, name);
 				cw.Put("}\n");
+				return;
 			}
-			else if (t.IsArray && !JsonOptions.ArrayLengthPrefix) {
+			if (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>)) {
+				cw.PutPart("null;\n");
+				cw.Put("if (SkipSpacesCarefully() == 'n') {\n");
+				cw.Put("Require(\"null\");\n");
+				cw.Put("}\n");
+				cw.Put("else {\n");
+				cw.Put("{0} = ", name);
+				GenerateValue(t.GetGenericArguments()[0], name);
+				cw.Put("}\n");
+				return;
+			}
+			if (t.IsArray && !JsonOptions.ArrayLengthPrefix) {
 				PutRequireOrNullArray('[', t, name);
 				cw.Put("if (SkipSpacesCarefully() == ']') {\n");
 				cw.Put("Require(']');\n");
@@ -282,8 +294,9 @@ namespace Yuzu.Json
 				cw.Put("{0} = {1}.ToArray();\n", name, tempListName);
 				cw.Put("}\n");
 				cw.Put("}\n");
+				return;
 			}
-			else if (t.IsArray && JsonOptions.ArrayLengthPrefix) {
+			if (t.IsArray && JsonOptions.ArrayLengthPrefix) {
 				PutRequireOrNullArray('[', t, name);
 				cw.Put("if (SkipSpacesCarefully() != ']') {\n");
 				var tempArrayName = cw.GetTempName();
@@ -298,18 +311,23 @@ namespace Yuzu.Json
 				cw.Put("}\n");
 				cw.Put("Require(']');\n");
 				cw.Put("}\n");
+				return;
 			}
-			else if (icoll != null) {
+			var icoll = Utils.GetICollection(t);
+			if (icoll != null) {
 				PutRequireOrNull('[', t, name);
 				GenerateCollection(t, icoll, name);
 				cw.Put("}\n");
+				return;
 			}
-			else if (t.IsClass && !t.IsAbstract || Utils.IsStruct(t))
-				cw.PutPart("{0}.Instance.FromReaderTyped<{1}>(Reader);\n", GetDeserializerName(t), Utils.GetTypeSpec(t));
-			else if (t.IsInterface || t.IsAbstract)
-				cw.PutPart("{0}.Instance.FromReaderInterface<{1}>(Reader);\n", GetDeserializerName(t), Utils.GetTypeSpec(t));
-			else
-				throw new NotImplementedException(t.Name);
+			if (t.IsClass || t.IsInterface || Utils.IsStruct(t)) {
+				var fmt = t.IsInterface || t.IsAbstract ?
+					"{0}.Instance.FromReaderInterface<{1}>(Reader);\n" :
+					"{0}.Instance.FromReaderTyped<{1}>(Reader);\n";
+				cw.PutPart(fmt, GetDeserializerName(t), Utils.GetTypeSpec(t));
+				return;
+			}
+			throw new NotImplementedException(t.Name);
 		}
 
 		private void GenAssigns(string name, object obj)
@@ -338,20 +356,22 @@ namespace Yuzu.Json
 				cw.Put("result.{0}();\n", a.Info.Name);
 		}
 
-		public void Generate<T>()
-		{
-			var meta = Meta.Get(typeof(T), Options);
+		public void Generate<T>() { Generate(typeof(T)); }
 
-			if (lastNameSpace != typeof(T).Namespace) {
+		public void Generate(Type t)
+		{
+			var meta = Meta.Get(t, Options);
+
+			if (lastNameSpace != t.Namespace) {
 				if (lastNameSpace != "")
 					cw.Put("}\n");
 				cw.Put("\n");
-				lastNameSpace = typeof(T).Namespace;
+				lastNameSpace = t.Namespace;
 				cw.Put("namespace {0}.{1}\n", wrapperNameSpace, lastNameSpace);
 				cw.Put("{\n");
 			}
 
-			var deserializerName = Utils.GetMangledTypeName(typeof(T)) + "_JsonDeserializer";
+			var deserializerName = Utils.GetMangledTypeName(t) + "_JsonDeserializer";
 			cw.Put("class {0} : JsonDeserializerGenBase\n", deserializerName);
 			cw.Put("{\n");
 
@@ -365,13 +385,13 @@ namespace Yuzu.Json
 			cw.Put("}\n");
 			cw.Put("\n");
 
-			var icoll = typeof(T).GetInterface(typeof(ICollection<>).Name);
-			var typeSpec = Utils.GetTypeSpec(typeof(T));
+			var icoll = Utils.GetICollection(t);
+			var typeSpec = Utils.GetTypeSpec(t);
 			cw.Put("public override object FromReaderInt()\n");
 			cw.Put("{\n");
 			if (icoll != null)
 				cw.Put("return FromReaderInt(new {0}());\n", typeSpec);
-			else if (typeof(T).IsInterface || typeof(T).IsAbstract)
+			else if (t.IsInterface || t.IsAbstract)
 				cw.Put("return FromReaderInterface<{0}>(Reader);\n", typeSpec);
 			else
 				cw.Put("return FromReaderTyped<{0}>(Reader);\n", typeSpec);
@@ -383,7 +403,7 @@ namespace Yuzu.Json
 				cw.Put("{\n");
 				cw.Put("var result = ({0})obj;\n", typeSpec);
 				cw.Put("Require('[');\n");
-				GenerateCollection(typeof(T), icoll, "result");
+				GenerateCollection(t, icoll, "result");
 				cw.Put("return result;\n");
 				cw.Put("}\n");
 				cw.Put("\n");
@@ -391,7 +411,7 @@ namespace Yuzu.Json
 
 			cw.Put("public override object FromReaderIntPartial(string name)\n");
 			cw.Put("{\n");
-			if (typeof(T).IsInterface || typeof(T).IsAbstract)
+			if (t.IsInterface || t.IsAbstract)
 				cw.Put("return null;\n");
 			else
 				cw.Put("return ReadFields(new {0}(), name);\n", typeSpec);

@@ -17,6 +17,9 @@ namespace Yuzu.Json
 		public string Indent = "\t";
 		public string ClassTag = "class";
 
+		private int maxOnelineFields = 0;
+		public int MaxOnelineFields { get { return maxOnelineFields; } set { maxOnelineFields = value; generation++; } }
+
 		private bool enumAsString = false;
 		public bool EnumAsString { get { return enumAsString; } set { enumAsString = value; generation++; } }
 
@@ -84,6 +87,44 @@ namespace Yuzu.Json
 	{
 		public JsonSerializeOptions JsonOptions = new JsonSerializeOptions();
 
+		private int depth = 0;
+
+		private Dictionary<string, byte[]> strCache = new Dictionary<string, byte[]>();
+		private byte[] StrToBytesCached(string s)
+		{
+			byte[] b;
+			if (!strCache.TryGetValue(s, out b)) {
+				b = Encoding.UTF8.GetBytes(s);
+				strCache[s] = b;
+			}
+			return b;
+		}
+
+		private void WriteStr(string s)
+		{
+			writer.Write(Encoding.UTF8.GetBytes(s));
+		}
+
+		private void WriteStrCached(string s)
+		{
+			writer.Write(StrToBytesCached(s));
+		}
+
+		private void WriteFieldSeparator()
+		{
+			if (JsonOptions.FieldSeparator != String.Empty)
+				WriteStrCached(JsonOptions.FieldSeparator);
+		}
+
+		private void WriteIndent()
+		{
+			if (JsonOptions.Indent == String.Empty)
+				return;
+			var b = StrToBytesCached(JsonOptions.Indent);
+			for (int i = 0; i < depth; ++i)
+				writer.Write(b);
+		}
+
 		private void WriteInt(object obj)
 		{
 			WriteStr(obj.ToString());
@@ -111,13 +152,13 @@ namespace Yuzu.Json
 
 		private void WriteEnumAsInt(object obj)
 		{
-			WriteStr(((int)obj).ToString());
+			WriteStrCached(((int)obj).ToString());
 		}
 
 		private void WriteUnescapedString(object obj)
 		{
 			writer.Write('"');
-			writer.Write(Encoding.UTF8.GetBytes(obj.ToString()));
+			WriteStrCached(obj.ToString());
 			writer.Write('"');
 		}
 
@@ -146,7 +187,7 @@ namespace Yuzu.Json
 		private void WriteNullableEscapedString(object obj)
 		{
 			if (obj == null) {
-				WriteStr("null");
+				WriteStrCached("null");
 				return;
 			}
 			WriteEscapedString(obj);
@@ -154,7 +195,7 @@ namespace Yuzu.Json
 
 		private void WriteBool(object obj)
 		{
-			WriteStr((bool)obj ? "true" : "false");
+			WriteStrCached((bool)obj ? "true" : "false");
 		}
 
 		private void WriteDateTime(object obj)
@@ -180,70 +221,95 @@ namespace Yuzu.Json
 		private void WriteCollection<T>(ICollection<T> list)
 		{
 			if (list == null) {
-				WriteStr("null");
+				WriteStrCached("null");
 				return;
 			}
 			var wf = GetWriteFunc(typeof(T));
 			writer.Write('[');
 			if (list.Count > 0) {
-				var isFirst = true;
-				foreach (var elem in list) {
-					if (!isFirst)
-						writer.Write(',');
-					isFirst = false;
-					WriteStr(JsonOptions.FieldSeparator);
-					wf(elem);
+				try {
+					depth += 1;
+					var isFirst = true;
+					foreach (var elem in list) {
+						if (!isFirst)
+							writer.Write(',');
+						isFirst = false;
+						WriteFieldSeparator();
+						WriteIndent();
+						wf(elem);
+					}
+					WriteFieldSeparator();
 				}
-				WriteStr(JsonOptions.FieldSeparator);
+				finally {
+					depth -= 1;
+				}
 			}
+			WriteIndent();
 			writer.Write(']');
 		}
 
 		private void WriteDictionary<K, V>(Dictionary<K, V> dict)
 		{
 			if (dict == null) {
-				WriteStr("null");
+				WriteStrCached("null");
 				return;
 			}
 			var wf = GetWriteFunc(typeof(V));
 			writer.Write('{');
 			if (dict.Count > 0) {
-				WriteStr(JsonOptions.FieldSeparator);
-				var isFirst = true;
-				foreach (var elem in dict) {
-					WriteSep(ref isFirst);
-					WriteStr(JsonOptions.Indent);
-					// TODO: Option to not escape dictionary keys.
-					WriteEscapedString(elem.Key.ToString());
-					writer.Write(':');
-					wf(elem.Value);
+				try {
+					depth += 1;
+					WriteFieldSeparator();
+					var isFirst = true;
+					foreach (var elem in dict) {
+						WriteSep(ref isFirst);
+						WriteIndent();
+						// TODO: Option to not escape dictionary keys.
+						WriteEscapedString(elem.Key.ToString());
+						writer.Write(':');
+						wf(elem.Value);
+					}
+					WriteFieldSeparator();
 				}
-				WriteStr(JsonOptions.FieldSeparator);
+				finally {
+					depth -= 1;
+				}
 			}
+			WriteIndent();
 			writer.Write('}');
 		}
 
 		private void WriteArray<T>(T[] array)
 		{
 			if (array == null) {
-				WriteStr("null");
+				WriteStrCached("null");
 				return;
 			}
 			var wf = GetWriteFunc(typeof(T));
 			writer.Write('[');
 			if (array.Length > 0) {
-				if (JsonOptions.ArrayLengthPrefix)
-					WriteStr(array.Length.ToString());
-				var isFirst = !JsonOptions.ArrayLengthPrefix;
-				foreach (var elem in array) {
-					if (!isFirst)
-						writer.Write(',');
-					isFirst = false;
-					WriteStr(JsonOptions.FieldSeparator);
-					wf(elem);
+				try {
+					depth += 1;
+					if (JsonOptions.ArrayLengthPrefix) {
+						WriteIndent();
+						WriteStr(array.Length.ToString());
+					}
+					var isFirst = !JsonOptions.ArrayLengthPrefix;
+					foreach (var elem in array) {
+						if (!isFirst)
+							writer.Write(',');
+						isFirst = false;
+						WriteFieldSeparator();
+						WriteIndent();
+						wf(elem);
+					}
+					WriteFieldSeparator();
 				}
-				WriteStr(JsonOptions.FieldSeparator);
+				finally {
+					depth -= 1;
+				}
 			}
+			WriteIndent();
 			writer.Write(']');
 		}
 
@@ -264,13 +330,31 @@ namespace Yuzu.Json
 		private void WriteAction(object obj)
 		{
 			if (obj == null) {
-				WriteStr("null");
+				WriteStrCached("null");
 				return;
 			}
 			var a = obj as MulticastDelegate;
 			if (a.Target != objStack.Peek())
 				throw new NotImplementedException();
 			WriteUnescapedString(a.Method.Name);
+		}
+
+		private void WriteNullable(object obj, Action<object> normalWrite)
+		{
+			if (obj == null)
+				WriteStrCached("null");
+			else
+				normalWrite(obj);
+		}
+
+		private bool IsOneline(Meta meta)
+		{
+			if (meta.Items.Count > JsonOptions.MaxOnelineFields)
+				return false;
+			foreach (var yi in meta.Items)
+				if (!yi.Type.IsPrimitive && !yi.Type.IsEnum && yi.Type != typeof(string))
+					return false;
+			return true;
 		}
 
 		private Dictionary<Type, Action<object>> writerCache = new Dictionary<Type, Action<object>>();
@@ -341,20 +425,27 @@ namespace Yuzu.Json
 				if (g == typeof(Action<>)) {
 					return WriteAction;
 				}
+				if (g == typeof(Nullable<>)) {
+					var w = GetWriteFunc(t.GetGenericArguments()[0]);
+					return obj => WriteNullable(obj, w);
+				}
 			}
 			if (t.IsArray) {
 				var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteArray", t);
 				return obj => m.Invoke(this, new object[] { obj });
 			}
-			var icoll = t.GetInterface(typeof(ICollection<>).Name);
+			var icoll = Utils.GetICollection(t);
 			if (icoll != null) {
 				Meta.Get(t, Options); // Check for serializable fields.
 				var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteCollection", icoll);
 				return obj => m.Invoke(this, new object[] { obj });
 			}
 			if (Utils.IsStruct(t) || t.IsClass || t.IsInterface) {
-				var name = Meta.Get(t, Options).IsCompact && !JsonOptions.IgnoreCompact ?
-					"WriteObjectCompact" : "WriteObject";
+				var meta = Meta.Get(t, Options);
+				var name =
+					!meta.IsCompact || JsonOptions.IgnoreCompact ? "WriteObject" :
+					IsOneline(meta) ? "WriteObjectCompactOneline" :
+					"WriteObjectCompact";
 				var m = Utils.GetPrivateGeneric(GetType(), name, t);
 				return (Action<object>)Delegate.CreateDelegate(typeof(Action<object>), this, m);
 			}
@@ -365,7 +456,7 @@ namespace Yuzu.Json
 		{
 			if (!isFirst) {
 				writer.Write(',');
-				WriteStr(JsonOptions.FieldSeparator);
+				WriteFieldSeparator();
 			}
 			isFirst = false;
 		}
@@ -373,7 +464,7 @@ namespace Yuzu.Json
 		private void WriteName(string name, ref bool isFirst)
 		{
 			WriteSep(ref isFirst);
-			WriteStr(JsonOptions.Indent);
+			WriteIndent();
 			WriteUnescapedString(name);
 			writer.Write(':');
 		}
@@ -381,19 +472,20 @@ namespace Yuzu.Json
 		private void WriteObject<T>(object obj)
 		{
 			if (obj == null) {
-				WriteStr("null");
+				WriteStrCached("null");
 				return;
 			}
 			writer.Write('{');
-			WriteStr(JsonOptions.FieldSeparator);
-			var isFirst = true;
-			var actualType = obj.GetType();
-			if (typeof(T) != actualType || objStack.Count == 0 && JsonOptions.SaveRootClass) {
-				WriteName(JsonOptions.ClassTag, ref isFirst);
-				WriteUnescapedString(TypeSerializer.Serialize(actualType));
-			}
+			WriteFieldSeparator();
 			objStack.Push(obj);
 			try {
+				depth += 1;
+				var isFirst = true;
+				var actualType = obj.GetType();
+				if (typeof(T) != actualType || objStack.Count == 1 && JsonOptions.SaveRootClass) {
+					WriteName(JsonOptions.ClassTag, ref isFirst);
+					WriteUnescapedString(TypeSerializer.Serialize(actualType));
+				}
 				foreach (var yi in Meta.Get(actualType, Options).Items) {
 					var value = yi.GetValue(obj);
 					if (yi.SerializeIf != null && !yi.SerializeIf(obj, value))
@@ -401,23 +493,56 @@ namespace Yuzu.Json
 					WriteName(yi.Tag(Options), ref isFirst);
 					GetWriteFunc(yi.Type)(value);
 				}
+				if (!isFirst)
+					WriteFieldSeparator();
 			}
 			finally {
+				depth -= 1;
 				objStack.Pop();
 			}
-			if (!isFirst)
-				WriteStr(JsonOptions.FieldSeparator);
+			WriteIndent();
 			writer.Write('}');
 		}
 
 		private void WriteObjectCompact<T>(object obj)
 		{
 			if (obj == null) {
-				WriteStr("null");
+				WriteStrCached("null");
 				return;
 			}
 			writer.Write('[');
-			WriteStr(JsonOptions.FieldSeparator);
+			WriteFieldSeparator();
+			var isFirst = true;
+			var actualType = obj.GetType();
+			if (typeof(T) != actualType)
+				throw new YuzuException(String.Format(
+					"Attempt to write compact type {0} instead of {1}", actualType.Name, typeof(T).Name));
+			objStack.Push(obj);
+			try {
+				depth += 1;
+				foreach (var yi in Meta.Get(actualType, Options).Items) {
+					WriteSep(ref isFirst);
+					WriteIndent();
+					GetWriteFunc(yi.Type)(yi.GetValue(obj));
+				}
+			}
+			finally {
+				depth -= 1;
+				objStack.Pop();
+			};
+			if (!isFirst)
+				WriteFieldSeparator();
+			WriteIndent();
+			writer.Write(']');
+		}
+
+		private void WriteObjectCompactOneline<T>(object obj)
+		{
+			if (obj == null) {
+				WriteStrCached("null");
+				return;
+			}
+			writer.Write('[');
 			var isFirst = true;
 			var actualType = obj.GetType();
 			if (typeof(T) != actualType)
@@ -426,15 +551,15 @@ namespace Yuzu.Json
 			objStack.Push(obj);
 			try {
 				foreach (var yi in Meta.Get(actualType, Options).Items) {
-					WriteSep(ref isFirst);
+					if (!isFirst)
+						writer.Write(',');
+					isFirst = false;
 					GetWriteFunc(yi.Type)(yi.GetValue(obj));
 				}
 			}
 			finally {
 				objStack.Pop();
 			};
-			if (!isFirst)
-				WriteStr(JsonOptions.FieldSeparator);
 			writer.Write(']');
 		}
 

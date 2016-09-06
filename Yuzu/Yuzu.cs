@@ -186,11 +186,6 @@ namespace Yuzu
 			ToWriter(obj);
 		}
 
-		protected void WriteStr(string s)
-		{
-			writer.Write(Encoding.UTF8.GetBytes(s));
-		}
-
 		public override string ToString(object obj)
 		{
 			var ms = new MemoryStream();
@@ -261,6 +256,14 @@ namespace Yuzu
 		public abstract T FromString<T>(string source);
 		public abstract T FromStream<T>(Stream source);
 		public abstract T FromBytes<T>(byte[] bytes);
+	}
 
+	public interface IDeserializerGenerator
+	{
+		StreamWriter GenWriter { get; set; }
+		void GenerateHeader();
+		void GenerateFooter();
+		void Generate<T>();
+		void Generate(Type t);
 	}
 }

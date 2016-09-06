@@ -48,6 +48,16 @@ namespace Yuzu.Util
 			return t.IsValueType && !t.IsPrimitive && !t.IsEnum && !t.IsPointer;
 		}
 
+		public static Type GetICollection(Type t)
+		{
+			try {
+				return t.GetInterface("ICollection`1");
+			}
+			catch (AmbiguousMatchException) {
+				throw new YuzuException("Multiple ICollection interfaces for type " + t.Name);
+			}
+		}
+
 		public static MethodInfo GetPrivateGeneric(Type callerType, string name, Type parameter)
 		{
 			return callerType.GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic).
