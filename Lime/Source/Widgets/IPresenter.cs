@@ -91,8 +91,8 @@ namespace Lime
 
 	public class WidgetBoundsPresenter : CustomPresenter
 	{
-		public readonly Color4 Color;
-		public readonly float Thickness;
+		public Color4 Color { get; set; }
+		public float Thickness { get; set; }
 
 		public WidgetBoundsPresenter(Color4 color, float thickness = 0)
 		{
@@ -105,13 +105,13 @@ namespace Lime
 			var widget = node.AsWidget;
 			widget.PrepareRendererState();
 			var t = Thickness > 0 ? Thickness : 1 / CommonWindow.Current.PixelScale;
-			Renderer.DrawRectOutline(Vector2.Zero, node.AsWidget.Size, Color * widget.GlobalColor, t);
+			Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Color * widget.GlobalColor, t);
 		}
 	}
 
 	public class WidgetFlatFillPresenter : CustomPresenter
 	{
-		public readonly Color4 Color;
+		public Color4 Color { get; set; }
 
 		public WidgetFlatFillPresenter(Color4 color)
 		{
