@@ -21,6 +21,12 @@ namespace Lime
 			get { return SerializationStackKeeper.stack ?? (SerializationStackKeeper.stack = new Stack<string>()); }
 		}
 
+		public delegate AbstractDeserializer DeserializerBuilder(string path, Stream stream);
+
+		public static readonly List<DeserializerBuilder> DeserializerBuilders = new List<DeserializerBuilder> {
+			(path, stream) => new Yuzu.Json.JsonDeserializer { JsonOptions = defaultYuzuJSONOptions, Options = defaultYuzuCommonOptions }
+		};
+
 		public static string ShrinkPath(string path)
 		{
 			if (SerializationPathStack.Count == 0) {
@@ -105,12 +111,15 @@ namespace Lime
 			stream = ms;
 			SerializationPathStack.Push(path);
 			try {
-				Yuzu.Deserializer.AbstractReaderDeserializer yd = null;
+				AbstractDeserializer yd = null;
 				if (CheckYuzuBinarySignature(stream)) {
 					yd = new GeneratedDeserializersBIN.BinaryDeserializerGen  { Options = defaultYuzuCommonOptions };
 				} else {
-					yd = new Yuzu.Json.JsonDeserializer { JsonOptions = defaultYuzuJSONOptions,
-						Options = defaultYuzuCommonOptions};
+					foreach (var d in DeserializerBuilders) {
+						yd = d(path, stream);
+						if (yd != null)
+							break;
+					}
 				}
 				var bd = yd as BinaryDeserializer;
 				if (obj == null) {
@@ -131,13 +140,13 @@ namespace Lime
 			}
 		}
 
-		public static T ReadObject<T>(string path, object obj = null) where T : new()
+		public static T ReadObject<T>(string path, object obj = null)
 		{
 			using (Stream stream = AssetsBundle.Instance.OpenFileLocalized(path))
 				return ReadObject<T>(path, stream, obj);
 		}
 
-		public static T ReadObjectFromFile<T>(string path, object obj = null) where T : new()
+		public static T ReadObjectFromFile<T>(string path, object obj = null)
 		{
 			using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
 				return ReadObject<T>(path, stream, obj);

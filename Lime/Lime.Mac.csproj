@@ -56,10 +56,6 @@
     <Reference Include="Xamarin.Mac" />
     <Reference Include="System.Core" />
     <Reference Include="OpenTK" />
-    <Reference Include="System.Xml" />
-    <Reference Include="protobuf-net">
-      <HintPath>..\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
-    </Reference>
     <Reference Include="Lzma">
       <HintPath>..\3rdParty\Lzma\bin\Release\Lzma.dll</HintPath>
     </Reference>
@@ -103,7 +99,6 @@
     <Compile Include="Source\Localization\Localization.cs" />
     <Compile Include="Source\Localization\LocalizationDictionary.cs" />
     <Compile Include="Source\Localization\LocalizationDictionaryTextSerializer.cs" />
-    <Compile Include="Source\Localization\LocalizationDictionaryXmlSerializer.cs" />
     <Compile Include="Source\Widgets\Text\TextParser.cs" />
     <Compile Include="Source\Widgets\Text\TextRenderer.cs" />
     <Compile Include="Source\Graphics\TextureAtlasElement.cs" />
@@ -270,6 +265,7 @@
     <Compile Include="Source\Application\Menu\Command.cs" />
     <Compile Include="Source\Widgets\TabBar.cs" />
     <Compile Include="Source\Widgets\BorderedFrame.cs" />
+    <Compile Include="Source\GeneratedDeserializersBIN.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
@@ -346,8 +342,8 @@
     <MonoDevelop>
       <Properties>
         <Policies>
-          <TextStylePolicy TabsToSpaces="False" inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp" />
-          <CSharpFormattingPolicy inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
+          <TextStylePolicy FileWidth="80" TabWidth="4" IndentWidth="4" RemoveTrailingWhitespace="True" NoTabsAfterNonTabs="False" EolMarker="Native" TabsToSpaces="False" inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/x-csharp" />
+          <CSharpFormattingPolicy IndentBlock="True" IndentBraces="False" IndentSwitchSection="False" IndentSwitchCaseSection="True" LabelPositioning="OneLess" NewLinesForBracesInTypes="True" NewLinesForBracesInMethods="True" NewLinesForBracesInProperties="False" NewLinesForBracesInAccessors="False" NewLinesForBracesInAnonymousMethods="False" NewLinesForBracesInControlBlocks="False" NewLinesForBracesInAnonymousTypes="False" NewLinesForBracesInObjectCollectionArrayInitializers="False" NewLinesForBracesInLambdaExpressionBody="False" NewLineForElse="False" NewLineForCatch="False" NewLineForFinally="False" NewLineForMembersInObjectInit="False" NewLineForMembersInAnonymousTypes="False" NewLineForClausesInQuery="False" SpacingAfterMethodDeclarationName="True" SpaceWithinMethodDeclarationParenthesis="False" SpaceBetweenEmptyMethodDeclarationParentheses="False" SpaceAfterMethodCallName="True" SpaceWithinMethodCallParentheses="False" SpaceBetweenEmptyMethodCallParentheses="False" SpaceAfterControlFlowStatementKeyword="True" SpaceWithinExpressionParentheses="False" SpaceWithinCastParentheses="False" SpaceWithinOtherParentheses="False" SpaceAfterCast="False" SpacesIgnoreAroundVariableDeclaration="False" SpaceBeforeOpenSquareBracket="True" SpaceBetweenEmptySquareBrackets="False" SpaceWithinSquareBrackets="False" SpaceAfterColonInBaseTypeDeclaration="True" SpaceAfterComma="True" SpaceAfterDot="False" SpaceAfterSemicolonsInForStatement="True" SpaceBeforeColonInBaseTypeDeclaration="True" SpaceBeforeComma="False" SpaceBeforeDot="False" SpaceBeforeSemicolonsInForStatement="False" SpacingAroundBinaryOperator="Single" WrappingPreserveSingleLine="True" WrappingKeepStatementsOnSingleLine="True" PlaceSystemDirectiveFirst="True" inheritsSet="Mono" inheritsScope="text/x-csharp" scope="text/x-csharp" />
         </Policies>
       </Properties>
     </MonoDevelop>
@@ -379,6 +375,10 @@
     <ProjectReference Include="..\Lemon\Lemon.Mac.csproj">
       <Project>{BB697671-700C-455D-B8EE-66A6B122B949}</Project>
       <Name>Lemon.Mac</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Yuzu\Yuzu.Mac.csproj">
+      <Project>{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}</Project>
+      <Name>Yuzu.Mac</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>
