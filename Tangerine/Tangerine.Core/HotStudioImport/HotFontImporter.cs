@@ -5,6 +5,31 @@ using System.Collections.Generic;
 
 namespace Orange
 {
+	public class HotFontDeserializer : Yuzu.Deserializer.AbstractReaderDeserializer
+	{
+		Stream stream;
+
+		public HotFontDeserializer(Stream stream)
+		{
+			this.stream = stream;
+		}
+
+		public override object FromReaderInt()
+		{
+			return new Orange.HotFontImporter().ParseFont(stream);
+		}
+
+		public override object FromReaderInt(object obj)
+		{
+			return new Orange.HotFontImporter().ParseFont(stream);
+		}
+
+		public override T FromReaderInt<T>()
+		{
+			return (T)(object)new Orange.HotFontImporter().ParseFont(stream);
+		}
+	}
+
 	public partial class HotFontImporter
 	{
 		HotLexer lexer;
@@ -117,9 +142,9 @@ namespace Orange
 			}
 		}
 
-		public Font ParseFont(Stream stream)
+		public Font ParseFont(Stream stream, Font font = null)
 		{
-			var path = Serialization.GetCurrentOperation().SerializationPath;
+			var path = Serialization.GetCurrentSerializationPath();
 			this.textureSize = GetTextureSize(path);
 			using(var reader = new StreamReader(stream)) {
 				string text = reader.ReadToEnd();
@@ -128,7 +153,9 @@ namespace Orange
 			var type = lexer.ParseQuotedString();
 			if (type != "Hot::Font")
 				throw new Exception("Unknown type of object '{0}'", type);
-			var font = new Font();
+			if (font == null) {
+				font = new Font();
+			}
 			AddFontTextures(font, path);
 			lexer.ParseToken('{');
 			while (lexer.PeekChar() != '}')

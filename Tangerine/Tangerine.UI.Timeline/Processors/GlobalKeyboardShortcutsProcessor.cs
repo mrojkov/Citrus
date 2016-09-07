@@ -20,10 +20,12 @@ namespace Tangerine.UI.Timeline
 		public IEnumerator<object> Loop()
 		{
 			while (true) {
-				HandleShortcuts(input);
-				HorizontalScroll(input);
-				VerticalScroll(input);
-				HandleEnterExit(input);
+				if (Document.Current != null) {
+					HandleShortcuts(input);
+					HorizontalScroll(input);
+					VerticalScroll(input);
+					HandleEnterExit(input);
+				}
 				yield return Task.WaitForInput();
 			}
 		}

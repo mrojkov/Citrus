@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using ProtoBuf;
+using Yuzu;
 using Lime;
 using Tangerine.Core;
 
@@ -48,7 +48,7 @@ namespace Tangerine.UI.Inspector
 					// WTF, Bug in Mono?
 					continue;
 				}
-				if (PropertyAttributes<ProtoMemberAttribute>.Get(type, property.Name) == null)
+				if (PropertyAttributes<YuzuField>.Get(type, property.Name) == null)
 					continue;
 				if (!categoryLabelAdded) {
 					categoryLabelAdded = true;

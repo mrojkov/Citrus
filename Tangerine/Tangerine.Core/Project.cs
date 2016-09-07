@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.IO;
 using System.Collections.Generic;
-using ProtoBuf;
+using Yuzu;
 using Lime;
 
 namespace Tangerine.Core
@@ -73,7 +73,7 @@ namespace Tangerine.Core
 				}
 				userprefs.Documents.Add(doc.Path);
 			}
-			Serialization.WriteObjectToFile(UserprefsPath, userprefs);
+			Serialization.WriteObjectToFile(UserprefsPath, userprefs, Serialization.Format.JSON);
 			AssetsBundle.Instance = null;
 			Current = Null;
 			return true;

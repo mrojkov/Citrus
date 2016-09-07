@@ -4,7 +4,7 @@ using System.Linq;
 using Tangerine.Core;
 using System.Collections.Generic;
 using System.Reflection;
-using ProtoBuf;
+using Yuzu;
 
 namespace Tangerine.UI.Inspector
 {

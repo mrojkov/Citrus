@@ -61,9 +61,6 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.Mac" />
-    <Reference Include="protobuf-net">
-      <HintPath>..\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
-    </Reference>
     <Reference Include="Lzma">
       <HintPath>..\3rdParty\Lzma\bin\Release\Lzma.dll</HintPath>
     </Reference>
@@ -125,6 +122,10 @@
     <ProjectReference Include="Tangerine.UI.SceneView\Tangerine.UI.SceneView.csproj">
       <Project>{80486551-A659-42B0-AADA-165C54E9B0AF}</Project>
       <Name>Tangerine.UI.SceneView</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Yuzu\Yuzu.Mac.csproj">
+      <Project>{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}</Project>
+      <Name>Yuzu.Mac</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

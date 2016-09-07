@@ -1,5 +1,5 @@
-using System;
 using System.IO;
+using System;
 using Lime;
 using System.Collections.Generic;
 using Exception = Lime.Exception;
@@ -14,6 +14,31 @@ namespace Orange
 		{
 			var ctr = ImporterClass.GetConstructor(new System.Type[] { typeof(string) });
 			return ctr.Invoke(new object[] { srcPath }) as HotSceneImporter;
+		}
+	}
+
+	public class HotSceneDeserializer : Yuzu.Deserializer.AbstractReaderDeserializer
+	{
+		Stream stream;
+
+		public HotSceneDeserializer(Stream stream)
+		{
+			this.stream = stream;
+		}
+
+		public override object FromReaderInt()
+		{
+			throw new System.NotImplementedException();
+		}
+
+		public override object FromReaderInt(object obj)
+		{
+			return new Orange.HotSceneImporter(stream).ParseNode(obj as Node);
+		}
+
+		public override T FromReaderInt<T>()
+		{
+			return (T)(object)new Orange.HotSceneImporter(stream).ParseNode(null);
 		}
 	}
 

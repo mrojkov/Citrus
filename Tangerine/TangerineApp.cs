@@ -2,7 +2,7 @@
 using System.Linq;
 using Lime;
 using Tangerine.Core;
-using ProtoBuf;
+using Yuzu;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using Tangerine.UI;
@@ -36,27 +36,12 @@ namespace Tangerine
 
 		public Menu PadsMenu { get; private set; }
 
-		class Deserializer : Serialization.IDeserializer
-		{
-			public object Deserialize(System.IO.Stream stream, object value, Type type)
-			{
-				if (type == typeof(Frame)) {
-					return new Orange.HotSceneImporter(stream).ParseNode(value as Node);
-				} else if (type == typeof(Font)) {
-					return new Orange.HotFontImporter().ParseFont(stream);
-				} else {
-					return new Serialization.ProtoBufDeserializer(Serialization.ProtoBufTypeModel).Deserialize(stream, value, type);
-				}
-			}
-		}
-
 		private TangerineApp()
 		{
 			WindowOptions.DefaultRefreshRate = 30;
 			WidgetInput.CompatibilityModeByDefault = false;
 			Application.IsTangerine = true;
-			Lime.Serialization.Deserializer = new Deserializer();
-
+			Lime.Serialization.DeserializerBuilders.Insert(0, DeserializeHotStudioAssets);
 			Widget.DefaultWidgetSize = Vector2.Zero;
 			CreateMainMenu();
 			Theme.Current = new DesktopTheme();
@@ -112,6 +97,16 @@ namespace Tangerine
 			if (proj != null) {
 				new Project(proj).Open();
 			}
+		}
+
+		Yuzu.AbstractDeserializer DeserializeHotStudioAssets(string path, System.IO.Stream stream)
+		{
+			if (path.EndsWith(".scene", StringComparison.CurrentCultureIgnoreCase)) {
+				return new Orange.HotSceneDeserializer(stream); 
+			} else if (path.EndsWith(".fnt", StringComparison.CurrentCultureIgnoreCase)) {
+				return new Orange.HotFontDeserializer(stream); 
+			}
+			return null;
 		}
 
 		private static void InvalidateWindows()

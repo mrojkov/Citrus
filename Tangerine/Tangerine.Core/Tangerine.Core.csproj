@@ -50,9 +50,6 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.Mac" />
-    <Reference Include="protobuf-net">
-      <HintPath>..\..\3rdParty\ProtoBuf-Net\Mono\protobuf-net.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -82,6 +79,10 @@
     <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">
       <Project>{DC16EEBF-404D-4610-B87A-15B57464D707}</Project>
       <Name>Lime.Mac</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Yuzu\Yuzu.Mac.csproj">
+      <Project>{5F16D8E4-A0F1-4341-83A0-3897FC44EBB8}</Project>
+      <Name>Yuzu.Mac</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using Lime;
-using ProtoBuf;
+using Yuzu;
 using System.Collections.Generic;
 
 namespace Tangerine.UI
@@ -28,9 +28,10 @@ namespace Tangerine.UI
 				throw new InvalidOperationException();
 			}
 			Instance = new UserPreferences();
+			Instance.Load();
 		}
 
-		private UserPreferences()
+		public void Load()
 		{
 			if (System.IO.File.Exists(GetPath())) {
 				try {
@@ -43,7 +44,7 @@ namespace Tangerine.UI
 
 		public void Save()
 		{
-			Serialization.WriteObjectToFile(GetPath(), this);
+			Serialization.WriteObjectToFile(GetPath(), this, Serialization.Format.JSON);
 		}
 
 		public static string GetPath()
