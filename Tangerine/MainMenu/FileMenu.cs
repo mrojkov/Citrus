@@ -10,7 +10,7 @@ namespace Tangerine
 		public OpenProjectCommand()
 		{
 			Text = "Open Project...";
-			Shortcut = KeyBindings.Generic.OpenProject;
+			Shortcut = KeyBindings.GenericKeys.OpenProject;
 		}
 
 		public override void Execute()
@@ -33,7 +33,7 @@ namespace Tangerine
 		public OpenFileCommand()
 		{
 			Text = "Open File...";
-			Shortcut = KeyBindings.Generic.OpenFile;
+			Shortcut = KeyBindings.GenericKeys.OpenFile;
 		}
 
 		public override void Execute()
@@ -61,7 +61,7 @@ namespace Tangerine
 		public CloseDocumentCommand()
 		{
 			Text = "Close Document";
-			Shortcut = KeyBindings.Generic.CloseDocument;
+			Shortcut = KeyBindings.GenericKeys.CloseDocument;
 		}
 
 		public override void Execute()

@@ -22,7 +22,6 @@ namespace Tangerine.UI
 		{
 			Title = title;
 			TitleWidget = new Widget {
-				Id = $"DockPanel<{title}>",
 				Layout = new HBoxLayout(),
 				Nodes = {
 					new SimpleText { Text = Title, Padding = new Thickness(4, 0), AutoSizeConstraints = false, MinMaxHeight = 20 },
@@ -30,8 +29,9 @@ namespace Tangerine.UI
 				},
 				HitTestTarget = true
 			};
-			ContentWidget = new Frame { ClipChildren = ClipMethod.ScissorTest, Layout = new StackLayout() };
+			ContentWidget = new Frame { Id = "PanelContent", ClipChildren = ClipMethod.ScissorTest, Layout = new StackLayout() };
 			RootWidget = new Widget {
+				Id = $"DockPanel<{title}>",
 				LayoutCell = new LayoutCell(),
 				Layout = new VBoxLayout(),
 				Nodes = {

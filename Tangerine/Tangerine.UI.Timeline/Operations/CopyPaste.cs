@@ -39,8 +39,7 @@ namespace Tangerine.UI.Timeline.Operations
 				foreach (var node in Timeline.Clipboard.Nodes) {
 					var clone = node.Clone();
 					Core.Operations.InsertNode.Perform(Document.Current.Container, insertionIndex++, clone);
-					var row = Timeline.Instance.GetCachedRow(clone.EditorState().Uid);
-					Operations.SelectRow.Perform(row);
+					Operations.SelectNode.Perform(clone);
 				}
 			}
 		}

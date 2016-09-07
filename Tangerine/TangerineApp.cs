@@ -14,7 +14,7 @@ namespace Tangerine
 		public PreferencesCommand()
 		{
 			Text = "Preferences...";
-			Shortcut = KeyBindings.Generic.PreferencesDialog;
+			Shortcut = KeyBindings.GenericKeys.PreferencesDialog;
 		}
 
 		public override void Execute()
@@ -63,7 +63,8 @@ namespace Tangerine
 			LoadFont();
 
 			DockManager.Initialize(new Vector2(1024, 768), PadsMenu);
-			DockManager.Instance.DockPanelAdded += SetupKeyboardShortcutsForDockPanel;
+			DockManager.Instance.DockPanelAdded += panel => AddKeyboardShortcutsProcessors(panel.RootWidget);
+			AddKeyboardShortcutsProcessors(DockManager.Instance.DocumentArea);
 
 			Application.Exiting += () => Project.Current.Close();
 			Application.Exited += () => {
@@ -102,13 +103,10 @@ namespace Tangerine
 						new UI.Console(consolePanel.ContentWidget),
 						new UI.SearchPanel(searchPanel.ContentWidget),
 					});
-					doc.History.Changed += () => {
-						foreach (var window in Application.Windows) {
-							window.Invalidate();
-						}
-					};
+					doc.History.Changed += InvalidateWindows;
 				}
 				RefreshExternalContent(doc.RootNode);
+				InvalidateWindows();
 			};
 			var proj = UserPreferences.Instance.RecentProjects.FirstOrDefault();
 			if (proj != null) {
@@ -116,10 +114,17 @@ namespace Tangerine
 			}
 		}
 
-		private void SetupKeyboardShortcutsForDockPanel(DockPanel panel)
+		private static void InvalidateWindows()
 		{
-			var widget = panel.RootWidget;
-			widget.LateTasks.Add(new UI.Timeline.GlobalKeyboardShortcutsProcessor(widget.Input));
+			foreach (var window in Application.Windows) {
+				window.Invalidate();
+			}
+		}
+
+		private void AddKeyboardShortcutsProcessors(Widget panel)
+		{
+			panel.LateTasks.Add(new UI.Timeline.GlobalKeyboardShortcutsProcessor(panel.Input));
+			panel.LateTasks.Add(new UI.SceneView.ExpositionProcessor(panel.Input));
 		}
 
 		private static void RefreshExternalContent(Node node)
@@ -159,6 +164,8 @@ namespace Tangerine
 			docArea.Layout = new VBoxLayout();
 			docArea.AddNode(tabBar);
 			docArea.AddNode(documentViewContainer);
+			docArea.FocusScope = new KeyboardFocusScope(docArea);
+			docArea.LateTasks.Add(new UI.Timeline.GlobalKeyboardShortcutsProcessor(docArea.Input));
 			return documentViewContainer;
 		}
 

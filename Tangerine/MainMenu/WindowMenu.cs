@@ -10,7 +10,7 @@ namespace Tangerine
 		public NextDocumentCommand()
 		{
 			Text = "Next Document";
-			Shortcut = KeyBindings.Generic.NextDocument;
+			Shortcut = KeyBindings.GenericKeys.NextDocument;
 		}
 
 		public override void Execute()
@@ -24,7 +24,7 @@ namespace Tangerine
 		public PreviousDocumentCommand()
 		{
 			Text = "Previous Document";
-			Shortcut = KeyBindings.Generic.PreviousDocument;
+			Shortcut = KeyBindings.GenericKeys.PreviousDocument;
 		}
 
 		public override void Execute()

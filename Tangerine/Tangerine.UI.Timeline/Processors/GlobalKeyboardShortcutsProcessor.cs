@@ -60,25 +60,25 @@ namespace Tangerine.UI.Timeline
 		void HandleEnterExit(WidgetInput input)
 		{
 			var doc = Document.Current;
-			if (input.ConsumeKeyRepeat(KeyBindings.Timeline.EnterNode)) {
+			if (input.ConsumeKeyRepeat(KeyBindings.TimelineKeys.EnterNode)) {
 				var node = timeline.SelectedRows.Select(i => i.Components.Get<Components.NodeRow>()).FirstOrDefault(i => i != null)?.Node;
 				if (node != null) {
 					Operations.EnterNode.Perform(node);
 				}
-			} else if (input.ConsumeKeyRepeat(KeyBindings.Timeline.ExitNode)) {
+			} else if (input.ConsumeKeyRepeat(KeyBindings.TimelineKeys.ExitNode)) {
 				Operations.LeaveNode.Perform();
 			}
 		}
 		
 		void VerticalScroll(WidgetInput input)
 		{
-			if (input.ConsumeKeyRepeat(KeyBindings.Timeline.ScrollUp)) {
+			if (input.ConsumeKeyRepeat(KeyBindings.TimelineKeys.ScrollUp)) {
 				SelectRow(-1, false);
-			} else if (input.ConsumeKeyRepeat(KeyBindings.Timeline.ScrollDown)) {
+			} else if (input.ConsumeKeyRepeat(KeyBindings.TimelineKeys.ScrollDown)) {
 				SelectRow(1, false);
-			} else if (input.ConsumeKeyRepeat(KeyBindings.Timeline.SelectUp)) {
+			} else if (input.ConsumeKeyRepeat(KeyBindings.TimelineKeys.SelectUp)) {
 				SelectRow(-1, true);
-			} else if (input.ConsumeKeyRepeat(KeyBindings.Timeline.SelectDown)) {
+			} else if (input.ConsumeKeyRepeat(KeyBindings.TimelineKeys.SelectDown)) {
 				SelectRow(1, true);
 			}
 		}
@@ -106,13 +106,13 @@ namespace Tangerine.UI.Timeline
 		void HorizontalScroll(WidgetInput input)
 		{
 			int stride = 0;
-			if (input.ConsumeKeyRepeat(KeyBindings.Timeline.FastScrollLeft)) {
+			if (input.ConsumeKeyRepeat(KeyBindings.TimelineKeys.FastScrollLeft)) {
 				stride = -10;
-			} else if (input.ConsumeKeyRepeat(KeyBindings.Timeline.FastScrollRight)) {
+			} else if (input.ConsumeKeyRepeat(KeyBindings.TimelineKeys.FastScrollRight)) {
 				stride = 10;
-			} else if (input.ConsumeKeyRepeat(KeyBindings.Timeline.ScrollRight)) {
+			} else if (input.ConsumeKeyRepeat(KeyBindings.TimelineKeys.ScrollRight)) {
 				stride = 1;
-			} else if (input.ConsumeKeyRepeat(KeyBindings.Timeline.ScrollLeft)) {
+			} else if (input.ConsumeKeyRepeat(KeyBindings.TimelineKeys.ScrollLeft)) {
 				stride = -1;
 			}
 			if (stride != 0) {

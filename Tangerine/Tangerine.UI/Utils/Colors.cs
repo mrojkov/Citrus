@@ -21,6 +21,16 @@ namespace Tangerine.UI
 			public static readonly ColorGradient Background = new ColorGradient(Color4.White, Color4.White.Darken(0.2f));
 		}
 
+		public static class SceneView
+		{
+			public static readonly Color4 SelectedWidgetBorder = Color4.Green;
+			public static readonly Color4 LockedWidgetBorder = Color4.FromFloats(0, 1, 1);
+			public static readonly Color4 ExposedItemInactiveBorder = Color4.Gray;
+			public static readonly Color4 ExposedItemActiveBorder = Color4.White;
+			public static readonly Color4 ExposedItemSelectedBorder = SelectedWidgetBorder;
+			public static readonly Color4 Label = Color4.Green;
+		}
+
 		public static class Timeline
 		{
 			public static class Grid
@@ -49,11 +59,13 @@ namespace Tangerine.UI
 				public static readonly Color4 Lines = Grid.Lines;
 			}
 		}
+
 		public static class Docking
 		{
 			public static readonly Color4 DragRectagleOutline = Color4.FromFloats(0.2f, 0.2f, 1f);
 			public static readonly Color4 PanelBorder = Color4.White.Darken(0.75f);
 		}
+
 		public static class Inspector
 		{
 			public static readonly Color4 BorderAroundKeyframeColorbox = DesktopTheme.Colors.ControlBorder;

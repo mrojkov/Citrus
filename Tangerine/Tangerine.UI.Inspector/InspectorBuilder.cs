@@ -52,10 +52,15 @@ namespace Tangerine.UI.Inspector
 					continue;
 				if (!categoryLabelAdded) {
 					categoryLabelAdded = true;
-					var label = new SimpleText {
-						Text = type.Name,
-						AutoSizeConstraints = false,
-						LayoutCell = new LayoutCell { StretchY = 0 }
+					var label = new Widget {
+						LayoutCell = new LayoutCell { StretchY = 0 },
+						Layout = new StackLayout(),
+						Nodes = {
+							new SimpleText {
+								Text = type.Name,
+								AutoSizeConstraints = false,
+							}
+						}
 					};
 					label.CompoundPresenter.Add(new WidgetFlatFillPresenter(Colors.Inspector.CategoryLabelBackground));
 					Inspector.ScrollableWidget.AddNode(label);

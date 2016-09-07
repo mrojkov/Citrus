@@ -50,4 +50,13 @@ namespace Tangerine.UI.Timeline.Operations
 			}
 		}
 	}
+
+	public class SelectNode
+	{
+		public static void Perform(Node node, bool select = true)
+		{
+			var row = Timeline.Instance.GetCachedRow(node.EditorState().Uid);
+			SelectRow.Perform(row, select);
+		}
+	}
 }

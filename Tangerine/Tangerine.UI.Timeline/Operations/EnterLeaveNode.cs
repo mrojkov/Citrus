@@ -36,8 +36,7 @@ namespace Tangerine.UI.Timeline.Operations
 			DelegateOperation.Perform(() => SetContainer(container), () => SetContainer(prevContainer));
 			ClearRowSelection.Perform();
 			if (container.Nodes.Count > 0) {
-				var r = Timeline.Instance.GetCachedRow(container.Nodes[0].EditorState().Uid);
-				SelectRow.Perform(r);
+				SelectNode.Perform(container);
 			}
 		}
 

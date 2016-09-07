@@ -27,7 +27,7 @@ namespace Tangerine.Core
 		public void Perform(IOperation operation)
 		{
 			operation.Timestamp = DateTime.UtcNow;
-			Lime.Logger.Write(operation.ToString());
+			// Lime.Logger.Write(operation.ToString());
 			operations.RemoveRange(undoPosition, operations.Count - undoPosition);
 			operations.Add(operation);
 			undoPosition = operations.Count;

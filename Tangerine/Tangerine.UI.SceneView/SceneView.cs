@@ -5,12 +5,12 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
 {
-	public class SceneView : IDocumentView
+	public class SceneView : Entity, IDocumentView
 	{
 		// Given panel.
 		private readonly Widget panelWidget;
 		// Widget which is a direct child of the panel.
-		private readonly Widget rootWidget;
+		public readonly Widget RootWidget;
 		// Widget having the same size as panel, used for intercepting mouse events above the canvas.
 		public readonly Widget InputArea;
 		// Canvas which is meant to be scrollable and zoomable widget.
@@ -25,29 +25,36 @@ namespace Tangerine.UI.SceneView
 			CanvasWidget = new Widget {
 				Nodes = { Document.Current.RootNode }
 			};
-			rootWidget = new Widget {
+			RootWidget = new Widget {
 				Id = "SceneView",
 				Nodes = { InputArea, CanvasWidget }
 			};
+			CreateComponents();
 			CreateProcessors();
 		}
 
 		public void Attach()
 		{
 			Instance = this;
-			panelWidget.AddNode(rootWidget);
+			panelWidget.AddNode(RootWidget);
 		}
 
 		public void Detach()
 		{
 			Instance = null;
-			rootWidget.Unlink();
+			RootWidget.Unlink();
+		}
+
+		void CreateComponents()
+		{
+			Components.Add(new ExpositionComponent());
 		}
 
 		void CreateProcessors()
 		{
-			rootWidget.Tasks.Add(
-				new MouseScrollProcessor()
+			RootWidget.Tasks.Add(
+				new MouseScrollProcessor(),
+				new SelectedWidgetsPresenter()
 			);
 		}
 	}
