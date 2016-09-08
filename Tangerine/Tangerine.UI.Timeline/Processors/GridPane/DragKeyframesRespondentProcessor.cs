@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
+using Tangerine.Core.Components;
 using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline
@@ -37,7 +38,7 @@ namespace Tangerine.UI.Timeline
 					if (!CheckRowRange(row)) {
 						continue;
 					}
-					var rowComponents = Timeline.Instance.Rows[row].Components;
+					var rowComponents = Document.Current.Rows[row].Components;
 					var node = rowComponents.Get<NodeRow>()?.Node ?? rowComponents.Get<PropertyRow>()?.Node;
 					if (node == null) {
 						continue;
@@ -57,7 +58,7 @@ namespace Tangerine.UI.Timeline
 							if (!CheckRowRange(destRow)) {
 								continue;
 							}
-							var destRowComponents = Timeline.Instance.Rows[destRow].Components;
+							var destRowComponents = Document.Current.Rows[destRow].Components;
 							var destNode = destRowComponents.Get<NodeRow>()?.Node ?? destRowComponents.Get<PropertyRow>()?.Node;
 							if (destNode == null || !ArePropertiesCompatible(node, destNode, a.TargetProperty)) {
 								continue;
@@ -78,7 +79,7 @@ namespace Tangerine.UI.Timeline
 
 		static bool CheckRowRange(int row)
 		{
-			return row >= 0 && row < Timeline.Instance.Rows.Count;
+			return row >= 0 && row < Document.Current.Rows.Count;
 		}
 
 		static bool ArePropertiesCompatible(object object1, object object2, string property)

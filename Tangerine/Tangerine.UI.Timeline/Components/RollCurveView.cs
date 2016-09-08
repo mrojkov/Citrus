@@ -14,7 +14,7 @@ namespace Tangerine.UI.Timeline.Components
 		public RollCurveView(Row row, int identation)
 		{
 			this.row = row;
-			var c = row.Components.Get<CurveRow>();
+			var c = row.Components.Get<Core.Components.CurveRow>();
 			label = new SimpleText { AutoSizeConstraints = false, LayoutCell = new LayoutCell(Alignment.Center), Text = c.State.Component };
 			widget = new Widget {
 				Padding = new Thickness { Left = 4, Right = 2 },
@@ -35,7 +35,7 @@ namespace Tangerine.UI.Timeline.Components
 		void RenderBackground(Widget widget)
 		{
 			widget.PrepareRendererState();
-			Renderer.DrawRect(Vector2.Zero, widget.Size, Timeline.Instance.SelectedRows.Contains(row) ? Colors.SelectedBackground : Colors.WhiteBackground);
+			Renderer.DrawRect(Vector2.Zero, widget.Size, Document.Current.SelectedRows.Contains(row) ? Colors.SelectedBackground : Colors.WhiteBackground);
 		}
 	}
 }

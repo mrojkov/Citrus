@@ -34,6 +34,7 @@ namespace Tangerine.UI
 		public static class SceneViewKeys
 		{
 			public static readonly Key SceneExposition = Key.F1;
+			public static readonly Key SceneExpositionMultiSelect = Key.MapShortcut(Modifiers.Shift, Key.F1);
 		}
 	}
 }

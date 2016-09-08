@@ -32,30 +32,30 @@ namespace Tangerine.UI.Timeline
 
 		void HandleShortcuts(WidgetInput input)
 		{
-			var hasSelection = Document.Current.SelectedNodes.Count > 0;
+			var hasSelection = Document.Current.SelectedRows.Count > 0;
 			input.EnableKey(Key.Commands.Undo, Document.Current.History.UndoEnabled);
 			input.EnableKey(Key.Commands.Redo, Document.Current.History.RedoEnabled);
 			input.EnableKey(Key.Commands.SelectAll, hasSelection);
 			input.EnableKey(Key.Commands.Cut, hasSelection);
 			input.EnableKey(Key.Commands.Copy, hasSelection);
-			input.EnableKey(Key.Commands.Paste, Timeline.Clipboard.Nodes.Count > 0);
+			input.EnableKey(Key.Commands.Paste, Core.Operations.Clipboard.Nodes.Count > 0);
 			input.EnableKey(Key.Commands.Delete, hasSelection);
 			if (input.ConsumeKeyRepeat(Key.Commands.Redo)) {
 				Document.Current.History.Redo();
 			} else if (input.ConsumeKeyRepeat(Key.Commands.Undo)) {
 				Document.Current.History.Undo();
 			} else if (input.ConsumeKeyRepeat(Key.Commands.SelectAll)) {
-				foreach (var row in timeline.Rows) {
-					Operations.SelectRow.Perform(row, true);
+				foreach (var row in Document.Current.Rows) {
+					Core.Operations.SelectRow.Perform(row, true);
 				}
 			} else if (input.ConsumeKeyRepeat(Key.Commands.Cut)) {
-				Operations.Cut.Perform();
+				Core.Operations.Cut.Perform();
 			} else if (input.ConsumeKeyRepeat(Key.Commands.Copy)) {
-				Operations.Copy.Perform();
+				Core.Operations.Copy.Perform();
 			} else if (input.ConsumeKeyRepeat(Key.Commands.Paste)) {
-				Operations.Paste.Perform();
+				Core.Operations.Paste.Perform();
 			} else if (input.ConsumeKeyRepeat(Key.Commands.Delete)) {
-				Operations.Delete.Perform();
+				Core.Operations.Delete.Perform();
 			}
 		}
 
@@ -63,12 +63,12 @@ namespace Tangerine.UI.Timeline
 		{
 			var doc = Document.Current;
 			if (input.ConsumeKeyRepeat(KeyBindings.TimelineKeys.EnterNode)) {
-				var node = timeline.SelectedRows.Select(i => i.Components.Get<Components.NodeRow>()).FirstOrDefault(i => i != null)?.Node;
+				var node = Document.Current.EnumerateSelectedNodes().FirstOrDefault();
 				if (node != null) {
-					Operations.EnterNode.Perform(node);
+					Core.Operations.EnterNode.Perform(node);
 				}
 			} else if (input.ConsumeKeyRepeat(KeyBindings.TimelineKeys.ExitNode)) {
-				Operations.LeaveNode.Perform();
+				Core.Operations.LeaveNode.Perform();
 			}
 		}
 		
@@ -88,19 +88,19 @@ namespace Tangerine.UI.Timeline
 		void SelectRow(int advance, bool multiselection)
 		{
 			var doc = Document.Current;
-			if (timeline.Rows.Count == 0) {
+			if (doc.Rows.Count == 0) {
 				return;
 			}
-			var lastSelectedRow = timeline.SelectedRows.Count > 0 ? timeline.SelectedRows[0] : timeline.Rows[0];
-			var nextRow = timeline.Rows[Mathf.Clamp(lastSelectedRow.Index + advance, 0, timeline.Rows.Count - 1)];
+			var lastSelectedRow = doc.SelectedRows.Count > 0 ? doc.SelectedRows[0] : doc.Rows[0];
+			var nextRow = doc.Rows[Mathf.Clamp(lastSelectedRow.Index + advance, 0, doc.Rows.Count - 1)];
 			if (nextRow != lastSelectedRow) {
 				if (!multiselection) {
-					Operations.ClearRowSelection.Perform();
+					Core.Operations.ClearRowSelection.Perform();
 				}
-				if (timeline.SelectedRows.Contains(nextRow)) {
-					Operations.SelectRow.Perform(lastSelectedRow, false);
+				if (doc.SelectedRows.Contains(nextRow)) {
+					Core.Operations.SelectRow.Perform(lastSelectedRow, false);
 				}
-				Operations.SelectRow.Perform(nextRow);
+				Core.Operations.SelectRow.Perform(nextRow);
 				timeline.EnsureRowVisible(nextRow);
 			}
 		}

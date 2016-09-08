@@ -1,7 +1,7 @@
 ﻿using System;
 using Tangerine.Core;
 
-namespace Tangerine.UI.Timeline.Operations
+namespace Tangerine.Core.Operations
 {
 	public static class SelectRowRange
 	{
@@ -9,11 +9,11 @@ namespace Tangerine.UI.Timeline.Operations
 		{
 			if (endRow.Index >= startRow.Index) {
 				for (int i = startRow.Index; i <= endRow.Index; i++) {
-					SelectRow.Perform(Timeline.Instance.Rows[i]);
+					SelectRow.Perform(Document.Current.Rows[i]);
 				}
 			} else {
 				for (int i = startRow.Index; i >= endRow.Index; i--) {
-					SelectRow.Perform(Timeline.Instance.Rows[i]);
+					SelectRow.Perform(Document.Current.Rows[i]);
 				}
 			}
 		}

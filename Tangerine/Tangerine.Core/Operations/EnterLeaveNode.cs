@@ -4,7 +4,7 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 
-namespace Tangerine.UI.Timeline.Operations
+namespace Tangerine.Core.Operations
 {
 	public static class EnterNode
 	{
@@ -32,18 +32,17 @@ namespace Tangerine.UI.Timeline.Operations
 
 		public static void ChangeContainer(Node container)
 		{
-			var prevContainer = Timeline.Instance.Container;
+			var prevContainer = Document.Current.Container;
 			DelegateOperation.Perform(() => SetContainer(container), () => SetContainer(prevContainer));
 			ClearRowSelection.Perform();
 			if (container.Nodes.Count > 0) {
-				SelectNode.Perform(container);
+				SelectNode.Perform(container.Nodes[0]);
 			}
 		}
 
 		static void SetContainer(Node container)
 		{
-			Timeline.Instance.Container = container;
-			Timeline.Instance.EnsureColumnVisible(Document.Current.AnimationFrame);
+			Document.Current.Container = container;
 		}
 	}
 

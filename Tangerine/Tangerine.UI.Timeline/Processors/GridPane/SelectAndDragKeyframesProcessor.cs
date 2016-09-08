@@ -97,11 +97,11 @@ namespace Tangerine.UI.Timeline
 			position -= grid.ContentWidget.GlobalPosition;
 			var r = new IntVector2((int)(position.X / Metrics.TimelineColWidth), 0);
 			if (position.Y >= grid.ContentSize.Y) {
-				r.Y = Math.Max(0, timeline.Rows.Count - 1);
+				r.Y = Math.Max(0, Document.Current.Rows.Count - 1);
 				return r;
 			}
-			foreach (var row in timeline.Rows) {
-				if (position.Y >= row.Top && position.Y < row.Bottom + Metrics.TimelineRowSpacing) {
+			foreach (var row in Document.Current.Rows) {
+				if (position.Y >= row.GetGridWidget().Top && position.Y < row.GetGridWidget().Bottom + Metrics.TimelineRowSpacing) {
 					r.Y = row.Index;
 					break;
 				}

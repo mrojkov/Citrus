@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
+using Tangerine.Core.Components;
 
 namespace Tangerine.UI.Timeline.Components
 {
@@ -113,7 +114,7 @@ namespace Tangerine.UI.Timeline.Components
 		void RenderBackground(Widget widget)
 		{
 			widget.PrepareRendererState();
-			Renderer.DrawRect(Vector2.Zero, widget.Size, Timeline.Instance.SelectedRows.Contains(row) ? Colors.SelectedBackground : Colors.WhiteBackground);
+			Renderer.DrawRect(Vector2.Zero, widget.Size, Document.Current.SelectedRows.Contains(row) ? Colors.SelectedBackground : Colors.WhiteBackground);
 		}
 
 		Widget IRollWidget.Widget => widget;
@@ -122,8 +123,8 @@ namespace Tangerine.UI.Timeline.Components
 		{
 			while (true) {
 				if (label.Input.WasKeyPressed(Key.Mouse0DoubleClick)) {
-					Operations.ClearRowSelection.Perform();
-					Operations.SelectRow.Perform(row);
+					Core.Operations.ClearRowSelection.Perform();
+					Core.Operations.SelectRow.Perform(row);
 					label.Visible = false;
 					editBox.Visible = true;
 					editBox.Text = nodeData.Node.Id;
@@ -131,7 +132,7 @@ namespace Tangerine.UI.Timeline.Components
 					editBox.SetFocus();
 					editBox.Tasks.Add(EditNodeIdTask());
 				} else if (widget.Input.WasKeyPressed(Key.Mouse0DoubleClick)) {
-					Operations.EnterNode.Perform(row.Components.Get<NodeRow>().Node);
+					Core.Operations.EnterNode.Perform(row.Components.Get<NodeRow>().Node);
 				}
 				yield return null;
 			}

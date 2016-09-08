@@ -6,7 +6,7 @@ using System.IO;
 using Lime;
 using Tangerine.Core;
 
-namespace Tangerine.UI.Timeline.Components
+namespace Tangerine.Core.Components
 {
 	public class CurveRow : IComponent
 	{

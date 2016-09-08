@@ -4,13 +4,13 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 
-namespace Tangerine.UI.Timeline.Operations
+namespace Tangerine.Core.Operations
 {
 	public static class ClearRowSelection
 	{
 		public static void Perform()
 		{
-			foreach (var i in Timeline.Instance.SelectedRows.ToList()) {
+			foreach (var i in Document.Current.SelectedRows.ToList()) {
 				SelectRow.Perform(i, false);
 			}
 		}

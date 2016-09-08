@@ -14,8 +14,8 @@ namespace Tangerine.UI.Timeline
 		{
 			while (true) {
 				List<Row> rowsToUnlink = null;
-				foreach (var row in timeline.SelectedRows) {
-					var node = row.Components.Get<Components.NodeRow>()?.Node;
+				foreach (var row in Document.Current.SelectedRows) {
+					var node = row.Components.Get<Core.Components.NodeRow>()?.Node;
 					if (node != null && node.Parent != timeline.Container) {
 						rowsToUnlink = rowsToUnlink ?? new List<Row>();
 						rowsToUnlink.Add(row);
@@ -23,7 +23,7 @@ namespace Tangerine.UI.Timeline
 				}
 				if (rowsToUnlink != null) {
 					foreach (var row in rowsToUnlink) {
-						Operations.SelectRow.Perform(row, false);
+						Core.Operations.SelectRow.Perform(row, false);
 					}
 				}
 				yield return null;

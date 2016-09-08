@@ -4,12 +4,10 @@ using System.Linq;
 using Lime;
 using Tangerine.Core;
 
-namespace Tangerine.UI.Timeline.Operations
+namespace Tangerine.Core.Operations
 {
 	public class SelectRow : IOperation
 	{
-		Timeline timeline => Timeline.Instance;
-
 		private int lastIndex;
 		readonly Row row;
 		readonly bool select;
@@ -30,7 +28,7 @@ namespace Tangerine.UI.Timeline.Operations
 
 		public void Do()
 		{
-			var sr = timeline.SelectedRows;
+			var sr = Document.Current.SelectedRows;
 			lastIndex = sr.IndexOf(row);
 			if (lastIndex >= 0) {
 				sr.RemoveAt(lastIndex);
@@ -42,7 +40,7 @@ namespace Tangerine.UI.Timeline.Operations
 
 		public void Undo()
 		{
-			var sr = timeline.SelectedRows;
+			var sr = Document.Current.SelectedRows;
 			if (select) {
 				sr.RemoveAt(0);
 			} else if (lastIndex >= 0) {
@@ -55,7 +53,7 @@ namespace Tangerine.UI.Timeline.Operations
 	{
 		public static void Perform(Node node, bool select = true)
 		{
-			var row = Timeline.Instance.GetCachedRow(node.EditorState().Uid);
+			var row = Document.Current.GetRowById(node.EditorState().Uid);
 			SelectRow.Perform(row, select);
 		}
 	}

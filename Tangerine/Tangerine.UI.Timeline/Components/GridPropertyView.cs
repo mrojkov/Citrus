@@ -26,6 +26,10 @@ namespace Tangerine.UI.Timeline.Components
 		Widget IGridWidget.Widget => gridWidget;
 		Widget IOverviewWidget.Widget => overviewWidget;
 
+		float IGridWidget.Top => gridWidget.Y;
+		float IGridWidget.Bottom => gridWidget.Y + gridWidget.Height;
+		float IGridWidget.Height => gridWidget.Height;
+
 		void Render(Widget widget)
 		{
 			var maxCol = Timeline.Instance.ColumnCount;

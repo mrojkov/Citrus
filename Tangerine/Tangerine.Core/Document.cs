@@ -22,6 +22,8 @@ namespace Tangerine.Core
 			DiscardChanges
 		}
 
+		private readonly Dictionary<Uid, Row> RowCache = new Dictionary<Uid, Row>();
+
 		public static event Action<Document> AttachingViews;
 		public static event Func<Document, CloseAction> Closing;
 
@@ -32,12 +34,29 @@ namespace Tangerine.Core
 		public string Path { get; private set; }
 		public readonly DocumentHistory History;
 		public bool IsModified => History.IsDocumentModified;
-
+		/// <summary>
+		/// Gets the root node for the current document.
+		/// </summary>
 		public Node RootNode { get; private set; }
+		/// <summary>
+		/// Gets or sets the current container widget.
+		/// </summary>
 		public Node Container { get; set; }
+		/// <summary>
+		/// Gets or sets the scene we are navigated from. Need for getting back into the main scene from the external one.
+		/// </summary>
 		public string SceneNavigatedFrom { get; set; }
-
-		public readonly VersionedCollection<Node> SelectedNodes = new VersionedCollection<Node>();
+		/// <summary>
+		/// The list of rows, currently displayed on the timeline.
+		/// </summary>
+		public readonly List<Row> Rows = new List<Row>();
+		/// <summary>
+		/// The list of selected rows, currently displayed on the timeline.
+		/// </summary>
+		public readonly VersionedCollection<Row> SelectedRows = new VersionedCollection<Row>();
+		/// <summary>
+		/// The list of views (timeline, inspector, ...)
+		/// </summary>
 		public readonly List<IDocumentView> Views = new List<IDocumentView>();
 
 		public int AnimationFrame
@@ -116,6 +135,21 @@ namespace Tangerine.Core
 		public void Save()
 		{
 			throw new NotImplementedException();
+		}
+
+		public IEnumerable<Node> EnumerateSelectedNodes()
+		{
+			return SelectedRows.Select(i => i.Components.Get<Components.NodeRow>()?.Node).Where(n => n != null);
+		}
+
+		public Row GetRowById(Uid uid)
+		{
+			Row row;
+			if (!RowCache.TryGetValue(uid, out row)) {
+				row = new Row(uid);
+				RowCache.Add(uid, row);
+			}
+			return row;
 		}
 	}
 }

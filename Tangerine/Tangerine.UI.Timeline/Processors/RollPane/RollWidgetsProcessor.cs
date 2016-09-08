@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Tangerine.Core;
 
 namespace Tangerine.UI.Timeline
 {
@@ -21,7 +22,7 @@ namespace Tangerine.UI.Timeline
 		{
 			var content = timeline.Roll.ContentWidget;
 			content.Nodes.Clear();
-			foreach (var row in timeline.Rows) {
+			foreach (var row in Document.Current.Rows) {
 				content.AddNode(row.Components.Get<Components.IRollWidget>().Widget);
 			}
 		}
@@ -29,10 +30,10 @@ namespace Tangerine.UI.Timeline
 		bool AreWidgetsValid()
 		{
 			var content = timeline.Roll.ContentWidget;
-			if (timeline.Rows.Count != content.Nodes.Count) {
+			if (Document.Current.Rows.Count != content.Nodes.Count) {
 				return false;
 			}
-			foreach (var row in timeline.Rows) {
+			foreach (var row in Document.Current.Rows) {
 				if (row.Components.Get<Components.IRollWidget>().Widget != content.Nodes[row.Index]) {
 					return false;
 				}

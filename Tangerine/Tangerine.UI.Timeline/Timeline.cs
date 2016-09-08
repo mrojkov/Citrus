@@ -6,17 +6,15 @@ using System.Collections.Generic;
 
 namespace Tangerine.UI.Timeline
 {
+	public static class RowExtensions
+	{
+		public static Components.IGridWidget GetGridWidget(this Row row) => row.Components.Get<Components.IGridWidget>();
+	}
+
 	public class Timeline : IDocumentView
 	{
-		public static class Clipboard
-		{
-			public static List<Node> Nodes = new List<Node>();
-		}
-
 		public static Timeline Instance { get; private set; }
 			
-		private readonly Dictionary<Uid, Row> RowCache = new Dictionary<Uid, Row>();
-
 		public readonly Toolbar Toolbar = new Toolbar();
 		public readonly Rulerbar Ruler = new Rulerbar();
 		public readonly OverviewPane Overview = new OverviewPane();
@@ -45,8 +43,6 @@ namespace Tangerine.UI.Timeline
 		}
 		public int ColumnCount { get; set; }
 		public GridSelection GridSelection = new GridSelection();
-		public readonly List<Row> Rows = new List<Row>();
-		public readonly VersionedCollection<Row> SelectedRows = new VersionedCollection<Row>();
 		public readonly Entity Globals = new Entity();
 
 		public Timeline(Widget panelWidget)
@@ -54,7 +50,9 @@ namespace Tangerine.UI.Timeline
 			PanelWidget = panelWidget;
 			CreateProcessors();
 			InitializeWidgets();
-			SelectFirstNode();
+			if (Document.Current.Container.Nodes.Count > 0) {
+				Core.Operations.SelectNode.Perform(Document.Current.Container.Nodes[0]);
+			}
 		}
 
 		public void Attach()
@@ -121,16 +119,14 @@ namespace Tangerine.UI.Timeline
 				new RulerMouseScrollProcessor(),
 				new ClampScrollOriginProcessor(),
 				new EditMarkerProcessor(),
-				CreateDocumentSelectedNodesProcessor()
+				new ClampScrollOriginProcessor(),
+				EnsureCurrentColumnVisibleOnContainerChange(),
 			});
 		}
 
-		static IProcessor CreateDocumentSelectedNodesProcessor()
+		IProcessor EnsureCurrentColumnVisibleOnContainerChange()
 		{
-			return new Property<int>(() => Timeline.Instance.SelectedRows.Version).DistinctUntilChanged().Consume(_ => {
-				Document.Current.SelectedNodes.Clear();
-				Document.Current.SelectedNodes.AddRange(Timeline.Instance.SelectedRows.Select(i => i.Components.Get<Components.NodeRow>()?.Node).Where(n => n != null));
-			});
+			return new Property<Node>(() => Document.Current.Container).DistinctUntilChanged().Consume(_ => EnsureColumnVisible(Document.Current.AnimationFrame));
 		}
 
 		void SetCurrentFrameRecursive(Node node, int frame)
@@ -139,25 +135,6 @@ namespace Tangerine.UI.Timeline
 			foreach (var child in node.Nodes) {
 				SetCurrentFrameRecursive(child, frame);
 			}
-		}
-
-		void SelectFirstNode()
-		{
-			if (Container.Nodes.Count > 0) {
-				var r = GetCachedRow(Container.Nodes[0].EditorState().Uid);
-				SelectedRows.Clear();
-				SelectedRows.Add(r);
-			}
-		}
-
-		public Row GetCachedRow(Uid uid)
-		{
-			Row row;
-			if (!RowCache.TryGetValue(uid, out row)) {
-				row = new Row(uid);
-				RowCache.Add(uid, row);
-			}
-			return row;
 		}
 
 		public void EnsureColumnVisible(int column)
@@ -172,11 +149,12 @@ namespace Tangerine.UI.Timeline
 
 		public void EnsureRowVisible(Row row)
 		{
-			if (row.Bottom > ScrollOrigin.Y + Grid.Size.Y) {
-				ScrollOrigin.Y = row.Bottom - Grid.Size.Y;
+			var gw = row.GetGridWidget();
+			if (gw.Bottom > ScrollOrigin.Y + Grid.Size.Y) {
+				ScrollOrigin.Y = gw.Bottom - Grid.Size.Y;
 			}
-			if (row.Top < ScrollOrigin.Y) {
-				ScrollOrigin.Y = Math.Max(0, row.Top);
+			if (gw.Top < ScrollOrigin.Y) {
+				ScrollOrigin.Y = Math.Max(0, gw.Top);
 			}
 		}
 
@@ -188,7 +166,7 @@ namespace Tangerine.UI.Timeline
 		
 		public bool IsRowVisible(int row)
 		{
-			var pos = Rows[row].Top - ScrollOrigin.Y;
+			var pos = Document.Current.Rows[row].GetGridWidget().Top - ScrollOrigin.Y;
 			return pos >= 0 && pos < Grid.Size.Y;
 		}
 	}

@@ -43,7 +43,7 @@ namespace Tangerine.UI.Inspector
 			Editors = new List<IPropertyEditor>();
 			RegisterEditors();
 			InitializeWidgets();
-			RootWidget.Tasks.Add(RebuildInspectorWhenSelectedNodesChanged());
+			RootWidget.Tasks.Add(RebuildInspectorWhenSelectedRowsChanged());
 		}
 
 		void InitializeWidgets()
@@ -77,11 +77,11 @@ namespace Tangerine.UI.Inspector
 			PropertyEditorRegistry.Add(new PropertyEditorRegistryItem(condition, builder));
 		}
 
-		IProcessor RebuildInspectorWhenSelectedNodesChanged()
+		IProcessor RebuildInspectorWhenSelectedRowsChanged()
 		{
 			var builder = new InspectorBuilder();
-			return new Property<int>(() => Document.Current.SelectedNodes.Version).DistinctUntilChanged().Consume(_ => {
-				builder.Build(Document.Current.SelectedNodes);
+			return new Property<int>(() => Document.Current.SelectedRows.Version).DistinctUntilChanged().Consume(_ => {
+				builder.Build(Document.Current.EnumerateSelectedNodes());
 			});
 		}
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
+using Tangerine.Core.Components;
 
 namespace Tangerine.UI.Timeline.Components
 {
@@ -55,7 +56,7 @@ namespace Tangerine.UI.Timeline.Components
 		void RenderBackground(Widget widget)
 		{
 			widget.PrepareRendererState();
-			Renderer.DrawRect(Vector2.Zero, widget.Size, Timeline.Instance.SelectedRows.Contains(row) ? Colors.SelectedBackground : Colors.WhiteBackground);
+			Renderer.DrawRect(Vector2.Zero, widget.Size, Document.Current.SelectedRows.Contains(row) ? Colors.SelectedBackground : Colors.WhiteBackground);
 		}
 
 		Widget IRollWidget.Widget => widget;

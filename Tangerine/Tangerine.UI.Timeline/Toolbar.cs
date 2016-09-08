@@ -58,7 +58,7 @@ namespace Tangerine.UI.Timeline
 		ToolbarButton CreateExitButton()
 		{
 			var button = new ToolbarButton(IconPool.GetTexture("Timeline.ExitContainer"));
-			button.Clicked += Operations.LeaveNode.Perform;
+			button.Clicked += Core.Operations.LeaveNode.Perform;
 			return button;
 		}
 

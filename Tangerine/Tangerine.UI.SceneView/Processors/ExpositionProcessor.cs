@@ -15,6 +15,9 @@ namespace Tangerine.UI.SceneView
 	{
 		readonly WidgetInput input;
 
+		public static readonly Key Key = KeyBindings.SceneViewKeys.SceneExposition;
+		public static readonly Key MultiSelectKey = KeyBindings.SceneViewKeys.SceneExpositionMultiSelect;
+
 		SceneView sceneView => SceneView.Instance;
 
 		public ExpositionProcessor(WidgetInput input)
@@ -24,15 +27,14 @@ namespace Tangerine.UI.SceneView
 
 		public IEnumerator<object> Loop()
 		{
-			var key = KeyBindings.SceneViewKeys.SceneExposition;
 			const float animationLength = 0.5f;
 			while (true) {
-				if (input.ConsumeKeyPress(key)) {
+				if (input.ConsumeKeyPress(Key) || input.ConsumeKeyPress(MultiSelectKey)) {
 					sceneView.Components.Get<ExpositionComponent>().InProgress = true;
-					using (var exposition = new Exposition(sceneView.RootWidget)) {
+					using (var exposition = new Exposition(sceneView.RootWidget, input)) {
 						float t = 0; 
 						while (true) {
-							if (input.IsKeyPressed(key)) {
+							if (input.IsKeyPressed(Key) || input.IsKeyPressed(MultiSelectKey)) {
 								if (t < animationLength) {
 									t += Task.Current.Delta;
 									if (t >= animationLength) {
@@ -69,11 +71,11 @@ namespace Tangerine.UI.SceneView
 			readonly Widget canvas;
 			readonly List<Item> items;
 
-			public Exposition(Widget root)
+			public Exposition(Widget root, WidgetInput input)
 			{
 				canvas = CreateCanvas(root);
 				var cellSize = CalcCellSize(root.Size, GetWidgets().Count());
-				items = GetWidgets().Select((w, i) => new Item(w, CreateItemFrame(i, canvas, cellSize))).ToList();
+				items = GetWidgets().Select((w, i) => new Item(w, CreateItemFrame(i, canvas, cellSize), input)).ToList();
 			}
 
 			static Frame CreateItemFrame(int index, Widget canvas, Vector2 cellSize)
@@ -166,7 +168,7 @@ namespace Tangerine.UI.SceneView
 				readonly Frame frame;
 				public bool Closed { get; private set; }
 
-				public Item(Widget widget, Frame frame)
+				public Item(Widget widget, Frame frame, WidgetInput input)
 				{
 					this.frame = frame;
 					originalWidget = widget;
@@ -183,22 +185,29 @@ namespace Tangerine.UI.SceneView
 						OverflowMode = TextOverflowMode.Ignore
 					};
 					frame.HitTestTarget = true;
+					var clickArea = new Widget { Size = frame.Size, Anchors = Anchors.LeftRightTopBottom, HitTestTarget = true };
+					frame.AddNode(clickArea);
 					frame.AddNode(label);
 					frame.AddNode(exposedWidget);
 					borderPresenter = new WidgetBoundsPresenter(Colors.SceneView.ExposedItemInactiveBorder, 1);
 					frame.CompoundPresenter.Push(borderPresenter);
 					frame.Tasks.AddLoop(() => {
-						borderPresenter.Color = Document.Current.SelectedNodes.Contains(widget) ? 
+						borderPresenter.Color = Document.Current.EnumerateSelectedNodes().Contains(widget) ? 
 							Colors.SceneView.ExposedItemSelectedBorder :
 							Colors.SceneView.ExposedItemInactiveBorder;
-						if (frame.IsMouseOver()) {
+						if (clickArea.IsMouseOver()) {
 							if (Task.Current.LifeTime % 0.5f < 0.25f) {
 								borderPresenter.Color = Colors.SceneView.ExposedItemActiveBorder;
 							}
-							if (frame.Input.WasMousePressed()) {
-								// XXX
-								// Core.Operations.SelectNode();
-								Closed = true;
+							if (clickArea.Input.WasMousePressed()) {
+								if (!input.IsKeyPressed(MultiSelectKey)) {
+									Core.Operations.ClearRowSelection.Perform();
+									Core.Operations.SelectNode.Perform(widget);
+									Closed = true;
+								} else {
+									var isSelected = Document.Current.EnumerateSelectedNodes().Contains(widget);
+									Core.Operations.SelectNode.Perform(widget, !isSelected);
+								}
 							}
 						}
 					});

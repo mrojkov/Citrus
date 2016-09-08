@@ -71,8 +71,8 @@ namespace Tangerine.UI.Timeline
 
 		public Vector2 CellToGridCoordinates(IntVector2 cell)
 		{
-			var rows = timeline.Rows;
-			var y = cell.Y < rows.Count ? rows[Math.Max(cell.Y, 0)].Top : rows[rows.Count - 1].Bottom;
+			var rows = Document.Current.Rows;
+			var y = cell.Y < rows.Count ? rows[Math.Max(cell.Y, 0)].GetGridWidget().Top : rows[rows.Count - 1].GetGridWidget().Bottom;
 			return new Vector2(cell.X * Metrics.TimelineColWidth, y);
 		}
 	}

@@ -24,6 +24,10 @@ namespace Tangerine.UI.Timeline.Components
 		Widget IGridWidget.Widget => gridWidget;
 		Widget IOverviewWidget.Widget => overviewWidget;
 
+		float IGridWidget.Top => gridWidget.Y;
+		float IGridWidget.Bottom => gridWidget.Y + gridWidget.Height;
+		float IGridWidget.Height => gridWidget.Height;
+
 		static BitSet32[] keyStrips = new BitSet32[0];
 
 		void Render(Widget widget)

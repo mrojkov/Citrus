@@ -2,6 +2,8 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Lime;
+using Tangerine.Core;
+using Tangerine.Core.Components;
 using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline
@@ -13,7 +15,7 @@ namespace Tangerine.UI.Timeline
 		public IEnumerator<object> Loop()
 		{
 			while (true) {
-				foreach (var row in Timeline.Instance.Rows) {
+				foreach (var row in Document.Current.Rows) {
 					if (!row.Components.Has<CurveRow>()) {
 						continue;
 					}

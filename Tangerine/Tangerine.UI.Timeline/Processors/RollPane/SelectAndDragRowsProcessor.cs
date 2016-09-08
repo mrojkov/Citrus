@@ -26,18 +26,18 @@ namespace Tangerine.UI.Timeline
 				var initialMousePosition = input.MousePosition;
 				var row = MousePositionToRow(initialMousePosition);
 				if (input.IsKeyPressed(Key.LShift)) {
-					if (timeline.SelectedRows.Count > 0) {
-						Operations.ClearRowSelection.Perform();
-						Operations.SelectRowRange.Perform(timeline.SelectedRows[0], row);
+					if (Document.Current.SelectedRows.Count > 0) {
+						Core.Operations.ClearRowSelection.Perform();
+						Core.Operations.SelectRowRange.Perform(Document.Current.SelectedRows[0], row);
 					} else {
-						Operations.ClearRowSelection.Perform();
-						Operations.SelectRow.Perform(row);
+						Core.Operations.ClearRowSelection.Perform();
+						Core.Operations.SelectRow.Perform(row);
 					}
 				} else {
 					input.CaptureMouse();
-					if (!timeline.SelectedRows.Contains(row)) {
-						Operations.ClearRowSelection.Perform();
-						Operations.SelectRow.Perform(row);
+					if (!Document.Current.SelectedRows.Contains(row)) {
+						Core.Operations.ClearRowSelection.Perform();
+						Core.Operations.SelectRow.Perform(row);
 					}
 					while (input.IsMousePressed() && Math.Abs(initialMousePosition.Y - input.MousePosition.Y) < Metrics.TimelineDefaultRowHeight / 4) {
 						yield return null;
@@ -61,13 +61,13 @@ namespace Tangerine.UI.Timeline
 			}
 			roll.OnRenderOverlay -= RenderDragCursor;
 			Window.Current.Invalidate();
-			Operations.DragRows.Perform(dragPosition);
+			Core.Operations.DragRows.Perform(dragPosition);
 		}
 
 		private void RenderDragCursor(Widget widget)
 		{
 			roll.ContentWidget.PrepareRendererState();
-			var y = dragPosition == 0 ? 0 : timeline.Rows[dragPosition - 1].Bottom;
+			var y = dragPosition == 0 ? 0 : Document.Current.Rows[dragPosition - 1].GetGridWidget().Bottom;
 			Renderer.DrawRect(new Vector2(0, y - 1), new Vector2(roll.ContentWidget.Width, y + 1), Colors.DragCursor);
 		}
 
@@ -75,14 +75,14 @@ namespace Tangerine.UI.Timeline
 		{
 			position -= roll.ContentWidget.GlobalPosition;
 			if (position.Y < 0) {
-				return timeline.Rows[0];
+				return Document.Current.Rows[0];
 			}
-			foreach (var row in timeline.Rows) {
-				if (position.Y >= row.Top && position.Y < row.Bottom + Metrics.TimelineRowSpacing) {
-					return timeline.Rows[row.Index];
+			foreach (var row in Document.Current.Rows) {
+				if (position.Y >= row.GetGridWidget().Top && position.Y < row.GetGridWidget().Bottom + Metrics.TimelineRowSpacing) {
+					return Document.Current.Rows[row.Index];
 				}
 			}
-			return timeline.Rows[Math.Max(0, timeline.Rows.Count - 1)];
+			return Document.Current.Rows[Math.Max(0, Document.Current.Rows.Count - 1)];
 		}
 
 		int MouseToDragPosition(Vector2 position)
@@ -91,12 +91,13 @@ namespace Tangerine.UI.Timeline
 			if (position.Y < 0) {
 				return 0;
 			}
-			foreach (var row in timeline.Rows) {
-				if (position.Y >= row.Top && position.Y < row.Bottom + Metrics.TimelineRowSpacing) {
-					return position.Y > (row.Top + row.Bottom) / 2 ? row.Index + 1 : row.Index;
+			foreach (var row in Document.Current.Rows) {
+				var gw = row.GetGridWidget();
+				if (position.Y >= gw.Top && position.Y < gw.Bottom + Metrics.TimelineRowSpacing) {
+					return position.Y > (gw.Top + gw.Bottom) / 2 ? row.Index + 1 : row.Index;
 				}
 			}
-			return timeline.Rows.Count;
+			return Document.Current.Rows.Count;
 		}
 	}
 }

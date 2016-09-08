@@ -16,12 +16,12 @@ namespace Tangerine.UI.SceneView
 					return;
 				}
 				canvas.PrepareRendererState();
-				foreach (var widget in Core.Document.Current.SelectedNodes.OfType<Widget>()) {
-					widget.PrepareRendererState();
-					var color = widget.GetTangerineFlag(TangerineFlags.Locked) ?
-						Colors.SceneView.LockedWidgetBorder : Colors.SceneView.SelectedWidgetBorder;
-					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, color, 1);
-				}
+				//foreach (var widget in Core.Document.Current.SelectedNodes.OfType<Widget>()) {
+				//	widget.PrepareRendererState();
+				//	var color = widget.GetTangerineFlag(TangerineFlags.Locked) ?
+				//		Colors.SceneView.LockedWidgetBorder : Colors.SceneView.SelectedWidgetBorder;
+				//	Renderer.DrawRectOutline(Vector2.Zero, widget.Size, color, 1);
+				//}
 			});
 			sceneView.CanvasWidget.CompoundPostPresenter.Add(p);
 			while (true) {

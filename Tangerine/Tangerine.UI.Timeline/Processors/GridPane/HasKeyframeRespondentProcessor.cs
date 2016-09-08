@@ -2,6 +2,8 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Lime;
+using Tangerine.Core;
+using Tangerine.Core.Components;
 using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline
@@ -22,7 +24,7 @@ namespace Tangerine.UI.Timeline
 
 		bool HasKeyframeOnCell(IntVector2 cell)
 		{
-			var row = Timeline.Instance.Rows[cell.Y];
+			var row = Document.Current.Rows[cell.Y];
 			var nodeData = row.Components.Get<NodeRow>();
 			if (nodeData != null) {
 				var hasKey = nodeData.Node.Animators.Any(i => i.Keys.Any(k => k.Frame == cell.X));

@@ -1,8 +1,7 @@
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
-using System.Collections.Generic;
 
 namespace Tangerine.UI.Timeline
 {
@@ -12,10 +11,10 @@ namespace Tangerine.UI.Timeline
 		{
 			var timeline = Timeline.Instance;
 			while (true) {
-				var rows = timeline.Rows;
+				var rows = Document.Current.Rows;
 				int maxColumn = 0;
 				foreach (var row in rows) {
-					var nodeData = row.Components.Get<Components.NodeRow>();
+					var nodeData = row.Components.Get<Core.Components.NodeRow>();
 					if (nodeData != null) {
 						maxColumn = Math.Max(maxColumn, nodeData.Node.Animators.GetOverallDuration());
 					}
