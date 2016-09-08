@@ -13,6 +13,8 @@ namespace Yuzu.Binary
 	{
 		public static BinaryDeserializer Instance = new BinaryDeserializer();
 
+		public BinarySerializeOptions BinaryOptions = new BinarySerializeOptions();
+
 		public BinaryDeserializer()
 		{
 			InitReaders();
@@ -488,13 +490,20 @@ namespace Yuzu.Binary
 			throw Error("Unable to merge field of type {0}", t.Name);
 		}
 
-		public override object FromReaderInt() { return ReadAny(); }
+		public override object FromReaderInt()
+		{
+			if (BinaryOptions.AutoSignature)
+				CheckSignature();
+			return ReadAny();
+		}
 
 		public override object FromReaderInt(object obj)
 		{
 			var expectedType = obj.GetType();
 			if (expectedType == typeof(object))
 				throw Error("Unable to read into untyped object");
+			if (BinaryOptions.AutoSignature)
+				CheckSignature();
 			if (!ReadCompatibleType(expectedType))
 				throw Error("Incompatible type to read into {0}", expectedType.Name);
 			MergeValueFunc(expectedType)(obj);
@@ -503,9 +512,37 @@ namespace Yuzu.Binary
 
 		public override T FromReaderInt<T>()
 		{
+			if (BinaryOptions.AutoSignature)
+				CheckSignature();
 			if (!ReadCompatibleType(typeof(T)))
 				throw Error("Incompatible type to read into {0}", typeof(T).Name);
 			return (T)ReadValueFunc(typeof(T))();
 		}
+
+		// If possible, preserves stream position if signature is absent.
+		public bool IsValidSignature()
+		{
+			var s = BinaryOptions.Signature;
+			if (s.Length == 0)
+				return true;
+			if (!Reader.BaseStream.CanSeek)
+				return s.Equals(Reader.ReadBytes(s.Length));
+			var pos = Reader.BaseStream.Position;
+			if (Reader.BaseStream.Length - pos < s.Length)
+				return false;
+			foreach (var b in s)
+				if (b != Reader.ReadByte()) {
+					Reader.BaseStream.Position = pos;
+					return false;
+				}
+			return true;
+		}
+
+		public void CheckSignature()
+		{
+			if (!IsValidSignature())
+				throw Error("Signature not found");
+		}
+
 	}
 }

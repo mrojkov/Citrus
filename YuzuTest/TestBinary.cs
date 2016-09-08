@@ -1251,6 +1251,26 @@ namespace YuzuTest.Binary
 		}
 
 		[TestMethod]
+		public void TestSignature()
+		{
+			var bs = new BinarySerializer();
+			bs.BinaryOptions.AutoSignature = true;
+			var result1 = bs.ToBytes(17);
+			Assert.AreEqual("59 42 30 31 05 11 00 00 00", XS(result1));
+			var bd = new BinaryDeserializer();
+			bd.BinaryOptions.AutoSignature = true;
+			Assert.AreEqual(17, bd.FromBytes<int>(result1));
+
+			XAssert.Throws<YuzuException>(() => bd.FromBytes(new byte [] { 0x05, 0x11, 0, 0, 0 }), "ignature");
+
+			var ms = new MemoryStream(new byte[] { 0x05, 0x12, 0, 0, 0 });
+			bd.Reader = new BinaryReader(ms);
+			Assert.IsFalse(bd.IsValidSignature());
+			bd.BinaryOptions.AutoSignature = false;
+			Assert.AreEqual(18, bd.FromReader<int>(bd.Reader));
+		}
+
+		[TestMethod]
 		public void TestErrors()
 		{
 			var bd = new BinaryDeserializer();
