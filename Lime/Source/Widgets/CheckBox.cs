@@ -21,7 +21,7 @@ namespace Lime
 
 		public CheckBox()
 		{
-			Input.CompatibilityMode = false;
+			Input.AcceptMouseBeyondWidget = false;
 			Theme.Current.Apply(this);
 		}
 

@@ -34,7 +34,7 @@ namespace Tangerine.UI.SceneView
 					using (var exposition = new Exposition(sceneView.RootWidget, input)) {
 						float t = 0; 
 						while (true) {
-							if (input.IsKeyPressed(Key) || input.IsKeyPressed(MultiSelectKey)) {
+							if ((input.IsKeyPressed(Key) || input.IsKeyPressed(MultiSelectKey)) && !exposition.Closed()) {
 								if (t < animationLength) {
 									t += Task.Current.Delta;
 									if (t >= animationLength) {
@@ -42,15 +42,12 @@ namespace Tangerine.UI.SceneView
 									}
 								}
 							} else {
-								t -= Task.Current.Delta;
+								t -= Task.Current.Delta * 3f;
 								if (t < 0) {
 									break;
 								}
 							}
 							exposition.Morph(CalcMorphKoeff(t, animationLength));
-							if (exposition.Closed()) {
-								break;
-							}
 							yield return null;
 						}
 					}

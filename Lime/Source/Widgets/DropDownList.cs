@@ -43,7 +43,7 @@ namespace Lime
 
 		public DropDownList()
 		{
-			Input.CompatibilityMode = false;
+			Input.AcceptMouseBeyondWidget = false;
 			Items = new ObservableCollection<Item>();
 			Items.CollectionChanged += (sender, e) => RefreshLabel();
 			HitTestTarget = true;

@@ -20,12 +20,12 @@ namespace Lime
 		public event KeyEventHandler KeyReleased;
 		public event KeyEventHandler KeyRepeated;
 
-		public static bool CompatibilityModeByDefault = true;
+		public static bool AcceptMouseBeyondWidgetByDefault = true;
 
 		/// <summary>
-		/// Indicates whether additional checks (KeyboardFocus, MouseOver) should be avoided.
+		/// Indicates whether mouse events should be accepted even the widget is not under the mouse cursor.
 		/// </summary>
-		public bool CompatibilityMode = CompatibilityModeByDefault;
+		public bool AcceptMouseBeyondWidget = AcceptMouseBeyondWidgetByDefault;
 
 		/// <summary>
 		/// Indicates whether mouse events should be accepted even the mouse is over one of widget's descendant.
@@ -39,7 +39,7 @@ namespace Lime
 
 		public string TextInput 
 		{
-			get { return CompatibilityMode || widget.IsFocused() ? windowInput.TextInput : string.Empty; }
+			get { return widget.IsFocused() ? windowInput.TextInput : string.Empty; }
 		}
 
 		public Vector2 MousePosition { get { return windowInput.MousePosition; } }
@@ -78,7 +78,7 @@ namespace Lime
 				if (mouseOwner != null) {
 					return mouseOwner == widget;
 				}
-				if (CompatibilityMode) {
+				if (AcceptMouseBeyondWidget) {
 					return true;
 				}
 				var nodeUnderMouse = WidgetContext.Current.NodeUnderMouse;
@@ -92,7 +92,7 @@ namespace Lime
 				}
 			} else {
 				var focused = Widget.Focused;
-				return CompatibilityMode || focused != null && focused.DescendantOrThis(widget);
+				return focused != null && focused.DescendantOrThis(widget);
 			}
 		}
 

@@ -85,7 +85,7 @@ namespace Lime
 			this.ScrollDirection = scrollDirection;
 			RejectOrtogonalSwipes = true;
 			Frame = frame;
-			Frame.Input.CompatibilityMode = false;
+			Frame.Input.AcceptMouseBeyondWidget = false;
 			Frame.Input.AcceptMouseThroughDescendants = true;
 			Frame.HitTestTarget = true;
 			Frame.ClipChildren = ClipMethod.ScissorTest;

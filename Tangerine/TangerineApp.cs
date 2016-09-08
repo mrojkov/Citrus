@@ -39,7 +39,7 @@ namespace Tangerine
 		private TangerineApp()
 		{
 			WindowOptions.DefaultRefreshRate = 30;
-			WidgetInput.CompatibilityModeByDefault = false;
+			WidgetInput.AcceptMouseBeyondWidgetByDefault = false;
 			Application.IsTangerine = true;
 			Lime.Serialization.DeserializerBuilders.Insert(0, DeserializeHotStudioAssets);
 			Widget.DefaultWidgetSize = Vector2.Zero;

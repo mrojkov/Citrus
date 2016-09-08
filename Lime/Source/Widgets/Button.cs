@@ -87,7 +87,7 @@ namespace Lime
 		public Button()
 		{
 			HitTestTarget = true;
-			Input.CompatibilityMode = false;
+			Input.AcceptMouseBeyondWidget = false;
 			Theme.Current.Apply(this);
 		}
 
