@@ -959,7 +959,7 @@ namespace Lime
 
 		public bool IsMouseOver()
 		{
-			var mouseOwner = MouseCaptureStack.Instance.MouseOwner;
+			var mouseOwner = WidgetInput.MouseCaptureStack.Top;
 			return (mouseOwner == null || mouseOwner == this) && WidgetContext.Current.NodeUnderMouse == this;
 		}
 

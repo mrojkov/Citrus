@@ -16,6 +16,9 @@ namespace Lime
 		private Input windowInput { get { return CommonWindow.Current.Input; } }
 		private WidgetContext context { get { return WidgetContext.Current; } }
 
+		public static readonly WidgetStack MouseCaptureStack = new WidgetStack();
+		public static readonly WidgetStack InputScopeStack = new WidgetStack();
+
 		public event KeyEventHandler KeyPressed;
 		public event KeyEventHandler KeyReleased;
 		public event KeyEventHandler KeyRepeated;
@@ -56,15 +59,15 @@ namespace Lime
 
 		public void CaptureMouse()
 		{
-			MouseCaptureStack.Instance.CaptureMouse(widget);
+			MouseCaptureStack.Add(widget);
 		}
 
 		public void ReleaseMouse()
 		{
-			MouseCaptureStack.Instance.ReleaseMouse(widget);
+			MouseCaptureStack.Remove(widget);
 		}
 
-		public bool IsMouseOwner() { return widget == MouseCaptureStack.Instance.MouseOwner; }
+		public bool IsMouseOwner() { return widget == MouseCaptureStack.Top; }
 
 		public bool IsAcceptingMouse()
 		{
@@ -73,8 +76,11 @@ namespace Lime
 
 		public bool IsAcceptingKey(Key key)
 		{
+			if (InputScopeStack.Top != null && !InputScopeStack.Top.DescendantOrThis(widget)) {
+				return false;
+			}
 			if (key.IsMouseButton()) {
-				var mouseOwner = MouseCaptureStack.Instance.MouseOwner;
+				var mouseOwner = MouseCaptureStack.Top;
 				if (mouseOwner != null) {
 					return mouseOwner == widget;
 				}
@@ -209,39 +215,63 @@ namespace Lime
 				}
 			}
 		}
-	}
 
-	public class MouseCaptureStack
-	{
-		public static readonly MouseCaptureStack Instance = new MouseCaptureStack();
-
-		readonly List<Widget> stack = new List<Widget>();
-
-		public Widget MouseOwner { get; private set; }
-
-		private MouseCaptureStack() { }
-
-		public void CaptureMouse(Widget widget)
+		/// <summary>
+		/// Restricts input scope with the current widget and its descendants.
+		/// </summary>
+		public void RestrictScope()
 		{
-			var thisLayer = widget.GetEffectiveLayer();
-			var t = stack.FindLastIndex(i => i.GetEffectiveLayer() <= thisLayer);
-			stack.Insert(t + 1, widget);
-			RefreshMouseOwner();
+			InputScopeStack.Add(widget);
 		}
 
-		public void ReleaseMouse(Widget widget)
+		/// <summary>
+		/// Derestricts input scope from the current widget and its descendants.
+		/// </summary>
+		public void DerestrictScope()
 		{
-			var i = stack.IndexOf(widget);
-			if (i >= 0) {
-				stack.RemoveAt(i);
+			InputScopeStack.Remove(widget);
+		}
+
+		[Obsolete("Use RestrictScope() instead")]
+		public void CaptureAll()
+		{
+			RestrictScope();
+		}
+
+		[Obsolete("Use DerestrictScope() instead")]
+		public void ReleaseAll()
+		{
+			DerestrictScope();
+		}
+
+		public class WidgetStack
+		{
+			readonly List<Widget> stack = new List<Widget>();
+
+			public Widget Top { get; private set; }
+
+			public void Add(Widget widget)
+			{
+				var thisLayer = widget.GetEffectiveLayer();
+				var t = stack.FindLastIndex(i => i.GetEffectiveLayer() <= thisLayer);
+				stack.Insert(t + 1, widget);
+				RefreshTop();
 			}
-			RefreshMouseOwner();
-		}
 
-		private void RefreshMouseOwner()
-		{
-			int i = stack.Count;
-			MouseOwner = i > 0 ? stack[i - 1] : null;
+			public void Remove(Widget widget)
+			{
+				var i = stack.IndexOf(widget);
+				if (i >= 0) {
+					stack.RemoveAt(i);
+				}
+				RefreshTop();
+			}
+
+			private void RefreshTop()
+			{
+				int i = stack.Count;
+				Top = i > 0 ? stack[i - 1] : null;
+			}
 		}
 	}
 }
