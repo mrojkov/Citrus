@@ -58,7 +58,7 @@ namespace Tangerine.UI.Timeline
 				x += Metrics.TimelineColWidth;
 			}
 			x = Metrics.TimelineColWidth * (timeline.CurrentColumn + 0.5f);
-			Renderer.DrawLine(x, 0, x, ContentWidget.Height, Colors.Timeline.Grid.Cursor);
+			Renderer.DrawLine(x, 0, x, ContentWidget.Height, Document.Current.Container.IsRunning ? Colors.Timeline.Ruler.RunningCursor : Colors.Timeline.Ruler.Cursor);
 		}
 
 		private void RenderSelection(Widget widget)

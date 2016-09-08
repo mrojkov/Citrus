@@ -39,6 +39,7 @@ namespace Tangerine.UI
 				public static readonly Color4 Lines = Color4.White.Darken(0.25f);
 				public static readonly Color4 Selection = Color4.Gray.Transparentify(0.5f);
 				public static readonly Color4 Cursor = Color4.Red.Lighten(0.4f);
+				public static readonly Color4 RunningCursor = Color4.Green.Lighten(0.4f);
 			}
 			public static class Ruler
 			{
@@ -48,6 +49,7 @@ namespace Tangerine.UI
 				public static readonly Color4 StopMarker = Color4.Red;
 				public static readonly Color4 UnknownMarker = Color4.Black;
 				public static readonly Color4 Cursor = Grid.Cursor;
+				public static readonly Color4 RunningCursor = Grid.RunningCursor;
 			}
 			public static class Overview
 			{

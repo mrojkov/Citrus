@@ -57,6 +57,7 @@
     <Compile Include="Processors\MouseScrollProcessor.cs" />
     <Compile Include="Processors\ExpositionProcessor.cs" />
     <Compile Include="Processors\SelectedWidgetPresenter.cs" />
+    <Compile Include="Processors\PreviewAnimationProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">

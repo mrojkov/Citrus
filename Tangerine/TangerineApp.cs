@@ -120,6 +120,7 @@ namespace Tangerine
 		{
 			panel.LateTasks.Add(new UI.Timeline.GlobalKeyboardShortcutsProcessor(panel.Input));
 			panel.LateTasks.Add(new UI.SceneView.ExpositionProcessor(panel.Input));
+			panel.LateTasks.Add(new UI.SceneView.PreviewAnimationProcessor(panel.Input));
 		}
 
 		private static void RefreshExternalContent(Node node)

@@ -44,7 +44,7 @@ namespace Tangerine.UI.Timeline
 		void RenderCursor()
 		{
 			var r = GetRectangle(Timeline.Instance.CurrentColumn);
-			Renderer.DrawRect(r.A, r.B, Colors.Timeline.Ruler.Cursor);
+			Renderer.DrawRect(r.A, r.B, Document.Current.Container.IsRunning ? Colors.Timeline.Ruler.RunningCursor : Colors.Timeline.Ruler.Cursor);
 		}
 
 		void RenderMarker(Marker marker)
