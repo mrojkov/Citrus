@@ -547,7 +547,8 @@ namespace YuzuTest
 	public class BadPrivate
 	{
 		[YuzuRequired]
-		private int F;
+		private int F = 0;
+		public int G { get { return F; } }
 	}
 
 	public class BadPrivateGetter
