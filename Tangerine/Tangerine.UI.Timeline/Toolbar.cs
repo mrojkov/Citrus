@@ -32,7 +32,7 @@ namespace Tangerine.UI.Timeline
 		void Render(Widget widget)
 		{
 			widget.PrepareRendererState();
-			Renderer.DrawVerticalGradientRect(Vector2.Zero, widget.Size, Colors.Toolbar.Background); 
+			Renderer.DrawVerticalGradientRect(Vector2.Zero, widget.Size, ToolbarColors.Background); 
 		}
 
 		ToolbarButton CreateAnimationModeButton()

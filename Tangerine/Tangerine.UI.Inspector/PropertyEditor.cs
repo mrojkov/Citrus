@@ -250,7 +250,7 @@ namespace Tangerine.UI.Inspector
 						Renderer.DrawRect(checkPos, checkPos + checkSize, Color4.Black);
 					}
 					Renderer.DrawRect(Vector2.Zero, widget.Size, color.Value);
-					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.Inspector.BorderAroundKeyframeColorbox);
+					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, InspectorColors.BorderAroundKeyframeColorbox);
 				});
 			}
 		}

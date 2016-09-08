@@ -44,7 +44,7 @@ namespace Tangerine.UI.Timeline
 		{
 			var size = RootWidget.Size;
 			widget.PrepareRendererState();
-			var veilColor = Colors.Timeline.Overview.Veil;
+			var veilColor = TimelineOverviewColors.Veil;
 			var zoom = ContentWidget.Scale;
 			var a = Vector2.Floor(timeline.ScrollOrigin * zoom) + Vector2.Half;
 			var b = a + Vector2.Floor(timeline.Grid.Size * zoom) - Vector2.Half;
@@ -53,7 +53,7 @@ namespace Tangerine.UI.Timeline
 			Renderer.DrawRect(b.X, 0, size.X, size.Y, veilColor);
 			Renderer.DrawRect(a.X, 0, b.X, a.Y, veilColor);
 			Renderer.DrawRect(a.X, b.Y, b.X, size.Y, veilColor);
-			Renderer.DrawRectOutline(a, b, Colors.Timeline.Overview.Border, 1);
+			Renderer.DrawRectOutline(a, b, TimelineOverviewColors.Border, 1);
 		}
 
 		class CustomFrame : Frame

@@ -108,7 +108,7 @@ namespace Tangerine.UI
 				mainWidget.PostPresenter = new DelegatePresenter<Widget>(widget => {
 					if (dockSite != DockSite.None) {
 						widget.PrepareRendererState();
-						Renderer.DrawRectOutline(dockSiteRect.A + Vector2.One, dockSiteRect.B - Vector2.One, Colors.Docking.DragRectagleOutline, 2);
+						Renderer.DrawRectOutline(dockSiteRect.A + Vector2.One, dockSiteRect.B - Vector2.One, DockingColors.DragRectagleOutline, 2);
 					}
 				});
 				var input = panel.TitleWidget.Input;

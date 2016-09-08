@@ -113,14 +113,14 @@ namespace Tangerine.UI.Timeline
 		{
 			widget.PrepareRendererState();
 			foreach (var r in selection.GetNonOverlappedRects()) {
-				Renderer.DrawRect(grid.CellToGridCoordinates(r.A + offset), grid.CellToGridCoordinates(r.B + offset), Colors.Timeline.Grid.Selection);
+				Renderer.DrawRect(grid.CellToGridCoordinates(r.A + offset), grid.CellToGridCoordinates(r.B + offset), TimelineGridColors.Selection);
 			}
 		}
 
 		void RenderSelectionRect(Widget widget)
 		{
 			widget.PrepareRendererState();
-			Renderer.DrawRect(grid.CellToGridCoordinates(rect.A), grid.CellToGridCoordinates(rect.B), Colors.Timeline.Grid.Selection);
+			Renderer.DrawRect(grid.CellToGridCoordinates(rect.A), grid.CellToGridCoordinates(rect.B), TimelineGridColors.Selection);
 		}
 	}
 }

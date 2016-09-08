@@ -177,7 +177,7 @@ namespace Tangerine.UI.SceneView
 					originalWidget.SetTangerineFlag(TangerineFlags.HiddenOnExposition, true);
 					var label = new SimpleText { 
 						Position = new Vector2(10, 10),
-						Color = Colors.SceneView.Label,
+						Color = SceneViewColors.Label,
 						Text = (exposedWidget.Id ?? ""),
 						OverflowMode = TextOverflowMode.Ignore
 					};
@@ -186,15 +186,15 @@ namespace Tangerine.UI.SceneView
 					frame.AddNode(clickArea);
 					frame.AddNode(label);
 					frame.AddNode(exposedWidget);
-					borderPresenter = new WidgetBoundsPresenter(Colors.SceneView.ExposedItemInactiveBorder, 1);
+					borderPresenter = new WidgetBoundsPresenter(SceneViewColors.ExposedItemInactiveBorder, 1);
 					frame.CompoundPresenter.Push(borderPresenter);
 					frame.Tasks.AddLoop(() => {
 						borderPresenter.Color = Document.Current.EnumerateSelectedNodes().Contains(widget) ? 
-							Colors.SceneView.ExposedItemSelectedBorder :
-							Colors.SceneView.ExposedItemInactiveBorder;
+							SceneViewColors.ExposedItemSelectedBorder :
+							SceneViewColors.ExposedItemInactiveBorder;
 						if (clickArea.IsMouseOver()) {
 							if (Task.Current.LifeTime % 0.5f < 0.25f) {
-								borderPresenter.Color = Colors.SceneView.ExposedItemActiveBorder;
+								borderPresenter.Color = SceneViewColors.ExposedItemActiveBorder;
 							}
 							if (clickArea.Input.WasMousePressed()) {
 								if (!input.IsKeyPressed(MultiSelectKey)) {

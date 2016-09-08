@@ -21,7 +21,7 @@ namespace Tangerine.UI.Timeline
 		void Render(Widget widget)
 		{
 			widget.PrepareRendererState();
-			Renderer.DrawVerticalGradientRect(Vector2.Zero, RootWidget.Size, Colors.Toolbar.Background);
+			Renderer.DrawVerticalGradientRect(Vector2.Zero, RootWidget.Size, ToolbarColors.Background);
 			Renderer.Transform1 *= Matrix32.Translation(-Timeline.Instance.ScrollOrigin.X, 0);
 			RenderCursor();
 			for (int i = 0; i < Timeline.Instance.ColumnCount; i++) {
@@ -34,7 +34,7 @@ namespace Tangerine.UI.Timeline
 						DesktopTheme.Metrics.TextHeight, 
 						DesktopTheme.Colors.BlackText);
 				}
-				Renderer.DrawLine(x, RootWidget.Height - 1, x, RootWidget.Height - 4, Colors.Timeline.Ruler.Notchings);
+				Renderer.DrawLine(x, RootWidget.Height - 1, x, RootWidget.Height - 4, TimelineRulerColors.Notchings);
 			}
 			foreach (var m in Timeline.Instance.Container.Markers) {
 				RenderMarker(m);
@@ -44,7 +44,7 @@ namespace Tangerine.UI.Timeline
 		void RenderCursor()
 		{
 			var r = GetRectangle(Timeline.Instance.CurrentColumn);
-			Renderer.DrawRect(r.A, r.B, Document.Current.Container.IsRunning ? Colors.Timeline.Ruler.RunningCursor : Colors.Timeline.Ruler.Cursor);
+			Renderer.DrawRect(r.A, r.B, Document.Current.Container.IsRunning ? TimelineRulerColors.RunningCursor : TimelineRulerColors.Cursor);
 		}
 
 		void RenderMarker(Marker marker)
@@ -52,7 +52,7 @@ namespace Tangerine.UI.Timeline
 			var r = GetRectangle(marker.Frame);
 			r.A.Y = r.B.Y - 4;
 			Renderer.DrawRect(r.A, r.B, GetMarkerColor(marker));
-			Renderer.DrawRectOutline(r.A, r.B, Colors.Timeline.Ruler.Notchings);
+			Renderer.DrawRectOutline(r.A, r.B, TimelineRulerColors.Notchings);
 			if (!string.IsNullOrWhiteSpace(marker.Id)) {
 				var h = DesktopTheme.Metrics.TextHeight;
 				var extent = Renderer.MeasureTextLine(FontPool.Instance.DefaultFont, marker.Id, h) + Vector2.One;
@@ -67,13 +67,13 @@ namespace Tangerine.UI.Timeline
 		{
 			switch (marker.Action) {
 				case MarkerAction.Jump:
-					return Colors.Timeline.Ruler.JumpMarker;
+					return TimelineRulerColors.JumpMarker;
 				case MarkerAction.Play:
-					return Colors.Timeline.Ruler.PlayMarker;
+					return TimelineRulerColors.PlayMarker;
 				case MarkerAction.Stop:
-					return Colors.Timeline.Ruler.StopMarker;
+					return TimelineRulerColors.StopMarker;
 				default:
-					return Colors.Timeline.Ruler.UnknownMarker;
+					return TimelineRulerColors.UnknownMarker;
 			}
 		}
 

@@ -37,7 +37,7 @@ namespace Tangerine.UI.Timeline
 		private void RenderBackground(Node node)
 		{
 			RootWidget.PrepareRendererState();
-			Renderer.DrawRect(Vector2.Zero, RootWidget.Size, Colors.Timeline.Roll.Lines);
+			Renderer.DrawRect(Vector2.Zero, RootWidget.Size, TimelineRollColors.Lines);
 		}
 	}
 }

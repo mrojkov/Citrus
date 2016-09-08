@@ -93,14 +93,14 @@ namespace Tangerine.UI
 		private void GetColors(out Color4 bgColor, out Color4 borderColor)
 		{
 			if (Highlightable && state == State.Highlight) {
-				bgColor = Colors.Toolbar.ButtonHighlightBackground;
-				borderColor = Colors.Toolbar.ButtonHighlightBorder;
+				bgColor = ToolbarColors.ButtonHighlightBackground;
+				borderColor = ToolbarColors.ButtonHighlightBorder;
 			} else if (Highlightable && state == State.Press) {
-				bgColor = Colors.Toolbar.ButtonPressBackground;
-				borderColor = Colors.Toolbar.ButtonPressBorder;
+				bgColor = ToolbarColors.ButtonPressBackground;
+				borderColor = ToolbarColors.ButtonPressBorder;
 			} else if (Checked) {
-				bgColor = Colors.Toolbar.ButtonCheckedBackground;
-				borderColor = Colors.Toolbar.ButtonCheckedBorder;
+				bgColor = ToolbarColors.ButtonCheckedBackground;
+				borderColor = ToolbarColors.ButtonCheckedBorder;
 			} else {
 				bgColor = Color4.Transparent;
 				borderColor = Color4.Transparent;
