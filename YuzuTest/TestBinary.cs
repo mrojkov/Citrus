@@ -77,6 +77,11 @@ namespace YuzuTest.Binary
 			return XS(s1, rt1) + " " + XS(s2, rt2) + " " + XS(s3, rt3);
 		}
 
+		private void CheckDeserializers(Action<BinaryDeserializer> a) {
+			a(new BinaryDeserializer());
+			a(new BinaryDeserializerGen());
+		}
+
 		[TestMethod]
 		public void TestXS()
 		{
@@ -274,14 +279,11 @@ namespace YuzuTest.Binary
 				" 01 00 02 00 00 00 00 00",
 				XS(result1));
 
-
-			var bd = new BinaryDeserializer();
-			var w = new Sample4();
-			bd.FromBytes(w, result1);
-			Assert.AreEqual(SampleEnum.E3, w.E);
-
-			w = (Sample4)((new BinaryDeserializerGen()).FromBytes(result1));
-			Assert.AreEqual(SampleEnum.E3, w.E);
+			CheckDeserializers(bd => {
+				var w = new Sample4();
+				bd.FromBytes(w, result1);
+				Assert.AreEqual(SampleEnum.E3, w.E);
+			});
 		}
 
 		[TestMethod]
@@ -340,14 +342,10 @@ namespace YuzuTest.Binary
 				" 01 00" + " D2 04 00 00 00 00 00 00 00 00 00 00" + " 00 00 02 80" + " 00 00",
 				XS(result1));
 
-			var w = new SampleDecimal();
-			var bd = new BinaryDeserializer();
-			bd.FromBytes(w, result1);
-			Assert.AreEqual(v.N, w.N);
-
-			var bdg = new BinaryDeserializerGen();
-			w = bdg.FromBytes<SampleDecimal>(result1);
-			Assert.AreEqual(v.N, w.N);
+			CheckDeserializers(bd => {
+				var w = bd.FromBytes<SampleDecimal>(result1);
+				Assert.AreEqual(v.N, w.N);
+			});
 		}
 
 		[TestMethod]
@@ -627,23 +625,16 @@ namespace YuzuTest.Binary
 				" 01 00 " + XS("V", RoughType.Int) +
 				" 01 00 03 00 00 00 00 00 09 00 00 00 00 00", XS(result0));
 
-			var bd = new BinaryDeserializer();
-			var w = new SampleDictKeys();
-			bd.FromBytes(w, result0);
-			Assert.AreEqual(1, w.I.Count);
-			Assert.AreEqual(7, w.I[5]);
-			Assert.AreEqual(1, w.E.Count);
-			Assert.AreEqual(8, w.E[SampleEnum.E2]);
-			Assert.AreEqual(1, w.K.Count);
-			Assert.AreEqual(9, w.K[new SampleKey { V = 3 }]);
-
-			w = (SampleDictKeys)((new BinaryDeserializerGen()).FromBytes(result0));
-			Assert.AreEqual(1, w.I.Count);
-			Assert.AreEqual(7, w.I[5]);
-			Assert.AreEqual(1, w.E.Count);
-			Assert.AreEqual(8, w.E[SampleEnum.E2]);
-			Assert.AreEqual(1, w.K.Count);
-			Assert.AreEqual(9, w.K[new SampleKey { V = 3 }]);
+			CheckDeserializers(bd => {
+				var w = new SampleDictKeys();
+				bd.FromBytes(w, result0);
+				Assert.AreEqual(1, w.I.Count);
+				Assert.AreEqual(7, w.I[5]);
+				Assert.AreEqual(1, w.E.Count);
+				Assert.AreEqual(8, w.E[SampleEnum.E2]);
+				Assert.AreEqual(1, w.K.Count);
+				Assert.AreEqual(9, w.K[new SampleKey { V = 3 }]);
+			});
 		}
 
 		[TestMethod]
@@ -679,7 +670,6 @@ namespace YuzuTest.Binary
 		public void TestClassList()
 		{
 			var bs = new BinarySerializer();
-			var bd = new BinaryDeserializer();
 
 			var v = new SampleClassList {
 				E = new List<SampleBase> {
@@ -690,22 +680,16 @@ namespace YuzuTest.Binary
 			};
 
 			var result = bs.ToBytes(v);
-			var w = (SampleClassList)bd.FromBytes(result);
 
-			Assert.AreEqual(3, w.E.Count);
-			Assert.IsInstanceOfType(w.E[0], typeof(SampleDerivedA));
-			Assert.IsInstanceOfType(w.E[1], typeof(SampleDerivedB));
-			Assert.AreEqual(9, ((SampleDerivedB)w.E[1]).FB);
-			Assert.IsInstanceOfType(w.E[2], typeof(SampleDerivedB));
-			Assert.AreEqual(8, ((SampleDerivedB)w.E[2]).FB);
-
-			w = (SampleClassList)((new BinaryDeserializerGen()).FromBytes(result));
-			Assert.AreEqual(3, w.E.Count);
-			Assert.IsInstanceOfType(w.E[0], typeof(SampleDerivedA));
-			Assert.IsInstanceOfType(w.E[1], typeof(SampleDerivedB));
-			Assert.AreEqual(9, ((SampleDerivedB)w.E[1]).FB);
-			Assert.IsInstanceOfType(w.E[2], typeof(SampleDerivedB));
-			Assert.AreEqual(8, ((SampleDerivedB)w.E[2]).FB);
+			CheckDeserializers(bd => {
+				var w = (SampleClassList)bd.FromBytes(result);
+				Assert.AreEqual(3, w.E.Count);
+				Assert.IsInstanceOfType(w.E[0], typeof(SampleDerivedA));
+				Assert.IsInstanceOfType(w.E[1], typeof(SampleDerivedB));
+				Assert.AreEqual(9, ((SampleDerivedB)w.E[1]).FB);
+				Assert.IsInstanceOfType(w.E[2], typeof(SampleDerivedB));
+				Assert.AreEqual(8, ((SampleDerivedB)w.E[2]).FB);
+			});
 		}
 
 		[TestMethod]
@@ -716,23 +700,18 @@ namespace YuzuTest.Binary
 				"04 00 00 00 03 00 00 00 01 00 00 00 02 00 00 00 03 00 00 00 " +
 				"02 00 00 00 04 00 00 00 05 00 00 00 " +
 				"01 00 00 00 06 00 00 00 00 00 00 00 00 00";
-			var v = new SampleMatrix();
-			(new BinaryDeserializer()).FromBytes(v, SX(src).ToArray());
-			Assert.AreEqual(4, v.M.Count);
-			CollectionAssert.AreEqual(new int[] { 1, 2, 3 }, v.M[0]);
-			CollectionAssert.AreEqual(new int[] { 4, 5 }, v.M[1]);
-			CollectionAssert.AreEqual(new int[] { 6 }, v.M[2]);
-			Assert.AreEqual(0, v.M[3].Count);
-
-			v = (SampleMatrix)((new BinaryDeserializerGen()).FromBytes(SX(src).ToArray()));
-			Assert.AreEqual(4, v.M.Count);
-			CollectionAssert.AreEqual(new int[] { 1, 2, 3 }, v.M[0]);
-			CollectionAssert.AreEqual(new int[] { 4, 5 }, v.M[1]);
-			CollectionAssert.AreEqual(new int[] { 6 }, v.M[2]);
-			Assert.AreEqual(0, v.M[3].Count);
+			var w = new SampleMatrix();
+			CheckDeserializers(bd => {
+				bd.FromBytes(w, SX(src).ToArray());
+				Assert.AreEqual(4, w.M.Count);
+				CollectionAssert.AreEqual(new int[] { 1, 2, 3 }, w.M[0]);
+				CollectionAssert.AreEqual(new int[] { 4, 5 }, w.M[1]);
+				CollectionAssert.AreEqual(new int[] { 6 }, w.M[2]);
+				Assert.AreEqual(0, w.M[3].Count);
+			});
 
 			var bs = new BinarySerializer();
-			Assert.AreEqual(src, XS(bs.ToBytes(v)));
+			Assert.AreEqual(src, XS(bs.ToBytes(w)));
 		}
 
 		private void CheckSampleRect(SampleRect expected, SampleRect actual)
@@ -860,13 +839,11 @@ namespace YuzuTest.Binary
 				" 02 00 " + XS("G", RoughType.String, "X", RoughType.Int) +
 				" 01 00 " + XS("qq") + " 02 00 23 00 00 00 00 00 00 00",
 				XS(result1));
-			var w1 = (SampleInterfaceField)(new BinaryDeserializer()).FromBytes(new SampleInterfaceField(), result1);
-			Assert.AreEqual(w1.I.X, 35);
-			Assert.AreEqual((w1.I as SampleInterfacedGeneric<string>).G, "qq");
-
-			var w1g = (SampleInterfaceField)(new BinaryDeserializerGen()).FromBytes(result1);
-			Assert.AreEqual(w1g.I.X, 35);
-			Assert.AreEqual((w1g.I as SampleInterfacedGeneric<string>).G, "qq");
+			CheckDeserializers(bd => {
+				var w1 = (SampleInterfaceField)bd.FromBytes(new SampleInterfaceField(), result1);
+				Assert.AreEqual(w1.I.X, 35);
+				Assert.AreEqual((w1.I as SampleInterfacedGeneric<string>).G, "qq");
+			});
 		}
 
 		[TestMethod]
@@ -1104,20 +1081,12 @@ namespace YuzuTest.Binary
 				"20 01 00 " + XS(typeof(SampleAfter)) + " 01 00 " + XS("X", RoughType.String) +
 				" 01 00 " + XS("m") + " 00 00",
 				XS(result0));
-
-			var bd = new BinaryDeserializer();
-			var bdg = new BinaryDeserializerGen();
-
-			var w0 = new SampleAfter();
-			bd.FromBytes(w0, result0);
-			Assert.AreEqual("m1", w0.X);
-			Assert.AreEqual("m1", bdg.FromBytes<SampleAfter>(result0).X);
-
-			var w1 = new SampleAfter2();
 			var result1 = bs.ToBytes(new SampleAfter2 { X = "m" });
-			bd.FromBytes(w1, result1);
-			Assert.AreEqual("m231", w1.X);
-			Assert.AreEqual("m231", bdg.FromBytes<SampleAfter2>(result1).X);
+
+			CheckDeserializers(bd => {
+				Assert.AreEqual("m1", bd.FromBytes<SampleAfter>(result0).X);
+				Assert.AreEqual("m231", bd.FromBytes<SampleAfter2>(result1).X);
+			});
 		}
 
 		[TestMethod]
@@ -1140,27 +1109,17 @@ namespace YuzuTest.Binary
 				" 01 00 00 03 00 00 00 00 00 00",
 				XS(result1));
 
-			var bd = new BinaryDeserializer();
-			var w1 = new SampleMerge();
-			w1.DI.Add(5, 6);
-			w1.LI.Add(44);
-			w1.M = new Sample1 { X = 999, Y = "qqq" };
-			bd.FromBytes(w1, result1);
-			CollectionAssert.AreEqual(new Dictionary<int, int> { { 5, 6 }, { 3, 4 } }, w1.DI);
-			CollectionAssert.AreEqual(new[] { 44, 33 }, w1.LI);
-			Assert.AreEqual(768, w1.M.X);
-			Assert.AreEqual("qqq", w1.M.Y);
-
-			var bdg = new BinaryDeserializerGen();
-			var w2 = new SampleMerge();
-			w2.DI.Add(51, 61);
-			w2.LI.Add(55);
-			w2.M = new Sample1 { X = 999, Y = "www" };
-			bdg.FromBytes(w2, result1);
-			CollectionAssert.AreEqual(new Dictionary<int, int> { { 51, 61 }, { 3, 4 } }, w2.DI);
-			CollectionAssert.AreEqual(new[] { 55, 33 }, w2.LI);
-			Assert.AreEqual(768, w2.M.X);
-			Assert.AreEqual("www", w2.M.Y);
+			CheckDeserializers(bd => {
+				var w1 = new SampleMerge();
+				w1.DI.Add(5, 6);
+				w1.LI.Add(44);
+				w1.M = new Sample1 { X = 999, Y = "qqq" };
+				bd.FromBytes(w1, result1);
+				CollectionAssert.AreEqual(new Dictionary<int, int> { { 5, 6 }, { 3, 4 } }, w1.DI);
+				CollectionAssert.AreEqual(new[] { 44, 33 }, w1.LI);
+				Assert.AreEqual(768, w1.M.X);
+				Assert.AreEqual("qqq", w1.M.Y);
+			});
 		}
 
 		[TestMethod]
@@ -1176,11 +1135,10 @@ namespace YuzuTest.Binary
 				" 05 01 00 03 00 00 00 00 00 00 00",
 				XS(result1));
 
-			var w1 = (new BinaryDeserializer()).FromBytes(result1);
-			Assert.AreEqual(3, (w1 as YuzuTest2.SampleNamespace).B.FBase);
-
-			var w1g = (new BinaryDeserializerGen()).FromBytes(result1);
-			Assert.AreEqual(3, (w1g as YuzuTest2.SampleNamespace).B.FBase);
+			CheckDeserializers(bd => {
+				var w1 = bd.FromBytes(result1);
+				Assert.AreEqual(3, (w1 as YuzuTest2.SampleNamespace).B.FBase);
+			});
 		}
 
 		[TestMethod]
@@ -1199,13 +1157,11 @@ namespace YuzuTest.Binary
 				"02 00 00 00 00 00 00 00",
 				XS(result1));
 
-			var w1 = (SampleNested)(new BinaryDeserializer()).FromBytes(result1);
-			Assert.AreEqual(v1.E, w1.E);
-			Assert.AreEqual(v1.C.Z, w1.C.Z);
-
-			var w1g = (SampleNested)(new BinaryDeserializerGen()).FromBytes(result1);
-			Assert.AreEqual(v1.E, w1g.E);
-			Assert.AreEqual(v1.C.Z, w1g.C.Z);
+			CheckDeserializers(bd => {
+				var w1 = (SampleNested)bd.FromBytes(result1);
+				Assert.AreEqual(v1.E, w1.E);
+				Assert.AreEqual(v1.C.Z, w1.C.Z);
+			});
 		}
 
 		[TestMethod]
@@ -1286,16 +1242,12 @@ namespace YuzuTest.Binary
 				" 02 00 " + XS("R1") + " 00 00",
 				XS(result1));
 
-			var bd = new BinaryDeserializer();
-			var w1 = new List<SampleAssemblyBase>();
-			bd.FromBytes(w1, result1);
-			Assert.AreEqual((v1[0] as SampleAssemblyDerivedQ).Q, (w1[0] as SampleAssemblyDerivedQ).Q);
-			Assert.AreEqual((v1[1] as SampleAssemblyDerivedR).R, (w1[1] as SampleAssemblyDerivedR).R);
-
-			var bdg = new BinaryDeserializerGen();
-			var w1g = bdg.FromBytes<List<SampleAssemblyBase>>(result1);
-			Assert.AreEqual((v1[0] as SampleAssemblyDerivedQ).Q, (w1g[0] as SampleAssemblyDerivedQ).Q);
-			Assert.AreEqual((v1[1] as SampleAssemblyDerivedR).R, (w1g[1] as SampleAssemblyDerivedR).R);
+			CheckDeserializers(bd => {
+				var w1 = new List<SampleAssemblyBase>();
+				bd.FromBytes(w1, result1);
+				Assert.AreEqual((v1[0] as SampleAssemblyDerivedQ).Q, (w1[0] as SampleAssemblyDerivedQ).Q);
+				Assert.AreEqual((v1[1] as SampleAssemblyDerivedR).R, (w1[1] as SampleAssemblyDerivedR).R);
+			});
 		}
 
 		[TestMethod]
