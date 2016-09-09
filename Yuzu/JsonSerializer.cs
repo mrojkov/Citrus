@@ -49,6 +49,11 @@ namespace Yuzu.Json
 	{
 		public JsonSerializeOptions JsonOptions = new JsonSerializeOptions();
 
+		public JsonSerializer()
+		{
+			InitWriters();
+		}
+
 		private int depth = 0;
 
 		private byte[] nullBytes = new byte[] { (byte)'n', (byte)'u', (byte)'l', (byte)'l' };
@@ -398,10 +403,41 @@ namespace Yuzu.Json
 		private Dictionary<Type, Action<object>> writerCache = new Dictionary<Type, Action<object>>();
 		private int jsonOptionsGeneration = 0;
 
+		private void InitWriters()
+		{
+			writerCache[typeof(sbyte)] = WriteInt;
+			writerCache[typeof(byte)] = WriteUInt;
+			writerCache[typeof(short)] = WriteInt;
+			writerCache[typeof(ushort)] = WriteUInt;
+			writerCache[typeof(int)] = WriteInt;
+			writerCache[typeof(uint)] = WriteUInt;
+			if (JsonOptions.Int64AsString) {
+				writerCache[typeof(long)] = WriteLongAsString;
+				writerCache[typeof(ulong)] = WriteULongAsString;
+			}
+			else {
+				writerCache[typeof(long)] = WriteLong;
+				writerCache[typeof(ulong)] = WriteULong;
+			}
+			writerCache[typeof(bool)] = WriteBool;
+			writerCache[typeof(char)] = WriteEscapedString;
+			writerCache[typeof(float)] = WriteSingle;
+			writerCache[typeof(double)] = WriteDouble;
+			if (JsonOptions.DecimalAsString)
+				writerCache[typeof(decimal)] = WriteDecimalAsString;
+			else
+				writerCache[typeof(decimal)] = WriteDecimal;
+			writerCache[typeof(DateTime)] = WriteDateTime;
+			writerCache[typeof(TimeSpan)] = WriteTimeSpan;
+			writerCache[typeof(string)] = WriteNullableEscapedString;
+			writerCache[typeof(object)] = WriteAny;
+		}
+
 		private Action<object> GetWriteFunc(Type t)
 		{
 			if (jsonOptionsGeneration != JsonOptions.Generation) {
 				writerCache.Clear();
+				InitWriters();
 				jsonOptionsGeneration = JsonOptions.Generation;
 			}
 
@@ -415,49 +451,12 @@ namespace Yuzu.Json
 
 		private Action<object> MakeWriteFunc(Type t)
 		{
-			if (t == typeof(sbyte) || t == typeof(short) || t == typeof(int))
-				return WriteInt;
-			if (t == typeof(byte) || t == typeof(ushort) || t == typeof(uint))
-				return WriteUInt;
-			if (t == typeof(long)) {
-				if (JsonOptions.Int64AsString)
-					return WriteLongAsString;
-				else
-					return WriteLong;
-			}
-			if (t == typeof(ulong)) {
-				if (JsonOptions.Int64AsString)
-					return WriteULongAsString;
-				else
-					return WriteULong;
-			}
-			if (t == typeof(double))
-				return WriteDouble;
-			if (t == typeof(decimal))
-				if (JsonOptions.DecimalAsString)
-					return WriteDecimalAsString;
-				else
-					return WriteDecimal;
-			if (t == typeof(float))
-				return WriteSingle;
-			if (t == typeof(char))
-				return WriteEscapedString;
-			if (t == typeof(string))
-				return WriteNullableEscapedString;
-			if (t == typeof(bool))
-				return WriteBool;
-			if (t == typeof(DateTime))
-				return WriteDateTime;
-			if (t == typeof(TimeSpan))
-				return WriteTimeSpan;
 			if (t.IsEnum) {
 				if (JsonOptions.EnumAsString)
 					return WriteUnescapedString;
 				else
 					return WriteEnumAsInt;
 			}
-			if (t == typeof(object))
-				return WriteAny;
 			if (t.IsGenericType) {
 				var g = t.GetGenericTypeDefinition();
 				if (g == typeof(Dictionary<,>))
