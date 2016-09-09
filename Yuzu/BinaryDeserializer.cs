@@ -221,6 +221,11 @@ namespace Yuzu.Binary
 		// Zeroth element corresponds to 'null'.
 		private List<ClassDef> classDefs = new List<ClassDef> { new ClassDef() };
 
+		protected class YuzuUnknownBinary : YuzuUnknown
+		{
+			public ClassDef Def;
+		}
+
 		protected virtual void PrepareReaders(ClassDef def)
 		{
 			def.ReadFields = ReadFields;
@@ -228,16 +233,40 @@ namespace Yuzu.Binary
 
 		public void ClearClassIds() { classDefs = new List<ClassDef> { new ClassDef() }; }
 
+		private ClassDef GetClassDefUnknown(string typeName)
+		{
+			var result = new ClassDef {
+				Meta = Meta.Unknown,
+				Make = (bd, def) => {
+					var obj = new YuzuUnknownBinary { ClassTag = typeName, Def = def };
+					ReadFields(bd, def, obj);
+					return obj;
+				},
+			};
+			var theirCount = Reader.ReadInt16();
+			for (int theirIndex = 0; theirIndex < theirCount; ++theirIndex) {
+				var theirName = Reader.ReadString();
+				var rf = ReadValueFunc(ReadType());
+				result.Fields.Add(new ClassDef.FieldDef {
+					Name = theirName, OurIndex = -1,
+					ReadFunc = obj => ((YuzuUnknown)obj).Fields[theirName] = rf()
+				});
+			}
+			classDefs.Add(result);
+			return result;
+		}
+
 		private ClassDef GetClassDef(short classId)
 		{
 			if (classId < classDefs.Count)
 				return classDefs[classId];
 			if (classId > classDefs.Count)
 				throw Error("Bad classId: {0}", classId);
-			var result = new ClassDef();
 			var typeName = Reader.ReadString();
-			var classType = FindType(typeName);
-			result.Meta = Meta.Get(classType, Options);
+			var classType = TypeSerializer.Deserialize(typeName);
+			if (classType == null)
+				return GetClassDefUnknown(typeName);
+			var result = new ClassDef { Meta = Meta.Get(classType, Options) };
 			PrepareReaders(result);
 			var ourCount = result.Meta.Items.Count;
 			var theirCount = Reader.ReadInt16();

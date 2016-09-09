@@ -224,6 +224,12 @@ namespace Yuzu.Metadata
 			}
 		}
 
+		private Meta(Type t)
+		{
+			Type = t;
+			Options = MetaOptions.Default;
+		}
+
 		private Meta(Type t, CommonOptions options)
 		{
 			Type = t;
@@ -270,6 +276,8 @@ namespace Yuzu.Metadata
 			cache.Add(Tuple.Create(t, options), meta);
 			return meta;
 		}
+
+		internal static Meta Unknown = new Meta(typeof(YuzuUnknown));
 
 		private YuzuException Error(string format, params object[] args)
 		{

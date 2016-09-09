@@ -1251,6 +1251,30 @@ namespace YuzuTest.Binary
 		}
 
 		[TestMethod]
+		public void TestUnknown()
+		{
+			var bd = new BinaryDeserializer();
+			var w1 = (YuzuUnknown)bd.FromBytes(SX(
+				"20 01 00 " + XS("NewType1") + " 02 00 " + XS("a", RoughType.Int, "b", RoughType.String) +
+				" 01 00 07 07 00 00 00 00").ToArray());
+			Assert.AreEqual("NewType1", w1.ClassTag);
+			Assert.AreEqual(1, w1.Fields.Count);
+			Assert.AreEqual(7*256 + 7, w1.Fields["a"]);
+
+			var w2 = (YuzuUnknown)bd.FromBytes(SX("20 01 00 02 00 " + XS("qwe") + " 00 00").ToArray());
+			Assert.AreEqual("NewType1", w2.ClassTag);
+			Assert.AreEqual(1, w2.Fields.Count);
+			Assert.AreEqual("qwe", w2.Fields["b"]);
+
+			bd.Options.IgnoreUnknownFields = true;
+			bd.Options.ReportErrorPosition = true;
+			var w3 = bd.FromBytes<SampleBool>(SX(
+				"20 02 00 " + XS(typeof(SampleBool)) + " 02 00 " + XS("B", RoughType.Bool, "a", RoughType.Record) +
+				" 01 00 01 02 00 03 00 " + XS("NewType2") + " 00 00 00 00 00 00").ToArray());
+			Assert.AreEqual(true, w3.B);
+		}
+
+		[TestMethod]
 		public void TestSignature()
 		{
 			var bs = new BinarySerializer();
@@ -1289,7 +1313,7 @@ namespace YuzuTest.Binary
 
 			XAssert.Throws<YuzuException>(() => bd.FromBytes<Sample1>(SX(
 				"20 01 00 " + XS("notype") + " 00 00 00 00"
-			).ToArray()), "notype");
+			).ToArray()), "YuzuUnknown");
 
 			var w = new Sample1();
 			XAssert.Throws<YuzuException>(() => bd.FromBytes(w, SX(
