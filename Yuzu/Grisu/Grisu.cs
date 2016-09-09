@@ -46,11 +46,11 @@ namespace Yuzu.Grisu
 
         public static void Write(double value, BinaryWriter writer)
         {
-            if (Double.IsNaN(value)) {
+            if (double.IsNaN(value)) {
                 writer.Write(nan_symbol_);
                 return;
             }
-            if (Double.IsInfinity(value)) {
+            if (double.IsInfinity(value)) {
                 if (value < 0)
                     writer.Write((byte)'-');
                 writer.Write(infinity_symbol_);
@@ -71,14 +71,67 @@ namespace Yuzu.Grisu
             if (decimal_rep == null)
                 decimal_rep = ts_decimal_rep = new byte[kBase10MaximalLength + 1];
 
+            GrisuDouble v = new GrisuDouble(value);
+            DiyFp w = v.AsNormalizedDiyFp();
+            // boundary_minus and boundary_plus are the boundaries between v and its
+            // closest floating-point neighbors. Any number strictly between
+            // boundary_minus and boundary_plus will round to v when convert to a double.
+            // Grisu3 will never output representations that lie exactly on a boundary.
+            DiyFp boundary_minus, boundary_plus;
+            v.NormalizedBoundaries(out boundary_minus, out boundary_plus);
+
             int decimal_rep_length;
             int decimal_exponent;
 
-            if (!Grisu3(value, decimal_rep, out decimal_rep_length, out decimal_exponent)) {
+            if (Grisu3(w, boundary_minus, boundary_plus, decimal_rep, out decimal_rep_length, out decimal_exponent))
+                CreateRepresentation(decimal_rep, decimal_rep_length, decimal_rep_length + decimal_exponent, writer);
+            else
                 writer.Write(Encoding.ASCII.GetBytes(value.ToString("R", CultureInfo.InvariantCulture)));
+        }
+
+        public static void Write(float value, BinaryWriter writer)
+        {
+            if (float.IsNaN(value)) {
+                writer.Write(nan_symbol_);
                 return;
             }
-            CreateRepresentation(decimal_rep, decimal_rep_length, decimal_rep_length + decimal_exponent, writer);
+            if (float.IsInfinity(value)) {
+                if (value < 0)
+                    writer.Write((byte)'-');
+                writer.Write(infinity_symbol_);
+                return;
+            }
+
+            if (value == 0.0) {
+                writer.Write((byte)'0');
+                return;
+            }
+
+            if (value < 0.0) {
+                writer.Write((byte)'-');
+                value = -value;
+            }
+
+            byte[] decimal_rep = ts_decimal_rep;
+            if (decimal_rep == null)
+                decimal_rep = ts_decimal_rep = new byte[kBase10MaximalLength + 1];
+
+            GrisuDouble v = new GrisuDouble((double)value);
+            DiyFp w = v.AsNormalizedDiyFp();
+            // boundary_minus and boundary_plus are the boundaries between v and its
+            // closest floating-point neighbors. Any number strictly between
+            // boundary_minus and boundary_plus will round to v when convert to a double.
+            // Grisu3 will never output representations that lie exactly on a boundary.
+            DiyFp boundary_minus, boundary_plus;
+            (new GrisuSingle(value)).NormalizedBoundaries(out boundary_minus, out boundary_plus);
+
+            int decimal_rep_length;
+            int decimal_exponent;
+
+            if (Grisu3(w, boundary_minus, boundary_plus, decimal_rep, out decimal_rep_length, out decimal_exponent))
+                CreateRepresentation(decimal_rep, decimal_rep_length, decimal_rep_length + decimal_exponent, writer);
+            else
+                writer.Write(Encoding.ASCII.GetBytes(value.ToString("R", CultureInfo.InvariantCulture)));
         }
 
         private static void CreateRepresentation(
@@ -127,7 +180,7 @@ namespace Yuzu.Grisu
         private const int kMinimalTargetExponent = -60;
         private const int kMaximalTargetExponent = -32;
 
-        // Provides a decimal representation of v.
+        // Provides a decimal representation of v = (w, boundary_minus, boundary_plus).
         // Returns true if it succeeds, otherwise the result cannot be trusted.
         // There will be *length digits inside the buffer (not null-terminated).
         // If the function returns true then
@@ -138,19 +191,10 @@ namespace Yuzu.Grisu
         // The last digit will be closest to the actual v. That is, even if several
         // digits might correctly yield 'v' when read again, the closest will be
         // computed.
-        private static bool Grisu3(double value,
-                           byte[] buffer,
-                           out int length,
-                           out int decimal_exponent)
+        private static bool Grisu3(
+            DiyFp w, DiyFp boundary_minus, DiyFp boundary_plus,
+            byte[] buffer, out int length, out int decimal_exponent)
         {
-            GrisuDouble v = new GrisuDouble(value);
-            DiyFp w = v.AsNormalizedDiyFp();
-            // boundary_minus and boundary_plus are the boundaries between v and its
-            // closest floating-point neighbors. Any number strictly between
-            // boundary_minus and boundary_plus will round to v when convert to a double.
-            // Grisu3 will never output representations that lie exactly on a boundary.
-            DiyFp boundary_minus, boundary_plus;
-            v.NormalizedBoundaries(out boundary_minus, out boundary_plus);
             Debug.Assert(boundary_plus.E == w.E);
             DiyFp ten_mk;  // Cached power of ten: 10^-k
             int mk;        // -k

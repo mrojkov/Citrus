@@ -116,7 +116,8 @@ namespace Yuzu.Json
 
 		private void WriteSingle(object obj)
 		{
-			WriteStr(((float)obj).ToString(CultureInfo.InvariantCulture));
+			//WriteStr(((float)obj).ToString("R", CultureInfo.InvariantCulture));
+			DoubleWriter.Write((float)obj, writer);
 		}
 
 		private void WriteDecimal(object obj)

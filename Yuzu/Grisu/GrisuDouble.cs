@@ -330,4 +330,106 @@ namespace Yuzu.Grisu
         private ulong d64_;
         private double value_;
     }
+
+    internal struct GrisuSingle {
+        private const uint kSignMask = 0x80000000;
+        private const uint kExponentMask = 0x7F800000;
+        private const uint kSignificandMask = 0x007FFFFF;
+        private const uint kHiddenBit = 0x00800000;
+        private const int kPhysicalSignificandSize = 23;  // Excludes the hidden bit.
+        private const int kSignificandSize = 24;
+
+        public GrisuSingle(float f) { d32_ = BitConverter.ToUInt32(BitConverter.GetBytes(f), 0); }
+        public GrisuSingle(uint d32) { d32_ = d32; }
+
+        // The value encoded by this Single must be greater or equal to +0.0.
+        // It must not be special (infinity, or NaN).
+        private DiyFp AsDiyFp { get {
+            Debug.Assert(Sign > 0);
+            Debug.Assert(!IsSpecial);
+            return new DiyFp(Significand, Exponent);
+        }}
+
+        // Returns the single's bits as uint32.
+        public uint AsUint32 { get { return d32_; } }
+
+        public int Exponent { get {
+            if (IsDenormal) return kDenormalExponent;
+            var biased_e = (int)((d32_ & kExponentMask) >> kPhysicalSignificandSize);
+            return biased_e - kExponentBias;
+        }}
+
+        public uint Significand { get {
+            uint significand = d32_ & kSignificandMask;
+            return IsDenormal ? significand : significand + kHiddenBit;
+        }}
+
+        // Returns true if the single is a denormal.
+        public bool IsDenormal { get { return (d32_ & kExponentMask) == 0; }}
+
+        // We consider denormals not to be special.
+        // Hence only Infinity and NaN are special.
+        public bool IsSpecial { get { return (d32_ & kExponentMask) == kExponentMask; }}
+
+        public bool IsNan { get {
+            return ((d32_ & kExponentMask) == kExponentMask) && ((d32_ & kSignificandMask) != 0);
+        }}
+
+        public bool IsInfinite { get {
+            return ((d32_ & kExponentMask) == kExponentMask) && ((d32_ & kSignificandMask) == 0);
+        }}
+
+        public int Sign { get { return (d32_ & kSignMask) == 0? 1: -1; }}
+
+        // Computes the two boundaries of this.
+        // The bigger boundary (m_plus) is normalized. The lower boundary has the same
+        // exponent as m_plus.
+        // Precondition: the value encoded by this Single must be greater than 0.
+        public void NormalizedBoundaries(out DiyFp out_m_minus, out DiyFp out_m_plus)
+        {
+            Debug.Assert(Value > 0.0);
+            DiyFp v = AsDiyFp;
+            DiyFp m_plus = new DiyFp((v.F << 1) + 1, v.E - 1);
+            m_plus.Normalize();
+            DiyFp m_minus = LowerBoundaryIsCloser() ?
+                new DiyFp((v.F << 2) - 1, v.E - 2) :
+                new DiyFp((v.F << 1) - 1, v.E - 1);
+            m_minus.F = m_minus.F << (m_minus.E - m_plus.E);
+            m_minus.E = m_plus.E;
+            out_m_plus = m_plus;
+            out_m_minus = m_minus;
+        }
+
+        // Precondition: the value encoded by this Single must be greater or equal
+        // than +0.0.
+        private DiyFp UpperBoundary()
+        {
+            Debug.Assert(Sign > 0);
+            return new DiyFp(Significand * 2 + 1, Exponent - 1);
+        }
+
+        private bool LowerBoundaryIsCloser()
+        {
+            // The boundary is closer if the significand is of the form f == 2^p-1 then
+            // the lower boundary is closer.
+            // Think of v = 1000e10 and v- = 9999e9.
+            // Then the boundary (== (v - v-)/2) is not just at a distance of 1e9 but
+            // at a distance of 1e8.
+            // The only exception is for the smallest normal: the largest denormal is
+            // at the same distance as its successor.
+            // Note: denormals have the same exponent as the smallest normals.
+            bool physical_significand_is_zero = ((d32_ & kSignificandMask) == 0);
+            return physical_significand_is_zero && (Exponent != kDenormalExponent);
+        }
+
+        public float Value { get { return BitConverter.ToSingle(BitConverter.GetBytes(d32_), 0); } }
+
+        private const int kExponentBias = 0x7F + kPhysicalSignificandSize;
+        private const int kDenormalExponent = -kExponentBias + 1;
+        private const int kMaxExponent = 0xFF - kExponentBias;
+        private const uint kInfinity = 0x7F800000;
+        private const uint kNaN = 0x7FC00000;
+
+        private uint d32_;
+    }
 }
