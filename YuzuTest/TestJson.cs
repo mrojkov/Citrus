@@ -915,6 +915,7 @@ namespace YuzuTest.Json
 		public void TestObject()
 		{
 			var jd = new JsonDeserializer();
+
 			var w = new SampleObj();
 			const string str = "{ \"F\": 123.4 }";
 			jd.FromString(w, str);
@@ -930,6 +931,7 @@ namespace YuzuTest.Json
 				new Dictionary<string, object>() { { "a", "1" }, { "b", "2" } },
 				(Dictionary<string, object>)w.F);
 			Assert.AreEqual(typeof(Dictionary<string, object>), jd.FromString("{}").GetType());
+			Assert.AreEqual(typeof(Dictionary<string, object>), jd.FromString<object>("{}").GetType());
 
 			var d = jd.FromString("{ \"F\": [1,2,3] }");
 			Assert.AreEqual(typeof(Dictionary<string, object>), d.GetType());
@@ -959,6 +961,9 @@ namespace YuzuTest.Json
 			Assert.AreEqual(10, w.Value);
 
 			jd.FromString(w, "{\"a\":11, \"a1\":[], \"x\":null}");
+			Assert.AreEqual(11, w.Value);
+
+			jd.FromString(w, "{\"a\":11, \"a1\":[{}]}");
 			Assert.AreEqual(11, w.Value);
 		}
 
@@ -1372,6 +1377,7 @@ namespace YuzuTest.Json
 			var jd = new JsonDeserializer();
 			var w = new Sample1();
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{}"), "X");
+			XAssert.Throws<YuzuException>(() => jd.FromString("{null:1}"), "'n'");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"X\" }"), ":");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "nn"), "'u'");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"X\":1, \"Y\": \"\\z\" }"), "z");

@@ -47,11 +47,9 @@ namespace Yuzu.Json
 
 		private object MaybeReadObject(string className, string name)
 		{
-			if (name == "") {
-				Require('}');
-				return Activator.CreateInstance(FindType(className));
-			}
-			return MakeDeserializer(className).FromReaderIntPartial(name);
+			return name == "" ?
+				Activator.CreateInstance(FindType(className)) :
+				MakeDeserializer(className).FromReaderIntPartial(name);
 		}
 
 		private object FromReaderIntGenerated()
@@ -73,11 +71,8 @@ namespace Yuzu.Json
 				CheckExpectedType(RequireUnescapedString(), expectedType);
 				name = GetNextName(first: false);
 			}
-			if (name == "") {
-				Require('}');
-				return obj;
-			}
-			return MakeDeserializer(TypeSerializer.Serialize(obj.GetType())).ReadFields(obj, name);
+			return name == "" ? obj :
+				MakeDeserializer(TypeSerializer.Serialize(obj.GetType())).ReadFields(obj, name);
 		}
 
 		public override object FromReaderInt()
@@ -442,7 +437,6 @@ namespace Yuzu.Json
 					if (yi.IsOptional)
 						cw.Put("}\n");
 				}
-				cw.Put("Require('}');\n");
 				GenerateAfterDeserialization(meta);
 			}
 			cw.Put("return result;\n");

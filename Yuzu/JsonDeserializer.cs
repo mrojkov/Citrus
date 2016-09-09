@@ -81,6 +81,9 @@ namespace Yuzu.Json
 			}
 		}
 
+		// Optimization: avoid re-creating StringBuilder.
+		private StringBuilder sb = new StringBuilder();
+
 		protected string RequireUnescapedString()
 		{
 			sb.Clear();
@@ -93,9 +96,6 @@ namespace Yuzu.Json
 			}
 			return sb.ToString();
 		}
-
-		// Optimization: avoid re-creating StringBuilder.
-		private StringBuilder sb = new StringBuilder();
 
 		protected string RequireString()
 		{
@@ -317,15 +317,22 @@ namespace Yuzu.Json
 			var ch = SkipSpaces();
 			if (ch == ',') {
 				if (first)
-					throw Error("Expected name, but got ','");
+					throw Error("Expected name, but found ','");
 				ch = SkipSpaces();
 			}
-			PutBack(ch);
 			if (ch == '}')
 				return "";
-			var result = RequireUnescapedString();
+			if (ch != '"')
+				throw Error("Expected '\"' but found '{0}'", ch);
+			sb.Clear();
+			while (true) {
+				ch = Reader.ReadChar();
+				if (ch == '"')
+					break;
+				sb.Append(ch);
+			}
 			Require(':');
-			return result;
+			return sb.ToString();
 		}
 
 		protected bool RequireOrNull(char ch)
@@ -721,7 +728,6 @@ namespace Yuzu.Json
 			}
 			if (Options.IgnoreUnknownFields)
 				IgnoreNewFieldsTail(name);
-			Require('}');
 			meta.RunAfterDeserialization(obj);
 			return obj;
 		}
