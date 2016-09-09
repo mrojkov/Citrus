@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 
+using Yuzu.Metadata;
 using Yuzu.Util;
 
 namespace Yuzu.Binary
@@ -56,6 +58,22 @@ namespace Yuzu.Binary
 		{
 			return t.IsClass || t.IsInterface || Utils.IsStruct(t);
 		}
+	}
+
+	public class ReaderClassDef
+	{
+		public class FieldDef
+		{
+			public string Name;
+			public int OurIndex; // 1-based
+			public Action<object> ReadFunc;
+		}
+
+		internal Meta Meta;
+		public const int EOF = short.MaxValue;
+		public Action<BinaryDeserializer, ReaderClassDef, object> ReadFields;
+		public Func<BinaryDeserializer, ReaderClassDef, object> Make;
+		public List<FieldDef> Fields = new List<FieldDef> { new FieldDef { OurIndex = EOF } };
 	}
 
 }
