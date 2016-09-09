@@ -955,6 +955,28 @@ namespace YuzuTest.Binary
 		}
 
 		[TestMethod]
+		public void TestUnknownStorage()
+		{
+			var bd = new BinaryDeserializer();
+			bd.Options.IgnoreUnknownFields = true;
+
+			var w = new SampleUnknown();
+			bd.FromBytes(w, SX(
+				"20 01 00 " + XS(typeof(SampleUnknown)) + " 03 00 " +
+				XS("A", RoughType.String, "X", RoughType.Int, "Z", RoughType.Bool) +
+				" 01 00 " + XS("qq") + " 02 00 02 01 00 00 03 00 01 00 00"));
+			Assert.AreEqual(258, w.X);
+			Assert.AreEqual(2, w.Storage.Fields.Count);
+			Assert.AreEqual("A", w.Storage.Fields[0].Name);
+			Assert.AreEqual("qq", w.Storage.Fields[0].Value);
+			Assert.AreEqual("Z", w.Storage.Fields[1].Name);
+			Assert.AreEqual(true, w.Storage.Fields[1].Value);
+
+			bd.FromBytes(w, SX("20 01 00 00 00"));
+			Assert.AreEqual(0, w.Storage.Fields.Count);
+		}
+
+		[TestMethod]
 		public void TestEscape()
 		{
 			var bs = new BinarySerializer();

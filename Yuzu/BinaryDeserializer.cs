@@ -256,6 +256,19 @@ namespace Yuzu.Binary
 			return result;
 		}
 
+		private void AddUnknownFieldDef(ClassDef def, string fieldName, string typeName)
+		{
+			if (!Options.IgnoreUnknownFields)
+				throw Error("New field {0} for class {1}", fieldName, typeName);
+			var rf = ReadValueFunc(ReadType());
+			var fd = new ClassDef.FieldDef { Name = fieldName, OurIndex = -1 };
+			if (def.Meta.GetUnknownStorage == null)
+				fd.ReadFunc = obj => rf();
+			else
+				fd.ReadFunc = obj => def.Meta.GetUnknownStorage(obj).Add(fieldName, rf());
+			def.Fields.Add(fd);
+		}
+
 		private ClassDef GetClassDef(short classId)
 		{
 			if (classId < classDefs.Count)
@@ -282,11 +295,7 @@ namespace Yuzu.Binary
 					ourIndex += 1;
 				}
 				else if (cmp > 0) {
-					if (!Options.IgnoreUnknownFields)
-						throw Error("New field {0} for class {1}", theirName, typeName);
-					var rf = ReadValueFunc(ReadType());
-					result.Fields.Add(new ClassDef.FieldDef {
-						Name = theirName, OurIndex = -1, ReadFunc = obj => rf() });
+					AddUnknownFieldDef(result, theirName, typeName);
 					theirIndex += 1;
 				}
 				else {
@@ -307,22 +316,14 @@ namespace Yuzu.Binary
 					theirIndex += 1;
 				}
 			}
-			while (ourIndex < ourCount) {
+			for (; ourIndex < ourCount; ++ourIndex) {
 				var yi = result.Meta.Items[ourIndex];
 				var ourName = yi.Tag(Options);
 				if (!yi.IsOptional)
 					throw Error("Missing required field {0} for class {1}", ourName, typeName);
-				ourIndex += 1;
 			}
-			while (theirIndex < theirCount) {
-				var theirName = Reader.ReadString();
-				if (!Options.IgnoreUnknownFields)
-					throw Error("New field {0} for class {1}", theirName, typeName);
-				var rf = ReadValueFunc(ReadType());
-				result.Fields.Add(new ClassDef.FieldDef {
-					Name = theirName, OurIndex = -1, ReadFunc = obj => rf() });
-				theirIndex += 1;
-			}
+			for (; theirIndex < theirCount; ++theirIndex)
+				AddUnknownFieldDef(result, Reader.ReadString(), typeName);
 			classDefs.Add(result);
 			return result;
 		}
@@ -336,6 +337,8 @@ namespace Yuzu.Binary
 						def.Fields[i].ReadFunc(obj);
 				}
 				else {
+					if (def.Meta.GetUnknownStorage != null)
+						def.Meta.GetUnknownStorage(obj).Fields.Clear();
 					var actualIndex = d.Reader.ReadInt16();
 					for (int i = 1; i < def.Fields.Count; ++i) {
 						var fd = def.Fields[i];
