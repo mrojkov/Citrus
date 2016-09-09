@@ -35,12 +35,12 @@ using System.Text;
 
 namespace Yuzu.Grisu
 {
-    public static class Grisu
+    public static class DoubleWriter
     {
         [ThreadStatic]
         private static byte[] ts_decimal_rep;
 
-        public static void DoubleToString(double value, BinaryWriter writer)
+        public static void Write(double value, BinaryWriter writer)
         {
             if (value < 0.0)
             {
@@ -64,7 +64,7 @@ namespace Yuzu.Grisu
 
             if (!DoubleToShortestAscii(ref grisuDouble, decimal_rep, out decimal_rep_length, out decimal_point))
             {
-                writer.Write(Encoding.ASCII.GetBytes(string.Format(CultureInfo.InvariantCulture, "{0:R}", value)));
+                writer.Write(Encoding.ASCII.GetBytes(value.ToString("R", CultureInfo.InvariantCulture)));
                 return;
             }
 
@@ -114,7 +114,7 @@ namespace Yuzu.Grisu
 
         private static byte[] infinity_symbol_ = Encoding.ASCII.GetBytes("Infinity");
         private static byte[] nan_symbol_ = Encoding.ASCII.GetBytes("NaN");
-        private const byte exponent_character_ = (byte)'e';
+        private const byte exponent_character_ = (byte)'E';
 
         private static void HandleSpecialValues(
             ref GrisuDouble double_inspect,
@@ -341,10 +341,10 @@ namespace Yuzu.Grisu
             ulong unsafeIntervalF = unsafe_interval.F;
             while (kappa > 0)
             {
-                int digit = (int)(integrals / divisor);
-                buffer[length] = (byte)((int)'0' + digit);
+                var digit = integrals / divisor;
+                buffer[length] = (byte)((uint)'0' + digit);
                 ++length;
-                integrals %= divisor;
+                integrals -= digit * divisor;
                 kappa--;
                 // Note that kappa now equals the exponent of the divisor and that the
                 // invariant thus holds again.
@@ -361,7 +361,7 @@ namespace Yuzu.Grisu
                                      unsafeIntervalF, rest,
                                      (ulong)(divisor) << -one.E, unit);
                 }
-                divisor /= 10;
+                divisor = kSmallPowersOfTen[kappa];
             }
 
             // The integrals have been generated. We are at the point of the decimal
@@ -373,22 +373,27 @@ namespace Yuzu.Grisu
             Debug.Assert(one.E >= -60);
             Debug.Assert(fractionals < one.F);
             Debug.Assert(0xFFFFFFFFFFFFFFFF / 10 >= one.F);
+            int unitPower = 0;
             while (true)
             {
-                fractionals *= 10;
-                unit *= 10;
-                unsafe_interval.F *= 10;
+                //fractionals *= 10;
+                //unit *= 10;
+                //unsafeIntervalF *= 10;
+                fractionals = (fractionals << 3) + (fractionals << 1);
+                unitPower++;
+                unsafeIntervalF = (unsafeIntervalF << 3) + (unsafeIntervalF << 1);
                 // Integer division by one.
                 int digit = (int)(fractionals >> -one.E);
                 buffer[length] = (byte)((int)'0' + digit);
                 ++length;
                 fractionals &= one.F - 1;  // Modulo by one.
                 kappa--;
-                if (fractionals < unsafe_interval.F)
+                if (fractionals < unsafeIntervalF)
                 {
+                    unit = PowersOfTenCache.PowersOfTen[unitPower];
                     too_high.Subtract(ref w);
                     return RoundWeed(buffer, length, too_high.F * unit,
-                                     unsafe_interval.F, fractionals, one.F, unit);
+                                     unsafeIntervalF, fractionals, one.F, unit);
                 }
             }
         }

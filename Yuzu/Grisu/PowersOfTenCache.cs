@@ -180,5 +180,12 @@ namespace Yuzu.Grisu
 
         const int kCachedPowersOffset = 348;  // -1 * the first decimal_exponent.
         const double kD_1_LOG2_10 = 0.30102999566398114;  //  1 / lg(10)
+
+        public static ulong[] PowersOfTen = new ulong[20];
+        static PowersOfTenCache() {
+            PowersOfTen[0] = 1;
+            for (int i = 1; i < PowersOfTen.Length; ++i)
+                PowersOfTen[i] = PowersOfTen[i - 1] * 10UL;
+        }
     }
 }

@@ -74,7 +74,7 @@ namespace Yuzu.Grisu
             // However: the resulting number only contains 64 bits. The least
             // significant 64 bits are only used for rounding the most significant 64
             // bits.
-            const ulong kM32 = 0xFFFFFFFFU;
+            const ulong kM32 = 0xFFFFFFFFUL;
             ulong a = f_ >> 32;
             ulong b = f_ & kM32;
             ulong c = other.f_ >> 32;
