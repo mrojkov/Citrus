@@ -50,6 +50,8 @@ namespace Yuzu.Json
 
 		private int depth = 0;
 
+		private byte[] nullBytes = new byte[] { (byte)'n', (byte)'u', (byte)'l', (byte)'l' };
+
 		private Dictionary<string, byte[]> strCache = new Dictionary<string, byte[]>();
 		private byte[] StrToBytesCached(string s)
 		{
@@ -162,7 +164,7 @@ namespace Yuzu.Json
 		private void WriteNullableEscapedString(object obj)
 		{
 			if (obj == null) {
-				WriteStrCached("null");
+				writer.Write(nullBytes);
 				return;
 			}
 			WriteEscapedString(obj);
@@ -244,7 +246,7 @@ namespace Yuzu.Json
 		private void WriteCollection<T>(object obj)
 		{
 			if (obj == null) {
-				WriteStrCached("null");
+				writer.Write(nullBytes);
 				return;
 			}
 			var list = (ICollection<T>)obj;
@@ -275,7 +277,7 @@ namespace Yuzu.Json
 		private void WriteDictionary<K, V>(object obj)
 		{
 			if (obj == null) {
-				WriteStrCached("null");
+				writer.Write(nullBytes);
 				return;
 			}
 			var dict = (Dictionary<K, V>)obj;
@@ -307,7 +309,7 @@ namespace Yuzu.Json
 		private void WriteArray<T>(object obj)
 		{
 			if (obj == null) {
-				WriteStrCached("null");
+				writer.Write(nullBytes);
 				return;
 			}
 			var array = (T[])obj;
@@ -358,7 +360,7 @@ namespace Yuzu.Json
 		private void WriteAction(object obj)
 		{
 			if (obj == null) {
-				WriteStrCached("null");
+				writer.Write(nullBytes);
 				return;
 			}
 			var a = obj as MulticastDelegate;
@@ -370,7 +372,7 @@ namespace Yuzu.Json
 		private void WriteNullable(object obj, Action<object> normalWrite)
 		{
 			if (obj == null)
-				WriteStrCached("null");
+				writer.Write(nullBytes);
 			else
 				normalWrite(obj);
 		}
@@ -506,7 +508,7 @@ namespace Yuzu.Json
 		private void WriteObject<T>(object obj, Meta meta)
 		{
 			if (obj == null) {
-				WriteStrCached("null");
+				writer.Write(nullBytes);
 				return;
 			}
 			writer.Write((byte)'{');
@@ -543,7 +545,7 @@ namespace Yuzu.Json
 		private void WriteObjectCompact<T>(object obj, Meta meta)
 		{
 			if (obj == null) {
-				WriteStrCached("null");
+				writer.Write(nullBytes);
 				return;
 			}
 			writer.Write((byte)'[');
@@ -575,7 +577,7 @@ namespace Yuzu.Json
 		private void WriteObjectCompactOneline<T>(object obj, Meta meta)
 		{
 			if (obj == null) {
-				WriteStrCached("null");
+				writer.Write(nullBytes);
 				return;
 			}
 			writer.Write((byte)'[');
