@@ -294,7 +294,9 @@ namespace Yuzu.Json
 			if (t == typeof(object))
 				throw new YuzuException("WriteAny");
 			if (t.IsClass || Utils.IsStruct(t))
-				WriteObject<object>(obj);
+				// Ignore compact since class name is always required.
+				// Do not pass Meta since it will always be overritten.
+				WriteObject<object>(obj, null);
 			else
 				GetWriteFunc(t)(obj);
 		}
@@ -424,8 +426,10 @@ namespace Yuzu.Json
 					!meta.IsCompact || JsonOptions.IgnoreCompact ? "WriteObject" :
 					IsOneline(meta) ? "WriteObjectCompactOneline" :
 					"WriteObjectCompact";
+
 				var m = Utils.GetPrivateGeneric(GetType(), name, t);
-				return (Action<object>)Delegate.CreateDelegate(typeof(Action<object>), this, m);
+				var d = (Action<object, Meta>)Delegate.CreateDelegate(typeof(Action<object, Meta>), this, m);
+				return obj => d(obj, meta);
 			}
 			throw new NotImplementedException(t.Name);
 		}
@@ -447,7 +451,7 @@ namespace Yuzu.Json
 			writer.Write((byte)':');
 		}
 
-		private void WriteObject<T>(object obj)
+		private void WriteObject<T>(object obj, Meta meta)
 		{
 			if (obj == null) {
 				WriteStrCached("null");
@@ -464,7 +468,9 @@ namespace Yuzu.Json
 					WriteName(JsonOptions.ClassTag, ref isFirst);
 					WriteUnescapedString(TypeSerializer.Serialize(actualType));
 				}
-				foreach (var yi in Meta.Get(actualType, Options).Items) {
+				if (typeof(T) != actualType)
+					meta = Meta.Get(actualType, Options);
+				foreach (var yi in meta.Items) {
 					var value = yi.GetValue(obj);
 					if (yi.SerializeIf != null && !yi.SerializeIf(obj, value))
 						continue;
@@ -482,7 +488,7 @@ namespace Yuzu.Json
 			writer.Write((byte)'}');
 		}
 
-		private void WriteObjectCompact<T>(object obj)
+		private void WriteObjectCompact<T>(object obj, Meta meta)
 		{
 			if (obj == null) {
 				WriteStrCached("null");
@@ -498,7 +504,7 @@ namespace Yuzu.Json
 			objStack.Push(obj);
 			try {
 				depth += 1;
-				foreach (var yi in Meta.Get(actualType, Options).Items) {
+				foreach (var yi in meta.Items) {
 					WriteSep(ref isFirst);
 					WriteIndent();
 					GetWriteFunc(yi.Type)(yi.GetValue(obj));
@@ -514,7 +520,7 @@ namespace Yuzu.Json
 			writer.Write((byte)']');
 		}
 
-		private void WriteObjectCompactOneline<T>(object obj)
+		private void WriteObjectCompactOneline<T>(object obj, Meta meta)
 		{
 			if (obj == null) {
 				WriteStrCached("null");
@@ -528,7 +534,7 @@ namespace Yuzu.Json
 					"Attempt to write compact type {0} instead of {1}", actualType.Name, typeof(T).Name));
 			objStack.Push(obj);
 			try {
-				foreach (var yi in Meta.Get(actualType, Options).Items) {
+				foreach (var yi in meta.Items) {
 					if (!isFirst)
 						writer.Write((byte)',');
 					isFirst = false;
