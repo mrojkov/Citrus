@@ -30,19 +30,21 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace Yuzu.Grisu
 {
     public static class Grisu
     {
         [ThreadStatic]
-        private static char[] ts_decimal_rep;
+        private static byte[] ts_decimal_rep;
 
-        public static void DoubleToString(double value, TextWriter writer)
+        public static void DoubleToString(double value, BinaryWriter writer)
         {
             if (value < 0.0)
             {
-                writer.Write('-');
+                writer.Write((byte)'-');
                 value = -value;
             }
 
@@ -53,16 +55,16 @@ namespace Yuzu.Grisu
                 return;
             }
 
-            char[] decimal_rep = ts_decimal_rep;
+            byte[] decimal_rep = ts_decimal_rep;
             if (decimal_rep == null)
-                decimal_rep = ts_decimal_rep = new char[kBase10MaximalLength + 1];
+                decimal_rep = ts_decimal_rep = new byte[kBase10MaximalLength + 1];
 
             int decimal_point;
             int decimal_rep_length;
 
             if (!DoubleToShortestAscii(ref grisuDouble, decimal_rep, out decimal_rep_length, out decimal_point))
             {
-                writer.Write(string.Format(CultureInfo.InvariantCulture, "{0:R}", value));
+                writer.Write(Encoding.ASCII.GetBytes(string.Format(CultureInfo.InvariantCulture, "{0:R}", value)));
                 return;
             }
 
@@ -110,19 +112,19 @@ namespace Yuzu.Grisu
         // should be at least kBase10MaximalLength + 1 characters long.
         private const int kBase10MaximalLength = 17;
 
-        private const string infinity_symbol_ = "Infinity";
-        private const string nan_symbol_ = "NaN";
-        private const char exponent_character_ = 'e';
+        private static byte[] infinity_symbol_ = Encoding.ASCII.GetBytes("Infinity");
+        private static byte[] nan_symbol_ = Encoding.ASCII.GetBytes("NaN");
+        private const byte exponent_character_ = (byte)'e';
 
         private static void HandleSpecialValues(
             ref GrisuDouble double_inspect,
-            TextWriter writer)
+            BinaryWriter writer)
         {
             if (double_inspect.IsInfinite)
             {
                 if (double_inspect.Value < 0)
                 {
-                    writer.Write('-');
+                    writer.Write((byte)'-');
                 }
                 writer.Write(infinity_symbol_);
                 return;
@@ -134,7 +136,7 @@ namespace Yuzu.Grisu
             }
         }
 
-        private static bool DoubleToShortestAscii(ref GrisuDouble v, char[] buffer, out int length, out int point)
+        private static bool DoubleToShortestAscii(ref GrisuDouble v, byte[] buffer, out int length, out int point)
         {
             Debug.Assert(!v.IsSpecial);
             Debug.Assert(v.Value >= 0.0);
@@ -143,8 +145,7 @@ namespace Yuzu.Grisu
 
             if (value == 0.0)
             {
-                buffer[0] = '0';
-                buffer[1] = '\0';
+                buffer[0] = (byte)'0';
                 length = 1;
                 point = 1;
                 return true;
@@ -184,7 +185,7 @@ namespace Yuzu.Grisu
         // digits might correctly yield 'v' when read again, the closest will be
         // computed.
         private static bool Grisu3(ref GrisuDouble v,
-                           char[] buffer,
+                           byte[] buffer,
                            out int length,
                            out int decimal_exponent)
         {
@@ -291,7 +292,7 @@ namespace Yuzu.Grisu
         private static bool DigitGen(ref DiyFp low,
                              ref DiyFp w,
                              ref DiyFp high,
-                             char[] buffer,
+                             byte[] buffer,
                              out int length,
                              out int kappa)
         {
@@ -341,7 +342,7 @@ namespace Yuzu.Grisu
             while (kappa > 0)
             {
                 int digit = (int)(integrals / divisor);
-                buffer[length] = (char)('0' + digit);
+                buffer[length] = (byte)((int)'0' + digit);
                 ++length;
                 integrals %= divisor;
                 kappa--;
@@ -379,7 +380,7 @@ namespace Yuzu.Grisu
                 unsafe_interval.F *= 10;
                 // Integer division by one.
                 int digit = (int)(fractionals >> -one.E);
-                buffer[length] = (char)('0' + digit);
+                buffer[length] = (byte)((int)'0' + digit);
                 ++length;
                 fractionals &= one.F - 1;  // Modulo by one.
                 kappa--;
@@ -446,7 +447,7 @@ namespace Yuzu.Grisu
         // Output: returns true if the buffer is guaranteed to contain the closest
         //    representable number to the input.
         //  Modifies the generated digits in the buffer to approach (round towards) w.
-        static bool RoundWeed(char[] buffer,
+        static bool RoundWeed(byte[] buffer,
                               int length,
                               ulong distance_too_high_w,
                               ulong unsafe_interval,
@@ -556,37 +557,39 @@ namespace Yuzu.Grisu
             return (2 * unit <= rest) && (rest <= unsafe_interval - 4 * unit);
         }
 
+        private static byte[] zeroes = Enumerable.Repeat((byte)'0', 100).ToArray();
+
         private static void CreateDecimalRepresentation(
-            char[] decimal_digits,
+            byte[] decimal_digits,
             int length,
             int decimal_point,
             int digits_after_point,
-            TextWriter writer)
+            BinaryWriter writer)
         {
             // Create a representation that is padded with zeros if needed.
             if (decimal_point <= 0)
             {
                 // "0.00000decimal_rep".
-                writer.Write('0');
+                writer.Write((byte)'0');
                 if (digits_after_point > 0)
                 {
-                    writer.Write('.');
-                    writer.Write(new string('0', -decimal_point));
+                    writer.Write((byte)'.');
+                    writer.Write(zeroes, 0, -decimal_point);
                     Debug.Assert(length <= digits_after_point - (-decimal_point));
                     writer.Write(decimal_digits, 0, length);
                     int remaining_digits = digits_after_point - (-decimal_point) - length;
-                    writer.Write(new string('0', remaining_digits));
+                    writer.Write(zeroes, 0, remaining_digits);
                 }
             }
             else if (decimal_point >= length)
             {
                 // "decimal_rep0000.00000" or "decimal_rep.0000"
                 writer.Write(decimal_digits, 0, length);
-                writer.Write(new string('0', decimal_point - length));
+                writer.Write(zeroes, 0, decimal_point - length);
                 if (digits_after_point > 0)
                 {
-                    writer.Write('.');
-                    writer.Write(new string('0', digits_after_point));
+                    writer.Write((byte)'.');
+                    writer.Write(zeroes, 0, digits_after_point);
                 }
             }
             else
@@ -594,57 +597,57 @@ namespace Yuzu.Grisu
                 // "decima.l_rep000"
                 Debug.Assert(digits_after_point > 0);
                 writer.Write(decimal_digits, 0, decimal_point);
-                writer.Write('.');
+                writer.Write((byte)'.');
                 Debug.Assert(length - decimal_point <= digits_after_point);
                 writer.Write(decimal_digits, decimal_point,
                                              length - decimal_point);
                 int remaining_digits = digits_after_point - (length - decimal_point);
-                writer.Write(new string('0', remaining_digits));
+                writer.Write(zeroes, 0, remaining_digits);
             }
         }
 
         private static void CreateExponentialRepresentation(
-            char[] decimal_digits,
+            byte[] decimal_digits,
             int length,
             int exponent,
-            TextWriter writer)
+            BinaryWriter writer)
         {
             Debug.Assert(length != 0);
             writer.Write(decimal_digits[0]);
             if (length != 1)
             {
-                writer.Write('.');
+                writer.Write((byte)'.');
                 writer.Write(decimal_digits, 1, length - 1);
             }
             writer.Write(exponent_character_);
             if (exponent < 0)
             {
-                writer.Write('-');
+                writer.Write((byte)'-');
                 exponent = -exponent;
             }
             if (exponent == 0)
             {
-                writer.Write('0');
+                writer.Write((byte)'0');
                 return;
             }
             Debug.Assert(exponent < 1e4);
             if (exponent >= 100)
             {
-                writer.Write((char)('0' + exponent / 100));
+                writer.Write((byte)((int)'0' + exponent / 100));
                 exponent %= 100;
-                writer.Write((char)('0' + exponent / 10));
+                writer.Write((byte)((int)'0' + exponent / 10));
                 exponent %= 10;
-                writer.Write((char)('0' + exponent));
+                writer.Write((byte)((int)'0' + exponent));
             }
             else if (exponent >= 10)
             {
-                writer.Write((char)('0' + exponent / 10));
+                writer.Write((byte)((int)'0' + exponent / 10));
                 exponent %= 10;
-                writer.Write((char)('0' + exponent));
+                writer.Write((byte)((int)'0' + exponent));
             }
             else
             {
-                writer.Write(exponent);
+                writer.Write((byte)((int)'0' + exponent));
             }
         }
     }
