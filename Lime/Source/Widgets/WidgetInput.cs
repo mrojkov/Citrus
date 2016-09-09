@@ -76,7 +76,7 @@ namespace Lime
 
 		public bool IsAcceptingKey(Key key)
 		{
-			if (InputScopeStack.Top != null && !InputScopeStack.Top.DescendantOrThis(widget)) {
+			if (InputScopeStack.Top != null && !widget.DescendantOrThis(InputScopeStack.Top)) {
 				return false;
 			}
 			if (key.IsMouseButton()) {
