@@ -117,6 +117,21 @@ namespace YuzuTest
 			var result1 = js.ToString(list1);
 			Assert.IsTrue(result1 != "");
 		}
+
+		[TestMethod]
+		public void TestJsonLongListTime()
+		{
+			var list1 = new List<TimeSpan>();
+			for (int i = -10000; i < 30000; ++i) {
+				list1.Add(new TimeSpan(i * 98374709923L));
+			}
+			var js = new JsonSerializer();
+			var result1 = js.ToString(list1);
+			Assert.IsTrue(result1 != "");
+
+			var list2 = (new JsonDeserializer()).FromString<List<TimeSpan>>(result1);
+			CollectionAssert.AreEqual(list1, list2);
+		}
 	}
 
 	[TestClass]

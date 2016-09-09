@@ -211,12 +211,33 @@ namespace Yuzu.Json
 
 		private void WriteTimeSpan(object obj)
 		{
-			var s = ((TimeSpan)obj).ToString(JsonOptions.TimeSpanFormat, CultureInfo.InvariantCulture);
+			var t = (TimeSpan)obj;
 			// 'Constant' format is guaranteed to be ASCII-clean.
 			if (JsonOptions.TimeSpanFormat == "c") {
-				WriteUnescapedString(s);
+				writer.Write((byte)'"');
+				if (t.Ticks < 0) {
+					writer.Write((byte)'-');
+					t = t.Duration();
+				}
+				var d = t.Days;
+				if (d > 0) {
+					JsonIntWriter.WriteInt(writer, d);
+					writer.Write((byte)'.');
+				}
+				JsonIntWriter.WriteInt2Digits(writer, t.Hours);
+				writer.Write((byte)':');
+				JsonIntWriter.WriteInt2Digits(writer, t.Minutes);
+				writer.Write((byte)':');
+				JsonIntWriter.WriteInt2Digits(writer, t.Seconds);
+				var f = (int)(t.Ticks % TimeSpan.TicksPerSecond);
+				if (f > 0) {
+					writer.Write((byte)'.');
+					JsonIntWriter.WriteInt7Digits(writer, f);
+				}
+				writer.Write((byte)'"');
+			}
 			else
-				WriteEscapedString(s);
+				WriteEscapedString(t.ToString(JsonOptions.TimeSpanFormat, CultureInfo.InvariantCulture));
 		}
 
 		private void WriteCollection<T>(ICollection<T> list)
