@@ -78,42 +78,36 @@ namespace Yuzu.Grisu
                 writer.Write(Encoding.ASCII.GetBytes(value.ToString("R", CultureInfo.InvariantCulture)));
                 return;
             }
-            int decimal_point = decimal_rep_length + decimal_exponent;
+            CreateRepresentation(decimal_rep, decimal_rep_length, decimal_rep_length + decimal_exponent, writer);
+        }
 
+        private static void CreateRepresentation(
+            byte[] decimal_rep, int decimal_rep_length, int decimal_point, BinaryWriter writer)
+        {
             int decimalRepLength = decimal_rep_length;
             if (decimal_point < 1)
-            {
                 decimalRepLength += -decimal_point + 1;
-            }
             else if (decimal_point >= decimal_rep_length)
-            {
                 decimalRepLength += decimal_point - decimal_rep_length + 1;
-            }
 
             int exponent = decimal_point - 1;
             int absExponent = Math.Abs(exponent);
             int exponentRepLength = decimal_rep_length + 3;
             if (exponent < 0)
                 ++exponentRepLength;
-            if (absExponent >= 10)
-            {
+            if (absExponent >= 10) {
                 ++exponentRepLength;
                 if (absExponent >= 100)
                     ++exponentRepLength;
             }
 
             if (decimalRepLength <= exponentRepLength)
-            {
-                CreateDecimalRepresentation(decimal_rep, decimal_rep_length,
-                                            decimal_point,
-                                            Math.Max(0, decimal_rep_length - decimal_point),
-                                            writer);
-            }
+                CreateDecimalRepresentation(
+                    decimal_rep, decimal_rep_length, decimal_point,
+                    Math.Max(0, decimal_rep_length - decimal_point),
+                    writer);
             else
-            {
-                CreateExponentialRepresentation(decimal_rep, decimal_rep_length, exponent,
-                                                writer);
-            }
+                CreateExponentialRepresentation(decimal_rep, decimal_rep_length, exponent, writer);
         }
 
         // The maximal number of digits that are needed to emit a double in base 10.
