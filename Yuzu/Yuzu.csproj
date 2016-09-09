@@ -48,6 +48,10 @@
     <Compile Include="BinaryGenerators.cs" />
     <Compile Include="BinarySerializer.cs" />
     <Compile Include="Code.cs" />
+    <Compile Include="Grisu\DiyFp.cs" />
+    <Compile Include="Grisu\Grisu.cs" />
+    <Compile Include="Grisu\GrisuDouble.cs" />
+    <Compile Include="Grisu\PowersOfTenCache.cs" />
     <Compile Include="JsonHelpers.cs" />
     <Compile Include="ReaderDeserializer.cs" />
     <Compile Include="UnsafeReader.cs" />
