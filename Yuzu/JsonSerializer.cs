@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Text;
 
+using Yuzu.Grisu;
 using Yuzu.Metadata;
 using Yuzu.Util;
 
@@ -109,7 +110,8 @@ namespace Yuzu.Json
 
 		private void WriteDouble(object obj)
 		{
-			WriteStr(((double)obj).ToString(CultureInfo.InvariantCulture));
+			//WriteStr(((double)obj).ToString("R", CultureInfo.InvariantCulture));
+			DoubleWriter.Write((double)obj, writer);
 		}
 
 		private void WriteSingle(object obj)

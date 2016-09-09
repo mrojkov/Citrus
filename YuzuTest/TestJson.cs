@@ -281,7 +281,7 @@ namespace YuzuTest.Json
 			js.JsonOptions.Indent = "";
 
 			var result1 = js.ToString(v);
-			Assert.AreEqual("{\n\"F\":1E-20,\n\"D\":-3.1415E+100\n}", result1);
+			Assert.AreEqual("{\n\"F\":1E-20,\n\"D\":-3.1415E100\n}", result1);
 
 			var w = new SampleFloat();
 			var jd = new JsonDeserializer();

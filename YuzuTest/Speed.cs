@@ -119,6 +119,31 @@ namespace YuzuTest
 		}
 
 		[TestMethod]
+		public void TestJsonLongListDouble()
+		{
+			var list1 = new List<double>();
+			var rnd = new Random();
+			for (int i = 0; i < 50000; ++i)
+				list1.Add(i * 19234.73457);
+			for (int i = 0; i < 50000; ++i)
+				list1.Add(rnd.NextDouble());
+			for (int i = 0; i < 10000; ++i)
+				list1.Add(rnd.NextDouble() * 1e27);
+			for (int i = 0; i < 10000; ++i)
+				list1.Add(rnd.NextDouble() * 1e-27);
+
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = "";
+			var result1 = js.ToString(list1);
+			Assert.IsTrue(result1 != "");
+
+			var list2 = (new JsonDeserializer()).FromString<List<double>>(result1);
+			for (int i = 0; i < list1.Count; ++i)
+				Assert.AreEqual(list1[i], list2[i]);
+		}
+
+		[TestMethod]
 		public void TestJsonLongListTime()
 		{
 			var list1 = new List<TimeSpan>();
