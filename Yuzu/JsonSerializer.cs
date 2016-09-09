@@ -213,7 +213,7 @@ namespace Yuzu.Json
 		{
 			var s = ((TimeSpan)obj).ToString(JsonOptions.TimeSpanFormat, CultureInfo.InvariantCulture);
 			// 'Constant' format is guaranteed to be ASCII-clean.
-			if (JsonOptions.DateFormat == "c")
+			if (JsonOptions.TimeSpanFormat == "c") {
 				WriteUnescapedString(s);
 			else
 				WriteEscapedString(s);
