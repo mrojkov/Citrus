@@ -49,6 +49,7 @@ namespace Yuzu.Json
 		private static byte[][] digitPairsZero = new byte[100][];
 		private static byte[][] digitPairsNoZero = new byte[100][];
 		private static byte[] minIntValueBytes = Encoding.ASCII.GetBytes(int.MinValue.ToString());
+		private static byte[] minLongValueBytes = Encoding.ASCII.GetBytes(long.MinValue.ToString());
 
 		static JsonIntWriter()
 		{
@@ -132,6 +133,44 @@ namespace Yuzu.Json
 				return;
 			}
 			WriteUIntInternal(writer, x);
+		}
+
+		public static void WriteLong(BinaryWriter writer, object obj)
+		{
+			var x = Convert.ToInt64(obj);
+			if (x == long.MinValue) {
+				writer.Write(minLongValueBytes);
+				return;
+			}
+			if (x < 0) {
+				writer.Write((byte)'-');
+				x = -x;
+			}
+			if (x < 100) {
+				writer.Write(digitPairsNoZero[x]);
+				return;
+			}
+			if (x < int.MaxValue) {
+				unchecked { WriteUIntInternal(writer, (uint)x); }
+				return;
+			}
+			// TODO: Optimize long case.
+			writer.Write(Encoding.ASCII.GetBytes(x.ToString()));
+		}
+
+		public static void WriteULong(BinaryWriter writer, object obj)
+		{
+			var x = Convert.ToUInt64(obj);
+			if (x < 100) {
+				writer.Write(digitPairsNoZero[x]);
+				return;
+			}
+			if (x < int.MaxValue) {
+				unchecked { WriteUIntInternal(writer, (uint)x); }
+				return;
+			}
+			// TODO: Optimize long case.
+			writer.Write(Encoding.ASCII.GetBytes(x.ToString()));
 		}
 	}
 

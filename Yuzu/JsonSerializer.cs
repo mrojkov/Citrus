@@ -85,19 +85,23 @@ namespace Yuzu.Json
 				writer.Write(b);
 		}
 
-		private void WriteInt(object obj)
+		private void WriteInt(object obj) { JsonIntWriter.WriteInt(writer, obj); }
+		private void WriteUInt(object obj) { JsonIntWriter.WriteUInt(writer, obj); }
+		private void WriteLong(object obj) { JsonIntWriter.WriteLong(writer, obj); }
+		private void WriteULong(object obj) { JsonIntWriter.WriteULong(writer, obj); }
+
+		private void WriteLongAsString(object obj)
 		{
-			JsonIntWriter.WriteInt(writer, obj);
+			writer.Write((byte)'"');
+			JsonIntWriter.WriteLong(writer, obj);
+			writer.Write((byte)'"');
 		}
 
-		private void WriteUInt(object obj)
+		private void WriteULongAsString(object obj)
 		{
-			JsonIntWriter.WriteUInt(writer, obj);
-		}
-
-		private void WriteLong(object obj)
-		{
-			WriteStr(obj.ToString());
+			writer.Write((byte)'"');
+			JsonIntWriter.WriteULong(writer, obj);
+			writer.Write((byte)'"');
 		}
 
 		private void WriteDouble(object obj)
@@ -351,11 +355,17 @@ namespace Yuzu.Json
 				return WriteInt;
 			if (t == typeof(byte) || t == typeof(ushort) || t == typeof(uint))
 				return WriteUInt;
-			if (t == typeof(long) || t == typeof(ulong)) {
+			if (t == typeof(long)) {
 				if (JsonOptions.Int64AsString)
-					return WriteUnescapedString;
+					return WriteLongAsString;
 				else
 					return WriteLong;
+			}
+			if (t == typeof(ulong)) {
+				if (JsonOptions.Int64AsString)
+					return WriteULongAsString;
+				else
+					return WriteULong;
 			}
 			if (t == typeof(double))
 				return WriteDouble;

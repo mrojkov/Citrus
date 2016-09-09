@@ -106,6 +106,17 @@ namespace YuzuTest
 			Assert.AreEqual(list1.M.Count, list3.M.Count);
 		}
 
+		[TestMethod]
+		public void TestJsonLongListLong()
+		{
+			var list1 = new List<long>();
+			for (int i = 0; i < 100000; ++i) {
+				list1.Add(i * 1973457);
+			}
+			var js = new JsonSerializer();
+			var result1 = js.ToString(list1);
+			Assert.IsTrue(result1 != "");
+		}
 	}
 
 	[TestClass]
