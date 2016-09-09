@@ -65,6 +65,7 @@ namespace Yuzu.Metadata
 		public readonly bool IsCompact;
 		public object Default { get; private set; }
 		public Dictionary<string, Item> TagToItem = new Dictionary<string, Item>();
+		public Func<object, YuzuUnknownStorage> GetUnknownStorage;
 
 		public struct MethodAction
 		{
@@ -217,10 +218,36 @@ namespace Yuzu.Metadata
 			const BindingFlags bindingFlags =
 				BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy;
 			foreach (var m in t.GetMembers(bindingFlags)) {
-				if (m.MemberType == MemberTypes.Field || m.MemberType == MemberTypes.Property)
-					AddItem(m);
-				else if (m.MemberType == MemberTypes.Method)
-					AddMethod(m as MethodInfo);
+				switch (m.MemberType) {
+					case MemberTypes.Field:
+						var f = m as FieldInfo;
+						if (f.FieldType == typeof(YuzuUnknownStorage)) {
+							if (GetUnknownStorage != null)
+								throw Error("Duplicated unknown storage in field {0}", m.Name);
+							GetUnknownStorage = obj => (YuzuUnknownStorage)f.GetValue(obj);
+						}
+						else
+							AddItem(m);
+						break;
+					case MemberTypes.Property:
+						var p = m as PropertyInfo;
+						if (p.PropertyType == typeof(YuzuUnknownStorage)) {
+							if (GetUnknownStorage != null)
+								throw Error("Duplicated unknown storage in field {0}", m.Name);
+#if iOS // Apple forbids code generation.
+							GetUnknownStorage = obj => (YuzuUnknownStorage)p.GetValue(obj, Utils.ZeroObjects);
+#else
+							var getter = BuildGetter(p.GetGetMethod());
+							GetUnknownStorage = obj => (YuzuUnknownStorage)getter(obj);
+#endif
+						}
+						else
+							AddItem(m);
+						break;
+					case MemberTypes.Method:
+						AddMethod(m as MethodInfo);
+						break;
+				}
 			}
 		}
 

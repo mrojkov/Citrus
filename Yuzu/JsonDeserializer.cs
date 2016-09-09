@@ -651,19 +651,19 @@ namespace Yuzu.Json
 			throw Error("Unable to merge field of type {0}", t.Name);
 		}
 
-		protected void IgnoreNewFieldsTail(string name)
+		protected void IgnoreNewFieldsTail(YuzuUnknownStorage storage, string name)
 		{
 			while (name != "") {
-				ReadAnyObject();
+				storage.Add(name, ReadAnyObject());
 				name = GetNextName(false);
 			}
 		}
 
-		protected int IgnoreNewFields(string tag, ref string name)
+		protected int IgnoreNewFields(YuzuUnknownStorage storage, string tag, ref string name)
 		{
 			var cmp = String.CompareOrdinal(tag, name);
 			while (cmp > 0 && name != "") {
-				ReadAnyObject();
+				storage.Add(name, ReadAnyObject());
 				name = GetNextName(false);
 				cmp = String.CompareOrdinal(tag, name);
 			}
@@ -677,12 +677,15 @@ namespace Yuzu.Json
 			try {
 				// Optimization: duplicate loop to extract options check.
 				if (JsonOptions.Unordered) {
+					var storage = !Options.IgnoreUnknownFields || meta.GetUnknownStorage == null ?
+						NullYuzuUnknownStorage.Instance : meta.GetUnknownStorage(obj);
+					storage.Fields.Clear();
 					while (name != "") {
 						Meta.Item yi;
 						if (!meta.TagToItem.TryGetValue(name, out yi)) {
 							if (!Options.IgnoreUnknownFields)
 								throw Error("Unknown field '{0}'", name);
-							ReadAnyObject();
+							storage.Add(name, ReadAnyObject());
 							name = GetNextName(false);
 							continue;
 						}
@@ -694,8 +697,11 @@ namespace Yuzu.Json
 					}
 				}
 				else if (Options.IgnoreUnknownFields) {
+					var storage = meta.GetUnknownStorage == null ?
+						NullYuzuUnknownStorage.Instance : meta.GetUnknownStorage(obj);
+					storage.Fields.Clear();
 					foreach (var yi in meta.Items) {
-						if (IgnoreNewFields(yi.Tag(Options), ref name) != 0) {
+						if (IgnoreNewFields(storage, yi.Tag(Options), ref name) != 0) {
 							if (!yi.IsOptional)
 								throw Error("Expected field '{0}', but found '{1}'", yi.NameTagged(Options), name);
 							continue;
@@ -706,6 +712,7 @@ namespace Yuzu.Json
 							MergeValueFunc(yi.Type)(yi.GetValue(obj));
 						name = GetNextName(false);
 					}
+					IgnoreNewFieldsTail(storage, name);
 				}
 				else {
 					foreach (var yi in meta.Items) {
@@ -725,8 +732,6 @@ namespace Yuzu.Json
 			finally {
 				objStack.Pop();
 			}
-			if (Options.IgnoreUnknownFields)
-				IgnoreNewFieldsTail(name);
 			meta.RunAfterDeserialization(obj);
 			return obj;
 		}

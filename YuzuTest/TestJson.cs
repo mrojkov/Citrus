@@ -971,6 +971,28 @@ namespace YuzuTest.Json
 		}
 
 		[TestMethod]
+		public void TestUnknownStorage()
+		{
+			var jd = new JsonDeserializer();
+			jd.Options.IgnoreUnknownFields = true;
+
+			var w = new SampleUnknown();
+			jd.FromString(w, "{}");
+			Assert.AreEqual(0, w.X);
+
+			jd.FromString(w, "{\"a\":10}");
+			Assert.AreEqual(1, w.Storage.Fields.Count);
+			Assert.AreEqual("a", w.Storage.Fields[0].Name);
+			Assert.AreEqual(10.0, w.Storage.Fields[0].Value);
+
+			jd.FromString(w, "{\"X\":77,\"Y\":{}}");
+			Assert.AreEqual(77, w.X);
+			Assert.AreEqual(1, w.Storage.Fields.Count);
+			Assert.AreEqual("Y", w.Storage.Fields[0].Name);
+			Assert.IsInstanceOfType(w.Storage.Fields[0].Value, typeof(Dictionary<string, object>));
+		}
+
+		[TestMethod]
 		public void TestSpaces()
 		{
 			var jd = new JsonDeserializer();

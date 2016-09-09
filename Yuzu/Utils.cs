@@ -216,4 +216,11 @@ namespace Yuzu.Util
 			return "tmp" + tempCount.ToString();
 		}
 	}
+
+	internal class NullYuzuUnknownStorage : YuzuUnknownStorage
+	{
+		internal static NullYuzuUnknownStorage Instance = new NullYuzuUnknownStorage();
+		public override void Add(string name, object value) { }
+	}
+
 }

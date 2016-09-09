@@ -166,6 +166,20 @@ namespace Yuzu
 		public Dictionary<string, object> Fields = new Dictionary<string, object>();
 	}
 
+	public class YuzuUnknownStorage
+	{
+		public struct Item
+		{
+			public string Name;
+			public object Value;
+		}
+		public List<Item> Fields = new List<Item>();
+		public virtual void Add(string name, object value)
+		{
+			Fields.Add(new Item { Name = name, Value = value });
+		}
+	}
+
 	public class YuzuAssert : YuzuException
 	{
 		public YuzuAssert(string message = "") : base(message) { }

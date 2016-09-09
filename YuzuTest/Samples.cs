@@ -523,6 +523,13 @@ namespace YuzuTest
 		public string R = "R";
 	}
 
+	public class SampleUnknown
+	{
+		[YuzuMember]
+		public int X;
+		public YuzuUnknownStorage Storage = new YuzuUnknownStorage();
+	}
+
 	public class Bad1
 	{
 		[YuzuRequired]
