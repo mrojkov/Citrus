@@ -289,6 +289,10 @@ namespace YuzuTest.Json
 			jd.FromString(w, result1);
 			Assert.AreEqual(v.F, w.F);
 			Assert.AreEqual(v.D, w.D);
+
+			Assert.AreEqual("NaN", js.ToString(Double.NaN));
+			Assert.AreEqual("Infinity", js.ToString(Double.PositiveInfinity));
+			Assert.AreEqual("-Infinity", js.ToString(Double.NegativeInfinity));
 		}
 
 		[TestMethod]

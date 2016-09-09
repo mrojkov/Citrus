@@ -40,12 +40,20 @@ namespace Yuzu.Grisu
         [ThreadStatic]
         private static byte[] ts_decimal_rep;
 
+        private static byte[] infinity_symbol_ = Encoding.ASCII.GetBytes("Infinity");
+        private static byte[] nan_symbol_ = Encoding.ASCII.GetBytes("NaN");
+        private const byte exponent_character_ = (byte)'E';
+
         public static void Write(double value, BinaryWriter writer)
         {
-            GrisuDouble grisuDouble = new GrisuDouble(value);
-            if (grisuDouble.IsSpecial)
-            {
-                HandleSpecialValues(ref grisuDouble, writer);
+            if (Double.IsNaN(value)) {
+                writer.Write(nan_symbol_);
+                return;
+            }
+            if (Double.IsInfinity(value)) {
+                if (value < 0)
+                    writer.Write((byte)'-');
+                writer.Write(infinity_symbol_);
                 return;
             }
 
@@ -65,7 +73,8 @@ namespace Yuzu.Grisu
 
             int decimal_rep_length;
             int decimal_exponent;
-            if (!Grisu3(ref grisuDouble, decimal_rep, out decimal_rep_length, out decimal_exponent)) {
+
+            if (!Grisu3(value, decimal_rep, out decimal_rep_length, out decimal_exponent)) {
                 writer.Write(Encoding.ASCII.GetBytes(value.ToString("R", CultureInfo.InvariantCulture)));
                 return;
             }
@@ -115,30 +124,6 @@ namespace Yuzu.Grisu
         // should be at least kBase10MaximalLength + 1 characters long.
         private const int kBase10MaximalLength = 17;
 
-        private static byte[] infinity_symbol_ = Encoding.ASCII.GetBytes("Infinity");
-        private static byte[] nan_symbol_ = Encoding.ASCII.GetBytes("NaN");
-        private const byte exponent_character_ = (byte)'E';
-
-        private static void HandleSpecialValues(
-            ref GrisuDouble double_inspect,
-            BinaryWriter writer)
-        {
-            if (double_inspect.IsInfinite)
-            {
-                if (double_inspect.Value < 0)
-                {
-                    writer.Write((byte)'-');
-                }
-                writer.Write(infinity_symbol_);
-                return;
-            }
-            if (double_inspect.IsNaN)
-            {
-                writer.Write(nan_symbol_);
-                return;
-            }
-        }
-
         // The minimal and maximal target exponent define the range of w's binary
         // exponent, where 'w' is the result of multiplying the input by a cached power
         // of ten.
@@ -159,11 +144,12 @@ namespace Yuzu.Grisu
         // The last digit will be closest to the actual v. That is, even if several
         // digits might correctly yield 'v' when read again, the closest will be
         // computed.
-        private static bool Grisu3(ref GrisuDouble v,
+        private static bool Grisu3(double value,
                            byte[] buffer,
                            out int length,
                            out int decimal_exponent)
         {
+            GrisuDouble v = new GrisuDouble(value);
             DiyFp w = v.AsNormalizedDiyFp();
             // boundary_minus and boundary_plus are the boundaries between v and its
             // closest floating-point neighbors. Any number strictly between
