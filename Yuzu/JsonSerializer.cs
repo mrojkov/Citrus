@@ -131,23 +131,23 @@ namespace Yuzu.Json
 
 		private void WriteUnescapedString(object obj)
 		{
-			writer.Write('"');
+			writer.Write((byte)'"');
 			WriteStrCached(obj.ToString());
-			writer.Write('"');
+			writer.Write((byte)'"');
 		}
 
 		private void WriteEscapedString(object obj)
 		{
-			writer.Write('"');
+			writer.Write((byte)'"');
 			foreach (var ch in obj.ToString()) {
 				var escape = ch <= '\\' ? JsonEscapeData.escapeChars[ch] : '\0';
 				if (escape > 0) {
-					writer.Write('\\');
+					writer.Write((byte)'\\');
 					writer.Write(escape);
 				}
 				else if (ch < ' ') {
-					writer.Write('\\');
-					writer.Write('u');
+					writer.Write((byte)'\\');
+					writer.Write((byte)'u');
 					for (int i = 3 * 4; i >= 0; i -= 4)
 						writer.Write(JsonEscapeData.digitHex[ch >> i & 0xf]);
 				}
@@ -155,7 +155,7 @@ namespace Yuzu.Json
 					writer.Write(ch);
 				}
 			}
-			writer.Write('"');
+			writer.Write((byte)'"');
 		}
 
 		private void WriteNullableEscapedString(object obj)
@@ -199,14 +199,14 @@ namespace Yuzu.Json
 				return;
 			}
 			var wf = GetWriteFunc(typeof(T));
-			writer.Write('[');
+			writer.Write((byte)'[');
 			if (list.Count > 0) {
 				try {
 					depth += 1;
 					var isFirst = true;
 					foreach (var elem in list) {
 						if (!isFirst)
-							writer.Write(',');
+							writer.Write((byte)',');
 						isFirst = false;
 						WriteFieldSeparator();
 						WriteIndent();
@@ -219,7 +219,7 @@ namespace Yuzu.Json
 				}
 			}
 			WriteIndent();
-			writer.Write(']');
+			writer.Write((byte)']');
 		}
 
 		private void WriteDictionary<K, V>(Dictionary<K, V> dict)
@@ -229,7 +229,7 @@ namespace Yuzu.Json
 				return;
 			}
 			var wf = GetWriteFunc(typeof(V));
-			writer.Write('{');
+			writer.Write((byte)'{');
 			if (dict.Count > 0) {
 				try {
 					depth += 1;
@@ -240,7 +240,7 @@ namespace Yuzu.Json
 						WriteIndent();
 						// TODO: Option to not escape dictionary keys.
 						WriteEscapedString(elem.Key.ToString());
-						writer.Write(':');
+						writer.Write((byte)':');
 						wf(elem.Value);
 					}
 					WriteFieldSeparator();
@@ -250,7 +250,7 @@ namespace Yuzu.Json
 				}
 			}
 			WriteIndent();
-			writer.Write('}');
+			writer.Write((byte)'}');
 		}
 
 		private void WriteArray<T>(T[] array)
@@ -260,7 +260,7 @@ namespace Yuzu.Json
 				return;
 			}
 			var wf = GetWriteFunc(typeof(T));
-			writer.Write('[');
+			writer.Write((byte)'[');
 			if (array.Length > 0) {
 				try {
 					depth += 1;
@@ -271,7 +271,7 @@ namespace Yuzu.Json
 					var isFirst = !JsonOptions.ArrayLengthPrefix;
 					foreach (var elem in array) {
 						if (!isFirst)
-							writer.Write(',');
+							writer.Write((byte)',');
 						isFirst = false;
 						WriteFieldSeparator();
 						WriteIndent();
@@ -284,7 +284,7 @@ namespace Yuzu.Json
 				}
 			}
 			WriteIndent();
-			writer.Write(']');
+			writer.Write((byte)']');
 		}
 
 		// List<object>
@@ -433,7 +433,7 @@ namespace Yuzu.Json
 		private void WriteSep(ref bool isFirst)
 		{
 			if (!isFirst) {
-				writer.Write(',');
+				writer.Write((byte)',');
 				WriteFieldSeparator();
 			}
 			isFirst = false;
@@ -444,7 +444,7 @@ namespace Yuzu.Json
 			WriteSep(ref isFirst);
 			WriteIndent();
 			WriteUnescapedString(name);
-			writer.Write(':');
+			writer.Write((byte)':');
 		}
 
 		private void WriteObject<T>(object obj)
@@ -453,7 +453,7 @@ namespace Yuzu.Json
 				WriteStrCached("null");
 				return;
 			}
-			writer.Write('{');
+			writer.Write((byte)'{');
 			WriteFieldSeparator();
 			objStack.Push(obj);
 			try {
@@ -479,7 +479,7 @@ namespace Yuzu.Json
 				objStack.Pop();
 			}
 			WriteIndent();
-			writer.Write('}');
+			writer.Write((byte)'}');
 		}
 
 		private void WriteObjectCompact<T>(object obj)
@@ -488,7 +488,7 @@ namespace Yuzu.Json
 				WriteStrCached("null");
 				return;
 			}
-			writer.Write('[');
+			writer.Write((byte)'[');
 			WriteFieldSeparator();
 			var isFirst = true;
 			var actualType = obj.GetType();
@@ -511,7 +511,7 @@ namespace Yuzu.Json
 			if (!isFirst)
 				WriteFieldSeparator();
 			WriteIndent();
-			writer.Write(']');
+			writer.Write((byte)']');
 		}
 
 		private void WriteObjectCompactOneline<T>(object obj)
@@ -520,7 +520,7 @@ namespace Yuzu.Json
 				WriteStrCached("null");
 				return;
 			}
-			writer.Write('[');
+			writer.Write((byte)'[');
 			var isFirst = true;
 			var actualType = obj.GetType();
 			if (typeof(T) != actualType)
@@ -530,7 +530,7 @@ namespace Yuzu.Json
 			try {
 				foreach (var yi in Meta.Get(actualType, Options).Items) {
 					if (!isFirst)
-						writer.Write(',');
+						writer.Write((byte)',');
 					isFirst = false;
 					GetWriteFunc(yi.Type)(yi.GetValue(obj));
 				}
@@ -538,7 +538,7 @@ namespace Yuzu.Json
 			finally {
 				objStack.Pop();
 			};
-			writer.Write(']');
+			writer.Write((byte)']');
 		}
 
 		protected override void ToWriter(object obj) { GetWriteFunc(obj.GetType())(obj); }
