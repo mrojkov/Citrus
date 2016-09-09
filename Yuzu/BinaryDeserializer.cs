@@ -338,7 +338,7 @@ namespace Yuzu.Binary
 				}
 				else {
 					if (def.Meta.GetUnknownStorage != null)
-						def.Meta.GetUnknownStorage(obj).Fields.Clear();
+						def.Meta.GetUnknownStorage(obj).Clear();
 					var actualIndex = d.Reader.ReadInt16();
 					for (int i = 1; i < def.Fields.Count; ++i) {
 						var fd = def.Fields[i];

@@ -172,11 +172,28 @@ namespace Yuzu
 		{
 			public string Name;
 			public object Value;
+			static public int Comparer(Item i1, Item i2) { return String.CompareOrdinal(i1.Name, i2.Name); }
 		}
 		public List<Item> Fields = new List<Item>();
+		public bool IsOrdered { get; private set; }
+		public YuzuUnknownStorage() { IsOrdered = true; }
+		public void Sort()
+		{
+			if (IsOrdered)
+				return;
+			Fields.Sort(Item.Comparer);
+			IsOrdered = true;
+		}
+		public void Clear()
+		{
+			Fields.Clear();
+			IsOrdered = true;
+		}
 		public virtual void Add(string name, object value)
 		{
 			Fields.Add(new Item { Name = name, Value = value });
+			if (Fields.Count > 1 && IsOrdered)
+				IsOrdered = Item.Comparer(Fields[0], Fields[1]) < 0;
 		}
 	}
 

@@ -679,7 +679,7 @@ namespace Yuzu.Json
 				if (JsonOptions.Unordered) {
 					var storage = !Options.IgnoreUnknownFields || meta.GetUnknownStorage == null ?
 						NullYuzuUnknownStorage.Instance : meta.GetUnknownStorage(obj);
-					storage.Fields.Clear();
+					storage.Clear();
 					while (name != "") {
 						Meta.Item yi;
 						if (!meta.TagToItem.TryGetValue(name, out yi)) {
@@ -699,7 +699,7 @@ namespace Yuzu.Json
 				else if (Options.IgnoreUnknownFields) {
 					var storage = meta.GetUnknownStorage == null ?
 						NullYuzuUnknownStorage.Instance : meta.GetUnknownStorage(obj);
-					storage.Fields.Clear();
+					storage.Clear();
 					foreach (var yi in meta.Items) {
 						if (ReadUnknownFields(storage, yi.Tag(Options), ref name) != 0) {
 							if (!yi.IsOptional)

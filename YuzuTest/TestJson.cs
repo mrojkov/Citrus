@@ -997,6 +997,12 @@ namespace YuzuTest.Json
 			Assert.AreEqual("Y", w.Storage.Fields[0].Name);
 			Assert.IsInstanceOfType(w.Storage.Fields[0].Value, typeof(Dictionary<string, object>));
 			Assert.AreEqual("{\"X\":77,\"Y\":{}}", js.ToString(w));
+
+			jd.JsonOptions.Unordered = true;
+			jd.FromString(w, "{\"X\":88,\"Y\":\"qq\",\"B\":0}");
+			Assert.AreEqual("{\"B\":0,\"X\":88,\"Y\":\"qq\"}", js.ToString(w));
+			js.JsonOptions.Unordered = true;
+			Assert.AreEqual("{\"X\":88,\"B\":0,\"Y\":\"qq\"}", js.ToString(w));
 		}
 
 		[TestMethod]
