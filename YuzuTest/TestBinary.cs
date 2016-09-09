@@ -920,6 +920,8 @@ namespace YuzuTest.Binary
 			CollectionAssert.AreEqual(
 				(List<object>)bd.FromBytes(SX("21 11 02 00 00 00 01 05 10 " + XS("abc"))),
 				new object[] { (sbyte)5, "abc" });
+
+			Assert.AreEqual((short)266, bd.FromBytes<object>(SX("03 0A 01")));
 		}
 
 		[TestMethod]
@@ -1254,7 +1256,7 @@ namespace YuzuTest.Binary
 		public void TestUnknown()
 		{
 			var bd = new BinaryDeserializer();
-			var w1 = (YuzuUnknown)bd.FromBytes(SX(
+			var w1 = (YuzuUnknown)bd.FromBytes<object>(SX(
 				"20 01 00 " + XS("NewType1") + " 02 00 " + XS("a", RoughType.Int, "b", RoughType.String) +
 				" 01 00 07 07 00 00 00 00"));
 			Assert.AreEqual("NewType1", w1.ClassTag);
@@ -1267,7 +1269,6 @@ namespace YuzuTest.Binary
 			Assert.AreEqual("qwe", w2.Fields["b"]);
 
 			bd.Options.IgnoreUnknownFields = true;
-			bd.Options.ReportErrorPosition = true;
 			var w3 = bd.FromBytes<SampleBool>(SX(
 				"20 02 00 " + XS(typeof(SampleBool)) + " 02 00 " + XS("B", RoughType.Bool, "a", RoughType.Record) +
 				" 01 00 01 02 00 03 00 " + XS("NewType2") + " 00 00 00 00 00 00"));

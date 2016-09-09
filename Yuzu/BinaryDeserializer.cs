@@ -437,8 +437,6 @@ namespace Yuzu.Binary
 
 		private Func<object> ReadValueFunc(Type t)
 		{
-			if (t == null)
-				return ReadObject<object>;
 			Func<object> f;
 			if (readerCache.TryGetValue(t, out f))
 				return f;
@@ -543,6 +541,8 @@ namespace Yuzu.Binary
 		{
 			if (BinaryOptions.AutoSignature)
 				CheckSignature();
+			if (typeof(T) == typeof(object))
+				return (T)ReadAny();
 			if (!ReadCompatibleType(typeof(T)))
 				throw Error("Incompatible type to read into {0}", typeof(T).Name);
 			return (T)ReadValueFunc(typeof(T))();
