@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Reflection;
 using System.Text;
 
 using Yuzu.Metadata;
@@ -240,12 +241,13 @@ namespace Yuzu.Json
 				WriteEscapedString(t.ToString(JsonOptions.TimeSpanFormat, CultureInfo.InvariantCulture));
 		}
 
-		private void WriteCollection<T>(ICollection<T> list)
+		private void WriteCollection<T>(object obj)
 		{
-			if (list == null) {
+			if (obj == null) {
 				WriteStrCached("null");
 				return;
 			}
+			var list = (ICollection<T>)obj;
 			var wf = GetWriteFunc(typeof(T));
 			writer.Write((byte)'[');
 			if (list.Count > 0) {
@@ -270,12 +272,13 @@ namespace Yuzu.Json
 			writer.Write((byte)']');
 		}
 
-		private void WriteDictionary<K, V>(Dictionary<K, V> dict)
+		private void WriteDictionary<K, V>(object obj)
 		{
-			if (dict == null) {
+			if (obj == null) {
 				WriteStrCached("null");
 				return;
 			}
+			var dict = (Dictionary<K, V>)obj;
 			var wf = GetWriteFunc(typeof(V));
 			writer.Write((byte)'{');
 			if (dict.Count > 0) {
@@ -301,12 +304,13 @@ namespace Yuzu.Json
 			writer.Write((byte)'}');
 		}
 
-		private void WriteArray<T>(T[] array)
+		private void WriteArray<T>(object obj)
 		{
-			if (array == null) {
+			if (obj == null) {
 				WriteStrCached("null");
 				return;
 			}
+			var array = (T[])obj;
 			var wf = GetWriteFunc(typeof(T));
 			writer.Write((byte)'[');
 			if (array.Length > 0) {
@@ -381,6 +385,11 @@ namespace Yuzu.Json
 			return true;
 		}
 
+		public Action<object> MakeDelegate(MethodInfo m)
+		{
+			return (Action<object>)Delegate.CreateDelegate(typeof(Action<object>), this, m);
+		}
+
 		private Dictionary<Type, Action<object>> writerCache = new Dictionary<Type, Action<object>>();
 		private int jsonOptionsGeneration = 0;
 
@@ -446,10 +455,8 @@ namespace Yuzu.Json
 				return WriteAny;
 			if (t.IsGenericType) {
 				var g = t.GetGenericTypeDefinition();
-				if (g == typeof(Dictionary<,>)) {
-					var m = Utils.GetPrivateCovariantGenericAll(GetType(), "WriteDictionary", t);
-					return obj => m.Invoke(this, new object[] { obj });
-				}
+				if (g == typeof(Dictionary<,>))
+					return MakeDelegate(Utils.GetPrivateCovariantGenericAll(GetType(), "WriteDictionary", t));
 				if (g == typeof(Action<>)) {
 					return WriteAction;
 				}
@@ -458,15 +465,12 @@ namespace Yuzu.Json
 					return obj => WriteNullable(obj, w);
 				}
 			}
-			if (t.IsArray) {
-				var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteArray", t);
-				return obj => m.Invoke(this, new object[] { obj });
-			}
+			if (t.IsArray)
+				return MakeDelegate(Utils.GetPrivateCovariantGeneric(GetType(), "WriteArray", t));
 			var icoll = Utils.GetICollection(t);
 			if (icoll != null) {
 				Meta.Get(t, Options); // Check for serializable fields.
-				var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteCollection", icoll);
-				return obj => m.Invoke(this, new object[] { obj });
+				return MakeDelegate(Utils.GetPrivateCovariantGeneric(GetType(), "WriteCollection", icoll));
 			}
 			if (Utils.IsStruct(t) || t.IsClass || t.IsInterface) {
 				var meta = Meta.Get(t, Options);
