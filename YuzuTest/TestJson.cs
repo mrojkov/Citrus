@@ -1318,14 +1318,23 @@ namespace YuzuTest.Json
 		[TestMethod]
 		public void TestUnknown()
 		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = "";
 			var jd = new JsonDeserializer();
+			jd.JsonOptions.Unordered = true;
+
 			var w1 = (YuzuUnknown)jd.FromString<object>("{\"class\":\"NewType1\"}");
 			Assert.AreEqual("NewType1", w1.ClassTag);
 			Assert.AreEqual(0, w1.Fields.Count);
-			var w2 = (YuzuUnknown)jd.FromString<object>("{\"class\":\"NewType2\", \"a\": 1, \"b\": \"qqq\"}");
+			Assert.AreEqual("{\"class\":\"NewType1\"}", js.ToString(w1));
+
+			var w2 = (YuzuUnknown)jd.FromString<object>("{\"class\":\"NewType2\", \"b\":\"qqq\", \"a\":1}");
 			Assert.AreEqual(2, w2.Fields.Count);
 			Assert.AreEqual(1.0, w2.Fields["a"]);
 			Assert.AreEqual("qqq", w2.Fields["b"]);
+			Assert.AreEqual("{\"class\":\"NewType2\",\"a\":1,\"b\":\"qqq\"}", js.ToString(w2));
+
 			jd.Options.IgnoreUnknownFields = true;
 			var w3 = jd.FromString<SampleBool>("{\"B\":true, \"a\": {\"class\":\"NewType3\"}}");
 		}

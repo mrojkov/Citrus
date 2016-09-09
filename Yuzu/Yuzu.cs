@@ -163,7 +163,7 @@ namespace Yuzu
 	public class YuzuUnknown
 	{
 		public string ClassTag;
-		public Dictionary<string, object> Fields = new Dictionary<string, object>();
+		public SortedDictionary<string, object> Fields = new SortedDictionary<string, object>();
 	}
 
 	public class YuzuUnknownStorage

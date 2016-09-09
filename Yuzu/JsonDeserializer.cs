@@ -383,7 +383,7 @@ namespace Yuzu.Json
 			keyParsers.Add(t, parser);
 		}
 
-		protected void ReadIntoDictionary<K, V>(Dictionary<K, V> dict)
+		protected void ReadIntoDictionary<K, V>(IDictionary<K, V> dict)
 		{
 			// ReadValue might invoke a new serializer, so we must not rely on PutBack.
 			if (SkipSpacesCarefully() == '}') {

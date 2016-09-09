@@ -385,6 +385,36 @@ namespace Yuzu.Json
 				normalWrite(obj);
 		}
 
+		private void WriteUnknown(object obj)
+		{
+			if (obj == null) {
+				writer.Write(nullBytes);
+				return;
+			}
+			var u = (YuzuUnknown)obj;
+			writer.Write((byte)'{');
+			WriteFieldSeparator();
+			objStack.Push(obj);
+			try {
+				depth += 1;
+				var isFirst = true;
+				WriteName(JsonOptions.ClassTag, ref isFirst);
+				WriteUnescapedString(u.ClassTag);
+				foreach (var f in u.Fields) {
+					WriteName(f.Key, ref isFirst);
+					GetWriteFunc(f.Value.GetType())(f.Value);
+				}
+				if (!isFirst)
+					WriteFieldSeparator();
+			}
+			finally {
+				depth -= 1;
+				objStack.Pop();
+			}
+			WriteIndent();
+			writer.Write((byte)'}');
+		}
+
 		private bool IsOneline(Meta meta)
 		{
 			if (meta.Items.Count > JsonOptions.MaxOnelineFields)
@@ -431,6 +461,7 @@ namespace Yuzu.Json
 			writerCache[typeof(TimeSpan)] = WriteTimeSpan;
 			writerCache[typeof(string)] = WriteNullableEscapedString;
 			writerCache[typeof(object)] = WriteAny;
+			writerCache[typeof(YuzuUnknown)] = WriteUnknown;
 		}
 
 		private Action<object> GetWriteFunc(Type t)
