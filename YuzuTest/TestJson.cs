@@ -950,7 +950,6 @@ namespace YuzuTest.Json
 		public void TestNewFields()
 		{
 			var jd = new JsonDeserializer();
-			jd.Options.TagMode = TagMode.Aliases;
 			jd.Options.IgnoreUnknownFields = true;
 
 			var w = new SampleTree();
@@ -965,6 +964,10 @@ namespace YuzuTest.Json
 
 			jd.FromString(w, "{\"a\":11, \"a1\":[{}]}");
 			Assert.AreEqual(11, w.Value);
+
+			jd.Options.TagMode = TagMode.Names;
+			jd.FromString(w, "{\"A\":11, \"Value\":12, \"Z\": null}");
+			Assert.AreEqual(12, w.Value);
 		}
 
 		[TestMethod]

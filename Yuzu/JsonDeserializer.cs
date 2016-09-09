@@ -662,12 +662,11 @@ namespace Yuzu.Json
 		protected int IgnoreNewFields(string tag, ref string name)
 		{
 			var cmp = String.CompareOrdinal(tag, name);
-			if (Options.IgnoreUnknownFields && Options.TagMode != TagMode.Names)
-				while (cmp > 0 && name != "") {
-					ReadAnyObject();
-					name = GetNextName(false);
-					cmp = String.CompareOrdinal(tag, name);
-				}
+			while (cmp > 0 && name != "") {
+				ReadAnyObject();
+				name = GetNextName(false);
+				cmp = String.CompareOrdinal(tag, name);
+			}
 			return cmp;
 		}
 
@@ -694,7 +693,7 @@ namespace Yuzu.Json
 						name = GetNextName(false);
 					}
 				}
-				else if (Options.IgnoreUnknownFields && Options.TagMode != TagMode.Names) {
+				else if (Options.IgnoreUnknownFields) {
 					foreach (var yi in meta.Items) {
 						if (IgnoreNewFields(yi.Tag(Options), ref name) != 0) {
 							if (!yi.IsOptional)
