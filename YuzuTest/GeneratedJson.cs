@@ -14,6 +14,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = false;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -62,6 +63,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = false;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -110,6 +112,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = false;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -162,6 +165,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -207,6 +211,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -251,6 +256,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -301,6 +307,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -345,6 +352,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -400,6 +408,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -444,6 +453,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -505,6 +515,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -594,6 +605,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -639,6 +651,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -688,6 +701,7 @@ namespace YuzuGen.System.Collections.Generic
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -748,6 +762,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -803,6 +818,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -847,6 +863,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -894,6 +911,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -941,6 +959,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1007,6 +1026,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1064,6 +1084,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1111,6 +1132,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1158,6 +1180,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1224,6 +1247,7 @@ namespace YuzuGen.System.Collections.Generic
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1295,6 +1319,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1350,6 +1375,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1406,6 +1432,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1458,6 +1485,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1503,6 +1531,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1565,6 +1594,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1629,6 +1659,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1670,6 +1701,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1714,6 +1746,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1758,6 +1791,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1805,6 +1839,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1846,6 +1881,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1890,6 +1926,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1946,6 +1983,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -2002,6 +2040,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -2071,6 +2110,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -2127,6 +2167,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -2174,6 +2215,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -2245,6 +2287,7 @@ namespace YuzuGen.YuzuTest
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -2298,6 +2341,7 @@ namespace YuzuGen.System.Collections.Generic
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -2358,6 +2402,7 @@ namespace YuzuGen.YuzuTestAssembly
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -2403,6 +2448,7 @@ namespace YuzuGen.YuzuTestAssembly
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -2456,6 +2502,7 @@ namespace YuzuGen.YuzuTest2
 			Options.IgnoreUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
