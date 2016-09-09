@@ -172,14 +172,41 @@ namespace Yuzu.Json
 			WriteStrCached((bool)obj ? "true" : "false");
 		}
 
+		private static byte[] localTimeZone = Encoding.ASCII.GetBytes(DateTime.Now.ToString("%K"));
+
 		private void WriteDateTime(object obj)
 		{
-			var s = ((DateTime)obj).ToString(JsonOptions.DateFormat, CultureInfo.InvariantCulture);
+			var d = (DateTime)obj;
 			// 'Roundtrip' format is guaranteed to be ASCII-clean.
-			if (JsonOptions.DateFormat == "O")
-				WriteUnescapedString(s);
+			if (JsonOptions.DateFormat == "O") {
+				writer.Write((byte)'"');
+				JsonIntWriter.WriteInt4Digits(writer, d.Year);
+				writer.Write((byte)'-');
+				JsonIntWriter.WriteInt2Digits(writer, d.Month);
+				writer.Write((byte)'-');
+				JsonIntWriter.WriteInt2Digits(writer, d.Day);
+				writer.Write((byte)'T');
+				JsonIntWriter.WriteInt2Digits(writer, d.Hour);
+				writer.Write((byte)':');
+				JsonIntWriter.WriteInt2Digits(writer, d.Minute);
+				writer.Write((byte)':');
+				JsonIntWriter.WriteInt2Digits(writer, d.Second);
+				writer.Write((byte)'.');
+				JsonIntWriter.WriteInt7Digits(writer, (int)(d.Ticks % TimeSpan.TicksPerSecond));
+				switch (d.Kind) {
+					case DateTimeKind.Local:
+						writer.Write(localTimeZone);
+						break;
+					case DateTimeKind.Unspecified:
+						break;
+					case DateTimeKind.Utc:
+						writer.Write((byte)'Z');
+						break;
+				}
+				writer.Write((byte)'"');
+			}
 			else
-				WriteEscapedString(s);
+				WriteEscapedString(d.ToString(JsonOptions.DateFormat, CultureInfo.InvariantCulture));
 		}
 
 		private void WriteTimeSpan(object obj)

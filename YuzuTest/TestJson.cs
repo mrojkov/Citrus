@@ -1007,6 +1007,9 @@ namespace YuzuTest.Json
 			js.JsonOptions.FieldSeparator = " ";
 			var jd = new JsonDeserializer();
 
+			var n = DateTime.Now;
+			Assert.AreEqual("\"" + n.ToString("O") + "\"", js.ToString(n));
+
 			var v1 = new SampleDate { D = new DateTime(2011, 3, 25), T = TimeSpan.FromMinutes(5) };
 			var result1 = js.ToString(v1);
 			Assert.AreEqual("{ \"D\":\"2011-03-25T00:00:00.0000000\", \"T\":\"00:05:00\" }", result1);

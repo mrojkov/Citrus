@@ -172,6 +172,31 @@ namespace Yuzu.Json
 			// TODO: Optimize long case.
 			writer.Write(Encoding.ASCII.GetBytes(x.ToString()));
 		}
+
+		public static void WriteInt2Digits(BinaryWriter writer, int x)
+		{
+			writer.Write(digitPairsZero[x]);
+		}
+
+		public static void WriteInt4Digits(BinaryWriter writer, int x)
+		{
+			var d = x / 100;
+			writer.Write(digitPairsZero[d]);
+			writer.Write(digitPairsZero[x - d * 100]);
+		}
+
+		public static void WriteInt7Digits(BinaryWriter writer, int x)
+		{
+			var d = x / 1000000;
+			writer.Write(digitPairsNoZero[d]);
+			x -= d * 1000000;
+			d = x / 10000;
+			writer.Write(digitPairsZero[d]);
+			x -= d * 10000;
+			d = x / 100;
+			writer.Write(digitPairsZero[d]);
+			writer.Write(digitPairsZero[x - d * 100]);
+		}
 	}
 
 }
