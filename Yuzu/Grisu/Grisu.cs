@@ -42,12 +42,6 @@ namespace Yuzu.Grisu
 
         public static void Write(double value, BinaryWriter writer)
         {
-            if (value < 0.0)
-            {
-                writer.Write((byte)'-');
-                value = -value;
-            }
-
             GrisuDouble grisuDouble = new GrisuDouble(value);
             if (grisuDouble.IsSpecial)
             {
@@ -55,18 +49,27 @@ namespace Yuzu.Grisu
                 return;
             }
 
+            if (value == 0.0) {
+                writer.Write((byte)'0');
+                return;
+            }
+
+            if (value < 0.0) {
+                writer.Write((byte)'-');
+                value = -value;
+            }
+
             byte[] decimal_rep = ts_decimal_rep;
             if (decimal_rep == null)
                 decimal_rep = ts_decimal_rep = new byte[kBase10MaximalLength + 1];
 
-            int decimal_point;
             int decimal_rep_length;
-
-            if (!DoubleToShortestAscii(ref grisuDouble, decimal_rep, out decimal_rep_length, out decimal_point))
-            {
+            int decimal_exponent;
+            if (!Grisu3(ref grisuDouble, decimal_rep, out decimal_rep_length, out decimal_exponent)) {
                 writer.Write(Encoding.ASCII.GetBytes(value.ToString("R", CultureInfo.InvariantCulture)));
                 return;
             }
+            int decimal_point = decimal_rep_length + decimal_exponent;
 
             int decimalRepLength = decimal_rep_length;
             if (decimal_point < 1)
@@ -134,34 +137,6 @@ namespace Yuzu.Grisu
                 writer.Write(nan_symbol_);
                 return;
             }
-        }
-
-        private static bool DoubleToShortestAscii(ref GrisuDouble v, byte[] buffer, out int length, out int point)
-        {
-            Debug.Assert(!v.IsSpecial);
-            Debug.Assert(v.Value >= 0.0);
-
-            double value = v.Value;
-
-            if (value == 0.0)
-            {
-                buffer[0] = (byte)'0';
-                length = 1;
-                point = 1;
-                return true;
-            }
-
-            int decimal_exponent;
-            bool result = Grisu3(ref v, buffer, out length, out decimal_exponent);
-            if (result)
-            {
-                point = length + decimal_exponent;
-            }
-            else
-            {
-                point = 0;
-            }
-            return result;
         }
 
         // The minimal and maximal target exponent define the range of w's binary
