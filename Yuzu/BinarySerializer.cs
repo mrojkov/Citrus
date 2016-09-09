@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 
@@ -209,26 +210,36 @@ namespace Yuzu.Binary
 			writer.Write(a.Method.Name);
 		}
 
-		private void WriteArray<T>(T[] arr)
+		private void WriteArray<T>(T[] arr, Action<object> wf)
 		{
 			if (arr == null) {
 				writer.Write(-1);
 				return;
 			}
 			writer.Write(arr.Length);
-			var wf = GetWriteFunc(typeof(T));
 			foreach (var a in arr)
 				wf(a);
 		}
 
-		private void WriteCollection<T>(ICollection<T> list)
+		private void WriteCollection<T>(ICollection<T> list, Action<object> wf)
 		{
 			if (list == null) {
 				writer.Write(-1);
 				return;
 			}
 			writer.Write(list.Count);
-			var wf = GetWriteFunc(typeof(T));
+			foreach (var a in list)
+				wf(a);
+		}
+
+		private void WriteCollectionNG(object obj, Action<object> wf)
+		{
+			if (obj == null) {
+				writer.Write(-1);
+				return;
+			}
+			var list = (ICollection)obj;
+			writer.Write(list.Count);
 			foreach (var a in list)
 				wf(a);
 		}
@@ -346,14 +357,18 @@ namespace Yuzu.Binary
 				}
 			}
 			if (t.IsArray) {
+				var wf = GetWriteFunc(t.GetElementType());
 				var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteArray", t);
-				return obj => m.Invoke(this, new object[] { obj });
+				return obj => m.Invoke(this, new object[] { obj, wf });
 			}
 			var icoll = Utils.GetICollection(t);
 			if (icoll != null) {
 				Meta.Get(t, Options); // Check for serializable fields.
+				var wf = GetWriteFunc(icoll.GetGenericArguments()[0]);
+				if (Utils.GetICollectionNG(t) != null)
+					return obj => WriteCollectionNG(obj, wf);
 				var m = Utils.GetPrivateCovariantGeneric(GetType(), "WriteCollection", icoll);
-				return obj => m.Invoke(this, new object[] { obj });
+				return obj => m.Invoke(this, new object[] { obj, wf });
 			}
 			if (Utils.IsStruct(t) || t.IsClass || t.IsInterface) {
 				var name = Meta.Get(t, Options).IsCompact ? "WriteObjectCompact" : "WriteObject";
