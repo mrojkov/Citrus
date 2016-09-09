@@ -233,27 +233,59 @@ namespace Yuzu.Binary
 				wf(a);
 		}
 
-		private Dictionary<Type, short> classIdCache = new Dictionary<Type, short>();
+		protected class ClassDef
+		{
+			public struct FieldDef
+			{
+				public Action<object> WriteFunc;
+				public Action<object> WriteFuncCompact;
+			}
+			public short Id;
+			internal Meta Meta;
+			public List<FieldDef> Fields = new List<FieldDef>();
+		}
+		private Dictionary<Type, ClassDef> classIdCache = new Dictionary<Type, ClassDef>();
 
 		public void ClearClassIds() { classIdCache.Clear(); }
 
-		private void WriteClassId(Meta meta)
+		private ClassDef WriteClassId(Type t)
 		{
-			short result;
-			if (classIdCache.TryGetValue(meta.Type, out result)) {
-				writer.Write(result);
-				return;
+			ClassDef result;
+			if (classIdCache.TryGetValue(t, out result)) {
+				writer.Write(result.Id);
+				return result;
 			}
 
-			result = (short)(classIdCache.Count + 1);
-			classIdCache[meta.Type] = result;
-			writer.Write(result);
-			writer.Write(TypeSerializer.Serialize(meta.Type));
-			writer.Write((short)meta.Items.Count);
-			foreach (var yi in meta.Items) {
+			result = new ClassDef { Id = (short)(classIdCache.Count + 1) };
+			result.Meta = Meta.Get(t, Options);
+			classIdCache[t] = result;
+			writer.Write(result.Id);
+			writer.Write(TypeSerializer.Serialize(result.Meta.Type));
+			writer.Write((short)result.Meta.Items.Count);
+			for (short i = 0; i < result.Meta.Items.Count; ++i) {
+				var yi = result.Meta.Items[i];
 				writer.Write(yi.Tag(Options));
 				WriteRoughType(yi.Type);
+				short j = (short)(i + 1); // Capture.
+				var wf = GetWriteFunc(yi.Type);
+				var fd = new ClassDef.FieldDef();
+				if (yi.SerializeIf != null)
+					fd.WriteFunc = obj => {
+						var value = yi.GetValue(obj);
+						if (!yi.SerializeIf(obj, value))
+							return;
+						writer.Write(j);
+						wf(value);
+					};
+				else
+					fd.WriteFunc = obj => {
+						writer.Write(j);
+						wf(yi.GetValue(obj));
+					};
+				fd.WriteFuncCompact = obj => wf(yi.GetValue(obj));
+				result.Fields.Add(fd);
 			}
+			return result;
 		}
 
 		private void WriteObject<T>(object obj)
@@ -262,19 +294,11 @@ namespace Yuzu.Binary
 				writer.Write((short)0);
 				return;
 			}
-			var meta = Meta.Get(obj.GetType(), Options);
-			WriteClassId(meta);
+			var def = WriteClassId(obj.GetType());
 			objStack.Push(obj);
 			try {
-				short i = 0;
-				foreach (var yi in meta.Items) {
-					++i;
-					var value = yi.GetValue(obj);
-					if (yi.SerializeIf != null && !yi.SerializeIf(obj, value))
-						continue;
-					writer.Write(i);
-					GetWriteFunc(yi.Type)(value);
-				}
+				foreach (var d in def.Fields)
+					d.WriteFunc(obj);
 				writer.Write((short)0);
 			}
 			finally {
@@ -288,12 +312,11 @@ namespace Yuzu.Binary
 				writer.Write((short)0);
 				return;
 			}
-			var meta = Meta.Get(obj.GetType(), Options);
-			WriteClassId(meta);
+			var def = WriteClassId(obj.GetType());
 			objStack.Push(obj);
 			try {
-				foreach (var yi in meta.Items)
-					GetWriteFunc(yi.Type)(yi.GetValue(obj));
+				foreach (var d in def.Fields)
+					d.WriteFuncCompact(obj);
 			}
 			finally {
 				objStack.Pop();
