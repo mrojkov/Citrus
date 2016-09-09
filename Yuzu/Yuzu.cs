@@ -160,6 +160,12 @@ namespace Yuzu
 		}
 	}
 
+	public class YuzuUnknown
+	{
+		public string ClassTag;
+		public Dictionary<string, object> Fields = new Dictionary<string, object>();
+	}
+
 	public class YuzuAssert : YuzuException
 	{
 		public YuzuAssert(string message = "") : base(message) { }

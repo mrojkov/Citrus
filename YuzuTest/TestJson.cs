@@ -1273,6 +1273,21 @@ namespace YuzuTest.Json
 		}
 
 		[TestMethod]
+		public void TestUnknown()
+		{
+			var jd = new JsonDeserializer();
+			var w1 = (YuzuUnknown)jd.FromString<object>("{\"class\":\"NewType1\"}");
+			Assert.AreEqual("NewType1", w1.ClassTag);
+			Assert.AreEqual(0, w1.Fields.Count);
+			var w2 = (YuzuUnknown)jd.FromString<object>("{\"class\":\"NewType2\", \"a\": 1, \"b\": \"qqq\"}");
+			Assert.AreEqual(2, w2.Fields.Count);
+			Assert.AreEqual(1.0, w2.Fields["a"]);
+			Assert.AreEqual("qqq", w2.Fields["b"]);
+			jd.Options.IgnoreUnknownFields = true;
+			var w3 = jd.FromString<SampleBool>("{\"B\":true, \"a\": {\"class\":\"NewType3\"}}");
+		}
+
+		[TestMethod]
 		public void TestIndentation()
 		{
 			var js = new JsonSerializer();

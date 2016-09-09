@@ -465,12 +465,19 @@ namespace Yuzu.Json
 							var val = ReadAnyObject();
 							any.Add(name, val);
 							if (Require(',', '}') == ',')
-								ReadIntoDictionary<string, object>(any);
+								ReadIntoDictionary(any);
 						}
 						return any;
 					}
 					var typeName = RequireUnescapedString();
-					return ReadFields(Activator.CreateInstance(FindType(typeName)), GetNextName(first: false));
+					var t = TypeSerializer.Deserialize(typeName);
+					if (t == null) {
+						var result = new YuzuUnknown { ClassTag = typeName };
+						if (Require(',', '}') == ',')
+							ReadIntoDictionary(result.Fields);
+						return result;
+					}
+					return ReadFields(Activator.CreateInstance(t), GetNextName(first: false));
 				case '[':
 					return ReadList<object>();
 				default:
