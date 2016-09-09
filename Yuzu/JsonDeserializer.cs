@@ -651,7 +651,7 @@ namespace Yuzu.Json
 			throw Error("Unable to merge field of type {0}", t.Name);
 		}
 
-		protected void IgnoreNewFieldsTail(YuzuUnknownStorage storage, string name)
+		protected void ReadUnknownFieldsTail(YuzuUnknownStorage storage, string name)
 		{
 			while (name != "") {
 				storage.Add(name, ReadAnyObject());
@@ -659,7 +659,7 @@ namespace Yuzu.Json
 			}
 		}
 
-		protected int IgnoreNewFields(YuzuUnknownStorage storage, string tag, ref string name)
+		protected int ReadUnknownFields(YuzuUnknownStorage storage, string tag, ref string name)
 		{
 			var cmp = String.CompareOrdinal(tag, name);
 			while (cmp > 0 && name != "") {
@@ -701,7 +701,7 @@ namespace Yuzu.Json
 						NullYuzuUnknownStorage.Instance : meta.GetUnknownStorage(obj);
 					storage.Fields.Clear();
 					foreach (var yi in meta.Items) {
-						if (IgnoreNewFields(storage, yi.Tag(Options), ref name) != 0) {
+						if (ReadUnknownFields(storage, yi.Tag(Options), ref name) != 0) {
 							if (!yi.IsOptional)
 								throw Error("Expected field '{0}', but found '{1}'", yi.NameTagged(Options), name);
 							continue;
@@ -712,7 +712,7 @@ namespace Yuzu.Json
 							MergeValueFunc(yi.Type)(yi.GetValue(obj));
 						name = GetNextName(false);
 					}
-					IgnoreNewFieldsTail(storage, name);
+					ReadUnknownFieldsTail(storage, name);
 				}
 				else {
 					foreach (var yi in meta.Items) {
