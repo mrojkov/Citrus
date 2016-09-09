@@ -526,12 +526,41 @@ namespace Yuzu.Json
 				}
 				if (typeof(T) != actualType)
 					meta = Meta.Get(actualType, Options);
-				foreach (var yi in meta.Items) {
-					var value = yi.GetValue(obj);
-					if (yi.SerializeIf != null && !yi.SerializeIf(obj, value))
-						continue;
-					WriteName(yi.Tag(Options), ref isFirst);
-					GetWriteFunc(yi.Type)(value);
+				var storage = meta.GetUnknownStorage == null ? null : meta.GetUnknownStorage(obj).Fields;
+				// Duplicate code to optimize fast-path without unknown storage.
+				if (storage == null || storage.Count == 0)
+					foreach (var yi in meta.Items) {
+						var value = yi.GetValue(obj);
+						if (yi.SerializeIf != null && !yi.SerializeIf(obj, value))
+							continue;
+						WriteName(yi.Tag(Options), ref isFirst);
+						GetWriteFunc(yi.Type)(value);
+					}
+				else {
+					var storageIndex = 0;
+					foreach (var yi in meta.Items) {
+						var value = yi.GetValue(obj);
+						if (yi.SerializeIf != null && !yi.SerializeIf(obj, value))
+							continue;
+						var name = yi.Tag(Options);
+						while (storageIndex < storage.Count) {
+							var sn = storage[storageIndex].Name;
+							if (String.CompareOrdinal(sn, name) >= 0)
+								break;
+							WriteName(sn, ref isFirst);
+							var sv = storage[storageIndex].Value;
+							GetWriteFunc(sv.GetType())(sv);
+							++storageIndex;
+						}
+						WriteName(name, ref isFirst);
+						GetWriteFunc(yi.Type)(value);
+					}
+					while (storageIndex < storage.Count) {
+						WriteName(storage[storageIndex].Name, ref isFirst);
+						var sv = storage[storageIndex].Value;
+						GetWriteFunc(sv.GetType())(sv);
+						++storageIndex;
+					}
 				}
 				if (!isFirst)
 					WriteFieldSeparator();

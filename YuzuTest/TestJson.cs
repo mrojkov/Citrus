@@ -973,6 +973,11 @@ namespace YuzuTest.Json
 		[TestMethod]
 		public void TestUnknownStorage()
 		{
+			var js = new JsonSerializer();
+			js.Options.IgnoreUnknownFields = true;
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = "";
+
 			var jd = new JsonDeserializer();
 			jd.Options.IgnoreUnknownFields = true;
 
@@ -980,16 +985,18 @@ namespace YuzuTest.Json
 			jd.FromString(w, "{}");
 			Assert.AreEqual(0, w.X);
 
-			jd.FromString(w, "{\"a\":10}");
+			jd.FromString(w, "{\"A\":10}");
 			Assert.AreEqual(1, w.Storage.Fields.Count);
-			Assert.AreEqual("a", w.Storage.Fields[0].Name);
+			Assert.AreEqual("A", w.Storage.Fields[0].Name);
 			Assert.AreEqual(10.0, w.Storage.Fields[0].Value);
+			Assert.AreEqual("{\"A\":10}", js.ToString(w));
 
 			jd.FromString(w, "{\"X\":77,\"Y\":{}}");
 			Assert.AreEqual(77, w.X);
 			Assert.AreEqual(1, w.Storage.Fields.Count);
 			Assert.AreEqual("Y", w.Storage.Fields[0].Name);
 			Assert.IsInstanceOfType(w.Storage.Fields[0].Value, typeof(Dictionary<string, object>));
+			Assert.AreEqual("{\"X\":77,\"Y\":{}}", js.ToString(w));
 		}
 
 		[TestMethod]
