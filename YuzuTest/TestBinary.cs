@@ -929,7 +929,7 @@ namespace YuzuTest.Binary
 		{
 			var bd = new BinaryDeserializer();
 			bd.Options.TagMode = TagMode.Aliases;
-			bd.Options.IgnoreUnknownFields = true;
+			bd.Options.AllowUnknownFields = true;
 
 			var w = new SampleTree();
 			bd.FromBytes(w, SX(
@@ -958,7 +958,7 @@ namespace YuzuTest.Binary
 		public void TestUnknownStorage()
 		{
 			var bd = new BinaryDeserializer();
-			bd.Options.IgnoreUnknownFields = true;
+			bd.Options.AllowUnknownFields = true;
 
 			var w = new SampleUnknown();
 			bd.FromBytes(w, SX(
@@ -1290,7 +1290,7 @@ namespace YuzuTest.Binary
 			Assert.AreEqual(1, w2.Fields.Count);
 			Assert.AreEqual("qwe", w2.Fields["b"]);
 
-			bd.Options.IgnoreUnknownFields = true;
+			bd.Options.AllowUnknownFields = true;
 			var w3 = bd.FromBytes<SampleBool>(SX(
 				"20 02 00 " + XS(typeof(SampleBool)) + " 02 00 " + XS("B", RoughType.Bool, "a", RoughType.Record) +
 				" 01 00 01 02 00 03 00 " + XS("NewType2") + " 00 00 00 00 00 00"));

@@ -258,7 +258,7 @@ namespace Yuzu.Binary
 
 		private void AddUnknownFieldDef(ClassDef def, string fieldName, string typeName)
 		{
-			if (!Options.IgnoreUnknownFields)
+			if (!Options.AllowUnknownFields)
 				throw Error("New field {0} for class {1}", fieldName, typeName);
 			var rf = ReadValueFunc(ReadType());
 			var fd = new ClassDef.FieldDef { Name = fieldName, OurIndex = -1 };

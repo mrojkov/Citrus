@@ -950,7 +950,7 @@ namespace YuzuTest.Json
 		public void TestNewFields()
 		{
 			var jd = new JsonDeserializer();
-			jd.Options.IgnoreUnknownFields = true;
+			jd.Options.AllowUnknownFields = true;
 
 			var w = new SampleTree();
 			jd.FromString(w, "{\"a\":9,\"a1\":[],\"b\":null}");
@@ -974,12 +974,12 @@ namespace YuzuTest.Json
 		public void TestUnknownStorage()
 		{
 			var js = new JsonSerializer();
-			js.Options.IgnoreUnknownFields = true;
+			js.Options.AllowUnknownFields = true;
 			js.JsonOptions.Indent = "";
 			js.JsonOptions.FieldSeparator = "";
 
 			var jd = new JsonDeserializer();
-			jd.Options.IgnoreUnknownFields = true;
+			jd.Options.AllowUnknownFields = true;
 
 			var w = new SampleUnknown();
 			jd.FromString(w, "{}");
@@ -1335,7 +1335,7 @@ namespace YuzuTest.Json
 			Assert.AreEqual("qqq", w2.Fields["b"]);
 			Assert.AreEqual("{\"class\":\"NewType2\",\"a\":1,\"b\":\"qqq\"}", js.ToString(w2));
 
-			jd.Options.IgnoreUnknownFields = true;
+			jd.Options.AllowUnknownFields = true;
 			var w3 = jd.FromString<SampleBool>("{\"B\":true, \"a\": {\"class\":\"NewType3\"}}");
 		}
 

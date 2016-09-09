@@ -132,7 +132,7 @@ namespace Yuzu
 	{
 		public MetaOptions Meta;
 		public TagMode TagMode;
-		public bool IgnoreUnknownFields;
+		public bool AllowUnknownFields;
 		public bool AllowEmptyTypes;
 		public bool ReportErrorPosition;
 	}

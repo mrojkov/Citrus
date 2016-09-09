@@ -11,7 +11,7 @@ namespace YuzuGen.YuzuTest
 
 		public Sample1_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -59,7 +59,7 @@ namespace YuzuGen.YuzuTest
 
 		public Sample2_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -107,7 +107,7 @@ namespace YuzuGen.YuzuTest
 
 		public Sample3_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -159,7 +159,7 @@ namespace YuzuGen.YuzuTest
 
 		public Sample4_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -204,7 +204,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleDecimal_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -248,7 +248,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleNullable_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -298,7 +298,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleBool_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -342,7 +342,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleList_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -397,7 +397,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleObj_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -441,7 +441,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleDict_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -502,7 +502,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleDictKeys_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -591,7 +591,7 @@ namespace YuzuGen.YuzuTest
 
 		public ISampleMember_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -636,7 +636,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleMemberI_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -685,7 +685,7 @@ namespace YuzuGen.System.Collections.Generic
 
 		public List_ISampleMember_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -746,7 +746,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleArray_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -801,7 +801,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleBase_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -845,7 +845,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleDerivedA_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -892,7 +892,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleDerivedB_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -939,7 +939,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleMatrix_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -1005,7 +1005,7 @@ namespace YuzuGen.YuzuTest
 
 		public SamplePoint_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -1062,7 +1062,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleRect_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -1109,7 +1109,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleDate_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -1156,7 +1156,7 @@ namespace YuzuGen.YuzuTest
 
 		public Color_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -1222,7 +1222,7 @@ namespace YuzuGen.System.Collections.Generic
 
 		public List_List_Int32_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -1294,7 +1294,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleClassList_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -1349,7 +1349,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleSmallTypes_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -1405,7 +1405,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleWithNullFieldCompact_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -1457,7 +1457,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleNested__NestedClass_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -1502,7 +1502,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleNested_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -1564,7 +1564,7 @@ namespace YuzuGen.YuzuTest
 
 		public SamplePerson_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -1628,7 +1628,7 @@ namespace YuzuGen.YuzuTest
 
 		public ISample_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -1669,7 +1669,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleInterfaced_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -1713,7 +1713,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleInterfaceField_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -1757,7 +1757,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleInterfacedGeneric_String_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -1804,7 +1804,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleAbstract_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -1845,7 +1845,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleConcrete_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -1889,7 +1889,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleCollection_Int32_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -1946,7 +1946,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleExplicitCollection_Int32_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -2003,7 +2003,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleWithCollection_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -2072,7 +2072,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleConcreteCollection_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -2129,7 +2129,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleAfter2_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -2176,7 +2176,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleMerge_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -2247,7 +2247,7 @@ namespace YuzuGen.YuzuTest
 
 		public SampleAssemblyDerivedR_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -2300,7 +2300,7 @@ namespace YuzuGen.System.Collections.Generic
 
 		public List_SampleAssemblyBase_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -2361,7 +2361,7 @@ namespace YuzuGen.YuzuTestAssembly
 
 		public SampleAssemblyBase_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -2406,7 +2406,7 @@ namespace YuzuGen.YuzuTestAssembly
 
 		public SampleAssemblyDerivedQ_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;
@@ -2459,7 +2459,7 @@ namespace YuzuGen.YuzuTest2
 
 		public SampleNamespace_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
 			JsonOptions.MaxOnelineFields = 0;

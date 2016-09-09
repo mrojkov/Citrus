@@ -677,13 +677,13 @@ namespace Yuzu.Json
 			try {
 				// Optimization: duplicate loop to extract options check.
 				if (JsonOptions.Unordered) {
-					var storage = !Options.IgnoreUnknownFields || meta.GetUnknownStorage == null ?
+					var storage = !Options.AllowUnknownFields || meta.GetUnknownStorage == null ?
 						NullYuzuUnknownStorage.Instance : meta.GetUnknownStorage(obj);
 					storage.Clear();
 					while (name != "") {
 						Meta.Item yi;
 						if (!meta.TagToItem.TryGetValue(name, out yi)) {
-							if (!Options.IgnoreUnknownFields)
+							if (!Options.AllowUnknownFields)
 								throw Error("Unknown field '{0}'", name);
 							storage.Add(name, ReadAnyObject());
 							name = GetNextName(false);
@@ -696,7 +696,7 @@ namespace Yuzu.Json
 						name = GetNextName(false);
 					}
 				}
-				else if (Options.IgnoreUnknownFields) {
+				else if (Options.AllowUnknownFields) {
 					var storage = meta.GetUnknownStorage == null ?
 						NullYuzuUnknownStorage.Instance : meta.GetUnknownStorage(obj);
 					storage.Clear();

@@ -131,7 +131,7 @@ namespace Yuzu.Json
 
 		public void GenerateHeader()
 		{
-			if (Options.IgnoreUnknownFields || JsonOptions.Unordered)
+			if (Options.AllowUnknownFields || JsonOptions.Unordered)
 				throw new NotImplementedException();
 			cw.Put("using System;\n");
 			cw.Put("\n");
