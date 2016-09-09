@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Text;
 
 using Yuzu.Metadata;
@@ -83,6 +84,97 @@ namespace Yuzu.Json
 		}
 	}
 
+	internal static class JsonIntWriter
+	{
+		private static byte[][] digitPairsZero = new byte[100][];
+		private static byte[][] digitPairsNoZero = new byte[100][];
+		private static byte[] minIntValueBytes = Encoding.ASCII.GetBytes(int.MinValue.ToString());
+
+		static JsonIntWriter()
+		{
+			for (int i = 0; i < 10; ++i)
+				for (int j = 0; j < 10; ++j)
+					digitPairsZero[i * 10 + j] = new byte[] { (byte)((int)'0' + i), (byte)((int)'0' + j) };
+			for (int j = 0; j < 10; ++j)
+				digitPairsNoZero[j] = new byte[] { (byte)((int)'0' + j) };
+			for (int i = 1; i < 10; ++i)
+				for (int j = 0; j < 10; ++j)
+					digitPairsNoZero[i * 10 + j] = new byte[] { (byte)((int)'0' + i), (byte)((int)'0' + j) };
+		}
+
+		private static void WriteUIntInternal(BinaryWriter writer, uint x)
+		{
+			uint d;
+			if (x < 10000) {
+				d = x / 100;
+				writer.Write(digitPairsNoZero[d]);
+				writer.Write(digitPairsZero[x - d * 100]);
+				return;
+			}
+			if (x < 1000000) {
+				d = x / 10000;
+				writer.Write(digitPairsNoZero[d]);
+				x -= d * 10000;
+				d = x / 100;
+				writer.Write(digitPairsZero[d]);
+				writer.Write(digitPairsZero[x - d * 100]);
+				return;
+			}
+			if (x < 100000000) {
+				d = x / 1000000;
+				writer.Write(digitPairsNoZero[d]);
+				x -= d * 1000000;
+				d = x / 10000;
+				writer.Write(digitPairsZero[d]);
+				x -= d * 10000;
+				d = x / 100;
+				writer.Write(digitPairsZero[d]);
+				writer.Write(digitPairsZero[x - d * 100]);
+				return;
+			}
+			d = x / 100000000;
+			writer.Write(digitPairsNoZero[d]);
+			x -= d * 100000000;
+			d = x / 1000000;
+			writer.Write(digitPairsZero[d]);
+			x -= d * 1000000;
+			d = x / 10000;
+			writer.Write(digitPairsZero[d]);
+			x -= d * 10000;
+			d = x / 100;
+			writer.Write(digitPairsZero[d]);
+			writer.Write(digitPairsZero[x - d * 100]);
+		}
+
+		public static void WriteInt(BinaryWriter writer, object obj)
+		{
+			var x = Convert.ToInt32(obj);
+			if (x == int.MinValue) {
+				writer.Write(minIntValueBytes);
+				return;
+			}
+			if (x < 0) {
+				writer.Write((byte)'-');
+				x = -x;
+			}
+			if (x < 100) {
+				writer.Write(digitPairsNoZero[x]);
+				return;
+			}
+			unchecked { WriteUIntInternal(writer, (uint)x); }
+		}
+
+		public static void WriteUInt(BinaryWriter writer, object obj)
+		{
+			var x = Convert.ToUInt32(obj);
+			if (x < 100) {
+				writer.Write(digitPairsNoZero[x]);
+				return;
+			}
+			WriteUIntInternal(writer, x);
+		}
+	}
+
 	public class JsonSerializer : AbstractWriterSerializer
 	{
 		public JsonSerializeOptions JsonOptions = new JsonSerializeOptions();
@@ -126,6 +218,16 @@ namespace Yuzu.Json
 		}
 
 		private void WriteInt(object obj)
+		{
+			JsonIntWriter.WriteInt(writer, obj);
+		}
+
+		private void WriteUInt(object obj)
+		{
+			JsonIntWriter.WriteUInt(writer, obj);
+		}
+
+		private void WriteLong(object obj)
 		{
 			WriteStr(obj.ToString());
 		}
@@ -377,17 +479,15 @@ namespace Yuzu.Json
 
 		private Action<object> MakeWriteFunc(Type t)
 		{
-			if (
-				t == typeof(int) || t == typeof(uint) ||
-				t == typeof(byte) || t == typeof(sbyte) ||
-				t == typeof(short) || t == typeof(ushort)
-			)
+			if (t == typeof(sbyte) || t == typeof(short) || t == typeof(int))
 				return WriteInt;
+			if (t == typeof(byte) || t == typeof(ushort) || t == typeof(uint))
+				return WriteUInt;
 			if (t == typeof(long) || t == typeof(ulong)) {
 				if (JsonOptions.Int64AsString)
 					return WriteUnescapedString;
 				else
-					return WriteInt;
+					return WriteLong;
 			}
 			if (t == typeof(double))
 				return WriteDouble;

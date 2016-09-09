@@ -85,7 +85,7 @@ namespace YuzuTest
 			for (int i = 0; i < 300; ++i) {
 				list1.M.Add(new List<int>());
 				for (int j = 0; j < 400; ++j)
-					list1.M[i].Add(i * j);
+					list1.M[i].Add(i * j * 97);
 			}
 
 			var js = new JsonSerializer();
@@ -96,6 +96,10 @@ namespace YuzuTest
 			var jd = new JsonDeserializer();
 			jd.FromString(list2, result1);
 			Assert.AreEqual(list1.M.Count, list2.M.Count);
+			for (int i = 0; i < list1.M.Count; ++i) {
+				for (int j = 0; j < list1.M[i].Count; ++j)
+					Assert.AreEqual(list1.M[i][j], list2.M[i][j]);
+			}
 
 			var jdg = new SampleMatrix_JsonDeserializer();
 			var list3 = (SampleMatrix)jdg.FromString(result1);
