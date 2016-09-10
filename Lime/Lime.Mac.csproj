@@ -266,6 +266,7 @@
     <Compile Include="Source\Widgets\TabBar.cs" />
     <Compile Include="Source\Widgets\BorderedFrame.cs" />
     <Compile Include="Source\GeneratedDeserializersBIN.cs" />
+    <Compile Include="Source\Widgets\Quadrangle.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

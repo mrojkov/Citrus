@@ -185,5 +185,15 @@ namespace Lime
 		{
 			return new Rectangle(A * value, B * value);
 		}
+
+		public Quadrangle ToQuadrangle()
+		{
+			return new Quadrangle {
+				V1 = A,
+				V2 = new Vector2(B.X, A.Y),
+				V3 = B,
+				V4 = new Vector2(A.X, B.Y)
+			};
+		}
 	}
 }

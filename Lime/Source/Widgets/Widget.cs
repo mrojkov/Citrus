@@ -29,8 +29,6 @@ namespace Lime
 		public Vector2 Position;
 		public Vector2 Scale;
 		public float Rotation;
-		public Vector2 U;
-		public Vector2 V;
 
 		public static Transform2 Lerp(float t, Transform2 a, Transform2 b)
 		{
@@ -38,18 +36,18 @@ namespace Lime
 				Position = Mathf.Lerp(t, a.Position, b.Position),
 				Scale = Mathf.Lerp(t, a.Scale, b.Scale),
 				Rotation = Mathf.Lerp(t, a.Rotation, b.Rotation),
-				U = Mathf.Lerp(t, a.U, b.U),
-				V = Mathf.Lerp(t, a.V, b.V)
 			};
 		}
-	}
 
-	public struct WidgetHull
-	{
-		public Vector2 V1;
-		public Vector2 V2;
-		public Vector2 V3;
-		public Vector2 V4;
+		public Matrix32 ToMatrix32()
+		{
+			var v = Vector2.CosSin(Rotation * Mathf.DegToRad) * Scale;
+			return new Matrix32 {
+				U = v.X * new Vector2(1, 0) + v.Y * new Vector2(0, 1),
+				V = v.X * new Vector2(0, 1) - v.Y * new Vector2(1, 0),
+				T = Position
+			};
+		}
 	}
 
 	/// <summary>
@@ -1093,37 +1091,6 @@ namespace Lime
 			}
 		}
 
-		/// <summary>
-		/// Âîçâðàùàåò true, åñëè äâà âèäæåòà ïåðåñåêàþòñÿ. Ðåçóëüòàò íå çàâèñèò îò ñâîéñòâ HitTestMethod.
-		/// Ïðîâåðÿåòñÿ òîëüêî ïåðåñå÷åíèå ãðàíèö âèäæåòîâ
-		/// </summary>
-		public static bool AreWidgetsIntersected(Widget a, Widget b)
-		{
-			Vector2[] rect = new Vector2[4] {
-				new Vector2(0, 0), new Vector2(1, 0),
-				new Vector2(1, 1), new Vector2(0, 1)
-			};
-			var sizes = new Vector2[2] { a.Size, b.Size };
-			var matrices = new Matrix32[2] { a.LocalToWorldTransform, b.LocalToWorldTransform };
-			var det = new float[2] { matrices[0].CalcDeterminant(), matrices[1].CalcDeterminant() };
-			if (det[0] == 0 || det[1] == 0) {
-				return false;
-			}
-			for (int k = 0; k < 2; k++)
-				for (int i = 0; i < 4; i++) {
-					var ptA = matrices[k] * (rect[i] * sizes[k]);
-					var ptB = matrices[k] * (rect[(i + 1) % 4] * sizes[k]);
-					var isOutside = true;
-					for (int j = 0; j < 4; j++) {
-						var pt = matrices[1 - k] * (rect[j] * sizes[1 - k]);
-						isOutside = isOutside && GeometryUtils.CalcPointHalfPlane(pt, ptA, ptB) * det[k] < 0;
-					}
-					if (isOutside)
-						return false;
-				}
-			return true;
-		}
-
 		public void CenterOnParent()
 		{
 			if (Parent == null) {
@@ -1135,27 +1102,31 @@ namespace Lime
 
 		public Matrix32 CalcTransitionToSpaceOf(Widget container)
 		{
-			Matrix32 mtx1 = container.LocalToWorldTransform.CalcInversed();
-			Matrix32 mtx2 = LocalToWorldTransform;
+			var mtx1 = container.LocalToWorldTransform.CalcInversed();
+			var mtx2 = LocalToWorldTransform;
 			return mtx2 * mtx1;
 		}
 
-		public void CalcHullInSpaceOf(out WidgetHull hull, Widget container)
+		/// <summary>
+		/// Calculates the widget's convex hull in the space of another widget.
+		/// </summary>
+		public Quadrangle CalcHullInSpaceOf(Widget container)
 		{
-			var transform = CalcTransformInSpaceOf(container);
-			hull.V1 = transform.Position - transform.U * Size.X * Pivot.X - transform.V * Size.Y * Pivot.Y;
-			hull.V2 = hull.V1 + transform.U * Size.X;
-			hull.V3 = hull.V1 + transform.U * Size.X + transform.V * Size.Y;
-			hull.V4 = hull.V1 + transform.V * Size.Y;
+			var t = CalcTransitionToSpaceOf(container);
+			return new Quadrangle {
+				V1 = t * Vector2.Zero,
+				V2 = t * new Vector2(Width, 0),
+				V3 = t * Size,
+				V4 = t * new Vector2(0, Height)
+			};
 		}
 
 		/// <summary>
-		/// Âîçâðàùàåò îãðàíè÷èâàþùèé ïðÿìîóãîëüíèê ýòîãî âèäæåòà, åñëè áû îí íàõîäèëñÿ â ýòîé æå ýêðàííîé êîîðäèíàòå, íî â äðóãîì êîíòåéíåðå
+		/// Calculates the widget's AABB in the space of another widget.
 		/// </summary>
 		public Rectangle CalcAABBInSpaceOf(Widget container)
 		{
-			WidgetHull hull;
-			CalcHullInSpaceOf(out hull, container);
+			var hull = CalcHullInSpaceOf(container);
 			var aabb = new Rectangle(float.MaxValue, float.MaxValue, float.MinValue, float.MinValue)
 				.IncludingPoint(hull.V1)
 				.IncludingPoint(hull.V2)
@@ -1217,34 +1188,6 @@ namespace Lime
 			};
 		}
 
-		public Transform2 CalcTransformFromMatrix(Matrix32 matrix)
-		{
-			var v1 = new Vector2(1, 0);
-			var v2 = new Vector2(0, 1);
-			var v3 = new Vector2(0, 0);
-			v1 = matrix.TransformVector(v1);
-			v2 = matrix.TransformVector(v2);
-			v3 = matrix.TransformVector(v3);
-			v1 = v1 - v3;
-			v2 = v2 - v3;
-			Transform2 transform;
-			transform.Position = matrix.TransformVector(Pivot * Size);
-			transform.Scale = new Vector2(v1.Length, v2.Length);
-			transform.Rotation = v1.Atan2Deg;
-			transform.U = v1;
-			transform.V = v2;
-			return transform;
-		}
-
-		/// <summary>
-		/// Âîçâðàùàåò èíôîðìàöèþ î òðàíñôîðìàöèè ýòîãî âèäæåòà, åñëè áû îí íàõîäèëñÿ â ýòîé æå ýêðàííîé êîîðäèíàòå, íî â äðóãîì êîíòåéíåðå
-		/// </summary>
-		public Transform2 CalcTransformInSpaceOf(Widget container)
-		{
-			Matrix32 matrix = CalcTransitionToSpaceOf(container);
-			return CalcTransformFromMatrix(matrix);
-		}
-
 		/// <summary>
 		/// Âîçâðàùàåò ïîçèöèþ ýòîãî âèäæåòà, åñëè áû îí íàõîäèëñÿ â ýòîé æå ýêðàííîé êîîðäèíàòå, íî â äðóãîì êîíòåéíåðå
 		/// </summary>
@@ -1273,8 +1216,8 @@ namespace Lime
 			} else if (GlobalColor.A < 10) {
 				yield return "One of its parent has 'Opacity' close to zero";
 			}
-			var basis = CalcTransformInSpaceOf(WidgetContext.Current.Root);
-			if ((basis.Scale.X * Size.X).Abs() < 1 || (basis.Scale.Y * Size.Y).Abs() < 1) {
+			var transform = CalcTransitionToSpaceOf(WidgetContext.Current.Root).ToTransform2();
+			if ((transform.Scale.X * Size.X).Abs() < 1 || (transform.Scale.Y * Size.Y).Abs() < 1) {
 				yield return string.Format("The widget is probably too small");
 			}
 			bool passedHitTest = false;

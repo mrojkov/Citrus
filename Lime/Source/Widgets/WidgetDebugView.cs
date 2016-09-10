@@ -79,7 +79,7 @@ namespace Lime
 		{
 			get
 			{
-				var b = widget.CalcTransformFromMatrix(widget.LocalToWorldTransform);
+				var b = widget.LocalToWorldTransform.ToTransform2();
 				return new WidgetBasis {
 					Position = b.Position,
 					Rotation = b.Rotation,
