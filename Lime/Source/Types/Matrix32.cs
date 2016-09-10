@@ -180,6 +180,15 @@ namespace Lime
 			return v;
 		}
 
+		public Transform2 ToTransform2()
+		{
+			return new Transform2 {
+				Translation = T,
+				Scale = new Vector2(U.Length, V.Length),
+				Rotation = U.Atan2Deg
+			}
+		}
+
 		public static Vector2 operator *(Vector2 a, Matrix32 b)
 		{
 			return b.TransformVector(a);
