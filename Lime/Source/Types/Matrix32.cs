@@ -106,7 +106,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Returns transformation matrix.
+		/// Returns the transformation matrix.
 		/// </summary>
 		/// <param name="center">Center of rotation and scaling.</param>
 		/// <param name="rotation">Rotation (in radians).</param>
@@ -124,7 +124,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Multiplication of matrixes.
+		/// Multiplication of matrices.
 		/// Combines transformations in result (this operation is non-communicative).
 		/// </summary>
 		public static Matrix32 operator *(Matrix32 a, Matrix32 b)
@@ -140,7 +140,7 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// Multiplication of matrixes.
+		/// Multiplication of matrices.
 		/// Combines transformations in result (this operation is non-communicative).
 		/// </summary>
 		public static void Multiply(ref Matrix32 a, ref Matrix32 b, out Matrix32 result)
@@ -182,11 +182,12 @@ namespace Lime
 
 		public Transform2 ToTransform2()
 		{
+			var vSign = Math.Sign(Vector2.CrossProduct(U, V));
 			return new Transform2 {
 				Translation = T,
-				Scale = new Vector2(U.Length, V.Length),
+				Scale = new Vector2(U.Length, V.Length * vSign),
 				Rotation = U.Atan2Deg
-			}
+			};
 		}
 
 		public static Vector2 operator *(Vector2 a, Matrix32 b)
@@ -208,7 +209,7 @@ namespace Lime
 
 		/// <summary>
 		/// Creates a new <see cref="Matrix32"/> that contains
-		/// linear interpolation of the specified matrixes.
+		/// linear interpolation of the specified matrices.
 		/// </summary>
 		/// <param name="amount">Weighting value(between 0.0 and 1.0).</param>
 		/// <param name="value1">The first matrix.</param>

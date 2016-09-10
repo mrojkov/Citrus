@@ -81,7 +81,7 @@ namespace Lime
 			{
 				var b = widget.LocalToWorldTransform.ToTransform2();
 				return new WidgetBasis {
-					Position = b.Position,
+					Position = b.Translation,
 					Rotation = b.Rotation,
 					Scale = b.Scale,
 				};
