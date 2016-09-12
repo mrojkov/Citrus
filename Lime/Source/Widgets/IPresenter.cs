@@ -82,11 +82,33 @@ namespace Lime
 
 	public class DelegatePresenter<T> : CustomPresenter where T: Node
 	{
+		public delegate bool HitTestDelegate(T node, ref HitTestArgs args);
 		readonly Action<T> render;
+		readonly HitTestDelegate hitTest;
 
 		public DelegatePresenter(Action<T> render) { this.render = render; }
 
-		public override void Render(Node node) { render(node as T); }
+		public DelegatePresenter(HitTestDelegate hitTest)
+		{
+			this.hitTest = hitTest;
+		}
+
+		public DelegatePresenter(Action<T> render, HitTestDelegate hitTest)
+		{
+			this.render = render;
+			this.hitTest = hitTest;
+		}
+
+		public override void Render(Node node)
+		{
+			if (render != null)
+				render((T)node);
+		}
+
+		public override bool PartialHitTest (Node node, ref HitTestArgs args)
+		{
+			return hitTest != null && hitTest ((T)node, ref args);
+		}
 	}
 
 	public class WidgetBoundsPresenter : CustomPresenter
