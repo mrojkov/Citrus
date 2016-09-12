@@ -16,7 +16,6 @@ namespace EmptyProject.Android
 		static MainActivity()
 		{
 			System.Threading.ThreadPool.SetMinThreads(4, 8);
-			Lime.Serialization.Serializer = new Serializer();
 			new Lime.ActivityDelegate(() => {
 				Lime.Application.Initialize(
 				new Lime.ApplicationOptions

@@ -1,19 +1,18 @@
 using System;
 using Lime;
-using ProtoBuf;
+using Yuzu;
 
 namespace EmptyProject.Application
 {
-	[ProtoContract]
 	public struct Display : IEquatable<Display>
 	{
-		[ProtoMember(1)]
+		[YuzuMember]
 		public string Name;
 
-		[ProtoMember(2)]
+		[YuzuMember]
 		public IntVector2 Resolution;
 
-		[ProtoMember(3)]
+		[YuzuMember]
 		public int DPI;
 
 		public Display(string name, int width, int height, int dpi)

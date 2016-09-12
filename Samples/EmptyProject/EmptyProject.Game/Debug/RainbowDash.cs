@@ -54,7 +54,8 @@ namespace RainbowDash
 			}
 			foreach (var w in widgets) {
 				w.Size = widget.Size;
-				LayoutWidgetWithinCell(w, Vector2.Zero, widget.Size, DebugRectangles);
+				var align = (w.LayoutCell ?? LayoutCell.Default).Alignment;
+				LayoutWidgetWithinCell(w, Vector2.Zero, widget.Size, align, DebugRectangles);
 			}
 			DebugRectangles.Clear();
 		}
@@ -113,13 +114,13 @@ namespace RainbowDash
 			(textPresenter.Nodes[0] as TextStyle).TextColor = textColor.Value;
 			var bg = b["bg"];
 			var aBg = bg.Animators["Color"];
-			b.Markers.AddStopMarker("Normal", 0);
+			b.Markers.Add(new Marker("Normal", 0, MarkerAction.Stop));
 			aBg.Keys.Add(0, bgColor);
-			b.Markers.AddStopMarker("Focus", 10);
+			b.Markers.Add(new Marker("Focus", 10, MarkerAction.Stop));
 			aBg.Keys.Add(10, bgColor);
-			b.Markers.AddStopMarker("Press", 20);
+			b.Markers.Add(new Marker("Press", 20, MarkerAction.Stop));
 			aBg.Keys.Add(20, bgColor);
-			b.Markers.AddStopMarker("Disable", 30);
+			b.Markers.Add(new Marker("Disable", 30, MarkerAction.Stop));
 			aBg.Keys.Add(30, Color4.Gray);
 		}
 	}

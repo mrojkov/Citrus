@@ -1,35 +1,31 @@
 ﻿using System;
 using System.IO;
 using Lime;
-using ProtoBuf;
+using Yuzu;
 
 namespace EmptyProject.Application
 {
-	[ProtoContract]
 	public class AppData
 	{
 		public static AppData Instance;
 
 		public const string Version = "0.1";
 
-		[ProtoMember(1)]
+		[YuzuMember]
 		public float MusicVolume = 1;
 
-		[ProtoMember(2)]
+		[YuzuMember]
 		public float EffectsVolume = 1;
 
-		[ProtoMember(3)]
+		[YuzuMember]
 #if !iOS && !ANDROID
 		public Display SimulateDisplay = DisplayInfo.Displays[0];
 #else
 		public Display SimulateDisplay;
 #endif
 
-		[ProtoMember(4)]
+		[YuzuMember]
 		public DeviceOrientation SimulateDeviceOrientation = DeviceOrientation.LandscapeLeft;
-
-		[ProtoMember(5)]
-		public bool IsLevelConfigsOnWebModeOn;
 
 		public static string GetDataFilePath()
 		{
@@ -64,11 +60,12 @@ namespace EmptyProject.Application
 		{
 			EffectsVolume = AudioSystem.GetGroupVolume(AudioChannelGroup.Effects);
 			MusicVolume = AudioSystem.GetGroupVolume(AudioChannelGroup.Music);
+
 			try {
-				Serialization.WriteObjectToFile(GetDataFilePath(), this);
+				Serialization.WriteObjectToFile(GetDataFilePath(), this, Serialization.Format.Binary);
 			}
 			catch (System.Exception e) {
-				Logger.Write("Save failed: " + e.Message);
+				Logger.Write("AppData saving failed: {0}", e.Message);
 			}
 		}
 
