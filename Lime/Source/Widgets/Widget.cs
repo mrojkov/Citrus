@@ -288,8 +288,8 @@ namespace Lime
 		}
 
 		/// <summary>
-		/// SilenSize is needed to prevent unwanted propagation of `OnSizeChanged`
-		/// while deserializing with Yuzu
+		/// SilentSize is needed to prevent unwanted propagation of `OnSizeChanged`
+		/// while deserializing with Yuzu.
 		/// </summary>
 		[YuzuMember("Size")]
 		public Vector2 SilentSize { get { return size; } set { size = value; } }
