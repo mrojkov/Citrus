@@ -21,9 +21,7 @@ namespace Tangerine.UI.Timeline.Components
 			nodeData = row.Components.Get<NodeRow>();
 			label = new SimpleText { HitTestTarget = true };
 			editBox = new EditBox { AutoSizeConstraints = false, LayoutCell = new LayoutCell(Alignment.Center, stretchX: float.MaxValue) };
-			nodeIcon = new Image {
-				Texture = IconPool.GetTexture("Nodes." + nodeData.Node.GetType(), "Nodes.Unknown"),
-			};
+			nodeIcon = new Image(NodeIconPool.GetTexture(nodeData.Node));
 			nodeIcon.MinMaxSize = (Vector2)nodeIcon.Texture.ImageSize;
 			var expandButtonContainer = new Widget {
 				Layout = new StackLayout { IgnoreHidden = false },

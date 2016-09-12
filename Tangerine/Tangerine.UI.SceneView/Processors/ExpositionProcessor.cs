@@ -172,7 +172,7 @@ namespace Tangerine.UI.SceneView
 					exposedWidget = (Widget)widget.Clone();
 					exposedWidget.Animations.Clear();
 					OriginalPivot = widget.Pivot;
-					originalTransform = widget.CalcTransformInSpaceOf(frame);
+					originalTransform = widget.CalcTransitionToSpaceOf(frame).ToTransform2();
 					exposedTransform = CalcExposedTransform(widget, frame);
 					originalWidget.SetTangerineFlag(TangerineFlags.HiddenOnExposition, true);
 					var label = new SimpleText { 
@@ -189,7 +189,7 @@ namespace Tangerine.UI.SceneView
 					borderPresenter = new WidgetBoundsPresenter(SceneViewColors.ExposedItemInactiveBorder, 1);
 					frame.CompoundPresenter.Push(borderPresenter);
 					frame.Tasks.AddLoop(() => {
-						borderPresenter.Color = Document.Current.EnumerateSelectedNodes().Contains(widget) ? 
+						borderPresenter.Color = Document.Current.SelectedNodes().Contains(widget) ? 
 							SceneViewColors.ExposedItemSelectedBorder :
 							SceneViewColors.ExposedItemInactiveBorder;
 						if (clickArea.IsMouseOver()) {
@@ -202,7 +202,7 @@ namespace Tangerine.UI.SceneView
 									Core.Operations.SelectNode.Perform(widget);
 									Closed = true;
 								} else {
-									var isSelected = Document.Current.EnumerateSelectedNodes().Contains(widget);
+									var isSelected = Document.Current.SelectedNodes().Contains(widget);
 									Core.Operations.SelectNode.Perform(widget, !isSelected);
 								}
 							}
@@ -228,7 +228,7 @@ namespace Tangerine.UI.SceneView
 							frame.Height / widget.Height;
 						transform.Scale *= scale;
 					}
-					transform.Position = (frame.Size - widget.Size * transform.Scale) / 2;
+					transform.Translation = (frame.Size - widget.Size * transform.Scale) / 2;
 					return transform;
 				}
 
@@ -240,7 +240,7 @@ namespace Tangerine.UI.SceneView
 				public void Morph(float morphKoeff)
 				{
 					var t = Transform2.Lerp(morphKoeff, originalTransform, exposedTransform);
-					exposedWidget.Position = t.Position;
+					exposedWidget.Position = t.Translation;
 					exposedWidget.Scale = t.Scale;
 					exposedWidget.Rotation = t.Rotation;
 					exposedWidget.Pivot = Vector2.Lerp(morphKoeff, OriginalPivot, Vector2.Zero);

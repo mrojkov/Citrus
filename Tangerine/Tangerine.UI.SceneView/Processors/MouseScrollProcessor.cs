@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using Lime;
 
 namespace Tangerine.UI.SceneView
 {
 	class MouseScrollProcessor : Core.IProcessor
 	{
-		SceneView sceneView => SceneView.Instance;
-
 		public IEnumerator<object> Loop()
 		{
+			var sceneView = SceneView.Instance;
 			var input = sceneView.InputArea.Input;
 			while (true) {
-				if (input.WasMousePressed()) {
+				if (input.WasMousePressed() && Window.Current.Input.IsKeyPressed(Key.Space)) {
 					var initialMouse = input.MousePosition;
 					var initialPosition = sceneView.CanvasWidget.Position;
 					input.CaptureMouse();

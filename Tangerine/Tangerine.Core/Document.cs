@@ -137,7 +137,7 @@ namespace Tangerine.Core
 			throw new NotImplementedException();
 		}
 
-		public IEnumerable<Node> EnumerateSelectedNodes()
+		public IEnumerable<Node> SelectedNodes()
 		{
 			return SelectedRows.Select(i => i.Components.Get<Components.NodeRow>()?.Node).Where(n => n != null);
 		}

@@ -54,7 +54,9 @@ namespace Tangerine.UI.SceneView
 		{
 			RootWidget.Tasks.Add(
 				new MouseScrollProcessor(),
-				new SelectedWidgetsPresenter()
+				new SelectedWidgetsPresenter(),
+				new ResizeProcessor(),
+				new MouseSelectionProcessor()
 			);
 		}
 	}

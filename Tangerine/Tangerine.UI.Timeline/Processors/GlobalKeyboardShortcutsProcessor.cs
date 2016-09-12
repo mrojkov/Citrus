@@ -63,7 +63,7 @@ namespace Tangerine.UI.Timeline
 		{
 			var doc = Document.Current;
 			if (input.ConsumeKeyRepeat(KeyBindings.TimelineKeys.EnterNode)) {
-				var node = Document.Current.EnumerateSelectedNodes().FirstOrDefault();
+				var node = Document.Current.SelectedNodes().FirstOrDefault();
 				if (node != null) {
 					Core.Operations.EnterNode.Perform(node);
 				}

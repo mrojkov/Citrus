@@ -30,6 +30,7 @@ namespace Tangerine.UI
 		public static readonly Color4 ExposedItemActiveBorder = Color4.White;
 		public static readonly Color4 ExposedItemSelectedBorder = SelectedWidgetBorder;
 		public static readonly Color4 Label = Color4.Green;
+		public static readonly Color4 MouseSelection = Color4.Yellow;
 	}
 
 	public static class TimelineGridColors

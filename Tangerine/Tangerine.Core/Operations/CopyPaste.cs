@@ -16,7 +16,7 @@ namespace Tangerine.Core.Operations
 		public static void Perform()
 		{
 			Clipboard.Nodes.Clear();
-			Clipboard.Nodes.AddRange(Document.Current.EnumerateSelectedNodes().Select(i => {
+			Clipboard.Nodes.AddRange(Document.Current.SelectedNodes().Select(i => {
 				var clone = i.Clone();
 				clone.UserData = null;
 				return clone;
@@ -37,7 +37,7 @@ namespace Tangerine.Core.Operations
 	{
 		public static void Perform()
 		{
-			var nodeInsertBefore = Document.Current.EnumerateSelectedNodes().FirstOrDefault();
+			var nodeInsertBefore = Document.Current.SelectedNodes().FirstOrDefault();
 			var insertionIndex = nodeInsertBefore != null ? Document.Current.Container.Nodes.IndexOf(nodeInsertBefore) : 0;
 			if (Clipboard.Nodes.Count > 0) {
 				ClearRowSelection.Perform();
@@ -54,7 +54,7 @@ namespace Tangerine.Core.Operations
 	{
 		public static void Perform()
 		{
-			foreach (var i in Document.Current.EnumerateSelectedNodes().ToList()) {
+			foreach (var i in Document.Current.SelectedNodes().ToList()) {
 				UnlinkNode.Perform(i);
 			}
 		}

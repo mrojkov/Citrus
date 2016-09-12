@@ -60,7 +60,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EmbeddedResource.cs" />
-    <Compile Include="Icon.cs" />
+    <Compile Include="IconPool.cs" />
     <Compile Include="Utils\PropertyAttributes.cs" />
     <Compile Include="Utils\KeyframePalette.cs" />
     <Compile Include="Utils\HSpacer.cs" />
@@ -75,6 +75,7 @@
     <Compile Include="Dialogs\ColorPickerDialog.cs" />
     <Compile Include="SearchPanel\SearchPanel.cs" />
     <Compile Include="UserPreferences.cs" />
+    <Compile Include="NodeIconPool.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

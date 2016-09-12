@@ -81,7 +81,7 @@ namespace Tangerine.UI.Inspector
 		{
 			var builder = new InspectorBuilder();
 			return new Property<int>(() => Document.Current.SelectedRows.Version).DistinctUntilChanged().Consume(_ => {
-				builder.Build(Document.Current.EnumerateSelectedNodes());
+				builder.Build(Document.Current.SelectedNodes());
 			});
 		}
 
