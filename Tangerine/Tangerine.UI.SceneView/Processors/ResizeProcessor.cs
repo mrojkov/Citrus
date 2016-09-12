@@ -32,7 +32,7 @@ namespace Tangerine.UI.SceneView
 
 		bool HitTestControlPoint(Vector2 controlPoint)
 		{
-			return (controlPoint - SceneView.Instance.CanvasMousePosition).Length < 10;
+			return (controlPoint - SceneView.Instance.CanvasMousePosition).Length < 6;
 		}
 
 		IEnumerator<object> Resize(int controlPointIndex)
