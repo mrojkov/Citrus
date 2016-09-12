@@ -7,24 +7,20 @@ namespace Tangerine.UI.SceneView
 {
 	public class ResizeProcessor : IProcessor
 	{
-		SceneView sceneView => SceneView.Instance;
-		Widget canvas => SceneView.Instance.CanvasWidget;
-		WidgetInput input => SceneView.Instance.InputArea.Input;
-
 		public IEnumerator<object> Loop()
 		{
 			while (true) {
-				if (input.WasMousePressed()) {
+				if (SceneView.Instance.Input.WasMousePressed()) {
 					var widgets = Utils.UnlockedWidgets();
 					if (widgets.Count > 0) {
 						Quadrangle hull;
 						Vector2 pivot;
-						Utils.CalcHullAndPivot(widgets, canvas, out hull, out pivot);
+						Utils.CalcHullAndPivot(widgets, SceneView.Instance.Canvas, out hull, out pivot);
 						for (int i = 0; i < 4; i++) {
-							if (HitTestStretcher(hull[i])) {
+							if (HitTestControlPoint(hull[i])) {
 								yield return Resize(i * 2);
 							}
-							if (HitTestStretcher((hull[(i + 1) % 4] + hull[i]) / 2)) {
+							if (HitTestControlPoint((hull[(i + 1) % 4] + hull[i]) / 2)) {
 								yield return Resize(i * 2 + 1);
 							}
 						}
@@ -34,30 +30,31 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		bool HitTestStretcher(Vector2 stretcher)
+		bool HitTestControlPoint(Vector2 controlPoint)
 		{
-			return (stretcher - canvas.Input.LocalMousePosition).Length < 10;
+			return (controlPoint - SceneView.Instance.CanvasMousePosition).Length < 10;
 		}
 
-		IEnumerator<object> Resize(int stretcher)
+		IEnumerator<object> Resize(int controlPointIndex)
 		{
-			input.CaptureMouse();
-			input.ConsumeKey(Key.Mouse0);
+			var sv = SceneView.Instance;
+			sv.Input.CaptureMouse();
+			sv.Input.ConsumeKey(Key.Mouse0);
 			var widgets = Utils.UnlockedWidgets();
-			var mousePos = canvas.Input.LocalMousePosition;
-			while (input.IsMousePressed()) {
-				var mouseDelta = canvas.Input.LocalMousePosition - mousePos;
-				var proportional = input.IsKeyPressed(Key.LShift);
+			var mousePos = sv.CanvasMousePosition;
+			while (sv.Input.IsMousePressed()) {
+				var mouseDelta = sv.CanvasMousePosition - mousePos;
+				var proportional = sv.Input.IsKeyPressed(Key.LShift);
 				foreach (var widget in widgets) {
-					ProcessWidget(widget, stretcher, mouseDelta, proportional);
+					ProcessWidget(widget, controlPointIndex, mouseDelta, proportional);
 				}
-				mousePos = canvas.Input.LocalMousePosition;
+				mousePos = sv.CanvasMousePosition;
 				yield return null;
 			}
-			input.ReleaseMouse();
+			sv.Input.ReleaseMouse();
 		}
 
-		readonly Vector2[] sizeTable = {
+		readonly Vector2[] directionLookup = {
 			new Vector2(-1, -1),
 			new Vector2(0, -1),
 			new Vector2(1, -1),
@@ -68,7 +65,7 @@ namespace Tangerine.UI.SceneView
 			new Vector2(-1, 0),
 		};
 
-		readonly Vector2[] positionTable = {
+		readonly Vector2[] positionLookup = {
 			new Vector2(1, 1),
 			new Vector2(0, 1),
 			new Vector2(0, 1),
@@ -79,13 +76,13 @@ namespace Tangerine.UI.SceneView
 			new Vector2(1, 0),
 		};
 
-		void ProcessWidget(Widget widget, int stretcher, Vector2 mouseDelta, bool proportional)
+		void ProcessWidget(Widget widget, int controlPointIndex, Vector2 mouseDelta, bool proportional)
 		{
 			var rotatedMouseDelta = Vector2.RotateDeg(mouseDelta, -widget.Rotation);
-			var deltaSize = rotatedMouseDelta * sizeTable[stretcher];
-			var deltaPosition = rotatedMouseDelta * positionTable[stretcher];
+			var deltaSize = rotatedMouseDelta * directionLookup[controlPointIndex];
+			var deltaPosition = rotatedMouseDelta * positionLookup[controlPointIndex];
 			if (proportional) {
-				if(stretcher == 1 || stretcher == 5) {
+				if(controlPointIndex == 1 || controlPointIndex == 5) {
 					deltaSize.Y = deltaSize.X;
 					deltaPosition.Y = deltaPosition.X;
 				} else {
@@ -93,10 +90,10 @@ namespace Tangerine.UI.SceneView
 					deltaPosition.X = deltaPosition.Y;
 				}
 			}
-			var newSize = widget.Size + deltaSize / widget.Scale;
-			var newPos = widget.Position + Vector2.RotateDeg(deltaPosition + widget.Pivot * deltaSize, widget.Rotation);
-			Core.Operations.SetAnimableProperty.Perform(widget, "Position", newPos);
-			Core.Operations.SetAnimableProperty.Perform(widget, "Size", newSize);
+			var size = widget.Size + deltaSize / widget.Scale;
+			var position = widget.Position + Vector2.RotateDeg(deltaPosition + widget.Pivot * deltaSize, widget.Rotation);
+			Core.Operations.SetAnimableProperty.Perform(widget, "Position", position);
+			Core.Operations.SetAnimableProperty.Perform(widget, "Size", size);
 		}
 	}
 }

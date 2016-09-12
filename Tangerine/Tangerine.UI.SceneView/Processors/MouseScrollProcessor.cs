@@ -8,18 +8,17 @@ namespace Tangerine.UI.SceneView
 	{
 		public IEnumerator<object> Loop()
 		{
-			var sceneView = SceneView.Instance;
-			var input = sceneView.InputArea.Input;
+			var sv = SceneView.Instance;
 			while (true) {
-				if (input.WasMousePressed() && Window.Current.Input.IsKeyPressed(Key.Space)) {
-					var initialMouse = input.MousePosition;
-					var initialPosition = sceneView.CanvasWidget.Position;
-					input.CaptureMouse();
-					while (input.IsMousePressed()) {
-						sceneView.CanvasWidget.Position = (input.MousePosition - initialMouse) + initialPosition;
+				if (sv.Input.WasMousePressed() && CommonWindow.Current.Input.IsKeyPressed(Key.Space)) {
+					var initialMouse = sv.Input.MousePosition;
+					var initialPosition = sv.Canvas.Position;
+					sv.Input.CaptureMouse();
+					while (sv.Input.IsMousePressed()) {
+						sv.Canvas.Position = (sv.Input.MousePosition - initialMouse) + initialPosition;
 						yield return null;
 					}
-					input.ReleaseMouse();
+					sv.Input.ReleaseMouse();
 				}
 				yield return null;
 			}

@@ -11,24 +11,25 @@ namespace Tangerine.UI.SceneView
 		public IEnumerator<object> Loop()
 		{
 			var sceneView = SceneView.Instance;
-			var input = sceneView.InputArea.Input;
+			var input = sceneView.Input;
+			var canvasInput = sceneView.Canvas.Input;
 			while (true) {
 				if (input.WasMousePressed() && !CommonWindow.Current.Input.IsKeyPressed(Key.Space)) {
-					var rect = new Rectangle(GetMousePosition(), GetMousePosition());
+					var rect = new Rectangle(canvasInput.LocalMousePosition, canvasInput.LocalMousePosition);
 					var presenter = new DelegatePresenter<Widget>(w => {
 						w.PrepareRendererState();
 						Renderer.DrawRectOutline(rect.A, rect.B, SceneViewColors.MouseSelection, 1);
 					});
-					sceneView.CanvasWidget.CompoundPostPresenter.Add(presenter);
+					sceneView.Canvas.CompoundPostPresenter.Add(presenter);
 					input.CaptureMouse();
 					while (input.IsMousePressed()) {
 						RefreshSelectedWidgets(rect);
-						rect.B = GetMousePosition();
+						rect.B = canvasInput.LocalMousePosition;
 						CommonWindow.Current.Invalidate();
 						yield return null;
 					}
 					input.ReleaseMouse();
-					sceneView.CanvasWidget.CompoundPostPresenter.Remove(presenter);
+					sceneView.Canvas.CompoundPostPresenter.Remove(presenter);
 					CommonWindow.Current.Invalidate();
 				}
 				yield return null;
@@ -39,19 +40,13 @@ namespace Tangerine.UI.SceneView
 		{
 			var currentSelection = Document.Current.SelectedNodes().OfType<Widget>();
 			var selectionQuad = rect.ToQuadrangle();
-			var newSelection = Document.Current.Container.Nodes.OfType<Widget>().Where(w => selectionQuad.Intersects(w.CalcHullInSpaceOf(SceneView.Instance.CanvasWidget)));
+			var newSelection = Document.Current.Container.Nodes.OfType<Widget>().Where(w => selectionQuad.Intersects(w.CalcHullInSpaceOf(SceneView.Instance.Canvas)));
 			if (!currentSelection.SequenceEqual(newSelection)) {
 				Core.Operations.ClearRowSelection.Perform();
 				foreach (var node in newSelection) {
 					Core.Operations.SelectNode.Perform(node);
 				}
 			}
-		}
-
-		static Vector2 GetMousePosition()
-		{
-			var sceneView = SceneView.Instance;
-			return sceneView.InputArea.Input.MousePosition - sceneView.CanvasWidget.GlobalPosition;
 		}
 	}
 }

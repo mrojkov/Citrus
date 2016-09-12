@@ -18,8 +18,6 @@ namespace Tangerine.UI.SceneView
 		public static readonly Key Key = KeyBindings.SceneViewKeys.SceneExposition;
 		public static readonly Key MultiSelectKey = KeyBindings.SceneViewKeys.SceneExpositionMultiSelect;
 
-		SceneView sceneView => SceneView.Instance;
-
 		public ExpositionProcessor(WidgetInput input)
 		{
 			this.input = input;
@@ -27,11 +25,12 @@ namespace Tangerine.UI.SceneView
 
 		public IEnumerator<object> Loop()
 		{
-			const float animationLength = 0.5f;
+			const float animationLength = 0.75f;
 			while (true) {
 				if (input.ConsumeKeyPress(Key) || input.ConsumeKeyPress(MultiSelectKey)) {
-					sceneView.Components.Get<ExpositionComponent>().InProgress = true;
-					using (var exposition = new Exposition(sceneView.RootWidget, input)) {
+					var sv = SceneView.Instance;
+					sv.Components.Get<ExpositionComponent>().InProgress = true;
+					using (var exposition = new Exposition(sv.Root, input)) {
 						float t = 0; 
 						while (true) {
 							if ((input.IsKeyPressed(Key) || input.IsKeyPressed(MultiSelectKey)) && !exposition.Closed()) {
@@ -51,7 +50,7 @@ namespace Tangerine.UI.SceneView
 							yield return null;
 						}
 					}
-					sceneView.Components.Get<ExpositionComponent>().InProgress = false;
+					sv.Components.Get<ExpositionComponent>().InProgress = false;
 				}
 				yield return null;
 			}
@@ -67,9 +66,11 @@ namespace Tangerine.UI.SceneView
 			const float spacing = 20;
 			readonly Widget canvas;
 			readonly List<Item> items;
+			readonly WidgetFlatFillPresenter blackBackgroundPresenter;
 
 			public Exposition(Widget root, WidgetInput input)
 			{
+				blackBackgroundPresenter = new WidgetFlatFillPresenter(Color4.Transparent);
 				canvas = CreateCanvas(root);
 				var cellSize = CalcCellSize(root.Size, GetWidgets().Count());
 				items = GetWidgets().Select((w, i) => new Item(w, CreateItemFrame(i, canvas, cellSize), input)).ToList();
@@ -97,7 +98,7 @@ namespace Tangerine.UI.SceneView
 			Widget CreateCanvas(Widget root)
 			{
 				var canvas = new Widget { HitTestTarget = true, Anchors = Anchors.LeftRightTopBottom, Size = root.Size };
-				canvas.CompoundPresenter.Add(new WidgetFlatFillPresenter(Color4.Black));
+				canvas.CompoundPresenter.Add(blackBackgroundPresenter);
 				root.Nodes.Push(canvas);
 				return canvas;
 			}
@@ -112,7 +113,7 @@ namespace Tangerine.UI.SceneView
 
 			public void Morph(float morphKoeff)
 			{
-				canvas.Opacity = morphKoeff * 0.75f;
+				blackBackgroundPresenter.Color = Color4.Black.Transparentify(1 - morphKoeff);
 				foreach (var i in items) {
 					i.Morph(morphKoeff);
 				}
@@ -160,7 +161,6 @@ namespace Tangerine.UI.SceneView
 				readonly Widget exposedWidget;
 				readonly Transform2 originalTransform;
 				readonly Transform2 exposedTransform;
-				readonly Vector2 OriginalPivot;
 				readonly WidgetBoundsPresenter borderPresenter;
 				readonly Frame frame;
 				public bool Closed { get; private set; }
@@ -171,7 +171,6 @@ namespace Tangerine.UI.SceneView
 					originalWidget = widget;
 					exposedWidget = (Widget)widget.Clone();
 					exposedWidget.Animations.Clear();
-					OriginalPivot = widget.Pivot;
 					originalTransform = widget.CalcTransitionToSpaceOf(frame).ToTransform2();
 					exposedTransform = CalcExposedTransform(widget, frame);
 					originalWidget.SetTangerineFlag(TangerineFlags.HiddenOnExposition, true);
@@ -243,7 +242,7 @@ namespace Tangerine.UI.SceneView
 					exposedWidget.Position = t.Translation;
 					exposedWidget.Scale = t.Scale;
 					exposedWidget.Rotation = t.Rotation;
-					exposedWidget.Pivot = Vector2.Lerp(morphKoeff, OriginalPivot, Vector2.Zero);
+					exposedWidget.Pivot = Vector2.Zero;
 					frame.ClipChildren = morphKoeff >= 0.8f ? ClipMethod.ScissorTest : ClipMethod.None;
 				}
 			}

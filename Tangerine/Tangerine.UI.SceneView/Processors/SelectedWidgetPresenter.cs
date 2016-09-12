@@ -7,11 +7,9 @@ namespace Tangerine.UI.SceneView
 {
 	class SelectedWidgetsPresenter : Core.IProcessor
 	{
-		SceneView sceneView => SceneView.Instance;
-
 		public IEnumerator<object> Loop()
 		{
-			sceneView.CanvasWidget.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(RenderSelection));
+			SceneView.Instance.Canvas.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(RenderSelection));
 			while (true) {
 				yield return null;
 			}
@@ -20,7 +18,7 @@ namespace Tangerine.UI.SceneView
 		private void RenderSelection(Widget canvas)
 		{
 			if (
-				sceneView.Components.Get<ExpositionComponent>().InProgress ||
+				SceneView.Instance.Components.Get<ExpositionComponent>().InProgress ||
 				Core.Document.Current.Container.IsRunning
 			) {
 				return;

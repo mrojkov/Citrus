@@ -94,7 +94,7 @@ namespace Lime
 					return
 						nodeUnderMouse != null && nodeUnderMouse.DescendantOrThis(widget) &&
 						// Full HitTest would be better.
-						widget.HitTestTarget && widget.IsInsideBoundingRect(MousePosition);
+						widget.HitTestTarget && widget.BoundingRectHitTest(MousePosition);
 				} else {
 					return nodeUnderMouse == widget;
 				}

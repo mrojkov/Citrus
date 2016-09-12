@@ -10,24 +10,29 @@ namespace Tangerine.UI.SceneView
 		// Given panel.
 		private readonly Widget panelWidget;
 		// Widget which is a direct child of the panel.
-		public readonly Widget RootWidget;
+		public readonly Widget Root;
 		// Widget having the same size as panel, used for intercepting mouse events above the canvas.
-		public readonly Widget InputArea;
+		private readonly Widget inputArea;
+		public WidgetInput Input => inputArea.Input;
 		// Canvas which is meant to be scrollable and zoomable widget.
-		public readonly Widget CanvasWidget;
+		public readonly Widget Canvas;
+		/// <summary>
+		/// Gets the mouse position in the canvas space.
+		/// </summary>
+		public Vector2 CanvasMousePosition => Canvas.Input.LocalMousePosition;
 
 		public static SceneView Instance { get; private set; }
 
 		public SceneView(Widget panelWidget)
 		{
 			this.panelWidget = panelWidget;
-			InputArea = new Widget { HitTestTarget = true, Anchors = Anchors.LeftRightTopBottom };
-			CanvasWidget = new Widget {
+			inputArea = new Widget { HitTestTarget = true, Anchors = Anchors.LeftRightTopBottom };
+			Canvas = new Widget {
 				Nodes = { Document.Current.RootNode }
 			};
-			RootWidget = new Widget {
+			Root = new Widget {
 				Id = "SceneView",
-				Nodes = { InputArea, CanvasWidget }
+				Nodes = { inputArea, Canvas }
 			};
 			CreateComponents();
 			CreateProcessors();
@@ -36,13 +41,13 @@ namespace Tangerine.UI.SceneView
 		public void Attach()
 		{
 			Instance = this;
-			panelWidget.AddNode(RootWidget);
+			panelWidget.AddNode(Root);
 		}
 
 		public void Detach()
 		{
 			Instance = null;
-			RootWidget.Unlink();
+			Root.Unlink();
 		}
 
 		void CreateComponents()
@@ -52,7 +57,7 @@ namespace Tangerine.UI.SceneView
 
 		void CreateProcessors()
 		{
-			RootWidget.Tasks.Add(
+			Root.Tasks.Add(
 				new MouseScrollProcessor(),
 				new SelectedWidgetsPresenter(),
 				new ResizeProcessor(),

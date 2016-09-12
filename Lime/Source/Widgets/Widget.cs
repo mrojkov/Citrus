@@ -995,7 +995,7 @@ namespace Lime
 				return false;
 			}
 			if (
-				HitTestMethod == HitTestMethod.BoundingRect && IsInsideBoundingRect(args.Point) ||
+				HitTestMethod == HitTestMethod.BoundingRect && BoundingRectHitTest(args.Point) ||
 			    HitTestMethod == HitTestMethod.Contents && PartialHitTestByContents(ref args)
 			) {
 				args.Node = targetNode;
@@ -1009,7 +1009,7 @@ namespace Lime
 			return false;
 		}
 
-		internal bool IsInsideBoundingRect(Vector2 point)
+		public bool BoundingRectHitTest(Vector2 point)
 		{
 			var position = LocalToWorldTransform.CalcInversed().TransformVector(point);
 			var size = Size;
@@ -1026,7 +1026,7 @@ namespace Lime
 
 		private bool IsPointInsideClipperWidget(ref HitTestArgs args)
 		{
-			return args.ClipperWidget == null || args.ClipperWidget.IsInsideBoundingRect(args.Point);
+			return args.ClipperWidget == null || args.ClipperWidget.BoundingRectHitTest(args.Point);
 		}
 
 		/// <summary>
