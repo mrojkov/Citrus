@@ -12,12 +12,12 @@ namespace EmptyProject.Dialogs
 			label.OverflowMode = TextOverflowMode.Minify;
 			label.Text = text;
 
+			Root["BtnCancel"].Visible = cancelButtonVisible;
+			Root["BtnCancel"].Clicked = Close;
 			Root["BtnOk"].Clicked = () => {
 				Close();
 				onOk.SafeInvoke();
 			};
-			Root["BtnCancel"].Visible = cancelButtonVisible;
-			Root["BtnCancel"].Clicked = Close;
 		}
 	}
 }

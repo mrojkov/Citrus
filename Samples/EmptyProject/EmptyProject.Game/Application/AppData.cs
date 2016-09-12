@@ -7,9 +7,9 @@ namespace EmptyProject.Application
 {
 	public class AppData
 	{
-		public static AppData Instance;
-
 		public const string Version = "0.1";
+
+		public static AppData Instance;
 
 		[YuzuMember]
 		public float MusicVolume = 1;
@@ -26,6 +26,9 @@ namespace EmptyProject.Application
 
 		[YuzuMember]
 		public DeviceOrientation SimulateDeviceOrientation = DeviceOrientation.LandscapeLeft;
+
+		[YuzuMember]
+		public bool EnableSplashScreen = true;
 
 		public static string GetDataFilePath()
 		{
@@ -46,7 +49,7 @@ namespace EmptyProject.Application
 					Instance = Lime.Serialization.ReadObjectFromFile<AppData>(path);
 				}
 				catch (System.Exception e) {
-					Console.WriteLine("Failed to load the application profile: {0}", e.Message);
+					The.Log.Warn("Failed to load the application profile: {0}", e.Message);
 				}
 			}
 			if (Instance == null) {
@@ -65,7 +68,7 @@ namespace EmptyProject.Application
 				Serialization.WriteObjectToFile(GetDataFilePath(), this, Serialization.Format.Binary);
 			}
 			catch (System.Exception e) {
-				Logger.Write("AppData saving failed: {0}", e.Message);
+				The.Log.Warn("AppData saving failed: {0}", e.Message);
 			}
 		}
 

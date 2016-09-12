@@ -20,12 +20,8 @@ namespace EmptyProject.Dialogs
 
 		private void BackToMenu()
 		{
-			if (State != DialogState.Shown)
-				return;
-
-			State = DialogState.Closing;
 			new ScreenCrossfade(() => {
-				Close();
+				CloseImmediately();
 				new MainMenu();
 			});
 		}

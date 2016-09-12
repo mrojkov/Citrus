@@ -25,9 +25,35 @@ namespace EmptyProject
 			return widget;
 		}
 
-		public static Widget Play(this Widget widget, string animationNameFormat, params object[] args)
+		public static void Play(this Widget widget, string animationName, Action onStopped = null)
 		{
-			return widget.Play(string.Format(animationNameFormat, args));
+			var animation = widget.GetAnimation();
+			animation.Play(animationName, onStopped);
+		}
+
+		public static void Play(this Animation animation, string animationName, Action onStopped = null)
+		{
+			Action animationStoppedHandler = null;
+			animationStoppedHandler = () => {
+				if (onStopped != null) {
+					onStopped();
+				}
+
+				animation.Stopped -= animationStoppedHandler;
+			};
+
+			animation.TryRun(animationName);
+			animation.Stopped += animationStoppedHandler;
+		}
+
+		public static Animation GetAnimation(this Widget widget)
+		{
+			Animation animation;
+			if (!widget.Animations.TryFind(null, out animation)) {
+				throw new Lime.Exception("Unknown animation or marker");
+			}
+
+			return animation;
 		}
 
 		public static void ExpandToContainer(this Widget widget)

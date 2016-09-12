@@ -32,10 +32,11 @@ namespace EmptyProject.Dialogs
 			Root["BtnOk"].Clicked = Close;
 		}
 
-		public override void Close()
+		protected override void Closing()
 		{
+			base.Closing();
+
 			The.AppData.Save();
-			base.Close();
 		}
 
 		static void CreateCheckBox(Widget root, Func<bool> onGetValue, Action onToggleValue, bool autoUpdate = false)

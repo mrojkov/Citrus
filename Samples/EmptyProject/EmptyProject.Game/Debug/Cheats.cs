@@ -6,23 +6,17 @@ namespace EmptyProject.Debug
 {
 	public static class Cheats
 	{
-		private static Input Input
-		{
-			get { return The.Window.Input; }
-		}
+		public static bool Enabled { get { return true; } }
+		public static bool IsDebugInfoVisible { get; set; }
 
-		public static bool Enabled
-		{
-			get { return true; }
-		}
-
-		public static bool IsDebugInfoVisible;
-
+		private static Input Input { get { return The.Window.Input; } }
 		private static RainbowDash.Menu currentMenu;
 
-		public static void Initialize()
+		static Cheats()
 		{
-			//IsDebugInfoVisible = ExecutionFlag.DebugInfo.IsSet();
+#if DEBUG
+			IsDebugInfoVisible = true;
+#endif
 		}
 
 		public static void ProcessCheatKeys()
@@ -71,14 +65,37 @@ namespace EmptyProject.Debug
 			if (currentMenu != null) {
 				return;
 			}
+
 			var menu = new RainbowDash.Menu(The.World, Layers.CheatsMenu);
 			var section = menu.Section();
+
+			InitialFill(menu);
 			Dialog.Top.FillDebugMenuItems(menu);
+
 			menu.Show();
 			currentMenu = menu;
 			menu.Hidden += () => {
 				currentMenu = null;
 			};
+		}
+
+		private static void InitialFill(RainbowDash.Menu menu)
+		{
+			var debugSection = menu.Section("Debug");
+
+			debugSection.Item("Toggle Debug Info", () =>
+				IsDebugInfoVisible = !IsDebugInfoVisible
+			);
+
+			debugSection.Item("Enable Splash Screen", () => {
+				The.AppData.EnableSplashScreen = true;
+				The.AppData.Save();
+			}, () => !The.AppData.EnableSplashScreen);
+
+			debugSection.Item("Disable Splash Screen", () => {
+				The.AppData.EnableSplashScreen = false;
+				The.AppData.Save();
+			}, () => The.AppData.EnableSplashScreen);
 		}
 	}
 }

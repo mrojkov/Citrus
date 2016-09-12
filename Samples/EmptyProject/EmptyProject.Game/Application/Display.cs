@@ -40,7 +40,7 @@ namespace EmptyProject.Application
 				// http://developer.android.com/guide/practices/screens_support.html
 				var ps = PhysicalSize;
 				if (ps.Y > ps.X) {
-					Toolbox.Swap(ref ps.Y, ref ps.X);
+					Lime.Toolbox.Swap(ref ps.Y, ref ps.X);
 				}
 				return ps.X >= 6 && ps.Y >= 4.5f;
 			}

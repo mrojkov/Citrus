@@ -3,9 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using EmptyProject.Application;
 using Lime;
+using EmptyProject.Debug;
 
 namespace EmptyProject.Dialogs
 {
+	public enum DialogState
+	{
+		Showing,
+		Shown,
+		Closing,
+		Closed
+	}
+
 	public class Dialog : IDisposable
 	{
 		private const string DialogTag = "Dialog";
@@ -22,11 +31,6 @@ namespace EmptyProject.Dialogs
 		public bool IsTopDialog { get { return Top == this; } }
 		public DialogState State { get; protected set; }
 
-		public Action BeforeHide;
-		public Action AfterHide;
-		public Action BeforeShow;
-		public Action AfterShow;
-
 		public Dialog(Widget windowProto, string animation = "Show", int layer = Layers.Interface)
 		{
 			Root = windowProto.Clone<Widget>();
@@ -42,6 +46,7 @@ namespace EmptyProject.Dialogs
 		private void Initialize(string animation, int layer)
 		{
 			ActiveDialogs.Add(this);
+
 			Root.Layer = layer;
 			Root.Tag = DialogTag;
 			Root.PushToNode(The.World);
@@ -51,35 +56,45 @@ namespace EmptyProject.Dialogs
 			Lime.Application.InvokeOnMainThread(() => {
 				Root.Input.CaptureAll();
 			});
+
 			DisplayInfo.BeforeOrientationOrResolutionChanged += OnBeforeOrientationOrResolutionChanged;
 			DisplayInfo.OrientationOrResolutionChanged += OnOrientationOrResolutionChanged;
+
 			ApplyLocalization();
+
 			Tasks.Add(ShowTask(animation));
 		}
 
-		private IEnumerator<object> ShowTask(string animation)
+		private void Show(string animation)
 		{
-			BeforeShow.SafeInvoke();
-			Orientate();
 			State = DialogState.Showing;
-			if (animation != null && Root.TryRunAnimation(animation)) {
-				yield return Root;
-			}
-			State = DialogState.Shown;
-			AfterShow.SafeInvoke();
+			Tasks.Add(ShowTask(animation, () => {
+				State = DialogState.Shown;
+			}));
 		}
 
-		private IEnumerator<object> HideTask(string animation)
+		private IEnumerator<object> ShowTask(string animation, Action whenDone = null)
 		{
-			BeforeHide.SafeInvoke();
-			State = DialogState.Closing;
+			Orientate();
 			if (animation != null && Root.TryRunAnimation(animation)) {
 				yield return Root;
 			}
-			State = DialogState.Closed;
-			UnlinkAndDispose();
-			AfterHide.SafeInvoke();
+
+			whenDone.SafeInvoke();
 		}
+
+		private IEnumerator<object> HideTask(string animation, Action whenDone = null)
+		{
+			if (animation != null && Root.TryRunAnimation(animation)) {
+				yield return Root;
+			}
+
+			UnlinkAndDispose();
+			whenDone.SafeInvoke();
+		}
+
+		protected virtual void Closing()
+		{ }
 
 		protected virtual void OnBeforeOrientationOrResolutionChanged()
 		{
@@ -88,8 +103,7 @@ namespace EmptyProject.Dialogs
 		}
 
 		protected virtual void OnOrientationOrResolutionChanged()
-		{
-		}
+		{ }
 
 		protected virtual void Orientate()
 		{
@@ -119,22 +133,28 @@ namespace EmptyProject.Dialogs
 			Root.UnlinkAndDispose();
 		}
 
-		public virtual void Close()
+		public void Close()
 		{
+			State = DialogState.Closing;
+
+			Closing();
+
 			ActiveDialogs.Remove(this);
-			Tasks.Add(HideTask(HideAnimationName));
+			Tasks.Add(HideTask(HideAnimationName, () => {
+				State = DialogState.Closed;
+			}));
 		}
 
 		public void CloseImmediately()
 		{
+			State = DialogState.Closing;
+
+			Closing();
+
 			ActiveDialogs.Remove(this);
 			UnlinkAndDispose();
-			State = DialogState.Closed;
-		}
 
-		public void Dispose()
-		{
-			Close();
+			State = DialogState.Closed;
 		}
 
 		public IEnumerator<object> WaitForDisappear()
@@ -144,22 +164,20 @@ namespace EmptyProject.Dialogs
 
 		protected virtual bool HandleAndroidBackButton()
 		{
-			if (!IsTopDialog)
+			if (!IsTopDialog) {
 				return false;
+			}
+
 			Close();
 			return true;
 		}
 
 		public virtual void FillDebugMenuItems(RainbowDash.Menu menu)
-		{
-		}
-	}
+		{ }
 
-	public enum DialogState
-	{
-		Showing,
-		Shown,
-		Closing,
-		Closed
+		public void Dispose()
+		{
+			CloseImmediately();
+		}
 	}
 }

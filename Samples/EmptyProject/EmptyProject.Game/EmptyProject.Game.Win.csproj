@@ -66,9 +66,11 @@
     <Compile Include="Application\SoundManager.cs" />
     <Compile Include="Debug\Cheats.cs" />
     <Compile Include="Application\DisplayInfo.cs" />
+    <Compile Include="Dialogs\SplashScreen.cs" />
     <Compile Include="Layers.cs" />
     <Compile Include="Debug\RainbowDash.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="Profile.cs" />
     <Compile Include="Dialogs\AlertDialog.cs" />
     <Compile Include="Dialogs\Confirmation.cs" />
@@ -78,6 +80,7 @@
     <Compile Include="Dialogs\Options.cs" />
     <Compile Include="Dialogs\ScreenCrossfade.cs" />
     <Compile Include="The.cs" />
+    <Compile Include="Toolbox.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Citrus\Lemon\Lemon.Win.csproj">
