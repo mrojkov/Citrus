@@ -47,6 +47,8 @@ namespace Lime
 
 		public Vector2 MousePosition { get { return windowInput.MousePosition; } }
 
+		public Vector2 LocalMousePosition { get { return windowInput.MousePosition * widget.LocalToWorldTransform.CalcInversed(); } }
+
 		public Vector2 GetTouchPosition(int index)
 		{
 			return windowInput.GetTouchPosition(index);
@@ -96,6 +98,8 @@ namespace Lime
 				} else {
 					return nodeUnderMouse == widget;
 				}
+			} else if (key.IsModifier()) {
+				return true;
 			} else {
 				var focused = Widget.Focused;
 				return focused != null && focused.DescendantOrThis(widget);
