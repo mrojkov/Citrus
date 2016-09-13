@@ -9,7 +9,7 @@ namespace Tangerine.UI.SceneView
 	{
 		public IEnumerator<object> Loop()
 		{
-			SceneView.Instance.Root.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(RenderSelection));
+			SceneView.Instance.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(RenderSelection));
 			while (true) {
 				yield return null;
 			}

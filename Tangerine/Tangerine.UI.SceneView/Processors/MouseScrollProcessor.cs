@@ -14,10 +14,10 @@ namespace Tangerine.UI.SceneView
 			while (true) {
 				if (sv.Input.WasMousePressed() && CommonWindow.Current.Input.IsKeyPressed(Key.Space)) {
 					var initialMouse = sv.Input.MousePosition;
-					var initialPosition = sv.Canvas.Position;
+					var initialPosition = sv.Scene.Position;
 					sv.Input.CaptureMouse();
 					while (sv.Input.IsMousePressed()) {
-						sv.Canvas.Position = (sv.Input.MousePosition - initialMouse) + initialPosition;
+						sv.Scene.Position = (sv.Input.MousePosition - initialMouse) + initialPosition;
 						yield return null;
 					}
 					sv.Input.ReleaseMouse();
@@ -40,15 +40,15 @@ namespace Tangerine.UI.SceneView
 
 		void ZoomCanvas(int advance)
 		{
-			var i = zoomTable.IndexOf(sv.Canvas.Scale.X);
+			var i = zoomTable.IndexOf(sv.Scene.Scale.X);
 			if (i < 0) {
 				throw new InvalidOperationException();
 			}
 			var prevZoom = zoomTable[i];
 			var zoom = zoomTable[(i + advance).Clamp(0, zoomTable.Count - 1)];
-			var p = sv.CanvasMousePosition;
-			sv.Canvas.Scale = zoom * Vector2.One;
-			sv.Canvas.Position -= p * (zoom - prevZoom);
+			var p = sv.MousePosition;
+			sv.Scene.Scale = zoom * Vector2.One;
+			sv.Scene.Position -= p * (zoom - prevZoom);
 		}
 	}
 }

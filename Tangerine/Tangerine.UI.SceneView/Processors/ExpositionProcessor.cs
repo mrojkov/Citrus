@@ -30,7 +30,7 @@ namespace Tangerine.UI.SceneView
 				if (input.ConsumeKeyPress(Key) || input.ConsumeKeyPress(MultiSelectKey)) {
 					var sv = SceneView.Instance;
 					sv.Components.Get<ExpositionComponent>().InProgress = true;
-					using (var exposition = new Exposition(sv.Root, input)) {
+					using (var exposition = new Exposition(sv.Frame, input)) {
 						float t = 0; 
 						while (true) {
 							if ((input.IsKeyPressed(Key) || input.IsKeyPressed(MultiSelectKey)) && !exposition.Closed()) {
@@ -68,11 +68,11 @@ namespace Tangerine.UI.SceneView
 			readonly List<Item> items;
 			readonly WidgetFlatFillPresenter blackBackgroundPresenter;
 
-			public Exposition(Widget root, WidgetInput input)
+			public Exposition(Widget container, WidgetInput input)
 			{
 				blackBackgroundPresenter = new WidgetFlatFillPresenter(Color4.Transparent);
-				canvas = CreateCanvas(root);
-				var cellSize = CalcCellSize(root.Size, GetWidgets().Count());
+				canvas = CreateCanvas(container);
+				var cellSize = CalcCellSize(container.Size, GetWidgets().Count());
 				items = GetWidgets().Select((w, i) => new Item(w, CreateItemFrame(i, canvas, cellSize), input)).ToList();
 			}
 

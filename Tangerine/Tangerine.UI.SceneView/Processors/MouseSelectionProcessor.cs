@@ -12,7 +12,7 @@ namespace Tangerine.UI.SceneView
 		{
 			var sceneView = SceneView.Instance;
 			var input = sceneView.Input;
-			var canvasInput = sceneView.Canvas.Input;
+			var canvasInput = sceneView.Scene.Input;
 			while (true) {
 				if (input.WasMousePressed() && !CommonWindow.Current.Input.IsKeyPressed(Key.Space)) {
 					var rect = new Rectangle(canvasInput.LocalMousePosition, canvasInput.LocalMousePosition);
@@ -20,7 +20,7 @@ namespace Tangerine.UI.SceneView
 						w.PrepareRendererState();
 						Renderer.DrawRectOutline(rect.A, rect.B, SceneViewColors.MouseSelection, 1);
 					});
-					sceneView.Canvas.CompoundPostPresenter.Add(presenter);
+					sceneView.Scene.CompoundPostPresenter.Add(presenter);
 					input.CaptureMouse();
 					while (input.IsMousePressed()) {
 						RefreshSelectedWidgets(rect);
@@ -29,7 +29,7 @@ namespace Tangerine.UI.SceneView
 						yield return null;
 					}
 					input.ReleaseMouse();
-					sceneView.Canvas.CompoundPostPresenter.Remove(presenter);
+					sceneView.Scene.CompoundPostPresenter.Remove(presenter);
 					CommonWindow.Current.Invalidate();
 				}
 				yield return null;
@@ -40,7 +40,7 @@ namespace Tangerine.UI.SceneView
 		{
 			var currentSelection = Document.Current.SelectedNodes().OfType<Widget>();
 			var selectionQuad = rect.ToQuadrangle();
-			var newSelection = Document.Current.Container.Nodes.OfType<Widget>().Where(w => selectionQuad.Intersects(w.CalcHullInSpaceOf(SceneView.Instance.Canvas)));
+			var newSelection = Document.Current.Container.Nodes.OfType<Widget>().Where(w => selectionQuad.Intersects(w.CalcHullInSpaceOf(SceneView.Instance.Scene)));
 			if (!currentSelection.SequenceEqual(newSelection)) {
 				Core.Operations.ClearRowSelection.Perform();
 				foreach (var node in newSelection) {

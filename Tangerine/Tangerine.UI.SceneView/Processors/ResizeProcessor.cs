@@ -15,7 +15,7 @@ namespace Tangerine.UI.SceneView
 					if (widgets.Count > 0) {
 						Quadrangle hull;
 						Vector2 pivot;
-						Utils.CalcHullAndPivot(widgets, SceneView.Instance.Canvas, out hull, out pivot);
+						Utils.CalcHullAndPivot(widgets, SceneView.Instance.Scene, out hull, out pivot);
 						for (int i = 0; i < 4; i++) {
 							if (HitTestControlPoint(hull[i])) {
 								yield return Resize(i * 2);
@@ -32,7 +32,7 @@ namespace Tangerine.UI.SceneView
 
 		bool HitTestControlPoint(Vector2 controlPoint)
 		{
-			return (controlPoint - SceneView.Instance.CanvasMousePosition).Length < 6;
+			return (controlPoint - SceneView.Instance.MousePosition).Length < 6;
 		}
 
 		IEnumerator<object> Resize(int controlPointIndex)
@@ -41,14 +41,14 @@ namespace Tangerine.UI.SceneView
 			sv.Input.CaptureMouse();
 			sv.Input.ConsumeKey(Key.Mouse0);
 			var widgets = Utils.UnlockedWidgets();
-			var mousePos = sv.CanvasMousePosition;
+			var mousePos = sv.MousePosition;
 			while (sv.Input.IsMousePressed()) {
-				var mouseDelta = sv.CanvasMousePosition - mousePos;
+				var mouseDelta = sv.MousePosition - mousePos;
 				var proportional = sv.Input.IsKeyPressed(Key.LShift);
 				foreach (var widget in widgets) {
 					ProcessWidget(widget, controlPointIndex, mouseDelta, proportional);
 				}
-				mousePos = sv.CanvasMousePosition;
+				mousePos = sv.MousePosition;
 				yield return null;
 			}
 			sv.Input.ReleaseMouse();
