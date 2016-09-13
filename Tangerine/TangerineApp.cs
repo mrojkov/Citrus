@@ -119,7 +119,6 @@ namespace Tangerine
 		private void AddKeyboardShortcutsProcessors(Widget panel)
 		{
 			panel.LateTasks.Add(new UI.Timeline.GlobalKeyboardShortcutsProcessor(panel.Input));
-			panel.LateTasks.Add(new UI.SceneView.ExpositionProcessor(panel.Input));
 			panel.LateTasks.Add(new UI.SceneView.PreviewAnimationProcessor(panel.Input));
 		}
 

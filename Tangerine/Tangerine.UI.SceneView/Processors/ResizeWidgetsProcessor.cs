@@ -5,7 +5,7 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
 {
-	public class ResizeProcessor : IProcessor
+	public class ResizeWidgetsProcessor : IProcessor
 	{
 		public IEnumerator<object> Loop()
 		{

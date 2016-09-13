@@ -59,8 +59,10 @@
     <Compile Include="Processors\SelectedWidgetPresenter.cs" />
     <Compile Include="Processors\PreviewAnimationProcessor.cs" />
     <Compile Include="Processors\MouseSelectionProcessor.cs" />
-    <Compile Include="Processors\ResizeProcessor.cs" />
+    <Compile Include="Processors\ResizeWidgetsProcessor.cs" />
     <Compile Include="Utils.cs" />
+    <Compile Include="Processors\DragWidgetsProcessor.cs" />
+    <Compile Include="Processors\WASDProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">

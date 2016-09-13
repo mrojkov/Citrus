@@ -22,10 +22,14 @@ namespace Tangerine.UI.SceneView
 					});
 					sceneView.Scene.CompoundPostPresenter.Add(presenter);
 					input.CaptureMouse();
+					var occasionalClick = true;
 					while (input.IsMousePressed()) {
-						RefreshSelectedWidgets(rect);
 						rect.B = canvasInput.LocalMousePosition;
-						CommonWindow.Current.Invalidate();
+						occasionalClick &= (rect.B - rect.A).Length <= 5;
+						if (!occasionalClick) {
+							RefreshSelectedWidgets(rect);
+							CommonWindow.Current.Invalidate();
+						}
 						yield return null;
 					}
 					input.ReleaseMouse();

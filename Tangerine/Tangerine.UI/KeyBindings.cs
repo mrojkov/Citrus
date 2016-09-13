@@ -33,9 +33,17 @@ namespace Tangerine.UI
 
 		public static class SceneViewKeys
 		{
-			public static readonly Key SceneExposition = Key.F1;
-			public static readonly Key SceneExpositionMultiSelect = Key.MapShortcut(Modifiers.Shift, Key.F1);
+			public static readonly Key SceneExposition = Key.Tab;
+			public static readonly Key SceneExpositionMultiSelect = Key.MapShortcut(Modifiers.Shift, Key.Tab);
 			public static readonly Key PreviewAnimation = Key.F5;
+			public static readonly Key DragRight = Key.D;
+			public static readonly Key DragLeft = Key.A;
+			public static readonly Key DragUp = Key.W;
+			public static readonly Key DragDown = Key.S;
+			public static readonly Key DragRightFast = Key.MapShortcut(Modifiers.Shift, Key.D);
+			public static readonly Key DragLeftFast = Key.MapShortcut(Modifiers.Shift, Key.A);
+			public static readonly Key DragUpFast = Key.MapShortcut(Modifiers.Shift, Key.W);
+			public static readonly Key DragDownFast = Key.MapShortcut(Modifiers.Shift, Key.S);
 		}
 	}
 }

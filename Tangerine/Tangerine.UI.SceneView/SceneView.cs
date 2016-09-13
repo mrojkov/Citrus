@@ -8,13 +8,13 @@ namespace Tangerine.UI.SceneView
 	public class SceneView : Entity, IDocumentView
 	{
 		// Given panel.
-		private readonly Widget panelWidget;
+		public readonly Widget Panel;
 		// Widget which is a direct child of the panel.
 		public readonly Widget Frame;
 		// Widget having the same size as panel, used for intercepting mouse events above the canvas.
 		private readonly Widget inputArea;
 		public WidgetInput Input => inputArea.Input;
-		// Root node of the document.
+		// Container for the document root node.
 		public readonly Widget Scene;
 		/// <summary>
 		/// Gets the mouse position in the scene coordinates.
@@ -25,8 +25,9 @@ namespace Tangerine.UI.SceneView
 
 		public SceneView(Widget panelWidget)
 		{
-			this.panelWidget = panelWidget;
+			this.Panel = panelWidget;
 			inputArea = new Widget { HitTestTarget = true, Anchors = Anchors.LeftRightTopBottom };
+			inputArea.FocusScope = new KeyboardFocusScope(inputArea);
 			Scene = new Widget {
 				Nodes = { Document.Current.RootNode }
 			};
@@ -41,7 +42,7 @@ namespace Tangerine.UI.SceneView
 		public void Attach()
 		{
 			Instance = this;
-			panelWidget.AddNode(Frame);
+			Panel.AddNode(Frame);
 		}
 
 		public void Detach()
@@ -58,10 +59,13 @@ namespace Tangerine.UI.SceneView
 		void CreateProcessors()
 		{
 			Frame.Tasks.Add(
+				new ExpositionProcessor(),
 				new MouseScrollProcessor(),
 				new SelectedWidgetsPresenter(),
-				new ResizeProcessor(),
-				new MouseSelectionProcessor()
+				new DragWidgetsProcessor(),
+				new ResizeWidgetsProcessor(),
+				new MouseSelectionProcessor(),
+				new WASDProcessor()
 			);
 		}
 	}

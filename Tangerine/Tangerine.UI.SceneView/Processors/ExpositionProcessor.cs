@@ -13,27 +13,20 @@ namespace Tangerine.UI.SceneView
 
 	public class ExpositionProcessor : Core.IProcessor
 	{
-		readonly WidgetInput input;
-
 		public static readonly Key Key = KeyBindings.SceneViewKeys.SceneExposition;
 		public static readonly Key MultiSelectKey = KeyBindings.SceneViewKeys.SceneExpositionMultiSelect;
-
-		public ExpositionProcessor(WidgetInput input)
-		{
-			this.input = input;
-		}
 
 		public IEnumerator<object> Loop()
 		{
 			const float animationLength = 0.75f;
 			while (true) {
-				if (input.ConsumeKeyPress(Key) || input.ConsumeKeyPress(MultiSelectKey)) {
-					var sv = SceneView.Instance;
+				var sv = SceneView.Instance;
+				if (sv.Input.ConsumeKeyPress(Key) || sv.Input.ConsumeKeyPress(MultiSelectKey)) {
 					sv.Components.Get<ExpositionComponent>().InProgress = true;
-					using (var exposition = new Exposition(sv.Frame, input)) {
+					using (var exposition = new Exposition(sv.Frame, sv.Input)) {
 						float t = 0; 
 						while (true) {
-							if ((input.IsKeyPressed(Key) || input.IsKeyPressed(MultiSelectKey)) && !exposition.Closed()) {
+							if ((sv.Input.IsKeyPressed(Key) || sv.Input.IsKeyPressed(MultiSelectKey)) && !exposition.Closed()) {
 								if (t < animationLength) {
 									t += Task.Current.Delta;
 									if (t >= animationLength) {
@@ -52,7 +45,7 @@ namespace Tangerine.UI.SceneView
 					}
 					sv.Components.Get<ExpositionComponent>().InProgress = false;
 				}
-				yield return null;
+				yield return Task.WaitForInput();
 			}
 		}
 
