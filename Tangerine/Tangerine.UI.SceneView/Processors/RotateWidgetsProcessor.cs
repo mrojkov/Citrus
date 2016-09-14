@@ -39,23 +39,24 @@ namespace Tangerine.UI.SceneView
 		{
 			sv.Input.CaptureMouse();
 			var widgets = Utils.UnlockedWidgets().ToList();
-			var rotations = widgets.Select(i => i.Rotation).ToList();
-			var mousePos = sv.MousePosition;
-			float rotation = 0;
 			foreach (var widget in widgets) {
 				SetWidgetPivot(widget, pivot);
 			}
+			var rotations = widgets.Select(i => i.Rotation).ToList();
+			float rotation = 0;
+			var mousePos = sv.MousePosition;
+			var t = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 			while (sv.Input.IsMousePressed()) {
 				Utils.ChangeCursorIfDefault(MouseCursor.Hand);
-				var a = mousePos - pivot;
-				var b = sv.MousePosition - pivot;
+				var a = mousePos * t - pivot * t;
+				var b = sv.MousePosition * t - pivot * t;
+				mousePos = sv.MousePosition;
 				if (a.Length > Mathf.ZeroTolerance && b.Length > Mathf.ZeroTolerance) {
 					rotation += WrapAngle(b.Atan2Deg - a.Atan2Deg);
 				}
 				for (int i = 0; i < widgets.Count; i++) {
 					SetWidgetRotation(widgets[i], rotations[i] + GetSnappedRotation(rotation));
 				}
-				mousePos = sv.MousePosition;
 				yield return null;
 			}
 			sv.Input.ReleaseMouse();
@@ -93,12 +94,6 @@ namespace Tangerine.UI.SceneView
 
 		void SetWidgetRotation(Widget widget, float rotation)
 		{
-			//var transform = sv.Scene.CalcTransitionToSpaceOf(widget);
-			//var newPivot = ((transform * pivot) / widget.Size).Snap(widget.Pivot);
-			//var deltaPos = Vector2.RotateDeg((newPivot - widget.Pivot) * (widget.Scale * widget.Size), widget.Rotation);
-			//var newPos = widget.Position + deltaPos.Snap(Vector2.Zero);
-			//Core.Operations.SetAnimableProperty.Perform(widget, "Position", newPos);
-			//Core.Operations.SetAnimableProperty.Perform(widget, "Pivot", newPivot);
 			Core.Operations.SetAnimableProperty.Perform(widget, "Rotation", rotation);
 		}
 	}
