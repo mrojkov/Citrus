@@ -40,9 +40,10 @@ namespace Tangerine.UI.SceneView
 			sv.Input.CaptureMouse();
 			var initialMousePos = sv.MousePosition;
 			var widgets = Utils.UnlockedWidgets().ToList();
-			var transform = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 			var dragDirection = DragDirection.Any;
 			var positions = widgets.Select(i => i.Position).ToList();
+			var pivots = widgets.Select(i => i.Pivot).ToList();
+			var hull = CalcWidgetsHull(widgets);
 			while (sv.Input.IsMousePressed()) {
 				Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 				var curMousePos = sv.MousePosition;
@@ -54,18 +55,53 @@ namespace Tangerine.UI.SceneView
 						curMousePos.X = initialMousePos.X;
 					}
 				}
-				var dragDelta = curMousePos * transform - initialMousePos * transform;
+				SnapMousePosToHull(hull, ref curMousePos);
 				if (shiftPressed && dragDirection == DragDirection.Any && (curMousePos - initialMousePos).Length > 5) {
 					var d = curMousePos - initialMousePos;
 					dragDirection = d.X.Abs() > d.Y.Abs() ? DragDirection.Horizontal : DragDirection.Vertical;
 				}
-
 				for (int i = 0; i < widgets.Count; i++) {
-					Core.Operations.SetAnimableProperty.Perform(widgets[i], "Position", positions[i] + dragDelta.Snap(Vector2.Zero));
+					var widget = widgets[i];
+					var transform = sv.Scene.CalcTransitionToSpaceOf(widget);
+					var dragDelta = curMousePos * transform - initialMousePos * transform;
+					var deltaPivot = dragDelta / widget.Size;
+					var deltaPos = Vector2.RotateDeg(dragDelta * widget.Scale, widget.Rotation);
+					Core.Operations.SetAnimableProperty.Perform(widget, "Pivot", pivots[i] + deltaPivot.Snap(Vector2.Zero));
+					Core.Operations.SetAnimableProperty.Perform(widget, "Position", positions[i] + deltaPos.Snap(Vector2.Zero));
 				}
 				yield return null;
 			}
 			sv.Input.ReleaseMouse();
+		}
+
+		static void SnapMousePosToHull(Quadrangle hull, ref Vector2 mousePos)
+		{
+			for (int i = 0; i < 4; i++) {
+				if (HitTestSpecialPoint(mousePos, hull[i])) {
+					mousePos = hull[i];
+				}
+				var p = (hull[(i + 1) % 4] + hull[i]) / 2;
+				if (HitTestSpecialPoint(mousePos, p)) {
+					mousePos = p;
+				}
+			}
+			var center = (hull[0] + hull[2]) / 2;
+			if (HitTestSpecialPoint(mousePos, center)) {
+				mousePos = center;
+			}
+		}
+
+		static bool HitTestSpecialPoint(Vector2 mousePos, Vector2 point)
+		{
+			return (mousePos - point).Length < 10;
+		}
+
+		Quadrangle CalcWidgetsHull(List<Widget> widgets)
+		{
+			Quadrangle hull;
+			Vector2 pivot;
+			Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out pivot);
+			return hull;
 		}
 	}
 }
