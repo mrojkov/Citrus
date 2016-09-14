@@ -18,17 +18,19 @@ namespace Tangerine.UI.SceneView
 			int savedFrame = 0;
 			while (true) {
 				var doc = Core.Document.Current;
-				if (input.ConsumeKeyPress(KeyBindings.SceneViewKeys.PreviewAnimation)) {
-					if (doc.Container.IsRunning) {
-						doc.Container.AnimationFrame = savedFrame;
-					} else {
-						savedFrame = doc.Container.AnimationFrame;
+				if (doc != null) {
+					if (input.ConsumeKeyPress(KeyBindings.SceneViewKeys.PreviewAnimation)) {
+						if (doc.Container.IsRunning) {
+							doc.Container.AnimationFrame = savedFrame;
+						} else {
+							savedFrame = doc.Container.AnimationFrame;
+						}
+						doc.Container.IsRunning = !doc.Container.IsRunning;
+						InvalidateWindows();
 					}
-					doc.Container.IsRunning = !doc.Container.IsRunning;
-					InvalidateWindows();
-				}
-				if (doc.Container.IsRunning) {
-					InvalidateWindows();
+					if (doc.Container.IsRunning) {
+						InvalidateWindows();
+					}
 				}
 				yield return null;
 			}
