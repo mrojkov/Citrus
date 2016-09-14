@@ -40,7 +40,7 @@ namespace Lime
 			this.widget = widget;
 		}
 
-		public string TextInput 
+		public string TextInput
 		{
 			get { return widget.IsFocused() ? windowInput.TextInput : string.Empty; }
 		}
@@ -123,7 +123,7 @@ namespace Lime
 
 		public float WheelScrollAmount
 		{
-			get { return IsAcceptingKey(Key.MouseWheelUp) ? windowInput.WheelScrollAmount : 0; } 
+			get { return IsAcceptingKey(Key.MouseWheelUp) ? windowInput.WheelScrollAmount : 0; }
 		}
 
 		public bool IsKeyPressed(Key key)
@@ -177,7 +177,7 @@ namespace Lime
 		{
 			return windowInput.IsKeyEnabled(key);
 		}
-		
+
 		public void EnableKey(Key key, bool enable)
 		{
 			if (IsAcceptingKey(key)) {
@@ -248,9 +248,9 @@ namespace Lime
 			DerestrictScope();
 		}
 
-		public class WidgetStack
+		public class WidgetStack : IReadOnlyList<Widget>
 		{
-			readonly List<Widget> stack = new List<Widget>();
+			private readonly List<Widget> stack = new List<Widget>();
 
 			public Widget Top { get; private set; }
 
@@ -275,6 +275,26 @@ namespace Lime
 			{
 				int i = stack.Count;
 				Top = i > 0 ? stack[i - 1] : null;
+			}
+
+			public IEnumerator<Widget> GetEnumerator()
+			{
+				return stack.GetEnumerator();
+			}
+
+			IEnumerator IEnumerable.GetEnumerator()
+			{
+				return ((IEnumerable) stack).GetEnumerator();
+			}
+
+			public int Count
+			{
+				get { return stack.Count; }
+			}
+
+			public Widget this[int index]
+			{
+				get { throw new NotImplementedException(); }
 			}
 		}
 	}
