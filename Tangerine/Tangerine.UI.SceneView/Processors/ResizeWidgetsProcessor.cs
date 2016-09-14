@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
@@ -7,20 +8,28 @@ namespace Tangerine.UI.SceneView
 {
 	public class ResizeWidgetsProcessor : IProcessor
 	{
+		SceneView sv => SceneView.Instance;
+
 		public IEnumerator<object> Loop()
 		{
 			while (true) {
-				if (SceneView.Instance.Input.WasMousePressed()) {
-					var widgets = Utils.UnlockedWidgets();
-					if (widgets.Count > 0) {
-						Quadrangle hull;
-						Vector2 pivot;
-						Utils.CalcHullAndPivot(widgets, SceneView.Instance.Scene, out hull, out pivot);
-						for (int i = 0; i < 4; i++) {
-							if (HitTestControlPoint(hull[i])) {
+				var widgets = Utils.UnlockedWidgets();
+				Quadrangle hull;
+				Vector2 pivot;
+				if (Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out pivot)) {
+					for (int i = 0; i < 4; i++) {
+						var a = hull[i];
+						if (HitTestControlPoint(a)) {
+							Utils.ChangeCursorIfDefault(MouseCursor.SizeNS);
+							if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
 								yield return Resize(i * 2);
 							}
-							if (HitTestControlPoint((hull[(i + 1) % 4] + hull[i]) / 2)) {
+						}
+						var b = hull[(i + 1) % 4];
+						if (HitTestControlPoint((a + b) / 2)) {
+							var cursor = (b.X - a.X).Abs() > (b.Y - a.Y).Abs() ? MouseCursor.SizeNS : MouseCursor.SizeWE;
+							Utils.ChangeCursorIfDefault(cursor);
+							if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
 								yield return Resize(i * 2 + 1);
 							}
 						}
@@ -32,17 +41,17 @@ namespace Tangerine.UI.SceneView
 
 		bool HitTestControlPoint(Vector2 controlPoint)
 		{
-			return (controlPoint - SceneView.Instance.MousePosition).Length < 6;
+			return (controlPoint - sv.MousePosition).Length < 6;
 		}
 
 		IEnumerator<object> Resize(int controlPointIndex)
 		{
-			var sv = SceneView.Instance;
+			var cursor = WidgetContext.Current.MouseCursor;
 			sv.Input.CaptureMouse();
-			sv.Input.ConsumeKey(Key.Mouse0);
 			var widgets = Utils.UnlockedWidgets();
 			var mousePos = sv.MousePosition;
 			while (sv.Input.IsMousePressed()) {
+				Utils.ChangeCursorIfDefault(cursor);
 				var mouseDelta = sv.MousePosition - mousePos;
 				var proportional = sv.Input.IsKeyPressed(Key.LShift);
 				foreach (var widget in widgets) {

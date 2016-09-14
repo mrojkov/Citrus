@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
@@ -12,14 +13,14 @@ namespace Tangerine.UI.SceneView
 		public IEnumerator<object> Loop()
 		{
 			while (true) {
-				if (sv.Input.WasMousePressed()) {
-					var widgets = Utils.UnlockedWidgets();
-					if (widgets.Count > 0) {
-						Quadrangle hull;
-						Vector2 pivot;
-						Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out pivot);
-						for (int i = 0; i < 4; i++) {
-							if (HitTestControlPoint(hull[i])) {
+				var widgets = Utils.UnlockedWidgets();
+				Quadrangle hull;
+				Vector2 pivot;
+				if (Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out pivot)) {
+					for (int i = 0; i < 4; i++) {
+						if (HitTestControlPoint(hull[i])) {
+							Utils.ChangeCursorIfDefault(MouseCursor.Hand);
+							if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
 								yield return Rotate(pivot);
 							}
 						}
@@ -31,17 +32,16 @@ namespace Tangerine.UI.SceneView
 
 		bool HitTestControlPoint(Vector2 controlPoint)
 		{
-			return (controlPoint - SceneView.Instance.MousePosition).Length < 10;
+			return (controlPoint - sv.MousePosition).Length < 10;
 		}
 
 		IEnumerator<object> Rotate(Vector2 pivot)
 		{
-			var sv = SceneView.Instance;
 			sv.Input.CaptureMouse();
-			sv.Input.ConsumeKey(Key.Mouse0);
-			var widgets = Utils.UnlockedWidgets();
+			var widgets = Utils.UnlockedWidgets().ToList();
 			var mousePos = sv.MousePosition;
 			while (sv.Input.IsMousePressed()) {
+				Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 				var a = mousePos - pivot;
 				var b = sv.MousePosition - pivot;
 				float angle = 0;
