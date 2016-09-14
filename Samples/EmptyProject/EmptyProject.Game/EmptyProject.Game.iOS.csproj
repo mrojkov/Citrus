@@ -33,9 +33,6 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.iOS" />
-    <Reference Include="protobuf-net">
-      <HintPath>..\..\Citrus\3rdParty\ProtoBuf-Net\iOS\protobuf-net.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ItemGroup>
@@ -60,5 +57,23 @@
     <Compile Include="Application\SoundManager.cs" />
     <Compile Include="Debug\Cheats.cs" />
     <Compile Include="Debug\RainbowDash.cs" />
+    <ProjectReference Include="..\..\..\Citrus\Yuzu\Yuzu.iOS.csproj">
+      <Project>{DF52C768-5E17-4A26-AD77-4BDD31A2224C}</Project>
+      <Name>Yuzu.iOS</Name>
+    </ProjectReference>
+    <Compile Include="Logger.cs" />
+    <Compile Include="Toolbox.cs" />
+    <Compile Include="Dialogs\AlertDialog.cs" />
+    <Compile Include="Dialogs\Confirmation.cs" />
+    <Compile Include="Dialogs\Dialog.cs" />
+    <Compile Include="Dialogs\GameScreen.cs" />
+    <Compile Include="Dialogs\MainMenu.cs" />
+    <Compile Include="Dialogs\Options.cs" />
+    <Compile Include="Dialogs\ScreenCrossfade.cs" />
+    <Compile Include="Dialogs\SplashScreen.cs" />
+    <ProjectReference Include="..\..\..\Citrus\Lime\Extensions\DynamicFont\DynamicFont.iOS.csproj">
+      <Project>{B956A746-3D0C-4378-926B-8A776846FFFA}</Project>
+      <Name>DynamicFont.iOS</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

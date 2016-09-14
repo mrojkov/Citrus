@@ -56,6 +56,16 @@
     <Folder Include="Resources\" />
     <Compile Include="Debug\Cheats.cs" />
     <Compile Include="Debug\RainbowDash.cs" />
+    <Compile Include="Logger.cs" />
+    <Compile Include="Toolbox.cs" />
+    <Compile Include="Dialogs\AlertDialog.cs" />
+    <Compile Include="Dialogs\Confirmation.cs" />
+    <Compile Include="Dialogs\Dialog.cs" />
+    <Compile Include="Dialogs\GameScreen.cs" />
+    <Compile Include="Dialogs\MainMenu.cs" />
+    <Compile Include="Dialogs\Options.cs" />
+    <Compile Include="Dialogs\ScreenCrossfade.cs" />
+    <Compile Include="Dialogs\SplashScreen.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
@@ -66,13 +76,6 @@
     <Compile Include="Application\DisplayInfo.Mobile.cs" />
     <Compile Include="Application\DisplayInfo.cs" />
     <Compile Include="Application\SoundManager.cs" />
-    <Compile Include="ScreensAndDialogs\AlertDialog.cs" />
-    <Compile Include="ScreensAndDialogs\Confirmation.cs" />
-    <Compile Include="ScreensAndDialogs\Dialog.cs" />
-    <Compile Include="ScreensAndDialogs\GameScreen.cs" />
-    <Compile Include="ScreensAndDialogs\MainMenu.cs" />
-    <Compile Include="ScreensAndDialogs\Options.cs" />
-    <Compile Include="ScreensAndDialogs\ScreenCrossfade.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Layers.cs" />
     <Compile Include="Profile.cs" />

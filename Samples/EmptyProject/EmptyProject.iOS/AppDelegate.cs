@@ -10,11 +10,11 @@ namespace EmptyProject.iOS
 		public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
 		{
 			AVAudioSession.SharedInstance().SetCategory(AVAudioSessionCategory.Ambient);
-			Lime.Serialization.Serializer = new Serializer();
 			Lime.Application.Initialize(new Lime.ApplicationOptions {
 				DecodeAudioInSeparateThread = false,
 				UsingDeferredHitTest = true
 			});
+
 			new EmptyProject.Application.Application();
 			return true;
 		}
