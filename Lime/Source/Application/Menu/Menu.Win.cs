@@ -132,6 +132,7 @@ namespace Lime
 			return ToNativeKeys(shortcut.Modifiers) | ToNativeKeys(shortcut.Main);
 		}
 
+		private static readonly Func<Keys> InvalidKeyExceptionFunc = () => { throw new ArgumentException(); };
 		private static Keys ToNativeKeys(Key key)
 		{
 			if (key == Key.Unknown) {
@@ -146,7 +147,48 @@ namespace Lime
 			if (key >= Key.F1 && key <= Key.F24) {
 				return Keys.F1 + key - Key.F1;
 			}
-			throw new ArgumentException();
+			return key == Key.Up ? Keys.Up :
+				key == Key.Down ? Keys.Down :
+				key == Key.Left ? Keys.Left :
+				key == Key.Right ? Keys.Right :
+				key == Key.Enter ? Keys.Enter :
+				key == Key.Escape ? Keys.Escape :
+				key == Key.Space ? Keys.Space :
+				key == Key.Tab ? Keys.Tab :
+				key == Key.Back ? Keys.Back :
+				key == Key.BackSpace ? Keys.Back :
+				key == Key.Insert ? Keys.Insert :
+				key == Key.Delete ? Keys.Delete :
+				key == Key.PageUp ? Keys.PageUp :
+				key == Key.PageDown ? Keys.PageDown :
+				key == Key.Home ? Keys.Home :
+				key == Key.End ? Keys.End :
+				key == Key.CapsLock ? Keys.CapsLock :
+				key == Key.ScrollLock ? Keys.Scroll :
+				key == Key.PrintScreen ? Keys.PrintScreen :
+				key == Key.Pause ? Keys.Pause :
+				key == Key.NumLock ? Keys.NumLock :
+				key == Key.Clear ? Keys.Clear :
+				key == Key.Sleep ? Keys.Sleep :
+				key == Key.Keypad0 ? Keys.NumPad0 :
+				key == Key.Keypad1 ? Keys.NumPad1 :
+				key == Key.Keypad2 ? Keys.NumPad2 :
+				key == Key.Keypad3 ? Keys.NumPad3 :
+				key == Key.Keypad4 ? Keys.NumPad4 :
+				key == Key.Keypad5 ? Keys.NumPad5 :
+				key == Key.Keypad6 ? Keys.NumPad6 :
+				key == Key.Keypad7 ? Keys.NumPad7 :
+				key == Key.Keypad8 ? Keys.NumPad8 :
+				key == Key.Keypad9 ? Keys.NumPad9 :
+				key == Key.KeypadDivide ? Keys.Divide :
+				key == Key.KeypadMultiply ? Keys.Multiply :
+				key == Key.KeypadMinus ? Keys.Subtract :
+				key == Key.KeypadSubtract ? Keys.Subtract :
+				key == Key.KeypadAdd ? Keys.Add :
+				key == Key.KeypadPlus ? Keys.Add :
+				key == Key.KeypadDecimal ? Keys.Decimal :
+				key == Key.KeypadEnter ? Keys.Enter :
+				InvalidKeyExceptionFunc();
 		}
 
 		private static Keys ToNativeKeys(Modifiers modifiers)
