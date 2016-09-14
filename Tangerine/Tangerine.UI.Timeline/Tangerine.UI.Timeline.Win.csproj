@@ -8,6 +8,8 @@
     <AssemblyName>Tangerine.UI.Timeline</AssemblyName>
     <MonoMacResourcePrefix>Resources</MonoMacResourcePrefix>
     <ProjectGuid>{DB168347-08CC-40FC-B612-5A33A6877863}</ProjectGuid>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -24,6 +26,7 @@
     <IncludeMonoRuntime>false</IncludeMonoRuntime>
     <UseSGen>false</UseSGen>
     <Profiling>true</Profiling>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -37,12 +40,28 @@
     <EnablePackageSigning>false</EnablePackageSigning>
     <IncludeMonoRuntime>false</IncludeMonoRuntime>
     <UseSGen>false</UseSGen>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\GridCurveView.cs" />
+    <Compile Include="Components\GridNodeView.cs" />
+    <Compile Include="Components\GridPropertyView.cs" />
+    <Compile Include="Components\IGridWidget.cs" />
+    <Compile Include="Components\IOverviewWidget.cs" />
+    <Compile Include="Components\IRollWidget.cs" />
+    <Compile Include="Components\RollCurveView.cs" />
+    <Compile Include="Components\RollNodeView.cs" />
+    <Compile Include="Components\RollPropertyView.cs" />
+    <Compile Include="Operations\ClearGridSelection.cs" />
+    <Compile Include="Operations\SelectRectangleOnGrid.cs" />
+    <Compile Include="Operations\SetCurrentColumn.cs" />
+    <Compile Include="Operations\ShiftSelection.cs" />
+    <Compile Include="Processors\GlobalKeyboardShortcutsProcessor.cs" />
+    <Compile Include="Processors\UnselectUnlinkedNodesProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Processors\GridPane\ClampScrollOriginProcessor.cs" />
     <Compile Include="Processors\GridPane\DragKeyframesRespondentProcessor.cs" />
@@ -59,36 +78,14 @@
     <Compile Include="Processors\RollPane\SelectAndDragRowsProcessor.cs" />
     <Compile Include="Processors\BuildRowsProcessor.cs" />
     <Compile Include="Processors\BuildRowViewsProcessor.cs" />
-    <Compile Include="Processors\KeyboardShortcutsProcessor.cs" />
     <Compile Include="Processors\MouseWheelProcessor.cs" />
     <Compile Include="GridPane.cs" />
     <Compile Include="GridSelection.cs" />
     <Compile Include="OverviewPane.cs" />
     <Compile Include="RollPane.cs" />
-    <Compile Include="Row.cs" />
     <Compile Include="Rulerbar.cs" />
     <Compile Include="Timeline.cs" />
     <Compile Include="Toolbar.cs" />
-    <Compile Include="Commands\ClearGridSelection.cs" />
-    <Compile Include="Commands\ClearRowSelection.cs" />
-    <Compile Include="Commands\DragRows.cs" />
-    <Compile Include="Commands\SelectRectangleOnGrid.cs" />
-    <Compile Include="Commands\SelectRow.cs" />
-    <Compile Include="Commands\SetCurrentColumn.cs" />
-    <Compile Include="Commands\SetCurrentContainer.cs" />
-    <Compile Include="Commands\ShiftSelection.cs" />
-    <Compile Include="Components\Model\CurveRow.cs" />
-    <Compile Include="Components\Model\NodeRow.cs" />
-    <Compile Include="Components\Model\PropertyRow.cs" />
-    <Compile Include="Components\Presentation\GridCurveView.cs" />
-    <Compile Include="Components\Presentation\GridNodeView.cs" />
-    <Compile Include="Components\Presentation\GridPropertyView.cs" />
-    <Compile Include="Components\Presentation\IGridWidget.cs" />
-    <Compile Include="Components\Presentation\IOverviewWidget.cs" />
-    <Compile Include="Components\Presentation\IRollWidget.cs" />
-    <Compile Include="Components\Presentation\RollCurveView.cs" />
-    <Compile Include="Components\Presentation\RollNodeView.cs" />
-    <Compile Include="Components\Presentation\RollPropertyView.cs" />
     <Compile Include="Components\DragKeyframesRequest.cs" />
     <Compile Include="Components\HasKeyframeRequest.cs" />
     <Compile Include="MarkerPropertiesDialog.cs" />
@@ -96,6 +93,9 @@
     <Compile Include="Processors\Rulerbar\RulerMouseScrollProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Commands\" />
+    <Folder Include="Components\Model\" />
+    <Folder Include="Components\Presentation\" />
     <Folder Include="Tasks\Rulerbar\" />
   </ItemGroup>
   <ItemGroup>

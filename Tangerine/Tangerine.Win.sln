@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.Core.Win", "Tangerine.Core\Tangerine.Core.Win.csproj", "{05FB6476-C29B-49A7-918C-A52CAF73FCA7}"
 EndProject
@@ -18,6 +18,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.Win", "..\Lime\Lime.Win.csproj", "{FC2DE6C9-641A-4230-8D29-EA4035CD8708}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.Win", "Tangerine.Win.csproj", "{3E49F498-47E1-4D67-9F13-EACA50FFF4AE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yuzu", "..\Yuzu\Yuzu.csproj", "{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tangerine.UI.SceneView.Win", "Tangerine.UI.SceneView\Tangerine.UI.SceneView.Win.csproj", "{80486551-A659-42B0-AADA-165C54E9B0AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -91,6 +95,22 @@ Global
 		{3E49F498-47E1-4D67-9F13-EACA50FFF4AE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3E49F498-47E1-4D67-9F13-EACA50FFF4AE}.Release|x86.ActiveCfg = Release|Any CPU
 		{3E49F498-47E1-4D67-9F13-EACA50FFF4AE}.Release|x86.Build.0 = Release|Any CPU
+		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}.Debug|x86.Build.0 = Debug|Any CPU
+		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}.Release|x86.ActiveCfg = Release|Any CPU
+		{DDD2DFE9-CED2-4CEA-ADF0-5A6865865A46}.Release|x86.Build.0 = Release|Any CPU
+		{80486551-A659-42B0-AADA-165C54E9B0AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80486551-A659-42B0-AADA-165C54E9B0AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80486551-A659-42B0-AADA-165C54E9B0AF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{80486551-A659-42B0-AADA-165C54E9B0AF}.Debug|x86.Build.0 = Debug|Any CPU
+		{80486551-A659-42B0-AADA-165C54E9B0AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80486551-A659-42B0-AADA-165C54E9B0AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80486551-A659-42B0-AADA-165C54E9B0AF}.Release|x86.ActiveCfg = Release|Any CPU
+		{80486551-A659-42B0-AADA-165C54E9B0AF}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Tangerine</RootNamespace>
     <AssemblyName>Tangerine</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -33,9 +34,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="protobuf-net">
-      <HintPath>..\3rdParty\ProtoBuf-Net\win (full-net30)\protobuf-net.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -46,6 +44,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MainMenu\FileMenu.cs" />
+    <Compile Include="MainMenu\ViewMenu.cs" />
+    <Compile Include="MainMenu\WindowMenu.cs" />
+    <Compile Include="PreferencesDialog\PreferencesDialog.cs" />
     <Compile Include="TangerineApp.cs" />
     <Compile Include="Main.Win.cs" />
   </ItemGroup>
@@ -66,6 +68,10 @@
       <Project>{fc2de6c9-641a-4230-8d29-ea4035cd8708}</Project>
       <Name>Lime.Win</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Yuzu\Yuzu.csproj">
+      <Project>{ddd2dfe9-ced2-4cea-adf0-5a6865865a46}</Project>
+      <Name>Yuzu</Name>
+    </ProjectReference>
     <ProjectReference Include="Tangerine.Core\Tangerine.Core.Win.csproj">
       <Project>{05fb6476-c29b-49a7-918c-a52caf73fca7}</Project>
       <Name>Tangerine.Core.Win</Name>
@@ -73,6 +79,10 @@
     <ProjectReference Include="Tangerine.UI.Inspector\Tangerine.UI.Inspector.Win.csproj">
       <Project>{d6b543cb-0223-4210-bb0f-7d8250760895}</Project>
       <Name>Tangerine.UI.Inspector.Win</Name>
+    </ProjectReference>
+    <ProjectReference Include="Tangerine.UI.SceneView\Tangerine.UI.SceneView.Win.csproj">
+      <Project>{80486551-a659-42b0-aada-165c54e9b0af}</Project>
+      <Name>Tangerine.UI.SceneView.Win</Name>
     </ProjectReference>
     <ProjectReference Include="Tangerine.UI.Timeline\Tangerine.UI.Timeline.Win.csproj">
       <Project>{db168347-08cc-40fc-b612-5a33a6877863}</Project>
@@ -111,8 +121,6 @@
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.TextPresenter.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Lime.TextStyle.png" />
     <EmbeddedResource Include="Resources\Icons\Nodes\Unknown.png" />
-    <EmbeddedResource Include="Resources\Icons\PopupClose.png" />
-    <EmbeddedResource Include="Resources\Icons\PopupCloseHover.png" />
     <EmbeddedResource Include="Resources\Icons\Timeline\Collapsed.png" />
     <EmbeddedResource Include="Resources\Icons\Timeline\Cross.png" />
     <EmbeddedResource Include="Resources\Icons\Timeline\Dot.png" />
@@ -166,5 +174,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Icons\Timeline\AnimationMode.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Icons\Timeline\Key.png" />
   </ItemGroup>
 </Project>

@@ -7,7 +7,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Tangerine.Core</RootNamespace>
     <AssemblyName>Tangerine.Core</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -32,10 +32,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\3rdParty\ProtoBuf-Net\win (full-net30)\protobuf-net.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
@@ -43,8 +39,22 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\CurveRow.cs" />
+    <Compile Include="Components\NodeRow.cs" />
+    <Compile Include="Components\PropertyRow.cs" />
+    <Compile Include="HotStudioImport\HotAnimators.cs" />
+    <Compile Include="HotStudioImport\HotFontImporter.cs" />
+    <Compile Include="HotStudioImport\HotLexer.cs" />
+    <Compile Include="HotStudioImport\HotSceneImporter.cs" />
     <Compile Include="IDataflow.cs" />
     <Compile Include="IProcessor.cs" />
+    <Compile Include="Operations\ClearRowSelection.cs" />
+    <Compile Include="Operations\CopyPaste.cs" />
+    <Compile Include="Operations\DragRows.cs" />
+    <Compile Include="Operations\EnterLeaveNode.cs" />
+    <Compile Include="Operations\SelectRow.cs" />
+    <Compile Include="Operations\SelectRowRange.cs" />
+    <Compile Include="Project.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DocumentHistory.cs" />
     <Compile Include="Document.cs" />
@@ -52,14 +62,19 @@
     <Compile Include="Operations\Modification.cs" />
     <Compile Include="NodeEditorState.cs" />
     <Compile Include="AnimatorEditorState.cs" />
+    <Compile Include="Row.cs" />
     <Compile Include="Uid.cs" />
     <Compile Include="Operation.cs" />
-    <Compile Include="Workspace.cs" />
+    <Compile Include="VersionedCollection.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Win.csproj">
       <Project>{fc2de6c9-641a-4230-8d29-ea4035cd8708}</Project>
       <Name>Lime.Win</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Yuzu\Yuzu.csproj">
+      <Project>{ddd2dfe9-ced2-4cea-adf0-5a6865865a46}</Project>
+      <Name>Yuzu</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
