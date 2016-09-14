@@ -64,6 +64,7 @@
     <Compile Include="Processors\DragWidgetsProcessor.cs" />
     <Compile Include="Processors\WASDProcessor.cs" />
     <Compile Include="Processors\RotateWidgetsProcessor.cs" />
+    <Compile Include="Processors\DragPivotProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Lime\Lime.Mac.csproj">
