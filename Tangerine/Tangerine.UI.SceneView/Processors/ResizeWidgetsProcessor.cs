@@ -87,9 +87,10 @@ namespace Tangerine.UI.SceneView
 
 		void ProcessWidget(Widget widget, int controlPointIndex, Vector2 mouseDelta, bool proportional)
 		{
-			var rotatedMouseDelta = Vector2.RotateDeg(mouseDelta, -widget.Rotation);
-			var deltaSize = rotatedMouseDelta * directionLookup[controlPointIndex];
-			var deltaPosition = rotatedMouseDelta * positionLookup[controlPointIndex];
+			var transform = sv.Scene.CalcTransitionToSpaceOf(widget.ParentWidget);
+			var transformedMouseDelta = Vector2.RotateDeg(mouseDelta * transform - Vector2.Zero * transform, -widget.Rotation);
+			var deltaSize = transformedMouseDelta * directionLookup[controlPointIndex];
+			var deltaPosition = transformedMouseDelta * positionLookup[controlPointIndex];
 			if (proportional) {
 				if(controlPointIndex == 1 || controlPointIndex == 5) {
 					deltaSize.Y = deltaSize.X;

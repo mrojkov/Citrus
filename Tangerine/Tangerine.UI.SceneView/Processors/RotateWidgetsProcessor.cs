@@ -39,23 +39,21 @@ namespace Tangerine.UI.SceneView
 		{
 			sv.Input.CaptureMouse();
 			var widgets = Utils.UnlockedWidgets().ToList();
+			var rotations = widgets.Select(i => i.Rotation).ToList();
 			var mousePos = sv.MousePosition;
+			float rotation = 0;
+			foreach (var widget in widgets) {
+				SetWidgetPivot(widget, pivot);
+			}
 			while (sv.Input.IsMousePressed()) {
 				Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 				var a = mousePos - pivot;
 				var b = sv.MousePosition - pivot;
-				float angle = 0;
 				if (a.Length > Mathf.ZeroTolerance && b.Length > Mathf.ZeroTolerance) {
-					angle = b.Atan2Deg - a.Atan2Deg;
-					if (angle > 180) {
-						angle -= 360;
-					}
-					if (angle < -180) {
-						angle += 360;
-					}
+					rotation += WrapAngle(b.Atan2Deg - a.Atan2Deg);
 				}
-				foreach (var widget in widgets) {
-					RotateWidget(widget, pivot, angle);
+				for (int i = 0; i < widgets.Count; i++) {
+					SetWidgetRotation(widgets[i], rotations[i] + GetSnappedRotation(rotation));
 				}
 				mousePos = sv.MousePosition;
 				yield return null;
@@ -63,16 +61,45 @@ namespace Tangerine.UI.SceneView
 			sv.Input.ReleaseMouse();
 		}
 
-		void RotateWidget(Widget widget, Vector2 pivot, float angle)
+		static float WrapAngle(float angle)
 		{
-			var transform = widget.CalcTransitionToSpaceOf(sv.Scene).CalcInversed();
+			if (angle > 180) {
+				return angle - 360;
+			}
+			if (angle < -180) {
+				return angle + 360;
+			}
+			return angle;
+		}
+
+		float GetSnappedRotation(float rotation)
+		{
+			if (sv.Input.IsKeyPressed(Key.LShift)) {
+				return ((rotation / 15f).Round() * 15f).Snap(0);
+			} else {
+				return rotation.Snap(0);
+			}
+		}
+
+		void SetWidgetPivot(Widget widget, Vector2 pivot)
+		{
+			var transform = sv.Scene.CalcTransitionToSpaceOf(widget);
 			var newPivot = ((transform * pivot) / widget.Size).Snap(widget.Pivot);
 			var deltaPos = Vector2.RotateDeg((newPivot - widget.Pivot) * (widget.Scale * widget.Size), widget.Rotation);
 			var newPos = widget.Position + deltaPos.Snap(Vector2.Zero);
-			var newRotation = widget.Rotation + angle.Snap(0);
 			Core.Operations.SetAnimableProperty.Perform(widget, "Position", newPos);
 			Core.Operations.SetAnimableProperty.Perform(widget, "Pivot", newPivot);
-			Core.Operations.SetAnimableProperty.Perform(widget, "Rotation", newRotation);
+		}
+
+		void SetWidgetRotation(Widget widget, float rotation)
+		{
+			//var transform = sv.Scene.CalcTransitionToSpaceOf(widget);
+			//var newPivot = ((transform * pivot) / widget.Size).Snap(widget.Pivot);
+			//var deltaPos = Vector2.RotateDeg((newPivot - widget.Pivot) * (widget.Scale * widget.Size), widget.Rotation);
+			//var newPos = widget.Position + deltaPos.Snap(Vector2.Zero);
+			//Core.Operations.SetAnimableProperty.Perform(widget, "Position", newPos);
+			//Core.Operations.SetAnimableProperty.Perform(widget, "Pivot", newPivot);
+			Core.Operations.SetAnimableProperty.Perform(widget, "Rotation", rotation);
 		}
 	}
 }
