@@ -10,21 +10,20 @@ namespace Tangerine.UI.SceneView
 	{
 		public IEnumerator<object> Loop()
 		{
-			var sceneView = SceneView.Instance;
-			var input = sceneView.Input;
-			var canvasInput = sceneView.Scene.Input;
+			var sv = SceneView.Instance;
+			var input = sv.Input;
 			while (true) {
-				if (input.WasMousePressed() && !CommonWindow.Current.Input.IsKeyPressed(Key.Space)) {
-					var rect = new Rectangle(canvasInput.LocalMousePosition, canvasInput.LocalMousePosition);
+				if (input.WasMousePressed()) {
+					var rect = new Rectangle(sv.MousePosition, sv.MousePosition);
 					var presenter = new DelegatePresenter<Widget>(w => {
 						w.PrepareRendererState();
 						Renderer.DrawRectOutline(rect.A, rect.B, SceneViewColors.MouseSelection, 1);
 					});
-					sceneView.Scene.CompoundPostPresenter.Add(presenter);
+					sv.Frame.CompoundPostPresenter.Add(presenter);
 					input.CaptureMouse();
 					var occasionalClick = true;
 					while (input.IsMousePressed()) {
-						rect.B = canvasInput.LocalMousePosition;
+						rect.B = sv.MousePosition;
 						occasionalClick &= (rect.B - rect.A).Length <= 5;
 						if (!occasionalClick) {
 							RefreshSelectedWidgets(rect);
@@ -33,7 +32,7 @@ namespace Tangerine.UI.SceneView
 						yield return null;
 					}
 					input.ReleaseMouse();
-					sceneView.Scene.CompoundPostPresenter.Remove(presenter);
+					sv.Frame.CompoundPostPresenter.Remove(presenter);
 					CommonWindow.Current.Invalidate();
 				}
 				yield return null;

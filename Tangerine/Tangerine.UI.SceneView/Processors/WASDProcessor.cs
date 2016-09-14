@@ -44,8 +44,8 @@ namespace Tangerine.UI.SceneView
 
 		void DragWidgets(Vector2 delta)
 		{
-			var transform = Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(sv.Scene);
-			var dragDelta = transform.CalcInversed() * delta;
+			var transform = Document.Current.Container.AsWidget.CalcTransitionToSpaceOf(sv.Scene).CalcInversed();
+			var dragDelta = transform * delta - transform * Vector2.Zero;
 			foreach (var widget in Utils.UnlockedWidgets()) {
 				Core.Operations.SetAnimableProperty.Perform(widget, "Position", widget.Position + dragDelta);
 			}

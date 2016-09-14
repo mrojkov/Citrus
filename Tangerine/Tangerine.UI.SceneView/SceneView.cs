@@ -63,6 +63,7 @@ namespace Tangerine.UI.SceneView
 				new MouseScrollProcessor(),
 				new SelectedWidgetsPresenter(),
 				new DragWidgetsProcessor(),
+				new RotateWidgetsProcessor(),
 				new ResizeWidgetsProcessor(),
 				new MouseSelectionProcessor(),
 				new WASDProcessor()

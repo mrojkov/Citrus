@@ -16,6 +16,7 @@ namespace Tangerine.UI.SceneView
 					var initialMouse = sv.Input.MousePosition;
 					var initialPosition = sv.Scene.Position;
 					sv.Input.CaptureMouse();
+					sv.Input.ConsumeKey(Key.Mouse0);
 					while (sv.Input.IsMousePressed()) {
 						sv.Scene.Position = (sv.Input.MousePosition - initialMouse) + initialPosition;
 						yield return null;

@@ -7,6 +7,16 @@ namespace Tangerine.UI.SceneView
 {
 	public static class Utils
 	{
+		public static Vector2 Snap(this Vector2 value, Vector2 origin, float distanceTolerance = 0.001f)
+		{
+			return (value - origin).Length > distanceTolerance ? value : origin;
+		}
+
+		public static float Snap(this float value, float origin, float distanceTolerance = 0.001f)
+		{
+			return (value - origin).Abs() > distanceTolerance ? value : origin;
+		}
+
 		public static List<Widget> UnlockedWidgets()
 		{
 			return Core.Document.Current.SelectedNodes().OfType<Widget>().Where(w => !w.GetTangerineFlag(TangerineFlags.Locked)).ToList();

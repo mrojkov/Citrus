@@ -90,8 +90,8 @@ namespace Tangerine.UI.SceneView
 					deltaPosition.X = deltaPosition.Y;
 				}
 			}
-			var size = widget.Size + deltaSize / widget.Scale;
-			var position = widget.Position + Vector2.RotateDeg(deltaPosition + widget.Pivot * deltaSize, widget.Rotation);
+			var size = widget.Size + (deltaSize / widget.Scale).Snap(Vector2.Zero);
+			var position = widget.Position + Vector2.RotateDeg(deltaPosition + widget.Pivot * deltaSize, widget.Rotation).Snap(Vector2.Zero);
 			Core.Operations.SetAnimableProperty.Perform(widget, "Position", position);
 			Core.Operations.SetAnimableProperty.Perform(widget, "Size", size);
 		}

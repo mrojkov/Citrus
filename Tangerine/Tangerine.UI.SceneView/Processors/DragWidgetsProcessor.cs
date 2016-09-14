@@ -59,7 +59,7 @@ namespace Tangerine.UI.SceneView
 					dragDirection = d.X.Abs() > d.Y.Abs() ? DragDirection.Horizontal : DragDirection.Vertical;
 				}
 				for (int i = 0; i < widgets.Count; i++) {
-					Core.Operations.SetAnimableProperty.Perform(widgets[i], "Position", positions[i] + dragDelta);
+					Core.Operations.SetAnimableProperty.Perform(widgets[i], "Position", positions[i] + dragDelta.Snap(Vector2.Zero));
 				}
 				yield return null;
 			}
