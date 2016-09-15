@@ -8,7 +8,7 @@ namespace Lime
 	/// The WidgetInput class allows a widget to capture an input device (mouse, keyboard).
 	/// After capturing the device, the widget and all its children receive an actual buttons and device axes state (e.g. mouse position). Other widgets receive released buttons state and frozen axes values.
 	/// </summary>
-	public class WidgetInput
+	public class WidgetInput : IDisposable
 	{
 		public delegate void KeyEventHandler(WidgetInput input, Key key);
 
@@ -296,6 +296,12 @@ namespace Lime
 			{
 				get { throw new NotImplementedException(); }
 			}
+		}
+
+		public void Dispose()
+		{
+			DerestrictScope();
+			ReleaseMouse();
 		}
 	}
 }
