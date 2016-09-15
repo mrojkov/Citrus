@@ -331,6 +331,9 @@ namespace Lime
 			if (lateTasks != null) {
 				lateTasks.Stop();
 			}
+			if (input != null) {
+				input.Dispose();
+			}
 			base.Dispose();
 		}
 

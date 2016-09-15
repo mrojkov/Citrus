@@ -271,6 +271,11 @@ namespace Lime
 				RefreshTop();
 			}
 
+			internal void RemoveAll(Predicate<Widget> match)
+			{
+				stack.RemoveAll(match);
+			}
+
 			private void RefreshTop()
 			{
 				int i = stack.Count;
@@ -300,8 +305,8 @@ namespace Lime
 
 		public void Dispose()
 		{
-			DerestrictScope();
-			ReleaseMouse();
+			InputScopeStack.RemoveAll(i => i == widget);
+			MouseCaptureStack.RemoveAll(i => i == widget);
 		}
 	}
 }
