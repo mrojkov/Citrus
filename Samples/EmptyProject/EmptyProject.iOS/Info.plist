@@ -55,5 +55,7 @@
 		<string>Icon-Small-40</string>
 		<string>Icon-Small-40@2x</string>
 	</array>
+	<key>CFBundleName</key>
+	<string>EmptyProject</string>
 </dict>
 </plist>

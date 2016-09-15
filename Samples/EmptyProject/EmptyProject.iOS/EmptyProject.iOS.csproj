@@ -125,6 +125,8 @@
     <BundleResource Include="Resources\nl.lproj\InfoPlist.strings" />
     <BundleResource Include="Resources\pt.lproj\InfoPlist.strings" />
     <BundleResource Include="Resources\ru.lproj\InfoPlist.strings" />
+    <BundleResource Include="Resources\Default-568h%402x.png" />
+    <BundleResource Include="Resources\Default%402x.png" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\Data.iOS">
