@@ -41,7 +41,7 @@ namespace Tangerine.UI.SceneView
 
 		bool HitTestControlPoint(Vector2 controlPoint)
 		{
-			return (controlPoint - sv.MousePosition).Length < 6;
+			return (controlPoint - sv.MousePosition).Length < 6 / sv.Scene.Scale.X;
 		}
 
 		IEnumerator<object> Resize(int controlPointIndex)

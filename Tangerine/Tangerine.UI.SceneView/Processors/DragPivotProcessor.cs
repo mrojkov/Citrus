@@ -19,7 +19,7 @@ namespace Tangerine.UI.SceneView
 				if (
 					sv.Input.IsKeyPressed(Key.LControl) &&
 					Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out pivot) &&
-					(pivot - sv.MousePosition).Length < 10)
+					(pivot - sv.MousePosition).Length < 10 / sv.Scene.Scale.X)
 				{
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					if (sv.Input.ConsumeKeyPress(Key.Mouse0)) {
@@ -38,32 +38,34 @@ namespace Tangerine.UI.SceneView
 		IEnumerator<object> Drag()
 		{
 			sv.Input.CaptureMouse();
-			var initialMousePos = sv.MousePosition;
+			var iniMousePos = sv.MousePosition;
 			var widgets = Utils.UnlockedWidgets().ToList();
 			var dragDirection = DragDirection.Any;
 			var positions = widgets.Select(i => i.Position).ToList();
 			var pivots = widgets.Select(i => i.Pivot).ToList();
-			var hull = CalcWidgetsHull(widgets);
+			Quadrangle hull;
+			Vector2 iniPivot;
+			Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out iniPivot);
 			while (sv.Input.IsMousePressed()) {
 				Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 				var curMousePos = sv.MousePosition;
 				var shiftPressed = sv.Input.IsKeyPressed(Key.LShift);
 				if (shiftPressed && dragDirection != DragDirection.Any) {
 					if (dragDirection == DragDirection.Horizontal) {
-						curMousePos.Y = initialMousePos.Y;
+						curMousePos.Y = iniMousePos.Y;
 					} else if (dragDirection == DragDirection.Vertical) {
-						curMousePos.X = initialMousePos.X;
+						curMousePos.X = iniMousePos.X;
 					}
 				}
-				SnapMousePosToHull(hull, ref curMousePos);
-				if (shiftPressed && dragDirection == DragDirection.Any && (curMousePos - initialMousePos).Length > 5) {
-					var d = curMousePos - initialMousePos;
+				curMousePos = SnapMousePosToSpecialPoints(hull, curMousePos, iniMousePos - iniPivot);
+				if (shiftPressed && dragDirection == DragDirection.Any && (curMousePos - iniMousePos).Length > 5) {
+					var d = curMousePos - iniMousePos;
 					dragDirection = d.X.Abs() > d.Y.Abs() ? DragDirection.Horizontal : DragDirection.Vertical;
 				}
 				for (int i = 0; i < widgets.Count; i++) {
 					var widget = widgets[i];
 					var transform = sv.Scene.CalcTransitionToSpaceOf(widget);
-					var dragDelta = curMousePos * transform - initialMousePos * transform;
+					var dragDelta = curMousePos * transform - iniMousePos * transform;
 					var deltaPivot = dragDelta / widget.Size;
 					var deltaPos = Vector2.RotateDeg(dragDelta * widget.Scale, widget.Rotation);
 					Core.Operations.SetAnimableProperty.Perform(widget, "Pivot", pivots[i] + deltaPivot.Snap(Vector2.Zero));
@@ -74,34 +76,31 @@ namespace Tangerine.UI.SceneView
 			sv.Input.ReleaseMouse();
 		}
 
-		static void SnapMousePosToHull(Quadrangle hull, ref Vector2 mousePos)
+		Vector2 SnapMousePosToSpecialPoints(Quadrangle hull, Vector2 mousePos, Vector2 correction)
+		{
+			var md = float.MaxValue;
+			var mp = Vector2.Zero;
+			foreach (var p in GetSpecialPoints(hull)) {
+				var d = (mousePos - p).Length;
+				if (d < md) {
+					mp = p;
+					md = d;
+				}
+			}
+			var r = ((hull[0] - hull[2]).Length / 20) / sv.Scene.Scale.X;
+			if (md < r) {
+				return mp + correction;
+			}
+			return mousePos;
+		}
+
+		IEnumerable<Vector2> GetSpecialPoints(Quadrangle hull)
 		{
 			for (int i = 0; i < 4; i++) {
-				if (HitTestSpecialPoint(mousePos, hull[i])) {
-					mousePos = hull[i];
-				}
-				var p = (hull[(i + 1) % 4] + hull[i]) / 2;
-				if (HitTestSpecialPoint(mousePos, p)) {
-					mousePos = p;
-				}
+				yield return hull[i];
+				yield return (hull[i] + hull[(i + 1) % 4]) / 2;
 			}
-			var center = (hull[0] + hull[2]) / 2;
-			if (HitTestSpecialPoint(mousePos, center)) {
-				mousePos = center;
-			}
-		}
-
-		static bool HitTestSpecialPoint(Vector2 mousePos, Vector2 point)
-		{
-			return (mousePos - point).Length < 10;
-		}
-
-		Quadrangle CalcWidgetsHull(List<Widget> widgets)
-		{
-			Quadrangle hull;
-			Vector2 pivot;
-			Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out pivot);
-			return hull;
+			yield return (hull[0] + hull[2]) / 2;
 		}
 	}
 }

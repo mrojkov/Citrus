@@ -34,7 +34,7 @@ namespace Tangerine.UI.SceneView
 		IEnumerator<object> Drag()
 		{
 			sv.Input.CaptureMouse();
-			var initialMousePos = sv.MousePosition;
+			var iniMousePos = sv.MousePosition;
 			var widgets = Utils.UnlockedWidgets().ToList();
 			var transform = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 			var dragDirection = DragDirection.Any;
@@ -45,14 +45,14 @@ namespace Tangerine.UI.SceneView
 				var shiftPressed = sv.Input.IsKeyPressed(Key.LShift);
 				if (shiftPressed && dragDirection != DragDirection.Any) {
 					if (dragDirection == DragDirection.Horizontal) {
-						curMousePos.Y = initialMousePos.Y;
+						curMousePos.Y = iniMousePos.Y;
 					} else if (dragDirection == DragDirection.Vertical) {
-						curMousePos.X = initialMousePos.X;
+						curMousePos.X = iniMousePos.X;
 					}
 				}
-				var dragDelta = curMousePos * transform - initialMousePos * transform;
-				if (shiftPressed && dragDirection == DragDirection.Any && (curMousePos - initialMousePos).Length > 5) {
-					var d = curMousePos - initialMousePos;
+				var dragDelta = curMousePos * transform - iniMousePos * transform;
+				if (shiftPressed && dragDirection == DragDirection.Any && (curMousePos - iniMousePos).Length > 5 / sv.Scene.Scale.X) {
+					var d = curMousePos - iniMousePos;
 					dragDirection = d.X.Abs() > d.Y.Abs() ? DragDirection.Horizontal : DragDirection.Vertical;
 				}
 				for (int i = 0; i < widgets.Count; i++) {

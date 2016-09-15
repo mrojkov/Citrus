@@ -32,7 +32,7 @@ namespace Tangerine.UI.SceneView
 
 		bool HitTestControlPoint(Vector2 controlPoint)
 		{
-			return (controlPoint - sv.MousePosition).Length < 10;
+			return (controlPoint - sv.MousePosition).Length < 10 / sv.Scene.Scale.X;
 		}
 
 		IEnumerator<object> Rotate(Vector2 pivot)
