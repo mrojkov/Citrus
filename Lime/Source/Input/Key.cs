@@ -11,13 +11,13 @@ namespace Lime
 		{
 			var field = typeof(Key).GetFields().
 				FirstOrDefault(i => string.Equals(i.Name, name, StringComparison.OrdinalIgnoreCase) && i.FieldType == typeof(Key));
-			return (Key?) field?.GetValue(null) ?? Key.Unknown;
+			return (Key?) (field == null ? null : field.GetValue(null)) ?? Key.Unknown;
 		}
 
 		public static string Name(Key key)
 		{
 			var field = typeof(Key).GetFields().FirstOrDefault(i => i.FieldType == typeof(Key) && Equals(((Key)i.GetValue(null)).Code, key.Code));
-			return field?.Name ?? "Unknown";
+			return (field == null ? null : field.Name) ?? "Unknown";
 		}
 
 		public const int MaxCount = 512;
