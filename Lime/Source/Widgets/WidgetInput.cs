@@ -274,6 +274,7 @@ namespace Lime
 			internal void RemoveAll(Predicate<Widget> match)
 			{
 				stack.RemoveAll(match);
+				RefreshTop();
 			}
 
 			private void RefreshTop()
