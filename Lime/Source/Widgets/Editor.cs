@@ -224,6 +224,7 @@ namespace Lime
 
 		private void HandleKeys(string originalText)
 		{
+			ConsumeKeyRepeat(Key.BackSpace);
 			if (ConsumeKeyRepeat(Key.Left))
 				caretPos.TextPos--;
 			if (ConsumeKeyRepeat(Key.Right))
@@ -273,7 +274,6 @@ namespace Lime
 				// Some platforms, notably iOS, do not generate Key.BackSpace.
 				// OTOH, '\b' is emulated everywhere.
 				if (ch == '\b') {
-					ConsumeKeyRepeat(Key.BackSpace);
 					if (caretPos.TextPos > 0 && caretPos.TextPos <= Text.Text.Length) {
 						caretPos.TextPos--;
 						Text.Text = Text.Text.Remove(caretPos.TextPos, 1);
