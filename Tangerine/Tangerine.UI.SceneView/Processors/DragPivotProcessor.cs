@@ -38,42 +38,50 @@ namespace Tangerine.UI.SceneView
 		IEnumerator<object> Drag()
 		{
 			sv.Input.CaptureMouse();
-			var iniMousePos = sv.MousePosition;
-			var widgets = Utils.UnlockedWidgets().ToList();
-			var dragDirection = DragDirection.Any;
-			var positions = widgets.Select(i => i.Position).ToList();
-			var pivots = widgets.Select(i => i.Pivot).ToList();
-			Quadrangle hull;
-			Vector2 iniPivot;
-			Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out iniPivot);
-			while (sv.Input.IsMousePressed()) {
-				Utils.ChangeCursorIfDefault(MouseCursor.Hand);
-				var curMousePos = sv.MousePosition;
-				var shiftPressed = sv.Input.IsKeyPressed(Key.LShift);
-				if (shiftPressed && dragDirection != DragDirection.Any) {
-					if (dragDirection == DragDirection.Horizontal) {
-						curMousePos.Y = iniMousePos.Y;
-					} else if (dragDirection == DragDirection.Vertical) {
-						curMousePos.X = iniMousePos.X;
+			Document.Current.History.BeginTransaction();
+			try {
+				var iniMousePos = sv.MousePosition;
+				var widgets = Utils.UnlockedWidgets().ToList();
+				var dragDirection = DragDirection.Any;
+				var positions = widgets.Select(i => i.Position).ToList();
+				var pivots = widgets.Select(i => i.Pivot).ToList();
+				Quadrangle hull;
+				Vector2 iniPivot;
+				Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out iniPivot);
+				while (sv.Input.IsMousePressed()) {
+					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
+					var curMousePos = sv.MousePosition;
+					var shiftPressed = sv.Input.IsKeyPressed(Key.LShift);
+					if (shiftPressed && dragDirection != DragDirection.Any) {
+						if (dragDirection == DragDirection.Horizontal) {
+							curMousePos.Y = iniMousePos.Y;
+						} else if (dragDirection == DragDirection.Vertical) {
+							curMousePos.X = iniMousePos.X;
+						}
 					}
+					curMousePos = SnapMousePosToSpecialPoints(hull, curMousePos, iniMousePos - iniPivot);
+					if (shiftPressed && dragDirection == DragDirection.Any && (curMousePos - iniMousePos).Length > 5) {
+						var d = curMousePos - iniMousePos;
+						dragDirection = d.X.Abs() > d.Y.Abs() ? DragDirection.Horizontal : DragDirection.Vertical;
+					}
+					for (int i = 0; i < widgets.Count; i++) {
+						var widget = widgets[i];
+						var transform = sv.Scene.CalcTransitionToSpaceOf(widget);
+						var dragDelta = curMousePos * transform - iniMousePos * transform;
+						var deltaPivot = dragDelta / widget.Size;
+						var deltaPos = Vector2.RotateDeg(dragDelta * widget.Scale, widget.Rotation);
+						deltaPivot = deltaPivot.Snap(Vector2.Zero);
+						if (deltaPivot != Vector2.Zero) {
+							Core.Operations.SetAnimableProperty.Perform(widget, "Pivot", pivots[i] + deltaPivot);
+							Core.Operations.SetAnimableProperty.Perform(widget, "Position", positions[i] + deltaPos.Snap(Vector2.Zero));
+						}
+					}
+					yield return null;
 				}
-				curMousePos = SnapMousePosToSpecialPoints(hull, curMousePos, iniMousePos - iniPivot);
-				if (shiftPressed && dragDirection == DragDirection.Any && (curMousePos - iniMousePos).Length > 5) {
-					var d = curMousePos - iniMousePos;
-					dragDirection = d.X.Abs() > d.Y.Abs() ? DragDirection.Horizontal : DragDirection.Vertical;
-				}
-				for (int i = 0; i < widgets.Count; i++) {
-					var widget = widgets[i];
-					var transform = sv.Scene.CalcTransitionToSpaceOf(widget);
-					var dragDelta = curMousePos * transform - iniMousePos * transform;
-					var deltaPivot = dragDelta / widget.Size;
-					var deltaPos = Vector2.RotateDeg(dragDelta * widget.Scale, widget.Rotation);
-					Core.Operations.SetAnimableProperty.Perform(widget, "Pivot", pivots[i] + deltaPivot.Snap(Vector2.Zero));
-					Core.Operations.SetAnimableProperty.Perform(widget, "Position", positions[i] + deltaPos.Snap(Vector2.Zero));
-				}
-				yield return null;
+			} finally {
+				sv.Input.ReleaseMouse();
+				Document.Current.History.EndTransaction();
 			}
-			sv.Input.ReleaseMouse();
 		}
 
 		Vector2 SnapMousePosToSpecialPoints(Quadrangle hull, Vector2 mousePos, Vector2 correction)

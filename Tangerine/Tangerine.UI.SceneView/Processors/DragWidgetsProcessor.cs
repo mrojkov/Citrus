@@ -34,33 +34,41 @@ namespace Tangerine.UI.SceneView
 		IEnumerator<object> Drag()
 		{
 			sv.Input.CaptureMouse();
-			var iniMousePos = sv.MousePosition;
-			var widgets = Utils.UnlockedWidgets().ToList();
-			var transform = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
-			var dragDirection = DragDirection.Any;
-			var positions = widgets.Select(i => i.Position).ToList();
-			while (sv.Input.IsMousePressed()) {
-				Utils.ChangeCursorIfDefault(MouseCursor.Hand);
-				var curMousePos = sv.MousePosition;
-				var shiftPressed = sv.Input.IsKeyPressed(Key.LShift);
-				if (shiftPressed && dragDirection != DragDirection.Any) {
-					if (dragDirection == DragDirection.Horizontal) {
-						curMousePos.Y = iniMousePos.Y;
-					} else if (dragDirection == DragDirection.Vertical) {
-						curMousePos.X = iniMousePos.X;
+			Document.Current.History.BeginTransaction();
+			try {
+				var iniMousePos = sv.MousePosition;
+				var widgets = Utils.UnlockedWidgets().ToList();
+				var transform = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
+				var dragDirection = DragDirection.Any;
+				var positions = widgets.Select(i => i.Position).ToList();
+				while (sv.Input.IsMousePressed()) {
+					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
+					var curMousePos = sv.MousePosition;
+					var shiftPressed = sv.Input.IsKeyPressed(Key.LShift);
+					if (shiftPressed && dragDirection != DragDirection.Any) {
+						if (dragDirection == DragDirection.Horizontal) {
+							curMousePos.Y = iniMousePos.Y;
+						} else if (dragDirection == DragDirection.Vertical) {
+							curMousePos.X = iniMousePos.X;
+						}
 					}
+					var dragDelta = curMousePos * transform - iniMousePos * transform;
+					if (shiftPressed && dragDirection == DragDirection.Any && (curMousePos - iniMousePos).Length > 5 / sv.Scene.Scale.X) {
+						var d = curMousePos - iniMousePos;
+						dragDirection = d.X.Abs() > d.Y.Abs() ? DragDirection.Horizontal : DragDirection.Vertical;
+					}
+					dragDelta = dragDelta.Snap(Vector2.Zero);
+					if (dragDelta != Vector2.Zero) {
+						for (int i = 0; i < widgets.Count; i++) {
+							Core.Operations.SetAnimableProperty.Perform(widgets[i], "Position", positions[i] + dragDelta);
+						}
+					}
+					yield return null;
 				}
-				var dragDelta = curMousePos * transform - iniMousePos * transform;
-				if (shiftPressed && dragDirection == DragDirection.Any && (curMousePos - iniMousePos).Length > 5 / sv.Scene.Scale.X) {
-					var d = curMousePos - iniMousePos;
-					dragDirection = d.X.Abs() > d.Y.Abs() ? DragDirection.Horizontal : DragDirection.Vertical;
-				}
-				for (int i = 0; i < widgets.Count; i++) {
-					Core.Operations.SetAnimableProperty.Perform(widgets[i], "Position", positions[i] + dragDelta.Snap(Vector2.Zero));
-				}
-				yield return null;
+			} finally {
+				sv.Input.ReleaseMouse();
+				Document.Current.History.EndTransaction();
 			}
-			sv.Input.ReleaseMouse();
 		}
 	}
 }

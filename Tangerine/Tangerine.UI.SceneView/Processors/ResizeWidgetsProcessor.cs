@@ -48,24 +48,29 @@ namespace Tangerine.UI.SceneView
 		{
 			var cursor = WidgetContext.Current.MouseCursor;
 			sv.Input.CaptureMouse();
-			var widgets = Utils.UnlockedWidgets();
-			var mousePos = sv.MousePosition;
-			while (sv.Input.IsMousePressed()) {
-				Utils.ChangeCursorIfDefault(cursor);
-				var proportional = sv.Input.IsKeyPressed(Key.LShift);
-				foreach (var widget in widgets) {
-					if (sv.MousePosition != mousePos) {
-						if (sv.Input.IsKeyPressed(Key.LControl)) {
-							RescaleWidget(widget, controlPointIndex, sv.MousePosition, mousePos, pivot, proportional);
-						} else {
-							ResizeWidget(widget, controlPointIndex, sv.MousePosition, mousePos, proportional);
+			Document.Current.History.BeginTransaction();
+			try {
+				var widgets = Utils.UnlockedWidgets();
+				var mousePos = sv.MousePosition;
+				while (sv.Input.IsMousePressed()) {
+					Utils.ChangeCursorIfDefault(cursor);
+					var proportional = sv.Input.IsKeyPressed(Key.LShift);
+					foreach (var widget in widgets) {
+						if (sv.MousePosition != mousePos) {
+							if (sv.Input.IsKeyPressed(Key.LControl)) {
+								RescaleWidget(widget, controlPointIndex, sv.MousePosition, mousePos, pivot, proportional);
+							} else {
+								ResizeWidget(widget, controlPointIndex, sv.MousePosition, mousePos, proportional);
+							}
 						}
 					}
+					mousePos = sv.MousePosition;
+					yield return null;
 				}
-				mousePos = sv.MousePosition;
-				yield return null;
+			} finally {
+				sv.Input.ReleaseMouse();
+				Document.Current.History.EndTransaction();
 			}
-			sv.Input.ReleaseMouse();
 		}
 
 		readonly Vector2[] directionLookup = {

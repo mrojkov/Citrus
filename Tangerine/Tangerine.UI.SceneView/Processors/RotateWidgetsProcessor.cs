@@ -38,28 +38,33 @@ namespace Tangerine.UI.SceneView
 		IEnumerator<object> Rotate(Vector2 pivot)
 		{
 			sv.Input.CaptureMouse();
-			var widgets = Utils.UnlockedWidgets().ToList();
-			foreach (var widget in widgets) {
-				SetWidgetPivot(widget, pivot);
-			}
-			var rotations = widgets.Select(i => i.Rotation).ToList();
-			float rotation = 0;
-			var mousePos = sv.MousePosition;
-			var t = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
-			while (sv.Input.IsMousePressed()) {
-				Utils.ChangeCursorIfDefault(MouseCursor.Hand);
-				var a = mousePos * t - pivot * t;
-				var b = sv.MousePosition * t - pivot * t;
-				mousePos = sv.MousePosition;
-				if (a.Length > Mathf.ZeroTolerance && b.Length > Mathf.ZeroTolerance) {
-					rotation += WrapAngle(b.Atan2Deg - a.Atan2Deg);
+			Document.Current.History.BeginTransaction();
+			try {
+				var widgets = Utils.UnlockedWidgets().ToList();
+				foreach (var widget in widgets) {
+					SetWidgetPivot(widget, pivot);
 				}
-				for (int i = 0; i < widgets.Count; i++) {
-					SetWidgetRotation(widgets[i], rotations[i] + GetSnappedRotation(rotation));
+				var rotations = widgets.Select(i => i.Rotation).ToList();
+				float rotation = 0;
+				var mousePos = sv.MousePosition;
+				var t = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
+				while (sv.Input.IsMousePressed()) {
+					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
+					var a = mousePos * t - pivot * t;
+					var b = sv.MousePosition * t - pivot * t;
+					mousePos = sv.MousePosition;
+					if (a.Length > Mathf.ZeroTolerance && b.Length > Mathf.ZeroTolerance) {
+						rotation += WrapAngle(b.Atan2Deg - a.Atan2Deg);
+					}
+					for (int i = 0; i < widgets.Count; i++) {
+						SetWidgetRotation(widgets[i], rotations[i] + GetSnappedRotation(rotation));
+					}
+					yield return null;
 				}
-				yield return null;
+			} finally {
+				sv.Input.ReleaseMouse();
+				Document.Current.History.EndTransaction();
 			}
-			sv.Input.ReleaseMouse();
 		}
 
 		static float WrapAngle(float angle)

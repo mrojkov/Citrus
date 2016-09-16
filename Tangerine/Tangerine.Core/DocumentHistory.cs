@@ -10,6 +10,8 @@ namespace Tangerine.Core
 
 	public class DocumentHistory
 	{
+		private int transactionCounter;
+		private DateTime transactionTimestamp;
 		private int undoPosition;
 		private List<IOperation> operations = new List<IOperation>();
 
@@ -24,10 +26,20 @@ namespace Tangerine.Core
 			Changed += RefreshModifiedStatus;
 		}
 
+		public void BeginTransaction()
+		{
+			transactionCounter++;
+			transactionTimestamp = DateTime.UtcNow;
+		}
+
+		public void EndTransaction()
+		{
+			transactionCounter--;
+		}
+
 		public void Perform(IOperation operation)
 		{
-			operation.Timestamp = DateTime.UtcNow;
-			// Lime.Logger.Write(operation.ToString());
+			operation.Timestamp = (transactionCounter > 0) ? transactionTimestamp : DateTime.UtcNow;
 			operations.RemoveRange(undoPosition, operations.Count - undoPosition);
 			operations.Add(operation);
 			undoPosition = operations.Count;
