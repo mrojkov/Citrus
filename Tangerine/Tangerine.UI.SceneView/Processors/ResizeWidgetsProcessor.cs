@@ -56,7 +56,7 @@ namespace Tangerine.UI.SceneView
 				foreach (var widget in widgets) {
 					if (sv.MousePosition != mousePos) {
 						if (sv.Input.IsKeyPressed(Key.LControl)) {
-							RescaleWidget(widget, controlPointIndex, sv.MousePosition, mousePos, pivot);
+							RescaleWidget(widget, controlPointIndex, sv.MousePosition, mousePos, pivot, proportional);
 						} else {
 							ResizeWidget(widget, controlPointIndex, sv.MousePosition, mousePos, proportional);
 						}
@@ -112,7 +112,7 @@ namespace Tangerine.UI.SceneView
 			Core.Operations.SetAnimableProperty.Perform(widget, "Size", size);
 		}
 
-		void RescaleWidget(Widget widget, int controlPointIndex, Vector2 curMousePos, Vector2 prevMousePos, Vector2 masterPivot)
+		void RescaleWidget(Widget widget, int controlPointIndex, Vector2 curMousePos, Vector2 prevMousePos, Vector2 masterPivot, bool proportional)
 		{
 			var transform = sv.Scene.CalcTransitionToSpaceOf(widget.ParentWidget);
 			var a = Vector2.RotateDeg(transform * prevMousePos - transform * masterPivot, -widget.Rotation);
@@ -120,9 +120,15 @@ namespace Tangerine.UI.SceneView
 			var scale = Vector2.One;
 			if (directionLookup[controlPointIndex].X != 0) {
 				scale.X = b.X / a.X;
+				if (proportional) {
+					scale.Y = scale.X;
+				}
 			}
 			if (directionLookup[controlPointIndex].Y != 0) {
 				scale.Y = b.Y / a.Y;
+				if (proportional) {
+					scale.X = scale.Y;
+				}
 			}
 			var newPivot = sv.Scene.CalcTransitionToSpaceOf(widget) * masterPivot;
 			newPivot.X /= widget.Width;
