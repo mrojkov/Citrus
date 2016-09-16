@@ -167,7 +167,7 @@ namespace Orange
 		private static void AddFontTextures(Font font, string path)
 		{
 			for (var i = 0; ; i++) {
-				var texturePath = Path.ChangeExtension(path, null);
+				var texturePath = Path.ChangeExtension(Path.GetFileName(path), null);
 				var index = (i == 0) ? "" : i.ToString("00");
 				var texturePng = Path.ChangeExtension(path, null) + index + ".png";
 				if (!AssetsBundle.Instance.FileExists(texturePng)) {
