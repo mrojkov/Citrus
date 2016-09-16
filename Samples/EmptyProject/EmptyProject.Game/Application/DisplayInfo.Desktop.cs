@@ -55,7 +55,7 @@ namespace EmptyProject.Application
 			index = (index >= 0) ? (index + 1)%Displays.Count : 0;
 			Display = Displays[index];
 #if WIN
-			The.Window.Title = Display.Name;
+			The.Window.Title = $"{Application.ApplicationName} (Display: {Display.Name})";
 #endif
 		}
 	}
