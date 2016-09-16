@@ -91,7 +91,11 @@ namespace Tangerine.UI.Timeline
 			if (doc.Rows.Count == 0) {
 				return;
 			}
-			var lastSelectedRow = doc.SelectedRows.Count > 0 ? doc.SelectedRows[0] : doc.Rows[0];
+			if (doc.SelectedRows.Count == 0) {
+				Core.Operations.SelectRow.Perform(doc.Rows[0]);
+				return;
+			}
+			var lastSelectedRow = doc.SelectedRows[0];
 			var nextRow = doc.Rows[Mathf.Clamp(lastSelectedRow.Index + advance, 0, doc.Rows.Count - 1)];
 			if (nextRow != lastSelectedRow) {
 				if (!multiselection) {
