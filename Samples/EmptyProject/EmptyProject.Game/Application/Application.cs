@@ -10,11 +10,10 @@ namespace EmptyProject.Application
 {
 	public class Application
 	{
-		public static Application Instance;
+        public static Application Instance;
 
-		public const string ApplicationName = "EmptyProject";
-
-		public static Vector2 DefaultWorldSize = new Vector2(1024, 768);
+        public const string ApplicationName = "EmptyProject";
+        public static readonly Vector2 DefaultWorldSize = new Vector2(1024, 768);
 
 		private readonly object uiSync = new object();
 		private static List<string> debugInfoStrings = new List<string>();

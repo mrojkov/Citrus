@@ -6,11 +6,11 @@ using System.Text;
 
 namespace EmptyProject
 {
-	public static class Toolbox
+	public static class Utils
 	{
 		private static Random random;
 
-		static Toolbox()
+		static Utils()
 		{
 			random = new Random();
 		}
