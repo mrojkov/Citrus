@@ -48,8 +48,8 @@ namespace Tangerine
 			LoadFont();
 
 			DockManager.Initialize(new Vector2(1024, 768), PadsMenu);
-			DockManager.Instance.DockPanelAdded += panel => AddKeyboardShortcutsProcessors(panel.RootWidget);
-			AddKeyboardShortcutsProcessors(DockManager.Instance.DocumentArea);
+			DockManager.Instance.DockPanelAdded += panel => AddGlobalProcessors(panel.RootWidget);
+			AddGlobalProcessors(DockManager.Instance.DocumentArea);
 
 			Application.Exiting += () => Project.Current.Close();
 			Application.Exited += () => {
@@ -116,8 +116,9 @@ namespace Tangerine
 			}
 		}
 
-		private void AddKeyboardShortcutsProcessors(Widget panel)
+		private void AddGlobalProcessors(Widget panel)
 		{
+			panel.LateTasks.Add(new BuildRowsProcessor());
 			panel.LateTasks.Add(new UI.Timeline.GlobalKeyboardShortcutsProcessor(panel.Input));
 			panel.LateTasks.Add(new UI.SceneView.PreviewAnimationProcessor(panel.Input));
 		}

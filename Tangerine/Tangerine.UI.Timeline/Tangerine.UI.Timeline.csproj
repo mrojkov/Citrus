@@ -67,7 +67,6 @@
     <Compile Include="Processors\RollPane\RollWidgetsProcessor.cs" />
     <Compile Include="Processors\RollPane\RollMouseScrollProcessor.cs" />
     <Compile Include="Processors\RollPane\SelectAndDragRowsProcessor.cs" />
-    <Compile Include="Processors\BuildRowsProcessor.cs" />
     <Compile Include="Processors\BuildRowViewsProcessor.cs" />
     <Compile Include="Processors\GlobalKeyboardShortcutsProcessor.cs" />
     <Compile Include="Processors\MouseWheelProcessor.cs" />
