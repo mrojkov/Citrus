@@ -30,7 +30,8 @@
     <MtouchTlsProvider>Default</MtouchTlsProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType></DebugType>
+    <DebugType>
+    </DebugType>
     <Optimize>True</Optimize>
     <OutputPath>bin\iOS\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
@@ -325,6 +326,8 @@
     <Compile Include="Source\Widgets\DropDownList.cs" />
     <Compile Include="Source\Widgets\TabBar.cs" />
     <Compile Include="Source\GeneratedDeserializersBIN.cs" />
+    <Compile Include="Source\Types\Quadrangle.cs" />
+    <Compile Include="Source\Types\Transform2.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
