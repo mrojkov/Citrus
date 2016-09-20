@@ -41,7 +41,7 @@ namespace Lime
 				maxSize.Y += i.MaxSize;
 			}
 			// TODO: totalSpacing should take in account col/row spans.
-			var totalSpacing = ColSpacing * new Vector2(ColCount - 1, RowCount - 1);
+			var totalSpacing = new Vector2(ColSpacing * (ColCount - 1), RowSpacing * (RowCount - 1));
 			widget.MeasuredMinSize = minSize + totalSpacing;
 			widget.MeasuredMaxSize = maxSize + totalSpacing;
 		}
