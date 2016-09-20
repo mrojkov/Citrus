@@ -268,6 +268,8 @@
     <Compile Include="Source\Application\Menu\Command.cs" />
     <Compile Include="Source\Widgets\TabBar.cs" />
     <Compile Include="Source\GeneratedDeserializersBIN.cs" />
+    <Compile Include="Source\Types\Quadrangle.cs" />
+    <Compile Include="Source\Types\Transform2.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />
