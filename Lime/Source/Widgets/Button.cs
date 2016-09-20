@@ -176,7 +176,11 @@ namespace Lime
 				yield return 0;
 				if ((mouse - Input.MousePosition).Length > DragDistanceThreshold) {
 					State = NormalState;
-				} else if (!Input.IsMousePressed()) {
+				} else if (
+					// Added checking if mouse over because we need to make sure this button or no one is mouse owner
+					// since button may be inside list view which took control of a mouse.
+					!Input.IsMousePressed() && IsMouseOver()
+				) {
 					State = QuickClickOnDraggableButtonState;
 					yield break;
 				}
@@ -206,8 +210,9 @@ namespace Lime
 				if (!Input.IsMouseOwner()) {
 					State = ReleaseState;
 				}
-				bool isPressed = IsMouseOver() ||
-					(Input.MousePosition - this.GlobalCenter).Length < ButtonEffectiveRadius;
+				// Check if this button is still mouse owner since button may be inside list view which took control of a mouse.
+				bool isPressed = IsMouseOver() || (Input.IsMouseOwner() &&
+					(Input.MousePosition - this.GlobalCenter).Length < ButtonEffectiveRadius);
 				if (!Input.IsMousePressed()) {
 					if (isPressed) {
 						HandleClick();
