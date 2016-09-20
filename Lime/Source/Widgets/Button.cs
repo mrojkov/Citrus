@@ -127,7 +127,7 @@ namespace Lime
 			TryRunAnimation("Normal");
 			while (true) {
 				if (TabletControlScheme) {
-					if (Input.WasMousePressed()) {
+					if (IsMouseOver() && Input.WasMousePressed()) {
 						if (Draggable) {
 							State = DetectDraggingState;
 						} else {
