@@ -197,9 +197,9 @@ namespace Lime
 			Container.Tasks.StopByTag(this);
 		}
 
-		private bool ConsumeKeyRepeat(Key key)
+		private bool WasKeyRepeated(Key key)
 		{
-			return Container.Input.ConsumeKeyRepeat(key);
+			return Container.Input.WasKeyRepeated(key);
 		}
 
 		private void InsertChar(char ch)
@@ -222,45 +222,52 @@ namespace Lime
 			return height;
 		}
 
+		static readonly List<Key> consumingKeys = Key.Enumerate().Where(
+			k => k.IsPrintable() || k.IsTextNavigation() || k.IsTextEditing() || k == Key.Escape).ToList();
+
 		private void HandleKeys(string originalText)
 		{
-			ConsumeKeyRepeat(Key.BackSpace);
-			if (ConsumeKeyRepeat(Key.Left))
-				caretPos.TextPos--;
-			if (ConsumeKeyRepeat(Key.Right))
-				caretPos.TextPos++;
-			if (ConsumeKeyRepeat(Key.Up))
-				caretPos.Line--;
-			if (ConsumeKeyRepeat(Key.Down))
-				caretPos.Line++;
-			if (ConsumeKeyRepeat(Key.Home))
-				caretPos.Pos = 0;
-			if (ConsumeKeyRepeat(Key.End))
-				caretPos.Pos = int.MaxValue;
-			if (ConsumeKeyRepeat(Key.Commands.Delete) || ConsumeKeyRepeat(Key.Delete)) {
-				if (caretPos.TextPos >= 0 && caretPos.TextPos < Text.Text.Length) {
-					Text.Text = Text.Text.Remove(caretPos.TextPos, 1);
+			try {
+				if (WasKeyRepeated(Key.Left))
 					caretPos.TextPos--;
-					caretPos.TextPos++; // Enforce revalidation.
+				if (WasKeyRepeated(Key.Right))
+					caretPos.TextPos++;
+				if (WasKeyRepeated(Key.Up))
+					caretPos.Line--;
+				if (WasKeyRepeated(Key.Down))
+					caretPos.Line++;
+				if (WasKeyRepeated(Key.Home))
+					caretPos.Pos = 0;
+				if (WasKeyRepeated(Key.End))
+					caretPos.Pos = int.MaxValue;
+				if (WasKeyRepeated(Key.Commands.Delete) || WasKeyRepeated(Key.Delete)) {
+					if (caretPos.TextPos >= 0 && caretPos.TextPos < Text.Text.Length) {
+						Text.Text = Text.Text.Remove(caretPos.TextPos, 1);
+						caretPos.TextPos--;
+						caretPos.TextPos++; // Enforce revalidation.
+					}
 				}
-			}
-			if (ConsumeKeyRepeat(Key.Enter)) {
-				if (EditorParams.IsAcceptableLines(Text.Text.Count(ch => ch == '\n') + 2)) {
-					InsertChar('\n');
-				} else {
+				if (WasKeyRepeated(Key.Enter)) {
+					if (EditorParams.IsAcceptableLines(Text.Text.Count(ch => ch == '\n') + 2)) {
+						InsertChar('\n');
+					} else {
+						Container.Input.ConsumeKey(Key.Enter);
+						Container.RevokeFocus();
+					}
+				}
+				if (WasKeyRepeated(Key.Escape)) {
+					Text.Text = originalText;
 					Container.RevokeFocus();
 				}
+	#if WIN
+				if (Container.Input.IsKeyPressed(Key.LControl) && WasKeyRepeated(Key.V)) {
+					foreach (var ch in Clipboard.Text)
+						InsertChar(ch);
+				}
+	#endif
+			} finally {
+				Container.Input.ConsumeKeys(consumingKeys);
 			}
-			if (ConsumeKeyRepeat(Key.Escape)) {
-				Text.Text = originalText;
-				Container.RevokeFocus();
-			}
-#if WIN
-			if (Container.Input.IsKeyPressed(Key.LControl) && ConsumeKeyRepeat(Key.V)) {
-				foreach (var ch in Clipboard.Text)
-					InsertChar(ch);
-			}
-#endif
 		}
 
 		private float lastCharShowTimeLeft;

@@ -81,7 +81,7 @@ namespace Lime
 			if (InputScopeStack.Top != null && !widget.DescendantOrThis(InputScopeStack.Top)) {
 				return false;
 			}
-			if (key.IsMouseButton()) {
+			if (key.IsMouseKey()) {
 				var mouseOwner = MouseCaptureStack.Top;
 				if (mouseOwner != null) {
 					return mouseOwner == widget;
@@ -189,6 +189,20 @@ namespace Lime
 		{
 			if (IsAcceptingKey(key)) {
 				windowInput.ConsumeKey(key);
+			}
+		}
+
+		public void ConsumeKeys(List<Key> keys)
+		{
+			foreach (var key in keys) {
+				ConsumeKey(key);
+			}
+		}
+
+		public void ConsumeKeys(IEnumerable<Key> keys)
+		{
+			foreach (var key in keys) {
+				ConsumeKey(key);
 			}
 		}
 
