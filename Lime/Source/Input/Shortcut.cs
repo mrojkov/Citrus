@@ -61,7 +61,22 @@ namespace Lime
 		{
 			return this == (Shortcut)obj;
 		}
-	}	
+
+		public override string ToString()
+		{
+			string r = "";
+			if ((Modifiers & Modifiers.Alt) != 0) {
+				r += "Alt+";
+			}
+			if ((Modifiers & Modifiers.Control) != 0) {
+				r += "Ctrl+";
+			}
+			if ((Modifiers & Modifiers.Shift) != 0) {
+				r += "Shift+";
+			}
+			return r + Main;
+		}
+	}
 }
 
 #endif

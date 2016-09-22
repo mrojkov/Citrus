@@ -2,24 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Lime
 {
 	public struct Key
 	{
-		public static Key GetByName(string name)
-		{
-			var field = typeof(Key).GetFields().
-				FirstOrDefault(i => string.Equals(i.Name, name, StringComparison.OrdinalIgnoreCase) && i.FieldType == typeof(Key));
-			return (Key?) (field == null ? null : field.GetValue(null)) ?? Key.Unknown;
-		}
-
-		public static string Name(Key key)
-		{
-			var field = typeof(Key).GetFields().FirstOrDefault(i => i.FieldType == typeof(Key) && Equals(((Key)i.GetValue(null)).Code, key.Code));
-			return (field == null ? null : field.Name) ?? "Unknown";
-		}
-
 		public const int MaxCount = 512;
 
 		public static int Count = 1;
@@ -123,6 +111,34 @@ namespace Lime
 		public override bool Equals(object obj)
 		{
 			return (Key)obj == this;
+		}
+
+		public static Key GetByName(string name)
+		{
+			var field = typeof(Key).GetFields().
+				FirstOrDefault(i => string.Equals(i.Name, name, StringComparison.OrdinalIgnoreCase) && i.FieldType == typeof(Key));
+			return (Key?) (field == null ? null : field.GetValue(null)) ?? Key.Unknown;
+		}
+
+		private static Dictionary<Key, string> keyToNameCache;
+
+		public override string ToString()
+		{
+			if (keyToNameCache == null) {
+				keyToNameCache = typeof(Key).GetFields().Union(typeof(Commands).GetFields())
+				.Where(i => i.FieldType == typeof(Key)).ToDictionary(i => (Key)i.GetValue(null), i => i.Name);
+			}
+			string value;
+			if (keyToNameCache.TryGetValue(this, out value)) {
+				return value;
+			} else {
+				foreach (var kv in ShortcutMap) {
+					if (kv.Value == this) {
+						return kv.Key.ToString();
+					}
+				}
+			}
+			return Code.ToString();
 		}
 
 		public static implicit operator Key (int code) { return new Key(code); }
