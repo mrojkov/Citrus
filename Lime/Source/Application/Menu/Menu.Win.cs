@@ -144,7 +144,7 @@ namespace Lime
 			if (key >= Key.Number0 && key <= Key.Number9) {
 				return Keys.D0 + key - Key.Number0;
 			}
-			if (key >= Key.F1 && key <= Key.F24) {
+			if (key >= Key.F1 && key <= Key.F12) {
 				return Keys.F1 + key - Key.F1;
 			}
 			return key == Key.Up ? Keys.Up :
@@ -167,27 +167,6 @@ namespace Lime
 				key == Key.ScrollLock ? Keys.Scroll :
 				key == Key.PrintScreen ? Keys.PrintScreen :
 				key == Key.Pause ? Keys.Pause :
-				key == Key.NumLock ? Keys.NumLock :
-				key == Key.Clear ? Keys.Clear :
-				key == Key.Sleep ? Keys.Sleep :
-				key == Key.Keypad0 ? Keys.NumPad0 :
-				key == Key.Keypad1 ? Keys.NumPad1 :
-				key == Key.Keypad2 ? Keys.NumPad2 :
-				key == Key.Keypad3 ? Keys.NumPad3 :
-				key == Key.Keypad4 ? Keys.NumPad4 :
-				key == Key.Keypad5 ? Keys.NumPad5 :
-				key == Key.Keypad6 ? Keys.NumPad6 :
-				key == Key.Keypad7 ? Keys.NumPad7 :
-				key == Key.Keypad8 ? Keys.NumPad8 :
-				key == Key.Keypad9 ? Keys.NumPad9 :
-				key == Key.KeypadDivide ? Keys.Divide :
-				key == Key.KeypadMultiply ? Keys.Multiply :
-				key == Key.KeypadMinus ? Keys.Subtract :
-				key == Key.KeypadSubtract ? Keys.Subtract :
-				key == Key.KeypadAdd ? Keys.Add :
-				key == Key.KeypadPlus ? Keys.Add :
-				key == Key.KeypadDecimal ? Keys.Decimal :
-				key == Key.KeypadEnter ? Keys.Enter :
 				InvalidKeyExceptionFunc();
 		}
 

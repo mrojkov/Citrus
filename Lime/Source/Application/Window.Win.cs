@@ -437,9 +437,9 @@ namespace Lime
 				case Keys.Oem7:
 					return Key.Quote;
 				case Keys.Oem4:
-					return Key.BracketLeft;
+					return Key.LBracket;
 				case Keys.Oem6:
-					return Key.BracketRight;
+					return Key.RBracket;
 				case Keys.Oem5:
 					return Key.BackSlash;
 				case Keys.D0:
@@ -581,7 +581,7 @@ namespace Lime
 				case Keys.Escape:
 					return Key.Escape;
 				case Keys.Oemplus:
-					return Key.Plus;
+					return Key.EqualsSign;
 				case Keys.OemMinus:
 					return Key.Minus;
 				case Keys.OemPeriod:
