@@ -90,9 +90,20 @@ namespace Lime
 			return lastFocused != null && lastFocused.GloballyVisible && lastFocused.DescendantOf(Widget);
 		}
 
-		private IEnumerable<Widget> GetTabTraversables(Widget root)
+		private static IEnumerable<Widget> GetTabTraversables(Widget root)
 		{
-			return root.Descendants.OfType<Widget>().Where(i => i.TabTravesable != null && i.GloballyVisible).OrderBy(i => i.TabTravesable.Order);
+			return root.Descendants.OfType<Widget>().Where(i => i.TabTravesable != null &&
+				i.GloballyVisible).OrderBy(i => i.TabTravesable.Order);
+		}
+
+		public void SetDefaultFocus()
+		{
+			var firstFocusable = GetTabTraversables(Widget).FirstOrDefault();
+			if (firstFocusable != null) {
+				firstFocusable.SetFocus();
+			} else {
+				Widget.SetFocus();
+			}
 		}
 	}
 }
