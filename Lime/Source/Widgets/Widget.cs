@@ -334,9 +334,6 @@ namespace Lime
 			if (input != null) {
 				input.Dispose();
 			}
-			if (IsFocused()) {
-				RevokeFocus();
-			}
 			base.Dispose();
 		}
 
