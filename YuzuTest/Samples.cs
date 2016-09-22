@@ -523,6 +523,13 @@ namespace YuzuTest
 		public string R = "R";
 	}
 
+	public class SampleUnknown
+	{
+		[YuzuMember]
+		public int X;
+		public YuzuUnknownStorage Storage = new YuzuUnknownStorage();
+	}
+
 	public class Bad1
 	{
 		[YuzuRequired]
@@ -547,7 +554,8 @@ namespace YuzuTest
 	public class BadPrivate
 	{
 		[YuzuRequired]
-		private int F;
+		private int F = 0;
+		public int G { get { return F; } }
 	}
 
 	public class BadPrivateGetter

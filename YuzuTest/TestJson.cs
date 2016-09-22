@@ -281,7 +281,7 @@ namespace YuzuTest.Json
 			js.JsonOptions.Indent = "";
 
 			var result1 = js.ToString(v);
-			Assert.AreEqual("{\n\"F\":1E-20,\n\"D\":-3.1415E+100\n}", result1);
+			Assert.AreEqual("{\n\"F\":1E-20,\n\"D\":-3.1415E100\n}", result1);
 
 			var w = new SampleFloat();
 			var jd = new JsonDeserializer();
@@ -289,6 +289,10 @@ namespace YuzuTest.Json
 			jd.FromString(w, result1);
 			Assert.AreEqual(v.F, w.F);
 			Assert.AreEqual(v.D, w.D);
+
+			Assert.AreEqual("NaN", js.ToString(Double.NaN));
+			Assert.AreEqual("Infinity", js.ToString(Double.PositiveInfinity));
+			Assert.AreEqual("-Infinity", js.ToString(Double.NegativeInfinity));
 		}
 
 		[TestMethod]
@@ -911,6 +915,7 @@ namespace YuzuTest.Json
 		public void TestObject()
 		{
 			var jd = new JsonDeserializer();
+
 			var w = new SampleObj();
 			const string str = "{ \"F\": 123.4 }";
 			jd.FromString(w, str);
@@ -926,6 +931,7 @@ namespace YuzuTest.Json
 				new Dictionary<string, object>() { { "a", "1" }, { "b", "2" } },
 				(Dictionary<string, object>)w.F);
 			Assert.AreEqual(typeof(Dictionary<string, object>), jd.FromString("{}").GetType());
+			Assert.AreEqual(typeof(Dictionary<string, object>), jd.FromString<object>("{}").GetType());
 
 			var d = jd.FromString("{ \"F\": [1,2,3] }");
 			Assert.AreEqual(typeof(Dictionary<string, object>), d.GetType());
@@ -944,8 +950,7 @@ namespace YuzuTest.Json
 		public void TestNewFields()
 		{
 			var jd = new JsonDeserializer();
-			jd.Options.TagMode = TagMode.Aliases;
-			jd.Options.IgnoreUnknownFields = true;
+			jd.Options.AllowUnknownFields = true;
 
 			var w = new SampleTree();
 			jd.FromString(w, "{\"a\":9,\"a1\":[],\"b\":null}");
@@ -956,6 +961,48 @@ namespace YuzuTest.Json
 
 			jd.FromString(w, "{\"a\":11, \"a1\":[], \"x\":null}");
 			Assert.AreEqual(11, w.Value);
+
+			jd.FromString(w, "{\"a\":11, \"a1\":[{}]}");
+			Assert.AreEqual(11, w.Value);
+
+			jd.Options.TagMode = TagMode.Names;
+			jd.FromString(w, "{\"A\":11, \"Value\":12, \"Z\": null}");
+			Assert.AreEqual(12, w.Value);
+		}
+
+		[TestMethod]
+		public void TestUnknownStorage()
+		{
+			var js = new JsonSerializer();
+			js.Options.AllowUnknownFields = true;
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = "";
+
+			var jd = new JsonDeserializer();
+			jd.Options.AllowUnknownFields = true;
+
+			var w = new SampleUnknown();
+			jd.FromString(w, "{}");
+			Assert.AreEqual(0, w.X);
+
+			jd.FromString(w, "{\"A\":10}");
+			Assert.AreEqual(1, w.Storage.Fields.Count);
+			Assert.AreEqual("A", w.Storage.Fields[0].Name);
+			Assert.AreEqual(10.0, w.Storage.Fields[0].Value);
+			Assert.AreEqual("{\"A\":10}", js.ToString(w));
+
+			jd.FromString(w, "{\"X\":77,\"Y\":{}}");
+			Assert.AreEqual(77, w.X);
+			Assert.AreEqual(1, w.Storage.Fields.Count);
+			Assert.AreEqual("Y", w.Storage.Fields[0].Name);
+			Assert.IsInstanceOfType(w.Storage.Fields[0].Value, typeof(Dictionary<string, object>));
+			Assert.AreEqual("{\"X\":77,\"Y\":{}}", js.ToString(w));
+
+			jd.JsonOptions.Unordered = true;
+			jd.FromString(w, "{\"X\":88,\"Y\":\"qq\",\"B\":0}");
+			Assert.AreEqual("{\"B\":0,\"X\":88,\"Y\":\"qq\"}", js.ToString(w));
+			js.JsonOptions.Unordered = true;
+			Assert.AreEqual("{\"X\":88,\"B\":0,\"Y\":\"qq\"}", js.ToString(w));
 		}
 
 		[TestMethod]
@@ -1007,12 +1054,19 @@ namespace YuzuTest.Json
 			js.JsonOptions.FieldSeparator = " ";
 			var jd = new JsonDeserializer();
 
+			var n = DateTime.Now;
+			Assert.AreEqual("\"" + n.ToString("O") + "\"", js.ToString(n));
+
+			var t = DateTime.Now - DateTime.MinValue;
+			Assert.AreEqual("\"" + t.ToString("c") + "\"", js.ToString(t));
+
 			var v1 = new SampleDate { D = new DateTime(2011, 3, 25), T = TimeSpan.FromMinutes(5) };
 			var result1 = js.ToString(v1);
 			Assert.AreEqual("{ \"D\":\"2011-03-25T00:00:00.0000000\", \"T\":\"00:05:00\" }", result1);
 
 			js.JsonOptions.DateFormat = @"yyyy";
-			Assert.AreEqual("{ \"D\":\"2011\", \"T\":\"00:05:00\" }", js.ToString(v1));
+			js.JsonOptions.TimeSpanFormat = @"hh\#mm\#ss";
+			Assert.AreEqual("{ \"D\":\"2011\", \"T\":\"00#05#00\" }", js.ToString(v1));
 
 			var w1 = new SampleDate();
 			(new JsonDeserializer()).FromString(w1, result1);
@@ -1262,6 +1316,30 @@ namespace YuzuTest.Json
 		}
 
 		[TestMethod]
+		public void TestUnknown()
+		{
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = "";
+			var jd = new JsonDeserializer();
+			jd.JsonOptions.Unordered = true;
+
+			var w1 = (YuzuUnknown)jd.FromString<object>("{\"class\":\"NewType1\"}");
+			Assert.AreEqual("NewType1", w1.ClassTag);
+			Assert.AreEqual(0, w1.Fields.Count);
+			Assert.AreEqual("{\"class\":\"NewType1\"}", js.ToString(w1));
+
+			var w2 = (YuzuUnknown)jd.FromString<object>("{\"class\":\"NewType2\", \"b\":\"qqq\", \"a\":1}");
+			Assert.AreEqual(2, w2.Fields.Count);
+			Assert.AreEqual(1.0, w2.Fields["a"]);
+			Assert.AreEqual("qqq", w2.Fields["b"]);
+			Assert.AreEqual("{\"class\":\"NewType2\",\"a\":1,\"b\":\"qqq\"}", js.ToString(w2));
+
+			jd.Options.AllowUnknownFields = true;
+			var w3 = jd.FromString<SampleBool>("{\"B\":true, \"a\": {\"class\":\"NewType3\"}}");
+		}
+
+		[TestMethod]
 		public void TestIndentation()
 		{
 			var js = new JsonSerializer();
@@ -1346,6 +1424,7 @@ namespace YuzuTest.Json
 			var jd = new JsonDeserializer();
 			var w = new Sample1();
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{}"), "X");
+			XAssert.Throws<YuzuException>(() => jd.FromString("{null:1}"), "'n'");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"X\" }"), ":");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "nn"), "'u'");
 			XAssert.Throws<YuzuException>(() => jd.FromString(w, "{ \"X\":1, \"Y\": \"\\z\" }"), "z");

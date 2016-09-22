@@ -11,9 +11,10 @@ namespace YuzuGen.YuzuTest
 
 		public Sample1_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = false;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -48,7 +49,6 @@ namespace YuzuGen.YuzuTest
 				result.Y = RequireString();
 				name = GetNextName(false);
 			}
-			Require('}');
 			return result;
 		}
 	}
@@ -59,9 +59,10 @@ namespace YuzuGen.YuzuTest
 
 		public Sample2_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = false;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -96,7 +97,6 @@ namespace YuzuGen.YuzuTest
 				result.Y = RequireString();
 				name = GetNextName(false);
 			}
-			Require('}');
 			return result;
 		}
 	}
@@ -107,9 +107,10 @@ namespace YuzuGen.YuzuTest
 
 		public Sample3_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = false;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -148,7 +149,6 @@ namespace YuzuGen.YuzuTest
 				result.S2 = YuzuGen.YuzuTest.Sample2_JsonDeserializer.Instance.FromReaderTyped<global::YuzuTest.Sample2>(Reader);
 				name = GetNextName(false);
 			}
-			Require('}');
 			return result;
 		}
 	}
@@ -159,9 +159,10 @@ namespace YuzuGen.YuzuTest
 
 		public Sample4_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -193,7 +194,6 @@ namespace YuzuGen.YuzuTest
 				result.E = (global::YuzuTest.SampleEnum)Enum.Parse(typeof(global::YuzuTest.SampleEnum), RequireString());
 				name = GetNextName(false);
 			}
-			Require('}');
 			return result;
 		}
 	}
@@ -204,9 +204,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleDecimal_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -237,7 +238,6 @@ namespace YuzuGen.YuzuTest
 			if ("N" != name) throw new YuzuException("N!=" + name);
 			result.N = RequireDecimal();
 			name = GetNextName(false);
-			Require('}');
 			return result;
 		}
 	}
@@ -248,9 +248,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleNullable_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -287,7 +288,6 @@ namespace YuzuGen.YuzuTest
 				result.N = RequireInt();
 			}
 			name = GetNextName(false);
-			Require('}');
 			return result;
 		}
 	}
@@ -298,9 +298,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleBool_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -331,7 +332,6 @@ namespace YuzuGen.YuzuTest
 			if ("B" != name) throw new YuzuException("B!=" + name);
 			result.B = RequireBool();
 			name = GetNextName(false);
-			Require('}');
 			return result;
 		}
 	}
@@ -342,9 +342,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleList_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -386,7 +387,6 @@ namespace YuzuGen.YuzuTest
 				}
 			}
 			name = GetNextName(false);
-			Require('}');
 			return result;
 		}
 	}
@@ -397,9 +397,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleObj_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -430,7 +431,6 @@ namespace YuzuGen.YuzuTest
 			if ("F" != name) throw new YuzuException("F!=" + name);
 			result.F = ReadAnyObject();
 			name = GetNextName(false);
-			Require('}');
 			return result;
 		}
 	}
@@ -441,9 +441,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleDict_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -491,7 +492,6 @@ namespace YuzuGen.YuzuTest
 				}
 				name = GetNextName(false);
 			}
-			Require('}');
 			return result;
 		}
 	}
@@ -502,9 +502,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleDictKeys_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -580,7 +581,6 @@ namespace YuzuGen.YuzuTest
 				}
 			}
 			name = GetNextName(false);
-			Require('}');
 			return result;
 		}
 	}
@@ -591,9 +591,10 @@ namespace YuzuGen.YuzuTest
 
 		public ISampleMember_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -625,7 +626,6 @@ namespace YuzuGen.YuzuTest
 				result.X = RequireInt();
 				name = GetNextName(false);
 			}
-			Require('}');
 			return result;
 		}
 	}
@@ -636,9 +636,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleMemberI_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -670,7 +671,6 @@ namespace YuzuGen.YuzuTest
 				result.X = RequireInt();
 				name = GetNextName(false);
 			}
-			Require('}');
 			return result;
 		}
 	}
@@ -685,9 +685,10 @@ namespace YuzuGen.System.Collections.Generic
 
 		public List_ISampleMember_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -745,9 +746,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleArray_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -789,7 +791,6 @@ namespace YuzuGen.YuzuTest
 				Require(']');
 			}
 			name = GetNextName(false);
-			Require('}');
 			return result;
 		}
 	}
@@ -800,9 +801,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleBase_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -833,7 +835,6 @@ namespace YuzuGen.YuzuTest
 			if ("FBase" != name) throw new YuzuException("FBase!=" + name);
 			result.FBase = RequireInt();
 			name = GetNextName(false);
-			Require('}');
 			return result;
 		}
 	}
@@ -844,9 +845,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleDerivedA_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -880,7 +882,6 @@ namespace YuzuGen.YuzuTest
 			if ("FA" != name) throw new YuzuException("FA!=" + name);
 			result.FA = RequireInt();
 			name = GetNextName(false);
-			Require('}');
 			return result;
 		}
 	}
@@ -891,9 +892,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleDerivedB_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -927,7 +929,6 @@ namespace YuzuGen.YuzuTest
 			if ("FB" != name) throw new YuzuException("FB!=" + name);
 			result.FB = RequireInt();
 			name = GetNextName(false);
-			Require('}');
 			return result;
 		}
 	}
@@ -938,9 +939,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleMatrix_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -993,7 +995,6 @@ namespace YuzuGen.YuzuTest
 				}
 			}
 			name = GetNextName(false);
-			Require('}');
 			return result;
 		}
 	}
@@ -1004,9 +1005,10 @@ namespace YuzuGen.YuzuTest
 
 		public SamplePoint_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1040,7 +1042,6 @@ namespace YuzuGen.YuzuTest
 			if ("Y" != name) throw new YuzuException("Y!=" + name);
 			result.Y = RequireInt();
 			name = GetNextName(false);
-			Require('}');
 			return result;
 		}
 
@@ -1061,9 +1062,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleRect_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1097,7 +1099,6 @@ namespace YuzuGen.YuzuTest
 			if ("B" != name) throw new YuzuException("B!=" + name);
 			result.B = YuzuGen.YuzuTest.SamplePoint_JsonDeserializer.Instance.FromReaderTyped<global::YuzuTest.SamplePoint>(Reader);
 			name = GetNextName(false);
-			Require('}');
 			return result;
 		}
 	}
@@ -1108,9 +1109,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleDate_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1144,7 +1146,6 @@ namespace YuzuGen.YuzuTest
 			if ("T" != name) throw new YuzuException("T!=" + name);
 			result.T = RequireTimeSpan();
 			name = GetNextName(false);
-			Require('}');
 			return result;
 		}
 	}
@@ -1155,9 +1156,10 @@ namespace YuzuGen.YuzuTest
 
 		public Color_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1194,7 +1196,6 @@ namespace YuzuGen.YuzuTest
 			if ("R" != name) throw new YuzuException("R!=" + name);
 			result.R = checked((byte)RequireUInt());
 			name = GetNextName(false);
-			Require('}');
 			return result;
 		}
 
@@ -1221,9 +1222,10 @@ namespace YuzuGen.System.Collections.Generic
 
 		public List_List_Int32_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1292,9 +1294,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleClassList_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1336,7 +1339,6 @@ namespace YuzuGen.YuzuTest
 				}
 			}
 			name = GetNextName(false);
-			Require('}');
 			return result;
 		}
 	}
@@ -1347,9 +1349,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleSmallTypes_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1392,7 +1395,6 @@ namespace YuzuGen.YuzuTest
 			if ("USh" != name) throw new YuzuException("USh!=" + name);
 			result.USh = checked((ushort)RequireUInt());
 			name = GetNextName(false);
-			Require('}');
 			return result;
 		}
 	}
@@ -1403,9 +1405,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleWithNullFieldCompact_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1436,7 +1439,6 @@ namespace YuzuGen.YuzuTest
 			if ("N" != name) throw new YuzuException("N!=" + name);
 			result.N = YuzuGen.YuzuTest.Sample1_JsonDeserializer.Instance.FromReaderTyped<global::YuzuTest.Sample1>(Reader);
 			name = GetNextName(false);
-			Require('}');
 			return result;
 		}
 
@@ -1455,9 +1457,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleNested__NestedClass_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1489,7 +1492,6 @@ namespace YuzuGen.YuzuTest
 				result.Z = RequireInt();
 				name = GetNextName(false);
 			}
-			Require('}');
 			return result;
 		}
 	}
@@ -1500,9 +1502,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleNested_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1551,7 +1554,6 @@ namespace YuzuGen.YuzuTest
 				}
 				name = GetNextName(false);
 			}
-			Require('}');
 			return result;
 		}
 	}
@@ -1562,9 +1564,10 @@ namespace YuzuGen.YuzuTest
 
 		public SamplePerson_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1615,7 +1618,6 @@ namespace YuzuGen.YuzuTest
 			if ("4" != name) throw new YuzuException("4!=" + name);
 			result.EyeColor = YuzuGen.YuzuTest.Color_JsonDeserializer.Instance.FromReaderTyped<global::YuzuTest.Color>(Reader);
 			name = GetNextName(false);
-			Require('}');
 			return result;
 		}
 	}
@@ -1626,9 +1628,10 @@ namespace YuzuGen.YuzuTest
 
 		public ISample_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1656,7 +1659,6 @@ namespace YuzuGen.YuzuTest
 		protected override object ReadFields(object obj, string name)
 		{
 			var result = (global::YuzuTest.ISample)obj;
-			Require('}');
 			return result;
 		}
 	}
@@ -1667,9 +1669,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleInterfaced_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1700,7 +1703,6 @@ namespace YuzuGen.YuzuTest
 			if ("X" != name) throw new YuzuException("X!=" + name);
 			result.X = RequireInt();
 			name = GetNextName(false);
-			Require('}');
 			return result;
 		}
 	}
@@ -1711,9 +1713,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleInterfaceField_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1744,7 +1747,6 @@ namespace YuzuGen.YuzuTest
 			if ("I" != name) throw new YuzuException("I!=" + name);
 			result.I = YuzuGen.YuzuTest.ISample_JsonDeserializer.Instance.FromReaderInterface<global::YuzuTest.ISample>(Reader);
 			name = GetNextName(false);
-			Require('}');
 			return result;
 		}
 	}
@@ -1755,9 +1757,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleInterfacedGeneric_String_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1791,7 +1794,6 @@ namespace YuzuGen.YuzuTest
 			if ("X" != name) throw new YuzuException("X!=" + name);
 			result.X = RequireInt();
 			name = GetNextName(false);
-			Require('}');
 			return result;
 		}
 	}
@@ -1802,9 +1804,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleAbstract_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1832,7 +1835,6 @@ namespace YuzuGen.YuzuTest
 		protected override object ReadFields(object obj, string name)
 		{
 			var result = (global::YuzuTest.SampleAbstract)obj;
-			Require('}');
 			return result;
 		}
 	}
@@ -1843,9 +1845,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleConcrete_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1876,7 +1879,6 @@ namespace YuzuGen.YuzuTest
 			if ("XX" != name) throw new YuzuException("XX!=" + name);
 			result.XX = RequireInt();
 			name = GetNextName(false);
-			Require('}');
 			return result;
 		}
 	}
@@ -1887,9 +1889,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleCollection_Int32_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1943,9 +1946,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleExplicitCollection_Int32_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -1999,9 +2003,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleWithCollection_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -2057,7 +2062,6 @@ namespace YuzuGen.YuzuTest
 				}
 			}
 			name = GetNextName(false);
-			Require('}');
 			return result;
 		}
 	}
@@ -2068,9 +2072,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleConcreteCollection_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -2124,9 +2129,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleAfter2_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -2157,7 +2163,6 @@ namespace YuzuGen.YuzuTest
 			if ("X" != name) throw new YuzuException("X!=" + name);
 			result.X = RequireString();
 			name = GetNextName(false);
-			Require('}');
 			result.After2();
 			result.After3();
 			result.After();
@@ -2171,9 +2176,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleMerge_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -2231,7 +2237,6 @@ namespace YuzuGen.YuzuTest
 				YuzuGen.YuzuTest.Sample1_JsonDeserializer.Instance.FromReader(result.M, Reader);
 				name = GetNextName(false);
 			}
-			Require('}');
 			return result;
 		}
 	}
@@ -2242,9 +2247,10 @@ namespace YuzuGen.YuzuTest
 
 		public SampleAssemblyDerivedR_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -2280,7 +2286,6 @@ namespace YuzuGen.YuzuTest
 				result.R = RequireString();
 				name = GetNextName(false);
 			}
-			Require('}');
 			return result;
 		}
 	}
@@ -2295,9 +2300,10 @@ namespace YuzuGen.System.Collections.Generic
 
 		public List_SampleAssemblyBase_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -2355,9 +2361,10 @@ namespace YuzuGen.YuzuTestAssembly
 
 		public SampleAssemblyBase_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -2389,7 +2396,6 @@ namespace YuzuGen.YuzuTestAssembly
 				result.P = checked((short)RequireInt());
 				name = GetNextName(false);
 			}
-			Require('}');
 			return result;
 		}
 	}
@@ -2400,9 +2406,10 @@ namespace YuzuGen.YuzuTestAssembly
 
 		public SampleAssemblyDerivedQ_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -2438,7 +2445,6 @@ namespace YuzuGen.YuzuTestAssembly
 				result.Q = checked((short)RequireInt());
 				name = GetNextName(false);
 			}
-			Require('}');
 			return result;
 		}
 	}
@@ -2453,9 +2459,10 @@ namespace YuzuGen.YuzuTest2
 
 		public SampleNamespace_JsonDeserializer()
 		{
-			Options.IgnoreUnknownFields = false;
+			Options.AllowUnknownFields = false;
 			Options.AllowEmptyTypes = false;
 			Options.ReportErrorPosition = false;
+			JsonOptions.MaxOnelineFields = 0;
 			JsonOptions.EnumAsString = true;
 			JsonOptions.SaveRootClass = false;
 			JsonOptions.IgnoreCompact = false;
@@ -2486,7 +2493,6 @@ namespace YuzuGen.YuzuTest2
 			if ("B" != name) throw new YuzuException("B!=" + name);
 			result.B = YuzuGen.YuzuTest.SampleBase_JsonDeserializer.Instance.FromReaderTyped<global::YuzuTest.SampleBase>(Reader);
 			name = GetNextName(false);
-			Require('}');
 			return result;
 		}
 	}

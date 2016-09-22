@@ -7,6 +7,12 @@ using Yuzu.Util;
 
 namespace Yuzu.Binary
 {
+	public class BinarySerializeOptions
+	{
+		public byte[] Signature = new byte[] { (byte)'Y', (byte)'B', (byte)'0', (byte)'1' };
+		public bool AutoSignature = false;
+	}
+
 	// These values are part of format.
 	public enum RoughType: byte
 	{
@@ -57,6 +63,8 @@ namespace Yuzu.Binary
 
 	public class BinarySerializer : AbstractWriterSerializer
 	{
+		public BinarySerializeOptions BinaryOptions = new BinarySerializeOptions();
+
 		protected void WriteSByte(object obj) { writer.Write((sbyte)obj); }
 		protected void WriteByte(object obj) { writer.Write((byte)obj); }
 		protected void WriteShort(object obj) { writer.Write((short)obj); }
@@ -332,6 +340,13 @@ namespace Yuzu.Binary
 			throw new NotImplementedException(t.Name);
 		}
 
-		protected override void ToWriter(object obj) { WriteAny(obj); }
+		protected override void ToWriter(object obj)
+		{
+			if (BinaryOptions.AutoSignature)
+				WriteSignature();
+			WriteAny(obj);
+		}
+
+		public void WriteSignature() { writer.Write(BinaryOptions.Signature); }
 	}
 }

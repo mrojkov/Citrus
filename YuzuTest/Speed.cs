@@ -85,7 +85,7 @@ namespace YuzuTest
 			for (int i = 0; i < 300; ++i) {
 				list1.M.Add(new List<int>());
 				for (int j = 0; j < 400; ++j)
-					list1.M[i].Add(i * j);
+					list1.M[i].Add(i * j * 97);
 			}
 
 			var js = new JsonSerializer();
@@ -96,12 +96,92 @@ namespace YuzuTest
 			var jd = new JsonDeserializer();
 			jd.FromString(list2, result1);
 			Assert.AreEqual(list1.M.Count, list2.M.Count);
+			for (int i = 0; i < list1.M.Count; ++i) {
+				for (int j = 0; j < list1.M[i].Count; ++j)
+					Assert.AreEqual(list1.M[i][j], list2.M[i][j]);
+			}
 
 			var jdg = new SampleMatrix_JsonDeserializer();
 			var list3 = (SampleMatrix)jdg.FromString(result1);
 			Assert.AreEqual(list1.M.Count, list3.M.Count);
 		}
 
+		[TestMethod]
+		public void TestJsonLongListLong()
+		{
+			var list1 = new List<long>();
+			for (int i = 0; i < 100000; ++i) {
+				list1.Add(i * 1973457);
+			}
+			var js = new JsonSerializer();
+			var result1 = js.ToString(list1);
+			Assert.IsTrue(result1 != "");
+		}
+
+		[TestMethod]
+		public void TestJsonLongListDouble()
+		{
+			var list1 = new List<double>();
+			var rnd = new Random();
+			for (int i = 0; i < 50000; ++i)
+				list1.Add(i * 19234.73457);
+			for (int i = 0; i < 50000; ++i)
+				list1.Add(rnd.NextDouble());
+			for (int i = 0; i < 10000; ++i)
+				list1.Add(rnd.NextDouble() * 1e27);
+			for (int i = 0; i < 10000; ++i)
+				list1.Add(rnd.NextDouble() * 1e-27);
+
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = "";
+			var result1 = js.ToString(list1);
+			Assert.IsTrue(result1 != "");
+
+			var list2 = (new JsonDeserializer()).FromString<List<double>>(result1);
+			for (int i = 0; i < list1.Count; ++i)
+				Assert.AreEqual(list1[i], list2[i]);
+		}
+
+		[TestMethod]
+		public void TestJsonLongListSingle()
+		{
+			var list1 = new List<float>();
+			var rnd = new Random();
+			for (int i = 0; i < 50000; ++i)
+				list1.Add(i * 19234.734f);
+			for (int i = 0; i < 50000; ++i)
+				list1.Add((float)rnd.NextDouble());
+			for (int i = 0; i < 10000; ++i)
+				list1.Add((float)(rnd.NextDouble() * 1e7));
+			for (int i = 0; i < 10000; ++i)
+				list1.Add((float)(rnd.NextDouble() * 1e-7));
+
+			var js = new JsonSerializer();
+			js.JsonOptions.Indent = "";
+			js.JsonOptions.FieldSeparator = "";
+			var result1 = js.ToString(list1);
+			Assert.IsTrue(result1 != "");
+
+			var list2 = (new JsonDeserializer()).FromString<List<float>>(result1);
+			for (int i = 0; i < list1.Count; ++i)
+				Assert.AreEqual(list1[i], list2[i]);
+		}
+
+		[TestMethod]
+		public void TestJsonLongListTime()
+		{
+			var list1 = new List<TimeSpan>();
+			for (int i = -10000; i < 30000; ++i) {
+				list1.Add(new TimeSpan(i * 98374709923L));
+			}
+			var js = new JsonSerializer();
+			var result1 = js.ToString(list1);
+			Assert.IsTrue(result1 != "");
+
+			var list2 = (new JsonDeserializer()).FromString<List<TimeSpan>>(result1);
+			CollectionAssert.AreEqual(list1, list2);
+		}
 	}
 
 	[TestClass]

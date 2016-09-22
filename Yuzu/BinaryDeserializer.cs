@@ -13,6 +13,8 @@ namespace Yuzu.Binary
 	{
 		public static BinaryDeserializer Instance = new BinaryDeserializer();
 
+		public BinarySerializeOptions BinaryOptions = new BinarySerializeOptions();
+
 		public BinaryDeserializer()
 		{
 			InitReaders();
@@ -219,6 +221,11 @@ namespace Yuzu.Binary
 		// Zeroth element corresponds to 'null'.
 		private List<ClassDef> classDefs = new List<ClassDef> { new ClassDef() };
 
+		protected class YuzuUnknownBinary : YuzuUnknown
+		{
+			public ClassDef Def;
+		}
+
 		protected virtual void PrepareReaders(ClassDef def)
 		{
 			def.ReadFields = ReadFields;
@@ -226,16 +233,53 @@ namespace Yuzu.Binary
 
 		public void ClearClassIds() { classDefs = new List<ClassDef> { new ClassDef() }; }
 
+		private ClassDef GetClassDefUnknown(string typeName)
+		{
+			var result = new ClassDef {
+				Meta = Meta.Unknown,
+				Make = (bd, def) => {
+					var obj = new YuzuUnknownBinary { ClassTag = typeName, Def = def };
+					ReadFields(bd, def, obj);
+					return obj;
+				},
+			};
+			var theirCount = Reader.ReadInt16();
+			for (int theirIndex = 0; theirIndex < theirCount; ++theirIndex) {
+				var theirName = Reader.ReadString();
+				var rf = ReadValueFunc(ReadType());
+				result.Fields.Add(new ClassDef.FieldDef {
+					Name = theirName, OurIndex = -1,
+					ReadFunc = obj => ((YuzuUnknown)obj).Fields[theirName] = rf()
+				});
+			}
+			classDefs.Add(result);
+			return result;
+		}
+
+		private void AddUnknownFieldDef(ClassDef def, string fieldName, string typeName)
+		{
+			if (!Options.AllowUnknownFields)
+				throw Error("New field {0} for class {1}", fieldName, typeName);
+			var rf = ReadValueFunc(ReadType());
+			var fd = new ClassDef.FieldDef { Name = fieldName, OurIndex = -1 };
+			if (def.Meta.GetUnknownStorage == null)
+				fd.ReadFunc = obj => rf();
+			else
+				fd.ReadFunc = obj => def.Meta.GetUnknownStorage(obj).Add(fieldName, rf());
+			def.Fields.Add(fd);
+		}
+
 		private ClassDef GetClassDef(short classId)
 		{
 			if (classId < classDefs.Count)
 				return classDefs[classId];
 			if (classId > classDefs.Count)
 				throw Error("Bad classId: {0}", classId);
-			var result = new ClassDef();
 			var typeName = Reader.ReadString();
-			var classType = FindType(typeName);
-			result.Meta = Meta.Get(classType, Options);
+			var classType = TypeSerializer.Deserialize(typeName);
+			if (classType == null)
+				return GetClassDefUnknown(typeName);
+			var result = new ClassDef { Meta = Meta.Get(classType, Options) };
 			PrepareReaders(result);
 			var ourCount = result.Meta.Items.Count;
 			var theirCount = Reader.ReadInt16();
@@ -251,11 +295,7 @@ namespace Yuzu.Binary
 					ourIndex += 1;
 				}
 				else if (cmp > 0) {
-					if (!Options.IgnoreUnknownFields)
-						throw Error("New field {0} for class {1}", theirName, typeName);
-					var rf = ReadValueFunc(ReadType());
-					result.Fields.Add(new ClassDef.FieldDef {
-						Name = theirName, OurIndex = -1, ReadFunc = obj => rf() });
+					AddUnknownFieldDef(result, theirName, typeName);
 					theirIndex += 1;
 				}
 				else {
@@ -276,22 +316,14 @@ namespace Yuzu.Binary
 					theirIndex += 1;
 				}
 			}
-			while (ourIndex < ourCount) {
+			for (; ourIndex < ourCount; ++ourIndex) {
 				var yi = result.Meta.Items[ourIndex];
 				var ourName = yi.Tag(Options);
 				if (!yi.IsOptional)
 					throw Error("Missing required field {0} for class {1}", ourName, typeName);
-				ourIndex += 1;
 			}
-			while (theirIndex < theirCount) {
-				var theirName = Reader.ReadString();
-				if (!Options.IgnoreUnknownFields)
-					throw Error("New field {0} for class {1}", theirName, typeName);
-				var rf = ReadValueFunc(ReadType());
-				result.Fields.Add(new ClassDef.FieldDef {
-					Name = theirName, OurIndex = -1, ReadFunc = obj => rf() });
-				theirIndex += 1;
-			}
+			for (; theirIndex < theirCount; ++theirIndex)
+				AddUnknownFieldDef(result, Reader.ReadString(), typeName);
 			classDefs.Add(result);
 			return result;
 		}
@@ -305,6 +337,8 @@ namespace Yuzu.Binary
 						def.Fields[i].ReadFunc(obj);
 				}
 				else {
+					if (def.Meta.GetUnknownStorage != null)
+						def.Meta.GetUnknownStorage(obj).Clear();
 					var actualIndex = d.Reader.ReadInt16();
 					for (int i = 1; i < def.Fields.Count; ++i) {
 						var fd = def.Fields[i];
@@ -406,8 +440,6 @@ namespace Yuzu.Binary
 
 		private Func<object> ReadValueFunc(Type t)
 		{
-			if (t == null)
-				return ReadObject<object>;
 			Func<object> f;
 			if (readerCache.TryGetValue(t, out f))
 				return f;
@@ -488,13 +520,20 @@ namespace Yuzu.Binary
 			throw Error("Unable to merge field of type {0}", t.Name);
 		}
 
-		public override object FromReaderInt() { return ReadAny(); }
+		public override object FromReaderInt()
+		{
+			if (BinaryOptions.AutoSignature)
+				CheckSignature();
+			return ReadAny();
+		}
 
 		public override object FromReaderInt(object obj)
 		{
 			var expectedType = obj.GetType();
 			if (expectedType == typeof(object))
 				throw Error("Unable to read into untyped object");
+			if (BinaryOptions.AutoSignature)
+				CheckSignature();
 			if (!ReadCompatibleType(expectedType))
 				throw Error("Incompatible type to read into {0}", expectedType.Name);
 			MergeValueFunc(expectedType)(obj);
@@ -503,9 +542,39 @@ namespace Yuzu.Binary
 
 		public override T FromReaderInt<T>()
 		{
+			if (BinaryOptions.AutoSignature)
+				CheckSignature();
+			if (typeof(T) == typeof(object))
+				return (T)ReadAny();
 			if (!ReadCompatibleType(typeof(T)))
 				throw Error("Incompatible type to read into {0}", typeof(T).Name);
 			return (T)ReadValueFunc(typeof(T))();
 		}
+
+		// If possible, preserves stream position if signature is absent.
+		public bool IsValidSignature()
+		{
+			var s = BinaryOptions.Signature;
+			if (s.Length == 0)
+				return true;
+			if (!Reader.BaseStream.CanSeek)
+				return s.Equals(Reader.ReadBytes(s.Length));
+			var pos = Reader.BaseStream.Position;
+			if (Reader.BaseStream.Length - pos < s.Length)
+				return false;
+			foreach (var b in s)
+				if (b != Reader.ReadByte()) {
+					Reader.BaseStream.Position = pos;
+					return false;
+				}
+			return true;
+		}
+
+		public void CheckSignature()
+		{
+			if (!IsValidSignature())
+				throw Error("Signature not found");
+		}
+
 	}
 }

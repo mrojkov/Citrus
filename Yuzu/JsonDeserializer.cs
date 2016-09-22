@@ -81,6 +81,9 @@ namespace Yuzu.Json
 			}
 		}
 
+		// Optimization: avoid re-creating StringBuilder.
+		private StringBuilder sb = new StringBuilder();
+
 		protected string RequireUnescapedString()
 		{
 			sb.Clear();
@@ -93,9 +96,6 @@ namespace Yuzu.Json
 			}
 			return sb.ToString();
 		}
-
-		// Optimization: avoid re-creating StringBuilder.
-		private StringBuilder sb = new StringBuilder();
 
 		protected string RequireString()
 		{
@@ -317,15 +317,22 @@ namespace Yuzu.Json
 			var ch = SkipSpaces();
 			if (ch == ',') {
 				if (first)
-					throw Error("Expected name, but got ','");
+					throw Error("Expected name, but found ','");
 				ch = SkipSpaces();
 			}
-			PutBack(ch);
 			if (ch == '}')
 				return "";
-			var result = RequireUnescapedString();
+			if (ch != '"')
+				throw Error("Expected '\"' but found '{0}'", ch);
+			sb.Clear();
+			while (true) {
+				ch = Reader.ReadChar();
+				if (ch == '"')
+					break;
+				sb.Append(ch);
+			}
 			Require(':');
-			return result;
+			return sb.ToString();
 		}
 
 		protected bool RequireOrNull(char ch)
@@ -376,7 +383,7 @@ namespace Yuzu.Json
 			keyParsers.Add(t, parser);
 		}
 
-		protected void ReadIntoDictionary<K, V>(Dictionary<K, V> dict)
+		protected void ReadIntoDictionary<K, V>(IDictionary<K, V> dict)
 		{
 			// ReadValue might invoke a new serializer, so we must not rely on PutBack.
 			if (SkipSpacesCarefully() == '}') {
@@ -465,12 +472,19 @@ namespace Yuzu.Json
 							var val = ReadAnyObject();
 							any.Add(name, val);
 							if (Require(',', '}') == ',')
-								ReadIntoDictionary<string, object>(any);
+								ReadIntoDictionary(any);
 						}
 						return any;
 					}
 					var typeName = RequireUnescapedString();
-					return ReadFields(Activator.CreateInstance(FindType(typeName)), GetNextName(first: false));
+					var t = TypeSerializer.Deserialize(typeName);
+					if (t == null) {
+						var result = new YuzuUnknown { ClassTag = typeName };
+						if (Require(',', '}') == ',')
+							ReadIntoDictionary(result.Fields);
+						return result;
+					}
+					return ReadFields(Activator.CreateInstance(t), GetNextName(first: false));
 				case '[':
 					return ReadList<object>();
 				default:
@@ -637,23 +651,22 @@ namespace Yuzu.Json
 			throw Error("Unable to merge field of type {0}", t.Name);
 		}
 
-		protected void IgnoreNewFieldsTail(string name)
+		protected void ReadUnknownFieldsTail(YuzuUnknownStorage storage, string name)
 		{
 			while (name != "") {
-				ReadAnyObject();
+				storage.Add(name, ReadAnyObject());
 				name = GetNextName(false);
 			}
 		}
 
-		protected int IgnoreNewFields(string tag, ref string name)
+		protected int ReadUnknownFields(YuzuUnknownStorage storage, string tag, ref string name)
 		{
 			var cmp = String.CompareOrdinal(tag, name);
-			if (Options.IgnoreUnknownFields && Options.TagMode != TagMode.Names)
-				while (cmp > 0 && name != "") {
-					ReadAnyObject();
-					name = GetNextName(false);
-					cmp = String.CompareOrdinal(tag, name);
-				}
+			while (cmp > 0 && name != "") {
+				storage.Add(name, ReadAnyObject());
+				name = GetNextName(false);
+				cmp = String.CompareOrdinal(tag, name);
+			}
 			return cmp;
 		}
 
@@ -664,12 +677,15 @@ namespace Yuzu.Json
 			try {
 				// Optimization: duplicate loop to extract options check.
 				if (JsonOptions.Unordered) {
+					var storage = !Options.AllowUnknownFields || meta.GetUnknownStorage == null ?
+						NullYuzuUnknownStorage.Instance : meta.GetUnknownStorage(obj);
+					storage.Clear();
 					while (name != "") {
 						Meta.Item yi;
 						if (!meta.TagToItem.TryGetValue(name, out yi)) {
-							if (!Options.IgnoreUnknownFields)
+							if (!Options.AllowUnknownFields)
 								throw Error("Unknown field '{0}'", name);
-							ReadAnyObject();
+							storage.Add(name, ReadAnyObject());
 							name = GetNextName(false);
 							continue;
 						}
@@ -680,9 +696,12 @@ namespace Yuzu.Json
 						name = GetNextName(false);
 					}
 				}
-				else if (Options.IgnoreUnknownFields && Options.TagMode != TagMode.Names) {
+				else if (Options.AllowUnknownFields) {
+					var storage = meta.GetUnknownStorage == null ?
+						NullYuzuUnknownStorage.Instance : meta.GetUnknownStorage(obj);
+					storage.Clear();
 					foreach (var yi in meta.Items) {
-						if (IgnoreNewFields(yi.Tag(Options), ref name) != 0) {
+						if (ReadUnknownFields(storage, yi.Tag(Options), ref name) != 0) {
 							if (!yi.IsOptional)
 								throw Error("Expected field '{0}', but found '{1}'", yi.NameTagged(Options), name);
 							continue;
@@ -693,6 +712,7 @@ namespace Yuzu.Json
 							MergeValueFunc(yi.Type)(yi.GetValue(obj));
 						name = GetNextName(false);
 					}
+					ReadUnknownFieldsTail(storage, name);
 				}
 				else {
 					foreach (var yi in meta.Items) {
@@ -712,9 +732,6 @@ namespace Yuzu.Json
 			finally {
 				objStack.Pop();
 			}
-			if (Options.IgnoreUnknownFields)
-				IgnoreNewFieldsTail(name);
-			Require('}');
 			meta.RunAfterDeserialization(obj);
 			return obj;
 		}

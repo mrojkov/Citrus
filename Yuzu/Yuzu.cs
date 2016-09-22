@@ -132,7 +132,7 @@ namespace Yuzu
 	{
 		public MetaOptions Meta;
 		public TagMode TagMode;
-		public bool IgnoreUnknownFields;
+		public bool AllowUnknownFields;
 		public bool AllowEmptyTypes;
 		public bool ReportErrorPosition;
 	}
@@ -157,6 +157,43 @@ namespace Yuzu
 			position == null ? message : message + " at " + position.ToString())
 		{
 			Position = position;
+		}
+	}
+
+	public class YuzuUnknown
+	{
+		public string ClassTag;
+		public SortedDictionary<string, object> Fields = new SortedDictionary<string, object>();
+	}
+
+	public class YuzuUnknownStorage
+	{
+		public struct Item
+		{
+			public string Name;
+			public object Value;
+			static public int Comparer(Item i1, Item i2) { return String.CompareOrdinal(i1.Name, i2.Name); }
+		}
+		public List<Item> Fields = new List<Item>();
+		public bool IsOrdered { get; private set; }
+		public YuzuUnknownStorage() { IsOrdered = true; }
+		public void Sort()
+		{
+			if (IsOrdered)
+				return;
+			Fields.Sort(Item.Comparer);
+			IsOrdered = true;
+		}
+		public void Clear()
+		{
+			Fields.Clear();
+			IsOrdered = true;
+		}
+		public virtual void Add(string name, object value)
+		{
+			Fields.Add(new Item { Name = name, Value = value });
+			if (Fields.Count > 1 && IsOrdered)
+				IsOrdered = Item.Comparer(Fields[0], Fields[1]) < 0;
 		}
 	}
 
