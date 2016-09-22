@@ -107,13 +107,6 @@ namespace Lime.Platform
                     return Key.F11;
                 case MacKeyCode.F12:
                     return Key.F12;
-                case MacKeyCode.F13:
-                    return Key.F13;
-                case MacKeyCode.F14:
-                    return Key.F14;
-                case MacKeyCode.F15:
-                    return Key.F15;
-                // F16-F35
                 case MacKeyCode.G:
                     return Key.G;
                 case MacKeyCode.H:
