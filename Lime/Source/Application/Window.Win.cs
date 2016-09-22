@@ -567,15 +567,11 @@ namespace Lime
 				case Keys.Pause:
 					return Key.Pause;
 				case Keys.Menu:
-					return Key.LAlt;
+					return Key.Alt;
 				case Keys.ControlKey:
-					return Key.LControl;
+					return Key.Control;
 				case Keys.ShiftKey:
-					return Key.LShift;
-				case Keys.LShiftKey:
-					return Key.LShift;
-				case Keys.RShiftKey:
-					return Key.RShift;
+					return Key.Shift;
 				case Keys.Tab:
 					return Key.Tab;
 				case Keys.Escape:

@@ -39,12 +39,12 @@ namespace Lime
 
 		public bool IsModifier()
 		{
-			return this >= LShift && this <= Menu;
+			return this >= Shift && this <= Menu;
 		}
 
 		public bool IsAlphanumeric()
 		{
-			return IsLetter() || IsDigit(); 
+			return IsLetter() || IsDigit();
 		}
 
 		public bool IsDigit()
@@ -150,19 +150,9 @@ namespace Lime
 		}
 
 #region Keyboard
-		public static readonly Key LShift = New();
-		public static readonly Key RShift = New();
-		public static readonly Key LControl = New();
-		public static readonly Key RControl = New();
-#if MAC
-		public static readonly Key Command = New();
-#else
-		public static readonly Key Command = LControl;
-#endif
-		public static readonly Key LAlt = New();
-		public static readonly Key RAlt = New();
-		public static readonly Key LWin = New();
-		public static readonly Key RWin = New();
+		public static readonly Key Shift = New();
+		public static readonly Key Control = New();
+		public static readonly Key Alt = New();
 		public static readonly Key Menu = New();
 		public static readonly Key F1 = New();
 		public static readonly Key F2 = New();

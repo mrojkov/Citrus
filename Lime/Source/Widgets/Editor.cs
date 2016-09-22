@@ -260,7 +260,7 @@ namespace Lime
 					Container.RevokeFocus();
 				}
 	#if WIN
-				if (Container.Input.IsKeyPressed(Key.LControl) && WasKeyRepeated(Key.V)) {
+				if (Container.Input.IsKeyPressed(Key.Control) && WasKeyRepeated(Key.V)) {
 					foreach (var ch in Clipboard.Text)
 						InsertChar(ch);
 				}

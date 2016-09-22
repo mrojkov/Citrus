@@ -10,10 +10,9 @@ namespace Lime
 	public enum Modifiers
 	{
 		None = 0,
-		Shift = 1,
+		Alt = 1,
 		Control = 2,
-		Alt = 4,
-		Command = 8
+		Shift = 4,
 	}
 
 	/// <summary>

@@ -73,17 +73,14 @@ namespace Lime
 		public Modifiers GetModifiers()
 		{
 			var result = Modifiers.None;
-			if (IsKeyPressed(Key.LShift) || IsKeyPressed(Key.RShift)) {
+			if (IsKeyPressed(Key.Shift)) {
 				result |= Modifiers.Shift;
 			}
-			if (IsKeyPressed(Key.LAlt) || IsKeyPressed(Key.RAlt)) {
+			if (IsKeyPressed(Key.Alt)) {
 				result |= Modifiers.Alt;
 			}
-			if (IsKeyPressed(Key.LControl) || IsKeyPressed(Key.RControl)) {
+			if (IsKeyPressed(Key.Control)) {
 				result |= Modifiers.Control;
-			}
-			if (IsKeyPressed(Key.Command) ) {
-				result |= Modifiers.Command;
 			}
 			return result;
 		}

@@ -173,17 +173,14 @@ namespace Lime
 		private static Keys ToNativeKeys(Modifiers modifiers)
 		{
 			var keys = Keys.None;
+			if ((modifiers & Modifiers.Alt) != 0) {
+				keys |= Keys.Alt;
+			}
 			if ((modifiers & Modifiers.Control) != 0) {
 				keys |= Keys.Control;
 			}
 			if ((modifiers & Modifiers.Shift) != 0) {
 				keys |= Keys.Shift;
-			}
-			if ((modifiers & Modifiers.Alt) != 0) {
-				keys |= Keys.Alt;
-			}
-			if ((modifiers & Modifiers.Command) != 0) {
-				keys |= Keys.Control;
 			}
 			return keys;
 		}
