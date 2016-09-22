@@ -275,5 +275,15 @@ namespace Lime
 			}
 			return result;
 		}
+
+		public override int GetHashCode()
+		{
+			return (int)ABGR;
+		}
+
+		public override bool Equals(object obj)
+		{
+			return (Color4)obj == this;
+		}
 	}
 }
