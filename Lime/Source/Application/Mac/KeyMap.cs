@@ -53,9 +53,9 @@ namespace Lime.Platform
                 case MacKeyCode.Backspace:
                     return Key.BackSpace;
                 case MacKeyCode.BracketLeft:
-                    return Key.BracketLeft;
+                    return Key.LBracket;
                 case MacKeyCode.BracketRight:
-                    return Key.BracketRight;
+                    return Key.RBracket;
                 case MacKeyCode.C:
                     return Key.C;
                 // Capslock
@@ -121,39 +121,6 @@ namespace Lime.Platform
                     return Key.J;
                 case MacKeyCode.K:
                     return Key.K;
-                case MacKeyCode.KeyPad_0:
-                    return Key.Keypad0;
-                case MacKeyCode.KeyPad_1:
-                    return Key.Keypad1;
-                case MacKeyCode.KeyPad_2:
-                    return Key.Keypad2;
-                case MacKeyCode.KeyPad_3:
-                    return Key.Keypad3;
-                case MacKeyCode.KeyPad_4:
-                    return Key.Keypad4;
-                case MacKeyCode.KeyPad_5:
-                    return Key.Keypad5;
-                case MacKeyCode.KeyPad_6:
-                    return Key.Keypad6;
-                case MacKeyCode.KeyPad_7:
-                    return Key.Keypad7;
-                case MacKeyCode.KeyPad_8:
-                    return Key.Keypad8;
-                case MacKeyCode.KeyPad_9:
-                    return Key.Keypad9;
-                case MacKeyCode.KeyPad_Add:
-                    return Key.KeypadAdd;
-                case MacKeyCode.KeyPad_Decimal:
-                    return Key.KeypadDecimal;
-                case MacKeyCode.KeyPad_Divide:
-                    return Key.KeypadDivide;
-                case MacKeyCode.KeyPad_Enter:
-                    return Key.KeypadEnter;
-                case MacKeyCode.KeyPad_Multiply:
-                    return Key.KeypadMultiply;
-                case MacKeyCode.KeyPad_Subtract:
-                    return Key.KeypadSubtract;
-                //case MacOSKeyCode.KeyPad_Equal;
                 case MacKeyCode.L:
                     return Key.L;
                 case MacKeyCode.Left:
@@ -200,7 +167,7 @@ namespace Lime.Platform
                 case MacKeyCode.Period:
                     return Key.Period;
                 case MacKeyCode.Equals:
-                    return Key.Plus;
+                    return Key.EqualsSign;
                 // PrintScreen
                 case MacKeyCode.Q:
                     return Key.Q;

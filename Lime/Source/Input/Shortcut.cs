@@ -36,6 +36,11 @@ namespace Lime
 			Main = main;
 		}
 
+		public static bool ValidateMainKey(Key key)
+		{
+			return key.IsPrintable() || key.IsTextNavigation() || key.IsTextEditing() || key.IsFunctional() || key == Key.Escape || key == Key.Tab;
+		}
+
 		public static implicit operator Shortcut(Key main) { return new Shortcut(main); }
 
 		public override int GetHashCode()

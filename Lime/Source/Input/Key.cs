@@ -32,19 +32,80 @@ namespace Lime
 
 		public Key(int code) { Code = code; }
 
-		public bool IsMouseButton()
+		public bool IsMouseKey()
 		{
-			return Code >= Mouse0.Code && Code <= Mouse1DoubleClick.Code;
-		}
-
-		public bool IsAffectedByModifiers()
-		{
-			return Code >= F1.Code && Code <= BackSlash.Code;
+			return this >= Mouse0 && this <= Touch3;
 		}
 
 		public bool IsModifier()
 		{
-			return Code >= LShift.Code && Code <= Menu.Code;
+			return this >= LShift && this <= Menu;
+		}
+
+		public bool IsAlphanumeric()
+		{
+			return IsLetter() || IsDigit(); 
+		}
+
+		public bool IsDigit()
+		{
+			return this >= Number0 && this <= Number9;
+		}
+
+		public bool IsLetter()
+		{
+			return this >= A && this <= Z;
+		}
+
+		public bool IsTextNavigation()
+		{
+			return this == PageUp || this == PageDown || this == Home || this == End
+				|| this == Left || this == Right || this == Up || this == Down;
+		}
+
+		public bool IsPrintable()
+		{
+			return IsAlphanumeric() || (this >= Tilde && this <= BackSlash) || this == Space;
+		}
+
+		public bool IsTextEditing()
+		{
+			return this == Delete || this == BackSpace || this == Insert || this == Enter;
+		}
+
+		public bool IsFunctional()
+		{
+			return this >= F1 && this <= F12;
+		}
+
+		public static bool operator == (Key lhs, Key rhs)
+		{
+			return lhs.Code == rhs.Code;
+		}
+
+		public static bool operator != (Key lhs, Key rhs)
+		{
+			return lhs.Code != rhs.Code;
+		}
+
+		public static bool operator > (Key lhs, Key rhs)
+		{
+			return lhs.Code > rhs.Code;
+		}
+
+		public static bool operator < (Key lhs, Key rhs)
+		{
+			return lhs.Code < rhs.Code;
+		}
+
+		public static bool operator >= (Key lhs, Key rhs)
+		{
+			return lhs.Code >= rhs.Code;
+		}
+
+		public static bool operator <= (Key lhs, Key rhs)
+		{
+			return lhs.Code <= rhs.Code;
 		}
 
 		public static IEnumerable<Key> Enumerate()
@@ -52,6 +113,16 @@ namespace Lime
 			for (int i = 0; i < Count; i++) {
 				yield return (Key)i;
 			}
+		}
+
+		public override int GetHashCode()
+		{
+			return Code;
+		}
+
+		public override bool Equals(object obj)
+		{
+			return (Key)obj == this;
 		}
 
 		public static implicit operator Key (int code) { return new Key(code); }
@@ -64,7 +135,7 @@ namespace Lime
 
 		public static Key MapShortcut(Shortcut shortcut)
 		{
-			if (!shortcut.Main.IsAffectedByModifiers()) {
+			if (!Shortcut.ValidateMainKey(shortcut.Main)) {
 				throw new ArgumentException();
 			}
 			if (shortcut.Modifiers == Modifiers.None) {
@@ -125,25 +196,6 @@ namespace Lime
 		public static readonly Key ScrollLock = New();
 		public static readonly Key PrintScreen = New();
 		public static readonly Key Pause = New();
-		public static readonly Key NumLock = New();
-		public static readonly Key Keypad0 = New();
-		public static readonly Key Keypad1 = New();
-		public static readonly Key Keypad2 = New();
-		public static readonly Key Keypad3 = New();
-		public static readonly Key Keypad4 = New();
-		public static readonly Key Keypad5 = New();
-		public static readonly Key Keypad6 = New();
-		public static readonly Key Keypad7 = New();
-		public static readonly Key Keypad8 = New();
-		public static readonly Key Keypad9 = New();
-		public static readonly Key KeypadDivide = New();
-		public static readonly Key KeypadMultiply = New();
-		public static readonly Key KeypadMinus = New();
-		public static readonly Key KeypadSubtract = New();
-		public static readonly Key KeypadAdd = New();
-		public static readonly Key KeypadPlus = New();
-		public static readonly Key KeypadDecimal = New();
-		public static readonly Key KeypadEnter = New();
 		public static readonly Key A = New();
 		public static readonly Key B = New();
 		public static readonly Key C = New();
@@ -182,10 +234,8 @@ namespace Lime
 		public static readonly Key Number9 = New();
 		public static readonly Key Tilde = New();
 		public static readonly Key Minus = New();
-		public static readonly Key Plus = New();
+		public static readonly Key EqualsSign = New();
 		public static readonly Key LBracket = New();
-		public static readonly Key BracketLeft = New();
-		public static readonly Key BracketRight = New();
 		public static readonly Key RBracket = New();
 		public static readonly Key Semicolon = New();
 		public static readonly Key Quote = New();
@@ -209,14 +259,8 @@ namespace Lime
 		/// </summary>
 		public static readonly Key Mouse2 = New();
 
-		public static readonly Key Touch0 = New();
-		public static readonly Key Touch1 = New();
-		public static readonly Key Touch2 = New();
-		public static readonly Key Touch3 = New();
-
 		public static readonly Key MouseWheelUp = New();
 		public static readonly Key MouseWheelDown = New();
-		public static readonly Key DismissSoftKeyboard = New();
 
 		/// <summary>
 		/// The double click with the left mouse button.
@@ -227,6 +271,13 @@ namespace Lime
 		/// The double click with the right mouse button.
 		/// </summary>
 		public static readonly Key Mouse1DoubleClick = New();
+
+		public static readonly Key Touch0 = New();
+		public static readonly Key Touch1 = New();
+		public static readonly Key Touch2 = New();
+		public static readonly Key Touch3 = New();
+
+		public static readonly Key DismissSoftKeyboard = New();
 #endregion
 
 		public static class Commands

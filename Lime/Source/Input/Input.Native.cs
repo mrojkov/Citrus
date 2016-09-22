@@ -218,7 +218,7 @@ namespace Lime
 				ReleaseAffectedByModifierKeys();
 			}
 			key = TranslateShortcuts(key);
-			if (key.IsAffectedByModifiers() && GetModifiers() != Modifiers.None) {
+			if (Shortcut.ValidateMainKey(key) && GetModifiers() != Modifiers.None) {
 				return;
 			}
 			keyEventQueue.Add(new KeyEvent { Key = key, State = value });
@@ -240,7 +240,7 @@ namespace Lime
 		private void ReleaseAffectedByModifierKeys()
 		{
 			for (var i = 0; i < Key.Count; i++) {
-				if (keys[i].CurrentState && ((Key)i).IsAffectedByModifiers()) {
+				if (keys[i].CurrentState && Shortcut.ValidateMainKey((Key)i)) {
 					SetKeyState(i, false);
 				}
 			}
