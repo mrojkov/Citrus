@@ -223,7 +223,7 @@ namespace Lime
 		}
 
 		static readonly List<Key> consumingKeys = Key.Enumerate().Where(
-			k => k.IsPrintable() || k.IsTextNavigation() || k.IsTextEditing() || k == Key.Escape).ToList();
+			k => k.IsPrintable() || k.IsTextNavigation() || k.IsTextEditing()).ToList();
 
 		private void HandleKeys(string originalText)
 		{
@@ -257,6 +257,7 @@ namespace Lime
 				}
 				if (WasKeyRepeated(Key.Escape)) {
 					Text.Text = originalText;
+					Container.Input.ConsumeKey(Key.Escape);
 					Container.RevokeFocus();
 				}
 	#if WIN
