@@ -27,7 +27,7 @@ namespace Lime
 
 		public bool IsModifier()
 		{
-			return this >= Shift && this <= Menu;
+			return this >= Shift && this <= Win;
 		}
 
 		public bool IsAlphanumeric()
@@ -169,7 +169,7 @@ namespace Lime
 		public static readonly Key Shift = New();
 		public static readonly Key Control = New();
 		public static readonly Key Alt = New();
-		public static readonly Key Menu = New();
+		public static readonly Key Win = New();
 		public static readonly Key F1 = New();
 		public static readonly Key F2 = New();
 		public static readonly Key F3 = New();

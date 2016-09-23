@@ -44,7 +44,7 @@ namespace Lime.Platform
                 case MacKeyCode.A:
                     return Key.A;
                 case MacKeyCode.OptionAlt:
-                    return Key.LAlt;
+                    return Key.Alt;
                 // RAlt
                 case MacKeyCode.B:
                     return Key.B;
@@ -63,7 +63,7 @@ namespace Lime.Platform
                 case MacKeyCode.Comma:
                     return Key.Comma;
                 case MacKeyCode.Control:
-                    return Key.LControl;
+                    return Key.Control;
                 // RControl
                 case MacKeyCode.D:
                     return Key.D;
@@ -128,8 +128,6 @@ namespace Lime.Platform
                 case MacKeyCode.M:
                     return Key.M;
                 //Key.MaxKeys 
-                case MacKeyCode.Menu:
-                    return Key.Menu;
                 case MacKeyCode.Minus:
                     return Key.Minus;
                 case MacKeyCode.N:
@@ -183,7 +181,7 @@ namespace Lime.Platform
                 case MacKeyCode.Semicolon:
                     return Key.Semicolon;
                 case MacKeyCode.Shift:
-                    return Key.LShift;
+                    return Key.Shift;
                 //Key.RShift 
                 case MacKeyCode.Slash:
                     return Key.Slash;
@@ -204,8 +202,6 @@ namespace Lime.Platform
                     return Key.V;
                 case MacKeyCode.W:
                     return Key.W;
-                case MacKeyCode.Command:
-                    return Key.Command;
                 case MacKeyCode.X:
                     return Key.X;
                 case MacKeyCode.Y:

@@ -135,14 +135,14 @@ namespace Lime.Platform
 		}
 
 		private readonly static Dictionary<MacKeyModifiers, Key> modifiersToKeys = new Dictionary<MacKeyModifiers, Key> {
-			{ MacKeyModifiers.LShiftFlag, Key.LShift },
-			{ MacKeyModifiers.RShiftFlag, Key.RShift },
-			{ MacKeyModifiers.LCtrlFlag, Key.LControl },
-			{ MacKeyModifiers.RCtrlFlag, Key.RControl },
-			{ MacKeyModifiers.LAltFlag, Key.LAlt },
-			{ MacKeyModifiers.RAltFlag, Key.RAlt },
-			{ MacKeyModifiers.LWinFlag, Key.LWin },
-			{ MacKeyModifiers.RWinFlag, Key.RWin } 
+			{ MacKeyModifiers.LShiftFlag, Key.Shift },
+			{ MacKeyModifiers.RShiftFlag, Key.Shift },
+			{ MacKeyModifiers.LCtrlFlag, Key.Control },
+			{ MacKeyModifiers.RCtrlFlag, Key.Control },
+			{ MacKeyModifiers.LAltFlag, Key.Alt },
+			{ MacKeyModifiers.RAltFlag, Key.Alt },
+			{ MacKeyModifiers.LWinFlag, Key.Win },
+			{ MacKeyModifiers.RWinFlag, Key.Win },
 		};
 
 		public override void FlagsChanged(NSEvent theEvent)

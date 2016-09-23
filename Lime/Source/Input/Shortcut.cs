@@ -13,6 +13,18 @@ namespace Lime
 		Alt = 1,
 		Control = 2,
 		Shift = 4,
+		Win = 8,
+#if MAC
+		/// <summary>
+		/// Command modifier corresponds Control on Windows and Command key on Mac.
+		/// </summary>
+		Command = Win,
+#else
+		/// <summary>
+		/// Command modifier corresponds Control on Windows and Command key on Mac.
+		/// </summary>
+		Command = Control,
+#endif
 	}
 
 	/// <summary>
@@ -73,6 +85,13 @@ namespace Lime
 			}
 			if ((Modifiers & Modifiers.Shift) != 0) {
 				r += "Shift+";
+			}
+			if ((Modifiers & Modifiers.Command) != 0) {
+				#if MAC				
+				r += "Cmd+";
+				#else
+				r += "Win+";
+				#endif
 			}
 			return r + Main;
 		}
