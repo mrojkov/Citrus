@@ -323,7 +323,7 @@ namespace RainbowDash
 			}
 			worldContainer.AddNode(topContainer);
 			topContainer.CenterOnParent();
-			topContainer.Input.CaptureAll();
+			topContainer.Input.RestrictScope();
 			topContainer.Tasks.Add(RefreshTask);
 		}
 
@@ -435,7 +435,7 @@ namespace RainbowDash
 		{
 			instance = null;
 			topContainer.Unlink();
-			topContainer.Input.ReleaseAll();
+			topContainer.Input.DerestrictScope();
 			if (Hidden != null) {
 				Hidden();
 			}

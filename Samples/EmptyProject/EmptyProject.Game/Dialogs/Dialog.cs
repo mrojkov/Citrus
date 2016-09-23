@@ -54,7 +54,7 @@ namespace EmptyProject.Dialogs
 			Root.Update(0);
 			Root.Updating += Tasks.Update;
 			Lime.Application.InvokeOnMainThread(() => {
-				Root.Input.CaptureAll();
+				Root.Input.RestrictScope();
 			});
 
 			DisplayInfo.BeforeOrientationOrResolutionChanged += OnBeforeOrientationOrResolutionChanged;

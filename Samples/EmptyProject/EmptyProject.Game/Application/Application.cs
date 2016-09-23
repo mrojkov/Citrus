@@ -107,13 +107,13 @@ namespace EmptyProject.Application
 			lock (uiSync) {
 				Cheats.ProcessCheatKeys();
 				var speedMultiplier = 1.0f;
-				if (Cheats.IsKeyPressed(Key.LShift) || Cheats.IsTripleTouch()) {
+				if (Cheats.IsKeyPressed(Key.Shift) || Cheats.IsTripleTouch()) {
 					speedMultiplier = 10.0f;
 				}
 				if (Cheats.IsKeyPressed(Key.Tilde)) {
 					speedMultiplier = 0.1f;
 				}
-				Lime.Debug.BreakOnButtonClick = The.Window.Input.IsKeyPressed(Key.LAlt);
+				Lime.Debug.BreakOnButtonClick = The.Window.Input.IsKeyPressed(Key.Alt);
 
 				delta *= speedMultiplier;
 				The.World.Update(delta);

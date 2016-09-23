@@ -25,7 +25,7 @@ namespace EmptyProject.Dialogs
 			}
 			frame = new Frame();
 			frame.PushToNode(The.World);
-			frame.Input.CaptureAll();
+			frame.Input.RestrictScope();
 			image.PushToNode(frame);
 			var tasks = new TaskList { MainTask(doFadeIn, doFadeOut) };
 			image.Updating += tasks.Update;
@@ -39,7 +39,7 @@ namespace EmptyProject.Dialogs
 					yield return 0;
 				}
 			}
-			frame.Input.ReleaseAll();
+			frame.Input.DerestrictScope();
 			action.SafeInvoke();
 			if (doFadeOut) {
 				for (float t = 0; t < FadeTime; t += Task.Current.Delta) {
@@ -61,10 +61,10 @@ namespace EmptyProject.Dialogs
 				Size = The.World.Size
 			};
 			frame.PushToNode(The.World);
-			frame.Input.CaptureAll();
+			frame.Input.RestrictScope();
 			frame.RunAnimation("Show");
 			frame.AnimationStopped += () => {
-				frame.Input.ReleaseAll();
+				frame.Input.DerestrictScope();
 				action.SafeInvoke();
 				frame.RunAnimation("Hide");
 				frame.AnimationStopped += () => {
