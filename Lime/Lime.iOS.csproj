@@ -50,6 +50,7 @@
     <Reference Include="Lzma">
       <HintPath>..\3rdParty\Lzma\bin\Release\Lzma.dll</HintPath>
     </Reference>
+    <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

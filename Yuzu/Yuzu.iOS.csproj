@@ -107,6 +107,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="Xamarin.iOS" />
+    <Reference Include="System.Core" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ItemGroup>
@@ -124,5 +125,13 @@
     <Compile Include="BinaryGenerators.cs" />
     <Compile Include="ReaderDeserializer.cs" />
     <Compile Include="UnsafeReader.cs" />
+    <Compile Include="Grisu\DiyFp.cs" />
+    <Compile Include="Grisu\Grisu.cs" />
+    <Compile Include="Grisu\GrisuDouble.cs" />
+    <Compile Include="Grisu\PowersOfTenCache.cs" />
+    <Compile Include="JsonHelpers.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Grisu\LICENSE" />
   </ItemGroup>
 </Project>
