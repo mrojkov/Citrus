@@ -650,7 +650,7 @@ namespace Lime
 			if (Focused == value) {
 				return;
 			}
-			if (value != null) {
+			if (value != null && value is IText) {
 				Application.SoftKeyboard.Show(true, value.Text);
 			} else {
 				Application.SoftKeyboard.Show(false, "");
