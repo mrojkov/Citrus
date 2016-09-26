@@ -176,7 +176,10 @@ namespace Yuzu
 		}
 		public List<Item> Fields = new List<Item>();
 		public bool IsOrdered { get; private set; }
+		internal object Internal;
+
 		public YuzuUnknownStorage() { IsOrdered = true; }
+
 		public void Sort()
 		{
 			if (IsOrdered)

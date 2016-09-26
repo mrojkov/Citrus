@@ -65,6 +65,7 @@ namespace Yuzu.Binary
 		public class FieldDef
 		{
 			public string Name;
+			public Type Type;
 			public int OurIndex; // 1-based
 			public Action<object> ReadFunc;
 		}
@@ -75,5 +76,4 @@ namespace Yuzu.Binary
 		public Func<BinaryDeserializer, ReaderClassDef, object> Make;
 		public List<FieldDef> Fields = new List<FieldDef> { new FieldDef { OurIndex = EOF } };
 	}
-
 }

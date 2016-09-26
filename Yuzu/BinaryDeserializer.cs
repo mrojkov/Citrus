@@ -244,8 +244,8 @@ namespace Yuzu.Binary
 		{
 			if (!Options.AllowUnknownFields)
 				throw Error("New field {0} for class {1}", fieldName, typeName);
-			var rf = ReadValueFunc(ReadType());
-			var fd = new ReaderClassDef.FieldDef { Name = fieldName, OurIndex = -1 };
+			var fd = new ReaderClassDef.FieldDef { Name = fieldName, OurIndex = -1, Type = ReadType() };
+			var rf = ReadValueFunc(fd.Type);
 			if (def.Meta.GetUnknownStorage == null)
 				fd.ReadFunc = obj => rf();
 			else
@@ -268,10 +268,12 @@ namespace Yuzu.Binary
 			var ourCount = result.Meta.Items.Count;
 			var theirCount = Reader.ReadInt16();
 			int ourIndex = 0, theirIndex = 0;
+			var theirName = "";
 			while (ourIndex < ourCount && theirIndex < theirCount) {
 				var yi = result.Meta.Items[ourIndex];
 				var ourName = yi.Tag(Options);
-				var theirName = Reader.ReadString();
+				if (theirName == "")
+					theirName = Reader.ReadString();
 				var cmp = String.CompareOrdinal(ourName, theirName);
 				if (cmp < 0) {
 					if (!yi.IsOptional)
@@ -281,12 +283,14 @@ namespace Yuzu.Binary
 				else if (cmp > 0) {
 					AddUnknownFieldDef(result, theirName, typeName);
 					theirIndex += 1;
+					theirName = "";
 				}
 				else {
 					if (!ReadCompatibleType(yi.Type))
 						throw Error(
 							"Incompatible type for field {0}, expected {1}", ourName, yi.Type.Name);
-					var fieldDef = new ReaderClassDef.FieldDef { Name = theirName, OurIndex = ourIndex + 1 };
+					var fieldDef = new ReaderClassDef.FieldDef {
+						Name = theirName, OurIndex = ourIndex + 1, Type = yi.Type };
 					if (yi.SetValue != null) {
 						var rf = ReadValueFunc(yi.Type);
 						fieldDef.ReadFunc = obj => yi.SetValue(obj, rf());
@@ -298,6 +302,7 @@ namespace Yuzu.Binary
 					result.Fields.Add(fieldDef);
 					ourIndex += 1;
 					theirIndex += 1;
+					theirName = "";
 				}
 			}
 			for (; ourIndex < ourCount; ++ourIndex) {
@@ -306,8 +311,12 @@ namespace Yuzu.Binary
 				if (!yi.IsOptional)
 					throw Error("Missing required field {0} for class {1}", ourName, typeName);
 			}
-			for (; theirIndex < theirCount; ++theirIndex)
-				AddUnknownFieldDef(result, Reader.ReadString(), typeName);
+			for (; theirIndex < theirCount; ++theirIndex) {
+				if (theirName == "")
+					theirName = Reader.ReadString();
+				AddUnknownFieldDef(result, theirName, typeName);
+				theirName = "";
+			}
 			classDefs.Add(result);
 			return result;
 		}
@@ -321,8 +330,11 @@ namespace Yuzu.Binary
 						def.Fields[i].ReadFunc(obj);
 				}
 				else {
-					if (def.Meta.GetUnknownStorage != null)
-						def.Meta.GetUnknownStorage(obj).Clear();
+					if (def.Meta.GetUnknownStorage != null) {
+						var storage = def.Meta.GetUnknownStorage(obj);
+						storage.Clear();
+						storage.Internal = def;
+					}
 					var actualIndex = d.Reader.ReadInt16();
 					for (int i = 1; i < def.Fields.Count; ++i) {
 						var fd = def.Fields[i];

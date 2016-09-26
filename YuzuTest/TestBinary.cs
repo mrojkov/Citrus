@@ -957,14 +957,16 @@ namespace YuzuTest.Binary
 		[TestMethod]
 		public void TestUnknownStorage()
 		{
+			var bs = new BinarySerializer();
 			var bd = new BinaryDeserializer();
 			bd.Options.AllowUnknownFields = true;
 
-			var w = new SampleUnknown();
-			bd.FromBytes(w, SX(
+			var data =
 				"20 01 00 " + XS(typeof(SampleUnknown)) + " 03 00 " +
 				XS("A", RoughType.String, "X", RoughType.Int, "Z", RoughType.Bool) +
-				" 01 00 " + XS("qq") + " 02 00 02 01 00 00 03 00 01 00 00"));
+				" 01 00 " + XS("qq") + " 02 00 02 01 00 00 03 00 01 00 00";
+			var w = new SampleUnknown();
+			bd.FromBytes(w, SX(data));
 			Assert.AreEqual(258, w.X);
 			Assert.AreEqual(2, w.Storage.Fields.Count);
 			Assert.AreEqual("A", w.Storage.Fields[0].Name);
@@ -972,8 +974,36 @@ namespace YuzuTest.Binary
 			Assert.AreEqual("Z", w.Storage.Fields[1].Name);
 			Assert.AreEqual(true, w.Storage.Fields[1].Value);
 
+			Assert.AreEqual(data, XS(bs.ToBytes(w)));
+
 			bd.FromBytes(w, SX("20 01 00 00 00"));
 			Assert.AreEqual(0, w.Storage.Fields.Count);
+
+			Assert.AreEqual("20 01 00 00 00", XS(bs.ToBytes(new SampleUnknown())));
+
+			bd.ClearClassIds();
+			bs.ClearClassIds();
+			bd.FromBytes(w, SX(
+				"20 01 00 " + XS(typeof(SampleUnknown)) + " 02 00 " +
+				XS("A", RoughType.String, "Z", RoughType.Bool) +
+				" 01 00 " + XS("tt") + " 02 00 01 00 00"));
+			Assert.AreEqual(2, w.Storage.Fields.Count);
+			Assert.AreEqual("A", w.Storage.Fields[0].Name);
+			Assert.AreEqual("tt", w.Storage.Fields[0].Value);
+			Assert.AreEqual("Z", w.Storage.Fields[1].Name);
+			Assert.AreEqual(true, w.Storage.Fields[1].Value);
+			Assert.AreEqual(258, w.X);
+
+			w.X = 0;
+			Assert.AreEqual(
+				"20 01 00 " + XS(typeof(SampleUnknown)) + " 03 00 " +
+				XS("A", RoughType.String, "X", RoughType.Int, "Z", RoughType.Bool) +
+				" 01 00 " + XS("tt") + " 03 00 01 00 00",
+				XS(bs.ToBytes(w)));
+
+			bs.ClearClassIds();
+			bs.ToBytes(new SampleUnknown());
+			XAssert.Throws<YuzuException>(() => bs.ToBytes(w), "SampleUnknown");
 		}
 
 		[TestMethod]

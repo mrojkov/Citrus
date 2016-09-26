@@ -233,4 +233,9 @@ namespace Yuzu.Util
 		public override void Add(string name, object value) { }
 	}
 
+	internal class BoxedInt
+	{
+		public int Value = 0;
+	}
+
 }
