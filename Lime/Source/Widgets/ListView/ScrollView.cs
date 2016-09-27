@@ -93,6 +93,14 @@ namespace Lime
 			CanScroll = true;
 			Content = CreateContentWidget();
 			Content.ScrollDirection = ScrollDirection;
+			if (ScrollDirection == ScrollDirection.Vertical) {
+				Content.Width = Frame.Width;
+				Content.Height = 0;
+			}
+			else {
+				Content.Width = 0;
+				Content.Height = Frame.Height;
+			}
 			Content.PushToNode(Frame);
 			if (processChildrenFirst) {
 				Content.LateTasks.Add(MainTask());

@@ -178,6 +178,7 @@
     <Compile Include="Source\Widgets\3D\WidgetAdapter3D.cs" />
     <Compile Include="Source\Widgets\3D\IRenderObject3D.cs" />
     <Compile Include="Source\Widgets\3D\MaterialTechnique.cs" />
+    <Compile Include="Source\Widgets\ListView\ScrollViewWidget.cs" />
     <Compile Include="Source\Widgets\Text\IText.cs" />
     <Compile Include="Source\Widgets\ListView\ExpandableListItem.cs" />
     <Compile Include="Source\Widgets\ListView\ListView.cs" />
