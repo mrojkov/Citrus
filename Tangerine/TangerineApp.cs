@@ -208,11 +208,15 @@ namespace Tangerine
 		void CreateMainMenu()
 		{
 			Application.MainMenu = new Menu {
-				new Command("Application", new Shortcut(Modifiers.Command, Key.Q)) {
+				new Command("Application") {
 					Submenu = new Menu {
 						new PreferencesCommand(),
 						Command.MenuSeparator, 
+						#if MAC
 						new DelegateCommand("Quit", new Shortcut(Modifiers.Command, Key.Q), Application.Exit),
+						#else
+						new DelegateCommand("Quit", new Shortcut(Modifiers.Alt, Key.F4), Application.Exit),
+						#endif
 					}
 				},
 				new Command("File") {

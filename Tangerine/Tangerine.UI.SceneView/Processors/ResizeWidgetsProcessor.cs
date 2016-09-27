@@ -54,10 +54,10 @@ namespace Tangerine.UI.SceneView
 				var mousePos = sv.MousePosition;
 				while (sv.Input.IsMousePressed()) {
 					Utils.ChangeCursorIfDefault(cursor);
-					var proportional = sv.Input.IsKeyPressed(Key.LShift);
+					var proportional = sv.Input.IsKeyPressed(Key.Shift);
 					foreach (var widget in widgets) {
 						if (sv.MousePosition != mousePos) {
-							if (sv.Input.IsKeyPressed(Key.LControl)) {
+							if (sv.Input.IsKeyPressed(Key.Control)) {
 								RescaleWidget(widget, controlPointIndex, sv.MousePosition, mousePos, pivot, proportional);
 							} else {
 								ResizeWidget(widget, controlPointIndex, sv.MousePosition, mousePos, proportional);

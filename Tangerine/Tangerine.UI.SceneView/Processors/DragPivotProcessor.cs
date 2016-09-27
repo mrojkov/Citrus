@@ -17,7 +17,7 @@ namespace Tangerine.UI.SceneView
 				Quadrangle hull;
 				Vector2 pivot;
 				if (
-					sv.Input.IsKeyPressed(Key.LControl) &&
+					sv.Input.IsKeyPressed(Key.Control) &&
 					Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out pivot) &&
 					(pivot - sv.MousePosition).Length < 10 / sv.Scene.Scale.X)
 				{
@@ -51,7 +51,7 @@ namespace Tangerine.UI.SceneView
 				while (sv.Input.IsMousePressed()) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					var curMousePos = sv.MousePosition;
-					var shiftPressed = sv.Input.IsKeyPressed(Key.LShift);
+					var shiftPressed = sv.Input.IsKeyPressed(Key.Shift);
 					if (shiftPressed && dragDirection != DragDirection.Any) {
 						if (dragDirection == DragDirection.Horizontal) {
 							curMousePos.Y = iniMousePos.Y;

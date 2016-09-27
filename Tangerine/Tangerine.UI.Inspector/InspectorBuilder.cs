@@ -14,7 +14,7 @@ namespace Tangerine.UI.Inspector
 
 		public void Build(IEnumerable<object> objects)
 		{
-			Inspector.ScrollableWidget.Nodes.Clear();
+			Inspector.ContentWidget.Nodes.Clear();
 			Inspector.Editors.Clear();
 			foreach (var t in GetTypes(objects)) {
 				var o = objects.Where(i => t.IsInstanceOfType(i)).ToList();
@@ -63,9 +63,9 @@ namespace Tangerine.UI.Inspector
 						}
 					};
 					label.CompoundPresenter.Add(new WidgetFlatFillPresenter(InspectorColors.CategoryLabelBackground));
-					Inspector.ScrollableWidget.AddNode(label);
+					Inspector.ContentWidget.AddNode(label);
 				}
-				var context = new PropertyEditorContext(Inspector.ScrollableWidget, objects, type, property.Name);
+				var context = new PropertyEditorContext(Inspector.ContentWidget, objects, type, property.Name);
 				foreach (var i in Inspector.PropertyEditorRegistry) {
 					if (i.Condition(context)) {
 						var propertyEditor = i.Builder(context);

@@ -25,7 +25,7 @@ namespace Tangerine.UI.Timeline
 				}
 				var initialMousePosition = input.MousePosition;
 				var row = MousePositionToRow(initialMousePosition);
-				if (input.IsKeyPressed(Key.LShift)) {
+				if (input.IsKeyPressed(Key.Shift)) {
 					if (Document.Current.SelectedRows.Count > 0) {
 						Core.Operations.ClearRowSelection.Perform();
 						Core.Operations.SelectRowRange.Perform(Document.Current.SelectedRows[0], row);

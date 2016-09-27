@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
-
+	
 namespace Tangerine.UI.SceneView
 {
 	public class RotateWidgetsProcessor : IProcessor
@@ -80,7 +80,7 @@ namespace Tangerine.UI.SceneView
 
 		float GetSnappedRotation(float rotation)
 		{
-			if (sv.Input.IsKeyPressed(Key.LShift)) {
+			if (sv.Input.IsKeyPressed(Key.Shift)) {
 				return ((rotation / 15f).Round() * 15f).Snap(0);
 			} else {
 				return rotation.Snap(0);

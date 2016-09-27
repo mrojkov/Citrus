@@ -30,8 +30,8 @@
     <EnableCodeSigning>false</EnableCodeSigning>
     <EnablePackageSigning>false</EnablePackageSigning>
     <XamMacArch>x86_64</XamMacArch>
-    <HttpClientHandler>HttpClientHandler</HttpClientHandler>
-    <LinkMode>None</LinkMode>
+    <HttpClientHandler>NSUrlSessionHandler</HttpClientHandler>
+    <LinkMode>SdkOnly</LinkMode>
     <TlsProvider>Default</TlsProvider>
     <PackageSigningKey>Developer ID Installer</PackageSigningKey>
     <CodeSignEntitlements></CodeSignEntitlements>

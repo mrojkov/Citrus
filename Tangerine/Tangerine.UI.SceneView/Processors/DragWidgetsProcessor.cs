@@ -44,7 +44,7 @@ namespace Tangerine.UI.SceneView
 				while (sv.Input.IsMousePressed()) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 					var curMousePos = sv.MousePosition;
-					var shiftPressed = sv.Input.IsKeyPressed(Key.LShift);
+					var shiftPressed = sv.Input.IsKeyPressed(Key.Shift);
 					if (shiftPressed && dragDirection != DragDirection.Any) {
 						if (dragDirection == DragDirection.Horizontal) {
 							curMousePos.Y = iniMousePos.Y;

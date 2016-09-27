@@ -14,20 +14,74 @@ namespace Tangerine.UI
 		public readonly Frame RootWidget;
 		readonly EditBox searchStringEditor;
 		readonly Widget resultPane;
+		readonly ScrollViewWidget scrollView;
+		private List<Node> results = new List<Node>();
+		private int selectedIndex;
+		private int rowHeight = DesktopTheme.Metrics.TextHeight;
 
 		public SearchPanel(Widget rootWidget)
 		{
 			PanelWidget = rootWidget;
+			scrollView = new ScrollViewWidget();
 			RootWidget = new Frame { Id = "SearchPanel",
 				Padding = new Thickness(4),
-				Layout = new VBoxLayout(),
+				Layout = new VBoxLayout { Spacing = 4 },
 				Nodes = {
 					(searchStringEditor = new EditBox()),
-					(resultPane = new Frame { ClipChildren = ClipMethod.ScissorTest })
+					scrollView
 				}
 			};
+			resultPane = scrollView.Content;
 			RootWidget.Tasks.Add(new Property<string>(() => searchStringEditor.Text).DistinctUntilChanged().Consume(RefreshResultPane));
-			//RefreshResultPane("t");
+			scrollView.TabTravesable = new TabTraversable();
+			resultPane.CompoundPresenter.Insert(0, new DelegatePresenter<Widget>(w => {
+				w.PrepareRendererState();
+				if (scrollView.IsFocused() && results.Count > 0) {
+					Renderer.DrawRect(0, rowHeight * selectedIndex, w.Width, (selectedIndex + 1) * rowHeight, DesktopTheme.Colors.SelectedBackground);
+				}
+			}));
+			scrollView.Input.KeyRepeated += (input, key) => {
+				try {
+					if (results.Count == 0) {
+						return;
+					}
+					if (key == Key.Mouse0) {
+						scrollView.SetFocus();
+						selectedIndex = (resultPane.Input.LocalMousePosition.Y / rowHeight).Floor().Clamp(0, results.Count - 1);
+					} else if (key == Key.Down) {
+						selectedIndex++;
+					} else if (key == Key.Up) {
+						selectedIndex--;
+					} else if (key == Key.Escape) {
+						scrollView.RevokeFocus();
+					} else if (key == Key.Enter || key == Key.Mouse0DoubleClick) {
+						Core.Operations.ClearRowSelection.Perform();
+						var node = results[selectedIndex];
+						Core.Operations.EnterNode.Perform(node.Parent, selectFirstNode: false);
+						Core.Operations.SelectNode.Perform(node);
+					} else {
+						return;
+					}
+					selectedIndex = selectedIndex.Clamp(0, results != null ? results.Count - 1 : 0);
+					EnsureRowVisible(selectedIndex);
+					Window.Current.Invalidate();
+				} finally {
+					input.ConsumeKey(Key.Up);
+					input.ConsumeKey(Key.Down);
+					input.ConsumeKey(Key.Enter);
+					input.ConsumeKey(Key.Escape);
+				}
+			};
+		}
+
+		void EnsureRowVisible(int row)
+		{
+			while ((row + 1) * rowHeight > scrollView.ScrollPosition + scrollView.Height) {
+				scrollView.ScrollPosition++;
+			}
+			while (row * rowHeight < scrollView.ScrollPosition) {
+				scrollView.ScrollPosition--;
+			}
 		}
 
 		void RefreshResultPane(string searchString)
@@ -37,7 +91,8 @@ namespace Tangerine.UI
 				return;
 			}
 			var searchStringLowercase = searchString.Trim().ToLower();
-			var results = Document.Current.RootNode.Descendants.Where(i => i.Id != null && i.Id.ToLower().Contains(searchStringLowercase)).ToList();
+			results = Document.Current.RootNode.Descendants.Where(i => i.Id != null && i.Id.ToLower().
+				Contains(searchStringLowercase)).OrderBy(i => i.Id.ToLower()).ToList();
 			resultPane.Nodes.Clear();
 			resultPane.Layout = new TableLayout {
 				ColCount = 3,
@@ -52,11 +107,10 @@ namespace Tangerine.UI
 			foreach (var node in results) {
 				resultPane.Nodes.Add(new SimpleText(node.Id));
 				resultPane.Nodes.Add(new SimpleText(GetTypeName(node)));
-				resultPane.Nodes.Add(new SimpleText(GetContainerPath(node)) {
-					AutoSizeConstraints = false,
-					OverflowMode = TextOverflowMode.Ignore // Use 'Ignore' because ellipsis by default is toooo slow.
-				});
+				resultPane.Nodes.Add(new SimpleText(GetContainerPath(node)));
 			}
+			selectedIndex = 0;
+			scrollView.ScrollPosition = scrollView.MinScrollPosition;
 		}
 
 		static string GetTypeName(Node node)
@@ -90,30 +144,6 @@ namespace Tangerine.UI
 		{
 			Instance = null;
 			RootWidget.Unlink();
-		}
-	}
-
-	class DataGridView
-	{
-		public readonly Widget Widget;
-
-		public class ColumnHeader
-		{
-			public string Text;
-			public float Stretch;
-		}
-
-		public class Row
-		{
-			public List<string> Cells = new List<string>();
-		}
-
-		public List<ColumnHeader> ColumnHeaders = new List<ColumnHeader>();
-		public List<Row> Rows = new List<Row>();
-
-		public DataGridView()
-		{
-			
 		}
 	}
 }

@@ -15,8 +15,8 @@ namespace Tangerine.UI.Inspector
 		public static Inspector Instance { get; private set; }
 
 		public readonly Widget PanelWidget;
-		public readonly Frame RootWidget;
-		public readonly Widget ScrollableWidget;
+		public readonly ScrollViewWidget RootWidget;
+		public readonly Widget ContentWidget;
 		public readonly List<object> Objects;
 		public readonly List<PropertyEditorRegistryItem> PropertyEditorRegistry;
 		public readonly List<IPropertyEditor> Editors;
@@ -36,21 +36,15 @@ namespace Tangerine.UI.Inspector
 		public Inspector(Widget panelWidget)
 		{
 			PanelWidget = panelWidget;
-			RootWidget = new Frame();
-			ScrollableWidget = new ScrollView((Frame)RootWidget).Content;
+			RootWidget = new ScrollViewWidget();
+			ContentWidget = RootWidget.Content;
+			ContentWidget.Layout = new VBoxLayout { Tag = "InspectorContent", Spacing = 4 };
+			ContentWidget.Padding = new Thickness { Left = 4, Top = 4, Right = 12, Bottom = 4 };
 			Objects = new List<object>();
 			PropertyEditorRegistry = new List<PropertyEditorRegistryItem>();
 			Editors = new List<IPropertyEditor>();
 			RegisterEditors();
-			InitializeWidgets();
 			RootWidget.Tasks.Add(RebuildInspectorWhenSelectedRowsChanged());
-		}
-
-		void InitializeWidgets()
-		{
-			RootWidget.Layout = new StackLayout { VerticallySizeable = true };
-			ScrollableWidget.Layout = new VBoxLayout { Tag = "InspectorContent", Spacing = 4 };
-			ScrollableWidget.Padding = new Thickness(4);
 		}
 
 		private void RegisterEditors()

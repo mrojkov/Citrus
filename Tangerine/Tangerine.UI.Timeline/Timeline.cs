@@ -126,7 +126,8 @@ namespace Tangerine.UI.Timeline
 
 		IProcessor EnsureCurrentColumnVisibleOnContainerChange()
 		{
-			return new Property<Node>(() => Document.Current.Container).DistinctUntilChanged().Consume(_ => EnsureColumnVisible(Document.Current.AnimationFrame));
+			return new Property<Node>(() => Document.Current.Container).
+				DistinctUntilChanged().Consume(_ => EnsureColumnVisible(Document.Current.AnimationFrame));
 		}
 
 		void SetCurrentFrameRecursive(Node node, int frame)

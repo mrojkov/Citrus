@@ -8,12 +8,12 @@ namespace Tangerine.Core.Operations
 {
 	public static class EnterNode
 	{
-		public static void Perform(Node container)
+		public static void Perform(Node container, bool selectFirstNode = true)
 		{
 			if (container.ContentsPath != null) {
 				OpenExternalScene(container.ContentsPath);
 			} else {
-				ChangeContainer(container);
+				ChangeContainer(container, selectFirstNode);
 			}
 		}
 
@@ -30,12 +30,12 @@ namespace Tangerine.Core.Operations
 			doc.SceneNavigatedFrom = sceneNavigatedFrom;
 		}
 
-		public static void ChangeContainer(Node container)
+		public static void ChangeContainer(Node container, bool selectFirstNode)
 		{
 			var prevContainer = Document.Current.Container;
 			DelegateOperation.Perform(() => SetContainer(container), () => SetContainer(prevContainer));
 			ClearRowSelection.Perform();
-			if (container.Nodes.Count > 0) {
+			if (selectFirstNode && container.Nodes.Count > 0) {
 				SelectNode.Perform(container.Nodes[0]);
 			}
 		}
