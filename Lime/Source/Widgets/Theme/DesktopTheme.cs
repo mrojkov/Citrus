@@ -36,6 +36,8 @@ namespace Lime
 			public static readonly Color4 CloseButtonNormal = GrayBackground.Darken(0.3f);
 			public static readonly Color4 CloseButtonHovered = GrayBackground.Darken(0.7f);
 			public static readonly Color4 CloseButtonPressed = GrayBackground.Darken(1);
+			public static readonly Color4 ScrollbarBackground = new Color4(210, 210, 210);
+			public static readonly Color4 ScrollbarThumb = new Color4(120, 120, 120);
 		}
 
 		public DesktopTheme()
@@ -55,6 +57,7 @@ namespace Lime
 			Decorators[typeof(TabBar)] = DecorateTabBar;
 			Decorators[typeof(BorderedFrame)] = DecorateBorderedFrame;
 			Decorators[typeof(Slider)] = DecorateSlider;
+			Decorators[typeof(ScrollViewWidget)] = DecorateScrollViewWidget;
 		}
 
 		private void DecorateSplitter(Widget widget)
@@ -62,7 +65,7 @@ namespace Lime
 			var splitter = (Splitter)widget;
 			splitter.SeparatorColor = Colors.SeparatorColor;
 			splitter.SeparatorWidth = 2;
-			splitter.SeparatorActiveAreaWidth = 10;
+			splitter.SeparatorActiveAreaWidth = 4;
 		}
 
 		private void DecorateButton(Widget widget)
@@ -273,6 +276,28 @@ namespace Lime
 			slider.MinSize = new Vector2(30, 16);
 			thumb.CompoundPresenter.Add(new SliderThumbPresenter());
 			slider.CompoundPresenter.Add(new SliderPresenter());
+		}
+
+		private void DecorateScrollViewWidget(Widget widget)
+		{
+			var sv = (ScrollViewWidget)widget;
+			var slider = new Widget();
+			slider.Size = new Vector2(10, 5);
+			slider.CompoundPresenter.Add(new DelegatePresenter<Widget>(_ => {
+				sv.PrepareRendererState();
+				Renderer.DrawRect(new Vector2(sv.Width - slider.Width, 0), sv.Size, Colors.ScrollbarBackground);
+				slider.PrepareRendererState();
+				Renderer.DrawRect(new Vector2(2, 0), new Vector2(slider.Width - 2, slider.Height), Colors.ScrollbarThumb);
+			}));
+			var ae = new AnimationEngineDelegate();
+			ae.OnRunAnimation = (_, marker) => {
+				slider.Opacity = marker == "Show" ? 1 : 0;
+				return true;
+			};
+			slider.DefaultAnimation.AnimationEngine = ae;
+			sv.Behaviour = new ScrollViewWithSlider(sv, slider, ScrollDirection.Vertical) {
+				ScrollBySlider = true
+			};
 		}
 
 		private static void ExpandToContainer(Widget widget)

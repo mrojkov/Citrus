@@ -268,6 +268,7 @@
     <Compile Include="Source\GeneratedDeserializersBIN.cs" />
     <Compile Include="Source\Types\Quadrangle.cs" />
     <Compile Include="Source\Types\Transform2.cs" />
+    <Compile Include="Source\Widgets\ListView\ScrollViewWidget.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\Exception.cs" />

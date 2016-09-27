@@ -10,7 +10,12 @@ namespace Lime
 		public bool ManualItemsPositioning;
 
 		public ListView(Frame frame, ScrollDirection scrollDirection = ScrollDirection.Vertical, bool processChildrenFirst = false)
-			: base(frame, scrollDirection, processChildrenFirst)
+			: this(frame, null, scrollDirection, processChildrenFirst)
+		{
+		}
+
+		public ListView(Frame frame, Widget slider, ScrollDirection scrollDirection = ScrollDirection.Vertical, bool processChildrenFirst = false)
+			: base(frame, slider, scrollDirection, processChildrenFirst)
 		{
 			Content.ReverseOrderRendering = true;
 			Content.Tasks.Add(RefreshLayoutTask());

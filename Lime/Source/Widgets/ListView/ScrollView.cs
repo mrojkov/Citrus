@@ -20,6 +20,7 @@ namespace Lime
 
 		protected bool IsBeingRefreshed { get; set; }
 		public bool CanScroll { get; set; }
+		public bool ScrollBySlider { get; set; }
 		public bool RejectOrtogonalSwipes { get; set; }
 		public Vector2? SwipeSensitivity { get; set; }
 		public float BounceZoneThickness = 100;
@@ -92,14 +93,6 @@ namespace Lime
 			CanScroll = true;
 			Content = CreateContentWidget();
 			Content.ScrollDirection = ScrollDirection;
-			if (ScrollDirection == ScrollDirection.Vertical) {
-				Content.Width = Frame.Width;
-				Content.Height = 0;
-			} else {
-				Content.Width = 0;
-				Content.Height = Frame.Height;
-			}
-			Content.Anchors = (ScrollDirection == ScrollDirection.Vertical) ? Anchors.LeftRight : Anchors.TopBottom;
 			Content.PushToNode(Frame);
 			if (processChildrenFirst) {
 				Content.LateTasks.Add(MainTask());
@@ -109,6 +102,7 @@ namespace Lime
 #if MAC || MONOMAC || WIN
 			Content.Tasks.Add(WheelScrollingTask());
 #endif
+			Frame.Layout = new Layout(scrollDirection, Content);
 		}
 
 		public bool IsItemOnscreen(Widget item)
@@ -231,7 +225,7 @@ namespace Lime
 
 		private void Bounce()
 		{
-			if (IsScrolling())
+			if (IsScrolling() || ScrollBySlider)
 				return;
 			if (ScrollPosition < MinScrollPosition)
 				ScrollTo(MinScrollPosition);
@@ -358,7 +352,7 @@ namespace Lime
 
 		private IEnumerator<object> HandleDragTask(VelocityMeter velocityMeter, float mouseProjectedPosition)
 		{
-			if (!CanScroll || !ScrollWhenContentFits && MaxScrollPosition == 0)
+			if (!CanScroll || !ScrollWhenContentFits && MaxScrollPosition == 0 || ScrollBySlider)
 				yield break;
 			IsBeingRefreshed = false; // Do not block scrollview on refresh gesture
 			IsDragging = true;
@@ -474,6 +468,40 @@ namespace Lime
 			Up = -1,
 			Stop = 0,
 			Down = 1
+		}
+
+		protected class Layout : CommonLayout, ILayout
+		{
+			readonly Widget content;
+			protected readonly ScrollDirection direction;
+
+			public Layout(ScrollDirection direction, Widget content)
+			{
+				this.direction = direction;
+				this.content = content;
+			}
+
+			public override void MeasureSizeConstraints(Widget widget)
+			{
+				ConstraintsValid = true;
+				widget.MeasuredMinSize = Vector2.Zero;
+				widget.MeasuredMaxSize = Vector2.PositiveInfinity;
+			}
+
+			public override void ArrangeChildren(Widget widget)
+			{
+				ArrangementValid = true;
+				var p = widget.ContentPosition;
+				var s = widget.ContentSize;
+				if (direction == ScrollDirection.Vertical) {
+					p.Y = content.Y;
+					s.Y = content.Height;
+				} else {
+					p.X = content.X;
+					s.X = content.Width;
+				}
+				LayoutWidgetWithinCell(content, p, s, Alignment.LeftTop);
+			}
 		}
 	}
 }
