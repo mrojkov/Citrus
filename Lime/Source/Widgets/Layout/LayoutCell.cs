@@ -28,6 +28,7 @@ namespace Lime
 		public HAlignment X;
 		public VAlignment Y;
 
+		public static readonly Alignment LeftTop = new Alignment { X = HAlignment.Left, Y = VAlignment.Top };
 		public static readonly Alignment Center = new Alignment { X = HAlignment.Center, Y = VAlignment.Center };
 		public static readonly Alignment LeftCenter = new Alignment { X = HAlignment.Left, Y = VAlignment.Center };
 		public static readonly Alignment RightCenter = new Alignment { X = HAlignment.Right, Y = VAlignment.Center };
