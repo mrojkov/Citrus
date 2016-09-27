@@ -15,13 +15,15 @@ namespace Lime
 		public ScrollViewWithSlider(Frame frame, Widget slider = null, ScrollDirection scrollDirection = ScrollDirection.Vertical, bool processChildrenFirst = false)
 			: base(frame, scrollDirection, processChildrenFirst)
 		{
-			frame.Layout = new Layout(ScrollDirection, Content, slider);
 			this.slider = slider;
-			sliderMinLength = ProjectToScrollAxis(slider.Size);
-			slider.RunAnimation("Def");
-			// Bring the slider above the content widget
-			slider.Unlink();
-			slider.PushToNode(Frame);
+			frame.Layout = new Layout(ScrollDirection, Content, slider);
+			if (slider != null) {
+				sliderMinLength = ProjectToScrollAxis(slider.Size);
+				slider.RunAnimation("Def");
+				// Bring the slider above the content widget
+				slider.Unlink();
+				slider.PushToNode(Frame);
+			}
 			Content.LateTasks.Add(ShowSliderWhenScrollingTask());
 			Content.LateTasks.Add(AdjustSliderTask());
 			Content.LateTasks.Add(DragSliderTask());
@@ -154,10 +156,12 @@ namespace Lime
 			public override void ArrangeChildren(Widget widget)
 			{
 				base.ArrangeChildren(widget);
-				if (direction == ScrollDirection.Vertical) {
-					slider.X = widget.Width - slider.Width;
-				} else {
-					slider.Y = widget.Height - slider.Height;
+				if (slider != null) {
+					if (direction == ScrollDirection.Vertical) {
+						slider.X = widget.Width - slider.Width;
+					} else {
+						slider.Y = widget.Height - slider.Height;
+					}
 				}
 			}
 		}
