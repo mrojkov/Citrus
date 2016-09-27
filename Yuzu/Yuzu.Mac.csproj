@@ -67,6 +67,12 @@
     <Compile Include="UnsafeReader.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Yuzu.cs" />
+    <Compile Include="Grisu\DiyFp.cs" />
+    <Compile Include="Grisu\Grisu.cs" />
+    <Compile Include="Grisu\GrisuDouble.cs" />
+    <Compile Include="Grisu\PowersOfTenCache.cs" />
+    <Compile Include="JsonHelpers.cs" />
+    <Compile Include="Code.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
 </Project>
