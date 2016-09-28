@@ -33,11 +33,12 @@ namespace Tangerine.UI
 
 		public void Load()
 		{
-			if (System.IO.File.Exists(GetPath())) {
+			var path = GetPath();
+			if (System.IO.File.Exists(path)) {
 				try {
-					Serialization.ReadObjectFromFile<UserPreferences>(GetPath(), this);
+					Serialization.ReadObjectFromFile<UserPreferences>(path, this);
 				} catch (System.Exception e) {
-					Debug.Write($"Failed to load the user preferences: {e}");
+					Debug.Write($"Failed to load the user preferences ({path}): {e}");
 				}
 			}
 		}
