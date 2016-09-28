@@ -5,12 +5,16 @@ namespace Orange.Source
 {
 	class MSBuild: BuildSystem
 	{
-		public MSBuild(string projectDirectory, string projectName, TargetPlatform platform, string customSolution = null) 
+		public MSBuild(string projectDirectory, string projectName, TargetPlatform platform, string customSolution = null)
 			: base(projectDirectory, projectName, platform, customSolution)
 		{
-			BuilderPath = Path.Combine(System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(), "MSBuild.exe");
+			BuilderPath = Path.Combine(@"C:\Program Files (x86)\MSBuild\14.0\Bin\", "MSBuild.exe");
+			if (!File.Exists(BuilderPath)) {
+				System.Diagnostics.Process.Start(@"https://www.microsoft.com/en-us/download/details.aspx?id=48159");
+				throw new System.Exception(@"Please install Microsoft Build Tools 2015: https://www.microsoft.com/en-us/download/details.aspx?id=48159");
+			}
 		}
-		
+
 		public override int Execute(StringBuilder output = null)
 		{
 			return Process.Start(BuilderPath, string.Format("\"{0}\" {1}", SlnPath, Args), output: output);
