@@ -71,6 +71,9 @@ namespace Tangerine.Core
 		bool ValidateRows()
 		{
 			var doc = Document.Current;
+			if (doc == null) {
+				return true;
+			}
 			int i = 0;
 			foreach (var node in Document.Current.Container.Nodes) {
 				if (!ValidateNodeRow(i++, node)) {
