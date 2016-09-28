@@ -8,6 +8,7 @@ namespace Orange.Source
 		public MSBuild(string projectDirectory, string projectName, TargetPlatform platform, string customSolution = null)
 			: base(projectDirectory, projectName, platform, customSolution)
 		{
+			// MSBuild from path obtained with RuntimeEnvironment.GetRuntimeDirectory() is unable to compile C#6.0
 			BuilderPath = Path.Combine(@"C:\Program Files (x86)\MSBuild\14.0\Bin\", "MSBuild.exe");
 			if (!File.Exists(BuilderPath)) {
 				System.Diagnostics.Process.Start(@"https://www.microsoft.com/en-us/download/details.aspx?id=48159");
