@@ -91,7 +91,7 @@ namespace Lime
 		public LayoutCell LayoutCell { get; set; }
 
 		public Vector2 EffectiveMinSize { get { return Vector2.Max(MinSize, MeasuredMinSize); } }
-		public Vector2 EffectiveMaxSize { get { return Vector2.Min(MaxSize, MeasuredMaxSize); } }
+		public Vector2 EffectiveMaxSize { get { return Vector2.Max(Vector2.Min(MaxSize, MeasuredMaxSize), EffectiveMinSize); } }
 
 		public Vector2 MeasuredMinSize
 		{
