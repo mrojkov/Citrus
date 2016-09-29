@@ -423,7 +423,7 @@ namespace Yuzu.Binary
 			WriteFields(def, obj);
 		}
 
-		private void WriteObject<T>(object obj)
+		private void WriteObject(object obj)
 		{
 			if (obj == null)
 				writer.Write((short)0);
@@ -431,7 +431,7 @@ namespace Yuzu.Binary
 				WriteFields(WriteClassId(obj), obj);
 		}
 
-		private void WriteObjectUnknown<T>(object obj)
+		private void WriteObjectUnknown(object obj)
 		{
 			if (obj == null) {
 				writer.Write((short)0);
@@ -457,7 +457,7 @@ namespace Yuzu.Binary
 			}
 		}
 
-		private void WriteObjectCompact<T>(object obj)
+		private void WriteObjectCompact(object obj)
 		{
 			if (obj == null) {
 				writer.Write((short)0);
@@ -512,11 +512,9 @@ namespace Yuzu.Binary
 			}
 			if (Utils.IsStruct(t) || t.IsClass || t.IsInterface) {
 				var meta = Meta.Get(t, Options);
-				var name =
-					meta.IsCompact ? "WriteObjectCompact" :
-					meta.GetUnknownStorage == null ? "WriteObject" : "WriteObjectUnknown";
-				var m = Utils.GetPrivateGeneric(GetType(), name, t);
-				return (Action<object>)Delegate.CreateDelegate(typeof(Action<object>), this, m);
+				if (meta.IsCompact) return WriteObjectCompact;
+				if (meta.GetUnknownStorage == null) return WriteObject;
+				return WriteObjectUnknown;
 			}
 			throw new NotImplementedException(t.Name);
 		}
