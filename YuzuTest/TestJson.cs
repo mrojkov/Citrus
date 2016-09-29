@@ -345,6 +345,15 @@ namespace YuzuTest.Json
 			Assert.AreEqual(v2.N, w2.N);
 			var w2g = (SampleNullable)SampleNullable_JsonDeserializer.Instance.FromString(result2);
 			Assert.AreEqual(v2.N, w2g.N);
+
+			var v3 = new List<SamplePoint?> { new SamplePoint { X = -1, Y = -2 }, null };
+			var result3 = js.ToString(v3);
+			Assert.AreEqual("[[-1,-2],null]", result3);
+			var w3 = jd.FromString<List<SamplePoint?>>(result3);
+			Assert.AreEqual(v3.Count, w3.Count);
+			Assert.AreEqual(v3[0].Value.X, w3[0].Value.X);
+			Assert.AreEqual(v3[0].Value.Y, w3[0].Value.Y);
+			Assert.IsNull(w3[1]);
 		}
 
 		[TestMethod]

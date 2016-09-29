@@ -375,6 +375,18 @@ namespace YuzuTest.Binary
 			Assert.AreEqual(v2.N, w2.N);
 			var w2g = bdg.FromBytes<SampleNullable>(result2);
 			Assert.AreEqual(v2.N, w2g.N);
+
+			var v3 = new List<SamplePoint?> { new SamplePoint { X = -1, Y = -2 }, null };
+			var result3 = bs.ToBytes(v3);
+			Assert.AreEqual(
+				"21 12 20 02 00 00 00 00 02 00 " + XS(typeof(SamplePoint)) + " 02 00 " +
+				XS("X", RoughType.Int, "Y", RoughType.Int) + " FF FF FF FF FE FF FF FF 01",
+				XS(result3));
+			var w3 = bd.FromBytes<List<SamplePoint?>>(result3);
+			Assert.AreEqual(v3.Count, w3.Count);
+			Assert.AreEqual(v3[0].Value.X, w3[0].Value.X);
+			Assert.AreEqual(v3[0].Value.Y, w3[0].Value.Y);
+			Assert.IsNull(w3[1]);
 		}
 
 		[TestMethod]

@@ -628,8 +628,10 @@ namespace Yuzu.Json
 				var m = Utils.GetPrivateGeneric(GetType(), "ReadInterface", t);
 				return (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);
 			}
-			if (Utils.IsStruct(t))
-				return () => FromReaderInt(Activator.CreateInstance(t));
+			if (Utils.IsStruct(t)) {
+				var m = Utils.GetPrivateGeneric(GetType(), "ReadStruct", t);
+				return (Func<object>)Delegate.CreateDelegate(typeof(Func<object>), this, m);
+			}
 			throw new NotImplementedException(t.Name);
 		}
 
@@ -788,7 +790,7 @@ namespace Yuzu.Json
 		}
 
 		// T is neither a collection nor a bare object.
-		private void ReadIntoObject<T>(object obj) where T : class, new()
+		private void ReadIntoObject<T>(object obj) where T : class
 		{
 			KillBuf();
 			switch (Require('{', '[')) {
@@ -820,6 +822,23 @@ namespace Yuzu.Json
 			if (!typeof(T).IsAssignableFrom(t))
 				throw Error("Expected interface '{0}', but got '{1}'", typeof(T).Name, typeName);
 			return (T)ReadFields(Activator.CreateInstance(t), GetNextName(first: false));
+		}
+
+		private object ReadStruct<T>() where T : new()
+		{
+			var obj = new T();
+			switch (Require('{', '[')) {
+				case '{':
+					var name = GetNextName(first: true);
+					if (name != JsonOptions.ClassTag)
+						return ReadFields(obj, name);
+					CheckExpectedType(RequireUnescapedString(), typeof(T));
+					return ReadFields(obj, GetNextName(first: false));
+				case '[':
+					return ReadFieldsCompact(obj);
+				default:
+					throw new YuzuAssert();
+			}
 		}
 
 		public override object FromReaderInt() { return ReadAnyObject(); }
