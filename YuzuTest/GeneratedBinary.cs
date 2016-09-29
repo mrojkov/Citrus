@@ -394,7 +394,6 @@ namespace YuzuGenBin
 		private static object Make_YuzuTest__SamplePoint(BinaryDeserializer d, ReaderClassDef def)
 		{
 			var result = new global::YuzuTest.SamplePoint();
-			var dg = (BinaryDeserializerGen)d;
 			result.X = d.Reader.ReadInt32();
 			result.Y = d.Reader.ReadInt32();
 			return result;
@@ -425,7 +424,6 @@ namespace YuzuGenBin
 		private static void Read_YuzuTest__Color(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			var result = (global::YuzuTest.Color)obj;
-			var dg = (BinaryDeserializerGen)d;
 			result.B = d.Reader.ReadByte();
 			result.G = d.Reader.ReadByte();
 			result.R = d.Reader.ReadByte();

@@ -229,10 +229,25 @@ namespace Yuzu.Binary
 			throw new YuzuException(String.Format("Unable to merge field {1} of type {0}", name, t.Name));
 		}
 
+		private bool IsDeserializerGenRequired(Meta meta)
+		{
+			if (!meta.IsCompact) return true;
+			foreach (var yi in meta.Items)
+			{
+				if (yi.Type == typeof(object)) return true;
+				if (simpleValueReader.ContainsKey(yi.Type) || yi.Type.IsEnum || yi.Type == typeof(string))
+					continue;
+				// TODO: Containers.
+				return true;
+			}
+			return false;
+		}
+
 		private void GenerateReaderBody(Meta meta)
 		{
 			cw.ResetTempNames();
-			cw.Put("var dg = (BinaryDeserializerGen)d;\n", Utils.GetTypeSpec(meta.Type));
+			if (IsDeserializerGenRequired(meta))
+				cw.Put("var dg = (BinaryDeserializerGen)d;\n", Utils.GetTypeSpec(meta.Type));
 			if (meta.IsCompact) {
 				foreach (var yi in meta.Items) {
 					cw.Put("result.{0} = ", yi.Name);
