@@ -501,12 +501,14 @@ namespace Lime
 				ArrangementValid = true;
 				var p = widget.ContentPosition;
 				var s = widget.ContentSize;
+				// Check content.Layout for the compatibility with the existing code.
+				var contentMinSize = (content.Layout is AnchorLayout) ? content.Size : content.EffectiveMinSize;
 				if (direction == ScrollDirection.Vertical) {
 					p.Y = content.Y;
-					s.Y = content.Height;
+					s.Y = contentMinSize.Y;
 				} else {
 					p.X = content.X;
-					s.X = content.Width;
+					s.X = contentMinSize.X;
 				}
 				LayoutWidgetWithinCell(content, p, s, Alignment.LeftTop);
 			}

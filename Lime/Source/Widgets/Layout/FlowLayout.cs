@@ -97,7 +97,8 @@ namespace Lime
 				}
 				i++;
 			}
-			widget.Height = widget.MinHeight = widget.MaxHeight = dy;
+			widget.MeasuredMinSize = new Vector2(0, dy);
+			widget.MeasuredMaxSize = new Vector2(float.PositiveInfinity, dy);
 		}
 	}
 }
