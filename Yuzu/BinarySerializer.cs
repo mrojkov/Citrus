@@ -48,6 +48,8 @@ namespace Yuzu.Binary
 			GetWriteFunc(t)(obj);
 		}
 
+		protected void WriteRecord(object obj) { GetWriteFunc(obj.GetType())(obj); }
+
 		private Dictionary<Type, Action<object>> writerCache = new Dictionary<Type, Action<object>>();
 
 		private Action<object> GetWriteFunc(Type t)
@@ -84,6 +86,10 @@ namespace Yuzu.Binary
 			writerCache[typeof(TimeSpan)] = WriteTimeSpan;
 			writerCache[typeof(string)] = WriteString;
 			writerCache[typeof(object)] = WriteAny;
+
+			writerCache[typeof(Record)] = WriteRecord;
+			writerCache[typeof(YuzuUnknown)] = WriteUnknown;
+			writerCache[typeof(YuzuUnknownBinary)] = WriteUnknownBinary;
 		}
 
 		private void WriteRoughType(Type t)
@@ -206,6 +212,7 @@ namespace Yuzu.Binary
 			public List<FieldDef> Fields = new List<FieldDef>();
 		}
 		private Dictionary<Type, ClassDef> classIdCache = new Dictionary<Type, ClassDef>();
+		private Dictionary<string, ClassDef> unknownClassIdCache = new Dictionary<string, ClassDef>();
 
 		public void ClearClassIds() { classIdCache.Clear(); }
 
@@ -285,6 +292,30 @@ namespace Yuzu.Binary
 			}
 		}
 
+		private void WriteClassDefFields(ClassDef def, string className)
+		{
+			writer.Write(def.Id);
+			writer.Write(className);
+			writer.Write((short)def.Fields.Count);
+			foreach (var fd in def.Fields) {
+				writer.Write(fd.Name);
+				WriteRoughType(fd.Type);
+			}
+		}
+
+		private void WriteFields(ClassDef def, object obj)
+		{
+			objStack.Push(obj);
+			try {
+				foreach (var d in def.Fields)
+					d.WriteFunc(obj);
+				writer.Write((short)0);
+			}
+			finally {
+				objStack.Pop();
+			}
+		}
+
 		private ClassDef WriteClassId(object obj)
 		{
 			var t = obj.GetType();
@@ -302,11 +333,9 @@ namespace Yuzu.Binary
 				return result;
 			}
 
-			result = new ClassDef { Id = (short)(classIdCache.Count + 1) };
+			result = new ClassDef { Id = (short)(classIdCache.Count + unknownClassIdCache.Count + 1) };
 			result.Meta = Meta.Get(t, Options);
 			classIdCache[t] = result;
-			writer.Write(result.Id);
-			writer.Write(TypeSerializer.Serialize(result.Meta.Type));
 			if (result.Meta.GetUnknownStorage == null)
 				PrepareClassDefFields(result);
 			else {
@@ -316,30 +345,90 @@ namespace Yuzu.Binary
 				else
 					PrepareClassDefFieldsUnknown(result);
 			}
-			writer.Write((short)result.Fields.Count);
-			foreach (var fd in result.Fields) {
-				writer.Write(fd.Name);
-				WriteRoughType(fd.Type);
-			}
+			WriteClassDefFields(result, TypeSerializer.Serialize(result.Meta.Type));
 			return result;
 		}
 
-		private void WriteObject<T>(object obj)
+		// Unknown class lacking binary-specific field descriptions.
+		protected void WriteUnknown(object obj)
 		{
 			if (obj == null) {
 				writer.Write((short)0);
 				return;
 			}
-			var def = WriteClassId(obj);
-			objStack.Push(obj);
-			try {
-				foreach (var d in def.Fields)
-					d.WriteFunc(obj);
+			var u = (YuzuUnknown)obj;
+			ClassDef def;
+			if (unknownClassIdCache.TryGetValue(u.ClassTag, out def)) {
+				writer.Write(def.Id);
+			}
+			else {
+				def = new ClassDef { Id = (short)(classIdCache.Count + unknownClassIdCache.Count + 1) };
+				def.Meta = Meta.Unknown;
+				unknownClassIdCache[u.ClassTag] = def;
+				short i = 0;
+				foreach (var f in u.Fields) {
+					short j = (short)(i + 1); // Capture.
+					var t = f.Value.GetType();
+					var wf = GetWriteFunc(t);
+					var name = f.Key; // Capture.
+					def.Fields.Add(new ClassDef.FieldDef {
+						Name = name, Type = t,
+						WriteFunc = obj1 => {
+							object value;
+							if ((obj1 as YuzuUnknown).Fields.TryGetValue(name, out value)) {
+								writer.Write(j);
+								wf(value);
+							}
+						},
+					});
+					++i;
+				}
+				WriteClassDefFields(def, u.ClassTag);
+			}
+			WriteFields(def, obj);
+		}
+
+		protected void WriteUnknownBinary(object obj)
+		{
+			if (obj == null) {
 				writer.Write((short)0);
+				return;
 			}
-			finally {
-				objStack.Pop();
+			var u = (YuzuUnknownBinary)obj;
+			ClassDef def;
+			if (unknownClassIdCache.TryGetValue(u.ClassTag, out def)) {
+				writer.Write(def.Id);
 			}
+			else {
+				def = new ClassDef { Id = (short)(classIdCache.Count + unknownClassIdCache.Count + 1) };
+				def.Meta = Meta.Unknown;
+				unknownClassIdCache[u.ClassTag] = def;
+				for (short i = 1; i < u.Def.Fields.Count; ++i) {
+					var f = u.Def.Fields[i];
+					short j = (short)i; // Capture.
+					var wf = GetWriteFunc(f.Type);
+					def.Fields.Add(new ClassDef.FieldDef {
+						Name = f.Name, Type = f.Type,
+						WriteFunc = obj1 => {
+							object value;
+							if ((obj1 as YuzuUnknown).Fields.TryGetValue(f.Name, out value)) {
+								writer.Write(j);
+								wf(value);
+							}
+						},
+					});
+				}
+				WriteClassDefFields(def, u.ClassTag);
+			}
+			WriteFields(def, obj);
+		}
+
+		private void WriteObject<T>(object obj)
+		{
+			if (obj == null)
+				writer.Write((short)0);
+			else
+				WriteFields(WriteClassId(obj), obj);
 		}
 
 		private void WriteObjectUnknown<T>(object obj)

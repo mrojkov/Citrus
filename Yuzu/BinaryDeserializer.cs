@@ -45,8 +45,6 @@ namespace Yuzu.Binary
 			return s != "" ? s : Reader.ReadBoolean() ? null : "";
 		}
 
-		private class Record { }
-
 		private Type ReadType()
 		{
 			var rt = (RoughType)Reader.ReadByte();
@@ -205,11 +203,6 @@ namespace Yuzu.Binary
 		// Zeroth element corresponds to 'null'.
 		private List<ReaderClassDef> classDefs = new List<ReaderClassDef> { new ReaderClassDef() };
 
-		protected class YuzuUnknownBinary : YuzuUnknown
-		{
-			public ReaderClassDef Def;
-		}
-
 		protected virtual void PrepareReaders(ReaderClassDef def)
 		{
 			def.ReadFields = ReadFields;
@@ -230,9 +223,10 @@ namespace Yuzu.Binary
 			var theirCount = Reader.ReadInt16();
 			for (int theirIndex = 0; theirIndex < theirCount; ++theirIndex) {
 				var theirName = Reader.ReadString();
-				var rf = ReadValueFunc(ReadType());
+				var t = ReadType();
+				var rf = ReadValueFunc(t);
 				result.Fields.Add(new ReaderClassDef.FieldDef {
-					Name = theirName, OurIndex = -1,
+					Name = theirName, Type = t, OurIndex = -1,
 					ReadFunc = obj => ((YuzuUnknown)obj).Fields[theirName] = rf()
 				});
 			}

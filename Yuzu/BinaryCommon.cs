@@ -76,4 +76,12 @@ namespace Yuzu.Binary
 		public Func<BinaryDeserializer, ReaderClassDef, object> Make;
 		public List<FieldDef> Fields = new List<FieldDef> { new FieldDef { OurIndex = EOF } };
 	}
+
+	internal class Record { }
+
+	internal class YuzuUnknownBinary : YuzuUnknown
+	{
+		public ReaderClassDef Def;
+	}
+
 }

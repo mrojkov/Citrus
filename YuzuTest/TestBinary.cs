@@ -1016,6 +1016,24 @@ namespace YuzuTest.Binary
 			bs.ClearClassIds();
 			bs.ToBytes(new SampleUnknown());
 			XAssert.Throws<YuzuException>(() => bs.ToBytes(w), "SampleUnknown");
+
+			bs.ClearClassIds();
+			bd.ClearClassIds();
+			var data2 =
+				"20 01 00 " + XS(typeof(SampleUnknown)) + " 02 00 " +
+				XS("A", RoughType.Record, "X", RoughType.Int) +
+				" 01 00 02 00 " + XS("NewType") + " 01 00 " + XS("Fld", RoughType.SByte) +
+				" 01 00 FE 00 00 02 00 14 00 00 00 00 00";
+			var w2 = bd.FromBytes<SampleUnknown>(SX(data2));
+			Assert.AreEqual(1, w2.Storage.Fields.Count);
+			Assert.AreEqual("A", w2.Storage.Fields[0].Name);
+			var u2 = (YuzuUnknown)w2.Storage.Fields[0].Value;
+			Assert.AreEqual("NewType", u2.ClassTag);
+			Assert.AreEqual(1, u2.Fields.Count);
+			Assert.AreEqual((sbyte)-2, u2.Fields["Fld"]);
+			Assert.AreEqual(20, w2.X);
+
+			Assert.AreEqual("\n" + data2, "\n" + XS(bs.ToBytes(w2)));
 		}
 
 		[TestMethod]
