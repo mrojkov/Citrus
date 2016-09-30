@@ -12,21 +12,21 @@ namespace Tangerine.UI.SceneView
 		public IEnumerator<object> Loop()
 		{
 			while (true) {
-				var c = sv.Components.Get<CreateNodeRequestComponent>();
-				if (c != null && c.NodeType.IsSubclassOf(typeof(Widget))) {
-					sv.Components.Remove<CreateNodeRequestComponent>();
-					yield return CreateWidgetTask(c.NodeType);
+				Type nodeType = null;
+				if (ConsumeCreateWidgetRequest(ref nodeType)) {
+					yield return CreateWidgetTask(nodeType);
 				}
 				yield return null;
 			}
 		}
 
-		public IEnumerator<object> CreateWidgetTask(Type nodeType)
+		IEnumerator<object> CreateWidgetTask(Type nodeType)
 		{
 			while (true) {
 				if (sv.InputArea.IsMouseOver()) {
 					Utils.ChangeCursorIfDefault(MouseCursor.Hand);
 				}
+				ConsumeCreateWidgetRequest(ref nodeType);
 				if (sv.Input.WasMousePressed()) {
 					sv.Input.CaptureMouse();
 					sv.Input.ConsumeKey(Key.Mouse0);
@@ -56,6 +56,17 @@ namespace Tangerine.UI.SceneView
 				}
 				yield return null;
 			}
+		}
+
+		bool ConsumeCreateWidgetRequest(ref Type nodeType)
+		{
+			var c = sv.Components.Get<CreateNodeRequestComponent>();
+			if (c != null && c.NodeType.IsSubclassOf(typeof(Widget))) {
+				sv.Components.Remove<CreateNodeRequestComponent>();
+				nodeType = c.NodeType;
+				return true;
+			}
+			return false;
 		}
 
 		public static void DrawRectOutline(Vector2 a, Vector2 b, Matrix32 t)
