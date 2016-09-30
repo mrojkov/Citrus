@@ -10,7 +10,6 @@ namespace Lime
 	{
 		[ThreadStatic]
 		private static Task current;
-		public static bool SkipFrameOnTaskCompletion;
 		private Stack<IEnumerator<object>> stack = new Stack<IEnumerator<object>>();
 		private WaitPredicate waitPredicate;
 		private float waitTime;
@@ -85,7 +84,7 @@ namespace Lime
 					HandleYieldedResult(e.Current);
 				} else if (!Completed) {
 					stack.Pop();
-					if (!SkipFrameOnTaskCompletion && !Completed) {
+					if (!Completed) {
 						Advance(0);
 					}
 				}
