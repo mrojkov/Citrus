@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Lime
 {
@@ -71,7 +69,10 @@ namespace Lime
 				}
 				if (waitTime > 0) {
 					waitTime -= delta;
-					return;
+					if (waitTime >= 0) {
+						return;
+					}
+					Delta = -waitTime;
 				}
 				if (waitPredicate != null) {
 					waitPredicate.TotalTime += delta;
