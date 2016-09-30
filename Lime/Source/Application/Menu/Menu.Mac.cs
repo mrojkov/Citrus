@@ -1,5 +1,6 @@
 ﻿#if MAC
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using AppKit;
 
@@ -45,6 +46,11 @@ namespace Lime
 					}
 				}
 			}
+		}
+
+		public ICommand FindCommand(string text)
+		{
+			return AllCommands().First(i => i.Text == text);
 		}
 
 		private void Rebuild()
