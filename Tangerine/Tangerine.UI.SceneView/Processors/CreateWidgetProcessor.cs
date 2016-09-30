@@ -47,11 +47,9 @@ namespace Tangerine.UI.SceneView
 					}
 					sv.Input.ReleaseMouse();
 					sv.Frame.CompoundPostPresenter.Remove(presenter);
-					Document.Current.History.BeginTransaction();
 					var widget = (Widget)Core.Operations.CreateNode.Perform(container, 0, nodeType);
 					Core.Operations.SetProperty.Perform(widget, "Position", rect.A);
 					Core.Operations.SetProperty.Perform(widget, "Size", rect.B - rect.A);
-					Document.Current.History.EndTransaction();
 					break;
 				}
 				yield return null;

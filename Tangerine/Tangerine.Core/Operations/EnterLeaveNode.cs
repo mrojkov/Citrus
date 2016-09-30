@@ -58,7 +58,9 @@ namespace Tangerine.Core.Operations
 					Project.Current.Documents.FirstOrDefault(i => i.Path == path)?.MakeCurrent();
 				}
 			} else {
-				EnterNode.Perform(doc.Container.Parent);
+				var container = doc.Container;
+				EnterNode.Perform(doc.Container.Parent, false);
+				SelectNode.Perform(container, true);
 			}
 		}
 	}
