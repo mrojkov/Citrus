@@ -95,13 +95,13 @@ namespace Tangerine.UI.Timeline
 		IntVector2 MousePositionToCell(Vector2 position)
 		{
 			position -= grid.ContentWidget.GlobalPosition;
-			var r = new IntVector2((int)(position.X / Metrics.TimelineColWidth), 0);
+			var r = new IntVector2((int)(position.X / Metrics.ColWidth), 0);
 			if (position.Y >= grid.ContentSize.Y) {
 				r.Y = Math.Max(0, Document.Current.Rows.Count - 1);
 				return r;
 			}
 			foreach (var row in Document.Current.Rows) {
-				if (position.Y >= row.GetGridWidget().Top && position.Y < row.GetGridWidget().Bottom + Metrics.TimelineRowSpacing) {
+				if (position.Y >= row.GetGridWidget().Top && position.Y < row.GetGridWidget().Bottom + Metrics.RowSpacing) {
 					r.Y = row.Index;
 					break;
 				}

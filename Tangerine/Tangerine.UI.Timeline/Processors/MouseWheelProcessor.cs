@@ -15,10 +15,10 @@ namespace Tangerine.UI.Timeline
 				var wheelDown = widget.Input.WasKeyPressed(Key.MouseWheelDown);
 				var wheelUp = widget.Input.WasKeyPressed(Key.MouseWheelUp);
 				if (wheelDown) {
-					timeline.ScrollOrigin.Y += Metrics.TimelineDefaultRowHeight;
+					timeline.ScrollOrigin.Y += Metrics.DefaultRowHeight;
 				}
 				if (wheelUp) {
-					timeline.ScrollOrigin.Y -= Metrics.TimelineDefaultRowHeight;
+					timeline.ScrollOrigin.Y -= Metrics.DefaultRowHeight;
 				}
 				yield return null;
 			}

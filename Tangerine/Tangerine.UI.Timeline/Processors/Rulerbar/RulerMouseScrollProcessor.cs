@@ -19,7 +19,7 @@ namespace Tangerine.UI.Timeline
 					var initialColumn = timeline.CurrentColumn;
 					try {
 						while (input.IsMousePressed()) {
-							var colWidth = Metrics.TimelineColWidth;
+							var colWidth = Metrics.ColWidth;
 							var x = (input.MousePosition.X - rulerWidget.GlobalPosition.X).Clamp(-colWidth, rulerWidget.Width + colWidth);
 							timeline.CurrentColumn = ((x + timeline.ScrollOrigin.X) / colWidth).Floor().Max(0);
 							timeline.EnsureColumnVisible(timeline.CurrentColumn);

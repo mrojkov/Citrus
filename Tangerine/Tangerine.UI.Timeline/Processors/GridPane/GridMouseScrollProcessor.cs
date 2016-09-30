@@ -16,13 +16,13 @@ namespace Tangerine.UI.Timeline
 				if (input.IsMouseOwner()) {
 					var rect = timeline.Grid.RootWidget.CalcAABBInSpaceOf(timeline.PanelWidget);
 					if (input.MousePosition.X > rect.B.X) {
-						timeline.ScrollOrigin.X += Metrics.TimelineColWidth;
+						timeline.ScrollOrigin.X += Metrics.ColWidth;
 					} else if (input.MousePosition.X < rect.A.X) {
-						timeline.ScrollOrigin.X -= Metrics.TimelineColWidth;
+						timeline.ScrollOrigin.X -= Metrics.ColWidth;
 					} else if (input.MousePosition.Y > rect.B.Y) {
-						timeline.ScrollOrigin.Y += Metrics.TimelineDefaultRowHeight;
+						timeline.ScrollOrigin.Y += Metrics.DefaultRowHeight;
 					} else if (input.MousePosition.Y < rect.A.Y) {
-						timeline.ScrollOrigin.Y -= Metrics.TimelineDefaultRowHeight;
+						timeline.ScrollOrigin.Y -= Metrics.DefaultRowHeight;
 					}
 					Window.Current.Invalidate();
 				}

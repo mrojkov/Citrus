@@ -39,7 +39,7 @@ namespace Tangerine.UI.Timeline
 						Core.Operations.ClearRowSelection.Perform();
 						Core.Operations.SelectRow.Perform(row);
 					}
-					while (input.IsMousePressed() && Math.Abs(initialMousePosition.Y - input.MousePosition.Y) < Metrics.TimelineDefaultRowHeight / 4) {
+					while (input.IsMousePressed() && Math.Abs(initialMousePosition.Y - input.MousePosition.Y) < Metrics.DefaultRowHeight / 4) {
 						yield return null;
 					}
 					if (input.IsMousePressed()) {
@@ -78,7 +78,7 @@ namespace Tangerine.UI.Timeline
 				return Document.Current.Rows[0];
 			}
 			foreach (var row in Document.Current.Rows) {
-				if (position.Y >= row.GetGridWidget().Top && position.Y < row.GetGridWidget().Bottom + Metrics.TimelineRowSpacing) {
+				if (position.Y >= row.GetGridWidget().Top && position.Y < row.GetGridWidget().Bottom + Metrics.RowSpacing) {
 					return Document.Current.Rows[row.Index];
 				}
 			}
@@ -93,7 +93,7 @@ namespace Tangerine.UI.Timeline
 			}
 			foreach (var row in Document.Current.Rows) {
 				var gw = row.GetGridWidget();
-				if (position.Y >= gw.Top && position.Y < gw.Bottom + Metrics.TimelineRowSpacing) {
+				if (position.Y >= gw.Top && position.Y < gw.Bottom + Metrics.RowSpacing) {
 					return position.Y > (gw.Top + gw.Bottom) / 2 ? row.Index + 1 : row.Index;
 				}
 			}

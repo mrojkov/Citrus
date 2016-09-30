@@ -22,7 +22,7 @@ namespace Tangerine.UI.Timeline.Components
 				Layout = new HBoxLayout(),
 				HitTestTarget = true,
 				Nodes = {
-					new HSpacer(identation * Metrics.TimelineRollIndentation),
+					new HSpacer(identation * Metrics.RollIndentation),
 					label,
 				},
 			};

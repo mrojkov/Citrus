@@ -25,7 +25,7 @@ namespace Tangerine.UI.Timeline
 			Renderer.Transform1 *= Matrix32.Translation(-Timeline.Instance.ScrollOrigin.X, 0);
 			RenderCursor();
 			for (int i = 0; i < Timeline.Instance.ColumnCount; i++) {
-				var x = i * Metrics.TimelineColWidth + 0.5f;
+				var x = i * Metrics.ColWidth + 0.5f;
 				if (i % 10 == 0) {
 					float textHeight = DesktopTheme.Metrics.TextHeight;
 					float y = (RootWidget.Height - textHeight) / 2;
@@ -80,8 +80,8 @@ namespace Tangerine.UI.Timeline
 		private Rectangle GetRectangle(int frame)
 		{
 			return new Rectangle {
-				A = new Vector2(frame * Metrics.TimelineColWidth + 0.5f, 0),
-				B = new Vector2((frame + 1) * Metrics.TimelineColWidth + 0.5f, RootWidget.Height)
+				A = new Vector2(frame * Metrics.ColWidth + 0.5f, 0),
+				B = new Vector2((frame + 1) * Metrics.ColWidth + 0.5f, RootWidget.Height)
 			};
 		}
 	}
