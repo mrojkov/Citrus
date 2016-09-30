@@ -51,7 +51,7 @@ namespace Lime
 						? w.EffectiveMinSize.Y
 						: maxLineHeight;
 					var size = new Vector2(sizes[i], height);
-					var align = (widget.LayoutCell ?? LayoutCell.Default).Alignment;
+					var align = (w.LayoutCell ?? LayoutCell.Default).Alignment;
 					LayoutWidgetWithinCell(w, position, size, align, DebugRectangles);
 					position.X += size.X + Spacing;
 					i++;
