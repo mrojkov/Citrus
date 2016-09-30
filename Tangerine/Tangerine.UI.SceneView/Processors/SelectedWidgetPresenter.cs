@@ -30,7 +30,7 @@ namespace Tangerine.UI.SceneView
 			}
 			// Render node icons.
 			foreach (var widget in widgets) {
-				var t = NodeIconPool.GetTexture(widget);
+				var t = NodeIconPool.GetTexture(widget.GetType());
 				var p = widget.CalcPositionInSpaceOf(canvas);
 				Renderer.DrawSprite(t, Color4.White, p - Vector2.Floor((Vector2)t.ImageSize / 2), (Vector2)t.ImageSize, Vector2.Zero, Vector2.One);
 			}

@@ -20,6 +20,7 @@ namespace Tangerine.UI
 	{
 		readonly List<DockPanel> panels = new List<DockPanel>();
 		readonly Menu padsMenu;
+		public readonly Widget Toolbar;
 		public readonly Widget DocumentArea;
 		public readonly WindowWidget MainWindowWidget;
 		public event Action<DockPanel> DockPanelAdded;
@@ -39,10 +40,15 @@ namespace Tangerine.UI
 			var window = new Window(new WindowOptions { ClientSize = windowSize, FixedSize = false, Title = "Tangerine" });
 			MainWindowWidget = new InvalidableWindowWidget(window) {
 				Id = "MainWindow",
-				Layout = new HBoxLayout(),
+				Layout = new VBoxLayout(),
 				Padding = new Thickness(4),
 				Size = windowSize,
 				RedrawMarkVisible = true
+			};
+			Toolbar = new Frame {
+				Id = "Toolbar",
+				ClipChildren = ClipMethod.ScissorTest,
+				LayoutCell = new LayoutCell { StretchY = 0 },
 			};
 			DocumentArea = new Frame {
 				ClipChildren = ClipMethod.ScissorTest,
@@ -104,8 +110,11 @@ namespace Tangerine.UI
 		void RefreshDockedPanels()
 		{
 			MainWindowWidget.Nodes.Clear();
+			Toolbar.Unlink();
 			DocumentArea.Unlink();
-			var currentContainer = (Widget)MainWindowWidget;
+			MainWindowWidget.Nodes.Add(Toolbar);
+			var currentContainer = new Widget { Layout = new HBoxLayout() };
+			MainWindowWidget.Nodes.Add(currentContainer);
 			int insertAt = 0;
 			var stretch = Vector2.Zero;
 			foreach (var p in panels.Where(p => p.Placement.Docked)) {

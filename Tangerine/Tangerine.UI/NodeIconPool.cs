@@ -8,11 +8,11 @@ namespace Tangerine.UI
 	{
 		static Dictionary<Type, ITexture> map = new Dictionary<Type, ITexture>();
 
-		public static ITexture GetTexture(Node node)
+		public static ITexture GetTexture(Type nodeType)
 		{
 			ITexture texture;
-			if (!map.TryGetValue(node.GetType(), out texture)) {
-				texture = IconPool.GetTexture("Nodes." + node.GetType(), "Nodes.Unknown");
+			if (!map.TryGetValue(nodeType, out texture)) {
+				texture = IconPool.GetTexture("Nodes." + nodeType, "Nodes.Unknown");
 			}
 			return texture;
 		}

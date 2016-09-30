@@ -214,6 +214,34 @@ namespace Tangerine.Core.Operations
 		}
 	}
 
+	public static class CreateNode
+	{
+		public static Node Perform(Node container, int index, Type nodeType)
+		{
+			if (!nodeType.IsSubclassOf(typeof(Node))) {
+				throw new InvalidOperationException();
+			}
+			var ctr = nodeType.GetConstructor(System.Type.EmptyTypes);
+			var node = (Node)ctr.Invoke(new object[] {});
+			node.Id = GenerateNodeId(container, nodeType);
+			InsertNode.Perform(container, index, node);
+			ClearRowSelection.Perform();
+			SelectNode.Perform(node);
+			return node;
+		}
+
+		static string GenerateNodeId(Node container, Type nodeType)
+		{
+			int c = 1;
+			var id = nodeType.Name;
+			while (container.Nodes.Any(i => i.Id == id)) {
+				id = nodeType.Name + c;
+				c++;
+			}
+			return id;
+		}
+	}
+
 	public class UnlinkNode : IOperation
 	{
 		readonly Node node;

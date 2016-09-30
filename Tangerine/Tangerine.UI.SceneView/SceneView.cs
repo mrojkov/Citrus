@@ -12,8 +12,8 @@ namespace Tangerine.UI.SceneView
 		// Widget which is a direct child of the panel.
 		public readonly Widget Frame;
 		// Widget having the same size as panel, used for intercepting mouse events above the canvas.
-		private readonly Widget inputArea;
-		public WidgetInput Input => inputArea.Input;
+		public readonly Widget InputArea;
+		public WidgetInput Input => InputArea.Input;
 		// Container for the document root node.
 		public readonly Widget Scene;
 		/// <summary>
@@ -26,14 +26,14 @@ namespace Tangerine.UI.SceneView
 		public SceneView(Widget panelWidget)
 		{
 			this.Panel = panelWidget;
-			inputArea = new Widget { HitTestTarget = true, Anchors = Anchors.LeftRightTopBottom };
-			inputArea.FocusScope = new KeyboardFocusScope(inputArea);
+			InputArea = new Widget { HitTestTarget = true, Anchors = Anchors.LeftRightTopBottom };
+			InputArea.FocusScope = new KeyboardFocusScope(InputArea);
 			Scene = new Widget {
 				Nodes = { Document.Current.RootNode }
 			};
 			Frame = new Widget {
 				Id = "SceneView",
-				Nodes = { inputArea, Scene }
+				Nodes = { InputArea, Scene }
 			};
 			CreateComponents();
 			CreateProcessors();
@@ -59,6 +59,8 @@ namespace Tangerine.UI.SceneView
 		void CreateProcessors()
 		{
 			Frame.Tasks.Add(
+				new CreateWidgetProcessor(),
+				new CreateNodeProcessor(),
 				new ExpositionProcessor(),
 				new MouseScrollProcessor(),
 				new SelectedWidgetsPresenter(),
@@ -70,5 +72,15 @@ namespace Tangerine.UI.SceneView
 				new WASDProcessor()
 			);
 		}
+
+		public void CreateNode(Type nodeType)
+		{
+			Components.Add(new CreateNodeRequestComponent { NodeType = nodeType });
+		}
+	}
+
+	public class CreateNodeRequestComponent : IComponent
+	{
+		public Type NodeType { get; set; }
 	}
 }

@@ -9,32 +9,17 @@ using Tangerine.UI;
 
 namespace Tangerine
 {
-	public class PreferencesCommand : Command
-	{
-		public PreferencesCommand()
-		{
-			Text = "Preferences...";
-			Shortcut = KeyBindings.GenericKeys.PreferencesDialog;
-		}
-
-		public override void Execute()
-		{
-			new PreferencesDialog();
-		}
-	}
-
 	public class TangerineApp
 	{
 		public static TangerineApp Instance { get; private set; }
-
+		public readonly Menu PadsMenu;
+		public readonly Toolbar Toolbar;
 		public readonly DockManager.State DockManagerInitialState;
 
 		public static void Initialize()
 		{
 			Instance = new TangerineApp();
 		}
-
-		public Menu PadsMenu { get; private set; }
 
 		private TangerineApp()
 		{
@@ -43,13 +28,14 @@ namespace Tangerine
 			Application.IsTangerine = true;
 			Lime.Serialization.DeserializerBuilders.Insert(0, DeserializeHotStudioAssets);
 			Widget.DefaultWidgetSize = Vector2.Zero;
-			CreateMainMenu();
 			Theme.Current = new DesktopTheme();
 			LoadFont();
 
+			PadsMenu = new Menu();
 			DockManager.Initialize(new Vector2(1024, 768), PadsMenu);
 			DockManager.Instance.DockPanelAdded += panel => AddGlobalProcessors(panel.RootWidget);
 			AddGlobalProcessors(DockManager.Instance.DocumentArea);
+			CreateMainMenu();
 
 			Application.Exiting += () => Project.Current.Close();
 			Application.Exited += () => {
@@ -79,6 +65,10 @@ namespace Tangerine
 					default: return Document.CloseAction.Cancel;
 				}
 			};
+			var toolbar = new Toolbar(dockManager.Toolbar);
+			foreach (var c in Application.MainMenu.FindCommand("Create").Submenu) {
+				toolbar.Add(c);
+			}
 			Document.AttachingViews += doc => {
 				if (doc.Views.Count == 0) {
 					doc.Views.AddRange(new IDocumentView [] {
@@ -219,6 +209,9 @@ namespace Tangerine
 						#endif
 					}
 				},
+				new Command("Create") {
+					Submenu = new Menu()
+				},
 				new Command("File") {
 					Submenu = new Menu {
 						new OpenFileCommand(),
@@ -244,7 +237,7 @@ namespace Tangerine
 					Submenu = new Menu {
 						new DefaultLayoutCommand(),
 						new Command("Pads") {
-							Submenu = (PadsMenu = new Menu())
+							Submenu = PadsMenu
 						}
 					}
 				},
@@ -255,6 +248,27 @@ namespace Tangerine
 					}
 				},
 			};
+			Application.MainMenu.FindCommand("Create").Submenu.AddRange(
+				new List<Type> {
+					typeof(Frame),
+					typeof(Image),
+					typeof(Movie),
+					typeof(Bone),
+					typeof(SplineGear),
+					typeof(ParticleEmitter),
+					typeof(ParticlesMagnet),
+					typeof(EmitterShapePoint),
+					typeof(ParticlesMagnet),
+					typeof(ParticleModifier),
+					typeof(SimpleText),
+					typeof(RichText),
+					typeof(TextStyle),
+					typeof(NineGrid),
+					typeof(DistortionMesh),
+					typeof(Spline),
+					typeof(SplinePoint),
+					typeof(ImageCombiner)
+				}.Select(i => new CreateNodeCommand(i)));
 		}
 
 		static void LoadFont()

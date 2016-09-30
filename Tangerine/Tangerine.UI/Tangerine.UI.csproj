@@ -66,7 +66,6 @@
     <Compile Include="Utils\HSpacer.cs" />
     <Compile Include="Utils\Colors.cs" />
     <Compile Include="Docking\DockManager.cs" />
-    <Compile Include="Metrics.cs" />
     <Compile Include="Docking\DockPanel.cs" />
     <Compile Include="KeyBindings.cs" />
     <Compile Include="Console.cs" />
@@ -76,6 +75,7 @@
     <Compile Include="SearchPanel\SearchPanel.cs" />
     <Compile Include="UserPreferences.cs" />
     <Compile Include="NodeIconPool.cs" />
+    <Compile Include="Toolbar.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
