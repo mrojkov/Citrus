@@ -48,8 +48,9 @@ namespace Tangerine.UI.SceneView
 					sv.Input.ReleaseMouse();
 					sv.Frame.CompoundPostPresenter.Remove(presenter);
 					var widget = (Widget)Core.Operations.CreateNode.Perform(container, 0, nodeType);
-					Core.Operations.SetProperty.Perform(widget, "Position", rect.A);
 					Core.Operations.SetProperty.Perform(widget, "Size", rect.B - rect.A);
+					Core.Operations.SetProperty.Perform(widget, "Position", rect.A + widget.Size / 2);
+					Core.Operations.SetProperty.Perform(widget, "Pivot", Vector2.Half);
 					break;
 				}
 				yield return null;
