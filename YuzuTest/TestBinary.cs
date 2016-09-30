@@ -1337,23 +1337,29 @@ namespace YuzuTest.Binary
 		[TestMethod]
 		public void TestUnknown()
 		{
+			var bs = new BinarySerializer();
 			var bd = new BinaryDeserializer();
-			var w1 = (YuzuUnknown)bd.FromBytes<object>(SX(
+			var data1 = SX(
 				"20 01 00 " + XS("NewType1") + " 02 00 " + XS("a", RoughType.Int, "b", RoughType.String) +
-				" 01 00 07 07 00 00 00 00"));
+				" 01 00 07 07 00 00 00 00");
+			var w1 = (YuzuUnknown)bd.FromBytes<object>(data1);
 			Assert.AreEqual("NewType1", w1.ClassTag);
 			Assert.AreEqual(1, w1.Fields.Count);
 			Assert.AreEqual(7*256 + 7, w1.Fields["a"]);
+			CollectionAssert.AreEqual(data1, bs.ToBytes(w1));
 
-			var w2 = (YuzuUnknown)bd.FromBytes(SX("20 01 00 02 00 " + XS("qwe") + " 00 00"));
+			var data2 = SX("20 01 00 02 00 " + XS("qwe") + " 00 00");
+			var w2 = (YuzuUnknown)bd.FromBytes(data2);
 			Assert.AreEqual("NewType1", w2.ClassTag);
 			Assert.AreEqual(1, w2.Fields.Count);
 			Assert.AreEqual("qwe", w2.Fields["b"]);
+			CollectionAssert.AreEqual(data2, bs.ToBytes(w2));
 
-			bd.Options.AllowUnknownFields = true;
-			var w3 = bd.FromBytes<SampleBool>(SX(
+			var data3 = SX(
 				"20 02 00 " + XS(typeof(SampleBool)) + " 02 00 " + XS("B", RoughType.Bool, "a", RoughType.Record) +
-				" 01 00 01 02 00 03 00 " + XS("NewType2") + " 00 00 00 00 00 00"));
+				" 01 00 01 02 00 03 00 " + XS("NewType2") + " 00 00 00 00 00 00");
+			bd.Options.AllowUnknownFields = true;
+			var w3 = bd.FromBytes<SampleBool>(data3);
 			Assert.AreEqual(true, w3.B);
 		}
 

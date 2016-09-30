@@ -68,6 +68,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="TestBinary.cs" />
+    <Compile Include="TestInterop.cs" />
     <Compile Include="TestJson.cs" />
     <Compile Include="TestProtobuf.cs" />
   </ItemGroup>
