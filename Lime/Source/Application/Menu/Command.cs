@@ -10,6 +10,7 @@ namespace Lime
 		Menu Submenu { get; }
 		bool Enabled { get; }
 		bool Visible { get; }
+		ITexture Icon { get; }
 		void Execute();
 		void Refresh();
 	}
@@ -21,6 +22,7 @@ namespace Lime
 		public Menu Submenu { get; set; }
 		public bool Enabled { get; set; }
 		public bool Visible { get; set; }
+		public ITexture Icon { get; set; }
 
 		public static readonly ICommand MenuSeparator = new Command();
 
