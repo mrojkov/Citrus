@@ -61,8 +61,8 @@ namespace Tangerine.UI
 		{
 			highlightable = true;
 			Nodes.Clear();
-			Padding = new Thickness(3);
-			Size = MinMaxSize = new Vector2(22, 22);
+			Padding = new Thickness(3, 5);
+			Size = MinMaxSize = new Vector2(22, 26);
 			DefaultAnimation.AnimationEngine = new AnimationEngineDelegate {
 				OnRunAnimation = (animation, markerId) => {
 					if (markerId == "Focus") {
