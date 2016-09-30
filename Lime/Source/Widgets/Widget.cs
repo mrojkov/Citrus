@@ -928,7 +928,7 @@ namespace Lime
 		public override void AddToRenderChain(RenderChain chain)
 		{
 			if (GloballyVisible) {
-				AddContentsToRenderChain(chain);
+				base.AddToRenderChain(chain);
 			}
 		}
 

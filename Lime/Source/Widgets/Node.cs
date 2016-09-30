@@ -150,23 +150,20 @@ namespace Lime
 
 		/// <summary>
 		/// The presenter used for rendering and hit-testing the node.
+		/// TODO: Add Add/RemovePresenter methods. Remove CompoundPresenter property and Presenter setter.
 		/// </summary>
 		public IPresenter Presenter { get; set; }
 
-		public CompoundPresenter CompoundPresenter
-		{
-			get { return (Presenter as CompoundPresenter) ?? (CompoundPresenter)(Presenter = new CompoundPresenter(Presenter)); }
-		}
+		public CompoundPresenter CompoundPresenter =>
+			(Presenter as CompoundPresenter) ?? (CompoundPresenter)(Presenter = new CompoundPresenter(Presenter));
 
 		/// <summary>
 		/// The presenter used for rendering the node after rendering its children.
 		/// </summary>
 		public IPresenter PostPresenter { get; set; }
 
-		public CompoundPresenter CompoundPostPresenter
-		{
-			get { return (PostPresenter as CompoundPresenter) ?? (CompoundPresenter)(PostPresenter = new CompoundPresenter(PostPresenter)); }
-		}
+		public CompoundPresenter CompoundPostPresenter =>
+			(PostPresenter as CompoundPresenter) ?? (CompoundPresenter)(PostPresenter = new CompoundPresenter(PostPresenter));
 
 		/// <summary>
 		/// Shortcut to the next element of nodes of this parent.
@@ -515,11 +512,6 @@ namespace Lime
 		/// </summary>
 		public virtual void AddToRenderChain(RenderChain chain)
 		{
-			AddContentsToRenderChain(chain);
-		}
-
-		protected void AddContentsToRenderChain(RenderChain chain)
-		{
 			var savedLayer = chain.CurrentLayer;
 			if (Layer != 0) {
 				chain.CurrentLayer = Layer;
@@ -744,7 +736,7 @@ namespace Lime
 			{
 				for (var p = Parent; p != null; p = p.Parent) {
 					yield return p;
-				}		
+				}
 			}
 		}
 

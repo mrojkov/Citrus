@@ -44,14 +44,6 @@ namespace Lime
 			invalidBones = true;
 		}
 
-		public override void AddToRenderChain(RenderChain chain)
-		{
-			if (!GloballyVisible) {
-				return;
-			}
-			AddContentsToRenderChain(chain);
-		}
-
 		internal void PrepareToRender()
 		{
 			ValidateBones();

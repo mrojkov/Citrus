@@ -22,8 +22,8 @@ namespace Lime
 
 		public InputSimulator Simulator;
 
-		private Vector2[] touchPositions = new Vector2[MaxTouches];
-		private List<KeyEvent> keyEventQueue = new List<KeyEvent>();
+		private readonly Vector2[] touchPositions = new Vector2[MaxTouches];
+		private readonly List<KeyEvent> keyEventQueue = new List<KeyEvent>();
 		private Key lastPressedKey;
 
 		private struct KeyState
@@ -35,7 +35,7 @@ namespace Lime
 			public bool Disabled;
 		}
 
-		private KeyState[] keys = new KeyState[Key.MaxCount];
+		private readonly KeyState[] keys = new KeyState[Key.MaxCount];
 
 		/// <summary>
 		/// The matrix describes transition from pixels to virtual coordinates.
@@ -314,7 +314,7 @@ namespace Lime
 
 		public class InputSimulator
 		{
-			Input input;
+			readonly Input input;
 
 			public InputSimulator(Input input)
 			{

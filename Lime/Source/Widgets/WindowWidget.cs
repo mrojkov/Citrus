@@ -37,7 +37,7 @@ namespace Lime
 			Window.Cursor = WidgetContext.Current.MouseCursor;
 			LayoutManager.Instance.Layout();
 			renderChain.Clear();
-			AddContentsToRenderChain(renderChain);
+			AddToRenderChain(renderChain);
 			var hitTestArgs = new HitTestArgs(Window.Input.MousePosition);
 			renderChain.HitTest(ref hitTestArgs);
 			WidgetContext.Current.NodeUnderMouse = hitTestArgs.Node;
