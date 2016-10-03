@@ -44,12 +44,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MainMenu\CreateMenu.cs" />
     <Compile Include="MainMenu\FileMenu.cs" />
+    <Compile Include="MainMenu\Preferences.cs" />
     <Compile Include="MainMenu\ViewMenu.cs" />
     <Compile Include="MainMenu\WindowMenu.cs" />
     <Compile Include="PreferencesDialog\PreferencesDialog.cs" />
     <Compile Include="TangerineApp.cs" />
     <Compile Include="Main.Win.cs" />
+    <Compile Include="Tools\AlignTools.cs" />
+    <Compile Include="Tools\FitTools.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Images.xcassets\AppIcons.appiconset\Contents.json" />

@@ -56,6 +56,7 @@
     <Compile Include="Components\RollCurveView.cs" />
     <Compile Include="Components\RollNodeView.cs" />
     <Compile Include="Components\RollPropertyView.cs" />
+    <Compile Include="Metrics.cs" />
     <Compile Include="Operations\ClearGridSelection.cs" />
     <Compile Include="Operations\SelectRectangleOnGrid.cs" />
     <Compile Include="Operations\SetCurrentColumn.cs" />
@@ -76,7 +77,6 @@
     <Compile Include="Processors\RollPane\RollWidgetsProcessor.cs" />
     <Compile Include="Processors\RollPane\RollMouseScrollProcessor.cs" />
     <Compile Include="Processors\RollPane\SelectAndDragRowsProcessor.cs" />
-    <Compile Include="Processors\BuildRowsProcessor.cs" />
     <Compile Include="Processors\BuildRowViewsProcessor.cs" />
     <Compile Include="Processors\MouseWheelProcessor.cs" />
     <Compile Include="GridPane.cs" />

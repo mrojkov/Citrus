@@ -39,6 +39,7 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BuildRowsProcessor.cs" />
     <Compile Include="Components\CurveRow.cs" />
     <Compile Include="Components\NodeRow.cs" />
     <Compile Include="Components\PropertyRow.cs" />
