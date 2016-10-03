@@ -113,7 +113,6 @@ namespace Lime
 				if (separator) {
 					return;
 				}
-				Command.Refresh();
 				if (Command.Submenu != null) {
 					Command.Submenu.Refresh();
 				}

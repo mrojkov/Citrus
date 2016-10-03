@@ -12,38 +12,46 @@ namespace Lime
 		bool Visible { get; }
 		ITexture Icon { get; }
 		void Execute();
-		void Refresh();
 	}
 
 	public class Command : ICommand
 	{
-		public string Text { get; set; }
-		public Shortcut Shortcut { get; set; }
-		public Menu Submenu { get; set; }
-		public bool Enabled { get; set; }
-		public bool Visible { get; set; }
-		public ITexture Icon { get; set; }
+		public virtual string Text { get; private set; }
+		public virtual Shortcut Shortcut { get; private set; }
+		public virtual bool Enabled => true;
+		public virtual bool Visible => true;
+		public virtual ITexture Icon => null;
+		public virtual Menu Submenu => null;
 
 		public static readonly ICommand MenuSeparator = new Command();
 
-		public Command()
-		{
-			Enabled = true;
-			Visible = true;
-		}
-
-		public Command(string text) : this()
-		{
-			Text = text;
-		}
-
+		public Command() { }
+		public Command(string text) { Text = text; }
 		public Command(string text, Shortcut shortcut) : this(text)
 		{
 			Shortcut = shortcut;
 		}
 
 		public virtual void Execute() { }
-		public virtual void Refresh() { }
+	}
+
+	public class Submenu : Menu, ICommand
+	{
+		private string text;
+
+		string ICommand.Text => text;
+		Shortcut ICommand.Shortcut => new Shortcut();
+		bool ICommand.Enabled => true;
+		bool ICommand.Visible => true;
+		ITexture ICommand.Icon => null;
+		Menu ICommand.Submenu => this;
+
+		public Submenu(string text)
+		{
+			this.text = text;
+		}
+
+		void ICommand.Execute() { }
 	}
 
 	public sealed class DelegateCommand : Command
@@ -99,16 +107,19 @@ namespace Lime
 			}
 		}
 
-		public override void Refresh()
+		public override bool Enabled
 		{
-			if (Shortcut.Main == Key.Unknown) {
-				return;
+			get
+			{
+				if (Shortcut.Main == Key.Unknown) {
+					return false;
+				}
+				var enabled = false;
+				foreach (var i in Application.Windows) {
+					enabled |= i.Input.IsKeyEnabled(Key);
+				}
+				return enabled;
 			}
-			var enabled = false;
-			foreach (var i in Application.Windows) {
-				enabled |= i.Input.IsKeyEnabled(Key);
-			}
-			Enabled = enabled;
 		}
 	}
 }
