@@ -11,11 +11,18 @@ namespace Tangerine
 	{
 		readonly Widget widget;
 
-		public Toolbar(Widget widget)
+		public Toolbar(Widget container)
 		{
-			this.widget = widget;
+			widget = new Widget();
+			container.Nodes.Add(widget);
 			DecorateToolbar(widget);
-			widget.Tasks.Add(new Property<int>(() => Version).DistinctUntilChanged().Consume(_ => Rebuild()));
+			container.Tasks.Add(new Property<int>(() => Version).DistinctUntilChanged().Consume(_ => Rebuild()));
+			widget.Tasks.AddLoop(() => {
+				for (int i = 0; i < Count; i++) {
+					var b = (ToolbarButton)widget.Nodes[i];
+					b.Enabled = this[i].Enabled;
+				}
+			});
 		}
 
 		void Rebuild()
@@ -31,10 +38,14 @@ namespace Tangerine
 		static void DecorateToolbar(Widget widget)
 		{
 			widget.Padding = new Thickness(4, 0);
-			widget.Layout = new FlowLayout { Spacing = 2 };
+			widget.LayoutCell = new LayoutCell { StretchX = 0 };
+			widget.Layout = new HBoxLayout { Spacing = 2 };
 			widget.CompoundPresenter.Add(new DelegatePresenter<Widget>(w => {
 				w.PrepareRendererState();
-				Renderer.DrawVerticalGradientRect(Vector2.Zero, w.Size, ToolbarColors.Background);
+				if (w.Width > 0) {
+					Renderer.DrawVerticalGradientRect(new Vector2(2, 0), w.Size - new Vector2(2, 0), ToolbarColors.Background);
+					Renderer.DrawRectOutline(new Vector2(2, 0), w.Size - new Vector2(2, 0), ToolbarColors.Border);
+				}
 			}));
 		}
 	}
