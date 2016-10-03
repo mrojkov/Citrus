@@ -27,7 +27,7 @@ namespace Tangerine.UI.SceneView
 						rect.B = sv.MousePosition;
 						occasionalClick &= (rect.B - rect.A).Length <= 5;
 						if (!occasionalClick) {
-							RefreshSelectedWidgets(rect);
+							RefreshSelectedNodes(rect);
 							CommonWindow.Current.Invalidate();
 						}
 						yield return null;
@@ -40,18 +40,37 @@ namespace Tangerine.UI.SceneView
 			}
 		}
 
-		void RefreshSelectedWidgets(Rectangle rect)
+		void RefreshSelectedNodes(Rectangle rect)
 		{
 			var currentSelection = Document.Current.SelectedNodes().OfType<Widget>();
-			var selectionQuad = rect.ToQuadrangle();
-			var newSelection = Document.Current.Container.Nodes.Unlocked().OfType<Widget>().Where(w => 
-				selectionQuad.Overlaps(w.CalcHullInSpaceOf(SceneView.Instance.Scene)));
+			var newSelection = Document.Current.Container.Nodes.Unlocked().Where(n => TestNode(rect, n));
 			if (!currentSelection.SequenceEqual(newSelection)) {
 				Core.Operations.ClearRowSelection.Perform();
 				foreach (var node in newSelection) {
 					Core.Operations.SelectNode.Perform(node);
 				}
 			}
+		}
+
+		bool TestNode(Rectangle rect, Node node)
+		{
+			var canvas = SceneView.Instance.Scene;
+			if (node is Widget) {
+				var widget = (Widget)node;
+				var hull = widget.CalcHullInSpaceOf(canvas);
+				for (int i = 0; i < 4; i++) {
+					if (rect.Contains(hull[i])) {
+						return true;
+					}
+				}
+				var pivot = widget.CalcPositionInSpaceOf(canvas);
+				return rect.Contains(pivot);
+			} else if (node is PointObject) {
+				var po = (PointObject)node;
+				var p = ((Widget)node.Parent).CalcPositionInSpaceOf(canvas);
+				throw new NotImplementedException();
+			}
+			return false;
 		}
 	}
 }
