@@ -2,6 +2,7 @@
 using System;
 using System.Windows.Forms;
 using System.Collections.Generic;
+using System.Linq;
 using SD = System.Drawing;
 
 namespace Lime
@@ -37,6 +38,29 @@ namespace Lime
 				}
 				return nativeContextMenu;
 			}
+		}
+
+		private IEnumerable<ICommand> AllCommands()
+		{
+			foreach (var i in this)
+			{
+				yield return i;
+			}
+			foreach (var i in this)
+			{
+				if (i.Submenu != null)
+				{
+					foreach (var j in i.Submenu.AllCommands())
+					{
+						yield return j;
+					}
+				}
+			}
+		}
+
+		public ICommand FindCommand(string text)
+		{
+			return AllCommands().First(i => i.Text == text);
 		}
 
 		private void Rebuild()
@@ -114,7 +138,6 @@ namespace Lime
 
 		public void Refresh()
 		{
-			Command.Refresh();
 			NativeItem.Visible = Command.Visible;
 			NativeItem.Enabled = Command.Enabled;
 			NativeItem.Text = Command.Text;
