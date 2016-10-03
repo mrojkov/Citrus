@@ -20,7 +20,9 @@ namespace Tangerine
 			widget.Tasks.AddLoop(() => {
 				for (int i = 0; i < Count; i++) {
 					var b = (ToolbarButton)widget.Nodes[i];
-					b.Enabled = this[i].Enabled;
+					var c = this[i];
+					b.Enabled = c.Enabled;
+					b.Tip = c.Text;
 				}
 			});
 		}

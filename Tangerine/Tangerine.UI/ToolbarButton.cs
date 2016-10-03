@@ -1,9 +1,7 @@
 using System;
-using System.IO;
-using System.Linq;
 using System.Collections.Generic;
+using System.IO;
 using Lime;
-using Yuzu;
 
 namespace Tangerine.UI
 {
@@ -57,6 +55,8 @@ namespace Tangerine.UI
 			}
 		}
 
+		public string Tip { get; set; }
+
 		public ToolbarButton()
 		{
 			highlightable = true;
@@ -88,6 +88,50 @@ namespace Tangerine.UI
 					Renderer.DrawRectOutline(Vector2.One, Size - 2 * Vector2.One, borderColor, 1);
 				}
 			}));
+		}
+
+		protected override void Awake()
+		{
+			base.Awake();
+			Tasks.Add(ShowTipTask());
+		}
+
+		private IEnumerator<object> ShowTipTask()
+		{
+			while (true) {
+				yield return null;
+				if (IsMouseOver() && Tip != null) {
+					var showTip = true;
+					for (float t = 0; t < 0.5f; t += Task.Current.Delta) {
+						if (!IsMouseOver()) {
+							showTip = false;
+							break;
+						}
+						yield return null;
+					}
+					if (showTip) {
+						var window = WidgetContext.Current.Root;
+						var tip = new Widget {
+							Position = CalcPositionInSpaceOf(window) + new Vector2(Width * 0.66f, Height),
+							LayoutCell = new LayoutCell { Ignore = true },
+							Layout = new StackLayout(),
+							Nodes = {
+								new SimpleText { Text = Tip, Padding = new Thickness(4) },
+								new BorderedFrame()
+							}
+						};
+						tip.Updated += _ => tip.Size = tip.EffectiveMinSize;
+						window.PushNode(tip);
+						try {
+							while (IsMouseOver()) {
+								yield return null;
+							}
+						} finally {
+							tip.Unlink();
+						}
+					}
+				}
+			}
 		}
 
 		private void GetColors(out Color4 bgColor, out Color4 borderColor)
