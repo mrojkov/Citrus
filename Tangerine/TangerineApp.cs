@@ -1,10 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Lime;
 using Tangerine.Core;
-using Yuzu;
-using System.Collections.Generic;
-using System.Collections.Specialized;
 using Tangerine.UI;
 
 namespace Tangerine
