@@ -10,6 +10,7 @@ namespace Lime
 		public Vector2 Stretch = Vector2.One;
 		public float StretchX { get { return Stretch.X; } set { Stretch.X = value; } }
 		public float StretchY { get { return Stretch.Y; } set { Stretch.Y = value; } }
+		public bool Ignore { get; set; }
 		public static readonly LayoutCell Default = new LayoutCell();
 
 		public LayoutCell() { }

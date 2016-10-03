@@ -65,7 +65,10 @@ namespace Lime
 #region protected methods
 		protected List<Widget> GetChildren(Widget widget)
 		{
-			return widget.Nodes.OfType<Widget>().Where(i => !IgnoreHidden || i.Visible).ToList();
+			return widget.Nodes.OfType<Widget>().Where(
+				i => (!IgnoreHidden || i.Visible) && 
+				!(i.LayoutCell ?? LayoutCell.Default).Ignore
+			).ToList();
 		}
 
 		protected static void LayoutWidgetWithinCell(Widget widget, Vector2 position, Vector2 size, Alignment alignment, List<Rectangle> debugRectangles = null)
