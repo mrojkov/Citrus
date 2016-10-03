@@ -604,7 +604,13 @@ namespace Lime
 				menu.Refresh();
 				form.Controls.Add(menu.NativeMainMenu);
 				form.MainMenuStrip = menu.NativeMainMenu;
+				menu.NativeMainMenu.Invalidated += NativeMainMenu_Invalidated;
 			}
+		}
+
+		private void NativeMainMenu_Invalidated(object sender, InvalidateEventArgs e)
+		{
+			Invalidate();
 		}
 	}
 
