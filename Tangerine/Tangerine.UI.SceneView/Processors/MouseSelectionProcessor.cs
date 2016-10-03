@@ -44,7 +44,8 @@ namespace Tangerine.UI.SceneView
 		{
 			var currentSelection = Document.Current.SelectedNodes().OfType<Widget>();
 			var selectionQuad = rect.ToQuadrangle();
-			var newSelection = Document.Current.Container.Nodes.OfType<Widget>().Where(w => selectionQuad.Intersects(w.CalcHullInSpaceOf(SceneView.Instance.Scene)));
+			var newSelection = Document.Current.Container.Nodes.OfType<Widget>().Where(w => 
+				selectionQuad.Overlaps(w.CalcHullInSpaceOf(SceneView.Instance.Scene)));
 			if (!currentSelection.SequenceEqual(newSelection)) {
 				Core.Operations.ClearRowSelection.Perform();
 				foreach (var node in newSelection) {

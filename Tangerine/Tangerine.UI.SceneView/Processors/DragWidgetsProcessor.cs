@@ -13,7 +13,7 @@ namespace Tangerine.UI.SceneView
 		public IEnumerator<object> Loop()
 		{
 			while (true) {
-				var widgets = Utils.UnlockedWidgets();
+				var widgets = Document.Current.SelectedEditableNodes().OfType<Widget>();
 				Quadrangle hull;
 				Vector2 pivot;
 				if (Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out pivot) && (pivot - sv.MousePosition).Length < 10 / sv.Scene.Scale.X) {
@@ -37,7 +37,7 @@ namespace Tangerine.UI.SceneView
 			Document.Current.History.BeginTransaction();
 			try {
 				var iniMousePos = sv.MousePosition;
-				var widgets = Utils.UnlockedWidgets().ToList();
+				var widgets = Document.Current.SelectedEditableNodes().OfType<Widget>().ToList();
 				var transform = sv.Scene.CalcTransitionToSpaceOf(Document.Current.Container.AsWidget);
 				var dragDirection = DragDirection.Any;
 				var positions = widgets.Select(i => i.Position).ToList();
