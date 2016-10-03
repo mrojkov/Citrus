@@ -20,7 +20,7 @@ namespace Tangerine.UI
 	{
 		readonly List<DockPanel> panels = new List<DockPanel>();
 		readonly Menu padsMenu;
-		public readonly Widget Toolbar;
+		public readonly Widget ToolbarArea;
 		public readonly Widget DocumentArea;
 		public readonly WindowWidget MainWindowWidget;
 		public event Action<DockPanel> DockPanelAdded;
@@ -45,9 +45,10 @@ namespace Tangerine.UI
 				Size = windowSize,
 				RedrawMarkVisible = true
 			};
-			Toolbar = new Frame {
+			ToolbarArea = new Frame {
 				Id = "Toolbar",
 				ClipChildren = ClipMethod.ScissorTest,
+				Layout = new FlowLayout(),
 				LayoutCell = new LayoutCell { StretchY = 0 },
 			};
 			DocumentArea = new Frame {
@@ -110,9 +111,9 @@ namespace Tangerine.UI
 		void RefreshDockedPanels()
 		{
 			MainWindowWidget.Nodes.Clear();
-			Toolbar.Unlink();
+			ToolbarArea.Unlink();
 			DocumentArea.Unlink();
-			MainWindowWidget.Nodes.Add(Toolbar);
+			MainWindowWidget.Nodes.Add(ToolbarArea);
 			var currentContainer = new Widget { Layout = new HBoxLayout() };
 			MainWindowWidget.Nodes.Add(currentContainer);
 			int insertAt = 0;
