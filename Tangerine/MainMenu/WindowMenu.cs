@@ -7,11 +7,8 @@ namespace Tangerine
 {
 	public class NextDocumentCommand : Command
 	{
-		public NextDocumentCommand()
-		{
-			Text = "Next Document";
-			Shortcut = KeyBindings.GenericKeys.NextDocument;
-		}
+		public override string Text => "Next Document";
+		public override Shortcut Shortcut => KeyBindings.GenericKeys.NextDocument;
 
 		public override void Execute()
 		{
@@ -21,11 +18,8 @@ namespace Tangerine
 
 	public class PreviousDocumentCommand : Command
 	{
-		public PreviousDocumentCommand()
-		{
-			Text = "Previous Document";
-			Shortcut = KeyBindings.GenericKeys.PreviousDocument;
-		}
+		public override string Text => "Previous Document";
+		public override Shortcut Shortcut => KeyBindings.GenericKeys.PreviousDocument;
 
 		public override void Execute()
 		{

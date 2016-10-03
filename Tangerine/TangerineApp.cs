@@ -13,7 +13,7 @@ namespace Tangerine
 	{
 		public static TangerineApp Instance { get; private set; }
 		public readonly Menu PadsMenu;
-		public readonly Toolbar Toolbar;
+		public readonly Dictionary<string, Toolbar> Toolbars = new Dictionary<string, Toolbar>();
 		public readonly DockManager.State DockManagerInitialState;
 
 		public static void Initialize()
@@ -31,7 +31,7 @@ namespace Tangerine
 			Theme.Current = new DesktopTheme();
 			LoadFont();
 
-			PadsMenu = new Menu();
+			PadsMenu = new Submenu("Pads");
 			DockManager.Initialize(new Vector2(1024, 768), PadsMenu);
 			DockManager.Instance.DockPanelAdded += panel => AddGlobalProcessors(panel.RootWidget);
 			AddGlobalProcessors(DockManager.Instance.DocumentArea);
@@ -65,10 +65,12 @@ namespace Tangerine
 					default: return Document.CloseAction.Cancel;
 				}
 			};
-			var toolbar = new Toolbar(dockManager.Toolbar);
+			Toolbars.Add("Create", new Toolbar(dockManager.ToolbarArea));
+			Toolbars.Add("Tools", new Toolbar(dockManager.ToolbarArea));
 			foreach (var c in Application.MainMenu.FindCommand("Create").Submenu) {
-				toolbar.Add(c);
+				Toolbars["Create"].Add(c);
 			}
+			CreateToolsToolbar();
 			Document.AttachingViews += doc => {
 				if (doc.Views.Count == 0) {
 					doc.Views.AddRange(new IDocumentView [] {
@@ -87,6 +89,15 @@ namespace Tangerine
 			if (proj != null) {
 				new Project(proj).Open();
 			}
+		}
+
+		void CreateToolsToolbar()
+		{
+			var tb = Toolbars["Tools"];
+			tb.Add(CenterHorizontally.Instance);
+			tb.Add(CenterVertically.Instance);
+			tb.Add(AlignCentersHorizontally.Instance);
+			tb.Add(AlignCentersVertically.Instance);
 		}
 
 		Yuzu.AbstractDeserializer DeserializeHotStudioAssets(string path, System.IO.Stream stream)
@@ -198,54 +209,41 @@ namespace Tangerine
 		void CreateMainMenu()
 		{
 			Application.MainMenu = new Menu {
-				new Command("Application") {
-					Submenu = new Menu {
-						new PreferencesCommand(),
-						Command.MenuSeparator, 
-						#if MAC
-						new DelegateCommand("Quit", new Shortcut(Modifiers.Command, Key.Q), Application.Exit),
-						#else
-						new DelegateCommand("Quit", new Shortcut(Modifiers.Alt, Key.F4), Application.Exit),
-						#endif
-					}
+				new Submenu("Application") {
+					new PreferencesCommand(),
+					Command.MenuSeparator, 
+					#if MAC
+					new DelegateCommand("Quit", new Shortcut(Modifiers.Command, Key.Q), Application.Exit),
+					#else
+					new DelegateCommand("Quit", new Shortcut(Modifiers.Alt, Key.F4), Application.Exit),
+					#endif
 				},
-				new Command("Create") {
-					Submenu = new Menu()
+				new Submenu("Create") {
 				},
-				new Command("File") {
-					Submenu = new Menu {
-						new OpenFileCommand(),
-						new OpenProjectCommand(),
-						Command.MenuSeparator,
-						new CloseDocumentCommand(),
-					}
+				new Submenu("File") {
+					new OpenFileCommand(),
+					new OpenProjectCommand(),
+					Command.MenuSeparator,
+					new CloseDocumentCommand(),
 				},
-				new Command("Edit") {
-					Submenu = new Menu {
-						new KeySendingCommand("Undo", new Shortcut(Modifiers.Command, Key.Z), Key.Commands.Undo),
-						new KeySendingCommand("Redo", new Shortcut(Modifiers.Command | Modifiers.Shift, Key.Z), Key.Commands.Redo),
-						Command.MenuSeparator,
-						new KeySendingCommand("Cut", new Shortcut(Modifiers.Command, Key.X), Key.Commands.Cut),
-						new KeySendingCommand("Copy", new Shortcut(Modifiers.Command, Key.C), Key.Commands.Copy),
-						new KeySendingCommand("Paste", new Shortcut(Modifiers.Command, Key.V), Key.Commands.Paste),
-						new KeySendingCommand("Delete", Key.Delete, Key.Commands.Delete),
-						Command.MenuSeparator,
-						new KeySendingCommand("Select All", new Shortcut(Modifiers.Command, Key.A), Key.Commands.SelectAll),
-					}
+				new Submenu("Edit") {
+					new KeySendingCommand("Undo", new Shortcut(Modifiers.Command, Key.Z), Key.Commands.Undo),
+					new KeySendingCommand("Redo", new Shortcut(Modifiers.Command | Modifiers.Shift, Key.Z), Key.Commands.Redo),
+					Command.MenuSeparator,
+					new KeySendingCommand("Cut", new Shortcut(Modifiers.Command, Key.X), Key.Commands.Cut),
+					new KeySendingCommand("Copy", new Shortcut(Modifiers.Command, Key.C), Key.Commands.Copy),
+					new KeySendingCommand("Paste", new Shortcut(Modifiers.Command, Key.V), Key.Commands.Paste),
+					new KeySendingCommand("Delete", Key.Delete, Key.Commands.Delete),
+					Command.MenuSeparator,
+					new KeySendingCommand("Select All", new Shortcut(Modifiers.Command, Key.A), Key.Commands.SelectAll),
 				},
-				new Command("View") {
-					Submenu = new Menu {
-						new DefaultLayoutCommand(),
-						new Command("Pads") {
-							Submenu = PadsMenu
-						}
-					}
+				new Submenu("View") {
+					new DefaultLayoutCommand(),
+					(Submenu)PadsMenu
 				},
-				new Command("Window") {
-					Submenu = new Menu {
-						new NextDocumentCommand(),
-						new PreviousDocumentCommand(),
-					}
+				new Submenu("Window") {
+					new NextDocumentCommand(),
+					new PreviousDocumentCommand(),
 				},
 			};
 			Application.MainMenu.FindCommand("Create").Submenu.AddRange(

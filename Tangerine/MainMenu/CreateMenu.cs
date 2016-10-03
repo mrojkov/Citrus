@@ -9,11 +9,12 @@ namespace Tangerine
 	{
 		readonly Type type;
 
+		public override string Text => type.Name;
+		public override ITexture Icon => NodeIconPool.GetTexture(type);
+
 		public CreateNodeCommand(Type type)
 		{
 			this.type = type;
-			Text = type.Name;
-			Icon = NodeIconPool.GetTexture(type);
 		}
 
 		public override void Execute()

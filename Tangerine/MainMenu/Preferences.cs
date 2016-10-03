@@ -7,11 +7,8 @@ namespace Tangerine
 {
 	public class PreferencesCommand : Command
 	{
-		public PreferencesCommand()
-		{
-			Text = "Preferences...";
-			Shortcut = KeyBindings.GenericKeys.PreferencesDialog;
-		}
+		public override string Text => "Preferences...";
+		public override Shortcut Shortcut => KeyBindings.GenericKeys.PreferencesDialog;
 
 		public override void Execute()
 		{

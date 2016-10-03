@@ -7,10 +7,7 @@ namespace Tangerine
 {
 	public class DefaultLayoutCommand : Command
 	{
-		public DefaultLayoutCommand()
-		{
-			Text = "Default Layout";
-		}
+		public override string Text => "Default Layout";
 
 		public override void Execute()
 		{

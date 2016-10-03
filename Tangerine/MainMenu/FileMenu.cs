@@ -7,11 +7,8 @@ namespace Tangerine
 {
 	public class OpenProjectCommand : Command
 	{
-		public OpenProjectCommand()
-		{
-			Text = "Open Project...";
-			Shortcut = KeyBindings.GenericKeys.OpenProject;
-		}
+		public override string Text => "Open Project...";
+		public override Shortcut Shortcut => KeyBindings.GenericKeys.OpenProject;
 
 		public override void Execute()
 		{
@@ -30,11 +27,9 @@ namespace Tangerine
 
 	public class OpenFileCommand : Command
 	{
-		public OpenFileCommand()
-		{
-			Text = "Open File...";
-			Shortcut = KeyBindings.GenericKeys.OpenFile;
-		}
+		public override string Text => "Open File...";
+		public override Shortcut Shortcut => KeyBindings.GenericKeys.OpenFile;
+		public override bool Enabled => Project.Current != null;
 
 		public override void Execute()
 		{
@@ -49,20 +44,12 @@ namespace Tangerine
 				}
 			}
 		}
-
-		public override void Refresh()
-		{
-			Enabled = Project.Current != null;
-		}
 	}
 
 	public class CloseDocumentCommand : Command
 	{
-		public CloseDocumentCommand()
-		{
-			Text = "Close Document";
-			Shortcut = KeyBindings.GenericKeys.CloseDocument;
-		}
+		public override string Text => "Close Document...";
+		public override Shortcut Shortcut => KeyBindings.GenericKeys.CloseDocument;
 
 		public override void Execute()
 		{
