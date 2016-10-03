@@ -20,6 +20,7 @@ namespace Tangerine.UI
 		public static readonly Color4 ButtonCheckedBorder = ButtonPressBorder.Darken(0.1f);
 		public static readonly Color4 ButtonCheckedBackground = ButtonPressBackground.Transparentify(0.5f);
 		public static readonly ColorGradient Background = new ColorGradient(Color4.White, Color4.White.Darken(0.2f));
+		public static readonly Color4 Border = DesktopTheme.Colors.ControlBorder;
 	}
 
 	public static class SceneViewColors

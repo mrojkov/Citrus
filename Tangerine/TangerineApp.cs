@@ -94,10 +94,21 @@ namespace Tangerine
 		void CreateToolsToolbar()
 		{
 			var tb = Toolbars["Tools"];
-			tb.Add(CenterHorizontally.Instance);
-			tb.Add(CenterVertically.Instance);
-			tb.Add(AlignCentersHorizontally.Instance);
-			tb.Add(AlignCentersVertically.Instance);
+			tb.Add(new AlignLeft());
+			tb.Add(new AlignTop());
+			tb.Add(new AlignRight());
+			tb.Add(new AlignBottom());
+			tb.Add(new AlignCentersHorizontally());
+			tb.Add(new AlignCentersVertically());
+			tb.Add(new CenterHorizontally());
+			tb.Add(new CenterVertically());
+
+			tb.Add(new ResetScale());
+			tb.Add(new ResetRotation());
+			tb.Add(new FitToContainer());
+			tb.Add(new FitToContent());
+			tb.Add(new FlipX());
+			tb.Add(new FlipY());
 		}
 
 		Yuzu.AbstractDeserializer DeserializeHotStudioAssets(string path, System.IO.Stream stream)

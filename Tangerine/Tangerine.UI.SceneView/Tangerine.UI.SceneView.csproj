@@ -60,7 +60,6 @@
     <Compile Include="Processors\PreviewAnimationProcessor.cs" />
     <Compile Include="Processors\MouseSelectionProcessor.cs" />
     <Compile Include="Processors\ResizeWidgetsProcessor.cs" />
-    <Compile Include="Utils.cs" />
     <Compile Include="Processors\DragWidgetsProcessor.cs" />
     <Compile Include="Processors\WASDProcessor.cs" />
     <Compile Include="Processors\RotateWidgetsProcessor.cs" />

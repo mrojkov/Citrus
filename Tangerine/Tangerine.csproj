@@ -90,6 +90,8 @@
     <Compile Include="MainMenu\ViewMenu.cs" />
     <Compile Include="MainMenu\CreateMenu.cs" />
     <Compile Include="MainMenu\Preferences.cs" />
+    <Compile Include="Tools\AlignTools.cs" />
+    <Compile Include="Tools\FitTools.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
@@ -204,5 +206,6 @@
   <ItemGroup>
     <Folder Include="PreferencesDialog\" />
     <Folder Include="MainMenu\" />
+    <Folder Include="Tools\" />
   </ItemGroup>
 </Project>

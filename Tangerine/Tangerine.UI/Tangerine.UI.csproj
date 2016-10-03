@@ -76,6 +76,7 @@
     <Compile Include="UserPreferences.cs" />
     <Compile Include="NodeIconPool.cs" />
     <Compile Include="Toolbar.cs" />
+    <Compile Include="Utils\Utils.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>
