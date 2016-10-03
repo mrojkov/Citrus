@@ -15,7 +15,7 @@ namespace Tangerine
 		{
 			Rectangle aabb;
 			var container = (Widget)Core.Document.Current.Container;
-			var nodes = Core.Document.Current.SelectedEditableNodes().OfType<Widget>();
+			var nodes = Core.Document.Current.SelectedNodes().Unlocked().OfType<Widget>();
 			if (Utils.CalcAABB(nodes, container, out aabb)) {
 				foreach (var widget in nodes.OfType<Widget>()) {
 					var p = widget.Position;
@@ -40,7 +40,7 @@ namespace Tangerine
 		{
 			Rectangle aabb;
 			var container = (Widget)Core.Document.Current.Container;
-			var nodes = Core.Document.Current.SelectedEditableNodes().OfType<Widget>();
+			var nodes = Core.Document.Current.SelectedNodes().Unlocked().OfType<Widget>();
 			if (Utils.CalcAABB(nodes, container, out aabb)) {
 				foreach (var widget in nodes.OfType<Widget>()) {
 					var p = widget.Position;
@@ -65,7 +65,7 @@ namespace Tangerine
 		{
 			Rectangle aabb;
 			var container = (Widget)Core.Document.Current.Container;
-			var nodes = Core.Document.Current.SelectedEditableNodes();
+			var nodes = Core.Document.Current.SelectedNodes().Unlocked();
 			if (Utils.CalcAABB(nodes, container, out aabb)) {
 				foreach (var widget in nodes.OfType<Widget>()) {
 					var p = widget.Position;
@@ -90,7 +90,7 @@ namespace Tangerine
 		{
 			Rectangle aabb;
 			var container = (Widget)Core.Document.Current.Container;
-			var nodes = Core.Document.Current.SelectedEditableNodes();
+			var nodes = Core.Document.Current.SelectedNodes().Unlocked();
 			if (Utils.CalcAABB(nodes, container, out aabb)) {
 				foreach (var widget in nodes.OfType<Widget>()) {
 					var p = widget.Position;
@@ -115,7 +115,7 @@ namespace Tangerine
 		{
 			Rectangle aabb;
 			var container = (Widget)Core.Document.Current.Container;
-			var nodes = Core.Document.Current.SelectedEditableNodes();
+			var nodes = Core.Document.Current.SelectedNodes().Unlocked();
 			if (Utils.CalcAABB(nodes, container, out aabb)) {
 				foreach (var widget in nodes.OfType<Widget>()) {
 					var p = widget.Position;
@@ -140,7 +140,7 @@ namespace Tangerine
 		{
 			Rectangle aabb;
 			var container = (Widget)Core.Document.Current.Container;
-			var nodes = Core.Document.Current.SelectedEditableNodes();
+			var nodes = Core.Document.Current.SelectedNodes().Unlocked();
 			if (Utils.CalcAABB(nodes, container, out aabb)) {
 				foreach (var widget in nodes.OfType<Widget>()) {
 					var p = widget.Position;
@@ -165,7 +165,7 @@ namespace Tangerine
 		{
 			Rectangle aabb;
 			var container = (Widget)Core.Document.Current.Container;
-			var nodes = Core.Document.Current.SelectedEditableNodes().OfType<Widget>();
+			var nodes = Core.Document.Current.SelectedNodes().Unlocked().OfType<Widget>();
 			if (Utils.CalcAABB(nodes, container, out aabb)) {
 				foreach (var widget in nodes.OfType<Widget>()) {
 					var p = widget.Position;
@@ -190,7 +190,7 @@ namespace Tangerine
 		{
 			Rectangle aabb;
 			var container = (Widget)Core.Document.Current.Container;
-			var nodes = Core.Document.Current.SelectedEditableNodes().OfType<Widget>();
+			var nodes = Core.Document.Current.SelectedNodes().Unlocked().OfType<Widget>();
 			if (Utils.CalcAABB(nodes, container, out aabb)) {
 				foreach (var widget in nodes.OfType<Widget>()) {
 					var p = widget.Position;

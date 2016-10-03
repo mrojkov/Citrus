@@ -7,6 +7,11 @@ namespace Tangerine.UI
 {
 	public static class Utils
 	{
+		public static IEnumerable<T> Unlocked<T>(this IEnumerable<T> nodes) where T: Node
+		{
+			return nodes.Where(n => !n.GetTangerineFlag(TangerineFlags.Locked));
+		}
+
 		public static void ChangeCursorIfDefault(MouseCursor cursor)
 		{
 			if (WidgetContext.Current.MouseCursor == MouseCursor.Default) {

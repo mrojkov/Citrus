@@ -12,7 +12,7 @@ namespace Tangerine
 
 		public override void Execute()
 		{
-			foreach (var widget in Core.Document.Current.SelectedEditableNodes().OfType<Widget>()) {
+			foreach (var widget in Core.Document.Current.SelectedNodes().Unlocked().OfType<Widget>()) {
 				Core.Operations.SetProperty.Perform(widget, "Scale", Vector2.One);
 			}
 		}
@@ -25,7 +25,7 @@ namespace Tangerine
 
 		public override void Execute()
 		{
-			foreach (var widget in Core.Document.Current.SelectedEditableNodes().OfType<Widget>()) {
+			foreach (var widget in Core.Document.Current.SelectedNodes().Unlocked().OfType<Widget>()) {
 				Core.Operations.SetProperty.Perform(widget, "Rotation", 0);
 			}
 		}
@@ -38,7 +38,7 @@ namespace Tangerine
 
 		public override void Execute()
 		{
-			foreach (var widget in Core.Document.Current.SelectedEditableNodes().OfType<Widget>()) {
+			foreach (var widget in Core.Document.Current.SelectedNodes().Unlocked().OfType<Widget>()) {
 				var s = widget.Scale;
 				s.X = -s.X;
 				Core.Operations.SetProperty.Perform(widget, "Scale", s);
@@ -53,7 +53,7 @@ namespace Tangerine
 
 		public override void Execute()
 		{
-			foreach (var widget in Core.Document.Current.SelectedEditableNodes().OfType<Widget>()) {
+			foreach (var widget in Core.Document.Current.SelectedNodes().Unlocked().OfType<Widget>()) {
 				var s = widget.Scale;
 				s.Y = -s.Y;
 				Core.Operations.SetProperty.Perform(widget, "Scale", s);
@@ -69,7 +69,7 @@ namespace Tangerine
 		public override void Execute()
 		{
 			var container = (Widget)Core.Document.Current.Container;
-			foreach (var widget in Core.Document.Current.SelectedEditableNodes().OfType<Widget>()) {
+			foreach (var widget in Core.Document.Current.SelectedNodes().Unlocked().OfType<Widget>()) {
 				Core.Operations.SetProperty.Perform(widget, "Size", container.Size);
 				Core.Operations.SetProperty.Perform(widget, "Rotation", 0);
 				Core.Operations.SetProperty.Perform(widget, "Position", widget.Pivot * container.Size);
@@ -87,7 +87,7 @@ namespace Tangerine
 		public override void Execute()
 		{
 			var container = (Widget)Core.Document.Current.Container;
-			var nodes = Core.Document.Current.SelectedEditableNodes();
+			var nodes = Core.Document.Current.SelectedNodes().Unlocked();
 			foreach (var widget in nodes.OfType<Widget>()) {
 				Rectangle aabb;
 				if (Utils.CalcAABB(widget.Nodes, widget, out aabb)) {

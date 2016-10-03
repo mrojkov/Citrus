@@ -142,11 +142,6 @@ namespace Tangerine.Core
 			return SelectedRows.Select(i => i.Components.Get<Components.NodeRow>()?.Node).Where(n => n != null);
 		}
 
-		public IEnumerable<Node> SelectedEditableNodes()
-		{
-			return SelectedNodes().Where(w => !w.GetTangerineFlag(TangerineFlags.Locked));
-		}
-
 		public Row GetRowById(Uid uid)
 		{
 			Row row;
