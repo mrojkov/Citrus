@@ -22,6 +22,11 @@ namespace Lime
 		/// Refreshes the menu according to its internal state.
 		/// </summary>
 		void Refresh();
+
+		/// <summary>
+		/// Returns first menu item with a given text.
+		/// </summary>
+		ICommand FindCommand(string text);
 	}
 }
 #endif
