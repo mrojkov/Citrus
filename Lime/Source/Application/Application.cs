@@ -118,7 +118,7 @@ namespace Lime
 				mainWindow = value;
 				mainWindow.Updating += RunScheduledActions;
 #if WIN
-				(mainWindow as Window).SetMenu(mainMenu);
+				(mainWindow as Window).SetMenu(mainMenu as Menu);
 #endif
 			}
 		}
@@ -196,9 +196,9 @@ namespace Lime
 		private static readonly object scheduledActionsSync = new object();
 		private static Action scheduledActions;
 #if WIN || MAC
-		private static Menu mainMenu;
+		private static IMenu mainMenu;
 
-		public static Menu MainMenu
+		public static IMenu MainMenu
 		{
 			get { return mainMenu; }
 			set
@@ -214,7 +214,7 @@ namespace Lime
 					}
 #elif WIN
 					if (mainWindow is Window) {
-						(mainWindow as Window).SetMenu(mainMenu);
+						(mainWindow as Window).SetMenu(mainMenu as Menu);
 					}
 #endif
 				}
