@@ -271,7 +271,8 @@ namespace Tangerine.UI.Inspector
 					(button = new Button {
 						Text = "...",
 						MinMaxWidth = 20,
-						Draggable = true
+						Draggable = true,
+						LayoutCell = new LayoutCell(Alignment.Center)
 					})
 				}
 			});
