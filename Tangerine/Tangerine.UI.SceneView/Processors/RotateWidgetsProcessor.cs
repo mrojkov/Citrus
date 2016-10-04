@@ -40,7 +40,7 @@ namespace Tangerine.UI.SceneView
 			sv.Input.CaptureMouse();
 			Document.Current.History.BeginTransaction();
 			try {
-				var widgets = Document.Current.SelectedNodes().Unlocked().OfType<Widget>().ToList();
+				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>().ToList();
 				foreach (var widget in widgets) {
 					SetWidgetPivot(widget, pivot);
 				}

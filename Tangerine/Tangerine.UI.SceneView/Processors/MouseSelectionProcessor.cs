@@ -23,7 +23,7 @@ namespace Tangerine.UI.SceneView
 					sv.Frame.CompoundPostPresenter.Add(presenter);
 					input.CaptureMouse();
 					var cliked = true;
-					var selectedNodes = Document.Current.SelectedNodes().Unlocked().ToList();
+					var selectedNodes = Document.Current.SelectedNodes().Editable().ToList();
 					Document.Current.History.BeginTransaction();
 					while (input.IsMousePressed()) {
 						rect.B = sv.MousePosition;
@@ -53,7 +53,7 @@ namespace Tangerine.UI.SceneView
 			if (!ctrlPressed) {
 				Core.Operations.ClearRowSelection.Perform();
 			}
-			foreach (var widget in Document.Current.Container.Nodes.Unlocked().OfType<Widget>()) {
+			foreach (var widget in Document.Current.Container.Nodes.Editable().OfType<Widget>()) {
 				var hull = widget.CalcHullInSpaceOf(sv.Scene);
 				if (hull.Contains(point)) {
 					Core.Operations.SelectNode.Perform(widget,
@@ -67,7 +67,7 @@ namespace Tangerine.UI.SceneView
 		{
 			var ctrlPressed = SceneView.Instance.Input.IsKeyPressed(Key.Control);
 			var currentSelection = Document.Current.SelectedNodes();
-			var newSelection = Document.Current.Container.Nodes.Unlocked().Where(n =>
+			var newSelection = Document.Current.Container.Nodes.Editable().Where(n =>
 				ctrlPressed ? TestNode(rect, n) ^ originalSelection.Contains(n) : TestNode(rect, n));
 			if (!newSelection.SequenceEqual(currentSelection)) {
 				Core.Operations.ClearRowSelection.Perform();
