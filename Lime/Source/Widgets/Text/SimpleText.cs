@@ -296,6 +296,14 @@ namespace Lime
 				caret.RenderingTextPos = 0;
 				caret.NearestCharPos = Vector2.Zero;
 				if (String.IsNullOrEmpty(DisplayText)) {
+					switch (HAlignment) {
+						case HAlignment.Right:
+							pos.X = ContentSize.X - Padding.Right;
+							break;
+						case HAlignment.Center:
+							pos.X = (ContentSize.X * 0.5f).Round();
+							break;
+					}
 					caret.WorldPos = pos;
 					caret.Line = caret.Pos = caret.TextPos = 0;
 					caret.Valid = CaretPosition.ValidState.All;
