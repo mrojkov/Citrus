@@ -260,6 +260,14 @@ namespace Lime
 					Container.Input.ConsumeKey(Key.Escape);
 					Container.RevokeFocus();
 				}
+				if (Container.Input.WasKeyPressed(Key.Commands.Copy)) {
+					Clipboard.Text = Text.Text;
+				}
+				if (Container.Input.WasKeyPressed(Key.Commands.Cut)) {
+					Clipboard.Text = Text.Text;
+					Text.Text = "";
+					caretPos.TextPos = 0;
+				}
 				if (WasKeyRepeated(Key.Commands.Paste)) {
 					foreach (var ch in Clipboard.Text)
 						InsertChar(ch);
