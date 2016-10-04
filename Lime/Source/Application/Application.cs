@@ -208,7 +208,7 @@ namespace Lime
 #if MAC
 					if (mainMenu != null) {
 						mainMenu.Refresh();
-						NSApplication.SharedApplication.MainMenu = mainMenu.NativeMenu;
+						NSApplication.SharedApplication.MainMenu = ((Menu)mainMenu).NativeMenu;
 					} else {
 						NSApplication.SharedApplication.MainMenu = null;
 					}

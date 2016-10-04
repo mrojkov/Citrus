@@ -7,9 +7,9 @@ namespace Tangerine.UI
 {
 	public static class Utils
 	{
-		public static IEnumerable<T> Unlocked<T>(this IEnumerable<T> nodes) where T: Node
+		public static IEnumerable<T> Editable<T>(this IEnumerable<T> nodes) where T: Node
 		{
-			return nodes.Where(n => !n.GetTangerineFlag(TangerineFlags.Locked));
+			return nodes.Where(n => !n.GetTangerineFlag(TangerineFlags.Locked) && !n.GetTangerineFlag(TangerineFlags.Hidden));
 		}
 
 		public static void ChangeCursorIfDefault(MouseCursor cursor)

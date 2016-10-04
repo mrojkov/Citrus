@@ -37,7 +37,7 @@ namespace Lime
 			for (int k = 0; k < 2; k++) {
 				var outerQuad = k == 0 ? this : quadrangle;
 				var innerQuad = k == 0 ? quadrangle : this;
-				var sign = Vector2.CrossProduct(outerQuad[1] - outerQuad[0], outerQuad[3] - outerQuad[0]);
+				var sign = Vector2.CrossProduct(outerQuad.V2 - outerQuad.V1, outerQuad.V4 - outerQuad.V1);
 				if (sign.Abs() < Mathf.ZeroTolerance) {
 					return false;
 				}
@@ -74,6 +74,18 @@ namespace Lime
 				}
 			}
 			return false;
+		}
+
+		public bool Contains(Vector2 point)
+		{
+			var sign = Vector2.CrossProduct(V2 - V1, V4 - V1);
+			var inside = true;
+			for (int i = 0; i < 4; i++) {
+				var a = this[i];
+				var b = this[(i + 1) % 4];			
+				inside &= GeometryUtils.CalcPointHalfPlane(point, a, b) * sign > 0;
+			}
+			return inside;
 		}
 	}
 }
