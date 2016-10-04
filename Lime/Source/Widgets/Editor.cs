@@ -260,12 +260,10 @@ namespace Lime
 					Container.Input.ConsumeKey(Key.Escape);
 					Container.RevokeFocus();
 				}
-	#if WIN
-				if (Container.Input.IsKeyPressed(Key.Control) && WasKeyRepeated(Key.V)) {
+				if (WasKeyRepeated(Key.Commands.Paste)) {
 					foreach (var ch in Clipboard.Text)
 						InsertChar(ch);
 				}
-	#endif
 			} finally {
 				Container.Input.ConsumeKeys(consumingKeys);
 			}

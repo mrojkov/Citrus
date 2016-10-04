@@ -211,7 +211,7 @@ namespace Lime
 
 		internal void SetKeyState(Key key, bool value)
 		{
-			if (key.IsModifier() ) {
+			if (key.IsModifier()) {
 				ReleaseAffectedByModifierKeys();
 			}
 			key = TranslateShortcuts(key);
