@@ -59,6 +59,7 @@ namespace Tangerine.UI.SceneView
 		void CreateProcessors()
 		{
 			Frame.Tasks.Add(
+				new SceneViewDecorator(),
 				new CreateWidgetProcessor(),
 				new CreateNodeProcessor(),
 				new ExpositionProcessor(),
