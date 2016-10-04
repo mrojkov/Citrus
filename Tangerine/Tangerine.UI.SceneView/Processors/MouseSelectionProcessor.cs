@@ -13,7 +13,7 @@ namespace Tangerine.UI.SceneView
 			var sv = SceneView.Instance;
 			var input = sv.Input;
 			while (true) {
-				if (input.WasMousePressed()) {
+				if (input.WasMousePressed() && !input.IsKeyPressed(Key.Shift)) {
 					var rect = new Rectangle(sv.MousePosition, sv.MousePosition);
 					var presenter = new DelegatePresenter<Widget>(w => {
 						w.PrepareRendererState();

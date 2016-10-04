@@ -70,6 +70,7 @@ namespace Tangerine.UI.SceneView
 				new ResizeWidgetsProcessor(),
 				new RotateWidgetsProcessor(),
 				new MouseSelectionProcessor(),
+				new ShiftClickProcessor(),
 				new WASDProcessor()
 			);
 		}
