@@ -1,13 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 14 for Windows Desktop
-VisualStudioVersion = 14.0.25123.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lime.Win", "..\..\Citrus\Lime\Lime.Win.csproj", "{FC2DE6C9-641A-4230-8D29-EA4035CD8708}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lemon.Win", "..\..\Citrus\Lemon\Lemon.Win.csproj", "{538E41E4-725C-4521-BCF3-A5591A1A3AFD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyProject.Win", "EmptyProject.Win.csproj", "{87884330-1A04-4008-9D2F-05585F4C7E05}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8DF7F0F3-8C68-4A0E-9573-CC4CA0882A3E} = {8DF7F0F3-8C68-4A0E-9573-CC4CA0882A3E}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmptyProject.Game.Win", "..\EmptyProject.Game\EmptyProject.Game.Win.csproj", "{8DF7F0F3-8C68-4A0E-9573-CC4CA0882A3E}"
 EndProject
