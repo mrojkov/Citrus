@@ -116,7 +116,7 @@ namespace Lime
 		public Color4 Color { get; set; }
 		public float Thickness { get; set; }
 
-		public WidgetBoundsPresenter(Color4 color, float thickness = 0)
+		public WidgetBoundsPresenter(Color4 color, float thickness = 1)
 		{
 			Color = color;
 			Thickness = thickness;
@@ -126,8 +126,7 @@ namespace Lime
 		{
 			var widget = node.AsWidget;
 			widget.PrepareRendererState();
-			var t = Thickness > 0 ? Thickness : 1 / CommonWindow.Current.PixelScale;
-			Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Color * widget.GlobalColor, t);
+			Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Color * widget.GlobalColor, Thickness);
 		}
 	}
 
