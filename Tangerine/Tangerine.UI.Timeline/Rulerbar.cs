@@ -21,11 +21,11 @@ namespace Tangerine.UI.Timeline
 		void Render(Widget widget)
 		{
 			widget.PrepareRendererState();
-			Renderer.DrawVerticalGradientRect(Vector2.Zero, RootWidget.Size, ToolbarColors.Background);
+			Renderer.DrawRect(Vector2.Zero, RootWidget.Size, ToolbarColors.Background);
 			Renderer.Transform1 *= Matrix32.Translation(-Timeline.Instance.ScrollOrigin.X, 0);
 			RenderCursor();
 			for (int i = 0; i < Timeline.Instance.ColumnCount; i++) {
-				var x = i * Metrics.ColWidth + 0.5f;
+				var x = i * TimelineMetrics.ColWidth + 0.5f;
 				if (i % 10 == 0) {
 					float textHeight = DesktopTheme.Metrics.TextHeight;
 					float y = (RootWidget.Height - textHeight) / 2;
@@ -33,8 +33,8 @@ namespace Tangerine.UI.Timeline
 						new Vector2(x, y), i.ToString(),
 						DesktopTheme.Metrics.TextHeight, 
 						DesktopTheme.Colors.BlackText);
+					Renderer.DrawLine(x, 0, x, RootWidget.Height, TimelineRulerColors.Notchings);
 				}
-				Renderer.DrawLine(x, RootWidget.Height - 1, x, RootWidget.Height - 4, TimelineRulerColors.Notchings);
 			}
 			foreach (var m in Timeline.Instance.Container.Markers) {
 				RenderMarker(m);
@@ -80,8 +80,8 @@ namespace Tangerine.UI.Timeline
 		private Rectangle GetRectangle(int frame)
 		{
 			return new Rectangle {
-				A = new Vector2(frame * Metrics.ColWidth + 0.5f, 0),
-				B = new Vector2((frame + 1) * Metrics.ColWidth + 0.5f, RootWidget.Height)
+				A = new Vector2(frame * TimelineMetrics.ColWidth + 0.5f, 0),
+				B = new Vector2((frame + 1) * TimelineMetrics.ColWidth + 0.5f, RootWidget.Height)
 			};
 		}
 	}

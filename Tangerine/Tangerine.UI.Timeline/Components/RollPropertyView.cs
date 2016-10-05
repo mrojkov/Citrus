@@ -26,11 +26,11 @@ namespace Tangerine.UI.Timeline.Components
 			};
 			widget = new Widget {
 				Padding = new Thickness { Left = 4, Right = 2 },
-				MinHeight = Metrics.DefaultRowHeight,
+				MinHeight = TimelineMetrics.DefaultRowHeight,
 				HitTestTarget = true,
 				Layout = new HBoxLayout(),
 				Nodes = {
-					new HSpacer(identation * Metrics.RollIndentation),
+					new HSpacer(identation * TimelineMetrics.RollIndentation),
 					CreateExpandButton(),
 					propIcon,
 					new HSpacer(3),

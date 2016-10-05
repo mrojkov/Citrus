@@ -19,7 +19,7 @@ namespace Tangerine.UI.Timeline
 						maxColumn = Math.Max(maxColumn, nodeData.Node.Animators.GetOverallDuration());
 					}
 				}
-				var maxVisibleColumn = ((timeline.ScrollOrigin.X + timeline.Grid.Size.X) / Metrics.ColWidth).Ceiling();
+				var maxVisibleColumn = ((timeline.ScrollOrigin.X + timeline.Grid.Size.X) / TimelineMetrics.ColWidth).Ceiling();
 				timeline.ColumnCount = Math.Max(maxColumn + 1, maxVisibleColumn);
 				yield return null;
 			}

@@ -15,8 +15,8 @@ namespace Tangerine.UI.Timeline.Components
 		public GridNodeView(Node node)
 		{
 			this.node = node;
-			gridWidget = new Widget { LayoutCell = new LayoutCell { StretchY = 0 }, MinHeight = Metrics.DefaultRowHeight };
-			overviewWidget = new Widget { LayoutCell = new LayoutCell { StretchY = 0 }, MinHeight = Metrics.DefaultRowHeight };
+			gridWidget = new Widget { LayoutCell = new LayoutCell { StretchY = 0 }, MinHeight = TimelineMetrics.DefaultRowHeight };
+			overviewWidget = new Widget { LayoutCell = new LayoutCell { StretchY = 0 }, MinHeight = TimelineMetrics.DefaultRowHeight };
 			gridWidget.Presenter = new DelegatePresenter<Widget>(Render);
 			overviewWidget.Presenter = new DelegatePresenter<Widget>(Render);
 		}
@@ -57,11 +57,11 @@ namespace Tangerine.UI.Timeline.Components
 					for (int j = 0; j < 32; j++) {
 						c += s[j] ? 1 : 0;
 					}
-					var a = new Vector2(i * Metrics.ColWidth, 0);
+					var a = new Vector2(i * TimelineMetrics.ColWidth, 0);
 					var d = widget.Height / c;
 					for (int j = 0; j < 32; j++) {
 						if (s[j]) {
-							var b = a + new Vector2(Metrics.ColWidth, d);
+							var b = a + new Vector2(TimelineMetrics.ColWidth, d);
 							Renderer.DrawRect(a, b, KeyframePalette.Colors[j]);
 							a.Y += d;
 						}

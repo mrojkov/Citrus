@@ -140,11 +140,11 @@ namespace Tangerine.UI.Timeline
 
 		public void EnsureColumnVisible(int column)
 		{
-			if ((column + 1) * Metrics.ColWidth - ScrollOrigin.X >= Grid.RootWidget.Width) {
-				ScrollOrigin.X = (column + 1) * Metrics.ColWidth - Grid.RootWidget.Width;
+			if ((column + 1) * TimelineMetrics.ColWidth - ScrollOrigin.X >= Grid.RootWidget.Width) {
+				ScrollOrigin.X = (column + 1) * TimelineMetrics.ColWidth - Grid.RootWidget.Width;
 			}
-			if (column * Metrics.ColWidth < ScrollOrigin.X) {
-				ScrollOrigin.X = Math.Max(0, column * Metrics.ColWidth);
+			if (column * TimelineMetrics.ColWidth < ScrollOrigin.X) {
+				ScrollOrigin.X = Math.Max(0, column * TimelineMetrics.ColWidth);
 			}
 		}
 
@@ -161,7 +161,7 @@ namespace Tangerine.UI.Timeline
 
 		public bool IsColumnVisible(int col)
 		{
-			var pos = col * Metrics.ColWidth - ScrollOrigin.X;
+			var pos = col * TimelineMetrics.ColWidth - ScrollOrigin.X;
 			return pos >= 0 && pos < Grid.Size.X;
 		}
 		

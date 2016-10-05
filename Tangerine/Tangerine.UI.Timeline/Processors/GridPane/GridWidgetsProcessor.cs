@@ -23,7 +23,7 @@ namespace Tangerine.UI.Timeline
 		{
 			foreach (var row in Document.Current.Rows) {
 				var gw = row.Components.Get<Components.IGridWidget>();
-				gw.Widget.MinWidth = Timeline.Instance.ColumnCount * Metrics.ColWidth;
+				gw.Widget.MinWidth = Timeline.Instance.ColumnCount * TimelineMetrics.ColWidth;
 			}
 		}
 

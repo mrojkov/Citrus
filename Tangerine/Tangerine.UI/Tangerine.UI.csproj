@@ -77,6 +77,7 @@
     <Compile Include="NodeIconPool.cs" />
     <Compile Include="Toolbar.cs" />
     <Compile Include="Utils\Utils.cs" />
+    <Compile Include="Utils\TimelineMetrics.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

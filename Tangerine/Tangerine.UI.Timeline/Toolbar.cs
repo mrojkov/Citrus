@@ -13,11 +13,11 @@ namespace Tangerine.UI.Timeline
 		public Toolbar()
 		{
 			RootWidget = new Widget {
-				Padding = new Thickness { Left = 4, Right = 2 },
+				Padding = new Thickness { Left = 4 },
 				MinMaxHeight = Metrics.ToolbarHeight,
-				MinWidth = Metrics.ToolbarMinWidth,
+				MinWidth = TimelineMetrics.ToolbarMinWidth,
 				Presenter = new DelegatePresenter<Widget>(Render),
-				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center) },
+				Layout = new HBoxLayout { Spacing = 2, CellDefaults = new LayoutCell(Alignment.Center) },
 				Nodes = {
 					CreateAnimationModeButton(),
 					CreateAutoKeyframesButton(),
@@ -32,12 +32,12 @@ namespace Tangerine.UI.Timeline
 		void Render(Widget widget)
 		{
 			widget.PrepareRendererState();
-			Renderer.DrawVerticalGradientRect(Vector2.Zero, widget.Size, ToolbarColors.Background); 
+			Renderer.DrawRect(Vector2.Zero, widget.Size, ToolbarColors.Background); 
 		}
 
 		ToolbarButton CreateAnimationModeButton()
 		{
-			var button = new ToolbarButton(IconPool.GetTexture("Timeline.AnimationMode"));
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.AnimationMode")) { Tip = "Animation mode" };
 			button.Tasks.Add(new Property<bool>(() => UserPreferences.Instance.AnimationMode).DistinctUntilChanged().Consume(i => button.Checked = i));
 			button.Clicked += () => {
 				UserPreferences.Instance.AnimationMode = !UserPreferences.Instance.AnimationMode;
@@ -47,7 +47,7 @@ namespace Tangerine.UI.Timeline
 
 		ToolbarButton CreateAutoKeyframesButton()
 		{
-			var button = new ToolbarButton(IconPool.GetTexture("Timeline.Key"));
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.Key")) { Tip = "Automatic keyframes" };
 			button.Tasks.Add(new Property<bool>(() => UserPreferences.Instance.AutoKeyframes).DistinctUntilChanged().Consume(i => button.Checked = i));
 			button.Clicked += () => {
 				UserPreferences.Instance.AutoKeyframes = !UserPreferences.Instance.AutoKeyframes;
@@ -57,14 +57,14 @@ namespace Tangerine.UI.Timeline
 
 		ToolbarButton CreateExitButton()
 		{
-			var button = new ToolbarButton(IconPool.GetTexture("Timeline.ExitContainer"));
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.ExitContainer")) { Tip = "Exit current container (backspace)" };
 			button.Clicked += Core.Operations.LeaveNode.Perform;
 			return button;
 		}
 
 		ToolbarButton CreateEyeButton()
 		{
-			var button = new ToolbarButton(IconPool.GetTexture("Timeline.Eye"));
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.Eye")) { Tip = "Show widgets" };
 			button.Clicked += () => {
 				var visibility = NodeVisibility.Hidden;
 				if (Document.Current.Container.Nodes.All(i => i.EditorState().Visibility == NodeVisibility.Hidden)) {
@@ -84,7 +84,7 @@ namespace Tangerine.UI.Timeline
 
 		ToolbarButton CreateLockButton()
 		{
-			var button = new ToolbarButton(IconPool.GetTexture("Timeline.Lock"));
+			var button = new ToolbarButton(IconPool.GetTexture("Timeline.Lock")) { Tip = "Lock widgets" };
 			button.Clicked += () => {
 				var locked = Document.Current.Container.Nodes.All(i => !i.EditorState().Locked);
 				foreach (var node in Document.Current.Container.Nodes) {
