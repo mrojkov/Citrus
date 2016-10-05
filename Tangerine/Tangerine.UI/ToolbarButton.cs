@@ -61,8 +61,8 @@ namespace Tangerine.UI
 		{
 			highlightable = true;
 			Nodes.Clear();
-			Padding = new Thickness(3, 5);
-			Size = MinMaxSize = new Vector2(22, 26);
+			Padding = new Thickness(3);
+			Size = MinMaxSize = DesktopTheme.Metrics.DefaultButtonSize.Y * Vector2.One;
 			DefaultAnimation.AnimationEngine = new AnimationEngineDelegate {
 				OnRunAnimation = (animation, markerId) => {
 					if (markerId == "Focus") {
@@ -81,11 +81,11 @@ namespace Tangerine.UI
 				Color4 bgColor, borderColor;
 				GetColors(out bgColor, out borderColor);
 				if (bgColor != Color4.Transparent) {
-					Renderer.DrawRect(Vector2.One, Size - 2 * Vector2.One, bgColor);
+					Renderer.DrawRect(Vector2.Zero, Size, bgColor);
 				}
 				Renderer.DrawSprite(Texture, GlobalColor, ContentPosition, ContentSize, Vector2.Zero, Vector2.One);
 				if (borderColor != Color4.Transparent) {
-					Renderer.DrawRectOutline(Vector2.One, Size - 2 * Vector2.One, borderColor, 1);
+					Renderer.DrawRectOutline(Vector2.Zero, Size, borderColor);
 				}
 			}));
 		}
