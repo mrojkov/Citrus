@@ -710,26 +710,35 @@ namespace Lime
 			DrawRect(new Vector2(x0, y0), new Vector2(x1, y1), color);
 		}
 
-		public static void DrawRectOutline(Vector2 a, Vector2 b, Color4 color)
+		/// <summary>
+		/// Draws the rectangle outline inscribed within the given bounds.
+		/// </summary>
+		public static void DrawRectOutline(Vector2 a, Vector2 b, Color4 color, float thickness = 1)
 		{
-			var thickness = 1 / Window.Current.PixelScale;
-			DrawRectOutline(a, b, color, thickness);
-		}
-
-		public static void DrawRectOutline(float x0, float y0, float x1, float y1, Color4 color)
-		{
-			DrawRectOutline(new Vector2(x0, y0), new Vector2(x1, y1), color);
-		}
-
-		public static void DrawRectOutline(Vector2 a, Vector2 b, Color4 color, float thickness)
-		{
+			float t;
+			if (b.X < a.X) {
+				t = b.X;
+				b.X = a.X;
+				a.X = t;
+			}
+			if (b.Y < a.Y) {
+				t = b.Y;
+				b.Y = a.Y;
+				a.Y = t;
+			}
+			var d = new Vector2(thickness / 2, thickness / 2);
+			a += d;
+			b -= d;
 			DrawLine(a.X, a.Y, b.X, a.Y, color, thickness, LineCap.Square);
 			DrawLine(b.X, a.Y, b.X, b.Y, color, thickness, LineCap.Square);
 			DrawLine(b.X, b.Y, a.X, b.Y, color, thickness, LineCap.Square);
 			DrawLine(a.X, b.Y, a.X, a.Y, color, thickness, LineCap.Square);
 		}
 
-		public static void DrawRectOutline(float x0, float y0, float x1, float y1, Color4 color, float thickness)
+		/// <summary>
+		/// Draws the rectangle outline inscribed within the given bounds.
+		/// </summary>
+		public static void DrawRectOutline(float x0, float y0, float x1, float y1, Color4 color, float thickness = 1)
 		{
 			DrawRectOutline(new Vector2(x0, y0), new Vector2(x1, y1), color, thickness);
 		}
