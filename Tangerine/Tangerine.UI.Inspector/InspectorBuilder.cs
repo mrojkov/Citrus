@@ -55,9 +55,11 @@ namespace Tangerine.UI.Inspector
 					var label = new Widget {
 						LayoutCell = new LayoutCell { StretchY = 0 },
 						Layout = new StackLayout(),
+						MinHeight = DesktopTheme.Metrics.DefaultButtonSize.Y,
 						Nodes = {
 							new SimpleText {
 								Text = type.Name,
+								Padding = new Thickness(4, 0),
 								AutoSizeConstraints = false,
 							}
 						}

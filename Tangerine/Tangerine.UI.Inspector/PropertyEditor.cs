@@ -43,6 +43,7 @@ namespace Tangerine.UI.Inspector
 			this.context = context;
 			containerWidget = new Widget {
 				Layout = new HBoxLayout { IgnoreHidden = false },
+				Padding = new Thickness { Left = 4, Right = 12 },
 				LayoutCell = new LayoutCell { StretchY = 0 },
 			};
 			context.InspectorPane.AddNode(containerWidget);
@@ -101,11 +102,9 @@ namespace Tangerine.UI.Inspector
 		{
 			EditBox editorX, editorY;
 			containerWidget.AddNode(new Widget {
-				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center) },
+				Layout = new HBoxLayout { CellDefaults = new LayoutCell(Alignment.Center), Spacing = 4 },
 				Nodes = {
-					new SimpleText { Text = "X", Padding = new Thickness(4, 0) },
 					(editorX = new EditBox()),
-					new SimpleText { Text = "Y", Padding = new Thickness(4, 0) },
 					(editorY = new EditBox()),
 				}
 			});

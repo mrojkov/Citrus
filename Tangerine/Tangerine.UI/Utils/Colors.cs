@@ -19,8 +19,8 @@ namespace Tangerine.UI
 		public static readonly Color4 ButtonPressBackground = ButtonHighlightBackground.Darken(0.1f);
 		public static readonly Color4 ButtonCheckedBorder = ButtonPressBorder.Darken(0.1f);
 		public static readonly Color4 ButtonCheckedBackground = ButtonPressBackground.Transparentify(0.5f);
-		public static readonly ColorGradient Background = new ColorGradient(Color4.White, Color4.White.Darken(0.2f));
-		public static readonly Color4 Border = DesktopTheme.Colors.ControlBorder;
+		public static readonly Color4 Background = DesktopTheme.Colors.GrayBackground;
+		public static readonly Color4 Border = DesktopTheme.Colors.SeparatorColor;
 	}
 
 	public static class SceneViewColors
@@ -57,8 +57,8 @@ namespace Tangerine.UI
 	}
 	public static class TimelineOverviewColors
 	{
-		public static readonly Color4 Veil = Color4.White.Darken(0.3f).Transparentify(0.3f);
-		public static readonly Color4 Border = Color4.White.Darken(0.4f);
+		public static readonly Color4 Veil = Color4.White.Darken(0.2f).Transparentify(0.3f);
+		public static readonly Color4 Border = Color4.White.Darken(0.2f);
 	}
 	public static class TimelineRollColors
 	{
@@ -68,12 +68,13 @@ namespace Tangerine.UI
 	public static class DockingColors
 	{
 		public static readonly Color4 DragRectagleOutline = Color4.FromFloats(0.2f, 0.2f, 1f);
-		public static readonly Color4 PanelBorder = Color4.White.Darken(0.75f);
+		public static readonly Color4 PanelTitleBackground = DesktopTheme.Colors.GrayBackground.Darken(0.1f);
+		public static readonly Color4 PanelTitleSeparator = DesktopTheme.Colors.GrayBackground.Darken(0.15f);
 	}
 
 	public static class InspectorColors
 	{
 		public static readonly Color4 BorderAroundKeyframeColorbox = DesktopTheme.Colors.ControlBorder;
-		public static readonly Color4 CategoryLabelBackground = Color4.White.Darken(0.2f);
+		public static readonly Color4 CategoryLabelBackground = Color4.White.Darken(0.13f);
 	}
 }

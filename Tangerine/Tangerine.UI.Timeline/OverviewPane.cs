@@ -46,14 +46,14 @@ namespace Tangerine.UI.Timeline
 			widget.PrepareRendererState();
 			var veilColor = TimelineOverviewColors.Veil;
 			var zoom = ContentWidget.Scale;
-			var a = Vector2.Floor(timeline.ScrollOrigin * zoom) + Vector2.Half;
-			var b = a + Vector2.Floor(timeline.Grid.Size * zoom) - Vector2.Half;
-			b = Vector2.Min(size - Vector2.Half, b);
+			var a = Vector2.Floor(timeline.ScrollOrigin * zoom);
+			var b = a + Vector2.Floor(timeline.Grid.Size * zoom);
+			b = Vector2.Min(size, b);
 			Renderer.DrawRect(0, 0, a.X, size.Y, veilColor);
 			Renderer.DrawRect(b.X, 0, size.X, size.Y, veilColor);
 			Renderer.DrawRect(a.X, 0, b.X, a.Y, veilColor);
 			Renderer.DrawRect(a.X, b.Y, b.X, size.Y, veilColor);
-			Renderer.DrawRectOutline(a, b, TimelineOverviewColors.Border, 1);
+			Renderer.DrawRectOutline(a, b, TimelineOverviewColors.Border);
 		}
 
 		class CustomFrame : Frame

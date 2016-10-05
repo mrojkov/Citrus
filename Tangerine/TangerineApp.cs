@@ -43,7 +43,7 @@ namespace Tangerine
 			var timelinePanel = new DockPanel("Timeline");
 			var inspectorPanel = new DockPanel("Inspector");
 			var consolePanel = new DockPanel("Console");
-			var searchPanel = new DockPanel("SearchPanel");
+			var searchPanel = new DockPanel("Search");
 
 			var dockManager = DockManager.Instance;
 			dockManager.AddPanel(timelinePanel, DockSite.Top, new Vector2(800, 300));

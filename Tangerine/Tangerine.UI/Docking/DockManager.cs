@@ -41,14 +41,13 @@ namespace Tangerine.UI
 			MainWindowWidget = new InvalidableWindowWidget(window) {
 				Id = "MainWindow",
 				Layout = new VBoxLayout(),
-				Padding = new Thickness(4),
 				Size = windowSize,
 				RedrawMarkVisible = true
 			};
 			ToolbarArea = new Frame {
 				Id = "Toolbar",
 				ClipChildren = ClipMethod.ScissorTest,
-				Layout = new FlowLayout(),
+				Layout = new FlowLayout { Spacing = 4 },
 				LayoutCell = new LayoutCell { StretchY = 0 },
 			};
 			DocumentArea = new Frame {

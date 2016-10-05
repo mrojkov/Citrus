@@ -39,7 +39,6 @@ namespace Tangerine.UI.Inspector
 			RootWidget = new ScrollViewWidget();
 			ContentWidget = RootWidget.Content;
 			ContentWidget.Layout = new VBoxLayout { Tag = "InspectorContent", Spacing = 4 };
-			ContentWidget.Padding = new Thickness { Left = 4, Top = 4, Right = 12, Bottom = 4 };
 			Objects = new List<object>();
 			PropertyEditorRegistry = new List<PropertyEditorRegistryItem>();
 			Editors = new List<IPropertyEditor>();

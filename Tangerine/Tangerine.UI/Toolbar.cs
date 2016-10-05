@@ -17,14 +17,6 @@ namespace Tangerine
 			container.Nodes.Add(widget);
 			DecorateToolbar(widget);
 			container.Tasks.Add(new Property<int>(() => Version).DistinctUntilChanged().Consume(_ => Rebuild()));
-			widget.Tasks.AddLoop(() => {
-				for (int i = 0; i < Count; i++) {
-					var b = (ToolbarButton)widget.Nodes[i];
-					var c = this[i];
-					b.Enabled = c.Enabled;
-					b.Tip = c.Text;
-				}
-			});
 		}
 
 		void Rebuild()
@@ -33,20 +25,24 @@ namespace Tangerine
 			foreach (var c in this) {
 				var b = new ToolbarButton(c.Icon ?? new SerializableTexture());
 				b.Clicked += c.Execute;
+				b.Updating += _ => {
+					b.Enabled = c.Enabled;
+					b.Tip = c.Text;
+				};
 				widget.Nodes.Add(b);
 			}
 		}
 
 		static void DecorateToolbar(Widget widget)
 		{
-			widget.Padding = new Thickness(4, 0);
+			widget.MinMaxHeight = Metrics.ToolbarHeight;
 			widget.LayoutCell = new LayoutCell { StretchX = 0 };
-			widget.Layout = new HBoxLayout { Spacing = 2 };
+			widget.Layout = new HBoxLayout { Spacing = 1, CellDefaults = new LayoutCell(Alignment.Center) };
 			widget.CompoundPresenter.Add(new DelegatePresenter<Widget>(w => {
-				w.PrepareRendererState();
 				if (w.Width > 0) {
-					Renderer.DrawVerticalGradientRect(new Vector2(2, 0), w.Size - new Vector2(2, 0), ToolbarColors.Background);
-					Renderer.DrawRectOutline(new Vector2(2, 0), w.Size - new Vector2(2, 0), ToolbarColors.Border);
+					w.PrepareRendererState();
+					Renderer.DrawRect(Vector2.Zero, w.Size, ToolbarColors.Background);
+					Renderer.DrawRectOutline(Vector2.Zero, w.Size, ToolbarColors.Border);
 				}
 			}));
 		}

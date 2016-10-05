@@ -24,11 +24,16 @@ namespace Tangerine.UI
 			TitleWidget = new Widget {
 				Layout = new HBoxLayout(),
 				Nodes = {
-					new SimpleText { Text = Title, Padding = new Thickness(4, 0), AutoSizeConstraints = false, MinMaxHeight = 20 },
+					new SimpleText { Text = Title, Padding = new Thickness(4, 0), AutoSizeConstraints = false, MinMaxHeight = DesktopTheme.Metrics.MinTabSize.Y },
 					(CloseButton = new DesktopTheme.TabCloseButton { LayoutCell = new LayoutCell(Alignment.Center) })
 				},
 				HitTestTarget = true
 			};
+			TitleWidget.CompoundPresenter.Add(new DelegatePresenter<Widget>(w => {
+				w.PrepareRendererState();
+				Renderer.DrawRect(Vector2.Zero, w.Size, DockingColors.PanelTitleBackground);
+				Renderer.DrawLine(0, w.Height - 0.5f, w.Width, w.Height - 0.5f, DockingColors.PanelTitleSeparator);
+			}));
 			ContentWidget = new Frame { Id = "PanelContent", ClipChildren = ClipMethod.ScissorTest, Layout = new StackLayout() };
 			RootWidget = new Widget {
 				Id = $"DockPanel<{title}>",
