@@ -10,10 +10,10 @@ namespace Lime
 		{
 			public static readonly int TextHeight = 18;
 			public static readonly Vector2 CheckBoxSize = new Vector2(16, 16);
-			public static readonly Vector2 DefaultButtonSize = new Vector2(75, 23);
-			public static readonly Vector2 DefaultEditBoxSize = new Vector2(75, 23);
-			public static readonly Vector2 MaxTabSize = new Vector2(250, 23);
-			public static readonly Vector2 MinTabSize = new Vector2(25, 23);
+			public static readonly Vector2 DefaultButtonSize = new Vector2(75, 22);
+			public static readonly Vector2 DefaultEditBoxSize = new Vector2(75, 22);
+			public static readonly Vector2 MaxTabSize = new Vector2(250, 24);
+			public static readonly Vector2 MinTabSize = new Vector2(25, 24);
 			public static readonly Vector2 CloseButtonSize = new Vector2(16, 16);
 			public static readonly Thickness ControlsPadding = new Thickness(2);
 		}
@@ -24,17 +24,17 @@ namespace Lime
 			public static readonly Color4 WhiteBackground = new Color4(255, 255, 255);
 			public static readonly Color4 GrayBackground = new Color4(240, 240, 240);
 			public static readonly Color4 SelectedBackground = new Color4(140, 170, 255);
-			public static readonly Color4 ControlBorder = new Color4(172, 172, 172);
+			public static readonly Color4 ControlBorder = new Color4(172, 172, 172).Lighten(0.3f);
 			public static readonly ColorGradient ButtonDefault = new ColorGradient(new Color4(239, 239, 239), new Color4(229, 229, 229));
 			public static readonly ColorGradient ButtonHover = new ColorGradient(new Color4(235, 244, 252), new Color4(222, 238, 252));
 			public static readonly ColorGradient ButtonPress = new ColorGradient(new Color4(215, 234, 252), new Color4(199, 226, 252));
 			public static readonly ColorGradient ButtonDisable = new ColorGradient(new Color4(244, 244, 244), new Color4(244, 244, 244));
 			public static readonly Color4 TabNormal = GrayBackground.Darken(0.1f);
-			public static readonly Color4 TabActive = GrayBackground;
-			public static readonly Color4 SeparatorColor = new Color4(255, 255, 255);
+			public static readonly Color4 TabActive = GrayBackground.Darken(0.05f);
+			public static readonly Color4 SeparatorColor = GrayBackground.Darken(0.3f);
 			public static readonly Color4 KeyboardFocusBorder = new Color4(150, 200, 255);
-			public static readonly Color4 CloseButtonNormal = GrayBackground.Darken(0.3f);
-			public static readonly Color4 CloseButtonHovered = GrayBackground.Darken(0.7f);
+			public static readonly Color4 CloseButtonNormal = GrayBackground.Darken(0.6f);
+			public static readonly Color4 CloseButtonHovered = GrayBackground.Darken(0.8f);
 			public static readonly Color4 CloseButtonPressed = GrayBackground.Darken(1);
 			public static readonly Color4 ScrollbarBackground = new Color4(210, 210, 210);
 			public static readonly Color4 ScrollbarThumb = new Color4(120, 120, 120);
@@ -64,7 +64,7 @@ namespace Lime
 		{
 			var splitter = (Splitter)widget;
 			splitter.SeparatorColor = Colors.SeparatorColor;
-			splitter.SeparatorWidth = 2;
+			splitter.SeparatorWidth = 1;
 			splitter.SeparatorActiveAreaWidth = 4;
 		}
 
@@ -334,7 +334,7 @@ namespace Lime
 				if (node == Widget.Focused) {
 					var widget = node.AsWidget;
 					widget.PrepareRendererState();
-					Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.KeyboardFocusBorder, 2);
+					Renderer.DrawRectOutline(-Vector2.One, widget.Size + Vector2.One, Colors.KeyboardFocusBorder, 2);
 				}
 			}
 		}
@@ -440,14 +440,7 @@ namespace Lime
 			{
 				var widget = node.AsWidget;
 				widget.PrepareRendererState();
-				Renderer.DrawRect(Vector2.Zero, widget.Size, active ? Colors.TabActive : Colors.TabNormal);
-				Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.ControlBorder);
-				Renderer.DrawRectOutline(Vector2.Zero, widget.Size, Colors.ControlBorder);
-				if (active) {
-					var pixel = 1 / Window.Current.PixelScale;
-					// Erase the bottom border
-					Renderer.DrawLine(new Vector2(pixel, widget.Height), new Vector2(widget.Width - pixel, widget.Height), Colors.TabActive);
-				}
+				Renderer.DrawRect(Vector2.Zero, widget.Size - new Vector2(1, 0), active ? Colors.TabActive : Colors.TabNormal);
 			}
 
 			public override bool PartialHitTest(Node node, ref HitTestArgs args)
@@ -505,8 +498,8 @@ namespace Lime
 		class TabCloseButtonPresenter : CustomPresenter, IButtonPresenter
 		{
 			private VectorShape icon = new VectorShape {
-				new VectorShape.Line(0.3f, 0.3f, 0.7f, 0.7f, Color4.White, 0.075f),
-				new VectorShape.Line(0.3f, 0.7f, 0.7f, 0.3f, Color4.White, 0.0751f),
+				new VectorShape.Line(0.3f, 0.3f, 0.7f, 0.7f, Color4.White, 0.075f * 1.5f),
+				new VectorShape.Line(0.3f, 0.7f, 0.7f, 0.3f, Color4.White, 0.0751f * 1.5f),
 			};
 
 			Color4 color;
