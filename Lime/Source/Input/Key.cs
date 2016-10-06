@@ -115,30 +115,30 @@ namespace Lime
 
 		public static Key GetByName(string name)
 		{
-			var field = typeof(Key).GetFields().
-				FirstOrDefault(i => string.Equals(i.Name, name, StringComparison.OrdinalIgnoreCase) && i.FieldType == typeof(Key));
-			return (Key?) (field == null ? null : field.GetValue(null)) ?? Key.Unknown;
+			return keyToNameCache.FirstOrDefault(p => p.Value == name).Key;
+		}
+
+		public override string ToString()
+		{
+			string value;
+			if (keyToNameCache.TryGetValue(this, out value)) {
+				return value;
+			}
+			foreach (var kv in ShortcutMap) {
+				if (kv.Value == this) {
+					return kv.Key.ToString();
+				}
+			}
+			return Code.ToString();
 		}
 
 		private static Dictionary<Key, string> keyToNameCache;
 
-		public override string ToString()
+		static Key()
 		{
-			if (keyToNameCache == null) {
-				keyToNameCache = typeof(Key).GetFields()
-				.Where(i => i.FieldType == typeof(Key)).ToDictionary(i => (Key)i.GetValue(null), i => i.Name);
-			}
-			string value;
-			if (keyToNameCache.TryGetValue(this, out value)) {
-				return value;
-			} else {
-				foreach (var kv in ShortcutMap) {
-					if (kv.Value == this) {
-						return kv.Key.ToString();
-					}
-				}
-			}
-			return Code.ToString();
+			keyToNameCache = typeof(Key).GetFields()
+				.Where(i => i.FieldType == typeof(Key))
+				.ToDictionary(i => (Key)i.GetValue(null), i => i.Name);
 		}
 
 		public static implicit operator Key (int code) { return new Key(code); }
