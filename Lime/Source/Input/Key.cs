@@ -125,7 +125,7 @@ namespace Lime
 		public override string ToString()
 		{
 			if (keyToNameCache == null) {
-				keyToNameCache = typeof(Key).GetFields().Union(typeof(Commands).GetFields())
+				keyToNameCache = typeof(Key).GetFields()
 				.Where(i => i.FieldType == typeof(Key)).ToDictionary(i => (Key)i.GetValue(null), i => i.Name);
 			}
 			string value;
