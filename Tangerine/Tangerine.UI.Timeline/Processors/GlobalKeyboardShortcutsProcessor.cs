@@ -33,13 +33,13 @@ namespace Tangerine.UI.Timeline
 		void HandleShortcuts(WidgetInput input)
 		{
 			var hasSelection = Document.Current.SelectedRows.Count > 0;
-			input.EnableKey(Key.Commands.Undo, Document.Current.History.UndoEnabled);
-			input.EnableKey(Key.Commands.Redo, Document.Current.History.RedoEnabled);
-			input.EnableKey(Key.Commands.SelectAll, hasSelection);
-			input.EnableKey(Key.Commands.Cut, hasSelection);
-			input.EnableKey(Key.Commands.Copy, hasSelection);
-			input.EnableKey(Key.Commands.Paste, Core.Operations.Clipboard.Nodes.Count > 0);
-			input.EnableKey(Key.Commands.Delete, hasSelection);
+			input.SetKeyEnabled(Key.Commands.Undo, Document.Current.History.UndoEnabled);
+			input.SetKeyEnabled(Key.Commands.Redo, Document.Current.History.RedoEnabled);
+			input.SetKeyEnabled(Key.Commands.SelectAll, hasSelection);
+			input.SetKeyEnabled(Key.Commands.Cut, hasSelection);
+			input.SetKeyEnabled(Key.Commands.Copy, hasSelection);
+			input.SetKeyEnabled(Key.Commands.Paste, Core.Operations.Clipboard.Nodes.Count > 0);
+			input.SetKeyEnabled(Key.Commands.Delete, hasSelection);
 			if (input.ConsumeKeyRepeat(Key.Commands.Redo)) {
 				Document.Current.History.Redo();
 			} else if (input.ConsumeKeyRepeat(Key.Commands.Undo)) {

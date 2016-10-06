@@ -204,7 +204,7 @@ namespace Lime
 			return !keys[key].Disabled;
 		}
 		
-		public void EnableKey(Key key, bool enable)
+		public void SetKeyEnabled(Key key, bool enable)
 		{
 			keys[key].Disabled = !enable;
 		}
