@@ -250,10 +250,10 @@ namespace Lime
 					if (!processedKeys[evt.Key]) {
 						ProcessKeyEvent(evt.Key, evt.State);
 						processedKeys[evt.Key] = true;
-						keyEventQueue.RemoveAt(i);
-						i--;
+						keyEventQueue[i] = new KeyEvent();
 					}
 				}
+				keyEventQueue.RemoveAll(i => i.Key == Key.Unknown);
 			}
 		}
 
