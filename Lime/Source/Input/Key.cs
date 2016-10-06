@@ -144,6 +144,11 @@ namespace Lime
 		public static implicit operator Key (int code) { return new Key(code); }
 		public static implicit operator int (Key key) { return key.Code; }
 
+		public static Key MapShortcut(Key main)
+		{
+			return MapShortcut(new Shortcut(Modifiers.None, main));
+		}
+
 		public static Key MapShortcut(Modifiers modifiers, Key main)
 		{
 			return MapShortcut(new Shortcut(modifiers, main));
@@ -153,9 +158,6 @@ namespace Lime
 		{
 			if (!Shortcut.ValidateMainKey(shortcut.Main)) {
 				throw new ArgumentException();
-			}
-			if (shortcut.Modifiers == Modifiers.None) {
-				return shortcut.Main;
 			}
 			Key key;
 			if (!ShortcutMap.TryGetValue(shortcut, out key)) {
@@ -294,7 +296,7 @@ namespace Lime
 			public static readonly Key Cut = MapShortcut(Modifiers.Command, Key.X);
 			public static readonly Key Copy = MapShortcut(Modifiers.Command, Key.C);
 			public static readonly Key Paste = MapShortcut(Modifiers.Command, Key.V);
-			public static readonly Key Delete = Key.Delete;
+			public static readonly Key Delete = MapShortcut(Key.Delete);
 		}
 	}
 }

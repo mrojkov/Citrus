@@ -212,37 +212,40 @@ namespace Lime
 			keys[key].Disabled = !enable;
 		}
 
+		private Key currentShortcut = Key.Unknown;
+
 		internal void SetKeyState(Key key, bool value)
 		{
-			if (key.IsModifier()) {
-				ReleaseAffectedByModifierKeys();
-			}
-			key = TranslateShortcuts(key);
-			if (Shortcut.ValidateMainKey(key) && GetModifiers() != Modifiers.None) {
-				return;
-			}
 			keyEventQueue.Add(new KeyEvent { Key = key, State = value });
+			if (currentShortcut != Key.Unknown) {
+				keyEventQueue.Add(new KeyEvent { Key = currentShortcut, State = false });
+				currentShortcut = Key.Unknown;
+			}
+			Key mainKey = Shortcut.ValidateMainKey(key) && value ? key : Key.Unknown;
+			if (mainKey == Key.Unknown)
+				for (var i = Key.Unknown; i < Key.Count; i++) {
+					var state = i == key ? value : keys[i].CurrentState;
+					if (state && Shortcut.ValidateMainKey(i)) {
+						mainKey = i;
+						break;
+					}
+				}
+			var modifier = KeyToModifier(key);
+			var modifiers = value ? GetModifiers() | modifier : GetModifiers() & ~modifier;
+
+			if (mainKey != Key.Unknown && Key.ShortcutMap.TryGetValue(new Shortcut(modifiers, mainKey), out currentShortcut)) {
+				// Must have zero shortcuts here.
+				keyEventQueue.Add(new KeyEvent { Key = currentShortcut, State = true });
+			}
 		}
 
-		private Key TranslateShortcuts(Key mainKey)
+		private static Modifiers KeyToModifier(Key key)
 		{
-			Key key;
-			return Key.ShortcutMap.TryGetValue(
-				new Shortcut(GetModifiers(), mainKey), out key) ? key : mainKey;
-		}
-
-		private void ReleaseAffectedByModifierKeys()
-		{
-			for (var i = 0; i < Key.Count; i++) {
-				if (keys[i].CurrentState && Shortcut.ValidateMainKey((Key)i)) {
-					SetKeyState(i, false);
-				}
-			}
-			foreach (var i in Key.ShortcutMap.Values) {
-				if (keys[i].CurrentState) {
-					SetKeyState(i, false);
-				}
-			}
+			if (key == Key.Shift) return Modifiers.Shift;
+			if (key == Key.Alt) return Modifiers.Alt;
+			if (key == Key.Control) return Modifiers.Control;
+			if (key == Key.Win) return Modifiers.Win;
+			return Modifiers.None;
 		}
 
 		internal bool HasPendingKeyEvent(Key key)
