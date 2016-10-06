@@ -82,6 +82,9 @@ namespace Lime
 			if (IsKeyPressed(Key.Control)) {
 				result |= Modifiers.Control;
 			}
+			if (IsKeyPressed(Key.Win)) {
+				result |= Modifiers.Win;
+			}
 			return result;
 		}
 
