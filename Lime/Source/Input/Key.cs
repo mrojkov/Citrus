@@ -288,13 +288,13 @@ namespace Lime
 
 		public static class Commands
 		{
-			public static readonly Key Undo = New();
-			public static readonly Key Redo = New();
-			public static readonly Key SelectAll = New();
-			public static readonly Key Cut = New();
-			public static readonly Key Copy = New();
-			public static readonly Key Paste = New();
-			public static readonly Key Delete = New();
+			public static readonly Key Undo = MapShortcut(Modifiers.Command, Key.Z);
+			public static readonly Key Redo = MapShortcut(Modifiers.Command | Modifiers.Shift, Key.Z);
+			public static readonly Key SelectAll = MapShortcut(Modifiers.Command, Key.A);
+			public static readonly Key Cut = MapShortcut(Modifiers.Command, Key.X);
+			public static readonly Key Copy = MapShortcut(Modifiers.Command, Key.C);
+			public static readonly Key Paste = MapShortcut(Modifiers.Command, Key.V);
+			public static readonly Key Delete = Key.Delete;
 		}
 	}
 }
