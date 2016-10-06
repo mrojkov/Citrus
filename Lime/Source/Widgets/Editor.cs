@@ -180,6 +180,11 @@ namespace Lime
 			container.Tasks.Add(HandleInputTask(), this);
 		}
 
+		public static class Keys {
+			public static Key PreviousWord = Key.New();
+			public static Key NextWord = Key.New();
+		}
+
 		private string PasswordChars(int length) { return new string(EditorParams.PasswordChar.Value, length); }
 
 		private void ProcessTextAsPassword(ref string text)
@@ -225,6 +230,57 @@ namespace Lime
 		static readonly List<Key> consumingKeys = Key.Enumerate().Where(
 			k => k.IsPrintable() || k.IsTextNavigation() || k.IsTextEditing()).ToList();
 
+		private enum CharClass
+		{
+			Begin,
+			Space,
+			Punctuation,
+			Word,
+			Other,
+			End,
+		}
+
+		private static CharClass GetCharClassAt(string text, int pos)
+		{
+			if (pos < 0) return CharClass.Begin;
+			if (pos >= text.Length) return CharClass.End;
+			var ch = text[pos];
+			if (Char.IsWhiteSpace(ch)) return CharClass.Space;
+			if (Char.IsPunctuation(ch) || Char.IsSeparator(ch) || Char.IsSymbol(ch))
+				return CharClass.Punctuation;
+			if (Char.IsLetterOrDigit(ch))
+				return CharClass.Word;
+			return CharClass.Other;
+		}
+
+		private static int PreviousWord(string text, int pos)
+		{
+			if (pos <= 0)
+				return 0;
+			--pos;
+			for (var ccRight = GetCharClassAt(text, pos); pos > 0; --pos) {
+				var ccLeft = GetCharClassAt(text, pos - 1);
+				if (ccLeft != ccRight && ccRight != CharClass.Space)
+					break;
+				ccRight = ccLeft;
+			}
+			return pos;
+		}
+
+		private static int NextWord(string text, int pos)
+		{
+			if (pos >= text.Length)
+				return text.Length;
+			++pos;
+			for (var ccLeft = GetCharClassAt(text, pos - 1); pos < text.Length; ++pos) {
+				var ccRight = GetCharClassAt(text, pos);
+				if (ccRight != ccLeft && ccRight != CharClass.Space)
+					break;
+				ccLeft = ccRight;
+			}
+			return pos;
+		}
+
 		private void HandleKeys(string originalText)
 		{
 			try {
@@ -232,6 +288,10 @@ namespace Lime
 					caretPos.TextPos--;
 				if (WasKeyRepeated(Key.Right))
 					caretPos.TextPos++;
+				if (WasKeyRepeated(Keys.PreviousWord))
+					caretPos.TextPos = PreviousWord(Text.Text, caretPos.TextPos);
+				if (WasKeyRepeated(Keys.NextWord))
+					caretPos.TextPos = NextWord(Text.Text, caretPos.TextPos);
 				if (WasKeyRepeated(Key.Up))
 					caretPos.Line--;
 				if (WasKeyRepeated(Key.Down))
