@@ -190,11 +190,6 @@ namespace Lime
 			#endif
 			public static Key DeletePreviousWord = Key.MapShortcut(Modifiers.Control, Key.BackSpace);
 			public static Key DeleteNextWord = Key.MapShortcut(Modifiers.Control, Key.Delete);
-
-			public static IEnumerable<Key> Enumerate()
-			{
-				return new[] { PreviousWord, NextWord, DeletePreviousWord, DeleteNextWord };
-			}
 		}
 
 		private string PasswordChars(int length) { return new string(EditorParams.PasswordChar.Value, length); }
@@ -240,7 +235,13 @@ namespace Lime
 		}
 
 		static readonly List<Key> consumingKeys = Key.Enumerate().Where(
-			k => k.IsPrintable() || k.IsTextNavigation() || k.IsTextEditing()).Concat(Keys.Enumerate()).ToList();
+			k => k.IsPrintable() || k.IsTextNavigation() || k.IsTextEditing()).Concat(
+				new[] {
+					Keys.PreviousWord, Keys.NextWord,
+					Keys.DeletePreviousWord, Keys.DeleteNextWord,
+					Key.Commands.Cut, Key.Commands.Copy, Key.Commands.Paste,
+				}
+			).ToList();
 
 		private enum CharClass
 		{
@@ -360,7 +361,11 @@ namespace Lime
 						InsertChar(ch);
 				}
 			} finally {
-				Container.Input.ConsumeKeys(consumingKeys);
+				var input = Container.Input;
+				input.SetKeyEnabled(Key.Commands.Cut, !string.IsNullOrEmpty(Text.Text));
+				input.SetKeyEnabled(Key.Commands.Copy, !string.IsNullOrEmpty(Text.Text));
+				input.SetKeyEnabled(Key.Commands.Paste, !string.IsNullOrEmpty(Clipboard.Text));
+				input.ConsumeKeys(consumingKeys);
 			}
 		}
 
