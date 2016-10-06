@@ -117,20 +117,20 @@ namespace Lime.Platform
 			var key = (Key)MacKeyMap.GetKey((MacKeyCode)theEvent.KeyCode);
 			if (!theEvent.IsARepeat) {
 				input.SetKeyState(key, true);
-				// There is no KeyUp event for regular key on Mac if Command key pressed, so we release it manualy in the same frame
-				if ((theEvent.ModifierFlags & (NSEventModifierMask)(MacKeyModifiers.LWinFlag | MacKeyModifiers.RWinFlag)) != 0) {
-					input.SetKeyState(key, false);
-				}
 			}
-			foreach(var c in theEvent.Characters) {
-				const char backspaceCode = (char)127;
-				bool isControl = Enum.IsDefined(typeof(NSFunctionKey), (ulong)c);
-				if (!isControl && c != backspaceCode) {
-					input.TextInput += c;
-				} else if (c == backspaceCode) {
-					// Imitation of original OpenTK backspace bug
+			if ((input.GetModifiers() & (Modifiers.Control | Modifiers.Alt | Modifiers.Win)) != 0) {
+				return;
+			}
+			foreach (var c in theEvent.Characters) {
+				// Imitation of original OpenTK backspace bug.
+				if (c == (char)127) {
 					input.TextInput += '\b';
+					continue;
 				}
+				if (Enum.IsDefined(typeof(NSFunctionKey), (ulong)c)) {
+					continue;
+				}
+				input.TextInput += c;
 			}
 		}
 
