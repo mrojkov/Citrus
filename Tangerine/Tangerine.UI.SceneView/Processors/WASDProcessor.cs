@@ -25,7 +25,6 @@ namespace Tangerine.UI.SceneView
 				if (sv.Input.ConsumeKeyRepeat(KeyBindings.SceneViewKeys.DragRightFast)) {
 					DragWidgets(new Vector2(5, 0));
 				}
-				sv.Input.IsAcceptingKey(Key.A);
 				if (sv.Input.ConsumeKeyRepeat(KeyBindings.SceneViewKeys.DragUp)) {
 					DragWidgets(new Vector2(0, -1));
 				}
