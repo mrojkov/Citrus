@@ -183,6 +183,8 @@ namespace Lime
 		public static class Keys {
 			public static Key PreviousWord = Key.New();
 			public static Key NextWord = Key.New();
+			public static Key DeletePreviousWord = Key.New();
+			public static Key DeleteNextWord = Key.New();
 		}
 
 		private string PasswordChars(int length) { return new string(EditorParams.PasswordChar.Value, length); }
@@ -307,6 +309,21 @@ namespace Lime
 						caretPos.TextPos++; // Enforce revalidation.
 					}
 				}
+				if (WasKeyRepeated(Keys.DeletePreviousWord)) {
+					var p = PreviousWord(Text.Text, caretPos.TextPos);
+					if (p < caretPos.TextPos) {
+						Text.Text = Text.Text.Remove(p, caretPos.TextPos - p);
+						caretPos.TextPos = p;
+					}
+				}
+				if (WasKeyRepeated(Keys.DeleteNextWord)) {
+					var p = NextWord(Text.Text, caretPos.TextPos);
+					if (p > caretPos.TextPos) {
+						Text.Text = Text.Text.Remove(caretPos.TextPos, p - caretPos.TextPos);
+						caretPos.TextPos--;
+						caretPos.TextPos++; // Enforce revalidation.
+					}
+				}
 				if (WasKeyRepeated(Key.Enter)) {
 					if (EditorParams.IsAcceptableLines(Text.Text.Count(ch => ch == '\n') + 2)) {
 						InsertChar('\n');
@@ -354,7 +371,7 @@ namespace Lime
 						lastCharShowTimeLeft = 0f;
 					}
 				}
-				else if (ch >= ' ') {
+				else if (ch >= ' ' && ch != '\u007f') { // Ignore control and 'delete' characters.
 					InsertChar(ch);
 					lastCharShowTimeLeft = EditorParams.PasswordLastCharShowTime;
 				}
