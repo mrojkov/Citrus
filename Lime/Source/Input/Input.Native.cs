@@ -228,12 +228,6 @@ namespace Lime
 			return Modifiers.None;
 		}
 
-		internal bool HasPendingKeyEvent(Key key)
-		{
-			return keyEventQueue.Contains(new KeyEvent { Key = key, State = true }) ||
-				keyEventQueue.Contains(new KeyEvent { Key = key, State = false });
-		}
-
 		internal void ProcessPendingKeyEvents(float delta)
 		{
 			Changed = false;
@@ -312,7 +306,7 @@ namespace Lime
 				return;
 			}
 			var key = delta > 0 ? Key.MouseWheelUp : Key.MouseWheelDown;
-			if (!HasPendingKeyEvent(key)) {
+			if (!keyEventQueue.Any(i => i.Key == key)) {
 				SetKeyState(key, true);
 				SetKeyState(key, false);
 				WheelScrollAmount = delta;
