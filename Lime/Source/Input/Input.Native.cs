@@ -224,17 +224,11 @@ namespace Lime
 			keyEventQueue.Add(new KeyEvent { Key = key, State = value });
 		}
 
-		private Key TranslateShortcuts(Key key)
+		private Key TranslateShortcuts(Key mainKey)
 		{
-			var modifiers = GetModifiers();
-			foreach (var kv in Key.ShortcutMap) {
-				var shortcut = kv.Key;
-				if (key == shortcut.Main && shortcut.Modifiers == modifiers) {
-					key = kv.Value;
-					break;
-				}
-			}
-			return key;
+			Key key;
+			return Key.ShortcutMap.TryGetValue(
+				new Shortcut(GetModifiers(), mainKey), out key) ? key : mainKey;
 		}
 
 		private void ReleaseAffectedByModifierKeys()
