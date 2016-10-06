@@ -21,7 +21,7 @@ namespace Tangerine
 
 		private TangerineApp()
 		{
-			WindowOptions.DefaultRefreshRate = 30;
+			WindowOptions.DefaultRefreshRate = 60;
 			WidgetInput.AcceptMouseBeyondWidgetByDefault = false;
 			Application.IsTangerine = true;
 			Lime.Serialization.DeserializerBuilders.Insert(0, DeserializeHotStudioAssets);
@@ -227,8 +227,6 @@ namespace Tangerine
 					new DelegateCommand("Quit", new Shortcut(Modifiers.Alt, Key.F4), Application.Exit),
 					#endif
 				},
-				new Submenu("Create") {
-				},
 				new Submenu("File") {
 					new OpenFileCommand(),
 					new OpenProjectCommand(),
@@ -245,6 +243,8 @@ namespace Tangerine
 					new KeySendingCommand("Delete", Key.Delete, Key.Commands.Delete),
 					Command.MenuSeparator,
 					new KeySendingCommand("Select All", new Shortcut(Modifiers.Command, Key.A), Key.Commands.SelectAll),
+				},
+				new Submenu("Create") {
 				},
 				new Submenu("View") {
 					new DefaultLayoutCommand(),
