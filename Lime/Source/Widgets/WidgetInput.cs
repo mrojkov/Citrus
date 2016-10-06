@@ -95,15 +95,14 @@ namespace Lime
 						nodeUnderMouse != null && nodeUnderMouse.DescendantOrThis(widget) &&
 						// Full HitTest would be better.
 						widget.HitTestTarget && widget.BoundingRectHitTest(MousePosition);
-				} else {
-					return nodeUnderMouse == widget;
 				}
-			} else if (key.IsModifier()) {
-				return true;
-			} else {
-				var focused = Widget.Focused;
-				return focused != null && focused.DescendantOrThis(widget);
+				return nodeUnderMouse == widget;
 			}
+			if (key.IsModifier()) {
+				return true;
+			}
+			var focused = Widget.Focused;
+			return focused != null && focused.DescendantOrThis(widget);
 		}
 
 		public bool IsMousePressed(int button = 0)
