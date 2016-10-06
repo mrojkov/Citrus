@@ -217,26 +217,6 @@ namespace Lime
 		internal void SetKeyState(Key key, bool value)
 		{
 			keyEventQueue.Add(new KeyEvent { Key = key, State = value });
-			if (currentShortcut != Key.Unknown) {
-				keyEventQueue.Add(new KeyEvent { Key = currentShortcut, State = false });
-				currentShortcut = Key.Unknown;
-			}
-			Key mainKey = Shortcut.ValidateMainKey(key) && value ? key : Key.Unknown;
-			if (mainKey == Key.Unknown)
-				for (var i = Key.Unknown; i < Key.Count; i++) {
-					var state = i == key ? value : keys[i].CurrentState;
-					if (state && Shortcut.ValidateMainKey(i)) {
-						mainKey = i;
-						break;
-					}
-				}
-			var modifier = KeyToModifier(key);
-			var modifiers = value ? GetModifiers() | modifier : GetModifiers() & ~modifier;
-
-			if (mainKey != Key.Unknown && Key.ShortcutMap.TryGetValue(new Shortcut(modifiers, mainKey), out currentShortcut)) {
-				// Must have zero shortcuts here.
-				keyEventQueue.Add(new KeyEvent { Key = currentShortcut, State = true });
-			}
 		}
 
 		private static Modifiers KeyToModifier(Key key)
@@ -273,21 +253,50 @@ namespace Lime
 				var processedKeys = new BitArray(Key.MaxCount);
 				for (int i = 0; i < keyEventQueue.Count; i++) {
 					var evt = keyEventQueue[i];
-					var k = evt.Key;
-					if (!processedKeys[k]) {
-						processedKeys[k] = true;
-						if (evt.State) {
-							lastPressedKey = k;
-						}
-						keys[k].CurrentState = evt.State;
-						keys[k].RepeatDelay = KeyRepeatDelay;
-						keys[k].Repeated |= evt.State;
+					if (!processedKeys[evt.Key]) {
+						ProcessKeyEvent(evt.Key, evt.State);
+						processedKeys[evt.Key] = true;
 						keyEventQueue.RemoveAt(i);
-						Changed = true;
 						i--;
 					}
 				}
 			}
+		}
+
+		private void ProcessKeyEvent(Key key, bool value)
+		{
+			SetKeyStateInternal(key, value);
+			if (currentShortcut != Key.Unknown) {
+				SetKeyStateInternal(currentShortcut, false);
+				currentShortcut = Key.Unknown;
+			}
+			Key mainKey = Shortcut.ValidateMainKey(key) && value ? key : Key.Unknown;
+			if (mainKey == Key.Unknown)
+				for (var i = Key.Unknown; i < Key.Count; i++) {
+					var state = i == key ? value : keys[i].CurrentState;
+					if (state && Shortcut.ValidateMainKey(i)) {
+						mainKey = i;
+						break;
+					}
+				}
+			var modifier = KeyToModifier(key);
+			var modifiers = value ? GetModifiers() | modifier : GetModifiers() & ~modifier;
+
+			if (mainKey != Key.Unknown && Key.ShortcutMap.TryGetValue(new Shortcut(modifiers, mainKey), out currentShortcut)) {
+				// Must have zero shortcuts here.
+				SetKeyStateInternal(currentShortcut, true);
+			}
+		}
+
+		private void SetKeyStateInternal(Key key, bool value)
+		{
+			if (value) {
+				lastPressedKey = key;
+			}
+			keys[key].CurrentState = value;
+			keys[key].RepeatDelay = KeyRepeatDelay;
+			keys[key].Repeated |= value;
+			Changed = true;
 		}
 
 		internal void CopyKeysState()
