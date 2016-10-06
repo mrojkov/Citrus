@@ -181,10 +181,20 @@ namespace Lime
 		}
 
 		public static class Keys {
-			public static Key PreviousWord = Key.New();
-			public static Key NextWord = Key.New();
-			public static Key DeletePreviousWord = Key.New();
-			public static Key DeleteNextWord = Key.New();
+			#if MAC
+			public static Key PreviousWord = Key.MapShortcut(Modifiers.Alt, Key.Left);
+			public static Key NextWord = Key.MapShortcut(Modifiers.Alt, Key.Right);
+			#else
+			public static Key PreviousWord = Key.MapShortcut(Modifiers.Control, Key.Left);
+			public static Key NextWord = Key.MapShortcut(Modifiers.Control, Key.Right);
+			#endif
+			public static Key DeletePreviousWord = Key.MapShortcut(Modifiers.Control, Key.BackSpace);
+			public static Key DeleteNextWord = Key.MapShortcut(Modifiers.Control, Key.Delete);
+
+			public static IEnumerable<Key> Enumerate()
+			{
+				return new[] { PreviousWord, NextWord, DeletePreviousWord, DeleteNextWord };
+			}
 		}
 
 		private string PasswordChars(int length) { return new string(EditorParams.PasswordChar.Value, length); }
@@ -230,7 +240,7 @@ namespace Lime
 		}
 
 		static readonly List<Key> consumingKeys = Key.Enumerate().Where(
-			k => k.IsPrintable() || k.IsTextNavigation() || k.IsTextEditing()).ToList();
+			k => k.IsPrintable() || k.IsTextNavigation() || k.IsTextEditing()).Concat(Keys.Enumerate()).ToList();
 
 		private enum CharClass
 		{
