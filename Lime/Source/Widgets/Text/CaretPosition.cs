@@ -2,7 +2,7 @@ namespace Lime
 {
 	internal class CaretPosition: ICaretPosition
 	{
-		public enum ValidState { None, All, LinePos, WorldPos, TextPos };
+		public enum ValidState { None, All, LineCol, WorldPos, TextPos };
 		public ValidState Valid;
 		public int RenderingLineNumber;
 		public int RenderingTextPos;
@@ -18,7 +18,7 @@ namespace Lime
 			get { return line; }
 			set {
 				if (line == value) return;
-				Valid = ValidState.LinePos;
+				Valid = ValidState.LineCol;
 				line = value;
 			}
 		}
@@ -27,7 +27,7 @@ namespace Lime
 			get { return col; }
 			set {
 				if (col == value) return;
-				Valid = ValidState.LinePos;
+				Valid = ValidState.LineCol;
 				col = value;
 			}
 		}
@@ -65,7 +65,7 @@ namespace Lime
 				case ValidState.None:
 				case ValidState.All:
 					break;
-				case ValidState.LinePos:
+				case ValidState.LineCol:
 					if (Line == RenderingLineNumber && Col == index) {
 						TextPos = RenderingTextPos;
 						WorldPos = charPos;

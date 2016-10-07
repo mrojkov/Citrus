@@ -312,12 +312,12 @@ namespace Lime
 				bool firstLine = true;
 				if (caret.Valid == CaretPosition.ValidState.TextPos)
 					Caret.TextPos = Caret.TextPos.Clamp(0, Text.Length);
-				if (caret.Valid == CaretPosition.ValidState.LinePos)
+				if (caret.Valid == CaretPosition.ValidState.LineCol)
 					Caret.Line = Caret.Line.Clamp(0, lines.Count - 1);
 				int i = 0;
 				foreach (var line in lines) {
 					bool lastLine = ++i == lines.Count;
-					if (caret.Valid == CaretPosition.ValidState.LinePos && caret.Line == caret.RenderingLineNumber) {
+					if (caret.Valid == CaretPosition.ValidState.LineCol && caret.Line == caret.RenderingLineNumber) {
 						Caret.Col = Caret.Col.Clamp(0, line.Length - (lastLine ? 0 : 1));
 					}
 					Rectangle lineRect = RenderSingleTextLine(spriteList, pos, line);
