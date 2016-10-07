@@ -247,7 +247,6 @@ namespace Lime
 				new[] {
 					Cmds.MoveCharPrev, Cmds.MoveCharNext,
 					Cmds.MoveWordPrev, Cmds.MoveWordNext,
-					Cmds.MoveLinePrev, Cmds.MoveLineNext,
 					Cmds.MoveLineStart, Cmds.MoveLineEnd,
 					Cmds.DeleteWordPrev, Cmds.DeleteWordNext,
 					Key.Commands.Cut, Key.Commands.Copy, Key.Commands.Paste, Key.Commands.Delete,
@@ -305,6 +304,8 @@ namespace Lime
 			return pos;
 		}
 
+		private bool IsMultiline() { return EditorParams.IsAcceptableLines(2); }
+
 		private void HandleKeys(string originalText)
 		{
 			try {
@@ -316,9 +317,9 @@ namespace Lime
 					caretPos.TextPos = PreviousWord(Text.Text, caretPos.TextPos);
 				if (WasKeyRepeated(Cmds.MoveWordNext))
 					caretPos.TextPos = NextWord(Text.Text, caretPos.TextPos);
-				if (WasKeyRepeated(Cmds.MoveLinePrev))
+				if (IsMultiline() && WasKeyRepeated(Cmds.MoveLinePrev))
 					caretPos.Line--;
-				if (WasKeyRepeated(Cmds.MoveLineNext))
+				if (IsMultiline() && WasKeyRepeated(Cmds.MoveLineNext))
 					caretPos.Line++;
 				if (WasKeyRepeated(Cmds.MoveLineStart))
 					caretPos.Pos = 0;
@@ -377,6 +378,8 @@ namespace Lime
 				input.SetKeyEnabled(Key.Commands.Copy, !string.IsNullOrEmpty(Text.Text));
 				input.SetKeyEnabled(Key.Commands.Paste, !string.IsNullOrEmpty(Clipboard.Text));
 				input.ConsumeKeys(consumingKeys);
+				if (IsMultiline())
+					input.ConsumeKeys(new[] { Cmds.MoveLinePrev, Cmds.MoveLineNext, });
 			}
 		}
 
