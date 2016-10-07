@@ -264,6 +264,11 @@ namespace Lime
 				SetKeyStateInternal(currentShortcut, false);
 				currentShortcut = Key.Unknown;
 			}
+			if (key > Key.LastNormal && value) {
+				// Shortcut was simulated by menu item.
+				currentShortcut = key;
+				return;
+			}
 			Key mainKey = Shortcut.ValidateMainKey(key) && value ? key : Key.Unknown;
 			if (mainKey == Key.Unknown)
 				for (var i = Key.Unknown; i < Key.Count; i++) {

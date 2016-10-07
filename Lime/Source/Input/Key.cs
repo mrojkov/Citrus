@@ -288,6 +288,8 @@ namespace Lime
 		public static readonly Key DismissSoftKeyboard = New();
 #endregion
 
+		public static readonly Key LastNormal = Count;
+
 		public static class Commands
 		{
 			public static readonly Key Undo = MapShortcut(Modifiers.Command, Key.Z);
