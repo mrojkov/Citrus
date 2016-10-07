@@ -218,15 +218,6 @@ namespace Lime
 			keyEventQueue.Add(new KeyEvent { Key = key, State = value });
 		}
 
-		private static Modifiers KeyToModifier(Key key)
-		{
-			if (key == Key.Shift) return Modifiers.Shift;
-			if (key == Key.Alt) return Modifiers.Alt;
-			if (key == Key.Control) return Modifiers.Control;
-			if (key == Key.Win) return Modifiers.Win;
-			return Modifiers.None;
-		}
-
 		internal void ProcessPendingKeyEvents(float delta)
 		{
 			Changed = false;
@@ -257,34 +248,33 @@ namespace Lime
 			}
 		}
 
+		private Key FindMainKey()
+		{
+			for (var i = Key.Unknown; i < Key.Count; i++)
+				if (keys[i].CurrentState && Shortcut.ValidateMainKey(i))
+					return i;
+			return Key.Unknown;
+		}
+
 		private void ProcessKeyEvent(Key key, bool value)
 		{
-			SetKeyStateInternal(key, value);
 			if (currentShortcut != Key.Unknown) {
+				// If currentShortcut == key, we will restore state by the next call.
 				SetKeyStateInternal(currentShortcut, false);
 				currentShortcut = Key.Unknown;
 			}
-			if (key > Key.LastNormal && value) {
+			SetKeyStateInternal(key, value);
+			if (value && key > Key.LastNormal) {
 				// Shortcut was simulated by menu item.
 				currentShortcut = key;
 				return;
 			}
-			Key mainKey = Shortcut.ValidateMainKey(key) && value ? key : Key.Unknown;
+			// Give priority to the last pressed key, choose arbitrarily among others.
+			Key mainKey = value && Shortcut.ValidateMainKey(key) ? key : FindMainKey();
 			if (mainKey == Key.Unknown)
-				for (var i = Key.Unknown; i < Key.Count; i++) {
-					var state = i == key ? value : keys[i].CurrentState;
-					if (state && Shortcut.ValidateMainKey(i)) {
-						mainKey = i;
-						break;
-					}
-				}
-			var modifier = KeyToModifier(key);
-			var modifiers = value ? GetModifiers() | modifier : GetModifiers() & ~modifier;
-
-			if (mainKey != Key.Unknown && Key.ShortcutMap.TryGetValue(new Shortcut(modifiers, mainKey), out currentShortcut)) {
-				// Must have zero shortcuts here.
+				return;
+			if (Key.ShortcutMap.TryGetValue(new Shortcut(GetModifiers(), mainKey), out currentShortcut))
 				SetKeyStateInternal(currentShortcut, true);
-			}
 		}
 
 		private void SetKeyStateInternal(Key key, bool value)
