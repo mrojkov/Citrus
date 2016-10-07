@@ -114,6 +114,7 @@ namespace Lime
 		char? PasswordChar { get; set; }
 		float PasswordLastCharShowTime { get; set; }
 		Predicate<string> AcceptText { get; set; }
+		ScrollView Scroll { get; set; }
 
 		bool IsAcceptableLength(int length);
 		bool IsAcceptableLines(int lines);
@@ -128,6 +129,7 @@ namespace Lime
 		public char? PasswordChar { get; set; }
 		public float PasswordLastCharShowTime { get; set; }
 		public Predicate<string> AcceptText { get; set; }
+		public ScrollView Scroll { get; set; }
 
 		public EditorParams()
 		{
@@ -420,6 +422,17 @@ namespace Lime
 			}
 		}
 
+		private void HandleScroll()
+		{
+			if (!caretPos.IsVisible) return;
+			var s = EditorParams.Scroll;
+			if (s == null) return;
+			var b = Rectangle.Bounds(Text.MeasureText(), new Rectangle(Vector2.Zero, s.Frame.Size));
+			s.Content.Size = Container.Size = b.Size;
+			s.MinScrollPosition = s.ProjectToScrollAxis(b.A);
+			s.ScrollTo(s.PositionToView(s.ProjectToScrollAxis(caretPos.WorldPos)), instantly: true);
+		}
+
 		private IEnumerator<object> HandleInputTask()
 		{
 			bool wasFocused = false;
@@ -436,6 +449,7 @@ namespace Lime
 						caretPos.WorldPos = t.TransformVector(Container.Input.MousePosition);
 					}
 					Text.SyncCaretPosition();
+					HandleScroll();
 				}
 				var isFocused = Container.IsFocused();
 				caretPos.IsVisible = isFocused;
