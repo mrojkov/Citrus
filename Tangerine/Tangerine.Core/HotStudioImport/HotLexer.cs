@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Text;
 using Lime;
 
 namespace Orange
@@ -60,7 +61,7 @@ namespace Orange
 			if (quote != '\'' && quote != '\"')
 				throw new Lime.Exception("Illegal symbol found near quoted string");
 			ReadByte();
-			string result = "";
+			var sb = new StringBuilder();
 			while (true) {
 				if (PeekByte() < 0)
 					throw new Lime.Exception("Unterminated string");
@@ -72,22 +73,22 @@ namespace Orange
 					ReadByte();
 					switch(ReadByte()) {
 					case '\\':
-						result += '\\';
+						sb.Append('\\');
 						break;
 					case 'n':
-						result += '\n';
+						sb.Append('\n');
 						break;
 					case 't':
-						result += '\t';
+						sb.Append('\t');
 						break;
 					case 'r':
-						result += '\r';
+						sb.Append('\r');
 						break;
 					case '\"':
-						result += '\"';
+							sb.Append('\"');
 						break;
 					case '\'':
-						result += '\'';
+						sb.Append('\'');
 						break;
 					default:
 						throw new Lime.Exception("Invalid escape sequence");
@@ -95,9 +96,9 @@ namespace Orange
 				} else if (PeekByte() == '\n')
 					throw new Lime.Exception("Illegal EOL found inside quoted string");
 				else
-					result += (char)ReadByte();
+					sb.Append((char)ReadByte());
 			}
-			return result;
+			return sb.ToString();
 		}
 
 		public Tuple<Blending, ShaderId> ParseBlendMode()
@@ -170,10 +171,10 @@ namespace Orange
 		public string ParseWord()
 		{
 			SkipWhitespace();
-			string result = "";
+			var sb = new StringBuilder();
 			while ((PeekByte() == '.' || Char.IsLetterOrDigit((char)PeekByte()) && !EndOfStream()))
-				result += (char)ReadByte();
-			return result;
+				sb.Append((char)ReadByte());
+			return sb.ToString();
 		}
 
 		public string PeekWord()

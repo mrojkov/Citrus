@@ -12,8 +12,8 @@ namespace Tangerine.UI.SceneView
 
 		public IEnumerator<object> Loop()
 		{
+			var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>();
 			while (true) {
-				var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>();
 				Quadrangle hull;
 				Vector2 pivot;
 				if (Utils.CalcHullAndPivot(widgets, sv.Scene, out hull, out pivot)) {
