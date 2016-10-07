@@ -126,7 +126,7 @@ namespace Lime
 			}
 			foreach (var kv in ShortcutMap) {
 				if (kv.Value == this) {
-					return kv.Key.ToString();
+					return "[" + kv.Key.ToString() + "]";
 				}
 			}
 			return Code.ToString();
