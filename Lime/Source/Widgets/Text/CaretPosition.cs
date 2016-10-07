@@ -1,24 +1,36 @@
+using System;
+
 namespace Lime
 {
 	internal class CaretPosition: ICaretPosition
 	{
-		public enum ValidState { None, All, LineCol, WorldPos, TextPos };
-		public ValidState Valid;
+		public enum ValidState { None, All, LineCol, WorldPos, TextPos, LineWorldX };
+		public ValidState Valid { get; private set; }
 		public int RenderingLineNumber;
 		public int RenderingTextPos;
-		public Vector2 NearestCharPos;
 
 		private int line;
 		private int col;
 		private int textPos;
 		private Vector2 worldPos;
 		private bool isVisible;
+		private Vector2 nearestCharPos;
 
 		public int Line {
 			get { return line; }
 			set {
 				if (line == value) return;
-				Valid = ValidState.LineCol;
+				switch (Valid) {
+					case ValidState.All:
+					case ValidState.WorldPos:
+					case ValidState.LineWorldX:
+						Valid = ValidState.LineWorldX;
+						break;
+					case ValidState.LineCol:
+						break;
+					default:
+						throw new InvalidOperationException(Valid.ToString());
+				}
 				line = value;
 			}
 		}
@@ -27,7 +39,15 @@ namespace Lime
 			get { return col; }
 			set {
 				if (col == value) return;
-				Valid = ValidState.LineCol;
+				switch (Valid) {
+					case ValidState.All:
+					case ValidState.LineCol:
+					case ValidState.LineWorldX:
+						Valid = ValidState.LineCol;
+						break;
+					default:
+						throw new InvalidOperationException(Valid.ToString());
+				}
 				col = value;
 			}
 		}
@@ -59,6 +79,20 @@ namespace Lime
 			set { isVisible = value; }
 		}
 
+		public void EmptyText(Vector2 pos)
+		{
+			worldPos = pos;
+			line = col = textPos = 0;
+			Valid = ValidState.All;
+		}
+
+		public void StartSync()
+		{
+			RenderingLineNumber = 0;
+			RenderingTextPos = 0;
+			nearestCharPos = Vector2.PositiveInfinity;
+		}
+
 		public void Sync(int index, Vector2 charPos, Vector2 size)
 		{
 			switch (Valid) {
@@ -67,30 +101,52 @@ namespace Lime
 					break;
 				case ValidState.LineCol:
 					if (Line == RenderingLineNumber && Col == index) {
-						TextPos = RenderingTextPos;
-						WorldPos = charPos;
+						textPos = RenderingTextPos;
+						worldPos = charPos;
 						Valid = ValidState.All;
 					}
 					break;
 				case ValidState.TextPos:
 					if (TextPos == RenderingTextPos) {
-						Line = RenderingLineNumber;
-						Col = index;
-						WorldPos = charPos;
+						line = RenderingLineNumber;
+						col = index;
+						worldPos = charPos;
 						Valid = ValidState.All;
 					}
 					break;
 				case ValidState.WorldPos:
-					if ((WorldPos - charPos).SqrLength < (WorldPos - NearestCharPos).SqrLength) {
-						Line = RenderingLineNumber;
-						Col = index;
-						TextPos = RenderingTextPos;
-						NearestCharPos = charPos;
+					if ((WorldPos - charPos).SqrLength < (WorldPos - nearestCharPos).SqrLength) {
+						line = RenderingLineNumber;
+						col = index;
+						textPos = RenderingTextPos;
+						nearestCharPos = charPos;
 						Valid = ValidState.WorldPos;
+					}
+					break;
+				case ValidState.LineWorldX:
+					if (
+						Line == RenderingLineNumber &&
+						(WorldPos.X - charPos.X).Abs() < (WorldPos.X - nearestCharPos.X).Abs())
+					{
+						col = index;
+						textPos = RenderingTextPos;
+						nearestCharPos = charPos;
 					}
 					break;
 			}
 			++RenderingTextPos;
+		}
+
+		public void FinishSync()
+		{
+			if (Valid == ValidState.WorldPos || Valid == ValidState.LineWorldX)
+				worldPos = nearestCharPos;
+			Valid = ValidState.All;
+		}
+
+		public void InvalidatePreservingTextPos()
+		{
+			Valid = ValidState.TextPos;
 		}
 
 		public CaretPosition Clone()

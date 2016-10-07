@@ -292,9 +292,7 @@ namespace Lime
 					TrimLinesWhitespaces(lines);
 				}
 				var pos = new Vector2(Padding.Left, Padding.Top + CalcVerticalTextPosition(lines));
-				caret.RenderingLineNumber = 0;
-				caret.RenderingTextPos = 0;
-				caret.NearestCharPos = Vector2.Zero;
+				caret.StartSync();
 				if (String.IsNullOrEmpty(DisplayText)) {
 					switch (HAlignment) {
 						case HAlignment.Right:
@@ -304,15 +302,13 @@ namespace Lime
 							pos.X = (ContentSize.X * 0.5f).Round();
 							break;
 					}
-					caret.WorldPos = pos;
-					caret.Line = caret.Col = caret.TextPos = 0;
-					caret.Valid = CaretPosition.ValidState.All;
+					caret.EmptyText(pos);
 					return rect;
 				}
 				bool firstLine = true;
 				if (caret.Valid == CaretPosition.ValidState.TextPos)
 					Caret.TextPos = Caret.TextPos.Clamp(0, Text.Length);
-				if (caret.Valid == CaretPosition.ValidState.LineCol)
+				if (caret.Valid == CaretPosition.ValidState.LineCol || caret.Valid == CaretPosition.ValidState.LineWorldX)
 					Caret.Line = Caret.Line.Clamp(0, lines.Count - 1);
 				int i = 0;
 				foreach (var line in lines) {
@@ -334,10 +330,7 @@ namespace Lime
 						rect = Rectangle.Bounds(rect, lineRect);
 					}
 				}
-				if (caret.Valid == CaretPosition.ValidState.WorldPos) {
-					caret.WorldPos = caret.NearestCharPos;
-				}
-				caret.Valid = CaretPosition.ValidState.All;
+				caret.FinishSync();
 			} finally {
 				caret = savedCaret;
 			}
@@ -446,7 +439,7 @@ namespace Lime
 		public void Invalidate()
 		{
 			displayText = null;
-			caret.Valid = CaretPosition.ValidState.TextPos;
+			caret.InvalidatePreservingTextPos();
 			spriteList = null;
 			minSizeValid = false;
 			InvalidateParentConstraintsAndArrangement();
