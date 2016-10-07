@@ -24,7 +24,6 @@ namespace Lime
 
 		private readonly Vector2[] touchPositions = new Vector2[MaxTouches];
 		private readonly List<KeyEvent> keyEventQueue = new List<KeyEvent>();
-		private Key lastPressedKey;
 
 		private struct KeyState
 		{
@@ -106,9 +105,6 @@ namespace Lime
 
 		public void ConsumeKey(Key key)
 		{
-			if (keys[key].CurrentState) {
-				keys[key].PreviousState = true;
-			}
 			keys[key].PreviousState = keys[key].CurrentState;
 			keys[key].Repeated = false;
 		}
@@ -237,8 +233,9 @@ namespace Lime
 			for (int i = 0; i < Key.Count; i++) {
 				var key = keys[i];
 				key.Repeated = false;
-				if (key.CurrentState && i == lastPressedKey) {
-					if ((key.RepeatDelay -= delta) < 0) {
+				if (key.CurrentState) {
+					key.RepeatDelay -= delta;
+					if (key.RepeatDelay <= 0) {
 						key.RepeatDelay = KeyRepeatInterval;
 						key.Repeated = true;
 						Changed = true;
@@ -287,12 +284,9 @@ namespace Lime
 
 		private void SetKeyStateInternal(Key key, bool value)
 		{
-			if (value) {
-				lastPressedKey = key;
-			}
 			keys[key].CurrentState = value;
 			keys[key].RepeatDelay = KeyRepeatDelay;
-			keys[key].Repeated |= value;
+			keys[key].Repeated = value;
 			Changed = true;
 		}
 
