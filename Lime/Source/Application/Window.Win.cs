@@ -253,6 +253,8 @@ namespace Lime
 			}
 			if (Application.MainWindow == null) {
 				Application.MainWindow = this;
+				Closing += Application.DoExiting;
+				Closed += Application.DoExited;
 			}
 			Application.Windows.Add(this);
 		}
