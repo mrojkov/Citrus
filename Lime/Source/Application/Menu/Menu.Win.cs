@@ -126,13 +126,17 @@ namespace Lime
 	class MenuItem
 	{
 		public readonly ICommand Command;
-		public readonly ToolStripMenuItem NativeItem;
+		public readonly ToolStripItem NativeItem;
 
 		public MenuItem(ICommand command)
 		{
 			Command = command;
-			NativeItem = new ToolStripMenuItem();
-			NativeItem.Click += (s, e) => command.Execute();
+			if (command == Lime.Command.MenuSeparator) {
+				NativeItem = new ToolStripSeparator();
+			} else {
+				NativeItem = new ToolStripMenuItem();
+				NativeItem.Click += (s, e) => command.Execute();
+			}
 			Refresh();
 		}
 
@@ -141,12 +145,15 @@ namespace Lime
 			NativeItem.Visible = Command.Visible;
 			NativeItem.Enabled = Command.Enabled;
 			NativeItem.Text = Command.Text;
-			NativeItem.ShortcutKeys = ToNativeKeys(Command.Shortcut);
+			var mi = NativeItem as ToolStripMenuItem;
+			if (mi == null)
+				return;
+			mi.ShortcutKeys = ToNativeKeys(Command.Shortcut);
 			if (Command.Submenu != null) {
 				Command.Submenu.Refresh();
-				NativeItem.DropDown = Command.Submenu.NativeContextMenu;
+				mi.DropDown = Command.Submenu.NativeContextMenu;
 			} else {
-				NativeItem.DropDown = null;
+				mi.DropDown = null;
 			}
 		}
 
