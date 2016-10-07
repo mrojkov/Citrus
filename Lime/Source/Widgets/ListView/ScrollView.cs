@@ -220,8 +220,7 @@ namespace Lime
 				var w = ch.AsWidget;
 				if (w == null) continue;
 				var end = ProjectToScrollAxis(w.Position + w.Size) * (1 - ProjectToScrollAxis(w.Pivot));
-				if (end > Content.Height)
-					Content.Height = end;
+				SetProjectedSize(Content, Mathf.Max(ProjectToScrollAxis(Content.Size), end));
 			}
 		}
 
