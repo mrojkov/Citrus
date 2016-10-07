@@ -51,7 +51,13 @@ namespace Lime
 		public float Height { get { return 0; } }
 		public event Action Shown;
 		public event Action Hidden;
-		public void Show(bool show, string text) { }
+		public void Show(bool show, string text)
+		{
+			if (show)
+				Shown?.Invoke();
+			else
+				Hidden?.Invoke();
+		}
 		public void ChangeText(string text) { }
 		public bool Supported { get { return false; } }
 	}
