@@ -67,11 +67,12 @@ namespace Lime
 			set { SetScrollPosition(value); }
 		}
 
-		public readonly float MinScrollPosition = 0;
+		public float MinScrollPosition = 0;
 
 		public float MaxScrollPosition
 		{
-			get { return Mathf.Max(0, ProjectToScrollAxis(Content.Size - Frame.Size).Round()); }
+			get { return
+					Mathf.Max(0, ProjectToScrollAxis(Content.Size - Frame.Size).Round()) + MinScrollPosition; }
 		}
 
 		public float MaxOverscroll
