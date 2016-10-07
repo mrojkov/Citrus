@@ -291,17 +291,10 @@ namespace Lime
 				if (TrimWhitespaces) {
 					TrimLinesWhitespaces(lines);
 				}
-				var pos = new Vector2(Padding.Left, Padding.Top + CalcVerticalTextPosition(lines));
+				var pos = new Vector2(0, Padding.Top + CalcVerticalTextPosition(lines));
 				caret.StartSync();
 				if (String.IsNullOrEmpty(DisplayText)) {
-					switch (HAlignment) {
-						case HAlignment.Right:
-							pos.X = ContentSize.X - Padding.Right;
-							break;
-						case HAlignment.Center:
-							pos.X = (ContentSize.X * 0.5f).Round();
-							break;
-					}
+					pos.X = CalcXByAlignment(lineWidth: 0);
 					caret.EmptyText(pos);
 					return rect;
 				}
@@ -360,17 +353,24 @@ namespace Lime
 			return Math.Max(FontHeight * numLines + Spacing * (numLines - 1), FontHeight);
 		}
 
+		private float CalcXByAlignment(float lineWidth)
+		{
+			switch (HAlignment) {
+				case HAlignment.Left:
+					return Padding.Left;
+				case HAlignment.Right:
+					return Size.X - Padding.Right - lineWidth;
+				case HAlignment.Center:
+					return ((ContentSize.X - lineWidth) * 0.5f + Padding.Left).Round();
+				default:
+					throw new InvalidOperationException();
+			}
+		}
+
 		Rectangle RenderSingleTextLine(SpriteList spriteList, Vector2 pos, string line)
 		{
 			float lineWidth = MeasureTextLine(line).X;
-			switch (HAlignment) {
-				case HAlignment.Right:
-					pos.X = ContentSize.X - lineWidth;
-					break;
-				case HAlignment.Center:
-					pos.X = ((ContentSize.X - lineWidth) * 0.5f).Round();
-					break;
-			}
+			pos.X = CalcXByAlignment(lineWidth);
 			if (spriteList != null) {
 				Renderer.DrawTextLine(
 					Font.Instance, pos, line, Color4.White, FontHeight, 0, line.Length, spriteList, caret.Sync);
