@@ -165,6 +165,11 @@ namespace Lime
 				p + ProjectToScrollAxis(w.Size) - ProjectToScrollAxis(Frame.Size), ScrollPosition, p);
 		}
 
+		public float PositionToView(float pos)
+		{
+			return ScrollPosition.Clamp(pos - ProjectToScrollAxis(Frame.Size), pos);
+		}
+
 		protected virtual void SetScrollPosition(float value)
 		{
 			if (!IsBeingRefreshed) {
