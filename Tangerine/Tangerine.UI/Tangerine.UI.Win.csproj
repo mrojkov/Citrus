@@ -59,6 +59,7 @@
     <Compile Include="Docking\DockPanel.cs" />
     <Compile Include="KeyBindings.cs" />
     <Compile Include="Utils\PropertyAttributes.cs" />
+    <Compile Include="Utils\TimelineMetrics.cs" />
     <Compile Include="Utils\Utils.cs" />
   </ItemGroup>
   <ItemGroup>
