@@ -102,9 +102,7 @@ namespace Lime
 
 		public IEnumerator<IKeyframe> GetEnumerator()
 		{
-			foreach (var i in source) {
-				yield return (IKeyframe)i;
-			}
+			return source.GetEnumerator();
 		}
 
 		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
