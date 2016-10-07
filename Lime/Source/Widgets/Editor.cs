@@ -328,8 +328,7 @@ namespace Lime
 				if (WasKeyRepeated(Key.Commands.Delete)) {
 					if (caretPos.TextPos >= 0 && caretPos.TextPos < Text.Text.Length) {
 						Text.Text = Text.Text.Remove(caretPos.TextPos, 1);
-						caretPos.TextPos--;
-						caretPos.TextPos++; // Enforce revalidation.
+						caretPos.InvalidatePreservingTextPos();
 					}
 				}
 				if (WasKeyRepeated(Cmds.DeleteWordPrev)) {
@@ -343,8 +342,7 @@ namespace Lime
 					var p = NextWord(Text.Text, caretPos.TextPos);
 					if (p > caretPos.TextPos) {
 						Text.Text = Text.Text.Remove(caretPos.TextPos, p - caretPos.TextPos);
-						caretPos.TextPos--;
-						caretPos.TextPos++; // Enforce revalidation.
+						caretPos.InvalidatePreservingTextPos();
 					}
 				}
 				if (WasKeyRepeated(Key.Enter)) {
