@@ -300,9 +300,7 @@ namespace Lime
 
 		private void OnDeactivate(object sender, EventArgs e)
 		{
-			for (int i = 0; i < Key.Count; i++) {
-				Input.SetKeyState(i, false);
-			}
+			Input.ClearKeyState();
 			active = false;
 			RaiseDeactivated();
 		}

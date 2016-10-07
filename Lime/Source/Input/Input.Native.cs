@@ -106,6 +106,9 @@ namespace Lime
 
 		public void ConsumeKey(Key key)
 		{
+			if (keys[key].CurrentState) {
+				keys[key].PreviousState = true;
+			}
 			keys[key].PreviousState = keys[key].CurrentState;
 			keys[key].Repeated = false;
 		}
@@ -297,6 +300,15 @@ namespace Lime
 		{
 			for (int i = 0; i < Key.Count; i++) {
 				keys[i].PreviousState = keys[i].CurrentState;
+			}
+			keyEventQueue.Clear();
+		}
+
+		internal void ClearKeyState()
+		{
+			for (int k = 0; k < Key.Count; k++) {
+				keys[k].CurrentState = false;
+				keys[k].Repeated = false;
 			}
 		}
 
