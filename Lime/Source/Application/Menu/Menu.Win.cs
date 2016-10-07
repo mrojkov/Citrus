@@ -120,6 +120,7 @@ namespace Lime
 				}
 			}
 			NativeContextMenu.Show(window.Form, new SD.Point((int)position.X, (int)position.Y));
+			NativeContextMenu.Closed += (s, e) => window.Invalidate();
 		}
 	}
 
