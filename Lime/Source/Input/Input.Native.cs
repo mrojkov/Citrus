@@ -290,7 +290,6 @@ namespace Lime
 			for (int i = 0; i < Key.Count; i++) {
 				keys[i].PreviousState = keys[i].CurrentState;
 			}
-			keyEventQueue.Clear();
 		}
 
 		internal void ClearKeyState()
@@ -299,6 +298,7 @@ namespace Lime
 				keys[k].CurrentState = false;
 				keys[k].Repeated = false;
 			}
+			keyEventQueue.Clear();
 		}
 
 		internal void SetWheelScrollAmount(float delta)
