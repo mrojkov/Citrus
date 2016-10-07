@@ -115,7 +115,7 @@ namespace Lime
 			foreach (var menuItem in items) {
 				var ni = menuItem.NativeItem;
 				ni.Width = NativeContextMenu.Width;
-				if (menuItem == command) {
+				if (menuItem.Command == command) {
 					ni.Select();
 				}
 			}
