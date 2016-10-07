@@ -137,7 +137,7 @@ namespace Lime
 		static Key()
 		{
 			keyToNameCache = typeof(Key).GetFields()
-				.Where(i => i.FieldType == typeof(Key))
+				.Where(i => i.FieldType == typeof(Key) && i.Name != "LastNormal")
 				.ToDictionary(i => (Key)i.GetValue(null), i => i.Name);
 		}
 
@@ -288,7 +288,7 @@ namespace Lime
 		public static readonly Key DismissSoftKeyboard = New();
 #endregion
 
-		public static readonly Key LastNormal = Count;
+		public static readonly Key LastNormal = Count - 1;
 
 		public static class Commands
 		{
