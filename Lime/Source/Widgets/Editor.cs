@@ -180,16 +180,24 @@ namespace Lime
 			container.Tasks.Add(HandleInputTask(), this);
 		}
 
-		public static class Keys {
-			#if MAC
-			public static Key PreviousWord = Key.MapShortcut(Modifiers.Alt, Key.Left);
-			public static Key NextWord = Key.MapShortcut(Modifiers.Alt, Key.Right);
-			#else
-			public static Key PreviousWord = Key.MapShortcut(Modifiers.Control, Key.Left);
-			public static Key NextWord = Key.MapShortcut(Modifiers.Control, Key.Right);
-			#endif
-			public static Key DeletePreviousWord = Key.MapShortcut(Modifiers.Control, Key.BackSpace);
-			public static Key DeleteNextWord = Key.MapShortcut(Modifiers.Control, Key.Delete);
+		public static class Cmds {
+			public static Key MoveCharPrev = Key.MapShortcut(Key.Left);
+			public static Key MoveCharNext = Key.MapShortcut(Key.Right);
+#if MAC
+			public static Key MoveWordPrev = Key.MapShortcut(Modifiers.Alt, Key.Left);
+			public static Key MoveWordNext = Key.MapShortcut(Modifiers.Alt, Key.Right);
+#else
+			public static Key MoveWordPrev = Key.MapShortcut(Modifiers.Control, Key.Left);
+			public static Key MoveWordNext = Key.MapShortcut(Modifiers.Control, Key.Right);
+#endif
+			public static Key MoveLinePrev = Key.MapShortcut(Key.Up);
+			public static Key MoveLineNext = Key.MapShortcut(Key.Down);
+
+			public static Key MoveLineStart = Key.MapShortcut(Key.Home);
+			public static Key MoveLineEnd = Key.MapShortcut(Key.End);
+
+			public static Key DeleteWordPrev = Key.MapShortcut(Modifiers.Control, Key.BackSpace);
+			public static Key DeleteWordNext = Key.MapShortcut(Modifiers.Control, Key.Delete);
 		}
 
 		private string PasswordChars(int length) { return new string(EditorParams.PasswordChar.Value, length); }
@@ -235,11 +243,14 @@ namespace Lime
 		}
 
 		static readonly List<Key> consumingKeys = Key.Enumerate().Where(
-			k => k.IsPrintable() || k.IsTextNavigation() || k.IsTextEditing()).Concat(
+			k => k.IsPrintable() || k.IsTextEditing()).Concat(
 				new[] {
-					Keys.PreviousWord, Keys.NextWord,
-					Keys.DeletePreviousWord, Keys.DeleteNextWord,
-					Key.Commands.Cut, Key.Commands.Copy, Key.Commands.Paste,
+					Cmds.MoveCharPrev, Cmds.MoveCharNext,
+					Cmds.MoveWordPrev, Cmds.MoveWordNext,
+					Cmds.MoveLinePrev, Cmds.MoveLineNext,
+					Cmds.MoveLineStart, Cmds.MoveLineEnd,
+					Cmds.DeleteWordPrev, Cmds.DeleteWordNext,
+					Key.Commands.Cut, Key.Commands.Copy, Key.Commands.Paste, Key.Commands.Delete,
 				}
 			).ToList();
 
@@ -297,37 +308,37 @@ namespace Lime
 		private void HandleKeys(string originalText)
 		{
 			try {
-				if (WasKeyRepeated(Key.Left))
+				if (WasKeyRepeated(Cmds.MoveCharPrev))
 					caretPos.TextPos--;
-				if (WasKeyRepeated(Key.Right))
+				if (WasKeyRepeated(Cmds.MoveCharNext))
 					caretPos.TextPos++;
-				if (WasKeyRepeated(Keys.PreviousWord))
+				if (WasKeyRepeated(Cmds.MoveWordPrev))
 					caretPos.TextPos = PreviousWord(Text.Text, caretPos.TextPos);
-				if (WasKeyRepeated(Keys.NextWord))
+				if (WasKeyRepeated(Cmds.MoveWordNext))
 					caretPos.TextPos = NextWord(Text.Text, caretPos.TextPos);
-				if (WasKeyRepeated(Key.Up))
+				if (WasKeyRepeated(Cmds.MoveLinePrev))
 					caretPos.Line--;
-				if (WasKeyRepeated(Key.Down))
+				if (WasKeyRepeated(Cmds.MoveLineNext))
 					caretPos.Line++;
-				if (WasKeyRepeated(Key.Home))
+				if (WasKeyRepeated(Cmds.MoveLineStart))
 					caretPos.Pos = 0;
-				if (WasKeyRepeated(Key.End))
+				if (WasKeyRepeated(Cmds.MoveLineEnd))
 					caretPos.Pos = int.MaxValue;
-				if (WasKeyRepeated(Key.Commands.Delete) || WasKeyRepeated(Key.Delete)) {
+				if (WasKeyRepeated(Key.Commands.Delete)) {
 					if (caretPos.TextPos >= 0 && caretPos.TextPos < Text.Text.Length) {
 						Text.Text = Text.Text.Remove(caretPos.TextPos, 1);
 						caretPos.TextPos--;
 						caretPos.TextPos++; // Enforce revalidation.
 					}
 				}
-				if (WasKeyRepeated(Keys.DeletePreviousWord)) {
+				if (WasKeyRepeated(Cmds.DeleteWordPrev)) {
 					var p = PreviousWord(Text.Text, caretPos.TextPos);
 					if (p < caretPos.TextPos) {
 						Text.Text = Text.Text.Remove(p, caretPos.TextPos - p);
 						caretPos.TextPos = p;
 					}
 				}
-				if (WasKeyRepeated(Keys.DeleteNextWord)) {
+				if (WasKeyRepeated(Cmds.DeleteWordNext)) {
 					var p = NextWord(Text.Text, caretPos.TextPos);
 					if (p > caretPos.TextPos) {
 						Text.Text = Text.Text.Remove(caretPos.TextPos, p - caretPos.TextPos);
