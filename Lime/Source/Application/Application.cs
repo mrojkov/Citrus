@@ -240,13 +240,9 @@ namespace Lime
 #if MAC
 			NSApplication.Init();
 			NSApplication.SharedApplication.ApplicationShouldTerminate += (sender) => {
-				return (Exiting == null) || Exiting() ? NSApplicationTerminateReply.Now : NSApplicationTerminateReply.Cancel;
+				return DoExiting() ? NSApplicationTerminateReply.Now : NSApplicationTerminateReply.Cancel;
 			};
-			NSApplication.SharedApplication.WillTerminate += (sender, e) => {
-				if (Exited != null) {
-					Exited();
-				}
-			};
+			NSApplication.SharedApplication.WillTerminate += (sender, e) => DoExited();
 #endif
 			options = options ?? new ApplicationOptions();
 			RenderingBackend = options.RenderingBackend;
