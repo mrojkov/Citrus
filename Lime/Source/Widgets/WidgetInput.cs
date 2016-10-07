@@ -211,21 +211,21 @@ namespace Lime
 				return;
 			}
 			if (KeyPressed != null) {
-				foreach (var key in Key.Enumerate()) {
+				for (var key = Key.Unknown; key < Key.Count; key++) {
 					if (WasKeyPressed(key)) {
 						KeyPressed(this, key);
 					}
 				}
 			}
 			if (KeyRepeated != null) {
-				foreach (var key in Key.Enumerate()) {
+				for (var key = Key.Unknown; key < Key.Count; key++) {
 					if (WasKeyRepeated(key)) {
 						KeyRepeated(this, key);
 					}
 				}
 			}
 			if (KeyReleased != null) {
-				foreach (var key in Key.Enumerate()) {
+				for (var key = Key.Unknown; key < Key.Count; key++) {
 					if (WasKeyReleased(key)) {
 						KeyReleased(this, key);
 					}
