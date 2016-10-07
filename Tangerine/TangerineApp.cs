@@ -218,20 +218,25 @@ namespace Tangerine
 		void CreateMainMenu()
 		{
 			Application.MainMenu = new Menu {
+#if MAC
 				new Submenu("Application") {
 					new PreferencesCommand(),
 					Command.MenuSeparator, 
-					#if MAC
 					new DelegateCommand("Quit", new Shortcut(Modifiers.Command, Key.Q), Application.Exit),
-					#else
-					new DelegateCommand("Quit", new Shortcut(Modifiers.Alt, Key.F4), Application.Exit),
-					#endif
 				},
+#endif
 				new Submenu("File") {
 					new OpenFileCommand(),
 					new OpenProjectCommand(),
 					Command.MenuSeparator,
+#if !MAC
+					new PreferencesCommand(),
+					Command.MenuSeparator,
+#endif
 					new CloseDocumentCommand(),
+#if !MAC
+					new DelegateCommand("Quit", new Shortcut(Modifiers.Alt, Key.F4), Application.Exit),
+#endif
 				},
 				new Submenu("Edit") {
 					new KeySendingCommand("Undo", new Shortcut(Modifiers.Command, Key.Z), Key.Commands.Undo),
