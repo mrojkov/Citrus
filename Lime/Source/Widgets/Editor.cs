@@ -322,9 +322,9 @@ namespace Lime
 				if (IsMultiline() && WasKeyRepeated(Cmds.MoveLineNext))
 					caretPos.Line++;
 				if (WasKeyRepeated(Cmds.MoveLineStart))
-					caretPos.Pos = 0;
+					caretPos.Col = 0;
 				if (WasKeyRepeated(Cmds.MoveLineEnd))
-					caretPos.Pos = int.MaxValue;
+					caretPos.Col = int.MaxValue;
 				if (WasKeyRepeated(Key.Commands.Delete)) {
 					if (caretPos.TextPos >= 0 && caretPos.TextPos < Text.Text.Length) {
 						Text.Text = Text.Text.Remove(caretPos.TextPos, 1);

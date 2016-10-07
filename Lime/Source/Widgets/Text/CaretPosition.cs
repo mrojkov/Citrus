@@ -9,7 +9,7 @@ namespace Lime
 		public Vector2 NearestCharPos;
 
 		private int line;
-		private int pos;
+		private int col;
 		private int textPos;
 		private Vector2 worldPos;
 		private bool isVisible;
@@ -23,12 +23,12 @@ namespace Lime
 			}
 		}
 
-		public int Pos {
-			get { return pos; }
+		public int Col {
+			get { return col; }
 			set {
-				if (pos == value) return;
+				if (col == value) return;
 				Valid = ValidState.LinePos;
-				pos = value;
+				col = value;
 			}
 		}
 
@@ -66,7 +66,7 @@ namespace Lime
 				case ValidState.All:
 					break;
 				case ValidState.LinePos:
-					if (Line == RenderingLineNumber && Pos == index) {
+					if (Line == RenderingLineNumber && Col == index) {
 						TextPos = RenderingTextPos;
 						WorldPos = charPos;
 						Valid = ValidState.All;
@@ -75,7 +75,7 @@ namespace Lime
 				case ValidState.TextPos:
 					if (TextPos == RenderingTextPos) {
 						Line = RenderingLineNumber;
-						Pos = index;
+						Col = index;
 						WorldPos = charPos;
 						Valid = ValidState.All;
 					}
@@ -83,7 +83,7 @@ namespace Lime
 				case ValidState.WorldPos:
 					if ((WorldPos - charPos).SqrLength < (WorldPos - NearestCharPos).SqrLength) {
 						Line = RenderingLineNumber;
-						Pos = index;
+						Col = index;
 						TextPos = RenderingTextPos;
 						NearestCharPos = charPos;
 						Valid = ValidState.WorldPos;

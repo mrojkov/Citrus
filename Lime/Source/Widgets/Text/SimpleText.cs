@@ -305,7 +305,7 @@ namespace Lime
 							break;
 					}
 					caret.WorldPos = pos;
-					caret.Line = caret.Pos = caret.TextPos = 0;
+					caret.Line = caret.Col = caret.TextPos = 0;
 					caret.Valid = CaretPosition.ValidState.All;
 					return rect;
 				}
@@ -318,7 +318,7 @@ namespace Lime
 				foreach (var line in lines) {
 					bool lastLine = ++i == lines.Count;
 					if (caret.Valid == CaretPosition.ValidState.LinePos && caret.Line == caret.RenderingLineNumber) {
-						Caret.Pos = Caret.Pos.Clamp(0, line.Length - (lastLine ? 0 : 1));
+						Caret.Col = Caret.Col.Clamp(0, line.Length - (lastLine ? 0 : 1));
 					}
 					Rectangle lineRect = RenderSingleTextLine(spriteList, pos, line);
 					if (lastLine) {

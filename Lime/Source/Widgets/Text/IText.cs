@@ -51,7 +51,7 @@ namespace Lime
 	public interface ICaretPosition
 	{
 		int Line { get; set; }
-		int Pos { get; set; }
+		int Col { get; set; }
 		int TextPos { get; set; }
 		Vector2 WorldPos { get; set; }
 		bool IsVisible { get; set; }
