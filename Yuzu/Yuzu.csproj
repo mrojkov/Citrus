@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BinaryCommon.cs" />
     <Compile Include="BinaryDeserializer.cs" />
     <Compile Include="BinaryGenerators.cs" />
     <Compile Include="BinarySerializer.cs" />

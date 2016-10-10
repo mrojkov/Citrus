@@ -338,9 +338,9 @@ namespace Lime
 				"/../../../..";
 #elif MAC || MONOMAC
 				"/../../../../../../..";
-#else	
+#else
 				"";
-				throw new NotSupportedException();	
+				throw new NotSupportedException();
 #endif
 				ms.WriteTo(new FileStream(executablePath + goUp + @"/Lime/Source/GeneratedDeserializersBIN.cs", FileMode.Create));
 			}

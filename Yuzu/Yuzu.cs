@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 
@@ -176,7 +175,10 @@ namespace Yuzu
 		}
 		public List<Item> Fields = new List<Item>();
 		public bool IsOrdered { get; private set; }
+		internal object Internal;
+
 		public YuzuUnknownStorage() { IsOrdered = true; }
+
 		public void Sort()
 		{
 			if (IsOrdered)

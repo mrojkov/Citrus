@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Yuzu.Util
 {
@@ -52,6 +52,16 @@ namespace Yuzu.Util
 		{
 			try {
 				return t.GetInterface("ICollection`1");
+			}
+			catch (AmbiguousMatchException) {
+				throw new YuzuException("Multiple ICollection interfaces for type " + t.Name);
+			}
+		}
+
+		public static Type GetICollectionNG(Type t)
+		{
+			try {
+				return t.GetInterface("ICollection");
 			}
 			catch (AmbiguousMatchException) {
 				throw new YuzuException("Multiple ICollection interfaces for type " + t.Name);
@@ -221,6 +231,11 @@ namespace Yuzu.Util
 	{
 		internal static NullYuzuUnknownStorage Instance = new NullYuzuUnknownStorage();
 		public override void Add(string name, object value) { }
+	}
+
+	internal class BoxedInt
+	{
+		public int Value = 0;
 	}
 
 }

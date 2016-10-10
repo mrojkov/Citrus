@@ -507,6 +507,8 @@ namespace Yuzu.Json
 				Meta.Get(t, Options); // Check for serializable fields.
 				return MakeDelegate(Utils.GetPrivateCovariantGeneric(GetType(), "WriteCollection", icoll));
 			}
+			if (t.IsSubclassOf(typeof(YuzuUnknown)))
+				return WriteUnknown;
 			if (Utils.IsStruct(t) || t.IsClass || t.IsInterface) {
 				var meta = Meta.Get(t, Options);
 				var name =

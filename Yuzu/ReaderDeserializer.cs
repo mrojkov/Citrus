@@ -4,7 +4,6 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 
-using Yuzu.Metadata;
 using Yuzu.Util;
 
 namespace Yuzu.Deserializer

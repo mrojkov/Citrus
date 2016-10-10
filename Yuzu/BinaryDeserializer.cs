@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 
 using Yuzu.Deserializer;
@@ -44,8 +43,6 @@ namespace Yuzu.Binary
 			var s = Reader.ReadString();
 			return s != "" ? s : Reader.ReadBoolean() ? null : "";
 		}
-
-		private class Record { }
 
 		private Type ReadType()
 		{
@@ -202,40 +199,19 @@ namespace Yuzu.Binary
 
 		protected Action<T> ReadAction<T>() { return GetAction<T>(Reader.ReadString()); }
 
-		protected class ClassDef
-		{
-			public class FieldDef
-			{
-				public string Name;
-				public int OurIndex; // 1-based
-				public Action<object> ReadFunc;
-			}
-
-			internal Meta Meta;
-			public const int EOF = short.MaxValue;
-			public Action<BinaryDeserializer, ClassDef, object> ReadFields;
-			public Func<BinaryDeserializer, ClassDef, object> Make;
-			public List<FieldDef> Fields = new List<FieldDef> { new FieldDef { OurIndex = EOF } };
-		}
-
 		// Zeroth element corresponds to 'null'.
-		private List<ClassDef> classDefs = new List<ClassDef> { new ClassDef() };
+		private List<ReaderClassDef> classDefs = new List<ReaderClassDef> { new ReaderClassDef() };
 
-		protected class YuzuUnknownBinary : YuzuUnknown
-		{
-			public ClassDef Def;
-		}
-
-		protected virtual void PrepareReaders(ClassDef def)
+		protected virtual void PrepareReaders(ReaderClassDef def)
 		{
 			def.ReadFields = ReadFields;
 		}
 
-		public void ClearClassIds() { classDefs = new List<ClassDef> { new ClassDef() }; }
+		public void ClearClassIds() { classDefs = new List<ReaderClassDef> { new ReaderClassDef() }; }
 
-		private ClassDef GetClassDefUnknown(string typeName)
+		private ReaderClassDef GetClassDefUnknown(string typeName)
 		{
-			var result = new ClassDef {
+			var result = new ReaderClassDef {
 				Meta = Meta.Unknown,
 				Make = (bd, def) => {
 					var obj = new YuzuUnknownBinary { ClassTag = typeName, Def = def };
@@ -246,9 +222,10 @@ namespace Yuzu.Binary
 			var theirCount = Reader.ReadInt16();
 			for (int theirIndex = 0; theirIndex < theirCount; ++theirIndex) {
 				var theirName = Reader.ReadString();
-				var rf = ReadValueFunc(ReadType());
-				result.Fields.Add(new ClassDef.FieldDef {
-					Name = theirName, OurIndex = -1,
+				var t = ReadType();
+				var rf = ReadValueFunc(t);
+				result.Fields.Add(new ReaderClassDef.FieldDef {
+					Name = theirName, Type = t, OurIndex = -1,
 					ReadFunc = obj => ((YuzuUnknown)obj).Fields[theirName] = rf()
 				});
 			}
@@ -256,12 +233,12 @@ namespace Yuzu.Binary
 			return result;
 		}
 
-		private void AddUnknownFieldDef(ClassDef def, string fieldName, string typeName)
+		private void AddUnknownFieldDef(ReaderClassDef def, string fieldName, string typeName)
 		{
 			if (!Options.AllowUnknownFields)
 				throw Error("New field {0} for class {1}", fieldName, typeName);
-			var rf = ReadValueFunc(ReadType());
-			var fd = new ClassDef.FieldDef { Name = fieldName, OurIndex = -1 };
+			var fd = new ReaderClassDef.FieldDef { Name = fieldName, OurIndex = -1, Type = ReadType() };
+			var rf = ReadValueFunc(fd.Type);
 			if (def.Meta.GetUnknownStorage == null)
 				fd.ReadFunc = obj => rf();
 			else
@@ -269,7 +246,7 @@ namespace Yuzu.Binary
 			def.Fields.Add(fd);
 		}
 
-		private ClassDef GetClassDef(short classId)
+		private ReaderClassDef GetClassDef(short classId)
 		{
 			if (classId < classDefs.Count)
 				return classDefs[classId];
@@ -279,15 +256,17 @@ namespace Yuzu.Binary
 			var classType = TypeSerializer.Deserialize(typeName);
 			if (classType == null)
 				return GetClassDefUnknown(typeName);
-			var result = new ClassDef { Meta = Meta.Get(classType, Options) };
+			var result = new ReaderClassDef { Meta = Meta.Get(classType, Options) };
 			PrepareReaders(result);
 			var ourCount = result.Meta.Items.Count;
 			var theirCount = Reader.ReadInt16();
 			int ourIndex = 0, theirIndex = 0;
+			var theirName = "";
 			while (ourIndex < ourCount && theirIndex < theirCount) {
 				var yi = result.Meta.Items[ourIndex];
 				var ourName = yi.Tag(Options);
-				var theirName = Reader.ReadString();
+				if (theirName == "")
+					theirName = Reader.ReadString();
 				var cmp = String.CompareOrdinal(ourName, theirName);
 				if (cmp < 0) {
 					if (!yi.IsOptional)
@@ -297,12 +276,14 @@ namespace Yuzu.Binary
 				else if (cmp > 0) {
 					AddUnknownFieldDef(result, theirName, typeName);
 					theirIndex += 1;
+					theirName = "";
 				}
 				else {
 					if (!ReadCompatibleType(yi.Type))
 						throw Error(
 							"Incompatible type for field {0}, expected {1}", ourName, yi.Type.Name);
-					var fieldDef = new ClassDef.FieldDef { Name = theirName, OurIndex = ourIndex + 1 };
+					var fieldDef = new ReaderClassDef.FieldDef {
+						Name = theirName, OurIndex = ourIndex + 1, Type = yi.Type };
 					if (yi.SetValue != null) {
 						var rf = ReadValueFunc(yi.Type);
 						fieldDef.ReadFunc = obj => yi.SetValue(obj, rf());
@@ -314,6 +295,7 @@ namespace Yuzu.Binary
 					result.Fields.Add(fieldDef);
 					ourIndex += 1;
 					theirIndex += 1;
+					theirName = "";
 				}
 			}
 			for (; ourIndex < ourCount; ++ourIndex) {
@@ -322,13 +304,17 @@ namespace Yuzu.Binary
 				if (!yi.IsOptional)
 					throw Error("Missing required field {0} for class {1}", ourName, typeName);
 			}
-			for (; theirIndex < theirCount; ++theirIndex)
-				AddUnknownFieldDef(result, Reader.ReadString(), typeName);
+			for (; theirIndex < theirCount; ++theirIndex) {
+				if (theirName == "")
+					theirName = Reader.ReadString();
+				AddUnknownFieldDef(result, theirName, typeName);
+				theirName = "";
+			}
 			classDefs.Add(result);
 			return result;
 		}
 
-		private static void ReadFields(BinaryDeserializer d, ClassDef def, object obj)
+		private static void ReadFields(BinaryDeserializer d, ReaderClassDef def, object obj)
 		{
 			d.objStack.Push(obj);
 			try {
@@ -337,8 +323,11 @@ namespace Yuzu.Binary
 						def.Fields[i].ReadFunc(obj);
 				}
 				else {
-					if (def.Meta.GetUnknownStorage != null)
-						def.Meta.GetUnknownStorage(obj).Clear();
+					if (def.Meta.GetUnknownStorage != null) {
+						var storage = def.Meta.GetUnknownStorage(obj);
+						storage.Clear();
+						storage.Internal = def;
+					}
 					var actualIndex = d.Reader.ReadInt16();
 					for (int i = 1; i < def.Fields.Count; ++i) {
 						var fd = def.Fields[i];

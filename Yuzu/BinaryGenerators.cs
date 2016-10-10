@@ -11,18 +11,18 @@ namespace Yuzu.Binary
 
 	public class BinaryDeserializerGenBase: BinaryDeserializer
 	{
-		protected static Dictionary<Type, Action<BinaryDeserializer, ClassDef, object>> readCache =
-			new Dictionary<Type, Action<BinaryDeserializer, ClassDef, object>>();
-		protected static Dictionary<Type, Func<BinaryDeserializer, ClassDef, object>> makeCache =
-			new Dictionary<Type, Func<BinaryDeserializer, ClassDef, object>>();
+		protected static Dictionary<Type, Action<BinaryDeserializer, ReaderClassDef, object>> readCache =
+			new Dictionary<Type, Action<BinaryDeserializer, ReaderClassDef, object>>();
+		protected static Dictionary<Type, Func<BinaryDeserializer, ReaderClassDef, object>> makeCache =
+			new Dictionary<Type, Func<BinaryDeserializer, ReaderClassDef, object>>();
 
-		protected override void PrepareReaders(ClassDef def)
+		protected override void PrepareReaders(ReaderClassDef def)
 		{
 			base.PrepareReaders(def);
-			Action<BinaryDeserializer, ClassDef, object> r;
+			Action<BinaryDeserializer, ReaderClassDef, object> r;
 			if (readCache.TryGetValue(def.Meta.Type, out r))
 				def.ReadFields = r;
-			Func<BinaryDeserializer, ClassDef, object> m;
+			Func<BinaryDeserializer, ReaderClassDef, object> m;
 			if (makeCache.TryGetValue(def.Meta.Type, out m))
 				def.Make = m;
 		}
@@ -36,6 +36,7 @@ namespace Yuzu.Binary
 		private CommonOptions options;
 		private Dictionary<Type, string> generatedReaders = new Dictionary<Type, string>();
 		private Dictionary<Type, string> generatedMakers = new Dictionary<Type, string>();
+		private string classDefName = typeof(ReaderClassDef).Name;
 
 		public StreamWriter GenWriter
 		{
@@ -228,10 +229,25 @@ namespace Yuzu.Binary
 			throw new YuzuException(String.Format("Unable to merge field {1} of type {0}", name, t.Name));
 		}
 
+		private bool IsDeserializerGenRequired(Meta meta)
+		{
+			if (!meta.IsCompact) return true;
+			foreach (var yi in meta.Items)
+			{
+				if (yi.Type == typeof(object)) return true;
+				if (simpleValueReader.ContainsKey(yi.Type) || yi.Type.IsEnum || yi.Type == typeof(string))
+					continue;
+				// TODO: Containers.
+				return true;
+			}
+			return false;
+		}
+
 		private void GenerateReaderBody(Meta meta)
 		{
 			cw.ResetTempNames();
-			cw.Put("var dg = (BinaryDeserializerGen)d;\n", Utils.GetTypeSpec(meta.Type));
+			if (IsDeserializerGenRequired(meta))
+				cw.Put("var dg = (BinaryDeserializerGen)d;\n", Utils.GetTypeSpec(meta.Type));
 			if (meta.IsCompact) {
 				foreach (var yi in meta.Items) {
 					cw.Put("result.{0} = ", yi.Name);
@@ -239,7 +255,7 @@ namespace Yuzu.Binary
 				}
 			}
 			else {
-				cw.Put("ClassDef.FieldDef fd;\n");
+				cw.Put("{0}.FieldDef fd;\n", classDefName);
 				var ourIndex = 0;
 				cw.Put("fd = def.Fields[d.Reader.ReadInt16()];\n");
 				foreach (var yi in meta.Items) {
@@ -264,7 +280,7 @@ namespace Yuzu.Binary
 						cw.Put("}\n");
 				}
 				if (SafetyChecks)
-					cw.Put("if (fd.OurIndex != ClassDef.EOF) throw dg.Error(\"Unfinished object\");\n");
+					cw.Put("if (fd.OurIndex != {0}.EOF) throw dg.Error(\"Unfinished object\");\n", classDefName);
 			}
 			GenerateAfterDeserialization(meta);
 		}
@@ -287,7 +303,7 @@ namespace Yuzu.Binary
 
 			var readerName = "Read_" + GetMangledTypeNameNS(t);
 			if (!Utils.IsStruct(t)) {
-				cw.Put("private static void {0}(BinaryDeserializer d, ClassDef def, object obj)\n", readerName);
+				cw.Put("private static void {0}(BinaryDeserializer d, {1} def, object obj)\n", readerName, classDefName);
 				cw.Put("{\n");
 				cw.Put("var result = ({0})obj;\n", Utils.GetTypeSpec(t));
 				GenerateReaderBody(meta);
@@ -297,7 +313,7 @@ namespace Yuzu.Binary
 			}
 
 			var makerName = "Make_" + GetMangledTypeNameNS(t);
-			cw.Put("private static object {0}(BinaryDeserializer d, ClassDef def)\n", makerName);
+			cw.Put("private static object {0}(BinaryDeserializer d, {1} def)\n", makerName, classDefName);
 			cw.Put("{\n");
 			cw.Put("var result = new {0}();\n", Utils.GetTypeSpec(t));
 			if (Utils.IsStruct(t))
