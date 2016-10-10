@@ -427,12 +427,14 @@ namespace Lime
 			if (!caretPos.IsVisible) return;
 			var s = EditorParams.Scroll;
 			if (s == null) return;
-			var b = Rectangle.Bounds(Text.MeasureText(), new Rectangle(Vector2.Zero, s.Frame.Size));
+			var b = Rectangle.Bounds(
+				Text.MeasureText().ExpandedBy(Container.Padding),
+				new Rectangle(Vector2.Zero, s.Frame.Size));
 			s.Content.Size = Container.Size = b.Size;
 			s.MinScrollPosition = s.ProjectToScrollAxis(b.A);
-			var t = s.ProjectToScrollAxis(caretPos.WorldPos);
-			var p = s.ScrollPosition.Clamp(t - s.ProjectToScrollAxis(s.Frame.Size) + Container.Padding.Right, t - Container.Padding.Left);
-			s.ScrollTo(p, instantly: true);
+			s.ScrollTo(
+				s.PositionToView(s.ProjectToScrollAxis(caretPos.WorldPos),
+				Container.Padding.Left, Container.Padding.Right), instantly: true);
 		}
 
 		private IEnumerator<object> HandleInputTask()
