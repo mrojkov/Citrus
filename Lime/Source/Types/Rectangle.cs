@@ -164,6 +164,16 @@ namespace Lime
 			);
 		}
 
+		public Rectangle ExpandedBy(Thickness padding)
+		{
+			return new Rectangle(
+				Left - padding.Left,
+				Top - padding.Top,
+				Right + padding.Right,
+				Bottom + padding.Bottom
+			);
+		}
+
 		/// <summary>
 		/// Returns the string representation of this <see cref="Rectangle"/> in the format:
 		/// "A.X, A.Y, B.X, B.Y".
