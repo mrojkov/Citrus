@@ -1,5 +1,4 @@
-﻿#if !MONOMAC
-namespace Lime
+﻿namespace Lime
 {
 	interface IClipboardImplementation
 	{
@@ -8,7 +7,11 @@ namespace Lime
 
 	public static class Clipboard
 	{
+#if MONOMAC
+		private static readonly IClipboardImplementation implementation;
+#else
 		private static readonly IClipboardImplementation implementation = new ClipboardImplementation();
+#endif
 
 		public static string Text
 		{
@@ -17,4 +20,3 @@ namespace Lime
 		}
 	}
 }
-#endif
