@@ -430,7 +430,9 @@ namespace Lime
 			var b = Rectangle.Bounds(Text.MeasureText(), new Rectangle(Vector2.Zero, s.Frame.Size));
 			s.Content.Size = Container.Size = b.Size;
 			s.MinScrollPosition = s.ProjectToScrollAxis(b.A);
-			s.ScrollTo(s.PositionToView(s.ProjectToScrollAxis(caretPos.WorldPos)), instantly: true);
+			var t = s.ProjectToScrollAxis(caretPos.WorldPos);
+			var p = s.ScrollPosition.Clamp(t - s.ProjectToScrollAxis(s.Frame.Size) + Container.Padding.Right, t - Container.Padding.Left);
+			s.ScrollTo(p, instantly: true);
 		}
 
 		private IEnumerator<object> HandleInputTask()

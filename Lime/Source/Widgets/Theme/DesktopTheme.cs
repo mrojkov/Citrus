@@ -141,24 +141,23 @@ namespace Lime
 		
 		private void DecorateEditBox(Widget widget)
 		{
-			DecorateSimpleText(widget);
 			var eb = (EditBox)widget;
-			eb.AutoSizeConstraints = false;
-			eb.MinSize = Metrics.DefaultEditBoxSize;
-			eb.MaxHeight = eb.MinHeight;
-			eb.HAlignment = HAlignment.Left;
-			eb.Localizable = false;	
-			eb.TrimWhitespaces = false;
-			eb.VAlignment = VAlignment.Center;
-			eb.Padding = Metrics.ControlsPadding;
-			var editorParams = new EditorParams { MaxLength = 100, MaxLines = 1 };
-			new CaretDisplay(
-				eb, eb.Caret,
-				new CaretParams { CaretPresenter = new VerticalLineCaret() });
-			new Editor(eb, eb.Caret, editorParams);
-			eb.TabTravesable = new TabTraversable();
+			var tw = eb.TextWidget;
+			DecorateSimpleText(tw);
+			tw.AutoSizeConstraints = false;
+			tw.MinSize = Metrics.DefaultEditBoxSize;
+			tw.MaxHeight = tw.MinHeight;
+			tw.Updated += _ => tw.Size = eb.Size;
+			tw.Localizable = false;	
+			tw.TrimWhitespaces = false;
+			tw.OverflowMode = TextOverflowMode.Ignore;
+			tw.Padding = Metrics.ControlsPadding;
+			var editorParams = new EditorParams { MaxLength = 100, MaxLines = 1, Scroll = eb.Scroll };
+			new CaretDisplay(tw, tw.Caret, new CaretParams { CaretPresenter = new VerticalLineCaret() });
+			eb.Editor = new Editor(tw, tw.Caret, editorParams);
+			tw.TabTravesable = new TabTraversable();
 			eb.CompoundPresenter.Add(new BorderedFramePresenter(Colors.WhiteBackground, Colors.ControlBorder));
-			eb.CompoundPostPresenter.Add(new KeyboardFocusBorderPresenter());
+			eb.CompoundPostPresenter.Add(new KeyboardFocusBorderPresenter(tw));
 		}
 
 		private void DecorateCheckBox(Widget widget)
@@ -329,9 +328,16 @@ namespace Lime
 
 		class KeyboardFocusBorderPresenter : CustomPresenter
 		{
+			readonly Node actualFocusedWidget;
+
+			public KeyboardFocusBorderPresenter(Node actualFocusedWidget = null)
+			{
+				this.actualFocusedWidget = actualFocusedWidget;
+			}
+
 			public override void Render(Node node)
 			{
-				if (node == Widget.Focused) {
+				if (Widget.Focused == (actualFocusedWidget ?? node)) {
 					var widget = node.AsWidget;
 					widget.PrepareRendererState();
 					Renderer.DrawRectOutline(-Vector2.One, widget.Size + Vector2.One, Colors.KeyboardFocusBorder, 2);
