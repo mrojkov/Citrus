@@ -422,15 +422,18 @@ namespace Lime
 			}
 		}
 
-		private void HandleScroll()
+		public void AdjustSizeAndScrollToCaret()
 		{
-			if (!caretPos.IsVisible) return;
 			var s = EditorParams.Scroll;
 			if (s == null) return;
+			// ScrollView limits scrolling by Content.Size.
+			// Container.Size must be large enough to satistfy scissor test,
+			// but not less than Frame.Size to support alignment.
 			var b = Rectangle.Bounds(
 				Text.MeasureText().ExpandedBy(Container.Padding),
 				new Rectangle(Vector2.Zero, s.Frame.Size));
 			s.Content.Size = Container.Size = b.Size;
+			if (!caretPos.IsVisible) return;
 			s.MinScrollPosition = s.ProjectToScrollAxis(b.A);
 			s.ScrollTo(
 				s.PositionToView(s.ProjectToScrollAxis(caretPos.WorldPos),
@@ -453,7 +456,7 @@ namespace Lime
 						caretPos.WorldPos = t.TransformVector(Container.Input.MousePosition);
 					}
 					Text.SyncCaretPosition();
-					HandleScroll();
+					AdjustSizeAndScrollToCaret();
 				}
 				var isFocused = Container.IsFocused();
 				caretPos.IsVisible = isFocused;

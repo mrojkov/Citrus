@@ -29,6 +29,13 @@ namespace Lime
 			TextWidget.Submitted += text => Submitted?.Invoke(text);
 			base.Awake();
 		}
+
+		protected override void OnSizeChanged(Vector2 sizeDelta)
+		{
+			base.OnSizeChanged(sizeDelta);
+			TextWidget.Height = Height;
+			Editor.AdjustSizeAndScrollToCaret();
+		}
 	}
 }
 

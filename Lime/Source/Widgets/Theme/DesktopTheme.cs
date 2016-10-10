@@ -145,10 +145,9 @@ namespace Lime
 			var tw = eb.TextWidget;
 			DecorateSimpleText(tw);
 			tw.AutoSizeConstraints = false;
-			tw.MinSize = Metrics.DefaultEditBoxSize;
-			tw.MaxHeight = tw.MinHeight;
-			tw.Updated += _ => tw.Size = eb.Size;
-			tw.Localizable = false;	
+			eb.MinSize = Metrics.DefaultEditBoxSize;
+			eb.MaxHeight = eb.MinHeight;
+			tw.Localizable = false;
 			tw.TrimWhitespaces = false;
 			tw.OverflowMode = TextOverflowMode.Ignore;
 			tw.Padding = Metrics.ControlsPadding;
