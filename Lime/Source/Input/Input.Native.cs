@@ -235,6 +235,7 @@ namespace Lime
 				keys[i] = key;
 			}
 			if (keyEventQueue.Count > 0) {
+				Changed = true;
 				var processedKeys = new BitArray(Key.MaxCount);
 				for (int i = 0; i < keyEventQueue.Count; i++) {
 					var evt = keyEventQueue[i];
