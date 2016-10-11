@@ -29,27 +29,19 @@ namespace Lime
 
 		public static string ShrinkPath(string path)
 		{
-			if (SerializationPathStack.Count == 0) {
+			if (SerializationPathStack.Count == 0 || string.IsNullOrEmpty(path)) {
 				return path;
 			}
-			return string.IsNullOrEmpty(path) ? path : '/' + path;
+			var d = GetCurrentSerializationDirectory() + '/';
+			return path.StartsWith(d) ? path.Substring(d.Length) : '/' + path;
 		}
 
 		public static string ExpandPath(string path)
 		{
-			if (SerializationPathStack.Count == 0) {
+			if (SerializationPathStack.Count == 0 || string.IsNullOrEmpty(path)) {
 				return path;
 			}
-			string result;
-			if (string.IsNullOrEmpty(path))
-				return path;
-			else if (path[0] == '/')
-				result = path.Substring(1);
-			else {
-				string p = SerializationPathStack.Peek();
-				result = Path.Combine(Path.GetDirectoryName(p), path).Replace('\\', '/');
-			}
-			return result;
+			return (path[0] == '/') ? path.Substring(1) : GetCurrentSerializationDirectory() + '/' + path;
 		}
 
 		private static readonly CommonOptions defaultYuzuCommonOptions = new CommonOptions {
@@ -83,6 +75,19 @@ namespace Lime
 						JsonOptions = defaultYuzuJSONOptions };
 				}
 				ys.ToStream(instance, stream);
+			} finally {
+				SerializationPathStack.Pop();
+			}
+		}
+
+		public static void WriteObject<T>(string path, Stream stream, T instance, AbstractSerializer serializer)
+		{
+			SerializationPathStack.Push(path);
+			try {
+				if (serializer is BinarySerializer) {
+					WriteYuzuBinarySignature(stream);
+				}
+				serializer.ToStream(instance, stream);
 			} finally {
 				SerializationPathStack.Pop();
 			}
@@ -165,6 +170,13 @@ namespace Lime
 		public static string GetCurrentSerializationPath()
 		{
 			return SerializationPathStack.Peek();
+		}
+
+		private static string GetCurrentSerializationDirectory()
+		{
+			var path = SerializationPathStack.Peek();
+			var c = path.LastIndexOf('/');
+			return c >= 0 ? path.Substring(0, c) : path;
 		}
 
 		private static void WriteYuzuBinarySignature(Stream s)
