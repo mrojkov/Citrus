@@ -185,4 +185,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Icons\Timeline\Key.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Icons\Tools\Root.png" />
+  </ItemGroup>
 </Project>
