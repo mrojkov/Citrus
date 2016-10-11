@@ -3,8 +3,6 @@ using Lime;
 using System.Linq;
 using Tangerine.Core;
 using System.Collections.Generic;
-using System.Reflection;
-using Yuzu;
 
 namespace Tangerine.UI.Inspector
 {
@@ -17,9 +15,11 @@ namespace Tangerine.UI.Inspector
 		public readonly Widget PanelWidget;
 		public readonly ScrollViewWidget RootWidget;
 		public readonly Widget ContentWidget;
+		public readonly Toolbar Toolbar;
 		public readonly List<object> Objects;
 		public readonly List<PropertyEditorRegistryItem> PropertyEditorRegistry;
 		public readonly List<IPropertyEditor> Editors;
+		public bool InspectRootNode { get; set; }
 
 		public void Attach()
 		{
@@ -37,13 +37,24 @@ namespace Tangerine.UI.Inspector
 		{
 			PanelWidget = panelWidget;
 			RootWidget = new ScrollViewWidget();
-			ContentWidget = RootWidget.Content;
+			var toolbarArea = new Widget { Layout = new StackLayout(), Padding = new Thickness(4, 0) };
+			ContentWidget = new Widget();
+			RootWidget.Content.AddNode(toolbarArea);
+			RootWidget.Content.AddNode(ContentWidget);
+			RootWidget.Content.Layout = new VBoxLayout();
+			Toolbar = new Toolbar(toolbarArea);
 			ContentWidget.Layout = new VBoxLayout { Tag = "InspectorContent", Spacing = 4 };
 			Objects = new List<object>();
 			PropertyEditorRegistry = new List<PropertyEditorRegistryItem>();
 			Editors = new List<IPropertyEditor>();
 			RegisterEditors();
 			RootWidget.Tasks.Add(RebuildInspectorWhenSelectedRowsChanged());
+			SetupToolbar();
+		}
+
+		void SetupToolbar()
+		{
+			Toolbar.Add(new InspectRootNodeCommand());
 		}
 
 		private void RegisterEditors()
@@ -88,6 +99,17 @@ namespace Tangerine.UI.Inspector
 				Condition = condition;
 				Builder = builder;
 			}
+		}
+	}
+
+	public class InspectRootNodeCommand : Command
+	{
+		public override string Text => "Root node properties";
+		public override ITexture Icon => IconPool.GetTexture("Tools.Root");
+
+		public override void Execute()
+		{
+			Inspector.Instance.InspectRootNode = !Inspector.Instance.InspectRootNode;
 		}
 	}
 }
