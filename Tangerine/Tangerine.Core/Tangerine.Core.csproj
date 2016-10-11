@@ -55,6 +55,7 @@
     <Folder Include="Resources\" />
     <Folder Include="Operations\" />
     <Folder Include="Components\" />
+    <Folder Include="HotStudioExport\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -85,6 +86,7 @@
     <Compile Include="Operations\DragRows.cs" />
     <Compile Include="Operations\EnterLeaveNode.cs" />
     <Compile Include="BuildRowsProcessor.cs" />
+    <Compile Include="HotStudioExport\HotSceneExporter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
   <ItemGroup>

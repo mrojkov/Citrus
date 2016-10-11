@@ -229,6 +229,8 @@ namespace Tangerine
 					new OpenFileCommand(),
 					new OpenProjectCommand(),
 					Command.MenuSeparator,
+					new SaveFileCommand(),
+					Command.MenuSeparator,
 #if !MAC
 					new PreferencesCommand(),
 					Command.MenuSeparator,

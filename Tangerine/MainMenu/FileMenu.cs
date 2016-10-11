@@ -46,6 +46,18 @@ namespace Tangerine
 		}
 	}
 
+	public class SaveFileCommand : Command
+	{
+		public override string Text => "Save File";
+		public override Shortcut Shortcut => KeyBindings.GenericKeys.SaveFile;
+		public override bool Enabled => Document.Current != null;
+
+		public override void Execute()
+		{
+			Document.Current.Save();
+		}
+	}
+
 	public class CloseDocumentCommand : Command
 	{
 		public override string Text => "Close Document...";
