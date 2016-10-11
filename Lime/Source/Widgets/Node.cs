@@ -30,9 +30,9 @@ namespace Lime
 	public enum TangerineFlags
 	{
 		None = 0,
-		Shown = 1,
-		Hidden = 2,
-		Locked = 4,
+		Hidden = 1,
+		Locked = 2,
+		Shown = 4,
 		Expanded = 8,
 		HiddenOnExposition = 16
 	}
