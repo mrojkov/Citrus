@@ -75,7 +75,7 @@ namespace Orange
 				node.ContentsPath = s;
 				break;
 			case "Attributes":
-				lexer.ParseInt();
+				node.TangerineFlags = (TangerineFlags)(lexer.ParseInt() & 7);
 				break;
 			case "Trigger":
 				lexer.ParseQuotedString();
