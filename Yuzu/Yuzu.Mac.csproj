@@ -73,6 +73,7 @@
     <Compile Include="Grisu\PowersOfTenCache.cs" />
     <Compile Include="JsonHelpers.cs" />
     <Compile Include="Code.cs" />
+    <Compile Include="BinaryCommon.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
 </Project>
