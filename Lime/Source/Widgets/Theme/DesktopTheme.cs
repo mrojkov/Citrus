@@ -130,7 +130,7 @@ namespace Lime
 			text.HAlignment = HAlignment.Left;
 			text.VAlignment = VAlignment.Center;
 			text.OverflowMode = TextOverflowMode.Ellipsis;
-			text.TrimWhitespaces = true;	
+			text.TrimWhitespaces = true;
 			text.Size = text.MinSize;
 		}
 				
