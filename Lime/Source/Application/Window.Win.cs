@@ -261,7 +261,7 @@ namespace Lime
 
 		public void ShowDialog()
 		{
-			throw new NotImplementedException();
+			form.ShowDialog();
 		}
 
 		private static float CalcPixelScale(float Dpi)
