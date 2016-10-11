@@ -87,7 +87,7 @@ namespace Orange
 			public void WriteProperty(string name, bool value, bool def = false)
 			{
 				if (value != def)
-					WriteLine($"{name} {value ? "true" : "false"}");
+					WriteLine($"{name} " + (value ? "true" : "false"));
 			}
 
 			public void WriteProperty(string name, Color4 value)
