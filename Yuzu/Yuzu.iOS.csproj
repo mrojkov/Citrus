@@ -130,6 +130,7 @@
     <Compile Include="Grisu\GrisuDouble.cs" />
     <Compile Include="Grisu\PowersOfTenCache.cs" />
     <Compile Include="JsonHelpers.cs" />
+    <Compile Include="BinaryCommon.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Grisu\LICENSE" />

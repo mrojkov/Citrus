@@ -650,11 +650,14 @@ namespace Lime
 			if (Focused == value) {
 				return;
 			}
-			if (value != null && value is IText) {
-				Application.SoftKeyboard.Show(true, value.Text);
-			} else {
-				Application.SoftKeyboard.Show(false, "");
-			}
+			// Grisha: invoke on main thread to make it possible to focus widgets not from main thread
+			Application.InvokeOnMainThread(() => {
+				if (value != null && value is IText) {
+					Application.SoftKeyboard.Show(true, value.Text);
+				} else {
+					Application.SoftKeyboard.Show(false, "");
+				}
+			});
 			Focused = value;
 			foreach (var i in Application.Windows) {
 				i.Invalidate();
