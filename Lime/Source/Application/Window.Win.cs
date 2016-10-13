@@ -290,13 +290,16 @@ namespace Lime
 
 		private void OnMove(object sender, EventArgs e)
 		{
+			foreach (var w in Application.Windows) {
+				(w as Window).Invalidate();
+			}
 			RaiseMoved();
 		}
 
 		private void OnActivated(object sender, EventArgs e)
 		{
 			active = true;
-			glControl.Invalidate();
+			Invalidate();
 			RaiseActivated();
 		}
 
