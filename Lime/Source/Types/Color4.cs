@@ -278,7 +278,7 @@ namespace Lime
 
 		public override int GetHashCode()
 		{
-			return (int)ABGR;
+			return ABGR.GetHashCode();
 		}
 
 		public override bool Equals(object obj)
