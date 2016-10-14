@@ -304,11 +304,11 @@ namespace Lime
 		/// </summary>
 		protected internal void PropagateDirtyFlags(DirtyFlags mask = DirtyFlags.All)
 		{
+			if ((DirtyMask & mask) == mask)
+				return;
 			if (Window.Current != null) {
 				Window.Current.Invalidate();
 			}
-			if ((DirtyMask & mask) == mask)
-				return;
 			DirtyMask |= mask;
 			for (var n = Nodes.FirstOrNull(); n != null; n = n.NextSibling) {
 				if ((n.DirtyMask & mask) != mask) {
