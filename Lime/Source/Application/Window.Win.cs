@@ -263,7 +263,7 @@ namespace Lime
 			Application.Windows.Add(this);
 		}
 
-		public void ShowDialog()
+		public void ShowModal()
 		{
 			RaiseVisibleChanging(true);
 			form.ShowDialog();

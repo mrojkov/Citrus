@@ -84,7 +84,7 @@ namespace Tangerine.UI.Timeline
 		public Marker Show()
 		{
 			result = false;
-			window.ShowDialog();
+			window.ShowModal();
 			return result ? marker : null;
 		}
 	}

@@ -70,10 +70,10 @@ namespace Lime
 		public Vector2 DecoratedSize
 		{
 			get { return new Vector2((float)window.Frame.Width, (float)window.Frame.Height); }
-			set 
+			set
 			{
 				var frame = window.Frame;
-				frame.Size = new CGSize(value.X.Round(), value.Y.Round()); 
+				frame.Size = new CGSize(value.X.Round(), value.Y.Round());
 				window.SetFrame(frame, true);
 			}
 		}
@@ -95,9 +95,9 @@ namespace Lime
 			get { return window.IsKeyWindow; }
 		}
 
-		public WindowState State 
+		public WindowState State
 		{
-			get 
+			get
 			{
 				if (window.IsMiniaturized) {
 					return WindowState.Minimized;
@@ -150,7 +150,7 @@ namespace Lime
 				}
 			}
 		}
-		
+
 		public float FPS { get { return fpsCounter.FPS; } }
 
 		[Obsolete("Use FPS property instead", true)]
@@ -283,7 +283,7 @@ namespace Lime
 			}
 		}
 
-		public void ShowDialog()
+		public void ShowModal()
 		{
 			if (Visible) {
 				throw new InvalidOperationException();
@@ -316,7 +316,7 @@ namespace Lime
 		private void Update()
 		{
 #if MAC
-			if (this == Application.MainWindow) {			
+			if (this == Application.MainWindow) {
 				Application.MainMenu.Refresh();
 			}
 #endif

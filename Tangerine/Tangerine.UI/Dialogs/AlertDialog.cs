@@ -61,7 +61,7 @@ namespace Tangerine.UI
 
 		public int Show()
 		{
-			window.ShowDialog();
+			window.ShowModal();
 			return result;
 		}
 	}

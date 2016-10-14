@@ -77,7 +77,7 @@ namespace Tangerine.UI
 
 		public bool Show()
 		{
-			window.ShowDialog();
+			window.ShowModal();
 			return result;
 		}
 

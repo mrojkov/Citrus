@@ -190,6 +190,6 @@ namespace Lime
 		/// When this method is called, the code following it is not executed until after the dialog box is closed.
 		/// The window must be hidden before calling this method.
 		/// </summary>
-		void ShowDialog();
+		void ShowModal();
 	}
 }

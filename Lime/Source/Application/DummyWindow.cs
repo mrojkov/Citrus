@@ -39,7 +39,7 @@ namespace Lime
 #endif
 		public float PixelScale { get; set; }
 
-		public void ShowDialog() {}
+		public void ShowModal() {}
 	}
 }
 #endif

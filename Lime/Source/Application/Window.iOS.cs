@@ -91,7 +91,7 @@ namespace Lime
 
 		public void Center() { }
 		public void Close() { }
-		public void ShowDialog() { }
+		public void ShowModal() { }
 		public void Invalidate() { }
 
 		private void OnUpdateFrame(object s, Xamarin.FrameEventArgs e)

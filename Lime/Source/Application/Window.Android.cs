@@ -22,7 +22,7 @@ namespace Lime
 		public Vector2 DecoratedPosition { get { return Vector2.Zero; } set {} }
 		public Vector2 ClientSize
 		{
-			get { return ToLimeSize(ActivityDelegate.Instance.GameView.Size, PixelScale); } 
+			get { return ToLimeSize(ActivityDelegate.Instance.GameView.Size, PixelScale); }
 			set { }
 		}
 		public Vector2 DecoratedSize { get { return ClientSize; } set {} }
@@ -72,7 +72,7 @@ namespace Lime
 		public void Center() {}
 		public void Close() {}
 		public void Invalidate() {}
-		public void ShowDialog() {}
+		public void ShowModal() {}
 
 		private static Vector2 ToLimeSize(System.Drawing.Size size, float pixelScale)
 		{
