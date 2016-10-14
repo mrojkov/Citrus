@@ -174,9 +174,7 @@ namespace Lime
 
 		private static string GetCurrentSerializationDirectory()
 		{
-			var path = SerializationPathStack.Peek();
-			var c = path.LastIndexOf('/');
-			return c >= 0 ? path.Substring(0, c) : path;
+			return Path.GetDirectoryName(SerializationPathStack.Peek());
 		}
 
 		private static void WriteYuzuBinarySignature(Stream s)
