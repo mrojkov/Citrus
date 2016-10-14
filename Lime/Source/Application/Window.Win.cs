@@ -122,7 +122,11 @@ namespace Lime
 		public bool Visible
 		{
 			get { return form.Visible; }
-			set { form.Visible = value; }
+			set
+			{
+				RaiseVisibleChanging(value);
+				form.Visible = value;
+			}
 		}
 
 		private MouseCursor cursor;
@@ -261,6 +265,7 @@ namespace Lime
 
 		public void ShowDialog()
 		{
+			RaiseVisibleChanging(true);
 			form.ShowDialog();
 		}
 
