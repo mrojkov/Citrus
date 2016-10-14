@@ -613,8 +613,8 @@ namespace Lime
 		internal void SetMenu(Menu menu)
 		{
 			if (form.MainMenuStrip != null) {
-				form.MainMenuStrip = null;
 				form.Controls.Remove(form.MainMenuStrip);
+				form.MainMenuStrip = null;
 			}
 			if (menu != null) {
 				menu.Refresh();
