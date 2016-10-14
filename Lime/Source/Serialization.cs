@@ -17,7 +17,8 @@ namespace Lime
 			public static Stack<string> stack;
 		}
 
-		static Stack<string> SerializationPathStack {
+		static Stack<string> SerializationPathStack
+		{
 			get { return SerializationStackKeeper.stack ?? (SerializationStackKeeper.stack = new Stack<string>()); }
 		}
 
@@ -71,8 +72,10 @@ namespace Lime
 					WriteYuzuBinarySignature(stream);
 					ys = new Yuzu.Binary.BinarySerializer { Options = defaultYuzuCommonOptions };
 				} else if (format == Format.JSON) {
-					ys = new Yuzu.Json.JsonSerializer { Options = defaultYuzuCommonOptions,
-						JsonOptions = defaultYuzuJSONOptions };
+					ys = new Yuzu.Json.JsonSerializer {
+						Options = defaultYuzuCommonOptions,
+						JsonOptions = defaultYuzuJSONOptions
+					};
 				}
 				ys.ToStream(instance, stream);
 			} finally {
@@ -118,7 +121,7 @@ namespace Lime
 			try {
 				AbstractDeserializer yd = null;
 				if (CheckYuzuBinarySignature(stream)) {
-					yd = new GeneratedDeserializersBIN.BinaryDeserializerGen  { Options = defaultYuzuCommonOptions };
+					yd = new GeneratedDeserializersBIN.BinaryDeserializerGen { Options = defaultYuzuCommonOptions };
 				} else {
 					foreach (var d in DeserializerBuilders) {
 						yd = d(path, stream);
@@ -204,20 +207,20 @@ namespace Lime
 		public static void GenerateDeserializers(string filename, string rootNamespace, List<Type> types)
 		{
 			var yjdg = new BinaryDeserializerGenerator(rootNamespace);
-				using (var ms = new MemoryStream())
-				using (var sw = new StreamWriter(ms)) {
-					yjdg.GenWriter = sw;
-					yjdg.GenerateHeader();
-					foreach (var generate in types
-						.Select(t => yjdg.GetType()
-						.GetMethod("Generate")
-						.MakeGenericMethod(t))) {
-						generate.Invoke(yjdg, new object[] { });
-					}
-					yjdg.GenerateFooter();
-					sw.Flush();
-					ms.WriteTo(new FileStream(filename, FileMode.Create));
+			using (var ms = new MemoryStream())
+			using (var sw = new StreamWriter(ms)) {
+				yjdg.GenWriter = sw;
+				yjdg.GenerateHeader();
+				foreach (var generate in types
+					.Select(t => yjdg.GetType()
+					.GetMethod("Generate")
+					.MakeGenericMethod(t))) {
+					generate.Invoke(yjdg, new object[] { });
 				}
+				yjdg.GenerateFooter();
+				sw.Flush();
+				ms.WriteTo(new FileStream(filename, FileMode.Create));
+			}
 		}
 
 		public static void GenerateBinaryDeserializers()
@@ -341,7 +344,7 @@ namespace Lime
 				jd.Generate<SerializableTexture>();
 				jd.GenerateFooter();
 				sw.Flush();
-				var executablePath = System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly ().Location);
+				var executablePath = System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 				string goUp =
 
 #if WIN
