@@ -8,12 +8,20 @@ namespace Lime
 {
 	public class Window : CommonWindow, IWindow
 	{
+		// We must perform no more than single render per update.
+		// So we defer Invalidate() calls until next Update().
+		private enum RenderingState
+		{
+			Updated,
+			RenderDeferred,
+			Rendered,
+		}
 		private OpenTK.GLControl glControl;
 		private Form form;
 		private Timer timer;
 		private Stopwatch stopwatch;
 		private bool active;
-		private bool invalidated;
+		private RenderingState renderingState = RenderingState.Rendered;
 		private System.Drawing.Point lastMousePosition;
 
 		public Input Input { get; private set; }
@@ -295,16 +303,12 @@ namespace Lime
 
 		private void OnMove(object sender, EventArgs e)
 		{
-			foreach (var w in Application.Windows) {
-				(w as Window).Invalidate();
-			}
 			RaiseMoved();
 		}
 
 		private void OnActivated(object sender, EventArgs e)
 		{
 			active = true;
-			Invalidate();
 			RaiseActivated();
 		}
 
@@ -330,7 +334,6 @@ namespace Lime
 			if (!hasBeenMinimizedOrRestored) {
 				RaiseResized(deviceRotated: false);
 			}
-			Invalidate();
 		}
 
 		private void OnMouseDown(object sender, MouseEventArgs e)
@@ -378,7 +381,7 @@ namespace Lime
 
 		private void OnTick(object sender, EventArgs e)
 		{
-			glControl.Invalidate();
+			Update();
 		}
 
 		private void OnKeyDown(object sender, KeyEventArgs e)
@@ -404,25 +407,32 @@ namespace Lime
 
 		private void OnPaint(object sender, PaintEventArgs e)
 		{
-			// Do not allow updating if modal dialog is shown, otherwise it will lead to recursive OnPaint.
-			if (glControl.IsHandleCreated && form.Visible && form.CanFocus) {
-				glControl.MakeCurrent();
-				var delta = (float)stopwatch.Elapsed.TotalSeconds;
-				stopwatch.Restart();
-				delta = Mathf.Clamp(delta, 0, 1 / Application.LowFPSLimit);
-				PixelScale = CalcPixelScale(e.Graphics.DpiX);
-				Update(delta);
-				if (invalidated && !glControl.IsDisposed) {
-					fpsCounter.Refresh();
-					RaiseRendering();
-					glControl.SwapBuffers();
-					invalidated = false;
-				}
+			switch (renderingState) {
+				case RenderingState.Updated:
+					if (glControl.IsHandleCreated && form.Visible && !glControl.IsDisposed) {
+						glControl.MakeCurrent();
+						PixelScale = CalcPixelScale(e.Graphics.DpiX);
+						fpsCounter.Refresh();
+						RaiseRendering();
+						glControl.SwapBuffers();
+					}
+					renderingState = RenderingState.Rendered;
+					break;
+				case RenderingState.Rendered:
+					renderingState = RenderingState.RenderDeferred;
+					break;
+				case RenderingState.RenderDeferred:
+					break;
 			}
 		}
 
-		private void Update(float delta)
+		private void Update()
 		{
+			if (!form.Visible || !form.CanFocus) {
+				return;
+			}
+			float delta = Mathf.Clamp((float)stopwatch.Elapsed.TotalSeconds, 0, 1 / Application.LowFPSLimit);
+			stopwatch.Restart();
 			if (this == Application.MainWindow && Application.MainMenu != null) {
 				Application.MainMenu.Refresh();
 			}
@@ -441,6 +451,10 @@ namespace Lime
 				Input.TextInput = null;
 				Input.CopyKeysState();
 			}
+			if (renderingState == RenderingState.RenderDeferred) {
+				Invalidate();
+			}
+			renderingState = RenderingState.Updated;
 		}
 
 		private static Key TranslateKey(Keys key)
@@ -607,7 +621,7 @@ namespace Lime
 
 		public void Invalidate()
 		{
-			invalidated = true;
+			glControl.Invalidate();
 		}
 
 		internal void SetMenu(Menu menu)
@@ -620,13 +634,7 @@ namespace Lime
 				menu.Refresh();
 				form.Controls.Add(menu.NativeMainMenu);
 				form.MainMenuStrip = menu.NativeMainMenu;
-				menu.NativeMainMenu.Invalidated += NativeMainMenu_Invalidated;
 			}
-		}
-
-		private void NativeMainMenu_Invalidated(object sender, InvalidateEventArgs e)
-		{
-			Invalidate();
 		}
 	}
 
