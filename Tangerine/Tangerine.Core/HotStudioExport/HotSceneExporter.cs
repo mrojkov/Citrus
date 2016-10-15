@@ -45,7 +45,7 @@ namespace Orange
 				value = ((SerializableFont)value).Name;
 			}
 			if (value is string) {
-				value = ((string)value).Replace("\n", "\\n");
+				value = ((string)value).Replace("\n", "\\n").Replace("\\", "\\\\");
 				return $"\"{value}\"";
 			}
 			if (value is int || value is AudioAction || value is MovieAction || value is HAlignment || value is VAlignment || value is EmitterShape) {
@@ -82,7 +82,8 @@ namespace Orange
 
 		static string FloatToString(float value)
 		{
-			return $"{((double)value):0.00000}";
+			// Returns negative zero for the lesser diff with the imported scene.
+			return value == -float.Epsilon ? "-0.00000" : $"{((double)value):0.00000}";
 		}
 
 		class Writer
@@ -102,6 +103,7 @@ namespace Orange
 				if (
 					(value is ITexture) && string.IsNullOrEmpty((value as ITexture).SerializationPath) ||
 					(value is SerializableSample) && string.IsNullOrEmpty((value as SerializableSample).SerializationPath) ||
+					(value is SerializableFont) && string.IsNullOrEmpty((value as SerializableFont).Name) ||
 					value == null || value.Equals(def)
 				) {
 					return;
@@ -174,8 +176,13 @@ namespace Orange
 				{ typeof(SimpleText), new NodeWriter { ActorClass = "Hot::Text", Writer = n => WriteSimpleTextProperties((SimpleText)n) } },
 				{ typeof(RichText), new NodeWriter { ActorClass = "Hot::RichText", Writer = n => WriteRichTextProperties((RichText)n) } },
 				{ typeof(TextStyle), new NodeWriter { ActorClass = "Hot::TextStyle", Writer = n => WriteTextStyleProperties((TextStyle)n) } },
+				{ typeof(NineGrid), new NodeWriter { ActorClass = "Hot::NineGrid", Writer = n => WriteNineGridProperties((NineGrid)n) } },
+				{ typeof(LinearLayout), new NodeWriter { ActorClass = "LinearLayout", Writer = n => WriteLinearLayoutProperties((LinearLayout)n) } },
+				{ typeof(FolderBegin), new NodeWriter { ActorClass = "Hot::FolderBegin", Writer = n => WriteFolderBeginProperties((FolderBegin)n) } },
+				{ typeof(FolderEnd), new NodeWriter { ActorClass = "Hot::FolderEnd", Writer = n => WriteNodeProperties(n) } },
 			};
 		}
+
 
 		public void Export(Stream stream, Node node)
 		{
@@ -332,7 +339,7 @@ namespace Orange
 		static string RestorePath(string path, string extension)
 		{
 			if (!string.IsNullOrEmpty(path)) {
-				return path.Replace("/", "\\\\") + extension;
+				return path.Replace("/", "\\") + extension;
 			}
 			return path;
 		}
@@ -410,6 +417,7 @@ namespace Orange
 		void WriteButtonProperties(Button node)
 		{
 			WriteWidgetProperties(node);
+			WriteProperty("Enabled", node.Enabled, true);
 			WriteProperty("Text", node.Text, null);
 		}
 
@@ -519,11 +527,11 @@ namespace Orange
 			WriteWidgetProperties(node);
 			WriteProperty("FontName", node.Font, null);
 			WriteProperty("FontSize", node.FontHeight, 0f);
+			WriteProperty("LineIndent", node.Spacing, 0f);
 			WriteProperty("Text", node.Text, null);
 			WriteProperty("TextColor", node.TextColor, new Color4(0));
 			WriteProperty("HAlign", (int)node.HAlignment, (int)HAlignment.Left);
 			WriteProperty("VAlign", (int)node.VAlignment, (int)VAlignment.Top);
-			WriteProperty("LineIndent", node.Spacing, 0f);
 		}
 
 		void WriteRichTextProperties(RichText node)
@@ -548,6 +556,29 @@ namespace Orange
 			WriteProperty("TextColor", node.TextColor, Color4.White);
 			WriteProperty("ShadowColor", node.ShadowColor, Color4.Black);
 			WriteProperty("ShadowOffset", node.ShadowOffset, Vector2.One);
+		}
+
+		void WriteNineGridProperties(NineGrid node)
+		{
+			WriteWidgetProperties(node);
+			WriteProperty("TexturePath", node.Texture, null);
+			WriteProperty("LeftOffset", node.LeftOffset, 0f);
+			WriteProperty("TopOffset", node.TopOffset, 0f);
+			WriteProperty("RightOffset", node.RightOffset, 0f);
+			WriteProperty("BottomOffset", node.BottomOffset, 0f);
+		}
+
+		void WriteLinearLayoutProperties(LinearLayout node)
+		{
+			WriteNodeProperties(node);
+			WriteProperty("Horizontal", node.Horizontal, false);
+			WriteProperty("ProcessHidden", node.ProcessHidden, false);
+		}
+
+		void WriteFolderBeginProperties(FolderBegin node)
+		{
+			WriteNodeProperties(node);
+			WriteProperty("Expanded", node.Expanded, true);
 		}
 	}
 }

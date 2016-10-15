@@ -879,9 +879,10 @@ namespace Orange
 
 		protected void ParseFolderBeginProperty(Node node, string name)
 		{
+			var fb = (FolderBegin)node;
 			switch (name) {
 			case "Expanded":
-				lexer.ParseBool();
+				fb.Expanded = lexer.ParseBool();
 				break;
 			default:
 				ParseActorProperty(node, name);
@@ -944,8 +945,6 @@ namespace Orange
 					while (lexer.PeekChar() != '}')
 						t.PropReader(node, lexer.ParseWord());
 					lexer.ParseToken('}');
-					if (t.ActorClass == "Hot::FolderBegin" || t.ActorClass == "Hot::FolderEnd")
-						return null;
 					return node;
 				}
 			}
@@ -1027,8 +1026,8 @@ namespace Orange
 				new KnownActorType {ActorClass = "Hot::SplinePoint", NodeClass = "Lime.SplinePoint, Lime", PropReader = ParseSplinePointProperty},
 				new KnownActorType {ActorClass = "Hot::Gear", NodeClass = "Lime.SplineGear, Lime", PropReader = ParseGearProperty},
 				new KnownActorType {ActorClass = "Hot::Button", NodeClass = "Lime.Button, Lime", PropReader = ParseButtonProperty},
-				new KnownActorType {ActorClass = "Hot::FolderBegin", NodeClass = "Lime.Node, Lime", PropReader = ParseFolderBeginProperty},
-				new KnownActorType {ActorClass = "Hot::FolderEnd", NodeClass = "Lime.Node, Lime", PropReader = ParseFolderEndProperty},
+				new KnownActorType {ActorClass = "Hot::FolderBegin", NodeClass = "Lime.FolderBegin, Lime", PropReader = ParseFolderBeginProperty},
+				new KnownActorType {ActorClass = "Hot::FolderEnd", NodeClass = "Lime.FolderEnd, Lime", PropReader = ParseFolderEndProperty},
 				new KnownActorType {ActorClass = "Hot::NineGrid", NodeClass = "Lime.NineGrid, Lime", PropReader = ParseNineGridProperty},
 				new KnownActorType {ActorClass = "Hot::Slider", NodeClass = "Lime.Slider, Lime", PropReader = ParseSliderProperty},
 				new KnownActorType {ActorClass = "Hot::RichText", NodeClass = "Lime.RichText, Lime", PropReader = ParseRichTextProperty},

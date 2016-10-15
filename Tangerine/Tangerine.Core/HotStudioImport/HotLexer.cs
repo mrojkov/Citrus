@@ -27,8 +27,10 @@ namespace Orange
 		{
 			SkipWhitespace();
 			int p = position;
-			if (PeekByte() == '-')
+			var negative = PeekByte() == '-';
+			if (negative) {
 				ReadByte();
+			}
 			while (Char.IsDigit((char)PeekByte())) {
 				ReadByte();
 			}
@@ -38,7 +40,12 @@ namespace Orange
 				ReadByte();
 			}
 			string number = GetSubstring(p, position - p);
-			return float.Parse(number, numberFormat);
+			var f = float.Parse(number, numberFormat);
+			if (negative && f == 0f) {
+				// Store negative zero for the lesser diff with the exported scene.
+				f = -float.Epsilon;
+			}
+			return f;
 		}
 
 		public int ParseInt()
