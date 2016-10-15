@@ -3,10 +3,11 @@ using System.Linq;
 using System.IO;
 using System.Collections.Generic;
 using Lime;
+using Tangerine;
 
 namespace Orange
 {
-	public class HotSceneExporter : IDisposable
+	public class HotSceneExporter
 	{
 		public class Serializer : Yuzu.AbstractSerializer
 		{
@@ -27,73 +28,85 @@ namespace Orange
 
 			public override void ToStream(object obj, Stream target)
 			{
-				var e = new HotSceneExporter(target);
-				e.Write((Node)obj);
+				new HotSceneExporter().Export(target, (Node)obj);
 			}
 		}
 
-		class Writer : IDisposable
+		static string ObjectToString(object value)
+		{
+			if (value is ITexture) {
+				var path = ((ITexture)value).SerializationPath;
+				value = !path.StartsWith("#") ? RestorePath(path, ".png") : path;
+			}
+			if (value is SerializableSample) {
+				value = RestorePath(((SerializableSample)value).SerializationPath, ".ogg");
+			}
+			if (value is SerializableFont) {
+				value = ((SerializableFont)value).Name;
+			}
+			if (value is string) {
+				value = ((string)value).Replace("\n", "\\n");
+				return $"\"{value}\"";
+			}
+			if (value is int || value is AudioAction || value is MovieAction || value is HAlignment || value is VAlignment || value is EmitterShape) {
+				return ((int)value).ToString();
+			}
+			if (value is float) {
+				return FloatToString((float)value);
+			}
+			if (value is bool) {
+				return ((bool)value) ? "true" : "false";
+			}
+			if (value is Vector2) {
+				var v = (Vector2)value;
+				return $"[ {FloatToString(v.X)} {FloatToString(v.Y)} ]";
+			}
+			if (value is NumericRange) {
+				var v = (NumericRange)value;
+				return $"[ {FloatToString(v.Median)} {FloatToString(v.Dispersion)} ]";
+			}
+			if (value is SkinningWeights) {
+				var v = (SkinningWeights)value;
+				return
+					$"{v.Bone0.Index} {FloatToString(v.Bone0.Weight)} " +
+					$"{v.Bone1.Index} {FloatToString(v.Bone1.Weight)} " +
+					$"{v.Bone2.Index} {FloatToString(v.Bone2.Weight)} " +
+					$"{v.Bone3.Index} {FloatToString(v.Bone3.Weight)} ]";
+			}
+			if (value is Color4) {
+				var v = (Color4)value;
+				return $"0x{v.A:X2}{v.R:X2}{v.G:X2}{v.B:X2}";
+			}
+			throw new ArgumentException();
+		}
+
+		static string FloatToString(float value)
+		{
+			return $"{((double)value):0.00000}";
+		}
+
+		class Writer
 		{
 			readonly TextWriter tw;
 
 			public int Indent { get; set; }
 
-			public Writer(Stream stream)
+			public Writer(TextWriter target)
 			{
-				tw = new StreamWriter(stream);
+				tw = target;
+				tw.NewLine = "\n";
 			}
 
-			public void Dispose()
+			public void WriteProperty(string name, object value, object def)
 			{
-				tw.Dispose();
-			}
-
-			public void WriteProperty(string name, string value)
-			{
-				if (!string.IsNullOrEmpty(value))
-					WriteLine($"{name} \"{value}\"");
-			}
-
-			public void WriteProperty(string name, int value, int def = 0)
-			{
-				if (value != def)
-					WriteLine($"{name} {value}");
-			}
-
-			public void WriteProperty(string name, float value, float def = 0)
-			{
-				if (value != def)
-					WriteLine($"{name} {value:0.00000}");
-			}
-
-			public void WriteProperty(string name, Vector2 value, Vector2? def = null)
-			{
-				if (value != (def.HasValue ? def.Value : Vector2.Zero))
-					WriteLine($"{name} [ {value.X:0.00000} {value.Y:0.00000} ]");
-			}
-
-			public void WriteProperty(string name, SkinningWeights value)
-			{
-				if (value != null) {
-					WriteLine($"{name} [" +
-						$"{value.Bone0.Index} {value.Bone0.Weight:0.00000} " +
-						$"{value.Bone1.Index} {value.Bone1.Weight:0.00000} " +
-						$"{value.Bone2.Index} {value.Bone2.Weight:0.00000} " +
-						$"{value.Bone3.Index} {value.Bone3.Weight:0.00000} ]");
+				if (
+					(value is ITexture) && string.IsNullOrEmpty((value as ITexture).SerializationPath) ||
+					(value is SerializableSample) && string.IsNullOrEmpty((value as SerializableSample).SerializationPath) ||
+					value == null || value.Equals(def)
+				) {
+					return;
 				}
-			}
-
-
-			public void WriteProperty(string name, bool value, bool def = false)
-			{
-				if (value != def)
-					WriteLine($"{name} " + (value ? "true" : "false"));
-			}
-
-			public void WriteProperty(string name, Color4 value)
-			{
-				if (value != Color4.White)
-					WriteLine($"{name} 0x{value.A:X2}{value.R:X2}{value.G:X2}{value.B:X2}");
+				WriteLine(name + ' ' + ObjectToString(value));
 			}
 
 			public void WriteLine(string value)
@@ -102,6 +115,30 @@ namespace Orange
 					tw.Write('\t');
 				}
 				tw.WriteLine(value);
+			}
+
+			public void BeginCollection(string name)
+			{
+				WriteLine($"{name} [");
+				Indent++;
+			}
+
+			public void EndCollection()
+			{
+				Indent--;
+				WriteLine("]");
+			}
+
+			public void BeginStruct(string name)
+			{
+				WriteLine($"\"{name}\" {{");
+				Indent++;
+			}
+
+			public void EndStruct()
+			{
+				Indent--;
+				WriteLine("}");
 			}
 		}
 
@@ -115,67 +152,189 @@ namespace Orange
 
 		Dictionary<Type, NodeWriter> nodeWriters;
 
-		public HotSceneExporter(Stream stream)
+		public HotSceneExporter()
 		{
-			writer = new Writer(stream);
 			nodeWriters = new Dictionary<Type, NodeWriter> {
-				{ typeof(Node), new NodeWriter { ActorClass = "Hot::Actor", Writer = WriteActorProperties } },
-				{ typeof(Widget), new NodeWriter { ActorClass = "Hot::Graphic", Writer = n => WriteGraphicProperties((Widget)n) } },
-				{ typeof(Frame), new NodeWriter { ActorClass = "Hot::Scene", Writer = n => WriteSceneProperties((Frame)n) } },
+				{ typeof(Node), new NodeWriter { ActorClass = "Hot::Actor", Writer = WriteNodeProperties } },
+				{ typeof(Widget), new NodeWriter { ActorClass = "Hot::Graphic", Writer = n => WriteWidgetProperties((Widget)n) } },
+				{ typeof(Frame), new NodeWriter { ActorClass = "Hot::Scene", Writer = n => WriteFrameProperties((Frame)n) } },
 				{ typeof(Image), new NodeWriter { ActorClass = "Hot::Image", Writer = n => WriteImageProperties((Image)n) } },
 				{ typeof(Audio), new NodeWriter { ActorClass = "Hot::Audio", Writer = n => WriteAudioProperties((Audio)n) } },
 				{ typeof(Button), new NodeWriter { ActorClass = "Hot::Button", Writer = n => WriteButtonProperties((Button)n) } },
+				{ typeof(ImageCombiner), new NodeWriter { ActorClass = "Hot::MaskedEffect", Writer = n => WriteImageCombinerProperties((ImageCombiner)n) } },
+				{ typeof(ParticleEmitter), new NodeWriter { ActorClass = "Hot::ParticleEmitter2", Writer = n => WriteParticleEmitterProperties((ParticleEmitter)n) } },
+				{ typeof(ParticleModifier), new NodeWriter { ActorClass = "Hot::ParticleTemplate", Writer = n => WriteParticleModifierProperties((ParticleModifier)n) } },
+				{ typeof(ParticlesMagnet), new NodeWriter { ActorClass = "Hot::ParticlesMagnet", Writer = n => WriteParticlesMagnetProperties((ParticlesMagnet)n) } },
+				{ typeof(SplineGear), new NodeWriter { ActorClass = "Hot::Gear", Writer = n => WriteSplineGearProperties((SplineGear)n) } },
+				{ typeof(Spline), new NodeWriter { ActorClass = "Hot::Spline", Writer = n => WriteWidgetProperties((Spline)n) } },
+				{ typeof(SplinePoint), new NodeWriter { ActorClass = "Hot::SplinePoint", Writer = n => WriteSplinePointProperties((SplinePoint)n) } },
+				{ typeof(DistortionMesh), new NodeWriter { ActorClass = "Hot::DistortionMesh", Writer = n => WriteDistortionMeshProperties((DistortionMesh)n) } },
+				{ typeof(DistortionMeshPoint), new NodeWriter { ActorClass = "Hot::MeshPoint", Writer = n => WriteDistortionMeshPointProperties((DistortionMeshPoint)n) } },
+				{ typeof(PointObject), new NodeWriter { ActorClass = "Hot::PointObject", Writer = null } },
+				{ typeof(SimpleText), new NodeWriter { ActorClass = "Hot::Text", Writer = n => WriteSimpleTextProperties((SimpleText)n) } },
+				{ typeof(RichText), new NodeWriter { ActorClass = "Hot::RichText", Writer = n => WriteRichTextProperties((RichText)n) } },
+				{ typeof(TextStyle), new NodeWriter { ActorClass = "Hot::TextStyle", Writer = n => WriteTextStyleProperties((TextStyle)n) } },
 			};
 		}
 
-		public void Dispose()
+		public void Export(Stream stream, Node node)
 		{
-			writer.Dispose();
+			using (var tw = new StreamWriter(stream)) {
+				writer = new Writer(tw);
+				Write(node);
+				var thumbnail = node.EditorState().ThumbnailData;
+				if (thumbnail != null) {
+					tw.NewLine = "\r\n";
+					tw.WriteLine(HotSceneImporter.ThumbnailMarker);
+					tw.Write(thumbnail);
+				}
+			}
 		}
 
-		public void Write(Node node)
+		void Write(Node node)
 		{
 			NodeWriter w;
 			if (!nodeWriters.TryGetValue(node.GetType(), out w)) {
 				throw new InvalidOperationException($"Unknown node type: {node.GetType()}");
 			}
-			writer.WriteLine($"\"{w.ActorClass}\" {{");
-			writer.Indent++;
+			writer.BeginStruct(w.ActorClass);
 			w.Writer(node);
+			if (node.Animators.Count > 0) {
+				writer.BeginCollection("Animators");
+				foreach (var a in node.Animators) {
+					WriteAnimator(a);
+				}
+				writer.EndCollection();
+			}
 			if (node.Nodes.Count > 0) {
-				writer.WriteLine("Actors [");
-				writer.Indent++;
+				writer.BeginCollection("Actors");
 				foreach (var child in node.Nodes) {
 					Write(child);
 				}
-				writer.Indent--;
-				writer.WriteLine("]");
+				writer.EndCollection();
 			}
-			writer.Indent--;
-			writer.WriteLine("}");
+			if (node.Markers.Count > 0) {
+				writer.BeginCollection("Markers");
+				foreach (var m in node.Markers) {
+					WriteMarker(m);
+				}
+				writer.EndCollection();
+			}
+			writer.EndStruct();
 		}
 
-		void WriteActorProperties(Node node)
+		void WriteMarker(Marker marker)
 		{
-			writer.WriteProperty("Name", node.Id);
-			writer.WriteProperty("Source", node.ContentsPath);
-			writer.WriteProperty("Attributes", (int)node.TangerineFlags);
+			writer.BeginStruct("Hot::Marker");
+			WriteProperty("Name", marker.Id, null);
+			WriteProperty("Frame", marker.Frame, 0);
+			WriteProperty("Command", (int)marker.Action, 0);
+			WriteProperty("OtherMarkerName", marker.JumpTo, null);
+			writer.EndStruct();
 		}
 
-		void WriteGraphicProperties(Widget widget)
+		void WriteAnimator(IAnimator animator)
 		{
-			WriteActorProperties(widget);
-			writer.WriteProperty("Visible", widget.Visible, true);
-			writer.WriteProperty("Rotation", widget.Rotation);
-			writer.WriteProperty("Position", widget.Position);
-			writer.WriteProperty("Scale", widget.Scale, Vector2.One);
-			writer.WriteProperty("Pivot", widget.Pivot);
-			writer.WriteProperty("Size", widget.Size);
-			writer.WriteProperty("Anchors", (int)widget.Anchors);
-			writer.WriteProperty("Color", widget.Color);
-			writer.WriteProperty("BlendMode", GetHotStudioBlending(widget.Blending, widget.Shader));
-			writer.WriteProperty("HitTestMethod", (int)widget.HitTestMethod, ((widget is Image) || (widget is NineGrid)) ? 1 : 0);
-			writer.WriteProperty("SkinningWeights", widget.SkinningWeights);
+			if (animator is Animator<ShaderId>) {
+				return;
+			}
+			var type = GetHotStudioValueType(animator.GetValueType());
+			writer.BeginStruct($"Hot::TypedAnimator<{type}>");
+			WriteProperty("Property", GetAnimatorPropertyReference(animator), null);
+			if (animator.ReadonlyKeys.Count == 0) {
+				writer.WriteLine("Frames [ ]");
+				writer.WriteLine("Attributes [ ]");
+				writer.WriteLine("Keys [ ]");
+			} else {
+				writer.WriteLine("Frames [ " + string.Join(" ", animator.ReadonlyKeys.Select(i => i.Frame)) + " ]");
+				writer.WriteLine("Attributes [ " + string.Join(" ", animator.ReadonlyKeys.Select(i => (int)i.Function)) + " ]");
+				if (animator is Animator<Blending>) {
+					var shaderAnimator = animator.Owner.Animators.OfType<Animator<ShaderId>>().First();
+					writer.WriteLine("Keys [ " + string.Join(" ",
+						animator.ReadonlyKeys.Select((b, i) =>
+							GetHotStudioBlending((Blending)b.Value, shaderAnimator.ReadonlyKeys[i].Value).ToString())) + " ]");
+				} else {
+					writer.WriteLine("Keys [ " + string.Join(" ", animator.ReadonlyKeys.Select(i => ObjectToString(i.Value))) + " ]");
+				}
+			}
+			writer.EndStruct();
+		}
+
+		string GetAnimatorPropertyReference(IAnimator animator)
+		{
+			var p = GetHotStudioPropertyName(animator.Owner.GetType(), animator.TargetProperty) + '@' + GetHotStudioActorName(animator);
+			if (p == "Position@Hot::PointObject") {
+				return "Anchor@Hot::PointObject";
+			}
+			return p;
+		}
+
+		string GetHotStudioActorName(IAnimator animator)
+		{
+			var t = animator.Owner.GetType();
+			var nodeType = t.GetProperty(animator.TargetProperty).DeclaringType;
+			var a = nodeWriters.First(i => i.Key == nodeType).Value.ActorClass;
+			if (a == "Hot::ParticleEmitter2") {
+				return "Hot::ParticleEmitter";
+			}
+			return a;
+		}
+
+		void WriteProperty(string name, object value, object def)
+		{
+			writer.WriteProperty(name, value, def);
+		}
+
+		string GetHotStudioPropertyName(Type type, string name)
+		{
+			switch (name) {
+				case "AlongPathOrientation": return "AlongTrackOrientation";
+				case "File": return "Sample";
+				case "UV0": return "TexCoordForMins";
+				case "UV1": return "TexCoordForMaxs";
+				case "WidgetId": return "WidgetName";
+				case "Texture": return "TexturePath";
+				case "Blending": return "BlendMode";
+				case "AnimationFps": return "AnimationFPS";
+				case "Lifetime": return "Life";
+				case "FontHeight": return "FontSize";
+				case "HAlignment": return "HAlign";
+				case "VAlignment": return "VAlign";
+				case "SplineId": return "SplineName";
+				case "RandomMotionRadius": return "RandMotionRadius";
+				case "RandomMotionRotation": return "RandMotionRotation";
+				case "RandomMotionSpeed": return "RandMotionSpeed";
+				case "RandomMotionAspectRatio": return "RandMotionAspectRatio";
+				default: return name;
+			}
+		}
+
+		string GetHotStudioValueType(Type type)
+		{
+			if (type == typeof(ITexture) || type == typeof(string) || type == typeof(SerializableSample))
+				return "std::basic_string<char,std::char_traits<char>,std::allocator<char>>";
+			if (type == typeof(Vector2)) return "Hot::Vector2";
+			if (type == typeof(Color4)) return "Hot::Color";
+			if (type == typeof(float)) return "float";
+			if (type == typeof(int)) return "int";
+			if (type == typeof(bool)) return "bool";
+			if (type == typeof(Blending)) return "Hot::BlendMode";
+			if (type == typeof(HAlignment)) return "Hot::HorizontalAlignment";
+			if (type == typeof(VAlignment)) return "Hot::VerticalAlignment";
+			if (type == typeof(NumericRange)) return "Hot::RandomPair";
+			if (type == typeof(AudioAction)) return "Hot::Audio::Action";
+			if (type == typeof(MovieAction)) return "Hot::Movie::Action";
+			if (type == typeof(EmissionType)) return "Hot::EmissionType";
+			if (type == typeof(EmitterShape)) return "Hot::EmitterShape";
+			throw new ArgumentException($"Unknown type {type}");
+		}
+
+		static string RestorePath(string path, string extension)
+		{
+			if (!string.IsNullOrEmpty(path)) {
+				return path.Replace("/", "\\\\") + extension;
+			}
+			return path;
 		}
 
 		int GetHotStudioBlending(Blending blending, ShaderId shader)
@@ -197,32 +356,198 @@ namespace Orange
 			return 1;
 		}
 
-		void WriteSceneProperties(Frame frame)
+		void WriteNodeProperties(Node node)
 		{
-			WriteGraphicProperties(frame);
-			writer.WriteProperty("RenderTarget", (int)frame.RenderTarget);
+			WriteProperty("Name", node.Id, null);
+			WriteProperty("Source", RestorePath(node.ContentsPath, ".scene"), null);
+			WriteProperty("Attributes", (int)node.TangerineFlags, 0);
+			WriteProperty("Trigger", node.Trigger, string.Empty);
 		}
 
-		void WriteImageProperties(Image image)
+		void WriteWidgetProperties(Widget node)
 		{
-			WriteGraphicProperties(image);
-			writer.WriteProperty("TexturePath", TransformPath(image.Texture.SerializationPath + ".png"));
+			WriteNodeProperties(node);
+			WriteProperty("Visible", node.Visible, true);
+			WriteProperty("Rotation", node.Rotation, 0f);
+			WriteProperty("Position", node.Position, Vector2.Zero);
+			WriteProperty("Scale", node.Scale, Vector2.One);
+			WriteProperty("Pivot", node.Pivot, Vector2.Zero);
+			WriteProperty("Size", node.Size, new Vector2(100, 100));
+			WriteProperty("Color", node.Color, Color4.White);
+			WriteProperty("BlendMode", GetHotStudioBlending(node.Blending, node.Shader), 0);
+			WriteProperty("Anchors", (int)node.Anchors, 0);
+			WriteProperty("HitTestMethod", (int)node.HitTestMethod, ((node is Image) || (node is NineGrid)) ? 1 : 0);
+			WriteProperty("SkinningWeights", node.SkinningWeights, new SkinningWeights());
 		}
 
-		void WriteAudioProperties(Audio audio)
+		void WriteFrameProperties(Frame node)
 		{
-			WriteActorProperties(audio);
+			WriteWidgetProperties(node);
+			WriteProperty("RenderTarget", (int)node.RenderTarget, 0);
 		}
 
-		void WriteButtonProperties(Button button)
+		void WriteImageProperties(Image node)
 		{
-			WriteGraphicProperties(button);
+			WriteWidgetProperties(node);
+			WriteProperty("TexturePath", node.Texture, null);
+			WriteProperty("TexCoordForMins", node.UV0, Vector2.Zero);
+			WriteProperty("TexCoordForMaxs", node.UV1, Vector2.One);
 		}
 
-		static string TransformPath(string path)
+		void WriteAudioProperties(Audio node)
 		{
-			path = path.Replace("/", "\\\\");
-			return path;
+			WriteNodeProperties(node);
+			WriteProperty("Action", (int)node.Action, (int)AudioAction.Play);
+			WriteProperty("File", node.Sample, null);
+			WriteProperty("Flags", (node.Looping ? 4 : 0) | (node.Bumpable ? 0 : 1), 0);
+			WriteProperty("Group", node.Group == AudioChannelGroup.Music ? 1 : 0, 0);
+			WriteProperty("Priority", node.Priority, 0.5f);
+			WriteProperty("FadeTime", node.FadeTime, 0f);
+			WriteProperty("Volume", node.Volume, 0.5f);
+			WriteProperty("Pan", node.Pan, 0f);
+		}
+
+		void WriteButtonProperties(Button node)
+		{
+			WriteWidgetProperties(node);
+			WriteProperty("Text", node.Text, null);
+		}
+
+		void WriteImageCombinerProperties(ImageCombiner node)
+		{
+			WriteNodeProperties(node);
+			WriteProperty("Enabled", node.Enabled, true);
+			WriteProperty("BlendMode", GetHotStudioBlending(node.Blending, node.Shader), 0);
+		}
+
+		void WriteParticleEmitterProperties(ParticleEmitter node)
+		{
+			WriteWidgetProperties(node);
+			WriteProperty("Shape", (int)node.Shape, (int)EmitterShape.Point);
+			WriteProperty("EmissionType", (int)node.EmissionType, (int)EmissionType.Outer);
+			WriteProperty("ParticlesLinkage", (int)node.ParticlesLinkage, (int)ParticlesLinkage.Parent);
+			WriteProperty("LinkageActorName", node.LinkageWidgetName, null);
+			WriteProperty("Number", node.Number, 100f);
+			WriteProperty("TimeShift", node.TimeShift, 0f);
+			WriteProperty("ImmortalParticles", node.ImmortalParticles, false);
+			WriteProperty("Speed", node.Speed, 1f);
+			WriteProperty("Life", node.Lifetime, new NumericRange(1, 0));
+			WriteProperty("Velocity", node.Velocity, new NumericRange(100, 0));
+			WriteProperty("Zoom", node.Zoom, new NumericRange(1, 0));
+			WriteProperty("AspectRatio", node.AspectRatio, new NumericRange(1, 0));
+			WriteProperty("Spin", node.Spin, new NumericRange(0, 0));
+			WriteProperty("AngularVelocity", node.AngularVelocity, new NumericRange(0, 0));
+			WriteProperty("Orientation", node.Orientation, new NumericRange(0, 360));
+			WriteProperty("AlongTrackOrientation", node.AlongPathOrientation, false);
+			WriteProperty("Direction", node.Direction, new NumericRange(0, 360));
+			WriteProperty("WindDirection", node.WindDirection, new NumericRange(0, 0));
+			WriteProperty("WindAmount", node.WindAmount, new NumericRange(0, 0));
+			WriteProperty("GravityDirection", node.GravityDirection, new NumericRange(90, 0));
+			WriteProperty("GravityAmount", node.GravityAmount, new NumericRange(0, 0));
+			WriteProperty("MagnetAmount", node.MagnetAmount, new NumericRange(0, 0));
+			WriteProperty("RandMotionRadius", node.RandomMotionRadius, new NumericRange(20, 0));
+			WriteProperty("RandMotionRotation", node.RandomMotionRotation, new NumericRange(0, 360));
+			WriteProperty("RandMotionSpeed", node.RandomMotionSpeed, new NumericRange(0, 0));
+			WriteProperty("RandMotionAspectRatio", node.RandomMotionAspectRatio, 1f);
+		}
+
+		void WriteParticleModifierProperties(ParticleModifier node)
+		{
+			WriteNodeProperties(node);
+			WriteProperty("TexturePath", node.Texture, null);
+			WriteProperty("FirstFrame", node.FirstFrame, 1);
+			WriteProperty("LastFrame", node.LastFrame, 1);
+			WriteProperty("LoopedAnimation", node.LoopedAnimation, true);
+			WriteProperty("AnimationFPS", node.AnimationFps, 20f);
+			WriteProperty("Scale", node.Scale, 1f);
+			WriteProperty("AspectRatio", node.AspectRatio, 1f);
+			WriteProperty("Velocity", node.Velocity, 1f);
+			WriteProperty("WindAmount", node.WindAmount, 1f);
+			WriteProperty("GravityAmount", node.GravityAmount, 1f);
+			WriteProperty("MagnetAmount", node.MagnetAmount, 1f);
+			WriteProperty("Spin", node.Spin, 1f);
+			WriteProperty("AngularVelocity", node.AngularVelocity, 1f);
+			WriteProperty("Color", node.Color, Color4.White);
+		}
+
+		void WriteParticlesMagnetProperties(ParticlesMagnet node)
+		{
+			WriteWidgetProperties(node);
+			WriteProperty("Shape", (int)node.Shape, (int)EmitterShape.Area);
+			WriteProperty("Strength", node.Strength, 1000f);
+			WriteProperty("Attenuation", node.Attenuation, 0f);
+		}
+
+		void WriteSplineGearProperties(SplineGear node)
+		{
+			WriteNodeProperties(node);
+			WriteProperty("WidgetName", node.WidgetId, null);
+			WriteProperty("SplineName", node.SplineId, null);
+			WriteProperty("SplineOffset", node.SplineOffset, 0f);
+		}
+
+		void WriteSplinePointProperties(SplinePoint node)
+		{
+			WriteNodeProperties(node);
+			WriteProperty("Anchor", node.Position, Vector2.Zero);
+			WriteProperty("SkinningWeights", node.SkinningWeights, new SkinningWeights());
+			WriteProperty("TangentAngle", node.TangentAngle, 0f);
+			WriteProperty("TangentWeight", node.TangentWeight, 0f);
+			WriteProperty("Straight", node.Straight, false);
+		}
+
+		void WriteDistortionMeshProperties(DistortionMesh node)
+		{
+			WriteWidgetProperties(node);
+			WriteProperty("TexturePath", node.Texture, null);
+			WriteProperty("NumRows", node.NumRows, 2);
+			WriteProperty("NumCols", node.NumCols, 2);
+		}
+
+		void WriteDistortionMeshPointProperties(DistortionMeshPoint node)
+		{
+			WriteNodeProperties(node);
+			WriteProperty("Position", node.Offset, Vector2.Zero);
+			WriteProperty("Anchor", node.Position, Vector2.Zero);
+			WriteProperty("SkinningWeights", node.SkinningWeights, new SkinningWeights());
+			WriteProperty("Color", node.Color, Color4.White);
+			WriteProperty("UV", node.UV, Vector2.Zero);
+		}
+
+		void WriteSimpleTextProperties(SimpleText node)
+		{
+			WriteWidgetProperties(node);
+			WriteProperty("FontName", node.Font, null);
+			WriteProperty("FontSize", node.FontHeight, 0f);
+			WriteProperty("Text", node.Text, null);
+			WriteProperty("TextColor", node.TextColor, new Color4(0));
+			WriteProperty("HAlign", (int)node.HAlignment, (int)HAlignment.Left);
+			WriteProperty("VAlign", (int)node.VAlignment, (int)VAlignment.Top);
+			WriteProperty("LineIndent", node.Spacing, 0f);
+		}
+
+		void WriteRichTextProperties(RichText node)
+		{
+			WriteWidgetProperties(node);
+			WriteProperty("Text", node.Text, null);
+			WriteProperty("HAlign", (int)node.HAlignment, (int)HAlignment.Left);
+			WriteProperty("VAlign", (int)node.VAlignment, (int)VAlignment.Top);
+		}
+
+		void WriteTextStyleProperties(TextStyle node)
+		{
+			WriteNodeProperties(node);
+			WriteProperty("ImagePath", node.ImageTexture, null);
+			WriteProperty("ImageSize", node.ImageSize, Vector2.Zero);
+			WriteProperty("ImageUsage", (int)node.ImageUsage, (int)TextStyle.ImageUsageEnum.Bullet);
+			WriteProperty("Font", node.Font, null);
+			WriteProperty("Size", node.Size, 15f);
+			WriteProperty("SpaceAfter", node.SpaceAfter, 0f);
+			WriteProperty("Bold", node.Bold, false);
+			WriteProperty("DropShadow", node.CastShadow, false);
+			WriteProperty("TextColor", node.TextColor, Color4.White);
+			WriteProperty("ShadowColor", node.ShadowColor, Color4.Black);
+			WriteProperty("ShadowOffset", node.ShadowOffset, Vector2.One);
 		}
 	}
 }

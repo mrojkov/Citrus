@@ -18,6 +18,7 @@ namespace Tangerine
 	{
 		readonly Node node;
 		public Uid Uid { get; private set; } = Uid.Generate();
+		public string ThumbnailData { get; set; }
 		public NodeVisibility Visibility
 		{
 			get

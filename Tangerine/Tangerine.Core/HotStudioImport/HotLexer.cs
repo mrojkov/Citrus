@@ -38,7 +38,7 @@ namespace Orange
 				ReadByte();
 			}
 			string number = GetSubstring(p, position - p);
-			return Single.Parse(number, numberFormat);
+			return float.Parse(number, numberFormat);
 		}
 
 		public int ParseInt()
@@ -101,41 +101,25 @@ namespace Orange
 			return sb.ToString();
 		}
 
-		public Tuple<Blending, ShaderId> ParseBlendMode()
+		public string ReadLine()
 		{
-			Blending blending = Blending.Inherited;
-			ShaderId shader = ShaderId.Inherited;
-			switch(ParseInt()) {
-			case 0:
-				break;
-			case 2:
-				blending = Blending.Add;
-				shader = ShaderId.Diffuse;
-				break;
-			case 3:
-				blending = Blending.Burn;
-				shader = ShaderId.Diffuse;
-				break;
-			case 5:
-				blending = Blending.Modulate;
-				shader = ShaderId.Diffuse;
-				break;
-			case 7:
-				blending = Blending.Alpha;
-				shader = ShaderId.Silhuette;
-				break;
-			case 8:
-				blending = Blending.Opaque;
-				shader = ShaderId.Diffuse;
-				break;
-			default:
-				blending = Blending.Alpha;
-				shader = ShaderId.Diffuse;
-				break;
+			var sb = new StringBuilder();
+			while (!EndOfStream()) {
+				if (PeekByte() == '\r') {
+					ReadByte();
+					if (PeekByte() == '\n') {
+						ReadByte();
+					}
+					break;
+				}
+				if (PeekByte() == '\n') {
+					ReadByte();
+					break;
+				}
+				sb.Append((char)ReadByte());
 			}
-			return new Tuple<Blending, ShaderId>(blending, shader);
+			return sb.Length > 0 ? sb.ToString() : null;
 		}
-
 		public uint ParseHex()
 		{
 			SkipWhitespace();

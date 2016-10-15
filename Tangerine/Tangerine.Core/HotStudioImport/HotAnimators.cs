@@ -23,7 +23,7 @@ namespace Orange
 			case "Hot::TypedAnimator<Hot::EmitterShape>":
 				return () => (EmitterShape)lexer.ParseInt();
 			case "Hot::TypedAnimator<Hot::BlendMode>":
-				return () => lexer.ParseBlendMode();
+				return () => ParseBlendMode();
 			case "Hot::TypedAnimator<Hot::Color>":
 				return () => lexer.ParseColor4();
 			case "Hot::TypedAnimator<Hot::Vector2>":
@@ -56,6 +56,41 @@ namespace Orange
 			default:
 				throw new Lime.Exception("Unknown type of animator '{0}'", animatorType);
 			}
+		}
+
+		Tuple<Blending, ShaderId> ParseBlendMode()
+		{
+			Blending blending = Blending.Inherited;
+			ShaderId shader = ShaderId.Inherited;
+			switch(lexer.ParseInt()) {
+				case 0:
+				break;
+				case 2:
+					blending = Blending.Add;
+					shader = ShaderId.Diffuse;
+				break;
+				case 3:
+					blending = Blending.Burn;
+					shader = ShaderId.Diffuse;
+				break;
+				case 5:
+					blending = Blending.Modulate;
+					shader = ShaderId.Diffuse;
+				break;
+				case 7:
+					blending = Blending.Alpha;
+					shader = ShaderId.Silhuette;
+				break;
+				case 8:
+					blending = Blending.Opaque;
+					shader = ShaderId.Diffuse;
+				break;
+				default:
+					blending = Blending.Alpha;
+					shader = ShaderId.Diffuse;
+				break;
+			}
+			return new Tuple<Blending, ShaderId>(blending, shader);
 		}
 
 		void ParseAnimator(Node node)

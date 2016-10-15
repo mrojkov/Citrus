@@ -138,7 +138,15 @@ namespace Tangerine.Core
 			var absPath = System.IO.Path.ChangeExtension(System.IO.Path.Combine(bd, Path), ".scene1");
 			using (var stream = new FileStream(absPath, FileMode.Create)) {
 				var serializer = new Orange.HotSceneExporter.Serializer();
-				Serialization.WriteObject(Path, stream, RootNode, serializer);
+				var node = RootNode.Clone();
+				foreach (var n in node.Descendants) {
+					n.AnimationFrame = 0;
+				}
+				foreach (var n in node.Descendants.Where(i => i.ContentsPath != null)) {
+					n.Nodes.Clear();
+					n.Markers.Clear();
+				}
+				Serialization.WriteObject(Path, stream, node, serializer);
 			}
 		}
 

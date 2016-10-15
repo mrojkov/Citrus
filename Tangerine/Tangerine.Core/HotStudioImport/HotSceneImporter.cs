@@ -2,6 +2,7 @@ using System.IO;
 using System;
 using Lime;
 using System.Collections.Generic;
+using Tangerine;
 using Exception = Lime.Exception;
 
 namespace Orange
@@ -28,35 +29,63 @@ namespace Orange
 
 		public override object FromReaderInt()
 		{
-			throw new System.NotImplementedException();
+			throw new NotImplementedException();
 		}
 
 		public override object FromReaderInt(object obj)
 		{
-			return new Orange.HotSceneImporter(stream).ParseNode(obj as Node);
+			return new HotSceneImporter().Import(stream, obj as Node);
 		}
 
 		public override T FromReaderInt<T>()
 		{
-			return (T)(object)new Orange.HotSceneImporter(stream).ParseNode(null);
+			return (T)(object)new HotSceneImporter().Import(stream, null);
 		}
 	}
 
 	public partial class HotSceneImporter
 	{
-		protected HotLexer lexer;
-		protected List<KnownActorType> knownActorTypes;
+		HotLexer lexer;
+		List<KnownActorType> knownActorTypes;
+		public const string ThumbnailMarker = "{8069CDD4-F02F-4981-A3CB-A0BAD4018D00}";
 
-		public HotSceneImporter(Stream stream)
+		public Node Import(Stream stream, Node node)
 		{
 			RegisterKnownActorTypes();
 			using (TextReader reader = new StreamReader(stream)) {
 				string text = reader.ReadToEnd();
 				lexer = new HotLexer(text);
+				var savedDefaultWidgetSize = Widget.DefaultWidgetSize;
+				try {
+					Widget.DefaultWidgetSize = new Vector2(100, 100);
+					node = ParseNode(node);
+				} finally {
+					Widget.DefaultWidgetSize = savedDefaultWidgetSize;
+				}
+				lexer.ReadLine();
+				node.EditorState().ThumbnailData = ReadThumbnail(lexer);
+				return node;
 			}
 		}
 
-		#region LimeParse
+		string ReadThumbnail(HotLexer lexer)
+		{
+			var l = lexer.ReadLine();
+			if (l != ThumbnailMarker) {
+				return null;
+			}
+			var sb = new System.Text.StringBuilder();
+			var firstLine = true;
+			while ((l = lexer.ReadLine()) != null) {
+				if (!firstLine) {
+					sb.Append('\r');
+					sb.Append('\n');
+				}
+				firstLine = false;
+				sb.Append(l);
+			}
+			return sb.ToString();
+		}
 
 		protected void ParseActorProperty(Node node, string name)
 		{
@@ -78,7 +107,7 @@ namespace Orange
 				node.TangerineFlags = (TangerineFlags)(lexer.ParseInt() & 7);
 				break;
 			case "Trigger":
-				lexer.ParseQuotedString();
+				node.Trigger = lexer.ParseQuotedString();
 				break;
 			case "Tag":
 				node.Tag = lexer.ParseQuotedString();
@@ -208,7 +237,7 @@ namespace Orange
 				widget.Rotation = lexer.ParseFloat();
 				break;
 			case "BlendMode":
-				var t = lexer.ParseBlendMode();
+				var t = ParseBlendMode();
 				widget.Blending = t.Item1;
 				widget.Shader = t.Item2;
 				break;
@@ -474,7 +503,7 @@ namespace Orange
 				combiner.Enabled = lexer.ParseBool();
 				break;
 			case "BlendMode":
-				var t = lexer.ParseBlendMode();
+				var t = ParseBlendMode();
 				combiner.Blending = t.Item1;
 				combiner.Shader = t.Item2;
 				break;
@@ -579,7 +608,9 @@ namespace Orange
 				audio.Sample = new SerializableSample(lexer.ParsePath());
 				break;
 			case "Flags":
-				audio.Looping = (lexer.ParseInt() & 4) != 0;
+				var flags = lexer.ParseInt();
+				audio.Looping = (flags & 4) != 0;
+				audio.Bumpable = (flags & 1) == 0;
 				break;
 			case "Action":
 				lexer.ParseInt();
@@ -901,7 +932,7 @@ namespace Orange
 			return obj;
 		}
 
-		public Node ParseNode(Node node)
+		private Node ParseNode(Node node)
 		{
 			string actorClass = lexer.ParseQuotedString();
 			foreach (KnownActorType t in knownActorTypes) {
@@ -921,7 +952,7 @@ namespace Orange
 			throw new Exception("Unknown type of actor '{0}'", actorClass);
 		}
 
-		protected void ParseLinearLayoutProperty(Node node, string name)
+		private void ParseLinearLayoutProperty(Node node, string name)
 		{
 			var layout = (LinearLayout)node;
 			switch (name) {
@@ -974,9 +1005,7 @@ namespace Orange
 			}
 		}
 
-		#endregion
-
-		protected virtual void RegisterKnownActorTypes()
+		private void RegisterKnownActorTypes()
 		{
 			knownActorTypes = new List<KnownActorType> {
 				new KnownActorType {ActorClass = "Hot::Scene", NodeClass = "Lime.Frame, Lime", PropReader = ParseSceneProperty},
