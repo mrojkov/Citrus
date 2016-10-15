@@ -28,6 +28,8 @@ namespace Lime
 		IKeyframeCollection Keys { get; }
 
 		object UserData { get; set; }
+
+		Type GetValueType();
 	}
 
 	/// <summary>
@@ -47,6 +49,8 @@ namespace Lime
 		/// </summary>
 		[YuzuMember]
 		public string TargetProperty { get; set; }
+
+		public Type GetValueType() { return typeof(T); }
 
 		/// <summary>
 		/// Коллекция ключей анимации
