@@ -1033,7 +1033,7 @@ namespace YuzuTest.Json
 			var s = "\"/{\u0001}\n\t\"\"";
 			var v = new Sample1 { Y = s };
 			var result = js.ToString(v);
-			Assert.AreEqual("{\"X\":0,\"Y\":\"\\\"\\/{\\u0001}\\n\\t\\\"\\\"\"}", result);
+			Assert.AreEqual("{\"X\":0,\"Y\":\"\\\"/{\\u0001}\\n\\t\\\"\\\"\"}", result);
 
 			var w = new Sample1();
 			var jd = new JsonDeserializer();
