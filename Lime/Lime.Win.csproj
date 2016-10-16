@@ -170,6 +170,7 @@
     <Compile Include="Source\Localization\LocalizationDictionaryTextSerializer.cs" />
     <Compile Include="Source\Version.cs" />
     <Compile Include="Source\Widgets\FileChooserButton.cs" />
+    <Compile Include="Source\Widgets\Folder.cs" />
     <Compile Include="Source\Widgets\HSplitter.cs" />
     <Compile Include="Source\Widgets\KeyboardFocus.cs" />
     <Compile Include="Source\Widgets\Layout\HBoxLayout.cs" />
