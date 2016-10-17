@@ -286,7 +286,6 @@ namespace Lime
 
 		private Rectangle RenderHelper(SpriteList spriteList, CaretPosition caret)
 		{
-			Rectangle rect = Rectangle.Empty;
 			var lines = SplitText(DisplayText);
 			if (TrimWhitespaces) {
 				TrimLinesWhitespaces(lines);
@@ -296,10 +295,10 @@ namespace Lime
 			if (String.IsNullOrEmpty(DisplayText)) {
 				pos.X = CalcXByAlignment(lineWidth: 0);
 				caret.EmptyText(pos);
-				return rect;
+				return Rectangle.Empty;
 			}
-			bool firstLine = true;
 			caret.Clamp(Text.Length, lines.Count);
+			Rectangle rect = new Rectangle(Vector2.PositiveInfinity, Vector2.NegativeInfinity);
 			int i = 0;
 			foreach (var line in lines) {
 				bool lastLine = ++i == lines.Count;
@@ -319,12 +318,7 @@ namespace Lime
 				}
 				pos.Y += Spacing + FontHeight;
 				++caret.RenderingLineNumber;
-				if (firstLine) {
-					rect = lineRect;
-					firstLine = false;
-				} else {
-					rect = Rectangle.Bounds(rect, lineRect);
-				}
+				rect = Rectangle.Bounds(rect, lineRect);
 			}
 			caret.FinishSync();
 			return rect;
