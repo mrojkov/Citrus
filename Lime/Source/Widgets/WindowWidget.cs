@@ -8,7 +8,7 @@ namespace Lime
 	/// </summary>
 	public class WindowWidget : Widget
 	{
-		private bool windowWasActive;
+		private bool windowActivated;
 		private Widget lastFocused;
 		private readonly RenderChain renderChain;
 
@@ -20,6 +20,7 @@ namespace Lime
 			Window.Context = new CombinedContext(Window.Context, new WidgetContext(this));
 			renderChain = new RenderChain();
 			Theme.Current.Apply(this);
+			window.Activated += () => windowActivated = true;
 		}
 
 		protected virtual bool ContinuousRendering() { return true; }
@@ -50,15 +51,15 @@ namespace Lime
 				if (Widget.Focused != null && Widget.Focused.DescendantOrThis(this)) {
 					lastFocused = Widget.Focused;
 				}
-				if (!windowWasActive) {
-					if (lastFocused == null || !lastFocused.GloballyVisible || !lastFocused.DescendantOrThis(this)) {
-						// Looking the first focus scope widget on the window and make it focused.
-						lastFocused = Descendants.OfType<Widget>().FirstOrDefault(i => i.FocusScope != null && i.GloballyVisible);
-					}
-					Widget.SetFocus(lastFocused);
-				}
 			}
-			windowWasActive = Window.Active;
+			if (windowActivated) {
+				windowActivated = false;
+				if (lastFocused == null || !lastFocused.GloballyVisible || !lastFocused.DescendantOrThis(this)) {
+					// Looking the first focus scope widget on the window and make it focused.
+					lastFocused = Descendants.OfType<Widget>().FirstOrDefault(i => i.FocusScope != null && i.GloballyVisible);
+				}
+				Widget.SetFocus(lastFocused);
+			}
 		}
 
 		public virtual void RenderAll()
