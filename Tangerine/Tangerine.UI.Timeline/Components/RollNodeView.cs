@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using Lime;
 using Tangerine.Core;
@@ -136,11 +137,16 @@ namespace Tangerine.UI.Timeline.Components
 			}
 		}
 
+		static List<Key> keysToConsume = new List<Key> {
+			Key.Enter, Key.Down, Key.Up
+		}.Select(i => Key.MapShortcut(i)).ToList();
+
 		IEnumerator<object> EditNodeIdTask()
 		{
 			editBox.Input.CaptureMouse();
 			var initialText = editBox.Text;
 			while (editBox.IsFocused()) {
+				editBox.Input.ConsumeKeys(keysToConsume);
 				yield return null;
 			}
 			editBox.Input.ReleaseMouse();
