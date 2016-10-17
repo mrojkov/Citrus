@@ -163,16 +163,16 @@ namespace Lime
 	public class Editor
 	{
 		public readonly Widget Container;
-		public readonly Widget focus;
+		public readonly Widget InputWidget;
 		public readonly IText Text;
 		public readonly IEditorParams EditorParams;
 
 		private ICaretPosition caretPos;
 
-		public Editor(Widget container, ICaretPosition caretPos, IEditorParams editorParams, Widget focus = null)
+		public Editor(Widget container, ICaretPosition caretPos, IEditorParams editorParams, Widget inputWidget = null)
 		{
 			Container = container;
-			this.focus = focus ?? container;
+			InputWidget = inputWidget ?? container;
 			Container.HitTestTarget = true;
 			Text = (IText)container;
 			Text.TrimWhitespaces = false;
@@ -228,7 +228,7 @@ namespace Lime
 
 		private bool WasKeyRepeated(Key key)
 		{
-			return focus.Input.WasKeyRepeated(key);
+			return InputWidget.Input.WasKeyRepeated(key);
 		}
 
 		private void InsertChar(char ch)
@@ -360,19 +360,19 @@ namespace Lime
 					if (EditorParams.IsAcceptableLines(Text.Text.Count(ch => ch == '\n') + 2)) {
 						InsertChar('\n');
 					} else {
-						focus.Input.ConsumeKey(Cmds.Submit);
-						focus.RevokeFocus();
+						InputWidget.Input.ConsumeKey(Cmds.Submit);
+						InputWidget.RevokeFocus();
 					}
 				}
 				if (WasKeyRepeated(Cmds.Cancel)) {
 					Text.Text = originalText;
-					focus.Input.ConsumeKey(Cmds.Cancel);
-					focus.RevokeFocus();
+					InputWidget.Input.ConsumeKey(Cmds.Cancel);
+					InputWidget.RevokeFocus();
 				}
-				if (focus.Input.WasKeyPressed(Key.Commands.Copy)) {
+				if (InputWidget.Input.WasKeyPressed(Key.Commands.Copy)) {
 					Clipboard.Text = Text.Text;
 				}
-				if (focus.Input.WasKeyPressed(Key.Commands.Cut)) {
+				if (InputWidget.Input.WasKeyPressed(Key.Commands.Cut)) {
 					Clipboard.Text = Text.Text;
 					Text.Text = "";
 					caretPos.TextPos = 0;
@@ -382,7 +382,7 @@ namespace Lime
 						InsertChar(ch);
 				}
 			} finally {
-				var input = focus.Input;
+				var input = InputWidget.Input;
 				input.SetKeyEnabled(Key.Commands.Cut, !string.IsNullOrEmpty(Text.Text));
 				input.SetKeyEnabled(Key.Commands.Copy, !string.IsNullOrEmpty(Text.Text));
 				input.SetKeyEnabled(Key.Commands.Paste, !string.IsNullOrEmpty(Clipboard.Text));
@@ -397,9 +397,9 @@ namespace Lime
 
 		private void HandleTextInput()
 		{
-			if (focus.Input.TextInput == null)
+			if (InputWidget.Input.TextInput == null)
 				return;
-			foreach (var ch in focus.Input.TextInput) {
+			foreach (var ch in InputWidget.Input.TextInput) {
 				// Some platforms, notably iOS, do not generate Key.BackSpace.
 				// OTOH, '\b' is emulated everywhere.
 				if (ch == '\b') {
@@ -456,18 +456,18 @@ namespace Lime
 			while (true) {
 				var wasClicked = Container.WasClicked();
 				if (wasClicked)
-					focus.SetFocus();
-				if (focus.IsFocused()) {
+					InputWidget.SetFocus();
+				if (InputWidget.IsFocused()) {
 					HandleKeys(originalText);
 					HandleTextInput();
 					if (wasClicked) {
 						var t = Container.LocalToWorldTransform.CalcInversed();
-						caretPos.WorldPos = t.TransformVector(focus.Input.MousePosition);
+						caretPos.WorldPos = t.TransformVector(InputWidget.Input.MousePosition);
 					}
 					Text.SyncCaretPosition();
 					AdjustSizeAndScrollToCaret();
 				}
-				var isFocused = focus.IsFocused();
+				var isFocused = InputWidget.IsFocused();
 				caretPos.IsVisible = isFocused;
 				if (!wasFocused && isFocused) {
 					originalText = Text.Text;
