@@ -36,7 +36,7 @@ namespace Lime
 			lastWord = null;
 			// Use Line Separator character as a soft break
 			int lastSpaceAt = Math.Max(text.LastIndexOf(' '), text.LastIndexOf((char)8232));
-			if (lastSpaceAt < 0) {
+			if (lastSpaceAt <= 0) {
 				return false;
 			}
 			if (lastSpaceAt == text.Length - 1) {
