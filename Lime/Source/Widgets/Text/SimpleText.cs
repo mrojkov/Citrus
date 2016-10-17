@@ -299,10 +299,7 @@ namespace Lime
 				return rect;
 			}
 			bool firstLine = true;
-			if (caret.Valid == CaretPosition.ValidState.TextPos)
-				caret.TextPos = caret.TextPos.Clamp(0, Text.Length);
-			if (caret.Valid == CaretPosition.ValidState.LineCol || caret.Valid == CaretPosition.ValidState.LineWorldX)
-				caret.Line = caret.Line.Clamp(0, lines.Count - 1);
+			caret.Clamp(Text.Length, lines.Count);
 			int i = 0;
 			foreach (var line in lines) {
 				bool lastLine = ++i == lines.Count;

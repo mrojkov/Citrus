@@ -23,9 +23,9 @@ namespace Lime
 				switch (Valid) {
 					case ValidState.All:
 					case ValidState.WorldPos:
-					case ValidState.LineWorldX:
 						Valid = ValidState.LineWorldX;
 						break;
+					case ValidState.LineWorldX:
 					case ValidState.LineCol:
 						break;
 					default:
@@ -147,6 +147,14 @@ namespace Lime
 		public void InvalidatePreservingTextPos()
 		{
 			Valid = ValidState.TextPos;
+		}
+
+		public void Clamp(int textLength, int lineCount)
+		{
+			if (Valid == ValidState.TextPos)
+				textPos = textPos.Clamp(0, textLength);
+			if (Valid == ValidState.LineCol || Valid == ValidState.LineWorldX)
+				line = line.Clamp(0, lineCount - 1);
 		}
 
 		public CaretPosition Clone()

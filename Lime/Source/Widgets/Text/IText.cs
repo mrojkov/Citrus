@@ -56,6 +56,7 @@ namespace Lime
 		Vector2 WorldPos { get; set; }
 		bool IsVisible { get; set; }
 		void InvalidatePreservingTextPos();
+		void Clamp(int textLength, int lineCount);
 	}
 
 	public delegate void TextProcessorDelegate(ref string text);
