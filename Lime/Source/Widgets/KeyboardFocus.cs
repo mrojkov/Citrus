@@ -77,9 +77,9 @@ namespace Lime
 				lastFocused.SetFocus();
 			} else {
 				var traversables = GetTabTraversables(Widget).ToList();
-				var i = traversables.IndexOf(lastFocused);
-				if (i >= 0) {
-					i = Mathf.Wrap(i + direction, 0, traversables.Count - 1);
+				if (traversables.Count > 0) {
+					var i = traversables.IndexOf(lastFocused);
+					i = (i < 0) ? 0 : Mathf.Wrap(i + direction, 0, traversables.Count - 1);
 					traversables[i].SetFocus();
 				}
 			}
