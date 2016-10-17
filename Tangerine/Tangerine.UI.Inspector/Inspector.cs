@@ -69,6 +69,8 @@ namespace Tangerine.UI.Inspector
 			AddEditor(typeof(Anchors), c => new EnumPropertyEditor<Anchors>(c));
 			AddEditor(typeof(RenderTarget), c => new EnumPropertyEditor<RenderTarget>(c));
 			AddEditor(typeof(ITexture), c => new TexturePropertyEditor<ITexture>(c));
+			AddEditor(typeof(HAlignment), c => new EnumPropertyEditor<HAlignment>(c));
+			AddEditor(typeof(VAlignment), c => new EnumPropertyEditor<VAlignment>(c));
 		}
 
 		private void AddEditor(Type type, PropertyEditorBuilder builder)
