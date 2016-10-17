@@ -138,7 +138,7 @@ namespace Tangerine.UI.Timeline.Components
 		}
 
 		static List<Key> keysToConsume = new List<Key> {
-			Key.Enter, Key.Down, Key.Up
+			Key.Down, Key.Up
 		}.Select(i => Key.MapShortcut(i)).ToList();
 
 		IEnumerator<object> EditNodeIdTask()
