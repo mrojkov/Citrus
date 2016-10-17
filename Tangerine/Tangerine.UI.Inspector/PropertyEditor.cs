@@ -296,7 +296,7 @@ namespace Tangerine.UI.Inspector
 		protected abstract void SetFilePath(string path);
 	}
 
-	class TexturePropertyEditor<T> : FilePropertyEditor
+	class TexturePropertyEditor : FilePropertyEditor
 	{
 		public TexturePropertyEditor(PropertyEditorContext context) : base(context, new string[] { "png" })
 		{
