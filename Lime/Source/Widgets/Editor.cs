@@ -219,8 +219,8 @@ namespace Lime
 
 		public void Unlink()
 		{
-			if (Container.IsFocused()) {
-				Container.RevokeFocus();
+			if (InputWidget.IsFocused()) {
+				InputWidget.RevokeFocus();
 				caretPos.IsVisible = false;
 			}
 			Container.Tasks.StopByTag(this);
