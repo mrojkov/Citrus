@@ -306,7 +306,13 @@ namespace Lime
 				if (caret.Valid == CaretPosition.ValidState.LineCol && caret.Line == caret.RenderingLineNumber) {
 					caret.Col = caret.Col.Clamp(0, line.Length - (lastLine ? 0 : 1));
 				}
-				Rectangle lineRect = RenderSingleTextLine(spriteList, pos, line);
+				float lineWidth = MeasureTextLine(line).X;
+				pos.X = CalcXByAlignment(lineWidth);
+				if (spriteList != null) {
+					Renderer.DrawTextLine(
+						Font, pos, line, Color4.White, FontHeight, 0, line.Length, spriteList, caret.Sync);
+				}
+				Rectangle lineRect = new Rectangle(pos.X, pos.Y, pos.X + lineWidth, pos.Y + FontHeight);
 				if (lastLine) {
 					// There is no end-of-text character, so simulate it.
 					caret.Sync(line.Length, new Vector2(lineRect.Right, lineRect.Top), Vector2.Down * fontHeight);
@@ -359,17 +365,6 @@ namespace Lime
 				default:
 					throw new InvalidOperationException();
 			}
-		}
-
-		Rectangle RenderSingleTextLine(SpriteList spriteList, Vector2 pos, string line)
-		{
-			float lineWidth = MeasureTextLine(line).X;
-			pos.X = CalcXByAlignment(lineWidth);
-			if (spriteList != null) {
-				Renderer.DrawTextLine(
-					Font, pos, line, Color4.White, FontHeight, 0, line.Length, spriteList, caret.Sync);
-			}
-			return new Rectangle(pos.X, pos.Y, pos.X + lineWidth, pos.Y + FontHeight);
 		}
 
 		private List<string> SplitText(string text)
