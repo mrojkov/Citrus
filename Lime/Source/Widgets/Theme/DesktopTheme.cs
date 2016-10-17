@@ -153,10 +153,10 @@ namespace Lime
 			tw.Padding = Metrics.ControlsPadding;
 			var editorParams = new EditorParams { MaxLength = 100, MaxLines = 1, Scroll = eb.Scroll };
 			new CaretDisplay(tw, tw.Caret, new CaretParams { CaretPresenter = new VerticalLineCaret() });
-			eb.Editor = new Editor(tw, tw.Caret, editorParams);
-			tw.TabTravesable = new TabTraversable();
+			eb.Editor = new Editor(tw, tw.Caret, editorParams, eb);
+			eb.TabTravesable = new TabTraversable();
 			eb.CompoundPresenter.Add(new BorderedFramePresenter(Colors.WhiteBackground, Colors.ControlBorder));
-			eb.CompoundPostPresenter.Add(new KeyboardFocusBorderPresenter(tw));
+			eb.CompoundPostPresenter.Add(new KeyboardFocusBorderPresenter());
 		}
 
 		private void DecorateCheckBox(Widget widget)
@@ -327,16 +327,9 @@ namespace Lime
 
 		class KeyboardFocusBorderPresenter : CustomPresenter
 		{
-			readonly Node actualFocusedWidget;
-
-			public KeyboardFocusBorderPresenter(Node actualFocusedWidget = null)
-			{
-				this.actualFocusedWidget = actualFocusedWidget;
-			}
-
 			public override void Render(Node node)
 			{
-				if (Widget.Focused == (actualFocusedWidget ?? node)) {
+				if (Widget.Focused == node) {
 					var widget = node.AsWidget;
 					widget.PrepareRendererState();
 					Renderer.DrawRectOutline(-Vector2.One, widget.Size + Vector2.One, Colors.KeyboardFocusBorder, 2);
