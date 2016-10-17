@@ -162,7 +162,7 @@ namespace Lime
 	/// </summary>
 	public class Editor
 	{
-		public readonly Widget Container;
+		public readonly Widget DisplayWidget;
 		public readonly Widget InputWidget;
 		public readonly IText Text;
 		public readonly IEditorParams EditorParams;
@@ -171,9 +171,9 @@ namespace Lime
 
 		public Editor(Widget container, ICaretPosition caretPos, IEditorParams editorParams, Widget inputWidget = null)
 		{
-			Container = container;
+			DisplayWidget = container;
 			InputWidget = inputWidget ?? container;
-			Container.HitTestTarget = true;
+			DisplayWidget.HitTestTarget = true;
 			Text = (IText)container;
 			Text.TrimWhitespaces = false;
 			EditorParams = editorParams;
@@ -223,7 +223,7 @@ namespace Lime
 				InputWidget.RevokeFocus();
 				caretPos.IsVisible = false;
 			}
-			Container.Tasks.StopByTag(this);
+			DisplayWidget.Tasks.StopByTag(this);
 		}
 
 		private bool WasKeyRepeated(Key key)
@@ -439,14 +439,14 @@ namespace Lime
 			// Container.Size must be large enough to satistfy scissor test,
 			// but not less than Frame.Size to support alignment.
 			var b = Rectangle.Bounds(
-				Text.MeasureText().ExpandedBy(Container.Padding),
+				Text.MeasureText().ExpandedBy(DisplayWidget.Padding),
 				new Rectangle(Vector2.Zero, s.Frame.Size));
-			s.Content.Size = Container.Size = b.Size;
+			s.Content.Size = DisplayWidget.Size = b.Size;
 			if (!caretPos.IsVisible) return;
 			s.MinScrollPosition = s.ProjectToScrollAxis(b.A);
 			s.ScrollTo(
 				s.PositionToView(s.ProjectToScrollAxis(caretPos.WorldPos),
-				Container.Padding.Left, Container.Padding.Right), instantly: true);
+				DisplayWidget.Padding.Left, DisplayWidget.Padding.Right), instantly: true);
 		}
 
 		private IEnumerator<object> HandleInputTask()
@@ -454,14 +454,14 @@ namespace Lime
 			bool wasFocused = false;
 			string originalText = null;
 			while (true) {
-				var wasClicked = Container.WasClicked();
+				var wasClicked = DisplayWidget.WasClicked();
 				if (wasClicked)
 					InputWidget.SetFocus();
 				if (InputWidget.IsFocused()) {
 					HandleKeys(originalText);
 					HandleTextInput();
 					if (wasClicked) {
-						var t = Container.LocalToWorldTransform.CalcInversed();
+						var t = DisplayWidget.LocalToWorldTransform.CalcInversed();
 						caretPos.WorldPos = t.TransformVector(InputWidget.Input.MousePosition);
 					}
 					Text.SyncCaretPosition();
