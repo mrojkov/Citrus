@@ -229,12 +229,12 @@ namespace Lime
 				var savedHeight = fontHeight;
 				FitTextInsideWidgetArea();
 				spriteList = new SpriteList();
-				extent = RenderHelper(spriteList);
+				extent = RenderHelper(spriteList, caret);
 				spacing = savedSpacing;
 				fontHeight = savedHeight;
 			} else {
 				spriteList = new SpriteList();
-				extent = RenderHelper(spriteList);
+				extent = RenderHelper(spriteList, caret);
 			}
 		}
 
@@ -254,6 +254,8 @@ namespace Lime
 			base.StaticScale(ratio, roundCoordinates);
 		}
 
+		private static CaretPosition dummyCaret = new CaretPosition();
+
 		/// <summary>
 		/// Changes FontHeight and Spacing to make the text inside widget's area.
 		/// </summary>
@@ -267,7 +269,7 @@ namespace Lime
 			var bestHeight = minH;
 			var spacingKoeff = Spacing / FontHeight;
 			while (maxH - minH > 1) {
-				Rectangle rect = RenderHelper(null);
+				Rectangle rect = RenderHelper(null, dummyCaret);
 				var fit = (rect.Width <= ContentWidth && rect.Height <= ContentHeight);
 				if (fit) {
 					minH = FontHeight;
@@ -282,56 +284,46 @@ namespace Lime
 			Spacing = bestHeight * spacingKoeff;
 		}
 
-		private static CaretPosition dummyCaret = new CaretPosition();
-
-		private Rectangle RenderHelper(SpriteList spriteList)
+		private Rectangle RenderHelper(SpriteList spriteList, CaretPosition caret)
 		{
 			Rectangle rect = Rectangle.Empty;
-			var savedCaret = caret;
-			if (spriteList == null) {
-				caret = dummyCaret;
+			var lines = SplitText(DisplayText);
+			if (TrimWhitespaces) {
+				TrimLinesWhitespaces(lines);
 			}
-			try {
-				var lines = SplitText(DisplayText);
-				if (TrimWhitespaces) {
-					TrimLinesWhitespaces(lines);
-				}
-				var pos = new Vector2(0, Padding.Top + CalcVerticalTextPosition(lines));
-				caret.StartSync();
-				if (String.IsNullOrEmpty(DisplayText)) {
-					pos.X = CalcXByAlignment(lineWidth: 0);
-					caret.EmptyText(pos);
-					return rect;
-				}
-				bool firstLine = true;
-				if (caret.Valid == CaretPosition.ValidState.TextPos)
-					Caret.TextPos = Caret.TextPos.Clamp(0, Text.Length);
-				if (caret.Valid == CaretPosition.ValidState.LineCol || caret.Valid == CaretPosition.ValidState.LineWorldX)
-					Caret.Line = Caret.Line.Clamp(0, lines.Count - 1);
-				int i = 0;
-				foreach (var line in lines) {
-					bool lastLine = ++i == lines.Count;
-					if (caret.Valid == CaretPosition.ValidState.LineCol && caret.Line == caret.RenderingLineNumber) {
-						Caret.Col = Caret.Col.Clamp(0, line.Length - (lastLine ? 0 : 1));
-					}
-					Rectangle lineRect = RenderSingleTextLine(spriteList, pos, line);
-					if (lastLine) {
-						// There is no end-of-text character, so simulate it.
-						caret.Sync(line.Length, new Vector2(lineRect.Right, lineRect.Top), Vector2.Down * fontHeight);
-					}
-					pos.Y += Spacing + FontHeight;
-					++caret.RenderingLineNumber;
-					if (firstLine) {
-						rect = lineRect;
-						firstLine = false;
-					} else {
-						rect = Rectangle.Bounds(rect, lineRect);
-					}
-				}
-				caret.FinishSync();
-			} finally {
-				caret = savedCaret;
+			var pos = new Vector2(0, Padding.Top + CalcVerticalTextPosition(lines));
+			caret.StartSync();
+			if (String.IsNullOrEmpty(DisplayText)) {
+				pos.X = CalcXByAlignment(lineWidth: 0);
+				caret.EmptyText(pos);
+				return rect;
 			}
+			bool firstLine = true;
+			if (caret.Valid == CaretPosition.ValidState.TextPos)
+				caret.TextPos = caret.TextPos.Clamp(0, Text.Length);
+			if (caret.Valid == CaretPosition.ValidState.LineCol || caret.Valid == CaretPosition.ValidState.LineWorldX)
+				caret.Line = caret.Line.Clamp(0, lines.Count - 1);
+			int i = 0;
+			foreach (var line in lines) {
+				bool lastLine = ++i == lines.Count;
+				if (caret.Valid == CaretPosition.ValidState.LineCol && caret.Line == caret.RenderingLineNumber) {
+					caret.Col = caret.Col.Clamp(0, line.Length - (lastLine ? 0 : 1));
+				}
+				Rectangle lineRect = RenderSingleTextLine(spriteList, pos, line);
+				if (lastLine) {
+					// There is no end-of-text character, so simulate it.
+					caret.Sync(line.Length, new Vector2(lineRect.Right, lineRect.Top), Vector2.Down * fontHeight);
+				}
+				pos.Y += Spacing + FontHeight;
+				++caret.RenderingLineNumber;
+				if (firstLine) {
+					rect = lineRect;
+					firstLine = false;
+				} else {
+					rect = Rectangle.Bounds(rect, lineRect);
+				}
+			}
+			caret.FinishSync();
 			return rect;
 		}
 
