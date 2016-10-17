@@ -247,6 +247,7 @@ namespace Lime
 				RaiseActivated();
 			};
 			window.DidResignKey += (sender, e) => {
+				Input.ClearKeyState();
 				RaiseDeactivated();
 			};
 #if MAC
