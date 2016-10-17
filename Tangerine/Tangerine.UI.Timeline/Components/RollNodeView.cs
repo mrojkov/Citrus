@@ -51,7 +51,7 @@ namespace Tangerine.UI.Timeline.Components
 			label.Tasks.Add(new Property<string>(() => nodeData.Node.ContentsPath).DistinctUntilChanged().Consume(s => RefreshLabel()));
 			widget.CompoundPresenter.Push(new DelegatePresenter<Widget>(RenderBackground));
 			editBox.Visible = false;
-			widget.Tasks.Add(RenameOnDoubleClickTask());
+			widget.Tasks.Add(HandleDobleClickTask());
 		}
 
 		void RefreshLabel()
@@ -118,7 +118,7 @@ namespace Tangerine.UI.Timeline.Components
 
 		Widget IRollWidget.Widget => widget;
 
-		IEnumerator<object> RenameOnDoubleClickTask()
+		IEnumerator<object> HandleDobleClickTask()
 		{
 			while (true) {
 				if (label.Input.WasKeyPressed(Key.Mouse0DoubleClick)) {
@@ -127,7 +127,6 @@ namespace Tangerine.UI.Timeline.Components
 					label.Visible = false;
 					editBox.Visible = true;
 					editBox.Text = nodeData.Node.Id;
-					yield return null;
 					editBox.SetFocus();
 					editBox.Tasks.Add(EditNodeIdTask());
 				} else if (widget.Input.WasKeyPressed(Key.Mouse0DoubleClick)) {
