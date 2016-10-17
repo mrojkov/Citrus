@@ -20,15 +20,16 @@ namespace Tangerine.UI.Timeline
 			input.AcceptMouseThroughDescendants = true;
 			while (true) {
 				yield return null;
-				if (!input.WasMousePressed()) {
+				if (!input.WasMousePressed() || input.WasKeyPressed(Key.Mouse0DoubleClick)) {
 					continue;
 				}
 				var initialMousePosition = input.MousePosition;
 				var row = MousePositionToRow(initialMousePosition);
 				if (input.IsKeyPressed(Key.Shift)) {
 					if (Document.Current.SelectedRows.Count > 0) {
+						var firstRow = Document.Current.SelectedRows[0];
 						Core.Operations.ClearRowSelection.Perform();
-						Core.Operations.SelectRowRange.Perform(Document.Current.SelectedRows[0], row);
+						Core.Operations.SelectRowRange.Perform(firstRow, row);
 					} else {
 						Core.Operations.ClearRowSelection.Perform();
 						Core.Operations.SelectRow.Perform(row);
