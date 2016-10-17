@@ -128,7 +128,7 @@ namespace Tangerine
 
 		private void AddGlobalProcessors(Widget panel)
 		{
-			panel.LateTasks.Add(new BuildRowsProcessor());
+			panel.Tasks.Add(new BuildRowsProcessor());
 			panel.LateTasks.Add(new UI.Timeline.GlobalKeyboardShortcutsProcessor(panel.Input));
 			panel.LateTasks.Add(new UI.SceneView.PreviewAnimationProcessor(panel.Input));
 		}

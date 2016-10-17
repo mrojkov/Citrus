@@ -101,7 +101,6 @@ namespace Tangerine.UI.Timeline
 		{
 			var tasks = RootWidget.LateTasks;
 			tasks.Add(new IProcessor[] {
-				new BuildRowsProcessor(),
 				new UnselectUnlinkedNodesProcessor(),
 				new ColumnCountProcessor(),
 				new BuildRowViewsProcessor(),
