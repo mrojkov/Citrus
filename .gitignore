@@ -1,6 +1,7 @@
 .DS_Store
 .vs/
 *.userprefs
+*.csproj.user
 *.vshost.exe
 [Oo]bj/
 Lemon/bin/
