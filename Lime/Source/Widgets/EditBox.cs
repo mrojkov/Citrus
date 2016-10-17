@@ -18,6 +18,7 @@ namespace Lime
 		public EditBox()
 		{
 			Scroll = new ScrollView(this, ScrollDirection.Horizontal);
+			Scroll.CanScroll = false;
 			TextWidget = new SimpleText();
 			Scroll.Content.AddNode(TextWidget);
 			Theme.Current.Apply(this);
