@@ -204,6 +204,9 @@ namespace Lime
 
 			public static Key DeleteWordPrev = Key.MapShortcut(Modifiers.Control, Key.BackSpace);
 			public static Key DeleteWordNext = Key.MapShortcut(Modifiers.Control, Key.Delete);
+
+			public static Key Submit = Key.MapShortcut(Key.Enter);
+			public static Key Cancel = Key.MapShortcut(Key.Escape);
 		}
 
 		private string PasswordChars(int length) { return new string(EditorParams.PasswordChar.Value, length); }
@@ -256,6 +259,7 @@ namespace Lime
 					Cmds.MoveWordPrev, Cmds.MoveWordNext,
 					Cmds.MoveLineStart, Cmds.MoveLineEnd,
 					Cmds.DeleteWordPrev, Cmds.DeleteWordNext,
+					Cmds.Submit, Cmds.Cancel,
 					Key.Commands.Cut, Key.Commands.Copy, Key.Commands.Paste, Key.Commands.Delete,
 				}
 			).ToList();
@@ -352,18 +356,18 @@ namespace Lime
 						caretPos.InvalidatePreservingTextPos();
 					}
 				}
-				if (WasKeyRepeated(Key.Enter)) {
+				if (WasKeyRepeated(Cmds.Submit)) {
 					if (EditorParams.IsAcceptableLines(Text.Text.Count(ch => ch == '\n') + 2)) {
 						InsertChar('\n');
 					} else {
-						focus.Input.ConsumeKey(Key.Enter);
+						focus.Input.ConsumeKey(Cmds.Submit);
 						focus.RevokeFocus();
 					}
 				}
-				if (WasKeyRepeated(Key.Escape)) {
+				if (WasKeyRepeated(Cmds.Cancel)) {
 					Text.Text = originalText;
-					focus.Input.ConsumeKey(Key.Escape);
-					Container.RevokeFocus();
+					focus.Input.ConsumeKey(Cmds.Cancel);
+					focus.RevokeFocus();
 				}
 				if (focus.Input.WasKeyPressed(Key.Commands.Copy)) {
 					Clipboard.Text = Text.Text;
