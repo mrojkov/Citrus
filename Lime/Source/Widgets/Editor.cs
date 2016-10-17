@@ -115,6 +115,7 @@ namespace Lime
 		float PasswordLastCharShowTime { get; set; }
 		Predicate<string> AcceptText { get; set; }
 		ScrollView Scroll { get; set; }
+		bool AllowNonDisplayableChars { get; set; }
 
 		bool IsAcceptableLength(int length);
 		bool IsAcceptableLines(int lines);
@@ -130,6 +131,7 @@ namespace Lime
 		public float PasswordLastCharShowTime { get; set; }
 		public Predicate<string> AcceptText { get; set; }
 		public ScrollView Scroll { get; set; }
+		public bool AllowNonDisplayableChars { get; set; }
 
 		public EditorParams()
 		{
@@ -228,6 +230,7 @@ namespace Lime
 		{
 			if (caretPos.TextPos < 0 || caretPos.TextPos > Text.Text.Length) return;
 			if (!EditorParams.IsAcceptableLength(Text.Text.Length + 1)) return;
+			if (!EditorParams.AllowNonDisplayableChars && !Text.CanDisplay(ch)) return;
 			var newText = Text.Text.Insert(caretPos.TextPos, ch.ToString());
 			if (EditorParams.AcceptText != null && !EditorParams.AcceptText(newText)) return;
 			if (EditorParams.MaxHeight > 0 && !EditorParams.IsAcceptableHeight(CalcTextHeight(newText))) return;
