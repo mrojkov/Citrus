@@ -59,6 +59,7 @@ namespace Tangerine.UI.Timeline
 		{
 			Instance = this;
 			PanelWidget.PushNode(RootWidget);
+			RootWidget.SetFocus();
 		}
 
 		public void Detach()
