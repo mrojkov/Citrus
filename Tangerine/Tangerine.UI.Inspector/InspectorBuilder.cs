@@ -14,10 +14,11 @@ namespace Tangerine.UI.Inspector
 
 		public void Build(IEnumerable<object> objects)
 		{
-			if (Widget.Focused != null && Widget.Focused.DescendantOf(Inspector.PanelWidget)) {
-				Inspector.PanelWidget.SetFocus();
+			var content = Inspector.ContentWidget;
+			if (Widget.Focused != null && Widget.Focused.DescendantOf(content)) {
+				content.SetFocus();
 			}
-			Inspector.ContentWidget.Nodes.Clear();
+			content.Nodes.Clear();
 			Inspector.Editors.Clear();
 			foreach (var t in GetTypes(objects)) {
 				var o = objects.Where(i => t.IsInstanceOfType(i)).ToList();
