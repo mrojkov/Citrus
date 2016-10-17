@@ -111,7 +111,7 @@ namespace Lime.Text
 		{
 			var style = styles[word.Style];
 			Vector2 size = Renderer.MeasureTextLine(
-				style.Font.Instance, texts[word.TextIndex], ScaleSize(style.Size), word.Start, word.Length);
+				style.Font, texts[word.TextIndex], ScaleSize(style.Size), word.Start, word.Length);
 			return size.X + (IsBullet(word) ? ScaleSize(style.ImageSize.X) : 0);
 		}
 
@@ -170,7 +170,7 @@ namespace Lime.Text
 						position.X += sz.X;
 					}
 					var yOffset = new Vector2(0, (maxHeight - ScaleSize(style.Size)) * 0.5f);
-					var font = style.Font.Instance;
+					var font = style.Font;
 					if (style.CastShadow) {
 						for (int k = 0; k < (style.Bold ? 2 : 1); k++) {
 							Renderer.DrawTextLine(
@@ -289,7 +289,7 @@ namespace Lime.Text
 			while (true) {
 				var word = fittedWords[lastWordInLastLine];
 				var style = styles[word.Style];
-				var font = style.Font.Instance;
+				var font = style.Font;
 				var t = texts[word.TextIndex];
 				float dotsWidth = Renderer.MeasureTextLine(font, "...", ScaleSize(style.Size)).X;
 				if (
@@ -377,7 +377,7 @@ namespace Lime.Text
 			int mid = 0;
 			bool isLineLonger = false;
 			var style = styles[word.Style];
-			var font = style.Font.Instance;
+			var font = style.Font;
 			var t = texts[word.TextIndex];
 			do {
 				mid = min + ((max - min) / 2);
@@ -397,7 +397,7 @@ namespace Lime.Text
 		private void ClipWordWithEllipsis(Word word, float maxWidth)
 		{
 			var style = styles[word.Style];
-			float dotsWidth = Renderer.MeasureTextLine(style.Font.Instance, "...", ScaleSize(style.Size)).X;
+			float dotsWidth = Renderer.MeasureTextLine(style.Font, "...", ScaleSize(style.Size)).X;
 			while (word.Length > 1 && word.X + word.Width + dotsWidth > maxWidth) {
 				word.Length--;
 				word.Width = CalcWordWidth(word);

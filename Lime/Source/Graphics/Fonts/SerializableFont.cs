@@ -5,19 +5,41 @@ using Yuzu;
 
 namespace Lime
 {
-	public class SerializableFont
+	public class SerializableFont: IFont
 	{
-		public IFont Instance { get; private set; }
+		private IFont font;
 
 		[YuzuMember]
 		public string Name
 		{
-			get	{
+			get
+			{
 				return name;
 			}
-			set	{
+			set
+			{
+				if (name == value)
+					return;
 				name = value;
-				Instance = FontPool.Instance[Name];
+				font = null;
+			}
+		}
+
+		public string About {
+			get
+			{
+				if (font == null)
+					font = FontPool.Instance[Name];
+				return font.About;
+			}
+		}
+
+		public IFontCharSource Chars {
+			get
+			{
+				if (font == null)
+					font = FontPool.Instance[Name];
+				return font.Chars;
 			}
 		}
 
@@ -31,6 +53,18 @@ namespace Lime
 		public SerializableFont(string name)
 		{
 			Name = name;
+		}
+
+		public void ClearCache()
+		{
+			if (font == null)
+				font = FontPool.Instance[Name];
+			font.ClearCache();
+		}
+
+		public void Dispose()
+		{
+			font = null;
 		}
 	}
 

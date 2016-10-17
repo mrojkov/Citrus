@@ -183,12 +183,12 @@ namespace Lime
 
 		public bool CanDisplay(char ch)
 		{
-			return Font.Instance.Chars.Get(ch, fontHeight) != FontChar.Null;
+			return Font.Chars.Get(ch, fontHeight) != FontChar.Null;
 		}
 
 		public override Vector2 CalcContentSize()
 		{
-			return Renderer.MeasureTextLine(Font.Instance, DisplayText, FontHeight);
+			return Renderer.MeasureTextLine(Font, DisplayText, FontHeight);
 		}
 
 		protected override void OnSizeChanged(Vector2 sizeDelta)
@@ -378,7 +378,7 @@ namespace Lime
 			pos.X = CalcXByAlignment(lineWidth);
 			if (spriteList != null) {
 				Renderer.DrawTextLine(
-					Font.Instance, pos, line, Color4.White, FontHeight, 0, line.Length, spriteList, caret.Sync);
+					Font, pos, line, Color4.White, FontHeight, 0, line.Length, spriteList, caret.Sync);
 			}
 			return new Rectangle(pos.X, pos.Y, pos.X + lineWidth, pos.Y + FontHeight);
 		}
@@ -419,12 +419,12 @@ namespace Lime
 
 		private bool IsTextLinePartFitToWidth(string line, int start, int count)
 		{
-			return Renderer.MeasureTextLine(Font.Instance, line, FontHeight, start, count).X <= ContentWidth;
+			return Renderer.MeasureTextLine(Font, line, FontHeight, start, count).X <= ContentWidth;
 		}
 
 		public Vector2 MeasureTextLine(string line)
 		{
-			return Renderer.MeasureTextLine(Font.Instance, line, FontHeight);
+			return Renderer.MeasureTextLine(Font, line, FontHeight);
 		}
 
 		private string ClipLineWithEllipsis(string line)
