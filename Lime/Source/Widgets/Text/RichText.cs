@@ -247,5 +247,8 @@ namespace Lime
 		}
 
 		void IText.SyncCaretPosition() { }
+
+		public bool CanDisplay(char ch) { return true; }
+
 	}
 }

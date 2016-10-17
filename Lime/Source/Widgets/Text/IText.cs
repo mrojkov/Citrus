@@ -70,6 +70,7 @@ namespace Lime
 		void Invalidate();
 		void SyncCaretPosition();
 		void Submit();
+		bool CanDisplay(char ch);
 
 		bool Localizable { get; set; }
 		string Text { get; set; }

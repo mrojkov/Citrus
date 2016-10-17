@@ -181,6 +181,11 @@ namespace Lime
 			}
 		}
 
+		public bool CanDisplay(char ch)
+		{
+			return Font.Instance.Chars.Get(ch, fontHeight) != FontChar.Null;
+		}
+
 		public override Vector2 CalcContentSize()
 		{
 			return Renderer.MeasureTextLine(Font.Instance, DisplayText, FontHeight);
