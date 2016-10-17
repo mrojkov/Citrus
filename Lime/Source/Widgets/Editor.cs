@@ -431,7 +431,7 @@ namespace Lime
 			}
 		}
 
-		public void AdjustSizeAndScrollToCaret()
+		private void AdjustSizeAndScrollToCaret()
 		{
 			var s = EditorParams.Scroll;
 			if (s == null) return;
@@ -465,8 +465,8 @@ namespace Lime
 						caretPos.WorldPos = t.TransformVector(InputWidget.Input.MousePosition);
 					}
 					Text.SyncCaretPosition();
-					AdjustSizeAndScrollToCaret();
 				}
+				AdjustSizeAndScrollToCaret();
 				var isFocused = InputWidget.IsFocused();
 				caretPos.IsVisible = isFocused;
 				if (!wasFocused && isFocused) {

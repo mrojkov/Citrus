@@ -33,7 +33,6 @@ namespace Lime
 		{
 			base.OnSizeChanged(sizeDelta);
 			TextWidget.Height = Height;
-			Editor.AdjustSizeAndScrollToCaret();
 		}
 	}
 }
