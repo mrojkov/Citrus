@@ -14,6 +14,9 @@ namespace Tangerine.UI.Inspector
 
 		public void Build(IEnumerable<object> objects)
 		{
+			if (Widget.Focused != null && Widget.Focused.DescendantOf(Inspector.PanelWidget)) {
+				Inspector.PanelWidget.SetFocus();
+			}
 			Inspector.ContentWidget.Nodes.Clear();
 			Inspector.Editors.Clear();
 			foreach (var t in GetTypes(objects)) {
