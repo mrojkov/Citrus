@@ -111,6 +111,8 @@ namespace Tangerine.UI.Inspector
 			OnKeyframeToggle += editorX.SetFocus;
 			var currentX = CoalescedPropertyValue<Vector2, float>(context, v => v.X);
 			var currentY = CoalescedPropertyValue<Vector2, float>(context, v => v.Y);
+			editorX.TextWidget.HAlignment = HAlignment.Right;
+			editorY.TextWidget.HAlignment = HAlignment.Right;
 			editorX.Submitted += text => SetComponent(context, 0, editorX, currentX.GetValue());
 			editorY.Submitted += text => SetComponent(context, 1, editorY, currentY.GetValue());
 			editorX.Tasks.Add(currentX.DistinctUntilChanged().Consume(v => editorX.Text = v.ToString()));
@@ -183,6 +185,7 @@ namespace Tangerine.UI.Inspector
 		public FloatPropertyEditor(PropertyEditorContext context) : base(context)
 		{
 			var editor = new EditBox { LayoutCell = new LayoutCell(Alignment.Center) };
+			editor.TextWidget.HAlignment = HAlignment.Right;
 			containerWidget.AddNode(editor);
 			OnKeyframeToggle += editor.SetFocus;
 			var current = CoalescedPropertyValue<float>(context);
