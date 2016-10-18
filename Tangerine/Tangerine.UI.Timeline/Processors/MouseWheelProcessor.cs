@@ -11,16 +11,20 @@ namespace Tangerine.UI.Timeline
 		public IEnumerator<object> Loop()
 		{
 			while (true) {
-				var widget = timeline.PanelWidget;
-				var wheelDown = widget.Input.WasKeyPressed(Key.MouseWheelDown);
-				var wheelUp = widget.Input.WasKeyPressed(Key.MouseWheelUp);
-				if (wheelDown) {
-					timeline.ScrollOrigin.Y += TimelineMetrics.DefaultRowHeight;
-				}
-				if (wheelUp) {
-					timeline.ScrollOrigin.Y -= TimelineMetrics.DefaultRowHeight;
-				}
+				HandleScroll(timeline.Roll.RootWidget.Input);
+				HandleScroll(timeline.Grid.RootWidget.Input);
+				HandleScroll(timeline.Overview.RootWidget.Input);
 				yield return null;
+			}
+		}
+
+		void HandleScroll(WidgetInput input)
+		{
+			if (input.WasKeyPressed(Key.MouseWheelDown)) {
+				timeline.ScrollOrigin.Y += TimelineMetrics.DefaultRowHeight;
+			}
+			if (input.WasKeyPressed(Key.MouseWheelUp)) {
+				timeline.ScrollOrigin.Y -= TimelineMetrics.DefaultRowHeight;
 			}
 		}
 	}
