@@ -149,12 +149,27 @@ namespace Lime
 			Valid = ValidState.TextPos;
 		}
 
-		public void Clamp(int textLength, int lineCount)
+		public void ClampTextPos(int textLength)
 		{
 			if (Valid == ValidState.TextPos)
 				textPos = textPos.Clamp(0, textLength);
+		}
+
+		public void ClampLine(int lineCount)
+		{
 			if (Valid == ValidState.LineCol || Valid == ValidState.LineWorldX)
 				line = line.Clamp(0, lineCount - 1);
+		}
+
+		public void ClampCol(int maxCol)
+		{
+			if (Valid == ValidState.LineCol && Line == RenderingLineNumber)
+				Col = Col.Clamp(0, maxCol);
+		}
+
+		public void NextLine()
+		{
+			++RenderingLineNumber;
 		}
 
 		public CaretPosition Clone()

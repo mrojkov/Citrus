@@ -297,14 +297,13 @@ namespace Lime
 				caret.EmptyText(pos);
 				return Rectangle.Empty;
 			}
-			caret.Clamp(Text.Length, lines.Count);
+			caret.ClampTextPos(Text.Length);
+			caret.ClampLine(lines.Count);
 			Rectangle rect = new Rectangle(Vector2.PositiveInfinity, Vector2.NegativeInfinity);
 			int i = 0;
 			foreach (var line in lines) {
 				bool lastLine = ++i == lines.Count;
-				if (caret.Valid == CaretPosition.ValidState.LineCol && caret.Line == caret.RenderingLineNumber) {
-					caret.Col = caret.Col.Clamp(0, line.Length - (lastLine ? 0 : 1));
-				}
+				caret.ClampCol(line.Length - (lastLine ? 0 : 1));
 				float lineWidth = MeasureTextLine(line).X;
 				pos.X = CalcXByAlignment(lineWidth);
 				if (spriteList != null) {
@@ -317,7 +316,7 @@ namespace Lime
 					caret.Sync(line.Length, new Vector2(lineRect.Right, lineRect.Top), Vector2.Down * fontHeight);
 				}
 				pos.Y += Spacing + FontHeight;
-				++caret.RenderingLineNumber;
+				caret.NextLine();
 				rect = Rectangle.Bounds(rect, lineRect);
 			}
 			caret.FinishSync();
