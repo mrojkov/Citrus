@@ -235,7 +235,7 @@ namespace Lime
 		{
 			if (caretPos.TextPos < 0 || caretPos.TextPos > Text.Text.Length) return;
 			if (!EditorParams.IsAcceptableLength(Text.Text.Length + 1)) return;
-			if (!EditorParams.AllowNonDisplayableChars && !Text.CanDisplay(ch)) return;
+			if (ch != '\n' && !EditorParams.AllowNonDisplayableChars && !Text.CanDisplay(ch)) return;
 			var newText = Text.Text.Insert(caretPos.TextPos, ch.ToString());
 			if (EditorParams.AcceptText != null && !EditorParams.AcceptText(newText)) return;
 			if (EditorParams.MaxHeight > 0 && !EditorParams.IsAcceptableHeight(CalcTextHeight(newText))) return;
