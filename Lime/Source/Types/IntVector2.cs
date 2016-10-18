@@ -52,6 +52,12 @@ namespace Lime
 			Y = y;
 		}
 
+		public IntVector2(int value)
+		{
+			X = value;
+			Y = value;
+		}
+
 		public static explicit operator Size(IntVector2 value)
 		{
 			return new Size(value.X, value.Y);
