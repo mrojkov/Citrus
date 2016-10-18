@@ -1,8 +1,6 @@
 #if ANDROID
 using System;
-using System.Collections.Generic;
-using System.Drawing;
-
+using Android.Content;
 using Android.Views;
 using Android.Webkit;
 using Android.Widget;
@@ -45,7 +43,7 @@ namespace Lime
 			webView.Settings.JavaScriptEnabled = true;
 			webView.Settings.LoadWithOverviewMode = true;
 			webView.Settings.UseWideViewPort = true;
-			webView.SetWebViewClient(new WebViewClient());
+			webView.SetWebViewClient(new CustomClient());
 		}
 
 		public override Node Clone()
@@ -139,6 +137,21 @@ namespace Lime
 		private void SetUrl(Uri value)
 		{
 			webView.LoadUrl(value.AbsoluteUri);
+		}
+
+		private class CustomClient : WebViewClient
+		{
+			public override bool ShouldOverrideUrlLoading(WebView view, string url)
+			{
+				if (url.StartsWith("file:") || url.StartsWith("http:") || url.StartsWith("https:")) {
+					return false;
+				}
+
+				// Otherwise allow the OS to handle things like tel, mailto, etc. 
+				var intent = new Intent(Intent.ActionView, Android.Net.Uri.Parse(url));
+				ActivityDelegate.Instance.Activity.StartActivity(intent);
+				return true;
+			}
 		}
 	}
 }
