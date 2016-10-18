@@ -22,7 +22,7 @@ namespace Tangerine.UI.Timeline
 		{
 			widget.PrepareRendererState();
 			Renderer.DrawRect(Vector2.Zero, RootWidget.Size, ToolbarColors.Background);
-			Renderer.Transform1 *= Matrix32.Translation(-Timeline.Instance.ScrollOrigin.X, 0);
+			Renderer.Transform1 *= Matrix32.Translation(-Timeline.Instance.ScrollPos.X, 0);
 			RenderCursor();
 			for (int i = 0; i < Timeline.Instance.ColumnCount; i++) {
 				var x = i * TimelineMetrics.ColWidth + 0.5f;

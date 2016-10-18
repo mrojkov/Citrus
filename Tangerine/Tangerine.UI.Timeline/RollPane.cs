@@ -31,7 +31,7 @@ namespace Tangerine.UI.Timeline
 			OverlayWidget = new Widget { Presenter = new DelegatePresenter<Widget>(w => OnRenderOverlay?.Invoke(w)) };
 			RootWidget.AddNode(OverlayWidget);
 			RootWidget.AddNode(ContentWidget);
-			ContentWidget.Updating += delta => ContentWidget.Y = -Timeline.Instance.ScrollOrigin.Y;
+			ContentWidget.Updating += delta => ContentWidget.Y = -Timeline.Instance.ScrollPos.Y;
 		}
 				
 		private void RenderBackground(Node node)

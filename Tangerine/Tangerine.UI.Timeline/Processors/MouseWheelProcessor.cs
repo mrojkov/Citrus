@@ -21,10 +21,10 @@ namespace Tangerine.UI.Timeline
 		void HandleScroll(WidgetInput input)
 		{
 			if (input.WasKeyPressed(Key.MouseWheelDown)) {
-				timeline.ScrollOrigin.Y += TimelineMetrics.DefaultRowHeight;
+				timeline.ScrollPos.Y += TimelineMetrics.DefaultRowHeight;
 			}
 			if (input.WasKeyPressed(Key.MouseWheelUp)) {
-				timeline.ScrollOrigin.Y -= TimelineMetrics.DefaultRowHeight;
+				timeline.ScrollPos.Y -= TimelineMetrics.DefaultRowHeight;
 			}
 		}
 	}

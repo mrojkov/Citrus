@@ -34,7 +34,7 @@ namespace Tangerine.UI.Timeline
 			};
 			RootWidget.AddNode(ContentWidget);
 			RootWidget.Updating += delta => {
-				ContentWidget.Position = -timeline.ScrollOrigin;
+				ContentWidget.Position = -timeline.ScrollPos;
 			};
 			OnPostRender += RenderGrid;
 			OnPostRender += RenderSelection;

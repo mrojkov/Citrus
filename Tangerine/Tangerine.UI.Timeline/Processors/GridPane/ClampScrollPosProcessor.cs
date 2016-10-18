@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Tangerine.UI.Timeline
 {
-	class ClampScrollOriginProcessor : IProcessor
+	class ClampScrollPosProcessor : IProcessor
 	{
 		Timeline timeline => Timeline.Instance;
 
@@ -14,8 +14,8 @@ namespace Tangerine.UI.Timeline
 		{
 			var doc = Document.Current;
 			while (true) {
-				var maxScrollOrigin = new Vector2(float.MaxValue, Math.Max(0, timeline.Grid.ContentSize.Y - timeline.Grid.Size.Y));
-				timeline.ScrollOrigin = Vector2.Clamp(timeline.ScrollOrigin, Vector2.Zero, maxScrollOrigin);
+				var maxScrollPos = new Vector2(float.MaxValue, Math.Max(0, timeline.Grid.ContentSize.Y - timeline.Grid.Size.Y));
+				timeline.ScrollPos = Vector2.Clamp(timeline.ScrollPos, Vector2.Zero, maxScrollPos);
 				yield return null;
 			}
 		}

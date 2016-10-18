@@ -23,7 +23,7 @@ namespace Tangerine.UI.Timeline
 		public readonly Widget PanelWidget;
 		public readonly Widget RootWidget = new Widget();
 
-		public Vector2 ScrollOrigin;
+		public Vector2 ScrollPos;
 		public Node Container
 		{
 			get { return Document.Current.Container; }
@@ -117,9 +117,9 @@ namespace Tangerine.UI.Timeline
 				new DragKeyframesRespondentProcessor(),
 				new SelectAndDragRowsProcessor(),
 				new RulerMouseScrollProcessor(),
-				new ClampScrollOriginProcessor(),
+				new ClampScrollPosProcessor(),
 				new EditMarkerProcessor(),
-				new ClampScrollOriginProcessor(),
+				new ClampScrollPosProcessor(),
 				EnsureCurrentColumnVisibleOnContainerChange(),
 			});
 		}
@@ -140,34 +140,34 @@ namespace Tangerine.UI.Timeline
 
 		public void EnsureColumnVisible(int column)
 		{
-			if ((column + 1) * TimelineMetrics.ColWidth - ScrollOrigin.X >= Grid.RootWidget.Width) {
-				ScrollOrigin.X = (column + 1) * TimelineMetrics.ColWidth - Grid.RootWidget.Width;
+			if ((column + 1) * TimelineMetrics.ColWidth - ScrollPos.X >= Grid.RootWidget.Width) {
+				ScrollPos.X = (column + 1) * TimelineMetrics.ColWidth - Grid.RootWidget.Width;
 			}
-			if (column * TimelineMetrics.ColWidth < ScrollOrigin.X) {
-				ScrollOrigin.X = Math.Max(0, column * TimelineMetrics.ColWidth);
+			if (column * TimelineMetrics.ColWidth < ScrollPos.X) {
+				ScrollPos.X = Math.Max(0, column * TimelineMetrics.ColWidth);
 			}
 		}
 
 		public void EnsureRowVisible(Row row)
 		{
 			var gw = row.GetGridWidget();
-			if (gw.Bottom > ScrollOrigin.Y + Grid.Size.Y) {
-				ScrollOrigin.Y = gw.Bottom - Grid.Size.Y;
+			if (gw.Bottom > ScrollPos.Y + Grid.Size.Y) {
+				ScrollPos.Y = gw.Bottom - Grid.Size.Y;
 			}
-			if (gw.Top < ScrollOrigin.Y) {
-				ScrollOrigin.Y = Math.Max(0, gw.Top);
+			if (gw.Top < ScrollPos.Y) {
+				ScrollPos.Y = Math.Max(0, gw.Top);
 			}
 		}
 
 		public bool IsColumnVisible(int col)
 		{
-			var pos = col * TimelineMetrics.ColWidth - ScrollOrigin.X;
+			var pos = col * TimelineMetrics.ColWidth - ScrollPos.X;
 			return pos >= 0 && pos < Grid.Size.X;
 		}
 		
 		public bool IsRowVisible(int row)
 		{
-			var pos = Document.Current.Rows[row].GetGridWidget().Top - ScrollOrigin.Y;
+			var pos = Document.Current.Rows[row].GetGridWidget().Top - ScrollPos.Y;
 			return pos >= 0 && pos < Grid.Size.Y;
 		}
 	}
