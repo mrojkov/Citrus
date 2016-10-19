@@ -123,6 +123,13 @@ namespace Lime
 			}
 		}
 
+		public static void InvalidateWindows()
+		{
+			foreach (var window in Application.Windows) {
+				window.Invalidate();
+			}
+		}
+
 		private static DeviceOrientation supportedDeviceOrientations = DeviceOrientation.All;
 		/// <summary>
 		/// Supported device orientations (only for mobile platforms)
