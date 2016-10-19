@@ -85,7 +85,7 @@
     <Compile Include="Operations\SelectRowRange.cs" />
     <Compile Include="Operations\DragRows.cs" />
     <Compile Include="Operations\EnterLeaveNode.cs" />
-    <Compile Include="BuildRowsProcessor.cs" />
+    <Compile Include="RowsSynchronizer.cs" />
     <Compile Include="HotStudioExport\HotSceneExporter.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />

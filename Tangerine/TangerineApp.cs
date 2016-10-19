@@ -69,6 +69,8 @@ namespace Tangerine
 				Toolbars["Create"].Add(c);
 			}
 			CreateToolsToolbar();
+			var sr = new RowsSynchronizer();
+			Document.RowsSynchronizer += sr.Process;
 			Document.AttachingViews += doc => {
 				if (doc.Views.Count == 0) {
 					doc.Views.AddRange(new IDocumentView [] {
@@ -78,10 +80,8 @@ namespace Tangerine
 						new UI.Console(consolePanel.ContentWidget),
 						new UI.SearchPanel(searchPanel.ContentWidget),
 					});
-					doc.History.Changed += InvalidateWindows;
 				}
 				RefreshExternalContent(doc.RootNode);
-				InvalidateWindows();
 			};
 			var proj = UserPreferences.Instance.RecentProjects.FirstOrDefault();
 			if (proj != null) {
@@ -119,16 +119,8 @@ namespace Tangerine
 			return null;
 		}
 
-		private static void InvalidateWindows()
-		{
-			foreach (var window in Application.Windows) {
-				window.Invalidate();
-			}
-		}
-
 		private void AddGlobalProcessors(Widget panel)
 		{
-			panel.Tasks.Add(new BuildRowsProcessor());
 			panel.LateTasks.Add(new UI.Timeline.GlobalKeyboardShortcutsProcessor(panel.Input));
 			panel.LateTasks.Add(new UI.SceneView.PreviewAnimationProcessor(panel.Input));
 		}

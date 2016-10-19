@@ -26,6 +26,7 @@ namespace Tangerine.Core
 
 		public static event Action<Document> AttachingViews;
 		public static event Func<Document, CloseAction> Closing;
+		public static event Action<Document> RowsSynchronizer;
 
 		public const string SceneFileExtension = "scene";
 
@@ -70,6 +71,8 @@ namespace Tangerine.Core
 		public Document()
 		{
 			History = new DocumentHistory();
+			History.Changed += SyncRows;
+			History.Changed += Application.InvalidateWindows;
 		}
 
 		public Document(string path) : this()
@@ -92,8 +95,7 @@ namespace Tangerine.Core
 				Current.DetachViews();
 			}
 			Current = doc;
-			if (doc == null) {
-			} else {
+			if (doc != null) {
 				doc.AttachViews();
 			}
 		}
@@ -148,6 +150,11 @@ namespace Tangerine.Core
 				}
 				Serialization.WriteObject(Path, stream, node, serializer);
 			}
+		}
+
+		void SyncRows()
+		{
+			RowsSynchronizer?.Invoke(this);
 		}
 
 		public IEnumerable<Node> SelectedNodes()

@@ -50,9 +50,6 @@ namespace Tangerine.UI.Timeline
 			PanelWidget = panelWidget;
 			CreateProcessors();
 			InitializeWidgets();
-			if (Document.Current.Container.Nodes.Count > 0) {
-				Core.Operations.SelectNode.Perform(Document.Current.Container.Nodes[0]);
-			}
 		}
 
 		public void Attach()
@@ -99,8 +96,7 @@ namespace Tangerine.UI.Timeline
 
 		void CreateProcessors()
 		{
-			var tasks = RootWidget.LateTasks;
-			tasks.Add(new IProcessor[] {
+			RootWidget.LateTasks.Add(new IProcessor[] {
 				new UnselectUnlinkedNodesProcessor(),
 				new ColumnCountProcessor(),
 				new BuildRowViewsProcessor(),
@@ -118,10 +114,22 @@ namespace Tangerine.UI.Timeline
 				new SelectAndDragRowsProcessor(),
 				new RulerMouseScrollProcessor(),
 				new ClampScrollPosProcessor(),
+				new ClampScrollPosOnContainerChange().GetProcessor(),
 				new EditMarkerProcessor(),
-				new ClampScrollPosProcessor(),
 				EnsureCurrentColumnVisibleOnContainerChange(),
+				new SelectFirstNodeOnDocumentOpeningProcessor()
 			});
+		}
+
+		class SelectFirstNodeOnDocumentOpeningProcessor : IProcessor
+		{
+			public IEnumerator<object> Loop()
+			{
+				if (Document.Current.Container.Nodes.Count > 0) {
+					Core.Operations.SelectNode.Perform(Document.Current.Container.Nodes[0]);
+				}
+				yield return null;
+			}
 		}
 
 		IProcessor EnsureCurrentColumnVisibleOnContainerChange()

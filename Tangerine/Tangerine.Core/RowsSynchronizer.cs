@@ -5,15 +5,12 @@ using System.Collections.Generic;
 
 namespace Tangerine.Core
 {
-	public class BuildRowsProcessor : IProcessor
+	public class RowsSynchronizer
 	{
-		public IEnumerator<object> Loop()
+		public void Process(Document doc)
 		{
-			while (true) {
-				if (!ValidateRows()) {
-					RebuildRows();
-				}
-				yield return null;
+			if (!ValidateRows()) {
+				RebuildRows();
 			}
 		}
 
