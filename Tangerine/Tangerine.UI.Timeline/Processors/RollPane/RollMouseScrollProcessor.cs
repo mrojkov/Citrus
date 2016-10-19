@@ -19,7 +19,7 @@ namespace Tangerine.UI.Timeline
 					} else if (input.LocalMousePosition.Y < s / 2) {
 						timeline.ScrollPos.Y -= s;
 					}
-					Application.InvalidateWindows();
+					Window.Current.Invalidate();
 				}
 				yield return 0.1f;
 			}

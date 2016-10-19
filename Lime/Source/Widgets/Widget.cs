@@ -659,9 +659,7 @@ namespace Lime
 				}
 			});
 			Focused = value;
-			foreach (var i in Application.Windows) {
-				i.Invalidate();
-			}
+			Application.InvalidateWindows();
 		}
 
 		internal void InvalidateParentConstraintsAndArrangement()

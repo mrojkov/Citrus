@@ -26,20 +26,13 @@ namespace Tangerine.UI.SceneView
 							savedFrame = doc.Container.AnimationFrame;
 						}
 						doc.Container.IsRunning = !doc.Container.IsRunning;
-						InvalidateWindows();
+						Application.InvalidateWindows();
 					}
 					if (doc.Container.IsRunning) {
-						InvalidateWindows();
+						Application.InvalidateWindows();
 					}
 				}
 				yield return null;
-			}
-		}
-
-		void InvalidateWindows()
-		{
-			foreach (var window in Application.Windows) {
-				window.Invalidate();
 			}
 		}
 	}

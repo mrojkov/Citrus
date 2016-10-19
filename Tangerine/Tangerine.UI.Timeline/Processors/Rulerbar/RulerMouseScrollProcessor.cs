@@ -27,7 +27,7 @@ namespace Tangerine.UI.Timeline
 								timeline.ScrollPos.X -= cw;
 							}
 							timeline.CurrentColumn = ((mp + timeline.ScrollPos.X) / cw).Floor().Max(0);
-							Application.InvalidateWindows();
+							Window.Current.Invalidate();
 							yield return null;
 						}
 					} finally {

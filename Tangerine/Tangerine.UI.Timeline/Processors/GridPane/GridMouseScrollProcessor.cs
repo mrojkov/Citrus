@@ -25,7 +25,7 @@ namespace Tangerine.UI.Timeline
 					} else if (p.Y < s.Y / 2) {
 						timeline.ScrollPos.Y -= s.Y;
 					}
-					Application.InvalidateWindows();
+					Window.Current.Invalidate();
 				}
 				yield return null;
 			}
