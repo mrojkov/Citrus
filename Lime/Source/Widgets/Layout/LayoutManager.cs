@@ -5,8 +5,6 @@ namespace Lime
 {
 	public class LayoutManager
 	{
-		public event Action LayoutChanged;
-
 		// ArrangeQueue has root-nodes first order to minimize ArrangeChildren calls.
 		private DepthOrderedQueue arrangeQueue = new DepthOrderedQueue(rootToLeavesOrder: true);
 		// MeasureQueue has leaf-nodes first order, because widget size constraints depends only on the widget's children constraints.
@@ -26,7 +24,6 @@ namespace Lime
 
 		public void Layout()
 		{
-			var changed = false;
 			while (true) {
 				var w = measureQueue.Dequeue();
 				if (w == null) {
@@ -45,10 +42,6 @@ namespace Lime
 				// Keep in mind: ArrangeChildren could force a child re-arrangement when changes a child size.
 				// See ILayout.OnSizeChanged implementation.
 				w.Layout.ArrangeChildren(w);
-				changed = true;
-			}
-			if (changed) {
-				LayoutChanged?.Invoke();
 			}
 		}
 
