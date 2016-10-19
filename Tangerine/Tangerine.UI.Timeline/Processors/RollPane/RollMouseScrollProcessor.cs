@@ -13,15 +13,15 @@ namespace Tangerine.UI.Timeline
 			var input = timeline.Roll.RootWidget.Input;
 			while (true) {
 				if (input.IsMouseOwner()) {
-					var rect = timeline.Roll.RootWidget.CalcAABBInSpaceOf(timeline.PanelWidget);
-					if (input.MousePosition.Y > rect.B.Y) {
-						timeline.ScrollPos.Y += TimelineMetrics.DefaultRowHeight;
-					} else if (input.MousePosition.Y < rect.A.Y) {
-						timeline.ScrollPos.Y -= TimelineMetrics.DefaultRowHeight;
+					var s = TimelineMetrics.DefaultRowHeight;
+					if (input.LocalMousePosition.Y > timeline.Roll.RootWidget.Height - s / 2) {
+						timeline.ScrollPos.Y += s;
+					} else if (input.LocalMousePosition.Y < s / 2) {
+						timeline.ScrollPos.Y -= s;
 					}
-					Window.Current.Invalidate();
+					Application.InvalidateWindows();
 				}
-				yield return null;
+				yield return 0.1f;
 			}
 		}
 	}	

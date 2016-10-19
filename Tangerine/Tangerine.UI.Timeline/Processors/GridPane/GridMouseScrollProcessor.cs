@@ -11,20 +11,21 @@ namespace Tangerine.UI.Timeline
 
 		public IEnumerator<object> Loop()
 		{
-			var input = timeline.Grid.RootWidget.Input;
+			var widget = timeline.Grid.RootWidget;
 			while (true) {
-				if (input.IsMouseOwner()) {
-					var rect = timeline.Grid.RootWidget.CalcAABBInSpaceOf(timeline.PanelWidget);
-					if (input.MousePosition.X > rect.B.X) {
-						timeline.ScrollPos.X += TimelineMetrics.ColWidth;
-					} else if (input.MousePosition.X < rect.A.X) {
-						timeline.ScrollPos.X -= TimelineMetrics.ColWidth;
-					} else if (input.MousePosition.Y > rect.B.Y) {
-						timeline.ScrollPos.Y += TimelineMetrics.DefaultRowHeight;
-					} else if (input.MousePosition.Y < rect.A.Y) {
-						timeline.ScrollPos.Y -= TimelineMetrics.DefaultRowHeight;
+				if (widget.Input.IsMouseOwner()) {
+					var s = new Vector2(TimelineMetrics.ColWidth, TimelineMetrics.DefaultRowHeight);
+					var p = widget.Input.LocalMousePosition;
+					if (p.X > widget.Width - s.X / 2) {
+						timeline.ScrollPos.X += s.X;
+					} else if (p.X < s.X / 2) {
+						timeline.ScrollPos.X -= s.X;
+					} else if (p.Y > widget.Height - s.Y / 2) {
+						timeline.ScrollPos.Y += s.Y;
+					} else if (p.Y < s.Y / 2) {
+						timeline.ScrollPos.Y -= s.Y;
 					}
-					Window.Current.Invalidate();
+					Application.InvalidateWindows();
 				}
 				yield return null;
 			}
