@@ -2,7 +2,7 @@ using System;
 
 namespace Lime
 {
-	internal class CaretPosition: ICaretPosition
+	internal class CaretPosition : ICaretPosition
 	{
 		public enum ValidState { None, All, LineCol, WorldPos, TextPos, LineWorldX };
 		public ValidState Valid { get; private set; }
@@ -16,9 +16,12 @@ namespace Lime
 		private bool isVisible;
 		private Vector2 nearestCharPos;
 
+		public bool IsValid => Valid == ValidState.All;
+
 		public int Line {
 			get { return line; }
-			set {
+			set
+			{
 				if (line == value) return;
 				switch (Valid) {
 					case ValidState.All:
@@ -37,7 +40,8 @@ namespace Lime
 
 		public int Col {
 			get { return col; }
-			set {
+			set
+			{
 				if (col == value) return;
 				switch (Valid) {
 					case ValidState.All:
@@ -52,8 +56,7 @@ namespace Lime
 			}
 		}
 
-		public int TextPos
-		{
+		public int TextPos {
 			get { return textPos; }
 			set
 			{
@@ -63,8 +66,7 @@ namespace Lime
 			}
 		}
 
-		public Vector2 WorldPos
-		{
+		public Vector2 WorldPos {
 			get { return worldPos; }
 			set
 			{
@@ -173,7 +175,7 @@ namespace Lime
 			++renderingLineNumber;
 		}
 
-		public CaretPosition Clone()
+		public ICaretPosition Clone()
 		{
 			return (CaretPosition)MemberwiseClone();
 		}

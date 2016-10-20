@@ -50,16 +50,22 @@ namespace Lime
 
 	public interface ICaretPosition
 	{
+		bool IsValid { get; }
 		int Line { get; set; }
 		int Col { get; set; }
 		int TextPos { get; set; }
 		Vector2 WorldPos { get; set; }
 		bool IsVisible { get; set; }
+		void EmptyText(Vector2 pos);
+		void StartSync();
+		void Sync(int index, Vector2 charPos, Vector2 size);
+		void FinishSync();
 		void InvalidatePreservingTextPos();
 		void ClampTextPos(int textLength);
 		void ClampLine(int lineCount);
 		void ClampCol(int maxCol);
 		void NextLine();
+		ICaretPosition Clone();
 	}
 
 	public delegate void TextProcessorDelegate(ref string text);

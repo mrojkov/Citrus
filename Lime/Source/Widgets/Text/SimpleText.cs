@@ -156,7 +156,7 @@ namespace Lime
 
 		public bool TrimWhitespaces { get; set; }
 
-		private CaretPosition caret = new CaretPosition();
+		private ICaretPosition caret = new CaretPosition();
 
 		public ICaretPosition Caret { get { return caret; } }
 
@@ -213,7 +213,7 @@ namespace Lime
 
 		private void PrepareSpriteListAndSyncCaret()
 		{
-			if (caret.Valid != CaretPosition.ValidState.All) {
+			if (!caret.IsValid) {
 				spriteList = null;
 			}
 			PrepareSpriteListAndExtent();
@@ -284,7 +284,7 @@ namespace Lime
 			Spacing = bestHeight * spacingKoeff;
 		}
 
-		private Rectangle RenderHelper(SpriteList spriteList, CaretPosition caret)
+		private Rectangle RenderHelper(SpriteList spriteList, ICaretPosition caret)
 		{
 			var lines = SplitText(DisplayText);
 			if (TrimWhitespaces) {
