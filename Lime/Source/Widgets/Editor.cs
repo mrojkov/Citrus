@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 
 namespace Lime
 {
@@ -24,27 +23,16 @@ namespace Lime
 	public class CaretParams : ICaretParams
 	{
 		public ICaretPresenter CaretPresenter { get; set; }
-		public float BlinkInterval { get; set; }
+		public float BlinkInterval { get; set; } = 0.5f;
 		public bool FollowTextColor { get; set; }
-
-		public CaretParams()
-		{
-			BlinkInterval = 0.5f;
-		}
 	}
 
 	public class VerticalLineCaret : CustomPresenter, ICaretPresenter
 	{
 		public Vector2 Position { get; set; }
-		public Color4 Color { get; set; }
+		public Color4 Color { get; set; } = Color4.Black;
 		public bool Visible { get; set; }
-		public float Thickness { get; set; }
-
-		public VerticalLineCaret()
-		{
-			Thickness = 1.0f;
-			Color = Color4.Black;
-		}
+		public float Thickness { get; set; } = 1.0f;
 
 		public override void Render(Node node)
 		{
@@ -166,24 +154,20 @@ namespace Lime
 		public int MaxLines { get; set; }
 		public float MaxHeight { get; set; }
 		public char? PasswordChar { get; set; }
-		public float PasswordLastCharShowTime { get; set; }
+		public float PasswordLastCharShowTime { get; set; } =
+#if WIN || MAC || MONOMAC
+			0.0f;
+#else
+			1.0f;
+#endif
 		public Predicate<string> AcceptText { get; set; }
 		public ScrollView Scroll { get; set; }
 		public bool AllowNonDisplayableChars { get; set; }
 		public float MouseSelectionThreshold { get; set; } = 3.0f;
 
-		public EditorParams()
-		{
-#if WIN || MAC || MONOMAC
-			PasswordLastCharShowTime = 0.0f;
-#else
-			PasswordLastCharShowTime = 1.0f;
-#endif
-		}
-
-		public bool IsAcceptableLength(int length) { return MaxLength <= 0 || length <= MaxLength; }
-		public bool IsAcceptableLines(int lines) { return MaxLines <= 0 || lines <= MaxLines; }
-		public bool IsAcceptableHeight(float height) { return MaxHeight <= 0 || height <= MaxHeight; }
+		public bool IsAcceptableLength(int length) => MaxLength <= 0 || length <= MaxLength;
+		public bool IsAcceptableLines(int lines) => MaxLines <= 0 || lines <= MaxLines;
+		public bool IsAcceptableHeight(float height) => MaxHeight <= 0 || height <= MaxHeight;
 
 		public const NumberStyles numberStyle =
 			NumberStyles.AllowDecimalPoint |
@@ -272,7 +256,7 @@ namespace Lime
 			public static Key Cancel = Key.MapShortcut(Key.Escape);
 		}
 
-		private string PasswordChars(int length) { return new string(EditorParams.PasswordChar.Value, length); }
+		private string PasswordChars(int length) => new string(EditorParams.PasswordChar.Value, length);
 
 		private void ProcessTextAsPassword(ref string text)
 		{
@@ -291,10 +275,7 @@ namespace Lime
 
 		private WidgetInput input => InputWidget.Input;
 
-		private bool WasKeyRepeated(Key key)
-		{
-			return input.WasKeyRepeated(key);
-		}
+		private bool WasKeyRepeated(Key key) => input.WasKeyRepeated(key);
 
 		private void InsertChar(char ch)
 		{
@@ -386,7 +367,7 @@ namespace Lime
 			return pos;
 		}
 
-		private bool IsMultiline() { return EditorParams.IsAcceptableLines(2); }
+		private bool IsMultiline() => EditorParams.IsAcceptableLines(2);
 
 		private bool HasSelection() =>
 			SelectionStart.IsVisible && SelectionStart.IsValid && SelectionEnd.IsValid;
@@ -398,10 +379,8 @@ namespace Lime
 			SelectionStart.TextPos = SelectionEnd.TextPos = CaretPos.TextPos;
 		}
 
-		private void HideSelection()
-		{
+		private void HideSelection() =>
 			SelectionStart.IsVisible = SelectionEnd.IsVisible = false;
-		}
 
 		private void MoveCaret(Action move)
 		{
