@@ -167,7 +167,7 @@ namespace Lime
 		public readonly IText Text;
 		public readonly IEditorParams EditorParams;
 
-		private ICaretPosition caretPos;
+		public ICaretPosition CaretPos { get; }
 
 		public Editor(Widget container, ICaretPosition caretPos, IEditorParams editorParams, Widget inputWidget = null)
 		{
@@ -177,7 +177,7 @@ namespace Lime
 			Text = (IText)container;
 			Text.TrimWhitespaces = false;
 			EditorParams = editorParams;
-			this.caretPos = caretPos;
+			CaretPos = caretPos;
 			Text.Localizable = false;
 			if (editorParams.PasswordChar != null) {
 				Text.TextProcessor += ProcessTextAsPassword;
@@ -221,7 +221,7 @@ namespace Lime
 		{
 			if (InputWidget.IsFocused()) {
 				InputWidget.RevokeFocus();
-				caretPos.IsVisible = false;
+				CaretPos.IsVisible = false;
 			}
 			DisplayWidget.Tasks.StopByTag(this);
 		}
@@ -233,14 +233,14 @@ namespace Lime
 
 		private void InsertChar(char ch)
 		{
-			if (caretPos.TextPos < 0 || caretPos.TextPos > Text.Text.Length) return;
+			if (CaretPos.TextPos < 0 || CaretPos.TextPos > Text.Text.Length) return;
 			if (!EditorParams.IsAcceptableLength(Text.Text.Length + 1)) return;
 			if (ch != '\n' && !EditorParams.AllowNonDisplayableChars && !Text.CanDisplay(ch)) return;
-			var newText = Text.Text.Insert(caretPos.TextPos, ch.ToString());
+			var newText = Text.Text.Insert(CaretPos.TextPos, ch.ToString());
 			if (EditorParams.AcceptText != null && !EditorParams.AcceptText(newText)) return;
 			if (EditorParams.MaxHeight > 0 && !EditorParams.IsAcceptableHeight(CalcTextHeight(newText))) return;
 			Text.Text = newText;
-			caretPos.TextPos++;
+			CaretPos.TextPos++;
 		}
 
 		private float CalcTextHeight(string s)
@@ -321,39 +321,39 @@ namespace Lime
 		{
 			try {
 				if (WasKeyRepeated(Cmds.MoveCharPrev))
-					caretPos.TextPos--;
+					CaretPos.TextPos--;
 				if (WasKeyRepeated(Cmds.MoveCharNext))
-					caretPos.TextPos++;
+					CaretPos.TextPos++;
 				if (WasKeyRepeated(Cmds.MoveWordPrev))
-					caretPos.TextPos = PreviousWord(Text.Text, caretPos.TextPos);
+					CaretPos.TextPos = PreviousWord(Text.Text, CaretPos.TextPos);
 				if (WasKeyRepeated(Cmds.MoveWordNext))
-					caretPos.TextPos = NextWord(Text.Text, caretPos.TextPos);
+					CaretPos.TextPos = NextWord(Text.Text, CaretPos.TextPos);
 				if (IsMultiline() && WasKeyRepeated(Cmds.MoveLinePrev))
-					caretPos.Line--;
+					CaretPos.Line--;
 				if (IsMultiline() && WasKeyRepeated(Cmds.MoveLineNext))
-					caretPos.Line++;
+					CaretPos.Line++;
 				if (WasKeyRepeated(Cmds.MoveLineStart))
-					caretPos.Col = 0;
+					CaretPos.Col = 0;
 				if (WasKeyRepeated(Cmds.MoveLineEnd))
-					caretPos.Col = int.MaxValue;
+					CaretPos.Col = int.MaxValue;
 				if (WasKeyRepeated(Key.Commands.Delete)) {
-					if (caretPos.TextPos >= 0 && caretPos.TextPos < Text.Text.Length) {
-						Text.Text = Text.Text.Remove(caretPos.TextPos, 1);
-						caretPos.InvalidatePreservingTextPos();
+					if (CaretPos.TextPos >= 0 && CaretPos.TextPos < Text.Text.Length) {
+						Text.Text = Text.Text.Remove(CaretPos.TextPos, 1);
+						CaretPos.InvalidatePreservingTextPos();
 					}
 				}
 				if (WasKeyRepeated(Cmds.DeleteWordPrev)) {
-					var p = PreviousWord(Text.Text, caretPos.TextPos);
-					if (p < caretPos.TextPos) {
-						Text.Text = Text.Text.Remove(p, caretPos.TextPos - p);
-						caretPos.TextPos = p;
+					var p = PreviousWord(Text.Text, CaretPos.TextPos);
+					if (p < CaretPos.TextPos) {
+						Text.Text = Text.Text.Remove(p, CaretPos.TextPos - p);
+						CaretPos.TextPos = p;
 					}
 				}
 				if (WasKeyRepeated(Cmds.DeleteWordNext)) {
-					var p = NextWord(Text.Text, caretPos.TextPos);
-					if (p > caretPos.TextPos) {
-						Text.Text = Text.Text.Remove(caretPos.TextPos, p - caretPos.TextPos);
-						caretPos.InvalidatePreservingTextPos();
+					var p = NextWord(Text.Text, CaretPos.TextPos);
+					if (p > CaretPos.TextPos) {
+						Text.Text = Text.Text.Remove(CaretPos.TextPos, p - CaretPos.TextPos);
+						CaretPos.InvalidatePreservingTextPos();
 					}
 				}
 				if (WasKeyRepeated(Cmds.Submit)) {
@@ -375,7 +375,7 @@ namespace Lime
 				if (InputWidget.Input.WasKeyPressed(Key.Commands.Cut)) {
 					Clipboard.Text = Text.Text;
 					Text.Text = "";
-					caretPos.TextPos = 0;
+					CaretPos.TextPos = 0;
 				}
 				if (WasKeyRepeated(Key.Commands.Paste)) {
 					foreach (var ch in Clipboard.Text)
@@ -403,9 +403,9 @@ namespace Lime
 				// Some platforms, notably iOS, do not generate Key.BackSpace.
 				// OTOH, '\b' is emulated everywhere.
 				if (ch == '\b') {
-					if (caretPos.TextPos > 0 && caretPos.TextPos <= Text.Text.Length) {
-						caretPos.TextPos--;
-						Text.Text = Text.Text.Remove(caretPos.TextPos, 1);
+					if (CaretPos.TextPos > 0 && CaretPos.TextPos <= Text.Text.Length) {
+						CaretPos.TextPos--;
+						Text.Text = Text.Text.Remove(CaretPos.TextPos, 1);
 						lastCharShowTimeLeft = 0f;
 					}
 				}
@@ -443,9 +443,9 @@ namespace Lime
 			s.Content.Size = DisplayWidget.Size = Vector2.Max(
 				Text.MeasureText().ExpandedBy(DisplayWidget.Padding).Size,
 				s.Frame.Size);
-			if (!caretPos.IsVisible) return;
+			if (!CaretPos.IsVisible) return;
 			s.ScrollTo(
-				s.PositionToView(s.ProjectToScrollAxis(caretPos.WorldPos),
+				s.PositionToView(s.ProjectToScrollAxis(CaretPos.WorldPos),
 				DisplayWidget.Padding.Left, DisplayWidget.Padding.Right), instantly: true);
 		}
 
@@ -462,13 +462,13 @@ namespace Lime
 					HandleTextInput();
 					if (wasClicked) {
 						var t = DisplayWidget.LocalToWorldTransform.CalcInversed();
-						caretPos.WorldPos = t.TransformVector(InputWidget.Input.MousePosition);
+						CaretPos.WorldPos = t.TransformVector(InputWidget.Input.MousePosition);
 					}
 					Text.SyncCaretPosition();
 				}
 				AdjustSizeAndScrollToCaret();
 				var isFocused = InputWidget.IsFocused();
-				caretPos.IsVisible = isFocused;
+				CaretPos.IsVisible = isFocused;
 				if (!wasFocused && isFocused) {
 					originalText = Text.Text;
 				}
