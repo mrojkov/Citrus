@@ -259,6 +259,7 @@ namespace Lime
 			if (CaretPos.TextPos < 0 || CaretPos.TextPos > Text.Text.Length) return;
 			if (!EditorParams.IsAcceptableLength(Text.Text.Length + 1)) return;
 			if (ch != '\n' && !EditorParams.AllowNonDisplayableChars && !Text.CanDisplay(ch)) return;
+			HideSelection();
 			var newText = Text.Text.Insert(CaretPos.TextPos, ch.ToString());
 			if (EditorParams.AcceptText != null && !EditorParams.AcceptText(newText)) return;
 			if (EditorParams.MaxHeight > 0 && !EditorParams.IsAcceptableHeight(CalcTextHeight(newText))) return;
@@ -362,7 +363,7 @@ namespace Lime
 		{
 			EnsureSelection();
 			move();
-			SelectionEnd.TextPos = CaretPos.TextPos;
+			SelectionEnd.AssignFrom(CaretPos);
 		}
 
 		private void HandleKeys(string originalText)
@@ -422,7 +423,6 @@ namespace Lime
 					}
 				}
 				if (WasKeyRepeated(Cmds.Submit)) {
-					HideSelection();
 					if (EditorParams.IsAcceptableLines(Text.Text.Count(ch => ch == '\n') + 2)) {
 						InsertChar('\n');
 					} else {
@@ -446,7 +446,6 @@ namespace Lime
 					CaretPos.TextPos = 0;
 				}
 				if (WasKeyRepeated(Key.Commands.Paste)) {
-					HideSelection();
 					foreach (var ch in Clipboard.Text)
 						InsertChar(ch);
 				}
