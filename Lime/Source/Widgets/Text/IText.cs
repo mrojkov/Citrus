@@ -83,6 +83,7 @@ namespace Lime
 		void Submit();
 		bool CanDisplay(char ch);
 
+		ICaretPosition Caret { get; set; }
 		bool Localizable { get; set; }
 		string Text { get; set; }
 		string DisplayText { get; }

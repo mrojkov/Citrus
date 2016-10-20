@@ -206,15 +206,11 @@ namespace Lime
 		public readonly IText Text;
 		public readonly IEditorParams EditorParams;
 
-		public ICaretPosition CaretPos { get; }
-		public ICaretPosition SelectionStart { get; }
-		public ICaretPosition SelectionEnd { get; }
+		public ICaretPosition CaretPos { get; } = new CaretPosition();
+		public ICaretPosition SelectionStart { get; } = new CaretPosition();
+		public ICaretPosition SelectionEnd { get; } = new CaretPosition();
 
-		public Editor(
-			Widget container,
-			ICaretPosition caretPos,
-			ICaretPosition selectionStart, ICaretPosition selectionEnd,
-			IEditorParams editorParams, Widget inputWidget = null)
+		public Editor(Widget container, IEditorParams editorParams, Widget inputWidget = null)
 		{
 			DisplayWidget = container;
 			InputWidget = inputWidget ?? container;
@@ -223,10 +219,13 @@ namespace Lime
 			Text.TrimWhitespaces = false;
 			Text.Localizable = false;
 
-			CaretPos = caretPos;
-			SelectionStart = selectionStart;
-			SelectionEnd = selectionEnd;
 			EditorParams = editorParams;
+
+			var mc = new MultiCaretPosition();
+			mc.Add(CaretPos);
+			mc.Add(SelectionStart);
+			mc.Add(SelectionEnd);
+			Text.Caret = mc;
 
 			if (editorParams.PasswordChar != null) {
 				Text.TextProcessor += ProcessTextAsPassword;

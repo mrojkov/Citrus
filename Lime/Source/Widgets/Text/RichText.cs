@@ -246,6 +246,8 @@ namespace Lime
 			return false;
 		}
 
+		public ICaretPosition Caret { get; set; } = DummyCaretPosition.Instance;
+
 		void IText.SyncCaretPosition() { }
 
 		public bool CanDisplay(char ch) { return true; }
