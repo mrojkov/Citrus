@@ -6,6 +6,7 @@ namespace Tangerine.UI.Timeline
 {
 	public class Rulerbar
 	{
+		public int MeasuredFrameDistance { get; set; }
 		public Widget RootWidget { get; private set; }
 		
 		public Rulerbar()

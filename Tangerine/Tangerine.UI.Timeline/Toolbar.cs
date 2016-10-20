@@ -21,6 +21,7 @@ namespace Tangerine.UI.Timeline
 				Nodes = {
 					CreateAnimationModeButton(),
 					CreateAutoKeyframesButton(),
+					CreateAnimationIndicator(),
 					new Widget(),
 					CreateExitButton(),
 					CreateEyeButton(),
@@ -43,6 +44,17 @@ namespace Tangerine.UI.Timeline
 				UserPreferences.Instance.AnimationMode = !UserPreferences.Instance.AnimationMode;
 			};
 			return button;
+		}
+
+		Widget CreateAnimationIndicator()
+		{
+			var t = new SimpleText { Padding = new Thickness(4, 0) };
+			Action f = () => {
+				t.Text = $"{Document.Current.Container.AnimationFrame} : {Timeline.Instance.Ruler.MeasuredFrameDistance:+#;-#;0}";
+			};
+			t.Tasks.Add(new Property<int>(() => Document.Current.Container.AnimationFrame).DistinctUntilChanged().Consume(_ => f()));
+			t.Tasks.Add(new Property<int>(() => Timeline.Instance.Ruler.MeasuredFrameDistance).DistinctUntilChanged().Consume(_ => f()));
+			return t;
 		}
 
 		ToolbarButton CreateAutoKeyframesButton()

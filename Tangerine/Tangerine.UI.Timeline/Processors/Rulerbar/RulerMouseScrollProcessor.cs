@@ -16,8 +16,8 @@ namespace Tangerine.UI.Timeline
 			while (true) {
 				if (input.WasMousePressed()) {
 					input.CaptureMouse();
-					var initialColumn = timeline.CurrentColumn;
 					try {
+						int initialCol = CalcColumn(input.LocalMousePosition.X);
 						while (input.IsMousePressed()) {
 							var cw = TimelineMetrics.ColWidth;
 							var mp = input.LocalMousePosition.X;
@@ -26,19 +26,23 @@ namespace Tangerine.UI.Timeline
 							} else if (mp < cw / 2) {
 								timeline.ScrollPos.X -= cw;
 							}
-							timeline.CurrentColumn = ((mp + timeline.ScrollPos.X) / cw).Floor().Max(0);
+							Operations.SetCurrentColumn.Perform(CalcColumn(mp));
+							timeline.Ruler.MeasuredFrameDistance = timeline.CurrentColumn - initialCol;
 							Window.Current.Invalidate();
 							yield return null;
 						}
 					} finally {
+						timeline.Ruler.MeasuredFrameDistance = 0;
 						input.ReleaseMouse();
 					}
-					var currentColumn = timeline.CurrentColumn;
-					timeline.CurrentColumn = initialColumn;
-					Operations.SetCurrentColumn.Perform(currentColumn);
 				}
 				yield return null;
 			}
+		}
+
+		int CalcColumn(float mouseX)
+		{
+			return ((mouseX + timeline.ScrollPos.X) / TimelineMetrics.ColWidth).Floor().Max(0);
 		}
 	}	
 }
