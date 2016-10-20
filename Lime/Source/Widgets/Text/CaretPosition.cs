@@ -146,7 +146,8 @@ namespace Lime
 
 		public void InvalidatePreservingTextPos()
 		{
-			Valid = ValidState.TextPos;
+			if (Valid == ValidState.All)
+				Valid = ValidState.TextPos;
 		}
 
 		public void ClampTextPos(int textLength)
