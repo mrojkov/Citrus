@@ -66,11 +66,16 @@ namespace Tangerine.UI.Inspector
 			AddEditor(typeof(bool), c => new BooleanPropertyEditor(c));
 			AddEditor(typeof(Color4), c => new Color4PropertyEditor(c));
 			AddEditor(typeof(Blending), c => new EnumPropertyEditor<Blending>(c));
+			AddEditor(typeof(ShaderId), c => new EnumPropertyEditor<ShaderId>(c));
 			AddEditor(typeof(Anchors), c => new EnumPropertyEditor<Anchors>(c));
 			AddEditor(typeof(RenderTarget), c => new EnumPropertyEditor<RenderTarget>(c));
 			AddEditor(typeof(ITexture), c => new TexturePropertyEditor(c));
 			AddEditor(typeof(HAlignment), c => new EnumPropertyEditor<HAlignment>(c));
 			AddEditor(typeof(VAlignment), c => new EnumPropertyEditor<VAlignment>(c));
+			AddEditor(typeof(AudioAction), c => new EnumPropertyEditor<AudioAction>(c));
+			AddEditor(typeof(MovieAction), c => new EnumPropertyEditor<MovieAction>(c));
+			AddEditor(typeof(EmitterShape), c => new EnumPropertyEditor<EmitterShape>(c));
+			AddEditor(typeof(EmissionType), c => new EnumPropertyEditor<EmissionType>(c));
 			AddEditor(typeof(TextOverflowMode), c => new EnumPropertyEditor<TextOverflowMode>(c));
 		}
 
