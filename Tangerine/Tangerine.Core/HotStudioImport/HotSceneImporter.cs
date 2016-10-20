@@ -120,9 +120,6 @@ namespace Orange
 						node.Nodes.Add(child);
 				}
 				lexer.ParseToken(']');
-				if (node is Widget) {
-					ReorderBones(node as Widget);
-				}
 				break;
 			case "Animators":
 				lexer.ParseToken('[');
