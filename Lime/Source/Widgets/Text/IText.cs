@@ -66,6 +66,7 @@ namespace Lime
 		void ClampCol(int maxCol);
 		void NextLine();
 		ICaretPosition Clone();
+		void AssignFrom(ICaretPosition c);
 	}
 
 	public delegate void TextProcessorDelegate(ref string text);

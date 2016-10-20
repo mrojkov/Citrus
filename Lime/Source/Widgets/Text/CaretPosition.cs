@@ -181,6 +181,19 @@ namespace Lime
 		{
 			return (CaretPosition)MemberwiseClone();
 		}
+
+		public void AssignFrom(ICaretPosition c)
+		{
+			line = c.Line;
+			col = c.Col;
+			textPos = c.TextPos;
+			worldPos = c.WorldPos;
+			isVisible = c.IsVisible;
+			var cp = c as CaretPosition;
+			if (cp != null) {
+				Valid = cp.Valid;
+			}
+		}
 	}
 
 	internal class DummyCaretPosition: ICaretPosition
@@ -207,6 +220,7 @@ namespace Lime
 		public void ClampCol(int maxCol) {}
 		public void NextLine() {}
 		public ICaretPosition Clone() { return this; }
+		public void AssignFrom(ICaretPosition c) { }
 	}
 
 	internal class MultiCaretPosition : ICaretPosition
@@ -232,9 +246,12 @@ namespace Lime
 		public void ClampLine(int lineCount) => carets.ForEach(c => c.ClampLine(lineCount));
 		public void ClampCol(int maxCol) => carets.ForEach(c => c.ClampCol(maxCol));
 		public void NextLine() => carets.ForEach(c => c.NextLine());
+		public ICaretPosition Clone() => new MultiCaretPosition { carets = carets.Select(c => c.Clone()).ToList() };
 
-		public ICaretPosition Clone() =>
-			new MultiCaretPosition { carets = carets.Select(c => c.Clone()).ToList() };
+		public void AssignFrom(ICaretPosition c)
+		{
+			throw new InvalidOperationException();
+		}
 
 		public void Add(ICaretPosition c) => carets.Add(c);
 	}
