@@ -431,10 +431,12 @@ namespace Lime
 			}
 		}
 
-		private void AdjustSizeAndScrollToCaret()
+		public void AdjustSizeAndScrollToCaret()
 		{
 			var s = EditorParams.Scroll;
 			if (s == null) return;
+			// Layout has not been not done yet.
+			if (s.Frame.Size == Vector2.Zero) return;
 			// ScrollView limits scrolling by Content.Size.
 			// Container.Size must be large enough to satistfy scissor test,
 			// but not less than Frame.Size to support alignment.
