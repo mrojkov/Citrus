@@ -59,6 +59,7 @@ namespace Tangerine.UI.Timeline
 		{
 			var button = new ToolbarButton(IconPool.GetTexture("Timeline.ExitContainer")) { Tip = "Exit current container (backspace)" };
 			button.Clicked += Core.Operations.LeaveNode.Perform;
+			button.Updating += _ => button.Enabled = Core.Operations.LeaveNode.IsAllowed();
 			return button;
 		}
 

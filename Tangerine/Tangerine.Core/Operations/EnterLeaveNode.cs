@@ -63,5 +63,11 @@ namespace Tangerine.Core.Operations
 				SelectNode.Perform(container, true);
 			}
 		}
+
+		public static bool IsAllowed()
+		{
+			var doc = Document.Current;
+			return doc.Container != doc.RootNode || doc.SceneNavigatedFrom != null;
+		}
 	}
 }
