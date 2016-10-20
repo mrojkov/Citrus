@@ -48,7 +48,11 @@ namespace Orange
 				value = ((string)value).Replace("\n", "\\n").Replace("\\", "\\\\");
 				return $"\"{value}\"";
 			}
-			if (value is int || value is AudioAction || value is MovieAction || value is HAlignment || value is VAlignment || value is EmitterShape) {
+			if (
+				value is int || value is AudioAction || value is MovieAction ||
+				value is HAlignment || value is VAlignment || value is EmitterShape ||
+				value is EmissionType
+			) {
 				return ((int)value).ToString();
 			}
 			if (value is float) {
