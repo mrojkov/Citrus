@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Lime
 {
@@ -205,5 +207,35 @@ namespace Lime
 		public void ClampCol(int maxCol) {}
 		public void NextLine() {}
 		public ICaretPosition Clone() { return this; }
+	}
+
+	internal class MultiCaretPosition : ICaretPosition
+	{
+		private List<ICaretPosition> carets = new List<ICaretPosition>();
+
+		public bool IsValid => carets.All(c => c.IsValid);
+
+		public int Line { get; set; }
+		public int Col { get; set; }
+		public int TextPos { get; set; }
+		public Vector2 WorldPos { get; set; }
+		public bool IsVisible {
+			get { return carets.Any(c => c.IsVisible); }
+			set { }
+		}
+		public void EmptyText(Vector2 pos) => carets.ForEach(c => c.EmptyText(pos));
+		public void StartSync() => carets.ForEach(c => c.StartSync());
+		public void Sync(int index, Vector2 charPos, Vector2 size) => carets.ForEach(c => c.Sync(index, charPos, size));
+		public void FinishSync() => carets.ForEach(c => c.FinishSync());
+		public void InvalidatePreservingTextPos() => carets.ForEach(c => c.InvalidatePreservingTextPos());
+		public void ClampTextPos(int textLength) => carets.ForEach(c => c.ClampTextPos(textLength));
+		public void ClampLine(int lineCount) => carets.ForEach(c => c.ClampLine(lineCount));
+		public void ClampCol(int maxCol) => carets.ForEach(c => c.ClampCol(maxCol));
+		public void NextLine() => carets.ForEach(c => c.NextLine());
+
+		public ICaretPosition Clone() =>
+			new MultiCaretPosition { carets = carets.Select(c => c.Clone()).ToList() };
+
+		public void Add(ICaretPosition c) => carets.Add(c);
 	}
 }
