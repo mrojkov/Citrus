@@ -296,7 +296,8 @@ namespace Lime
 			if (CaretPos.TextPos < 0 || CaretPos.TextPos > Text.Text.Length) return;
 			if (!EditorParams.IsAcceptableLength(Text.Text.Length + 1)) return;
 			if (ch != '\n' && !EditorParams.AllowNonDisplayableChars && !Text.CanDisplay(ch)) return;
-			HideSelection();
+			if (HasSelection())
+				DeleteSelection();
 			var newText = Text.Text.Insert(CaretPos.TextPos, ch.ToString());
 			if (EditorParams.AcceptText != null && !EditorParams.AcceptText(newText)) return;
 			if (EditorParams.MaxHeight > 0 && !EditorParams.IsAcceptableHeight(CalcTextHeight(newText))) return;
@@ -319,6 +320,9 @@ namespace Lime
 					Cmds.MoveCharPrev, Cmds.MoveCharNext,
 					Cmds.MoveWordPrev, Cmds.MoveWordNext,
 					Cmds.MoveLineStart, Cmds.MoveLineEnd,
+					Cmds.SelectCharPrev, Cmds.SelectCharNext,
+					Cmds.SelectWordPrev, Cmds.SelectWordNext,
+					Cmds.SelectLineStart, Cmds.SelectLineEnd,
 					Cmds.DeleteWordPrev, Cmds.DeleteWordNext,
 					Cmds.Submit, Cmds.Cancel,
 					Key.Commands.Cut, Key.Commands.Copy, Key.Commands.Paste, Key.Commands.Delete,
@@ -378,6 +382,9 @@ namespace Lime
 
 		private bool IsMultiline() { return EditorParams.IsAcceptableLines(2); }
 
+		private bool HasSelection() =>
+			SelectionStart.IsVisible && SelectionStart.IsValid && SelectionEnd.IsValid;
+
 		private void EnsureSelection()
 		{
 			if (SelectionStart.IsVisible) return;
@@ -403,6 +410,28 @@ namespace Lime
 			SelectionEnd.AssignFrom(CaretPos);
 		}
 
+		private struct SelectionRange
+		{
+			public int Start;
+			public int Length;
+		}
+
+		private SelectionRange GetSelectionRange() =>
+			new SelectionRange {
+				Start = Math.Min(SelectionStart.TextPos, SelectionEnd.TextPos),
+				Length = Math.Abs(SelectionStart.TextPos - SelectionEnd.TextPos)
+			};
+
+		private void DeleteSelection()
+		{
+			if (!HasSelection()) return;
+			var r = GetSelectionRange();
+			Text.Text = Text.Text.Remove(r.Start, r.Length);
+			CaretPos.TextPos = r.Start;
+			CaretPos.InvalidatePreservingTextPos();
+			HideSelection();
+		}
+
 		private void HandleKeys(string originalText)
 		{
 			try {
@@ -422,13 +451,6 @@ namespace Lime
 					MoveCaret(() => CaretPos.Col = 0);
 				if (WasKeyRepeated(Cmds.MoveLineEnd))
 					MoveCaret(() => CaretPos.Col = int.MaxValue);
-				if (WasKeyRepeated(Key.Commands.Delete)) {
-					HideSelection();
-					if (CaretPos.TextPos >= 0 && CaretPos.TextPos < Text.Text.Length) {
-						Text.Text = Text.Text.Remove(CaretPos.TextPos, 1);
-						CaretPos.InvalidatePreservingTextPos();
-					}
-				}
 
 				if (WasKeyRepeated(Cmds.SelectCharPrev))
 					MoveCaretSelection(() => CaretPos.TextPos--);
@@ -443,6 +465,14 @@ namespace Lime
 				if (WasKeyRepeated(Cmds.SelectLineEnd))
 					MoveCaretSelection(() => CaretPos.Col = int.MaxValue);
 
+				if (WasKeyRepeated(Key.Commands.Delete)) {
+					if (HasSelection())
+						DeleteSelection();
+					else if (CaretPos.TextPos >= 0 && CaretPos.TextPos < Text.Text.Length) {
+						Text.Text = Text.Text.Remove(CaretPos.TextPos, 1);
+						CaretPos.InvalidatePreservingTextPos();
+					}
+				}
 				if (WasKeyRepeated(Cmds.DeleteWordPrev)) {
 					HideSelection();
 					var p = PreviousWord(Text.Text, CaretPos.TextPos);
@@ -463,6 +493,7 @@ namespace Lime
 					if (EditorParams.IsAcceptableLines(Text.Text.Count(ch => ch == '\n') + 2)) {
 						InsertChar('\n');
 					} else {
+						HideSelection();
 						InputWidget.Input.ConsumeKey(Cmds.Submit);
 						InputWidget.RevokeFocus();
 					}
@@ -473,14 +504,14 @@ namespace Lime
 					InputWidget.Input.ConsumeKey(Cmds.Cancel);
 					InputWidget.RevokeFocus();
 				}
-				if (InputWidget.Input.WasKeyPressed(Key.Commands.Copy)) {
-					Clipboard.Text = Text.Text;
+				if (InputWidget.Input.WasKeyPressed(Key.Commands.Copy) && HasSelection()) {
+					var r = GetSelectionRange();
+					Clipboard.Text = Text.Text.Substring(r.Start, r.Length);
 				}
-				if (InputWidget.Input.WasKeyPressed(Key.Commands.Cut)) {
-					HideSelection();
-					Clipboard.Text = Text.Text;
-					Text.Text = "";
-					CaretPos.TextPos = 0;
+				if (InputWidget.Input.WasKeyPressed(Key.Commands.Cut) && HasSelection()) {
+					var r = GetSelectionRange();
+					Clipboard.Text = Text.Text.Substring(r.Start, r.Length);
+					DeleteSelection();
 				}
 				if (WasKeyRepeated(Key.Commands.Paste)) {
 					foreach (var ch in Clipboard.Text)
@@ -508,7 +539,9 @@ namespace Lime
 				// Some platforms, notably iOS, do not generate Key.BackSpace.
 				// OTOH, '\b' is emulated everywhere.
 				if (ch == '\b') {
-					if (CaretPos.TextPos > 0 && CaretPos.TextPos <= Text.Text.Length) {
+					if (HasSelection())
+						DeleteSelection();
+					else if (CaretPos.TextPos > 0 && CaretPos.TextPos <= Text.Text.Length) {
 						CaretPos.TextPos--;
 						Text.Text = Text.Text.Remove(CaretPos.TextPos, 1);
 						lastCharShowTimeLeft = 0f;
