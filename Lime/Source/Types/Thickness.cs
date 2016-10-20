@@ -7,6 +7,8 @@ namespace Lime
 		public float Right;
 		public float Bottom;
 
+		public static Thickness Zero = new Thickness(0);
+
 		public Thickness(float overall)
 		{
 			Left = Top = Right = Bottom = overall;
