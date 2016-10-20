@@ -438,12 +438,10 @@ namespace Lime
 			// ScrollView limits scrolling by Content.Size.
 			// Container.Size must be large enough to satistfy scissor test,
 			// but not less than Frame.Size to support alignment.
-			var b = Rectangle.Bounds(
-				Text.MeasureText().ExpandedBy(DisplayWidget.Padding),
-				new Rectangle(Vector2.Zero, s.Frame.Size));
-			s.Content.Size = DisplayWidget.Size = b.Size;
+			s.Content.Size = DisplayWidget.Size = Vector2.Max(
+				Text.MeasureText().ExpandedBy(DisplayWidget.Padding).Size,
+				s.Frame.Size);
 			if (!caretPos.IsVisible) return;
-			s.MinScrollPosition = s.ProjectToScrollAxis(b.A);
 			s.ScrollTo(
 				s.PositionToView(s.ProjectToScrollAxis(caretPos.WorldPos),
 				DisplayWidget.Padding.Left, DisplayWidget.Padding.Right), instantly: true);
