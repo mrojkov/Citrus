@@ -14,21 +14,29 @@ namespace Tangerine.UI
 
 		public readonly Widget RootWidget;
 		public readonly Widget TitleWidget;
+		public readonly SimpleText TitleLabel;
 		public readonly Widget ContentWidget;
 		public readonly Button CloseButton;
-		public readonly string Title;
+		public readonly string Id;
 
-		public DockPanel(string title)
+		public string Title
 		{
-			Title = title;
+			get { return TitleLabel.Text; }
+			set { TitleLabel.Text = value; }
+		}
+
+		public DockPanel(string id, string title = null)
+		{
+			Id = id;
 			TitleWidget = new Widget {
 				Layout = new HBoxLayout(),
 				Nodes = {
-					new SimpleText { Text = Title, Padding = new Thickness(4, 0), AutoSizeConstraints = false, MinMaxHeight = DesktopTheme.Metrics.MinTabSize.Y },
+					(TitleLabel = new SimpleText { Padding = new Thickness(4, 0), AutoSizeConstraints = false, MinMaxHeight = DesktopTheme.Metrics.MinTabSize.Y }),
 					(CloseButton = new DesktopTheme.TabCloseButton { LayoutCell = new LayoutCell(Alignment.Center) })
 				},
 				HitTestTarget = true
 			};
+			Title = title ?? id;
 			TitleWidget.CompoundPresenter.Add(new DelegatePresenter<Widget>(w => {
 				w.PrepareRendererState();
 				Renderer.DrawRect(Vector2.Zero, w.Size, DockingColors.PanelTitleBackground);

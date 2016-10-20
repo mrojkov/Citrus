@@ -21,6 +21,7 @@ namespace Tangerine.UI.Timeline
 		public readonly GridPane Grid = new GridPane();
 		public readonly RollPane Roll = new RollPane();
 		public readonly Widget PanelWidget;
+		public readonly DockPanel Panel;
 		public readonly Widget RootWidget = new Widget();
 
 		public Vector2 ScrollPos;
@@ -45,9 +46,10 @@ namespace Tangerine.UI.Timeline
 		public GridSelection GridSelection = new GridSelection();
 		public readonly Entity Globals = new Entity();
 
-		public Timeline(Widget panelWidget)
+		public Timeline(DockPanel panel)
 		{
-			PanelWidget = panelWidget;
+			Panel = panel;
+			PanelWidget = panel.ContentWidget;
 			CreateProcessors();
 			InitializeWidgets();
 		}
@@ -116,8 +118,9 @@ namespace Tangerine.UI.Timeline
 				new ClampScrollPosProcessor(),
 				new ClampScrollPosOnContainerChange().GetProcessor(),
 				new EditMarkerProcessor(),
+				new SelectFirstNodeOnDocumentOpeningProcessor(),
 				EnsureCurrentColumnVisibleOnContainerChange(),
-				new SelectFirstNodeOnDocumentOpeningProcessor()
+				PanelTitleUpdater(),
 			});
 		}
 
@@ -136,6 +139,21 @@ namespace Tangerine.UI.Timeline
 		{
 			return new Property<Node>(() => Document.Current.Container).
 				DistinctUntilChanged().Consume(_ => EnsureColumnVisible(Document.Current.AnimationFrame));
+		}
+
+		IProcessor PanelTitleUpdater()
+		{
+			return new Property<Node>(() => Document.Current.Container).DistinctUntilChanged().Consume(_ => {
+				Panel.Title = "Timeline";
+				var t = "";
+				for (var n = Document.Current.Container; n != Document.Current.RootNode; n = n.Parent) {
+					var id = string.IsNullOrEmpty(n.Id) ? "?" : n.Id;
+					t = id + ((t != "") ? ": " + t : t);
+				}
+				if (t != "") {
+					Panel.Title += " - '" + t + "'";
+				}
+			});
 		}
 
 		void SetCurrentFrameRecursive(Node node, int frame)

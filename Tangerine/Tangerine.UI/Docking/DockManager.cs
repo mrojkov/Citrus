@@ -61,7 +61,7 @@ namespace Tangerine.UI
 			padsMenu.Add(new DelegateCommand(panel.Title, () => ShowPanel(panel)));
 			padsMenu.Refresh();
 			var dockedSize = CalcDockedSize(site, size);
-			panel.Placement = new DockPanel.PanelPlacement { Title = panel.Title, Site = site, DockedSize = dockedSize, Docked = true, UndockedSize = size };
+			panel.Placement = new DockPanel.PanelPlacement { Title = panel.Id, Site = site, DockedSize = dockedSize, Docked = true, UndockedSize = size };
 			panels.Add(panel);
 			var db = new DockPanel.DragBehaviour(MainWindowWidget, panel);
 			db.OnDock += newDockSite => {
@@ -205,7 +205,7 @@ namespace Tangerine.UI
 				MainWindowWidget.Window.ClientPosition = state.MainWindowPosition;
 			}
 			foreach (var p in panels) {
-				var pp = state.PanelPlacements.FirstOrDefault(i => i.Title == p.Title);
+				var pp = state.PanelPlacements.FirstOrDefault(i => i.Title == p.Id);
 				if (pp != null) {
 					p.Placement = pp;
 				}

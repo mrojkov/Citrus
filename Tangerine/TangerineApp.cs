@@ -75,7 +75,7 @@ namespace Tangerine
 				if (doc.Views.Count == 0) {
 					doc.Views.AddRange(new IDocumentView [] {
 						new UI.Inspector.Inspector(inspectorPanel.ContentWidget),
-						new UI.Timeline.Timeline(timelinePanel.ContentWidget),
+						new UI.Timeline.Timeline(timelinePanel),
 						new UI.SceneView.SceneView(documentViewContainer),
 						new UI.Console(consolePanel.ContentWidget),
 						new UI.SearchPanel(searchPanel.ContentWidget),
