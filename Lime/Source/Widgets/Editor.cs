@@ -99,6 +99,7 @@ namespace Lime
 		public Color4 Color { get; set; } = Color4.Yellow;
 		public Color4 OutlineColor { get; set; } = Color4.Orange;
 		public Thickness Padding { get; set; } = new Thickness(1f);
+		public float OutlineThickness{ get; set; } = 1f;
 	}
 
 	public class SelectionPresenter: CustomPresenter, IPresenter
@@ -119,15 +120,46 @@ namespace Lime
 			container.CompoundPresenter.Add(this);
 		}
 
+		private List<Rectangle> PrepareRows(Vector2 s, Vector2 e, float fh)
+		{
+			var rows = new List<Rectangle>();
+			if (s.Y == e.Y) {
+				rows.Add(new Rectangle(s, e + Vector2.Down * fh));
+			} else { // Multi-line selection.
+				rows.Add(new Rectangle(s, new Vector2(float.PositiveInfinity, s.Y + fh)));
+				if (s.Y + fh < e.Y)
+					rows.Add(new Rectangle(0, s.Y + fh, float.PositiveInfinity, e.Y));
+				rows.Add(new Rectangle(new Vector2(0, e.Y), e + Vector2.Down * fh));
+			}
+			return rows;
+		}
+
 		public override void Render(Node node)
 		{
 			if (!selectionStart.IsVisible || !selectionEnd.IsVisible) return;
+
+			var s = selectionStart.WorldPos;
+			var e = selectionEnd.WorldPos;
+			if (s == e) return;
+			if (s.Y > e.Y || s.Y == e.Y && s.X > e.X) {
+				var t = s;
+				s = e;
+				e = t;
+			}
 			var text = (SimpleText)node;
 			text.PrepareRendererState();
-			var r = new Rectangle(selectionStart.WorldPos, selectionEnd.WorldPos + Vector2.Down * text.FontHeight).
-				Normalized.ExpandedBy(selectionParams.Padding);
-			Renderer.DrawRect(r.A, r.B, selectionParams.Color);
-			Renderer.DrawRectOutline(r.A, r.B, selectionParams.OutlineColor);
+
+			var th = selectionParams.OutlineThickness;
+			var b = text.MeasureText().ShrinkedBy(new Thickness(th));
+			var rows = PrepareRows(s, e, text.FontHeight).
+				Select(r => Rectangle.Intersect(r.ExpandedBy(selectionParams.Padding), b)).ToList();
+
+			foreach (var r in rows) {
+				var r1 = r.ExpandedBy(new Thickness(th));
+				Renderer.DrawRectOutline(r1.A, r1.B, selectionParams.OutlineColor, th);
+			}
+			foreach (var r in rows)
+				Renderer.DrawRect(r.A, r.B, selectionParams.Color);
 		}
 	}
 
