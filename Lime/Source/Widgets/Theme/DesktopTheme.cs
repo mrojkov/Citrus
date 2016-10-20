@@ -151,10 +151,22 @@ namespace Lime
 			tw.TrimWhitespaces = false;
 			tw.OverflowMode = TextOverflowMode.Ignore;
 			tw.Padding = Metrics.ControlsPadding;
-			tw.Caret = new CaretPosition();
+			var caret = new CaretPosition();
+			var selStart = new CaretPosition();
+			var selEnd = new CaretPosition();
+			var mc = new MultiCaretPosition();
+			mc.Add(caret);
+			mc.Add(selStart);
+			mc.Add(selEnd);
+			tw.Caret = mc;
 			var editorParams = new EditorParams { MaxLength = 100, MaxLines = 1, Scroll = eb.Scroll };
-			new CaretDisplay(tw, tw.Caret, new CaretParams { CaretPresenter = new VerticalLineCaret() });
-			eb.Editor = new Editor(tw, tw.Caret, editorParams, eb);
+			new CaretDisplay(tw, caret, new CaretParams { CaretPresenter = new VerticalLineCaret() });
+			new CaretDisplay(tw, selStart, new CaretParams {
+				CaretPresenter = new VerticalLineCaret { Color = Color4.Red }, FollowTextColor = false, BlinkInterval = 0 });
+			new CaretDisplay(tw, selEnd, new CaretParams {
+				CaretPresenter = new VerticalLineCaret { Color = Color4.Blue }, FollowTextColor = false, BlinkInterval = 0 });
+
+			eb.Editor = new Editor(tw, caret, selStart, selEnd, editorParams, eb);
 			eb.TabTravesable = new TabTraversable();
 			eb.CompoundPresenter.Add(new BorderedFramePresenter(Colors.WhiteBackground, Colors.ControlBorder));
 			eb.CompoundPostPresenter.Add(new KeyboardFocusBorderPresenter());

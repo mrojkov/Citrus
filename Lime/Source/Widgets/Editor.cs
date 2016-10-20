@@ -168,17 +168,27 @@ namespace Lime
 		public readonly IEditorParams EditorParams;
 
 		public ICaretPosition CaretPos { get; }
+		public ICaretPosition SelectionStart { get; }
+		public ICaretPosition SelectionEnd { get; }
 
-		public Editor(Widget container, ICaretPosition caretPos, IEditorParams editorParams, Widget inputWidget = null)
+		public Editor(
+			Widget container,
+			ICaretPosition caretPos,
+			ICaretPosition selectionStart, ICaretPosition selectionEnd,
+			IEditorParams editorParams, Widget inputWidget = null)
 		{
 			DisplayWidget = container;
 			InputWidget = inputWidget ?? container;
 			DisplayWidget.HitTestTarget = true;
 			Text = (IText)container;
 			Text.TrimWhitespaces = false;
-			EditorParams = editorParams;
-			CaretPos = caretPos;
 			Text.Localizable = false;
+
+			CaretPos = caretPos;
+			SelectionStart = selectionStart;
+			SelectionEnd = selectionEnd;
+			EditorParams = editorParams;
+
 			if (editorParams.PasswordChar != null) {
 				Text.TextProcessor += ProcessTextAsPassword;
 				container.Tasks.Add(TrackLastCharInput, this);
@@ -187,20 +197,33 @@ namespace Lime
 		}
 
 		public static class Cmds {
+#if MAC
+			private const Modifiers WordModifier = Modifiers.Alt;
+#else
+			private const Modifiers WordModifier = Modifiers.Control;
+#endif
+			private const Modifiers SelectModifier = Modifiers.Shift;
+
 			public static Key MoveCharPrev = Key.MapShortcut(Key.Left);
 			public static Key MoveCharNext = Key.MapShortcut(Key.Right);
-#if MAC
-			public static Key MoveWordPrev = Key.MapShortcut(Modifiers.Alt, Key.Left);
-			public static Key MoveWordNext = Key.MapShortcut(Modifiers.Alt, Key.Right);
-#else
-			public static Key MoveWordPrev = Key.MapShortcut(Modifiers.Control, Key.Left);
-			public static Key MoveWordNext = Key.MapShortcut(Modifiers.Control, Key.Right);
-#endif
+
+			public static Key MoveWordPrev = Key.MapShortcut(WordModifier, Key.Left);
+			public static Key MoveWordNext = Key.MapShortcut(WordModifier, Key.Right);
+
 			public static Key MoveLinePrev = Key.MapShortcut(Key.Up);
 			public static Key MoveLineNext = Key.MapShortcut(Key.Down);
 
 			public static Key MoveLineStart = Key.MapShortcut(Key.Home);
 			public static Key MoveLineEnd = Key.MapShortcut(Key.End);
+
+			public static Key SelectCharPrev = Key.MapShortcut(SelectModifier, Key.Left);
+			public static Key SelectCharNext = Key.MapShortcut(SelectModifier, Key.Right);
+
+			public static Key SelectWordPrev = Key.MapShortcut(SelectModifier | WordModifier, Key.Left);
+			public static Key SelectWordNext = Key.MapShortcut(SelectModifier | WordModifier, Key.Right);
+
+			public static Key SelectLineStart = Key.MapShortcut(SelectModifier, Key.Home);
+			public static Key SelectLineEnd = Key.MapShortcut(SelectModifier, Key.End);
 
 			public static Key DeleteWordPrev = Key.MapShortcut(Modifiers.Control, Key.BackSpace);
 			public static Key DeleteWordNext = Key.MapShortcut(Modifiers.Control, Key.Delete);
@@ -317,32 +340,73 @@ namespace Lime
 
 		private bool IsMultiline() { return EditorParams.IsAcceptableLines(2); }
 
+		private void EnsureSelection()
+		{
+			if (SelectionStart.IsVisible) return;
+			SelectionStart.IsVisible = SelectionEnd.IsVisible = true;
+			SelectionStart.TextPos = SelectionEnd.TextPos = CaretPos.TextPos;
+		}
+
+		private void HideSelection()
+		{
+			SelectionStart.IsVisible = SelectionEnd.IsVisible = false;
+		}
+
+		private void MoveCaret(Action move)
+		{
+			HideSelection();
+			move();
+		}
+
+		private void MoveCaretSelection(Action move)
+		{
+			EnsureSelection();
+			move();
+			SelectionEnd.TextPos = CaretPos.TextPos;
+		}
+
 		private void HandleKeys(string originalText)
 		{
 			try {
 				if (WasKeyRepeated(Cmds.MoveCharPrev))
-					CaretPos.TextPos--;
+					MoveCaret(() => CaretPos.TextPos--);
 				if (WasKeyRepeated(Cmds.MoveCharNext))
-					CaretPos.TextPos++;
+					MoveCaret(() => CaretPos.TextPos++);
 				if (WasKeyRepeated(Cmds.MoveWordPrev))
-					CaretPos.TextPos = PreviousWord(Text.Text, CaretPos.TextPos);
+					MoveCaret(() => CaretPos.TextPos = PreviousWord(Text.Text, CaretPos.TextPos));
 				if (WasKeyRepeated(Cmds.MoveWordNext))
-					CaretPos.TextPos = NextWord(Text.Text, CaretPos.TextPos);
+					MoveCaret(() => CaretPos.TextPos = NextWord(Text.Text, CaretPos.TextPos));
 				if (IsMultiline() && WasKeyRepeated(Cmds.MoveLinePrev))
-					CaretPos.Line--;
+					MoveCaret(() => CaretPos.Line--);
 				if (IsMultiline() && WasKeyRepeated(Cmds.MoveLineNext))
-					CaretPos.Line++;
+					MoveCaret(() => CaretPos.Line++);
 				if (WasKeyRepeated(Cmds.MoveLineStart))
-					CaretPos.Col = 0;
+					MoveCaret(() => CaretPos.Col = 0);
 				if (WasKeyRepeated(Cmds.MoveLineEnd))
-					CaretPos.Col = int.MaxValue;
+					MoveCaret(() => CaretPos.Col = int.MaxValue);
 				if (WasKeyRepeated(Key.Commands.Delete)) {
+					HideSelection();
 					if (CaretPos.TextPos >= 0 && CaretPos.TextPos < Text.Text.Length) {
 						Text.Text = Text.Text.Remove(CaretPos.TextPos, 1);
 						CaretPos.InvalidatePreservingTextPos();
 					}
 				}
+
+				if (WasKeyRepeated(Cmds.SelectCharPrev))
+					MoveCaretSelection(() => CaretPos.TextPos--);
+				if (WasKeyRepeated(Cmds.SelectCharNext))
+					MoveCaretSelection(() => CaretPos.TextPos++);
+				if (WasKeyRepeated(Cmds.SelectWordPrev))
+					MoveCaretSelection(() => CaretPos.TextPos = PreviousWord(Text.Text, CaretPos.TextPos));
+				if (WasKeyRepeated(Cmds.SelectWordNext))
+					MoveCaretSelection(() => CaretPos.TextPos = NextWord(Text.Text, CaretPos.TextPos));
+				if (WasKeyRepeated(Cmds.SelectLineStart))
+					MoveCaretSelection(() => CaretPos.Col = 0);
+				if (WasKeyRepeated(Cmds.SelectLineEnd))
+					MoveCaretSelection(() => CaretPos.Col = int.MaxValue);
+
 				if (WasKeyRepeated(Cmds.DeleteWordPrev)) {
+					HideSelection();
 					var p = PreviousWord(Text.Text, CaretPos.TextPos);
 					if (p < CaretPos.TextPos) {
 						Text.Text = Text.Text.Remove(p, CaretPos.TextPos - p);
@@ -350,6 +414,7 @@ namespace Lime
 					}
 				}
 				if (WasKeyRepeated(Cmds.DeleteWordNext)) {
+					HideSelection();
 					var p = NextWord(Text.Text, CaretPos.TextPos);
 					if (p > CaretPos.TextPos) {
 						Text.Text = Text.Text.Remove(CaretPos.TextPos, p - CaretPos.TextPos);
@@ -357,6 +422,7 @@ namespace Lime
 					}
 				}
 				if (WasKeyRepeated(Cmds.Submit)) {
+					HideSelection();
 					if (EditorParams.IsAcceptableLines(Text.Text.Count(ch => ch == '\n') + 2)) {
 						InsertChar('\n');
 					} else {
@@ -365,6 +431,7 @@ namespace Lime
 					}
 				}
 				if (WasKeyRepeated(Cmds.Cancel)) {
+					HideSelection();
 					Text.Text = originalText;
 					InputWidget.Input.ConsumeKey(Cmds.Cancel);
 					InputWidget.RevokeFocus();
@@ -373,11 +440,13 @@ namespace Lime
 					Clipboard.Text = Text.Text;
 				}
 				if (InputWidget.Input.WasKeyPressed(Key.Commands.Cut)) {
+					HideSelection();
 					Clipboard.Text = Text.Text;
 					Text.Text = "";
 					CaretPos.TextPos = 0;
 				}
 				if (WasKeyRepeated(Key.Commands.Paste)) {
+					HideSelection();
 					foreach (var ch in Clipboard.Text)
 						InsertChar(ch);
 				}
