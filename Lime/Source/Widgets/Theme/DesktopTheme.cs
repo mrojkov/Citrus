@@ -161,10 +161,7 @@ namespace Lime
 			tw.Caret = mc;
 			var editorParams = new EditorParams { MaxLength = 100, MaxLines = 1, Scroll = eb.Scroll };
 			new CaretDisplay(tw, caret, new CaretParams { CaretPresenter = new VerticalLineCaret() });
-			new CaretDisplay(tw, selStart, new CaretParams {
-				CaretPresenter = new VerticalLineCaret { Color = Color4.Red }, FollowTextColor = false, BlinkInterval = 0 });
-			new CaretDisplay(tw, selEnd, new CaretParams {
-				CaretPresenter = new VerticalLineCaret { Color = Color4.Blue }, FollowTextColor = false, BlinkInterval = 0 });
+			new SelectionPresenter(tw, selStart, selEnd, new SelectionParams());
 
 			eb.Editor = new Editor(tw, caret, selStart, selEnd, editorParams, eb);
 			eb.TabTravesable = new TabTraversable();

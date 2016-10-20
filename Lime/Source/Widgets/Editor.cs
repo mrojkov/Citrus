@@ -106,6 +106,43 @@ namespace Lime
 		}
 	}
 
+	public class SelectionParams
+	{
+		public Color4 Color { get; set; } = Color4.Yellow;
+		public Color4 OutlineColor { get; set; } = Color4.Orange;
+		public Thickness Padding { get; set; } = new Thickness(1f);
+	}
+
+	public class SelectionPresenter: CustomPresenter, IPresenter
+	{
+		private Widget container;
+		private ICaretPosition selectionStart;
+		private ICaretPosition selectionEnd;
+		private SelectionParams selectionParams;
+
+		public SelectionPresenter(
+			Widget container, ICaretPosition selectionStart, ICaretPosition selectionEnd,
+			SelectionParams selectionParams)
+		{
+			this.container = container;
+			this.selectionStart = selectionStart;
+			this.selectionEnd = selectionEnd;
+			this.selectionParams = selectionParams;
+			container.CompoundPresenter.Add(this);
+		}
+
+		public override void Render(Node node)
+		{
+			if (!selectionStart.IsVisible || !selectionEnd.IsVisible) return;
+			var text = (SimpleText)node;
+			text.PrepareRendererState();
+			var r = new Rectangle(selectionStart.WorldPos, selectionEnd.WorldPos + Vector2.Down * text.FontHeight).
+				Normalized.ExpandedBy(selectionParams.Padding);
+			Renderer.DrawRect(r.A, r.B, selectionParams.Color);
+			Renderer.DrawRectOutline(r.A, r.B, selectionParams.OutlineColor);
+		}
+	}
+
 	public interface IEditorParams
 	{
 		int MaxLength { get; set; }
