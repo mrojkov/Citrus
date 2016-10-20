@@ -180,4 +180,30 @@ namespace Lime
 			return (CaretPosition)MemberwiseClone();
 		}
 	}
+
+	internal class DummyCaretPosition: ICaretPosition
+	{
+		public static DummyCaretPosition Instance = new DummyCaretPosition();
+
+		public bool IsValid => true;
+
+		public int Line { get; set; }
+		public int Col { get; set; }
+		public int TextPos { get; set; }
+		public Vector2 WorldPos { get; set; }
+		public bool IsVisible {
+			get { return false; }
+			set { }
+		}
+		public void EmptyText(Vector2 pos) {}
+		public void StartSync() {}
+		public void Sync(int index, Vector2 charPos, Vector2 size) {}
+		public void FinishSync() {}
+		public void InvalidatePreservingTextPos() {}
+		public void ClampTextPos(int textLength) {}
+		public void ClampLine(int lineCount) {}
+		public void ClampCol(int maxCol) {}
+		public void NextLine() {}
+		public ICaretPosition Clone() { return this; }
+	}
 }

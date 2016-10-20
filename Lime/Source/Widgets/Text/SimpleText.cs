@@ -156,9 +156,7 @@ namespace Lime
 
 		public bool TrimWhitespaces { get; set; }
 
-		private ICaretPosition caret = new CaretPosition();
-
-		public ICaretPosition Caret { get { return caret; } }
+		public ICaretPosition Caret { get; set; } = DummyCaretPosition.Instance;
 
 		public event Action<string> Submitted;
 
@@ -213,7 +211,7 @@ namespace Lime
 
 		private void PrepareSpriteListAndSyncCaret()
 		{
-			if (!caret.IsValid) {
+			if (!Caret.IsValid) {
 				spriteList = null;
 			}
 			PrepareSpriteListAndExtent();
@@ -229,12 +227,12 @@ namespace Lime
 				var savedHeight = fontHeight;
 				FitTextInsideWidgetArea();
 				spriteList = new SpriteList();
-				extent = RenderHelper(spriteList, caret);
+				extent = RenderHelper(spriteList, Caret);
 				spacing = savedSpacing;
 				fontHeight = savedHeight;
 			} else {
 				spriteList = new SpriteList();
-				extent = RenderHelper(spriteList, caret);
+				extent = RenderHelper(spriteList, Caret);
 			}
 		}
 
@@ -421,7 +419,7 @@ namespace Lime
 		public void Invalidate()
 		{
 			displayText = null;
-			caret.InvalidatePreservingTextPos();
+			Caret.InvalidatePreservingTextPos();
 			spriteList = null;
 			minSizeValid = false;
 			InvalidateParentConstraintsAndArrangement();
@@ -433,7 +431,7 @@ namespace Lime
 		public override Node Clone()
 		{
 			var clone = base.Clone() as SimpleText;
-			clone.caret = clone.caret.Clone();
+			clone.Caret = clone.Caret.Clone();
 			return clone;
 		}
 	}

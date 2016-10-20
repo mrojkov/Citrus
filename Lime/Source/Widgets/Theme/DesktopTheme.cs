@@ -151,6 +151,7 @@ namespace Lime
 			tw.TrimWhitespaces = false;
 			tw.OverflowMode = TextOverflowMode.Ignore;
 			tw.Padding = Metrics.ControlsPadding;
+			tw.Caret = new CaretPosition();
 			var editorParams = new EditorParams { MaxLength = 100, MaxLines = 1, Scroll = eb.Scroll };
 			new CaretDisplay(tw, tw.Caret, new CaretParams { CaretPresenter = new VerticalLineCaret() });
 			eb.Editor = new Editor(tw, tw.Caret, editorParams, eb);
