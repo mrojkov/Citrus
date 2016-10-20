@@ -43,6 +43,8 @@ namespace Lime
 			webView.Settings.JavaScriptEnabled = true;
 			webView.Settings.LoadWithOverviewMode = true;
 			webView.Settings.UseWideViewPort = true;
+			webView.Settings.BuiltInZoomControls = true;
+			webView.Settings.DisplayZoomControls = false;
 			webView.SetWebViewClient(new CustomClient());
 		}
 
