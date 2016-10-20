@@ -153,6 +153,7 @@ namespace Lime
 		Predicate<string> AcceptText { get; set; }
 		ScrollView Scroll { get; set; }
 		bool AllowNonDisplayableChars { get; set; }
+		float MouseSelectionThreshold { get; set; }
 
 		bool IsAcceptableLength(int length);
 		bool IsAcceptableLines(int lines);
@@ -169,6 +170,7 @@ namespace Lime
 		public Predicate<string> AcceptText { get; set; }
 		public ScrollView Scroll { get; set; }
 		public bool AllowNonDisplayableChars { get; set; }
+		public float MouseSelectionThreshold { get; set; } = 3.0f;
 
 		public EditorParams()
 		{
@@ -599,16 +601,29 @@ namespace Lime
 		{
 			bool wasFocused = false;
 			string originalText = null;
+			Vector2 lastClickPos = Vector2.Zero;
+
 			while (true) {
-				var wasClicked = DisplayWidget.WasClicked();
-				if (wasClicked)
+				if (DisplayWidget.Input.WasMousePressed()) {
 					InputWidget.SetFocus();
+				}
 				if (InputWidget.IsFocused()) {
 					HandleKeys(originalText);
 					HandleTextInput();
-					if (wasClicked) {
-						var t = DisplayWidget.LocalToWorldTransform.CalcInversed();
-						CaretPos.WorldPos = t.TransformVector(InputWidget.Input.MousePosition);
+					var p = InputWidget.Input.MousePosition;
+					if (InputWidget.Input.IsMousePressed()) {
+						CaretPos.WorldPos = DisplayWidget.LocalToWorldTransform.CalcInversed().TransformVector(p);
+						if (InputWidget.Input.WasMousePressed()) {
+							lastClickPos = p;
+							HideSelection();
+							InputWidget.Input.CaptureMouse();
+						} else if ((p - lastClickPos).SqrLength > EditorParams.MouseSelectionThreshold) {
+							EnsureSelection();
+							SelectionEnd.AssignFrom(CaretPos);
+						}
+					}
+					else {
+						InputWidget.Input.ReleaseMouse();
 					}
 					Text.SyncCaretPosition();
 				}
@@ -619,6 +634,7 @@ namespace Lime
 					originalText = Text.Text;
 				}
 				if (wasFocused && !isFocused) {
+					HideSelection();
 					if (originalText != Text.Text) {
 						Text.Submit();
 					}
