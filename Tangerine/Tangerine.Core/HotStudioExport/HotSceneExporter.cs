@@ -184,6 +184,7 @@ namespace Orange
 				{ typeof(LinearLayout), new NodeWriter { ActorClass = "LinearLayout", Writer = n => WriteLinearLayoutProperties((LinearLayout)n) } },
 				{ typeof(FolderBegin), new NodeWriter { ActorClass = "Hot::FolderBegin", Writer = n => WriteFolderBeginProperties((FolderBegin)n) } },
 				{ typeof(FolderEnd), new NodeWriter { ActorClass = "Hot::FolderEnd", Writer = n => WriteNodeProperties(n) } },
+				{ typeof(Bone), new NodeWriter { ActorClass = "Hot::Bone", Writer = n => WriteBoneProperties((Bone)n) } },
 			};
 		}
 
@@ -583,6 +584,22 @@ namespace Orange
 		{
 			WriteNodeProperties(node);
 			WriteProperty("Expanded", node.Expanded, true);
+		}
+
+		void WriteBoneProperties(Bone node)
+		{
+			WriteNodeProperties(node);
+			WriteProperty("Position", node.Position, Vector2.Zero);
+			WriteProperty("Rotation", node.Rotation, 0f);
+			WriteProperty("Length", node.Length, 100f);
+			WriteProperty("IKStopper", node.IKStopper, true);
+			WriteProperty("Index", node.Index, 0);
+			WriteProperty("BaseIndex", node.BaseIndex, 0);
+			WriteProperty("EffectiveRadius", node.EffectiveRadius, 100f);
+			WriteProperty("FadeoutZone", node.FadeoutZone, 50f);
+			WriteProperty("RefPosition", node.RefPosition, Vector2.Zero);
+			WriteProperty("RefRotation", node.RefRotation, 0f);
+			WriteProperty("RefLength", node.RefLength, 0f);
 		}
 	}
 }
