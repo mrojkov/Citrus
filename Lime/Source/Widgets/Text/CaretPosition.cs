@@ -6,9 +6,9 @@ namespace Lime
 	{
 		public enum ValidState { None, All, LineCol, WorldPos, TextPos, LineWorldX };
 		public ValidState Valid { get; private set; }
-		public int RenderingLineNumber;
-		public int RenderingTextPos;
 
+		private int renderingLineNumber;
+		private int renderingTextPos;
 		private int line;
 		private int col;
 		private int textPos;
@@ -88,8 +88,8 @@ namespace Lime
 
 		public void StartSync()
 		{
-			RenderingLineNumber = 0;
-			RenderingTextPos = 0;
+			renderingLineNumber = 0;
+			renderingTextPos = 0;
 			nearestCharPos = Vector2.PositiveInfinity;
 		}
 
@@ -100,15 +100,15 @@ namespace Lime
 				case ValidState.All:
 					break;
 				case ValidState.LineCol:
-					if (Line == RenderingLineNumber && Col == index) {
-						textPos = RenderingTextPos;
+					if (Line == renderingLineNumber && Col == index) {
+						textPos = renderingTextPos;
 						worldPos = charPos;
 						Valid = ValidState.All;
 					}
 					break;
 				case ValidState.TextPos:
-					if (TextPos == RenderingTextPos) {
-						line = RenderingLineNumber;
+					if (TextPos == renderingTextPos) {
+						line = renderingLineNumber;
 						col = index;
 						worldPos = charPos;
 						Valid = ValidState.All;
@@ -116,25 +116,25 @@ namespace Lime
 					break;
 				case ValidState.WorldPos:
 					if ((WorldPos - charPos).SqrLength < (WorldPos - nearestCharPos).SqrLength) {
-						line = RenderingLineNumber;
+						line = renderingLineNumber;
 						col = index;
-						textPos = RenderingTextPos;
+						textPos = renderingTextPos;
 						nearestCharPos = charPos;
 						Valid = ValidState.WorldPos;
 					}
 					break;
 				case ValidState.LineWorldX:
 					if (
-						Line == RenderingLineNumber &&
+						Line == renderingLineNumber &&
 						(WorldPos.X - charPos.X).Abs() < (WorldPos.X - nearestCharPos.X).Abs())
 					{
 						col = index;
-						textPos = RenderingTextPos;
+						textPos = renderingTextPos;
 						nearestCharPos = charPos;
 					}
 					break;
 			}
-			++RenderingTextPos;
+			++renderingTextPos;
 		}
 
 		public void FinishSync()
@@ -164,13 +164,13 @@ namespace Lime
 
 		public void ClampCol(int maxCol)
 		{
-			if (Valid == ValidState.LineCol && Line == RenderingLineNumber)
+			if (Valid == ValidState.LineCol && Line == renderingLineNumber)
 				Col = Col.Clamp(0, maxCol);
 		}
 
 		public void NextLine()
 		{
-			++RenderingLineNumber;
+			++renderingLineNumber;
 		}
 
 		public CaretPosition Clone()
