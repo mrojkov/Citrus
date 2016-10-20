@@ -19,6 +19,7 @@ namespace Tangerine.UI
 		public static readonly Color4 ButtonPressBackground = ButtonHighlightBackground.Darken(0.1f);
 		public static readonly Color4 ButtonCheckedBorder = ButtonPressBorder.Darken(0.1f);
 		public static readonly Color4 ButtonCheckedBackground = ButtonPressBackground.Transparentify(0.5f);
+		public static readonly Color4 ButtonDisabledColor = Color4.Gray.Darken(0.1f);
 		public static readonly Color4 Background = DesktopTheme.Colors.GrayBackground;
 		public static readonly Color4 Border = DesktopTheme.Colors.SeparatorColor;
 	}

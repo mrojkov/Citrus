@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Lime;
+using Tangerine.Core;
 
 namespace Tangerine.UI
 {
@@ -78,12 +79,14 @@ namespace Tangerine.UI
 			};
 			CompoundPresenter.Add(new DelegatePresenter<Widget>(w => {
 				w.PrepareRendererState();
+				Renderer.Shader = Enabled ? ShaderId.Diffuse : ShaderId.Silhuette;
 				Color4 bgColor, borderColor;
 				GetColors(out bgColor, out borderColor);
 				if (bgColor != Color4.Transparent) {
 					Renderer.DrawRect(Vector2.Zero, Size, bgColor);
 				}
-				Renderer.DrawSprite(Texture, GlobalColor, ContentPosition, ContentSize, Vector2.Zero, Vector2.One);
+				var iconColor = Enabled ? GlobalColor : GlobalColor * ToolbarColors.ButtonDisabledColor;
+				Renderer.DrawSprite(Texture, iconColor, ContentPosition, ContentSize, Vector2.Zero, Vector2.One);
 				if (borderColor != Color4.Transparent) {
 					Renderer.DrawRectOutline(Vector2.Zero, Size, borderColor);
 				}
@@ -94,6 +97,7 @@ namespace Tangerine.UI
 		{
 			base.Awake();
 			Tasks.Add(ShowTipTask());
+			Tasks.Add(new Property<bool>(() => Enabled).DistinctUntilChanged().Consume(_ => Window.Current.Invalidate()));
 		}
 
 		private IEnumerator<object> ShowTipTask()
