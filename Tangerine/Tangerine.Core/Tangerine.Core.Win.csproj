@@ -39,7 +39,6 @@
     <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BuildRowsProcessor.cs" />
     <Compile Include="Components\CurveRow.cs" />
     <Compile Include="Components\NodeRow.cs" />
     <Compile Include="Components\PropertyRow.cs" />
@@ -65,6 +64,7 @@
     <Compile Include="NodeEditorState.cs" />
     <Compile Include="AnimatorEditorState.cs" />
     <Compile Include="Row.cs" />
+    <Compile Include="RowsSynchronizer.cs" />
     <Compile Include="Uid.cs" />
     <Compile Include="Operation.cs" />
     <Compile Include="VersionedCollection.cs" />
