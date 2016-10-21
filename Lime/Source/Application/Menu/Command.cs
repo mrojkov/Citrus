@@ -122,5 +122,28 @@ namespace Lime
 			}
 		}
 	}
+
+	public sealed class LocalKeySendingCommand : Command
+	{
+		public readonly Input Input;
+		public readonly Key Key;
+
+		public LocalKeySendingCommand(Input input, string text, Key key) : base(text)
+		{
+			Input = input;
+			Key = key;
+			Enabled = Input.IsKeyEnabled(Key);
+		}
+
+		public override void Execute()
+		{
+			if (Key != Key.Unknown) {
+				Input.SetKeyState(Key, true);
+				Input.SetKeyState(Key, false);
+			}
+		}
+
+		public override bool Enabled { get; }
+	}
 }
 #endif
