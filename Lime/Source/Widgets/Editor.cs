@@ -163,11 +163,61 @@ namespace Lime
 		}
 	}
 
+	public class UndoHistory<T> where T: IEquatable<T>
+	{
+
+		private List<T> queue = new List<T>();
+		private int current;
+
+		public int MaxDepth { get; set; }
+
+		public void Add(T item)
+		{
+			if (queue.Count > 0 && item.Equals(queue[queue.Count - 1]))
+				return;
+			if (current < queue.Count)
+				queue.RemoveRange(current, queue.Count - current);
+			var overflow = queue.Count - MaxDepth + 1;
+			if (MaxDepth > 0 && overflow > 0) {
+				queue.RemoveRange(0, overflow);
+				current -= overflow;
+			}
+			queue.Add(item);
+			current = queue.Count;
+		}
+
+		public bool CanUndo() => current > 0;
+		public bool CanRedo() => current < queue.Count - 1;
+
+		public T Undo(T item)
+		{
+			if (!CanUndo())
+				throw new InvalidOperationException();
+			if (current == queue.Count && !item.Equals(queue[queue.Count - 1]))
+				queue.Add(item);
+			return queue[--current];
+		}
+
+		public T Redo()
+		{
+			if (!CanRedo())
+				throw new InvalidOperationException();
+			return queue[++current];
+		}
+
+		public void Clear()
+		{
+			queue.Clear();
+			current = 0;
+		}
+	}
+
 	public interface IEditorParams
 	{
 		int MaxLength { get; set; }
 		int MaxLines { get; set; }
 		float MaxHeight { get; set; }
+		int MaxUndoDepth { get; set; }
 		char? PasswordChar { get; set; }
 		float PasswordLastCharShowTime { get; set; }
 		Predicate<string> AcceptText { get; set; }
@@ -185,6 +235,7 @@ namespace Lime
 		public int MaxLength { get; set; }
 		public int MaxLines { get; set; }
 		public float MaxHeight { get; set; }
+		public int MaxUndoDepth { get; set; } = 100;
 		public char? PasswordChar { get; set; }
 		public float PasswordLastCharShowTime { get; set; } =
 #if WIN || MAC || MONOMAC
@@ -226,6 +277,16 @@ namespace Lime
 		public ICaretPosition SelectionStart { get; } = new CaretPosition();
 		public ICaretPosition SelectionEnd { get; } = new CaretPosition();
 
+		public struct UndoItem : IEquatable<UndoItem>
+		{
+			public int TextPos;
+			public string Value;
+			public bool Equals(UndoItem other) =>
+				TextPos == other.TextPos && Value == other.Value;
+		}
+
+		public UndoHistory<UndoItem> History = new UndoHistory<UndoItem>();
+
 		public Editor(Widget container, IEditorParams editorParams, Widget inputWidget = null)
 		{
 			DisplayWidget = container;
@@ -236,6 +297,7 @@ namespace Lime
 			Text.Localizable = false;
 
 			EditorParams = editorParams;
+			History.MaxDepth = EditorParams.MaxUndoDepth;
 
 			var mc = new MultiCaretPosition();
 			mc.Add(CaretPos);
@@ -305,6 +367,16 @@ namespace Lime
 			DisplayWidget.Tasks.StopByTag(this);
 		}
 
+		private UndoItem MakeUndoItem() =>
+			new UndoItem { TextPos = CaretPos.TextPos, Value = Text.Text };
+
+		private void ApplyUndoItem(UndoItem i)
+		{
+			Text.Text = i.Value;
+			CaretPos.TextPos = i.TextPos;
+			CaretPos.InvalidatePreservingTextPos();
+		}
+
 		private WidgetInput input => InputWidget.Input;
 
 		private bool WasKeyRepeated(Key key) => input.WasKeyRepeated(key);
@@ -345,6 +417,7 @@ namespace Lime
 					Cmds.DeleteWordPrev, Cmds.DeleteWordNext,
 					Cmds.Submit, Cmds.Cancel,
 					Key.Commands.Cut, Key.Commands.Copy, Key.Commands.Paste, Key.Commands.Delete,
+					Key.Commands.Undo, Key.Commands.Redo,
 				}
 			).ToList();
 
@@ -427,6 +500,24 @@ namespace Lime
 			SelectionEnd.AssignFrom(CaretPos);
 		}
 
+		private void ModifyText(Func<string, string> f, int newTextPos = -1)
+		{
+			History.Add(MakeUndoItem());
+			HideSelection();
+			Text.Text = f(Text.Text);
+			if (newTextPos >= 0)
+				CaretPos.TextPos = newTextPos;
+			CaretPos.InvalidatePreservingTextPos();
+		}
+
+		private void MaybeModifyText(Action a)
+		{
+			var u = MakeUndoItem();
+			a();
+			if (Text.Text != u.Value)
+				History.Add(u);
+		}
+
 		private struct SelectionRange
 		{
 			public int Start;
@@ -443,10 +534,7 @@ namespace Lime
 		{
 			if (!HasSelection()) return;
 			var r = GetSelectionRange();
-			Text.Text = Text.Text.Remove(r.Start, r.Length);
-			CaretPos.TextPos = r.Start;
-			CaretPos.InvalidatePreservingTextPos();
-			HideSelection();
+			ModifyText(s => s.Remove(r.Start, r.Length), r.Start);
 		}
 
 		private void SelectWord()
@@ -505,39 +593,34 @@ namespace Lime
 				if (WasKeyRepeated(Key.Commands.Delete)) {
 					if (HasSelection())
 						DeleteSelection();
-					else if (CaretPos.TextPos >= 0 && CaretPos.TextPos < Text.Text.Length) {
-						Text.Text = Text.Text.Remove(CaretPos.TextPos, 1);
-						CaretPos.InvalidatePreservingTextPos();
-					}
+					else if (CaretPos.TextPos >= 0 && CaretPos.TextPos < Text.Text.Length)
+						ModifyText(s => s.Remove(CaretPos.TextPos, 1), CaretPos.TextPos);
 				}
 				if (WasKeyRepeated(Cmds.DeleteWordPrev)) {
-					HideSelection();
 					var p = PreviousWord(Text.Text, CaretPos.TextPos);
-					if (p < CaretPos.TextPos) {
-						Text.Text = Text.Text.Remove(p, CaretPos.TextPos - p);
-						CaretPos.TextPos = p;
-					}
+					if (p < CaretPos.TextPos)
+						ModifyText(s => s.Remove(p, CaretPos.TextPos - p), p);
 				}
 				if (WasKeyRepeated(Cmds.DeleteWordNext)) {
-					HideSelection();
 					var p = NextWord(Text.Text, CaretPos.TextPos);
-					if (p > CaretPos.TextPos) {
-						Text.Text = Text.Text.Remove(CaretPos.TextPos, p - CaretPos.TextPos);
-						CaretPos.InvalidatePreservingTextPos();
-					}
+					if (p > CaretPos.TextPos)
+						ModifyText(s => s.Remove(CaretPos.TextPos, p - CaretPos.TextPos));
 				}
+
 				if (WasKeyRepeated(Cmds.Submit)) {
 					if (EditorParams.IsAcceptableLines(Text.Text.Count(ch => ch == '\n') + 2)) {
-						InsertChar('\n');
+						MaybeModifyText(() => InsertChar('\n'));
 					} else {
 						HideSelection();
+						History.Clear();
 						input.ConsumeKey(Cmds.Submit);
 						InputWidget.RevokeFocus();
 					}
 				}
 				if (WasKeyRepeated(Cmds.Cancel)) {
-					HideSelection();
 					Text.Text = originalText;
+					HideSelection();
+					History.Clear();
 					input.ConsumeKey(Cmds.Cancel);
 					InputWidget.RevokeFocus();
 				}
@@ -550,16 +633,22 @@ namespace Lime
 					Clipboard.Text = Text.Text.Substring(r.Start, r.Length);
 					DeleteSelection();
 				}
-				if (WasKeyRepeated(Key.Commands.Paste)) {
-					foreach (var ch in Clipboard.Text)
-						InsertChar(ch);
-				}
+				if (WasKeyRepeated(Key.Commands.Paste))
+					MaybeModifyText(() => {
+						foreach (var ch in Clipboard.Text)
+							InsertChar(ch);
+					});
+				if (WasKeyRepeated(Key.Commands.Undo) && History.CanUndo())
+					ApplyUndoItem(History.Undo(MakeUndoItem()));
+				if (WasKeyRepeated(Key.Commands.Redo) && History.CanRedo())
+					ApplyUndoItem(History.Redo());
 			} finally {
 				var hs = HasSelection();
 				input.SetKeyEnabled(Key.Commands.Cut, hs);
 				input.SetKeyEnabled(Key.Commands.Copy, hs);
 				input.SetKeyEnabled(Key.Commands.Delete, hs);
 				input.SetKeyEnabled(Key.Commands.Paste, !string.IsNullOrEmpty(Clipboard.Text));
+				input.SetKeyEnabled(Key.Commands.Undo, History.CanUndo());
 
 				input.ConsumeKeys(consumingKeys);
 				if (IsMultiline())
@@ -581,13 +670,12 @@ namespace Lime
 					if (HasSelection())
 						DeleteSelection();
 					else if (CaretPos.TextPos > 0 && CaretPos.TextPos <= Text.Text.Length) {
-						CaretPos.TextPos--;
-						Text.Text = Text.Text.Remove(CaretPos.TextPos, 1);
+						ModifyText(s => s.Remove(CaretPos.TextPos - 1, 1), CaretPos.TextPos - 1);
 						lastCharShowTimeLeft = 0f;
 					}
 				}
 				else if (ch >= ' ' && ch != '\u007f') { // Ignore control and 'delete' characters.
-					InsertChar(ch);
+					MaybeModifyText(() => InsertChar(ch));
 					lastCharShowTimeLeft = EditorParams.PasswordLastCharShowTime;
 				}
 			}
@@ -681,8 +769,10 @@ namespace Lime
 		{
 			var i = Window.Current.Input;
 			(new Menu {
-				new LocalKeySendingCommand(i, "Copy", Key.Commands.Copy),
+				new LocalKeySendingCommand(i, "Undo", Key.Commands.Undo),
+				Command.MenuSeparator,
 				new LocalKeySendingCommand(i, "Cut", Key.Commands.Cut),
+				new LocalKeySendingCommand(i, "Copy", Key.Commands.Copy),
 				new LocalKeySendingCommand(i, "Paste", Key.Commands.Paste),
 				new LocalKeySendingCommand(i, "Delete", Key.Commands.Delete),
 				Command.MenuSeparator,
