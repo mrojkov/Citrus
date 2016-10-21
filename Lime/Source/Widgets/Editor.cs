@@ -767,6 +767,7 @@ namespace Lime
 
 		private void ShowContextMenu()
 		{
+#if MAC || WIN
 			var i = Window.Current.Input;
 			(new Menu {
 				new LocalKeySendingCommand(i, "Undo", Key.Commands.Undo),
@@ -778,6 +779,7 @@ namespace Lime
 				Command.MenuSeparator,
 				new LocalKeySendingCommand(i, "Select all", Key.Commands.SelectAll),
 			}).Popup();
+#endif
 		}
 	}
 }
