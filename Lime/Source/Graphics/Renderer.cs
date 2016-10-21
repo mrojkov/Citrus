@@ -310,7 +310,7 @@ namespace Lime
 			if (list != null) {
 				for (int i = 0; i < length; i++) {
 					char ch = text[i + start];
-					if (ch != '\n' && font.Chars.Get(ch, fontHeight) != FontChar.Null)
+					if (ch != '\n' && ch != '\r' && font.Chars.Get(ch, fontHeight) != FontChar.Null)
 						++j;
 				}
 			}
