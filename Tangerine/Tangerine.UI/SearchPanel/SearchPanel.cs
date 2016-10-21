@@ -19,6 +19,15 @@ namespace Tangerine.UI
 		private int selectedIndex;
 		private int rowHeight = DesktopTheme.Metrics.TextHeight;
 
+		class Cmds
+		{
+			public static readonly Key Up = Key.MapShortcut(Key.Up);
+			public static readonly Key Down = Key.MapShortcut(Key.Down);
+			public static readonly Key Cancel = Key.MapShortcut(Key.Escape);
+			public static readonly Key Enter = Key.MapShortcut(Key.Enter);
+			public static readonly List<Key> All = new List<Key> { Up, Down, Cancel, Enter };
+		}
+
 		public SearchPanel(Widget rootWidget)
 		{
 			PanelWidget = rootWidget;
@@ -41,36 +50,32 @@ namespace Tangerine.UI
 				}
 			}));
 			scrollView.Input.KeyRepeated += (input, key) => {
-				try {
-					if (results.Count == 0) {
-						return;
-					}
-					if (key == Key.Mouse0) {
-						scrollView.SetFocus();
-						selectedIndex = (resultPane.Input.LocalMousePosition.Y / rowHeight).Floor().Clamp(0, results.Count - 1);
-					} else if (key == Key.Down) {
-						selectedIndex++;
-					} else if (key == Key.Up) {
-						selectedIndex--;
-					} else if (key == Key.Escape) {
-						scrollView.RevokeFocus();
-					} else if (key == Key.Enter || key == Key.Mouse0DoubleClick) {
-						Core.Operations.ClearRowSelection.Perform();
-						var node = results[selectedIndex];
-						Core.Operations.EnterNode.Perform(node.Parent, selectFirstNode: false);
-						Core.Operations.SelectNode.Perform(node);
-					} else {
-						return;
-					}
-					selectedIndex = selectedIndex.Clamp(0, results != null ? results.Count - 1 : 0);
-					EnsureRowVisible(selectedIndex);
-					Window.Current.Invalidate();
-				} finally {
-					input.ConsumeKey(Key.Up);
-					input.ConsumeKey(Key.Down);
-					input.ConsumeKey(Key.Enter);
-					input.ConsumeKey(Key.Escape);
+				if (Cmds.All.Contains(key)) {
+					input.ConsumeKey(key);
 				}
+				if (results.Count == 0) {
+					return;
+				}
+				if (key == Key.Mouse0) {
+					scrollView.SetFocus();
+					selectedIndex = (resultPane.Input.LocalMousePosition.Y / rowHeight).Floor().Clamp(0, results.Count - 1);
+				} else if (key == Cmds.Down) {
+					selectedIndex++;
+				} else if (key == Cmds.Up) {
+					selectedIndex--;
+				} else if (key == Cmds.Cancel) {
+					scrollView.RevokeFocus();
+				} else if (key == Cmds.Enter || key == Key.Mouse0DoubleClick) {
+					Core.Operations.ClearRowSelection.Perform();
+					var node = results[selectedIndex];
+					Core.Operations.EnterNode.Perform(node.Parent, selectFirstNode: false);
+					Core.Operations.SelectNode.Perform(node);
+				} else {
+					return;
+				}
+				selectedIndex = selectedIndex.Clamp(0, results != null ? results.Count - 1 : 0);
+				EnsureRowVisible(selectedIndex);
+				Window.Current.Invalidate();
 			};
 		}
 
