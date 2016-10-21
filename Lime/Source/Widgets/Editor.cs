@@ -555,9 +555,12 @@ namespace Lime
 						InsertChar(ch);
 				}
 			} finally {
-				input.SetKeyEnabled(Key.Commands.Cut, !string.IsNullOrEmpty(Text.Text));
-				input.SetKeyEnabled(Key.Commands.Copy, !string.IsNullOrEmpty(Text.Text));
+				var hs = HasSelection();
+				input.SetKeyEnabled(Key.Commands.Cut, hs);
+				input.SetKeyEnabled(Key.Commands.Copy, hs);
+				input.SetKeyEnabled(Key.Commands.Delete, hs);
 				input.SetKeyEnabled(Key.Commands.Paste, !string.IsNullOrEmpty(Clipboard.Text));
+
 				input.ConsumeKeys(consumingKeys);
 				if (IsMultiline())
 					input.ConsumeKeys(new[] { Cmds.MoveLinePrev, Cmds.MoveLineNext, });
@@ -653,6 +656,8 @@ namespace Lime
 					else {
 						input.ReleaseMouse();
 					}
+					if (input.WasMouseReleased(1))
+						ShowContextMenu();
 					Text.SyncCaretPosition();
 				}
 				AdjustSizeAndScrollToCaret();
@@ -670,6 +675,19 @@ namespace Lime
 				wasFocused = isFocused;
 				yield return null;
 			}
+		}
+
+		private void ShowContextMenu()
+		{
+			var i = Window.Current.Input;
+			(new Menu {
+				new LocalKeySendingCommand(i, "Copy", Key.Commands.Copy),
+				new LocalKeySendingCommand(i, "Cut", Key.Commands.Cut),
+				new LocalKeySendingCommand(i, "Paste", Key.Commands.Paste),
+				new LocalKeySendingCommand(i, "Delete", Key.Commands.Delete),
+				Command.MenuSeparator,
+				new LocalKeySendingCommand(i, "Select all", Key.Commands.SelectAll),
+			}).Popup();
 		}
 	}
 }
