@@ -3,7 +3,6 @@ using System;
 using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Linq;
-using SD = System.Drawing;
 
 namespace Lime
 {
@@ -104,13 +103,14 @@ namespace Lime
 		public void Popup()
 		{
 			Refresh();
-			NativeContextMenu.Show(Window.Current.Form, new SD.Point());
+			var w = Window.Current;
+			NativeContextMenu.Show(w.Form, LimeToSD.ConvertToPoint(w.Input.MousePosition, w.PixelScale));
 		}
 
 		public void Popup(IWindow window, Vector2 position, float minimumWidth, ICommand command)
 		{
 			Refresh();
-			NativeContextMenu.MinimumSize = new SD.Size(
+			NativeContextMenu.MinimumSize = new System.Drawing.Size(
 				(int)minimumWidth, NativeContextMenu.MinimumSize.Height);
 			foreach (var menuItem in items) {
 				var ni = menuItem.NativeItem;
@@ -119,7 +119,7 @@ namespace Lime
 					ni.Select();
 				}
 			}
-			NativeContextMenu.Show(window.Form, new SD.Point((int)position.X, (int)position.Y));
+			NativeContextMenu.Show(window.Form, LimeToSD.ConvertToPoint(position, window.PixelScale));
 			NativeContextMenu.Closed += (s, e) => window.Invalidate();
 		}
 	}
