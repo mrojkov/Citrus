@@ -292,6 +292,7 @@ namespace Lime
 		/// while deserializing with Yuzu.
 		/// </summary>
 		[YuzuMember("Size")]
+		[TangerineIgnore]
 		public Vector2 SilentSize { get { return size; } set { size = value; } }
 
 		/// <summary>

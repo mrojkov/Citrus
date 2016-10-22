@@ -52,7 +52,10 @@ namespace Tangerine.UI.Inspector
 					// WTF, Bug in Mono?
 					continue;
 				}
-				if (PropertyAttributes<YuzuField>.Get(type, property.Name) == null)
+				var yuzuField = PropertyAttributes<YuzuField>.Get(type, property.Name);
+				var tang = PropertyAttributes<TangerineAttribute>.Get(type, property.Name);
+				var tangIgnore = PropertyAttributes<TangerineIgnoreAttribute>.Get(type, property.Name);
+				if (yuzuField == null && tang == null || tangIgnore != null)
 					continue;
 				if (!categoryLabelAdded) {
 					categoryLabelAdded = true;

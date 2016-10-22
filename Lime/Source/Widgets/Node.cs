@@ -26,6 +26,8 @@ namespace Lime
 		}
 	}
 
+	public class TangerineIgnoreAttribute : Attribute { }
+
 	[Flags]
 	public enum TangerineFlags
 	{
