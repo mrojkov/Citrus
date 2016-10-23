@@ -8,6 +8,8 @@ namespace Tangerine.Core.Operations
 {
 	public static class EnterNode
 	{
+		public static event Action ContainerChanging;
+
 		public static void Perform(Node container, bool selectFirstNode = true)
 		{
 			if (container.ContentsPath != null) {
@@ -27,9 +29,10 @@ namespace Tangerine.Core.Operations
 
 		static void ChangeContainer(Node container, bool selectFirstNode)
 		{
+			ContainerChanging?.Invoke();
+			ClearRowSelection.Perform();
 			var prevContainer = Document.Current.Container;
 			DelegateOperation.Perform(() => SetContainer(container), () => SetContainer(prevContainer));
-			ClearRowSelection.Perform();
 			if (selectFirstNode && container.Nodes.Count > 0) {
 				SelectNode.Perform(container.Nodes[0]);
 			}

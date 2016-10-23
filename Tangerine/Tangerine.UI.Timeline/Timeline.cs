@@ -46,6 +46,11 @@ namespace Tangerine.UI.Timeline
 		public GridSelection GridSelection = new GridSelection();
 		public readonly Entity Globals = new Entity();
 
+		static Timeline()
+		{
+			Core.Operations.EnterNode.ContainerChanging += Operations.ClearGridSelection.Perform;
+		}
+
 		public Timeline(DockPanel panel)
 		{
 			Panel = panel;
