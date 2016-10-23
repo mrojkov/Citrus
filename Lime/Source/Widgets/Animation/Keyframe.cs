@@ -81,16 +81,5 @@ namespace Lime
 		{
 			return Clone();
 		}
-
-		public override bool Equals(object obj)
-		{
-			var other = (IKeyframe)obj;
-			return Frame == other.Frame && Function == other.Function && Equals(Value, other.Value);
-		}
-
-		public override int GetHashCode()
-		{
-			return Frame.GetHashCode() ^ Function.GetHashCode() ^ Value.GetHashCode();
-		}
 	}
 }
