@@ -20,17 +20,12 @@ namespace Tangerine.Core.Operations
 		static void OpenExternalScene(string path)
 		{
 			path = System.IO.Path.ChangeExtension(path, Document.SceneFileExtension);
-			var doc = Project.Current.Documents.FirstOrDefault(i => i.Path == path);
 			var sceneNavigatedFrom = Document.Current.Path;
-			if (doc != null) {
-				doc.MakeCurrent();
-			} else {
-				doc = Project.Current.OpenDocument(path);
-			}
+			var doc = Project.Current.OpenDocument(path);
 			doc.SceneNavigatedFrom = sceneNavigatedFrom;
 		}
 
-		public static void ChangeContainer(Node container, bool selectFirstNode)
+		static void ChangeContainer(Node container, bool selectFirstNode)
 		{
 			var prevContainer = Document.Current.Container;
 			DelegateOperation.Perform(() => SetContainer(container), () => SetContainer(prevContainer));

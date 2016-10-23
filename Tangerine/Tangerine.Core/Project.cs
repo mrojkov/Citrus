@@ -81,8 +81,11 @@ namespace Tangerine.Core
 
 		public Document OpenDocument(string path)
 		{
-			var doc = new Document(path);
-			documents.Add(doc);
+			var doc = Documents.FirstOrDefault(i => i.Path == path);
+			if (doc == null) {
+				doc = new Document(path);
+				documents.Add(doc);
+			}
 			doc.MakeCurrent();
 			return doc;
 		}
