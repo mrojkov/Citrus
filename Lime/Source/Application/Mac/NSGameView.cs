@@ -117,6 +117,10 @@ namespace Lime.Platform
 			var key = (Key)MacKeyMap.GetKey((MacKeyCode)theEvent.KeyCode);
 			if (!theEvent.IsARepeat) {
 				input.SetKeyState(key, true);
+				if ((input.GetModifiers() & Modifiers.Win) != 0) {
+					// There is no KeyUp event if the Command key is pressed down, so unpress the key immediately.
+					input.SetKeyState(key, false);
+				}
 			}
 			if ((input.GetModifiers() & (Modifiers.Control | Modifiers.Alt | Modifiers.Win)) != 0) {
 				return;
