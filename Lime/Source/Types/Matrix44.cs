@@ -6,25 +6,16 @@ namespace Lime
 	[YuzuCompact]
 	public struct Matrix44 : IEquatable<Matrix44>
 	{
-		public Matrix44(float m11, float m12, float m13, float m14, float m21, float m22, float m23, float m24, float m31,
-					  float m32, float m33, float m34, float m41, float m42, float m43, float m44)
+		public Matrix44(
+			float m11, float m12, float m13, float m14,
+			float m21, float m22, float m23, float m24,
+			float m31, float m32, float m33, float m34,
+			float m41, float m42, float m43, float m44)
 		{
-			this.M11 = m11;
-			this.M12 = m12;
-			this.M13 = m13;
-			this.M14 = m14;
-			this.M21 = m21;
-			this.M22 = m22;
-			this.M23 = m23;
-			this.M24 = m24;
-			this.M31 = m31;
-			this.M32 = m32;
-			this.M33 = m33;
-			this.M34 = m34;
-			this.M41 = m41;
-			this.M42 = m42;
-			this.M43 = m43;
-			this.M44 = m44;
+			M11 = m11; M12 = m12; M13 = m13; M14 = m14;
+			M21 = m21; M22 = m22; M23 = m23; M24 = m24;
+			M31 = m31; M32 = m32; M33 = m33; M34 = m34;
+			M41 = m41; M42 = m42; M43 = m43; M44 = m44;
 		}
 
 		[YuzuMember("0")]
@@ -86,13 +77,13 @@ namespace Lime
 		{
 			get
 			{
-				return new Vector3(this.M31, this.M32, this.M33);
+				return new Vector3(M31, M32, M33);
 			}
 			set
 			{
-				this.M31 = value.X;
-				this.M32 = value.Y;
-				this.M33 = value.Z;
+				M31 = value.X;
+				M32 = value.Y;
+				M33 = value.Z;
 			}
 		}
 
@@ -104,9 +95,9 @@ namespace Lime
 			}
 			set
 			{
-				this.M21 = -value.X;
-				this.M22 = -value.Y;
-				this.M23 = -value.Z;
+				M21 = -value.X;
+				M22 = -value.Y;
+				M23 = -value.Z;
 			}
 		}
 
@@ -118,39 +109,33 @@ namespace Lime
 			}
 			set
 			{
-				this.M31 = -value.X;
-				this.M32 = -value.Y;
-				this.M33 = -value.Z;
+				M31 = -value.X;
+				M32 = -value.Y;
+				M33 = -value.Z;
 			}
 		}
 
-		public static Matrix44 Identity
-		{
-			get { return identity; }
-		}
+		public static Matrix44 Identity => identity;
 
-		public float[] ToFloatArray()
-		{
-			float[] array = {
+		public float[] ToFloatArray() =>
+			new float[] {
 				M11, M12, M13, M14,
 				M21, M22, M23, M24,
 				M31, M32, M33, M34,
 				M41, M42, M43, M44
 			};
-			return array;
-		}
 
 		public Vector3 Left
 		{
 			get
 			{
-				return new Vector3(-this.M11, -this.M12, -this.M13);
+				return new Vector3(-M11, -M12, -M13);
 			}
 			set
 			{
-				this.M11 = -value.X;
-				this.M12 = -value.Y;
-				this.M13 = -value.Z;
+				M11 = -value.X;
+				M12 = -value.Y;
+				M13 = -value.Z;
 			}
 		}
 
@@ -158,13 +143,13 @@ namespace Lime
 		{
 			get
 			{
-				return new Vector3(this.M11, this.M12, this.M13);
+				return new Vector3(M11, M12, M13);
 			}
 			set
 			{
-				this.M11 = value.X;
-				this.M12 = value.Y;
-				this.M13 = value.Z;
+				M11 = value.X;
+				M12 = value.Y;
+				M13 = value.Z;
 			}
 		}
 
@@ -172,13 +157,13 @@ namespace Lime
 		{
 			get
 			{
-				return new Vector3(this.M41, this.M42, this.M43);
+				return new Vector3(M41, M42, M43);
 			}
 			set
 			{
-				this.M41 = value.X;
-				this.M42 = value.Y;
-				this.M43 = value.Z;
+				M41 = value.X;
+				M42 = value.Y;
+				M43 = value.Z;
 			}
 		}
 
@@ -186,20 +171,17 @@ namespace Lime
 		{
 			get
 			{
-				return new Vector3(this.M21, this.M22, this.M23);
+				return new Vector3(M21, M22, M23);
 			}
 			set
 			{
-				this.M21 = value.X;
-				this.M22 = value.Y;
-				this.M23 = value.Z;
+				M21 = value.X;
+				M22 = value.Y;
+				M23 = value.Z;
 			}
 		}
 
-		public Vector3 Scale
-		{
-			get { return GetScale(true); }
-		}
+		public Vector3 Scale => GetScale(true);
 
 		public Quaternion Rotation
 		{
@@ -301,7 +283,8 @@ namespace Lime
 			return matrix;
 		}
 
-		public static void CreateLookAt(ref Vector3 cameraPosition, ref Vector3 cameraTarget, ref Vector3 cameraUpVector, out Matrix44 result)
+		public static void CreateLookAt(
+			ref Vector3 cameraPosition, ref Vector3 cameraTarget, ref Vector3 cameraUpVector, out Matrix44 result)
 		{
 			Vector3 vector = (cameraPosition - cameraTarget).Normalized;
 			Vector3 vector2 = Vector3.CrossProduct(cameraUpVector, vector).Normalized;
@@ -340,27 +323,27 @@ namespace Lime
 			if (right == left || top == bottom || zNear == zFar)
 				return new Matrix44();
 
-			Matrix44 matrix;
-			matrix.M11 = (float)(2.0 / ((double)right - (double)left));
-			matrix.M12 = 0.0f;
-			matrix.M13 = 0.0f;
-			matrix.M14 = 0.0f;
+			return new Matrix44 {
+				M11 = (float)(2.0 / ((double)right - (double)left)),
+				M12 = 0.0f,
+				M13 = 0.0f,
+				M14 = 0.0f,
 
-			matrix.M21 = 0.0f;
-			matrix.M22 = (float)(2.0 / ((double)top - (double)bottom));
-			matrix.M23 = 0.0f;
-			matrix.M24 = 0.0f;
+				M21 = 0.0f,
+				M22 = (float)(2.0 / ((double)top - (double)bottom)),
+				M23 = 0.0f,
+				M24 = 0.0f,
 
-			matrix.M31 = 0.0f;
-			matrix.M32 = 0.0f;
-			matrix.M33 = (float)(1.0 / ((double)zNear - (double)zFar));
-			matrix.M34 = 0.0f;
+				M31 = 0.0f,
+				M32 = 0.0f,
+				M33 = (float)(1.0 / ((double)zNear - (double)zFar)),
+				M34 = 0.0f,
 
-			matrix.M41 = (float)(((double)left + (double)right) / ((double)left - (double)right));
-			matrix.M42 = (float)(((double)top + (double)bottom) / ((double)bottom - (double)top));
-			matrix.M43 = (float)(((double)zNear + (double)zFar) / ((double)zNear - (double)zFar));
-			matrix.M44 = 1.0f;
-			return matrix;
+				M41 = (float)(((double)left + (double)right) / ((double)left - (double)right)),
+				M42 = (float)(((double)top + (double)bottom) / ((double)bottom - (double)top)),
+				M43 = (float)(((double)zNear + (double)zFar) / ((double)zNear - (double)zFar)),
+				M44 = 1.0f,
+			};
 		}
 
 		public static Matrix44 CreatePerspective(float width, float height, float zNear, float zFar)
@@ -381,29 +364,30 @@ namespace Lime
 			return CreatePerspectiveOffCenter(minX, maxX, minY, maxY, zNear, zFar);
 		}
 
-		public static Matrix44 CreatePerspectiveOffCenter(float left, float right, float bottom, float top, float zNear, float zFar)
+		public static Matrix44 CreatePerspectiveOffCenter(
+			float left, float right, float bottom, float top, float zNear, float zFar)
 		{
-			Matrix44 matrix;
-			matrix.M11 = (2f * zNear) / (right - left);
-			matrix.M12 = 0f;
-			matrix.M13 = 0f;
-			matrix.M14 = 0f;
+			return new Matrix44 {
+				M11 = (2f * zNear) / (right - left),
+				M12 = 0f,
+				M13 = 0f,
+				M14 = 0f,
 
-			matrix.M21 = 0f;
-			matrix.M22 = (2f * zNear) / (top - bottom);
-			matrix.M23 = 0f;
-			matrix.M24 = 0f;
+				M21 = 0f,
+				M22 = (2f * zNear) / (top - bottom),
+				M23 = 0f,
+				M24 = 0f,
 
-			matrix.M31 = (left + right) / (right - left);
-			matrix.M32 = (top + bottom) / (top - bottom);
-			matrix.M33 = -(zFar + zNear) / (zFar - zNear);
-			matrix.M34 = -1f;
+				M31 = (left + right) / (right - left),
+				M32 = (top + bottom) / (top - bottom),
+				M33 = -(zFar + zNear) / (zFar - zNear),
+				M34 = -1f,
 
-			matrix.M41 = 0f;
-			matrix.M42 = 0f;
-			matrix.M43 = -2f * (zFar * zNear) / (zFar - zNear);
-			matrix.M44 = 0f;
-			return matrix;
+				M41 = 0f,
+				M42 = 0f,
+				M43 = -2f * (zFar * zNear) / (zFar - zNear),
+				M44 = 0f,
+			};
 		}
 
 		public static Matrix44 CreateRotationX(float radians)
@@ -526,49 +510,21 @@ namespace Lime
 			result.M44 = 1f;
 		}
 
-		public static Matrix44 CreateScale(Vector3 scales)
-		{
-			Matrix44 result;
-			result.M11 = scales.X;
-			result.M12 = 0;
-			result.M13 = 0;
-			result.M14 = 0;
-			result.M21 = 0;
-			result.M22 = scales.Y;
-			result.M23 = 0;
-			result.M24 = 0;
-			result.M31 = 0;
-			result.M32 = 0;
-			result.M33 = scales.Z;
-			result.M34 = 0;
-			result.M41 = 0;
-			result.M42 = 0;
-			result.M43 = 0;
-			result.M44 = 1;
-			return result;
-		}
+		public static Matrix44 CreateScale(Vector3 scales) =>
+			new Matrix44 {
+				M11 = scales.X, M12 = 0, M13 = 0, M14 = 0,
+				M21 = 0, M22 = scales.Y, M23 = 0, M24 = 0,
+				M31 = 0, M32 = 0, M33 = scales.Z, M34 = 0,
+				M41 = 0, M42 = 0, M43 = 0, M44 = 1,
+			};
 
-		public static Matrix44 CreateTranslation(Vector3 position)
-		{
-			Matrix44 result;
-			result.M11 = 1;
-			result.M12 = 0;
-			result.M13 = 0;
-			result.M14 = 0;
-			result.M21 = 0;
-			result.M22 = 1;
-			result.M23 = 0;
-			result.M24 = 0;
-			result.M31 = 0;
-			result.M32 = 0;
-			result.M33 = 1;
-			result.M34 = 0;
-			result.M41 = position.X;
-			result.M42 = position.Y;
-			result.M43 = position.Z;
-			result.M44 = 1;
-			return result;
-		}
+		public static Matrix44 CreateTranslation(Vector3 position) =>
+			new Matrix44 {
+				M11 = 1, M12 = 0, M13 = 0, M14 = 0,
+				M21 = 0, M22 = 1, M23 = 0, M24 = 0,
+				M31 = 0, M32 = 0, M33 = 1, M34 = 0,
+				M41 = position.X, M42 = position.Y, M43 = position.Z, M44 = 1,
+			};
 
 		public static Matrix44 CreateReflection(Plane plane)
 		{
@@ -578,24 +534,12 @@ namespace Lime
 			var x2 = -2.0f * x;
 			var y2 = -2.0f * y;
 			var z2 = -2.0f * z;
-			Matrix44 result;
-			result.M11 = (x2 * x) + 1.0f;
-			result.M12 = y2 * x;
-			result.M13 = z2 * x;
-			result.M14 = 0.0f;
-			result.M21 = x2 * y;
-			result.M22 = (y2 * y) + 1.0f;
-			result.M23 = z2 * y;
-			result.M24 = 0.0f;
-			result.M31 = x2 * z;
-			result.M32 = y2 * z;
-			result.M33 = (z2 * z) + 1.0f;
-			result.M34 = 0.0f;
-			result.M41 = x2 * plane.D;
-			result.M42 = y2 * plane.D;
-			result.M43 = z2 * plane.D;
-			result.M44 = 1.0f;
-			return result;
+			return new Matrix44 {
+				M11 = (x2 * x) + 1.0f, M12 = y2 * x, M13 = z2 * x, M14 = 0.0f,
+				M21 = x2 * y, M22 = (y2 * y) + 1.0f, M23 = z2 * y, M24 = 0.0f,
+				M31 = x2 * z, M32 = y2 * z, M33 = (z2 * z) + 1.0f, M34 = 0.0f,
+				M41 = x2 * plane.D, M42 = y2 * plane.D, M43 = z2 * plane.D, M44 = 1.0f,
+			};
 		}
 
 		public float CalcDeterminant()
@@ -630,32 +574,22 @@ namespace Lime
 			)));
 		}
 
-		public bool Equals(Matrix44 other)
-		{
-			return ((((((this.M11 == other.M11) && (this.M22 == other.M22)) && ((this.M33 == other.M33) &&
-				(this.M44 == other.M44))) && (((this.M12 == other.M12) && (this.M13 == other.M13)) &&
-				((this.M14 == other.M14) && (this.M21 == other.M21)))) && ((((this.M23 == other.M23) &&
-				(this.M24 == other.M24)) && ((this.M31 == other.M31) && (this.M32 == other.M32))) &&
-				(((this.M34 == other.M34) && (this.M41 == other.M41)) && (this.M42 == other.M42)))) &&
-				(this.M43 == other.M43));
-		}
+		public bool Equals(Matrix44 other) =>
+			// Check main diagonal first to catch the most frequent case.
+			M11 == other.M11 && M22 == other.M22 && M33 == other.M33 && M44 == other.M44 &&
+			M12 == other.M12 && M13 == other.M13 && M14 == other.M14 &&
+			M21 == other.M21 && M23 == other.M23 && M24 == other.M24 &&
+			M31 == other.M31 && M32 == other.M32 && M34 == other.M34 &&
+			M41 == other.M41 && M42 == other.M42 && M43 == other.M43;
 
-		public override bool Equals(object obj)
-		{
-			bool flag = false;
-			if (obj is Matrix44) {
-				flag = this.Equals((Matrix44)obj);
-			}
-			return flag;
-		}
+		public override bool Equals(object obj) =>
+			obj is Matrix44 && Equals((Matrix44)obj);
 
-		public override int GetHashCode()
-		{
-			return (((((((((((((((M11.GetHashCode() + M12.GetHashCode()) + M13.GetHashCode()) + M14.GetHashCode()) +
-				M21.GetHashCode()) + M22.GetHashCode()) + M23.GetHashCode()) + M24.GetHashCode()) +
-				M31.GetHashCode()) + M32.GetHashCode()) + M33.GetHashCode()) + M34.GetHashCode()) +
-				M41.GetHashCode()) + M42.GetHashCode()) + M43.GetHashCode()) + M44.GetHashCode());
-		}
+		public override int GetHashCode() =>
+			M11.GetHashCode() + M12.GetHashCode() + M13.GetHashCode() + M14.GetHashCode() +
+			M21.GetHashCode() + M22.GetHashCode() + M23.GetHashCode() + M24.GetHashCode() +
+			M31.GetHashCode() + M32.GetHashCode() + M33.GetHashCode() + M34.GetHashCode() +
+			M41.GetHashCode() + M42.GetHashCode() + M43.GetHashCode() + M44.GetHashCode();
 
 		public static Matrix44 Invert(Matrix44 matrix)
 		{
@@ -729,27 +663,28 @@ namespace Lime
 			result.M44 = (float)((double)num1 * (double)num36 - (double)num2 * (double)num38 + (double)num3 * (double)num39) * num27;
 		}
 
-		public static Matrix44 Lerp(Matrix44 value1, Matrix44 value2, float amount)
-		{
-			var result = new Matrix44();
-			result.M11 = value1.M11 + ((value2.M11 - value1.M11) * amount);
-			result.M12 = value1.M12 + ((value2.M12 - value1.M12) * amount);
-			result.M13 = value1.M13 + ((value2.M13 - value1.M13) * amount);
-			result.M14 = value1.M14 + ((value2.M14 - value1.M14) * amount);
-			result.M21 = value1.M21 + ((value2.M21 - value1.M21) * amount);
-			result.M22 = value1.M22 + ((value2.M22 - value1.M22) * amount);
-			result.M23 = value1.M23 + ((value2.M23 - value1.M23) * amount);
-			result.M24 = value1.M24 + ((value2.M24 - value1.M24) * amount);
-			result.M31 = value1.M31 + ((value2.M31 - value1.M31) * amount);
-			result.M32 = value1.M32 + ((value2.M32 - value1.M32) * amount);
-			result.M33 = value1.M33 + ((value2.M33 - value1.M33) * amount);
-			result.M34 = value1.M34 + ((value2.M34 - value1.M34) * amount);
-			result.M41 = value1.M41 + ((value2.M41 - value1.M41) * amount);
-			result.M42 = value1.M42 + ((value2.M42 - value1.M42) * amount);
-			result.M43 = value1.M43 + ((value2.M43 - value1.M43) * amount);
-			result.M44 = value1.M44 + ((value2.M44 - value1.M44) * amount);
-			return result;
-		}
+		public static Matrix44 Lerp(Matrix44 a, Matrix44 b, float amount) =>
+			new Matrix44 {
+				M12 = a.M12 + (b.M12 - a.M12) * amount,
+				M11 = a.M11 + (b.M11 - a.M11) * amount,
+				M13 = a.M13 + (b.M13 - a.M13) * amount,
+				M14 = a.M14 + (b.M14 - a.M14) * amount,
+
+				M21 = a.M21 + (b.M21 - a.M21) * amount,
+				M22 = a.M22 + (b.M22 - a.M22) * amount,
+				M23 = a.M23 + (b.M23 - a.M23) * amount,
+				M24 = a.M24 + (b.M24 - a.M24) * amount,
+
+				M31 = a.M31 + (b.M31 - a.M31) * amount,
+				M32 = a.M32 + (b.M32 - a.M32) * amount,
+				M33 = a.M33 + (b.M33 - a.M33) * amount,
+				M34 = a.M34 + (b.M34 - a.M34) * amount,
+
+				M41 = a.M41 + (b.M41 - a.M41) * amount,
+				M42 = a.M42 + (b.M42 - a.M42) * amount,
+				M43 = a.M43 + (b.M43 - a.M43) * amount,
+				M44 = a.M44 + (b.M44 - a.M44) * amount,
+			};
 
 		/// <summary>
 		/// Decomposes a matrix into a scale, rotation, and translation.
@@ -821,213 +756,103 @@ namespace Lime
 			return true;
 		}
 
-		public static bool operator ==(Matrix44 matrix1, Matrix44 matrix2)
-		{
-			return
-				matrix1.M11 == matrix2.M11 &&
-				matrix1.M12 == matrix2.M12 &&
-				matrix1.M13 == matrix2.M13 &&
-				matrix1.M14 == matrix2.M14 &&
-				matrix1.M21 == matrix2.M21 &&
-				matrix1.M22 == matrix2.M22 &&
-				matrix1.M23 == matrix2.M23 &&
-				matrix1.M24 == matrix2.M24 &&
-				matrix1.M31 == matrix2.M31 &&
-				matrix1.M32 == matrix2.M32 &&
-				matrix1.M33 == matrix2.M33 &&
-				matrix1.M34 == matrix2.M34 &&
-				matrix1.M41 == matrix2.M41 &&
-				matrix1.M42 == matrix2.M42 &&
-				matrix1.M43 == matrix2.M43 &&
-				matrix1.M44 == matrix2.M44;
-		}
+		public static bool operator ==(Matrix44 a, Matrix44 b) =>
+			a.M11 == b.M11 && a.M12 == b.M12 && a.M13 == b.M13 && a.M14 == b.M14 &&
+			a.M21 == b.M21 && a.M22 == b.M22 && a.M23 == b.M23 && a.M24 == b.M24 &&
+			a.M31 == b.M31 && a.M32 == b.M32 && a.M33 == b.M33 && a.M34 == b.M34 &&
+			a.M41 == b.M41 && a.M42 == b.M42 && a.M43 == b.M43 && a.M44 == b.M44;
 
-		public static bool operator !=(Matrix44 matrix1, Matrix44 matrix2)
-		{
-			return
-				matrix1.M11 != matrix2.M11 ||
-				matrix1.M12 != matrix2.M12 ||
-				matrix1.M13 != matrix2.M13 ||
-				matrix1.M14 != matrix2.M14 ||
-				matrix1.M21 != matrix2.M21 ||
-				matrix1.M22 != matrix2.M22 ||
-				matrix1.M23 != matrix2.M23 ||
-				matrix1.M24 != matrix2.M24 ||
-				matrix1.M31 != matrix2.M31 ||
-				matrix1.M32 != matrix2.M32 ||
-				matrix1.M33 != matrix2.M33 ||
-				matrix1.M34 != matrix2.M34 ||
-				matrix1.M41 != matrix2.M41 ||
-				matrix1.M42 != matrix2.M42 ||
-				matrix1.M43 != matrix2.M43 ||
-				matrix1.M44 != matrix2.M44;
-		}
+		public static bool operator !=(Matrix44 a, Matrix44 b) =>
+			a.M11 != b.M11 || a.M12 != b.M12 || a.M13 != b.M13 || a.M14 != b.M14 ||
+			a.M21 != b.M21 || a.M22 != b.M22 || a.M23 != b.M23 || a.M24 != b.M24 ||
+			a.M31 != b.M31 || a.M32 != b.M32 || a.M33 != b.M33 || a.M34 != b.M34 ||
+			a.M41 != b.M41 || a.M42 != b.M42 || a.M43 != b.M43 || a.M44 != b.M44;
 
-		public static Matrix44 operator *(Matrix44 matrix1, Matrix44 matrix2)
-		{
-			var m11 = (((matrix1.M11 * matrix2.M11) + (matrix1.M12 * matrix2.M21)) + (matrix1.M13 * matrix2.M31)) + (matrix1.M14 * matrix2.M41);
-			var m12 = (((matrix1.M11 * matrix2.M12) + (matrix1.M12 * matrix2.M22)) + (matrix1.M13 * matrix2.M32)) + (matrix1.M14 * matrix2.M42);
-			var m13 = (((matrix1.M11 * matrix2.M13) + (matrix1.M12 * matrix2.M23)) + (matrix1.M13 * matrix2.M33)) + (matrix1.M14 * matrix2.M43);
-			var m14 = (((matrix1.M11 * matrix2.M14) + (matrix1.M12 * matrix2.M24)) + (matrix1.M13 * matrix2.M34)) + (matrix1.M14 * matrix2.M44);
-			var m21 = (((matrix1.M21 * matrix2.M11) + (matrix1.M22 * matrix2.M21)) + (matrix1.M23 * matrix2.M31)) + (matrix1.M24 * matrix2.M41);
-			var m22 = (((matrix1.M21 * matrix2.M12) + (matrix1.M22 * matrix2.M22)) + (matrix1.M23 * matrix2.M32)) + (matrix1.M24 * matrix2.M42);
-			var m23 = (((matrix1.M21 * matrix2.M13) + (matrix1.M22 * matrix2.M23)) + (matrix1.M23 * matrix2.M33)) + (matrix1.M24 * matrix2.M43);
-			var m24 = (((matrix1.M21 * matrix2.M14) + (matrix1.M22 * matrix2.M24)) + (matrix1.M23 * matrix2.M34)) + (matrix1.M24 * matrix2.M44);
-			var m31 = (((matrix1.M31 * matrix2.M11) + (matrix1.M32 * matrix2.M21)) + (matrix1.M33 * matrix2.M31)) + (matrix1.M34 * matrix2.M41);
-			var m32 = (((matrix1.M31 * matrix2.M12) + (matrix1.M32 * matrix2.M22)) + (matrix1.M33 * matrix2.M32)) + (matrix1.M34 * matrix2.M42);
-			var m33 = (((matrix1.M31 * matrix2.M13) + (matrix1.M32 * matrix2.M23)) + (matrix1.M33 * matrix2.M33)) + (matrix1.M34 * matrix2.M43);
-			var m34 = (((matrix1.M31 * matrix2.M14) + (matrix1.M32 * matrix2.M24)) + (matrix1.M33 * matrix2.M34)) + (matrix1.M34 * matrix2.M44);
-			var m41 = (((matrix1.M41 * matrix2.M11) + (matrix1.M42 * matrix2.M21)) + (matrix1.M43 * matrix2.M31)) + (matrix1.M44 * matrix2.M41);
-			var m42 = (((matrix1.M41 * matrix2.M12) + (matrix1.M42 * matrix2.M22)) + (matrix1.M43 * matrix2.M32)) + (matrix1.M44 * matrix2.M42);
-			var m43 = (((matrix1.M41 * matrix2.M13) + (matrix1.M42 * matrix2.M23)) + (matrix1.M43 * matrix2.M33)) + (matrix1.M44 * matrix2.M43);
-			var m44 = (((matrix1.M41 * matrix2.M14) + (matrix1.M42 * matrix2.M24)) + (matrix1.M43 * matrix2.M34)) + (matrix1.M44 * matrix2.M44);
-			var result = new Matrix44();
-			result.M11 = m11;
-			result.M12 = m12;
-			result.M13 = m13;
-			result.M14 = m14;
-			result.M21 = m21;
-			result.M22 = m22;
-			result.M23 = m23;
-			result.M24 = m24;
-			result.M31 = m31;
-			result.M32 = m32;
-			result.M33 = m33;
-			result.M34 = m34;
-			result.M41 = m41;
-			result.M42 = m42;
-			result.M43 = m43;
-			result.M44 = m44;
-			return result;
-		}
+		public static Matrix44 operator *(Matrix44 a, Matrix44 b) =>
+			new Matrix44 {
+				M11 = a.M11 * b.M11 + a.M12 * b.M21 + a.M13 * b.M31 + a.M14 * b.M41,
+				M12 = a.M11 * b.M12 + a.M12 * b.M22 + a.M13 * b.M32 + a.M14 * b.M42,
+				M13 = a.M11 * b.M13 + a.M12 * b.M23 + a.M13 * b.M33 + a.M14 * b.M43,
+				M14 = a.M11 * b.M14 + a.M12 * b.M24 + a.M13 * b.M34 + a.M14 * b.M44,
 
-		public static Matrix44 operator *(Matrix44 matrix, float scaleFactor)
-		{
-			var result = new Matrix44();
-			result.M11 = matrix.M11 * scaleFactor;
-			result.M12 = matrix.M12 * scaleFactor;
-			result.M13 = matrix.M13 * scaleFactor;
-			result.M14 = matrix.M14 * scaleFactor;
-			result.M21 = matrix.M21 * scaleFactor;
-			result.M22 = matrix.M22 * scaleFactor;
-			result.M23 = matrix.M23 * scaleFactor;
-			result.M24 = matrix.M24 * scaleFactor;
-			result.M31 = matrix.M31 * scaleFactor;
-			result.M32 = matrix.M32 * scaleFactor;
-			result.M33 = matrix.M33 * scaleFactor;
-			result.M34 = matrix.M34 * scaleFactor;
-			result.M41 = matrix.M41 * scaleFactor;
-			result.M42 = matrix.M42 * scaleFactor;
-			result.M43 = matrix.M43 * scaleFactor;
-			result.M44 = matrix.M44 * scaleFactor;
-			return result;
-		}
+				M21 = a.M21 * b.M11 + a.M22 * b.M21 + a.M23 * b.M31 + a.M24 * b.M41,
+				M22 = a.M21 * b.M12 + a.M22 * b.M22 + a.M23 * b.M32 + a.M24 * b.M42,
+				M23 = a.M21 * b.M13 + a.M22 * b.M23 + a.M23 * b.M33 + a.M24 * b.M43,
+				M24 = a.M21 * b.M14 + a.M22 * b.M24 + a.M23 * b.M34 + a.M24 * b.M44,
 
-		public static Matrix44 operator +(Matrix44 matrix1, Matrix44 matrix2)
-		{
-			var result = new Matrix44();
-			result.M11 = matrix1.M11 + matrix2.M11;
-			result.M12 = matrix1.M12 + matrix2.M12;
-			result.M13 = matrix1.M13 + matrix2.M13;
-			result.M14 = matrix1.M14 + matrix2.M14;
-			result.M21 = matrix1.M21 + matrix2.M21;
-			result.M22 = matrix1.M22 + matrix2.M22;
-			result.M23 = matrix1.M23 + matrix2.M23;
-			result.M24 = matrix1.M24 + matrix2.M24;
-			result.M31 = matrix1.M31 + matrix2.M31;
-			result.M32 = matrix1.M32 + matrix2.M32;
-			result.M33 = matrix1.M33 + matrix2.M33;
-			result.M34 = matrix1.M34 + matrix2.M34;
-			result.M41 = matrix1.M41 + matrix2.M41;
-			result.M42 = matrix1.M42 + matrix2.M42;
-			result.M43 = matrix1.M43 + matrix2.M43;
-			result.M44 = matrix1.M44 + matrix2.M44;
-			return result;
-		}
+				M31 = a.M31 * b.M11 + a.M32 * b.M21 + a.M33 * b.M31 + a.M34 * b.M41,
+				M32 = a.M31 * b.M12 + a.M32 * b.M22 + a.M33 * b.M32 + a.M34 * b.M42,
+				M33 = a.M31 * b.M13 + a.M32 * b.M23 + a.M33 * b.M33 + a.M34 * b.M43,
+				M34 = a.M31 * b.M14 + a.M32 * b.M24 + a.M33 * b.M34 + a.M34 * b.M44,
 
-		public static Matrix44 operator -(Matrix44 matrix1, Matrix44 matrix2)
-		{
-			var result = new Matrix44();
-			result.M11 = matrix1.M11 - matrix2.M11;
-			result.M12 = matrix1.M12 - matrix2.M12;
-			result.M13 = matrix1.M13 - matrix2.M13;
-			result.M14 = matrix1.M14 - matrix2.M14;
-			result.M21 = matrix1.M21 - matrix2.M21;
-			result.M22 = matrix1.M22 - matrix2.M22;
-			result.M23 = matrix1.M23 - matrix2.M23;
-			result.M24 = matrix1.M24 - matrix2.M24;
-			result.M31 = matrix1.M31 - matrix2.M31;
-			result.M32 = matrix1.M32 - matrix2.M32;
-			result.M33 = matrix1.M33 - matrix2.M33;
-			result.M34 = matrix1.M34 - matrix2.M34;
-			result.M41 = matrix1.M41 - matrix2.M41;
-			result.M42 = matrix1.M42 - matrix2.M42;
-			result.M43 = matrix1.M43 - matrix2.M43;
-			result.M44 = matrix1.M44 - matrix2.M44;
-			return result;
-		}
-
-		public static Matrix44 operator -(Matrix44 matrix)
-		{
-			matrix.M11 = -matrix.M11;
-			matrix.M12 = -matrix.M12;
-			matrix.M13 = -matrix.M13;
-			matrix.M14 = -matrix.M14;
-			matrix.M21 = -matrix.M21;
-			matrix.M22 = -matrix.M22;
-			matrix.M23 = -matrix.M23;
-			matrix.M24 = -matrix.M24;
-			matrix.M31 = -matrix.M31;
-			matrix.M32 = -matrix.M32;
-			matrix.M33 = -matrix.M33;
-			matrix.M34 = -matrix.M34;
-			matrix.M41 = -matrix.M41;
-			matrix.M42 = -matrix.M42;
-			matrix.M43 = -matrix.M43;
-			matrix.M44 = -matrix.M44;
-			return matrix;
-		}
-
-		public Vector3 TransformVector(Vector3 position)
-		{
-			var result = new Vector3(
-				(position.X * M11) + (position.Y * M21) + (position.Z * M31) + M41,
-				(position.X * M12) + (position.Y * M22) + (position.Z * M32) + M42,
-				(position.X * M13) + (position.Y * M23) + (position.Z * M33) + M43);
-			return result;
-		}
-
-		public Vector2 TransformVector(Vector2 position)
-		{
-			return (Vector2)TransformVector((Vector3)position);
-		}
-
-		public Vector4 TransformVector(Vector4 position)
-		{
-			return new Vector4(
-				(position.X * M11) + (position.Y * M21) + (position.Z * M31) + (position.W * M41),
-				(position.X * M12) + (position.Y * M22) + (position.Z * M32) + (position.W * M42),
-				(position.X * M13) + (position.Y * M23) + (position.Z * M33) + (position.W * M43),
-				(position.X * M14) + (position.Y * M24) + (position.Z * M34) + (position.W * M44)
-			);
-		}
-
-		public Vector2 TransformNormal(Vector2 normal)
-		{
-			return new Vector2 {
-				X = normal.X * M11 + normal.Y * M21,
-				Y = normal.X * M12 + normal.Y * M22
+				M41 = a.M41 * b.M11 + a.M42 * b.M21 + a.M43 * b.M31 + a.M44 * b.M41,
+				M42 = a.M41 * b.M12 + a.M42 * b.M22 + a.M43 * b.M32 + a.M44 * b.M42,
+				M43 = a.M41 * b.M13 + a.M42 * b.M23 + a.M43 * b.M33 + a.M44 * b.M43,
+				M44 = a.M41 * b.M14 + a.M42 * b.M24 + a.M43 * b.M34 + a.M44 * b.M44,
 			};
-		}
 
-		public Vector3 TransformNormal(Vector3 normal)
-		{
-			return new Vector3 {
+		public static Matrix44 operator *(Matrix44 a, float x) =>
+			new Matrix44 {
+				M11 = a.M11 * x, M12 = a.M12 * x, M13 = a.M13 * x, M14 = a.M14 * x,
+				M21 = a.M21 * x, M22 = a.M22 * x, M23 = a.M23 * x, M24 = a.M24 * x,
+				M31 = a.M31 * x, M32 = a.M32 * x, M33 = a.M33 * x, M34 = a.M34 * x,
+				M41 = a.M41 * x, M42 = a.M42 * x, M43 = a.M43 * x, M44 = a.M44 * x,
+			};
+
+		public static Matrix44 operator +(Matrix44 a, Matrix44 b) =>
+			new Matrix44 {
+				M11 = a.M11 + b.M11, M12 = a.M12 + b.M12, M13 = a.M13 + b.M13, M14 = a.M14 + b.M14,
+				M21 = a.M21 + b.M21, M22 = a.M22 + b.M22, M23 = a.M23 + b.M23, M24 = a.M24 + b.M24,
+				M31 = a.M31 + b.M31, M32 = a.M32 + b.M32, M33 = a.M33 + b.M33, M34 = a.M34 + b.M34,
+				M41 = a.M41 + b.M41, M42 = a.M42 + b.M42, M43 = a.M43 + b.M43, M44 = a.M44 + b.M44,
+			};
+
+		public static Matrix44 operator -(Matrix44 a, Matrix44 b) =>
+			new Matrix44 {
+				M11 = a.M11 - b.M11, M12 = a.M12 - b.M12, M13 = a.M13 - b.M13, M14 = a.M14 - b.M14,
+				M21 = a.M21 - b.M21, M22 = a.M22 - b.M22, M23 = a.M23 - b.M23, M24 = a.M24 - b.M24,
+				M31 = a.M31 - b.M31, M32 = a.M32 - b.M32, M33 = a.M33 - b.M33, M34 = a.M34 - b.M34,
+				M41 = a.M41 - b.M41, M42 = a.M42 - b.M42, M43 = a.M43 - b.M43, M44 = a.M44 - b.M44,
+			};
+
+		public static Matrix44 operator -(Matrix44 a) =>
+			new Matrix44 {
+				M11 = -a.M11, M12 = -a.M12, M13 = -a.M13, M14 = -a.M14,
+				M21 = -a.M21, M22 = -a.M22, M23 = -a.M23, M24 = -a.M24,
+				M31 = -a.M31, M32 = -a.M32, M33 = -a.M33, M34 = -a.M34,
+				M41 = -a.M41, M42 = -a.M42, M43 = -a.M43, M44 = -a.M44,
+			};
+
+		public Vector3 TransformVector(Vector3 position) =>
+			new Vector3(
+				position.X * M11 + position.Y * M21 + position.Z * M31 + M41,
+				position.X * M12 + position.Y * M22 + position.Z * M32 + M42,
+				position.X * M13 + position.Y * M23 + position.Z * M33 + M43
+			);
+
+		public Vector2 TransformVector(Vector2 position) =>
+			(Vector2)TransformVector((Vector3)position);
+
+		public Vector4 TransformVector(Vector4 position) =>
+			new Vector4(
+				position.X * M12 + position.Y * M22 + position.Z * M32 + position.W * M42,
+				position.X * M11 + position.Y * M21 + position.Z * M31 + position.W * M41,
+				position.X * M13 + position.Y * M23 + position.Z * M33 + position.W * M43,
+				position.X * M14 + position.Y * M24 + position.Z * M34 + position.W * M44
+			);
+
+		public Vector2 TransformNormal(Vector2 normal) =>
+			new Vector2 {
+				X = normal.X * M11 + normal.Y * M21,
+				Y = normal.X * M12 + normal.Y * M22,
+			};
+
+		public Vector3 TransformNormal(Vector3 normal) =>
+			new Vector3 {
 				X = normal.X * M11 + normal.Y * M21 + normal.Z * M31,
 				Y = normal.X * M12 + normal.Y * M22 + normal.Z * M32,
 				Z = normal.X * M13 + normal.Y * M23 + normal.Z * M33
 			};
-		}
 
 		public Vector3 ProjectVector(Vector3 position)
 		{
@@ -1043,28 +868,17 @@ namespace Lime
 			return new Vector2(x / w, y / w);
 		}
 
-		public static Vector3 operator *(Vector3 a, Matrix44 b)
-		{
-			return b.TransformVector(a);
-		}
+		public static Vector3 operator *(Vector3 a, Matrix44 b) => b.TransformVector(a);
 
-		public static Vector2 operator *(Vector2 a, Matrix44 b)
-		{
-			return b.TransformVector(a);
-		}
+		public static Vector2 operator *(Vector2 a, Matrix44 b) => b.TransformVector(a);
 
-		public override string ToString()
-		{
-			return "{" + String.Format("M11:{0} M12:{1} M13:{2} M14:{3}", M11, M12, M13, M14) + "}"
-				+ " {" + String.Format("M21:{0} M22:{1} M23:{2} M24:{3}", M21, M22, M23, M24) + "}"
-				+ " {" + String.Format("M31:{0} M32:{1} M33:{2} M34:{3}", M31, M32, M33, M34) + "}"
-				+ " {" + String.Format("M41:{0} M42:{1} M43:{2} M44:{3}", M41, M42, M43, M44) + "}";
-		}
+		public override string ToString() =>
+			$"{{M11:{M11} M12:{M12} M13:{M13} M14:{M14}}} " +
+			$"{{M21:{M21} M22:{M22} M23:{M23} M24:{M24}}} " +
+			$"{{M31:{M31} M32:{M32} M33:{M33} M34:{M34}}} " +
+			$"{{M41:{M41} M42:{M42} M43:{M43} M44:{M44}}}";
 
-		public Matrix44 Transpose()
-		{
-			return Transpose(this);
-		}
+		public Matrix44 Transpose() => Transpose(this);
 
 		public static Matrix44 Transpose(Matrix44 matrix)
 		{
@@ -1073,27 +887,12 @@ namespace Lime
 			return ret;
 		}
 
-		public static void Transpose(ref Matrix44 matrix, out Matrix44 result)
+		public static void Transpose(ref Matrix44 a, out Matrix44 result)
 		{
-			result.M11 = matrix.M11;
-			result.M12 = matrix.M21;
-			result.M13 = matrix.M31;
-			result.M14 = matrix.M41;
-
-			result.M21 = matrix.M12;
-			result.M22 = matrix.M22;
-			result.M23 = matrix.M32;
-			result.M24 = matrix.M42;
-
-			result.M31 = matrix.M13;
-			result.M32 = matrix.M23;
-			result.M33 = matrix.M33;
-			result.M34 = matrix.M43;
-
-			result.M41 = matrix.M14;
-			result.M42 = matrix.M24;
-			result.M43 = matrix.M34;
-			result.M44 = matrix.M44;
+			result.M11 = a.M11; result.M12 = a.M21; result.M13 = a.M31; result.M14 = a.M41;
+			result.M21 = a.M12; result.M22 = a.M22; result.M23 = a.M32; result.M24 = a.M42;
+			result.M31 = a.M13; result.M32 = a.M23; result.M33 = a.M33; result.M34 = a.M43;
+			result.M41 = a.M14; result.M42 = a.M24; result.M43 = a.M34; result.M44 = a.M44;
 		}
 
 		public Vector3 GetScale(bool checkReflexion)
