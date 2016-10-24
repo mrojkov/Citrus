@@ -76,24 +76,17 @@ namespace Lime
 
 		public override string ToString()
 		{
-			string r = "";
-			if ((Modifiers & Modifiers.Alt) != 0) {
-				r += "Alt+";
-			}
-			if ((Modifiers & Modifiers.Control) != 0) {
-				r += "Ctrl+";
-			}
-			if ((Modifiers & Modifiers.Shift) != 0) {
-				r += "Shift+";
-			}
-			if ((Modifiers & Modifiers.Command) != 0) {
-				#if MAC				
-				r += "Cmd+";
-				#else
-				r += "Win+";
-				#endif
-			}
-			return r + Main;
+			var sb = new StringBuilder();
+			if (Modifiers.HasFlag(Modifiers.Alt)) sb.Append("Alt+");
+			if (Modifiers.HasFlag(Modifiers.Shift)) sb.Append("Shift+");
+			if (Modifiers.HasFlag(Modifiers.Control)) sb.Append("Ctrl+");
+#if MAC
+			if (Modifiers.HasFlag(Modifiers.Command)) sb.Append("Cmd+");
+#else
+			if (Modifiers.HasFlag(Modifiers.Win)) sb.Append("Win+");
+#endif
+			sb.Append(Main.ToString());
+			return sb.ToString();
 		}
 	}
 }
