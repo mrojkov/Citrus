@@ -92,21 +92,25 @@ namespace Lime
 				RenderAll();
 				Renderer.EndFrame();
 			};
-			window.Updating += delta => {
-				if (LayoutBasedWindowSize) {
-					Size = window.ClientSize = EffectiveMinSize;
-				} else {
-					Size = (Vector2)window.ClientSize;
-				}
-				Update(delta);
-			};
+			window.Updating += UpdateAndResize;
+			window.Resized += deviceRotated => UpdateAndResize(0);
 			window.VisibleChanging += showing => {
-				if (showing && LayoutBasedWindowSize) {
-					Update(0); // Update widgets in order to deduce EffectiveMinSize.
-					Size = window.ClientSize = EffectiveMinSize;
+				if (showing) {
+					UpdateAndResize(0);
 					window.Center();
 				}
 			};
+		}
+
+		private void UpdateAndResize(float delta)
+		{
+			if (LayoutBasedWindowSize) {
+				Update(delta); // Update widgets in order to deduce EffectiveMinSize.
+				Size = Window.ClientSize = EffectiveMinSize;
+			} else {
+				Size = Window.ClientSize;
+				Update(delta);
+			}
 		}
 	}
 
