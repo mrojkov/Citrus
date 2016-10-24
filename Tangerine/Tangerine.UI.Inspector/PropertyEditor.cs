@@ -314,6 +314,24 @@ namespace Tangerine.UI.Inspector
 		}
 	}
 
+	class AudioSamplePropertyEditor : FilePropertyEditor
+	{
+		public AudioSamplePropertyEditor(PropertyEditorContext context) : base(context, new string[] { "ogg" })
+		{
+			editor.Submitted += text => {
+				Core.Operations.SetAnimableProperty.Perform(context.Objects, context.PropertyName, new SerializableSample(text));
+			};
+			editor.Tasks.Add(CoalescedPropertyValue<SerializableSample>(context).DistinctUntilChanged().Select(i => i != null ? i.SerializationPath : "").Consume(v => editor.Text = v));
+		}
+
+		protected override void SetFilePath(string path)
+		{
+			foreach (var obj in context.Objects) {
+				Core.Operations.SetAnimableProperty.Perform(obj, context.PropertyName, new SerializableSample(path));
+			}
+		}
+	}
+
 	class ContentsPathPropertyEditor : FilePropertyEditor
 	{
 		public ContentsPathPropertyEditor(PropertyEditorContext context) : base(context, new string[] { Document.SceneFileExtension })
