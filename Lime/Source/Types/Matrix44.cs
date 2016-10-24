@@ -333,8 +333,13 @@ namespace Lime
 			return CreateOrthographicOffCenter(minX, maxX, minY, maxY, zNear, zFar);
 		}
 
-		public static Matrix44 CreateOrthographicOffCenter(float left, float right, float bottom, float top, float zNear, float zFar)
+		public static Matrix44 CreateOrthographicOffCenter(
+			float left, float right, float bottom, float top, float zNear, float zFar)
 		{
+			// If the viewport has zero size, project everything into a single point.
+			if (right == left || top == bottom || zNear == zFar)
+				return new Matrix44();
+
 			Matrix44 matrix;
 			matrix.M11 = (float)(2.0 / ((double)right - (double)left));
 			matrix.M12 = 0.0f;
