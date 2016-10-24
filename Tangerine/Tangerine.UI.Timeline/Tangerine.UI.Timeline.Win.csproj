@@ -50,6 +50,7 @@
     <Compile Include="Components\GridCurveView.cs" />
     <Compile Include="Components\GridNodeView.cs" />
     <Compile Include="Components\GridPropertyView.cs" />
+    <Compile Include="Components\GridSpanList.cs" />
     <Compile Include="Components\IGridWidget.cs" />
     <Compile Include="Components\IOverviewWidget.cs" />
     <Compile Include="Components\IRollWidget.cs" />
@@ -57,9 +58,9 @@
     <Compile Include="Components\RollNodeView.cs" />
     <Compile Include="Components\RollPropertyView.cs" />
     <Compile Include="Operations\ClearGridSelection.cs" />
-    <Compile Include="Operations\SelectRectangleOnGrid.cs" />
+    <Compile Include="Operations\SelectGridSpan.cs" />
     <Compile Include="Operations\SetCurrentColumn.cs" />
-    <Compile Include="Operations\ShiftSelection.cs" />
+    <Compile Include="Operations\ShiftGridSelection.cs" />
     <Compile Include="Processors\GlobalKeyboardShortcutsProcessor.cs" />
     <Compile Include="Processors\GridPane\ClampScrollPosOnContainerChange.cs" />
     <Compile Include="Processors\GridPane\ClampScrollPosProcessor.cs" />
@@ -80,7 +81,6 @@
     <Compile Include="Processors\BuildRowViewsProcessor.cs" />
     <Compile Include="Processors\MouseWheelProcessor.cs" />
     <Compile Include="GridPane.cs" />
-    <Compile Include="GridSelection.cs" />
     <Compile Include="OverviewPane.cs" />
     <Compile Include="RollPane.cs" />
     <Compile Include="Rulerbar.cs" />
