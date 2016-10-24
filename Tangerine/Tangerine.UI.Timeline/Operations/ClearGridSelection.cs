@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using Lime;
 using Tangerine.Core;
+using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline.Operations
 {
 	public class ClearGridSelection : IOperation
 	{
-		GridSelection savedSelection;
-
 		public bool IsChangingDocument => false;
 		public DateTime Timestamp { get; set; }
+		List<GridSpanList> savedSpans;
 
 		public static void Perform()
 		{
@@ -22,14 +22,19 @@ namespace Tangerine.UI.Timeline.Operations
 
 		public void Do()
 		{
-			savedSelection = Timeline.Instance.GridSelection;
-			Timeline.Instance.GridSelection = new GridSelection();
+			savedSpans = Document.Current.Rows.Select(r => r.Components.GetOrAdd<GridSpanList>()).ToList();
+			foreach (var row in Document.Current.Rows) {
+				row.Components.Remove<GridSpanList>();
+			}
 		}
 
 		public void Undo()
 		{
-			Timeline.Instance.GridSelection = savedSelection;
-			savedSelection = null;
+			foreach (var row in Document.Current.Rows) {
+				row.Components.Remove<GridSpanList>();
+				row.Components.Add(savedSpans[row.Index]);
+			}
+			savedSpans = null;
 		}
 	}
 }

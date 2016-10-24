@@ -21,7 +21,7 @@ namespace Tangerine.UI.Timeline
 				if (input.WasMousePressed()) {
 					var initialCell = MousePositionToCell(input.MousePosition);
 					input.CaptureMouse();
-					if (timeline.GridSelection.IsCellSelected(initialCell)) {
+					if (IsCellSelected(initialCell)) {
 						yield return DragSelectionTask(initialCell);
 					} else {
 						var r = new HasKeyframeRequest(initialCell);
@@ -40,12 +40,16 @@ namespace Tangerine.UI.Timeline
 			}
 		}
 
+		bool IsCellSelected(IntVector2 cell)
+		{
+			return Document.Current.Rows[cell.Y].Components.GetOrAdd<Components.GridSpanList>().IsCellSelected(cell.X);
+		}
+
 		private IEnumerator<object> DragSelectionTask(IntVector2 initialCell)
 		{
-			var selection = new GridSelection(timeline.GridSelection);
 			var input = grid.RootWidget.Input;
 			var offset = IntVector2.Zero;
-			Action<Widget> r = widget => RenderSelection(widget, selection, offset);
+			Action<Widget> r = widget => timeline.Grid.RenderSelection(widget, offset);
 			grid.OnPostRender += r;
 			while (input.IsMousePressed()) {
 				offset = MousePositionToCell(input.MousePosition) - initialCell;
@@ -54,15 +58,14 @@ namespace Tangerine.UI.Timeline
 			}
 			grid.OnPostRender -= r;
 			if (offset != IntVector2.Zero) {
-				timeline.Globals.Components.Add(new DragKeyframesRequest(offset, selection));
+				timeline.Globals.Components.Add(new DragKeyframesRequest(offset));
 			}
 		}
 
 		private IEnumerator<object> DragKeyframeTask(IntVector2 cell)
 		{
-			var rect = new IntRectangle { A = cell, B = cell + IntVector2.One };
 			Operations.ClearGridSelection.Perform();
-			Operations.SelectRectangleOnGrid.Perform(rect);
+			Operations.SelectGridSpan.Perform(cell.Y, new GridSpan(cell.X, cell.X + 1));
 			yield return DragSelectionTask(cell);
 		}
 
@@ -75,7 +78,7 @@ namespace Tangerine.UI.Timeline
 				rect.A = initialCell;
 				rect.B = MousePositionToCell(input.MousePosition);
 				if (rect.Width >= 0) {
-						rect.B.X++;
+					rect.B.X++;
 				} else {
 					rect.A.X++;
 				}
@@ -89,7 +92,9 @@ namespace Tangerine.UI.Timeline
 				yield return null;
 			}
 			grid.OnPostRender -= RenderSelectionRect;
-			Operations.SelectRectangleOnGrid.Perform(rect);
+			for (var r = rect.A.Y; r < rect.B.Y; r++) {
+				Operations.SelectGridSpan.Perform(r, new GridSpan(rect.A.X, rect.B.X));
+			}
 		}
 
 		IntVector2 MousePositionToCell(Vector2 position)
@@ -107,14 +112,6 @@ namespace Tangerine.UI.Timeline
 				}
 			}
 			return r;
-		}
-
-		private void RenderSelection(Widget widget, GridSelection selection, IntVector2 offset)
-		{
-			widget.PrepareRendererState();
-			foreach (var r in selection.GetNonOverlappedRects()) {
-				Renderer.DrawRect(grid.CellToGridCoordinates(r.A + offset), grid.CellToGridCoordinates(r.B + offset), TimelineGridColors.Selection);
-			}
 		}
 
 		void RenderSelectionRect(Widget widget)

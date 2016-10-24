@@ -16,7 +16,7 @@ namespace Tangerine.UI.Timeline
 			while (true) {
 				var r = g.Components.Get<DragKeyframesRequest>();
 				if (r != null) {
-					DragKeys(r.Offset, r.Selection);
+					DragKeys(r.Offset);
 					ShiftSelection(r.Offset);
 					g.Components.Remove<DragKeyframesRequest>();
 				}
@@ -26,35 +26,32 @@ namespace Tangerine.UI.Timeline
 
 		static void ShiftSelection(IntVector2 offset)
 		{
-			Operations.ShiftSelection.Perform(offset);
+			Operations.ShiftGridSelection.Perform(offset);
 		}
 
-		static void DragKeys(IntVector2 offset, GridSelection selection)
+		static void DragKeys(IntVector2 offset)
 		{
 			var processedKeys = new HashSet<IKeyframe>();
 			var operations = new List<Action>();
-			foreach (var rect in Timeline.Instance.GridSelection.GetNonOverlappedRects()) {
-				for (int row = rect.A.Y; row < rect.B.Y; row++) {
-					if (!CheckRowRange(row)) {
-						continue;
-					}
-					var rowComponents = Document.Current.Rows[row].Components;
-					var node = rowComponents.Get<NodeRow>()?.Node ?? rowComponents.Get<PropertyRow>()?.Node;
+			foreach (var row in Document.Current.Rows) {
+				var spans = row.Components.GetOrAdd<GridSpanList>();
+				foreach (var span in spans.GetNonOverlappedSpans()) {
+					var node = row.Components.Get<NodeRow>()?.Node ?? row.Components.Get<PropertyRow>()?.Node;
 					if (node == null) {
 						continue;
 					}
-					var property = rowComponents.Get<PropertyRow>()?.Animator.TargetProperty;
+					var property = row.Components.Get<PropertyRow>()?.Animator.TargetProperty;
 					foreach (var a in node.Animators) {
 						if (property != null && a.TargetProperty != property) {
 							continue;
 						}
-						foreach (var k in a.Keys.Where(k => k.Frame >= rect.A.X && k.Frame < rect.B.X)) {
+						foreach (var k in a.Keys.Where(k => k.Frame >= span.A && k.Frame < span.B)) {
 							if (processedKeys.Contains(k)) {
 								continue;
 							}
 							processedKeys.Add(k);
 							operations.Insert(0, () => Core.Operations.RemoveKeyframe.Perform(a, k.Frame));
-							var destRow = row + offset.Y;
+							var destRow = row.Index + offset.Y;
 							if (!CheckRowRange(destRow)) {
 								continue;
 							}

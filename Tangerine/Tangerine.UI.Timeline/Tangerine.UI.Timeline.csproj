@@ -71,16 +71,14 @@
     <Compile Include="Processors\GlobalKeyboardShortcutsProcessor.cs" />
     <Compile Include="Processors\MouseWheelProcessor.cs" />
     <Compile Include="GridPane.cs" />
-    <Compile Include="GridSelection.cs" />
     <Compile Include="OverviewPane.cs" />
     <Compile Include="RollPane.cs" />
     <Compile Include="Rulerbar.cs" />
     <Compile Include="Timeline.cs" />
     <Compile Include="Toolbar.cs" />
     <Compile Include="Operations\ClearGridSelection.cs" />
-    <Compile Include="Operations\SelectRectangleOnGrid.cs" />
     <Compile Include="Operations\SetCurrentColumn.cs" />
-    <Compile Include="Operations\ShiftSelection.cs" />
+    <Compile Include="Operations\ShiftGridSelection.cs" />
     <Compile Include="Components\DragKeyframesRequest.cs" />
     <Compile Include="Components\HasKeyframeRequest.cs" />
     <Compile Include="MarkerPropertiesDialog.cs" />
@@ -97,6 +95,8 @@
     <Compile Include="Components\RollNodeView.cs" />
     <Compile Include="Components\RollPropertyView.cs" />
     <Compile Include="Processors\GridPane\ClampScrollPosOnContainerChange.cs" />
+    <Compile Include="Components\GridSpanList.cs" />
+    <Compile Include="Operations\SelectGridSpan.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.csproj">

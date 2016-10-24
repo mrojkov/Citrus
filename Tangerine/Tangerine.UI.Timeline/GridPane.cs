@@ -61,19 +61,34 @@ namespace Tangerine.UI.Timeline
 			Renderer.DrawLine(x, 0, x, ContentWidget.Height, Document.Current.Container.IsRunning ? TimelineRulerColors.RunningCursor : TimelineRulerColors.Cursor);
 		}
 
-		private void RenderSelection(Widget widget)
+		void RenderSelection(Widget widget)
+		{
+			RenderSelection(widget, IntVector2.Zero);
+		}
+
+		public void RenderSelection(Widget widget, IntVector2 offset)
 		{
 			widget.PrepareRendererState();
-			foreach (var rect in timeline.GridSelection.GetNonOverlappedRects()) {
-				Renderer.DrawRect(CellToGridCoordinates(rect.A), CellToGridCoordinates(rect.B), TimelineGridColors.Selection);
+			foreach (var row in Document.Current.Rows) {
+				var s = row.Components.GetOrAdd<Components.GridSpanList>();
+				foreach (var i in s.GetNonOverlappedSpans()) {
+					var a = CellToGridCoordinates(new IntVector2(i.A, row.Index) + offset);
+					var b = CellToGridCoordinates(new IntVector2(i.B, row.Index + 1) + offset);
+					Renderer.DrawRect(a, b, TimelineGridColors.Selection);
+				}
 			}
 		}
 
 		public Vector2 CellToGridCoordinates(IntVector2 cell)
 		{
+			return CellToGridCoordinates(cell.Y, cell.X);
+		}
+
+		public Vector2 CellToGridCoordinates(int row, int col)
+		{
 			var rows = Document.Current.Rows;
-			var y = cell.Y < rows.Count ? rows[Math.Max(cell.Y, 0)].GetGridWidget().Top : rows[rows.Count - 1].GetGridWidget().Bottom;
-			return new Vector2(cell.X * TimelineMetrics.ColWidth, y);
+			var y = row < rows.Count ? rows[Math.Max(row, 0)].GetGridWidget().Top : rows[rows.Count - 1].GetGridWidget().Bottom;
+			return new Vector2(col * TimelineMetrics.ColWidth, y);
 		}
 	}
 }
