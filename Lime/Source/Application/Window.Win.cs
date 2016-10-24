@@ -319,21 +319,9 @@ namespace Lime
 			RaiseDeactivated();
 		}
 
-		private WindowState prevWindowState;
-
 		private void OnResize(object sender, EventArgs e)
 		{
-			// We should ignore this event after minimize or restore.
-			// Calling to RaiseResized() after minimize can lead to various bugs because window size is 0x0
-			// Calling to RaiseResized() after restore leads to useless screen recreating and some screen state loss
-			// (like scroll position in scrollview).
-			var hasBeenMinimizedOrRestored =
-				(prevWindowState != WindowState.Minimized && State == WindowState.Minimized) ||
-				(prevWindowState == WindowState.Minimized && State != WindowState.Minimized);
-			prevWindowState = State;
-			if (!hasBeenMinimizedOrRestored) {
-				RaiseResized(deviceRotated: false);
-			}
+			RaiseResized(deviceRotated: false);
 		}
 
 		private void OnMouseDown(object sender, MouseEventArgs e)
