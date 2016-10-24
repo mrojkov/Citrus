@@ -39,6 +39,16 @@ namespace Tangerine.Core
 			return ComponentMap<T>.Instance.Get(Owner);
 		}
 
+		public T GetOrAdd<T>() where T : IComponent, new()
+		{
+			var c = ComponentMap<T>.Instance.Get(Owner);
+			if (c == null) {
+				c = new T();
+				Add(c);
+			}
+			return c;
+		}
+
 		public void Add<T>(T component) where T : IComponent
 		{
 			var map = ComponentMap<T>.Instance;
@@ -50,15 +60,16 @@ namespace Tangerine.Core
 			componentSet[index] = true;
 		}
 
-		public void Remove<T>() where T : IComponent
+		public bool Remove<T>() where T : IComponent
 		{
 			var map = ComponentMap<T>.Instance;
 			int index = ComponentMapRegistry.Instance.TypeIndices[typeof(T)];
 			if (!componentSet[index]) {
-				throw new ArgumentException("Attempt to remove a missing component");
+				return false;
 			}
 			map.Remove(Owner);
 			componentSet[index] = false;
+			return true;
 		}
 
 		IEnumerator<IComponent> IEnumerable<IComponent>.GetEnumerator()
