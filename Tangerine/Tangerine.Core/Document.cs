@@ -13,6 +13,14 @@ namespace Tangerine.Core
 		void Attach();
 	}
 
+	/// <summary>
+	/// Document updater maintains a document in the consistent state. Update() is being invoked after every executed operation.
+	/// </summary>
+	public interface IDocumentUpdater
+	{
+		void Update();
+	}
+
 	public sealed class Document
 	{
 		public enum CloseAction
@@ -26,7 +34,6 @@ namespace Tangerine.Core
 
 		public static event Action<Document> AttachingViews;
 		public static event Func<Document, CloseAction> Closing;
-		public static event Action<Document> RowsSynchronizer;
 
 		public const string SceneFileExtension = "scene";
 
@@ -60,6 +67,9 @@ namespace Tangerine.Core
 		/// </summary>
 		public readonly List<IDocumentView> Views = new List<IDocumentView>();
 
+		public static readonly List<Func<IDocumentUpdater>> UpdaterBuilders = new List<Func<IDocumentUpdater>>();
+		readonly List<IDocumentUpdater> updaters = new List<IDocumentUpdater>();
+
 		public int AnimationFrame
 		{
 			get { return Container.AnimationFrame; }
@@ -71,7 +81,7 @@ namespace Tangerine.Core
 		public Document()
 		{
 			History = new DocumentHistory();
-			History.Changed += SyncRows;
+			History.Changed += Update;
 			History.Changed += Application.InvalidateWindows;
 		}
 
@@ -105,6 +115,9 @@ namespace Tangerine.Core
 			AttachingViews?.Invoke(this);
 			foreach (var i in Current.Views) {
 				i.Attach();
+			}
+			if (updaters.Count == 0) {
+				updaters.AddRange(UpdaterBuilders.Select(i => i()));
 			}
 		}
 
@@ -152,9 +165,14 @@ namespace Tangerine.Core
 			}
 		}
 
-		void SyncRows()
+		/// <summary>
+		/// Restores the document consistency.
+		/// </summary>
+		public void Update()
 		{
-			RowsSynchronizer?.Invoke(this);
+			foreach (var i in updaters) {
+				i.Update();
+			}
 		}
 
 		public IEnumerable<Node> SelectedNodes()

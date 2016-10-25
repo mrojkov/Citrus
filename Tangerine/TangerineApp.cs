@@ -63,14 +63,16 @@ namespace Tangerine
 					default: return Document.CloseAction.Cancel;
 				}
 			};
+
+			Document.UpdaterBuilders.Add(() => new RowsSynchronizer());
+			Document.UpdaterBuilders.AddRange(UI.Timeline.Timeline.GetDocumentUpdateBuilders());
+
 			Toolbars.Add("Create", new Toolbar(dockManager.ToolbarArea));
 			Toolbars.Add("Tools", new Toolbar(dockManager.ToolbarArea));
 			foreach (var c in Application.MainMenu.FindCommand("Create").Submenu) {
 				Toolbars["Create"].Add(c);
 			}
 			CreateToolsToolbar();
-			var sr = new RowsSynchronizer();
-			Document.RowsSynchronizer += sr.Process;
 			Document.AttachingViews += doc => {
 				if (doc.Views.Count == 0) {
 					doc.Views.AddRange(new IDocumentView [] {
@@ -163,7 +165,6 @@ namespace Tangerine
 			docArea.AddNode(tabBar);
 			docArea.AddNode(documentViewContainer);
 			docArea.FocusScope = new KeyboardFocusScope(docArea);
-			docArea.LateTasks.Add(new UI.Timeline.GlobalKeyboardShortcutsProcessor(docArea.Input));
 			return documentViewContainer;
 		}
 

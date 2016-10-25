@@ -45,6 +45,18 @@ namespace Tangerine.UI.Timeline
 		public int ColumnCount { get; set; }
 		public readonly Entity Globals = new Entity();
 
+		public static IEnumerable<Func<IDocumentUpdater>> GetDocumentUpdateBuilders()
+		{
+			return new Func<IDocumentUpdater>[] { 
+				() => new UnlinkedNodesDeselector(),
+				() => new ColumnCountUpdater(),
+				() => new RowViewsUpdater(),
+				() => new RollWidgetsUpdater(),
+				() => new GridWidgetsUpdater(),
+				() => new OverviewWidgetsUpdater()
+			};
+		}
+
 		public Timeline(DockPanel panel)
 		{
 			Panel = panel;
@@ -98,12 +110,6 @@ namespace Tangerine.UI.Timeline
 		void CreateProcessors()
 		{
 			RootWidget.LateTasks.Add(new IProcessor[] {
-				new UnselectUnlinkedNodesProcessor(),
-				new ColumnCountProcessor(),
-				new BuildRowViewsProcessor(),
-				new RollWidgetsProcessor(),
-				new GridWidgetsProcessor(),
-				new OverviewWidgetsProcessor(),
 				new OverviewScrollProcessor(),
 				new MouseWheelProcessor(),
 				new ResizeGridCurveViewProcessor(),

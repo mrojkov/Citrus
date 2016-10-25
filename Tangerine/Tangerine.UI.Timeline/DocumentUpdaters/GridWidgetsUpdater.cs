@@ -4,19 +4,16 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.Timeline
 {
-	public class GridWidgetsProcessor : Core.IProcessor
+	public class GridWidgetsUpdater : IDocumentUpdater
 	{
 		Timeline timeline => Timeline.Instance;
 
-		public IEnumerator<object> Loop()
+		public void Update()
 		{
-			while (true) {
-				if (!AreWidgetsValid()) {
-					ResetWidgets();
-				}
-				AdjustWidths();
-				yield return null;
+			if (!AreWidgetsValid()) {
+				ResetWidgets();
 			}
+			AdjustWidths();
 		}
 
 		void AdjustWidths()

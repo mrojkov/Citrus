@@ -36,6 +36,10 @@ namespace Tangerine.UI.Timeline
 			RootWidget.Updating += delta => {
 				ContentWidget.Position = -timeline.ScrollPos;
 			};
+			RootWidget.LateTasks.Add(new Property<Vector2>(() => RootWidget.Size).DistinctUntilChanged().Consume(_ => {
+				// Some document updaters (e.g. ColumnCountUpdater) require up-to-date timeline dimensions.
+				Document.Current.Update();
+			}));
 			OnPostRender += RenderGrid;
 			OnPostRender += RenderSelection;
 		}

@@ -58,16 +58,11 @@
     <Compile Include="Processors\GridPane\DragKeyframesRespondentProcessor.cs" />
     <Compile Include="Processors\GridPane\GridMouseScrollProcessor.cs" />
     <Compile Include="Processors\GridPane\HasKeyframeRespondentProcessor.cs" />
-    <Compile Include="Processors\GridPane\GridWidgetsProcessor.cs" />
-    <Compile Include="Processors\GridPane\ColumnCountProcessor.cs" />
     <Compile Include="Processors\GridPane\ResizeGridCurveViewProcessor.cs" />
     <Compile Include="Processors\GridPane\SelectAndDragKeyframesProcessor.cs" />
     <Compile Include="Processors\OverviewPane\OverviewScrollProcessor.cs" />
-    <Compile Include="Processors\OverviewPane\OverviewWidgetsProcessor.cs" />
-    <Compile Include="Processors\RollPane\RollWidgetsProcessor.cs" />
     <Compile Include="Processors\RollPane\RollMouseScrollProcessor.cs" />
     <Compile Include="Processors\RollPane\SelectAndDragRowsProcessor.cs" />
-    <Compile Include="Processors\BuildRowViewsProcessor.cs" />
     <Compile Include="Processors\GlobalKeyboardShortcutsProcessor.cs" />
     <Compile Include="Processors\MouseWheelProcessor.cs" />
     <Compile Include="GridPane.cs" />
@@ -84,7 +79,6 @@
     <Compile Include="MarkerPropertiesDialog.cs" />
     <Compile Include="Processors\Rulerbar\EditMarkerProcessor.cs" />
     <Compile Include="Processors\Rulerbar\RulerMouseScrollProcessor.cs" />
-    <Compile Include="Processors\UnselectUnlinkedNodesProcessor.cs" />
     <Compile Include="Components\GridCurveView.cs" />
     <Compile Include="Components\GridNodeView.cs" />
     <Compile Include="Components\GridPropertyView.cs" />
@@ -97,6 +91,12 @@
     <Compile Include="Processors\GridPane\ClampScrollPosOnContainerChange.cs" />
     <Compile Include="Components\GridSpanList.cs" />
     <Compile Include="Operations\SelectGridSpan.cs" />
+    <Compile Include="DocumentUpdaters\ColumnCountUpdater.cs" />
+    <Compile Include="DocumentUpdaters\RollWidgetsUpdater.cs" />
+    <Compile Include="DocumentUpdaters\UnlinkedNodesDeselector.cs" />
+    <Compile Include="DocumentUpdaters\OverviewWidgetsUpdater.cs" />
+    <Compile Include="DocumentUpdaters\GridWidgetsUpdater.cs" />
+    <Compile Include="DocumentUpdaters\RowViewsUpdater.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.csproj">
@@ -117,6 +117,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Processors\Rulerbar\" />
+    <Folder Include="DocumentUpdaters\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
 </Project>

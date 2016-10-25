@@ -4,17 +4,14 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.Timeline
 {
-	public class RollWidgetsProcessor : Core.IProcessor
+	public class RollWidgetsUpdater : IDocumentUpdater
 	{
 		Timeline timeline => Timeline.Instance;
 
-		public IEnumerator<object> Loop()
+		public void Update()
 		{
-			while (true) {
-				if (!AreWidgetsValid()) {
-					ResetWidgets();
-				}
-				yield return null;
+			if (!AreWidgetsValid()) {
+				ResetWidgets();
 			}
 		}
 

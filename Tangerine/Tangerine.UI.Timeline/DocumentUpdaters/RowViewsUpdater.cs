@@ -7,20 +7,17 @@ using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline
 {
-	public class BuildRowViewsProcessor : IProcessor
+	public class RowViewsUpdater : IDocumentUpdater
 	{
-		public IEnumerator<object> Loop()
+		public void Update()
 		{
-			while (true) {
-				foreach (var row in Document.Current.Rows) {
-					TryCreateGridNodeView(row);
-					TryCreateGridPropertyView(row);
-					TryCreateGridCurveView(row);
-					TryCreateRollNodeView(row);
-					TryCreateRollPropertyView(row);
-					TryCreateRollCurveView(row);
-				}
-				yield return null;
+			foreach (var row in Document.Current.Rows) {
+				TryCreateGridNodeView(row);
+				TryCreateGridPropertyView(row);
+				TryCreateGridCurveView(row);
+				TryCreateRollNodeView(row);
+				TryCreateRollPropertyView(row);
+				TryCreateRollCurveView(row);
 			}
 		}
 
