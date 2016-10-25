@@ -184,7 +184,6 @@
     <Compile Include="Source\Widgets\Layout\LayoutDebugPresenter.cs" />
     <Compile Include="Source\Widgets\Layout\FlowLayout.cs" />
     <Compile Include="Source\Widgets\3D\WidgetAdapter3D.cs" />
-    <Compile Include="Source\Widgets\3D\IRenderObject3D.cs" />
     <Compile Include="Source\Widgets\3D\MaterialTechnique.cs" />
     <Compile Include="Source\Widgets\ListView\ScrollViewWidget.cs" />
     <Compile Include="Source\Widgets\Text\IText.cs" />

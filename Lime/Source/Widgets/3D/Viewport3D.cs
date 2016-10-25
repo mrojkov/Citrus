@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Yuzu;
+using System;
 #if OPENGL
 #if !MAC && !MONOMAC
 using OpenTK.Graphics.ES20;
@@ -16,30 +17,31 @@ namespace Lime
 	{
 		private Camera3D camera;
 		private float frame;
-		private List<IRenderObject3D> renderQueue;
-		private List<Mesh3D> modelMeshes;
+		private List<Node3D> opaqueNodes;
+		private List<Node3D> transparentNodes;
 		private bool zSortEnabled;
 		private RenderChain renderChain = new RenderChain();
+		private DistanceComparer backToFrontComparer = new BackToFrontComparer();
+		private DistanceComparer frontToBackComparer = new FrontToBackComparer();
 
 		public bool ZSortEnabled
 		{
 			get { return zSortEnabled; }
 			set
 			{
+				if (value == zSortEnabled) {
+					return;
+				}
 				if (value) {
-					if (!zSortEnabled) {
-						renderQueue = new List<IRenderObject3D>();
-						modelMeshes = new List<Mesh3D>();
-					}
+					opaqueNodes = new List<Node3D>();
+					transparentNodes = new List<Node3D>();
 				} else {
-					renderQueue = null;
-					modelMeshes = null;
+					opaqueNodes = null;
+					transparentNodes = null;
 				}
 				zSortEnabled = value;
 			}
 		}
-
-		private DepthComparer depthComparer = new DepthComparer();
 
 		public Camera3D Camera
 		{
@@ -47,7 +49,7 @@ namespace Lime
 			set
 			{
 				camera = value;
-				depthComparer.Camera = camera;
+				backToFrontComparer.Camera = frontToBackComparer.Camera = Camera;
 				AdjustCameraAspectRatio();
 			}
 		}
@@ -92,18 +94,6 @@ namespace Lime
 			}
 		}
 
-		private class DepthComparer : IComparer<IRenderObject3D>
-		{
-			public Camera3D Camera;
-
-			public int Compare(IRenderObject3D a, IRenderObject3D b)
-			{
-				float da = (a.Center * Camera.View).Z;
-				float db = (b.Center * Camera.View).Z;
-				return da.CompareTo(db);
-			}
-		}
-
 		internal protected override bool PartialHitTest(ref HitTestArgs args)
 		{
 			try {
@@ -141,63 +131,50 @@ namespace Lime
 			var oldWorld = Renderer.World;
 			var oldView = Renderer.View;
 			var oldProj = Renderer.Projection;
-			var oldCullMode = Renderer.CullMode;
 			var oldZTestEnabled = Renderer.ZTestEnabled;
 			var oldZWriteEnabled = Renderer.ZWriteEnabled;
+			var oldCullMode = Renderer.CullMode;
 			Renderer.Flush();
 			Renderer.View = Camera.View;
 			Renderer.Projection = TransformProjection(Renderer.Projection);
-#if UNITY
-			MaterialFactory.ThreeDimensionalRendering = true;
-#else
-			Renderer.CullMode = CullMode.CullClockwise;
-#endif
-			if (ZSortEnabled && false) {
-				//for (int i = 0; i < RenderChain.LayerCount; i++) {
-				//	var layer = renderChain.Layers[i];
-				//	if (layer == null || layer.Count == 0) {
-				//		continue;
-				//	}
-				//	renderQueue.Clear();
-				//	modelMeshes.Clear();
-				//	foreach (var t in layer) {
-				//		var mm = t.Node as Mesh3D;
-				//		if (mm != null) {
-				//			if (!mm.SkipRender) {
-				//				modelMeshes.Add(mm);
-				//				foreach (var sm in mm.Submeshes) {
-				//					renderQueue.Add(sm);
-				//				}
-				//			}
-				//		}
-				//		var wa = t.Node as WidgetAdapter3D;
-				//		if (wa != null) {
-				//			renderQueue.Add(wa);
-				//		}
-				//	}
-				//	renderQueue.Sort(depthComparer);
-				//	foreach (var mm in modelMeshes) {
-				//		mm.PrepareToRender();
-				//	}
-				//	foreach (var sm in renderQueue) {
-				//		sm.Render();
-				//	}
-				//}
-				//renderChain.Clear();
+			if (ZSortEnabled) {
+				for (var i = 0; i < RenderChain.LayerCount; i++) {
+					var layer = renderChain.Layers[i];
+					if (layer == null || layer.Count == 0) {
+						continue;
+					}
+					for (var j = 0; j < layer.Count; j++) {
+						var node = layer[j].Node.AsNode3D;
+						var list = node.Opaque ? opaqueNodes : transparentNodes;
+						list.Add(node);
+					}
+					Renderer.ZTestEnabled = true;
+					Renderer.ZWriteEnabled = false;
+					SortAndRender(opaqueNodes, frontToBackComparer);
+					Renderer.ZTestEnabled = false;
+					Renderer.ZWriteEnabled = true;
+					SortAndRender(transparentNodes, backToFrontComparer);
+					opaqueNodes.Clear();
+					transparentNodes.Clear();
+				}
 			} else {
 				renderChain.RenderAndClear();
 			}
-#if UNITY
-			MaterialFactory.ThreeDimensionalRendering = false;
-#else
-			Renderer.CullMode = oldCullMode;
-#endif
 			Renderer.Clear(ClearTarget.DepthBuffer);
 			Renderer.World = oldWorld;
 			Renderer.View = oldView;
 			Renderer.Projection = oldProj;
 			Renderer.ZTestEnabled = oldZTestEnabled;
 			Renderer.ZWriteEnabled = oldZWriteEnabled;
+			Renderer.CullMode = oldCullMode;
+		}
+
+		private void SortAndRender(List<Node3D> nodes, IComparer<Node3D> comparer)
+		{
+			nodes.Sort(comparer);
+			for (var i = 0; i < nodes.Count; i++) {
+				nodes[i].Presenter.Render(nodes[i]);
+			}
 		}
 
 		private Matrix44 TransformProjection(Matrix44 orthoProjection)
@@ -273,6 +250,31 @@ namespace Lime
 			var zFar = Camera.FarClipPlane;
 			var z = (pt.Z * (zFar + zNear) + 2f * zFar * zNear) / (pt.Z * (zFar - zNear));
 			return new Vector3(xy, z) * new Vector3(1, -1, 1);
+		}
+
+		private abstract class DistanceComparer : Comparer<Node3D>
+		{
+			public Camera3D Camera { get; set; }
+		}
+
+		private class BackToFrontComparer : DistanceComparer
+		{
+			public override int Compare(Node3D x, Node3D y)
+			{
+				var xDistance = x.CalcDistanceToCamera(Camera);
+				var yDistance = y.CalcDistanceToCamera(Camera);
+				return xDistance.CompareTo(yDistance);
+			}
+		}
+
+		private class FrontToBackComparer : DistanceComparer
+		{
+			public override int Compare(Node3D x, Node3D y)
+			{
+				var xDistance = x.CalcDistanceToCamera(Camera);
+				var yDistance = y.CalcDistanceToCamera(Camera);
+				return yDistance.CompareTo(xDistance);
+			}
 		}
 	}
 }

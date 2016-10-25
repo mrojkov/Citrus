@@ -76,6 +76,8 @@ namespace Lime
 		public bool GloballyVisible { get { RecalcDirtyGlobals(); return globallyVisible; } }
 		public Color4 GlobalColor { get { RecalcDirtyGlobals(); return globalColor; } }
 
+		public bool Opaque = true;
+
 		public bool IsMouseOver()
 		{
 			return WidgetContext.Current.NodeUnderMouse == this;
@@ -88,6 +90,11 @@ namespace Lime
 			rotation = Quaternion.Identity;
 			visible = true;
 			color = Color4.White;
+		}
+
+		public virtual float CalcDistanceToCamera(Camera3D camera)
+		{
+			return camera.View.TransformVector(GlobalTransform.Translation).Z;
 		}
 
 		protected override void RecalcDirtyGlobalsUsingParents()

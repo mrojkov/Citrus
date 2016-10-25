@@ -1,7 +1,7 @@
 ﻿
 namespace Lime
 {
-	public class WidgetAdapter3D : Node3D, IRenderObject3D
+	public class WidgetAdapter3D : Node3D
 	{
 		private RenderChain renderChain = new RenderChain();
 
@@ -22,9 +22,15 @@ namespace Lime
 			}
 		}
 
-		public Vector3 Center
+		public WidgetAdapter3D()
 		{
-			get { return GlobalTransform.TransformVector((Vector3)(Widget.Position * new Vector2(1, -1))); }
+			Opaque = false;
+		}
+
+		public override float CalcDistanceToCamera(Camera3D camera)
+		{
+			var p = GlobalTransform.TransformVector((Vector3)(Widget.Position * new Vector2(1, -1)));
+			return camera.View.TransformVector(p).Z;
 		}
 
 		public Plane GetPlane()
