@@ -27,8 +27,6 @@ namespace Lime
 		/// </summary>
 		public MouseCursor MouseCursor { get; set; }
 
-		public Camera3D CurrentCamera { get; set; }
-
 		public WidgetContext(Widget root) : base("Current")
 		{
 			Root = root;

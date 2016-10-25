@@ -138,50 +138,52 @@ namespace Lime
 			foreach (var node in Nodes) {
 				node.AddToRenderChain(renderChain);
 			}
+			var oldWorld = Renderer.World;
+			var oldView = Renderer.View;
 			var oldProj = Renderer.Projection;
 			var oldCullMode = Renderer.CullMode;
 			var oldZTestEnabled = Renderer.ZTestEnabled;
 			var oldZWriteEnabled = Renderer.ZWriteEnabled;
 			Renderer.Flush();
+			Renderer.View = Camera.View;
 			Renderer.Projection = TransformProjection(Renderer.Projection);
-			WidgetContext.Current.CurrentCamera = Camera;
 #if UNITY
 			MaterialFactory.ThreeDimensionalRendering = true;
 #else
 			Renderer.CullMode = CullMode.CullClockwise;
 #endif
-			if (ZSortEnabled) {
-				for (int i = 0; i < RenderChain.LayerCount; i++) {
-					var layer = renderChain.Layers[i];
-					if (layer == null || layer.Count == 0) {
-						continue;
-					}
-					renderQueue.Clear();
-					modelMeshes.Clear();
-					foreach (var t in layer) {
-						var mm = t.Node as Mesh3D;
-						if (mm != null) {
-							if (!mm.SkipRender) {
-								modelMeshes.Add(mm);
-								foreach (var sm in mm.Submeshes) {
-									renderQueue.Add(sm);
-								}
-							}
-						}
-						var wa = t.Node as WidgetAdapter3D;
-						if (wa != null) {
-							renderQueue.Add(wa);
-						}
-					}
-					renderQueue.Sort(depthComparer);
-					foreach (var mm in modelMeshes) {
-						mm.PrepareToRender();
-					}
-					foreach (var sm in renderQueue) {
-						sm.Render();
-					}
-				}
-				renderChain.Clear();
+			if (ZSortEnabled && false) {
+				//for (int i = 0; i < RenderChain.LayerCount; i++) {
+				//	var layer = renderChain.Layers[i];
+				//	if (layer == null || layer.Count == 0) {
+				//		continue;
+				//	}
+				//	renderQueue.Clear();
+				//	modelMeshes.Clear();
+				//	foreach (var t in layer) {
+				//		var mm = t.Node as Mesh3D;
+				//		if (mm != null) {
+				//			if (!mm.SkipRender) {
+				//				modelMeshes.Add(mm);
+				//				foreach (var sm in mm.Submeshes) {
+				//					renderQueue.Add(sm);
+				//				}
+				//			}
+				//		}
+				//		var wa = t.Node as WidgetAdapter3D;
+				//		if (wa != null) {
+				//			renderQueue.Add(wa);
+				//		}
+				//	}
+				//	renderQueue.Sort(depthComparer);
+				//	foreach (var mm in modelMeshes) {
+				//		mm.PrepareToRender();
+				//	}
+				//	foreach (var sm in renderQueue) {
+				//		sm.Render();
+				//	}
+				//}
+				//renderChain.Clear();
 			} else {
 				renderChain.RenderAndClear();
 			}
@@ -191,17 +193,18 @@ namespace Lime
 			Renderer.CullMode = oldCullMode;
 #endif
 			Renderer.Clear(ClearTarget.DepthBuffer);
+			Renderer.World = oldWorld;
+			Renderer.View = oldView;
 			Renderer.Projection = oldProj;
 			Renderer.ZTestEnabled = oldZTestEnabled;
 			Renderer.ZWriteEnabled = oldZWriteEnabled;
-			WidgetContext.Current.CurrentCamera = Camera;
 		}
 
 		private Matrix44 TransformProjection(Matrix44 orthoProjection)
 		{
 			orthoProjection.M33 = 1; // Discard Z normalization, since it comes from the camera projection matrix
 			orthoProjection.M43 = 0;
-			return Camera.ViewProjection *
+			return Camera.Projection *
 				// Transform from <-1, 1> normalized coordinates to the widget space
 				Matrix44.CreateScale(new Vector3(Width / 2, -Height / 2, 1)) *
 				Matrix44.CreateTranslation(new Vector3(Width / 2, Height / 2, 0)) *

@@ -182,9 +182,8 @@ namespace Orange
 					var aiMesh = aiScene.Meshes[aiNode.MeshIndices[i]];
 					if (aiMesh.HasBones) {
 						foreach (var bone in aiMesh.Bones) {
-							mesh.Submeshes[i].BoneIndices.Add(mesh.Bones.Count);
-							mesh.Bones.Add(Model.Find<Node3D>(bone.Name));
-							mesh.BoneBindPoseInverses.Add(bone.OffsetMatrix.ToLime());
+							mesh.Submeshes[i].BoneNames.Add(bone.Name);
+							mesh.Submeshes[i].BoneBindPoses.Add(bone.OffsetMatrix.ToLime());
 						}
 					}
 				}
