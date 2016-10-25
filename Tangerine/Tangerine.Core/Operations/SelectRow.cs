@@ -42,6 +42,7 @@ namespace Tangerine.Core.Operations
 		{
 			var sr = Document.Current.SelectedRows;
 			if (select) {
+				System.Diagnostics.Debug.Assert(sr[0] == row);
 				sr.RemoveAt(0);
 			} else if (lastIndex >= 0) {
 				sr.Insert(lastIndex, row);
