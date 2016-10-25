@@ -146,7 +146,7 @@ namespace Orange
 		private Dictionary<string, Assimp.Camera> aiCameras = new Dictionary<string, Assimp.Camera>();
 		private Dictionary<string, Pivot> pivots = new Dictionary<string, Pivot>();
 
-		public Node3D RootNode { get; private set; }
+		public Model3D Model { get; private set; }
 
 		public ModelImporter(string path, TargetPlatform platform)
 		{
@@ -161,6 +161,7 @@ namespace Orange
 				}
 				postProcess |= Assimp.PostProcessSteps.LimitBoneWeights;
 				aiScene = aiContext.ImportFile(path, postProcess);
+				Model = new Model3D();
 				FindCameras();
 				ImportNodes();
 				ImportSkeleton();
@@ -176,13 +177,13 @@ namespace Orange
 		private void ImportSkeleton(Assimp.Node aiNode)
 		{
 			if (aiNode.HasMeshes) {
-				var mesh = RootNode.Find<Mesh3D>(aiNode.Name);
+				var mesh = Model.Find<Mesh3D>(aiNode.Name);
 				for (var i = 0; i < aiNode.MeshCount; i++) {
 					var aiMesh = aiScene.Meshes[aiNode.MeshIndices[i]];
 					if (aiMesh.HasBones) {
 						foreach (var bone in aiMesh.Bones) {
 							mesh.Submeshes[i].BoneIndices.Add(mesh.Bones.Count);
-							mesh.Bones.Add(RootNode.Find<Node3D>(bone.Name));
+							mesh.Bones.Add(Model.Find<Node3D>(bone.Name));
 							mesh.BoneBindPoseInverses.Add(bone.OffsetMatrix.ToLime());
 						}
 					}
@@ -200,7 +201,7 @@ namespace Orange
 
 		private void ImportNodes()
 		{
-			RootNode = ImportNodes(aiScene.RootNode, null, null);
+			Model.Nodes.Add(ImportNodes(aiScene.RootNode, null, null));
 		}
 
 		private Node3D ImportNodes(Assimp.Node aiNode, Assimp.Node aiParent, Node parent)
@@ -397,7 +398,7 @@ namespace Orange
 				.NodeAnimationChannels
 				.GroupBy(channel => GetNodeName(channel.NodeName));
 			foreach (var channelGroup in channelGroups) {
-				var n = RootNode.TryFind<Node3D>(channelGroup.Key);
+				var n = Model.TryFind<Node3D>(channelGroup.Key);
 				var aiScaleKeys = new List<Assimp.VectorKey>();
 				var aiRotationKeys = new List<Assimp.QuaternionKey>();
 				var aiTranslationKeys = new List<Assimp.VectorKey>();
@@ -502,7 +503,7 @@ namespace Orange
 				(n.Animators["Position", animationId] as Animator<Vector3>).Keys.AddRange(
 					Vector3KeyReducer.Default.Reduce(translationKeys));
 			}
-			RootNode.Animations.Add(new Animation {
+			Model.Animations.Add(new Animation {
 				Id = animationId
 			});
 		}

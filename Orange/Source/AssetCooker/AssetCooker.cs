@@ -742,7 +742,7 @@ namespace Orange
 		private static bool ConvertModel(string srcPath, string dstPath)
 		{
 			var rootNode = new Lime.Frame();
-			rootNode.AddNode(new ModelImporter(srcPath, The.Workspace.ActivePlatform).RootNode);
+			rootNode.AddNode(new ModelImporter(srcPath, The.Workspace.ActivePlatform).Model);
 			Serialization.WriteObjectToBundle(assetsBundle, dstPath, rootNode, Serialization.Format.Binary, Path.GetExtension(srcPath), AssetAttributes.ZippedLZMA);
 			return true;
 		}

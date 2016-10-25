@@ -151,6 +151,28 @@ namespace Lime
 			return p as Viewport3D;
 		}
 
+		public Model3D FindModel()
+		{
+			var model = TryFindModel();
+			if (model == null) {
+				throw new Lime.Exception("Model for node '{0}' is not found", this);
+			}
+			return model;
+		}
+
+		public Model3D TryFindModel()
+		{
+			Node n = this;
+			do {
+				var model = n as Model3D;
+				if (model != null) {
+					return model;
+				}
+				n = n.Parent;
+			} while (n != null);
+			return null;
+		}
+
 		public override Node Clone()
 		{
 			var clone = base.Clone() as Node3D;
