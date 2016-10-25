@@ -138,11 +138,11 @@ namespace Lime
 			foreach (var node in Nodes) {
 				node.AddToRenderChain(renderChain);
 			}
+			var oldProj = Renderer.Projection;
 			var oldCullMode = Renderer.CullMode;
 			var oldZTestEnabled = Renderer.ZTestEnabled;
 			var oldZWriteEnabled = Renderer.ZWriteEnabled;
 			Renderer.Flush();
-			Renderer.PushProjectionMatrix();
 			Renderer.Projection = TransformProjection(Renderer.Projection);
 			WidgetContext.Current.CurrentCamera = Camera;
 #if UNITY
@@ -191,7 +191,7 @@ namespace Lime
 			Renderer.CullMode = oldCullMode;
 #endif
 			Renderer.Clear(ClearTarget.DepthBuffer);
-			Renderer.PopProjectionMatrix();
+			Renderer.Projection = oldProj;
 			Renderer.ZTestEnabled = oldZTestEnabled;
 			Renderer.ZWriteEnabled = oldZWriteEnabled;
 			WidgetContext.Current.CurrentCamera = Camera;

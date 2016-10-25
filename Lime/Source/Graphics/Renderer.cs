@@ -91,8 +91,18 @@ namespace Lime
 
 	public static class Renderer
 	{
+		private static Matrix44 world = Matrix44.Identity;
+		private static Matrix44 view = Matrix44.Identity;
+		private static Matrix44 proj = Matrix44.Identity;
+		private static Matrix44 worldView = Matrix44.Identity;
+		private static Matrix44 worldViewProj = Matrix44.Identity;
+		private static Matrix44 viewProj = Matrix44.Identity;
+
+		private static bool worldViewDirty = true;
+		private static bool worldViewProjDirty = true;
+		private static bool viewProjDirty = true;
+
 		private static Matrix32 transform2 = Matrix32.Identity;
-		private static Stack<Matrix44> projectionStack;
 		private static WindowRect viewport;
 		private static WindowRect scissorRectangle = new WindowRect();
 		private static bool scissorTestEnabled = false;
@@ -113,6 +123,75 @@ namespace Lime
 #if ANDROID
 		public static bool AmazonBindTextureWorkaround;
 #endif
+		public static Matrix44 World
+		{
+			get { return world; }
+			set
+			{
+				world = value;
+				worldViewDirty = worldViewProjDirty = true;
+				PlatformRenderer.InvalidateShaderProgram();
+			}
+		}
+
+		public static Matrix44 View
+		{
+			get { return view; }
+			set
+			{
+				view = value;
+				viewProjDirty = worldViewDirty = worldViewProjDirty = true;
+				PlatformRenderer.InvalidateShaderProgram();
+			}
+		}
+
+		public static Matrix44 Projection
+		{
+			get { return proj; }
+			set
+			{
+				proj = value;
+				viewProjDirty = worldViewProjDirty = true;
+				PlatformRenderer.InvalidateShaderProgram();
+			}
+		}
+
+		public static Matrix44 WorldView
+		{
+			get
+			{
+				if (worldViewDirty) {
+					worldViewDirty = false;
+					worldView = world * view;
+				}
+				return worldView;
+			}
+		}
+
+		public static Matrix44 ViewProjection
+		{
+			get
+			{
+				if (viewProjDirty) {
+					viewProjDirty = false;
+					viewProj = view * proj;
+				}
+				return viewProj;
+			}
+		}
+
+		public static Matrix44 WorldViewProjection
+		{
+			get
+			{
+				if (worldViewProjDirty) {
+					worldViewProjDirty = false;
+					worldViewProj = world * ViewProjection;
+				}
+				return worldViewProj;
+			}
+		}
+
 		public static Matrix32 Transform2
 		{
 			get { return transform2; }
@@ -120,17 +199,6 @@ namespace Lime
 			{
 				transform2 = value;
 				Transform2Active = !value.IsIdentity();
-			}
-		}
-
-		public static Matrix44 Projection
-		{
-			get { return projectionStack.Peek(); }
-			set
-			{
-				projectionStack.Pop();
-				projectionStack.Push(value);
-				PlatformRenderer.SetProjectionMatrix(value);
 			}
 		}
 
@@ -215,23 +283,6 @@ namespace Lime
 			Projection = Matrix44.CreateOrthographicOffCenter(left, right, bottom, top, -50, 50);
 		}
 
-		public static void PushProjectionMatrix()
-		{
-			projectionStack.Push(projectionStack.Peek());
-		}
-
-		public static void PopProjectionMatrix()
-		{
-			projectionStack.Pop();
-			Projection = projectionStack.Peek();
-		}
-
-		static Renderer()
-		{
-			projectionStack = new Stack<Matrix44>();
-			projectionStack.Push(Matrix44.Identity);
-		}
-
 		public static void BeginFrame()
 		{
 			PlatformRenderer.BeginFrame();
@@ -241,6 +292,8 @@ namespace Lime
 			CullMode = CullMode.None;
 			Transform1 = Matrix32.Identity;
 			Transform2 = Matrix32.Identity;
+			World = Matrix44.Identity;
+			View = Matrix44.Identity;
 			CurrentRenderList = MainRenderList;
 			RenderCycle++;
 		}

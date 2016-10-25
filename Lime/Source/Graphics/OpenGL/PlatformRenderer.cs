@@ -49,7 +49,7 @@ namespace Lime
 			throw new Exception("OpenGL error(s): " + errors);
 		}
 
-		public static void SetProjectionMatrix(Matrix44 matrix)
+		public static void InvalidateShaderProgram()
 		{
 			shaderProgram = null;
 		}
@@ -73,7 +73,7 @@ namespace Lime
 			if (shaderProgram != program) {
 				shaderProgram = program;
 				shaderProgram.Use();
-				shaderProgram.LoadMatrix(program.ProjectionMatrixUniformId, FixupWVP(Renderer.Projection));
+				shaderProgram.LoadMatrix(program.ProjectionMatrixUniformId, FixupWVP(Renderer.WorldViewProjection));
 			}
 		}
 
