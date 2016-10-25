@@ -44,13 +44,13 @@ namespace Lime
 			Widget.AddToRenderChain(renderChain);
 			var oldZTestEnabled = Renderer.ZTestEnabled;
 			var oldCullMode = Renderer.CullMode;
-			var oldProj = Renderer.Projection;
+			var oldWorld = Renderer.World;
 			Renderer.ZTestEnabled = false;
 			Renderer.CullMode = CullMode.None;
-			Renderer.Projection = Matrix44.CreateScale(new Vector3(1, -1, 1)) * GlobalTransform * oldProj;
+			Renderer.World = Matrix44.CreateScale(new Vector3(1, -1, 1)) * GlobalTransform;
 			renderChain.RenderAndClear();
 			Renderer.Flush();
-			Renderer.Projection = oldProj;
+			Renderer.World = oldWorld;
 			Renderer.CullMode = oldCullMode;
 			Renderer.ZTestEnabled = oldZTestEnabled;
 		}
