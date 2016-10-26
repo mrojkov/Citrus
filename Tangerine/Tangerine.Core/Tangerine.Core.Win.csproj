@@ -48,7 +48,7 @@
     <Compile Include="HotStudioImport\HotLexer.cs" />
     <Compile Include="HotStudioImport\HotSceneImporter.cs" />
     <Compile Include="IDataflow.cs" />
-    <Compile Include="IProcessor.cs" />
+    <Compile Include="ITaskProvider.cs" />
     <Compile Include="Operations\ClearRowSelection.cs" />
     <Compile Include="Operations\CopyPaste.cs" />
     <Compile Include="Operations\DragRows.cs" />
