@@ -10,7 +10,7 @@ namespace Tangerine.UI.SceneView
 	{
 		SceneView sv => SceneView.Instance;
 
-		public IEnumerator<object> Loop()
+		public IEnumerator<object> Task()
 		{
 			while (true) {
 				if (sv.Input.ConsumeKeyRepeat(KeyBindings.SceneViewKeys.DragUpFast)) {
@@ -37,7 +37,7 @@ namespace Tangerine.UI.SceneView
 				if (sv.Input.ConsumeKeyRepeat(KeyBindings.SceneViewKeys.DragRight)) {
 					DragWidgets(new Vector2(1, 0));
 				}
-				yield return Task.WaitForInput();
+				yield return Lime.Task.WaitForInput();
 			}
 		}
 

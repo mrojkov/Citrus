@@ -9,7 +9,7 @@ namespace Tangerine.UI.SceneView
 	{
 		SceneView sv => SceneView.Instance;
 
-		public IEnumerator<object> Loop()
+		public IEnumerator<object> Task()
 		{
 			while (true) {
 				Type nodeType = null;

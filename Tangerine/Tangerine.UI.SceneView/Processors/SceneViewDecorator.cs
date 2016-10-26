@@ -8,7 +8,7 @@ namespace Tangerine.UI.SceneView
 	{
 		SceneView sv => SceneView.Instance;
 
-		public IEnumerator<object> Loop()
+		public IEnumerator<object> Task()
 		{
 			const float inf = 1000000f;
 			sv.Scene.CompoundPresenter.Push(new DelegatePresenter<Widget>(w => {

@@ -7,7 +7,7 @@ namespace Tangerine.UI.SceneView
 {
 	class SelectedWidgetsPresenter : Core.ITaskProvider
 	{
-		public IEnumerator<object> Loop()
+		public IEnumerator<object> Task()
 		{
 			SceneView.Instance.Frame.CompoundPostPresenter.Add(new DelegatePresenter<Widget>(RenderSelection));
 			while (true) {

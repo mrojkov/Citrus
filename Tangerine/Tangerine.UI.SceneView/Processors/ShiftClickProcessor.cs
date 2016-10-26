@@ -7,7 +7,7 @@ namespace Tangerine.UI.SceneView
 {
 	public class ShiftClickProcessor : Core.ITaskProvider
 	{
-		public IEnumerator<object> Loop()
+		public IEnumerator<object> Task()
 		{
 			var sv = SceneView.Instance;
 			while (true) {

@@ -13,7 +13,7 @@ namespace Tangerine.UI.SceneView
 			this.input = input;
 		}
 
-		public IEnumerator<object> Loop()
+		public IEnumerator<object> Task()
 		{
 			int savedFrame = 0;
 			while (true) {

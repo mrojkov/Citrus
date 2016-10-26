@@ -8,7 +8,7 @@ namespace Tangerine.UI.SceneView
 {
 	class MouseSelectionProcessor : ITaskProvider
 	{
-		public IEnumerator<object> Loop()
+		public IEnumerator<object> Task()
 		{
 			var sv = SceneView.Instance;
 			var input = sv.Input;

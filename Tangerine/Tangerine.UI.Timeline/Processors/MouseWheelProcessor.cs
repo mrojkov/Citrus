@@ -8,7 +8,7 @@ namespace Tangerine.UI.Timeline
 	{
 		Timeline timeline => Timeline.Instance;
 
-		public IEnumerator<object> Loop()
+		public IEnumerator<object> Task()
 		{
 			while (true) {
 				HandleScroll(timeline.Roll.RootWidget.Input);

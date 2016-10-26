@@ -43,7 +43,7 @@ namespace Tangerine.UI.Inspector
 			this.button = button;
 		}
 
-		public IEnumerator<object> Loop()
+		public IEnumerator<object> Task()
 		{
 			var provider = KeyframeDataflow.GetProvider(context, i => i != null).DistinctUntilChanged();
 			var hasKeyframe = provider.GetDataflow();

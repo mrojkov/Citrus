@@ -17,7 +17,7 @@ namespace Tangerine.UI.Timeline
 			this.input = input;
 		}
 
-		public IEnumerator<object> Loop()
+		public IEnumerator<object> Task()
 		{
 			while (true) {
 				if (Document.Current != null) {
@@ -26,7 +26,7 @@ namespace Tangerine.UI.Timeline
 					VerticalScroll(input);
 					HandleEnterExit(input);
 				}
-				yield return Task.WaitForInput();
+				yield return Lime.Task.WaitForInput();
 			}
 		}
 

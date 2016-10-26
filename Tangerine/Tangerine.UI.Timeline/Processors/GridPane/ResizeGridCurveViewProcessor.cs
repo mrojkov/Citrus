@@ -12,7 +12,7 @@ namespace Tangerine.UI.Timeline
 	{
 		const float separatorThickness = 10;
 
-		public IEnumerator<object> Loop()
+		public IEnumerator<object> Task()
 		{
 			while (true) {
 				foreach (var row in Document.Current.Rows) {

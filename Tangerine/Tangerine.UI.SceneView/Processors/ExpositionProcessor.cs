@@ -16,7 +16,7 @@ namespace Tangerine.UI.SceneView
 		public static readonly Key Key = KeyBindings.SceneViewKeys.SceneExposition;
 		public static readonly Key MultiSelectKey = KeyBindings.SceneViewKeys.SceneExpositionMultiSelect;
 
-		public IEnumerator<object> Loop()
+		public IEnumerator<object> Task()
 		{
 			const float animationLength = 0.75f;
 			while (true) {
@@ -28,13 +28,13 @@ namespace Tangerine.UI.SceneView
 						while (true) {
 							if ((sv.Input.IsKeyPressed(Key) || sv.Input.IsKeyPressed(MultiSelectKey)) && !exposition.Closed()) {
 								if (t < animationLength) {
-									t += Task.Current.Delta;
+									t += Lime.Task.Current.Delta;
 									if (t >= animationLength) {
 										exposition.RunItemAnimations();
 									}
 								}
 							} else {
-								t -= Task.Current.Delta * 3f;
+								t -= Lime.Task.Current.Delta * 3f;
 								if (t < 0) {
 									break;
 								}
@@ -45,7 +45,7 @@ namespace Tangerine.UI.SceneView
 					}
 					sv.Components.Get<ExpositionComponent>().InProgress = false;
 				}
-				yield return Task.WaitForInput();
+				yield return Lime.Task.WaitForInput();
 			}
 		}
 
@@ -181,21 +181,21 @@ namespace Tangerine.UI.SceneView
 					borderPresenter = new WidgetBoundsPresenter(SceneViewColors.ExposedItemInactiveBorder, 1);
 					frame.CompoundPresenter.Push(borderPresenter);
 					frame.Tasks.AddLoop(() => {
-						borderPresenter.Color = Document.Current.SelectedNodes().Contains(widget) ? 
-							SceneViewColors.ExposedItemSelectedBorder :
-							SceneViewColors.ExposedItemInactiveBorder;
+                        borderPresenter.Color = Document.Current.SelectedNodes().Contains(widget) ?
+                            SceneViewColors.ExposedItemSelectedBorder :
+                            SceneViewColors.ExposedItemInactiveBorder;
 						if (clickArea.IsMouseOver()) {
-							if (Task.Current.LifeTime % 0.5f < 0.25f) {
-								borderPresenter.Color = SceneViewColors.ExposedItemActiveBorder;
+							if (Lime.Task.Current.LifeTime % 0.5f < 0.25f) {
+                                borderPresenter.Color = SceneViewColors.ExposedItemActiveBorder;
 							}
 							if (clickArea.Input.WasMousePressed()) {
 								if (!input.IsKeyPressed(MultiSelectKey)) {
-									Core.Operations.ClearRowSelection.Perform();
-									Core.Operations.SelectNode.Perform(widget);
-									Closed = true;
+                                    Core.Operations.ClearRowSelection.Perform();
+                                    Core.Operations.SelectNode.Perform(widget);
+                                    Closed = true;
 								} else {
 									var isSelected = Document.Current.SelectedNodes().Contains(widget);
-									Core.Operations.SelectNode.Perform(widget, !isSelected);
+                                    Core.Operations.SelectNode.Perform(widget, !isSelected);
 								}
 							}
 						}

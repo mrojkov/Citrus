@@ -130,7 +130,7 @@ namespace Tangerine.UI.Timeline
 
 		class SelectFirstNodeOnDocumentOpeningProcessor : ITaskProvider
 		{
-			public IEnumerator<object> Loop()
+			public IEnumerator<object> Task()
 			{
 				if (Document.Current.Container.Nodes.Count > 0) {
 					Core.Operations.SelectNode.Perform(Document.Current.Container.Nodes[0]);

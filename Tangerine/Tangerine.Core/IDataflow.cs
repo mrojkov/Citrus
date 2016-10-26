@@ -439,7 +439,7 @@ namespace Tangerine.Core
 				this.action = action;
 			}
 
-			public IEnumerator<object> Loop()
+			public IEnumerator<object> Task()
 			{
 				try {
 					while (true) {

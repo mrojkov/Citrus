@@ -14,7 +14,7 @@ namespace Tangerine.UI.Timeline
 		Timeline timeline => Timeline.Instance;
 		RollPane roll => Timeline.Instance.Roll;
 
-		public IEnumerator<object> Loop()
+		public IEnumerator<object> Task()
 		{
 			var input = roll.RootWidget.Input;
 			input.AcceptMouseThroughDescendants = true;

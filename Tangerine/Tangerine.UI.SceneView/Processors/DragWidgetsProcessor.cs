@@ -10,7 +10,7 @@ namespace Tangerine.UI.SceneView
 	{
 		SceneView sv => SceneView.Instance;
 
-		public IEnumerator<object> Loop()
+		public IEnumerator<object> Task()
 		{
 			var widgets = Document.Current.SelectedNodes().Editable().OfType<Widget>();
 			while (true) {

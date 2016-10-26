@@ -6,7 +6,7 @@ namespace Tangerine.Core
 {
 	public interface ITaskProvider
 	{
-		IEnumerator<object> Loop();
+		IEnumerator<object> Task();
 	}
 
 	public static class TaskListExtension
@@ -14,13 +14,13 @@ namespace Tangerine.Core
 		public static void Add(this TaskList taskList, params ITaskProvider[] collection)
 		{
 			foreach (var i in collection) {
-				taskList.Add(i.Loop());
+				taskList.Add(i.Task());
 			}
 		}
 
 		public static void Add(this TaskList taskList, ITaskProvider task)
 		{
-			taskList.Add(task.Loop());
+			taskList.Add(task.Task());
 		}
 	}
 }
