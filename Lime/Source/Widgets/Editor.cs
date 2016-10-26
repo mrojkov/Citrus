@@ -212,6 +212,16 @@ namespace Lime
 			queue.Clear();
 			current = 0;
 		}
+
+		public T ClearAndRestore()
+		{
+			if (!CanUndo())
+				throw new InvalidOperationException();
+			var result = queue[0];
+			queue.Clear();
+			current = 0;
+			return result;
+		}
 	}
 
 	public interface IEditorParams
@@ -629,7 +639,7 @@ namespace Lime
 			SelectionEnd.TextPos = int.MaxValue;
 		}
 
-		private void HandleKeys(string originalText)
+		private void HandleKeys()
 		{
 			try {
 				if (WasKeyRepeated(Cmds.MoveCharPrev))
@@ -685,6 +695,7 @@ namespace Lime
 					if (IsMultiline()) {
 						if (EditorParams.IsAcceptableLines(Text.Text.Count(ch => ch == '\n') + 2))
 							InsertText("\n");
+						input.ConsumeKey(Cmds.Submit);
 					} else {
 						HideSelection();
 						History.Clear();
@@ -693,7 +704,8 @@ namespace Lime
 					}
 				}
 				if (WasKeyRepeated(Cmds.Cancel) && IsTextReadable) {
-					Text.Text = originalText;
+					if (History.CanUndo())
+						ApplyUndoItem(History.ClearAndRestore());
 					HideSelection();
 					History.Clear();
 					input.ConsumeKey(Cmds.Cancel);
@@ -789,7 +801,6 @@ namespace Lime
 		private IEnumerator<object> HandleInputTask()
 		{
 			bool wasFocused = false;
-			string originalText = null;
 			Vector2 lastClickPos = Vector2.Zero;
 
 			while (true) {
@@ -797,7 +808,7 @@ namespace Lime
 					InputWidget.SetFocus();
 				}
 				if (InputWidget.IsFocused()) {
-					HandleKeys(originalText);
+					HandleKeys();
 					HandleTextInput();
 					var p = input.MousePosition;
 					if (input.IsMousePressed()) {
@@ -824,14 +835,11 @@ namespace Lime
 					Text.SyncCaretPosition();
 				}
 				AdjustSizeAndScrollToCaret();
-				var isFocused = InputWidget.IsFocused();
-				CaretPos.IsVisible = isFocused;
-				if (!wasFocused && isFocused) {
-					originalText = Text.Text;
-				}
+				var isFocused = CaretPos.IsVisible = InputWidget.IsFocused();
 				if (wasFocused && !isFocused) {
 					HideSelection();
-					if (originalText != Text.Text) {
+					if (History.CanUndo()) {
+						History.Clear();
 						Text.Submit();
 					}
 				}
