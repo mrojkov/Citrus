@@ -7,9 +7,9 @@ using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline
 {
-	public class RowViewsUpdater : IDocumentUpdater
+	public class RowViewsUpdater : SymmetricOperationProcessor
 	{
-		public void Update()
+		public override void Do(IOperation op)
 		{
 			foreach (var row in Document.Current.Rows) {
 				TryCreateGridNodeView(row);

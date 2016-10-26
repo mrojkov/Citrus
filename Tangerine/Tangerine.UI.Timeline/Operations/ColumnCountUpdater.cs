@@ -5,9 +5,9 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.Timeline
 {
-	public class ColumnCountUpdater : IDocumentUpdater
+	public class ColumnCountUpdater : SymmetricOperationProcessor
 	{
-		public void Update()
+		public override void Do(IOperation op)
 		{
 			var timeline = Timeline.Instance;
 			var rows = Document.Current.Rows;

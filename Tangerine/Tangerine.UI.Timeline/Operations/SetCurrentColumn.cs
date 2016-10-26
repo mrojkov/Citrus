@@ -6,35 +6,39 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.Timeline.Operations
 {
-	public class SetCurrentColumn : IOperation
+	public class SetCurrentColumn : Operation
 	{
-		readonly int previousColumn;
-		int currentColumn;
+		protected int Column;
 
-		public bool IsChangingDocument => false;
-		public DateTime Timestamp { get; set; }
+		public override bool IsChangingDocument => false;
 
-		public static void Perform(int currentColumn)
+		public static void Perform(int column)
 		{
-			Document.Current.History.Perform(new SetCurrentColumn(currentColumn));
+			Document.Current.History.Perform(new SetCurrentColumn(column));
 		}
 
-		private SetCurrentColumn(int currentColumn)
+		private SetCurrentColumn(int column)
 		{
-			previousColumn = Timeline.Instance.CurrentColumn;
-			this.currentColumn = currentColumn;
+			Column = column;
 		}
 
-		public void Do()
+		public class Processor : OperationProcessor<SetCurrentColumn>
 		{
-			Timeline.Instance.CurrentColumn = currentColumn;
-			Timeline.Instance.EnsureColumnVisible(currentColumn);
-		}
+			class Backup { public int Column; }
 
-		public void Undo()
-		{
-			Timeline.Instance.CurrentColumn = previousColumn;
-			Timeline.Instance.EnsureColumnVisible(previousColumn);
+			protected override void InternalDo(SetCurrentColumn op)
+			{
+				op.Save(new Backup { Column = Timeline.Instance.CurrentColumn });
+				Timeline.Instance.CurrentColumn = op.Column;
+				Timeline.Instance.EnsureColumnVisible(op.Column);
+			}
+
+			protected override void InternalUndo(SetCurrentColumn op)
+			{
+				var col = op.Restore<Backup>().Column;
+				Timeline.Instance.CurrentColumn = col;
+				Timeline.Instance.EnsureColumnVisible(col);
+			}
 		}
 	}
 }

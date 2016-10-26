@@ -6,14 +6,12 @@ using Tangerine.Core;
 
 namespace Tangerine.Core.Operations
 {
-	public class SelectRow : IOperation
+	public class SelectRow : Operation
 	{
-		private int lastIndex;
-		readonly Row row;
-		readonly bool select;
+		public readonly Row Row;
+		public readonly bool Select;
 
-		public bool IsChangingDocument => false;
-		public DateTime Timestamp { get; set; }
+		public override bool IsChangingDocument => false;
 
 		public static void Perform(Row row, bool select = true)
 		{
@@ -22,30 +20,37 @@ namespace Tangerine.Core.Operations
 
 		private SelectRow(Row row, bool select)
 		{
-			this.select = select;
-			this.row = row;
+			Select = select;
+			Row = row;
 		}
 
-		public void Do()
+		public class Processor : OperationProcessor<SelectRow>
 		{
-			var sr = Document.Current.SelectedRows;
-			lastIndex = sr.IndexOf(row);
-			if (lastIndex >= 0) {
-				sr.RemoveAt(lastIndex);
-			}
-			if (select) {
-				sr.Insert(0, row);
-			}
-		}
+			class Backup { public int LastIndex; }
 
-		public void Undo()
-		{
-			var sr = Document.Current.SelectedRows;
-			if (select) {
-				System.Diagnostics.Debug.Assert(sr[0] == row);
-				sr.RemoveAt(0);
-			} else if (lastIndex >= 0) {
-				sr.Insert(lastIndex, row);
+			protected override void InternalDo(SelectRow op)
+			{
+				var sr = Document.Current.SelectedRows;
+				var b = new Backup { LastIndex = sr.IndexOf(op.Row) };
+				op.Save(b);
+				if (b.LastIndex >= 0) {
+					sr.RemoveAt(b.LastIndex);
+				}
+				if (op.Select) {
+					sr.Insert(0, op.Row);
+				}
+			}
+
+			protected override void InternalUndo(SelectRow op)
+			{
+				var b = op.Restore<Backup>();
+				var sr = Document.Current.SelectedRows;
+				if (op.Select) {
+					System.Diagnostics.Debug.Assert(sr[0] == op.Row);
+					sr.RemoveAt(0);
+				} else if (b.LastIndex >= 0) {
+					sr.Insert(b.LastIndex, op.Row);
+				}
 			}
 		}
 	}

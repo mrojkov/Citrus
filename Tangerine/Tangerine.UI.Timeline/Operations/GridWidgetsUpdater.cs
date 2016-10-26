@@ -4,11 +4,11 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.Timeline
 {
-	public class GridWidgetsUpdater : IDocumentUpdater
+	public class GridWidgetsUpdater : SymmetricOperationProcessor
 	{
 		Timeline timeline => Timeline.Instance;
 
-		public void Update()
+		public override void Do(IOperation op)
 		{
 			if (!AreWidgetsValid()) {
 				ResetWidgets();

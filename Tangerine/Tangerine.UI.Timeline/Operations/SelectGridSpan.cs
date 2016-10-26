@@ -1,20 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Lime;
 using Tangerine.Core;
 using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline.Operations
 {
-	public class SelectGridSpan : IOperation
+	public class SelectGridSpan : Operation
 	{
-		Timeline timeline => Timeline.Instance;
-		readonly GridSpan span;
-		readonly int row;
+		public readonly GridSpan Span;
+		public readonly int Row;
 
-		public bool IsChangingDocument => false;
-		public DateTime Timestamp { get; set; }
+		public override bool IsChangingDocument => false;
 
 		public static void Perform(int row, GridSpan span)
 		{
@@ -23,18 +20,21 @@ namespace Tangerine.UI.Timeline.Operations
 
 		private SelectGridSpan(int row, GridSpan span)
 		{
-			this.row = row;
-			this.span = span;
+			Row = row;
+			Span = span;
 		}
 
-		public void Do()
+		public class Processor : OperationProcessor<SelectGridSpan>
 		{
-			Document.Current.Rows[row].Components.GetOrAdd<GridSpanList>().Add(span);
-		}
+			protected override void InternalDo(SelectGridSpan op)
+			{
+				Document.Current.Rows[op.Row].Components.GetOrAdd<GridSpanList>().Add(op.Span);
+			}
 
-		public void Undo()
-		{
-			Document.Current.Rows[row].Components.GetOrAdd<GridSpanList>().Remove(span);
+			protected override void InternalUndo(SelectGridSpan op)
+			{
+				Document.Current.Rows[op.Row].Components.GetOrAdd<GridSpanList>().Remove(op.Span);
+			}
 		}
 	}
 }

@@ -91,12 +91,11 @@
     <Compile Include="Processors\GridPane\ClampScrollPosOnContainerChange.cs" />
     <Compile Include="Components\GridSpanList.cs" />
     <Compile Include="Operations\SelectGridSpan.cs" />
-    <Compile Include="DocumentUpdaters\ColumnCountUpdater.cs" />
-    <Compile Include="DocumentUpdaters\RollWidgetsUpdater.cs" />
-    <Compile Include="DocumentUpdaters\UnlinkedNodesDeselector.cs" />
-    <Compile Include="DocumentUpdaters\OverviewWidgetsUpdater.cs" />
-    <Compile Include="DocumentUpdaters\GridWidgetsUpdater.cs" />
-    <Compile Include="DocumentUpdaters\RowViewsUpdater.cs" />
+    <Compile Include="Operations\ColumnCountUpdater.cs" />
+    <Compile Include="Operations\GridWidgetsUpdater.cs" />
+    <Compile Include="Operations\OverviewWidgetsUpdater.cs" />
+    <Compile Include="Operations\RollWidgetsUpdater.cs" />
+    <Compile Include="Operations\RowViewsUpdater.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tangerine.Core\Tangerine.Core.csproj">
@@ -117,7 +116,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Processors\Rulerbar\" />
-    <Folder Include="DocumentUpdaters\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Mac\Xamarin.Mac.CSharp.targets" />
 </Project>

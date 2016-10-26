@@ -45,10 +45,9 @@ namespace Tangerine.UI.Timeline
 		public int ColumnCount { get; set; }
 		public readonly Entity Globals = new Entity();
 
-		public static IEnumerable<Func<IDocumentUpdater>> GetDocumentUpdateBuilders()
+		public static IEnumerable<Func<IOperationProcessor>> GetOperationProcessorBuilders()
 		{
-			return new Func<IDocumentUpdater>[] { 
-				() => new UnlinkedNodesDeselector(),
+			return new Func<IOperationProcessor>[] { 
 				() => new ColumnCountUpdater(),
 				() => new RowViewsUpdater(),
 				() => new RollWidgetsUpdater(),

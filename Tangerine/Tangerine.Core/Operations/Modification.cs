@@ -6,15 +6,13 @@ using System.Reflection;
 
 namespace Tangerine.Core.Operations
 {
-	public class SetProperty : IOperation
+	public class SetProperty : Operation
 	{
-		readonly object obj;
-		readonly object value;
-		readonly PropertyInfo property;
-		object savedValue;
+		public readonly object Obj;
+		public readonly object Value;
+		public readonly PropertyInfo Property;
 
-		public bool IsChangingDocument => true;
-		public DateTime Timestamp { get; set; }
+		public override bool IsChangingDocument => true;
 
 		public static void Perform(object obj, string propertyName, object value)
 		{
@@ -23,33 +21,36 @@ namespace Tangerine.Core.Operations
 
 		private SetProperty(object obj, string propertyName, object value)
 		{
-			this.obj = obj;
-			this.value = value;
-			property = obj.GetType().GetProperty(propertyName);
+			Obj = obj;
+			Value = value;
+			Property = obj.GetType().GetProperty(propertyName);
 		}
 
-		public void Do()
+		public class Processor : OperationProcessor<SetProperty>
 		{
-			savedValue = property.GetValue(obj, null);
-			property.SetValue(obj, value, null);
-		}
+			class Backup { public object Value; }
 
-		public void Undo()
-		{
-			property.SetValue(obj, savedValue, null);
-			savedValue = null;
+			protected override void InternalDo(SetProperty op)
+			{
+				op.Save(new Backup { Value = op.Property.GetValue(op.Obj, null) });
+				op.Property.SetValue(op.Obj, op.Value, null);
+			}
+
+			protected override void InternalUndo(SetProperty op)
+			{
+				var v = op.Restore<Backup>().Value;
+				op.Property.SetValue(op.Obj, v, null);
+			}
 		}
 	}
 
-	public class SetGenericProperty<T> : IOperation
+	public class SetGenericProperty<T> : Operation
 	{
-		Func<T> getter;
-		Action<T> setter;
-		T value;
-		T savedValue;
+		public Func<T> Getter;
+		public Action<T> Setter;
+		public T Value;
 
-		public bool IsChangingDocument => true;
-		public DateTime Timestamp { get; set; }
+		public override bool IsChangingDocument => true;
 
 		public static void Perform(Func<T> getter, Action<T> setter, T value)
 		{
@@ -58,20 +59,25 @@ namespace Tangerine.Core.Operations
 
 		private SetGenericProperty(Func<T> getter, Action<T> setter, T value)
 		{
-			this.value = value;
-			this.getter = getter;
-			this.setter = setter;
+			Value = value;
+			Getter = getter;
+			Setter = setter;
 		}
 
-		public void Do()
+		public class Processor : OperationProcessor<SetGenericProperty<T>>
 		{
-			savedValue = getter();
-			setter(value);
-		}
+			class Backup { public T Value; }
 
-		public void Undo()
-		{
-			setter(savedValue);
+			protected override void InternalDo(SetGenericProperty<T> op)
+			{
+				op.Save(new Backup { Value = op.Getter() });
+				op.Setter(op.Value);
+			}
+
+			protected override void InternalUndo(SetGenericProperty<T> op)
+			{
+				op.Setter(op.Restore<Backup>().Value);
+			}
 		}
 	}
 
@@ -101,14 +107,12 @@ namespace Tangerine.Core.Operations
 		}
 	}
 
-	public class RemoveKeyframe : IOperation
+	public class RemoveKeyframe : Operation
 	{
-		readonly int frame;
-		readonly IAnimator animator;
-		IKeyframe savedKeyframe;
+		public readonly int Frame;
+		public readonly IAnimator Animator;
 
-		public bool IsChangingDocument => true;
-		public DateTime Timestamp { get; set; }
+		public override bool IsChangingDocument => true;
 
 		public static void Perform(IAnimator animator, int frame)
 		{
@@ -117,35 +121,36 @@ namespace Tangerine.Core.Operations
 
 		private RemoveKeyframe(IAnimator animator, int frame)
 		{
-			this.frame = frame;
-			this.animator = animator;
+			Frame = frame;
+			Animator = animator;
 		}
 
-		public void Do()
+		public class Processor : OperationProcessor<RemoveKeyframe>
 		{
-			savedKeyframe = animator.Keys.FirstOrDefault(k => k.Frame == frame);
-			animator.Keys.Remove(savedKeyframe);
-		}
+			class Backup { public IKeyframe Keyframe; }
 
-		public void Undo()
-		{
-			animator.Keys.AddOrdered(savedKeyframe);
-			savedKeyframe = null;
+			protected override void InternalDo(RemoveKeyframe op)
+			{
+				var kf = op.Animator.Keys.FirstOrDefault(k => k.Frame == op.Frame);
+				op.Save(new Backup { Keyframe = kf });
+				op.Animator.Keys.Remove(kf);
+			}
+
+			protected override void InternalUndo(RemoveKeyframe op)
+			{
+				op.Animator.Keys.AddOrdered(op.Restore<Backup>().Keyframe);
+			}
 		}
 	}
 
-	public class SetKeyframe : IOperation
+	public class SetKeyframe : Operation
 	{
-		readonly IAnimable animable;
-		readonly string propertyName;
-		readonly string animationId;
-		readonly IKeyframe keyframe;
-		IKeyframe savedKeyframe;
-		bool animatorExists;
-		IAnimator animator;
+		public readonly IAnimable Animable;
+		public readonly string PropertyName;
+		public readonly string AnimationId;
+		public readonly IKeyframe Keyframe;
 
-		public bool IsChangingDocument => true;
-		public DateTime Timestamp { get; set; }
+		public override bool IsChangingDocument => true;
 
 		public static void Perform(IAnimable animable, string propertyName, string animationId, IKeyframe keyframe)
 		{
@@ -154,42 +159,53 @@ namespace Tangerine.Core.Operations
 
 		private SetKeyframe(IAnimable animable, string propertyName, string animationId, IKeyframe keyframe)
 		{
-			this.animable = animable;
-			this.propertyName = propertyName;
-			this.keyframe = keyframe;
-			this.animationId = animationId;
+			Animable = animable;
+			PropertyName = propertyName;
+			Keyframe = keyframe;
+			AnimationId = animationId;
 		}
 
-		public void Do()
+		public class Processor : OperationProcessor<SetKeyframe>
 		{
-			animatorExists = animable.Animators.Any(a => a.TargetProperty == propertyName && a.AnimationId == animationId);
-			animator = animable.Animators[propertyName, animationId];
-			savedKeyframe = animator.Keys.FirstOrDefault(k => k.Frame == keyframe.Frame);
-			animator.Keys.AddOrdered(keyframe);
-		}
+			class Backup
+			{
+				public IKeyframe Keyframe;
+				public bool AnimatorExists;
+				public IAnimator Animator;
+			}
 
-		public void Undo()
-		{
-			animator.Keys.Remove(keyframe);
-			if (savedKeyframe != null) {
-				animator.Keys.AddOrdered(savedKeyframe);
+			protected override void InternalDo(SetKeyframe op)
+			{
+				var animator = op.Animable.Animators[op.PropertyName, op.AnimationId];
+				op.Save(new Backup {
+					AnimatorExists = op.Animable.Animators.Any(a => a.TargetProperty == op.PropertyName && a.AnimationId == op.AnimationId),
+					Animator = animator,
+					Keyframe = animator.Keys.FirstOrDefault(k => k.Frame == op.Keyframe.Frame)
+				});
+				animator.Keys.AddOrdered(op.Keyframe);
 			}
-			if (!animatorExists) {
-				animable.Animators.Remove(animator);
+
+			protected override void InternalUndo(SetKeyframe op)
+			{
+				var b = op.Restore<Backup>();
+				b.Animator.Keys.Remove(op.Keyframe);
+				if (b.Keyframe != null) {
+					b.Animator.Keys.AddOrdered(b.Keyframe);
+				}
+				if (!b.AnimatorExists) {
+					op.Animable.Animators.Remove(b.Animator);
+				}
 			}
-			savedKeyframe = null;
-			animator = null;
 		}
 	}
 
-	public class InsertNode : IOperation
+	public class InsertNode : Operation
 	{
-		readonly Node container;
-		readonly int index;
-		readonly Node node;
+		public readonly Node Container;
+		public readonly int Index;
+		public readonly Node Node;
 
-		public bool IsChangingDocument => true;
-		public DateTime Timestamp { get; set; }
+		public override bool IsChangingDocument => true;
 
 		public static void Perform(Node container, int index, Node node)
 		{
@@ -198,19 +214,22 @@ namespace Tangerine.Core.Operations
 
 		private InsertNode(Node container, int index, Node node)
 		{
-			this.container = container;
-			this.index = index;
-			this.node = node;
+			Container = container;
+			Index = index;
+			Node = node;
 		}
 
-		public void Do()
+		public class Processor : OperationProcessor<InsertNode>
 		{
-			container.Nodes.Insert(index, node);
-		}
+			protected override void InternalDo(InsertNode op)
+			{
+				op.Container.Nodes.Insert(op.Index, op.Node);
+			}
 
-		public void Undo()
-		{
-			node.Unlink();
+			protected override void InternalUndo(InsertNode op)
+			{
+				op.Node.Unlink();
+			}
 		}
 	}
 
@@ -242,47 +261,53 @@ namespace Tangerine.Core.Operations
 		}
 	}
 
-	public class UnlinkNode : IOperation
+	public class UnlinkNode : Operation
 	{
-		readonly Node node;
-		int savedIndex;
-		Node container;
+		public readonly Node Node;
 
-		public bool IsChangingDocument => true;
-		public DateTime Timestamp { get; set; }
+		public override bool IsChangingDocument => true;
 
 		public static void Perform(Node node)
 		{
+			if (Document.Current.SelectedNodes().Contains(node)) {
+				SelectNode.Perform(node, select: false);
+			}
 			Document.Current.History.Perform(new UnlinkNode(node));
 		}
 
 		private UnlinkNode(Node node)
 		{
-			this.node = node;
+			Node = node;
 		}
 
-		public void Do()
+		public class Processor : OperationProcessor<UnlinkNode>
 		{
-			container = node.Parent;
-			savedIndex = container.Nodes.IndexOf(node);
-			node.Unlink();
-		}
+			class Backup
+			{
+				public Node Container;
+				public int Index;
+			}
 
-		public void Undo()
-		{
-			container.Nodes.Insert(savedIndex, node);
-			container = null;
+			protected override void InternalDo(UnlinkNode op)
+			{
+				op.Save(new Backup { Container = op.Node.Parent, Index = op.Node.Parent.Nodes.IndexOf(op.Node) });
+				op.Node.Unlink();
+			}
+
+			protected override void InternalUndo(UnlinkNode op)
+			{
+				var b = op.Restore<Backup>();
+				b.Container.Nodes.Insert(b.Index, op.Node);
+			}
 		}
 	}
 
-	public class SetMarker : IOperation
+	public class SetMarker : Operation
 	{
-		readonly MarkerCollection collection;
-		readonly Marker marker;
-		Marker savedMarker;
+		public readonly MarkerCollection Collection;
+		public readonly Marker Marker;
 
-		public bool IsChangingDocument => true;
-		public DateTime Timestamp { get; set; }
+		public override bool IsChangingDocument => true;
 
 		public static void Perform(MarkerCollection collection, Marker marker)
 		{
@@ -291,21 +316,27 @@ namespace Tangerine.Core.Operations
 
 		private SetMarker(MarkerCollection collection, Marker marker)
 		{
-			this.collection = collection;
-			this.marker = marker;
+			Collection = collection;
+			Marker = marker;
 		}
 
-		public void Do()
+		public class Processor : OperationProcessor<SetMarker>
 		{
-			savedMarker = collection.FirstOrDefault(i => i.Frame == marker.Frame);
-			collection.AddOrdered(marker);
-		}
+			class Backup { public Marker Marker; }
 
-		public void Undo()
-		{
-			collection.Remove(marker);
-			if (savedMarker != null) {
-				collection.AddOrdered(savedMarker);
+			protected override void InternalDo(SetMarker op)
+			{
+				op.Save(new Backup { Marker = op.Collection.FirstOrDefault(i => i.Frame == op.Marker.Frame) });
+				op.Collection.AddOrdered(op.Marker);
+			}
+
+			protected override void InternalUndo(SetMarker op)
+			{
+				op.Collection.Remove(op.Marker);
+				var b = op.Restore<Backup>();
+				if (b.Marker != null) {
+					op.Collection.AddOrdered(b.Marker);
+				}
 			}
 		}
 	}

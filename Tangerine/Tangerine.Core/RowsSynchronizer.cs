@@ -5,9 +5,9 @@ using System.Collections.Generic;
 
 namespace Tangerine.Core
 {
-	public class RowsSynchronizer : IDocumentUpdater
+	public class RowsSynchronizer : SymmetricOperationProcessor
 	{
-		public void Update()
+		public override void Do(IOperation operation)
 		{
 			if (!ValidateRows()) {
 				RebuildRows();

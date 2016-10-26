@@ -15,6 +15,9 @@ namespace Tangerine.Core
 		private int undoPosition;
 		private List<IOperation> operations = new List<IOperation>();
 
+		public static readonly List<Func<IOperationProcessor>> ProcessorBuilders = new List<Func<IOperationProcessor>>();
+		readonly List<IOperationProcessor> processors;
+
 		public event Action Changed;
 
 		public bool UndoEnabled => undoPosition > 0;
@@ -23,6 +26,7 @@ namespace Tangerine.Core
 
 		public DocumentHistory()
 		{
+			processors = ProcessorBuilders.Select(i => i()).ToList();
 			Changed += RefreshModifiedStatus;
 		}
 
@@ -43,7 +47,9 @@ namespace Tangerine.Core
 			operations.RemoveRange(undoPosition, operations.Count - undoPosition);
 			operations.Add(operation);
 			undoPosition = operations.Count;
-			operation.Do();
+			foreach (var p in processors) {
+				p.Do(operation);
+			}
 			Changed?.Invoke();
 		}
 
@@ -61,7 +67,9 @@ namespace Tangerine.Core
 				if (timestamp.HasValue && (timestamp.Value - o.Timestamp) > TimeSpan.FromSeconds(0.1f)) {
 					break;
 				}
-				o.Undo();
+				foreach (var p in processors) {
+					p.Undo(o);
+				}
 			}
 			Changed?.Invoke();
 		}
@@ -80,7 +88,9 @@ namespace Tangerine.Core
 				if (timestamp.HasValue && (o.Timestamp - timestamp.Value) > TimeSpan.FromSeconds(0.1f)) {
 					break;
 				}
-				o.Do();
+				foreach (var p in processors) {
+					p.Do(o);
+				}
 			}
 			Changed?.Invoke();
 		}

@@ -7,13 +7,11 @@ using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline.Operations
 {
-	public class ShiftGridSelection : IOperation
+	public class ShiftGridSelection : Operation
 	{
-		public bool IsChangingDocument => false;
-		public DateTime Timestamp { get; set; }
+		public override bool IsChangingDocument => false;
 
-		readonly IntVector2 offset;
-		List<GridSpanList> savedSpans;
+		public readonly IntVector2 Offset;
 
 		public static void Perform(IntVector2 offset)
 		{
@@ -22,53 +20,59 @@ namespace Tangerine.UI.Timeline.Operations
 
 		ShiftGridSelection(IntVector2 offset)
 		{
-			this.offset = offset;
+			Offset = offset;
 		}
 
-		public void Do()
+		public class Processor : OperationProcessor<ShiftGridSelection>
 		{
-			ShiftX(offset.X);
-			ShiftY();
-		}
+			class Backup { public List<GridSpanList> Spans; }
 
-		public void Undo()
-		{
-			UnshiftY();
-			ShiftX(-offset.X);
-		}
-
-		void ShiftX(int offset)
-		{
-			foreach (var row in Document.Current.Rows) {
-				var spans = row.Components.GetOrAdd<GridSpanList>();
-				for (int i = 0; i < spans.Count; i++) {
-					var s = spans[i];
-					s.A += offset;
-					s.B += offset;
-					spans[i] = s;
-				}
+			protected override void InternalDo(ShiftGridSelection op)
+			{
+				ShiftX(op.Offset.X);
+				ShiftY(op);
 			}
-		}
 
-		void ShiftY()
-		{
-			savedSpans = Document.Current.Rows.Select(r => r.Components.GetOrAdd<GridSpanList>()).ToList();
-			if (offset.Y != 0) {
+			protected override void InternalUndo(ShiftGridSelection op)
+			{
+				UnshiftY(op);
+				ShiftX(-op.Offset.X);
+			}
+
+			void ShiftX(int offset)
+			{
 				foreach (var row in Document.Current.Rows) {
-					var i = row.Index - offset.Y;
-					row.Components.Remove<GridSpanList>();
-					row.Components.Add(i >= 0 && i < Document.Current.Rows.Count ? savedSpans[i] : new GridSpanList());
+					var spans = row.Components.GetOrAdd<GridSpanList>();
+					for (int i = 0; i < spans.Count; i++) {
+						var s = spans[i];
+						s.A += offset;
+						s.B += offset;
+						spans[i] = s;
+					}
 				}
 			}
-		}
 
-		void UnshiftY()
-		{
-			foreach (var row in Document.Current.Rows) {
-				row.Components.Remove<GridSpanList>();
-				row.Components.Add(savedSpans[row.Index]);
+			void ShiftY(ShiftGridSelection op)
+			{
+				var b = new Backup { Spans = Document.Current.Rows.Select(r => r.Components.GetOrAdd<GridSpanList>()).ToList() };
+				op.Save(b);
+				if (op.Offset.Y != 0) {
+					foreach (var row in Document.Current.Rows) {
+						var i = row.Index - op.Offset.Y;
+						row.Components.Remove<GridSpanList>();
+						row.Components.Add(i >= 0 && i < Document.Current.Rows.Count ? b.Spans[i] : new GridSpanList());
+					}
+				}
 			}
-			savedSpans = null;
+
+			void UnshiftY(ShiftGridSelection op)
+			{
+				var b = op.Restore<Backup>();
+				foreach (var row in Document.Current.Rows) {
+					row.Components.Remove<GridSpanList>();
+					row.Components.Add(b.Spans[row.Index]);
+				}
+			}
 		}
 	}
 }

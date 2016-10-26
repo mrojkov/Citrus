@@ -7,33 +7,59 @@ namespace Tangerine.Core
 {
 	public interface IOperation
 	{
-		void Do();
-		void Undo();
 		DateTime Timestamp { get; set; }
 		bool IsChangingDocument { get; }
 	}
 
-	public class DelegateOperation : IOperation
+	public abstract class Operation : IOperation
 	{
-		readonly Action @do;
-		readonly Action undo;
-
-		public bool IsChangingDocument { get; private set; }
 		public DateTime Timestamp { get; set; }
+		public abstract bool IsChangingDocument { get; }
 
-		public static void Perform(Action @do, Action undo, bool hasModifications = false)
+		readonly Dictionary<Type, object> backup = new Dictionary<Type, object>();
+
+		public void Save<T>(T data)
 		{
-			Document.Current.History.Perform(new DelegateOperation(@do, undo, hasModifications));
+			backup.Add(typeof(T), data);
 		}
 
-		private DelegateOperation(Action @do, Action undo, bool hasModifications)
+		public T Restore<T>()
 		{
-			this.@do = @do;
-			this.undo = undo;
-			this.IsChangingDocument = hasModifications;
+			var r = backup[typeof(T)];
+			backup.Remove(typeof(T));
+			return (T)r;
+		}
+	}
+
+	public abstract class OperationProcessor<T> : IOperationProcessor where T: IOperation
+	{
+		public void Do(IOperation op)
+		{
+			if (op is T) {
+				InternalDo((T)op);
+			}
 		}
 
-		public void Do() => @do?.Invoke();
-		public void Undo() => undo?.Invoke();
+		public void Undo(IOperation op)
+		{
+			if (op is T) {
+				InternalUndo((T)op);
+			}
+		}
+
+		protected abstract void InternalDo(T op);
+		protected abstract void InternalUndo(T op);
+	}
+
+	public interface IOperationProcessor
+	{
+		void Do(IOperation operation);
+		void Undo(IOperation operation);
+	}
+
+	public abstract class SymmetricOperationProcessor : IOperationProcessor
+	{
+		public abstract void Do(IOperation op);
+		public void Undo(IOperation op) { Do(op); }
 	}
 }

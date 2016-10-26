@@ -7,11 +7,9 @@ using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline.Operations
 {
-	public class ClearGridSelection : IOperation
+	public class ClearGridSelection : Operation
 	{
-		public bool IsChangingDocument => false;
-		public DateTime Timestamp { get; set; }
-		List<GridSpanList> savedSpans;
+		public override bool IsChangingDocument => false;
 
 		public static void Perform()
 		{
@@ -20,21 +18,26 @@ namespace Tangerine.UI.Timeline.Operations
 
 		private ClearGridSelection() {}
 
-		public void Do()
+		public class Processor : OperationProcessor<ClearGridSelection>
 		{
-			savedSpans = Document.Current.Rows.Select(r => r.Components.GetOrAdd<GridSpanList>()).ToList();
-			foreach (var row in Document.Current.Rows) {
-				row.Components.Remove<GridSpanList>();
+			class Backup { public List<GridSpanList> Spans; }
+				
+			protected override void InternalDo(ClearGridSelection op)
+			{
+				op.Save(new Backup { Spans = Document.Current.Rows.Select(r => r.Components.GetOrAdd<GridSpanList>()).ToList() });
+				foreach (var row in Document.Current.Rows) {
+					row.Components.Remove<GridSpanList>();
+				}
 			}
-		}
 
-		public void Undo()
-		{
-			foreach (var row in Document.Current.Rows) {
-				row.Components.Remove<GridSpanList>();
-				row.Components.Add(savedSpans[row.Index]);
+			protected override void InternalUndo(ClearGridSelection op)
+			{
+				var s = op.Restore<Backup>().Spans;
+				foreach (var row in Document.Current.Rows) {
+					row.Components.Remove<GridSpanList>();
+					row.Components.Add(s[row.Index]);
+				}
 			}
-			savedSpans = null;
 		}
 	}
 }
