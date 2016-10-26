@@ -434,11 +434,11 @@ namespace Lime
 
 		private void InsertChar(char ch)
 		{
+			if (HasSelection())
+				DeleteSelection();
 			if (CaretPos.TextPos < 0 || CaretPos.TextPos > TextLength) return;
 			if (!EditorParams.IsAcceptableLength(TextLength + 1)) return;
 			if (ch != '\n' && !EditorParams.AllowNonDisplayableChars && !Text.CanDisplay(ch)) return;
-			if (HasSelection())
-				DeleteSelection();
 			if (EditorParams.UseSecureString) {
 				if (ch == '\n') return;
 				Password.InsertAt(CaretPos.TextPos, ch);
@@ -531,7 +531,8 @@ namespace Lime
 		private bool IsMultiline() => EditorParams.IsAcceptableLines(2);
 
 		private bool HasSelection() =>
-			SelectionStart.IsVisible && SelectionStart.IsValid && SelectionEnd.IsValid;
+			SelectionStart.IsVisible && SelectionStart.IsValid && SelectionEnd.IsValid &&
+			SelectionStart.TextPos != SelectionEnd.TextPos;
 
 		private void EnsureSelection()
 		{
@@ -602,7 +603,6 @@ namespace Lime
 
 		private void DeleteSelection()
 		{
-			if (!HasSelection()) return;
 			var r = GetSelectionRange();
 			RemoveText(r.Start, r.Length, r.Start);
 		}
