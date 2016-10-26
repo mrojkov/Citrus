@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security;
 
 namespace Lime
 {
@@ -218,6 +220,7 @@ namespace Lime
 		int MaxLines { get; set; }
 		float MaxHeight { get; set; }
 		int MaxUndoDepth { get; set; }
+		bool UseSecureString { get; set; }
 		char? PasswordChar { get; set; }
 		float PasswordLastCharShowTime { get; set; }
 		Predicate<string> AcceptText { get; set; }
@@ -236,6 +239,7 @@ namespace Lime
 		public int MaxLines { get; set; }
 		public float MaxHeight { get; set; }
 		public int MaxUndoDepth { get; set; } = 100;
+		public bool UseSecureString { get; set; }
 		public char? PasswordChar { get; set; }
 		public float PasswordLastCharShowTime { get; set; } =
 #if WIN || MAC || MONOMAC
@@ -272,6 +276,7 @@ namespace Lime
 		public readonly Widget InputWidget;
 		public readonly IText Text;
 		public readonly IEditorParams EditorParams;
+		public SecureString Password;
 
 		public ICaretPosition CaretPos { get; } = new CaretPosition();
 		public ICaretPosition SelectionStart { get; } = new CaretPosition();
@@ -305,10 +310,20 @@ namespace Lime
 			mc.Add(SelectionEnd);
 			Text.Caret = mc;
 
-			if (editorParams.PasswordChar != null) {
-				Text.TextProcessor += ProcessTextAsPassword;
-				container.Tasks.Add(TrackLastCharInput, this);
+			if (EditorParams.PasswordChar.HasValue) {
+				if (EditorParams.UseSecureString)
+					Text.TextProcessor += ProcessSecurePassword;
+				else
+					Text.TextProcessor += ProcessPlainPassword;
+				if (EditorParams.PasswordLastCharShowTime > 0)
+					container.Tasks.Add(TrackLastCharInput, this);
 			}
+			else if (EditorParams.UseSecureString) {
+				Text.TextProcessor += ProcessUnsecuredPassword;
+			}
+			if (EditorParams.UseSecureString)
+				Password = new SecureString();
+
 			container.Tasks.Add(HandleInputTask(), this);
 		}
 
@@ -350,9 +365,45 @@ namespace Lime
 			public static Key Cancel = Key.MapShortcut(Key.Escape);
 		}
 
+		bool IsTextReadable => !EditorParams.UseSecureString && !EditorParams.PasswordChar.HasValue;
+		private int TextLength => EditorParams.UseSecureString ? Password.Length : Text.Text.Length;
+
 		private string PasswordChars(int length) => new string(EditorParams.PasswordChar.Value, length);
 
-		private void ProcessTextAsPassword(ref string text)
+		private static char LastChar(SecureString s)
+		{
+			if (s.Length == 0)
+				return '\0';
+			var bstr = Marshal.SecureStringToBSTR(s);
+			try {
+				return (char)Marshal.ReadInt16(bstr, s.Length - 2);
+			} finally {
+				Marshal.ZeroFreeBSTR(bstr);
+			}
+		}
+
+		// This totally defeats the point of using SecureString.
+		private static string Unsecure(SecureString s)
+		{
+			if (s.Length == 0)
+				return "";
+			var bstr = Marshal.SecureStringToBSTR(s);
+			try {
+				return Marshal.PtrToStringBSTR(bstr);
+			} finally {
+				Marshal.ZeroFreeBSTR(bstr);
+			}
+		}
+
+		private void ProcessSecurePassword(ref string text)
+		{
+			text = isLastCharVisible ?
+				PasswordChars(Password.Length - 1) + LastChar(Password) : PasswordChars(Password.Length);
+		}
+
+		private void ProcessUnsecuredPassword(ref string text) { text = Unsecure(Password); }
+
+		private void ProcessPlainPassword(ref string text)
 		{
 			if (text != "")
 				text = isLastCharVisible ? PasswordChars(text.Length - 1) + text.Last() : PasswordChars(text.Length);
@@ -383,15 +434,20 @@ namespace Lime
 
 		private void InsertChar(char ch)
 		{
-			if (CaretPos.TextPos < 0 || CaretPos.TextPos > Text.Text.Length) return;
-			if (!EditorParams.IsAcceptableLength(Text.Text.Length + 1)) return;
+			if (CaretPos.TextPos < 0 || CaretPos.TextPos > TextLength) return;
+			if (!EditorParams.IsAcceptableLength(TextLength + 1)) return;
 			if (ch != '\n' && !EditorParams.AllowNonDisplayableChars && !Text.CanDisplay(ch)) return;
 			if (HasSelection())
 				DeleteSelection();
-			var newText = Text.Text.Insert(CaretPos.TextPos, ch.ToString());
-			if (EditorParams.AcceptText != null && !EditorParams.AcceptText(newText)) return;
-			if (EditorParams.MaxHeight > 0 && !EditorParams.IsAcceptableHeight(CalcTextHeight(newText))) return;
-			Text.Text = newText;
+			if (EditorParams.UseSecureString) {
+				if (ch == '\n') return;
+				Password.InsertAt(CaretPos.TextPos, ch);
+			} else {
+				var newText = Text.Text.Insert(CaretPos.TextPos, ch.ToString());
+				if (EditorParams.AcceptText != null && !EditorParams.AcceptText(newText)) return;
+				if (EditorParams.MaxHeight > 0 && !EditorParams.IsAcceptableHeight(CalcTextHeight(newText))) return;
+				Text.Text = newText;
+			}
 			CaretPos.TextPos++;
 		}
 
@@ -500,22 +556,36 @@ namespace Lime
 			SelectionEnd.AssignFrom(CaretPos);
 		}
 
-		private void ModifyText(Func<string, string> f, int newTextPos = -1)
+		private void RemoveText(int start, int length, int newTextPos = -1)
 		{
-			History.Add(MakeUndoItem());
-			HideSelection();
-			Text.Text = f(Text.Text);
+			if (EditorParams.UseSecureString) {
+				HideSelection();
+				for (int i = 0; i < length; ++i)
+					Password.RemoveAt(start);
+				Text.Invalidate();
+			} else {
+				History.Add(MakeUndoItem());
+				HideSelection();
+				Text.Text = Text.Text.Remove(start, length);
+			}
 			if (newTextPos >= 0)
 				CaretPos.TextPos = newTextPos;
 			CaretPos.InvalidatePreservingTextPos();
 		}
 
-		private void MaybeModifyText(Action a)
+		private void InsertText(string text)
 		{
-			var u = MakeUndoItem();
-			a();
-			if (Text.Text != u.Value)
-				History.Add(u);
+			if (EditorParams.UseSecureString) {
+				foreach (var ch in text)
+					InsertChar(ch);
+				Text.Invalidate();
+			} else {
+				var u = MakeUndoItem();
+				foreach (var ch in text)
+					InsertChar(ch);
+				if (Text.Text != u.Value)
+					History.Add(u);
+			}
 		}
 
 		private struct SelectionRange
@@ -534,7 +604,7 @@ namespace Lime
 		{
 			if (!HasSelection()) return;
 			var r = GetSelectionRange();
-			ModifyText(s => s.Remove(r.Start, r.Length), r.Start);
+			RemoveText(r.Start, r.Length, r.Start);
 		}
 
 		private void SelectWord()
@@ -552,6 +622,13 @@ namespace Lime
 				++SelectionEnd.TextPos;
 		}
 
+		public void SelectAll()
+		{
+			SelectionStart.IsVisible = SelectionEnd.IsVisible = true;
+			SelectionStart.TextPos = 0;
+			SelectionEnd.TextPos = int.MaxValue;
+		}
+
 		private void HandleKeys(string originalText)
 		{
 			try {
@@ -559,13 +636,13 @@ namespace Lime
 					MoveCaret(() => CaretPos.TextPos--);
 				if (WasKeyRepeated(Cmds.MoveCharNext))
 					MoveCaret(() => CaretPos.TextPos++);
-				if (WasKeyRepeated(Cmds.MoveWordPrev))
+				if (WasKeyRepeated(Cmds.MoveWordPrev) && IsTextReadable)
 					MoveCaret(() => CaretPos.TextPos = PreviousWord(Text.Text, CaretPos.TextPos));
-				if (WasKeyRepeated(Cmds.MoveWordNext))
+				if (WasKeyRepeated(Cmds.MoveWordNext) && IsTextReadable)
 					MoveCaret(() => CaretPos.TextPos = NextWord(Text.Text, CaretPos.TextPos));
-				if (IsMultiline() && WasKeyRepeated(Cmds.MoveLinePrev))
+				if (IsMultiline() && WasKeyRepeated(Cmds.MoveLinePrev) && IsTextReadable)
 					MoveCaret(() => CaretPos.Line--);
-				if (IsMultiline() && WasKeyRepeated(Cmds.MoveLineNext))
+				if (IsMultiline() && WasKeyRepeated(Cmds.MoveLineNext) && IsTextReadable)
 					MoveCaret(() => CaretPos.Line++);
 				if (WasKeyRepeated(Cmds.MoveLineStart))
 					MoveCaret(() => CaretPos.Col = 0);
@@ -576,40 +653,37 @@ namespace Lime
 					MoveCaretSelection(() => CaretPos.TextPos--);
 				if (WasKeyRepeated(Cmds.SelectCharNext))
 					MoveCaretSelection(() => CaretPos.TextPos++);
-				if (WasKeyRepeated(Cmds.SelectWordPrev))
+				if (WasKeyRepeated(Cmds.SelectWordPrev) && IsTextReadable)
 					MoveCaretSelection(() => CaretPos.TextPos = PreviousWord(Text.Text, CaretPos.TextPos));
-				if (WasKeyRepeated(Cmds.SelectWordNext))
+				if (WasKeyRepeated(Cmds.SelectWordNext) && IsTextReadable)
 					MoveCaretSelection(() => CaretPos.TextPos = NextWord(Text.Text, CaretPos.TextPos));
 				if (WasKeyRepeated(Cmds.SelectLineStart))
 					MoveCaretSelection(() => CaretPos.Col = 0);
 				if (WasKeyRepeated(Cmds.SelectLineEnd))
 					MoveCaretSelection(() => CaretPos.Col = int.MaxValue);
-				if (WasKeyRepeated(Cmds.SelectAll)) {
-					SelectionStart.IsVisible = SelectionEnd.IsVisible = true;
-					SelectionStart.TextPos = 0;
-					SelectionEnd.TextPos = int.MaxValue;
-				}
+				if (WasKeyRepeated(Cmds.SelectAll))
+					SelectAll();
 
 				if (WasKeyRepeated(Key.Commands.Delete)) {
 					if (HasSelection())
 						DeleteSelection();
 					else if (CaretPos.TextPos >= 0 && CaretPos.TextPos < Text.Text.Length)
-						ModifyText(s => s.Remove(CaretPos.TextPos, 1), CaretPos.TextPos);
+						RemoveText(CaretPos.TextPos, 1, CaretPos.TextPos);
 				}
-				if (WasKeyRepeated(Cmds.DeleteWordPrev)) {
+				if (WasKeyRepeated(Cmds.DeleteWordPrev) && IsTextReadable) {
 					var p = PreviousWord(Text.Text, CaretPos.TextPos);
 					if (p < CaretPos.TextPos)
-						ModifyText(s => s.Remove(p, CaretPos.TextPos - p), p);
+						RemoveText(p, CaretPos.TextPos - p, p);
 				}
-				if (WasKeyRepeated(Cmds.DeleteWordNext)) {
+				if (WasKeyRepeated(Cmds.DeleteWordNext) && IsTextReadable) {
 					var p = NextWord(Text.Text, CaretPos.TextPos);
 					if (p > CaretPos.TextPos)
-						ModifyText(s => s.Remove(CaretPos.TextPos, p - CaretPos.TextPos));
+						RemoveText(CaretPos.TextPos, p - CaretPos.TextPos);
 				}
 
 				if (WasKeyRepeated(Cmds.Submit)) {
 					if (EditorParams.IsAcceptableLines(Text.Text.Count(ch => ch == '\n') + 2)) {
-						MaybeModifyText(() => InsertChar('\n'));
+						InsertText("\n");
 					} else {
 						HideSelection();
 						History.Clear();
@@ -617,35 +691,32 @@ namespace Lime
 						InputWidget.RevokeFocus();
 					}
 				}
-				if (WasKeyRepeated(Cmds.Cancel)) {
+				if (WasKeyRepeated(Cmds.Cancel) && IsTextReadable) {
 					Text.Text = originalText;
 					HideSelection();
 					History.Clear();
 					input.ConsumeKey(Cmds.Cancel);
 					InputWidget.RevokeFocus();
 				}
-				if (input.WasKeyPressed(Key.Commands.Copy) && HasSelection()) {
+				if (input.WasKeyPressed(Key.Commands.Copy) && HasSelection() && IsTextReadable) {
 					var r = GetSelectionRange();
 					Clipboard.Text = Text.Text.Substring(r.Start, r.Length);
 				}
-				if (input.WasKeyPressed(Key.Commands.Cut) && HasSelection()) {
+				if (input.WasKeyPressed(Key.Commands.Cut) && HasSelection() && IsTextReadable) {
 					var r = GetSelectionRange();
 					Clipboard.Text = Text.Text.Substring(r.Start, r.Length);
 					DeleteSelection();
 				}
 				if (WasKeyRepeated(Key.Commands.Paste))
-					MaybeModifyText(() => {
-						foreach (var ch in Clipboard.Text)
-							InsertChar(ch);
-					});
+					InsertText(Clipboard.Text);
 				if (WasKeyRepeated(Key.Commands.Undo) && History.CanUndo())
 					ApplyUndoItem(History.Undo(MakeUndoItem()));
 				if (WasKeyRepeated(Key.Commands.Redo) && History.CanRedo())
 					ApplyUndoItem(History.Redo());
 			} finally {
 				var hs = HasSelection();
-				input.SetKeyEnabled(Key.Commands.Cut, hs);
-				input.SetKeyEnabled(Key.Commands.Copy, hs);
+				input.SetKeyEnabled(Key.Commands.Cut, hs && IsTextReadable);
+				input.SetKeyEnabled(Key.Commands.Copy, hs && IsTextReadable);
 				input.SetKeyEnabled(Key.Commands.Delete, hs);
 				input.SetKeyEnabled(Key.Commands.Paste, !string.IsNullOrEmpty(Clipboard.Text));
 				input.SetKeyEnabled(Key.Commands.Undo, History.CanUndo());
@@ -669,13 +740,13 @@ namespace Lime
 				if (ch == '\b') {
 					if (HasSelection())
 						DeleteSelection();
-					else if (CaretPos.TextPos > 0 && CaretPos.TextPos <= Text.Text.Length) {
-						ModifyText(s => s.Remove(CaretPos.TextPos - 1, 1), CaretPos.TextPos - 1);
+					else if (CaretPos.TextPos > 0 && CaretPos.TextPos <= TextLength) {
+						RemoveText(CaretPos.TextPos - 1, 1, CaretPos.TextPos - 1);
 						lastCharShowTimeLeft = 0f;
 					}
 				}
 				else if (ch >= ' ' && ch != '\u007f') { // Ignore control and 'delete' characters.
-					MaybeModifyText(() => InsertChar(ch));
+					InsertText(ch.ToString());
 					lastCharShowTimeLeft = EditorParams.PasswordLastCharShowTime;
 				}
 			}
@@ -684,7 +755,7 @@ namespace Lime
 		private IEnumerator<object> TrackLastCharInput()
 		{
 			while (true) {
-				if (Text.Text != "") {
+				if (TextLength > 0) {
 					lastCharShowTimeLeft -= Task.Current.Delta;
 					var shouldShowLastChar = lastCharShowTimeLeft > 0;
 					if (shouldShowLastChar != isLastCharVisible) {
@@ -730,9 +801,12 @@ namespace Lime
 					var p = input.MousePosition;
 					if (input.IsMousePressed()) {
 						CaretPos.WorldPos = DisplayWidget.LocalToWorldTransform.CalcInversed().TransformVector(p);
-						if (input.WasKeyPressed(Key.Mouse0DoubleClick))
-							SelectWord();
-						else if (input.WasMousePressed()) {
+						if (input.WasKeyPressed(Key.Mouse0DoubleClick)) {
+							if (IsTextReadable)
+								SelectWord();
+							else
+								SelectAll();
+						} else if (input.WasMousePressed()) {
 							lastClickPos = p;
 							HideSelection();
 							input.CaptureMouse();
