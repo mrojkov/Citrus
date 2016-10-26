@@ -47,10 +47,9 @@ namespace Lime
 			Main = main;
 		}
 
-		public static bool ValidateMainKey(Key key)
-		{
-			return key.IsPrintable() || key.IsTextNavigation() || key.IsTextEditing() || key.IsFunctional() || key == Key.Escape || key == Key.Tab;
-		}
+		public static bool ValidateMainKey(Key key) =>
+			key.IsPrintable() || key.IsTextNavigation() || key.IsTextEditing() || key.IsFunctional() ||
+			key == Key.Escape || key == Key.Tab || key == Key.Menu;
 
 		public static implicit operator Shortcut(Key main) { return new Shortcut(main); }
 

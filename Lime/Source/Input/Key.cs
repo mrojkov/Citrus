@@ -172,6 +172,7 @@ namespace Lime
 		public static readonly Key Control = New();
 		public static readonly Key Alt = New();
 		public static readonly Key Win = New();
+		public static readonly Key Menu = New();
 		public static readonly Key F1 = New();
 		public static readonly Key F2 = New();
 		public static readonly Key F3 = New();

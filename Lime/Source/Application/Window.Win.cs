@@ -590,6 +590,8 @@ namespace Lime
 					return Key.Control;
 				case Keys.ShiftKey:
 					return Key.Shift;
+				case Keys.Apps:
+					return Key.Menu;
 				case Keys.Tab:
 					return Key.Tab;
 				case Keys.Escape:
