@@ -682,8 +682,9 @@ namespace Lime
 				}
 
 				if (WasKeyRepeated(Cmds.Submit)) {
-					if (EditorParams.IsAcceptableLines(Text.Text.Count(ch => ch == '\n') + 2)) {
-						InsertText("\n");
+					if (IsMultiline()) {
+						if (EditorParams.IsAcceptableLines(Text.Text.Count(ch => ch == '\n') + 2))
+							InsertText("\n");
 					} else {
 						HideSelection();
 						History.Clear();
