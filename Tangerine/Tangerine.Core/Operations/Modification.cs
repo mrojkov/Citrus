@@ -188,7 +188,9 @@ namespace Tangerine.Core.Operations
 			protected override void InternalUndo(SetKeyframe op)
 			{
 				var b = op.Restore<Backup>();
-				b.Animator.Keys.Remove(op.Keyframe);
+				if (!b.Animator.Keys.Remove(op.Keyframe)) {
+					throw new InvalidOperationException();
+				}
 				if (b.Keyframe != null) {
 					b.Animator.Keys.AddOrdered(b.Keyframe);
 				}
