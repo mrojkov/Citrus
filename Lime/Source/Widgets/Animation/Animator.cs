@@ -32,10 +32,6 @@ namespace Lime
 		Type GetValueType();
 	}
 
-	/// <summary>
-	/// Аниматор. Анимирует значение свойства, основываясь на ключевых кадрах
-	/// </summary>
-	/// <typeparam name="T">Тип анимируемого свойства</typeparam>
 	public class Animator<T> : IAnimator
 	{
 		public IAnimable Owner { get; private set; }
@@ -44,17 +40,11 @@ namespace Lime
 
 		public bool IsTriggerable { get; set; }
 
-		/// <summary>
-		/// Название анимируемого свойства
-		/// </summary>
 		[YuzuMember]
 		public string TargetProperty { get; set; }
 
 		public Type GetValueType() { return typeof(T); }
 
-		/// <summary>
-		/// Коллекция ключей анимации
-		/// </summary>
 		[YuzuMember]
 		public KeyframeCollection<T> ReadonlyKeys = new KeyframeCollection<T>();
 
@@ -63,9 +53,6 @@ namespace Lime
 
 		public object UserData { get; set; }
 
-		/// <summary>
-		/// Возвращает коллекцию ключей анимации
-		/// </summary>
 		public KeyframeCollection<T> Keys
 		{
 			get {
@@ -98,9 +85,6 @@ namespace Lime
 			}
 		}
 
-		/// <summary>
-		/// Создает клон аниматора
-		/// </summary>
 		public IAnimator Clone()
 		{
 			var clone = (Animator<T>)MemberwiseClone();
@@ -114,10 +98,6 @@ namespace Lime
 
 		protected SetterDelegate Setter;
 
-		/// <summary>
-		/// Привязывает аниматор к свойству указанного объекта
-		/// </summary>
-		/// <param name="owner">Объект, которому будет назначен аниматор</param>
 		public void Bind(IAnimable owner)
 		{
 			this.Owner = owner;
@@ -140,9 +120,6 @@ namespace Lime
 			InterpolateAndSet(t, b, c);
 		}
 
-		/// <summary>
-		/// Удаляет все ключи анимации
-		/// </summary>
 		public void Clear()
 		{
 			currentKey = 0;
@@ -159,10 +136,6 @@ namespace Lime
 			}
 		}
 
-		/// <summary>
-		/// Изменяет значение анимируемого свойства объекта
-		/// </summary>
-		/// <param name="time">Время в миллисекундах</param>
 		public void Apply(int time)
 		{
 			int count = ReadonlyKeys.Count;
@@ -211,9 +184,6 @@ namespace Lime
 			}
 		}
 
-		/// <summary>
-		/// Возвращает номер кадра самого последнего ключа или 0, если ключей нет
-		/// </summary>
 		public int Duration {
 			get {
 				if (ReadonlyKeys.Count == 0)
