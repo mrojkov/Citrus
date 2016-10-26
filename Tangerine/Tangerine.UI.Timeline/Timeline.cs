@@ -108,7 +108,7 @@ namespace Tangerine.UI.Timeline
 
 		void CreateProcessors()
 		{
-			RootWidget.LateTasks.Add(new IProcessor[] {
+			RootWidget.LateTasks.Add(new ITaskProvider[] {
 				new OverviewScrollProcessor(),
 				new MouseWheelProcessor(),
 				new ResizeGridCurveViewProcessor(),
@@ -128,7 +128,7 @@ namespace Tangerine.UI.Timeline
 			});
 		}
 
-		class SelectFirstNodeOnDocumentOpeningProcessor : IProcessor
+		class SelectFirstNodeOnDocumentOpeningProcessor : ITaskProvider
 		{
 			public IEnumerator<object> Loop()
 			{
@@ -139,13 +139,13 @@ namespace Tangerine.UI.Timeline
 			}
 		}
 
-		IProcessor EnsureCurrentColumnVisibleOnContainerChange()
+		ITaskProvider EnsureCurrentColumnVisibleOnContainerChange()
 		{
 			return new Property<Node>(() => Document.Current.Container).
 				DistinctUntilChanged().Consume(_ => EnsureColumnVisible(Document.Current.AnimationFrame));
 		}
 
-		IProcessor PanelTitleUpdater()
+		ITaskProvider PanelTitleUpdater()
 		{
 			return new Property<Node>(() => Document.Current.Container).DistinctUntilChanged().Consume(_ => {
 				Panel.Title = "Timeline";

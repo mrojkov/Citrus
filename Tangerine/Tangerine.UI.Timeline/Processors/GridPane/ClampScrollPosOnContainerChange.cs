@@ -7,7 +7,7 @@ namespace Tangerine.UI.Timeline
 {
 	public class ClampScrollPosOnContainerChange
 	{
-		public IProcessor GetProcessor()
+		public ITaskProvider GetProcessor()
 		{
 			return new Property<Node>(() => Document.Current.Container).DistinctUntilChanged().Consume(_ => {
 				var rows = Document.Current.SelectedRows;

@@ -8,7 +8,7 @@ using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline
 {
-	public class ResizeGridCurveViewProcessor : Core.IProcessor
+	public class ResizeGridCurveViewProcessor : Core.ITaskProvider
 	{
 		const float separatorThickness = 10;
 

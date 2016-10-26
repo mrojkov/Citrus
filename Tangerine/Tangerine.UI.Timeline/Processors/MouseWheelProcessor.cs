@@ -4,7 +4,7 @@ using Lime;
 
 namespace Tangerine.UI.Timeline
 {
-	public class MouseWheelProcessor : Core.IProcessor
+	public class MouseWheelProcessor : Core.ITaskProvider
 	{
 		Timeline timeline => Timeline.Instance;
 

@@ -6,7 +6,7 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
 {
-	public class WASDProcessor : IProcessor
+	public class WASDProcessor : ITaskProvider
 	{
 		SceneView sv => SceneView.Instance;
 

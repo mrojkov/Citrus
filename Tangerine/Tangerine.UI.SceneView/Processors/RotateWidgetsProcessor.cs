@@ -6,7 +6,7 @@ using Tangerine.Core;
 	
 namespace Tangerine.UI.SceneView
 {
-	public class RotateWidgetsProcessor : IProcessor
+	public class RotateWidgetsProcessor : ITaskProvider
 	{
 		SceneView sv => SceneView.Instance;
 

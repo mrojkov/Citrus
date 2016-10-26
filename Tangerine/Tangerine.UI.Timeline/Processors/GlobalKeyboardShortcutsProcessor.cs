@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Tangerine.UI.Timeline
 {
-	public class GlobalKeyboardShortcutsProcessor : Core.IProcessor
+	public class GlobalKeyboardShortcutsProcessor : Core.ITaskProvider
 	{
 		readonly WidgetInput input;
 

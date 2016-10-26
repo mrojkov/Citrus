@@ -5,7 +5,7 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
 {
-	public class CreateWidgetProcessor : IProcessor
+	public class CreateWidgetProcessor : ITaskProvider
 	{
 		SceneView sv => SceneView.Instance;
 

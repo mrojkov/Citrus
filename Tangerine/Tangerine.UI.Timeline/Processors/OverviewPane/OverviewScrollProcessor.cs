@@ -4,7 +4,7 @@ using Lime;
 
 namespace Tangerine.UI.Timeline
 {
-	public class OverviewScrollProcessor : Core.IProcessor
+	public class OverviewScrollProcessor : Core.ITaskProvider
 	{
 		private Timeline timeline => Timeline.Instance;
 

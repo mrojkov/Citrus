@@ -4,23 +4,23 @@ using System.Collections.Generic;
 
 namespace Tangerine.Core
 {
-	public interface IProcessor
+	public interface ITaskProvider
 	{
 		IEnumerator<object> Loop();
 	}
 
 	public static class TaskListExtension
 	{
-		public static void Add(this TaskList taskList, params IProcessor[] collection)
+		public static void Add(this TaskList taskList, params ITaskProvider[] collection)
 		{
 			foreach (var i in collection) {
 				taskList.Add(i.Loop());
 			}
 		}
 
-		public static void Add(this TaskList taskList, IProcessor processor)
+		public static void Add(this TaskList taskList, ITaskProvider task)
 		{
-			taskList.Add(processor.Loop());
+			taskList.Add(task.Loop());
 		}
 	}
 }

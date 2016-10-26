@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Tangerine.UI.Timeline
 {
-	class ClampScrollPosProcessor : IProcessor
+	class ClampScrollPosProcessor : ITaskProvider
 	{
 		Timeline timeline => Timeline.Instance;
 

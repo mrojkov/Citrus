@@ -67,7 +67,7 @@
     <Compile Include="AnimatorEditorState.cs" />
     <Compile Include="Uid.cs" />
     <Compile Include="Operation.cs" />
-    <Compile Include="IProcessor.cs" />
+    <Compile Include="ITaskProvider.cs" />
     <Compile Include="HotStudioImport\HotAnimators.cs" />
     <Compile Include="HotStudioImport\HotFontImporter.cs" />
     <Compile Include="HotStudioImport\HotLexer.cs" />

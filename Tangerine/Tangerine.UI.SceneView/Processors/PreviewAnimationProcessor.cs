@@ -4,7 +4,7 @@ using Lime;
 
 namespace Tangerine.UI.SceneView
 {
-	public class PreviewAnimationProcessor : Core.IProcessor
+	public class PreviewAnimationProcessor : Core.ITaskProvider
 	{
 		readonly WidgetInput input;
 

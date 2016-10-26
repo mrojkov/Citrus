@@ -7,7 +7,7 @@ using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline
 {
-	public class SelectAndDragRowsProcessor : IProcessor
+	public class SelectAndDragRowsProcessor : ITaskProvider
 	{
 		int dragPosition;
 

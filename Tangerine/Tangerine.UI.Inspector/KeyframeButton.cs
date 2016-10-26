@@ -32,7 +32,7 @@ namespace Tangerine.UI.Inspector
 		}
 	}	
 
-	class KeyframeButtonBinding : IProcessor
+	class KeyframeButtonBinding : ITaskProvider
 	{
 		readonly PropertyEditorContext context;
 		readonly KeyframeButton button;

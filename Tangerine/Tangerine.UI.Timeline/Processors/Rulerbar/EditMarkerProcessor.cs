@@ -6,7 +6,7 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.Timeline
 {
-	public class EditMarkerProcessor : IProcessor
+	public class EditMarkerProcessor : ITaskProvider
 	{
 		Timeline timeline => Timeline.Instance;
 

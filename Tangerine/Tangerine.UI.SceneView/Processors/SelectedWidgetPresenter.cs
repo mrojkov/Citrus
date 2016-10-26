@@ -5,7 +5,7 @@ using Lime;
 
 namespace Tangerine.UI.SceneView
 {
-	class SelectedWidgetsPresenter : Core.IProcessor
+	class SelectedWidgetsPresenter : Core.ITaskProvider
 	{
 		public IEnumerator<object> Loop()
 		{

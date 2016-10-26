@@ -4,7 +4,7 @@ using Lime;
 
 namespace Tangerine.UI.Timeline
 {
-	class RollMouseScrollProcessor : Core.IProcessor
+	class RollMouseScrollProcessor : Core.ITaskProvider
 	{
 		Timeline timeline => Timeline.Instance;
 

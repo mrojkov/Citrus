@@ -428,7 +428,7 @@ namespace Tangerine.Core
 			}
 		}
 
-		public class Consumer<T> : IProcessor
+		public class Consumer<T> : ITaskProvider
 		{
 			readonly IDataflow<T> dataflow;
 			readonly Action<T> action;

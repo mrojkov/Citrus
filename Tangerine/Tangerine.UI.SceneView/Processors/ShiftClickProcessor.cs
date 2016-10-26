@@ -5,7 +5,7 @@ using Lime;
 
 namespace Tangerine.UI.SceneView
 {
-	public class ShiftClickProcessor : Core.IProcessor
+	public class ShiftClickProcessor : Core.ITaskProvider
 	{
 		public IEnumerator<object> Loop()
 		{

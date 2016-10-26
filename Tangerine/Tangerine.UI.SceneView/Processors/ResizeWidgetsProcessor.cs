@@ -6,7 +6,7 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
 {
-	public class ResizeWidgetsProcessor : IProcessor
+	public class ResizeWidgetsProcessor : ITaskProvider
 	{
 		SceneView sv => SceneView.Instance;
 

@@ -4,7 +4,7 @@ using Lime;
 
 namespace Tangerine.UI.SceneView
 {
-	public class SceneViewDecorator : Core.IProcessor
+	public class SceneViewDecorator : Core.ITaskProvider
 	{
 		SceneView sv => SceneView.Instance;
 

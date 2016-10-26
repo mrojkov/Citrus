@@ -11,7 +11,7 @@ namespace Tangerine.UI.SceneView
 		public bool InProgress;
 	}
 
-	public class ExpositionProcessor : Core.IProcessor
+	public class ExpositionProcessor : Core.ITaskProvider
 	{
 		public static readonly Key Key = KeyBindings.SceneViewKeys.SceneExposition;
 		public static readonly Key MultiSelectKey = KeyBindings.SceneViewKeys.SceneExpositionMultiSelect;

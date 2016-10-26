@@ -5,7 +5,7 @@ using Lime;
 
 namespace Tangerine.UI.SceneView
 {
-	class MouseScrollProcessor : Core.IProcessor
+	class MouseScrollProcessor : Core.ITaskProvider
 	{
 		SceneView sv => SceneView.Instance;
 

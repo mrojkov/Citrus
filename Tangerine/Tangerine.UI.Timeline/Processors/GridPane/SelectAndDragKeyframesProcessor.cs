@@ -7,7 +7,7 @@ using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline
 {
-	public class SelectAndDragKeyframesProcessor : Core.IProcessor
+	public class SelectAndDragKeyframesProcessor : Core.ITaskProvider
 	{
 		IntRectangle rect;
 

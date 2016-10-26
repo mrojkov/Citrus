@@ -5,7 +5,7 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.Timeline
 {
-	public class RulerMouseScrollProcessor : IProcessor
+	public class RulerMouseScrollProcessor : ITaskProvider
 	{
 		Timeline timeline => Timeline.Instance;
 

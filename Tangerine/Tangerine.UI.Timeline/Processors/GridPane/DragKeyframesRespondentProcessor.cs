@@ -8,7 +8,7 @@ using Tangerine.UI.Timeline.Components;
 
 namespace Tangerine.UI.Timeline
 {
-	public class DragKeyframesRespondentProcessor : IProcessor
+	public class DragKeyframesRespondentProcessor : ITaskProvider
 	{
 		public IEnumerator<object> Loop()
 		{

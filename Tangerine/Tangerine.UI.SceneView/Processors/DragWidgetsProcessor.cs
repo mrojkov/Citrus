@@ -6,7 +6,7 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
 {
-	public class DragWidgetsProcessor : IProcessor
+	public class DragWidgetsProcessor : ITaskProvider
 	{
 		SceneView sv => SceneView.Instance;
 

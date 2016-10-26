@@ -6,7 +6,7 @@ using Tangerine.Core;
 
 namespace Tangerine.UI.SceneView
 {
-	class MouseSelectionProcessor : IProcessor
+	class MouseSelectionProcessor : ITaskProvider
 	{
 		public IEnumerator<object> Loop()
 		{

@@ -90,7 +90,7 @@ namespace Tangerine.UI.Inspector
 			PropertyEditorRegistry.Add(new PropertyEditorRegistryItem(condition, builder));
 		}
 
-		IProcessor RebuildInspectorWhenSelectedRowsChanged()
+		ITaskProvider RebuildInspectorWhenSelectedRowsChanged()
 		{
 			var builder = new InspectorBuilder();
 			return new Property<int>(() => Document.Current.SelectedRows.Version).DistinctUntilChanged().Consume(_ => {
