@@ -7,7 +7,7 @@ namespace Lime
 {
 	public sealed class TriggerAttribute : Attribute {}
 
-	public sealed class AnimatorCollection : ICollection<IAnimator>
+	public sealed class AnimatorCollection : ICollection<IAnimator>, IDisposable
 	{
 		static List<IAnimator> emptyList = new List<IAnimator>();
 		static IAnimator[] emptyArray = new IAnimator[0];
@@ -20,6 +20,13 @@ namespace Lime
 		public AnimatorCollection(Node owner)
 		{
 			this.owner = owner;
+		}
+
+		public void Dispose()
+		{
+			foreach (var a in this) {
+				a.Dispose();
+			}
 		}
 
 		public AnimatorCollection(Node owner, int capacity)

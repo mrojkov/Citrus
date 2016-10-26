@@ -299,6 +299,8 @@ namespace Lime
 				n.Dispose();
 			}
 			Nodes.Clear();
+			Animators.Dispose();
+			Animators.Clear();
 		}
 
 		/// <summary>
