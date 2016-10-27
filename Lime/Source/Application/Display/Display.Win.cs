@@ -1,15 +1,22 @@
 ﻿#if WIN
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace Lime
 {
 	internal class Display : IDisplay
 	{
-		public readonly Screen Screen;
+		private Screen Screen;
+		public static List<Display> Displays = new List<Display>();
 
-		public Display(Screen screen)
+		public static Display GetDisplay(Screen screen)
 		{
-			Screen = screen;
+			foreach (var d in Displays)
+				if (d.Screen.Equals(screen))
+					return d;
+			var nd = new Display { Screen = screen };
+			Displays.Add(nd);
+			return nd;
 		}
 
 		public Vector2 Size => new Vector2(

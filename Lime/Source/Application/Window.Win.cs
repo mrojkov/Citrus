@@ -281,17 +281,7 @@ namespace Lime
 		/// <summary>
 		/// Gets the display device containing the largest portion of this window.
 		/// </summary>
-		public IDisplay Display
-		{
-			get
-			{
-				var screen = Screen.FromControl(form);
-				if (display == null || display.Screen != screen) {
-					display = new Display(screen);
-				}
-				return display;
-			}
-		}
+		public IDisplay Display => Lime.Display.GetDisplay(Screen.FromControl(form));
 
 		private static float CalcPixelScale(float Dpi)
 		{
