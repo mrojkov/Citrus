@@ -12,9 +12,9 @@ namespace Lime
 		void Popup();
 
 		/// <summary>
-		/// Shows the menu at the given position relative to the window left top corner.
+		/// Shows the menu at the given client position of the window.
 		/// </summary>
-		/// <param name="position">The location in the window coordinate system to display the menu item.</param>
+		/// <param name="position">The location in the window client coordinate system to display the menu item.</param>
 		/// <param name="command">The menu item to be positioned at the specified location in the window.</param>
 		void Popup(IWindow window, Vector2 position, float minimumWidth, ICommand command);
 
