@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
 
@@ -125,7 +124,7 @@ namespace Lime
 
 		public static void InvalidateWindows()
 		{
-			foreach (var window in Application.Windows) {
+			foreach (var window in Windows) {
 				window.Invalidate();
 			}
 		}
@@ -144,9 +143,7 @@ namespace Lime
 			{
 				if (supportedDeviceOrientations != value) {
 					supportedDeviceOrientations = value;
-					if (SupportedDeviceOrientationsChanged != null) {
-						SupportedDeviceOrientationsChanged(value);
-					}
+					SupportedDeviceOrientationsChanged?.Invoke(value);
 				}
 			}
 		}
@@ -155,7 +152,7 @@ namespace Lime
 		/// Gets the current device orientation. On desktop platforms it is always DeviceOrientation.LandscapeLeft.
 		/// </summary>
 #if WIN || MAC || UNITY
-		public static DeviceOrientation CurrentDeviceOrientation { get { return DeviceOrientation.LandscapeLeft; } }
+		public static DeviceOrientation CurrentDeviceOrientation => DeviceOrientation.LandscapeLeft;
 #else
 		public static DeviceOrientation CurrentDeviceOrientation { get; internal set; }
 #endif
@@ -166,14 +163,7 @@ namespace Lime
 			get { return new Vector2((float)AppKit.NSEvent.CurrentMouseLocation.X, (float)AppKit.NSEvent.CurrentMouseLocation.Y); }
 		}
 #elif WIN
-		public static Vector2 DesktopMousePosition
-		{
-			get
-			{
-				var p = Cursor.Position;
-				return new Vector2(p.X, p.Y);
-			}
-		}
+		public static Vector2 DesktopMousePosition => SDToLime.Convert(Cursor.Position, 1f);
 #endif
 
 		// Specifies the lowest possible 1/(time delta) passed to Window.Updating.
@@ -188,12 +178,12 @@ namespace Lime
 		/// <summary>
 		/// Gets the currently running thread.
 		/// </summary>
-		public static Thread CurrentThread { get { return Thread.CurrentThread; } }
+		public static Thread CurrentThread => Thread.CurrentThread;
 
 		/// <summary>
 		/// Checks whether a thread is the main thread.
 		/// </summary>
-		public static bool IsMain(this Thread thread) { return thread == MainThread; }
+		public static bool IsMain(this Thread thread) => thread == MainThread;
 
 		/// <summary>
 		/// Software (on-screen) keyboard for mobile devices.
