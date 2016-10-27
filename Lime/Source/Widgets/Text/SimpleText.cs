@@ -295,7 +295,7 @@ namespace Lime
 				caret.EmptyText(pos);
 				return Rectangle.Empty;
 			}
-			caret.ClampTextPos(Text.Length);
+			caret.ClampTextPos(DisplayText.Length);
 			caret.ClampLine(lines.Count);
 			Rectangle rect = new Rectangle(Vector2.PositiveInfinity, Vector2.NegativeInfinity);
 			int i = 0;
