@@ -179,11 +179,11 @@ namespace Lime
 		private float titleBarHeight;
 		private bool shouldFixFullscreen;
 
-		public Display Display
+		public IDisplay Display
 		{
 			get
 			{
-				if (display == null || window.Screen != display.NSScreen) {
+				if (display == null || window.Screen != display.NativeScreen) {
 					display = new Display(window.Screen);
 				}
 				return display;

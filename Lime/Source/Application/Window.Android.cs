@@ -85,7 +85,7 @@ namespace Lime
 		/// <summary>
 		/// Gets the default display device.
 		/// </summary>
-		public Display Display
+		public IDisplay Display
 		{
 			get { return display; }
 		}

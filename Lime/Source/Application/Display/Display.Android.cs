@@ -4,39 +4,22 @@ using AndroidDisplay = Android.Views.Display;
 
 namespace Lime
 {
-	/// <summary>
-	/// Wraps a native <see cref="Android.Views.Display"/> class.
-	/// </summary>
-	public class Display : IDisplay
+	internal class Display : IDisplay
 	{
-		/// <summary>
-		/// Initializes a new instance of <see cref="Display"/> class from native screen.
-		/// </summary>
-		/// <param name="screen">The native screen.</param>
-		public Display(AndroidDisplay screen)
+		private readonly AndroidDisplay nativeDisplay;
+
+		public Display(AndroidDisplay nativeDisplay)
 		{
-			AndroidScreen = screen;
+			this.nativeDisplay = nativeDisplay;
 		}
 
-		/// <summary>
-		/// Gets the native Android Display.
-		/// </summary>
-		public AndroidDisplay AndroidScreen
-		{
-			get;
-			private set;
-		}
-
-		/// <summary>
-		/// Gets the real size of display in virtual pixels.
-		/// </summary>
-		public Size Size
+		public Vector2 Size
 		{
 			get
 			{
 				var size = new Point();
-				AndroidScreen.GetRealSize(size);
-				return new Size((int)(size.X / Window.Current.PixelScale), (int)(size.Y / Window.Current.PixelScale));
+				nativeDisplay.GetRealSize(size);
+				return new Vector2(size.X / Window.Current.PixelScale, size.Y / Window.Current.PixelScale);
 			}
 		}
 	}

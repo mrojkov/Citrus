@@ -281,13 +281,13 @@ namespace Lime
 		/// <summary>
 		/// Gets the display device containing the largest portion of this window.
 		/// </summary>
-		public Display Display
+		public IDisplay Display
 		{
 			get
 			{
-				Screen screen = Screen.FromControl(form);
-				if (display == null || display.WinFormsScreen != screen) {
-					display = new Display(Screen.FromControl(form));
+				var screen = Screen.FromControl(form);
+				if (display == null || display.Screen != screen) {
+					display = new Display(screen);
 				}
 				return display;
 			}

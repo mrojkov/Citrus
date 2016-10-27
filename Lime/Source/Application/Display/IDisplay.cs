@@ -4,11 +4,11 @@ namespace Lime
 	/// <summary>
 	/// Defines a display device.
 	/// </summary>
-	interface IDisplay
+	public interface IDisplay
 	{
 		/// <summary>
-		/// Gets the size of the screen.
+		/// Gets the size of display in virtual pixels.
 		/// </summary>
-		Size Size { get; }
+		Vector2 Size { get; }
 	}
 }
