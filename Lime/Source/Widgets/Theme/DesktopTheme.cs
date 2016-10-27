@@ -128,7 +128,7 @@ namespace Lime
 			text.Font = new SerializableFont();
 			text.FontHeight = Metrics.TextHeight;
 			text.HAlignment = HAlignment.Left;
-			text.VAlignment = VAlignment.Center;
+			text.VAlignment = VAlignment.Top;
 			text.OverflowMode = TextOverflowMode.Ellipsis;
 			text.TrimWhitespaces = true;
 			text.Size = text.MinSize;
@@ -152,7 +152,7 @@ namespace Lime
 			tw.OverflowMode = TextOverflowMode.Ignore;
 			tw.Padding = Metrics.ControlsPadding;
 
-			var editorParams = new EditorParams { MaxLength = 100, MaxLines = 1, Scroll = eb.Scroll };
+			var editorParams = new EditorParams { MaxLines = 1, Scroll = eb.Scroll };
 			eb.Editor = new Editor(tw, editorParams, eb);
 			new CaretDisplay(
 				tw, eb.Editor.CaretPos, new CaretParams { CaretPresenter = new VerticalLineCaret() });
