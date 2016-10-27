@@ -106,7 +106,11 @@ namespace Tangerine.Core
 
 		public void AddSavePoint()
 		{
-			savePos = headPos;
+			for (savePos = headPos; savePos > 0; savePos--) {
+				if (operations[savePos - 1].IsChangingDocument) {
+					break;
+				}
+			}
 			RefreshModifiedStatus();
 		}
 
